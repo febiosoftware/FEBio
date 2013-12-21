@@ -1,79 +1,5 @@
 #pragma once
-#include "FEBiphasicSolute.h"
-
-//-----------------------------------------------------------------------------
-// Monovalent salt (cation + anion)
-
-class FESaltMaterialPoint : public FEMaterialPoint
-{
-public:
-	FESaltMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
-	
-	FEMaterialPoint* Copy()
-	{
-		FESaltMaterialPoint* pt = new FESaltMaterialPoint(*this);
-		if (m_pt) pt->m_pt = m_pt->Copy();
-		return pt;
-	}
-
-	void ShallowCopy(DumpStream& dmp, bool bsave)
-	{
-		if (bsave)
-		{
-			dmp << m_c[0] << m_gradc[0] << m_j[0] << m_ca[0];
-			dmp << m_c[1] << m_gradc[1] << m_j[1] << m_ca[1];
-			dmp << m_psi << m_Ie << m_cF;
-		}
-		else
-		{
-			dmp >> m_c[0] >> m_gradc[0] >> m_j[0] >> m_ca[0];
-			dmp >> m_c[1] >> m_gradc[1] >> m_j[1] >> m_ca[1];
-			dmp >> m_psi >> m_Ie >> m_cF;
-		}
-		
-		if (m_pt) m_pt->ShallowCopy(dmp, bsave);
-	}
-
-	void Serialize(DumpFile& ar)
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_c[0] << m_gradc[0] << m_j[0] << m_ca[0];
-			ar << m_c[1] << m_gradc[1] << m_j[1] << m_ca[1];
-		}
-		else
-		{
-			ar >> m_c[0] >> m_gradc[0] >> m_j[0] >> m_ca[0];
-			ar >> m_c[1] >> m_gradc[1] >> m_j[1] >> m_ca[1];
-		}
-		
-		if (m_pt) m_pt->Serialize(ar);
-	}
-	
-	void Init(bool bflag)
-	{
-		if (bflag)
-		{
-			m_c[0] = m_c[1] = 0;
-			m_ca[0] = m_ca[1] = 0;
-			m_psi = m_cF = 0;
-			m_gradc[0] = m_gradc[1] = vec3d(0,0,0);
-			m_j[0] = m_j[1] = m_Ie = vec3d(0,0,0);
-		}
-		
-		if (m_pt) m_pt->Init(bflag);
-	}
-	
-public:
-	// salt material data
-	double		m_c[2];		//!< effective concentration (0=cation, 1=anion)
-	vec3d		m_gradc[2];	//!< spatial gradient of concentration
-	vec3d		m_j[2];		//!< solute molar flux
-	double		m_ca[2];	//!< actual solute concentration
-	double		m_psi;		//!< electric potential
-	vec3d		m_Ie;		//!< current density
-	double		m_cF;		//!< fixed charge density in current configuration
-};
+#include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for triphasic materials.
@@ -88,7 +14,7 @@ public:
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() 
 	{ 
-		return new FESaltMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
+		return new FESolutesMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
 	}
 
 	// Get the elastic component (overridden from FEMaterial)

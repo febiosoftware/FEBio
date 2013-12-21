@@ -26,11 +26,11 @@ void FEBiphasicMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
 	if (bsave)
 	{
-		dmp << m_p << m_gradp << m_w << m_pa << m_phi0 << m_phi0p << m_phi0hat << m_phi0hatp;
+		dmp << m_p << m_gradp << m_w << m_pa << m_phi0 << m_phi0p << m_phi0hat;
 	}
 	else
 	{
-		dmp >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p >> m_phi0hat >> m_phi0hatp;
+		dmp >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p >> m_phi0hat;
 	}
 
 	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
@@ -41,11 +41,11 @@ void FEBiphasicMaterialPoint::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_p << m_gradp << m_w << m_pa << m_phi0 << m_phi0p << m_phi0hat << m_phi0hatp;
+		ar << m_p << m_gradp << m_w << m_pa << m_phi0 << m_phi0p << m_phi0hat;
 	}
 	else
 	{
-		ar >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p >> m_phi0hat >> m_phi0hatp;
+		ar >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p >> m_phi0hat;
 	}
 
 	if (m_pt) m_pt->Serialize(ar);
@@ -60,7 +60,7 @@ void FEBiphasicMaterialPoint::Init(bool bflag)
 		m_gradp = vec3d(0,0,0);
 		m_w = vec3d(0,0,0);
 		m_phi0 = m_phi0p = 0;
-		m_phi0hat = m_phi0hatp = 0;
+		m_phi0hat = 0;
 	}
 
 	if (m_pt) m_pt->Init(bflag);
@@ -350,34 +350,4 @@ FEParam* FEBiphasic::GetParameter(const ParamString& s)
 	if      (s == "solid"       ) return m_pSolid->GetParameter(s.next());
 	else if (s == "permeability") return m_pPerm ->GetParameter(s.next());
 	else return 0;
-}
-
-//-----------------------------------------------------------------------------
-// Material parameters for FEHydraulicPermeability
-void FEHydraulicPermeability::Init()
-{
-	FEMaterial::Init();
-}
-
-//-----------------------------------------------------------------------------
-// Derivative of permeability w.r.t. solute concentration at material point
-// Set this to zero by default because poroelasticity problems do not require it
-mat3ds FEHydraulicPermeability::Tangent_Permeability_Concentration(FEMaterialPoint& pt, const int isol)
-{
-	return mat3ds(0,0,0,0,0,0);
-}
-
-//-----------------------------------------------------------------------------
-// Material parameters for FESolventSupply
-void FESolventSupply::Init()
-{
-	FEMaterial::Init();
-}
-
-//-----------------------------------------------------------------------------
-// Derivative of supply w.r.t. solute concentration at material point
-// Set this to zero by default because biphasic problems do not require it
-double FESolventSupply::Tangent_Supply_Concentration(FEMaterialPoint& pt, const int isol)
-{
-	return 0;
 }

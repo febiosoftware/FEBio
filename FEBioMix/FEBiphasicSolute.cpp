@@ -3,67 +3,6 @@
 #include "FECore/febio.h"
 
 //=============================================================================
-//                 S O L U T E M A T E R I A L P O I N T
-//=============================================================================
-
-//-----------------------------------------------------------------------------
-FESoluteMaterialPoint::FESoluteMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt)
-{
-}
-
-//-----------------------------------------------------------------------------
-FEMaterialPoint* FESoluteMaterialPoint::Copy()
-{
-	FESoluteMaterialPoint* pt = new FESoluteMaterialPoint(*this);
-	if (m_pt) pt->m_pt = m_pt->Copy();
-	return pt;
-}
-
-//-----------------------------------------------------------------------------
-void FESoluteMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		dmp << m_c << m_gradc << m_j << m_ca << m_crc << m_crcp << m_crchat << m_crchatp;
-	}
-	else
-	{
-		dmp >> m_c >> m_gradc >> m_j >> m_ca >> m_crc >> m_crcp >> m_crchat >> m_crchatp;
-	}
-	
-	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
-}
-
-//-----------------------------------------------------------------------------
-void FESoluteMaterialPoint::Serialize(DumpFile& ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << m_c << m_gradc << m_j << m_ca << m_crc << m_crcp << m_crchat << m_crchatp;
-	}
-	else
-	{
-		ar >> m_c >> m_gradc >> m_j >> m_ca >> m_crc >> m_crcp >> m_crchat >> m_crchatp;
-	}
-	
-	if (m_pt) m_pt->Serialize(ar);
-}
-
-//-----------------------------------------------------------------------------
-void FESoluteMaterialPoint::Init(bool bflag)
-{
-	if (bflag)
-	{
-		m_c = m_ca = 0;
-		m_gradc = vec3d(0,0,0);
-		m_j = vec3d(0,0,0);
-		m_crc = m_crcp = m_crchat = m_crchat = m_crchatp = 0;
-	}
-		
-	if (m_pt) m_pt->Init(bflag);
-}
-
-//=============================================================================
 //                 B I P H A S I C S O L U T E
 //=============================================================================
 
@@ -95,7 +34,7 @@ FEBiphasicSolute::FEBiphasicSolute(FEModel* pfem) : FEMaterial(pfem)
 //-----------------------------------------------------------------------------
 FEMaterialPoint* FEBiphasicSolute::CreateMaterialPointData() 
 { 
-	return new FESoluteMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
+	return new FESolutesMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
 }
 
 //-----------------------------------------------------------------------------
@@ -168,7 +107,7 @@ tens4ds FEBiphasicSolute::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& ept = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-	FESoluteMaterialPoint& spt = *mp.ExtractData<FESoluteMaterialPoint>();
+	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
 	
 	// call solid tangent routine
 	tens4ds C = m_pSolid->Tangent(mp);
@@ -178,7 +117,7 @@ tens4ds FEBiphasicSolute::Tangent(FEMaterialPoint& mp)
 	
 	// fluid pressure and solute concentration
 	double p = ppt.m_pa;
-	double c = spt.m_c;
+	double c = spt.m_c[0];
 	
 	// solubility and its derivative w.r.t. strain
 	double kappa = m_pSolute->m_pSolub->Solubility(mp);
@@ -215,7 +154,7 @@ tens4ds FEBiphasicSolute::Tangent(FEMaterialPoint& mp)
 vec3d FEBiphasicSolute::FluidFlux(FEMaterialPoint& pt)
 {
 	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-	FESoluteMaterialPoint& spt = *pt.ExtractData<FESoluteMaterialPoint>();
+	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	
 	// fluid volume fraction (porosity) in current configuration
 	double phiw = Porosity(pt);
@@ -224,10 +163,10 @@ vec3d FEBiphasicSolute::FluidFlux(FEMaterialPoint& pt)
 	vec3d gradp = ppt.m_gradp;
 	
 	// concentration
-	double c = spt.m_c;
+	double c = spt.m_c[0];
 	
 	// concentration gradient
-	vec3d gradc = spt.m_gradc;
+	vec3d gradc = spt.m_gradc[0];
 	
 	// hydraulic permeability
 	mat3ds kt = m_pPerm->Permeability(pt);
@@ -259,20 +198,16 @@ vec3d FEBiphasicSolute::FluidFlux(FEMaterialPoint& pt)
 
 vec3d FEBiphasicSolute::SoluteFlux(FEMaterialPoint& pt)
 {
-	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-	FESoluteMaterialPoint& spt = *pt.ExtractData<FESoluteMaterialPoint>();
+	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	
 	// fluid volume fraction (porosity) in current configuration
 	double phiw = Porosity(pt);
 	
-	// pressure gradient
-	vec3d gradp = ppt.m_gradp;
-	
 	// concentration
-	double c = spt.m_c;
+	double c = spt.m_c[0];
 	
 	// concentration gradient
-	vec3d gradc = spt.m_gradc;
+	vec3d gradc = spt.m_gradc[0];
 	
 	// solute diffusivity in mixture
 	mat3ds D = m_pSolute->m_pDiff->Diffusivity(pt);
@@ -297,13 +232,13 @@ vec3d FEBiphasicSolute::SoluteFlux(FEMaterialPoint& pt)
 double FEBiphasicSolute::Pressure(FEMaterialPoint& pt)
 {
 	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-	FESoluteMaterialPoint& spt = *pt.ExtractData<FESoluteMaterialPoint>();
+	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	
 	// effective pressure
 	double p = ppt.m_p;
 	
 	// effective concentration
-	double c = spt.m_c;
+	double c = spt.m_c[0];
 	
 	// osmotic coefficient
 	double osmc = m_pOsmC->OsmoticCoefficient(pt);
@@ -321,13 +256,13 @@ double FEBiphasicSolute::Pressure(FEMaterialPoint& pt)
 //! actual concentration
 double FEBiphasicSolute::Concentration(FEMaterialPoint& pt)
 {
-	FESoluteMaterialPoint& spt = *pt.ExtractData<FESoluteMaterialPoint>();
+	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	
 	// solubility
 	double kappa = m_pSolute->m_pSolub->Solubility(pt);
 	
 	// actual concentration = solubility * effective concentration
-	double ca = kappa*spt.m_c;
+	double ca = kappa*spt.m_c[0];
 	
 	return ca;
 }

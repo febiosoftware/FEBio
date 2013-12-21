@@ -1,5 +1,7 @@
 #pragma once
 #include "FEBioMech/FEElasticMaterial.h"
+#include "FEHydraulicPermeability.h"
+#include "FESolventSupply.h"
 
 //-----------------------------------------------------------------------------
 //! Biphasic material point class.
@@ -36,54 +38,6 @@ public:
 	double		m_phi0;		//!< referential solid volume fraction at current time
 	double		m_phi0p;	//!< referential solid volume fraction at previous time
 	double		m_phi0hat;	//!< referential solid volume fraction supply at current time
-	double		m_phi0hatp;	//!< m_phi0hat at previous time
-};
-
-//-----------------------------------------------------------------------------
-//! Base class for hydraulic permeability of porous materials.
-//! These materials need to define the permeability and tangent permeability functions.
-//!
-class FEHydraulicPermeability : public FEMaterial
-{
-public:
-	FEHydraulicPermeability(FEModel* pfem) : FEMaterial(pfem) {}
-	virtual ~FEHydraulicPermeability(){}
-		
-	//! hydraulic permeability
-	virtual mat3ds Permeability(FEMaterialPoint& pt) = 0;
-		
-	//! tangent of hydraulic permeability with respect to strain
-	virtual tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp) = 0;
-		
-	//! tangent of hydraulic permeability with respect to concentration
-	mat3ds Tangent_Permeability_Concentration(FEMaterialPoint& mp, const int isol);
-		
-	void Init();
-};
-
-//-----------------------------------------------------------------------------
-//! Base class for solvent supply.
-//! These materials need to define the supply and tangent supply functions.
-//!
-class FESolventSupply : public FEMaterial
-{
-public:
-	FESolventSupply(FEModel* pfem) : FEMaterial(pfem) {}
-	virtual ~FESolventSupply(){}
-	
-	//! solvent supply
-	virtual double Supply(FEMaterialPoint& pt) = 0;
-	
-	//! tangent of solvent supply with respect to strain
-	virtual mat3ds Tangent_Supply_Strain(FEMaterialPoint& mp) = 0;
-	
-	//! tangent of solvent supply with respect to pressure
-	virtual double Tangent_Supply_Pressure(FEMaterialPoint& mp) = 0;
-	
-	//! tangent of solvent supply with respect to concentration
-	double Tangent_Supply_Concentration(FEMaterialPoint& mp, const int isol);
-	
-	void Init();
 };
 
 //-----------------------------------------------------------------------------

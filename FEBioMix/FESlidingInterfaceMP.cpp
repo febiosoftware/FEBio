@@ -761,11 +761,11 @@ double FESlidingInterfaceMP::AutoPressurePenalty(FESurfaceElement& el, FESliding
 			
 			// if this is a biphasic-solute element, then get the permeability tensor
 			FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-			FESoluteMaterialPoint& spt = *(mp.ExtractData<FESoluteMaterialPoint>());
+			FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
 			ppt.m_p = 0;
 			ppt.m_w = vec3d(0,0,0);
-			spt.m_c = 0;
-			spt.m_j = vec3d(0,0,0);
+			spt.m_c[0] = 0;
+			spt.m_j[0] = vec3d(0,0,0);
 			
 			mat3ds K = pbs->GetPermeability()->Permeability(mp);
 			
@@ -881,11 +881,11 @@ double FESlidingInterfaceMP::AutoConcentrationPenalty(FESurfaceElement& el,
 			
 			// for a biphasic-solute element, get the diffusivity tensor
 			FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-			FESoluteMaterialPoint& spt = *(mp.ExtractData<FESoluteMaterialPoint>());
+			FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
 			ppt.m_p = 0;
 			ppt.m_w = vec3d(0,0,0);
-			spt.m_c = 0;
-			spt.m_j = vec3d(0,0,0);
+			spt.m_c[0] = 0;
+			spt.m_j[0] = vec3d(0,0,0);
 			
 			mat3ds D = pbs->GetSolute()->m_pDiff->Diffusivity(mp)
 			*(pbs->Porosity(mp)*pbs->GetSolute()->m_pSolub->Solubility(mp));

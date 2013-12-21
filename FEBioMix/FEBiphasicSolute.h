@@ -1,58 +1,8 @@
 #pragma once
 #include "FEBiphasic.h"
+#include "FESolutesMaterialPoint.h"
 #include "FESolute.h"
-
-//-----------------------------------------------------------------------------
-//! Base class for osmotic coefficient.
-//! These materials need to define the osmotic coefficient and tangent functions.
-//!
-class FEOsmoticCoefficient : public FEMaterial
-{
-public:
-	//! constructor
-	FEOsmoticCoefficient(FEModel* pfem) : FEMaterial(pfem) {}
-
-	//! osmotic coefficient
-	virtual double OsmoticCoefficient(FEMaterialPoint& pt) = 0;
-	
-	//! tangent of osmotic coefficient with respect to strain
-	virtual double Tangent_OsmoticCoefficient_Strain(FEMaterialPoint& mp) = 0;
-	
-	//! tangent of osmotic coefficient with respect to concentration
-	virtual double Tangent_OsmoticCoefficient_Concentration(FEMaterialPoint& mp, const int isol) = 0;
-};
-
-//-----------------------------------------------------------------------------
-//! material point data for solute in biphasic-solute material
-class FESoluteMaterialPoint : public FEMaterialPoint
-{
-public:
-	//! constructor
-	FESoluteMaterialPoint(FEMaterialPoint* ppt);
-	
-	//! shallow copy 
-	FEMaterialPoint* Copy();
-	
-	//! serialize data
-	void Serialize(DumpFile& ar);
-
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
-	//! Data initialization
-	void Init(bool bflag);
-	
-public:
-	// solute material data
-	double		m_c;		//!< effective solute concentration
-	vec3d		m_gradc;	//!< spatial gradient of c
-	vec3d		m_j;		//!< solute molar flux
-	double		m_ca;		//!< actual solute concentration
-	double		m_crc;		//!< referential concentration of receptor-ligand complex
-	double		m_crcp;		//!< m_crc at previous time point
-	double		m_crchat;	//!< referential receptor-ligand complex supply
-	double		m_crchatp;	//!< m_crchat at previous time point
-};
+#include "FEOsmoticCoefficient.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for solute diffusion in biphasic materials.

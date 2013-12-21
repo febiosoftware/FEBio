@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEBioMixData.h"
+#include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
 #include "FEMultiphasic.h"
 #include "FECore/FEModel.h"
@@ -95,8 +96,8 @@ double FELogElemSoluteConcentration::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESoluteMaterialPoint* ppt = el.m_State[i]->ExtractData<FESoluteMaterialPoint>();
-		if (ppt) val += ppt->m_ca;
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_ca[0];
 	}
 	return val / (double) nint;
 }
@@ -108,8 +109,8 @@ double FELogElemSoluteFluxX::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESoluteMaterialPoint* ppt = el.m_State[i]->ExtractData<FESoluteMaterialPoint>();
-		if (ppt) val += ppt->m_j.x;
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_j[0].x;
 	}
 	return val / (double) nint;
 }
@@ -121,8 +122,8 @@ double FELogElemSoluteFluxY::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESoluteMaterialPoint* ppt = el.m_State[i]->ExtractData<FESoluteMaterialPoint>();
-		if (ppt) val += ppt->m_j.y;
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_j[0].y;
 	}
 	return val / (double) nint;
 }
@@ -134,8 +135,8 @@ double FELogElemSoluteFluxZ::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESoluteMaterialPoint* ppt = el.m_State[i]->ExtractData<FESoluteMaterialPoint>();
-		if (ppt) val += ppt->m_j.z;
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_j[0].z;
 	}
 	return val / (double) nint;
 }
@@ -147,8 +148,8 @@ double FELogElemSoluteRefConcentration::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESoluteMaterialPoint* ppt = el.m_State[i]->ExtractData<FESoluteMaterialPoint>();
-		if (ppt) val += ppt->m_crc;
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_sbmr[0];
 	}
 	return val / (double) nint;
 }

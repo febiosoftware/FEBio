@@ -388,7 +388,6 @@ void FESlidingSurface3::GetNodalContactGap(int nface, double* gn)
 {
 	double gi[FEElement::MAX_INTPOINTS];
 	FESurfaceElement& el = Element(nface);
-	int ne = el.Nodes();
 	int ni = el.GaussPoints();
 	for (int k=0; k<ni; ++k) gi[k] = m_Data[nface][k].m_gap;
 	el.project_to_nodes(gi, gn);
@@ -398,7 +397,6 @@ void FESlidingSurface3::GetNodalContactGap(int nface, double* gn)
 void FESlidingSurface3::GetNodalContactPressure(int nface, double* pn)
 {
 	FESurfaceElement& el = Element(nface);
-	int ne = el.Nodes();
 	int ni = el.GaussPoints();
 	double ti[FEElement::MAX_INTPOINTS];
 	for (int k=0; k<ni; ++k) ti[k] = m_Data[nface][k].m_Ln;
@@ -508,7 +506,6 @@ void FESlidingInterface3::BuildMatrixProfile(FEStiffnessMatrix& K)
 		FESlidingSurface3& ss = (np == 0? m_ss : m_ms);
 		FESlidingSurface3& ms = (np == 0? m_ms : m_ss);
 		// get the mesh
-		FEMesh* pm = ss.GetMesh();
 		int sid, mid;
 						
 		int k, l;
@@ -733,11 +730,11 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 			
 			// if this is a biphasic-solute element, then get the permeability tensor
 			FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-			FESoluteMaterialPoint& spt = *(mp.ExtractData<FESoluteMaterialPoint>());
+			FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
 			ppt.m_p = 0;
 			ppt.m_w = vec3d(0,0,0);
-			spt.m_c = 0;
-			spt.m_j = vec3d(0,0,0);
+			spt.m_c[0] = 0;
+			spt.m_j[0] = vec3d(0,0,0);
 			
 			mat3ds K = bps->GetPermeability()->Permeability(mp);
 			
@@ -823,11 +820,11 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 			
 			// if this is a biphasic-solute element, then get the diffusivity tensor
 			FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-			FESoluteMaterialPoint& spt = *(mp.ExtractData<FESoluteMaterialPoint>());
+			FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
 			ppt.m_p = 0;
 			ppt.m_w = vec3d(0,0,0);
-			spt.m_c = 0;
-			spt.m_j = vec3d(0,0,0);
+			spt.m_c[0] = 0;
+			spt.m_j[0] = vec3d(0,0,0);
 			
 			mat3ds D = pbs->GetSolute()->m_pDiff->Diffusivity(mp)
 			*(pbs->Porosity(mp)*pbs->GetSolute()->m_pSolub->Solubility(mp));
@@ -1174,10 +1171,6 @@ void FESlidingInterface3::ContactForces(FEGlobalVector& R)
 
 	FEModel& fem = *GetFEModel();
 
-	// get the mesh
-	FEMesh* pm = m_ss.GetMesh();
-	
-	
 	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over the nr of passes
@@ -1391,9 +1384,6 @@ void FESlidingInterface3::ContactStiffness(FESolver* psolver)
 
 	FEModel& fem = *GetFEModel();
 
-	// get the mesh
-	FEMesh* pm = m_ss.GetMesh();
-	
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;
 	
@@ -2035,8 +2025,8 @@ bool FESlidingInterface3::Augment(int naug)
 	
 	bool bporo = (m_ss.m_bporo && m_ms.m_bporo);
 	bool bsolu = (m_ss.m_bsolu && m_ms.m_bsolu);
-	int NS = m_ss.m_Data.size();
-	int NM = m_ms.m_Data.size();
+	int NS = (int)m_ss.m_Data.size();
+	int NM = (int)m_ms.m_Data.size();
 	
 	// --- c a l c u l a t e   i n i t i a l   n o r m s ---
 	// a. normal component

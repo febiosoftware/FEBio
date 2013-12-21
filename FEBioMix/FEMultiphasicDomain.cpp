@@ -324,7 +324,7 @@ void FEMultiphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>
 	assert(pm);
 	const int nsol = pm->Solutes();
 
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -452,7 +452,7 @@ void FEMultiphasicDomain::InternalSoluteWork(FESolver* psolver, vector<double>& 
 	assert(pm);
 	const int nsol = pm->Solutes();
 
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -664,7 +664,7 @@ void FEMultiphasicDomain::InternalFluidWork(FESolver* psolver, vector<double>& R
 	vector<double> fe;
 	vector<int> elm;
 	
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -811,7 +811,7 @@ void FEMultiphasicDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>&
 	vector<double> fe;
 	vector<int> elm;
 	
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -1038,7 +1038,7 @@ void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const F
 	const int nsol = pm->Solutes();
 
 	// repeat over all solid elements
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
@@ -1089,7 +1089,7 @@ void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const
 	const int nsol = pm->Solutes();
 
 	// repeat over all solid elements
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];

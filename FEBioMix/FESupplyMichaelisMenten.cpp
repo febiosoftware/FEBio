@@ -39,10 +39,10 @@ double FESupplyMichaelisMenten::Supply(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-	FESoluteMaterialPoint& spt = *mp.ExtractData<FESoluteMaterialPoint>();
+	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
 	
 	double J = et.m_J;
-	double ca = spt.m_ca;
+	double ca = spt.m_ca[0];
 	double phi0 = ppt.m_phi0;
 	double cr = (J-phi0)*ca;
 	double crhat = -m_Vmax*cr/(m_Km+cr);
@@ -63,10 +63,10 @@ double FESupplyMichaelisMenten::Tangent_Supply_Concentration(FEMaterialPoint &mp
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-	FESoluteMaterialPoint& spt = *mp.ExtractData<FESoluteMaterialPoint>();
+	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
 	
 	double J = et.m_J;
-	double ca = spt.m_ca;
+	double ca = spt.m_ca[0];
 	double phi0 = ppt.m_phi0;
 	double cr = (J-phi0)*ca;
 	double dcrhatdcr = -m_Vmax*m_Km/SQR(m_Km+cr);

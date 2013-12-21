@@ -185,7 +185,7 @@ double FETriphasic::ElectricPotential(FEMaterialPoint& pt, const bool eform)
 	int i, j;
 	
 	// Solve electroneutrality polynomial for zeta
-	FESaltMaterialPoint& set = *pt.ExtractData<FESaltMaterialPoint>();
+	FESolutesMaterialPoint& set = *pt.ExtractData<FESolutesMaterialPoint>();
 	const int nsol = 2;
 	double cF = FixedChargeDensity(pt);
 	double c[2];		// effective concentration
@@ -227,7 +227,7 @@ double FETriphasic::ElectricPotential(FEMaterialPoint& pt, const bool eform)
 //! actual concentration
 double FETriphasic::Concentration(FEMaterialPoint& pt, const int ion)
 {
-	FESaltMaterialPoint& spt = *pt.ExtractData<FESaltMaterialPoint>();
+	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	
 	// effective concentration
 	double c = spt.m_c[ion];
@@ -275,7 +275,7 @@ tens4ds FETriphasic::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& ept = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-	FESaltMaterialPoint& spt = *mp.ExtractData<FESaltMaterialPoint>();
+	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
 	
 	// call solid tangent routine
 	tens4ds C = m_pSolid->Tangent(mp);
@@ -349,7 +349,7 @@ tens4ds FETriphasic::Tangent(FEMaterialPoint& mp)
 vec3d FETriphasic::FluidFlux(FEMaterialPoint& pt)
 {
 	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-	FESaltMaterialPoint& spt = *pt.ExtractData<FESaltMaterialPoint>();
+	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	
 	// fluid volume fraction (porosity) in current configuration
 	double phiw = Porosity(pt);
@@ -409,7 +409,7 @@ vec3d FETriphasic::FluidFlux(FEMaterialPoint& pt)
 
 vec3d FETriphasic::SoluteFlux(FEMaterialPoint& pt, const int ion)
 {
-	FESaltMaterialPoint& spt = *pt.ExtractData<FESaltMaterialPoint>();
+	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	
 	// fluid volume fraction (porosity) in current configuration
 	double phiw = Porosity(pt);
