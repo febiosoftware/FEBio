@@ -52,10 +52,16 @@ FESlidingSurface3::Data::Data()
 // FESlidingSurface3
 //-----------------------------------------------------------------------------
 
-FESlidingSurface3::FESlidingSurface3(FEModel* pfem) : FEContactSurface(&pfem->GetMesh())
+FESlidingSurface3::FESlidingSurface3(FEModel* pfem) : FEBiphasicContactSurface(&pfem->GetMesh())
 { 
 	m_bporo = m_bsolu = false;
 	m_pfem = pfem; 
+}
+
+//-----------------------------------------------------------------------------
+FESlidingSurface3::~FESlidingSurface3()
+{
+
 }
 
 //-----------------------------------------------------------------------------

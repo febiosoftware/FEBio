@@ -221,3 +221,13 @@ template <int SBM> class FEPlotSBMRefAppDensityT : public FEPlotSBMRefAppDensity
 public:
 	FEPlotSBMRefAppDensityT(FEModel* pfem) : FEPlotSBMRefAppDensity_(SBM) {}
 };
+
+//-----------------------------------------------------------------------------
+//! Fluid force
+//!
+class FEPlotFluidForce : public FESurfaceData
+{
+public:
+	FEPlotFluidForce(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+	bool Save(FESurface& surf, vector<float>& a);
+};

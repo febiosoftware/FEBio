@@ -1,9 +1,9 @@
 #pragma once
 #include "FEBioMech/FEContactInterface.h"
-#include "FECore/FEContactSurface.h"
+#include "FEBiphasicContactSurface.h"
 
 //-----------------------------------------------------------------------------
-class FESlidingSurfaceMP : public FEContactSurface
+class FESlidingSurfaceMP : public FEBiphasicContactSurface
 {
 public:
 	//! integration point data
@@ -33,7 +33,7 @@ public:
 	FESlidingSurfaceMP(FEModel* pfem);
 	
 	//! destructor
-	~FESlidingSurfaceMP() {}
+	~FESlidingSurfaceMP();
 	
 	//! initialization
 	bool Init();

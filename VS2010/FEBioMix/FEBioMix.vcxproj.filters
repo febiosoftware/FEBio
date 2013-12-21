@@ -165,6 +165,15 @@
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSoluteAnalysis.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMix\FEDiffAlbroIso.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMix\FESlidingInterfaceMP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMix\FEBiphasicContactSurface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMix\FEBioMix.h">
@@ -315,6 +324,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSoluteAnalysis.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMix\FEDiffAlbroIso.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMix\FESlidingInterfaceMP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMix\FEBiphasicContactSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -276,7 +276,9 @@
     <ClCompile Include="..\..\FEBioMix\FEBioMixPlot.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasic.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicAnalysis.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEBiphasicContactSurface.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSoluteAnalysis.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEDiffAlbroIso.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMixDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolute.cpp" />
@@ -309,6 +311,7 @@
     <ClCompile Include="..\..\FEBioMix\FESFDSBM.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESlidingInterface2.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESlidingInterface3.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FESlidingInterfaceMP.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESolubConst.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESolute.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESoluteFlux.cpp" />
@@ -327,7 +330,9 @@
     <ClInclude Include="..\..\FEBioMix\FEBioMixPlot.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasic.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicAnalysis.h" />
+    <ClInclude Include="..\..\FEBioMix\FEBiphasicContactSurface.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSoluteAnalysis.h" />
+    <ClInclude Include="..\..\FEBioMix\FEDiffAlbroIso.h" />
     <ClInclude Include="..\..\FEBioMix\FEMixDomainFactory.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolute.h" />
@@ -360,6 +365,7 @@
     <ClInclude Include="..\..\FEBioMix\FESFDSBM.h" />
     <ClInclude Include="..\..\FEBioMix\FESlidingInterface2.h" />
     <ClInclude Include="..\..\FEBioMix\FESlidingInterface3.h" />
+    <ClInclude Include="..\..\FEBioMix\FESlidingInterfaceMP.h" />
     <ClInclude Include="..\..\FEBioMix\FESolubConst.h" />
     <ClInclude Include="..\..\FEBioMix\FESolute.h" />
     <ClInclude Include="..\..\FEBioMix\FESoluteFlux.h" />

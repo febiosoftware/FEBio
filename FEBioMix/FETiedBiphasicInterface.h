@@ -1,9 +1,9 @@
 #pragma once
 #include "FEBioMech/FEContactInterface.h"
-#include "FECore/FEContactSurface.h"
+#include "FEBiphasicContactSurface.h"
 
 //-----------------------------------------------------------------------------
-class FETiedBiphasicSurface : public FEContactSurface
+class FETiedBiphasicSurface : public FEBiphasicContactSurface
 {
 public:
 	//! constructor

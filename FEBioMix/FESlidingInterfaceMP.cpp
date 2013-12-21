@@ -58,10 +58,16 @@ FESlidingSurfaceMP::Data::Data()
 // FESlidingSurfaceMP
 //-----------------------------------------------------------------------------
 
-FESlidingSurfaceMP::FESlidingSurfaceMP(FEModel* pfem) : FEContactSurface(&pfem->GetMesh())
+FESlidingSurfaceMP::FESlidingSurfaceMP(FEModel* pfem) : FEBiphasicContactSurface(&pfem->GetMesh())
 { 
 	m_bporo = m_bsolu = false;
 	m_pfem = pfem; 
+}
+
+//-----------------------------------------------------------------------------
+FESlidingSurfaceMP::~FESlidingSurfaceMP()
+{
+
 }
 
 //-----------------------------------------------------------------------------

@@ -8,6 +8,8 @@
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
 #include "FEMultiphasic.h"
+#include "FEBiphasicContactSurface.h"
+#include "FEBioPlot/FEBioPlotFile.h"
 
 //-----------------------------------------------------------------------------
 bool FEPlotActualFluidPressure::Save(FEDomain &dom, vector<float>& a)
@@ -481,7 +483,7 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, vector<float>& a)
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt)
-                    for (int isol=0; isol<pt->m_ca.size(); ++isol)
+                    for (int isol=0; isol<(int)pt->m_ca.size(); ++isol)
                         ew += pt->m_ca[isol];
 			}
 			
@@ -985,4 +987,32 @@ bool FEPlotSBMRefAppDensity_::Save(FEDomain &dom, vector<float>& a)
 		return true;
 	}
 	return false;
+}
+
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidForce::Save(FESurface &surf, std::vector<float> &a)
+{
+	FEBiphasicContactSurface* pcs = dynamic_cast<FEBiphasicContactSurface*>(&surf);
+	if (pcs == 0) return false;
+    
+	int NF = pcs->Elements();
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(3*MFN*NF, 0.f);
+	vec3d fn = pcs->GetFluidForce();
+	for (int j=0; j<NF; ++j)
+	{
+		FESurfaceElement& el = pcs->Element(j);
+        
+		// store in archive
+		int ne = el.Nodes();
+		for (int k=0; k<ne; ++k)
+		{
+			a[3*MFN*j +3*k   ] = (float) fn.x;
+			a[3*MFN*j +3*k +1] = (float) fn.y;
+			a[3*MFN*j +3*k +2] = (float) fn.z;
+		}
+	}
+    
+	return true;
 }

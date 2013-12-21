@@ -1,9 +1,9 @@
 #pragma once
 #include "FEBioMech/FEContactInterface.h"
-#include "FECore/FEContactSurface.h"
+#include "FEBiphasicContactSurface.h"
 
 //-----------------------------------------------------------------------------
-class FESlidingSurface2 : public FEContactSurface
+class FESlidingSurface2 : public FEBiphasicContactSurface
 {
 public:
 	//! Integration point data

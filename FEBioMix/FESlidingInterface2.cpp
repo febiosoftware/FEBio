@@ -43,7 +43,7 @@ FESlidingSurface2::Data::Data()
 // FESlidingSurface2
 //-----------------------------------------------------------------------------
 
-FESlidingSurface2::FESlidingSurface2(FEModel* pfem) : FEContactSurface(&pfem->GetMesh())
+FESlidingSurface2::FESlidingSurface2(FEModel* pfem) : FEBiphasicContactSurface(&pfem->GetMesh())
 { 
 	m_bporo = false;
 	m_pfem = pfem; 

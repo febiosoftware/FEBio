@@ -25,8 +25,8 @@ public:
 	virtual void GetNodalContactGap     (int nface, double* pg);
 	virtual void GetNodalContactPressure(int nface, double* pg);
 	virtual void GetNodalContactTraction(int nface, vec3d* pt);
-    virtual vec3d GetContactForce();
-    virtual vec3d GetFluidForce();
+
+	virtual vec3d GetContactForce();
 
 protected:
 	FEContactSurface* m_pSibling;

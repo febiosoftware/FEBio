@@ -27,7 +27,7 @@ END_PARAMETER_LIST();
 // FETiedBiphasicSurface
 //-----------------------------------------------------------------------------
 
-FETiedBiphasicSurface::FETiedBiphasicSurface(FEModel* pfem) : FEContactSurface(&pfem->GetMesh())
+FETiedBiphasicSurface::FETiedBiphasicSurface(FEModel* pfem) : FEBiphasicContactSurface(&pfem->GetMesh())
 { 
 	m_bporo = false;
 	m_pfem = pfem; 

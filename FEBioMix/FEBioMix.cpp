@@ -158,6 +158,7 @@ REGISTER_FEBIO_CLASS(FEPlotFixedChargeDensity           , FEPLOTDATA_ID, "fixed 
 REGISTER_FEBIO_CLASS(FEPlotReferentialFixedChargeDensity, FEPLOTDATA_ID, "referential fixed charge density");
 REGISTER_FEBIO_CLASS(FEPlotNodalFluidFlux               , FEPLOTDATA_ID, "nodal fluid flux"    );
 REGISTER_FEBIO_CLASS(FEPlotOsmolarity                   , FEPLOTDATA_ID,  "osmolarity"         );
+REGISTER_FEBIO_CLASS(FEPlotFluidForce                   , FEPLOTDATA_ID, "fluid force"         );
 REGISTER_FEBIO_CLASS_T(FEPlotSBMRefAppDensityT          , FEPLOTDATA_ID, 0, "sbm 1 referential apparent density");
 REGISTER_FEBIO_CLASS_T(FEPlotSBMRefAppDensityT          , FEPLOTDATA_ID, 1, "sbm 2 referential apparent density");
 REGISTER_FEBIO_CLASS_T(FEPlotSBMRefAppDensityT          , FEPLOTDATA_ID, 2, "sbm 3 referential apparent density");
