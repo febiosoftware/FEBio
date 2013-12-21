@@ -217,6 +217,8 @@ void FEBiphasicSolidDomain::InternalFluidWork(FESolver* psolver, vector<double>&
 	vector<int> elm;
 	
 	int NE = m_Elem.size();
+    
+    #pragma omp parallel for private(fe, elm) shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -232,13 +234,16 @@ void FEBiphasicSolidDomain::InternalFluidWork(FESolver* psolver, vector<double>&
 		// calculate fluid internal work
 		ElementInternalFluidWork(el, fe, dt);
 			
-		// add fluid work to global residual
-		int neln = el.Nodes();
-		for (int j=0; j<neln; ++j)
-		{
-			int J = elm[3*neln+j];
-			if (J >= 0) R[J] += fe[j];
-		}
+        #pragma omp critical
+        {
+            // add fluid work to global residual
+            int neln = el.Nodes();
+            for (int j=0; j<neln; ++j)
+            {
+                int J = elm[3*neln+j];
+                if (J >= 0) R[J] += fe[j];
+            }
+        }
 	}
 }
 
@@ -523,6 +528,8 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, doubl
 
 	// repeat over all solid elements
 	int NE = m_Elem.size();
+    
+    #pragma omp parallel for private(ke, elm) shared(NE)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
@@ -542,17 +549,18 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, doubl
 		// the LM vector in the right order for poroelastic elements.
 		UnpackLM(el, elm);
 
-		vector<int> lm(ndof);
-		for (int i=0; i<neln; ++i)
-		{
-			lm[4*i  ] = elm[3*i];
-			lm[4*i+1] = elm[3*i+1];
-			lm[4*i+2] = elm[3*i+2];
-			lm[4*i+3] = elm[3*neln+i];
-		}
-		
-		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+        vector<int> lm(ndof);
+        for (int i=0; i<neln; ++i)
+        {
+            lm[4*i  ] = elm[3*i];
+            lm[4*i+1] = elm[3*i+1];
+            lm[4*i+2] = elm[3*i+2];
+            lm[4*i+3] = elm[3*neln+i];
+        }
+        
+        // assemble element matrix in global stiffness matrix
+        #pragma omp critical
+        psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
 

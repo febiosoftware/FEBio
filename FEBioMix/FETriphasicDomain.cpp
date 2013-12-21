@@ -284,6 +284,8 @@ void FETriphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& 
 	FETriphasic* pm = dynamic_cast<FETriphasic*>(GetMaterial()); assert(pm);
 	
 	int NE = m_Elem.size();
+    
+    #pragma omp parallel for private(fe, elm) shared(NE, pm)
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -312,12 +314,15 @@ void FETriphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& 
 		ElementInternalSoluteWorkSS(el, fe, dt, 1);
 			
 		// add solute work to global residual
-		dofc = DOF_C + pm->m_pSolute[1]->GetSoluteID();
-		for (int j=0; j<neln; ++j)
-		{
-			int J = elm[dofc*neln+j];
-			if (J >= 0) R[J] += fe[j];
-		}
+        #pragma omp critical
+        {
+            dofc = DOF_C + pm->m_pSolute[1]->GetSoluteID();
+            for (int j=0; j<neln; ++j)
+            {
+                int J = elm[dofc*neln+j];
+                if (J >= 0) R[J] += fe[j];
+            }
+        }
 	}
 }
 
@@ -376,6 +381,8 @@ void FETriphasicDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>& R
 	vector<int> elm;
 	
 	int NE = m_Elem.size();
+    
+    #pragma omp parallel for private(fe, elm) shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -392,12 +399,15 @@ void FETriphasicDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>& R
 		ElementInternalFluidWorkSS(el, fe, dt);
 			
 		// add fluid work to global residual
-		int neln = el.Nodes();
-		for (int j=0; j<neln; ++j)
-		{
-			int J = elm[3*neln+j];
-			if (J >= 0) R[J] += fe[j];
-		}
+        #pragma omp critical
+        {
+            int neln = el.Nodes();
+            for (int j=0; j<neln; ++j)
+            {
+                int J = elm[3*neln+j];
+                if (J >= 0) R[J] += fe[j];
+            }
+        }
 	}
 }
 
@@ -409,6 +419,8 @@ void FETriphasicDomain::InternalFluidWork(FESolver* psolver, vector<double>& R, 
 	vector<int> elm;
 	
 	int NE = m_Elem.size();
+    
+    #pragma omp parallel for private(fe, elm) shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -425,12 +437,15 @@ void FETriphasicDomain::InternalFluidWork(FESolver* psolver, vector<double>& R, 
 		ElementInternalFluidWork(el, fe, dt);
 			
 		// add fluid work to global residual
-		int neln = el.Nodes();
-		for (int j=0; j<neln; ++j)
-		{
-			int J = elm[3*neln+j];
-			if (J >= 0) R[J] += fe[j];
-		}
+        #pragma omp critical
+        {
+            int neln = el.Nodes();
+            for (int j=0; j<neln; ++j)
+            {
+                int J = elm[3*neln+j];
+                if (J >= 0) R[J] += fe[j];
+            }
+        }
 	}
 }
 
@@ -982,6 +997,8 @@ void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FET
 	
 	// repeat over all solid elements
 	int NE = m_Elem.size();
+    
+    #pragma omp parallel for private(ke, elm) shared(NE)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
@@ -1013,6 +1030,7 @@ void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FET
 		}
 		
 		// assemble element matrix in global stiffness matrix
+        #pragma omp critical
 		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
@@ -1031,6 +1049,8 @@ void FETriphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const F
 	
 	// repeat over all solid elements
 	int NE = m_Elem.size();
+    
+    #pragma omp parallel for private(ke, elm) shared(NE)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
@@ -1062,6 +1082,7 @@ void FETriphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const F
 		}
 		
 		// assemble element matrix in global stiffness matrix
+        #pragma omp critical
 		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
