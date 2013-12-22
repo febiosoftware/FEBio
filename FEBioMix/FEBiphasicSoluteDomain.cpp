@@ -264,14 +264,15 @@ void FEBiphasicSoluteDomain::Residual(FESolver* psolver, vector<double>& R)
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteDomain::InternalFluidWork(FESolver* psolver, vector<double>& R, double dt)
 {
-	// element force vector
-	vector<double> fe;
-	vector<int> elm;
 	const int NE = (int)m_Elem.size();
 
-	#pragma omp parallel for private(fe, elm) shared(NE)
+	#pragma omp parallel for
 	for (int i=0; i<NE; ++i)
 	{
+		// element force vector
+		vector<double> fe;
+		vector<int> elm;
+
 		// get the element
 		FESolidElement& el = m_Elem[i];
 			
@@ -301,14 +302,15 @@ void FEBiphasicSoluteDomain::InternalFluidWork(FESolver* psolver, vector<double>
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt)
 {
-	// element force vector
-	vector<double> fe;
-	vector<int> elm;
 	const int NE = (int)m_Elem.size();
 
-	#pragma omp parallel for private(fe, elm) shared(NE)
+	#pragma omp parallel for
 	for (int i=0; i<NE; ++i)
 	{
+		// element force vector
+		vector<double> fe;
+		vector<int> elm;
+		
 		// get the element
 		FESolidElement& el = m_Elem[i];
 			
@@ -338,18 +340,18 @@ void FEBiphasicSoluteDomain::InternalFluidWorkSS(FESolver* psolver, vector<doubl
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteDomain::InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt)
 {
-	// element force vector
-	vector<double> fe;
-	vector<int> elm;
-
 	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (GetMaterial());
 	assert(pm);
 
 	const int NE = (int)m_Elem.size();
 
-	#pragma omp parallel for private(fe, elm) shared(NE, pm)
+	#pragma omp parallel for shared(pm)
 	for (int i=0; i<NE; ++i)
 	{
+		// element force vector
+		vector<double> fe;
+		vector<int> elm;
+		
 		// get the element
 		FESolidElement& el = m_Elem[i];
 			
@@ -380,18 +382,18 @@ void FEBiphasicSoluteDomain::InternalSoluteWork(FESolver* psolver, vector<double
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt)
 {
-	// element force vector
-	vector<double> fe;
-	vector<int> elm;
-
 	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (GetMaterial());
 	assert(pm);
 	
 	const int NE = (int)m_Elem.size();
 
-	#pragma omp parallel for private(fe, elm) shared(NE, pm)
+	#pragma omp parallel for shared(pm)
 	for (int i=0; i<NE; ++i)
 	{
+		// element force vector
+		vector<double> fe;
+		vector<int> elm;
+		
 		// get the element
 		FESolidElement& el = m_Elem[i];
 			
@@ -936,19 +938,19 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FESolver* psolver)
 
 void FEBiphasicSoluteDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp)
 {
-	// element stiffness matrix
-	matrix ke;
-	vector<int> elm;
-
 	FEBiphasicSolute* pmat = dynamic_cast<FEBiphasicSolute*> (GetMaterial());
 	assert(pmat);
 	
 	// repeat over all solid elements
 	const int NE = (int)m_Elem.size();
 
-	#pragma omp parallel for private(ke, elm) shared(pmat, NE)
+	#pragma omp parallel for shared(pmat)
 	for (int iel=0; iel<NE; ++iel)
 	{
+		// element stiffness matrix
+		matrix ke;
+		vector<int> elm;
+		
 		FESolidElement& el = m_Elem[iel];
 		
 		UnpackLM(el, elm);
@@ -990,19 +992,19 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, cons
 
 void FEBiphasicSoluteDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp)
 {
-	// element stiffness matrix
-	matrix ke;
-	vector<int> elm;
-
 	FEBiphasicSolute* pmat = dynamic_cast<FEBiphasicSolute*> (GetMaterial());
 	assert(pmat);
 
 	// repeat over all solid elements
 	const int NE = (int)m_Elem.size();
 
-	#pragma omp parallel for private(ke, elm) shared(pmat, NE)
+	#pragma omp parallel for shared(pmat)
 	for (int iel=0; iel<NE; ++iel)
 	{
+		// element stiffness matrix
+		matrix ke;
+		vector<int> elm;
+		
 		FESolidElement& el = m_Elem[iel];
 		UnpackLM(el, elm);
 		

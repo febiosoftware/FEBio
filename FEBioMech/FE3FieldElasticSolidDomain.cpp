@@ -58,15 +58,15 @@ void FE3FieldElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
 
-	// element stiffness matrix
-	matrix ke;
-	vector<int> lm;
-
 	// repeat over all solid elements
 	int NE = m_Elem.size();
-	#pragma omp parallel for private(ke,lm)
+	#pragma omp parallel for
 	for (int iel=0; iel<NE; ++iel)
 	{
+		// element stiffness matrix
+		matrix ke;
+		vector<int> lm;
+
 		FESolidElement& el = m_Elem[iel];
 
 		// create the element's stiffness matrix

@@ -168,15 +168,15 @@ void FEBiphasicSolidDomain::Residual(FESolver* psolver, vector<double>& R)
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt)
 {
-	// element force vector
-	vector<double> fe;
-	vector<int> elm;
-	
 	int NE = m_Elem.size();
 
-	#pragma omp parallel for private(fe, elm) shared(NE)
+	#pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
+		// element force vector
+		vector<double> fe;
+		vector<int> elm;
+		
 		// get the element
 		FESolidElement& el = m_Elem[i];
 		
@@ -212,15 +212,15 @@ void FEBiphasicSolidDomain::InternalFluidWorkSS(FESolver* psolver, vector<double
 // Calculate the work due to the internal fluid pressure
 void FEBiphasicSolidDomain::InternalFluidWork(FESolver* psolver, vector<double>& R, double dt)
 {
-	// element force vector
-	vector<double> fe;
-	vector<int> elm;
-	
 	int NE = m_Elem.size();
     
-    #pragma omp parallel for private(fe, elm) shared(NE)
+    #pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
+		// element force vector
+		vector<double> fe;
+		vector<int> elm;
+		
 		// get the element
 		FESolidElement& el = m_Elem[i];
 			
@@ -522,16 +522,16 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FESolver* psolver)
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, double dt)
 {
-	// element stiffness matrix
-	matrix ke;
-	vector<int> elm;
-
 	// repeat over all solid elements
 	int NE = m_Elem.size();
     
-    #pragma omp parallel for private(ke, elm) shared(NE)
+    #pragma omp parallel for shared(NE)
 	for (int iel=0; iel<NE; ++iel)
 	{
+		// element stiffness matrix
+		matrix ke;
+		vector<int> elm;
+		
 		FESolidElement& el = m_Elem[iel];
 		
 		// allocate stiffness matrix
@@ -567,16 +567,16 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, doubl
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, double dt)
 {
-	// element stiffness matrix
-	matrix ke;
-	vector<int> elm;
-
 	// repeat over all solid elements
 	int NE = m_Elem.size();
 
-	#pragma omp parallel for private(ke, elm) shared(NE)
+	#pragma omp parallel for shared(NE)
 	for (int iel=0; iel<NE; ++iel)
 	{
+		// element stiffness matrix
+		matrix ke;
+		vector<int> elm;
+		
 		FESolidElement& el = m_Elem[iel];
 		
 		// allocate stiffness matrix

@@ -209,15 +209,14 @@ void FEElasticSolidDomain::Residual(FESolver *psolver, vector<double>& R)
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::InternalForces(FEGlobalVector& R)
 {
-	// element force vector
-	vector<double> fe;
-
-	vector<int> lm;
-
 	int NE = m_Elem.size();
-	#pragma omp parallel for private(fe, lm)
+	#pragma omp parallel for
 	for (int i=0; i<NE; ++i)
 	{
+		// element force vector
+		vector<double> fe;
+		vector<int> lm;
+		
 		// get the element
 		FESolidElement& el = m_Elem[i];
 
@@ -831,19 +830,19 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 
 void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
-	// element stiffness matrix
-	matrix ke;
-	vector<int> lm;
-
 	// repeat over all solid elements
 	int NE = m_Elem.size();
 
 	// TODO: I only need this for the element density stiffness which I want to remove
 	FEModel& fem = psolver->GetFEModel();
 
-	#pragma omp parallel for private(ke,lm)
+	#pragma omp parallel for
 	for (int iel=0; iel<NE; ++iel)
 	{
+		// element stiffness matrix
+		matrix ke;
+		vector<int> lm;
+		
 		FESolidElement& el = m_Elem[iel];
 
 		// create the element's stiffness matrix

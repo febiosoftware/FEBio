@@ -315,10 +315,6 @@ void FEMultiphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 //! of nodes
 void FEMultiphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt)
 {
-	// element force vector
-	vector<double> fe;
-	vector<int> elm;
-
 	// get the elements material
 	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial());
 	assert(pm);
@@ -326,9 +322,13 @@ void FEMultiphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>
 
 	int NE = (int)m_Elem.size();
     
-    #pragma omp parallel for private(fe, elm) shared(NE, pm)
+    #pragma omp parallel for shared(NE, pm)
 	for (int i=0; i<NE; ++i)
 	{
+		// element force vector
+		vector<double> fe;
+		vector<int> elm;
+		
 		// get the element
 		FESolidElement& el = m_Elem[i];
 			
@@ -448,10 +448,6 @@ bool FEMultiphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector
 //-----------------------------------------------------------------------------
 void FEMultiphasicDomain::InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt)
 {
-	// element force vector
-	vector<double> fe;
-	vector<int> elm;
-
 	// get the elements material
 	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial());
 	assert(pm);
@@ -459,9 +455,13 @@ void FEMultiphasicDomain::InternalSoluteWork(FESolver* psolver, vector<double>& 
 
 	int NE = (int)m_Elem.size();
     
-    #pragma omp parallel for private(fe, elm) shared(NE, pm)
+	#pragma omp parallel for shared(NE, pm)
 	for (int i=0; i<NE; ++i)
 	{
+		// element force vector
+		vector<double> fe;
+		vector<int> elm;
+		
 		// get the element
 		FESolidElement& el = m_Elem[i];
 			
@@ -670,15 +670,15 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 //-----------------------------------------------------------------------------
 void FEMultiphasicDomain::InternalFluidWork(FESolver* psolver, vector<double>& R, double dt)
 {
-	// element force vector
-	vector<double> fe;
-	vector<int> elm;
-	
 	int NE = (int)m_Elem.size();
     
-    #pragma omp parallel for private(fe, elm) shared(NE)
+    #pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
+		// element force vector
+		vector<double> fe;
+		vector<int> elm;
+		
 		// get the element
 		FESolidElement& el = m_Elem[i];
 			
@@ -822,15 +822,15 @@ bool FEMultiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<do
 //-----------------------------------------------------------------------------
 void FEMultiphasicDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt)
 {
-	// element force vector
-	vector<double> fe;
-	vector<int> elm;
-	
 	int NE = (int)m_Elem.size();
     
-    #pragma omp parallel for private(fe, elm) shared(NE)
+    #pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
+		// element force vector
+		vector<double> fe;
+		vector<int> elm;
+		
 		// get the element
 		FESolidElement& el = m_Elem[i];
 			
@@ -1049,10 +1049,6 @@ void FEMultiphasicDomain::StiffnessMatrix(FESolidSolver* psolver)
 //-----------------------------------------------------------------------------
 void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp)
 {
-	// element stiffness matrix
-	matrix ke;
-	vector<int> elm;
-
 	// get the elements material
 	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial()); assert(pm);
 	const int nsol = pm->Solutes();
@@ -1060,9 +1056,13 @@ void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const F
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
     
-    #pragma omp parallel for private(ke, elm) shared(pm, NE)
+    #pragma omp parallel for shared(pm)
 	for (int iel=0; iel<NE; ++iel)
 	{
+		// element stiffness matrix
+		matrix ke;
+		vector<int> elm;
+		
 		FESolidElement& el = m_Elem[iel];
 		UnpackLM(el, elm);
 			
@@ -1105,10 +1105,6 @@ void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const F
 
 void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp)
 {
-	// element stiffness matrix
-	matrix ke;
-	vector<int> elm;
-
 	// get the elements material
 	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial()); assert(pm);
 	const int nsol = pm->Solutes();
@@ -1116,9 +1112,13 @@ void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
     
-    #pragma omp parallel for private(ke, elm) shared(pm, NE)
+    #pragma omp parallel for shared(pm)
 	for (int iel=0; iel<NE; ++iel)
 	{
+		// element stiffness matrix
+		matrix ke;
+		vector<int> elm;
+		
 		FESolidElement& el = m_Elem[iel];
 		UnpackLM(el, elm);
 		
