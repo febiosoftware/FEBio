@@ -279,6 +279,7 @@
     <ClCompile Include="..\..\FEBioMix\FEBiphasicContactSurface.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSoluteAnalysis.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEDiffAlbroIso.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEHydraulicPermeability.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMixDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolute.cpp" />
@@ -300,6 +301,7 @@
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicSolver.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEOsmCoefConst.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEOsmoticCoefficient.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPermConstIso.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPermHolmesMow.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPermRefIso.cpp" />
@@ -315,6 +317,8 @@
     <ClCompile Include="..\..\FEBioMix\FESolubConst.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESolute.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESoluteFlux.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FESolutesMaterialPoint.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FESolventSupply.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESolventSupplyStarling.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESupplyBinding.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESupplyConst.cpp" />
@@ -333,6 +337,7 @@
     <ClInclude Include="..\..\FEBioMix\FEBiphasicContactSurface.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSoluteAnalysis.h" />
     <ClInclude Include="..\..\FEBioMix\FEDiffAlbroIso.h" />
+    <ClInclude Include="..\..\FEBioMix\FEHydraulicPermeability.h" />
     <ClInclude Include="..\..\FEBioMix\FEMixDomainFactory.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolute.h" />
@@ -354,6 +359,7 @@
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicSolver.h" />
     <ClInclude Include="..\..\FEBioMix\FEOsmCoefConst.h" />
+    <ClInclude Include="..\..\FEBioMix\FEOsmoticCoefficient.h" />
     <ClInclude Include="..\..\FEBioMix\FEPermConstIso.h" />
     <ClInclude Include="..\..\FEBioMix\FEPermHolmesMow.h" />
     <ClInclude Include="..\..\FEBioMix\FEPermRefIso.h" />
@@ -369,6 +375,8 @@
     <ClInclude Include="..\..\FEBioMix\FESolubConst.h" />
     <ClInclude Include="..\..\FEBioMix\FESolute.h" />
     <ClInclude Include="..\..\FEBioMix\FESoluteFlux.h" />
+    <ClInclude Include="..\..\FEBioMix\FESolutesMaterialPoint.h" />
+    <ClInclude Include="..\..\FEBioMix\FESolventSupply.h" />
     <ClInclude Include="..\..\FEBioMix\FESolventSupplyStarling.h" />
     <ClInclude Include="..\..\FEBioMix\FESupplyBinding.h" />
     <ClInclude Include="..\..\FEBioMix\FESupplyConst.h" />
