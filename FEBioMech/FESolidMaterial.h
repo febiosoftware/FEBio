@@ -9,7 +9,7 @@ class FESolidMaterial : public FEMaterial
 {
 public:
 	//! constructor
-	FESolidMaterial(FEModel* pfem) : FEMaterial(pfem) {}
+	FESolidMaterial(FEModel* pfem);
 
 	//! calculate stress at material point
 	virtual mat3ds Stress(FEMaterialPoint& pt) = 0;
@@ -17,11 +17,8 @@ public:
 	//! calculate tangent stiffness at material point
 	virtual tens4ds Tangent(FEMaterialPoint& pt) = 0;
 
-	//! calculate derivative of stress w.r.t. solute concentration at material point
-	mat3ds Tangent_Concentration(FEMaterialPoint& pt, const int isol);
-	
 	//! return the material density
-	virtual double Density() { return m_density; }
+	virtual double Density();
 
 protected:
 	double	m_density;	//!< material density

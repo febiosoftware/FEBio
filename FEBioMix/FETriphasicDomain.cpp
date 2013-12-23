@@ -1394,7 +1394,8 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 			dodc[isol] = pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp,isol);
 			
 			// evaluate the stress tangent with concentration
-			dTdc[isol] = pm->m_pSolid->Tangent_Concentration(mp,isol);
+//			dTdc[isol] = pm->m_pSolid->Tangent_Concentration(mp,isol);
+			dTdc[isol] = mat3ds(0,0,0,0,0,0);
 			
 			ImD[isol] = I-D[isol]/D0[isol];
 			
@@ -1846,7 +1847,8 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
 			dodc[isol] = pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp,isol);
 			
 			// evaluate the stress tangent with concentration
-			dTdc[isol] = pm->m_pSolid->Tangent_Concentration(mp,isol);
+//			dTdc[isol] = pm->m_pSolid->Tangent_Concentration(mp,isol);
+			dTdc[isol] = mat3ds(0,0,0,0,0,0);
 			
 			ImD[isol] = I-D[isol]/D0[isol];
 			

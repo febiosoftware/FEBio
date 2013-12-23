@@ -1217,7 +1217,8 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FESolidElement& el, 
 		double dodc = pm->GetOsmoticCoefficient()->Tangent_OsmoticCoefficient_Concentration(mp, 0);
 		
 		// evaluate the stress tangent with concentration
-		mat3ds dTdc = pm->GetSolid()->Tangent_Concentration(mp, 0);
+//		mat3ds dTdc = pm->GetSolid()->Tangent_Concentration(mp, 0);
+		mat3ds dTdc(0,0,0,0,0,0);
 		
 		// Miscellaneous constants
 		mat3dd I(1);
@@ -1455,7 +1456,8 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FESolidElement& el
 		double dodc = pm->GetOsmoticCoefficient()->Tangent_OsmoticCoefficient_Concentration(mp, 0);
 		
 		// evaluate the stress tangent with concentration
-		mat3ds dTdc = pm->GetSolid()->Tangent_Concentration(mp, 0);
+//		mat3ds dTdc = pm->GetSolid()->Tangent_Concentration(mp, 0);
+		mat3ds dTdc(0,0,0,0,0,0);
 		
 		// Miscellaneous constants
 		mat3dd I(1);

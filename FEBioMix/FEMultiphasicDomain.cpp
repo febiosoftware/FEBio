@@ -1381,7 +1381,8 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 			dodc[isol] = pm->GetOsmoticCoefficient()->Tangent_OsmoticCoefficient_Concentration(mp,isol);
 			
 			// evaluate the stress tangent with concentration
-			dTdc[isol] = pm->GetSolid()->Tangent_Concentration(mp,isol);
+//			dTdc[isol] = pm->GetSolid()->Tangent_Concentration(mp,isol);
+			dTdc[isol] = mat3ds(0,0,0,0,0,0);
 			
 			ImD[isol] = I-D[isol]/D0[isol];
 			
@@ -1796,7 +1797,8 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 			dodc[isol] = pm->GetOsmoticCoefficient()->Tangent_OsmoticCoefficient_Concentration(mp,isol);
 			
 			// evaluate the stress tangent with concentration
-			dTdc[isol] = pm->GetSolid()->Tangent_Concentration(mp,isol);
+//			dTdc[isol] = pm->GetSolid()->Tangent_Concentration(mp,isol);
+			dTdc[isol] = mat3ds(0,0,0,0,0,0);
 			
 			ImD[isol] = I-D[isol]/D0[isol];
 			
