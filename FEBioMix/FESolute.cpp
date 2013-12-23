@@ -2,6 +2,61 @@
 #include "FECore/FEModel.h"
 #include "FECore/febio.h"
 
+
+//=============================================================================
+// FESoluteData
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+// Material parameters for FESoluteData
+BEGIN_PARAMETER_LIST(FESoluteData, FEGlobalData)
+	ADD_PARAMETER(m_rhoT, FE_PARAM_DOUBLE, "density");
+	ADD_PARAMETER(m_M, FE_PARAM_DOUBLE, "molar_mass");
+	ADD_PARAMETER(m_z, FE_PARAM_INT, "charge_number");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+FESoluteData::FESoluteData(FEModel* pfem)
+{ 
+	m_nID = -1; 
+	m_rhoT = 1; 
+	m_M = 1; 
+	m_z = 0; 
+	m_szname[0] = 0; 
+}
+
+//-----------------------------------------------------------------------------
+bool FESoluteData::SetAttribute(const char* szname, const char* szval)
+{
+	if (strcmp(szname, "id") == 0)
+	{
+		m_nID = atoi(szval)-1;
+		return true;
+	}
+	else if (strcmp(szname, "name") == 0)
+	{
+		if (strcmp(szval, "") == 0) return false;
+		strcpy(m_szname, szval);
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+//! Store the solute data to the archive
+void FESoluteData::Serialize(DumpFile &ar)
+{
+	if (ar.IsSaving()) ar << m_nID;
+	else ar >> m_nID;
+
+	// store parameters
+	FEGlobalData::Serialize(ar);
+}
+
+//=============================================================================
+// FESolute
+//=============================================================================
+
 //-----------------------------------------------------------------------------
 //! FESolute constructor
 
@@ -16,6 +71,20 @@ FESolute::FESolute(FEModel* pfem) : FEMaterial(pfem)
 	m_pSupp = 0;
 }
 
+
+//-----------------------------------------------------------------------------
+FESoluteData* FESolute::FindSoluteData(int nid)
+{
+	FEModel& fem = *GetFEModel();
+	int N = GetFEModel()->GlobalDataItems();
+	for (int i=0; i<N; ++i)
+	{
+		FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
+		if (psd && (psd->m_nID == nid)) return psd;
+	}
+	return 0;
+}
+
 //-----------------------------------------------------------------------------
 void FESolute::Init()
 {
@@ -24,7 +93,7 @@ void FESolute::Init()
 	m_pSolub->SetParent(this); m_pSolub->Init();
 	if (m_pSupp) { m_pSupp->SetParent(this); m_pSupp->Init(); }
 
-	FESoluteData* psd = GetFEModel()->FindSoluteData(m_ID);
+	FESoluteData* psd = FindSoluteData(m_ID);
 	if (psd == 0) throw MaterialError("no match with global solute data");
 	m_rhoT = psd->m_rhoT;
 	m_M = psd->m_M;
@@ -167,9 +236,63 @@ FEParam* FESolute::GetParameter(const ParamString& s)
 	return 0;
 }
 
+//=============================================================================
+// FESBMData
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+// Material parameters for FESoluteData
+BEGIN_PARAMETER_LIST(FESBMData, FEGlobalData)
+	ADD_PARAMETER(m_rhoT, FE_PARAM_DOUBLE, "density"      );
+	ADD_PARAMETER(m_M   , FE_PARAM_DOUBLE, "molar_mass"   );
+	ADD_PARAMETER(m_z   , FE_PARAM_INT   , "charge_number");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+FESBMData::FESBMData(FEModel* pfem)
+{ 
+	m_nID = -1; 
+	m_rhoT = 1; 
+	m_M = 1; 
+	m_z = 0; 
+	m_szname[0] = 0; 
+}
+
+//-----------------------------------------------------------------------------
+bool FESBMData::SetAttribute(const char* szname, const char* szval)
+{
+	if (strcmp(szname, "id") == 0)
+	{
+		m_nID = atoi(szval)-1;
+		return true;
+	}
+	else if (strcmp(szname, "name") == 0)
+	{
+		if (strcmp(szval, "") == 0) return false;
+		strcpy(m_szname, szval);
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+//! Store the solute data to the archive
+void FESBMData::Serialize(DumpFile &ar)
+{
+	if (ar.IsSaving()) ar << m_nID;
+	else ar >> m_nID;
+
+	// store parameters
+	FEGlobalData::Serialize(ar);
+}
+
+//=============================================================================
+// FESolidBoundMolecule
+//=============================================================================
+
 // Material parameters for the FESolidBoundMolecule material
 BEGIN_PARAMETER_LIST(FESolidBoundMolecule, FEMaterial)
-	ADD_PARAMETER(m_rho0, FE_PARAM_DOUBLE, "rho0");
+	ADD_PARAMETER(m_rho0  , FE_PARAM_DOUBLE, "rho0"  );
 	ADD_PARAMETER(m_rhomin, FE_PARAM_DOUBLE, "rhomin");
 	ADD_PARAMETER(m_rhomax, FE_PARAM_DOUBLE, "rhomax");
 END_PARAMETER_LIST();
@@ -188,11 +311,24 @@ FESolidBoundMolecule::FESolidBoundMolecule(FEModel* pfem) : FEMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
+FESBMData* FESolidBoundMolecule::FindSBMData(int nid)
+{
+	FEModel& fem = *GetFEModel();
+	int N = GetFEModel()->GlobalDataItems();
+	for (int i=0; i<N; ++i)
+	{
+		FESBMData* psd = dynamic_cast<FESBMData*>(fem.GetGlobalData(i));
+		if (psd && (psd->m_nID == nid)) return psd;
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 void FESolidBoundMolecule::Init()
 {
 	FEMaterial::Init();
 	
-	FESBMData* psd = GetFEModel()->FindSBMData(m_ID);
+	FESBMData* psd = FindSBMData(m_ID);
 	if (psd == 0) throw MaterialError("no match with global solid-bound molecule data");
 	m_rhoT = psd->m_rhoT;
 	m_M = psd->m_M;

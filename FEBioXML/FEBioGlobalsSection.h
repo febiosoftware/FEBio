@@ -11,7 +11,6 @@ public:
 
 protected:
 	void ParseConstants   (XMLTag& tag);
-	void ParseGSSoluteData(XMLTag& tag);
-	void ParseGSSBMData   (XMLTag& tag);
+	void ParseGlobalData  (XMLTag& tag);
 	void ParseMGData      (XMLTag &tag);
 };

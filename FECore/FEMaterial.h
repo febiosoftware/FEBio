@@ -141,11 +141,6 @@ public: // interface for getting/setting material properties
 	//! set a material property (returns false on error)
 	virtual bool SetProperty(int i, FEMaterial* pm) { return false; }
 
-public: // interface for managing attributes
-
-	//! Set the attribute
-	virtual bool SetAttribute(const char* szname, const char* szval) { return true; }
-
 private:
 	char	m_szname[128];	//!< name of material
 	int		m_nID;			//!< material ID
@@ -156,45 +151,5 @@ private:
 	FEModel*		m_pfem;			//!< pointer to model this material belongs to
 	FEMaterial*		m_pParent;		//!< pointer to "parent" material (if any)
 };
-
-//-----------------------------------------------------------------------------
-//! Global solute data
-//! This structure uniquely identifies a solute in multiphasic problems
-//! \todo Move this to a different file
-class FESoluteData : public FEParamContainer 
-{
-public:
-	FESoluteData() { m_nID = -1; m_rhoT = 1; m_M = 1; m_z = 0; m_szname[0] = 0; }
-
-public:
-	int		m_nID;			//!< solute ID
-	double	m_rhoT;			//!< true solute density
-	double	m_M;			//!< solute molecular weight
-	int		m_z;			//!< solute charge number
-	char	m_szname[128];	//!< solute name
-
-	//! Serialize solute data to archive
-	void Serialize(DumpFile& ar);
-
-	DECLARE_PARAMETER_LIST();
-};
-
-
-//-----------------------------------------------------------------------------
-//! Global solid-bound molecule (SBM) data.
-//! \todo move this to a different file
-class FESBMData : public FEParamContainer
-{
-public:
-	FESBMData() { m_nID = -1; m_rhoT = 1; m_M = 1; m_z = 0; m_szname[0] = 0; }
-	
-public:
-	int		m_nID;			//!< SBM ID
-	double	m_rhoT;			//!< SBM true density
-	double	m_M;			//!< SBM molar mass
-	int		m_z;			//!< SBM charge number
-	char	m_szname[128];	//!< SBM name
-};
-
 
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)

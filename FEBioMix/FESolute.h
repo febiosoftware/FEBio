@@ -1,5 +1,6 @@
 #pragma once
 #include "FECore/FEMaterial.h"
+#include "FECore/FEGlobalData.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for solute diffusivity.
@@ -118,6 +119,30 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Global solute data
+//! This structure uniquely identifies a solute in multiphasic problems
+class FESoluteData : public FEGlobalData 
+{
+public:
+	FESoluteData(FEModel* pfem);
+
+	//! Serialize solute data to archive
+	void Serialize(DumpFile& ar);
+
+	//! Set the attribute
+	bool SetAttribute(const char* szname, const char* szval);
+
+public:
+	int		m_nID;			//!< solute ID
+	double	m_rhoT;			//!< true solute density
+	double	m_M;			//!< solute molecular weight
+	int		m_z;			//!< solute charge number
+	char	m_szname[128];	//!< solute name
+
+	DECLARE_PARAMETER_LIST();
+};
+
+//-----------------------------------------------------------------------------
 //! Base class for solute materials.
 
 class FESolute : public FEMaterial
@@ -170,6 +195,9 @@ public:
 
 	//! set the material attribute
 	bool SetAttribute(const char* szname, const char* szval);
+
+private:
+	FESoluteData* FindSoluteData(int nid);
 	
 private:
 	int						m_ID;		//!< solute ID in global table
@@ -184,6 +212,29 @@ public: // material properties
 	FESoluteDiffusivity*	m_pDiff;	//!< pointer to diffusivity material
 	FESoluteSolubility*		m_pSolub;	//!< pointer to solubility material
 	FESoluteSupply*			m_pSupp;	//!< pointer to solute supply material
+};
+
+//-----------------------------------------------------------------------------
+//! Global solid-bound molecule (SBM) data.
+class FESBMData : public FEGlobalData
+{
+public:
+	FESBMData(FEModel* pfem);
+
+	//! Serialize solute data to archive
+	void Serialize(DumpFile& ar);
+
+	//! Set the attribute
+	bool SetAttribute(const char* szname, const char* szval);
+
+public:
+	int		m_nID;			//!< SBM ID
+	double	m_rhoT;			//!< SBM true density
+	double	m_M;			//!< SBM molar mass
+	int		m_z;			//!< SBM charge number
+	char	m_szname[128];	//!< SBM name
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
@@ -221,7 +272,10 @@ public:
 
 	//! Find a material parameter
 	FEParam* GetParameter(const ParamString& s);
-	
+
+private:
+	FESBMData* FindSBMData(int nid);
+
 private:
 	int						m_ID;		//!< SBM ID in global table
 	

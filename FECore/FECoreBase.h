@@ -22,6 +22,11 @@ public:
 	//! This string is used in object creation
 	const char* GetTypeStr();
 
+public: // interface for managing attributes
+
+	//! Set the attribute
+	virtual bool SetAttribute(const char* szname, const char* szval) { return true; }
+
 private:
 	//! Set the type string (This is used by the factory methods to make sure 
 	//! the class has the same type string as corresponding factory class

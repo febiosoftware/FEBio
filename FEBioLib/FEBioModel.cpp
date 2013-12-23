@@ -335,9 +335,14 @@ void FEBioModel::SerializeGlobals(DumpFile& ar)
 				ar << it->second;
 			}
 		}
-		int nSD = m_SD.size();
-		ar << nSD;
-		for (int i=0; i<nSD; i++) m_SD[i]->Serialize(ar);
+		int nGD = GlobalDataItems();
+		ar << nGD;
+		for (int i=0; i<nGD; i++) 
+		{
+			FEGlobalData* pgd = GetGlobalData(i);
+			ar << pgd->GetTypeStr();
+			pgd->Serialize(ar);
+		}
 	}
 	else
 	{
@@ -351,13 +356,18 @@ void FEBioModel::SerializeGlobals(DumpFile& ar)
 			ar >> sz >> v;
 			SetGlobalConstant(string(sz), v);
 		}
-		int nSD;
-		ar >> nSD;
-		if (nSD) for (int i=0; i<nSD; ++i)
+		int nGD;
+		ar >> nGD;
+		if (nGD) 
 		{
-			FESoluteData* psd = new FESoluteData;
-			FEModel::AddSoluteData(psd);
-			psd->Serialize(ar);
+			char sztype[256];
+			for (int i=0; i<nGD; ++i)
+			{
+				ar >> sztype;
+				FEGlobalData* pgd = fecore_new<FEGlobalData>(FEGLOBALDATA_ID, sztype, this);
+				pgd->Serialize(ar);
+				FEModel::AddGlobalData(pgd);
+			}
 		}
 	}
 }

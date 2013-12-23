@@ -61,6 +61,11 @@ void FEBioMix::InitModule()
 	febio.RegisterDomain(new FEMixDomainFactory);
 
 //-----------------------------------------------------------------------------
+// Global data classes
+REGISTER_FEBIO_CLASS(FESoluteData, FEGLOBALDATA_ID, "solute"     );
+REGISTER_FEBIO_CLASS(FESBMData   , FEGLOBALDATA_ID, "solid_bound");
+
+//-----------------------------------------------------------------------------
 // Analysis classes
 REGISTER_FEBIO_CLASS(FEBiphasicAnalysis      , FEANALYSIS_ID, "biphasic"       );
 REGISTER_FEBIO_CLASS(FEBiphasicSoluteAnalysis, FEANALYSIS_ID, "biphasic-solute");

@@ -93,6 +93,7 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FEELEMLOGDATA_ID            0x000C	// derived from FElemLogData
 #define FEOBJLOGDATA_ID             0x000D	// derived from FELogObjectData
 #define FEBC_ID						0x000E	// derived from FEBoundaryCondition (TODO: This does not work yet)
+#define FEGLOBALDATA_ID				0x000F	// derived from FEGlobalData
 
 /////////////////////////////////////////////////////////////////////////////
 // ENUM: Linear solvers

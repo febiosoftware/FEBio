@@ -12,6 +12,7 @@
 #include "FEObject.h"
 #include "DumpStream.h"
 #include "DataStore.h"
+#include "FEGlobalData.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -237,12 +238,10 @@ public: // --- I/O functions
 	//! Add data record
 	virtual void AddDataRecord(DataRecord* pd) {}
 
-public:
-	// TODO: I don't like this here.
-	void AddSoluteData(FESoluteData* psd);
-	FESoluteData* FindSoluteData(int nid);
-	void AddSBMData(FESBMData* psd);
-	FESBMData* FindSBMData(int nid);
+public: // Global data
+	void AddGlobalData(FEGlobalData* psd);
+	FEGlobalData* GetGlobalData(int i);
+	int GlobalDataItems();
 
 	// get/set global data
 	void SetGlobalConstant(const string& s, double v);
@@ -307,6 +306,5 @@ protected:
 
 protected: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
-	vector<FESoluteData*> m_SD;			//!< unique identifier of solutes in multiphasic materials
-	vector<FESBMData*> m_SBM;			//!< unique identifier of solid-bound molecules in multiphasic materials
+	vector<FEGlobalData*>	m_GD;		//!< global data structures
 };

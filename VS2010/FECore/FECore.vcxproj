@@ -599,6 +599,7 @@
     <ClInclude Include="..\..\FECore\FEElementLibrary.h" />
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
+    <ClInclude Include="..\..\FECore\FEGlobalData.h" />
     <ClInclude Include="..\..\FECore\FEGlobalMatrix.h" />
     <ClInclude Include="..\..\FECore\FEGlobalVector.h" />
     <ClInclude Include="..\..\FECore\FELevelStructure.h" />
@@ -677,6 +678,7 @@
     <ClCompile Include="..\..\FECore\FEElementLibrary.cpp" />
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
     <ClCompile Include="..\..\FECore\FEException.cpp" />
+    <ClCompile Include="..\..\FECore\FEGlobalData.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalMatrix.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalVector.cpp" />
     <ClCompile Include="..\..\FECore\FELevelStructure.cpp" />

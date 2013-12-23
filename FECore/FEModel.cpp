@@ -45,8 +45,7 @@ FEModel::~FEModel(void)
 	for (i=0; i<m_Obj.size (); ++i) delete m_Obj[i] ; m_Obj.clear ();
 
 	// global data
-	for (i=0; i<m_SD.size(); ++i) delete m_SD[i]; m_SD.clear();
-	for (i=0; i<m_SBM.size(); ++i) delete m_SBM[i]; m_SBM.clear();
+	for (i=0; i<m_GD.size(); ++i) delete m_GD[i]; m_GD.clear();
 	m_Const.clear();
 }
 
@@ -760,33 +759,21 @@ double FEModel::GetGlobalConstant(const string& s)
 }
 
 //-----------------------------------------------------------------------------
-void FEModel::AddSoluteData(FESoluteData* psd)
+void FEModel::AddGlobalData(FEGlobalData* psd)
 {
-	m_SD.push_back(psd);
+	m_GD.push_back(psd);
 }
 
 //-----------------------------------------------------------------------------
-FESoluteData* FEModel::FindSoluteData(int nid)
+FEGlobalData* FEModel::GetGlobalData(int i)
 {
-	int i;
-	for (i=0; i<(int) m_SD.size(); ++i) if (m_SD[i]->m_nID == nid) return m_SD[i];
-	
-	return 0;
+	return m_GD[i];
 }
 
 //-----------------------------------------------------------------------------
-void FEModel::AddSBMData(FESBMData* psd)
+int FEModel::GlobalDataItems()
 {
-	m_SBM.push_back(psd);
-}
-
-//-----------------------------------------------------------------------------
-FESBMData* FEModel::FindSBMData(int nid)
-{
-	int i;
-	for (i=0; i<(int) m_SBM.size(); ++i) if (m_SBM[i]->m_nID == nid) return m_SBM[i];
-	
-	return 0;
+	return (int) m_GD.size();
 }
 
 //-----------------------------------------------------------------------------
