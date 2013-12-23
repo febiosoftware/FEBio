@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/FEMaterial.h"
+#include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
 // Material point data for discrete materials.

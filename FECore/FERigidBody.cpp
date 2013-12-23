@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "FERigidBody.h"
-#include "FECore/FEMaterial.h"
-#include "FECore/FESolidDomain.h"
+#include "FEMaterial.h"
+#include "FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidBody, FEObject);
