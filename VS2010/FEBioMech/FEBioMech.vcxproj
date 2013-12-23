@@ -348,6 +348,7 @@
     <ClCompile Include="..\..\FEBioMech\FEPointConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPressureLoad.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPreStrainTransIsoMR.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERemodelingElasticDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERemodelingElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEResidualVector.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidJoint.cpp" />
@@ -464,6 +465,7 @@
     <ClInclude Include="..\..\FEBioMech\FEPointConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEPressureLoad.h" />
     <ClInclude Include="..\..\FEBioMech\FEPreStrainTransIsoMR.h" />
+    <ClInclude Include="..\..\FEBioMech\FERemodelingElasticDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FERemodelingElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEResidualVector.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidJoint.h" />

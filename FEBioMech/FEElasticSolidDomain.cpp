@@ -3,7 +3,6 @@
 #include "FETransverselyIsotropic.h"
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledViscoElasticMaterial.h"
-#include "FERemodelingElasticMaterial.h"
 #include "FECore/log.h"
 
 #ifdef WIN32
@@ -696,97 +695,6 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 }
 
 //-----------------------------------------------------------------------------
-//! calculates element's density stiffness component for integration point n
-//! \todo Remove the FEModel parameter. We only need to dt parameter, not the entire model.
-//! \todo Problems seem to run better without this stiffness matrix
-void FEElasticSolidDomain::ElementDensityStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
-{
-	int n, i, j;
-
-	// make sure this is a remodeling material
-	FERemodelingElasticMaterial* pmat = dynamic_cast<FERemodelingElasticMaterial*>(m_pMat);
-    
-    if (pmat) {
-        const int NE = FEElement::MAX_NODES;
-        vec3d gradN[NE];
-        double *Grn, *Gsn, *Gtn;
-        double Gr, Gs, Gt;
-        vec3d kru, kur;
-        
-        // nr of nodes
-        int neln = el.Nodes();
-        
-        // nr of integration points
-        int nint = el.GaussPoints();
-        
-        // get the time step value
-        double dt = fem.GetCurrentStep()->m_dt;
-        
-        // jacobian
-        double Ji[3][3], detJt;
-        
-        // weights at gauss points
-        const double *gw = el.GaussWeights();
-        
-        // density stiffness component for the stiffness matrix
-        mat3d kab;
-        
-        // calculate geometrical element stiffness matrix
-        for (n=0; n<nint; ++n)
-        {
-            // calculate jacobian
-            double J = invjact(el, Ji, n);
-            detJt = J*gw[n];
-            
-            Grn = el.Gr(n);
-            Gsn = el.Gs(n);
-            Gtn = el.Gt(n);
-            
-            for (i=0; i<neln; ++i)
-            {
-                Gr = Grn[i];
-                Gs = Gsn[i];
-                Gt = Gtn[i];
-                
-                // calculate global gradient of shape functions
-                // note that we need the transposed of Ji, not Ji itself !
-                gradN[i].x = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
-                gradN[i].y = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
-                gradN[i].z = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
-            }
-            
-            // get the material point data
-            FEMaterialPoint& mp = *el.m_State[n];
-            double drhohat = pmat->m_pSupp->Tangent_Supply_Density(mp);
-            mat3ds ruhat = pmat->m_pSupp->Tangent_Supply_Strain(mp);
-            mat3ds crho = pmat->Tangent_Stress_Density(mp);
-            double krr = (drhohat - 1./dt)/J;
-            
-            for (i=0; i<neln; ++i) {
-                kur = (crho*gradN[i])/krr;
-                for (j=0; j<neln; ++j)
-                {
-                    kru = ruhat*gradN[j];
-                    kab = kur & kru;
-                    ke[3*i  ][3*j  ] -= kab(0,0)*detJt;
-                    ke[3*i  ][3*j+1] -= kab(0,1)*detJt;
-                    ke[3*i  ][3*j+2] -= kab(0,2)*detJt;
-                    
-                    ke[3*i+1][3*j  ] -= kab(1,0)*detJt;
-                    ke[3*i+1][3*j+1] -= kab(1,1)*detJt;
-                    ke[3*i+1][3*j+2] -= kab(1,2)*detJt;
-                    
-                    ke[3*i+2][3*j  ] -= kab(2,0)*detJt;
-                    ke[3*i+2][3*j+1] -= kab(2,1)*detJt;
-                    ke[3*i+2][3*j+2] -= kab(2,2)*detJt;
-                }
-            }
-        }
-    }
-}
-
-
-//-----------------------------------------------------------------------------
 /*
 void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
@@ -832,10 +740,7 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
 	// repeat over all solid elements
 	int NE = m_Elem.size();
-
-	// TODO: I only need this for the element density stiffness which I want to remove
-	FEModel& fem = psolver->GetFEModel();
-
+	
 	#pragma omp parallel for
 	for (int iel=0; iel<NE; ++iel)
 	{
@@ -855,9 +760,6 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 
 		// calculate material stiffness
 		ElementMaterialStiffness(el, ke);
-
-		// calculate density stiffness
-		ElementDensityStiffness(fem, el, ke);
 
 		// assign symmetic parts
 		// TODO: Can this be omitted by changing the Assemble routine so that it only
@@ -953,9 +855,6 @@ void FEElasticSolidDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
 
 	// calculate geometrical stiffness
 	ElementGeometricalStiffness(el, ke);
-
-	// calculate density stiffness
-	ElementDensityStiffness(fem, el, ke);
 
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only

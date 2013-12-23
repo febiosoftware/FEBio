@@ -8,11 +8,13 @@
 #include "FEElasticTrussDomain.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidShellDomain.h"
+#include "FERemodelingElasticDomain.h"
 #include "FEUDGHexDomain.h"
 #include "FEUT4Domain.h"
 #include "FELinearElastic.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FEDiscreteSpringDomain.h"
+#include "FERemodelingElasticMaterial.h"
 #include "FECore/FEDiscreteMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -76,7 +78,11 @@ int FESolidDomainFactory::GetDomainType(const FE_Element_Spec& spec, FEMaterial*
 //-----------------------------------------------------------------------------
 FEDomain* FESolidDomainFactory::CreateDomain(int dtype, FEMesh* pm, FEMaterial* pmat)
 {
-	if (dtype == FE_SOLID_DOMAIN       ) return new FEElasticSolidDomain      (pm, pmat);
+	if (dtype == FE_SOLID_DOMAIN       ) 
+	{
+		if (dynamic_cast<FERemodelingElasticMaterial*>(pmat)) return new FERemodelingElasticDomain(pm, pmat);
+		else return new FEElasticSolidDomain(pm, pmat);
+	}
 	if (dtype == FE_SHELL_DOMAIN       ) return new FEElasticShellDomain      (pm, pmat);
 	if (dtype == FE_TRUSS_DOMAIN       ) return new FEElasticTrussDomain      (pm, pmat);
 	if (dtype == FE_RIGID_SOLID_DOMAIN ) return new FERigidSolidDomain        (pm, pmat);
