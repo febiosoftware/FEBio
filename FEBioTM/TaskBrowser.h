@@ -49,7 +49,7 @@ public:
 
 	void AddTask(CTask *pt);
 
-	void RemoveTask(int n);
+	void RemoveTask();
 
 	void SelectTask(int n);
 

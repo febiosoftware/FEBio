@@ -16,7 +16,7 @@ TMSession::~TMSession()
 //-----------------------------------------------------------------------------
 void TMSession::Clear()
 {
-	while (m_Task.empty() == false) RemoveTask(0);
+	while (m_Task.empty() == false) RemoveTask(m_Task[0]);
 }
 
 //-----------------------------------------------------------------------------
@@ -24,6 +24,22 @@ CTask* TMSession::GetTask(int i)
 {
 	if ((i>=0) && (i<(int)m_Task.size())) return m_Task[i];
 	else return 0;
+}
+
+//-----------------------------------------------------------------------------
+CTask* TMSession::GetVisibleTask(int n)
+{
+	if (n<0) return 0;
+	int c = 0;
+	for (int i=0; i<(int)m_Task.size(); ++i)
+	{
+		CTask* pt = m_Task[i];
+		if (pt->IsVisible())
+		{
+			if (c == n) return pt; else c++;
+		}
+	}
+	return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -49,13 +65,28 @@ CTask* TMSession::AddTask(const char* szfile)
 	return pt;
 }
 
+
 //-----------------------------------------------------------------------------
-void TMSession::RemoveTask(int n)
+int TMSession::VisibleTasks()
 {
-	CTask* pt = GetTask(n);
+	int nv = 0;
+	for (int i=0; i<Tasks(); ++i) if (m_Task[i]->IsVisible()) nv++;
+	return nv;
+}
+
+//-----------------------------------------------------------------------------
+void TMSession::RemoveTask(CTask* pt)
+{
 	assert(pt);
-	if (pt == 0) return;
-	vector<CTask*>::iterator it = m_Task.begin() + n;
-	m_Task.erase(it);
-	delete pt;
+	for (int i=0; i<(int)m_Task.size(); ++i)
+	{
+		CTask* pti = GetTask(i);
+		if (pt == pti)
+		{
+			vector<CTask*>::iterator it = m_Task.begin() + i;
+			m_Task.erase(it);
+			delete pti;
+			break;
+		}
+	}
 }

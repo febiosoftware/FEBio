@@ -24,6 +24,7 @@ CMenu::CMenu(int w, int h, CWnd* pwnd) : Fl_Menu_Bar(0, 0, w, h), m_pWnd(pwnd)
 			{"Find again"    ,      FL_F + 3, FLX_MENU_HANDLER(pwnd, CWnd::OnEditFindAgain)},
 			{"Go to line ...", FL_CTRL + 'l', FLX_MENU_HANDLER(pwnd, CWnd::OnEditGoToLine)},
 			{"Filter ..."    ,             0, FLX_MENU_HANDLER(pwnd, CWnd::OnEditFilter)},
+			{"Clear filter"  ,             0, FLX_MENU_HANDLER(pwnd, CWnd::OnEditClearFilter)},
 			{0},
 		{"Run", 0, 0, 0, FL_SUBMENU },
 			{"Run Selected"   , FL_CTRL + FL_F + 5, FLX_MENU_HANDLER(pwnd, CWnd::OnRunSelected)},

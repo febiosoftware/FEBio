@@ -72,7 +72,7 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 
 			 bool b = (row_selected(ROW)==1);
 			CDocument* pdoc = m_pWnd->GetDocument();
-			CTask* pt = pdoc->GetSession().GetTask(ROW);
+			CTask* pt = pdoc->GetSession().GetVisibleTask(ROW);
 			 fl_push_clip(X,Y,W,H);
 			 // Draw cell bg
 			 fl_color((b?selection_color():FL_WHITE)); fl_rectf(X,Y,W,H);
@@ -286,7 +286,8 @@ CTaskBrowser::CTaskBrowser(int x, int y, int w, int h, CWnd* pwnd) : Flx_Group(x
 void CTaskBrowser::Update()
 {
 	CDocument* pdoc = m_pWnd->GetDocument();
-	m_pg->rows(pdoc->GetSession().Tasks());
+	m_pg->select_all_rows(0);
+	m_pg->rows(pdoc->GetSession().VisibleTasks());
 	if (m_pg->rows() > 0)
 	{
 		m_pg->row_height_all(20); // default height of rows
@@ -308,7 +309,7 @@ void CTaskBrowser::AddTask(CTask *pt)
 }
 
 //-----------------------------------------------------------------------------
-void CTaskBrowser::RemoveTask(int n)
+void CTaskBrowser::RemoveTask()
 {
 	int N = m_pg->rows();
 	if (N > 0)

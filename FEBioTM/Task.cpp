@@ -30,6 +30,8 @@ CTask::CTask()
 	m_stats.nmin = 0;
 	m_stats.nsec = 0;
 
+	m_bvisible = true;
+
 	m_ptime = 0;
 }
 

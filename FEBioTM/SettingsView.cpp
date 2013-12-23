@@ -46,12 +46,13 @@ void CSettingsView::OnChange(Fl_Widget* pw, void* pd)
 	TMSession& session = m_pWnd->GetDocument()->GetSession();
 
 	int N = session.Tasks();
+	int c = 0;
 	for (int i=0; i<N; ++i)
 	{
-		if (m_pWnd->IsTaskSelected(i))
+		CTask* pt = session.GetTask(i);
+		if (pt->IsVisible())
 		{
-			CTask* pt = session.GetTask(i);
-			if (pt)
+			if (m_pWnd->IsTaskSelected(c++))
 			{
 				pt->m_bdebug = m_bdebug;
 				pt->m_nlog   = m_nlog;

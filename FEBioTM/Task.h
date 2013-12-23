@@ -83,6 +83,11 @@ public:
 	void UpdateRunTime();
 
 public:
+	bool IsVisible() { return m_bvisible; }
+	void Show() { m_bvisible = true; }
+	void Hide() { m_bvisible = false; }
+
+public:
 	void UpdateStyle(int pos, int nInserted, int nDeleted, int nRestyled, const char* deletedText);
 
 protected:
@@ -90,6 +95,7 @@ protected:
 	Fl_Text_Buffer*	m_pFile;				//!< text buffer for editing
 	Fl_Text_Buffer*	m_pStyle;				//!< text buffer for styling
 	int				m_nstatus;				//!< status
+	bool			m_bvisible;				//!< is the file visible in the task browser?
 
 public: // FEBio command line and control options
 	bool	m_bdebug;	//!< debug mode

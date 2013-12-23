@@ -156,12 +156,18 @@ void* febio_func(void* pd)
 		// find a queued task
 		Fl::lock();
 		itask = -1;
+		int c = 0;
 		for (int i=0; i<session.Tasks(); ++i)
 		{
-			if (session.GetTask(i)->GetStatus() == CTask::QUEUED)
+			CTask* pti = session.GetTask(i);
+			if (pti->IsVisible())
 			{
-				itask = i;
-				break;
+				if (pti->GetStatus() == CTask::QUEUED)
+				{
+					itask = c;
+					break;
+				}
+				c++;
 			}
 		}
 		Fl::unlock();
@@ -172,7 +178,7 @@ void* febio_func(void* pd)
 			time_t time0, time1;
 
 			// get the task
-			CTask* pt = session.GetTask(itask);
+			CTask* pt = session.GetVisibleTask(itask);
 
 			// lock the display
 			Fl_Progress* pw = 0;
@@ -279,11 +285,15 @@ void CDocument::RunSession()
 		// get the next task
 		CTask* pt = m_session.GetTask(i);
 
-		// save if necessary
-		if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
+		// only run visible tasks
+		if (pt->IsVisible())
+		{
+			// save if necessary
+			if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
 
-		// only add the task if it is not running
-		if (pt->GetStatus() != CTask::RUNNING) pt->SetStatus(CTask::QUEUED);
+			// only add the task if it is not running
+			if (pt->GetStatus() != CTask::RUNNING) pt->SetStatus(CTask::QUEUED);
+		}
 	}
 
 	// run the queue

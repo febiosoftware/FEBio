@@ -300,8 +300,7 @@ void CWnd::OnFileSave(Fl_Widget* pw, void* pd)
 	if (m_pSel == 0) return;
 	if (m_pSel == m_pText)
 	{
-		int n = m_pTask->SelectedTask();
-		CTask* pt = m_pDoc->GetSession().GetTask(n);
+		CTask* pt = GetSelectedTask();
 		if (pt == 0) flx_error("No task selected");
 		else 
 		{
@@ -321,8 +320,7 @@ void CWnd::OnFileSaveAs(Fl_Widget* pw, void* pd)
 	char szfile[1024] = {0};
 	if (m_pSel == m_pText)
 	{
-		int n = m_pTask->SelectedTask();
-		CTask* pt = m_pDoc->GetSession().GetTask(n);
+		CTask* pt = GetSelectedTask();
 		if (pt == 0) flx_error("No task selected");
 		else 
 		{
@@ -347,8 +345,7 @@ void CWnd::OnFileSaveAs(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 void CWnd::OnFileRevert(Fl_Widget* pw, void* pd)
 {
-	int n = m_pTask->SelectedTask();
-	CTask* pt = m_pDoc->GetSession().GetTask(n);
+	CTask* pt = GetSelectedTask();
 	if (pt == 0) flx_error("No task selected");
 	else 
 	{
@@ -365,12 +362,12 @@ void CWnd::OnFileRevert(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 void CWnd::OnFileClose(Fl_Widget* pw, void* pd)
 {
-	int n = m_pTask->SelectedTask();
-	if (n>=0)
+	CTask* ptask = GetSelectedTask();
+	if (ptask)
 	{
 		if (m_pText) m_pText->buffer(0);
-		m_pDoc->GetSession().RemoveTask(n);
-		m_pTask->RemoveTask(n);
+		m_pDoc->GetSession().RemoveTask(ptask);
+		m_pTask->RemoveTask();
 		SelectFile();
 	}
 	else flx_alert("Nothing to remove.");
@@ -433,7 +430,7 @@ void CWnd::OnSelectFile(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 void CWnd::SelectFile()
 {
-	CTask* pt = GetDocument()->GetSession().GetTask(m_pTask->SelectedTask());
+	CTask* pt = GetSelectedTask();
 	if (pt)
 	{
 		if (m_pText) 
@@ -500,7 +497,6 @@ void CWnd::OnEditFilter(Fl_Widget* pw, void* pd)
 	static CDlgEditFilter dlg;
 	if (dlg.DoModal() == FLX_OK)
 	{
-		m_pTask->SelectAll(0);
 		TMSession& session = m_pDoc->GetSession();
 		int N = session.Tasks();
 		int ncnt = 0;
@@ -509,10 +505,30 @@ void CWnd::OnEditFilter(Fl_Widget* pw, void* pd)
 			CTask& task = *session.GetTask(i);
 			Fl_Text_Buffer* pbuf = task.GetTextBuffer();
 			int npos;
-			if (pbuf->search_forward(0, dlg.m_sztxt, &npos, dlg.m_bcase) > 0) { m_pTask->SelectTask(i); ncnt++; }
+			if (pbuf->search_forward(0, dlg.m_sztxt, &npos, dlg.m_bcase) > 0) { task.Show(); ncnt++; } else task.Hide();
 		}
-		flx_alert("%d files found.", ncnt);
+		// update the task browser
+		m_pTask->Update();
+		SelectFile();
+
+//		flx_alert("%d files found.", ncnt);
 	}
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnEditClearFilter(Fl_Widget* pw, void* pd)
+{
+	// show all tasks
+	TMSession& session = m_pDoc->GetSession();
+	int N = session.Tasks();
+	for (int i=0; i<N; ++i)
+	{
+		CTask& task = *session.GetTask(i);
+		task.Show();
+	}
+
+	// update task browser
+	m_pTask->Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -535,7 +551,7 @@ void CWnd::OnEditGoToLine(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 CTask* CWnd::GetSelectedTask()
 {
-	return m_pDoc->GetSession().GetTask(m_pTask->SelectedTask());
+	return m_pDoc->GetSession().GetVisibleTask(m_pTask->SelectedTask());
 }
 
 //-----------------------------------------------------------------------------
@@ -555,7 +571,7 @@ void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 	{
 		if (m_pTask->IsTaskSelected(i))
 		{
-			CTask* pt = session.GetTask(i);
+			CTask* pt = session.GetVisibleTask(i);
 
 			// Add the task to the queue
 			m_pDoc->RunTask(pt);
@@ -589,7 +605,7 @@ void CWnd::OnRunCancelSelected(Fl_Widget* pw, void* pd)
 	{
 		if (m_pTask->IsTaskSelected(i))
 		{
-			CTask* pt = session.GetTask(i);
+			CTask* pt = session.GetVisibleTask(i);
 			if (pt)
 			{
 				int n = pt->GetStatus();
@@ -711,8 +727,7 @@ void CWnd::OnSelectTab(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 void CWnd::OnChangeText(Fl_Widget* pw, void* pd)
 {
-	int n = m_pTask->SelectedTask();
-	CTask* pt = m_pDoc->GetSession().GetTask(n);
+	CTask* pt = GetSelectedTask();
 
 	// we need to update the format of the modified line
 	int npos = m_pText->insert_position();
