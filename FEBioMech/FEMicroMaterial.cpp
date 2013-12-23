@@ -2,8 +2,8 @@
 #include "FEMicroMaterial.h"
 #include "FECore/FEElemElemList.h"
 #include "FECore/log.h"
-#include "FEBioMech/FESolidSolver.h"
-#include "FEBioMech/FEElasticSolidDomain.h"
+#include "FESolidSolver.h"
+#include "FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
 #include "FEBioXML/FEBioImport.h"
 
