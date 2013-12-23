@@ -2272,9 +2272,6 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
                                               spt.m_dkdr, spt.m_dkdJr, spt.m_dkdrc);
 			
 		pt.m_s = pmb->Stress(mp);
-
-		// evaluate the strain energy density
-		pt.m_sed = pme->StrainEnergy(mp);
             
 		// evaluate the referential solid density
 		pt.m_rhor = pmb->SolidReferentialApparentDensity(mp);

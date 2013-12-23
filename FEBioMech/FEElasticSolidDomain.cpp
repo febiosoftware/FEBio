@@ -993,9 +993,6 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, double dt)
 		// get the deformation gradient and determinant
 		pt.m_J = defgrad(el, pt.m_F, n);
 
-		// calculate the strain energy density at this material point
-		pt.m_sed = pm->StrainEnergy(mp);
-
 		// calculate the stress at this material point
 		pt.m_s = pm->Stress(mp);
 	}

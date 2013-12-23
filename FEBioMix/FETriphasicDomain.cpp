@@ -2282,9 +2282,5 @@ void FETriphasicDomain::UpdateElementStress(int iel)
 		spt.m_Ie = pmb->CurrentDensity(mp);
 			
 		pt.m_s = pmb->Stress(mp);
-
-		// evaluate the strain energy density
-//		pt.sed = pme->StrainEnergy(mp);
-
 	}
 }

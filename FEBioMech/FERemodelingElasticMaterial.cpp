@@ -131,7 +131,7 @@ bool FERemodelingElasticMaterial::SetProperty(int n, FEMaterial* pm)
 //! Strain energy density function
 double FERemodelingElasticMaterial::StrainEnergy(FEMaterialPoint& mp)
 {
-	return m_pBase->StrainEnergy(mp);
+	return (dynamic_cast<FERemodelingInterface*>(m_pBase))->StrainEnergy(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -142,6 +142,9 @@ mat3ds FERemodelingElasticMaterial::Stress(FEMaterialPoint& mp)
 
     FERemodelingMaterialPoint& rpt = *(mp.ExtractData<FERemodelingMaterialPoint>());
 	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+	// calculate the strain energy density at this material point
+	pt.m_sed = StrainEnergy(mp);
 
 	// calculate the sed derivative with respect to mass density at this material point
     rpt.dsed = Tangent_SE_Density(mp);
@@ -165,12 +168,12 @@ tens4ds FERemodelingElasticMaterial::Tangent(FEMaterialPoint& mp)
 //! Tangent of strain energy density with mass density
 double FERemodelingElasticMaterial::Tangent_SE_Density(FEMaterialPoint& pt)
 {
-    return m_pBase->Tangent_SE_Density(pt);
+    return (dynamic_cast<FERemodelingInterface*>(m_pBase))->Tangent_SE_Density(pt);
 }
 
 //-----------------------------------------------------------------------------
 //! Tangent of stress with mass density
 mat3ds FERemodelingElasticMaterial::Tangent_Stress_Density(FEMaterialPoint& pt)
 {
-    return m_pBase->Tangent_Stress_Density(pt);
+    return (dynamic_cast<FERemodelingInterface*>(m_pBase))->Tangent_Stress_Density(pt);
 }

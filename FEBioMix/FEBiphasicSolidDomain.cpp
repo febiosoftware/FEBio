@@ -1222,8 +1222,5 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 			
 		// calculate the stress at this material point
 		pt.m_s = pmb->Stress(mp);
-
-		// evaluate the strain energy density
-		pt.m_sed = pme->StrainEnergy(mp);
 	}
 }

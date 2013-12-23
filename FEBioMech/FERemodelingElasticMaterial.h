@@ -48,6 +48,22 @@ public:
 
 
 //-----------------------------------------------------------------------------
+//! A material that wants to use the remodeling framework needs to implement 
+//! this additional interface.
+class FERemodelingInterface
+{
+public:
+	//! calculate strain energy density at material point
+	virtual double StrainEnergy(FEMaterialPoint& pt) = 0;
+
+	//! calculate tangent of strain energy density with solid density at material point
+	virtual double Tangent_SE_Density(FEMaterialPoint& pt) = 0;
+
+	//! calculate tangent of stress with solid density at material point
+	virtual mat3ds Tangent_Stress_Density(FEMaterialPoint& pt) = 0;
+};
+
+//-----------------------------------------------------------------------------
 //! Material class for remodeling solids
 class FERemodelingElasticMaterial : public FEElasticMaterial
 {
