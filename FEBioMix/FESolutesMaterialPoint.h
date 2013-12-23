@@ -33,6 +33,7 @@ public:
 	vec3d			m_Ie;		//!< current density
 	double			m_cF;		//!< fixed charge density in current configuration
 	int				m_nsbm;		//!< number of solid-bound molecules
+	double			m_rhor;		//!< current referential mass density
 	vector<double>	m_sbmr;		//!< referential mass concentration of solid-bound molecules
 	vector<double>	m_sbmrp;	//!< m_sbmr at previoust time step
 	vector<double>	m_sbmrhat;	//!< referential mass supply of solid-bound molecules

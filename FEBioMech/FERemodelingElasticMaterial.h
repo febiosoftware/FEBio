@@ -43,8 +43,9 @@ public:
     
 public:
 	double		m_sed;		//!< strain energy density
-	double		dsed;		//!< derivative of strain energy density with mass density
-	double		rhorp;		//!< referential mass density at previous time step
+	double		m_dsed;		//!< derivative of strain energy density with mass density
+	double		m_rhor;		//!< current referential mass density
+	double		m_rhorp;	//!< referential mass density at previous time step
 };
 
 //-----------------------------------------------------------------------------

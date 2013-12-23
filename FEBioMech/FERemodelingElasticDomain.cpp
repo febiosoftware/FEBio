@@ -9,6 +9,48 @@ FERemodelingElasticDomain::FERemodelingElasticDomain(FEMesh* pm, FEMaterial* pma
 }
 
 //-----------------------------------------------------------------------------
+// Reset data
+void FERemodelingElasticDomain::Reset()
+{
+	FEElasticSolidDomain::Reset();
+
+	FERemodelingElasticMaterial* pme = dynamic_cast<FERemodelingElasticMaterial*>(m_pMat); assert(pme);
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		FESolidElement& el = m_Elem[i];
+		int n = el.GaussPoints();
+		for (int j=0; j<n; ++j) {
+			FERemodelingMaterialPoint& pt = *el.m_State[j]->ExtractData<FERemodelingMaterialPoint>();
+			pt.m_rhor = pme->Density();
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! \todo The material point initialization needs to move to the base class.
+bool FERemodelingElasticDomain::Initialize(FEModel &fem)
+{
+	// initialize base class
+	if (FEElasticSolidDomain::Initialize(fem) == false) return false;
+
+	// get the elements material
+	FERemodelingElasticMaterial* pme = dynamic_cast<FERemodelingElasticMaterial*>(m_pMat); assert(pme);
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		FESolidElement& el = m_Elem[i];
+
+		// initialize referential solid density
+		for (int n=0; n<el.GaussPoints(); ++n)
+		{
+			FERemodelingMaterialPoint& pt = *el.m_State[n]->ExtractData<FERemodelingMaterialPoint>();
+			pt.m_rhor = pme->Density();
+		}
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! calculates the global stiffness matrix for this domain
 void FERemodelingElasticDomain::StiffnessMatrix(FESolver* psolver)
 {

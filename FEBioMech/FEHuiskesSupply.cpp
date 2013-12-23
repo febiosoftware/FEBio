@@ -25,9 +25,8 @@ void FEHuiskesSupply::Init()
 //! Solid supply
 double FEHuiskesSupply::Supply(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FERemodelingMaterialPoint& rpt = *mp.ExtractData<FERemodelingMaterialPoint>();
-	double rhor = pt.m_rhor;
+	double rhor = rpt.m_rhor;
 	double sed = rpt.m_sed;
 	double rhorhat = m_B*(sed/rhor - m_k);
 	return rhorhat;
@@ -38,7 +37,8 @@ double FEHuiskesSupply::Supply(FEMaterialPoint& mp)
 mat3ds FEHuiskesSupply::Tangent_Supply_Strain(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    mat3ds ruhat = pt.m_s*(m_B/pt.m_rhor);
+	FERemodelingMaterialPoint& rpt = *mp.ExtractData<FERemodelingMaterialPoint>();
+    mat3ds ruhat = pt.m_s*(m_B/rpt.m_rhor);
 	return ruhat;
 }
 
@@ -46,11 +46,10 @@ mat3ds FEHuiskesSupply::Tangent_Supply_Strain(FEMaterialPoint &mp)
 //! Tangent of solid supply with respect to referential density
 double FEHuiskesSupply::Tangent_Supply_Density(FEMaterialPoint &mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FERemodelingMaterialPoint& rpt = *mp.ExtractData<FERemodelingMaterialPoint>();
-    double rhor = pt.m_rhor;
+    double rhor = rpt.m_rhor;
     double sed = rpt.m_sed;
-    double dsed = rpt.dsed;
+    double dsed = rpt.m_dsed;
 	return (dsed - sed/rhor)*m_B/rhor;
 }
 

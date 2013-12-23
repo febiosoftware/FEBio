@@ -11,6 +11,12 @@ public:
 	//! constructor
 	FERemodelingElasticDomain(FEMesh* pm, FEMaterial* pmat);
 
+	//! reset element data
+	void Reset();
+
+	//! initialize class
+	bool Initialize(FEModel& fem);
+
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolver* psolver);
 

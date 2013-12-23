@@ -23,6 +23,7 @@ void FECarterHayesOld::Init()
 
 double FECarterHayesOld::StrainEnergy(FEMaterialPoint& mp)
 {
+	FERemodelingMaterialPoint& rpt = *mp.ExtractData<FERemodelingMaterialPoint>();
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	double detF = pt.m_J;
@@ -33,7 +34,7 @@ double FECarterHayesOld::StrainEnergy(FEMaterialPoint& mp)
 	double I1 = b.tr();
 	
 	// lame parameters
-	double rhor = pt.m_rhor;
+	double rhor = rpt.m_rhor;
 	double m_E = YoungModulus(rhor);
 	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
 	double mu  = 0.5*m_E/(1+m_v);
@@ -45,6 +46,7 @@ double FECarterHayesOld::StrainEnergy(FEMaterialPoint& mp)
 
 mat3ds FECarterHayesOld::Stress(FEMaterialPoint& mp)
 {
+	FERemodelingMaterialPoint& rpt = *mp.ExtractData<FERemodelingMaterialPoint>();
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	double detF = pt.m_J;
@@ -55,7 +57,7 @@ mat3ds FECarterHayesOld::Stress(FEMaterialPoint& mp)
 	mat3ds b = pt.LeftCauchyGreen();
 	
 	// lame parameters
-	double rhor = pt.m_rhor;
+	double rhor = rpt.m_rhor;
 	double m_E = YoungModulus(rhor);
 	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
 	double mu  = 0.5*m_E/(1+m_v);
@@ -71,13 +73,14 @@ mat3ds FECarterHayesOld::Stress(FEMaterialPoint& mp)
 
 tens4ds FECarterHayesOld::Tangent(FEMaterialPoint& mp)
 {
+	FERemodelingMaterialPoint& rpt = *mp.ExtractData<FERemodelingMaterialPoint>();
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// deformation gradient
 	double detF = pt.m_J;
 	
 	// lame parameters
-	double rhor = pt.m_rhor;
+	double rhor = rpt.m_rhor;
 	double m_E = YoungModulus(rhor);
 	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
 	double mu  = 0.5*m_E/(1+m_v);
@@ -99,14 +102,14 @@ tens4ds FECarterHayesOld::Tangent(FEMaterialPoint& mp)
 //! calculate tangent of strain energy density with mass density
 double FECarterHayesOld::Tangent_SE_Density(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    return StrainEnergy(mp)*m_g/pt.m_rhor;
+	FERemodelingMaterialPoint& rpt = *mp.ExtractData<FERemodelingMaterialPoint>();
+    return StrainEnergy(mp)*m_g/rpt.m_rhor;
 }
 
 //! calculate tangent of stress with mass density
 mat3ds FECarterHayesOld::Tangent_Stress_Density(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    return Stress(mp)*m_g/pt.m_rhor;
+	FERemodelingMaterialPoint& rpt = *mp.ExtractData<FERemodelingMaterialPoint>();
+    return Stress(mp)*m_g/rpt.m_rhor;
 }
 

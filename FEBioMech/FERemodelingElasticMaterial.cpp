@@ -12,16 +12,15 @@ FEMaterialPoint* FERemodelingMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FERemodelingMaterialPoint::Init(bool bflag)
 {
-	FEElasticMaterialPoint& pt = *m_pt->ExtractData<FEElasticMaterialPoint>();
 	if (bflag)
 	{
 		// intialize data to zero
-        m_sed = 0;
-		dsed = rhorp = 0;
+        m_sed = m_dsed = 0; 
+		m_rhor = m_rhorp = 0;
 	}
 	else
 	{
-		rhorp = pt.m_rhor;
+		m_rhorp = m_rhor;
 	}
         
 	// don't forget to intialize the nested data
@@ -35,11 +34,13 @@ void FERemodelingMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
         
 	if (bsave)
 	{
-		dmp << dsed << rhorp;
+		dmp << m_sed << m_dsed;
+		dmp << m_rhor << m_rhorp;
 	}
 	else
 	{
-		dmp >> dsed >> rhorp;
+		dmp >> m_sed >> m_dsed;
+		dmp >> m_rhor >> m_rhorp;
 	}
 }
 
@@ -50,11 +51,13 @@ void FERemodelingMaterialPoint::Serialize(DumpFile& ar)
         
 	if (ar.IsSaving())
 	{
-		ar << dsed << rhorp;
+		ar << m_sed << m_dsed;
+		ar << m_rhor << m_rhorp;
 	}
 	else
 	{
-		ar >> dsed >> rhorp;
+		ar >> m_sed >> m_dsed;
+		ar >> m_rhor >> m_rhorp;
 	}
 }
 
@@ -148,12 +151,12 @@ mat3ds FERemodelingElasticMaterial::Stress(FEMaterialPoint& mp)
 	rpt.m_sed = StrainEnergy(mp);
 
 	// calculate the sed derivative with respect to mass density at this material point
-    rpt.dsed = Tangent_SE_Density(mp);
+    rpt.m_dsed = Tangent_SE_Density(mp);
                 
 	double rhorhat = m_pSupp->Supply(mp);
-	pt.m_rhor = rhorhat*dt + rpt.rhorp;
-	if (pt.m_rhor > m_rhormax) pt.m_rhor = m_rhormax;
-	if (pt.m_rhor < m_rhormin) pt.m_rhor = m_rhormin;
+	rpt.m_rhor = rhorhat*dt + rpt.m_rhorp;
+	if (rpt.m_rhor > m_rhormax) rpt.m_rhor = m_rhormax;
+	if (rpt.m_rhor < m_rhormin) rpt.m_rhor = m_rhormin;
 
 	return m_pBase->Stress(mp);
 }

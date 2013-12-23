@@ -23,6 +23,7 @@ void FESolutesMaterialPoint::Init(bool bflag)
 		m_nsol = m_nsbm = 0;
 		m_psi = m_cF = 0;
 		m_Ie = vec3d(0,0,0);
+		m_rhor = 0;
 	}
     
 	if (m_pt) m_pt->Init(bflag);

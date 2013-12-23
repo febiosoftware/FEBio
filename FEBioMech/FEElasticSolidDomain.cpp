@@ -26,17 +26,6 @@ FEDomain* FEElasticSolidDomain::Clone()
 void FEElasticSolidDomain::Reset()
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
-
-	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-	for (size_t i=0; i<m_Elem.size(); ++i)
-	{
-		FESolidElement& el = m_Elem[i];
-		int n = el.GaussPoints();
-		for (int j=0; j<n; ++j) {
-			FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
-			pt.m_rhor = pme->Density();
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -85,13 +74,6 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 						bmerr = true;
 					}
 				}
-			}
-
-			// initialize referential solid density
-			for (int n=0; n<el.GaussPoints(); ++n)
-			{
-				FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-				pt.m_rhor = pme->Density();
 			}
 
 			// check if this is also a viscoelastic material

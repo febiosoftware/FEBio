@@ -39,8 +39,6 @@ void FEElasticMaterialPoint::Init(bool bflag)
 		m_s0.zero();
 
 //		m_Q.unit();
-
-	    m_rhor = 0;
 	}
 
 	if (m_pt) m_pt->Init(bflag);
@@ -52,12 +50,10 @@ void FEElasticMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 	if (bsave)
 	{
 		dmp << m_F << m_J << m_Q << m_s << m_s0;
-		dmp << m_rhor;
 	}
 	else
 	{
 		dmp >> m_F >> m_J >> m_Q >> m_s >> m_s0;
-		dmp >> m_rhor;
 	}
 
 	if (m_pt) m_pt->ShallowCopy(dmp, bsave);

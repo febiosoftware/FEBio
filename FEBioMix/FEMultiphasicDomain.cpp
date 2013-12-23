@@ -2269,13 +2269,13 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
 		ppt.m_pa = pmb->Pressure(mp);
 		spt.m_cF = pmb->FixedChargeDensity(mp);
 		spt.m_Ie = pmb->CurrentDensity(mp);
-           pmb->PartitionCoefficientFunctions(mp, spt.m_k, spt.m_dkdJ, spt.m_dkdc,
+		pmb->PartitionCoefficientFunctions(mp, spt.m_k, spt.m_dkdJ, spt.m_dkdc,
                                               spt.m_dkdJJ, spt.m_dkdJc, spt.m_dkdcc,
                                               spt.m_dkdr, spt.m_dkdJr, spt.m_dkdrc);
 			
 		pt.m_s = pmb->Stress(mp);
             
 		// evaluate the referential solid density
-		pt.m_rhor = pmb->SolidReferentialApparentDensity(mp);
+		spt.m_rhor = pmb->SolidReferentialApparentDensity(mp);
 	}
 }

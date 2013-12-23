@@ -426,9 +426,8 @@ bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FERemodelingMaterialPoint* rpt = (mp.ExtractData<FERemodelingMaterialPoint>());
-				FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint>());
 				
-				if (rpt) ew += rpt->m_sed/ept->m_rhor;
+				if (rpt) ew += rpt->m_sed/rpt->m_rhor;
 			}
 			
 			ew /= el.GaussPoints();
@@ -457,8 +456,7 @@ bool FEPlotDensity::Save(FEDomain &dom, vector<float>& a)
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
-				FEElasticMaterialPoint* pt = (mp.ExtractData<FEElasticMaterialPoint>());
-				
+				FERemodelingMaterialPoint* pt = (mp.ExtractData<FERemodelingMaterialPoint>());
 				if (pt) ew += pt->m_rhor;
 			}
 			
