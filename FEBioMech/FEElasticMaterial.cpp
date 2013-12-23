@@ -230,7 +230,6 @@ mat3ds FEElasticMaterialPoint::push_forward(const mat3ds& A)
 FEElasticMaterial::FEElasticMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 { 
 	m_density = 1; 
-	m_molarmass = 0; 
 }
 
 //-----------------------------------------------------------------------------

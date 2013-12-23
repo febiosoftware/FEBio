@@ -23,9 +23,6 @@ public:
 	//! return the material density
 	virtual double Density() { return m_density; }
 
-	//! return the molar mass
-	virtual double MolarMass() { return m_molarmass; }
-
 	//! calculate strain energy density at material point \todo remove this
 	virtual double StrainEnergy(FEMaterialPoint& pt) { return 0; }
 
@@ -37,5 +34,4 @@ public:
 
 protected:
 	double	m_density;	//!< material density
-	double	m_molarmass;//!< material molar mass (molecular weight)
 };

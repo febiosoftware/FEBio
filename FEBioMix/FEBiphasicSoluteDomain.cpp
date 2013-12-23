@@ -1814,8 +1814,11 @@ void FEBiphasicSoluteDomain::UpdateElementStress(int iel, double dt, bool sstate
 				spt.m_sbmrhat[0] = pmb->GetSolute()->m_pSupp->ReceptorLigandSupply(mp);
 				spt.m_sbmr[0] = spt.m_sbmrp[0] + spt.m_sbmrhat[0]*dt;
 				// update phi0 using backward difference integration
-				ppt.m_phi0hat = pmb->GetSolid()->MolarMass()/pmb->GetSolid()->Density()
-				*pmb->GetSolute()->m_pSupp->SolidSupply(mp);
+
+				// NOTE: MolarMass was removed since not used
+				ppt.m_phi0hat = 0;
+//				ppt.m_phi0hat = pmb->GetSolid()->MolarMass()/pmb->GetSolid()->Density()*pmb->GetSolute()->m_pSupp->SolidSupply(mp);
+
 				ppt.m_phi0 = ppt.m_phi0p + ppt.m_phi0hat*dt;
 			}
 		}
