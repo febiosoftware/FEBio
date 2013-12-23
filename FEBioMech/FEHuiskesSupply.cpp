@@ -26,8 +26,9 @@ void FEHuiskesSupply::Init()
 double FEHuiskesSupply::Supply(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FERemodelingMaterialPoint& rpt = *mp.ExtractData<FERemodelingMaterialPoint>();
 	double rhor = pt.m_rhor;
-	double sed = pt.m_sed;
+	double sed = rpt.m_sed;
 	double rhorhat = m_B*(sed/rhor - m_k);
 	return rhorhat;
 }
@@ -48,7 +49,7 @@ double FEHuiskesSupply::Tangent_Supply_Density(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FERemodelingMaterialPoint& rpt = *mp.ExtractData<FERemodelingMaterialPoint>();
     double rhor = pt.m_rhor;
-    double sed = pt.m_sed;
+    double sed = rpt.m_sed;
     double dsed = rpt.dsed;
 	return (dsed - sed/rhor)*m_B/rhor;
 }

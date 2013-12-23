@@ -47,7 +47,6 @@ public:
 	// solid material data
 	mat3ds		m_s;		//!< Cauchy stress
 	mat3ds		m_s0;		//!< Initial stress (only used by linear solid solver)
-	double		m_sed;		//!< strain energy density	\todo Is this a good place for this?
 	double		m_rhor;		//!< current referential mass density
 };
 

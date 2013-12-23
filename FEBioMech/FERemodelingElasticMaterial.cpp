@@ -16,7 +16,8 @@ void FERemodelingMaterialPoint::Init(bool bflag)
 	if (bflag)
 	{
 		// intialize data to zero
-        dsed = rhorp = 0;
+        m_sed = 0;
+		dsed = rhorp = 0;
 	}
 	else
 	{
@@ -144,7 +145,7 @@ mat3ds FERemodelingElasticMaterial::Stress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 	// calculate the strain energy density at this material point
-	pt.m_sed = StrainEnergy(mp);
+	rpt.m_sed = StrainEnergy(mp);
 
 	// calculate the sed derivative with respect to mass density at this material point
     rpt.dsed = Tangent_SE_Density(mp);

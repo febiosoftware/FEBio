@@ -42,10 +42,10 @@ public:
 	void ShallowCopy(DumpStream& dmp, bool bsave);
     
 public:
-	double	dsed;		//!< derivative of strain energy density with mass density
-	double	rhorp;		//!< referential mass density at previous time step
+	double		m_sed;		//!< strain energy density
+	double		dsed;		//!< derivative of strain energy density with mass density
+	double		rhorp;		//!< referential mass density at previous time step
 };
-
 
 //-----------------------------------------------------------------------------
 //! A material that wants to use the remodeling framework needs to implement 

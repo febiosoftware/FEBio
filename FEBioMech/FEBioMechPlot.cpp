@@ -2,6 +2,7 @@
 #include "FEBioMechPlot.h"
 #include "FEDamageNeoHookean.h"
 #include "FEDamageTransIsoMooneyRivlin.h"
+#include "FERemodelingElasticMaterial.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidShellDomain.h"
 #include "FEElasticMixture.h"
@@ -393,7 +394,7 @@ bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
-				FEElasticMaterialPoint* pt = (mp.ExtractData<FEElasticMaterialPoint>());
+				FERemodelingMaterialPoint* pt = (mp.ExtractData<FERemodelingMaterialPoint>());
 				
 				if (pt) ew += pt->m_sed;
 			}
@@ -424,9 +425,10 @@ bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, vector<float>& a)
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
-				FEElasticMaterialPoint* pt = (mp.ExtractData<FEElasticMaterialPoint>());
+				FERemodelingMaterialPoint* rpt = (mp.ExtractData<FERemodelingMaterialPoint>());
+				FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint>());
 				
-				if (pt) ew += pt->m_sed/pt->m_rhor;
+				if (rpt) ew += rpt->m_sed/ept->m_rhor;
 			}
 			
 			ew /= el.GaussPoints();
