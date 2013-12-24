@@ -244,14 +244,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\FEBioFactory.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\FEBioTask.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\FEBodyLoad.cpp"
 				>
 			</File>
@@ -277,6 +269,18 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FECoreBase.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FECoreFactory.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FECoreKernel.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FECoreTask.cpp"
 				>
 			</File>
 			<File
@@ -309,6 +313,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEException.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FEGlobalData.cpp"
 				>
 			</File>
 			<File
@@ -416,10 +424,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\kernel.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\LinearSolver.cpp"
 				>
 			</File>
@@ -522,18 +526,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\febio.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\FEBioFactory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\FEBioTask.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\FEBodyLoad.h"
 				>
 			</File>
@@ -559,6 +551,18 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FECoreBase.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FECoreFactory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FECoreKernel.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FECoreTask.h"
 				>
 			</File>
 			<File
@@ -591,6 +595,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEException.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FEGlobalData.h"
 				>
 			</File>
 			<File

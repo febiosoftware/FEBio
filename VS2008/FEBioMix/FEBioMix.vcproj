@@ -169,6 +169,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEBiphasicContactSurface.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEBiphasicSolidDomain.cpp"
 				>
 			</File>
@@ -205,6 +209,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEDiffAlbroIso.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEDiffConstIso.cpp"
 				>
 			</File>
@@ -218,6 +226,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FEFluidFlux.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FEHydraulicPermeability.cpp"
 				>
 			</File>
 			<File
@@ -254,6 +266,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FEOsmCoefConst.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FEOsmoticCoefficient.cpp"
 				>
 			</File>
 			<File
@@ -301,6 +317,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FESlidingInterfaceMP.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FESolubConst.cpp"
 				>
 			</File>
@@ -310,6 +330,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FESoluteFlux.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FESolutesMaterialPoint.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FESolventSupply.cpp"
 				>
 			</File>
 			<File
@@ -371,6 +399,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEBiphasicContactSurface.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEBiphasicSolidDomain.h"
 				>
 			</File>
@@ -407,6 +439,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEDiffAlbroIso.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEDiffConstIso.h"
 				>
 			</File>
@@ -420,6 +456,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FEFluidFlux.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FEHydraulicPermeability.h"
 				>
 			</File>
 			<File
@@ -456,6 +496,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FEOsmCoefConst.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FEOsmoticCoefficient.h"
 				>
 			</File>
 			<File
@@ -503,6 +547,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FESlidingInterfaceMP.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FESolubConst.h"
 				>
 			</File>
@@ -512,6 +560,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FESoluteFlux.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FESolutesMaterialPoint.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FESolventSupply.h"
 				>
 			</File>
 			<File
