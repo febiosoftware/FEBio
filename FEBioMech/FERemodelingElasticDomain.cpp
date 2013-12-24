@@ -14,7 +14,7 @@ void FERemodelingElasticDomain::Reset()
 {
 	FEElasticSolidDomain::Reset();
 
-	FERemodelingElasticMaterial* pme = dynamic_cast<FERemodelingElasticMaterial*>(m_pMat); assert(pme);
+	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
@@ -34,7 +34,7 @@ bool FERemodelingElasticDomain::Initialize(FEModel &fem)
 	if (FEElasticSolidDomain::Initialize(fem) == false) return false;
 
 	// get the elements material
-	FERemodelingElasticMaterial* pme = dynamic_cast<FERemodelingElasticMaterial*>(m_pMat); assert(pme);
+	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
