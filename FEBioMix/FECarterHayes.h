@@ -37,6 +37,9 @@ public:
 	
 	//! calculate tangent stiffness at material point
 	tens4ds Tangent(FEMaterialPoint& pt);
+
+	//! Create material point data
+	FEMaterialPoint* CreateMaterialPointData();
 	
 public: // --- remodeling interface ---
 

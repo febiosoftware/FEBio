@@ -40,6 +40,13 @@ void FECarterHayes::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! Create material point data
+FEMaterialPoint* FECarterHayes::CreateMaterialPointData()
+{
+	return new FERemodelingMaterialPoint(new FEElasticMaterialPoint);
+}
+
+//-----------------------------------------------------------------------------
 double FECarterHayes::StrainEnergy(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -72,6 +79,10 @@ mat3ds FECarterHayes::Stress(FEMaterialPoint& mp)
 	double detF = pt.m_J;
 	double detFi = 1.0/detF;
 	double lndetF = log(detF);
+
+	// evaluate the strain energy
+	FERemodelingMaterialPoint& rpt = *mp.ExtractData<FERemodelingMaterialPoint>();
+	rpt.m_sed = StrainEnergy(mp);
 	
 	// calculate left Cauchy-Green tensor
 	mat3ds b = pt.LeftCauchyGreen();

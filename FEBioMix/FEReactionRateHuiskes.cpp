@@ -32,10 +32,10 @@ double FEReactionRateHuiskes::ReactionRate(FEMaterialPoint& pt)
 	double rhor = m_pReact->m_pMP->SolidReferentialApparentDensity(pt);
     double phir = m_pReact->m_pMP->SolidReferentialVolumeFraction(pt);
 	
-//    FERemodelingMaterialPoint& rpt = *(pt.ExtractData<FERemodelingMaterialPoint>());
+    FERemodelingMaterialPoint& rpt = *(pt.ExtractData<FERemodelingMaterialPoint>());
 	FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
     double J = et.m_J;
-	double sed = 0; //rpt.m_sed;
+	double sed = rpt.m_sed;
 	double zhat = m_B*(sed/rhor - m_psi0)/(J-phir);
 	return zhat;
 }
