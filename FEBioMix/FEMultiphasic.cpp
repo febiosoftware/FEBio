@@ -4,7 +4,7 @@
 
 #include "FEMultiphasic.h"
 #include "FECore/FEModel.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 #include <complex>
 using namespace std;
 
@@ -1031,7 +1031,7 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 	int i, nsol;
 	
 	FEMaterial::Serialize(ar);
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 	
 	int nSupp = 0;
 	if (ar.IsSaving())

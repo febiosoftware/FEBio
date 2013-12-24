@@ -1,20 +1,20 @@
 #include "stdafx.h"
-#include "febio.h"
+#include "FECoreKernel.h"
 #include "Logfile.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
-FEBioKernel* FEBioKernel::m_pKernel = 0;
+FECoreKernel* FECoreKernel::m_pKernel = 0;
 
 //-----------------------------------------------------------------------------
-FEBioKernel& FEBioKernel::GetInstance()
+FECoreKernel& FECoreKernel::GetInstance()
 {
-	if (m_pKernel == 0) m_pKernel = new FEBioKernel;
+	if (m_pKernel == 0) m_pKernel = new FECoreKernel;
 	return *m_pKernel;
 }
 
 //-----------------------------------------------------------------------------
-Logfile& FEBioKernel::GetLogfile()
+Logfile& FECoreKernel::GetLogfile()
 {
 	return *m_plog;
 }
@@ -22,12 +22,12 @@ Logfile& FEBioKernel::GetLogfile()
 //-----------------------------------------------------------------------------
 //! Create an object. An object is created by specifying the super-class id
 //! and the type-string. 
-void* FEBioKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
+void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 {
-	std::vector<FEBioFactory*>::iterator pf;
+	std::vector<FECoreFactory*>::iterator pf;
 	for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
 	{
-		FEBioFactory* pfac = *pf;
+		FECoreFactory* pfac = *pf;
 		if (pfac->GetSuperClassID() == id) {
 			if (strcmp(pfac->GetTypeStr(), sztype) == 0) return pfac->CreateInstance(pfem);
 		}
@@ -37,7 +37,7 @@ void* FEBioKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 	fprintf(stderr, "Unable to create class\n. These are the possible values:\n");
 	for (pf=m_Fac.begin(); pf!=m_Fac.end(); ++pf)
 	  {
-	    FEBioFactory* pfac = *pf;
+	    FECoreFactory* pfac = *pf;
 	    if (pfac->GetSuperClassID() == id) fprintf(stderr, "%s\n", pfac->GetTypeStr());
 	  }
 #endif
@@ -46,37 +46,37 @@ void* FEBioKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 }
 
 //-----------------------------------------------------------------------------
-int FEBioKernel::Count(SUPER_CLASS_ID sid)
+int FECoreKernel::Count(SUPER_CLASS_ID sid)
 {
 	int N = 0;
-	std::vector<FEBioFactory*>::iterator pf;
+	std::vector<FECoreFactory*>::iterator pf;
 	for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
 	{
-		FEBioFactory* pfac = *pf;
+		FECoreFactory* pfac = *pf;
 		if (pfac->GetSuperClassID() == sid) N++;
 	}
 	return N;
 }
 
 //-----------------------------------------------------------------------------
-void FEBioKernel::List(SUPER_CLASS_ID sid)
+void FECoreKernel::List(SUPER_CLASS_ID sid)
 {
-  std::vector<FEBioFactory*>::iterator pf;
+  std::vector<FECoreFactory*>::iterator pf;
   for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
     {
-      FEBioFactory* pfac = *pf;
+      FECoreFactory* pfac = *pf;
       if (pfac->GetSuperClassID() == sid) fprintf(stdout, "%s\n", pfac->GetTypeStr());
     }
 }
 
 //-----------------------------------------------------------------------------
-FEBioKernel::FEBioKernel()
+FECoreKernel::FECoreKernel()
 {
 	m_plog = Logfile::GetInstance();
 }
 
 //-----------------------------------------------------------------------------
-int FEBioKernel::GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat)
+int FECoreKernel::GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat)
 {
 	for (int i=0; i<(int)m_Dom.size(); ++i)
 	{
@@ -87,7 +87,7 @@ int FEBioKernel::GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-FEDomain* FEBioKernel::CreateDomain(int dtype, FEMesh* pm, FEMaterial* pmat)
+FEDomain* FECoreKernel::CreateDomain(int dtype, FEMesh* pm, FEMaterial* pmat)
 {
 	for (int i=0; i<(int)m_Dom.size(); ++i)
 	{

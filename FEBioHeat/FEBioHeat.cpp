@@ -16,28 +16,28 @@ namespace FEBioHeat {
 void InitModule()
 {
 	// Domain factory
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 	febio.RegisterDomain(new FEHeatDomainFactory);
 
 	// Analysis
-	REGISTER_FEBIO_CLASS(FEHeatTransferAnalysis, FEANALYSIS_ID, "heat transfer");
+	REGISTER_FECORE_CLASS(FEHeatTransferAnalysis, FEANALYSIS_ID, "heat transfer");
 
 	// Solvers
-	REGISTER_FEBIO_CLASS(FEHeatSolver, FESOLVER_ID, "heat transfer");
+	REGISTER_FECORE_CLASS(FEHeatSolver, FESOLVER_ID, "heat transfer");
 
 	// Materials
-	REGISTER_FEBIO_CLASS(FEIsotropicFourier, FEMATERIAL_ID, "isotropic Fourier");
+	REGISTER_FECORE_CLASS(FEIsotropicFourier, FEMATERIAL_ID, "isotropic Fourier");
 
 	// Body loads
-	REGISTER_FEBIO_CLASS(FEHeatSource, FEBODYLOAD_ID, "heat_source");
+	REGISTER_FECORE_CLASS(FEHeatSource, FEBODYLOAD_ID, "heat_source");
 
 	// Surface loads
-	REGISTER_FEBIO_CLASS(FEHeatFlux          , FESURFACELOAD_ID, "heatflux"           );
-	REGISTER_FEBIO_CLASS(FEConvectiveHeatFlux, FESURFACELOAD_ID, "convective_heatflux");
+	REGISTER_FECORE_CLASS(FEHeatFlux          , FESURFACELOAD_ID, "heatflux"           );
+	REGISTER_FECORE_CLASS(FEConvectiveHeatFlux, FESURFACELOAD_ID, "convective_heatflux");
 
 	// Plot data fields
-	REGISTER_FEBIO_CLASS(FEPlotNodeTemperature	, FEPLOTDATA_ID, "temperature"	);
-	REGISTER_FEBIO_CLASS(FEPlotHeatFlux			, FEPLOTDATA_ID, "heat flux"	);
+	REGISTER_FECORE_CLASS(FEPlotNodeTemperature	, FEPLOTDATA_ID, "temperature"	);
+	REGISTER_FECORE_CLASS(FEPlotHeatFlux			, FEPLOTDATA_ID, "heat flux"	);
 }
 
 }

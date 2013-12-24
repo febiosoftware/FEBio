@@ -1,5 +1,5 @@
 #include "FEBiphasic.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 // Material parameters for the FEBiphasic material

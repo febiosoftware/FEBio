@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 //! The dump stream allows a class to record its internal state to a memory object
 //! so that it can be restored later.
-//! In FEBio this is used for storing the FEModel state during running restarts
+//! This can be used for storing the FEModel state during running restarts
 class DumpStream
 {
 public:

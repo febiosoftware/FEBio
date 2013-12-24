@@ -2,7 +2,7 @@
 #include "FEBioLoadsSection.h"
 #include "FEBioMech/FEPointBodyForce.h"
 #include "FECore/FEModel.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 //!  Parses the loads section from the xml file (version 1.2 or up)

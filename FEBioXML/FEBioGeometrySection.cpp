@@ -5,7 +5,7 @@
 #include "FECore/FETrussDomain.h"
 #include "FECore/FEModel.h"
 #include "FEBioMech/FEElasticMaterial.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 //!  Parses the geometry section from the xml file
@@ -122,7 +122,7 @@ int FEBioGeometrySection::DomainType(FE_Element_Shape eshape, FEMaterial* pmat)
 	else if (eshape == ET_TRI3 ) spec.etype = m_pim->m_ntri3;
 	
 	// get the domain type
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 	return febio.GetDomainType(spec, pmat);
 }
 
@@ -131,7 +131,7 @@ int FEBioGeometrySection::DomainType(FE_Element_Shape eshape, FEMaterial* pmat)
 FEDomain* FEBioGeometrySection::CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat)
 {
 	// create a new domain based on the type
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 	FEDomain* pd = febio.CreateDomain(ntype, pm, pmat);
 
 	// return the domain

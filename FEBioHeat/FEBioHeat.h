@@ -1,5 +1,4 @@
 #pragma once
-#include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
 //! The FEBioHeat module

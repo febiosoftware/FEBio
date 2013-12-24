@@ -63,7 +63,7 @@ private:
 //! Class that is used for logging purposes
 
 //! This class can output to different 
-//! files at the same time. In FEBio, it is used for logging purposes.
+//! files at the same time.
 //! At this time it outputs data to the screen (stdout) and to an external text file.
 //! Note that this class is implemented as a singleton, in other words, only one
 //! instance can be created.

@@ -4,7 +4,7 @@
 
 #include "FETriphasic.h"
 #include "FECore/FEModel.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -483,7 +483,7 @@ void FETriphasic::Serialize(DumpFile& ar)
 {
 	FEParamContainer::Serialize(ar);
 	FEMaterial::Serialize(ar);
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 	
 	if (ar.IsSaving())
 	{

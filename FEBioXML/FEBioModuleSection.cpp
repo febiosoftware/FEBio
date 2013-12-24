@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEBioModuleSection.h"
-#include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
 //! This function parses the Module section.

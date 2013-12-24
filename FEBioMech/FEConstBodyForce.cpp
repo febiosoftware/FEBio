@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEConstBodyForce.h"
-#include "FECore/febio.h"
 
 //=============================================================================
 // FEConstBodyForce

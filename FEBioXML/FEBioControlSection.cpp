@@ -2,7 +2,7 @@
 #include "FEBioControlSection.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 using namespace FECore;
 
 //-----------------------------------------------------------------------------

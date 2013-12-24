@@ -722,9 +722,9 @@ void FEModel::EvaluateMaterialParameters(FEMaterial* pm)
 //-----------------------------------------------------------------------------
 // This function adds a callback routine
 //
-void FEModel::AddCallback(FEBIO_CB_FNC pcb, unsigned int nwhen, void *pd)
+void FEModel::AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void *pd)
 {
-	FEBIO_CALLBACK cb;
+	FECORE_CALLBACK cb;
 	cb.m_pcb = pcb;
 	cb.m_pd = pd;
 	cb.m_nwhen = nwhen;
@@ -737,7 +737,7 @@ void FEModel::AddCallback(FEBIO_CB_FNC pcb, unsigned int nwhen, void *pd)
 //
 void FEModel::DoCallback(unsigned int nevent)
 {
-	list<FEBIO_CALLBACK>::iterator it = m_pcb.begin();
+	list<FECORE_CALLBACK>::iterator it = m_pcb.begin();
 	for (int i=0; i<(int) m_pcb.size(); ++i, ++it)
 	{
 		// call the callback function

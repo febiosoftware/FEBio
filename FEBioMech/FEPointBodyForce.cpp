@@ -1,8 +1,7 @@
 #include "stdafx.h"
-#include "FECore/febio.h"
 #include "FEPointBodyForce.h"
-#include "FECore/FEModel.h"
 #include "FEElasticMaterial.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEPointBodyForce, FEBodyForce);

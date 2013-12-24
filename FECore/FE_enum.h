@@ -1,4 +1,4 @@
-// FE_enum.h: defines enumerations used in FEBio
+// FE_enum.h: defines enumerations
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -76,10 +76,10 @@ struct FE_Element_Spec
 
 //-----------------------------------------------------------------------------
 //! This lists the super-class id's that can be used to register new classes
-//! with the FEBio kernel. It effectively defines the base class that a class
+//! with the kernel. It effectively defines the base class that a class
 //! is derived from.
 typedef unsigned int SUPER_CLASS_ID;
-#define FETASK_ID                   0x0001	// derived from FEBioTask
+#define FETASK_ID                   0x0001	// derived from FECoreTask
 #define FESOLVER_ID                 0x0002	// derived from FESolver
 #define FEMATERIAL_ID               0x0003	// derived from FEMaterial
 #define FEBODYLOAD_ID               0x0004	// derived from FEBodyLoad
@@ -129,7 +129,7 @@ enum FE_Step_Type {
 
 ///////////////////////////////////////////////////////////////////////////////
 // ENUM: Analysis types
-//  Types of analysis that can be performed with FEBio.
+//  Types of analysis that can be performed
 //
 enum FE_Analysis_Type {
 	FE_STATIC		= 0,
@@ -158,7 +158,7 @@ enum FE_Plot_Level {
 ///////////////////////////////////////////////////////////////////////////////
 
 enum FE_Print_Level {
-	FE_PRINT_DEFAULT,		// let FEBio choose
+	FE_PRINT_DEFAULT,
 	FE_PRINT_NEVER,
 	FE_PRINT_PROGRESS,
 	FE_PRINT_MAJOR_ITRS,

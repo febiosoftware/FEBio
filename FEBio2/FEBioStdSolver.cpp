@@ -3,9 +3,9 @@
 #include "FEBioLib/FEBioModel.h"
 
 //-----------------------------------------------------------------------------
-REGISTER_FEBIO_CLASS(FEBioStdSolver , FETASK_ID, "solve"   );
-REGISTER_FEBIO_CLASS(FEBioRestart   , FETASK_ID, "restart" );
-REGISTER_FEBIO_CLASS(FEBioDiagnostic, FETASK_ID, "diagnose");
+REGISTER_FECORE_CLASS(FEBioStdSolver , FETASK_ID, "solve"   );
+REGISTER_FECORE_CLASS(FEBioRestart   , FETASK_ID, "restart" );
+REGISTER_FECORE_CLASS(FEBioDiagnostic, FETASK_ID, "diagnose");
 
 //-----------------------------------------------------------------------------
 // This simply calls the FEM::Solve function which will solve the FE problem.

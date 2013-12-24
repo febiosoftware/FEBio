@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEAnalysis.h"
 #include "FEModel.h"
-#include "febio.h"
+#include "FECoreKernel.h"
 #include "log.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))

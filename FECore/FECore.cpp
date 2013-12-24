@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FECore.h"
 #include "FECoordSysMap.h"
-#include "febio.h"
+#include "FECoreKernel.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -25,8 +25,8 @@ const char* FECore::get_version_string()
 //-----------------------------------------------------------------------------
 void FECore::InitModule()
 {
-REGISTER_FEBIO_CLASS(FELocalMap      , FECOORDSYSMAP_ID, "local"      );
-REGISTER_FEBIO_CLASS(FESphericalMap  , FECOORDSYSMAP_ID, "spherical"  );
-REGISTER_FEBIO_CLASS(FECylindricalMap, FECOORDSYSMAP_ID, "cylindrical");
-REGISTER_FEBIO_CLASS(FEVectorMap     , FECOORDSYSMAP_ID, "vector"     );
+REGISTER_FECORE_CLASS(FELocalMap      , FECOORDSYSMAP_ID, "local"      );
+REGISTER_FECORE_CLASS(FESphericalMap  , FECOORDSYSMAP_ID, "spherical"  );
+REGISTER_FECORE_CLASS(FECylindricalMap, FECOORDSYSMAP_ID, "cylindrical");
+REGISTER_FECORE_CLASS(FEVectorMap     , FECOORDSYSMAP_ID, "vector"     );
 }

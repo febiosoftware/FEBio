@@ -10,7 +10,7 @@
 //! The global system matrix is usually created by the discretization of the FE 
 //! equations into a linear system of equations. The structure of it depends greatly
 //! on the element connectivity and usually results in a sparse matrix structure. 
-//! FEBio supports several sparse matrix structure (Compact, Skyline, etc.) and to 
+//! Several sparse matrix structures are supported (Compact, Skyline, etc.) and to 
 //! simplify the creation of the specific matrix structure, the FEGlobalMatrix offers
 //! functionality to create the global matrix structure without the need to know 
 //! what particular sparse matrix format is used by the linear solver.

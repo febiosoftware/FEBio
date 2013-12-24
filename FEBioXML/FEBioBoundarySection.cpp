@@ -5,7 +5,7 @@
 #include "FEBioMech/FERigidWallInterface.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FEBioMech/FERigidJoint.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 //!  Parses the boundary section from the xml file
@@ -430,7 +430,7 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
 	// create a new spring "domain"
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 	FE_Element_Spec spec;
 	spec.eshape = ET_TRUSS2;
 	spec.etype  = FE_DISCRETE;

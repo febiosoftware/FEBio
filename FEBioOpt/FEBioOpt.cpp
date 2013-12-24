@@ -1,16 +1,16 @@
 #include "FEBioOpt.h"
 #include "FEOptimizer.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 #include "FECore/Logfile.h"
 
 //-----------------------------------------------------------------------------
 // declared in dllmain.cpp
-extern FEBioKernel* pFEBio;
+extern FECoreKernel* pFEBio;
 
 static Logfile& GetLogfile() { return pFEBio->GetLogfile(); }
 
 //-----------------------------------------------------------------------------
-FEBioOpt::FEBioOpt(FEModel* pfem) : FEBioTask(pfem)
+FEBioOpt::FEBioOpt(FEModel* pfem) : FECoreTask(pfem)
 {
 
 }

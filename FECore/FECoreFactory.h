@@ -9,14 +9,14 @@ class FEModel;
 
 //-----------------------------------------------------------------------------
 //! The factory class contains the mechanism for instantiating a class.
-class FEBioFactory
+class FECoreFactory
 {
 public:
 	//! constructor
-	FEBioFactory(SUPER_CLASS_ID scid, const char* sztype);
+	FECoreFactory(SUPER_CLASS_ID scid, const char* sztype);
 
 	//! virtual constructor
-	virtual ~FEBioFactory();
+	virtual ~FECoreFactory();
 
 	//! This is the function that the kernel will use to intantiate an object
 	void* CreateInstance(FEModel* pfem);

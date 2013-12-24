@@ -1,12 +1,11 @@
 #include "stdafx.h"
 #include "ElementDataRecord.h"
-#include "febio.h"
+#include "FECoreKernel.h"
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 void ElementDataRecord::Parse(const char *szexpr)
 {
-	FEBioKernel& febio = FEBioKernel::GetInstance();
 	char szcopy[MAX_STRING] = {0};
 	strcpy(szcopy, szexpr);
 	char* sz = szcopy, *ch;

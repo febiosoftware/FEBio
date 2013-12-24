@@ -3,7 +3,7 @@
 #include "FEBioMech/FERigidMaterial.h"
 #include "FEBioMech/FEPointConstraint.h"
 #include "FECore/FEModel.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 //=============================================================================
 //

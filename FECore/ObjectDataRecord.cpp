@@ -1,12 +1,11 @@
 #include "stdafx.h"
 #include "ObjectDataRecord.h"
-#include "febio.h"
+#include "FECoreKernel.h"
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 void ObjectDataRecord::Parse(const char* szexpr)
 {
-	FEBioKernel& febio = FEBioKernel::GetInstance();
 	char szcopy[MAX_STRING] = {0};
 	strcpy(szcopy, szexpr);
 	char* sz = szcopy, *ch;
@@ -23,6 +22,7 @@ void ObjectDataRecord::Parse(const char* szexpr)
 	}
 	while (ch);
 }
+
 //-----------------------------------------------------------------------------
 double ObjectDataRecord::Evaluate(int item, int ndata)
 {

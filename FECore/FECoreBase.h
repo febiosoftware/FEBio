@@ -3,7 +3,7 @@
 #include "FE_enum.h"
 
 //-----------------------------------------------------------------------------
-class FEBioFactory;
+class FECoreFactory;
 
 //-----------------------------------------------------------------------------
 //! Base class for most classes in FECore library and the base class for all 
@@ -36,5 +36,5 @@ private:
 	SUPER_CLASS_ID	m_sid;		//!< The super-class ID
 	const char*		m_sztype;	//!< the type string
 
-	friend class FEBioFactory;
+	friend class FECoreFactory;
 };

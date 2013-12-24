@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "plugin.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 #include "FECore/log.h"
 
 #ifdef WIN32
@@ -17,10 +17,10 @@
 // Typedefs of the plugin functions.
 // These are the functions that the plugin must implement
 extern "C" {
-	typedef void (*FEPLUGIN_INIT_FNC)(FEBioKernel&);
+	typedef void (*FEPLUGIN_INIT_FNC)(FECoreKernel&);
 	typedef void (*FEPLUGIN_CLEANUP_FNC)();
 	typedef int  (*FEPLUGIN_NUMCLASSES_FNC)();
-	typedef FEBioFactory* (*FEPLUGIN_GETFACTORY_FNC)(int i);
+	typedef FECoreFactory* (*FEPLUGIN_GETFACTORY_FNC)(int i);
 }
 
 //=============================================================================
@@ -75,7 +75,7 @@ bool FEBioPlugin::Load(const char* szfile)
 	FEPLUGIN_INIT_FNC pfnc_init = (FEPLUGIN_INIT_FNC) FindPluginFunc(ph, "PluginInitialize");
 
 	// call the (optional) initialization function
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 	if (pfnc_init) pfnc_init(febio);
 
 	// find out how many classes there are in this plugin
@@ -85,7 +85,7 @@ bool FEBioPlugin::Load(const char* szfile)
 	// call the get factory functions
 	for (int i=0; i<NC; ++i)
 	{
-		FEBioFactory* pfac = pfnc_get(i);
+		FECoreFactory* pfac = pfnc_get(i);
 		if (pfac) febio.RegisterClass(pfac);
 	}
 

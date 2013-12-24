@@ -3,7 +3,7 @@
 #include "FEBioMech/FERigidWallInterface.h"
 #include "FEBioMech/FERigidJoint.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 //! Parse the Contact section (new in version 2.0)

@@ -1,6 +1,6 @@
 #include "FEBiphasicSolute.h"
 #include "FECore/FEModel.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 //=============================================================================
 //                 B I P H A S I C S O L U T E

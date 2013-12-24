@@ -1,6 +1,6 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
-#include "FECore/febio.h"
-#include "FECore/FEBioFactory.h"
+#include "FECore/FECoreKernel.h"
+#include "FECore/FECoreFactory.h"
 #include "FECore/Logfile.h"
 #include "FEBioOpt.h"
 
@@ -39,21 +39,21 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 //-----------------------------------------------------------------------------
 // the optimization task factory
-class FEBioOptFactory : public FEBioFactory
+class FEBioOptFactory : public FECoreFactory
 {
 public:
-	FEBioOptFactory() : FEBioFactory(FETASK_ID, "optimize"){}
+	FEBioOptFactory() : FECoreFactory(FETASK_ID, "optimize"){}
 	void* Create(FEModel* pfem) { return new FEBioOpt(pfem); }
 };
 
 FEBioOptFactory	febioopt_factory;
 
 //-----------------------------------------------------------------------------
-// keep a copy of the FEBioKernel
-FEBioKernel*	pFEBio;
+// keep a copy of the FECoreKernel
+FECoreKernel*	pFEBio;
 
 //-----------------------------------------------------------------------------
-extern "C" DLL_EXPORT void PluginInitialize(FEBioKernel& febio)
+extern "C" DLL_EXPORT void PluginInitialize(FECoreKernel& febio)
 {
 	pFEBio = &febio;
 }
@@ -65,7 +65,7 @@ extern "C" DLL_EXPORT int PluginNumClasses()
 }
 
 //-----------------------------------------------------------------------------
-extern "C" DLL_EXPORT FEBioFactory* PluginGetFactory(int i)
+extern "C" DLL_EXPORT FECoreFactory* PluginGetFactory(int i)
 {
 	if (i==0) return &febioopt_factory;
 	return 0;

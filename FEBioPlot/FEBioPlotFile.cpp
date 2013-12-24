@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "FEBioPlotFile.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, vector<int>& item)
 {
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 
 	FEPlotData* ps = fecore_new<FEPlotData>(FEPLOTDATA_ID, szname, pfem);
 	if (ps)

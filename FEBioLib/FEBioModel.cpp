@@ -8,7 +8,7 @@
 #include "FECore/ObjectDataRecord.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 #include "version.h"
 
 //-----------------------------------------------------------------------------
@@ -452,7 +452,7 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 //! serialize material data
 void FEBioModel::SerializeMaterials(DumpFile& ar)
 {
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 
 	if (ar.IsSaving())
 	{
@@ -578,7 +578,7 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 	}
 	else
 	{
-		FEBioKernel& febio = FEBioKernel::GetInstance();
+		FECoreKernel& febio = FECoreKernel::GetInstance();
 
 		// read nodal data
 		int nn;
@@ -614,7 +614,7 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 //! serialize contact data
 void FEBioModel::SerializeContactData(DumpFile &ar)
 {
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 
 	if (ar.IsSaving())
 	{
@@ -656,7 +656,7 @@ void FEBioModel::SerializeContactData(DumpFile &ar)
 //! \todo Do we need to store the m_bActive flag of the boundary conditions?
 void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 {
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 
 	if (ar.IsSaving())
 	{

@@ -24,17 +24,17 @@ class DataRecord;
 class PlotFile;
 
 //-----------------------------------------------------------------------------
-// FEBIO callback structure
+// callback structure
 #define CB_ALWAYS		0x00000011
 #define CB_MAJOR_ITERS	0x00000001
 #define CB_MINOR_ITERS	0x00000010
 
-typedef unsigned int FEBIO_CB_WHEN;
-typedef void (*FEBIO_CB_FNC)(FEModel*,void*);
-struct FEBIO_CALLBACK {
-	FEBIO_CB_FNC	m_pcb;		// pointer to callback function
+typedef unsigned int FECORE_CB_WHEN;
+typedef void (*FECORE_CB_FNC)(FEModel*,void*);
+struct FECORE_CALLBACK {
+	FECORE_CB_FNC	m_pcb;		// pointer to callback function
 	void*			m_pd;		// pointer to user data
-	FEBIO_CB_WHEN	m_nwhen;	// when to call function
+	FECORE_CB_WHEN	m_nwhen;	// when to call function
 };
 
 //-----------------------------------------------------------------------------
@@ -216,7 +216,7 @@ public:	// --- Miscellaneous routines ---
 	FEBoundaryCondition* FindBC(int nid);
 
 	//! set callback function
-	void AddCallback(FEBIO_CB_FNC pcb, unsigned int nwhen, void* pd);
+	void AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void* pd);
 
 	//! call the callback function
 	void DoCallback(unsigned int nevent);
@@ -302,7 +302,7 @@ public:
 
 protected:
 	char	m_sztitle[MAX_STRING];	//!< problem title
-	list<FEBIO_CALLBACK>	m_pcb;	//!< pointer to callback function
+	list<FECORE_CALLBACK>	m_pcb;	//!< pointer to callback function
 
 protected: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants

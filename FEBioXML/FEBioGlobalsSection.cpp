@@ -3,7 +3,7 @@
 #include "FEBioMech/FEElasticMultigeneration.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEGlobalData.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 //!  This function reads the global variables from the xml file

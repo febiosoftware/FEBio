@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 class FEMixDomainFactory : public FEDomainFactory

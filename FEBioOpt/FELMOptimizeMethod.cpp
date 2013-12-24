@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "FELMOptimizeMethod.h"
 #include "FECore/Logfile.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 // declared in dllmain.cpp
-extern FEBioKernel* pFEBio;
+extern FECoreKernel* pFEBio;
 
 static Logfile& GetLogfile() { return pFEBio->GetLogfile(); }
 

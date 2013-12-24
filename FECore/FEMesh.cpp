@@ -489,7 +489,7 @@ bool FEMesh::Init()
 	if (ninverted != 0)
 	{
 		felog.printf("**************************** E R R O R ****************************\n");
-		felog.printf(" FEBio found %d initially inverted elements.\n", ninverted);
+		felog.printf(" Found %d initially inverted elements.\n", ninverted);
 		felog.printf(" Run will be aborted.\n");
 		felog.printf("*******************************************************************\n\n");
 		return false;

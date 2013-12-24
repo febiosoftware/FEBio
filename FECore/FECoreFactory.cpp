@@ -1,17 +1,17 @@
 #include "stdafx.h"
-#include "FEBioFactory.h"
+#include "FECoreFactory.h"
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEBioFactory::FEBioFactory(SUPER_CLASS_ID scid, const char* sztype) : m_scid(scid) { m_sztype = sztype; }
+FECoreFactory::FECoreFactory(SUPER_CLASS_ID scid, const char* sztype) : m_scid(scid) { m_sztype = sztype; }
 
 //-----------------------------------------------------------------------------
 //! virtual constructor
-FEBioFactory::~FEBioFactory(){}
+FECoreFactory::~FECoreFactory(){}
 
 //-----------------------------------------------------------------------------
-void* FEBioFactory::CreateInstance(FEModel* pfem)
+void* FECoreFactory::CreateInstance(FEModel* pfem)
 {
 	// create a new instance of this class
 	FECoreBase* pclass = static_cast<FECoreBase*>(Create(pfem)); assert(pclass);

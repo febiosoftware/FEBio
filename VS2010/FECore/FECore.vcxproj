@@ -581,9 +581,6 @@
     <ClInclude Include="..\..\FECore\DumpStream.h" />
     <ClInclude Include="..\..\FECore\ElementDataRecord.h" />
     <ClInclude Include="..\..\FECore\FEAnalysis.h" />
-    <ClInclude Include="..\..\FECore\febio.h" />
-    <ClInclude Include="..\..\FECore\FEBioFactory.h" />
-    <ClInclude Include="..\..\FECore\FEBioTask.h" />
     <ClInclude Include="..\..\FECore\FEBodyLoad.h" />
     <ClInclude Include="..\..\FECore\FEBoundaryCondition.h" />
     <ClInclude Include="..\..\FECore\FEClosestPointProjection.h" />
@@ -591,6 +588,9 @@
     <ClInclude Include="..\..\FECore\FECoordSysMap.h" />
     <ClInclude Include="..\..\FECore\FECore.h" />
     <ClInclude Include="..\..\FECore\FECoreBase.h" />
+    <ClInclude Include="..\..\FECore\FECoreFactory.h" />
+    <ClInclude Include="..\..\FECore\FECoreKernel.h" />
+    <ClInclude Include="..\..\FECore\FECoreTask.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteMaterial.h" />
     <ClInclude Include="..\..\FECore\FEDomain.h" />
@@ -661,8 +661,6 @@
     <ClCompile Include="..\..\FECore\DumpStream.cpp" />
     <ClCompile Include="..\..\FECore\ElementDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\FEAnalysis.cpp" />
-    <ClCompile Include="..\..\FECore\FEBioFactory.cpp" />
-    <ClCompile Include="..\..\FECore\FEBioTask.cpp" />
     <ClCompile Include="..\..\FECore\FEBodyLoad.cpp" />
     <ClCompile Include="..\..\FECore\FEBoundaryCondition.cpp" />
     <ClCompile Include="..\..\FECore\FEClosestPointProjection.cpp" />
@@ -670,6 +668,9 @@
     <ClCompile Include="..\..\FECore\FECoordSysMap.cpp" />
     <ClCompile Include="..\..\FECore\FECore.cpp" />
     <ClCompile Include="..\..\FECore\FECoreBase.cpp" />
+    <ClCompile Include="..\..\FECore\FECoreFactory.cpp" />
+    <ClCompile Include="..\..\FECore\FECoreKernel.cpp" />
+    <ClCompile Include="..\..\FECore\FECoreTask.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain.cpp" />
@@ -705,7 +706,6 @@
     <ClCompile Include="..\..\FECore\FESurfacePairInteraction.cpp" />
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
     <ClCompile Include="..\..\FECore\Image.cpp" />
-    <ClCompile Include="..\..\FECore\kernel.cpp" />
     <ClCompile Include="..\..\FECore\LinearSolver.cpp" />
     <ClCompile Include="..\..\FECore\LoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\Logfile.cpp" />

@@ -3,7 +3,7 @@
 #include "FECore/FEDiscreteMaterial.h"
 #include "FECore/FEDiscreteDomain.h"
 #include "FECore/FEModel.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 void FEBioDiscreteSection::Parse(XMLTag& tag)
@@ -35,7 +35,7 @@ void FEBioDiscreteSection::ParseSpringSection(XMLTag &tag)
 	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
 	// create a new spring "domain"
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 	FE_Element_Spec spec;
 	spec.eshape = ET_TRUSS2;
 	spec.etype  = FE_DISCRETE;

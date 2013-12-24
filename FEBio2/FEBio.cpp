@@ -49,7 +49,7 @@
 #include "console.h"
 #include "FECore/log.h"
 #include "FEBioStdSolver.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 #include "Interrupt.h"
 #include "plugin.h"
 #include "FEBioXML/XMLReader.h"
@@ -209,7 +209,7 @@ int main(int argc, char* argv[])
 	fem.SetDebugFlag(ops.bdebug);
 
 	// find a task
-	FEBioTask* ptask = fecore_new<FEBioTask>(FETASK_ID, ops.sztask, &fem);
+	FECoreTask* ptask = fecore_new<FECoreTask>(FETASK_ID, ops.sztask, &fem);
 	if (ptask == 0)
 	{
 		fprintf(stderr, "Don't know how to do task: %s\n", ops.sztask);

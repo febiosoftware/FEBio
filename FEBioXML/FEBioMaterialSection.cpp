@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEBioMaterialSection.h"
 #include "FECore/FEModel.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 //! This function creates a material by checking the type attribute against
@@ -186,7 +186,7 @@ bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 
 	// create a new coordinate system generator
 	XMLAtt& type = tag.Attribute("type");

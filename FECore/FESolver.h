@@ -8,7 +8,7 @@
 class FEModel;
 
 //-----------------------------------------------------------------------------
-//! This is the base class for all FEBio solvers.
+//! This is the base class for all FE solvers.
 
 //! A class derived from FESolver implements a solver for a specific type
 //! of physics problem. It takes the FEModel in its constructor and implements

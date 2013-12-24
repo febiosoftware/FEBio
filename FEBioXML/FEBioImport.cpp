@@ -22,7 +22,7 @@
 #include "FECore/log.h"
 #include "FECore/Image.h"
 #include "FECore/FEModel.h"
-#include "FECore/febio.h"
+#include "FECore/FECoreKernel.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------

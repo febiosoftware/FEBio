@@ -1,7 +1,6 @@
 #include "FESolute.h"
 #include "FECore/FEModel.h"
-#include "FECore/febio.h"
-
+#include "FECore/FECoreKernel.h"
 
 //=============================================================================
 // FESoluteData
@@ -357,7 +356,7 @@ bool FESolidBoundMolecule::SetAttribute(const char* szname, const char* szval)
 void FESolidBoundMolecule::Serialize(DumpFile& ar)
 {
 	FEMaterial::Serialize(ar);
-	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FECoreKernel& febio = FECoreKernel::GetInstance();
 	
 	if (ar.IsSaving())
 	{
