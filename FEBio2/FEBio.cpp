@@ -200,9 +200,6 @@ int main(int argc, char* argv[])
 
 		// read the input file
 		if (fem.Input(ops.szfile) == false) return 1;
-
-		// initialize and check data
-		if (fem.Init() == false) return false;
 	}
 
 	// set options that were passed on the command line
@@ -321,13 +318,22 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		{
 			ops.szcnf[0] = 0;
 		}
-/*		// TODO: a task now needs an optional control file
 		else if (strncmp(sz, "-task", 5) == 0)
 		{
 			if (sz[5] != '=') { fprintf(stderr, "command line error when parsing task\n"); return false; }
 			strcpy(ops.sztask, sz+6);
+
+			if (i<nargs-1)
+			{
+				char* szi = argv[i+1];
+				if (szi[0] != '-')
+				{
+					// assume this is a control file for the specified task
+					strcpy(ops.szctrl, argv[++i]);
+				}
+			}
 		}
-*/		else if (strcmp(sz, "-info")==0)
+		else if (strcmp(sz, "-info")==0)
 		{
 			FILE* fp = stdout;
 			if ((i<nargs-1) && (argv[i+1][0] != '-'))

@@ -17,6 +17,9 @@ public:
 	//! constructor
 	FEBioModel();
 
+	//! destructor
+	~FEBioModel();
+
 	//! Initializes data structures
 	bool Init();
 

@@ -42,6 +42,13 @@ FEBioModel::FEBioModel()
 }
 
 //-----------------------------------------------------------------------------
+FEBioModel::~FEBioModel()
+{
+	// close the plot file
+	if (m_plot) { delete m_plot; m_plot = 0; }
+}
+
+//-----------------------------------------------------------------------------
 Timer& FEBioModel::GetTotalTimer()
 {
 	return m_TotalTime;
@@ -208,7 +215,7 @@ bool FEBioModel::Input(const char* szfile)
 //! Export state to plot file.
 void FEBioModel::Write()
 {
-	m_plot->Write(*this);
+	if (m_plot) m_plot->Write(*this);
 }
 
 //-----------------------------------------------------------------------------
@@ -1114,9 +1121,6 @@ bool FEBioModel::Solve()
 
 	// solve the FE model
 	bool bconv = FEModel::Solve();
-
-	// close the plot file
-	if (m_plot) { delete m_plot; m_plot = 0; }
 
 	// stop total time tracker
 	m_TotalTime.stop();
