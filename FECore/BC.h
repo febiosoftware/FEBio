@@ -63,16 +63,29 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! fixed rigid body constraint
+class FERigidBodyFixedBC : public FEBoundaryCondition
+{
+public:
+	FERigidBodyFixedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+
+public:
+	int		id;	//!< rigid body ID
+	int		bc;	//!< constrained dof
+};
+
+//-----------------------------------------------------------------------------
 //! rigid body displacement
 
 class FERigidBodyDisplacement : public FEBoundaryCondition
 {
 public:
-	FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+	FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem) { ref= 0.0; }
 
 public:
-	int		id;	// rigid body id
-	int		bc;	// displacement direction
-	int		lc;	// load curve number
-	double	sf;	// scale factor
+	int		id;		//!< rigid body id
+	int		bc;		//!< displacement direction
+	int		lc;		//!< load curve number
+	double	sf;		//!< scale factor
+	double	ref;	//!< reference value
 };

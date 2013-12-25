@@ -21,7 +21,11 @@ END_PARAMETER_LIST();
 FERigidBody::FERigidBody(FEModel* pfem) : FEObject(pfem)
 {
 	m_bActive = true;
-	for (int i=0; i<6; ++i) m_pDC[i] = 0;
+	for (int i=0; i<6; ++i) 
+	{
+		m_BC[i] = 0;
+		m_pDC[i] = 0;
+	}
 	m_prb = 0;
 
 	// zero total displacements
@@ -237,9 +241,12 @@ void FERigidBody::Update(std::vector<double>& Ui, std::vector<double>& ui)
 			{
 				int lc = pdc->lc;
 				// TODO: do I need to take the line search step into account here?
-				du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc)->Value() - m_Up[j]);
+				du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc)->Value() - m_Up[j] + pdc->ref);
 			}
-			else du[j] = (lm[j] >=0 ? Ui[lm[j]] + ui[lm[j]] : 0);
+			else 
+			{
+				du[j] = (lm[j] >=0 ? Ui[lm[j]] + ui[lm[j]] : 0);
+			}
 		}
 	}
 

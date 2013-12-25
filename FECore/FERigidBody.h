@@ -69,6 +69,7 @@ public:
 	quatd	m_qp;	//!< previous orientation of rigid body
 	quatd	m_qt;	//!< current orientation of rigid body
 
+	int		m_BC[6];	//!< dof constrains (0=free, -1=fixed, >0 = prescribed)
 	int		m_LM[6];	//!< dof equation numbers
 	double	m_Up[6];	//!< previous displacement/rotation vector
 	double	m_Ut[6];	//!<  total displacement/rotation vector

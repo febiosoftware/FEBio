@@ -71,11 +71,13 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 	const char* szm = tag.AttributeValue("mat");
 	assert(szm);
 
+	// get the material ID
 	int nmat = atoi(szm);
 	if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
-	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nmat-1));
-	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
+	// make sure this is a valid rigid material
+	FEMaterial* pm = fem.GetMaterial(nmat-1);
+	if (pm->IsRigid() == false) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
 	++tag;
 	do
@@ -101,7 +103,6 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				pDC->lc = lc;
 				tag.value(pDC->sf);
 				fem.m_RDC.push_back(pDC);
-				pm->m_bc[bc] = lc+1;
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -123,7 +124,6 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				pFC->lc = lc;
 				tag.value(pFC->sf);
 				fem.m_RFC.push_back(pFC);
-				pm->m_bc[bc] = 0;
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -134,7 +134,22 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 					pFC->Deactivate();
 				}
 			}
-			else if (strcmp(szt, "fixed") == 0) pm->m_bc[bc] = -1;
+			else if (strcmp(szt, "fixed") == 0)
+			{
+				FERigidBodyFixedBC* pBC = new FERigidBodyFixedBC(&fem);
+				pBC->id = nmat;
+				pBC->bc = bc;
+				fem.m_RBC.push_back(pBC);
+
+				// add this boundary condition to the current step
+				if (m_pim->m_nsteps > 0)
+				{
+					int n = fem.m_RBC.size()-1;
+					FERigidBodyFixedBC* pBC = fem.m_RBC[n];
+					pStep->AddBoundaryCondition(pBC);
+					pBC->Deactivate();
+				}
+			}
 			else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 		}
 		else if (strncmp(tag.Name(), "rot_", 4) == 0)
@@ -158,7 +173,6 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				pDC->lc = lc;
 				tag.value(pDC->sf);
 				fem.m_RDC.push_back(pDC);
-				pm->m_bc[bc] = lc+1;
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -180,7 +194,6 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				pFC->lc = lc;
 				tag.value(pFC->sf);
 				fem.m_RFC.push_back(pFC);
-				pm->m_bc[bc] = 0;
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -191,7 +204,22 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 					pFC->Deactivate();
 				}
 			}
-			else if (strcmp(szt, "fixed") == 0) pm->m_bc[bc] = -1;
+			else if (strcmp(szt, "fixed") == 0)
+			{
+				FERigidBodyFixedBC* pBC = new FERigidBodyFixedBC(&fem);
+				pBC->id = nmat;
+				pBC->bc = bc;
+				fem.m_RBC.push_back(pBC);
+
+				// add this boundary condition to the current step
+				if (m_pim->m_nsteps > 0)
+				{
+					int n = fem.m_RBC.size()-1;
+					FERigidBodyFixedBC* pBC = fem.m_RBC[n];
+					pStep->AddBoundaryCondition(pBC);
+					pBC->Deactivate();
+				}
+			}
 			else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 		}
 		else throw XMLReader::InvalidTag(tag);

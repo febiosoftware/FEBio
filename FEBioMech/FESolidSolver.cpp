@@ -258,15 +258,15 @@ bool FESolidSolver::InitEquations()
 	for (i=0; i<nrb; ++i)
 	{
 		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
-		assert(pm);
 		for (j=0; j<6; ++j)
-			if (pm->m_bc[j] >= 0)
+			if (RB.m_BC[j] >= 0)
 			{
 				RB.m_LM[j] = neq++;
 			}
-			else 
+			else
+			{
 				RB.m_LM[j] = -1;
+			}
 	}
 
 	// store the number of equations
@@ -293,11 +293,10 @@ bool FESolidSolver::InitEquations()
 	for (i=0; i<nrb; ++i)
 	{
 		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
 		for (j=0; j<6; ++j)
 		{
 			n = RB.m_LM[j];
-			if (pm->m_bc[j] > 0) RB.m_LM[j] = -n-2;
+			if (RB.m_BC[j] > 0) RB.m_LM[j] = -n-2;
 		}
 	}
 
@@ -824,7 +823,7 @@ void FESolidSolver::PrepStep(double time)
 			int lc = DC.lc;
 			if (lc >= 0)
 			{
-				RB.m_dul[I] = DC.sf*m_fem.GetLoadCurve(lc)->Value() - RB.m_Ut[DC.bc];
+				RB.m_dul[I] = DC.ref + DC.sf*m_fem.GetLoadCurve(lc)->Value() - RB.m_Ut[DC.bc];
 			}
 		}
 	}

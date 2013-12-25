@@ -21,20 +21,24 @@ bool FESolidAnalysis::Init()
 	// initialize base class data
 	FEAnalysis::Init();
 
-	// clear the active rigid body BC's
+	// clear the rigid body BC's
 	int NRB = m_fem.Objects();
 	for (int i=0; i<NRB; ++i)
 	{
 		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
 		for (int j=0; j<6; ++j)
 		{
-			if (RB.m_pDC[j])
-			{
-				RB.m_pDC[j] = 0;
-				pm->m_bc[j] = 0;
-			}
+			RB.m_pDC[j] = 0;
+			RB.m_BC[j] = 0;
 		}
+	}
+
+	// set the fixed rigid body BC's
+	for (int i=0;i<(int) m_fem.m_RBC.size(); ++i)
+	{
+		FERigidBodyFixedBC* pbc = m_fem.m_RBC[i];
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(pbc->id));
+		if (RB.IsActive() && pbc->IsActive()) RB.m_BC[pbc->bc] = -1;
 	}
 
 	// set the active rigid bodies BC's
@@ -42,12 +46,17 @@ bool FESolidAnalysis::Init()
 	{
 		FERigidBodyDisplacement& DC = *(m_fem.m_RDC[i]);
 		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(DC.id));
-//		assert(RB.m_pDC[DC.bc] == 0);
 		if (RB.IsActive() && DC.IsActive())
 		{
+			assert(RB.m_BC[DC.bc] == 0);	// make sure we are not overriding a fixed bc
 			RB.m_pDC[DC.bc] = &DC;
-			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
-			pm->m_bc[DC.bc] = 1;
+			RB.m_BC[DC.bc] = 1;
+			switch (DC.bc)
+			{
+			case 0: DC.ref = RB.m_rt.x - RB.m_r0.x; break;
+			case 1: DC.ref = RB.m_rt.y - RB.m_r0.y; break;
+			case 2: DC.ref = RB.m_rt.z - RB.m_r0.z; break;
+			}
 		}
 	}
 
@@ -302,15 +311,19 @@ bool FEExplicitSolidAnalysis::Init()
 	for (int i=0; i<NRB; ++i)
 	{
 		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
 		for (int j=0; j<6; ++j)
 		{
-			if (RB.m_pDC[j])
-			{
-				RB.m_pDC[j] = 0;
-				pm->m_bc[j] = 0;
-			}
+			RB.m_pDC[j] = 0;
+			RB.m_BC[j] = 0;
 		}
+	}
+
+	// set the fixed rigid body BC's
+	for (int i=0;i<(int) m_fem.m_RBC.size(); ++i)
+	{
+		FERigidBodyFixedBC* pbc = m_fem.m_RBC[i];
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(pbc->id));
+		if (RB.IsActive() && pbc->IsActive()) RB.m_BC[pbc->bc] = -1;
 	}
 
 	// set the active rigid bodies BC's
@@ -318,12 +331,17 @@ bool FEExplicitSolidAnalysis::Init()
 	{
 		FERigidBodyDisplacement& DC = *(m_fem.m_RDC[i]);
 		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(DC.id));
-//		assert(RB.m_pDC[DC.bc] == 0);
 		if (RB.IsActive() && DC.IsActive())
 		{
+			assert(RB.m_BC[DC.bc] == 0);	// make sure we are not overriding a fixed bc
 			RB.m_pDC[DC.bc] = &DC;
-			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
-			pm->m_bc[DC.bc] = 1;
+			RB.m_BC[DC.bc] = 1;
+			switch (DC.bc)
+			{
+			case 0: DC.ref = RB.m_rt.x - RB.m_r0.x; break;
+			case 1: DC.ref = RB.m_rt.y - RB.m_r0.y; break;
+			case 2: DC.ref = RB.m_rt.z - RB.m_r0.z; break;
+			}
 		}
 	}
 

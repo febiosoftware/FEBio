@@ -167,15 +167,15 @@ bool FEExplicitSolidSolver::InitEquations()
 	for (i=0; i<nrb; ++i)
 	{
 		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
-		assert(pm);
 		for (j=0; j<6; ++j)
-			if (pm->m_bc[j] >= 0)
+			if (RB.m_BC[j] >= 0)
 			{
 				RB.m_LM[j] = neq++;
 			}
 			else 
+			{
 				RB.m_LM[j] = -1;
+			}
 	}
 
 	// store the number of equations
@@ -206,7 +206,7 @@ bool FEExplicitSolidSolver::InitEquations()
 		for (j=0; j<6; ++j)
 		{
 			n = RB.m_LM[j];
-			if (pm->m_bc[j] > 0) RB.m_LM[j] = -n-2;
+			if (RB.m_BC[j] > 0) RB.m_LM[j] = -n-2;
 		}
 	}
 

@@ -21,12 +21,6 @@ END_PARAMETER_LIST();
 FERigidMaterial::FERigidMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 {
 	m_com = 0;	// calculate COM automatically
-	for (int i=0; i<6; ++i)
-	{
-		m_bc[i] =  0;	// rigid bodies are initially free
-		m_fc[i] = -1;
-		m_fs[i] =  0;
-	}
 	m_E = 1;
 	m_v = 0;
 	m_pmid = -1;
@@ -77,14 +71,6 @@ void FERigidMaterial::Init()
 
 			FERigidBody& prb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(ppm->GetRigidBodyID()));
 			rb.m_prb = &prb;
-
-			// we also need to open up all the RB's degree of freedoms
-			m_bc[0] = 1;
-			m_bc[1] = 1;
-			m_bc[2] = 1;
-			m_bc[3] = 1;
-			m_bc[4] = 1;
-			m_bc[5] = 1;
 		}
 
 		m_binit = true;
@@ -98,17 +84,12 @@ void FERigidMaterial::Serialize(DumpFile &ar)
 	// serialize base class parameters
 	FESolidMaterial::Serialize(ar);
 
-	// TODO: do we really need to store this data?
 	if (ar.IsSaving())
 	{
-		ar.write(m_bc, sizeof(int), 6);
-		ar.write(m_fc, sizeof(int), 6);
-		ar.write(m_fs, sizeof(double), 6);
+		ar << m_com;
 	}
 	else
 	{
-		ar.read(m_bc, sizeof(int), 6);
-		ar.read(m_fc, sizeof(int), 6);
-		ar.read(m_fs, sizeof(double), 6);
+		ar >> m_com;
 	}
 }

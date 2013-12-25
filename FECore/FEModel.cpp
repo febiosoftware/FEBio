@@ -424,6 +424,12 @@ bool FEModel::InitObjects()
 
 	// the rigid body constraints are still associated with the rigid materials
 	// so we now associate them with the rigid bodies
+	for (int i=0; i<(int) m_RBC.size(); ++i)
+	{
+		FERigidBodyFixedBC& BC = *m_RBC[i];
+		FEMaterial* pm = GetMaterial(BC.id-1);
+		BC.id = pm->GetRigidBodyID(); assert(BC.id >= 0);
+	}
 	for (int i=0; i<(int) m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *m_RDC[i];

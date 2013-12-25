@@ -701,6 +701,15 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			psl->Serialize(ar);
 		}
 
+		// fixed rigid body dofs
+		ar << m_RBC.size();
+		for (int i=0; i<(int) m_RBC.size(); ++i)
+		{
+			FERigidBodyFixedBC& bc = *m_RBC[i];
+			ar << bc.GetID() << bc.IsActive();
+			ar << bc.bc << bc.id;
+		}
+
 		// rigid body displacements
 		ar << m_RDC.size();
 		for (int i=0; i<(int) m_RDC.size(); ++i)
@@ -807,6 +816,19 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 
 			ps->Serialize(ar);
 			m_SL.push_back(ps);
+		}
+
+		// fixed rigid body dofs
+		ar >> n;
+		m_RBC.clear();
+		for (int i=0; i<n; ++i)
+		{
+			FERigidBodyFixedBC* pbc = new FERigidBodyFixedBC(this);
+			ar >> nid >> bactive;
+			ar >> pbc->bc >> pbc->id;
+			pbc->SetID(nid);
+			if (bactive) pbc->Activate(); else pbc->Deactivate();
+			m_RBC.push_back(pbc);
 		}
 
 		// rigid body displacements

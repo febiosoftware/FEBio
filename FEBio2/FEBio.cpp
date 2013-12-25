@@ -187,6 +187,9 @@ int main(int argc, char* argv[])
 		if (Configure(fem, ops.szcnf) == false) return 1;
 	}
 
+	// set options that were passed on the command line
+	fem.SetDebugFlag(ops.bdebug);
+
 	// set the output filenames
 	fem.SetLogFilename (ops.szlog);
 	fem.SetPlotFilename(ops.szplt);
@@ -201,9 +204,6 @@ int main(int argc, char* argv[])
 		// read the input file
 		if (fem.Input(ops.szfile) == false) return 1;
 	}
-
-	// set options that were passed on the command line
-	fem.SetDebugFlag(ops.bdebug);
 
 	// find a task
 	FECoreTask* ptask = fecore_new<FECoreTask>(FETASK_ID, ops.sztask, &fem);

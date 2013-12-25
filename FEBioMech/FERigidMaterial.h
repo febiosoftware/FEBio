@@ -33,11 +33,6 @@ public:
 	int		m_com;	//!< center of mass input flag
 	vec3d	m_rc;	//!< center of mass
 
-	int		m_bc[6];	//!< rigid boundary conditions
-
-	int		m_fc[6];	//!< rigid force/torque loadcurve ID's
-	double	m_fs[6];	//!< rigid force/torque scale factors
-
 public:
 	// inherited from FEMaterial
 	virtual bool IsRigid() { return true; }
