@@ -11,5 +11,6 @@ public:
 
 protected:
 	void ParseRigidConstraint(XMLTag& tag);
+	void ParseRigidConstraint20(XMLTag& tag);
 	bool ParseSurfaceSection (XMLTag& tag, FESurface& s, int nfmt, bool bnodal);
 };

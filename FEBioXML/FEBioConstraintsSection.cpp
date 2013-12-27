@@ -19,7 +19,11 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 	++tag;
 	do
 	{
-		if      (tag == "rigid_body") ParseRigidConstraint(tag);
+		if      (tag == "rigid_body") 
+		{
+			if (m_pim->Version() < 0x0200) ParseRigidConstraint(tag);
+			else ParseRigidConstraint20(tag);
+		}
 		else if (tag == "constraint")
 		{
 			const char* sztype = tag.AttributeValue("type");
@@ -231,6 +235,139 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				}
 			}
 			else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEAnalysis* pStep = (m_pim->m_nsteps > 0 ? GetStep() : 0);
+
+	const char* szm = tag.AttributeValue("mat");
+	assert(szm);
+
+	// get the material ID
+	int nmat = atoi(szm);
+	if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
+
+	// make sure this is a valid rigid material
+	FEMaterial* pm = fem.GetMaterial(nmat-1);
+	if (pm->IsRigid() == false) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
+
+	++tag;
+	do
+	{
+		if (tag == "prescribed")
+		{
+			// get the dof
+			int bc = -1;
+			const char* szbc = tag.AttributeValue("bc");
+			if      (strcmp(szbc, "x") == 0) bc = 0;
+			else if (strcmp(szbc, "y") == 0) bc = 1;
+			else if (strcmp(szbc, "z") == 0) bc = 2;
+			else if (strcmp(szbc, "Rx") == 0) bc = 3;
+			else if (strcmp(szbc, "Ry") == 0) bc = 4;
+			else if (strcmp(szbc, "Rz") == 0) bc = 5;
+			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+
+			// get the loadcurve
+			const char* szlc = tag.AttributeValue("lc");
+			int lc = atoi(szlc) - 1;
+
+			// get the (optional) type attribute
+			bool brel = false;
+			const char* szrel = tag.AttributeValue("type", true);
+			if (szrel)
+			{
+				if      (strcmp(szrel, "relative" ) == 0) brel = true;
+				else if (strcmp(szrel, "absolute" ) == 0) brel = false;
+				else throw XMLReader::InvalidAttributeValue(tag, "type", szrel);
+			}
+
+			// create the rigid displacement constraint
+			FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement(&fem);
+			pDC->id = nmat;
+			pDC->bc = bc;
+			pDC->lc = lc;
+			pDC->brel = brel;
+			tag.value(pDC->sf);
+			fem.m_RDC.push_back(pDC);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				int n = fem.m_RDC.size()-1;
+				FERigidBodyDisplacement* pDC = fem.m_RDC[n];
+				pStep->AddBoundaryCondition(pDC);
+				pDC->Deactivate();
+			}
+		}
+		else if (tag == "force")
+		{
+			// get the dof
+			int bc = -1;
+			const char* szbc = tag.AttributeValue("bc");
+			if      (strcmp(szbc, "x") == 0) bc = 0;
+			else if (strcmp(szbc, "y") == 0) bc = 1;
+			else if (strcmp(szbc, "z") == 0) bc = 2;
+			else if (strcmp(szbc, "Rx") == 0) bc = 3;
+			else if (strcmp(szbc, "Ry") == 0) bc = 4;
+			else if (strcmp(szbc, "Rz") == 0) bc = 5;
+			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+
+			// get the loadcurve
+			const char* szlc = tag.AttributeValue("lc");
+			int lc = atoi(szlc) - 1;
+
+			// create the rigid body force
+			FERigidBodyForce* pFC = new FERigidBodyForce(&fem);
+			pFC->id = nmat;
+			pFC->bc = bc;
+			pFC->lc = lc;
+			tag.value(pFC->sf);
+			fem.m_RFC.push_back(pFC);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				int n = fem.m_RFC.size()-1;
+				FERigidBodyForce* pFC = fem.m_RFC[n];
+				pStep->AddBoundaryCondition(pFC);
+				pFC->Deactivate();
+			}
+		}
+		else if (tag == "fixed")
+		{
+			// get the dof
+			int bc = -1;
+			const char* szbc = tag.AttributeValue("bc");
+			if      (strcmp(szbc, "x") == 0) bc = 0;
+			else if (strcmp(szbc, "y") == 0) bc = 1;
+			else if (strcmp(szbc, "z") == 0) bc = 2;
+			else if (strcmp(szbc, "Rx") == 0) bc = 3;
+			else if (strcmp(szbc, "Ry") == 0) bc = 4;
+			else if (strcmp(szbc, "Rz") == 0) bc = 5;
+			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+
+			// create the fixed dof
+			FERigidBodyFixedBC* pBC = new FERigidBodyFixedBC(&fem);
+			pBC->id = nmat;
+			pBC->bc = bc;
+			fem.m_RBC.push_back(pBC);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				int n = fem.m_RBC.size()-1;
+				FERigidBodyFixedBC* pBC = fem.m_RBC[n];
+				pStep->AddBoundaryCondition(pBC);
+				pBC->Deactivate();
+			}
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
