@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D5B572E1186CD45900D12E45 /* FERemodelingElasticDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B572DF186CD45900D12E45 /* FERemodelingElasticDomain.cpp */; };
+		D5B572E2186CD45900D12E45 /* FERemodelingElasticDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B572E0186CD45900D12E45 /* FERemodelingElasticDomain.h */; };
 		D5E107741865DFAD00B23922 /* FE2DFiberNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1068D1865DFAC00B23922 /* FE2DFiberNeoHookean.cpp */; };
 		D5E107751865DFAD00B23922 /* FE2DFiberNeoHookean.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1068E1865DFAC00B23922 /* FE2DFiberNeoHookean.h */; };
 		D5E107761865DFAD00B23922 /* FE2DTransIsoMooneyRivlin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1068F1865DFAC00B23922 /* FE2DTransIsoMooneyRivlin.cpp */; };
@@ -240,6 +242,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D5B572DF186CD45900D12E45 /* FERemodelingElasticDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERemodelingElasticDomain.cpp; sourceTree = "<group>"; };
+		D5B572E0186CD45900D12E45 /* FERemodelingElasticDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERemodelingElasticDomain.h; sourceTree = "<group>"; };
 		D5E106851865DF9F00B23922 /* libFEBioMech.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioMech.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E1068D1865DFAC00B23922 /* FE2DFiberNeoHookean.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FE2DFiberNeoHookean.cpp; sourceTree = "<group>"; };
 		D5E1068E1865DFAC00B23922 /* FE2DFiberNeoHookean.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FE2DFiberNeoHookean.h; sourceTree = "<group>"; };
@@ -656,6 +660,8 @@
 				D5E107241865DFAD00B23922 /* FEPressureLoad.h */,
 				D5E107251865DFAD00B23922 /* FEPreStrainTransIsoMR.cpp */,
 				D5E107261865DFAD00B23922 /* FEPreStrainTransIsoMR.h */,
+				D5B572DF186CD45900D12E45 /* FERemodelingElasticDomain.cpp */,
+				D5B572E0186CD45900D12E45 /* FERemodelingElasticDomain.h */,
 				D5E107271865DFAD00B23922 /* FERemodelingElasticMaterial.cpp */,
 				D5E107281865DFAD00B23922 /* FERemodelingElasticMaterial.h */,
 				D5E107291865DFAD00B23922 /* FEResidualVector.cpp */,
@@ -850,6 +856,7 @@
 				D5E1079D1865DFAD00B23922 /* FEDiscreteSpringDomain.h in Headers */,
 				D5E108001865DFAD00B23922 /* FEOrthoElastic.h in Headers */,
 				D5E108141865DFAD00B23922 /* FERigidMaterial.h in Headers */,
+				D5B572E2186CD45900D12E45 /* FERemodelingElasticDomain.h in Headers */,
 				D5E108421865DFAD00B23922 /* FETransverselyIsotropic.h in Headers */,
 				D5E1082C1865DFAD00B23922 /* FESpringMaterial.h in Headers */,
 				D5E108571865DFAD00B23922 /* gauss.h in Headers */,
@@ -916,6 +923,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5B572E1186CD45900D12E45 /* FERemodelingElasticDomain.cpp in Sources */,
 				D5E107F31865DFAD00B23922 /* FEMRVonMisesFibers.cpp in Sources */,
 				D5E107EB1865DFAD00B23922 /* FELinearSolidSolver.cpp in Sources */,
 				D5E107981865DFAD00B23922 /* FEDamageNeoHookean.cpp in Sources */,
@@ -1140,6 +1148,7 @@
 				D5E1068B1865DF9F00B23922 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
