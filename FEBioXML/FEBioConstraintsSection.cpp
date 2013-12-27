@@ -97,10 +97,20 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				const char* szlc = tag.AttributeValue("lc");
 				int lc = atoi(szlc) - 1;
 
+				bool brel = false;
+				const char* szrel = tag.AttributeValue("relative", true);
+				if (szrel)
+				{
+					if      (strcmp(szrel, "true" ) == 0) brel = true;
+					else if (strcmp(szrel, "false") == 0) brel = false;
+					else throw XMLReader::InvalidAttributeValue(tag, "relative", szrel);
+				}
+
 				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement(&fem);
 				pDC->id = nmat;
 				pDC->bc = bc;
 				pDC->lc = lc;
+				pDC->brel = brel;
 				tag.value(pDC->sf);
 				fem.m_RDC.push_back(pDC);
 

@@ -116,11 +116,15 @@ bool FEBiphasicAnalysis::Init()
 			assert(RB.m_BC[DC.bc] == 0);	// make sure we are not overriding a fixed bc
 			RB.m_pDC[DC.bc] = &DC;
 			RB.m_BC[DC.bc] = 1;
-			switch (DC.bc)
+			DC.ref = 0.0;
+			if (DC.brel)
 			{
-			case 0: DC.ref = RB.m_rt.x - RB.m_r0.x; break;
-			case 1: DC.ref = RB.m_rt.y - RB.m_r0.y; break;
-			case 2: DC.ref = RB.m_rt.z - RB.m_r0.z; break;
+				switch (DC.bc)
+				{
+				case 0: DC.ref = RB.m_rt.x - RB.m_r0.x; break;
+				case 1: DC.ref = RB.m_rt.y - RB.m_r0.y; break;
+				case 2: DC.ref = RB.m_rt.z - RB.m_r0.z; break;
+				}
 			}
 		}
 	}

@@ -80,12 +80,13 @@ public:
 class FERigidBodyDisplacement : public FEBoundaryCondition
 {
 public:
-	FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem) { ref= 0.0; }
+	FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem) { ref= 0.0; brel = false; }
 
 public:
 	int		id;		//!< rigid body id
 	int		bc;		//!< displacement direction
 	int		lc;		//!< load curve number
 	double	sf;		//!< scale factor
-	double	ref;	//!< reference value
+	double	ref;	//!< reference value for relative displacement
+	bool	brel;	//!< relative displacement flag
 };
