@@ -4,6 +4,7 @@
 #include "FEBioMech/FEResidualVector.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
+#include "FECore/DOFS.h"
 
 #ifdef WIN32
 	#include <float.h>
@@ -30,7 +31,12 @@ END_PARAMETER_LIST();
 FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel* pfem) : FEBiphasicSolver(pfem)
 {
 	m_Ctol = 0.01;
-	for (int k=0; k<MAX_CDOFS; ++k) m_nceq[k] = 0;
+    
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
+    m_nceq.assign(MAX_CDOFS, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -43,6 +49,10 @@ bool FEBiphasicSoluteSolver::Init()
 
 	int i, j, n;
 	
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// allocate concentration-vectors
 	m_ci.assign(MAX_CDOFS,vector<double>(0,0));
 	m_Ci.assign(MAX_CDOFS,vector<double>(0,0));
@@ -79,6 +89,10 @@ bool FEBiphasicSoluteSolver::InitEquations()
 	
 	int i,j;
 	
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// determined the nr of concentration equations
 	FEMesh& mesh = m_fem.GetMesh();
 	for (j=0; j<MAX_CDOFS; ++j) m_nceq[j] = 0;
@@ -98,6 +112,10 @@ bool FEBiphasicSoluteSolver::InitEquations()
 //!
 void FEBiphasicSoluteSolver::PrepStep(double time)
 {
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	for (int j=0; j<MAX_CDOFS; ++j)
 		if (m_nceq[j]) zero(m_Ci[j]);
 	FEBiphasicSolver::PrepStep(time);
@@ -128,10 +146,14 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 	double	normP;		// current pressure norm
 	double	normp;		// incremement pressure norm
 
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// solute convergence data
-	double	normCi[MAX_CDOFS];	// initial concentration norm
-	double	normC[MAX_CDOFS];	// current concentration norm
-	double	normc[MAX_CDOFS];	// incremement concentration norm
+	vector<double>	normCi(MAX_CDOFS);	// initial concentration norm
+	vector<double>	normC(MAX_CDOFS);	// current concentration norm
+	vector<double>	normc(MAX_CDOFS);	// incremement concentration norm
 
 	// initialize flags
 	bool bconv = false;		// convergence flag
@@ -711,6 +733,10 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 	FEMesh& mesh = m_fem.GetMesh();
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// update solute data
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
@@ -750,7 +776,7 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 			int lc   = dc.lc;
 			int bc   = dc.bc;
 			double s = dc.s;
-			double r = dc.r;	// GAA
+			double r = dc.r;
 			
 			FENode& node = mesh.Node(n);
 			
@@ -768,6 +794,10 @@ void FEBiphasicSoluteSolver::Serialize(DumpFile& ar)
 {
 	FEBiphasicSolver::Serialize(ar);
 
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	if (ar.IsSaving())
 	{
 		ar << m_Ctol;

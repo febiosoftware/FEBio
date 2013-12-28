@@ -30,7 +30,7 @@ public:
 	int		node;	// node number
 	int		bc;		// dof
 	int		lc;		// load curve
-	double	r;		// initial value // GAA
+	double	r;		// initial value
 	bool	br;		// flag for relative bc
 };
 

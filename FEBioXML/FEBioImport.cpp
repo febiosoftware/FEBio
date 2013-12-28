@@ -23,6 +23,7 @@
 #include "FECore/Image.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include "FECore/DOFS.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------
@@ -108,6 +109,15 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 		return false;
 	}
 
+	// Determine the number of solutes and total number of degrees of freedom
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+    int MAX_CDOFS = 0;
+    XMLTag soltag;
+    if (xml.FindTag("Solutes", soltag)) MAX_CDOFS = soltag.children();
+    fedofs.SetCDOFS(MAX_CDOFS);
+    fedofs.SetNDOFS(MAX_NDOFS + MAX_CDOFS);
+    
 	// parse the file
 	try
 	{

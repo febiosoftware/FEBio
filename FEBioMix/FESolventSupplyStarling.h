@@ -29,8 +29,8 @@ public:
 public:
 	double		m_kp;				//!< coefficient of pressure drop
 	double		m_pv;				//!< prescribed (e.g., vascular) pressure
-	double		m_qc[MAX_CDOFS];	//!< coefficients of concentration drops
-	double		m_cv[MAX_CDOFS];	//!< prescribed (e.g., vascular) concentrations
+	vector<double>		m_qc;       //!< coefficients of concentration drops
+	vector<double>		m_cv;       //!< prescribed (e.g., vascular) concentrations
 	
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();

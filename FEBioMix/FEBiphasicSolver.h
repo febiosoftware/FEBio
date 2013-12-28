@@ -55,7 +55,7 @@ public:
 	// equation numbers
 	int		m_ndeq;				//!< number of equations related to displacement dofs
 	int		m_npeq;				//!< number of equations related to pressure dofs
-	int		m_nceq[MAX_CDOFS];	//!< number of equations related to concentration dofs
+	vector<int>		m_nceq;	//!< number of equations related to concentration dofs
 
 	// poro data
 	vector<double>	m_di;	//!< displacement increment vector

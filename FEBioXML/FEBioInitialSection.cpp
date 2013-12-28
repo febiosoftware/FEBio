@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEBioInitialSection.h"
 #include "FECore/FEModel.h"
+#include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
 //! Read the Initial from the FEBio input file
@@ -12,6 +13,10 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// make sure we've read the nodes section
 	if (mesh.Nodes() == 0) throw XMLReader::InvalidTag(tag);
 

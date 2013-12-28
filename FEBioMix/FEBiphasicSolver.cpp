@@ -685,11 +685,11 @@ void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 			int lc   = dc.lc;
 			int bc   = dc.bc;
 			double s = dc.s;
-			double r = dc.r;	// GAA
+			double r = dc.r;
 
 			FENode& node = mesh.Node(n);
 
-			if (bc == DOF_P) node.m_pt = r + s*m_fem.GetLoadCurve(lc)->Value(); // GAA
+			if (bc == DOF_P) node.m_pt = r + s*m_fem.GetLoadCurve(lc)->Value();
 		}
 	}
 }

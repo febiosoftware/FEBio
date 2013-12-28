@@ -8,6 +8,7 @@
 #include "FECore/FENodeReorder.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
+#include "FECore/DOFS.h"
 #include "NumCore/NumCore.h"
 
 #ifdef WIN32
@@ -222,6 +223,10 @@ bool FESolidSolver::InitEquations()
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
 
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+
 	// initialize nr of equations
 	int neq = 0;
 
@@ -431,11 +436,11 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 			int lc   = dc.lc;
 			int bc   = dc.bc;
 			double s = dc.s;
-			double r = dc.r;	// GAA
+			double r = dc.r;
 
 			FENode& node = mesh.Node(n);
 
-			double g = r + s*m_fem.GetLoadCurve(lc)->Value(); // GAA
+			double g = r + s*m_fem.GetLoadCurve(lc)->Value();
 
 			switch (bc)
 			{
@@ -672,6 +677,11 @@ void FESolidSolver::PrepStep(double time)
 {
 	int i, j;
 
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// initialize counters
 	m_niter = 0;	// nr of iterations
 	m_nrhs  = 0;	// nr of RHS evaluations
@@ -716,9 +726,9 @@ void FESolidSolver::PrepStep(double time)
 			int lc   = dc.lc;
 			int bc   = dc.bc;
 			double s = dc.s;
-			double r = dc.r;	// GAA
+			double r = dc.r;
 
-			double dq = r + s*m_fem.GetLoadCurve(lc)->Value();	// GAA
+			double dq = r + s*m_fem.GetLoadCurve(lc)->Value();
 
 			int I;
 
@@ -1504,6 +1514,11 @@ void FESolidSolver::ContactStiffness()
 void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 {
 	int i, j, k, l, n = en.size();
+
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+
 	double kij[MAX_NDOFS][MAX_NDOFS], Ri[3][3] = {0}, Rj[3][3] = {0};
 
 	double KF[MAX_NDOFS][6];
@@ -1754,6 +1769,10 @@ void FESolidSolver::AssembleStiffness(std::vector<int>& lm, matrix& ke)
 
 void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 {
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+
 	// assemble into global stiffness matrix
 	m_pK->Assemble(ke, elm);
 

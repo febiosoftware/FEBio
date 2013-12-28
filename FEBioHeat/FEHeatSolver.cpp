@@ -177,9 +177,9 @@ void FEHeatSolver::PrepStep()
 			int lc   = dc.lc;
 			int bc   = dc.bc;
 			double s = dc.s;
-			double r = dc.r;	// GAA
+			double r = dc.r;
 
-			double T = r + s*m_fem.GetLoadCurve(lc)->Value(); // GAA
+			double T = r + s*m_fem.GetLoadCurve(lc)->Value();
 
 			FENode& node = m_fem.GetMesh().Node(n);
 

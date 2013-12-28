@@ -8,16 +8,22 @@
 #include "FETriphasic.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
+#include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteAnalysis::InitNodes()
 {
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// open all dofs we need
 	FEMesh& mesh = m_fem.GetMesh();
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		for (int i=0; i<MAX_NDOFS; ++i) node.m_ID[i] = -1; 
+		for (int i=0; i<MAX_NDOFS; ++i) node.m_ID[i] = -1;
 
 		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
 		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;
@@ -130,6 +136,10 @@ bool FEBiphasicSoluteAnalysis::Init()
 {
 	// initialize base class data
 	FEAnalysis::Init();
+
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
 
 	// clear the active rigid body BC's
 	int NRB = m_fem.Objects();
@@ -281,7 +291,7 @@ bool FEBiphasicSoluteAnalysis::Init()
 			case DOF_X: // x-displacement
 				n = node.m_ID[bc];
 				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.x - node.m_r0.x : 0;	// GAA
+				DC.r = br ? node.m_rt.x - node.m_r0.x : 0;
 				break;
 			case DOF_Y: // y-displacement
 				n = node.m_ID[bc];

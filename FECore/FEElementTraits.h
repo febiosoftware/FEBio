@@ -18,10 +18,6 @@
 //-----------------------------------------------------------------------------
 // Max nr of nodal degrees of freedom
 
-#define MAX_CDOFS	8
-//#define MAX_NDOFS	11+MAX_CDOFS
-#define MAX_NDOFS	19
-
 // At this point the nodal dofs are used as follows:
 //
 #define DOF_X			0		// x-displacement

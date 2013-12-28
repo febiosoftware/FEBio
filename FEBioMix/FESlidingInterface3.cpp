@@ -4,6 +4,7 @@
 #include "FEBioMech/FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
+#include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -531,7 +532,7 @@ void FESlidingInterface3::BuildMatrixProfile(FEStiffnessMatrix& K)
 									
 					for (l=0; l<nseln; ++l)
 					{
-						int* id = mesh.Node(sn[l]).m_ID;
+						vector<int>& id = mesh.Node(sn[l]).m_ID;
 						lm[8*l  ] = id[DOF_X];
 						lm[8*l+1] = id[DOF_Y];
 						lm[8*l+2] = id[DOF_Z];
@@ -544,7 +545,7 @@ void FESlidingInterface3::BuildMatrixProfile(FEStiffnessMatrix& K)
 									
 					for (l=0; l<nmeln; ++l)
 					{
-						int* id = mesh.Node(mn[l]).m_ID;
+						vector<int>& id = mesh.Node(mn[l]).m_ID;
 						lm[8*(l+nseln)  ] = id[DOF_X];
 						lm[8*(l+nseln)+1] = id[DOF_Y];
 						lm[8*(l+nseln)+2] = id[DOF_Z];
@@ -993,6 +994,10 @@ void FESlidingInterface3::Update(int niter)
 
 	FEModel& fem = *GetFEModel();
 
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	double R = m_srad*fem.GetMesh().GetBoundingBox().radius();
 	
 	static int naug = 0;
@@ -2188,6 +2193,11 @@ void FESlidingInterface3::MarkAmbient()
 	// that for surfaces involved in more than one contact interface, nodes
 	// that have been marked as non free-draining are not reset to 
 	// free-draining.
+
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	for (int np=0; np<2; ++np)
 	{
 		FESlidingSurface3& s = (np == 0? m_ss : m_ms);
@@ -2231,6 +2241,10 @@ void FESlidingInterface3::MarkAmbient()
 
 void FESlidingInterface3::SetAmbient()
 {	
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// Set the pressure to zero for the free-draining nodes
 	for (int np=0; np<2; ++np)
 	{

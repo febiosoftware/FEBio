@@ -85,7 +85,7 @@ double FENodeForceX::value(int nnode)
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
-		int* id = mesh.Node(nnode).m_ID;
+		vector<int>& id = mesh.Node(nnode).m_ID;
 		return (-id[0] - 2 >= 0 ? Fr[-id[0]-2] : 0);
 	}
 	return 0;
@@ -99,7 +99,7 @@ double FENodeForceY::value(int nnode)
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
-		int* id = mesh.Node(nnode).m_ID;
+		vector<int>& id = mesh.Node(nnode).m_ID;
 		return (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0);
 	}
 	return 0;
@@ -113,7 +113,7 @@ double FENodeForceZ::value(int nnode)
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
-		int* id = mesh.Node(nnode).m_ID;
+		vector<int>& id = mesh.Node(nnode).m_ID;
 		return (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);
 	}
 	return 0;

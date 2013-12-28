@@ -483,7 +483,7 @@ void FESlidingInterface2::BuildMatrixProfile(FEStiffnessMatrix& K)
 
 					for (l=0; l<nseln; ++l)
 					{
-						int* id = mesh.Node(sn[l]).m_ID;
+						vector<int>& id = mesh.Node(sn[l]).m_ID;
 						lm[7*l  ] = id[DOF_X];
 						lm[7*l+1] = id[DOF_Y];
 						lm[7*l+2] = id[DOF_Z];
@@ -495,7 +495,7 @@ void FESlidingInterface2::BuildMatrixProfile(FEStiffnessMatrix& K)
 
 					for (l=0; l<nmeln; ++l)
 					{
-						int* id = mesh.Node(mn[l]).m_ID;
+						vector<int>& id = mesh.Node(mn[l]).m_ID;
 						lm[7*(l+nseln)  ] = id[DOF_X];
 						lm[7*(l+nseln)+1] = id[DOF_Y];
 						lm[7*(l+nseln)+2] = id[DOF_Z];

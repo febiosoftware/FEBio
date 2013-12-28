@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEDiscreteSpringDomain.h"
 #include "FESpringMaterial.h"
+#include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FEDiscreteSpringDomain::Clone()
@@ -13,6 +14,11 @@ FEDomain* FEDiscreteSpringDomain::Clone()
 //-----------------------------------------------------------------------------
 void FEDiscreteSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 {
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+
 	int N = el.Nodes();
 	lm.resize(N*MAX_NDOFS);
 
@@ -21,7 +27,7 @@ void FEDiscreteSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 		int n = el.m_node[i];
 		FENode& node = m_pMesh->Node(n);
 
-		int* id = node.m_ID;
+		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
 		lm[3*i  ] = id[0];

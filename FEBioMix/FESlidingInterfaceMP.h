@@ -164,7 +164,7 @@ public:
 	double	m_Rgas;					//!< universal gas constant
 	double	m_Tabs;					//!< absolute temperature
 	double	m_ambp;					//!< ambient pressure
-	double	m_ambc[MAX_CDOFS];		//!< ambient concentration
+	vector<double>	m_ambc;         //!< ambient concentration
 	vector<int> m_sid;				//!< list of solute ids common to both contact surfaces
 	vector<int> m_ssl;				//!< list of slave surface solutes common to both contact surfaces
 	vector<int> m_msl;				//!< list of master surface solutes common to both contact surfaces

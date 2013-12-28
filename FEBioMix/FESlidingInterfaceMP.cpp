@@ -6,6 +6,7 @@
 #include "FEBioMech/FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
+#include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -462,6 +463,10 @@ FESlidingInterfaceMP::FESlidingInterfaceMP(FEModel* pfem) : FEContactInterface(p
 	static int count = 1;
 	m_nID = count++;
 	
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// initial values
 	m_knmult = 1;
 	m_atol = 0.1;
@@ -476,7 +481,7 @@ FESlidingInterfaceMP::FESlidingInterfaceMP(FEModel* pfem) : FEContactInterface(p
 	m_ptol = 0;
 	m_ctol = 0;
 	m_ambp = 0;
-	for (int isol=0; isol<MAX_CDOFS; ++isol) m_ambc[isol] = 0;
+    m_ambc.assign(MAX_CDOFS,0);
 	m_nsegup = 0;
 	m_bautopen = false;
 	
@@ -553,7 +558,7 @@ void FESlidingInterfaceMP::BuildMatrixProfile(FEStiffnessMatrix& K)
                     
 					for (l=0; l<nseln; ++l)
 					{
-						int* id = mesh.Node(sn[l]).m_ID;
+						vector<int>& id = mesh.Node(sn[l]).m_ID;
 						lm[8*l  ] = id[DOF_X];
 						lm[8*l+1] = id[DOF_Y];
 						lm[8*l+2] = id[DOF_Z];
@@ -568,7 +573,7 @@ void FESlidingInterfaceMP::BuildMatrixProfile(FEStiffnessMatrix& K)
                     
 					for (l=0; l<nmeln; ++l)
 					{
-						int* id = mesh.Node(mn[l]).m_ID;
+						vector<int>& id = mesh.Node(mn[l]).m_ID;
 						lm[8*(l+nseln)  ] = id[DOF_X];
 						lm[8*(l+nseln)+1] = id[DOF_Y];
 						lm[8*(l+nseln)+2] = id[DOF_Z];
@@ -1082,6 +1087,10 @@ void FESlidingInterfaceMP::Update(int niter)
 	
 	FEModel& fem = *GetFEModel();
 	
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	double R = m_srad*GetFEModel()->GetMesh().GetBoundingBox().radius();
 	
 	static int naug = 0;
@@ -2313,6 +2322,10 @@ void FESlidingInterfaceMP::MarkAmbient()
 {	
 	int i, j, id, np;
 	
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// Mark all nodes as free-draining.  This needs to be done for ALL
 	// contact interfaces prior to executing Update(), where nodes that are
 	// in contact are subsequently marked as non free-draining.  This ensures
@@ -2364,6 +2377,10 @@ void FESlidingInterfaceMP::SetAmbient()
 {	
 	int i, j, np;
 	
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// Set the pressure to zero for the free-draining nodes
 	for (np=0; np<2; ++np)
 	{

@@ -27,7 +27,7 @@ void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		int n = el.m_node[i];
 		FENode& node = m_pMesh->Node(n);
 
-		int* id = node.m_ID;
+		vector<int>& id = node.m_ID;
 
 		// get temperature equation number
 		lm[i] = id[DOF_T];

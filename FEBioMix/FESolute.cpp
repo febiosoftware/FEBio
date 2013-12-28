@@ -1,6 +1,7 @@
 #include "FESolute.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include "FECore/DOFS.h"
 
 //=============================================================================
 // FESoluteData
@@ -217,6 +218,10 @@ bool FESolute::SetProperty(int n, FEMaterial* pm)
 //-----------------------------------------------------------------------------
 bool FESolute::SetAttribute(const char* szname, const char* szval)
 {
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	if (strcmp(szname, "sol") == 0)
 	{
 		int nid = atoi(szval) - 1;

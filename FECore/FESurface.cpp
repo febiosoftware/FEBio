@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FESurface.h"
+#include "DOFS.h"
 
 //-----------------------------------------------------------------------------
 //! Initialize surface node data structure
@@ -112,6 +113,11 @@ int FESurface::FindElement(FESurfaceElement& el)
 //-----------------------------------------------------------------------------
 void FESurface::UnpackLM(FEElement& el, vector<int>& lm)
 {
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	int N = el.Nodes();
 	lm.resize(N*MAX_NDOFS);
 
@@ -120,7 +126,7 @@ void FESurface::UnpackLM(FEElement& el, vector<int>& lm)
 		int n = el.m_node[i];
 
 		FENode& node = m_pMesh->Node(n);
-		int* id = node.m_ID;
+		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
 		lm[3*i  ] = id[DOF_X];

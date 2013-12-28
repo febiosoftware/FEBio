@@ -114,17 +114,17 @@ public:
 	double	m_T;	//!< temperature
 
 	// solute-data
-	double	m_c0[MAX_CDOFS];	//!< initial effective concentration
-	double	m_ct[MAX_CDOFS];	//!< current effective concentration
-	double	m_cp[MAX_CDOFS];	//!< effective concentration at previous time step
+	vector<double>	m_c0;	//!< initial effective concentration
+	vector<double>	m_ct;	//!< current effective concentration
+	vector<double>	m_cp;	//!< effective concentration at previous time step
 	
 	// rigid body data
 	int		m_rid;	//!< rigid body number
 	bool	m_bshell;	//!< does this node belong to a non-rigid shell element?
 
 public:
-	int		m_ID[MAX_NDOFS];	//!< nodal equation numbers
-	int		m_BC[MAX_NDOFS];	//!< boundary condition
+	vector<int>		m_ID;	//!< nodal equation numbers
+	vector<int>		m_BC;	//!< boundary condition
 };
 
 //-----------------------------------------------------------------------------

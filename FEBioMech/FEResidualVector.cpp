@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEResidualVector.h"
 #include "FECore/FERigidBody.h"
+#include "FECore/DOFS.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -21,6 +22,10 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
 	int i, j, I, n, l;
 
 	vec3d a, d;
+
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
 
 	// assemble the element residual into the global residual
 	int ndof = fe.size();

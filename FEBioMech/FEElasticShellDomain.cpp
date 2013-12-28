@@ -2,6 +2,7 @@
 #include "FEElasticShellDomain.h"
 #include "FETransverselyIsotropic.h"
 #include "FECore/log.h"
+#include "FECore/DOFS.h"
 #include <math.h>
 
 //-----------------------------------------------------------------------------
@@ -740,6 +741,11 @@ void FEElasticShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	FEShellElement& se = dynamic_cast<FEShellElement&>(el);
 
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+
 	int N = se.Nodes();
 	lm.resize(N*MAX_NDOFS);
 
@@ -748,7 +754,7 @@ void FEElasticShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		int n = se.m_node[i];
 		FENode& node = m_pMesh->Node(n);
 
-		int* id = node.m_ID;
+		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
 		lm[6*i  ] = id[0];

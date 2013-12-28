@@ -11,6 +11,7 @@
 #include "FESolidDomain.h"
 #include "FEMaterial.h"
 #include "log.h"
+#include "DOFS.h"
 
 //=============================================================================
 // FENode
@@ -21,11 +22,19 @@ FENode::FENode()
 	m_p0 = 0;
 	m_pt = 0;
 	m_T = 0;
-	for (int k=0; k<MAX_CDOFS; ++k) m_c0[k] = 0.;
+    
+    // get DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
+    m_c0.assign(MAX_CDOFS, 0);
+    m_ct.assign(MAX_CDOFS, 0);
+    m_cp.assign(MAX_CDOFS, 0);
 
 	// initialize dof stuff
-	for (int i=0; i<MAX_NDOFS; ++i) m_BC[i] =  0;
-	for (int i=0; i<MAX_NDOFS; ++i) m_ID[i] = -1;
+    m_BC.assign(MAX_NDOFS,0);
+    m_ID.assign(MAX_NDOFS, -1);
 
 	// rigid body data
 	m_rid = -1;
@@ -100,6 +109,10 @@ void FEMesh::ClearParts()
 //-----------------------------------------------------------------------------
 void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 {
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// stream nodal data
 	if (bsave)
 	{
@@ -316,6 +329,10 @@ void FEMesh::UpdateBox()
 int FEMesh::RemoveIsolatedVertices()
 {
 	int i, j, k, N = Nodes(), n;
+
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
 
 	// create a valence array
 	vector<int> val; val.assign(N, 0);
@@ -541,6 +558,10 @@ bool FEMesh::Init()
 
 void FEMesh::Reset()
 {
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// reset nodal data
 	for (int i=0; i<Nodes(); ++i) 
 	{

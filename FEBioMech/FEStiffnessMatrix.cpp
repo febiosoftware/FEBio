@@ -8,6 +8,7 @@
 #include "FEPointConstraint.h"
 #include "FEAugLagLinearConstraint.h"
 #include "FECore/FERigidBody.h"
+#include "FECore/DOFS.h"
 #include "FERigidJoint.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -35,6 +36,10 @@ FEStiffnessMatrix::~FEStiffnessMatrix()
 bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 {
 	int i, j, k, l, m, n;
+
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
 
 	// keep a pointer to the FEM object
 	m_pfem = pfem;

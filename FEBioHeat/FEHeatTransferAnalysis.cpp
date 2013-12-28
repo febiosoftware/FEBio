@@ -1,6 +1,7 @@
 #include "FEHeatTransferAnalysis.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
+#include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
 FEHeatTransferAnalysis::FEHeatTransferAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_HEAT)
@@ -13,6 +14,10 @@ bool FEHeatTransferAnalysis::Init()
 	// initialize base class data
 	FEAnalysis::Init();
 
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+    
 	// reset nodal ID's
 	FEMesh& mesh = m_fem.GetMesh();
 	for (int i=0; i<mesh.Nodes(); ++i)

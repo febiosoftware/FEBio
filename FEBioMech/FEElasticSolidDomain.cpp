@@ -4,6 +4,7 @@
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledViscoElasticMaterial.h"
 #include "FECore/log.h"
+#include "FECore/DOFS.h"
 
 #ifdef WIN32
 extern "C" int __cdecl omp_get_num_threads(void);
@@ -984,15 +985,20 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, double dt)
 //! Unpack the element LM data. 
 void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	int N = el.Nodes();
-	lm.resize(N*int(MAX_NDOFS));
+	lm.resize(N*MAX_NDOFS);
 	
 	for (int i=0; i<N; ++i)
 	{
 		int n = el.m_node[i];
 		FENode& node = m_pMesh->Node(n);
 
-		int* id = node.m_ID;
+		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
 		lm[3*i  ] = id[0];

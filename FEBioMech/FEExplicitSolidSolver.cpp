@@ -6,6 +6,7 @@
 #include "FEContactInterface.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
+#include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -146,6 +147,10 @@ bool FEExplicitSolidSolver::Init()
 bool FEExplicitSolidSolver::InitEquations()
 {
 	int i, j, n;
+
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
 
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
@@ -382,11 +387,11 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 			int lc   = dc.lc;
 			int bc   = dc.bc;
 			double s = dc.s;
-			double r = dc.r;	// GAA
+			double r = dc.r;
 
 			FENode& node = mesh.Node(n);
 
-			double g = r + s*m_fem.GetLoadCurve(lc)->Value(); // GAA
+			double g = r + s*m_fem.GetLoadCurve(lc)->Value();
 
 			switch (bc)
 			{
@@ -577,6 +582,11 @@ void FEExplicitSolidSolver::PrepStep(double time)
 {
 	int i, j;
 
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	// initialize counters
 	m_niter = 0;	// nr of iterations
 	m_nrhs  = 0;	// nr of RHS evaluations
@@ -619,9 +629,9 @@ void FEExplicitSolidSolver::PrepStep(double time)
 			int lc   = dc.lc;
 			int bc   = dc.bc;
 			double s = dc.s;
-			double r = dc.r;	// GAA
+			double r = dc.r;
 
-			double dq = r + s*m_fem.GetLoadCurve(lc)->Value();	// GAA
+			double dq = r + s*m_fem.GetLoadCurve(lc)->Value();
 
 			int I;
 

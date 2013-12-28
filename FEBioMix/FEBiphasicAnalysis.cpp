@@ -6,10 +6,15 @@
 #include "FEBiphasic.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
+#include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
 void FEBiphasicAnalysis::InitNodes()
 {
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+
 	// open all dofs we need
 	FEMesh& mesh = m_fem.GetMesh();
 	for (int i=0; i<mesh.Nodes(); ++i)
@@ -236,7 +241,7 @@ bool FEBiphasicAnalysis::Init()
 			case DOF_X: // x-displacement
 				n = node.m_ID[bc];
 				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.x - node.m_r0.x : 0;	// GAA
+				DC.r = br ? node.m_rt.x - node.m_r0.x : 0;
 				break;
 			case DOF_Y: // y-displacement
 				n = node.m_ID[bc];

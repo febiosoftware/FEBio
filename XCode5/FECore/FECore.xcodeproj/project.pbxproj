@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D5A0A8F0186F4AC60046B0DE /* DOFS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A0A8EE186F4AC50046B0DE /* DOFS.cpp */; };
+		D5A0A8F1186F4AC60046B0DE /* DOFS.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A0A8EF186F4AC60046B0DE /* DOFS.h */; };
 		D5B572D7186CC76500D12E45 /* FECoreFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B572CF186CC76500D12E45 /* FECoreFactory.cpp */; };
 		D5B572D8186CC76500D12E45 /* FECoreFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B572D0186CC76500D12E45 /* FECoreFactory.h */; };
 		D5B572D9186CC76500D12E45 /* FECoreKernel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B572D1186CC76500D12E45 /* FECoreKernel.cpp */; };
@@ -156,6 +158,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D5A0A8EE186F4AC50046B0DE /* DOFS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DOFS.cpp; sourceTree = "<group>"; };
+		D5A0A8EF186F4AC60046B0DE /* DOFS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DOFS.h; sourceTree = "<group>"; };
 		D5B572CF186CC76500D12E45 /* FECoreFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECoreFactory.cpp; sourceTree = "<group>"; };
 		D5B572D0186CC76500D12E45 /* FECoreFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECoreFactory.h; sourceTree = "<group>"; };
 		D5B572D1186CC76500D12E45 /* FECoreKernel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECoreKernel.cpp; sourceTree = "<group>"; };
@@ -343,6 +347,8 @@
 				D5E109F41865E15900B23922 /* colsol.cpp */,
 				D5E109F51865E15900B23922 /* DataStore.cpp */,
 				D5E109F61865E15900B23922 /* DataStore.h */,
+				D5A0A8EE186F4AC50046B0DE /* DOFS.cpp */,
+				D5A0A8EF186F4AC60046B0DE /* DOFS.h */,
 				D5E109F71865E15900B23922 /* DumpFile.cpp */,
 				D5E109F81865E15900B23922 /* DumpFile.h */,
 				D5E109F91865E15900B23922 /* DumpStream.cpp */,
@@ -499,6 +505,7 @@
 				D5E10A891865E15900B23922 /* DumpFile.h in Headers */,
 				D5E10AA11865E15900B23922 /* FECore.h in Headers */,
 				D5E10AA91865E15900B23922 /* FEDomain.h in Headers */,
+				D5A0A8F1186F4AC60046B0DE /* DOFS.h in Headers */,
 				D5E10B031865E15900B23922 /* SparseMatrix.h in Headers */,
 				D5E10AE91865E15900B23922 /* Image.h in Headers */,
 				D5E10AC11865E15900B23922 /* FEMesh.h in Headers */,
@@ -691,6 +698,7 @@
 				D5E10AE51865E15900B23922 /* FETrussDomain.cpp in Sources */,
 				D5E10A881865E15900B23922 /* DumpFile.cpp in Sources */,
 				D5E10AA01865E15900B23922 /* FECore.cpp in Sources */,
+				D5A0A8F0186F4AC60046B0DE /* DOFS.cpp in Sources */,
 				D5E10AC81865E15900B23922 /* FENNQuery.cpp in Sources */,
 				D5E10AEB1865E15900B23922 /* LinearSolver.cpp in Sources */,
 			);

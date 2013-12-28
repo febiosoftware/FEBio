@@ -775,7 +775,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		{
 			FEPrescribedBC* pdc = new FEPrescribedBC(this);
 			ar >> nid >> bactive;
-			ar >> pdc->bc >> pdc->lc >> pdc->node >> pdc->s >> pdc->br >> pdc->r; // GAA
+			ar >> pdc->bc >> pdc->lc >> pdc->node >> pdc->s >> pdc->br >> pdc->r;
 			pdc->SetID(nid);
 			if (bactive) pdc->Activate(); else pdc->Deactivate();
 			m_DC.push_back(pdc);

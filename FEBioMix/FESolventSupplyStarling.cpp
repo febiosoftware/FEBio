@@ -1,7 +1,8 @@
 #include <sstream>
 #include <iostream>
 #include "FESolventSupplyStarling.h"
-#include "FEMultiphasic.h" // need this for FESolutesMaterialPoint. can we move elsewhere?
+#include "FESolutesMaterialPoint.h"
+#include "FECore/DOFS.h"
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESolventSupplyStarling, FESolventSupply)
@@ -31,10 +32,13 @@ FESolventSupplyStarling::FESolventSupplyStarling(FEModel* pfem) : FESolventSuppl
 {
 	m_kp = 0;
 	m_pv = 0;
-	for (int i=0; i<MAX_CDOFS; ++i) {
-		m_qc[i] = 0;
-		m_cv[i] = 0;
-	}
+
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
+    m_qc.assign(MAX_CDOFS,0);
+    m_cv.assign(MAX_CDOFS,0);
 }
 
 //-----------------------------------------------------------------------------

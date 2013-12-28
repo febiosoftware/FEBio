@@ -3,6 +3,7 @@
 #include "FEModel.h"
 #include "FECoreKernel.h"
 #include "log.h"
+#include "DOFS.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -125,6 +126,10 @@ bool FEAnalysis::InitConstraints()
 	int i;
 
 	FEMesh& mesh = m_fem.GetMesh();
+
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
 
 	// set the equation numbers for the linear constraints
 	list<FELinearConstraint>::iterator it = m_fem.m_LinC.begin();

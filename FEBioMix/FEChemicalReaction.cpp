@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEChemicalReaction.h"
 #include "FECore/FEElementTraits.h"
+#include "FECore/DOFS.h"
 #include <stdlib.h>
 
 
@@ -39,6 +40,10 @@ void FEChemicalReaction::SetParameter(FEParam& p)
 //-----------------------------------------------------------------------------
 bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
 {
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
 	if (strcmp(p.m_szname, "vR") == 0)
 	{
 		if (strcmp(szatt, "sbm") == 0)

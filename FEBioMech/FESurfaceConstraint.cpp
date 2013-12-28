@@ -142,7 +142,7 @@ void FESurfaceConstraint::BuildMatrixProfile(FEStiffnessMatrix& K)
 
 	for (int k=0; k<n0; ++k)
 	{
-		int* id = mesh.Node(nr0[k]).m_ID;
+		vector<int>& id = mesh.Node(nr0[k]).m_ID;
 		lm[6*(k+1)  ] = id[DOF_X];
 		lm[6*(k+1)+1] = id[DOF_Y];
 		lm[6*(k+1)+2] = id[DOF_Z];
@@ -169,7 +169,7 @@ void FESurfaceConstraint::BuildMatrixProfile(FEStiffnessMatrix& K)
 
 		for (int k=0; k<n; ++k)
 		{
-			int* id = mesh.Node(en[k]).m_ID;
+			vector<int>& id = mesh.Node(en[k]).m_ID;
 			lm[6*(k+1)  ] = id[DOF_X];
 			lm[6*(k+1)+1] = id[DOF_Y];
 			lm[6*(k+1)+2] = id[DOF_Z];
