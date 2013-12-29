@@ -16,7 +16,6 @@ void FEMultiphasicAnalysis::InitNodes()
 {
     // get nodal DOFS
     DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
     int MAX_CDOFS = fedofs.GetCDOFS();
     
 	// open all dofs we need
@@ -24,7 +23,7 @@ void FEMultiphasicAnalysis::InitNodes()
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		for (int i=0; i<MAX_NDOFS; ++i) node.m_ID[i] = -1;
+		for (int i=0; i<(int)node.m_ID.size(); ++i) node.m_ID[i] = -1;
 
 		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
 		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;
@@ -154,10 +153,6 @@ bool FEMultiphasicAnalysis::Init()
 {
 	// initialize base class data
 	FEAnalysis::Init();
-
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
 
 	// clear the active rigid body BC's
 	int NRB = m_fem.Objects();
@@ -360,7 +355,7 @@ bool FEMultiphasicAnalysis::Init()
 				DC.r = 0;
 				break;
 			default:	// all prescribed concentrations
-				if ((bc >= DOF_C) && (bc < MAX_NDOFS)) {
+				if ((bc >= DOF_C) && (bc < (int)node.m_ID.size())) {
 					n = node.m_ID[bc];
 					node.m_ID[bc] = (n<0?n:-n-2);
 					int sid = bc - DOF_C;

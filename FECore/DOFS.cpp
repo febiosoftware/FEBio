@@ -26,6 +26,12 @@ DOFS* DOFS::GetInstance()
 // constructor for the DOFS class
 DOFS::DOFS()
 {
+	Reset();
+}
+
+//-----------------------------------------------------------------------------
+void DOFS::Reset()
+{
     MAX_NDOFS = 11;
     MAX_CDOFS = 0;
 }

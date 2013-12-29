@@ -22,10 +22,6 @@ bool FESolidAnalysis::Init()
 	// initialize base class data
 	FEAnalysis::Init();
 
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-    
 	// clear the rigid body BC's
 	int NRB = m_fem.Objects();
 	for (int i=0; i<NRB; ++i)
@@ -74,7 +70,7 @@ bool FESolidAnalysis::Init()
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		for (int j=0; j<MAX_NDOFS; ++j)	node.m_ID[j] = -1;
+		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = -1;
 
 		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
 		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;
@@ -244,7 +240,7 @@ bool FESolidAnalysis::Init()
 				DC.r = 0;
 				break;
 			default:	// all prescribed concentrations
-				if ((bc >= DOF_C) && (bc < MAX_NDOFS)) {
+				if ((bc >= DOF_C) && (bc < (int)node.m_ID.size())) {
 					n = node.m_ID[bc];
 					node.m_ID[bc] = (n<0?n:-n-2);
 					int sid = bc - DOF_C;
@@ -315,10 +311,6 @@ bool FEExplicitSolidAnalysis::Init()
 	// initialize base class data
 	FEAnalysis::Init();
 
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-
 	// clear the active rigid body BC's
 	int NRB = m_fem.Objects();
 	for (int i=0; i<NRB; ++i)
@@ -367,7 +359,7 @@ bool FEExplicitSolidAnalysis::Init()
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		for (int j=0; j<MAX_NDOFS; ++j)	node.m_ID[j] = -1;
+		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = -1;
 
 		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
 		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;
@@ -537,7 +529,7 @@ bool FEExplicitSolidAnalysis::Init()
 				DC.r = 0;
 				break;
 			default:	// all prescribed concentrations
-				if ((bc >= DOF_C) && (bc < MAX_NDOFS)) {
+				if ((bc >= DOF_C) && (bc < (int)node.m_ID.size())) {
 					n = node.m_ID[bc];
 					node.m_ID[bc] = (n<0?n:-n-2);
 					int sid = bc - DOF_C;
@@ -608,16 +600,12 @@ bool FELinearSolidAnalysis::Init()
 	// initialize base class data
 	FEAnalysis::Init();
 
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-
 	// reset nodal ID's
 	FEMesh& mesh = m_fem.GetMesh();
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		for (int j=0; j<MAX_NDOFS; ++j)	node.m_ID[j] = -1;
+		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = -1;
 
 		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
 		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;

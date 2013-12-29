@@ -223,10 +223,6 @@ bool FESolidSolver::InitEquations()
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
 
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-
 	// initialize nr of equations
 	int neq = 0;
 
@@ -242,7 +238,7 @@ bool FESolidSolver::InitEquations()
 		for (i=0; i<mesh.Nodes(); ++i)
 		{
 			FENode& node = mesh.Node(P[i]);
-			for (j=0; j<MAX_NDOFS; ++j)
+			for (j=0; j<(int)node.m_ID.size(); ++j)
 				if (node.m_ID[j] >= 0) node.m_ID[j] = neq++;
 		}
 	}
@@ -252,7 +248,7 @@ bool FESolidSolver::InitEquations()
 		for (i=0; i<mesh.Nodes(); ++i)
 		{
 			FENode& node = mesh.Node(i);
-			for (j=0; j<MAX_NDOFS; ++j)
+			for (j=0; j<(int)node.m_ID.size(); ++j)
 				if (node.m_ID[j] >= 0) node.m_ID[j] = neq++;
 		}
 	}
@@ -679,7 +675,6 @@ void FESolidSolver::PrepStep(double time)
 
     // get nodal DOFS
     DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
     int MAX_CDOFS = fedofs.GetCDOFS();
     
 	// initialize counters
@@ -782,7 +777,7 @@ void FESolidSolver::PrepStep(double time)
 				}
 					break;
 				default:
-					if ((bc >= DOF_C) && (bc < MAX_NDOFS)) {
+					if ((bc >= DOF_C) && (bc < (int)node.m_ID.size())) {
 						I = -node.m_ID[bc]-2;
 						if (I>=0 && I<neq) 
 							ui[I] = dq - node.m_ct[bc - DOF_C]; 

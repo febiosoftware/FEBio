@@ -127,10 +127,6 @@ bool FEAnalysis::InitConstraints()
 
 	FEMesh& mesh = m_fem.GetMesh();
 
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-
 	// set the equation numbers for the linear constraints
 	list<FELinearConstraint>::iterator it = m_fem.m_LinC.begin();
 	for (i=0; i<nlin; ++i, ++it)
@@ -152,6 +148,8 @@ bool FEAnalysis::InitConstraints()
 	}
 
 	// create the linear constraint table
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
 	m_fem.m_LCT.assign(mesh.Nodes()*MAX_NDOFS, -1);
 
 	list<FELinearConstraint>::iterator ic = m_fem.m_LinC.begin();

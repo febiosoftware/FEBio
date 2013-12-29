@@ -11,16 +11,12 @@
 //-----------------------------------------------------------------------------
 void FEBiphasicAnalysis::InitNodes()
 {
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-
 	// open all dofs we need
 	FEMesh& mesh = m_fem.GetMesh();
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		for (int i=0; i<MAX_NDOFS; ++i) node.m_ID[i] = -1; 
+		for (int i=0; i<(int)node.m_ID.size(); ++i) node.m_ID[i] = -1; 
 
 		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
 		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;

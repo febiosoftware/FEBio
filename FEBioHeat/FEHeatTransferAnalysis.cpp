@@ -14,10 +14,6 @@ bool FEHeatTransferAnalysis::Init()
 	// initialize base class data
 	FEAnalysis::Init();
 
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-    
 	// reset nodal ID's
 	FEMesh& mesh = m_fem.GetMesh();
 	for (int i=0; i<mesh.Nodes(); ++i)
@@ -25,7 +21,7 @@ bool FEHeatTransferAnalysis::Init()
 		FENode& node = mesh.Node(i);
 
 		// fix all degrees of freedom
-		for (int j=0; j<MAX_NDOFS; ++j)	node.m_ID[j] = -1;
+		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = -1;
 
 		// open the temperature dof for non-fixed nodes
 		if (node.m_BC[DOF_T] != -1) node.m_ID[DOF_T] = 0;

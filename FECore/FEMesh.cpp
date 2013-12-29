@@ -330,10 +330,6 @@ int FEMesh::RemoveIsolatedVertices()
 {
 	int i, j, k, N = Nodes(), n;
 
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-
 	// create a valence array
 	vector<int> val; val.assign(N, 0);
 
@@ -356,7 +352,7 @@ int FEMesh::RemoveIsolatedVertices()
 		{
 			++ni;
 			FENode& node = Node(i);
-			for (k=0; k<MAX_NDOFS; ++k) node.m_BC[k] = -1;
+			for (k=0; k<(int)node.m_BC.size(); ++k) node.m_BC[k] = -1;
 		}
 
 	return ni;

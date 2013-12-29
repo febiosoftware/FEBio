@@ -15,6 +15,9 @@ public:
     
 	//! destructor
 	~DOFS();
+
+	//! Reset dofs
+	void Reset();
     
 private:
 	//! constructor is private so that you cannot create it directly

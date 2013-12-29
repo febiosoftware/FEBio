@@ -584,7 +584,6 @@ void FEExplicitSolidSolver::PrepStep(double time)
 
     // get nodal DOFS
     DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
     int MAX_CDOFS = fedofs.GetCDOFS();
     
 	// initialize counters
@@ -685,7 +684,7 @@ void FEExplicitSolidSolver::PrepStep(double time)
 				}
 					break;
 				default:
-					if ((bc >= DOF_C) && (bc < MAX_NDOFS)) {
+					if ((bc >= DOF_C) && (bc < (int)node.m_ID.size())) {
 						I = -node.m_ID[bc]-2;
 						if (I>=0 && I<neq) 
 							ui[I] = dq - node.m_ct[bc - DOF_C]; 
