@@ -177,6 +177,8 @@ public:
 
 	int GetCurrentLine() { return m_nline; }
 
+	void SkipTag(XMLTag& tag);
+
 protected:
 	char GetChar();
 	void ReadTag(XMLTag& tag);

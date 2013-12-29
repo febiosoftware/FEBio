@@ -114,7 +114,10 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
     int MAX_NDOFS = fedofs.GetNDOFS();
     int MAX_CDOFS = 0;
     XMLTag soltag;
-    if (xml.FindTag("Solutes", soltag)) MAX_CDOFS = soltag.children();
+    if (xml.FindTag("Solutes", soltag)) 
+	{
+		MAX_CDOFS = soltag.children();
+	}
     fedofs.SetCDOFS(MAX_CDOFS);
     fedofs.SetNDOFS(MAX_NDOFS + MAX_CDOFS);
     

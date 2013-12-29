@@ -1519,9 +1519,10 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
     DOFS& fedofs = *DOFS::GetInstance();
     int MAX_NDOFS = fedofs.GetNDOFS();
 
-	double kij[MAX_NDOFS][MAX_NDOFS], Ri[3][3] = {0}, Rj[3][3] = {0};
+	double Ri[3][3] = {0}, Rj[3][3] = {0};
+	vector< vector<double> > kij; kij.assign(MAX_NDOFS, vector<double>(MAX_NDOFS));
 
-	double KF[MAX_NDOFS][6];
+	vector< vector<double> > KF; KF.assign(MAX_NDOFS, vector<double>(6));
 	double KR[6][6];
 
 	int *lmi, *lmj;

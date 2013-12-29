@@ -215,7 +215,7 @@ int XMLTag::children()
 {
 	XMLTag tag(*this); ++tag;
 	int ncount = 0;
-	while (!tag.isend()) { ncount++; ++tag; }
+	while (!tag.isend()) { ncount++; m_preader->SkipTag(tag); }
 	return ncount;
 }
 
@@ -365,13 +365,21 @@ bool XMLReader::FindTag(const char* sztag, XMLTag& tag)
 	fgetpos(m_fp, &tag.m_fpos);
 
 	// find the correct tag
-	bool bfound = false;
-	do
+	try
 	{
-		NextTag(tag);
-		if (strcmp(sztag, tag.m_sztag) == 0) bfound = true;
+		bool bfound = false;
+		do
+		{
+			NextTag(tag);
+			if (strcmp(sztag, tag.m_sztag) == 0) bfound = true;
+		}
+		while (!bfound);
 	}
-	while (!bfound);
+	catch (EndOfFile)
+	{
+		// we reached the end of the file before finding this tag.
+		return false;
+	}
 
 	return true;
 }
@@ -406,7 +414,7 @@ void XMLReader::NextTag(XMLTag& tag)
 			ReadEndTag(tag);
 		}
 	}
-	catch (EndOfFile)
+	catch (EndOfFile e)
 	{
 		if (!tag.isend()) throw UnexpectedEOF();
 	}
@@ -610,6 +618,29 @@ char XMLReader::GetChar()
 {
 	char ch;
 	while ((ch=fgetc(m_fp))=='\n') ++m_nline;
-	if (feof(m_fp)) throw EndOfFile();
+	if (feof(m_fp)) 
+	{
+		int a = 0;
+		throw EndOfFile();
+	}
 	return ch;
+}
+
+//-----------------------------------------------------------------------------
+//! Skip a tag
+void XMLReader::SkipTag(XMLTag& tag)
+{
+	// if this tag is a leaf we just return
+	if (tag.isleaf()) { ++tag; return; }
+
+	// if it is not a leaf we have to loop over all 
+	// the children, skipping each child in turn
+	NextTag(tag);
+	do
+	{
+		SkipTag(tag);
+	}
+	while (!tag.isend());
+
+	++tag;
 }
