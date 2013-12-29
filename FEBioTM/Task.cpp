@@ -26,8 +26,6 @@ CTask::CTask()
 	m_bdebug = false;
 	m_nlog   = FE_PRINT_DEFAULT;
 
-	m_stats.nhour = 0;
-	m_stats.nmin = 0;
 	m_stats.nsec = 0;
 
 	m_bvisible = true;
@@ -253,7 +251,7 @@ void update_ui_cb(FEModel* pfem, void* pd)
 //-----------------------------------------------------------------------------
 void CTask::UpdateRunTime()
 {
-	if (m_ptime) m_ptime->GetTime(m_stats.nhour, m_stats.nmin, m_stats.nsec);
+	if (m_ptime) m_stats.nsec = m_ptime->GetTime();
 }
 
 //-----------------------------------------------------------------------------
@@ -306,8 +304,6 @@ void CTask::Run(Progress& prg)
 	m_stats.niters  = 0;
 	m_stats.nrhs    = 0;
 	m_stats.nreform = 0;
-	m_stats.nhour   = 0;
-	m_stats.nmin    = 0;
 	m_stats.nsec    = 0;
 
 	// start a timer
@@ -351,7 +347,7 @@ void CTask::Run(Progress& prg)
 
 	// stop timer
 	timer.stop();
-	timer.GetTime(m_stats.nhour, m_stats.nmin, m_stats.nsec);
+	m_stats.nsec = timer.GetTime();
 
 	// collect the stats
 	m_stats.nreturn = (bret? 1 : 0);

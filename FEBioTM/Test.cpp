@@ -23,8 +23,8 @@ bool CTest::LoadData(const char* szfile)
 	while (fgets(szline, 1024, fp))
 	{
 		STATS s;
-		int nread = sscanf(szline, "%s%d%d%d%d%d", s.szfile, &s.nreturn, &s.ntime, &s.niters, &s.nrhs, &s.nreform);
-		if (nread == 6) m_data.push_back(s);
+		int nread = sscanf(szline, "%s%d%d%d%d%d%d", s.szfile, &s.nreturn, &s.ntime, &s.niters, &s.nrhs, &s.nreform, &s.nsec);
+		if (nread == 7) m_data.push_back(s);
 	}
 
 	int N = m_data.size();
@@ -45,7 +45,7 @@ bool CTest::SaveData(const char* szfile)
 	{
 		CTask& task = *m_session.GetTask(i);
 		CTask::STATS& s = task.m_stats;
-		fprintf(fp, "%s %d %d %d %d %d\n", task.GetFileTitle(), s.nreturn, s.ntime, s.niters, s.nrhs, s.nreform);
+		fprintf(fp, "%s %d %d %d %d %d %d\n", task.GetFileTitle(), s.nreturn, s.ntime, s.niters, s.nrhs, s.nreform, s.nsec);
 	}
 
 	fclose(fp);
@@ -71,6 +71,7 @@ void CTest::Run()
 			s.niters  = task.m_stats.niters;
 			s.nrhs    = task.m_stats.nrhs;
 			s.nreform = task.m_stats.nreform;
+			s.nsec    = task.m_stats.nsec;
 		}
 	}
 	else
@@ -91,6 +92,7 @@ void CTest::Run()
 				s.niters  = task.m_stats.niters;
 				s.nrhs    = task.m_stats.nrhs;
 				s.nreform = task.m_stats.nreform;
+				s.nsec    = task.m_stats.nsec;
 				m_data.push_back(s);
 				m_result.push_back(2);
 			}

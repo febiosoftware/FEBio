@@ -53,6 +53,12 @@ void Timer::GetTime(int& nhour, int& nmin, int& nsec)
 }
 
 //-----------------------------------------------------------------------------
+int Timer::GetTime()
+{
+	return (int) (m_brunning? peek() : m_sec);
+}
+
+//-----------------------------------------------------------------------------
 void Timer::time_str(char* sz)
 {
 	int nhour, nmin, nsec;

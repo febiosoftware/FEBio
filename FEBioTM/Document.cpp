@@ -99,12 +99,12 @@ void CDocument::RunTest()
 	{
 		const char* sz[] = {"Failed", "Passed", "No Data"};
 		const int M = 12;
-		char szret[M], sztime[M], sziter[M], szrhs[M], szref[M];
+		char szret[M], sztime[M], sziter[M], szrhs[M], szref[M], szsec[M];
 
 		m_ptest->Run();
 
 		pwnd->SetTestFormat(0);
-		pwnd->AddTestEntry(" Name                           | Return code| Timesteps  | Iterations | RHS evals  |  Reforms   | Status\n");
+		pwnd->AddTestEntry(" Name                           | Return code| Timesteps  | Iterations | RHS evals  |  Reforms   |  Runtime   | Status\n");
 		pwnd->AddTestEntry("-------------------------------------------------------------------------------------------------------------------------\n");
 		int N = m_session.Tasks();
 		for (int i=0; i<N; ++i)
@@ -120,10 +120,11 @@ void CDocument::RunTest()
 				if (stat.niters  == data.niters ) sprintf(sziter, "%d", stat.niters ); else sprintf(sziter, "%d(%d)", stat.niters , data.niters );
 				if (stat.nrhs    == data.nrhs   ) sprintf(szrhs , "%d", stat.nrhs   ); else sprintf(szrhs , "%d(%d)", stat.nrhs   , data.nrhs   );
 				if (stat.nreform == data.nreform) sprintf(szref , "%d", stat.nreform); else sprintf(szref , "%d(%d)", stat.nreform, data.nreform);
+				if (stat.nsec    == data.nsec   ) sprintf(szsec , "%d", stat.nsec   ); else sprintf(szsec , "%d(%d)", stat.nsec   , data.nsec   );
 
 				int nresult = m_ptest->GetResult(n);
 				if (nresult == 0) pwnd->SetTestFormat(1); else pwnd->SetTestFormat(0);
-				pwnd->AddTestEntry("%-32s|%12s|%12s|%12s|%12s|%12s| %s\n", task.GetFileTitle(), szret, sztime, sziter, szrhs, szref, sz[nresult]);
+				pwnd->AddTestEntry("%-32s|%12s|%12s|%12s|%12s|%12s|%12s| %s\n", task.GetFileTitle(), szret, sztime, sziter, szrhs, szref, szsec, sz[nresult]);
 			}
 		}
 	}

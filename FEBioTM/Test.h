@@ -16,6 +16,7 @@ public:
 		int		niters;		// number of iterations
 		int		nrhs;		// number of RHS evaluations
 		int		nreform;	// number of reformations
+		int		nsec;		// number of seconds runtime
 	};
 
 public:

@@ -36,6 +36,9 @@ public:
 	//! Get the elapsed time
 	void GetTime(int& nhour, int& nmin, int& nsec);
 
+	//! Get the time in seconds
+	int GetTime();
+
 	//! return the time as a text string
 	void time_str(char* sz);
 

@@ -106,7 +106,10 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 					{
 						char sz[32];
 						CTask::STATS& s = pt->m_stats;
-						sprintf(sz, "%d:%02d:%02d", s.nhour, s.nmin, s.nsec);
+						int nsec = s.nsec;
+						int nhour = (int) (nsec / 3600.0); nsec -= nhour*3600;
+						int nmin  = (int) (nsec /   60.0); nsec -= nmin*60;
+						sprintf(sz, "%d:%02d:%02d", nhour, nmin, nsec);
 						fl_draw(sz, X, Y, W-5, H, FL_ALIGN_RIGHT);
 					}
 				}
