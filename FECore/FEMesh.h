@@ -160,6 +160,33 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+//! This class defines a set of facets. This can be used in the creation of
+//! surfaces.
+class FEFacetSet
+{
+public:
+	struct FACET
+	{
+		int	node[FEElement::MAX_NODES];
+		int	ntype;	//	3=tri3, 4=quad4, 6=tri6, 8=quad8
+	};
+
+public:
+	FEFacetSet();
+	const char* GetName() { return m_szname; }
+	void SetName(const char* sz);
+
+	void Create(int n);
+
+	int Faces() { return (int) m_Face.size(); }
+	FACET& Face(int i);
+
+public:
+	vector<FACET>	m_Face;
+	char			m_szname[256];
+};
+
+//-----------------------------------------------------------------------------
 //! Class that defines a finite element part, that is, a list of elements.
 
 //! Note that this class is only a base class defining a common interface
@@ -316,6 +343,10 @@ public:
 	FESurface& Surface(int n) { return *m_Surf[n]; }
 	void AddSurface(FESurface* ps) { m_Surf.push_back(ps); }
 
+	// --- FACETSETS ---
+	int FacetSets() { return (int) m_FaceSet.size(); }
+	FEFacetSet& FacetSet(int n) { return *m_FaceSet[n]; }
+	void AddFacetSet(FEFacetSet* ps) { m_FaceSet.push_back(ps); }
 
 protected:
 	double SolidElementVolume(FESolidElement& el);
@@ -329,15 +360,15 @@ protected:
 
 protected:
 	void ClearDomains();
-	void ClearParts();
 
 protected:
 	vector<FENode>		m_Node;		//!< nodes
-	vector<FEPart*>		m_Part;		//!< parts
-	vector<FENodeSet*>	m_NodeSet;	//!< node sets
+	vector<FEDomain*>	m_Domain;	//!< list of domains
 	vector<FESurface*>	m_Surf;		//!< surfaces
 
-	vector<FEDomain*>	m_Domain;	//!< list of domains
+	vector<FEPart*>		m_Part;		//!< parts
+	vector<FENodeSet*>	m_NodeSet;	//!< node sets
+	vector<FEFacetSet*>	m_FaceSet;	//!< facet sets
 
 	FE_BOUNDING_BOX		m_box;	//!< bounding box
 

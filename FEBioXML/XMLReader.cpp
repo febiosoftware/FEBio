@@ -375,9 +375,9 @@ bool XMLReader::FindTag(const char* sztag, XMLTag& tag)
 		}
 		while (!bfound);
 	}
-	catch (EndOfFile)
+	catch (...)
 	{
-		// we reached the end of the file before finding this tag.
+		// an error has occured (or the end-of-file was reached)
 		return false;
 	}
 
@@ -414,7 +414,7 @@ void XMLReader::NextTag(XMLTag& tag)
 			ReadEndTag(tag);
 		}
 	}
-	catch (EndOfFile e)
+	catch (EndOfFile)
 	{
 		if (!tag.isend()) throw UnexpectedEOF();
 	}

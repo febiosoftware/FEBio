@@ -62,6 +62,32 @@ void FENodeSet::SetName(const char* sz)
 }
 
 //=============================================================================
+// FEFacetSet
+//-----------------------------------------------------------------------------
+FEFacetSet::FEFacetSet()
+{
+	m_szname[0] = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FEFacetSet::Create(int n)
+{
+	m_Face.resize(n);
+}
+
+//-----------------------------------------------------------------------------
+FEFacetSet::FACET& FEFacetSet::Face(int i)
+{
+	return m_Face[i];
+}
+
+//-----------------------------------------------------------------------------
+void FEFacetSet::SetName(const char* sz)
+{
+	strcpy(m_szname, sz); 
+}
+
+//=============================================================================
 // FEPart
 //-----------------------------------------------------------------------------
 FEElement* FEPart::FindElementFromID(int nid)
@@ -87,23 +113,21 @@ FEMesh::FEMesh()
 FEMesh::~FEMesh()
 {
 	for (size_t i=0; i<m_NodeSet.size(); ++i) delete m_NodeSet[i];
+	for (size_t i=0; i<m_FaceSet.size(); ++i) delete m_FaceSet[i];
+	for (size_t i=0; i<m_Part.size()   ; ++i) delete m_Part[i];
 	m_NodeSet.clear();
+	m_FaceSet.clear();
+	m_Part.clear();
+
 	ClearDomains();
-	ClearParts();
 }
 
 //-----------------------------------------------------------------------------
 void FEMesh::ClearDomains()
 {
-	for (int i=0; i<(int) m_Domain.size(); ++i) delete m_Domain[i];
+	// clear solid domains
+	for (size_t i=0; i<m_Domain.size(); ++i) delete m_Domain[i];
 	m_Domain.clear();
-}
-
-//-----------------------------------------------------------------------------
-void FEMesh::ClearParts()
-{
-	for (int i=0; i<(int) m_Part.size(); ++i) delete m_Part[i];
-	m_Part.clear();
 }
 
 //-----------------------------------------------------------------------------

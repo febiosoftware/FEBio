@@ -37,6 +37,7 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 			else if (tag == "ElementData") ParseElementDataSection(tag);
 			else if (tag == "NodeSet"    ) ParseNodeSetSection    (tag);
 			else if (tag == "Part"       ) ParsePartSection       (tag);
+			else if (tag == "Surface"    ) ParseSurfaceSection    (tag);
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
 		}
@@ -941,4 +942,57 @@ void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 
 	// add the nodeset to the mesh
 	mesh.AddNodeSet(pns);
+}
+
+//-----------------------------------------------------------------------------
+//! Reads a Geometry\Surface section.
+void FEBioGeometrySection::ParseSurfaceSection(XMLTag& tag)
+{
+	// get the mesh
+	FEMesh& mesh = *m_pim->GetFEMesh();
+
+	// get the number of nodes
+	// (we use this for checking the node indices of the facets)
+	int NN = mesh.Nodes();
+
+	// get the required name attribute
+	const char* szname = tag.AttributeValue("name");
+
+	// count nr of faces
+	int faces = tag.children();
+
+	// allocate storage for faces
+	FEFacetSet* ps = new FEFacetSet;
+	ps->Create(faces);
+	ps->SetName(szname);
+
+	// add it to the mesh
+	mesh.AddFacetSet(ps);
+
+	// read faces
+	++tag;
+	int nf[FEElement::MAX_NODES];
+	for (int i=0; i<faces; ++i)
+	{
+		FEFacetSet::FACET& face = ps->Face(i);
+
+		// set the facet type
+		if      (tag == "quad4") face.ntype = 4;
+		else if (tag == "tri3" ) face.ntype = 3;
+		else if (tag == "tri6" ) face.ntype = 6;
+		else if (tag == "quad8") face.ntype = 8;
+		else throw XMLReader::InvalidTag(tag);
+
+		// we assume that the facet type also defines the number of nodes
+		int N = face.ntype;
+		tag.value(nf, N);
+		for (int j=0; j<N; ++j) 
+		{
+			int nid = nf[j]-1;
+			if ((nid<0)||(nid>= NN)) throw XMLReader::InvalidValue(tag);
+			face.node[j] = nid;
+		}
+
+		++tag;
+	}
 }

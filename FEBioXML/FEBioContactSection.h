@@ -19,4 +19,7 @@ protected:
 protected:
 	void ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci);
 	bool ParseSurfaceSection  (XMLTag& tag, FESurface& s, int nfmt, bool bnodal);
+
+protected:
+	bool BuildSurface(FESurface& s, FEFacetSet& f, bool bnodal);
 };

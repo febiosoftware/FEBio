@@ -82,8 +82,37 @@ void FEBioContactSection::ParseContactInterface(XMLTag& tag, FESurfacePairIntera
 					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
 				}
 
-				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt, pci->UseNodalIntegration());
+				// see if the set attribute is defined
+				const char* szset = tag.AttributeValue("set", true);
+				if (szset)
+				{
+					// make sure this tag does not have any children
+					if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
+
+					// see if we can find the facet set
+					FEFacetSet* ps = 0;
+					for (int i=0; i<m.FacetSets(); ++i)
+					{
+						FEFacetSet& fi = m.FacetSet(i);
+						if (strcmp(fi.GetName(), szset) == 0)
+						{
+							ps = &fi;
+							break;
+						}
+					}
+
+					// create a surface from the facet set
+					if (ps)
+					{
+						if (BuildSurface(s, *ps, pci->UseNodalIntegration()) == false) throw XMLReader::InvalidTag(tag);
+					}
+					else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
+				}
+				else 
+				{
+					// read the surface section
+					if (ParseSurfaceSection(tag, s, nfmt, pci->UseNodalIntegration()) == false) throw XMLReader::InvalidTag(tag);
+				}
 			}
 			else throw XMLReader::InvalidTag(tag);
 		}
@@ -353,6 +382,50 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 		}
 
 		++tag;
+	}
+	return true;
+}
+
+//---------------------------------------------------------------------------------
+// parse a surface section for contact definitions
+//
+bool FEBioContactSection::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& m = fem.GetMesh();
+	int NN = m.Nodes();
+
+	// count nr of faces
+	int faces = fs.Faces();
+
+	// allocate storage for faces
+	s.create(faces);
+
+	// read faces
+	for (int i=0; i<faces; ++i)
+	{
+		FESurfaceElement& el = s.Element(i);
+		FEFacetSet::FACET& fi = fs.Face(i);
+
+		// set the element type/integration rule
+		if (bnodal)
+		{
+			if      (fi.ntype == 4) el.SetType(FE_QUAD4NI);
+			else if (fi.ntype == 3) el.SetType(FE_TRI3NI );
+			else if (fi.ntype == 6) el.SetType(m_pim->m_ntri6);
+			else return false;
+		}
+		else
+		{
+			if      (fi.ntype == 4) el.SetType(FE_QUAD4G4);
+			else if (fi.ntype == 3) el.SetType(m_pim->m_ntri3);
+			else if (fi.ntype == 6) el.SetType(m_pim->m_ntri6);
+			else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
+			else return false;
+		}
+
+		int N = el.Nodes(); assert(N == fi.ntype);
+		for (int j=0; j<N; ++j) el.m_node[j] = fi.node[j];
 	}
 	return true;
 }

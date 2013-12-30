@@ -24,6 +24,7 @@ protected:
 	void ParseElementDataSection(XMLTag& tag);
 	void ParseNodeSetSection    (XMLTag& tag);
 	void ParsePartSection       (XMLTag& tag);
+	void ParseSurfaceSection    (XMLTag& tag);
 
 	void ParseMesh(XMLTag& tag);
 
