@@ -87,20 +87,18 @@ bool FEBiphasicSoluteSolver::InitEquations()
 	// base class does most of the work
 	FEBiphasicSolver::InitEquations();
 	
-	int i,j;
-	
+	// determined the nr of concentration equations
+	FEMesh& mesh = m_fem.GetMesh();
+	for (int j=0; j<(int)m_nceq.size(); ++j) m_nceq[j] = 0;
+
     // get number of DOFS
     DOFS& fedofs = *DOFS::GetInstance();
     int MAX_CDOFS = fedofs.GetCDOFS();
-    
-	// determined the nr of concentration equations
-	FEMesh& mesh = m_fem.GetMesh();
-	for (j=0; j<MAX_CDOFS; ++j) m_nceq[j] = 0;
-	
-	for (i=0; i<mesh.Nodes(); ++i)
+
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& n = mesh.Node(i);
-		for (j=0; j<MAX_CDOFS; ++j)
+		for (int j=0; j<MAX_CDOFS; ++j)
 			if (n.m_ID[DOF_C+j] != -1) m_nceq[j]++;
 	}
 	
@@ -112,12 +110,7 @@ bool FEBiphasicSoluteSolver::InitEquations()
 //!
 void FEBiphasicSoluteSolver::PrepStep(double time)
 {
-    // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_CDOFS = fedofs.GetCDOFS();
-    
-	for (int j=0; j<MAX_CDOFS; ++j)
-		if (m_nceq[j]) zero(m_Ci[j]);
+	for (int j=0; j<(int)m_nceq.size(); ++j) if (m_nceq[j]) zero(m_Ci[j]);
 	FEBiphasicSolver::PrepStep(time);
 }
 
@@ -291,7 +284,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 		// check solute convergence
 		{
 			// extract the concentration increments
-			for (j=0; j<MAX_CDOFS; ++j) {
+			for (j=0; j<(int)m_nceq.size(); ++j) {
 				if (m_nceq[j]) {
 					GetConcentrationData(m_ci[j], m_bfgs.m_ui,j);
 					
@@ -311,7 +304,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 			
 			// check convergence
 			if (m_Ctol > 0) {
-				for (j=0; j<MAX_CDOFS; ++j)
+				for (j=0; j<(int)m_nceq.size(); ++j)
 					if (m_nceq[j]) bconv = bconv && (normc[j] <= (m_Ctol*m_Ctol)*normC[j]);
 			}
 		}
@@ -331,7 +324,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 		felog.printf("\t energy                 %15le %15le %15le\n", normEi, normE1, m_Etol*normEi);
 		felog.printf("\t displacement           %15le %15le %15le\n", normDi, normd ,(m_Dtol*m_Dtol)*normD );
 		felog.printf("\t fluid pressure         %15le %15le %15le\n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
-		for (j=0; j<MAX_CDOFS; ++j) {
+		for (j=0; j<(int)m_nceq.size(); ++j) {
 			if (m_nceq[j])
 				felog.printf("\t solute %d concentration %15le %15le %15le\n", j+1, normCi[j], normc[j] ,(m_Ctol*m_Ctol)*normC[j] );
 		}
@@ -364,7 +357,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 				normRi = normR1;
 				normDi = normd;
 				normPi = normp;
-				for (j=0; j<MAX_CDOFS; ++j)
+				for (j=0; j<(int)m_nceq.size(); ++j)
 					if (m_nceq[j]) normCi[j] = normc[j];
 				breform = true;
 			}
@@ -793,19 +786,15 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 void FEBiphasicSoluteSolver::Serialize(DumpFile& ar)
 {
 	FEBiphasicSolver::Serialize(ar);
-
-    // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_CDOFS = fedofs.GetCDOFS();
     
 	if (ar.IsSaving())
 	{
 		ar << m_Ctol;
-		for (int i=0; i<MAX_CDOFS; ++i) ar << m_nceq[i];
+		ar << m_nceq;
 	}
 	else
 	{
 		ar >> m_Ctol;
-		for (int i=0; i<MAX_CDOFS; ++i) ar >> m_nceq[i];
+		ar >> m_nceq;
 	}
 }

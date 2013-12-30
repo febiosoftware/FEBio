@@ -671,12 +671,6 @@ bool FESolidSolver::SolveStep(double time)
 //! Prepares the data for the first BFGS-iteration. 
 void FESolidSolver::PrepStep(double time)
 {
-	int i, j;
-
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_CDOFS = fedofs.GetCDOFS();
-    
 	// initialize counters
 	m_niter = 0;	// nr of iterations
 	m_nrhs  = 0;	// nr of RHS evaluations
@@ -691,14 +685,14 @@ void FESolidSolver::PrepStep(double time)
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
 	FEMesh& mesh = m_fem.GetMesh();
-	for (i=0; i<m_fem.GetMesh().Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
-		mesh.Node(i).m_rp = mesh.Node(i).m_rt;
-		mesh.Node(i).m_vp = mesh.Node(i).m_vt;
-		mesh.Node(i).m_ap = mesh.Node(i).m_at;
+		FENode& ni = mesh.Node(i);
+		ni.m_rp = ni.m_rt;
+		ni.m_vp = ni.m_vt;
+		ni.m_ap = ni.m_at;
 		// ---> TODO: move to the FEPoroSoluteSolver
-		for (int k=0; k<MAX_CDOFS; ++k)
-			mesh.Node(i).m_cp[k] = mesh.Node(i).m_ct[k];
+		for (int k=0; k<(int)ni.m_cp.size(); ++k) ni.m_cp[k] = ni.m_ct[k];
 	}
 
 	// apply concentrated nodal forces
@@ -712,7 +706,7 @@ void FESolidSolver::PrepStep(double time)
 	zero(ui);
 	int neq = m_neq;
 	int nbc = m_fem.PrescribedBCs();
-	for (i=0; i<nbc; ++i)
+	for (int i=0; i<nbc; ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
 		if (dc.IsActive())
@@ -788,7 +782,7 @@ void FESolidSolver::PrepStep(double time)
 
 	// initialize rigid bodies
 	int NO = m_fem.Objects();
-	for (i=0; i<NO; ++i)
+	for (int i=0; i<NO; ++i)
 	{
 		FERigidBody* prb = dynamic_cast<FERigidBody*>(m_fem.Object(i));
 		if (prb)
@@ -818,7 +812,7 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// calculate local rigid displacements
-	for (i=0; i<(int) m_fem.m_RDC.size(); ++i)
+	for (int i=0; i<(int) m_fem.m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *m_fem.m_RDC[i];
 		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(DC.id));
@@ -834,7 +828,7 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// calculate global rigid displacements
-	for (i=0; i<NO; ++i)
+	for (int i=0; i<NO; ++i)
 	{
 		FERigidBody* prb = dynamic_cast<FERigidBody*>(m_fem.Object(i));
 		if (prb)
@@ -842,7 +836,7 @@ void FESolidSolver::PrepStep(double time)
 			FERigidBody& RB = *prb;
 			if (RB.m_prb == 0)
 			{
-				for (j=0; j<6; ++j) RB.m_du[j] = RB.m_dul[j];
+				for (int j=0; j<6; ++j) RB.m_du[j] = RB.m_dul[j];
 			}
 			else
 			{
@@ -905,10 +899,10 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// store rigid displacements in Ui vector
-	for (i=0; i<NO; ++i)
+	for (int i=0; i<NO; ++i)
 	{
 		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
-		for (j=0; j<6; ++j)
+		for (int j=0; j<6; ++j)
 		{
 			int I = -RB.m_LM[j]-2;
 			if (I >= 0) ui[I] = RB.m_du[j];
@@ -918,7 +912,7 @@ void FESolidSolver::PrepStep(double time)
 	// apply prescribed rigid body forces
 	// TODO: I don't think this does anything since
 	//       the reaction forces are zeroed in the FESolidSolver::Residual function
-	for (i=0; i<(int) m_fem.m_RFC.size(); ++i)
+	for (int i=0; i<(int) m_fem.m_RFC.size(); ++i)
 	{
 		FERigidBodyForce& FC = *m_fem.m_RFC[i];
 		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(FC.id));
@@ -954,7 +948,7 @@ void FESolidSolver::PrepStep(double time)
 	FEMaterialPoint::dt = m_fem.GetCurrentStep()->m_dt;
 	FEMaterialPoint::time = m_fem.m_ftime;
 
-	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
+	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
 
 	// intialize the stresses
 	// TODO: is this a good place to update the stresses?

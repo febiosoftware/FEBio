@@ -109,11 +109,7 @@ void FEMesh::ClearParts()
 //-----------------------------------------------------------------------------
 void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-    // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_CDOFS = fedofs.GetCDOFS();
-    
-	// stream nodal data
+ 	// stream nodal data
 	if (bsave)
 	{
 		int NN = (int) m_Node.size();
@@ -127,12 +123,9 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 			dmp << nd.m_D0 << nd.m_Dt;
 			dmp << nd.m_p0 << nd.m_pt;
 			dmp << nd.m_T;
-			for (int j=0; j<MAX_CDOFS; ++j)
-			{
-				dmp << nd.m_c0[j];
-				dmp << nd.m_ct[j];
-				dmp << nd.m_cp[j];
-			}
+			dmp << nd.m_c0;
+			dmp << nd.m_ct;
+			dmp << nd.m_cp;
 		}
 	}
 	else
@@ -148,12 +141,9 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 			dmp >> nd.m_D0 >> nd.m_Dt;
 			dmp >> nd.m_p0 >> nd.m_pt;
 			dmp >> nd.m_T;
-			for (int j=0; j<MAX_CDOFS; ++j)
-			{
-				dmp >> nd.m_c0[j];
-				dmp >> nd.m_ct[j];
-				dmp >> nd.m_cp[j];
-			}
+			dmp >> nd.m_c0;
+			dmp >> nd.m_ct;
+			dmp >> nd.m_cp;
 		}
 	}
 
@@ -498,10 +488,6 @@ bool FEMesh::Init()
 
 void FEMesh::Reset()
 {
-    // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_CDOFS = fedofs.GetCDOFS();
-    
 	// reset nodal data
 	for (int i=0; i<Nodes(); ++i) 
 	{
@@ -513,7 +499,8 @@ void FEMesh::Reset()
 
 		node.m_pt = node.m_p0;
 		
-		for (int k=0; k<MAX_CDOFS; ++k)
+		int cdofs = (int) node.m_ct.size();
+		for (int k=0; k<cdofs; ++k)
 			node.m_ct[k] = node.m_cp[k] = node.m_c0[k];
 		
 		node.m_T = 0;
