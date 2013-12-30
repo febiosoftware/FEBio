@@ -28,15 +28,6 @@ public:
 
 	void SetSolute(int isol) { m_isol = isol; }
 	
-/*	//! clone
-	FEDomain* Clone()
-	{
-		FESoluteFlux* ps = new FESoluteFlux(m_pMesh);
-		ps->m_PC = m_PC;
-		return ps;
-	}
-*/
-
 	//! get a flux BC
 	LOAD& SoluteFlux(int n) { return m_PC[n]; }
 	

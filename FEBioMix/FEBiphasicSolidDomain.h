@@ -12,9 +12,6 @@ public:
 	//! constructor
 	FEBiphasicSolidDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_BIPHASIC_DOMAIN; }
 
-	//! clone this domain
-	FEDomain* Clone();
-	
 	//! initialize class
 	bool Initialize(FEModel& fem);
 

@@ -13,15 +13,6 @@ FEMultiphasicDomain::FEMultiphasicDomain(FEMesh* pm, FEMaterial* pmat) : FEElast
 }
 
 //-----------------------------------------------------------------------------
-//! clone domain
-FEDomain* FEMultiphasicDomain::Clone()
-{
-	FEMultiphasicDomain* pd = new FEMultiphasicDomain(m_pMesh, m_pMat);
-	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-	return pd;
-}
-
-//-----------------------------------------------------------------------------
 bool FEMultiphasicDomain::Initialize(FEModel &mdl)
 {
 	// initialize base class

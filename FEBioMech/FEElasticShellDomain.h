@@ -12,9 +12,6 @@ public:
 	//! \todo do I really need this?
 	FEElasticShellDomain& operator = (FEElasticShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
-	//! Clone this domain
-	FEDomain* Clone();
-
 	//! Initialize domain
 	bool Initialize(FEModel& fem);
 

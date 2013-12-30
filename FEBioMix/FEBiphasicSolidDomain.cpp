@@ -3,14 +3,6 @@
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
-FEDomain* FEBiphasicSolidDomain::Clone()
-{
-	FEBiphasicSolidDomain* pd = new FEBiphasicSolidDomain(m_pMesh, m_pMat);
-	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-	return pd;
-}
-
-//-----------------------------------------------------------------------------
 bool FEBiphasicSolidDomain::Initialize(FEModel &mdl)
 {
 	// initialize base class

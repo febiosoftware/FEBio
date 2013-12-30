@@ -20,15 +20,6 @@ public:
 	//! allocate storage
 	void Create(int n) { m_FC.resize(n); }
 
-	//! clone
-/*	FEDomain* Clone()
-	{
-		FEHeatFlux* ps = new FEHeatFlux(m_pMesh);
-		ps->m_FC = m_FC;
-		return ps;
-	}
-*/
-
 	//! get a heat flux load BC
 	LOAD& HeatFlux(int n) { return m_FC[n]; }
 

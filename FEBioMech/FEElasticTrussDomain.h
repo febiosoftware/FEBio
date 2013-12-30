@@ -10,9 +10,6 @@ public:
 	//! Constructor
 	FEElasticTrussDomain(FEMesh* pm, FEMaterial* pmat) : FETrussDomain(FE_TRUSS_DOMAIN, pm, pmat) {}
 
-	//! Clone this domain
-	FEDomain* Clone();
-
 	//! copy operator
 	FEElasticTrussDomain& operator = (FEElasticTrussDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 

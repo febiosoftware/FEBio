@@ -27,15 +27,6 @@ public:
 	//! allocate storage
 	void Create(int n) { m_PC.resize(n); }
 
-	//! clone
-/*	FEDomain* Clone()
-	{
-		FEFluidFlux* ps = new FEFluidFlux(m_pMesh);
-		ps->m_PC = m_PC;
-		return ps;
-	}
-*/
-
 	//! get a flux BC
 	LOAD& FluidFlux(int n) { return m_PC[n]; }
 

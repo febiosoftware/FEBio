@@ -19,9 +19,6 @@ public:
 	//! constructor
 	FEHeatSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_HEAT_SOLID_DOMAIN, pm, pmat) {}
 
-	//! Create a clone of this domain
-	FEDomain* Clone();
-
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 

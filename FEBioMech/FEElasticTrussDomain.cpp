@@ -4,14 +4,6 @@
 #include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
-FEDomain* FEElasticTrussDomain::Clone()
-{
-	FEElasticTrussDomain* pd = new FEElasticTrussDomain(m_pMesh, m_pMat);
-	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-	return pd;
-}
-
-//-----------------------------------------------------------------------------
 void FEElasticTrussDomain::Reset()
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);

@@ -10,14 +10,6 @@ FEBiphasicSoluteDomain::FEBiphasicSoluteDomain(FEMesh* pm, FEMaterial* pmat) : F
 }
 
 //-----------------------------------------------------------------------------
-FEDomain* FEBiphasicSoluteDomain::Clone()
-{
-	FEBiphasicSoluteDomain* pd = new FEBiphasicSoluteDomain(m_pMesh, m_pMat);
-	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-	return pd;
-}
-
-//-----------------------------------------------------------------------------
 bool FEBiphasicSoluteDomain::Initialize(FEModel &mdl)
 {
 	// initialize base class

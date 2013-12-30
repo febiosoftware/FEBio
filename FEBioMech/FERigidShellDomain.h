@@ -10,9 +10,6 @@ public:
 	//! constructor
 	FERigidShellDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticShellDomain(pm, pmat) { m_ntype = FE_RIGID_SHELL_DOMAIN; }
 
-	//! clone this domain
-	FEDomain* Clone();
-
 	//! Initialize
 	bool Initialize(FEModel& fem);
 

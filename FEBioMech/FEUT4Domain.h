@@ -29,9 +29,6 @@ public:
 	//! destructor
 	~FEUT4Domain();
 
-	//! clone function
-	FEDomain* Clone();
-
 	//! data serialization
 	void Serialize(DumpFile& ar);
 

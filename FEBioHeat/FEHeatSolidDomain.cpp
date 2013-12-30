@@ -7,14 +7,6 @@
 //============================================================================
 
 //-----------------------------------------------------------------------------
-FEDomain* FEHeatSolidDomain::Clone()
-{
-	FEHeatSolidDomain* pd = new FEHeatSolidDomain(m_pMesh, m_pMat);
-	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-	return pd;
-}
-
-//-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
 
 void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)

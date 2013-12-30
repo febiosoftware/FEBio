@@ -168,23 +168,6 @@ FEUT4Domain::~FEUT4Domain()
 }
 
 //-----------------------------------------------------------------------------
-//! clone function
-FEDomain* FEUT4Domain::Clone()
-{
-	FEUT4Domain* pd = new FEUT4Domain(m_pMesh, m_pMat);
-	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-	pd->m_tag = m_tag;
-	pd->m_NODE = m_NODE;
-	pd->m_Ve0 = m_Ve0;
-	pd->m_NEL.Create(*pd);
-	int Nmax = pd->m_NEL.MaxValence();
-	pd->m_Ge = new double[Nmax*4][4][3];
-	pd->m_Be = new double[Nmax*4][6][3];
-	pd->m_DB = new double[Nmax*4][6][3];
-	return pd;
-}
-
-//-----------------------------------------------------------------------------
 //! Initialization for the UT4Domain.
 //! Note that we first initialize the base class before initializing the domain.
 bool FEUT4Domain::Initialize(FEModel& mdl)

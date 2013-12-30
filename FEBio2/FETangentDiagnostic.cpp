@@ -8,7 +8,6 @@
 #include "FEBioMech/FESolidSolver.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include "FECore/log.h"
-#include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
 // Helper function to print a matrix
@@ -147,9 +146,6 @@ void FETangentDiagnostic::BuildSimpleShear()
 	};
 
 	// --- create the FE problem ---
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
 	// create the mesh
 	FEMesh& m = m_fem.GetMesh();
 	m.CreateNodes(8);
@@ -165,7 +161,7 @@ void FETangentDiagnostic::BuildSimpleShear()
 		n.m_BC[DOF_Z] = BC[i][2];
 
 		// fix all DOFS
-		for (j=3; j<MAX_NDOFS; ++j) n.m_BC[j] = -1;
+		for (j=3; j<(int) n.m_BC.size(); ++j) n.m_BC[j] = -1;
 	}
 
 	// get the material

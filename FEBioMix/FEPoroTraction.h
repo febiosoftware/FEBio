@@ -24,15 +24,7 @@ public:
 	void SetLinear(bool blinear) { m_blinear = blinear; }
 
 	void SetEffective(bool beff) { m_beffective = beff; }
-/*
-	//! clone
-	FEDomain* Clone()
-	{
-		FEPoroNormalTraction* ps = new FEPoroNormalTraction(m_pMesh);
-		ps->m_PC = m_PC;
-		return ps;
-	}
-*/
+
 	//! get a pressure load BC
 	LOAD& NormalTraction(int n) { return m_PC[n]; }
 

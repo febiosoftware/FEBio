@@ -14,13 +14,6 @@ extern "C" int omp_get_num_threads(void);
 extern "C" int omp_get_thread_num(void);
 #endif
 
-//-----------------------------------------------------------------------------
-FEDomain* FEElasticSolidDomain::Clone()
-{
-	FEElasticSolidDomain* pd = new FEElasticSolidDomain(m_pMesh, m_pMat);
-	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-	return pd;
-}
 
 //-----------------------------------------------------------------------------
 // Reset data

@@ -13,9 +13,6 @@ public:
 	//! constructor
 	FEMultiphasicDomain(FEMesh* pm, FEMaterial* pmat);
 	
-	//! clone domain
-	FEDomain* Clone();
-
 	//! Reset data
 	void Reset();
 	

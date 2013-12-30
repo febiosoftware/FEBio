@@ -2,14 +2,6 @@
 #include "FERigidSolidDomain.h"
 
 //-----------------------------------------------------------------------------
-FEDomain* FERigidSolidDomain::Clone()
-{
-	FERigidSolidDomain* pd = new FERigidSolidDomain(m_pMesh, m_pMat);
-	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-	return pd;
-}
-
-//-----------------------------------------------------------------------------
 bool FERigidSolidDomain::Initialize(FEModel& fem)
 {
 	return FESolidDomain::Initialize(fem);

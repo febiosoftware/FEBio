@@ -177,9 +177,6 @@ public:
 	//! Create a part
 	virtual void Create(int n) = 0;
 
-	//! clone part
-	virtual FEPart* Clone() = 0;
-
 	//! Number of elements in domain
 	virtual int Elements() = 0;
 
@@ -200,12 +197,6 @@ public:
 	FEPart_T(FEMesh* pm) : FEPart(pm) {}
 
 	void Create(int n) { m_Elem.resize(n); }
-	FEPart* Clone()
-	{
-		FEPart_T<T>* pg = new FEPart_T<T>(m_pmesh);
-		pg->m_Elem = m_Elem;
-		return pg;
-	}
 	int Elements() { return (int) m_Elem.size(); }
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
@@ -230,14 +221,8 @@ public:
 	//! constructor
 	FEMesh();
 
-	//! copy constructor
-	FEMesh(FEMesh& m);
-
 	//! destructor
 	virtual ~FEMesh();
-
-	//! assignment operator
-	FEMesh& operator = (FEMesh& m);
 
 	//! stream mesh data
 	void ShallowCopy(DumpStream& dmp, bool bsave);
@@ -357,6 +342,13 @@ protected:
 	FE_BOUNDING_BOX		m_box;	//!< bounding box
 
 	FENodeElemList	m_NEL;
+
+private:
+	//! hide the copy constructor
+	FEMesh(FEMesh& m){}
+
+	//! hide assignment operator
+	void FEMesh::operator =(FEMesh& m) {}
 };
 
 #endif // !defined(AFX_FEMESH_H__81ABA97F_AD5F_4F1D_8EE9_95B67EBA448E__INCLUDED_)

@@ -13,9 +13,6 @@ public:
 	//! constructor
 	FEBiphasicSoluteDomain(FEMesh* pm, FEMaterial* pmat);
 	
-	//! Create shallow copy
-	FEDomain* Clone();
-
 	//! reset domain data
 	void Reset();
 

@@ -23,15 +23,6 @@ public:
 	//! allocate storage
 	void Create(int n) { m_PC.resize(n); }
 
-	//! clone
-/*	FEDomain* Clone()
-	{
-		FEPressureLoad* ps = new FEPressureLoad(m_surf.GetMesh());
-		ps->m_PC = m_PC;
-		return ps;
-	}
-*/
-
 	//! get a pressure load BC
 	LOAD& PressureLoad(int n) { return m_PC[n]; }
 

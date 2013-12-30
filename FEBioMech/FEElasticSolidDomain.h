@@ -15,9 +15,6 @@ public:
 	//! \todo Do I really use this?
 	FEElasticSolidDomain& operator = (FEElasticSolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
-	//! create a clone of this class
-	FEDomain* Clone();
-
 	//! initialize class
 	bool Initialize(FEModel& fem);
 

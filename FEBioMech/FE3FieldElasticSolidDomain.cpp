@@ -29,15 +29,6 @@ bool FE3FieldElasticSolidDomain::Initialize(FEModel &fem)
 }
 
 //-----------------------------------------------------------------------------
-FEDomain* FE3FieldElasticSolidDomain::Clone()
-{
-	FE3FieldElasticSolidDomain* pd = new FE3FieldElasticSolidDomain(m_pMesh, m_pMat);
-	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-	pd->m_Data = m_Data;
-	return pd;
-}
-
-//-----------------------------------------------------------------------------
 void FE3FieldElasticSolidDomain::Reset()
 {
 	FEElasticSolidDomain::Reset();

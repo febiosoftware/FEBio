@@ -22,9 +22,6 @@ public:
 	//! constructor
 	FELinearSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_LINEAR_SOLID_DOMAIN, pm, pmat) {}
 
-	//! Clone the data
-	FEDomain* Clone();
-
 	//! Initialization
 	bool Initialize(FEModel& fem);
 

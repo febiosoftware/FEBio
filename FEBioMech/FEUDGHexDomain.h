@@ -9,9 +9,6 @@ public:
 	//! constructor
 	FEUDGHexDomain(FEMesh* pm, FEMaterial* pmat);
 
-	//! Clone domain
-	FEDomain* Clone();
-
 	//! initialize class
 	bool Initialize(FEModel& fem);
 

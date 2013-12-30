@@ -70,9 +70,6 @@ public: // interface for derived classes
 
 public: // optional functions to overload
 
-	//! create a clone of this domain (used in running restarts)
-	virtual FEDomain* Clone() { assert(false); return 0; }
-
 	//! reset the domain
 	virtual void Reset() {}
 

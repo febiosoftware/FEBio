@@ -167,62 +167,6 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 }
 
 //-----------------------------------------------------------------------------
-FEMesh::FEMesh(FEMesh& m)
-{
-	// copy nodal data
-	m_Node = m.m_Node;
-
-	// clear the domains
-	ClearDomains();
-	ClearParts();
-
-	// copy parts
-	for (int i=0; i<m.Parts(); ++i)
-	{
-		FEPart* pg = m.Part(i).Clone();
-		m_Part.push_back(pg);
-	}
-
-	// copy domains
-	for (int i=0; i<m.Domains(); ++i)
-	{
-		FEDomain* pd = m.Domain(i).Clone();
-		pd->SetMesh(this);
-		m_Domain.push_back(pd);
-	}
-}
-
-//-----------------------------------------------------------------------------
-//  Assignment operator.
-//
-FEMesh& FEMesh::operator =(FEMesh& m)
-{
-	// copy nodal data
-	m_Node = m.m_Node;
-
-	// clear the domains
-	ClearDomains();
-	ClearParts();
-
-	// copy parts
-	for (int i=0; i<m.Parts(); ++i)
-	{
-		FEPart* pg = m.Part(i).Clone();
-		m_Part.push_back(pg);
-	}
-
-	// copy domains
-	for (int i=0; i<m.Domains(); ++i)
-	{
-		FEDomain* pd = m.Domain(i).Clone();
-		pd->SetMesh(this);
-		m_Domain.push_back(pd);
-	}
-
-	return (*this);
-}
-
-//-----------------------------------------------------------------------------
 //  Allocates storage for mesh data.
 //
 void FEMesh::CreateNodes(int nodes)

@@ -12,9 +12,6 @@ public:
 	//! constructor
 	FETriphasicDomain(FEMesh* pm, FEMaterial* pmat);
 	
-	//! create shallow copy
-	FEDomain* Clone();
-
 	//! reset domain data
 	void Reset();
 

@@ -10,9 +10,6 @@ public:
 	//! constructor
 	FERigidSolidDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_RIGID_SOLID_DOMAIN; }
 
-	//! clone domain
-	FEDomain* Clone();
-
 	//! Initialize
 	bool Initialize(FEModel& fem);
 

@@ -14,14 +14,6 @@ FETriphasicDomain::FETriphasicDomain(FEMesh* pm, FEMaterial* pmat) : FEBiphasicS
 }
 
 //-----------------------------------------------------------------------------
-FEDomain* FETriphasicDomain::Clone()
-{
-	FETriphasicDomain* pd = new FETriphasicDomain(m_pMesh, m_pMat);
-	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-	return pd;
-}
-
-//-----------------------------------------------------------------------------
 bool FETriphasicDomain::Initialize(FEModel &mdl)
 {
 	// initialize base class

@@ -9,15 +9,6 @@ void FELinearSolidDomain::Reset()
 }
 
 //-----------------------------------------------------------------------------
-//! Create a copy of this domain
-FEDomain* FELinearSolidDomain::Clone()
-{
-	FELinearSolidDomain* pd = new FELinearSolidDomain(m_pMesh, m_pMat);
-	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-	return pd;
-}
-
-//-----------------------------------------------------------------------------
 //! \todo The material point initialization needs to move to the base class.
 bool FELinearSolidDomain::Initialize(FEModel &mdl)
 {

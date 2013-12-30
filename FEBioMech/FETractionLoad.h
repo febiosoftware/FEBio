@@ -21,14 +21,6 @@ public:
 	//! allocate storage
 	void Create(int n) { m_TC.resize(n); }
 
-	//! clone
-/*	FEDomain* Clone()
-	{
-		FETractionLoad* ps = new FETractionLoad(m_surf.GetMesh());
-		ps->m_TC = m_TC;
-		return ps;
-	}
-*/
 	//! get a traction load BC
 	LOAD& TractionLoad(int n) { return m_TC[n]; }
 

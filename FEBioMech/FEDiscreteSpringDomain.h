@@ -10,9 +10,6 @@ public:
 	//! constructor
 	FEDiscreteSpringDomain(FEMesh* pm, FEMaterial* pmat) : FEDiscreteDomain(FE_DISCRETE_DOMAIN, pm, pmat) {}
 
-	//! Clone this domain
-	FEDomain* Clone();
-
 	//! Unpack LM data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
