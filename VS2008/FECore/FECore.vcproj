@@ -228,6 +228,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\DOFS.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\DumpFile.cpp"
 				>
 			</File>
@@ -503,6 +507,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\DataStore.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\DOFS.h"
 				>
 			</File>
 			<File
