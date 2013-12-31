@@ -147,6 +147,14 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 
 	log.SetMode(Logfile::FILE_AND_SCREEN);
 
+	// print reaction forces
+	log.printf("\n\tFunction values:\n\n");
+	log.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
+	for (i=0; i<ndata; ++i)
+	{
+		log.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, m_yopt[i], y[i], fabs(m_yopt[i] - y[i]));
+	}
+
 	log.printf("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
 
 	log.printf("\tMajor iterations ....................... : %d\n\n", niter);
@@ -157,14 +165,6 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	{
 		OPT_VARIABLE& var = opt.Variable(i);
 		log.printf("\t\t%-15s : %.16lg\n", var.m_szname, a[i]);
-	}
-
-	// print reaction forces
-	log.printf("\n\tFunction values:\n\n");
-	log.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
-	for (i=0; i<ndata; ++i)
-	{
-		log.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, m_yopt[i], y[i], fabs(m_yopt[i] - y[i]));
 	}
 
 	log.printf("\n\tFinal objective value: %15lg\n\n", fret);

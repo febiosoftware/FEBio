@@ -399,7 +399,16 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		ch = strrchr(szbase, '.');
 		if (ch) *ch = 0;
 
-		if (!blog) sprintf(ops.szlog, "%s.log", szbase);
+		char szlogbase[256];
+		if (ops.szctrl[0])
+		{
+			strcpy(szlogbase, ops.szctrl);
+			ch = strrchr(szlogbase, '.');
+			if (ch) *ch = 0;
+		}
+		else strcpy(szlogbase, szbase);
+
+		if (!blog) sprintf(ops.szlog, "%s.log", szlogbase);
 		if (!bplt) sprintf(ops.szplt, "%s.xplt", szbase);
 		if (!bdmp) sprintf(ops.szdmp, "%s.dmp", szbase);
 	}
