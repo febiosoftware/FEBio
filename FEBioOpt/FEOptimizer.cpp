@@ -34,7 +34,8 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		bool bret = true;
 		do
 		{
-			if      (tag == "Options"   ) bret = ParseOptions   (tag, opt);
+			if		(tag == "Model"     ) ;
+			else if (tag == "Options"   ) bret = ParseOptions   (tag, opt);
 			else if (tag == "Function"  ) bret = ParseObjective (tag, opt);
 			else if (tag == "Parameters") bret = ParseParameters(tag, opt);
 			else if (tag == "LoadData"  ) bret = ParseLoadData  (tag, opt);
@@ -91,7 +92,7 @@ bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 	if (szt == 0) popt = new FELMOptimizeMethod;
 	else
 	{
-		if (strcmp(szt, "marquardt") == 0) popt = new FELMOptimizeMethod;
+		if (strcmp(szt, "levmar") == 0) popt = new FELMOptimizeMethod;
 		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 	}
 
