@@ -372,12 +372,14 @@
     <ClCompile Include="..\..\FEBioOpt\FEOptimizer.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FELMOptimizeMethod.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEPowellOptimizeMethod.cpp" />
+    <ClCompile Include="..\..\FEBioOpt\FEScanOptimizeMethod.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioOpt\FEBioOpt.h" />
     <ClInclude Include="..\..\FEBioOpt\FELMOptimizeMethod.h" />
     <ClInclude Include="..\..\FEBioOpt\FEOptimizer.h" />
     <ClInclude Include="..\..\FEBioOpt\FEPowellOptimizeMethod.h" />
+    <ClInclude Include="..\..\FEBioOpt\FEScanOptimizeMethod.h" />
     <ClInclude Include="..\..\FEBioOpt\stdafx.h" />
     <ClInclude Include="..\..\FEBioOpt\targetver.h" />
   </ItemGroup>

@@ -30,6 +30,9 @@
     <ClCompile Include="..\..\FEBioOpt\FEPowellOptimizeMethod.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioOpt\FEScanOptimizeMethod.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioOpt\targetver.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioOpt\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioOpt\FEScanOptimizeMethod.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
