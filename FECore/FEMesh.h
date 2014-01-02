@@ -379,7 +379,7 @@ private:
 	FEMesh(FEMesh& m){}
 
 	//! hide assignment operator
-	void FEMesh::operator =(FEMesh& m) {}
+	void operator =(FEMesh& m) {}
 };
 
 #endif // !defined(AFX_FEMESH_H__81ABA97F_AD5F_4F1D_8EE9_95B67EBA448E__INCLUDED_)
