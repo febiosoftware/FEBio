@@ -2,12 +2,55 @@
 #include "FECore/tens4d.h"
 #include "FEElasticMultigeneration.h"
 
+//=============================================================================
 // define the material parameters
-// BEGIN_PARAMETER_LIST(FEElasticMultigeneration, FEElasticMaterial)
-// END_PARAMETER_LIST();
+BEGIN_PARAMETER_LIST(FEGenerationMaterial, FEElasticMaterial)
+	ADD_PARAMETER(btime, FE_PARAM_DOUBLE, "start_time");
+END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-vector<FEGenerationData*> FEElasticMultigeneration::m_MG;
+//! find a material property index ( returns <0 for error)
+int FEGenerationMaterial::FindPropertyIndex(const char* szname)
+{
+	if (strcmp(szname, "solid") == 0) return 0;
+	else return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! set a material property (returns false on error)
+bool FEGenerationMaterial::SetProperty(int i, FEMaterial* pm)
+{
+	if (i==0)
+	{
+		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
+		if (pme == 0) return false;
+		m_pMat = pme;
+	}
+	else return false;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEGenerationMaterial::Init()
+{
+	assert(m_pMat);
+	m_pMat->Init();
+}
+
+//-----------------------------------------------------------------------------
+//! calculate stress at material point
+mat3ds FEGenerationMaterial::Stress(FEMaterialPoint& pt)
+{
+	return m_pMat->Stress(pt);
+}
+		
+//-----------------------------------------------------------------------------
+//! calculate tangent stiffness at material point
+tens4ds FEGenerationMaterial::Tangent(FEMaterialPoint& pt)
+{
+	return m_pMat->Tangent(pt);
+}
 
 //=============================================================================
 FEMaterialPoint* FEMultigenerationMaterialPoint::Copy()
@@ -82,7 +125,7 @@ void FEMultigenerationMaterialPoint::Init(bool bflag)
 	// Check if this constitutes a new generation
 	int igen = m_pmat->CheckGeneration(t);
 	t = m_pmat->m_MG[igen]->btime;
-	if ((bflag == false) && (m_pmat->HasGeneration(igen) && (t>m_tgen)))
+	if ((bflag == false) && (t>m_tgen))
 	{
 		FEElasticMaterialPoint& pt = *((*this).ExtractData<FEElasticMaterialPoint>());
 					
@@ -102,7 +145,7 @@ void FEMultigenerationMaterialPoint::Init(bool bflag)
 //! Find the index of a material property
 int FEElasticMultigeneration::FindPropertyIndex(const char* szname)
 {
-	if (strcmp(szname, "solid") == 0) return (int) m_pMat.size();
+	if (strcmp(szname, "generation") == 0) return (int) m_MG.size();
 	return -1;
 }
 
@@ -110,26 +153,14 @@ int FEElasticMultigeneration::FindPropertyIndex(const char* szname)
 //! Set a material property
 bool FEElasticMultigeneration::SetProperty(int n, FEMaterial* pm)
 {
-	assert(n == (int)m_pMat.size());
-	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-	if (pme)
+	assert(n == (int)m_MG.size());
+	FEGenerationMaterial* pmg = dynamic_cast<FEGenerationMaterial*>(pm);
+	if (pmg)
 	{
-		AddMaterial(pme);
+		m_MG.push_back(pmg);
 		return true;
 	}
 	return false;
-}
-
-//-----------------------------------------------------------------------------
-void FEElasticMultigeneration::AddMaterial(FEElasticMaterial* pmat)
-{
-	m_pMat.push_back(pmat);
-}
-
-//--------------------------------------------------------------------------------
-void FEElasticMultigeneration::PushGeneration(FEGenerationData* G)
-{
-	m_MG.push_back (G);
 }
 
 //--------------------------------------------------------------------------------
@@ -144,21 +175,11 @@ int FEElasticMultigeneration::CheckGeneration(const double t)
 	return ngen - 1;
 }
 
-//--------------------------------------------------------------------------------
-bool FEElasticMultigeneration::HasGeneration(const int igen)
-{
-	for (int i=0; i<(int)m_pMat.size(); ++i)
-		if (m_pMat[i]->GetID() == igen) return true;
-
-	return false;
-}
-
 //-----------------------------------------------------------------------------
 void FEElasticMultigeneration::Init()
 {
 	FEElasticMaterial::Init();
-	for (int i=0; i<(int)m_pMat.size(); i++)
-		m_pMat[i]->Init();
+	for (int i=0; i<(int)m_MG.size(); i++) m_MG[i]->Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -172,7 +193,7 @@ mat3ds FEElasticMultigeneration::Stress(FEMaterialPoint& mp)
 	// calculate stress
 	s.zero();
 	
-	s = m_pMat[0]->Stress(mp);
+	s = m_MG[0]->Stress(mp);
 	
 	// extract deformation gradient
 	mat3d Fs = mpt.m_F;
@@ -186,7 +207,7 @@ mat3ds FEElasticMultigeneration::Stress(FEMaterialPoint& mp)
 		double Ji = pt.Ji[i];
 		mpt.m_J = Js*Ji;
 		// evaluate stress for this generation
-		s += Ji*m_pMat[i+1]->Stress(mp);
+		s += Ji*m_MG[i+1]->Stress(mp);
 	}
 
 	// restore the material point deformation gradient
@@ -204,7 +225,7 @@ tens4ds FEElasticMultigeneration::Tangent(FEMaterialPoint& mp)
 	
 	tens4ds c(0.);
 	
-	c = m_pMat[0]->Tangent(mp);
+	c = m_MG[0]->Tangent(mp);
 
 	// extract deformation gradient
 	mat3d Fs = mpt.m_F;
@@ -218,7 +239,7 @@ tens4ds FEElasticMultigeneration::Tangent(FEMaterialPoint& mp)
 		double Ji = pt.Ji[i];
 		mpt.m_J = Js*Ji;
 		// evaluate stress for this generation
-		c += Ji*m_pMat[i+1]->Tangent(mp);
+		c += Ji*m_MG[i+1]->Tangent(mp);
 	}
 	
 	// restore the material point deformation gradient

@@ -2,11 +2,40 @@
 #include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
-//! Global generation data
+//! Material defining a single generation of a multi-generation material
+class FEGenerationMaterial : public FEElasticMaterial
+{
+public:
+	FEGenerationMaterial(FEModel* pfem) : FEElasticMaterial(pfem){}
 
-struct FEGenerationData {
+	//! initialization
+	void Init();
+
+	//! calculate stress at material point
+	mat3ds Stress(FEMaterialPoint& pt);
+		
+	//! calculate tangent stiffness at material point
+	tens4ds Tangent(FEMaterialPoint& pt);
+
+public:
+	// get the number of properties
+	int Properties() { return 1; }
+
+	//! return a material property
+	FEMaterial* GetProperty(int i) { return m_pMat; }
+
+	//! find a material property index ( returns <0 for error)
+	int FindPropertyIndex(const char* szname);
+
+	//! set a material property (returns false on error)
+	bool SetProperty(int i, FEMaterial* pm);
+
+public:
 	double	btime;	//!< generation birth time
-	bool	born;	//!< flag for generation birth
+
+	FEElasticMaterial*	m_pMat;	//!< pointer to elastic material
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
@@ -38,6 +67,7 @@ public:
 	vector <mat3d> Fi;	//!< inverse of relative deformation gradient
 	vector <double> Ji;	//!< determinant of Fi (store for efficiency)
 	double	m_tgen;		//!< last generation time
+
 private:
 	FEElasticMultigeneration*	m_pmat;
 };
@@ -54,20 +84,17 @@ public:
 	FEMaterialPoint* CreateMaterialPointData() 
 	{ 
 		// use the zero-th generation material point as the base elastic material point
-		return new FEMultigenerationMaterialPoint(this, m_pMat[0]->CreateMaterialPointData());
+		return new FEMultigenerationMaterialPoint(this, m_MG[0]->CreateMaterialPointData());
 	}
 
 	void AddMaterial(FEElasticMaterial* pmat);
 	
 public:
-	vector <FEElasticMaterial*>	m_pMat;	//!< pointers to elastic material
-
-public:
 	//! return material properties
-	int Properties() { return (int) m_pMat.size(); }
+	int Properties() { return (int) m_MG.size(); }
 
 	//! return a material property
-	FEMaterial* GetProperty(int i) { return m_pMat[i]; }
+	FEMaterial* GetProperty(int i) { return m_MG[i]; }
 
 	//! find a material property index ( returns <0 for error)
 	int FindPropertyIndex(const char* szname);
@@ -85,14 +112,10 @@ public:
 	//! data initialization and checking
 	void Init();
 		
-	//! check existence of generation
-	bool HasGeneration(const int igen);
-
-	static void PushGeneration(FEGenerationData* G);
-	static int CheckGeneration(const double t);
+	int CheckGeneration(const double t);
 
 public:
-	static vector<FEGenerationData*> m_MG;	//!< multigeneration data
+	vector<FEGenerationMaterial*>	m_MG;		//!< multigeneration data
 
 	// declare the parameter list
 //	DECLARE_PARAMETER_LIST();

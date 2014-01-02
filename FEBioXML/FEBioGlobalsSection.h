@@ -12,5 +12,4 @@ public:
 protected:
 	void ParseConstants   (XMLTag& tag);
 	void ParseGlobalData  (XMLTag& tag);
-	void ParseMGData      (XMLTag &tag);
 };

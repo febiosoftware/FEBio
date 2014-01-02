@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEBioGlobalsSection.h"
-#include "FEBioMech/FEElasticMultigeneration.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEGlobalData.h"
 #include "FECore/FECoreKernel.h"
@@ -16,7 +15,6 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 		if      (tag == "Constants"          ) ParseConstants(tag);
 		else if (tag == "Solutes"            ) ParseGlobalData(tag);
 		else if (tag == "SolidBoundMolecules") ParseGlobalData(tag);
-		else if (tag == "Generations"        ) ParseMGData(tag);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
@@ -71,28 +69,4 @@ void FEBioGlobalsSection::ParseGlobalData(XMLTag &tag)
 		++tag;
 	}
 	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-//! Parse the time increments for multigeneration materials
-void FEBioGlobalsSection::ParseMGData(XMLTag &tag)
-{
-	++tag;
-	do
-	{
-		if (tag == "gen") {
-			FEGenerationData* G = new FEGenerationData;
-			int id = atoi(tag.AttributeValue("id"))-1;
-			if (id) {
-				G->born = false;
-			} else {
-				G->born = true;
-			}
-			tag.value(G->btime);
-			FEElasticMultigeneration::PushGeneration(G);
-		}
-		++tag;
-	}
-	while (!tag.isend());
-
 }
