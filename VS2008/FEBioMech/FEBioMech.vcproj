@@ -205,6 +205,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEContactSurface.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEContinuousFiberDistribution.cpp"
 				>
 			</File>
@@ -664,6 +668,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FEContactInterface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEContactSurface.h"
 				>
 			</File>
 			<File
