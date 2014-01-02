@@ -27,9 +27,10 @@ public:
 	double			m_fdiff;	// forward difference step size
 	int				m_nmax;		// maximum number of iterations
 	bool			m_bcov;		// flag to print covariant matrix
-	Logfile::MODE	m_loglevel; // log file output level
 
 protected:
 	vector<double>	m_yopt;	// optimal y-values
 	vector<double>	m_y0;	// initial (target) y-values
+
+	DECLARE_PARAMETER_LIST();
 };

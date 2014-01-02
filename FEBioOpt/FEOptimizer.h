@@ -2,6 +2,7 @@
 
 #include "FEBioXML/XMLReader.h"
 #include "FECore/FEModel.h"
+#include "FECore/Logfile.h"
 #include <vector>
 #include <string.h>
 
@@ -37,14 +38,25 @@ protected:
 	bool ParseObjective (XMLTag& tag, FEOptimizeData& opt);
 	bool ParseParameters(XMLTag& tag, FEOptimizeData& opt);
 	bool ParseLoadData  (XMLTag& tag, FEOptimizeData& opt);
+
+protected:
+	bool ReadParameter(XMLTag& tag, FEParameterList& pl);
+};
+
+//=============================================================================
+enum {
+	PRINT_ITERATIONS,
+	PRINT_VERBOSE
 };
 
 //=============================================================================
 //! optimization method - this class does the actual work
-class FEOptimizeMethod
+class FEOptimizeMethod : public FEParamContainer
 {
 public:
 	virtual bool Solve(FEOptimizeData* pOpt) = 0;
+	Logfile::MODE	m_loglevel; // log file output level
+	int		m_print_level;	// level of detailed output
 };
 
 //=============================================================================

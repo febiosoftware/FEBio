@@ -1,7 +1,17 @@
+#pragma once
+
 #include "stdafx.h"
 #include "FELMOptimizeMethod.h"
 #include "FECore/Logfile.h"
 #include "FECore/FECoreKernel.h"
+
+//-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FELMOptimizeMethod, FEOptimizeMethod)
+	ADD_PARAMETER(m_objtol, FE_PARAM_DOUBLE, "obj_tol"     );
+	ADD_PARAMETER(m_fdiff , FE_PARAM_DOUBLE, "f_diff_scale");
+	ADD_PARAMETER(m_nmax  , FE_PARAM_INT   , "max_iter"    );
+	ADD_PARAMETER(m_bcov  , FE_PARAM_BOOL  , "print_cov"   );
+END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 // declared in dllmain.cpp

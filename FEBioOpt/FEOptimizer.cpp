@@ -1,11 +1,65 @@
 #include "FEOptimizer.h"
 #include "FELMOptimizeMethod.h"
+#include "FEPowellOptimizeMethod.h"
 #include "FECore/Logfile.h"
+#include "FECore/FECoreKernel.h"
+
+//-----------------------------------------------------------------------------
+// declared in dllmain.cpp
+extern FECoreKernel* pFEBio;
+
+static Logfile& GetLogfile() { return pFEBio->GetLogfile(); }
 
 //=============================================================================
 InvalidVariableName::InvalidVariableName(const char* sz)
 { 
 	strcpy(szname, sz); 
+}
+
+//-----------------------------------------------------------------------------
+//! This function parses a parameter list
+bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
+{
+	// see if we can find this parameter
+	FEParam* pp = pl.Find(tag.Name());
+	if (pp == 0) return false;
+
+	switch (pp->m_itype)
+	{
+	case FE_PARAM_DOUBLE : tag.value(pp->value<double>() ); break;
+	case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
+	case FE_PARAM_BOOL   : tag.value(pp->value<bool  >() ); break;
+	case FE_PARAM_VEC3D  : tag.value(pp->value<vec3d >() ); break;
+	case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
+	case FE_PARAM_INTV   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
+	case FE_PARAM_DOUBLEV: tag.value(pp->pvalue<double>(), pp->m_ndim); break;
+	default:
+		assert(false);
+		return false;
+	}
+
+	int nattr = tag.m_natt;
+	for (int i=0; i<nattr; ++i)
+	{
+		const char* szat = tag.m_att[i].m_szatt;
+		if (strcmp(szat, "lc") == 0)
+		{
+			int lc = atoi(tag.m_att[i].m_szatv) - 1;
+			if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+			pp->m_nlc = lc;
+			switch (pp->m_itype)
+			{
+			case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
+			}
+		}
+		else
+		{
+			Logfile& log = GetLogfile();
+			log.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
+		}
+	}
+
+	return true;
 }
 
 //=============================================================================
@@ -34,7 +88,7 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		bool bret = true;
 		do
 		{
-			if		(tag == "Model"     ) ;
+			if		(tag == "Model"     ) ; // No longer used, but included for backwards compatibility
 			else if (tag == "Options"   ) bret = ParseOptions   (tag, opt);
 			else if (tag == "Function"  ) bret = ParseObjective (tag, opt);
 			else if (tag == "Parameters") bret = ParseParameters(tag, opt);
@@ -87,37 +141,46 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 //! Read the optimizer section of the input file
 bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 {
-	FELMOptimizeMethod* popt = 0;
+	FEOptimizeMethod* popt = 0;
 	const char* szt = tag.AttributeValue("type", true);
 	if (szt == 0) popt = new FELMOptimizeMethod;
 	else
 	{
-		if (strcmp(szt, "levmar") == 0) popt = new FELMOptimizeMethod;
+		if      (strcmp(szt, "levmar") == 0) popt = new FELMOptimizeMethod;
+		else if (strcmp(szt, "powell") == 0) popt = new FEPowellOptimizeMethod;
 		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 	}
+
+	// get the parameter list
+	FEParameterList& pl = popt->GetParameterList();
 
 	if (!tag.isleaf())
 	{
 		++tag;
 		do
 		{
-			if      (tag == "obj_tol"     ) tag.value(popt->m_objtol);
-			else if (tag == "f_diff_scale") tag.value(popt->m_fdiff );
-			else if (tag == "max_iter"    ) tag.value(popt->m_nmax  );
-//			else if (tag == "print_cov"   ) tag.value(popt->m_bcov  );
-            else if (tag == "log_level"   )
-            {
-                char szval[256];
-                tag.value(szval);
-                if		(strcmp(szval, "LOG_DEFAULT"        ) == 0) {} // don't change the plot level
-                else if (strcmp(szval, "LOG_NEVER"          ) == 0) popt->m_loglevel = Logfile::NEVER;
-                else if (strcmp(szval, "LOG_FILE_ONLY"      ) == 0) popt->m_loglevel = Logfile::FILE_ONLY;
-                else if (strcmp(szval, "LOG_SCREEN_ONLY"    ) == 0) popt->m_loglevel = Logfile::SCREEN_ONLY;
-                else if (strcmp(szval, "LOG_FILE_AND_SCREEN") == 0) popt->m_loglevel = Logfile::FILE_AND_SCREEN;
-                else throw XMLReader::InvalidValue(tag);
-            }
-			else throw XMLReader::InvalidTag(tag);
-
+			if (ReadParameter(tag, pl) == false)
+			{
+				if (tag == "log_level"   )
+				{
+					char szval[256];
+					tag.value(szval);
+					if		(strcmp(szval, "LOG_DEFAULT"        ) == 0) {} // don't change the plot level
+					else if (strcmp(szval, "LOG_NEVER"          ) == 0) popt->m_loglevel = Logfile::NEVER;
+					else if (strcmp(szval, "LOG_FILE_ONLY"      ) == 0) popt->m_loglevel = Logfile::FILE_ONLY;
+					else if (strcmp(szval, "LOG_SCREEN_ONLY"    ) == 0) popt->m_loglevel = Logfile::SCREEN_ONLY;
+					else if (strcmp(szval, "LOG_FILE_AND_SCREEN") == 0) popt->m_loglevel = Logfile::FILE_AND_SCREEN;
+					else throw XMLReader::InvalidValue(tag);
+				}
+				else if (tag == "print_level")
+				{
+					char szval[256];
+					tag.value(szval);
+					if      (strcmp(szval, "PRINT_ITERATIONS") == 0) popt->m_print_level = PRINT_ITERATIONS;
+					else if (strcmp(szval, "PRINT_VERBOSE"   ) == 0) popt->m_print_level = PRINT_VERBOSE;
+				}
+				else throw XMLReader::InvalidTag(tag);
+			}
 			++tag;
 		}
 		while (!tag.isend());
