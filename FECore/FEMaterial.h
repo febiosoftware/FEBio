@@ -10,7 +10,6 @@
 #endif // _MSC_VER > 1000
 
 #include "tens4d.h"
-#include "LoadCurve.h"		//---> can we delete this?
 #include "FECoreBase.h"
 #include "FEMaterialPoint.h"
 #include "FECoordSysMap.h"

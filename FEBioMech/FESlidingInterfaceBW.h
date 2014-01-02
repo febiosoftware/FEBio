@@ -1,6 +1,6 @@
 #pragma once
 #include "FEContactInterface.h"
-#include "FECore/FEContactSurface.h"
+#include "FEContactSurface.h"
 
 // Elastic sliding contact, reducing the algorithm of biphasic sliding contact
 // (FESlidingInterface2) to elastic case.  The algorithm derives from Bonet

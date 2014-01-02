@@ -9,9 +9,9 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "FEContactSurface.h"
 #include "FEContactInterface.h"
 #include "FECore/FEClosestPointProjection.h"
-#include "FECore/FEContactSurface.h"
 #include "FECore/vector.h"
 
 //-----------------------------------------------------------------------------

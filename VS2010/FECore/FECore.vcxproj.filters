@@ -201,9 +201,6 @@
     <ClInclude Include="..\..\FECore\FESolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FEContactSurface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\FESurfacePairInteraction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -405,9 +402,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FESolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FECore\FEContactSurface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FESurfacePairInteraction.cpp">

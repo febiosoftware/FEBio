@@ -1,6 +1,6 @@
 #pragma once
 #include "FEContactInterface.h"
-#include "FECore/FEContactSurface.h"
+#include "FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
 //! Surface definition for the facet-to-facet tied interface

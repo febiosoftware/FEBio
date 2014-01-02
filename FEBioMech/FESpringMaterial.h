@@ -1,5 +1,6 @@
 #pragma once
 #include "FECore/FEDiscreteMaterial.h"
+#include "FECore/LoadCurve.h"		
 
 //-----------------------------------------------------------------------------
 //! material class for discrete elements

@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/FEContactSurface.h"
+#include "FEBioMech/FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
 //! This class describes a contact surface used in a biphasic/multiphasic analysis.

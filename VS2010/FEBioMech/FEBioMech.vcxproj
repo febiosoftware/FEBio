@@ -286,6 +286,7 @@
     <ClCompile Include="..\..\FEBioMech\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEConstBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContactInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEContactSurface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContinuousFiberDistribution.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECoupledTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECoupledTransIsoVerondaWestmann.cpp" />
@@ -402,6 +403,7 @@
     <ClInclude Include="..\..\FEBioMech\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBioMech\FEConstBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEContactInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FEContactSurface.h" />
     <ClInclude Include="..\..\FEBioMech\FEContinuousFiberDistribution.h" />
     <ClInclude Include="..\..\FEBioMech\FECoupledTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FECoupledTransIsoVerondaWestmann.h" />

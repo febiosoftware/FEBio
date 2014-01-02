@@ -9,7 +9,7 @@
 #include "FEUT4Domain.h"
 #include "FEPreStrainTransIsoMR.h"
 #include "FEBioPlot/FEBioPlotFile.h"
-#include "FECore/FEContactSurface.h"
+#include "FEContactSurface.h"
 #include "FECore/FERigidBody.h"
 
 //=============================================================================
