@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEViscoElasticMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -151,7 +152,7 @@ bool FEViscoElasticMaterial::SetProperty(int i, FEMaterial* pm)
 	if (i==0)
 	{
 		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-		if (pme)
+		if (pme && (dynamic_cast<FEUncoupledMaterial*>(pme) == 0))
 		{ 
 			SetBaseMaterial(pme);
 			return true;
