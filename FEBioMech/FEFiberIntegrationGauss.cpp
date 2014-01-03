@@ -28,9 +28,9 @@ void FEFiberIntegrationGauss::Init()
 	if (m_nph < 1) throw MaterialError("nph must be strictly greater than zero.");
 	if (m_nth < 1) throw MaterialError("nth must be strictly greater than zero.");
     
-	static bool bfirst = true;
+	m_bfirst = true;
 	
-	if (bfirst)
+	if (m_bfirst)
 	{
         switch (m_nph) {
             case 1:
@@ -77,7 +77,7 @@ void FEFiberIntegrationGauss::Init()
                 throw MaterialError("nint must not exceed 10.");
                 break;
         }
-		bfirst = false;
+		m_bfirst = false;
     }
     
     // also initialize the parent class
