@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FECoreKernel.h"
 #include "Logfile.h"
-#include "FEBio2/console.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -18,12 +17,6 @@ FECoreKernel& FECoreKernel::GetInstance()
 Logfile& FECoreKernel::GetLogfile()
 {
 	return *m_plog;
-}
-
-//-----------------------------------------------------------------------------
-Console& FECoreKernel::GetConsole()
-{
-	return *m_pShell;
 }
 
 //-----------------------------------------------------------------------------

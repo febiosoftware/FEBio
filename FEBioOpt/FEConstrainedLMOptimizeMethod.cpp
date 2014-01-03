@@ -2,7 +2,6 @@
 #include "FEConstrainedLMOptimizeMethod.h"
 #include "FECore/Logfile.h"
 #include "FECore/FECoreKernel.h"
-#include "FEBio2/console.h"
 
 #ifdef HAVE_LEVMAR
 #include "levmar.h"
@@ -20,7 +19,6 @@ END_PARAMETER_LIST();
 extern FECoreKernel* pFEBio;
 
 static Logfile& GetLogfile() { return pFEBio->GetLogfile(); }
-static Console& GetConsole() { return pFEBio->GetConsole(); }
 
 //-----------------------------------------------------------------------------
 FEConstrainedLMOptimizeMethod* FEConstrainedLMOptimizeMethod::m_pThis = 0;
@@ -288,8 +286,6 @@ bool FEConstrainedLMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a
 
 	// solve the FE problem
 	log.SetMode((Logfile::MODE)m_loglevel);
-	Console& pwnd = GetConsole();
-	pwnd.Deactivate();
 
 	bool bret = fem.Solve();
 
