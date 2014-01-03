@@ -200,7 +200,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>febioxmld.lib;febiomechd.lib;fecored.lib;numcored.lib;levmard.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_lapack95.lib;libiomp5mt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>febioxmld.lib;febiomechd.lib;fecored.lib;numcored.lib;levmard.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_lapack95.lib;libiomp5md.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
