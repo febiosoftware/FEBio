@@ -34,10 +34,11 @@ public:
 	bool Input(const char* szfile, FEOptimizeData* pOpt);
 
 protected:
-	bool ParseOptions   (XMLTag& tag, FEOptimizeData& opt);
-	bool ParseObjective (XMLTag& tag, FEOptimizeData& opt);
-	bool ParseParameters(XMLTag& tag, FEOptimizeData& opt);
-	bool ParseLoadData  (XMLTag& tag, FEOptimizeData& opt);
+	bool ParseOptions    (XMLTag& tag, FEOptimizeData& opt);
+	bool ParseObjective  (XMLTag& tag, FEOptimizeData& opt);
+	bool ParseParameters (XMLTag& tag, FEOptimizeData& opt);
+	bool ParseConstraints(XMLTag& tag, FEOptimizeData& opt);
+	bool ParseLoadData   (XMLTag& tag, FEOptimizeData& opt);
 
 protected:
 	bool ReadParameter(XMLTag& tag, FEParameterList& pl);
@@ -67,6 +68,14 @@ struct OPT_VARIABLE
 	double	m_val;			//!< value
 	double	m_min, m_max;	//!< variable bounds
 	double	m_sf;			//!< variable scale factor
+};
+
+//=============================================================================
+#define OPT_MAX_VAR 64
+struct OPT_LIN_CONSTRAINT
+{
+	double	a[OPT_MAX_VAR];
+	double	b;
 };
 
 //=============================================================================
@@ -108,6 +117,15 @@ public:
 	//! add a variable to optimize
 	void AddVariable(OPT_VARIABLE& var) { m_Var.push_back(var); }
 
+	//! add a linear constraint
+	void AddLinearConstraint(OPT_LIN_CONSTRAINT& con) { m_LinCon.push_back(con); }
+
+	//! return number of constraints
+	int Constraints() { return (int) m_LinCon.size(); }
+
+	//! return a linear constraint
+	OPT_LIN_CONSTRAINT& Constraint(int i) { return m_LinCon[i]; }
+
 	int Variables() { return m_Var.size(); }
 
 	OPT_VARIABLE& Variable(int n) { return m_Var[n]; }
@@ -132,6 +150,7 @@ protected:
 
 	FELoadCurve	m_rf;	// reaction force data
 
-	std::vector<FELoadCurve*>	m_LC;
-	std::vector<OPT_VARIABLE>	m_Var;
+	std::vector<FELoadCurve*>	    m_LC;
+	std::vector<OPT_VARIABLE>	    m_Var;
+	std::vector<OPT_LIN_CONSTRAINT>	m_LinCon;
 };

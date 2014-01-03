@@ -2,6 +2,7 @@
 #include "FELMOptimizeMethod.h"
 #include "FEPowellOptimizeMethod.h"
 #include "FEScanOptimizeMethod.h"
+#include "FEConstrainedLMOptimizeMethod.h"
 #include "FECore/Logfile.h"
 #include "FECore/FECoreKernel.h"
 
@@ -89,11 +90,12 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		bool bret = true;
 		do
 		{
-			if		(tag == "Model"     ) ; // No longer used, but included for backwards compatibility
-			else if (tag == "Options"   ) bret = ParseOptions   (tag, opt);
-			else if (tag == "Function"  ) bret = ParseObjective (tag, opt);
-			else if (tag == "Parameters") bret = ParseParameters(tag, opt);
-			else if (tag == "LoadData"  ) bret = ParseLoadData  (tag, opt);
+			if		(tag == "Model"      ) ; // No longer used, but included for backwards compatibility
+			else if (tag == "Options"    ) bret = ParseOptions    (tag, opt);
+			else if (tag == "Function"   ) bret = ParseObjective  (tag, opt);
+			else if (tag == "Parameters" ) bret = ParseParameters (tag, opt);
+			else if (tag == "Constraints") bret = ParseConstraints(tag, opt);
+			else if (tag == "LoadData"   ) bret = ParseLoadData   (tag, opt);
 			else throw XMLReader::InvalidTag(tag);
 
 			if (bret == false) return false;
@@ -268,6 +270,36 @@ bool FEOptimizeInput::ParseParameters(XMLTag& tag, FEOptimizeData& opt)
 		}
 		else throw XMLReader::InvalidTag(tag);
 
+		++tag;
+	}
+	while (!tag.isend());
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Parse the Constraints
+bool FEOptimizeInput::ParseConstraints(XMLTag &tag, FEOptimizeData &opt)
+{
+	int NP = opt.Variables();
+	if ((NP > OPT_MAX_VAR) || (NP < 2)) throw XMLReader::InvalidTag(tag);
+
+	double v[OPT_MAX_VAR+1];
+	++tag;
+	do
+	{
+		if (tag == "constraint")
+		{
+			int m = tag.value(v, OPT_MAX_VAR+1);
+			if (m != NP+1) throw XMLReader::InvalidValue(tag);
+
+			OPT_LIN_CONSTRAINT con;
+			for (int i=0; i<NP; ++i) con.a[i] = v[i];
+			con.b = v[NP];
+
+			opt.AddLinearConstraint(con);
+		}
+		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());
