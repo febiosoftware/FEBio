@@ -369,6 +369,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\FEBioOpt\dllmain.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEBioOpt.cpp" />
+    <ClCompile Include="..\..\FEBioOpt\FEConstrainedLMOptimizeMethod.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEOptimizer.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FELMOptimizeMethod.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEPowellOptimizeMethod.cpp" />
@@ -376,6 +377,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioOpt\FEBioOpt.h" />
+    <ClInclude Include="..\..\FEBioOpt\FEConstrainedLMOptimizeMethod.h" />
     <ClInclude Include="..\..\FEBioOpt\FELMOptimizeMethod.h" />
     <ClInclude Include="..\..\FEBioOpt\FEOptimizer.h" />
     <ClInclude Include="..\..\FEBioOpt\FEPowellOptimizeMethod.h" />

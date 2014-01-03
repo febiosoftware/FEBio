@@ -1,6 +1,7 @@
 #include "FEOptimizer.h"
 #include "FELMOptimizeMethod.h"
 #include "FEPowellOptimizeMethod.h"
+#include "FEScanOptimizeMethod.h"
 #include "FECore/Logfile.h"
 #include "FECore/FECoreKernel.h"
 
@@ -146,8 +147,12 @@ bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 	if (szt == 0) popt = new FELMOptimizeMethod;
 	else
 	{
-		if      (strcmp(szt, "levmar") == 0) popt = new FELMOptimizeMethod;
-		else if (strcmp(szt, "powell") == 0) popt = new FEPowellOptimizeMethod;
+		if      (strcmp(szt, "levmar"            ) == 0) popt = new FELMOptimizeMethod;
+		else if (strcmp(szt, "powell"            ) == 0) popt = new FEPowellOptimizeMethod;
+		else if (strcmp(szt, "scan"              ) == 0) popt = new FEScanOptimizeMethod;
+#ifdef HAVE_LEVMAR
+		else if (strcmp(szt, "constrained levmar") == 0) popt = new FEConstrainedLMOptimizeMethod;
+#endif
 		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 	}
 

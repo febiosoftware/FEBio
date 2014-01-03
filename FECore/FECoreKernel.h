@@ -13,6 +13,10 @@ class FEModel;
 class Logfile;
 
 //-----------------------------------------------------------------------------
+// forward declaration of the console
+class Console;
+
+//-----------------------------------------------------------------------------
 //! This is the FECore kernel class that manages the interactions between the 
 //! different modules. In particular, it manages the factory classes
 //! which are responsible for the creation of different classes that are registered
@@ -26,6 +30,9 @@ public:
 
 	// Get the logfile
 	Logfile& GetLogfile();
+
+	// Get the console
+	Console& GetConsole();
 
 public:
 	//! Register a class with the framework
@@ -54,7 +61,8 @@ private:
 	std::vector<FECoreFactory*>		m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>	m_Dom;	// list of domain factory classes
 
-	Logfile*	m_plog;	// keep a pointer to the logfile (used by plugins)
+	Logfile*	m_plog;	    // keep a pointer to the logfile (used by plugins)
+	Console*	m_pShell;	// keep a pointer to the console (used by plugins)
 
 private: // make singleton
 	FECoreKernel();

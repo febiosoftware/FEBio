@@ -4,7 +4,7 @@
 #include "FEScanOptimizeMethod.h"
 #include "FECore/Logfile.h"
 #include "FECore/FECoreKernel.h"
-//#include "FEBio2/console.h"
+#include "FEBio2/console.h"
 
 BEGIN_PARAMETER_LIST(FEScanOptimizeMethod, FEOptimizeMethod)
 	ADD_PARAMETERV(m_inc, FE_PARAM_DOUBLEV, 32, "inc");
@@ -15,6 +15,7 @@ END_PARAMETER_LIST();
 extern FECoreKernel* pFEBio;
 
 static Logfile& GetLogfile() { return pFEBio->GetLogfile(); }
+static Console& GetConsole() { return pFEBio->GetConsole(); }
 
 //-----------------------------------------------------------------------------
 // FEScanOptimizeMethod
@@ -148,8 +149,8 @@ bool FEScanOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<
 
 	// solve the FE problem
 	log.SetMode(Logfile::NEVER);
-//	Console* pwnd = Console::GetHandle();
-//	pwnd->Deactivate();
+	Console& pwnd = GetConsole();
+	pwnd.Deactivate();
 
 	bool bret = fem.Solve();
 
