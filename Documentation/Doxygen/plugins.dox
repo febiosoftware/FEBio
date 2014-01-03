@@ -1,0 +1,30 @@
+/**
+\page plugins Creating FEBio Plugins
+
+As of FEBio 2.0, a plugin mechanism has been implemented which allows users to add new capabilities to FEBio without changing or recompiling the source code.
+
+
+\section plugin_sec1 Building a plugin
+
+\subsection plugin_sec1_1 Creating a plugin project in Visual Studio 2010
+Discuss how to setup a plugin project in VS10
+
+\subsection plugin_sec1_2 Creating a plugin for Linux
+Disucss how to create a plugin on Linux
+
+\subsection plugin_sec1_3 Creating a plugin for Mac
+Discuss how to create a plugin for Mac
+
+\section plugin_sec2 Required Functions
+Discuss the functions that the user needs to define for interacting with FEBio.
+
+\section plugin_sec3 Factory Classes
+Discuss what factory classes are and how to use them in a plugin
+
+\section plugin_sec4 Examples
+Some examples
+
+\subsection plugin_sec4_1 A Material Plugin
+A simple material plugin
+
+*/

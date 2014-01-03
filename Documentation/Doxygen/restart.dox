@@ -5,7 +5,7 @@ FEBio has several mechanism for restarting a problem. The "running restart" capa
 from the last converged state. The "cold restart" allows the user to restart using a restart file. Again, the analysis will restart from the last converged state. 
 The "reset" feature allows a user to reset all data and restart the analysis from scratch. The following sections describe these features in more detail.
 
-\section sec1 Running Restart
+\section restart_sec1 Running Restart
 
 The running restart feature allows the analysis to recover from a potentially fatal error. In FEBio, the most common error that triggers a running restart is 
 an inverted element. Since in this case the solution has become non-physical, FEBio cannot continue and attempts to do a running restart. The analysis will
@@ -14,7 +14,7 @@ restart from the last converged time step and the time step size will be adjuste
 The way this works in FEBio is as follows. At the beginning of a time step, the current state of the model is backed up using FEModel::PushState. This places 
 the current state on a stack. This function in turn calls FEModel::ShallowCopy which will call the ShallowCopy function of all the model components.
 
-\section sec2 Cold Restart
+\section restart_sec2 Cold Restart
 
 The cold restart feature allows an analysis to restart from a restart file. The file can simply define the state of the model at the last converged timestep
 or modify certain analysis parameters prior to restarting from the last converged time step. This feature is useful for restarting a model after a program or
@@ -22,7 +22,7 @@ system crash.
 
 In FEBio this feature is implemented using the Serialization member function.
 
-\section sec3 Model Reset
+\section restart_sec3 Model Reset
 
 The model reset allows the user to reset the model to the initial configuration prior to running the model. 
 

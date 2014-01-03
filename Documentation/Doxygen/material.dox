@@ -18,9 +18,9 @@ The basic procedure for creating a new material for FEBio requires the following
 
 Next, the steps for the basic procedure will be discussed in more detail.
 
-\section sec1 Basic Procedure
+\section mat_sec1 Basic Procedure
 
-\subsection sec11 Defining the material base class
+\subsection step1 Defining the material base class
 
 FEBio is written in C++ and therefore the new material implementation must be coded in C++ as well.
 Each material requires a separate class and hence the first step is to define a new class. The class
@@ -94,7 +94,7 @@ be explained further when the use of the new material is discussed.
 
 Defining the material parameters of the class requires two steps. First, variables need to be defined that
 will store the values for these parameters. In our example, the FENeoHookean class defines two parameters:
-m_E stores the Young’s modulus and m_v stores the Poisson's ratio. Note that these variables are defined
+m_E stores the Young's modulus and m_v stores the Poisson's ratio. Note that these variables are defined
 as public. This is important, since only public variables can be used by FEBio's framework. 
 The second step is to register the material parameters with FEBio's framework. A set of macros exist
 that will facilitate this process. The first one is placed in the class definition.
@@ -183,31 +183,31 @@ The actual definition of the stress function is, as usual, placed in the compila
 the FENeoHookean.cpp file.
 
 \code
-1: mat3ds FENeoHookean::Stress(FEMaterialPoint& mp)
-2: {
-3:  FEElasticMaterialPoint& pt =  mp.ExtractData<FEElasticMaterialPoint>();
-4: 
-5:  mat3d &F = pt.F;
-6:  double detF = pt.J;
-7:  double detFi = 1.0/detF;
-8:  double lndetF = log(detF);
-9: 
-10:  // calculate left Cauchy-Green tensor
-11:  // (we commented out the matrix components we do not need)
-12:  mat3ds b = pt.LeftCauchyGreen();
-13: 
-14:  // lame parameters
-15:  double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
-16:  double mu  = 0.5*m_E/(1+m_v);
-17: 
-18:  // Identity
-19:  mat3dd I(1);
-20: 
-21:  // calculate stress
-22:  mat3ds s = (b - I)*(mu*detFi) + I*(lam*lndetF*detFi);
-23: 
-24:  return s;
-25: }
+mat3ds FENeoHookean::Stress(FEMaterialPoint& mp)
+{
+ FEElasticMaterialPoint& pt =  mp.ExtractData<FEElasticMaterialPoint>();
+
+ mat3d &F = pt.F;
+ double detF = pt.J;
+ double detFi = 1.0/detF;
+ double lndetF = log(detF);
+
+  // calculate left Cauchy-Green tensor
+  // (we commented out the matrix components we do not need)
+  mat3ds b = pt.LeftCauchyGreen();
+ 
+  // lame parameters
+  double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
+  double mu  = 0.5*m_E/(1+m_v);
+ 
+  // Identity
+  mat3dd I(1);
+ 
+  // calculate stress
+  mat3ds s = (b - I)*(mu*detFi) + I*(lam*lndetF*detFi);
+ 
+  return s;
+ }
 \endcode
 
 Although the detailed implementation of this constitutive model will not be explained, a few important points are noted. 
@@ -229,27 +229,27 @@ tens4ds Tangent(FEMaterialPoint& pt);
 This function too takes a single FEMaterialPoint variable as input. Note that in this case the return value is of type tens4ds which is a class that implements a fourth-order tensor with major and minor symmetries. The definition of the function can be found in the FENeoHookean.cpp file.
 
 \code
-1: tens4ds FENeoHookean::Tangent(FEMaterialPoint& mp)
-2: {
-3:    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-4: 
-5: 		// deformation gradient
-6: 		mat3d &F = pt.F;
-7: 		double detF = pt.J;
-8: 
-9: 		// lame parameters
-10: 		double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
-11: 		double mu  = 0.5*m_E/(1+m_v);
-12: 
-13: 		double lam1 = lam / detF;
-14: 		double mu1  = (mu - lam*log(detF)) / detF;
-15: 
-16: 		mat3dd I(1);
-17: 		tens4ds IxI = dyad1s(I);
-18: 		tens4ds I4 = dyad4s(I);
-19: 
-20: 		return IxI*lam1 + I4*(2*mu1);
-21: }
+tens4ds FENeoHookean::Tangent(FEMaterialPoint& mp)
+{
+   FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// deformation gradient
+	mat3d &F = pt.F;
+	double detF = pt.J;
+
+	// lame parameters
+	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
+	double mu  = 0.5*m_E/(1+m_v);
+
+	double lam1 = lam / detF;
+	double mu1  = (mu - lam*log(detF)) / detF;
+
+	mat3dd I(1);
+	tens4ds IxI = dyad1s(I);
+	tens4ds I4 = dyad4s(I);
+
+	return IxI*lam1 + I4*(2*mu1);
+}
 \endcode
 
 In line 3 the data of the material data that pertains to elastic materials is extracted. The next few lines extract some data from the FEElasticMaterialPoint variable and calculate some other parameters. 
@@ -258,7 +258,7 @@ Lines 16 and following calculate the tangent stiffness. Note the use of the four
 
 In addition to the material classes defining solid materials, there are several classes defining materials relevant to biphasic and multiphasic mixtures.  These are briefly described here.
 
-\section sec2 The FEElasticMaterialPoint class
+\section mat_sec2 The FEElasticMaterialPoint class
 
 As was shown above, the stress and tangent are evaluated at so-called material points. These are points at which the state of the deformation is tracked. Most often, these points correspond to the integration points of the elements. Material points are implemented by deriving special classes from the FEMaterialPoint base class. A class of particular importance is the FEElasticMaterialPoint class which is used to define the state of hyper-elastic materials. Unless your material implementation requires additional (history-dependent) data, this is the class you will use in the stress and tangent functions.
 
@@ -285,7 +285,7 @@ This class also defines some useful functions that can facilitate the implementa
 
 For materials that require additional information to be stored at the material points (e.g. history-dependent materials) a new material point class needs to be defined, by deriving from the FEElasticMaterialPoint class. See section 2.4.3 for more information.
 
-\section sec3 Using the new material class
+\section mat_sec3 Using the new material class
 
 If the steps to register the material and its material parameters have been followed as outlined in the previous sections, the material class will be seamlessly integrated in FEBio's framework. One of the important consequences of this is that the xml-input file reader will automatically recognize the new material and its parameters. For example, imagine the user created a new class MyFancyMaterial and named it "fancy material" by registering the material as follows. 
 
@@ -319,7 +319,7 @@ The user can now enter a value for this parameter in the FEBio input file as fol
 
 FEBio will now automatically read the value (here 0.123) and store it in the m_a variable which will be defined as a public member variable of the MyFancyMaterial class.
 
-\section sec4 Debugging the Material Implementation
+\section mat_sec4 Debugging the Material Implementation
 
 Implementing a new material formulation can be tricky sometimes. Particularly the implementation of the correct tangent stiffness is often quite challenging. For this reason, FEBio offers a few tools that can help in diagnosing a new material implementation.
 
@@ -365,7 +365,7 @@ Note that the command option –d needs to be used instead of the usual –i to info
 
 This diagnostic test outputs a log file that contains the tangent stiffness as calculated from the implementation and a finite difference approximation to this tangent. It also contains the difference between these two matrices and the matrix element where the difference is largest. Although a small difference between the two matrices can be expected due to the finite difference approximation, the difference should be small, e.g. less than 0.01%. If this is not the case, there is probably a mistake in either the Stress function or in the Tangent function or both. To identify the culprit, the result of the simulation, which is reported as usual in the plot file, can be compared to a known solution (or a solution obtained in a different fashion). If the solutions correspond, then the problem most likely lies with the tangent implementation. If the solutions do not agree, then the implementation of the Cauchy stress is probably also erroneous. 
 
-\section sec5 Advanced Topics
+\section mat_sec5 Advanced Topics
 
 \subsection subsec61 Array parameters
 
