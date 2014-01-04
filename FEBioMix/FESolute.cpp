@@ -165,7 +165,7 @@ int FESolute::Properties()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial* FESolute::GetProperty(int i)
+FECoreBase* FESolute::GetProperty(int i)
 {
 	switch (i)
 	{
@@ -189,7 +189,7 @@ int FESolute::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! Set a material property
-bool FESolute::SetProperty(int n, FEMaterial* pm)
+bool FESolute::SetProperty(int n, FECoreBase* pm)
 {
 	switch(n)
 	{

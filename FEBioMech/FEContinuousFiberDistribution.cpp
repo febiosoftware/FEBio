@@ -16,7 +16,7 @@ int FEContinuousFiberDistribution::Properties()
 
 //-----------------------------------------------------------------------------
 //! get a specific material property
-FEMaterial* FEContinuousFiberDistribution::GetProperty(int i)
+FECoreBase* FEContinuousFiberDistribution::GetProperty(int i)
 {
 	switch(i)
 	{
@@ -39,7 +39,7 @@ int FEContinuousFiberDistribution::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! set a material property (returns false on error)
-bool FEContinuousFiberDistribution::SetProperty(int i, FEMaterial* pm)
+bool FEContinuousFiberDistribution::SetProperty(int i, FECoreBase* pm)
 {
 	switch(i)
 	{

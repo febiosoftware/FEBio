@@ -131,7 +131,7 @@ int FEViscoElasticMaterial::Properties()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial* FEViscoElasticMaterial::GetProperty(int i)
+FECoreBase* FEViscoElasticMaterial::GetProperty(int i)
 {
 	if (i == 0) return m_pBase;
 	assert(false);
@@ -147,7 +147,7 @@ int FEViscoElasticMaterial::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! set a material property (returns false on error)
-bool FEViscoElasticMaterial::SetProperty(int i, FEMaterial* pm)
+bool FEViscoElasticMaterial::SetProperty(int i, FECoreBase* pm)
 {
 	if (i==0)
 	{

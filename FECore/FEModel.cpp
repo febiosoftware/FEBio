@@ -720,7 +720,7 @@ void FEModel::EvaluateMaterialParameters(FEMaterial* pm)
 	int N = pm->Properties();
 	for (int i=0; i<N; ++i)
 	{
-		FEMaterial* pmi = pm->GetProperty(i);
+		FEMaterial* pmi = dynamic_cast<FEMaterial*>(pm->GetProperty(i));
 		if (pmi) EvaluateMaterialParameters(pmi);
 	}
 }

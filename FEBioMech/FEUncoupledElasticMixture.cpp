@@ -47,7 +47,7 @@ int FEUncoupledElasticMixture::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! Set a material property
-bool FEUncoupledElasticMixture::SetProperty(int n, FEMaterial* pm)
+bool FEUncoupledElasticMixture::SetProperty(int n, FECoreBase* pm)
 {
 	assert(n <= (int) m_pMat.size());
 	FEUncoupledMaterial* pme = dynamic_cast<FEUncoupledMaterial*>(pm);

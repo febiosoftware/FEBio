@@ -422,6 +422,113 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 }
 
 //-----------------------------------------------------------------------------
+//! This function parese a parameter list
+bool FEFEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam)
+{
+	FEParameterList& pl = pc->GetParameterList();
+
+	// see if we can find this parameter
+	FEParam* pp = pl.Find((szparam == 0 ? tag.Name() : szparam));
+	if (pp)
+	{
+		switch (pp->m_itype)
+		{
+		case FE_PARAM_DOUBLE : tag.value(pp->value<double>() ); break;
+		case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
+		case FE_PARAM_BOOL   : tag.value(pp->value<bool  >() ); break;
+		case FE_PARAM_VEC3D  : tag.value(pp->value<vec3d >() ); break;
+		case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
+		case FE_PARAM_INTV   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
+		case FE_PARAM_DOUBLEV: tag.value(pp->pvalue<double>(), pp->m_ndim); break;
+		case FE_PARAM_IMAGE_3D:
+			{
+				const char* szfile = tag.AttributeValue("file");
+				++tag;
+				int n[3] = {0};
+				do
+				{
+					if (tag == "size") tag.value(n, 3);
+					else throw XMLReader::InvalidTag(tag);
+					++tag;
+				}
+				while (!tag.isend());
+				Image& im = pp->value<Image>();
+				im.Create(n[0], n[1], n[2]);
+				if (im.Load(szfile) == false) throw XMLReader::InvalidValue(tag);
+			}
+			break;
+		default:
+			assert(false);
+			return false;
+		}
+
+		int nattr = tag.m_natt;
+		for (int i=0; i<nattr; ++i)
+		{
+			const char* szat = tag.m_att[i].m_szatt;
+			if (pl.GetContainer()->SetParameterAttribute(*pp, szat, tag.m_att[i].m_szatv) == false)
+			{
+				// If we get here, the container did not understand the attribute.
+				// If the attribute is a "lc", we interpret it as a load curve
+				if (strcmp(szat, "lc") == 0)
+				{
+					int lc = atoi(tag.m_att[i].m_szatv)-1;
+					if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+					pp->m_nlc = lc;
+					switch (pp->m_itype)
+					{
+					case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
+					}
+				}
+/*				else 
+				{
+					throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+				}
+*/			}
+			// This is not true. Parameters can have attributes that are used for other purposed. E.g. The local fiber option.
+//			else felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
+		}
+
+		// give the parameter container a chance to do additional processing
+		pl.GetContainer()->SetParameter(*pp);
+
+		return true;
+	}
+	else
+	{
+		// if we get here, the parameter is not found.
+		// See if the parameter container has defined a property of this name
+		int n = pc->FindPropertyIndex(tag.Name());
+		if (n >= 0)
+		{
+			// get the property
+			FECoreBase* pp = pc->GetProperty(n);
+			if (pp)
+			{
+				if (!tag.isleaf())
+				{
+					++tag;
+					do
+					{
+						if (ReadParameter(tag, pp) == false) throw XMLReader::InvalidTag(tag);
+						++tag;
+					}
+					while (!tag.isend());
+				}
+				else
+				{
+					// there should be one parameter with the same name as the tag
+					if (ReadParameter(tag, pp) == false) throw XMLReader::InvalidTag(tag);
+				}
+			}
+			else throw XMLReader::InvalidTag(tag);
+			return true;
+		}
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 void FEFEBioImport::ReadList(XMLTag& tag, vector<int>& l)
 {
 	// make sure the list is empty

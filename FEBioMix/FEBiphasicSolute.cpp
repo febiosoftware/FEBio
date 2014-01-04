@@ -288,7 +288,7 @@ int FEBiphasicSolute::Properties()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial* FEBiphasicSolute::GetProperty(int i)
+FECoreBase* FEBiphasicSolute::GetProperty(int i)
 {
 	switch (i)
 	{
@@ -314,7 +314,7 @@ int FEBiphasicSolute::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! Set a material property
-bool FEBiphasicSolute::SetProperty(int n, FEMaterial* pm)
+bool FEBiphasicSolute::SetProperty(int n, FECoreBase* pm)
 {
 	switch(n)
 	{

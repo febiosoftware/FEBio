@@ -6,6 +6,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FEPlane, FERigidSurface)
+	ADD_PARAMETERV(a, FE_PARAM_DOUBLEV, 4, "plane");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 //! Initializes data for FEPlane
 
 void FEPlane::Init()
@@ -14,17 +19,32 @@ void FEPlane::Init()
 	if (m_nplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_nplc);
 }
 
+bool FEPlane::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
+{
+	if (strcmp(szatt, "lc") == 0)
+	{
+		m_nplc = atoi(szval) - 1;
+		return true;
+	}
+	else return false;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // FERigidSphere
 ///////////////////////////////////////////////////////////////////////////////
+
+//-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FERigidSphere, FERigidSurface)
+	ADD_PARAMETER(m_R, FE_PARAM_DOUBLE, "radius");
+	ADD_PARAMETER(m_rc, FE_PARAM_VEC3D, "center");
+END_PARAMETER_LIST();
+
 
 //-----------------------------------------------------------------------------
 //! constructor
 
 FERigidSphere::FERigidSphere(FEModel *pfem) : FERigidSurface(pfem)
 {
-	m_nplc[0] = m_nplc[1] = m_nplc[2] = -1;
-	m_pplc[0] = m_pplc[1] = m_pplc[2] = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -32,9 +52,6 @@ FERigidSphere::FERigidSphere(FEModel *pfem) : FERigidSurface(pfem)
 
 void FERigidSphere::Init()
 {
-	if (m_nplc[0] >= 0) m_pplc[0] = m_pfem->GetLoadCurve(m_nplc[0]);
-	if (m_nplc[1] >= 0) m_pplc[1] = m_pfem->GetLoadCurve(m_nplc[1]);
-	if (m_nplc[2] >= 0) m_pplc[2] = m_pfem->GetLoadCurve(m_nplc[2]);
 }
 
 //-----------------------------------------------------------------------------
@@ -43,10 +60,6 @@ void FERigidSphere::Init()
 vec3d FERigidSphere::Center()
 {
 	vec3d rc = m_rc;
-	if (m_pplc[0]) rc.x += m_pplc[0]->Value();
-	if (m_pplc[1]) rc.y += m_pplc[1]->Value();
-	if (m_pplc[2]) rc.z += m_pplc[2]->Value();
-
 	return rc;
 }
 

@@ -22,13 +22,13 @@ public:
 	int Properties() { return 1; }
 
 	//! return a material property
-	FEMaterial* GetProperty(int i) { return m_pMat; }
+	FECoreBase* GetProperty(int i) { return m_pMat; }
 
 	//! find a material property index ( returns <0 for error)
 	int FindPropertyIndex(const char* szname);
 
 	//! set a material property (returns false on error)
-	bool SetProperty(int i, FEMaterial* pm);
+	bool SetProperty(int i, FECoreBase* pm);
 
 public:
 	double	btime;	//!< generation birth time
@@ -94,13 +94,13 @@ public:
 	int Properties() { return (int) m_MG.size(); }
 
 	//! return a material property
-	FEMaterial* GetProperty(int i) { return m_MG[i]; }
+	FECoreBase* GetProperty(int i) { return m_MG[i]; }
 
 	//! find a material property index ( returns <0 for error)
 	int FindPropertyIndex(const char* szname);
 
 	//! set a material property (returns false on error)
-	bool SetProperty(int i, FEMaterial* pm);
+	bool SetProperty(int i, FECoreBase* pm);
 
 public:
 	//! calculate stress at material point

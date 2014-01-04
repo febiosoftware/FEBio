@@ -31,7 +31,7 @@ int FETransverselyIsotropic::Properties()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial* FETransverselyIsotropic::GetProperty(int n)
+FECoreBase* FETransverselyIsotropic::GetProperty(int n)
 {
 	if (n == 0) return &m_fib;
 	if (n == 1) return m_fib.GetActiveContraction();
@@ -48,7 +48,7 @@ int FETransverselyIsotropic::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! set a material property (returns false on error)
-bool FETransverselyIsotropic::SetProperty(int i, FEMaterial* pm)
+bool FETransverselyIsotropic::SetProperty(int i, FECoreBase* pm)
 {
 	if (i == 1)
 	{

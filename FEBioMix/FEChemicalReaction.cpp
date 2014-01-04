@@ -88,7 +88,7 @@ int FEChemicalReaction::Properties()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial* FEChemicalReaction::GetProperty(int i)
+FECoreBase* FEChemicalReaction::GetProperty(int i)
 {
 	if (i==0) return m_pFwd;
 	if (i==1) return m_pRev;
@@ -106,7 +106,7 @@ int FEChemicalReaction::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! set a material property (returns false on error)
-bool FEChemicalReaction::SetProperty(int i, FEMaterial* pm)
+bool FEChemicalReaction::SetProperty(int i, FECoreBase* pm)
 { 
 	if (i==0)
 	{

@@ -214,6 +214,41 @@ bool FERigidWallInterface::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! get the number of properties
+int FERigidWallInterface::Properties()
+{
+	return 2;
+}
+
+//-----------------------------------------------------------------------------
+//! get a specific property
+FECoreBase* FERigidWallInterface::GetProperty(int i)
+{
+	switch (i)
+	{
+	case 0: if (m_mp == 0) SetMasterSurface(new FEPlane(GetFEModel())); break;
+	case 1: if (m_mp == 0) SetMasterSurface(new FERigidSphere(GetFEModel())); break;
+	}
+	return m_mp;
+}
+
+//-----------------------------------------------------------------------------
+//! find a property index ( returns <0 for error)
+int FERigidWallInterface::FindPropertyIndex(const char* szname)
+{
+	if (strcmp(szname, "plane" ) == 0) return 0;
+	if (strcmp(szname, "sphere") == 0) return 1;
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! set a property (returns false on error)
+bool FERigidWallInterface::SetProperty(int i, FECoreBase* pm)
+{
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
 void FERigidWallInterface::BuildMatrixProfile(FEStiffnessMatrix& K)
 {
@@ -608,7 +643,6 @@ void FERigidWallInterface::Serialize(DumpFile &ar)
 			ar << FE_RIGID_SPHERE;
 			ar << ps->m_rc;
 			ar << ps->m_R;
-			ar << ps->m_nplc[0] << ps->m_nplc[1] << ps->m_nplc[2];
 		}
 	}
 	else
@@ -639,7 +673,6 @@ void FERigidWallInterface::Serialize(DumpFile &ar)
 				FERigidSphere& s = dynamic_cast<FERigidSphere&>(*m_mp);
 				ar >> s.m_rc;
 				ar >> s.m_R;
-				ar >> s.m_nplc[0] >> s.m_nplc[1] >> s.m_nplc[2];
 			}
 			break;
 		default:

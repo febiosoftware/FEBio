@@ -61,13 +61,13 @@ public:
 	int Properties() { return (int) m_pMat.size(); }
 
 	//! return a material property
-	FEMaterial* GetProperty(int i) { return m_pMat[i]; }
+	FECoreBase* GetProperty(int i) { return m_pMat[i]; }
 
 	//! find a material property index ( returns <0 for error)
 	int FindPropertyIndex(const char* szname);
 
 	//! set a material property (returns false on error)
-	bool SetProperty(int i, FEMaterial* pm);
+	bool SetProperty(int i, FECoreBase* pm);
 	
 public:
 	//! calculate stress at material point

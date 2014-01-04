@@ -109,6 +109,20 @@ public:
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEStiffnessMatrix& K);
 
+public: // inherited from FECoreBase
+
+	//! get the number of properties
+	int Properties();
+
+	//! get a specific property
+	FECoreBase* GetProperty(int i);
+
+	//! find a property index ( returns <0 for error)
+	int FindPropertyIndex(const char* szname);
+
+	//! set a property (returns false on error)
+	bool SetProperty(int i, FECoreBase* pm);
+
 private:
 	//! copy constructor hidden
 	FERigidWallInterface(FERigidWallInterface& ri){}

@@ -1103,7 +1103,7 @@ int FEMultiphasic::Properties()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial* FEMultiphasic::GetProperty(int i)
+FECoreBase* FEMultiphasic::GetProperty(int i)
 {
 	if (i < 0) { assert(false); return 0; }
 	if (i < 4)
@@ -1148,7 +1148,7 @@ int FEMultiphasic::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! Set a material property
-bool FEMultiphasic::SetProperty(int n, FEMaterial* pm)
+bool FEMultiphasic::SetProperty(int n, FECoreBase* pm)
 {
 	switch(n)
 	{

@@ -27,6 +27,20 @@ public: // interface for managing attributes
 	//! Set the attribute
 	virtual bool SetAttribute(const char* szname, const char* szval) { return true; }
 
+public: // interface for getting/setting properties
+
+	//! get the number of properties
+	virtual int Properties () { return 0; }
+
+	//! get a specific property
+	virtual FECoreBase* GetProperty(int i) { return 0; }
+
+	//! find a property index ( returns <0 for error)
+	virtual int FindPropertyIndex(const char* szname) { return -1; }
+
+	//! set a property (returns false on error)
+	virtual bool SetProperty(int i, FECoreBase* pm) { return false; }
+
 private:
 	//! Set the type string (This is used by the factory methods to make sure 
 	//! the class has the same type string as corresponding factory class

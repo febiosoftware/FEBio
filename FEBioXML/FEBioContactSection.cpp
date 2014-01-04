@@ -132,53 +132,12 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 	FERigidWallInterface* ps = new FERigidWallInterface(&fem);
 	fem.AddSurfacePairInteraction(ps);
 
-	FEParameterList& pl = ps->GetParameterList();
-
 	++tag;
 	do
 	{
-		if (m_pim->ReadParameter(tag, pl) == false)
+		if (m_pim->ReadParameter(tag, ps) == false)
 		{
-			if (tag == "plane")
-			{
-				ps->SetMasterSurface(new FEPlane(&fem));
-				FEPlane& pl = dynamic_cast<FEPlane&>(*ps->m_mp);
-				const char* sz = tag.AttributeValue("lc", true);
-				if (sz)	pl.m_nplc = atoi(sz) - 1;
-
-				double* a = pl.GetEquation();
-				tag.value(a, 4);
-			}
-			else if (tag == "sphere")
-			{
-				ps->SetMasterSurface(new FERigidSphere(&fem));
-				FERigidSphere& s = dynamic_cast<FERigidSphere&>(*ps->m_mp);
-				++tag;
-				do
-				{
-					if      (tag == "center") tag.value(s.m_rc);
-					else if (tag == "radius") tag.value(s.m_R);
-					else if (tag == "xtrans")
-					{
-						const char* szlc = tag.AttributeValue("lc");
-						s.m_nplc[0] = atoi(szlc) - 1;
-					}
-					else if (tag == "ytrans")
-					{
-						const char* szlc = tag.AttributeValue("lc");
-						s.m_nplc[1] = atoi(szlc) - 1;
-					}
-					else if (tag == "ztrans")
-					{
-						const char* szlc = tag.AttributeValue("lc");
-						s.m_nplc[2] = atoi(szlc) - 1;
-					}
-					else throw XMLReader::InvalidTag(tag);
-					++tag;
-				}
-				while (!tag.isend());
-			}
-			else if (tag == "surface")
+			if (tag == "surface")
 			{
 				FERigidWallSurface& s = ps->m_ss;
 

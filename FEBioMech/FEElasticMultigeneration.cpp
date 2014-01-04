@@ -18,7 +18,7 @@ int FEGenerationMaterial::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! set a material property (returns false on error)
-bool FEGenerationMaterial::SetProperty(int i, FEMaterial* pm)
+bool FEGenerationMaterial::SetProperty(int i, FECoreBase* pm)
 {
 	if (i==0)
 	{
@@ -151,7 +151,7 @@ int FEElasticMultigeneration::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! Set a material property
-bool FEElasticMultigeneration::SetProperty(int n, FEMaterial* pm)
+bool FEElasticMultigeneration::SetProperty(int n, FECoreBase* pm)
 {
 	assert(n == (int)m_MG.size());
 	FEGenerationMaterial* pmg = dynamic_cast<FEGenerationMaterial*>(pm);

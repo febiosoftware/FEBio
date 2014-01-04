@@ -111,7 +111,7 @@ int FEBiphasic::Properties()
 
 //-----------------------------------------------------------------------------
 //! return a pointer to a biphasic material property
-FEMaterial* FEBiphasic::GetProperty(int i)
+FECoreBase* FEBiphasic::GetProperty(int i)
 {
 	switch (i)
 	{
@@ -135,7 +135,7 @@ int FEBiphasic::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! Set a material property
-bool FEBiphasic::SetProperty(int n, FEMaterial* pm)
+bool FEBiphasic::SetProperty(int n, FECoreBase* pm)
 {
 	switch(n)
 	{

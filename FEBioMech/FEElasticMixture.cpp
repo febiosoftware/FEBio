@@ -106,7 +106,7 @@ int FEElasticMixture::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! Set a material property
-bool FEElasticMixture::SetProperty(int n, FEMaterial* pm)
+bool FEElasticMixture::SetProperty(int n, FECoreBase* pm)
 {
 	assert(n <= (int) m_pMat.size());
 	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);

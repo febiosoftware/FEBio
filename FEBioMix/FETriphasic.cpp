@@ -51,7 +51,7 @@ int FETriphasic::Properties()
 
 //-----------------------------------------------------------------------------
 //! return a triphasic material property
-FEMaterial* FETriphasic::GetProperty(int i)
+FECoreBase* FETriphasic::GetProperty(int i)
 {
 	switch (i)
 	{
@@ -78,7 +78,7 @@ int FETriphasic::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! Set a material property
-bool FETriphasic::SetProperty(int n, FEMaterial* pm)
+bool FETriphasic::SetProperty(int n, FECoreBase* pm)
 {
 	switch(n)
 	{

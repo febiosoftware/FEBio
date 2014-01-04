@@ -61,13 +61,13 @@ public:
 	int Properties();
 
 	//! return a material property
-	FEMaterial* GetProperty(int i);
+	FECoreBase* GetProperty(int i);
 
 	//! find a material property index ( returns <0 for error)
 	virtual int FindPropertyIndex(const char* szname);
 
 	//! set a material property (returns false on error)
-	virtual bool SetProperty(int i, FEMaterial* pm);
+	virtual bool SetProperty(int i, FECoreBase* pm);
 
 public:
 	//! data initialization

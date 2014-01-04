@@ -89,7 +89,7 @@ int FERemodelingElasticMaterial::Properties()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial* FERemodelingElasticMaterial::GetProperty(int i)
+FECoreBase* FERemodelingElasticMaterial::GetProperty(int i)
 {
 	switch (i)
 	{
@@ -111,7 +111,7 @@ int FERemodelingElasticMaterial::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! Set a material property
-bool FERemodelingElasticMaterial::SetProperty(int n, FEMaterial* pm)
+bool FERemodelingElasticMaterial::SetProperty(int n, FECoreBase* pm)
 {
 	switch(n)
 	{

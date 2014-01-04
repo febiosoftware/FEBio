@@ -11,10 +11,10 @@
 
 //! \todo Introduce parameter lists so that we can remove references to load curves.
 
-class FERigidSurface
+class FERigidSurface : public FECoreBase
 {
 public: // interface
-	FERigidSurface(FEModel* pfem) : m_pfem(pfem) {}
+	FERigidSurface(FEModel* pfem) : m_pfem(pfem), FECoreBase(FERIGIDOBJECT_ID) {}
 
 	//! intialize surface
 	virtual void Init() = 0;
@@ -67,12 +67,17 @@ public:
 	//! get the initial plane equation
 	double* GetEquation() { return a; }
 
+	//! If a parameter has attributes, this function will be called
+	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval);
+
 protected:
 	double	a[4];	//!< plane equation
 
 public:
 	int				m_nplc;		//!< plane loadcurve number
 	FELoadCurve*	m_pplc;		//!< plane load curve
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
@@ -100,6 +105,5 @@ public:
 	vec3d	m_rc;		//!< center of sphere
 	double	m_R;		//!< radius
 
-	int				m_nplc[3];	//!< displacement load curve numbers
-	FELoadCurve*	m_pplc[3];	//!< displacement load curves
+	DECLARE_PARAMETER_LIST();
 };

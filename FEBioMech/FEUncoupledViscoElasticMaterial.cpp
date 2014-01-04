@@ -55,7 +55,7 @@ int FEUncoupledViscoElasticMaterial::Properties()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial* FEUncoupledViscoElasticMaterial::GetProperty(int i)
+FECoreBase* FEUncoupledViscoElasticMaterial::GetProperty(int i)
 {
 	if (i == 0) return m_pBase;
 	assert(false);
@@ -78,7 +78,7 @@ int FEUncoupledViscoElasticMaterial::FindPropertyIndex(const char* szname)
 
 //-----------------------------------------------------------------------------
 //! set a material property (returns false on error)
-bool FEUncoupledViscoElasticMaterial::SetProperty(int i, FEMaterial* pm)
+bool FEUncoupledViscoElasticMaterial::SetProperty(int i, FECoreBase* pm)
 {
 	if (i==0)
 	{
