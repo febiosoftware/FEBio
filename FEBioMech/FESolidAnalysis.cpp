@@ -49,7 +49,9 @@ bool FESolidAnalysis::Init()
 		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(DC.id));
 		if (RB.IsActive() && DC.IsActive())
 		{
-			assert(RB.m_BC[DC.bc] == 0);	// make sure we are not overriding a fixed bc
+			// TODO: I commented this line out since we can have more rigid materials than rigid bodies
+			//       I just probably find a better way to test this (or prevent this from happening)
+//			assert(RB.m_BC[DC.bc] == 0);	// make sure we are not overriding a fixed bc
 			RB.m_pDC[DC.bc] = &DC;
 			RB.m_BC[DC.bc] = 1;
 			DC.ref = 0.0;
