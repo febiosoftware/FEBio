@@ -163,6 +163,7 @@ REGISTER_FECORE_CLASS(FEPlotFixedChargeDensity           , FEPLOTDATA_ID, "fixed
 REGISTER_FECORE_CLASS(FEPlotReferentialFixedChargeDensity, FEPLOTDATA_ID, "referential fixed charge density");
 REGISTER_FECORE_CLASS(FEPlotNodalFluidFlux               , FEPLOTDATA_ID, "nodal fluid flux"    );
 REGISTER_FECORE_CLASS(FEPlotOsmolarity                   , FEPLOTDATA_ID,  "osmolarity"         );
+REGISTER_FECORE_CLASS(FEPlotPressureGap					 , FEPLOTDATA_ID, "pressure gap"        );
 REGISTER_FECORE_CLASS(FEPlotFluidForce                   , FEPLOTDATA_ID, "fluid force"         );
 REGISTER_FECORE_CLASS_T(FEPlotSBMRefAppDensityT          , FEPLOTDATA_ID, 0, "sbm 1 referential apparent density");
 REGISTER_FECORE_CLASS_T(FEPlotSBMRefAppDensityT          , FEPLOTDATA_ID, 1, "sbm 2 referential apparent density");

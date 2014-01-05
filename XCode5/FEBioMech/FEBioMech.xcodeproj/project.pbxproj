@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D5A12B1A1875B02C008BF405 /* FEContactSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A12B181875B02C008BF405 /* FEContactSurface.cpp */; };
+		D5A12B1B1875B02C008BF405 /* FEContactSurface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A12B191875B02C008BF405 /* FEContactSurface.h */; };
 		D5B572E1186CD45900D12E45 /* FERemodelingElasticDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B572DF186CD45900D12E45 /* FERemodelingElasticDomain.cpp */; };
 		D5B572E2186CD45900D12E45 /* FERemodelingElasticDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B572E0186CD45900D12E45 /* FERemodelingElasticDomain.h */; };
 		D5E107741865DFAD00B23922 /* FE2DFiberNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1068D1865DFAC00B23922 /* FE2DFiberNeoHookean.cpp */; };
@@ -242,6 +244,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D5A12B181875B02C008BF405 /* FEContactSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactSurface.cpp; sourceTree = "<group>"; };
+		D5A12B191875B02C008BF405 /* FEContactSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEContactSurface.h; sourceTree = "<group>"; };
 		D5B572DF186CD45900D12E45 /* FERemodelingElasticDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERemodelingElasticDomain.cpp; sourceTree = "<group>"; };
 		D5B572E0186CD45900D12E45 /* FERemodelingElasticDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERemodelingElasticDomain.h; sourceTree = "<group>"; };
 		D5E106851865DF9F00B23922 /* libFEBioMech.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioMech.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -535,6 +539,8 @@
 				D5E106A71865DFAC00B23922 /* FEConstBodyForce.h */,
 				D5E106A81865DFAC00B23922 /* FEContactInterface.cpp */,
 				D5E106A91865DFAC00B23922 /* FEContactInterface.h */,
+				D5A12B181875B02C008BF405 /* FEContactSurface.cpp */,
+				D5A12B191875B02C008BF405 /* FEContactSurface.h */,
 				D5E106AA1865DFAC00B23922 /* FEContinuousFiberDistribution.cpp */,
 				D5E106AB1865DFAC00B23922 /* FEContinuousFiberDistribution.h */,
 				D5E106AC1865DFAC00B23922 /* FECoupledTransIsoMooneyRivlin.cpp */,
@@ -868,6 +874,7 @@
 				D5E107CA1865DFAD00B23922 /* FEFiberIntegrationGauss.h in Headers */,
 				D5E107A51865DFAD00B23922 /* FEEFDMooneyRivlin.h in Headers */,
 				D5E108281865DFAD00B23922 /* FESolidSolver.h in Headers */,
+				D5A12B1B1875B02C008BF405 /* FEContactSurface.h in Headers */,
 				D5E107BC1865DFAD00B23922 /* FEEllipsoidalFiberDistribution.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -952,6 +959,7 @@
 				D5E108171865DFAD00B23922 /* FERigidSolidDomain.cpp in Sources */,
 				D5E1083D1865DFAD00B23922 /* FETransIsoMooneyRivlin.cpp in Sources */,
 				D5E107F51865DFAD00B23922 /* FEMuscleMaterial.cpp in Sources */,
+				D5A12B1A1875B02C008BF405 /* FEContactSurface.cpp in Sources */,
 				D5E1079A1865DFAD00B23922 /* FEDamageTransIsoMooneyRivlin.cpp in Sources */,
 				D5E107941865DFAD00B23922 /* FECoupledTransIsoVerondaWestmann.cpp in Sources */,
 				D5E108191865DFAD00B23922 /* FERigidSurface.cpp in Sources */,

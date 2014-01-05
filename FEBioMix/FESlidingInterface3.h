@@ -58,6 +58,7 @@ public:
 	void GetNodalContactGap     (int nface, double* pg);
 	void GetNodalContactPressure(int nface, double* pg);
 	void GetNodalContactTraction(int nface, vec3d* tn);
+    void GetNodalPressureGap    (int nface, double* pg);
 	
 protected:
 	FEModel*	m_pfem;

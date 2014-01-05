@@ -339,7 +339,6 @@ void FESlidingSurface2::Serialize(DumpFile& ar)
 void FESlidingSurface2::GetNodalContactGap(int nface, double* pg)
 {
 	FESurfaceElement& el = Element(nface);
-	int ne = el.Nodes();
 	int ni = el.GaussPoints();
 	double gi[FEElement::MAX_INTPOINTS];
 	for (int k=0; k<ni; ++k) gi[k] = m_Data[nface][k].m_gap;
@@ -350,11 +349,20 @@ void FESlidingSurface2::GetNodalContactGap(int nface, double* pg)
 void FESlidingSurface2::GetNodalContactPressure(int nface, double* pg)
 {
 	FESurfaceElement& el = Element(nface);
-	int ne = el.Nodes();
 	int ni = el.GaussPoints();
 	double ti[FEElement::MAX_INTPOINTS];
 	for (int k=0; k<ni; ++k) ti[k] = m_Data[nface][k].m_Ln;
 	el.project_to_nodes(ti, pg);
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurface2::GetNodalPressureGap(int nface, double* pg)
+{
+	FESurfaceElement& el = Element(nface);
+	int ni = el.GaussPoints();
+	double gi[FEElement::MAX_INTPOINTS];
+	for (int k=0; k<ni; ++k) gi[k] = m_Data[nface][k].m_pg;
+	el.project_to_nodes(gi, pg);
 }
 
 //-----------------------------------------------------------------------------

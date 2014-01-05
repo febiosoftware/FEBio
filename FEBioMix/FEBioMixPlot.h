@@ -222,6 +222,10 @@ public:
 	FEPlotSBMRefAppDensityT(FEModel* pfem) : FEPlotSBMRefAppDensity_(SBM) {}
 };
 
+//=============================================================================
+//                         S U R F A C E   D A T A
+//=============================================================================
+
 //-----------------------------------------------------------------------------
 //! Fluid force
 //!
@@ -229,5 +233,15 @@ class FEPlotFluidForce : public FESurfaceData
 {
 public:
 	FEPlotFluidForce(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+	bool Save(FESurface& surf, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Fluid pressure gap
+//!
+class FEPlotPressureGap : public FESurfaceData
+{
+public:
+	FEPlotPressureGap(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_MULT){}
 	bool Save(FESurface& surf, vector<float>& a);
 };

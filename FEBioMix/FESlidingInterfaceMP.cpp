@@ -29,14 +29,7 @@ ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"               );
 ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"             );
 ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"             );
 ADD_PARAMETER(m_ambp     , FE_PARAM_DOUBLE, "ambient_pressure"     );
-ADD_PARAMETER(m_ambc[0]  , FE_PARAM_DOUBLE, "ambient_concentration_1");
-ADD_PARAMETER(m_ambc[1]  , FE_PARAM_DOUBLE, "ambient_concentration_2");
-ADD_PARAMETER(m_ambc[2]  , FE_PARAM_DOUBLE, "ambient_concentration_3");
-ADD_PARAMETER(m_ambc[3]  , FE_PARAM_DOUBLE, "ambient_concentration_4");
-ADD_PARAMETER(m_ambc[4]  , FE_PARAM_DOUBLE, "ambient_concentration_5");
-ADD_PARAMETER(m_ambc[5]  , FE_PARAM_DOUBLE, "ambient_concentration_6");
-ADD_PARAMETER(m_ambc[6]  , FE_PARAM_DOUBLE, "ambient_concentration_7");
-ADD_PARAMETER(m_ambc[7]  , FE_PARAM_DOUBLE, "ambient_concentration_8");
+ADD_PARAMETER(m_ambctmp  , FE_PARAM_DOUBLE, "ambient_concentration");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -419,6 +412,16 @@ void FESlidingSurfaceMP::GetNodalContactPressure(int nface, double* pn)
 }
 
 //-----------------------------------------------------------------------------
+void FESlidingSurfaceMP::GetNodalPressureGap(int nface, double* pg)
+{
+	FESurfaceElement& el = Element(nface);
+	int ni = el.GaussPoints();
+	double gi[FEElement::MAX_INTPOINTS];
+	for (int k=0; k<ni; ++k) gi[k] = m_Data[nface][k].m_pg;
+	el.project_to_nodes(gi, pg);
+}
+
+//-----------------------------------------------------------------------------
 void FESlidingSurfaceMP::GetNodalContactTraction(int nface, vec3d* tn)
 {
 	FESurfaceElement& el = Element(nface);
@@ -499,6 +502,26 @@ FESlidingInterfaceMP::~FESlidingInterfaceMP()
 }
 
 //-----------------------------------------------------------------------------
+bool FESlidingInterfaceMP::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
+{
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
+	if (strcmp(p.m_szname, "ambient_concentration") == 0)
+	{
+		if (strcmp(szatt, "sol") == 0)
+		{
+			int id = atoi(szval) - 1;
+			if ((id < 0) || (id >= MAX_CDOFS)) return false;
+			SetAmbientConcentration(id, m_ambctmp);
+			return true;
+		}
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 bool FESlidingInterfaceMP::Init()
 {
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
@@ -519,7 +542,18 @@ bool FESlidingInterfaceMP::Init()
 			}
 		}
 	}
-	
+
+    // cycle through all the solutes and determine ambient concentrations
+    DOFS& fedofs = *DOFS::GetInstance();
+    int nsol = fedofs.GetCDOFS();
+    
+	itridmap it;
+	idmap ambc = m_ambcinp;
+	for (int isol=0; isol<nsol; ++isol) {
+		it = ambc.find(isol);
+		if (it != ambc.end()) m_ambc[isol] = it->second;
+	}
+
 	return true;
 }
 

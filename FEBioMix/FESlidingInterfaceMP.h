@@ -1,6 +1,7 @@
 #pragma once
 #include "FEBioMech/FEContactInterface.h"
 #include "FEBiphasicContactSurface.h"
+#include <map>
 
 //-----------------------------------------------------------------------------
 class FESlidingSurfaceMP : public FEBiphasicContactSurface
@@ -58,6 +59,7 @@ public:
 	void GetNodalContactGap     (int nface, double* pg);
 	void GetNodalContactPressure(int nface, double* pg);
 	void GetNodalContactTraction(int nface, vec3d* tn);
+    void GetNodalPressureGap    (int nface, double* pg);
 	
 protected:
 	FEModel*	m_pfem;
@@ -72,6 +74,9 @@ public:
 	
 	vector<int>					m_sid;	//!< list of solute id's for this surface
 };
+
+typedef std::map<int,double> idmap;     //!< map integer id with double value
+typedef std::map<int,double>::iterator itridmap;
 
 //-----------------------------------------------------------------------------
 class FESlidingInterfaceMP : public FEContactInterface
@@ -126,6 +131,12 @@ public:
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEStiffnessMatrix& K);
     
+    //! set parameter attribute for ambient concentrations
+	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval);
+    
+	//! set the ambient concentration
+	void SetAmbientConcentration(int id, double ambc) { m_ambcinp.insert(std::pair<int, double>(id, ambc)); }
+    
 protected:
 	void ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfaceMP& ms, bool bupseg);
 	
@@ -165,6 +176,8 @@ public:
 	double	m_Tabs;					//!< absolute temperature
 	double	m_ambp;					//!< ambient pressure
 	vector<double>	m_ambc;         //!< ambient concentration
+    double  m_ambctmp;              //!< helper variable for reading in ambient concentrations of solutes
+    idmap	m_ambcinp;                 //!< ambient concentration of solute (input)
 	vector<int> m_sid;				//!< list of solute ids common to both contact surfaces
 	vector<int> m_ssl;				//!< list of slave surface solutes common to both contact surfaces
 	vector<int> m_msl;				//!< list of master surface solutes common to both contact surfaces

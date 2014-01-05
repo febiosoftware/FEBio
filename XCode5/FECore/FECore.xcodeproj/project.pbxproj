@@ -40,8 +40,6 @@
 		D5E10A991865E15900B23922 /* FEBoundaryCondition.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A081865E15900B23922 /* FEBoundaryCondition.h */; };
 		D5E10A9A1865E15900B23922 /* FEClosestPointProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A091865E15900B23922 /* FEClosestPointProjection.cpp */; };
 		D5E10A9B1865E15900B23922 /* FEClosestPointProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A0A1865E15900B23922 /* FEClosestPointProjection.h */; };
-		D5E10A9C1865E15900B23922 /* FEContactSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A0B1865E15900B23922 /* FEContactSurface.cpp */; };
-		D5E10A9D1865E15900B23922 /* FEContactSurface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A0C1865E15900B23922 /* FEContactSurface.h */; };
 		D5E10A9E1865E15900B23922 /* FECoordSysMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A0D1865E15900B23922 /* FECoordSysMap.cpp */; };
 		D5E10A9F1865E15900B23922 /* FECoordSysMap.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A0E1865E15900B23922 /* FECoordSysMap.h */; };
 		D5E10AA01865E15900B23922 /* FECore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A0F1865E15900B23922 /* FECore.cpp */; };
@@ -192,8 +190,6 @@
 		D5E10A081865E15900B23922 /* FEBoundaryCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBoundaryCondition.h; sourceTree = "<group>"; };
 		D5E10A091865E15900B23922 /* FEClosestPointProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEClosestPointProjection.cpp; sourceTree = "<group>"; };
 		D5E10A0A1865E15900B23922 /* FEClosestPointProjection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEClosestPointProjection.h; sourceTree = "<group>"; };
-		D5E10A0B1865E15900B23922 /* FEContactSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactSurface.cpp; sourceTree = "<group>"; };
-		D5E10A0C1865E15900B23922 /* FEContactSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEContactSurface.h; sourceTree = "<group>"; };
 		D5E10A0D1865E15900B23922 /* FECoordSysMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECoordSysMap.cpp; sourceTree = "<group>"; };
 		D5E10A0E1865E15900B23922 /* FECoordSysMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECoordSysMap.h; sourceTree = "<group>"; };
 		D5E10A0F1865E15900B23922 /* FECore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECore.cpp; sourceTree = "<group>"; };
@@ -364,8 +360,6 @@
 				D5E10A081865E15900B23922 /* FEBoundaryCondition.h */,
 				D5E10A091865E15900B23922 /* FEClosestPointProjection.cpp */,
 				D5E10A0A1865E15900B23922 /* FEClosestPointProjection.h */,
-				D5E10A0B1865E15900B23922 /* FEContactSurface.cpp */,
-				D5E10A0C1865E15900B23922 /* FEContactSurface.h */,
 				D5E10A0D1865E15900B23922 /* FECoordSysMap.cpp */,
 				D5E10A0E1865E15900B23922 /* FECoordSysMap.h */,
 				D5E10A0F1865E15900B23922 /* FECore.cpp */,
@@ -531,7 +525,6 @@
 				D5E10AFD1865E15900B23922 /* NodeDataRecord.h in Headers */,
 				D5E10B091865E15900B23922 /* tens4d.hpp in Headers */,
 				D5E10A8B1865E15900B23922 /* DumpStream.h in Headers */,
-				D5E10A9D1865E15900B23922 /* FEContactSurface.h in Headers */,
 				D5E10AEF1865E15900B23922 /* log.h in Headers */,
 				D5E10ACF1865E15900B23922 /* FENodeReorder.h in Headers */,
 				D5E10AE61865E15900B23922 /* FETrussDomain.h in Headers */,
@@ -656,7 +649,6 @@
 				D5E10AD51865E15900B23922 /* FEPlotData.cpp in Sources */,
 				D5E10B0E1865E15900B23922 /* vector.cpp in Sources */,
 				D5E10AA21865E15900B23922 /* FECoreBase.cpp in Sources */,
-				D5E10A9C1865E15900B23922 /* FEContactSurface.cpp in Sources */,
 				D5E10B0A1865E15900B23922 /* Timer.cpp in Sources */,
 				D5E10AED1865E15900B23922 /* LoadCurve.cpp in Sources */,
 				D5B572DB186CC76500D12E45 /* FECoreTask.cpp in Sources */,

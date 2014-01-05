@@ -13,6 +13,9 @@ public:
 	~FEBiphasicContactSurface();
 
 public:
+	//! Get the fluid pressure gap
+	virtual void GetNodalPressureGap(int nface, double* pg);
+    
 	//! Get the total force exerted by the fluid
     virtual vec3d GetFluidForce();
 };

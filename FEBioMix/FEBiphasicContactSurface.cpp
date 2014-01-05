@@ -12,8 +12,11 @@ FEBiphasicContactSurface::~FEBiphasicContactSurface()
 }
 
 //-----------------------------------------------------------------------------
+void FEBiphasicContactSurface::GetNodalPressureGap(int nface, double* pg) { assert(false); }
+
+//-----------------------------------------------------------------------------
 vec3d FEBiphasicContactSurface::GetFluidForce()
 {
-	return vec3d(0,0,0);
+	assert(false);
+    return vec3d(0,0,0);
 }
-

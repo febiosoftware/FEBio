@@ -990,6 +990,31 @@ bool FEPlotSBMRefAppDensity_::Save(FEDomain &dom, vector<float>& a)
 }
 
 
+//=============================================================================
+//                       S U R F A C E    D A T A
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+// Plot contact gap
+bool FEPlotPressureGap::Save(FESurface& surf, vector<float>& a)
+{
+	FEBiphasicContactSurface* pcs = dynamic_cast<FEBiphasicContactSurface*>(&surf);
+	if (pcs == 0) return false;
+    
+	int NF = pcs->Elements();
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	double gn[MFN];
+	a.assign(MFN*NF, 0.f);
+	for (int i=0; i<NF; ++i)
+	{
+		FESurfaceElement& f = pcs->Element(i);
+		pcs->GetNodalPressureGap(i, gn);
+		int ne = (int)f.m_lnode.size();
+		for (int j = 0; j< ne; ++j) a[MFN*i + j] = (float) gn[j];
+	}
+	return true;
+}
+
 //-----------------------------------------------------------------------------
 bool FEPlotFluidForce::Save(FESurface &surf, std::vector<float> &a)
 {
