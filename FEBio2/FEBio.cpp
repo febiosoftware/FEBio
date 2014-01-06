@@ -412,6 +412,18 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		if (!bplt) sprintf(ops.szplt, "%s.xplt", szbase);
 		if (!bdmp) sprintf(ops.szdmp, "%s.dmp", szbase);
 	}
+	else if (ops.szctrl[0])
+	{
+		char szbase[256]; strcpy(szbase, ops.szfile);
+		strcpy(szbase, ops.szctrl);
+		ch = strrchr(szbase, '.');
+		if (ch) *ch = 0;
+
+		if (!blog) sprintf(ops.szlog, "%s.log", szbase);
+		if (!bplt) sprintf(ops.szplt, "%s.xplt", szbase);
+		if (!bdmp) sprintf(ops.szdmp, "%s.dmp", szbase);
+	}
+
 
 	return brun;
 }
