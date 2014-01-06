@@ -198,6 +198,9 @@ public: // --- Nonlinear constraints functions ---
 
 public: // --- parameter functions ---
 
+	//! evaluate all parameter lists
+	void EvaluateAllParameterLists();
+
 	//! Evaluate parameter list
 	void EvaluateParameterList(FEParameterList& pl);
 

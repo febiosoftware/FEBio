@@ -686,6 +686,48 @@ double* FEModel::FindParameter(const char* szparam)
 }
 
 //-----------------------------------------------------------------------------
+void FEModel::EvaluateAllParameterLists()
+{
+	// evaluate material parameter lists
+	for (int i=0; i<Materials(); ++i)
+	{
+		// get the material
+		FEMaterial* pm = GetMaterial(i);
+
+		// evaluate its parameter list
+		EvaluateMaterialParameters(pm);
+	}
+
+	// evaluate surface load parameter lists
+	for (int i=0; i<SurfaceLoads(); ++i)
+	{
+		FEParameterList& pl = SurfaceLoad(i)->GetParameterList();
+		EvaluateParameterList(pl);
+	}
+
+	// evaluate body load parameter lists
+	for (int i=0; i<BodyLoads(); ++i)
+	{
+		FEParameterList& pl = GetBodyLoad(i)->GetParameterList();
+		EvaluateParameterList(pl);
+	}
+
+	// evaluate contact interface parameter lists
+	for (int i=0; i<SurfacePairInteractions(); ++i)
+	{
+		FEParameterList& pl = SurfacePairInteraction(i)->GetParameterList();
+		EvaluateParameterList(pl);
+	}
+
+	// evaluate constraint parameter lists
+	for (int i=0; i<NonlinearConstraints(); ++i)
+	{
+		FEParameterList& pl = NonlinearConstraint(i)->GetParameterList();
+		EvaluateParameterList(pl);
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Evaluate a parameter list
 void FEModel::EvaluateParameterList(FEParameterList &pl)
 {

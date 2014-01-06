@@ -16,10 +16,11 @@ public:
 	};
 
 public:
-	FEConvectiveHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem){}
+	//! constructor
+	FEConvectiveHeatFlux(FEModel* pfem);
 
 	//! allocate storage
-	void Create(int n) { m_FC.resize(n); }
+	void Create(int n);
 
 	//! get a heat flux load BC
 	LOAD& HeatFlux(int n) { return m_FC[n]; }
@@ -36,9 +37,15 @@ public:
 	//! set an attribute of a surface facet
 	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);
 
+private:
+	double	m_hc;		//!< heat transfer coefficient
+	double	m_flux;		//!< convective heat flux
+
 protected:
 	void ElementStiffness(FESurfaceElement& el, matrix& ke, double hc);
 
 protected:
 	vector<LOAD>	m_FC;
+
+	DECLARE_PARAMETER_LIST();
 };

@@ -232,17 +232,10 @@ bool FEAnalysis::Solve()
 		// evaluate load curve values at current time
 		for (i=0; i<m_fem.LoadCurves(); ++i) m_fem.GetLoadCurve(i)->Evaluate(m_fem.m_ftime);
 
-		// evaluate material parameter lists
-		for (i=0; i<m_fem.Materials(); ++i)
-		{
-			// get the material
-			FEMaterial* pm = m_fem.GetMaterial(i);
+		// evaluate the parameter lists
+		m_fem.EvaluateAllParameterLists();
 
-			// evaluate its parameter list
-			m_fem.EvaluateMaterialParameters(pm);
-		}
-
-		// initialize materials
+		// re-initialize materials
 		// TODO: I need to do this since the material parameters can have changed and thus a new initialization
 		//       needs to be done to see if the material parameters are still valid. I would like to add value checking
 		//       directly in the parameter evaluation above so this can be removed.
@@ -250,27 +243,6 @@ bool FEAnalysis::Solve()
 		{
 			bconv = false;
 			break;
-		}
-
-		// evaluate body-force parameter lists
-		for (i=0; i<m_fem.BodyLoads(); ++i)
-		{
-			FEParameterList& pl = m_fem.GetBodyLoad(i)->GetParameterList();
-			m_fem.EvaluateParameterList(pl);
-		}
-
-		// evaluate contact interface parameter lists
-		for (i=0; i<m_fem.SurfacePairInteractions(); ++i)
-		{
-			FEParameterList& pl = m_fem.SurfacePairInteraction(i)->GetParameterList();
-			m_fem.EvaluateParameterList(pl);
-		}
-
-		// evaluate constraint parameter lists
-		for (i=0; i<m_fem.NonlinearConstraints(); ++i)
-		{
-			FEParameterList& pl = m_fem.NonlinearConstraint(i)->GetParameterList();
-			m_fem.EvaluateParameterList(pl);
 		}
 
 		// solve this timestep,

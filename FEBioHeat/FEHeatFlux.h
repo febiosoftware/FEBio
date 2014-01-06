@@ -15,10 +15,11 @@ public:
 	};
 
 public:
-	FEHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem){}
+	//! constructor
+	FEHeatFlux(FEModel* pfem);
 
 	//! allocate storage
-	void Create(int n) { m_FC.resize(n); }
+	void Create(int n);
 
 	//! get a heat flux load BC
 	LOAD& HeatFlux(int n) { return m_FC[n]; }
@@ -36,6 +37,11 @@ public:
 	//! set an attribute of a surface facet
 	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);
 
+public:
+	double	m_flux;	//!< heat flux
+
 protected:
 	vector<LOAD>	m_FC;
+
+	DECLARE_PARAMETER_LIST();
 };

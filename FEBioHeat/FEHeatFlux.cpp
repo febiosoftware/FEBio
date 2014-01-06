@@ -2,6 +2,30 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FEHeatFlux, FESurfaceLoad)
+	ADD_PARAMETER(m_flux, FE_PARAM_DOUBLE, "flux");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+FEHeatFlux::FEHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem)
+{
+	m_flux = 1.0;
+}
+
+//-----------------------------------------------------------------------------
+//! allocate storage
+void FEHeatFlux::Create(int n)
+{ 
+	m_FC.resize(n);
+
+	for (int i=0; i<n; ++i)
+	{
+		m_FC[i].lc = -1;
+		for (int j=0; j<8; ++j) m_FC[i].s[j] = 1.0;
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the heat flux residual
 void FEHeatFlux::Residual(FEGlobalVector& R)
 {
@@ -18,7 +42,8 @@ void FEHeatFlux::Residual(FEGlobalVector& R)
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
 
-		double g = fem.GetLoadCurve(hf.lc)->Value();
+		double g = m_flux;
+		if (hf.lc >= 0) g *= fem.GetLoadCurve(hf.lc)->Value();
 
 		// calculate nodal fluxes
 		double qn[FEElement::MAX_NODES];

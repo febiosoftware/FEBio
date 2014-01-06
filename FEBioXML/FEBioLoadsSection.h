@@ -16,4 +16,7 @@ protected:
 	void ParseBodyLoad20   (XMLTag& tag);
 	void ParseSurfaceLoad  (XMLTag& tag);
 	void ParseSurfaceLoad20(XMLTag& tag);
+
+protected:
+	bool BuildSurface(FESurface& s, FEFacetSet& f);
 };
