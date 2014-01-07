@@ -2,9 +2,13 @@
 #include "FECoreBase.h"
 
 //-----------------------------------------------------------------------------
+//! The constructor takes one argument, namely the SUPER_CLASS_ID which
+//! defines the type of class this is. (The SUPER_CLASS_ID was introduced to
+//! eliminate a lot of akward dynamic_casts.)
 FECoreBase::FECoreBase(SUPER_CLASS_ID sid) : m_sid(sid) { m_sztype = 0; }
 
 //-----------------------------------------------------------------------------
+//! destructor does nothing for now.
 FECoreBase::~FECoreBase(){}
 
 //-----------------------------------------------------------------------------

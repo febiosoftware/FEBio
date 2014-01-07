@@ -150,19 +150,19 @@ private:
 class FEParamContainer
 {
 public:
-	// constructor
+	//! constructor
 	FEParamContainer();
 
-	// destructor
+	//! destructor
 	virtual ~FEParamContainer();
 
-	// return the material's parameter list
+	//! return the material's parameter list
 	FEParameterList& GetParameterList();
 
 	//! find a parameter using it's name
 	virtual FEParam* GetParameter(const ParamString& s);
 
-	// serialize parameter data
+	//! serialize parameter data
 	virtual void Serialize(DumpFile& ar);
 
 public:
@@ -174,7 +174,7 @@ public:
 	virtual bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) { return false; }
 
 protected:
-	// This function will be overridden by each class that defines a parameter list
+	//! This function will be overridden by each class that defines a parameter list
 	virtual void BuildParamList() {}
 
 	//! Add a parameter to the list

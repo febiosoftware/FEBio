@@ -11,7 +11,10 @@ class FECoreFactory;
 class FECoreBase : public FEParamContainer
 {
 public:
+	//! constructor
 	FECoreBase(SUPER_CLASS_ID sid);
+
+	//! destructor
 	virtual ~FECoreBase();
 
 public:

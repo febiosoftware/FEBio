@@ -97,7 +97,7 @@ protected:
 public:
 	// --- The FE Model
 	//{
-		FEModel&	m_fem;
+		FEModel&	m_fem;	//!< reference to FE model
 	//}
 
 	// --- Control Data ---
@@ -126,7 +126,7 @@ public:
 	// --- Quasi-Newton Solver Variables ---
 	//{
 		// the FE solver
-		FESolver*	m_psolver;
+		FESolver*	m_psolver;	//!< pointer to solver class that will solve this step.
 
 		int		m_nretries;		//!< nr of retries tried so far
 		int		m_maxretries;	//!< max nr of retries allowed per time step
@@ -151,7 +151,7 @@ protected:
 	std::vector<FENLConstraint*>			m_NLC;	//!< non-linear constraints
 
 protected:
-	int		m_ntype;		// step type
+	int		m_ntype;		//!< step type
 };
 
 } // namespace FECore

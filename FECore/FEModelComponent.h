@@ -13,7 +13,10 @@ class FEModel;
 class FEModelComponent : public FECoreBase
 {
 public:
+	//! constructor
 	FEModelComponent(SUPER_CLASS_ID, FEModel* pfem);
+
+	//! destructor
 	virtual ~FEModelComponent();
 
 	//! return the FE model

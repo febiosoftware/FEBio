@@ -25,7 +25,7 @@ public:
 protected:
 	int		m_nID;		//!< unique ID for this BC.
 
-	static int	m_ncount;
+	static int	m_ncount;	//!< used to create unique ID's for the boundary conditions \todo is this really used?
 };
 
 } // namespace FECore
