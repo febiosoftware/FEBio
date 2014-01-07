@@ -10,19 +10,17 @@ class FESoluteFlux : public FESurfaceLoad
 public:
 	struct LOAD
 	{
-		LOAD() { s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = 1.0; bc = 0; }
-		
+		LOAD();
 		double	s[8];		// nodal scale factors
 		int		lc;			// load curve
-		int		bc;			// degree of freedom
 	};
 
 public:
 	//! constructor
-	FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem) { m_blinear = false; m_isol = 0; }
+	FESoluteFlux(FEModel* pfem);
 	
 	//! allocate storage
-	void Create(int n) { m_PC.resize(n); }
+	void Create(int n);
 
 	void SetLinear(bool blinear) { m_blinear = blinear; }
 
@@ -58,6 +56,7 @@ protected:
 	bool LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn, double dt);
 	
 protected:
+	double	m_flux;		//!< flux magnitude
 	bool	m_blinear;	//!< linear or not (true is non-follower, false is follower)
 	int		m_isol;		//!< solute index
 

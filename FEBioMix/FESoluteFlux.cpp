@@ -2,10 +2,34 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+FESoluteFlux::LOAD::LOAD()
+{ 
+	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = 1.0; 
+	lc = -1;
+}
+
+//-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FESoluteFlux, FESurfaceLoad)
+	ADD_PARAMETER(m_flux, FE_PARAM_DOUBLE, "flux");
 	ADD_PARAMETER(m_blinear, FE_PARAM_BOOL, "linear");
 	ADD_PARAMETER(m_isol, FE_PARAM_INT, "solute_id");
 END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! constructor
+FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem)
+{ 
+	m_flux = 1.0;
+	m_blinear = false; 
+	m_isol = 0; 
+}
+	
+//-----------------------------------------------------------------------------
+//! allocate storage
+void FESoluteFlux::Create(int n)
+{ 
+	m_PC.resize(n); 
+}
 
 //-----------------------------------------------------------------------------
 //! \deprecated Only used by the 1.2 file reader
@@ -232,7 +256,6 @@ void FESoluteFlux::Serialize(DumpFile& ar)
 			ar << fc.lc;
 			ar << fc.s[0] << fc.s[1] << fc.s[2] << fc.s[3];
 			ar << fc.s[4] << fc.s[5] << fc.s[6] << fc.s[7];
-			ar << fc.bc;
 		}
 	}
 	else
@@ -248,7 +271,6 @@ void FESoluteFlux::Serialize(DumpFile& ar)
 			ar >> fc.lc;
 			ar >> fc.s[0] >> fc.s[1] >> fc.s[2] >> fc.s[3];
 			ar >> fc.s[4] >> fc.s[5] >> fc.s[6] >> fc.s[7];
-			ar >> fc.bc;
 		}
 	}
 }
@@ -266,52 +288,50 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 	for (int m=0; m<nfr; ++m)
 	{
 		LOAD& fc = m_PC[m];
-		if (fc.bc == 0)
-		{
-			// get the surface element
-			FESurfaceElement& el = m_psurf->Element(m);
+		// get the surface element
+		FESurfaceElement& el = m_psurf->Element(m);
 			
-			// skip rigid surface elements
-			// TODO: do we really need to skip rigid elements?
-			if (!el.IsRigid())
-			{
-				// calculate nodal normal solute flux
-				int neln = el.Nodes();
-				vector<double> wn(neln);
+		// skip rigid surface elements
+		// TODO: do we really need to skip rigid elements?
+		if (!el.IsRigid())
+		{
+			// calculate nodal normal solute flux
+			int neln = el.Nodes();
+			vector<double> wn(neln);
 				
-				if (m_blinear == false)
-				{
-					double g = fem.GetLoadCurve(fc.lc)->Value();
+			if (m_blinear == false)
+			{
+				double g = m_flux;
+				if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
 					
-					for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
+				for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
 					
-					// get the element stiffness matrix
-					int ndof = neln*4;
-					ke.resize(ndof, ndof);
+				// get the element stiffness matrix
+				int ndof = neln*4;
+				ke.resize(ndof, ndof);
 					
-					// calculate pressure stiffness
-					FluxStiffness(el, ke, wn, dt);
+				// calculate pressure stiffness
+				FluxStiffness(el, ke, wn, dt);
 
-					// get the element's LM vector
-					m_psurf->UnpackLM(el, elm);
+				// get the element's LM vector
+				m_psurf->UnpackLM(el, elm);
 					
-					// TODO: the problem here is that the LM array that is returned by the UnpackElement
-					// function does not give the equation numbers in the right order. For this reason we
-					// have to create a new lm array and place the equation numbers in the right order.
-					// What we really ought to do is fix the UnpackElement function so that it returns
-					// the LM vector in the right order for solute-solid elements.
-					vector<int> lm(ndof);
-					for (int i=0; i<neln; ++i)
-					{
-						lm[4*i  ] = elm[3*i];
-						lm[4*i+1] = elm[3*i+1];
-						lm[4*i+2] = elm[3*i+2];
-						lm[4*i+3] = elm[(11+m_isol)*neln+i];
-					}
-					
-					// assemble element matrix in global stiffness matrix
-					psolver->AssembleStiffness(el.m_node, lm, ke);
+				// TODO: the problem here is that the LM array that is returned by the UnpackElement
+				// function does not give the equation numbers in the right order. For this reason we
+				// have to create a new lm array and place the equation numbers in the right order.
+				// What we really ought to do is fix the UnpackElement function so that it returns
+				// the LM vector in the right order for solute-solid elements.
+				vector<int> lm(ndof);
+				for (int i=0; i<neln; ++i)
+				{
+					lm[4*i  ] = elm[3*i];
+					lm[4*i+1] = elm[3*i+1];
+					lm[4*i+2] = elm[3*i+2];
+					lm[4*i+3] = elm[(11+m_isol)*neln+i];
 				}
+					
+				// assemble element matrix in global stiffness matrix
+				psolver->AssembleStiffness(el.m_node, lm, ke);
 			}
 		}
 	}
@@ -330,37 +350,36 @@ void FESoluteFlux::Residual(FEGlobalVector& R)
 	for (int i=0; i<nfr; ++i)
 	{
 		LOAD& fc = m_PC[i];
-		if (fc.bc == 0)
-		{
-			FESurfaceElement& el = m_psurf->Element(i);
-			
-			// calculate nodal normal solute flux
-			int neln = el.Nodes();
-			vector<double> wn(neln);
-			
-			double g = fem.GetLoadCurve(fc.lc)->Value();
-			
-			for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
-			
-			int ndof = neln;
-			fe.resize(ndof);
-			
-			if (m_blinear) LinearFlowRate(el, fe, wn, dt); else FlowRate(el, fe, wn, dt);
 
-			// get the element's LM vector
-			m_psurf->UnpackLM(el, elm);
+		FESurfaceElement& el = m_psurf->Element(i);
 			
-			// TODO: the problem here is that the LM array that is returned by the UnpackElement
-			// function does not give the equation numbers in the right order. For this reason we
-			// have to create a new lm array and place the equation numbers in the right order.
-			// What we really ought to do is fix the UnpackElement function so that it returns
-			// the LM vector in the right order for solute-solid elements.
-			vector<int> lm(ndof);
-			for (int i=0; i<neln; ++i)
-				lm[i] = elm[(11+m_isol)*neln+i];
+		// calculate nodal normal solute flux
+		int neln = el.Nodes();
+		vector<double> wn(neln);
 			
-			// add element force vector to global force vector
-			R.Assemble(el.m_node, lm, fe);
-		}
+		double g = m_flux;
+		if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
+			
+		for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
+			
+		int ndof = neln;
+		fe.resize(ndof);
+			
+		if (m_blinear) LinearFlowRate(el, fe, wn, dt); else FlowRate(el, fe, wn, dt);
+
+		// get the element's LM vector
+		m_psurf->UnpackLM(el, elm);
+			
+		// TODO: the problem here is that the LM array that is returned by the UnpackElement
+		// function does not give the equation numbers in the right order. For this reason we
+		// have to create a new lm array and place the equation numbers in the right order.
+		// What we really ought to do is fix the UnpackElement function so that it returns
+		// the LM vector in the right order for solute-solid elements.
+		vector<int> lm(ndof);
+		for (int i=0; i<neln; ++i)
+			lm[i] = elm[(11+m_isol)*neln+i];
+			
+		// add element force vector to global force vector
+		R.Assemble(el.m_node, lm, fe);
 	}
 }

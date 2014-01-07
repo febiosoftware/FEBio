@@ -3,10 +3,33 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+FEPressureLoad::LOAD::LOAD()
+{ 
+	lc = -1;
+	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = 1.0;
+}
+
+//-----------------------------------------------------------------------------
 // Parameter block for pressure loads
 BEGIN_PARAMETER_LIST(FEPressureLoad, FESurfaceLoad)
-	ADD_PARAMETER(m_blinear, FE_PARAM_BOOL, "linear");
+	ADD_PARAMETER(m_blinear , FE_PARAM_BOOL  , "linear"  );
+	ADD_PARAMETER(m_pressure, FE_PARAM_DOUBLE, "pressure");
 END_PARAMETER_LIST()
+
+//-----------------------------------------------------------------------------
+//! constructor
+FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem)
+{ 
+	m_blinear = false;
+	m_pressure = 1.0;
+}
+
+//-----------------------------------------------------------------------------
+//! allocate storage
+void FEPressureLoad::Create(int n)
+{
+	m_PC.resize(n); 
+}
 
 //-----------------------------------------------------------------------------
 //! \deprecated This function is only used by the 1.2 file reader and is to be 
@@ -282,7 +305,8 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 
 			if (m_blinear == false)
 			{
-				double g = fem.GetLoadCurve(pc.lc)->Value();
+				double g = m_pressure;
+				if (pc.lc >= 0) g *= fem.GetLoadCurve(pc.lc)->Value();
 
 				// evaluate the prescribed traction.
 				// note the negative sign. This is because this boundary condition uses the 
@@ -324,7 +348,8 @@ void FEPressureLoad::Residual(FEGlobalVector& R)
 		int neln = el.Nodes();
 		vector<double> tn(neln);
 
-		double g = fem.GetLoadCurve(pc.lc)->Value();
+		double g = m_pressure;
+		if (pc.lc >= 0) g *= fem.GetLoadCurve(pc.lc)->Value();
 
 		// evaluate the prescribed traction.
 		// note the negative sign. This is because this boundary condition uses the 

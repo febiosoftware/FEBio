@@ -9,17 +9,17 @@ class FEPoroNormalTraction : public FESurfaceLoad
 public:
 	struct LOAD
 	{
-		LOAD() { s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = 1.0; }
+		LOAD();
 		double	s[8];		// nodal scale factors
 		int		lc;			// load curve
 	};
 
 public:
 	//! constructor
-	FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem) { m_blinear = false; m_beffective = false; }
+	FEPoroNormalTraction(FEModel* pfem);
 
 	//! allocate storage
-	void Create(int n) { m_PC.resize(n); }
+	void Create(int n);
 
 	void SetLinear(bool blinear) { m_blinear = blinear; }
 
@@ -55,6 +55,7 @@ protected:
 	bool LinearTractionForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
 
 protected:
+	double	m_traction;		//!< traction value
 	bool	m_blinear;		//!< linear or not (true is non-follower, false is follower)
 	bool	m_beffective;	//!< effective or total normal traction
 

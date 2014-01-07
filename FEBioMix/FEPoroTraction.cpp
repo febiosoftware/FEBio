@@ -2,10 +2,34 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+FEPoroNormalTraction::LOAD::LOAD()
+{ 
+	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = 1.0; 
+	lc = -1;
+}
+
+//-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEPoroNormalTraction, FESurfaceLoad)
-	ADD_PARAMETER(m_blinear, FE_PARAM_BOOL, "linear");
-	ADD_PARAMETER(m_beffective, FE_PARAM_BOOL, "effective");
+	ADD_PARAMETER(m_traction  , FE_PARAM_DOUBLE, "traction" );
+	ADD_PARAMETER(m_blinear   , FE_PARAM_BOOL  , "linear"   );
+	ADD_PARAMETER(m_beffective, FE_PARAM_BOOL  , "effective");
 END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! constructor
+FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem)
+{ 
+	m_traction = 1.0;
+	m_blinear = false; 
+	m_beffective = false; 
+}
+
+//-----------------------------------------------------------------------------
+//! allocate storage
+void FEPoroNormalTraction::Create(int n)
+{ 
+	m_PC.resize(n); 
+}
 
 //-----------------------------------------------------------------------------
 //! \deprecated This function is only needed for the 1.2 file format which is obsolete
@@ -347,7 +371,8 @@ void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 
 			if (m_blinear == false)
 			{
-				double g = fem.GetLoadCurve(pc.lc)->Value();
+				double g = m_traction;
+				if (pc.lc >= 0) g *= fem.GetLoadCurve(pc.lc)->Value();
 
 				// evaluate the prescribed traction.
 				for (int j=0; j<neln; ++j) tn[j] = g*pc.s[j];
@@ -395,7 +420,8 @@ void FEPoroNormalTraction::Residual(FEGlobalVector& R)
 		// calculate nodal normal tractions
 		vector<double> tn(neln);
 
-		double g = fem.GetLoadCurve(pc.lc)->Value();
+		double g = m_traction;
+		if (pc.lc >= 0) g *= fem.GetLoadCurve(pc.lc)->Value();
 
 		// evaluate the prescribed traction.
 		for (int j=0; j<neln; ++j) tn[j] = g*pc.s[j];
