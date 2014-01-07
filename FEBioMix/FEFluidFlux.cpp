@@ -3,10 +3,32 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+FEFluidFlux::LOAD::LOAD()
+{ 
+	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = 1.0; 
+	lc = -1; 
+}
+
+//-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEFluidFlux, FESurfaceLoad)
-	ADD_PARAMETER(m_blinear, FE_PARAM_BOOL, "linear");
-	ADD_PARAMETER(m_bmixture, FE_PARAM_BOOL, "mixture");
+	ADD_PARAMETER(m_flux    , FE_PARAM_DOUBLE, "flux"   );
+	ADD_PARAMETER(m_blinear , FE_PARAM_BOOL  , "linear" );
+	ADD_PARAMETER(m_bmixture, FE_PARAM_BOOL  , "mixture");
 END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+FEFluidFlux::FEFluidFlux(FEModel* pfem) : FESurfaceLoad(pfem)
+{ 
+	m_blinear = false; 
+	m_bmixture = false; 
+	m_flux = 1.0;
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidFlux::Create(int n) 
+{ 
+	m_PC.resize(n); 
+}
 
 //-----------------------------------------------------------------------------
 //! \deprecated This is only used in the 1.2 file format which is obsolete
@@ -472,7 +494,6 @@ void FEFluidFlux::Serialize(DumpFile& ar)
 			ar << fc.lc;
 			ar << fc.s[0] << fc.s[1] << fc.s[2] << fc.s[3];
 			ar << fc.s[4] << fc.s[5] << fc.s[6] << fc.s[7];
-			ar << fc.bc;
 		}
 	}
 	else
@@ -487,7 +508,6 @@ void FEFluidFlux::Serialize(DumpFile& ar)
 			ar >> fc.lc;
 			ar >> fc.s[0] >> fc.s[1] >> fc.s[2] >> fc.s[3];
 			ar >> fc.s[4] >> fc.s[5] >> fc.s[6] >> fc.s[7];
-			ar >> fc.bc;
 		}
 	}
 }
@@ -509,37 +529,36 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 		for (int m=0; m<nfr; ++m)
 		{
 			LOAD& fc = m_PC[m];
-			if (fc.bc == 0)
-			{
-				// get the surface element
-				FESurfaceElement& el = m_psurf->Element(m);
+
+			// get the surface element
+			FESurfaceElement& el = m_psurf->Element(m);
 				
-				// skip rigid surface elements
-				// TODO: do we really need to skip rigid elements?
-				if (!el.IsRigid())
+			// skip rigid surface elements
+			// TODO: do we really need to skip rigid elements?
+			if (!el.IsRigid())
+			{
+				m_psurf->UnpackLM(el, elm);
+					
+				// calculate nodal normal fluid flux
+				int neln = el.Nodes();
+				vector<double> wn(neln);
+					
+				if (!m_blinear || m_bmixture)
 				{
-					m_psurf->UnpackLM(el, elm);
-					
-					// calculate nodal normal fluid flux
-					int neln = el.Nodes();
-					vector<double> wn(neln);
-					
-					if (!m_blinear || m_bmixture)
-					{
-						double g = fem.GetLoadCurve(fc.lc)->Value();
+					double g = m_flux;
+					if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
 						
-						for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
+					for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
 						
-						// get the element stiffness matrix
-						int ndof = neln*4;
-						ke.resize(ndof, ndof);
+					// get the element stiffness matrix
+					int ndof = neln*4;
+					ke.resize(ndof, ndof);
 						
-						// calculate pressure stiffness
-						FluxStiffnessSS(el, ke, wn, dt, m_bmixture);
+					// calculate pressure stiffness
+					FluxStiffnessSS(el, ke, wn, dt, m_bmixture);
 						
-						// assemble element matrix in global stiffness matrix
-						psolver->AssembleStiffness(el.m_node, elm, ke);
-					}
+					// assemble element matrix in global stiffness matrix
+					psolver->AssembleStiffness(el.m_node, elm, ke);
 				}
 			}
 		}
@@ -549,37 +568,36 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 		for (int m=0; m<nfr; ++m)
 		{
 			LOAD& fc = m_PC[m];
-			if (fc.bc == 0)
-			{
-				// get the surface element
-				FESurfaceElement& el = m_psurf->Element(m);
+
+			// get the surface element
+			FESurfaceElement& el = m_psurf->Element(m);
 				
-				// skip rigid surface elements
-				// TODO: do we really need to skip rigid elements?
-				if (!el.IsRigid())
+			// skip rigid surface elements
+			// TODO: do we really need to skip rigid elements?
+			if (!el.IsRigid())
+			{
+				m_psurf->UnpackLM(el, elm);
+					
+				// calculate nodal normal fluid flux
+				int neln = el.Nodes();
+				vector<double> wn(neln);
+					
+				if (!m_blinear || m_bmixture)
 				{
-					m_psurf->UnpackLM(el, elm);
-					
-					// calculate nodal normal fluid flux
-					int neln = el.Nodes();
-					vector<double> wn(neln);
-					
-					if (!m_blinear || m_bmixture)
-					{
-						double g = fem.GetLoadCurve(fc.lc)->Value();
+					double g = m_flux;
+					if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
 						
-						for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
+					for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
 						
-						// get the element stiffness matrix
-						int ndof = neln*4;
-						ke.resize(ndof, ndof);
+					// get the element stiffness matrix
+					int ndof = neln*4;
+					ke.resize(ndof, ndof);
 						
-						// calculate pressure stiffness
-						FluxStiffness(el, ke, wn, dt, m_bmixture);
+					// calculate pressure stiffness
+					FluxStiffness(el, ke, wn, dt, m_bmixture);
 						
-						// assemble element matrix in global stiffness matrix
-						psolver->AssembleStiffness(el.m_node, elm, ke);
-					}
+					// assemble element matrix in global stiffness matrix
+					psolver->AssembleStiffness(el.m_node, elm, ke);
 				}
 			}
 		}
@@ -604,61 +622,58 @@ void FEFluidFlux::Residual(FEGlobalVector& R)
 		for (int i=0; i<nfr; ++i)
 		{
 			LOAD& fc = m_PC[i];
-			if (fc.bc == 0)
-			{
-				FESurfaceElement& el = m_psurf->Element(i);
-				m_psurf->UnpackLM(el, elm);
+
+			FESurfaceElement& el = m_psurf->Element(i);
+			m_psurf->UnpackLM(el, elm);
 				
-				// calculate nodal normal fluid flux
-				int neln = el.Nodes();
-				vector<double> wn(neln);
+			// calculate nodal normal fluid flux
+			int neln = el.Nodes();
+			vector<double> wn(neln);
 				
-				double g = fem.GetLoadCurve(fc.lc)->Value();
+			double g = m_flux;
+			if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
 				
-				for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
+			for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
 				
-				int ndof = 4*neln;
-				fe.resize(ndof);
+			int ndof = 4*neln;
+			fe.resize(ndof);
 				
-				if (m_blinear == true) 
-					LinearFlowRateSS(el, fe, wn, dt, m_bmixture);
-				else
-					FlowRateSS(el, fe, wn, dt, m_bmixture);
+			if (m_blinear == true) 
+				LinearFlowRateSS(el, fe, wn, dt, m_bmixture);
+			else
+				FlowRateSS(el, fe, wn, dt, m_bmixture);
 				
-				// add element force vector to global force vector
-				R.Assemble(el.m_node, elm, fe);
-			}
+			// add element force vector to global force vector
+			R.Assemble(el.m_node, elm, fe);
 		}
 	}
 	else {
 		for (int i=0; i<nfr; ++i)
 		{
 			LOAD& fc = m_PC[i];
-			if (fc.bc == 0)
-			{
-				FESurfaceElement& el = m_psurf->Element(i);
-				m_psurf->UnpackLM(el, elm);
+
+			FESurfaceElement& el = m_psurf->Element(i);
+			m_psurf->UnpackLM(el, elm);
 				
-				// calculate nodal normal fluid flux
-				int neln = el.Nodes();
-				vector<double> wn(neln);
+			// calculate nodal normal fluid flux
+			int neln = el.Nodes();
+			vector<double> wn(neln);
 				
-				double g = fem.GetLoadCurve(fc.lc)->Value();
+			double g = m_flux;
+			if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
 				
-				for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
+			for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
 				
-				int ndof = 4*neln;
-				fe.resize(ndof);
+			int ndof = 4*neln;
+			fe.resize(ndof);
 				
-				if (m_blinear == true) 
-					LinearFlowRate(el, fe, wn, dt, m_bmixture);
-				else
-					FlowRate(el, fe, wn, dt, m_bmixture);
+			if (m_blinear == true) 
+				LinearFlowRate(el, fe, wn, dt, m_bmixture);
+			else
+				FlowRate(el, fe, wn, dt, m_bmixture);
 				
-				// add element force vector to global force vector
-				R.Assemble(el.m_node, elm, fe);
-			}
+			// add element force vector to global force vector
+			R.Assemble(el.m_node, elm, fe);
 		}
 	}
-
 }

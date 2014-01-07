@@ -9,10 +9,10 @@ class FEConvectiveHeatFlux : public FESurfaceLoad
 public:
 	struct LOAD
 	{
+		LOAD();
 		double	hc;			// heat transfer coefficient
 		double	s[8];		// nodal scale factors
 		int		lc;			// load curve describing ambient temperature
-		LOAD()  { s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = 1.0; lc = -1; }
 	};
 
 public:
@@ -39,7 +39,7 @@ public:
 
 private:
 	double	m_hc;		//!< heat transfer coefficient
-	double	m_flux;		//!< convective heat flux
+	double	m_Ta;		//!< ambient temperature
 
 protected:
 	void ElementStiffness(FESurfaceElement& el, matrix& ke, double hc);

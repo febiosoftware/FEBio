@@ -2,16 +2,24 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+FEConvectiveHeatFlux::LOAD::LOAD()
+{ 
+	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = 1.0;
+	hc = 0.0;
+	lc = -1; 
+}
+
+//-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEConvectiveHeatFlux, FESurfaceLoad)
-	ADD_PARAMETER(m_hc   , FE_PARAM_DOUBLE, "hc"  );
-	ADD_PARAMETER(m_flux , FE_PARAM_DOUBLE, "flux");
+	ADD_PARAMETER(m_hc, FE_PARAM_DOUBLE, "hc");
+	ADD_PARAMETER(m_Ta, FE_PARAM_DOUBLE, "Ta");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 FEConvectiveHeatFlux::FEConvectiveHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem)
 {
 	m_hc = 0;
-	m_flux = 1.0;
+	m_Ta = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -20,13 +28,8 @@ void FEConvectiveHeatFlux::Create(int n)
 	m_FC.resize(n);
 
 	// let's initialize the m_FC data array
-	// NOTE: This assumes that the parameters are read in before the surface in the input file
-	for (int i=0; i<n; ++i)
-	{
-		m_FC[i].hc = m_hc;
-		m_FC[i].lc = -1;
-		for (int j=0; j<8; ++j) m_FC[i].s[j] = 1.0;
-	}
+	// NOTE: This assumes that the hc parameter is read in before the surface in the input file
+	for (int i=0; i<n; ++i) m_FC[i].hc = m_hc;
 }
 
 //-----------------------------------------------------------------------------
@@ -46,7 +49,7 @@ void FEConvectiveHeatFlux::Residual(FEGlobalVector& R)
 		int ni = el.GaussPoints();
 
 		// get ambient temperature
-		double Tc = m_flux;
+		double Tc = m_Ta;
 		if (hf.lc >= 0) Tc *= fem.GetLoadCurve(hf.lc)->Value();
 
 		// calculate nodal fluxes

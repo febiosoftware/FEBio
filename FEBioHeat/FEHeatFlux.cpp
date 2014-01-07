@@ -2,6 +2,13 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+FEHeatFlux::LOAD::LOAD()
+{ 
+	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = 1.0; 
+	lc = -1; 
+}
+
+//-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEHeatFlux, FESurfaceLoad)
 	ADD_PARAMETER(m_flux, FE_PARAM_DOUBLE, "flux");
 END_PARAMETER_LIST();
@@ -17,12 +24,6 @@ FEHeatFlux::FEHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem)
 void FEHeatFlux::Create(int n)
 { 
 	m_FC.resize(n);
-
-	for (int i=0; i<n; ++i)
-	{
-		m_FC[i].lc = -1;
-		for (int j=0; j<8; ++j) m_FC[i].s[j] = 1.0;
-	}
 }
 
 //-----------------------------------------------------------------------------
