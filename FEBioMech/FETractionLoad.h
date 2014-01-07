@@ -10,21 +10,22 @@ class FETractionLoad : public FESurfaceLoad
 public:
 	struct LOAD
 	{
+		LOAD();
 		vec3d	s[8];		// nodal scale factors
 		int		lc;			// load curve
 	};
 
 public:
 	//! constructor
-	FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem) {}
+	FETractionLoad(FEModel* pfem);
 
 	//! allocate storage
-	void Create(int n) { m_TC.resize(n); }
+	void Create(int n);
 
 	//! get a traction load BC
 	LOAD& TractionLoad(int n) { return m_TC[n]; }
 
-	//! calculate pressure stiffness
+	//! calculate traction stiffness (there is none)
 	void StiffnessMatrix(FESolver* psolver) {}
 
 	//! calculate residual
@@ -37,6 +38,12 @@ public:
 	//! set an attribute of a surface facet
 	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);
 
+private:
+	double	m_scale;	//!< magnitude of traction load
+	vec3d	m_traction;	//!< traction vector
+
 protected:
 	vector<LOAD>	m_TC;		//!< traction boundary cards
+
+	DECLARE_PARAMETER_LIST();
 };

@@ -3,6 +3,40 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+FETractionLoad::LOAD::LOAD()
+{
+	lc = -1;
+	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = vec3d(0,0,0);
+}
+
+//=============================================================================
+BEGIN_PARAMETER_LIST(FETractionLoad, FESurfaceLoad)
+	ADD_PARAMETER(m_scale   , FE_PARAM_DOUBLE, "scale"   );
+	ADD_PARAMETER(m_traction, FE_PARAM_VEC3D , "traction");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! constructor
+FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem)
+{
+	m_traction = vec3d(0,0,0);
+	m_scale = 1.0;
+}
+
+//-----------------------------------------------------------------------------
+//! allocate storage
+void FETractionLoad::Create(int n)
+{
+	m_TC.resize(n); 
+
+	// TODO: This assumes the traction vector was read in before the surface
+	for (int i=0; i<n; i++)
+	{
+		for (int j=0; j<8; ++j) m_TC[i].s[j] = m_traction;
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the residual for the traction load
 void FETractionLoad::Residual(FEGlobalVector& R)
 {
@@ -20,7 +54,8 @@ void FETractionLoad::Residual(FEGlobalVector& R)
 		LOAD& pc = m_TC[iel];
 		FESurfaceElement& el = m_psurf->Element(iel);
 
-		double g = fem.GetLoadCurve(pc.lc)->Value();
+		double g = m_scale;
+		if (pc.lc >= 0) g *= fem.GetLoadCurve(pc.lc)->Value();
 
 		int ndof = 3*el.Nodes();
 		fe.resize(ndof);
@@ -112,6 +147,7 @@ void FETractionLoad::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+// \deprecated This is only needed for parsing the obsolete 1.2 format
 bool FETractionLoad::SetFacetAttribute(int nface, const char* szatt, const char* szval)
 {
 	LOAD& tc = TractionLoad(nface);
