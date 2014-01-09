@@ -567,7 +567,31 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 		// write nodal data
 		int nn = m.Nodes();
 		ar << nn;
-		for (i=0; i<nn; ++i) ar.write(&m.Node(i), sizeof(FENode), 1);
+		for (i=0; i<nn; ++i)
+		{
+			ar << m.Node(i).m_ap;
+			ar << m.Node(i).m_at;
+			ar << m.Node(i).m_BC;
+			ar << m.Node(i).m_bshell;
+			ar << m.Node(i).m_c0;
+			ar << m.Node(i).m_cp;
+			ar << m.Node(i).m_ct;
+			ar << m.Node(i).m_D0;
+			ar << m.Node(i).m_Dt;
+			ar << m.Node(i).m_Fr;
+			ar << m.Node(i).m_ID;
+			ar << m.Node(i).m_p0;
+			ar << m.Node(i).m_p0;
+			ar << m.Node(i).m_pt;
+			ar << m.Node(i).m_r0;
+			ar << m.Node(i).m_rid;
+			ar << m.Node(i).m_rp;
+			ar << m.Node(i).m_rt;
+			ar << m.Node(i).m_T;
+			ar << m.Node(i).m_v0;
+			ar << m.Node(i).m_vp;
+			ar << m.Node(i).m_vt;
+		}
 
 		// write domain data
 		int ND = m.Domains();
@@ -591,7 +615,31 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 		int nn;
 		ar >> nn;
 		m.CreateNodes(nn);
-		for (int i=0; i<nn; ++i) ar.read(&m.Node(i), sizeof(FENode), 1);
+		for (int i=0; i<nn; ++i)
+		{
+			ar >> m.Node(i).m_ap;
+			ar >> m.Node(i).m_at;
+			ar >> m.Node(i).m_BC;
+			ar >> m.Node(i).m_bshell;
+			ar >> m.Node(i).m_c0;
+			ar >> m.Node(i).m_cp;
+			ar >> m.Node(i).m_ct;
+			ar >> m.Node(i).m_D0;
+			ar >> m.Node(i).m_Dt;
+			ar >> m.Node(i).m_Fr;
+			ar >> m.Node(i).m_ID;
+			ar >> m.Node(i).m_p0;
+			ar >> m.Node(i).m_p0;
+			ar >> m.Node(i).m_pt;
+			ar >> m.Node(i).m_r0;
+			ar >> m.Node(i).m_rid;
+			ar >> m.Node(i).m_rp;
+			ar >> m.Node(i).m_rt;
+			ar >> m.Node(i).m_T;
+			ar >> m.Node(i).m_v0;
+			ar >> m.Node(i).m_vp;
+			ar >> m.Node(i).m_vt;
+		}
 
 		// read domain data
 		int ND;
