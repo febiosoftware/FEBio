@@ -9,6 +9,7 @@
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FECoreKernel.h"
+#include "FECore/DOFS.h"
 #include "version.h"
 
 //-----------------------------------------------------------------------------
@@ -558,12 +559,16 @@ void FEBioModel::SerializeGeometry(DumpFile &ar)
 
 void FEBioModel::SerializeMesh(DumpFile& ar)
 {
+    DOFS& fedofs = *DOFS::GetInstance();
 	FEMesh& m = m_mesh;
 
 	if (ar.IsSaving())
 	{
 		int i;
 
+		// write DOFS
+		ar << fedofs.GetNDOFS() << fedofs.GetCDOFS();
+		
 		// write nodal data
 		int nn = m.Nodes();
 		ar << nn;
@@ -611,6 +616,12 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 	{
 		FECoreKernel& febio = FECoreKernel::GetInstance();
 
+		// read DOFS
+		int MAX_NDOFS, MAX_CDOFS;
+		ar >> MAX_NDOFS >> MAX_CDOFS;
+		fedofs.SetNDOFS(MAX_NDOFS);
+		fedofs.SetCDOFS(MAX_CDOFS);
+		
 		// read nodal data
 		int nn;
 		ar >> nn;
