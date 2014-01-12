@@ -52,7 +52,7 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 			pt.m_s.zero();
 
 			// get the tangent (stiffness) and it inverse (compliance) at this point
-			tens4ds S = pme->Tangent(pt);
+			tens4ds S = pme->Tangent(mp);
 			tens4ds C = S.inverse();
 
 			// evaluate element surface normal at parametric center
