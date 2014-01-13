@@ -179,6 +179,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioOpt\FEConstrainedLMOptimizeMethod.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioOpt\FELMOptimizeMethod.cpp"
 				>
 			</File>
@@ -188,6 +192,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioOpt\FEPowellOptimizeMethod.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioOpt\FEScanOptimizeMethod.cpp"
 				>
 			</File>
 		</Filter>
@@ -201,6 +209,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioOpt\FEConstrainedLMOptimizeMethod.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioOpt\FELMOptimizeMethod.h"
 				>
 			</File>
@@ -210,6 +222,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioOpt\FEPowellOptimizeMethod.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioOpt\FEScanOptimizeMethod.h"
 				>
 			</File>
 			<File

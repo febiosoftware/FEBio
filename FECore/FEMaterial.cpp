@@ -87,6 +87,7 @@ void FEMaterial::Serialize(DumpFile &ar)
 	if (ar.IsSaving())
 	{
 		ar << m_nID;
+		ar << m_nRB;
 
 		int ntype = -1;
 		if (m_pmap) ntype = m_pmap->m_ntype;
@@ -99,6 +100,7 @@ void FEMaterial::Serialize(DumpFile &ar)
 	else
 	{
 		ar >> m_nID;
+		ar >> m_nRB;
 
 		int ntype;
 		ar >> ntype;
