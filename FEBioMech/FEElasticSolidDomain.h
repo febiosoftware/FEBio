@@ -50,9 +50,6 @@ public: // overrides from FEElasticDomain
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolver* psolver);
 
-	//! calculates the stiffness matrix from the residual
-	void ResidualStiffness(FESolver* psolver);
-
 	//! calculates inertial stiffness
 	void InertialStiffness(FESolver* psolver);
 

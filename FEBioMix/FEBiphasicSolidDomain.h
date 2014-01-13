@@ -18,13 +18,6 @@ public:
 	//! reset domain data
 	void Reset();
 	
-/*	//! return element stiffness matrix
-	void ElementStiffness(FEModel& fem, int iel, matrix& ke) {
-		FESolidElement& el = Element(iel);
-		ElementBiphasicStiffness(fem, el, ke);
-	}
-*/
-
 public: // overrides from FEElasticDomain
 
 	// update stresses
