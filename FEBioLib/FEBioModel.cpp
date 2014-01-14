@@ -506,11 +506,14 @@ void FEBioModel::SerializeMaterials(DumpFile& ar)
 			// read all parameters
 			pmat->Serialize(ar);
 
-			// call init in case this function initializes other data
-			pmat->Init();
-
 			// Add material and parameter list to FEM
 			AddMaterial(pmat);
+
+			// initialize the rigid bodies
+			FEModel::InitObjects();
+
+			// call init in case this function initializes other data
+			pmat->Init();
 		}
 	}
 }
