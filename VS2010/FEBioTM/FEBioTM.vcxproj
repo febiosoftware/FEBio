@@ -138,7 +138,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)..;$(FlexDir)\include;$(FLTKDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..;$(FLEXDir)\Flex;$(FLTKDir);$(IncludePath)</IncludePath>
     <LibraryPath>$(FLTKDir)\lib;$(FLEXDir)\lib;$(MKLDir)\ia32\lib;$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
@@ -168,13 +168,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(FLTKDir);$(FLEXDir)\include;$(SolutionDir)..;$(IncludePath)</IncludePath>
+    <IncludePath>$(FLTKDir);$(FLEXDir)\Flex;$(SolutionDir)..;$(IncludePath)</IncludePath>
     <LibraryPath>$(FLTKDir)\lib;$(FLEXDir)\lib;$(MKLDir)\ia32\lib;$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\steve\Documents\fltk-1.3.0;C:\Users\steve\Documents\Flex\include;C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Intel\MKL\10.1.1.022\ia32\lib;C:\Users\steve\Documents\Flex\lib;C:\Users\steve\Documents\fltk-1.3.0\lib;C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2\VS2010\x64\Release;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(FLTKDir);$(FLEXDir)\Flex;$(SolutionDir)..;$(IncludePath)</IncludePath>
+    <LibraryPath>$(MKLDir)\em64t\lib;$(FLEXDir)\lib64;$(FLTKDir)\lib64;$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -199,7 +199,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fecored.lib;numcored.lib;febiolibd.lib;febiomechd.lib;febioheatd.lib;febiomixd.lib;febioplotd.lib;febioxmld.lib;fltkd.lib;fltkzlibd.lib;fltkimagesd.lib;fltkjpegd.lib;fltkpngd.lib;flexd.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_solver.lib;libiomp5mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecored.lib;numcored.lib;febiolibd.lib;febiomechd.lib;febioheatd.lib;febiomixd.lib;febioplotd.lib;febioxmld.lib;fltkd.lib;fltkzlibd.lib;fltkimagesd.lib;fltkjpegd.lib;fltkpngd.lib;flexd.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
@@ -296,7 +296,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febiolib.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioplot.lib;febioxml.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_solver.lib;libiomp5mt.lib;flex.lib;fltk.lib;fltkzlib.lib;fltkimages.lib;fltkjpeg.lib;fltkpng.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;febiolib.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioplot.lib;febioxml.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;flex.lib;fltk.lib;fltkzlib.lib;fltkimages.lib;fltkjpeg.lib;fltkpng.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -314,7 +314,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febiolib.lib;febioplot.lib;febioxml.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_solver.lib;libiomp5mt.lib;flex.lib;fltk.lib;fltkzlib.lib;fltkimages.lib;fltkjpeg.lib;fltkpng.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;febiolib.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioplot.lib;febioxml.lib;mkl_intel_lp64.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;flex.lib;fltk.lib;fltkzlib.lib;fltkimages.lib;fltkjpeg.lib;fltkpng.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|Win32'">
