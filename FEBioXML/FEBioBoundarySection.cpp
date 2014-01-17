@@ -609,34 +609,38 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	{
 		// --- R I G I D   W A L L   I N T E R F A C E ---
 
-		FERigidWallInterface* ps = new FERigidWallInterface(&fem);
-		fem.AddSurfacePairInteraction(ps);
-
-		++tag;
-		do
+		FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, szt, GetFEModel()));
+		if (ps)
 		{
-			if (m_pim->ReadParameter(tag, ps) == false)
-			{
-				if (tag == "surface")
-				{
-					FERigidWallSurface& s = ps->m_ss;
+			fem.AddSurfacePairInteraction(ps);
 
-					int nfmt = 0;
-					const char* szfmt = tag.AttributeValue("format", true);
-					if (szfmt)
-					{
-						if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
-						else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
-					}
-
-					// read the surface section
-					ParseSurfaceSection(tag, s, nfmt, true);
-				}
-				else throw XMLReader::InvalidTag(tag);
-			}
 			++tag;
+			do
+			{
+				if (m_pim->ReadParameter(tag, ps) == false)
+				{
+					if (tag == "surface")
+					{
+						FERigidWallSurface& s = ps->m_ss;
+
+						int nfmt = 0;
+						const char* szfmt = tag.AttributeValue("format", true);
+						if (szfmt)
+						{
+							if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+							else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+						}
+
+						// read the surface section
+						ParseSurfaceSection(tag, s, nfmt, true);
+					}
+					else throw XMLReader::InvalidTag(tag);
+				}
+				++tag;
+			}
+			while (!tag.isend());
 		}
-		while (!tag.isend());
+		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 	}
 	else if (strcmp(szt, "rigid") == 0)
 	{
@@ -673,7 +677,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	{
 		// --- R I G I D   J O I N T   I N T E R F A C E ---
 
-		FERigidJoint* prj = new FERigidJoint(&fem);
+		FERigidJoint* prj = dynamic_cast<FERigidJoint*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, szt, GetFEModel()));
 		FEParameterList& pl = prj->GetParameterList();
 		++tag;
 		do
@@ -694,7 +698,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		if (tag.isleaf()) return;
 
 		// create a new linear constraint manager
-		FELinearConstraintSet* pLCS = new FELinearConstraintSet(&fem);
+		FELinearConstraintSet* pLCS = dynamic_cast<FELinearConstraintSet*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, szt, GetFEModel()));
 		fem.AddNonlinearConstraint(pLCS);
 
 		// read the linear constraints
