@@ -57,7 +57,7 @@ void print_banner()
 	printf("  University of Utah                                                       \n");
 	printf("  http://mrl.sci.utah.edu                                                  \n");
 	printf("                                                                           \n");
-	printf("  copyright (c) 2006-2013 - All rights reserved                            \n");
+	printf("  copyright (c) 2006-2014 - All rights reserved                            \n");
 	printf("                                                                           \n");
 	pwnd->Write(sz, 0xF0 );
 	printf("\n\n");
@@ -99,7 +99,7 @@ void Hello()
 	felog.printf("  University of Utah                                                       \n");
 	felog.printf("  http://mrl.sci.utah.edu                                                  \n");
 	felog.printf("                                                                           \n");
-	felog.printf("  copyright (c) 2006-2013 - All rights reserved                            \n");
+	felog.printf("  copyright (c) 2006-2014 - All rights reserved                            \n");
 	if(nlic == 0)
 	{
 		felog.printf("                                                                              \n");

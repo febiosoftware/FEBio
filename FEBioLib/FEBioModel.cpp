@@ -90,7 +90,7 @@ void FEBioModel::SetInputFilename(const char* szfile)
 	m_szfile_title = strrchr(m_szfile, '/');
 	if (m_szfile_title == 0) 
 	{
-		m_szfile_title = strchr(m_szfile, '\\'); 
+		m_szfile_title = strrchr(m_szfile, '\\'); 
 		if (m_szfile_title == 0) m_szfile_title = m_szfile; else ++m_szfile_title;
 	}
 	else ++m_szfile_title;

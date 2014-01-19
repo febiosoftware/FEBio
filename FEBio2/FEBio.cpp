@@ -24,7 +24,7 @@
 //
 // This software is developed at the Musculoskeletal Research Laboratories
 // at the University of Utah. All rights reserved.
-// Copyright (c) 2006 - 2013
+// Copyright (c) 2006 - 2014
 //
 // The subversion (svn) revision number of this code can be found in the file
 // FEBio/svnrev.h
@@ -122,11 +122,14 @@ void update_console_cb(FEModel* pfem, void* pd)
 	// set the title of the console window.
 	Console* pShell = Console::GetHandle();
 
+	char szvers[32] = {0};
+	sprintf(szvers, "FEBio %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
+
 	// print progress in title bar
 	if (nsteps > 1)
-		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", fem.m_nStep+1, nsteps, f, fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
+		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s %s", fem.m_nStep+1, nsteps, f, fem.GetFileTitle(), szvers, (bdebug?"(debug mode)": ""));
 	else
-		pShell->SetTitle("(%.f%%) %s - %s", f, fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
+		pShell->SetTitle("(%.f%%) %s - %s %s", f, fem.GetFileTitle(), szvers, (bdebug?"(debug mode)": ""));
 }
 
 //-----------------------------------------------------------------------------
