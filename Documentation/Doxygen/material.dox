@@ -1,11 +1,10 @@
 /**
-\page material Adding new materials
+\page material Material Plugins
 
-FEBio allows the user to create new material implementations in a simple and straightforward 
-manner with a minimum of modifications to the code. The new material will be integrated seamlessly
-in FEBio's framework so that the user can take immediate advantage of additional functionality
-such as reading material parameters from the xml-formatted FEBio input file, serialization to the
-restart archive, parameter optimization and more.
+In this section we will look at the details of setting up a plugin that implemetns a new constitutive
+model. The new material will be integrated seamlessly in FEBio's framework so that the user can take
+immediate advantage of additional functionality such as reading material parameters from the xml-formatted
+FEBio input file, serialization to the restart archive, parameter optimization and more.
 
 The basic procedure for creating a new material for FEBio requires the following steps.
 
@@ -76,19 +75,23 @@ class' material parameters.
 \subsection step2 Registering the new material
 
 In order for FEBio to recognize the new material, the material needs to be registered with the framework.
-A macro is defined to help with the registration of the new class. This macro which actually registers the 
-class with the framework, is placed in intialization function of the module (e.g. FEBioMech::InitModule).
+In a plugin, this is done by defining a factory class and creating an instance of this class and then passing 
+a pointer to the factory back to FEBio in the PluginGetFactory function.
+
+A material factory class can be defined like this.
 
 \code
-REGISTER_FEBIO_CLASS(FENeoHookean, FEMATERIAL_ID, "neo-Hookean");
+class MyFactory : public FECoreFactory
+{
+public:
+	MyFactory() : FECoreFactory(FEMATERIAL_ID, "my_material"){}
+	void* Create(FEModel* pfem) { return new MyMaterial(pfem); }
+};
 \endcode
 
-This macro takes three parameters: the class that needs to be registered, the core class ID identifying
-what type of class is defined (in this case it is FEMATERIAL_ID since we are creating a material) and a
-text parameter that defines the name of the class. The name of the class is used in several places to identify 
-the new material and must be unique (that is, two materials cannot have the same name). This name will be 
-used, for instance, as the value of the type parameter in the xml-formatted input file. This aspect will
-be explained further when the use of the new material is discussed. 
+Note that the constructor of the base class FECoreFactory takes two parameters. A super class ID which defines the type
+of class that the factory creates (a material in this case) and a name that uniquely defines the class. This name will 
+later be used to define the material in the user-input file and can also be used for other purposes.
 
 \subsection step3 Defining the material parameters
 

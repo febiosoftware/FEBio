@@ -7,9 +7,8 @@ Copyright (c) 2006 - 2013
 
 \li \subpage intro
 \li \subpage febio
-\li \subpage material
-\li \subpage callback
 \li \subpage restart
 \li \subpage plugins
+\li \subpage febiolib
 
 */

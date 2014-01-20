@@ -42,5 +42,4 @@ FEModel fem;
 fem.AddCallback(my_cb, CB_ALWAYS, 0);
 \endcode
 
-
 */
