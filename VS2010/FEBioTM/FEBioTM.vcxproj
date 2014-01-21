@@ -158,7 +158,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug OpenMP|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(FLTKDir);$(FLEXDir)\include;$(SolutionDir)..;$(IncludePath)</IncludePath>
+    <IncludePath>$(FLTKDir);$(FLEXDir)\Flex;$(SolutionDir)..;$(IncludePath)</IncludePath>
     <LibraryPath>$(FLTKDir)\lib;$(FLEXDir)\lib;$(MKLDir)\ia32\lib;$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug OpenMP|x64'">
@@ -178,7 +178,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(FLTKDir);$(FLEXDir)\include;$(SolutionDir)..;$(IncludePath)</IncludePath>
+    <IncludePath>$(FLTKDir);$(FLEXDir)\Flex;$(SolutionDir)..;$(IncludePath)</IncludePath>
     <LibraryPath>$(FLTKDir)\lib;$(FLEXDir)\lib;$(MKLDir)\ia32\lib;$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|x64'">
@@ -259,11 +259,12 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;PARDISO;MKL_ISS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fecored.lib;numcored.lib;febiolibd.lib;febioplotd.lib;febioxmld.lib;flexd.lib;fltkd.lib;fltkzlibd.lib;fltkimagesd.lib;fltkjpegd.lib;fltkpngd.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_solver.lib;libiomp5mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecored.lib;numcored.lib;febiomechd.lib;febiomixd.lib;febioheatd.lib;febiolibd.lib;febioplotd.lib;febioxmld.lib;flexd.lib;fltkd.lib;fltkzlibd.lib;fltkimagesd.lib;fltkjpegd.lib;fltkpngd.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_solver.lib;libiomp5mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug OpenMP|x64'">
@@ -324,15 +325,16 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;PARDISO;MKL_ISS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febiolibmp.lib;febioplot.lib;febioxml.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_solver.lib;libiomp5mt.lib;flex.lib;fltk.lib;fltkzlib.lib;fltkimages.lib;fltkjpeg.lib;fltkpng.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;febiomech.lib;febiomix.lib;febioheat.lib;febiolibmp.lib;febioplot.lib;febioxml.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_solver.lib;libiomp5mt.lib;flex.lib;fltk.lib;fltkzlib.lib;fltkimages.lib;fltkjpeg.lib;fltkpng.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|x64'">

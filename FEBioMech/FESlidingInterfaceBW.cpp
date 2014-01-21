@@ -431,7 +431,7 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
 	bool binit = false;
 	
 	// loop over all integration points
-	#pragma omp parallel for shared(R, binit, bupseg)
+//	#pragma omp parallel for shared(R, binit, bupseg)
 	for (int i=0; i<ss.Elements(); ++i)
 	{
 		FESurfaceElement& el = ss.Element(i);

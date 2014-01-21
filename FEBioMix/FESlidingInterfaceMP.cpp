@@ -984,7 +984,7 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
 	double R = m_srad*mesh.GetBoundingBox().radius();
 	
 	// loop over all integration points
-    #pragma omp parallel for shared(R, bfirst, bupseg)
+//    #pragma omp parallel for shared(R, bfirst, bupseg)
 	for (int i=0; i<ss.Elements(); ++i)
 	{
 		FESurfaceElement& el = ss.Element(i);

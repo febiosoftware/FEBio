@@ -87,6 +87,9 @@
 #include "FEPointConstraint.h"
 #include "FEFacet2FacetTied.h"
 
+#include "FEAugLagLinearConstraint.h"
+#include "FERigidJoint.h"
+
 #include "FESolidAnalysis.h"
 #include "FESolidSolver.h"
 #include "FELinearSolidSolver.h"
@@ -215,8 +218,10 @@ REGISTER_FECORE_CLASS(FEPointBodyForce      , FEBODYLOAD_ID, "point"      );
 
 //-----------------------------------------------------------------------------
 // constraint classes
-REGISTER_FECORE_CLASS(FEPointConstraint, FENLCONSTRAINT_ID, "point"          );
-REGISTER_FECORE_CLASS(FEInSituStretch  , FENLCONSTRAINT_ID, "in-situ stretch");
+REGISTER_FECORE_CLASS(FEPointConstraint    , FENLCONSTRAINT_ID, "point"            );
+REGISTER_FECORE_CLASS(FEInSituStretch      , FENLCONSTRAINT_ID, "in-situ stretch"  );
+REGISTER_FECORE_CLASS(FELinearConstraintSet, FENLCONSTRAINT_ID, "linear constraint");
+REGISTER_FECORE_CLASS(FERigidJoint         , FENLCONSTRAINT_ID, "rigid joint"      );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface

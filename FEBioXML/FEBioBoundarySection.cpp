@@ -677,7 +677,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	{
 		// --- R I G I D   J O I N T   I N T E R F A C E ---
 
-		FERigidJoint* prj = dynamic_cast<FERigidJoint*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, szt, GetFEModel()));
+		FERigidJoint* prj = dynamic_cast<FERigidJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
 		FEParameterList& pl = prj->GetParameterList();
 		++tag;
 		do
@@ -698,7 +698,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		if (tag.isleaf()) return;
 
 		// create a new linear constraint manager
-		FELinearConstraintSet* pLCS = dynamic_cast<FELinearConstraintSet*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, szt, GetFEModel()));
+		FELinearConstraintSet* pLCS = dynamic_cast<FELinearConstraintSet*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
 		fem.AddNonlinearConstraint(pLCS);
 
 		// read the linear constraints
