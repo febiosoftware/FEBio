@@ -199,42 +199,80 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int NN = mesh.Nodes();
 
 	// make sure this section does not appear in a step section
 	if (m_pim->m_nsteps != 0) throw XMLReader::InvalidTag(tag);
 
 	// get the required bc attribute
-	char sz[8];
-	strcpy(sz, tag.AttributeValue("bc"));
+	char szbc[8];
+	strcpy(szbc, tag.AttributeValue("bc"));
 
-	// Read the fixed nodes
-	++tag;
-	do
+	// process the bc string
+	vector<int> bc;
+	char* ch = szbc;
+	while (*ch)
 	{
-		int n = atoi(tag.AttributeValue("id"))-1;
-		FENode& node = fem.GetMesh().Node(n);
-		if      (strcmp(sz, "x"  ) == 0) { node.m_BC[DOF_X] = -1; }
-		else if (strcmp(sz, "y"  ) == 0) { node.m_BC[DOF_Y] = -1; }
-		else if (strcmp(sz, "z"  ) == 0) { node.m_BC[DOF_Z] = -1; }
-		else if (strcmp(sz, "xy" ) == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Y] = -1; }
-		else if (strcmp(sz, "yz" ) == 0) { node.m_BC[DOF_Y] = node.m_BC[DOF_Z] = -1; }
-		else if (strcmp(sz, "xz" ) == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Z] = -1; }
-		else if (strcmp(sz, "xyz") == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Y] = node.m_BC[DOF_Z] = -1; }
-		else if (strcmp(sz, "p"  ) == 0) { node.m_BC[DOF_P] = -1; }
-		else if (strcmp(sz, "u"  ) == 0) { node.m_BC[DOF_U] = -1; }
-		else if (strcmp(sz, "v"  ) == 0) { node.m_BC[DOF_V] = -1; }
-		else if (strcmp(sz, "w"  ) == 0) { node.m_BC[DOF_W] = -1; }
-		else if (strcmp(sz, "uv" ) == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_V] = -1; }
-		else if (strcmp(sz, "vw" ) == 0) { node.m_BC[DOF_V] = node.m_BC[DOF_W] = -1; }
-		else if (strcmp(sz, "uw" ) == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_W] = -1; }
-		else if (strcmp(sz, "uvw") == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_V] = node.m_BC[DOF_W] = -1; }
-		else if (strcmp(sz, "t"  ) == 0) { node.m_BC[DOF_T] = -1; }
-		else if (strcmp(sz, "c"  ) == 0) { node.m_BC[DOF_C] = -1; }
-		else if (strncmp(sz, "c", 1) == 0) node.m_BC[DOF_C + atoi(&sz[1]) - 1] = -1;
-		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
-		++tag;
+		if      (*ch == 'x') bc.push_back(DOF_X);
+		else if (*ch == 'y') bc.push_back(DOF_Y);
+		else if (*ch == 'z') bc.push_back(DOF_Z);
+		else if (*ch == 'u') bc.push_back(DOF_U);
+		else if (*ch == 'v') bc.push_back(DOF_V);
+		else if (*ch == 'w') bc.push_back(DOF_W);
+		else if (*ch == 'p') bc.push_back(DOF_P);
+		else if (*ch == 't') bc.push_back(DOF_T);
+		else if (*ch == 'c')
+		{
+			char ci = ch[1];
+			if (isdigit(ci))
+			{
+				int i = (ci - '0');
+				bc.push_back(DOF_C + i);
+			}
+			else bc.push_back(DOF_C);
+		}
+		else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+		++ch;
 	}
-	while (!tag.isend());
+	if (bc.empty()) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+	int nbc = bc.size();
+
+	// see if the set attribute is defined
+	const char* szset = tag.AttributeValue("set", true);
+	if (szset)
+	{
+		// make sure the tag is a leaf
+		if (tag.isleaf() == false) throw XMLReader::InvalidValue(tag);
+
+		// process the node set
+		FENodeSet* pns = mesh.FindNodeSet(szset);
+		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
+
+		FENodeSet& ns = *pns;
+		int N = pns->size();
+		for (int i=0; i<N; ++i)
+		{
+			int n = ns[i];
+			if ((n < 0)||(n >= NN)) throw XMLReader::InvalidTag(tag);
+			FENode& node = mesh.Node(n);
+			for (int j=0; j<nbc; ++j) node.m_BC[bc[j]] = -1;
+		}
+	}
+	else
+	{
+		// Read the fixed nodes
+		++tag;
+		do
+		{
+			int n = atoi(tag.AttributeValue("id"))-1;
+			if ((n<0) || (n >= NN)) throw XMLReader::InvalidAttributeValue(tag, "id");
+			FENode& node = fem.GetMesh().Node(n);
+			for (int j=0; j<nbc; ++j) node.m_BC[bc[j]] = -1;
+			++tag;
+		}
+		while (!tag.isend());
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -359,6 +397,7 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
+	int NN = mesh.Nodes();
 
 	int nversion = m_pim->Version();
 
@@ -391,29 +430,67 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 	sz = tag.AttributeValue("lc");
 	int lc = atoi(sz) - 1;
 
-	// read the prescribed data
-	++tag;
-	for (int i=0; i<ndis; ++i)
+	// see if there is a set defined
+	const char* szset = tag.AttributeValue("set", true);
+	if (szset)
 	{
-		// get the node ID
-		int n = atoi(tag.AttributeValue("id"))-1;
+		// make sure this is a leaf tag
+		if (tag.isleaf() == false) throw XMLReader::InvalidValue(tag);
 
-		// create a new BC
-		FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
-		pdc->node = n;
-		pdc->bc = bc;
-		pdc->lc = lc;
-		tag.value(pdc->s);
-		pdc->br = br;
-		fem.AddPrescribedBC(pdc);
+		// find the node set
+		FENodeSet* pns = mesh.FindNodeSet(szset);
+		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 
-		// add this boundary condition to the current step
-		if (m_pim->m_nsteps > 0)
+		// see if the scale attribute is defined
+		double scale = 1.0;
+		tag.AttributeValue("scale", scale, true);
+
+		FENodeSet& ns = *pns;
+		int N = ns.size();
+		for (int i=0; i<N; ++i)
 		{
-			GetStep()->AddBoundaryCondition(pdc);
-			pdc->Deactivate();
+			int n = ns[i];
+			FEPrescribedBC* pbc = new FEPrescribedBC(&fem);
+			pbc->node = n;
+			pbc->bc = bc;
+			pbc->lc = lc;
+			pbc->s = scale;
+			fem.AddPrescribedBC(pbc);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddBoundaryCondition(pbc);
+				pbc->Deactivate();
+			}
 		}
+	}
+	else
+	{
+		// read the prescribed data
 		++tag;
+		for (int i=0; i<ndis; ++i)
+		{
+			// get the node ID
+			int n = atoi(tag.AttributeValue("id"))-1;
+
+			// create a new BC
+			FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
+			pdc->node = n;
+			pdc->bc = bc;
+			pdc->lc = lc;
+			tag.value(pdc->s);
+			pdc->br = br;
+			fem.AddPrescribedBC(pdc);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddBoundaryCondition(pdc);
+				pdc->Deactivate();
+			}
+			++tag;
+		}
 	}
 }
 
