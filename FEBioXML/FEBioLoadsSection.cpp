@@ -133,6 +133,7 @@ void FEBioLoadsSection::ParseBodyLoad20(XMLTag& tag)
 void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	int nversion = m_pim->Version();
 	if (nversion >= 0x0200)
@@ -158,29 +159,68 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 		sz = tag.AttributeValue("lc");
 		int lc = atoi(sz)-1;
 
-		// read the prescribed data
-		++tag;
-		for (int i=0; i<ncnf; ++i)
+		// see if there is a set defined
+		const char* szset = tag.AttributeValue("set", true);
+		if (szset)
 		{
-			// get the nodal ID
-			int n = atoi(tag.AttributeValue("id"))-1;
+			// make sure this is a leaf tag
+			if (tag.isleaf() == false) throw XMLReader::InvalidValue(tag);
 
-			// create new nodal force
-			FENodalForce* pfc = new FENodalForce(&fem);
-			pfc->node = n;
-			pfc->bc = bc;
-			pfc->lc = lc;
-			tag.value(pfc->s);
-			fem.AddNodalLoad(pfc);
+			// find the node set
+			FENodeSet* pns = mesh.FindNodeSet(szset);
+			if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 
-			// add this boundary condition to the current step
-			if (m_pim->m_nsteps > 0)
+			// see if the scale attribute is defined
+			double scale = 1.0;
+			tag.AttributeValue("scale", scale, true);
+
+			FENodeSet& ns = *pns;
+			int N = ns.size();
+			for (int i=0; i<N; ++i)
 			{
-				GetStep()->AddBoundaryCondition(pfc);
-				pfc->Deactivate();
-			}
+				int n = ns[i];
+				// create new nodal force
+				FENodalForce* pfc = new FENodalForce(&fem);
+				pfc->node = n;
+				pfc->bc = bc;
+				pfc->lc = lc;
+				pfc->s = scale;
+				fem.AddNodalLoad(pfc);
 
+				// add this boundary condition to the current step
+				if (m_pim->m_nsteps > 0)
+				{
+					GetStep()->AddBoundaryCondition(pfc);
+					pfc->Deactivate();
+				}
+			}
+		}
+		else
+		{
+			// read the prescribed data
 			++tag;
+			for (int i=0; i<ncnf; ++i)
+			{
+				// get the nodal ID
+				int n = atoi(tag.AttributeValue("id"))-1;
+
+				// create new nodal force
+				FENodalForce* pfc = new FENodalForce(&fem);
+				pfc->node = n;
+				pfc->bc = bc;
+				pfc->lc = lc;
+				tag.value(pfc->s);
+				fem.AddNodalLoad(pfc);
+
+				// add this boundary condition to the current step
+				if (m_pim->m_nsteps > 0)
+				{
+					GetStep()->AddBoundaryCondition(pfc);
+					pfc->Deactivate();
+				}
+
+				++tag;
+			}
 		}
 	}
 	else
