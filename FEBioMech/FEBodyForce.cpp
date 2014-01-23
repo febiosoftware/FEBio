@@ -12,5 +12,5 @@ FEBodyForce::FEBodyForce(FEModel* pfem) : FEBodyLoad(pfem)
 //! \todo serialize parameters
 void FEBodyForce::Serialize(DumpFile& ar)
 {
-	return;
+	FEBodyLoad::Serialize(ar);
 }

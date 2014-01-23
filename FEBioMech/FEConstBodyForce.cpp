@@ -28,6 +28,12 @@ FENonConstBodyForce::FENonConstBodyForce(FEModel* pfem) : FEBodyForce(pfem)
 }
 
 //-----------------------------------------------------------------------------
+void FEConstBodyForce::Serialize(DumpFile &ar)
+{
+	FEBodyForce::Serialize(ar);
+}
+
+//-----------------------------------------------------------------------------
 vec3d FENonConstBodyForce::force(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
