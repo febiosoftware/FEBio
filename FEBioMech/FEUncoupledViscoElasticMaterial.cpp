@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEUncoupledViscoElasticMaterial.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -158,3 +159,30 @@ FEParam* FEUncoupledViscoElasticMaterial::GetParameter(const ParamString& s)
 	if (s == "elastic") return m_pBase->GetParameter(s.next());
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+//! Save data to dump file
+
+void FEUncoupledViscoElasticMaterial::Serialize(DumpFile& ar)
+{
+	// Serialize parameters
+	FEUncoupledMaterial::Serialize(ar);
+	
+	if (ar.IsSaving())
+	{
+		ar << m_binit;
+		ar << m_pBase->GetTypeStr();
+		m_pBase->Serialize(ar);
+	}
+	else
+	{
+		ar >> m_binit;
+
+		char szmat[256] = {0};
+		ar >> szmat;
+		m_pBase = dynamic_cast<FEUncoupledMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, szmat, ar.GetFEModel()));
+		assert(m_pBase); m_pBase->Serialize(ar);
+		m_pBase->Init();
+	}
+}
+

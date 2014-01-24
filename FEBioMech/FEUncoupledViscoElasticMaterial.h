@@ -28,6 +28,9 @@ public:
 	//! Find a material parameter
 	FEParam* GetParameter(const ParamString& s);
 
+	//! serialize data to/from dump file
+	void Serialize(DumpFile& ar);
+
 public:
 	//! return number of properties
 	int Properties();
