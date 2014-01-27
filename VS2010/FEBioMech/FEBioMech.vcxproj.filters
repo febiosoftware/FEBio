@@ -363,6 +363,9 @@
     <ClCompile Include="..\..\FEBioMech\FEContactSurface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FESPRProjection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h">
@@ -720,6 +723,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEContactSurface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FESPRProjection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

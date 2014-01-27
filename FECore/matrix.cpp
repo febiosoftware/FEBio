@@ -10,9 +10,17 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+//-----------------------------------------------------------------------------
+// These functions are defined in colsol.cpp
 void lubksb(double**a, int n, int *indx, double b[]);
 void ludcmp(double**a, int n, int* indx);
 
+//-----------------------------------------------------------------------------
+// These functions are defined in svd.cpp
+void svbksb(matrix& u, vector<double>& w, matrix& v, vector<double>& b, vector<double>& x);
+void svdcmp(matrix& a, vector<double>& w, matrix& v);
+
+//-----------------------------------------------------------------------------
 vector<double> operator / (vector<double>& b, matrix& m)
 {
 	int n = b.size();
@@ -143,6 +151,31 @@ matrix matrix::operator * (const matrix& m)
 }
 
 //-----------------------------------------------------------------------------
+// Calculate the LU decomposition of this matrix. Note that this will modify
+// the matrix. This is used for repeated solves of a linear system. Use 
+// lusolve for solving after lufactor.
+void matrix::lufactor(vector<int>& indx)
+{
+	// make sure this is a square matrix
+	assert(m_nr == m_nc);
+
+	// do a LU decomposition
+	int n = m_nr;
+	indx.resize(n);
+	ludcmp(*(this), n, &indx[0]);
+}
+
+//-----------------------------------------------------------------------------
+// Solve the linear system Ax=b, where A has been factored using lufactor.
+// The indx array is the same one that was returned from lufactor
+void matrix::lusolve(vector<double>& b, vector<int>& indx)
+{
+	// make sure this is a square matrix
+	assert(m_nr == m_nc);
+	lubksb(*(this), m_nr, &indx[0], &b[0]);
+}
+
+//-----------------------------------------------------------------------------
 matrix matrix::inverse()
 {
 	// make sure this is a square matrix
@@ -178,6 +211,34 @@ matrix matrix::inverse()
 }
 
 //-----------------------------------------------------------------------------
+// Matrix using singular value decomposition
+matrix matrix::svd_inverse()
+{
+	matrix U(*this);
+	matrix V(m_nr, m_nc);
+	vector<double> w(m_nc);
+
+	// calculate the decomposition
+	svdcmp(U, w, V);
+
+	matrix Ai(m_nc, m_nr); // inverse
+	for (int i=0; i<m_nc; ++i)
+		for (int j=0; j<m_nr; ++j)
+		{
+			double s = 0.0;
+			for (int k=0;k<m_nc; ++k)
+			{
+				if (w[k] > 0.0)
+				{
+					s += (V[i][k]*U[j][k])/w[k];
+				}
+			}
+			Ai[i][j] = s;
+		}
+	return Ai;
+}
+
+//-----------------------------------------------------------------------------
 matrix matrix::transpose()
 {
 	int i, j;
@@ -201,4 +262,32 @@ matrix& matrix::operator -= (const matrix& m)
 	assert((m_nr == m.m_nr ) && (m_nc == m.m_nc));
 	for (int i=0; i<m_nsize; ++i) m_pd[i] -= m.m_pd[i];
 	return (*this);
+}
+
+//-----------------------------------------------------------------------------
+// calculate outer product of a vector to produce a matrix
+matrix outer_product(vector<double>& a)
+{
+	int n = (int) a.size();
+	matrix m(n,n);
+	for (int i=0; i<n; ++i)
+	{
+		for (int j=0; j<n; ++j) m[i][j] = a[i]*a[j];
+	}
+	return m;
+}
+
+//-----------------------------------------------------------------------------
+// Calculates the infinity norm. That is, the max of the absolute row sum.
+double matrix::inf_norm()
+{
+	matrix& self = (*this);
+	double m = 0;
+	for (int j=0; j<m_nr; ++j)
+	{
+		double s = 0;
+		for (int i=0; i<m_nc; ++i) s += fabs(self[j][i]);
+		if (s > m) m = s;
+	}
+	return m;
 }

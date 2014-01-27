@@ -719,6 +719,7 @@
     <ClCompile Include="..\..\FECore\qsort.cpp" />
     <ClCompile Include="..\..\FECore\SparseMatrix.cpp" />
     <ClCompile Include="..\..\FECore\stdafx.cpp" />
+    <ClCompile Include="..\..\FECore\svd.cpp" />
     <ClCompile Include="..\..\FECore\tens4d.cpp" />
     <ClCompile Include="..\..\FECore\Timer.cpp" />
     <ClCompile Include="..\..\FECore\vector.cpp" />

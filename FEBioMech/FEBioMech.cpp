@@ -236,22 +236,26 @@ REGISTER_FECORE_CLASS(FEFacet2FacetTied      , FESURFACEPAIRINTERACTION_ID, "fac
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
-REGISTER_FECORE_CLASS(FEPlotStrainEnergyDensity          , FEPLOTDATA_ID, "strain energy density"           );
-REGISTER_FECORE_CLASS(FEPlotSpecificStrainEnergy         , FEPLOTDATA_ID, "specific strain energy"          );
-REGISTER_FECORE_CLASS(FEPlotDensity                      , FEPLOTDATA_ID, "density"                         );
-REGISTER_FECORE_CLASS(FEPlotElementStress                , FEPLOTDATA_ID, "stress"                          );
-REGISTER_FECORE_CLASS(FEPlotRelativeVolume               , FEPLOTDATA_ID, "relative volume"                 );
-REGISTER_FECORE_CLASS(FEPlotFiberVector                  , FEPLOTDATA_ID, "fiber vector"                    );
-REGISTER_FECORE_CLASS(FEPlotShellThickness               , FEPLOTDATA_ID, "shell thickness"                 );
-REGISTER_FECORE_CLASS(FEPlotDamage                       , FEPLOTDATA_ID, "damage"                          );
-REGISTER_FECORE_CLASS(FEPlotMixtureVolumeFraction        , FEPLOTDATA_ID, "volume fraction"                 );
-REGISTER_FECORE_CLASS(FEPlotUT4NodalStresses             , FEPLOTDATA_ID, "ut4 nodal stress"                );
-REGISTER_FECORE_CLASS(FEPlotFiberPreStretch				, FEPLOTDATA_ID, "in-situ fiber stretch"           );
-REGISTER_FECORE_CLASS(FEPlotShellStrain                  , FEPLOTDATA_ID, "shell strain"                    );
-REGISTER_FECORE_CLASS(FEPlotContactGap					, FEPLOTDATA_ID, "contact gap"                     );
-REGISTER_FECORE_CLASS(FEPlotContactPressure				, FEPLOTDATA_ID, "contact pressure"                );
-REGISTER_FECORE_CLASS(FEPlotContactTraction				, FEPLOTDATA_ID, "contact traction"                );
-REGISTER_FECORE_CLASS(FEPlotContactForce 				, FEPLOTDATA_ID, "contact force"                   );
+REGISTER_FECORE_CLASS(FEPlotStrainEnergyDensity  , FEPLOTDATA_ID, "strain energy density" );
+REGISTER_FECORE_CLASS(FEPlotSpecificStrainEnergy , FEPLOTDATA_ID, "specific strain energy");
+REGISTER_FECORE_CLASS(FEPlotDensity              , FEPLOTDATA_ID, "density"               );
+REGISTER_FECORE_CLASS(FEPlotElementStress        , FEPLOTDATA_ID, "stress"                );
+REGISTER_FECORE_CLASS(FEPlotRelativeVolume       , FEPLOTDATA_ID, "relative volume"       );
+REGISTER_FECORE_CLASS(FEPlotFiberVector          , FEPLOTDATA_ID, "fiber vector"          );
+REGISTER_FECORE_CLASS(FEPlotShellThickness       , FEPLOTDATA_ID, "shell thickness"       );
+REGISTER_FECORE_CLASS(FEPlotDamage               , FEPLOTDATA_ID, "damage"                );
+REGISTER_FECORE_CLASS(FEPlotMixtureVolumeFraction, FEPLOTDATA_ID, "volume fraction"       );
+REGISTER_FECORE_CLASS(FEPlotUT4NodalStresses     , FEPLOTDATA_ID, "ut4 nodal stress"      );
+REGISTER_FECORE_CLASS(FEPlotFiberPreStretch		 , FEPLOTDATA_ID, "in-situ fiber stretch" );
+REGISTER_FECORE_CLASS(FEPlotShellStrain          , FEPLOTDATA_ID, "shell strain"          );
+REGISTER_FECORE_CLASS(FEPlotContactGap			 , FEPLOTDATA_ID, "contact gap"           );
+REGISTER_FECORE_CLASS(FEPlotContactPressure		 , FEPLOTDATA_ID, "contact pressure"      );
+REGISTER_FECORE_CLASS(FEPlotContactTraction		 , FEPLOTDATA_ID, "contact traction"      );
+REGISTER_FECORE_CLASS(FEPlotContactForce 		 , FEPLOTDATA_ID, "contact force"         );
+REGISTER_FECORE_CLASS(FEPlotSPRStresses          , FEPLOTDATA_ID, "SPR stress"            );
+REGISTER_FECORE_CLASS(FEPlotSPRPrincStresses     , FEPLOTDATA_ID, "SPR principal stress"  );
+REGISTER_FECORE_CLASS(FEPlotSPRTestLinear		 , FEPLOTDATA_ID, "SPR test linear"       );
+REGISTER_FECORE_CLASS(FEPlotSPRTestQuadratic	 , FEPLOTDATA_ID, "SPR test quadratic"    );
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FEPlotNodeDisplacement   , FEPLOTDATA_ID, "displacement"   );

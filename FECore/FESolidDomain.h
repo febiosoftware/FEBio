@@ -25,6 +25,7 @@ public:
 
 	int Nodes() { return (int) m_Node.size(); }
 	FENode& Node(int i);
+	int NodeIndex(int i) { return m_Node[i]; }
 
 	//! find the element in which point y lies
 	FESolidElement* FindElement(vec3d y, double r[3]);

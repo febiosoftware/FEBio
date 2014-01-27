@@ -220,3 +220,43 @@ public:
 	FEPlotShellStrain(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
+
+//-----------------------------------------------------------------------------
+//! class the projects stresses from integration points to nodes using
+//! SPR (superconvergergent patch recovery)
+class FEPlotSPRStresses : public FEDomainData
+{
+public:
+	FEPlotSPRStresses(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_NODE){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! class that projects the principal stresses from integration points to nodes
+//! using the SPR projection method
+class FEPlotSPRPrincStresses : public FEDomainData
+{
+public:
+	FEPlotSPRPrincStresses(FEModel* pfem) : FEDomainData(PLT_MAT3FD, FMT_NODE){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! class the projects stresses from integration points to nodes using
+//! SPR (superconvergergent patch recovery)
+class FEPlotSPRTestLinear: public FEDomainData
+{
+public:
+	FEPlotSPRTestLinear(FEModel* pfem) : FEDomainData(PLT_MAT3FD, FMT_NODE){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! class the projects stresses from integration points to nodes using
+//! SPR (superconvergergent patch recovery)
+class FEPlotSPRTestQuadratic: public FEDomainData
+{
+public:
+	FEPlotSPRTestQuadratic(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_NODE){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};

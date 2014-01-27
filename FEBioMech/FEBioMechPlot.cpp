@@ -11,6 +11,7 @@
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FEContactSurface.h"
 #include "FECore/FERigidBody.h"
+#include "FESPRProjection.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -714,5 +715,242 @@ bool FEPlotFiberPreStretch::Save(FEDomain& dom, vector<float>& a)
 		lam /= (double) nint;
 		a.push_back((float)lam);
 	}
+	return true;
+}
+
+
+//-----------------------------------------------------------------------------
+bool FEPlotSPRStresses::Save(FEDomain& dom, vector<float>& a)
+{
+	const int LUT[6][2] = {{0,0},{1,1},{2,2},{0,1},{1,2},{0,2}};
+
+	// For now, this is only available for solid domains
+	if (dynamic_cast<FESolidDomain*>(&dom) == 0) return false;
+
+	// get the domain
+	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
+	int NN = sd.Nodes();
+	int NE = sd.Elements();
+
+	// build the element data array
+	vector< vector<double> > ED;
+	ED.resize(NE);
+	for (int i=0; i<NE; ++i)
+	{
+		FESolidElement& e = sd.Element(i);
+		int nint = e.GaussPoints();
+		ED[i].assign(nint, 0.0);
+	}
+
+	// this array will store the results
+	FESPRProjection map;
+	vector<double> val[6];
+
+	// loop over stress components
+	for (int n=0; n<6; ++n)
+	{
+		// fill the ED array
+		for (int i=0; i<NE; ++i)
+		{
+			FESolidElement& el = sd.Element(i);
+			int nint = el.GaussPoints();
+			for (int j=0; j<nint; ++j)
+			{
+				FEElasticMaterialPoint& ep = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+				mat3ds& s = ep.m_s;
+				ED[i][j] = s(LUT[n][0], LUT[n][1]);
+			}
+		}
+
+		// project to nodes
+		map.Project(sd, ED, val[n]);
+	}
+
+	// copy results to archive
+	for (int i=0; i<NN; ++i)
+	{
+		a.push_back((float)val[0][i]);
+		a.push_back((float)val[1][i]);
+		a.push_back((float)val[2][i]);
+		a.push_back((float)val[3][i]);
+		a.push_back((float)val[4][i]);
+		a.push_back((float)val[5][i]);
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSPRPrincStresses::Save(FEDomain& dom, vector<float>& a)
+{
+	// For now, this is only available for solid domains
+	if (dynamic_cast<FESolidDomain*>(&dom) == 0) return false;
+
+	// get the domain
+	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
+	int NN = sd.Nodes();
+	int NE = sd.Elements();
+
+	// build the element data array
+	vector< vector<double> > ED;
+	ED.resize(NE);
+	for (int i=0; i<NE; ++i)
+	{
+		FESolidElement& e = sd.Element(i);
+		int nint = e.GaussPoints();
+		ED[i].assign(nint, 0.0);
+	}
+
+	// this array will store the results
+	FESPRProjection map;
+	vector<double> val[3];
+
+	// loop over stress components
+	for (int n=0; n<3; ++n)
+	{
+		// fill the ED array
+		for (int i=0; i<NE; ++i)
+		{
+			FESolidElement& el = sd.Element(i);
+			int nint = el.GaussPoints();
+			for (int j=0; j<nint; ++j)
+			{
+				FEElasticMaterialPoint& ep = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+				mat3ds& s = ep.m_s;
+				double l[3];
+				s.exact_eigen(l);
+				ED[i][j] = l[n];
+			}
+		}
+
+		// project to nodes
+		map.Project(sd, ED, val[n]);
+	}
+
+	// copy results to archive
+	for (int i=0; i<NN; ++i)
+	{
+		a.push_back((float)val[0][i]);
+		a.push_back((float)val[1][i]);
+		a.push_back((float)val[2][i]);
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSPRTestLinear::Save(FEDomain& dom, vector<float>& a)
+{
+	// For now, this is only available for solid domains
+	if (dynamic_cast<FESolidDomain*>(&dom) == 0) return false;
+
+	// get the domain
+	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
+	int NN = sd.Nodes();
+	int NE = sd.Elements();
+
+	// build the element data array
+	vector< vector<double> > ED;
+	ED.resize(NE);
+	for (int i=0; i<NE; ++i)
+	{
+		FESolidElement& e = sd.Element(i);
+		int nint = e.GaussPoints();
+		ED[i].assign(nint, 0.0);
+	}
+
+	// this array will store the results
+	FESPRProjection map;
+	vector<double> val[3];
+
+	// loop over stress components
+	for (int n=0; n<3; ++n)
+	{
+		// fill the ED array
+		for (int i=0; i<NE; ++i)
+		{
+			FESolidElement& el = sd.Element(i);
+			int nint = el.GaussPoints();
+			for (int j=0; j<nint; ++j)
+			{
+				FEElasticMaterialPoint& ep = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+				vec3d r = ep.m_rt;
+				double l[3] = {r.x, r.y, r.z};
+				ED[i][j] = l[n];
+			}
+		}
+
+		// project to nodes
+		map.Project(sd, ED, val[n]);
+	}
+
+	// copy results to archive
+	for (int i=0; i<NN; ++i)
+	{
+		a.push_back((float)val[0][i]);
+		a.push_back((float)val[1][i]);
+		a.push_back((float)val[2][i]);
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSPRTestQuadratic::Save(FEDomain& dom, vector<float>& a)
+{
+	// For now, this is only available for solid domains
+	if (dynamic_cast<FESolidDomain*>(&dom) == 0) return false;
+
+	// get the domain
+	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
+	int NN = sd.Nodes();
+	int NE = sd.Elements();
+
+	// build the element data array
+	vector< vector<double> > ED;
+	ED.resize(NE);
+	for (int i=0; i<NE; ++i)
+	{
+		FESolidElement& e = sd.Element(i);
+		int nint = e.GaussPoints();
+		ED[i].assign(nint, 0.0);
+	}
+
+	// this array will store the results
+	FESPRProjection map;
+	vector<double> val[6];
+
+	// loop over stress components
+	for (int n=0; n<6; ++n)
+	{
+		// fill the ED array
+		for (int i=0; i<NE; ++i)
+		{
+			FESolidElement& el = sd.Element(i);
+			int nint = el.GaussPoints();
+			for (int j=0; j<nint; ++j)
+			{
+				FEElasticMaterialPoint& ep = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+				vec3d r = ep.m_rt;
+				double l[6] = {r.x*r.x, r.y*r.y, r.z*r.z, r.x*r.y, r.y*r.z, r.x*r.z};
+				ED[i][j] = l[n];
+			}
+		}
+
+		// project to nodes
+		map.Project(sd, ED, val[n]);
+	}
+
+	// copy results to archive
+	for (int i=0; i<NN; ++i)
+	{
+		a.push_back((float)val[0][i]);
+		a.push_back((float)val[1][i]);
+		a.push_back((float)val[2][i]);
+		a.push_back((float)val[3][i]);
+		a.push_back((float)val[4][i]);
+		a.push_back((float)val[5][i]);
+	}
+
 	return true;
 }

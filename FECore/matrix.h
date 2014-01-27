@@ -53,12 +53,25 @@ public:
 	//! matrix inversion
 	matrix inverse();
 
+	//! matrix inverse using SVD
+	matrix svd_inverse();
+
 	//! matrix operators
 	matrix operator * (const matrix& m);
 
 	matrix& operator += (const matrix& m);
 
 	matrix& operator -= (const matrix& m);
+
+	// calculate the LU decomposition
+	// note that this modifies the matrix
+	void lufactor(vector<int>& indx);
+
+	// solve using the lu factor calculated with lufactor
+	void lusolve(vector<double>& b, vector<int>& indx);
+
+	// infinity-norm
+	double inf_norm();
 
 protected:
 	double**	m_pr;	// pointer to rows
@@ -71,5 +84,6 @@ protected:
 
 vector<double> operator / (vector<double>& b, matrix& m);
 vector<double> operator * (matrix& m, vector<double>& b);
+matrix outer_product(vector<double>& a);
 
 #endif // !defined(AFX_MATRIX_H__C0F2C6F6_AE26_4C7F_8C70_5A7BF5DD421E__INCLUDED_)
