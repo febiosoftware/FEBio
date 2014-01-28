@@ -78,7 +78,7 @@ DataRecord::DataRecord(FEModel* pfem, const char* szfile)
 	{
 		strcpy(m_szfile, szfile);
 		m_fp = fopen(szfile, "wt");
-		fprintf(m_fp, "*Title:%s\n", m_pfem->GetTitle());
+		if (m_fp) fprintf(m_fp, "*Title:%s\n", m_pfem->GetTitle());
 	}
 }
 
