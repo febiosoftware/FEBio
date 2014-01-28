@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FESPRProjection.h"
-#include "FECore\FESolidDomain.h"
-#include "FECore\FEMesh.h"
+#include "FECore/FESolidDomain.h"
+#include "FECore/FEMesh.h"
 #include "FEElasticMaterial.h"
 using namespace std;
 
