@@ -14,9 +14,11 @@ CC = icpc
 DEF = -DLINUX -DNDEBUG
 DEFD = -DLINUX 
 
-FLG = -O3
+FLG = -O3 -fopenmp
 
 #Intel Compiler (for omp.h)
+#INTEL_INC = /usr/local/intel/include/
+#INTEL_INC = /opt/intel/include/
 INTEL_INC = /usr/sci/linux64/intel/Compiler/2012/include/
 
 INC = -I$(INTEL_INC) -I..
@@ -64,6 +66,8 @@ DEF += -DPARDISO
 DEFD += -DPARDISO
 # Put the path to the MKL library directory here
 MKL_PATH = /usr/sci/linux64/intel/Compiler/2012/mkl/lib/intel64
+#MKL_PATH = /usr/local/intel/mkl/lib/intel64
+#MKL_PATH = /usr/sci/linux64/intel/mkl_10.2/lib/em64t/
 MKL_LIB = -L$(MKL_PATH) -Wl,--start-group -lmkl_intel_lp64 
 MKL_LIB += -lmkl_intel_thread -lmkl_core -Wl,--end-group
 MKL_LIB += -liomp5 -pthread

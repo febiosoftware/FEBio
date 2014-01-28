@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "matrix.h"
 #include <assert.h>
+#include <math.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
