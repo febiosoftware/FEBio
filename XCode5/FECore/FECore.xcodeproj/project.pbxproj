@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D595BB421899C7B40028A7F3 /* svd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D595BB411899C7B40028A7F3 /* svd.cpp */; };
 		D5A0A8F0186F4AC60046B0DE /* DOFS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A0A8EE186F4AC50046B0DE /* DOFS.cpp */; };
 		D5A0A8F1186F4AC60046B0DE /* DOFS.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A0A8EF186F4AC60046B0DE /* DOFS.h */; };
 		D5B572D7186CC76500D12E45 /* FECoreFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B572CF186CC76500D12E45 /* FECoreFactory.cpp */; };
@@ -156,6 +157,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D595BB411899C7B40028A7F3 /* svd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = svd.cpp; sourceTree = "<group>"; };
 		D5A0A8EE186F4AC50046B0DE /* DOFS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DOFS.cpp; sourceTree = "<group>"; };
 		D5A0A8EF186F4AC60046B0DE /* DOFS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DOFS.h; sourceTree = "<group>"; };
 		D5B572CF186CC76500D12E45 /* FECoreFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECoreFactory.cpp; sourceTree = "<group>"; };
@@ -471,6 +473,7 @@
 				D5E10A731865E15900B23922 /* SparseMatrix.h */,
 				D5E10A741865E15900B23922 /* stdafx.cpp */,
 				D5E10A751865E15900B23922 /* stdafx.h */,
+				D595BB411899C7B40028A7F3 /* svd.cpp */,
 				D5E10A761865E15900B23922 /* targetver.h */,
 				D5E10A771865E15900B23922 /* tens4d.cpp */,
 				D5E10A781865E15900B23922 /* tens4d.h */,
@@ -655,6 +658,7 @@
 				D5E10AB61865E15900B23922 /* FEGlobalVector.cpp in Sources */,
 				D5E10AE11865E15900B23922 /* FESurfaceLoad.cpp in Sources */,
 				D5E10AA41865E15900B23922 /* FEDiscreteDomain.cpp in Sources */,
+				D595BB421899C7B40028A7F3 /* svd.cpp in Sources */,
 				D5E10AF81865E15900B23922 /* matrix.cpp in Sources */,
 				D5E10B021865E15900B23922 /* SparseMatrix.cpp in Sources */,
 				D5E10A9A1865E15900B23922 /* FEClosestPointProjection.cpp in Sources */,

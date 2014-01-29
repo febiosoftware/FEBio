@@ -15,6 +15,9 @@ BEGIN_PARAMETER_LIST(FEMichaelisMenten, FEChemicalReaction)
 	ADD_PARAMETER(m_c0, FE_PARAM_DOUBLE, "c0");
 END_PARAMETER_LIST();
 
+#ifndef SQR
+#define SQR(x) ((x)*(x))
+#endif
 
 //-----------------------------------------------------------------------------
 //! data initialization and checking
@@ -87,9 +90,11 @@ mat3ds FEMichaelisMenten::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 		dcdJ = spt.m_dkdJ[m_Rid]*spt.m_c[m_Rid];
 	}
 	
-	double zhat = ReactionSupply(pt);
 	double dzhatdJ = 0;
-	if (c > m_c0) dzhatdJ = dcdJ*m_Km*zhat/(m_Km + c);
+	if (c > m_c0) {
+        double Vmax = m_pFwd->ReactionRate(pt);
+        dzhatdJ = dcdJ*m_Km*Vmax/SQR(m_Km + c);
+    }
 	
 	return mat3dd(1)*dzhatdJ;
 }
@@ -107,20 +112,18 @@ double FEMichaelisMenten::Tangent_ReactionSupply_Concentration(FEMaterialPoint& 
 {
 	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	
-	double c;
-	double dcdc;
 	if (m_Rtype) {
-		c = m_pMP->SBMConcentration(pt, m_Rid);
-		dcdc = (m_Rid == sol) ? 1 : 0;
+        return 0;
 	}
-	else {
-		c = spt.m_ca[m_Rid];
-		dcdc = (m_Rid == sol) ? 1 : 0;
-	}
+	else if (m_Rid != sol)
+        return 0;
 	
-	double zhat = ReactionSupply(pt);
+    double c = spt.m_ca[m_Rid];
 	double dzhatdc = 0;
-	if (c > m_c0) dzhatdc = dcdc*m_Km*zhat/(m_Km + c);
+	if (c > m_c0) {
+        double Vmax = m_pFwd->ReactionRate(pt);
+        dzhatdc = m_Km*Vmax/SQR(m_Km + c)*(spt.m_k[m_Rid] + spt.m_dkdc[m_Rid][m_Rid]*spt.m_c[m_Rid]);
+    }
 	
 	return dzhatdc;
 }

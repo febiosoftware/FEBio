@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D595BB451899C7D90028A7F3 /* FESPRProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D595BB431899C7D90028A7F3 /* FESPRProjection.cpp */; };
+		D595BB461899C7D90028A7F3 /* FESPRProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D595BB441899C7D90028A7F3 /* FESPRProjection.h */; };
 		D5A12B1A1875B02C008BF405 /* FEContactSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A12B181875B02C008BF405 /* FEContactSurface.cpp */; };
 		D5A12B1B1875B02C008BF405 /* FEContactSurface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A12B191875B02C008BF405 /* FEContactSurface.h */; };
 		D5B572E1186CD45900D12E45 /* FERemodelingElasticDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B572DF186CD45900D12E45 /* FERemodelingElasticDomain.cpp */; };
@@ -244,6 +246,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D595BB431899C7D90028A7F3 /* FESPRProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESPRProjection.cpp; sourceTree = "<group>"; };
+		D595BB441899C7D90028A7F3 /* FESPRProjection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESPRProjection.h; sourceTree = "<group>"; };
 		D5A12B181875B02C008BF405 /* FEContactSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactSurface.cpp; sourceTree = "<group>"; };
 		D5A12B191875B02C008BF405 /* FEContactSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEContactSurface.h; sourceTree = "<group>"; };
 		D5B572DF186CD45900D12E45 /* FERemodelingElasticDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERemodelingElasticDomain.cpp; sourceTree = "<group>"; };
@@ -700,6 +704,8 @@
 				D5E107441865DFAD00B23922 /* FESphericalFiberDistribution.h */,
 				D5E107451865DFAD00B23922 /* FESpringMaterial.cpp */,
 				D5E107461865DFAD00B23922 /* FESpringMaterial.h */,
+				D595BB431899C7D90028A7F3 /* FESPRProjection.cpp */,
+				D595BB441899C7D90028A7F3 /* FESPRProjection.h */,
 				D5E107471865DFAD00B23922 /* FEStiffnessMatrix.cpp */,
 				D5E107481865DFAD00B23922 /* FEStiffnessMatrix.h */,
 				D5E107491865DFAD00B23922 /* FEStVenantKirchhoff.cpp */,
@@ -785,6 +791,7 @@
 				D5E107911865DFAD00B23922 /* FEContinuousFiberDistribution.h in Headers */,
 				D5E108081865DFAD00B23922 /* FEPointConstraint.h in Headers */,
 				D5E107AE1865DFAD00B23922 /* FEElasticFiberMaterial.h in Headers */,
+				D595BB461899C7D90028A7F3 /* FESPRProjection.h in Headers */,
 				D5E107FA1865DFAD00B23922 /* FENeoHookeanTransIso.h in Headers */,
 				D5E107EC1865DFAD00B23922 /* FELinearSolidSolver.h in Headers */,
 				D5E107C21865DFAD00B23922 /* FEFacet2FacetTied.h in Headers */,
@@ -971,6 +978,7 @@
 				D5E107ED1865DFAD00B23922 /* FELinearTransIso.cpp in Sources */,
 				D5E107A01865DFAD00B23922 /* FEEFD.cpp in Sources */,
 				D5E1077A1865DFAD00B23922 /* FE3FieldElasticSolidDomain.cpp in Sources */,
+				D595BB451899C7D90028A7F3 /* FESPRProjection.cpp in Sources */,
 				D5E108451865DFAD00B23922 /* FEUDGHexDomain.cpp in Sources */,
 				D5E108271865DFAD00B23922 /* FESolidSolver.cpp in Sources */,
 				D5E108011865DFAD00B23922 /* FEPerfectOsmometer.cpp in Sources */,
