@@ -98,6 +98,7 @@ FE_Element_Shape FEBioGeometrySection::ElementShape(XMLTag& t)
 	else if (t=="penta6") return ET_PENTA6;
 	else if (t=="tet4"  ) return ET_TET4;
 	else if (t=="tet10" ) return ET_TET10;
+	else if (t=="tet15" ) return ET_TET15;
 	else if (t=="quad4" ) return ET_QUAD4;
 	else if (t=="tri3"  ) return ET_TRI3;
 	else if (t=="truss2") return ET_TRUSS2;
@@ -120,6 +121,7 @@ int FEBioGeometrySection::DomainType(FE_Element_Shape eshape, FEMaterial* pmat)
 	if      (eshape == ET_HEX8 ) spec.etype = m_pim->m_nhex8;
 	else if (eshape == ET_TET4 ) spec.etype = m_pim->m_ntet4;
 	else if (eshape == ET_TET10) spec.etype = m_pim->m_ntet10;
+	else if (eshape == ET_TET15) spec.etype = m_pim->m_ntet15;
 	else if (eshape == ET_TRI3 ) spec.etype = m_pim->m_ntri3;
 	
 	// get the domain type
@@ -253,6 +255,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		else if (tag == "penta6") etype = ET_PENTA6;
 		else if (tag == "tet4"  ) etype = m_pim->m_ntet4;
 		else if (tag == "tet10" ) etype = ET_TET10;
+		else if (tag == "tet15" ) etype = ET_TET15;
 		else if (tag == "quad4" ) etype = ET_QUAD4;
 		else if (tag == "tri3"  ) etype = ET_TRI3;
 		else if (tag == "truss2") etype = ET_TRUSS2;
@@ -288,6 +291,12 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), m_pim->m_ntet10, nid, nmat);
+			}
+			break;
+		case ET_TET15:
+			{
+				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+				ReadSolidElement(tag, bd.Element(ne), m_pim->m_ntet15, nid, nmat);
 			}
 			break;
 		case ET_QUAD4:
@@ -350,6 +359,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	else if (strcmp(sztype, "penta6") == 0) etype = ET_PENTA6;
 	else if (strcmp(sztype, "tet4"  ) == 0) etype = ET_TET4;
 	else if (strcmp(sztype, "tet10" ) == 0) etype = ET_TET10;
+	else if (strcmp(sztype, "tet15" ) == 0) etype = ET_TET15;
 	else if (strcmp(sztype, "quad4" ) == 0) etype = ET_QUAD4;
 	else if (strcmp(sztype, "tri3"  ) == 0) etype = ET_TRI3;
 	else if (strcmp(sztype, "truss2") == 0) etype = ET_TRUSS2;
@@ -412,6 +422,12 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(i), m_pim->m_ntet10, nid, nmat);
+			}
+			break;
+		case ET_TET15:
+			{
+				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+				ReadSolidElement(tag, bd.Element(i), m_pim->m_ntet15, nid, nmat);
 			}
 			break;
 		case ET_HEX20:
@@ -541,6 +557,7 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 		else if (tag == "penta6") etype = ET_PENTA6;
 		else if (tag == "tet4"  ) etype = m_pim->m_ntet4;
 		else if (tag == "tet10" ) etype = ET_TET10;
+		else if (tag == "tet15" ) etype = ET_TET15;
 		else if (tag == "quad4" ) etype = ET_QUAD4;
 		else if (tag == "tri3"  ) etype = ET_TRI3;
 		else if (tag == "truss2") etype = ET_TRUSS2;
@@ -576,6 +593,12 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), FE_TET10G4, nid, 0);
+			}
+			break;
+		case ET_TET15:
+			{
+				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+				ReadSolidElement(tag, bd.Element(ne), FE_TET15G8, nid, 0);
 			}
 			break;
 		case ET_QUAD4:

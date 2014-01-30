@@ -8,7 +8,7 @@ int FEHeatDomainFactory::GetDomainType(const FE_Element_Spec& spec, FEMaterial* 
 	FE_Element_Shape eshape = spec.eshape;
 	if (dynamic_cast<FEHeatTransferMaterial*>(pmat))
 	{
-		if ((eshape == ET_HEX8) || (eshape == ET_HEX20) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10)) return FE_HEAT_SOLID_DOMAIN;
+		if ((eshape == ET_HEX8) || (eshape == ET_HEX20) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_TET15)) return FE_HEAT_SOLID_DOMAIN;
 		else return 0;
 	}
 	return 0;

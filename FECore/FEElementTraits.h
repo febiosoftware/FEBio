@@ -286,6 +286,12 @@ protected:
 };
 
 //=============================================================================
+//
+//   FETet10
+//   
+//=============================================================================
+
+//=============================================================================
 //! Base class for 10-node quadratic tetrahedral elements
 class FETet10_ : public FESolidElementTraits
 {
@@ -352,6 +358,57 @@ public:
 
 	void project_to_nodes(double* ai, double* ao);
 };
+
+//=============================================================================
+//
+//   FETet15
+//   
+//=============================================================================
+
+//=============================================================================
+//! Base class for 15-node quadratic tetrahedral elements
+class FETet15_ : public FESolidElementTraits
+{
+public:
+	enum { NELN = 15 };
+
+public:
+	FETet15_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, et){}
+
+	//! values of shape functions
+	void shape_fnc(double* H, double r, double s, double t);
+
+	//! values of shape function derivatives
+	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
+
+	//! values of shape function second derivatives
+	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
+};
+
+//=============================================================================
+// 15-node tetrahedral element using a 8-node Gaussian integration rule
+class FETet15G8 : public FETet15_
+{
+public:
+	enum { NINT = 8 };
+
+public:
+	FETet15G8();
+
+	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix N;
+	matrix Ai;
+};
+
+
+//=============================================================================
+//
+//   FEHex20
+//   
+//=============================================================================
+
 
 //=============================================================================
 //! Base class for 20-node quadratic hexahedral element
@@ -428,6 +485,12 @@ public:
 };
 
 //=============================================================================
+//
+//   FEQuad4
+//   
+//=============================================================================
+
+//=============================================================================
 // Base class for 4-node bilinear quadrilaterals
 //
 class FEQuad4_ : public FESurfaceElementTraits
@@ -480,6 +543,12 @@ public:
 	//! project integration point data to nodes
 	void project_to_nodes(double* ai, double* ao);
 };
+
+//=============================================================================
+//
+//   FETri3
+//   
+//=============================================================================
 
 //=============================================================================
 //! Base class for linear triangles
@@ -549,6 +618,12 @@ public:
 	// project integration point data to nodes
 	void project_to_nodes(double* ai, double* ao);
 };
+
+//=============================================================================
+//
+//   FETri6
+//   
+//=============================================================================
 
 //=============================================================================
 // Base class for 6-noded quadratic triangles
@@ -652,6 +727,57 @@ public:
 	// project integration point data to nodes
 	void project_to_nodes(double* ai, double* ao);
 };
+
+//=============================================================================
+//
+//   FETri7
+//   
+//=============================================================================
+
+//=============================================================================
+// Base class for 7-noded quadratic triangles
+class FETri7_ : public FESurfaceElementTraits
+{
+public:
+	enum { NELN = 7 };
+
+public:
+	FETri7_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, et){}
+
+	// shape function at (r,s)
+	void shape(double* H, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv(double* Gr, double* Gs, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+};
+
+//=============================================================================
+//  7-node triangular element with 7-point gaussian quadrature
+//
+class FETri7G7 : public FETri7_
+{
+public:
+	enum { NINT = 7 };
+
+public:
+	// constructor
+	FETri7G7();
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix	Ai;
+};
+
+//=============================================================================
+//
+//   FEQuad8
+//   
+//=============================================================================
 
 //=============================================================================
 //! Base class for 8-node quadratic quadrilaterals

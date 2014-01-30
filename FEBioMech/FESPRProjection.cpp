@@ -33,6 +33,7 @@ void FESPRProjection::Project(FESolidDomain& dom, const vector< vector<double> >
 	case FE_TET10G4  : { NDOF = 10; NCN = 4; } break;
 	case FE_TET10G8  : { NDOF = 10; NCN = 4; } break;
 	case FE_TET10GL11: { NDOF = 10; NCN = 4; } break;
+	case FE_TET15G8  : { NDOF = 10; NCN = 4; } break;
 	case FE_HEX8G8   : { NDOF =  7; NCN = 8; } break;
 	default:
 		return;

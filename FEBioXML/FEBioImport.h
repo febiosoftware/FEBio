@@ -127,8 +127,9 @@ public:
 	bool	m_b3field;	//!< three-field element flag
 	bool	m_but4;		//!< use UT4 formulation flag
 	FE_Element_Type		m_nhex8;	//!< hex integration rule
-	FE_Element_Type		m_ntet4;	//!< tetrahedral integration rule
+	FE_Element_Type		m_ntet4;	//!< tet4 integration rule
 	FE_Element_Type		m_ntet10;	//!< tet10 integration rule
+	FE_Element_Type		m_ntet15;	//!< tet15 integration rule
 	FE_Element_Type		m_ntri6;	//!< tri6 integration rule
 	FE_Element_Type		m_ntri3;	//!< tri3 integration rule
 

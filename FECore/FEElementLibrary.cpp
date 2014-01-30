@@ -29,6 +29,7 @@ FEElementLibrary* FEElementLibrary::GetInstance()
 		n = m_pThis->RegisterTraits(new FETet10G4  ); assert(n==FE_TET10G4  );
 		n = m_pThis->RegisterTraits(new FETet10G8  ); assert(n==FE_TET10G8  );
 		n = m_pThis->RegisterTraits(new FETet10GL11); assert(n==FE_TET10GL11);
+		n = m_pThis->RegisterTraits(new FETet15G8  ); assert(n==FE_TET10G8  );
 		n = m_pThis->RegisterTraits(new FEHex20G27 ); assert(n==FE_HEX20G27 );
 		n = m_pThis->RegisterTraits(new FEQuad4G4  ); assert(n==FE_QUAD4G4  );
 		n = m_pThis->RegisterTraits(new FEQuad4NI  ); assert(n==FE_QUAD4NI  );
@@ -40,6 +41,7 @@ FEElementLibrary* FEElementLibrary::GetInstance()
 		n = m_pThis->RegisterTraits(new FETri6G7   ); assert(n==FE_TRI6G7   );
 		n = m_pThis->RegisterTraits(new FETri6GL7  ); assert(n==FE_TRI6GL7  );
 		n = m_pThis->RegisterTraits(new FETri6NI   ); assert(n==FE_TRI6NI   );
+		n = m_pThis->RegisterTraits(new FETri7G7   ); assert(n==FE_TRI7G7   );
 		n = m_pThis->RegisterTraits(new FEQuad8G9  ); assert(n==FE_QUAD8G9  );
 		n = m_pThis->RegisterTraits(new FEShellQuadElementTraits  ); assert(n==FE_SHELL_QUAD);
 		n = m_pThis->RegisterTraits(new FEShellTriElementTraits   ); assert(n==FE_SHELL_TRI);

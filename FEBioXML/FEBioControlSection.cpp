@@ -167,6 +167,10 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 					else if (strcmp(szv, "LOBATTO11") == 0) m_pim->m_ntet10 = FE_TET10GL11;
 					else throw XMLReader::InvalidValue(tag);
 				}
+				else if (elem == "tet15")
+				{
+					if (strcmp(szv, "GAUSS8") == 0) m_pim->m_ntet15 = FE_TET15G8;
+				}
 				else if (elem == "tri3")
 				{
 					if      (strcmp(szv, "GAUSS1") == 0) m_pim->m_ntri3 = FE_TRI3G1;
