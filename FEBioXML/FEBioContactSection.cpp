@@ -301,7 +301,7 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 		{
 			if      (tag == "quad4") el.SetType(FE_QUAD4NI);
 			else if (tag == "tri3" ) el.SetType(FE_TRI3NI );
-			else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
+			else if (tag == "tri6" ) el.SetType(FE_TRI6NI );
 			else throw XMLReader::InvalidTag(tag);
 		}
 		else
@@ -309,6 +309,7 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 			if      (tag == "quad4") el.SetType(FE_QUAD4G4);
 			else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
 			else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
+			else if (tag == "tri7" ) el.SetType(m_pim->m_ntri7);
 			else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 			else throw XMLReader::InvalidTag(tag);
 		}
@@ -371,7 +372,7 @@ bool FEBioContactSection::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal
 		{
 			if      (fi.ntype == 4) el.SetType(FE_QUAD4NI);
 			else if (fi.ntype == 3) el.SetType(FE_TRI3NI );
-			else if (fi.ntype == 6) el.SetType(m_pim->m_ntri6);
+			else if (fi.ntype == 6) el.SetType(FE_TRI6NI );
 			else return false;
 		}
 		else
@@ -379,6 +380,7 @@ bool FEBioContactSection::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal
 			if      (fi.ntype == 4) el.SetType(FE_QUAD4G4);
 			else if (fi.ntype == 3) el.SetType(m_pim->m_ntri3);
 			else if (fi.ntype == 6) el.SetType(m_pim->m_ntri6);
+			else if (fi.ntype == 7) el.SetType(m_pim->m_ntri7);
 			else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
 			else return false;
 		}

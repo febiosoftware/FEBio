@@ -131,6 +131,7 @@ public:
 	FE_Element_Type		m_ntet10;	//!< tet10 integration rule
 	FE_Element_Type		m_ntet15;	//!< tet15 integration rule
 	FE_Element_Type		m_ntri6;	//!< tri6 integration rule
+	FE_Element_Type		m_ntri7;	//!< tri7 integration rule
 	FE_Element_Type		m_ntri3;	//!< tri3 integration rule
 
 protected:

@@ -91,6 +91,7 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 	m_ntet15 = FE_TET15G8;
 	m_ntri6  = FE_TRI6G3;
 	m_ntri3  = FE_TRI3G3;
+	m_ntri7  = FE_TRI7G7;
 
 	// 3-field formulation on by default
 	m_b3field = true;

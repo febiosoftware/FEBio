@@ -186,6 +186,11 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 					else if (strcmp(szv, "LOBATTO7") == 0) m_pim->m_ntri6 = FE_TRI6GL7;
 					else throw XMLReader::InvalidValue(tag);
 				}
+				else if (elem == "tri7")
+				{
+					if (strcmp(szv, "GAUSS7") == 0) m_pim->m_ntri7 = FE_TRI7G7;
+					else throw XMLReader::InvalidValue(tag);
+				}
 				else if (elem == "tet4")
 				{
 					if (tag.isleaf())

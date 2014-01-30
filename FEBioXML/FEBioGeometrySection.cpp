@@ -1003,6 +1003,7 @@ void FEBioGeometrySection::ParseSurfaceSection(XMLTag& tag)
 		if      (tag == "quad4") face.ntype = 4;
 		else if (tag == "tri3" ) face.ntype = 3;
 		else if (tag == "tri6" ) face.ntype = 6;
+		else if (tag == "tri7" ) face.ntype = 7;
 		else if (tag == "quad8") face.ntype = 8;
 		else throw XMLReader::InvalidTag(tag);
 
