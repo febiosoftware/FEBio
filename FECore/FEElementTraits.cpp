@@ -982,7 +982,7 @@ FEHex20G27::FEHex20G27() : FEHex20_(NINT, FE_HEX20G27)
 	// integration point coordinates
 	const double a = 0.774596669241483;
 	const double w1 = 5.0 / 9.0;
-	const double w2 = 8.9 / 9.0;
+	const double w2 = 8.0 / 9.0;
 	gr[ 0] = -a; gs[ 0] = -a; gt[ 0] = -a; gw[ 0] = w1*w1*w1;
 	gr[ 1] =  0; gs[ 1] = -a; gt[ 1] = -a; gw[ 1] = w2*w1*w1;
 	gr[ 2] =  a; gs[ 2] = -a; gt[ 2] = -a; gw[ 2] = w1*w1*w1;
