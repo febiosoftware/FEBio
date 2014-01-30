@@ -411,6 +411,140 @@ bool project2tri6(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 }
 
 //-----------------------------------------------------------------------------
+// project onto a 7-node quadratic triangular element
+bool project2tri7(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
+{
+	double R[2], u[2], D;
+	double H[7], Hr[7], Hs[7], Hrs[7];
+	
+	int i, j;
+	int NMAX = 50, n=0;
+	
+	// evaulate scalar products
+	double xy[7] = {x*y[0], x*y[1], x*y[2], x*y[3], x*y[4], x*y[5], x*y[6]};
+	double yy[7][7];
+	yy[0][0] = y[0]*y[0]; yy[1][1] = y[1]*y[1]; yy[2][2] = y[2]*y[2]; yy[3][3] = y[3]*y[3]; yy[4][4] = y[4]*y[4]; yy[5][5] = y[5]*y[5];  yy[6][6] = y[6]*y[6];
+	yy[0][1] = yy[1][0] = y[0]*y[1];
+	yy[0][2] = yy[2][0] = y[0]*y[2];
+	yy[0][3] = yy[3][0] = y[0]*y[3];
+	yy[0][4] = yy[4][0] = y[0]*y[4];
+	yy[0][5] = yy[5][0] = y[0]*y[5];
+	yy[0][6] = yy[6][0] = y[0]*y[6];
+	yy[1][2] = yy[2][1] = y[1]*y[2];
+	yy[1][3] = yy[3][1] = y[1]*y[3];
+	yy[1][4] = yy[4][1] = y[1]*y[4];
+	yy[1][5] = yy[5][1] = y[1]*y[5];
+	yy[1][6] = yy[6][1] = y[1]*y[6];
+	yy[2][3] = yy[3][2] = y[2]*y[3];
+	yy[2][4] = yy[4][2] = y[2]*y[4];
+	yy[2][5] = yy[5][2] = y[2]*y[5];
+	yy[2][6] = yy[6][2] = y[2]*y[6];
+	yy[3][4] = yy[4][3] = y[3]*y[4];
+	yy[3][5] = yy[5][3] = y[3]*y[5];
+	yy[3][6] = yy[6][3] = y[3]*y[6];
+	yy[4][5] = yy[5][4] = y[4]*y[5];
+	yy[4][6] = yy[6][4] = y[4]*y[6];
+	yy[5][6] = yy[6][5] = y[5]*y[6];
+	
+	// loop until converged
+	bool bconv = false;
+	double normu;
+	do
+	{
+		// evaluate shape functions and shape function derivatives.
+		double r1 = 1.0 - r - s;
+		double r2 = r;
+		double r3 = s;
+
+		H[6] = 27.0*r1*r2*r3;
+		H[0] = r1*(2.0*r1 - 1.0) + H[6]/9.0;
+		H[1] = r2*(2.0*r2 - 1.0) + H[6]/9.0;
+		H[2] = r3*(2.0*r3 - 1.0) + H[6]/9.0;
+		H[3] = 4.0*r1*r2 - 4.0*H[6]/9.0;
+		H[4] = 4.0*r2*r3 - 4.0*H[6]/9.0;
+		H[5] = 4.0*r3*r1 - 4.0*H[6]/9.0;
+
+		Hr[6] = 27.0*s*(1.0 - 2.0*r - s);
+		Hr[0] = -3.0 + 4.0*r + 4.0*s     + Hr[6]/9.0;
+		Hr[1] =  4.0*r - 1.0             + Hr[6]/9.0;
+		Hr[2] =  0.0                     + Hr[6]/9.0;
+		Hr[3] =  4.0 - 8.0*r - 4.0*s - 4.0*Hr[6]/9.0;
+		Hr[4] =  4.0*s               - 4.0*Hr[6]/9.0;
+		Hr[5] = -4.0*s               - 4.0*Hr[6]/9.0;
+
+		Hs[6] = 27.0*r*(1.0 - r - 2.0*s);
+		Hs[0] = -3.0 + 4.0*s + 4.0*r     + Hs[6]/9.0;
+		Hs[1] =  0.0                     + Hs[6]/9.0;
+		Hs[2] =  4.0*s - 1.0             + Hs[6]/9.0;
+		Hs[3] = -4.0*r               - 4.0*Hs[6]/9.0;
+		Hs[4] =  4.0*r               - 4.0*Hs[6]/9.0;
+		Hs[5] =  4.0 - 8.0*s - 4.0*r - 4.0*Hs[6]/9.0;
+
+
+		Hrs[6] = 27.0*(1.0 - 2.0*r - 2.0*s);
+		Hrs[0] =  4.0 +     Hrs[6]/9.0;
+		Hrs[1] =  0.0 +     Hrs[6]/9.0;
+		Hrs[2] =  0.0 +     Hrs[6]/9.0;
+		Hrs[3] = -4.0 - 4.0*Hrs[6]/9.0;
+		Hrs[4] =  4.0 - 4.0*Hrs[6]/9.0;
+		Hrs[5] = -4.0 - 4.0*Hrs[6]/9.0;
+
+		// set up the system of equations
+		R[0] = R[1] = 0;
+		double A[2][2] = {0};
+		for (i=0; i<7; ++i)
+		{
+			R[0] -= (xy[i])*Hr[i];
+			R[1] -= (xy[i])*Hs[i];
+			
+			A[0][1] += (xy[i])*Hrs[i];
+			A[1][0] += (xy[i])*Hrs[i];
+			
+			for (j=0; j<7; ++j)
+			{
+				double yij = yy[i][j];
+				R[0] -= -H[j]*Hr[i]*(yij);
+				R[1] -= -H[j]*Hs[i]*(yij);
+				
+				A[0][0] -= (yij)*(Hr[i]*Hr[j]);
+				A[1][1] -= (yij)*(Hs[i]*Hs[j]);
+				
+				A[0][1] -= (yij)*(Hr[i]*Hs[j]+Hrs[i]*H[j]);
+				A[1][0] -= (yij)*(Hs[i]*Hr[j]+Hrs[i]*H[j]);
+			}
+		}
+		
+		// determinant of A
+		D = A[0][0]*A[1][1] - A[0][1]*A[1][0];
+		
+		// solve for u = A^(-1)*R
+		u[0] = (A[1][1]*R[0] - A[0][1]*R[1])/D;
+		u[1] = (A[0][0]*R[1] - A[1][0]*R[0])/D;
+		
+		// calculate displacement norm
+		normu = u[0]*u[0]+u[1]*u[1];
+		
+		// check for convergence
+		bconv = ((normu < 1e-10));
+		if (!bconv && (n <= NMAX))
+		{
+			// Don't update if converged otherwise the point q
+			// does not correspond with the current values for (r,s)
+			r += u[0];
+			s += u[1];
+			++n;
+		}
+		else break;
+	}
+	while (1);
+	
+	// evaluate q
+	q = y[0]*H[0] + y[1]*H[1] + y[2]*H[2] + y[3]*H[3]+ y[4]*H[4]+ y[5]*H[5]+ y[6]*H[6];
+	
+	return bconv;
+}
+
+//-----------------------------------------------------------------------------
 //! This function calculates the projection of x on the surface element el.
 //! It does this by finding the solution of the nonlinear equation (x-y)*y,[a]=0,
 //! where the comma denotes differentation and a ranges from 1 to 2.
@@ -468,6 +602,12 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 		break;
 	case 6: 
 		if (project2tri6(y, x, r, s, q)==false)
+		{
+//			assert(false);
+		}
+		break;
+	case 7: 
+		if (project2tri7(y, x, r, s, q)==false)
 		{
 //			assert(false);
 		}
