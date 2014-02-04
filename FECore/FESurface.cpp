@@ -104,6 +104,14 @@ int FESurface::FindElement(FESurfaceElement& el)
 			{
 				if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.m_nID;
 			}
+			else if ((nn == 7) && (el.Nodes() == 7))
+			{
+				if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.m_nID;
+			}
+			else if ((nn == 8) && (el.Nodes() == 8))
+			{
+				if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.m_nID;
+			}
 		}
 	}
 
