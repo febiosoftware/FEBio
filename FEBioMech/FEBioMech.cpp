@@ -83,6 +83,7 @@
 #include "FESlidingInterfaceBW.h"
 #include "FESurfaceConstraint.h"
 #include "FETiedInterface.h"
+#include "FEStickyInterface.h"
 #include "FEInSituStretch.h"
 #include "FEPointConstraint.h"
 #include "FEFacet2FacetTied.h"
@@ -232,6 +233,7 @@ REGISTER_FECORE_CLASS(FESlidingInterface     , FESURFACEPAIRINTERACTION_ID, "sli
 REGISTER_FECORE_CLASS(FESlidingInterfaceBW   , FESURFACEPAIRINTERACTION_ID, "sliding-tension-compression");
 REGISTER_FECORE_CLASS(FESurfaceConstraint    , FESURFACEPAIRINTERACTION_ID, "surface constraint"         );
 REGISTER_FECORE_CLASS(FETiedInterface        , FESURFACEPAIRINTERACTION_ID, "tied"                       );
+REGISTER_FECORE_CLASS(FEStickyInterface      , FESURFACEPAIRINTERACTION_ID, "sticky"                     );
 REGISTER_FECORE_CLASS(FEFacet2FacetTied      , FESURFACEPAIRINTERACTION_ID, "facet-to-facet tied"        );
 
 //-----------------------------------------------------------------------------
