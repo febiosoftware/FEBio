@@ -1,26 +1,28 @@
 
 TARGET = ../bin/febio2.$(PLAT)
 
-FECORE = ../lib/fecore_$(PLAT).a
+FELIBS = ../lib/fecore_$(PLAT).a
 
-FEBIOLIB = ../lib/febiolib_$(PLAT).a
+FELIBS += ../lib/febiolib_$(PLAT).a
 
-FEBIOPLOT = ../lib/febioplot_$(PLAT).a
+FELIBS += ../lib/febioplot_$(PLAT).a
 
-FEBIOMECH = ../lib/febiomech_$(PLAT).a
+FELIBS += ../lib/febiomech_$(PLAT).a
 
-FEBIOMIX = ../lib/febiomix_$(PLAT).a
+FELIBS += ../lib/febiomix_$(PLAT).a
 
-FEBIOHEAT = ../lib/febioheat_$(PLAT).a
+FELIBS += ../lib/febioheat_$(PLAT).a
 
-FEBIOXML = ../lib/febioxml_$(PLAT).a
+FELIBS += ../lib/febioxml_$(PLAT).a
 
-NUMCORE = ../lib/numcore_$(PLAT).a
+FELIBS += ../lib/numcore_$(PLAT).a
 
-FEBIO2LIBS = -Wl,--start-group $(FEBIOLIB) $(FEBIOPLOT) $(FEBIOHEAT) $(FEBIOMIX) $(FEBIOMECH) $(FEBIOXML) $(FECORE) $(NUMCORE) -Wl,--end-group
+#FELIBS += -L../lib -lfebioopt_$(PLAT)
+
+FEBIO2LIBS = -Wl,--start-group $(FELIBS) -Wl,--end-group
 
 $(TARGET):
-	$(CC) -o $(TARGET) $(DEF) *.cpp $(FLG) $(INC) $(FEBIO2LIBS) $(LIBS) -ldl -fPIC -static
+	$(CC) -o $(TARGET) $(DEF) *.cpp $(FLG) $(INC) $(FEBIO2LIBS) $(LIBS) -ldl
 
 clean:
 	rm -f $(TARGET)

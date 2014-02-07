@@ -1,4 +1,5 @@
-LIB = ../bin/febioopt_$(PLAT).so.1.0
+SO = libfebioopt_$(PLAT).so
+LIB = ../lib/$(SO)
 
 FECORE = ../lib/fecore_$(PLAT).a
 
@@ -8,9 +9,9 @@ FEBIO2LIBS = $(FEBIOXML) $(FECORE)
 
 $(LIB):
 	$(CC) -c $(INC) $(DEF) -O3 -Wall *.cpp -fPIC
-	$(CC) -shared -Wl,-soname,febioopt_$(PLAT).so.1 -o ../bin/febioopt_$(PLAT).so.1.0 *.o $(FEBIO2LIBS)
-	ln -sf ../bin/febioopt_$(PLAT).so.1.0 ../bin/febioopt_$(PLAT).so
-	ln -sf ../bin/febioopt_$(PLAT).so.1.0 ../bin/febioopt_$(PLAT).so.1
+	$(CC) -shared -Wl,-soname,$(SO).1 -o $(LIB).1.0 *.o $(FEBIO2LIBS)
+	ln -sf $(LIB).1.0 $(LIB)
+	ln -sf $(LIB).1.0 $(LIB).1
 
 clean:
 	rm -f *.o

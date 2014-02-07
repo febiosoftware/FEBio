@@ -65,11 +65,11 @@ INC = -I$(INTEL_INC) -I..
 DEF += -DPARDISO
 DEFD += -DPARDISO
 # Put the path to the MKL library directory here
-MKL_PATH = /usr/sci/linux64/intel/Compiler/2012/mkl/lib/intel64
+MKL_PATH = $(MKLROOT)/lib/intel64
 #MKL_PATH = /usr/local/intel/mkl/lib/intel64
 #MKL_PATH = /usr/sci/linux64/intel/mkl_10.2/lib/em64t/
-MKL_LIB = -L$(MKL_PATH) -Wl,--start-group -lmkl_intel_lp64 
-MKL_LIB += -lmkl_intel_thread -lmkl_core -Wl,--end-group
+MKL_LIB = -Wl,--start-group $(MKL_PATH)/libmkl_intel_lp64.a
+MKL_LIB += $(MKL_PATH)/libmkl_intel_thread.a $(MKL_PATH)/libmkl_core.a -Wl,--end-group
 MKL_LIB += -liomp5 -pthread
 LIBS += $(MKL_LIB)
 
