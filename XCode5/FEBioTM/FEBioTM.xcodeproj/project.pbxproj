@@ -34,16 +34,15 @@
 		D5E10C1F1865E41D00B23922 /* libfltk_png.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C181865E41D00B23922 /* libfltk_png.a */; };
 		D5E10C201865E41D00B23922 /* libfltk_z.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C191865E41D00B23922 /* libfltk_z.a */; };
 		D5E10C211865E41D00B23922 /* libfltk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C1A1865E41D00B23922 /* libfltk.a */; };
-		D5E10C3D1865E57700B23922 /* libFEBioHeat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C341865E57600B23922 /* libFEBioHeat.a */; };
-		D5E10C3E1865E57700B23922 /* libFEBioLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C351865E57600B23922 /* libFEBioLib.a */; };
-		D5E10C3F1865E57700B23922 /* libFEBioMech.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C361865E57600B23922 /* libFEBioMech.a */; };
-		D5E10C401865E57700B23922 /* libFEBioMix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C371865E57600B23922 /* libFEBioMix.a */; };
-		D5E10C411865E57700B23922 /* libFEBioOpt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C381865E57600B23922 /* libFEBioOpt.a */; };
-		D5E10C421865E57700B23922 /* libFEBioPlot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C391865E57600B23922 /* libFEBioPlot.a */; };
-		D5E10C431865E57700B23922 /* libFEBioXML.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C3A1865E57700B23922 /* libFEBioXML.a */; };
-		D5E10C441865E57700B23922 /* libFECore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C3B1865E57700B23922 /* libFECore.a */; };
-		D5E10C451865E57700B23922 /* libNumCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C3C1865E57700B23922 /* libNumCore.a */; };
-		D5E10C471865E79D00B23922 /* libFlex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C461865E79D00B23922 /* libFlex.a */; };
+		D5FB052618A5B330004E688A /* libFEBioHeat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB051C18A5B330004E688A /* libFEBioHeat.a */; };
+		D5FB052718A5B330004E688A /* libFEBioLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB051D18A5B330004E688A /* libFEBioLib.a */; };
+		D5FB052818A5B330004E688A /* libFEBioMech.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB051E18A5B330004E688A /* libFEBioMech.a */; };
+		D5FB052918A5B330004E688A /* libFEBioMix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB051F18A5B330004E688A /* libFEBioMix.a */; };
+		D5FB052B18A5B330004E688A /* libFEBioPlot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB052118A5B330004E688A /* libFEBioPlot.a */; };
+		D5FB052C18A5B330004E688A /* libFEBioXML.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB052218A5B330004E688A /* libFEBioXML.a */; };
+		D5FB052D18A5B330004E688A /* libFECore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB052318A5B330004E688A /* libFECore.a */; };
+		D5FB052E18A5B330004E688A /* libFlex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB052418A5B330004E688A /* libFlex.a */; };
+		D5FB052F18A5B330004E688A /* libNumCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB052518A5B330004E688A /* libNumCore.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -96,16 +95,15 @@
 		D5E10C181865E41D00B23922 /* libfltk_png.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfltk_png.a; path = ../../../../../../../../../../../usr/local/lib/libfltk_png.a; sourceTree = "<group>"; };
 		D5E10C191865E41D00B23922 /* libfltk_z.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfltk_z.a; path = ../../../../../../../../../../../usr/local/lib/libfltk_z.a; sourceTree = "<group>"; };
 		D5E10C1A1865E41D00B23922 /* libfltk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfltk.a; path = ../../../../../../../../../../../usr/local/lib/libfltk.a; sourceTree = "<group>"; };
-		D5E10C341865E57600B23922 /* libFEBioHeat.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioHeat.a; path = ../FEBioHeat/build/Debug/libFEBioHeat.a; sourceTree = "<group>"; };
-		D5E10C351865E57600B23922 /* libFEBioLib.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioLib.a; path = ../FEBioLib/build/Debug/libFEBioLib.a; sourceTree = "<group>"; };
-		D5E10C361865E57600B23922 /* libFEBioMech.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioMech.a; path = ../FEBioMech/build/Debug/libFEBioMech.a; sourceTree = "<group>"; };
-		D5E10C371865E57600B23922 /* libFEBioMix.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioMix.a; path = ../FEBioMix/build/Debug/libFEBioMix.a; sourceTree = "<group>"; };
-		D5E10C381865E57600B23922 /* libFEBioOpt.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioOpt.a; path = ../FEBioOpt/build/Debug/libFEBioOpt.a; sourceTree = "<group>"; };
-		D5E10C391865E57600B23922 /* libFEBioPlot.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioPlot.a; path = ../FEBioPlot/build/Debug/libFEBioPlot.a; sourceTree = "<group>"; };
-		D5E10C3A1865E57700B23922 /* libFEBioXML.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioXML.a; path = ../FEBioXML/build/Debug/libFEBioXML.a; sourceTree = "<group>"; };
-		D5E10C3B1865E57700B23922 /* libFECore.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFECore.a; path = ../FECore/build/Debug/libFECore.a; sourceTree = "<group>"; };
-		D5E10C3C1865E57700B23922 /* libNumCore.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libNumCore.a; path = ../NumCore/build/Debug/libNumCore.a; sourceTree = "<group>"; };
-		D5E10C461865E79D00B23922 /* libFlex.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFlex.a; path = ../../../Flex/XCode5/Flex/build/Debug/libFlex.a; sourceTree = "<group>"; };
+		D5FB051C18A5B330004E688A /* libFEBioHeat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFEBioHeat.a; path = ../DerivedData/FEBio2/Build/Products/Debug/libFEBioHeat.a; sourceTree = "<group>"; };
+		D5FB051D18A5B330004E688A /* libFEBioLib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFEBioLib.a; path = ../DerivedData/FEBio2/Build/Products/Debug/libFEBioLib.a; sourceTree = "<group>"; };
+		D5FB051E18A5B330004E688A /* libFEBioMech.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFEBioMech.a; path = ../DerivedData/FEBio2/Build/Products/Debug/libFEBioMech.a; sourceTree = "<group>"; };
+		D5FB051F18A5B330004E688A /* libFEBioMix.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFEBioMix.a; path = ../DerivedData/FEBio2/Build/Products/Debug/libFEBioMix.a; sourceTree = "<group>"; };
+		D5FB052118A5B330004E688A /* libFEBioPlot.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFEBioPlot.a; path = ../DerivedData/FEBio2/Build/Products/Debug/libFEBioPlot.a; sourceTree = "<group>"; };
+		D5FB052218A5B330004E688A /* libFEBioXML.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFEBioXML.a; path = ../DerivedData/FEBio2/Build/Products/Debug/libFEBioXML.a; sourceTree = "<group>"; };
+		D5FB052318A5B330004E688A /* libFECore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFECore.a; path = ../DerivedData/FEBio2/Build/Products/Debug/libFECore.a; sourceTree = "<group>"; };
+		D5FB052418A5B330004E688A /* libFlex.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFlex.a; path = ../DerivedData/FEBio2/Build/Products/Debug/libFlex.a; sourceTree = "<group>"; };
+		D5FB052518A5B330004E688A /* libNumCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libNumCore.a; path = ../DerivedData/FEBio2/Build/Products/Debug/libNumCore.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,16 +111,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D5E10C471865E79D00B23922 /* libFlex.a in Frameworks */,
-				D5E10C3D1865E57700B23922 /* libFEBioHeat.a in Frameworks */,
-				D5E10C3E1865E57700B23922 /* libFEBioLib.a in Frameworks */,
-				D5E10C3F1865E57700B23922 /* libFEBioMech.a in Frameworks */,
-				D5E10C401865E57700B23922 /* libFEBioMix.a in Frameworks */,
-				D5E10C411865E57700B23922 /* libFEBioOpt.a in Frameworks */,
-				D5E10C421865E57700B23922 /* libFEBioPlot.a in Frameworks */,
-				D5E10C431865E57700B23922 /* libFEBioXML.a in Frameworks */,
-				D5E10C441865E57700B23922 /* libFECore.a in Frameworks */,
-				D5E10C451865E57700B23922 /* libNumCore.a in Frameworks */,
+				D5FB052618A5B330004E688A /* libFEBioHeat.a in Frameworks */,
+				D5FB052718A5B330004E688A /* libFEBioLib.a in Frameworks */,
+				D5FB052818A5B330004E688A /* libFEBioMech.a in Frameworks */,
+				D5FB052918A5B330004E688A /* libFEBioMix.a in Frameworks */,
+				D5FB052B18A5B330004E688A /* libFEBioPlot.a in Frameworks */,
+				D5FB052C18A5B330004E688A /* libFEBioXML.a in Frameworks */,
+				D5FB052D18A5B330004E688A /* libFECore.a in Frameworks */,
+				D5FB052E18A5B330004E688A /* libFlex.a in Frameworks */,
+				D5FB052F18A5B330004E688A /* libNumCore.a in Frameworks */,
 				D5E10C1B1865E41D00B23922 /* libfltk_forms.a in Frameworks */,
 				D5E10C1C1865E41D00B23922 /* libfltk_gl.a in Frameworks */,
 				D5E10C1D1865E41D00B23922 /* libfltk_images.a in Frameworks */,
@@ -161,16 +158,15 @@
 		D5E10BAC1865E32800B23922 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D5E10C461865E79D00B23922 /* libFlex.a */,
-				D5E10C341865E57600B23922 /* libFEBioHeat.a */,
-				D5E10C351865E57600B23922 /* libFEBioLib.a */,
-				D5E10C361865E57600B23922 /* libFEBioMech.a */,
-				D5E10C371865E57600B23922 /* libFEBioMix.a */,
-				D5E10C381865E57600B23922 /* libFEBioOpt.a */,
-				D5E10C391865E57600B23922 /* libFEBioPlot.a */,
-				D5E10C3A1865E57700B23922 /* libFEBioXML.a */,
-				D5E10C3B1865E57700B23922 /* libFECore.a */,
-				D5E10C3C1865E57700B23922 /* libNumCore.a */,
+				D5FB051C18A5B330004E688A /* libFEBioHeat.a */,
+				D5FB051D18A5B330004E688A /* libFEBioLib.a */,
+				D5FB051E18A5B330004E688A /* libFEBioMech.a */,
+				D5FB051F18A5B330004E688A /* libFEBioMix.a */,
+				D5FB052118A5B330004E688A /* libFEBioPlot.a */,
+				D5FB052218A5B330004E688A /* libFEBioXML.a */,
+				D5FB052318A5B330004E688A /* libFECore.a */,
+				D5FB052418A5B330004E688A /* libFlex.a */,
+				D5FB052518A5B330004E688A /* libNumCore.a */,
 				D5E10C141865E41D00B23922 /* libfltk_forms.a */,
 				D5E10C151865E41D00B23922 /* libfltk_gl.a */,
 				D5E10C161865E41D00B23922 /* libfltk_images.a */,
@@ -372,7 +368,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
@@ -417,7 +413,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DHAVE_PTHREAD_H",
@@ -441,6 +437,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "FEBioTM/FEBioTM-Prefix.pch";
 				INFOPLIST_FILE = "FEBioTM/FEBioTM-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/gerard/Documents/Programs/fem/FEBio/MRLProjects/FEBio2/XCode5/DerivedData/FEBio2/Build/Products/Debug,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -453,6 +453,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "FEBioTM/FEBioTM-Prefix.pch";
 				INFOPLIST_FILE = "FEBioTM/FEBioTM-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/gerard/Documents/Programs/fem/FEBio/MRLProjects/FEBio2/XCode5/DerivedData/FEBio2/Build/Products/Debug,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
