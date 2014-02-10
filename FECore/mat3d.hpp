@@ -349,6 +349,13 @@ inline void mat3ds::zero()
 	m[0] = m[1] = m[2] = m[3] = m[4] = m[5] = 0;
 }
 
+// unit tensor
+inline void mat3ds::unit()
+{
+	m[XX] = m[YY] = m[ZZ] = 1.0;
+	m[XY] = m[YZ] = m[XZ] = 0.0;
+}
+
 // deviator
 inline mat3ds mat3ds::dev() const
 {

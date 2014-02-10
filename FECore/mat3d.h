@@ -174,6 +174,9 @@ public:
 	// intialize to zero
 	void zero();
 
+	// initialize to unit tensor
+	void unit();
+
 	// deviator
 	mat3ds dev() const;
 
