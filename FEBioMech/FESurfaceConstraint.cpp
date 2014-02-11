@@ -3,6 +3,7 @@
 #include "FEStiffnessMatrix.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEModel.h"
+#include "FECore/FENormalProjection.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -199,10 +200,13 @@ void FESurfaceConstraint::Activate()
 
 void FESurfaceConstraint::ProjectSurface(FESurfaceConstraintSurface& ss, FESurfaceConstraintSurface& ms, bool bmove)
 {
-	bool bfirst = true;
-
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	double R = m_srad*mesh.GetBoundingBox().radius();
+
+	FENormalProjection np(ms);
+	np.SetTolerance(m_stol);
+	np.SetSearchRadius(R);
+	np.Init();
 
 	int i;
 	double rs[2];
@@ -229,7 +233,7 @@ void FESurfaceConstraint::ProjectSurface(FESurfaceConstraintSurface& ss, FESurfa
 		vec3d r0 = node.m_r0;
 
 		// find the intersection with the master surface
-		ss.m_pme[i] = ms.FindIntersection(r0, cn, rs, bfirst, m_stol, R);
+		ss.m_pme[i] = np.Project(r0, cn, rs);
 		assert(ss.m_pme[i]);
 
 		ss.m_rs[i][0] = rs[0];

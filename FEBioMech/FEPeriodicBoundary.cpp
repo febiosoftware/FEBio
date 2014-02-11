@@ -3,6 +3,7 @@
 #include "FEStiffnessMatrix.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEModel.h"
+#include "FECore/FENormalProjection.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -176,8 +177,6 @@ void FEPeriodicBoundary::BuildMatrixProfile(FEStiffnessMatrix& K)
 //! project surface
 void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface& ms, bool bmove)
 {
-	bool bfirst = true;
-
 	int i;
 	double rs[2];
 
@@ -194,6 +193,12 @@ void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface
 	// this will serve as the projection distance
 	vec3d cn(cr); cn.unit();
 
+	// initialize projection data
+	FENormalProjection np(ms);
+	np.SetTolerance(m_stol);
+	np.SetSearchRadius(m_srad);
+	np.Init();
+
 	// loop over all slave nodes
 	for (i=0; i<ss.Nodes(); ++i)
 	{
@@ -203,7 +208,7 @@ void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface
 		vec3d r0 = node.m_r0;
 
 		// find the intersection with the master surface
-		ss.m_pme[i] = ms.FindIntersection(r0, cn, rs, bfirst, m_stol, m_srad);
+		ss.m_pme[i] = np.Project(r0, cn, rs);
 		assert(ss.m_pme[i]);
 
 		ss.m_rs[i][0] = rs[0];

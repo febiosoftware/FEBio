@@ -5,6 +5,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
+#include "FECore/FENormalProjection.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -850,8 +851,6 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 //-----------------------------------------------------------------------------
 void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface3& ms, bool bupseg)
 {
-	bool bfirst = true;
-
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	FESurfaceElement* pme;
 	vec3d r, nu;
@@ -863,8 +862,14 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 	
 	double R = m_srad*mesh.GetBoundingBox().radius();
 	
+	// initialize projection data
+	FENormalProjection np(ms);
+	np.SetTolerance(m_stol);
+	np.SetSearchRadius(m_srad);
+	np.Init();
+
 	// loop over all integration points
-//    #pragma omp parallel for shared(R, bfirst, bupseg)
+//    #pragma omp parallel for shared(R, bupseg)
 	for (int i=0; i<ss.Elements(); ++i)
 	{
 		FESurfaceElement& el = ss.Element(i);
@@ -923,7 +928,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 			}
 			
 			// find the intersection point with the master surface
-			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, bfirst, m_stol, R);
+			if (pme == 0 && bupseg) pme = np.Project(r, nu, rs);
 			
 			pt.m_pme = pme;
 			pt.m_nu = nu;
@@ -1064,6 +1069,12 @@ void FESlidingInterface3::Update(int niter)
 		FESlidingSurface3& ss = (np == 0? m_ss : m_ms);
 		FESlidingSurface3& ms = (np == 0? m_ms : m_ss);
 		
+		// initialize projection data
+		FENormalProjection np(ss);
+		np.SetTolerance(m_stol);
+		np.SetSearchRadius(m_srad);
+		np.Init();
+
 		// loop over all elements of the primary surface
 		for (n=0; n<ss.Elements(); ++n)
 		{
@@ -1115,8 +1126,7 @@ void FESlidingInterface3::Update(int niter)
 				FENode& node = ms.Node(n);
 				
 				// project it onto the primary surface
-				bool bfirst = false;
-				FESurfaceElement* pse = ss.FindIntersection(node.m_rt, ms.m_nn[n], rs, bfirst, m_stol, R);
+				FESurfaceElement* pse = np.Project(node.m_rt, ms.m_nn[n], rs);
 				
 				if (pse)
 				{

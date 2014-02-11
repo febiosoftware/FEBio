@@ -41,9 +41,6 @@ public:
 	//! evaluate net contact force
 	vec3d GetContactForce();
 
-	//! initialize projection
-	void InitProjection();
-
 public:
 	void GetNodalContactGap     (int nface, double* pg);
 	void GetNodalContactPressure(int nface, double* pg);

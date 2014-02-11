@@ -14,8 +14,11 @@ public:
 	//! Initialization
 	bool Init();
 
-	//! Project point onto surface
+	//! Project a point onto surface
 	FESurfaceElement* Project(vec3d& x, vec3d& q, vec2d& r);
+
+	//! Project a node onto a surface
+	FESurfaceElement* Project(int n, vec3d& q, vec2d& r);
 
 public:
 	//! Set the projection tolerance
@@ -26,6 +29,7 @@ public:
 
 protected:
 	double	m_tol;	//!< projection tolerance
+	double	m_rad;	//!< search radius
 
 protected:
 	FESurface&		m_surf;		//!< reference to surface

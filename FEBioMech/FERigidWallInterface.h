@@ -14,6 +14,7 @@
 #include "FECore/FESurface.h"
 #include "FECore/vec3d.h"
 #include "FECore/vec2d.h"
+#include "FECore/FENNQuery.h"
 #include "FERigidSurface.h"
 
 //-----------------------------------------------------------------------------

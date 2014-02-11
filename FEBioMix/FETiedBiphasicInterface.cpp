@@ -2,6 +2,7 @@
 #include "FEBiphasic.h"
 #include "FEBioMech/FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
+#include "FECore/FENormalProjection.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -480,14 +481,18 @@ double FETiedBiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FETied
 // Perform initial projection between tied surfaces in reference configuration
 void FETiedBiphasicInterface::InitialProjection(FETiedBiphasicSurface& ss, FETiedBiphasicSurface& ms)
 {
-	bool bfirst = true;
-
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	double R = m_srad*mesh.GetBoundingBox().radius();
 	
 	FESurfaceElement* pme;
 	vec3d r, nu;
 	double rs[2];
+
+	// initialize projection data
+	FENormalProjection np(ms);
+	np.SetTolerance(m_stol);
+	np.SetSearchRadius(m_srad);
+	np.Init();
 	
 	// loop over all integration points
 	int n = 0;
@@ -506,7 +511,7 @@ void FETiedBiphasicInterface::InitialProjection(FETiedBiphasicSurface& ss, FETie
 			nu = ss.SurfaceNormal(el, j);
 			
 			// find the intersection point with the master surface
-			pme = ms.FindIntersection2(r, nu, rs, bfirst, m_stol, R);
+			pme = np.Project2(r, nu, rs);
 			
 			ss.m_pme[n] = pme;
 			ss.m_rs[n][0] = rs[0];

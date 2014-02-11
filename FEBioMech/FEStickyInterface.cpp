@@ -2,7 +2,7 @@
 #include "FEStickyInterface.h"
 #include "FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
-#include "FECore/FENNQuery.h"
+#include "FECore/FEClosestPointProjection.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -212,6 +212,11 @@ void FEStickyInterface::ShallowCopy(DumpStream& dmp, bool bsave)
 //!
 void FEStickyInterface::Update(int niter)
 {
+	// closest point projection method
+	FEClosestPointProjection cpp(ms);
+	cpp.SetTolerance(m_stol);
+	cpp.Init();
+
 	// get the mesh
 	FEMesh& mesh = *ss.GetMesh();
 
@@ -252,7 +257,7 @@ void FEStickyInterface::Update(int niter)
 
 			// find the master element
 			vec3d q; vec2d rs;
-			FESurfaceElement* pme = ms.ClosestPointProjection(x, q, rs, (i==0), m_stol);
+			FESurfaceElement* pme = cpp.Project(x, q, rs);
 			if (pme)
 			{
 				// calculate the master normal
@@ -282,6 +287,11 @@ void FEStickyInterface::Update(int niter)
 
 void FEStickyInterface::ProjectSurface(FEStickySurface& ss, FEStickySurface& ms, bool bmove)
 {
+	// closest point projection method
+	FEClosestPointProjection cpp(ms);
+	cpp.SetTolerance(m_stol);
+	cpp.Init();
+
 	// loop over all slave nodes
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
@@ -297,7 +307,7 @@ void FEStickyInterface::ProjectSurface(FEStickySurface& ss, FEStickySurface& ms,
 
 		// find the master element
 		vec3d q; vec2d rs;
-		FESurfaceElement* pme = ms.ClosestPointProjection(x, q, rs, (i==0), m_stol);
+		FESurfaceElement* pme = cpp.Project(x, q, rs);
 		if (pme)
 		{
 			// calculate the master normal

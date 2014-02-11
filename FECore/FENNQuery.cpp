@@ -43,7 +43,7 @@ void FENNQuery::Init()
 	// pick a random point as pivot
 	r0 = m_q1 = m_ps->Node(0).m_rt;
 
-	// find the furtest node of this node
+	// find the farthest node of this node
 	double dmax = 0, d;
 	for (i=0; i<N; ++i)
 	{
@@ -56,7 +56,7 @@ void FENNQuery::Init()
 		}
 	}
 
-	// let's find the furthest node of this node
+	// let's find the farthest node of this node
 	r0 = m_q2 = m_q1;
 	dmax = 0;
 	for (i=0; i<N; ++i)

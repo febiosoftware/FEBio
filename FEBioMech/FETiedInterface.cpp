@@ -6,7 +6,7 @@
 #include "FETiedInterface.h"
 #include "FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
-#include "FECore/FENNQuery.h"
+#include "FECore/FEClosestPointProjection.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -158,6 +158,11 @@ void FETiedInterface::Update(int niter)
 
 void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurface& ms, bool bmove)
 {
+	// closest point projection method
+	FEClosestPointProjection cpp(ms);
+	cpp.SetTolerance(m_stol);
+	cpp.Init();
+
 	// loop over all slave nodes
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
@@ -170,7 +175,7 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 
 		// find the master element
 		vec3d q; vec2d rs;
-		FESurfaceElement* pme = ms.ClosestPointProjection(x, q, rs, (i==0), m_stol);
+		FESurfaceElement* pme = cpp.Project(x, q, rs);
 		if (pme)
 		{
 			// store the master element

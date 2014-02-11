@@ -2,6 +2,7 @@
 #include "FEBiphasic.h"
 #include "FEBioMech/FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
+#include "FECore/FENormalProjection.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -671,8 +672,6 @@ double FESlidingInterface2::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 //-----------------------------------------------------------------------------
 void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface2& ms, bool bupseg)
 {
-	bool bfirst = true;
-
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	FESurfaceElement* pme;
 	vec3d r, nu;
@@ -683,8 +682,13 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 
 	double R = m_srad*mesh.GetBoundingBox().radius();
 
+	FENormalProjection np(ms);
+	np.SetTolerance(m_stol);
+	np.SetSearchRadius(R);
+	np.Init();
+
 	// loop over all integration points
- //   #pragma omp parallel for shared(R, bfirst, bupseg)
+ //   #pragma omp parallel for shared(R, bupseg)
 	for (int i=0; i<ss.Elements(); ++i)
 	{
 		FESurfaceElement& el = ss.Element(i);
@@ -732,7 +736,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 			}
 
 			// find the intersection point with the master surface
-			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, bfirst, m_stol, R);
+			if (pme == 0 && bupseg) pme = np.Project(r, nu, rs);
 
 			pt.m_pme = pme;
 			pt.m_nu = nu;
@@ -894,14 +898,18 @@ void FESlidingInterface2::Update(int niter)
 		// the secondary surface is trickier since we need
 		// to look at the primary's surface projection
 		if (ms.m_bporo) {
+			FENormalProjection np(ss);
+			np.SetTolerance(m_stol);
+			np.SetSearchRadius(R);
+			np.Init();
+
 			for (n=0; n<ms.Nodes(); ++n)
 			{
 				// get the node
 				FENode& node = ms.Node(n);
 				
 				// project it onto the primary surface
-				bool bfirst = false;
-				FESurfaceElement* pse = ss.FindIntersection(node.m_rt, ms.m_nn[n], rs, bfirst, m_stol, R);
+				FESurfaceElement* pse = np.Project(node.m_rt, ms.m_nn[n], rs);
 				
 				if (pse)
 				{

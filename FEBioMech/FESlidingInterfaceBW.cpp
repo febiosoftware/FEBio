@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FESlidingInterfaceBW.h"
 #include "FESolidSolver.h"
+#include "FECore/FENormalProjection.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -59,12 +60,6 @@ bool FESlidingSurfaceBW::Init()
 		m_Data[i].resize(nint);
 	}
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FESlidingSurfaceBW::InitProjection()
-{
-	m_OT.Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -427,8 +422,10 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
 	double R = m_srad*mesh.GetBoundingBox().radius();
 
 	// initialize projection data
-	ms.InitProjection();
-	bool binit = false;
+	FENormalProjection np(ms);
+	np.SetTolerance(m_stol);
+	np.SetSearchRadius(R);
+	np.Init();
 	
 	// loop over all integration points
 //	#pragma omp parallel for shared(R, binit, bupseg)
@@ -470,7 +467,7 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
 			}
 			
 			// find the intersection point with the master surface
-			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, binit, m_stol, R);
+			if (pme == 0 && bupseg) pme = np.Project(r, nu, rs);
 			
 			data.m_pme = pme;
 			data.m_nu = nu;

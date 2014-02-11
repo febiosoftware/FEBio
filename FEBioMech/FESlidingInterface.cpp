@@ -6,6 +6,7 @@
 #include "FEStiffnessMatrix.h"
 #include "FESlidingInterface.h"
 #include "FEElasticShellDomain.h"
+#include "FECore/FEClosestPointProjection.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
 
@@ -366,6 +367,10 @@ void FESlidingInterface::CalcAutoPenalty(FESlidingSurface& s)
 	// get the mesh
 	FEMesh& mesh = *s.GetMesh();
 
+	// get the node element list for this surface
+	FENodeElemList NEL;
+	NEL.Create(s);
+
 	// loop over all surface elements
 	FEElement *pe;
 	for (i=0; i<s.Elements(); ++i)
@@ -397,8 +402,8 @@ void FESlidingInterface::CalcAutoPenalty(FESlidingSurface& s)
 		}
 	}
 
-	// scale values according to valence
-	for (i=0; i<s.Nodes(); ++i) s.m_eps[i] /= s.m_NEL.Valence(i);
+	// scale values according to valence (TODO: Why are we doing this?)
+	for (i=0; i<s.Nodes(); ++i) s.m_eps[i] /= NEL.Valence(i);
 }
 
 //-----------------------------------------------------------------------------
@@ -450,11 +455,13 @@ void FESlidingInterface::Activate()
 
 void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& ms, bool bupseg, bool bmove)
 {
-	bool bfirst = true;
-
 	// slave node projection
 	double r, s;
 	vec3d q;
+
+	FEClosestPointProjection cpp(ms);
+	cpp.SetTolerance(m_stol);
+	cpp.Init();
 
 	// loop over all slave nodes
 	for (int i=0; i<ss.Nodes(); ++i)
@@ -494,7 +501,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 					// see if the node might have moved to another master element
 					FESurfaceElement* pold = pme; 
 					ss.m_rs[i] = vec2d(0,0);
-					pme = ms.ClosestPointProjection(x, q, ss.m_rs[i], bfirst, m_stol); bfirst = false;
+					pme = cpp.Project(x, q, ss.m_rs[i]);
 
 					if (pme == 0)
 					{
@@ -519,7 +526,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 			// get the master element
 			// don't forget to initialize the search for the first node!
 			ss.m_rs[i] = vec2d(0,0);
-			pme = ms.ClosestPointProjection(x, q, ss.m_rs[i], bfirst, m_stol); bfirst = false;
+			pme = cpp.Project(x, q, ss.m_rs[i]);
 			if (pme)
 			{
 				// the node has come into contact so make sure to initialize
@@ -579,7 +586,6 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 //-----------------------------------------------------------------------------
 //! updates sliding interface data
 //! niter is the number of Newton iterations.
-//! \todo Should I get rid of the bfirst static variable?
 void FESlidingInterface::Update(int niter)
 {
 	// should we do a segment update or not?

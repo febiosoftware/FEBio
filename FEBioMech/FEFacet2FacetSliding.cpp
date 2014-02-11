@@ -2,6 +2,7 @@
 #include "FEFacet2FacetSliding.h"
 #include "FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEClosestPointProjection.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -428,7 +429,9 @@ void FEFacet2FacetSliding::CalcAutoPenalty(FEFacetSlidingSurface& s)
 //
 void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlidingSurface &ms, bool bsegup)
 {
-	bool bfirst = true;
+	FEClosestPointProjection cpp(ms);
+	cpp.SetTolerance(m_stol);
+	cpp.Init();
 
 	// loop over all slave elements
 	for (int i=0; i<ss.Elements(); ++i)
@@ -466,15 +469,15 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 				{
 					// if not, do a new search
 					pt.m_rs = vec2d(0,0);
-					FESurfaceElement* pme = ms.ClosestPointProjection(x, q, pt.m_rs, bfirst, m_stol); bfirst = false;
-					pt.m_pme = dynamic_cast<FESurfaceElement*>(pme);
+					FESurfaceElement* pme = cpp.Project(x, q, pt.m_rs);
+					pt.m_pme = pme;
 				}
 			}
 			if (bsegup)
 			{
 				// find the master segment this element belongs to
 				pt.m_rs = vec2d(0,0);
-				FESurfaceElement* pme = ms.ClosestPointProjection(x, q, pt.m_rs, bfirst, m_stol); bfirst = false;
+				FESurfaceElement* pme = cpp.Project(x, q, pt.m_rs);
 				pt.m_pme = pme;
 			}
 
