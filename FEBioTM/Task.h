@@ -6,13 +6,14 @@ class Timer;
 
 //-----------------------------------------------------------------------------
 // The task defines a problem to be run with FEBio. It has several states:
-// - READY = File is read in and awaits to be scheduled.
-// - MODIFIED = File has been modified. Will be saved automatically when run.
-// - QUEUED = File is scheduled to be run.
-// - RUNNING = File is being run.
+// - READY     = File is read in and awaits to be scheduled.
+// - MODIFIED  = File has been modified. Will be saved automatically when run.
+// - QUEUED    = File is scheduled to be run.
+// - RUNNING   = File is being run.
 // - COMPLETED = File has run and terminated successfully.
-// - FAILED = File has run but did not terminate successfully.
+// - FAILED    = File has run but did not terminate successfully.
 // - CANCELLED = Run was cancelled by the user before terminating.
+// - PAUSED    = File is running but paused
 //
 // Each task also manages its own input file through the Fl_Text_Buffer
 // reference. 
@@ -41,7 +42,7 @@ public:
 public:
 	// status values
 	// note that at any given time, only one task may have its status set to RUNNING
-	enum { READY, MODIFIED, QUEUED, RUNNING, COMPLETED, FAILED, CANCELLED };
+	enum { READY, MODIFIED, QUEUED, RUNNING, COMPLETED, FAILED, CANCELLED, PAUSED };
 
 public:
 	// con-/de-structor

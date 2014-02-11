@@ -77,6 +77,8 @@ public:	// --- M E N U   H A N D L E R S ---
 
 	void OnRunSelected      (Fl_Widget* pw, void* pd);
 	void OnRunSession       (Fl_Widget* pw, void* pd);
+	void OnPauseRun         (Fl_Widget* pw, void* pd);
+	void OnContinueRun      (Fl_Widget* pw, void* pd);
 	void OnRunCancelSelected(Fl_Widget* pw, void* pd);
 	void OnRunCancelAll     (Fl_Widget* pw, void* pd);
 

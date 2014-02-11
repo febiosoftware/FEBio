@@ -29,6 +29,8 @@ CMenu::CMenu(int w, int h, CWnd* pwnd) : Fl_Menu_Bar(0, 0, w, h), m_pWnd(pwnd)
 		{"Run", 0, 0, 0, FL_SUBMENU },
 			{"Run Selected"   , FL_CTRL + FL_F + 5, FLX_MENU_HANDLER(pwnd, CWnd::OnRunSelected)},
 			{"Run Session"    ,           FL_F + 5, FLX_MENU_HANDLER(pwnd, CWnd::OnRunSession), FL_MENU_DIVIDER},
+			{"Pause Run"      , FL_CTRL + FL_F + 6, FLX_MENU_HANDLER(pwnd, CWnd::OnPauseRun)},
+			{"Continue Run"   ,           FL_F + 6, FLX_MENU_HANDLER(pwnd, CWnd::OnContinueRun), FL_MENU_DIVIDER},
 			{"Cancel Selected",                  0, FLX_MENU_HANDLER(pwnd, CWnd::OnRunCancelSelected)},
 			{"Cancel all"     ,                  0, FLX_MENU_HANDLER(pwnd, CWnd::OnRunCancelAll)},
 			{0},

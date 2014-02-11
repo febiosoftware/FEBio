@@ -267,6 +267,13 @@ void intterupt_cb(FEModel* pfem, void* pd)
 		Fl::unlock();
 		throw ExitRequest();
 	}
+	else if (ptask->GetStatus() == CTask::PAUSED)
+	{
+		while (ptask->GetStatus() == CTask::PAUSED)
+		{
+			Fl::check();
+		}
+	}
 	// release lock
 	Fl::unlock();
 }

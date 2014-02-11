@@ -42,7 +42,7 @@ CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X,
 void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y, int W, int H)
 {
 	static char* szc[] = {"Path", "File Size", "Status", "Run time"};
-	static char* szs[] = {"", "Modified", "Queued", "Running", "Completed", "Failed", "Cancelled"};
+	static char* szs[] = {"", "Modified", "Queued", "Running", "Completed", "Failed", "Cancelled", "Paused"};
 
     switch ( context ) 
 	{
@@ -102,7 +102,8 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 					int nstatus = pt->GetStatus();
 					if ((nstatus == CTask::COMPLETED) || 
 						(nstatus == CTask::RUNNING  ) ||
-						(nstatus == CTask::CANCELLED))
+						(nstatus == CTask::CANCELLED) ||
+						(nstatus == CTask::PAUSED))
 					{
 						char sz[32];
 						CTask::STATS& s = pt->m_stats;

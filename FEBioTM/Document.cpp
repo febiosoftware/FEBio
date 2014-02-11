@@ -265,7 +265,7 @@ void CDocument::RunQueue()
 void CDocument::RunTask(CTask* pt)
 {
 	// make sure this task is not running
-	if (pt->GetStatus() == CTask::RUNNING) return;
+	if ((pt->GetStatus() == CTask::RUNNING) || (pt->GetStatus() == CTask::PAUSED)) return;
 
 	// save the file if necessary
 	if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
@@ -293,7 +293,7 @@ void CDocument::RunSession()
 			if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
 
 			// only add the task if it is not running
-			if (pt->GetStatus() != CTask::RUNNING) pt->SetStatus(CTask::QUEUED);
+			if ((pt->GetStatus() != CTask::RUNNING) && (pt->GetStatus() != CTask::PAUSED)) pt->SetStatus(CTask::QUEUED);
 		}
 	}
 

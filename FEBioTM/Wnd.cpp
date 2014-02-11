@@ -596,6 +596,20 @@ void CWnd::OnRunSession(Fl_Widget* pw, void* pd)
 }
 
 //-----------------------------------------------------------------------------
+void CWnd::OnPauseRun(Fl_Widget* pw, void* pd)
+{
+	CTask* ptask = CTask::GetRunningTask();
+	ptask->SetStatus(CTask::PAUSED);
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnContinueRun(Fl_Widget* pw, void* pd)
+{
+	CTask* ptask = CTask::GetRunningTask();
+	ptask->SetStatus(CTask::RUNNING);
+}
+
+//-----------------------------------------------------------------------------
 // Stop the task that the user has selected
 void CWnd::OnRunCancelSelected(Fl_Widget* pw, void* pd)
 {
