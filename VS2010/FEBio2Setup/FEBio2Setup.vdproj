@@ -19,18 +19,6 @@
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
-        "Entry"
-        {
-        "MsmKey" = "8:_91E8C71A6E3645F586950E342DF004E1"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_CC04C874ED666DAAAE458EE202BD7729"
-        "OwnerKey" = "8:_91E8C71A6E3645F586950E342DF004E1"
-        "MsmSig" = "8:_UNDEFINED"
-        }
     }
     "Configurations"
     {
@@ -350,26 +338,6 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CC04C874ED666DAAAE458EE202BD7729"
-            {
-            "SourcePath" = "8:COMDLG32.dll"
-            "TargetName" = "8:COMDLG32.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_A2F0549FBE9844E5B4B2A0D14CB819DE"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
         }
         "FileType"
         {
@@ -1006,7 +974,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_5F85932F5BA749ED8AC24C2FCC4CA99B"
             {
-            "SourcePath" = "8:..\\Debug - MTd\\FEBio2.exe"
+            "SourcePath" = "8:..\\Debug\\FEBio2.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_529ABCE5344A48FB8387D60260816A83"
@@ -1027,34 +995,6 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{448F4A28-A0DA-42F8-8D30-ED583D612E49}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_91E8C71A6E3645F586950E342DF004E1"
-            {
-            "SourcePath" = "8:..\\Debug - MTd\\FEBioTM.exe"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_529ABCE5344A48FB8387D60260816A83"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
-            "OutputProjectGuid" = "8:{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
