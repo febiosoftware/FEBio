@@ -101,3 +101,45 @@ FESurfaceElement* FENormalProjection::Project2(vec3d r, vec3d n, double rs[2])
 	return 0;
 }
 
+//-----------------------------------------------------------------------------
+//! This function finds the element which is intersected by the ray (r,n).
+//! It returns a pointer to the element, as well as the isoparametric coordinates
+//! of the intersection point.
+//!
+FESurfaceElement* FENormalProjection::Project3(vec3d r, vec3d n, double rs[2], int* pei)
+{
+//	double g, gmin = 1e99, r2[2] = {rs[0], rs[1]};
+	double g, gmax = -1e99, r2[2] = {rs[0], rs[1]};
+	int imin = -1;
+	FESurfaceElement* pme = 0;
+
+	// loop over all surface element
+	for (int i=0; i<m_surf.Elements(); ++i)
+	{
+		FESurfaceElement& el = m_surf.Element(i);
+
+		// see if the ray intersects this element
+		if (m_surf.Intersect(el, r, n, r2, g, m_tol))
+		{
+			// see if this is the best intersection found so far
+			// TODO: should I put a limit on how small g can
+			//       be to be considered a valid intersection?
+//			if (g < gmin)
+			if (g > gmax)
+			{
+				// keep results
+				pme = &el;
+//				gmin = g;
+				gmax = g;
+				imin = i;
+				rs[0] = r2[0];
+				rs[1] = r2[1];
+			}
+		}	
+	}
+
+	if (pei) *pei = imin;
+
+	// return the intersected element (or zero if none)
+	return pme;
+}

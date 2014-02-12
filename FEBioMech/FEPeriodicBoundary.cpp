@@ -208,7 +208,7 @@ void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface
 		vec3d r0 = node.m_r0;
 
 		// find the intersection with the master surface
-		ss.m_pme[i] = np.Project(r0, cn, rs);
+		ss.m_pme[i] = np.Project3(r0, cn, rs);
 		assert(ss.m_pme[i]);
 
 		ss.m_rs[i][0] = rs[0];
