@@ -117,5 +117,6 @@
     <None Include="icon1.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\Debug\febio.xml" />
   </ItemGroup>
 </Project>
