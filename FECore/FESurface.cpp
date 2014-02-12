@@ -1027,7 +1027,9 @@ bool FESurface::IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g
 	vec3d m = e[0]^e[1]; m.unit();
 
 	double d = n*m;
-	if (d != 0)
+//	if (d != 0)
+	// normals should be pointing opposite to each other for valid contact
+	if (d < 0)
 	{
 		// distance from r to plane of triangle
 		g = m*(y[0] - r)/d;

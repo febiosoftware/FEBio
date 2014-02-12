@@ -187,7 +187,7 @@ void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface
 	vec3d cm = ms.CenterOfMass();
 
 	// get the relative distance
-	vec3d cr = cm - cs;
+	vec3d cr = cs - cm;
 
 	// unit vector in direction of cr
 	// this will serve as the projection distance
