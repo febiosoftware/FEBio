@@ -49,12 +49,12 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -69,7 +69,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug OpenMP|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -79,7 +79,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
@@ -91,7 +91,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
@@ -139,7 +139,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(LMDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKLDir)\ia32\lib;$(LMDir)\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -169,7 +169,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(LMDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKLDir)\ia32\lib;$(LMDir)\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -202,6 +202,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>febioxmld.lib;febiomechd.lib;fecored.lib;numcored.lib;levmard.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_lapack95.lib;libiomp5mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
     <ClCompile>
@@ -367,9 +370,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\FEBioOpt\dllmain.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEBioOpt.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEConstrainedLMOptimizeMethod.cpp" />
+    <ClCompile Include="..\..\FEBioOpt\FEOptimize.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEOptimizer.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FELMOptimizeMethod.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEPowellOptimizeMethod.cpp" />
@@ -379,6 +382,7 @@
     <ClInclude Include="..\..\FEBioOpt\FEBioOpt.h" />
     <ClInclude Include="..\..\FEBioOpt\FEConstrainedLMOptimizeMethod.h" />
     <ClInclude Include="..\..\FEBioOpt\FELMOptimizeMethod.h" />
+    <ClInclude Include="..\..\FEBioOpt\FEOptimize.h" />
     <ClInclude Include="..\..\FEBioOpt\FEOptimizer.h" />
     <ClInclude Include="..\..\FEBioOpt\FEPowellOptimizeMethod.h" />
     <ClInclude Include="..\..\FEBioOpt\FEScanOptimizeMethod.h" />

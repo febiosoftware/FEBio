@@ -1,19 +1,11 @@
 #pragma once
-
 #include "stdafx.h"
 #include "FEScanOptimizeMethod.h"
-#include "FECore/Logfile.h"
-#include "FECore/FECoreKernel.h"
+#include "FECore/log.h"
 
 BEGIN_PARAMETER_LIST(FEScanOptimizeMethod, FEOptimizeMethod)
 	ADD_PARAMETERV(m_inc, FE_PARAM_DOUBLEV, 32, "inc");
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-// declared in dllmain.cpp
-extern FECoreKernel* pFEBio;
-
-static Logfile& GetLogfile() { return pFEBio->GetLogfile(); }
 
 //-----------------------------------------------------------------------------
 // FEScanOptimizeMethod
@@ -51,7 +43,6 @@ bool FEScanOptimizeMethod::Solve(FEOptimizeData* pOpt)
 	}
 
 	opt.m_niter = 0;
-	Logfile& log = GetLogfile();
 
 	bool bdone = false;
 	double fmin = 0.0;
@@ -68,7 +59,7 @@ bool FEScanOptimizeMethod::Solve(FEOptimizeData* pOpt)
 			double dy = y[i] - y0[i];
 			fobj += dy*dy;
 		}
-		log.printf("Objective value: %lg\n", fobj);
+		felog.printf("Objective value: %lg\n", fobj);
 
 		if ((fmin == 0.0) || (fobj < fmin))
 		{
@@ -98,13 +89,13 @@ bool FEScanOptimizeMethod::Solve(FEOptimizeData* pOpt)
 	}
 	while (!bdone);
 
-	log.printf("\n-------------------------------------------------------\n");
+	felog.printf("\n-------------------------------------------------------\n");
 	for (int i=0; i<ma; ++i) 
 	{
 		OPT_VARIABLE& var = opt.Variable(i);
-		log.printf("%-15s = %lg\n", var.m_szname, amin[i]);
+		felog.printf("%-15s = %lg\n", var.m_szname, amin[i]);
 	}
-	log.printf("Objective value: %lg\n", fmin);
+	felog.printf("Objective value: %lg\n", fmin);
 
 	return true;
 }
@@ -136,30 +127,29 @@ bool FEScanOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<
 	// reset the FEM data
 	fem.Reset();
 
-	Logfile& log = GetLogfile();
-	log.SetMode(Logfile::FILE_AND_SCREEN);
-	log.printf("\n----- Iteration: %d -----\n", opt.m_niter);
+	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.printf("\n----- Iteration: %d -----\n", opt.m_niter);
 	for (int i=0; i<nvar; ++i) 
 	{
 		OPT_VARIABLE& var = opt.Variable(i);
-		log.printf("%-15s = %lg\n", var.m_szname, a[i]);
+		felog.printf("%-15s = %lg\n", var.m_szname, a[i]);
 	}
 
 	// solve the FE problem
-	log.SetMode(Logfile::NEVER);
+	felog.SetMode(Logfile::NEVER);
 
 	bool bret = fem.Solve();
 
-	log.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::FILE_AND_SCREEN);
 	if (bret)
 	{
 		FELoadCurve& rlc = opt.ReactionLoad();
 		int ndata = x.size();
-		if (m_print_level == PRINT_VERBOSE) log.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
+		if (m_print_level == PRINT_VERBOSE) felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
 		for (int i=0; i<ndata; ++i) 
 		{
 			y[i] = rlc.Value(x[i]);
-//			if (m_print_level == PRINT_VERBOSE) clog.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, y[i], m_y0[i], fabs(y[i] - m_y0[i]));
+//			if (m_print_level == PRINT_VERBOSE) felog.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, y[i], m_y0[i], fabs(y[i] - m_y0[i]));
 		}
 	}
 

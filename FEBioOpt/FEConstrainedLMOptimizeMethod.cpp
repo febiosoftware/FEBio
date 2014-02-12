@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FEConstrainedLMOptimizeMethod.h"
-#include "FECore/Logfile.h"
-#include "FECore/FECoreKernel.h"
+#include "FECore/log.h"
 
 #ifdef HAVE_LEVMAR
 #include "levmar.h"
@@ -13,12 +12,6 @@ BEGIN_PARAMETER_LIST(FEConstrainedLMOptimizeMethod, FEOptimizeMethod)
 	ADD_PARAMETER(m_fdiff , FE_PARAM_DOUBLE, "f_diff_scale");
 	ADD_PARAMETER(m_nmax  , FE_PARAM_INT   , "max_iter"    );
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-// declared in dllmain.cpp
-extern FECoreKernel* pFEBio;
-
-static Logfile& GetLogfile() { return pFEBio->GetLogfile(); }
 
 //-----------------------------------------------------------------------------
 FEConstrainedLMOptimizeMethod* FEConstrainedLMOptimizeMethod::m_pThis = 0;
@@ -114,8 +107,7 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	// return value
 	double fret = 0.0;
 
-	Logfile& log = GetLogfile();
-	log.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::FILE_AND_SCREEN);
 
 	int niter = 1;
 
@@ -176,32 +168,32 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	}
 	catch (FEErrorTermination)
 	{
-		log.printbox("F A T A L   E R R O R", "FEBio error terminated. Parameter optimization cannot continue.");
+		felog.printbox("F A T A L   E R R O R", "FEBio error terminated. Parameter optimization cannot continue.");
 		return false;
 	}
 
-	log.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::FILE_AND_SCREEN);
 
-	log.printf("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
+	felog.printf("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
 
 	// print reaction forces
-	log.printf("\n\tFunction values:\n\n");
-	log.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
+	felog.printf("\n\tFunction values:\n\n");
+	felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
 	for (int i=0; i<ndata; ++i)
 	{
-		log.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, m_yopt[i], y[i], fabs(m_yopt[i] - y[i]));
+		felog.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, m_yopt[i], y[i], fabs(m_yopt[i] - y[i]));
 	}
     
-	log.printf("\n\tFinal objective value: %15lg\n\n", fret);
+	felog.printf("\n\tFinal objective value: %15lg\n\n", fret);
     
-	log.printf("\tMajor iterations ....................... : %d\n\n", niter);
-	log.printf("\tMinor iterations ....................... : %d\n\n", opt.m_niter);
+	felog.printf("\tMajor iterations ....................... : %d\n\n", niter);
+	felog.printf("\tMinor iterations ....................... : %d\n\n", opt.m_niter);
 
-	log.printf("\tVariables:\n\n");
+	felog.printf("\tVariables:\n\n");
 	for (int i=0; i<ma; ++i)
 	{
 		OPT_VARIABLE& var = opt.Variable(i);
-		log.printf("\t\t%-15s : %.16lg\n", var.m_szname, a[i]);
+		felog.printf("\t\t%-15s : %.16lg\n", var.m_szname, a[i]);
 	}
 
 	return true;
@@ -275,35 +267,34 @@ bool FEConstrainedLMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a
 	// reset the FEM data
 	fem.Reset();
 
-	Logfile& log = GetLogfile();
-	log.SetMode(Logfile::FILE_AND_SCREEN);
-	log.printf("\n----- Iteration: %d -----\n", opt.m_niter);
+	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.printf("\n----- Iteration: %d -----\n", opt.m_niter);
 	for (int i=0; i<nvar; ++i) 
 	{
 		OPT_VARIABLE& var = opt.Variable(i);
-		log.printf("%-15s = %lg\n", var.m_szname, a[i]);
+		felog.printf("%-15s = %lg\n", var.m_szname, a[i]);
 	}
 
 	// solve the FE problem
-	log.SetMode((Logfile::MODE)m_loglevel);
+	felog.SetMode((Logfile::MODE)m_loglevel);
 
 	bool bret = fem.Solve();
 
-	log.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::FILE_AND_SCREEN);
 	if (bret)
 	{
 		double chisq = 0.0;
 		FELoadCurve& rlc = opt.ReactionLoad();
 		int ndata = x.size();
-		if (m_print_level == PRINT_VERBOSE) log.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
+		if (m_print_level == PRINT_VERBOSE) felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
 		for (int i=0; i<ndata; ++i) 
 		{
 			y[i] = rlc.Value(x[i]);
 			double dy = (m_y0[i] - y[i]);
 			chisq += dy*dy;
-			if (m_print_level == PRINT_VERBOSE) log.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, y[i], m_y0[i], fabs(y[i] - m_y0[i]));
+			if (m_print_level == PRINT_VERBOSE) felog.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, y[i], m_y0[i], fabs(y[i] - m_y0[i]));
 		}
-		log.printf("objective value: %lg\n", chisq);
+		felog.printf("objective value: %lg\n", chisq);
 	}
 
 

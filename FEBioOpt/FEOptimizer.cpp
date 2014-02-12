@@ -3,14 +3,7 @@
 #include "FEPowellOptimizeMethod.h"
 #include "FEScanOptimizeMethod.h"
 #include "FEConstrainedLMOptimizeMethod.h"
-#include "FECore/Logfile.h"
-#include "FECore/FECoreKernel.h"
-
-//-----------------------------------------------------------------------------
-// declared in dllmain.cpp
-extern FECoreKernel* pFEBio;
-
-static Logfile& GetLogfile() { return pFEBio->GetLogfile(); }
+#include "FECore/log.h"
 
 //=============================================================================
 InvalidVariableName::InvalidVariableName(const char* sz)
@@ -56,8 +49,7 @@ bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 		}
 		else
 		{
-			Logfile& log = GetLogfile();
-			log.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
+			felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
 		}
 	}
 
