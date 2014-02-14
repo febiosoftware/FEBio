@@ -14,14 +14,17 @@ CC = icpc
 DEF = -DLINUX -DNDEBUG
 DEFD = -DLINUX 
 
-FLG = -O3 -fopenmp
+FLG = -O3 -fPIC -openmp -static-intel
 
 #Intel Compiler (for omp.h)
 #INTEL_INC = /usr/local/intel/include/
 #INTEL_INC = /opt/intel/include/
-INTEL_INC = /usr/sci/linux64/intel/Compiler/2012/include/
+#INTEL_INC = /usr/sci/linux64/intel/Compiler/2012/include/
+INTELROOT = $(subst /mkl,,$(MKLROOT))
+INTEL_INC = $(INTELROOT)/compiler/include
+INTEL_LIB = $(INTELROOT)/compiler/lib/intel64
 
-INC = -I$(INTEL_INC) -I..
+INC = -I$(INTEL_INC) -I.. -I../include
 
 # The default solver for FEBio is the Slyline solver, which is included with the
 # FEBio source code.  Below are instructions for using the SuperLU and Pardiso solvers.
@@ -70,7 +73,7 @@ MKL_PATH = $(MKLROOT)/lib/intel64
 #MKL_PATH = /usr/sci/linux64/intel/mkl_10.2/lib/em64t/
 MKL_LIB = -Wl,--start-group $(MKL_PATH)/libmkl_intel_lp64.a
 MKL_LIB += $(MKL_PATH)/libmkl_intel_thread.a $(MKL_PATH)/libmkl_core.a -Wl,--end-group
-MKL_LIB += -liomp5 -pthread
+MKL_LIB += -pthread
 LIBS += $(MKL_LIB)
 
 # Includes
@@ -93,10 +96,10 @@ lnx64:
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
 	( cd FEBioMech; $(MAKE) -f febiomech.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
-	( cd FEBio2;  $(MAKE) -f febio2.mk \
-	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)" LIBS="$(LIBS)")
 	( cd FEBioOpt; $(MAKE) -f febioopt.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
+	( cd FEBio2;  $(MAKE) -f febio2.mk \
+	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)" LIBS="$(LIBS)")
 
 lnx64d:
 	( cd FEBioLib; $(MAKE) -f febiolib.mk \
@@ -115,10 +118,10 @@ lnx64d:
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEFD)" FLG="$(FLG)" INC="$(INC)")
 	( cd FEBioMech; $(MAKE) -f febiomech.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEFD)" FLG="$(FLG)" INC="$(INC)")
-	( cd FEBio2;  $(MAKE) -f febio2.mk \
-	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEFD)" FLG="$(FLG)" INC="$(INC)" LIBS="$(LIBS)")
 	( cd FEBioOpt; $(MAKE) -f febioopt.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEFD)" FLG="$(FLG)" INC="$(INC)")
+	( cd FEBio2;  $(MAKE) -f febio2.mk \
+	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEFD)" FLG="$(FLG)" INC="$(INC)" LIBS="$(LIBS)")
 
 febio2:
 	( cd FEBio2;  $(MAKE) -f febio2.mk \
@@ -158,6 +161,10 @@ febiomix:
 
 febiomech:
 	( cd FEBioMech; $(MAKE) -f febiomech.mk \
+	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
+
+neohookeanpi:
+	( cd NeoHookeanPI; $(MAKE) -f neohookeanpi.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
 
 lnx64clean:

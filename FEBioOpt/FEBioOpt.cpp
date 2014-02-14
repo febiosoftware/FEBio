@@ -1,6 +1,6 @@
 #include "FEBioOpt.h"
 #include "FEOptimize.h"
-#include "FECore\FECoreKernel.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 //! Initialization of the FEBioOpt module. This function registers all the classes

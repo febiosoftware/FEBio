@@ -17,7 +17,9 @@ FELIBS += ../lib/febioxml_$(PLAT).a
 
 FELIBS += ../lib/numcore_$(PLAT).a
 
-#FELIBS += -L../lib -lfebioopt_$(PLAT)
+FELIBS += ../lib/febioopt_$(PLAT).a
+
+FELIBS += ../lib/liblevmar_$(PLAT).a
 
 FEBIO2LIBS = -Wl,--start-group $(FELIBS) -Wl,--end-group
 

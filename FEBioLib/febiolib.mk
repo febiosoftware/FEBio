@@ -1,7 +1,7 @@
 LIB = ../lib/febiolib_$(PLAT).a
 
 $(LIB):
-	$(CC) -c $(INC) $(DEF) $(FLG) *.cpp -fPIC
+	$(CC) -c $(INC) $(DEF) $(FLG) *.cpp
 	ar -cvr $(LIB) *.o
 
 clean:
