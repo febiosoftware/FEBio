@@ -376,6 +376,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FENormalProjection.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEOctree.cpp"
 				>
 			</File>
@@ -469,6 +473,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\stdafx.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\svd.cpp"
 				>
 			</File>
 			<File
@@ -655,6 +663,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FENodeReorder.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FENormalProjection.h"
 				>
 			</File>
 			<File

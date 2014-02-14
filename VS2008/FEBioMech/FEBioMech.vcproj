@@ -525,6 +525,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FESPRProjection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEStickyInterface.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEStiffnessMatrix.cpp"
 				>
 			</File>
@@ -992,6 +1000,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FESpringMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FESPRProjection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEStickyInterface.h"
 				>
 			</File>
 			<File
