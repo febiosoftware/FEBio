@@ -662,7 +662,9 @@
     <ResourceCompile Include="FEBio2.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Debug\febio.xml" />
+    <None Include="..\Debug\febio.xml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="icon1.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
