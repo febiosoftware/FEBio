@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D5307A4818B40A6B008C8463 /* FENormalProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5307A4618B40A6B008C8463 /* FENormalProjection.cpp */; };
+		D5307A4918B40A6B008C8463 /* FENormalProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A4718B40A6B008C8463 /* FENormalProjection.h */; };
 		D595BB421899C7B40028A7F3 /* svd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D595BB411899C7B40028A7F3 /* svd.cpp */; };
 		D5A0A8F0186F4AC60046B0DE /* DOFS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A0A8EE186F4AC50046B0DE /* DOFS.cpp */; };
 		D5A0A8F1186F4AC60046B0DE /* DOFS.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A0A8EF186F4AC60046B0DE /* DOFS.h */; };
@@ -157,6 +159,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D5307A4618B40A6B008C8463 /* FENormalProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENormalProjection.cpp; sourceTree = "<group>"; };
+		D5307A4718B40A6B008C8463 /* FENormalProjection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENormalProjection.h; sourceTree = "<group>"; };
 		D595BB411899C7B40028A7F3 /* svd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = svd.cpp; sourceTree = "<group>"; };
 		D5A0A8EE186F4AC50046B0DE /* DOFS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DOFS.cpp; sourceTree = "<group>"; };
 		D5A0A8EF186F4AC60046B0DE /* DOFS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DOFS.h; sourceTree = "<group>"; };
@@ -420,6 +424,8 @@
 				D5E10A3D1865E15900B23922 /* FENodeNodeList.h */,
 				D5E10A3E1865E15900B23922 /* FENodeReorder.cpp */,
 				D5E10A3F1865E15900B23922 /* FENodeReorder.h */,
+				D5307A4618B40A6B008C8463 /* FENormalProjection.cpp */,
+				D5307A4718B40A6B008C8463 /* FENormalProjection.h */,
 				D5E10A401865E15900B23922 /* FEObject.h */,
 				D5E10A411865E15900B23922 /* FEOctree.cpp */,
 				D5E10A421865E15900B23922 /* FEOctree.h */,
@@ -523,6 +529,7 @@
 				D5E10AC91865E15900B23922 /* FENNQuery.h in Headers */,
 				D5E10ADE1865E15900B23922 /* FESolver.h in Headers */,
 				D5E10ABB1865E15900B23922 /* FELinearConstraint.h in Headers */,
+				D5307A4918B40A6B008C8463 /* FENormalProjection.h in Headers */,
 				D5E10ABF1865E15900B23922 /* FEMaterialPoint.h in Headers */,
 				D5E10ADC1865E15900B23922 /* FESolidDomain.h in Headers */,
 				D5E10AFD1865E15900B23922 /* NodeDataRecord.h in Headers */,
@@ -636,6 +643,7 @@
 				D5E10B041865E15900B23922 /* stdafx.cpp in Sources */,
 				D5E10AD31865E15900B23922 /* FEParameterList.cpp in Sources */,
 				D5E10A831865E15900B23922 /* BFGSSolver.cpp in Sources */,
+				D5307A4818B40A6B008C8463 /* FENormalProjection.cpp in Sources */,
 				D5E10A8A1865E15900B23922 /* DumpStream.cpp in Sources */,
 				D5E10A8C1865E15900B23922 /* ElementDataRecord.cpp in Sources */,
 				D5E10ABA1865E15900B23922 /* FELinearConstraint.cpp in Sources */,
