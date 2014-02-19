@@ -34,6 +34,9 @@ public:
 	mat3ds pull_back(const mat3ds& A);
 	mat3ds push_forward(const mat3ds& A);
 
+	tens4ds pull_back(const tens4ds& C);
+	tens4ds push_forward(const tens4ds& C);
+
 public:
 	// position 
 	vec3d	m_r0;	//!< material position

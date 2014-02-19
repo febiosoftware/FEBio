@@ -52,6 +52,13 @@ public:
 		return T(m[i][j], m[k][l]);
 	}
 
+	double operator () (int i, int j, int k, int l) const
+	{
+		const int m[3][3] = {{0,3,5},{3,1,4},{5,4,2}};
+		const tens4ds& T = (*this);
+		return T(m[i][j], m[k][l]);
+	}
+
 	double& operator () (int i, int j)
 	{
 		const int m[6] = {0, 1, 3, 6, 10, 15};
