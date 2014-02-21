@@ -1,3 +1,5 @@
+include $(INCLUDE)
+
 LIB = ../lib/fecore_$(PLAT).a
 
 $(LIB):

@@ -1,3 +1,5 @@
+include $(INCLUDE)
+
 LIB = ../lib/febioxml_$(PLAT).a
 
 $(LIB):

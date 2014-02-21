@@ -1,3 +1,5 @@
+include $(INCLUDE)
+
 LIB = ../lib/febioplot_$(PLAT).a
 
 $(LIB):

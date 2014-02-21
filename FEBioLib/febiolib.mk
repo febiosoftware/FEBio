@@ -1,3 +1,5 @@
+include $(INCLUDE)
+
 LIB = ../lib/febiolib_$(PLAT).a
 
 $(LIB):

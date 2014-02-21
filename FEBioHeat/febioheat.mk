@@ -1,3 +1,5 @@
+include $(INCLUDE)
+
 LIB = ../lib/febioheat_$(PLAT).a
 
 $(LIB):

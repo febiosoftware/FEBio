@@ -1,3 +1,5 @@
+include $(INCLUDE)
+
 
 TARGET = ../bin/febio2.$(PLAT)
 

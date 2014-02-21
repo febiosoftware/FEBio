@@ -1,3 +1,5 @@
+include $(INCLUDE)
+
 LIB = ../lib/numcore_$(PLAT).a
 
 $(LIB):

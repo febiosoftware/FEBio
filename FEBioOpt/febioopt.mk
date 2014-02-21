@@ -1,7 +1,9 @@
+include $(INCLUDE)
+
 LIB = ../lib/febioopt_$(PLAT).a
 
 $(LIB):
-	$(CC) -c $(INC) $(DEF) $(FLG) -DHAVE_LEVMAR *.cpp
+	$(CC) -c $(INC) $(DEF) $(FLG) *.cpp
 	ar -cvr $(LIB) *.o
 
 clean:
