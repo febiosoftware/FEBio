@@ -126,10 +126,13 @@ void update_console_cb(FEModel* pfem, void* pd)
 	sprintf(szvers, "FEBio %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
 
 	// print progress in title bar
+	const char* szfile = fem.GetFileTitle();
+	if (szfile == 0) szfile = "";
+
 	if (nsteps > 1)
-		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s %s", fem.m_nStep+1, nsteps, f, fem.GetFileTitle(), szvers, (bdebug?"(debug mode)": ""));
+		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s %s", fem.m_nStep+1, nsteps, f, szfile, szvers, (bdebug?"(debug mode)": ""));
 	else
-		pShell->SetTitle("(%.f%%) %s - %s %s", f, fem.GetFileTitle(), szvers, (bdebug?"(debug mode)": ""));
+		pShell->SetTitle("(%.f%%) %s - %s %s", f, szfile, szvers, (bdebug?"(debug mode)": ""));
 }
 
 //-----------------------------------------------------------------------------

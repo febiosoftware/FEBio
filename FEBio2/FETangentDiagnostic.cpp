@@ -210,7 +210,9 @@ bool FETangentDiagnostic::Run()
 	Logfile::MODE oldmode = felog.SetMode(Logfile::FILE_ONLY);
 
 	// solve the problem
+	felog.SetMode(Logfile::NEVER);
 	m_fem.Solve();
+	felog.SetMode(Logfile::FILE_ONLY);
 
 	FEMesh& mesh = m_fem.GetMesh();
 	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
