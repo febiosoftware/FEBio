@@ -95,6 +95,7 @@
 #include "FESolidSolver.h"
 #include "FELinearSolidSolver.h"
 #include "FEExplicitSolidSolver.h"
+#include "FECGSolidSolver.h"
 
 #include "FEBioMechPlot.h"
 #include "FEBioMechData.h"
@@ -121,6 +122,7 @@ REGISTER_FECORE_CLASS(FELinearSolidAnalysis  , FEANALYSIS_ID, "linear-solid"  );
 REGISTER_FECORE_CLASS(FESolidSolver        , FESOLVER_ID, "solid"         );
 REGISTER_FECORE_CLASS(FEExplicitSolidSolver, FESOLVER_ID, "explicit-solid");
 REGISTER_FECORE_CLASS(FELinearSolidSolver  , FESOLVER_ID, "linear-solid"  );
+REGISTER_FECORE_CLASS(FECGSolidSolver      , FESOLVER_ID, "CG-solid"      );
 
 //-----------------------------------------------------------------------------
 // material classes

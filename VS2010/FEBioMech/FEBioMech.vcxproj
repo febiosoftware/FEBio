@@ -345,6 +345,7 @@
     <ClCompile Include="..\..\FEBioMech\FEBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECarterHayesOld.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECellGrowth.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FECGSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEConstBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContactInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContactSurface.cpp" />
@@ -464,6 +465,7 @@
     <ClInclude Include="..\..\FEBioMech\FEBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FECarterHayesOld.h" />
     <ClInclude Include="..\..\FEBioMech\FECellGrowth.h" />
+    <ClInclude Include="..\..\FEBioMech\FECGSolidSolver.h" />
     <ClInclude Include="..\..\FEBioMech\FEConstBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEContactInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FEContactSurface.h" />

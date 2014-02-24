@@ -54,9 +54,7 @@ protected:
 	FEModel&	m_fem;
 
 public: //TODO Move these parameters elsewhere
-
 	bool		m_bsymm;		//!< symmetry flag for linear solver allocation
-	int			m_solvertype;	//!< defines the type of solver; 0=BFGs, 1-Hager-Zhang NLCG
 
 	// timers
 	Timer	m_SolverTime;	//!< time spent in solver
