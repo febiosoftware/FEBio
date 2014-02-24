@@ -692,34 +692,7 @@ void FEExplicitSolidSolver::PrepStep(double time)
 
 	// initialize rigid bodies
 	int NO = m_fem.Objects();
-	for (i=0; i<NO; ++i)
-	{
-		FERigidBody* prb = dynamic_cast<FERigidBody*>(m_fem.Object(i));
-		if (prb)
-		{
-			FERigidBody& RB = *prb;
-
-			// clear reaction forces
-			RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
-
-			// store previous state
-			RB.m_rp = RB.m_rt;
-			RB.m_qp = RB.m_qt;
-			RB.m_Up[0] = RB.m_Ut[0];
-			RB.m_Up[1] = RB.m_Ut[1];
-			RB.m_Up[2] = RB.m_Ut[2];
-			RB.m_Up[3] = RB.m_Ut[3];
-			RB.m_Up[4] = RB.m_Ut[4];
-			RB.m_Up[5] = RB.m_Ut[5];
-
-			RB.m_du[0] = RB.m_dul[0] = 0.0;
-			RB.m_du[1] = RB.m_dul[1] = 0.0;
-			RB.m_du[2] = RB.m_dul[2] = 0.0;
-			RB.m_du[3] = RB.m_dul[3] = 0.0;
-			RB.m_du[4] = RB.m_dul[4] = 0.0;
-			RB.m_du[5] = RB.m_dul[5] = 0.0;
-		}
-	}
+	for (i=0; i<NO; ++i) m_fem.Object(i)->Init();
 
 	// calculate local rigid displacements
 	for (i=0; i<(int) m_fem.m_RDC.size(); ++i)

@@ -59,7 +59,7 @@ void FERigidBody::Reset()
 	m_Ut[5] = m_Up[5] = 0;
 
 	// initialize orientation
-	m_qt = quatd(0, vec3d(0,0,1));
+	m_qp = m_qt = quatd(0, vec3d(0,0,1));
 
 	// initialize center of mass
 	m_rt = m_r0;
@@ -67,6 +67,33 @@ void FERigidBody::Reset()
 	// reset reaction force and torque
 	m_Fr = vec3d(0,0,0);
 	m_Mr = vec3d(0,0,0);
+}
+
+//-----------------------------------------------------------------------------
+//! This function is called at the start of each time step and is used to update
+//! some variables.
+void FERigidBody::Init()
+{
+	// clear reaction forces
+	m_Fr = m_Mr = vec3d(0,0,0);
+
+	// store previous state
+	m_rp = m_rt;
+	m_qp = m_qt;
+	m_Up[0] = m_Ut[0];
+	m_Up[1] = m_Ut[1];
+	m_Up[2] = m_Ut[2];
+	m_Up[3] = m_Ut[3];
+	m_Up[4] = m_Ut[4];
+	m_Up[5] = m_Ut[5];
+
+	// zero incremental displacements
+	m_du[0] = m_dul[0] = 0.0;
+	m_du[1] = m_dul[1] = 0.0;
+	m_du[2] = m_dul[2] = 0.0;
+	m_du[3] = m_dul[3] = 0.0;
+	m_du[4] = m_dul[4] = 0.0;
+	m_du[5] = m_dul[5] = 0.0;
 }
 
 //-----------------------------------------------------------------------------

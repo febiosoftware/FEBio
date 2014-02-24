@@ -29,6 +29,9 @@ public:
 	//! shallow copy
 	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
 
+	//! initialize object
+	virtual void Init() = 0;
+
 	//! reset object data
 	virtual void Reset() = 0;
 

@@ -40,6 +40,9 @@ public:
 	//! reset rigid body data
 	void Reset();
 
+	//! initialize data
+	void Init();
+
 	//! update solution
 	void Update(std::vector<double>& Ui, std::vector<double>& ui);
 
@@ -72,7 +75,7 @@ public:
 	int		m_BC[6];	//!< dof constrains (0=free, -1=fixed, >0 = prescribed)
 	int		m_LM[6];	//!< dof equation numbers
 	double	m_Up[6];	//!< previous displacement/rotation vector
-	double	m_Ut[6];	//!<  total displacement/rotation vector
+	double	m_Ut[6];	//!< total displacement/rotation vector
 	double	m_du[6];	//!< incremental displacement vector
 	double	m_dul[6];	//!< displacement in local coordinates system
 
