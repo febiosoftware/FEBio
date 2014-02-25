@@ -1,14 +1,17 @@
-FEBIO = /home/sci/rawlins/FEBio2
+FEBIO = $(CURDIR)
 lnx64: INCLUDE = $(FEBIO)/make.lnx64
 lnx64d: INCLUDE = $(FEBIO)/make.lnx64d
 lnx32: INCLUDE = $(FEBIO)/make.lnx32
 osx: INCLUDE = $(FEBIO)/make.osx
 osxd: INCLUDE = $(FEBIO)/make.osxd
+neohookeanpi: INCLUDE = $(FEBIO)/make.lnx64d
+neohookeanpi_osx: INCLUDE = $(FEBIO)/make.osxd
 lnx64clean: INCLUDE = $(FEBIO)/make.lnx64
 lnx32clean: INCLUDE = $(FEBIO)/make.lnx32
 osxclean: INCLUDE = $(FEBIO)/make.osx
 
 export INCLUDE
+export FEBIO
 
 lnx64:
 	( cd FEBioLib; $(MAKE) -f febiolib.mk )
@@ -69,36 +72,6 @@ osxd:
 	( cd FEBioMech; $(MAKE) -f febiomech.mk )
 	( cd FEBioOpt; $(MAKE) -f febioopt.mk )
 	( cd FEBio2;  $(MAKE) -f febio2_osx.mk )
-
-febio2:
-	( cd FEBio2;  $(MAKE) -f febio2.mk )
-
-numcore:
-	( cd NumCore; $(MAKE) -f numcore.mk )
-
-fecore:
-	( cd FECore; $(MAKE) -f fecore.mk )
-
-febioxml:
-	( cd FEBioXML; $(MAKE) -f febioxml.mk )
-
-febioplot:
-	( cd FEBioPlot; $(MAKE) -f febioplot.mk )
-
-febiolib:
-	( cd FEBioLib; $(MAKE) -f febiolib.mk )
-
-febioopt:
-	( cd FEBioOpt; $(MAKE) -f febioopt.mk )
-
-febioheat:
-	( cd FEBioHeat; $(MAKE) -f febioheat.mk )
-
-febiomix:
-	( cd FEBioMix; $(MAKE) -f febiomix.mk )
-
-febiomech:
-	( cd FEBioMech; $(MAKE) -f febiomech.mk )
 
 neohookeanpi:
 	( cd NeoHookeanPI; $(MAKE) -f neohookeanpi.mk )
