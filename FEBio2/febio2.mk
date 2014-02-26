@@ -1,32 +1,31 @@
-include $(INCLUDE)
+include $(FEBDIR)/make.$(PLAT)
 
+SRC = $(wildcard ../*.cpp)
+OBJ = $(patsubst ../%.cpp, %.o, $(SRC))
+DEP = $(patsubst ../%.cpp, %.d, $(SRC))
 
-TARGET = ../bin/febio2.$(PLAT)
+TARGET =  $(FEBDIR)/bin/febio2.$(PLAT)
 
-FELIBS = ../lib/fecore_$(PLAT).a
+FELIBS =  $(FEBDIR)/lib/libfecore_$(PLAT).a
+FELIBS += $(FEBDIR)/lib/libfebiolib_$(PLAT).a
+FELIBS += $(FEBDIR)/lib/libfebioplot_$(PLAT).a
+FELIBS += $(FEBDIR)/lib/libfebiomech_$(PLAT).a
+FELIBS += $(FEBDIR)/lib/libfebiomix_$(PLAT).a
+FELIBS += $(FEBDIR)/lib/libfebioheat_$(PLAT).a
+FELIBS += $(FEBDIR)/lib/libfebioxml_$(PLAT).a
+FELIBS += $(FEBDIR)/lib/libnumcore_$(PLAT).a
+FELIBS += $(FEBDIR)/lib/libfebioopt_$(PLAT).a
+FELIBS += $(FEBDIR)/lib/liblevmar_$(PLAT).a
 
-FELIBS += ../lib/febiolib_$(PLAT).a
+FEBIOLIBS = -Wl,--start-group $(FELIBS) -Wl,--end-group
 
-FELIBS += ../lib/febioplot_$(PLAT).a
+$(TARGET): $(OBJ)
+	$(CC) -o $(TARGET) $(DEF) $(FLG) $(INC) $(OBJ) $(FEBIOLIBS) $(LIBS) -ldl
 
-FELIBS += ../lib/febiomech_$(PLAT).a
-
-FELIBS += ../lib/febiomix_$(PLAT).a
-
-FELIBS += ../lib/febioheat_$(PLAT).a
-
-FELIBS += ../lib/febioxml_$(PLAT).a
-
-FELIBS += ../lib/numcore_$(PLAT).a
-
-FELIBS += ../lib/febioopt_$(PLAT).a
-
-FELIBS += ../lib/liblevmar_$(PLAT).a
-
-FEBIO2LIBS = -Wl,--start-group $(FELIBS) -Wl,--end-group
-
-$(TARGET):
-	$(CC) -o $(TARGET) $(DEF) *.cpp $(FLG) $(INC) $(FEBIO2LIBS) $(LIBS) -ldl
+%.o: ../%.cpp
+	$(CC) $(INC) $(DEF) $(FLG) -MMD -c -o $@ $<
 
 clean:
-	rm -f $(TARGET)
+	$(RM) *.o *.d $(TARGET)
+
+-include $(DEP)

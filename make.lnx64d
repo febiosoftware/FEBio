@@ -1,7 +1,5 @@
 # Make include file for FEBio on Linux
 
-PLAT = lnx64
-
 CC = icpc
 
 # Add DPRINTHB for matrix output, DNAGLIB for NAG optimization
@@ -13,18 +11,12 @@ DEF = -DLINUX -DPARDISO -DHAVE_LEVMAR
 FLG = -O3 -fPIC -openmp -static-intel -no-intel-extensions
 
 # Pardiso solver
-#MKL_PATH = /usr/sci/linux64/intel/Compiler/2012/mkl/lib/intel64
-#MKL_PATH = /usr/sci/linux64/intel/mkl_10.2/lib/em64t
-#MKL_PATH = /opt/intel/composerxe/mkl/lib/intel64
-#MKL_PATH = /usr/local/intel/mkl/lib/intel64
 MKL_PATH = $(MKLROOT)/lib/intel64
 MKL_LIB = -Wl,--start-group $(MKL_PATH)/libmkl_intel_lp64.a
 MKL_LIB += $(MKL_PATH)/libmkl_intel_thread.a $(MKL_PATH)/libmkl_core.a -Wl,--end-group
 MKL_LIB += -pthread
 
 #Intel Compiler
-#INTEL_INC = /usr/sci/linux64/intel/Compiler/2012/include/
-#INTEL_INC = /opt/intel/composerxe/include/
 INTELROOT = $(subst /mkl,,$(MKLROOT))
 INTEL_INC = $(INTELROOT)/compiler/include
 
@@ -38,8 +30,6 @@ NAG_LIB=-L/usr/sci/apps/mrl/NAG/cll6a09dhl/lib -lnagc_nag -lpthread
 #Levmar library
 LEV_LIB = -llevmar_$(PLAT)
 
-LIBS = -L$(FEBIO)/lib $(LEV_LIB) $(MKL_LIB)
+LIBS = -L$(FEBDIR)/lib $(LEV_LIB) $(MKL_LIB)
 
-#INC = -I.. -I$(NAG_INC) -I$(INTEL_INC)
-#INC = -I$(FEBIO)/include -I..
-INC = -I$(INTEL_INC) -I.. -I../include
+INC = -I$(INTEL_INC) -I $(FEBDIR) -I $(FEBDIR)/include

@@ -1,6 +1,6 @@
 # Make include file for FEBio on Mac
 
-include /home/sci/rawlins/FEBio2/make.osxd
+include $(FEBDIR)/make.osxd
 
 DEF += -DNDEBUG
 

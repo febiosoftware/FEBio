@@ -1,25 +1,23 @@
 # Make include file for FEBio on Linux 32bit
 
-PLAT = lnx32
-
 CC = icpc
 
 # Add DPRINTHB for matrix output
 # Compile with DNDEBUG for release version
-DEF = -DLINUX -DPARDISO -DSUPERLU -DSVN -DFEBIO_LICENSE -DHAVE_LEVMAR -DNDEBUG
+#DEF = -DLINUX -DPARDISO -DSUPERLU -DSVN -DFEBIO_LICENSE -DHAVE_LEVMAR -DNDEBUG
+DEF = -DLINUX -DPARDISO -DHAVE_LEVMAR
 
-FLG = -static -O3 
+FLG = -O3 -fPIC -openmp -static-intel -no-intel-extensions 
 
 # Pardiso solver
-#MKL_PATH = /usr/sci/linux64/intel/mkl_10.2/lib/32
-#MKL_PATH = /usr/sci/linux64/intel/Compiler/2012/mkl/lib/ia32
 MKL_PATH = $(MKLROOT)/lib/ia32
 MKL_LIB = -L$(MKL_PATH) -Wl,--start-group -lmkl_intel 
 MKL_LIB += -lmkl_intel_thread -lmkl_core -Wl,--end-group
 MKL_LIB += -liomp5 -lpthread
 
-# SuperLU solver
-SUPERLU_LIB = -lsuperlu_4.0_$(PLAT)
+#Intel Compiler
+INTELROOT = $(subst /mkl,,$(MKLROOT))
+INTEL_INC = $(INTELROOT)/compiler/include
 
 # KeyGen
 KEYGEN = -L$(FEBIO)/lib -lkeygen_$(PLAT)
@@ -27,6 +25,6 @@ KEYGEN = -L$(FEBIO)/lib -lkeygen_$(PLAT)
 #Levmar library
 LEV_LIB = -llevmar_$(PLAT)
 
-LIBS = -L$(FEBIO)/lib $(SUPERLU_LIB) $(LEV_LIB) $(MKL_LIB) $(KEYGEN)
+LIBS = -L$(FEBDIR)/lib $(LEV_LIB) $(MKL_LIB)
 
-INC = -I$(FEBIO)/include -I..
+INC = -I$(INTEL_INC) -I $(FEBDIR) -I $(FEBDIR)/include

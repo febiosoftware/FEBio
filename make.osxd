@@ -1,11 +1,6 @@
 # Make include file for FEBio on Mac
 # Debug version (doesn't include -DNDEBUG)
 
-HOME = /home/sci/rawlins
-FEBIO = $(HOME)/FEBio2
-
-PLAT = osx
-
 CC = icpc
 
 DEF = -DPARDISO -DHAVE_LEVMAR
@@ -16,7 +11,6 @@ FLG = -O3 -fopenmp -fPIC -static-intel -no-intel-extensions
 INTELROOT = $(subst /mkl,,$(MKLROOT))
 INTEL_INC = $(INTELROOT)/compiler/include
 INTEL_LIB = $(INTELROOT)/compiler/lib/
-#MKL_PATH = /opt/intel/mkl/lib/
 MKL_PATH = $(MKLROOT)/lib/
 MKL_LIB = $(MKL_PATH)libmkl_intel_lp64.a $(MKL_PATH)libmkl_intel_thread.a $(MKL_PATH)libmkl_core.a \
 	$(MKL_PATH)libmkl_pgi_thread.a $(INTEL_LIB)libiomp5.a
@@ -27,7 +21,6 @@ KEYGEN = -lkeygen_$(PLAT)
 #Levmar library
 LEV_LIB = -llevmar_$(PLAT)
 
-LIBS = -L$(FEBIO)/lib $(LEV_LIB) $(MKL_LIB) -lm
+LIBS = -L$(FEBDIR)/lib $(LEV_LIB) $(MKL_LIB)
 
-#INC = -I$(FEBIO)/include -I..
-INC = -I$(INTEL_INC) -I.. -I../include
+INC = -I$(INTEL_INC) -I $(FEBDIR) -I $(FEBDIR)/include

@@ -1,119 +1,57 @@
-FEBIO = $(CURDIR)
-lnx64: INCLUDE = $(FEBIO)/make.lnx64
-lnx64d: INCLUDE = $(FEBIO)/make.lnx64d
-lnx32: INCLUDE = $(FEBIO)/make.lnx32
-osx: INCLUDE = $(FEBIO)/make.osx
-osxd: INCLUDE = $(FEBIO)/make.osxd
-neohookeanpi: INCLUDE = $(FEBIO)/make.lnx64d
-neohookeanpi_osx: INCLUDE = $(FEBIO)/make.osxd
-lnx64clean: INCLUDE = $(FEBIO)/make.lnx64
-lnx32clean: INCLUDE = $(FEBIO)/make.lnx32
-osxclean: INCLUDE = $(FEBIO)/make.osx
+FEBDIR = $(CURDIR)
+lnx64: PLAT = lnx64
+lnx64d: PLAT = lnx64d
+lnx32: PLAT = lnx32
+osx: PLAT = osx
+osxd: PLAT = osxd
+neohookeanpi: PLAT = lnx64d
+neohookeanpi_osx: PLAT = osxd
+lnx64clean: PLAT = lnx64
+lnx32clean: PLAT = lnx32
+osxclean: PLAT = osx
 
-export INCLUDE
-export FEBIO
+export PLAT
+export FEBDIR
 
-lnx64:
-	( cd FEBioLib; $(MAKE) -f febiolib.mk )
-	( cd FEBioPlot; $(MAKE) -f febioplot.mk )
-	( cd FEBioHeat; $(MAKE) -f febioheat.mk )
-	( cd FEBioXML; $(MAKE) -f febioxml.mk )
-	( cd NumCore; $(MAKE) -f numcore.mk )
-	( cd FECore; $(MAKE) -f fecore.mk )
-	( cd FEBioMix; $(MAKE) -f febiomix.mk )
-	( cd FEBioMech; $(MAKE) -f febiomech.mk )
-	( cd FEBioOpt; $(MAKE) -f febioopt.mk )
-	( cd FEBio2;  $(MAKE) -f febio2.mk )
+lnx64 lnx64d lnx32:
+	( cd FEBioLib/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiolib" )
+	( cd FEBioPlot/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioplot" )
+	( cd FEBioHeat/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioheat" )
+	( cd FEBioXML/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioxml" )
+	( cd NumCore/$(PLAT);   $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="numcore" )
+	( cd FECore/$(PLAT);    $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="fecore" )
+	( cd FEBioMix/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiomix" )
+	( cd FEBioMech/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiomech" )
+	( cd FEBioOpt/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioopt" )
+	( cd FEBio2/$(PLAT);    $(MAKE) -f ../febio2.mk )
 
-lnx64d:
-	( cd FEBioLib; $(MAKE) -f febiolib.mk )
-	( cd FEBioPlot; $(MAKE) -f febioplot.mk )
-	( cd FEBioHeat; $(MAKE) -f febioheat.mk )
-	( cd FEBioXML; $(MAKE) -f febioxml.mk )
-	( cd NumCore; $(MAKE) -f numcore.mk )
-	( cd FECore; $(MAKE) -f fecore.mk )
-	( cd FEBioMix; $(MAKE) -f febiomix.mk )
-	( cd FEBioMech; $(MAKE) -f febiomech.mk )
-	( cd FEBioOpt; $(MAKE) -f febioopt.mk )
-	( cd FEBio2;  $(MAKE) -f febio2.mk )
-
-lnx32:
-	( cd FEBioLib; $(MAKE) -f febiolib.mk )
-	( cd FEBioPlot; $(MAKE) -f febioplot.mk )
-	( cd FEBioHeat; $(MAKE) -f febioheat.mk )
-	( cd FEBioXML; $(MAKE) -f febioxml.mk )
-	( cd NumCore; $(MAKE) -f numcore.mk )
-	( cd FECore; $(MAKE) -f fecore.mk )
-	( cd FEBioMix; $(MAKE) -f febiomix.mk )
-	( cd FEBioMech; $(MAKE) -f febiomech.mk )
-	( cd FEBioOpt; $(MAKE) -f febioopt.mk )
-	( cd FEBio2;  $(MAKE) -f febio2.mk )
-
-osx:
-	( cd FEBioLib; $(MAKE) -f febiolib.mk )
-	( cd FEBioPlot; $(MAKE) -f febioplot.mk )
-	( cd FEBioHeat; $(MAKE) -f febioheat.mk )
-	( cd FEBioXML; $(MAKE) -f febioxml.mk )
-	( cd NumCore; $(MAKE) -f numcore.mk )
-	( cd FECore; $(MAKE) -f fecore.mk )
-	( cd FEBioMix; $(MAKE) -f febiomix.mk )
-	( cd FEBioMech; $(MAKE) -f febiomech.mk )
-	( cd FEBioOpt; $(MAKE) -f febioopt.mk )
-	( cd FEBio2;  $(MAKE) -f febio2_osx.mk )
-
-osxd:
-	( cd FEBioLib; $(MAKE) -f febiolib.mk )
-	( cd FEBioPlot; $(MAKE) -f febioplot.mk )
-	( cd FEBioHeat; $(MAKE) -f febioheat.mk )
-	( cd FEBioXML; $(MAKE) -f febioxml.mk )
-	( cd NumCore; $(MAKE) -f numcore.mk )
-	( cd FECore; $(MAKE) -f fecore.mk )
-	( cd FEBioMix; $(MAKE) -f febiomix.mk )
-	( cd FEBioMech; $(MAKE) -f febiomech.mk )
-	( cd FEBioOpt; $(MAKE) -f febioopt.mk )
-	( cd FEBio2;  $(MAKE) -f febio2_osx.mk )
+osx osxd:
+	( cd FEBioLib/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiolib" )
+	( cd FEBioPlot/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioplot" )
+	( cd FEBioHeat/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioheat" )
+	( cd FEBioXML/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioxml" )
+	( cd NumCore/$(PLAT);   $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="numcore" )
+	( cd FECore/$(PLAT);    $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="fecore" )
+	( cd FEBioMix/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiomix" )
+	( cd FEBioMech/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiomech" )
+	( cd FEBioOpt/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioopt" )
+	( cd FEBio2/$(PLAT);    $(MAKE) -f ../febio2_osx.mk )
 
 neohookeanpi:
-	( cd NeoHookeanPI; $(MAKE) -f neohookeanpi.mk )
+	( cd NeoHookeanPI/$(PLAT); $(MAKE) -f ../neohookeanpi.mk )
 
 neohookeanpi_osx:
-	( cd NeoHookeanPI; $(MAKE) -f neohookeanpi_osx.mk )
+	( cd NeoHookeanPI/$(PLAT); $(MAKE) -f ../neohookeanpi_osx.mk )
 
-lnx64clean:
+lnx64clean lnx32clean osxclean:
 
-	( cd FEBioLib; $(MAKE) -f febiolib.mk clean )
-	( cd FEBioPlot; $(MAKE) -f febioplot.mk clean )
-	( cd FEBioHeat; $(MAKE) -f febioheat.mk clean )
-	( cd FEBioXML; $(MAKE) -f febioxml.mk clean )
-	( cd NumCore; $(MAKE) -f numcore.mk clean )
-	( cd FECore; $(MAKE) -f fecore.mk clean )
-	( cd FEBioMix; $(MAKE) -f febiomix.mk clean )
-	( cd FEBioMech; $(MAKE) -f febiomech.mk clean )
-	( cd FEBioOpt; $(MAKE) -f febioopt.mk clean )
-	( cd FEBio2;  $(MAKE) -f febio2.mk clean )
-
-lnx32clean:
-
-	( cd FEBioLib; $(MAKE) -f febiolib.mk clean )
-	( cd FEBioPlot; $(MAKE) -f febioplot.mk clean )
-	( cd FEBioHeat; $(MAKE) -f febioheat.mk clean )
-	( cd FEBioXML; $(MAKE) -f febioxml.mk clean )
-	( cd NumCore; $(MAKE) -f numcore.mk clean )
-	( cd FECore; $(MAKE) -f fecore.mk clean )
-	( cd FEBioMix; $(MAKE) -f febiomix.mk clean )
-	( cd FEBioMech; $(MAKE) -f febiomech.mk clean )
-	( cd FEBioOpt; $(MAKE) -f febioopt.mk clean )
-	( cd FEBio2;  $(MAKE) -f febio2.mk clean )
-
-osxclean:
-
-	( cd FEBioLib; $(MAKE) -f febiolib.mk clean )
-	( cd FEBioPlot; $(MAKE) -f febioplot.mk clean )
-	( cd FEBioHeat; $(MAKE) -f febioheat.mk clean )
-	( cd FEBioXML; $(MAKE) -f febioxml.mk clean )
-	( cd NumCore; $(MAKE) -f numcore.mk clean )
-	( cd FECore; $(MAKE) -f fecore.mk clean )
-	( cd FEBioMix; $(MAKE) -f febiomix.mk clean )
-	( cd FEBioMech; $(MAKE) -f febiomech.mk clean )
-	( cd FEBioOpt; $(MAKE) -f febioopt.mk clean )
-	( cd FEBio2;  $(MAKE) -f febio2.mk clean )
+	( cd FEBioLib/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiolib" clean )
+	( cd FEBioPlot/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioplot" clean )
+	( cd FEBioHeat/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioheat" clean )
+	( cd FEBioXML/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioxml" clean )
+	( cd NumCore/$(PLAT);   $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="numcore" clean )
+	( cd FECore/$(PLAT);    $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="fecore" clean )
+	( cd FEBioMix/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiomix" clean )
+	( cd FEBioMech/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiomech" clean )
+	( cd FEBioOpt/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioopt" clean )
+	( cd FEBio2/$(PLAT);    $(MAKE) -f ../febio2.mk clean )
