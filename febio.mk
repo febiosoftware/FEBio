@@ -4,11 +4,11 @@ lnx64d: PLAT = lnx64d
 lnx32: PLAT = lnx32
 osx: PLAT = osx
 osxd: PLAT = osxd
-neohookeanpi: PLAT = lnx64d
-neohookeanpi_osx: PLAT = osxd
 lnx64clean: PLAT = lnx64
 lnx32clean: PLAT = lnx32
 osxclean: PLAT = osx
+lnx64dclean: PLAT = lnx64d
+osxdclean: PLAT = osxd
 
 export PLAT
 export FEBDIR
@@ -37,13 +37,7 @@ osx osxd:
 	( cd FEBioOpt/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioopt" )
 	( cd FEBio2/$(PLAT);    $(MAKE) -f ../febio2_osx.mk )
 
-neohookeanpi:
-	( cd NeoHookeanPI/$(PLAT); $(MAKE) -f ../neohookeanpi.mk )
-
-neohookeanpi_osx:
-	( cd NeoHookeanPI/$(PLAT); $(MAKE) -f ../neohookeanpi_osx.mk )
-
-lnx64clean lnx32clean osxclean:
+lnx64clean lnx32clean osxclean lnx64dclean osxdclean:
 
 	( cd FEBioLib/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiolib" clean )
 	( cd FEBioPlot/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioplot" clean )
