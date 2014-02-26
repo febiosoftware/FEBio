@@ -59,16 +59,25 @@ mat3ds FEPreStrainTransIsoMR::DevStress(FEMaterialPoint& mp)
 		FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
 
 		// set-up local uni-axial stretch tensor
-		mat3d U(psp.m_lam, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+		double l = psp.m_lam;
+		double li = 1.0;
+		mat3d U(l, 0.0, 0.0, 0.0, li, 0.0, 0.0, 0.0, li);
 
 		m_fib.m_lcur = psp.m_lam;
 
+		mat3d Q = pt.m_Q;
+		mat3d Qt = Q.transpose();
+
+		mat3d F_bar = Q*U;//*Qt;
+
 		// transform to local coordinate system
-		F = F*(pt.m_Q*U);
+		F = F*F_bar;
 	}
 
 //	double J = pt.m_J;
 	double J = F.det();
+//	pt.m_F = F;
+//	pt.m_J = J;
 
 	// calculate deviatoric left Cauchy-Green tensor
 	double Jm23 = pow(J, -2.0/3.0);
@@ -118,8 +127,9 @@ tens4ds FEPreStrainTransIsoMR::DevTangent(FEMaterialPoint& mp)
 
 		m_fib.m_lcur = psp.m_lam;
 
-		// transform to local coordinate system
-		F = F*(pt.m_Q*U);
+		mat3d Q = pt.m_Q;
+		mat3d Qt = Q.transpose();
+		mat3d F_bar = Q*U*Qt;
 	}
 
 //	double J = pt.m_J;
