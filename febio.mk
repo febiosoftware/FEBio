@@ -13,7 +13,7 @@ osxdclean: PLAT = osxd
 export PLAT
 export FEBDIR
 
-lnx64 lnx64d lnx32:
+lnx64 lnx64d lnx32 osx osxd:
 	( cd FEBioLib/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiolib" )
 	( cd FEBioPlot/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioplot" )
 	( cd FEBioHeat/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioheat" )
@@ -24,18 +24,6 @@ lnx64 lnx64d lnx32:
 	( cd FEBioMech/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiomech" )
 	( cd FEBioOpt/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioopt" )
 	( cd FEBio2/$(PLAT);    $(MAKE) -f ../febio2.mk )
-
-osx osxd:
-	( cd FEBioLib/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiolib" )
-	( cd FEBioPlot/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioplot" )
-	( cd FEBioHeat/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioheat" )
-	( cd FEBioXML/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioxml" )
-	( cd NumCore/$(PLAT);   $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="numcore" )
-	( cd FECore/$(PLAT);    $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="fecore" )
-	( cd FEBioMix/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiomix" )
-	( cd FEBioMech/$(PLAT); $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febiomech" )
-	( cd FEBioOpt/$(PLAT);  $(MAKE) -f $(FEBDIR)/Makelibs.mk FELIB="febioopt" )
-	( cd FEBio2/$(PLAT);    $(MAKE) -f ../febio2_osx.mk )
 
 lnx64clean lnx32clean osxclean lnx64dclean osxdclean:
 

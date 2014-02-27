@@ -20,7 +20,11 @@ FELIBS += $(FEBDIR)/lib/liblevmar_$(PLAT).a
 FEBIOLIBS = -Wl,--start-group $(FELIBS) -Wl,--end-group
 
 $(TARGET): $(OBJ)
+ifeq ($(findstring lnx,$(PLAT)),lnx)
 	$(CC) -o $(TARGET) $(DEF) $(FLG) $(INC) $(OBJ) $(FEBIOLIBS) $(LIBS) -ldl
+else
+	$(CC) -o $(TARGET) $(DEF) $(FLG) $(INC) $(OBJ) $(FELIBS) $(LIBS)
+endif
 
 %.o: ../%.cpp
 	$(CC) $(INC) $(DEF) $(FLG) -MMD -c -o $@ $<
