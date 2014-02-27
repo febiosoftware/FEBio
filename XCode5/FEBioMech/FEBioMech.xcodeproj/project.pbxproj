@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CAA03F9018BFA51700EAF395 /* FECGSolidSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA03F8E18BFA51700EAF395 /* FECGSolidSolver.cpp */; };
+		CAA03F9118BFA51700EAF395 /* FECGSolidSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = CAA03F8F18BFA51700EAF395 /* FECGSolidSolver.h */; };
 		D595BB451899C7D90028A7F3 /* FESPRProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D595BB431899C7D90028A7F3 /* FESPRProjection.cpp */; };
 		D595BB461899C7D90028A7F3 /* FESPRProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D595BB441899C7D90028A7F3 /* FESPRProjection.h */; };
 		D5A12B1A1875B02C008BF405 /* FEContactSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A12B181875B02C008BF405 /* FEContactSurface.cpp */; };
@@ -248,6 +250,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CAA03F8E18BFA51700EAF395 /* FECGSolidSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECGSolidSolver.cpp; sourceTree = "<group>"; };
+		CAA03F8F18BFA51700EAF395 /* FECGSolidSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECGSolidSolver.h; sourceTree = "<group>"; };
 		D595BB431899C7D90028A7F3 /* FESPRProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESPRProjection.cpp; sourceTree = "<group>"; };
 		D595BB441899C7D90028A7F3 /* FESPRProjection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESPRProjection.h; sourceTree = "<group>"; };
 		D5A12B181875B02C008BF405 /* FEContactSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactSurface.cpp; sourceTree = "<group>"; };
@@ -519,6 +523,8 @@
 		D5E1068C1865DFAC00B23922 /* FEBioMech */ = {
 			isa = PBXGroup;
 			children = (
+				CAA03F8E18BFA51700EAF395 /* FECGSolidSolver.cpp */,
+				CAA03F8F18BFA51700EAF395 /* FECGSolidSolver.h */,
 				D5E1068D1865DFAC00B23922 /* FE2DFiberNeoHookean.cpp */,
 				D5E1068E1865DFAC00B23922 /* FE2DFiberNeoHookean.h */,
 				D5E1068F1865DFAC00B23922 /* FE2DTransIsoMooneyRivlin.cpp */,
@@ -799,6 +805,7 @@
 				D5E108081865DFAD00B23922 /* FEPointConstraint.h in Headers */,
 				D5E107AE1865DFAD00B23922 /* FEElasticFiberMaterial.h in Headers */,
 				D595BB461899C7D90028A7F3 /* FESPRProjection.h in Headers */,
+				CAA03F9118BFA51700EAF395 /* FECGSolidSolver.h in Headers */,
 				D5E107FA1865DFAD00B23922 /* FENeoHookeanTransIso.h in Headers */,
 				D5E107EC1865DFAD00B23922 /* FELinearSolidSolver.h in Headers */,
 				D5E107C21865DFAD00B23922 /* FEFacet2FacetTied.h in Headers */,
@@ -1039,6 +1046,7 @@
 				D5E107B11865DFAD00B23922 /* FEElasticMixture.cpp in Sources */,
 				D5E107D51865DFAD00B23922 /* FEFungOrthoCompressible.cpp in Sources */,
 				D5E108551865DFAD00B23922 /* FEVonMisesPlasticity.cpp in Sources */,
+				CAA03F9018BFA51700EAF395 /* FECGSolidSolver.cpp in Sources */,
 				D5E107D71865DFAD00B23922 /* FEFungOrthotropic.cpp in Sources */,
 				D5E108371865DFAD00B23922 /* FETiedContactSurface.cpp in Sources */,
 				D5E108431865DFAD00B23922 /* FETrussMaterial.cpp in Sources */,
