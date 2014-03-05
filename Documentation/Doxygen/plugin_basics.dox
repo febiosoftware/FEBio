@@ -16,9 +16,37 @@ Disucss how to create a plugin on Linux
 Discuss how to create a plugin for Mac
 
 \section plugin_sec2 Required Functions
-Discuss the functions that the user needs to define for interacting with FEBio.
+The following functions need to be defined in the plugin and are needed for plugin registration, initialization and cleanup. 
+
+\subsection PluginInitialize
+This function will be the first function called by FEBio and can be used to allocated and initialize plugin data.
+
+\code
+extern "C" FECORE_EXPORT void PluginInitialize(FECoreKernel&);
+\endcode
+
+\subsection PluginNumClasses
+This functions returns the number of classes that the plugin defines. 
+
+\code
+extern "C" FECORE_EXPORT int PluginNumClasses();
+\endcode
+
+\subsection PluginGetFactory
+This function will be called as many times as there are classes (i.e. the value returned by PluginNumClasses). In each call, it should return
+a pointer to a factory class. See section below for more details on how to create a plugin factory class.
+
+\code
+extern "C" FECORE_EXPORT PluginGetFactory(int i);
+\endcode
+
+\subsection PluginCleanup
+This function will be called when FEBio terminates and can be used to deallocate resources.
+
+\code
+extern "C" FECORE_EXPORT void PluginCleanup()
+\endcode
 
 \section plugin_sec3 Factory Classes
 Discuss what factory classes are and how to use them in a plugin
-
 */
