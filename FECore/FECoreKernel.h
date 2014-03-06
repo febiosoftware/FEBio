@@ -67,8 +67,6 @@ private:
 
 //-----------------------------------------------------------------------------
 //! This class helps with the registration of a class with the framework
-//! The TDerived class is the typename of the class to be registered.
-//! The TBase class is the name of the base class, that is the class that TDerived inherits from
 template <typename T> class FERegisterClass_T : public FECoreFactory
 {
 public:
@@ -96,3 +94,20 @@ template <typename TBase> inline TBase* fecore_new(SUPER_CLASS_ID sid, const cha
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
 	return static_cast<TBase*>(fecore.Create(sid, sztype, pfem));
 }
+
+//-----------------------------------------------------------------------------
+// Template class for factory classes for plugins
+template <typename T, SUPER_CLASS_ID sid> class FEPluginFactory_T : public FECoreFactory
+{
+public:
+	FEPluginFactory_T(const char* sz) : FECoreFactory(sid, sz){}
+	void* Create(FEModel* pfem) { return new T(pfem); }
+};
+
+//------------------------------------------------------------------------------
+// This is for functions exported from a plugin
+#ifdef WIN32
+#define FECORE_EXPORT extern "C" __declspec(dllexport)
+#else
+#define FECORE_EXPORT extern "C"
+#endif

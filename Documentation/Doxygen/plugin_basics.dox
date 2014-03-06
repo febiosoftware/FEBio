@@ -25,6 +25,9 @@ This function will be the first function called by FEBio and can be used to allo
 extern "C" FECORE_EXPORT void PluginInitialize(FECoreKernel&);
 \endcode
 
+It takes one parameter, a reference to the kernel object. This object is used for accessing the resources managed by this class, such as logging.
+Since use of this class is an advanced feature, for most plugins it is advised to ignore it.
+
 \subsection PluginNumClasses
 This functions returns the number of classes that the plugin defines. 
 
@@ -32,13 +35,19 @@ This functions returns the number of classes that the plugin defines.
 extern "C" FECORE_EXPORT int PluginNumClasses();
 \endcode
 
+A plugin can contain multiple classes. For example, it can contain a class for a new material that uses internal variables.
+In addition, classes for writing the internal variables to the plotfile can be defined as well. This function returns the number of class
+(or more correctly, the number of factory classes) that the plugin wants to register with FEBio.
+
 \subsection PluginGetFactory
-This function will be called as many times as there are classes (i.e. the value returned by PluginNumClasses). In each call, it should return
-a pointer to a factory class. See section below for more details on how to create a plugin factory class.
+This function is used to register the individual factory classes with FEBio.
 
 \code
 extern "C" FECORE_EXPORT PluginGetFactory(int i);
 \endcode
+
+This function will be called as many times as there are factory classes (i.e. the value returned by PluginNumClasses). In each call, it should return
+a pointer to a factory class. See section below for more details on how to create a plugin factory class.
 
 \subsection PluginCleanup
 This function will be called when FEBio terminates and can be used to deallocate resources.
@@ -48,5 +57,18 @@ extern "C" FECORE_EXPORT void PluginCleanup()
 \endcode
 
 \section plugin_sec3 Factory Classes
-Discuss what factory classes are and how to use them in a plugin
+A factory class is a special type of class that is designed to create an instance of a specific class that can be used in FEBio. 
+The easiest way to create a factory class is to use the FEPluginFactory_T template class. This template has two arguments, the class name
+and the SuperClass ID. In addition, the constructor takes the string name of the class that is to used in the FEBio xml input file. For example, for
+a material plugin. You must include the "FECore/FECoreKernel.h" header file.
+
+\code
+class MyPluginClass : public FEElasticMaterial {};
+
+FEPluginFactory_T<MyPluginClass, FEMATERIAL_ID> my_factory("my material");
+\endcode
+
+Then, in the PluginGetFactory method, you return a pointer to the my_factory object. 
+
+The available SuperClass ID's can be found in "FECore/FE_enum.h".
 */
