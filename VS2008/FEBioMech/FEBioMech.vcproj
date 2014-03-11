@@ -197,6 +197,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FECGSolidSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEConstBodyForce.cpp"
 				>
 			</File>
@@ -668,6 +672,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FECellGrowth.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FECGSolidSolver.h"
 				>
 			</File>
 			<File
