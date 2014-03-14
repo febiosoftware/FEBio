@@ -534,8 +534,8 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 			FEBiphasicSoluteDomain* pdom = dynamic_cast<FEBiphasicSoluteDomain*>(&mesh.Domain(i));
 			if (pdom)
 			{
-				pdom->InternalFluidWorkSS (this, R, dt);
-				pdom->InternalSoluteWorkSS(this, R, dt);
+				pdom->InternalFluidWorkSS (R, dt);
+				pdom->InternalSoluteWorkSS(R, dt);
 			}
 		}
 	}
@@ -546,8 +546,8 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 			FEBiphasicSoluteDomain* pdom = dynamic_cast<FEBiphasicSoluteDomain*>(&mesh.Domain(i));
 			if (pdom)
 			{
- 				pdom->InternalFluidWork (this, R, dt);
-				pdom->InternalSoluteWork(this, R, dt);
+ 				pdom->InternalFluidWork (R, dt);
+				pdom->InternalSoluteWork(R, dt);
 			}
 		}
 	}

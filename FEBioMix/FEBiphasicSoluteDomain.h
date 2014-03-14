@@ -30,16 +30,16 @@ public:
 
 public:
 	//! internal fluid work
-	virtual void InternalFluidWork(FESolver* psolver, vector<double>& R, double dt);
+	virtual void InternalFluidWork(vector<double>& R, double dt);
 
 	//! internal fluid work (steady-state analysis)
-	virtual void InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt);
+	virtual void InternalFluidWorkSS(vector<double>& R, double dt);
 
 	//! internal solute work
-	virtual void InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt);
+	virtual void InternalSoluteWork(vector<double>& R, double dt);
 
 	//! internal solute work (steady-state analysis)
-	virtual void InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt);
+	virtual void InternalSoluteWorkSS(vector<double>& R, double dt);
 
 public:
 	//! calculates the global stiffness matrix for this domain

@@ -304,7 +304,7 @@ void FEMultiphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 //! solute concentration)
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
-void FEMultiphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt)
+void FEMultiphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 {
 	// get the elements material
 	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial());
@@ -437,7 +437,7 @@ bool FEMultiphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt)
+void FEMultiphasicDomain::InternalSoluteWork(vector<double>& R, double dt)
 {
 	// get the elements material
 	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial());
@@ -659,7 +659,7 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::InternalFluidWork(FESolver* psolver, vector<double>& R, double dt)
+void FEMultiphasicDomain::InternalFluidWork(vector<double>& R, double dt)
 {
 	int NE = (int)m_Elem.size();
     
@@ -811,7 +811,7 @@ bool FEMultiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<do
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt)
+void FEMultiphasicDomain::InternalFluidWorkSS(vector<double>& R, double dt)
 {
 	int NE = (int)m_Elem.size();
     

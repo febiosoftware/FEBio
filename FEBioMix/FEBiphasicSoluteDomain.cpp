@@ -254,7 +254,7 @@ void FEBiphasicSoluteDomain::Residual(FESolver* psolver, vector<double>& R)
 }
 */
 //-----------------------------------------------------------------------------
-void FEBiphasicSoluteDomain::InternalFluidWork(FESolver* psolver, vector<double>& R, double dt)
+void FEBiphasicSoluteDomain::InternalFluidWork(vector<double>& R, double dt)
 {
 	const int NE = (int)m_Elem.size();
 
@@ -292,7 +292,7 @@ void FEBiphasicSoluteDomain::InternalFluidWork(FESolver* psolver, vector<double>
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSoluteDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt)
+void FEBiphasicSoluteDomain::InternalFluidWorkSS(vector<double>& R, double dt)
 {
 	const int NE = (int)m_Elem.size();
 
@@ -330,7 +330,7 @@ void FEBiphasicSoluteDomain::InternalFluidWorkSS(FESolver* psolver, vector<doubl
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSoluteDomain::InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt)
+void FEBiphasicSoluteDomain::InternalSoluteWork(vector<double>& R, double dt)
 {
 	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (GetMaterial());
 	assert(pm);
@@ -372,7 +372,7 @@ void FEBiphasicSoluteDomain::InternalSoluteWork(FESolver* psolver, vector<double
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSoluteDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt)
+void FEBiphasicSoluteDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 {
 	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (GetMaterial());
 	assert(pm);

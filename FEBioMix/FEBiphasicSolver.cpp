@@ -488,7 +488,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 		for (i=0; i<mesh.Domains(); ++i)
 		{
 			FEBiphasicSolidDomain* pdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-			if (pdom) pdom->InternalFluidWorkSS(this, R, dt);
+			if (pdom) pdom->InternalFluidWorkSS(R, dt);
 		}
 	}
 	else
@@ -496,7 +496,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 		for (i=0; i<mesh.Domains(); ++i)
 		{
 			FEBiphasicSolidDomain* pdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-			if (pdom) pdom->InternalFluidWork(this, R, dt);
+			if (pdom) pdom->InternalFluidWork(R, dt);
 		}
 	}
 

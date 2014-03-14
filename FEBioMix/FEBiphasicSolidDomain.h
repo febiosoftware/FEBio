@@ -38,10 +38,10 @@ public: // overrides from FEElasticDomain
 public: // TODO: The following functions are to replace Residual
 
 	//! internal fluid work
-	void InternalFluidWork(FESolver* psolver, vector<double>& R, double dt);
+	void InternalFluidWork(vector<double>& R, double dt);
 
 	//! internal fluid work (steady state analysis)
-	void InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt);
+	void InternalFluidWorkSS(vector<double>& R, double dt);
 
 public:
 	

@@ -267,7 +267,7 @@ void FETriphasicDomain::Residual(FESolver* psolver, vector<double>& R)
 */
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt)
+void FETriphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 {
 	FETriphasic* pm = dynamic_cast<FETriphasic*>(GetMaterial()); assert(pm);
 	
@@ -319,7 +319,7 @@ void FETriphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& 
 }
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt)
+void FETriphasicDomain::InternalSoluteWork(vector<double>& R, double dt)
 {
 	// element force vector
 	vector<double> fe;
@@ -366,7 +366,7 @@ void FETriphasicDomain::InternalSoluteWork(FESolver* psolver, vector<double>& R,
 }
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt)
+void FETriphasicDomain::InternalFluidWorkSS(vector<double>& R, double dt)
 {
 	int NE = m_Elem.size();
     
@@ -404,7 +404,7 @@ void FETriphasicDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>& R
 }
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::InternalFluidWork(FESolver* psolver, vector<double>& R, double dt)
+void FETriphasicDomain::InternalFluidWork(vector<double>& R, double dt)
 {
 	int NE = m_Elem.size();
     

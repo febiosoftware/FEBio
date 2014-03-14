@@ -581,22 +581,22 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 
 			if (pbd)
 			{
-				pbd->InternalFluidWorkSS(this, R, dt);
+				pbd->InternalFluidWorkSS(R, dt);
 			} 
 			else if (pbs)
 			{
-				pbs->InternalFluidWorkSS(this, R, dt);
-				pbs->InternalSoluteWorkSS(this, R, dt);
+				pbs->InternalFluidWorkSS(R, dt);
+				pbs->InternalSoluteWorkSS(R, dt);
 			} 
 			else if (ptd)
 			{
-				ptd->InternalFluidWorkSS(this, R, dt);
-				ptd->InternalSoluteWorkSS(this, R, dt);
+				ptd->InternalFluidWorkSS(R, dt);
+				ptd->InternalSoluteWorkSS(R, dt);
 			}
 			else if (pdom)
 			{
-				pdom->InternalFluidWorkSS (this, R, dt);
-				pdom->InternalSoluteWorkSS(this, R, dt);
+				pdom->InternalFluidWorkSS (R, dt);
+				pdom->InternalSoluteWorkSS(R, dt);
 			}
 		}
 	}
@@ -612,22 +612,22 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 
 			if (pbd)
 			{
-				pbd->InternalFluidWork(this, R, dt);
+				pbd->InternalFluidWork(R, dt);
 			}
 			else if (pbs)
 			{
-				pbs->InternalFluidWork(this, R, dt);
-				pbs->InternalSoluteWork(this, R, dt);
+				pbs->InternalFluidWork(R, dt);
+				pbs->InternalSoluteWork(R, dt);
 			}
 			else if (ptd)
 			{
-				ptd->InternalFluidWork(this, R, dt);
-				ptd->InternalSoluteWork(this, R, dt);
+				ptd->InternalFluidWork(R, dt);
+				ptd->InternalSoluteWork(R, dt);
 			}
 			else if (pdom)
 			{
- 				pdom->InternalFluidWork (this, R, dt);
-				pdom->InternalSoluteWork(this, R, dt);
+ 				pdom->InternalFluidWork (R, dt);
+				pdom->InternalSoluteWork(R, dt);
 			}
 		}
 	}

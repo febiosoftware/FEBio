@@ -33,16 +33,16 @@ public:
 public: // --- overridden from FEBiphasicSoluteDomain ---
 
 	// internal fluid work
-	void InternalFluidWork(FESolver* psolver, vector<double>& R, double dt);
+	void InternalFluidWork(vector<double>& R, double dt);
 
 	// internal fluid work (steady state analysis)
-	void InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt);
+	void InternalFluidWorkSS(vector<double>& R, double dt);
 
 	// solute work
-	void InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt);
+	void InternalSoluteWork(vector<double>& R, double dt);
 
 	// solute work (steady state analysis)
-	void InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt);
+	void InternalSoluteWorkSS(vector<double>& R, double dt);
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp);

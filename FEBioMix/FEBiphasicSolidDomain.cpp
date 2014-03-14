@@ -158,7 +158,7 @@ void FEBiphasicSolidDomain::Residual(FESolver* psolver, vector<double>& R)
 */
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSolidDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt)
+void FEBiphasicSolidDomain::InternalFluidWorkSS(vector<double>& R, double dt)
 {
 	int NE = m_Elem.size();
 
@@ -179,10 +179,6 @@ void FEBiphasicSolidDomain::InternalFluidWorkSS(FESolver* psolver, vector<double
 		// assemble element 'fe'-vector into global R vector
 		UnpackLM(el, elm);
 		
-		// do biphasic forces
-		FEMaterial* pm = m_pMat;
-		assert(dynamic_cast<FEBiphasic*>(pm) != 0);
-			
 		// calculate fluid internal work
 		ElementInternalFluidWorkSS(el, fe, dt);
 			
@@ -202,7 +198,7 @@ void FEBiphasicSolidDomain::InternalFluidWorkSS(FESolver* psolver, vector<double
 
 //-----------------------------------------------------------------------------
 // Calculate the work due to the internal fluid pressure
-void FEBiphasicSolidDomain::InternalFluidWork(FESolver* psolver, vector<double>& R, double dt)
+void FEBiphasicSolidDomain::InternalFluidWork(vector<double>& R, double dt)
 {
 	int NE = m_Elem.size();
     
