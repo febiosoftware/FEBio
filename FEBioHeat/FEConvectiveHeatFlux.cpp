@@ -217,3 +217,18 @@ bool FEConvectiveHeatFlux::SetFacetAttribute(int nface, const char* szatt, const
 
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+void FEConvectiveHeatFlux::Serialize(DumpFile& ar)
+{
+	FESurfaceLoad::Serialize(ar);
+	
+	if (ar.IsSaving())
+	{
+		ar << m_FC;
+	}
+	else
+	{
+		ar >> m_FC;
+	}
+}

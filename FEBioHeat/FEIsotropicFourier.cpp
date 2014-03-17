@@ -25,3 +25,9 @@ void FEIsotropicFourier::Conductivity(double D[3][3])
 	D[0][2] = D[2][0] = 0;
 	D[1][2] = D[2][1] = 0;
 }
+
+//-----------------------------------------------------------------------------
+void FEIsotropicFourier::Serialize(DumpFile& ar)
+{
+	FEHeatTransferMaterial::Serialize(ar);
+}

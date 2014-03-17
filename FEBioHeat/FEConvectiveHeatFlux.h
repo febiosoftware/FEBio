@@ -32,7 +32,7 @@ public:
 	void Residual(FEGlobalVector& R);
 
 	//! serialization
-	void Serialize(DumpFile& ar) {}
+	void Serialize(DumpFile& ar);
 
 	//! set an attribute of a surface facet
 	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);

@@ -27,6 +27,9 @@ public:
 	//! get the heat flux
 	vec3d HeatFlux(vec3d gradT) { return gradT*(-m_k); }
 
+	//! serialization
+	void Serialize(DumpFile& ar);
+
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

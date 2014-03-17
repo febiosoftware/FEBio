@@ -174,7 +174,7 @@ void FEParamContainer::Serialize(DumpFile& ar)
 	{
 		int NP = 0;
 		list<FEParam>::iterator it;
-		if (m_pParam)
+		if (m_pParam) // If the input file doesn't set any parameters, the parameter list won't be created.
 		{
 			NP = m_pParam->Parameters();
 			it = m_pParam->first();

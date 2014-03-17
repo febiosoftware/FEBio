@@ -546,5 +546,17 @@ void FEHeatSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& k
 //!
 void FEHeatSolver::Serialize(DumpFile &ar)
 {
+	FESolver::Serialize(ar);
+
+	if (ar.IsSaving())
+	{
+		ar << m_T << m_Tp << m_R << m_u;
+		ar << m_brhs;
+	}
+	else
+	{
+		ar >> m_T >> m_Tp >> m_R >> m_u;
+		ar >> m_brhs;
+	}
 
 }

@@ -18,6 +18,9 @@ public:
 	//! calculate the RHS-contribution of the source
 	void Residual(FEGlobalVector& R);
 
+	//! serialization
+	void Serialize(DumpFile& ar);
+
 protected:
 	void ElementResidual(FEHeatSolidDomain& dom, FESolidElement& el, vector<double>& fe);
 

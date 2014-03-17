@@ -56,3 +56,9 @@ void FEHeatSource::ElementResidual(FEHeatSolidDomain& dom, FESolidElement& el, v
 		}
 	}
 }
+
+//-----------------------------------------------------------------------------
+void FEHeatSource::Serialize(DumpFile& ar)
+{
+	FEBodyLoad::Serialize(ar);
+}
