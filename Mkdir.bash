@@ -1,7 +1,7 @@
 set -v
 
 if [ $# == 0 ]; then
-	echo "Usage: Mkdir.bash dir"
+	echo "Usage: Mkdir.bash platform"
 	exit
 fi
 
@@ -33,8 +33,5 @@ cd FECore
 mkdir $1
 cd ..
 cd NumCore
-mkdir $1
-cd ..
-cd NeoHookeanPI
 mkdir $1
 cd ..
