@@ -70,6 +70,7 @@
 #include "FEMicroMaterial.h"
 #include "FESpringMaterial.h"
 #include "FEElasticMultigeneration.h"
+#include "FEPRLig.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -202,6 +203,7 @@ REGISTER_FECORE_CLASS(FECoupledTransIsoVerondaWestmann     , FEMATERIAL_ID, "cou
 REGISTER_FECORE_CLASS(FECoupledTransIsoMooneyRivlin        , FEMATERIAL_ID, "coupled trans-iso Mooney-Rivlin");
 REGISTER_FECORE_CLASS(FEMicroMaterial                      , FEMATERIAL_ID, "micro-material");
 REGISTER_FECORE_CLASS(FEGenerationMaterial                 , FEMATERIAL_ID, "generation");
+REGISTER_FECORE_CLASS(FEPRLig					           , FEMATERIAL_ID, "PRLig");
 
 REGISTER_FECORE_CLASS(FELinearSpring           , FEMATERIAL_ID, "linear");
 REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, FEMATERIAL_ID, "tension-only linear");
