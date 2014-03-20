@@ -361,7 +361,9 @@
     <ClCompile Include="..\..\FEBioMix\FEMultiphasic.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicAnalysis.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMultiphasicMultigeneration.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicSolver.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMultiphasicStandard.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEOsmCoefConst.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEOsmoticCoefficient.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPermConstIso.cpp" />
@@ -419,7 +421,9 @@
     <ClInclude Include="..\..\FEBioMix\FEMultiphasic.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicAnalysis.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicDomain.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMultiphasicMultigeneration.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicSolver.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMultiphasicStandard.h" />
     <ClInclude Include="..\..\FEBioMix\FEOsmCoefConst.h" />
     <ClInclude Include="..\..\FEBioMix\FEOsmoticCoefficient.h" />
     <ClInclude Include="..\..\FEBioMix\FEPermConstIso.h" />
