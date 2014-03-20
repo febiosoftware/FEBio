@@ -175,6 +175,21 @@ public:
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Element elasticity tensor
+class FEPlotElementElasticity : public FEDomainData
+{
+public:
+	FEPlotElementElasticity(FEModel* pfem) : FEDomainData(PLT_TENS4FS, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+    
+protected:
+	bool WriteSolidElasticity(FEElasticSolidDomain& d, vector<float>& a);
+	bool WriteShellElasticity(FEElasticShellDomain& d, vector<float>& a);
+    
+	bool WriteLinearSolidElasticity(FELinearSolidDomain& d, vector<float>& a);
+};
+
 
 //-----------------------------------------------------------------------------
 //! Damage reduction factor

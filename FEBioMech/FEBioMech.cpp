@@ -246,6 +246,7 @@ REGISTER_FECORE_CLASS(FEPlotStrainEnergyDensity  , FEPLOTDATA_ID, "strain energy
 REGISTER_FECORE_CLASS(FEPlotSpecificStrainEnergy , FEPLOTDATA_ID, "specific strain energy");
 REGISTER_FECORE_CLASS(FEPlotDensity              , FEPLOTDATA_ID, "density"               );
 REGISTER_FECORE_CLASS(FEPlotElementStress        , FEPLOTDATA_ID, "stress"                );
+REGISTER_FECORE_CLASS(FEPlotElementElasticity    , FEPLOTDATA_ID, "elasticity"            );
 REGISTER_FECORE_CLASS(FEPlotRelativeVolume       , FEPLOTDATA_ID, "relative volume"       );
 REGISTER_FECORE_CLASS(FEPlotFiberVector          , FEPLOTDATA_ID, "fiber vector"          );
 REGISTER_FECORE_CLASS(FEPlotShellThickness       , FEPLOTDATA_ID, "shell thickness"       );

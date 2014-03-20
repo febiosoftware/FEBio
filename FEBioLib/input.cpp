@@ -220,6 +220,7 @@ void echo_input(FEBioModel& fem)
 					case PLT_VEC3F : szt = "vec3f"; break;
 					case PLT_MAT3FS: szt = "mat3fs"; break;
 					case PLT_MAT3FD: szt = "mat3fd"; break;
+                    case PLT_TENS4FS: szt = "tens4fs"; break;
 					}
 
 					const char* szf = 0;

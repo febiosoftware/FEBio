@@ -379,6 +379,131 @@ bool FEPlotElementStress::WriteLinearSolidStress(FELinearSolidDomain& d, vector<
 
 
 //-----------------------------------------------------------------------------
+//! Store the average elasticity for each element.
+bool FEPlotElementElasticity::Save(FEDomain& dom, vector<float>& a)
+{
+	// write solid elasticity
+	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
+	if (pbd) return WriteSolidElasticity(*pbd, a);
+    
+	FELinearSolidDomain* pbl = dynamic_cast<FELinearSolidDomain*>(&dom);
+	if (pbl) return WriteLinearSolidElasticity(*pbl, a);
+    
+	// write shell elasticity
+	FEElasticShellDomain* pbs = dynamic_cast<FEElasticShellDomain*>(&dom);
+	if (pbs) return WriteShellElasticity(*pbs, a);
+    
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotElementElasticity::WriteSolidElasticity(FEElasticSolidDomain& d, vector<float>& a)
+{
+    FEMaterial* pm = dynamic_cast<FEMaterial*> (d.GetMaterial());
+    FEElasticMaterial* pme = pm->GetElasticMaterial();
+    if (pme == 0) return false;
+    
+    tens4ds c;
+    
+	// write solid element data
+	for (int i=0; i<d.Elements(); ++i)
+	{
+		FESolidElement& el = d.Element(i);
+        
+		float s[21] = {0};
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double) nint;
+        
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		// we output the average stress values of the gauss points
+		for (int j=0; j<nint; ++j)
+		{
+			FEMaterialPoint& pt = (*el.m_State[j]->ExtractData<FEMaterialPoint>());
+            c = pme->Tangent(pt);
+            
+            for (int k=0; k<21; ++k) s[k] += (float) (f*c.d[k]);
+		}
+        
+        for (int k=0; k<21; ++k) a.push_back(s[k]);
+	}
+    
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotElementElasticity::WriteShellElasticity(FEElasticShellDomain& d, vector<float>& a)
+{
+    FEMaterial* pm = dynamic_cast<FEMaterial*> (d.GetMaterial());
+    FEElasticMaterial* pme = pm->GetElasticMaterial();
+    if (pme == 0) return false;
+    
+    tens4ds c;
+    
+	// write shell element data
+	for (int i=0; i<d.Elements(); ++i)
+	{
+		FEShellElement& el = d.Element(i);
+        
+		float s[21] = {0};
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double) nint;
+        
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		// we output the average stress values of the gauss points
+		for (int j=0; j<nint; ++j)
+		{
+			FEMaterialPoint& pt = (*el.m_State[j]->ExtractData<FEMaterialPoint>());
+            c = pme->Tangent(pt);
+            
+            for (int k=0; k<21; ++k) s[k] += (float) (f*c.d[k]);
+		}
+        
+        for (int k=0; k<21; ++k) a.push_back(s[k]);
+	}
+    
+	return true;
+}
+
+
+//-----------------------------------------------------------------------------
+bool FEPlotElementElasticity::WriteLinearSolidElasticity(FELinearSolidDomain& d, vector<float>& a)
+{
+    FEMaterial* pm = dynamic_cast<FEMaterial*> (d.GetMaterial());
+    FEElasticMaterial* pme = pm->GetElasticMaterial();
+    if (pme == 0) return false;
+    
+    tens4ds c;
+    
+	// write solid element data
+	for (int i=0; i<d.Elements(); ++i)
+	{
+		FESolidElement& el = d.Element(i);
+        
+		float s[21] = {0};
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double) nint;
+        
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		// we output the average stress values of the gauss points
+		for (int j=0; j<nint; ++j)
+		{
+			FEMaterialPoint& pt = (*el.m_State[j]->ExtractData<FEMaterialPoint>());
+            c = pme->Tangent(pt);
+            
+            for (int k=0; k<21; ++k) s[k] += (float) (f*c.d[k]);
+		}
+        
+        for (int k=0; k<21; ++k) a.push_back(s[k]);
+	}
+    
+	return true;
+}
+
+
+//-----------------------------------------------------------------------------
 bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
 {
 	int i, j;
