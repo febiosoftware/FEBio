@@ -651,7 +651,7 @@ double* FEModel::FindParameter(const char* szparam)
 	}
 
 	// make sure we found a material with the same name
-	if (pmat == 0) return false;
+	if (pmat == 0) return 0;
 
 	// if the variable is a vector, then we require an index
 	char* szarg = strchr((char*) szvar, '[');

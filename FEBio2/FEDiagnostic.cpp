@@ -61,7 +61,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 	{
 		// Find the root element
 		XMLTag tag;
-		if (xml.FindTag("febio_diagnostic", tag) == false) return false;
+		if (xml.FindTag("febio_diagnostic", tag) == false) return 0;
 
 		XMLAtt& att = tag.m_att[0];
 		if      (att == "tangent test"  ) m_pdia = new FETangentDiagnostic(fem);
@@ -91,22 +91,22 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 	catch (InvalidVersion)
 	{
 		felog.printbox("FATAL ERROR", "Invalid version for FEBio specification.");
-		return false;
+		return 0;
 	}
 	catch (InvalidMaterial e)
 	{
 		felog.printbox("FATAL ERROR:", "Element %d has an invalid material type.", e.m_nel);
-		return false;
+		return 0;
 	}
 	catch (XMLReader::XMLSyntaxError)
 	{
 		felog.printf("FATAL ERROR: Syntax error (line %d)\n", xml.GetCurrentLine());
-		return false;
+		return 0;
 	}
 	catch (XMLReader::InvalidTag e)
 	{
 		felog.printf("FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
-		return false;
+		return 0;
 	}
 	catch (XMLReader::InvalidAttributeValue e)
 	{
@@ -115,28 +115,28 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 		const char* szv = e.szval;
 		int l = e.tag.m_nstart_line;
 		felog.printf("FATAL ERROR: unrecognized value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
-		return false;
+		return 0;
 	}
 	catch (XMLReader::InvalidValue e)
 	{
 		felog.printf("FATAL ERROR: the value for tag \"%s\" is invalid (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
-		return false;
+		return 0;
 	}
 	catch (XMLReader::MissingAttribute e)
 	{
 		felog.printf("FATAL ERROR: Missing attribute \"%s\" of tag \"%s\" (line %d)\n", e.szatt, e.tag.m_sztag, e.tag.m_nstart_line);
-		return false;
+		return 0;
 	}
 	catch (XMLReader::UnmatchedEndTag e)
 	{
 		const char* sz = e.tag.m_szroot[e.tag.m_nlevel];
 		felog.printf("FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
-		return false;
+		return 0;
 	}
 	catch (...)
 	{
 		felog.printf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
-		return false;
+		return 0;
 	}
 
 	// close the XML file
