@@ -12,12 +12,22 @@ bool FEBiphasicSolidDomain::Initialize(FEModel &mdl)
 	FEBiphasic* pmb = dynamic_cast<FEBiphasic*>(GetMaterial());
 	assert(pmb);
 
+	const int NE = FEElement::MAX_NODES;
+    double p0[NE];
+	FEMesh& m = *GetMesh();
+    
 	// initialize all element data
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
 		
+        // get the number of nodes
+        int neln = el.Nodes();
+        // get initial values of fluid pressure and solute concentrations
+		for (int i=0; i<neln; ++i)
+			p0[i] = m.Node(el.m_node[i]).m_p0;
+        
 		// get the number of integration points
 		int nint = el.GaussPoints();
 		
@@ -25,8 +35,16 @@ bool FEBiphasicSolidDomain::Initialize(FEModel &mdl)
 		for (int n=0; n<nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.m_State[n];
+            FEElasticMaterialPoint& pm = *(mp.ExtractData<FEElasticMaterialPoint>());
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			
+            // initialize effective fluid pressure, its gradient, and fluid flux
+            pt.m_p = el.Evaluate(p0, n);
+            pt.m_gradp = gradient(el, p0, n);
+            pt.m_w = pmb->Flux(mp);
+            pt.m_pa = pmb->Pressure(mp);
+            pm.m_s = pmb->Stress(mp);
+           
 			// initialize referential solid volume fraction
 			pt.m_phi0 = pmb->m_phi0;
 		}

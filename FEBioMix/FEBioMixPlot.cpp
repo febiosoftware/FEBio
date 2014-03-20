@@ -989,6 +989,48 @@ bool FEPlotSBMRefAppDensity_::Save(FEDomain &dom, vector<float>& a)
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveElasticity::Save(FEDomain &dom, vector<float>& a)
+{
+    tens4ds c;
+    
+	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
+    
+    FEBiphasic* pb = dynamic_cast<FEBiphasic*> (dom.GetMaterial());
+    FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+    FETriphasic* ptp = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+    FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+
+    if ((pb == 0) && (pbs == 0) && (ptp == 0) && (pmp == 0)) return false;
+
+    for (int i=0; i<pbd->Elements(); ++i)
+    {
+        FESolidElement& el = pbd->Element(i);
+        
+        float s[21] = {0};
+        int nint = el.GaussPoints();
+        double f = 1.0 / (double) nint;
+        
+        // since the PLOT file requires floats we need to convert
+        // the doubles to single precision
+        // we output the average stress values of the gauss points
+        for (int j=0; j<nint; ++j)
+        {
+            FEMaterialPoint& pt = (*el.m_State[j]->ExtractData<FEMaterialPoint>());
+            if (pb) c = pb->Tangent(pt);
+            else if (pbs) c = pbs->Tangent(pt);
+            else if (ptp) c = ptp->Tangent(pt);
+            else if (pmp) c = pmp->Tangent(pt);
+            
+            for (int k=0; k<21; ++k) s[k] += (float) (f*c.d[k]);
+        }
+        
+        for (int k=0; k<21; ++k) a.push_back(s[k]);
+    }
+    
+    return true;
+}
+
 
 //=============================================================================
 //                       S U R F A C E    D A T A

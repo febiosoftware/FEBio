@@ -27,11 +27,26 @@ bool FETriphasicDomain::Initialize(FEModel &mdl)
 	const int nsol = 2;
 	const int nsbm = 0;
     
+	const int NE = FEElement::MAX_NODES;
+    double p0[NE];
+    vector< vector<double> > c0(nsol, vector<double>(NE));
+	FEMesh& m = *GetMesh();
+    
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
 		
+        // get the number of nodes
+        int neln = el.Nodes();
+        // get initial values of fluid pressure and solute concentrations
+		for (int i=0; i<neln; ++i)
+		{
+			p0[i] = m.Node(el.m_node[i]).m_p0;
+            for (int isol=0; isol<nsol; ++isol)
+                c0[isol][i] = m.Node(el.m_node[i]).m_c0[isol];
+		}
+
 		// get the number of integration points
 		int nint = el.GaussPoints();
 		
@@ -39,22 +54,40 @@ bool FETriphasicDomain::Initialize(FEModel &mdl)
 		for (int n=0; n<nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.m_State[n];
+            FEElasticMaterialPoint& pm = *(mp.ExtractData<FEElasticMaterialPoint>());
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
 			
 			// initialize referential solid volume fraction
 			pt.m_phi0 = pmb->m_phi0;
-			
+            
+            // initialize effective fluid pressure, its gradient, and fluid flux
+            pt.m_p = el.Evaluate(p0, n);
+            pt.m_gradp = gradient(el, p0, n);
+            pt.m_w = pmb->FluidFlux(mp);
+
+            
 			// initialize multiphasic solutes
 			ps.m_nsol = nsol;
-			ps.m_c.assign(nsol,0);
-			ps.m_ca.assign(nsol,0);
-			ps.m_gradc.assign(nsol,0);
-			ps.m_k.assign(nsol, 0);
-			ps.m_dkdJ.assign(nsol, 0);
-			ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
-			ps.m_j.assign(nsol,0);
 			ps.m_nsbm = nsbm;
+            
+            // initialize effective solute concentrations
+            for (int isol=0; isol<nsol; ++isol) {
+                ps.m_c[isol] = el.Evaluate(c0[isol].data(), n);
+                ps.m_gradc[isol] = gradient(el, c0[isol].data(), n);
+            }
+			
+            ps.m_psi = pmb->ElectricPotential(mp);
+            for (int isol=0; isol<nsol; ++isol) {
+                ps.m_ca[isol] = pmb->Concentration(mp,isol);
+                ps.m_j[isol] = pmb->SoluteFlux(mp,isol);
+            }
+            pt.m_pa = pmb->Pressure(mp);
+            ps.m_cF = pmb->FixedChargeDensity(mp);
+            ps.m_Ie = pmb->CurrentDensity(mp);
+			
+            pm.m_s = pmb->Stress(mp);
+
 		}
 	}
 	

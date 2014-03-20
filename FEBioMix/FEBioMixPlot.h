@@ -222,6 +222,15 @@ public:
 	FEPlotSBMRefAppDensityT(FEModel* pfem) : FEPlotSBMRefAppDensity_(SBM) {}
 };
 
+//-----------------------------------------------------------------------------
+//! effective elasticity
+class FEPlotEffectiveElasticity : public FEDomainData
+{
+public:
+	FEPlotEffectiveElasticity(FEModel* pfem) : FEDomainData(PLT_TENS4FS, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
 //=============================================================================
 //                         S U R F A C E   D A T A
 //=============================================================================

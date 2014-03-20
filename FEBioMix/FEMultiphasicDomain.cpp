@@ -27,6 +27,11 @@ bool FEMultiphasicDomain::Initialize(FEModel &mdl)
 	const int nsol = pmb->Solutes();
 	const int nsbm = pmb->SBMs();
 
+	const int NE = FEElement::MAX_NODES;
+    double p0[NE];
+    vector< vector<double> > c0(nsol, vector<double>(NE));
+	FEMesh& m = *GetMesh();
+    
 	// extract the initial concentrations of the solid-bound molecules
 	vector<double> sbmr(nsbm,0);
 	for (int i=0; i<nsbm; ++i) {
@@ -38,6 +43,16 @@ bool FEMultiphasicDomain::Initialize(FEModel &mdl)
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
 		
+        // get the number of nodes
+        int neln = el.Nodes();
+        // get initial values of fluid pressure and solute concentrations
+		for (int i=0; i<neln; ++i)
+		{
+			p0[i] = m.Node(el.m_node[i]).m_p0;
+            for (int isol=0; isol<nsol; ++isol)
+                c0[isol][i] = m.Node(el.m_node[i]).m_c0[isol];
+		}
+        
 		// get the number of integration points
 		int nint = el.GaussPoints();
 		
@@ -45,20 +60,33 @@ bool FEMultiphasicDomain::Initialize(FEModel &mdl)
 		for (int n=0; n<nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.m_State[n];
+            FEElasticMaterialPoint& pm = *(mp.ExtractData<FEElasticMaterialPoint>());
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             FEMultigenSBMMaterialPoint& pmg = *(mp.ExtractData<FEMultigenSBMMaterialPoint>());
 			
+            // initialize effective fluid pressure, its gradient, and fluid flux
+            pt.m_p = el.Evaluate(p0, n);
+            pt.m_gradp = gradient(el, p0, n);
+            pt.m_w = pmb->FluidFlux(mp);
+            
 			// initialize multiphasic solutes
 			ps.m_nsol = nsol;
-			ps.m_c.assign(nsol,0);
-			ps.m_ca.assign(nsol,0);
-			ps.m_gradc.assign(nsol,0);
-			ps.m_k.assign(nsol, 0);
-			ps.m_dkdJ.assign(nsol, 0);
-			ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
-			ps.m_j.assign(nsol,0);
 			ps.m_nsbm = nsbm;
+            
+            // initialize effective solute concentrations
+            for (int isol=0; isol<nsol; ++isol) {
+                ps.m_c[isol] = el.Evaluate(c0[isol].data(), n);
+                ps.m_gradc[isol] = gradient(el, c0[isol].data(), n);
+            }
+			
+            ps.m_psi = pmb->ElectricPotential(mp);
+            for (int isol=0; isol<nsol; ++isol) {
+                ps.m_ca[isol] = pmb->Concentration(mp,isol);
+                ps.m_j[isol] = pmb->SoluteFlux(mp,isol);
+            }
+            pt.m_pa = pmb->Pressure(mp);
+
 			ps.m_sbmr = sbmr;
 			ps.m_sbmrp = sbmr;
 			ps.m_sbmrhat.assign(nsbm,0);
@@ -71,6 +99,11 @@ bool FEMultiphasicDomain::Initialize(FEModel &mdl)
 
 			// initialize referential solid volume fraction
 			pt.m_phi0 = pmb->SolidReferentialVolumeFraction(mp);
+			
+            // calculate FCD, current and stress
+            ps.m_cF = pmb->FixedChargeDensity(mp);
+            ps.m_Ie = pmb->CurrentDensity(mp);
+            pm.m_s = pmb->Stress(mp);
 		}
 	}
 	

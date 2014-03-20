@@ -22,13 +22,25 @@ bool FEBiphasicSoluteDomain::Initialize(FEModel &mdl)
 	FEBiphasicSolute* pmb = dynamic_cast<FEBiphasicSolute*>(pm);
 	assert(pmb);
 	const int nsol = 1;
-	const int nsbm = 1;
 
+	const int NE = FEElement::MAX_NODES;
+    double p0[NE], c0[NE];
+	FEMesh& m = *GetMesh();
+    
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
 		
+        // get the number of nodes
+        int neln = el.Nodes();
+        // get initial values of fluid pressure and solute concentrations
+		for (int i=0; i<neln; ++i)
+		{
+			p0[i] = m.Node(el.m_node[i]).m_p0;
+            c0[i] = m.Node(el.m_node[i]).m_c0[0];
+		}
+        
 		// get the number of integration points
 		int nint = el.GaussPoints();
 		
@@ -36,25 +48,29 @@ bool FEBiphasicSoluteDomain::Initialize(FEModel &mdl)
 		for (int n=0; n<nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.m_State[n];
+            FEElasticMaterialPoint& pm = *(mp.ExtractData<FEElasticMaterialPoint>());
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
 			
+            // initialize effective fluid pressure, its gradient, and fluid flux
+            pt.m_p = el.Evaluate(p0, n);
+            pt.m_gradp = gradient(el, p0, n);
+            pt.m_w = pmb->FluidFlux(mp);
+            
+			// initialize multiphasic solutes
+			ps.m_nsol = nsol;
+            ps.m_c[0] = el.Evaluate(c0, n);
+            ps.m_gradc[0] = gradient(el, c0, n);
+
+            ps.m_ca[0] = pmb->Concentration(mp);
+            ps.m_j[0] = pmb->SoluteFlux(mp);
+            pt.m_pa = pmb->Pressure(mp);
+            
 			// initialize referential solid volume fraction
 			pt.m_phi0 = pmb->m_phi0;
 
-			// initialize multiphasic solutes
-			ps.m_nsol = nsol;
-			ps.m_c.assign(nsol,0);
-			ps.m_ca.assign(nsol,0);
-			ps.m_gradc.assign(nsol,0);
-			ps.m_k.assign(nsol, 0);
-			ps.m_dkdJ.assign(nsol, 0);
-			ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
-			ps.m_j.assign(nsol,0);
-			ps.m_nsbm = nsbm;
-			ps.m_sbmr.assign(nsbm,0);
-			ps.m_sbmrp.assign(nsbm,0);
-			ps.m_sbmrhat.assign(nsbm,0);
+            // calculate stress
+            pm.m_s = pmb->Stress(mp);
 		}
 	}
 	

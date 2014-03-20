@@ -127,7 +127,8 @@ REGISTER_FECORE_CLASS(FETiedBiphasicInterface, FESURFACEPAIRINTERACTION_ID, "tie
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
-REGISTER_FECORE_CLASS(FEPlotEffectiveFluidPressure		, FEPLOTDATA_ID, "effective fluid pressure"        );
+REGISTER_FECORE_CLASS(FEPlotEffectiveElasticity		     , FEPLOTDATA_ID, "effective elasticity"            );
+REGISTER_FECORE_CLASS(FEPlotEffectiveFluidPressure		 , FEPLOTDATA_ID, "effective fluid pressure"        );
 REGISTER_FECORE_CLASS(FEPlotActualFluidPressure          , FEPLOTDATA_ID, "fluid pressure"                  );
 REGISTER_FECORE_CLASS(FEPlotFluidFlux                    , FEPLOTDATA_ID, "fluid flux"                      );
 REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentration , FEPLOTDATA_ID, "effective solute concentration"  );

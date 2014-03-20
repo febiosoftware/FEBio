@@ -80,6 +80,9 @@ bool FEModel::Init()
 
 	// evaluate all loadcurves at the initial time
 	for (int i=0; i<LoadCurves(); ++i) m_LC[i]->Evaluate(0);
+    
+    // evaluate all parameter lists
+    EvaluateAllParameterLists();
 
 	// if the analysis is run in plain-strain mode we fix all the z-dofs of all nodes
 	if (m_nplane_strain >= 0)
