@@ -63,6 +63,7 @@ public:
 	int		m_nID;		//!< ID of rigid body
 	int		m_mat;		//!< material ID
 	double	m_mass;		//!< total mass of rigid body
+    mat3ds  m_moi;      //!< mass moment of inertia about center of mass
 	vec3d	m_Fr, m_Mr;	//!< reaction force and torque
 
 	vec3d	m_r0;	//!< initial position of rigid body

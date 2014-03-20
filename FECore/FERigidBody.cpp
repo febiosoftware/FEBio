@@ -104,7 +104,8 @@ void FERigidBody::SetCOM(vec3d rc)
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the total mass and center of mass of a rigid body
+//! Calculates the rigid body's total mass, center of mass, and mass moment
+//! of inertia about the center of mass
 //!
 void FERigidBody::UpdateCOM()
 {
@@ -114,6 +115,8 @@ void FERigidBody::UpdateCOM()
 	// initialize some data
 	m_mass = 0;			// total mass of rigid body
 	vec3d rc(0,0,0);	// center of mass
+    mat3ds moi(0,0,0,0,0,0);    // mass moment of inertia about origin
+    mat3dd I(1);        // identity tensor
 
 	// jacobian
 	double detJ;
@@ -170,10 +173,11 @@ void FERigidBody::UpdateCOM()
 						// add to total mass
 						m_mass += dens*detJ*gw[n];
 
-						// add to com
+						// add to com and moi
 						for (int i=0; i<el.Nodes(); ++i)
 						{
 							rc += r0[i]*H[i]*detJ*gw[n]*dens;
+                            moi += ((r0[i]*r0[i])*I - dyad(r0[i]))*H[i]*detJ*gw[n]*dens;
 						}
 					}
 				}
@@ -183,6 +187,10 @@ void FERigidBody::UpdateCOM()
 
 	// normalize com
 	if (m_mass != 0) rc /= m_mass;
+    
+    // use parallel axis theorem to transfer moi to com
+    // and store moi
+    m_moi = moi - m_mass*((rc*rc)*I - dyad(rc));
 
 	// store com
 	m_r0 = m_rt = rc;
@@ -194,6 +202,7 @@ void FERigidBody::ShallowCopy(DumpStream& dmp, bool bsave)
 	if (bsave)
 	{
 		dmp << m_mass;
+        dmp << m_moi;
 		dmp << m_Fr << m_Mr;
 		dmp << m_rp << m_rt;
 		dmp << m_qp << m_qt;
@@ -209,6 +218,7 @@ void FERigidBody::ShallowCopy(DumpStream& dmp, bool bsave)
 	else
 	{
 		dmp >> m_mass;
+        dmp >> m_moi;
 		dmp >> m_Fr >> m_Mr;
 		dmp >> m_rp >> m_rt;
 		dmp >> m_qp >> m_qt;
@@ -229,7 +239,7 @@ void FERigidBody::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_nID << m_mat << m_mass << m_Fr << m_Mr;
+		ar << m_nID << m_mat << m_mass << m_moi << m_Fr << m_Mr;
 		ar << m_r0 << m_rt << m_rp << m_qt << m_qp;
 		ar << m_bActive;
 		ar.write(m_LM , sizeof(int), 6);
@@ -240,7 +250,7 @@ void FERigidBody::Serialize(DumpFile& ar)
 	}
 	else
 	{
-		ar >> m_nID >> m_mat >> m_mass >> m_Fr >> m_Mr;
+		ar >> m_nID >> m_mat >> m_mass >> m_moi >> m_Fr >> m_Mr;
 		ar >> m_r0 >> m_rt >> m_rp >> m_qt >> m_qp;
 		ar >> m_bActive;
 		ar.read(m_LM , sizeof(int   ), 6);
