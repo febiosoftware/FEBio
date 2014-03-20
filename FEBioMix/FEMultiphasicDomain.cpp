@@ -1,5 +1,6 @@
 #include "FEMultiphasicDomain.h"
 #include "FEMultiphasic.h"
+#include "FEMultiphasicMultigeneration.h"
 #include "FECore/log.h"
 
 #ifndef SQR
@@ -46,6 +47,7 @@ bool FEMultiphasicDomain::Initialize(FEModel &mdl)
 			FEMaterialPoint& mp = *el.m_State[n];
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
+            FEMultigenSBMMaterialPoint& pmg = *(mp.ExtractData<FEMultigenSBMMaterialPoint>());
 			
 			// initialize multiphasic solutes
 			ps.m_nsol = nsol;
@@ -60,6 +62,12 @@ bool FEMultiphasicDomain::Initialize(FEModel &mdl)
 			ps.m_sbmr = sbmr;
 			ps.m_sbmrp = sbmr;
 			ps.m_sbmrhat.assign(nsbm,0);
+            if (&pmg) {
+                pmg.m_lsbmr = sbmr;
+                pmg.m_gsbmr[0] = sbmr;
+                pmg.m_gsbmrp[0] = sbmr;
+                pmg.m_nsbm = nsbm;
+            }
 
 			// initialize referential solid volume fraction
 			pt.m_phi0 = pmb->SolidReferentialVolumeFraction(mp);
@@ -145,6 +153,7 @@ void FEMultiphasicDomain::InitElements()
 			FEMaterialPoint& mp = *el.m_State[n];
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
+            FEMultigenSBMMaterialPoint& pmg = *(mp.ExtractData<FEMultigenSBMMaterialPoint>());
 			
 			// reset referential solid volume fraction at previous time
 			pt.m_phi0p = pt.m_phi0;
@@ -153,6 +162,14 @@ void FEMultiphasicDomain::InitElements()
 			for (int j=0; j<ps.m_nsbm; ++j) {
 				ps.m_sbmrp[j] = ps.m_sbmr[j];
 			}
+			// reset generational referential solid-bound molecule concentrations at previous time
+            if (&pmg) {
+                for (int i=0; i<pmg.m_ngen; ++i) {
+                    for (int j=0; j<ps.m_nsbm; ++j) {
+                        pmg.m_gsbmrp[i][j] = pmg.m_gsbmr[i][j];
+                    }
+                }
+            }
 		}
 	}
 }
@@ -2209,32 +2226,10 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
 		// multiphasic material point data
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 		FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
-			
-		// check if this mixture includes chemical reactions
-		int nreact = (int)pmb->Reactions();
-		if (nreact) {
-			// for chemical reactions involving solid-bound molecules,
-			// update their concentration
-            double phi0 = ppt.m_phi0;
-			for (int isbm=0; isbm<nsbm; ++isbm) {
-				spt.m_sbmrhat[isbm] = 0;
-				// combine the molar supplies from all the reactions
-				for (k=0; k<nreact; ++k) {
-					double zetahat = pmb->GetReaction(k)->ReactionSupply(mp);
-					double v = pmb->GetReaction(k)->m_v[nsol+isbm];
-					// remember to convert from molar supply to referential mass supply
-					spt.m_sbmrhat[isbm] += (pt.m_J-phi0)*pmb->SBMMolarMass(isbm)*v*zetahat;
-				}
-				// perform the time integration (Euler's method)
-				spt.m_sbmr[isbm] = spt.m_sbmrp[isbm] + dt*spt.m_sbmrhat[isbm];
-				// check bounds
-				if (spt.m_sbmr[isbm] < pmb->GetSBM(isbm)->m_rhomin)
-					spt.m_sbmr[isbm] = pmb->GetSBM(isbm)->m_rhomin;
-				if ((pmb->GetSBM(isbm)->m_rhomax > 0) && (spt.m_sbmr[isbm] > pmb->GetSBM(isbm)->m_rhomax))
-					spt.m_sbmr[isbm] = pmb->GetSBM(isbm)->m_rhomax;
-			}
-		}
-            
+        
+        // update SBM referential densities
+        pmb->UpdateSolidBoundMolecules(mp, dt);
+        
         // evaluate referential solid volume fraction
         ppt.m_phi0 = pmb->SolidReferentialVolumeFraction(mp);
             

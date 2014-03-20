@@ -248,12 +248,6 @@ FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEMultiphasic::CreateMaterialPointData() 
-{ 
-	return new FESolutesMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
-}
-
-//-----------------------------------------------------------------------------
 void FEMultiphasic::AddSolute(FESolute* psol)
 {
 	m_pSolute.push_back(psol);
@@ -423,8 +417,6 @@ double FEMultiphasic::SolidReferentialApparentDensity(FEMaterialPoint& pt)
 //! Solid referential volume fraction
 double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
 {
-	FEBiphasicMaterialPoint& pet = *pt.ExtractData<FEBiphasicMaterialPoint>();
-    
 	// get referential apparent density of base solid (assumed constant)
 	double phisr = m_phi0;
     
@@ -492,7 +484,7 @@ double FEMultiphasic::ElectricPotential(FEMaterialPoint& pt, const bool eform)
 	
 	// if not neutral, solve electroneutrality polynomial for zeta
 	FESolutesMaterialPoint& set = *pt.ExtractData<FESolutesMaterialPoint>();
-	const int nsol = m_pSolute.size();
+	const int nsol = (int)m_pSolute.size();
 	double cF = FixedChargeDensity(pt);
 
 	vector<double> c(nsol);		// effective concentration
@@ -791,7 +783,7 @@ tens4ds FEMultiphasic::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& ept = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEBiphasicMaterialPoint& bpt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
-	const int nsol = m_pSolute.size();
+	const int nsol = (int)m_pSolute.size();
 	
 	// call solid tangent routine
 	tens4ds C = m_pSolid->Tangent(mp);
@@ -875,7 +867,7 @@ vec3d FEMultiphasic::FluidFlux(FEMaterialPoint& pt)
 	
 	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-	const int nsol = m_pSolute.size();
+	const int nsol = (int)m_pSolute.size();
 	vector<double> c(nsol);
 	vector<vec3d> gradc(nsol);
 	vector<mat3ds> D(nsol);
@@ -983,7 +975,7 @@ double FEMultiphasic::Pressure(FEMaterialPoint& pt)
 	int i;
 	
 	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-	const int nsol = m_pSolute.size();
+	const int nsol = (int)m_pSolute.size();
 	
 	// effective pressure
 	double p = ppt.m_p;
@@ -1009,7 +1001,7 @@ double FEMultiphasic::Pressure(FEMaterialPoint& pt)
 vec3d FEMultiphasic::CurrentDensity(FEMaterialPoint& pt)
 {
 	int i;
-	const int nsol = m_pSolute.size();
+	const int nsol = (int)m_pSolute.size();
 	
 	vector<vec3d> j(nsol);
 	vector<int> z(nsol);
@@ -1031,7 +1023,6 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 	int i, nsol;
 	
 	FEMaterial::Serialize(ar);
-	FECoreKernel& febio = FECoreKernel::GetInstance();
 	
 	int nSupp = 0;
 	if (ar.IsSaving())

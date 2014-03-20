@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D534C48218BA930A006B5E1B /* FEMultiphasicStandard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D534C48018BA930A006B5E1B /* FEMultiphasicStandard.cpp */; };
+		D534C48318BA930A006B5E1B /* FEMultiphasicStandard.h in Headers */ = {isa = PBXBuildFile; fileRef = D534C48118BA930A006B5E1B /* FEMultiphasicStandard.h */; };
+		D534C48618BAAE70006B5E1B /* FEMultiphasicMultigeneration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D534C48418BAAE70006B5E1B /* FEMultiphasicMultigeneration.cpp */; };
+		D534C48718BAAE70006B5E1B /* FEMultiphasicMultigeneration.h in Headers */ = {isa = PBXBuildFile; fileRef = D534C48518BAAE70006B5E1B /* FEMultiphasicMultigeneration.h */; };
 		D5E108D31865E02800B23922 /* FEBioMix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1086B1865E02800B23922 /* FEBioMix.cpp */; };
 		D5E108D41865E02800B23922 /* FEBioMix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1086C1865E02800B23922 /* FEBioMix.h */; };
 		D5E108D51865E02800B23922 /* FEBioMixData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1086E1865E02800B23922 /* FEBioMixData.cpp */; };
@@ -123,6 +127,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D534C48018BA930A006B5E1B /* FEMultiphasicStandard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicStandard.cpp; sourceTree = "<group>"; };
+		D534C48118BA930A006B5E1B /* FEMultiphasicStandard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicStandard.h; sourceTree = "<group>"; };
+		D534C48418BAAE70006B5E1B /* FEMultiphasicMultigeneration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicMultigeneration.cpp; sourceTree = "<group>"; };
+		D534C48518BAAE70006B5E1B /* FEMultiphasicMultigeneration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicMultigeneration.h; sourceTree = "<group>"; };
 		D5E108631865E01B00B23922 /* libFEBioMix.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioMix.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E1086B1865E02800B23922 /* FEBioMix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioMix.cpp; sourceTree = "<group>"; };
 		D5E1086C1865E02800B23922 /* FEBioMix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioMix.h; sourceTree = "<group>"; };
@@ -325,8 +333,12 @@
 				D5E1089D1865E02800B23922 /* FEMultiphasicAnalysis.h */,
 				D5E1089E1865E02800B23922 /* FEMultiphasicDomain.cpp */,
 				D5E1089F1865E02800B23922 /* FEMultiphasicDomain.h */,
+				D534C48418BAAE70006B5E1B /* FEMultiphasicMultigeneration.cpp */,
+				D534C48518BAAE70006B5E1B /* FEMultiphasicMultigeneration.h */,
 				D5E108A01865E02800B23922 /* FEMultiphasicSolver.cpp */,
 				D5E108A11865E02800B23922 /* FEMultiphasicSolver.h */,
+				D534C48018BA930A006B5E1B /* FEMultiphasicStandard.cpp */,
+				D534C48118BA930A006B5E1B /* FEMultiphasicStandard.h */,
 				D5E108A21865E02800B23922 /* FEOsmCoefConst.cpp */,
 				D5E108A31865E02800B23922 /* FEOsmCoefConst.h */,
 				D5ECCEDB186644B00073481A /* FEOsmoticCoefficient.cpp */,
@@ -396,6 +408,7 @@
 			files = (
 				D5E108DE1865E02800B23922 /* FEBiphasicSolidDomain.h in Headers */,
 				D5E1091A1865E02800B23922 /* FEReactionRateHuiskes.h in Headers */,
+				D534C48718BAAE70006B5E1B /* FEMultiphasicMultigeneration.h in Headers */,
 				D5E109141865E02800B23922 /* FEPermRefTransIso.h in Headers */,
 				D5E108F81865E02800B23922 /* FEFluidFlux.h in Headers */,
 				D5E108F41865E02800B23922 /* FEDiffConstOrtho.h in Headers */,
@@ -406,6 +419,7 @@
 				D5E108F01865E02800B23922 /* FEDiffAlbroIso.h in Headers */,
 				D5E109081865E02800B23922 /* FEMultiphasicSolver.h in Headers */,
 				D5E108E41865E02800B23922 /* FEBiphasicSoluteDomain.h in Headers */,
+				D534C48318BA930A006B5E1B /* FEMultiphasicStandard.h in Headers */,
 				D5E108DA1865E02800B23922 /* FEBiphasic.h in Headers */,
 				D5E109161865E02800B23922 /* FEPoroTraction.h in Headers */,
 				D5E108EA1865E02800B23922 /* FECarterHayes.h in Headers */,
@@ -530,6 +544,7 @@
 				D5E108D31865E02800B23922 /* FEBioMix.cpp in Sources */,
 				D5E109351865E02800B23922 /* FETriphasic.cpp in Sources */,
 				D5E1092F1865E02800B23922 /* FESupplyMichaelisMenten.cpp in Sources */,
+				D534C48218BA930A006B5E1B /* FEMultiphasicStandard.cpp in Sources */,
 				D5E108FF1865E02800B23922 /* FEMixDomainFactory.cpp in Sources */,
 				D5ECCEE1186644B00073481A /* FEBiphasicContactSurface.cpp in Sources */,
 				D5E1090B1865E02800B23922 /* FEPermConstIso.cpp in Sources */,
@@ -554,6 +569,7 @@
 				D5E108EB1865E02800B23922 /* FEChemicalReaction.cpp in Sources */,
 				D5E108E31865E02800B23922 /* FEBiphasicSoluteDomain.cpp in Sources */,
 				D5E109271865E02800B23922 /* FESoluteFlux.cpp in Sources */,
+				D534C48618BAAE70006B5E1B /* FEMultiphasicMultigeneration.cpp in Sources */,
 				D5ECCEE3186644B00073481A /* FEHydraulicPermeability.cpp in Sources */,
 				D5E109311865E02800B23922 /* FESupplySynthesisBinding.cpp in Sources */,
 				D5E108E51865E02800B23922 /* FEBiphasicSoluteSolver.cpp in Sources */,

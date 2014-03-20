@@ -18,7 +18,7 @@ public:
 	void Init();
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
+	virtual FEMaterialPoint* CreateMaterialPointData() = 0;
 	
 	// return elastic material component
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
@@ -26,6 +26,9 @@ public:
 	// find a material parameter
 	FEParam* GetParameter(const ParamString& s);
 	
+    //! Update solid bound molecules
+    virtual void UpdateSolidBoundMolecules(FEMaterialPoint& mp, const double dt) = 0;
+    
 public:
 	//! return number of material properties
 	int Properties();
@@ -143,7 +146,7 @@ public:
 
 	//! Add a chemical reaction
 	void AddChemicalReaction(FEChemicalReaction* pcr);
-
+    
 public:
 	FEElasticMaterial*			GetSolid()				{ return m_pSolid; }
 	FEHydraulicPermeability*	GetPermeability()		{ return m_pPerm;  }
@@ -168,7 +171,7 @@ public:
 	int							m_zmin;			//!< minimum charge number in mixture
 	int							m_ndeg;			//!< polynomial degree of zeta in electroneutrality
 
-private:
+protected:
 	FEElasticMaterial*				m_pSolid;		//!< pointer to elastic solid material
 	FEHydraulicPermeability*		m_pPerm;		//!< pointer to permeability material
 	FEOsmoticCoefficient*			m_pOsmC;		//!< pointer to osmotic coefficient material

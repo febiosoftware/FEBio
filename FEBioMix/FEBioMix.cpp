@@ -1,7 +1,8 @@
 #include "FEBioMix.h"
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
-#include "FEMultiphasic.h"
+#include "FEMultiphasicStandard.h"
+#include "FEMultiphasicMultigeneration.h"
 #include "FESolute.h"
 #include "FETriphasic.h"
 #include "FEDiffConstIso.h"
@@ -81,7 +82,8 @@ REGISTER_FECORE_CLASS(FEMultiphasicSolver   , FESOLVER_ID, "multiphasic"    );
 // Materials
 REGISTER_FECORE_CLASS(FEBiphasic                          ,FEMATERIAL_ID, "biphasic"          );
 REGISTER_FECORE_CLASS(FEBiphasicSolute                    ,FEMATERIAL_ID, "biphasic-solute"   );
-REGISTER_FECORE_CLASS(FEMultiphasic                       ,FEMATERIAL_ID, "multiphasic"       );
+REGISTER_FECORE_CLASS(FEMultiphasicStandard               ,FEMATERIAL_ID, "multiphasic"       );
+REGISTER_FECORE_CLASS(FEMultiphasicMultigeneration        ,FEMATERIAL_ID, "multiphasic-multigeneration");
 REGISTER_FECORE_CLASS(FESolute                            ,FEMATERIAL_ID, "solute"            );
 REGISTER_FECORE_CLASS(FETriphasic                         ,FEMATERIAL_ID, "triphasic"         );
 REGISTER_FECORE_CLASS(FEDiffConstIso                      ,FEMATERIAL_ID, "diff-const-iso"    );
