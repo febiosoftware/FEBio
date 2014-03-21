@@ -44,6 +44,9 @@ public:
 	//! evaluate net contact force
 	vec3d GetContactForce();
 	
+	//! evaluate net contact area
+	double GetContactArea();
+    
 	//! evaluate net fluid force
 	vec3d GetFluidForce();
 	

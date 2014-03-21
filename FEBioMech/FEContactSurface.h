@@ -27,6 +27,7 @@ public:
 	virtual void GetNodalContactTraction(int nface, vec3d* pt);
 
 	virtual vec3d GetContactForce();
+    virtual double GetContactArea();
 
 protected:
 	FEContactSurface* m_pSibling;

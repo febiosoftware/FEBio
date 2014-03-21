@@ -37,6 +37,9 @@ public:
 	//! evaluate net contact force
 	vec3d GetContactForce();
 
+	//! evaluate net contact area
+	double GetContactArea();
+    
 	//! serialize data for (cold) restart
 	void Serialize(DumpFile& ar);
 

@@ -221,6 +221,27 @@ bool FEPlotContactForce::Save(FESurface &surf, std::vector<float> &a)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+// Plot contact area
+bool FEPlotContactArea::Save(FESurface &surf, vector<float>& a)
+{
+	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+	if (pcs == 0) return false;
+    
+	int NF = pcs->Elements();
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(MFN*NF, 0.f);
+	double area;
+	for (int i=0; i<NF; ++i)
+	{
+		FESurfaceElement& el = pcs->Element(i);
+		area = pcs->GetContactArea();
+		int ne = el.Nodes();
+		for (int k=0; k<ne; ++k) a[MFN*i + k] = (float) area;
+	}
+	return true;
+}
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

@@ -22,3 +22,6 @@ void FEContactSurface::GetNodalContactTraction(int nface, vec3d* pt) { assert(fa
 
 //-----------------------------------------------------------------------------
 vec3d FEContactSurface::GetContactForce() { assert(false); return vec3d(0,0,0); }
+
+//-----------------------------------------------------------------------------
+double FEContactSurface::GetContactArea() { assert(false); return 0; }

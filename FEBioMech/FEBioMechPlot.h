@@ -102,6 +102,16 @@ public:
 	bool Save(FESurface& surf, vector<float>& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Contact area
+//!
+class FEPlotContactArea : public FESurfaceData
+{
+public:
+	FEPlotContactArea(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_MULT){}
+	bool Save(FESurface& surf, vector<float>& a);
+};
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

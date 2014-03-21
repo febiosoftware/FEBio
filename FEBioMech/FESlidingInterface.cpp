@@ -254,6 +254,53 @@ vec3d FESlidingSurface::GetContactForce()
 }
 
 //-----------------------------------------------------------------------------
+double FESlidingSurface::GetContactArea()
+{
+	const int MN = FEElement::MAX_NODES;
+	double Tn[MN];
+    
+	// initialize contact area
+	double a = 0;
+	
+	// loop over all elements of the primary surface
+	for (int n=0; n<Elements(); ++n)
+	{
+		FESurfaceElement& el = Element(n);
+		int nint = el.GaussPoints();
+		
+		int nseln = el.Nodes();
+		
+		// nodal contact pressures
+		for (int i=0; i<nseln; ++i) {
+            Tn[i] = m_Ln[el.m_lnode[i]];
+        }
+        
+		// evaluate the contact force for that element
+		for (int i=0; i<nint; ++i)
+		{
+			// get data for this integration point
+			double Ln = el.eval(Tn,i);
+            double s = (Ln > 0) ? 1 : 0;
+            
+			// get the base vectors
+			vec3d g[2];
+			CoBaseVectors(el, i, g);
+            
+			// normal (magnitude = area)
+			vec3d n = g[0] ^ g[1];
+            
+			// gauss weight
+			double w = el.GaussWeights()[i];
+            
+			// contact force
+			a += n.norm()*(w*s);
+		}
+	}
+	
+	return a;
+}
+
+//-----------------------------------------------------------------------------
 void FESlidingSurface::Serialize(DumpFile& ar)
 {
 	FEContactSurface::Serialize(ar);

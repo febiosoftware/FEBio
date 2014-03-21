@@ -41,6 +41,9 @@ public:
 	//! evaluate net contact force
 	vec3d GetContactForce();
 
+	//! evaluate net contact area
+	double GetContactArea();
+    
 public:
 	void GetNodalContactGap     (int nface, double* pg);
 	void GetNodalContactPressure(int nface, double* pg);
