@@ -115,7 +115,7 @@ void FERigidBody::UpdateCOM()
 	// initialize some data
 	m_mass = 0;			// total mass of rigid body
 	vec3d rc(0,0,0);	// center of mass
-    mat3ds moi(0,0,0,0,0,0);    // mass moment of inertia about origin
+    mat3d moi(0,0,0,0,0,0,0,0,0);    // mass moment of inertia about origin
     mat3dd I(1);        // identity tensor
 
 	// jacobian
@@ -177,7 +177,9 @@ void FERigidBody::UpdateCOM()
 						for (int i=0; i<el.Nodes(); ++i)
 						{
 							rc += r0[i]*H[i]*detJ*gw[n]*dens;
-                            moi += ((r0[i]*r0[i])*I - dyad(r0[i]))*H[i]*detJ*gw[n]*dens;
+                            for (int j=0; j<el.Nodes(); ++j) {
+                                moi += ((r0[i]*r0[j])*I - (r0[i] & r0[j]))*H[i]*H[j]*detJ*gw[n]*dens;
+                            }
 						}
 					}
 				}
@@ -190,7 +192,7 @@ void FERigidBody::UpdateCOM()
     
     // use parallel axis theorem to transfer moi to com
     // and store moi
-    m_moi = moi - m_mass*((rc*rc)*I - dyad(rc));
+    m_moi = moi.sym() - m_mass*((rc*rc)*I - dyad(rc));
 
 	// store com
 	m_r0 = m_rt = rc;
