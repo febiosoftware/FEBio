@@ -1020,14 +1020,15 @@ vec3d FEMultiphasic::CurrentDensity(FEMaterialPoint& pt)
 //! Data serialization
 void FEMultiphasic::Serialize(DumpFile& ar)
 {
-	int i, nsol;
+	int i, nsol, nsbm, nreact;
 	
 	FEMaterial::Serialize(ar);
 	
 	int nSupp = 0;
 	if (ar.IsSaving())
 	{
-		ar << m_phi0 << m_rhoTw << m_cFr << m_Rgas << m_Tabs << m_Fc << m_pSolute.size();
+		ar << m_phi0 << m_rhoTw << m_cFr << m_Rgas << m_Tabs << m_Fc << m_penalty << m_zmin << m_ndeg;
+        ar << m_pSolute.size() << m_pSBM.size() << m_pReact.size();
 		
 		ar << m_pSolid->GetTypeStr(); m_pSolid->Serialize(ar);
 		ar << m_pPerm ->GetTypeStr(); m_pPerm ->Serialize(ar);
@@ -1045,10 +1046,19 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 			ar << m_pSolute[i]->GetTypeStr();
 			m_pSolute[i] ->Serialize(ar);
 		}
+		for (i=0; i<(int)m_pSBM.size(); ++i) {
+			ar << m_pSBM[i]->GetTypeStr();
+			m_pSBM[i] ->Serialize(ar);
+		}
+		for (i=0; i<(int)m_pReact.size(); ++i) {
+			ar << m_pReact[i]->GetTypeStr();
+			m_pReact[i] ->Serialize(ar);
+		}
 	}
 	else
 	{
-		ar >> m_phi0 >> m_rhoTw >> m_cFr >> m_Rgas >> m_Tabs >> m_Fc >> nsol ;
+		ar >> m_phi0 >> m_rhoTw >> m_cFr >> m_Rgas >> m_Tabs >> m_Fc >> m_penalty >> m_zmin >> m_ndeg;
+        ar >> nsol >> nsbm >> nreact;
 		
 		char sz[256] = {0};
 		ar >> sz;
@@ -1080,6 +1090,20 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 			m_pSolute.push_back(dynamic_cast<FESolute*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel())));
 			assert(m_pSolute[i]); m_pSolute[i]->Serialize(ar);
 			m_pSolute[i]->Init();
+		}
+		
+		for (i=0; i<nsbm; ++i) {
+			ar >> sz;
+			m_pSBM.push_back(dynamic_cast<FESolidBoundMolecule*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel())));
+			assert(m_pSBM[i]); m_pSBM[i]->Serialize(ar);
+			m_pSBM[i]->Init();
+		}
+		
+		for (i=0; i<nreact; ++i) {
+			ar >> sz;
+			m_pReact.push_back(dynamic_cast<FEChemicalReaction*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel())));
+			assert(m_pReact[i]); m_pReact[i]->Serialize(ar);
+			m_pReact[i]->Init();
 		}
 		
 	}
