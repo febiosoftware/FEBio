@@ -1,5 +1,6 @@
 #include "FEBiphasicSoluteSolver.h"
 #include "FEBiphasicSoluteDomain.h"
+#include "FEBiphasicSolidDomain.h"
 #include "FEBioMech/FEPressureLoad.h"
 #include "FEBioMech/FEResidualVector.h"
 #include "FECore/FERigidBody.h"
@@ -621,16 +622,26 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix(const FETimePoint& tp)
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEBiphasicSoluteDomain* pdom = dynamic_cast<FEBiphasicSoluteDomain*>(&mesh.Domain(i));
-			if (pdom) pdom->StiffnessMatrixSS(this, bsymm, tp);
+            // Biphasic-solute analyses may also include biphasic and elastic domains
+			FEBiphasicSoluteDomain* psdom = dynamic_cast<FEBiphasicSoluteDomain*>(&mesh.Domain(i));
+			FEBiphasicSolidDomain* pbdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
+			FEElasticSolidDomain* pedom = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
+			if (psdom) psdom->StiffnessMatrixSS(this, bsymm, tp);
+			else if (pbdom) pbdom->StiffnessMatrixSS(this, bsymm, dt);
+            else if (pedom) pedom->StiffnessMatrix(this);
 		}
 	}
 	else
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEBiphasicSoluteDomain* pdom = dynamic_cast<FEBiphasicSoluteDomain*>(&mesh.Domain(i));
-			if (pdom) pdom->StiffnessMatrix(this, bsymm, tp);
+            // Biphasic-solute analyses may also include biphasic and elastic domains
+			FEBiphasicSoluteDomain* psdom = dynamic_cast<FEBiphasicSoluteDomain*>(&mesh.Domain(i));
+			FEBiphasicSolidDomain* pbdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
+			FEElasticSolidDomain* pedom = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
+			if (psdom) psdom->StiffnessMatrix(this, bsymm, tp);
+			else if (pbdom) pbdom->StiffnessMatrix(this, bsymm, dt);
+            else if (pedom) pedom->StiffnessMatrix(this);
 		}
 	}
 

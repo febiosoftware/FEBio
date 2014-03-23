@@ -3,6 +3,7 @@
 #include "FEBiphasicSoluteDomain.h"
 #include "FEMultiphasicDomain.h"
 #include "FETriphasicDomain.h"
+#include "FEBiphasicSolidDomain.h"
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
 #include "FESlidingInterfaceMP.h"
@@ -711,6 +712,7 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 			else if (pbs) pbs->StiffnessMatrixSS(this, bsymm, tp);
 			else if (ptd) ptd->StiffnessMatrixSS(this, bsymm, tp);
 			else if (pmd) pmd->StiffnessMatrixSS(this, bsymm, tp);
+            else if (pde) pde->StiffnessMatrix(this);
 		}
 	}
 	else
@@ -727,6 +729,7 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 			else if (pbs) pbs->StiffnessMatrix(this, bsymm, tp);
 			else if (ptd) ptd->StiffnessMatrix(this, bsymm, tp);
 			else if (pmd) pmd->StiffnessMatrix(this, bsymm, tp);
+            else if (pde) pde->StiffnessMatrix(this);
 		}
 	}
 
