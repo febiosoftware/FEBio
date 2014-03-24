@@ -1364,7 +1364,8 @@ bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 		int neq = K.Size();
 		for (i=0; i<neq; ++i)
 		{
-			if (K.diag(i) == 0) zd.push_back(i);
+//			if (K.diag(i) == 0) zd.push_back(i);
+			if (fabs(K.diag(i)) < 1e-15) zd.push_back(i);
 		}
 
 //		if (zd.empty() == false) throw ZeroDiagonal(zd, m_fem);

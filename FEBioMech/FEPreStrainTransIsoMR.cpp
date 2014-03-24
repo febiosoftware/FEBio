@@ -68,7 +68,7 @@ mat3ds FEPreStrainTransIsoMR::DevStress(FEMaterialPoint& mp)
 		mat3d Q = pt.m_Q;
 		mat3d Qt = Q.transpose();
 
-		mat3d F_bar = Q*U;//*Qt;
+		mat3d F_bar = Q*U*Qt;
 
 		// transform to local coordinate system
 		F = F*F_bar;
@@ -130,6 +130,9 @@ tens4ds FEPreStrainTransIsoMR::DevTangent(FEMaterialPoint& mp)
 		mat3d Q = pt.m_Q;
 		mat3d Qt = Q.transpose();
 		mat3d F_bar = Q*U*Qt;
+
+		// transform to local coordinate system
+		F = F*F_bar;
 	}
 
 //	double J = pt.m_J;

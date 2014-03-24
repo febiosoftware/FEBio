@@ -216,10 +216,16 @@ tens4ds FEFiberMaterial::Tangent(FEMaterialPoint &mp)
 	if (m_lcur != 1.0)
 	{
 		// set-up local uni-axial stretch tensor
-		mat3d U(m_lcur, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+		double l = m_lcur;
+		double li = 1.0;
+		mat3d U(l, 0.0, 0.0, 0.0, li, 0.0, 0.0, 0.0, li);
+
+		mat3d Q = pt.m_Q;
+		mat3d Qt = Q.transpose();
+		mat3d F_bar = Q*U*Qt;
 
 		// transform to local coordinate system
-		F = F*(pt.m_Q*U);
+		F = F*F_bar;
 	}
 
 	// deformation gradient
