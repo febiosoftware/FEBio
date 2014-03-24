@@ -365,10 +365,14 @@ void FESolidBoundMolecule::Serialize(DumpFile& ar)
 	
 	if (ar.IsSaving())
 	{
+		ar << GetSBMID();
 		ar << m_rhoT << m_M << m_z << m_rho0 << m_rhomin << m_rhomax;
 	}
 	else
 	{
+		int SBMID;
+		ar >> SBMID;
+		SetSBMID(SBMID);
 		ar >> m_rhoT >> m_M >> m_z >> m_rho0 >> m_rhomin >> m_rhomax;
 	}
 }
