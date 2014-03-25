@@ -368,6 +368,38 @@ vec3d FESolidDomain::gradient(FESolidElement& el, double* fn, int n)
 }
 
 //-----------------------------------------------------------------------------
+//! calculate gradient of function at integration points
+vec3d FESolidDomain::gradient(FESolidElement& el, vector<double>& fn, int n)
+{
+	double Ji[3][3];
+	invjact(el, Ji, n);
+				
+	double* Grn = el.Gr(n);
+	double* Gsn = el.Gs(n);
+	double* Gtn = el.Gt(n);
+
+	double Gx, Gy, Gz;
+
+	vec3d gradf;
+	int N = el.Nodes();
+	for (int i=0; i<N; ++i)
+	{
+		// calculate global gradient of shape functions
+		// note that we need the transposed of Ji, not Ji itself !
+		Gx = Ji[0][0]*Grn[i]+Ji[1][0]*Gsn[i]+Ji[2][0]*Gtn[i];
+		Gy = Ji[0][1]*Grn[i]+Ji[1][1]*Gsn[i]+Ji[2][1]*Gtn[i];
+		Gz = Ji[0][2]*Grn[i]+Ji[1][2]*Gsn[i]+Ji[2][2]*Gtn[i];
+
+		// calculate pressure gradient
+		gradf.x += Gx*fn[i];
+		gradf.y += Gy*fn[i];
+		gradf.z += Gz*fn[i];
+	}
+
+	return gradf;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate jacobian with respect to current frame
 double FESolidDomain::detJt(FESolidElement &el, int n)
 {

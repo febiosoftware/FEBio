@@ -100,24 +100,13 @@ public:
 	void SetMaterialPointData(FEMaterialPoint* pmp, int n) { m_State[n] = pmp; }
 
 	//! evaluate scalar field at integration point
-	double Evaluate(double* fn, int n)
-	{
-		double* Hn = H(n);
-		double f = 0;
-		const int N = Nodes();
-		for (int i=0; i<N; ++i) f += Hn[i]*fn[i];
-		return f;
-	}
+	double Evaluate(double* fn, int n);
+
+	//! evaluate scale field at integration point
+	double Evaluate(vector<double>& fn, int n);
 
 	//! evaluate vector field at integration point
-	vec3d Evaluate(vec3d* vn, int n)
-	{
-		double* Hn = H(n);
-		vec3d v;
-		const int N = Nodes();
-		for (int i=0; i<N; ++i) v += vn[i]*Hn[i];
-		return v;
-	}
+	vec3d Evaluate(vec3d* vn, int n);
 
 protected:
 	int		m_mat;		//!< material index

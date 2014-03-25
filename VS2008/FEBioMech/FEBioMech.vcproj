@@ -461,6 +461,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEPRLig.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FERemodelingElasticDomain.cpp"
 				>
 			</File>
@@ -940,6 +944,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FEPreStrainTransIsoMR.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEPRLig.h"
 				>
 			</File>
 			<File

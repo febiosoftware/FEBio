@@ -22,6 +22,34 @@ FEElementState& FEElementState::operator = (const FEElementState& s)
 }
 
 //-----------------------------------------------------------------------------
+double FEElement::Evaluate(double* fn, int n)
+{
+	double* Hn = H(n);
+	double f = 0;
+	const int N = Nodes();
+	for (int i=0; i<N; ++i) f += Hn[i]*fn[i];
+	return f;
+}
+
+double FEElement::Evaluate(vector<double>& fn, int n)
+{
+	double* Hn = H(n);
+	double f = 0;
+	const int N = Nodes();
+	for (int i=0; i<N; ++i) f += Hn[i]*fn[i];
+	return f;
+}
+
+vec3d FEElement::Evaluate(vec3d* vn, int n)
+{
+	double* Hn = H(n);
+	vec3d v;
+	const int N = Nodes();
+	for (int i=0; i<N; ++i) v += vn[i]*Hn[i];
+	return v;
+}
+
+//-----------------------------------------------------------------------------
 FESolidElement::FESolidElement(const FESolidElement& el)
 {
 	// set the traits of the element

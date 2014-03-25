@@ -73,8 +73,8 @@ bool FETriphasicDomain::Initialize(FEModel &mdl)
             
             // initialize effective solute concentrations
             for (int isol=0; isol<nsol; ++isol) {
-                ps.m_c[isol] = el.Evaluate(c0[isol].data(), n);
-                ps.m_gradc[isol] = gradient(el, c0[isol].data(), n);
+                ps.m_c[isol] = el.Evaluate(c0[isol], n);
+                ps.m_gradc[isol] = gradient(el, c0[isol], n);
             }
 			
             ps.m_psi = pmb->ElectricPotential(mp);
