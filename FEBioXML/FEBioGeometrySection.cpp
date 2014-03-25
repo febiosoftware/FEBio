@@ -7,6 +7,9 @@
 #include "FEBioMech/FEElasticMaterial.h"
 #include "FECore/FECoreKernel.h"
 
+// TODO: remove this
+#include "FEBioMech/FEPreStrainTransIsoMR.h"
+
 //-----------------------------------------------------------------------------
 //!  Parses the geometry section from the xml file
 //!
@@ -928,6 +931,19 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 
 				// read truss area
 				tag.value(pt->m_a0);
+			}
+			else if (tag == "fiber_pre_stretch")
+			{
+				// TODO: This is a hack. I need a better way!
+				// read the pre-stretch
+				double l;
+				tag.value(l);
+				FESolidElement* pbe = dynamic_cast<FESolidElement*> (pe);
+				for (int i=0; i<pbe->GaussPoints(); ++i)
+				{
+					FEPreStrainMaterialPoint& pt = *pbe->m_State[i]->ExtractData<FEPreStrainMaterialPoint>();
+					pt.m_lam = l;
+				}
 			}
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
