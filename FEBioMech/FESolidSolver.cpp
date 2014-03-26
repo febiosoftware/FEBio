@@ -80,6 +80,18 @@ void FESolidSolver::Clean()
 //
 bool FESolidSolver::Init()
 {
+	// check parameters
+	if (m_Dtol <= 0.0) { felog.printf("Error: dtol must be positive.\n"   ); return false; }
+	if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }
+	if (m_Rtol <  0.0) { felog.printf("Error: rtol must be nonnegative.\n"); return false; }
+	if (m_Rmin <  0.0) { felog.printf("Error: min_residual must be nonnegative.\n"  ); return false; }
+	if (m_bfgs.m_LStol  < 0.0) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
+	if (m_bfgs.m_LSmin  < 0.0) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
+	if (m_bfgs.m_LSiter < 0) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
+	if (m_bfgs.m_maxref < 0) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
+	if (m_bfgs.m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
+	if (m_bfgs.m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
+
 	// Now that we have determined the equation numbers we can continue
 	// with creating the stiffness matrix. First we select the linear solver
 	// The stiffness matrix is created in CreateStiffness
