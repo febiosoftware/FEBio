@@ -7,7 +7,20 @@ In this section we'll see how to start a plugin for FEBio.
 \section plugin_sec1 1. Building a plugin
 
 \subsection plugin_sec1_1 Creating a plugin project in Visual Studio 2010
-Discuss how to setup a plugin project in VS10
+To create a plugin for FEBio in Visual Studio 2010, you need to create a new dll project. To do this, open Visual Studio 2010 and select File->New->Project from the menu. 
+Select the Win32 Project, give it a name and select OK. This will start the Win32 Application Wizard. The first window of the wizard shows the current project settings. 
+Select the Next button to customize the settings. In the Application Settings window select DLL for the Application type. Then press Finish to create the new project.
+
+Next, we'll need to tell Visual Studio where to find the FEBio header and library files. To do this, right-click on the project name in the Solution Explorer and select Properties.
+Locate the VC++ Directories in the Configuration Properties. In the Include Directories, add the path to the root installation of the FEBio code (e.g. "C:\Program Files\FEBio2\"). Then,
+add the path to the FEBio library files to the Library Directories field (e.g. "C:\Program Files\FEBio2\lib\"). When done, press the OK button.
+
+Now you are ready to write your plugin. You will start by implementing the required functions described below. Before you write these functions, you need to add following include file
+to the top of your source file. (If you are using precompiled header files, make sure the precompiled header file (e.g. stdafx.h) is the first included file.)
+
+\code
+#include "FECore\FECoreKernel.h"
+\endcode
 
 \subsection plugin_sec1_2 Creating a plugin for Linux
 Disucss how to create a plugin on Linux
@@ -70,5 +83,16 @@ FEPluginFactory_T<MyPluginClass, FEMATERIAL_ID> my_factory("my material");
 
 Then, in the PluginGetFactory method, you return a pointer to the my_factory object to register the factory class. 
 
-The available SuperClass ID's can be found in "FECore/FE_enum.h".
+The available SuperClass ID's can be found in "FECore\FE_enum.h".
+
+\section plugin_sec4 4. Using the plugin
+In order to use the plugin you have to add it to the FEBio configuration file. This file, usually called "febio.xml", is located in the same place as the executable is.
+Add the following line to this configuration file.
+
+\code
+<import>c:\path\to\plugin\plugin.dll</import>
+\endcode
+
+That is, enclose the full path and filename of the plugin between "import" tags. When FEBio starts it will read all plugins listed in the configuration file. A message will be printed on the screen at the start of an FEBio analysis indicating if FEBio was successful in loading the plugin.
+
 */

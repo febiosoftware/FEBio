@@ -361,10 +361,10 @@ The third section defines the material that will be assigned to the model. In th
 To run the tangent diagnostic, simply type the following at the command prompt.
 
 \code
->febio -d <filename> [ENTER]
+>febio -d filename [ENTER]
 \endcode
 
-Note that the command option –d needs to be used instead of the usual –i to inform FEBio that you are running a diagnostics problem and not a regular model. Replace <filename> with the name of the actual input file.
+Note that the command option –d needs to be used instead of the usual –i to inform FEBio that you are running a diagnostics problem and not a regular model. Replace "filename" with the name of the actual input file.
 
 This diagnostic test outputs a log file that contains the tangent stiffness as calculated from the implementation and a finite difference approximation to this tangent. It also contains the difference between these two matrices and the matrix element where the difference is largest. Although a small difference between the two matrices can be expected due to the finite difference approximation, the difference should be small, e.g. less than 0.01%. If this is not the case, there is probably a mistake in either the Stress function or in the Tangent function or both. To identify the culprit, the result of the simulation, which is reported as usual in the plot file, can be compared to a known solution (or a solution obtained in a different fashion). If the solutions correspond, then the problem most likely lies with the tangent implementation. If the solutions do not agree, then the implementation of the Cauchy stress is probably also erroneous. 
 
