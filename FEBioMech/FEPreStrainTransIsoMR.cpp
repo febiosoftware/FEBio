@@ -2,6 +2,12 @@
 #include "FEPreStrainTransIsoMR.h"
 
 //-----------------------------------------------------------------------------
+FEPreStrainMaterialPoint::FEPreStrainMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) 
+{
+	m_ltrg = 0.0;
+}
+
+//-----------------------------------------------------------------------------
 void FEPreStrainMaterialPoint::Init(bool bflag)
 {
 	if (bflag) m_lam = m_lamp = 1.0;
@@ -21,11 +27,11 @@ void FEPreStrainMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
 	if (bsave)
 	{
-		dmp << m_lam << m_lamp;
+		dmp << m_ltrg << m_lam << m_lamp;
 	}
 	else
 	{
-		dmp >> m_lam >> m_lamp;
+		dmp >> m_ltrg >> m_lam >> m_lamp;
 	}
 	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
 }
@@ -46,18 +52,33 @@ BEGIN_PARAMETER_LIST(FEPreStrainTransIsoMR, FETransverselyIsotropic)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
+double FEPreStrainTransIsoMR::FiberStretch(FEMaterialPoint& mp)
+{
+	FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
+	if (psp.m_ltrg ==0.0) return m_ltrg;
+	else
+	{
+		double w = m_ltrg;
+		double l = psp.m_ltrg;
+		return w*l + (1.0-w);
+	}
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FEPreStrainTransIsoMR::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
 
 	// deformation gradient
 	mat3d F = pt.m_F;
 
-	// apply in-situ stretch
-	if (m_ltrg != 1.0)
-	{
-		FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
+	// get the target stretch
+	double ltrg = FiberStretch(mp);
 
+	// apply in-situ stretch
+	if (ltrg != 1.0)
+	{
 		// set-up local uni-axial stretch tensor
 		double l = psp.m_lam;
 		double li = 1.0;
@@ -113,12 +134,16 @@ mat3ds FEPreStrainTransIsoMR::DevStress(FEMaterialPoint& mp)
 tens4ds FEPreStrainTransIsoMR::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
 
 	// deformation gradient
 	mat3d F = pt.m_F;
 
+	// get the target stretch
+	double ltrg = FiberStretch(mp);
+
 	// apply in-situ stretch
-	if (m_ltrg != 1.0)
+	if (ltrg != 1.0)
 	{
 		FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
 

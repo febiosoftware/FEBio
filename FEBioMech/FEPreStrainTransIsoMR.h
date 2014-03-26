@@ -5,7 +5,7 @@
 class FEPreStrainMaterialPoint : public FEMaterialPoint
 {
 public:
-	FEPreStrainMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) {}
+	FEPreStrainMaterialPoint(FEMaterialPoint* pt);
 
 	void Init(bool bflag);
 
@@ -16,6 +16,7 @@ public:
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 public:
+	double	m_ltrg;	//!< target fiber stretch
 	double	m_lam;	//!< in-situ fiber stretch
 	double	m_lamp;	//!< previous in-situ fiber stretch
 };
@@ -41,6 +42,8 @@ public:
 
 	//! calculate deviatoric tangent stiffness at material point
 	virtual tens4ds DevTangent(FEMaterialPoint& pt);
+
+	double FiberStretch(FEMaterialPoint& pt);
 
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();

@@ -59,7 +59,10 @@ bool FEInSituStretch::Augment(int naug)
 					vec3d a = F*a0;
 					double lRtor = a.norm();
 
-					double err = pm->m_ltrg / lRtor - psp.m_lam;
+					// get the target stretch
+					double ltrg = pm->FiberStretch(mp);
+
+					double err = ltrg / lRtor - psp.m_lam;
 					double lnew = psp.m_lam + err;
 
 					double dl = (lnew - psp.m_lamp)/psp.m_lamp;
@@ -97,7 +100,10 @@ bool FEInSituStretch::Augment(int naug)
 						vec3d a = F*a0;
 						double lRtor = a.norm();
 
-						double err = pm->m_ltrg / lRtor - psp.m_lam;
+						// get the target stretch
+						double ltrg = pm->FiberStretch(mp);
+
+						double err = ltrg / lRtor - psp.m_lam;
 						double lnew = psp.m_lam + err;
 
 						psp.m_lamp = psp.m_lam;

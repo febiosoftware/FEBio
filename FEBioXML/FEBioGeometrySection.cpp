@@ -942,7 +942,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 				for (int i=0; i<pbe->GaussPoints(); ++i)
 				{
 					FEPreStrainMaterialPoint& pt = *pbe->m_State[i]->ExtractData<FEPreStrainMaterialPoint>();
-					pt.m_lam = l;
+					pt.m_ltrg = l;
 				}
 			}
 			else throw XMLReader::InvalidTag(tag);
