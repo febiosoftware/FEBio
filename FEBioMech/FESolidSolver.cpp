@@ -1569,6 +1569,27 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 							}
 						}
 
+                    // now the transpose location
+					for (k=0; k<3; ++k)
+						for (l=3; l<ndof; ++l)
+						{
+							KF[l][k] = kij[k][l];
+							KF[l][3+k] = kij[0][l]*Rj[0][k] + kij[1][l]*Rj[1][k] + kij[2][l]*Rj[2][k];
+						}
+                    
+					for (k=0; k<6; ++k)
+						for (l=3; l<ndof; ++l)
+						{
+							J = elm[ndof*j+l];
+							I = lmi[k];
+                            
+							if (I >= 0)
+							{
+								if (J < -1) m_Fd[I] -= KF[l][k]*ui[-J-2];
+								else if (J >= 0) K.add(I,J, KF[l][k]);
+							}
+						}
+                    
 				}
 				else
 				{
