@@ -81,7 +81,7 @@ void FESolidSolver::Clean()
 bool FESolidSolver::Init()
 {
 	// check parameters
-	if (m_Dtol <= 0.0) { felog.printf("Error: dtol must be positive.\n"   ); return false; }
+	if (m_Dtol <  0.0) { felog.printf("Error: dtol must be nonnegative.\n"   ); return false; }
 	if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }
 	if (m_Rtol <  0.0) { felog.printf("Error: rtol must be nonnegative.\n"); return false; }
 	if (m_Rmin <  0.0) { felog.printf("Error: min_residual must be nonnegative.\n"  ); return false; }
