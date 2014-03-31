@@ -11,6 +11,12 @@ public:
 	// destructor
 	~Image(void);
 
+	//! copy constructor
+	Image(Image& im);
+
+	//! assignment operator
+	Image& operator = (Image& im);
+
 	// allocate storage for image data
 	void Create(int nx, int ny, int nz);
 

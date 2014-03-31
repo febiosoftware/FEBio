@@ -615,6 +615,18 @@ void FESolidSolver::UpdateContact()
 }
 
 //-----------------------------------------------------------------------------
+//! Update nonlinear constraints
+void FESolidSolver::UpdateConstraints()
+{
+	// Update all nonlinear constraints
+	for (int i=0; i<m_fem.NonlinearConstraints(); ++i) 
+	{
+		FENLConstraint* pci = m_fem.NonlinearConstraint(i);
+		if (pci->IsActive()) pci->Update();
+	}
+}
+
+//-----------------------------------------------------------------------------
 //!  This function mainly calls the Quasin routine 
 //!  and deals with exceptions that require the immediate termination of
 //!	quasi-Newton iterations.
@@ -926,6 +938,9 @@ void FESolidSolver::PrepStep(double time)
 
 	// initialize contact
 	if (m_fem.SurfacePairInteractions() > 0) UpdateContact();
+
+	// initialize nonlinear constraints
+	if (m_fem.NonlinearConstraints() > 0) UpdateConstraints();
 
 	// intialize material point data
 	// NOTE: do this before the stresses are updated

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Image.h"
 #include <stdio.h>
+#include <memory.h>
 
 //-----------------------------------------------------------------------------
 Image::Image(void)
@@ -19,10 +20,27 @@ Image::~Image(void)
 //-----------------------------------------------------------------------------
 void Image::Create(int nx, int ny, int nz)
 {
+	if (m_pf) delete [] m_pf;
 	m_nx = nx;
 	m_ny = ny;
 	m_nz = nz;
 	m_pf = new float[m_nx*m_ny*m_nz];
+}
+
+//-----------------------------------------------------------------------------
+Image::Image(Image& im)
+{
+	m_pf = 0;
+	Create(im.width(), im.height(), im.depth());
+	memcpy(m_pf, im.m_pf, m_nx*m_ny*m_nz*sizeof(float));
+}
+
+//-----------------------------------------------------------------------------
+Image& Image::operator = (Image& im)
+{
+	if ((m_nx != im.m_nx)||(m_ny != im.m_ny)||(m_nz != im.m_nz)) Create(im.width(), im.height(), im.depth());
+	memcpy(m_pf, im.m_pf, m_nx*m_ny*m_nz*sizeof(float));
+	return (*this);
 }
 
 //-----------------------------------------------------------------------------

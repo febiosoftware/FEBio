@@ -71,6 +71,9 @@ public:
 		//! update contact data
 		virtual void UpdateContact();
 
+		//! update constraint data
+		virtual void UpdateConstraints();
+
 		//! Lagrangian augmentation
 		bool Augment();
 	//}
