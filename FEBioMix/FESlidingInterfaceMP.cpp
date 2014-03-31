@@ -600,8 +600,10 @@ bool FESlidingInterfaceMP::Init()
 void FESlidingInterfaceMP::BuildMatrixProfile(FEStiffnessMatrix& K)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
+    int nsol = (int)m_sid.size();
+    int ndpn = 7 + nsol;
     
-	vector<int> lm(8*FEElement::MAX_NODES*2);
+	vector<int> lm(ndpn*FEElement::MAX_NODES*2);
     
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
@@ -631,30 +633,30 @@ void FESlidingInterfaceMP::BuildMatrixProfile(FEStiffnessMatrix& K)
 					for (l=0; l<nseln; ++l)
 					{
 						vector<int>& id = mesh.Node(sn[l]).m_ID;
-						lm[8*l  ] = id[DOF_X];
-						lm[8*l+1] = id[DOF_Y];
-						lm[8*l+2] = id[DOF_Z];
-						lm[8*l+3] = id[DOF_P];
-						lm[8*l+4] = id[DOF_RU];
-						lm[8*l+5] = id[DOF_RV];
-						lm[8*l+6] = id[DOF_RW];
-                        for (int m=0; m<ss.m_sid.size(); ++m) {
-                            lm[8*l+7+m] = id[DOF_C + ss.m_sid[m]];
+						lm[ndpn*l  ] = id[DOF_X];
+						lm[ndpn*l+1] = id[DOF_Y];
+						lm[ndpn*l+2] = id[DOF_Z];
+						lm[ndpn*l+3] = id[DOF_P];
+						lm[ndpn*l+4] = id[DOF_RU];
+						lm[ndpn*l+5] = id[DOF_RV];
+						lm[ndpn*l+6] = id[DOF_RW];
+                        for (int m=0; m<nsol; ++m) {
+                            lm[ndpn*l+7+m] = id[DOF_C + m_sid[m]];
                         }
 					}
                     
 					for (l=0; l<nmeln; ++l)
 					{
 						vector<int>& id = mesh.Node(mn[l]).m_ID;
-						lm[8*(l+nseln)  ] = id[DOF_X];
-						lm[8*(l+nseln)+1] = id[DOF_Y];
-						lm[8*(l+nseln)+2] = id[DOF_Z];
-						lm[8*(l+nseln)+3] = id[DOF_P];
-						lm[8*(l+nseln)+4] = id[DOF_RU];
-						lm[8*(l+nseln)+5] = id[DOF_RV];
-						lm[8*(l+nseln)+6] = id[DOF_RW];
-                        for (int m=0; m<ms.m_sid.size(); ++m) {
-                            lm[8*(l+nseln)+7+m] = id[DOF_C + ms.m_sid[m]];
+						lm[ndpn*(l+nseln)  ] = id[DOF_X];
+						lm[ndpn*(l+nseln)+1] = id[DOF_Y];
+						lm[ndpn*(l+nseln)+2] = id[DOF_Z];
+						lm[ndpn*(l+nseln)+3] = id[DOF_P];
+						lm[ndpn*(l+nseln)+4] = id[DOF_RU];
+						lm[ndpn*(l+nseln)+5] = id[DOF_RV];
+						lm[ndpn*(l+nseln)+6] = id[DOF_RW];
+                        for (int m=0; m<nsol; ++m) {
+                            lm[ndpn*(l+nseln)+7+m] = id[DOF_C + m_sid[m]];
                         }
 					}
                     
