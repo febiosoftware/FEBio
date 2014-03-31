@@ -1489,8 +1489,7 @@ void FESlidingInterface3::ContactStiffness(FESolver* psolver)
 			int nint = se.GaussPoints();
 
 			double pn[FEElement::MAX_NODES], cn[FEElement::MAX_NODES];
-			assert(nseln == 4);
-			for (j=0; j<4; ++j)
+			for (j=0; j<nseln; ++j)
 			{
 				pn[j] = ss.GetMesh()->Node(se.m_node[j]).m_pt;
 				cn[j] = ss.GetMesh()->Node(se.m_node[j]).m_ct[sid];
@@ -1549,8 +1548,7 @@ void FESlidingInterface3::ContactStiffness(FESolver* psolver)
 
 					// nodal data
 					double pm[FEElement::MAX_NODES], cm[FEElement::MAX_NODES];
-					assert(nmeln == 4);
-					for (k=0; k<nmeln; ++k) 
+					for (k=0; k<nmeln; ++k)
 					{
 						pm[k] = ms.GetMesh()->Node(me.m_node[k]).m_pt;
 						cm[k] = ms.GetMesh()->Node(me.m_node[k]).m_ct[mid];
