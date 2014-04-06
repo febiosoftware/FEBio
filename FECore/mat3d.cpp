@@ -129,7 +129,7 @@ void mat3ds::exact_eigen(double l[3])
 	mat3ds T = (S*S).dev();
 	double nT = T.norm();
 
-	double w = S.dotdot(T)/(nS*nT);	if (w > 1.0) w = 1.0; 
+	double w = S.dotdot(T)/(nS*nT);	if (w > 1.0) w = 1.0; if (w < -1.0) w = -1.0;
 	double t = asin(w)/3.0;
 	double r = S.norm();
 	double z = tr()/S3;
