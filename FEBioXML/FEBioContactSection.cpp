@@ -38,6 +38,12 @@ void FEBioContactSection::Parse(XMLTag& tag)
 				{
 					fem.AddSurfacePairInteraction(pci);
 					ParseContactInterface(tag, pci);
+					// add this boundary condition to the current step
+					if (m_pim->m_nsteps > 0)
+					{
+						GetStep()->AddSurfacePairInteraction(pci);
+						pci->Deactivate();
+					}
 				}
 				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 			}
