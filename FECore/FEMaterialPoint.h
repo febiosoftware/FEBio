@@ -32,6 +32,8 @@ public:
 
 	template <class T> T* ExtractData();
 
+	virtual FEMaterialPoint* GetPointData(int i) { return this; }
+
 protected:
 	FEMaterialPoint*	m_pt;	//<! nested point data
 

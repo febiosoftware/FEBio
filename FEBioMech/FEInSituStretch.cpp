@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FEInSituStretch.h"
-#include "FEPreStrainTransIsoMR.h"
+#include "FEElasticMixture.h"
+#include "FEUncoupledElasticMixture.h"
 #include "FECore/FEModel.h"
-#include "FECore/FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -32,41 +32,36 @@ bool FEInSituStretch::Augment(int naug)
 
 	// do pre-strain augmentations
 	bool bconv = true;
-
 	for (int i=0; i<ND; ++i)
 	{
 		FEDomain& dom = m.Domain(i);
 		FESolidDomain* psd = dynamic_cast<FESolidDomain*>(&dom);
-		FEPreStrainTransIsoMR* pm = dynamic_cast<FEPreStrainTransIsoMR*>(dom.GetMaterial());
-		if (psd && pm)
+		if (psd)
 		{
-			int NE = psd->Elements();
-
-			// check convergence
-			for (int i=0; i<NE; ++i)
+			FEPreStrainTransIsoMR* pm = dynamic_cast<FEPreStrainTransIsoMR*>(psd->GetMaterial());
+			if (pm) bconv = CheckAugment(psd, pm, 0);
+			else
 			{
-				FESolidElement& el = psd->Element(i);
-				int nint = el.GaussPoints();
-				for (int i=0; i<nint; ++i)
+				FEElasticMixture* pmix = dynamic_cast<FEElasticMixture*>(psd->GetMaterial());
+				if (pmix)
 				{
-					FEMaterialPoint& mp = *el.m_State[i];
-					FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
-
-					FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-					mat3d& F = pt.m_F;
-
-					vec3d a0(pt.m_Q[0][0], pt.m_Q[1][0], pt.m_Q[2][0]);
-					vec3d a = F*a0;
-					double lRtor = a.norm();
-
-					// get the target stretch
-					double ltrg = pm->FiberStretch(mp);
-
-					double err = ltrg / lRtor - psp.m_lam;
-					double lnew = psp.m_lam + err;
-
-					double dl = (lnew - psp.m_lamp)/psp.m_lamp;
-					if (fabs(dl) >= m_ltol) bconv = false;
+					for (int j=0; j<pmix->Materials(); ++j)
+					{
+						FEPreStrainTransIsoMR* pmj = dynamic_cast<FEPreStrainTransIsoMR*>(pmix->GetMaterial(j));
+						if (pmj) bconv = CheckAugment(psd, pmj, j);
+					}
+				}
+				else
+				{
+					FEUncoupledElasticMixture* pmix = dynamic_cast<FEUncoupledElasticMixture*>(psd->GetMaterial());
+					if (pmix)
+					{
+						for (int j=0; j<pmix->Materials(); ++j)
+						{
+							FEPreStrainTransIsoMR* pmj = dynamic_cast<FEPreStrainTransIsoMR*>(pmix->GetMaterial(j));
+							if (pmj) bconv = CheckAugment(psd, pmj, j);
+						}
+					}
 				}
 			}
 		}
@@ -79,35 +74,32 @@ bool FEInSituStretch::Augment(int naug)
 		{
 			FEDomain& dom = m.Domain(i);
 			FESolidDomain* psd = dynamic_cast<FESolidDomain*>(&dom);
-			FEPreStrainTransIsoMR* pm = dynamic_cast<FEPreStrainTransIsoMR*>(dom.GetMaterial());
-			if (psd && pm)
+			if (psd)
 			{
-				int NE = psd->Elements();
-
-				for (int i=0; i<NE; ++i)
+				FEPreStrainTransIsoMR* pm = dynamic_cast<FEPreStrainTransIsoMR*>(psd->GetMaterial());
+				if (pm) DoAugment(psd, pm, 0);
+				else
 				{
-					FESolidElement& el = psd->Element(i);
-					int nint = el.GaussPoints();
-					for (int i=0; i<nint; ++i)
+					FEElasticMixture* pmix = dynamic_cast<FEElasticMixture*>(psd->GetMaterial());
+					if (pmix)
 					{
-						FEMaterialPoint& mp = *el.m_State[i];
-						FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
-
-						FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-						mat3d& F = pt.m_F;
-
-						vec3d a0(pt.m_Q[0][0], pt.m_Q[1][0], pt.m_Q[2][0]);
-						vec3d a = F*a0;
-						double lRtor = a.norm();
-
-						// get the target stretch
-						double ltrg = pm->FiberStretch(mp);
-
-						double err = ltrg / lRtor - psp.m_lam;
-						double lnew = psp.m_lam + err;
-
-						psp.m_lamp = psp.m_lam;
-						psp.m_lam = lnew;
+						for (int j=0; j<pmix->Materials(); ++j)
+						{
+							FEPreStrainTransIsoMR* pmj = dynamic_cast<FEPreStrainTransIsoMR*>(pmix->GetMaterial(j));
+							if (pmj) DoAugment(psd, pmj, j);
+						}
+					}
+					else
+					{
+						FEUncoupledElasticMixture* pmix = dynamic_cast<FEUncoupledElasticMixture*>(psd->GetMaterial());
+						if (pmix)
+						{
+							for (int j=0; j<pmix->Materials(); ++j)
+							{
+								FEPreStrainTransIsoMR* pmj = dynamic_cast<FEPreStrainTransIsoMR*>(pmix->GetMaterial(j));
+								if (pmj) DoAugment(psd, pmj, j);
+							}
+						}
 					}
 				}
 			}
@@ -115,4 +107,74 @@ bool FEInSituStretch::Augment(int naug)
 	}
 
 	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+//! Check an augmentation for a specific domain/material pair
+bool FEInSituStretch::CheckAugment(FESolidDomain* psd, FEPreStrainTransIsoMR* pmat, int n)
+{
+	int NE = psd->Elements();
+
+	// check convergence
+	bool bconv = true;
+	for (int i=0; i<NE; ++i)
+	{
+		FESolidElement& el = psd->Element(i);
+		int nint = el.GaussPoints();
+		for (int i=0; i<nint; ++i)
+		{
+			FEMaterialPoint& mp = *(el.m_State[i]->GetPointData(n));
+			FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
+
+			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			mat3d& F = pt.m_F;
+
+			vec3d a0(pt.m_Q[0][0], pt.m_Q[1][0], pt.m_Q[2][0]);
+			vec3d a = F*a0;
+			double lRtor = a.norm();
+
+			// get the target stretch
+			double ltrg = pmat->FiberStretch(mp);
+
+			double err = ltrg / lRtor - psp.m_lam;
+			double lnew = psp.m_lam + err;
+
+			double dl = (lnew - psp.m_lamp)/psp.m_lamp;
+			if (fabs(dl) >= m_ltol) bconv = false;
+		}
+	}
+
+	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+void FEInSituStretch::DoAugment(FESolidDomain* psd, FEPreStrainTransIsoMR* pmat, int n)
+{
+	int NE = psd->Elements();
+	for (int i=0; i<NE; ++i)
+	{
+		FESolidElement& el = psd->Element(i);
+		int nint = el.GaussPoints();
+		for (int i=0; i<nint; ++i)
+		{
+			FEMaterialPoint& mp = *(el.m_State[i]->GetPointData(n));
+			FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
+
+			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			mat3d& F = pt.m_F;
+
+			vec3d a0(pt.m_Q[0][0], pt.m_Q[1][0], pt.m_Q[2][0]);
+			vec3d a = F*a0;
+			double lRtor = a.norm();
+
+			// get the target stretch
+			double ltrg = pmat->FiberStretch(mp);
+
+			double err = ltrg / lRtor - psp.m_lam;
+			double lnew = psp.m_lam + err;
+
+			psp.m_lamp = psp.m_lam;
+			psp.m_lam = lnew;
+		}
+	}
 }
