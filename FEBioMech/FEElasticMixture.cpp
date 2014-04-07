@@ -25,6 +25,7 @@ void FEElasticMixtureMaterialPoint::Init(bool bflag)
 		for (int i=0; i<(int) m_w.size(); ++i) m_w[i] = 1.0;
 	}
 
+	m_pt->Init(bflag);
 	for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Init(bflag);
 }
 
