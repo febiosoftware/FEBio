@@ -3,6 +3,7 @@
 #include "FETransverselyIsotropic.h"
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledViscoElasticMaterial.h"
+#include "FEUncoupledElasticMixture.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 
@@ -23,90 +24,69 @@ void FEElasticSolidDomain::Reset()
 }
 
 //-----------------------------------------------------------------------------
+void FEElasticSolidDomain::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp, FEElasticMaterial* pme)
+{
+	// get the material's coordinate system (if defined)
+	FECoordSysMap* pmap = pme->GetCoordinateSystemMap();
+
+	// set the local element coordinates
+	if (pmap)
+	{
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+	
+		// compound the local map with the global material axes
+		mat3d Qlocal = pmap->LocalElementCoord(el, n);
+		pt.m_Q = Qlocal*pt.m_Q;
+	}
+
+	// check if this is also a viscoelastic material
+	FEViscoElasticMaterial* pve = dynamic_cast<FEViscoElasticMaterial*> (pme);
+	if (pve)
+	{
+		FEElasticMaterial* pme2 = pve->GetBaseMaterial();
+		SetLocalCoordinateSystem(el, n, mp, pme2);
+	}
+
+	// check if this is also an uncoupled viscoelastic material
+	FEUncoupledViscoElasticMaterial* puve = dynamic_cast<FEUncoupledViscoElasticMaterial*> (pme);
+	if (puve)
+	{
+		// check if the nested elastic material has local material axes specified
+		FEElasticMaterial* pme2 = puve->GetBaseMaterial();
+		SetLocalCoordinateSystem(el, n, mp, pme2);
+	}
+
+	// check the uncoupled elastic mixture
+	FEUncoupledElasticMixture* pumix = dynamic_cast<FEUncoupledElasticMixture*>(pme);
+	if (pumix)
+	{
+		// check the local coordinate systems for each component
+		for (int j=0; j<pumix->Materials(); ++j)
+		{
+			FEElasticMaterial* pmj = pumix->GetMaterial(j)->GetElasticMaterial();
+			FEMaterialPoint& mpj = *mp.GetPointData(j);
+			SetLocalCoordinateSystem(el, n, mpj, pmj);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! \todo The material point initialization needs to move to the base class.
 bool FEElasticSolidDomain::Initialize(FEModel &fem)
 {
 	// initialize base class
 	FESolidDomain::Initialize(fem);
 
-	bool bmerr = false;
-
 	// get the elements material
 	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-	FECoordSysMap* pmap = pme->GetCoordinateSystemMap();
 
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-
-		// set the local element coordinates
-		if (pme)
-		{
-			if (pmap)
-			{
-				for (int n=0; n<el.GaussPoints(); ++n)
-				{
-					FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-					pt.m_Q = pmap->LocalElementCoord(el, n);
-				}
-			}
-			else
-			{
-				// If we get here, then the element has a user-defined fiber axis
-				// we should check to see if it has indeed been specified.
-				// TODO: This assumes that pt.Q will not get intialized to
-				//		 a valid value. I should find another way for checking since I
-				//		 would like pt.Q always to be initialized to a decent value.
-				if (dynamic_cast<FETransverselyIsotropic*>(m_pMat))
-				{
-					FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
-					mat3d& m = pt.m_Q;
-					if (fabs(m.det() - 1) > 1e-7)
-					{
-						// this element did not get specified a user-defined fiber direction
-//							felog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
-						bmerr = true;
-					}
-				}
-			}
-
-			// check if this is also a viscoelastic material
-			FEViscoElasticMaterial* pve = dynamic_cast<FEViscoElasticMaterial*> (pme);
-			if (pve)
-			{
-				// check if the nested elastic material has local material axes specified
-				FECoordSysMap* pmap2 = pve->GetBaseMaterial()->GetCoordinateSystemMap();
-				if (pmap2) {
-					for (int n=0; n<el.GaussPoints(); ++n)
-					{
-						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-						// compound the local map with the global material axes
-						mat3d Qlocal = pmap2->LocalElementCoord(el, n);
-						pt.m_Q = Qlocal*pt.m_Q;
-					}
-				}
-			}
-
-			// check if this is also an uncoupled viscoelastic material
-			FEUncoupledViscoElasticMaterial* puve = dynamic_cast<FEUncoupledViscoElasticMaterial*> (pme);
-			if (puve)
-			{
-				// check if the nested elastic material has local material axes specified
-				FECoordSysMap* pmap2 = puve->GetBaseMaterial()->GetCoordinateSystemMap();
-				if (pmap2) {
-					for (int n=0; n<el.GaussPoints(); ++n)
-					{
-						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-						// compound the local map with the global material axes
-						mat3d Qlocal = pmap2->LocalElementCoord(el, n);
-						pt.m_Q = Qlocal*pt.m_Q;
-					}
-				}
-			}
-		}
+		for (int n=0; n<el.GaussPoints(); ++n) SetLocalCoordinateSystem(el, n, *(el.m_State[n]), pme);
 	}
 
-	return (bmerr == false);
+	return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -77,7 +77,7 @@ mat3ds FEUncoupledElasticMixture::DevStress(FEMaterialPoint& mp)
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
 		epi.m_s = m_pMat[i]->DevStress(*pt.m_mp[i]);
-		epi.m_Q = ep.m_Q;
+//		epi.m_Q = ep.m_Q;
 		s += epi.m_s;
 	}
 	
@@ -104,7 +104,7 @@ tens4ds FEUncoupledElasticMixture::DevTangent(FEMaterialPoint& mp)
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-		epi.m_Q = ep.m_Q;
+//		epi.m_Q = ep.m_Q;
 		c += m_pMat[i]->DevTangent(*pt.m_mp[i]);
 	}
 	

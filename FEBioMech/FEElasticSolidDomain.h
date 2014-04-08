@@ -84,5 +84,10 @@ public:
 
 	//! Calculatess external body forces for solid elements
 	void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe);
+
 	// ---
+
+private:
+	//! Helper function for setting the material point's local coordinate system
+	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp, FEElasticMaterial* pme);
 };
