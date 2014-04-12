@@ -172,6 +172,8 @@ FEMaterialPoint* FEViscoElasticMaterial::CreateMaterialPointData()
 //! Stress function
 mat3ds FEViscoElasticMaterial::Stress(FEMaterialPoint& mp)
 {
+    if (mp.dt == 0) return mat3ds(0,0,0,0,0,0);
+    
 	// get the elastic part
 	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 

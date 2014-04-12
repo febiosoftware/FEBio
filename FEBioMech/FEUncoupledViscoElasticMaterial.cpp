@@ -97,6 +97,8 @@ bool FEUncoupledViscoElasticMaterial::SetProperty(int i, FECoreBase* pm)
 //! Stress function
 mat3ds FEUncoupledViscoElasticMaterial::DevStress(FEMaterialPoint& mp)
 {
+    if (mp.dt == 0) return mat3ds(0,0,0,0,0,0);
+    
 	// get the elastic part
 	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 	
