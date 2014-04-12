@@ -138,6 +138,7 @@ tens4ds FEUncoupledViscoElasticMaterial::DevTangent(FEMaterialPoint& pt)
 {
 	// calculate the spatial elastic tangent
 	tens4ds C = m_pBase->DevTangent(pt);
+	if (pt.dt == 0.0) return C;
 	
 	// calculate the visco scale factor
 	double dt = pt.dt;
