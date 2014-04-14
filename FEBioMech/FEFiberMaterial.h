@@ -75,8 +75,5 @@ public:
 	//--- time varying elastance active contraction data ---
 	FEActiveFiberContraction*	m_pafc;
 
-	//--- pre-strain data ---
-	double	m_lcur;		//!< in-situ current stretch
-
 	DECLARE_PARAMETER_LIST();
 };

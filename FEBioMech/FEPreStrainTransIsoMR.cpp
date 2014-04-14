@@ -65,40 +65,39 @@ double FEPreStrainTransIsoMR::FiberStretch(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEPreStrainTransIsoMR::DevStress(FEMaterialPoint& mp)
+mat3d FEPreStrainTransIsoMR::PreStrainDeformationGradient(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
 
-	// deformation gradient
-	mat3d F = pt.m_F;
-
 	// get the target stretch
 	double ltrg = FiberStretch(mp);
 
-	// apply in-situ stretch
-	if (ltrg != 1.0)
-	{
-		// set-up local uni-axial stretch tensor
-		double l = psp.m_lam;
-		double li = 1.0;
-		mat3d U(l, 0.0, 0.0, 0.0, li, 0.0, 0.0, 0.0, li);
+	// set-up local uni-axial stretch tensor
+	double l = psp.m_lam;
+	double li = 1.0;
+	mat3d U(l, 0.0, 0.0, 0.0, li, 0.0, 0.0, 0.0, li);
 
-		m_fib.m_lcur = psp.m_lam;
+	mat3d Q = pt.m_Q;
+	mat3d Qt = Q.transpose();
 
-		mat3d Q = pt.m_Q;
-		mat3d Qt = Q.transpose();
+	mat3d F_bar = Q*U*Qt;
 
-		mat3d F_bar = Q*U*Qt;
+	return F_bar;
+}
 
-		// transform to local coordinate system
-		F = F*F_bar;
-	}
+//-----------------------------------------------------------------------------
+mat3ds FEPreStrainTransIsoMR::DevStress(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-//	double J = pt.m_J;
+	// deformation gradient
+	mat3d F0 = pt.m_F;
+	double J0 = pt.m_J;
+
+	// calculate total deformation gradient
+	mat3d F = F0*PreStrainDeformationGradient(mp);
 	double J = F.det();
-//	pt.m_F = F;
-//	pt.m_J = J;
 
 	// calculate deviatoric left Cauchy-Green tensor
 	double Jm23 = pow(J, -2.0/3.0);
@@ -125,7 +124,14 @@ mat3ds FEPreStrainTransIsoMR::DevStress(FEMaterialPoint& mp)
 	mat3ds s = T.dev()*(2.0/J);
 
 	// add the fiber stress
+	pt.m_F = F;
+	pt.m_J = J;
 	mat3ds fs = m_fib.Stress(mp);
+
+	// restore original deformation gradient
+	pt.m_F = F0;
+	pt.m_J = J0;
+
 	return s + fs;
 }
 
@@ -137,30 +143,11 @@ tens4ds FEPreStrainTransIsoMR::DevTangent(FEMaterialPoint& mp)
 	FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
 
 	// deformation gradient
-	mat3d F = pt.m_F;
+	mat3d F0 = pt.m_F;
+	double J0 = pt.m_J;
 
-	// get the target stretch
-	double ltrg = FiberStretch(mp);
-
-	// apply in-situ stretch
-	if (ltrg != 1.0)
-	{
-		FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
-
-		// set-up local uni-axial stretch tensor
-		mat3d U(psp.m_lam, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-
-		m_fib.m_lcur = psp.m_lam;
-
-		mat3d Q = pt.m_Q;
-		mat3d Qt = Q.transpose();
-		mat3d F_bar = Q*U*Qt;
-
-		// transform to local coordinate system
-		F = F*F_bar;
-	}
-
-//	double J = pt.m_J;
+	// calculate total deformation gradient
+	mat3d F = F0*PreStrainDeformationGradient(mp);
 	double J = F.det();
 	double Ji = 1.0/J;
 
@@ -195,6 +182,8 @@ tens4ds FEPreStrainTransIsoMR::DevTangent(FEMaterialPoint& mp)
 	tens4ds B4  = dyad4s(B);
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
+	// TODO: I think this is wrong since the stress in the material point is matrix + fiber
+	//       whereas here we only need matrix stress.
 	mat3ds devs = pt.m_s.dev();
 
 	// d2W/dCdC:C
@@ -203,5 +192,14 @@ tens4ds FEPreStrainTransIsoMR::DevTangent(FEMaterialPoint& mp)
 	tens4ds cw = (BxB - B4)*(W2*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
-	return c + m_fib.Tangent(mp);
+	// get fiber tangent
+	pt.m_F = F;
+	pt.m_J = J;
+	tens4ds c_fiber = m_fib.Tangent(mp);
+
+	// restore original deformation gradient
+	pt.m_F = F0;
+	pt.m_J = J0;
+
+	return c + c_fiber;
 }

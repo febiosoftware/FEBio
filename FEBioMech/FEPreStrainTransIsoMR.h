@@ -43,7 +43,12 @@ public:
 	//! calculate deviatoric tangent stiffness at material point
 	virtual tens4ds DevTangent(FEMaterialPoint& pt);
 
+	//! target fiber stretch
 	double FiberStretch(FEMaterialPoint& pt);
+
+protected:
+	// calculate the prestrain deformation gradient
+	mat3d PreStrainDeformationGradient(FEMaterialPoint& mp);
 
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
