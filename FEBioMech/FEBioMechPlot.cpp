@@ -12,6 +12,7 @@
 #include "FEContactSurface.h"
 #include "FECore/FERigidBody.h"
 #include "FESPRProjection.h"
+#include "FEUncoupledElasticMixture.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -835,7 +836,21 @@ bool FEPlotShellStrain::Save(FEDomain &dom, std::vector<float> &a)
 bool FEPlotFiberPreStretch::Save(FEDomain& dom, vector<float>& a)
 {
 	FEPreStrainTransIsoMR* pm = dynamic_cast<FEPreStrainTransIsoMR*>(dom.GetMaterial());
-	if (pm == 0) return false;
+	if (pm == 0) 
+	{
+		// see if we have a mixture
+		FEUncoupledElasticMixture* pmix = dynamic_cast<FEUncoupledElasticMixture*>(dom.GetMaterial());
+		if (pmix == 0) return false;
+
+		// For now, we just grab the first match we find
+		int N = pmix->Materials();
+		for (int i=0; i<N; ++i)
+		{
+			pm = dynamic_cast<FEPreStrainTransIsoMR*>(pmix->GetMaterial(i));
+			if (pm) break;
+		}
+		if (pm == 0) return false;
+	}
 
 	FESolidDomain& d = dynamic_cast<FESolidDomain&>(dom);
 	int NE = d.Elements();
@@ -846,7 +861,7 @@ bool FEPlotFiberPreStretch::Save(FEDomain& dom, vector<float>& a)
 		double lam = 0.0;
 		for (int j=0; j<nint; ++j)
 		{
-			FEMaterialPoint& mp = *e.m_State[j];
+			FEMaterialPoint& mp = *e.m_State[j]->GetPointData(0);
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 			FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
 			mat3d& F = pt.m_F;
