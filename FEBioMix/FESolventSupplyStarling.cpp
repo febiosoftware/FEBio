@@ -8,22 +8,8 @@
 BEGIN_PARAMETER_LIST(FESolventSupplyStarling, FESolventSupply)
 	ADD_PARAMETER(m_kp, FE_PARAM_DOUBLE, "kp");
 	ADD_PARAMETER(m_pv, FE_PARAM_DOUBLE, "pv");
-	ADD_PARAMETER(m_qc[0], FE_PARAM_DOUBLE, "q1");
-	ADD_PARAMETER(m_qc[1], FE_PARAM_DOUBLE, "q2");
-	ADD_PARAMETER(m_qc[2], FE_PARAM_DOUBLE, "q3");
-	ADD_PARAMETER(m_qc[3], FE_PARAM_DOUBLE, "q4");
-	ADD_PARAMETER(m_qc[4], FE_PARAM_DOUBLE, "q5");
-	ADD_PARAMETER(m_qc[5], FE_PARAM_DOUBLE, "q6");
-	ADD_PARAMETER(m_qc[6], FE_PARAM_DOUBLE, "q7");
-	ADD_PARAMETER(m_qc[7], FE_PARAM_DOUBLE, "q8");
-	ADD_PARAMETER(m_cv[0], FE_PARAM_DOUBLE, "c1");
-	ADD_PARAMETER(m_cv[1], FE_PARAM_DOUBLE, "c2");
-	ADD_PARAMETER(m_cv[2], FE_PARAM_DOUBLE, "c3");
-	ADD_PARAMETER(m_cv[3], FE_PARAM_DOUBLE, "c4");
-	ADD_PARAMETER(m_cv[4], FE_PARAM_DOUBLE, "c5");
-	ADD_PARAMETER(m_cv[5], FE_PARAM_DOUBLE, "c6");
-	ADD_PARAMETER(m_cv[6], FE_PARAM_DOUBLE, "c7");
-	ADD_PARAMETER(m_cv[7], FE_PARAM_DOUBLE, "c8");
+	ADD_PARAMETER(m_qctmp, FE_PARAM_DOUBLE, "qc");
+	ADD_PARAMETER(m_cvtmp, FE_PARAM_DOUBLE, "cv");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -39,6 +25,36 @@ FESolventSupplyStarling::FESolventSupplyStarling(FEModel* pfem) : FESolventSuppl
     
     m_qc.assign(MAX_CDOFS,0);
     m_cv.assign(MAX_CDOFS,0);
+}
+
+//-----------------------------------------------------------------------------
+bool FESolventSupplyStarling::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
+{
+    // get number of DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
+	if (strcmp(p.m_szname, "qc") == 0)
+	{
+		if (strcmp(szatt, "sol") == 0)
+		{
+			int id = atoi(szval) - 1;
+			if ((id < 0) || (id >= MAX_CDOFS)) return false;
+			SetIndexedParameter(m_qcinp, id, m_qctmp);
+			return true;
+		}
+	}
+	else if (strcmp(p.m_szname, "cv") == 0)
+	{
+		if (strcmp(szatt, "sol") == 0)
+		{
+			int id = atoi(szval) - 1;
+			if ((id < 0) || (id >= MAX_CDOFS)) return false;
+			SetIndexedParameter(m_cvinp, id, m_cvtmp);
+			return true;
+		}
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
