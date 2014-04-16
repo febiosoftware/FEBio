@@ -23,3 +23,8 @@ void FEReactionRateConst::Init()
 	
 }
 
+//! Data serialization
+void FEReactionRateConst::Serialize(DumpFile& ar)
+{
+	FEReactionRate::Serialize(ar);
+}

@@ -2,6 +2,7 @@
 #include "FEChemicalReaction.h"
 #include "FECore/FEElementTraits.h"
 #include "FECore/DOFS.h"
+#include "FECore/FEModel.h"
 #include <stdlib.h>
 
 
@@ -126,4 +127,57 @@ bool FEChemicalReaction::SetProperty(int i, FECoreBase* pm)
 void FEChemicalReaction::InitializeReactionRate(FEReactionRate* m_pRate)
 {
 	m_pRate->m_pReact = this; 
+}
+
+//-----------------------------------------------------------------------------
+//! Data serialization
+void FEChemicalReaction::Serialize(DumpFile& ar)
+{
+	FEMaterial::Serialize(ar);
+	
+	if (ar.IsSaving())
+	{
+		itrmap p;
+		ar << m_nsol << m_vR << m_vP << m_v << m_Vbar << m_Vovr << m_vRtmp << m_vPtmp;
+		ar << m_solR.size();
+		for (p = m_solR.begin(); p!=m_solR.end(); ++p) {ar << p->first; ar << p->second;}
+		ar << m_solP.size();
+		for (p = m_solP.begin(); p!=m_solP.end(); ++p) {ar << p->first; ar << p->second;}
+		ar << m_sbmR.size();
+		for (p = m_sbmR.begin(); p!=m_sbmR.end(); ++p) {ar << p->first; ar << p->second;}
+		ar << m_sbmP.size();
+		for (p = m_sbmP.begin(); p!=m_sbmP.end(); ++p) {ar << p->first; ar << p->second;}
+	}
+	else
+	{
+		ar >> m_nsol >> m_vR >> m_vP >> m_v >> m_Vbar >> m_Vovr >> m_vRtmp >> m_vPtmp;
+		int size, id, vR;
+		ar >> size;
+		for (int i=0; i<size; ++i)
+		{
+			ar >> id; ar >> vR;
+			SetSoluteReactantsCoefficients(id, vR);
+		}
+		ar >> size;
+		for (int i=0; i<size; ++i)
+		{
+			ar >> id; ar >> vR;
+			SetSoluteProductsCoefficients(id, vR);
+		}
+		ar >> size;
+		for (int i=0; i<size; ++i)
+		{
+			ar >> id; ar >> vR;
+			SetSolidReactantsCoefficients(id, vR);
+		}
+		ar >> size;
+		for (int i=0; i<size; ++i)
+		{
+			ar >> id; ar >> vR;
+			SetSolidProductsCoefficients(id, vR);
+		}
+
+		FEModel& fem = *GetFEModel();
+	}
+
 }

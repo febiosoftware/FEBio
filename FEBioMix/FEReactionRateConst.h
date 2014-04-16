@@ -26,6 +26,9 @@ public:
 	
 	//! tangent of reaction rate with effective fluid pressure at material point
 	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) {return 0; }
+
+	//! Serialization
+	void Serialize(DumpFile& ar);
 	
 public:
 	double	m_k;		//!< reaction rate

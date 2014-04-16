@@ -85,6 +85,9 @@ public:
 	//! set the stoichiometric coefficients of solute products
 	void SetSoluteProductsCoefficients(int id, int vR) { m_solP.insert(std::pair<int, int>(id, vR)); }
 
+	//! Serialization
+	void Serialize(DumpFile& ar);
+
 public:
 
 	//! molar supply at material point
