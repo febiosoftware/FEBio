@@ -15,7 +15,6 @@ FELIBS += $(FEBDIR)/lib/libfebioheat_$(PLAT).a
 FELIBS += $(FEBDIR)/lib/libfebioxml_$(PLAT).a
 FELIBS += $(FEBDIR)/lib/libnumcore_$(PLAT).a
 FELIBS += $(FEBDIR)/lib/libfebioopt_$(PLAT).a
-FELIBS += $(FEBDIR)/lib/liblevmar_$(PLAT).a
 
 FEBIOLIBS = -Wl,--start-group $(FELIBS) -Wl,--end-group
 

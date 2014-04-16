@@ -1,5 +1,6 @@
 #include <sstream>
 #include <iostream>
+#include <cstdlib>
 #include "FESolventSupplyStarling.h"
 #include "FESolutesMaterialPoint.h"
 #include "FECore/DOFS.h"
