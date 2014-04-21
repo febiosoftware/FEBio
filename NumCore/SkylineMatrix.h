@@ -30,12 +30,13 @@ public:
 
 	void add(int i, int j, double v)
 	{
+/*
 #ifdef _DEBUG
 		if (j<i) { j ^= i; i ^= j; j ^= i; }
 		int l = m_ppointers[j+1] - m_ppointers[j];
 		assert(j-i<l);
 #endif // _DEBUG
-
+*/
 		// only add to the upper triangular part
 		if (j>=i) m_pd[ m_ppointers[j] + j-i] += v;
 	}
