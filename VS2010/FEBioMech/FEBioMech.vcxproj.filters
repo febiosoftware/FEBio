@@ -375,6 +375,9 @@
     <ClCompile Include="..\..\FEBioMech\FEPRLig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEPreStrainElastic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h">
@@ -744,6 +747,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEPRLig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEPreStrainElastic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

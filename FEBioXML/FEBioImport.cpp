@@ -363,6 +363,8 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
 		case FE_PARAM_BOOL   : tag.value(pp->value<bool  >() ); break;
 		case FE_PARAM_VEC3D  : tag.value(pp->value<vec3d >() ); break;
+		case FE_PARAM_MAT3D  : tag.value(pp->value<mat3d >() ); break;
+		case FE_PARAM_MAT3DS : tag.value(pp->value<mat3ds>() ); break;
 		case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
 		case FE_PARAM_INTV   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
 		case FE_PARAM_DOUBLEV: tag.value(pp->pvalue<double>(), pp->m_ndim); break;

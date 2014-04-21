@@ -192,6 +192,8 @@ void FEParamContainer::Serialize(DumpFile& ar)
 			case FE_PARAM_BOOL  : ar << p.value<bool  >(); break;
 			case FE_PARAM_DOUBLE: ar << p.value<double>(); break;
 			case FE_PARAM_VEC3D : ar << p.value<vec3d >(); break;
+			case FE_PARAM_MAT3D : ar << p.value<mat3d >(); break;
+			case FE_PARAM_MAT3DS: ar << p.value<mat3ds>(); break;
 			case FE_PARAM_STRING: ar << (const char*) p.m_pv; break;
 			case FE_PARAM_INTV:
 				{
@@ -235,6 +237,8 @@ void FEParamContainer::Serialize(DumpFile& ar)
 				case FE_PARAM_BOOL  : ar >> p.value<bool  >(); break;
 				case FE_PARAM_DOUBLE: ar >> p.value<double>(); break;
 				case FE_PARAM_VEC3D : ar >> p.value<vec3d >(); break;
+				case FE_PARAM_MAT3D : ar >> p.value<mat3d >(); break;
+				case FE_PARAM_MAT3DS: ar >> p.value<mat3ds>(); break;
 				case FE_PARAM_STRING: ar >> (char*) p.m_pv; break;
 				case FE_PARAM_INTV:
 					{

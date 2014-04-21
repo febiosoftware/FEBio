@@ -15,6 +15,8 @@ enum FEParamType {
 	FE_PARAM_BOOL,
 	FE_PARAM_DOUBLE,
 	FE_PARAM_VEC3D,
+	FE_PARAM_MAT3D,
+	FE_PARAM_MAT3DS,
 	FE_PARAM_IMAGE_3D,
 	FE_PARAM_STRING,
 	FE_PARAM_INTV = 100,
@@ -57,6 +59,8 @@ public:
 	void operator = (int    n) { assert(m_itype == FE_PARAM_INT   ); value<int   >() = n; }
 	void operator = (bool   b) { assert(m_itype == FE_PARAM_BOOL  ); value<bool  >() = b; }
 	void operator = (vec3d  v) { assert(m_itype == FE_PARAM_VEC3D ); value<vec3d >() = v; }
+	void operator = (mat3d  m) { assert(m_itype == FE_PARAM_MAT3D ); value<mat3d >() = m; }
+	void operator = (mat3ds m) { assert(m_itype == FE_PARAM_MAT3DS); value<mat3ds>() = m; }
 
 	//! override the template for char pointers
 	char* cvalue() { return (char*) m_pv; }

@@ -470,6 +470,7 @@
     <ClCompile Include="..\..\FEBioMech\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPointConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPressureLoad.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPreStrainElastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPreStrainTransIsoMR.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPRLig.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERemodelingElasticDomain.cpp" />
@@ -592,6 +593,7 @@
     <ClInclude Include="..\..\FEBioMech\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEPointConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEPressureLoad.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPreStrainElastic.h" />
     <ClInclude Include="..\..\FEBioMech\FEPreStrainTransIsoMR.h" />
     <ClInclude Include="..\..\FEBioMech\FEPRLig.h" />
     <ClInclude Include="..\..\FEBioMech\FERemodelingElasticDomain.h" />

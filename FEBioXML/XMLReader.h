@@ -14,6 +14,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "FECore/vec3d.h"
+#include "FECore/mat3d.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -105,6 +106,8 @@ public:
 		void value(bool& val);
 		void value(char* szstr);
 		void value(vec3d& v);
+		void value(mat3d& m);
+		void value(mat3ds& m);
 		void value(vector<int>& l);
 
 		const char* szvalue() { return m_szval.c_str(); }

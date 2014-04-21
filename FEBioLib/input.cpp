@@ -31,6 +31,18 @@ void print_parameter(FEParam& p)
 			felog.printf("%s : %lg,%lg,%lg\n", sz, v.x, v.y, v.z);
 		}
 		break;
+	case FE_PARAM_MAT3DS :
+		{
+			mat3ds m = p.value<mat3ds>();
+			felog.printf("%s : %lg,%lg,%lg,%lg,%lg,%lg\n", sz, m.xx(), m.yy(), m.zz(), m.xy(), m.yz(), m.xz());
+		}
+		break;
+	case FE_PARAM_MAT3D:
+		{
+			mat3d m = p.value<mat3d>();
+			felog.printf("%s : %lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg\n", sz, m(0,0), m(0,1), m(0,2), m(1,0), m(1,1), m(1,2), m(2,0), m(2,1), m(2,2));
+		}
+		break;
 	case FE_PARAM_INTV   :
 	case FE_PARAM_DOUBLEV:
 		{

@@ -139,6 +139,22 @@ void XMLTag::value(vec3d& v)
 	if (n != 3) throw XMLReader::XMLSyntaxError();
 }
 
+void XMLTag::value(mat3d& m)
+{
+	double xx, xy, xz, yx, yy, yz, zx, zy, zz;
+	int n = sscanf(m_szval.c_str(), "%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
+	if (n != 9) throw XMLReader::XMLSyntaxError();
+	m = mat3d(xx, xy, xz, yx, yy, yz, zx, zy, zz);
+}
+
+void XMLTag::value(mat3ds& m)
+{
+	double x, y, z, xy, yz, xz;
+	int n = sscanf(m_szval.c_str(), "%lg,%lg,%lg,%lg,%lg,%lg", &x, &y, &z, &xy, &yz, &xz);
+	if (n != 6) throw XMLReader::XMLSyntaxError();
+	m = mat3ds(x, y, z, xy, yz, xz);
+}
+
 //-----------------------------------------------------------------------------
 void XMLTag::value(vector<int>& l)
 {
