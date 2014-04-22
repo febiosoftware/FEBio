@@ -71,6 +71,14 @@ void FERigidMaterial::Init()
 
 			FERigidBody& prb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(ppm->GetRigidBodyID()));
 			rb.m_prb = &prb;
+
+			// mark all degrees of freedom as prescribed
+			rb.m_BC[0] = 2;
+			rb.m_BC[1] = 2;
+			rb.m_BC[2] = 2;
+			rb.m_BC[3] = 2;
+			rb.m_BC[4] = 2;
+			rb.m_BC[5] = 2;
 		}
 
 		m_binit = true;

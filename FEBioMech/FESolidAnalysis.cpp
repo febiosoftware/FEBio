@@ -30,7 +30,7 @@ bool FESolidAnalysis::Init()
 		for (int j=0; j<6; ++j)
 		{
 			RB.m_pDC[j] = 0;
-			RB.m_BC[j] = 0;
+			if (RB.m_BC[j] != 2) RB.m_BC[j] = 0;
 		}
 	}
 
