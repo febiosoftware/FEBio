@@ -22,9 +22,3 @@ void FEReactionRateConst::Init()
 	if (m_k < 0) throw MaterialError("reaction rate constant must be positive");
 	
 }
-
-//! Data serialization
-void FEReactionRateConst::Serialize(DumpFile& ar)
-{
-	FEReactionRate::Serialize(ar);
-}

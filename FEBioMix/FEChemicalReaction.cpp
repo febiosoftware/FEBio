@@ -3,6 +3,7 @@
 #include "FECore/FEElementTraits.h"
 #include "FECore/DOFS.h"
 #include "FECore/FEModel.h"
+#include "FECore/FECoreKernel.h"
 #include <stdlib.h>
 
 
@@ -147,6 +148,20 @@ void FEChemicalReaction::Serialize(DumpFile& ar)
 		for (p = m_sbmR.begin(); p!=m_sbmR.end(); ++p) {ar << p->first; ar << p->second;}
 		ar << m_sbmP.size();
 		for (p = m_sbmP.begin(); p!=m_sbmP.end(); ++p) {ar << p->first; ar << p->second;}
+
+		if (m_pFwd)
+		{
+			ar << 1;
+			ar << m_pFwd->GetTypeStr(); m_pFwd->Serialize(ar);
+		}
+		else ar << 0;
+		if (m_pRev)
+		{
+			ar << 1;
+			ar << m_pRev->GetTypeStr(); m_pRev->Serialize(ar);
+		}
+		else ar << 0;
+
 	}
 	else
 	{
@@ -176,8 +191,25 @@ void FEChemicalReaction::Serialize(DumpFile& ar)
 			ar >> id; ar >> vR;
 			SetSolidProductsCoefficients(id, vR);
 		}
+		int rr;
+		char sz[256] = {0};
+		ar >> rr;
+		if (rr)
+		{
+			ar >> sz;
+			m_pFwd = dynamic_cast<FEReactionRate*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+			assert(m_pFwd); m_pFwd->Serialize(ar);
+			m_pFwd->Init();
+		}
+		ar >> rr;
+		if (rr)
+		{
+			ar >> sz;
+			m_pRev = dynamic_cast<FEReactionRate*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+			assert(m_pRev); m_pRev->Serialize(ar);
+			m_pRev->Init();
+		}
 
-		FEModel& fem = *GetFEModel();
 	}
 
 }
