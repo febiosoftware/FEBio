@@ -21,12 +21,14 @@ FEBIOLIBS = -Wl,--start-group $(FELIBS) -Wl,--end-group
 $(TARGET): $(OBJ) $(FELIBS)
 ifeq ($(findstring lnx,$(PLAT)),lnx)
 	$(CC) -o $(TARGET) $(DEF) $(FLG) $(INC) $(OBJ) $(FEBIOLIBS) $(LIBS) -ldl
+else ifeq ($(findstring gcc,$(PLAT)),gcc)
+	$(CC) -o $(TARGET) $(DEF) $(FLG) $(INC) $(OBJ) $(FEBIOLIBS) $(LIBS) -ldl
 else
 	$(CC) -o $(TARGET) $(DEF) $(FLG) $(INC) $(OBJ) $(FELIBS) $(LIBS)
 endif
 
 %.o: ../%.cpp
-	$(CC) $(INC) $(DEF) $(FLG) -MMD -c -o $@ $<
+	$(CC) $(INC) $(DEF) $(FLG) -MMD -c $<
 
 clean:
 	$(RM) *.o *.d $(TARGET)

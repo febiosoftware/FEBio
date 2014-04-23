@@ -10,7 +10,7 @@ $(LIB): $(OBJ)
 	ar -cvr $(LIB) $(OBJ)
 
 %.o: ../%.cpp
-	$(CC) -MMD -MP -c $(INC) $(DEF) $(FLG) -o $@ $<
+	$(CC) -MMD -c $(INC) $(DEF) $(FLG) $<
 
 clean:
 	$(RM) *.o *.d $(LIB)
