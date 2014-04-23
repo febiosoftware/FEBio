@@ -51,14 +51,14 @@ PROJECT_BRIEF          = "Finite Elements for Biomechanics"
 # and the maximum width should not exceed 200 pixels. Doxygen will copy the logo
 # to the output directory.
 
-PROJECT_LOGO           = "C:/Users/Steve/Documents/Visual Studio 2010/Projects/FEBio2/Documentation/febio_logo.png"
+PROJECT_LOGO           = "../febio_logo.png"
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = "C:/Users/Steve/Documents/Visual Studio 2010/Projects/FEBio2/doc"
+OUTPUT_DIRECTORY       = "../../doc"
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -743,7 +743,7 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = "C:/Users/Steve/Documents/Visual Studio 2010/Projects/FEBio2/"
+INPUT                  = "../../"
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -768,7 +768,6 @@ FILE_PATTERNS          = *.c \
                          *.cxx \
                          *.cpp \
                          *.c++ \
-                         *.d \
                          *.java \
                          *.ii \
                          *.ixx \
@@ -814,8 +813,7 @@ RECURSIVE              = YES
 EXCLUDE                = ../../VS2008/ \
                          ../../VS2010/ \
                          ../../FEBioTM/ \
-                         ../../XCode5/ \
-                         ../../FEBioOpt/
+                         ../../XCode5/
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
