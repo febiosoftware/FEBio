@@ -2,6 +2,32 @@
 #include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
+//! Material point class for the PreStrainElastic material.
+//! This class allows the user to define a pre-strain deformation gradient for
+//! each integration point.
+class FEPreStrainMaterialPoint : public FEMaterialPoint
+{
+public:
+	//! constructor
+	FEPreStrainMaterialPoint(FEMaterialPoint* pt);
+
+	//! Initialize
+	void Init(bool bflag);
+
+	//! create a shallow copy
+	FEMaterialPoint* Copy();
+
+	//! serialize material point data
+	void Serialize(DumpFile& ar);
+
+	//! stream material point data
+	void ShallowCopy(DumpStream& dmp, bool bsave);
+
+public:
+	mat3d	m_Fp;	//!< prestrain deformation gradient
+};
+
+//-----------------------------------------------------------------------------
 //! This material applies a user-defined prestrain deformation gradient
 //! before evaluating the stress and tangents. 
 class FEPreStrainElastic : public FEElasticMaterial

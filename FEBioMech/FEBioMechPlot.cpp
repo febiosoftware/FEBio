@@ -863,7 +863,7 @@ bool FEPlotFiberPreStretch::Save(FEDomain& dom, vector<float>& a)
 		{
 			FEMaterialPoint& mp = *e.m_State[j]->GetPointData(0);
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
+			FEFiberPreStretchMaterialPoint& psp = *mp.ExtractData<FEFiberPreStretchMaterialPoint>();
 			mat3d& F = pt.m_F;
 
 			vec3d a0(pt.m_Q[0][0], pt.m_Q[1][0], pt.m_Q[2][0]);

@@ -2,28 +2,28 @@
 #include "FEPreStrainTransIsoMR.h"
 
 //-----------------------------------------------------------------------------
-FEPreStrainMaterialPoint::FEPreStrainMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) 
+FEFiberPreStretchMaterialPoint::FEFiberPreStretchMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) 
 {
 	m_ltrg = 0.0;
 }
 
 //-----------------------------------------------------------------------------
-void FEPreStrainMaterialPoint::Init(bool bflag)
+void FEFiberPreStretchMaterialPoint::Init(bool bflag)
 {
 	if (bflag) m_lam = m_lamp = 1.0;
 	else m_lamp = m_lam;
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEPreStrainMaterialPoint::Copy()
+FEMaterialPoint* FEFiberPreStretchMaterialPoint::Copy()
 {
-	FEPreStrainMaterialPoint* pt = new FEPreStrainMaterialPoint(*this);
+	FEFiberPreStretchMaterialPoint* pt = new FEFiberPreStretchMaterialPoint(*this);
 	if (m_pt) pt->m_pt = m_pt->Copy();
 	return pt;
 }
 
 //-----------------------------------------------------------------------------
-void FEPreStrainMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+void FEFiberPreStretchMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
 	if (bsave)
 	{
@@ -38,7 +38,7 @@ void FEPreStrainMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 
 //-----------------------------------------------------------------------------
 //! \todo implement this.
-void FEPreStrainMaterialPoint::Serialize(DumpFile& ar)
+void FEFiberPreStretchMaterialPoint::Serialize(DumpFile& ar)
 {
 	assert(false);
 }
@@ -54,7 +54,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 double FEPreStrainTransIsoMR::FiberStretch(FEMaterialPoint& mp)
 {
-	FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
+	FEFiberPreStretchMaterialPoint& psp = *mp.ExtractData<FEFiberPreStretchMaterialPoint>();
 	if (psp.m_ltrg ==0.0) return m_ltrg;
 	else
 	{
@@ -68,7 +68,7 @@ double FEPreStrainTransIsoMR::FiberStretch(FEMaterialPoint& mp)
 mat3d FEPreStrainTransIsoMR::PreStrainDeformationGradient(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
+	FEFiberPreStretchMaterialPoint& psp = *mp.ExtractData<FEFiberPreStretchMaterialPoint>();
 
 	// get the target stretch
 	double ltrg = FiberStretch(mp);
@@ -140,7 +140,7 @@ mat3ds FEPreStrainTransIsoMR::DevStress(FEMaterialPoint& mp)
 tens4ds FEPreStrainTransIsoMR::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
+	FEFiberPreStretchMaterialPoint& psp = *mp.ExtractData<FEFiberPreStretchMaterialPoint>();
 
 	// deformation gradient
 	mat3d F0 = pt.m_F;

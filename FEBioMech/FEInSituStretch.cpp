@@ -124,7 +124,7 @@ bool FEInSituStretch::CheckAugment(FESolidDomain* psd, FEPreStrainTransIsoMR* pm
 		for (int i=0; i<nint; ++i)
 		{
 			FEMaterialPoint& mp = *(el.m_State[i]->GetPointData(n));
-			FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
+			FEFiberPreStretchMaterialPoint& psp = *mp.ExtractData<FEFiberPreStretchMaterialPoint>();
 
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 			mat3d& F = pt.m_F;
@@ -158,7 +158,7 @@ void FEInSituStretch::DoAugment(FESolidDomain* psd, FEPreStrainTransIsoMR* pmat,
 		for (int i=0; i<nint; ++i)
 		{
 			FEMaterialPoint& mp = *(el.m_State[i]->GetPointData(n));
-			FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
+			FEFiberPreStretchMaterialPoint& psp = *mp.ExtractData<FEFiberPreStretchMaterialPoint>();
 
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 			mat3d& F = pt.m_F;

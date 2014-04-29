@@ -2,6 +2,59 @@
 #include "FEPreStrainElastic.h"
 
 //-----------------------------------------------------------------------------
+//! Constructor
+FEPreStrainMaterialPoint::FEPreStrainMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt)
+{
+	// initialize to identity tensor
+	m_Fp.unit();
+}
+
+//-----------------------------------------------------------------------------
+void FEPreStrainMaterialPoint::Init(bool bflag)
+{
+	if (bflag) m_Fp.unit();
+}
+
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FEPreStrainMaterialPoint::Copy()
+{
+	FEPreStrainMaterialPoint* pt = new FEPreStrainMaterialPoint(*this);
+	if (m_pt) pt->m_pt = m_pt->Copy();
+	return pt;
+}
+
+//-----------------------------------------------------------------------------
+void FEPreStrainMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (bsave)
+	{
+		dmp << m_Fp;
+	}
+	else
+	{
+		dmp >> m_Fp;
+	}
+
+	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+}
+
+//-----------------------------------------------------------------------------
+void FEPreStrainMaterialPoint::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_Fp;
+	}
+	else
+	{
+		ar >> m_Fp;
+	}
+
+	if (m_pt) m_pt->Serialize(ar);
+}
+
+
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPreStrainElastic, FEElasticMaterial)
 	ADD_PARAMETER(m_Fp, FE_PARAM_MAT3D, "F0");
@@ -66,20 +119,23 @@ bool FEPreStrainElastic::SetProperty(int i, FECoreBase* pm)
 //! Create material point data for this material
 FEMaterialPoint* FEPreStrainElastic::CreateMaterialPointData()
 { 
-	return m_pmat->CreateMaterialPointData();
+	return new FEPreStrainMaterialPoint(m_pmat->CreateMaterialPointData());
 }
 
 //-----------------------------------------------------------------------------
 mat3ds FEPreStrainElastic::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& ep = *(mp.ExtractData<FEElasticMaterialPoint>());
+	FEPreStrainMaterialPoint& pp = *(mp.ExtractData<FEPreStrainMaterialPoint>());
 
 	// store the original deformation gradient
 	mat3d F0 = ep.m_F;
 	double J0 = ep.m_J;
 
 	// pre-multiply the pre-strain
-	ep.m_F = ep.m_F*m_Fp;
+	// Note: Note that we first multiply the material point's deformation gradient
+	//       and then the material's deformation gradient
+	ep.m_F = ep.m_F*m_Fp*pp.m_Fp;
 	ep.m_J = ep.m_F.det();
 
 	// evaluate the stress
@@ -97,13 +153,16 @@ mat3ds FEPreStrainElastic::Stress(FEMaterialPoint& mp)
 tens4ds FEPreStrainElastic::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& ep = *(mp.ExtractData<FEElasticMaterialPoint>());
+	FEPreStrainMaterialPoint& pp = *(mp.ExtractData<FEPreStrainMaterialPoint>());
 
 	// store the original deformation gradient
 	mat3d F0 = ep.m_F;
 	double J0 = ep.m_J;
 
 	// pre-multiply the pre-strain
-	ep.m_F = ep.m_F*m_Fp;
+	// Note: Note that we first multiply the material point's deformation gradient
+	//       and then the material's deformation gradient
+	ep.m_F = ep.m_F*m_Fp*pp.m_Fp;
 	ep.m_J = ep.m_F.det();
 
 	// evaluate the tangent

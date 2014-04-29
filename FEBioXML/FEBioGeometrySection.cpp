@@ -941,7 +941,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 				FESolidElement* pbe = dynamic_cast<FESolidElement*> (pe);
 				for (int i=0; i<pbe->GaussPoints(); ++i)
 				{
-					FEPreStrainMaterialPoint& pt = *pbe->m_State[i]->ExtractData<FEPreStrainMaterialPoint>();
+					FEFiberPreStretchMaterialPoint& pt = *pbe->m_State[i]->ExtractData<FEFiberPreStretchMaterialPoint>();
 					pt.m_ltrg = l;
 				}
 			}

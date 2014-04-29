@@ -2,10 +2,10 @@
 #include "FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
-class FEPreStrainMaterialPoint : public FEMaterialPoint
+class FEFiberPreStretchMaterialPoint : public FEMaterialPoint
 {
 public:
-	FEPreStrainMaterialPoint(FEMaterialPoint* pt);
+	FEFiberPreStretchMaterialPoint(FEMaterialPoint* pt);
 
 	void Init(bool bflag);
 
@@ -35,7 +35,7 @@ public:
 
 public:
 	//! create material point data for this material
-	virtual FEMaterialPoint* CreateMaterialPointData() { return new FEPreStrainMaterialPoint(new FEElasticMaterialPoint); }
+	virtual FEMaterialPoint* CreateMaterialPointData() { return new FEFiberPreStretchMaterialPoint(new FEElasticMaterialPoint); }
 
 	//! calculate deviatoric stress at material point
 	virtual mat3ds DevStress(FEMaterialPoint& pt);
