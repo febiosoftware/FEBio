@@ -238,6 +238,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir);$(MKLDir)\ia32\lib;$(LMDir)\lib;$(LibraryPath)</LibraryPath>
+    <TargetName>FEBio</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -298,6 +299,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir);$(MKLDir)\ia32\lib;$(LMDir)\lib;$(LibraryPath)</LibraryPath>
+    <TargetName>FEBio</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|Win32'">
     <LinkIncremental>false</LinkIncremental>
