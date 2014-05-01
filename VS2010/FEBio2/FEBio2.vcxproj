@@ -252,8 +252,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;</IncludePath>
-    <LibraryPath>C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2\VS2010\x64\Debug;C:\Program Files\Intel\MKL\10.2.7.040\em64t\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);$(MKLDir)\em64t\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -315,9 +315,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2</IncludePath>
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir);$(MKLDir)\em64t\lib;$(LibraryPath)</LibraryPath>
-    <TargetName>$(ProjectName)x64mt</TargetName>
+    <TargetName>FEBio</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">
     <LinkIncremental>false</LinkIncremental>
@@ -587,7 +587,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>numcore.lib;fecore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioxml.lib;febioplot.lib;febiolib.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_solver.lib;libiomp5mt.lib;mkl_intel_lp64.lib</AdditionalDependencies>
+      <AdditionalDependencies>numcore.lib;fecore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioxml.lib;febioplot.lib;febioopt.lib;febiolib.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;mkl_intel_lp64.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">

@@ -115,7 +115,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
@@ -217,8 +217,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2\VS2010\Release OpenMP;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
