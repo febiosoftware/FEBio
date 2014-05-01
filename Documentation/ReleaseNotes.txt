@@ -49,6 +49,10 @@ at http://mrlforums.sci.utah.edu/forums/.
 -------------------
 Plugins are dynamic libraries which extend the capabilities of FEBio at runtime without the need to recompile the entire source code. This offers the user a powerful mechanism for extending the default feature set of FEBio with little effort.  This has involved a major restructuring of the code.
 
+2. FEATURE: OpenMP
+------------------
+OpenMP directives have been added to speed up several sections of the code.
+
 2. BUG FIX: Restart
 -------------------
 Fixed several bugs in the restart feature

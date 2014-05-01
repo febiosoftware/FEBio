@@ -553,7 +553,6 @@ Global
 		{4246434D-F9C8-4119-BD3A-F0F571D9449E}.Release OpenMP|Itanium.ActiveCfg = Release OpenMP
 		{4246434D-F9C8-4119-BD3A-F0F571D9449E}.Release OpenMP|Itanium.Build.0 = Release OpenMP
 		{4246434D-F9C8-4119-BD3A-F0F571D9449E}.Release OpenMP|Win32.ActiveCfg = Release OpenMP
-		{4246434D-F9C8-4119-BD3A-F0F571D9449E}.Release OpenMP|Win32.Build.0 = Release OpenMP
 		{4246434D-F9C8-4119-BD3A-F0F571D9449E}.Release OpenMP|x64.ActiveCfg = Release OpenMP
 		{4246434D-F9C8-4119-BD3A-F0F571D9449E}.Release|Itanium.ActiveCfg = Release OpenMP
 		{4246434D-F9C8-4119-BD3A-F0F571D9449E}.Release|Itanium.Build.0 = Release OpenMP
