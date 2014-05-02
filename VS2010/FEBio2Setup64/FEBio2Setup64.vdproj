@@ -1899,12 +1899,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_A14077DB83A04071ADC635DE9FB1CD4C"
-        "OwnerKey" = "8:_5F85932F5BA749ED8AC24C2FCC4CA99B"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_A15EBD898FD64CFEB028CCC3F6A094FA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2548,6 +2542,12 @@
         "Entry"
         {
         "MsmKey" = "8:_D5D441112D2F4B72B67E1476AEE332D4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D659A703DB434B449E28BA4431AF7421"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -11820,6 +11820,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D659A703DB434B449E28BA4431AF7421"
+            {
+            "SourcePath" = "8:..\\..\\Documentation\\FEBio_EULA.pdf"
+            "TargetName" = "8:FEBio_EULA.pdf"
+            "Tag" = "8:"
+            "Folder" = "8:_5EF9866C3B9F41E88D147ED4B14B5BA1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D6C43CD90B2C449884C0C9DE3E224E34"
             {
             "SourcePath" = "8:..\\..\\FEBioMech\\FEContactInterface.h"
@@ -14342,26 +14362,12 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_A14077DB83A04071ADC635DE9FB1CD4C"
-            {
-            "UseDynamicProperties" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:Microsoft_VC100_CRT_x64.msm"
-                "Properties"
-                {
-                }
-            "LanguageId" = "3:0"
-            "Exclude" = "11:FALSE"
-            "Folder" = "8:"
-            "Feature" = "8:"
-            "IsolateTo" = "8:"
-            }
         }
         "ProjectOutput"
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_5F85932F5BA749ED8AC24C2FCC4CA99B"
             {
-            "SourcePath" = "8:..\\x64\\Release OpenMP\\FEBio2x64mt.exe"
+            "SourcePath" = "8:..\\x64\\Release OpenMP\\FEBio.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_6B94C48B2C8C48A28FD52BCC98948BA8"
