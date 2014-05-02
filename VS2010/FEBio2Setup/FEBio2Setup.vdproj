@@ -387,12 +387,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_22F6CF735BCE4606B5B767AB2B8BE035"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_2331604D08B345B28BD7EFB8F2CD175C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1725,6 +1719,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_9262EB7B36B645919256BEE62521D94C"
+        "OwnerKey" = "8:_5F85932F5BA749ED8AC24C2FCC4CA99B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_9321674C95EB42209D0776C953E639BC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1816,6 +1816,12 @@
         "Entry"
         {
         "MsmKey" = "8:_99ACB3BFA59247889031299018A38FF0"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_99B3445202D6429FBEF709B59404FE73"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -4626,26 +4632,6 @@
             "TargetName" = "8:oi02.feb"
             "Tag" = "8:"
             "Folder" = "8:_27E1A5E4D2EB4026AF2B9D6E4822D9A1"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_22F6CF735BCE4606B5B767AB2B8BE035"
-            {
-            "SourcePath" = "8:..\\..\\Documentation\\febio_svn.log"
-            "TargetName" = "8:febio_svn.log"
-            "Tag" = "8:"
-            "Folder" = "8:_F73CF22FC41F41409715345C0CED90CD"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -9386,6 +9372,26 @@
             "TargetName" = "8:FEGlobalVector.h"
             "Tag" = "8:"
             "Folder" = "8:_2CC591DC2DDE4B44A757B01E32FADDBA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_99B3445202D6429FBEF709B59404FE73"
+            {
+            "SourcePath" = "8:..\\..\\Documentation\\febio2_svn.log"
+            "TargetName" = "8:febio2_svn.log"
+            "Tag" = "8:"
+            "Folder" = "8:_F73CF22FC41F41409715345C0CED90CD"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -14362,12 +14368,26 @@
         }
         "MergeModule"
         {
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_9262EB7B36B645919256BEE62521D94C"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "SourcePath" = "8:Microsoft_VC100_CRT_x86.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
         }
         "ProjectOutput"
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_5F85932F5BA749ED8AC24C2FCC4CA99B"
             {
-            "SourcePath" = "8:..\\x64\\Release OpenMP\\FEBio.exe"
+            "SourcePath" = "8:..\\Release OpenMP\\FEBio.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_BDAFA02141794D0AB7E7B0F2C44F5EA3"

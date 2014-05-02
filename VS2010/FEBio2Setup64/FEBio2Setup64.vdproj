@@ -387,12 +387,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_22F6CF735BCE4606B5B767AB2B8BE035"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_2331604D08B345B28BD7EFB8F2CD175C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2763,6 +2757,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_E7E2708B4C1040BE8AB76DCD903A0781"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E7ED53621CE04B61AFE3463BC2DDF0FD"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -4626,26 +4626,6 @@
             "TargetName" = "8:oi02.feb"
             "Tag" = "8:"
             "Folder" = "8:_535B67B14BCE436F91F5E59318C66181"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_22F6CF735BCE4606B5B767AB2B8BE035"
-            {
-            "SourcePath" = "8:..\\..\\Documentation\\febio_svn.log"
-            "TargetName" = "8:febio_svn.log"
-            "Tag" = "8:"
-            "Folder" = "8:_5EF9866C3B9F41E88D147ED4B14B5BA1"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -12540,6 +12520,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E7E2708B4C1040BE8AB76DCD903A0781"
+            {
+            "SourcePath" = "8:..\\..\\Documentation\\febio2_svn.log"
+            "TargetName" = "8:febio2_svn.log"
+            "Tag" = "8:"
+            "Folder" = "8:_5EF9866C3B9F41E88D147ED4B14B5BA1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E7ED53621CE04B61AFE3463BC2DDF0FD"
             {
             "SourcePath" = "8:..\\..\\FEBioHeat\\FEHeatTransferMaterial.h"
@@ -14367,7 +14367,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_5F85932F5BA749ED8AC24C2FCC4CA99B"
             {
-            "SourcePath" = "8:..\\x64\\Release OpenMP\\FEBio.exe"
+            "SourcePath" = "8:..\\Release OpenMP\\FEBio.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_6B94C48B2C8C48A28FD52BCC98948BA8"
