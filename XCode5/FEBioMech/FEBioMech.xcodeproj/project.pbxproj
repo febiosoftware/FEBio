@@ -11,6 +11,8 @@
 		CAA03F9118BFA51700EAF395 /* FECGSolidSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = CAA03F8F18BFA51700EAF395 /* FECGSolidSolver.h */; };
 		D515BD3A18DB3D7B00B661B2 /* FEPRLig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D515BD3818DB3D7B00B661B2 /* FEPRLig.cpp */; };
 		D515BD3B18DB3D7B00B661B2 /* FEPRLig.h in Headers */ = {isa = PBXBuildFile; fileRef = D515BD3918DB3D7B00B661B2 /* FEPRLig.h */; };
+		D58DFCCB19145D5400CE97F1 /* FEPreStrainElastic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58DFCC919145D5400CE97F1 /* FEPreStrainElastic.cpp */; };
+		D58DFCCC19145D5400CE97F1 /* FEPreStrainElastic.h in Headers */ = {isa = PBXBuildFile; fileRef = D58DFCCA19145D5400CE97F1 /* FEPreStrainElastic.h */; };
 		D595BB451899C7D90028A7F3 /* FESPRProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D595BB431899C7D90028A7F3 /* FESPRProjection.cpp */; };
 		D595BB461899C7D90028A7F3 /* FESPRProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D595BB441899C7D90028A7F3 /* FESPRProjection.h */; };
 		D5A12B1A1875B02C008BF405 /* FEContactSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A12B181875B02C008BF405 /* FEContactSurface.cpp */; };
@@ -256,6 +258,8 @@
 		CAA03F8F18BFA51700EAF395 /* FECGSolidSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECGSolidSolver.h; sourceTree = "<group>"; };
 		D515BD3818DB3D7B00B661B2 /* FEPRLig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPRLig.cpp; sourceTree = "<group>"; };
 		D515BD3918DB3D7B00B661B2 /* FEPRLig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPRLig.h; sourceTree = "<group>"; };
+		D58DFCC919145D5400CE97F1 /* FEPreStrainElastic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPreStrainElastic.cpp; sourceTree = "<group>"; };
+		D58DFCCA19145D5400CE97F1 /* FEPreStrainElastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPreStrainElastic.h; sourceTree = "<group>"; };
 		D595BB431899C7D90028A7F3 /* FESPRProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESPRProjection.cpp; sourceTree = "<group>"; };
 		D595BB441899C7D90028A7F3 /* FESPRProjection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESPRProjection.h; sourceTree = "<group>"; };
 		D5A12B181875B02C008BF405 /* FEContactSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactSurface.cpp; sourceTree = "<group>"; };
@@ -682,6 +686,8 @@
 				D5E107221865DFAD00B23922 /* FEPointConstraint.h */,
 				D5E107231865DFAD00B23922 /* FEPressureLoad.cpp */,
 				D5E107241865DFAD00B23922 /* FEPressureLoad.h */,
+				D58DFCC919145D5400CE97F1 /* FEPreStrainElastic.cpp */,
+				D58DFCCA19145D5400CE97F1 /* FEPreStrainElastic.h */,
 				D5E107251865DFAD00B23922 /* FEPreStrainTransIsoMR.cpp */,
 				D5E107261865DFAD00B23922 /* FEPreStrainTransIsoMR.h */,
 				D515BD3818DB3D7B00B661B2 /* FEPRLig.cpp */,
@@ -827,6 +833,7 @@
 				D5E108201865DFAD00B23922 /* FESlidingInterfaceBW.h in Headers */,
 				D5E107F21865DFAD00B23922 /* FEMooneyRivlin.h in Headers */,
 				D5E107B61865DFAD00B23922 /* FEElasticShellDomain.h in Headers */,
+				D58DFCCC19145D5400CE97F1 /* FEPreStrainElastic.h in Headers */,
 				D5E108121865DFAD00B23922 /* FERigidJoint.h in Headers */,
 				D5E108341865DFAD00B23922 /* FETCNonlinearOrthotropic.h in Headers */,
 				D5E108591865DFAD00B23922 /* stdafx.h in Headers */,
@@ -1037,6 +1044,7 @@
 				D5E107F71865DFAD00B23922 /* FENeoHookean.cpp in Sources */,
 				D5E1083B1865DFAD00B23922 /* FETractionLoad.cpp in Sources */,
 				D5E108211865DFAD00B23922 /* FESolidAnalysis.cpp in Sources */,
+				D58DFCCB19145D5400CE97F1 /* FEPreStrainElastic.cpp in Sources */,
 				D5E1082B1865DFAD00B23922 /* FESpringMaterial.cpp in Sources */,
 				D5E1078E1865DFAD00B23922 /* FEContactInterface.cpp in Sources */,
 				D5E108051865DFAD00B23922 /* FEPointBodyForce.cpp in Sources */,
