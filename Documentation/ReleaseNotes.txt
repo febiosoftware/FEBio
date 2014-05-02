@@ -24,7 +24,7 @@
   Columbia University
   http://me.columbia.edu/mbl
 
-  copyright (c) University of Utah 2006-2013 - All rights reserved
+  copyright (c) University of Utah 2006-2014 - All rights reserved
 
 
 ===========================================================================
@@ -47,15 +47,19 @@ at http://mrlforums.sci.utah.edu/forums/.
 
 1. FEATURE: Plugins
 -------------------
-Plugins are dynamic libraries which extend the capabilities of FEBio at runtime without the need to recompile the entire source code. This offers the user a powerful mechanism for extending the default feature set of FEBio with little effort.  This has involved a major restructuring of the code.
+A plugin mechanism has been added for FEBio. Plugins are dynamic libraries which extend the capabilities of FEBio at runtime without the need to recompile the entire source code. This offers the user a powerful mechanism for extending the default feature set of FEBio with little effort.  This has involved a major restructuring of the code.
 
 2. FEATURE: OpenMP
 ------------------
-OpenMP directives have been added to speed up several sections of the code.
+OpenMP directives have been added to speed up several sections of the code. Users can expect improved performance and reduced runtimes for many areas of applications. Problem areas that rely on complex material formulations seem to benefit greatly from this new capability (e.g. bi- and multiphasic, EFD type materials, homogenization, etc.).
 
-2. BUG FIX: Restart
+3. FEATURE: New File format specitication
+-----------------------------------------
+FEBio 2.0 supports the new FEBio file format specification 2.0. This new format adds several new features including the ability to add surfaces and nodesets which can be referenced in the boundary conditions that use them. See the FEBio User's Manual for details regarding this format. The older format (version 1.2) is still supported but considered deprecated.
+
+4. BUG FIX: Restart
 -------------------
-Fixed several bugs in the restart feature.
+Fixed several bugs in the (cold) restart feature. This feature allows users to restart the code from a dump file, which is a file generated at the last converged state of a previous run. 
 
 ===========================================================================
 
@@ -72,8 +76,8 @@ Chemical reactions may be modeled within a multiphasic mixture.
 Changed names of constant and Huiskes reaction rates to be more descriptive.
 Modified Carter-Hayes list of parameters.
 
-3. FEATURE: SPR Projectiion
----------------------------
+3. FEATURE: SPR Projection
+--------------------------
 Implemented the Superconvergent Patch Recovery stress recovery algorithm.
 
 4. FEATURE: Levenberg-Marquardt Methods
