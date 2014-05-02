@@ -55,7 +55,7 @@ OpenMP directives have been added to speed up several sections of the code.
 
 2. BUG FIX: Restart
 -------------------
-Fixed several bugs in the restart feature
+Fixed several bugs in the restart feature.
 
 ===========================================================================
 
