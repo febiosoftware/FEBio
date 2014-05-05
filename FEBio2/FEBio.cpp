@@ -166,7 +166,11 @@ int main(int argc, char* argv[])
 	if (ops.bsplash && (!ops.bsilent)) Hello();
 
 	// if silent mode only output to file
-	if (ops.bsilent) felog.SetMode(Logfile::FILE_ONLY);
+	if (ops.bsilent)
+	{
+		felog.SetMode(Logfile::FILE_ONLY);
+		Console::GetHandle()->Deactivate();
+	}
 
 	// initialize FEBio library
 	InitFEBioLibrary();
