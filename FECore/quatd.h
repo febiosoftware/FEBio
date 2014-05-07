@@ -2,6 +2,7 @@
 #define _QUATD_H_02082007_
 
 #include "vec3d.h"
+#include "mat3d.h"
 
 ///////////////////////////////////////////////////////////////////
 // CLASS: quatd
@@ -250,6 +251,21 @@ public:
 		r[0] = (double) (fw*qx + fx*qw + fy*qz - fz*qy);
 		r[1] = (double) (fw*qy + fy*qw + fz*qx - fx*qz);
 		r[2] = (double) (fw*qz + fz*qw + fx*qy - fy*qx);
+	}
+
+	//! Convert a quaternion to a matrix
+	mat3d RotationMatrix()
+	{
+		return mat3d(
+			w*w + x*x - y*y - z*z,
+			2.0*(x*y - w*z),
+			2.0*(x*z + w*y),
+			2.0*(x*y + w*z),
+			w*w - x*x + y*y - z*z,
+			2.0*(y*z - w*x),
+			2.0*(x*z - w*y),
+			2.0*(y*z + w*x),
+			w*w - x*x - y*y + z*z);
 	}
 
 public:

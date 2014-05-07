@@ -417,6 +417,78 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogRigidBodyR11 : public FELogObjectData
+{
+public:
+	FELogRigidBodyR11(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyR12 : public FELogObjectData
+{
+public:
+	FELogRigidBodyR12(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyR13 : public FELogObjectData
+{
+public:
+	FELogRigidBodyR13(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyR21 : public FELogObjectData
+{
+public:
+	FELogRigidBodyR21(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyR22 : public FELogObjectData
+{
+public:
+	FELogRigidBodyR22(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyR23 : public FELogObjectData
+{
+public:
+	FELogRigidBodyR23(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyR31 : public FELogObjectData
+{
+public:
+	FELogRigidBodyR31(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyR32 : public FELogObjectData
+{
+public:
+	FELogRigidBodyR32(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyR33 : public FELogObjectData
+{
+public:
+	FELogRigidBodyR33(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
 class FELogRigidBodyForceX : public FELogObjectData
 {
 public:
