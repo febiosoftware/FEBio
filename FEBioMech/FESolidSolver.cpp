@@ -528,15 +528,6 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 			n.m_vt = n.m_vp + (n.m_ap + n.m_at)*dt*0.5;
 		}
 	}
-	//	// update velocity - acceleration is calculated in Quasin
-	//{
-	//	int N = mesh.Nodes();
-	//	double dt = m_fem.m_pStep->m_dt;
-	//	for (i=0; i<N; ++i)
-	//	{
-	//		FENode& n = mesh.Node(i);
-	//	}
-	//}
 }
 
 //-----------------------------------------------------------------------------
