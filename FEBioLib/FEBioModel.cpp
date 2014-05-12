@@ -235,7 +235,7 @@ void FEBioModel::DumpData()
 	DumpFile ar(this);
 	if (ar.Create(m_szdump) == false)
 	{
-		felog.printf("WARNING: Failed creating restart point.\n");
+		felog.printf("WARNING: Failed creating restart file (%s).\n", m_szdump);
 	}
 	else 
 	{
