@@ -62,7 +62,7 @@ mat3ds FECoupledTransIsoMooneyRivlin::Stress(FEMaterialPoint& mp)
 	double W1 = m_c1;
 	double W2 = m_c2;
 
-	mat3ds s = (B*(W1 + I1*W2) - B2*W2)*(2.0/J);
+	mat3ds s = (B*(W1 + I1*W2) - B2*W2 - I*(W1 + 2.0*W2))*(2.0/J);
 
 	// b. define fiber stress
 	//-------------------------
@@ -133,7 +133,7 @@ tens4ds FECoupledTransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
 	double W1 = m_c1;
 	double W2 = m_c2;
 
-	tens4ds c = BxB*(4.0*W2/J) - BoB*(4.0*W2/J);
+	tens4ds c = BxB*(4.0*W2/J) - BoB*(4.0*W2/J)  + IoI*(4.0*(W1+2.0*W2)/J);
 
 	// b. fiber tangent
 	// ---------------------------------

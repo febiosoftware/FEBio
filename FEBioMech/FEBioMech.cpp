@@ -72,6 +72,8 @@
 #include "FESpringMaterial.h"
 #include "FEElasticMultigeneration.h"
 #include "FEPRLig.h"
+#include "FECoupledMooneyRivlin.h"
+#include "FECoupledVerondaWestmann.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -160,6 +162,8 @@ REGISTER_FECORE_CLASS(FELinearElastic                ,FEMATERIAL_ID, "linear ela
 REGISTER_FECORE_CLASS(FELinearOrthotropic            ,FEMATERIAL_ID, "linear orthotropic"            );
 REGISTER_FECORE_CLASS(FELinearTransIso               ,FEMATERIAL_ID, "linear trans iso"              );
 REGISTER_FECORE_CLASS(FEMooneyRivlin                 ,FEMATERIAL_ID, "Mooney-Rivlin"                 );
+REGISTER_FECORE_CLASS(FECoupledMooneyRivlin          ,FEMATERIAL_ID, "coupled Mooney-Rivlin"         );
+REGISTER_FECORE_CLASS(FECoupledVerondaWestmann       ,FEMATERIAL_ID, "coupled Veronda-Westmann"      );
 REGISTER_FECORE_CLASS(FEMuscleMaterial               ,FEMATERIAL_ID, "muscle material"               );
 REGISTER_FECORE_CLASS(FENeoHookean                   ,FEMATERIAL_ID, "neo-Hookean"                   );
 REGISTER_FECORE_CLASS(FENeoHookeanTransIso           ,FEMATERIAL_ID, "neo-Hookean transiso"          );
