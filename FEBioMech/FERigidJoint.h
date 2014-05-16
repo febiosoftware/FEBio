@@ -58,10 +58,11 @@ public:
 	vec3d	m_qa0;	//! initial relative position vector of joint w.r.t. A
 	vec3d	m_qb0;	//! initial relative position vector of joint w.r.t. B
 
-	vec3d	m_F;		//! constraining force
-	vec3d	m_L;		//! Lagrange multiplier
-	double	m_eps;	//! penalty factor
-	double	m_atol;	//! augmented Lagrangian tolerance
+	vec3d	m_F;		//!< constraining force
+	vec3d	m_L;		//!< Lagrange multiplier
+	double	m_eps;		//!< penalty factor
+	double	m_atol;		//!< augmented Lagrangian tolerance
+	bool	m_blaugon;	//!< augmented Lagrangian flag
 
 protected:
 	int		m_nID;	//!< ID of rigid joint

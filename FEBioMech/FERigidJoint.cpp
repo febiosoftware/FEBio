@@ -9,11 +9,12 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidJoint, FENLConstraint);
-	ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance");
-	ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "penalty"  );
-	ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"   );
-	ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"   );
-	ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint"    );
+	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"   );
+	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance");
+	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"  );
+	ADD_PARAMETER(m_nRBa   , FE_PARAM_INT   , "body_a"   );
+	ADD_PARAMETER(m_nRBb   , FE_PARAM_INT   , "body_b"   );
+	ADD_PARAMETER(m_q0     , FE_PARAM_VEC3D , "joint"    );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -22,6 +23,7 @@ FERigidJoint::FERigidJoint(FEModel* pfem) : FENLConstraint(pfem)
 	static int count = 1;
 	m_nID = count++;
 	m_binit = false;
+	m_blaugon = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -244,6 +246,9 @@ void FERigidJoint::StiffnessMatrix(FESolver* psolver)
 //-----------------------------------------------------------------------------
 bool FERigidJoint::Augment(int naug)
 {
+	// make sure we need to augment
+	if (!m_blaugon) return true;
+
 	vec3d ra, rb, qa, qb, c,  Lm;
 	double normF0, normF1;
 	bool bconv = true;
