@@ -8,12 +8,7 @@ FEBio can be downloaded from http://mrl.sci.utah.edu/software/febio.  Please inf
 FEBio Makefile Guide
 ********************
 
-FEBio comes with the default linear solver Skyline.  Instructions are included in the Makefile to add the SuperLU and Pardiso linear solvers.  In order to make FEBio from the source code, the makefile must be edited to link to the proper libraries, and then execute on the command line:
-make.
-
-SuperLU
-
-If you are using the MKL BLAS for SuperLU, edit the SuperLU Makefile and remove lsame.o from LAAUX (lsame.o is included in the MKL).  If you are not using the MKL, it is recommended that you get an optimized BLAS for your platform.  The documentation for SuperLU has some recommendations.
+FEBio comes with the default linear solver Skyline.  Instructions are included in the Makefile to add the Pardiso linear solver.  The source code download also contains Visual Studio and XCode configurations.
 
 febio.xml
 *********

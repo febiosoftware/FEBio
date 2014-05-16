@@ -1,3 +1,14 @@
+# ************************************  FEBio Makefile  *************************************
+#
+# The file Mkdir.bash needs to be run to create the directories of the configurations
+# you want to build.  For example, execute "./Mkdir.bash lnx64" to create the directories
+# for lnx64.  Then run "make lnx64" to build that configuration.
+# Several configurations are included in this directory.  All configurations except "sky"
+# assume that the Intel MKL is installed and that the environment variable MKLROOT is defined
+# (running # the Intel script "compilervars" will set the necessary environment variables).
+# sky: Compiles using g++ and uses the default skyline linear solver.  You will need to
+# edit febio.xml in the bin directory (replace "pardiso" with "skyline") to use this solver.
+
 FEBDIR = $(dir $(CURDIR))
 lnx64:  PLAT = lnx64
 lnx64d: PLAT = lnx64d
