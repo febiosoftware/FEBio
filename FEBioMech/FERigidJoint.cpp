@@ -126,8 +126,8 @@ void FERigidJoint::Residual(FEGlobalVector& R)
 	fb[4] = -a.z*m_F.x+a.x*m_F.z;
 	fb[5] = -a.x*m_F.y+a.y*m_F.x;
 
-	for (int i=0; i<6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] += fa[i];
-	for (int i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fb[i];
+	for (int i=0; i<6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] -= fa[i];
+	for (int i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] -= fb[i];
 }
 
 //-----------------------------------------------------------------------------
@@ -231,7 +231,7 @@ void FERigidJoint::StiffnessMatrix(FESolver* psolver)
 	for (j=0; j<12; ++j)
 		for (k=0; k<12; ++k)
 		{
-			ke[j][k] *= -m_eps;
+			ke[j][k] *= m_eps;
 		}
 
 	for (j=0; j<6; ++j)
