@@ -10,15 +10,16 @@ DEF = -DLINUX -DPARDISO -DHAVE_LEVMAR
 
 FLG = -O3 -fPIC -openmp -static-intel -no-intel-extensions
 
+#Intel Compiler
+INTELROOT = $(subst /mkl,,$(MKLROOT))/compiler
+INTEL_INC = $(INTELROOT)/include
+INTEL_LIB = $(INTELROOT)/lib/intel64
+
 # Pardiso solver
 MKL_PATH = $(MKLROOT)/lib/intel64
 MKL_LIB = -Wl,--start-group $(MKL_PATH)/libmkl_intel_lp64.a
 MKL_LIB += $(MKL_PATH)/libmkl_intel_thread.a $(MKL_PATH)/libmkl_core.a -Wl,--end-group
-MKL_LIB += -liomp5 -pthread
-
-#Intel Compiler
-INTELROOT = $(subst /mkl,,$(MKLROOT))
-INTEL_INC = $(INTELROOT)/compiler/include
+MKL_LIB += $(INTEL_LIB)/libiomp5.a -pthread
 
 # KeyGen
 KEYGEN = -lkeygen_$(PLAT)
