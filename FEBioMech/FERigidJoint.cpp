@@ -23,7 +23,7 @@ FERigidJoint::FERigidJoint(FEModel* pfem) : FENLConstraint(pfem)
 	static int count = 1;
 	m_nID = count++;
 	m_binit = false;
-	m_blaugon = false;
+	m_blaugon = true; // on by default for backward compatibility
 }
 
 //-----------------------------------------------------------------------------
