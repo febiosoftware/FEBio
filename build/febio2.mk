@@ -1,8 +1,8 @@
 include $(FEBDIR)/make.$(PLAT)
 
-SRC = $(wildcard ../*.cpp)
-OBJ = $(patsubst ../%.cpp, %.o, $(SRC))
-DEP = $(patsubst ../%.cpp, %.d, $(SRC))
+SRC = $(wildcard $(FEBDIR)/FEBio2/*.cpp)
+OBJ = $(patsubst $(FEBDIR)/FEBio2/%.cpp, %.o, $(SRC))
+DEP = $(patsubst $(FEBDIR)/FEBio2/%.cpp, %.d, $(SRC))
 
 TARGET =  $(FEBDIR)/bin/febio2.$(PLAT)
 
@@ -27,7 +27,7 @@ else
 	$(CC) -o $(TARGET) $(DEF) $(FLG) $(INC) $(OBJ) $(FELIBS) $(LIBS)
 endif
 
-%.o: ../%.cpp
+%.o: $(FEBDIR)/FEBio2/%.cpp
 	$(CC) $(INC) $(DEF) $(FLG) -MMD -c $<
 
 clean:
