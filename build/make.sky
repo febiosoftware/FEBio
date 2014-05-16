@@ -1,11 +1,9 @@
 # Make include file for FEBio on Linux
 
-CC = gcc
+CC = g++
 
 DEF = -DLINUX
 
-FLG = -O3 -fPIC -openmp
-
-LIBS = -L$(FEBDIR)/lib
+FLG = -O3 -fPIC
 
 INC = -I$(FEBDIR)

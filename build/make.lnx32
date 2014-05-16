@@ -21,11 +21,11 @@ MKL_LIB += $(MKL_PATH)/libmkl_intel_thread.a $(MKL_PATH)/libmkl_core.a -Wl,--end
 MKL_LIB += $(INTEL_LIB)/libiomp5.a -pthread
 
 # KeyGen
-KEYGEN = -L$(FEBIO)/lib -lkeygen_$(PLAT)
+KEYGEN = -L$(FEBIO)lib -lkeygen_$(PLAT)
 
 #Levmar library
 LEV_LIB = -llevmar_$(PLAT)
 
-LIBS = -L$(FEBDIR)/lib $(LEV_LIB) $(MKL_LIB)
+LIBS = -L$(FEBDIR)lib $(LEV_LIB) $(MKL_LIB)
 
-INC = -I$(INTEL_INC) -I $(FEBDIR) -I $(FEBDIR)/include
+INC = -I$(INTEL_INC) -I $(FEBDIR) -I $(FEBDIR)include
