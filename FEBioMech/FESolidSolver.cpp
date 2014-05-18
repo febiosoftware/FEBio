@@ -39,6 +39,8 @@ BEGIN_PARAMETER_LIST(FESolidSolver, FESolver)
 	ADD_PARAMETER(m_bfgs.m_maxref, FE_PARAM_INT   , "max_refs"    );
 	ADD_PARAMETER(m_bfgs.m_maxups, FE_PARAM_INT   , "max_ups"     );
 	ADD_PARAMETER(m_bfgs.m_cmax  , FE_PARAM_DOUBLE, "cmax"        );
+	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
+	ADD_PARAMETER(m_gamma        , FE_PARAM_DOUBLE, "gamma"       );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -58,6 +60,11 @@ FESolidSolver::FESolidSolver(FEModel* pfem) : FESolver(pfem)
 	m_pK = 0;
 	m_neq = 0;
 	m_plinsolve = 0;
+
+
+	// default Newmark parameters for unconditionally stable time integration
+	m_beta = 0.25;
+	m_gamma = 0.5;
 }
 
 //-----------------------------------------------------------------------------
@@ -519,13 +526,14 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 	{
 		int N = mesh.Nodes();
 		double dt = pstep->m_dt;
-		double a = 4.0 / dt;
+		double a = 1.0 / (m_beta*dt);
 		double b = a / dt;
+		double c = 1.0 - 0.5/m_beta;
 		for (i=0; i<N; ++i)
 		{
 			FENode& n = mesh.Node(i);
-			n.m_at = (n.m_rt - n.m_rp)*b - n.m_vp*a - n.m_ap;
-			n.m_vt = n.m_vp + (n.m_ap + n.m_at)*dt*0.5;
+			n.m_at = (n.m_rt - n.m_rp)*b - n.m_vp*a + n.m_ap*c;
+			n.m_vt = n.m_vp + (n.m_ap*m_gamma + n.m_at*(1.0 - m_gamma))*dt;
 		}
 	}
 }
@@ -1332,7 +1340,8 @@ bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 	if (pstep->m_nanalysis == FE_DYNAMIC)
 	{
 		// scale factor
-		double a = 4.0 / (pstep->m_dt*pstep->m_dt);
+		double dt = tp.dt;
+		double a = 1.0 / (m_beta*dt*dt);
 
 		// loop over all domains
 		for (i=0; i<mesh.Domains(); ++i) 
@@ -2170,8 +2179,9 @@ void FESolidSolver::InertialForces(FEGlobalVector& R)
 
 	// calculate F
 	double dt = m_fem.GetCurrentStep()->m_dt;
-	double a = 4.0 / dt;
+	double a = 1.0 / (m_beta*dt);
 	double b = a / dt;
+	double c = 1.0 - 0.5/m_beta;
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
@@ -2180,9 +2190,9 @@ void FESolidSolver::InertialForces(FEGlobalVector& R)
 		vec3d& vp = node.m_vp;
 		vec3d& ap = node.m_ap;
 
-		F[3*i  ] = b*(rt.x - rp.x) - a*vp.x - ap.x;
-		F[3*i+1] = b*(rt.y - rp.y) - a*vp.y - ap.y;
-		F[3*i+2] = b*(rt.z - rp.z) - a*vp.z - ap.z;
+		F[3*i  ] = b*(rt.x - rp.x) - a*vp.x + c * ap.x;
+		F[3*i+1] = b*(rt.y - rp.y) - a*vp.y + c * ap.y;
+		F[3*i+2] = b*(rt.z - rp.z) - a*vp.z + c * ap.z;
 	}
 
 	// now multiply F with the mass matrix

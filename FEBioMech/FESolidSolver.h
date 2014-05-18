@@ -129,6 +129,10 @@ public:
 	// equation numbers
 	int		m_nreq;			//!< start of rigid body equations
 
+	// Newmark parameters (for dynamic analyses)
+	double	m_beta;			//!< Newmark parameter beta (displacement integration)
+	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
+
 public:
 	vector<double> m_Fn;	//!< concentrated nodal force vector
 	vector<double> m_Fr;	//!< nodal reaction forces
