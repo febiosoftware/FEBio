@@ -44,6 +44,6 @@ public:
 	//! Calculate stiffness contribution of body forces
 	virtual void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) = 0;
 
-	//! calculate the inertial stiffness matrix (for dynamic problems)
-	virtual void InertialStiffness (FESolver* psolver) = 0;
+	//! calculate the mass matrix (for dynamic problems)
+	virtual void MassMatrix(FESolver* psolver, double scale) = 0;
 };

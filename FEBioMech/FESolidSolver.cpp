@@ -1327,13 +1327,18 @@ bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 		}
 	}
 
-	// Add inertial stiffness for dynamic problems
-	if (m_fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC)
+	// Add mass matrix for dynamic problems
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	if (pstep->m_nanalysis == FE_DYNAMIC)
 	{
+		// scale factor
+		double a = 4.0 / (pstep->m_dt*pstep->m_dt);
+
+		// loop over all domains
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
 			FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-			dom.InertialStiffness(this);
+			dom.MassMatrix(this, a);
 		}
 	}
 

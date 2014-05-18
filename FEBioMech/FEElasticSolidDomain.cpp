@@ -735,9 +735,12 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 
 //-----------------------------------------------------------------------------
 
-void FEElasticSolidDomain::InertialStiffness(FESolver* psolver)
+void FEElasticSolidDomain::MassMatrix(FESolver* psolver, double scale)
 {
 	FEModel& fem = psolver->GetFEModel();
+
+	// get the analysis
+	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	// element stiffness matrix
 	matrix ke;
@@ -755,7 +758,7 @@ void FEElasticSolidDomain::InertialStiffness(FESolver* psolver)
 		ke.zero();
 
 		// calculate inertial stiffness
-		ElementInertialStiffness(fem, el, ke);
+		ElementMassMatrix(el, ke, scale);
 
 		// get the element's LM vector
 		UnpackLM(el, lm);
@@ -824,25 +827,11 @@ void FEElasticSolidDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
 
 //-----------------------------------------------------------------------------
 //! calculates element inertial stiffness matrix
-void FEElasticSolidDomain::ElementInertialStiffness(FEModel& fem, FESolidElement& el, matrix& ke)
+void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, double a)
 {
-	int i, j, n;
-
-	// shape functions
-	double* H;
-
-	// jacobian
-	double J0;
-
-	// get the material
+	// get the material's density
 	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
-
-	// get the analysis
-	FEAnalysis* pstep = fem.GetCurrentStep();
-
-	double a = 4.0 / (pstep->m_dt*pstep->m_dt);
 	double d = pm->Density();
-	double kab;
 
 	// Get the current element's data
 	const int nint = el.GaussPoints();
@@ -852,15 +841,20 @@ void FEElasticSolidDomain::ElementInertialStiffness(FEModel& fem, FESolidElement
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
-	// calculate element stiffness matrix
-	for (n=0; n<nint; ++n)
+	// calculate element mass matrix
+	for (int n=0; n<nint; ++n)
 	{
-		H = el.H(n);
-		J0 = detJ0(el, n)*gw[n];
-		for (i=0; i<neln; ++i)
-			for (j=i; j<neln; ++j)
+		// shape functions
+		double* H = el.H(n);
+
+		// jacobian
+		double J0 = detJ0(el, n)*gw[n];
+
+		// loop over nodes
+		for (int i=0; i<neln; ++i)
+			for (int j=i; j<neln; ++j)
 			{
-				kab = a*H[i]*H[j]*J0*d;
+				double kab = a*H[i]*H[j]*J0*d;
 				ke[3*i  ][3*j  ] += kab;
 				ke[3*i+1][3*j+1] += kab;
 				ke[3*i+2][3*j+2] += kab;
@@ -870,8 +864,8 @@ void FEElasticSolidDomain::ElementInertialStiffness(FEModel& fem, FESolidElement
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only
 	// grabs elements from the upper diagonal matrix?
-	for (i=0; i<ndof; ++i)
-		for (j=i+1; j<ndof; ++j)
+	for (int i=0; i<ndof; ++i)
+		for (int j=i+1; j<ndof; ++j)
 			ke[j][i] = ke[i][j];
 
 }

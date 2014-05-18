@@ -43,7 +43,7 @@ public: // overloads from FEElasticDomain
 	void StiffnessMatrix(FESolver* psolver);
 
 	//! intertial stiffness matrix \todo implement this
-	void InertialStiffness(FESolver* psolver) { assert(false); }
+	void MassMatrix(FESolver* psolver, double scale) { assert(false); }
 
 	//! body force stiffness matrix \todo implement this
 	void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) { assert(false); }

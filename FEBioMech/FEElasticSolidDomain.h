@@ -51,7 +51,7 @@ public: // overrides from FEElasticDomain
 	void StiffnessMatrix(FESolver* psolver);
 
 	//! calculates inertial stiffness
-	void InertialStiffness(FESolver* psolver);
+	void MassMatrix(FESolver* psolver, double scale);
 
 	//! body force stiffness
 	void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf);
@@ -68,8 +68,8 @@ public:
 	//! material stiffness component
 	void ElementMaterialStiffness(FESolidElement& el, matrix& ke);
 
-	//! calculates the solid element inertial stiffness matrix
-	void ElementInertialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
+	//! calculates the solid element mass matrix
+	void ElementMassMatrix(FESolidElement& el, matrix& ke, double a);
 
 	//! calculates the stiffness matrix due to body forces 
 	void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke);
