@@ -8,7 +8,7 @@ FEBio can be downloaded from http://mrl.sci.utah.edu/software/febio.  Please inf
 FEBio Makefile Guide
 ********************
 
-FEBio comes with the default linear solver Skyline.  Instructions are included in the Makefile to add the Pardiso linear solver.  The source code download also contains Visual Studio and XCode configurations.
+FEBio comes with the default linear solver Skyline.  Instructions are included in build/Makefile to add the Pardiso linear solver.  The source code download also contains Visual Studio and XCode configurations.
 
 febio.xml
 *********

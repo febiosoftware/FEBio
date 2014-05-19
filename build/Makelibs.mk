@@ -7,7 +7,7 @@ SRC = $(wildcard $(FEBDIR)$(LIBDIR)/*.cpp)
 OBJ = $(patsubst $(FEBDIR)$(LIBDIR)/%.cpp, %.o, $(SRC))
 DEP = $(patsubst $(FEBDIR)$(LIBDIR)/%.cpp, %.d, $(SRC))
 
-LIB = $(FEBDIR)lib/lib$(FELIB)_$(PLAT).a
+LIB = $(FEBDIR)build/lib/lib$(FELIB)_$(PLAT).a
 
 $(LIB): $(OBJ)
 	ar -cvr $(LIB) $(OBJ)
