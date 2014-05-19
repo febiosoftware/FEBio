@@ -3,6 +3,7 @@
 #include "mat3d.h"
 #include "DumpFile.h"
 #include "DumpStream.h"
+#include "FEParameterList.h"
 #include <vector>
 using namespace std;
 
@@ -15,7 +16,7 @@ using namespace std;
 //! it contains the state information that is associated with the current
 //! point.
 
-class FEMaterialPoint
+class FEMaterialPoint : public FEParamContainer
 {
 public:
 	FEMaterialPoint(FEMaterialPoint* ppt = 0) : m_pt(ppt){}
@@ -24,15 +25,20 @@ public:
 	//! The init function is used to intialize data
 	virtual void Init(bool bflag) = 0;
 
+	//! copy material point data (for running restarts) \todo Is this still used?
 	virtual FEMaterialPoint* Copy() = 0;
 
-	virtual void Serialize(DumpFile& ar) = 0;
-
+	//! copy material point data (for running restarts) \todo Is this still used?
 	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
 
-	template <class T> T* ExtractData();
-
+	//! Get the material point data
 	virtual FEMaterialPoint* GetPointData(int i) { return this; }
+
+	//! Get the nested material point data
+	FEMaterialPoint* Next() { return m_pt; }
+
+	//! Extract data (\todo Is it safe for a plugin to use this function?)
+	template <class T> T* ExtractData();
 
 protected:
 	FEMaterialPoint*	m_pt;	//<! nested point data

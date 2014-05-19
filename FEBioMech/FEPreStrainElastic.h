@@ -25,6 +25,8 @@ public:
 
 public:
 	mat3d	m_Fp;	//!< prestrain deformation gradient
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
@@ -68,7 +70,7 @@ public:
 private:
 	FEElasticMaterial*	m_pmat;	//!< elastic base material
 
-	mat3d	m_Fp; //!< pre-strain deformationg gradient
+	mat3d	m_Fp; //!< pre-strain deformation gradient
 
 	DECLARE_PARAMETER_LIST();
 };

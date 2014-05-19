@@ -19,6 +19,8 @@ public:
 	double	m_ltrg;	//!< target fiber stretch
 	double	m_lam;	//!< in-situ fiber stretch
 	double	m_lamp;	//!< previous in-situ fiber stretch
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------

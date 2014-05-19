@@ -2,6 +2,11 @@
 #include "FEPreStrainElastic.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FEPreStrainMaterialPoint, FEMaterialPoint)
+	ADD_PARAMETER(m_Fp, FE_PARAM_MAT3D, "F0");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 //! Constructor
 FEPreStrainMaterialPoint::FEPreStrainMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt)
 {
@@ -12,7 +17,8 @@ FEPreStrainMaterialPoint::FEPreStrainMaterialPoint(FEMaterialPoint* pt) : FEMate
 //-----------------------------------------------------------------------------
 void FEPreStrainMaterialPoint::Init(bool bflag)
 {
-	if (bflag) m_Fp.unit();
+	// Don't init m_Fp here since this will overwrite the value
+	// read from the input file.
 }
 
 //-----------------------------------------------------------------------------

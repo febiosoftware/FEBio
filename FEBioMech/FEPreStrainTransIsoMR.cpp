@@ -2,6 +2,11 @@
 #include "FEPreStrainTransIsoMR.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FEFiberPreStretchMaterialPoint, FEMaterialPoint)
+	ADD_PARAMETER(m_ltrg, FE_PARAM_DOUBLE, "fiber_pre_stretch");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 FEFiberPreStretchMaterialPoint::FEFiberPreStretchMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) 
 {
 	m_ltrg = 0.0;
