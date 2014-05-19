@@ -1,4 +1,4 @@
-include ../../make.$(PLAT)
+include ../../$(PLAT).mk
 
 SRC = $(wildcard $(FEBDIR)FEBio2/*.cpp)
 OBJ = $(patsubst $(FEBDIR)FEBio2/%.cpp, %.o, $(SRC))

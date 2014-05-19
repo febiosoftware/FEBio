@@ -1,4 +1,4 @@
-include ../../make.$(PLAT)
+include ../../$(PLAT).mk
 
 LIBDIR = $(notdir $(CURDIR))
 FELIB = $(shell echo $(LIBDIR) | tr A-Z a-z)
