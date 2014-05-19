@@ -6,6 +6,10 @@
 # Several configurations are included in this directory.  All configurations except "sky"
 # assume that the Intel MKL is installed and that the environment variable MKLROOT is defined
 # (running # the Intel script "compilervars" will set the necessary environment variables).
+# They also assume that you are linking with the Lourakis levmar routine, which can be
+# downloaded at http://users.ics.forth.gr/~lourakis/levmar/.
+# The main configuration files are lnx64d, osxd, lnx32 and sky.  The other are derived from
+# those.
 # sky: Compiles using g++ and uses the default skyline linear solver.  You will need to
 # edit febio.xml in the bin directory (replace "pardiso" with "skyline") to use this solver.
 

@@ -2,9 +2,7 @@
 
 CC = icpc
 
-# Add DPRINTHB for matrix output
-# Compile with DNDEBUG for release version
-#DEF = -DLINUX -DPARDISO -DSUPERLU -DSVN -DFEBIO_LICENSE -DHAVE_LEVMAR -DNDEBUG
+# Remove -DHAVE_LEVMAR and $(LEV_LIB) from LIBS if not linking with the Lourakis levmar routine.
 DEF = -DLINUX -DPARDISO -DHAVE_LEVMAR
 
 FLG = -O3 -fPIC -openmp -static-intel -no-intel-extensions 
@@ -19,9 +17,6 @@ MKL_PATH = $(MKLROOT)/lib/ia32
 MKL_LIB = -Wl,--start-group $(MKL_PATH)/libmkl_intel.a
 MKL_LIB += $(MKL_PATH)/libmkl_intel_thread.a $(MKL_PATH)/libmkl_core.a -Wl,--end-group
 MKL_LIB += $(INTEL_LIB)/libiomp5.a -pthread
-
-# KeyGen
-KEYGEN = -L$(FEBIO)lib -lkeygen_$(PLAT)
 
 #Levmar library
 LEV_LIB = -llevmar_$(PLAT)
