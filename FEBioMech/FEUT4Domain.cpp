@@ -298,7 +298,7 @@ void FEUT4Domain::UpdateStresses(FEModel &fem)
 		// copy the orientation data of the first element adjacent to this node
 		// TODO: This will only really work when the fiber orientation field is
 		//       constant or sufficiently smooth.
-		pt.m_Q = m_NEL.ElementList(node.inode)[0]->m_State[0]->ExtractData<FEElasticMaterialPoint>()->m_Q;
+		pt.m_Q = m_NEL.ElementList(node.inode)[0]->GetMaterialPoint(0)->ExtractData<FEElasticMaterialPoint>()->m_Q;
 
 		// calculate the stress
 		node.si = pme->Stress(pt);
@@ -498,7 +498,7 @@ void FEUT4Domain::ElementInternalForces(FESolidElement& el, vector<double>& fe)
 	// repeat for all integration points
 	for (n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// calculate the jacobian
@@ -755,7 +755,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 	//       first element that connects to this node
 	FEElasticMaterialPoint pt;
 	pt.Init(true);
-	pt.m_Q = ppe[0]->m_State[0]->ExtractData<FEElasticMaterialPoint>()->m_Q;
+	pt.m_Q = ppe[0]->GetMaterialPoint(0)->ExtractData<FEElasticMaterialPoint>()->m_Q;
 
 	// set the material point data
 	pt.m_r0 = m_pMesh->Node(node.inode).m_r0;
@@ -1010,7 +1010,7 @@ void FEUT4Domain::ElementGeometricalStiffness(FESolidElement &el, matrix &ke)
 		}
 
 		// get the material point data
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// element's Cauchy-stress tensor at gauss point n
@@ -1094,7 +1094,7 @@ void FEUT4Domain::ElementMaterialStiffness(FEModel& fem, FESolidElement &el, mat
 
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// Calculate the tangent

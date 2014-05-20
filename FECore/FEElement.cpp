@@ -50,6 +50,22 @@ vec3d FEElement::Evaluate(vec3d* vn, int n)
 }
 
 //-----------------------------------------------------------------------------
+FEElement::FEElement() : m_pT(0) 
+{ 
+	static int n = 1;
+	m_nID = n++;
+	m_nrigid = -1; 
+}
+
+//-----------------------------------------------------------------------------
+void FEElement::SetTraits(FEElementTraits* ptraits)
+{
+	m_pT = ptraits;
+	m_node.resize(Nodes());
+	m_State.Create(GaussPoints());
+}
+
+//-----------------------------------------------------------------------------
 FESolidElement::FESolidElement(const FESolidElement& el)
 {
 	// set the traits of the element

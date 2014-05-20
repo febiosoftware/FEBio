@@ -681,7 +681,7 @@ double FESlidingInterface2::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 		if (biph)
 		{
 			// get a material point
-			FEMaterialPoint& mp = *pe->m_State[0];
+			FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
 			FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 			// setup the material point

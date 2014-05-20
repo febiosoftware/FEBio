@@ -29,7 +29,7 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 		{
 			for (int n=0; n<el.GaussPoints(); ++n)
 			{
-				FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
 				pt.m_Q = pmap->LocalElementCoord(el, n);
 			}
 		}
@@ -42,7 +42,7 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 			//		 would like pt.Q always to be initialized to a decent value.
 			if (dynamic_cast<FETransverselyIsotropic*>(m_pMat))
 			{
-				FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
+				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(0)->ExtractData<FEElasticMaterialPoint>();
 				mat3d& m = pt.m_Q;
 				if (fabs(m.det() - 1) > 1e-7)
 				{
@@ -151,7 +151,7 @@ void FEElasticShellDomain::ElementInternalForce(FEShellElement& el, vector<doubl
 	// repeat for all integration points
 	for (n=0; n<nint; ++n)
 	{
-		FEElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEElasticMaterialPoint>());
+		FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>());
 
 		// calculate the jacobian
 		detJt = invjact(el, Ji, n);
@@ -273,7 +273,7 @@ void FEElasticShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElement& el,
 
 	for (int n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 		pt.m_r0 = el.Evaluate(r0, n);
 		pt.m_rt = el.Evaluate(rt, n);
@@ -395,7 +395,7 @@ void FEElasticShellDomain::ElementStiffness(int iel, matrix& ke)
 	ke.zero();
 	for (n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *(el.m_State[n]);
+		FEMaterialPoint& mp = *(el.GetMaterialPoint(n));
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// calculate jacobian
@@ -641,7 +641,7 @@ void FEElasticShellDomain::ElementBodyForce(FEModel& fem, FEShellElement& el, ve
 
 			for (int n=0; n<nint; ++n)
 			{
-				FEMaterialPoint& mp = *el.m_State[n];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 				pt.m_r0 = el.Evaluate(r0, n);
 				pt.m_rt = el.Evaluate(rt, n);
@@ -705,7 +705,7 @@ void FEElasticShellDomain::UpdateStresses(FEModel &fem)
 		// the stress at the integration point
 		for (n=0; n<nint; ++n)
 		{
-			FEMaterialPoint& mp = *(el.m_State[n]);
+			FEMaterialPoint& mp = *(el.GetMaterialPoint(n));
 			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 			// material point coordinates

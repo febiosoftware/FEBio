@@ -30,7 +30,7 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 				
 				if (pt) ew += pt->m_pa;
@@ -66,7 +66,7 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 			ew = vec3d(0,0,0);
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 
 				if (pt) ew += pt->m_w;
@@ -110,7 +110,7 @@ bool FEPlotNodalFluidFlux::Save(FEDomain &dom, vector<float>& a)
 			double vi[3][FEElement::MAX_NODES];
 			for (j=0; j<nint; ++j)
 			{
-				FEBiphasicMaterialPoint* pt = el.m_State[j]->ExtractData<FEBiphasicMaterialPoint>(); assert(pt);
+				FEBiphasicMaterialPoint* pt = el.GetMaterialPoint(j)->ExtractData<FEBiphasicMaterialPoint>(); assert(pt);
 				vi[0][j] = pt->m_w.x;
 				vi[1][j] = pt->m_w.y;
 				vi[2][j] = pt->m_w.z;
@@ -151,7 +151,7 @@ bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_ca[0];
@@ -185,7 +185,7 @@ bool FEPlotActualSolConcentration_::Save(FEDomain &dom, vector<float>& a)
 			double ew = 0;
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_ca[0];
@@ -216,7 +216,7 @@ bool FEPlotActualSolConcentration_::Save(FEDomain &dom, vector<float>& a)
 			double ew = 0;
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_ca[sid];
@@ -247,7 +247,7 @@ bool FEPlotActualSolConcentration_::Save(FEDomain &dom, vector<float>& a)
 			double ew = 0;
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_ca[sid];
@@ -279,7 +279,7 @@ bool FEPlotSoluteFlux::Save(FEDomain &dom, vector<float>& a)
 			ew = vec3d(0,0,0);
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_j[0];
@@ -319,7 +319,7 @@ bool FEPlotSolFlux_::Save(FEDomain &dom, vector<float>& a)
 			vec3d ew = vec3d(0,0,0);
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_j[0];
@@ -357,7 +357,7 @@ bool FEPlotSolFlux_::Save(FEDomain &dom, vector<float>& a)
 			vec3d ew = vec3d(0,0,0);
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_j[sid];
@@ -395,7 +395,7 @@ bool FEPlotSolFlux_::Save(FEDomain &dom, vector<float>& a)
 			vec3d ew = vec3d(0,0,0);
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_j[sid];
@@ -435,7 +435,7 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_ca[0];
@@ -457,7 +457,7 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_ca[0] + pt->m_ca[1];
@@ -479,7 +479,7 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt)
@@ -519,7 +519,7 @@ bool FEPlotSBMConcentration_::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += pm->SBMConcentration(mp,sid);
@@ -551,7 +551,7 @@ bool FEPlotElectricPotential::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_psi;
@@ -573,7 +573,7 @@ bool FEPlotElectricPotential::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_psi;
@@ -606,7 +606,7 @@ bool FEPlotCurrentDensity::Save(FEDomain &dom, vector<float>& a)
 			ew = vec3d(0,0,0);
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_Ie;
@@ -634,7 +634,7 @@ bool FEPlotCurrentDensity::Save(FEDomain &dom, vector<float>& a)
 			ew = vec3d(0,0,0);
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_Ie;
@@ -671,7 +671,7 @@ bool FEPlotReferentialSolidVolumeFraction::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 				
 				if (pt) ew += pt->m_phi0;
@@ -703,7 +703,7 @@ bool FEPlotFixedChargeDensity::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_cF;
@@ -725,7 +725,7 @@ bool FEPlotFixedChargeDensity::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_cF;
@@ -757,10 +757,10 @@ bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
-                FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEElasticMaterialPoint*  ept = (mp.ExtractData<FEElasticMaterialPoint >());
                 FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
-				FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+				FESolutesMaterialPoint*  spt = (mp.ExtractData<FESolutesMaterialPoint >());
 				
 				if (spt) ew += (ept->m_J - bpt->m_phi0)*spt->m_cF/(1 - bpt->m_phi0);
 			}
@@ -781,10 +781,10 @@ bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
-                FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEElasticMaterialPoint*  ept = (mp.ExtractData<FEElasticMaterialPoint >());
                 FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
-				FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+				FESolutesMaterialPoint*  spt = (mp.ExtractData<FESolutesMaterialPoint >());
 				
 				if (spt) ew += (ept->m_J - bpt->m_phi0)*spt->m_cF/(1 - bpt->m_phi0);
 			}
@@ -936,7 +936,7 @@ bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_sbmr[0];
@@ -974,7 +974,7 @@ bool FEPlotSBMRefAppDensity_::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_sbmr[sid];
@@ -1016,7 +1016,7 @@ bool FEPlotEffectiveElasticity::Save(FEDomain &dom, vector<float>& a)
         // we output the average stress values of the gauss points
         for (int j=0; j<nint; ++j)
         {
-            FEMaterialPoint& pt = (*el.m_State[j]->ExtractData<FEMaterialPoint>());
+            FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
             if (pb) c = pb->Tangent(pt);
             else if (pbs) c = pbs->Tangent(pt);
             else if (ptp) c = ptp->Tangent(pt);

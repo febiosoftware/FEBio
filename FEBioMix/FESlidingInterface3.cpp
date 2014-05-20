@@ -746,7 +746,7 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 		if (bp)
 		{
 			// get a material point
-			FEMaterialPoint& mp = *pe->m_State[0];
+			FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
 			FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
 			
 			// setup the material point
@@ -769,7 +769,7 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 		else if (bps)
 		{
 			// get a material point
-			FEMaterialPoint& mp = *pe->m_State[0];
+			FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
 			FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
 			
 			// setup the material point
@@ -859,7 +859,7 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 		if (pbs)
 		{
 			// get a material point
-			FEMaterialPoint& mp = *pe->m_State[0];
+			FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
 			FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
 			
 			// setup the material point

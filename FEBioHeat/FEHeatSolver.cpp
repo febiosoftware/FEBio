@@ -261,7 +261,7 @@ void FEHeatSolver::Update(vector<double>& u)
 				// calculate heat flux for each integration point
 				for (int n=0; n<ni; ++n)
 				{
-					FEMaterialPoint& mp = *el.m_State[n];
+					FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 					FEHeatMaterialPoint* pt = (mp.ExtractData<FEHeatMaterialPoint>());
 					assert(pt);
 

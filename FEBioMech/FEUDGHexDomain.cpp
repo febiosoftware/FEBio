@@ -54,7 +54,7 @@ void FEUDGHexDomain::InternalForces(FEGlobalVector& R)
 void FEUDGHexDomain::UDGInternalForces(FESolidElement& el, vector<double>& fe)
 {
 	// get the stress data
-	FEMaterialPoint& mp = *el.m_State[0];
+	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
 	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 	mat3ds& s = pt.m_s;
 
@@ -343,7 +343,7 @@ void FEUDGHexDomain::UDGGeometricalStiffness(FESolidElement& el, matrix& ke)
 	double kab;
 
 	// get the material point data
-	FEMaterialPoint& mp = *el.m_State[0];
+	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
 	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 	// element's Cauchy-stress tensor at gauss point n
@@ -440,7 +440,7 @@ void FEUDGHexDomain::UDGMaterialStiffness(FESolidElement &el, matrix &ke)
 
 	// setup the material point
 	// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-	FEMaterialPoint& mp = *el.m_State[0];
+	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
 	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 	// get the 'D' matrix
@@ -539,7 +539,7 @@ void FEUDGHexDomain::UpdateStresses(FEModel &fem)
 		// is evaluated using an average deformation gradient.
 
 		// get the material point data
-		FEMaterialPoint& mp = *el.m_State[0];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(0);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// material point coordinates

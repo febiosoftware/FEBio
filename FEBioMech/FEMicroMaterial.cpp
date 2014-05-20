@@ -138,7 +138,7 @@ void FEMicroMaterial::PrepRVE()
 			ve = 0;
 			for (int n=0; n<nint; ++n)
 			{
-				FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
 				J = dom.detJt(el, n);
 
 				ve += J*w[n];

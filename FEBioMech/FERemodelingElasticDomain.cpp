@@ -20,7 +20,7 @@ void FERemodelingElasticDomain::Reset()
 		FESolidElement& el = m_Elem[i];
 		int n = el.GaussPoints();
 		for (int j=0; j<n; ++j) {
-			FERemodelingMaterialPoint& pt = *el.m_State[j]->ExtractData<FERemodelingMaterialPoint>();
+			FERemodelingMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FERemodelingMaterialPoint>();
 			pt.m_rhor = pme->Density();
 		}
 	}
@@ -42,7 +42,7 @@ bool FERemodelingElasticDomain::Initialize(FEModel &fem)
 		// initialize referential solid density
 		for (int n=0; n<el.GaussPoints(); ++n)
 		{
-			FERemodelingMaterialPoint& pt = *el.m_State[n]->ExtractData<FERemodelingMaterialPoint>();
+			FERemodelingMaterialPoint& pt = *el.GetMaterialPoint(n)->ExtractData<FERemodelingMaterialPoint>();
 			pt.m_rhor = pme->Density();
 		}
 	}
@@ -185,7 +185,7 @@ void FERemodelingElasticDomain::ElementDensityStiffness(FEModel& fem, FESolidEle
         }
             
         // get the material point data
-        FEMaterialPoint& mp = *el.m_State[n];
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         double drhohat = pmat->m_pSupp->Tangent_Supply_Density(mp);
         mat3ds ruhat = pmat->m_pSupp->Tangent_Supply_Strain(mp);
         mat3ds crho = pmat->Tangent_Stress_Density(mp);

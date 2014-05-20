@@ -99,7 +99,7 @@ void FECoupledHeatSolidSolver::CalculateInitialStresses()
 		{
 			// get the material point
 			// TODO: do I need to do anything to the material point?
-			FEMaterialPoint& mp = *el.m_State[j];
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 
 			// get the material tangent at this point
 			tens4ds C = pmat->Tangent(mp);

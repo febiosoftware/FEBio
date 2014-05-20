@@ -53,7 +53,7 @@ bool FETriphasicDomain::Initialize(FEModel &mdl)
 		// loop over the integration points
 		for (int n=0; n<nint; ++n)
 		{
-			FEMaterialPoint& mp = *el.m_State[n];
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
             FEElasticMaterialPoint& pm = *(mp.ExtractData<FEElasticMaterialPoint>());
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
@@ -119,7 +119,7 @@ void FETriphasicDomain::Reset()
 		// loop over the integration points
 		for (int n=0; n<nint; ++n)
 		{
-			FEMaterialPoint& mp = *el.m_State[n];
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
 			
@@ -158,7 +158,7 @@ void FETriphasicDomain::InitElements()
 		// loop over the integration points
 		for (int n=0; n<nint; ++n)
 		{
-			FEMaterialPoint& mp = *el.m_State[n];
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			
 			// reset referential solid volume fraction at previous time
@@ -512,9 +512,9 @@ bool FETriphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<doub
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEBiphasicMaterialPoint& ppt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
+		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -606,7 +606,7 @@ bool FETriphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<do
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FEBiphasicMaterialPoint& ppt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
+		FEBiphasicMaterialPoint& ppt = *(el.GetMaterialPoint(n)->ExtractData<FEBiphasicMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -694,10 +694,10 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<dou
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-		FESolutesMaterialPoint& spt = *(el.m_State[n]->ExtractData<FESolutesMaterialPoint>());
+		FESolutesMaterialPoint& spt = *(el.GetMaterialPoint(n)->ExtractData<FESolutesMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -870,7 +870,7 @@ bool FETriphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector<d
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
 		FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
 		
@@ -1177,7 +1177,7 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 		FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
@@ -1670,7 +1670,7 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 		FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
@@ -2123,7 +2123,7 @@ void FETriphasicDomain::ElementTriphasicMaterialStiffness(FESolidElement &el, ma
 		
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		
 		// evaluate concentration at gauss-point
 		FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
@@ -2266,7 +2266,7 @@ void FETriphasicDomain::UpdateElementStress(int iel)
 	// the stress at the integration point
 	for (int n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 			
 		// material point coordinates

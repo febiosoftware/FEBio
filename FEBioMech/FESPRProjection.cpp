@@ -92,7 +92,7 @@ void FESPRProjection::Project(FESolidDomain& dom, const vector< vector<double> >
 				int nint = el.GaussPoints();
 				for (int n=0; n<nint; ++n, ++m)
 				{
-					FEElasticMaterialPoint& ep = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+					FEElasticMaterialPoint& ep = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
 					vec3d r = ep.m_rt - rc;
 					pk[0] = 1.0; pk[1] = r.x; pk[2] = r.y; pk[3] = r.z;
 					if (NDOF >=  7) { pk[4] = r.x*r.y; pk[5] = r.y*r.z; pk[6] = r.x*r.z; }
@@ -121,7 +121,7 @@ void FESPRProjection::Project(FESolidDomain& dom, const vector< vector<double> >
 					int nint = el.GaussPoints();
 					for (int n=0; n<nint; ++n)
 					{
-						FEElasticMaterialPoint& ep = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+						FEElasticMaterialPoint& ep = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
 						vec3d r = ep.m_rt - rc;
 						pk[0] = 1.0; pk[1] = r.x; pk[2] = r.y; pk[3] = r.z;
 						if (NDOF >=  7) { pk[4] = r.x*r.y; pk[5] = r.y*r.z; pk[6] = r.x*r.z; }

@@ -44,7 +44,7 @@ double FELogElemFluidPressure::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEBiphasicMaterialPoint* ppt = el.m_State[i]->ExtractData<FEBiphasicMaterialPoint>();
+		FEBiphasicMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEBiphasicMaterialPoint>();
 		if (ppt) val += ppt->m_pa;
 	}
 	return val / (double) nint;
@@ -57,7 +57,7 @@ double FELogElemFluidFluxX::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEBiphasicMaterialPoint* ppt = el.m_State[i]->ExtractData<FEBiphasicMaterialPoint>();
+		FEBiphasicMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEBiphasicMaterialPoint>();
 		if (ppt) val += ppt->m_w.x;
 	}
 	return val / (double) nint;
@@ -70,7 +70,7 @@ double FELogElemFluidFluxY::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEBiphasicMaterialPoint* ppt = el.m_State[i]->ExtractData<FEBiphasicMaterialPoint>();
+		FEBiphasicMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEBiphasicMaterialPoint>();
 		if (ppt) val += ppt->m_w.y;
 	}
 	return val / (double) nint;
@@ -83,7 +83,7 @@ double FELogElemFluidFluxZ::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEBiphasicMaterialPoint* ppt = el.m_State[i]->ExtractData<FEBiphasicMaterialPoint>();
+		FEBiphasicMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEBiphasicMaterialPoint>();
 		if (ppt) val += ppt->m_w.z;
 	}
 	return val / (double) nint;
@@ -96,7 +96,7 @@ double FELogElemSoluteConcentration::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_ca[0];
 	}
 	return val / (double) nint;
@@ -109,7 +109,7 @@ double FELogElemSoluteFluxX::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_j[0].x;
 	}
 	return val / (double) nint;
@@ -122,7 +122,7 @@ double FELogElemSoluteFluxY::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_j[0].y;
 	}
 	return val / (double) nint;
@@ -135,7 +135,7 @@ double FELogElemSoluteFluxZ::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_j[0].z;
 	}
 	return val / (double) nint;
@@ -148,7 +148,7 @@ double FELogElemSoluteRefConcentration::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_sbmr[0];
 	}
 	return val / (double) nint;
@@ -161,7 +161,7 @@ double FELogElemSoluteConcentration_::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_ca[m_nsol];
 	}
 	return val / (double) nint;
@@ -174,7 +174,7 @@ double FELogElemSoluteFluxX_::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_j[m_nsol].x;
 	}
 	return val / (double) nint;
@@ -187,7 +187,7 @@ double FELogElemSoluteFluxY_::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_j[m_nsol].y;
 	}
 	return val / (double) nint;
@@ -200,7 +200,7 @@ double FELogElemSoluteFluxZ_::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_j[m_nsol].z;
 	}
 	return val / (double) nint;
@@ -213,7 +213,7 @@ double FELogElemElectricPotential::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_psi;
 	}
 	return val / (double) nint;
@@ -226,7 +226,7 @@ double FELogElemCurrentDensityX::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_Ie.x;
 	}
 	return val / (double) nint;
@@ -239,7 +239,7 @@ double FELogElemCurrentDensityY::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_Ie.y;
 	}
 	return val / (double) nint;
@@ -252,7 +252,7 @@ double FELogElemCurrentDensityZ::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_Ie.z;
 	}
 	return val / (double) nint;
@@ -265,7 +265,7 @@ double FELogElemSBMConcentration_::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		FESolutesMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FESolutesMaterialPoint>();
 		if (ppt) val += ppt->m_sbmr[m_nsol];
 	}
 	return val / (double) nint;

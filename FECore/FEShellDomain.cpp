@@ -10,7 +10,7 @@ void FEShellDomain::InitElements()
 	{
 		FEShellElement& el = m_Elem[i];
 		int n = el.GaussPoints();
-		for (int j=0; j<n; ++j) el.m_State[j]->Init(false);
+		for (int j=0; j<n; ++j) el.GetMaterialPoint(j)->Init(false);
 	}
 }
 
@@ -316,7 +316,7 @@ void FEShellDomain::ShallowCopy(DumpStream& dmp, bool bsave)
 	{
 		FEShellElement& el = m_Elem[i];
 		int nint = el.GaussPoints();
-		for (int j=0; j<nint; ++j) el.m_State[j]->ShallowCopy(dmp, bsave);
+		for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->ShallowCopy(dmp, bsave);
 	}
 }
 
@@ -337,7 +337,7 @@ void FEShellDomain::Serialize(DumpFile &ar)
 
 			ar << el.m_h0;
 
-			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
+			for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
 		}
 	}
 	else
@@ -362,7 +362,7 @@ void FEShellDomain::Serialize(DumpFile &ar)
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
 				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
-				el.m_State[j]->Serialize(ar);
+				el.GetMaterialPoint(j)->Serialize(ar);
 			}
 		}
 	}

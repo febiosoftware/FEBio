@@ -841,7 +841,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 				{
 					for (int i=0; i<pbe->GaussPoints(); ++i)
 					{
-						FEElasticMaterialPoint& pt = *pbe->m_State[i]->ExtractData<FEElasticMaterialPoint>();
+						FEElasticMaterialPoint& pt = *pbe->GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
 						mat3d& m = pt.m_Q;
 						m.zero();
 						m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
@@ -853,7 +853,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 				{
 					for (int i=0; i<pse->GaussPoints(); ++i)
 					{
-						FEElasticMaterialPoint& pt = *pse->m_State[i]->ExtractData<FEElasticMaterialPoint>();
+						FEElasticMaterialPoint& pt = *pse->GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
 						mat3d& m = pt.m_Q;
 						m.zero();
 						m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
@@ -892,7 +892,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 				{
 					for (int i=0; i<pbe->GaussPoints(); ++i)
 					{
-						FEElasticMaterialPoint& pt = *pbe->m_State[i]->ExtractData<FEElasticMaterialPoint>();
+						FEElasticMaterialPoint& pt = *pbe->GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
 						mat3d& m = pt.m_Q;
 						m.zero();
 						m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
@@ -904,7 +904,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 				{
 					for (int i=0; i<pse->GaussPoints(); ++i)
 					{
-						FEElasticMaterialPoint& pt = *pse->m_State[i]->ExtractData<FEElasticMaterialPoint>();
+						FEElasticMaterialPoint& pt = *pse->GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
 						mat3d& m = pt.m_Q;
 						m.zero();
 						m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
@@ -934,7 +934,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 				FESolidElement* pbe = dynamic_cast<FESolidElement*> (pe);
 				for (int i=0; i<pbe->GaussPoints(); ++i)
 				{
-					FEMaterialPoint* pt = pbe->m_State[i];
+					FEMaterialPoint* pt = pbe->GetMaterialPoint(i);
 					while (pt)
 					{
 						FEParameterList& pl = pt->GetParameterList();

@@ -59,7 +59,7 @@ void FEElasticTrussDomain::InitElements()
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FETrussElement& el = m_Elem[i];
-		el.m_State[0]->Init(false);
+		el.GetMaterialPoint(0)->Init(false);
 	}
 }
 
@@ -103,7 +103,7 @@ void FEElasticTrussDomain::ElementStiffness(int iel, matrix& ke)
 	double l = (rt[1] - rt[0]).norm();
 
 	// get the elastic tangent
-	FEMaterialPoint& mp = *el.m_State[0];
+	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
 	FETrussMaterialPoint& pt = *mp.ExtractData<FETrussMaterialPoint>();
 	double E = pm->Tangent(pt);
 
@@ -175,7 +175,7 @@ void FEElasticTrussDomain::InternalForces(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 void FEElasticTrussDomain::ElementInternalForces(FETrussElement& el, vector<double>& fe)
 {
-	FEMaterialPoint& mp = *el.m_State[0];
+	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
 	FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
 
 	// get the element's normal
@@ -227,7 +227,7 @@ void FEElasticTrussDomain::UpdateStresses(FEModel &fem)
 		FETrussElement& el = m_Elem[i];
 
 		// setup the material point
-		FEMaterialPoint& mp = *(el.m_State[0]);
+		FEMaterialPoint& mp = *(el.GetMaterialPoint(0));
 		FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
 
 		// nodal coordinates

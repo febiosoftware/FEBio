@@ -83,7 +83,7 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-		for (int n=0; n<el.GaussPoints(); ++n) SetLocalCoordinateSystem(el, n, *(el.m_State[n]), pme);
+		for (int n=0; n<el.GaussPoints(); ++n) SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)), pme);
 	}
 
 	return true;
@@ -112,14 +112,14 @@ void FEElasticSolidDomain::InitElements()
 			r0 = el.Evaluate(x0, j);
 			rt = el.Evaluate(xt, j);
 
-			FEMaterialPoint& mp = *el.m_State[j];
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 			pt.m_r0 = r0;
 			pt.m_rt = rt;
 
 			pt.m_J = defgrad(el, pt.m_F, j);
 
-			el.m_State[j]->Init(false);
+			mp.Init(false);
 		}
 	}
 }
@@ -214,7 +214,7 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 	// repeat for all integration points
 	for (n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// calculate the jacobian
@@ -314,7 +314,7 @@ void FEElasticSolidDomain::ElementBodyForce(FEBodyForce& BF, FESolidElement& el,
 	int nint = el.GaussPoints();
 	for (int n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 		pt.m_r0 = el.Evaluate(r0, n);
 		pt.m_rt = el.Evaluate(rt, n);
@@ -424,7 +424,7 @@ void FEElasticSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEle
 	int nint = el.GaussPoints();
 	for (int n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		detJ = detJ0(el, n)*gw[n];
 
 		// get the stiffness
@@ -502,7 +502,7 @@ void FEElasticSolidDomain::ElementGeometricalStiffness(FESolidElement &el, matri
 		}
 
 		// get the material point data
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// element's Cauchy-stress tensor at gauss point n
@@ -574,7 +574,7 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// get the 'D' matrix
@@ -931,7 +931,7 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, double dt)
 	// the stress at the integration point
 	for (int n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// material point coordinates

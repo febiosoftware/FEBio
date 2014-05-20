@@ -34,8 +34,8 @@ bool FEBiphasicSolidDomain::Initialize(FEModel &mdl)
 		// loop over the integration points
 		for (int n=0; n<nint; ++n)
 		{
-			FEMaterialPoint& mp = *el.m_State[n];
-            FEElasticMaterialPoint& pm = *(mp.ExtractData<FEElasticMaterialPoint>());
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+            FEElasticMaterialPoint&  pm = *(mp.ExtractData<FEElasticMaterialPoint >());
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			
             // initialize effective fluid pressure, its gradient, and fluid flux
@@ -76,7 +76,7 @@ void FEBiphasicSolidDomain::Reset()
 		// loop over the integration points
 		for (int n=0; n<nint; ++n)
 		{
-			FEMaterialPoint& mp = *el.m_State[n];
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			
 			// initialize referential solid volume fraction
@@ -294,9 +294,9 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWork(FESolidElement& el, vector<
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
-		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEBiphasicMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint >());
+		FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -392,9 +392,9 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWorkSS(FESolidElement& el, vecto
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
-		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEBiphasicMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint >());
+		FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -675,9 +675,9 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
-		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEBiphasicMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint >());
+		FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -868,8 +868,8 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
-		FEBiphasicMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -1058,7 +1058,7 @@ void FEBiphasicSolidDomain::ElementBiphasicMaterialStiffness(FESolidElement &el,
 
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// evaluate fluid pressure at gauss-point
@@ -1201,7 +1201,7 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 	// the stress at the integration point
 	for (int n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 			
 		// material point coordinates

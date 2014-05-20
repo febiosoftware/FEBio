@@ -236,7 +236,7 @@ void FE3FieldElasticSolidDomain::ElementMaterialStiffness(FEModel& fem, int iel,
 
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// get the material's tangent
@@ -369,7 +369,7 @@ void FE3FieldElasticSolidDomain::ElementGeometricalStiffness(int iel, matrix &ke
 		}
 
 		// get the material point data
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// element's Cauchy-stress tensor at gauss point n
@@ -466,7 +466,7 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel)
 	// the stress at the integration point
 	for (int n=0; n<nint; ++n)
 	{
-		FEMaterialPoint& mp = *el.m_State[n];
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// material point coordinates

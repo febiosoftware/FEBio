@@ -285,8 +285,7 @@ bool FEPlotElementStress::WriteSolidStress(FEElasticSolidDomain& d, vector<float
 		// we output the average stress values of the gauss points
 		for (int j=0; j<nint; ++j)
 		{
-			FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
-
+			FEElasticMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
 			if (ppt)
 			{
 				FEElasticMaterialPoint& pt = *ppt;
@@ -330,8 +329,7 @@ bool FEPlotElementStress::WriteShellStress(FEElasticShellDomain& d, vector<float
 		// we output the average stress values of the gauss points
 		for (int j=0; j<nint; ++j)
 		{
-			FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
-
+			FEElasticMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
 			if (ppt)
 			{
 				FEElasticMaterialPoint& pt = *ppt;
@@ -373,8 +371,7 @@ bool FEPlotElementStress::WriteLinearSolidStress(FELinearSolidDomain& d, vector<
 		// we output the average stress values of the gauss points
 		for (int j=0; j<nint; ++j)
 		{
-			FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
-
+			FEElasticMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
 			if (ppt)
 			{
 				FEElasticMaterialPoint& pt = *ppt;
@@ -441,7 +438,7 @@ bool FEPlotElementElasticity::WriteSolidElasticity(FEElasticSolidDomain& d, vect
 		// we output the average stress values of the gauss points
 		for (int j=0; j<nint; ++j)
 		{
-			FEMaterialPoint& pt = (*el.m_State[j]->ExtractData<FEMaterialPoint>());
+			FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
             c = pme->Tangent(pt);
             
             for (int k=0; k<21; ++k) s[k] += (float) (f*c.d[k]);
@@ -476,7 +473,7 @@ bool FEPlotElementElasticity::WriteShellElasticity(FEElasticShellDomain& d, vect
 		// we output the average stress values of the gauss points
 		for (int j=0; j<nint; ++j)
 		{
-			FEMaterialPoint& pt = (*el.m_State[j]->ExtractData<FEMaterialPoint>());
+			FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
             c = pme->Tangent(pt);
             
             for (int k=0; k<21; ++k) s[k] += (float) (f*c.d[k]);
@@ -512,7 +509,7 @@ bool FEPlotElementElasticity::WriteLinearSolidElasticity(FELinearSolidDomain& d,
 		// we output the average stress values of the gauss points
 		for (int j=0; j<nint; ++j)
 		{
-			FEMaterialPoint& pt = (*el.m_State[j]->ExtractData<FEMaterialPoint>());
+			FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
             c = pme->Tangent(pt);
             
             for (int k=0; k<21; ++k) s[k] += (float) (f*c.d[k]);
@@ -541,7 +538,7 @@ bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FERemodelingMaterialPoint* pt = (mp.ExtractData<FERemodelingMaterialPoint>());
 				
 				if (pt) ew += pt->m_sed;
@@ -572,7 +569,7 @@ bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FERemodelingMaterialPoint* rpt = (mp.ExtractData<FERemodelingMaterialPoint>());
 				
 				if (rpt) ew += rpt->m_sed/rpt->m_rhor;
@@ -603,7 +600,7 @@ bool FEPlotDensity::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FERemodelingMaterialPoint* pt = (mp.ExtractData<FERemodelingMaterialPoint>());
 				if (pt) ew += pt->m_rhor;
 			}
@@ -634,7 +631,7 @@ bool FEPlotRelativeVolume::Save(FEDomain &dom, vector<float>& a)
 			ew = 0;
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FEElasticMaterialPoint* pt = (mp.ExtractData<FEElasticMaterialPoint>());
 				
 				if (pt) ew += pt->m_J;
@@ -666,7 +663,7 @@ bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 			r = vec3d(0,0,0);
 			for (j=0; j<n; ++j)
 			{
-				FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
 				vec3d ri;
 				ri.x = pt.m_Q[0][0];
 				ri.y = pt.m_Q[1][0];
@@ -727,7 +724,7 @@ bool FEPlotDamage::Save(FEDomain &m, vector<float>& a)
 			int nint = el.GaussPoints();
 			for (int j=0; j<nint; ++j)
 			{
-				FEDamageMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEDamageMaterialPoint>());
+				FEDamageMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEDamageMaterialPoint>());
 
 				if (ppt)
 				{
@@ -735,7 +732,7 @@ bool FEPlotDamage::Save(FEDomain &m, vector<float>& a)
 					D += (float) pt.m_D;
 				}
 
-				FETIMRDamageMaterialPoint* pt2 = (el.m_State[j]->ExtractData<FETIMRDamageMaterialPoint>());
+				FETIMRDamageMaterialPoint* pt2 = (el.GetMaterialPoint(j)->ExtractData<FETIMRDamageMaterialPoint>());
 				if (pt2)
 				{
 					D += (float) pt2->m_Df;
@@ -767,7 +764,7 @@ bool FEPlotMixtureVolumeFraction::Save(FEDomain &m, std::vector<float> &a)
 		int nint = e.GaussPoints();
 		for (int n=0; n<nint; ++n)
 		{
-			FEElasticMixtureMaterialPoint& pt = *e.m_State[n]->ExtractData<FEElasticMixtureMaterialPoint>();
+			FEElasticMixtureMaterialPoint& pt = *e.GetMaterialPoint(n)->ExtractData<FEElasticMixtureMaterialPoint>();
 			s += (float) pt.m_w[0];
 		}
 
@@ -812,9 +809,9 @@ bool FEPlotShellStrain::Save(FEDomain &dom, std::vector<float> &a)
 		mat3ds E; E.zero();
 		for (int j=0; j<ni; ++j)
 		{
-			FEElasticMaterialPoint& ptm = *(el.m_State[j + ni]->ExtractData<FEElasticMaterialPoint>());
-			FEElasticMaterialPoint& pti = *(el.m_State[j     ]->ExtractData<FEElasticMaterialPoint>());
-			FEElasticMaterialPoint& pto = *(el.m_State[j+2*ni]->ExtractData<FEElasticMaterialPoint>());
+			FEElasticMaterialPoint& ptm = *(el.GetMaterialPoint(j + ni)->ExtractData<FEElasticMaterialPoint>());
+			FEElasticMaterialPoint& pti = *(el.GetMaterialPoint(j     )->ExtractData<FEElasticMaterialPoint>());
+			FEElasticMaterialPoint& pto = *(el.GetMaterialPoint(j+2*ni)->ExtractData<FEElasticMaterialPoint>());
 
 			E += ptm.Strain();
 			E += pto.Strain();
@@ -861,7 +858,7 @@ bool FEPlotFiberPreStretch::Save(FEDomain& dom, vector<float>& a)
 		double lam = 0.0;
 		for (int j=0; j<nint; ++j)
 		{
-			FEMaterialPoint& mp = *e.m_State[j]->GetPointData(0);
+			FEMaterialPoint& mp = *e.GetMaterialPoint(j)->GetPointData(0);
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 			FEFiberPreStretchMaterialPoint& psp = *mp.ExtractData<FEFiberPreStretchMaterialPoint>();
 			mat3d& F = pt.m_F;
@@ -917,7 +914,7 @@ bool FEPlotSPRStresses::Save(FEDomain& dom, vector<float>& a)
 			int nint = el.GaussPoints();
 			for (int j=0; j<nint; ++j)
 			{
-				FEElasticMaterialPoint& ep = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+				FEElasticMaterialPoint& ep = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
 				mat3ds& s = ep.m_s;
 				ED[i][j] = s(LUT[n][0], LUT[n][1]);
 			}
@@ -976,7 +973,7 @@ bool FEPlotSPRPrincStresses::Save(FEDomain& dom, vector<float>& a)
 			int nint = el.GaussPoints();
 			for (int j=0; j<nint; ++j)
 			{
-				FEElasticMaterialPoint& ep = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+				FEElasticMaterialPoint& ep = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
 				mat3ds& s = ep.m_s;
 				double l[3];
 				s.exact_eigen(l);
@@ -1034,7 +1031,7 @@ bool FEPlotSPRTestLinear::Save(FEDomain& dom, vector<float>& a)
 			int nint = el.GaussPoints();
 			for (int j=0; j<nint; ++j)
 			{
-				FEElasticMaterialPoint& ep = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+				FEElasticMaterialPoint& ep = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
 				vec3d r = ep.m_rt;
 				double l[3] = {r.x, r.y, r.z};
 				ED[i][j] = l[n];
@@ -1091,7 +1088,7 @@ bool FEPlotSPRTestQuadratic::Save(FEDomain& dom, vector<float>& a)
 			int nint = el.GaussPoints();
 			for (int j=0; j<nint; ++j)
 			{
-				FEElasticMaterialPoint& ep = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+				FEElasticMaterialPoint& ep = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
 				vec3d r = ep.m_rt;
 				double l[6] = {r.x*r.x, r.y*r.y, r.z*r.z, r.x*r.y, r.y*r.z, r.x*r.z};
 				ED[i][j] = l[n];

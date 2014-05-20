@@ -58,31 +58,22 @@ public:
 	enum {MAX_INTPOINTS = 27};	// max nr of integration points
 
 public:
-	// default constructor
-	FEElement() : m_pT(0) 
-	{ 
-		static int n = 1;
-		m_nID = n++;
-		m_nrigid = -1; 
-	}
+	//! default constructor
+	FEElement();
 
+	//! destructor
 	virtual ~FEElement() {}
 
-	bool IsRigid() { return (m_nrigid >= 0); }
+	//! Set the type of the element
+	void SetType(int ntype) { FEElementLibrary::SetElementTraits(*this, ntype); }
 
-	// Set the traits of an element
-	virtual void SetTraits(FEElementTraits* ptraits)
-	{
-		m_pT = ptraits;
-		m_node.resize(Nodes());
-		m_State.Create(GaussPoints());
-	}
+	//! Set the traits of an element
+	virtual void SetTraits(FEElementTraits* ptraits);
 
-	int GaussPoints() const { return m_pT->nint; } 
+	//! return number of nodes
 	int Nodes() const { return m_pT->neln; } 
 
-	double* H(int n) { return m_pT->H[n]; }		// shape function values
-
+	//! return the type of element
 	int Type() const { return m_pT->m_ntype; } 
 
 	//! Get the element's material ID
@@ -91,13 +82,20 @@ public:
 	//! Set the element's material ID
 	void SetMatID(int id) { m_mat = id; }
 
-	//! Set the type of the element
-	void SetType(int ntype)
-	{
-		FEElementLibrary::SetElementTraits(*this, ntype);
-	}
+	//! returs if the element is part of a rigid body \todo I may not need this function anymore
+	bool IsRigid() { return (m_nrigid >= 0); }
 
+	//! return number of integration points
+	int GaussPoints() const { return m_pT->nint; } 
+
+	//! Get the material point data
+	FEMaterialPoint* GetMaterialPoint(int n) { return m_State[n]; }
+
+	//! set the material point data
 	void SetMaterialPointData(FEMaterialPoint* pmp, int n) { m_State[n] = pmp; }
+
+	//! shape function values
+	double* H(int n) { return m_pT->H[n]; }
 
 	//! evaluate scalar field at integration point
 	double Evaluate(double* fn, int n);
@@ -112,11 +110,11 @@ protected:
 	int		m_mat;		//!< material index
 
 public:
+	int				m_nrigid;	//!< rigid body number that this element is attached to
+	int				m_nID;		//!< element ID
+	vector<int>		m_node;		//!< connectivity
 
-	int		m_nrigid;		//!< rigid body number that this element is attached to
-	int		m_nID;			//!< element ID
-
-	vector<int>			m_node;		//!< connectivity
+protected:
 	FEElementState		m_State;	//!< element state data
 	FEElementTraits*	m_pT;		//!< pointer to element traits
 };

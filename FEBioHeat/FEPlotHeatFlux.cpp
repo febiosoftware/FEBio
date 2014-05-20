@@ -18,7 +18,7 @@ bool FEPlotHeatFlux::Save(FEDomain &dom, vector<float>& a)
 			vec3d ew = vec3d(0,0,0);
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
-				FEMaterialPoint& mp = *el.m_State[j];
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FEHeatMaterialPoint* pt = (mp.ExtractData<FEHeatMaterialPoint>());
 				if (pt) ew += pt->m_q;
 			}
