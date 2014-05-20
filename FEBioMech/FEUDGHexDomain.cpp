@@ -179,44 +179,6 @@ void FEUDGHexDomain::UDGHourglassForces(FESolidElement &el, vector<double> &fe)
 	}
 }
 
-
-//-----------------------------------------------------------------------------
-/*
-void FEUDGHexDomain::StiffnessMatrix(FESolver* psolver)
-{
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
-
-	// element stiffness matrix
-	matrix ke;
-
-	vector<int> lm;
-
-	// repeat over all solid elements
-	int NE = m_Elem.size();
-	for (int iel=0; iel<NE; ++iel)
-	{
-		FESolidElement& el = m_Elem[iel];
-
-		// create the element's stiffness matrix
-		int ndof = 3*el.Nodes();
-		ke.resize(ndof, ndof);
-		ke.zero();
-
-		// calculate the element stiffness matrix
-		UDGElementStiffness(fem, el, ke);
-
-		// add the inertial stiffness for dynamics
-		if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
-
-		// get the element's LM vector
-		UnpackLM(el, lm);
-
-		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, lm, ke);
-	}
-}
-*/
-
 void FEUDGHexDomain::StiffnessMatrix(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
