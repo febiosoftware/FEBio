@@ -583,6 +583,16 @@ bool FEModel::Reset()
 }
 
 //-----------------------------------------------------------------------------
+//! Get the current time information.
+FETimePoint FEModel::GetCurrentTime()
+{
+	FETimePoint pt;
+	pt.t = m_ftime;
+	pt.dt = GetCurrentStep()->m_dt;
+	return pt;
+}
+
+//-----------------------------------------------------------------------------
 //! This function is used when pushing the FEM state data. Since we don't need
 //! to copy all the data, this function only copies the data that needs to be 
 //! restored for a running restart.

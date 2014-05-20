@@ -23,9 +23,6 @@ public:
 
 	// --- R E S I D U A L ---
 
-	// calculate total residual (TODO: remove this)
-//	virtual void Residual(FESolver* psolver, vector<double>& R) = 0;
-
 	//! calculate the internal forces
 	virtual void InternalForces(FEGlobalVector& R) = 0;
 

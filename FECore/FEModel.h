@@ -13,6 +13,7 @@
 #include "DumpStream.h"
 #include "DataStore.h"
 #include "FEGlobalData.h"
+#include "FETypes.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -167,6 +168,9 @@ public: // --- Analysis steps functions ---
 
 	//! Set the current step
 	void SetCurrentStep(FEAnalysis* pstep) { m_pStep = pstep; }
+
+	//! Get the current time
+	FETimePoint GetCurrentTime();
 
 public: // --- Contact interface functions ---
 
