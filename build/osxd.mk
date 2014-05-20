@@ -20,4 +20,4 @@ LEV_LIB = -llevmar_$(PLAT)
 
 LIBS = -L$(FEBDIR)build/lib $(LEV_LIB) $(MKL_LIB)
 
-INC = -I$(INTEL_INC) -I$(FEBDIR) -I$(FEBDIR)include -I/usr/include/c++/4.2.1
+INC = -I$(INTEL_INC) -I$(FEBDIR) -I$(FEBDIR)build/include
