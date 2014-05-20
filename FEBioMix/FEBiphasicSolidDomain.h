@@ -32,10 +32,7 @@ public: // overrides from FEElasticDomain
 	//! calculates the global stiffness matrix (steady-state case)
 	void StiffnessMatrixSS(FESolver* psolver, bool bsymm, double dt);
 	
-	//! calculates the residual
-//	void Residual(FESolver* psolver, vector<double>& R);
-
-public: // TODO: The following functions are to replace Residual
+public:
 
 	//! internal fluid work
 	void InternalFluidWork(vector<double>& R, double dt);

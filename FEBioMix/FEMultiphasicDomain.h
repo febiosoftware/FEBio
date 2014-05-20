@@ -25,9 +25,6 @@ public:
 	//! calculates the global stiffness matrix for this domain (steady-state case)
 	void StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp);
 	
-	//! calculates the residual
-//	void Residual(FESolidSolver* psolver, vector<double>& R);
-	
 	//! initialize class
 	bool Initialize(FEModel& fem);
 	
@@ -37,13 +34,6 @@ public:
 	// update element state data
 	void UpdateElementStress(int iel, double dt);
 
-/*	
-	//! return element stiffness matrix
-	void ElementStiffness(FEM& fem, int iel, matrix& ke) {
-		FESolidElement& el = Element(iel);
-		ElementMultiphasicStiffness(fem, el, ke);
-	}
-*/	
 public:
 	// internal fluid work
 	void InternalFluidWork(vector<double>& R, double dt);
@@ -82,30 +72,4 @@ public:
 	
 	//! material stiffness component
 	void ElementMultiphasicMaterialStiffness(FESolidElement& el, matrix& ke);
-/*
-protected:
-	//! Calculates the internal fluid forces
-	bool InternalFluidWork(FEM& fem, FESolidElement& elem, vector<double>& fe);
-	
-	//! Calculates the internal fluid forces for steady-state response
-	bool InternalFluidWorkSS(FEM& fem, FESolidElement& elem, vector<double>& fe);
-	
-	//! Calculates the internal solute forces
-	bool InternalSoluteWork(FEM& fem, FESolidElement& elem, vector<double>& fe, const int ion);
-	
-	//! Calculates the internal solute forces for steady-state response
-	bool InternalSoluteWorkSS(FEM& fem, FESolidElement& elem, vector<double>& fe, const int ion);
-	
-	//! calculates the element triphasic stiffness matrix
-	bool ElementMultiphasicStiffness(FEM& fem, FESolidElement& el, matrix& ke);
-	
-	//! calculates the element triphasic stiffness matrix
-	bool ElementMultiphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke);
-	
-	//! calculates the solid element stiffness matrix for steady-state response
-	void SolidElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
-	
-	//! material stiffness component
-	void MultiphasicMaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
-*/	
 };
