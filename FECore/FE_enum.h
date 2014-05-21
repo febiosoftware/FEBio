@@ -152,11 +152,11 @@ enum FE_Rigid_Surface_Type {
 ///////////////////////////////////////////////////////////////////////////////
 
 enum FE_Plot_Level {
-	FE_PLOT_NEVER,
-	FE_PLOT_MAJOR_ITRS,
-	FE_PLOT_MINOR_ITRS,
-	FE_PLOT_MUST_POINTS,
-	FE_PLOT_FINAL
+	FE_PLOT_NEVER,			// don't output anything
+	FE_PLOT_MAJOR_ITRS,		// only output major iterations (i.e. converged time steps)
+	FE_PLOT_MINOR_ITRS,		// output minor iterations (i.e. every Newton iteration)
+	FE_PLOT_MUST_POINTS,	// output only on must-points
+	FE_PLOT_FINAL,			// only output final converged state
 };
 
 ///////////////////////////////////////////////////////////////////////////////

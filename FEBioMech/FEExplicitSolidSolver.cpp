@@ -342,7 +342,7 @@ void FEExplicitSolidSolver::Update(vector<double>& ui)
 	}
 
 	// dump all states to the plot file when requested
-	if (m_fem.GetCurrentStep()->m_nplot == FE_PLOT_MINOR_ITRS) m_fem.Write();
+	if (m_fem.GetCurrentStep()->GetPlotLevel() == FE_PLOT_MINOR_ITRS) m_fem.Write();
 }
 
 

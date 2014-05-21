@@ -46,6 +46,7 @@ FEAnalysis::FEAnalysis(FEModel* pfem, int ntype) : FECoreBase(FEANALYSIS_ID), m_
 	bool bdebug = m_fem.GetDebugFlag();
 	m_nplot  = (bdebug?FE_PLOT_MINOR_ITRS     : FE_PLOT_MAJOR_ITRS );
 	m_nprint = (bdebug?FE_PRINT_MINOR_ITRS_EXP: FE_PRINT_MINOR_ITRS);
+	m_nplot_stride = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -216,6 +217,10 @@ bool FEAnalysis::Solve()
 	// dump stream for running restarts
 	DumpStream dmp;
 
+	// Flag used to note whether the last converged time step was plotted.
+	// This is used by to make sure that the final time step is stored to the plot file.
+	bool bplot = false;
+
 	// repeat for all timesteps
 	m_nretries = 0;
 	while (endtime - m_fem.m_ftime > eps)
@@ -318,14 +323,18 @@ bool FEAnalysis::Solve()
 			m_ntimesteps++;
 
 			// output results to plot database
+			bplot = false;
 			if ((m_nplot != FE_PLOT_NEVER) && (m_nplot != FE_PLOT_FINAL))
 			{
 				if ((m_nplot == FE_PLOT_MUST_POINTS) && (m_nmplc >= 0))
 				{
 					FELoadCurve& lc = *m_fem.GetLoadCurve(m_nmplc);
-					if (lc.HasPoint(m_fem.m_ftime)) m_fem.Write();
+					if (lc.HasPoint(m_fem.m_ftime)) { m_fem.Write(); bplot = true; }
 				}
-				else m_fem.Write();
+				else
+				{
+					if (m_ntimesteps % m_nplot_stride == 0) { m_fem.Write(); bplot = true; }
+				}
 			}
 
 			// Dump converged state to the archive
@@ -380,7 +389,11 @@ bool FEAnalysis::Solve()
 		felog.flush();
 	}
 
-	if ((m_nplot == FE_PLOT_FINAL) && bconv) m_fem.Write();
+	// write the final time step, if it hasn't been written yet.
+	if (m_nplot != FE_PLOT_NEVER)
+	{
+		if (bconv && (bplot == false)) m_fem.Write();
+	}
 
 	m_fem.m_ftime0 = m_fem.m_ftime;
 
@@ -551,6 +564,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		ar << m_nplot;
 		ar << m_nprint;
 		ar << m_bDump;
+		ar << m_nplot_stride;
 
 		// boundary conditions
 		ar << (int) m_BC.size();
@@ -593,6 +607,8 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		ar >> m_nplot;
 		ar >> m_nprint;
 		ar >> m_bDump;
+		ar >> m_nplot_stride;
+
 #ifdef _DEBUG
 		m_bDump = false;
 #endif

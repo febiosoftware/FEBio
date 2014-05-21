@@ -97,7 +97,7 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	fem.AddCallback(fecb, CB_MAJOR_ITERS, &opt);
 
 	// don't plot anything
-	fem.GetCurrentStep()->m_nplot = FE_PLOT_NEVER;
+	fem.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
 
 	// set the this pointer
 	m_pThis = this;

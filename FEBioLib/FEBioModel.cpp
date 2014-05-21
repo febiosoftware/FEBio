@@ -1107,7 +1107,7 @@ bool FEBioModel::Init()
 	FEModel::Init();
 
 	// open plot database file
-	if (m_pStep->m_nplot != FE_PLOT_NEVER)
+	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER)
 	{
 		if (m_plot == 0) 
 		{
@@ -1126,7 +1126,7 @@ bool FEBioModel::Init()
 	// Therefor we can output those results here.
 	// TODO: Offcourse we should actually check if this is indeed
 	//       the case, otherwise we should also solve for t=0
-	if (m_pStep->m_nplot != FE_PLOT_NEVER) m_plot->Write(*this);
+	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER) m_plot->Write(*this);
 
 	// do the callback
 	DoCallback(CB_MAJOR_ITERS);
@@ -1145,7 +1145,7 @@ bool FEBioModel::Reset()
 	FEModel::Reset();
 
 	// open plot database file
-	if (m_pStep->m_nplot != FE_PLOT_NEVER)
+	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER)
 	{
 		if (m_plot == 0) 
 		{
@@ -1164,7 +1164,7 @@ bool FEBioModel::Reset()
 	// Therefor we can output those results here.
 	// Offcourse we should actually check if this is indeed
 	// the case, otherwise we should also solve for t=0
-	if (m_pStep->m_nplot != FE_PLOT_NEVER) m_plot->Write(*this);
+	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER) m_plot->Write(*this);
 /*
 	// reset the log file
 	if (!log.is_valid())

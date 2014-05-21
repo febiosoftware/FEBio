@@ -75,6 +75,9 @@ public:
 	//! sets the plot level
 	void SetPlotLevel(int n) { m_nplot = n; }
 
+	//! sets the plot stride
+	void SetPlotStride(int n) { m_nplot_stride = n; }
+
 	//! get the plot level
 	int GetPlotLevel() { return m_nplot; }
 
@@ -139,9 +142,10 @@ public:
 
 	// --- I/O Data ---
 	//{
-		int		m_nprint;	//!< print level
-		int		m_nplot;	//!< plot level
-		bool	m_bDump;	//!< create a restart file or not
+		int		m_nprint;		//!< print level
+		int		m_nplot;		//!< plot level
+		int		m_nplot_stride;	//!< stride for plotting
+		bool	m_bDump;		//!< create a restart file or not
 	//}
 
 protected:

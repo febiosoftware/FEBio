@@ -130,6 +130,13 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 		else if (strcmp(szval, "PLOT_FINAL"      ) == 0) pstep->SetPlotLevel(FE_PLOT_FINAL);
 		else throw XMLReader::InvalidValue(tag);
 	}
+	else if (tag == "plot_stride")
+	{
+		int n;
+		tag.value(n);
+		if (n<=0) n = 1;
+		pstep->SetPlotStride(n);
+	}
 	else if (tag == "print_level")
 	{
 		char szval[256];
