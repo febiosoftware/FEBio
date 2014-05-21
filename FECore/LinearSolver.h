@@ -1,9 +1,7 @@
 #pragma once
 
 #include "SparseMatrix.h"
-#include "matrix.h"
 #include <vector>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 //! Different matrix types. This is used when requesting a sparse matrix format
@@ -41,7 +39,7 @@ public:
 	virtual bool Factor() = 0;
 
 	//! do a backsolve, i.e. solve for a right-hand side vector b (must be overridden)
-	virtual bool BackSolve(vector<double>& x, vector<double>& b) = 0;
+	virtual bool BackSolve(std::vector<double>& x, std::vector<double>& b) = 0;
 
 	//! Do any cleanup
 	virtual void Destroy();
