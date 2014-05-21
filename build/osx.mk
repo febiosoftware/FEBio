@@ -1,6 +1,6 @@
 # Make include file for FEBio on Mac
 
-include $(FEBDIR)build/make.osxd
+include $(FEBDIR)build/osxd.mk
 
 DEF += -DNDEBUG
 
