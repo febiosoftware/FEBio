@@ -6,6 +6,18 @@ void colsol_factor(int N, double* values, int* pointers);
 void colsol_solve (int N, double* values, int* pointers, double* R);
 
 //-----------------------------------------------------------------------------
+SkylineSolver::SkylineSolver() : m_pA(0)
+{
+}
+
+//-----------------------------------------------------------------------------
+//! Create a sparse matrix
+SparseMatrix* SkylineSolver::CreateSparseMatrix(Matrix_Type ntype)
+{ 
+	return (m_pA = (ntype == SPARSE_SYMMETRIC? new SkylineMatrix() : 0)); 
+}
+
+//-----------------------------------------------------------------------------
 bool SkylineSolver::PreProcess()
 {
 	// We don't need to do any preprocessing for this solver
@@ -15,31 +27,18 @@ bool SkylineSolver::PreProcess()
 //-----------------------------------------------------------------------------
 bool SkylineSolver::Factor()
 {
-	// Let's make sure the matrix K is of the correct type
-	SkylineMatrix* pK = dynamic_cast<SkylineMatrix*> (m_pA);
-	assert(pK);
-
-	colsol_factor(pK->Size(), pK->values(), pK->pointers());
+	colsol_factor(m_pA->Size(), m_pA->values(), m_pA->pointers());
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 bool SkylineSolver::BackSolve(vector<double>& x, vector<double>& R)
 {
-	// Let's make sure the matrix K is of the correct type
-	SkylineMatrix* pK = dynamic_cast<SkylineMatrix*> (m_pA);
-
-	if (pK == 0)
-	{
-		fprintf(stderr, "Stiffness matrix is not of correct type for this solver\n");
-		return false;
-	}
-
 	// we need to make a copy of R since colsol overwrites the right hand side vector
 	// with the solution
-	int neq = pK->Size();
+	int neq = m_pA->Size();
 	for (int i=0; i<neq; ++i) x[i] = R[i];
-	colsol_solve(pK->Size(), pK->values(), pK->pointers(), &x[0]);
+	colsol_solve(m_pA->Size(), m_pA->values(), m_pA->pointers(), &x[0]);
 
 	return true;
 }

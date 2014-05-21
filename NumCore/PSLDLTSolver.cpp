@@ -2,6 +2,17 @@
 #include "PSLDLTSolver.h"
 
 //-----------------------------------------------------------------------------
+PSLDLTSolver::PSLDLTSolver() : m_pA(0)
+{
+}
+
+//-----------------------------------------------------------------------------
+SparseMatrix* PSLDLTSolver::CreateSparseMatrix(Matrix_Type ntype)
+{
+	return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix() : 0)); 
+}
+
+//-----------------------------------------------------------------------------
 bool PSLDLTSolver::PreProcess()
 {
 	// First, make sure the PSLDLT solver is available on this platform
@@ -10,18 +21,10 @@ bool PSLDLTSolver::PreProcess()
 	return false;
 #else
 
-	// let's make sure the matrix K is of the correct type
-	CompactSymmMatrix* pK = dynamic_cast<CompactSymmMatrix*> (m_pA);
-	if (pK == 0)
-	{
-		fprintf(stderr, "Stiffness matrix is not of correct type for this solver\n\n");
-		return false;
-	}
-
 	// Do the preprocessing
 	int nonz;
 	double ops;
-	PSLDLT_Preprocess(0, pK->Size(), pK->pointers(), pK->indices(), &nonz, &ops);
+	PSLDLT_Preprocess(0, m_pA->Size(), m_pA->pointers(), m_pA->indices(), &nonz, &ops);
 
 	return LinearSolver::PreProcess();
 #endif
@@ -37,24 +40,16 @@ bool PSLDLTSolver::Factor()
 	return false;
 #else
 
-	// let's make sure the matrix K is of the correct type
-	CompactSymmMatrix* pK = dynamic_cast<CompactSymmMatrix*> (m_pA);
-	if (pK == 0)
-	{
-		fprintf(stderr, "Stiffness matrix is not of correct type for this solver\n\n");
-		return false;
-	}
-
 #ifdef DEBUG
 
 	int i, n, nnz, *pointers, *indices;
 	double* values;
 
-	n = pK->Size();
-	nnz = pK->NonZeroes();
-	pointers = pK->pointers();
-	indices = pK->indices();
-	values = pK->values();
+	n = m_pA->Size();
+	nnz = m_pA->NonZeroes();
+	pointers = m_pA->pointers();
+	indices = m_pA->indices();
+	values = m_pA->values();
 	fprintf(stdout, "\nPointers:");
 	for (i=0; i<n; i++) fprintf(stdout, "\n%d", pointers[i]);
 	fprintf(stdout, "\nIndices, Values:");
@@ -62,11 +57,9 @@ bool PSLDLTSolver::Factor()
 #endif
 
 	// Do the factorization
-	PSLDLT_Factor(0, pK->Size(), pK->pointers(), pK->indices(), pK->values());
+	PSLDLT_Factor(0, m_pA->Size(), m_pA->pointers(), m_pA->indices(), m_pA->values());
 	return true;
-
 #endif
-
 }
 
 //-----------------------------------------------------------------------------
@@ -77,14 +70,6 @@ bool PSLDLTSolver::BackSolve(vector<double>& x, vector<double>& R)
 	fprintf(stderr, "FATAL ERROR : The PSLDLT solver is not available on this platform\n\n");
 	return false;
 #else
-
-	// let's make sure the matrix K is of the correct type
-	CompactSymmMatrix* pK = dynamic_cast<CompactSymmMatrix*> (m_pA);
-	if (pK == 0)
-	{
-		fprintf(stderr, "Stiffness matrix is not of correct type for this solver\n\n");
-		return false;
-	}
 
 	// Let's roll !!
 	PSLDLT_Solve(0, &x[0], &R[0]);
@@ -100,7 +85,6 @@ void PSLDLTSolver::Destroy()
 #ifndef PSLDLT
 	fprintf(stderr, "FATAL ERROR : The PSLDLT solver is not available on this platform\n\n");
 #else
-	if (m_bvalid) PSLDLT_Destroy(0);
 	LinearSolver::Destroy();
 #endif
 }

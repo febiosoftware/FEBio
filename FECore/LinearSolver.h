@@ -6,42 +6,43 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------
-// matrix types
+//! Different matrix types. This is used when requesting a sparse matrix format
+//! from a linear solver. 
+//! \sa LinearSolver::CreateSparseMatrix.
 enum Matrix_Type {
 	SPARSE_SYMMETRIC,
 	SPARSE_UNSYMMETRIC
 };
 
 //-----------------------------------------------------------------------------
-//! base class for the linear solver classes
+//! Abstract base class for the linear solver classes. Linear solver classes
+//! are derived from this class and must implement the abstract virtual methods.
 
-//! This class defines several virtual functions that need to be overriden
-//! in the derived class
+//! This class assumes that a linear system is solved in two steps. First, the Factor()
+//! method factorizes the matrix, and then BackSolve() solves the system for a given 
+//! right hand side vector using the previously factored matrix. 
 
 class LinearSolver
 {
 public:
-	LinearSolver() { m_bvalid = false; m_pA = 0; }
-	virtual ~LinearSolver() { Destroy(); }
+	//! constructor
+	LinearSolver();
 
-	virtual bool PreProcess() { m_bvalid = true; return true; }
-	virtual bool Factor() = 0;
-	virtual bool BackSolve(vector<double>& x, vector<double>& b) = 0;
-	virtual void Destroy() { m_bvalid = false; };
+	//! destructor
+	virtual ~LinearSolver();
 
-	//! returns a pointer to the sparse matrix
-	SparseMatrix* GetMatrix() { return m_pA; };
-
-	//! set the number of threads
-	static void SetNumThreads(int n) { m_numthreads = (n>0? n : 1); }
-
-	// create the sparse matrix
+	//! create a sparse matrix that can be used with this solver (must be overridden)
 	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) = 0;
 
-protected:
-	bool	m_bvalid;	//!< flag indication wether a valid matrix structure is ready
+	//! perform any preprocessing
+	virtual bool PreProcess();
 
-	SparseMatrix*	m_pA;	//!< the matrix that stores the coefficients
+	//! factor the matrix (must be overridden)
+	virtual bool Factor() = 0;
 
-	static int	m_numthreads;	//!< nr of threads to create
+	//! do a backsolve, i.e. solve for a right-hand side vector b (must be overridden)
+	virtual bool BackSolve(vector<double>& x, vector<double>& b) = 0;
+
+	//! Do any cleanup
+	virtual void Destroy();
 };

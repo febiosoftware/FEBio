@@ -31,20 +31,23 @@ extern "C"
 class WSMPSolver : public LinearSolver
 {
 public:
+	WSMPSolver();
 	bool PreProcess();
 	bool Factor();
 	bool BackSolve(vector<double>& x, vector<double>& b);
 	void Destroy();
 
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix(1) : 0)); }
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
-protected:
-	/* WSMP control parameters */
+private:
+	// WSMP control parameters
 	int m_iparm[64];
 	double m_dparm[64];
 
-	/* Matrix data */
+	// Matrix data
 	int m_n, m_nnz;
 	vector<int> m_perm, m_invp;
 	vector<double> m_b;
+
+	CompactSymmMatrix*	m_pA;
 };

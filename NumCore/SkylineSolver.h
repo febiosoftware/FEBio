@@ -9,6 +9,9 @@
 class SkylineSolver : public LinearSolver
 {
 public:
+	//! constructor
+	SkylineSolver();
+
 	//! Preprocess 
 	bool PreProcess();
 
@@ -22,5 +25,8 @@ public:
 	void Destroy();
 
 	//! Create a sparse matrix
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = (ntype == SPARSE_SYMMETRIC? new SkylineMatrix() : 0)); }
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
+
+private:
+	SkylineMatrix*	m_pA;
 };

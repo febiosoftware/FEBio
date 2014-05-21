@@ -43,24 +43,17 @@ int pardiso_(void *, int *, int *, int *, int *, int *,
 class PardisoSolver : public LinearSolver
 {
 public:
+	PardisoSolver();
 	bool PreProcess();
 	bool Factor();
 	bool BackSolve(vector<double>& x, vector<double>& b);
 	void Destroy();
 
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype)
-	{
-		m_bsymm = (ntype == SPARSE_SYMMETRIC);
-		if (m_bsymm) m_pA = new CompactSymmMatrix(1);
-		else m_pA = new CompactUnSymmMatrix(1, true);
-
-		return m_pA;
-	}
-
-	PardisoSolver();
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
 protected:
 
+	CompactMatrix*	m_pA;
 	bool m_bsymm; // use symmetric mode or not
 
 	// Pardiso control parameters

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "RCICGSolver.h"
-#include "NumCore/CompactMatrix.h"
 
 //-----------------------------------------------------------------------------
 // We must undef PARDISO since it is defined as a function in mkl_solver.h
@@ -12,6 +11,11 @@
 #include "mkl_blas.h"
 #include "mkl_spblas.h"
 #endif // MKL_ISS
+
+//-----------------------------------------------------------------------------
+RCICGSolver::RCICGSolver() : m_pA(0)
+{
+}
 
 //-----------------------------------------------------------------------------
 SparseMatrix* RCICGSolver::CreateSparseMatrix(Matrix_Type ntype)
@@ -43,7 +47,6 @@ bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
 #ifdef MKL_ISS
 	// make sure we have a matrix
 	if (m_pA == 0) return false;
-	CompactSymmMatrix& A = dynamic_cast<CompactSymmMatrix&>(*m_pA);
 
 	// get number of equations
 	MKL_INT n = m_pA->Size();
@@ -97,9 +100,9 @@ bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
 				// NOTE: It seems that this blas operation has a memory leak for large problems (+1,500,000). 
 				//       The solution is to set the environment variable MKL_DISABLE_FAST_MM to 1
 				char tr = 'u';
-				double* a = A.Values();
-				int* ia = A.Pointers();
-				int* ja = A.Indices();
+				double* a = m_pA->Values();
+				int* ia = m_pA->Pointers();
+				int* ja = m_pA->Indices();
 				mkl_dcsrsymv(&tr, &n, a, ia, ja, ptmp, ptmp+n);
 			}
 			break;

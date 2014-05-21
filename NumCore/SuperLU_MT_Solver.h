@@ -13,14 +13,15 @@
 class SuperLU_MT_Solver : public LinearSolver
 {
 public:
+	SuperLU_MT_Solver();
 	bool PreProcess();
 	bool Factor();
 	bool BackSolve(vector<double>& x, vector<double>& b);
 	void Destroy();
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = new CompactUnSymmMatrix()); }
-
-	SuperLU_MT_Solver();
+private:
+	CompactUnSymmMatrix*	m_pA;
 
 #ifdef SUPERLU_MT
 

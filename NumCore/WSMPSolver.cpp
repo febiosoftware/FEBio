@@ -3,10 +3,18 @@
 #include <stdlib.h>
 #include "WSMPSolver.h"
 
-//////////////////////////////////////////////////////////////
-// WSMPSolver
-//////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+WSMPSolver::WSMPSolver() : m_pA(0)
+{
+}
 
+//-----------------------------------------------------------------------------
+SparseMatrix* WSMPSolver::CreateSparseMatrix(Matrix_Type ntype)
+{ 
+	return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix(1) : 0)); 
+}
+
+//-----------------------------------------------------------------------------
 bool WSMPSolver::PreProcess()
 {
 	// Make sure the solver is available
@@ -18,9 +26,8 @@ bool WSMPSolver::PreProcess()
 	int idum, nrhs=1, naux=0;
 	double ddum;
 
-	CompactSymmMatrix* A = dynamic_cast<CompactSymmMatrix*> (m_pA);
-	m_n = A->Size();
-	m_nnz = A->NonZeroes();
+	m_n = m_pA->Size();
+	m_nnz = m_pA->NonZeroes();
 
 	// Initialize m_perm and m_invp
 	m_perm.create(m_n); m_perm.zero();
@@ -47,7 +54,7 @@ bool WSMPSolver::PreProcess()
 	m_iparm[1] = 0;
 	m_iparm[2] = 0;
 
-	wssmp_(&m_n, A->pointers(), A->indices(), A->values(), &ddum, m_perm, m_invp,
+	wssmp_(&m_n, m_pA->pointers(), m_pA->indices(), m_pA->values(), &ddum, m_perm, m_invp,
 		 m_b, &m_n, &nrhs, &ddum, &naux, &idum, m_iparm, m_dparm);
 
 	if (m_iparm[63])
@@ -71,11 +78,8 @@ bool WSMPSolver::Factor()
 	int idum, nrhs=1, naux=0;
 	double ddum;
 
-	CompactSymmMatrix* A = dynamic_cast<CompactSymmMatrix*> (m_pA);
-
-
 #ifdef PRINTHB
-	A->print_hb(); // Write Harwell-Boeing matrix to file
+	m_pA->print_hb(); // Write Harwell-Boeing matrix to file
 #endif
 
 // ------------------------------------------------------------------------------
@@ -86,7 +90,7 @@ bool WSMPSolver::Factor()
 	m_iparm[2] = 1;
 	m_dparm[9] = 1.0e-18; // matrix singularity threshold
 
-	wssmp_(&m_n, A->pointers(), A->indices(), A->values(), &ddum, m_perm, m_invp,
+	wssmp_(&m_n, m_pA->pointers(), m_pA->indices(), m_pA->values(), &ddum, m_perm, m_invp,
 		 m_b, &m_n, &nrhs, &ddum, &naux, &idum, m_iparm, m_dparm);
 
 	if (m_iparm[63])
@@ -102,7 +106,7 @@ bool WSMPSolver::Factor()
 	m_iparm[1] = 2;
 	m_iparm[2] = 2;
 
-	wssmp_(&m_n, A->pointers(), A->indices(), A->values(), &ddum, m_perm, m_invp,
+	wssmp_(&m_n, m_pA->pointers(), m_pA->indices(), m_pA->values(), &ddum, m_perm, m_invp,
 		 m_b, &m_n, &nrhs, &ddum, &naux, &idum, m_iparm, m_dparm);
 
 	if (m_iparm[63])
@@ -118,7 +122,7 @@ bool WSMPSolver::Factor()
 	m_iparm[2] = 3;
 	m_iparm[30] = 1; // 0: Cholesky factorization
 
-	wssmp_(&m_n, A->pointers(), A->indices(), A->values(), &ddum, m_perm, m_invp,
+	wssmp_(&m_n, m_pA->pointers(), m_pA->indices(), m_pA->values(), &ddum, m_perm, m_invp,
 		 m_b, &m_n, &nrhs, &ddum, &naux, &idum, m_iparm, m_dparm);
 
 	if (m_iparm[63])
@@ -131,7 +135,7 @@ bool WSMPSolver::Factor()
 			m_iparm[2] = 3;
 			m_iparm[30] = 1;
 
-			wssmp_(&m_n, A->pointers(), A->indices(), A->values(), &ddum, m_perm, m_invp,
+			wssmp_(&m_n, m_pA->pointers(), m_pA->indices(), m_pA->values(), &ddum, m_perm, m_invp,
 				 &ddum, &m_n, &nrhs, &ddum, &naux, &idum, m_iparm, m_dparm);
 
 			if (m_iparm[63])
@@ -159,8 +163,6 @@ bool WSMPSolver::BackSolve(vector<double>& x, vector<double>& b)
 	int i, idum, nrhs=1, naux=0;
 	double ddum;
 
-	CompactSymmMatrix* A = dynamic_cast<CompactSymmMatrix*> (m_pA);
-
 // ------------------------------------------------------------------------------
 // This step performs back substitution
 // ------------------------------------------------------------------------------
@@ -168,7 +170,7 @@ bool WSMPSolver::BackSolve(vector<double>& x, vector<double>& b)
 	m_iparm[1] = 4;
 	m_iparm[2] = 4;
 
-	wssmp_(&m_n, A->pointers(), A->indices(), A->values(), &ddum, m_perm, m_invp,
+	wssmp_(&m_n, m_pA->pointers(), m_pA->indices(), m_pA->values(), &ddum, m_perm, m_invp,
 		 b, &m_n, &nrhs, &ddum, &naux, &idum, m_iparm, m_dparm);
 
 	if (m_iparm[63])

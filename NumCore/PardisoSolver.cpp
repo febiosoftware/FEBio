@@ -13,13 +13,23 @@
 //////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-PardisoSolver::PardisoSolver()
+PardisoSolver::PardisoSolver() : m_pA(0)
 {
 	/* If both PARDISO AND PARDISODL are defined, print a warning */
 #ifdef PARDISODL
 	fprintf(stderr, "WARNING: The MKL version of the Pardiso solver is being used\n\n");
 	exit(1);
 #endif
+}
+
+//-----------------------------------------------------------------------------
+SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype)
+{
+	m_bsymm = (ntype == SPARSE_SYMMETRIC);
+	if (m_bsymm) m_pA = new CompactSymmMatrix(1);
+	else m_pA = new CompactUnSymmMatrix(1, true);
+
+	return m_pA;
 }
 
 //-----------------------------------------------------------------------------
@@ -53,8 +63,6 @@ bool PardisoSolver::PreProcess()
 bool PardisoSolver::Factor()
 {
 
-	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
-
 // ------------------------------------------------------------------------------
 // Reordering and Symbolic Factorization.  This step also allocates all memory
 // that is necessary for the factorization.
@@ -62,7 +70,7 @@ bool PardisoSolver::Factor()
 
 	int phase = 11;
 
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->Values(), A->Pointers(), A->Indices(),
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, m_pA->Values(), m_pA->Pointers(), m_pA->Indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &m_error);
 
 	if (m_error)
@@ -82,7 +90,7 @@ bool PardisoSolver::Factor()
 	A->print_hb();
 #endif
 
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->Values(), A->Pointers(), A->Indices(),
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, m_pA->Values(), m_pA->Pointers(), m_pA->Indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &m_error);
 
 	if (m_error)
@@ -98,14 +106,11 @@ bool PardisoSolver::Factor()
 //-----------------------------------------------------------------------------
 bool PardisoSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
-
-	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
-
 	int phase = 33;
 
 	m_iparm[7] = 1;	/* Maximum number of iterative refinement steps */
 
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->Values(), A->Pointers(), A->Indices(),
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, m_pA->Values(), m_pA->Pointers(), m_pA->Indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, &b[0], &x[0], &m_error);
 
 	if (m_error)
@@ -121,16 +126,11 @@ bool PardisoSolver::BackSolve(vector<double>& x, vector<double>& b)
 //-----------------------------------------------------------------------------
 void PardisoSolver::Destroy()
 {
-	// make sure we actually initialized the matrix data.
-	if (m_bvalid == false) return;
-
-	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
-
 	int phase = -1;
 
 	//fprintf(stderr, "In Destroy\n");
 
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, A->Pointers(), A->Indices(),
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, m_pA->Pointers(), m_pA->Indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &m_error);
 
 	LinearSolver::Destroy();

@@ -5,12 +5,18 @@
 //-----------------------------------------------------------------------------
 //! constructor
 
-SuperLU_MT_Solver::SuperLU_MT_Solver()
+SuperLU_MT_Solver::SuperLU_MT_Solver() : m_pA(0)
 {
 #ifdef SUPERLU_MT
 	m_bfact = false;
 	m_balloc = false;
 #endif
+}
+
+//-----------------------------------------------------------------------------
+SparseMatrix* SuperLU_MT_Solver::CreateSparseMatrix(Matrix_Type ntype)
+{ 
+	return (m_pA = new CompactUnSymmMatrix()); 
 }
 
 //-----------------------------------------------------------------------------
@@ -23,14 +29,11 @@ bool SuperLU_MT_Solver::PreProcess()
 	return false;
 #else
 
-	// get a reference to the correct matrix type
-	CompactUnSymmMatrix& K = dynamic_cast<CompactUnSymmMatrix&> (*m_pA);
-
 	// get the number of columns/rows
-	int N = K.Size();
+	int N = m_pA->Size();
 
 	// get the number of non-zero entries
-	int nnz = K.NonZeroes();
+	int nnz = m_pA->NonZeroes();
 
 	// allocate storage for the permutation matrices
 	m_perm_c.create(N);
@@ -54,7 +57,7 @@ bool SuperLU_MT_Solver::PreProcess()
     m_ops.lwork				= 0;
 
 	// create the SuperMatrix m_A
-    dCreate_CompCol_Matrix(&m_A, N, N, nnz, K.values(), K.indices(), K.pointers(), SLU_NC, SLU_D, SLU_GE);
+    dCreate_CompCol_Matrix(&m_A, N, N, nnz, m_pA->values(), m_pA->indices(), m_pA->pointers(), SLU_NC, SLU_D, SLU_GE);
 
 	// create the dense matrices B and X
 	// note that we don't provide any data yet

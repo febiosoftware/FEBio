@@ -14,6 +14,9 @@
 class LUSolver : public LinearSolver
 {
 public:
+	//! constructor
+	LUSolver();
+
 	//! Pre-process data
 	bool PreProcess();
 
@@ -27,8 +30,9 @@ public:
 	void Destroy();
 
 	//! Create a sparse matrix
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = new DenseMatrix()); }
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
 protected:
-	vector<int>	indx;	//!< indices
+	vector<int>		indx;	//!< indices
+	DenseMatrix*	m_pA;	//!< sparse matrix
 };

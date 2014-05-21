@@ -4,11 +4,18 @@
 #include <algorithm>
 
 //-----------------------------------------------------------------------------
-ConjGradIterSolver::ConjGradIterSolver()
+ConjGradIterSolver::ConjGradIterSolver() : m_pA(0)
 {
 	m_tol = 0.01;
 	m_kmax = 200;
 	m_nprint = 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Create a sparse matrix for this linear solver
+SparseMatrix* ConjGradIterSolver::CreateSparseMatrix(Matrix_Type ntype)
+{ 
+	return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix() : 0)); 
 }
 
 //-----------------------------------------------------------------------------
@@ -21,12 +28,12 @@ bool ConjGradIterSolver::PreProcess()
 //-----------------------------------------------------------------------------
 bool ConjGradIterSolver::Factor()
 {
-/*	CompactMatrix& C = dynamic_cast<CompactMatrix&>(*m_pA);
-	int neq = K.Size();
+/*	
+	int neq = m_pA->.Size();
 
-	int* pi = C.indices();
-	int* pr = C.pointers();
-	double* pv = C.values();
+	int* pi = m_pA->indices();
+	int* pr = m_pA->pointers();
+	double* pv = m_pA->values();
 
 	// copy the diagonals to P
 	m_P.create(neq);
@@ -56,8 +63,6 @@ bool ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 	int i;
 
-	CompactSymmMatrix& A = dynamic_cast<CompactSymmMatrix&>(*m_pA);
-
 	int N = x.size();
 
 	// intialize x to zero
@@ -68,7 +73,7 @@ bool ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
 
 	// initial residual vector
 	vector<double> r(N);
-	A.mult_vector(x, r);
+	m_pA->mult_vector(x, r);
 	for (i=0; i<N; ++i) r[i] = b[i] - r[i];
 
 	// initial norms
@@ -98,7 +103,7 @@ bool ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
 		beta = rho1/rho2;
 		for (i=0; i<N; ++i) p[i] = r[i] + p[i]*beta;
 
-		A.mult_vector(p, w);
+		m_pA->mult_vector(p, w);
 		alpha = rho1 / (p*w);
 
 		for (i=0; i<N; ++i)

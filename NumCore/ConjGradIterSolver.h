@@ -24,9 +24,11 @@ public:
 	void Destroy();
 
 	//! Create a sparse matrix for this linear solver
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix() : 0)); }
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
 public:
+	CompactSymmMatrix*	m_pA;
+
 	double	m_tol;		//!< convergence tolerance
 	int		m_kmax;		//!< max iterations
 	int		m_nprint;	//!< printing level

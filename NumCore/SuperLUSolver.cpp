@@ -3,10 +3,23 @@
 #include "SuperLUSolver.h"
 #include <math.h>
 
-//////////////////////////////////////////////////////////////////////
-// SUPERLUSolver
-//////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+SuperLUSolver::SuperLUSolver() : m_pA(0)
+{ 
+	m_balloc = false; 
+	m_bfact = false; 
+	m_bcond = false; 
+	m_bsymm = true; 
+}
 
+//-----------------------------------------------------------------------------
+SparseMatrix* SuperLUSolver::CreateSparseMatrix(Matrix_Type ntype)
+{
+	m_bsymm = (ntype == SPARSE_SYMMETRIC);
+	return (m_pA = new CompactUnSymmMatrix()); 
+}
+
+//-----------------------------------------------------------------------------
 bool SuperLUSolver::PreProcess()
 {
 	// Make sure the solver is available
@@ -15,11 +28,8 @@ bool SuperLUSolver::PreProcess()
 	return false;
 #else
 
-	// get a reference to the correct matrix type
-	CompactUnSymmMatrix& rK = dynamic_cast<CompactUnSymmMatrix&> (*m_pA);
-
-	int N = rK.Size();
-	int nnz = rK.NonZeroes();
+	int N = m_pA->Size();
+	int nnz = m_pA->NonZeroes();
 
 	// set custom options
 	set_default_options(&options);
@@ -29,7 +39,7 @@ bool SuperLUSolver::PreProcess()
 	options.Equil			= NO;		// no equilibration
 
 	// create the supermatrix A
-    dCreate_CompCol_Matrix(&A, N, N, nnz, rK.Values(), rK.Indices(), rK.Pointers(), SLU_NC, SLU_D, SLU_GE);
+    dCreate_CompCol_Matrix(&A, N, N, nnz, m_pA->Values(), m_pA->Indices(), m_pA->Pointers(), SLU_NC, SLU_D, SLU_GE);
 
 	// since we don't have any values yet, we don't supply any data to the matrix B and X
 	dCreate_Dense_Matrix(&B, N, 0, NULL, N, SLU_DN, SLU_D, SLU_GE);
@@ -55,11 +65,8 @@ double SuperLUSolver::norm(SparseMatrix& K)
 	double n = 0, nc;
 	int l;
 
-	// get a reference to the correct matrix type
-	CompactUnSymmMatrix& A = dynamic_cast<CompactUnSymmMatrix&> (K);
-
-	int* ptr = A.Pointers();
-	double* pval = A.Values(), *pv;
+	int* ptr = m_pA->Pointers();
+	double* pval = m_pA->Values(), *pv;
 
 	for (int i=0; i<A.Size(); ++i)
 	{

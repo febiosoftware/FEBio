@@ -3,6 +3,18 @@
 #include <math.h>
 
 //-----------------------------------------------------------------------------
+LUSolver::LUSolver() : m_pA(0)
+{
+}
+
+//-----------------------------------------------------------------------------
+//! Create a sparse matrix
+SparseMatrix* LUSolver::CreateSparseMatrix(Matrix_Type ntype)
+{ 
+	return (m_pA = new DenseMatrix()); 
+}
+
+//-----------------------------------------------------------------------------
 bool LUSolver::PreProcess()
 {
 	// We don't need to do any preprocessing for this solver
@@ -12,8 +24,7 @@ bool LUSolver::PreProcess()
 //-----------------------------------------------------------------------------
 bool LUSolver::Factor()
 {
-	// convert to a FullMatrix
-	DenseMatrix& a = dynamic_cast<DenseMatrix&> (*m_pA);
+	DenseMatrix& a = *m_pA;
 
 	const double TINY = 1.0e-20;
 	int i, imax, j, k;
@@ -81,7 +92,7 @@ bool LUSolver::Factor()
 //-----------------------------------------------------------------------------
 bool LUSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
-	DenseMatrix& a = dynamic_cast<DenseMatrix&> (*m_pA);
+	DenseMatrix& a = *m_pA;
 
 	x = b;
 

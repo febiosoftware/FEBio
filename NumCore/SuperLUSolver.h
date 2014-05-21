@@ -17,18 +17,12 @@
 class SuperLUSolver : public LinearSolver
 {
 public:
+	SuperLUSolver();
 	bool PreProcess();
 	bool Factor();
 	bool BackSolve(vector<double>& x, vector<double>& b);
 	void Destroy();
-
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype)
-	{
-		m_bsymm = (ntype == SPARSE_SYMMETRIC);
-		return (m_pA = new CompactUnSymmMatrix()); 
-	}
-
-	SuperLUSolver() { m_balloc = false; m_bfact = false; m_bcond = false; m_bsymm = true; }
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
 	void print_cnorm(bool b) { m_bcond = b; }
 
@@ -37,13 +31,14 @@ protected:
 	double norm(SparseMatrix& K); // calculates the 1-norm of the matrix A
 #endif
 
-protected:
+private:
 
 	bool m_bsymm;	// use symmetric mode or not
 	bool m_balloc;
 	bool m_bfact;
 	bool m_bcond;	// calculate condition numbers
 
+	CompactUnSymmMatrix*	m_pA;
 
 #ifdef SUPERLU
 

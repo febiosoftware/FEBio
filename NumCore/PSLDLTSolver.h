@@ -22,10 +22,14 @@ extern "C" {
 class PSLDLTSolver : public LinearSolver
 {
 public:
+	PSLDLTSolver();
 	bool PreProcess();
 	bool Factor();
 	bool BackSolve(vector<double>& x, vector<double>& b);
 	void Destroy();
 
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix() : 0)); }
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
+
+private:
+	CompactSymmMatrix*	m_pA;
 };

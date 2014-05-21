@@ -6,8 +6,25 @@
 #include "LinearSolver.h"
 
 //-----------------------------------------------------------------------------
-// The variable m_numthreads determines the number of threads to request for
-// solvers that can take advantage of multiple processors.
+LinearSolver::LinearSolver()
+{
 
-int LinearSolver::m_numthreads = 1;
+}
 
+//-----------------------------------------------------------------------------
+LinearSolver::~LinearSolver()
+{ 
+	Destroy(); 
+}
+
+//-----------------------------------------------------------------------------
+bool LinearSolver::PreProcess()
+{ 
+	return true; 
+}
+
+//-----------------------------------------------------------------------------
+void LinearSolver::Destroy()
+{
+
+}
