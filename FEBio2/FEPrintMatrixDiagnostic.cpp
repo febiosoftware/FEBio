@@ -1,7 +1,27 @@
 #include "stdafx.h"
 #include "FEPrintMatrixDiagnostic.h"
 #include "FEBioMech/FESolidSolver.h"
+#include <stdio.h>
 
+//-----------------------------------------------------------------------------
+//! Print a block from a sparse matrix to file
+void print(SparseMatrix& m, FILE* fp, int i0, int j0, int i1, int j1)
+{
+	int ndim = m.Size();
+	if ((i1 < 0) || (i1 >= ndim)) i1 = ndim-1;
+	if ((j1 < 0) || (j1 >= ndim)) j1 = ndim-1;
+
+	for (int i=i0; i<=i1; ++i)
+	{
+		for (int j=j0; j<=j1; ++j)
+		{
+			fprintf(fp, "%10.3g", m.get(i,j));
+		}
+		fprintf(fp, "\n");
+	}
+}
+
+//-----------------------------------------------------------------------------
 FEPrintMatrixDiagnostic::FEPrintMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
 	m_szout[0] = 0;
@@ -9,10 +29,12 @@ FEPrintMatrixDiagnostic::FEPrintMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fe
 	m_rng[2] = m_rng[3] = -1;
 }
 
+//-----------------------------------------------------------------------------
 FEPrintMatrixDiagnostic::~FEPrintMatrixDiagnostic(void)
 {
 }
 
+//-----------------------------------------------------------------------------
 bool FEPrintMatrixDiagnostic::ParseSection(XMLTag &tag)
 {
 	if (tag == "input")
@@ -47,6 +69,7 @@ bool FEPrintMatrixDiagnostic::ParseSection(XMLTag &tag)
 	return  false;
 }
 
+//-----------------------------------------------------------------------------
 bool FEPrintMatrixDiagnostic::Run()
 {
 	// get and initialize the first step

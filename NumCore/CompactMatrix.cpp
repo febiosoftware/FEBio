@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CompactMatrix.h"
+#include <assert.h>
 
 //=============================================================================
 // CompactMatrix
@@ -270,34 +271,77 @@ void CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
 }
 
 //-----------------------------------------------------------------------------
-void write_hb(CompactMatrix& m, FILE* fp)
+//! add a matrix item
+void CompactSymmMatrix::add(int i, int j, double v)
 {
-	int neq = m.Size();
-	int nnz = m.NonZeroes();
 
-	fwrite(&neq, sizeof(neq), 1, fp);
-	fwrite(&nnz, sizeof(nnz), 1, fp);
-	fwrite(m.Pointers(), sizeof(int)   , neq+1, fp);
-	fwrite(m.Indices (), sizeof(int)   , nnz, fp);
-	fwrite(m.Values  (), sizeof(double), nnz, fp);
+	// only add to lower triangular part
+	// since FEBio only works with the upper triangular part
+	// we have to swap the indices
+	i ^= j; j ^= i; i ^= j;
+
+	if (j<=i)
+	{
+		int* pi = m_pindices + m_ppointers[j];
+		pi -= m_offset;
+		int l = m_ppointers[j+1] - m_ppointers[j];
+		for (int n=0; n<l; ++n)
+			if (pi[n] == i + m_offset)
+			{
+				m_pd[ m_ppointers[j] + n - m_offset ] += v;
+				return;
+			}
+
+		assert(false);
+	}
 }
 
 //-----------------------------------------------------------------------------
-void read_hb(CompactSymmMatrix& m, FILE* fp)
+//! set matrix item
+void CompactSymmMatrix::set(int i, int j, double v)
 {
-	int neq, nnz;
-	fread(&neq, sizeof(neq), 1, fp);
-	fread(&nnz, sizeof(nnz), 1, fp);
+	int k;
 
-	int* pptr = new int[neq+1];
-	int* pind = new int[nnz];
-	double* pval = new double[nnz];
+	// only add to lower triangular part
+	// since FEBio only works with the upper triangular part
+	// we have to swap the indices
+	i ^= j; j ^= i; i ^= j;
 
-	fread(pptr, sizeof(int)   , neq+1, fp);
-	fread(pind, sizeof(int)   , nnz, fp);
-	fread(pval, sizeof(double), nnz, fp);
+	if (j<=i)
+	{
+		int* pi = m_pindices + m_ppointers[j];
+		pi -= m_offset;
+		int l = m_ppointers[j+1] - m_ppointers[j];
+		for (int n=0; n<l; ++n)
+			if (pi[n] == i + m_offset)
+			{
+				k = m_ppointers[j] + n;
+				k -= m_offset;
+				m_pd[k] = v;
+				return;
+			}
 
-	m.Create(neq, nnz, pval, pind, pptr);
+		assert(false);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! get a matrix item
+double CompactSymmMatrix::get(int i, int j)
+{
+	if (j>i) { i ^= j; j ^= i; i ^= j; }
+
+	int *pi = m_pindices + m_ppointers[j], k;
+	pi -= m_offset;
+	int l = m_ppointers[j+1] - m_ppointers[j];
+	for (int n=0; n<l; ++n)
+		if (pi[n] == i + m_offset)
+		{
+			k = m_ppointers[j] + n;
+			k -= m_offset;
+			return m_pd[k];
+		}
+	return 0;
 }
 
 //=============================================================================
@@ -433,4 +477,86 @@ void CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LM
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+void CompactUnSymmMatrix::add(int i, int j, double v)
+{
+	if (m_brow_based)
+	{
+		i ^= j; j ^= i; i ^= j;
+	}
+	assert((i>=0) && (i<m_ndim));
+	assert((j>=0) && (j<m_ndim));
+
+	int* pi = m_pindices + m_ppointers[j];
+	pi -= m_offset;
+	i += m_offset;
+	double* pd = m_pd + (m_ppointers[j] - m_offset);
+	int l = m_ppointers[j+1] - m_ppointers[j];
+	for (int n=0; n<l; ++n, ++pd, ++pi)
+	{
+		if (*pi == i)
+		{
+			*pd += v;
+			return;
+		}
+	}
+	assert(false);
+}
+
+//-----------------------------------------------------------------------------
+void CompactUnSymmMatrix::set(int i, int j, double v)
+{
+	if (m_brow_based)
+	{
+		i ^= j; j ^= i; i ^= j;
+	}
+	int* pi = m_pindices + m_ppointers[j];
+	pi -= m_offset;
+	int l = m_ppointers[j+1] - m_ppointers[j];
+	for (int n=0; n<l; ++n)
+	{
+		if (pi[n] == i + m_offset)
+		{
+			m_pd[ m_ppointers[j] + n - m_offset ] = v;
+			return;
+		}
+	}
+	assert(false);
+}
+
+//-----------------------------------------------------------------------------
+double CompactUnSymmMatrix::get(int i, int j)
+{
+	if (m_brow_based)
+	{
+		i ^= j; j ^= i; i ^= j;
+	}
+	int* pi = m_pindices + m_ppointers[j];
+	pi -= m_offset;
+	int l = m_ppointers[j+1] - m_ppointers[j];
+	for (int n=0; n<l; ++n)
+	{
+		if (pi[n] == i + m_offset) return m_pd[ m_ppointers[j] + n - m_offset ];
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+double CompactUnSymmMatrix::diag(int i)
+{
+	int* pi = m_pindices + m_ppointers[i] - m_offset;
+	int l = m_ppointers[i+1] - m_ppointers[i];
+	for (int n=0; n<l; ++n)
+	{
+		if (pi[n] == i + m_offset)
+		{
+			return m_pd[ m_ppointers[i] + n - m_offset ];
+		}
+	}
+
+	assert(false);
+
+	return 0;
 }

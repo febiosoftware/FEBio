@@ -2,6 +2,7 @@
 #include "ConjGradIterSolver.h"
 #include "FECore/vector.h"
 #include <algorithm>
+#include <assert.h>
 
 //-----------------------------------------------------------------------------
 ConjGradIterSolver::ConjGradIterSolver() : m_pA(0)

@@ -9,14 +9,11 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include <memory.h>
-#include <assert.h>
-#include <stdio.h>
-#include <vector>
 #include "MatrixProfile.h"
 #include "matrix.h"
+#include <vector>
 
-//=============================================================================
+//-----------------------------------------------------------------------------
 //! Base class for sparse matrices
 
 //! This is the base class for the sparse matrix classes and defines the interface
@@ -29,7 +26,6 @@ public:
 	virtual ~SparseMatrix() {}
 
 public:
-
 	//! return number of nonzeros
 	int NonZeroes() { return m_nsize; };
 
@@ -71,8 +67,5 @@ protected:
 
 	double*	m_pd;	//!< matrix values
 };
-
-//-----------------------------------------------------------------------------
-void print(SparseMatrix& A, FILE* fp, int i0 = 0, int j0 = 0, int i1 = -1, int j1 = -1);
 
 #endif // !defined(AFX_SPARSEMATRIX_H__B6DFA524_679D_4A35_86F8_D7F080D0ACD5__INCLUDED_)

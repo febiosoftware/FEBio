@@ -5,14 +5,30 @@
 #include "FEBioMech/FESolidSolver.h"
 #include "NumCore/CompactMatrix.h"
 
+//-----------------------------------------------------------------------------
+void write_hb(CompactMatrix& m, FILE* fp)
+{
+	int neq = m.Size();
+	int nnz = m.NonZeroes();
+
+	fwrite(&neq, sizeof(neq), 1, fp);
+	fwrite(&nnz, sizeof(nnz), 1, fp);
+	fwrite(m.Pointers(), sizeof(int)   , neq+1, fp);
+	fwrite(m.Indices (), sizeof(int)   , nnz, fp);
+	fwrite(m.Values  (), sizeof(double), nnz, fp);
+}
+
+//-----------------------------------------------------------------------------
 FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
 }
 
+//-----------------------------------------------------------------------------
 FEPrintHBMatrixDiagnostic::~FEPrintHBMatrixDiagnostic(void)
 {
 }
 
+//-----------------------------------------------------------------------------
 bool FEPrintHBMatrixDiagnostic::ParseSection(XMLTag &tag)
 {
 	FEModel& fem = m_fem;
@@ -38,6 +54,7 @@ bool FEPrintHBMatrixDiagnostic::ParseSection(XMLTag &tag)
 	return  false;
 }
 
+//-----------------------------------------------------------------------------
 bool FEPrintHBMatrixDiagnostic::Run()
 {
 	// Get the current step
