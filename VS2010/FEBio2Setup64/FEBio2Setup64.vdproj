@@ -1677,6 +1677,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_8BFBCB827FE04EAA9CBA78205C35FAA2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_8D5B047422C44DAF904733654DD84B2A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1852,6 +1858,12 @@
         "Entry"
         {
         "MsmKey" = "8:_9EB361ADC82147E59FFB327751290AEA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9EDD630E3C3240F4A03630AC9661B035"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2092,6 +2104,12 @@
         "Entry"
         {
         "MsmKey" = "8:_B0369C13667E42588894F3C9F5EEACBD"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B19CB017D1F34351B6FFB01845BD2772"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -8920,6 +8938,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8BFBCB827FE04EAA9CBA78205C35FAA2"
+            {
+            "SourcePath" = "8:..\\..\\FEBioMech\\FEBioMechData.h"
+            "TargetName" = "8:FEBioMechData.h"
+            "Tag" = "8:"
+            "Folder" = "8:_027BA0AC81CA437AA7FE1BCD3860B58B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8D5B047422C44DAF904733654DD84B2A"
             {
             "SourcePath" = "8:..\\..\\FEBioMix\\FESupplyMichaelisMenten.h"
@@ -9506,6 +9544,26 @@
             "TargetName" = "8:stdafx.h"
             "Tag" = "8:"
             "Folder" = "8:_FA4E2424447C40C4B8D550ED9E752370"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9EDD630E3C3240F4A03630AC9661B035"
+            {
+            "SourcePath" = "8:..\\..\\FEBioMech\\FECoupledVerondaWestmann.h"
+            "TargetName" = "8:FECoupledVerondaWestmann.h"
+            "Tag" = "8:"
+            "Folder" = "8:_027BA0AC81CA437AA7FE1BCD3860B58B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -10304,6 +10362,26 @@
             {
             "SourcePath" = "8:..\\..\\FEBioMech\\FEBioMech.h"
             "TargetName" = "8:FEBioMech.h"
+            "Tag" = "8:"
+            "Folder" = "8:_027BA0AC81CA437AA7FE1BCD3860B58B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B19CB017D1F34351B6FFB01845BD2772"
+            {
+            "SourcePath" = "8:..\\..\\FEBioMech\\FECoupledMooneyRivlin.h"
+            "TargetName" = "8:FECoupledMooneyRivlin.h"
             "Tag" = "8:"
             "Folder" = "8:_027BA0AC81CA437AA7FE1BCD3860B58B"
             "Condition" = "8:"
@@ -13770,15 +13848,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FEBio"
-        "ProductCode" = "8:{F2DC6832-6689-4239-AF84-E29B1273D284}"
-        "PackageCode" = "8:{A5685441-C478-4620-9272-8217E50F53A4}"
+        "ProductCode" = "8:{3426DD8C-DBA2-468B-A5F7-6355B275C302}"
+        "PackageCode" = "8:{A20F01E6-65D5-4EFB-AE4C-0CBD2D327559}"
         "UpgradeCode" = "8:{355EC1F5-9826-415A-82E5-28E1CBE65F9C}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:2.0.0"
+        "ProductVersion" = "8:2.0.1"
         "Manufacturer" = "8:University of Utah"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -14367,7 +14445,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_5F85932F5BA749ED8AC24C2FCC4CA99B"
             {
-            "SourcePath" = "8:..\\Release OpenMP\\FEBio.exe"
+            "SourcePath" = "8:..\\x64\\Release\\FEBio2x64.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_6B94C48B2C8C48A28FD52BCC98948BA8"
