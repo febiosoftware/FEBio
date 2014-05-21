@@ -533,7 +533,7 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 		{
 			FENode& n = mesh.Node(i);
 			n.m_at = (n.m_rt - n.m_rp)*b - n.m_vp*a + n.m_ap*c;
-			n.m_vt = n.m_vp + (n.m_ap*m_gamma + n.m_at*(1.0 - m_gamma))*dt;
+			n.m_vt = n.m_vp + (n.m_ap*(1.0 - m_gamma) + n.m_at*m_gamma)*dt;
 		}
 	}
 }
