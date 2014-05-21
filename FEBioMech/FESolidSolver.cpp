@@ -1434,32 +1434,29 @@ void FESolidSolver::ContactStiffness()
 
 void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 {
-	int i, j, k, l, n = en.size();
+	// number of element nodes
+	int n = en.size();
 
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-
-	double Ri[3][3] = {0}, Rj[3][3] = {0};
-	vector< vector<double> > kij; kij.assign(MAX_NDOFS, vector<double>(MAX_NDOFS));
-
-	vector< vector<double> > KF; KF.assign(MAX_NDOFS, vector<double>(6));
-	double KR[6][6];
-
-	int *lmi, *lmj;
-	int I, J;
-
-	SparseMatrix& K = *m_pK;
-
-	vec3d ai, aj;
-
+	// get degrees of freedoms
 	int ndof = ke.columns() / n;
 
+	// allocate temp vectors
+	double Ri[3][3] = {0}, Rj[3][3] = {0};
+	double KR[6][6];
+	matrix kij(ndof, ndof);
+	matrix KF(ndof, 6);
+
+	// get the sparse matrix
+	SparseMatrix& K = *m_pK;
+
+	// get the current incremental vector
 	vector<double>& ui = m_bfgs.m_ui;
+
+	// get the FE mesh
 	FEMesh& mesh = m_fem.GetMesh();
 
 	// loop over columns
-	for (j=0; j<n; ++j)
+	for (int j=0; j<n; ++j)
 	{
 		FENode& nodej = mesh.Node(en[j]);
 		if (nodej.m_rid >= 0)
@@ -1469,21 +1466,21 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 			FERigidBody& RBj = dynamic_cast<FERigidBody&>(*m_fem.Object(nodej.m_rid));
 
 			// get the rigid body equation nrs.
-			lmj = RBj.m_LM;
+			int *lmj = RBj.m_LM;
 
 			// get the relative distance to the center of mass
-			aj = nodej.m_rt - RBj.m_rt;
+			vec3d aj = nodej.m_rt - RBj.m_rt;
 	
 			Rj[0][1] = aj.z; Rj[0][2] =-aj.y;
 			Rj[1][0] =-aj.z; Rj[1][2] = aj.x;
 			Rj[2][0] = aj.y; Rj[2][1] =-aj.x;
 
 			// loop over rows
-			for (i=0; i<n; ++i)
+			for (int i=0; i<n; ++i)
 			{
 				// get the element sub-matrix
-				for (k=0; k<ndof; ++k)
-					for (l=0; l<ndof; ++l)
+				for (int k=0; k<ndof; ++k)
+					for (int l=0; l<ndof; ++l)
 						kij[k][l] = ke[ndof*i+k][ndof*j+l];
 
 				FENode& nodei = mesh.Node(en[i]);
@@ -1494,10 +1491,10 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 					// get the rigid body this node is attached to
 					FERigidBody& RBi = dynamic_cast<FERigidBody&>(*m_fem.Object(nodei.m_rid));
 
-					lmi = RBi.m_LM;
+					int *lmi = RBi.m_LM;
 					
 					// get the relative distance
-					ai = nodei.m_rt - RBi.m_rt;
+					vec3d ai = nodei.m_rt - RBi.m_rt;
 	
 					Ri[0][1] = ai.z; Ri[0][2] =-ai.y;
 					Ri[1][0] =-ai.z; Ri[1][2] = ai.x;
@@ -1552,11 +1549,11 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 					KR[5][5] = Ri[0][2]*KR[0][5]+Ri[1][2]*KR[1][5]+Ri[2][2]*KR[2][5];
 
 					// add the stiffness components to the Krr matrix
-					for (k=0; k<6; ++k)
-						for (l=0; l<6; ++l)
+					for (int k=0; k<6; ++k)
+						for (int l=0; l<6; ++l)
 						{
-							J = lmj[k];
-							I = lmi[l];
+							int J = lmj[k];
+							int I = lmi[l];
 
 							if (I >= 0)
 							{
@@ -1567,18 +1564,18 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 
 					// we still need to couple the non-rigid degrees of node i to the
 					// rigid dofs of node j
-					for (k=3; k<ndof; ++k)
-						for (l=0; l<3; ++l)
+					for (int k=3; k<ndof; ++k)
+						for (int l=0; l<3; ++l)
 						{
 							KF[k][l] = kij[k][l];
 							KF[k][3+l] = kij[k][0]*Rj[0][l] + kij[k][1]*Rj[1][l] + kij[k][2]*Rj[2][l];
 						}
 
-					for (k=0; k<6; ++k)
-						for (l=3; l<ndof; ++l)
+					for (int k=0; k<6; ++k)
+						for (int l=3; l<ndof; ++l)
 						{
-							J = lmj[k];
-							I = elm[ndof*i+l];
+							int J = lmj[k];
+							int I = elm[ndof*i+l];
 
 							if (I >= 0)
 							{
@@ -1588,18 +1585,18 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 						}
 
                     // now the transpose location
-					for (k=0; k<3; ++k)
-						for (l=3; l<ndof; ++l)
+					for (int k=0; k<3; ++k)
+						for (int l=3; l<ndof; ++l)
 						{
 							KF[l][k] = kij[k][l];
 							KF[l][3+k] = kij[0][l]*Rj[0][k] + kij[1][l]*Rj[1][k] + kij[2][l]*Rj[2][k];
 						}
                     
-					for (k=0; k<6; ++k)
-						for (l=3; l<ndof; ++l)
+					for (int k=0; k<6; ++k)
+						for (int l=3; l<ndof; ++l)
 						{
-							J = elm[ndof*j+l];
-							I = lmi[k];
+							int J = elm[ndof*j+l];
+							int I = lmi[k];
                             
 							if (I >= 0)
 							{
@@ -1615,18 +1612,18 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 					// add the stiffness components to the Kfr matrix
 
 					// Kij
-					for (k=0; k<ndof; ++k)
-						for (l=0; l<3; ++l)
+					for (int k=0; k<ndof; ++k)
+						for (int l=0; l<3; ++l)
 						{
 							KF[k][l] = kij[k][l];
 							KF[k][3+l] = kij[k][0]*Rj[0][l] + kij[k][1]*Rj[1][l] + kij[k][2]*Rj[2][l];
 						}
 
-					for (k=0; k<6; ++k)
-						for (l=0; l<ndof; ++l)
+					for (int k=0; k<6; ++k)
+						for (int l=0; l<ndof; ++l)
 						{
-							J = lmj[k];
-							I = elm[ndof*i+l];
+							int J = lmj[k];
+							int I = elm[ndof*i+l];
 
 							if (I >= 0)
 							{
@@ -1640,7 +1637,7 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 		else
 		{
 			// loop over rows
-			for (i=0; i<n; ++i)
+			for (int i=0; i<n; ++i)
 			{
 				FENode& nodei = mesh.Node(en[i]);
 				if (nodei.m_rid>=0)
@@ -1650,35 +1647,35 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 					FERigidBody& RBi = dynamic_cast<FERigidBody&>(*m_fem.Object(nodei.m_rid));
 
 					// get the rigid body equation nrs.
-					lmi = RBi.m_LM;
+					int *lmi = RBi.m_LM;
 
 					// get the relative distance to the center of mass
-					ai = nodei.m_rt - RBi.m_rt;
+					vec3d ai = nodei.m_rt - RBi.m_rt;
 
 					Ri[0][1] = ai.z; Ri[0][2] =-ai.y;
 					Ri[1][0] =-ai.z; Ri[1][2] = ai.x;
 					Ri[2][0] = ai.y; Ri[2][1] =-ai.x;
 
 					// get the element sub-matrix
-					for (k=0; k<ndof; ++k)
-						for (l=0; l<ndof; ++l)
+					for (int k=0; k<ndof; ++k)
+						for (int l=0; l<ndof; ++l)
 							kij[k][l] = ke[ndof*i+k][ndof*j+l];
 
 					// add the stiffness components to the Krf matrix
 
 					// Kij
-					for (k=0; k<ndof; ++k)
-						for (l=0; l<3; ++l)
+					for (int k=0; k<ndof; ++k)
+						for (int l=0; l<3; ++l)
 						{
 							KF[k][l] = kij[l][k];
 							KF[k][3+l] = Ri[0][l]*kij[0][k] + Ri[1][l]*kij[1][k] + Ri[2][l]*kij[2][k];
 						}
 
-					for (k=0; k<6; ++k)
-						for (l=0; l<ndof; ++l)
+					for (int k=0; k<6; ++k)
+						for (int l=0; l<ndof; ++l)
 						{
-							I = lmi[k];
-							J = elm[ndof*j+l];
+							int I = lmi[k];
+							int J = elm[ndof*j+l];
 
 							if (I >= 0)
 							{

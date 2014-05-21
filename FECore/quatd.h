@@ -4,10 +4,8 @@
 #include "vec3d.h"
 #include "mat3d.h"
 
-///////////////////////////////////////////////////////////////////
-// CLASS: quatd
-// This class implements a quaternion
-//
+//-----------------------------------------------------------------------------
+//! This class implements a quaternion. 
 
 class quatd
 {
@@ -182,21 +180,6 @@ public:
 		return (double)(acos(w)*2.0);
 	}
 
-/*	quatd& MultiplyAngle(double fa)
-	{
-		double angle = fa*acos(w)*2.0;
-
-		w = cos(angle * 0.5);
-
-		double sina = sin(angle * 0.5);
-
-		x *= sina;
-		y *= sina;
-		z *= sina;
-	}
-*/
-
-
 	// use only when *this is unit vector
 	void RotateVector(vec3d& v) const
 	{
@@ -209,9 +192,9 @@ public:
 		double qz = v.z*w - v.x*y + v.y*x;
 
 		// q* (v* q^-1)
-		v.x = (double) (w*qx + x*qw + y*qz - z*qy);
-		v.y = (double) (w*qy + y*qw + z*qx - x*qz);
-		v.z = (double) (w*qz + z*qw + x*qy - y*qx);
+		v.x = w*qx + x*qw + y*qz - z*qy;
+		v.y = w*qy + y*qw + z*qx - x*qz;
+		v.z = w*qz + z*qw + x*qy - y*qx;
 	}
 
 	// use only when *this is unit vector
@@ -226,31 +209,23 @@ public:
 		double qz = n.z*w - n.x*y + n.y*x;
 
 		// q* (v* q^-1)
-		n.x = (double) (w*qx + x*qw + y*qz - z*qy);
-		n.y = (double) (w*qy + y*qw + z*qx - x*qz);
-		n.z = (double) (w*qz + z*qw + x*qy - y*qx);
+		n.x = w*qx + x*qw + y*qz - z*qy;
+		n.y = w*qy + y*qw + z*qx - x*qz;
+		n.z = w*qz + z*qw + x*qy - y*qx;
 
 		return n;
 	}
 
 	void RotateVectorP(double* v, double* r) const
 	{
-		static double fx, fy, fz, fw;
-		static double qw, qx, qy, qz;
-		
-		fx = (double) x;
-		fy = (double) y;
-		fz = (double) z;
-		fw = (double) w;
+		double qw = v[0]*x + v[1]*y + v[2]*z;
+		double qx = v[0]*w - v[1]*z + v[2]*y;
+		double qy = v[1]*w - v[2]*x + v[0]*z;
+		double qz = v[2]*w - v[0]*y + v[1]*x;
 
-		qw = v[0]*fx + v[1]*fy + v[2]*fz;
-		qx = v[0]*fw - v[1]*fz + v[2]*fy;
-		qy = v[1]*fw - v[2]*fx + v[0]*fz;
-		qz = v[2]*fw - v[0]*fy + v[1]*fx;
-
-		r[0] = (double) (fw*qx + fx*qw + fy*qz - fz*qy);
-		r[1] = (double) (fw*qy + fy*qw + fz*qx - fx*qz);
-		r[2] = (double) (fw*qz + fz*qw + fx*qy - fy*qx);
+		r[0] = w*qx + x*qw + y*qz - z*qy;
+		r[1] = w*qy + y*qw + z*qx - x*qz;
+		r[2] = w*qz + z*qw + x*qy - y*qx;
 	}
 
 	//! Convert a quaternion to a matrix
