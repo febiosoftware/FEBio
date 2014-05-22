@@ -23,10 +23,13 @@ to the top of your source file. (If you are using precompiled header files, make
 \endcode
 
 \subsection plugin_sec1_2 Creating a plugin for Linux
-Disucss how to create a plugin on Linux
+A sample plugin, NeoHookeanPI, is included on the FEBio download page.  Review the Makefile for specifics of compiling a plugin on Linux.  The important points are:
+- compile with the -fPIC flag.
+- link with -shared -Wl,-soname,libname.so where libname is the name of the library.
 
 \subsection plugin_sec1_3 Creating a plugin for Mac
-Discuss how to create a plugin for Mac
+The instructions for the Mac are the same as those for Linux except:
+- link with -dynamiclib
 
 \section plugin_sec2 2. Required Functions
 The following functions need to be defined in the plugin and are needed for plugin registration, initialization and cleanup. 
