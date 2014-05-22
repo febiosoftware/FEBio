@@ -33,6 +33,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_029D47562A9F42E788A2E9EA3568324F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_030F45333E96451CB87691015E8A3243"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -351,7 +357,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_1EFD07E16308435085A5918FD5226882"
+        "MsmKey" = "8:_1E6F483736E245B6918B81220332ABBF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -609,12 +615,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_3302F723D51D4E949507E44EF70B6F66"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_3356C1DA35CF4979930E72FA530EA3C9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -622,6 +622,12 @@
         "Entry"
         {
         "MsmKey" = "8:_33899C63AEB941228B954BD9CCD01121"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_33BF19F804954811934E708AE0B08961"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -807,12 +813,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_43305388FBC64F1BB278CF0DE63B919F"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_4358D4DDE6D74095B1C02C0DD702AEDD"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -862,12 +862,6 @@
         "Entry"
         {
         "MsmKey" = "8:_46A4D59C0D504DC9A2E4A8F88E169C0C"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_470AA243F6B64ECEB474C21F6F66CA61"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1137,6 +1131,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5C891234750C4EA2B94DBE95AEC1F8F1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5DA079B564094FA4A8748AE1E2C3CC4B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1401,6 +1401,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_724B59BD0046479D9DECA1C08922AFC8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_729C654C1BBB431AA63AC68102D060E7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1486,6 +1492,12 @@
         "Entry"
         {
         "MsmKey" = "8:_77F60737D1784A739DF0FF9E0DBEB062"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7829DA7CDEBF4CC0BFFFBDA507D370BF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2019,12 +2031,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_A6E0113238AD4E63A929A6910F8D994D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_A71D9E702EEC426B80AD04E469DA159D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2032,6 +2038,12 @@
         "Entry"
         {
         "MsmKey" = "8:_A877DF24127F4A18ABDB89CA9D522BB5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A8EFD06963D448D1A862D61A6E78D6FC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2068,12 +2080,6 @@
         "Entry"
         {
         "MsmKey" = "8:_AB83557C65AC48E3B143656BA220CF3A"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_ABA3AFA9A89F454295A4DC31C7946683"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2523,12 +2529,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_D3802863C9224E198C7D893D2E2DFA63"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_D3F54162A6264D588D6E6B1830D8F12F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2883,6 +2883,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_F14C2ACE68DF431EB746F6087D944724"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_F20487BE23174B9A9C1D4AF140686637"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2992,12 +2998,6 @@
         "Entry"
         {
         "MsmKey" = "8:_F8FCF04E773A411C8230383410741146"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F928141C027B484DBC24AA884EB3E69D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3458,6 +3458,26 @@
             "TargetName" = "8:FEPeriodicBoundary.h"
             "Tag" = "8:"
             "Folder" = "8:_027BA0AC81CA437AA7FE1BCD3860B58B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_029D47562A9F42E788A2E9EA3568324F"
+            {
+            "SourcePath" = "8:..\\Release OpenMP\\FEBioMix.lib"
+            "TargetName" = "8:FEBioMix.lib"
+            "Tag" = "8:"
+            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -4532,10 +4552,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1EFD07E16308435085A5918FD5226882"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1E6F483736E245B6918B81220332ABBF"
             {
-            "SourcePath" = "8:..\\Release\\FEBioMix.lib"
-            "TargetName" = "8:FEBioMix.lib"
+            "SourcePath" = "8:..\\Release OpenMP\\FEBioXML.lib"
+            "TargetName" = "8:FEBioXML.lib"
             "Tag" = "8:"
             "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
             "Condition" = "8:"
@@ -5392,26 +5412,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3302F723D51D4E949507E44EF70B6F66"
-            {
-            "SourcePath" = "8:..\\Release\\FEBioPlot.lib"
-            "TargetName" = "8:FEBioPlot.lib"
-            "Tag" = "8:"
-            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3356C1DA35CF4979930E72FA530EA3C9"
             {
             "SourcePath" = "8:..\\..\\Documentation\\FEBioBinaryDatabaseSpecification.pdf"
@@ -5438,6 +5438,26 @@
             "TargetName" = "8:co11.feb"
             "Tag" = "8:"
             "Folder" = "8:_27E1A5E4D2EB4026AF2B9D6E4822D9A1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_33BF19F804954811934E708AE0B08961"
+            {
+            "SourcePath" = "8:..\\Release OpenMP\\NumCore.lib"
+            "TargetName" = "8:NumCore.lib"
+            "Tag" = "8:"
+            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -6052,26 +6072,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_43305388FBC64F1BB278CF0DE63B919F"
-            {
-            "SourcePath" = "8:..\\Release\\FEBioMech.lib"
-            "TargetName" = "8:FEBioMech.lib"
-            "Tag" = "8:"
-            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4358D4DDE6D74095B1C02C0DD702AEDD"
             {
             "SourcePath" = "8:..\\..\\FECore\\FECoreTask.h"
@@ -6238,26 +6238,6 @@
             "TargetName" = "8:FESolute.h"
             "Tag" = "8:"
             "Folder" = "8:_B6B889E9134C4680BFE0736DC8730D01"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_470AA243F6B64ECEB474C21F6F66CA61"
-            {
-            "SourcePath" = "8:..\\Release\\FEBioOpt.lib"
-            "TargetName" = "8:FEBioOpt.lib"
-            "Tag" = "8:"
-            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -7152,6 +7132,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5C891234750C4EA2B94DBE95AEC1F8F1"
+            {
+            "SourcePath" = "8:..\\Release OpenMP\\FEBioHeat.lib"
+            "TargetName" = "8:FEBioHeat.lib"
+            "Tag" = "8:"
+            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5DA079B564094FA4A8748AE1E2C3CC4B"
             {
             "SourcePath" = "8:..\\..\\FEBioHeat\\FEHeatDomainFactory.h"
@@ -8012,6 +8012,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_724B59BD0046479D9DECA1C08922AFC8"
+            {
+            "SourcePath" = "8:..\\Release OpenMP\\FEBioOpt.lib"
+            "TargetName" = "8:FEBioOpt.lib"
+            "Tag" = "8:"
+            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_729C654C1BBB431AA63AC68102D060E7"
             {
             "SourcePath" = "8:..\\..\\FEBioMix\\FEConcentrationIndependentReaction.h"
@@ -8298,6 +8318,26 @@
             "TargetName" = "8:ma17.feb"
             "Tag" = "8:"
             "Folder" = "8:_27E1A5E4D2EB4026AF2B9D6E4822D9A1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7829DA7CDEBF4CC0BFFFBDA507D370BF"
+            {
+            "SourcePath" = "8:..\\Release OpenMP\\FEBioPlot.lib"
+            "TargetName" = "8:FEBioPlot.lib"
+            "Tag" = "8:"
+            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -10072,26 +10112,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A6E0113238AD4E63A929A6910F8D994D"
-            {
-            "SourcePath" = "8:..\\Release\\NumCore.lib"
-            "TargetName" = "8:NumCore.lib"
-            "Tag" = "8:"
-            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A71D9E702EEC426B80AD04E469DA159D"
             {
             "SourcePath" = "8:..\\..\\FEBioHeat\\FEConvectiveHeatFlux.h"
@@ -10118,6 +10138,26 @@
             "TargetName" = "8:ReleaseNotes.txt"
             "Tag" = "8:"
             "Folder" = "8:_F73CF22FC41F41409715345C0CED90CD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A8EFD06963D448D1A862D61A6E78D6FC"
+            {
+            "SourcePath" = "8:..\\Release OpenMP\\FEBioMech.lib"
+            "TargetName" = "8:FEBioMech.lib"
+            "Tag" = "8:"
+            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -10238,26 +10278,6 @@
             "TargetName" = "8:FEBioMechPlot.h"
             "Tag" = "8:"
             "Folder" = "8:_027BA0AC81CA437AA7FE1BCD3860B58B"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ABA3AFA9A89F454295A4DC31C7946683"
-            {
-            "SourcePath" = "8:..\\Release\\FECore.lib"
-            "TargetName" = "8:FECore.lib"
-            "Tag" = "8:"
-            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -11752,26 +11772,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D3802863C9224E198C7D893D2E2DFA63"
-            {
-            "SourcePath" = "8:..\\Release\\FEBioHeat.lib"
-            "TargetName" = "8:FEBioHeat.lib"
-            "Tag" = "8:"
-            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D3F54162A6264D588D6E6B1830D8F12F"
             {
             "SourcePath" = "8:C:\\Testing\\Verify\\fi06.feb"
@@ -12952,6 +12952,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F14C2ACE68DF431EB746F6087D944724"
+            {
+            "SourcePath" = "8:..\\Release OpenMP\\FECore.lib"
+            "TargetName" = "8:FECore.lib"
+            "Tag" = "8:"
+            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F20487BE23174B9A9C1D4AF140686637"
             {
             "SourcePath" = "8:C:\\Testing\\Verify\\di02.feb"
@@ -13318,26 +13338,6 @@
             "TargetName" = "8:te05.feb"
             "Tag" = "8:"
             "Folder" = "8:_27E1A5E4D2EB4026AF2B9D6E4822D9A1"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F928141C027B484DBC24AA884EB3E69D"
-            {
-            "SourcePath" = "8:..\\Release\\FEBioXML.lib"
-            "TargetName" = "8:FEBioXML.lib"
-            "Tag" = "8:"
-            "Folder" = "8:_EE92BBA752FA4FE2A2083F00458B316E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -14419,7 +14419,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_5F85932F5BA749ED8AC24C2FCC4CA99B"
             {
-            "SourcePath" = "8:..\\x64\\Release\\FEBio2x64.exe"
+            "SourcePath" = "8:..\\Release OpenMP\\FEBio2.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_BDAFA02141794D0AB7E7B0F2C44F5EA3"
