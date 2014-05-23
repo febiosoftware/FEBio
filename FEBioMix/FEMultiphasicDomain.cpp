@@ -391,20 +391,16 @@ void FEMultiphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
     #pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> elm;
-		
 		// get the element
 		FESolidElement& el = m_Elem[i];
+		int neln = el.Nodes();
 			
 		// unpack the element
+		vector<int> elm;
 		UnpackLM(el, elm);
 			
-		// get the element force vector and initialize it to zero
-		int neln = el.Nodes();
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
+		// get the element force vector
+		vector<double> fe(neln);
 			
         for (int isol=0; isol<nsol; ++isol)
         {
@@ -517,20 +513,16 @@ void FEMultiphasicDomain::InternalSoluteWork(vector<double>& R, double dt)
 	#pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> elm;
-		
 		// get the element
 		FESolidElement& el = m_Elem[i];
+		int neln = el.Nodes();
 			
 		// unpack the element
+		vector<int> elm;
 		UnpackLM(el, elm);
 			
-		// get the element force vector and initialize it to zero
-		int neln = el.Nodes();
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
+		// get the element force vector
+		vector<double> fe(neln);
 			
 		for (int isol=0; isol<nsol; ++isol) 
 		{
@@ -730,22 +722,16 @@ void FEMultiphasicDomain::InternalFluidWork(vector<double>& R, double dt)
     #pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> elm;
-		
 		// get the element
 		FESolidElement& el = m_Elem[i];
+		int neln = el.Nodes();
 			
 		// unpack the element
+		vector<int> elm;
 		UnpackLM(el, elm);
 			
-		// get the element force vector and initialize it to zero
-        int neln = el.Nodes();
-		int ndof = 3*neln;
-		fe.assign(ndof, 0);
-		
 		// calculate fluid internal work
+		vector<double> fe(neln);
 		ElementInternalFluidWork(el, fe, dt);
 			
 		// add fluid work to global residual
@@ -879,26 +865,20 @@ void FEMultiphasicDomain::InternalFluidWorkSS(vector<double>& R, double dt)
     #pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> elm;
-		
 		// get the element
 		FESolidElement& el = m_Elem[i];
+		int neln = el.Nodes();
 			
 		// unpack the element
+		vector<int> elm;
 		UnpackLM(el, elm);
 			
-		// get the element force vector and initialize it to zero
-        int neln = el.Nodes();
-		int ndof = 3*neln;
-		fe.assign(ndof, 0);
-		
 		// calculate fluid internal work
+		vector<double> fe(neln);
 		ElementInternalFluidWorkSS(el, fe, dt);
 			
 		// add fluid work to global residual
-#pragma omp critical
+		#pragma omp critical
         {
             for (int j=0; j<neln; ++j)
             {

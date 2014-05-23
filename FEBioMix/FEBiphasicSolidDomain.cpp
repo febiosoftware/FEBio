@@ -270,6 +270,7 @@ void FEBiphasicSolidDomain::ElementInternalForce(FESolidElement& el, vector<doub
 }
 
 //-----------------------------------------------------------------------------
+// Calculate the work due to the internal fluid pressure (for steady-state analysis)
 void FEBiphasicSolidDomain::InternalFluidWorkSS(vector<double>& R, double dt)
 {
 	int NE = m_Elem.size();
@@ -277,23 +278,18 @@ void FEBiphasicSolidDomain::InternalFluidWorkSS(vector<double>& R, double dt)
 	#pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> elm;
-		
 		// get the element
 		FESolidElement& el = m_Elem[i];
-		
-		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
-			
-		// assemble element 'fe'-vector into global R vector
-		UnpackLM(el, elm);
+		int neln = el.Nodes();
 		
 		// calculate fluid internal work
+		vector<double> fe(neln);
 		ElementInternalFluidWorkSS(el, fe, dt);
 			
+		// assemble element 'fe'-vector into global R vector
+		vector<int> elm;
+		UnpackLM(el, elm);
+		
 		#pragma omp critical
 		{
 			// add fluid work to global residual
@@ -317,22 +313,17 @@ void FEBiphasicSolidDomain::InternalFluidWork(vector<double>& R, double dt)
     #pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> elm;
-		
 		// get the element
 		FESolidElement& el = m_Elem[i];
-			
-		// unpack the element
-		UnpackLM(el, elm);
-			
-		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
+		int neln = el.Nodes();
 			
 		// calculate fluid internal work
+		vector<double> fe(neln);
 		ElementInternalFluidWork(el, fe, dt);
+
+		// unpack the element
+		vector<int> elm;
+		UnpackLM(el, elm);
 			
         #pragma omp critical
         {
@@ -349,9 +340,6 @@ void FEBiphasicSolidDomain::InternalFluidWork(vector<double>& R, double dt)
 
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces due to the fluid work
-//! Note that we only use the first n entries in fe, where n is the number
-//! of nodes
-
 bool FEBiphasicSolidDomain::ElementInternalFluidWork(FESolidElement& el, vector<double>& fe, double dt)
 {
 	int i, n;

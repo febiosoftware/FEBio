@@ -334,23 +334,18 @@ void FEBiphasicSoluteDomain::InternalFluidWork(vector<double>& R, double dt)
 	#pragma omp parallel for
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> elm;
-
 		// get the element
 		FESolidElement& el = m_Elem[i];
-			
-		// unpack the element
-		UnpackLM(el, elm);
-			
-		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
+		int neln = el.Nodes();
 			
 		// calculate fluid internal work
+		vector<double> fe(neln);
 		ElementInternalFluidWork(el, fe, dt);
-			
+
+		// unpack the element
+		vector<int> elm;
+		UnpackLM(el, elm);
+
 		// add fluid work to global residual
 		#pragma omp critical
 		{
@@ -372,23 +367,18 @@ void FEBiphasicSoluteDomain::InternalFluidWorkSS(vector<double>& R, double dt)
 	#pragma omp parallel for
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> elm;
-		
 		// get the element
 		FESolidElement& el = m_Elem[i];
-			
-		// unpack the element
-		UnpackLM(el, elm);
-			
-		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
+		int neln = el.Nodes();
 			
 		// calculate fluid internal work
+		vector<double> fe(neln);
 		ElementInternalFluidWorkSS(el, fe, dt);
-			
+
+		// unpack the element
+		vector<int> elm;
+		UnpackLM(el, elm);
+
 		// add fluid work to global residual
 		#pragma omp critical
 		{
@@ -410,23 +400,18 @@ void FEBiphasicSoluteDomain::InternalSoluteWork(vector<double>& R, double dt)
 	#pragma omp parallel for
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> elm;
-		
 		// get the element
 		FESolidElement& el = m_Elem[i];
-			
-		// unpack the element
-		UnpackLM(el, elm);
-			
-		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
+		int neln = el.Nodes();
 			
 		// calculate fluid internal work
+		vector<double> fe(neln);
 		ElementInternalSoluteWork(el, fe, dt);
-			
+
+		// unpack the element
+		vector<int> elm;
+		UnpackLM(el, elm);
+
 		// add fluid work to global residual
 		#pragma omp critical
 		{
@@ -448,23 +433,18 @@ void FEBiphasicSoluteDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 	#pragma omp parallel for
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> elm;
-		
 		// get the element
 		FESolidElement& el = m_Elem[i];
-			
-		// unpack the element
-		UnpackLM(el, elm);
-			
-		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
+		int neln = el.Nodes();
 			
 		// calculate fluid internal work
+		vector<double> fe(neln);
 		ElementInternalSoluteWorkSS(el, fe, dt);
-			
+
+		// unpack the element
+		vector<int> elm;
+		UnpackLM(el, elm);
+
 		// add fluid work to global residual
 		#pragma omp critical
 		{

@@ -346,30 +346,29 @@ void FETriphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
     #pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> elm;
-		
 		// get the element
 		FESolidElement& el = m_Elem[i];
 		int neln = el.Nodes();
-			
+
+		// element force vector
+		vector<double> fe(neln);
+		
 		// unpack the element
+		vector<int> elm;
 		UnpackLM(el, elm);
-			
-		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
 			
 		// calculate cation internal work
 		ElementInternalSoluteWorkSS(el, fe, dt, 0);
 			
 		// add solute work to global residual
-		int dofc = DOF_C + m_pMat->m_pSolute[0]->GetSoluteID();
-		for (int j=0; j<neln; ++j)
-		{
-			int J = elm[dofc*neln+j];
-			if (J >= 0) R[J] += fe[j];
+        #pragma omp critical
+        {
+			int dofc = DOF_C + m_pMat->m_pSolute[0]->GetSoluteID();
+			for (int j=0; j<neln; ++j)
+			{
+				int J = elm[dofc*neln+j];
+				if (J >= 0) R[J] += fe[j];
+			}
 		}
 
 		// calculate anion internal work
@@ -378,7 +377,7 @@ void FETriphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 		// add solute work to global residual
         #pragma omp critical
         {
-            dofc = DOF_C + m_pMat->m_pSolute[1]->GetSoluteID();
+            int dofc = DOF_C + m_pMat->m_pSolute[1]->GetSoluteID();
             for (int j=0; j<neln; ++j)
             {
                 int J = elm[dofc*neln+j];
@@ -391,12 +390,6 @@ void FETriphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 //-----------------------------------------------------------------------------
 void FETriphasicDomain::InternalSoluteWork(vector<double>& R, double dt)
 {
-	// element force vector
-	vector<double> fe;
-	vector<int> elm;
-
-	FETriphasic* pm = m_pMat;
-	
 	int NE = m_Elem.size();
 	for (int i=0; i<NE; ++i)
 	{
@@ -405,17 +398,17 @@ void FETriphasicDomain::InternalSoluteWork(vector<double>& R, double dt)
 		int neln = el.Nodes();
 			
 		// unpack the element
+		vector<int> elm;
 		UnpackLM(el, elm);
 			
-		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
+		// the element force vector
+		vector<double> fe(neln);
 			
 		// calculate cation internal work
 		ElementInternalSoluteWork(el, fe, dt, 0);
 			
 		// add solute work to global residual
-		int dofc = DOF_C + pm->m_pSolute[0]->GetSoluteID();
+		int dofc = DOF_C + m_pMat->m_pSolute[0]->GetSoluteID();
 		for (int j=0; j<neln; ++j)
 		{
 			int J = elm[dofc*neln+j];
@@ -426,7 +419,7 @@ void FETriphasicDomain::InternalSoluteWork(vector<double>& R, double dt)
 		ElementInternalSoluteWork(el, fe, dt, 1);
 			
 		// add solute work to global residual
-		dofc = DOF_C + pm->m_pSolute[1]->GetSoluteID();
+		dofc = DOF_C + m_pMat->m_pSolute[1]->GetSoluteID();
 		for (int j=0; j<neln; ++j)
 		{
 			int J = elm[dofc*neln+j];
@@ -443,21 +436,16 @@ void FETriphasicDomain::InternalFluidWorkSS(vector<double>& R, double dt)
     #pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> elm;
-		
 		// get the element
 		FESolidElement& el = m_Elem[i];
+		int neln = el.Nodes();
 			
 		// unpack the element
+		vector<int> elm;
 		UnpackLM(el, elm);
 			
-		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
-			
 		// calculate fluid internal work
+		vector<double> fe(neln);
 		ElementInternalFluidWorkSS(el, fe, dt);
 			
 		// add fluid work to global residual
@@ -481,21 +469,16 @@ void FETriphasicDomain::InternalFluidWork(vector<double>& R, double dt)
     #pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> elm;
-		
 		// get the element
 		FESolidElement& el = m_Elem[i];
+		int neln = el.Nodes();
 			
 		// unpack the element
+		vector<int> elm;
 		UnpackLM(el, elm);
 			
-		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
-			
 		// calculate fluid internal work
+		vector<double> fe(neln);
 		ElementInternalFluidWork(el, fe, dt);
 			
 		// add fluid work to global residual
