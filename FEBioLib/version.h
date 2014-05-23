@@ -20,8 +20,8 @@
 //
 
 #define VERSION			2
-#define SUBVERSION		0
-#define SUBSUBVERSION	1
+#define SUBVERSION		1
+#define SUBSUBVERSION	0
 #ifdef SVN
 #include "svnrev.h"
 #else
