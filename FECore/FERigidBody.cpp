@@ -131,9 +131,9 @@ void FERigidBody::UpdateCOM()
 	for (int nd=0; nd < mesh.Domains(); ++nd)
 	{
 		// TODO: I should convert to a FERigidSolidDomain or FERigidShellDomain
-		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
-		if (pbd)
+		if (mesh.Domain(nd).Class() == FE_DOMAIN_SOLID)
 		{
+			FESolidDomain* pbd = static_cast<FESolidDomain*>(&mesh.Domain(nd));
 			FEMaterial* pm = pbd->GetMaterial();
 			// make sure this element belongs to the rigid body
 			if (pm->IsRigid() && (pm->GetRigidBodyID() == m_nID))

@@ -35,9 +35,9 @@ bool FEInSituStretch::Augment(int naug)
 	for (int i=0; i<ND; ++i)
 	{
 		FEDomain& dom = m.Domain(i);
-		FESolidDomain* psd = dynamic_cast<FESolidDomain*>(&dom);
-		if (psd)
+		if (dom.Class() == FE_DOMAIN_SOLID)
 		{
+			FESolidDomain* psd = static_cast<FESolidDomain*>(&dom);
 			FEPreStrainTransIsoMR* pm = dynamic_cast<FEPreStrainTransIsoMR*>(psd->GetMaterial());
 			if (pm) bconv = CheckAugment(psd, pm, 0);
 			else
@@ -73,9 +73,9 @@ bool FEInSituStretch::Augment(int naug)
 		for (int i=0; i<ND; ++i)
 		{
 			FEDomain& dom = m.Domain(i);
-			FESolidDomain* psd = dynamic_cast<FESolidDomain*>(&dom);
-			if (psd)
+			if (dom.Class() == FE_DOMAIN_SOLID)
 			{
+				FESolidDomain* psd = static_cast<FESolidDomain*>(&dom);
 				FEPreStrainTransIsoMR* pm = dynamic_cast<FEPreStrainTransIsoMR*>(psd->GetMaterial());
 				if (pm) DoAugment(psd, pm, 0);
 				else

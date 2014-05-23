@@ -76,6 +76,9 @@ public:
 	//! return the type of element
 	int Type() const { return m_pT->m_ntype; } 
 
+	//! return the element class
+	int Class() const { return m_pT->m_nclass; }
+
 	//! Get the element's material ID
 	int GetMatID() const { return m_mat; } 
 

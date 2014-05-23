@@ -601,7 +601,7 @@ void FEUT4Domain::NodalStiffnessMatrix(FESolver *psolver)
 		en.resize(NE*4  );
 		for (ni=0; ni<NE; ++ni)
 		{
-			FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
+			FEElement& el = *ppe[ni];
 			UnpackLM(el, elm);
 			for (int i=0; i<4; ++i)
 			{

@@ -78,8 +78,8 @@ bool FESlidingSurfaceMP::Init()
 	int nsol = 0;
 	if (Elements()) {
 		FESurfaceElement& se = Element(0);
-		// get the solid element this surface element belongs to
-		FESolidElement* pe = dynamic_cast<FESolidElement*>(m_pMesh->FindElementFromID(se.m_nelem));
+		// get the element this surface element belongs to
+		FEElement* pe = m_pMesh->FindElementFromID(se.m_nelem);
 		if (pe)
 		{
 			// get the material
@@ -793,8 +793,8 @@ double FESlidingInterfaceMP::AutoPressurePenalty(FESurfaceElement& el, FESliding
 	
 	double eps = 0;
 	
-	// get the solid element this surface element belongs to
-	FESolidElement* pe = dynamic_cast<FESolidElement*>(m.FindElementFromID(el.m_nelem));
+	// get the element this surface element belongs to
+	FEElement* pe = m.FindElementFromID(el.m_nelem);
 	if (pe)
 	{
 		// get the material
@@ -937,8 +937,8 @@ double FESlidingInterfaceMP::AutoConcentrationPenalty(FESurfaceElement& el,
 	
 	double eps = 0;
 	
-	// get the solid element this surface element belongs to
-	FESolidElement* pe = dynamic_cast<FESolidElement*>(m.FindElementFromID(el.m_nelem));
+	// get the element this surface element belongs to
+	FEElement* pe = m.FindElementFromID(el.m_nelem);
 	if (pe)
 	{
 		// get the material

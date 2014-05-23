@@ -14,66 +14,61 @@
 //-----------------------------------------------------------------------------
 bool FEPlotActualFluidPressure::Save(FEDomain &dom, vector<float>& a)
 {
-	int i, j;
-	double ew;
-	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
-	if ((dynamic_cast<FEBiphasicSolidDomain* >(&dom)) || 
-		(dynamic_cast<FEBiphasicSoluteDomain*>(&dom)) ||
-		(dynamic_cast<FETriphasicDomain*     >(&dom)) ||
-		(dynamic_cast<FEMultiphasicDomain*   >(&dom)))
+	if (dom.Class() != FE_DOMAIN_SOLID) return false;
+	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+	if ((dynamic_cast<FEBiphasicSolidDomain* >(&bd)) || 
+		(dynamic_cast<FEBiphasicSoluteDomain*>(&bd)) ||
+		(dynamic_cast<FETriphasicDomain*     >(&bd)) ||
+		(dynamic_cast<FEMultiphasicDomain*   >(&bd)))
 	{
-		for (i=0; i<pbd->Elements(); ++i)
+		for (int i=0; i<bd.Elements(); ++i)
 		{
-			FESolidElement& el = pbd->Element(i);
+			FESolidElement& el = bd.Element(i);
 			
 			// calculate average pressure
-			ew = 0;
-			for (j=0; j<el.GaussPoints(); ++j)
+			double ew = 0;
+			for (int j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 				
 				if (pt) ew += pt->m_pa;
 			}
-			
 			ew /= el.GaussPoints();
 			
 			a.push_back((float) ew);
 		}
 		return true;
 	}
-
 	return false;
 }
 
 //-----------------------------------------------------------------------------
 bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 {
-	int i, j;
-	float af[3];
-	vec3d ew;
-	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
-	if ((dynamic_cast<FEBiphasicSolidDomain* >(&dom)) || 
-		(dynamic_cast<FEBiphasicSoluteDomain*>(&dom)) ||
-		(dynamic_cast<FETriphasicDomain*     >(&dom)) ||
-		(dynamic_cast<FEMultiphasicDomain*   >(&dom)))
+	if (dom.Class() != FE_DOMAIN_SOLID) return false;
+	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+	if ((dynamic_cast<FEBiphasicSolidDomain* >(&bd)) || 
+		(dynamic_cast<FEBiphasicSoluteDomain*>(&bd)) ||
+		(dynamic_cast<FETriphasicDomain*     >(&bd)) ||
+		(dynamic_cast<FEMultiphasicDomain*   >(&bd)))
 	{
-		for (i=0; i<pbd->Elements(); ++i)
+		for (int i=0; i<bd.Elements(); ++i)
 		{
-			FESolidElement& el = pbd->Element(i);
+			FESolidElement& el = bd.Element(i);
 
 			// calculate average flux
-			ew = vec3d(0,0,0);
-			for (j=0; j<el.GaussPoints(); ++j)
+			vec3d ew = vec3d(0,0,0);
+			for (int j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 
 				if (pt) ew += pt->m_w;
 			}
-
 			ew /= el.GaussPoints();
 
+			float af[3];
 			af[0] = (float) ew.x;
 			af[1] = (float) ew.y;
 			af[2] = (float) ew.z;
@@ -91,24 +86,23 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotNodalFluidFlux::Save(FEDomain &dom, vector<float>& a)
 {
-	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
-	if ((dynamic_cast<FEBiphasicSolidDomain* >(&dom)) ||
-		(dynamic_cast<FEBiphasicSoluteDomain*>(&dom)) ||
-		(dynamic_cast<FETriphasicDomain*     >(&dom)) ||
-		(dynamic_cast<FEMultiphasicDomain*   >(&dom)))
+	if (dom.Class() != FE_DOMAIN_SOLID) return false;
+	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+	if ((dynamic_cast<FEBiphasicSolidDomain* >(&bd)) ||
+		(dynamic_cast<FEBiphasicSoluteDomain*>(&bd)) ||
+		(dynamic_cast<FETriphasicDomain*     >(&bd)) ||
+		(dynamic_cast<FEMultiphasicDomain*   >(&bd)))
 	{
-		for (int i=0; i<pbd->Elements(); ++i)
+		for (int i=0; i<bd.Elements(); ++i)
 		{
-			FESolidElement& el = pbd->Element(i);
+			FESolidElement& el = bd.Element(i);
 
 			int nint = el.GaussPoints();
 			int neln = el.Nodes();
-			assert(nint == neln); // TODO: just for now
 
 			// fluid flux at gauss points
-			int j;
 			double vi[3][FEElement::MAX_NODES];
-			for (j=0; j<nint; ++j)
+			for (int j=0; j<nint; ++j)
 			{
 				FEBiphasicMaterialPoint* pt = el.GetMaterialPoint(j)->ExtractData<FEBiphasicMaterialPoint>(); assert(pt);
 				vi[0][j] = pt->m_w.x;
@@ -123,7 +117,7 @@ bool FEPlotNodalFluidFlux::Save(FEDomain &dom, vector<float>& a)
 			el.project_to_nodes(vi[2], vn[2]);
 
 			// output data
-			for (j=0; j<neln; ++j)
+			for (int j=0; j<neln; ++j)
 			{
 				a.push_back((float)vn[0][j]);
 				a.push_back((float)vn[1][j]);
@@ -138,25 +132,22 @@ bool FEPlotNodalFluidFlux::Save(FEDomain &dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, vector<float>& a)
 {
-	int i, j;
-	double ew;
 	FEBiphasicSoluteDomain* pbd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	if (pbd)
 	{
-		for (i=0; i<pbd->Elements(); ++i)
+		for (int i=0; i<pbd->Elements(); ++i)
 		{
 			FESolidElement& el = pbd->Element(i);
 			
 			// calculate average concentration
-			ew = 0;
-			for (j=0; j<el.GaussPoints(); ++j)
+			double ew = 0;
+			for (int j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_ca[0];
 			}
-			
 			ew /= el.GaussPoints();
 			
 			a.push_back((float) ew);
@@ -176,10 +167,10 @@ bool FEPlotActualSolConcentration_::Save(FEDomain &dom, vector<float>& a)
 		bool present = (psm->GetSolute()->GetSoluteID() == m_nsol);
 		if (!present) return false;
 
-		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
-		for (int i=0; i<sd.Elements(); ++i)
+		int N = dom.Elements();
+		for (int i=0; i<N; ++i)
 		{
-			FESolidElement& el = sd.Element(i);
+			FEElement& el = dom.ElementRef(i);
 			
 			// calculate average concentration
 			double ew = 0;
@@ -207,10 +198,10 @@ bool FEPlotActualSolConcentration_::Save(FEDomain &dom, vector<float>& a)
 		else if (ptm->m_pSolute[1]->GetSoluteID() == m_nsol) sid = 1;
 		if (sid == -1) return false;
 
-		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
-		for (int i=0; i<sd.Elements(); ++i)
+		int N = dom.Elements();
+		for (int i=0; i<N; ++i)
 		{
-			FESolidElement& el = sd.Element(i);
+			FEElement& el = dom.ElementRef(i);
 			
 			// calculate average concentration
 			double ew = 0;
@@ -238,10 +229,10 @@ bool FEPlotActualSolConcentration_::Save(FEDomain &dom, vector<float>& a)
 			if (pmm->GetSolute(i)->GetSoluteID() == m_nsol) {sid = i; break;}
 		if (sid == -1) return false;
 		
-		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
-		for (int i=0; i<sd.Elements(); ++i)
+		int N = dom.Elements();
+		for (int i=0; i<N; ++i)
 		{
-			FESolidElement& el = sd.Element(i);
+			FEElement& el = dom.ElementRef(i);
 			
 			// calculate average concentration
 			double ew = 0;
@@ -310,10 +301,10 @@ bool FEPlotSolFlux_::Save(FEDomain &dom, vector<float>& a)
 		bool present = (psm->GetSolute()->GetSoluteID() == m_nsol);
 		if (!present) return false;
 		
-		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
-		for (int i=0; i<sd.Elements(); ++i)
+		int N = dom.Elements();
+		for (int i=0; i<N; ++i)
 		{
-			FESolidElement& el = sd.Element(i);
+			FEElement& el = dom.ElementRef(i);
 			
 			// calculate average flux
 			vec3d ew = vec3d(0,0,0);
@@ -348,10 +339,10 @@ bool FEPlotSolFlux_::Save(FEDomain &dom, vector<float>& a)
 		else if (ptm->m_pSolute[1]->GetSoluteID() == m_nsol) sid = 1;
 		if (sid == -1) return false;
 		
-		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
-		for (int i=0; i<sd.Elements(); ++i)
+		int N = dom.Elements();
+		for (int i=0; i<N; ++i)
 		{
-			FESolidElement& el = sd.Element(i);
+			FEElement& el = dom.ElementRef(i);
 			
 			// calculate average flux
 			vec3d ew = vec3d(0,0,0);
@@ -386,10 +377,10 @@ bool FEPlotSolFlux_::Save(FEDomain &dom, vector<float>& a)
 			if (pmm->GetSolute(i)->GetSoluteID() == m_nsol) {sid = i; break;}
 		if (sid == -1) return false;
 		
-		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
-		for (int i=0; i<sd.Elements(); ++i)
+		int N = dom.Elements();
+		for (int i=0; i<N; ++i)
 		{
-			FESolidElement& el = sd.Element(i);
+			FEElement& el = dom.ElementRef(i);
 			
 			// calculate average flux
 			vec3d ew = vec3d(0,0,0);
@@ -994,13 +985,13 @@ bool FEPlotEffectiveElasticity::Save(FEDomain &dom, vector<float>& a)
 {
     tens4ds c;
     
-	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
+	if (dom.Class() != FE_DOMAIN_SOLID) return false;
+	FESolidDomain* pbd = static_cast<FESolidDomain*>(&dom);
     
-    FEBiphasic* pb = dynamic_cast<FEBiphasic*> (dom.GetMaterial());
+    FEBiphasic*       pb  = dynamic_cast<FEBiphasic      *> (dom.GetMaterial());
     FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
-    FETriphasic* ptp = dynamic_cast<FETriphasic*> (dom.GetMaterial());
-    FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
-
+    FETriphasic*      ptp = dynamic_cast<FETriphasic     *> (dom.GetMaterial());
+    FEMultiphasic*    pmp = dynamic_cast<FEMultiphasic   *> (dom.GetMaterial());
     if ((pb == 0) && (pbs == 0) && (ptp == 0) && (pmp == 0)) return false;
 
     for (int i=0; i<pbd->Elements(); ++i)

@@ -50,7 +50,7 @@ class FEElementTraits
 {
 public:
 	//! constructor
-	FEElementTraits(int ni, int ne, FE_Element_Type et) : m_ntype(et)
+	FEElementTraits(int ni, int ne, FE_Element_Type et, FE_Element_Class ec) : m_ntype(et), m_nclass(ec)
 	{
 		neln = ne;
 		nint = ni;
@@ -71,6 +71,7 @@ public:
 				//!< the second index to the shape function
 
 	int m_ntype;	//!< type of element
+	int	m_nclass;	//!< element class
 
 private:
 
@@ -829,7 +830,7 @@ public:
 class FEShellElementTraits : public FEElementTraits
 {
 public:
-	FEShellElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et) 
+	FEShellElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_SHELL) 
 	{
 		gr.resize(ni);
 		gs.resize(ni);
@@ -919,7 +920,7 @@ public:
 	enum { NELN = 2 };
 
 public:
-	FETrussElementTraits() : FEElementTraits(NINT, NELN, FE_TRUSS) { init(); }
+	FETrussElementTraits() : FEElementTraits(NINT, NELN, FE_TRUSS, FE_ELEM_TRUSS) { init(); }
 
 	void init();
 };
@@ -938,7 +939,7 @@ public:
 	enum { NELN = 2 };
 
 public:
-	FEDiscreteElementTraits() : FEElementTraits(NINT, NELN, FE_DISCRETE) { init(); }
+	FEDiscreteElementTraits() : FEElementTraits(NINT, NELN, FE_DISCRETE, FE_ELEM_DISCRETE) { init(); }
 
 	void init() {}
 };

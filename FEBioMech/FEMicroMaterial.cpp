@@ -129,7 +129,7 @@ void FEMicroMaterial::PrepRVE()
 	double* w, J;
 	for (int k=0; k<m.Domains(); ++k)
 	{
-		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(m.Domain(k));
+		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
 		for (int i=0; i<dom.Elements(); ++i)
 		{
 			FESolidElement& el = dom.Element(i);

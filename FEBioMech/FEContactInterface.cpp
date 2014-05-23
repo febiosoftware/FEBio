@@ -33,8 +33,8 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 	// get the mesh
 	FEMesh& m = GetFEModel()->GetMesh();
 
-	// get the solid element this surface element belongs to
-	FESolidElement* pe = dynamic_cast<FESolidElement*>(m.FindElementFromID(el.m_nelem));
+	// get the element this surface element belongs to
+	FEElement* pe = m.FindElementFromID(el.m_nelem);
 	if (pe)
 	{
 		// extract the elastic material

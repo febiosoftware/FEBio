@@ -649,11 +649,10 @@ bool FEPlotFiberPreStretch::Save(FEDomain& dom, vector<float>& a)
 		if (pm == 0) return false;
 	}
 
-	FESolidDomain& d = dynamic_cast<FESolidDomain&>(dom);
-	int NE = d.Elements();
+	int NE = dom.Elements();
 	for (int i=0; i<NE; ++i)
 	{
-		FESolidElement& e = d.Element(i);
+		FEElement& e = dom.ElementRef(i);
 		int nint = e.GaussPoints();
 		double lam = 0.0;
 		for (int j=0; j<nint; ++j)

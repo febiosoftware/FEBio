@@ -6,6 +6,18 @@
 #define _FE_ENUM_H_05132007_
 
 //-----------------------------------------------------------------------------
+// Element Class:
+// Defines the general category of element.
+enum FE_Element_Class {
+	FE_ELEM_SOLID,
+	FE_ELEM_SHELL,
+	FE_ELEM_BEAM,
+	FE_ELEM_SURFACE,
+	FE_ELEM_TRUSS,
+	FE_ELEM_DISCRETE
+};
+
+//-----------------------------------------------------------------------------
 // Element shapes:
 // This defines the general element shape classes. This classification differs from the
 // element types below, in that the latter is defined by a shape and integration rule.

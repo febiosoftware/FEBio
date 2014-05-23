@@ -361,12 +361,13 @@ bool FEModel::InitObjects()
 	for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_bshell = false;
 	for (int nd = 0; nd<m_mesh.Domains(); ++nd)
 	{
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
-		if (psd)
+		FEDomain& dom = m_mesh.Domain(nd);
+		if (dom.Class() == FE_DOMAIN_SHELL)
 		{
-			for (int i=0; i<psd->Elements(); ++i)
+			int N = dom.Elements();
+			for (int i=0; i<N; ++i)
 			{
-				FEShellElement& el = psd->Element(i);
+				FEElement& el = dom.ElementRef(i);
 				if (el.m_nrigid < 0)
 				{
 					int n = el.Nodes();

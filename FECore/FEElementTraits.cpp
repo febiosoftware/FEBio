@@ -7,7 +7,7 @@
 #include "FEElement.h"
 #include "FEException.h"
 //=============================================================================
-FESolidElementTraits::FESolidElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et) 
+FESolidElementTraits::FESolidElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_SOLID) 
 {
 	gr.resize(ni);
 	gs.resize(ni);
@@ -1027,7 +1027,7 @@ void FEHex20G27::project_to_nodes(double* ai, double* ao)
 //
 //=============================================================================
 
-FESurfaceElementTraits::FESurfaceElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et)
+FESurfaceElementTraits::FESurfaceElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_SURFACE)
 {
 	m_ntype = et;
 

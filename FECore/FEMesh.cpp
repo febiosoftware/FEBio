@@ -345,13 +345,13 @@ void FEMesh::InitShellNormals()
 	for (int nd = 0; nd < Domains(); ++nd)
 	{
 		// Calculate the shell directors as the local node normals
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&Domain(nd));
-		if (psd)
+		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
 		{
+			FEShellDomain& sd = static_cast<FEShellDomain&>(Domain(nd));
 			vec3d r0[FEElement::MAX_NODES];
-			for (int i=0; i<psd->Elements(); ++i)
+			for (int i=0; i<sd.Elements(); ++i)
 			{
-				FEShellElement& el = psd->Element(i);
+				FEShellElement& el = sd.Element(i);
 
 				int n = el.Nodes();
 				int* en = &el.m_node[0];
@@ -395,17 +395,17 @@ int FEMesh::FindInvertedElements()
 	for (int nd = 0; nd < Domains(); ++nd)
 	{
 		// check solid domains
-		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&Domain(nd));
-		if (pbd)
+		if (Domain(nd).Class() == FE_DOMAIN_SOLID)
 		{
-			for (int i=0; i<pbd->Elements(); ++i)
+			FESolidDomain& bd = static_cast<FESolidDomain&>(Domain(nd));
+			for (int i=0; i<bd.Elements(); ++i)
 			{
-				FESolidElement& el = pbd->Element(i);
+				FESolidElement& el = bd.Element(i);
 
 				int nint = el.GaussPoints();
 				for (int n=0; n<nint; ++n)
 				{
-					double J0 = pbd->detJ0(el, n);
+					double J0 = bd.detJ0(el, n);
 					if (J0 <= 0)
 					{
 						felog.printf("**************************** E R R O R ****************************\n");
@@ -426,19 +426,19 @@ int FEMesh::FindInvertedElements()
 		}
 
 		// check shell domains (we don't care about rigid domains)
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&Domain(nd));
-		if (psd)
+		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
 		{
+			FEShellDomain& sd = static_cast<FEShellDomain&>(Domain(nd));
 			// check the connectivity of the shells
-			for (int i=0; i<psd->Elements(); ++i)
+			for (int i=0; i<sd.Elements(); ++i)
 			{
-				FEShellElement& el = psd->Element(i);
+				FEShellElement& el = sd.Element(i);
 				if (!el.IsRigid())
 				{
 					int nint = el.GaussPoints();
 					for (int n=0; n<nint; ++n)
 					{
-						double J0 = psd->detJ0(el, n);
+						double J0 = sd.detJ0(el, n);
 						if (J0 <= 0)
 						{
 							felog.printf("**************************** E R R O R ****************************\n");
@@ -491,12 +491,12 @@ bool FEMesh::Init()
 	zero(tag);
 	for (int nd = 0; nd < Domains(); ++nd)
 	{
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&Domain(nd));
-		if (psd)
+		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
 		{
-			for (int i=0; i<psd->Elements(); ++i)
+			FEShellDomain& sd = static_cast<FEShellDomain&>(Domain(nd));
+			for (int i=0; i<sd.Elements(); ++i)
 			{
-				FEShellElement& el = psd->Element(i);
+				FEShellElement& el = sd.Element(i);
 				int n = el.Nodes();
 				int* en = &el.m_node[0];
 				for (int j=0; j<n; ++j) tag[en[j]] = 1;
@@ -564,10 +564,11 @@ void FEMesh::Reset()
 double FEMesh::ElementVolume(FEElement &el)
 {
 	double V = 0;
-	if (dynamic_cast<FESolidElement*  >(&el)) V = SolidElementVolume(dynamic_cast<FESolidElement&>(el));
-	if (dynamic_cast<FEShellElement*  >(&el)) V = ShellElementVolume(dynamic_cast<FEShellElement&>(el));
-	if (dynamic_cast<FESurfaceElement*>(&el)) V = 0;
-
+	switch (el.Class())
+	{
+	case FE_ELEM_SOLID: V = SolidElementVolume(static_cast<FESolidElement&>(el)); break;
+	case FE_ELEM_SHELL: V = ShellElementVolume(static_cast<FEShellElement&>(el)); break;
+	}
 	return V;
 }
 
@@ -833,10 +834,10 @@ FESolidElement* FEMesh::FindSolidElement(vec3d y, double r[3])
 	int ND = (int) m_Domain.size();
 	for (int i=0; i<ND; ++i)
 	{
-		FESolidDomain* pd = dynamic_cast<FESolidDomain*>(m_Domain[i]);
-		if (pd)
+		if (m_Domain[i]->Class() == FE_DOMAIN_SOLID)
 		{
-			FESolidElement* pe = pd->FindElement(y, r);
+			FESolidDomain& bd = static_cast<FESolidDomain&>(*m_Domain[i]);
+			FESolidElement* pe = bd.FindElement(y, r);
 			if (pe) return pe;
 		}
 	}
