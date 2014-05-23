@@ -342,11 +342,8 @@ void FETriphasicDomain::ElementInternalForce(FESolidElement& el, vector<double>&
 //-----------------------------------------------------------------------------
 void FETriphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 {
-	FETriphasic* pm = m_pMat;
-	
 	int NE = m_Elem.size();
-    
-    #pragma omp parallel for shared(NE, pm)
+    #pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
 		// element force vector
@@ -368,7 +365,7 @@ void FETriphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 		ElementInternalSoluteWorkSS(el, fe, dt, 0);
 			
 		// add solute work to global residual
-		int dofc = DOF_C + pm->m_pSolute[0]->GetSoluteID();
+		int dofc = DOF_C + m_pMat->m_pSolute[0]->GetSoluteID();
 		for (int j=0; j<neln; ++j)
 		{
 			int J = elm[dofc*neln+j];
@@ -381,7 +378,7 @@ void FETriphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 		// add solute work to global residual
         #pragma omp critical
         {
-            dofc = DOF_C + pm->m_pSolute[1]->GetSoluteID();
+            dofc = DOF_C + m_pMat->m_pSolute[1]->GetSoluteID();
             for (int j=0; j<neln; ++j)
             {
                 int J = elm[dofc*neln+j];

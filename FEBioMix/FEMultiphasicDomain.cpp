@@ -388,7 +388,7 @@ void FEMultiphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 
 	int NE = (int)m_Elem.size();
     
-    #pragma omp parallel for shared(NE, pm)
+    #pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
 		// element force vector
@@ -514,7 +514,7 @@ void FEMultiphasicDomain::InternalSoluteWork(vector<double>& R, double dt)
 
 	int NE = (int)m_Elem.size();
     
-	#pragma omp parallel for shared(NE, pm)
+	#pragma omp parallel for shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
 		// element force vector
@@ -997,7 +997,7 @@ void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const F
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
     
-    #pragma omp parallel for shared(pm)
+    #pragma omp parallel
 	for (int iel=0; iel<NE; ++iel)
 	{
 		// element stiffness matrix
@@ -1051,7 +1051,7 @@ void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
     
-    #pragma omp parallel for shared(pm)
+    #pragma omp parallel
 	for (int iel=0; iel<NE; ++iel)
 	{
 		// element stiffness matrix
