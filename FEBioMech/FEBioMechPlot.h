@@ -123,12 +123,6 @@ class FEPlotElementStress : public FEDomainData
 public:
 	FEPlotElementStress(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
-
-protected:
-	bool WriteSolidStress(FEElasticSolidDomain& d, vector<float>& a);
-	bool WriteShellStress(FEElasticShellDomain& d, vector<float>& a);
-
-	bool WriteLinearSolidStress(FELinearSolidDomain& d, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -192,14 +186,7 @@ class FEPlotElementElasticity : public FEDomainData
 public:
 	FEPlotElementElasticity(FEModel* pfem) : FEDomainData(PLT_TENS4FS, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
-    
-protected:
-	bool WriteSolidElasticity(FEElasticSolidDomain& d, vector<float>& a);
-	bool WriteShellElasticity(FEElasticShellDomain& d, vector<float>& a);
-    
-	bool WriteLinearSolidElasticity(FELinearSolidDomain& d, vector<float>& a);
 };
-
 
 //-----------------------------------------------------------------------------
 //! Damage reduction factor

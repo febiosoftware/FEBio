@@ -251,30 +251,14 @@ bool FEPlotContactArea::Save(FESurface &surf, vector<float>& a)
 //! Store the average stresses for each element. 
 bool FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
 {
-	// write solid stresses
-	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
-	if (pbd) return WriteSolidStress(*pbd, a);
-
-	FELinearSolidDomain* pbl = dynamic_cast<FELinearSolidDomain*>(&dom);
-	if (pbl) return WriteLinearSolidStress(*pbl, a);
-
-	// write shell stresses
-	FEElasticShellDomain* pbs = dynamic_cast<FEElasticShellDomain*>(&dom);
-	if (pbs) return WriteShellStress(*pbs, a);
-
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotElementStress::WriteSolidStress(FEElasticSolidDomain& d, vector<float>& a)
-{
-	// make sure this is not a rigid body
-	if (dynamic_cast<FERigidSolidDomain*>(&d)) return false;
+	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+	if ((pme == 0) || pme->IsRigid()) return false;
 
 	// write solid element data
-	for (int i=0; i<d.Elements(); ++i)
+	int N = dom.Elements();
+	for (int i=0; i<N; ++i)
 	{
-		FESolidElement& el = d.Element(i);
+		FEElement& el = dom.ElementRef(i);
 
 		float s[6] = {0};
 		int nint = el.GaussPoints();
@@ -308,126 +292,21 @@ bool FEPlotElementStress::WriteSolidStress(FEElasticSolidDomain& d, vector<float
 
 	return true;
 }
-
-//-----------------------------------------------------------------------------
-bool FEPlotElementStress::WriteShellStress(FEElasticShellDomain& d, vector<float>& a)
-{
-	// make sure this is not a rigid body
-	if (dynamic_cast<FERigidShellDomain*>(&d)) return false;
-
-	// write shell element data
-	for (int i=0; i<d.Elements(); ++i)
-	{
-		FEShellElement& el = d.Element(i);
-
-		float s[6] = {0};
-		int nint = el.GaussPoints();
-		double f = 1.0 / (double) nint;
-
-		// since the PLOT file requires floats we need to convert
-		// the doubles to single precision
-		// we output the average stress values of the gauss points
-		for (int j=0; j<nint; ++j)
-		{
-			FEElasticMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
-			if (ppt)
-			{
-				FEElasticMaterialPoint& pt = *ppt;
-				s[0] += (float) (f*pt.m_s.xx());
-				s[1] += (float) (f*pt.m_s.yy());
-				s[2] += (float) (f*pt.m_s.zz());
-				s[3] += (float) (f*pt.m_s.xy());
-				s[4] += (float) (f*pt.m_s.yz());
-				s[5] += (float) (f*pt.m_s.xz());
-			}
-		}
-
-		a.push_back(s[0]);
-		a.push_back(s[1]);
-		a.push_back(s[2]);
-		a.push_back(s[3]);
-		a.push_back(s[4]);
-		a.push_back(s[5]);
-	}
-
-	return true;
-}
-
-
-//-----------------------------------------------------------------------------
-bool FEPlotElementStress::WriteLinearSolidStress(FELinearSolidDomain& d, vector<float>& a)
-{
-	// write solid element data
-	for (int i=0; i<d.Elements(); ++i)
-	{
-		FESolidElement& el = d.Element(i);
-
-		float s[6] = {0};
-		int nint = el.GaussPoints();
-		double f = 1.0 / (double) nint;
-
-		// since the PLOT file requires floats we need to convert
-		// the doubles to single precision
-		// we output the average stress values of the gauss points
-		for (int j=0; j<nint; ++j)
-		{
-			FEElasticMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
-			if (ppt)
-			{
-				FEElasticMaterialPoint& pt = *ppt;
-				mat3ds& es = pt.m_s;
-				s[0] += (float) (f*es.xx());
-				s[1] += (float) (f*es.yy());
-				s[2] += (float) (f*es.zz());
-				s[3] += (float) (f*es.xy());
-				s[4] += (float) (f*es.yz());
-				s[5] += (float) (f*es.xz());
-			}
-		}
-
-		a.push_back(s[0]);
-		a.push_back(s[1]);
-		a.push_back(s[2]);
-		a.push_back(s[3]);
-		a.push_back(s[4]);
-		a.push_back(s[5]);
-	}
-
-	return true;
-}
-
 
 //-----------------------------------------------------------------------------
 //! Store the average elasticity for each element.
 bool FEPlotElementElasticity::Save(FEDomain& dom, vector<float>& a)
 {
-	// write solid elasticity
-	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
-	if (pbd) return WriteSolidElasticity(*pbd, a);
-    
-	FELinearSolidDomain* pbl = dynamic_cast<FELinearSolidDomain*>(&dom);
-	if (pbl) return WriteLinearSolidElasticity(*pbl, a);
-    
-	// write shell elasticity
-	FEElasticShellDomain* pbs = dynamic_cast<FEElasticShellDomain*>(&dom);
-	if (pbs) return WriteShellElasticity(*pbs, a);
-    
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotElementElasticity::WriteSolidElasticity(FEElasticSolidDomain& d, vector<float>& a)
-{
-    FEMaterial* pm = dynamic_cast<FEMaterial*> (d.GetMaterial());
-    FEElasticMaterial* pme = pm->GetElasticMaterial();
-    if (pme == 0) return false;
+    FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return false;
     
     tens4ds c;
     
 	// write solid element data
-	for (int i=0; i<d.Elements(); ++i)
+	int N = dom.Elements();
+	for (int i=0; i<N; ++i)
 	{
-		FESolidElement& el = d.Element(i);
+		FEElement& el = dom.ElementRef(i);
         
 		float s[21] = {0};
 		int nint = el.GaussPoints();
@@ -438,7 +317,7 @@ bool FEPlotElementElasticity::WriteSolidElasticity(FEElasticSolidDomain& d, vect
 		// we output the average stress values of the gauss points
 		for (int j=0; j<nint; ++j)
 		{
-			FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
+			FEMaterialPoint& pt = *el.GetMaterialPoint(j);
             c = pme->Tangent(pt);
             
             for (int k=0; k<21; ++k) s[k] += (float) (f*c.d[k]);
@@ -449,101 +328,26 @@ bool FEPlotElementElasticity::WriteSolidElasticity(FEElasticSolidDomain& d, vect
     
 	return true;
 }
-
-//-----------------------------------------------------------------------------
-bool FEPlotElementElasticity::WriteShellElasticity(FEElasticShellDomain& d, vector<float>& a)
-{
-    FEMaterial* pm = dynamic_cast<FEMaterial*> (d.GetMaterial());
-    FEElasticMaterial* pme = pm->GetElasticMaterial();
-    if (pme == 0) return false;
-    
-    tens4ds c;
-    
-	// write shell element data
-	for (int i=0; i<d.Elements(); ++i)
-	{
-		FEShellElement& el = d.Element(i);
-        
-		float s[21] = {0};
-		int nint = el.GaussPoints();
-		double f = 1.0 / (double) nint;
-        
-		// since the PLOT file requires floats we need to convert
-		// the doubles to single precision
-		// we output the average stress values of the gauss points
-		for (int j=0; j<nint; ++j)
-		{
-			FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
-            c = pme->Tangent(pt);
-            
-            for (int k=0; k<21; ++k) s[k] += (float) (f*c.d[k]);
-		}
-        
-        for (int k=0; k<21; ++k) a.push_back(s[k]);
-	}
-    
-	return true;
-}
-
-
-//-----------------------------------------------------------------------------
-bool FEPlotElementElasticity::WriteLinearSolidElasticity(FELinearSolidDomain& d, vector<float>& a)
-{
-    FEMaterial* pm = dynamic_cast<FEMaterial*> (d.GetMaterial());
-    FEElasticMaterial* pme = pm->GetElasticMaterial();
-    if (pme == 0) return false;
-    
-    tens4ds c;
-    
-	// write solid element data
-	for (int i=0; i<d.Elements(); ++i)
-	{
-		FESolidElement& el = d.Element(i);
-        
-		float s[21] = {0};
-		int nint = el.GaussPoints();
-		double f = 1.0 / (double) nint;
-        
-		// since the PLOT file requires floats we need to convert
-		// the doubles to single precision
-		// we output the average stress values of the gauss points
-		for (int j=0; j<nint; ++j)
-		{
-			FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
-            c = pme->Tangent(pt);
-            
-            for (int k=0; k<21; ++k) s[k] += (float) (f*c.d[k]);
-		}
-        
-        for (int k=0; k<21; ++k) a.push_back(s[k]);
-	}
-    
-	return true;
-}
-
 
 //-----------------------------------------------------------------------------
 bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
 {
-	int i, j;
-	double ew;
-	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
-	if (pbd)
+	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
-		for (i=0; i<pbd->Elements(); ++i)
+		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+		int N = bd.Elements();
+		for (int i=0; i<bd.Elements(); ++i)
 		{
-			FESolidElement& el = pbd->Element(i);
+			FESolidElement& el = bd.Element(i);
 			
 			// calculate average strain energy
-			ew = 0;
-			for (j=0; j<el.GaussPoints(); ++j)
+			double ew = 0;
+			for (int j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FERemodelingMaterialPoint* pt = (mp.ExtractData<FERemodelingMaterialPoint>());
-				
 				if (pt) ew += pt->m_sed;
 			}
-			
 			ew /= el.GaussPoints();
 			
 			a.push_back((float) ew);
@@ -556,25 +360,23 @@ bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, vector<float>& a)
 {
-	int i, j;
-	double ew;
-	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
-	if (pbd)
+	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
-		for (i=0; i<pbd->Elements(); ++i)
+		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+		int N = bd.Elements();
+		for (int i=0; i<bd.Elements(); ++i)
 		{
-			FESolidElement& el = pbd->Element(i);
+			FESolidElement& el = bd.Element(i);
 			
 			// calculate average strain energy
-			ew = 0;
-			for (j=0; j<el.GaussPoints(); ++j)
+			double ew = 0;
+			for (int j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FERemodelingMaterialPoint* rpt = (mp.ExtractData<FERemodelingMaterialPoint>());
 				
 				if (rpt) ew += rpt->m_sed/rpt->m_rhor;
 			}
-			
 			ew /= el.GaussPoints();
 			
 			a.push_back((float) ew);
@@ -587,24 +389,22 @@ bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotDensity::Save(FEDomain &dom, vector<float>& a)
 {
-	int i, j;
-	double ew;
-	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
-	if (pbd)
+	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
-		for (i=0; i<pbd->Elements(); ++i)
+		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+		int N = bd.Elements();
+		for (int i=0; i<bd.Elements(); ++i)
 		{
-			FESolidElement& el = pbd->Element(i);
+			FESolidElement& el = bd.Element(i);
 			
 			// calculate average mass density
-			ew = 0;
-			for (j=0; j<el.GaussPoints(); ++j)
+			double ew = 0;
+			for (int j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FERemodelingMaterialPoint* pt = (mp.ExtractData<FERemodelingMaterialPoint>());
 				if (pt) ew += pt->m_rhor;
 			}
-			
 			ew /= el.GaussPoints();
 			
 			a.push_back((float) ew);
@@ -618,25 +418,23 @@ bool FEPlotDensity::Save(FEDomain &dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotRelativeVolume::Save(FEDomain &dom, vector<float>& a)
 {
-	int i, j;
-	double ew;
-	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
-	if (pbd)
+	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
-		for (i=0; i<pbd->Elements(); ++i)
+		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+		int N = bd.Elements();
+		for (int i=0; i<bd.Elements(); ++i)
 		{
-			FESolidElement& el = pbd->Element(i);
+			FESolidElement& el = bd.Element(i);
 			
 			// calculate average flux
-			ew = 0;
-			for (j=0; j<el.GaussPoints(); ++j)
+			double ew = 0;
+			for (int j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FEElasticMaterialPoint* pt = (mp.ExtractData<FEElasticMaterialPoint>());
 				
 				if (pt) ew += pt->m_J;
 			}
-			
 			ew /= el.GaussPoints();
 			
 			a.push_back((float) ew);
@@ -649,19 +447,19 @@ bool FEPlotRelativeVolume::Save(FEDomain &dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 {
-	int i, j, n;
-	float f[3];
-	vec3d r;
-	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
-	if (pbd)
+	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+	if (pme == 0) return false;
+
+	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
-		int BE = pbd->Elements();
-		for (i=0; i<BE; ++i)
+		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+		int BE = bd.Elements();
+		for (int i=0; i<BE; ++i)
 		{
-			FESolidElement& el = pbd->Element(i);
-			n = el.GaussPoints();
-			r = vec3d(0,0,0);
-			for (j=0; j<n; ++j)
+			FESolidElement& el = bd.Element(i);
+			int n = el.GaussPoints();
+			vec3d r = vec3d(0,0,0);
+			for (int j=0; j<n; ++j)
 			{
 				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
 				vec3d ri;
@@ -672,6 +470,8 @@ bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 				r += pt.m_F*ri;
 			}
 			r /= (double) n;
+
+			float f[3];
 			f[0] = (float) r.x;
 			f[1] = (float) r.y;
 			f[2] = (float) r.z;
@@ -689,17 +489,17 @@ bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 //! Store shell thicknesses
 bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
 {
-	FEShellDomain* pbs = dynamic_cast<FEShellDomain*>(&dom);
-	if (pbs)
+	if (dom.Class() == FE_DOMAIN_SHELL)
 	{
-		int NS = pbs->Elements();
+		FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
+		int NS = sd.Elements();
 		for (int i=0; i<NS; ++i)
 		{
-			FEShellElement& e = pbs->Element(i);
+			FEShellElement& e = sd.Element(i);
 			int n = e.Nodes();
 			for (int j=0; j<n; ++j)
 			{
-				vec3d D = pbs->GetMesh()->Node(e.m_node[j]).m_Dt;
+				vec3d D = sd.GetMesh()->Node(e.m_node[j]).m_Dt;
 				double h = e.m_h0[j] * D.norm();
 				a.push_back((float) h);
 			}
@@ -712,11 +512,11 @@ bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
 //-----------------------------------------------------------------------------
 bool FEPlotDamage::Save(FEDomain &m, vector<float>& a)
 {
-	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m);
-	if (pbd)
+	if (m.Class() == FE_DOMAIN_SOLID)
 	{
-		FESolidDomain& d = *pbd;
-		for (int i=0; i<d.Elements(); ++i)
+		FESolidDomain& d = static_cast<FESolidDomain&>(m);
+		int N = d.Elements();
+		for (int i=0; i<N; ++i)
 		{
 			FESolidElement& el = d.Element(i);
 
@@ -725,7 +525,6 @@ bool FEPlotDamage::Save(FEDomain &m, vector<float>& a)
 			for (int j=0; j<nint; ++j)
 			{
 				FEDamageMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEDamageMaterialPoint>());
-
 				if (ppt)
 				{
 					FEDamageMaterialPoint& pt = *ppt;
@@ -799,12 +598,13 @@ bool FEPlotUT4NodalStresses::Save(FEDomain& dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotShellStrain::Save(FEDomain &dom, std::vector<float> &a)
 {
-	FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&dom);
-	if (psd == 0) return false;
-	int NE = psd->Elements();
+	if (dom.Class() != FE_DOMAIN_SHELL) return false;
+
+	FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
+	int NE = sd.Elements();
 	for (int i=0; i<NE; ++i)
 	{
-		FEShellElement& el = psd->Element(i);
+		FEShellElement& el = sd.Element(i);
 		int ni = el.Nodes();
 		mat3ds E; E.zero();
 		for (int j=0; j<ni; ++j)
@@ -883,10 +683,10 @@ bool FEPlotSPRStresses::Save(FEDomain& dom, vector<float>& a)
 	const int LUT[6][2] = {{0,0},{1,1},{2,2},{0,1},{1,2},{0,2}};
 
 	// For now, this is only available for solid domains
-	if (dynamic_cast<FESolidDomain*>(&dom) == 0) return false;
+	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 
 	// get the domain
-	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
+	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
 	int NN = sd.Nodes();
 	int NE = sd.Elements();
 
@@ -942,10 +742,10 @@ bool FEPlotSPRStresses::Save(FEDomain& dom, vector<float>& a)
 bool FEPlotSPRPrincStresses::Save(FEDomain& dom, vector<float>& a)
 {
 	// For now, this is only available for solid domains
-	if (dynamic_cast<FESolidDomain*>(&dom) == 0) return false;
+	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 
 	// get the domain
-	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
+	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
 	int NN = sd.Nodes();
 	int NE = sd.Elements();
 
@@ -1000,10 +800,10 @@ bool FEPlotSPRPrincStresses::Save(FEDomain& dom, vector<float>& a)
 bool FEPlotSPRTestLinear::Save(FEDomain& dom, vector<float>& a)
 {
 	// For now, this is only available for solid domains
-	if (dynamic_cast<FESolidDomain*>(&dom) == 0) return false;
+	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 
 	// get the domain
-	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
+	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
 	int NN = sd.Nodes();
 	int NE = sd.Elements();
 
@@ -1057,10 +857,10 @@ bool FEPlotSPRTestLinear::Save(FEDomain& dom, vector<float>& a)
 bool FEPlotSPRTestQuadratic::Save(FEDomain& dom, vector<float>& a)
 {
 	// For now, this is only available for solid domains
-	if (dynamic_cast<FESolidDomain*>(&dom) == 0) return false;
+	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 
 	// get the domain
-	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
+	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
 	int NN = sd.Nodes();
 	int NE = sd.Elements();
 
