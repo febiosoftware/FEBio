@@ -3,6 +3,12 @@
 #include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
+FEDomain::FEDomain(int ntype, int nclass, FEMesh* pm) : m_pMesh(pm), m_ntype(ntype), m_nclass(nclass) {}
+
+//-----------------------------------------------------------------------------
+FEDomain::~FEDomain() {}
+
+//-----------------------------------------------------------------------------
 FEElement* FEDomain::FindElementFromID(int nid)
 {
 	for (int i=0; i<Elements(); ++i)

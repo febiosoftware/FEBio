@@ -82,7 +82,7 @@ bool FETiedBiphasicSurface::Init()
 		if (pe)
 		{
 			// get the material
-			FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
+			FEMaterial* pm = m_pfem->GetMaterial(pe->GetMatID());
 			
 			// see if this is a poro-elastic element
 			FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
@@ -284,7 +284,7 @@ void FETiedBiphasicInterface::BuildMatrixProfile(FEStiffnessMatrix& K)
 				FESurfaceElement* pe = ss.m_pme[ni];
 				if (pe != 0)
 				{
-					FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+					FESurfaceElement& me = *pe;
 					int* mn = &me.m_node[0];
 									
 					assign(lm, -1);
@@ -445,7 +445,7 @@ double FETiedBiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FETied
 	if (pe)
 	{
 		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(GetFEModel()->GetMaterial(pe->GetMatID()));
+		FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
 		
 		// see if this is a poro-elastic element
 		FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);

@@ -38,16 +38,16 @@ bool FERigidWallSurface::Init()
 	int nn = Nodes();
 
 	// allocate other surface data
-	gap.assign(nn, 0);		// gap funtion
-	nu.resize(nn);		// node normal 
-	pme.assign(nn, static_cast<FEElement*>(0));		// penetrated master element
-	rs.resize(nn);		// natural coords of projected slave node on master element
-	rsp.resize(nn);
-	Lm.assign(nn, 0);
-	M.resize(nn);
-	Lt.resize(nn);
-	off.assign(nn, 0.0);
-	eps.assign(nn, 1.0);
+	m_gap.assign(nn, 0);		// gap funtion
+	m_nu.resize(nn);		// node normal 
+	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));		// penetrated master element
+	m_rs.resize(nn);		// natural coords of projected slave node on master element
+	m_rsp.resize(nn);
+	m_Lm.assign(nn, 0);
+	m_M.resize(nn);
+	m_Lt.resize(nn);
+	m_off.assign(nn, 0.0);
+	m_eps.assign(nn, 1.0);
 
 	// we calculate the gap offset values
 	// This value is used to take the shell thickness into account
@@ -68,7 +68,7 @@ bool FERigidWallSurface::Init()
 			}
 		}
 	}
-	for (i=0; i<nn; ++i) off[i] = tag[m_node[i]];
+	for (i=0; i<nn; ++i) m_off[i] = tag[m_node[i]];
 
 	return true;
 }
@@ -80,17 +80,17 @@ bool FERigidWallSurface::Init()
 vec3d FERigidWallSurface::traction(int inode)
 {
 	vec3d t(0,0,0);
-	FEElement* pe = pme[inode];
+	FESurfaceElement* pe = m_pme[inode];
 	if (pe)
 	{
-		FESurfaceElement& el = dynamic_cast<FESurfaceElement&>(*pe);
-		double Tn = Lm[inode];
-		double T1 = Lt[inode][0];
-		double T2 = Lt[inode][1];
-		double r = rs[inode][0];
-		double s = rs[inode][1];
+		FESurfaceElement& el = *pe;
+		double Tn = m_Lm[inode];
+		double T1 = m_Lt[inode][0];
+		double T2 = m_Lt[inode][1];
+		double r = m_rs[inode][0];
+		double s = m_rs[inode][1];
 
-		vec3d tn = nu[inode]*Tn, tt;
+		vec3d tn = m_nu[inode]*Tn, tt;
 		vec3d e[2];
 		ContraBaseVectors0(el, r, s, e);
 		tt = e[0]*T1 + e[1]*T2;
@@ -107,7 +107,7 @@ void FERigidWallSurface::UpdateNormals()
 	int i, j, jp1, jm1;
 	int N = Nodes();
 	int NE = Elements();
-	for (i=0; i<N; ++i) nu[i] = vec3d(0,0,0);
+	for (i=0; i<N; ++i) m_nu[i] = vec3d(0,0,0);
 	vec3d y[FEElement::MAX_NODES], e1, e2;
 
 	for (i=0; i<NE; ++i)
@@ -124,11 +124,11 @@ void FERigidWallSurface::UpdateNormals()
 			e1 = y[jp1] - y[j];
 			e2 = y[jm1] - y[j];
 
-			nu[el.m_lnode[j]] -= e1 ^ e2;						
+			m_nu[el.m_lnode[j]] -= e1 ^ e2;						
 		}
 	}
 
-	for (i=0; i<N; ++i) nu[i].unit();
+	for (i=0; i<N; ++i) m_nu[i].unit();
 }
 
 //-----------------------------------------------------------------------------
@@ -136,12 +136,12 @@ void FERigidWallSurface::ShallowCopy(DumpStream& dmp, bool bsave)
 {
 	if (bsave)
 	{
-		dmp << Lm << gap << Lt;
+		dmp << m_Lm << m_gap << m_Lt;
 	}
 	else
 	{
-		dmp >> Lm >> gap >> Lt;
-		zero(pme);
+		dmp >> m_Lm >> m_gap >> m_Lt;
+		zero(m_pme);
 	}
 }
 
@@ -151,27 +151,27 @@ void FERigidWallSurface::Serialize(DumpFile &ar)
 	FESurface::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << gap;
-		ar << nu;
-		ar << rs;
-		ar << rsp;
-		ar << Lm;
-		ar << M;
-		ar << Lt;
-		ar << off;
-		ar << eps;
+		ar << m_gap;
+		ar << m_nu;
+		ar << m_rs;
+		ar << m_rsp;
+		ar << m_Lm;
+		ar << m_M;
+		ar << m_Lt;
+		ar << m_off;
+		ar << m_eps;
 	}
 	else
 	{
-		ar >> gap;
-		ar >> nu;
-		ar >> rs;
-		ar >> rsp;
-		ar >> Lm;
-		ar >> M;
-		ar >> Lt;
-		ar >> off;
-		ar >> eps;
+		ar >> m_gap;
+		ar >> m_nu;
+		ar >> m_rs;
+		ar >> m_rsp;
+		ar >> m_Lm;
+		ar >> m_M;
+		ar >> m_Lt;
+		ar >> m_off;
+		ar >> m_eps;
 	}
 }
 
@@ -255,7 +255,7 @@ void FERigidWallInterface::BuildMatrixProfile(FEStiffnessMatrix& K)
 	vector<int> lm(6);
 	for (int j=0; j<m_ss.Nodes(); ++j)
 	{
-		if (m_ss.gap[j] >= 0)
+		if (m_ss.m_gap[j] >= 0)
 		{
 			lm[0] = m_ss.Node(j).m_ID[DOF_X];
 			lm[1] = m_ss.Node(j).m_ID[DOF_Y];
@@ -302,10 +302,10 @@ void FERigidWallInterface::ProjectSurface(FERigidWallSurface& ss)
 		np = m_mp->Normal(q);
 
 		// the slave normal is set to the master element normal
-		m_ss.nu[i] = np;
+		m_ss.m_nu[i] = np;
 	
 		// calculate initial gap
-		m_ss.gap[i] = -(np*(r - q)) + m_ss.off[i];
+		m_ss.m_gap[i] = -(np*(r - q)) + m_ss.m_off[i];
 	}
 }
 
@@ -400,12 +400,12 @@ void FERigidWallInterface::ContactForces(FEGlobalVector& R)
 				detJ = (dxr ^ dxs).norm();
 
 				// get slave node normal force
-				eps = pen*m_ss.eps[m];
-				tn = m_ss.Lm[m] + eps*m_ss.gap[m];
+				eps = pen*m_ss.m_eps[m];
+				tn = m_ss.m_Lm[m] + eps*m_ss.m_gap[m];
 				tn = MBRACKET(tn);
 
 				// get the slave node normal
-				vec3d& nu = m_ss.nu[m];
+				vec3d& nu = m_ss.m_nu[m];
 
 				// calculate force vector
 				fe[0] = detJ*w[n]*tn*nu.x;
@@ -504,19 +504,19 @@ void FERigidWallInterface::ContactStiffness(FESolver* psolver)
 				detJ = (dxr ^ dxs).norm();
 
 				// slave gap
-				gap = m_ss.gap[m];
+				gap = m_ss.m_gap[m];
 
 				// lagrange multiplier
-				Lm = m_ss.Lm[m];
+				Lm = m_ss.m_Lm[m];
 
 				// get slave node normal force
-				eps = pen*m_ss.eps[m];
+				eps = pen*m_ss.m_eps[m];
 
-				tn = m_ss.Lm[m] + eps*m_ss.gap[m];
+				tn = m_ss.m_Lm[m] + eps*m_ss.m_gap[m];
 				tn = MBRACKET(tn);
 
 				// get the slave node normal
-				vec3d& nu = m_ss.nu[m];
+				vec3d& nu = m_ss.m_nu[m];
 
 				// set up the N vector
 				N[0] = nu.x;
@@ -565,7 +565,7 @@ bool FERigidWallInterface::Augment(int naug)
 
 	// calculate initial norms
 	double normL0 = 0;
-	for (i=0; i<m_ss.Nodes(); ++i) normL0 += m_ss.Lm[i]*m_ss.Lm[i];
+	for (i=0; i<m_ss.Nodes(); ++i) normL0 += m_ss.m_Lm[i]*m_ss.m_Lm[i];
 	normL0 = sqrt(normL0);
 
 	// update Lagrange multipliers and calculate current norms
@@ -575,14 +575,14 @@ bool FERigidWallInterface::Augment(int naug)
 	for (i=0; i<m_ss.Nodes(); ++i)
 	{
 		// update Lagrange multipliers
-		eps = pen*m_ss.eps[i];
+		eps = pen*m_ss.m_eps[i];
 
-		Lm = m_ss.Lm[i] + eps*m_ss.gap[i];
+		Lm = m_ss.m_Lm[i] + eps*m_ss.m_gap[i];
 		Lm = MBRACKET(Lm);
 		normL1 += Lm*Lm;
-		if (m_ss.gap[i] > 0)
+		if (m_ss.m_gap[i] > 0)
 		{
-			normgc += m_ss.gap[i]*m_ss.gap[i];
+			normgc += m_ss.m_gap[i]*m_ss.m_gap[i];
 			++N;
 		}
 	}	
@@ -605,10 +605,10 @@ bool FERigidWallInterface::Augment(int naug)
 		for (i=0; i<m_ss.Nodes(); ++i)
 		{
 			// update Lagrange multipliers
-			eps = pen*m_ss.eps[i];
+			eps = pen*m_ss.m_eps[i];
 
-			Lm = m_ss.Lm[i] + eps*m_ss.gap[i];
-			m_ss.Lm[i] = MBRACKET(Lm);
+			Lm = m_ss.m_Lm[i] + eps*m_ss.m_gap[i];
+			m_ss.m_Lm[i] = MBRACKET(Lm);
 		}	
 	}
 

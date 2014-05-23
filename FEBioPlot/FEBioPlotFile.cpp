@@ -369,19 +369,16 @@ void FEBioPlotFile::WriteDomainSection(FEMesh& m)
 	// write all domains
 	for (int nd = 0; nd<m.Domains(); ++nd)
 	{
+		FEDomain& dom = m.Domain(nd);
 		m_ar.BeginChunk(PLT_DOMAIN);
 		{
-			FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m.Domain(nd));
-			if (pbd) WriteSolidDomain(*pbd);
-
-			FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
-			if (psd) WriteShellDomain(*psd);
-
-			FETrussDomain* ptd = dynamic_cast<FETrussDomain*>(&m.Domain(nd));
-			if (ptd) WriteTrussDomain(*ptd);
-
-			FEDiscreteDomain* pdd = dynamic_cast<FEDiscreteDomain*>(&m.Domain(nd));
-			if (pdd) WriteDiscreteDomain(*pdd);
+			switch (dom.Class())
+			{
+			case FE_DOMAIN_SOLID   : WriteSolidDomain   (static_cast<FESolidDomain&   >(dom)); break;
+			case FE_DOMAIN_SHELL   : WriteShellDomain   (static_cast<FEShellDomain&   >(dom)); break;
+			case FE_DOMAIN_TRUSS   : WriteTrussDomain   (static_cast<FETrussDomain&   >(dom)); break;
+			case FE_DOMAIN_DISCRETE: WriteDiscreteDomain(static_cast<FEDiscreteDomain&>(dom)); break;
+			}
 		}
 		m_ar.EndChunk();
 	}

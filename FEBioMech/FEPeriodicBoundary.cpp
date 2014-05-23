@@ -356,7 +356,7 @@ void FEPeriodicBoundary::ContactForces(FEGlobalVector& R)
 				tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps;
 
 				// get the master element
-				FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
+				FESurfaceElement& mel = *ss.m_pme[m];
 				ms.UnpackLM(mel, mLM);
 
 				nmeln = mel.Nodes();
@@ -504,7 +504,7 @@ void FEPeriodicBoundary::ContactStiffness(FESolver* psolver)
 				detJ = (dxr ^ dxs).norm();
 
 				// get the master element
-				FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
+				FESurfaceElement& me = *ss.m_pme[m];
 				ms.UnpackLM(me, mLM);
 
 				nmeln = me.Nodes();

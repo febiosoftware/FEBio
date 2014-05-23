@@ -97,7 +97,7 @@ bool FESlidingSurface3::Init()
 		if (pe)
 		{
 			// get the material
-			FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
+			FEMaterial* pm = m_pfem->GetMaterial(pe->GetMatID());
 			
 			// see if this is a poro-elastic element
 			FEBiphasic* pb = dynamic_cast<FEBiphasic*> (pm);
@@ -569,7 +569,7 @@ void FESlidingInterface3::BuildMatrixProfile(FEStiffnessMatrix& K)
 				FESurfaceElement* pe = ss.m_Data[j][k].m_pme;
 				if (pe != 0)
 				{
-					FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+					FESurfaceElement& me = *pe;
 					mid = ms.m_solu[pe->m_lid];
 					int* mn = &me.m_node[0];
 									
@@ -738,7 +738,7 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 	if (pe)
 	{
 		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(GetFEModel()->GetMaterial(pe->GetMatID()));
+		FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
 		
 		// see if this is a poro-elastic element
 		FEBiphasic* bp = dynamic_cast<FEBiphasic*> (pm);
@@ -852,7 +852,7 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 	if (pe)
 	{
 		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(GetFEModel()->GetMaterial(pe->GetMatID()));
+		FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
 		
 		// see if this is a biphasic-solute element
 		FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);

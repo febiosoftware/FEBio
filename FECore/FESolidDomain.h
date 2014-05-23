@@ -7,7 +7,7 @@ class FESolidDomain : public FEDomain
 {
 public:
 	//! constructor
-	FESolidDomain(int ntype, FEMesh* pm) : FEDomain(ntype, pm) {}
+	FESolidDomain(int ntype, FEMesh* pm) : FEDomain(ntype, FE_DOMAIN_SOLID, pm) {}
 
 	//! create storage for elements
 	void create(int nsize) { m_Elem.resize(nsize); }

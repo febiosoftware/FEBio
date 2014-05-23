@@ -83,7 +83,7 @@ bool FESlidingSurfaceMP::Init()
 		if (pe)
 		{
 			// get the material
-			FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
+			FEMaterial* pm = m_pfem->GetMaterial(pe->GetMatID());
 			
 			// check type of element
 			FEBiphasic* pb = dynamic_cast<FEBiphasic*> (pm);
@@ -622,7 +622,7 @@ void FESlidingInterfaceMP::BuildMatrixProfile(FEStiffnessMatrix& K)
 				FESurfaceElement* pe = ss.m_Data[j][k].m_pme;
 				if (pe != 0)
 				{
-					FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+					FESurfaceElement& me = *pe;
 					int* mn = &me.m_node[0];
                     
 					assign(lm, -1);
@@ -798,7 +798,7 @@ double FESlidingInterfaceMP::AutoPressurePenalty(FESurfaceElement& el, FESliding
 	if (pe)
 	{
 		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(GetFEModel()->GetMaterial(pe->GetMatID()));
+		FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
 		
 		// check type of element
 		FEBiphasic* pb = dynamic_cast<FEBiphasic*> (pm);
@@ -942,7 +942,7 @@ double FESlidingInterfaceMP::AutoConcentrationPenalty(FESurfaceElement& el,
 	if (pe)
 	{
 		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(GetFEModel()->GetMaterial(pe->GetMatID()));
+		FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
 		
 		// see if this is a biphasic-solute or multiphasic element
 		FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);

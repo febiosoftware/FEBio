@@ -343,7 +343,7 @@ void FEFacet2FacetSliding::BuildMatrixProfile(FEStiffnessMatrix& K)
 				FESurfaceElement* pe = pt.m_pme;
 				if (pe != 0)
 				{
-					FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+					FESurfaceElement& me = *pe;
 					int* mn = &me.m_node[0];
 
 					assign(lm, -1);

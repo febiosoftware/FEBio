@@ -6,7 +6,7 @@
 #include <math.h>
 
 //-----------------------------------------------------------------------------
-FEElasticShellDomain::FEElasticShellDomain(FEMesh* pm, FEMaterial* pmat) : FEShellDomain(FE_SHELL_DOMAIN, pm)
+FEElasticShellDomain::FEElasticShellDomain(FEMesh* pm, FEMaterial* pmat) : FEShellDomain(FE_ELASTIC_SHELL_DOMAIN, pm)
 {
 	m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
 }

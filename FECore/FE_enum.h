@@ -171,9 +171,22 @@ enum FE_Print_Level {
 };
 
 //-----------------------------------------------------------------------------
+//! Domain classes
+//! The domain class defines the general catergory of element types
+//! NOTE: beams are not supported yet.
+#define	FE_DOMAIN_SOLID		1
+#define	FE_DOMAIN_SHELL		2
+#define	FE_DOMAIN_BEAM		3
+#define	FE_DOMAIN_SURFACE	4
+#define	FE_DOMAIN_TRUSS		5
+#define	FE_DOMAIN_DISCRETE	6
+
+//-----------------------------------------------------------------------------
 //! Domain Types
-#define FE_SOLID_DOMAIN				1
-#define FE_SHELL_DOMAIN				2
+//! The domain type defines the specific type of domain
+//! \todo I'll probably want to get rid of this eventually
+#define FE_ELASTIC_SOLID_DOMAIN		1
+#define FE_ELASTIC_SHELL_DOMAIN		2
 #define FE_SURFACE_DOMAIN			3
 #define FE_TRUSS_DOMAIN				4
 #define FE_RIGID_SOLID_DOMAIN		5

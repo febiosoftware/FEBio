@@ -66,10 +66,10 @@ void FETiedInterface::BuildMatrixProfile(FEStiffnessMatrix& K)
 
 	for (int j=0; j<ss.Nodes(); ++j)
 	{
-		FEElement* pe = ss.m_pme[j];
+		FESurfaceElement* pe = ss.m_pme[j];
 		if (pe != 0)
 		{
-			FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+			FESurfaceElement& me = *pe;
 			int* en = &me.m_node[0];
 
 			int n = me.Nodes();
@@ -248,7 +248,7 @@ void FETiedInterface::ContactForces(FEGlobalVector& R)
 				vec3d tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps;
 
 				// get the master element
-				FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
+				FESurfaceElement& mel = *ss.m_pme[m];
 				ms.UnpackLM(mel, mLM);
 
 				int nmeln = mel.Nodes();
@@ -332,7 +332,7 @@ void FETiedInterface::ContactStiffness(FESolver* psolver)
 			if (pme)
 			{
 				// get the master element
-				FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pme);
+				FESurfaceElement& me = *pme;
 				int nmeln = me.Nodes();
 				ms.UnpackLM(me, mLM);
 

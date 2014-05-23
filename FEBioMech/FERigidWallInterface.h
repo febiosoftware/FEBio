@@ -41,16 +41,16 @@ public:
 	void Serialize(DumpFile& ar);
 
 public:
-	vector<double>		gap;	//!< gap function at nodes
-	vector<vec3d>		nu;		//!< master normal at slave node
-	vector<FEElement*>	pme;	//!< master element a slave node penetrates
-	vector<vec2d>		rs;		//!< natural coordinates of slave projection on master element
-	vector<vec2d>		rsp;	//!< natural coordinates at previous time step
-	vector<double>		Lm;		//!< Lagrange multipliers for contact pressure
-	vector<mat2d>		M;		//!< surface metric tensor
-	vector<vec2d>		Lt;		//!< Lagrange multipliers for friction
-	vector<double>		off;	//!< gap offset (= shell thickness)
-	vector<double>		eps;	//!< normal penalty factors
+	vector<double>				m_gap;	//!< gap function at nodes
+	vector<vec3d>				m_nu;	//!< master normal at slave node
+	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
+	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
+	vector<vec2d>				m_rsp;	//!< natural coordinates at previous time step
+	vector<double>				m_Lm;	//!< Lagrange multipliers for contact pressure
+	vector<mat2d>				m_M;	//!< surface metric tensor
+	vector<vec2d>				m_Lt;	//!< Lagrange multipliers for friction
+	vector<double>				m_off;	//!< gap offset (= shell thickness)
+	vector<double>				m_eps;	//!< normal penalty factors
 
 	FENNQuery		m_NQ;		//!< this structure is used in finding the master element that corresponds to a slave node
 };

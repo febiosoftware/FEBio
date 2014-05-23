@@ -199,6 +199,7 @@ void FEMesh::AddNodes(int nodes)
 }
 
 //-----------------------------------------------------------------------------
+//! Return the total number elements
 int FEMesh::Elements()
 {
 	int N = 0;
@@ -210,48 +211,65 @@ int FEMesh::Elements()
 }
 
 //-----------------------------------------------------------------------------
+//! Return the number of solid elements
 int FEMesh::SolidElements()
 {
 	int N = 0;
 	for (int i=0; i<(int) m_Domain.size(); ++i)
 	{
-		FESolidDomain* pd = dynamic_cast<FESolidDomain*>(m_Domain[i]);
-		if (pd) N += pd->Elements();
+		if (m_Domain[i]->Class() == FE_DOMAIN_SOLID)
+		{
+			FESolidDomain& sd = static_cast<FESolidDomain&>(*m_Domain[i]);
+			N += sd.Elements();
+		}
 	}
 	return N;
 }
 
 //-----------------------------------------------------------------------------
+//! Return the number of shell elements
 int FEMesh::ShellElements()
 {
 	int N = 0;
 	for (int i=0; i<(int) m_Domain.size(); ++i)
 	{
-		FEShellDomain* pd = dynamic_cast<FEShellDomain*>(m_Domain[i]);
-		if (pd) N += pd->Elements();
-	}
-	return N;
-}
-
-int FEMesh::TrussElements()
-{
-	int N = 0;
-	for (int i=0; i<(int) m_Domain.size(); ++i)
-	{
-		FETrussDomain* pd = dynamic_cast<FETrussDomain*>(m_Domain[i]);
-		if (pd) N += pd->Elements();
+		if (m_Domain[i]->Class() == FE_DOMAIN_SHELL)
+		{
+			FEShellDomain& sd = static_cast<FEShellDomain&>(*m_Domain[i]);
+			N += sd.Elements();
+		}
 	}
 	return N;
 }
 
 //-----------------------------------------------------------------------------
+//! Return the number of truss elements
+int FEMesh::TrussElements()
+{
+	int N = 0;
+	for (int i=0; i<(int) m_Domain.size(); ++i)
+	{
+		if (m_Domain[i]->Class() == FE_DOMAIN_TRUSS)
+		{
+			FETrussDomain& td = static_cast<FETrussDomain&>(*m_Domain[i]);
+			N += td.Elements();
+		}
+	}
+	return N;
+}
+
+//-----------------------------------------------------------------------------
+//! Return the number of discrete elements
 int FEMesh::DiscreteElements()
 {
 	int N = 0;
 	for (int i=0; i<(int) m_Domain.size(); ++i)
 	{
-		FEDiscreteDomain* pd = dynamic_cast<FEDiscreteDomain*>(m_Domain[i]);
-		if (pd) N += pd->Elements();
+		if (m_Domain[i]->Class() == FE_DOMAIN_DISCRETE)
+		{
+			FEDiscreteDomain& dd = static_cast<FEDiscreteDomain&>(*m_Domain[i]);
+			N += dd.Elements();
+		}
 	}
 	return N;
 }

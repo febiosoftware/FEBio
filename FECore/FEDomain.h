@@ -22,13 +22,16 @@ class FEDomain
 {
 public:
 	//! constructor
-	FEDomain(int ntype, FEMesh* pm) { m_pMesh = pm; m_ntype = ntype; }
+	FEDomain(int ntype, int nclass, FEMesh* pm);
 
 	//! virtual destructor
-	virtual ~FEDomain() {}
+	virtual ~FEDomain();
 
 	//! return domain type
 	int Type() { return m_ntype; }
+
+	//! return domain class
+	int Class() { return m_nclass; }
 
 	//! set the mesh of this domain
 	void SetMesh(FEMesh* pm) { m_pMesh = pm; }
@@ -91,5 +94,6 @@ protected:
 	FEMesh*		m_pMesh;	//!< the mesh that this domain is a part of
 
 protected:
-	int	m_ntype;			//! type of domain
+	int	m_ntype;			//!< type of domain
+	int	m_nclass;			//!< domain class
 };

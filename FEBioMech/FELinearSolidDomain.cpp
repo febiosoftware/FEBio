@@ -23,54 +23,21 @@ bool FELinearSolidDomain::Initialize(FEModel &mdl)
 	// initialize base class
 	FESolidDomain::Initialize(mdl);
 
-	// error flag
-	bool bmerr = false;
-
-	// If the material has a material map
-	// generate the element's local coordinate transformation
-	FECoordSysMap* pmap = m_pMat->GetElasticMaterial()->GetCoordinateSystemMap();
-	if (pmap)
+	// set the local element coordinate system
+	// this is defined by the material's fiber or matrix option
+	// loop over all elements
+	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
-		// loop over all elements
-		for (size_t i=0; i<m_Elem.size(); ++i)
-		{
-			// get the next element
-			FESolidElement& el = m_Elem[i];
+		// get the next element
+		FESolidElement& el = m_Elem[i];
 
-			for (int n=0; n<el.GaussPoints(); ++n)
-			{
-				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
-				pt.m_Q = pmap->LocalElementCoord(el, n);
-			}
+		for (int n=0; n<el.GaussPoints(); ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			m_pMat->SetLocalCoordinateSystem(el, n, mp);
 		}
 	}
-	else
-	{
-		// If we get here, then the element has a user-defined fiber axis
-		// we should check to see if it has indeed been specified.
-		// TODO: This assumes that pt.Q will not get intialized to
-		//		 a valid value. I should find another way for checking since I
-		//		 would like pt.Q always to be initialized to a decent value.
-		if (dynamic_cast<FETransverselyIsotropic*>(m_pMat))
-		{
-			// loop over all elements
-			for (size_t i=0; i<m_Elem.size(); ++i)
-			{
-				// get the next element
-				FESolidElement& el = m_Elem[i];
-				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(0)->ExtractData<FEElasticMaterialPoint>();
-				mat3d& m = pt.m_Q;
-				if (fabs(m.det() - 1) > 1e-7)
-				{
-					// this element did not get specified a user-defined fiber direction
-//					felog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
-					bmerr = true;
-				}
-			}
-		}
-	}
-
-	return (bmerr == false);
+	return true;
 }
 
 //-----------------------------------------------------------------------------

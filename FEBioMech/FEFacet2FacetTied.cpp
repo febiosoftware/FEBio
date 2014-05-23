@@ -152,8 +152,8 @@ void FEFacet2FacetTied::BuildMatrixProfile(FEStiffnessMatrix& K)
 
 	vector<int> lm(6*FEElement::MAX_NODES*2);
 
-	FEFacetTiedSurface& ss = dynamic_cast<FEFacetTiedSurface&>(*GetSlaveSurface ());
-	FEFacetTiedSurface& ms = dynamic_cast<FEFacetTiedSurface&>(*GetMasterSurface());
+	FEFacetTiedSurface& ss = m_ss;
+	FEFacetTiedSurface& ms = m_ms;
 
 	for (int j=0; j<ss.Elements(); ++j)
 	{
@@ -165,7 +165,7 @@ void FEFacet2FacetTied::BuildMatrixProfile(FEStiffnessMatrix& K)
 			FESurfaceElement* pe = ss.m_Data[j][k].m_pme;
 			if (pe != 0)
 			{
-				FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+				FESurfaceElement& me = *pe;
 				int* mn = &me.m_node[0];
 
 				lm.assign(lm.size(), -1);
@@ -375,7 +375,7 @@ void FEFacet2FacetTied::ContactForces(FEGlobalVector& R)
 			if (pme)
 			{
 				// get the master element
-				FESurfaceElement& me = dynamic_cast<FESurfaceElement&>(*pme);
+				FESurfaceElement& me = *pme;
 				m_ms.UnpackLM(me, mLM);
 				int nmeln = me.Nodes();
 
@@ -476,7 +476,7 @@ void FEFacet2FacetTied::ContactStiffness(FESolver* psolver)
 			if (pme)
 			{
 				// get the master element
-				FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pme);
+				FESurfaceElement& me = *pme;
 				int nmeln = me.Nodes();
 				m_ms.UnpackLM(me, mLM);
 
