@@ -1,6 +1,7 @@
 #pragma once
 #include "FECore/FEDiscreteDomain.h"
 #include "FEElasticDomain.h"
+#include "FESpringMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! domain for discrete elements
@@ -8,10 +9,13 @@ class FEDiscreteSpringDomain : public FEDiscreteDomain, public FEElasticDomain
 {
 public:
 	//! constructor
-	FEDiscreteSpringDomain(FEMesh* pm, FEMaterial* pmat) : FEDiscreteDomain(FE_DISCRETE_DOMAIN, pm, pmat) {}
+	FEDiscreteSpringDomain(FEMesh* pm, FEMaterial* pmat);
 
 	//! Unpack LM data
 	void UnpackLM(FEElement& el, vector<int>& lm);
+
+	//! get the material (overridden from FEDomain)
+	FEMaterial* GetMaterial() { return m_pMat; }
 
 public: // overridden from FEElasticDomain
 
@@ -23,9 +27,6 @@ public: // overridden from FEElasticDomain
 	//! Calculates inertial forces for dynamic problems
 	void InertialForces(FEGlobalVector& R, vector<double>& F) { assert(false); }
 
-	//! calculate residual
-//	void Residual(FEGlobalVector& R);
-
 	//! update stresses (not used for discrete springs)
 	void UpdateStresses(FEModel& fem){}	
 
@@ -34,4 +35,7 @@ public: // overridden from FEElasticDomain
 
 	//! calculate bodyforces (not used since springs are considered mass-less)
 	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) {}
+
+protected:
+	FESpringMaterial*	m_pMat;
 };

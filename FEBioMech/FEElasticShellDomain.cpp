@@ -6,8 +6,10 @@
 #include <math.h>
 
 //-----------------------------------------------------------------------------
-// FEElasticShellDomain
-//-----------------------------------------------------------------------------
+FEElasticShellDomain::FEElasticShellDomain(FEMesh* pm, FEMaterial* pmat) : FEShellDomain(FE_SHELL_DOMAIN, pm)
+{
+	m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
+}
 
 //-----------------------------------------------------------------------------
 bool FEElasticShellDomain::Initialize(FEModel& mdl)
@@ -55,42 +57,6 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 	}
 	return (bmerr == false);
 }
-
-//-----------------------------------------------------------------------------
-/*
-void FEElasticShellDomain::Residual(FESolver* psolver, vector<double>& R)
-{
-	FEModel& fem = psolver->GetFEModel();
-
-	// element force vector
-	vector<double> fe;
-
-	vector<int> lm;
-
-	int NS = m_Elem.size();
-	for (int i=0; i<NS; ++i)
-	{
-		// get the element
-		FEShellElement& el = m_Elem[i];
-
-		// create the element force vector and initialize to zero
-		int ndof = 6*el.Nodes();
-		fe.assign(ndof, 0);
-
-		// skip rigid elements for internal force calculation
-		ElementInternalForce(el, fe);
-
-		// apply body forces to shells
-		if (fem.HasBodyForces()) ElementBodyForce(fem, el, fe);
-
-		// get the element's LM vector
-		UnpackLM(el, lm);
-
-		// assemble the residual
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
-	}
-}
-*/
 
 //-----------------------------------------------------------------------------
 // Calculates the forces due to the stress
@@ -246,11 +212,7 @@ void FEElasticShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 
 void FEElasticShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe)
 {
-	// don't forget to multiply with the density
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
-	assert(pme);
-
-	double dens = pme->Density();
+	double dens = m_pMat->Density();
 
 	// calculate the average thickness
 	double* h0 = &el.m_h0[0], gt, za;
@@ -375,10 +337,6 @@ void FEElasticShellDomain::ElementStiffness(int iel, matrix& ke)
 	// element stress
 	mat3ds s;
 
-	// get the element's material
-	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
-	assert(pm);
-
 	double *Grn, *Gsn, *Hn;
 	double Gr, Gs, H;
 
@@ -413,7 +371,7 @@ void FEElasticShellDomain::ElementStiffness(int iel, matrix& ke)
 		// NOTE: deformation gradient has already been calculated in stress routine
 
 		// get the 'D' matrix
-		tens4ds C = pm->Tangent(mp);
+		tens4ds C = m_pMat->Tangent(mp);
 		C.extract(D);
 
 		for (i=0; i<neln; ++i)
@@ -614,11 +572,7 @@ void FEElasticShellDomain::ElementBodyForce(FEModel& fem, FEShellElement& el, ve
 		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(nf));
 		if (pbf)
 		{
-			// don't forget to multiply with the density
-			FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
-			assert(pme);
-
-			double dens = pme->Density();
+			double dens = m_pMat->Density();
 
 			// calculate the average thickness
 			double* h0 = &el.m_h0[0], gt, za;
@@ -698,9 +652,6 @@ void FEElasticShellDomain::UpdateStresses(FEModel &fem)
 		// get the integration weights
 		double* gw = el.GaussWeights();
 
-		// get the material
-		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
-
 		// loop over the integration points and calculate
 		// the stress at the integration point
 		for (n=0; n<nint; ++n)
@@ -718,7 +669,7 @@ void FEElasticShellDomain::UpdateStresses(FEModel &fem)
 			pt.m_J = defgrad(el, pt.m_F, n);
 
 			// calculate the stress at this material point
-			pt.m_s = pm->Stress(mp);
+			pt.m_s = m_pMat->Stress(mp);
 		}
 	}
 }
@@ -730,48 +681,28 @@ void FEElasticShellDomain::UpdateStresses(FEModel &fem)
 //! to the solid element ordering. This is because for shell elements the
 //! nodes have six degrees of freedom each, where for solids they only
 //! have 3 dofs.
-
 void FEElasticShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
-	FEShellElement& se = dynamic_cast<FEShellElement&>(el);
-
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
-
-	int N = se.Nodes();
-	lm.resize(N*MAX_NDOFS);
-
+	int N = el.Nodes();
+	lm.resize(N*9);
 	for (int i=0; i<N; ++i)
 	{
-		int n = se.m_node[i];
-		FENode& node = m_pMesh->Node(n);
-
+		FENode& node = m_pMesh->Node(el.m_node[i]);
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[6*i  ] = id[0];
-		lm[6*i+1] = id[1];
-		lm[6*i+2] = id[2];
+		lm[6*i  ] = id[DOF_X];
+		lm[6*i+1] = id[DOF_Y];
+		lm[6*i+2] = id[DOF_Z];
 
 		// next the rotational dofs
-		lm[6*i+3] = id[3];
-		lm[6*i+4] = id[4];
-		lm[6*i+5] = id[5];
-
-		// now the pressure dofs
-		lm[6*N+i] = id[6];
+		lm[6*i+3] = id[DOF_U];
+		lm[6*i+4] = id[DOF_V];
+		lm[6*i+5] = id[DOF_W];
 
 		// rigid rotational dofs
-		lm[7*N + 3*i  ] = id[7];
-		lm[7*N + 3*i+1] = id[8];
-		lm[7*N + 3*i+2] = id[9];
-
-		lm[10*N + i] = id[10];
-		
-		// concentration dof
-		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(11+k)*N + i] = id[11+k];
+		lm[6*N + 3*i  ] = id[DOF_RU];
+		lm[6*N + 3*i+1] = id[DOF_RV];
+		lm[6*N + 3*i+2] = id[DOF_RW];
 	}
 }

@@ -51,6 +51,9 @@ bool FECGSolidSolver::Quasin(double time)
 	// prepare for the first iteration
 	PrepStep(time);
 
+	// update stresses
+	UpdateStresses();
+
 	// do minor iterations callbacks
 	m_fem.DoCallback(CB_MINOR_ITERS);
 

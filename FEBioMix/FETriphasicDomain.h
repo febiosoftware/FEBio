@@ -1,12 +1,15 @@
 #pragma once
-#include "FEBiphasicSoluteDomain.h"
+#include "FECore/FESolidDomain.h"
+#include "FECore/FETypes.h"
+#include "FETriphasic.h"
+#include "FEBioMech/FEElasticDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Domain class for triphasic 3D solid elements
 //! Note that this class inherits from FEElasticSolidDomain since this domain
 //! also needs to calculate elastic stiffness contributions.
 //!
-class FETriphasicDomain : public FEBiphasicSoluteDomain
+class FETriphasicDomain : public FESolidDomain, public FEElasticDomain
 {
 public:
 	//! constructor
@@ -15,22 +18,27 @@ public:
 	//! reset domain data
 	void Reset();
 
+	//! get material (overridden from FEDomain)
+	FEMaterial* GetMaterial() { return m_pMat; }
+
+	//! Unpack solid element data (overridden from FEDomain)
+	void UnpackLM(FEElement& el, vector<int>& lm);
+
 	//! initialize class
 	bool Initialize(FEModel& fem);
 
 	//! initialize elements for this domain
 	void InitElements();
 	
-	//! calculates the residual
-//	void Residual(FESolver* psolver, vector<double>& R);
-	
-	// update stresses
+	// update stresses (overridden from FEElasticDomain)
 	void UpdateStresses(FEModel& fem);
 
 	//! update element state data
 	void UpdateElementStress(int iel);
 
-public: // --- overridden from FEBiphasicSoluteDomain ---
+public:
+	// internal work (overridden from FEElasticDomain)
+	void InternalForces(FEGlobalVector& R);
 
 	// internal fluid work
 	void InternalFluidWork(vector<double>& R, double dt);
@@ -51,6 +59,8 @@ public: // --- overridden from FEBiphasicSoluteDomain ---
 	void StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp);
 
 protected:
+	//! element internal force vector
+	void ElementInternalForce(FESolidElement& el, vector<double>& fe);
 
 	//! Calculates the internal fluid forces
 	bool ElementInternalFluidWork(FESolidElement& elem, vector<double>& fe, double dt);
@@ -75,5 +85,17 @@ protected:
 	
 	//! material stiffness component
 	void ElementTriphasicMaterialStiffness(FESolidElement& el, matrix& ke);
+
+	//! geometrical stiffness
+	void ElementGeometricalStiffness(FESolidElement &el, matrix &ke);
+
+protected: // overridden from FEElasticDomain, but not implemented in this domain
+	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) {}
+	void InertialForces(FEGlobalVector& R, vector<double>& F) {}
+	void StiffnessMatrix(FESolver* psolver) {}
+	void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) {}
+	void MassMatrix(FESolver* psolver, double scale) {}
 	
+protected:
+	FETriphasic*	m_pMat;
 };

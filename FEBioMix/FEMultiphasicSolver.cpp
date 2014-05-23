@@ -1,4 +1,5 @@
 #include "FEMultiphasicSolver.h"
+#include "FEBioMech/FEElasticSolidDomain.h"
 #include "FEBiphasicSolidDomain.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEMultiphasicDomain.h"
@@ -555,14 +556,6 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
 
-/*	// loop over all domains
-	for (i=0; i<mesh.Domains(); ++i) 
-	{
-		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		dom.Residual(this, R);
-	}
-*/
-
 	// internal stress work
 	for (i=0; i<mesh.Domains(); ++i)
 	{
@@ -574,11 +567,11 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEElasticSolidDomain*   pde  = dynamic_cast<FEElasticSolidDomain*  >(&mesh.Domain(i));
-			FEBiphasicSolidDomain*  pbd  = dynamic_cast<FEBiphasicSolidDomain* >(pde);
-			FEBiphasicSoluteDomain* pbs  = dynamic_cast<FEBiphasicSoluteDomain*>(pde);
-			FETriphasicDomain*      ptd  = dynamic_cast<FETriphasicDomain*     >(pde);
-			FEMultiphasicDomain*    pdom = dynamic_cast<FEMultiphasicDomain*   >(pde);
+			FEDomain& dom = mesh.Domain(i);
+			FEBiphasicSolidDomain*  pbd = dynamic_cast<FEBiphasicSolidDomain* >(&dom);
+			FEBiphasicSoluteDomain* pbs = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+			FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
+			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
 
 			if (pbd)
 			{
@@ -594,10 +587,10 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 				ptd->InternalFluidWorkSS(R, dt);
 				ptd->InternalSoluteWorkSS(R, dt);
 			}
-			else if (pdom)
+			else if (pmd)
 			{
-				pdom->InternalFluidWorkSS (R, dt);
-				pdom->InternalSoluteWorkSS(R, dt);
+				pmd->InternalFluidWorkSS (R, dt);
+				pmd->InternalSoluteWorkSS(R, dt);
 			}
 		}
 	}
@@ -605,11 +598,11 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEElasticSolidDomain*   pde  = dynamic_cast<FEElasticSolidDomain*  >(&mesh.Domain(i));
-			FEBiphasicSolidDomain*  pbd  = dynamic_cast<FEBiphasicSolidDomain* >(pde);
-			FEBiphasicSoluteDomain* pbs  = dynamic_cast<FEBiphasicSoluteDomain*>(pde);
-			FETriphasicDomain*      ptd  = dynamic_cast<FETriphasicDomain*     >(pde);
-			FEMultiphasicDomain*    pdom = dynamic_cast<FEMultiphasicDomain*   >(pde);
+			FEDomain& dom = mesh.Domain(i);
+			FEBiphasicSolidDomain*  pbd = dynamic_cast<FEBiphasicSolidDomain* >(&dom);
+			FEBiphasicSoluteDomain* pbs = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+			FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
+			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
 
 			if (pbd)
 			{
@@ -625,10 +618,10 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 				ptd->InternalFluidWork(R, dt);
 				ptd->InternalSoluteWork(R, dt);
 			}
-			else if (pdom)
+			else if (pmd)
 			{
- 				pdom->InternalFluidWork (R, dt);
-				pdom->InternalSoluteWork(R, dt);
+ 				pmd->InternalFluidWork (R, dt);
+				pmd->InternalSoluteWork(R, dt);
 			}
 		}
 	}
@@ -702,11 +695,12 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEElasticSolidDomain*   pde = dynamic_cast<FEElasticSolidDomain*  >(&mesh.Domain(i));
-			FEBiphasicSolidDomain*  pbd = dynamic_cast<FEBiphasicSolidDomain* >(pde);
-			FEBiphasicSoluteDomain* pbs = dynamic_cast<FEBiphasicSoluteDomain*>(pde);
-			FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(pde);
-			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(pde);
+			FEDomain& dom = mesh.Domain(i);
+			FEElasticSolidDomain*   pde = dynamic_cast<FEElasticSolidDomain*  >(&dom);
+			FEBiphasicSolidDomain*  pbd = dynamic_cast<FEBiphasicSolidDomain* >(&dom);
+			FEBiphasicSoluteDomain* pbs = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+			FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
+			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
 
 			if      (pbd) pbd->StiffnessMatrixSS(this, bsymm, tp.dt);
 			else if (pbs) pbs->StiffnessMatrixSS(this, bsymm, tp);
@@ -719,11 +713,12 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEElasticSolidDomain*   pde = dynamic_cast<FEElasticSolidDomain*  >(&mesh.Domain(i));
-			FEBiphasicSolidDomain*  pbd = dynamic_cast<FEBiphasicSolidDomain* >(pde);
-			FEBiphasicSoluteDomain* pbs = dynamic_cast<FEBiphasicSoluteDomain*>(pde);
-			FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(pde);
-			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(pde);
+			FEDomain& dom = mesh.Domain(i);
+			FEElasticSolidDomain*   pde = dynamic_cast<FEElasticSolidDomain*  >(&dom);
+			FEBiphasicSolidDomain*  pbd = dynamic_cast<FEBiphasicSolidDomain* >(&dom);
+			FEBiphasicSoluteDomain* pbs = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+			FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
+			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
 
 			if      (pbd) pbd->StiffnessMatrix(this, bsymm, tp.dt);
 			else if (pbs) pbs->StiffnessMatrix(this, bsymm, tp);

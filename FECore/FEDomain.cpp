@@ -17,12 +17,12 @@ FEElement* FEDomain::FindElementFromID(int nid)
 //-----------------------------------------------------------------------------
 void FEDomain::InitMaterialPointData()
 {
-	if (m_pMat == 0) return;
+	FEMaterial* pmat = GetMaterial();
 
 	for (int i=0; i<Elements(); ++i)
 	{
 		FEElement& el = ElementRef(i);
-		for (int k=0; k<el.GaussPoints(); ++k) el.SetMaterialPointData(m_pMat->CreateMaterialPointData(), k);
+		for (int k=0; k<el.GaussPoints(); ++k) el.SetMaterialPointData(pmat->CreateMaterialPointData(), k);
 	}
 }
 

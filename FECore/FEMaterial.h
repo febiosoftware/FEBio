@@ -20,8 +20,9 @@
 #define IN_RIGHT_OPEN_RANGE(x, a, b) ((x)>=(a) && (x)<(b))
 
 //-----------------------------------------------------------------------------
-// forward declaration of FEModel class
+// forward declaration of some classes
 class FEModel;
+class FEElement;
 
 //-----------------------------------------------------------------------------
 //! exception to throw during the material initialization phase
@@ -116,6 +117,9 @@ public:
 
 	//! Get the local coordinate system
 	FECoordSysMap* GetCoordinateSystemMap();
+
+	//! Set the local coordinate for a material point
+	virtual void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
 
 	//! return the model this material belongs to
 	FEModel* GetFEModel();

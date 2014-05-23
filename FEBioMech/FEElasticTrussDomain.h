@@ -1,6 +1,7 @@
 #pragma once
 #include "FECore/FETrussDomain.h"
 #include "FEElasticDomain.h"
+#include "FETrussMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Domain described by 3D truss elements
@@ -8,7 +9,7 @@ class FEElasticTrussDomain : public FETrussDomain, public FEElasticDomain
 {
 public:
 	//! Constructor
-	FEElasticTrussDomain(FEMesh* pm, FEMaterial* pmat) : FETrussDomain(FE_TRUSS_DOMAIN, pm, pmat) {}
+	FEElasticTrussDomain(FEMesh* pm, FEMaterial* pmat);
 
 	//! copy operator
 	FEElasticTrussDomain& operator = (FEElasticTrussDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
@@ -22,13 +23,13 @@ public:
 	//! Unpack truss element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
+	//! get the material (overridden from FEDomain)
+	FEMaterial* GetMaterial() { return m_pMat; }
+
 public: // overloads from FEElasticDomain
 
 	//! update the truss stresses
 	void UpdateStresses(FEModel& fem);
-
-	//! calculates the residual
-//	void Residual(FEGlobalVector& R);
 
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);
@@ -54,4 +55,7 @@ protected:
 
 	//! Calculates the internal stress vector for solid elements
 	void ElementInternalForces(FETrussElement& el, vector<double>& fe);
+
+protected:
+	FETrussMaterial*	m_pMat;
 };

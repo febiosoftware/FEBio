@@ -1,13 +1,14 @@
 #pragma once
 #include "FECore/FEShellDomain.h"
 #include "FEElasticDomain.h"
+#include "FESolidMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Domain described by 3D shell elements
 class FEElasticShellDomain : public FEShellDomain, public FEElasticDomain
 {
 public:
-	FEElasticShellDomain(FEMesh* pm, FEMaterial* pmat) : FEShellDomain(FE_SHELL_DOMAIN, pm, pmat) {}
+	FEElasticShellDomain(FEMesh* pm, FEMaterial* pmat);
 
 	//! \todo do I really need this?
 	FEElasticShellDomain& operator = (FEElasticShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
@@ -17,6 +18,9 @@ public:
 
 	//! Unpack shell element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
+
+	//! get the material (overridden from FEDomain)
+	FEMaterial* GetMaterial() { return m_pMat; }
 
 public: // overrides from FEElasticDomain
 
@@ -61,4 +65,7 @@ public:
 
 	//! Calculate extenral body forces for shell elements
 	void ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe);
+
+protected:
+	FESolidMaterial*	m_pMat;
 };

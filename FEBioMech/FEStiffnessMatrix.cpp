@@ -110,7 +110,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 							{
 								FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[n]);
 								ut4.UnpackLM(el, elm);
-								for (int j=0; j<4*MAX_NDOFS; ++j) LM[n*4*MAX_NDOFS + j] = elm[j];
+								for (int j=0; j<elm.size(); ++j) LM[n*4*MAX_NDOFS + j] = elm[j];
 							}
 							build_add(LM);
 						}

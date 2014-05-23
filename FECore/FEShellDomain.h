@@ -7,7 +7,7 @@ class FEShellDomain : public FEDomain
 {
 public:
 	//! constructor
-	FEShellDomain(int ntype, FEMesh* pm, FEMaterial* pmat) : FEDomain(ntype, pm, pmat) {}
+	FEShellDomain(int ntype, FEMesh* pm) : FEDomain(ntype, pm) {}
 
 	//! create storage for elements
 	void create(int nsize) { m_Elem.resize(nsize); }

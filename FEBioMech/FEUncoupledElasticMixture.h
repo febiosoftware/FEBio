@@ -31,6 +31,9 @@ public:
 	// get a material parameter
 	FEParam* GetParameter(const ParamString& s);
 
+	//! Set the local coordinate system for a material point (overridden from FEMaterial)
+	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
+
 public:
 	//! get number of material properties
 	int Properties() { return m_pMat.size(); }

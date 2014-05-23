@@ -1,6 +1,7 @@
 #pragma once
 #include "FECore/FESolidDomain.h"
 #include "FECore/FESolver.h"
+#include "FEHeatTransferMaterial.h"
 
 //-----------------------------------------------------------------------------
 class FEHeatDomain
@@ -17,10 +18,13 @@ class FEHeatSolidDomain : public FESolidDomain, public FEHeatDomain
 {
 public:
 	//! constructor
-	FEHeatSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_HEAT_SOLID_DOMAIN, pm, pmat) {}
+	FEHeatSolidDomain(FEMesh* pm, FEMaterial* pmat);
 
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
+
+	//! get the material (overridden from FEDomain)
+	FEMaterial* GetMaterial() { return m_pMat; }
 
 public: // overloaded from FEHeatDomain
 
@@ -36,4 +40,7 @@ protected:
 
 	//! calculate the capacitance element stiffness matrix
 	void ElementCapacitance(FESolidElement& el, matrix& ke, double dt);
+
+protected:
+	FEHeatTransferMaterial*	m_pMat;
 };

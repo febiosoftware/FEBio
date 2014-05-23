@@ -1,8 +1,8 @@
 #pragma once
-
 #include "FECore/FESolidDomain.h"
 #include "FECore/FESolver.h"
 #include "FECore/FEModel.h"
+#include "FESolidMaterial.h"
 
 //-----------------------------------------------------------------------------
 class FELinearElasticDomain
@@ -20,7 +20,10 @@ class FELinearSolidDomain : public FESolidDomain, public FELinearElasticDomain
 {
 public:
 	//! constructor
-	FELinearSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_LINEAR_SOLID_DOMAIN, pm, pmat) {}
+	FELinearSolidDomain(FEMesh* pm, FEMaterial* pmat);
+
+	//! get the material (overridden from FEDomain)
+	FEMaterial* GetMaterial() { return m_pMat; }
 
 	//! Initialization
 	bool Initialize(FEModel& fem);
@@ -50,4 +53,7 @@ protected:
 	void InternalForce(FESolidElement& el, vector<double>& fe);
 
 	void ElementStiffness(FESolidElement& el, matrix& ke);
+
+protected:
+	FESolidMaterial*	m_pMat;
 };

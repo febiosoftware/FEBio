@@ -56,6 +56,9 @@ public:
 	//! Set the base material
 	void SetBaseMaterial(FEElasticMaterial* pbase) { m_pBase = pbase; }
 
+	//! Set the local coordinate system for a material point (overridden from FEMaterial)
+	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
+
 public:
 	//! return number of properties
 	int Properties();

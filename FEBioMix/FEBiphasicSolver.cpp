@@ -1,5 +1,6 @@
 #include "FEBiphasicSolver.h"
 #include "FEBiphasicSolidDomain.h"
+#include "FEBioMech/FEElasticSolidDomain.h"
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
 #include "FEBioMech/FEElasticDomain.h"
@@ -467,14 +468,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
-/*
-	// loop over all domains
-	for (i=0; i<mesh.Domains(); ++i) 
-	{
-		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		dom.Residual(this, R);
-	}
-*/
+
 	// calculate internal stress force
 	for (i=0; i<mesh.Domains(); ++i)
 	{

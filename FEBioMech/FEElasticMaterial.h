@@ -76,6 +76,9 @@ public:
 	//! Get the elastic component
 	FEElasticMaterial* GetElasticMaterial() { return this; }
 
+	//! Set the local coordinate system for a material point (overridden from FEMaterial)
+	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
+
 public:
 	bool SetAttribute(const char* szatt, const char* szval);
 

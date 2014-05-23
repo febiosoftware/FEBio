@@ -1,10 +1,13 @@
 #include "FEHeatSolidDomain.h"
-#include "FEHeatTransferMaterial.h"
 #include "FECore/FEMesh.h"
 
-//============================================================================
-// FEHeatSolidDomain
-//============================================================================
+//-----------------------------------------------------------------------------
+//! constructor
+FEHeatSolidDomain::FEHeatSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_HEAT_SOLID_DOMAIN, pm)
+{
+	m_pMat = dynamic_cast<FEHeatTransferMaterial*>(pmat);
+	assert(m_pMat);
+}
 
 //-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
@@ -106,8 +109,6 @@ void FEHeatSolidDomain::ElementConduction(FESolidElement& el, matrix& ke)
 	// conductivity matrix
 	double D[3][3];
 
-	FEHeatTransferMaterial& mat = dynamic_cast<FEHeatTransferMaterial&>(*m_pMat);
-
 	// loop over all integration points
 	for (n=0; n<ni; ++n)
 	{
@@ -115,7 +116,7 @@ void FEHeatSolidDomain::ElementConduction(FESolidElement& el, matrix& ke)
 		detJt = invjact(el, Ji, n);
 
 		// evaluate the conductivity
-		mat.Conductivity(D);
+		m_pMat->Conductivity(D);
 
 		for (i=0; i<ne; ++i)
 		{
@@ -172,9 +173,8 @@ void FEHeatSolidDomain::ElementCapacitance(FESolidElement &el, matrix &ke, doubl
 	// zero stiffness matrix
 	ke.zero();
 
-	FEHeatTransferMaterial& mat = dynamic_cast<FEHeatTransferMaterial&>(*m_pMat);
-	double c = mat.Capacitance();
-	double d = mat.Density();
+	double c = m_pMat->Capacitance();
+	double d = m_pMat->Density();
 	double alpha = c*d/dt;
 
 	// loop over all integration points

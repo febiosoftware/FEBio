@@ -372,9 +372,6 @@ void FEUDGHexDomain::UDGMaterialStiffness(FESolidElement &el, matrix &ke)
 	// The 'D*BL' matrix
 	double DBL[6][3];
 
-	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(m_pMat);
-	assert(pmat);
-
 	FEMesh& mesh = *GetMesh();
 
 	// calculate the average cartesian derivatives
@@ -406,7 +403,7 @@ void FEUDGHexDomain::UDGMaterialStiffness(FESolidElement &el, matrix &ke)
 	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 	// get the 'D' matrix
-	tens4ds C = pmat->Tangent(mp);
+	tens4ds C = m_pMat->Tangent(mp);
 	C.extract(D);
 
 	// we only calculate the upper triangular part
@@ -492,10 +489,6 @@ void FEUDGHexDomain::UpdateStresses(FEModel &fem)
 		// get the integration weights
 		gw = el.GaussWeights();
 
-		// get the material
-		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
-		assert(pm);
-
 		// for the enhanced strain hex we need a slightly different procedure
 		// for calculating the element's stress. For this element, the stress
 		// is evaluated using an average deformation gradient.
@@ -519,7 +512,7 @@ void FEUDGHexDomain::UpdateStresses(FEModel &fem)
 		pt.m_J = pt.m_F.det();
 
 		// calculate the stress at this material point
-		pt.m_s = pm->Stress(mp);
+		pt.m_s = m_pMat->Stress(mp);
 	}
 }
 

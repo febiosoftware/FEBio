@@ -339,6 +339,23 @@ bool FEElasticMaterial::SetAttribute(const char* szname, const char* szval)
 }
 
 //-----------------------------------------------------------------------------
+void FEElasticMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
+{
+	// get the material's coordinate system (if defined)
+	FECoordSysMap* pmap = GetCoordinateSystemMap();
+
+	// set the local element coordinates
+	if (pmap)
+	{
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+	
+		// compound the local map with the global material axes
+		mat3d Qlocal = pmap->LocalElementCoord(el, n);
+		pt.m_Q = Qlocal*pt.m_Q;
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEElasticMaterial::Init()
 {
 	FEMaterial::Init();

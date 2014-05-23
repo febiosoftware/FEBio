@@ -7,13 +7,16 @@ class FESolidDomain : public FEDomain
 {
 public:
 	//! constructor
-	FESolidDomain(int ntype, FEMesh* pm, FEMaterial* pmat) : FEDomain(ntype, pm, pmat) {}
+	FESolidDomain(int ntype, FEMesh* pm) : FEDomain(ntype, pm) {}
 
 	//! create storage for elements
 	void create(int nsize) { m_Elem.resize(nsize); }
 
 	//! return nr of elements
 	int Elements() { return m_Elem.size(); }
+
+	//! reset data (overridden from FEDomain)
+	void Reset();
 
 	//! element access
 	FESolidElement& Element(int n) { return m_Elem[n]; }

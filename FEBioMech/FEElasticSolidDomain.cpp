@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "FEElasticSolidDomain.h"
 #include "FETransverselyIsotropic.h"
-#include "FEViscoElasticMaterial.h"
-#include "FEUncoupledViscoElasticMaterial.h"
-#include "FEUncoupledElasticMixture.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 
@@ -17,57 +14,17 @@ extern "C" int omp_get_thread_num(void);
 
 
 //-----------------------------------------------------------------------------
-// Reset data
-void FEElasticSolidDomain::Reset()
+//! constructor
+//! Some derived classes will pass 0 to the pmat, since the pmat variable will be
+//! to initialize another material. These derived classes will set the m_pMat variable as well.
+FEElasticSolidDomain::FEElasticSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_SOLID_DOMAIN, pm)
 {
-	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
-}
-
-//-----------------------------------------------------------------------------
-void FEElasticSolidDomain::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp, FEElasticMaterial* pme)
-{
-	// get the material's coordinate system (if defined)
-	FECoordSysMap* pmap = pme->GetCoordinateSystemMap();
-
-	// set the local element coordinates
-	if (pmap)
+	if (pmat)
 	{
-		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-	
-		// compound the local map with the global material axes
-		mat3d Qlocal = pmap->LocalElementCoord(el, n);
-		pt.m_Q = Qlocal*pt.m_Q;
+		m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
+		assert(m_pMat);
 	}
-
-	// check if this is also a viscoelastic material
-	FEViscoElasticMaterial* pve = dynamic_cast<FEViscoElasticMaterial*> (pme);
-	if (pve)
-	{
-		FEElasticMaterial* pme2 = pve->GetBaseMaterial();
-		SetLocalCoordinateSystem(el, n, mp, pme2);
-	}
-
-	// check if this is also an uncoupled viscoelastic material
-	FEUncoupledViscoElasticMaterial* puve = dynamic_cast<FEUncoupledViscoElasticMaterial*> (pme);
-	if (puve)
-	{
-		// check if the nested elastic material has local material axes specified
-		FEElasticMaterial* pme2 = puve->GetBaseMaterial();
-		SetLocalCoordinateSystem(el, n, mp, pme2);
-	}
-
-	// check the uncoupled elastic mixture
-	FEUncoupledElasticMixture* pumix = dynamic_cast<FEUncoupledElasticMixture*>(pme);
-	if (pumix)
-	{
-		// check the local coordinate systems for each component
-		for (int j=0; j<pumix->Materials(); ++j)
-		{
-			FEElasticMaterial* pmj = pumix->GetMaterial(j)->GetElasticMaterial();
-			FEMaterialPoint& mpj = *mp.GetPointData(j);
-			SetLocalCoordinateSystem(el, n, mpj, pmj);
-		}
-	}
+	else m_pMat = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -83,11 +40,12 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-		for (int n=0; n<el.GaussPoints(); ++n) SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)), pme);
+		for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
 	}
 
 	return true;
 }
+
 
 //-----------------------------------------------------------------------------
 //! Initialize element data
@@ -253,8 +211,7 @@ void FEElasticSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 void FEElasticSolidDomain::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe)
 {
 	// don't forget to multiply with the density
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
-	double dens = pme->Density();
+	double dens = m_pMat->Density();
 
 	// jacobian
 	double detJ;
@@ -306,8 +263,7 @@ void FEElasticSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEle
 	int ndof = ke.columns()/neln;
 
 	// don't forget to multiply with the density
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
-	double dens = pme->Density();
+	double dens = m_pMat->Density();
 
 	// jacobian
 	double detJ;
@@ -455,8 +411,6 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
-	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(m_pMat);
-
 	// calculate element stiffness matrix
 	for (n=0; n<nint; ++n)
 	{
@@ -473,7 +427,7 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// get the 'D' matrix
-		tens4ds C = pmat->Tangent(mp);
+		tens4ds C = m_pMat->Tangent(mp);
 		C.extract(D);
 
 		for (i=0; i<neln; ++i)
@@ -684,8 +638,7 @@ void FEElasticSolidDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
 void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, double a)
 {
 	// get the material's density
-	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
-	double d = pm->Density();
+	double d = m_pMat->Density();
 
 	// Get the current element's data
 	const int nint = el.GaussPoints();
@@ -777,10 +730,6 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, double dt)
 	// get the integration weights
 	double* gw = el.GaussWeights();
 
-	// get the material
-	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
-	assert(pm);
-
 	// loop over the integration points and calculate
 	// the stress at the integration point
 	for (int n=0; n<nint; ++n)
@@ -798,7 +747,7 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, double dt)
 		pt.m_J = defgrad(el, pt.m_F, n);
 
 		// calculate the stress at this material point
-		pt.m_s = pm->Stress(mp);
+		pt.m_s = m_pMat->Stress(mp);
 	}
 }
 
@@ -806,44 +755,22 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, double dt)
 //! Unpack the element LM data. 
 void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
-    
 	int N = el.Nodes();
-	lm.resize(N*MAX_NDOFS);
-	
+	lm.resize(N*6);
 	for (int i=0; i<N; ++i)
 	{
-		int n = el.m_node[i];
-		FENode& node = m_pMesh->Node(n);
-
+		FENode& node = m_pMesh->Node(el.m_node[i]);
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[0];
-		lm[3*i+1] = id[1];
-		lm[3*i+2] = id[2];
-
-		// now the pressure dofs
-		lm[3*N+i] = id[6];
+		lm[3*i  ] = id[DOF_X];
+		lm[3*i+1] = id[DOF_Y];
+		lm[3*i+2] = id[DOF_Z];
 
 		// rigid rotational dofs
-		lm[4*N + 3*i  ] = id[7];
-		lm[4*N + 3*i+1] = id[8];
-		lm[4*N + 3*i+2] = id[9];
-
-		// fill the rest with -1
-		lm[7*N + 3*i  ] = -1;
-		lm[7*N + 3*i+1] = -1;
-		lm[7*N + 3*i+2] = -1;
-
-		lm[10*N + i] = id[10];
-		
-		// concentration dofs
-		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(11+k)*N + i] = id[11+k];
+		lm[3*N + 3*i  ] = id[DOF_RU];
+		lm[3*N + 3*i+1] = id[DOF_RV];
+		lm[3*N + 3*i+2] = id[DOF_RW];
 	}
 }
 
@@ -851,8 +778,7 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 // Calculate inertial forces
 void FEElasticSolidDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
 {
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat); assert(pme);
-	double d = pme->Density();
+	double d = m_pMat->Density();
 
 	// element mass matrix
 	matrix ke;

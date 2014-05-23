@@ -3,6 +3,14 @@
 #include "FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
+//! constructor
+FELinearSolidDomain::FELinearSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_LINEAR_SOLID_DOMAIN, pm)
+{
+	m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
+	assert(false);
+}
+
+//-----------------------------------------------------------------------------
 void FELinearSolidDomain::Reset()
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
@@ -179,10 +187,6 @@ void FELinearSolidDomain::ElementStiffness(FESolidElement &el, matrix &ke)
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
-	// get the material
-	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(m_pMat);
-	assert(pmat);
-
 	// calculate element stiffness matrix
 	ke.zero();
 	for (n=0; n<nint; ++n)
@@ -213,7 +217,7 @@ void FELinearSolidDomain::ElementStiffness(FESolidElement &el, matrix &ke)
 		}
 
 		// get the 'D' matrix
-		tens4ds C = pmat->Tangent(mp);
+		tens4ds C = m_pMat->Tangent(mp);
 		C.extract(D);
 
 		// we only calculate the upper triangular part
@@ -472,14 +476,6 @@ void FELinearSolidDomain::UpdateStresses(FEModel &fem)
 		// get the integration weights
 		gw = el.GaussWeights();
 
-		// get the material
-		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
-		assert(pm);
-
-		// extract the elastic component
-		FEElasticMaterial* pme = pm->GetElasticMaterial();
-		assert(pme);
-
 		// loop over the integration points and calculate
 		// the stress at the integration point
 		for (n=0; n<nint; ++n)
@@ -501,7 +497,7 @@ void FELinearSolidDomain::UpdateStresses(FEModel &fem)
 			pt.m_J = defgrad(el, pt.m_F, n);
 
 			// calculate the stress at this material point
-			pt.m_s = pm->Stress(mp) + pt.m_s0;
+			pt.m_s = m_pMat->Stress(mp) + pt.m_s0;
 		}
 	}
 }

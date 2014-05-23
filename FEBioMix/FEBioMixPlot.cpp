@@ -16,7 +16,7 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, vector<float>& a)
 {
 	int i, j;
 	double ew;
-	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
 	if ((dynamic_cast<FEBiphasicSolidDomain* >(&dom)) || 
 		(dynamic_cast<FEBiphasicSoluteDomain*>(&dom)) ||
 		(dynamic_cast<FETriphasicDomain*     >(&dom)) ||
@@ -52,7 +52,7 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 	int i, j;
 	float af[3];
 	vec3d ew;
-	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
 	if ((dynamic_cast<FEBiphasicSolidDomain* >(&dom)) || 
 		(dynamic_cast<FEBiphasicSoluteDomain*>(&dom)) ||
 		(dynamic_cast<FETriphasicDomain*     >(&dom)) ||
@@ -91,7 +91,7 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotNodalFluidFlux::Save(FEDomain &dom, vector<float>& a)
 {
-	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
 	if ((dynamic_cast<FEBiphasicSolidDomain* >(&dom)) ||
 		(dynamic_cast<FEBiphasicSoluteDomain*>(&dom)) ||
 		(dynamic_cast<FETriphasicDomain*     >(&dom)) ||
@@ -994,7 +994,7 @@ bool FEPlotEffectiveElasticity::Save(FEDomain &dom, vector<float>& a)
 {
     tens4ds c;
     
-	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
     
     FEBiphasic* pb = dynamic_cast<FEBiphasic*> (dom.GetMaterial());
     FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());

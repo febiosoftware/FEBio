@@ -35,6 +35,14 @@ FEUncoupledViscoElasticMaterial::FEUncoupledViscoElasticMaterial(FEModel* pfem) 
 }
 
 //-----------------------------------------------------------------------------
+void FEUncoupledViscoElasticMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
+{
+	FEElasticMaterial::SetLocalCoordinateSystem(el, n, mp);
+	FEElasticMaterial* pme2 = GetBaseMaterial();
+	pme2->SetLocalCoordinateSystem(el, n, mp);
+}
+
+//-----------------------------------------------------------------------------
 //! data initialization and checking
 void FEUncoupledViscoElasticMaterial::Init()
 {

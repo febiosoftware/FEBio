@@ -71,6 +71,14 @@ FECoordSysMap* FEMaterial::GetCoordinateSystemMap()
 }
 
 //-----------------------------------------------------------------------------
+//! This function does nothing here. Derived classes will use this to set the 
+//! local coordinate systems for material points.
+void FEMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
+{
+	
+}
+
+//-----------------------------------------------------------------------------
 //! This function doesn't initialize anything but should be overridden in 
 //! derived classes to initialize and check material parameters
 void FEMaterial::Init()

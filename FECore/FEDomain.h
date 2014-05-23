@@ -22,7 +22,7 @@ class FEDomain
 {
 public:
 	//! constructor
-	FEDomain(int ntype, FEMesh* pm, FEMaterial* pmat) { m_pMesh = pm; m_ntype = ntype; m_pMat = pmat; }
+	FEDomain(int ntype, FEMesh* pm) { m_pMesh = pm; m_ntype = ntype; }
 
 	//! virtual destructor
 	virtual ~FEDomain() {}
@@ -39,11 +39,10 @@ public:
 	//! find the element with a specific ID
 	FEElement* FindElementFromID(int nid);
 
-	//! set the material of this domain
-	void SetMaterial(FEMaterial* pmat) { m_pMat = pmat; }
-
+public:
 	//! get the material of this domain
-	FEMaterial* GetMaterial() { return m_pMat; }
+	//! \todo Delete this.
+	virtual FEMaterial* GetMaterial() { return 0; }
 
 	//! set the material ID of all elements
 	void SetMatID(int mid);
@@ -90,7 +89,6 @@ public: // optional functions to overload
 
 protected:
 	FEMesh*		m_pMesh;	//!< the mesh that this domain is a part of
-	FEMaterial*	m_pMat;		//!< the material for this domain
 
 protected:
 	int	m_ntype;			//! type of domain

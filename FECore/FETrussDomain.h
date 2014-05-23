@@ -6,7 +6,7 @@
 class FETrussDomain : public FEDomain
 {
 public:
-	FETrussDomain(int ntype, FEMesh* pm, FEMaterial* pmat) : FEDomain(ntype, pm, pmat){}
+	FETrussDomain(int ntype, FEMesh* pm) : FEDomain(ntype, pm){}
 
 	void create(int n) { m_Elem.resize(n); }
 	int Elements() { return m_Elem.size(); }

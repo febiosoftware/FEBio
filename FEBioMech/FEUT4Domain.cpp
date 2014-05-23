@@ -271,10 +271,6 @@ void FEUT4Domain::UpdateStresses(FEModel &fem)
 		}
 	}
 
-	// let's calculate the stresses
-	// first, let's get the solid material
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
-
 	// create a material point
 	// TODO: this will set the Q variable to a unit-matrix
 	//		 in other words, we loose the material axis orientation
@@ -301,7 +297,7 @@ void FEUT4Domain::UpdateStresses(FEModel &fem)
 		pt.m_Q = m_NEL.ElementList(node.inode)[0]->GetMaterialPoint(0)->ExtractData<FEElasticMaterialPoint>()->m_Q;
 
 		// calculate the stress
-		node.si = pme->Stress(pt);
+		node.si = m_pMat->Stress(pt);
 	}
 }
 
@@ -570,9 +566,6 @@ void FEUT4Domain::NodalStiffnessMatrix(FESolver *psolver)
 	vector<int> LM;
 	vector<int> en;
 
-	// Get the material for the domain
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
-
 	// loop over all the nodes
 	int NN = (int) m_NODE.size(), ni, nj;
 	for (int i=0; i<NN; ++i)
@@ -591,7 +584,7 @@ void FEUT4Domain::NodalStiffnessMatrix(FESolver *psolver)
 		NodalGeometryStiffness(node, ke);
 
 		// calculate the material stiffness for this node
-		NodalMaterialStiffness(node, ke, pme);
+		NodalMaterialStiffness(node, ke, m_pMat);
 
 		// it is assumed that the previous function only build the upper-triangular part
 		// so now we build the lower-triangular by copying it from the upper-triangular part
@@ -1079,9 +1072,6 @@ void FEUT4Domain::ElementMaterialStiffness(FEModel& fem, FESolidElement &el, mat
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
-	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(m_pMat);
-	assert(pmat);
-
 	// calculate element stiffness matrix
 	for (n=0; n<nint; ++n)
 	{
@@ -1098,7 +1088,7 @@ void FEUT4Domain::ElementMaterialStiffness(FEModel& fem, FESolidElement &el, mat
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// Calculate the tangent
-		tens4ds C = pmat->Tangent(mp);
+		tens4ds C = m_pMat->Tangent(mp);
 
 		// Next, we need to subtract the volumetric contribution Cvol
 		if (m_bdev)

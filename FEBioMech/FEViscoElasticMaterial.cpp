@@ -113,6 +113,14 @@ FEViscoElasticMaterial::FEViscoElasticMaterial(FEModel* pfem) : FEElasticMateria
 }
 
 //-----------------------------------------------------------------------------
+void FEViscoElasticMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
+{
+	FEElasticMaterial::SetLocalCoordinateSystem(el, n, mp);
+	FEElasticMaterial* pme2 = GetBaseMaterial();
+	pme2->SetLocalCoordinateSystem(el, n, mp);
+}
+
+//-----------------------------------------------------------------------------
 //! data initialization
 //! \todo why does the base gets this material's parent?
 void FEViscoElasticMaterial::Init()

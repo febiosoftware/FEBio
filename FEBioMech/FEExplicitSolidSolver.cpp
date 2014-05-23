@@ -837,9 +837,6 @@ void FEExplicitSolidSolver::PrepStep(double time)
 
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
 
-	// intialize the stresses
-	// TODO: is this a good place to update the stresses?
-	// Perhaps I should place this back in the residual routine?
 	UpdateStresses();
 }
 

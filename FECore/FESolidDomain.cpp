@@ -35,6 +35,13 @@ bool FESolidDomain::Initialize(FEModel &fem)
 }
 
 //-----------------------------------------------------------------------------
+// Reset data
+void FESolidDomain::Reset()
+{
+	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
+}
+
+//-----------------------------------------------------------------------------
 FENode& FESolidDomain::Node(int i) 
 {
 	return m_pMesh->Node(m_Node[i]); 

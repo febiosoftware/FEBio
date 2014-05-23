@@ -140,8 +140,14 @@ bool FEContactDiagnostic::Init()
 		node.m_rt = node.m_r0;
 	}
 
+	// --- create a material ---
+	FENeoHookean* pm = new FENeoHookean(&m_fem);
+	pm->m_E = 1;
+	pm->m_v = 0.45;
+	m_fem.AddMaterial(pm);
+
 	// get the one-and-only domain
-	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(&mesh, 0);
+	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(&mesh, pm);
 	pbd->create(2);
 	mesh.AddDomain(pbd);
 
@@ -150,7 +156,7 @@ bool FEContactDiagnostic::Init()
 
 	el0.SetType(FE_HEX8G8);
 	el0.m_nID = 1;
-	el0.SetMatID(-1);
+	el0.SetMatID(0);
 	el0.m_node[0] = 0;
 	el0.m_node[1] = 1;
 	el0.m_node[2] = 2;
@@ -162,7 +168,7 @@ bool FEContactDiagnostic::Init()
 
 	el1.SetType(FE_HEX8G8);
 	el0.m_nID = 2;
-	el0.SetMatID(-1);
+	el0.SetMatID(0);
 	el1.m_node[0] = 8;
 	el1.m_node[1] = 9;
 	el1.m_node[2] = 10;
@@ -171,15 +177,6 @@ bool FEContactDiagnostic::Init()
 	el1.m_node[5] = 13;
 	el1.m_node[6] = 14;
 	el1.m_node[7] = 15;
-
-	// --- create a material ---
-	FENeoHookean* pm = new FENeoHookean(&m_fem);
-	pm->m_E = 1;
-	pm->m_v = 0.45;
-	m_fem.AddMaterial(pm);
-
-	pbd->SetMatID(0);
-	pbd->SetMaterial(pm);
 
 	// --- create the sliding interface ---
 	FESlidingInterface* ps = new FESlidingInterface(&m_fem);

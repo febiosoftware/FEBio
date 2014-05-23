@@ -1,7 +1,14 @@
 #include "stdafx.h"
-#include "FETrussMaterial.h"
 #include "FEElasticTrussDomain.h"
 #include "FECore/DOFS.h"
+
+//-----------------------------------------------------------------------------
+//! Constructor
+FEElasticTrussDomain::FEElasticTrussDomain(FEMesh* pm, FEMaterial* pmat) : FETrussDomain(FE_TRUSS_DOMAIN, pm)
+{
+	m_pMat = dynamic_cast<FETrussMaterial*>(pmat);
+	assert(m_pMat);
+}
 
 //-----------------------------------------------------------------------------
 void FEElasticTrussDomain::Reset()
@@ -12,45 +19,15 @@ void FEElasticTrussDomain::Reset()
 //-----------------------------------------------------------------------------
 void FEElasticTrussDomain::UnpackLM(FEElement &el, vector<int>& lm)
 {
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
-    
-	int N = el.Nodes();
-	lm.resize(N*MAX_NDOFS);
-
-	for (int i=0; i<N; ++i)
-	{
-		int n = el.m_node[i];
-		FENode& node = m_pMesh->Node(n);
-
-		vector<int>& id = node.m_ID;
-
-		// first the displacement dofs
-		lm[3*i  ] = id[0];
-		lm[3*i+1] = id[1];
-		lm[3*i+2] = id[2];
-
-		// now the pressure dofs
-		lm[3*N+i] = id[6];
-
-		// rigid rotational dofs
-		lm[4*N + 3*i  ] = id[7];
-		lm[4*N + 3*i+1] = id[8];
-		lm[4*N + 3*i+2] = id[9];
-
-		// fill the rest with -1
-		lm[7*N + 3*i  ] = -1;
-		lm[7*N + 3*i+1] = -1;
-		lm[7*N + 3*i+2] = -1;
-
-		lm[10*N + i] = id[10];
-
-		// concentration dofs
-		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(11+k)*N + i] = id[11+k];
-	}
+	lm.resize(6);
+	FENode& n1 = m_pMesh->Node(el.m_node[0]);
+	FENode& n2 = m_pMesh->Node(el.m_node[1]);
+	lm[0] = n1.m_ID[DOF_X];
+	lm[1] = n1.m_ID[DOF_Y];
+	lm[2] = n1.m_ID[DOF_Z];
+	lm[3] = n2.m_ID[DOF_X];
+	lm[4] = n2.m_ID[DOF_Y];
+	lm[5] = n2.m_ID[DOF_Z];
 }
 
 //-----------------------------------------------------------------------------
@@ -84,10 +61,6 @@ void FEElasticTrussDomain::ElementStiffness(int iel, matrix& ke)
 {
 	FETrussElement& el = Element(iel);
 
-	// get the material
-	FETrussMaterial* pm = dynamic_cast<FETrussMaterial*>(m_pMat);
-	assert(pm);
-
 	// nodal coordinates
 	vec3d r0[2], rt[2];
 	for (int i=0; i<2; ++i)
@@ -105,7 +78,7 @@ void FEElasticTrussDomain::ElementStiffness(int iel, matrix& ke)
 	// get the elastic tangent
 	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
 	FETrussMaterialPoint& pt = *mp.ExtractData<FETrussMaterialPoint>();
-	double E = pm->Tangent(pt);
+	double E = m_pMat->Tangent(pt);
 
 	// element initial volume
 	double V = L*el.m_a0;
@@ -139,24 +112,6 @@ void FEElasticTrussDomain::ElementStiffness(int iel, matrix& ke)
 }
 
 //----------------------------------------------------------------------------
-/*
-void FEElasticTrussDomain::Residual(FESolver* psolver, vector<double>& R)
-{
-	// element force vector
-	vector<double> fe;
-	vector<int> lm;
-	int NT = m_Elem.size();
-	for (int i=0; i<NT; ++i)
-	{
-		FETrussElement& el = m_Elem[i];
-		ElementInternalForces(el, fe);
-		UnpackLM(el, lm);
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
-	}
-}
-*/
-//----------------------------------------------------------------------------
-
 void FEElasticTrussDomain::InternalForces(FEGlobalVector& R)
 {
 	// element force vector
@@ -215,10 +170,6 @@ void FEElasticTrussDomain::ElementInternalForces(FETrussElement& el, vector<doub
 //! Update the truss' stresses
 void FEElasticTrussDomain::UpdateStresses(FEModel &fem)
 {
-	// get the material
-	FETrussMaterial* pm = dynamic_cast<FETrussMaterial*>(m_pMat);
-	assert(pm);
-
 	// loop over all elements
 	vec3d r0[2], rt[2];
 	for (int i=0; i<(int) m_Elem.size(); ++i)
@@ -244,6 +195,6 @@ void FEElasticTrussDomain::UpdateStresses(FEModel &fem)
 		pt.m_l = l / L;
 
 		// calculate stress
-		pt.m_tau = pm->Stress(pt);
+		pt.m_tau = m_pMat->Stress(pt);
 	}
 }
