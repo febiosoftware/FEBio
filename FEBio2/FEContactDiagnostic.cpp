@@ -52,7 +52,7 @@ bool FEContactDiagnostic::Run()
 {
 	// get the solver
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
+	FESolidSolver& solver = static_cast<FESolidSolver&>(*pstep->m_psolver);
 	solver.Init();
 
 	// make sure contact data is up to data
@@ -64,7 +64,7 @@ bool FEContactDiagnostic::Run()
 	// get the stiffness matrix
 	FEStiffnessMatrix& K = *solver.m_pK;
 	SparseMatrix *pA = (SparseMatrix*)K;
-	DenseMatrix& K0 = dynamic_cast<DenseMatrix&>(*pA);
+	DenseMatrix& K0 = static_cast<DenseMatrix&>(*pA);
 
 	// build the stiffness matrix
 	K0.zero();
@@ -211,7 +211,7 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 {
 	// get the solver
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
+	FESolidSolver& solver = static_cast<FESolidSolver&>(*pstep->m_psolver);
 
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();

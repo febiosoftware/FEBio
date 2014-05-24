@@ -49,7 +49,7 @@ void FERigidMaterial::Init()
 	if (m_binit == false)
 	{
 		// get this rigid body's ID
-		FERigidBody& rb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(GetRigidBodyID()));
+		FERigidBody& rb = static_cast<FERigidBody&>(*GetFEModel()->Object(GetRigidBodyID()));
 
 		// only set the rigid body com if this is the main rigid body material
 		if (rb.GetMaterialID() == GetID()-1)
@@ -69,7 +69,7 @@ void FERigidMaterial::Init()
 			FERigidMaterial* ppm = dynamic_cast<FERigidMaterial*>(GetFEModel()->GetMaterial(m_pmid-1));
 			if (ppm == 0) throw MaterialError("parent of rigid material %s is not a rigid material\n", GetName());
 
-			FERigidBody& prb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(ppm->GetRigidBodyID()));
+			FERigidBody& prb = static_cast<FERigidBody&>(*GetFEModel()->Object(ppm->GetRigidBodyID()));
 			rb.m_prb = &prb;
 
 			// mark all degrees of freedom as prescribed

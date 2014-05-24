@@ -50,7 +50,7 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 	for (int j=0; j<nval; ++j)
 	{
 		// get the master element
-		FESurfaceElement& el = dynamic_cast<FESurfaceElement&> (*pe[j]);
+		FESurfaceElement& el = static_cast<FESurfaceElement&> (*pe[j]);
 		int N = el.Nodes();
 
 		// project the node on the element
@@ -127,7 +127,7 @@ FESurfaceElement* FEClosestPointProjection::Project(int n, vec3d& q, vec2d& r)
 	for (int j=0; j<nval; ++j)
 	{
 		// get the master element
-		FESurfaceElement& el = dynamic_cast<FESurfaceElement&> (*pe[j]);
+		FESurfaceElement& el = static_cast<FESurfaceElement&> (*pe[j]);
 		// make sure the node is not contained in this surface element
 		if (el.HasNode(n)) return 0;
 	}
@@ -137,7 +137,7 @@ FESurfaceElement* FEClosestPointProjection::Project(int n, vec3d& q, vec2d& r)
 	for (int j=0; j<nval; ++j)
 	{
 		// get the master element
-		FESurfaceElement& el = dynamic_cast<FESurfaceElement&> (*pe[j]);
+		FESurfaceElement& el = static_cast<FESurfaceElement&> (*pe[j]);
 		int N = el.Nodes();
 
 		// project the node on the element

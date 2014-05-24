@@ -545,33 +545,33 @@ double FELogElemDeformationGradientZZ::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
-double FELogRigidBodyR11::value(FEObject& rb) { FERigidBody& o = dynamic_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,0)); }
-double FELogRigidBodyR12::value(FEObject& rb) { FERigidBody& o = dynamic_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,1)); }
-double FELogRigidBodyR13::value(FEObject& rb) { FERigidBody& o = dynamic_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,2)); }
-double FELogRigidBodyR21::value(FEObject& rb) { FERigidBody& o = dynamic_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(1,0)); }
-double FELogRigidBodyR22::value(FEObject& rb) { FERigidBody& o = dynamic_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(1,1)); }
-double FELogRigidBodyR23::value(FEObject& rb) { FERigidBody& o = dynamic_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(1,2)); }
-double FELogRigidBodyR31::value(FEObject& rb) { FERigidBody& o = dynamic_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(2,0)); }
-double FELogRigidBodyR32::value(FEObject& rb) { FERigidBody& o = dynamic_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(2,1)); }
-double FELogRigidBodyR33::value(FEObject& rb) { FERigidBody& o = dynamic_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(2,2)); }
+double FELogRigidBodyR11::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,0)); }
+double FELogRigidBodyR12::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,1)); }
+double FELogRigidBodyR13::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,2)); }
+double FELogRigidBodyR21::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(1,0)); }
+double FELogRigidBodyR22::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(1,1)); }
+double FELogRigidBodyR23::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(1,2)); }
+double FELogRigidBodyR31::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(2,0)); }
+double FELogRigidBodyR32::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(2,1)); }
+double FELogRigidBodyR33::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(2,2)); }
 
 //-----------------------------------------------------------------------------
-double FELogRigidBodyPosX::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_rt.x; }
-double FELogRigidBodyPosY::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_rt.y; }
-double FELogRigidBodyPosZ::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_rt.z; }
+double FELogRigidBodyPosX::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_rt.x; }
+double FELogRigidBodyPosY::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_rt.y; }
+double FELogRigidBodyPosZ::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_rt.z; }
 
 //-----------------------------------------------------------------------------
-double FELogRigidBodyQuatX::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_qt.x; }
-double FELogRigidBodyQuatY::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_qt.y; }
-double FELogRigidBodyQuatZ::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_qt.z; }
-double FELogRigidBodyQuatW::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_qt.w; }
+double FELogRigidBodyQuatX::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_qt.x; }
+double FELogRigidBodyQuatY::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_qt.y; }
+double FELogRigidBodyQuatZ::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_qt.z; }
+double FELogRigidBodyQuatW::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_qt.w; }
 
 //-----------------------------------------------------------------------------
-double FELogRigidBodyForceX::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_Fr.x; }
-double FELogRigidBodyForceY::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_Fr.y; }
-double FELogRigidBodyForceZ::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_Fr.z; }
+double FELogRigidBodyForceX::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_Fr.x; }
+double FELogRigidBodyForceY::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_Fr.y; }
+double FELogRigidBodyForceZ::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_Fr.z; }
 
 //-----------------------------------------------------------------------------
-double FELogRigidBodyTorqueX::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_Mr.x; }
-double FELogRigidBodyTorqueY::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_Mr.y; }
-double FELogRigidBodyTorqueZ::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_Mr.z; }
+double FELogRigidBodyTorqueX::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_Mr.x; }
+double FELogRigidBodyTorqueY::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_Mr.y; }
+double FELogRigidBodyTorqueZ::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_Mr.z; }

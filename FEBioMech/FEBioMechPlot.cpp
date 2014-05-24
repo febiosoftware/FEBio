@@ -105,7 +105,7 @@ bool FEPlotRigidReactionTorque::Save(FEMesh& m, vector<float>& a)
 		FENode& node = m.Node(i);
 		if (node.m_rid >= 0)
 		{
-			FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_pfem->Object(node.m_rid));
+			FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(node.m_rid));
 			a.push_back((float)rb.m_Mr.x);
 			a.push_back((float)rb.m_Mr.y);
 			a.push_back((float)rb.m_Mr.z);

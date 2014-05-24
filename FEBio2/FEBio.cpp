@@ -104,7 +104,7 @@ public:
 // callback to update window title
 void update_console_cb(FEModel* pfem, void* pd)
 {
-	FEBioModel& fem = dynamic_cast<FEBioModel&>(*pfem);
+	FEBioModel& fem = static_cast<FEBioModel&>(*pfem);
 
 	// get the number of steps
 	int nsteps = fem.Steps();

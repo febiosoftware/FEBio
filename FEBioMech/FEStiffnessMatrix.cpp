@@ -124,7 +124,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 				int nrb = fem.Objects();
 				for (int i=0; i<nrb; ++i)
 				{
-					FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.Object(i));
+					FERigidBody& rb = static_cast<FERigidBody&>(*fem.Object(i));
 					for (int j=0; j<6; ++j) lm[j] = rb.m_LM[j];
 					build_add(lm);
 				}

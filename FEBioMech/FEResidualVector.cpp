@@ -85,7 +85,7 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
 
 				// this is an interface dof 
 				// get the rigid body this node is connected to
-				FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(node.m_rid));
+				FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(node.m_rid));
 				lm = RB.m_LM;
 
 				// add to total torque of this body

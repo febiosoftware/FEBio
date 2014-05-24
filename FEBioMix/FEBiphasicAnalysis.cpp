@@ -91,7 +91,7 @@ bool FEBiphasicAnalysis::Init()
 	int NRB = m_fem.Objects();
 	for (int i=0; i<NRB; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
 		for (int j=0; j<6; ++j)
 		{
 			RB.m_pDC[j] = 0;
@@ -103,7 +103,7 @@ bool FEBiphasicAnalysis::Init()
 	for (int i=0;i<(int) m_fem.m_RBC.size(); ++i)
 	{
 		FERigidBodyFixedBC* pbc = m_fem.m_RBC[i];
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(pbc->id));
+		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(pbc->id));
 		if (RB.IsActive() && pbc->IsActive()) RB.m_BC[pbc->bc] = -1;
 	}
 
@@ -111,7 +111,7 @@ bool FEBiphasicAnalysis::Init()
 	for (int i=0; i<(int) m_fem.m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *(m_fem.m_RDC[i]);
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(DC.id));
+		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(DC.id));
 		if (RB.IsActive() && DC.IsActive())
 		{
 			assert(RB.m_BC[DC.bc] == 0);	// make sure we are not overriding a fixed bc
@@ -202,7 +202,7 @@ bool FEBiphasicAnalysis::Init()
 	for (int i=0; i<nrb; ++i)
 		if (mec[i] == 0)
 		{
-			FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
+			FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
 			felog.printbox("WARNING", "Rigid body %d is not being used.", RB.m_mat+1);
 			RB.Activate(false);
 		}

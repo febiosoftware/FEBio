@@ -984,9 +984,7 @@ void FEBioModel::SerializeIOData(DumpFile &ar)
 		ar << m_sztitle;
 
 		// plot file
-		int npltfmt = 0;
-		if (dynamic_cast<FEBioPlotFile*>(m_plot)) npltfmt = 2;
-		assert(npltfmt != 0);
+		int npltfmt = 2;
 		ar << npltfmt;
 
 		// data records
@@ -1002,24 +1000,19 @@ void FEBioModel::SerializeIOData(DumpFile &ar)
 		// that m_szfile_title gets initialized
 		SetInputFilename(m_szfile);
 
-		// get the plot file format
+		// get the plot file format (should be 2)
 		int npltfmt = 0;
 		ar >> npltfmt;
 		assert(m_plot == 0);
+		assert(npltfmt == 2);
 
-		switch (npltfmt)
+		// create the plot file and open it for appending
+		m_plot = new FEBioPlotFile(*this);
+		if (m_plot->Append(*this, m_szplot) == false)
 		{
-		case 2:
-			{
-				m_plot = new FEBioPlotFile(*this);
-				if (m_plot->Append(*this, m_szplot) == false)
-				{
-					printf("FATAL ERROR: Failed reopening plot database %s\n", m_szplot);
-					throw "FATAL ERROR";
-				}
-			}
-			break;
-		};
+			printf("FATAL ERROR: Failed reopening plot database %s\n", m_szplot);
+			throw "FATAL ERROR";
+		}
 
 		// data records
 		SerializeDataStore(ar);

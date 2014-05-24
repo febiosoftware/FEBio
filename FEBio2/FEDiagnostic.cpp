@@ -150,8 +150,8 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 //-----------------------------------------------------------------------------
 void FEBioScenarioSection::Parse(XMLTag &tag)
 {
-	FEDiagnosticImport& dim = dynamic_cast<FEDiagnosticImport&>(*m_pim);
-	FETangentDiagnostic& td = dynamic_cast<FETangentDiagnostic&>(*dim.m_pdia);
+	FEDiagnosticImport& dim = static_cast<FEDiagnosticImport&>(*m_pim);
+	FETangentDiagnostic& td = static_cast<FETangentDiagnostic&>(*dim.m_pdia);
 
 	XMLAtt& type = tag.Attribute("type");
 	if      (type == "uni-axial"   ) td.m_scn = FETangentDiagnostic::TDS_UNIAXIAL;

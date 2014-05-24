@@ -21,7 +21,7 @@ bool FEBioStdSolver::Run(const char* szfile)
 //-----------------------------------------------------------------------------
 bool FEBioRestart::Run(const char *szfile)
 {
-	FEBioModel& fem = dynamic_cast<FEBioModel&>(*m_pfem);
+	FEBioModel& fem = static_cast<FEBioModel&>(*m_pfem);
 
 	// load restart data
 	if (fem.Restart(szfile) == false) return false;

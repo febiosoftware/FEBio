@@ -329,9 +329,9 @@ void echo_input(FEBioModel& fem)
 			FENLConstraint* plc = fem.NonlinearConstraint(i);
 			if (dynamic_cast<FERigidJoint*>(plc))
 			{
-				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
-				FERigidBody& ra = dynamic_cast<FERigidBody&>(*fem.Object(rj.m_nRBa));
-				FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.Object(rj.m_nRBb));
+				FERigidJoint& rj = static_cast<FERigidJoint&>(*plc);
+				FERigidBody& ra = static_cast<FERigidBody&>(*fem.Object(rj.m_nRBa));
+				FERigidBody& rb = static_cast<FERigidBody&>(*fem.Object(rj.m_nRBb));
 				felog.printf("rigid joint %d:\n", i+1);
 				felog.printf("\tRigid body A                   : %d\n", ra.m_mat + 1);
 				felog.printf("\tRigid body B                   : %d\n", rb.m_mat + 1);

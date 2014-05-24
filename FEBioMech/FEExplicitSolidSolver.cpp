@@ -171,7 +171,7 @@ bool FEExplicitSolidSolver::InitEquations()
 	int nrb = m_fem.Objects();
 	for (i=0; i<nrb; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
 		for (j=0; j<6; ++j)
 			if (RB.m_BC[j] >= 0)
 			{
@@ -193,7 +193,7 @@ bool FEExplicitSolidSolver::InitEquations()
 		FENode& node = mesh.Node(i);
 		if (node.m_rid >= 0)
 		{
-			FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(node.m_rid));
+			FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(node.m_rid));
 			node.m_ID[DOF_X] = -RB.m_LM[0]-2;
 			node.m_ID[DOF_Y] = -RB.m_LM[1]-2;
 			node.m_ID[DOF_Z] = -RB.m_LM[2]-2;
@@ -206,7 +206,7 @@ bool FEExplicitSolidSolver::InitEquations()
 	// adjust the rigid dofs that are prescribed
 	for (i=0; i<nrb; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
 		for (j=0; j<6; ++j)
 		{
@@ -286,7 +286,7 @@ void FEExplicitSolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, 
 
 				// this is an interface dof
 				// get the rigid body this node is connected to
-				FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(node.m_rid));
+				FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(node.m_rid));
 				lm = RB.m_LM;
 
 				// add to total torque of this body
@@ -465,7 +465,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 	for (int i=0; i<nrb; ++i)
 	{
 		// get the rigid body
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
 		if (RB.IsActive()) RB.Update(m_Ui, ui);
 	}
 
@@ -698,7 +698,7 @@ void FEExplicitSolidSolver::PrepStep(double time)
 	for (i=0; i<(int) m_fem.m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *m_fem.m_RDC[i];
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(DC.id));
+		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(DC.id));
 		if (RB.IsActive() && DC.IsActive())
 		{
 			int I = DC.bc;
@@ -784,7 +784,7 @@ void FEExplicitSolidSolver::PrepStep(double time)
 	// store rigid displacements in Ui vector
 	for (i=0; i<NO; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
 		for (j=0; j<6; ++j)
 		{
 			int I = -RB.m_LM[j]-2;
@@ -798,7 +798,7 @@ void FEExplicitSolidSolver::PrepStep(double time)
 	for (i=0; i<(int) m_fem.m_RFC.size(); ++i)
 	{
 		FERigidBodyForce& FC = *m_fem.m_RFC[i];
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(FC.id));
+		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(FC.id));
 		if (RB.IsActive() && FC.IsActive())
 		{
 			int lc = FC.lc;
@@ -882,7 +882,7 @@ void FEExplicitSolidSolver::NodalForces(vector<double>& F)
 			else if (node.m_rid >=0)
 			{
 				// this is a rigid body node
-				FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(node.m_rid));
+				FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(node.m_rid));
 
 				// get the relative position
 				a = node.m_rt - RB.m_rt;
@@ -1024,7 +1024,7 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	int NRB = m_fem.Objects();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
 	}
 

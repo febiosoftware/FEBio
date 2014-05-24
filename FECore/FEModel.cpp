@@ -709,7 +709,7 @@ void FEModel::EvaluateAllParameterLists()
 		FEMaterial* pm = GetMaterial(i);
 
 		// evaluate its parameter list
-		EvaluateMaterialParameters(pm);
+		EvaluateParameterList(pm);
 	}
 
 	// evaluate surface load parameter lists
@@ -764,20 +764,20 @@ void FEModel::EvaluateParameterList(FEParameterList &pl)
 }
 
 //-----------------------------------------------------------------------------
-//! This function evaluates material parameter lists. Since some of the materials
-//! can have other materials as sub-componenents, we need to set up a recursive
-//! call to evaluate the parameter lists of the sub-materials.
-void FEModel::EvaluateMaterialParameters(FEMaterial* pm)
+//! This function evaluates parameter lists. First the FECoreBase's parameter
+//! list is evaluated. Then, the parameter lists of all the properties are 
+//! evaluated recursively.
+void FEModel::EvaluateParameterList(FECoreBase* pc)
 {
-	// evaluate the materials' parameter list
-	EvaluateParameterList(pm->GetParameterList());
+	// evaluate the component's parameter list
+	EvaluateParameterList(pc->GetParameterList());
 
-	// evaluate the material properties
-	int N = pm->Properties();
+	// evaluate the properties' parameter lists
+	int N = pc->Properties();
 	for (int i=0; i<N; ++i)
 	{
-		FEMaterial* pmi = dynamic_cast<FEMaterial*>(pm->GetProperty(i));
-		if (pmi) EvaluateMaterialParameters(pmi);
+		FECoreBase* pci = pc->GetProperty(i);
+		if (pci) EvaluateParameterList(pci);
 	}
 }
 

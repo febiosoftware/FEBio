@@ -215,7 +215,7 @@ bool FETangentDiagnostic::Run()
 	felog.SetMode(Logfile::FILE_ONLY);
 
 	FEMesh& mesh = m_fem.GetMesh();
-	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
+	FEElasticSolidDomain& bd = static_cast<FEElasticSolidDomain&>(mesh.Domain(0));
 
 	// get the one and only element
 	FESolidElement& el = bd.Element(0);
@@ -273,12 +273,12 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 {
 	// get the solver
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
+	FESolidSolver& solver = static_cast<FESolidSolver&>(*pstep->m_psolver);
 
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
 
-	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
+	FEElasticSolidDomain& bd = static_cast<FEElasticSolidDomain&>(mesh.Domain(0));
 
 	// get the one and only element
 	FESolidElement& el = bd.Element(0);

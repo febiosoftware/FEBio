@@ -208,8 +208,8 @@ public: // --- parameter functions ---
 	//! Evaluate parameter list
 	void EvaluateParameterList(FEParameterList& pl);
 
-	//! Evaluate material parameters
-	void EvaluateMaterialParameters(FEMaterial* pm);
+	//! Evaluate parameter list
+	void EvaluateParameterList(FECoreBase* pc);
 
 	//! return a pointer to the named variable
 	double* FindParameter(const char* szname);
