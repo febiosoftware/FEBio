@@ -2093,7 +2093,6 @@ void FESolidSolver::InertialForces(FEGlobalVector& R)
 	}
 
 	// now multiply F with the mass matrix
-	matrix ke;
 	for (int nd = 0; nd < mesh.Domains(); ++nd)
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(nd));
