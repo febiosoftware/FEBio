@@ -53,23 +53,30 @@ FEBioPlugin::~FEBioPlugin()
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlugin::Load(const char* szfile)
+//! This function tries to load a plugin from file.
+//! \return Return values are: 
+//! (0) success, 
+//! (1) Failed to load the file, 
+//! (2) Required plugin function PluginNumClasses not found,
+//! (3) Required plugin function PluginGetFactory not found,
+//! (4) Invalid number of classes returned by PluginNumClasses.
+int FEBioPlugin::Load(const char* szfile)
 {
 	// Make sure the plugin is not loaded already
 	assert(m_ph == 0);
-	if (m_ph) return true;
+	if (m_ph) return 0;
 
 	// load the library
 	FEBIO_PLUGIN_HANDLE ph = LoadPlugin(szfile);
-	if (ph == NULL) return false;
+	if (ph == NULL) return 1;
 
 	// find the numclasses function
 	FEPLUGIN_NUMCLASSES_FNC pfnc_cnt = (FEPLUGIN_NUMCLASSES_FNC) FindPluginFunc(ph, "PluginNumClasses");
-	if (pfnc_cnt == 0) return false;
+	if (pfnc_cnt == 0) return 2;
 
 	// find the GetFactory function
 	FEPLUGIN_GETFACTORY_FNC pfnc_get = (FEPLUGIN_GETFACTORY_FNC) FindPluginFunc(ph, "PluginGetFactory");
-	if (pfnc_get == 0) return false;
+	if (pfnc_get == 0) return 3;
 	
 	// find the plugin's initialization function
 	FEPLUGIN_INIT_FNC pfnc_init = (FEPLUGIN_INIT_FNC) FindPluginFunc(ph, "PluginInitialize");
@@ -80,7 +87,7 @@ bool FEBioPlugin::Load(const char* szfile)
 
 	// find out how many classes there are in this plugin
 	int NC = pfnc_cnt();
-	if (NC < 0) return false;
+	if (NC < 0) return 4;
 
 	// call the get factory functions
 	for (int i=0; i<NC; ++i)
@@ -93,8 +100,7 @@ bool FEBioPlugin::Load(const char* szfile)
 	m_ph = ph;
 
 	// a-ok!
-	return true;
-
+	return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -138,22 +144,24 @@ void FEBioPluginManager::DeleteThis()
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPluginManager::LoadPlugin(const char* szfile)
+//! This function tries to load a plugin and returns the error code from the
+//! FEBioPlugin::Load function. 
+//! \return Returns zero on success, nonzero on failure.
+//! \sa FEBioPlugin::Load
+int FEBioPluginManager::LoadPlugin(const char* szfile)
 {
 	// create a new plugin object
 	FEBioPlugin* pdll = new FEBioPlugin;
 
 	// try to load the plugin
-	if (pdll->Load(szfile) == false)
-	{
-		delete pdll;
-		return false;
-	}
-	else
-	{
-		m_Plugin.push_back(pdll);
-		return true;
-	}
+	int nerr = pdll->Load(szfile);
+
+	// add it to the list or delete it if error
+	if (nerr == 0) m_Plugin.push_back(pdll);
+	else delete pdll;
+
+	// pass error code to caller
+	return nerr;
 }
 
 /*

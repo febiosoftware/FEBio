@@ -365,13 +365,16 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		{
 			char* szfile = argv[++i];
 			FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
-			if (pPM->LoadPlugin(szfile) == false)
+			int nerr = pPM->LoadPlugin(szfile);
+			switch (nerr)
 			{
-				fprintf(stderr, "Failed loading plugin %s\n\n", szfile);
-			}
-			else
-			{
-				fprintf(stderr, "Success loading plugin %s\n\n", szfile);
+			case 0: fprintf(stderr, "Success loading plugin %s\n", szfile); break;
+			case 1: fprintf(stderr, "Failed loading plugin %s\n Reason: Failed to load the file.\n\n", szfile); break;
+			case 2: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginNumClasses not found.\n\n", szfile); break;
+			case 3: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginGetFactory not found.\n\n", szfile); break;
+			case 4: fprintf(stderr, "Failed loading plugin %s\n Reason: Invalid number of classes returned by PluginNumClasses.\n\n", szfile); break;
+			default:
+				fprintf(stderr, "Failed loading plugin %s\n Reason: unspecified.\n\n", szfile); break;
 			}
 		}
 		else
@@ -530,8 +533,17 @@ bool Configure(FEBioModel& fem, const char *szfile)
 					{
 						const char* szfile = tag.szvalue();
 						FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
-						if (pPM->LoadPlugin(szfile) == false) throw XMLReader::InvalidValue(tag);
-						printf("Plugin \"%s\" loaded successfully\n", szfile);
+						int nerr = pPM->LoadPlugin(szfile);
+						switch (nerr)
+						{
+						case 0: fprintf(stderr, "Success loading plugin %s\n", szfile); break;
+						case 1: fprintf(stderr, "Failed loading plugin %s\n Reason: Failed to load the file.\n\n", szfile); break;
+						case 2: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginNumClasses not found.\n\n", szfile); break;
+						case 3: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginGetFactory not found.\n\n", szfile); break;
+						case 4: fprintf(stderr, "Failed loading plugin %s\n Reason: Invalid number of classes returned by PluginNumClasses.\n\n", szfile); break;
+						default:
+							fprintf(stderr, "Failed loading plugin %s\n Reason: unspecified.\n\n", szfile); break;
+						}
 					}
 /*					else if (tag == "import_folder")
 					{

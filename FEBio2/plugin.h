@@ -28,7 +28,7 @@ public:
 	~FEBioPlugin();
 
 	//! Try to load the library
-	bool Load(const char* szfile);
+	int Load(const char* szfile);
 
 	//! Unload the library
 	void UnLoad();
@@ -46,7 +46,7 @@ public:
 	static FEBioPluginManager* GetInstance();
 
 	//! Load a plugin into memory
-	bool LoadPlugin(const char* szfile);
+	int LoadPlugin(const char* szfile);
 
 	//! Clean up
 	void DeleteThis();
