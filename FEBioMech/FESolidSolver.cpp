@@ -535,6 +535,89 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 			n.m_at = (n.m_rt - n.m_rp)*b - n.m_vp*a + n.m_ap*c;
 			n.m_vt = n.m_vp + (n.m_ap*(1.0 - m_gamma) + n.m_at*m_gamma)*dt;
 		}
+
+		// update the rigid body kinematics
+		UpdateRigidKinematics();
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! This function updates the rigid body linear and angular velocity by solving
+//! an overdetermined system of linear equations using the least-square method. 
+void FESolidSolver::UpdateRigidKinematics()
+{
+	// get the model and mesh
+	FEModel& fem = GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// loop over all rigid bodies
+	int NRB = fem.Objects();
+	for (int j=0; j<NRB; ++j)
+	{
+		// get the rigid body
+		FERigidBody& rb = static_cast<FERigidBody&>(*fem.Object(j));
+
+		// right-hand side and least-square matrix
+		vector<double> r; r.assign(6, 0.0);
+		matrix m(6,6); m.zero();
+
+		// we need to loop over all domains that define this rigid body
+		int ncnt = 0;
+		int NDOM = mesh.Domains();
+		for (int n=0; n<NDOM; ++n)
+		{
+			FEDomain& dom = mesh.Domain(n);
+			FEMaterial* pm = dom.GetMaterial();
+			if (pm->IsRigid())
+			{
+				FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
+				if (prm->GetRigidBodyID() == j)
+				{
+					// now loop over all the nodes
+					int NN = dom.Nodes();
+					for (int i=0; i<NN; ++i, ncnt++)
+					{
+						vec3d ri = dom.Node(i).m_rt - rb.m_rt;
+						vec3d vi = dom.Node(i).m_vt;
+
+						vec3d wi = ri ^ vi;
+
+						// right-hand side
+						r[0] += vi.x;
+						r[1] += vi.y;
+						r[2] += vi.z;
+						r[3] += wi.x;
+						r[4] += wi.y;
+						r[5] += wi.z;
+
+						// least-squares matrix
+						m[0][0] += 1.0;
+						m[1][1] += 1.0;
+						m[2][2] += 1.0;
+
+						m[0][4] +=  ri.z; m[0][5] += -ri.y;
+						m[1][3] += -ri.z; m[1][5] +=  ri.x;
+						m[2][3] +=  ri.y; m[2][4] += -ri.x;
+
+						m[3][4] += -ri.z; m[3][5] +=  ri.y;
+						m[4][3] +=  ri.z; m[4][5] += -ri.x;
+						m[5][3] += -ri.y; m[5][4] +=  ri.x;
+
+						m[3][3] += ri.y*ri.y + ri.z*ri.z; m[3][4] += -ri.x*ri.y; m[3][5] += -ri.x*ri.z;
+						m[4][4] += ri.x*ri.x + ri.z*ri.z; m[4][3] += -ri.x*ri.y; m[4][5] += -ri.y*ri.z;
+						m[5][5] += ri.x*ri.x + ri.y*ri.y; m[5][3] += -ri.x*ri.z; m[5][4] += -ri.y*ri.z;
+					}
+				}
+			}
+		}
+
+		// solve for the rigid body velocity (if we have enough nodes)
+		if (ncnt > 2)
+		{
+			vector<double> VR = r / m;
+			rb.m_vt = vec3d(VR[0], VR[1], VR[2]);
+			rb.m_wt = vec3d(VR[3], VR[4], VR[5]);
+		}
 	}
 }
 

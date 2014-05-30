@@ -62,6 +62,9 @@ public:
 		//! update nodal positions, velocities, accelerations, etc.
 		virtual void UpdateKinematics(vector<double>& ui);
 
+		//! update rigid body kinematics for dynamic problems
+		void UpdateRigidKinematics();
+
 		//! Update Stresses
 		void UpdateStresses();
 

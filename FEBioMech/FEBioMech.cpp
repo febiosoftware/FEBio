@@ -273,6 +273,8 @@ REGISTER_FECORE_CLASS(FEPlotSPRTestQuadratic	 , FEPLOTDATA_ID, "SPR test quadrat
 REGISTER_FECORE_CLASS(FEPlotRigidPotentialEnergy , FEPLOTDATA_ID, "rigid potential energy");
 REGISTER_FECORE_CLASS(FEPlotRigidKineticEnergy   , FEPLOTDATA_ID, "rigid kinetic energy"  );
 REGISTER_FECORE_CLASS(FEPlotRigidTotalEnergy     , FEPLOTDATA_ID, "rigid total energy"    );
+REGISTER_FECORE_CLASS(FEPlotRigidVelocity        , FEPLOTDATA_ID, "rigid velocity"        );
+REGISTER_FECORE_CLASS(FEPlotRigidAngularVelocity , FEPLOTDATA_ID, "rigid angular velocity");
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FEPlotNodeDisplacement   , FEPLOTDATA_ID, "displacement"   );

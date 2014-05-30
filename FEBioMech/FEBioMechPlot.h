@@ -305,3 +305,25 @@ public:
 protected:
 	FEModel*	m_pfem;
 };
+
+//-----------------------------------------------------------------------------
+//! rigid (linear) velocity
+class FEPlotRigidVelocity : public FEDomainData
+{
+public:
+	FEPlotRigidVelocity(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_NODE), m_pfem(pfem){}
+	bool Save(FEDomain& dom, vector<float>& a);
+protected:
+	FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! rigid (angular) velocity
+class FEPlotRigidAngularVelocity : public FEDomainData
+{
+public:
+	FEPlotRigidAngularVelocity(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_NODE), m_pfem(pfem){}
+	bool Save(FEDomain& dom, vector<float>& a);
+protected:
+	FEModel*	m_pfem;
+};
