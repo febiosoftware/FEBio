@@ -272,3 +272,36 @@ public:
 	FEPlotSPRTestQuadratic(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_NODE){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
+
+//-----------------------------------------------------------------------------
+//! potential energy for rigid bodies
+class FEPlotRigidPotentialEnergy : public FEDomainData
+{
+public:
+	FEPlotRigidPotentialEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE), m_pfem(pfem) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+protected:
+	FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! kinetic energy for rigid bodies
+class FEPlotRigidKineticEnergy : public FEDomainData
+{
+public:
+	FEPlotRigidKineticEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE), m_pfem(pfem) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+protected:
+	FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! total energy (potential + kinetic) for rigid bodies
+class FEPlotRigidTotalEnergy : public FEDomainData
+{
+public:
+	FEPlotRigidTotalEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE), m_pfem(pfem) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+protected:
+	FEModel*	m_pfem;
+};

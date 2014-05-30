@@ -13,6 +13,7 @@
 #include "FECore/FERigidBody.h"
 #include "FESPRProjection.h"
 #include "FEUncoupledElasticMixture.h"
+#include "FERigidMaterial.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -908,6 +909,209 @@ bool FEPlotSPRTestQuadratic::Save(FEDomain& dom, vector<float>& a)
 		a.push_back((float)val[4][i]);
 		a.push_back((float)val[5][i]);
 	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotRigidPotentialEnergy::Save(FEDomain& dom, vector<float>& a)
+{
+	// only store this on rigid bodies
+	FEMaterial* pm = dom.GetMaterial();
+	if (pm->IsRigid() == false) return false;
+
+	// we evaluate the potential energy of all rigid bodies
+	FEMesh& mesh = m_pfem->GetMesh();
+	int ndom = mesh.Domains();
+	double Ep = 0.0;
+	for (int i=0; i<ndom; ++i)
+	{
+		FEDomain& di = mesh.Domain(i);
+		FEMaterial* pm = di.GetMaterial();
+		if ((di.Class() == FE_DOMAIN_SOLID) && (pm->IsRigid() == true))
+		{
+			// get the domain
+			FESolidDomain& sd = static_cast<FESolidDomain&>(di);
+
+			// get the rigid material
+			FERigidMaterial* pmr = static_cast<FERigidMaterial*>(pm);
+
+			// get the corresponding rigid body
+			FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(pmr->GetRigidBodyID()));
+
+			// evaluate potential energy
+			// NOTE: we assume g = 1 and body force applied in z-direction
+			Ep += rb.m_mass*rb.m_rt.z;
+		}
+	}
+
+	// copy results to archive
+	int NN = dom.Nodes();
+	for (int i=0; i<NN; ++i) a.push_back((float) Ep);
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// helper function for finding the rigid body velocity from a rigid domain.
+void GetRigidBodyVelocity(FERigidBody& rb, FESolidDomain& sd, vec3d& vr, vec3d& wr)
+{
+	int NN = sd.Nodes();
+
+	// set up the least-square problem for finding
+	// the rigid velocity
+	vector<double> r; r.assign(6, 0.0);
+	matrix m(6,6); m.zero();
+	for (int i=0; i<NN; ++i)
+	{
+		vec3d ri = sd.Node(i).m_rt - rb.m_rt;
+		vec3d vi = sd.Node(i).m_vt;
+
+		vec3d wi = ri ^ vi;
+
+		// right-hand side
+		r[0] += vi.x;
+		r[1] += vi.y;
+		r[2] += vi.z;
+		r[3] += wi.x;
+		r[4] += wi.y;
+		r[5] += wi.z;
+
+		// least-squares matrix
+		m[0][0] += 1.0;
+		m[1][1] += 1.0;
+		m[2][2] += 1.0;
+
+		m[0][4] +=  ri.z; m[0][5] += -ri.y;
+		m[1][3] += -ri.z; m[1][5] +=  ri.x;
+		m[2][3] +=  ri.y; m[2][4] += -ri.x;
+
+		m[3][4] += -ri.z; m[3][5] +=  ri.y;
+		m[4][3] +=  ri.z; m[4][5] += -ri.x;
+		m[5][3] += -ri.y; m[5][4] +=  ri.x;
+
+		m[3][3] += ri.y*ri.y + ri.z*ri.z; m[3][4] += -ri.x*ri.y; m[3][5] += -ri.x*ri.z;
+		m[4][4] += ri.x*ri.x + ri.z*ri.z; m[4][3] += -ri.x*ri.y; m[4][5] += -ri.y*ri.z;
+		m[5][5] += ri.x*ri.x + ri.y*ri.y; m[5][3] += -ri.x*ri.z; m[5][4] += -ri.y*ri.z;
+	}
+
+	// solve the rigid body velocity
+	vector<double> VR = r / m;
+	vr = vec3d(VR[0], VR[1], VR[2]);
+	wr = vec3d(VR[3], VR[4], VR[5]);
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotRigidKineticEnergy::Save(FEDomain& dom, vector<float>& a)
+{
+	// only store this on rigid bodies
+	FEMaterial* pm = dom.GetMaterial();
+	if (pm->IsRigid() == false) return false;
+
+	// we evaluate the potential energy of all rigid bodies
+	FEMesh& mesh = m_pfem->GetMesh();
+	int ndom = mesh.Domains();
+	double K = 0.0;
+	for (int i=0; i<ndom; ++i)
+	{
+		FEDomain& di = mesh.Domain(i);
+		FEMaterial* pm = di.GetMaterial();
+		if ((di.Class() == FE_DOMAIN_SOLID) && (pm->IsRigid() == true))
+		{
+			// get the domain
+			FESolidDomain& sd = static_cast<FESolidDomain&>(di);
+
+			// get the rigid material
+			FERigidMaterial* pmr = static_cast<FERigidMaterial*>(pm);
+
+			// get the corresponding rigid body
+			FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(pmr->GetRigidBodyID()));
+
+			// get the rigid body velocity
+			vec3d vr, wr;
+			GetRigidBodyVelocity(rb, sd, vr, wr);
+
+			// get translational kinetic energy
+			double KT = 0.5*rb.m_mass*(vr*vr);
+
+			// get rotational matrix
+			mat3d Q = rb.m_qt.RotationMatrix();
+
+			// calculate moment of inertia
+			mat3d It = Q*rb.m_moi*Q.transpose();
+
+			// get rotational energy
+			double KR = 0.5*(wr*(It*wr));
+
+			// total kinetic energy
+			K += KT + KR;
+		}
+	}
+
+	// copy results to archive
+	int NN = dom.Nodes();
+	for (int i=0; i<NN; ++i) a.push_back((float) K);
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotRigidTotalEnergy::Save(FEDomain& dom, vector<float>& a)
+{
+	// only store this on rigid bodies
+	FEMaterial* pm = dom.GetMaterial();
+	if (pm->IsRigid() == false) return false;
+
+	// we evaluate the potential energy of all rigid bodies
+	FEMesh& mesh = m_pfem->GetMesh();
+	int ndom = mesh.Domains();
+	double E = 0.0;
+	for (int i=0; i<ndom; ++i)
+	{
+		FEDomain& di = mesh.Domain(i);
+		FEMaterial* pm = di.GetMaterial();
+		if ((di.Class() == FE_DOMAIN_SOLID) && (pm->IsRigid() == true))
+		{
+			// get the domain
+			FESolidDomain& sd = static_cast<FESolidDomain&>(di);
+
+			// get the rigid material
+			FERigidMaterial* pmr = static_cast<FERigidMaterial*>(pm);
+
+			// get the corresponding rigid body
+			FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(pmr->GetRigidBodyID()));
+
+			// get the rigid body velocity
+			vec3d vr, wr;
+			GetRigidBodyVelocity(rb, sd, vr, wr);
+
+			// get translational kinetic energy
+			double KT = 0.5*rb.m_mass*(vr*vr);
+
+			// get rotational matrix
+			mat3d Q = rb.m_qt.RotationMatrix();
+
+			// calculate moment of inertia
+			mat3d It = Q*rb.m_moi*Q.transpose();
+
+			// get rotational energy
+			double KR = 0.5*(wr*(It*wr));
+
+			// total kinetic energy
+			double K = KT + KR;
+
+			// evaluate potential energy
+			// NOTE: we assume g = 1 and body force applied in z-direction
+			double H = rb.m_mass*rb.m_rt.z;
+
+			// total energy
+			E += K + H;
+		}
+	}
+
+	// copy results to archive
+	int NN = dom.Nodes();
+	for (int i=0; i<NN; ++i) a.push_back((float) E);
 
 	return true;
 }
