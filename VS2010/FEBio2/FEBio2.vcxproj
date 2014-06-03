@@ -255,7 +255,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKLDir)\em64t\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(MKLDir)\em64t\lib;$(LMDir)\lib;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)x64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|x64'">
@@ -399,7 +399,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fecored.lib;numcored.lib;febioheatd.lib;febiomechd.lib;febiomixd.lib;febioxmld.lib;febioplotd.lib;febiolibd.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;mkl_intel_lp64.lib</AdditionalDependencies>
+      <AdditionalDependencies>fecored.lib;numcored.lib;febioheatd.lib;febiomechd.lib;febiomixd.lib;febiooptd.lib;febioxmld.lib;febioplotd.lib;febiolibd.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;mkl_intel_lp64.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
