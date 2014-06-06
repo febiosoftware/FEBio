@@ -217,11 +217,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FECoupledMooneyRivlin.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FECoupledTransIsoMooneyRivlin.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FECoupledTransIsoVerondaWestmann.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FECoupledVerondaWestmann.cpp"
 				>
 			</File>
 			<File
@@ -454,6 +462,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FEPressureLoad.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEPreStrainElastic.cpp"
 				>
 			</File>
 			<File
@@ -940,6 +952,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FEPressureLoad.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEPreStrainElastic.h"
 				>
 			</File>
 			<File
