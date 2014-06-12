@@ -59,6 +59,7 @@
 #include "FEViscoElasticMaterial.h"
 #include "FEVonMisesPlasticity.h"
 #include "FEPreStrainTransIsoMR.h"
+#include "FEPreStrainCoupledTransIsoMR.h"
 #include "FEPreStrainElastic.h"
 #include "FEElasticFiberMaterial.h"
 #include "FEFiberDensityDistribution.h"
@@ -192,6 +193,7 @@ REGISTER_FECORE_CLASS(FERemodelingElasticMaterial    ,FEMATERIAL_ID, "remodeling
 REGISTER_FECORE_CLASS(FECarterHayesOld               ,FEMATERIAL_ID, "Carter-Hayes (old)"            );
 REGISTER_FECORE_CLASS(FEActiveFiberContraction       ,FEMATERIAL_ID, "active_contraction"            );
 REGISTER_FECORE_CLASS(FEPreStrainTransIsoMR          ,FEMATERIAL_ID, "pre-strain trans iso Mooney-Rivlin");
+REGISTER_FECORE_CLASS(FEPreStrainCoupledTransIsoMR   ,FEMATERIAL_ID, "pre-strain coupled trans iso Mooney-Rivlin");
 REGISTER_FECORE_CLASS(FEPreStrainElastic             ,FEMATERIAL_ID, "pre-strain elastic"            );
 REGISTER_FECORE_CLASS(FEFiberExponentialPower        ,FEMATERIAL_ID, "fiber-exponential-power-law"   );
 REGISTER_FECORE_CLASS(FEFiberNH                      ,FEMATERIAL_ID, "fiber-NH"                      );

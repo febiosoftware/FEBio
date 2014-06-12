@@ -25,12 +25,11 @@ public:
 	double	m_flam;	//!< fiber stretch at which fibers are straight
 	double	m_K;	//!< "bulk"-modulus
 
-private:
+public:
 	//! calculate deviatoric stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt);
 
 	//! calculate deviatoric tangent stiffness at material point
-public:
 	tens4ds Tangent(FEMaterialPoint& pt);
 
 	//! data initialization

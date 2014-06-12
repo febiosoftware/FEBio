@@ -384,6 +384,9 @@
     <ClCompile Include="..\..\FEBioMech\FECoupledVerondaWestmann.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEPreStrainCoupledTransIsoMR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h">
@@ -762,6 +765,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FECoupledVerondaWestmann.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEPreStrainCoupledTransIsoMR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

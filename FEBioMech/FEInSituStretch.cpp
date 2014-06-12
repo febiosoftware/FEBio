@@ -38,69 +38,15 @@ bool FEInSituStretch::Augment(int naug)
 		if (dom.Class() == FE_DOMAIN_SOLID)
 		{
 			FESolidDomain* psd = static_cast<FESolidDomain*>(&dom);
-			FEPreStrainTransIsoMR* pm = dynamic_cast<FEPreStrainTransIsoMR*>(psd->GetMaterial());
-			if (pm) bconv = CheckAugment(psd, pm, 0);
+			FEMaterial* pmat = psd->GetMaterial();
+			FEPreStrainTransIsoMR* pm = dynamic_cast<FEPreStrainTransIsoMR*>(pmat);
+			if (pm) bconv |= Augment(psd, pm, 0);
 			else
 			{
-				FEElasticMixture* pmix = dynamic_cast<FEElasticMixture*>(psd->GetMaterial());
-				if (pmix)
+				for (int j=0; j<pmat->Properties(); ++j)
 				{
-					for (int j=0; j<pmix->Materials(); ++j)
-					{
-						FEPreStrainTransIsoMR* pmj = dynamic_cast<FEPreStrainTransIsoMR*>(pmix->GetMaterial(j));
-						if (pmj) bconv = CheckAugment(psd, pmj, j);
-					}
-				}
-				else
-				{
-					FEUncoupledElasticMixture* pmix = dynamic_cast<FEUncoupledElasticMixture*>(psd->GetMaterial());
-					if (pmix)
-					{
-						for (int j=0; j<pmix->Materials(); ++j)
-						{
-							FEPreStrainTransIsoMR* pmj = dynamic_cast<FEPreStrainTransIsoMR*>(pmix->GetMaterial(j));
-							if (pmj) bconv = CheckAugment(psd, pmj, j);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// if not converged, update Lagrange multipliers
-	if (bconv == false)
-	{
-		for (int i=0; i<ND; ++i)
-		{
-			FEDomain& dom = m.Domain(i);
-			if (dom.Class() == FE_DOMAIN_SOLID)
-			{
-				FESolidDomain* psd = static_cast<FESolidDomain*>(&dom);
-				FEPreStrainTransIsoMR* pm = dynamic_cast<FEPreStrainTransIsoMR*>(psd->GetMaterial());
-				if (pm) DoAugment(psd, pm, 0);
-				else
-				{
-					FEElasticMixture* pmix = dynamic_cast<FEElasticMixture*>(psd->GetMaterial());
-					if (pmix)
-					{
-						for (int j=0; j<pmix->Materials(); ++j)
-						{
-							FEPreStrainTransIsoMR* pmj = dynamic_cast<FEPreStrainTransIsoMR*>(pmix->GetMaterial(j));
-							if (pmj) DoAugment(psd, pmj, j);
-						}
-					}
-					else
-					{
-						FEUncoupledElasticMixture* pmix = dynamic_cast<FEUncoupledElasticMixture*>(psd->GetMaterial());
-						if (pmix)
-						{
-							for (int j=0; j<pmix->Materials(); ++j)
-							{
-								FEPreStrainTransIsoMR* pmj = dynamic_cast<FEPreStrainTransIsoMR*>(pmix->GetMaterial(j));
-								if (pmj) DoAugment(psd, pmj, j);
-							}
-						}
-					}
+					FEPreStrainTransIsoMR* pmj = dynamic_cast<FEPreStrainTransIsoMR*>(pmat->GetProperty(j));
+					if (pmj) bconv |= Augment(psd, pmj, j);
 				}
 			}
 		}
@@ -111,7 +57,7 @@ bool FEInSituStretch::Augment(int naug)
 
 //-----------------------------------------------------------------------------
 //! Check an augmentation for a specific domain/material pair
-bool FEInSituStretch::CheckAugment(FESolidDomain* psd, FEPreStrainTransIsoMR* pmat, int n)
+bool FEInSituStretch::Augment(FESolidDomain* psd, FEPreStrainTransIsoMR* pmat, int n)
 {
 	int NE = psd->Elements();
 
@@ -144,37 +90,36 @@ bool FEInSituStretch::CheckAugment(FESolidDomain* psd, FEPreStrainTransIsoMR* pm
 		}
 	}
 
-	return bconv;
-}
-
-//-----------------------------------------------------------------------------
-void FEInSituStretch::DoAugment(FESolidDomain* psd, FEPreStrainTransIsoMR* pmat, int n)
-{
-	int NE = psd->Elements();
-	for (int i=0; i<NE; ++i)
+	// only augment when we did not converge
+	if (bconv == false)
 	{
-		FESolidElement& el = psd->Element(i);
-		int nint = el.GaussPoints();
-		for (int i=0; i<nint; ++i)
+		for (int i=0; i<NE; ++i)
 		{
-			FEMaterialPoint& mp = *(el.GetMaterialPoint(i)->GetPointData(n));
-			FEFiberPreStretchMaterialPoint& psp = *mp.ExtractData<FEFiberPreStretchMaterialPoint>();
+			FESolidElement& el = psd->Element(i);
+			int nint = el.GaussPoints();
+			for (int i=0; i<nint; ++i)
+			{
+				FEMaterialPoint& mp = *(el.GetMaterialPoint(i)->GetPointData(n));
+				FEFiberPreStretchMaterialPoint& psp = *mp.ExtractData<FEFiberPreStretchMaterialPoint>();
 
-			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			mat3d& F = pt.m_F;
+				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+				mat3d& F = pt.m_F;
 
-			vec3d a0(pt.m_Q[0][0], pt.m_Q[1][0], pt.m_Q[2][0]);
-			vec3d a = F*a0;
-			double lRtor = a.norm();
+				vec3d a0(pt.m_Q[0][0], pt.m_Q[1][0], pt.m_Q[2][0]);
+				vec3d a = F*a0;
+				double lRtor = a.norm();
 
-			// get the target stretch
-			double ltrg = pmat->FiberStretch(mp);
+				// get the target stretch
+				double ltrg = pmat->FiberStretch(mp);
 
-			double err = ltrg / lRtor - psp.m_lam;
-			double lnew = psp.m_lam + err;
+				double err = ltrg / lRtor - psp.m_lam;
+				double lnew = psp.m_lam + err;
 
-			psp.m_lamp = psp.m_lam;
-			psp.m_lam = lnew;
+				psp.m_lamp = psp.m_lam;
+				psp.m_lam = lnew;
+			}
 		}
 	}
+
+	return bconv;
 }
