@@ -180,6 +180,9 @@ bool FEBioModel::Input(const char* szfile)
 	FEBioPlotFile* pplt = new FEBioPlotFile(*this);
 	m_plot = pplt;
 
+	// set compression
+	pplt->SetCompression(fim.m_nplot_compression);
+
 	// define the plot file variables
 	FEMesh& mesh = GetMesh();
 	int NP = (int) fim.m_plot.size();

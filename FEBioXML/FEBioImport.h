@@ -102,6 +102,8 @@ public:
 
 	void AddPlotVariable(const char* szvar, vector<int>& item);
 
+	void SetPlotCompression(int n);
+
 protected:
 	void ParseVersion			(XMLTag& tag);
 
@@ -118,6 +120,7 @@ public:
 public:
 	char					m_szplot_type[256];
 	vector<FEPlotVariable>	m_plot;
+	int						m_nplot_compression;
 
 public:
 	int m_nsteps;		//!< nr of step sections read

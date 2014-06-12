@@ -83,6 +83,7 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 	// plot output
 	m_szplot_type[0] = 0;
 	m_plot.clear();
+	m_nplot_compression = 0;
 
 	// default element type
 	m_ntet4  = FE_TET4G1;
@@ -571,4 +572,10 @@ void FEFEBioImport::AddPlotVariable(const char* szvar, vector<int>& item)
 {
 	FEPlotVariable var(szvar, item);
 	m_plot.push_back(var);
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::SetPlotCompression(int n)
+{
+	m_nplot_compression = n;
 }

@@ -175,6 +175,12 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 				// Add the plot variable
 				m_pim->AddPlotVariable(szt, item);
 			}
+			else if (tag=="compression")
+			{
+				int ncomp;
+				tag.value(ncomp);
+				m_pim->SetPlotCompression(ncomp);
+			}
 			++tag;
 		}
 		while (!tag.isend());

@@ -9,6 +9,43 @@
 #include <stack>
 using namespace std;
 
+//-----------------------------------------------------------------------------
+//! helper class for writing buffered data to file
+class FileStream
+{
+public:
+	FileStream();
+	~FileStream();
+
+	bool Create(const char* szfile);
+	bool Open(const char* szfile);
+	bool Append(const char* szfile);
+	void Close();
+
+	void Write(void* pd, size_t Size, size_t Count);
+
+	void Flush();
+
+	// \todo temporary reading functions. Needs to be replaced with buffered functions
+	size_t read(void* pd, size_t Size, size_t Count);
+	long tell();
+	void seek(long noff, int norigin);
+
+	void BeginStreaming();
+	void EndStreaming();
+
+	void SetCompression(int n) { m_ncompress = n; }
+
+private:
+	FILE*	m_fp;
+	size_t	m_bufsize;		//!< buffer size
+	size_t	m_current;		//!< current index
+	unsigned char*	m_buf;	//!< buffer
+	unsigned char*	m_pout;	//!< temp buffer when writing
+	int		m_ncompress;	//!< compression level
+};
+
+
 //----------------------
 // Output archive
 
@@ -22,7 +59,7 @@ public:
 
 	unsigned int GetID() { return m_nID; }
 
-	virtual void Write(FILE* fp) = 0;
+	virtual void Write(FileStream* fp) = 0;
 	virtual int Size() = 0;
 
 	void SetParent(OBranch* pparent) { m_pParent = pparent; }
@@ -52,12 +89,12 @@ public:
 		return nsize;
 	}
 
-	void Write(FILE* fp)
+	void Write(FileStream* fp)
 	{
-		fwrite(&m_nID  , sizeof(unsigned int), 1, fp);
+		fp->Write(&m_nID  , sizeof(unsigned int), 1);
 
 		unsigned int nsize = Size();
-		fwrite(&nsize, sizeof(unsigned int), 1, fp);
+		fp->Write(&nsize, sizeof(unsigned int), 1);
 
 		list<OChunk*>::iterator pc;
 		for (pc = m_child.begin(); pc != m_child.end(); ++pc) (*pc)->Write(fp);
@@ -77,12 +114,12 @@ public:
 
 	int Size() { return sizeof(T); }
 
-	void Write(FILE* fp)
+	void Write(FileStream* fp)
 	{
-		fwrite(&m_nID  , sizeof(unsigned int), 1, fp);
+		fp->Write(&m_nID  , sizeof(unsigned int), 1);
 		unsigned int nsize = sizeof(T);
-		fwrite(&nsize, sizeof(unsigned int), 1, fp);
-		fwrite(&m_d, sizeof(T), 1, fp);
+		fp->Write(&nsize, sizeof(unsigned int), 1);
+		fp->Write(&m_d, sizeof(T), 1);
 	}
 
 protected:
@@ -103,12 +140,12 @@ public:
 	~OLeaf() { delete m_pd; }
 
 	int Size() { return sizeof(T)*m_nsize; }
-	void Write(FILE* fp)
+	void Write(FileStream* fp)
 	{
-		fwrite(&m_nID , sizeof(unsigned int), 1, fp);
+		fp->Write(&m_nID , sizeof(unsigned int), 1);
 		unsigned int nsize = Size();
-		fwrite(&nsize , sizeof(unsigned int), 1, fp);
-		fwrite(m_pd   , sizeof(T), m_nsize, fp);
+		fp->Write(&nsize , sizeof(unsigned int), 1);
+		fp->Write(m_pd   , sizeof(T), m_nsize);
 	}
 
 protected:
@@ -129,14 +166,14 @@ public:
 	~OLeaf() { delete m_psz; }
 
 	int Size() { return strlen(m_psz)+sizeof(int); }
-	void Write(FILE* fp)
+	void Write(FileStream* fp)
 	{
-		fwrite(&m_nID , sizeof(unsigned int), 1, fp);
+		fp->Write(&m_nID , sizeof(unsigned int), 1);
 		unsigned int nsize = Size();
-		fwrite(&nsize , sizeof(unsigned int), 1, fp);
+		fp->Write(&nsize , sizeof(unsigned int), 1);
 		int l = nsize - sizeof(int);
-		fwrite(&l, sizeof(int), 1, fp);
-		fwrite(m_psz, sizeof(char), l, fp);
+		fp->Write(&l, sizeof(int), 1);
+		fp->Write(m_psz, sizeof(char), l);
 	}
 
 protected:
@@ -157,12 +194,12 @@ public:
 	~OLeaf() { delete m_pd; }
 
 	int Size() { return sizeof(T)*m_nsize; }
-	void Write(FILE* fp)
+	void Write(FileStream* fp)
 	{
-		fwrite(&m_nID , sizeof(unsigned int), 1, fp);
+		fp->Write(&m_nID , sizeof(unsigned int), 1);
 		unsigned int nsize = Size();
-		fwrite(&nsize , sizeof(unsigned int), 1, fp);
-		fwrite(m_pd   , sizeof(T), m_nsize, fp);
+		fp->Write(&nsize , sizeof(unsigned int), 1);
+		fp->Write(m_pd   , sizeof(T), m_nsize);
 	}
 
 protected:
@@ -179,7 +216,7 @@ protected:
 	struct CHUNK
 	{
 		unsigned int	id;		// chunk ID
-		long			lpos;	// file position of size field
+		unsigned int	lpos;	// file position
 		unsigned int	nsize;	// size of chunk
 	};
 
@@ -240,33 +277,35 @@ public:
 	void CloseChunk();
 
 	// input functions
-	IOResult read(char&   c) { int nr = (int) fread(&c, sizeof(char  ), 1, m_fp); if (nr != 1) return IO_ERROR; return IO_OK; }
-	IOResult read(int&    n) { int nr = (int) fread(&n, sizeof(int   ), 1, m_fp); if (nr != 1) return IO_ERROR; return IO_OK; }
-	IOResult read(bool&   b) { int nr = (int) fread(&b, sizeof(bool  ), 1, m_fp); if (nr != 1) return IO_ERROR; return IO_OK; }
-	IOResult read(float&  f) { int nr = (int) fread(&f, sizeof(float ), 1, m_fp); if (nr != 1) return IO_ERROR; return IO_OK; }
-	IOResult read(double& g) { int nr = (int) fread(&g, sizeof(double), 1, m_fp); if (nr != 1) return IO_ERROR; return IO_OK; }
+	IOResult read(char&   c) { size_t nr = m_fp->read(&c, sizeof(char  ), 1); if (nr != 1) return IO_ERROR; return IO_OK; }
+	IOResult read(int&    n) { size_t nr = m_fp->read(&n, sizeof(int   ), 1); if (nr != 1) return IO_ERROR; return IO_OK; }
+	IOResult read(bool&   b) { size_t nr = m_fp->read(&b, sizeof(bool  ), 1); if (nr != 1) return IO_ERROR; return IO_OK; }
+	IOResult read(float&  f) { size_t nr = m_fp->read(&f, sizeof(float ), 1); if (nr != 1) return IO_ERROR; return IO_OK; }
+	IOResult read(double& g) { size_t nr = m_fp->read(&g, sizeof(double), 1); if (nr != 1) return IO_ERROR; return IO_OK; }
 
-	IOResult read(unsigned int& n) { size_t nr = fread(&n, sizeof(unsigned int), 1, m_fp); if (nr != 1) return IO_ERROR; return IO_OK; }
+	IOResult read(unsigned int& n) { size_t nr = m_fp->read(&n, sizeof(unsigned int), 1); if (nr != 1) return IO_ERROR; return IO_OK; }
 
-	IOResult read(char*   pc, int n) { int nr = (int) fread(pc, sizeof(char  ), n, m_fp); if (nr != n) return IO_ERROR; return IO_OK; }
-	IOResult read(int*    pi, int n) { int nr = (int) fread(pi, sizeof(int   ), n, m_fp); if (nr != n) return IO_ERROR; return IO_OK; }
-	IOResult read(bool*   pb, int n) { int nr = (int) fread(pb, sizeof(bool  ), n, m_fp); if (nr != n) return IO_ERROR; return IO_OK; }
-	IOResult read(float*  pf, int n) { int nr = (int) fread(pf, sizeof(float ), n, m_fp); if (nr != n) return IO_ERROR; return IO_OK; }
-	IOResult read(double* pg, int n) { int nr = (int) fread(pg, sizeof(double), n, m_fp); if (nr != n) return IO_ERROR; return IO_OK; }
+	IOResult read(char*   pc, int n) { size_t nr = m_fp->read(pc, sizeof(char  ), n); if (nr != n) return IO_ERROR; return IO_OK; }
+	IOResult read(int*    pi, int n) { size_t nr = m_fp->read(pi, sizeof(int   ), n); if (nr != n) return IO_ERROR; return IO_OK; }
+	IOResult read(bool*   pb, int n) { size_t nr = m_fp->read(pb, sizeof(bool  ), n); if (nr != n) return IO_ERROR; return IO_OK; }
+	IOResult read(float*  pf, int n) { size_t nr = m_fp->read(pf, sizeof(float ), n); if (nr != n) return IO_ERROR; return IO_OK; }
+	IOResult read(double* pg, int n) { size_t nr = m_fp->read(pg, sizeof(double), n); if (nr != n) return IO_ERROR; return IO_OK; }
 
 	IOResult read(char* sz)
 	{
 		IOResult ret;
-		int l, nr;
+		int l;
 		ret = read(l); if (ret != IO_OK) return ret;
-		nr = (int) fread(sz, 1, l, m_fp); if (nr != l) return IO_ERROR;
+		size_t nr = m_fp->read(sz, 1, l); if (nr != l) return IO_ERROR;
 		sz[l] = 0;
 		return IO_OK;
 	}
 
+	void SetCompression(int n);
+
 protected:
-	FILE*	m_fp;		// the file pointer
-	bool	m_bSaving;	// read or write mode?
+	FileStream*	m_fp;		// pointer to file stream
+	bool		m_bSaving;	// read or write mode?
 
 	// write data
 	OBranch*	m_pRoot;	// chunk tree root

@@ -110,11 +110,19 @@ void FEBioPlotFile::Dictionary::Clear()
 
 FEBioPlotFile::FEBioPlotFile(FEModel& fem) : m_fem(fem)
 {
+	m_ncompress = 0;
 }
 
+//-----------------------------------------------------------------------------
 FEBioPlotFile::~FEBioPlotFile(void)
 {
 	Close();
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::SetCompression(int n)
+{
+	m_ncompress = n;
 }
 
 //-----------------------------------------------------------------------------
@@ -162,6 +170,8 @@ bool FEBioPlotFile::Open(FEModel &fem, const char *szfile)
 bool FEBioPlotFile::WriteRoot(FEModel& fem)
 {
 	// write the root element
+	// (don't compress this section)
+	m_ar.SetCompression(0);
 	m_ar.BeginChunk(PLT_ROOT);
 	{
 		// --- save the header file ---
@@ -212,6 +222,9 @@ bool FEBioPlotFile::WriteHeader(FEModel& fem)
 	// max number of nodes per facet
 	int n = (int) PLT_MAX_FACET_NODES;
 	m_ar.WriteChunk(PLT_HDR_MAX_FACET_NODES, n);
+
+	// compression flag
+	m_ar.WriteChunk(PLT_HDR_COMPRESSION, m_ncompress);
 
 	return true;
 }
@@ -597,6 +610,8 @@ bool FEBioPlotFile::Write(FEModel &fem)
 	// store the fem pointer
 	m_pfem = &fem;
 
+	// compress these sections if requested
+	m_ar.SetCompression(m_ncompress);
 	m_ar.BeginChunk(PLT_STATE);
 	{
 		// state header
