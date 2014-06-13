@@ -10,6 +10,11 @@
 
 #ifdef WIN32
 	#include <windows.h>
+	#include <conio.h>
+#else
+	//These are for the wait command
+	#include <termios.h>
+	#include <unistd.h>
 #endif
 
 //--------------------------------------------------------------------
@@ -52,6 +57,35 @@ void Console::SetTitle(const char* sz, ...)
 		printf("%c]0;%s%c", '\033', sztitle, '\007');
 #endif
 	}
+}
+
+
+//--------------------------------------------------------------------
+//! gets a line from the user
+void Console::Wait()
+{
+	// notify the user.
+	fprintf(stderr, "Press any key to continue...\n");
+
+	// flush the standard stream
+	fflush(stdin);
+
+	// wait until user inputs a character with no return symbol.
+#ifdef WIN32
+	_getch();
+#else
+	// change mode of termios so echo is off.
+	struct termios oldt,
+					newt;
+	tcgetattr( STDIN_FILENO, &oldt );
+	newt = oldt;
+	newt.c_lflag &= ~( ICANON | ECHO );
+	tcsetattr( STDIN_FILENO, TCSANOW, &newt );
+	getchar();
+	// reset stdin.
+	tcsetattr( STDIN_FILENO, TCSANOW, &oldt );
+#endif
+
 }
 
 //--------------------------------------------------------------------

@@ -32,6 +32,9 @@ public:
 
 	void GetCommand(int& nargs, char** argv);
 
+	//! waits for user input (similar to system("pause"))
+	void Wait();
+
 	void Draw(unsigned char* img, int nx, int ny);
 
 	void Write(const char* sz, unsigned short att);
