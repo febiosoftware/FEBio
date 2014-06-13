@@ -317,7 +317,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKLDir)\em64t\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(MKLDir)\em64t\lib;$(LMDir)\lib;$(ZLibDir)\lib64;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)x64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|x64'">
@@ -573,7 +573,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>numcore.lib;fecore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioxml.lib;febioplot.lib;febiolib.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;mkl_intel_lp64.lib</AdditionalDependencies>
+      <AdditionalDependencies>numcore.lib;fecore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioxml.lib;febioplot.lib;febiolib.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;mkl_intel_lp64.lib;zlib.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
