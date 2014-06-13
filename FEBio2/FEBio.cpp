@@ -87,6 +87,7 @@ struct CMDOPTIONS
 //
 bool ParseCmdLine(int argc, char* argv[], CMDOPTIONS& ops);
 void Hello();
+int Run(CMDOPTIONS& ops);
 int prompt(CMDOPTIONS& ops);
 int get_app_path (char *pname, size_t pathsize);
 extern void InitFEBioLibrary();
@@ -165,73 +166,15 @@ int main(int argc, char* argv[])
 	// print welcome message
 	if (ops.bsplash && (!ops.bsilent)) Hello();
 
-	// if silent mode only output to file
-	if (ops.bsilent)
-	{
-		felog.SetMode(Logfile::FILE_ONLY);
-		Console::GetHandle()->Deactivate();
-	}
 
-	// initialize FEBio library
+	//-------------------------
+	// Begin FEBio instance
+	// ------------------------
 	InitFEBioLibrary();
 
 	// if there are no arguments, print the FEBio prompt
-	if (argc == 1)
-	{
-		 if (prompt(ops) == 0) return 0;
-	}
-
-	// create the one and only FEBioModel object
-	FEBioModel fem;
-
-	// register callbacks
-	fem.AddCallback(update_console_cb, CB_MAJOR_ITERS, 0);
-	fem.AddCallback(interrupt_cb     , CB_MINOR_ITERS, 0);
-
-	// intialize the framework
-	FEBioCommand::SetFEM(&fem);
-
-	// read the configration file if specified
-	if (ops.szcnf[0])
-	{
-		if (Configure(fem, ops.szcnf) == false) return 1;
-	}
-
-	// set options that were passed on the command line
-	fem.SetDebugFlag(ops.bdebug);
-
-	// set the output filenames
-	fem.SetLogFilename (ops.szlog);
-	fem.SetPlotFilename(ops.szplt);
-	fem.SetDumpFilename(ops.szdmp);
-
-	// read the input file if specified
-	if (ops.szfile[0])
-	{
-		// store the input file name
-		fem.SetInputFilename(ops.szfile);
-
-		// read the input file
-		if (fem.Input(ops.szfile) == false) return 1;
-	}
-
-	// find a task
-	FECoreTask* ptask = fecore_new<FECoreTask>(FETASK_ID, ops.sztask, &fem);
-	if (ptask == 0)
-	{
-		fprintf(stderr, "Don't know how to do task: %s\n", ops.sztask);
-		return 1;
-	}
-
-	// run the FEBio task (and pass the optional control file)
-	bool bret = ptask->Run(ops.szctrl);
-
-	// Don't forget to cleanup the plugins
-	FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
-	pPM->DeleteThis();
-
-	// return the error code of the run
-	return (bret?0:1);
+	if (argc == 1)	 return (prompt(ops));
+	else			 return Run(ops);
 }
 
 //-----------------------------------------------------------------------------
@@ -248,6 +191,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	bool bplt = false;
 	bool bdmp = false;
 	bool brun = true;
+	
 
 	ops.szfile[0] = 0;
 	ops.sztask[0] = 0;
@@ -361,6 +305,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		{
 			brun = false;
 		}
+
 		else if (strcmp(sz, "-import") == 0)
 		{
 			char* szfile = argv[++i];
@@ -390,13 +335,13 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 				}
 				else
 				{
-					fprintf(stderr, "FATAL ERROR: Invalid command line option\n\n");
+					fprintf(stderr, "FATAL ERROR: Invalid command line option\n");
 					return false;
 				}
 			}
 			else
 			{
-				fprintf(stderr, "FATAL ERROR: Invalid command line option\n\n");
+				fprintf(stderr, "FATAL ERROR: Invalid command line option\n");
 				return false;
 			}
 		}
@@ -441,6 +386,69 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	return brun;
 }
 
+
+
+int Run(CMDOPTIONS& ops)
+{
+		// if silent mode only output to file
+		if (ops.bsilent)
+		{
+			felog.SetMode(Logfile::FILE_ONLY);
+			Console::GetHandle()->Deactivate();
+		}
+
+		// create the one and only FEBioModel object
+		FEBioModel fem;
+
+		// register callbacks
+		fem.AddCallback(update_console_cb, CB_MAJOR_ITERS, 0);
+		fem.AddCallback(interrupt_cb     , CB_MINOR_ITERS, 0);
+
+		// intialize the framework
+		FEBioCommand::SetFEM(&fem);
+
+				// read the configration file if specified
+		if (ops.szcnf[0])
+			if (Configure(fem, ops.szcnf) == false) return 1;
+		
+
+		// set options that were passed on the command line
+		fem.SetDebugFlag(ops.bdebug);
+
+		// set the output filenames
+		fem.SetLogFilename (ops.szlog);
+		fem.SetPlotFilename(ops.szplt);  
+		fem.SetDumpFilename(ops.szdmp);
+		
+		// read the input file if specified
+		if (ops.szfile[0])
+		{
+			// store the input file name
+			fem.SetInputFilename(ops.szfile);
+
+			// read the input file
+			if (fem.Input(ops.szfile) == false) return 1;
+		}
+
+		// find a task
+		FECoreTask* ptask = fecore_new<FECoreTask>(FETASK_ID, ops.sztask, &fem);
+		if (ptask == 0)
+		{
+			fprintf(stderr, "Don't know how to do task: %s\n", ops.sztask);
+			return 1;
+		}
+
+		// run the FEBio task (and pass the optional control file)
+		bool bret = ptask->Run(ops.szctrl);
+
+		// Don't forget to cleanup the plugins
+		FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
+		pPM->DeleteThis();
+
+		return (bret?0:1);
+}
+
+
 //-----------------------------------------------------------------------------
 //! Prints the FEBio prompt. If the user did not enter anything on the command
 //! line when running FEBio then commands can be entered at the FEBio prompt.
@@ -450,10 +458,10 @@ int prompt(CMDOPTIONS& ops)
 	// get a pointer to the console window
 	Console* pShell = Console::GetHandle();
 
+	// set the title
+	pShell->SetTitle("FEBio2");
 	int nargs;
 	char* argv[32];
-
-	fprintf(stderr, "Type help for an overview of commands.\n");
 
 	while (1)
 	{
@@ -473,7 +481,12 @@ int prompt(CMDOPTIONS& ops)
 			else if (strcmp(argv[0], "run") == 0)
 			{
 				ParseCmdLine(nargs, argv, ops);
-				return 1;
+				// run the FEBio2 on the ops
+				// in the case that no config file is found return 1;
+				Run(ops);
+					
+				// reset the title after computation.
+				pShell->SetTitle("FEBio2");
 			}
 			else if (strcmp(argv[0], "version") == 0)
 			{
@@ -484,6 +497,7 @@ int prompt(CMDOPTIONS& ops)
 			else
 			{
 				printf("Unknown command: %s\n", argv[0]);
+				fprintf(stderr, "Type help for an overview of commands.\n");
 			}
 		}
 	}
@@ -499,7 +513,7 @@ bool Configure(FEBioModel& fem, const char *szfile)
 	XMLReader xml;
 	if (xml.Open(szfile) == false)
 	{
-		fprintf(stderr, "FATAL ERROR: Failed reading FEBio configuration file %s.\n", szfile);
+		fprintf(stderr, "FATAL ERROR: Failed reading FEBio configuration file %s.", szfile);
 		return false;
 	}
 
@@ -607,7 +621,7 @@ bool Configure(FEBioModel& fem, const char *szfile)
 	}
 	catch (...)
 	{
-		felog.printf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
+		felog.printf("FATAL ERROR: unrecoverable error (line %d)", xml.GetCurrentLine());
 		return false;
 	}
 
