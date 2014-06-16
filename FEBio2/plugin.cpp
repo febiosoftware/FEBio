@@ -44,12 +44,25 @@ void* FindPluginFunc(FEBIO_PLUGIN_HANDLE ph, const char* szfunc) { return dlsym(
 FEBioPlugin::FEBioPlugin()
 {
 	m_ph = 0;
+	m_szname[0] = 0;
 }
 
 //-----------------------------------------------------------------------------
 FEBioPlugin::~FEBioPlugin()
 {
 	if (m_ph) UnLoad();
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlugin::SetNameFromFilePath(const char* szfile)
+{
+	const char* ch = strrchr(szfile, '\\');
+	if (ch==0) 
+	{
+		ch = strrchr(szfile, '/'); 
+		if (ch==0) ch = szfile; else ch++;
+	} else ch++;
+	if (ch) strcpy(m_szname, ch);
 }
 
 //-----------------------------------------------------------------------------
@@ -65,6 +78,9 @@ int FEBioPlugin::Load(const char* szfile)
 	// Make sure the plugin is not loaded already
 	assert(m_ph == 0);
 	if (m_ph) return 0;
+
+	// set the file name as the plugin name
+	SetNameFromFilePath(szfile);
 
 	// load the library
 	FEBIO_PLUGIN_HANDLE ph = LoadPlugin(szfile);
@@ -141,6 +157,18 @@ void FEBioPluginManager::DeleteThis()
 {
 	delete m_pThis;
 	m_pThis = 0;
+}
+
+//-----------------------------------------------------------------------------
+int FEBioPluginManager::Plugins()
+{ 
+	return (int) m_Plugin.size(); 
+}
+
+//-----------------------------------------------------------------------------
+const FEBioPlugin& FEBioPluginManager::GetPlugin(int i)
+{
+	return *(m_Plugin[i]);
 }
 
 //-----------------------------------------------------------------------------

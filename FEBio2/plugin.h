@@ -33,7 +33,14 @@ public:
 	//! Unload the library
 	void UnLoad();
 
+	//! get the plugin name
+	const char* GetName() const { return m_szname; }
+
+protected:
+	void SetNameFromFilePath(const char* szfile);
+
 private:
+	char					m_szname[1024];
 	FEBIO_PLUGIN_HANDLE		m_ph;
 };
 
@@ -50,6 +57,12 @@ public:
 
 	//! Clean up
 	void DeleteThis();
+
+	//! return the number of plugins loaded
+	int Plugins();
+
+	//! return an instance of a plugin
+	const FEBioPlugin& GetPlugin(int i);
 
 private:
 	std::vector<FEBioPlugin*>	m_Plugin;
