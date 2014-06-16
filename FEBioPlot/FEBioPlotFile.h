@@ -1,6 +1,6 @@
 #pragma once
 #include "PlotFile.h"
-#include "pltArchive.h"
+#include "PltArchive.h"
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEShellDomain.h"
 #include "FECore/FETrussDomain.h"

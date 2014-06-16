@@ -23,4 +23,4 @@ LEV_LIB = -llevmar_$(PLAT)
 
 LIBS = -L$(FEBDIR)build/lib $(LEV_LIB) $(MKL_LIB)
 
-INC = -I$(INTEL_INC) -I $(FEBDIR) -I $(FEBDIR)build/include
+INC = -I$(INTEL_INC) -I$(FEBDIR) -I$(FEBDIR)build/include

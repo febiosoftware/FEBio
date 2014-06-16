@@ -2,6 +2,7 @@
 #include "FECore/Archive.h"
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 #include <list>
 #include <vector>
 #include <stack>
