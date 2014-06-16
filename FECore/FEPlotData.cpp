@@ -32,7 +32,7 @@ void FENodeData::Save(FEModel &fem, Archive& ar)
 	if (Save(fem.GetMesh(), a))
 	{
 		assert(a.size() == N*ndata);
-		ar.WriteChunk(0, a);
+		ar.WriteData(0, a);
 	}
 }
 
@@ -82,7 +82,7 @@ void FEDomainData::Save(FEModel &fem, Archive& ar)
 		if (Save(D, a))
 		{
 			assert(a.size() == nsize);
-			ar.WriteChunk(m_item[i]+1, a);
+			ar.WriteData(m_item[i]+1, a);
 		}
 	}
 }
@@ -122,7 +122,7 @@ void FESurfaceData::Save(FEModel &fem, Archive& ar)
 		if (Save(S, a))
 		{
 			assert(a.size() == nsize);
-			ar.WriteChunk(i+1, a);
+			ar.WriteData(i+1, a);
 		}
 	}
 }

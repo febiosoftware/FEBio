@@ -1,6 +1,6 @@
 #pragma once
 #include "PlotFile.h"
-#include "FECore/Archive.h"
+#include "pltArchive.h"
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEShellDomain.h"
 #include "FECore/FETrussDomain.h"
@@ -192,7 +192,7 @@ protected:
 
 protected:
 	Dictionary	m_dic;	// dictionary
-	Archive		m_ar;	// the data archive
+	PltArchive	m_ar;	// the data archive
 	FEModel&	m_fem;
 	int			m_ncompress;	// compression level
 };
