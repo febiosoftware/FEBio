@@ -600,6 +600,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\FEBioLib\FEBioModel.h" />
     <ClInclude Include="..\..\FEBioLib\FEBox.h" />
+    <ClInclude Include="..\..\FEBioLib\plugin.h" />
     <ClInclude Include="..\..\FEBioLib\stdafx.h" />
     <ClInclude Include="..\..\FEBioLib\targetver.h" />
     <ClInclude Include="..\..\FEBioLib\validate.h" />
@@ -612,6 +613,7 @@
     <ClCompile Include="..\..\FEBioLib\hello.cpp" />
     <ClCompile Include="..\..\FEBioLib\InitLibrary.cpp" />
     <ClCompile Include="..\..\FEBioLib\input.cpp" />
+    <ClCompile Include="..\..\FEBioLib\plugin.cpp" />
     <ClCompile Include="..\..\FEBioLib\stdafx.cpp" />
     <ClCompile Include="..\..\FEBioLib\validate.cpp" />
   </ItemGroup>

@@ -51,7 +51,7 @@
 #include "FEBioStdSolver.h"
 #include "FECore/FECoreKernel.h"
 #include "Interrupt.h"
-#include "plugin.h"
+#include "FEBioLib/plugin.h"
 #include "FEBioXML/XMLReader.h"
 
 #ifdef WIN32
