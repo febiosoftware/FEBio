@@ -78,6 +78,30 @@ double FENodeZVel::value(int nnode)
 }
 
 //-----------------------------------------------------------------------------
+double FENodeXAcc::value(int nnode) 
+{
+	FEMesh& mesh = m_pfem->GetMesh();
+	FENode& node = mesh.Node(nnode);
+	return node.m_at.x; 
+}
+
+//-----------------------------------------------------------------------------
+double FENodeYAcc::value(int nnode) 
+{
+	FEMesh& mesh = m_pfem->GetMesh();
+	FENode& node = mesh.Node(nnode);
+	return node.m_at.y; 
+}
+
+//-----------------------------------------------------------------------------
+double FENodeZAcc::value(int nnode) 
+{
+	FEMesh& mesh = m_pfem->GetMesh();
+	FENode& node = mesh.Node(nnode);
+	return node.m_at.z; 
+}
+
+//-----------------------------------------------------------------------------
 double FENodeForceX::value(int nnode) 
 {
 	FEMesh& mesh = m_pfem->GetMesh();

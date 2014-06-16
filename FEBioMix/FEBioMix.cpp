@@ -178,7 +178,6 @@ REGISTER_FECORE_CLASS_T(FEPlotSBMRefAppDensityT          , FEPLOTDATA_ID, 6, "sb
 REGISTER_FECORE_CLASS_T(FEPlotSBMRefAppDensityT          , FEPLOTDATA_ID, 7, "sbm 8 referential apparent density");
 
 //-----------------------------------------------------------------------------
-REGISTER_FECORE_CLASS(FENodeTemp, FENODELOGDATA_ID, "T");
 REGISTER_FECORE_CLASS(FENodePressure, FENODELOGDATA_ID, "p");
 REGISTER_FECORE_CLASS(FENodeConcentration, FENODELOGDATA_ID, "c");
 REGISTER_FECORE_CLASS_T(FENodeConcentration_T, FENODELOGDATA_ID, 0, "c1");

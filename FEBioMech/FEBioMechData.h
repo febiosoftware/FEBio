@@ -81,6 +81,30 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FENodeXAcc : public FENodeLogData
+{ 
+public: 
+	FENodeXAcc(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//-----------------------------------------------------------------------------
+class FENodeYAcc : public FENodeLogData
+{ 
+public: 
+	FENodeYAcc(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//-----------------------------------------------------------------------------
+class FENodeZAcc : public FENodeLogData
+{ 
+public: 
+	FENodeZAcc(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//-----------------------------------------------------------------------------
 class FENodeForceX: public FENodeLogData
 { 
 public: 
