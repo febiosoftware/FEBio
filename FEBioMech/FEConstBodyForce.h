@@ -46,7 +46,7 @@ public:
 	vec3d force(FEMaterialPoint& mp) {
 		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 		mat3ds K = stiffness(mp);
-		return K*((pt.m_rt - c)*(w*w));
+		return K*(pt.m_rt - c);
 	}
 	mat3ds stiffness(FEMaterialPoint& mp) { return (mat3dd(1) - dyad(n))*(-w*w); }
 	void Serialize(DumpFile& ar);
