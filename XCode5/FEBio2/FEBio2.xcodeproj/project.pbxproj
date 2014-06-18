@@ -23,7 +23,6 @@
 		D5E10B9C1865E24900B23922 /* FEPrintMatrixDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B881865E24900B23922 /* FEPrintMatrixDiagnostic.cpp */; };
 		D5E10B9D1865E24900B23922 /* FETangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B8A1865E24900B23922 /* FETangentDiagnostic.cpp */; };
 		D5E10B9E1865E24900B23922 /* Interrupt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B8C1865E24900B23922 /* Interrupt.cpp */; };
-		D5E10B9F1865E24900B23922 /* plugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B8E1865E24900B23922 /* plugin.cpp */; };
 		D5E10BA01865E24900B23922 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B901865E24900B23922 /* stdafx.cpp */; };
 		D5FB050918A5B053004E688A /* libFEBioPlot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB050818A5B053004E688A /* libFEBioPlot.a */; };
 		D5FB051518A5B1EB004E688A /* libFEBioHeat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB050E18A5B1EB004E688A /* libFEBioHeat.a */; };
@@ -79,8 +78,6 @@
 		D5E10B8B1865E24900B23922 /* FETangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETangentDiagnostic.h; sourceTree = "<group>"; };
 		D5E10B8C1865E24900B23922 /* Interrupt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Interrupt.cpp; sourceTree = "<group>"; };
 		D5E10B8D1865E24900B23922 /* Interrupt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Interrupt.h; sourceTree = "<group>"; };
-		D5E10B8E1865E24900B23922 /* plugin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = plugin.cpp; sourceTree = "<group>"; };
-		D5E10B8F1865E24900B23922 /* plugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = plugin.h; sourceTree = "<group>"; };
 		D5E10B901865E24900B23922 /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stdafx.cpp; sourceTree = "<group>"; };
 		D5E10B911865E24900B23922 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
 		D5FB050818A5B053004E688A /* libFEBioPlot.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFEBioPlot.a; path = ../DerivedData/FEBio2/Build/Products/Debug/libFEBioPlot.a; sourceTree = "<group>"; };
@@ -169,8 +166,6 @@
 				D5E10B8B1865E24900B23922 /* FETangentDiagnostic.h */,
 				D5E10B8C1865E24900B23922 /* Interrupt.cpp */,
 				D5E10B8D1865E24900B23922 /* Interrupt.h */,
-				D5E10B8E1865E24900B23922 /* plugin.cpp */,
-				D5E10B8F1865E24900B23922 /* plugin.h */,
 				D5E10B901865E24900B23922 /* stdafx.cpp */,
 				D5E10B911865E24900B23922 /* stdafx.h */,
 			);
@@ -237,7 +232,6 @@
 				D5E10B981865E24900B23922 /* FEContactDiagnostic.cpp in Sources */,
 				D5E10B961865E24900B23922 /* FEBioCommand.cpp in Sources */,
 				D5E10B9B1865E24900B23922 /* FEPrintHBMatrixDiagnostic.cpp in Sources */,
-				D5E10B9F1865E24900B23922 /* plugin.cpp in Sources */,
 				D5E10BA01865E24900B23922 /* stdafx.cpp in Sources */,
 				D5E10B9E1865E24900B23922 /* Interrupt.cpp in Sources */,
 				D5E10B971865E24900B23922 /* FEBioStdSolver.cpp in Sources */,

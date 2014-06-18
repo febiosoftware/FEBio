@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D513A2F61952467E00060C20 /* FEBioHeatData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D513A2F41952467E00060C20 /* FEBioHeatData.cpp */; };
+		D513A2F71952467E00060C20 /* FEBioHeatData.h in Headers */ = {isa = PBXBuildFile; fileRef = D513A2F51952467E00060C20 /* FEBioHeatData.h */; };
 		D5E106331865DF1900B23922 /* FEBioHeat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E106171865DF1900B23922 /* FEBioHeat.cpp */; };
 		D5E106341865DF1900B23922 /* FEBioHeat.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E106181865DF1900B23922 /* FEBioHeat.h */; };
 		D5E106351865DF1900B23922 /* FEConvectiveHeatFlux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1061A1865DF1900B23922 /* FEConvectiveHeatFlux.cpp */; };
@@ -37,6 +39,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D513A2F41952467E00060C20 /* FEBioHeatData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioHeatData.cpp; sourceTree = "<group>"; };
+		D513A2F51952467E00060C20 /* FEBioHeatData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioHeatData.h; sourceTree = "<group>"; };
 		D5E1060F1865DF0200B23922 /* libFEBioHeat.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioHeat.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E106171865DF1900B23922 /* FEBioHeat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioHeat.cpp; sourceTree = "<group>"; };
 		D5E106181865DF1900B23922 /* FEBioHeat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioHeat.h; sourceTree = "<group>"; };
@@ -99,6 +103,8 @@
 			children = (
 				D5E106171865DF1900B23922 /* FEBioHeat.cpp */,
 				D5E106181865DF1900B23922 /* FEBioHeat.h */,
+				D513A2F41952467E00060C20 /* FEBioHeatData.cpp */,
+				D513A2F51952467E00060C20 /* FEBioHeatData.h */,
 				D5E1061A1865DF1900B23922 /* FEConvectiveHeatFlux.cpp */,
 				D5E1061B1865DF1900B23922 /* FEConvectiveHeatFlux.h */,
 				D5E1061C1865DF1900B23922 /* FECoupledHeatSolidSolver.cpp */,
@@ -146,6 +152,7 @@
 				D5E1064D1865DF1900B23922 /* FEPlotNodeTemperature.h in Headers */,
 				D5E106381865DF1900B23922 /* FECoupledHeatSolidSolver.h in Headers */,
 				D5E1064B1865DF1900B23922 /* FEPlotHeatFlux.h in Headers */,
+				D513A2F71952467E00060C20 /* FEBioHeatData.h in Headers */,
 				D5E106401865DF1900B23922 /* FEHeatSolver.h in Headers */,
 				D5E106441865DF1900B23922 /* FEHeatStiffnessMatrix.h in Headers */,
 				D5E106341865DF1900B23922 /* FEBioHeat.h in Headers */,
@@ -211,6 +218,7 @@
 				D5E106451865DF1900B23922 /* FEHeatTransferAnalysis.cpp in Sources */,
 				D5E106391865DF1900B23922 /* FEHeatDomainFactory.cpp in Sources */,
 				D5E106351865DF1900B23922 /* FEConvectiveHeatFlux.cpp in Sources */,
+				D513A2F61952467E00060C20 /* FEBioHeatData.cpp in Sources */,
 				D5E1064A1865DF1900B23922 /* FEPlotHeatFlux.cpp in Sources */,
 				D5E1063F1865DF1900B23922 /* FEHeatSolver.cpp in Sources */,
 				D5E106371865DF1900B23922 /* FECoupledHeatSolidSolver.cpp in Sources */,
