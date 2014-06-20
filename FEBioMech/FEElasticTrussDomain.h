@@ -35,10 +35,10 @@ public: // overloads from FEElasticDomain
 	void InternalForces(FEGlobalVector& R);
 
 	//! calculate body force \todo implement this
-	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) { assert(false); }
+	void BodyForce(FESolver* psolver, FEGlobalVector& R, FEBodyForce& bf) { assert(false); }
 
 	//! Calculates inertial forces for dynamic problems
-	void InertialForces(FEGlobalVector& R, vector<double>& F) { assert(false); }
+	void InertialForces(FESolver* psolver, FEGlobalVector& R, vector<double>& F) { assert(false); }
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolver* psolver);

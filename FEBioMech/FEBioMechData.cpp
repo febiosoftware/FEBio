@@ -585,6 +585,31 @@ double FELogRigidBodyPosY::value(FEObject& rb) { return static_cast<FERigidBody&
 double FELogRigidBodyPosZ::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_rt.z; }
 
 //-----------------------------------------------------------------------------
+double FELogRigidBodyVelX::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_vt.x; }
+double FELogRigidBodyVelY::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_vt.y; }
+double FELogRigidBodyVelZ::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_vt.z; }
+
+//-----------------------------------------------------------------------------
+double FELogRigidBodyAccX::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_at.x; }
+double FELogRigidBodyAccY::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_at.y; }
+double FELogRigidBodyAccZ::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_at.z; }
+
+//-----------------------------------------------------------------------------
+double FELogRigidBodyAngPosX::value(FEObject& rb) { FERigidBody& o = dynamic_cast<FERigidBody&>(rb); return ((o.m_qt.GetVector()).x*o.m_qt.GetAngle()); }
+double FELogRigidBodyAngPosY::value(FEObject& rb) { FERigidBody& o = dynamic_cast<FERigidBody&>(rb); return ((o.m_qt.GetVector()).y*o.m_qt.GetAngle()); }
+double FELogRigidBodyAngPosZ::value(FEObject& rb) { FERigidBody& o = dynamic_cast<FERigidBody&>(rb); return ((o.m_qt.GetVector()).z*o.m_qt.GetAngle()); }
+
+//-----------------------------------------------------------------------------
+double FELogRigidBodyAngVelX::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_wt.x; }
+double FELogRigidBodyAngVelY::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_wt.y; }
+double FELogRigidBodyAngVelZ::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_wt.z; }
+
+//-----------------------------------------------------------------------------
+double FELogRigidBodyAngAccX::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_alt.x; }
+double FELogRigidBodyAngAccY::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_alt.y; }
+double FELogRigidBodyAngAccZ::value(FEObject& rb) { return dynamic_cast<FERigidBody&>(rb).m_alt.z; }
+
+//-----------------------------------------------------------------------------
 double FELogRigidBodyQuatX::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_qt.x; }
 double FELogRigidBodyQuatY::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_qt.y; }
 double FELogRigidBodyQuatZ::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_qt.z; }

@@ -26,6 +26,19 @@ public:
 		z = v.z*sina;
 	}
 
+	quatd(vec3d v)
+	{
+        double angle = v.unit();
+        
+		w = (double) cos(angle * 0.5);
+        
+		double sina = (double) sin(angle * 0.5);
+        
+		x = v.x*sina;
+		y = v.y*sina;
+		z = v.z*sina;
+	}
+    
 	quatd (vec3d& v1, vec3d& v2)
 	{
 		vec3d n = v1^v2;
@@ -163,6 +176,13 @@ public:
 		return quatd(-x/N, -y/N, -z/N, w/N);
 	}
 
+	quatd Cayley() const
+    {
+        double a = GetAngle();
+        vec3d v = GetVector();
+        return quatd(2*atan(a/2),v);
+    }
+    
 	double DotProduct(const quatd& q) const
 	{
 		return w*q.w + x*q.x + y*q.y + z*q.z;

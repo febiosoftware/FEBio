@@ -274,56 +274,78 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! potential energy for rigid bodies
-class FEPlotRigidPotentialEnergy : public FEDomainData
+//! Rigid body displacement
+class FEPlotRigidDisplacement : public FEDomainData
 {
 public:
-	FEPlotRigidPotentialEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE), m_pfem(pfem) {}
+	FEPlotRigidDisplacement(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_NODE),  m_pfem(pfem) {}
 	bool Save(FEDomain& dom, vector<float>& a);
-protected:
-	FEModel*	m_pfem;
+private:
+	FEModel* m_pfem;
 };
 
 //-----------------------------------------------------------------------------
-//! kinetic energy for rigid bodies
-class FEPlotRigidKineticEnergy : public FEDomainData
-{
-public:
-	FEPlotRigidKineticEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE), m_pfem(pfem) {}
-	bool Save(FEDomain& dom, vector<float>& a);
-protected:
-	FEModel*	m_pfem;
-};
-
-//-----------------------------------------------------------------------------
-//! total energy (potential + kinetic) for rigid bodies
-class FEPlotRigidTotalEnergy : public FEDomainData
-{
-public:
-	FEPlotRigidTotalEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE), m_pfem(pfem) {}
-	bool Save(FEDomain& dom, vector<float>& a);
-protected:
-	FEModel*	m_pfem;
-};
-
-//-----------------------------------------------------------------------------
-//! rigid (linear) velocity
+//! Rigid body velocity
 class FEPlotRigidVelocity : public FEDomainData
 {
 public:
-	FEPlotRigidVelocity(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_NODE), m_pfem(pfem){}
+	FEPlotRigidVelocity(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_NODE),  m_pfem(pfem) {}
 	bool Save(FEDomain& dom, vector<float>& a);
-protected:
-	FEModel*	m_pfem;
+private:
+	FEModel* m_pfem;
 };
 
 //-----------------------------------------------------------------------------
-//! rigid (angular) velocity
+//! Rigid body acceleration
+class FEPlotRigidAcceleration : public FEDomainData
+{
+public:
+	FEPlotRigidAcceleration(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_NODE),  m_pfem(pfem) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+private:
+	FEModel* m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! Rigid body rotation
+class FEPlotRigidRotation : public FEDomainData
+{
+public:
+	FEPlotRigidRotation(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_NODE),  m_pfem(pfem) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+private:
+	FEModel* m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! Rigid body angular velocity
 class FEPlotRigidAngularVelocity : public FEDomainData
 {
 public:
-	FEPlotRigidAngularVelocity(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_NODE), m_pfem(pfem){}
+	FEPlotRigidAngularVelocity(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_NODE),  m_pfem(pfem) {}
 	bool Save(FEDomain& dom, vector<float>& a);
-protected:
-	FEModel*	m_pfem;
+private:
+	FEModel* m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! Rigid body angular acceleration
+class FEPlotRigidAngularAcceleration : public FEDomainData
+{
+public:
+	FEPlotRigidAngularAcceleration(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_NODE),  m_pfem(pfem) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+private:
+	FEModel* m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! Rigid body kinetic energy
+class FEPlotRigidKineticEnergy : public FEDomainData
+{
+public:
+	FEPlotRigidKineticEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE),  m_pfem(pfem) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+private:
+	FEModel* m_pfem;
 };

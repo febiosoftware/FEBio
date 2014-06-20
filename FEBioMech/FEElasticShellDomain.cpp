@@ -179,7 +179,7 @@ void FEElasticShellDomain::ElementInternalForce(FEShellElement& el, vector<doubl
 
 //-----------------------------------------------------------------------------
 
-void FEElasticShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
+void FEElasticShellDomain::BodyForce(FESolver* psolver, FEGlobalVector& R, FEBodyForce& BF)
 {
 	// element force vector
 	vector<double> fe;

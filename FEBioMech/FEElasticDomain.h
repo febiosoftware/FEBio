@@ -27,10 +27,10 @@ public:
 	virtual void InternalForces(FEGlobalVector& R) = 0;
 
 	//! Calculate the body force vector
-	virtual void BodyForce(FEGlobalVector& R, FEBodyForce& bf) = 0;
+	virtual void BodyForce(FESolver* psolver, FEGlobalVector& R, FEBodyForce& bf) = 0;
 
 	//! calculate the interial forces (for dynamic problems)
-	virtual void InertialForces(FEGlobalVector& R, vector<double>& F) = 0;
+	virtual void InertialForces(FESolver* psolver, FEGlobalVector& R, vector<double>& F) = 0;
 
 	// --- S T I F F N E S S   M A T R I X ---
 

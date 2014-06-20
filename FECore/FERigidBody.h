@@ -46,6 +46,9 @@ public:
 	//! update solution
 	void Update(std::vector<double>& Ui, std::vector<double>& ui);
 
+	//! update increment
+	void UpdateIncrement(std::vector<double>& Ui, std::vector<double>& ui, bool emap);
+    
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
 
@@ -69,13 +72,22 @@ public:
 	vec3d	m_r0;	//!< initial position of rigid body
 	vec3d	m_rp;	//!< previous position of rigid body
 	vec3d	m_rt;	//!< current position of rigid body
-
+    
+	vec3d	m_vp;	//!< previous velocity of rigid body
+	vec3d	m_vt;	//!< current velocity of rigid body
+    
+	vec3d	m_ap;	//!< previous acceleration of rigid body
+	vec3d	m_at;	//!< current acceleration of rigid body
+    
 	quatd	m_qp;	//!< previous orientation of rigid body
 	quatd	m_qt;	//!< current orientation of rigid body
-
-	vec3d	m_vt;	//!< linear velocity
-	vec3d	m_wt;	//!< angular velocity
-
+    
+    vec3d   m_wp;   //!< previous angular velocity of rigid body
+    vec3d   m_wt;   //!< current angular velocity of rigid body
+    
+    vec3d   m_alp;  //!< previous angular acceleration of rigid body
+    vec3d   m_alt;  //!< current angular acceleration of rigid body
+    
 	int		m_BC[6];	//!< dof constrains (0=free, -1=fixed, >0 = prescribed)
 	int		m_LM[6];	//!< dof equation numbers
 	double	m_Up[6];	//!< previous displacement/rotation vector
@@ -83,6 +95,8 @@ public:
 	double	m_du[6];	//!< incremental displacement vector
 	double	m_dul[6];	//!< displacement in local coordinates system
 
+    bool    m_bpofr;    //!< flag for all or none of rotation dofs prescribed/fixed
+    
 public:
 	FERigidBodyDisplacement*	m_pDC[6];	//!< active displacement constraints
 	FERigidBody*	m_prb;	//!< parent rigid body

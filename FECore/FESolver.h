@@ -65,4 +65,11 @@ public: //TODO Move these parameters elsewhere
 	int		m_nref;			//!< nr of stiffness retormations
 	int		m_ntotref;		//!< nr of total stiffness reformations
 	int		m_naug;			//!< nr of augmentations
+    
+    // Newmark parameters (for dynamic analyses)
+	double	m_alpha;		//!< Newmark parameter alpha (force integration)
+	double	m_beta;			//!< Newmark parameter beta (displacement integration)
+	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
+    
+
 };

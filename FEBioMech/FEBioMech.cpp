@@ -95,6 +95,8 @@
 
 #include "FEAugLagLinearConstraint.h"
 #include "FERigidJoint.h"
+#include "FERigidSphericalJoint.h"
+#include "FERigidPinJoint.h"
 
 #include "FESolidAnalysis.h"
 #include "FESolidSolver.h"
@@ -231,10 +233,12 @@ REGISTER_FECORE_CLASS(FEPointBodyForce      , FEBODYLOAD_ID, "point"      );
 
 //-----------------------------------------------------------------------------
 // constraint classes
-REGISTER_FECORE_CLASS(FEPointConstraint    , FENLCONSTRAINT_ID, "point"            );
-REGISTER_FECORE_CLASS(FEInSituStretch      , FENLCONSTRAINT_ID, "in-situ stretch"  );
-REGISTER_FECORE_CLASS(FELinearConstraintSet, FENLCONSTRAINT_ID, "linear constraint");
-REGISTER_FECORE_CLASS(FERigidJoint         , FENLCONSTRAINT_ID, "rigid joint"      );
+REGISTER_FECORE_CLASS(FEPointConstraint    , FENLCONSTRAINT_ID, "point"                );
+REGISTER_FECORE_CLASS(FEInSituStretch      , FENLCONSTRAINT_ID, "in-situ stretch"      );
+REGISTER_FECORE_CLASS(FELinearConstraintSet, FENLCONSTRAINT_ID, "linear constraint"    );
+REGISTER_FECORE_CLASS(FERigidJoint         , FENLCONSTRAINT_ID, "rigid joint"          );
+REGISTER_FECORE_CLASS(FERigidSphericalJoint, FENLCONSTRAINT_ID, "rigid spherical joint");
+REGISTER_FECORE_CLASS(FERigidPinJoint      , FENLCONSTRAINT_ID, "rigid pin joint"      );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface
@@ -272,11 +276,6 @@ REGISTER_FECORE_CLASS(FEPlotSPRStresses          , FEPLOTDATA_ID, "SPR stress"  
 REGISTER_FECORE_CLASS(FEPlotSPRPrincStresses     , FEPLOTDATA_ID, "SPR principal stress"  );
 REGISTER_FECORE_CLASS(FEPlotSPRTestLinear		 , FEPLOTDATA_ID, "SPR test linear"       );
 REGISTER_FECORE_CLASS(FEPlotSPRTestQuadratic	 , FEPLOTDATA_ID, "SPR test quadratic"    );
-REGISTER_FECORE_CLASS(FEPlotRigidPotentialEnergy , FEPLOTDATA_ID, "rigid potential energy");
-REGISTER_FECORE_CLASS(FEPlotRigidKineticEnergy   , FEPLOTDATA_ID, "rigid kinetic energy"  );
-REGISTER_FECORE_CLASS(FEPlotRigidTotalEnergy     , FEPLOTDATA_ID, "rigid total energy"    );
-REGISTER_FECORE_CLASS(FEPlotRigidVelocity        , FEPLOTDATA_ID, "rigid velocity"        );
-REGISTER_FECORE_CLASS(FEPlotRigidAngularVelocity , FEPLOTDATA_ID, "rigid angular velocity");
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FEPlotNodeDisplacement   , FEPLOTDATA_ID, "displacement"   );
@@ -284,6 +283,13 @@ REGISTER_FECORE_CLASS(FEPlotNodeVelocity       , FEPLOTDATA_ID, "velocity"      
 REGISTER_FECORE_CLASS(FEPlotNodeAcceleration   , FEPLOTDATA_ID, "acceleration"   );
 REGISTER_FECORE_CLASS(FEPlotNodeReactionForces , FEPLOTDATA_ID, "reaction forces");
 REGISTER_FECORE_CLASS(FEPlotRigidReactionTorque, FEPLOTDATA_ID, "rigid torque"   );
+REGISTER_FECORE_CLASS(FEPlotRigidDisplacement       , FEPLOTDATA_ID, "rigid position"            );
+REGISTER_FECORE_CLASS(FEPlotRigidVelocity           , FEPLOTDATA_ID, "rigid velocity"            );
+REGISTER_FECORE_CLASS(FEPlotRigidAcceleration       , FEPLOTDATA_ID, "rigid acceleration"        );
+REGISTER_FECORE_CLASS(FEPlotRigidRotation           , FEPLOTDATA_ID, "rigid angular position"    );
+REGISTER_FECORE_CLASS(FEPlotRigidAngularVelocity    , FEPLOTDATA_ID, "rigid angular velocity"    );
+REGISTER_FECORE_CLASS(FEPlotRigidAngularAcceleration, FEPLOTDATA_ID, "rigid angular acceleration");
+REGISTER_FECORE_CLASS(FEPlotRigidKineticEnergy      , FEPLOTDATA_ID, "rigid kinetic energy"      );
 
 //-----------------------------------------------------------------------------
 // Derived from FENodeLogData

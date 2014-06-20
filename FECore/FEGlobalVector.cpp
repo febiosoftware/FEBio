@@ -29,3 +29,21 @@ void FEGlobalVector::Assemble(vector<int>& en, vector<int>& elm, vector<double>&
 		else if (-I-2 >= 0) m_Fr[-I-2] -= fe[i];
 	}
 }
+
+//-----------------------------------------------------------------------------
+void FEGlobalVector::AssembleRigid(int lm[6], double fe[6])
+{
+	vector<double>& R = m_R;
+    
+	int n;
+    
+    // add to global force vector
+    n = lm[0]; if (n >= 0) R[n] += fe[0];
+    n = lm[1]; if (n >= 0) R[n] += fe[1];
+    n = lm[2]; if (n >= 0) R[n] += fe[2];
+    
+    // add to total torque of this body
+    n = lm[3]; if (n >= 0) R[n] += fe[3];
+    n = lm[4]; if (n >= 0) R[n] += fe[4];
+    n = lm[5]; if (n >= 0) R[n] += fe[5];
+}

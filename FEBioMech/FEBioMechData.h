@@ -409,6 +409,126 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogRigidBodyVelX : public FELogObjectData
+{
+public:
+	FELogRigidBodyVelX(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyVelY : public FELogObjectData
+{
+public:
+	FELogRigidBodyVelY(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyVelZ : public FELogObjectData
+{
+public:
+	FELogRigidBodyVelZ(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyAccX : public FELogObjectData
+{
+public:
+	FELogRigidBodyAccX(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyAccY : public FELogObjectData
+{
+public:
+	FELogRigidBodyAccY(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyAccZ : public FELogObjectData
+{
+public:
+	FELogRigidBodyAccZ(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyAngPosX : public FELogObjectData
+{
+public:
+	FELogRigidBodyAngPosX(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyAngPosY : public FELogObjectData
+{
+public:
+	FELogRigidBodyAngPosY(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyAngPosZ : public FELogObjectData
+{
+public:
+	FELogRigidBodyAngPosZ(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyAngVelX : public FELogObjectData
+{
+public:
+	FELogRigidBodyAngVelX(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyAngVelY : public FELogObjectData
+{
+public:
+	FELogRigidBodyAngVelY(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyAngVelZ : public FELogObjectData
+{
+public:
+	FELogRigidBodyAngVelZ(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyAngAccX : public FELogObjectData
+{
+public:
+	FELogRigidBodyAngAccX(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyAngAccY : public FELogObjectData
+{
+public:
+	FELogRigidBodyAngAccY(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyAngAccZ : public FELogObjectData
+{
+public:
+	FELogRigidBodyAngAccZ(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
 class FELogRigidBodyQuatX : public FELogObjectData
 {
 public:

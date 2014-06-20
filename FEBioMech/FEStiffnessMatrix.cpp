@@ -10,6 +10,8 @@
 #include "FECore/FERigidBody.h"
 #include "FECore/DOFS.h"
 #include "FERigidJoint.h"
+#include "FEBioMech/FERigidSphericalJoint.h"
+#include "FEBioMech/FERigidPinJoint.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -256,6 +258,30 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 					int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
 					int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
 
+					for (j=0; j<6; ++j) lm[j  ] = lm1[j];
+					for (j=0; j<6; ++j) lm[j+6] = lm2[j];
+					build_add(lm);
+				}
+				else if (dynamic_cast<FERigidSphericalJoint*>(pnlc))
+				{
+					FERigidSphericalJoint& rj = dynamic_cast<FERigidSphericalJoint&>(*pnlc);
+					vector<int> lm(12);
+                    
+					int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
+					int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
+                    
+					for (j=0; j<6; ++j) lm[j  ] = lm1[j];
+					for (j=0; j<6; ++j) lm[j+6] = lm2[j];
+					build_add(lm);
+				}
+				else if (dynamic_cast<FERigidPinJoint*>(pnlc))
+				{
+					FERigidPinJoint& rj = dynamic_cast<FERigidPinJoint&>(*pnlc);
+					vector<int> lm(12);
+                    
+					int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
+					int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
+                    
 					for (j=0; j<6; ++j) lm[j  ] = lm1[j];
 					for (j=0; j<6; ++j) lm[j+6] = lm2[j];
 					build_add(lm);

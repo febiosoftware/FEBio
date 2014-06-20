@@ -14,6 +14,8 @@ protected:
 	void ParseRigidWall            (XMLTag& tag);
 	void ParseRigidInterface       (XMLTag& tag);
 	void ParseRigidJoint           (XMLTag& tag);
+	void ParseRigidSphericalJoint  (XMLTag& tag);
+	void ParseRigidPinJoint        (XMLTag& tag);
 	void ParseLinearConstraint     (XMLTag& tag);
 
 protected:

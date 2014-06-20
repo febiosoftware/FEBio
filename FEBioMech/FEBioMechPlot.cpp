@@ -914,112 +914,25 @@ bool FEPlotSPRTestQuadratic::Save(FEDomain& dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotRigidPotentialEnergy::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotRigidDisplacement::Save(FEDomain& dom, vector<float>& a)
 {
-	// only store this on rigid bodies
+	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
 	if (pm->IsRigid() == false) return false;
-
-	// we evaluate the potential energy of all rigid bodies
-	int nrb = m_pfem->Objects();
-	double Ep = 0.0;
-	for (int i=0; i<nrb; ++i)
-	{
-		// get the corresponding rigid body
-		FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(i));
-
-		// evaluate potential energy
-		// NOTE: we assume g = 1 and body force applied in z-direction
-		Ep += rb.m_mass*rb.m_rt.z;
-	}
-
+	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
+    
+	// get the rigid body
+	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+    
 	// copy results to archive
 	int NN = dom.Nodes();
-	for (int i=0; i<NN; ++i) a.push_back((float) Ep);
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotRigidKineticEnergy::Save(FEDomain& dom, vector<float>& a)
-{
-	// only store this on rigid bodies
-	FEMaterial* pm = dom.GetMaterial();
-	if (pm->IsRigid() == false) return false;
-
-	// we evaluate the potential energy of all rigid bodies
-	int nrb = m_pfem->Objects();
-	double K = 0.0;
-	for (int i=0; i<nrb; ++i)
+	for (int i=0; i<NN; ++i)
 	{
-		// get the corresponding rigid body
-		FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(i));
-
-		// get translational kinetic energy
-		double KT = 0.5*rb.m_mass*(rb.m_vt*rb.m_vt);
-
-		// get rotational matrix
-		mat3d Q = rb.m_qt.RotationMatrix();
-
-		// calculate moment of inertia
-		mat3d It = Q*rb.m_moi*Q.transpose();
-
-		// get rotational energy
-		double KR = 0.5*(rb.m_wt*(It*rb.m_wt));
-
-		// total kinetic energy
-		K += KT + KR;
+		a.push_back((float) rb.m_rt.x);
+		a.push_back((float) rb.m_rt.y);
+		a.push_back((float) rb.m_rt.z);
 	}
-
-	// copy results to archive
-	int NN = dom.Nodes();
-	for (int i=0; i<NN; ++i) a.push_back((float) K);
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotRigidTotalEnergy::Save(FEDomain& dom, vector<float>& a)
-{
-	// only store this on rigid bodies
-	FEMaterial* pm = dom.GetMaterial();
-	if (pm->IsRigid() == false) return false;
-
-	// we evaluate the potential energy of all rigid bodies
-	int nrb = m_pfem->Objects();
-	double E = 0.0;
-	for (int i=0; i<nrb; ++i)
-	{
-		// get the corresponding rigid body
-		FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(i));
-
-		// get translational kinetic energy
-		double KT = 0.5*rb.m_mass*(rb.m_vt*rb.m_vt);
-
-		// get rotational matrix
-		mat3d Q = rb.m_qt.RotationMatrix();
-
-		// calculate moment of inertia
-		mat3d It = Q*rb.m_moi*Q.transpose();
-
-		// get rotational energy
-		double KR = 0.5*(rb.m_wt*(It*rb.m_wt));
-
-		// total kinetic energy
-		double K = KT + KR;
-
-		// evaluate potential energy
-		// NOTE: we assume g = 1 and body force applied in z-direction
-		double H = rb.m_mass*rb.m_rt.z;
-
-		// total energy
-		E += K + H;
-	}
-
-	// copy results to archive
-	int NN = dom.Nodes();
-	for (int i=0; i<NN; ++i) a.push_back((float) E);
-
+    
 	return true;
 }
 
@@ -1030,10 +943,10 @@ bool FEPlotRigidVelocity::Save(FEDomain& dom, vector<float>& a)
 	FEMaterial* pm = dom.GetMaterial();
 	if (pm->IsRigid() == false) return false;
 	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
-
+    
 	// get the rigid body
 	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
-
+    
 	// copy results to archive
 	int NN = dom.Nodes();
 	for (int i=0; i<NN; ++i)
@@ -1042,7 +955,54 @@ bool FEPlotRigidVelocity::Save(FEDomain& dom, vector<float>& a)
 		a.push_back((float) rb.m_vt.y);
 		a.push_back((float) rb.m_vt.z);
 	}
+    
+	return true;
+}
 
+//-----------------------------------------------------------------------------
+bool FEPlotRigidAcceleration::Save(FEDomain& dom, vector<float>& a)
+{
+	// get the rigid material
+	FEMaterial* pm = dom.GetMaterial();
+	if (pm->IsRigid() == false) return false;
+	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
+    
+	// get the rigid body
+	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+    
+	// copy results to archive
+	int NN = dom.Nodes();
+	for (int i=0; i<NN; ++i)
+	{
+		a.push_back((float) rb.m_at.x);
+		a.push_back((float) rb.m_at.y);
+		a.push_back((float) rb.m_at.z);
+	}
+    
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotRigidRotation::Save(FEDomain& dom, vector<float>& a)
+{
+	// get the rigid material
+	FEMaterial* pm = dom.GetMaterial();
+	if (pm->IsRigid() == false) return false;
+	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
+    
+	// get the rigid body
+	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+    vec3d q = rb.m_qt.GetVector()*rb.m_qt.GetAngle();
+    
+	// copy results to archive
+	int NN = dom.Nodes();
+	for (int i=0; i<NN; ++i)
+	{
+		a.push_back((float) q.x);
+		a.push_back((float) q.y);
+		a.push_back((float) q.z);
+	}
+    
 	return true;
 }
 
@@ -1053,10 +1013,10 @@ bool FEPlotRigidAngularVelocity::Save(FEDomain& dom, vector<float>& a)
 	FEMaterial* pm = dom.GetMaterial();
 	if (pm->IsRigid() == false) return false;
 	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
-
+    
 	// get the rigid body
 	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
-
+    
 	// copy results to archive
 	int NN = dom.Nodes();
 	for (int i=0; i<NN; ++i)
@@ -1065,6 +1025,53 @@ bool FEPlotRigidAngularVelocity::Save(FEDomain& dom, vector<float>& a)
 		a.push_back((float) rb.m_wt.y);
 		a.push_back((float) rb.m_wt.z);
 	}
+    
+	return true;
+}
 
+//-----------------------------------------------------------------------------
+bool FEPlotRigidAngularAcceleration::Save(FEDomain& dom, vector<float>& a)
+{
+	// get the rigid material
+	FEMaterial* pm = dom.GetMaterial();
+	if (pm->IsRigid() == false) return false;
+	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
+    
+	// get the rigid body
+	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+    
+	// copy results to archive
+	int NN = dom.Nodes();
+	for (int i=0; i<NN; ++i)
+	{
+		a.push_back((float) rb.m_alt.x);
+		a.push_back((float) rb.m_alt.y);
+		a.push_back((float) rb.m_alt.z);
+	}
+    
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotRigidKineticEnergy::Save(FEDomain& dom, vector<float>& a)
+{
+	// get the rigid material
+	FEMaterial* pm = dom.GetMaterial();
+	if (pm->IsRigid() == false) return false;
+	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
+    
+	// get the rigid body
+	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+    vec3d v = rb.m_vt;
+    double m = rb.m_mass;
+    vec3d w = rb.m_wt;
+    mat3d Rt = rb.m_qt.RotationMatrix();
+    mat3ds Jt = (Rt*rb.m_moi*Rt.transpose()).sym();
+    double ke = ((v*v)*m + w*(Jt*w))/2;
+    
+	// copy results to archive
+	int NN = dom.Nodes();
+	for (int i=0; i<NN; ++i) a.push_back((float) ke);
+    
 	return true;
 }

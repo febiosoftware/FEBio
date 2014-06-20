@@ -62,9 +62,9 @@ public:
 		//! update nodal positions, velocities, accelerations, etc.
 		virtual void UpdateKinematics(vector<double>& ui);
 
-		//! update rigid body kinematics for dynamic problems
-		void UpdateRigidKinematics();
-
+    //! update DOF increments
+        virtual void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
+    
 		//! Update Stresses
 		void UpdateStresses();
 
@@ -131,10 +131,6 @@ public:
 
 	// equation numbers
 	int		m_nreq;			//!< start of rigid body equations
-
-	// Newmark parameters (for dynamic analyses)
-	double	m_beta;			//!< Newmark parameter beta (displacement integration)
-	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
 
 public:
 	vector<double> m_Fn;	//!< concentrated nodal force vector

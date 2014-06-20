@@ -5,6 +5,8 @@
 #include "FEBioMech/FERigidWallInterface.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FEBioMech/FERigidJoint.h"
+#include "FEBioMech/FERigidSphericalJoint.h"
+#include "FEBioMech/FERigidPinJoint.h"
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
@@ -756,6 +758,40 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		// --- R I G I D   J O I N T   I N T E R F A C E ---
 
 		FERigidJoint* prj = dynamic_cast<FERigidJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
+		FEParameterList& pl = prj->GetParameterList();
+		++tag;
+		do
+		{
+			if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+		prj->m_nRBa--;
+		prj->m_nRBb--;
+		fem.AddNonlinearConstraint(prj);
+	}
+	else if (strcmp(szt, "rigid spherical joint") == 0)
+	{
+		// --- R I G I D   S P H E R I C A L   J O I N T   I N T E R F A C E ---
+        
+		FERigidSphericalJoint* prj = dynamic_cast<FERigidSphericalJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
+		FEParameterList& pl = prj->GetParameterList();
+		++tag;
+		do
+		{
+			if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+		prj->m_nRBa--;
+		prj->m_nRBb--;
+		fem.AddNonlinearConstraint(prj);
+	}
+	else if (strcmp(szt, "rigid pin joint") == 0)
+	{
+		// --- R I G I D   P I N  J O I N T   I N T E R F A C E ---
+        
+		FERigidPinJoint* prj = dynamic_cast<FERigidPinJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
 		FEParameterList& pl = prj->GetParameterList();
 		++tag;
 		do
