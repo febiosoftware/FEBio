@@ -66,7 +66,7 @@ FESolidSolver::FESolidSolver(FEModel* pfem) : FESolver(pfem)
 	// default Newmark parameters for unconditionally stable time integration
 	m_beta = 0.25;
 	m_gamma = 0.5;
-	m_alpha = (m_beta/m_gamma <= 1) ? m_beta/m_gamma : 1.;
+	m_alpha = 1.;
 }
 
 //-----------------------------------------------------------------------------
