@@ -1383,10 +1383,17 @@ bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 		double a = 1.0 / (m_beta*dt*dt);
 
 		// loop over all domains
-		for (i=0; i<mesh.Domains(); ++i) 
+		for (int i=0; i<mesh.Domains(); ++i) 
 		{
 			FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
 			dom.MassMatrix(this, a);
+		}
+
+		// loop over all rigid bodies
+		for (int i=0; i<m_fem.Objects(); ++i)
+		{
+			FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
+			RigidMassMatrix(RB);
 		}
 	}
 
@@ -1468,6 +1475,64 @@ void FESolidSolver::ContactStiffness()
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
 		if (pci->IsActive()) pci->ContactStiffness(this);
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the contribution to the mass matrix from the rigid bodies
+void FESolidSolver::RigidMassMatrix(FERigidBody& RB)
+{
+	// element stiffness matrix
+	vector<int> lm;
+	matrix ke;
+        
+    // 6 dofs per rigid body
+    ke.resize(6, 6);
+    ke.zero();
+        
+    // Newmark integration rule
+    double dt = m_fem.GetCurrentStep()->m_dt;
+    double beta = m_beta;
+    double gamma = m_gamma;
+    double a = 1./(beta*dt*dt);
+        
+    // mass matrix
+    double M = RB.m_mass*a;
+        
+    ke[0][0] = M;
+    ke[1][1] = M;
+    ke[2][2] = M;
+        
+    // evaluate mass moment of inertia at t
+    mat3d Rt = RB.m_qt.RotationMatrix();
+    mat3ds Jt = (Rt*RB.m_moi*Rt.transpose()).sym();
+        
+    // incremental rotation in spatial frame
+    quatd q = RB.m_qt*RB.m_qp.Inverse();
+    q.MakeUnit();                           // clean-up roundoff errors
+    double theta = 2*tan(q.GetAngle()/2);   // get theta from Cayley transform
+    vec3d e = q.GetVector();
+        
+    // skew-symmetric tensor whose axial vector is the incremental rotation
+    mat3d qhat;
+    qhat.skew(e*theta);
+        
+    // generate tensor T(theta)
+    mat3d T = mat3dd(1) + qhat/2 + dyad(e*theta)/4;
+        
+    // skew-symmetric of angular momentum
+    mat3d Jw;
+    Jw.skew(Jt*RB.m_wt);
+        
+    // rotational inertia stiffness
+    mat3d K = (Jt*T)*a*gamma - Jw/dt;
+        
+    ke[3][3] = K(0,0); ke[3][4] = K(0,1); ke[3][5] = K(0,2);
+    ke[4][3] = K(1,0); ke[4][4] = K(1,1); ke[4][5] = K(1,2);
+    ke[5][3] = K(2,0); ke[5][4] = K(2,1); ke[5][5] = K(2,2);
+        
+    lm.assign(RB.m_LM, RB.m_LM+6);
+        
+    AssembleStiffness(lm, ke);
 }
 
 //-----------------------------------------------------------------------------
@@ -2143,7 +2208,7 @@ void FESolidSolver::InertialForces(FEGlobalVector& R)
 	for (int i=0; i<nrb; ++i)
 	{
 		// get the rigid body
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
 		if (RB.IsActive())
         {
             // acceleration and velocity of center of mass
@@ -2160,9 +2225,59 @@ void FESolidSolver::InertialForces(FEGlobalVector& R)
         }
 	}
     
+	// calculate the interial forces for all elastic domains (except rigid domains)
 	for (int nd = 0; nd < mesh.Domains(); ++nd)
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(nd));
 		dom.InertialForces(R, F);
 	}
+
+	// calculate rigid body inertial forces
+	for (int i=0; i<m_fem.Objects(); ++i)
+	{
+		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
+		if (RB.IsActive())
+        {
+			RigidInertialForces(RB, R);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the inertial force contribution from a rigid body and assemble
+//! it in the global vector R.
+void FESolidSolver::RigidInertialForces(FERigidBody& RB, FEGlobalVector& R)
+{
+    // 6 dofs per rigid body
+    double fe[6];
+        
+    // rate of change of linear momentum = mass*acceleration
+    vec3d F = RB.m_at*RB.m_mass;
+        
+    fe[0] = -F.x;
+    fe[1] = -F.y;
+    fe[2] = -F.z;
+        
+    double dt = m_fem.GetCurrentStep()->m_dt;
+        
+    // evaluate mass moment of inertia at t and tp
+    mat3d Rt = RB.m_qt.RotationMatrix();
+    mat3ds Jt = (Rt*RB.m_moi*Rt.transpose()).sym();
+    mat3d Rp = RB.m_qp.RotationMatrix();
+    mat3ds Jp = (Rp*RB.m_moi*Rp.transpose()).sym();
+        
+    // evaluate rate of change of angular momentum
+    vec3d M = (Jt*RB.m_wt - Jp*RB.m_wp)/dt;
+        
+    fe[3] = -M.x;
+    fe[4] = -M.y;
+    fe[5] = -M.z;
+        
+    R.Assemble(RB.m_LM, fe, 6);
+        
+    // add to rigid body force
+    RB.m_Fr += F;
+        
+    // add to rigid body torque
+    RB.m_Mr += M;
 }

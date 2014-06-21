@@ -542,27 +542,10 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::MassMatrix(FESolver* psolver, double scale)
 {
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(GetMaterial()); assert(pme);
-
 	// element stiffness matrix
     matrix ke;
     vector<int> lm;
 
-	// get the fem model
-	FEModel& fem = psolver->GetFEModel();
-    
-	// get the material
-	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(GetMaterial());
-    
-	// Newmark integration rule
-	double dt = fem.GetCurrentStep()->m_dt;
-	double beta = psolver->m_beta;
-	double a = 1./(beta*dt*dt);
- 
-	double d = pm->Density();
-
-	scale = a*d;
-        
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     for (int iel=0; iel<NE; ++iel)
@@ -654,6 +637,9 @@ void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, dou
     
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
+
+	// density
+	double D = m_pMat->Density();
     
 	// calculate element stiffness matrix
 	for (int n=0; n<nint; ++n)
@@ -667,7 +653,7 @@ void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, dou
 		for (int i=0; i<neln; ++i)
 			for (int j=i; j<neln; ++j)
 			{
-				double kab = a*H[i]*H[j]*J0;
+				double kab = a*D*H[i]*H[j]*J0;
 				ke[3*i  ][3*j  ] += kab;
 				ke[3*i+1][3*j+1] += kab;
 				ke[3*i+2][3*j+2] += kab;

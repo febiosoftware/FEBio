@@ -3,6 +3,7 @@
 #include "FECore/FESolver.h"
 #include "FEStiffnessMatrix.h"
 #include "FECore/FETypes.h"
+#include "FECore/FERigidBody.h"
 
 //-----------------------------------------------------------------------------
 //! The FESolidSolver class solves large deformation solid mechanics problems
@@ -120,6 +121,15 @@ public:
 
 		//! Calculate nonlinear constraint forces
 		void NonLinearConstraintForces(FEGlobalVector& R);
+	//}
+
+	//{ --- Rigid body routines ---
+
+		//! calculate rigid body mass matrix
+		void RigidMassMatrix(FERigidBody& RB);
+
+		//! calculate rigid inertial forces
+		void RigidInertialForces(FERigidBody& RB, FEGlobalVector& R);
 	//}
 
 public:
