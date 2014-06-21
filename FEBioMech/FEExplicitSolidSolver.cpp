@@ -1059,7 +1059,7 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 		for (int j=0; j<m_fem.BodyLoads(); ++j)
 		{
 			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
-			if (pbf) dom.BodyForce(this, RHS, *pbf);
+			if (pbf) dom.BodyForce(RHS, *pbf);
 		}
 	}
 
@@ -1166,6 +1166,6 @@ void FEExplicitSolidSolver::InertialForces(FEGlobalVector& R)
 	for (int nd = 0; nd < mesh.Domains(); ++nd)
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(nd));
-		dom.InertialForces(this, R, F);
+		dom.InertialForces(R, F);
 	}
 }

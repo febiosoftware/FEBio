@@ -46,6 +46,11 @@ public:
 	void SetType(int ntype) { m_ntype = ntype; }
 
 public:
+	FEModel& GetFEModel() { return m_fem; }
+
+	FESolver* GetFESolver() { return m_psolver; }
+
+public:
 	//! Get active domains
 	int Domains() { return m_Dom.size(); }
 

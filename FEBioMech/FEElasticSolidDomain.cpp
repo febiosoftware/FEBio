@@ -1,10 +1,8 @@
 #include "stdafx.h"
 #include "FEElasticSolidDomain.h"
 #include "FETransverselyIsotropic.h"
-#include "FERigidMaterial.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
-#include "FECore/FERigidBody.h"
 
 #ifdef WIN32
 extern "C" int __cdecl omp_get_num_threads(void);
@@ -179,75 +177,29 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::BodyForce(FESolver* psolver, FEGlobalVector& R, FEBodyForce& BF)
+void FEElasticSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
-    FEModel& fem = psolver->GetFEModel();
-
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat); assert(pme);
-    FERigidMaterial* pmr = dynamic_cast<FERigidMaterial*>(m_pMat);
-    
-    // analyze rigid bodies separately from other materials
-    if (pmr) {
-        // get the rigid body
-        FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.Object(pmr->GetRigidBodyID()));
-        
-        // 6 dofs per rigid body
-        double fe[6];
-        
-        // evaluate body force per mass
-        FEElasticMaterialPoint mp;
-        mp.m_r0 = RB.m_r0;
-        // use alpha rule
-        double alpha = psolver->m_alpha;
-        mp.m_rt = RB.m_rt*alpha + RB.m_rp*(1-alpha);
-        vec3d b = BF.force(mp);
-        
-        // body force = mass*(body force per mass)
-        vec3d F = b*RB.m_mass;
-        
-        fe[0] = -F.x;
-        fe[1] = -F.y;
-        fe[2] = -F.z;
-        
-        // moment of body force about center of mass is zero
-        vec3d M(0,0,0);
-        
-        fe[3] = -M.x;
-        fe[4] = -M.y;
-        fe[5] = -M.z;
-        
-        R.AssembleRigid(RB.m_LM, fe);
-        
-        // add to rigid body force
-        RB.m_Fr += F;
-        
-        // add to rigid body torque
-        RB.m_Mr += M;
-    }
-    else
+    int NE = (int)m_Elem.size();
+    for (int i=0; i<NE; ++i)
     {
-        int NE = (int)m_Elem.size();
-        for (int i=0; i<NE; ++i)
-        {
-            vector<double> fe;
-            vector<int> lm;
+        vector<double> fe;
+        vector<int> lm;
             
-            // get the element
-            FESolidElement& el = m_Elem[i];
+        // get the element
+        FESolidElement& el = m_Elem[i];
             
-            // get the element force vector and initialize it to zero
-            int ndof = 3*el.Nodes();
-            fe.assign(ndof, 0);
+        // get the element force vector and initialize it to zero
+        int ndof = 3*el.Nodes();
+        fe.assign(ndof, 0);
             
-            // apply body forces
-            ElementBodyForce(BF, el, fe);
+        // apply body forces
+        ElementBodyForce(BF, el, fe);
             
-            // get the element's LM vector
-            UnpackLM(el, lm);
+        // get the element's LM vector
+        UnpackLM(el, lm);
             
-            // assemble element 'fe'-vector into global R vector
-            R.Assemble(el.m_node, lm, fe);
-        }
+        // assemble element 'fe'-vector into global R vector
+        R.Assemble(el.m_node, lm, fe);
     }
 }
 
@@ -588,169 +540,79 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-
 void FEElasticSolidDomain::MassMatrix(FESolver* psolver, double scale)
 {
-	FEModel& fem = psolver->GetFEModel();
+	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(GetMaterial()); assert(pme);
 
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat); assert(pme);
-    FERigidMaterial* pmr = dynamic_cast<FERigidMaterial*>(m_pMat);
+	// element stiffness matrix
+    matrix ke;
+    vector<int> lm;
+
+	// get the fem model
+	FEModel& fem = psolver->GetFEModel();
     
-    // analyze rigid bodies separately from other materials
-    if (pmr) {
-        // element stiffness matrix
-        vector<int> lm;
-        matrix ke;
+	// get the material
+	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(GetMaterial());
+    
+	// Newmark integration rule
+	double dt = fem.GetCurrentStep()->m_dt;
+	double beta = psolver->m_beta;
+	double a = 1./(beta*dt*dt);
+ 
+	double d = pm->Density();
+
+	scale = a*d;
         
-        // get the rigid body
-        FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.Object(pmr->GetRigidBodyID()));
-        
-        // 6 dofs per rigid body
-        ke.resize(6, 6);
+    // repeat over all solid elements
+    int NE = (int)m_Elem.size();
+    for (int iel=0; iel<NE; ++iel)
+    {
+        FESolidElement& el = m_Elem[iel];
+            
+        // create the element's stiffness matrix
+        int ndof = 3*el.Nodes();
+        ke.resize(ndof, ndof);
         ke.zero();
-        
-        // Newmark integration rule
-        double dt = fem.GetCurrentStep()->m_dt;
-        double beta = psolver->m_beta;
-        double gamma = psolver->m_gamma;
-        double a = 1./(beta*dt*dt);
-        
-        // mass matrix
-        double M = RB.m_mass*a;
-        
-        ke[0][0] = M;
-        ke[1][1] = M;
-        ke[2][2] = M;
-        
-        // evaluate mass moment of inertia at t
-        mat3d Rt = RB.m_qt.RotationMatrix();
-        mat3ds Jt = (Rt*RB.m_moi*Rt.transpose()).sym();
-        
-        // incremental rotation in spatial frame
-        quatd q = RB.m_qt*RB.m_qp.Inverse();
-        q.MakeUnit();                           // clean-up roundoff errors
-        double theta = 2*tan(q.GetAngle()/2);   // get theta from Cayley transform
-        vec3d e = q.GetVector();
-        
-        // skew-symmetric tensor whose axial vector is the incremental rotation
-        mat3d qhat;
-        qhat.skew(e*theta);
-        
-        // generate tensor T(theta)
-        mat3d T = mat3dd(1) + qhat/2 + dyad(e*theta)/4;
-        
-        // skew-symmetric of angular momentum
-        mat3d Jw;
-        Jw.skew(Jt*RB.m_wt);
-        
-        // rotational inertia stiffness
-        mat3d K = (Jt*T)*a*gamma - Jw/dt;
-        
-        ke[3][3] = K(0,0); ke[3][4] = K(0,1); ke[3][5] = K(0,2);
-        ke[4][3] = K(1,0); ke[4][4] = K(1,1); ke[4][5] = K(1,2);
-        ke[5][3] = K(2,0); ke[5][4] = K(2,1); ke[5][5] = K(2,2);
-        
-        lm.assign(RB.m_LM, RB.m_LM+6);
-        
-        psolver->AssembleStiffness(lm, ke);
-    }
-    else {
-        // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        // repeat over all solid elements
-        int NE = (int)m_Elem.size();
-        for (int iel=0; iel<NE; ++iel)
-        {
-            FESolidElement& el = m_Elem[iel];
             
-            // create the element's stiffness matrix
-            int ndof = 3*el.Nodes();
-            ke.resize(ndof, ndof);
-            ke.zero();
+        // calculate inertial stiffness
+        ElementMassMatrix(el, ke, scale);
             
-            // calculate inertial stiffness
-            ElementMassMatrix(psolver, el, ke, scale);
+        // get the element's LM vector
+        UnpackLM(el, lm);
             
-            // get the element's LM vector
-            UnpackLM(el, lm);
-            
-            // assemble element matrix in global stiffness matrix
-            psolver->AssembleStiffness(el.m_node, lm, ke);
-        }
+        // assemble element matrix in global stiffness matrix
+        psolver->AssembleStiffness(el.m_node, lm, ke);
     }
 }
 
 //-----------------------------------------------------------------------------
-
 void FEElasticSolidDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf)
 {
-	FEModel& fem = psolver->GetFEModel();
-    
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat); assert(pme);
-    FERigidMaterial* pmr = dynamic_cast<FERigidMaterial*>(m_pMat);
-    
-    // analyze rigid bodies separately from other materials
-    if (pmr)
+	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(GetMaterial()); assert(pme);
+
+	// element stiffness matrix
+    matrix ke;
+    vector<int> lm;
+        
+    // repeat over all solid elements
+    int NE = (int)m_Elem.size();
+    for (int iel=0; iel<NE; ++iel)
     {
-        vector<int> lm;
-        
-        // get the rigid body
-        FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.Object(pmr->GetRigidBodyID()));
-        
-        // 6 dofs per rigid body
-        matrix ke(6, 6);
+        FESolidElement& el = m_Elem[iel];
+            
+        // create the element's stiffness matrix
+        int ndof = 3*el.Nodes();
+        ke.resize(ndof, ndof);
         ke.zero();
-        
-        // evaluate body force stiffness per mass
-        FEElasticMaterialPoint mp;
-        mp.m_r0 = RB.m_r0;
-        // use alpha rule
-        double alpha = psolver->m_alpha;
-        mp.m_rt = RB.m_rt*alpha + RB.m_rp*(1-alpha);
-        mat3ds k = bf.stiffness(mp);
-        
-        // body force stiffness = mass*(body force stiffness per mass)
-        // multiply by alpha because of alpha rule
-        mat3ds K = k*(RB.m_mass*alpha);
-        
-        // since moment of body force about center of mass is zero
-        // there is no moment contribution to the stiffness
-        ke[0][0] = K.xx(); ke[0][1] = K.xy(); ke[0][2] = K.xz();
-        ke[1][0] = K.xy(); ke[1][1] = K.yy(); ke[1][2] = K.yz();
-        ke[2][0] = K.xz(); ke[2][1] = K.yz(); ke[2][2] = K.zz();
-        
-        lm.assign(RB.m_LM, RB.m_LM+6);
-        
-        psolver->AssembleStiffness(lm, ke);
-    }
-    else
-    {
-        // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        // repeat over all solid elements
-        int NE = (int)m_Elem.size();
-        for (int iel=0; iel<NE; ++iel)
-        {
-            FESolidElement& el = m_Elem[iel];
             
-            // create the element's stiffness matrix
-            int ndof = 3*el.Nodes();
-            ke.resize(ndof, ndof);
-            ke.zero();
+        // calculate inertial stiffness
+        ElementBodyForceStiffness(bf, el, ke);
             
-            // calculate inertial stiffness
-            ElementBodyForceStiffness(bf, el, ke);
+        // get the element's LM vector
+        UnpackLM(el, lm);
             
-            // get the element's LM vector
-            UnpackLM(el, lm);
-            
-            // assemble element matrix in global stiffness matrix
-            psolver->AssembleStiffness(el.m_node, lm, ke);
-        }
+        // assemble element matrix in global stiffness matrix
+        psolver->AssembleStiffness(el.m_node, lm, ke);
     }
 }
 
@@ -783,30 +645,8 @@ void FEElasticSolidDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
 
 //-----------------------------------------------------------------------------
 //! calculates element inertial stiffness matrix
-void FEElasticSolidDomain::ElementMassMatrix(FESolver* psolver, FESolidElement& el, matrix& ke, double c)
+void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, double a)
 {
-	int i, j, n;
-    
-	// shape functions
-	double* H;
-    
-	// jacobian
-	double J0;
-    
-    // get the fem model
-    FEModel& fem = psolver->GetFEModel();
-    
-	// get the material
-	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
-    
-    // Newmark integration rule
-    double dt = fem.GetCurrentStep()->m_dt;
-    double beta = psolver->m_beta;
-    double a = 1./(beta*dt*dt);
-    
-	double d = pm->Density();
-	double kab;
-    
 	// Get the current element's data
 	const int nint = el.GaussPoints();
 	const int neln = el.Nodes();
@@ -816,14 +656,18 @@ void FEElasticSolidDomain::ElementMassMatrix(FESolver* psolver, FESolidElement& 
 	const double *gw = el.GaussWeights();
     
 	// calculate element stiffness matrix
-	for (n=0; n<nint; ++n)
+	for (int n=0; n<nint; ++n)
 	{
-		H = el.H(n);
-		J0 = detJ0(el, n)*gw[n];
-		for (i=0; i<neln; ++i)
-			for (j=i; j<neln; ++j)
+		// shape functions
+		double* H = el.H(n);
+
+		// Jacobian
+		double J0 = detJ0(el, n)*gw[n];
+
+		for (int i=0; i<neln; ++i)
+			for (int j=i; j<neln; ++j)
 			{
-				kab = a*H[i]*H[j]*J0*d;
+				double kab = a*H[i]*H[j]*J0;
 				ke[3*i  ][3*j  ] += kab;
 				ke[3*i+1][3*j+1] += kab;
 				ke[3*i+2][3*j+2] += kab;
@@ -833,8 +677,8 @@ void FEElasticSolidDomain::ElementMassMatrix(FESolver* psolver, FESolidElement& 
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only
 	// grabs elements from the upper diagonal matrix?
-	for (i=0; i<ndof; ++i)
-		for (j=i+1; j<ndof; ++j)
+	for (int i=0; i<ndof; ++i)
+		for (int j=i+1; j<ndof; ++j)
 			ke[j][i] = ke[i][j];
     
 }
@@ -937,105 +781,61 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-// Calculate inertial forces
-void FEElasticSolidDomain::InertialForces(FESolver* psolver, FEGlobalVector& R, vector<double>& F)
+// Calculate inertial forces \todo Why is F no longer needed?
+void FEElasticSolidDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
 {
-    FEModel& fem = psolver->GetFEModel();
-    
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat); assert(pme);
+	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(GetMaterial()); assert(pme);
 	double d = pme->Density();
     
-    FERigidMaterial* pmr = dynamic_cast<FERigidMaterial*>(m_pMat);
-    
-    // analyze rigid bodies separately from other materials
-    if (pmr) {
-        // get the rigid body
-        FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.Object(pmr->GetRigidBodyID()));
+    const int MN = FEElement::MAX_NODES;
+    vec3d at[MN];
         
-        // 6 dofs per rigid body
-        double fe[6];
+    // acceleration at integration point
+    vec3d a;
         
-        // rate of change of linear momentum = mass*acceleration
-        vec3d F = RB.m_at*RB.m_mass;
+    // loop over all elements
+    int NE = Elements();
         
-        fe[0] = -F.x;
-        fe[1] = -F.y;
-        fe[2] = -F.z;
-        
-        double dt = fem.GetCurrentStep()->m_dt;
-        
-        // evaluate mass moment of inertia at t and tp
-        mat3d Rt = RB.m_qt.RotationMatrix();
-        mat3ds Jt = (Rt*RB.m_moi*Rt.transpose()).sym();
-        mat3d Rp = RB.m_qp.RotationMatrix();
-        mat3ds Jp = (Rp*RB.m_moi*Rp.transpose()).sym();
-        
-        // evaluate rate of change of angular momentum
-        vec3d M = (Jt*RB.m_wt - Jp*RB.m_wp)/dt;
-        
-        fe[3] = -M.x;
-        fe[4] = -M.y;
-        fe[5] = -M.z;
-        
-        R.AssembleRigid(RB.m_LM, fe);
-        
-        // add to rigid body force
-        RB.m_Fr += F;
-        
-        // add to rigid body torque
-        RB.m_Mr += M;
-    }
-    else {
-        const int MN = FEElement::MAX_NODES;
-        vec3d at[MN];
-        
-        // acceleration at integration point
-        vec3d a;
-        
-        // loop over all elements
-        int NE = Elements();
-        
-        for (int iel=0; iel<NE; ++iel)
+    for (int iel=0; iel<NE; ++iel)
+    {
+        vector<double> fe;
+        vector<int> lm;
+            
+        FESolidElement& el = Element(iel);
+            
+        int nint = el.GaussPoints();
+        int neln = el.Nodes();
+            
+        fe.assign(3*neln,0);
+            
+        // get the nodal accelerations
+        for (int i=0; i<neln; ++i)
         {
-            vector<double> fe;
-            vector<int> lm;
+            at[i] = m_pMesh->Node(el.m_node[i]).m_at;
+        }
             
-            FESolidElement& el = Element(iel);
-            
-            int nint = el.GaussPoints();
-            int neln = el.Nodes();
-            
-            fe.assign(3*neln,0);
-            
-            // get the nodal accelerations
+        // evaluate the element inertial force vector
+        for (int n=0; n<nint; ++n)
+        {
+            double J0 = detJ0(el, n)*el.GaussWeights()[n];
+                
+            // get the acceleration for this integration point
+            a = el.Evaluate(at, n);
+                
+            double* H = el.H(n);
             for (int i=0; i<neln; ++i)
             {
-                at[i] = m_pMesh->Node(el.m_node[i]).m_at;
+                double tmp = H[i]*J0*d;
+                fe[3*i  ] -= tmp*a.x;
+                fe[3*i+1] -= tmp*a.y;
+                fe[3*i+2] -= tmp*a.z;
             }
-            
-            // evaluate the element inertial force vector
-            for (int n=0; n<nint; ++n)
-            {
-                double J0 = detJ0(el, n)*el.GaussWeights()[n];
-                
-                // get the acceleration for this integration point
-                a = el.Evaluate(at, n);
-                
-                double* H = el.H(n);
-                for (int i=0; i<neln; ++i)
-                {
-                    double tmp = H[i]*J0*d;
-                    fe[3*i  ] -= tmp*a.x;
-                    fe[3*i+1] -= tmp*a.y;
-                    fe[3*i+2] -= tmp*a.z;
-                }
-            }
-            
-            // get the element degrees of freedom
-            UnpackLM(el, lm);
-            
-            // assemble fe into R
-            R.Assemble(el.m_node, lm, fe);
         }
+            
+        // get the element degrees of freedom
+        UnpackLM(el, lm);
+            
+        // assemble fe into R
+        R.Assemble(el.m_node, lm, fe);
     }
 }

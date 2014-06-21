@@ -19,8 +19,8 @@ public:
 	//! Assemble the element vector into this global vector
 	virtual void Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe);
 
-	//! Assemble a rigid body vector into this global vector
-	virtual void AssembleRigid(int lm[6], double fe[6]);
+	//! Assemble into this global vector (\todo replace pointers with vectors?).
+	virtual void Assemble(int* lm, double* fe, int n);
     
 	//! access operator
 	double& operator [] (int i) { return m_R[i]; }

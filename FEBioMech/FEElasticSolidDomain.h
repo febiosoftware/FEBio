@@ -37,13 +37,13 @@ public: // overrides from FEElasticDomain
 	void UpdateElementStress(int iel, double dt);
 
 	//! intertial forces for dynamic problems
-	void InertialForces(FESolver* psolver, FEGlobalVector& R, vector<double>& F);
+	void InertialForces(FEGlobalVector& R, vector<double>& F);
 
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);
 
 	//! body forces
-	void BodyForce(FESolver* psolver, FEGlobalVector& R, FEBodyForce& BF);
+	void BodyForce(FEGlobalVector& R, FEBodyForce& BF);
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolver* psolver);
@@ -67,7 +67,7 @@ public:
 	void ElementMaterialStiffness(FESolidElement& el, matrix& ke);
 
 	//! calculates the solid element mass matrix
-	void ElementMassMatrix(FESolver* psolver, FESolidElement& el, matrix& ke, double a);
+	void ElementMassMatrix(FESolidElement& el, matrix& ke, double a);
 
 	//! calculates the stiffness matrix due to body forces 
 	void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke);

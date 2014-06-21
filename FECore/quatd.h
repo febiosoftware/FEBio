@@ -176,13 +176,6 @@ public:
 		return quatd(-x/N, -y/N, -z/N, w/N);
 	}
 
-	quatd Cayley() const
-    {
-        double a = GetAngle();
-        vec3d v = GetVector();
-        return quatd(2*atan(a/2),v);
-    }
-    
 	double DotProduct(const quatd& q) const
 	{
 		return w*q.w + x*q.x + y*q.y + z*q.z;

@@ -19,7 +19,4 @@ public:
 
 	//! Assemble the element vector into this global vector
 	void Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe);
-    
-	//! Assemble the element vector into this global vector
-	void AssembleRigid(int lm[6], double fe[6]);
 };

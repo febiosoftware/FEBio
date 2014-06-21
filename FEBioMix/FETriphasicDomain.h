@@ -90,8 +90,8 @@ protected:
 	void ElementGeometricalStiffness(FESolidElement &el, matrix &ke);
 
 protected: // overridden from FEElasticDomain, but not implemented in this domain
-	void BodyForce(FESolver* psolver, FEGlobalVector& R, FEBodyForce& bf) {}
-	void InertialForces(FESolver* psolver, FEGlobalVector& R, vector<double>& F) {}
+	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) {}
+	void InertialForces(FEGlobalVector& R, vector<double>& F) {}
 	void StiffnessMatrix(FESolver* psolver) {}
 	void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) {}
 	void MassMatrix(FESolver* psolver, double scale) {}

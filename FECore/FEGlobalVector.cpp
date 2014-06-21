@@ -31,19 +31,14 @@ void FEGlobalVector::Assemble(vector<int>& en, vector<int>& elm, vector<double>&
 }
 
 //-----------------------------------------------------------------------------
-void FEGlobalVector::AssembleRigid(int lm[6], double fe[6])
+//! \todo This function does not add to m_Fr. Is this a problem?
+void FEGlobalVector::Assemble(int* lm, double* fe, int n)
 {
 	vector<double>& R = m_R;
-    
-	int n;
-    
-    // add to global force vector
-    n = lm[0]; if (n >= 0) R[n] += fe[0];
-    n = lm[1]; if (n >= 0) R[n] += fe[1];
-    n = lm[2]; if (n >= 0) R[n] += fe[2];
-    
-    // add to total torque of this body
-    n = lm[3]; if (n >= 0) R[n] += fe[3];
-    n = lm[4]; if (n >= 0) R[n] += fe[4];
-    n = lm[5]; if (n >= 0) R[n] += fe[5];
+
+	for (int i=0; i<n; ++i)
+	{
+		int nid = lm[i];
+		if (nid >= 0) R[nid] += fe[i];
+	}
 }
