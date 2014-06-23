@@ -719,6 +719,7 @@
     <ClCompile Include="..\..\FECore\NodeDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\ObjectDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\qsort.cpp" />
+    <ClCompile Include="..\..\FECore\quatd.cpp" />
     <ClCompile Include="..\..\FECore\SparseMatrix.cpp" />
     <ClCompile Include="..\..\FECore\stdafx.cpp" />
     <ClCompile Include="..\..\FECore\svd.cpp" />

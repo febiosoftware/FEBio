@@ -13,11 +13,13 @@
 #include <memory.h>
 #include <vector>
 #include <algorithm>
+#include "vec3d.h"
 using namespace std;
 
 double operator*(const vector<double>& a, const vector<double>& b);
 vector<double> operator - (vector<double>& a, vector<double>& b);
 template<typename T> void zero(vector<T>& a) { fill(a.begin(), a.end(), T(0)); }
+template<> inline void zero<vec3d>(vector<vec3d>& a) { fill(a.begin(), a.end(), vec3d(0,0,0)); }
 template<typename T> void assign(vector<T>& a, const T& v) { fill(a.begin(), a.end(), v); }
 vector<double>& operator += (vector<double>& a, const vector<double>& b);
 vector<double>& operator *= (vector<double>& a, double b);

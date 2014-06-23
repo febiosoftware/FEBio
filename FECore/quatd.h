@@ -67,6 +67,8 @@ public:
 
 	bool operator != (const quatd& q) { return ((x!=q.x) || (y!=q.y) || (z!=q.z) || (w!=q.w)); }
 
+	quatd operator - () { return quatd(-x, -y, -z, -w); }
+
 	// addition and substraction
 
 	quatd operator + (const quatd& q) const
@@ -255,6 +257,15 @@ public:
 			2.0*(y*z + w*x),
 			w*w - x*x - y*y + z*z);
 	}
+
+	static double dot(quatd &q1, quatd &q2) 
+	{ return q1.x*q2.x + q1.y*q2.y + q1.z*q2.z + q1.w*q2.w; }
+
+	static quatd lerp(quatd &q1, quatd &q2, const double t) 
+	{ quatd q = (q1*(1.0-t) + q2*t); q.MakeUnit(); return q; }
+
+	static quatd slerp(quatd &q1, quatd &q2, const double t);
+
 
 public:
 	double w;

@@ -15,7 +15,7 @@ public:
 	class NODE 
 	{
 	public:
-		NODE() { gap = 0.0; pme = 0; }
+		NODE() { gap = vec3d(0.0,0.0,0.0); pme = 0; }
 
 	public:
 		vec3d				gap;	//!< "gap" function

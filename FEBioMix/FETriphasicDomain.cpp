@@ -178,7 +178,7 @@ void FETriphasicDomain::Reset()
 			ps.m_nsol = nsol;
 			ps.m_c.assign(nsol,0);
 			ps.m_ca.assign(nsol,0);
-			ps.m_gradc.assign(nsol,0);
+			ps.m_gradc.assign(nsol,vec3d(0,0,0));
 			ps.m_k.assign(nsol, 0);
 			ps.m_dkdJ.assign(nsol, 0);
 			ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
@@ -735,7 +735,7 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<dou
 		// next we calculate the deformation gradient and the solid velocity
 		mat3d Fp;
 		Fp.zero();
-		vec3d vs(0);
+		vec3d vs(0,0,0);
 		double cprev[2] = {0,0};
 		
 		Gr = el.Gr(n);
@@ -1122,7 +1122,7 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 		mat3d Fp, gradv;
 		Fp.zero();
 		gradv.zero();
-		vec3d vs(0);
+		vec3d vs(0,0,0);
 		vector<double> cprev(nsol,0);
 		
 		Gr = el.Gr(n);

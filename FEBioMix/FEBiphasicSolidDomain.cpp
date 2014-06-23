@@ -677,7 +677,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 		mat3d Fp, gradv;
 		Fp.zero();
 		gradv.zero();
-		vec3d vs(0);
+		vec3d vs(0,0,0);
 		
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);

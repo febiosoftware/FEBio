@@ -921,7 +921,7 @@ vec3d FEMultiphasic::FluidFlux(FEMaterialPoint& pt)
 	ke = (kt.inverse() + ke*(m_Rgas*m_Tabs/phiw)).inverse();
 	
 	// fluid flux w
-	vec3d w(0);
+	vec3d w(0,0,0);
 	for (i=0; i<nsol; ++i)
 		w += (D[i]*gradc[i])*(kappa[i]/D0[i]);
 	w = -(ke*(gradp + w*m_Rgas*m_Tabs));
@@ -1005,7 +1005,7 @@ vec3d FEMultiphasic::CurrentDensity(FEMaterialPoint& pt)
 	
 	vector<vec3d> j(nsol);
 	vector<int> z(nsol);
-	vec3d Ie(0);
+	vec3d Ie(0,0,0);
 	for (i=0; i<nsol; ++i) {
 		j[i] = SoluteFlux(pt, i);
 		z[i] = m_pSolute[i]->ChargeNumber();

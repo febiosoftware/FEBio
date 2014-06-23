@@ -57,7 +57,7 @@ bool FETiedBiphasicSurface::Init()
 	m_pme.assign(nint, static_cast<FESurfaceElement*>(0));
 	m_epsn.assign(nint, 1.0);
 	
-	m_nn.assign(Nodes(), 0);
+	m_nn.assign(Nodes(), vec3d(0,0,0));
 	
 	m_nei.resize(Elements());
 	nint = 0;
@@ -528,7 +528,7 @@ void FETiedBiphasicInterface::InitialProjection(FETiedBiphasicSurface& ss, FETie
 			else
 			{
 				// the node is not in contact
-				ss.m_Gap[n] = 0;
+				ss.m_Gap[n] = vec3d(0,0,0);
 			}
 		}
 	}

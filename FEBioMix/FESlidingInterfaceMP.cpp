@@ -71,7 +71,7 @@ bool FESlidingSurfaceMP::Init()
 	// initialize surface data first
 	if (FEContactSurface::Init() == false) return false;
 	
-	m_nn.assign(Nodes(), 0);
+	m_nn.assign(Nodes(), vec3d(0,0,0));
 	
 	// determine solutes for this surface using the first surface element
 	// TODO: Check that all elements use the same set of solutes as the first element

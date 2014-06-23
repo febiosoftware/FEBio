@@ -67,7 +67,7 @@ bool FESlidingSurface2::Init()
 	}
 
 	// allocate node normals
-	m_nn.assign(Nodes(), 0);
+	m_nn.assign(Nodes(), vec3d(0,0,0));
 
 	// determine biphasic status
 	m_poro.resize(Elements(),false);

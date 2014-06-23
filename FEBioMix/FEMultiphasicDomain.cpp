@@ -197,11 +197,11 @@ void FEMultiphasicDomain::Reset()
 			ps.m_nsol = nsol;
 			ps.m_c.assign(nsol,0);
 			ps.m_ca.assign(nsol,0);
-			ps.m_gradc.assign(nsol,0);
+			ps.m_gradc.assign(nsol,vec3d(0,0,0));
 			ps.m_k.assign(nsol, 0);
 			ps.m_dkdJ.assign(nsol, 0);
 			ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
-			ps.m_j.assign(nsol,0);
+			ps.m_j.assign(nsol,vec3d(0,0,0));
 			ps.m_nsbm = nsbm;
 			ps.m_sbmr = sbmr;
 			ps.m_sbmrp = sbmr;
@@ -476,7 +476,7 @@ bool FEMultiphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector
 		}
 		
 		vector<vec3d> j(spt.m_j);
-		vec3d je(0);
+		vec3d je(0,0,0);
 		
 		for (isol=0; isol<nsol; ++isol) {
 			// get the charge number
@@ -616,7 +616,7 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 		// next we calculate the deformation gradient and the solid velocity
 		mat3d Fp;
 		Fp.zero();
-		vec3d vs(0);
+		vec3d vs(0,0,0);
 		vector<double> cprev(nsol,0);
 		
 		Gr = el.Gr(n);
@@ -661,7 +661,7 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 		vector<double> c(spt.m_c);
 		vector<int> z(nsol);
 		vector<double> kappa(spt.m_k);
-		vec3d je(0);
+		vec3d je(0,0,0);
 		vector<double> dcdt(nsol);
 		
 		for (isol=0; isol<nsol; ++isol) {
@@ -1167,7 +1167,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 		mat3d Fp, gradv;
 		Fp.zero();
 		gradv.zero();
-		vec3d vs(0);
+		vec3d vs(0,0,0);
 		vector<double> cprev(nsol,0);
 		
 		Gr = el.Gr(n);
