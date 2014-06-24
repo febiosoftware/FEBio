@@ -59,6 +59,9 @@ public:
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
 	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
 
+	//! serialize data to/from dump file
+	void Serialize(DumpFile& ar);
+
 public:
 	//! return number of properties
 	int Properties();
