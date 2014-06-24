@@ -245,7 +245,7 @@ public:
 		m_pChunk->AddChild(new OLeaf<T>(nid, o));
 	}
 
-	void WriteChunk(unsigned int nid, char* sz)
+	void WriteChunk(unsigned int nid, const char* sz)
 	{
 		m_pChunk->AddChild(new OLeaf<const char*>(nid, sz));
 	}

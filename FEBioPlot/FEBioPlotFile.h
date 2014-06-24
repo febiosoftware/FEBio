@@ -36,7 +36,7 @@ public:
 			PLT_HDR_VERSION				= 0x01010001,
 			PLT_HDR_NODES				= 0x01010002,
 			PLT_HDR_MAX_FACET_NODES		= 0x01010003,
-			PLT_HDR_COMPRESSION			= 0x01010004,
+			PLT_HDR_COMPRESSION			= 0x01010004,	// added in version 0x03
 		PLT_DICTIONARY					= 0x01020000,
 			PLT_DIC_ITEM				= 0x01020001,
 			PLT_DIC_ITEM_TYPE			= 0x01020002,
@@ -60,6 +60,7 @@ public:
 					PLT_DOM_ELEM_TYPE	= 0x01042102,
 					PLT_DOM_MAT_ID		= 0x01042103,
 					PLT_DOM_ELEMS		= 0x01032104,
+					PLT_DOM_NAME		= 0x01032105,	// added in version 0x03
 				PLT_DOM_ELEM_LIST		= 0x01042200,
 					PLT_ELEMENT			= 0x01042201,
 			PLT_SURFACE_SECTION			= 0x01043000,
@@ -67,8 +68,16 @@ public:
 				PLT_SURFACE_HDR			= 0x01043101,
 					PLT_SURFACE_ID		= 0x01043102,
 					PLT_SURFACE_FACES	= 0x01043103,
+					PLT_SURFACE_NAME	= 0x01043104,	// added in version 0x03
 				PLT_FACE_LIST			= 0x01043200,
-					PLT_FACE			= 0x01043201,
+					PLT_FACE			= 0x01043201, 
+			PLT_NODESET_SECTION			= 0x01044000,	// added in version 0x03
+				PLT_NODESET				= 0x01044100,	// added in version 0x03
+				PLT_NODESET_HDR			= 0x01044101,	// added in version 0x03
+					PLT_NODESET_ID		= 0x01044102,	// added in version 0x03
+					PLT_NODESET_NAME	= 0x01044103,	// added in version 0x03
+					PLT_NODESET_SIZE	= 0x01044104,	// added in version 0x03
+				PLT_NODESET_LIST		= 0x01044200,	// added in version 0x03
 		PLT_STATE						= 0x02000000,
 			PLT_STATE_HEADER			= 0x02010000,
 				PLT_STATE_HDR_ID		= 0x02010001,
@@ -174,6 +183,7 @@ protected:
 	void WriteNodeSection   (FEMesh& m);
 	void WriteDomainSection (FEMesh& m);
 	void WriteSurfaceSection(FEMesh& m);
+	void WriteNodeSetSection(FEMesh& m);
 
 	void WriteSolidDomain   (FESolidDomain&    dom);
 	void WriteShellDomain   (FEShellDomain&    dom);

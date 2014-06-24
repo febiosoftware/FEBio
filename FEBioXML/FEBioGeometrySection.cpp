@@ -351,6 +351,9 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	int nmat = atoi(szmat)-1;
 	if ((nmat < 0) || (nmat >= fem.Materials())) throw FEFEBioImport::InvalidDomainMaterial(NDOM+1);
 
+	// get the name
+	const char* szname = tag.AttributeValue("elset", true);
+
 	// get the element type
 	FE_Element_Shape etype;
 	const char* sztype = tag.AttributeValue("type");
@@ -377,6 +380,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	FEDomain* pdom = CreateDomain(ndomtype, &mesh, pmat);
 	if (pdom == 0) throw FEFEBioImport::FailedCreatingDomain();
 	FEDomain& dom = *pdom;
+	dom.SetName(szname);
 
 	// count elements
 	int elems = tag.children();

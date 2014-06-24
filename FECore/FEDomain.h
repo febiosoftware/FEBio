@@ -21,6 +21,9 @@ class FEMaterial;
 class FEDomain
 {
 public:
+	enum { MAX_DOMAIN_NAME = 64 };
+
+public:
 	//! constructor
 	FEDomain(int ntype, int nclass, FEMesh* pm);
 
@@ -41,6 +44,13 @@ public:
 
 	//! find the element with a specific ID
 	FEElement* FindElementFromID(int nid);
+
+public:
+	// Set the domain name
+	void SetName(const char* szname);
+
+	// get the domain name
+	const char* GetName();
 
 public:
 	//! get the material of this domain
@@ -96,4 +106,7 @@ protected:
 protected:
 	int	m_ntype;			//!< type of domain
 	int	m_nclass;			//!< domain class
+
+private:
+	char	m_szname[MAX_DOMAIN_NAME];	//!< domain name
 };

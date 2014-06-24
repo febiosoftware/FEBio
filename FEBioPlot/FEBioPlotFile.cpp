@@ -356,13 +356,23 @@ bool FEBioPlotFile::WriteGeometry(FEModel& fem)
 		m_ar.EndChunk();
 	}
 
+	// node sets
+	if (m.NodeSets() > 0)
+	{
+		m_ar.BeginChunk(PLT_NODESET_SECTION);
+		{
+			WriteNodeSetSection(m);
+		}
+		m_ar.EndChunk();
+	}
+
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteNodeSection(FEMesh& m)
 {
-	// write the material coordinates
+	// write the reference coordinates
 	int NN = m.Nodes();
 	vector<float> X(3*NN);
 	for (int i=0; i<m.Nodes(); ++i)
@@ -433,6 +443,7 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 		m_ar.WriteChunk(PLT_DOM_ELEM_TYPE, dtype);
 		m_ar.WriteChunk(PLT_DOM_MAT_ID   ,   mid);
 		m_ar.WriteChunk(PLT_DOM_ELEMS    ,    NE);
+		m_ar.WriteChunk(PLT_DOM_NAME     , dom.GetName());
 	}
 	m_ar.EndChunk();
 
@@ -582,6 +593,7 @@ void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 				int sid = ns+1;
 				m_ar.WriteChunk(PLT_SURFACE_ID, sid);
 				m_ar.WriteChunk(PLT_SURFACE_FACES, NF);
+				m_ar.WriteChunk(PLT_SURFACE_NAME, s.GetName());
 			}
 			m_ar.EndChunk();
 
@@ -599,6 +611,30 @@ void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 				}
 			}
 			m_ar.EndChunk();
+		}
+		m_ar.EndChunk();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteNodeSetSection(FEMesh& m)
+{
+	for (int ns = 0; ns < m.NodeSets(); ++ns)
+	{
+		FENodeSet& l = *m.NodeSet(ns);
+		int nodes = l.size();
+		m_ar.BeginChunk(PLT_NODESET);
+		{
+			m_ar.BeginChunk(PLT_NODESET_HDR);
+			{
+				int nid = ns+1;
+				m_ar.WriteChunk(PLT_NODESET_ID, nid);
+				m_ar.WriteChunk(PLT_NODESET_SIZE, nodes);
+				m_ar.WriteChunk(PLT_NODESET_NAME, l.GetName());
+			}
+			m_ar.EndChunk();
+
+			m_ar.WriteChunk(PLT_NODESET_LIST, l.GetNodeList());
 		}
 		m_ar.EndChunk();
 	}

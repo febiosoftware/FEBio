@@ -151,6 +151,8 @@ public:
 	void SetName(const char* sz);
 	const char* GetName() { return m_szname; }
 
+	vector<int>& GetNodeList() { return m_Node; }
+
 protected:
 	FEMesh*	m_pmesh;
 	vector<int>	m_Node;		//!< list of nodes
@@ -297,15 +299,6 @@ public:
 	//! Calculates an elements volume
 	double ElementVolume(FEElement& el);
 
-	//! adds a node set to the mesh
-	void AddNodeSet(FENodeSet* pns) { m_NodeSet.push_back(pns); }
-
-	//! Find a nodeset by ID
-	FENodeSet* FindNodeSet(int nid);
-
-	//! Find a nodeset by name
-	FENodeSet* FindNodeSet(const char* szname);
-
 	//! Get the face nodes from a given element
 	int GetFace(FEElement& el, int n, int nf[8]);
 
@@ -323,6 +316,22 @@ public:
 		if (m_NEL.Size() != m_Node.size()) m_NEL.Create(*this);
 		return m_NEL;
 	}
+
+	// --- NODESETS ---
+	//! adds a node set to the mesh
+	void AddNodeSet(FENodeSet* pns) { m_NodeSet.push_back(pns); }
+
+	//! number of nodesets
+	int NodeSets() { return (int) m_NodeSet.size(); }
+
+	//! return a node set
+	FENodeSet* NodeSet(int i) { return m_NodeSet[i]; }
+
+	//! Find a nodeset by ID
+	FENodeSet* FindNodeSet(int nid);
+
+	//! Find a nodeset by name
+	FENodeSet* FindNodeSet(const char* szname);
 
 	// --- PARTS ---
 	int Parts() { return (int) m_Part.size(); }
