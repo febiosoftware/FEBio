@@ -281,6 +281,7 @@ REGISTER_FECORE_CLASS(FEPlotRigidRotation           , FEPLOTDATA_ID, "rigid angu
 REGISTER_FECORE_CLASS(FEPlotRigidAngularVelocity    , FEPLOTDATA_ID, "rigid angular velocity"    );
 REGISTER_FECORE_CLASS(FEPlotRigidAngularAcceleration, FEPLOTDATA_ID, "rigid angular acceleration");
 REGISTER_FECORE_CLASS(FEPlotRigidKineticEnergy      , FEPLOTDATA_ID, "rigid kinetic energy"      );
+REGISTER_FECORE_CLASS(FEPlotRigidEuler              , FEPLOTDATA_ID, "Euler angle"               );
 
 //-----------------------------------------------------------------------------
 // Derived from FENodeLogData

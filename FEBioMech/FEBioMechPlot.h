@@ -340,3 +340,14 @@ public:
 private:
 	FEModel* m_pfem;
 };
+
+//-----------------------------------------------------------------------------
+//! Rigid Euler angles
+class FEPlotRigidEuler : public FEDomainData
+{
+public:
+	FEPlotRigidEuler(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_NODE), m_pfem(pfem) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+private:
+	FEModel* m_pfem;
+};

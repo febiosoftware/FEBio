@@ -243,7 +243,7 @@ public:
 		r[2] = w*qz + z*qw + x*qy - y*qx;
 	}
 
-	//! Convert a quaternion to a matrix
+	//! Convert a quaternion to a rotation matrix
 	mat3d RotationMatrix()
 	{
 		return mat3d(
@@ -276,6 +276,25 @@ inline quatd operator * (const double a, const quatd& q)
 {
 	return q*a;
 }
+
+// convert euler-angles to a rotation matrix
+// l[0] = psi   (x-rotation)
+// l[1] = theta (y-rotation)
+// l[2] = phi   (z-rotation)
+mat3d euler2rot(double l[3]);
+
+// convert a rotation matrix to euler angles
+// l[0] = psi   (x-rotation)
+// l[1] = theta (y-rotation)
+// l[2] = phi   (z-rotation)
+void rot2euler(mat3d& m, double l[3]);
+
+// extract euler angles from a quaternion
+// l[0] = psi   (x-rotation)
+// l[1] = theta (y-rotation)
+// l[2] = phi   (z-rotation)
+void quat2euler(quatd& q, double l[3]);
+
 
 
 #endif //_QUATD_H_02082007_

@@ -1027,3 +1027,30 @@ bool FEPlotRigidKineticEnergy::Save(FEDomain& dom, vector<float>& a)
     
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+bool FEPlotRigidEuler::Save(FEDomain& dom, vector<float>& a)
+{
+	// get the rigid material
+	FEMaterial* pm = dom.GetMaterial();
+	if (pm->IsRigid() == false) return false;
+	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
+    
+	// get the rigid body
+	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+
+	// get the Euler angles
+	double E[3];
+	quat2euler(rb.m_qt, E);
+    
+	// copy results to archive
+	int NN = dom.Nodes();
+	for (int i=0; i<NN; ++i)
+	{
+		a.push_back((float) E[0]);
+		a.push_back((float) E[1]);
+		a.push_back((float) E[2]);
+	}
+    
+	return true;
+}
