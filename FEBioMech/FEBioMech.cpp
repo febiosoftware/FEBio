@@ -58,9 +58,6 @@
 #include "FEVerondaWestmann.h"
 #include "FEViscoElasticMaterial.h"
 #include "FEVonMisesPlasticity.h"
-#include "FEPreStrainTransIsoMR.h"
-#include "FEPreStrainCoupledTransIsoMR.h"
-#include "FEPreStrainElastic.h"
 #include "FEElasticFiberMaterial.h"
 #include "FEFiberDensityDistribution.h"
 #include "FEContinuousFiberDistribution.h"
@@ -89,7 +86,6 @@
 #include "FESurfaceConstraint.h"
 #include "FETiedInterface.h"
 #include "FEStickyInterface.h"
-#include "FEInSituStretch.h"
 #include "FEPointConstraint.h"
 #include "FEFacet2FacetTied.h"
 
@@ -194,9 +190,6 @@ REGISTER_FECORE_CLASS(FEHuiskesSupply                ,FEMATERIAL_ID, "Huiskes-su
 REGISTER_FECORE_CLASS(FERemodelingElasticMaterial    ,FEMATERIAL_ID, "remodeling solid"              );
 REGISTER_FECORE_CLASS(FECarterHayesOld               ,FEMATERIAL_ID, "Carter-Hayes (old)"            );
 REGISTER_FECORE_CLASS(FEActiveFiberContraction       ,FEMATERIAL_ID, "active_contraction"            );
-REGISTER_FECORE_CLASS(FEPreStrainTransIsoMR          ,FEMATERIAL_ID, "pre-strain trans iso Mooney-Rivlin");
-REGISTER_FECORE_CLASS(FEPreStrainCoupledTransIsoMR   ,FEMATERIAL_ID, "pre-strain coupled trans iso Mooney-Rivlin");
-REGISTER_FECORE_CLASS(FEPreStrainElastic             ,FEMATERIAL_ID, "pre-strain elastic"            );
 REGISTER_FECORE_CLASS(FEFiberExponentialPower        ,FEMATERIAL_ID, "fiber-exponential-power-law"   );
 REGISTER_FECORE_CLASS(FEFiberNH                      ,FEMATERIAL_ID, "fiber-NH"                      );
 REGISTER_FECORE_CLASS(FESphericalFiberDensityDistribution  , FEMATERIAL_ID, "spherical"   );
@@ -234,7 +227,6 @@ REGISTER_FECORE_CLASS(FEPointBodyForce      , FEBODYLOAD_ID, "point"      );
 //-----------------------------------------------------------------------------
 // constraint classes
 REGISTER_FECORE_CLASS(FEPointConstraint    , FENLCONSTRAINT_ID, "point"                );
-REGISTER_FECORE_CLASS(FEInSituStretch      , FENLCONSTRAINT_ID, "in-situ stretch"      );
 REGISTER_FECORE_CLASS(FELinearConstraintSet, FENLCONSTRAINT_ID, "linear constraint"    );
 REGISTER_FECORE_CLASS(FERigidJoint         , FENLCONSTRAINT_ID, "rigid joint"          );
 REGISTER_FECORE_CLASS(FERigidSphericalJoint, FENLCONSTRAINT_ID, "rigid spherical joint");
@@ -265,7 +257,6 @@ REGISTER_FECORE_CLASS(FEPlotShellThickness       , FEPLOTDATA_ID, "shell thickne
 REGISTER_FECORE_CLASS(FEPlotDamage               , FEPLOTDATA_ID, "damage"                );
 REGISTER_FECORE_CLASS(FEPlotMixtureVolumeFraction, FEPLOTDATA_ID, "volume fraction"       );
 REGISTER_FECORE_CLASS(FEPlotUT4NodalStresses     , FEPLOTDATA_ID, "ut4 nodal stress"      );
-REGISTER_FECORE_CLASS(FEPlotFiberPreStretch		 , FEPLOTDATA_ID, "in-situ fiber stretch" );
 REGISTER_FECORE_CLASS(FEPlotShellStrain          , FEPLOTDATA_ID, "shell strain"          );
 REGISTER_FECORE_CLASS(FEPlotContactGap			 , FEPLOTDATA_ID, "contact gap"           );
 REGISTER_FECORE_CLASS(FEPlotContactPressure		 , FEPLOTDATA_ID, "contact pressure"      );

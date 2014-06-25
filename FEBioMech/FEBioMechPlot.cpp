@@ -7,7 +7,6 @@
 #include "FERigidShellDomain.h"
 #include "FEElasticMixture.h"
 #include "FEUT4Domain.h"
-#include "FEPreStrainTransIsoMR.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FEContactSurface.h"
 #include "FECore/FERigidBody.h"
@@ -629,53 +628,6 @@ bool FEPlotShellStrain::Save(FEDomain &dom, std::vector<float> &a)
 	}
 	return true;
 }
-
-//-----------------------------------------------------------------------------
-bool FEPlotFiberPreStretch::Save(FEDomain& dom, vector<float>& a)
-{
-	FEPreStrainTransIsoMR* pm = dynamic_cast<FEPreStrainTransIsoMR*>(dom.GetMaterial());
-	if (pm == 0) 
-	{
-		// see if we have a mixture
-		FEUncoupledElasticMixture* pmix = dynamic_cast<FEUncoupledElasticMixture*>(dom.GetMaterial());
-		if (pmix == 0) return false;
-
-		// For now, we just grab the first match we find
-		int N = pmix->Materials();
-		for (int i=0; i<N; ++i)
-		{
-			pm = dynamic_cast<FEPreStrainTransIsoMR*>(pmix->GetMaterial(i));
-			if (pm) break;
-		}
-		if (pm == 0) return false;
-	}
-
-	int NE = dom.Elements();
-	for (int i=0; i<NE; ++i)
-	{
-		FEElement& e = dom.ElementRef(i);
-		int nint = e.GaussPoints();
-		double lam = 0.0;
-		for (int j=0; j<nint; ++j)
-		{
-			FEMaterialPoint& mp = *e.GetMaterialPoint(j)->GetPointData(0);
-			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			FEFiberPreStretchMaterialPoint& psp = *mp.ExtractData<FEFiberPreStretchMaterialPoint>();
-			mat3d& F = pt.m_F;
-
-			vec3d a0(pt.m_Q[0][0], pt.m_Q[1][0], pt.m_Q[2][0]);
-			vec3d a = F*a0;
-			double lRtor = a.norm();
-
-			lam += psp.m_lam*lRtor;
-//			lam += psp.m_lam;
-		}
-		lam /= (double) nint;
-		a.push_back((float)lam);
-	}
-	return true;
-}
-
 
 //-----------------------------------------------------------------------------
 bool FEPlotSPRStresses::Save(FEDomain& dom, vector<float>& a)

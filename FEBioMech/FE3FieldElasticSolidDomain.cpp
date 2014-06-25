@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FEUncoupledMaterial.h"
-#include "FEPreStrainTransIsoMR.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

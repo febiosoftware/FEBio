@@ -306,12 +306,6 @@
     <ClCompile Include="..\..\FEBioMech\FEBioMechData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEPreStrainTransIsoMR.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEInSituStretch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FESolidMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -375,16 +369,10 @@
     <ClCompile Include="..\..\FEBioMech\FEPRLig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEPreStrainElastic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FECoupledMooneyRivlin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FECoupledVerondaWestmann.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEPreStrainCoupledTransIsoMR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FERigidPinJoint.cpp">
@@ -692,12 +680,6 @@
     <ClInclude Include="..\..\FEBioMech\FEBioMechData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEPreStrainTransIsoMR.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEInSituStretch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FESolidMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -764,16 +746,10 @@
     <ClInclude Include="..\..\FEBioMech\FEPRLig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEPreStrainElastic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FECoupledMooneyRivlin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FECoupledVerondaWestmann.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEPreStrainCoupledTransIsoMR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FERigidPinJoint.h">
