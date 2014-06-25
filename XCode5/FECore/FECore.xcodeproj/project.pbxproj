@@ -10,6 +10,7 @@
 		D5307A4818B40A6B008C8463 /* FENormalProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5307A4618B40A6B008C8463 /* FENormalProjection.cpp */; };
 		D5307A4918B40A6B008C8463 /* FENormalProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A4718B40A6B008C8463 /* FENormalProjection.h */; };
 		D595BB421899C7B40028A7F3 /* svd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D595BB411899C7B40028A7F3 /* svd.cpp */; };
+		D5960230195B65E6000A675D /* quatd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D596022F195B65E6000A675D /* quatd.cpp */; };
 		D5A0A8F0186F4AC60046B0DE /* DOFS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A0A8EE186F4AC50046B0DE /* DOFS.cpp */; };
 		D5A0A8F1186F4AC60046B0DE /* DOFS.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A0A8EF186F4AC60046B0DE /* DOFS.h */; };
 		D5B572D7186CC76500D12E45 /* FECoreFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B572CF186CC76500D12E45 /* FECoreFactory.cpp */; };
@@ -162,6 +163,7 @@
 		D5307A4618B40A6B008C8463 /* FENormalProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENormalProjection.cpp; sourceTree = "<group>"; };
 		D5307A4718B40A6B008C8463 /* FENormalProjection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENormalProjection.h; sourceTree = "<group>"; };
 		D595BB411899C7B40028A7F3 /* svd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = svd.cpp; sourceTree = "<group>"; };
+		D596022F195B65E6000A675D /* quatd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = quatd.cpp; sourceTree = "<group>"; };
 		D5A0A8EE186F4AC50046B0DE /* DOFS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DOFS.cpp; sourceTree = "<group>"; };
 		D5A0A8EF186F4AC60046B0DE /* DOFS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DOFS.h; sourceTree = "<group>"; };
 		D5B572CF186CC76500D12E45 /* FECoreFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECoreFactory.cpp; sourceTree = "<group>"; };
@@ -474,6 +476,7 @@
 				D5E10A6E1865E15900B23922 /* ObjectDataRecord.cpp */,
 				D5E10A6F1865E15900B23922 /* ObjectDataRecord.h */,
 				D5E10A701865E15900B23922 /* qsort.cpp */,
+				D596022F195B65E6000A675D /* quatd.cpp */,
 				D5E10A711865E15900B23922 /* quatd.h */,
 				D5E10A721865E15900B23922 /* SparseMatrix.cpp */,
 				D5E10A731865E15900B23922 /* SparseMatrix.h */,
@@ -685,6 +688,7 @@
 				D5E10AB21865E15900B23922 /* FEException.cpp in Sources */,
 				D5B572DD186CC76500D12E45 /* FEGlobalData.cpp in Sources */,
 				D5E10A801865E15900B23922 /* Archive.cpp in Sources */,
+				D5960230195B65E6000A675D /* quatd.cpp in Sources */,
 				D5E10AC41865E15900B23922 /* FEModelComponent.cpp in Sources */,
 				D5E10AB41865E15900B23922 /* FEGlobalMatrix.cpp in Sources */,
 				D5E10B001865E15900B23922 /* qsort.cpp in Sources */,
