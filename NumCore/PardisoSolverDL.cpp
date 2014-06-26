@@ -21,6 +21,24 @@ PardisoSolver::PardisoSolver() : m_pA(0)
 #endif
 }
 
+//-----------------------------------------------------------------------------
+SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype)
+{
+	/* Make sure the solver is available */
+#ifndef PARDISODL
+	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
+	return false;
+#else
+	m_bsymm = (ntype == SPARSE_SYMMETRIC);
+	if (m_bsymm) m_pA = new CompactSymmMatrix(1);
+	else m_pA = new CompactUnSymmMatrix(1, true);
+
+	return m_pA;
+#endif
+}
+
+//-----------------------------------------------------------------------------
+
 bool PardisoSolver::PreProcess()
 {
 	/* Make sure the solver is available */
