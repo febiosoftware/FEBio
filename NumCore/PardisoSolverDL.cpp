@@ -27,7 +27,7 @@ SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype)
 	/* Make sure the solver is available */
 #ifndef PARDISODL
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
-	return false;
+	return nullptr;
 #else
 	m_bsymm = (ntype == SPARSE_SYMMETRIC);
 	if (m_bsymm) m_pA = new CompactSymmMatrix(1);
