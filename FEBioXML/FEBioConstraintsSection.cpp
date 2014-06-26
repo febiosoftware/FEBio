@@ -369,7 +369,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 				pBC->Deactivate();
 			}
 		}
-		else if (tag == "velocity")
+		else if (tag == "initial_velocity")
 		{
 			// get the initial velocity
 			vec3d v;
@@ -390,7 +390,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 				pic->Deactivate();
 			}
 		}
-		else if (tag == "angular_velocity")
+		else if (tag == "initial_angular_velocity")
 		{
 			// get the initial angular velocity
 			vec3d w;
