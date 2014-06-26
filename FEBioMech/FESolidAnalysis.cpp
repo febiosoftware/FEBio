@@ -306,9 +306,15 @@ bool FESolidAnalysis::Init()
 			if (n.m_rid >= 0)
 			{
 				FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(n.m_rid));
+				vec3d V = rb.m_vt;
+				vec3d W = rb.m_wt;
 				vec3d r = n.m_rt - rb.m_rt;
-				vec3d v = rb.m_vt + (rb.m_wt ^ r); 
+
+				vec3d v = V + (W ^ r); 
 				n.m_v0 = n.m_vp = n.m_vt = v;
+
+				vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
+				n.m_ap = n.m_at = a;
 			}
 		}
 	}
