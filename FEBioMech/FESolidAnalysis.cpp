@@ -275,25 +275,41 @@ bool FESolidAnalysis::Init()
 		if (plc->IsActive()) plc->Init();
 	}
 
-	// Set the initial velocity for rigid bodies
-	for (int i=0; i<(int)m_fem.m_RBV.size(); ++i)
+	if (m_nanalysis == FE_DYNAMIC)
 	{
-		FERigidBodyVelocity* pv = m_fem.m_RBV[i];
-		if (pv->IsActive())
+		// Set the initial velocity for rigid bodies
+		for (int i=0; i<(int)m_fem.m_RBV.size(); ++i)
 		{
-			FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(i));
-			rb.m_vp = rb.m_vt = pv->v;
+			FERigidBodyVelocity* pv = m_fem.m_RBV[i];
+			if (pv->IsActive())
+			{
+				FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(i));
+				rb.m_vp = rb.m_vt = pv->v;
+			}
 		}
-	}
 
-	// Set the initial angular velocity for rigid bodies
-	for (int i=0; i<(int)m_fem.m_RBW.size(); ++i)
-	{
-		FERigidBodyAngularVelocity* pw = m_fem.m_RBW[i];
-		if (pw->IsActive())
+		// Set the initial angular velocity for rigid bodies
+		for (int i=0; i<(int)m_fem.m_RBW.size(); ++i)
 		{
-			FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(i));
-			rb.m_wp = rb.m_wt = pw->w;
+			FERigidBodyAngularVelocity* pw = m_fem.m_RBW[i];
+			if (pw->IsActive())
+			{
+				FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(i));
+				rb.m_wp = rb.m_wt = pw->w;
+			}
+		}
+
+		// now set the initial velocities of all rigid nodes
+		for (int i=0; i<mesh.Nodes(); ++i)
+		{
+			FENode& n = mesh.Node(i);
+			if (n.m_rid >= 0)
+			{
+				FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(n.m_rid));
+				vec3d r = n.m_rt - rb.m_rt;
+				vec3d v = rb.m_vt + (rb.m_wt ^ r); 
+				n.m_v0 = n.m_vp = n.m_vt = v;
+			}
 		}
 	}
 
