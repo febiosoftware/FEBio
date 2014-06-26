@@ -90,3 +90,27 @@ public:
 	double	ref;	//!< reference value for relative displacement
 	bool	brel;	//!< relative displacement flag
 };
+
+//-----------------------------------------------------------------------------
+//! rigid body initial velocity
+class FERigidBodyVelocity : public FEBoundaryCondition
+{
+public:
+	FERigidBodyVelocity(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+
+public:
+	int		id;	//!< rigid body ID
+	vec3d	v;	//!< value
+};
+
+//-----------------------------------------------------------------------------
+//! rigid body initial angular velocity
+class FERigidBodyAngularVelocity : public FEBoundaryCondition
+{
+public:
+	FERigidBodyAngularVelocity(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+
+public:
+	int		id;	//!< rigid body ID
+	vec3d	w;	//!< value
+};

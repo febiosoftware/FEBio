@@ -369,6 +369,48 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 				pBC->Deactivate();
 			}
 		}
+		else if (tag == "velocity")
+		{
+			// get the initial velocity
+			vec3d v;
+			tag.value(v);
+
+			// create the initial condition
+			FERigidBodyVelocity* pic = new FERigidBodyVelocity(&fem);
+			pic->id = nmat;
+			pic->v = v;
+			fem.m_RBV.push_back(pic);
+
+			// add this initial condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				int n = fem.m_RBV.size() - 1;
+				FERigidBodyVelocity* pic = fem.m_RBV[n];
+				pStep->AddBoundaryCondition(pic);
+				pic->Deactivate();
+			}
+		}
+		else if (tag == "angular_velocity")
+		{
+			// get the initial angular velocity
+			vec3d w;
+			tag.value(w);
+
+			// create the initial condition
+			FERigidBodyAngularVelocity* pic = new FERigidBodyAngularVelocity(&fem);
+			pic->id = nmat;
+			pic->w = w;
+			fem.m_RBW.push_back(pic);
+
+			// add this initial condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				int n = fem.m_RBW.size() - 1;
+				FERigidBodyAngularVelocity* pic = new FERigidBodyAngularVelocity(&fem);
+				pStep->AddBoundaryCondition(pic);
+				pic->Deactivate();
+			}
+		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}

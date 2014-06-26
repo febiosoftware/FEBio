@@ -275,6 +275,28 @@ bool FESolidAnalysis::Init()
 		if (plc->IsActive()) plc->Init();
 	}
 
+	// Set the initial velocity for rigid bodies
+	for (int i=0; i<(int)m_fem.m_RBV.size(); ++i)
+	{
+		FERigidBodyVelocity* pv = m_fem.m_RBV[i];
+		if (pv->IsActive())
+		{
+			FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(i));
+			rb.m_vp = rb.m_vt = pv->v;
+		}
+	}
+
+	// Set the initial angular velocity for rigid bodies
+	for (int i=0; i<(int)m_fem.m_RBW.size(); ++i)
+	{
+		FERigidBodyAngularVelocity* pw = m_fem.m_RBW[i];
+		if (pw->IsActive())
+		{
+			FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(i));
+			rb.m_wp = rb.m_wt = pw->w;
+		}
+	}
+
 	// see if we need to do contact augmentations
 	m_baugment = false;
 	for (int i=0; i<m_fem.SurfacePairInteractions(); ++i)

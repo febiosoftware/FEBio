@@ -297,11 +297,13 @@ protected:
 	std::vector<FERigidNode*>		m_RN;	//!< rigid nodes
 
 public:
-	// Boundary conditions for rigid bodies
+	// Boundary/Initial conditions for rigid bodies
 	// TODO: I'd like to do something different with this. Perhaps place them in the BC or in some constraint section.
 	vector<FERigidBodyFixedBC*>			m_RBC;	//!< rigid body fixed
 	vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
 	vector<FERigidBodyForce*>			m_RFC;	//!< rigid body forces
+	vector<FERigidBodyVelocity*>		m_RBV;	//!< rigid body initial velocities
+	vector<FERigidBodyAngularVelocity*>	m_RBW;	//!< rigid body initial angular velocities
 
 	// linear constraint data
 	list<FELinearConstraint>	m_LinC;		//!< linear constraints data

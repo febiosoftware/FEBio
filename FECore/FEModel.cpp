@@ -446,6 +446,18 @@ bool FEModel::InitObjects()
 		FEMaterial* pm = GetMaterial(FC.id-1);
 		FC.id = pm->GetRigidBodyID(); assert(FC.id >= 0);
 	}
+	for (int i=0; i<(int) m_RBV.size(); ++i)
+	{
+		FERigidBodyVelocity& RV = *m_RBV[i];
+		FEMaterial* pm = GetMaterial(RV.id-1);
+		RV.id = pm->GetRigidBodyID(); assert(RV.id>=0);
+	}
+	for (int i=0; i<(int) m_RBW.size(); ++i)
+	{
+		FERigidBodyAngularVelocity& RW = *m_RBW[i];
+		FEMaterial* pm = GetMaterial(RW.id-1);
+		RW.id = pm->GetRigidBodyID(); assert(RW.id>=0);
+	}
 
 	return true;
 }
