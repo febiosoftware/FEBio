@@ -134,6 +134,7 @@ enum FE_Linear_Solver_Type {
 //
 enum FE_Step_Type {
 	FE_SOLID,
+	FE_SOLID2,
 	FE_BIPHASIC,
 	FE_HEAT,
 	FE_POROSOLUTE,

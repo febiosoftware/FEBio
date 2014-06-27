@@ -381,6 +381,9 @@
     <ClCompile Include="..\..\FEBioMech\FERigidSphericalJoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FESolidSolver2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h">
@@ -756,6 +759,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FERigidSphericalJoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FESolidSolver2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

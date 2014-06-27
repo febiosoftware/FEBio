@@ -323,6 +323,7 @@ FEAnalysis* FEFEBioImport::CreateNewStep()
 	switch (m_nstep_type)
 	{
 	case FE_SOLID         : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid"          , m_pfem); break;
+	case FE_SOLID2        : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid"         , m_pfem); break;
 	case FE_EXPLICIT_SOLID: pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "explicit-solid" , m_pfem); break;
 	case FE_LINEAR_SOLID  : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "linear-solid"   , m_pfem); break;
 	case FE_BIPHASIC      : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "biphasic"       , m_pfem); break;

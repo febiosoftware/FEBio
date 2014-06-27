@@ -11,6 +11,7 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 	const char* szt = tag.AttributeValue("type");
 
 	if      (strcmp(szt, "solid"         ) == 0) m_pim->m_nstep_type = FE_SOLID;
+	else if (strcmp(szt, "solid2"        ) == 0) m_pim->m_nstep_type = FE_SOLID2;
 	else if (strcmp(szt, "explicit-solid") == 0) m_pim->m_nstep_type = FE_EXPLICIT_SOLID;
 	else if (strcmp(szt, "linear solid"  ) == 0) m_pim->m_nstep_type = FE_LINEAR_SOLID; 
 	else if (strcmp(szt, "biphasic"      ) == 0) m_pim->m_nstep_type = FE_BIPHASIC;
