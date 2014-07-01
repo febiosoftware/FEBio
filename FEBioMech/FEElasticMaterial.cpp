@@ -3,11 +3,6 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-// Material parameters for FEElasticMaterial
-BEGIN_PARAMETER_LIST(FEElasticMaterial, FEMaterial)
-	ADD_PARAMETER(m_density, FE_PARAM_DOUBLE, "density");
-END_PARAMETER_LIST();
-
 //-----------------------------------------------------------------------------
 FEElasticMaterialPoint::FEElasticMaterialPoint()
 {
@@ -360,18 +355,4 @@ void FEElasticMaterial::Init()
 {
 	FEMaterial::Init();
 	if (m_density <= 0) throw MaterialError("Invalid material density");
-}
-
-//-----------------------------------------------------------------------------
-void FEElasticMaterial::Serialize(DumpFile& ar)
-{
-	FEMaterial::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_density;
-	}
-	else
-	{
-		ar >> m_density;
-	}
 }

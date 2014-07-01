@@ -22,4 +22,6 @@ public:
 
 protected:
 	double	m_density;	//!< material density
+
+	DECLARE_PARAMETER_LIST();
 };

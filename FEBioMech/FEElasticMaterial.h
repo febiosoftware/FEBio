@@ -67,9 +67,6 @@ public:
 	//! Initialization
 	void Init();
 
-	//! Serialization
-	void Serialize(DumpFile& ar);
-
 	//! create material point data for this material
 	virtual FEMaterialPoint* CreateMaterialPointData() { return new FEElasticMaterialPoint; }
 
@@ -81,6 +78,4 @@ public:
 
 public:
 	bool SetAttribute(const char* szatt, const char* szval);
-
-	DECLARE_PARAMETER_LIST();
 };
