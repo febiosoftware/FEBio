@@ -58,6 +58,9 @@ public:
 	// get a material parameter
 	FEParam* GetParameter(const ParamString& s);
 
+	//! data serialization
+	void Serialize(DumpFile& ar);
+
 public:
 	//! return number of properties
 	int Properties() { return (int) m_pMat.size(); }

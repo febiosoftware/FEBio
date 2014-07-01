@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEElasticMixture.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 FEElasticMixtureMaterialPoint::FEElasticMixtureMaterialPoint()
@@ -198,3 +199,35 @@ FEParam* FEElasticMixture::GetParameter(const ParamString& s)
 	// no match found
 	return 0;
 }
+//-----------------------------------------------------------------------------
+void FEElasticMixture::Serialize(DumpFile& ar)
+{
+	FEElasticMaterial::Serialize(ar);
+
+	if (ar.IsSaving())
+	{
+		int nMat = m_pMat.size();
+		ar << nMat;
+		for (int i=0; i<nMat; ++i)
+		{
+			ar << m_pMat[i]->GetTypeStr();
+			m_pMat[i]->Serialize(ar);
+		}
+	}
+	else
+	{
+		int nMat;
+		char sz[256] = {0};
+		ar >> nMat;
+		m_pMat.resize(nMat);
+		for (int i=0; i<nMat; ++i)
+		{
+			ar >> sz;
+			m_pMat[i] = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+			assert(m_pMat[i]);
+			m_pMat[i]->Serialize(ar);
+			m_pMat[i]->Init();
+		}
+	}
+}
+
