@@ -32,6 +32,9 @@ public:
 	//! calculate the interial forces (for dynamic problems)
 	virtual void InertialForces(FEGlobalVector& R, vector<double>& F) = 0;
 
+	//! calculate the interial forces (used by FESolidSolver2)
+	virtual void InertialForces2(FEGlobalVector& R, vector<double>& F) {}
+
 	// --- S T I F F N E S S   M A T R I X ---
 
 	//! Calculate global stiffness matrix (only contribution from internal force derivative)

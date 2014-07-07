@@ -39,6 +39,9 @@ public: // overrides from FEElasticDomain
 	//! intertial forces for dynamic problems
 	void InertialForces(FEGlobalVector& R, vector<double>& F);
 
+	//! intertial forces for dynamic problems (used by FESolidSolver2)
+	void InertialForces2(FEGlobalVector& R, vector<double>& F);
+
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);
 

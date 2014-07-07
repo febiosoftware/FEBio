@@ -10,6 +10,7 @@
 #include "FERigidPinJoint.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
+#include "FESolidSolver2.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidPinJoint, FENLConstraint);
@@ -165,7 +166,7 @@ void FERigidPinJoint::Residual(FEGlobalVector& R)
 void FERigidPinJoint::StiffnessMatrix(FESolver* psolver)
 {
     // get m_alpha from solver
-    m_alpha = psolver->m_alpha;
+    m_alpha = dynamic_cast<FESolidSolver2*>(psolver)->m_alpha;
     
 	int j, k;
     

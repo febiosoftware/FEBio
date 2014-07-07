@@ -767,8 +767,72 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-// Calculate inertial forces \todo Why is F no longer needed?
+// Calculate inertial forces
 void FEElasticSolidDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
+{
+	double d = m_pMat->Density();
+
+	// element mass matrix
+	matrix ke;
+
+	// element force vector
+	vector<double> fe;
+
+	// element's LM vector
+	vector<int> lm;
+
+	// loop over all elements
+	int NE = Elements();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = Element(iel);
+
+		int nint = el.GaussPoints();
+		int neln = el.Nodes();
+
+		ke.resize(3*neln, 3*neln);
+		ke.zero();
+
+		fe.resize(3*neln);
+		
+		// create the element mass matrix
+		for (int n=0; n<nint; ++n)
+		{
+			double J0 = detJ0(el, n)*el.GaussWeights()[n];
+
+			double* H = el.H(n);
+			for (int i=0; i<neln; ++i)
+				for (int j=0; j<neln; ++j)
+				{
+					double kab = H[i]*H[j]*J0*d;
+					ke[3*i  ][3*j  ] += kab;
+					ke[3*i+1][3*j+1] += kab;
+					ke[3*i+2][3*j+2] += kab;
+				}	
+		}
+
+		// now, multiply M with F and add to R
+		int* en = &el.m_node[0];
+		for (int i=0; i<3*neln; ++i)
+		{
+			fe[i] = 0;
+			for (int j=0; j<3*neln; ++j)
+			{
+				fe[i] -= ke[i][j]*F[3*(en[j/3]) + j%3];
+			}
+		}
+
+		// get the element degrees of freedom
+		UnpackLM(el, lm);
+
+		// assemble fe into R
+		R.Assemble(el.m_node, lm, fe);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Calculate inertial forces \todo Why is F no longer needed?
+void FEElasticSolidDomain::InertialForces2(FEGlobalVector& R, vector<double>& F)
 {
 	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(GetMaterial()); assert(pme);
 	double d = pme->Density();

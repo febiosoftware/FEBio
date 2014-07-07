@@ -35,9 +35,6 @@ public:
 	//! reset object data
 	virtual void Reset() = 0;
 
-	//! update solution
-	virtual void Update(std::vector<double>& Ui, std::vector<double>& ui) = 0;
-	
 	//! get the material ID
 	virtual int GetMaterialID() { assert(false); return -1; }
 

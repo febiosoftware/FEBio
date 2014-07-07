@@ -6,7 +6,7 @@
 #include "FECore/FERigidBody.h"
 
 //-----------------------------------------------------------------------------
-//! The FESolidSolver class solves large deformation solid mechanics problems
+//! The FESolidSolver2 class solves large deformation solid mechanics problems
 //! It can deal with quasi-static and dynamic problems
 //! 
 class FESolidSolver2 : public FESolver
@@ -152,6 +152,11 @@ public:
 	// matrix reshape flag
 	bool	m_breshape;		//!< Matrix reshape flag
 
+    // Newmark parameters (for dynamic analyses)
+	double	m_alpha;		//!< Newmark parameter alpha (force integration)
+	double	m_beta;			//!< Newmark parameter beta (displacement integration)
+	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
+    
 public:
 	LinearSolver*		m_plinsolve;	//!< the linear solver
 

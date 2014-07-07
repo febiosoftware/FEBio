@@ -43,12 +43,6 @@ public:
 	//! initialize data
 	void Init();
 
-	//! update solution
-	void Update(std::vector<double>& Ui, std::vector<double>& ui);
-
-	//! update increment
-	void UpdateIncrement(std::vector<double>& Ui, std::vector<double>& ui, bool emap);
-    
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
 

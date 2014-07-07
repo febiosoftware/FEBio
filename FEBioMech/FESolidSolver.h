@@ -3,7 +3,6 @@
 #include "FECore/FESolver.h"
 #include "FEStiffnessMatrix.h"
 #include "FECore/FETypes.h"
-#include "FECore/FERigidBody.h"
 
 //-----------------------------------------------------------------------------
 //! The FESolidSolver class solves large deformation solid mechanics problems
@@ -63,9 +62,9 @@ public:
 		//! update nodal positions, velocities, accelerations, etc.
 		virtual void UpdateKinematics(vector<double>& ui);
 
-    //! update DOF increments
-        virtual void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
-    
+		//! update rigid body kinematics for dynamic problems
+		void UpdateRigidKinematics();
+
 		//! Update Stresses
 		void UpdateStresses();
 
@@ -123,15 +122,6 @@ public:
 		void NonLinearConstraintForces(FEGlobalVector& R);
 	//}
 
-	//{ --- Rigid body routines ---
-
-		//! calculate rigid body mass matrix
-		void RigidMassMatrix(FERigidBody& RB);
-
-		//! calculate rigid inertial forces
-		void RigidInertialForces(FERigidBody& RB, FEGlobalVector& R);
-	//}
-
 public:
 	// convergence tolerances
 	double	m_Rtol;			//!< residual tolerance
@@ -141,6 +131,10 @@ public:
 
 	// equation numbers
 	int		m_nreq;			//!< start of rigid body equations
+
+	// Newmark parameters (for dynamic analyses)
+	double	m_beta;			//!< Newmark parameter beta (displacement integration)
+	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
 
 public:
 	vector<double> m_Fn;	//!< concentrated nodal force vector
