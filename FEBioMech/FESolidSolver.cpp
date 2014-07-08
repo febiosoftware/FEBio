@@ -41,6 +41,7 @@ BEGIN_PARAMETER_LIST(FESolidSolver, FESolver)
 	ADD_PARAMETER(m_bfgs.m_cmax  , FE_PARAM_DOUBLE, "cmax"        );
 	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
 	ADD_PARAMETER(m_gamma        , FE_PARAM_DOUBLE, "gamma"       );
+	ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -61,6 +62,7 @@ FESolidSolver::FESolidSolver(FEModel* pfem) : FESolver(pfem)
 	m_neq = 0;
 	m_plinsolve = 0;
 
+	m_bdivreform = true;
 
 	// default Newmark parameters for unconditionally stable time integration
 	m_beta = 0.25;
@@ -1273,7 +1275,7 @@ bool FESolidSolver::Quasin(double time)
 				felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
 				breform = true;
 			}
-			else if (normE1 > normEm)
+			else if ((normE1 > normEm) && m_bdivreform)
 			{
 				// check for diverging
 				felog.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
