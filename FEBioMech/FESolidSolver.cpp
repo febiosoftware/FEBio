@@ -42,6 +42,7 @@ BEGIN_PARAMETER_LIST(FESolidSolver, FESolver)
 	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
 	ADD_PARAMETER(m_gamma        , FE_PARAM_DOUBLE, "gamma"       );
 	ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
+	ADD_PARAMETER(m_bdoreforms   , FE_PARAM_BOOL  , "do_reforms"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -63,6 +64,7 @@ FESolidSolver::FESolidSolver(FEModel* pfem) : FESolver(pfem)
 	m_plinsolve = 0;
 
 	m_bdivreform = true;
+	m_bdoreforms = true;
 
 	// default Newmark parameters for unconditionally stable time integration
 	m_beta = 0.25;
@@ -1162,8 +1164,7 @@ bool FESolidSolver::Quasin(double time)
 	felog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
 
 	// set the initial step length estimates to 1.0
-	double s, olds, oldolds;  // line search step lengths from the current iteration and the two previous ones
-	s=1; olds=1; oldolds=1;
+	double s = 1.0;
 
 	// loop until converged or when max nr of reformations reached
 	do
@@ -1322,7 +1323,7 @@ bool FESolidSolver::Quasin(double time)
 			zero(m_bfgs.m_ui);
 
 			// reform stiffness matrices if necessary
-			if (breform)
+			if (breform && m_bdoreforms)
 			{
 				felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 
