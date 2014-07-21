@@ -253,6 +253,8 @@
 		D5E108571865DFAD00B23922 /* gauss.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E107711865DFAD00B23922 /* gauss.h */; };
 		D5E108581865DFAD00B23922 /* geodesic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E107721865DFAD00B23922 /* geodesic.h */; };
 		D5E108591865DFAD00B23922 /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E107731865DFAD00B23922 /* stdafx.h */; };
+		D5F407CB197D7DDE0059F0B1 /* FESolidSolver2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F407C9197D7DDE0059F0B1 /* FESolidSolver2.cpp */; };
+		D5F407CC197D7DDE0059F0B1 /* FESolidSolver2.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F407CA197D7DDE0059F0B1 /* FESolidSolver2.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -503,6 +505,8 @@
 		D5E107711865DFAD00B23922 /* gauss.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gauss.h; sourceTree = "<group>"; };
 		D5E107721865DFAD00B23922 /* geodesic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = geodesic.h; sourceTree = "<group>"; };
 		D5E107731865DFAD00B23922 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
+		D5F407C9197D7DDE0059F0B1 /* FESolidSolver2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolidSolver2.cpp; sourceTree = "<group>"; };
+		D5F407CA197D7DDE0059F0B1 /* FESolidSolver2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolidSolver2.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -728,6 +732,8 @@
 				D5E107401865DFAD00B23922 /* FESolidMaterial.h */,
 				D5E107411865DFAD00B23922 /* FESolidSolver.cpp */,
 				D5E107421865DFAD00B23922 /* FESolidSolver.h */,
+				D5F407C9197D7DDE0059F0B1 /* FESolidSolver2.cpp */,
+				D5F407CA197D7DDE0059F0B1 /* FESolidSolver2.h */,
 				D5E107431865DFAD00B23922 /* FESphericalFiberDistribution.cpp */,
 				D5E107441865DFAD00B23922 /* FESphericalFiberDistribution.h */,
 				D5E107451865DFAD00B23922 /* FESpringMaterial.cpp */,
@@ -876,6 +882,7 @@
 				D5E107B81865DFAD00B23922 /* FEElasticSolidDomain.h in Headers */,
 				D5E1083E1865DFAD00B23922 /* FETransIsoMooneyRivlin.h in Headers */,
 				D5E108241865DFAD00B23922 /* FESolidDomainFactory.h in Headers */,
+				D5F407CC197D7DDE0059F0B1 /* FESolidSolver2.h in Headers */,
 				D5E1077F1865DFAD00B23922 /* FEAugLagLinearConstraint.h in Headers */,
 				D5E107D01865DFAD00B23922 /* FEFiberIntegrationTrapezoidal.h in Headers */,
 				D5E1080E1865DFAD00B23922 /* FERemodelingElasticMaterial.h in Headers */,
@@ -972,6 +979,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5F407CB197D7DDE0059F0B1 /* FESolidSolver2.cpp in Sources */,
 				D5B572E1186CD45900D12E45 /* FERemodelingElasticDomain.cpp in Sources */,
 				D5E107F31865DFAD00B23922 /* FEMRVonMisesFibers.cpp in Sources */,
 				D5E107EB1865DFAD00B23922 /* FELinearSolidSolver.cpp in Sources */,
