@@ -977,7 +977,7 @@ void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const F
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
     
-    #pragma omp parallel
+//    #pragma omp parallel
 	for (int iel=0; iel<NE; ++iel)
 	{
 		// element stiffness matrix
@@ -1001,7 +1001,7 @@ void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const F
 		// have to create a new lm array and place the equation numbers in the right order.
 		// What we really ought to do is fix the UnpackLM function so that it returns
 		// the LM vector in the right order for solute-solid elements.
-        #pragma omp critical
+//        #pragma omp critical
         {
             vector<int> lm(ndof);
             int isol;
@@ -1031,7 +1031,7 @@ void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
     
-    #pragma omp parallel
+//    #pragma omp parallel
 	for (int iel=0; iel<NE; ++iel)
 	{
 		// element stiffness matrix
@@ -1055,7 +1055,7 @@ void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const
 		// have to create a new lm array and place the equation numbers in the right order.
 		// What we really ought to do is fix the UnpackLM function so that it returns
 		// the LM vector in the right order for solute-solid elements.
-        #pragma omp critical
+//        #pragma omp critical
         {
             vector<int> lm(ndof);
             int isol;
