@@ -179,7 +179,7 @@ void FEBiphasicSolidDomain::Reset()
 void FEBiphasicSolidDomain::InternalForces(FEGlobalVector& R)
 {
 	int NE = m_Elem.size();
-	#pragma omp parallel for
+	#pragma omp parallel for shared (NE)
 	for (int i=0; i<NE; ++i)
 	{
 		// element force vector

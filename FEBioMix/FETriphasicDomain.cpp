@@ -249,7 +249,7 @@ void FETriphasicDomain::InitElements()
 void FETriphasicDomain::InternalForces(FEGlobalVector& R)
 {
 	int NE = m_Elem.size();
-	#pragma omp parallel for
+	#pragma omp parallel for shared (NE)
 	for (int i=0; i<NE; ++i)
 	{
 		// element force vector
