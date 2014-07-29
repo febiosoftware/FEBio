@@ -41,6 +41,8 @@ END_PARAMETER_LIST();
 FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver(pfem)
 {
 	m_Ctol = 0.01;
+    
+	m_bsymm = false; // assume non-symmetric stiffness matrix by default
 
     // get number of DOFS
     DOFS& fedofs = *DOFS::GetInstance();

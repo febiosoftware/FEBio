@@ -36,6 +36,8 @@ FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel* pfem) : FEBiphasicSolver
 {
 	m_Ctol = 0.01;
     
+	m_bsymm = false; // assume non-symmetric stiffness matrix by default
+    
     // get number of DOFS
     DOFS& fedofs = *DOFS::GetInstance();
     int MAX_CDOFS = fedofs.GetCDOFS();
