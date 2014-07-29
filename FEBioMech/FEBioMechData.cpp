@@ -569,6 +569,384 @@ double FELogElemDeformationGradientZZ::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogElemElasticityXXXX::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[0];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityXXYY::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[1];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityYYYY::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[2];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityXXZZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[3];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityYYZZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[4];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityZZZZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[5];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityXXXY::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[6];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityYYXY::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[7];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityZZXY::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[8];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityXYXY::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[9];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityXXYZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[10];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityYYYZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[11];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityZZYZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[12];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityXYYZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[13];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityYZYZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[14];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityXXXZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[15];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityYYXZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[16];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityZZXZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[17];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityXYXZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[18];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityYZXZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[19];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElasticityXZXZ::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    tens4ds c;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        c = pme->Tangent(pt);
+		val += c.d[20];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
 double FELogRigidBodyR11::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,0)); }
 double FELogRigidBodyR12::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,1)); }
 double FELogRigidBodyR13::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,2)); }
