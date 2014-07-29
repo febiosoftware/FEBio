@@ -139,6 +139,69 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="Release - OMP|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				OpenMP="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -381,10 +444,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioMech\FEInSituStretch.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioMech\FEIsotropicElastic.cpp"
 				>
 			</File>
@@ -465,14 +524,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioMech\FEPreStrainElastic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioMech\FEPreStrainTransIsoMR.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioMech\FEPRLig.cpp"
 				>
 			</File>
@@ -497,11 +548,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FERigidPinJoint.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FERigidShellDomain.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FERigidSolidDomain.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FERigidSphericalJoint.cpp"
 				>
 			</File>
 			<File
@@ -534,6 +593,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FESolidSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FESolidSolver2.cpp"
 				>
 			</File>
 			<File
@@ -711,11 +774,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FECoupledMooneyRivlin.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FECoupledTransIsoMooneyRivlin.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FECoupledTransIsoVerondaWestmann.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FECoupledVerondaWestmann.h"
 				>
 			</File>
 			<File
@@ -871,10 +942,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioMech\FEInSituStretch.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioMech\FEIsotropicElastic.h"
 				>
 			</File>
@@ -955,14 +1022,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioMech\FEPreStrainElastic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioMech\FEPreStrainTransIsoMR.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioMech\FEPRLig.h"
 				>
 			</File>
@@ -987,11 +1046,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FERigidPinJoint.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FERigidShellDomain.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FERigidSolidDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FERigidSphericalJoint.h"
 				>
 			</File>
 			<File
@@ -1024,6 +1091,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FESolidSolver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FESolidSolver2.h"
 				>
 			</File>
 			<File
