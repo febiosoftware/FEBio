@@ -41,7 +41,57 @@ at http://mrlforums.sci.utah.edu/forums/.
 
 ===========================================================================
 
- R E L E A S E   2.0  5/2/2013
+ R E L E A S E   2.1  7/30/2014
+
+===========================================================================
+
+1. FEATURE: Rotation Matrix
+---------------------------
+Added method for calculating rotation matrix from quaternion. Added support for exporting rigid body rotation matrix to log file.
+
+2. FEATURE: Coupled Materials
+-----------------------------
+Added coupled Mooney-Rivlin and coupled Veronda-Westmann materials. Fixed problem with coupled trans-iso material.
+
+3. FEATURE: Newmark Integration
+-------------------------------
+Implemented general Newmark integration for dynamic analyses.
+
+4. FEATURE: Plugin Error Code
+-----------------------------
+FEBioPlugin::Load now returns an error code that can be used to identify if and why the plugin failed to load.
+
+5. FEATURE: Plotfile Compression
+--------------------------------
+Implemented compression for plot files.
+
+6. FEATURE: New Prompt Paradigm
+-------------------------------
+Given no command line arguments, return to prompt after run/error.
+
+7. FEATURE: Rigid Body Dynamics
+-------------------------------
+Implemented rigid body dynamics, using Puso 2002 and Simo and Wong 1991 algorithms.  Modified update of rotation degrees of freedom to use Cayley transform.
+
+8. FEATURE: Euler Angles
+------------------------
+Added function to calculate Euler angles from quaternion. Added Euler angle plot variable which plots Euler angles for rigid bodies.
+
+9. BUG FIX: Rigid Joint
+-----------------------
+Fixed bug in rigid joint force and stiffness. 
+
+10. BUG FIX: OpenMP
+------------------
+Fixed several openmp directives. 
+
+11. BUG FIX: Serialization
+--------------------------
+Fixed serialization in viscoelastic material and FEElasticMixture. 
+
+===========================================================================
+
+ R E L E A S E   2.0  5/2/2014
 
 ===========================================================================
 
