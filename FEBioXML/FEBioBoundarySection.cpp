@@ -231,12 +231,13 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 			if (isdigit(ci))
 			{
 				int i = (ci - '0');
-				bc.push_back(DOF_C + i);
+				bc.push_back(DOF_C + i - 1);
+				++ch;
 			}
 			else bc.push_back(DOF_C);
 		}
 		else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
-		++ch;
+		if (*ch) ++ch;
 	}
 	if (bc.empty()) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 	int nbc = bc.size();
