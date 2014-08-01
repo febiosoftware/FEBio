@@ -13,7 +13,7 @@ INTEL_INC = $(INTELROOT)/compiler/include
 INTEL_LIB = $(INTELROOT)/compiler/lib/
 MKL_PATH = $(MKLROOT)/lib/
 MKL_LIB = $(MKL_PATH)libmkl_intel_lp64.a $(MKL_PATH)libmkl_intel_thread.a $(MKL_PATH)libmkl_core.a \
-	$(MKL_PATH)libmkl_pgi_thread.a $(INTEL_LIB)libiomp5.a
+	$(INTEL_LIB)libiomp5.a
 
 #Levmar library
 LEV_LIB = -llevmar_$(PLAT)
