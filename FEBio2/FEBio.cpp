@@ -347,6 +347,17 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		}
 	}
 
+	// do some sanity checks
+	if (strcmp(ops.sztask, "optimize") == 0)
+	{
+		// make sure we have an input file
+		if (ops.szfile[0]==0)
+		{
+			fprintf(stderr, "FATAL ERROR: no model input file was defined (use -i to define the model input file)\n\n");
+			return false;
+		}
+	}
+
 	// if no task is defined, we assume a std solve is wanted
 	if (ops.sztask[0] == 0) strcpy(ops.sztask, "solve");
 
