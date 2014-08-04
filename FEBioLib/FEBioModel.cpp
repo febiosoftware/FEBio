@@ -1090,6 +1090,13 @@ bool FEBioModel::Init()
 			return false;
 		}
 
+		// make sure we have a step
+		if (m_pStep == 0)
+		{
+			felog.printf("FATAL ERROR: No step defined\n\n");
+			return false;
+		}
+
 		// if we don't want to output anything we only output to the logfile
 		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) felog.SetMode(Logfile::FILE_ONLY);
 
