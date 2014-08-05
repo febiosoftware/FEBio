@@ -7,6 +7,7 @@
 //
 
 #include "FEFiberIntegrationTrapezoidal.h"
+#include "FEContinuousFiberDistribution.h"
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -35,6 +36,7 @@ void FEFiberIntegrationTrapezoidal::Init()
 mat3ds FEFiberIntegrationTrapezoidal::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
 	
     // initialize stress tensor
 	mat3ds s;
@@ -45,7 +47,7 @@ mat3ds FEFiberIntegrationTrapezoidal::Stress(FEMaterialPoint& mp)
     double dth = pi/m_nth;  // integrate from 0 to pi
     
     // get the element's local coordinate system
-	mat3d Q = pt.m_Q;
+	mat3d Q = pcfd->LocalMatAxes()*pt.m_Q;
     vec3d a0(Q(0,0),Q(1,0),Q(2,0)); // local x-direction unit vector
     vec3d a1(Q(0,1),Q(1,1),Q(2,1)); // local y-direction unit vector
     
@@ -62,7 +64,7 @@ mat3ds FEFiberIntegrationTrapezoidal::Stress(FEMaterialPoint& mp)
         
         // rotate to global configuration to set fiber direction
         n0e = Q*n0a;
-        m_pFmat->SetFiberDirection(n0e);
+        m_pFmat->SetFiberDirection(mp, n0e);
         
         // calculate the stress
         s += m_pFmat->Stress(mp)*(R*dth);
@@ -76,6 +78,7 @@ mat3ds FEFiberIntegrationTrapezoidal::Stress(FEMaterialPoint& mp)
 tens4ds FEFiberIntegrationTrapezoidal::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
 	
     // initialize stress tensor
 	tens4ds c;
@@ -86,7 +89,7 @@ tens4ds FEFiberIntegrationTrapezoidal::Tangent(FEMaterialPoint& mp)
     double dth = pi/m_nth;  // integrate from 0 to pi
     
     // get the element's local coordinate system
-	mat3d Q = pt.m_Q;
+	mat3d Q = pcfd->LocalMatAxes()*pt.m_Q;
     vec3d a0(Q(0,0),Q(1,0),Q(2,0)); // local x-direction unit vector
     vec3d a1(Q(0,1),Q(1,1),Q(2,1)); // local y-direction unit vector
     
@@ -103,7 +106,7 @@ tens4ds FEFiberIntegrationTrapezoidal::Tangent(FEMaterialPoint& mp)
         
         // rotate to global configuration to set fiber direction
         n0e = Q*n0a;
-        m_pFmat->SetFiberDirection(n0e);
+        m_pFmat->SetFiberDirection(mp, n0e);
         
         // calculate the stress
         c += m_pFmat->Tangent(mp)*(R*dth);

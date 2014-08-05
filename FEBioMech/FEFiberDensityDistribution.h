@@ -110,7 +110,7 @@ public:
 };
 
 //---------------------------------------------------------------------------
-// 2D axisymmetric von Mises fiber density distribution
+// 2D planar von Mises fiber density distribution
 //
 class FEVonMises2DFiberDensityDistribution : public FEFiberDensityDistribution
 {

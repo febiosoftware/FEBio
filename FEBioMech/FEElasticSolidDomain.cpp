@@ -86,7 +86,7 @@ void FEElasticSolidDomain::InitElements()
 void FEElasticSolidDomain::InternalForces(FEGlobalVector& R)
 {
 	int NE = m_Elem.size();
-	#pragma omp parallel for
+	#pragma omp parallel for shared (NE)
 	for (int i=0; i<NE; ++i)
 	{
 		// element force vector
@@ -503,7 +503,7 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 	// repeat over all solid elements
 	int NE = m_Elem.size();
 	
-	#pragma omp parallel for
+	#pragma omp parallel for shared (NE)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		// element stiffness matrix

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEEllipsoidalFiberDistribution.h"
+#include "FEContinuousFiberDistribution.h"
 
 // The following file contains the integration points and weights
 // for the integration over a unit sphere in spherical coordinates
@@ -354,13 +355,14 @@ void FEEllipsoidalFiberDistributionOld::Init()
 mat3ds FEEllipsoidalFiberDistributionOld::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
+	
+	// get the element's local coordinate system
+	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
 	
 	// deformation gradient
 	mat3d &F = pt.m_F;
 	double J = pt.m_J;
-
-	// get the element's local coordinate system
-	mat3d QT = (pt.m_Q).transpose();
 
 	// loop over all integration points
 	double ksi, beta;
@@ -414,13 +416,14 @@ mat3ds FEEllipsoidalFiberDistributionOld::Stress(FEMaterialPoint& mp)
 tens4ds FEEllipsoidalFiberDistributionOld::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
+	
+	// get the element's local coordinate system
+	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
 	
 	// deformation gradient
 	mat3d &F = pt.m_F;
 	double J = pt.m_J;
-
-	// get the element's local coordinate system
-	mat3d QT = (pt.m_Q).transpose();
 
 	// loop over all integration points
 	double ksi, beta;

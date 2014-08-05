@@ -1,4 +1,5 @@
 #include "FEElasticFiberMaterial.h"
+#include "FEFiberMaterialPoint.h"
 
 //-----------------------------------------------------------------------------
 // FEFiberExponentialPower
@@ -21,9 +22,16 @@ void FEFiberExponentialPower::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEElasticFiberMaterial::SetFiberDirection(FEMaterialPoint& mp, const vec3d n0)
+{
+    FEFiberMaterialPoint& pf = *mp.ExtractData<FEFiberMaterialPoint>();
+    pf.m_n0 = n0;
+}
+//-----------------------------------------------------------------------------
 mat3ds FEFiberExponentialPower::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEFiberMaterialPoint& pf = *mp.ExtractData<FEFiberMaterialPoint>();
 	
 	// deformation gradient
 	mat3d &F = pt.m_F;
@@ -37,7 +45,7 @@ mat3ds FEFiberExponentialPower::Stress(FEMaterialPoint& mp)
 	mat3ds s;
 	
 	// fiber direction in global coordinate system
-	n0 = m_n0;
+	n0 = pf.m_n0;
 	
 	// Calculate In = n0*C*n0
 	In_1 = n0*(C*n0) - 1.0;
@@ -69,6 +77,7 @@ mat3ds FEFiberExponentialPower::Stress(FEMaterialPoint& mp)
 tens4ds FEFiberExponentialPower::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEFiberMaterialPoint& pf = *mp.ExtractData<FEFiberMaterialPoint>();
 	
 	// deformation gradient
 	mat3d &F = pt.m_F;
@@ -81,7 +90,7 @@ tens4ds FEFiberExponentialPower::Tangent(FEMaterialPoint& mp)
 	tens4ds c;
 	
 	// fiber direction in global coordinate system
-	n0 = m_n0;
+	n0 = pf.m_n0;
 	
 	// Calculate In = n0*C*n0
 	In_1 = n0*(C*n0) - 1.0;
@@ -131,6 +140,7 @@ void FEFiberNH::Init()
 mat3ds FEFiberNH::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEFiberMaterialPoint& pf = *mp.ExtractData<FEFiberMaterialPoint>();
 	
 	// deformation gradient
 	mat3d &F = pt.m_F;
@@ -144,7 +154,7 @@ mat3ds FEFiberNH::Stress(FEMaterialPoint& mp)
 	mat3ds s;
 	
 	// fiber direction in global coordinate system
-	n0 = m_n0;
+	n0 = pf.m_n0;
 	
 	// Calculate In = n0*C*n0
 	In_1 = n0*(C*n0) - 1.0;
@@ -173,6 +183,7 @@ mat3ds FEFiberNH::Stress(FEMaterialPoint& mp)
 tens4ds FEFiberNH::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEFiberMaterialPoint& pf = *mp.ExtractData<FEFiberMaterialPoint>();
 	
 	// deformation gradient
 	mat3d &F = pt.m_F;
@@ -186,7 +197,7 @@ tens4ds FEFiberNH::Tangent(FEMaterialPoint& mp)
 	tens4ds c;
 	
 	// fiber direction in global coordinate system
-	n0 = m_n0;
+	n0 = pf.m_n0;
 	
 	// Calculate In = n0*C*n0
 	In_1 = n0*(C*n0) - 1.0;

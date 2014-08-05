@@ -7,6 +7,7 @@
 //
 
 #include "FEFiberIntegrationGeodesic.h"
+#include "FEContinuousFiberDistribution.h"
 #include "geodesic.h"
 
 #ifndef SQR
@@ -64,9 +65,10 @@ void FEFiberIntegrationGeodesic::Init()
 mat3ds FEFiberIntegrationGeodesic::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pt.m_Q).transpose();
+	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
     
 	// loop over all integration points
 	double R;
@@ -80,7 +82,7 @@ mat3ds FEFiberIntegrationGeodesic::Stress(FEMaterialPoint& mp)
 		n0e.x = m_cth[n]*m_sph[n];
 		n0e.y = m_sth[n]*m_sph[n];
 		n0e.z = m_cph[n];
-        m_pFmat->SetFiberDirection(n0e);
+        m_pFmat->SetFiberDirection(mp, n0e);
         
         // get the local material fiber direction in reference configuration
         n0a = QT*n0e;
@@ -97,9 +99,10 @@ mat3ds FEFiberIntegrationGeodesic::Stress(FEMaterialPoint& mp)
 tens4ds FEFiberIntegrationGeodesic::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pt.m_Q).transpose();
+	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
     
 	// loop over all integration points
 	double R;
@@ -113,7 +116,7 @@ tens4ds FEFiberIntegrationGeodesic::Tangent(FEMaterialPoint& mp)
 		n0e.x = m_cth[n]*m_sph[n];
 		n0e.y = m_sth[n]*m_sph[n];
 		n0e.z = m_cph[n];
-        m_pFmat->SetFiberDirection(n0e);
+        m_pFmat->SetFiberDirection(mp, n0e);
         
         // get the local material fiber direction in reference configuration
         n0a = QT*n0e;

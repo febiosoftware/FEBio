@@ -12,7 +12,6 @@
 #include "FEDamageTransIsoMooneyRivlin.h"
 #include "FESpringMaterial.h"
 #include "FEDonnanEquilibrium.h"
-#include "FEEFD.h"
 #include "FEEFDDonnanEquilibrium.h"
 #include "FEEFDMooneyRivlin.h"
 #include "FEEFDNeoHookean.h"
@@ -64,6 +63,8 @@
 #include "FEFiberIntegrationGauss.h"
 #include "FEFiberIntegrationTrapezoidal.h"
 #include "FEFiberIntegrationGeodesic.h"
+#include "FEFiberIntegrationGaussKronrod.h"
+#include "FEFiberIntegrationTriangle.h"
 #include "FECoupledTransIsoMooneyRivlin.h"
 #include "FECoupledTransIsoVerondaWestmann.h"
 #include "FEMicroMaterial.h"
@@ -140,7 +141,6 @@ REGISTER_FECORE_CLASS(FEDamageMooneyRivlin           ,FEMATERIAL_ID, "damage Moo
 REGISTER_FECORE_CLASS(FEDamageNeoHookean             ,FEMATERIAL_ID, "damage neo-Hookean"            );
 REGISTER_FECORE_CLASS(FEDamageTransIsoMooneyRivlin   ,FEMATERIAL_ID, "damage trans iso Mooney-Rivlin");
 REGISTER_FECORE_CLASS(FEDonnanEquilibrium            ,FEMATERIAL_ID, "Donnan equilibrium"            );
-REGISTER_FECORE_CLASS(FEEFD                          ,FEMATERIAL_ID, "EFD"                           );
 REGISTER_FECORE_CLASS(FEEFDDonnanEquilibrium         ,FEMATERIAL_ID, "EFD Donnan equilibrium"        );
 REGISTER_FECORE_CLASS(FEEFDMooneyRivlin              ,FEMATERIAL_ID, "EFD Mooney-Rivlin"             );
 //REGISTER_FECORE_CLASS(FEEFDNeoHookean                ,FEMATERIAL_ID, "EFD neo-Hookean"               );
@@ -202,8 +202,10 @@ REGISTER_FECORE_CLASS(FEEllipticalFiberDensityDistribution , FEMATERIAL_ID, "ell
 REGISTER_FECORE_CLASS(FEVonMises2DFiberDensityDistribution , FEMATERIAL_ID, "von-Mises-2d");
 REGISTER_FECORE_CLASS(FEContinuousFiberDistribution        , FEMATERIAL_ID, "continuous fiber distribution");
 REGISTER_FECORE_CLASS(FEFiberIntegrationGauss              , FEMATERIAL_ID, "fibers-3d-gauss");
-REGISTER_FECORE_CLASS(FEFiberIntegrationTrapezoidal        , FEMATERIAL_ID, "fibers-2d-trapezoidal");
 REGISTER_FECORE_CLASS(FEFiberIntegrationGeodesic           , FEMATERIAL_ID, "fibers-3d-geodesic");
+REGISTER_FECORE_CLASS(FEFiberIntegrationGaussKronrod       , FEMATERIAL_ID, "fibers-3d-gkt");
+REGISTER_FECORE_CLASS(FEFiberIntegrationTriangle           , FEMATERIAL_ID, "fibers-3d-triangle");
+REGISTER_FECORE_CLASS(FEFiberIntegrationTrapezoidal        , FEMATERIAL_ID, "fibers-2d-trapezoidal");
 REGISTER_FECORE_CLASS(FECoupledTransIsoVerondaWestmann     , FEMATERIAL_ID, "coupled trans-iso Veronda-Westmann");
 REGISTER_FECORE_CLASS(FECoupledTransIsoMooneyRivlin        , FEMATERIAL_ID, "coupled trans-iso Mooney-Rivlin");
 REGISTER_FECORE_CLASS(FEMicroMaterial                      , FEMATERIAL_ID, "micro-material");

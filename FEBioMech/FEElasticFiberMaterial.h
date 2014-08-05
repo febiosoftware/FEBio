@@ -16,10 +16,7 @@ class FEElasticFiberMaterial : public FEElasticMaterial
 public:
     FEElasticFiberMaterial(FEModel* pfem) : FEElasticMaterial(pfem) {}
     
-    void SetFiberDirection(const vec3d n0) { m_n0 = n0; }
-    
-protected:
-    vec3d   m_n0;    //!< fiber direction, reference configuration, global CS
+    void SetFiberDirection(FEMaterialPoint& mp, const vec3d n0);
 };
 
 //-----------------------------------------------------------------------------
