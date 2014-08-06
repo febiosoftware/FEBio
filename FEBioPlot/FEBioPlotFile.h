@@ -11,6 +11,10 @@ using namespace std;
 //-----------------------------------------------------------------------------
 // VERSION INFO
 //==============
+// -0.4: fixed bug with the PLT_MAX_FACET_NODES: Previous version was writing the 
+//       surface facets using a buffer of with PLT_MAX_FACET_NODES+2, but was only
+//       writing PLT_MAX_FACET_NODES entries, essentially cutting of two nodes for 
+//       eight node facets.
 // -0.3: added PLT_HDR_COMPRESSION flag and compression for state data
 // -0.2: increased max surface nodes to 8 to accomodate tri6 and quad8 facets.
 //       facets store nr of nodes for each face PLT_FACE
@@ -24,7 +28,7 @@ class FEBioPlotFile : public PlotFile
 {
 public:
 	// file version
-	enum { PLT_VERSION = 0x0003 };
+	enum { PLT_VERSION = 0x0004 };
 
 	// max nodes per facet
 	enum { PLT_MAX_FACET_NODES = 8 };

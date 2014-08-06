@@ -607,7 +607,7 @@ void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 					n[0] = i+1;
 					n[1] = nf;
 					for (int i=0; i<nf; ++i) n[i+2] = f.m_node[i];
-					m_ar.WriteChunk(PLT_FACE, n, FEBioPlotFile::PLT_MAX_FACET_NODES);
+					m_ar.WriteChunk(PLT_FACE, n, FEBioPlotFile::PLT_MAX_FACET_NODES+2);
 				}
 			}
 			m_ar.EndChunk();

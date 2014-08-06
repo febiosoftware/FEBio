@@ -1225,13 +1225,6 @@ void FETri3G3::project_to_nodes(double* ai, double* ao)
 	}
 }
 
-//-----------------------------------------------------------------------------
-//! \todo implement this
-void FEQuad8G9::project_to_nodes(double* ai, double* ao)
-{
-	
-}
-
 //=============================================================================
 //                          F E T R I N I
 //=============================================================================
@@ -1604,7 +1597,7 @@ void FEQuad8_::shape_deriv2(double* Grr, double* Grs, double* Gss, double r, dou
 }
 
 //=============================================================================
-//       F E Q U A D 8 G 7
+//       F E Q U A D 8 G 9
 //=============================================================================
 
 FEQuad8G9::FEQuad8G9() : FEQuad8_(NINT, FE_QUAD8G9)
@@ -1624,6 +1617,30 @@ FEQuad8G9::FEQuad8G9() : FEQuad8_(NINT, FE_QUAD8G9)
 	gr[ 7] =  0; gs[ 7] =  a;  gw[ 7] = w2;
 	gr[ 8] =  a; gs[ 8] =  a;  gw[ 8] = w1;
 	init();
+
+	// we need Ai to project integration point data to the nodes
+	matrix A(NELN,NELN);
+	Ai.resize(NELN,NELN);
+	A = H.transpose()*H;
+	Ai = A.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! \todo implement this
+void FEQuad8G9::project_to_nodes(double* ai, double* ao)
+{
+	vector<double> b(NELN);
+	for (int i=0; i<NELN; ++i) 
+	{
+		b[i] = 0;
+		for (int j=0; j<NINT; ++j) b[i] += H[j][i]*ai[j];
+	}
+
+	for (int i=0; i<NELN; ++i) 
+	{
+		ao[i] = 0;
+		for (int j=0; j<NELN; ++j) ao[i] += Ai[i][j]*b[j];
+	}
 }
 
 //=============================================================================

@@ -1159,6 +1159,95 @@ bool FESurface::IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& 
 	return false;
 }
 
+
+//-----------------------------------------------------------------------------
+//! This function calculates the intersection of a ray with a quad
+//! and returns true if the ray intersected.
+//!
+bool FESurface::IntersectQuad8(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
+{
+	mat3d A;
+	vec3d dx;
+	vec3d F, F1, F2, F3;
+	double H[8], H1[8], H2[8];
+
+	double l1 = 0;
+	double l2 = 0;
+	double l3 = 0;
+		
+	int nn = 0;
+	int maxn = 10;
+	do
+	{
+		// shape functions of quad
+		H[4] = 0.5*(1 - l1*l1)*(1 - l2);
+		H[5] = 0.5*(1 - l2*l2)*(1 + l1);
+		H[6] = 0.5*(1 - l1*l1)*(1 + l2);
+		H[7] = 0.5*(1 - l2*l2)*(1 - l1);
+
+		H[0] = 0.25*(1 - l1)*(1 - l2) - 0.5*(H[4] + H[7]);
+		H[1] = 0.25*(1 + l1)*(1 - l2) - 0.5*(H[4] + H[5]);
+		H[2] = 0.25*(1 + l1)*(1 + l2) - 0.5*(H[5] + H[6]);
+		H[3] = 0.25*(1 - l1)*(1 + l2) - 0.5*(H[6] + H[7]);
+
+		// shape function derivatives
+		H1[4] = -l1*(1 - l2);
+		H1[5] = 0.5*(1 - l2*l2);
+		H1[6] = -l1*(1 + l2);
+		H1[7] = -0.5*(1 - l2*l2);
+
+		H1[0] = -0.25*(1 - l2) - 0.5*(H1[4] + H1[7]);
+		H1[1] =  0.25*(1 - l2) - 0.5*(H1[4] + H1[5]);
+		H1[2] =  0.25*(1 + l2) - 0.5*(H1[5] + H1[6]);
+		H1[3] = -0.25*(1 + l2) - 0.5*(H1[6] + H1[7]);
+
+		H2[4] = -0.5*(1 - l1*l1);
+		H2[5] = -l2*(1 + l1);
+		H2[6] = 0.5*(1 - l1*l1);
+		H2[7] = -l2*(1 - l1);
+
+		H2[0] = -0.25*(1 - l1) - 0.5*(H2[4] + H2[7]);
+		H2[1] = -0.25*(1 + l1) - 0.5*(H2[4] + H2[5]);
+		H2[2] =  0.25*(1 + l1) - 0.5*(H2[5] + H2[6]);
+		H2[3] =  0.25*(1 - l1) - 0.5*(H2[6] + H2[7]);
+		
+		// calculate residual
+		F = r + n*l3 - y[0]*H[0] - y[1]*H[1] - y[2]*H[2] - y[3]*H[3] - y[4]*H[4] - y[5]*H[5] - y[6]*H[6] - y[7]*H[7];
+
+		// residual derivatives
+		F1 = - y[0]*H1[0] - y[1]*H1[1] - y[2]*H1[2] - y[3]*H1[3] - y[4]*H1[4] - y[5]*H1[5] - y[6]*H1[6] - y[7]*H1[7];
+		F2 = - y[0]*H2[0] - y[1]*H2[1] - y[2]*H2[2] - y[3]*H2[3] - y[4]*H2[4] - y[5]*H2[5] - y[6]*H2[6] - y[7]*H2[7];
+		F3 = n;
+
+		// set up the tangent matrix
+		A[0][0] = F1.x; A[0][1] = F2.x; A[0][2] = F3.x;
+		A[1][0] = F1.y; A[1][1] = F2.y; A[1][2] = F3.y;
+		A[2][0] = F1.z; A[2][1] = F2.z; A[2][2] = F3.z;
+
+		// calculate solution increment
+		dx = -(A.inverse()*F);
+
+		// update solution
+		l1 += dx.x;
+		l2 += dx.y;
+		l3 += dx.z;
+
+		++nn;
+	}
+	while ((dx.norm() > 1e-7) && (nn < maxn));
+
+	// store results
+	rs[0] = l1;
+	rs[1] = l2;
+	g     = l3;
+
+	// see if the point is inside the quad
+	if ((rs[0] >= -1-eps) && (rs[0] <= 1+eps) && 
+		(rs[1] >= -1-eps) && (rs[1] <= 1+eps)) return true;
+
+	return false;
+}
+
 //-----------------------------------------------------------------------------
 //! This function calculates the intersection of a ray with a surface element.
 //! It simply calls the tri or quad intersection function based on the type
@@ -1176,9 +1265,10 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 	// call the correct intersection function
 	switch (N)
 	{
-	case 3: return IntersectTri(y, r, n, rs, g, eps); break;
-	case 4: return IntersectQuad(y, r, n, rs, g, eps); break;
-	case 6: return IntersectTri6(y, r, n, rs, g, eps); break;
+	case 3: return IntersectTri  (y, r, n, rs, g, eps); break;
+	case 4: return IntersectQuad (y, r, n, rs, g, eps); break;
+	case 6: return IntersectTri6 (y, r, n, rs, g, eps); break;
+	case 8: return IntersectQuad8(y, r, n, rs, g, eps); break;
 	default:
 		assert(false);
 	}

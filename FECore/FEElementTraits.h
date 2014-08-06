@@ -814,6 +814,9 @@ public:
 
 	// project integration point data to nodes
 	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix	Ai;
 };
 
 //=============================================================================
