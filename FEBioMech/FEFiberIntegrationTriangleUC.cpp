@@ -1,14 +1,14 @@
 //
-//  FEFiberIntegrationTriangle.cpp
-//  FEBioXCode4
+//  FEFiberIntegrationTriangleUC.cpp
+//  FEBioMech
 //
-//  Created by Gerard Ateshian on 11/19/13.
-//  Copyright (c) 2013 Columbia University. All rights reserved.
+//  Created by Gerard Ateshian on 8/5/14.
+//  Copyright (c) 2014 febio.org. All rights reserved.
 //
 
 #include "stdafx.h"
-#include "FEFiberIntegrationTriangle.h"
-#include "FEContinuousFiberDistribution.h"
+#include "FEFiberIntegrationTriangleUC.h"
+#include "FEContinuousFiberDistributionUC.h"
 #include "triangle_sphere.h"
 
 #ifndef SQR
@@ -16,30 +16,30 @@
 #endif
 
 //-----------------------------------------------------------------------------
-// FEFiberIntegrationTriangle
+// FEFiberIntegrationTriangleUC
 //-----------------------------------------------------------------------------
 
 // we store the cos and sin of the angles here
-double FEFiberIntegrationTriangle::m_cth[2000];
-double FEFiberIntegrationTriangle::m_sth[2000];
-double FEFiberIntegrationTriangle::m_cph[2000];
-double FEFiberIntegrationTriangle::m_sph[2000];
-double FEFiberIntegrationTriangle::m_w[2000];
+double FEFiberIntegrationTriangleUC::m_cth[2000];
+double FEFiberIntegrationTriangleUC::m_sth[2000];
+double FEFiberIntegrationTriangleUC::m_cph[2000];
+double FEFiberIntegrationTriangleUC::m_sph[2000];
+double FEFiberIntegrationTriangleUC::m_w[2000];
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberIntegrationTriangle, FEFiberIntegrationScheme)
+BEGIN_PARAMETER_LIST(FEFiberIntegrationTriangleUC, FEFiberIntegrationSchemeUC)
     ADD_PARAMETER(m_nres, FE_PARAM_INT, "resolution");
 END_PARAMETER_LIST();
 
-void FEFiberIntegrationTriangle::Init()
+void FEFiberIntegrationTriangleUC::Init()
 {
 	static bool bfirst = true;
 	
 	if (bfirst)
 	{
 		switch (m_nres) {
-            
-            
+                
+                
             case 1:
                 m_nint=NST1;
                 for (int n=0; n<m_nint; ++n)
@@ -149,14 +149,14 @@ void FEFiberIntegrationTriangle::Init()
 	}
     
     // also initialize the parent class
-    FEFiberIntegrationScheme::Init();
+    FEFiberIntegrationSchemeUC::Init();
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberIntegrationTriangle::Stress(FEMaterialPoint& mp)
+mat3ds FEFiberIntegrationTriangleUC::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
+    FEContinuousFiberDistributionUC* pcfd = dynamic_cast<FEContinuousFiberDistributionUC*>(GetParent());
 	
 	// get the element's local coordinate system
 	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
@@ -181,16 +181,17 @@ mat3ds FEFiberIntegrationTriangle::Stress(FEMaterialPoint& mp)
         R = m_pFDD->FiberDensity(n0a);
         
         // evaluate this fiber's contribution to the stress
-		s += m_pFmat->Stress(mp)*(R*m_w[n]);
+		s += m_pFmat->DevStress(mp)*(R*m_w[n]);
 	}
+    // we don't need to evaluate the deviatoric part since we already summed up deviatoric fiber stresses
 	return s;
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberIntegrationTriangle::Tangent(FEMaterialPoint& mp)
+tens4ds FEFiberIntegrationTriangleUC::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
+    FEContinuousFiberDistributionUC* pcfd = dynamic_cast<FEContinuousFiberDistributionUC*>(GetParent());
 	
 	// get the element's local coordinate system
 	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
@@ -215,14 +216,15 @@ tens4ds FEFiberIntegrationTriangle::Tangent(FEMaterialPoint& mp)
         R = m_pFDD->FiberDensity(n0a);
         
         // evaluate this fiber's contribution to the tangent
-		c += m_pFmat->Tangent(mp)*(R*m_w[n]);
+		c += m_pFmat->DevTangent(mp)*(R*m_w[n]);
 	}
 	
+    // we don't need to evaluate the deviatoric part since we already summed up deviatoric fiber tangents
 	return c;
 }
 
 //-----------------------------------------------------------------------------
-void FEFiberIntegrationTriangle::IntegratedFiberDensity(double& IFD)
+void FEFiberIntegrationTriangleUC::IntegratedFiberDensity(double& IFD)
 {
     // initialize integrated fiber density distribution
     IFD = 1;

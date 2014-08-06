@@ -1,12 +1,14 @@
 //
-//  FEFiberIntegrationGaussKronrod.cpp
-//  FEBioXCode4
+//  FEFiberIntegrationGaussKronrodUC.cpp
+//  FEBioMech
 //
+//  Created by Gerard Ateshian on 8/5/14.
+//  Copyright (c) 2014 febio.org. All rights reserved.
 //
 
 #include "stdafx.h"
-#include "FEFiberIntegrationGaussKronrod.h"
-#include "FEContinuousFiberDistribution.h"
+#include "FEFiberIntegrationGaussKronrodUC.h"
+#include "FEContinuousFiberDistributionUC.h"
 #include "gausskronrod.h"
 
 #ifndef SQR
@@ -14,16 +16,16 @@
 #endif
 
 //-----------------------------------------------------------------------------
-// FEFiberIntegrationGaussKronrod
+// FEFiberIntegrationGaussKronrodUC
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberIntegrationGaussKronrod, FEFiberIntegrationScheme)
+BEGIN_PARAMETER_LIST(FEFiberIntegrationGaussKronrodUC, FEFiberIntegrationSchemeUC)
     ADD_PARAMETER(m_nph, FE_PARAM_INT, "nph");
     ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
 END_PARAMETER_LIST();
 
-void FEFiberIntegrationGaussKronrod::Init()
+void FEFiberIntegrationGaussKronrodUC::Init()
 {
 	if (m_nph < 1) throw MaterialError("nph must be strictly greater than zero.");
 	if (m_nth < 1) throw MaterialError("nth must be strictly greater than zero.");
@@ -65,20 +67,20 @@ void FEFiberIntegrationGaussKronrod::Init()
     }
     
     // also initialize the parent class
-    FEFiberIntegrationScheme::Init();
+    FEFiberIntegrationSchemeUC::Init();
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
+mat3ds FEFiberIntegrationGaussKronrodUC::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
+    FEContinuousFiberDistributionUC* pcfd = dynamic_cast<FEContinuousFiberDistributionUC*>(GetParent());
 	
 	// get the element's local coordinate system
 	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
 	
     // right Cauchy-Green tensor and its eigenvalues & eigenvectors
-    mat3ds C = pt.RightCauchyGreen();
+    mat3ds C = pt.DevRightCauchyGreen();
     double lC[3];
     vec3d vC[3];
     C.eigen(lC, vC);
@@ -143,7 +145,7 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
                 double R = m_pFDD->FiberDensity(n0a);
                 
                 // calculate the stress
-                s += m_pFmat->Stress(mp)*(R*wn);
+                s += m_pFmat->DevStress(mp)*(R*wn);
             }
         }
     }
@@ -170,7 +172,7 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
                 double R = m_pFDD->FiberDensity(n0a);
                 
                 // calculate the stress
-                s += m_pFmat->Stress(mp)*(R*wn);
+                s += m_pFmat->DevStress(mp)*(R*wn);
             }
         }
     }
@@ -202,26 +204,27 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
                 double R = m_pFDD->FiberDensity(n0a);
                 
                 // calculate the stress
-                s += m_pFmat->Stress(mp)*(R*wn);
+                s += m_pFmat->DevStress(mp)*(R*wn);
             }
         }
     }
     
 	// we multiply by two to add contribution from other half-sphere
+    // we don't need to evaluate the deviatoric part since we already summed up deviatoric fiber stresses
 	return s*(2.0);
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberIntegrationGaussKronrod::Tangent(FEMaterialPoint& mp)
+tens4ds FEFiberIntegrationGaussKronrodUC::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
+    FEContinuousFiberDistributionUC* pcfd = dynamic_cast<FEContinuousFiberDistributionUC*>(GetParent());
 	
 	// get the element's local coordinate system
 	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
 	
     // right Cauchy-Green tensor and its eigenvalues & eigenvectors
-    mat3ds C = pt.RightCauchyGreen();
+    mat3ds C = pt.DevRightCauchyGreen();
     double lC[3];
     vec3d vC[3];
     C.eigen(lC, vC);
@@ -286,7 +289,7 @@ tens4ds FEFiberIntegrationGaussKronrod::Tangent(FEMaterialPoint& mp)
                 double R = m_pFDD->FiberDensity(n0a);
                 
                 // calculate the tangent
-                c += m_pFmat->Tangent(mp)*(R*wn);
+                c += m_pFmat->DevTangent(mp)*(R*wn);
             }
         }
     }
@@ -313,7 +316,7 @@ tens4ds FEFiberIntegrationGaussKronrod::Tangent(FEMaterialPoint& mp)
                 double R = m_pFDD->FiberDensity(n0a);
                 
                 // calculate the tangent
-                c += m_pFmat->Tangent(mp)*(R*wn);
+                c += m_pFmat->DevTangent(mp)*(R*wn);
             }
         }
     }
@@ -345,17 +348,18 @@ tens4ds FEFiberIntegrationGaussKronrod::Tangent(FEMaterialPoint& mp)
                 double R = m_pFDD->FiberDensity(n0a);
                 
                 // calculate the tangent
-                c += m_pFmat->Tangent(mp)*(R*wn);
+                c += m_pFmat->DevTangent(mp)*(R*wn);
             }
         }
     }
     
 	// we multiply by two to add contribution from other half-sphere
+    // we don't need to evaluate the deviatoric part since we already summed up deviatoric fiber tangents
 	return c*(2.0);
 }
 
 //-----------------------------------------------------------------------------
-void FEFiberIntegrationGaussKronrod::IntegratedFiberDensity(double& IFD)
+void FEFiberIntegrationGaussKronrodUC::IntegratedFiberDensity(double& IFD)
 {
     // establish local basis
     vec3d a[3], n0a;

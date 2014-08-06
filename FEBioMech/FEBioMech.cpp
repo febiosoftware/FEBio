@@ -58,13 +58,20 @@
 #include "FEViscoElasticMaterial.h"
 #include "FEVonMisesPlasticity.h"
 #include "FEElasticFiberMaterial.h"
+#include "FEElasticFiberMaterialUC.h"
 #include "FEFiberDensityDistribution.h"
 #include "FEContinuousFiberDistribution.h"
+#include "FEContinuousFiberDistributionUC.h"
 #include "FEFiberIntegrationGauss.h"
+#include "FEFiberIntegrationGaussUC.h"
 #include "FEFiberIntegrationTrapezoidal.h"
+#include "FEFiberIntegrationTrapezoidalUC.h"
 #include "FEFiberIntegrationGeodesic.h"
+#include "FEFiberIntegrationGeodesicUC.h"
 #include "FEFiberIntegrationGaussKronrod.h"
+#include "FEFiberIntegrationGaussKronrodUC.h"
 #include "FEFiberIntegrationTriangle.h"
+#include "FEFiberIntegrationTriangleUC.h"
 #include "FECoupledTransIsoMooneyRivlin.h"
 #include "FECoupledTransIsoVerondaWestmann.h"
 #include "FEMicroMaterial.h"
@@ -193,7 +200,9 @@ REGISTER_FECORE_CLASS(FERemodelingElasticMaterial    ,FEMATERIAL_ID, "remodeling
 REGISTER_FECORE_CLASS(FECarterHayesOld               ,FEMATERIAL_ID, "Carter-Hayes (old)"            );
 REGISTER_FECORE_CLASS(FEActiveFiberContraction       ,FEMATERIAL_ID, "active_contraction"            );
 REGISTER_FECORE_CLASS(FEFiberExponentialPower        ,FEMATERIAL_ID, "fiber-exponential-power-law"   );
+REGISTER_FECORE_CLASS(FEFiberExponentialPowerUC      ,FEMATERIAL_ID, "fiber-exponential-power-law-uncoupled");
 REGISTER_FECORE_CLASS(FEFiberNH                      ,FEMATERIAL_ID, "fiber-NH"                      );
+REGISTER_FECORE_CLASS(FEFiberNHUC                    ,FEMATERIAL_ID, "fiber-NH-uncoupled"            );
 REGISTER_FECORE_CLASS(FESphericalFiberDensityDistribution  , FEMATERIAL_ID, "spherical"   );
 REGISTER_FECORE_CLASS(FEEllipsodialFiberDensityDistribution, FEMATERIAL_ID, "ellipsoidal" );
 REGISTER_FECORE_CLASS(FEVonMises3DFiberDensityDistribution , FEMATERIAL_ID, "von-Mises-3d");
@@ -201,11 +210,17 @@ REGISTER_FECORE_CLASS(FECircularFiberDensityDistribution   , FEMATERIAL_ID, "cir
 REGISTER_FECORE_CLASS(FEEllipticalFiberDensityDistribution , FEMATERIAL_ID, "elliptical"  );
 REGISTER_FECORE_CLASS(FEVonMises2DFiberDensityDistribution , FEMATERIAL_ID, "von-Mises-2d");
 REGISTER_FECORE_CLASS(FEContinuousFiberDistribution        , FEMATERIAL_ID, "continuous fiber distribution");
+REGISTER_FECORE_CLASS(FEContinuousFiberDistributionUC      , FEMATERIAL_ID, "continuous fiber distribution uncoupled");
 REGISTER_FECORE_CLASS(FEFiberIntegrationGauss              , FEMATERIAL_ID, "fibers-3d-gauss");
+REGISTER_FECORE_CLASS(FEFiberIntegrationGaussUC            , FEMATERIAL_ID, "fibers-3d-gauss-uncoupled");
 REGISTER_FECORE_CLASS(FEFiberIntegrationGeodesic           , FEMATERIAL_ID, "fibers-3d-geodesic");
+REGISTER_FECORE_CLASS(FEFiberIntegrationGeodesicUC         , FEMATERIAL_ID, "fibers-3d-geodesic-uncoupled");
 REGISTER_FECORE_CLASS(FEFiberIntegrationGaussKronrod       , FEMATERIAL_ID, "fibers-3d-gkt");
+REGISTER_FECORE_CLASS(FEFiberIntegrationGaussKronrodUC     , FEMATERIAL_ID, "fibers-3d-gkt-uncoupled");
 REGISTER_FECORE_CLASS(FEFiberIntegrationTriangle           , FEMATERIAL_ID, "fibers-3d-triangle");
+REGISTER_FECORE_CLASS(FEFiberIntegrationTriangleUC         , FEMATERIAL_ID, "fibers-3d-triangle-uncoupled");
 REGISTER_FECORE_CLASS(FEFiberIntegrationTrapezoidal        , FEMATERIAL_ID, "fibers-2d-trapezoidal");
+REGISTER_FECORE_CLASS(FEFiberIntegrationTrapezoidalUC      , FEMATERIAL_ID, "fibers-2d-trapezoidal-uncoupled");
 REGISTER_FECORE_CLASS(FECoupledTransIsoVerondaWestmann     , FEMATERIAL_ID, "coupled trans-iso Veronda-Westmann");
 REGISTER_FECORE_CLASS(FECoupledTransIsoMooneyRivlin        , FEMATERIAL_ID, "coupled trans-iso Mooney-Rivlin");
 REGISTER_FECORE_CLASS(FEMicroMaterial                      , FEMATERIAL_ID, "micro-material");
