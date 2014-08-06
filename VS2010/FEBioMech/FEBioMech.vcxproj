@@ -440,10 +440,13 @@
     <ClCompile Include="..\..\FEBioMech\FEFiberExpPow.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberExpPowUncoupled.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationGauss.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationGaussKronrod.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationGeodesic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationScheme.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTriangle.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberMaterialPoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFungOrthoCompressible.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFungOrthotropic.cpp" />
@@ -565,10 +568,13 @@
     <ClInclude Include="..\..\FEBioMech\FEFiberExpPow.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberExpPowUncoupled.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationGauss.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationGaussKronrod.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationGeodesic.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationScheme.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTriangle.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberMaterialPoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEFungOrthoCompressible.h" />
     <ClInclude Include="..\..\FEBioMech\FEFungOrthotropic.h" />
@@ -641,8 +647,10 @@
     <ClInclude Include="..\..\FEBioMech\FEViscoElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEVonMisesPlasticity.h" />
     <ClInclude Include="..\..\FEBioMech\gauss.h" />
+    <ClInclude Include="..\..\FEBioMech\gausskronrod.h" />
     <ClInclude Include="..\..\FEBioMech\geodesic.h" />
     <ClInclude Include="..\..\FEBioMech\stdafx.h" />
+    <ClInclude Include="..\..\FEBioMech\triangle_sphere.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
