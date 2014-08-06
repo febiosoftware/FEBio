@@ -355,10 +355,9 @@ void FEEllipsoidalFiberDistributionOld::Init()
 mat3ds FEEllipsoidalFiberDistributionOld::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
 	
 	// deformation gradient
 	mat3d &F = pt.m_F;
@@ -416,10 +415,9 @@ mat3ds FEEllipsoidalFiberDistributionOld::Stress(FEMaterialPoint& mp)
 tens4ds FEEllipsoidalFiberDistributionOld::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
 	
 	// deformation gradient
 	mat3d &F = pt.m_F;
