@@ -18,7 +18,6 @@ END_PARAMETER_LIST();
 FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : FESolver(pfem)
 {
 	m_dyn_damping = 0.99;
-
 	m_niter = 0;
 	m_nreq = 0;
 }
@@ -39,6 +38,7 @@ bool FEExplicitSolidSolver::Init()
 	m_Fd.assign(neq, 0);
 	m_Fr.assign(neq, 0);
 	m_Ui.assign(neq, 0);
+	m_ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);
 	m_inv_mass.assign(neq, 1);
 
@@ -62,7 +62,7 @@ bool FEExplicitSolidSolver::Init()
 		n = node.m_ID[DOF_W]; if (n >= 0) m_Ut[n] = node.m_Dt.z - node.m_D0.z;
 	}
 
-	// calculate the inverse mass vector for explicit analysis
+	// calculate the inverse mass vector for the explicit analysis
 	vector<double> dummy(m_inv_mass);
 	FEGlobalVector Mi(GetFEModel(), m_inv_mass, dummy);
 	matrix ke;
@@ -71,11 +71,23 @@ bool FEExplicitSolidSolver::Init()
 	double *H, kab;
 	vector <int> lm;
 	vector <double> el_lumped_mass;
+	// Data structure to store element mass data for dynamic damping:-
+	// Define an overall dynamic array of pointers to the array that points to the element data
+	// domain_mass is a list of pointers to the data for each domain
+	domain_mass = new double ** [mesh.Domains()];
+
 	for (int nd = 0; nd < mesh.Domains(); ++nd)
 	{
+		// check whether it is a solid domain
 		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
-		if (pbd)
+		if (pbd)  // it is an elastic solid domain
 		{
+			// for each domain define an array of pointers to the individual element_mass records
+			double ** elmasses; 
+			elmasses = new double * [pbd->Elements()];
+			// and set a pointer in domain_mass to the new element array
+			domain_mass[nd] = elmasses;
+
 			for (iel=0; iel<pbd->Elements(); ++iel)
 			{
 				FESolidElement& el = pbd->Element(iel);
@@ -108,18 +120,43 @@ bool FEExplicitSolidSolver::Init()
 							ke[3*i+2][3*j+2] += kab;
 						}	
 				}
-				// reduce to a lumped mass vector
+				// reduce to a lumped mass vector and add up the total
+				double total_mass = 0.0;
 				for (i=0; i<3*neln; ++i)
+				{
 						for (j=0; j<neln; ++j)
 						{
 							el_lumped_mass[i]+=ke[i][j];
-						}	
-					
-				// assemble element matrix into inv_mass vector
+						}
+						total_mass += el_lumped_mass[i];
+				}	
+				total_mass /= 3.0; // because each mass is represented three times for each direction
+				// define an element mass record
+				double * thiselement;
+				thiselement = new double [neln+1];
+				// and set a pointer to the element data
+				elmasses[iel] = thiselement;
+				thiselement[0] = total_mass; // total mass of the element first, followed by the fraction at each node
+				// for each node, store the fraction of the element mass associated with it
+				for (i=0; i<neln; ++i)
+				{
+					thiselement[i+1] = (el_lumped_mass[3*i]+el_lumped_mass[3*i+1]+el_lumped_mass[3*i+2])/(3*total_mass);
+				} // loop over nodes within element
+				// invert and assemble element matrix into inv_mass vector 
+				for (i=0; i<3*neln; ++i)
+				{
+					el_lumped_mass[i] = 1.0/el_lumped_mass[i];
+				}
 				Mi.Assemble(el.m_node, lm, el_lumped_mass);
-			}
-		}
+				// formerly AssembleResidual(el.m_node, lm, el_lumped_mass, m_inv_mass);
+			} // loop over elements
+		} // was an elastic solid domain
+		else domain_mass[nd] = 0;  // no masses stored for other types of domain
 	}
+
+	// Calculate initial residual to be used on the first time step
+	if (Residual(m_R1) == false) return false;
+	m_R1 += m_Fd;
 
 	return true;
 }
@@ -591,9 +628,9 @@ void FEExplicitSolidSolver::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-//!  This function mainly calls the Quasin routine 
+//!  This function mainly calls the DoSolve routine 
 //!  and deals with exceptions that require the immediate termination of
-//!	quasi-Newton iterations.
+//!	 the solution eg negative Jacobians.
 bool FEExplicitSolidSolver::SolveStep(double time)
 {
 	bool bret;
@@ -610,7 +647,7 @@ bool FEExplicitSolidSolver::SolveStep(double time)
 		if (m_fem.GetDebugFlag()) m_fem.Write();
 		return false;
 	}
-	catch (MaxStiffnessReformations)
+	catch (MaxStiffnessReformations) // shouldn't happen for an explicit analysis!
 	{
 		// max nr of reformations is reached
 		felog.printbox("ERROR", "Max nr of reformations reached.");
@@ -628,13 +665,13 @@ bool FEExplicitSolidSolver::SolveStep(double time)
 		felog.printbox("WARNING", "User forced iteration failure.");
 		return false;
 	}
-	catch (ZeroLinestepSize)
+	catch (ZeroLinestepSize) // shouldn't happen for an explicit analysis!
 	{
 		// a zero line step size was detected
 		felog.printbox("ERROR", "Zero line step size.");
 		return false;
 	}
-	catch (EnergyDiverging)
+	catch (EnergyDiverging) // shouldn't happen for an explicit analysis!
 	{
 		// problem was diverging after stiffness reformation
 		felog.printbox("ERROR", "Problem diverging uncontrollably.");
@@ -652,7 +689,7 @@ bool FEExplicitSolidSolver::SolveStep(double time)
 
 
 //-----------------------------------------------------------------------------
-//! Prepares the data for the first BFGS-iteration. 
+//! Prepares the data for the time step. 
 void FEExplicitSolidSolver::PrepStep(double time)
 {
 	int i, j;
@@ -1003,11 +1040,7 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 	// do minor iterations callbacks
 	m_fem.DoCallback(CB_MINOR_ITERS);
 
-	// calculate initial residual
-	if (Residual(m_R0) == false) return false;
-
-	m_R0 += m_Fd;
-
+	// print starting message
 	felog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
 
 	Logfile::MODE oldmode = felog.GetMode();
@@ -1019,22 +1052,79 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
-	int N = mesh.Nodes();
+	int N = mesh.Nodes(); // this is the total number of nodes in the mesh
+	int j,iel;
 	double dt=m_fem.GetCurrentStep()->m_dt;
+	double avx = 0.0;  // average element velocity in each direction
+	double avy = 0.0;
+	double avz = 0.0;
+	double mass_at_node;
+
+	for (i=0; i<N; ++i) // zero the new acceleration vector ready to add in the damping components
+	{
+		FENode& node = mesh.Node(i);
+		node.m_at.x = 0.0;
+		node.m_at.y = 0.0;
+		node.m_at.z = 0.0;
+	}
+
+	for (int nd = 0; nd < mesh.Domains(); ++nd)
+	{
+		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+		if (pbd)  // it is an elastic solid domain
+		{
+			double ** emass = domain_mass[nd]; // array of pointers to the element mass records for this domain
+			for (iel=0; iel<pbd->Elements(); ++iel)
+			{
+				FESolidElement& el = pbd->Element(iel);
+
+				// zero the three average velocity components
+				avx = 0.0;
+				avy = 0.0;
+				avz = 0.0;
+
+				// will use previously calculated element mass data for weighted averaging of velocities
+
+				// loop over each element to find the average velocity
+				// then calculate the weighted velocity change for each node
+				// add each velocity change into node.m_vt
+				double * this_element = emass[iel]; // pointer to the array of fractional nodal masses for this element
+				for (j=0; j<el.Nodes(); j++) // loop over each node in the element
+				{
+					FENode& node = mesh.Node(el.m_node[j]);  // get the node 
+					avx += node.m_vp.x*this_element[j+1];  // add each of the three components to the averages
+					avy += node.m_vp.y*this_element[j+1];  // weighted by the fractional mass of the node
+					avz += node.m_vp.z*this_element[j+1];  // remembering that this_element[0] is the total mass
+				}
+				for (j=0; j<el.Nodes(); j++) // loop over each node in the element again
+				// and calculate and add in the velocity change contribution to each dof
+				{
+					FENode& node = mesh.Node(el.m_node[j]);  // get the node 
+					//	need to find node.m_vt.x += (avx-node.m_vp.x)*dt*m_dyn_damping*element_mass_at_node/total_mass at node;
+					// should be t* = dt/(h/c) not dt
+					// put this into the accelerations as (avx-node.m_vp.x)*m_dyn_damping*element_mass_at_node
+					// then it will be multiplied by dt and divided by m_inv_mass later 
+					mass_at_node = this_element[j+1]*this_element[0];
+					node.m_at.x += (avx-node.m_vp.x)*mass_at_node*m_dyn_damping;
+					node.m_at.y += (avy-node.m_vp.y)*mass_at_node*m_dyn_damping;
+					node.m_at.z += (avz-node.m_vp.z)*mass_at_node*m_dyn_damping;
+				}
+			}  // loop over elements
+		}  // if (pbd)
+	}  // loop over domains
+
 	for (i=0; i<N; ++i)
 	{
 		FENode& node = mesh.Node(i);
-		//  calculate acceleration using F=ma and update
-		if ((n = node.m_ID[DOF_X]) >= 0) node.m_at.x = m_inv_mass[n]*m_R1[n];
-		if ((n = node.m_ID[DOF_Y]) >= 0) node.m_at.y = m_inv_mass[n]*m_R1[n];
-		if ((n = node.m_ID[DOF_Z]) >= 0) node.m_at.z = m_inv_mass[n]*m_R1[n];
+		//  calculate acceleration using F=ma and update - note m_inv_mass is 1/m so multiply not divide
+		n=m_R1[0];
+		if ((n = node.m_ID[DOF_X]) >= 0) node.m_at.x = (node.m_at.x+m_R1[n])*m_inv_mass[n];
+		if ((n = node.m_ID[DOF_Y]) >= 0) node.m_at.y = (node.m_at.y+m_R1[n])*m_inv_mass[n];
+		if ((n = node.m_ID[DOF_Z]) >= 0) node.m_at.z = (node.m_at.z+m_R1[n])*m_inv_mass[n];
 		// and update the velocities using the accelerations
+		// which are added to the previously calculated velocity changes from damping
 		node.m_vt = node.m_vp + node.m_at*dt;	//  update velocity using acceleration m_at
-		node.m_vt.x*=m_dyn_damping;
-		node.m_vt.y*=m_dyn_damping;
-		node.m_vt.z*=m_dyn_damping;
-		//	calculate incremental displacement using velocity
-		double vel=node.m_vt.x;
+		//	calculate incremental displacement using the velocity
 		if ((n = node.m_ID[DOF_X]) >= 0) m_ui[n] = node.m_vt.x*dt;
 		if ((n = node.m_ID[DOF_Y]) >= 0) m_ui[n] = node.m_vt.y*dt;
 		if ((n = node.m_ID[DOF_Z]) >= 0) m_ui[n] = node.m_vt.z*dt;
@@ -1044,7 +1134,7 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 	// Update geometry
 	Update(m_ui);
 
-	// calculate residual at this point
+	// calculate new residual at this point - which will be used on the next step to find the acceleration
 	Residual(m_R1);
 
 	// update total displacements

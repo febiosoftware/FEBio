@@ -86,6 +86,7 @@ public:
 
 	vector<double> m_R0;	//!< residual at iteration i-1
 	vector<double> m_R1;	//!< residual at iteration i
+	double *** domain_mass;	//! Pointer to data structure for nodal masses, dynamically allocated during initiation
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
