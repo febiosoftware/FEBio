@@ -39,7 +39,8 @@ public:
 public:
 	double	m_alpha;	// coefficient of (In-1) in exponential
 	double	m_beta;		// power of (In-1) in exponential
-	double	m_ksi;		// fiber modulus
+	double	m_ksi;		// measure of fiber modulus
+    double  m_mu;       // shear modulus
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

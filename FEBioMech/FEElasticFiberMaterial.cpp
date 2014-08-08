@@ -8,17 +8,19 @@
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberExponentialPower, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
-	ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
-	ADD_PARAMETER(m_ksi , FE_PARAM_DOUBLE, "ksi" );
+	ADD_PARAMETER(m_beta , FE_PARAM_DOUBLE, "beta" );
+	ADD_PARAMETER(m_ksi  , FE_PARAM_DOUBLE, "ksi"  );
+    ADD_PARAMETER(m_mu   , FE_PARAM_DOUBLE, "mu"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 void FEFiberExponentialPower::Init()
 {
     FEMaterial::Init();
-	if (m_ksi < 0) throw MaterialError("ksi must be positive.");
+	if ((4*m_ksi + 2*m_mu) < 0) throw MaterialError("4*ksi+2*mu must be positive.");
 	if (m_beta < 2) throw MaterialError("beta must be >= 2.");
 	if (m_alpha < 0) throw MaterialError("alpha must be >= 0.");
+	if (m_mu < 0) throw MaterialError("mu must be >= 0.");
 }
 
 //-----------------------------------------------------------------------------
@@ -64,6 +66,10 @@ mat3ds FEFiberExponentialPower::Stress(FEMaterialPoint& mp)
 		
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);
+        
+        // add the contribution from shear
+        mat3ds BmI = pt.LeftCauchyGreen() - mat3dd(1);
+        s += (N*BmI + BmI*N)*(m_mu/2/J);
 	}
 	else
 	{
@@ -111,6 +117,10 @@ tens4ds FEFiberExponentialPower::Tangent(FEMaterialPoint& mp)
 		
 		// calculate the fiber tangent
 		c = NxN*(4.0*Wll/J);
+        
+        // add the contribution from shear
+        mat3ds B = pt.LeftCauchyGreen();
+        c += dyad4s(N,B)*(m_mu/J);
 	}
 	else
 	{
