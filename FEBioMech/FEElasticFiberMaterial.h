@@ -25,7 +25,8 @@ public:
 class FEFiberExponentialPower : public FEElasticFiberMaterial
 {
 public:
-	FEFiberExponentialPower(FEModel* pfem) : FEElasticFiberMaterial(pfem) {}
+	FEFiberExponentialPower(FEModel* pfem) : FEElasticFiberMaterial(pfem) {
+        m_alpha = 0; m_beta = 2; m_ksi = 0; m_mu = 0; }
 	
 	//! Initialization
 	void Init();
@@ -52,7 +53,7 @@ public:
 class FEFiberNH : public FEElasticFiberMaterial
 {
 public:
-	FEFiberNH(FEModel* pfem) : FEElasticFiberMaterial(pfem) {}
+	FEFiberNH(FEModel* pfem) : FEElasticFiberMaterial(pfem) { m_mu = 0; }
 	
 	//! Initialization
 	void Init();
