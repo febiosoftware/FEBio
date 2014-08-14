@@ -254,6 +254,7 @@ void FEPressureLoad::Serialize(DumpFile& ar)
 	if (ar.IsSaving())
 	{
 		ar << m_blinear;
+		ar << m_pressure;
 		ar << (int) m_PC.size();
 		for (int i=0; i< (int) m_PC.size(); ++i)
 		{
@@ -267,6 +268,7 @@ void FEPressureLoad::Serialize(DumpFile& ar)
 	{
 		int n;
 		ar >> m_blinear;
+		ar >> m_pressure;
 		ar >> n;
 		m_PC.resize(n);
 		// pressure forces
