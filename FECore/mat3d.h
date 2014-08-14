@@ -189,6 +189,7 @@ public:
 	// determine eigen values and vectors
 	void eigen(double d[3], vec3d r[3] = 0);
 	void exact_eigen(double l[3]);
+	void eigen2(double d[3], vec3d r[3] = 0);
 
 	// L2-norm 
 	double norm();

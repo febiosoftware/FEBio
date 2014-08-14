@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "mat3d.h"
+#include "eig3.h"
 
 #define ROTATE(a, i, j, k, l) g=a[i][j]; h=a[k][l];a[i][j]=g-s*(h+g*tau); a[k][l] = h + s*(g - h*tau);
 
@@ -137,4 +138,17 @@ void mat3ds::exact_eigen(double l[3])
 	l[0] = z/S3 + (r/S2)*(sin(t)/S3 + cos(t));
 	l[1] = z/S3 - (S2/S3)*r*sin(t);
 	l[2] = z/S3 + (r/S2)*(sin(t)/S3 - cos(t));
+}
+
+//-----------------------------------------------------------------------------
+// Calculate the eigenvalues and eigenvectors of A using the method of
+// Connelly Barnes ( http://barnesc.blogspot.com/2007/02/eigenvectors-of-3x3-symmetric-matrix.html )
+void mat3ds::eigen2(double l[3], vec3d r[3])
+{
+    double A[3][3] = {xx(), xy(), xz(), xy(), yy(), yz(), xz(), yz(), zz()};
+    double V[3][3];
+    eigen_decomposition(A, V, l);
+    r[0] = vec3d(V[0][0],V[1][0],V[2][0]);
+    r[1] = vec3d(V[0][1],V[1][1],V[2][1]);
+    r[2] = vec3d(V[0][2],V[1][2],V[2][2]);
 }

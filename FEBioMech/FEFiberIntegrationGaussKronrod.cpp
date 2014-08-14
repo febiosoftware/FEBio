@@ -81,7 +81,7 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
     mat3ds C = pt.RightCauchyGreen();
     double lC[3];
     vec3d vC[3];
-    C.eigen(lC, vC);
+    C.eigen2(lC, vC);
     
     // initialize stress tensor
 	mat3ds s;
@@ -96,7 +96,7 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
     // bubble sort eigenvalues & eigenvectors from smallest to largest
     double ltmp;
     vec3d vtmp;
-    bool swp = true;
+/*    bool swp = true;
     while (swp) {
         swp = false;
         for (int i=1; i<3; ++i) {
@@ -108,7 +108,7 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
                 swp = true;
             }
         }
-    }
+    }*/
     
     // check remaining stretch states
     double phi, theta;
@@ -224,7 +224,7 @@ tens4ds FEFiberIntegrationGaussKronrod::Tangent(FEMaterialPoint& mp)
     mat3ds C = pt.RightCauchyGreen();
     double lC[3];
     vec3d vC[3];
-    C.eigen(lC, vC);
+    C.eigen2(lC, vC);
     
     // initialize stress tensor
 	tens4ds c;
@@ -239,7 +239,7 @@ tens4ds FEFiberIntegrationGaussKronrod::Tangent(FEMaterialPoint& mp)
     // bubble sort eigenvalues & eigenvectors from smallest to largest
     double ltmp;
     vec3d vtmp;
-    bool swp = true;
+/*    bool swp = true;
     while (swp) {
         swp = false;
         for (int i=1; i<3; ++i) {
@@ -251,7 +251,7 @@ tens4ds FEFiberIntegrationGaussKronrod::Tangent(FEMaterialPoint& mp)
                 swp = true;
             }
         }
-    }
+    }*/
     
     // check remaining stretch states
     double phi, theta;

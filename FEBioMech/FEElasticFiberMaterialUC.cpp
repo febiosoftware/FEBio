@@ -208,7 +208,7 @@ mat3ds FEFiberNHUC::DevStress(FEMaterialPoint& mp)
 		s.zero();
 	}
 	
-	return s;
+	return s.dev();
 }
 
 //-----------------------------------------------------------------------------
