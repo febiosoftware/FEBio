@@ -303,6 +303,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\eig3.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\ElementDataRecord.cpp"
 				>
 			</File>
@@ -590,6 +594,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\DumpStream.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\eig3.h"
 				>
 			</File>
 			<File

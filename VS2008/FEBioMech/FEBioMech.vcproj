@@ -280,6 +280,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEContinuousFiberDistributionUC.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FECoupledMooneyRivlin.cpp"
 				>
 			</File>
@@ -344,6 +348,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEElasticFiberMaterialUC.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEElasticMaterial.cpp"
 				>
 			</File>
@@ -400,7 +408,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationGaussKronrod.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationGaussKronrodUC.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationGaussUC.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEFiberIntegrationGeodesic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationGeodesicUC.cpp"
 				>
 			</File>
 			<File
@@ -408,11 +432,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationSchemeUC.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.cpp"
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationTrapezoidalUC.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationTriangle.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationTriangleUC.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEFiberMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberMaterialPoint.cpp"
 				>
 			</File>
 			<File
@@ -774,6 +818,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEContinuousFiberDistributionUC.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FECoupledMooneyRivlin.h"
 				>
 			</File>
@@ -842,6 +890,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEElasticFiberMaterialUC.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEElasticMaterial.h"
 				>
 			</File>
@@ -898,7 +950,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationGaussKronrod.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationGaussKronrodUC.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationGaussUC.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEFiberIntegrationGeodesic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationGeodesicUC.h"
 				>
 			</File>
 			<File
@@ -906,11 +974,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationSchemeUC.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.h"
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationTrapezoidalUC.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationTriangle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationTriangleUC.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEFiberMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberMaterialPoint.h"
 				>
 			</File>
 			<File
@@ -1202,11 +1290,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\gausskronrod.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\geodesic.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\triangle_sphere.h"
 				>
 			</File>
 		</Filter>
