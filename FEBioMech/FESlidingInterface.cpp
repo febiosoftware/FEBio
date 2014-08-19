@@ -334,7 +334,7 @@ void FESlidingSurface::Serialize(DumpFile& ar)
 		ar >> m_Ln;
 
 		// add surface to mesh
-		GetMesh()->AddSurface((FESurface*) this);
+		GetMesh()->AddSurface(this);
 	}
 }
 
