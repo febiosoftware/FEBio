@@ -332,6 +332,9 @@ void FESlidingSurface::Serialize(DumpFile& ar)
 		ar >> m_off;
 		ar >> m_eps;
 		ar >> m_Ln;
+
+		// add surface to mesh
+		GetMesh()->AddSurface((FESurface*) this);
 	}
 }
 
@@ -1863,4 +1866,5 @@ void FESlidingInterface::Serialize(DumpFile& ar)
 	// store contact surface data
 	m_ms.Serialize(ar);
 	m_ss.Serialize(ar);
+
 }

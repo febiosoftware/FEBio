@@ -883,6 +883,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 
 			ps->Serialize(ar);
 			m_SL.push_back(ps);
+			m_mesh.AddSurface(psurf);
 		}
 
 		// fixed rigid body dofs
