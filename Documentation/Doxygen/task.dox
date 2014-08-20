@@ -1,0 +1,55 @@
+/**
+\page task Task Plugins
+
+In this section we will look at the details of creating a task plugin. A task executes the main loop in FEBio. This gives the user the very powerful capability to 
+control exactly what FEBio does. 
+
+In order to create a new task plugin, you must implement the following.
+
+1. Create a new task class, derived from the FECoreTask base class.
+2. Implement the virtual Run() member function.
+
+In the next section, we will discuss these steps in more detail.
+
+\section task_sec1 Creating a Task Plugin
+
+\subsection task_sec11 Create the Task Class
+
+The first step is to create a new task class, derived from the FECoreTask base class, defined in FECore\FECoreTask.h. This class must implement a constructor and
+the Run member function.
+
+\code
+class MyTask : public FECoreTask
+{
+public:
+	MyTask(FEModel* pfem);
+	
+	bool Run(const char* szfile);
+}
+\endcode
+
+The constructor MyTask takes a pointer to the current active FEModel.
+
+The Run member function, described in the next section, will be called by FEBio.
+
+\subsection task_sec12 Implement the Run function
+After FEBio is done initializing the model data, it will call the selected task's Run function and passes the main execution loop to the task. The parameter passed to the Run
+function is a (optional) filename that was passed on the command line after the -task=[task_name] command. Note that this will not be the model input file (specified with -i) and
+this parameter can be NULL.   
+
+Inside the Run() function, the task can execute the code that implements the task. After completing, the Run() function must return a boolean indicating whether the task was executed
+successfully (true) or not (false). 
+
+\section task_sec2 Running a Task plugin
+In order to use a task plugin you must first register the plugin with the framework in the usual manner (i.e. implementing the required plugin functions and 
+adding the plugin filename to the FEBio configuration file). Then, you must specify the name of the taks on the command line when running FEBio.
+
+\code
+>febio -i file.feb -task=mytask data.txt
+\endcode
+
+Notice that the model input file is still required and defined with the -i command. The -task command specifies which task FEBio needs to execute. The task's name is
+specified after the equal sign (=). The task command can be followed by an optional file name. This file name will be passed to the task plugin as a parameter to the 
+Run() member function.
+
+*/

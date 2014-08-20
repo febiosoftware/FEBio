@@ -34,6 +34,20 @@ The instructions for the Mac are the same as those for Linux except:
 \section plugin_sec2 2. Required Functions
 The following functions need to be defined in the plugin and are needed for plugin registration, initialization and cleanup. 
 
+\subsection GetSDKVersion
+This function returns the version number of the SDK that was used to build the plugin. When loading the plugin FEBio will check this number
+to see if the plugin is compatible with the FEBio version that is trying to load the plugin. This function needs to return the
+FE_SDK_VERSION macro which is defined in the file FECore\version.h
+
+\code
+FECORE_EXPORT unsigned int GetSDKVersion()
+{
+	return FE_SDK_VERSION;
+}
+\endcode
+
+FEBio will not load the plugin if this function is omitted or if the returned version number is incompatible with the version of FEBio that is trying to load the plugin.
+
 \subsection PluginInitialize
 This function will be the first function called by FEBio and can be used to allocated and initialize plugin data.
 

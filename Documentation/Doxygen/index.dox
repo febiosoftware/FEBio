@@ -1,9 +1,10 @@
 /**
 \mainpage FEBio Developer's Manual
+The FEBio Developer's Manual describes how to develop plugins for FEBio that extend the default feature set of FEBio. 
 
 This software is developed at the Musculoskeletal Research Laboratories
 at the University of Utah. All rights reserved.
-Copyright (c) 2006 - 2013
+Copyright (c) 2006 - 2014
 
 \li \subpage intro
 \li \subpage febio
