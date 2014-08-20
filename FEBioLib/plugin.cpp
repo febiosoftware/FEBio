@@ -17,6 +17,7 @@
 // Typedefs of the plugin functions.
 // These are the functions that the plugin must implement
 extern "C" {
+	typedef unsigned int (*FEPLUGIN_GETSDKVERSION)();
 	typedef void (*FEPLUGIN_INIT_FNC)(FECoreKernel&);
 	typedef void (*FEPLUGIN_CLEANUP_FNC)();
 	typedef int  (*FEPLUGIN_NUMCLASSES_FNC)();
@@ -73,6 +74,8 @@ void FEBioPlugin::SetNameFromFilePath(const char* szfile)
 //! (2) Required plugin function PluginNumClasses not found,
 //! (3) Required plugin function PluginGetFactory not found,
 //! (4) Invalid number of classes returned by PluginNumClasses.
+//! (5) Required plugin function GetSDKVersion not found.
+//! (6) Invalid SDK version.
 int FEBioPlugin::Load(const char* szfile)
 {
 	// Make sure the plugin is not loaded already
@@ -85,6 +88,15 @@ int FEBioPlugin::Load(const char* szfile)
 	// load the library
 	FEBIO_PLUGIN_HANDLE ph = LoadPlugin(szfile);
 	if (ph == NULL) return 1;
+
+	// get the GetSDKVersion function
+	FEPLUGIN_GETSDKVERSION pf_sdk = (FEPLUGIN_GETSDKVERSION) FindPluginFunc(ph, "GetSDKVersion");
+	if (pf_sdk == 0) return 5;
+
+	// get the SDK version of the plugin
+	unsigned int n = FE_SDK_VERSION;
+	unsigned int version = pf_sdk();
+	if (version != FE_SDK_VERSION) return 6;
 
 	// find the numclasses function
 	FEPLUGIN_NUMCLASSES_FNC pfnc_cnt = (FEPLUGIN_NUMCLASSES_FNC) FindPluginFunc(ph, "PluginNumClasses");

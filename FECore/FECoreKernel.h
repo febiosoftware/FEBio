@@ -3,6 +3,7 @@
 #include <vector>
 #include <string.h>
 #include <stdio.h>
+#include "version.h"
 
 //-----------------------------------------------------------------------------
 // Forward declaration of model class

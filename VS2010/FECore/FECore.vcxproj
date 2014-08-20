@@ -654,6 +654,7 @@
     <ClInclude Include="..\..\FECore\vec2d.h" />
     <ClInclude Include="..\..\FECore\vec3d.h" />
     <ClInclude Include="..\..\FECore\vector.h" />
+    <ClInclude Include="..\..\FECore\version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp" />
