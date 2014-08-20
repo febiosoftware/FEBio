@@ -8,7 +8,7 @@
 class FEFiberExpPow : public FEElasticMaterial
 {
 public:
-	FEFiberExpPow(FEModel* pfem) : FEElasticMaterial(pfem) {}
+	FEFiberExpPow(FEModel* pfem) : FEElasticMaterial(pfem) { m_thd = 0; m_phd = 90; }
 	
 	//! Initialization
 	void Init();

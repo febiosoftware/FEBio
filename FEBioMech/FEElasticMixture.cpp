@@ -57,6 +57,9 @@ void FEElasticMixtureMaterialPoint::Serialize(DumpFile& ar)
 	{
 		ar >> m_w;
 	}
+	for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Serialize(ar);
+    
+	if (m_pt) m_pt->Serialize(ar);
 }
 
 //=============================================================================
@@ -81,13 +84,28 @@ FEMaterialPoint* FEElasticMixture::CreateMaterialPointData()
 }
 
 //-----------------------------------------------------------------------------
-//! \todo why does the base gets this material's parent?
+void FEElasticMixture::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
+{
+	FEElasticMaterial::SetLocalCoordinateSystem(el, n, mp);
+    FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+    
+	// check the local coordinate systems for each component
+	for (int j=0; j<Materials(); ++j)
+	{
+		FEElasticMaterial* pmj = GetMaterial(j)->GetElasticMaterial();
+		FEMaterialPoint& mpj = *mp.GetPointData(j);
+        FEElasticMaterialPoint& pj = *(mpj.ExtractData<FEElasticMaterialPoint>());
+        pj.m_Q = pt.m_Q;    // copy mixture material's coordinate system into component
+		pmj->SetLocalCoordinateSystem(el, n, mpj);
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEElasticMixture::Init()
 {
 	FEElasticMaterial::Init();
 	for (int i=0; i < (int)m_pMat.size(); ++i)
 	{
-		m_pMat[i]->SetParent(GetParent());
 		m_pMat[i]->Init();
 	}
 }
@@ -138,12 +156,12 @@ mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)
 	for (int i=0; i < (int) m_pMat.size(); ++i)
 	{
 		// copy the elastic material point data to the components
+        // but don't copy m_Q since correct value was set in SetLocalCoordinateSystem
 		FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
 		epi.m_rt = ep.m_rt;
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-		epi.m_Q = ep.m_Q;
 		s += epi.m_s = m_pMat[i]->Stress(*pt.m_mp[i])*w[i];
 	}
 
@@ -165,12 +183,12 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 	for (int i=0; i < (int) m_pMat.size(); ++i)
 	{
 		// copy the elastic material point data to the components
+        // but don't copy m_Q since correct value was set in SetLocalCoordinateSystem
 		FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
 		epi.m_rt = ep.m_rt;
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-		epi.m_Q = ep.m_Q;
 		c += m_pMat[i]->Tangent(*pt.m_mp[i])*w[i];
 	}
 

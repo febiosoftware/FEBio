@@ -6,7 +6,6 @@
 
 #include "stdafx.h"
 #include "FEFiberIntegrationGaussKronrod.h"
-#include "FEContinuousFiberDistribution.h"
 #include "gausskronrod.h"
 
 #ifndef SQR
@@ -72,10 +71,9 @@ void FEFiberIntegrationGaussKronrod::Init()
 mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
 	
     // right Cauchy-Green tensor and its eigenvalues & eigenvectors
     mat3ds C = pt.RightCauchyGreen();
@@ -215,10 +213,9 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
 tens4ds FEFiberIntegrationGaussKronrod::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
 	
     // right Cauchy-Green tensor and its eigenvalues & eigenvectors
     mat3ds C = pt.RightCauchyGreen();

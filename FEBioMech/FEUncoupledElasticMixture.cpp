@@ -24,11 +24,15 @@ FEMaterialPoint* FEUncoupledElasticMixture::CreateMaterialPointData()
 void FEUncoupledElasticMixture::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
 {
 	FEElasticMaterial::SetLocalCoordinateSystem(el, n, mp);
+    FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+    
 	// check the local coordinate systems for each component
 	for (int j=0; j<Materials(); ++j)
 	{
 		FEElasticMaterial* pmj = GetMaterial(j)->GetElasticMaterial();
 		FEMaterialPoint& mpj = *mp.GetPointData(j);
+        FEElasticMaterialPoint& pj = *(mpj.ExtractData<FEElasticMaterialPoint>());
+        pj.m_Q = pt.m_Q;    // copy mixture material's coordinate system into component
 		pmj->SetLocalCoordinateSystem(el, n, mpj);
 	}
 }
@@ -84,13 +88,13 @@ mat3ds FEUncoupledElasticMixture::DevStress(FEMaterialPoint& mp)
 	for (int i=0; i < (int)m_pMat.size(); ++i)
 	{
 		// copy the elastic material point data to the components
+        // but don't copy m_Q since correct value was set in SetLocalCoordinateSystem
 		FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
 		epi.m_rt = ep.m_rt;
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-		epi.m_s = m_pMat[i]->DevStress(*pt.m_mp[i]);
-//		epi.m_Q = ep.m_Q;
+		epi.m_s = m_pMat[i]->DevStress(*pt.m_mp[i])*w[i];
 		s += epi.m_s;
 	}
 	
@@ -112,13 +116,13 @@ tens4ds FEUncoupledElasticMixture::DevTangent(FEMaterialPoint& mp)
 	for (int i=0; i < (int)m_pMat.size(); ++i)
 	{
 		// copy the elastic material point data to the components
+        // but don't copy m_Q since correct value was set in SetLocalCoordinateSystem
 		FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
 		epi.m_rt = ep.m_rt;
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-//		epi.m_Q = ep.m_Q;
-		c += m_pMat[i]->DevTangent(*pt.m_mp[i]);
+		c += m_pMat[i]->DevTangent(*pt.m_mp[i])*w[i];
 	}
 	
 	return c;

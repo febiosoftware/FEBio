@@ -21,9 +21,7 @@
 class FEContinuousFiberDistributionUC : public FEUncoupledMaterial
 {
 public:
-    FEContinuousFiberDistributionUC(FEModel* pfem) : FEUncoupledMaterial(pfem) {
-        m_a = vec3d(1,0,0); m_d = vec3d(0,1,0); m_Q = mat3dd(1);
-    }
+    FEContinuousFiberDistributionUC(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
     ~FEContinuousFiberDistributionUC() {}
     
     // Initialization
@@ -57,21 +55,10 @@ public:
         return new FEFiberMaterialPoint(m_pFint->CreateMaterialPointData());
     }
     
-    // return local material axes
-    mat3d LocalMatAxes() { return m_Q; }
-    
-private:
-    vec3d   m_a;        // material axes relative to local axes
-    vec3d   m_d;
-    mat3d   m_Q;        // local orientation
-    
 public:
     FEElasticFiberMaterialUC*   m_pFmat;    // pointer to fiber material
     FEFiberDensityDistribution* m_pFDD;     // pointer to fiber density distribution
     FEFiberIntegrationSchemeUC* m_pFint;    // pointer to fiber integration scheme
-    
-	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
 };
 
 #endif /* defined(__FEBioMech__FEContinuousFiberDistributionUC__) */

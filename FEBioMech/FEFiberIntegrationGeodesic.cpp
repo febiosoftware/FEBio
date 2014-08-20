@@ -7,7 +7,6 @@
 //
 
 #include "FEFiberIntegrationGeodesic.h"
-#include "FEContinuousFiberDistribution.h"
 #include "geodesic.h"
 
 #ifndef SQR
@@ -65,10 +64,9 @@ void FEFiberIntegrationGeodesic::Init()
 mat3ds FEFiberIntegrationGeodesic::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
     
 	// loop over all integration points
 	double R;
@@ -99,10 +97,9 @@ mat3ds FEFiberIntegrationGeodesic::Stress(FEMaterialPoint& mp)
 tens4ds FEFiberIntegrationGeodesic::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
     
 	// loop over all integration points
 	double R;

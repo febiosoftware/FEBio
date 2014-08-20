@@ -7,7 +7,6 @@
 //
 
 #include "FEFiberIntegrationGeodesicUC.h"
-#include "FEContinuousFiberDistributionUC.h"
 #include "geodesic.h"
 
 #ifndef SQR
@@ -65,10 +64,9 @@ void FEFiberIntegrationGeodesicUC::Init()
 mat3ds FEFiberIntegrationGeodesicUC::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistributionUC* pcfd = dynamic_cast<FEContinuousFiberDistributionUC*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
     
 	// loop over all integration points
 	double R;
@@ -100,10 +98,9 @@ mat3ds FEFiberIntegrationGeodesicUC::DevStress(FEMaterialPoint& mp)
 tens4ds FEFiberIntegrationGeodesicUC::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistributionUC* pcfd = dynamic_cast<FEContinuousFiberDistributionUC*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
     
 	// loop over all integration points
 	double R;

@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 #include "FEFiberIntegrationTriangle.h"
-#include "FEContinuousFiberDistribution.h"
 #include "triangle_sphere.h"
 
 #ifndef SQR
@@ -156,10 +155,9 @@ void FEFiberIntegrationTriangle::Init()
 mat3ds FEFiberIntegrationTriangle::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
     
 	// loop over all integration points
 	double R;
@@ -190,10 +188,9 @@ mat3ds FEFiberIntegrationTriangle::Stress(FEMaterialPoint& mp)
 tens4ds FEFiberIntegrationTriangle::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistribution* pcfd = dynamic_cast<FEContinuousFiberDistribution*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
     
 	// loop over all integration points
 	double R;

@@ -47,7 +47,7 @@ public:
 	FEMaterialPoint* CreateMaterialPointData();
 
 	// return number of materials
-	int Materials() const { return m_pMat.size(); }
+	int Materials() const { return (int)m_pMat.size(); }
 
 	// return a material component
 	FEElasticMaterial* GetMaterial(int i) { return m_pMat[i]; }
@@ -57,6 +57,9 @@ public:
 
 	// get a material parameter
 	FEParam* GetParameter(const ParamString& s);
+    
+	//! Set the local coordinate system for a material point (overridden from FEMaterial)
+	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
 
 	//! data serialization
 	void Serialize(DumpFile& ar);

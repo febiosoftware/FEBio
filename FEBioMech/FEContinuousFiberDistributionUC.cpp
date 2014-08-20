@@ -8,14 +8,6 @@
 
 #include "FEContinuousFiberDistributionUC.h"
 
-// define the material parameters
-BEGIN_PARAMETER_LIST(FEContinuousFiberDistributionUC, FEUncoupledMaterial)
-    ADD_PARAMETER(m_a, FE_PARAM_VEC3D, "a");
-    ADD_PARAMETER(m_d, FE_PARAM_VEC3D, "d");
-END_PARAMETER_LIST();
-
-
-
 //-----------------------------------------------------------------------------
 int FEContinuousFiberDistributionUC::Properties()
 {
@@ -91,15 +83,6 @@ void FEContinuousFiberDistributionUC::Init()
     
     // initialize fiber integration scheme
     m_pFint->Init();
-    
-    // normalize axes vectors and evaluate local orientation
-    vec3d a = m_a; a.unit();
-    vec3d d = m_d; d.unit();
-    vec3d c = a ^ d; c.unit();
-    vec3d b = c ^ a;
-	m_Q[0][0] = a.x; m_Q[0][1] = b.x; m_Q[0][2] = c.x;
-	m_Q[1][0] = a.y; m_Q[1][1] = b.y; m_Q[1][2] = c.y;
-	m_Q[2][0] = a.z; m_Q[2][1] = b.z; m_Q[2][2] = c.z;
 }
 
 //-----------------------------------------------------------------------------

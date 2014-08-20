@@ -7,7 +7,6 @@
 //
 
 #include "FEFiberIntegrationGaussUC.h"
-#include "FEContinuousFiberDistributionUC.h"
 #include "gauss.h"
 
 #ifndef SQR
@@ -89,10 +88,9 @@ void FEFiberIntegrationGaussUC::Init()
 mat3ds FEFiberIntegrationGaussUC::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistributionUC* pcfd = dynamic_cast<FEContinuousFiberDistributionUC*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
 	
     // right Cauchy-Green tensor and its eigenvalues & eigenvectors
     mat3ds C = pt.DevRightCauchyGreen();
@@ -233,10 +231,9 @@ mat3ds FEFiberIntegrationGaussUC::DevStress(FEMaterialPoint& mp)
 tens4ds FEFiberIntegrationGaussUC::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistributionUC* pcfd = dynamic_cast<FEContinuousFiberDistributionUC*>(GetParent());
 	
 	// get the element's local coordinate system
-	mat3d QT = (pcfd->LocalMatAxes()*pt.m_Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
 	
     // right Cauchy-Green tensor and its eigenvalues & eigenvectors
     mat3ds C = pt.DevRightCauchyGreen();

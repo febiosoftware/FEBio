@@ -20,7 +20,7 @@ public:
 	FEMaterialPoint* CreateMaterialPointData();
 
 	// return number of materials
-	int Materials() const { return m_pMat.size(); }
+	int Materials() const { return (int)m_pMat.size(); }
 
 	// return a material component
 	FEUncoupledMaterial* GetMaterial(int i) { return m_pMat[i]; }
@@ -36,7 +36,7 @@ public:
 
 public:
 	//! get number of material properties
-	int Properties() { return m_pMat.size(); }
+	int Properties() { return (int)m_pMat.size(); }
 
 	//! return a material property
 	FECoreBase* GetProperty(int n) { return m_pMat[n]; }

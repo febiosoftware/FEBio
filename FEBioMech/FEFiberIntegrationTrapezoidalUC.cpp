@@ -7,7 +7,6 @@
 //
 
 #include "FEFiberIntegrationTrapezoidalUC.h"
-#include "FEContinuousFiberDistributionUC.h"
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -36,7 +35,6 @@ void FEFiberIntegrationTrapezoidalUC::Init()
 mat3ds FEFiberIntegrationTrapezoidalUC::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistributionUC* pcfd = dynamic_cast<FEContinuousFiberDistributionUC*>(GetParent());
 	
     // initialize stress tensor
 	mat3ds s;
@@ -47,7 +45,7 @@ mat3ds FEFiberIntegrationTrapezoidalUC::DevStress(FEMaterialPoint& mp)
     double dth = pi/m_nth;  // integrate from 0 to pi
     
     // get the element's local coordinate system
-	mat3d Q = pcfd->LocalMatAxes()*pt.m_Q;
+	mat3d Q = pt.m_Q;
     vec3d a0(Q(0,0),Q(1,0),Q(2,0)); // local x-direction unit vector
     vec3d a1(Q(0,1),Q(1,1),Q(2,1)); // local y-direction unit vector
     
@@ -79,7 +77,6 @@ mat3ds FEFiberIntegrationTrapezoidalUC::DevStress(FEMaterialPoint& mp)
 tens4ds FEFiberIntegrationTrapezoidalUC::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEContinuousFiberDistributionUC* pcfd = dynamic_cast<FEContinuousFiberDistributionUC*>(GetParent());
 	
     // initialize stress tensor
 	tens4ds c;
@@ -90,7 +87,7 @@ tens4ds FEFiberIntegrationTrapezoidalUC::DevTangent(FEMaterialPoint& mp)
     double dth = pi/m_nth;  // integrate from 0 to pi
     
     // get the element's local coordinate system
-	mat3d Q = pcfd->LocalMatAxes()*pt.m_Q;
+	mat3d Q = pt.m_Q;
     vec3d a0(Q(0,0),Q(1,0),Q(2,0)); // local x-direction unit vector
     vec3d a1(Q(0,1),Q(1,1),Q(2,1)); // local y-direction unit vector
     
