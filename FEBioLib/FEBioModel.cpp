@@ -1108,7 +1108,7 @@ bool FEBioModel::Init()
 	}
 
 	// initialize model data
-	FEModel::Init();
+	if (FEModel::Init() == false) return false;
 
 	// open plot database file
 	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER)
