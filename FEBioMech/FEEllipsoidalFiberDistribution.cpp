@@ -2,10 +2,6 @@
 #include "FEEllipsoidalFiberDistribution.h"
 #include "FEContinuousFiberDistribution.h"
 
-// The following file contains the integration points and weights
-// for the integration over a unit sphere in spherical coordinates
-#include "geodesic.h"
-
 #ifndef SQR
 #define SQR(x) ((x)*(x))
 #endif
@@ -301,14 +297,6 @@ tens4ds FEEllipsoidalFiberDistribution::Tangent(FEMaterialPoint& mp)
 // FEEllipsoidalFiberDistributionOld
 //-----------------------------------------------------------------------------
 
-// we store the cos and sin of the angles here
-int FEEllipsoidalFiberDistributionOld::m_nres = 0;
-double FEEllipsoidalFiberDistributionOld::m_cth[NSTH];
-double FEEllipsoidalFiberDistributionOld::m_sth[NSTH];
-double FEEllipsoidalFiberDistributionOld::m_cph[NSTH];
-double FEEllipsoidalFiberDistributionOld::m_sph[NSTH];
-double FEEllipsoidalFiberDistributionOld::m_w[NSTH];
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEEllipsoidalFiberDistributionOld, FEElasticMaterial)
 	ADD_PARAMETERV(m_beta, FE_PARAM_DOUBLEV, 3, "beta");
@@ -328,9 +316,9 @@ void FEEllipsoidalFiberDistributionOld::Init()
 	if (m_beta[1] < 2) throw MaterialError("beta1 must be greater than 2.");
 	if (m_beta[2] < 2) throw MaterialError("beta1 must be greater than 2.");
 
-	static bool bfirst = true;
+	m_bfirst = true;
 	
-	if (bfirst)
+	if (m_bfirst)
 	{
 		// select the integration rule
 		const int nint = (m_nres == 0? NSTL  : NSTH  );
@@ -347,7 +335,7 @@ void FEEllipsoidalFiberDistributionOld::Init()
 			m_w[n] = w[n];
 		}
 		
-		bfirst = false;
+		m_bfirst = false;
 	}
 }
 

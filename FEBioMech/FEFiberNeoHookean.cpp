@@ -1,17 +1,6 @@
 #include "stdafx.h"
 #include "FEFiberNeoHookean.h"
 
-// The following file contains the integration points and weights
-// for the integration over a unit sphere in spherical coordinates
-#include "geodesic.h"
-
-// we store the cos and sin of the angles here
-int FEFiberNeoHookean::m_nres = 0;
-double FEFiberNeoHookean::m_cth[NSTH];
-double FEFiberNeoHookean::m_sth[NSTH];
-double FEFiberNeoHookean::m_cph[NSTH];
-double FEFiberNeoHookean::m_sph[NSTH];
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
@@ -31,27 +20,7 @@ END_PARAMETER_LIST();
 
 FEFiberNeoHookean::FEFiberNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	static bool bfirst = true;
-
-	if (bfirst)
-	{
-		// select the integration rule
-		const int nint    = (m_nres == 0? NSTL  : NSTH  );
-		const double* phi = (m_nres == 0? PHIL  : PHIH  );
-		const double* the = (m_nres == 0? THETAL: THETAH);
-		const double* w   = (m_nres == 0? AREAL : AREAH );
-
-		for (int n=0; n<nint; ++n)
-		{
-			m_cth[n] = cos(the[n]); 
-			m_sth[n] = sin(the[n]);
-			m_cph[n] = cos(phi[n]);
-			m_sph[n] = sin(phi[n]);
-		}
-
-		bfirst = false;
-	}
-
+    m_nres = 0;
 	m_a[0] = m_a[1] = m_a[2] = 0;
 	m_ac = 0;
 }
@@ -62,6 +31,28 @@ void FEFiberNeoHookean::Init()
 
 	if (m_E <= 0) throw MaterialError("Invalid value for E");
 	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
+    
+    m_bfirst = true;
+    
+	if (m_bfirst)
+	{
+		// select the integration rule
+		const int nint    = (m_nres == 0? NSTL  : NSTH  );
+		const double* phi = (m_nres == 0? PHIL  : PHIH  );
+		const double* the = (m_nres == 0? THETAL: THETAH);
+		const double* w   = (m_nres == 0? AREAL : AREAH );
+        
+		for (int n=0; n<nint; ++n)
+		{
+			m_cth[n] = cos(the[n]);
+			m_sth[n] = sin(the[n]);
+			m_cph[n] = cos(phi[n]);
+			m_sph[n] = sin(phi[n]);
+			m_w[n] = w[n];
+		}
+        
+		m_bfirst = false;
+	}
 }
 
 mat3ds FEFiberNeoHookean::Stress(FEMaterialPoint& mp)

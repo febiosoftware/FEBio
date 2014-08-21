@@ -29,9 +29,9 @@ void FEFiberIntegrationGaussKronrodUC::Init()
 	if (m_nph < 1) throw MaterialError("nph must be strictly greater than zero.");
 	if (m_nth < 1) throw MaterialError("nth must be strictly greater than zero.");
     
-	static bool bfirst = true;
+	m_bfirst = true;
 	
-	if (bfirst)
+	if (m_bfirst)
 	{
         switch (m_nph) {
             case 7:
@@ -62,7 +62,7 @@ void FEFiberIntegrationGaussKronrodUC::Init()
                 throw MaterialError("nph must 7,11,15,19,23,27.");
                 break;
         }
-		bfirst = false;
+		m_bfirst = false;
     }
     
     // also initialize the parent class

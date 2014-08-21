@@ -39,9 +39,9 @@ void FEVonMises3DFiberDensityDistribution::Init()
 
 double FEVonMises3DFiberDensityDistribution::FiberDensity(const vec3d n0)
 {
-    // The local z-direction is the principal fiber bundle direction
-    // The z-component of n0 is cos(phi)
-    double R = exp(m_b*(2*SQR(n0.z)-1));
+    // The local x-direction is the principal fiber bundle direction
+    // The x-component of n0 is cos(phi)
+    double R = exp(m_b*(2*SQR(n0.x)-1));
     return R/m_IFD;
 }
 

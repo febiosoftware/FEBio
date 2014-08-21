@@ -31,11 +31,12 @@ public:
 public:
 	int             m_nres;	// resolution
     int             m_nint; // number of integration points
-	static double	m_cth[];
-	static double	m_sth[];
-	static double	m_cph[];
-	static double	m_sph[];
-	static double	m_w[];
+	double          m_cth[2000];
+	double          m_sth[2000];
+	double          m_cph[2000];
+	double          m_sph[2000];
+	double          m_w[2000];
+    bool            m_bfirst;
     
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

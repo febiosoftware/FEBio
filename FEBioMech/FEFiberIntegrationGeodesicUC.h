@@ -10,6 +10,7 @@
 #define __FEBioMech__FEFiberIntegrationGeodesicUC__
 
 #include "FEFiberIntegrationSchemeUC.h"
+#include "geodesic.h"
 
 //----------------------------------------------------------------------------------
 // Geodesic dome integration scheme for continuous fiber distributions
@@ -35,11 +36,12 @@ public:
 public:
 	int             m_nres;	// resolution
     int             m_nint; // number of integration points
-	static double	m_cth[];
-	static double	m_sth[];
-	static double	m_cph[];
-	static double	m_sph[];
-	static double	m_w[];
+	double          m_cth[NSTH];
+    double          m_sth[NSTH];
+    double          m_cph[NSTH];
+    double          m_sph[NSTH];
+    double          m_w[NSTH];
+    bool            m_bfirst;
     
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

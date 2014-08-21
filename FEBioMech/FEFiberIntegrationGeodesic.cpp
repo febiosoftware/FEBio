@@ -7,7 +7,6 @@
 //
 
 #include "FEFiberIntegrationGeodesic.h"
-#include "geodesic.h"
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -16,14 +15,6 @@
 //-----------------------------------------------------------------------------
 // FEFiberIntegrationGeodesic
 //-----------------------------------------------------------------------------
-
-// we store the cos and sin of the angles here
-double FEFiberIntegrationGeodesic::m_cth[NSTH];
-double FEFiberIntegrationGeodesic::m_sth[NSTH];
-double FEFiberIntegrationGeodesic::m_cph[NSTH];
-double FEFiberIntegrationGeodesic::m_sph[NSTH];
-double FEFiberIntegrationGeodesic::m_w[NSTH];
-
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberIntegrationGeodesic, FEFiberIntegrationScheme)
@@ -34,9 +25,9 @@ void FEFiberIntegrationGeodesic::Init()
 {
 	if ((m_nres != 0) && (m_nres != 1)) throw MaterialError("resolution must be 0 (low) or 1 (high).");
     
-	static bool bfirst = true;
+	m_bfirst = true;
 	
-	if (bfirst)
+	if (m_bfirst)
 	{
 		// select the integration rule
 		m_nint = (m_nres == 0? NSTL  : NSTH  );
@@ -53,7 +44,7 @@ void FEFiberIntegrationGeodesic::Init()
 			m_w[n] = w[n];
 		}
 		
-		bfirst = false;
+		m_bfirst = false;
 	}
     
     // also initialize the parent class

@@ -18,13 +18,6 @@
 // FEFiberIntegrationTriangle
 //-----------------------------------------------------------------------------
 
-// we store the cos and sin of the angles here
-double FEFiberIntegrationTriangle::m_cth[2000];
-double FEFiberIntegrationTriangle::m_sth[2000];
-double FEFiberIntegrationTriangle::m_cph[2000];
-double FEFiberIntegrationTriangle::m_sph[2000];
-double FEFiberIntegrationTriangle::m_w[2000];
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberIntegrationTriangle, FEFiberIntegrationScheme)
     ADD_PARAMETER(m_nres, FE_PARAM_INT, "resolution");
@@ -32,9 +25,9 @@ END_PARAMETER_LIST();
 
 void FEFiberIntegrationTriangle::Init()
 {
-	static bool bfirst = true;
+	m_bfirst = true;
 	
-	if (bfirst)
+	if (m_bfirst)
 	{
 		switch (m_nres) {
             
@@ -144,7 +137,7 @@ void FEFiberIntegrationTriangle::Init()
                 break;
         }
         
-		bfirst = false;
+		m_bfirst = false;
 	}
     
     // also initialize the parent class

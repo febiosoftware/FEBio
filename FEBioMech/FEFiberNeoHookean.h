@@ -1,6 +1,10 @@
 #pragma once
 #include "FEElasticMaterial.h"
 
+// The following file contains the integration points and weights
+// for the integration over a unit sphere in spherical coordinates
+#include "geodesic.h"
+
 class FEFiberNeoHookean : public FEElasticMaterial
 {
 public:
@@ -26,12 +30,14 @@ public:
 	// -------------------------------
 
 	// numerical quadrature stuff
-	static	int	m_nres;	// integration rule
+	int     m_nres;	// integration rule
 
-	static double	m_cth[];
-	static double	m_sth[];
-	static double	m_cph[];
-	static double	m_sph[];
+	double	m_cth[NSTH];
+	double	m_sth[NSTH];
+	double	m_cph[NSTH];
+	double	m_sph[NSTH];
+    double  m_w[NSTH];
+    bool    m_bfirst;
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

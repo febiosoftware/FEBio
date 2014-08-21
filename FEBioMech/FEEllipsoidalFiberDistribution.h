@@ -1,6 +1,10 @@
 #pragma once
 #include "FEElasticMaterial.h"
 
+// The following file contains the integration points and weights
+// for the integration over a unit sphere in spherical coordinates
+#include "geodesic.h"
+
 //-----------------------------------------------------------------------------
 //! Material class for the ellipsoidal fiber distribution
 //!
@@ -35,7 +39,7 @@ public:
 class FEEllipsoidalFiberDistributionOld : public FEElasticMaterial
 {
 public:
-	FEEllipsoidalFiberDistributionOld(FEModel* pfem) : FEElasticMaterial(pfem) {}
+	FEEllipsoidalFiberDistributionOld(FEModel* pfem) : FEElasticMaterial(pfem) { m_nres = 0; }
 	
 	//! Initialization
 	void Init();
@@ -53,10 +57,11 @@ public:
 	double	m_beta[3];	// power in power-law relation
 	double	m_ksi[3];	// coefficient in power-law relation
 
-	static int		m_nres;	// integration rule
-	static double	m_cth[];
-	static double	m_sth[];
-	static double	m_cph[];
-	static double	m_sph[];
-	static double	m_w[];
+	int		m_nres;	// integration rule
+	double	m_cth[NSTH];
+	double	m_sth[NSTH];
+	double	m_cph[NSTH];
+	double	m_sph[NSTH];
+	double	m_w[NSTH];
+    bool    m_bfirst;
 };

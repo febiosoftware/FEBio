@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 #include "FEFiberIntegrationTriangleUC.h"
-#include "triangle_sphere.h"
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -18,13 +17,6 @@
 // FEFiberIntegrationTriangleUC
 //-----------------------------------------------------------------------------
 
-// we store the cos and sin of the angles here
-double FEFiberIntegrationTriangleUC::m_cth[2000];
-double FEFiberIntegrationTriangleUC::m_sth[2000];
-double FEFiberIntegrationTriangleUC::m_cph[2000];
-double FEFiberIntegrationTriangleUC::m_sph[2000];
-double FEFiberIntegrationTriangleUC::m_w[2000];
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberIntegrationTriangleUC, FEFiberIntegrationSchemeUC)
     ADD_PARAMETER(m_nres, FE_PARAM_INT, "resolution");
@@ -32,9 +24,9 @@ END_PARAMETER_LIST();
 
 void FEFiberIntegrationTriangleUC::Init()
 {
-	static bool bfirst = true;
+	m_bfirst = true;
 	
-	if (bfirst)
+	if (m_bfirst)
 	{
 		switch (m_nres) {
                 
@@ -144,7 +136,7 @@ void FEFiberIntegrationTriangleUC::Init()
                 break;
         }
         
-		bfirst = false;
+		m_bfirst = false;
 	}
     
     // also initialize the parent class
