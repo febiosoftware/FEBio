@@ -23,6 +23,7 @@
 		D5B572DC186CC76500D12E45 /* FECoreTask.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B572D4186CC76500D12E45 /* FECoreTask.h */; };
 		D5B572DD186CC76500D12E45 /* FEGlobalData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B572D5186CC76500D12E45 /* FEGlobalData.cpp */; };
 		D5B572DE186CC76500D12E45 /* FEGlobalData.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B572D6186CC76500D12E45 /* FEGlobalData.h */; };
+		D5BE04D619A5806400AD08F8 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = D5BE04D519A5806400AD08F8 /* version.h */; };
 		D5E10A801865E15900B23922 /* Archive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E109EF1865E15900B23922 /* Archive.cpp */; };
 		D5E10A811865E15900B23922 /* Archive.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E109F01865E15900B23922 /* Archive.h */; };
 		D5E10A821865E15900B23922 /* BC.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E109F11865E15900B23922 /* BC.h */; };
@@ -178,6 +179,7 @@
 		D5B572D4186CC76500D12E45 /* FECoreTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECoreTask.h; sourceTree = "<group>"; };
 		D5B572D5186CC76500D12E45 /* FEGlobalData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEGlobalData.cpp; sourceTree = "<group>"; };
 		D5B572D6186CC76500D12E45 /* FEGlobalData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEGlobalData.h; sourceTree = "<group>"; };
+		D5BE04D519A5806400AD08F8 /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
 		D5E109E71865E14D00B23922 /* libFECore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFECore.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E109EF1865E15900B23922 /* Archive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Archive.cpp; sourceTree = "<group>"; };
 		D5E109F01865E15900B23922 /* Archive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Archive.h; sourceTree = "<group>"; };
@@ -347,8 +349,6 @@
 		D5E109EE1865E15900B23922 /* FECore */ = {
 			isa = PBXGroup;
 			children = (
-				D50E7EB51992EB8300950744 /* eig3.cpp */,
-				D50E7EB61992EB8300950744 /* eig3.h */,
 				D5E109EF1865E15900B23922 /* Archive.cpp */,
 				D5E109F01865E15900B23922 /* Archive.h */,
 				D5E109F11865E15900B23922 /* BC.h */,
@@ -363,6 +363,8 @@
 				D5E109F81865E15900B23922 /* DumpFile.h */,
 				D5E109F91865E15900B23922 /* DumpStream.cpp */,
 				D5E109FA1865E15900B23922 /* DumpStream.h */,
+				D50E7EB51992EB8300950744 /* eig3.cpp */,
+				D50E7EB61992EB8300950744 /* eig3.h */,
 				D5E109FB1865E15900B23922 /* ElementDataRecord.cpp */,
 				D5E109FC1865E15900B23922 /* ElementDataRecord.h */,
 				D5E109FD1865E15900B23922 /* FE_enum.h */,
@@ -499,6 +501,7 @@
 				D5E10A7D1865E15900B23922 /* vec3d.h */,
 				D5E10A7E1865E15900B23922 /* vector.cpp */,
 				D5E10A7F1865E15900B23922 /* vector.h */,
+				D5BE04D519A5806400AD08F8 /* version.h */,
 			);
 			name = FECore;
 			path = ../../FECore;
@@ -578,6 +581,7 @@
 				D5E10AA71865E15900B23922 /* FEDiscreteMaterial.h in Headers */,
 				D5E10B061865E15900B23922 /* targetver.h in Headers */,
 				D5E10AF91865E15900B23922 /* matrix.h in Headers */,
+				D5BE04D619A5806400AD08F8 /* version.h in Headers */,
 				D5E10ACD1865E15900B23922 /* FENodeNodeList.h in Headers */,
 				D5E10A841865E15900B23922 /* BFGSSolver.h in Headers */,
 				D5E10A9F1865E15900B23922 /* FECoordSysMap.h in Headers */,
