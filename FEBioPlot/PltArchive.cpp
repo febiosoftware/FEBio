@@ -89,6 +89,8 @@ void FileStream::EndStreaming()
 
 		// all done
 		deflateEnd(&strm);
+
+		fflush(m_fp);
 	}
 #endif
 }
@@ -143,6 +145,9 @@ void FileStream::Flush()
 #else
 	if (m_fp) fwrite(m_buf, m_current, 1, m_fp);
 #endif
+
+	// flush the file
+	if (m_fp) fflush(m_fp);
 
 	// reset current data pointer
 	m_current = 0;
