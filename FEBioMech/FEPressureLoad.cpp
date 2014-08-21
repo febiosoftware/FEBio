@@ -251,10 +251,10 @@ bool FEPressureLoad::LinearPressureForce(FESurfaceElement& el, vector<double>& f
 
 void FEPressureLoad::Serialize(DumpFile& ar)
 {
+	FESurfaceLoad::Serialize(ar);
+
 	if (ar.IsSaving())
 	{
-		ar << m_blinear;
-		ar << m_pressure;
 		ar << (int) m_PC.size();
 		for (int i=0; i< (int) m_PC.size(); ++i)
 		{
@@ -267,8 +267,6 @@ void FEPressureLoad::Serialize(DumpFile& ar)
 	else
 	{
 		int n;
-		ar >> m_blinear;
-		ar >> m_pressure;
 		ar >> n;
 		m_PC.resize(n);
 		// pressure forces

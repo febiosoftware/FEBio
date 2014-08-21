@@ -650,6 +650,8 @@
     <ClInclude Include="..\..\FECore\targetver.h" />
     <ClInclude Include="..\..\FECore\tens4d.h" />
     <ClInclude Include="..\..\FECore\tens4d.hpp" />
+    <ClInclude Include="..\..\FECore\tens4dms.hpp" />
+    <ClInclude Include="..\..\FECore\tens4ds.hpp" />
     <ClInclude Include="..\..\FECore\Timer.h" />
     <ClInclude Include="..\..\FECore\vec2d.h" />
     <ClInclude Include="..\..\FECore\vec3d.h" />
