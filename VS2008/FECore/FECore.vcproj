@@ -873,6 +873,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\tens4dms.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\tens4ds.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\Timer.h"
 				>
 			</File>
@@ -886,6 +894,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\vector.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\version.h"
 				>
 			</File>
 		</Filter>
