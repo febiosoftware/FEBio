@@ -332,28 +332,73 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 				else throw XMLReader::InvalidAttributeValue(tag, "extend", szt);
 			}
 
-			// count how many points we have
-			XMLTag t(tag); ++t;
-			int nlp = 0;
-			while (!t.isend()) { ++nlp; ++t; }
-
-			// create the loadcurve
-			FELoadCurve* plc = new FELoadCurve;
-			plc->Create(nlp);
-			plc->SetInterpolation(ntype);
-			plc->SetExtendMode(nextm);
-			opt.AddLoadCurve(plc);
-
-			// read the points
-			double d[2];
-			++tag;
-			for (int i=0; i<nlp; ++i)
+			// see if the user wants to read the data from a text file
+			const char* szf = tag.AttributeValue("import", true);
+			if (szf)
 			{
-				tag.value(d, 2);
-				plc->LoadPoint(i).time  = d[0];
-				plc->LoadPoint(i).value = d[1];
+				// make sure this tag is a leaf
+				if ((tag.isempty() == false) || (tag.isleaf() == false)) throw XMLReader::InvalidValue(tag);
 
+				// read the data form a text file
+				FILE* fp = fopen(szf, "rt");
+				if (fp == 0) throw XMLReader::InvalidAttributeValue(tag, "import", szf);
+				vector< pair<double,double> > data;
+				char szline[256] = {0};
+				do
+				{
+					fgets(szline, 255, fp);
+					double t, v;
+					int n = sscanf(szline, "%lg%lg", &t, &v);
+					if (n == 2)
+					{
+						data.push_back(pair<double,double>(t,v));
+					}
+					else break;
+				}
+				while ((feof(fp) == 0) && (ferror(fp) == 0));
+
+				fclose(fp);
+
+				// create the load curve
+				const int nlp = (const int) data.size();
+				FELoadCurve* plc = new FELoadCurve;
+				plc->Create(nlp);
+				plc->SetInterpolation(ntype);
+				plc->SetExtendMode(nextm);
+				opt.AddLoadCurve(plc);
+
+				// set the load points
+				for (int i=0; i<nlp; ++i)
+				{
+					plc->LoadPoint(i).time = data[i].first;
+					plc->LoadPoint(i).value = data[i].second;
+				}
+			}
+			else
+			{
+				// count how many points we have
+				XMLTag t(tag); ++t;
+				int nlp = 0;
+				while (!t.isend()) { ++nlp; ++t; }
+
+				// create the loadcurve
+				FELoadCurve* plc = new FELoadCurve;
+				plc->Create(nlp);
+				plc->SetInterpolation(ntype);
+				plc->SetExtendMode(nextm);
+				opt.AddLoadCurve(plc);
+
+				// read the points
+				double d[2];
 				++tag;
+				for (int i=0; i<nlp; ++i)
+				{
+					tag.value(d, 2);
+					plc->LoadPoint(i).time  = d[0];
+					plc->LoadPoint(i).value = d[1];
+
+					++tag;
+				}
 			}
 		}
 		else throw XMLReader::InvalidTag(tag);
