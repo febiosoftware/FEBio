@@ -5,24 +5,30 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>2AAA3577-26E9-49FD-A6EE-BA92909EFCEA</string>
+	<string>5611B895-3CDF-44A2-B865-E5DADFCB8F63</string>
 	<key>IDESourceControlProjectName</key>
 	<string>FEBio2</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>C97430A4-2867-4E30-B3AF-BF475A052829</key>
-		<string>https://gforge.sci.utah.edu/svn/MRLProjects</string>
+		<key>5AFCC535-4F24-40D0-B6AC-EED117829285</key>
+		<string>https://gforge.sci.utah.edu/svn/MRLProjects/FEBio</string>
+		<key>CA0B22FD-8C19-4076-9B2E-3D23EF42C09C</key>
+		<string>https://gforge.sci.utah.edu/svn/MRLProjects/FEBio2</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>FEBio2/XCode5/FEBio2.xcworkspace</string>
+	<string>XCode5/FEBio2.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>C97430A4-2867-4E30-B3AF-BF475A052829</key>
-		<string>../../..</string>
+		<key>5AFCC535-4F24-40D0-B6AC-EED117829285</key>
+		<string>../../../FEBio</string>
+		<key>CA0B22FD-8C19-4076-9B2E-3D23EF42C09C</key>
+		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectRepositoryRootDictionary</key>
 	<dict>
-		<key>C97430A4-2867-4E30-B3AF-BF475A052829</key>
+		<key>5AFCC535-4F24-40D0-B6AC-EED117829285</key>
+		<string>https://gforge.sci.utah.edu/svn/MRLProjects</string>
+		<key>CA0B22FD-8C19-4076-9B2E-3D23EF42C09C</key>
 		<string>https://gforge.sci.utah.edu/svn/MRLProjects</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
@@ -30,18 +36,24 @@
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>C97430A4-2867-4E30-B3AF-BF475A052829</string>
+	<string>CA0B22FD-8C19-4076-9B2E-3D23EF42C09C</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
-			<key>IDESourceControlRepositoryBranchesRelativeLocationKey</key>
-			<string>branches</string>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.subversion</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>C97430A4-2867-4E30-B3AF-BF475A052829</string>
+			<string>5AFCC535-4F24-40D0-B6AC-EED117829285</string>
 			<key>IDESourceControlWCCName</key>
-			<string>MRLProjects</string>
+			<string>FEBio</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.subversion</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>CA0B22FD-8C19-4076-9B2E-3D23EF42C09C</string>
+			<key>IDESourceControlWCCName</key>
+			<string>FEBio2</string>
 		</dict>
 	</array>
 </dict>

@@ -1,4 +1,371 @@
 ------------------------------------------------------------------------
+r6246 | maas | 2014-08-21 15:05:06 -0600 (Thu, 21 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioPlot/PltArchive.cpp
+
+FEBio2: Added flushing of plot file on write.
+------------------------------------------------------------------------
+r6245 | ateshian | 2014-08-21 14:54:29 -0600 (Thu, 21 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/FEBio_um_2.0.docx
+
+febio2: Updated User Manual to describe the significance of nesting material axes in solid mixtures.
+------------------------------------------------------------------------
+r6244 | ltedgar | 2014-08-21 13:58:17 -0600 (Thu, 21 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEMicroMaterial.cpp
+
+
+------------------------------------------------------------------------
+r6243 | ateshian | 2014-08-21 13:52:25 -0600 (Thu, 21 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEEllipsoidalFiberDistribution.cpp
+   M /FEBio2/FEBioMech/FEEllipsoidalFiberDistribution.h
+   M /FEBio2/FEBioMech/FEFiberDensityDistribution.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrod.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrod.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrodUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrodUC.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGeodesic.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGeodesic.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGeodesicUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGeodesicUC.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationTriangle.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationTriangle.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationTriangleUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationTriangleUC.h
+   M /FEBio2/FEBioMech/FEFiberNeoHookean.cpp
+   M /FEBio2/FEBioMech/FEFiberNeoHookean.h
+   M /FEBio2/XCode5/FECore/FECore.xcodeproj/project.pbxproj
+
+febio2: replaced static variables in various classes of fiber integration schemes, so that multiple fiber families may be superposed in solid mixtures without conflict. Modified FEVonMises3DFiberDensityDistribution so that fiber principal direction is along local x-direction (instead of z-direction), for consistency with other fiber density distributions. Updated XCode5 project.
+------------------------------------------------------------------------
+r6242 | maas | 2014-08-21 12:24:16 -0600 (Thu, 21 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioLib/FEBioModel.cpp
+
+FEBio2: fixed bug in FEBioModel::Init (was not checking return code of FEModel::Init).
+------------------------------------------------------------------------
+r6241 | maas | 2014-08-21 11:39:19 -0600 (Thu, 21 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEPressureLoad.cpp
+   M /FEBio2/VS2010/FECore/FECore.vcxproj
+   M /FEBio2/VS2010/FECore/FECore.vcxproj.filters
+
+FEBio2: fixed bug in FEPressureLoad serialization.
+------------------------------------------------------------------------
+r6239 | ltedgar | 2014-08-21 10:01:19 -0600 (Thu, 21 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FECore/tens4d.h
+   M /FEBio2/FECore/tens4d.hpp
+   A /FEBio2/FECore/tens4dms.hpp
+   A /FEBio2/FECore/tens4ds.hpp
+
+FEBio2:  Added new 4d tensor classes LTE
+------------------------------------------------------------------------
+r6236 | ateshian | 2014-08-20 19:21:02 -0600 (Wed, 20 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/XCode5/FECore/FECore.xcodeproj/project.pbxproj
+
+fecore: Updated XCode5 project.
+------------------------------------------------------------------------
+r6235 | ateshian | 2014-08-20 17:51:36 -0600 (Wed, 20 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEContinuousFiberDistribution.cpp
+   M /FEBio2/FEBioMech/FEContinuousFiberDistribution.h
+   M /FEBio2/FEBioMech/FEContinuousFiberDistributionUC.cpp
+   M /FEBio2/FEBioMech/FEContinuousFiberDistributionUC.h
+   M /FEBio2/FEBioMech/FEElasticMixture.cpp
+   M /FEBio2/FEBioMech/FEElasticMixture.h
+   M /FEBio2/FEBioMech/FEFiberExpPow.h
+   M /FEBio2/FEBioMech/FEFiberExpPowUncoupled.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGauss.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrod.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrodUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGeodesic.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGeodesicUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationTrapezoidal.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationTrapezoidalUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationTriangle.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationTriangleUC.cpp
+   M /FEBio2/FEBioMech/FEUncoupledElasticMixture.cpp
+   M /FEBio2/FEBioMech/FEUncoupledElasticMixture.h
+
+febio2: Modified FEElasticMixture and FEUncoupledElasticMixture to properly combine material axes information from parent material and components. Simplified FEContinuousFiberDistribution and FEContinuousFiberDistributionUC to account for this new capability in solid mixtures. Updated serialization in FEElasticMixtureMaterialPoint. Created default settings for fiber orientation in FEFiberExpPow and FEFiberExpPowUncoupled.
+------------------------------------------------------------------------
+r6232 | maas | 2014-08-20 11:20:47 -0600 (Wed, 20 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/Doxygen/index.dox
+   M /FEBio2/Documentation/Doxygen/plugin_basics.dox
+   M /FEBio2/Documentation/Doxygen/plugins.dox
+   A /FEBio2/Documentation/Doxygen/task.dox
+
+Updated developer's documentation.
+------------------------------------------------------------------------
+r6228 | maas | 2014-08-20 10:37:36 -0600 (Wed, 20 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBio2/FEBio.cpp
+   M /FEBio2/FEBioLib/plugin.cpp
+   M /FEBio2/FECore/FECoreKernel.h
+   A /FEBio2/FECore/version.h
+   M /FEBio2/VS2010/FECore/FECore.vcxproj
+   M /FEBio2/VS2010/FECore/FECore.vcxproj.filters
+
+FEBio2: Added FE_SKD_VERSION variable which defines the SDK version.
+------------------------------------------------------------------------
+r6226 | rawlins | 2014-08-19 15:45:49 -0600 (Tue, 19 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FESlidingInterface.cpp
+
+FEBio2: Small modification for mesh surface serialization.
+------------------------------------------------------------------------
+r6225 | maas | 2014-08-19 13:37:11 -0600 (Tue, 19 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2008/FEBioMech/FEBioMech.vcproj
+   M /FEBio2/VS2008/FECore/FECore.vcproj
+
+FEBio2: updated vs08 solution.
+------------------------------------------------------------------------
+r6224 | rawlins | 2014-08-19 12:47:53 -0600 (Tue, 19 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioLib/FEBioModel.cpp
+   M /FEBio2/FEBioMech/FESlidingInterface.cpp
+
+FEBio2: Fixed mesh surface serialization.
+------------------------------------------------------------------------
+r6220 | ateshian | 2014-08-18 15:52:45 -0600 (Mon, 18 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/FEBio_um_2.0.docx
+
+FEBio2: Updated User Manual to clarify the specification of fiber direction or material axes.
+------------------------------------------------------------------------
+r6219 | ateshian | 2014-08-18 15:34:07 -0600 (Mon, 18 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/FEBio_um_2.0.docx
+
+FEBio2: Updated User Manual to correct bulk modulus specification for uncoupled solid mixtures.  Added figure for spherical angles in fiber-exp-pow material description.
+------------------------------------------------------------------------
+r6217 | rawlins | 2014-08-15 12:10:10 -0600 (Fri, 15 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/Doxygen/Doxyfile
+
+FEBio2: Moved doxygen out files to the Doxygen/doc directory
+------------------------------------------------------------------------
+r6216 | rawlins | 2014-08-14 16:50:40 -0600 (Thu, 14 Aug 2014) | 3 lines
+Changed paths:
+   M /FEBio2/VS2010/FECore/FECore.vcxproj
+   M /FEBio2/VS2010/FECore/FECore.vcxproj.filters
+
+FEBio2: Added files to VS10 config.
+
+
+------------------------------------------------------------------------
+r6215 | rawlins | 2014-08-14 16:43:55 -0600 (Thu, 14 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEPressureLoad.cpp
+
+FEBio2: Fixed bug in pressure load serialization.
+------------------------------------------------------------------------
+r6210 | ateshian | 2014-08-14 06:11:52 -0600 (Thu, 14 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEElasticFiberMaterialUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrod.cpp
+   A /FEBio2/FECore/eig3.cpp
+   A /FEBio2/FECore/eig3.h
+   M /FEBio2/FECore/mat3d.cpp
+   M /FEBio2/FECore/mat3d.h
+   M /FEBio2/XCode5/FECore/FECore.xcodeproj/project.pbxproj
+
+febio2: added alternative algorithm for calculating eigenvalues and eigenvectors in 3x3 symmetric matrix.
+------------------------------------------------------------------------
+r6203 | ateshian | 2014-08-08 13:56:08 -0600 (Fri, 08 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEElasticFiberMaterial.h
+   M /FEBio2/FEBioMech/FEElasticFiberMaterialUC.h
+
+febio2: Added initialization of material properties in FEElasticFiberMaterial and FEElasticFiberMaterialUC.
+------------------------------------------------------------------------
+r6202 | ateshian | 2014-08-08 13:07:28 -0600 (Fri, 08 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEElasticFiberMaterial.cpp
+   M /FEBio2/FEBioMech/FEElasticFiberMaterial.h
+   M /FEBio2/FEBioMech/FEElasticFiberMaterialUC.cpp
+   M /FEBio2/FEBioMech/FEElasticFiberMaterialUC.h
+
+febio2: Added shear modulus term to FEFiberExponentialPower and FEFiberExponentialPowerUC.
+------------------------------------------------------------------------
+r6199 | maas | 2014-08-07 15:44:15 -0600 (Thu, 07 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEExplicitSolidSolver.cpp
+   M /FEBio2/FEBioMech/FEExplicitSolidSolver.h
+
+FEBio2: committed Sam Evan's explicit solid solver.
+------------------------------------------------------------------------
+r6197 | ateshian | 2014-08-06 17:32:54 -0600 (Wed, 06 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEEllipsoidalFiberDistribution.cpp
+
+febio2: fixed bug introduced in FEEllipsoidalFiberDistributionOld.
+------------------------------------------------------------------------
+r6196 | rawlins | 2014-08-06 17:03:27 -0600 (Wed, 06 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj.filters
+
+FEBio2: Added files to VS10 config.
+------------------------------------------------------------------------
+r6193 | maas | 2014-08-06 16:24:55 -0600 (Wed, 06 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioPlot/FEBioPlotFile.cpp
+   M /FEBio2/FEBioPlot/FEBioPlotFile.h
+   M /FEBio2/FECore/FEElementTraits.cpp
+   M /FEBio2/FECore/FEElementTraits.h
+   M /FEBio2/FECore/FESurface.cpp
+   M /FEBio2/FECore/FESurface.h
+
+FEBio2: fixed bug in xplt format related to storage of quadratic quads (now version 0.4). Added support for projection on quad8 facets and implemented project_to_nodes for this element.
+------------------------------------------------------------------------
+r6191 | ateshian | 2014-08-06 15:21:52 -0600 (Wed, 06 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+   A /FEBio2/FEBioMech/FEContinuousFiberDistributionUC.cpp
+   A /FEBio2/FEBioMech/FEContinuousFiberDistributionUC.h
+   A /FEBio2/FEBioMech/FEElasticFiberMaterialUC.cpp
+   A /FEBio2/FEBioMech/FEElasticFiberMaterialUC.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrod.cpp
+   A /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrodUC.cpp
+   A /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrodUC.h
+   A /FEBio2/FEBioMech/FEFiberIntegrationGaussUC.cpp
+   A /FEBio2/FEBioMech/FEFiberIntegrationGaussUC.h
+   A /FEBio2/FEBioMech/FEFiberIntegrationGeodesicUC.cpp
+   A /FEBio2/FEBioMech/FEFiberIntegrationGeodesicUC.h
+   A /FEBio2/FEBioMech/FEFiberIntegrationSchemeUC.cpp
+   A /FEBio2/FEBioMech/FEFiberIntegrationSchemeUC.h
+   A /FEBio2/FEBioMech/FEFiberIntegrationTrapezoidalUC.cpp
+   A /FEBio2/FEBioMech/FEFiberIntegrationTrapezoidalUC.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationTriangle.cpp
+   A /FEBio2/FEBioMech/FEFiberIntegrationTriangleUC.cpp
+   A /FEBio2/FEBioMech/FEFiberIntegrationTriangleUC.h
+   M /FEBio2/XCode5/FEBioMech/FEBioMech.xcodeproj/project.pbxproj
+
+febio2: Added uncoupled continuous fiber distribution material with all contingent material functions.
+------------------------------------------------------------------------
+r6190 | maas | 2014-08-06 10:54:38 -0600 (Wed, 06 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj.filters
+
+FEBio2: updated VS10 configuration to include new fiber integration files.
+------------------------------------------------------------------------
+r6187 | ateshian | 2014-08-05 13:49:27 -0600 (Tue, 05 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+   M /FEBio2/FEBioMech/FEContinuousFiberDistribution.cpp
+   M /FEBio2/FEBioMech/FEContinuousFiberDistribution.h
+   M /FEBio2/FEBioMech/FEElasticFiberMaterial.cpp
+   M /FEBio2/FEBioMech/FEElasticFiberMaterial.h
+   M /FEBio2/FEBioMech/FEElasticSolidDomain.cpp
+   M /FEBio2/FEBioMech/FEEllipsoidalFiberDistribution.cpp
+   M /FEBio2/FEBioMech/FEFiberDensityDistribution.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGauss.cpp
+   A /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrod.cpp
+   A /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrod.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGeodesic.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationTrapezoidal.cpp
+   A /FEBio2/FEBioMech/FEFiberIntegrationTriangle.cpp
+   A /FEBio2/FEBioMech/FEFiberIntegrationTriangle.h
+   A /FEBio2/FEBioMech/FEFiberMaterialPoint.cpp
+   A /FEBio2/FEBioMech/FEFiberMaterialPoint.h
+   A /FEBio2/FEBioMech/gausskronrod.h
+   A /FEBio2/FEBioMech/triangle_sphere.h
+   M /FEBio2/XCode5/FEBioMech/FEBioMech.xcodeproj/project.pbxproj
+
+febio2: Updated continuous fiber distribution models by adding two additional fiber integration schemes (Gauss-Kronrod and Triangular).  Fixed bug in the general scheme for continuous fiber distributions which prevented proper running on multiple threads. Removed obsolete FEEFD model (which had never been documented). Added the ability to define a local orientation for each continuous fiber distribution.
+------------------------------------------------------------------------
+r6184 | maas | 2014-08-04 11:22:34 -0600 (Mon, 04 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioLib/FEBioModel.cpp
+
+FEBio2: Added check for when a step is not defined (previously caused FEBio to crash).
+------------------------------------------------------------------------
+r6181 | rawlins | 2014-08-01 17:17:10 -0600 (Fri, 01 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/build/osxd.mk
+
+FEBio2: Removed libmkl_pgi_thread.a from link line (installed updated MKL).
+------------------------------------------------------------------------
+r6175 | maas | 2014-08-01 10:04:28 -0600 (Fri, 01 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBio2/FEBio.cpp
+
+FEBio2: Added check for proper command line syntax for optimization problems.
+------------------------------------------------------------------------
+r6174 | maas | 2014-07-31 16:45:39 -0600 (Thu, 31 Jul 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/Doxygen/plugin_basics.dox
+
+FEBio2: updated plugin documentation.
+------------------------------------------------------------------------
+r6173 | maas | 2014-07-31 14:47:10 -0600 (Thu, 31 Jul 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioXML/FEBioBoundarySection.cpp
+
+FEBio2: Fixed bug in parsing fixed concentration dofs.
+------------------------------------------------------------------------
+r6172 | ateshian | 2014-07-31 13:52:47 -0600 (Thu, 31 Jul 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/FEBio_um_2.0.docx
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+
+febio2: Added documentation for logfile output of elasticity tensory components.
+------------------------------------------------------------------------
+r6154 | ateshian | 2014-07-29 22:09:59 -0600 (Tue, 29 Jul 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/FEBio_um_2.0.docx
+
+febio2: Updated User Manual to correct description of Fung orthotropic material constants, and include Fung-ortho-compressible material description.
+------------------------------------------------------------------------
+r6152 | ateshian | 2014-07-29 17:35:13 -0600 (Tue, 29 Jul 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+   M /FEBio2/FEBioMech/FEBioMechData.cpp
+   M /FEBio2/FEBioMech/FEBioMechData.h
+
+febio2: Added elasticity tensor components to logfile output in FEBioMech and FEBioMechData.
+------------------------------------------------------------------------
+r6151 | rawlins | 2014-07-29 15:32:50 -0600 (Tue, 29 Jul 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/ReleaseNotes.txt
+   M /FEBio2/Documentation/febio2_svn.log
+
+FEBio2: Updated release notes and svn log.
+------------------------------------------------------------------------
+r6150 | maas | 2014-07-29 12:48:11 -0600 (Tue, 29 Jul 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2008/FEBio2/FEBio2.vcproj
+   M /FEBio2/VS2008/FEBio2.sln
+   M /FEBio2/VS2008/FEBioHeat/FEBioHeat.vcproj
+   M /FEBio2/VS2008/FEBioLib/FEBioLib.vcproj
+   M /FEBio2/VS2008/FEBioLib/FEBioLib.vcproj.SUPERNOVA.Steve.user
+   M /FEBio2/VS2008/FEBioMech/FEBioMech.vcproj
+   M /FEBio2/VS2008/FEBioMix/FEBioMix.vcproj
+   M /FEBio2/VS2008/FEBioOpt/FEBioOpt.vcproj
+   M /FEBio2/VS2008/FEBioPlot/FEBioPlot.vcproj
+   M /FEBio2/VS2008/FEBioXML/FEBioXML.vcproj
+   M /FEBio2/VS2008/FECore/FECore.vcproj
+   M /FEBio2/VS2008/FECore/FECore.vcproj.SUPERNOVA.Steve.user
+   M /FEBio2/VS2008/NumCore/NumCore.vcproj
+
+FEBio2: updated vs08 solution.
+------------------------------------------------------------------------
+r6148 | ateshian | 2014-07-29 09:44:48 -0600 (Tue, 29 Jul 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FEBiphasicSoluteSolver.cpp
+   M /FEBio2/FEBioMix/FEMultiphasicSolver.cpp
+
+febio2: Updated default value of m_bsymm to false for FEBiphasicSoluteSolver and FEMultiphasicSolver.
+------------------------------------------------------------------------
 r6139 | maas | 2014-07-24 18:48:23 -0600 (Thu, 24 Jul 2014) | 1 line
 Changed paths:
    M /FEBio2/Documentation/FEBio_um_2.0.docx
