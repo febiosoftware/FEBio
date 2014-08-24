@@ -25,6 +25,7 @@
 #include "FECarterHayes.h"
 #include "FEReactionRateConst.h"
 #include "FEReactionRateHuiskes.h"
+#include "FEReactionRateNims.h"
 #include "FEMassActionForward.h"
 #include "FEMichaelisMenten.h"
 #include "FEMassActionReversible.h"
@@ -106,6 +107,7 @@ REGISTER_FECORE_CLASS(FESupplyMichaelisMenten             ,FEMATERIAL_ID, "suppl
 REGISTER_FECORE_CLASS(FECarterHayes				    	 ,FEMATERIAL_ID, "Carter-Hayes"            );
 REGISTER_FECORE_CLASS(FEReactionRateConst		    	 ,FEMATERIAL_ID, "constant reaction rate"  );
 REGISTER_FECORE_CLASS(FEReactionRateHuiskes		    	 ,FEMATERIAL_ID, "Huiskes reaction rate"   );
+REGISTER_FECORE_CLASS(FEReactionRateNims		    	 ,FEMATERIAL_ID, "Nims reaction rate"      );
 REGISTER_FECORE_CLASS(FEMassActionForward		    	 ,FEMATERIAL_ID, "mass-action-forward"     );
 REGISTER_FECORE_CLASS(FEConcentrationIndependentReaction  ,FEMATERIAL_ID, "concentration-independent");
 REGISTER_FECORE_CLASS(FEMassActionReversible              ,FEMATERIAL_ID, "mass-action-reversible");
