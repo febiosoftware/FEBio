@@ -21,70 +21,6 @@ ADD_PARAMETER(m_trel, FE_PARAM_DOUBLE, "trel");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-//! Create a shallow copy of the material point data
-FEMaterialPoint* FENimsMaterialPoint::Copy()
-{
-	FENimsMaterialPoint* pt = new FENimsMaterialPoint(*this);
-	if (m_pt) pt->m_pt = m_pt->Copy();
-	return pt;
-}
-
-//-----------------------------------------------------------------------------
-//! Initializes material point data.
-void FENimsMaterialPoint::Init(bool bflag)
-{
-	if (bflag)
-	{
-		// initialize data
-        m_lid = -1;
-		m_cmax = 0;
-	}
-	else
-	{
-        FESolutesMaterialPoint& pt = *m_pt->ExtractData<FESolutesMaterialPoint>();
-        if (m_lid != -1) {
-            double c = pt.m_ca[m_lid];
-            if (c > m_cmax) m_cmax = c;
-        }
-	}
-    
-	// don't forget to intialize the nested data
-	if (m_pt) m_pt->Init(bflag);
-}
-
-//-----------------------------------------------------------------------------
-//! Serialize data to the archive
-void FENimsMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
-    
-	if (bsave)
-	{
-		dmp << m_lid << m_cmax;
-	}
-	else
-	{
-		dmp >> m_lid >> m_cmax;
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Serialize data to the archive
-void FENimsMaterialPoint::Serialize(DumpFile& ar)
-{
-	if (m_pt) m_pt->Serialize(ar);
-    
-	if (ar.IsSaving())
-	{
-		ar << m_lid << m_cmax;
-	}
-	else
-	{
-		ar >> m_lid >> m_cmax;
-	}
-}
-
-//-----------------------------------------------------------------------------
 void FEReactionRateNims::Init()
 {
 	FEMaterial::Init();
@@ -126,29 +62,21 @@ double FEReactionRateNims::ReactionRate(FEMaterialPoint& pt)
 	double t = FEMaterialPoint::time;
     
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-    FENimsMaterialPoint& npt = *pt.ExtractData<FENimsMaterialPoint>();
-    double cmax = npt.m_cmax;
+    double c = spt.m_ca[m_lid];
+    double cmax = max(c,spt.m_crd[m_cmax]);
     
     double k = m_k0;
-    double eps = 1.e-9;
     
     // if we are past the release time and got exposed to the solute
-    if ((t >= m_trel) && (cmax > eps)) {
+    if ((m_trel > 0) && (t >= m_trel)) {
         if (cmax < m_cr) k += (m_kr - m_k0)*cmax/m_cc;
         else k = m_kr;
-
-        // use m_lid to turn off checking history of max solute concentration
-        npt.m_lid = -1;
     }
     // otherwise
     else {
         // evaluate reaction rate
-        double c = spt.m_ca[m_lid];
-        if (c < m_cc) k += (m_kc - m_k0)*c/m_cc;
+        if (cmax < m_cc) k += (m_kc - m_k0)*cmax/m_cc;
         else k = m_kc;
-        
-        // use m_lid to turn on checking history of max solute concentration
-        npt.m_lid = m_lid;
     }
 
 	return k;
@@ -158,23 +86,7 @@ double FEReactionRateNims::ReactionRate(FEMaterialPoint& pt)
 //! tangent of reaction rate with strain at material point
 mat3ds FEReactionRateNims::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
 {
-    // get the time
-	double t = FEMaterialPoint::time;
-    
-    double dkdJ;
-    
-    if (t >= m_trel) {
-        dkdJ = 0;
-    }
-    else {
-        FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-        double c = spt.m_ca[m_lid];
-        double dcdJ = spt.m_dkdJ[m_lid]*spt.m_c[m_lid];
-        if (c < m_cc) dkdJ = (m_kc - m_k0)*dcdJ/m_cc;
-        else dkdJ = 0;
-    }
-    
-	return mat3dd(dkdJ);
+	return mat3dd(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -185,8 +97,24 @@ double FEReactionRateNims::Tangent_ReactionRate_Pressure(FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
-//! Create material point data for this material
-FEMaterialPoint* FEReactionRateNims::CreateMaterialPointData()
+//! reset, initialize and update chemical reaction data in the FESolutesMaterialPoint
+void FEReactionRateNims::ResetElementData(FEMaterialPoint& mp)
 {
-	return new FENimsMaterialPoint(m_pReact->m_pMP->CreateMaterialPointData());
+    // store the solute maximum concentration in the optional
+    // chemical reaction data vector m_crd in the solutes material point
+    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    spt.m_crd.push_back(0);
+    m_cmax = (int)spt.m_crd.size() - 1;
+}
+
+void FEReactionRateNims::InitializeElementData(FEMaterialPoint& mp)
+{
+    FESolutesMaterialPoint& pt = *mp.ExtractData<FESolutesMaterialPoint>();
+    double c = pt.m_ca[m_lid];
+    double cmax = pt.m_crd[m_cmax];
+    if (c > cmax) pt.m_crd[m_cmax] = c;
+}
+
+void FEReactionRateNims::UpdateElementData(FEMaterialPoint& mp)
+{
 }

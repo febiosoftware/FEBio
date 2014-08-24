@@ -1,5 +1,6 @@
 #pragma once
 #include "FECore/FEMaterial.h"
+#include "FEBioMix/FESolutesMaterialPoint.h"
 #include <map>
 
 //-----------------------------------------------------------------------------
@@ -27,6 +28,11 @@ public:
 	//! tangent of reaction rate with effective fluid pressure at material point
 	virtual double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) = 0;
 	
+    //! reset, initialize and update chemical reaction data in the FESolutesMaterialPoint
+    virtual void ResetElementData(FEMaterialPoint& mp) {}
+    virtual void InitializeElementData(FEMaterialPoint& mp) {}
+    virtual void UpdateElementData(FEMaterialPoint& mp) {}
+    
 public:
 	FEChemicalReaction*	m_pReact;	//!< pointer to parent chemical reaction
 };
@@ -88,6 +94,24 @@ public:
 	//! Serialization
 	void Serialize(DumpFile& ar);
 
+public:
+    //! reset, initialize and update optional chemical reaction data in the FESolutesMaterialPoint
+    virtual void ResetElementData(FEMaterialPoint& mp)
+    {
+        if (m_pFwd) m_pFwd->ResetElementData(mp);
+        if (m_pRev) m_pRev->ResetElementData(mp);
+    }
+    virtual void InitializeElementData(FEMaterialPoint& mp)
+    {
+        if (m_pFwd) m_pFwd->InitializeElementData(mp);
+        if (m_pRev) m_pRev->InitializeElementData(mp);
+    }
+    virtual void UpdateElementData(FEMaterialPoint& mp)
+    {
+        if (m_pFwd) m_pFwd->UpdateElementData(mp);
+        if (m_pRev) m_pRev->UpdateElementData(mp);
+    }
+    
 public:
 
 	//! molar supply at material point

@@ -12,32 +12,6 @@
 #include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
-//! Material point data for Nims reaction rate material
-class FENimsMaterialPoint : public FEMaterialPoint
-{
-public:
-	//! constructor
-	FENimsMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
-    
-	//! copy material point data
-	FEMaterialPoint* Copy();
-    
-	//! Initialize material point data
-	void Init(bool bflag);
-    
-	//! Serialize data to archive
-	void Serialize(DumpFile& ar);
-    
-	//! data streaming
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-    
-public:
-    int     m_lid;  //!< local id of solute
-	double	m_cmax;	//!< maximum solute concentration over past history
-};
-
-
-//-----------------------------------------------------------------------------
 //! Concentration-history-dependent reaction rate.
 //! Reaction rate depends on concentration of a solute (e.g., growth factor)
 //! and whether solute has been released (removed) at some release time.
@@ -51,7 +25,8 @@ class FEReactionRateNims : public FEReactionRate
 {
 public:
 	//! constructor
-	FEReactionRateNims(FEModel* pfem) : FEReactionRate(pfem) { m_trel = 0; m_lid = -1; }
+	FEReactionRateNims(FEModel* pfem) : FEReactionRate(pfem)
+    { m_trel = 0; m_lid = m_cmax = -1; }
 	
 	//! data initialization and checking
 	void Init();
@@ -65,8 +40,10 @@ public:
 	//! tangent of reaction rate with effective fluid pressure at material point
 	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt);
 	
-	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
+    //! reset, initialize and update chemical reaction data in the FESolutesMaterialPoint
+    void ResetElementData(FEMaterialPoint& mp);
+    void InitializeElementData(FEMaterialPoint& mp);
+    void UpdateElementData(FEMaterialPoint& mp);
     
 public:
     int     m_sol;                  //!< solute id (1-based)
@@ -77,6 +54,7 @@ public:
     double  m_cr;                   //!< concentration cr;
     double  m_kr;                   //!< reaction rate at cr;
     double  m_trel;                 //!< release time;
+    int     m_cmax;                 //!< index of entry in m_crd
 	
 	DECLARE_PARAMETER_LIST();
 };

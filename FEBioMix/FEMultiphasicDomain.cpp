@@ -206,6 +206,12 @@ void FEMultiphasicDomain::Reset()
 			ps.m_sbmr = sbmr;
 			ps.m_sbmrp = sbmr;
 			ps.m_sbmrhat.assign(nsbm,0);
+            
+            // reset chemical reaction element data
+            ps.m_cri.clear();
+            ps.m_crd.clear();
+            for (int j=0; j<m_pMat->Reactions(); ++j)
+                m_pMat->GetReaction(j)->ResetElementData(mp);
 		}
 	}
 }
@@ -278,6 +284,10 @@ void FEMultiphasicDomain::InitElements()
                     }
                 }
             }
+            
+            // reset chemical reaction element data
+            for (int j=0; j<m_pMat->Reactions(); ++j)
+                m_pMat->GetReaction(j)->InitializeElementData(mp);
 		}
 	}
 }
@@ -2240,5 +2250,10 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
      
         // evaluate the referential solid density
         spt.m_rhor = pmb->SolidReferentialApparentDensity(mp);
+        
+        // update chemical reaction element data
+        for (int j=0; j<m_pMat->Reactions(); ++j)
+            pmb->GetReaction(j)->UpdateElementData(mp);
+
 	}
 }

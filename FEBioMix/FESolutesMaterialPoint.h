@@ -48,5 +48,7 @@ public:
 	vector< vector<double> >	m_dkdr;			//!< 1st deriv of m_k with m_sbmr
 	vector< vector<double> >	m_dkdJr;		//!< cross deriv of m_k with J and m_sbmr
 	vector< vector< vector<double> > > m_dkdrc;	//!< cross deriv of m_k with m_sbmr and c
+    vector<int>     m_cri;      //!< optional integer data needed for chemical reactions
+    vector<double>  m_crd;      //!< optional double data needed for chemical reactions
 };
 

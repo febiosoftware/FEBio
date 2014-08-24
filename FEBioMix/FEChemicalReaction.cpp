@@ -127,7 +127,8 @@ bool FEChemicalReaction::SetProperty(int i, FECoreBase* pm)
 // initialize chemical reaction rate
 void FEChemicalReaction::InitializeReactionRate(FEReactionRate* m_pRate)
 {
-	m_pRate->m_pReact = this; 
+	m_pRate->m_pReact = this;
+    m_pRate->Init();
 }
 
 //-----------------------------------------------------------------------------
