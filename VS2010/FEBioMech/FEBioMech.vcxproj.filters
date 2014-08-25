@@ -417,6 +417,9 @@
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTriangleUC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMix\FEReactionRateNims.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h">
@@ -834,6 +837,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTriangleUC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMix\FEReactionRateNims.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

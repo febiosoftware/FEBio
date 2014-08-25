@@ -526,6 +526,7 @@
     <ClCompile Include="..\..\FEBioMech\FEVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEViscoElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEVonMisesPlasticity.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEReactionRateNims.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h" />
@@ -667,6 +668,7 @@
     <ClInclude Include="..\..\FEBioMech\geodesic.h" />
     <ClInclude Include="..\..\FEBioMech\stdafx.h" />
     <ClInclude Include="..\..\FEBioMech\triangle_sphere.h" />
+    <ClInclude Include="..\..\FEBioMix\FEReactionRateNims.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
