@@ -867,6 +867,8 @@ FEBoundaryCondition* FEModel::FindBC(int nid)
 
 	for (i=0; i<(int) m_SL.size(); ++i) if (m_SL[i]->GetID() == nid) return m_SL[i];
 
+	for (i=0; i<(int) m_RBC.size(); ++i) if (m_RBC[i]->GetID() == nid) return m_RBC[i];
+
 	for (i=0; i<(int) m_RDC.size(); ++i) if (m_RDC[i]->GetID() == nid) return m_RDC[i];
 
 	for (i=0; i<(int) m_RFC.size(); ++i) if (m_RFC[i]->GetID() == nid) return m_RFC[i];
