@@ -86,21 +86,11 @@ bool FEModel::Init()
     // evaluate all parameter lists
     EvaluateAllParameterLists();
 
-	// if the analysis is run in plain-strain mode we fix all the z-dofs of all nodes
+	// if the analysis is run in plane-strain mode we fix all the z-dofs of all nodes
 	if (m_nplane_strain >= 0)
 	{
 		int bc = m_nplane_strain;
 		for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_BC[bc] = -1;
-	}
-
-	// find and remove isolated vertices
-	int ni = m_mesh.RemoveIsolatedVertices();
-	if (ni != 0) 
-	{
-		if (ni == 1)
-			felog.printbox("WARNING", "%d isolated vertex removed.", ni);
-		else
-			felog.printbox("WARNING", "%d isolated vertices removed.", ni);
 	}
 
 	// create and initialize the rigid body data
@@ -125,7 +115,7 @@ bool FEModel::Init()
 
 	// initialize nonlinear constraints
 	// TODO: This is also initialized in the analysis step. Do I need to do this here?
-	InitConstraints();
+	if (InitConstraints() == false) return false;
 
 	return true;
 }

@@ -465,9 +465,20 @@ int FEMesh::FindInvertedElements()
 }
 
 //-----------------------------------------------------------------------------
-//! Initialize mesh data
+//! Does one-time initialization of the Mesh data. Call FEMesh::Reset for resetting 
+//! the mesh data.
 bool FEMesh::Init()
 {
+	// find and remove isolated vertices
+	int ni = RemoveIsolatedVertices();
+	if (ni != 0) 
+	{
+		if (ni == 1)
+			felog.printbox("WARNING", "%d isolated vertex removed.", ni);
+		else
+			felog.printbox("WARNING", "%d isolated vertices removed.", ni);
+	}
+
 	// Initialize shell normals (i.e. directors)
 	// NOTE: we do this before we check for inverted elements since the jacobian of a shell
 	//       depends on its normal.
