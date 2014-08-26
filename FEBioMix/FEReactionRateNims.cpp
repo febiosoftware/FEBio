@@ -69,7 +69,7 @@ double FEReactionRateNims::ReactionRate(FEMaterialPoint& pt)
     
     // if we are past the release time and got exposed to the solute
     if ((m_trel > 0) && (t >= m_trel)) {
-        if (cmax < m_cr) k += (m_kr - m_k0)*cmax/m_cc;
+        if (cmax < m_cr) k += (m_kr - m_k0)*cmax/m_cr;
         else k = m_kr;
     }
     // otherwise
