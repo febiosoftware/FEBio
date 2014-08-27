@@ -1029,8 +1029,6 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 	{
 		ar << m_phi0 << m_rhoTw << m_cFr << m_Rgas << m_Tabs << m_Fc << m_penalty << m_zmin << m_ndeg;
         ar << m_pSolute.size() << m_pSBM.size() << m_pReact.size();
-		
-		ar << m_pSolid->GetTypeStr(); m_pSolid->Serialize(ar);
 		ar << m_pPerm ->GetTypeStr(); m_pPerm ->Serialize(ar);
 
 		if (m_pSupp == 0) ar << nSupp;
@@ -1054,6 +1052,8 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 			ar << m_pReact[i]->GetTypeStr();
 			m_pReact[i] ->Serialize(ar);
 		}
+
+		ar << m_pSolid->GetTypeStr(); m_pSolid->Serialize(ar);
 	}
 	else
 	{
@@ -1061,12 +1061,6 @@ void FEMultiphasic::Serialize(DumpFile& ar)
         ar >> nsol >> nsbm >> nreact;
 		
 		char sz[256] = {0};
-		ar >> sz;
-		m_pSolid = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pSolid); m_pSolid->Serialize(ar);
-		m_pSolid->SetParent(this);
-		m_pSolid->Init();
-		
 		ar >> sz;
 		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
 		assert(m_pPerm); m_pPerm->Serialize(ar);
@@ -1105,6 +1099,13 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 			m_pReact.push_back(dynamic_cast<FEChemicalReaction*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel())));
 			assert(m_pReact[i]); m_pReact[i]->Serialize(ar);
 			m_pReact[i]->Init();
+
+		ar >> sz;
+		m_pSolid = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+		assert(m_pSolid); m_pSolid->Serialize(ar);
+		m_pSolid->SetParent(this);
+		m_pSolid->Init();
+		
 		}
 		
 	}
