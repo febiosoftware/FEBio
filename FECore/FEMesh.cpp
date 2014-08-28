@@ -22,6 +22,7 @@ FENode::FENode()
 	m_p0 = 0;
 	m_pt = 0;
 	m_T = 0;
+	m_T0 = 0;
     
     // get DOFS
     DOFS& fedofs = *DOFS::GetInstance();
@@ -556,7 +557,7 @@ void FEMesh::Reset()
 		for (int k=0; k<cdofs; ++k)
 			node.m_ct[k] = node.m_cp[k] = node.m_c0[k];
 		
-		node.m_T = 0;
+		node.m_T = node.m_T0;
 
 		node.m_Fr = vec3d(0,0,0);
 		node.m_Dt = node.m_D0;

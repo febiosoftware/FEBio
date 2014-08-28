@@ -93,11 +93,19 @@ bool FEHeatSolver::Init()
 	m_u.resize(neq);
 	m_Tp.assign(neq, 0);
 
+	// set initial temperatures
+	FEMesh& mesh = m_fem.GetMesh();
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		int nid = node.m_ID[DOF_T];
+		if (nid >= 0) m_Tp[nid] = node.m_T;
+	}
+
 	// Identify the heat-transfer domains
 	// TODO: I want this to be done automatically
 	//       e.g. while the input file is being read
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
-	FEMesh& mesh = m_fem.GetMesh();
 	pstep->ClearDomains();
 	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{

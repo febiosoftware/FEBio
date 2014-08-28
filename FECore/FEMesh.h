@@ -112,6 +112,7 @@ public:
 
 	// heat-conduction data
 	double	m_T;	//!< temperature
+	double	m_T0;	//!< initial temperature
 
 	// solute-data
 	vector<double>	m_c0;	//!< initial effective concentration

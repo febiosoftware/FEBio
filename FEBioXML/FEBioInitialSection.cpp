@@ -82,6 +82,23 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			}
 			while (!tag.isend());
 		}
+		else if (tag == "temperature")
+		{
+			++tag;
+			do
+			{
+				if (tag == "node")
+				{
+					int nid = atoi(tag.AttributeValue("id"))-1;
+					double T;
+					tag.value(T);
+					mesh.Node(nid).m_T0 = T;
+				}
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
+		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
