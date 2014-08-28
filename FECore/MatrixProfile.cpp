@@ -62,6 +62,9 @@ void SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 	// get the nr of equations
 	int neq = m_prof.size();
 
+	// make sure there is work to do
+	if (neq==0) return;
+
 	// Count the number of elements that contribute to a certain column
 	// The pval array stores this number (which I also call the valence
 	// of the column)

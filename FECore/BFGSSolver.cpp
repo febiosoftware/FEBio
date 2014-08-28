@@ -122,6 +122,9 @@ void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 	// get the nr of equations
 	int neq = x.size();
 
+	// make sure we need to do work
+	if (neq==0) return;
+
 	// create temporary storage
 	static vector<double> tmp;
 	tmp = b;

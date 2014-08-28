@@ -176,6 +176,8 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.GetMesh();
 
+	int NMAT = fem.Materials();
+
 	// count how many rigid nodes there are
 	int nrn= 0;
 	XMLTag t(tag); ++t;
@@ -187,6 +189,9 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 	{
 		id = atoi(tag.AttributeValue("id"))-1;
 		rb = atoi(tag.AttributeValue("rb"))-1;
+
+		// make sure we have a valid rigid body reference
+		if ((rb < 0)||(rb>=NMAT)) throw XMLReader::InvalidAttributeValue(tag, "rb", tag.AttributeValue("rb"));
 
 		FERigidNode* prn = new FERigidNode(&fem);
 
