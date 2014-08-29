@@ -376,6 +376,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEReactionRateNims.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FESFDSBM.cpp"
 				>
 			</File>
@@ -611,6 +615,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FEReactionRateHuiskes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FEReactionRateNims.h"
 				>
 			</File>
 			<File
