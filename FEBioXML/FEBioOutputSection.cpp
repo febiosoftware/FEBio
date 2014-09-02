@@ -49,6 +49,9 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			sz = tag.AttributeValue("delim", true);
 			if (sz != 0) prec->SetDelim(sz);
 
+			sz = tag.AttributeValue("format", true);
+			if (sz!=0) prec->SetFormat(sz);
+
 			sz = tag.AttributeValue("comments", true);
 			if (sz != 0)
 			{
@@ -96,6 +99,9 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			sz = tag.AttributeValue("delim", true);
 			if (sz != 0) prec->SetDelim(sz);
 
+			sz = tag.AttributeValue("format", true);
+			if (sz!=0) prec->SetFormat(sz);
+
 			sz = tag.AttributeValue("comments", true);
 			if (sz != 0)
 			{
@@ -120,6 +126,9 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 			sz = tag.AttributeValue("delim", true);
 			if (sz != 0) prec->SetDelim(sz);
+
+			sz = tag.AttributeValue("format", true);
+			if (sz!=0) prec->SetFormat(sz);
 
 			sz = tag.AttributeValue("comments", true);
 			if (sz != 0)

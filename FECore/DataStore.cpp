@@ -66,6 +66,7 @@ DataRecord::DataRecord(FEModel* pfem, const char* szfile)
 	m_nid = 0;
 	m_szname[0] = 0;
 	m_szdata[0] = 0;
+	m_szfmt[0] = 0;
 
 	strcpy(m_szdelim, " ");
 	
@@ -105,6 +106,12 @@ void DataRecord::SetDelim(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
+void DataRecord::SetFormat(const char* sz)
+{
+	strcpy(m_szfmt, sz);
+}
+
+//-----------------------------------------------------------------------------
 bool DataRecord::Write()
 {
 	int nstep = m_pfem->GetCurrentStep()->m_ntimesteps;
@@ -140,16 +147,81 @@ bool DataRecord::Write()
 	}
 
 	// save the data
-	for (size_t i=0; i<m_item.size(); ++i)
+	if (m_szfmt[0]==0)
 	{
-		fprintf(fp, "%d%s", m_item[i], m_szdelim);
-		int nd = Size();
-		for (int j=0; j<nd; ++j)
+		for (size_t i=0; i<m_item.size(); ++i)
 		{
-			val = Evaluate(m_item[i], j);
-			fprintf(fp, "%lg", val);
-			if (j!=nd-1) fprintf(fp, "%s", m_szdelim);
-			else fprintf(fp, "\n");
+			fprintf(fp, "%d%s", m_item[i], m_szdelim);
+			int nd = Size();
+			for (int j=0; j<nd; ++j)
+			{
+				val = Evaluate(m_item[i], j);
+				fprintf(fp, "%lg", val);
+				if (j!=nd-1) fprintf(fp, "%s", m_szdelim);
+				else fprintf(fp, "\n");
+			}
+		}
+	}
+	else
+	{
+		// print using the format string
+		int ndata = Size();
+		char szfmt[MAX_STRING];
+		strcpy(szfmt, m_szfmt);
+
+		for (size_t i=0; i<m_item.size(); ++i)
+		{
+			int nitem = m_item[i];
+			char* sz = szfmt, *ch = 0;
+			int j = 0;
+			do
+			{
+				ch = strchr(sz, '%');
+				if (ch)
+				{
+					if (ch[1]=='i')
+					{
+						*ch = 0;
+						fprintf(fp, "%s", sz);
+						*ch = '%'; sz = ch+2;
+						fprintf(fp, "%d", nitem);
+					}
+					else if (ch[1]=='g')
+					{
+						*ch = 0;
+						fprintf(fp, "%s", sz);
+						*ch = '%'; sz = ch+2;
+						if (j<ndata)
+						{
+							val = Evaluate(nitem, j++);
+							fprintf(fp, "%lg", val);
+						}
+					}
+					else if (ch[1]=='t')
+					{
+						*ch = 0;
+						fprintf(fp, "%s", sz);
+						*ch = '%'; sz = ch+2;
+						fprintf(fp, "\t", nitem);
+					}
+					else if (ch[1]=='n')
+					{
+						*ch = 0;
+						fprintf(fp, "%s", sz);
+						*ch = '%'; sz = ch+2;
+						fprintf(fp, "\n", nitem);
+					}
+					else
+					{
+						*ch = 0;
+						fprintf(fp, "%s", sz);
+						*ch = '%'; sz = ch+1;
+					}
+				}
+				else { fprintf(fp, "%s", sz); break; }
+			}
+			while (*sz);
+			fprintf(fp, "\n");
 		}
 	}
 

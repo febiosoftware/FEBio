@@ -531,10 +531,13 @@ void XMLReader::ReadTag(XMLTag& tag)
 
 		// skip whitespace
 		while (isspace(ch=GetChar()));
-		if (ch != '"') throw XMLSyntaxError();
+
+		// make sure the attribute's value starts with an apostrophe or quotation mark
+		if ((ch != '"')&&(ch != '\'')) throw XMLSyntaxError();
+		char quot = ch;
 
 		sz = tag.m_att[n].m_szatv;
-		while ((ch=GetChar())!='"') *sz++ = ch;
+		while ((ch=GetChar())!=quot) *sz++ = ch;
 		*sz=0; sz=0;
 		ch=GetChar();
 
@@ -628,6 +631,29 @@ char XMLReader::GetChar()
 {
 	char ch;
 	while ((ch=fgetc(m_fp))=='\n') ++m_nline;
+
+	// read entity references
+	if (ch=='&')
+	{
+		char szbuf[16]={0};
+		szbuf[0] = '&';
+		int i = 1;
+		do
+		{
+			ch = fgetc(m_fp);
+			szbuf[i++]=ch;
+		}
+		while ((i<16)&&(ch!=';'));
+		if (ch!=';') throw XMLSyntaxError();
+
+		if      (strcmp(szbuf, "&lt;"  )==0) ch = '<';
+		else if (strcmp(szbuf, "&gt;"  )==0) ch = '>';
+		else if (strcmp(szbuf, "&amp;" )==0) ch = '&';
+		else if (strcmp(szbuf, "&apos;")==0) ch = '\'';
+		else if (strcmp(szbuf, "&quot;")==0) ch = '"';
+		else throw XMLSyntaxError();
+	}
+
 	if (feof(m_fp)) 
 	{
 		int a = 0;

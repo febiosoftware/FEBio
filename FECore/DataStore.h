@@ -49,6 +49,7 @@ public:
 
 	void SetName(const char* sz);
 	void SetDelim(const char* sz);
+	void SetFormat(const char* sz);
 	void SetComments(bool b) { m_bcomm = b; }
 
 public:
@@ -67,6 +68,7 @@ protected:
 	char	m_szname[MAX_STRING];	//!< name of expression
 	char	m_szdelim[MAX_DELIM];	//!< data delimitor
 	char	m_szdata[MAX_STRING];	//!< data expression
+	char	m_szfmt[MAX_STRING];	//!< max format string
 
 protected:
 	char	m_szfile[MAX_STRING];	//!< file name of data record
