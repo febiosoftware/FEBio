@@ -112,18 +112,9 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 		return false;
 	}
 
-	// Determine the number of solutes and total number of degrees of freedom
+	// Reset degrees of freedom (TODO: Can I do this elsewhere?)
     DOFS& fedofs = *DOFS::GetInstance();
 	fedofs.Reset();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-    int MAX_CDOFS = 0;
-    XMLTag soltag;
-    if (xml.FindTag("Solutes", soltag)) 
-	{
-		MAX_CDOFS = soltag.children();
-	}
-    fedofs.SetCDOFS(MAX_CDOFS);
-    fedofs.SetNDOFS(MAX_NDOFS + MAX_CDOFS);
     
 	// parse the file
 	try

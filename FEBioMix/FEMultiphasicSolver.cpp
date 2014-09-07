@@ -43,12 +43,6 @@ FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver(pfem)
 	m_Ctol = 0.01;
     
 	m_bsymm = false; // assume non-symmetric stiffness matrix by default
-
-    // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_CDOFS = fedofs.GetCDOFS();
-    
-    m_nceq.assign(MAX_CDOFS, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -132,9 +126,10 @@ bool FEMultiphasicSolver::InitEquations()
 		if (n.m_ID[DOF_P] != -1) m_npeq++;
 	}
 	
-  
-	// determined the nr of concentration equations
-	for (int j=0; j<(int)m_nceq.size(); ++j) m_nceq[j] = 0;
+	// determine the nr of concentration equations
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    m_nceq.assign(MAX_CDOFS, 0);
 	
     // get number of DOFS
 	for (int i=0; i<mesh.Nodes(); ++i)

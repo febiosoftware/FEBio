@@ -37,12 +37,6 @@ FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel* pfem) : FEBiphasicSolver
 	m_Ctol = 0.01;
     
 	m_bsymm = false; // assume non-symmetric stiffness matrix by default
-    
-    // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_CDOFS = fedofs.GetCDOFS();
-    
-    m_nceq.assign(MAX_CDOFS, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -54,7 +48,7 @@ bool FEBiphasicSoluteSolver::Init()
 	if (FEBiphasicSolver::Init() == false) return false;
 
 	int i, j, n;
-	
+    
     // get number of DOFS
     DOFS& fedofs = *DOFS::GetInstance();
     int MAX_CDOFS = fedofs.GetCDOFS();
@@ -101,6 +95,7 @@ bool FEBiphasicSoluteSolver::InitEquations()
     DOFS& fedofs = *DOFS::GetInstance();
     int MAX_CDOFS = fedofs.GetCDOFS();
 
+    m_nceq.assign(MAX_CDOFS, 0);
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& n = mesh.Node(i);

@@ -23,6 +23,13 @@ FESoluteData::FESoluteData(FEModel* pfem)
 	m_M = 1; 
 	m_z = 0; 
 	m_szname[0] = 0; 
+
+	// for each solute we have to increase the number of concentration dofs
+    DOFS& fedofs = *DOFS::GetInstance();
+	int ndofs = fedofs.GetNDOFS();
+	int cdofs = fedofs.GetCDOFS();
+    fedofs.SetCDOFS(cdofs + 1);
+    fedofs.SetNDOFS(ndofs + 1);
 }
 
 //-----------------------------------------------------------------------------
