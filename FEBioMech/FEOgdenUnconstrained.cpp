@@ -173,3 +173,37 @@ tens4ds FEOgdenUnconstrained::Tangent(FEMaterialPoint& mp)
 	
 	return c;
 }
+
+//-----------------------------------------------------------------------------
+double FEOgdenUnconstrained::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	// extract elastic material data
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	// jacobian
+	double J = pt.m_J;
+    double lnJ = log(J);
+	
+	// get the left Cauchy-Green tensor
+	mat3ds b = pt.LeftCauchyGreen();
+	
+	// get the eigenvalues and eigenvectors of b
+	double lam2[3];	// these are the squares of the eigenvalues of V
+	vec3d ev[3];
+	EigenValues(b, lam2, ev, m_eps);
+	
+	// get the eigenvalues of V
+	double lam[3];
+	lam[0] = sqrt(lam2[0]);
+	lam[1] = sqrt(lam2[1]);
+	lam[2] = sqrt(lam2[2]);
+	
+	// strain energy density
+    double sed = m_p*(J-1)*(J-1)/2;
+    for (int j=0; j<MAX_TERMS; ++j)
+        sed += m_c[j]/(m_m[j]*m_m[j])*
+        (pow(lam[0], m_m[j]) + pow(lam[1], m_m[j]) + pow(lam[2], m_m[j])
+         - 3 - m_m[j]*lnJ);
+	
+	return sed;
+}

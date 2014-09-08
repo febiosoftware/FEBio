@@ -57,3 +57,18 @@ tens4ds FEEFDDonnanEquilibrium::Tangent(FEMaterialPoint& mp)
 
 	return c;
 }
+
+//-----------------------------------------------------------------------------
+//! calculate strain energy density at material point
+double FEEFDDonnanEquilibrium::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	// --- M A T R I X   C O N T R I B U T I O N ---
+	double sed = m_DEQ.StrainEnergyDensity(mp);
+	
+	// --- F I B E R   C O N T R I B U T I O N ---
+	
+	sed += m_Fib.StrainEnergyDensity(mp);
+    
+    return sed;
+}
+

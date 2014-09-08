@@ -292,6 +292,124 @@ tens4ds FEEllipsoidalFiberDistribution::Tangent(FEMaterialPoint& mp)
 	return c*(2.0*4.0/J);
 }
 
+//-----------------------------------------------------------------------------
+double FEEllipsoidalFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+    double sed = 0.0;
+    
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	// deformation gradient
+	mat3d &F = pt.m_F;
+    
+	// get the element's local coordinate system
+	mat3d Q = pt.m_Q;
+    
+	// loop over all integration points
+	vec3d n0e, n0a, n0q, nt;
+	double In, W;
+	const double eps = 0;
+    
+	const int nint = 45;
+	for (int n=0; n<nint; ++n)
+	{
+		// set the global fiber direction in material coordinate system
+		n0a.x = XYZ2[n][0];
+		n0a.y = XYZ2[n][1];
+		n0a.z = XYZ2[n][2];
+		double wn = XYZ2[n][3];
+        
+		// calculate material coefficients
+		// TODO: There is an obvious optimization opportunity here, since the values of ksi
+		//       and beta can be precalculated and reused. I have not done this yet since I
+		//       need to figure out how to initialize the material parameters for each time
+		//       step (instead of once at the start) in case the values depend on load curves.
+		double ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
+		double beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
+		
+		// --- quadrant 1,1,1 ---
+        
+		// rotate to reference configuration
+		n0e = Q*n0a;
+        
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+        
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy
+			W = ksi*pow(In - 1.0, beta);
+			sed += W*wn;
+		}
+        
+		// --- quadrant -1,1,1 ---
+		n0q = vec3d(-n0a.x, n0a.y, n0a.z);
+        
+		// rotate to reference configuration
+		n0e = Q*n0q;
+        
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+        
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy
+			W = ksi*pow(In - 1.0, beta);
+			sed += W*wn;
+		}
+        
+		// --- quadrant -1,-1,1 ---
+		n0q = vec3d(-n0a.x, -n0a.y, n0a.z);
+        
+		// rotate to reference configuration
+		n0e = Q*n0q;
+        
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+        
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy
+			W = ksi*pow(In - 1.0, beta);
+			sed += W*wn;
+		}
+        
+		// --- quadrant 1,-1,1 ---
+		n0q = vec3d(n0a.x, -n0a.y, n0a.z);
+        
+		// rotate to reference configuration
+		n0e = Q*n0q;
+        
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+        
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy
+			W = ksi*pow(In - 1.0, beta);
+			sed += W*wn;
+		}
+	}
+    
+	// multiply by two to integrate over other half of sphere
+    return sed*2.0;
+}
 
 //-----------------------------------------------------------------------------
 // FEEllipsoidalFiberDistributionOld
@@ -464,4 +582,59 @@ tens4ds FEEllipsoidalFiberDistributionOld::Tangent(FEMaterialPoint& mp)
 	}
 	
 	return c;
+}
+
+//-----------------------------------------------------------------------------
+double FEEllipsoidalFiberDistributionOld::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+    double sed = 0.0;
+    
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	// get the element's local coordinate system
+	mat3d QT = (pt.m_Q).transpose();
+	
+	// deformation gradient
+	mat3d &F = pt.m_F;
+    
+	// loop over all integration points
+	double ksi, beta;
+	vec3d n0e, n0a, nt;
+	double In, W;
+	const double eps = 0;
+	mat3ds C = pt.RightCauchyGreen();
+    
+	const int nint = (m_nres == 0? NSTL  : NSTH  );
+    
+	for (int n=0; n<nint; ++n)
+	{
+		// set the global fiber direction in reference configuration
+		n0e.x = m_cth[n]*m_sph[n];
+		n0e.y = m_sth[n]*m_sph[n];
+		n0e.z = m_cph[n];
+		
+		// Calculate In = n0e*C*n0e
+		In = n0e*(C*n0e);
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// get the global spatial fiber direction in current configuration
+			nt = (F*n0e)/sqrt(In);
+			
+			// get the local material fiber direction in reference configuration
+			n0a = QT*n0e;
+			
+			// calculate material coefficients
+			ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
+			beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
+			
+			// calculate strain energy density
+			W = ksi*pow(In - 1.0, beta);
+			sed += W*m_w[n];
+		}
+		
+	}
+    
+    return sed;
 }

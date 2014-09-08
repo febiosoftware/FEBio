@@ -150,7 +150,7 @@ REGISTER_FECORE_CLASS(FEDamageTransIsoMooneyRivlin   ,FEMATERIAL_ID, "damage tra
 REGISTER_FECORE_CLASS(FEDonnanEquilibrium            ,FEMATERIAL_ID, "Donnan equilibrium"            );
 REGISTER_FECORE_CLASS(FEEFDDonnanEquilibrium         ,FEMATERIAL_ID, "EFD Donnan equilibrium"        );
 REGISTER_FECORE_CLASS(FEEFDMooneyRivlin              ,FEMATERIAL_ID, "EFD Mooney-Rivlin"             );
-//REGISTER_FECORE_CLASS(FEEFDNeoHookean                ,FEMATERIAL_ID, "EFD neo-Hookean"               );
+REGISTER_FECORE_CLASS(FEEFDNeoHookean                ,FEMATERIAL_ID, "EFD neo-Hookean (new)"               );
 REGISTER_FECORE_CLASS(FEEFDNeoHookeanOld             ,FEMATERIAL_ID, "EFD neo-Hookean"               );
 REGISTER_FECORE_CLASS(FEEFDUncoupled                 ,FEMATERIAL_ID, "EFD uncoupled"                 );
 REGISTER_FECORE_CLASS(FEEFDVerondaWestmann           ,FEMATERIAL_ID, "EFD Veronda-Westmann"          );
@@ -266,6 +266,7 @@ REGISTER_FECORE_CLASS(FEFacet2FacetTied      , FESURFACEPAIRINTERACTION_ID, "fac
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
 REGISTER_FECORE_CLASS(FEPlotStrainEnergyDensity  , FEPLOTDATA_ID, "strain energy density" );
+REGISTER_FECORE_CLASS(FEPlotDevStrainEnergyDensity  , FEPLOTDATA_ID, "deviatoric strain energy density" );
 REGISTER_FECORE_CLASS(FEPlotSpecificStrainEnergy , FEPLOTDATA_ID, "specific strain energy");
 REGISTER_FECORE_CLASS(FEPlotDensity              , FEPLOTDATA_ID, "density"               );
 REGISTER_FECORE_CLASS(FEPlotElementStress        , FEPLOTDATA_ID, "stress"                );
@@ -374,6 +375,8 @@ REGISTER_FECORE_CLASS(FELogElemElasticityZZXZ , FEELEMLOGDATA_ID, "czzxz");
 REGISTER_FECORE_CLASS(FELogElemElasticityXYXZ , FEELEMLOGDATA_ID, "cxyxz");
 REGISTER_FECORE_CLASS(FELogElemElasticityYZXZ , FEELEMLOGDATA_ID, "cyzxz");
 REGISTER_FECORE_CLASS(FELogElemElasticityXZXZ , FEELEMLOGDATA_ID, "cxzxz");
+REGISTER_FECORE_CLASS(FELogElemStrainEnergyDensity , FEELEMLOGDATA_ID, "sed");
+REGISTER_FECORE_CLASS(FELogElemDevStrainEnergyDensity , FEELEMLOGDATA_ID, "devsed");
 
 //-----------------------------------------------------------------------------
 // Derived from FELogObjectData

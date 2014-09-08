@@ -17,6 +17,9 @@ public:
 	//! calculate tangent stiffness at material point
 	tens4ds Tangent(FEMaterialPoint& pt);
 
+	//! calculate strain energy density at material point
+	double StrainEnergyDensity(FEMaterialPoint& pt);
+    
 public:
 	// get the number of properties
 	int Properties() { return 1; }
@@ -109,6 +112,9 @@ public:
 	//! calculate tangent stiffness at material point
 	tens4ds Tangent(FEMaterialPoint& pt);
 		
+	//! calculate strain energy density at material point
+	double StrainEnergyDensity(FEMaterialPoint& pt);
+    
 	//! data initialization and checking
 	void Init();
 		

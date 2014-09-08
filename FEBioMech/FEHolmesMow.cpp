@@ -29,7 +29,6 @@ mat3ds FEHolmesMow::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	mat3d &F = pt.m_F;
 	double detF = pt.m_J;
 	double detFi = 1.0/detF;
 	
@@ -57,7 +56,6 @@ tens4ds FEHolmesMow::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	mat3d &F = pt.m_F;
 	double detF = pt.m_J;
 	double detFi = 1.0/detF;
 	
@@ -82,4 +80,27 @@ tens4ds FEHolmesMow::Tangent(FEMaterialPoint& mp)
 	+ detFi*eQ*(lam*(dyad1s(b) - dyad4s(b)) + Ha*dyad4s(identity));
 	
 	return c;
+}
+
+//-----------------------------------------------------------------------------
+double FEHolmesMow::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// calculate left Cauchy-Green tensor
+	mat3ds b = pt.LeftCauchyGreen(); //(F*F.transpose()).sym();
+	mat3ds b2 = b*b;
+    
+	// calculate invariants of B
+	double I1 = b.tr();
+	double I2 = (I1*I1 - b2.tr())/2.;
+	double I3 = b.det();
+    
+	// Exponential term
+	double eQ = exp(m_b*((2*mu-lam)*(I1-3) + lam*(I2-3))/Ha)/pow(I3,m_b);
+	
+	// calculate strain energy density
+	double sed = Ha/(4*m_b)*(eQ - 1);
+	
+	return sed;
 }

@@ -70,6 +70,9 @@ public:
 	//! create material point data for this material
 	virtual FEMaterialPoint* CreateMaterialPointData() { return new FEElasticMaterialPoint; }
 
+	//! calculate strain energy density at material point
+	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+    
 	//! Get the elastic component
 	FEElasticMaterial* GetElasticMaterial() { return this; }
 

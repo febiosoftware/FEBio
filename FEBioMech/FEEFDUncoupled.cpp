@@ -46,7 +46,6 @@ mat3ds FEEFDUncoupled::DevStress(FEMaterialPoint& mp)
 	vec3d n0e, n0a, n0q, nt;
 	double In, Wl;
 	const double eps = 0;
-	mat3ds C = pt.DevRightCauchyGreen();
 	mat3ds s;
 	s.zero();
 
@@ -123,7 +122,6 @@ tens4ds FEEFDUncoupled::DevTangent(FEMaterialPoint& mp)
 	vec3d n0e, n0a, nt;
 	double In, Wl, Wll;
 	const double eps = 0;
-	mat3ds C = pt.DevRightCauchyGreen();
 	mat3ds s;
 	tens4ds cf, cfw; cf.zero();
 	mat3ds N2;
@@ -199,4 +197,76 @@ tens4ds FEEFDUncoupled::DevTangent(FEMaterialPoint& mp)
 	- (ddots(IxI, c)-IxI*(c.tr()/3.))/3.;
 	
 	return c;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate deviatoric strain energy density
+double FEEFDUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+    double sed = 0.0;
+    
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	double J = pt.m_J;
+	// deviatoric deformation gradient
+	mat3d F = pt.m_F*pow(J,-1.0/3.0);
+	
+	// get the element's local coordinate system
+	mat3d Q = pt.m_Q;
+	
+	// loop over all integration points
+	vec3d n0e, n0a, n0q, nt;
+	double In, W;
+	const double eps = 0;
+    
+	const int li[4][3] = {
+		{ 1, 1, 1},
+		{-1, 1, 1},
+		{-1,-1, 1},
+		{ 1,-1, 1}
+	};
+    
+	const int nint = 45;
+	for (int n=0; n<nint; ++n)
+	{
+		// set the global fiber direction in material coordinate system
+		n0a.x = XYZ2[n][0];
+		n0a.y = XYZ2[n][1];
+		n0a.z = XYZ2[n][2];
+		double wn = XYZ2[n][3];
+        
+		// calculate material coefficients
+		// TODO: There is an obvious optimization opportunity here, since the values of ksi
+		//       and beta can be precalculated and reused. I have not done this yet since I
+		//       need to figure out how to initialize the material parameters for each time
+		//       step (instead of once at the start) in case the values depend on load curves.
+		double ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
+		double beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
+        
+		// loop over the four quadrants
+		for (int l=0; l<4; ++l)
+		{
+			n0q = vec3d(li[l][0]*n0a.x, li[l][1]*n0a.y, li[l][2]*n0a.z);
+            
+			// rotate to reference configuration
+			n0e = Q*n0q;
+            
+			// get the global spatial fiber direction in current configuration
+			nt = F*n0e;
+            
+			// Calculate In = n0e*C*n0e
+			In = nt*nt;
+            
+			// only take fibers in tension into consideration
+			if (In > 1. + eps)
+			{
+				// calculate strain energy density
+				W = ksi*pow(In - 1.0, beta);
+				sed += W*wn;
+			}
+		}
+	}
+    
+	// don't forget to multiply by two to include the other half-sphere
+    return sed*2.0;
 }

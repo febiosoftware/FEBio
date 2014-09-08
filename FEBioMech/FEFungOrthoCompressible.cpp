@@ -172,3 +172,46 @@ tens4ds FEFungOrthoCompressible::Tangent(FEMaterialPoint& mp)
 	
 	return C;
 }
+
+//-----------------------------------------------------------------------------
+//! Calculates the strain energy density
+double FEFungOrthoCompressible::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	int i,j;
+	vec3d a0[3];		// texture direction in reference configuration
+	mat3ds A0[3];		// texture tensor in current configuration
+	double eQ = 0.0;	// exp(Q)
+    double AE[3], AE2[3];
+	
+	double J = pt.m_J;
+    double lnJ = log(J);
+    
+	// calculate right Cauchy-Green tensor and Lagrange strain tensor
+	mat3ds C = pt.RightCauchyGreen();
+	mat3dd I(1.);
+    mat3ds E = (C - I)*0.5;
+    mat3ds E2 = E*E;
+	
+	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
+		// Copy the texture direction in the reference configuration to a0
+		a0[i].x = pt.m_Q[0][i]; a0[i].y = pt.m_Q[1][i]; a0[i].z = pt.m_Q[2][i];
+		A0[i] = dyad(a0[i]);			// Evaluate the texture tensor in the reference configuration
+        AE[i] = A0[i].dotdot(E);
+        AE2[i] = A0[i].dotdot(E2);
+	}
+	
+	// Evaluate exp(Q)
+	for (i=0; i<3; i++) {
+		eQ += 2*mu[i]*AE2[i];
+		for (j=0; j<3; j++)
+			eQ += lam[i][j]*AE[i]*AE[j];
+	}
+	eQ = exp(eQ/m_c);
+	
+	// Evaluate the strain energy density
+	double sed = 0.5*(m_c*(eQ-1) + m_k*lnJ*lnJ);
+	
+	return sed;
+}

@@ -53,13 +53,8 @@ tens4ds FECoupledMooneyRivlin::Tangent(FEMaterialPoint& mp)
 	// calculate left Cauchy-Green tensor: B = F*Ft
 	mat3ds B = pt.LeftCauchyGreen();
 
-	// calculate square of B
-	mat3ds B2 = B*B;
-
 	// Invariants of B (= invariants of C)
-	double I1 = B.tr();
 	double J = pt.m_J;
-	double Ji = 1.0/J;
 
 	// some useful tensors
 	mat3dd I(1.0);
@@ -69,11 +64,37 @@ tens4ds FECoupledMooneyRivlin::Tangent(FEMaterialPoint& mp)
 	tens4ds BoB = dyad4s(B);
 
 	// strain energy derivates
-	double W1 = m_c1;
 	double W2 = m_c2;
 
 	// spatial tangent
 	tens4ds c = BxB*(4.0*W2/J) - BoB*(4.0*W2/J) + IoI*(4.0*(m_c1+2.0*m_c2)/J) + IxI*(m_K/J) - IoI*(2.0*m_K*log(J)/J);
 
 	return c;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate strain energy density at material point
+double FECoupledMooneyRivlin::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	// get the elastic material point data
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// determinant of deformation gradient
+	double J = pt.m_J;
+    double lnJ = log(J);
+    
+	// calculate left Cauchy-Green tensor
+	mat3ds B = pt.LeftCauchyGreen();
+    
+	// calculate square of B
+	mat3ds B2 = B*B;
+    
+	// Invariants of B (= invariants of C)
+	double I1 = B.tr();
+    double I2 = (I1*I1 - B2.tr())/2.;
+    
+    double sed = m_c1*(I1-3) + m_c2*(I2-3)
+    - 2*(m_c1+2*m_c2)*lnJ + m_K*lnJ*lnJ/2.;
+    
+    return sed;
 }

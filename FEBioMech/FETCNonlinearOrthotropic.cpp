@@ -520,3 +520,69 @@ tens4ds FETCNonlinearOrthotropic::DevTangent(FEMaterialPoint& mp)
 
 	return tens4ds(D);
 }
+
+//-----------------------------------------------------------------------------
+// Calculate the deviatoric strain energy density
+double FETCNonlinearOrthotropic::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// deformation gradient
+	mat3d& F = pt.m_F;
+	double J = pt.m_J;
+	double Jm13 = pow(J, -1.0/3.0);
+    
+	// invariants of B
+	double I1, I2;
+    
+	// current local material axis
+	vec3d a0, b0, c0, a, b, c;
+	double la, lb, lc, lat, lbt, lct;
+    
+	// get the initial fiber directions
+	a0.x = pt.m_Q[0][0]; b0.x = pt.m_Q[0][1]; c0.x = pt.m_Q[0][2];
+	a0.y = pt.m_Q[1][0]; b0.y = pt.m_Q[1][1]; c0.y = pt.m_Q[1][2];
+	a0.z = pt.m_Q[2][0]; b0.z = pt.m_Q[2][1]; c0.z = pt.m_Q[2][2];
+    
+	// calculate the current material axes lam*a = F*a0;
+	a = F*a0;
+	b = F*b0;
+	c = F*c0;
+    
+	// normalize material axis and store fiber stretch
+	la  = a.unit();
+	lat = la*Jm13; // i.e. lambda tilde
+    
+	lb  = b.unit();
+	lbt = lb*Jm13;
+    
+	lc  = c.unit();
+	lct = lc*Jm13;
+    
+	// get deviatoric left Cauchy-Green tensor
+	mat3ds B = pt.DevLeftCauchyGreen();
+    
+	// square of B
+	mat3ds B2 = B*B;
+    
+	// Invariants of B (= invariants of C)
+	// Note that these are the invariants of Btilde, not of B!
+	I1 = B.tr();
+	I2 = 0.5*(I1*I1 - B2.tr());
+    
+    double sed = m_c1*(I1-3) + m_c2*(I2-3);
+    
+	// fiber a
+	if (lat > 1)
+		sed += m_ksi[0]*pow((lat - 1.0), m_beta[0]);
+    
+	// fiber b
+	if (lbt > 1)
+		sed += m_ksi[1]*pow((lbt - 1.0), m_beta[1]);
+    
+	// fiber c
+	if (lct > 1)
+		sed += m_ksi[2]*pow((lct - 1.0), m_beta[2]);
+    
+	return sed;
+}

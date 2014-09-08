@@ -27,6 +27,9 @@ public:
 	//! calculate deviatoric tangent stiffness at material point
 	tens4ds DevTangent(FEMaterialPoint& pt);
 
+	//! calculate deviatoric strain energy density
+	double DevStrainEnergyDensity(FEMaterialPoint& mp);
+    
 	//! data initialization
 	void Init();
 

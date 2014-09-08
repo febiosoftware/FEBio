@@ -17,6 +17,9 @@ public:
 	//! calculate tangent stiffness at material point
 	virtual tens4ds Tangent(FEMaterialPoint& pt);
 
+	//! calculate strain energy density at material point
+	virtual double StrainEnergyDensity(FEMaterialPoint& mp);
+    
 	//! material parameter intialization and checking
 	void Init();
 

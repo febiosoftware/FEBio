@@ -10,6 +10,7 @@
 		D5307A4518B40934008C8463 /* libFEBioOpt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5307A4418B40934008C8463 /* libFEBioOpt.a */; };
 		D5307A4B18B40AB0008C8463 /* liblevmar.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5307A4A18B40AB0008C8463 /* liblevmar.a */; };
 		D53FF8D61865F9F900CE43E4 /* febio.xml in Copy Files */ = {isa = PBXBuildFile; fileRef = D53FF8D51865F9F900CE43E4 /* febio.xml */; };
+		D5AC350D19B9454B003D048C /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5AC350C19B9454B003D048C /* libgsl.a */; };
 		D5E10B921865E24900B23922 /* CommandManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B751865E24900B23922 /* CommandManager.cpp */; };
 		D5E10B931865E24900B23922 /* console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B771865E24900B23922 /* console.cpp */; };
 		D5E10B941865E24900B23922 /* diagnose.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B791865E24900B23922 /* diagnose.cpp */; };
@@ -52,6 +53,7 @@
 		D5307A4418B40934008C8463 /* libFEBioOpt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFEBioOpt.a; path = ../FEBioOpt/build/Debug/libFEBioOpt.a; sourceTree = "<group>"; };
 		D5307A4A18B40AB0008C8463 /* liblevmar.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblevmar.a; path = ../../../../../../../../../../../usr/local/lib/liblevmar.a; sourceTree = "<group>"; };
 		D53FF8D51865F9F900CE43E4 /* febio.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = febio.xml; path = ../../../FEBio/bin/febio.xml; sourceTree = "<group>"; };
+		D5AC350C19B9454B003D048C /* libgsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgsl.a; path = ../../../../../../../../../../usr/local/lib/libgsl.a; sourceTree = "<group>"; };
 		D5E10B671865E23500B23922 /* FEBio2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FEBio2; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E10B741865E24900B23922 /* Command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Command.h; sourceTree = "<group>"; };
 		D5E10B751865E24900B23922 /* CommandManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommandManager.cpp; sourceTree = "<group>"; };
@@ -95,6 +97,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5AC350D19B9454B003D048C /* libgsl.a in Frameworks */,
 				D5307A4B18B40AB0008C8463 /* liblevmar.a in Frameworks */,
 				D5307A4518B40934008C8463 /* libFEBioOpt.a in Frameworks */,
 				D5FB051518A5B1EB004E688A /* libFEBioHeat.a in Frameworks */,
@@ -114,6 +117,7 @@
 		D5E10B5E1865E23500B23922 = {
 			isa = PBXGroup;
 			children = (
+				D5AC350C19B9454B003D048C /* libgsl.a */,
 				D5307A4A18B40AB0008C8463 /* liblevmar.a */,
 				D5307A4418B40934008C8463 /* libFEBioOpt.a */,
 				D5FB050E18A5B1EB004E688A /* libFEBioHeat.a */,

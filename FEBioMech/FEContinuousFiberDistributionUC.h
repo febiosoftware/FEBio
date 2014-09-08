@@ -50,6 +50,9 @@ public:
 	//! calculate tangent stiffness at material point
 	tens4ds DevTangent(FEMaterialPoint& pt) { return m_pFint->Tangent(pt); }
     
+	//! calculate deviatoric strain energy density
+	double DevStrainEnergyDensity(FEMaterialPoint& pt) { return m_pFint->StrainEnergyDensity(pt); }
+    
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() {
         return new FEFiberMaterialPoint(m_pFint->CreateMaterialPointData());

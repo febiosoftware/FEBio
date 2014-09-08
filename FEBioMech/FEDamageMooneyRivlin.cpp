@@ -125,6 +125,34 @@ tens4ds FEDamageMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	return c*g;
 }
 
+//-----------------------------------------------------------------------------
+//! calculate deviatoric strain energy density
+double FEDamageMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// calculate deviatoric left Cauchy-Green tensor
+	mat3ds B = pt.DevLeftCauchyGreen();
+    
+	// calculate square of B
+	mat3ds B2 = B*B;
+    
+	// Invariants of B (= invariants of C)
+	// Note that these are the invariants of Btilde, not of B!
+	double I1 = B.tr();
+	double I2 = 0.5*(I1*I1 - B2.tr());
+    
+	//
+	// W = C1*(I1 - 3) + C2*(I2 - 3)
+	//
+    
+    double sed = c1*(I1-3) + c2*(I2-3);
+    
+	// calculate damage reduction factor
+	double g = Damage(mp);
+    
+    return sed*g;
+}
 
 //-----------------------------------------------------------------------------
 // Calculate damage reduction factor 

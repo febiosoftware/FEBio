@@ -28,6 +28,9 @@ public:
 	// Spatial tangent
 	tens4ds Tangent(FEMaterialPoint& mp);
     
+	//! Strain energy density
+	double StrainEnergyDensity(FEMaterialPoint& mp);
+    
     // Fiber density
     void IntegratedFiberDensity(double& IFD);
     

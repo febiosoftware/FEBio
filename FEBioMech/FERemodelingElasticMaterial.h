@@ -73,7 +73,7 @@ public:
 	FERemodelingElasticMaterial(FEModel* pfem) : FEElasticMaterial(pfem) {}
 	
 	//! strain energy density function
-	double StrainEnergy(FEMaterialPoint& pt);
+	double StrainEnergyDensity(FEMaterialPoint& pt);
 	
 	//! stress function
 	mat3ds Stress(FEMaterialPoint& pt);

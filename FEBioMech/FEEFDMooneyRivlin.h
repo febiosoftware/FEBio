@@ -22,6 +22,9 @@ public:
 	//! Calculate deviatoric tangent
 	tens4ds DevTangent(FEMaterialPoint& pt);
 
+	//! calculate deviatoric strain energy density
+	double DevStrainEnergyDensity(FEMaterialPoint& mp);
+    
 public:
 	FEMooneyRivlin	m_MR;
 	FEEFDUncoupled	m_EFD;

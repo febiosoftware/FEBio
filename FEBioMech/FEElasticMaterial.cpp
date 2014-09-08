@@ -356,3 +356,6 @@ void FEElasticMaterial::Init()
 	FEMaterial::Init();
 	if (m_density <= 0) throw MaterialError("Invalid material density");
 }
+
+//! return the strain energy density
+double FEElasticMaterial::StrainEnergyDensity(FEMaterialPoint& pt) { return 0; }

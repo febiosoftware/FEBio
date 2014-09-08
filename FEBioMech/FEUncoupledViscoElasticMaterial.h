@@ -57,6 +57,9 @@ public:
 	//! deviatoric tangent function
 	tens4ds DevTangent(FEMaterialPoint& pt);
 	
+	//! deviatoric strain energy density function
+	double DevStrainEnergyDensity(FEMaterialPoint& pt);
+	
 	//! returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData();
 	

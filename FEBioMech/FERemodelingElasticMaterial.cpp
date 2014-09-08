@@ -133,7 +133,7 @@ bool FERemodelingElasticMaterial::SetProperty(int n, FECoreBase* pm)
 
 //-----------------------------------------------------------------------------
 //! Strain energy density function
-double FERemodelingElasticMaterial::StrainEnergy(FEMaterialPoint& mp)
+double FERemodelingElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 {
 	return (dynamic_cast<FERemodelingInterface*>(m_pBase))->StrainEnergy(mp);
 }
@@ -145,10 +145,9 @@ mat3ds FERemodelingElasticMaterial::Stress(FEMaterialPoint& mp)
 	double dt = FEMaterialPoint::dt;
 
     FERemodelingMaterialPoint& rpt = *(mp.ExtractData<FERemodelingMaterialPoint>());
-	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 	// calculate the strain energy density at this material point
-	rpt.m_sed = StrainEnergy(mp);
+	rpt.m_sed = StrainEnergyDensity(mp);
 
 	// calculate the sed derivative with respect to mass density at this material point
     rpt.m_dsed = Tangent_SE_Density(mp);

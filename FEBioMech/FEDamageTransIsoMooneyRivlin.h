@@ -114,6 +114,9 @@ public:
 	//! calculate deviatoric tangent stiffness at material point
 	tens4ds DevTangent(FEMaterialPoint& pt);
 
+	//! calculate deviatoric strain energy density at material point
+	double DevStrainEnergyDensity(FEMaterialPoint& pt);
+    
 	//! data initialization
 	void Init();
 
@@ -122,6 +125,8 @@ protected:
 	mat3ds FiberStress (FEMaterialPoint& mp);
 	tens4ds MatrixTangent(FEMaterialPoint& pt);
 	tens4ds FiberTangent (FEMaterialPoint& pt);
+	double MatrixStrainEnergyDensity(FEMaterialPoint& pt);
+	double FiberStrainEnergyDensity (FEMaterialPoint& pt);
 
 protected:
 	// calculate damage reduction factor for matrix

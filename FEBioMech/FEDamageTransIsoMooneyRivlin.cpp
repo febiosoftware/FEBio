@@ -24,6 +24,7 @@ FEDamageTransIsoMooneyRivlin::FEDamageTransIsoMooneyRivlin(FEModel* pfem) : FEUn
 //-----------------------------------------------------------------------------
 void FEDamageTransIsoMooneyRivlin::Init()
 {
+	if (m_c4 <= 0) throw MaterialError("c4 must be > 0");
 
 }
 
@@ -256,6 +257,85 @@ tens4ds FEDamageTransIsoMooneyRivlin::FiberTangent(FEMaterialPoint &mp)
 	}
 
 	return c;
+}
+
+//-----------------------------------------------------------------------------
+double FEDamageTransIsoMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+	// matrix sed
+	double sedm = MatrixStrainEnergyDensity(mp);
+    
+	// matrix reduction factor
+	double gm = MatrixDamage(mp);
+    
+	// fiber sed
+	double sedf = FiberStrainEnergyDensity(mp);
+    
+	// fiber reduction factor
+	double gf = FiberDamage(mp);
+    
+	return sedm*gm + sedf*gf;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the matrix strain energy density
+double FEDamageTransIsoMooneyRivlin::MatrixStrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// calculate deviatoric left Cauchy-Green tensor
+	mat3ds B = pt.DevLeftCauchyGreen();
+    
+	// calculate square of B
+	mat3ds B2 = B*B;
+    
+	// Invariants of B (= invariants of C)
+	// Note that these are the invariants of Btilde, not of B!
+	double I1 = B.tr();
+	double I2 = 0.5*(I1*I1 - B2.tr());
+    
+	// --- TODO: put strain energy derivatives here ---
+	//
+	// W = C1*(I1 - 3) + C2*(I2 - 3)
+	//
+    double sed = m_c1*(I1 - 3) + m_c2*(I2 - 3);
+    
+	return sed;
+}
+
+//-----------------------------------------------------------------------------
+// Calculate the fiber strain energy density
+double FEDamageTransIsoMooneyRivlin::FiberStrainEnergyDensity(FEMaterialPoint &mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// deformation gradient
+	mat3d& F = pt.m_F;
+	double J = pt.m_J;
+	double Jm13 = pow(J, -1.0/3.0);
+    
+	// get the initial fiber direction
+	vec3d a0;
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
+    
+	// calculate the current material axis lam*a = F*a0;
+	vec3d a = F*a0;
+    
+	// normalize material axis and store fiber stretch
+	double lam, lamd;
+	lam = a.unit();
+	lamd = lam*Jm13; // i.e. lambda tilde
+    
+	// invariant I4
+	double I4 = lamd*lamd;
+    
+	// strain energy derivative
+	double sed = 0.5*m_c3/m_c4*(exp(m_c4*(I4-1)*(I4-1))-1);
+    
+	// return sed
+	return sed;
 }
 
 //-----------------------------------------------------------------------------

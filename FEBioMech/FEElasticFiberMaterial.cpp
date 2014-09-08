@@ -131,6 +131,44 @@ tens4ds FEFiberExponentialPower::Tangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
+//! Strain energy density
+double FEFiberExponentialPower::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+    double sed = 0.0;
+    
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEFiberMaterialPoint& pf = *mp.ExtractData<FEFiberMaterialPoint>();
+	
+	// loop over all integration points
+	vec3d n0, nt;
+	double In_1;
+	const double eps = 0;
+	mat3ds C = pt.RightCauchyGreen();
+    mat3ds C2 = C*C;
+	
+	// fiber direction in global coordinate system
+	n0 = pf.m_n0;
+	
+	// Calculate In = n0*C*n0
+	In_1 = n0*(C*n0) - 1.0;
+	
+	// only take fibers in tension into consideration
+	if (In_1 > eps)
+	{
+		// calculate strain energy density
+        if (m_alpha > 0)
+            sed = m_ksi/(m_alpha*m_beta)*(exp(m_alpha*pow(In_1, m_beta))-1);
+        else
+            sed = m_ksi/m_beta*pow(In_1, m_beta);
+		
+        // add the contribution from shear
+        sed += m_mu*(n0*(C2*n0)-2*In_1-1)/4.0;
+	}
+
+    return sed;
+}
+
+//-----------------------------------------------------------------------------
 // FEFiberNH
 //-----------------------------------------------------------------------------
 
@@ -231,4 +269,32 @@ tens4ds FEFiberNH::Tangent(FEMaterialPoint& mp)
 	}
 	
 	return c;
+}
+
+//-----------------------------------------------------------------------------
+//! Strain energy density
+double FEFiberNH::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+    double sed = 0.0;
+    
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEFiberMaterialPoint& pf = *mp.ExtractData<FEFiberMaterialPoint>();
+	
+	// loop over all integration points
+	vec3d n0, nt;
+	double In_1;
+	const double eps = 0;
+	mat3ds C = pt.RightCauchyGreen();
+	
+	// fiber direction in global coordinate system
+	n0 = pf.m_n0;
+	
+	// Calculate In = n0*C*n0
+	In_1 = n0*(C*n0) - 1.0;
+	
+	// only take fibers in tension into consideration
+	if (In_1 > eps)
+        sed = 0.25*m_mu*In_1*In_1;
+    
+    return sed;
 }

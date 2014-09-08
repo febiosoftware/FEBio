@@ -20,7 +20,6 @@ mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d& F = pt.m_F;
 	double J = pt.m_J;
 
 	// calculate deviatoric left Cauchy-Green tensor
@@ -32,7 +31,6 @@ mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	// Invariants of B (= invariants of C)
 	// Note that these are the invariants of Btilde, not of B!
 	double I1 = B.tr();
-	double I2 = 0.5*(I1*I1 - B2.tr());
 
 	// --- TODO: put strain energy derivatives here ---
 	// Wi = dW/dIi
@@ -58,7 +56,6 @@ tens4ds FETransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d& F = pt.m_F;
 	double J = pt.m_J;
 	double Ji = 1.0/J;
 
@@ -101,4 +98,28 @@ tens4ds FETransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
 	return c + m_fib.Tangent(mp);
+}
+
+double FETransIsoMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// calculate deviatoric left Cauchy-Green tensor
+	mat3ds B = pt.DevLeftCauchyGreen();
+    
+	// calculate square of B
+	mat3ds B2 = B*B;
+    
+	// Invariants of B (= invariants of C)
+	// Note that these are the invariants of Btilde, not of B!
+	double I1 = B.tr();
+	double I2 = 0.5*(I1*I1 - B2.tr());
+    
+	// calculate sed
+	double sed = c1*(I1-3) + c2*(I2-3);
+    
+	// add the fiber sed
+	sed += m_fib.StrainEnergyDensity(mp);
+    
+	return sed;
 }

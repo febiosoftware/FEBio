@@ -52,6 +52,13 @@ tens4ds FEGenerationMaterial::Tangent(FEMaterialPoint& pt)
 	return m_pMat->Tangent(pt);
 }
 
+//-----------------------------------------------------------------------------
+//! calculate strain energy density at material point
+double FEGenerationMaterial::StrainEnergyDensity(FEMaterialPoint& pt)
+{
+	return m_pMat->StrainEnergyDensity(pt);
+}
+
 //=============================================================================
 FEMaterialPoint* FEMultigenerationMaterialPoint::Copy()
 {
@@ -258,4 +265,36 @@ tens4ds FEElasticMultigeneration::Tangent(FEMaterialPoint& mp)
 	mpt.m_J = Js;
 	
 	return c;
+}
+
+//-----------------------------------------------------------------------------
+double FEElasticMultigeneration::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEMultigenerationMaterialPoint& pt = *mp.ExtractData<FEMultigenerationMaterialPoint>();
+	FEElasticMaterialPoint& mpt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	double sed = 0.0;
+	
+	sed = m_MG[0]->StrainEnergyDensity(mp);
+	
+	// extract deformation gradient
+	mat3d Fs = mpt.m_F;
+	double Js = mpt.m_J;
+	
+	for (int i=0; i < (int)pt.Fi.size(); ++i)
+	{
+		// evaluate deformation gradient for this generation
+		mat3d Fi = pt.Fi[i];
+       	mpt.m_F = Fs*Fi;
+		double Ji = pt.Ji[i];
+		mpt.m_J = Js*Ji;
+		// evaluate stress for this generation
+		sed += Ji*m_MG[i+1]->StrainEnergyDensity(mp);
+	}
+    
+	// restore the material point deformation gradient
+	mpt.m_F = Fs;
+	mpt.m_J = Js;
+	
+	return sed;
 }

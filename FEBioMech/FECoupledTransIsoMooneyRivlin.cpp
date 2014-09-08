@@ -4,6 +4,9 @@
 
 #include "stdafx.h"
 #include "FECoupledTransIsoMooneyRivlin.h"
+#ifdef HAVE_GSL
+#include "gsl/gsl_sf_expint.h"
+#endif
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -100,9 +103,6 @@ tens4ds FECoupledTransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
 	// calculate left Cauchy-Green tensor: B = F*Ft
 	mat3ds B = pt.LeftCauchyGreen();
 
-	// calculate square of B
-	mat3ds B2 = B*B;
-
 	// get the material fiber axis
 	vec3d a0;
 	a0.x = pt.m_Q[0][0];
@@ -114,9 +114,7 @@ tens4ds FECoupledTransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
 	double l = a.unit();
 
 	// Invariants of B (= invariants of C)
-	double I1 = B.tr();
 	double J = pt.m_J;
-	double Ji = 1.0/J;
 	double I4 = l*l;
 
 	// some useful tensors
@@ -165,3 +163,62 @@ tens4ds FECoupledTransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
 
 	return c;
 }
+
+#ifdef HAVE_GSL
+//-----------------------------------------------------------------------------
+//! calculate strain energy density at material point
+double FECoupledTransIsoMooneyRivlin::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	// get the material point data
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// calculate left Cauchy-Green tensor
+	mat3ds B = pt.LeftCauchyGreen();
+    
+	// calculate square of B
+	mat3ds B2 = B*B;
+    
+	// get the material fiber axis
+	vec3d a0;
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
+    
+	// get the spatial fiber axis
+	vec3d a = pt.m_F*a0;
+	double l = a.unit();
+    
+	// Invariants of B (= invariants of C)
+	double I1 = B.tr();
+    double I2 = 0.5*(I1*I1 - B2.tr());
+	double J = pt.m_J;
+    double lnJ = log(J);
+    
+	// a. define the matrix sed
+	//-----------------------------
+	// W = c1*(I1 - 3) + c2*(I2 - 3)
+    double sed = m_c1*(I1 - 3) + m_c2*(I2 - 3) - 2*(m_c1 + 2*m_c2)*lnJ;
+    
+	// b. define fiber strain energy density
+	//-------------------------
+	if (l > 1.0)
+	{
+		if (l < m_flam)
+		{
+            sed += m_c3*(exp(-m_c4)*(gsl_sf_expint_Ei(m_c4*l) - gsl_sf_expint_Ei(m_c4))-log(l));
+		}
+		else
+		{
+			double c6 = m_c3*(exp(m_c4*(m_flam - 1.0)) - 1.0) - m_c5*m_flam;
+			sed += m_c5*(l-1) +c6*log(l);
+		}
+	}
+    
+	// c. define dilational stress
+	//------------------------------
+	// U(J) = 1/2*k*(lnJ)^2
+	sed += m_K*lnJ*lnJ/2;
+    
+    return sed;
+}
+#endif

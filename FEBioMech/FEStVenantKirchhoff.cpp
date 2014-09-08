@@ -70,3 +70,23 @@ tens4ds FEStVenantKirchhoff::Tangent(FEMaterialPoint& mp)
 
 	return c;
 }
+
+//-----------------------------------------------------------------------------
+double FEStVenantKirchhoff::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// lame parameters
+	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
+	double mu  = 0.5*m_E/(1+m_v);
+    
+	// calculate right Cauchy-Green tensor
+	mat3ds C = pt.RightCauchyGreen();
+	mat3ds C2 = C*C;
+    
+	double trE = 0.5*(C.tr()-3);
+    double trE2 = 0.25*(C2.tr() - 2*C.tr() + 3);
+    
+	// calculate strain energy density
+	return lam*trE*trE/2.0 + mu*trE2;
+}

@@ -47,6 +47,20 @@ tens4ds FEEFDNeoHookean::Tangent(FEMaterialPoint& mp)
 	return c;
 }
 
+//-----------------------------------------------------------------------------
+//! calculate strain energy density at material point
+double FEEFDNeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	// --- M A T R I X   C O N T R I B U T I O N ---
+	double sed = m_NH.StrainEnergyDensity(mp);
+	
+	// --- F I B E R   C O N T R I B U T I O N ---
+	
+	sed += m_EFD.StrainEnergyDensity(mp);
+    
+    return sed;
+}
+
 //////////////////////////////////////////////////////////////////////
 // FEEFDNeoHookeanOld
 //////////////////////////////////////////////////////////////////////
@@ -91,4 +105,18 @@ tens4ds FEEFDNeoHookeanOld::Tangent(FEMaterialPoint& mp)
 	c += m_EFD.Tangent(mp);
 	
 	return c;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate strain energy density at material point
+double FEEFDNeoHookeanOld::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	// --- M A T R I X   C O N T R I B U T I O N ---
+	double sed = m_NH.StrainEnergyDensity(mp);
+	
+	// --- F I B E R   C O N T R I B U T I O N ---
+	
+	sed += m_EFD.StrainEnergyDensity(mp);
+    
+    return sed;
 }

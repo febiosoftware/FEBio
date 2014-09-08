@@ -1232,9 +1232,13 @@
 				ICC_OPTLEVEL = none;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DHAVE_GSL",
+				);
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../.. /usr/local/include";
 			};
 			name = Debug;
 		};
@@ -1269,9 +1273,13 @@
 				ICC_LANG_OPENMP = parallel;
 				ICC_OPTLEVEL = speedHLO;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DHAVE_GSL",
+				);
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../.. /usr/local/include";
 			};
 			name = Release;
 		};

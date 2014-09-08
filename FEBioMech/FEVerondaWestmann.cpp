@@ -111,3 +111,25 @@ tens4ds FEVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 
 	return c;
 }
+
+//-----------------------------------------------------------------------------
+//! calculate strain energy density at material point
+double FEVerondaWestmann::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+	// get the elastic material point data
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// calculate left Cauchy-Green tensor
+	mat3ds B = pt.DevLeftCauchyGreen();
+    
+	// calculate square of B
+	mat3ds B2 = B*B;
+    
+	// Invariants of B (= invariants of C)
+	double I1 = B.tr();
+    double I2 = (I1*I1 - B2.tr())/2.0;
+    
+    double sed = m_c1*(exp(m_c2*(I1-3))-1) - m_c1*m_c2*(I2-3)/2;
+    
+    return sed;
+}

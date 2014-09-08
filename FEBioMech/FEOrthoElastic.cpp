@@ -122,7 +122,6 @@ tens4ds FEOrthoElastic::Tangent(FEMaterialPoint& mp)
 	// calculate left and right Cauchy-Green tensor
 	mat3ds b = pt.LeftCauchyGreen();
 	mat3ds c = pt.RightCauchyGreen();
-	mat3ds c2 = c*c;
 	mat3dd I(1.);
 	
 	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
@@ -144,4 +143,31 @@ tens4ds FEOrthoElastic::Tangent(FEMaterialPoint& mp)
 	C /= J;
 	
 	return C;
+}
+
+//-----------------------------------------------------------------------------
+double FEOrthoElastic::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    mat3ds E = (pt.RightCauchyGreen() - mat3dd(1))/2;
+    mat3ds E2 = E*E;
+    
+	vec3d a0[3];		// texture direction in reference configuration
+	mat3ds A0[3];		// texture tensor in current configuration
+    double AE[3], AE2[3];
+
+	for (int i=0; i<3; i++) {
+		// Copy the texture direction in the reference configuration to a0
+		a0[i].x = pt.m_Q[0][i]; a0[i].y = pt.m_Q[1][i]; a0[i].z = pt.m_Q[2][i];
+		A0[i] = dyad(a0[i]);			// Evaluate the texture tensor in the reference configuration
+        AE[i] = A0[i].dotdot(E);
+        AE2[i] = A0[i].dotdot(E2);
+	}
+    
+    double sed = mu[0]*AE2[0] + mu[1]*AE2[1] + mu[2]*AE2[2]
+    +0.5*(lam[0][0]*AE[0]*AE[0]+lam[1][1]*AE[1]*AE[1]+lam[2][2]*AE[2]*AE[2])
+    +lam[0][1]*AE[0]*AE[1]+lam[1][2]*AE[1]*AE[2]+lam[2][0]*AE[2]*AE[0];
+    
+	return sed;
 }

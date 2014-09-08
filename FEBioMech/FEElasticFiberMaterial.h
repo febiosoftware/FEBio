@@ -37,6 +37,9 @@ public:
 	// Spatial tangent
 	tens4ds Tangent(FEMaterialPoint& mp);
 	
+	//! Strain energy density
+	double StrainEnergyDensity(FEMaterialPoint& mp);
+    
 public:
 	double	m_alpha;	// coefficient of (In-1) in exponential
 	double	m_beta;		// power of (In-1) in exponential
@@ -64,6 +67,9 @@ public:
 	// Spatial tangent
 	tens4ds Tangent(FEMaterialPoint& mp);
 	
+	//! Strain energy density
+	double StrainEnergyDensity(FEMaterialPoint& mp);
+    
 public:
 	double	m_mu;       // shear modulus
 

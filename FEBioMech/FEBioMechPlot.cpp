@@ -332,10 +332,12 @@ bool FEPlotElementElasticity::Save(FEDomain& dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
 {
+    FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return false;
+    
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		int N = bd.Elements();
 		for (int i=0; i<bd.Elements(); ++i)
 		{
 			FESolidElement& el = bd.Element(i);
@@ -345,8 +347,39 @@ bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-				FERemodelingMaterialPoint* pt = (mp.ExtractData<FERemodelingMaterialPoint>());
-				if (pt) ew += pt->m_sed;
+                double sed = pme->StrainEnergyDensity(mp);
+                ew += sed;
+			}
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotDevStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+    FEUncoupledMaterial* pmu = dynamic_cast<FEUncoupledMaterial*>(pme);
+    if ((pme == 0) || pme->IsRigid() || (pmu == 0)) return false;
+    
+	if (dom.Class() == FE_DOMAIN_SOLID)
+	{
+		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+		for (int i=0; i<bd.Elements(); ++i)
+		{
+			FESolidElement& el = bd.Element(i);
+			
+			// calculate average strain energy
+			double ew = 0;
+			for (int j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                double sed = pmu->DevStrainEnergyDensity(mp);
+                ew += sed;
 			}
 			ew /= el.GaussPoints();
 			
@@ -363,7 +396,6 @@ bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, vector<float>& a)
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		int N = bd.Elements();
 		for (int i=0; i<bd.Elements(); ++i)
 		{
 			FESolidElement& el = bd.Element(i);

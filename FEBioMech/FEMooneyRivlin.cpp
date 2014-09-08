@@ -96,8 +96,6 @@ tens4ds FEMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	mat3ds T = B*(W1 + W2*I1) - B2*W2;
 	T = T.dev()*(2.0/J);
 
-	mat3ds diff = devs-T;
-
 	// Identity tensor
 	mat3ds I(1,1,1,0,0,0);
 
@@ -115,3 +113,29 @@ tens4ds FEMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 
 	return c;
 }
+
+//-----------------------------------------------------------------------------
+//! calculate deviatoric strain energy density
+double FEMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// calculate deviatoric left Cauchy-Green tensor
+	mat3ds B = pt.DevLeftCauchyGreen();
+    
+	// calculate square of B
+	mat3ds B2 = B*B;
+    
+	// Invariants of B (= invariants of C)
+	// Note that these are the invariants of Btilde, not of B!
+	double I1 = B.tr();
+	double I2 = 0.5*(I1*I1 - B2.tr());
+    
+	//
+	// W = C1*(I1 - 3) + C2*(I2 - 3)
+	//
+    double sed = c1*(I1-3) + c2*(I2-3);
+    
+    return sed;
+}
+

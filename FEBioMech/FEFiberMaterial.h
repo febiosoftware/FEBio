@@ -53,6 +53,9 @@ public:
 	//! Calculate the fiber tangent
 	tens4ds Tangent(FEMaterialPoint& mp);
 
+	//! Calculate the fiber strain energy density
+	double StrainEnergyDensity(FEMaterialPoint& mp);
+    
 public:
 	void Serialize(DumpFile& ar);
 

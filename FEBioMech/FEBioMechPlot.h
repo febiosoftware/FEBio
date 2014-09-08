@@ -135,6 +135,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Deviatoric strain energy density
+class FEPlotDevStrainEnergyDensity : public FEDomainData
+{
+public:
+	FEPlotDevStrainEnergyDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Specific strain energy
 class FEPlotSpecificStrainEnergy : public FEDomainData
 {

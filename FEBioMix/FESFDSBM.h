@@ -29,6 +29,9 @@ public:
 	// Spatial tangent
 	virtual tens4ds Tangent(FEMaterialPoint& mp);
 	
+	// Strain energy density
+	virtual double StrainEnergyDensity(FEMaterialPoint& mp);
+	
 	//! return fiber modulus
 	double FiberModulus(double rhor) { return m_ksi0*pow(rhor/m_rho0, m_g);}
 	

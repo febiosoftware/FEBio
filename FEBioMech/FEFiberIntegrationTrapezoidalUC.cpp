@@ -116,6 +116,46 @@ tens4ds FEFiberIntegrationTrapezoidalUC::DevTangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
+double FEFiberIntegrationTrapezoidalUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+    // initialize strain energy density
+	double sed = 0.0;
+    
+    double theta;
+    double pi = 4*atan(1.0);
+    double dth = pi/m_nth;  // integrate from 0 to pi
+    
+    // get the element's local coordinate system
+	mat3d Q = pt.m_Q;
+    vec3d a0(Q(0,0),Q(1,0),Q(2,0)); // local x-direction unit vector
+    vec3d a1(Q(0,1),Q(1,1),Q(2,1)); // local y-direction unit vector
+    
+    vec3d n0e, n0a;
+    
+    // loop over all integration points
+    for (int i=0; i<m_nth; ++i) {
+        theta = i*dth;
+        
+        // set fiber direction in x-y plane of local coordinate system
+        n0a = a0*cos(theta) + a1*sin(theta);
+        // evaluate local fiber distribution
+        double R = m_pFDD->FiberDensity(n0a);
+        
+        // rotate to global configuration to set fiber direction
+        n0e = Q*n0a;
+        m_pFmat->SetFiberDirection(mp, n0e);
+        
+        // calculate the stress
+        sed += m_pFmat->DevStrainEnergyDensity(mp)*(R*dth);
+    }
+    
+    // Multiply by 2 since fibers along theta+pi have same sed as along theta
+	return sed*2;
+}
+
+//-----------------------------------------------------------------------------
 void FEFiberIntegrationTrapezoidalUC::IntegratedFiberDensity(double& IFD)
 {
     // initialize integrated fiber density distribution

@@ -70,3 +70,14 @@ tens4ds FEUncoupledMaterial::Tangent(FEMaterialPoint &mp)
 	//        c_tilde         c_pressure            c_k
 	return DevTangent(mp) + (IxI - I4*2)*p + IxI*(UJJ(pt.m_J)*pt.m_J);
 }
+
+//-----------------------------------------------------------------------------
+//! The strain energy density function calculates the total sed as a sum of
+//! two terms, namely the deviatoric sed and U(J).
+double FEUncoupledMaterial::StrainEnergyDensity(FEMaterialPoint &mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// calculate the stress as a sum of deviatoric stress and pressure
+	return U(pt.m_J) + DevStrainEnergyDensity(mp);
+}

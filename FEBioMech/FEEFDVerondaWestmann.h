@@ -21,6 +21,9 @@ public:
 	//! deviatoric tangent
 	tens4ds DevTangent(FEMaterialPoint& pt);
 
+	//! calculate deviatoric strain energy density
+	double DevStrainEnergyDensity(FEMaterialPoint& mp);
+    
 public:
 	FEVerondaWestmann	m_VW;
 	FEEFDUncoupled		m_EFD;

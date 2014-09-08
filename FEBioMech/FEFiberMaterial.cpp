@@ -2,7 +2,9 @@
 #include "FEFiberMaterial.h"
 #include "FEElasticMaterial.h"
 #include <stdlib.h>
-
+#ifdef HAVE_GSL
+#include "gsl/gsl_sf_expint.h"
+#endif
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEActiveFiberContraction, FEMaterial);
@@ -192,7 +194,6 @@ tens4ds FEFiberMaterial::Tangent(FEMaterialPoint &mp)
 	mat3d F = pt.m_F;
 	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
-	double Jm23 = Jm13*Jm13;
 	double Ji = 1.0/J;
 
 	// get initial local material axis
@@ -259,6 +260,55 @@ tens4ds FEFiberMaterial::Tangent(FEMaterialPoint &mp)
 	tens4ds c = (Id4 - IxI/3.0)*(4.0/3.0*Ji*WC) + IxI*(4.0/9.0*Ji*CWWC) + cw;
 
 	return c;
+}
+
+//-----------------------------------------------------------------------------
+// Fiber material strain energy density
+//
+double FEFiberMaterial::StrainEnergyDensity(FEMaterialPoint &mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// get the deformation gradient
+	mat3d F = pt.m_F;
+	double J = pt.m_J;
+	double Jm13 = pow(J, -1.0/3.0);
+    
+	// get the initial fiber direction
+	vec3d a0;
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
+    
+	// calculate the current material axis lam*a = F*a0;
+	vec3d a = F*a0;
+    
+	// normalize material axis and store fiber stretch
+	double lam, lamd;
+	lam = a.unit();
+	lamd = lam*Jm13; // i.e. lambda tilde
+    
+	// strain energy density
+	double sed = 0.0;
+#ifdef HAVE_GSL
+	if (lamd > 1)
+	{
+		if (lamd < m_lam1)
+		{
+			sed = m_c3*(exp(-m_c4)*
+                        (gsl_sf_expint_Ei(m_c4*lamd)-gsl_sf_expint_Ei(m_c4))
+                        - log(lamd));
+		}
+		else
+		{
+			double c6 = m_c3*(exp(m_c4*(m_lam1-1))-1) - m_c5*m_lam1;
+			sed = m_c5*(lamd-1) + c6*log(lamd);
+		}
+	}
+#endif
+	// --- active contraction contribution to sed is zero ---
+    
+	return sed;
 }
 
 //-----------------------------------------------------------------------------

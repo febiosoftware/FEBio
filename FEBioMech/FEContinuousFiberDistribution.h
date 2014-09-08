@@ -46,6 +46,9 @@ public:
 	//! calculate tangent stiffness at material point
 	tens4ds Tangent(FEMaterialPoint& pt) { return m_pFint->Tangent(pt); }
     
+	//! calculate strain energy density at material point
+	double StrainEnergyDensity(FEMaterialPoint& pt) { return m_pFint->StrainEnergyDensity(pt); }
+    
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() {
         return new FEFiberMaterialPoint(m_pFint->CreateMaterialPointData());

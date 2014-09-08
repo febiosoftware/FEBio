@@ -16,8 +16,11 @@ public:
 	mat3ds DevStress(FEMaterialPoint& pt);
 
 	//! calculate the deviatoric tangent
-	virtual tens4ds DevTangent(FEMaterialPoint& pt);
+	tens4ds DevTangent(FEMaterialPoint& pt);
 
+	//! calculate the deviatoric strain energy density
+	double DevStrainEnergyDensity(FEMaterialPoint& pt);
+    
 protected:
 	void EigenValues(mat3ds& A, double l[3], vec3d r[3], const double eps = 0);
 	double	m_eps;

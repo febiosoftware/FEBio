@@ -35,9 +35,15 @@ public:
 	//! Deviatoric Cauchy stress
 	virtual mat3ds DevStress(FEMaterialPoint& mp) = 0;
 
-	//! Deviatroic spatial Tangent
+	//! Deviatoric spatial Tangent
 	virtual tens4ds DevTangent(FEMaterialPoint& mp) = 0;
 
+	//! Deviatoric strain energy density
+	virtual double DevStrainEnergyDensity(FEMaterialPoint& mp) { return 0; }
+    
+	//! strain energy density U(J)
+	virtual double U(double J) { double lnJ = log(J); return 0.5*m_K*lnJ*lnJ; }
+    
 	//! pressure, i.e. first derivative of U(J)
 	virtual double UJ(double J) { return m_K*log(J)/J; }
 
@@ -67,6 +73,9 @@ public:
 	//! total spatial tangent (do not overload!)
 	tens4ds Tangent(FEMaterialPoint& mp);
 
+	//! calculate strain energy (do not overload!)
+	double StrainEnergyDensity(FEMaterialPoint& pt);
+    
 	//! material initialization
 	void Init();
 

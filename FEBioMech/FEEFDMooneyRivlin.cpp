@@ -34,3 +34,10 @@ tens4ds FEEFDMooneyRivlin::DevTangent(FEMaterialPoint& pt)
 {
 	return m_MR.DevTangent(pt) + m_EFD.DevTangent(pt);
 }
+
+//-----------------------------------------------------------------------------
+//! calculate deviatoric strain energy density
+double FEEFDMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& pt)
+{
+    return m_MR.DevStrainEnergyDensity(pt) + m_EFD.DevStrainEnergyDensity(pt);
+}

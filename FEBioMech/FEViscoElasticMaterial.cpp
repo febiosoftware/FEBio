@@ -40,16 +40,27 @@ void FEViscoElasticMaterialPoint::Init(bool bflag)
 		// intialize data to zero
 		m_se.zero();
 		m_Sep.zero();
-		for (int i=0; i<MAX_TERMS; ++i) { m_H[i].zero(); m_Hp[i].zero(); };
+//        m_sed = 0.0;
+//        m_sedp = 0.0;
+		for (int i=0; i<MAX_TERMS; ++i) {
+            m_H[i].zero();
+            m_Hp[i].zero();
+//            m_Hsed[i] = 0;
+//            m_Hsedp[i] = 0;
+        };
 	}
 	else
 	{
 		// the elastic stress stored in pt is the Cauchy stress.
 		// however, we need to store the 2nd PK stress
 		m_Sep = pt.pull_back(m_se);
+//        m_sedp = m_sed;
 
 		// copy previous data
-		for (int i=0; i<MAX_TERMS; ++i) m_Hp[i] = m_H[i];
+		for (int i=0; i<MAX_TERMS; ++i) {
+            m_Hp[i] = m_H[i];
+//            m_Hsedp[i] = m_Hsed[i];
+        }
 	}
 
 	// don't forget to intialize the nested data
@@ -239,6 +250,40 @@ tens4ds FEViscoElasticMaterial::Tangent(FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
+//! Strain energy density function
+double FEViscoElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+/*    if (mp.dt == 0) return 0;
+    
+	// get the viscoelastic point data
+	FEViscoElasticMaterialPoint& pt = *mp.ExtractData<FEViscoElasticMaterialPoint>();
+    
+	// Calculate the new elastic strain energy density
+	pt.m_sed = m_pBase->StrainEnergyDensity(mp);
+    double sed = pt.m_sed;
+    
+	// get elastic strain energy density of previous timestep
+	double sedp = pt.m_sedp;
+    
+	// calculate new history variables
+	// terms are accumulated in sedt, the total strain energy density
+	double sedt = sed*m_g0;
+	double dt = mp.dt, g, h;
+	for (int i=0; i<MAX_TERMS; ++i)
+	{
+		g = exp(-dt/m_t[i]);
+		h = (1 - g)/(dt/m_t[i]);
+        
+		pt.m_Hsed[i] = pt.m_Hsedp[i]*g + (sed - sedp)*h;
+		sedt += pt.m_Hsed[i]*m_g[i];
+	}
+    
+	// return the total strain energy density
+	return sedt; */
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Get a material parameter
 FEParam* FEViscoElasticMaterial::GetParameter(const ParamString& s)
 {
@@ -269,3 +314,4 @@ void FEViscoElasticMaterial::Serialize(DumpFile& ar)
 		m_pBase->Init();
 	}
 }
+

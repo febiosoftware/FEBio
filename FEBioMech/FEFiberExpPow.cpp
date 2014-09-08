@@ -121,3 +121,36 @@ tens4ds FEFiberExpPow::Tangent(FEMaterialPoint& mp)
 	
 	return c;
 }
+
+//-----------------------------------------------------------------------------
+double FEFiberExpPow::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+    double sed = 0.0;
+    
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	// loop over all integration points
+	vec3d n0;
+	double In_1;
+	const double eps = 0;
+	mat3ds C = pt.RightCauchyGreen();
+	
+	// evaluate fiber direction in global coordinate system
+	n0 = pt.m_Q*m_n0;
+	
+	// Calculate In = n0*C*n0
+	In_1 = n0*(C*n0) - 1.0;
+	
+	// only take fibers in tension into consideration
+	if (In_1 > eps)
+	{
+		// calculate strain energy derivative
+        if (m_alpha > 0) {
+            sed = m_ksi/(m_alpha*m_beta)*(exp(m_alpha*pow(In_1, m_beta))-1);
+        }
+        else
+            sed = m_ksi/m_beta*pow(In_1, m_beta);
+	}
+
+    return sed;
+}

@@ -166,3 +166,28 @@ tens4ds FEFiberNeoHookean::Tangent(FEMaterialPoint& mp)
 
 	return tens4ds(D);
 }
+
+double FEFiberNeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	double J = pt.m_J;
+	double lnJ = log(J);
+    
+	// calculate left Cauchy-Green tensor
+	mat3ds b = pt.LeftCauchyGreen();
+    
+    double I1 = b.tr();
+    
+	// lame parameters
+	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
+	double mu  = 0.5*m_E/(1+m_v);
+    
+	// calculate strain energy density
+	double sed = mu*((I1-3)/2.0 - lnJ) + lam*lnJ*lnJ/2.0;
+    
+	// --- F I B E R   C O N T R I B U T I O N ---
+    // active contraction does not contribute to the strain energy density
+    
+	return sed;
+}

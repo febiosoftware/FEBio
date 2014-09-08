@@ -212,6 +212,38 @@ tens4ds FEFiberIntegrationTriangle::Tangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
+double FEFiberIntegrationTriangle::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	// get the element's local coordinate system
+	mat3d QT = (pt.m_Q).transpose();
+    
+	// loop over all integration points
+	double R;
+	vec3d n0e, n0a;
+	double sed = 0.0;
+    
+	for (int n=0; n<m_nint; ++n)
+	{
+		// set the global fiber direction in reference configuration
+		n0e.x = m_cth[n]*m_sph[n];
+		n0e.y = m_sth[n]*m_sph[n];
+		n0e.z = m_cph[n];
+        m_pFmat->SetFiberDirection(mp, n0e);
+        
+        // get the local material fiber direction in reference configuration
+        n0a = QT*n0e;
+        // evaluate the fiber density
+        R = m_pFDD->FiberDensity(n0a);
+        
+        // evaluate this fiber's contribution to the stress
+		sed += m_pFmat->StrainEnergyDensity(mp)*(R*m_w[n]);
+	}
+	return sed;
+}
+
+//-----------------------------------------------------------------------------
 void FEFiberIntegrationTriangle::IntegratedFiberDensity(double& IFD)
 {
     // initialize integrated fiber density distribution

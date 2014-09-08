@@ -22,6 +22,8 @@ public:
 public:
 	double	m_E;	//!< Young's modulus
 	double	m_v;	//!< Poisson's ratio
+    double  m_lam;  //!< first Lamé constant
+    double  m_mu;   //!< second Lamé constant
 
 public:
 	//! calculate stress at material point
@@ -30,6 +32,9 @@ public:
 	//! calculate tangent stiffness at material point
 	virtual tens4ds Tangent(FEMaterialPoint& pt);
 
+	//! calculate strain energy density at material point
+	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+    
 	//! data initialization
 	void Init();
 

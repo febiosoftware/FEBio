@@ -32,7 +32,6 @@ mat3ds FETransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 	// Invariants of B (= invariants of C)
 	// Note that these are the invariants of Btilde, not of B!
 	double I1 = B.tr();
-	double I2 = 0.5*(I1*I1 - B2.tr());
 
 	// --- TODO: put strain energy derivatives here ---
 	// Wi = dW/dIi
@@ -58,10 +57,7 @@ tens4ds FETransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	const double third = 1.0 / 3.0;
-
 	// deformation gradient
-	mat3d &F = pt.m_F;
 	double J = pt.m_J;
 	double Ji = 1.0/J;
 
@@ -107,4 +103,28 @@ tens4ds FETransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
 	return c + m_fib.Tangent(mp);
+}
+
+double FETransIsoVerondaWestmann::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// calculate deviatoric left Cauchy-Green tensor
+	mat3ds B = pt.DevLeftCauchyGreen();
+    
+	// calculate square of B
+	mat3ds B2 = B*B;
+    
+	// Invariants of B (= invariants of C)
+	// Note that these are the invariants of Btilde, not of B!
+	double I1 = B.tr();
+	double I2 = 0.5*(I1*I1 - B2.tr());
+    
+	// calculate sed
+    double sed = m_c1*(exp(m_c2*(I1-3))-1) - m_c1*m_c2*(I2-3)/2;
+    
+	// add the fiber strain energy density
+	sed += m_fib.StrainEnergyDensity(mp);
+    
+	return sed;
 }

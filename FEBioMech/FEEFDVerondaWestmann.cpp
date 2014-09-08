@@ -29,3 +29,11 @@ tens4ds FEEFDVerondaWestmann::DevTangent(FEMaterialPoint& pt)
 {
 	return m_VW.DevTangent(pt) + m_EFD.DevTangent(pt);
 }
+
+//-----------------------------------------------------------------------------
+//! calculate deviatoric strain energy density
+double FEEFDVerondaWestmann::DevStrainEnergyDensity(FEMaterialPoint& pt)
+{
+    return m_VW.DevStrainEnergyDensity(pt) + m_EFD.DevStrainEnergyDensity(pt);
+}
+

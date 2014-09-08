@@ -30,6 +30,12 @@ public:
 
 	mat3ds	m_H[MAX_TERMS];		//!< internal variables
 	mat3ds	m_Hp[MAX_TERMS];	//!< internal variables at previous timestep
+    
+//	double	m_sed;	//!< elastic strain energy density
+//	double	m_sedp;	//!< elastic strain energy density at previous time
+    
+//	double	m_Hsed[MAX_TERMS];	//!< sed internal variables
+//	double	m_Hsedp[MAX_TERMS];	//!< sed internal variables at previous timestep
 };
 
 
@@ -85,6 +91,9 @@ public:
 	//! tangent function
 	tens4ds Tangent(FEMaterialPoint& pt);
 
+	//! strain energy density
+	double StrainEnergyDensity(FEMaterialPoint& pt);
+    
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData();
 

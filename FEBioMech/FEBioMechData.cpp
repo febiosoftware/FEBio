@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEBioMechData.h"
 #include "FEElasticMaterial.h"
+#include "FEUncoupledMaterial.h"
 #include "FERigidMaterial.h"
 #include "FESolidSolver.h"
 #include "FECore/FERigidBody.h"
@@ -942,6 +943,43 @@ double FELogElemElasticityXZXZ::value(FEElement& el)
 		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
         c = pme->Tangent(pt);
 		val += c.d[20];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStrainEnergyDensity::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return 0;
+    
+    double sed;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        sed = pme->StrainEnergyDensity(pt);
+		val += sed;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemDevStrainEnergyDensity::value(FEElement& el)
+{
+    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    FEUncoupledMaterial* pmu = dynamic_cast<FEUncoupledMaterial*>(pme);
+    if ((pme == 0) || pme->IsRigid() || (pmu == 0)) return 0;
+    
+    double sed;
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
+        sed = pmu->DevStrainEnergyDensity(pt);
+		val += sed;
 	}
 	return val / (double) nint;
 }

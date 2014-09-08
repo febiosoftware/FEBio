@@ -30,6 +30,9 @@ public:
 	// Spatial tangent
 	tens4ds DevTangent(FEMaterialPoint& mp);
     
+	//! Strain energy density
+	double DevStrainEnergyDensity(FEMaterialPoint& mp);
+    
     // Fiber density
     void IntegratedFiberDensity(double& IFD);
     

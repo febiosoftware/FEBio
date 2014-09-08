@@ -59,15 +59,11 @@ tens4ds FEArrudaBoyce::DevTangent(FEMaterialPoint& mp)
 	const double a[] = {0.5, 0.1, 11.0/350.0, 19.0/1750.0, 519.0/134750.0};
 
 	// deformation gradient
-	mat3d &F = pt.m_F;
 	double J = pt.m_J;
 	double Ji = 1.0/J;
 
 	// calculate deviatoric left Cauchy-Green tensor: B = F*Ft
 	mat3ds B = pt.DevLeftCauchyGreen();
-
-	// calculate square of B
-	mat3ds B2 = B*B;
 
 	// Invariants of B (= invariants of C)
 	double I1 = B.tr();
@@ -95,7 +91,6 @@ tens4ds FEArrudaBoyce::DevTangent(FEMaterialPoint& mp)
 	tens4ds IxI = dyad1s(I);
 	tens4ds I4  = dyad4s(I);
 	tens4ds BxB = dyad1s(B);
-	tens4ds B4  = dyad4s(B);
 
 	// d2W/dCdC:C
 	mat3ds WCCxC = B*(W11*I1);
@@ -105,4 +100,30 @@ tens4ds FEArrudaBoyce::DevTangent(FEMaterialPoint& mp)
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
 	return c;
+}
+
+//-----------------------------------------------------------------------------
+double FEArrudaBoyce::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	const double a[] = {0.5, 0.1, 11.0/350.0, 19.0/1750.0, 519.0/134750.0};
+    
+	// left Cauchy-Green tensor and its square
+	mat3ds B = pt.DevLeftCauchyGreen();
+    
+	// Invariants of B_tilde
+	double I1 = B.tr();
+    double I1i = I1, ti = 3, Ni = 1;
+    
+    double sed = a[0]*(I1-3);
+    for (int i=1; i<5; ++i) {
+        Ni *= m_N;
+        ti *= 3;
+        I1i *= I1;
+        sed += a[i]*(I1i - ti)/Ni;
+    }
+    sed *= m_mu;
+    
+    return sed;
 }

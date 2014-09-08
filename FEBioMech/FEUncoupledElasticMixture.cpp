@@ -129,6 +129,33 @@ tens4ds FEUncoupledElasticMixture::DevTangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
+double FEUncoupledElasticMixture::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+	vector<double>& w = pt.m_w;
+	assert(w.size() == m_pMat.size());
+    
+	// get the elastic material point
+	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+	// calculate strain energy density
+	double sed = 0.0;
+	for (int i=0; i < (int)m_pMat.size(); ++i)
+	{
+		// copy the elastic material point data to the components
+        // but don't copy m_Q since correct value was set in SetLocalCoordinateSystem
+		FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
+		epi.m_rt = ep.m_rt;
+		epi.m_r0 = ep.m_r0;
+		epi.m_F = ep.m_F;
+		epi.m_J = ep.m_J;
+		sed += m_pMat[i]->DevStrainEnergyDensity(*pt.m_mp[i])*w[i];;
+	}
+	
+	return sed;
+}
+
+//-----------------------------------------------------------------------------
 //! For elastic mixtures, the parameter name is defined as follows:
 //!		material.param
 //! where material refers to the name of one of the mixture components and

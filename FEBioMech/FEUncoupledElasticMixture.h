@@ -54,6 +54,9 @@ public:
 	//! calculate tangent stiffness at material point
 	tens4ds DevTangent(FEMaterialPoint& pt);
 	
+	//! calculate strain energy density at material point
+	double DevStrainEnergyDensity(FEMaterialPoint& pt);
+    
 	//! data initialization and checking
 	void Init();
 

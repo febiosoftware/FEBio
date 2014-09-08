@@ -548,6 +548,22 @@ public:
 	double value(FEElement& el);
 };
 
+//-----------------------------------------------------------------------------
+class FELogElemStrainEnergyDensity : public FELogElemData
+{
+public:
+	FELogElemStrainEnergyDensity(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemDevStrainEnergyDensity : public FELogElemData
+{
+public:
+	FELogElemDevStrainEnergyDensity(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
 //=============================================================================
 // R I G I D   B O D Y    D A T A
 //=============================================================================

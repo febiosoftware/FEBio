@@ -66,3 +66,21 @@ tens4ds FEIsotropicElastic::Tangent(FEMaterialPoint& mp)
 
 	return dyad1s(b)*lam + dyad4s(b)*(2.0*mu);
 }
+
+//-----------------------------------------------------------------------------
+double FEIsotropicElastic::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+    mat3ds E = (pt.RightCauchyGreen() - mat3dd(1))/2;
+    
+    double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
+	double mu  = 0.5*m_E/(1+m_v);
+
+    double trE = E.tr();
+    double Enorm = E.norm();
+    
+    double sed = lam*trE*trE/2 + mu*Enorm*Enorm;
+    
+	return sed;
+}

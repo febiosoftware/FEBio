@@ -163,6 +163,40 @@ tens4ds FEUncoupledViscoElasticMaterial::DevTangent(FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
+//! Strain energy density function
+double FEUncoupledViscoElasticMaterial::DevStrainEnergyDensity(FEMaterialPoint& mp)
+{
+/*    if (mp.dt == 0) return 0;
+    
+	// get the viscoelastic point data
+	FEViscoElasticMaterialPoint& pt = *mp.ExtractData<FEViscoElasticMaterialPoint>();
+	
+	// Calculate the new elastic strain energy density
+	pt.m_sed = m_pBase->DevStrainEnergyDensity(mp);
+    double sed = pt.m_sed;
+	
+	// get elastic strain energy density of previous timestep
+	double sedp = pt.m_sedp;
+	
+	// calculate new history variables
+	// terms are accumulated in sedt, the total strain energy density
+	double sedt = sed*m_g0;
+	double dt = mp.dt, g, h;
+	for (int i=0; i<MAX_TERMS; ++i)
+	{
+		g = exp(-dt/m_t[i]);
+		h = (1 - g)/(dt/m_t[i]);
+		
+		pt.m_Hsed[i] = pt.m_Hsedp[i]*g + (sed - sedp)*h;
+		sedt += pt.m_Hsed[i]*m_g[i];
+	}
+	
+	// return the total strain energy density
+	return sedt;*/
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Get a material parameter
 FEParam* FEUncoupledViscoElasticMaterial::GetParameter(const ParamString& s)
 {

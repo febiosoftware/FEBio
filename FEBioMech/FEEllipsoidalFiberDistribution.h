@@ -23,6 +23,9 @@ public:
 	// Spatial tangent
 	virtual tens4ds Tangent(FEMaterialPoint& mp);
 	
+	//! calculate strain energy density at material point
+	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+    
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 	
@@ -50,6 +53,9 @@ public:
 	// Spatial tangent
 	virtual tens4ds Tangent(FEMaterialPoint& mp);
 	
+	//! calculate strain energy density at material point
+	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+    
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 	

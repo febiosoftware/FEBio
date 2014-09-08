@@ -21,7 +21,6 @@ public:
 
 	void Init(bool bflag)
 	{
-		FEElasticMaterialPoint& pt = *m_pt->ExtractData<FEElasticMaterialPoint>();
 		if (bflag)
 		{
 			// intialize data to zero
@@ -93,6 +92,9 @@ public:
 	//! calculate tangent stiffness at material point
 	virtual tens4ds Tangent(FEMaterialPoint& pt);
 
+	//! calculate strain energy density at material point
+	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+    
 	//! data initialization and checking
 	void Init();
 
