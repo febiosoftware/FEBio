@@ -164,11 +164,11 @@ tens4ds FECoupledTransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
 	return c;
 }
 
-#ifdef HAVE_GSL
 //-----------------------------------------------------------------------------
 //! calculate strain energy density at material point
 double FECoupledTransIsoMooneyRivlin::StrainEnergyDensity(FEMaterialPoint& mp)
 {
+#ifdef HAVE_GSL
 	// get the material point data
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -220,5 +220,7 @@ double FECoupledTransIsoMooneyRivlin::StrainEnergyDensity(FEMaterialPoint& mp)
 	sed += m_K*lnJ*lnJ/2;
     
     return sed;
-}
+#else
+	return 0;
 #endif
+}
