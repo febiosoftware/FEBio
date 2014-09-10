@@ -332,6 +332,9 @@ public:
 	// calculate the skew-symmetric matrix from a vector
 	void skew(const vec3d& v);
 
+	// calculate the one-norm
+	double norm() const;
+
 protected:
 	double d[3][3];	// matrix data
 

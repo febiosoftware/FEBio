@@ -827,3 +827,13 @@ inline void mat3d::skew(const vec3d& v)
 	d[1][0] =  v.z; d[1][1] =    0; d[1][2] = -v.x;
 	d[2][0] = -v.y; d[2][1] =  v.x; d[2][2] =    0;
 }
+
+// calculate the one-norm (max of absolute column-sum)
+inline double mat3d::norm() const
+{
+	double s, sc;
+	sc = fabs(d[0][0]) + fabs(d[1][0]) + fabs(d[2][0]); s = sc;
+	sc = fabs(d[0][1]) + fabs(d[1][1]) + fabs(d[2][1]); if (sc > s) s = sc;
+	sc = fabs(d[0][2]) + fabs(d[1][2]) + fabs(d[2][2]); if (sc > s) s = sc;
+	return s;
+}
