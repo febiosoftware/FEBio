@@ -200,7 +200,7 @@ void FEBiphasicSolidDomain::InternalForces(FEGlobalVector& R)
 		UnpackLM(el, lm);
 
 		// assemble element 'fe'-vector into global R vector
-		#pragma omp critical
+		//#pragma omp critical
 		R.Assemble(el.m_node, lm, fe);
 	}
 }
@@ -290,14 +290,18 @@ void FEBiphasicSolidDomain::InternalFluidWorkSS(vector<double>& R, double dt)
 		vector<int> elm;
 		UnpackLM(el, elm);
 		
-		#pragma omp critical
+		//#pragma omp critical
 		{
 			// add fluid work to global residual
 			int neln = el.Nodes();
 			for (int j=0; j<neln; ++j)
 			{
 				int J = elm[3*neln+j];
-				if (J >= 0) R[J] += fe[j];
+				if (J >= 0)
+					{
+#pragma omp atomic
+						R[J] += fe[j];
+				}
 			}
 		}
 	}
@@ -325,14 +329,17 @@ void FEBiphasicSolidDomain::InternalFluidWork(vector<double>& R, double dt)
 		vector<int> elm;
 		UnpackLM(el, elm);
 			
-        #pragma omp critical
         {
             // add fluid work to global residual
             int neln = el.Nodes();
             for (int j=0; j<neln; ++j)
             {
                 int J = elm[3*neln+j];
-                if (J >= 0) R[J] += fe[j];
+                if (J >= 0)
+				{
+		#pragma omp atomic
+					R[J] += fe[j];
+				}
             }
         }
 	}

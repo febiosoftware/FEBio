@@ -257,7 +257,7 @@ void FEBiphasicSoluteDomain::InternalForces(FEGlobalVector& R)
 		UnpackLM(el, lm);
 
 		// assemble element 'fe'-vector into global R vector
-		#pragma omp critical
+		//#pragma omp critical
 		R.Assemble(el.m_node, lm, fe);
 	}
 }

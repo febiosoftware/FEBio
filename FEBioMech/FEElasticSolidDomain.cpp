@@ -107,7 +107,7 @@ void FEElasticSolidDomain::InternalForces(FEGlobalVector& R)
 		UnpackLM(el, lm);
 
 		// assemble element 'fe'-vector into global R vector
-		#pragma omp critical
+		//#pragma omp critical
 		R.Assemble(el.m_node, lm, fe);
 	}
 }
@@ -180,6 +180,7 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 void FEElasticSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
     int NE = (int)m_Elem.size();
+#pragma omp parallel for 
     for (int i=0; i<NE; ++i)
     {
         vector<double> fe;
@@ -845,7 +846,8 @@ void FEElasticSolidDomain::InertialForces2(FEGlobalVector& R, vector<double>& F)
         
     // loop over all elements
     int NE = Elements();
-        
+       
+#pragma omp parallel for
     for (int iel=0; iel<NE; ++iel)
     {
         vector<double> fe;
