@@ -15,11 +15,10 @@
 //! Concentration-history-dependent reaction rate.
 //! Reaction rate depends on concentration of a solute (e.g., growth factor)
 //! and whether solute has been released (removed) at some release time.
-//! Before release, reaction rate varies linearly with current solute
-//! concentration c, from k0 at c=0 to kc at c=cc, then holds constant at kc.
-//! After release, reaction rate depends on past history of exposure to solute.
-//! Increases from k0 at cmax=0 to kr at cmax=cr, then holds constant at kr.
-//! Release time is trel.
+//! Before release, reaction rate varies linearly with history of maximum solute
+//! concentration cmax, from k0 at cmax=0 to kc at cmax=cc, then holds constant at kc.
+//! After release, reaction rate increases from k0 at cmax=0 to kr at cmax=cr,
+//! then holds constant at kr. Release time is trel.
 
 class FEReactionRateNims : public FEReactionRate
 {
