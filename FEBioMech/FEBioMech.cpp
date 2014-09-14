@@ -80,6 +80,8 @@
 #include "FEPRLig.h"
 #include "FECoupledMooneyRivlin.h"
 #include "FECoupledVerondaWestmann.h"
+#include "FEReactiveViscoelastic.h"
+#include "FEBondRelaxation.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -230,6 +232,9 @@ REGISTER_FECORE_CLASS(FEPRLig					           , FEMATERIAL_ID, "PRLig");
 REGISTER_FECORE_CLASS(FELinearSpring           , FEMATERIAL_ID, "linear");
 REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, FEMATERIAL_ID, "tension-only linear");
 REGISTER_FECORE_CLASS(FENonLinearSpring        , FEMATERIAL_ID, "nonlinear");
+
+REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial       , FEMATERIAL_ID, "reactive viscoelastic"   );
+REGISTER_FECORE_CLASS(FEBondRelaxationConstIso             , FEMATERIAL_ID, "relaxation-const-iso"    );
 
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad
