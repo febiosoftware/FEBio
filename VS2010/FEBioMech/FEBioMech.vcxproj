@@ -403,6 +403,7 @@
     <ClCompile Include="..\..\FEBioMech\FEBioMechData.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBioMechPlot.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEBondRelaxation.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECarterHayesOld.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECGSolidSolver.cpp" />
@@ -483,6 +484,7 @@
     <ClCompile Include="..\..\FEBioMech\FEPointConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPressureLoad.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPRLig.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEReactiveViscoelastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERemodelingElasticDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERemodelingElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEResidualVector.cpp" />
@@ -539,6 +541,7 @@
     <ClInclude Include="..\..\FEBioMech\FEBioMechData.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMechPlot.h" />
     <ClInclude Include="..\..\FEBioMech\FEBodyForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FEBondRelaxation.h" />
     <ClInclude Include="..\..\FEBioMech\FECarterHayesOld.h" />
     <ClInclude Include="..\..\FEBioMech\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBioMech\FECGSolidSolver.h" />
@@ -620,6 +623,7 @@
     <ClInclude Include="..\..\FEBioMech\FEPointConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEPressureLoad.h" />
     <ClInclude Include="..\..\FEBioMech\FEPRLig.h" />
+    <ClInclude Include="..\..\FEBioMech\FEReactiveViscoelastic.h" />
     <ClInclude Include="..\..\FEBioMech\FERemodelingElasticDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FERemodelingElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEResidualVector.h" />
