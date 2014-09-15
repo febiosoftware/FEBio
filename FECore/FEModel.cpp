@@ -93,6 +93,9 @@ bool FEModel::Init()
 		for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_BC[bc] = -1;
 	}
 
+	// validate BC's
+	if (InitBCs() == false) return false;
+
 	// create and initialize the rigid body data
 	if (InitObjects() == false) return false;
 
@@ -116,6 +119,40 @@ bool FEModel::Init()
 	// initialize nonlinear constraints
 	// TODO: This is also initialized in the analysis step. Do I need to do this here?
 	if (InitConstraints() == false) return false;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! See if the BC's are setup correctly.
+bool FEModel::InitBCs()
+{
+	// get the number of loadcurves
+	int NLC = LoadCurves();
+
+	// check the prescribed BC's
+	int NBC = PrescribedBCs();
+	for (int i=0; i<NBC; ++i)
+	{
+		FEPrescribedBC* pbc = PrescribedBC(i);
+		if ((pbc->lc < 0)||(pbc->lc >= NLC))
+		{
+			felog.printf("ERROR: Invalid loadcurve in prescribed BC %d\n", i+1);
+			return false;
+		}
+	}
+
+	// check the nodal loads
+	int NNL = NodalLoads();
+	for (int i=0; i<NNL; ++i)
+	{
+		FENodalForce* pbc = NodalLoad(i);
+		if ((pbc->lc < 0)||(pbc->lc >= NLC))
+		{
+			felog.printf("ERROR: Invalid loadcurve in nodal load %d\n", i+1);
+			return false;
+		}
+	}
 
 	return true;
 }

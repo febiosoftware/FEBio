@@ -77,6 +77,9 @@ public:
 	//! Initialize the objects
 	bool InitObjects();
 
+	//! Validate BC's
+	bool InitBCs();
+
 public:
 	//! set the problem title
 	void SetTitle(const char* sz);

@@ -7,7 +7,7 @@
 // newer version of FEBio.
 #define FE_SDK_MAJOR_VERSION	2
 #define FE_SDK_SUB_VERSION		1
-#define FE_SDK_SUBSUB_VERSION	0
+#define FE_SDK_SUBSUB_VERSION	1
 
 //-----------------------------------------------------------------------------
 // This macro needs to be exported by all plugins in the GetSDKVersion() function.
