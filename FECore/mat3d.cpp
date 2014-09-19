@@ -148,7 +148,9 @@ void mat3ds::eigen2(double l[3], vec3d r[3])
     double A[3][3] = {xx(), xy(), xz(), xy(), yy(), yz(), xz(), yz(), zz()};
     double V[3][3];
     eigen_decomposition(A, V, l);
-    r[0] = vec3d(V[0][0],V[1][0],V[2][0]);
-    r[1] = vec3d(V[0][1],V[1][1],V[2][1]);
-    r[2] = vec3d(V[0][2],V[1][2],V[2][2]);
+    if (r) {
+        r[0] = vec3d(V[0][0],V[1][0],V[2][0]);
+        r[1] = vec3d(V[0][1],V[1][1],V[2][1]);
+        r[2] = vec3d(V[0][2],V[1][2],V[2][2]);
+    }
 }

@@ -570,7 +570,7 @@ bool FEPlotDamage::Save(FEDomain &m, vector<float>& a)
 				}
 			}
 			D /= (float) nint;
-			a.push_back(1.f - D);
+			a.push_back(D);
 		}
 		return true;
 	}

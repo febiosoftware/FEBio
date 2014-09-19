@@ -374,7 +374,7 @@ double FEDamageTransIsoMooneyRivlin::MatrixDamage(FEMaterialPoint &mp)
 		g = 1.0 - (1.0 - m_Mbeta + m_Mbeta*F*F)*(F*F);
 	}
 
-	dp.m_Dm = g;
+	dp.m_Dm = 1-g;
 	return g;
 }
 
@@ -469,7 +469,7 @@ double FEDamageTransIsoMooneyRivlin::FiberDamage(FEMaterialPoint &mp)
 		g = 1.0 - (1.0 - m_Fbeta + m_Fbeta*F*F)*(F*F);
 	}
 
-	dp.m_Df = g;
+	dp.m_Df = 1-g;
 	return g;
 }
 

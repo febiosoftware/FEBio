@@ -190,6 +190,6 @@ double FEDamageMooneyRivlin::Damage(FEMaterialPoint &mp)
 		g = 1.0 - (1.0 - m_beta + m_beta*F*F)*(F*F);
 	}
 
-	dp.m_D = g;
+	dp.m_D = 1-g;
 	return g;
 }

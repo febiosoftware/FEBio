@@ -94,7 +94,7 @@ double FEDamageNeoHookean::Damage(FEMaterialPoint &mp)
 	if (fabs(Es) > 1e-12) g = m_beta + (1.0 - m_beta)*(1.0 - exp(-Es/m_alpha))/(Es/m_alpha);
 	else g = 1.0 - 0.5*(1.0 - m_beta)/m_alpha*Es;
 
-	dp.m_D = g;
+	dp.m_D = 1-g;
 	return g;
 }
 

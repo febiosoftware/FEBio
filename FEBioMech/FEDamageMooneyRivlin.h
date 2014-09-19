@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FEUncoupledMaterial.h"
-#include "FEDamageNeoHookean.h"
+#include "FEDamageMaterialPoint.h"
 
 class FEDamageMooneyRivlin : public FEUncoupledMaterial
 {

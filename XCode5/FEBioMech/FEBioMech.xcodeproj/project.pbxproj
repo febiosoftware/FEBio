@@ -55,6 +55,18 @@
 		D5B572E2186CD45900D12E45 /* FERemodelingElasticDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B572E0186CD45900D12E45 /* FERemodelingElasticDomain.h */; };
 		D5B57D0518A40AFC005C9598 /* FEStickyInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B57D0318A40AFC005C9598 /* FEStickyInterface.cpp */; };
 		D5B57D0618A40AFC005C9598 /* FEStickyInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B57D0418A40AFC005C9598 /* FEStickyInterface.h */; };
+		D5C6D40B19CB4A7900E48AAF /* FEDamageMaterialPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C6D40919CB4A7900E48AAF /* FEDamageMaterialPoint.cpp */; };
+		D5C6D40C19CB4A7900E48AAF /* FEDamageMaterialPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C6D40A19CB4A7900E48AAF /* FEDamageMaterialPoint.h */; };
+		D5C6D40F19CB4B4400E48AAF /* FEDamageMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C6D40D19CB4B4400E48AAF /* FEDamageMaterial.cpp */; };
+		D5C6D41019CB4B4400E48AAF /* FEDamageMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C6D40E19CB4B4400E48AAF /* FEDamageMaterial.h */; };
+		D5C6D41319CB628700E48AAF /* FEDamageCriterion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C6D41119CB628700E48AAF /* FEDamageCriterion.cpp */; };
+		D5C6D41419CB628700E48AAF /* FEDamageCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C6D41219CB628700E48AAF /* FEDamageCriterion.h */; };
+		D5C6D41719CB640D00E48AAF /* FEDamageCDF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C6D41519CB640D00E48AAF /* FEDamageCDF.cpp */; };
+		D5C6D41819CB640D00E48AAF /* FEDamageCDF.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C6D41619CB640D00E48AAF /* FEDamageCDF.h */; };
+		D5C6D41B19CCAAD400E48AAF /* FEDamageMaterialUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C6D41919CCAAD400E48AAF /* FEDamageMaterialUC.cpp */; };
+		D5C6D41C19CCAAD400E48AAF /* FEDamageMaterialUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C6D41A19CCAAD400E48AAF /* FEDamageMaterialUC.h */; };
+		D5C6D41F19CCB16100E48AAF /* FEDamageCriterionUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C6D41D19CCB16100E48AAF /* FEDamageCriterionUC.cpp */; };
+		D5C6D42019CCB16100E48AAF /* FEDamageCriterionUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C6D41E19CCB16100E48AAF /* FEDamageCriterionUC.h */; };
 		D5E107741865DFAD00B23922 /* FE2DFiberNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1068D1865DFAC00B23922 /* FE2DFiberNeoHookean.cpp */; };
 		D5E107751865DFAD00B23922 /* FE2DFiberNeoHookean.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1068E1865DFAC00B23922 /* FE2DFiberNeoHookean.h */; };
 		D5E107761865DFAD00B23922 /* FE2DTransIsoMooneyRivlin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1068F1865DFAC00B23922 /* FE2DTransIsoMooneyRivlin.cpp */; };
@@ -332,6 +344,18 @@
 		D5B572E0186CD45900D12E45 /* FERemodelingElasticDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERemodelingElasticDomain.h; sourceTree = "<group>"; };
 		D5B57D0318A40AFC005C9598 /* FEStickyInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEStickyInterface.cpp; sourceTree = "<group>"; };
 		D5B57D0418A40AFC005C9598 /* FEStickyInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEStickyInterface.h; sourceTree = "<group>"; };
+		D5C6D40919CB4A7900E48AAF /* FEDamageMaterialPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDamageMaterialPoint.cpp; sourceTree = "<group>"; };
+		D5C6D40A19CB4A7900E48AAF /* FEDamageMaterialPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDamageMaterialPoint.h; sourceTree = "<group>"; };
+		D5C6D40D19CB4B4400E48AAF /* FEDamageMaterial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDamageMaterial.cpp; sourceTree = "<group>"; };
+		D5C6D40E19CB4B4400E48AAF /* FEDamageMaterial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDamageMaterial.h; sourceTree = "<group>"; };
+		D5C6D41119CB628700E48AAF /* FEDamageCriterion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDamageCriterion.cpp; sourceTree = "<group>"; };
+		D5C6D41219CB628700E48AAF /* FEDamageCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDamageCriterion.h; sourceTree = "<group>"; };
+		D5C6D41519CB640D00E48AAF /* FEDamageCDF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDamageCDF.cpp; sourceTree = "<group>"; };
+		D5C6D41619CB640D00E48AAF /* FEDamageCDF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDamageCDF.h; sourceTree = "<group>"; };
+		D5C6D41919CCAAD400E48AAF /* FEDamageMaterialUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDamageMaterialUC.cpp; sourceTree = "<group>"; };
+		D5C6D41A19CCAAD400E48AAF /* FEDamageMaterialUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDamageMaterialUC.h; sourceTree = "<group>"; };
+		D5C6D41D19CCB16100E48AAF /* FEDamageCriterionUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDamageCriterionUC.cpp; sourceTree = "<group>"; };
+		D5C6D41E19CCB16100E48AAF /* FEDamageCriterionUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDamageCriterionUC.h; sourceTree = "<group>"; };
 		D5E106851865DF9F00B23922 /* libFEBioMech.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioMech.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E1068D1865DFAC00B23922 /* FE2DFiberNeoHookean.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FE2DFiberNeoHookean.cpp; sourceTree = "<group>"; };
 		D5E1068E1865DFAC00B23922 /* FE2DFiberNeoHookean.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FE2DFiberNeoHookean.h; sourceTree = "<group>"; };
@@ -637,6 +661,18 @@
 				D5E106AF1865DFAC00B23922 /* FECoupledTransIsoVerondaWestmann.h */,
 				D59D17D3192BD83B007C880C /* FECoupledVerondaWestmann.cpp */,
 				D59D17D4192BD83B007C880C /* FECoupledVerondaWestmann.h */,
+				D5C6D41519CB640D00E48AAF /* FEDamageCDF.cpp */,
+				D5C6D41619CB640D00E48AAF /* FEDamageCDF.h */,
+				D5C6D41119CB628700E48AAF /* FEDamageCriterion.cpp */,
+				D5C6D41219CB628700E48AAF /* FEDamageCriterion.h */,
+				D5C6D41D19CCB16100E48AAF /* FEDamageCriterionUC.cpp */,
+				D5C6D41E19CCB16100E48AAF /* FEDamageCriterionUC.h */,
+				D5C6D40D19CB4B4400E48AAF /* FEDamageMaterial.cpp */,
+				D5C6D40E19CB4B4400E48AAF /* FEDamageMaterial.h */,
+				D5C6D40919CB4A7900E48AAF /* FEDamageMaterialPoint.cpp */,
+				D5C6D40A19CB4A7900E48AAF /* FEDamageMaterialPoint.h */,
+				D5C6D41919CCAAD400E48AAF /* FEDamageMaterialUC.cpp */,
+				D5C6D41A19CCAAD400E48AAF /* FEDamageMaterialUC.h */,
 				D5E106B01865DFAC00B23922 /* FEDamageMooneyRivlin.cpp */,
 				D5E106B11865DFAC00B23922 /* FEDamageMooneyRivlin.h */,
 				D5E106B21865DFAC00B23922 /* FEDamageNeoHookean.cpp */,
@@ -914,6 +950,7 @@
 				D5E107C21865DFAD00B23922 /* FEFacet2FacetTied.h in Headers */,
 				D5E1078B1865DFAD00B23922 /* FECellGrowth.h in Headers */,
 				D5E108021865DFAD00B23922 /* FEPerfectOsmometer.h in Headers */,
+				D5C6D41419CB628700E48AAF /* FEDamageCriterion.h in Headers */,
 				D51BB412199197A100638A8B /* FEFiberIntegrationGeodesicUC.h in Headers */,
 				D5E107831865DFAD00B23922 /* FEBioMechData.h in Headers */,
 				D5E1079B1865DFAD00B23922 /* FEDamageTransIsoMooneyRivlin.h in Headers */,
@@ -944,11 +981,14 @@
 				D5E108261865DFAD00B23922 /* FESolidMaterial.h in Headers */,
 				D5E1082E1865DFAD00B23922 /* FEStiffnessMatrix.h in Headers */,
 				D5E108401865DFAD00B23922 /* FETransIsoVerondaWestmann.h in Headers */,
+				D5C6D42019CCB16100E48AAF /* FEDamageCriterionUC.h in Headers */,
 				D5E107C01865DFAD00B23922 /* FEFacet2FacetSliding.h in Headers */,
 				D5E1084A1865DFAD00B23922 /* FEUncoupledElasticMixture.h in Headers */,
 				D5E107DC1865DFAD00B23922 /* FEHolmesMow.h in Headers */,
+				D5C6D41C19CCAAD400E48AAF /* FEDamageMaterialUC.h in Headers */,
 				D5E1081C1865DFAD00B23922 /* FERigidWallInterface.h in Headers */,
 				D5E108301865DFAD00B23922 /* FEStVenantKirchhoff.h in Headers */,
+				D5C6D40C19CB4A7900E48AAF /* FEDamageMaterialPoint.h in Headers */,
 				D51BB3F8198FCDDA00638A8B /* triangle_sphere.h in Headers */,
 				D5E107BA1865DFAD00B23922 /* FEElasticTrussDomain.h in Headers */,
 				D5E107BE1865DFAD00B23922 /* FEExplicitSolidSolver.h in Headers */,
@@ -991,6 +1031,7 @@
 				D5E107791865DFAD00B23922 /* FE2DTransIsoVerondaWestmann.h in Headers */,
 				D5E107C61865DFAD00B23922 /* FEFiberExpPow.h in Headers */,
 				D5E107EE1865DFAD00B23922 /* FELinearTransIso.h in Headers */,
+				D5C6D41019CB4B4400E48AAF /* FEDamageMaterial.h in Headers */,
 				D5E108061865DFAD00B23922 /* FEPointBodyForce.h in Headers */,
 				D51BB3F2198FCA6A00638A8B /* FEFiberIntegrationGaussKronrod.h in Headers */,
 				D5E107991865DFAD00B23922 /* FEDamageNeoHookean.h in Headers */,
@@ -1012,6 +1053,7 @@
 				D5E108481865DFAD00B23922 /* FEUncoupledActiveContraction.h in Headers */,
 				D5E107A31865DFAD00B23922 /* FEEFDDonnanEquilibrium.h in Headers */,
 				D5E107771865DFAD00B23922 /* FE2DTransIsoMooneyRivlin.h in Headers */,
+				D5C6D41819CB640D00E48AAF /* FEDamageCDF.h in Headers */,
 				D5E107CA1865DFAD00B23922 /* FEFiberIntegrationGauss.h in Headers */,
 				D5E107A51865DFAD00B23922 /* FEEFDMooneyRivlin.h in Headers */,
 				D5E108281865DFAD00B23922 /* FESolidSolver.h in Headers */,
@@ -1121,6 +1163,7 @@
 				D5E1077A1865DFAD00B23922 /* FE3FieldElasticSolidDomain.cpp in Sources */,
 				D595BB451899C7D90028A7F3 /* FESPRProjection.cpp in Sources */,
 				D51BB4051991819900638A8B /* FEElasticFiberMaterialUC.cpp in Sources */,
+				D5C6D41B19CCAAD400E48AAF /* FEDamageMaterialUC.cpp in Sources */,
 				D5E108451865DFAD00B23922 /* FEUDGHexDomain.cpp in Sources */,
 				D5E108271865DFAD00B23922 /* FESolidSolver.cpp in Sources */,
 				D5E108011865DFAD00B23922 /* FEPerfectOsmometer.cpp in Sources */,
@@ -1178,6 +1221,8 @@
 				D5E107D51865DFAD00B23922 /* FEFungOrthoCompressible.cpp in Sources */,
 				D5E108551865DFAD00B23922 /* FEVonMisesPlasticity.cpp in Sources */,
 				CAA03F9018BFA51700EAF395 /* FECGSolidSolver.cpp in Sources */,
+				D5C6D41719CB640D00E48AAF /* FEDamageCDF.cpp in Sources */,
+				D5C6D41F19CCB16100E48AAF /* FEDamageCriterionUC.cpp in Sources */,
 				D5E107D71865DFAD00B23922 /* FEFungOrthotropic.cpp in Sources */,
 				D5E108371865DFAD00B23922 /* FETiedContactSurface.cpp in Sources */,
 				D5E108431865DFAD00B23922 /* FETrussMaterial.cpp in Sources */,
@@ -1189,6 +1234,7 @@
 				D5E1084D1865DFAD00B23922 /* FEUncoupledViscoElasticMaterial.cpp in Sources */,
 				D5E108471865DFAD00B23922 /* FEUncoupledActiveContraction.cpp in Sources */,
 				D56DC21D19532A83006C137D /* FERigidPinJoint.cpp in Sources */,
+				D5C6D40F19CB4B4400E48AAF /* FEDamageMaterial.cpp in Sources */,
 				D5E107741865DFAD00B23922 /* FE2DFiberNeoHookean.cpp in Sources */,
 				D5E107EF1865DFAD00B23922 /* FEMicroMaterial.cpp in Sources */,
 				D51BB41D19919E1100638A8B /* FEFiberIntegrationTrapezoidalUC.cpp in Sources */,
@@ -1197,7 +1243,9 @@
 				D5E107BF1865DFAD00B23922 /* FEFacet2FacetSliding.cpp in Sources */,
 				D5E107B51865DFAD00B23922 /* FEElasticShellDomain.cpp in Sources */,
 				D5E108511865DFAD00B23922 /* FEVerondaWestmann.cpp in Sources */,
+				D5C6D40B19CB4A7900E48AAF /* FEDamageMaterialPoint.cpp in Sources */,
 				D5E107AD1865DFAD00B23922 /* FEElasticFiberMaterial.cpp in Sources */,
+				D5C6D41319CB628700E48AAF /* FEDamageCriterion.cpp in Sources */,
 				D5E107B71865DFAD00B23922 /* FEElasticSolidDomain.cpp in Sources */,
 				D5E107E71865DFAD00B23922 /* FELinearOrthotropic.cpp in Sources */,
 				D5E107FB1865DFAD00B23922 /* FEOgdenMaterial.cpp in Sources */,

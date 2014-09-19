@@ -23,11 +23,11 @@ public:
 			// intialize data to zero
 			m_MEmax = 0;
 			m_MEtrial = 0;
-			m_Dm = 1;
+			m_Dm = 0;
 
 			m_FEmax = 0;
 			m_FEtrial = 0;
-			m_Df = 1;
+			m_Df = 0;
 		}
 		else
 		{
@@ -70,12 +70,12 @@ public:
 	// matrix
 	double	m_MEtrial;			//!< trial strain at time t
 	double	m_MEmax;			//!< max strain variable up to time t
-	double	m_Dm;				//!< damage reduction factor
+	double	m_Dm;				//!< damage
 
 	// fiber
 	double	m_FEtrial;			//!< trial strain at time t
 	double	m_FEmax;			//!< max strain variable up to time t
-	double	m_Df;				//!< damage reduction factor
+	double	m_Df;				//!< damage
 };
 
 //-----------------------------------------------------------------------------

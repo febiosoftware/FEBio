@@ -82,6 +82,11 @@
 #include "FECoupledVerondaWestmann.h"
 #include "FEReactiveViscoelastic.h"
 #include "FEBondRelaxation.h"
+#include "FEDamageMaterial.h"
+#include "FEDamageMaterialUC.h"
+#include "FEDamageCDF.h"
+#include "FEDamageCriterion.h"
+#include "FEDamageCriterionUC.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -233,9 +238,28 @@ REGISTER_FECORE_CLASS(FELinearSpring           , FEMATERIAL_ID, "linear");
 REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, FEMATERIAL_ID, "tension-only linear");
 REGISTER_FECORE_CLASS(FENonLinearSpring        , FEMATERIAL_ID, "nonlinear");
 
-REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial       , FEMATERIAL_ID, "reactive viscoelastic"   );
-REGISTER_FECORE_CLASS(FEBondRelaxationConstIso             , FEMATERIAL_ID, "relaxation-const-iso"    );
-
+REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial       , FEMATERIAL_ID, "reactive viscoelastic");
+REGISTER_FECORE_CLASS(FEBondRelaxationConstIso             , FEMATERIAL_ID, "relaxation-const-iso" );
+REGISTER_FECORE_CLASS(FEDamageMaterial                     , FEMATERIAL_ID, "elastic damage"       );
+REGISTER_FECORE_CLASS(FEDamageMaterialUC                   , FEMATERIAL_ID, "uncoupled elastic damage");
+REGISTER_FECORE_CLASS(FEDamageCDFSimo                      , FEMATERIAL_ID, "CDF Simo"             );
+REGISTER_FECORE_CLASS(FEDamageCDFLogNormal                 , FEMATERIAL_ID, "CDF log-normal"       );
+REGISTER_FECORE_CLASS(FEDamageCDFWeibull                   , FEMATERIAL_ID, "CDF Weibull"          );
+REGISTER_FECORE_CLASS(FEDamageCDFStep                      , FEMATERIAL_ID, "CDF step"             );
+REGISTER_FECORE_CLASS(FEDamageCDFPQP                       , FEMATERIAL_ID, "CDF quintic"          );
+REGISTER_FECORE_CLASS(FEDamageCriterionSimo                , FEMATERIAL_ID, "DC Simo"              );
+REGISTER_FECORE_CLASS(FEDamageCriterionSED                 , FEMATERIAL_ID, "DC strain energy density");
+REGISTER_FECORE_CLASS(FEDamageCriterionVMS                 , FEMATERIAL_ID, "DC von Mises stress"     );
+REGISTER_FECORE_CLASS(FEDamageCriterionMSS                 , FEMATERIAL_ID, "DC max shear stress"     );
+REGISTER_FECORE_CLASS(FEDamageCriterionMNS                 , FEMATERIAL_ID, "DC max normal stress"    );
+REGISTER_FECORE_CLASS(FEDamageCriterionMNLS                , FEMATERIAL_ID, "DC max normal Lagrange strain");
+REGISTER_FECORE_CLASS(FEDamageCriterionUCSimo              , FEMATERIAL_ID, "DC Simo"              );
+REGISTER_FECORE_CLASS(FEDamageCriterionUCSED               , FEMATERIAL_ID, "DC UC strain energy density");
+REGISTER_FECORE_CLASS(FEDamageCriterionUCVMS               , FEMATERIAL_ID, "DC UC von Mises stress"     );
+REGISTER_FECORE_CLASS(FEDamageCriterionUCMSS               , FEMATERIAL_ID, "DC UC max shear stress"     );
+REGISTER_FECORE_CLASS(FEDamageCriterionUCMNS               , FEMATERIAL_ID, "DC UC max normal stress"    );
+REGISTER_FECORE_CLASS(FEDamageCriterionUCMNLS              , FEMATERIAL_ID, "DC UC max normal Lagrange strain");
+    
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad
 REGISTER_FECORE_CLASS(FEPressureLoad, FESURFACELOAD_ID, "pressure");
