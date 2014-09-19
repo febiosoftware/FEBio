@@ -416,6 +416,12 @@
     <ClCompile Include="..\..\FEBioMech\FECoupledTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECoupledTransIsoVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECoupledVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageCDF.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageCriterion.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageCriterionUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageMaterialPoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDamageMaterialUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.cpp" />
@@ -554,6 +560,12 @@
     <ClInclude Include="..\..\FEBioMech\FECoupledTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FECoupledTransIsoVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioMech\FECoupledVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageCDF.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageCriterion.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageCriterionUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageMaterialPoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDamageMaterialUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.h" />

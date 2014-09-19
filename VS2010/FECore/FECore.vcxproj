@@ -583,6 +583,7 @@
     <ClInclude Include="..\..\FECore\DumpStream.h" />
     <ClInclude Include="..\..\FECore\eig3.h" />
     <ClInclude Include="..\..\FECore\ElementDataRecord.h" />
+    <ClInclude Include="..\..\FECore\erf.h" />
     <ClInclude Include="..\..\FECore\FEAnalysis.h" />
     <ClInclude Include="..\..\FECore\FEBodyLoad.h" />
     <ClInclude Include="..\..\FECore\FEBoundaryCondition.h" />
@@ -668,6 +669,7 @@
     <ClCompile Include="..\..\FECore\DumpStream.cpp" />
     <ClCompile Include="..\..\FECore\eig3.cpp" />
     <ClCompile Include="..\..\FECore\ElementDataRecord.cpp" />
+    <ClCompile Include="..\..\FECore\erf.cpp" />
     <ClCompile Include="..\..\FECore\FEAnalysis.cpp" />
     <ClCompile Include="..\..\FECore\FEBodyLoad.cpp" />
     <ClCompile Include="..\..\FECore\FEBoundaryCondition.cpp" />
