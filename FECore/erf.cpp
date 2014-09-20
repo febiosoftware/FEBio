@@ -2,6 +2,7 @@
 #include "erf.h"
 #include <math.h>
 
+#ifdef WIN32
 //-----------------------------------------------------------------------------
 // approximation to error function using rational expansion.
 double erf(double x)
@@ -23,3 +24,4 @@ double erfc(double x)
 {
 	return 1.0 - erf(x);
 }
+#endif
