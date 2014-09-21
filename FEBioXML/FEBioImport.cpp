@@ -100,6 +100,12 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 	// UT4 formulation off by default
 	m_but4 = false;
 
+	// extract the path
+	strcpy(m_szpath, szfile);
+	char* ch = strrchr(m_szpath, '\\');
+	if (ch==0) ch = strrchr(m_szpath, '/');
+	if (ch==0) m_szpath[0] = 0; else *(ch+1)=0;
+
 	// Find the root element
 	XMLTag tag;
 	try
@@ -375,7 +381,20 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				while (!tag.isend());
 				Image& im = pp->value<Image>();
 				im.Create(n[0], n[1], n[2]);
-				if (im.Load(szfile) == false) throw XMLReader::InvalidValue(tag);
+
+				// see if we need to pre-pend a path
+				char szin[512];
+				strcpy(szin, szfile);
+				char* ch = strrchr(szin, '\\');
+				if (ch==0) ch = strrchr(szin, '/');
+				if (ch==0)
+				{
+					// pre-pend the name with the input path
+					sprintf(szin, "%s%s", m_szpath, szfile);
+				}
+
+				// Try to load the image file
+				if (im.Load(szin) == false) throw XMLReader::InvalidValue(tag);
 			}
 			break;
 		default:

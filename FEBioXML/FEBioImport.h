@@ -113,9 +113,10 @@ public:
 	FEMesh*				m_pMesh;	//!< pointer to the mesh class
 
 public:
-	char	m_szdmp[256];
-	char	m_szlog[256];
-	char	m_szplt[256];
+	char	m_szpath[512];
+	char	m_szdmp[512];
+	char	m_szlog[512];
+	char	m_szplt[512];
 
 public:
 	char					m_szplot_type[256];
