@@ -527,3 +527,10 @@ double FEDamageTransIsoMooneyRivlin::FiberDamageDerive(FEMaterialPoint &mp)
 
 	return dg;
 }
+
+//-----------------------------------------------------------------------------
+//! damage
+double FEDamageTransIsoMooneyRivlin::Damage(FEMaterialPoint& pt)
+{
+    return MatrixDamage(pt) + FiberDamage(pt);
+}

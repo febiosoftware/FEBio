@@ -95,6 +95,23 @@ double FEDamageMaterial::StrainEnergyDensity(FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
+//! calculate damage at material point
+double FEDamageMaterial::Damage(FEMaterialPoint& pt)
+{
+    // get the damage material point data
+    FEDamageMaterialPoint& pd = *pt.ExtractData<FEDamageMaterialPoint>();
+
+    // evaluate the trial value of the damage criterion
+    // this must be done before evaluating the damage
+    pd.m_Etrial = m_pCrit->DamageCriterion(pt);
+    
+    // evaluate the damage
+    double d = m_pDamg->Damage(pt);
+    
+    return d;
+}
+
+//-----------------------------------------------------------------------------
 int FEDamageMaterial::Properties()
 {
 	return 3;

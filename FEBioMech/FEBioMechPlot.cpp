@@ -542,11 +542,14 @@ bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotDamage::Save(FEDomain &m, vector<float>& a)
+bool FEPlotDamage::Save(FEDomain &dom, vector<float>& a)
 {
-	if (m.Class() == FE_DOMAIN_SOLID)
+    FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+    if (pme == 0) return false;
+    
+	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
-		FESolidDomain& d = static_cast<FESolidDomain&>(m);
+		FESolidDomain& d = static_cast<FESolidDomain&>(dom);
 		int N = d.Elements();
 		for (int i=0; i<N; ++i)
 		{
@@ -556,18 +559,8 @@ bool FEPlotDamage::Save(FEDomain &m, vector<float>& a)
 			int nint = el.GaussPoints();
 			for (int j=0; j<nint; ++j)
 			{
-				FEDamageMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEDamageMaterialPoint>());
-				if (ppt)
-				{
-					FEDamageMaterialPoint& pt = *ppt;
-					D += (float) pt.m_D;
-				}
-
-				FETIMRDamageMaterialPoint* pt2 = (el.GetMaterialPoint(j)->ExtractData<FETIMRDamageMaterialPoint>());
-				if (pt2)
-				{
-					D += (float) pt2->m_Df;
-				}
+                FEMaterialPoint& pt = *el.GetMaterialPoint(j);
+                D += pme->Damage(pt);
 			}
 			D /= (float) nint;
 			a.push_back(D);

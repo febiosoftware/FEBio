@@ -57,6 +57,9 @@ public:
 	//! calculate strain energy density at material point
 	double DevStrainEnergyDensity(FEMaterialPoint& pt);
     
+    //! return the damage value
+    double Damage(FEMaterialPoint& pt);
+    
 	//! data initialization and checking
 	void Init();
 

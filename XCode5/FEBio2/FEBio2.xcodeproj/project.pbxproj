@@ -352,6 +352,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					/opt/intel/lib/libiomp5.a,
+					/opt/intel/mkl/lib/libmkl_core.a,
+					/opt/intel/mkl/lib/libmkl_intel.a,
+					/opt/intel/mkl/lib/libmkl_intel_lp64.a,
+					/opt/intel/mkl/lib/libmkl_intel_thread.a,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

@@ -94,6 +94,9 @@ public:
 	//! strain energy density
 	double StrainEnergyDensity(FEMaterialPoint& pt);
     
+    //! damage
+    double Damage(FEMaterialPoint& pt) { return m_pBase->Damage(pt); }
+    
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData();
 

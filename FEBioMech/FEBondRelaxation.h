@@ -21,7 +21,7 @@ public:
 	FEBondRelaxation(FEModel* pfem) : FEMaterial(pfem) {}
 	virtual ~FEBondRelaxation() {}
     
-	//! hydraulic permeability
+	//! relaxation
 	virtual double Relaxation(FEMaterialPoint& pt, const double t) = 0;
     
 	void Init();

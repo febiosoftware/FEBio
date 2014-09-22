@@ -117,6 +117,9 @@ public:
 	//! calculate deviatoric strain energy density at material point
 	double DevStrainEnergyDensity(FEMaterialPoint& pt);
     
+    //! damage
+    double Damage(FEMaterialPoint& pt);
+    
 	//! data initialization
 	void Init();
 
