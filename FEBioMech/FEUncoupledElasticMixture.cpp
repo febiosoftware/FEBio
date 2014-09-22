@@ -156,31 +156,6 @@ double FEUncoupledElasticMixture::DevStrainEnergyDensity(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! This function returns the damage at the material point by summing it over
-//! individual components.
-double FEUncoupledElasticMixture::Damage(FEMaterialPoint& mp)
-{
-    // get the elastic material point
-    FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
-    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
-    
-    // calculate damage
-    double d = 0.0;
-    for (int i=0; i < (int) m_pMat.size(); ++i) {
-        // copy the elastic material point data to the components
-        // but don't copy m_Q since correct value was set in SetLocalCoordinateSystem
-        FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
-        epi.m_rt = ep.m_rt;
-        epi.m_r0 = ep.m_r0;
-        epi.m_F = ep.m_F;
-        epi.m_J = ep.m_J;
-        d += m_pMat[i]->Damage(*pt.m_mp[i]);
-    }
-    
-    return d;
-}
-
-//-----------------------------------------------------------------------------
 //! For elastic mixtures, the parameter name is defined as follows:
 //!		material.param
 //! where material refers to the name of one of the mixture components and

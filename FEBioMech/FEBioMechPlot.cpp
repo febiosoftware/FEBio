@@ -544,30 +544,30 @@ bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
 //-----------------------------------------------------------------------------
 bool FEPlotDamage::Save(FEDomain &dom, vector<float>& a)
 {
-    FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
-    if (pme == 0) return false;
-    
-	if (dom.Class() == FE_DOMAIN_SOLID)
-	{
-		FESolidDomain& d = static_cast<FESolidDomain&>(dom);
-		int N = d.Elements();
-		for (int i=0; i<N; ++i)
-		{
-			FESolidElement& el = d.Element(i);
+	FEMaterial* pmat = dom.GetMaterial();
+	int NC = 1;
+	if (dynamic_cast<FEElasticMixture*>(pmat)||dynamic_cast<FEUncoupledElasticMixture*>(pmat)) NC = pmat->Properties();
 
-			float D = 0.f;
-			int nint = el.GaussPoints();
-			for (int j=0; j<nint; ++j)
+	int N = dom.Elements();
+	for (int i=0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		float D = 0.f;
+		int nint = el.GaussPoints();
+		for (int j=0; j<nint; ++j)
+		{
+			FEMaterialPoint& pt = *el.GetMaterialPoint(j);
+			for (int k=0; k<NC; ++k)
 			{
-                FEMaterialPoint& pt = *el.GetMaterialPoint(j);
-                D += pme->Damage(pt);
+				FEDamageMaterialPoint* ppd = pt.GetPointData(k)->ExtractData<FEDamageMaterialPoint>();
+				if (ppd) D += (float) ppd->m_D;
 			}
-			D /= (float) nint;
-			a.push_back(D);
 		}
-		return true;
+		D /= (float) nint;
+		a.push_back(D);
 	}
-	return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------

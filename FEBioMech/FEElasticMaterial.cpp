@@ -361,6 +361,3 @@ void FEElasticMaterial::Init()
 //! return the strain energy density
 double FEElasticMaterial::StrainEnergyDensity(FEMaterialPoint& pt) { return 0; }
 
-//-----------------------------------------------------------------------------
-//! return the damage value
-double FEElasticMaterial::Damage(FEMaterialPoint& pt) { return 0; }

@@ -60,9 +60,6 @@ public:
 	//! deviatoric strain energy density function
 	double DevStrainEnergyDensity(FEMaterialPoint& pt);
 	
-    //! damage
-    double Damage(FEMaterialPoint& pt) { return m_pBase->Damage(pt); }
-    
 	//! returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData();
 	

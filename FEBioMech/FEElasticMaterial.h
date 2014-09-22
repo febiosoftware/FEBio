@@ -73,9 +73,6 @@ public:
 	//! calculate strain energy density at material point
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
     
-    //! return the damage value
-    virtual double Damage(FEMaterialPoint& pt);
-    
 	//! Get the elastic component
 	FEElasticMaterial* GetElasticMaterial() { return this; }
 
