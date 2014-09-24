@@ -94,6 +94,9 @@ public:
 	//! tangent function
 	tens4ds Tangent(FEMaterialPoint& pt);
     
+    //! strain energy density function
+    double StrainEnergyDensity(FEMaterialPoint& pt);
+    
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData();
     

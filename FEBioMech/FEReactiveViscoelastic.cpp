@@ -311,6 +311,71 @@ tens4ds FEReactiveViscoelasticMaterial::Tangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
+//! strain energy density function
+double FEReactiveViscoelasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+    if (mp.dt == 0) return 0;
+    
+    int ig;
+    
+    // get the elastic part
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // get the reactive viscoelastic point data
+    FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
+    
+    // calculate the base material Cauchy stress
+    double sed = m_pBase->StrainEnergyDensity(mp);
+    
+    // keep safe copy of deformation gradient
+    mat3d F = ep.m_F;
+    double J = ep.m_J;
+    
+    // current time
+    double time = FEMaterialPoint::time;
+    
+    // current number of generations
+    int ng = (int)pt.m_Fi.size();
+    
+    double w;
+    double sedb;
+    double ta, tb;
+    
+    // calculate the bond stresses for past generations
+    for (ig=0; ig<ng; ++ig) {
+        // evaluate bond mass fraction for this generation
+        if (ig == 0) {
+            ta = time - pt.m_tgen[ig];
+            w = m_pRelx->Relaxation(mp, ta);
+        }
+        else if (ig == ng-1) {
+            ta = time - pt.m_tgen[ig];
+            w = 1 - m_pRelx->Relaxation(mp, ta);
+        }
+        else
+        {
+            ta = time - pt.m_tgen[ig];
+            tb = time - pt.m_tgen[ig+1];
+            w = m_pRelx->Relaxation(mp, tb) - m_pRelx->Relaxation(mp, ta);
+        }
+        // evaluate relative deformation gradient for this generation
+        ep.m_F = F*pt.m_Fi[ig];
+        ep.m_J = J*pt.m_Ji[ig];
+        // evaluate bond stress
+        sedb = m_pBond->StrainEnergyDensity(mp);
+        // add bond stress to total stress
+        sed += sedb*w;
+    }
+    
+    // restore safe copy of deformation gradient
+    ep.m_F = F;
+    ep.m_J = J;
+    
+    // return the total Cauchy stress
+    return sed;
+}
+
+//-----------------------------------------------------------------------------
 //! Get a material parameter
 FEParam* FEReactiveViscoelasticMaterial::GetParameter(const ParamString& s)
 {
