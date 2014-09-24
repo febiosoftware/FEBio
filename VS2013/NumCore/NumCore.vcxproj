@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{304EDAA2-A92C-4C5C-8967-ABB4DE028F6F}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>NumCore</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(SolutionDir)\..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(SolutionDir)\..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\NumCore\CompactMatrix.h" />
+    <ClInclude Include="..\..\NumCore\ConjGradIterSolver.h" />
+    <ClInclude Include="..\..\NumCore\DenseMatrix.h" />
+    <ClInclude Include="..\..\NumCore\LUSolver.h" />
+    <ClInclude Include="..\..\NumCore\NumCore.h" />
+    <ClInclude Include="..\..\NumCore\PardisoSolver.h" />
+    <ClInclude Include="..\..\NumCore\PSLDLTSolver.h" />
+    <ClInclude Include="..\..\NumCore\RCICGSolver.h" />
+    <ClInclude Include="..\..\NumCore\SkylineMatrix.h" />
+    <ClInclude Include="..\..\NumCore\SkylineSolver.h" />
+    <ClInclude Include="..\..\NumCore\stdafx.h" />
+    <ClInclude Include="..\..\NumCore\SuperLUSolver.h" />
+    <ClInclude Include="..\..\NumCore\SuperLU_MT_Solver.h" />
+    <ClInclude Include="..\..\NumCore\targetver.h" />
+    <ClInclude Include="..\..\NumCore\WSMPSolver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\NumCore\CompactMatrix.cpp" />
+    <ClCompile Include="..\..\NumCore\ConjGradIterSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\DenseMatrix.cpp" />
+    <ClCompile Include="..\..\NumCore\LUSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\NumCore.cpp" />
+    <ClCompile Include="..\..\NumCore\PardisoSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\PardisoSolverDL.cpp" />
+    <ClCompile Include="..\..\NumCore\PSLDLTSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\RCICGSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\SkylineMatrix.cpp" />
+    <ClCompile Include="..\..\NumCore\SkylineSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\stdafx.cpp" />
+    <ClCompile Include="..\..\NumCore\SuperLUSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\SuperLU_MT_Solver.cpp" />
+    <ClCompile Include="..\..\NumCore\WSMPSolver.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

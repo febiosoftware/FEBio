@@ -11,6 +11,10 @@
 
 #include "FECore/FEMaterialPoint.h"
 
+#ifndef max
+#define max(a,b) ((a)>(b)?(a):(b))
+#endif
+
 //-----------------------------------------------------------------------------
 // Define a material point that stores the damage variable.
 class FEDamageMaterialPoint : public FEMaterialPoint

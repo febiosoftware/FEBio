@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5C72BB14-FE3B-4455-9FB5-349B265115DA}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>FEBioHeat</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(SolutionDir)\..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(SolutionDir)\..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\FEBioHeat\FEBioHeat.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEBioHeatData.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEConvectiveHeatFlux.h" />
+    <ClInclude Include="..\..\FEBioHeat\FECoupledHeatSolidSolver.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEHeatDomainFactory.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEHeatFlux.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEHeatSolidDomain.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEHeatSolver.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEHeatSource.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEHeatStiffnessMatrix.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEHeatTransferAnalysis.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEHeatTransferMaterial.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEIsotropicFourier.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEPlotHeatFlux.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEPlotNodeTemperature.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\FEBioHeat\FEBioHeat.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEBioHeatData.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEConvectiveHeatFlux.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FECoupledHeatSolidSolver.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEHeatDomainFactory.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEHeatFlux.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEHeatSolidDomain.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEHeatSolver.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEHeatSource.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEHeatStiffnessMatrix.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEHeatTransferAnalysis.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEIsotropicFourier.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEPlotHeatFlux.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEPlotNodeTemperature.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

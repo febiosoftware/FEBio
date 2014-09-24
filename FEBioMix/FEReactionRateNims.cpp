@@ -54,6 +54,10 @@ void FEReactionRateNims::Init()
     }
 }
 
+#ifndef max
+#define max(a,b) ((a)>(b)?(a):(b))
+#endif
+
 //-----------------------------------------------------------------------------
 //! reaction rate at material point
 double FEReactionRateNims::ReactionRate(FEMaterialPoint& pt)

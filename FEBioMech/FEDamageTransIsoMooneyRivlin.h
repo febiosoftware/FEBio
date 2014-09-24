@@ -1,6 +1,10 @@
 #pragma once
 #include "FEUncoupledMaterial.h"
 
+#ifndef max
+#define max(a,b) ((a)>(b)?(a):(b))
+#endif
+
 //-----------------------------------------------------------------------------
 // We first define a material point that stores the damage variable.
 class FETIMRDamageMaterialPoint : public FEMaterialPoint

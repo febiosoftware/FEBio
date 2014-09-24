@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0905F677-3492-4061-A594-F59E2F6534ED}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>FEBioXML</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(SolutionDir)\..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(SolutionDir)\..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\FEBioXML\FEBioBoundarySection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioConstraintsSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioContactSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioControlSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioDiscreteSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioGeometrySection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioGlobalsSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioImport.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioInitialSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioLoadDataSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioLoadsSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioMaterialSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioModuleSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioOutputSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioStepSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FERestartImport.h" />
+    <ClInclude Include="..\..\FEBioXML\FileImport.h" />
+    <ClInclude Include="..\..\FEBioXML\stdafx.h" />
+    <ClInclude Include="..\..\FEBioXML\XMLReader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\FEBioXML\FEBioBoundarySection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioConstraintsSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioContactSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioControlSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioDiscreteSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioGeometrySection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioGlobalsSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioImport.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioInitialSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioLoadDataSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioLoadsSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioMaterialSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioModuleSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioOutputSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioStepSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FERestartImport.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FileImport.cpp" />
+    <ClCompile Include="..\..\FEBioXML\XMLReader.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
