@@ -2,6 +2,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/Timer.h"
 #include "FECore/DataStore.h"
+#include "FEBioPlot/PlotFile.h"
 
 //-----------------------------------------------------------------------------
 //! The FEBio model specializes the FEModel class to implement FEBio specific

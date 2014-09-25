@@ -22,7 +22,6 @@
 // Forward declaration of the FEModel class.
 class FEModel;
 class DataRecord;
-class PlotFile;
 
 //-----------------------------------------------------------------------------
 // callback structure
