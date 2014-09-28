@@ -82,7 +82,7 @@ void FERigidBody::Reset()
 	// reset reaction force and torque
 	m_Fr = vec3d(0,0,0);
 	m_Mr = vec3d(0,0,0);
-    
+/*    
     // if any of the rotation dofs is prescribed, all others should be
     // prescribed or fixed.
     m_bpofr = false;
@@ -98,6 +98,7 @@ void FERigidBody::Reset()
             throw "FATAL ERROR";
         }
     }
+*/
 }
 
 //-----------------------------------------------------------------------------
@@ -129,7 +130,7 @@ void FERigidBody::Init()
 	m_du[3] = m_dul[3] = 0.0;
 	m_du[4] = m_dul[4] = 0.0;
 	m_du[5] = m_dul[5] = 0.0;
-    
+/*    
     // if any of the rotation dofs is prescribed, all others should be
     // prescribed or fixed.
     m_bpofr = false;
@@ -145,6 +146,7 @@ void FERigidBody::Init()
             throw "FATAL ERROR";
         }
     }
+*/
 }
 
 //-----------------------------------------------------------------------------
