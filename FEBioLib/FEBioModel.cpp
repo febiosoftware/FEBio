@@ -1147,7 +1147,7 @@ bool FEBioModel::Reset()
 {
 	// Reset model data
 	FEModel::Reset();
-
+/*
 	// open plot database file
 	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER)
 	{
@@ -1169,6 +1169,7 @@ bool FEBioModel::Reset()
 	// Offcourse we should actually check if this is indeed
 	// the case, otherwise we should also solve for t=0
 	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER) m_plot->Write(*this);
+*/
 /*
 	// reset the log file
 	if (!log.is_valid())
