@@ -11,7 +11,7 @@
 
 #include "FECore/FEMaterialPoint.h"
 
-#ifndef max
+#ifdef WIN32
 #define max(a,b) ((a)>(b)?(a):(b))
 #endif
 
