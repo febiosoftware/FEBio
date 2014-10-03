@@ -142,6 +142,7 @@ enum FE_Step_Type {
 	FE_LINEAR_SOLID,
 	FE_HEAT_SOLID,
 	FE_EXPLICIT_SOLID,
+	FE_CG_SOLID
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -12,6 +12,7 @@ FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)
 	{
 	case FE_SOLID         : return fecore_new<FESolver>(FESOLVER_ID, "solid"          , &fem);
 	case FE_SOLID2        : return fecore_new<FESolver>(FESOLVER_ID, "solid2"         , &fem);
+	case FE_CG_SOLID      : return fecore_new<FESolver>(FESOLVER_ID, "CG-solid"       , &fem);
 	case FE_EXPLICIT_SOLID: return fecore_new<FESolver>(FESOLVER_ID, "explicit-solid" , &fem);
 	case FE_LINEAR_SOLID  : return fecore_new<FESolver>(FESOLVER_ID, "linear-solid"   , &fem);
 	case FE_BIPHASIC      : return fecore_new<FESolver>(FESOLVER_ID, "biphasic"       , &fem);
@@ -31,7 +32,7 @@ void FEBioControlSection::Parse(XMLTag& tag)
 	FEAnalysis* pstep = GetStep();
 
 	// make sure we have a solver defined
-	if (pstep->m_psolver == 0) pstep->m_psolver = BuildSolver(pstep->GetType(), fem);
+	if (pstep->m_psolver == 0) pstep->m_psolver = BuildSolver(m_pim->m_nstep_type, fem);
 	FESolver* psolver = pstep->m_psolver;
 
 	++tag;

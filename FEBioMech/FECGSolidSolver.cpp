@@ -22,6 +22,63 @@ FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolidSolver(pfem)
 {
 }
 
+
+//-----------------------------------------------------------------------------
+//! Allocates and initializes the data structures used by the FESolidSolver
+//
+bool FECGSolidSolver::Init()
+{
+	// check parameters
+	if (m_Dtol <  0.0) { felog.printf("Error: dtol must be nonnegative.\n"   ); return false; }
+	if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }
+	if (m_Rtol <  0.0) { felog.printf("Error: rtol must be nonnegative.\n"); return false; }
+	if (m_Rmin <  0.0) { felog.printf("Error: min_residual must be nonnegative.\n"  ); return false; }
+	if (m_bfgs.m_LStol  < 0.0) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
+	if (m_bfgs.m_LSmin  < 0.0) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
+	if (m_bfgs.m_LSiter < 0) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
+	if (m_bfgs.m_maxref < 0) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
+	if (m_bfgs.m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
+	if (m_bfgs.m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
+
+	// get nr of equations
+	int neq = m_neq;
+
+	// allocate vectors
+	m_Fn.assign(neq, 0);
+	m_Fd.assign(neq, 0);
+	m_Fr.assign(neq, 0);
+	m_Ui.assign(neq, 0);
+	m_Ut.assign(neq, 0);
+
+	int i, n;
+
+	// we need to fill the total displacement vector m_Ut
+	// TODO: I need to find an easier way to do this
+	FEMesh& mesh = m_fem.GetMesh();
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+
+		// displacement dofs
+		n = node.m_ID[DOF_X]; if (n >= 0) m_Ut[n] = node.m_rt.x - node.m_r0.x;
+		n = node.m_ID[DOF_Y]; if (n >= 0) m_Ut[n] = node.m_rt.y - node.m_r0.y;
+		n = node.m_ID[DOF_Z]; if (n >= 0) m_Ut[n] = node.m_rt.z - node.m_r0.z;
+
+		// rotational dofs
+		n = node.m_ID[DOF_U]; if (n >= 0) m_Ut[n] = node.m_Dt.x - node.m_D0.x;
+		n = node.m_ID[DOF_V]; if (n >= 0) m_Ut[n] = node.m_Dt.y - node.m_D0.y;
+		n = node.m_ID[DOF_W]; if (n >= 0) m_Ut[n] = node.m_Dt.z - node.m_D0.z;
+	}
+
+	// initialize BFGS data
+	m_bfgs.Init(neq, this, m_plinsolve);
+
+	// set the create stiffness matrix flag
+	m_breshape = true;
+
+	return true;
+}
+
 //-----------------------------------------------------------------------------
 bool FECGSolidSolver::Quasin(double time)
 {
@@ -264,13 +321,14 @@ bool FECGSolidSolver::Quasin(double time)
 				// for incompressible materials
 				UpdateStresses();
 				Residual(m_bfgs.m_R0);
-
+/*
 				// reform the matrix if we are using full-Newton
 				if (m_bfgs.m_maxups == 0)
 				{
 					felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 					if (ReformStiffness() == false) break;
 				}
+*/
 			}
 		}
 	

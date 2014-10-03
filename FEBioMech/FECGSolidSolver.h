@@ -10,6 +10,9 @@ public:
 	//! constructor
 	FECGSolidSolver(FEModel* pfem);
 
+	//! initialization
+	bool Init();
+
 	//! Performs a CG step
 	bool Quasin(double time);
 
