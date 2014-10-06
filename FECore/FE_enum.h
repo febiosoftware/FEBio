@@ -171,6 +171,7 @@ enum FE_Plot_Level {
 	FE_PLOT_MINOR_ITRS,		// output minor iterations (i.e. every Newton iteration)
 	FE_PLOT_MUST_POINTS,	// output only on must-points
 	FE_PLOT_FINAL,			// only output final converged state
+	FE_PLOT_AUGMENTATIONS	// plot state before augmentations
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -1340,8 +1340,17 @@ bool FESolidSolver::Quasin(double time)
 		else if (pstep->m_baugment)
 		{
 			// we have converged, so let's see if the augmentations have converged as well
-
 			felog.printf("\n........................ augmentation # %d\n", m_naug+1);
+
+			// plot states before augmentations.
+			if (pstep->GetPlotLevel() == FE_PLOT_AUGMENTATIONS)
+			{
+				// The reason we store the state prior to the augmentations
+				// is because the augmentations are going to change things such that
+				// the system no longer in equilibrium. Since the model has to be converged
+				// before we do augmentations, storing the model now will store an actual converged state.
+				pstep->GetFEModel().Write();
+			}
 
 			// do the augmentations
 			bconv = Augment();
