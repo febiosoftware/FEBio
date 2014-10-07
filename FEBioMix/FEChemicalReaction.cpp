@@ -141,13 +141,13 @@ void FEChemicalReaction::Serialize(DumpFile& ar)
 	{
 		itrmap p;
 		ar << m_nsol << m_vR << m_vP << m_v << m_Vbar << m_Vovr << m_vRtmp << m_vPtmp;
-		ar << m_solR.size();
+		ar << (int) m_solR.size();
 		for (p = m_solR.begin(); p!=m_solR.end(); ++p) {ar << p->first; ar << p->second;}
-		ar << m_solP.size();
+		ar << (int) m_solP.size();
 		for (p = m_solP.begin(); p!=m_solP.end(); ++p) {ar << p->first; ar << p->second;}
-		ar << m_sbmR.size();
+		ar << (int) m_sbmR.size();
 		for (p = m_sbmR.begin(); p!=m_sbmR.end(); ++p) {ar << p->first; ar << p->second;}
-		ar << m_sbmP.size();
+		ar << (int) m_sbmP.size();
 		for (p = m_sbmP.begin(); p!=m_sbmP.end(); ++p) {ar << p->first; ar << p->second;}
 
 		if (m_pFwd)

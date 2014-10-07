@@ -1028,7 +1028,7 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 	if (ar.IsSaving())
 	{
 		ar << m_phi0 << m_rhoTw << m_cFr << m_Rgas << m_Tabs << m_Fc << m_penalty << m_zmin << m_ndeg;
-        ar << m_pSolute.size() << m_pSBM.size() << m_pReact.size();
+        ar << (int) m_pSolute.size() << (int) m_pSBM.size() << (int) m_pReact.size();
 		ar << m_pPerm ->GetTypeStr(); m_pPerm ->Serialize(ar);
 
 		if (m_pSupp == 0) ar << nSupp;

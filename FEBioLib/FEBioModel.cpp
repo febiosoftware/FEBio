@@ -769,7 +769,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		}
 
 		// fixed rigid body dofs
-		ar << m_RBC.size();
+		ar << (int) m_RBC.size();
 		for (int i=0; i<(int) m_RBC.size(); ++i)
 		{
 			FERigidBodyFixedBC& bc = *m_RBC[i];
@@ -778,7 +778,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		}
 
 		// rigid body displacements
-		ar << m_RDC.size();
+		ar << (int) m_RDC.size();
 		for (int i=0; i<(int) m_RDC.size(); ++i)
 		{
 			FERigidBodyDisplacement& dc = *m_RDC[i];
@@ -787,7 +787,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		}
 
 		// rigid body forces
-		ar << m_RFC.size();
+		ar << (int) m_RFC.size();
 		for (int i=0; i<(int) m_RFC.size(); ++i)
 		{
 			FERigidBodyForce& fc = *m_RFC[i];
@@ -796,7 +796,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		}
 
 		// rigid nodes
-		ar << m_RN.size();
+		ar << (int) m_RN.size();
 		for (int i=0; i<(int) m_RN.size(); ++i)
 		{
 			FERigidNode& rn = *m_RN[i];
