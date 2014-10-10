@@ -20,6 +20,11 @@ public:
 	//! calculate strain energy density at material point
 	double StrainEnergyDensity(FEMaterialPoint& pt);
     
+    // returns a pointer to a new material point object
+    FEMaterialPoint* CreateMaterialPointData() {
+        return m_pMat->CreateMaterialPointData();
+    }
+    
 public:
 	// get the number of properties
 	int Properties() { return 1; }
@@ -55,7 +60,7 @@ class FEElasticMultigeneration;
 class FEMultigenerationMaterialPoint : public FEMaterialPoint
 {
 public:
-	FEMultigenerationMaterialPoint(FEElasticMultigeneration* pm, FEMaterialPoint* pt) : m_pmat(pm), FEMaterialPoint(pt) { m_tgen = 0.0; }
+    FEMultigenerationMaterialPoint();
 		
 	FEMaterialPoint* Copy();
 		
@@ -67,11 +72,9 @@ public:
 		
 public:
 	// multigenerational material data
-	vector <mat3d> Fi;	//!< inverse of relative deformation gradient
-	vector <double> Ji;	//!< determinant of Fi (store for efficiency)
+    vector<FEMaterialPoint*>    m_mp;   //!< material point data for multigeneration components
 	double	m_tgen;		//!< last generation time
-
-private:
+    int     m_ngen;     //!< number of active generations
 	FEElasticMultigeneration*	m_pmat;
 };
 
@@ -84,12 +87,11 @@ public:
 	FEElasticMultigeneration(FEModel* pfem) : FEElasticMaterial(pfem) {}
 		
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() 
-	{ 
-		// use the zero-th generation material point as the base elastic material point
-		return new FEMultigenerationMaterialPoint(this, m_MG[0]->CreateMaterialPointData());
-	}
+    FEMaterialPoint* CreateMaterialPointData();
 
+    // return number of materials
+    int Materials() const { return (int)m_MG.size(); }
+    
 	void AddMaterial(FEElasticMaterial* pmat);
 	
 public:

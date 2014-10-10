@@ -11,6 +11,7 @@
 
 #include "FEElasticMaterial.h"
 #include "FEBondRelaxation.h"
+#include <deque>
 
 //-----------------------------------------------------------------------------
 //! Material point data for reactive viscoelastic materials
@@ -34,10 +35,13 @@ public:
     
 public:
 	// multigenerational material data
-	vector <mat3d>  m_Fi;	//!< inverse of relative deformation gradient
+/*	vector <mat3d>  m_Fi;	//!< inverse of relative deformation gradient
 	vector <double> m_Ji;	//!< determinant of Fi (store for efficiency)
 	vector <double> m_tgen;	//!< generation time
-    
+    */
+    deque <mat3d>  m_Fi;	//!< inverse of relative deformation gradient
+    deque <double> m_Ji;	//!< determinant of Fi (store for efficiency)
+    deque <double> m_tgen;	//!< generation time
 };
 
 

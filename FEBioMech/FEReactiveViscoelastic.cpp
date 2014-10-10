@@ -9,6 +9,12 @@
 #include "FEReactiveViscoelastic.h"
 #include "FECore/FECoreKernel.h"
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// FEReactiveVEMaterialPoint
+//
+///////////////////////////////////////////////////////////////////////////////
+
 //-----------------------------------------------------------------------------
 //! Create a shallow copy of the material point data
 FEMaterialPoint* FEReactiveVEMaterialPoint::Copy()
@@ -87,6 +93,12 @@ void FEReactiveVEMaterialPoint::Serialize(DumpFile& ar)
 		for (int i=0; i<n; ++i) ar >> m_Fi[i] >> m_Ji[i] >> m_tgen[i];
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FEReactiveViscoelasticMaterial
+//
+///////////////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -215,6 +227,9 @@ mat3ds FEReactiveViscoelasticMaterial::Stress(FEMaterialPoint& mp)
     
     // calculate the bond stresses for past generations
     for (ig=0; ig<ng; ++ig) {
+        // evaluate relative deformation gradient for this generation
+        ep.m_F = F*pt.m_Fi[ig];
+        ep.m_J = J*pt.m_Ji[ig];
         // evaluate bond mass fraction for this generation
         if (ig == 0) {
             ta = time - pt.m_tgen[ig];
@@ -230,9 +245,6 @@ mat3ds FEReactiveViscoelasticMaterial::Stress(FEMaterialPoint& mp)
             tb = time - pt.m_tgen[ig+1];
             w = m_pRelx->Relaxation(mp, tb) - m_pRelx->Relaxation(mp, ta);
         }
-        // evaluate relative deformation gradient for this generation
-        ep.m_F = F*pt.m_Fi[ig];
-        ep.m_J = J*pt.m_Ji[ig];
         // evaluate bond stress
         sb = m_pBond->Stress(mp);
         // add bond stress to total stress
@@ -278,6 +290,9 @@ tens4ds FEReactiveViscoelasticMaterial::Tangent(FEMaterialPoint& mp)
     
     // calculate the bond tangents for past generations
     for (ig=0; ig<ng; ++ig) {
+        // evaluate relative deformation gradient for this generation
+        ep.m_F = F*pt.m_Fi[ig];
+        ep.m_J = J*pt.m_Ji[ig];
         // evaluate bond mass fraction for this generation
         if (ig == 0) {
             ta = time - pt.m_tgen[ig];
@@ -293,9 +308,6 @@ tens4ds FEReactiveViscoelasticMaterial::Tangent(FEMaterialPoint& mp)
             tb = time - pt.m_tgen[ig+1];
             w = m_pRelx->Relaxation(mp, tb) - m_pRelx->Relaxation(mp, ta);
         }
-        // evaluate relative deformation gradient for this generation
-        ep.m_F = F*pt.m_Fi[ig];
-        ep.m_J = J*pt.m_Ji[ig];
         // evaluate bond tangent
         cb = m_pBond->Tangent(mp);
         // add bond tangent to total tangent
@@ -343,6 +355,9 @@ double FEReactiveViscoelasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
     
     // calculate the bond stresses for past generations
     for (ig=0; ig<ng; ++ig) {
+        // evaluate relative deformation gradient for this generation
+        ep.m_F = F*pt.m_Fi[ig];
+        ep.m_J = J*pt.m_Ji[ig];
         // evaluate bond mass fraction for this generation
         if (ig == 0) {
             ta = time - pt.m_tgen[ig];
@@ -358,9 +373,6 @@ double FEReactiveViscoelasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
             tb = time - pt.m_tgen[ig+1];
             w = m_pRelx->Relaxation(mp, tb) - m_pRelx->Relaxation(mp, ta);
         }
-        // evaluate relative deformation gradient for this generation
-        ep.m_F = F*pt.m_Fi[ig];
-        ep.m_J = J*pt.m_Ji[ig];
         // evaluate bond stress
         sedb = m_pBond->StrainEnergyDensity(mp);
         // add bond stress to total stress

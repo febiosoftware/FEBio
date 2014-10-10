@@ -41,6 +41,7 @@
 #include "FEOgdenMaterial.h"
 #include "FEOgdenUnconstrained.h"
 #include "FEOrthoElastic.h"
+#include "FEOsmoticVirialExpansion.h"
 #include "FEPerfectOsmometer.h"
 #include "FERemodelingElasticMaterial.h"
 #include "FERigidMaterial.h"
@@ -186,6 +187,7 @@ REGISTER_FECORE_CLASS(FEOgdenMaterial                ,FEMATERIAL_ID, "Ogden"    
 REGISTER_FECORE_CLASS(FEOgdenUnconstrained           ,FEMATERIAL_ID, "Ogden unconstrained"           );
 REGISTER_FECORE_CLASS(FEOrthoElastic                 ,FEMATERIAL_ID, "orthotropic elastic"           );
 REGISTER_FECORE_CLASS(FEPerfectOsmometer             ,FEMATERIAL_ID, "perfect osmometer"             );
+REGISTER_FECORE_CLASS(FEOsmoticVirialExpansion       ,FEMATERIAL_ID, "osmotic virial expansion"      );    
 REGISTER_FECORE_CLASS(FERigidMaterial                ,FEMATERIAL_ID, "rigid body"                    );
 REGISTER_FECORE_CLASS(FESphericalFiberDistribution   ,FEMATERIAL_ID, "spherical fiber distribution"  );
 REGISTER_FECORE_CLASS(FEStVenantKirchhoff            ,FEMATERIAL_ID, "St.Venant-Kirchhoff"           );
@@ -239,7 +241,13 @@ REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, FEMATERIAL_ID, "tension-only li
 REGISTER_FECORE_CLASS(FENonLinearSpring        , FEMATERIAL_ID, "nonlinear");
 
 REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial       , FEMATERIAL_ID, "reactive viscoelastic");
-REGISTER_FECORE_CLASS(FEBondRelaxationConstIso             , FEMATERIAL_ID, "relaxation-const-iso" );
+REGISTER_FECORE_CLASS(FEBondRelaxationExponential          , FEMATERIAL_ID, "relaxation-exponential" );
+REGISTER_FECORE_CLASS(FEBondRelaxationExpDistortion        , FEMATERIAL_ID, "relaxation-exp-distortion");
+REGISTER_FECORE_CLASS(FEBondRelaxationFung                 , FEMATERIAL_ID, "relaxation-Fung" );
+REGISTER_FECORE_CLASS(FEBondRelaxationFungDistortion       , FEMATERIAL_ID, "relaxation-Fung-distortion");
+REGISTER_FECORE_CLASS(FEBondRelaxationPark                 , FEMATERIAL_ID, "relaxation-Park" );
+REGISTER_FECORE_CLASS(FEBondRelaxationParkDistortion       , FEMATERIAL_ID, "relaxation-Park-distortion");
+    
 REGISTER_FECORE_CLASS(FEDamageMaterial                     , FEMATERIAL_ID, "elastic damage"       );
 REGISTER_FECORE_CLASS(FEDamageMaterialUC                   , FEMATERIAL_ID, "uncoupled elastic damage");
 REGISTER_FECORE_CLASS(FEDamageCDFSimo                      , FEMATERIAL_ID, "CDF Simo"             );
