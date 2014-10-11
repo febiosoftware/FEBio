@@ -444,6 +444,9 @@
     <ClCompile Include="..\..\FEBioMech\FEDamageMaterialUC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEOsmoticVirialExpansion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h">
@@ -888,6 +891,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEDamageMaterialUC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEOsmoticVirialExpansion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

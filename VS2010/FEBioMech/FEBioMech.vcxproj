@@ -484,6 +484,7 @@
     <ClCompile Include="..\..\FEBioMech\FEOgdenMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEOgdenUnconstrained.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEOrthoElastic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEOsmoticVirialExpansion.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPerfectOsmometer.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPeriodicBoundary.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPointBodyForce.cpp" />
@@ -629,6 +630,7 @@
     <ClInclude Include="..\..\FEBioMech\FEOgdenMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEOgdenUnconstrained.h" />
     <ClInclude Include="..\..\FEBioMech\FEOrthoElastic.h" />
+    <ClInclude Include="..\..\FEBioMech\FEOsmoticVirialExpansion.h" />
     <ClInclude Include="..\..\FEBioMech\FEPerfectOsmometer.h" />
     <ClInclude Include="..\..\FEBioMech\FEPeriodicBoundary.h" />
     <ClInclude Include="..\..\FEBioMech\FEPointBodyForce.h" />
