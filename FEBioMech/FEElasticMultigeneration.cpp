@@ -243,7 +243,7 @@ mat3ds FEElasticMultigeneration::Stress(FEMaterialPoint& mp)
         epi.m_J = Js*Ji;
         
         // evaluate stress for this generation
-        s += Ji*m_MG[i]->Stress(*pt.m_mp[i]);
+        s += epi.m_s = Ji*m_MG[i]->Stress(*pt.m_mp[i]);
         
         // restore the material point deformation gradient
         epi.m_F = Fi;

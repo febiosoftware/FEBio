@@ -73,7 +73,7 @@ tens4ds FEHolmesMow::Tangent(FEMaterialPoint& mp)
 	double eQ = exp(m_b*((2*mu-lam)*(I1-3) + lam*(I2-3))/Ha)/pow(I3,m_b);
 	
 	// calculate stress
-	mat3ds s = pt.m_s; //0.5*detFi*eQ*((2*mu+lam*(I1-1))*b - lam*b2 - Ha*identity);
+	mat3ds s = 0.5*detFi*eQ*((2*mu+lam*(I1-1))*b - lam*b2 - Ha*identity);
 	
 	// calculate elasticity tensor
 	tens4ds c = 4.*m_b/Ha*detF/eQ*dyad1s(s) 
