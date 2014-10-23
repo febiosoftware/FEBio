@@ -13,21 +13,23 @@
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FESlidingInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"      ); 
-	ADD_PARAMETER(m_atol     , FE_PARAM_DOUBLE, "tolerance"   );
-	ADD_PARAMETER(m_eps      , FE_PARAM_DOUBLE, "penalty"     );
-	ADD_PARAMETER(m_bautopen , FE_PARAM_BOOL  , "auto_penalty");
-	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"    );
-	ADD_PARAMETER(m_gtol     , FE_PARAM_DOUBLE, "gaptol"      );
-	ADD_PARAMETER(m_mu       , FE_PARAM_DOUBLE, "fric_coeff"  );
-	ADD_PARAMETER(m_epsf     , FE_PARAM_DOUBLE, "fric_penalty");
-	ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"      );
-	ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"      );
-	ADD_PARAMETER(m_stol     , FE_PARAM_DOUBLE, "search_tol"  );
-	ADD_PARAMETER(m_ktmult   , FE_PARAM_DOUBLE, "ktmult"      );
-	ADD_PARAMETER(m_knmult   , FE_PARAM_DOUBLE, "knmult"      );
-	ADD_PARAMETER(m_breloc   , FE_PARAM_BOOL  , "node_reloc"  );
-	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"      );
+	ADD_PARAMETER(m_blaugon      , FE_PARAM_BOOL  , "laugon"       ); 
+	ADD_PARAMETER(m_atol         , FE_PARAM_DOUBLE, "tolerance"    );
+	ADD_PARAMETER(m_eps          , FE_PARAM_DOUBLE, "penalty"      );
+	ADD_PARAMETER(m_bautopen     , FE_PARAM_BOOL  , "auto_penalty" );
+	ADD_PARAMETER(m_btwo_pass    , FE_PARAM_BOOL  , "two_pass"     );
+	ADD_PARAMETER(m_gtol         , FE_PARAM_DOUBLE, "gaptol"       );
+	ADD_PARAMETER(m_mu           , FE_PARAM_DOUBLE, "fric_coeff"   );
+	ADD_PARAMETER(m_epsf         , FE_PARAM_DOUBLE, "fric_penalty" );
+	ADD_PARAMETER(m_naugmin      , FE_PARAM_INT   , "minaug"       );
+	ADD_PARAMETER(m_naugmax      , FE_PARAM_INT   , "maxaug"       );
+	ADD_PARAMETER(m_stol         , FE_PARAM_DOUBLE, "search_tol"   );
+	ADD_PARAMETER(m_ktmult       , FE_PARAM_DOUBLE, "ktmult"       );
+	ADD_PARAMETER(m_knmult       , FE_PARAM_DOUBLE, "knmult"       );
+	ADD_PARAMETER(m_breloc       , FE_PARAM_BOOL  , "node_reloc"   );
+	ADD_PARAMETER(m_nsegup       , FE_PARAM_INT   , "seg_up"       );
+	ADD_PARAMETER(m_bself_contact, FE_PARAM_BOOL  , "self_contact" );
+	ADD_PARAMETER(m_sradius      , FE_PARAM_DOUBLE, "search_radius");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -397,6 +399,8 @@ FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem)
 	m_nsegup = 0;	// always do segment updates
 	m_bautopen = false;	// don't use auto-penalty
 	m_btwo_pass = false; // don't use two-pass
+	m_bself_contact = false;	// no self-contact
+	m_sradius = 0;				// no search radius limitation
 	m_nID = count++;
 
 	// set the siblings
@@ -484,7 +488,7 @@ void FESlidingInterface::Activate()
 
 	// for two-pass algorithms we repeat the previous
 	// two steps with master and slave switched
-	if (m_btwo_pass)
+	if (m_btwo_pass && (m_bself_contact == false))
 	{
 		ProjectSurface(m_ms, m_ss, true);
 		if (m_bautopen) CalcAutoPenalty(m_ms);
@@ -511,6 +515,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 
 	FEClosestPointProjection cpp(ms);
 	cpp.SetTolerance(m_stol);
+	cpp.SetSearchRadius(m_sradius);
 	cpp.Init();
 
 	// loop over all slave nodes
@@ -551,7 +556,11 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 					// see if the node might have moved to another master element
 					FESurfaceElement* pold = pme; 
 					ss.m_rs[i] = vec2d(0,0);
-					pme = cpp.Project(x, q, ss.m_rs[i]);
+
+					if (m_bself_contact)
+						pme = cpp.Project(m, q, ss.m_rs[i]);
+					else
+						pme = cpp.Project(x, q, ss.m_rs[i]);
 
 					if (pme == 0)
 					{
@@ -576,7 +585,10 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 			// get the master element
 			// don't forget to initialize the search for the first node!
 			ss.m_rs[i] = vec2d(0,0);
-			pme = cpp.Project(x, q, ss.m_rs[i]);
+			if (m_bself_contact)
+				pme = cpp.Project(m, q, ss.m_rs[i]);
+			else
+				pme = cpp.Project(x, q, ss.m_rs[i]);
 			if (pme)
 			{
 				// the node has come into contact so make sure to initialize
@@ -647,7 +659,7 @@ void FESlidingInterface::Update(int niter)
 	// project slave surface onto master surface
 	// this also calculates the nodal gap functions
 	ProjectSurface(m_ss, m_ms, bupdate);
-	if (m_btwo_pass) ProjectSurface(m_ms, m_ss, bupdate);
+	if (m_btwo_pass && (m_bself_contact == false)) ProjectSurface(m_ms, m_ss, bupdate);
 
 	// Update the net contact pressures
 	UpdateContactPressures();
@@ -685,6 +697,7 @@ void FESlidingInterface::ContactForces(FEGlobalVector& R)
 
 	// do two-pass
 	int npass = (m_btwo_pass?2:1);
+	if (m_bself_contact) npass = 1;
 	for (np=0; np<npass; ++np)
 	{
 		// pick the slave and master surfaces
@@ -1028,6 +1041,7 @@ void FESlidingInterface::ContactStiffness(FESolver* psolver)
 
 	// do two-pass
 	int npass = (m_btwo_pass?2:1);
+	if (m_bself_contact) npass = 1;
 	for (np=0; np<npass; ++np)
 	{
 		// get the master and slave surface
@@ -1813,6 +1827,7 @@ void FESlidingInterface::MapFrictionData(int inode, FESlidingSurface& ss, FESlid
 void FESlidingInterface::UpdateContactPressures()
 {
 	int npass = (m_btwo_pass?2:1);
+	if (m_bself_contact) npass = 1;
 	for (int np=0; np<npass; ++np)
 	{
 		FESlidingSurface& ss = (np == 0? m_ss : m_ms);

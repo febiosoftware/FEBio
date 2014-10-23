@@ -140,6 +140,9 @@ public:
 
 	bool			m_btwo_pass;	//!< two pass algorithm flag
 
+	bool			m_bself_contact;	//!< self-contact flag
+	double			m_sradius;			//!< search radius for self contact
+
 	int				m_naugmax;	//!< maximum nr of augmentations
 	int				m_naugmin;	//!< minimum nr of augmentations
 	double			m_gtol;		//!< gap tolerance

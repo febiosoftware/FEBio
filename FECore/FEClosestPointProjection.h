@@ -27,6 +27,9 @@ public:
 	//! get the projection tolerance
 	double GetTolerance() { return m_tol; }
 
+	//! Set the search radius (used in self-projection)
+	void SetSearchRadius(double s) { m_rad = s; }
+
 protected:
 	double	m_tol;	//!< projection tolerance
 	double	m_rad;	//!< search radius
