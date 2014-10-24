@@ -522,7 +522,10 @@ void FESolidDomain::Serialize(DumpFile &ar)
 			ar << el.m_nID;
 			ar << el.m_node;
 
-			for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
+			for (int j=0; j<el.GaussPoints(); ++j)
+			{
+				el.GetMaterialPoint(j)->Serialize(ar);
+			}
 		}
 	}
 	else

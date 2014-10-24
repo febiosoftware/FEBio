@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FECore/tens4d.h"
 #include "FECore/log.h"
+#include "FECore/FECoreKernel.h"
 #include "FEElasticMultigeneration.h"
 
 //=============================================================================
@@ -32,6 +33,24 @@ bool FEGenerationMaterial::SetProperty(int i, FECoreBase* pm)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+void FEGenerationMaterial::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_pMat->GetTypeStr();
+		m_pMat->Serialize(ar);
+	}
+	else
+	{
+		char sz[256] = {0};
+		ar >> sz;
+		m_pMat = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+		assert(m_pMat);
+		m_pMat->Serialize(ar);
+		m_pMat->Init();
+	}
+}
 //-----------------------------------------------------------------------------
 void FEGenerationMaterial::Init()
 {
@@ -87,16 +106,22 @@ void FEMultigenerationMaterialPoint::Serialize(DumpFile& ar)
 	if (ar.IsSaving())
 	{
         ar << m_tgen << m_ngen;
+		ar << (int)m_mp.size();
+		for (int i=0; i < (int)m_mp.size(); i++) m_mp[i]->Serialize(ar);
 	}
 	else
 	{
         ar >> m_tgen >> m_ngen;
+		int mp_size;
+		ar >> mp_size;
+		m_mp.resize(mp_size);
+		for (int i=0; i < mp_size; i++)
+		{
+			m_mp[i] = new FEElasticMaterialPoint;
+			m_mp[i]->Serialize(ar);
+			m_mp[i]->Init(true);
+		}
 	}
-    for (int i=0; i < (int)m_mp.size(); i++) m_mp[i]->Serialize(ar);
-    
-    // TODO: serialize m_pmat
-			
-	if (m_pt) m_pt->Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
@@ -116,7 +141,6 @@ void FEMultigenerationMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
     
     // TODO: shallow copy m_pmat
     
-    if (m_pt) m_pt->ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------
@@ -209,6 +233,34 @@ void FEElasticMultigeneration::Init()
 	for (int i=0; i<(int)m_MG.size(); i++) m_MG[i]->Init();
 }
 
+//-----------------------------------------------------------------------------
+void FEElasticMultigeneration::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << (int)m_MG.size();
+		for (int i=0; i<(int)m_MG.size(); i++)
+		{
+			ar << m_MG[i]->GetTypeStr();
+			m_MG[i]->Serialize(ar);
+		}
+	}
+	else
+	{
+		int MG_size;
+		char sz[256] = {0};
+		ar >> MG_size;
+		m_MG.resize(MG_size);
+		for (int i=0; i<MG_size; i++)
+		{
+			ar >> sz;
+			m_MG[i] = dynamic_cast<FEGenerationMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+			assert(m_MG[i]);
+			m_MG[i]->Serialize(ar);
+			m_MG[i]->Init();
+		}
+	}
+}
 //-----------------------------------------------------------------------------
 mat3ds FEElasticMultigeneration::Stress(FEMaterialPoint& mp)
 {

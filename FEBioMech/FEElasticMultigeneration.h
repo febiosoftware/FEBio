@@ -38,6 +38,9 @@ public:
 	//! set a material property (returns false on error)
 	bool SetProperty(int i, FECoreBase* pm);
 
+	//! data serialization
+	void Serialize(DumpFile& ar);
+
 public:
 	double	btime;	//!< generation birth time
 
@@ -64,6 +67,7 @@ public:
 		
 	FEMaterialPoint* Copy();
 		
+	//! data serialization
 	void Serialize(DumpFile& ar);
 
 	void ShallowCopy(DumpStream& dmp, bool bsave);
@@ -120,6 +124,8 @@ public:
 	//! data initialization and checking
 	void Init();
 		
+	void Serialize(DumpFile& ar);
+
 	int CheckGeneration(const double t);
 
 public:
