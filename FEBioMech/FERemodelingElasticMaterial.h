@@ -112,6 +112,9 @@ public:
 	//! set a material property (returns false on error)
 	bool SetProperty(int i, FECoreBase* pm);
 	
+	//! data serialization
+	void Serialize(DumpFile& ar);
+
 public:
 	FEElasticMaterial*	m_pBase;		//!< pointer to elastic solid material
 	FESolidSupply*		m_pSupp;		//!< pointer to solid supply material

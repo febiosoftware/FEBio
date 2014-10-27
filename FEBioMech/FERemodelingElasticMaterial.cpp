@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FERemodelingElasticMaterial.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 FEMaterialPoint* FERemodelingMaterialPoint::Copy()
@@ -129,6 +130,40 @@ bool FERemodelingElasticMaterial::SetProperty(int n, FECoreBase* pm)
 		break;
 	}
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+//! Serialization
+void FERemodelingElasticMaterial::Serialize(DumpFile &ar)
+{
+	// serialize material parameters
+	FEElasticMaterial::Serialize(ar);
+
+	// serialize sub-materials
+	if (ar.IsSaving())
+	{
+		ar << m_pBase->GetTypeStr();
+		m_pBase->Serialize(ar);
+
+		ar << m_pSupp->GetTypeStr();
+		m_pSupp->Serialize(ar);
+	}
+	else
+	{
+		char sz[256] = {0};
+
+		ar >> sz;
+		m_pBase = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+		assert(m_pBase);
+		m_pBase->Serialize(ar);
+		m_pBase->Init();
+
+		ar >> sz;
+		m_pSupp = dynamic_cast<FESolidSupply*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+		assert (m_pSupp);
+		m_pSupp->Serialize(ar);
+		m_pSupp->Init();
+	}
 }
 
 //-----------------------------------------------------------------------------
