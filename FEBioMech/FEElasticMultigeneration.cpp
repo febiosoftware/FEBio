@@ -36,6 +36,9 @@ bool FEGenerationMaterial::SetProperty(int i, FECoreBase* pm)
 //-----------------------------------------------------------------------------
 void FEGenerationMaterial::Serialize(DumpFile& ar)
 {
+	// serialize material parameters
+	FEElasticMaterial::Serialize(ar);
+	
 	if (ar.IsSaving())
 	{
 		ar << m_pMat->GetTypeStr();
@@ -236,6 +239,10 @@ void FEElasticMultigeneration::Init()
 //-----------------------------------------------------------------------------
 void FEElasticMultigeneration::Serialize(DumpFile& ar)
 {
+	// serialize material parameters
+	FEElasticMaterial::Serialize(ar);
+	
+	// serialize sub-materials
 	if (ar.IsSaving())
 	{
 		ar << (int)m_MG.size();
