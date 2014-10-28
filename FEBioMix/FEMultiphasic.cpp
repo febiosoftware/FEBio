@@ -1099,14 +1099,13 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 			m_pReact.push_back(dynamic_cast<FEChemicalReaction*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel())));
 			assert(m_pReact[i]); m_pReact[i]->Serialize(ar);
 			m_pReact[i]->Init();
+		}
 
 		ar >> sz;
 		m_pSolid = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
 		assert(m_pSolid); m_pSolid->Serialize(ar);
 		m_pSolid->SetParent(this);
 		m_pSolid->Init();
-		
-		}
 		
 	}
 }
