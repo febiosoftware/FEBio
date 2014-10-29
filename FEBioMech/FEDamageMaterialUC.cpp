@@ -9,6 +9,7 @@
 #include "FEDamageMaterialUC.h"
 #include "FEDamageCriterionUC.h"
 #include "FEDamageCDF.h"
+#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 //! Constructor.
@@ -185,4 +186,45 @@ void FEDamageMaterialUC::SetLocalCoordinateSystem(FEElement& el, int n, FEMateri
 {
 	FEUncoupledMaterial::SetLocalCoordinateSystem(el, n, mp);
 	m_pBase->SetLocalCoordinateSystem(el, n, mp);
+}
+//-----------------------------------------------------------------------------
+void FEDamageMaterialUC::Serialize(DumpFile& ar)
+{
+	// serialize material parameters
+	FEUncoupledMaterial::Serialize(ar);
+
+	// serialize sub-materials
+	if (ar.IsSaving())
+	{
+		ar << m_pBase->GetTypeStr();
+		m_pBase->Serialize(ar);
+
+		ar << m_pDamg->GetTypeStr();
+		m_pDamg->Serialize(ar);
+
+		ar << m_pCrit->GetTypeStr();
+		m_pCrit->Serialize(ar);
+	}
+	else
+	{
+		char sz[256] = {0};
+
+		ar >> sz;
+		m_pBase = dynamic_cast<FEUncoupledMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+		assert(m_pBase);
+		m_pBase->Serialize(ar);
+		m_pBase->Init();
+
+		ar >> sz;
+		m_pDamg = dynamic_cast<FEDamageCDF*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+		assert(m_pDamg);
+		m_pDamg->Serialize(ar);
+		m_pDamg->Init();
+
+		ar >> sz;
+		m_pCrit = dynamic_cast<FEDamageCriterionUC*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+		assert(m_pCrit);
+		m_pCrit->Serialize(ar);
+		m_pCrit->Init();
+	}
 }
