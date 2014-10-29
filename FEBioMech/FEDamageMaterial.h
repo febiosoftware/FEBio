@@ -64,6 +64,9 @@ public:
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
 	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
     
+	//! data serialization
+	void Serialize(DumpFile& ar);
+
 public:
     FEElasticMaterial*  m_pBase;    // base elastic material
     FEDamageCDF*        m_pDamg;    // damage model

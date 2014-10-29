@@ -187,6 +187,7 @@ void FEDamageMaterialUC::SetLocalCoordinateSystem(FEElement& el, int n, FEMateri
 	FEUncoupledMaterial::SetLocalCoordinateSystem(el, n, mp);
 	m_pBase->SetLocalCoordinateSystem(el, n, mp);
 }
+
 //-----------------------------------------------------------------------------
 void FEDamageMaterialUC::Serialize(DumpFile& ar)
 {
