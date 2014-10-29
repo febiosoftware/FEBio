@@ -139,6 +139,7 @@ void FEUT4Domain::Serialize(DumpFile& ar)
 			UT4NODE& n = m_NODE[i];
 			ar << n.inode << n.Vi << n.vi << n.Fi << n.si;
 		}
+		ar << m_Ve0;
 	}
 	else
 	{
@@ -154,8 +155,19 @@ void FEUT4Domain::Serialize(DumpFile& ar)
 			ar >> n.inode >> n.Vi >> n.vi >> n.Fi >> n.si;
 		}
 
+		ar >> m_Ve0;
+
 		// create the node-element list
 		m_NEL.Create(*this);
+		
+		// find the largest valence
+		int Nmax = m_NEL.MaxValence();
+
+		// allocate buffers
+		m_Ge = new double[Nmax*4][4][3];
+		m_Be = new double[Nmax*4][6][3];
+		m_DB = new double[Nmax*4][6][3];
+
 	}
 }
 
