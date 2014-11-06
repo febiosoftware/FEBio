@@ -2,6 +2,7 @@
 #include "FEBioMech/FEElasticMaterial.h"
 #include "FEHydraulicPermeability.h"
 #include "FESolventSupply.h"
+#include "FEBiomech/FEBodyForce.h"
 
 //-----------------------------------------------------------------------------
 //! Biphasic material point class.
@@ -84,8 +85,11 @@ public:
 	//! porosity
 	double Porosity(FEMaterialPoint& pt);
 	
+    //! solid density
+    double SolidDensity() { return m_pSolid->Density(); }
+    
 	//! fluid density
-	double FluidDensity() { return m_rhoTw; } 
+	double FluidDensity() { return m_rhoTw; }
 
 	//! get the solvent supply
 	double SolventSupply(FEMaterialPoint& mp) { return (m_pSupp? m_pSupp->Supply(mp) : 0); }
@@ -112,6 +116,7 @@ public:
 public: // material parameters
 	double						m_rhoTw;	//!< true fluid density
 	double						m_phi0;		//!< solid volume fraction in reference configuration
+    vector<FEBodyForce*>        m_bf;       //!< body forces acting on this biphasic material
 
 private: // material properties
 	FEElasticMaterial*			m_pSolid;	//!< pointer to elastic solid material

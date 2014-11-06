@@ -50,6 +50,14 @@ bool FEBiphasicSolidDomain::Initialize(FEModel &fem)
 {
 	// initialize base class
 	FESolidDomain::Initialize(fem);
+    
+    // initialize body forces
+    m_pMat->m_bf.clear();
+    for (int j=0; j<fem.BodyLoads(); ++j)
+    {
+        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
+        if (pbf) m_pMat->m_bf.push_back(pbf);
+    }
 
 	// initialize local coordinate systems (can I do this elsewhere?)
 	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
@@ -1278,4 +1286,231 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 
 		int a = 0;
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBiphasicSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
+{
+    int NE = (int)m_Elem.size();
+#pragma omp parallel for
+    for (int i=0; i<NE; ++i)
+    {
+        vector<double> fe;
+        vector<int> lm;
+        
+        // get the element
+        FESolidElement& el = m_Elem[i];
+        
+        // get the element force vector and initialize it to zero
+        int ndof = 3*el.Nodes();
+        fe.assign(ndof, 0);
+        
+        // apply body forces
+        ElementBodyForce(BF, el, fe);
+        
+        // get the element's LM vector
+        UnpackLM(el, lm);
+        
+        // assemble element 'fe'-vector into global R vector
+        R.Assemble(el.m_node, lm, fe);
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the body forces
+
+void FEBiphasicSolidDomain::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe)
+{
+    // get true solid and fluid densities
+    double rhoTs = m_pMat->SolidDensity();
+    double rhoTw = m_pMat->FluidDensity();
+    
+    // jacobian
+    double detJ;
+    double *H;
+    double* gw = el.GaussWeights();
+    vec3d b;
+    
+    // number of nodes
+    int neln = el.Nodes();
+    
+    // nodal coordinates
+    vec3d r0[FEElement::MAX_NODES], rt[FEElement::MAX_NODES];
+    for (int i=0; i<neln; ++i)
+    {
+        r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+        rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+    }
+    
+    // loop over integration points
+    int nint = el.GaussPoints();
+    for (int n=0; n<nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+        pt.m_r0 = el.Evaluate(r0, n);
+        pt.m_rt = el.Evaluate(rt, n);
+        
+        detJ = detJt(el, n)*gw[n];
+        
+        // get the force
+        b = BF.force(mp);
+        
+        // evaluate apparent solid and fluid densities and mixture density
+        double phiw = m_pMat->Porosity(mp);
+        double rhos = (1-phiw)*rhoTs;
+        double rhow = phiw*rhoTw;
+        double rho = rhos + rhow;
+        
+        H = el.H(n);
+        
+        for (int i=0; i<neln; ++i)
+        {
+            fe[3*i  ] -= H[i]*rho*b.x*detJ;
+            fe[3*i+1] -= H[i]*rho*b.y*detJ;
+            fe[3*i+2] -= H[i]*rho*b.z*detJ;
+        }						
+    }
+}
+
+//-----------------------------------------------------------------------------
+void FEBiphasicSolidDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf)
+{
+    FEBiphasic* pmb = dynamic_cast<FEBiphasic*>(GetMaterial()); assert(pmb);
+    
+    // element stiffness matrix
+    matrix ke;
+    vector<int> elm;
+    
+    // repeat over all solid elements
+    int NE = (int)m_Elem.size();
+    for (int iel=0; iel<NE; ++iel)
+    {
+        FESolidElement& el = m_Elem[iel];
+        
+        // create the element's stiffness matrix
+        int neln = el.Nodes();
+        int ndof = 4*neln;
+        ke.resize(ndof, ndof);
+        ke.zero();
+        
+        // calculate inertial stiffness
+        ElementBodyForceStiffness(bf, el, ke);
+        
+        // TODO: the problem here is that the LM array that is returned by the UnpackLM
+        // function does not give the equation numbers in the right order. For this reason we
+        // have to create a new lm array and place the equation numbers in the right order.
+        // What we really ought to do is fix the UnpackLM function so that it returns
+        // the LM vector in the right order for poroelastic elements.
+        UnpackLM(el, elm);
+        
+        vector<int> lm(ndof);
+        for (int i=0; i<neln; ++i)
+        {
+            lm[4*i  ] = elm[3*i];
+            lm[4*i+1] = elm[3*i+1];
+            lm[4*i+2] = elm[3*i+2];
+            lm[4*i+3] = elm[3*neln+i];
+        }
+        
+        // get the element's LM vector
+        UnpackLM(el, lm);
+        
+        // assemble element matrix in global stiffness matrix
+        psolver->AssembleStiffness(el.m_node, lm, ke);
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the stiffness due to body forces
+void FEBiphasicSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke)
+{
+    int neln = el.Nodes();
+    int ndof = ke.columns()/neln;
+    
+    // get true solid and fluid densities
+    double rhoTs = m_pMat->SolidDensity();
+    double rhoTw = m_pMat->FluidDensity();
+    
+    // jacobian
+    double detJ, detJt, Ji[3][3];
+    double *H;
+    double* gw = el.GaussWeights();
+    vec3d G[FEElement::MAX_NODES];
+    double *Grn, *Gsn, *Gtn;
+    double Gr, Gs, Gt;
+    
+    vec3d b, kpu;
+    mat3ds Kb;
+    mat3d Kw, Kuu, Kpu;
+    
+    // loop over integration points
+    int nint = el.GaussPoints();
+    for (int n=0; n<nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        detJ = detJ0(el, n)*gw[n];
+        
+        // get the body force
+        b = BF.force(mp);
+        
+        // get the body force stiffness
+        Kb = BF.stiffness(mp);
+        
+        // evaluate apparent solid and fluid densities and mixture density
+        double phiw = m_pMat->Porosity(mp);
+        double rhos = (1-phiw)*rhoTs;
+        double rhow = phiw*rhoTw;
+        double rho = rhos + rhow;
+        
+        // evaluate the permeability and its derivatives
+        mat3ds K = m_pMat->Permeability(mp);
+        tens4ds dKdE = m_pMat->GetPermeability()->Tangent_Permeability_Strain(mp);
+        
+        H = el.H(n);
+        
+        // calculate jacobian
+        detJt = invjact(el, Ji, n)*gw[n];
+        
+        Grn = el.Gr(n);
+        Gsn = el.Gs(n);
+        Gtn = el.Gt(n);
+        
+        for (int i=0; i<neln; ++i)
+        {
+            Gr = Grn[i];
+            Gs = Gsn[i];
+            Gt = Gtn[i];
+            
+            // calculate global gradient of shape functions
+            // note that we need the transposed of Ji, not Ji itself !
+            G[i].x = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
+            G[i].y = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
+            G[i].z = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
+        }
+        
+        for (int i=0; i<neln; ++i)
+            for (int j=0; j<neln; ++j)
+            {
+                Kw = b & G[j];
+                Kuu = (Kb*(H[j]*rho) + Kw*rhoTw)*(H[i]*detJ);
+                ke[ndof*i  ][ndof*j  ] -= Kuu(0,0);
+                ke[ndof*i  ][ndof*j+1] -= Kuu(0,1);
+                ke[ndof*i  ][ndof*j+2] -= Kuu(0,2);
+                
+                ke[ndof*i+1][ndof*j  ] -= Kuu(1,0);
+                ke[ndof*i+1][ndof*j+1] -= Kuu(1,1);
+                ke[ndof*i+1][ndof*j+2] -= Kuu(1,2);
+                
+                ke[ndof*i+2][ndof*j  ] -= Kuu(2,0);
+                ke[ndof*i+2][ndof*j+1] -= Kuu(2,1);
+                ke[ndof*i+2][ndof*j+2] -= Kuu(2,2);
+                
+                Kpu = (Kw + H[j]*Kb)*K + (vdotTdotv(b, dKdE, G[j])).transpose();
+                kpu = (Kpu*G[i])*(rhoTw*detJ);
+                ke[ndof*i+3][ndof*j  ] += kpu.x;
+                ke[ndof*i+3][ndof*j+1] += kpu.y;
+                ke[ndof*i+3][ndof*j+2] += kpu.z;
+            }
+    }	
 }

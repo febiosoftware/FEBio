@@ -494,6 +494,21 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 		}
 	}
 
+    // calculate the body forces
+    for (i=0; i<mesh.Domains(); ++i)
+    {
+        FEBiphasicSolidDomain* pbdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
+        FEElasticSolidDomain* pedom = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
+        for (int j=0; j<m_fem.BodyLoads(); ++j)
+        {
+            FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+            if (pbf) {
+                if (pbdom) pbdom->BodyForce(RHS, *pbf);
+                else if (pedom) pedom->BodyForce(RHS, *pbf);
+            }
+        }
+    }
+    
 	// calculate forces due to surface loads
 	int nsl = m_fem.SurfaceLoads();
 	for (i=0; i<nsl; ++i)
@@ -582,6 +597,22 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 		}
 	}
 
+    // calculate the body force stiffness matrix for each domain
+    for (i=0; i<mesh.Domains(); ++i)
+    {
+        FEBiphasicSolidDomain* pbdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
+        FEElasticSolidDomain* pedom = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
+        int NBL = m_fem.BodyLoads();
+        for (int j=0; j<NBL; ++j)
+        {
+            FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+            if (pbf) {
+                if (pbdom) pbdom->BodyForceStiffness(this, *pbf);
+                else if (pedom) pedom->BodyForceStiffness(this, *pbf);
+            }
+        }
+    }
+    
 	// calculate contact stiffness
 	if (m_fem.SurfacePairInteractions() > 0) 
 	{

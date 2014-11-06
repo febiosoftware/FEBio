@@ -77,11 +77,13 @@ public:
 	//! material stiffness component
 	void ElementBiphasicMaterialStiffness(FESolidElement& el, matrix& ke);
 
-protected: // overridden from FEElasticDomain, but not implemented in this domain
-	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) {}
+public: // overridden from FEElasticDomain, but not all implemented in this domain
+    void BodyForce(FEGlobalVector& R, FEBodyForce& bf);
+    void ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe);
 	void InertialForces(FEGlobalVector& R, vector<double>& F) {}
 	void StiffnessMatrix(FESolver* psolver) {}
-	void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) {}
+    void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf);
+    void ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke);
 	void MassMatrix(FESolver* psolver, double scale) {}
 
 protected:

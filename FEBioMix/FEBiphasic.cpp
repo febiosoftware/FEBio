@@ -249,8 +249,21 @@ vec3d FEBiphasic::Flux(FEMaterialPoint& pt)
 	
 	// fluid flux w = -k*grad(p)
 	mat3ds kt = m_pPerm->Permeability(pt);
+    
+    vec3d w = -(kt*gradp);
+    
+    // body force contribution
+    int nbf = (int)m_bf.size();
+    if (nbf) {
+        vec3d b(0,0,0);
+        for (int i=0; i<nbf; ++i)
+            // negate b because body forces are defined with a negative sign in FEBio
+            b -= m_bf[i]->force(pt);
+        w += (kt*b)*m_rhoTw;
+    }
+    
 	
-	return -(kt*gradp);
+    return w;
 }
 
 //-----------------------------------------------------------------------------
