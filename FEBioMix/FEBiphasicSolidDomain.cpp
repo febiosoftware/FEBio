@@ -1442,7 +1442,7 @@ void FEBiphasicSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEl
     
     vec3d b, kpu;
     mat3ds Kb;
-    mat3d Kw, Kuu, Kpu;
+    mat3d Kw, Kuu;
     
     // loop over integration points
     int nint = el.GaussPoints();
@@ -1506,8 +1506,8 @@ void FEBiphasicSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEl
                 ke[ndof*i+2][ndof*j+1] -= Kuu(2,1);
                 ke[ndof*i+2][ndof*j+2] -= Kuu(2,2);
                 
-                Kpu = (Kw + H[j]*Kb)*K + (vdotTdotv(b, dKdE, G[j])).transpose();
-                kpu = (Kpu*G[i])*(rhoTw*detJ);
+                kpu = (vdotTdotv(G[i], dKdE, G[j])*b
+                       + (Kw + Kb*H[j])*K*G[i])*(rhoTw*detJ);
                 ke[ndof*i+3][ndof*j  ] += kpu.x;
                 ke[ndof*i+3][ndof*j+1] += kpu.y;
                 ke[ndof*i+3][ndof*j+2] += kpu.z;
