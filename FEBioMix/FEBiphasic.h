@@ -2,7 +2,7 @@
 #include "FEBioMech/FEElasticMaterial.h"
 #include "FEHydraulicPermeability.h"
 #include "FESolventSupply.h"
-#include "FEBiomech/FEBodyForce.h"
+#include "FEBioMech/FEBodyForce.h"
 
 //-----------------------------------------------------------------------------
 //! Biphasic material point class.
