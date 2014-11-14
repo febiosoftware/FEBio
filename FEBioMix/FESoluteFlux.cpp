@@ -327,7 +327,7 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 					lm[4*i  ] = elm[3*i];
 					lm[4*i+1] = elm[3*i+1];
 					lm[4*i+2] = elm[3*i+2];
-					lm[4*i+3] = elm[(11+m_isol)*neln+i];
+					lm[4*i+3] = elm[(11+m_isol-1)*neln+i];  // m_isol is 1-based
 				}
 					
 				// assemble element matrix in global stiffness matrix
@@ -377,7 +377,7 @@ void FESoluteFlux::Residual(FEGlobalVector& R)
 		// the LM vector in the right order for solute-solid elements.
 		vector<int> lm(ndof);
 		for (int i=0; i<neln; ++i)
-			lm[i] = elm[(11+m_isol)*neln+i];
+			lm[i] = elm[(11+m_isol-1)*neln+i];  // m_isol is 1-based
 			
 		// add element force vector to global force vector
 		R.Assemble(el.m_node, lm, fe);
