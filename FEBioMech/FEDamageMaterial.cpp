@@ -30,6 +30,11 @@ void FEDamageMaterial::Init()
     m_pBase->SetParent(this);
     m_pDamg->SetParent(this);
     m_pCrit->SetParent(this);
+    
+    // initialize materials
+    m_pBase->Init();
+    m_pDamg->Init();
+    m_pCrit->Init();
 }
 
 //-----------------------------------------------------------------------------
