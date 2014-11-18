@@ -36,8 +36,8 @@ bool SuperLU_MT_Solver::PreProcess()
 	int nnz = m_pA->NonZeroes();
 
 	// allocate storage for the permutation matrices
-	m_perm_c.create(N);
-	m_perm_r.create(N);
+	m_perm_c.resize(N);
+	m_perm_r.resize(N);
 
 	// set solver options
     m_ops.nprocs			= 1;			// nr. of threads that will be created
@@ -51,13 +51,13 @@ bool SuperLU_MT_Solver::PreProcess()
 	m_ops.SymmetricMode		= YES;			// is the matrix symmetric or not
     m_ops.drop_tol			= 0;			// drop tolerance (apparently not yet implemented)
 	m_ops.PrintStat			= NO;			// print solver statistics or not
-    m_ops.perm_c			= m_perm_c;
-    m_ops.perm_r			= m_perm_r;
+    m_ops.perm_c			= &m_perm_c[0];
+    m_ops.perm_r			= &m_perm_r[0];
     m_ops.work				= 0;
     m_ops.lwork				= 0;
 
 	// create the SuperMatrix m_A
-    dCreate_CompCol_Matrix(&m_A, N, N, nnz, m_pA->values(), m_pA->indices(), m_pA->pointers(), SLU_NC, SLU_D, SLU_GE);
+    dCreate_CompCol_Matrix(&m_A, N, N, nnz, m_pA->Values(), m_pA->Indices(), m_pA->Pointers(), SLU_NC, SLU_D, SLU_GE);
 
 	// create the dense matrices B and X
 	// note that we don't provide any data yet
@@ -99,8 +99,8 @@ bool SuperLU_MT_Solver::Factor()
 		m_ops.nprocs,			// (in) nr of threads
 		&m_ops,					// (in) solver options
 		&m_A,					// (in/out) sparse matrix to factor
-		m_perm_c,				// (in/out) column permutation vector
-		m_perm_r,				// (in/out) row permutation vector
+		&m_perm_c[0],				// (in/out) column permutation vector
+		&m_perm_r[0],				// (in/out) row permutation vector
 		&equed,					// (in/out) speicify the form of equilibrium that was done
 		NULL,					// (in/out) row scale factors
 		NULL,					// (in/out) column scale factors
@@ -134,12 +134,12 @@ bool SuperLU_MT_Solver::BackSolve(vector<double> &x, vector<double> &b)
 
 	// set the data in the B matrix
 	DNformat *Bstore = (DNformat*) m_B.Store;
-	Bstore->nzval = b;
+	Bstore->nzval = &b[0];
 	m_B.ncol = 1;
 
 	// set the data in the X matrix
 	DNformat *Xstore = (DNformat*) m_X.Store;
-	Xstore->nzval = x;
+	Xstore->nzval = &x[0];
 	m_X.ncol = 1;
 
 	// solve the system
@@ -148,8 +148,8 @@ bool SuperLU_MT_Solver::BackSolve(vector<double> &x, vector<double> &b)
 		m_ops.nprocs,			// (in) nr of threads
 		&m_ops,					// (in) solver options
 		&m_A,					// (in/out) sparse matrix to factor
-		m_perm_c,				// (in/out) column permutation vector
-		m_perm_r,				// (in/out) row permutation vector
+		&m_perm_c[0],				// (in/out) column permutation vector
+		&m_perm_r[0],				// (in/out) row permutation vector
 		&equed,					// (in/out) speicify the form of equilibrium that was done
 		NULL,					// (in/out) row scale factors
 		NULL,					// (in/out) column scale factors

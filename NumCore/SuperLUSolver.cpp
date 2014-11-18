@@ -65,6 +65,9 @@ double SuperLUSolver::norm(SparseMatrix& K)
 	double n = 0, nc;
 	int l;
 
+	// get a reference to the correct matrix type
+	CompactUnSymmMatrix& A = dynamic_cast<CompactUnSymmMatrix&> (K);
+
 	int* ptr = m_pA->Pointers();
 	double* pval = m_pA->Values(), *pv;
 
