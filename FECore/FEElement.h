@@ -54,7 +54,7 @@ private:
 class FEElement
 {
 public:
-	enum {MAX_NODES     = 20};	// max nr of nodes
+	enum {MAX_NODES     = 27};	// max nr of nodes
 	enum {MAX_INTPOINTS = 27};	// max nr of integration points
 
 public:

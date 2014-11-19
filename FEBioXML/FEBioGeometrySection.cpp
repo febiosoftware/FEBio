@@ -95,6 +95,7 @@ FE_Element_Shape FEBioGeometrySection::ElementShape(XMLTag& t)
 {
 	if      (t=="hex8"  ) return ET_HEX8;
 	else if (t=="hex20" ) return ET_HEX20;
+	else if (t=="hex27" ) return ET_HEX27;
 	else if (t=="penta6") return ET_PENTA6;
 	else if (t=="tet4"  ) return ET_TET4;
 	else if (t=="tet10" ) return ET_TET10;
@@ -252,6 +253,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		int etype = -1;
 		if      (tag == "hex8"  ) etype = ET_HEX8;
 		else if (tag == "hex20" ) etype = ET_HEX20;
+		else if (tag == "hex27" ) etype = ET_HEX27;
 		else if (tag == "penta6") etype = ET_PENTA6;
 		else if (tag == "tet4"  ) etype = m_pim->m_ntet4;
 		else if (tag == "tet10" ) etype = ET_TET10;
@@ -273,6 +275,12 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 			{
 				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), FE_HEX20G27, nid, nmat);
+			}
+			break;
+		case ET_HEX27:
+			{
+				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+				ReadSolidElement(tag, bd.Element(ne), FE_HEX27G27, nid, nmat);
 			}
 			break;
 		case ET_PENTA6:
@@ -359,6 +367,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	const char* sztype = tag.AttributeValue("type");
 	if      (strcmp(sztype, "hex8"  ) == 0) etype = ET_HEX8;
 	else if (strcmp(sztype, "hex20" ) == 0) etype = ET_HEX20;
+	else if (strcmp(sztype, "hex27" ) == 0) etype = ET_HEX27;
 	else if (strcmp(sztype, "penta6") == 0) etype = ET_PENTA6;
 	else if (strcmp(sztype, "tet4"  ) == 0) etype = ET_TET4;
 	else if (strcmp(sztype, "tet10" ) == 0) etype = ET_TET10;
@@ -438,6 +447,12 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 			{
 				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(i), FE_HEX20G27, nid, nmat);
+			}
+			break;
+		case ET_HEX27:
+			{
+				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+				ReadSolidElement(tag, bd.Element(i), FE_HEX27G27, nid, nmat);
 			}
 			break;
 		case ET_QUAD4:
@@ -558,6 +573,7 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 		int etype = -1;
 		if      (tag == "hex8"  ) etype = ET_HEX8;
 		else if (tag == "hex20" ) etype = ET_HEX20;
+		else if (tag == "hex27" ) etype = ET_HEX27;
 		else if (tag == "penta6") etype = ET_PENTA6;
 		else if (tag == "tet4"  ) etype = m_pim->m_ntet4;
 		else if (tag == "tet10" ) etype = ET_TET10;
@@ -579,6 +595,12 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 			{
 				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), FE_HEX20G27, nid, 0);
+			}
+			break;
+		case ET_HEX27:
+			{
+				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+				ReadSolidElement(tag, bd.Element(ne), FE_HEX27G27, nid, 0);
 			}
 			break;
 		case ET_PENTA6:
@@ -645,6 +667,7 @@ void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
 	FE_Element_Shape etype;
 	if      (strcmp(szel, "hex8"  ) == 0) etype = ET_HEX8;
 	else if (strcmp(szel, "hex20" ) == 0) etype = ET_HEX20;
+	else if (strcmp(szel, "hex27" ) == 0) etype = ET_HEX27;
 	else if (strcmp(szel, "penta6") == 0) etype = ET_PENTA6;
 	else if (strcmp(szel, "tet4"  ) == 0) etype = ET_TET4;
 	else if (strcmp(szel, "quad4" ) == 0) etype = ET_QUAD4;
@@ -935,6 +958,10 @@ void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 	// get the name attribute
 	const char* szname = tag.AttributeValue("name");
 
+	// create a new node set
+	FENodeSet* pns = new FENodeSet(&mesh);
+	pns->SetName(szname);
+
 	// NOTE: The initial specs of the 2.0 format defined the nodes as a value list.
 	// This was later revised to promote more consistency between the node set definitions
 	// and other features (e.g. fixed BC's) that define node sets. However, for now
@@ -968,10 +995,6 @@ void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 	// only add non-empty node sets
 	if (l.empty() == false)
 	{
-		// create a new node set
-		FENodeSet* pns = new FENodeSet(&mesh);
-		pns->SetName(szname);
-
 		// assign indices to node set
 		int N = l.size();
 		pns->create(N);
@@ -980,6 +1003,7 @@ void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 		// add the nodeset to the mesh
 		mesh.AddNodeSet(pns);
 	}
+	else delete pns;
 }
 
 //-----------------------------------------------------------------------------

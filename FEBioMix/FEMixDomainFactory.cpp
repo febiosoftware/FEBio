@@ -16,25 +16,25 @@ int FEMixDomainFactory::GetDomainType(const FE_Element_Spec& spec, FEMaterial* p
 	if (dynamic_cast<FEBiphasic*>(pmat))
 	{
 		// biphasic elements
-		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20)) return FE_BIPHASIC_DOMAIN;
+		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) return FE_BIPHASIC_DOMAIN;
 		else return 0;
 	}
 	if (dynamic_cast<FEBiphasicSolute*>(pmat))
 	{
 		// biphasic elements
-		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20)) return FE_BIPHASIC_SOLUTE_DOMAIN;
+		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) return FE_BIPHASIC_SOLUTE_DOMAIN;
 		else return 0;
 	}
 	else if (dynamic_cast<FETriphasic*>(pmat))
 	{
 		// triphasic elements
-		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20)) return FE_TRIPHASIC_DOMAIN;
+		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) return FE_TRIPHASIC_DOMAIN;
 		else return 0;
 	}
 	if (dynamic_cast<FEMultiphasic*>(pmat))
 	{
 		// multiphasic elements
-		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20)) return FE_MULTIPHASIC_DOMAIN;
+		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) return FE_MULTIPHASIC_DOMAIN;
 		else return 0;
 	}
 	return 0;

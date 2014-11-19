@@ -445,6 +445,46 @@ public:
 };
 
 //=============================================================================
+//
+//   FEHex27
+//   
+//=============================================================================
+
+
+//=============================================================================
+//! Base class for 27-node quadratic hexahedral element
+class FEHex27_ : public FESolidElementTraits
+{
+public:
+	enum { NELN = 27 };
+
+public:
+	FEHex27_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, et){}
+
+	//! values of shape functions
+	void shape_fnc(double* H, double r, double s, double t);
+
+	//! values of shape function derivatives
+	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
+
+	//! values of shape function second derivatives
+	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
+};
+
+//=============================================================================
+// 27-node hexahedral element using a 3x3x3 Gaussian integration rule
+class FEHex27G27 : public FEHex27_
+{
+public:
+	enum { NINT = 27 };
+
+public:
+	FEHex27G27();
+
+	void project_to_nodes(double* ai, double* ao);
+};
+
+//=============================================================================
 //    S U R F A C E   E L E M E N T S
 //
 // This section defines a set of surface element formulations for use in 3D

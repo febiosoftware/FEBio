@@ -714,7 +714,8 @@ int FEMesh::Faces(FEElement& el)
 	case FE_HEX8G8:
 	case FE_HEX8RI:
 	case FE_HEX8G1:
-	case FE_HEX20G27: return 6;
+	case FE_HEX20G27: 
+	case FE_HEX27G27: return 6;
 	case FE_PENTA6G6: return 5;
 	case FE_TET4G4:
 	case FE_TET10G4:

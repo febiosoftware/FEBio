@@ -24,6 +24,7 @@ enum FE_Element_Class {
 enum FE_Element_Shape {
 	ET_HEX8,
 	ET_HEX20,
+	ET_HEX27,
 	ET_PENTA6,
 	ET_TET4,
 	ET_TET10,
@@ -53,6 +54,7 @@ enum FE_Element_Type {
 	FE_TET10GL11,
 	FE_TET15G8,
 	FE_HEX20G27,
+	FE_HEX27G27,
 
 	// 2.5D surface elements
 	FE_QUAD4G4,

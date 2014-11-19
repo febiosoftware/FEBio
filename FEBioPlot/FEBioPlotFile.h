@@ -31,7 +31,7 @@ public:
 	enum { PLT_VERSION = 0x0004 };
 
 	// max nodes per facet
-	enum { PLT_MAX_FACET_NODES = 8 };
+	enum { PLT_MAX_FACET_NODES = 9 };
 
 	// file tags
 	enum { 
@@ -98,7 +98,18 @@ public:
 	};
 
 	// --- element types ---
-	enum Elem_Type { PLT_ELEM_HEX, PLT_ELEM_PENTA, PLT_ELEM_TET, PLT_ELEM_QUAD, PLT_ELEM_TRI, PLT_ELEM_TRUSS, PLT_ELEM_HEX20, PLT_ELEM_TET10, PLT_ELEM_TET15 };
+	enum Elem_Type { 
+		PLT_ELEM_HEX, 
+		PLT_ELEM_PENTA, 
+		PLT_ELEM_TET, 
+		PLT_ELEM_QUAD, 
+		PLT_ELEM_TRI, 
+		PLT_ELEM_TRUSS, 
+		PLT_ELEM_HEX20, 
+		PLT_ELEM_TET10, 
+		PLT_ELEM_TET15, 
+		PLT_ELEM_HEX27 
+	};
 
 	// size of name variables
 	enum { STR_SIZE = 64 };
