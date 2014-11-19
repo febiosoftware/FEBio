@@ -1185,13 +1185,6 @@ bool FESolidSolver::Quasin(double time)
 		}
 		m_SolverTime.stop();
 
-		// check for nans
-		if (m_fem.GetDebugFlag())
-		{
-			double du = m_bfgs.m_ui*m_bfgs.m_ui;
-			if (ISNAN(du)) throw NANDetected();
-		}
-
 		// set initial convergence norms
 		if (m_niter == 0)
 		{
@@ -1215,15 +1208,18 @@ bool FESolidSolver::Quasin(double time)
 			Residual(m_bfgs.m_R1);
 		}
 
-		// update total displacements
-		int neq = m_Ui.size();
-		for (i=0; i<neq; ++i) m_Ui[i] += s*m_bfgs.m_ui[i];
-
 		// calculate norms
 		normR1 = m_bfgs.m_R1*m_bfgs.m_R1;
 		normu  = (m_bfgs.m_ui*m_bfgs.m_ui)*(s*s);
-		normU  = m_Ui*m_Ui;
 		normE1 = s*fabs(m_bfgs.m_ui*m_bfgs.m_R1);
+
+		// check for nans
+		if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
+
+		// update total displacements
+		int neq = m_Ui.size();
+		for (i=0; i<neq; ++i) m_Ui[i] += s*m_bfgs.m_ui[i];
+		normU  = m_Ui*m_Ui;
 
 		// check residual norm
 		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	

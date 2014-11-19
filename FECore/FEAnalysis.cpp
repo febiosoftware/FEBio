@@ -271,8 +271,7 @@ bool FEAnalysis::Solve()
 		catch (NANDetected)
 		{
 			bconv = false;
-			felog.printbox("FATAL ERROR", "NAN Detected. Run aborted.");
-			break;
+			felog.printbox("ERROR", "NAN Detected.");
 		}
 		catch (MemException e)
 		{
