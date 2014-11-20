@@ -1044,6 +1044,7 @@ void FEBioGeometrySection::ParseSurfaceSection(XMLTag& tag)
 		else if (tag == "tri6" ) face.ntype = 6;
 		else if (tag == "tri7" ) face.ntype = 7;
 		else if (tag == "quad8") face.ntype = 8;
+		else if (tag == "quad9") face.ntype = 9;
 		else throw XMLReader::InvalidTag(tag);
 
 		// we assume that the facet type also defines the number of nodes
