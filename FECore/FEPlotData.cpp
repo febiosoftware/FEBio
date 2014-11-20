@@ -102,7 +102,7 @@ void FESurfaceData::Save(FEModel &fem, Archive& ar)
 
 		// Determine data size.
 		// Note that for the FMT_MULT case we are 
-		// assuming 8 data entries per facet
+		// assuming 9 data entries per facet
 		// regardless of the nr of nodes a facet really has
 		// this is because for surfaces, all elements are not
 		// necessarily of the same type
@@ -112,7 +112,7 @@ void FESurfaceData::Save(FEModel &fem, Archive& ar)
 		{
 		case FMT_NODE: nsize *= S.Nodes(); break;
 		case FMT_ITEM: nsize *= S.Elements(); break;
-		case FMT_MULT: nsize *= 8*S.Elements(); break;
+		case FMT_MULT: nsize *= 9*S.Elements(); break;
 		default:
 			assert(false);
 		}
