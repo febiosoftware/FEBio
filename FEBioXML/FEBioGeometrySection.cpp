@@ -255,7 +255,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		else if (tag == "hex20" ) etype = ET_HEX20;
 		else if (tag == "hex27" ) etype = ET_HEX27;
 		else if (tag == "penta6") etype = ET_PENTA6;
-		else if (tag == "tet4"  ) etype = m_pim->m_ntet4;
+		else if (tag == "tet4"  ) etype = ET_TET4;
 		else if (tag == "tet10" ) etype = ET_TET10;
 		else if (tag == "tet15" ) etype = ET_TET15;
 		else if (tag == "quad4" ) etype = ET_QUAD4;
