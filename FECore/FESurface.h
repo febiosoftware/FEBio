@@ -83,6 +83,9 @@ public:
 	//! helper function for intersection with 8-node quads
 	bool IntersectQuad8(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
 
+	//! helper function for intersection with 9-node quads
+	bool IntersectQuad9(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
+
 public:
 	//! calculate the surface area of a surface element
 	double FaceArea(FESurfaceElement& el);

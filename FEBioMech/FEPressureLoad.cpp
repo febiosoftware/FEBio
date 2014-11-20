@@ -6,7 +6,7 @@
 FEPressureLoad::LOAD::LOAD()
 { 
 	lc = -1;
-	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = 1.0;
+	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,6 +57,7 @@ bool FEPressureLoad::SetFacetAttribute(int nface, const char* szatt, const char*
 		double s = atof(szval);
 		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
 		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
+		pc.s[8] = s;
 	}
 	else return false;
 
@@ -261,7 +262,7 @@ void FEPressureLoad::Serialize(DumpFile& ar)
 			LOAD& pc = m_PC[i];
 			ar << pc.lc;
 			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
-			ar << pc.s[4] << pc.s[5] << pc.s[6] << pc.s[7];
+			ar << pc.s[4] << pc.s[5] << pc.s[6] << pc.s[7] << pc.s[8];
 		}
 	}
 	else
@@ -275,7 +276,7 @@ void FEPressureLoad::Serialize(DumpFile& ar)
 			LOAD& pc = m_PC[i];
 			ar >> pc.lc;
 			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
-			ar >> pc.s[4] >> pc.s[5] >> pc.s[6] >> pc.s[7];
+			ar >> pc.s[4] >> pc.s[5] >> pc.s[6] >> pc.s[7] >> pc.s[8];
 		}
 	}
 }

@@ -301,7 +301,7 @@ public:
 	double ElementVolume(FEElement& el);
 
 	//! Get the face nodes from a given element
-	int GetFace(FEElement& el, int n, int nf[8]);
+	int GetFace(FEElement& el, int n, int* nf);
 
 	//! return the nr of faces an element has
 	int Faces(FEElement& el);

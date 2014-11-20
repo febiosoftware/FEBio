@@ -11,7 +11,7 @@ public:
 	struct LOAD
 	{
 		LOAD();
-		vec3d	s[8];		// nodal scale factors
+		vec3d	s[9];		// nodal scale factors
 		int		lc;			// load curve
 	};
 

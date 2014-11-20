@@ -50,7 +50,7 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 	FEMesh& m = fem.GetMesh();
 	int NN = m.Nodes();
 
-	int N, nf[8];
+	int N, nf[9];
 
 	// count nr of faces
 	int faces = tag.children();
@@ -79,6 +79,7 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 			else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
 			else if (tag == "tri7" ) el.SetType(m_pim->m_ntri7);
 			else if (tag == "quad8") el.SetType(FE_QUAD8G9);
+			else if (tag == "quad9") el.SetType(FE_QUAD9G9);
 			else throw XMLReader::InvalidTag(tag);
 		}
 
@@ -100,7 +101,7 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 			FEElement* pe = m.FindElementFromID(nf[0]);
 			if (pe)
 			{
-				int ne[8];
+				int ne[9];
 				int nn = m.GetFace(*pe, nf[1]-1, ne);
 				if (nn != N) throw XMLReader::InvalidValue(tag);
 				for (int j=0; j<N; ++j) el.m_node[j] = ne[j];

@@ -6,7 +6,7 @@
 FETractionLoad::LOAD::LOAD()
 {
 	lc = -1;
-	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = vec3d(0,0,0);
+	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = vec3d(0,0,0);
 }
 
 //=============================================================================
@@ -32,7 +32,7 @@ void FETractionLoad::Create(int n)
 	// TODO: This assumes the traction vector was read in before the surface
 	for (int i=0; i<n; i++)
 	{
-		for (int j=0; j<8; ++j) m_TC[i].s[j] = m_traction;
+		for (int j=0; j<9; ++j) m_TC[i].s[j] = m_traction;
 	}
 }
 
@@ -128,7 +128,7 @@ void FETractionLoad::Serialize(DumpFile& ar)
 			LOAD& d = m_TC[i];
 			ar << d.lc;
 			ar << d.s[0] << d.s[1] << d.s[2] << d.s[3];
-			ar << d.s[4] << d.s[5] << d.s[6] << d.s[7];
+			ar << d.s[4] << d.s[5] << d.s[6] << d.s[7] << d.s[8];
 		}
 	}
 	else
@@ -141,7 +141,7 @@ void FETractionLoad::Serialize(DumpFile& ar)
 			LOAD& d = m_TC[i];
 			ar >> d.lc;
 			ar >> d.s[0] >> d.s[1] >> d.s[2] >> d.s[3];
-			ar >> d.s[4] >> d.s[5] >> d.s[6] >> d.s[7];
+			ar >> d.s[4] >> d.s[5] >> d.s[6] >> d.s[7] >> d.s[8];
 		}
 	}
 }
@@ -158,18 +158,21 @@ bool FETractionLoad::SetFacetAttribute(int nface, const char* szatt, const char*
 		double tx = atof(szval);
 		tc.s[0].x = tc.s[1].x = tc.s[2].x = tc.s[3].x = tx;
 		tc.s[4].x = tc.s[5].x = tc.s[6].x = tc.s[7].x = tx;
+		tc.s[8].x = tx;
 	}
 	else if (strcmp(szatt, "ty") == 0)
 	{
 		double ty = atof(szval);
 		tc.s[0].y = tc.s[1].y = tc.s[2].y = tc.s[3].y = ty;
 		tc.s[4].y = tc.s[5].y = tc.s[6].y = tc.s[7].y = ty;
+		tc.s[8].y = ty;
 	}
 	else if (strcmp(szatt, "tz") == 0)
 	{
 		double tz = atof(szval);
 		tc.s[0].z = tc.s[1].z = tc.s[2].z = tc.s[3].z = tz;
 		tc.s[4].z = tc.s[5].z = tc.s[6].z = tc.s[7].z = tz;
+		tc.s[8].z = tz;
 	}
 	else return false;
 

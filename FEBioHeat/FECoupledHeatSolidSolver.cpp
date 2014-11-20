@@ -81,7 +81,7 @@ void FECoupledHeatSolidSolver::CalculateInitialStresses()
 
 	const double alpha = 1.0;
 
-	double tn[8], tj;
+	double tn[9], tj;
 
 	FEMesh& mesh = *ds.GetMesh();
 

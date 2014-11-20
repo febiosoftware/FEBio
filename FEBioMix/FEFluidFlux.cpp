@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 FEFluidFlux::LOAD::LOAD()
 { 
-	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = 1.0; 
+	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = 1.0; 
 	lc = -1; 
 }
 
@@ -62,6 +62,7 @@ bool FEFluidFlux::SetFacetAttribute(int nface, const char* szatt, const char* sz
 		double s = atof(szval);
 		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
 		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
+		pc.s[8] = s;
 	}
 	else return false;
 
@@ -493,7 +494,7 @@ void FEFluidFlux::Serialize(DumpFile& ar)
 			LOAD& fc = m_PC[i];
 			ar << fc.lc;
 			ar << fc.s[0] << fc.s[1] << fc.s[2] << fc.s[3];
-			ar << fc.s[4] << fc.s[5] << fc.s[6] << fc.s[7];
+			ar << fc.s[4] << fc.s[5] << fc.s[6] << fc.s[7] << fc.s[8];
 		}
 	}
 	else
@@ -507,7 +508,7 @@ void FEFluidFlux::Serialize(DumpFile& ar)
 			LOAD& fc = m_PC[i];
 			ar >> fc.lc;
 			ar >> fc.s[0] >> fc.s[1] >> fc.s[2] >> fc.s[3];
-			ar >> fc.s[4] >> fc.s[5] >> fc.s[6] >> fc.s[7];
+			ar >> fc.s[4] >> fc.s[5] >> fc.s[6] >> fc.s[7] >> fc.s[8];
 		}
 	}
 }

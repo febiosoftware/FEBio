@@ -1837,6 +1837,114 @@ void FEQuad8G9::project_to_nodes(double* ai, double* ao)
 	}
 }
 
+
+//=============================================================================
+//          F E Q U A D 9 
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+// shape function at (r,s)
+void FEQuad9_::shape(double* H, double r, double s)
+{
+	double R[3] = {0.5*r*(r-1.0), 0.5*r*(r+1.0), 1.0 - r*r};
+	double S[3] = {0.5*s*(s-1.0), 0.5*s*(s+1.0), 1.0 - s*s};
+
+	H[0] = R[0]*S[0];
+	H[1] = R[1]*S[0];
+	H[2] = R[1]*S[1];
+	H[3] = R[0]*S[1];
+	H[4] = R[2]*S[0];
+	H[5] = R[1]*S[2];
+	H[6] = R[2]*S[1];
+	H[7] = R[0]*S[2];
+	H[8] = R[2]*S[2];
+}
+
+//-----------------------------------------------------------------------------
+// shape function derivatives at (r,s)
+void FEQuad9_::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	double R[3] = {0.5*r*(r-1.0), 0.5*r*(r+1.0), 1.0 - r*r};
+	double S[3] = {0.5*s*(s-1.0), 0.5*s*(s+1.0), 1.0 - s*s};
+	double DR[3] = {r-0.5, r+0.5, -2.0*r};
+	double DS[3] = {s-0.5, s+0.5, -2.0*s};
+
+	Hr[0] = DR[0]*S[0];
+	Hr[1] = DR[1]*S[0];
+	Hr[2] = DR[1]*S[1];
+	Hr[3] = DR[0]*S[1];
+	Hr[4] = DR[2]*S[0];
+	Hr[5] = DR[1]*S[2];
+	Hr[6] = DR[2]*S[1];
+	Hr[7] = DR[0]*S[2];
+	Hr[8] = DR[2]*S[2];
+
+	Hs[0] = R[0]*DS[0];
+	Hs[1] = R[1]*DS[0];
+	Hs[2] = R[1]*DS[1];
+	Hs[3] = R[0]*DS[1];
+	Hs[4] = R[2]*DS[0];
+	Hs[5] = R[1]*DS[2];
+	Hs[6] = R[2]*DS[1];
+	Hs[7] = R[0]*DS[2];
+	Hs[8] = R[2]*DS[2];
+}
+
+//-----------------------------------------------------------------------------
+//! shape function derivatives at (r,s)
+//! \todo implement this
+void FEQuad9_::shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s)
+{
+	
+}
+
+//=============================================================================
+//       F E Q U A D 9 G 9
+//=============================================================================
+
+FEQuad9G9::FEQuad9G9() : FEQuad9_(NINT, FE_QUAD9G9)
+{
+	// integration point coordinates
+	const double a = sqrt(0.6);
+	const double w1 = 25.0/81.0;
+	const double w2 = 40.0/81.0;
+	const double w3 = 64.0/81.0;
+	gr[ 0] = -a; gs[ 0] = -a;  gw[ 0] = w1;
+	gr[ 1] =  0; gs[ 1] = -a;  gw[ 1] = w2;
+	gr[ 2] =  a; gs[ 2] = -a;  gw[ 2] = w1;
+	gr[ 3] = -a; gs[ 3] =  0;  gw[ 3] = w2;
+	gr[ 4] =  0; gs[ 4] =  0;  gw[ 4] = w3;
+	gr[ 5] =  a; gs[ 5] =  0;  gw[ 5] = w2;
+	gr[ 6] = -a; gs[ 6] =  a;  gw[ 6] = w1;
+	gr[ 7] =  0; gs[ 7] =  a;  gw[ 7] = w2;
+	gr[ 8] =  a; gs[ 8] =  a;  gw[ 8] = w1;
+	init();
+
+	// we need Ai to project integration point data to the nodes
+	matrix A(NELN,NELN);
+	Ai.resize(NELN,NELN);
+	A = H.transpose()*H;
+	Ai = A.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! \todo implement this
+void FEQuad9G9::project_to_nodes(double* ai, double* ao)
+{
+	vector<double> b(NELN);
+	for (int i=0; i<NELN; ++i) 
+	{
+		b[i] = 0;
+		for (int j=0; j<NINT; ++j) b[i] += H[j][i]*ai[j];
+	}
+
+	for (int i=0; i<NELN; ++i) 
+	{
+		ao[i] = 0;
+		for (int j=0; j<NELN; ++j) ao[i] += Ai[i][j]*b[j];
+	}
+}
+
 //=============================================================================
 //
 //                      S H E L L   E L E M E N T S

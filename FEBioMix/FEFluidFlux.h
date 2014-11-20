@@ -10,7 +10,7 @@ public:
 	struct LOAD
 	{
 		LOAD();
-		double	s[8];		// nodal scale factors
+		double	s[9];		// nodal scale factors
 		int		lc;			// load curve
 	};
 

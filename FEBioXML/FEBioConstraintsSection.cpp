@@ -427,7 +427,7 @@ bool FEBioConstraintsSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int
 	int NN = m.Nodes();
 
 	// count nr of faces
-	int faces = 0, N, nf[8];
+	int faces = 0, N, nf[9];
 	XMLTag t(tag); ++t;
 	while (!t.isend()) { faces++; ++t; }
 
@@ -455,6 +455,7 @@ bool FEBioConstraintsSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int
 			else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
 			else if (tag == "tri7" ) el.SetType(m_pim->m_ntri7);
 			else if (tag == "quad8") el.SetType(FE_QUAD8G9);
+			else if (tag == "quad9") el.SetType(FE_QUAD9G9);
 			else throw XMLReader::InvalidTag(tag);
 		}
 
@@ -476,7 +477,7 @@ bool FEBioConstraintsSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int
 			FEElement* pe = m.FindElementFromID(nf[0]);
 			if (pe)
 			{
-				int ne[8];
+				int ne[9];
 				int nn = m.GetFace(*pe, nf[1]-1, ne);
 				if (nn != N) throw XMLReader::InvalidValue(tag);
 				for (int j=0; j<N; ++j) el.m_node[j] = ne[j];

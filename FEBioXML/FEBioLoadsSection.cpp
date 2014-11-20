@@ -310,6 +310,7 @@ void FEBioLoadsSection::ParseSurfaceLoad(XMLTag& tag)
 		else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
 		else if (tag == "tri7" ) el.SetType(m_pim->m_ntri7);
 		else if (tag == "quad8") el.SetType(FE_QUAD8G9);
+		else if (tag == "quad9") el.SetType(FE_QUAD9G9);
 		else throw XMLReader::InvalidTag(tag);
 
 		N = el.Nodes();
@@ -409,6 +410,7 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 						else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
 						else if (tag == "tri7" ) el.SetType(m_pim->m_ntri7);
 						else if (tag == "quad8") el.SetType(FE_QUAD8G9);
+						else if (tag == "quad9") el.SetType(FE_QUAD9G9);
 						else throw XMLReader::InvalidTag(tag);
 
 						N = el.Nodes();
@@ -460,6 +462,7 @@ bool FEBioLoadsSection::BuildSurface(FESurface& s, FEFacetSet& fs)
 		else if (fi.ntype == 6) el.SetType(m_pim->m_ntri6);
 		else if (fi.ntype == 7) el.SetType(m_pim->m_ntri7);
 		else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
+		else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
 		else return false;
 
 		int N = el.Nodes(); assert(N == fi.ntype);

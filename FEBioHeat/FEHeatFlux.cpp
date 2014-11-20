@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 FEHeatFlux::LOAD::LOAD()
 { 
-	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = 1.0; 
+	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = 1.0; 
 	lc = -1; 
 }
 
@@ -118,6 +118,7 @@ bool FEHeatFlux::SetFacetAttribute(int nface, const char* szatt, const char* szv
 		double s = atof(szval);
 		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
 		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
+		pc.s[8] = s;
 	}
 	else return false;
 
@@ -137,7 +138,7 @@ void FEHeatFlux::Serialize(DumpFile &ar)
 			LOAD& d = m_FC[i];
 			ar << d.lc;
 			ar << d.s[0] << d.s[1] << d.s[2] << d.s[3];
-			ar << d.s[4] << d.s[5] << d.s[6] << d.s[7];
+			ar << d.s[4] << d.s[5] << d.s[6] << d.s[7] << d.s[8];
 		}
 	}
 	else
@@ -150,7 +151,7 @@ void FEHeatFlux::Serialize(DumpFile &ar)
 			LOAD& d = m_FC[i];
 			ar >> d.lc;
 			ar >> d.s[0] >> d.s[1] >> d.s[2] >> d.s[3];
-			ar >> d.s[4] >> d.s[5] >> d.s[6] >> d.s[7];
+			ar >> d.s[4] >> d.s[5] >> d.s[6] >> d.s[7] >> d.s[8];
 		}
 	}
 }

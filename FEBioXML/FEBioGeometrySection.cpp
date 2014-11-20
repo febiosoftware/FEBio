@@ -771,7 +771,7 @@ void FEBioGeometrySection::ReadShellElement(XMLTag &tag, FEShellElement& el, int
 {
 	el.SetType(ntype);
 	el.m_nID = nid;
-	int n[8];
+	int n[9];
 	tag.value(n,el.Nodes());
 	for (int j=0; j<el.Nodes(); ++j) { el.m_node[j] = n[j]-1; el.m_h0[j] = 0.0; }
 	el.SetMatID(nmat);

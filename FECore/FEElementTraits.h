@@ -860,6 +860,51 @@ private:
 };
 
 //=============================================================================
+//
+//   FEQuad9
+//   
+//=============================================================================
+
+//=============================================================================
+//! Base class for 9-node quadratic quadrilaterals
+//
+class FEQuad9_ : public FESurfaceElementTraits
+{
+public:
+	enum { NELN = 9 };
+
+public:
+	FEQuad9_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, et) {}
+
+	// shape function at (r,s)
+	void shape(double* H, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv(double* Gr, double* Gs, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+};
+
+//=============================================================================
+//! class implementing 9-node quad quadrilateral with 9 integration points
+//
+class FEQuad9G9 : public FEQuad9_
+{
+public:
+	enum { NINT = 9 };
+
+	// constructor
+	FEQuad9G9();
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix	Ai;
+};
+
+//=============================================================================
 //     S H E L L   E L E M E N T S
 //
 // This section defines several shell formulations for use in 3D finite element
