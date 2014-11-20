@@ -18,6 +18,7 @@ BEGIN_PARAMETER_LIST(FETiedInterface, FEContactInterface)
 	ADD_PARAMETER(m_naugmin, FE_PARAM_INT   , "minaug"          );
 	ADD_PARAMETER(m_naugmax, FE_PARAM_INT   , "maxaug"          );
 	ADD_PARAMETER(m_stol   , FE_PARAM_DOUBLE, "search_tolerance");
+	ADD_PARAMETER(m_boffset, FE_PARAM_BOOL  , "offset_shells"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -37,6 +38,7 @@ FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&
 	m_stol = 0.0001;
 	m_naugmin = 0;
 	m_naugmax = 10;
+	m_boffset = false;
 
 	// give this interface an ID (TODO: where is this actually used?)
 	m_nID = count++;
@@ -48,6 +50,9 @@ FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&
 //! 
 bool FETiedInterface::Init()
 {
+	// set surface options
+	ss.SetShellOffset(m_boffset);
+
 	// create the surfaces
 	if (ss.Init() == false) return false;
 	if (ms.Init() == false) return false;
@@ -147,8 +152,12 @@ void FETiedInterface::Update(int niter)
 			// calculate the slave node projection
 			vec3d q = pme->eval(y, r, s);
 
+			// calculate the master normal
+			vec3d nu = ss.SurfaceNormal(*pme, r, s);
+
 			// calculate the gap function
-			ss.m_gap[i] = rt - q;
+			// (taking possible offset into account)
+			ss.m_gap[i] = (rt - q) - nu*ss.m_off[i];
 		}
 	}
 }
@@ -183,13 +192,16 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 			ss.m_rs[i][0] = rs[0];
 			ss.m_rs[i][1] = rs[1];
 
+			// calculate the master normal
+			vec3d nu = ss.SurfaceNormal(*pme, rs[0], rs[1]);
+
 			// calculate gap
-			ss.m_gap[i] = x - q;
+			ss.m_gap[i] = (x - q) - nu*ss.m_off[i];
 
 			// move the node if necessary
 			if (bmove && (ss.m_gap[i].norm()>0))
 			{
-				node.m_r0 = node.m_rt = q;
+				node.m_r0 = node.m_rt = q + nu*ss.m_off[i];
 				ss.m_gap[i] = vec3d(0,0,0);
 			}
 		}

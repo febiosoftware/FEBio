@@ -12,7 +12,7 @@ class FETiedContactSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FETiedContactSurface(FEMesh* pm=0) : FEContactSurface(pm) {}
+	FETiedContactSurface(FEMesh* pm=0) : FEContactSurface(pm) { m_boffset = false; }
 
 	//! Initializes data structures
 	bool Init();
@@ -22,6 +22,9 @@ public:
 
 	//! data serialization
 	void Serialize(DumpFile& ar);
+
+	//! offset shell surfaces (must be called before Init())
+	void SetShellOffset(bool b) { m_boffset = b; }
 
 public:
 	void GetNodalContactGap     (int nface, double* gn);
@@ -33,4 +36,8 @@ public:
 	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
 	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
 	vector<vec3d>				m_Lm;	//!< Lagrange multipliers
+	vector<double>				m_off;	//!< offset values (used for shells)
+
+protected:
+	bool	m_boffset;		//!< offset shells
 };

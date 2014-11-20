@@ -77,6 +77,7 @@ public:
 	double		m_stol;		//!< search tolerance
 	int			m_naugmax;	//!< maximum nr of augmentations
 	int			m_naugmin;	//!< minimum nr of augmentations
+	bool		m_boffset;	//!< offset slave surface for shells
 
 	DECLARE_PARAMETER_LIST();
 };
