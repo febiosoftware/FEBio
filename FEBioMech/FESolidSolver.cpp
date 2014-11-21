@@ -1520,9 +1520,12 @@ bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 	for (i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-
-		// respect the pressure stiffness flag
-		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
+		if (psl->IsActive())
+		{
+			// respect the pressure stiffness flag
+			// TODO: Find a different solution for this. Maybe I can pass the flag to the pressure load?
+			if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
+		}
 	}
 
 	// calculate nonlinear constraint stiffness
