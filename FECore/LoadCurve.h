@@ -87,7 +87,7 @@ public:
 	LOADPOINT& LoadPoint(int i) { return m_lp[i]; }
 
 	//! finds closest load point
-	int FindPoint(double t);
+	int FindPoint(double t, double& tval);
 
 	//! return nr of points
 	int Points() const { return m_lp.size(); }

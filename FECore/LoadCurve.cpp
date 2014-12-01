@@ -280,9 +280,33 @@ double FELoadCurve::ExtendValue(double t) const
 // It returns -1 if t is larger than the last time value
 //
 
-int FELoadCurve::FindPoint(double t)
+int FELoadCurve::FindPoint(double t, double& tval)
 {
-	for (int i=0; i<Points(); ++i) if (m_lp[i].time > t) return i;
+	switch (m_ext)
+	{
+	case REPEAT:
+	case REPEAT_OFFSET:
+		{
+			double toff = 0.0;
+			while (1)
+			{
+				double ti = 0;
+				for (int i=0; i<Points(); ++i)
+				{
+					ti = m_lp[i].time + toff;
+					if (ti > t) { tval = ti; return i;}
+				}
+				toff = ti;
+			}
+		}
+		break;
+	default:
+		for (int i=0; i<Points(); ++i)
+		{
+			double ti = m_lp[i].time;
+			if (ti > t) { tval = ti; return i; }
+		}
+	}
 	return -1;
 }
 

@@ -13,6 +13,7 @@ FEAnalysis::FEAnalysis(FEModel* pfem, int ntype) : FECoreBase(FEANALYSIS_ID), m_
 {
 	m_psolver = 0;
 	m_tend = 0.0;
+	m_nmust = -1;
 
 	// --- Analysis data ---
 	m_nanalysis = FE_STATIC;	// do quasi-static analysis
@@ -325,10 +326,9 @@ bool FEAnalysis::Solve()
 			bplot = false;
 			if ((m_nplot != FE_PLOT_NEVER) && (m_nplot != FE_PLOT_FINAL))
 			{
-				if ((m_nplot == FE_PLOT_MUST_POINTS) && (m_nmplc >= 0))
+				if (m_nplot == FE_PLOT_MUST_POINTS)
 				{
-					FELoadCurve& lc = *m_fem.GetLoadCurve(m_nmplc);
-					if (lc.HasPoint(m_fem.m_ftime)) { m_fem.Write(); bplot = true; }
+					if (m_nmust >= 0) { m_fem.Write(); bplot = true; }
 				}
 				else
 				{
@@ -493,28 +493,7 @@ void FEAnalysis::AutoTimeStep(int niter)
 	}
 
 	// check for mustpoints
-	if (m_nmplc >= 0)
-	{
-		double tnew = told + dtn;
-		const double eps = m_tend*1e-07;
-		FELoadCurve& lc = *m_fem.GetLoadCurve(m_nmplc);
-		int n = lc.FindPoint(told+eps);
-		if (n >= 0)
-		{
-			// TODO: what happens when dtn < dtmin and the next time step fails??
-			double tmust = lc.LoadPoint(n).time;
-			if (tnew > tmust)
-			{
-				dtn = tmust - told;
-				felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
-			}
-			else if (tnew > m_tend)
-			{
-				dtn = m_tend - told;
-				felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
-			}
-		}
-	}
+	if (m_nmplc >= 0) dtn = CheckMustPoints(told, dtn);
 
 	// make sure we are not exceeding the final time
 	if (told + dtn > m_tend)
@@ -525,6 +504,42 @@ void FEAnalysis::AutoTimeStep(int niter)
 
 	// store time step size
 	m_dt = dtn;
+}
+
+//-----------------------------------------------------------------------------
+//! This function makes sure that no must points are passed. It returns an
+//! updated value (less than dt) if t + dt would pass a must point. Otherwise
+//! it returns dt.
+//! \param t current time
+//! \param dt current time step
+//! \return updated time step.
+double FEAnalysis::CheckMustPoints(double t, double dt)
+{
+	double tnew = t + dt;
+	double dtnew = dt;
+	const double eps = m_tend*1e-07;
+	FELoadCurve& lc = *m_fem.GetLoadCurve(m_nmplc);
+	double tmust = tnew;
+	m_nmust = -1;
+	int n = lc.FindPoint(t+eps, tmust);
+	if (n >= 0)
+	{
+		// TODO: what happens when dtnew < dtmin and the next time step fails??
+		if (tnew > tmust)
+		{
+			dtnew = tmust - t;
+			felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
+			m_nmust = n;
+		}
+		else if (tnew == tmust) { m_nmust = n; }
+		else if (tnew > m_tend)
+		{
+			dtnew = m_tend - t;
+			felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
+			m_nmust = n;
+		}
+	}
+	return dtnew;
 }
 
 //-----------------------------------------------------------------------------

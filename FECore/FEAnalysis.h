@@ -102,6 +102,9 @@ protected:
 	//! Update Time step
 	void AutoTimeStep(int niter);
 
+	//! Adjust for must points
+	double CheckMustPoints(double t, double dt);
+
 public:
 	// --- The FE Model
 	//{
@@ -160,6 +163,7 @@ protected:
 	std::vector<FENLConstraint*>			m_NLC;	//!< non-linear constraints
 
 protected:
+	int		m_nmust;		//!< current must-point
 	int		m_ntype;		//!< step type
 };
 
