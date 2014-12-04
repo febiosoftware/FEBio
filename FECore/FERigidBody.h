@@ -62,6 +62,7 @@ public:
 	double	m_mass;		//!< total mass of rigid body
     mat3ds  m_moi;      //!< mass moment of inertia about center of mass
 	vec3d	m_Fr, m_Mr;	//!< reaction force and torque
+	vec3d	m_Fp, m_Mp;	//!< reaction force and torque at the end of the previous step
 
 	vec3d	m_r0;	//!< initial position of rigid body
 	vec3d	m_rp;	//!< previous position of rigid body

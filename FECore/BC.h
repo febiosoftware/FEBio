@@ -56,10 +56,11 @@ public:
 	FERigidBodyForce(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
 
 public:
-	int		id;	// rigid body id
-	int		bc;	// force direction
-	int		lc;	// load curve number
-	double	sf;	// scale factor
+	int		ntype;	//!< type of force (0=loadcurve, 1=target)
+	int		id;		// rigid body id
+	int		bc;		// force direction
+	int		lc;		// load curve number
+	double	sf;		// scale factor
 };
 
 //-----------------------------------------------------------------------------

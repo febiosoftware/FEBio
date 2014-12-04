@@ -349,6 +349,20 @@ bool FESolidAnalysis::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FESolidAnalysis::Finish()
+{
+	FEAnalysis::Finish();
+
+	// store the current rigid body reaction forces
+	for (int i=0; i<m_fem.Objects(); ++i)
+	{
+		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
+		RB.m_Fp = RB.m_Fr;
+		RB.m_Mp = RB.m_Mr;
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! This function is called before the analysis is solved and initializes all
 //! analysis data, such as determine active boundary conditions, initializes
 //! equation numbers (the latter is actually done by the FESolver class).

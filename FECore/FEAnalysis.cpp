@@ -77,6 +77,7 @@ bool FEAnalysis::Init()
 	// determine the end time
 	double Dt;
 	if (m_ntime == -1) Dt = m_final_time; else Dt = m_dt0*m_ntime;
+	m_tstart = m_fem.m_ftime0;
 	m_tend = m_fem.m_ftime0 + Dt;
 
 	// For now, add all domains to the analysis step

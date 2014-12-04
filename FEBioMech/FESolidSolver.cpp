@@ -10,6 +10,7 @@
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 #include "NumCore/NumCore.h"
+#include <assert.h>
 
 #ifdef WIN32
 	#include <float.h>
@@ -1064,31 +1065,45 @@ void FESolidSolver::PrepStep(double time)
 		}
 	}
 
+	// get the current analysis step
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
+
 	// apply prescribed rigid body forces
-	// TODO: I don't think this does anything since
-	//       the reaction forces are zeroed in the FESolidSolver::Residual function
 	for (int i=0; i<(int) m_fem.m_RFC.size(); ++i)
 	{
 		FERigidBodyForce& FC = *m_fem.m_RFC[i];
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(FC.id));
 		if (RB.IsActive() && FC.IsActive())
 		{
-			int lc = FC.lc;
 			int I  = RB.m_LM[FC.bc];
-			if ((I>=0) && (lc >= 0))
+			if (FC.ntype == 0)
 			{
-				double f = m_fem.GetLoadCurve(lc)->Value()*FC.sf;
-				m_Fn[I] += f;
-
+				int lc = FC.lc;
+				if ((I>=0) && (lc >= 0))
+				{
+					double f = m_fem.GetLoadCurve(lc)->Value()*FC.sf;
+					m_Fn[I] += f;
+				}
+			}
+			else if (FC.ntype == 1)
+			{
+				double t0 = pstep->m_tstart;
+				double t1 = pstep->m_tend;
+				double w = (time - t0)/(t1 - t0);
+				assert((w>=-0.0000001)&&(w<=1.0000001));
+				double f0 = 0.0, f1 = FC.sf;
 				switch (FC.bc)
 				{
-				case 0: RB.m_Fr.x += f; break;
-				case 1: RB.m_Fr.y += f; break;
-				case 2: RB.m_Fr.z += f; break;
-				case 3: RB.m_Mr.x += f; break;
-				case 4: RB.m_Mr.y += f; break;
-				case 5: RB.m_Mr.z += f; break;
+				case 0: f0 = RB.m_Fp.x; break;
+				case 1: f0 = RB.m_Fp.y; break;
+				case 2: f0 = RB.m_Fp.z; break;
+				case 3: f0 = RB.m_Mp.x; break;
+				case 4: f0 = RB.m_Mp.y; break;
+				case 5: f0 = RB.m_Mp.z; break;
 				}
+
+				double f = f0*(1.0 - w) + f1*w;
+				m_Fn[I] += f;
 			}
 		}
 	}

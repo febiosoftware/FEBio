@@ -45,6 +45,10 @@ FERigidBody::FERigidBody(FEModel* pfem) : FEObject(pfem)
     
     // initialize angular velocity and acceleration
     m_wt = m_alt = vec3d(0,0,0);
+
+	// initialize reaction forces
+	m_Fr = m_Fp = vec3d(0,0,0);
+	m_Mr = m_Mp = vec3d(0,0,0);
 }
 
 //-----------------------------------------------------------------------------

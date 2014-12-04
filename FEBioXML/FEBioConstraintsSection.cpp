@@ -320,12 +320,26 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			else if (strcmp(szbc, "Rz") == 0) bc = 5;
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
+			// get the type
+			int ntype = 0;
+			const char* sztype = tag.AttributeValue("type", true);
+			if (sztype)
+			{
+				if (strcmp(sztype, "ramp") == 0) ntype = 1;
+				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+			}
+
 			// get the loadcurve
-			const char* szlc = tag.AttributeValue("lc");
-			int lc = atoi(szlc) - 1;
+			const char* szlc = tag.AttributeValue("lc", true);
+			int lc = -1;
+			if (szlc) lc = atoi(szlc) - 1;
+
+			// make sure there is a loadcurve for type=0 forces
+			if ((ntype == 0)&&(lc==-1)) throw XMLReader::MissingAttribute(tag, "lc");
 
 			// create the rigid body force
 			FERigidBodyForce* pFC = new FERigidBodyForce(&fem);
+			pFC->ntype = ntype;
 			pFC->id = nmat;
 			pFC->bc = bc;
 			pFC->lc = lc;
