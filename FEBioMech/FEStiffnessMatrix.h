@@ -31,7 +31,8 @@ public:
 	bool Create(FEModel* pfem, int neq, bool breset);
 
 protected:
-	FEModel*		m_pfem;	//!< pointer to model
+	FEModel*			m_pfem;	//!< pointer to model
+	SparseMatrixProfile m_MPs;	//!< the "static" part of the matrix profile
 };
 
 #endif // !defined(AFX_FESTIFFNESSMATRIX_H__8E7BEF6B_A12D_4C74_9C88_3ADE0141B981__INCLUDED_)

@@ -54,8 +54,8 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 	// of the "elements" that do not change. Most elements are static except
 	// for instance contact elements which can change connectivity in between
 	// calls to the Create() function. Storing the static profile instead of
-	// reconstructing it every time we come here saves us a lot of time.
-	static SparseMatrixProfile MP;
+	// reconstructing it every time we come here saves us a lot of time. The 
+	// static profile is stored in the variable m_MP.
 
 	// begin building the profile
 	build_begin(neq);
@@ -69,7 +69,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 		// of building it from scratch.
 		if (breset)
 		{
-			MP.clear();
+			m_MPs.clear();
 
 			vector<int> elm;
 
@@ -291,12 +291,12 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 			// copy the static profile to the MP object
 			// Make sure the LM buffer is flushed first.
 			build_flush();
-			MP = *m_pMP;
+			m_MPs = *m_pMP;
 		}
 		else
 		{
 			// copy the old static profile
-			*m_pMP = MP;
+			*m_pMP = m_MPs;
 		}
 
 		// All following "elements" are nonstatic. That is, they can change
