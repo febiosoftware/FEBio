@@ -30,6 +30,7 @@
 #include "FEMichaelisMenten.h"
 #include "FEMassActionReversible.h"
 #include "FEConcentrationIndependentReaction.h"
+#include "FEActiveConstantSupply.h"
 
 #include "FEPoroTraction.h"
 #include "FEFluidFlux.h"
@@ -100,19 +101,20 @@ REGISTER_FECORE_CLASS(FEOsmCoefConst                      ,FEMATERIAL_ID, "osm-c
 REGISTER_FECORE_CLASS(FESFDSBM                            ,FEMATERIAL_ID, "spherical fiber distribution sbm");
 REGISTER_FECORE_CLASS(FESolventSupplyStarling             ,FEMATERIAL_ID, "Starling"          );
 REGISTER_FECORE_CLASS(FESolubConst                        ,FEMATERIAL_ID, "solub-const"       );
-REGISTER_FECORE_CLASS(FESupplyBinding                     ,FEMATERIAL_ID, "supply-binding"          );
-REGISTER_FECORE_CLASS(FESupplyConst                       ,FEMATERIAL_ID, "supply-const"            );
-REGISTER_FECORE_CLASS(FESupplySynthesisBinding            ,FEMATERIAL_ID, "supply-synthesis-binding");
-REGISTER_FECORE_CLASS(FESupplyMichaelisMenten             ,FEMATERIAL_ID, "supply-Michaelis-Menten" );
-REGISTER_FECORE_CLASS(FECarterHayes				    	 ,FEMATERIAL_ID, "Carter-Hayes"            );
-REGISTER_FECORE_CLASS(FEReactionRateConst		    	 ,FEMATERIAL_ID, "constant reaction rate"  );
-REGISTER_FECORE_CLASS(FEReactionRateHuiskes		    	 ,FEMATERIAL_ID, "Huiskes reaction rate"   );
-REGISTER_FECORE_CLASS(FEReactionRateNims		    	 ,FEMATERIAL_ID, "Nims reaction rate"      );
-REGISTER_FECORE_CLASS(FEMassActionForward		    	 ,FEMATERIAL_ID, "mass-action-forward"     );
+REGISTER_FECORE_CLASS(FESupplyBinding                     ,FEMATERIAL_ID, "supply-binding"           );
+REGISTER_FECORE_CLASS(FESupplyConst                       ,FEMATERIAL_ID, "supply-const"             );
+REGISTER_FECORE_CLASS(FESupplySynthesisBinding            ,FEMATERIAL_ID, "supply-synthesis-binding" );
+REGISTER_FECORE_CLASS(FESupplyMichaelisMenten             ,FEMATERIAL_ID, "supply-Michaelis-Menten"  );
+REGISTER_FECORE_CLASS(FECarterHayes				    	 ,FEMATERIAL_ID, "Carter-Hayes"              );
+REGISTER_FECORE_CLASS(FEReactionRateConst		    	 ,FEMATERIAL_ID, "constant reaction rate"    );
+REGISTER_FECORE_CLASS(FEReactionRateHuiskes		    	 ,FEMATERIAL_ID, "Huiskes reaction rate"     );
+REGISTER_FECORE_CLASS(FEReactionRateNims		    	 ,FEMATERIAL_ID, "Nims reaction rate"        );
+REGISTER_FECORE_CLASS(FEMassActionForward		    	 ,FEMATERIAL_ID, "mass-action-forward"       );
 REGISTER_FECORE_CLASS(FEConcentrationIndependentReaction  ,FEMATERIAL_ID, "concentration-independent");
-REGISTER_FECORE_CLASS(FEMassActionReversible              ,FEMATERIAL_ID, "mass-action-reversible");
-REGISTER_FECORE_CLASS(FEMichaelisMenten                   ,FEMATERIAL_ID, "Michaelis-Menten"      );
-REGISTER_FECORE_CLASS(FESolidBoundMolecule                ,FEMATERIAL_ID, "solid_bound"           );
+REGISTER_FECORE_CLASS(FEMassActionReversible              ,FEMATERIAL_ID, "mass-action-reversible"   );
+REGISTER_FECORE_CLASS(FEMichaelisMenten                   ,FEMATERIAL_ID, "Michaelis-Menten"         );
+REGISTER_FECORE_CLASS(FESolidBoundMolecule                ,FEMATERIAL_ID, "solid_bound"              );
+REGISTER_FECORE_CLASS(FEActiveConstantSupply              ,FEMATERIAL_ID, "active-const-supply"      );
 
 //-----------------------------------------------------------------------------
 // Surface loads

@@ -2,6 +2,7 @@
 #include "FEBioMech/FEElasticMaterial.h"
 #include "FEHydraulicPermeability.h"
 #include "FESolventSupply.h"
+#include "FEActiveMomentumSupply.h"
 #include "FEBioMech/FEBodyForce.h"
 
 //-----------------------------------------------------------------------------
@@ -122,6 +123,7 @@ private: // material properties
 	FEElasticMaterial*			m_pSolid;	//!< pointer to elastic solid material
 	FEHydraulicPermeability*	m_pPerm;	//!< pointer to permeability material
 	FESolventSupply*			m_pSupp;	//!< pointer to solvent supply
+    FEActiveMomentumSupply*		m_pAmom;	//!< pointer to active momentum supply
 	
 	DECLARE_PARAMETER_LIST();
 };

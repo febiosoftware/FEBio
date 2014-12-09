@@ -81,6 +81,7 @@ FEBiphasic::FEBiphasic(FEModel* pfem) : FEMaterial(pfem)
 	m_pSolid = 0;
 	m_pPerm = 0;
 	m_pSupp = 0;
+    m_pAmom = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -97,6 +98,7 @@ void FEBiphasic::Init()
 	m_pSolid->SetParent(this); m_pSolid->Init();
 	m_pPerm->SetParent(this); m_pPerm->Init();
 	if (m_pSupp) { m_pSupp->SetParent(this); m_pSupp->Init(); }
+    if (m_pAmom) { m_pAmom->SetParent(this); m_pAmom->Init(); }
 	
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
@@ -106,7 +108,10 @@ void FEBiphasic::Init()
 //! A biphasic material has three properties
 int FEBiphasic::Properties()
 {
-	return (m_pSupp ? 3 : 2);
+    int np = 2;
+    if (m_pSupp) ++np;
+    if (m_pAmom) ++np;
+	return np;
 }
 
 //-----------------------------------------------------------------------------
@@ -118,6 +123,7 @@ FECoreBase* FEBiphasic::GetProperty(int i)
 	case 0: return m_pSolid;
 	case 1: return m_pPerm;
 	case 2: return m_pSupp;
+    case 3: return m_pAmom;
 	}
 	assert(false);
 	return 0;
@@ -130,6 +136,7 @@ int FEBiphasic::FindPropertyIndex(const char* szname)
 	if (strcmp(szname, "solid"         ) == 0) return 0;
 	if (strcmp(szname, "permeability"  ) == 0) return 1;
 	if (strcmp(szname, "solvent_supply") == 0) return 2;
+    if (strcmp(szname, "active_supply" ) == 0) return 3;
 	return -1;
 }
 
@@ -157,6 +164,12 @@ bool FEBiphasic::SetProperty(int n, FECoreBase* pm)
 			if (pms) { m_pSupp = pms; return true; }
 		}
 		break;
+    case 3:
+        {
+            FEActiveMomentumSupply* pas = dynamic_cast<FEActiveMomentumSupply*>(pm);
+            if (pas) { m_pAmom = pas; return true; }
+        }
+        break;
 	}
 	return false;
 }
@@ -262,7 +275,12 @@ vec3d FEBiphasic::Flux(FEMaterialPoint& pt)
         w += (kt*b)*m_rhoTw;
     }
     
-	
+    // active momentum supply contribution
+    if (m_pAmom) {
+        vec3d pw = m_pAmom->ActiveSupply(pt);
+        w += kt*pw;
+    }
+    
     return w;
 }
 
@@ -308,6 +326,7 @@ void FEBiphasic::Serialize(DumpFile &ar)
 
 	// serialize sub-materials
 	int nSupp = 0;
+    int nAmom = 0;
 	if (ar.IsSaving())
 	{
 		ar << m_pSolid->GetTypeStr();
@@ -324,6 +343,15 @@ void FEBiphasic::Serialize(DumpFile &ar)
 			ar << m_pSupp->GetTypeStr();
 			m_pSupp->Serialize(ar);
 		}
+        
+        if (m_pAmom == 0) ar << nAmom;
+        else
+        {
+            nAmom = 1;
+            ar << nAmom;
+            ar << m_pAmom->GetTypeStr();
+            m_pAmom->Serialize(ar);
+        }
 	}
 	else
 	{
@@ -350,6 +378,16 @@ void FEBiphasic::Serialize(DumpFile &ar)
 			m_pSupp->Serialize(ar);
 			m_pSupp->Init();
 		}
+        
+        ar >> nAmom;
+        if (nAmom)
+        {
+            ar >> sz;
+            m_pAmom = dynamic_cast<FEActiveMomentumSupply*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+            assert(m_pAmom);
+            m_pAmom->Serialize(ar);
+            m_pAmom->Init();
+        }
 	}
 }
 
@@ -360,7 +398,9 @@ FEParam* FEBiphasic::GetParameter(const ParamString& s)
 	if (s.count() == 1) return FEMaterial::GetParameter(s);
 
 	// else find the component's parameter
-	if      (s == "solid"       ) return m_pSolid->GetParameter(s.next());
-	else if (s == "permeability") return m_pPerm ->GetParameter(s.next());
+	if      (s == "solid"         ) return m_pSolid->GetParameter(s.next());
+	else if (s == "permeability"  ) return m_pPerm ->GetParameter(s.next());
+    else if (s == "solvent_supply") return m_pSupp ->GetParameter(s.next());
+    else if (s == "active_supply" ) return m_pAmom ->GetParameter(s.next());
 	else return 0;
 }
