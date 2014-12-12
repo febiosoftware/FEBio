@@ -41,6 +41,8 @@
 		D548B9BF19DB52D4005AF337 /* FEOsmoticVirialExpansion.h in Headers */ = {isa = PBXBuildFile; fileRef = D548B9BD19DB52D4005AF337 /* FEOsmoticVirialExpansion.h */; };
 		D54A4E4A1A2B65F50032E843 /* FEReactiveVEMaterialPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54A4E481A2B65F50032E843 /* FEReactiveVEMaterialPoint.cpp */; };
 		D54A4E4B1A2B65F50032E843 /* FEReactiveVEMaterialPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D54A4E491A2B65F50032E843 /* FEReactiveVEMaterialPoint.h */; };
+		D553C6241A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D553C6221A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.cpp */; };
+		D553C6251A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.h in Headers */ = {isa = PBXBuildFile; fileRef = D553C6231A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.h */; };
 		D56DC21D19532A83006C137D /* FERigidPinJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D56DC21919532A83006C137D /* FERigidPinJoint.cpp */; };
 		D56DC21E19532A83006C137D /* FERigidPinJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D56DC21A19532A83006C137D /* FERigidPinJoint.h */; };
 		D56DC21F19532A83006C137D /* FERigidSphericalJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D56DC21B19532A83006C137D /* FERigidSphericalJoint.cpp */; };
@@ -336,6 +338,8 @@
 		D548B9BD19DB52D4005AF337 /* FEOsmoticVirialExpansion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOsmoticVirialExpansion.h; sourceTree = "<group>"; };
 		D54A4E481A2B65F50032E843 /* FEReactiveVEMaterialPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactiveVEMaterialPoint.cpp; sourceTree = "<group>"; };
 		D54A4E491A2B65F50032E843 /* FEReactiveVEMaterialPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReactiveVEMaterialPoint.h; sourceTree = "<group>"; };
+		D553C6221A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEUncoupledReactiveViscoelastic.cpp; sourceTree = "<group>"; };
+		D553C6231A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEUncoupledReactiveViscoelastic.h; sourceTree = "<group>"; };
 		D56DC21919532A83006C137D /* FERigidPinJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidPinJoint.cpp; sourceTree = "<group>"; };
 		D56DC21A19532A83006C137D /* FERigidPinJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidPinJoint.h; sourceTree = "<group>"; };
 		D56DC21B19532A83006C137D /* FERigidSphericalJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidSphericalJoint.cpp; sourceTree = "<group>"; };
@@ -904,6 +908,8 @@
 				D5E107641865DFAD00B23922 /* FEUncoupledElasticMixture.h */,
 				D5E107651865DFAD00B23922 /* FEUncoupledMaterial.cpp */,
 				D5E107661865DFAD00B23922 /* FEUncoupledMaterial.h */,
+				D553C6221A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.cpp */,
+				D553C6231A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.h */,
 				D5E107671865DFAD00B23922 /* FEUncoupledViscoElasticMaterial.cpp */,
 				D5E107681865DFAD00B23922 /* FEUncoupledViscoElasticMaterial.h */,
 				D5E107691865DFAD00B23922 /* FEUT4Domain.cpp */,
@@ -938,6 +944,7 @@
 				D5E1078F1865DFAD00B23922 /* FEContactInterface.h in Headers */,
 				D5B57D0618A40AFC005C9598 /* FEStickyInterface.h in Headers */,
 				D5E107951865DFAD00B23922 /* FECoupledTransIsoVerondaWestmann.h in Headers */,
+				D553C6251A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.h in Headers */,
 				D5E1082A1865DFAD00B23922 /* FESphericalFiberDistribution.h in Headers */,
 				D5E1079F1865DFAD00B23922 /* FEDonnanEquilibrium.h in Headers */,
 				D5E107DE1865DFAD00B23922 /* FEHuiskesSupply.h in Headers */,
@@ -1144,6 +1151,7 @@
 				D5E1080D1865DFAD00B23922 /* FERemodelingElasticMaterial.cpp in Sources */,
 				D59D17D7192BD83B007C880C /* FECoupledVerondaWestmann.cpp in Sources */,
 				D5E107761865DFAD00B23922 /* FE2DTransIsoMooneyRivlin.cpp in Sources */,
+				D553C6241A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.cpp in Sources */,
 				D5E108491865DFAD00B23922 /* FEUncoupledElasticMixture.cpp in Sources */,
 				D5E107E31865DFAD00B23922 /* FEIsotropicElastic.cpp in Sources */,
 				D5E108231865DFAD00B23922 /* FESolidDomainFactory.cpp in Sources */,

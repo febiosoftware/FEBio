@@ -41,12 +41,23 @@ void FEReactiveVEMaterialPoint::Init(bool bflag)
     {
         // check if the current deformation gradient is different from that of
         // the last generation, in which case store the current state
-        if (m_pRve->NewGeneration(*this)) {
-            m_Fi.push_back(pt.m_F.inverse());
-            m_Ji.push_back(1./pt.m_J);
-            m_v.push_back(FEMaterialPoint::time);
-            double w = m_pRve->ReformingBondMassFraction(*this);
-            m_w.push_back(w);
+        if (m_pRve) {
+            if (m_pRve->NewGeneration(*this)) {
+                m_Fi.push_back(pt.m_F.inverse());
+                m_Ji.push_back(1./pt.m_J);
+                m_v.push_back(FEMaterialPoint::time);
+                double w = m_pRve->ReformingBondMassFraction(*this);
+                m_w.push_back(w);
+            }
+        }
+        else {
+            if (m_pRuc->NewGeneration(*this)) {
+                m_Fi.push_back(pt.m_F.inverse());
+                m_Ji.push_back(1./pt.m_J);
+                m_v.push_back(FEMaterialPoint::time);
+                double w = m_pRuc->ReformingBondMassFraction(*this);
+                m_w.push_back(w);
+            }
         }
     }
     

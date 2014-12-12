@@ -82,6 +82,7 @@
 #include "FECoupledMooneyRivlin.h"
 #include "FECoupledVerondaWestmann.h"
 #include "FEReactiveViscoelastic.h"
+#include "FEUncoupledReactiveViscoelastic.h"
 #include "FEBondRelaxation.h"
 #include "FEDamageMaterial.h"
 #include "FEDamageMaterialUC.h"
@@ -242,6 +243,7 @@ REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, FEMATERIAL_ID, "tension-only li
 REGISTER_FECORE_CLASS(FENonLinearSpring        , FEMATERIAL_ID, "nonlinear");
 
 REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial       , FEMATERIAL_ID, "reactive viscoelastic"     );
+REGISTER_FECORE_CLASS(FEUncoupledReactiveViscoelasticMaterial, FEMATERIAL_ID, "uncoupled reactive viscoelastic");
 REGISTER_FECORE_CLASS(FEBondRelaxationExponential          , FEMATERIAL_ID, "relaxation-exponential"    );
 REGISTER_FECORE_CLASS(FEBondRelaxationExpDistortion        , FEMATERIAL_ID, "relaxation-exp-distortion" );
 REGISTER_FECORE_CLASS(FEBondRelaxationFung                 , FEMATERIAL_ID, "relaxation-Fung"           );

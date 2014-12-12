@@ -11,17 +11,20 @@
 
 #include "FECore/FEMaterialPoint.h"
 #include "FEReactiveViscoelastic.h"
+#include "FEUncoupledReactiveViscoelastic.h"
 #include <deque>
 
 class FEReactiveViscoelasticMaterial;
+class FEUncoupledReactiveViscoelasticMaterial;
 
 //-----------------------------------------------------------------------------
 //! Material point data for reactive viscoelastic materials
 class FEReactiveVEMaterialPoint : public FEMaterialPoint
 {
 public:
-    //! constructor
-    FEReactiveVEMaterialPoint(FEMaterialPoint *pt, FEReactiveViscoelasticMaterial *pe) : FEMaterialPoint(pt) { m_pRve = pe; }
+    //! olverloaded constructors
+    FEReactiveVEMaterialPoint(FEMaterialPoint *pt, FEReactiveViscoelasticMaterial *pe) : FEMaterialPoint(pt) { m_pRve = pe; m_pRuc = 0; }
+    FEReactiveVEMaterialPoint(FEMaterialPoint *pt, FEUncoupledReactiveViscoelasticMaterial *pe) : FEMaterialPoint(pt) { m_pRve = 0; m_pRuc = pe; }
     
     //! copy material point data
     FEMaterialPoint* Copy();
@@ -42,6 +45,7 @@ public:
     deque <double> m_v;     //!< time when generation starts breaking
     deque <double> m_w;     //!< mass fraction when generation starts breaking
     FEReactiveViscoelasticMaterial*  m_pRve; //!< pointer to parent material
+    FEUncoupledReactiveViscoelasticMaterial*  m_pRuc; //!< pointer to parent material
 };
 
 
