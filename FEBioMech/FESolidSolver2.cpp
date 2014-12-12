@@ -63,10 +63,10 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FESolver(pfem)
 	m_plinsolve = 0;
 
 
-	// default Newmark parameters for unconditionally stable time integration
-	m_beta = 0.25;
-	m_gamma = 0.5;
-	m_alpha = 1.;
+	// default Newmark parameters for unconditionally stable midpoint time integration
+    m_alpha = 0.5;
+	m_beta  = 0.5;
+	m_gamma = 1.0;
 }
 
 //-----------------------------------------------------------------------------

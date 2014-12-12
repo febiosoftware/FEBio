@@ -10,8 +10,9 @@
 #include "FECore/FERigidBody.h"
 #include "FECore/DOFS.h"
 #include "FERigidJoint.h"
-#include "FEBioMech/FERigidSphericalJoint.h"
-#include "FEBioMech/FERigidPinJoint.h"
+#include "FERigidSphericalJoint.h"
+#include "FERigidPinJoint.h"
+#include "FERigidRevoluteJoint.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -286,6 +287,18 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 					for (j=0; j<6; ++j) lm[j+6] = lm2[j];
 					build_add(lm);
 				}
+                else if (dynamic_cast<FERigidRevoluteJoint*>(pnlc))
+                {
+                    FERigidRevoluteJoint& rj = dynamic_cast<FERigidRevoluteJoint&>(*pnlc);
+                    vector<int> lm(12);
+                    
+                    int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
+                    int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
+                    
+                    for (j=0; j<6; ++j) lm[j  ] = lm1[j];
+                    for (j=0; j<6; ++j) lm[j+6] = lm2[j];
+                    build_add(lm);
+                }
 			}
 
 			// copy the static profile to the MP object

@@ -256,6 +256,18 @@ void FERigidBody::UpdateCOM()
 }
 
 //-----------------------------------------------------------------------------
+vec3d FERigidBody::CayleyIncrementalCompoundRotation()
+{
+    // incremental rotation in spatial frame
+    quatd q = m_qt*m_qp.Inverse();
+    q.MakeUnit();                           // clean-up roundoff errors
+    double theta = 2*tan(q.GetAngle()/2);   // get theta from Cayley transform
+    vec3d e = q.GetVector();
+    
+    return e*theta;
+}
+
+//-----------------------------------------------------------------------------
 void FERigidBody::ShallowCopy(DumpStream& dmp, bool bsave)
 {
 	if (bsave)

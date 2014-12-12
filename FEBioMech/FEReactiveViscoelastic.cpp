@@ -11,94 +11,16 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// FEReactiveVEMaterialPoint
-//
-///////////////////////////////////////////////////////////////////////////////
-
-//-----------------------------------------------------------------------------
-//! Create a shallow copy of the material point data
-FEMaterialPoint* FEReactiveVEMaterialPoint::Copy()
-{
-	FEReactiveVEMaterialPoint* pt = new FEReactiveVEMaterialPoint(*this);
-	if (m_pt) pt->m_pt = m_pt->Copy();
-	return pt;
-}
-
-//-----------------------------------------------------------------------------
-//! Initializes material point data.
-void FEReactiveVEMaterialPoint::Init(bool bflag)
-{
-	FEElasticMaterialPoint& pt = *m_pt->ExtractData<FEElasticMaterialPoint>();
-	if (bflag)
-	{
-		// initialize data to zero
-		m_Fi.clear(); m_Fi.push_back(mat3dd(1.0));
-        m_Ji.clear(); m_Ji.push_back(1.0);
-        m_tgen.clear(); m_tgen.push_back(FEMaterialPoint::time);
-	}
-	else
-	{
-        // check if the current deformation gradient is different from that of
-        // the last generation, in which case store the current state
-        double eps = 1e-9;
-        int lg = (int)m_Fi.size() - 1;
-        mat3d D = pt.m_F*m_Fi[lg] - mat3dd(1);
-        if (D.norm() > eps) {
-            m_Fi.push_back(pt.m_F.inverse());
-            m_Ji.push_back(1./pt.m_J);
-            m_tgen.push_back(FEMaterialPoint::time);
-        }
-	}
-    
-	// don't forget to initialize the nested data
-	if (m_pt) m_pt->Init(bflag);
-}
-
-//-----------------------------------------------------------------------------
-//! Serialize data to the archive
-void FEReactiveVEMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
-    
-	if (bsave)
-	{
-        int n = (int)m_Fi.size();
-		dmp << n;
-		for (int i=0; i<n; ++i) dmp << m_Fi[i] << m_Ji[i] << m_tgen[i];
-	}
-	else
-	{
-        int n;
-		dmp >> n;
-		for (int i=0; i<n; ++i) dmp >> m_Fi[i] >> m_Ji[i] >> m_tgen[i];
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Serialize data to the archive
-void FEReactiveVEMaterialPoint::Serialize(DumpFile& ar)
-{
-	if (m_pt) m_pt->Serialize(ar);
-    
-	if (ar.IsSaving())
-	{
-        int n = (int)m_Fi.size();
-		ar << n;
-		for (int i=0; i<n; ++i) ar << m_Fi[i] << m_Ji[i] << m_tgen[i];
-	}
-	else
-	{
-        int n;
-		ar >> n;
-		for (int i=0; i<n; ++i) ar >> m_Fi[i] >> m_Ji[i] >> m_tgen[i];
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-//
 // FEReactiveViscoelasticMaterial
 //
 ///////////////////////////////////////////////////////////////////////////////
+
+// Material parameters for the FEMultiphasic material
+BEGIN_PARAMETER_LIST(FEReactiveViscoelasticMaterial, FEElasticMaterial)
+    ADD_PARAMETER(m_wmin, FE_PARAM_DOUBLE, "wmin");
+    ADD_PARAMETER(m_btype, FE_PARAM_INT, "kinetics");
+    ADD_PARAMETER(m_ttype, FE_PARAM_INT, "trigger");
+END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -107,6 +29,10 @@ FEReactiveViscoelasticMaterial::FEReactiveViscoelasticMaterial(FEModel* pfem) : 
 	m_pBase = 0;
     m_pBond = 0;
     m_pRelx = 0;
+    
+    m_wmin = 0;
+    m_btype = 0;
+    m_ttype = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -127,6 +53,10 @@ void FEReactiveViscoelasticMaterial::Init()
 	if (m_pBase == 0) throw MaterialError("This material needs an elastic base.");
 	if (m_pBond == 0) throw MaterialError("This material needs an elastic bond.");
 	if (m_pRelx == 0) throw MaterialError("This material needs a bond relaxation.");
+    if (!INRANGE(m_wmin, 0.0, 1.0)) throw MaterialError("wmin must be in the range 0 <= wmin <= 1");
+    if ((m_btype != 1) && (m_btype != 2)) throw MaterialError("kinetics must be 1 or 2");
+    if (!INRANGE(m_ttype, 0, 2)) throw MaterialError("trigger must be 0, 1 or 2");
+    
 	m_pBase->Init();
 	m_pBond->Init();
     m_pRelx->Init();
@@ -191,16 +121,161 @@ bool FEReactiveViscoelasticMaterial::SetProperty(int i, FECoreBase* pm)
 //! Create material point data for this material
 FEMaterialPoint* FEReactiveViscoelasticMaterial::CreateMaterialPointData()
 {
-	return new FEReactiveVEMaterialPoint(m_pBase->CreateMaterialPointData());
+	return new FEReactiveVEMaterialPoint(m_pBase->CreateMaterialPointData(), this);
+}
+
+//-----------------------------------------------------------------------------
+//! detect new generation
+bool FEReactiveViscoelasticMaterial::NewGeneration(FEMaterialPoint& mp)
+{
+    double d;
+    double eps = 0;
+
+    // get the elastic material poit data
+    FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // get the reactive viscoelastic point data
+    FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
+    
+    // check if the current deformation gradient is different from that of
+    // the last generation, in which case store the current state
+    // evaluate the relative deformation gradient
+    mat3d F = pe.m_F;
+    int lg = (int)pt.m_Fi.size() - 1;
+    mat3d Fi = (lg > -1) ? pt.m_Fi[lg] : mat3d(mat3dd(1));
+    mat3d Fu = F*Fi;
+
+    switch (m_ttype) {
+        case 0:
+        {
+            // trigger in response to any strain
+            // evaluate the Lagrangian strain
+            mat3ds E = ((Fu.transpose()*Fu).sym() - mat3dd(1))/2;
+            
+            d = E.norm();
+        }
+            break;
+        case 1:
+        {
+            // trigger in response to distortional strain
+            // evaluate spatial Hencky (logarithmic) strain
+            mat3ds Bu = (Fu*Fu.transpose()).sym();
+            double l[3];
+            vec3d v[3];
+            Bu.eigen2(l,v);
+            mat3ds h = (dyad(v[0])*log(l[0]) + dyad(v[1])*log(l[1]) + dyad(v[2])*log(l[2]))/2;
+            
+            // evaluate distortion magnitude (always positive)
+            d = (h.dev()).norm();
+        }
+            break;
+        case 2:
+        {
+            // trigger in response to dilatational strain
+            d = fabs(log(Fu.det()));
+        }
+            
+        default:
+            d = 0;
+            break;
+    }
+    
+    if (d > eps) return true;
+    
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+//! evaluate bond mass fraction
+double FEReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMaterialPoint& mp, const int ig)
+{
+    // get the reactive viscoelastic point data
+    FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
+    
+    // bond mass fraction
+    double w = 0;
+    
+    // current time
+    double time = FEMaterialPoint::time;
+    
+    switch (m_btype) {
+        case 1:
+        {
+            // time when this generation started breaking
+            double v = pt.m_v[ig];
+            
+            if (time >= v)
+                w = pt.m_w[ig]*m_pRelx->Relaxation(mp, time - v);
+        }
+            break;
+        case 2:
+        {
+            double tu, tv;
+            if (ig == 0) {
+                tv = time - pt.m_v[ig];
+                w = m_pRelx->Relaxation(mp, tv);
+            }
+            else
+            {
+                tu = time - pt.m_v[ig-1];
+                tv = time - pt.m_v[ig];
+                w = m_pRelx->Relaxation(mp, tv) - m_pRelx->Relaxation(mp, tu);
+            }
+        }
+            break;
+            
+        default:
+            break;
+    }
+    
+    assert((w >= 0) && (w <= 1));
+    
+    return w;
+}
+
+//-----------------------------------------------------------------------------
+//! evaluate bond mass fraction of reforming generation
+double FEReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMaterialPoint& mp)
+{
+    // get the elastic part
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // get the reactive viscoelastic point data
+    FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
+    
+    // keep safe copy of deformation gradient
+    mat3d F = ep.m_F;
+    double J = ep.m_J;
+    
+    // get current number of generations
+    int ng = (int)pt.m_Fi.size();
+    
+    double w = 1;
+    
+    for (int ig=0; ig<ng-1; ++ig)
+    {
+        // evaluate relative deformation gradient for this generation Fu(v)
+        ep.m_F = pt.m_Fi[ig+1].inverse()*pt.m_Fi[ig];
+        ep.m_J = pt.m_Ji[ig]/pt.m_Ji[ig+1];
+        // evaluate the breaking bond mass fraction for this generation
+        w -= BreakingBondMassFraction(mp, ig);
+    }
+    
+    // restore safe copy of deformation gradient
+    ep.m_F = F;
+    ep.m_J = J;
+    
+    assert((w >= 0) && (w <= 1));
+    
+    // return the bond mass fraction of the reforming generation
+    return w;
 }
 
 //-----------------------------------------------------------------------------
 //! Stress function
 mat3ds FEReactiveViscoelasticMaterial::Stress(FEMaterialPoint& mp)
 {
-    if (mp.dt == 0) return mat3ds(0,0,0,0,0,0);
-    
-    int ig;
+   if (mp.dt == 0) return mat3ds(0,0,0,0,0,0);
     
 	// get the elastic part
 	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -211,44 +286,27 @@ mat3ds FEReactiveViscoelasticMaterial::Stress(FEMaterialPoint& mp)
 	// calculate the base material Cauchy stress
 	mat3ds s = m_pBase->Stress(mp);
     
+    // current number of breaking generations
+    int ng = (int)pt.m_Fi.size();
+    
     // keep safe copy of deformation gradient
     mat3d F = ep.m_F;
     double J = ep.m_J;
 
-    // current time
-    double time = FEMaterialPoint::time;
-    
-    // current number of generations
-    int ng = (int)pt.m_Fi.size();
-    
     double w;
     mat3ds sb;
-    double ta, tb;
     
-    // calculate the bond stresses for past generations
-    for (ig=0; ig<ng; ++ig) {
+    // calculate the bond stresses for breaking generations
+    for (int ig=0; ig<ng; ++ig) {
         // evaluate relative deformation gradient for this generation
         ep.m_F = F*pt.m_Fi[ig];
         ep.m_J = J*pt.m_Ji[ig];
         // evaluate bond mass fraction for this generation
-        if (ig == 0) {
-            ta = time - pt.m_tgen[ig];
-            w = m_pRelx->Relaxation(mp, ta);
-        }
-        else if (ig == ng-1) {
-            ta = time - pt.m_tgen[ig];
-            w = 1 - m_pRelx->Relaxation(mp, ta);
-        }
-        else
-        {
-            ta = time - pt.m_tgen[ig];
-            tb = time - pt.m_tgen[ig+1];
-            w = m_pRelx->Relaxation(mp, tb) - m_pRelx->Relaxation(mp, ta);
-        }
+        w = BreakingBondMassFraction(mp, ig);
         // evaluate bond stress
         sb = m_pBond->Stress(mp);
         // add bond stress to total stress
-        s += sb*w;
+        s += sb*(w*pt.m_Ji[ig]);
     }
     
     // restore safe copy of deformation gradient
@@ -263,7 +321,7 @@ mat3ds FEReactiveViscoelasticMaterial::Stress(FEMaterialPoint& mp)
 //! Material tangent
 tens4ds FEReactiveViscoelasticMaterial::Tangent(FEMaterialPoint& mp)
 {
-    int ig;
+    CullGenerations(mp);
     
 	// get the elastic part
 	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -274,44 +332,27 @@ tens4ds FEReactiveViscoelasticMaterial::Tangent(FEMaterialPoint& mp)
 	// calculate the base material tangent
 	tens4ds c = m_pBase->Tangent(mp);
     
+    // current number of breaking generations
+    int ng = (int)pt.m_Fi.size();
+    
     // keep safe copy of deformation gradient
     mat3d F = ep.m_F;
     double J = ep.m_J;
     
-    // current time
-    double time = FEMaterialPoint::time;
-    
-    // current number of generations
-    int ng = (int)pt.m_Fi.size();
-    
     double w;
     tens4ds cb;
-    double ta, tb;
     
-    // calculate the bond tangents for past generations
-    for (ig=0; ig<ng; ++ig) {
+    // calculate the bond tangents for breaking generations
+    for (int ig=0; ig<ng; ++ig) {
         // evaluate relative deformation gradient for this generation
         ep.m_F = F*pt.m_Fi[ig];
         ep.m_J = J*pt.m_Ji[ig];
         // evaluate bond mass fraction for this generation
-        if (ig == 0) {
-            ta = time - pt.m_tgen[ig];
-            w = m_pRelx->Relaxation(mp, ta);
-        }
-        else if (ig == ng-1) {
-            ta = time - pt.m_tgen[ig];
-            w = 1 - m_pRelx->Relaxation(mp, ta);
-        }
-        else
-        {
-            ta = time - pt.m_tgen[ig];
-            tb = time - pt.m_tgen[ig+1];
-            w = m_pRelx->Relaxation(mp, tb) - m_pRelx->Relaxation(mp, ta);
-        }
+        w = BreakingBondMassFraction(mp, ig);
         // evaluate bond tangent
         cb = m_pBond->Tangent(mp);
         // add bond tangent to total tangent
-        c += cb*w;
+        c += cb*(w*pt.m_Ji[ig]);
     }
     
     // restore safe copy of deformation gradient
@@ -328,8 +369,6 @@ double FEReactiveViscoelasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     if (mp.dt == 0) return 0;
     
-    int ig;
-    
     // get the elastic part
     FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -339,40 +378,23 @@ double FEReactiveViscoelasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
     // calculate the base material Cauchy stress
     double sed = m_pBase->StrainEnergyDensity(mp);
     
+    // current number of breaking generations
+    int ng = (int)pt.m_Fi.size();
+    
     // keep safe copy of deformation gradient
     mat3d F = ep.m_F;
     double J = ep.m_J;
     
-    // current time
-    double time = FEMaterialPoint::time;
-    
-    // current number of generations
-    int ng = (int)pt.m_Fi.size();
-    
     double w;
     double sedb;
-    double ta, tb;
     
-    // calculate the bond stresses for past generations
-    for (ig=0; ig<ng; ++ig) {
+    // calculate the strain energy density for breaking generations
+    for (int ig=0; ig<ng; ++ig) {
         // evaluate relative deformation gradient for this generation
         ep.m_F = F*pt.m_Fi[ig];
         ep.m_J = J*pt.m_Ji[ig];
         // evaluate bond mass fraction for this generation
-        if (ig == 0) {
-            ta = time - pt.m_tgen[ig];
-            w = m_pRelx->Relaxation(mp, ta);
-        }
-        else if (ig == ng-1) {
-            ta = time - pt.m_tgen[ig];
-            w = 1 - m_pRelx->Relaxation(mp, ta);
-        }
-        else
-        {
-            ta = time - pt.m_tgen[ig];
-            tb = time - pt.m_tgen[ig+1];
-            w = m_pRelx->Relaxation(mp, tb) - m_pRelx->Relaxation(mp, ta);
-        }
+        w = BreakingBondMassFraction(mp, ig);
         // evaluate bond stress
         sedb = m_pBond->StrainEnergyDensity(mp);
         // add bond stress to total stress
@@ -385,6 +407,34 @@ double FEReactiveViscoelasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
     
     // return the total Cauchy stress
     return sed;
+}
+
+//-----------------------------------------------------------------------------
+//! Cull generations that have relaxed below a threshold
+void FEReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& mp)
+{
+    // get the reactive viscoelastic point data
+    FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
+    
+    if (pt.m_Fi.empty()) return;
+
+    // culling termination flag
+    bool done = false;
+    
+    // always check oldest generation
+    while (!done) {
+        double w = BreakingBondMassFraction(mp, 0);
+        if ((w > m_wmin) || (pt.m_Fi.size() == 1))
+            done = true;
+        else {
+            pt.m_Fi.pop_front();
+            pt.m_Ji.pop_front();
+            pt.m_v.pop_front();
+            pt.m_w.pop_front();
+        }
+    }
+    
+    return;
 }
 
 //-----------------------------------------------------------------------------

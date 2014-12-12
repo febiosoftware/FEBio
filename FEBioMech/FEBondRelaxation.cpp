@@ -27,20 +27,14 @@ void FEBondRelaxation::Init()
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEBondRelaxationExponential, FEBondRelaxation)
-    ADD_PARAMETER(m_t[0], FE_PARAM_DOUBLE, "t1");
-    ADD_PARAMETER(m_t[1], FE_PARAM_DOUBLE, "t2");
-    ADD_PARAMETER(m_t[2], FE_PARAM_DOUBLE, "t3");
-    ADD_PARAMETER(m_t[3], FE_PARAM_DOUBLE, "t4");
-    ADD_PARAMETER(m_t[4], FE_PARAM_DOUBLE, "t5");
-    ADD_PARAMETER(m_t[5], FE_PARAM_DOUBLE, "t6");
+    ADD_PARAMETER(m_tau, FE_PARAM_DOUBLE, "tau");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FEBondRelaxationExponential::FEBondRelaxationExponential(FEModel* pfem) : FEBondRelaxation(pfem)
 {
-    m_nt = 0;
-	for (int i=0; i<MAX_TERMS; ++i) m_t[i] = 0;
+    m_tau = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -49,13 +43,7 @@ void FEBondRelaxationExponential::Init()
 {
     FEBondRelaxation::Init();
     
-    m_nt = 0;
-	for (int i=0; i<MAX_TERMS; ++i) {
-        if (m_t[i] < 0) throw MaterialError("relaxation times must be > 0");
-        if (m_t[i] > 0) ++m_nt;
-    }
-    if (m_nt == 0)
-        throw MaterialError("at least one relaxation time must be > 0");
+    if (m_tau <= 0) throw MaterialError("tau must be > 0");
 }
 
 //-----------------------------------------------------------------------------
@@ -63,14 +51,9 @@ void FEBondRelaxationExponential::Init()
 double FEBondRelaxationExponential::Relaxation(FEMaterialPoint& mp, const double t)
 {
 	// --- constant relaxation times ---
-    double g = 0;
-    
-    for (int i=0; i<m_nt; ++i)
-        if (m_t[i] > 0) {
-            g += exp(-t/m_t[i]);
-        }
+    double g = exp(-t/m_tau);
 	
-	return g/m_nt;
+	return g;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,20 +64,18 @@ double FEBondRelaxationExponential::Relaxation(FEMaterialPoint& mp, const double
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEBondRelaxationExpDistortion, FEBondRelaxation)
-ADD_PARAMETER(m_t[0], FE_PARAM_DOUBLE, "t1");
-ADD_PARAMETER(m_t[1], FE_PARAM_DOUBLE, "t2");
-ADD_PARAMETER(m_t[2], FE_PARAM_DOUBLE, "t3");
-ADD_PARAMETER(m_t[3], FE_PARAM_DOUBLE, "t4");
-ADD_PARAMETER(m_t[4], FE_PARAM_DOUBLE, "t5");
-ADD_PARAMETER(m_t[5], FE_PARAM_DOUBLE, "t6");
+    ADD_PARAMETER(m_tau, FE_PARAM_DOUBLE, "tau");
+    ADD_PARAMETER(m_tau1, FE_PARAM_DOUBLE, "tau1");
+    ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FEBondRelaxationExpDistortion::FEBondRelaxationExpDistortion(FEModel* pfem) : FEBondRelaxation(pfem)
 {
-    m_nt = 0;
-    for (int i=0; i<MAX_TERMS; ++i) m_t[i] = 0;
+    m_tau = 0;
+    m_tau1 = 0;
+    m_alpha = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -103,21 +84,13 @@ void FEBondRelaxationExpDistortion::Init()
 {
     FEBondRelaxation::Init();
     
-    m_nt = 0;
-    for (int i=0; i<MAX_TERMS; ++i) {
-        if (m_t[i] < 0) throw MaterialError("relaxation times must be > 0");
-        if (m_t[i] > 0) ++m_nt;
-    }
-    if (m_nt == 0)
-        throw MaterialError("at least one relaxation time must be > 0");
+    if (m_tau <= 0) throw MaterialError("tau must be > 0");
 }
 
 //-----------------------------------------------------------------------------
 //! Relaxation function
 double FEBondRelaxationExpDistortion::Relaxation(FEMaterialPoint& mp, const double t)
 {
-    double eps = 1e-9;
-    
     // get the elastic material point data
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -131,19 +104,10 @@ double FEBondRelaxationExpDistortion::Relaxation(FEMaterialPoint& mp, const doub
     // evaluate distortion magnitude (always positive)
     double K2 = (h.dev()).norm();
 
-    double g;
+    double K2a = pow(K2,m_alpha);
+    double tau = m_tau + m_tau1*K2a;
     
-    // relax only if deformation is distortional
-    if (K2 >= eps) {
-        g = 0;
-        for (int i=0; i<m_nt; ++i)
-            if (m_t[i] > 0) {
-                g += exp(-t/m_t[i]);
-            }
-        g /= m_nt;
-    }
-    else
-        g = 1;
+    double g = exp(-t/tau);
     
     return g;
 }
@@ -184,72 +148,9 @@ double FEBondRelaxationFung::Relaxation(FEMaterialPoint& mp, const double t)
     
 #ifdef HAVE_GSL
     if (t > 0) {
-        g = (gsl_sf_expint_Ei(-t/m_tau1) - gsl_sf_expint_Ei(-t/m_tau2))/log(m_tau2/m_tau1);
-    }
-    else
-        g = 1;
-#endif
-    
-    return g;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// FEBondRelaxationFungDistortional
-//
-///////////////////////////////////////////////////////////////////////////////
-//-----------------------------------------------------------------------------
-// define the material parameters
-BEGIN_PARAMETER_LIST(FEBondRelaxationFungDistortion, FEBondRelaxation)
-ADD_PARAMETER(m_tau1, FE_PARAM_DOUBLE, "tau1");
-ADD_PARAMETER(m_tau2, FE_PARAM_DOUBLE, "tau2");
-END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-//! Constructor.
-FEBondRelaxationFungDistortion::FEBondRelaxationFungDistortion(FEModel* pfem) : FEBondRelaxation(pfem)
-{
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization.
-void FEBondRelaxationFungDistortion::Init()
-{
-    FEBondRelaxation::Init();
-    
-    if (m_tau1 <= 0) throw MaterialError("tau1 must be > 0");
-    if (m_tau2 <= m_tau1) throw MaterialError("tau2 must be > tau1");
-}
-
-//-----------------------------------------------------------------------------
-//! Relaxation function
-double FEBondRelaxationFungDistortion::Relaxation(FEMaterialPoint& mp, const double t)
-{
-    double g = 0;
-    
-#ifdef HAVE_GSL
-    double eps = 1e-9;
-    
-    // get the elastic material point data
-    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    
-    // evaluate spatial Hencky (logarithmic) strain
-    mat3ds B = pt.LeftCauchyGreen();
-    double d[3];
-    vec3d v[3];
-    B.eigen2(d,v);
-    mat3ds h = (dyad(v[0])*log(d[0]) + dyad(v[1])*log(d[1]) + dyad(v[2])*log(d[2]))/2;
-    
-    // evaluate distortion magnitude (always positive)
-    double K2 = (h.dev()).norm();
-    
-    // relax only if deformation is distortional
-    if (K2 >= eps) {
-        if (t > 0) {
-            g = (gsl_sf_expint_Ei(-t/m_tau1) - gsl_sf_expint_Ei(-t/m_tau2))/log(m_tau2/m_tau1);
-        }
-        else
-            g = 1;
+        g = (m_tau2*exp(-t/m_tau2) - m_tau1*exp(-t/m_tau1)
+        + t*(gsl_sf_expint_Ei(-t/m_tau1) - gsl_sf_expint_Ei(-t/m_tau2)))
+        /(m_tau2 - m_tau1);
     }
     else
         g = 1;
@@ -266,8 +167,8 @@ double FEBondRelaxationFungDistortion::Relaxation(FEMaterialPoint& mp, const dou
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEBondRelaxationPark, FEBondRelaxation)
-ADD_PARAMETER(m_tau, FE_PARAM_DOUBLE, "tau");
-ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
+    ADD_PARAMETER(m_tau, FE_PARAM_DOUBLE, "tau");
+    ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -297,20 +198,26 @@ double FEBondRelaxationPark::Relaxation(FEMaterialPoint& mp, const double t)
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// FEBondRelaxationFungDistortion
+// FEBondRelaxationParkDistortion
 //
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEBondRelaxationParkDistortion, FEBondRelaxation)
-ADD_PARAMETER(m_tau, FE_PARAM_DOUBLE, "tau");
-ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
+    ADD_PARAMETER(m_tau, FE_PARAM_DOUBLE, "tau");
+    ADD_PARAMETER(m_tau1, FE_PARAM_DOUBLE, "tau1");
+    ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
+    ADD_PARAMETER(m_beta1, FE_PARAM_DOUBLE, "beta1");
+    ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FEBondRelaxationParkDistortion::FEBondRelaxationParkDistortion(FEModel* pfem) : FEBondRelaxation(pfem)
 {
+    m_tau1 = 0;
+    m_beta1 = 0;
+    m_alpha = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -328,7 +235,6 @@ void FEBondRelaxationParkDistortion::Init()
 double FEBondRelaxationParkDistortion::Relaxation(FEMaterialPoint& mp, const double t)
 {
     double g;
-    double eps = 1e-9;
     
     // get the elastic material point data
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -343,11 +249,108 @@ double FEBondRelaxationParkDistortion::Relaxation(FEMaterialPoint& mp, const dou
     // evaluate distortion magnitude (always positive)
     double K2 = (h.dev()).norm();
 
-    // relax only if deformation is distortional
-    if (K2 >= eps)
-        g = 1./(1+pow(t/m_tau,m_beta));
-    else
-        g = 1;
+    double K2a = pow(K2,m_alpha);
+    double tau = m_tau + m_tau1*K2a;
+    double beta = m_beta + m_beta1*K2a;
+    g = 1./(1+pow(t/tau,beta));
+    
+    return g;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FEBondRelaxationPower
+//
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_PARAMETER_LIST(FEBondRelaxationPower, FEBondRelaxation)
+    ADD_PARAMETER(m_tau, FE_PARAM_DOUBLE, "tau");
+    ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEBondRelaxationPower::FEBondRelaxationPower(FEModel* pfem) : FEBondRelaxation(pfem)
+{
+}
+
+//-----------------------------------------------------------------------------
+//! Initialization.
+void FEBondRelaxationPower::Init()
+{
+    FEBondRelaxation::Init();
+    
+    if (m_tau <= 0) throw MaterialError("tau must be > 0");
+    if (m_beta <= 0) throw MaterialError("beta must be > 0");
+}
+
+//-----------------------------------------------------------------------------
+//! Relaxation function
+double FEBondRelaxationPower::Relaxation(FEMaterialPoint& mp, const double t)
+{
+    double g = pow(1+t/m_tau,-m_beta);
+    
+    return g;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FEBondRelaxationPowerDistortion
+//
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_PARAMETER_LIST(FEBondRelaxationPowerDistortion, FEBondRelaxation)
+    ADD_PARAMETER(m_tau, FE_PARAM_DOUBLE, "tau");
+    ADD_PARAMETER(m_tau1, FE_PARAM_DOUBLE, "tau1");
+    ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
+    ADD_PARAMETER(m_beta1, FE_PARAM_DOUBLE, "beta1");
+    ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEBondRelaxationPowerDistortion::FEBondRelaxationPowerDistortion(FEModel* pfem) : FEBondRelaxation(pfem)
+{
+    m_tau1 = 0;
+    m_alpha = 1;
+}
+
+//-----------------------------------------------------------------------------
+//! Initialization.
+void FEBondRelaxationPowerDistortion::Init()
+{
+    FEBondRelaxation::Init();
+    
+    if (m_tau <= 0) throw MaterialError("tau must be > 0");
+    if (m_beta <= 0) throw MaterialError("beta must be > 0");
+}
+
+//-----------------------------------------------------------------------------
+//! Relaxation function
+double FEBondRelaxationPowerDistortion::Relaxation(FEMaterialPoint& mp, const double t)
+{
+    double g;
+    
+    // get the elastic material point data
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // evaluate spatial Hencky (logarithmic) strain
+    mat3ds B = pt.LeftCauchyGreen();
+    double d[3];
+    vec3d v[3];
+    B.eigen2(d,v);
+    mat3ds h = (dyad(v[0])*log(d[0]) + dyad(v[1])*log(d[1]) + dyad(v[2])*log(d[2]))/2;
+    
+    // evaluate distortion magnitude (always positive)
+    double K2 = (h.dev()).norm();
+    
+    double K2a = pow(K2,m_alpha);
+    double tau = m_tau + m_tau1*K2a;
+    double beta = m_beta + m_beta1*K2a;
+
+    g = pow(1+t/tau,-beta);
     
     return g;
 }

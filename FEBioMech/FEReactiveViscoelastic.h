@@ -11,39 +11,7 @@
 
 #include "FEElasticMaterial.h"
 #include "FEBondRelaxation.h"
-#include <deque>
-
-//-----------------------------------------------------------------------------
-//! Material point data for reactive viscoelastic materials
-class FEReactiveVEMaterialPoint : public FEMaterialPoint
-{
-public:
-	//! constructor
-	FEReactiveVEMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
-    
-	//! copy material point data
-	FEMaterialPoint* Copy();
-    
-	//! Initialize material point data
-	void Init(bool bflag);
-    
-	//! Serialize data to archive
-	void Serialize(DumpFile& ar);
-    
-	//! data streaming
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-    
-public:
-	// multigenerational material data
-/*	vector <mat3d>  m_Fi;	//!< inverse of relative deformation gradient
-	vector <double> m_Ji;	//!< determinant of Fi (store for efficiency)
-	vector <double> m_tgen;	//!< generation time
-    */
-    deque <mat3d>  m_Fi;	//!< inverse of relative deformation gradient
-    deque <double> m_Ji;	//!< determinant of Fi (store for efficiency)
-    deque <double> m_tgen;	//!< generation time
-};
-
+#include "FEReactiveVEMaterialPoint.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a large deformation reactive viscoelastic material
@@ -101,13 +69,32 @@ public:
     //! strain energy density function
     double StrainEnergyDensity(FEMaterialPoint& pt);
     
-	// returns a pointer to a new material point object
+    //! cull generations
+    void CullGenerations(FEMaterialPoint& pt);
+    
+    //! evaluate bond mass fraction for a given generation
+    double BreakingBondMassFraction(FEMaterialPoint& pt, const int ig);
+    
+    //! evaluate bond mass fraction of reforming generation
+    double ReformingBondMassFraction(FEMaterialPoint& pt);
+    
+    //! detect new generation
+    bool NewGeneration(FEMaterialPoint& pt);
+    
+	//! returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData();
     
 private:
 	FEElasticMaterial*	m_pBase;	//!< pointer to elastic solid material for polymer base
 	FEElasticMaterial*	m_pBond;	//!< pointer to elastic solid material for reactive bonds
     FEBondRelaxation*   m_pRelx;    //!< pointer to bond relaxation material for reactive bonds
+    
+public:
+    double	m_wmin;		//!< minimum value of relaxation
+    int     m_btype;    //!< bond kinetics type
+    int     m_ttype;    //!< bond breaking trigger type
+    
+    DECLARE_PARAMETER_LIST();
 };
 
 #endif /* defined(__FEBioMech__FEReactiveViscoelastic__) */

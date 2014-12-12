@@ -55,6 +55,9 @@ public:
 
 	//! get the material ID
 	int GetMaterialID() { return m_mat; }
+    
+    //! incremental compound rotation from Cayley transform
+    vec3d CayleyIncrementalCompoundRotation();
 
 public:
 	int		m_nID;		//!< ID of rigid body

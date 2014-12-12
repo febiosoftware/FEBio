@@ -28,13 +28,10 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// This class implements exponential relaxation triggered by any strain
+// This class implements exponential relaxation with constant relaxation time
 
 class FEBondRelaxationExponential : public FEBondRelaxation
 {
-public:
-	enum { MAX_TERMS = 6 };
-    
 public:
     //! constructor
     FEBondRelaxationExponential(FEModel* pfem);
@@ -46,21 +43,18 @@ public:
     void Init();
     
 public:
-	double	m_t[MAX_TERMS];	//!< relaxation times
-    int     m_nt;           //!< number of non-zero relaxation times
+	double	m_tau;      //!< relaxation time
     
     // declare parameter list
     DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
-// This class implements exponential relaxation triggered by distortional strain
+// This class implements exponential relaxation with a relaxation
+// time that is a function of the distortional strain
 
 class FEBondRelaxationExpDistortion : public FEBondRelaxation
 {
-public:
-    enum { MAX_TERMS = 6 };
-    
 public:
     //! constructor
     FEBondRelaxationExpDistortion(FEModel* pfem);
@@ -72,15 +66,16 @@ public:
     void Init();
     
 public:
-    double	m_t[MAX_TERMS];	//!< relaxation times
-    int     m_nt;           //!< number of non-zero relaxation times
+    double	m_tau;      //!< relaxation time
+    double	m_tau1;     //!< relaxation time coeff. of 2nd term
+    double  m_alpha;    //!< exponent of 2nd term for tau
     
     // declare parameter list
     DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
-// This class implements Fung's relaxation triggered by any strain
+// This class implements Fung's relaxation
 
 class FEBondRelaxationFung : public FEBondRelaxation
 {
@@ -103,30 +98,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// This class implements Fung's relaxation triggered by distortional strain
-
-class FEBondRelaxationFungDistortion : public FEBondRelaxation
-{
-public:
-    //! constructor
-    FEBondRelaxationFungDistortion(FEModel* pfem);
-    
-    //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t);
-    
-    //! data initialization and checking
-    void Init();
-    
-public:
-    double	m_tau1;     //!< lower relaxation time
-    double  m_tau2;     //!< upper relaxation time
-    
-    // declare parameter list
-    DECLARE_PARAMETER_LIST();
-};
-
-//-----------------------------------------------------------------------------
-// This class implements Park's relaxation triggered by any strain
+// This class implements Park's relaxation with constant relaxation time
 
 class FEBondRelaxationPark : public FEBondRelaxation
 {
@@ -149,7 +121,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// This class implements Park's relaxation triggered by distortional strain
+// This class implements Park's relaxation with a relaxation
+// time that is a function of the distortional strain
 
 class FEBondRelaxationParkDistortion : public FEBondRelaxation
 {
@@ -165,7 +138,60 @@ public:
     
 public:
     double	m_tau;      //!< relaxation time
+    double	m_tau1;     //!< relaxation time coeff. of 2nd term
     double  m_beta;     //!< exponent
+    double  m_beta1;    //!< coefficient of 2nd for beta
+    double  m_alpha;    //!< exponent of 2nd term for tau and beta
+    
+    // declare parameter list
+    DECLARE_PARAMETER_LIST();
+};
+
+//-----------------------------------------------------------------------------
+// This class implements a power-law relaxation with constant relaxation time
+
+class FEBondRelaxationPower : public FEBondRelaxation
+{
+public:
+    //! constructor
+    FEBondRelaxationPower(FEModel* pfem);
+    
+    //! relaxation
+    double Relaxation(FEMaterialPoint& pt, const double t);
+    
+    //! data initialization and checking
+    void Init();
+    
+public:
+    double	m_tau;      //!< relaxation time
+    double  m_beta;     //!< exponent
+    
+    // declare parameter list
+    DECLARE_PARAMETER_LIST();
+};
+
+//-----------------------------------------------------------------------------
+// This class implements a power-law relaxation with a relaxation
+// time that is a function of the distortional strain
+
+class FEBondRelaxationPowerDistortion : public FEBondRelaxation
+{
+public:
+    //! constructor
+    FEBondRelaxationPowerDistortion(FEModel* pfem);
+    
+    //! relaxation
+    double Relaxation(FEMaterialPoint& pt, const double t);
+    
+    //! data initialization and checking
+    void Init();
+    
+public:
+    double	m_tau;      //!< relaxation time at zero strain
+    double  m_beta;     //!< exponent of relaxation power law
+    double	m_tau1;     //!< relaxation time coeff. of 2nd term
+    double  m_beta1;    //!< coefficient of 2nd for beta
+    double  m_alpha;    //!< exponent of 2nd term
     
     // declare parameter list
     DECLARE_PARAMETER_LIST();

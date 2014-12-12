@@ -109,6 +109,7 @@
 #include "FERigidJoint.h"
 #include "FERigidSphericalJoint.h"
 #include "FERigidPinJoint.h"
+#include "FERigidRevoluteJoint.h"
 
 #include "FESolidAnalysis.h"
 #include "FESolidSolver.h"
@@ -240,13 +241,14 @@ REGISTER_FECORE_CLASS(FELinearSpring           , FEMATERIAL_ID, "linear");
 REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, FEMATERIAL_ID, "tension-only linear");
 REGISTER_FECORE_CLASS(FENonLinearSpring        , FEMATERIAL_ID, "nonlinear");
 
-REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial       , FEMATERIAL_ID, "reactive viscoelastic");
-REGISTER_FECORE_CLASS(FEBondRelaxationExponential          , FEMATERIAL_ID, "relaxation-exponential" );
-REGISTER_FECORE_CLASS(FEBondRelaxationExpDistortion        , FEMATERIAL_ID, "relaxation-exp-distortion");
-REGISTER_FECORE_CLASS(FEBondRelaxationFung                 , FEMATERIAL_ID, "relaxation-Fung" );
-REGISTER_FECORE_CLASS(FEBondRelaxationFungDistortion       , FEMATERIAL_ID, "relaxation-Fung-distortion");
-REGISTER_FECORE_CLASS(FEBondRelaxationPark                 , FEMATERIAL_ID, "relaxation-Park" );
+REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial       , FEMATERIAL_ID, "reactive viscoelastic"     );
+REGISTER_FECORE_CLASS(FEBondRelaxationExponential          , FEMATERIAL_ID, "relaxation-exponential"    );
+REGISTER_FECORE_CLASS(FEBondRelaxationExpDistortion        , FEMATERIAL_ID, "relaxation-exp-distortion" );
+REGISTER_FECORE_CLASS(FEBondRelaxationFung                 , FEMATERIAL_ID, "relaxation-Fung"           );
+REGISTER_FECORE_CLASS(FEBondRelaxationPark                 , FEMATERIAL_ID, "relaxation-Park"           );
 REGISTER_FECORE_CLASS(FEBondRelaxationParkDistortion       , FEMATERIAL_ID, "relaxation-Park-distortion");
+REGISTER_FECORE_CLASS(FEBondRelaxationPower                , FEMATERIAL_ID, "relaxation-power"           );
+REGISTER_FECORE_CLASS(FEBondRelaxationPowerDistortion       , FEMATERIAL_ID, "relaxation-power-distortion");
     
 REGISTER_FECORE_CLASS(FEDamageMaterial                     , FEMATERIAL_ID, "elastic damage"       );
 REGISTER_FECORE_CLASS(FEDamageMaterialUC                   , FEMATERIAL_ID, "uncoupled elastic damage");
@@ -287,6 +289,7 @@ REGISTER_FECORE_CLASS(FELinearConstraintSet, FENLCONSTRAINT_ID, "linear constrai
 REGISTER_FECORE_CLASS(FERigidJoint         , FENLCONSTRAINT_ID, "rigid joint"          );
 REGISTER_FECORE_CLASS(FERigidSphericalJoint, FENLCONSTRAINT_ID, "rigid spherical joint");
 REGISTER_FECORE_CLASS(FERigidPinJoint      , FENLCONSTRAINT_ID, "rigid pin joint"      );
+REGISTER_FECORE_CLASS(FERigidRevoluteJoint , FENLCONSTRAINT_ID, "rigid revolute joint" );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface
