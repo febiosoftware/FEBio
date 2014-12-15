@@ -491,6 +491,7 @@
     <ClCompile Include="..\..\FEBioMech\FEPointConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPressureLoad.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPRLig.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEReactiveViscoelastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERemodelingElasticDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERemodelingElasticMaterial.cpp" />
@@ -498,6 +499,7 @@
     <ClCompile Include="..\..\FEBioMech\FERigidJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidPinJoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidRevoluteJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSphericalJoint.cpp" />
@@ -530,6 +532,7 @@
     <ClCompile Include="..\..\FEBioMech\FEUncoupledActiveContraction.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEUncoupledElasticMixture.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEUncoupledMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEUncoupledReactiveViscoelastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEUncoupledViscoElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEUT4Domain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEVerondaWestmann.cpp" />
@@ -637,6 +640,7 @@
     <ClInclude Include="..\..\FEBioMech\FEPointConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEPressureLoad.h" />
     <ClInclude Include="..\..\FEBioMech\FEPRLig.h" />
+    <ClInclude Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEReactiveViscoelastic.h" />
     <ClInclude Include="..\..\FEBioMech\FERemodelingElasticDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FERemodelingElasticMaterial.h" />
@@ -644,6 +648,7 @@
     <ClInclude Include="..\..\FEBioMech\FERigidJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidPinJoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidRevoluteJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidShellDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidSphericalJoint.h" />
@@ -676,6 +681,7 @@
     <ClInclude Include="..\..\FEBioMech\FEUncoupledActiveContraction.h" />
     <ClInclude Include="..\..\FEBioMech\FEUncoupledElasticMixture.h" />
     <ClInclude Include="..\..\FEBioMech\FEUncoupledMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEUncoupledReactiveViscoelastic.h" />
     <ClInclude Include="..\..\FEBioMech\FEUncoupledViscoElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEUT4Domain.h" />
     <ClInclude Include="..\..\FEBioMech\FEVerondaWestmann.h" />
