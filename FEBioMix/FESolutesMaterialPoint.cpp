@@ -96,6 +96,14 @@ void FESolutesMaterialPoint::Serialize(DumpFile& ar)
 		}
 		for (int i=0; i<m_nsbm; ++i)
 			ar << m_sbmr[i] << m_sbmrp[i] << m_sbmrhat[i];
+        int ncri = (int)m_cri.size();
+        ar << ncri;
+        for (int i=0; i<ncri; ++i)
+            ar << m_cri[i];
+        int ncrd = (int)m_crd.size();
+        ar << ncrd;
+        for (int i=0; i<ncrd; ++i)
+            ar << m_crd[i];
 	}
 	else
 	{
@@ -129,6 +137,18 @@ void FESolutesMaterialPoint::Serialize(DumpFile& ar)
 			for (int i=0; i<m_nsbm; ++i)
 				ar >> m_sbmr[i] >> m_sbmrp[i] >> m_sbmrhat[i];
 		}
+        
+        int ncri;
+        ar >> ncri;
+        m_cri.resize(ncri);
+        for (int i=0; i<ncri; ++i)
+            ar >> m_cri[i];
+        
+        int ncrd;
+        ar >> ncrd;
+        m_crd.resize(ncrd);
+        for (int i=0; i<ncrd; ++i)
+            ar >> m_crd[i];
 	}
     
 	if (m_pt) m_pt->Serialize(ar);
