@@ -292,29 +292,36 @@ mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStress(FEMaterialPoint& mp)
     // current number of breaking generations
     int ng = (int)pt.m_Fi.size();
     
-    // keep safe copy of deformation gradient
-    mat3d F = ep.m_F;
-    double J = ep.m_J;
-    
-    double w;
-    mat3ds sb;
-    
-    // calculate the bond stresses for breaking generations
-    for (int ig=0; ig<ng; ++ig) {
-        // evaluate relative deformation gradient for this generation
-        ep.m_F = F*pt.m_Fi[ig];
-        ep.m_J = J*pt.m_Ji[ig];
-        // evaluate bond mass fraction for this generation
-        w = BreakingBondMassFraction(mp, ig);
-        // evaluate bond stress
-        sb = m_pBond->DevStress(mp);
-        // add bond stress to total stress
-        s += sb*(w*pt.m_Ji[ig]);
+    // no bonds have broken
+    if (ng == 0) {
+        s += m_pBond->DevStress(mp);
     }
-    
-    // restore safe copy of deformation gradient
-    ep.m_F = F;
-    ep.m_J = J;
+    // bonds have broken
+    else {
+        // keep safe copy of deformation gradient
+        mat3d F = ep.m_F;
+        double J = ep.m_J;
+        
+        double w;
+        mat3ds sb;
+        
+        // calculate the bond stresses for breaking generations
+        for (int ig=0; ig<ng; ++ig) {
+            // evaluate relative deformation gradient for this generation
+            ep.m_F = F*pt.m_Fi[ig];
+            ep.m_J = J*pt.m_Ji[ig];
+            // evaluate bond mass fraction for this generation
+            w = BreakingBondMassFraction(mp, ig);
+            // evaluate bond stress
+            sb = m_pBond->DevStress(mp);
+            // add bond stress to total stress
+            s += sb*(w*pt.m_Ji[ig]);
+        }
+        
+        // restore safe copy of deformation gradient
+        ep.m_F = F;
+        ep.m_J = J;
+    }
     
     // return the total Cauchy stress
     return s;
@@ -338,29 +345,36 @@ tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangent(FEMaterialPoint& mp)
     // current number of breaking generations
     int ng = (int)pt.m_Fi.size();
     
-    // keep safe copy of deformation gradient
-    mat3d F = ep.m_F;
-    double J = ep.m_J;
-    
-    double w;
-    tens4ds cb;
-    
-    // calculate the bond tangents for breaking generations
-    for (int ig=0; ig<ng; ++ig) {
-        // evaluate relative deformation gradient for this generation
-        ep.m_F = F*pt.m_Fi[ig];
-        ep.m_J = J*pt.m_Ji[ig];
-        // evaluate bond mass fraction for this generation
-        w = BreakingBondMassFraction(mp, ig);
-        // evaluate bond tangent
-        cb = m_pBond->DevTangent(mp);
-        // add bond tangent to total tangent
-        c += cb*(w*pt.m_Ji[ig]);
+    // no bonds have broken
+    if (ng == 0) {
+        c += m_pBond->DevTangent(mp);
     }
-    
-    // restore safe copy of deformation gradient
-    ep.m_F = F;
-    ep.m_J = J;
+    // bonds have broken
+    else {
+        // keep safe copy of deformation gradient
+        mat3d F = ep.m_F;
+        double J = ep.m_J;
+        
+        double w;
+        tens4ds cb;
+        
+        // calculate the bond tangents for breaking generations
+        for (int ig=0; ig<ng; ++ig) {
+            // evaluate relative deformation gradient for this generation
+            ep.m_F = F*pt.m_Fi[ig];
+            ep.m_J = J*pt.m_Ji[ig];
+            // evaluate bond mass fraction for this generation
+            w = BreakingBondMassFraction(mp, ig);
+            // evaluate bond tangent
+            cb = m_pBond->DevTangent(mp);
+            // add bond tangent to total tangent
+            c += cb*(w*pt.m_Ji[ig]);
+        }
+        
+        // restore safe copy of deformation gradient
+        ep.m_F = F;
+        ep.m_J = J;
+    }
     
     // return the total tangent
     return c;
@@ -384,29 +398,36 @@ double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensity(FEMateria
     // current number of breaking generations
     int ng = (int)pt.m_Fi.size();
     
-    // keep safe copy of deformation gradient
-    mat3d F = ep.m_F;
-    double J = ep.m_J;
-    
-    double w;
-    double sedb;
-    
-    // calculate the strain energy density for breaking generations
-    for (int ig=0; ig<ng; ++ig) {
-        // evaluate relative deformation gradient for this generation
-        ep.m_F = F*pt.m_Fi[ig];
-        ep.m_J = J*pt.m_Ji[ig];
-        // evaluate bond mass fraction for this generation
-        w = BreakingBondMassFraction(mp, ig);
-        // evaluate bond stress
-        sedb = m_pBond->DevStrainEnergyDensity(mp);
-        // add bond stress to total stress
-        sed += sedb*w;
+    // no bonds have broken
+    if (ng == 0) {
+        sed += m_pBond->DevStrainEnergyDensity(mp);
     }
-    
-    // restore safe copy of deformation gradient
-    ep.m_F = F;
-    ep.m_J = J;
+    // bonds have broken
+    else {
+        // keep safe copy of deformation gradient
+        mat3d F = ep.m_F;
+        double J = ep.m_J;
+        
+        double w;
+        double sedb;
+        
+        // calculate the strain energy density for breaking generations
+        for (int ig=0; ig<ng; ++ig) {
+            // evaluate relative deformation gradient for this generation
+            ep.m_F = F*pt.m_Fi[ig];
+            ep.m_J = J*pt.m_Ji[ig];
+            // evaluate bond mass fraction for this generation
+            w = BreakingBondMassFraction(mp, ig);
+            // evaluate bond stress
+            sedb = m_pBond->DevStrainEnergyDensity(mp);
+            // add bond stress to total stress
+            sed += sedb*w;
+        }
+        
+        // restore safe copy of deformation gradient
+        ep.m_F = F;
+        ep.m_J = J;
+    }
     
     // return the total Cauchy stress
     return sed;
