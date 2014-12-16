@@ -64,6 +64,10 @@ void FESolutesMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 		}
 		for (int i=0; i<m_nsbm; ++i)
 			dmp << m_sbmr[i] << m_sbmrp[i] << m_sbmrhat[i];
+        for (int i=0; i<m_cri.size(); ++i)
+            dmp << m_cri[i];
+        for (int i=0; i<m_crd.size(); ++i)
+            dmp << m_crd[i];
 	}
 	else
 	{
@@ -76,6 +80,10 @@ void FESolutesMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 		}
 		for (int i=0; i<m_nsbm; ++i)
 			dmp >> m_sbmr[i] >> m_sbmrp[i] >> m_sbmrhat[i];
+        for (int i=0; i<m_cri.size(); ++i)
+            dmp >> m_cri[i];
+        for (int i=0; i<m_crd.size(); ++i)
+            dmp >> m_crd[i];
 	}
     
 	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
