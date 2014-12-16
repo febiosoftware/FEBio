@@ -462,6 +462,15 @@
     <ClInclude Include="..\..\FEBioMech\FEOsmoticVirialExpansion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FERigidRevoluteJoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEUncoupledReactiveViscoelastic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -888,6 +897,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEOsmoticVirialExpansion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FERigidRevoluteJoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEUncoupledReactiveViscoelastic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
