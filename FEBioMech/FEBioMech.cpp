@@ -89,6 +89,8 @@
 #include "FEDamageCDF.h"
 #include "FEDamageCriterion.h"
 #include "FEDamageCriterionUC.h"
+#include "FEFiberExpLinear.h"
+#include "FEUncoupledFiberExpLinear.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -237,6 +239,8 @@ REGISTER_FECORE_CLASS(FECoupledTransIsoMooneyRivlin        , FEMATERIAL_ID, "cou
 REGISTER_FECORE_CLASS(FEMicroMaterial                      , FEMATERIAL_ID, "micro-material");
 REGISTER_FECORE_CLASS(FEGenerationMaterial                 , FEMATERIAL_ID, "generation");
 REGISTER_FECORE_CLASS(FEPRLig					           , FEMATERIAL_ID, "PRLig");
+REGISTER_FECORE_CLASS(FEFiberExpLinear					   , FEMATERIAL_ID, "fiber-exp-linear");
+REGISTER_FECORE_CLASS(FEUncoupledFiberExpLinear            , FEMATERIAL_ID, "uncoupled fiber-exp-linear");
 
 REGISTER_FECORE_CLASS(FELinearSpring           , FEMATERIAL_ID, "linear");
 REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, FEMATERIAL_ID, "tension-only linear");
