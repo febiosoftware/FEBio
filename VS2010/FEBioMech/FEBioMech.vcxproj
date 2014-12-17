@@ -446,6 +446,7 @@
     <ClCompile Include="..\..\FEBioMech\FEFacet2FacetSliding.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFacet2FacetTied.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberDensityDistribution.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberExpLinear.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberExpPow.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberExpPowUncoupled.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationGauss.cpp" />
@@ -531,6 +532,7 @@
     <ClCompile Include="..\..\FEBioMech\FEUDGHexDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEUncoupledActiveContraction.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEUncoupledElasticMixture.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEUncoupledFiberExpLinear.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEUncoupledMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEUncoupledReactiveViscoelastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEUncoupledViscoElasticMaterial.cpp" />
@@ -595,6 +597,7 @@
     <ClInclude Include="..\..\FEBioMech\FEFacet2FacetSliding.h" />
     <ClInclude Include="..\..\FEBioMech\FEFacet2FacetTied.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberDensityDistribution.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberExpLinear.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberExpPow.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberExpPowUncoupled.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationGauss.h" />
@@ -680,6 +683,7 @@
     <ClInclude Include="..\..\FEBioMech\FEUDGHexDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEUncoupledActiveContraction.h" />
     <ClInclude Include="..\..\FEBioMech\FEUncoupledElasticMixture.h" />
+    <ClInclude Include="..\..\FEBioMech\FEUncoupledFiberExpLinear.h" />
     <ClInclude Include="..\..\FEBioMech\FEUncoupledMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEUncoupledReactiveViscoelastic.h" />
     <ClInclude Include="..\..\FEBioMech\FEUncoupledViscoElasticMaterial.h" />
