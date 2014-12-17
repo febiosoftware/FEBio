@@ -22,7 +22,7 @@ public:
 	//! stream material point data
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
-	virtual FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }
+	FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }
 
 public:
 	vector<double>				m_w;	//!< material weights

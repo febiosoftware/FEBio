@@ -74,6 +74,8 @@ public:
 		
 	void Init(bool bflag);
 		
+    FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }
+    
 public:
 	// multigenerational material data
     vector<FEMaterialPoint*>    m_mp;   //!< material point data for multigeneration components
