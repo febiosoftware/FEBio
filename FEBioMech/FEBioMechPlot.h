@@ -360,3 +360,13 @@ public:
 private:
 	FEModel* m_pfem;
 };
+
+//-----------------------------------------------------------------------------
+//! Class that projects stresses from integration points to the nodes
+//! TODO: This only works with tet10 and hex8 -domains
+class FEPlotNodalStresses : public FEDomainData
+{
+public:
+	FEPlotNodalStresses(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_MULT){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
