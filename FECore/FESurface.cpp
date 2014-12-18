@@ -94,25 +94,19 @@ int FESurface::FindElement(FESurfaceElement& el)
 		for (int j=0; j<nfaces; ++j)
 		{
 			nn = mesh.GetFace(e, j, nf);
-			if ((nn == 3) && (el.Nodes() == 3))
+			if (nn == el.Nodes())
 			{
-				if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.m_nID;
-			}
-			else if ((nn == 4) && (el.Nodes() == 4))
-			{
-				if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.m_nID;
-			}
-			else if ((nn == 6) && (el.Nodes() == 6))
-			{
-				if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.m_nID;
-			}
-			else if ((nn == 7) && (el.Nodes() == 7))
-			{
-				if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.m_nID;
-			}
-			else if ((nn == 8) && (el.Nodes() == 8))
-			{
-				if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.m_nID;
+				switch (nn)
+				{
+				case 3: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.m_nID; break;
+				case 4: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.m_nID; break;
+				case 6: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.m_nID; break;
+				case 7: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.m_nID; break;
+				case 8: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.m_nID; break;
+				case 9: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.m_nID; break;
+				default:
+					assert(false);
+				}
 			}
 		}
 	}
@@ -293,6 +287,125 @@ bool project2quad(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 
 	// evaluate q
 	q = y[0]*H[0] + y[1]*H[1] + y[2]*H[2] + y[3]*H[3];
+
+	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+// project onto a quadrilateral surface.
+bool project2quad9(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
+{
+	double Q[2], u[2], D;
+	double H[9], Hr[9], Hs[9], Hrs[9];
+
+	int i, j;
+	int NMAX = 50, n=0;
+
+	// evaulate scalar products
+	double xy[9];
+	double yy[9][9];
+	for (i=0; i<9; ++i)
+	{
+		xy[i] = x*y[i];
+		yy[i][i] = y[i]*y[i];
+		for (j=i+1; j<9; ++j)
+		{
+			yy[i][j] = yy[j][i] = y[i]*y[j];
+		}
+	}
+
+	// loop until converged
+	bool bconv = false;
+	double normu;
+	do
+	{
+		// evaluate shape functions and shape function derivatives.
+		double R[3] = {0.5*r*(r-1.0), 0.5*r*(r+1.0), 1.0 - r*r};
+		double S[3] = {0.5*s*(s-1.0), 0.5*s*(s+1.0), 1.0 - s*s};
+		double DR[3] = {r-0.5, r+0.5, -2.0*r};
+		double DS[3] = {s-0.5, s+0.5, -2.0*s};
+
+		H[0] = R[0]*S[0];
+		H[1] = R[1]*S[0];
+		H[2] = R[1]*S[1];
+		H[3] = R[0]*S[1];
+		H[4] = R[2]*S[0];
+		H[5] = R[1]*S[2];
+		H[6] = R[2]*S[1];
+		H[7] = R[0]*S[2];
+		H[8] = R[2]*S[2];
+
+		Hr[0] = DR[0]*S[0];
+		Hr[1] = DR[1]*S[0];
+		Hr[2] = DR[1]*S[1];
+		Hr[3] = DR[0]*S[1];
+		Hr[4] = DR[2]*S[0];
+		Hr[5] = DR[1]*S[2];
+		Hr[6] = DR[2]*S[1];
+		Hr[7] = DR[0]*S[2];
+		Hr[8] = DR[2]*S[2];
+
+		Hs[0] = R[0]*DS[0];
+		Hs[1] = R[1]*DS[0];
+		Hs[2] = R[1]*DS[1];
+		Hs[3] = R[0]*DS[1];
+		Hs[4] = R[2]*DS[0];
+		Hs[5] = R[1]*DS[2];
+		Hs[6] = R[2]*DS[1];
+		Hs[7] = R[0]*DS[2];
+		Hs[8] = R[2]*DS[2];
+
+		// set up the system of equations
+		Q[0] = Q[1] = 0;
+		double A[2][2] = {0};
+		for (i=0; i<9; ++i)
+		{
+			Q[0] -= (xy[i])*Hr[i];
+			Q[1] -= (xy[i])*Hs[i];
+
+			A[0][1] += (xy[i])*Hrs[i];
+			A[1][0] += (xy[i])*Hrs[i];
+
+			for (j=0; j<9; ++j)
+			{
+				double yij = yy[i][j];
+				Q[0] -= -H[j]*Hr[i]*(yij);
+				Q[1] -= -H[j]*Hs[i]*(yij);
+
+				A[0][0] -= (yij)*(Hr[i]*Hr[j]);
+				A[1][1] -= (yij)*(Hs[i]*Hs[j]);
+
+				A[0][1] -= (yij)*(Hr[i]*Hs[j]+Hrs[i]*H[j]);
+				A[1][0] -= (yij)*(Hs[i]*Hr[j]+Hrs[i]*H[j]);
+			}
+		}
+	
+		// determinant of A
+		D = A[0][0]*A[1][1] - A[0][1]*A[1][0];
+
+		// solve for u = A^(-1)*R
+		u[0] = (A[1][1]*Q[0] - A[0][1]*Q[1])/D;
+		u[1] = (A[0][0]*Q[1] - A[1][0]*Q[0])/D;
+
+		// calculate displacement norm
+		normu = u[0]*u[0]+u[1]*u[1];
+
+		// check for convergence
+		bconv = ((normu < 1e-10));
+		if (!bconv && (n <= NMAX))
+		{
+			// Don't update if converged otherwise the point q
+			// does not correspond with the current values for (r,s)
+			r += u[0];
+			s += u[1];
+			++n;
+		}
+		else break;
+	}
+	while (1);
+
+	// evaluate q
+	q = y[0]*H[0]+y[1]*H[1]+y[2]*H[2]+y[3]*H[3]+y[4]*H[4]+y[5]*H[5]+y[6]*H[6]+y[7]*H[7]+y[8]*H[8];
 
 	return bconv;
 }
@@ -620,6 +733,12 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 		if (project2tri7(y, x, r, s, q)==false)
 		{
 //			assert(false);
+		}
+		break;
+	case 9:
+		if (project2quad9(y, x, r, s, q) == false)
+		{
+
 		}
 		break;
 	default:

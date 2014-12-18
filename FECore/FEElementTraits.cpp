@@ -1820,7 +1820,6 @@ FEQuad8G9::FEQuad8G9() : FEQuad8_(NINT, FE_QUAD8G9)
 }
 
 //-----------------------------------------------------------------------------
-//! \todo implement this
 void FEQuad8G9::project_to_nodes(double* ai, double* ao)
 {
 	vector<double> b(NELN);
@@ -1892,10 +1891,24 @@ void FEQuad9_::shape_deriv(double* Hr, double* Hs, double r, double s)
 
 //-----------------------------------------------------------------------------
 //! shape function derivatives at (r,s)
-//! \todo implement this
 void FEQuad9_::shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s)
 {
-	
+	double R[3] = {0.5*r*(r-1.0), 0.5*r*(r+1.0), 1.0 - r*r};
+	double S[3] = {0.5*s*(s-1.0), 0.5*s*(s+1.0), 1.0 - s*s};
+	double DR[3] = {r-0.5, r+0.5, -2.0*r};
+	double DS[3] = {s-0.5, s+0.5, -2.0*s};
+	double DDR[3] = {1.0, 1.0, -2.0};
+	double DDS[3] = {1.0, 1.0, -2.0};
+
+	Grr[0] = DDR[0]*S[0]; Grs[0] = DR[0]*DS[0]; Gss[0] = R[0]*DDS[0];
+	Grr[1] = DDR[1]*S[0]; Grs[1] = DR[1]*DS[0]; Gss[1] = R[1]*DDS[0];
+	Grr[2] = DDR[1]*S[1]; Grs[2] = DR[1]*DS[1]; Gss[2] = R[1]*DDS[1];
+	Grr[3] = DDR[0]*S[1]; Grs[3] = DR[0]*DS[1]; Gss[3] = R[0]*DDS[1];
+	Grr[4] = DDR[2]*S[0]; Grs[4] = DR[2]*DS[0]; Gss[4] = R[2]*DDS[0];
+	Grr[5] = DDR[1]*S[2]; Grs[5] = DR[1]*DS[2]; Gss[5] = R[1]*DDS[2];
+	Grr[6] = DDR[2]*S[1]; Grs[6] = DR[2]*DS[1]; Gss[6] = R[2]*DDS[1];
+	Grr[7] = DDR[0]*S[2]; Grs[7] = DR[0]*DS[2]; Gss[7] = R[0]*DDS[2];
+	Grr[8] = DDR[2]*S[2]; Grs[8] = DR[2]*DS[2]; Gss[8] = R[2]*DDS[2];		
 }
 
 //=============================================================================
@@ -1928,7 +1941,6 @@ FEQuad9G9::FEQuad9G9() : FEQuad9_(NINT, FE_QUAD9G9)
 }
 
 //-----------------------------------------------------------------------------
-//! \todo implement this
 void FEQuad9G9::project_to_nodes(double* ai, double* ao)
 {
 	vector<double> b(NELN);
