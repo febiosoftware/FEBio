@@ -24,120 +24,257 @@ END_PARAMETER_LIST();
 
 void FEFiberIntegrationTriangleUC::Init()
 {
-	m_bfirst = true;
-	
-	if (m_bfirst)
-	{
-		switch (m_nres) {
+    m_bfirst = true;
+    
+    if (m_bfirst)
+    {
+        switch (m_nres) {
                 
-                
-            case 1:
-                m_nint=NST1;
+            case 20:
+                m_nint=NST20;
                 for (int n=0; n<m_nint; ++n)
                 {
-                    m_cth[n] = cos(THETA1[n]);
-                    m_sth[n] = sin(THETA1[n]);
-                    m_cph[n] = cos(PHI1[n]);
-                    m_sph[n] = sin(PHI1[n]);
-                    m_w[n] = AREA1[n];
+                    m_cth[n] = cos(THETA20[n]);
+                    m_sth[n] = sin(THETA20[n]);
+                    m_cph[n] = cos(PHI20[n]);
+                    m_sph[n] = sin(PHI20[n]);
+                    m_w[n] = AREA20[n];
                 }
                 break;
-            case 2:
-                m_nint=NST2;
+            case 34:
+                m_nint=NST34;
                 for (int n=0; n<m_nint; ++n)
                 {
-                    m_cth[n] = cos(THETA2[n]);
-                    m_sth[n] = sin(THETA2[n]);
-                    m_cph[n] = cos(PHI2[n]);
-                    m_sph[n] = sin(PHI2[n]);
-                    m_w[n] = AREA2[n];
+                    m_cth[n] = cos(THETA34[n]);
+                    m_sth[n] = sin(THETA34[n]);
+                    m_cph[n] = cos(PHI34[n]);
+                    m_sph[n] = sin(PHI34[n]);
+                    m_w[n] = AREA34[n];
                 }
                 break;
-            case 3:
-                m_nint=NST3;
+            case 60:
+                m_nint=NST60;
                 for (int n=0; n<m_nint; ++n)
                 {
-                    m_cth[n] = cos(THETA3[n]);
-                    m_sth[n] = sin(THETA3[n]);
-                    m_cph[n] = cos(PHI3[n]);
-                    m_sph[n] = sin(PHI3[n]);
-                    m_w[n] = AREA3[n];
+                    m_cth[n] = cos(THETA60[n]);
+                    m_sth[n] = sin(THETA60[n]);
+                    m_cph[n] = cos(PHI60[n]);
+                    m_sph[n] = sin(PHI60[n]);
+                    m_w[n] = AREA60[n];
                 }
                 break;
-            case 4:
-                m_nint=NST4;
+            case 74:
+                m_nint=NST74;
                 for (int n=0; n<m_nint; ++n)
                 {
-                    m_cth[n] = cos(THETA4[n]);
-                    m_sth[n] = sin(THETA4[n]);
-                    m_cph[n] = cos(PHI4[n]);
-                    m_sph[n] = sin(PHI4[n]);
-                    m_w[n] = AREA4[n];
+                    m_cth[n] = cos(THETA74[n]);
+                    m_sth[n] = sin(THETA74[n]);
+                    m_cph[n] = cos(PHI74[n]);
+                    m_sph[n] = sin(PHI74[n]);
+                    m_w[n] = AREA74[n];
                 }
                 break;
-            case 5:
-                m_nint=NST5;
+            case 196:
+                m_nint=NST196;
                 for (int n=0; n<m_nint; ++n)
                 {
-                    m_cth[n] = cos(THETA5[n]);
-                    m_sth[n] = sin(THETA5[n]);
-                    m_cph[n] = cos(PHI5[n]);
-                    m_sph[n] = sin(PHI5[n]);
-                    m_w[n] = AREA5[n];
+                    m_cth[n] = cos(THETA196[n]);
+                    m_sth[n] = sin(THETA196[n]);
+                    m_cph[n] = cos(PHI196[n]);
+                    m_sph[n] = sin(PHI196[n]);
+                    m_w[n] = AREA196[n];
                 }
                 break;
-            case 6:
-                m_nint=NST6;
+            case 210:
+                m_nint=NST210;
                 for (int n=0; n<m_nint; ++n)
                 {
-                    m_cth[n] = cos(THETA6[n]);
-                    m_sth[n] = sin(THETA6[n]);
-                    m_cph[n] = cos(PHI6[n]);
-                    m_sph[n] = sin(PHI6[n]);
-                    m_w[n] = AREA6[n];
-                }
-                break;
-            case 7:
-                m_nint=NST7;
-                for (int n=0; n<m_nint; ++n)
-                {
-                    m_cth[n] = cos(THETA7[n]);
-                    m_sth[n] = sin(THETA7[n]);
-                    m_cph[n] = cos(PHI7[n]);
-                    m_sph[n] = sin(PHI7[n]);
-                    m_w[n] = AREA7[n];
-                }
-                break;
-            case 8:
-                m_nint=NST8;
-                for (int n=0; n<m_nint; ++n)
-                {
-                    m_cth[n] = cos(THETA8[n]);
-                    m_sth[n] = sin(THETA8[n]);
-                    m_cph[n] = cos(PHI8[n]);
-                    m_sph[n] = sin(PHI8[n]);
-                    m_w[n] = AREA8[n];
-                }
-                break;
-            case 9:
-                m_nint=NST9;
-                for (int n=0; n<m_nint; ++n)
-                {
-                    m_cth[n] = cos(THETA9[n]);
-                    m_sth[n] = sin(THETA9[n]);
-                    m_cph[n] = cos(PHI9[n]);
-                    m_sph[n] = sin(PHI9[n]);
-                    m_w[n] = AREA9[n];
+                    m_cth[n] = cos(THETA210[n]);
+                    m_sth[n] = sin(THETA210[n]);
+                    m_cph[n] = cos(PHI210[n]);
+                    m_sph[n] = sin(PHI210[n]);
+                    m_w[n] = AREA210[n];
                 }
                 break;
                 
-            default:
-                throw MaterialError("resolution must 1-9");
+            case 396:
+                m_nint=NST396;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA396[n]);
+                    m_sth[n] = sin(THETA396[n]);
+                    m_cph[n] = cos(PHI396[n]);
+                    m_sph[n] = sin(PHI396[n]);
+                    m_w[n] = AREA396[n];
+                }
                 break;
+                
+            case 410:
+                m_nint=NST410;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA410[n]);
+                    m_sth[n] = sin(THETA410[n]);
+                    m_cph[n] = cos(PHI410[n]);
+                    m_sph[n] = sin(PHI410[n]);
+                    m_w[n] = AREA410[n];
+                }
+                break;
+            case 596:
+                m_nint=NST596;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA596[n]);
+                    m_sth[n] = sin(THETA596[n]);
+                    m_cph[n] = cos(PHI596[n]);
+                    m_sph[n] = sin(PHI596[n]);
+                    m_w[n] = AREA596[n];
+                }
+                break;
+            case 610:
+                m_nint=NST610;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA610[n]);
+                    m_sth[n] = sin(THETA610[n]);
+                    m_cph[n] = cos(PHI610[n]);
+                    m_sph[n] = sin(PHI610[n]);
+                    m_w[n] = AREA610[n];
+                }
+                break;
+            case 796:
+                m_nint=NST796;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA796[n]);
+                    m_sth[n] = sin(THETA796[n]);
+                    m_cph[n] = cos(PHI796[n]);
+                    m_sph[n] = sin(PHI796[n]);
+                    m_w[n] = AREA796[n];
+                }
+                break;
+            case 810:
+                m_nint=NST810;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA810[n]);
+                    m_sth[n] = sin(THETA810[n]);
+                    m_cph[n] = cos(PHI810[n]);
+                    m_sph[n] = sin(PHI810[n]);
+                    m_w[n] = AREA810[n];
+                }
+                break;
+                
+            case 996:
+                m_nint=NST996;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA996[n]);
+                    m_sth[n] = sin(THETA996[n]);
+                    m_cph[n] = cos(PHI996[n]);
+                    m_sph[n] = sin(PHI996[n]);
+                    m_w[n] = AREA996[n];
+                }
+                break;
+                
+            case 1010:
+                m_nint=NST1010;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA1010[n]);
+                    m_sth[n] = sin(THETA1010[n]);
+                    m_cph[n] = cos(PHI1010[n]);
+                    m_sph[n] = sin(PHI1010[n]);
+                    m_w[n] = AREA1010[n];
+                }
+                break;
+                
+            case 1196:
+                m_nint=NST1196;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA1196[n]);
+                    m_sth[n] = sin(THETA1196[n]);
+                    m_cph[n] = cos(PHI1196[n]);
+                    m_sph[n] = sin(PHI1196[n]);
+                    m_w[n] = AREA1196[n];
+                }
+                break;
+                
+            case 1210:
+                m_nint=NST1210;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA1210[n]);
+                    m_sth[n] = sin(THETA1210[n]);
+                    m_cph[n] = cos(PHI1210[n]);
+                    m_sph[n] = sin(PHI1210[n]);
+                    m_w[n] = AREA1210[n];
+                }
+                break;
+            case 1396:
+                m_nint=NST1396;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA1396[n]);
+                    m_sth[n] = sin(THETA1396[n]);
+                    m_cph[n] = cos(PHI1396[n]);
+                    m_sph[n] = sin(PHI1396[n]);
+                    m_w[n] = AREA1396[n];
+                }
+                break;
+            case 1410:
+                m_nint=NST1410;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA1410[n]);
+                    m_sth[n] = sin(THETA1410[n]);
+                    m_cph[n] = cos(PHI1410[n]);
+                    m_sph[n] = sin(PHI1410[n]);
+                    m_w[n] = AREA1410[n];
+                }
+                break;
+            case 1596:
+                m_nint=NST1596;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA1596[n]);
+                    m_sth[n] = sin(THETA1596[n]);
+                    m_cph[n] = cos(PHI1596[n]);
+                    m_sph[n] = sin(PHI1596[n]);
+                    m_w[n] = AREA1596[n];
+                }
+                break;
+            case 1610:
+                m_nint=NST1610;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA1610[n]);
+                    m_sth[n] = sin(THETA1610[n]);
+                    m_cph[n] = cos(PHI1610[n]);
+                    m_sph[n] = sin(PHI1610[n]);
+                    m_w[n] = AREA1610[n];
+                }
+                break;
+            case 1796:
+                m_nint=NST1796;
+                for (int n=0; n<m_nint; ++n)
+                {
+                    m_cth[n] = cos(THETA1796[n]);
+                    m_sth[n] = sin(THETA1796[n]);
+                    m_cph[n] = cos(PHI1796[n]);
+                    m_sph[n] = sin(PHI1796[n]);
+                    m_w[n] = AREA1796[n];
+                }
+                break;
+                
+                //            default:
+                //                throw MaterialError("resolutio must 1-9");
+                //                break;
         }
         
-		m_bfirst = false;
-	}
+        m_bfirst = false;
+    }
     
     // also initialize the parent class
     FEFiberIntegrationSchemeUC::Init();

@@ -7,6 +7,7 @@
 #include "stdafx.h"
 #include "FEFiberIntegrationGaussKronrod.h"
 #include "gausskronrod.h"
+#include <limits>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -18,19 +19,19 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberIntegrationGaussKronrod, FEFiberIntegrationScheme)
-    ADD_PARAMETER(m_nph, FE_PARAM_INT, "nph");
-    ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
+ADD_PARAMETER(m_nph, FE_PARAM_INT, "nph");
+ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
 END_PARAMETER_LIST();
 
 void FEFiberIntegrationGaussKronrod::Init()
 {
-	if (m_nph < 1) throw MaterialError("nph must be strictly greater than zero.");
-	if (m_nth < 1) throw MaterialError("nth must be strictly greater than zero.");
+    if (m_nph < 1) throw MaterialError("nph must be strictly greater than zero.");
+    if (m_nth < 1) throw MaterialError("nth must be strictly greater than zero.");
     
-	m_bfirst = true;
-	
-	if (m_bfirst)
-	{
+    m_bfirst = true;
+    
+    if (m_bfirst)
+    {
         switch (m_nph) {
             case 7:
                 m_gp.assign(gp7, gp7+nint7);
@@ -57,10 +58,10 @@ void FEFiberIntegrationGaussKronrod::Init()
                 m_gw.assign(gw27, gw27+nint27);
                 break;
             default:
-                throw MaterialError("nph must 7,11,15,19,23,27.");
+                throw MaterialError("nph must be 7, 11, 15, 19, 23, or 27.");
                 break;
         }
-		m_bfirst = false;
+        m_bfirst = false;
     }
     
     // also initialize the parent class
@@ -70,27 +71,32 @@ void FEFiberIntegrationGaussKronrod::Init()
 //-----------------------------------------------------------------------------
 mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	
-	// get the element's local coordinate system
-	mat3d QT = (pt.m_Q).transpose();
-	
-    // Lagrangian strain tensor and its eigenvalues & eigenvectors
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // get the element's local coordinate system
+    mat3d QT = (pt.m_Q).transpose();
+    
+    // right Cauchy-Green tensor and its eigenvalues & eigenvectors
     mat3ds E = pt.Strain();
     mat3ds C = pt.RightCauchyGreen();
     double lE[3], lC[3];
     vec3d vE[3], vC[3];
-    E.eigen2(lE,vE);
-    C.eigen2(lC,vC);
+    E.eigen2(lE,vE);//lE[2]>lE[1]>lE[0]
+    C.eigen2(lC, vC);
+    const double eps = std::numeric_limits<double>::epsilon();
     
     // initialize stress tensor
-	mat3ds s;
-	s.zero();
+    mat3ds s;
+    s.zero();
     
-    // check if there is no tension (C case)
+    // check if there is no tension
     if (lE[2] <= 0) {
         return s;
     }
+    
+    // bubble sort eigenvalues & eigenvectors from smallest to largest
+    double ltmp;
+    vec3d vtmp;
     
     // check remaining stretch states
     double phi, theta;
@@ -101,26 +107,23 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
     vec3d n0e, n0a;
     double wn;
     
-    // loop over all integration points
-    for (int i=0; i<m_nth; ++i) {
-        theta = i*dth;
-        double den = lE[0]*SQR(cos(theta)) + lE[1]*SQR(sin(theta));
+    // tension along all three eigenvectors (all directions)
+    if (lE[0] >=0) {
+        ksia = 0;
+        ksib = 1;
+        dksi = (ksib - ksia)/2;
+        sksi = (ksib + ksia)/2;
         
-        // check for T, TC or CT cases
-        
-        // T case
-        if (lE[0] >= 0) {
-            ksia = 0;
-            ksib = 1;
-            dksi = (ksib - ksia)/2;
-            sksi = (ksib + ksia)/2;
+        // loop over all integration points
+        for (int i=0; i<m_nth; ++i) {
+            theta = i*dth;
             for (int j=0; j<m_nph; ++j) {
                 ksi = sksi + dksi*m_gp[j];
                 wn = m_gw[j]*dth*dksi;
                 phi = acos(ksi);
                 
                 // set fiber direction in global coordinate system
-                n0e = vC[0]*(cos(theta)*sin(phi)) + vC[1]*(sin(theta)*sin(phi)) + vC[2]*cos(phi);
+                n0e = vE[0]*(cos(theta)*sin(phi)) + vE[1]*(sin(theta)*sin(phi)) + vE[2]*cos(phi);
                 m_pFmat->SetFiberDirection(mp, n0e);
                 
                 // rotate to local configuration to evaluate ellipsoidally distributed material coefficients
@@ -131,9 +134,17 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
                 s += m_pFmat->Stress(mp)*(R*wn);
             }
         }
-        // TC case
-        else if (lE[1] <= 0) {
-            ksia = sqrt(den/(den-lE[2]));
+    }
+    // tension along one eigenvector and compression along other two// TC case
+    else if (lE[1] <= eps) {
+        // loop over all integration points
+        for (int i=0; i<m_nth; ++i) {
+            theta = i*dth;
+            double nu=-lE[0]*SQR(cos(theta))-lE[1]*SQR(sin(theta));
+            if (nu<0) nu=0;
+            double de=lE[2]-lE[0]*SQR(cos(theta))-lE[1]*SQR(sin(theta));
+            if (de<=0) ksia=1;
+            else ksia = sqrt(nu)/sqrt(de);
             ksib = 1;
             dksi = (ksib - ksia)/2;
             sksi = (ksib + ksia)/2;
@@ -143,7 +154,7 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
                 phi = acos(ksi);
                 
                 // set fiber direction in global coordinate system
-                n0e = vC[0]*(cos(theta)*sin(phi)) + vC[1]*(sin(theta)*sin(phi)) + vC[2]*cos(phi);
+                n0e = vE[0]*(cos(theta)*sin(phi)) + vE[1]*(sin(theta)*sin(phi)) + vE[2]*cos(phi);
                 m_pFmat->SetFiberDirection(mp, n0e);
                 
                 // rotate to local configuration to evaluate ellipsoidally distributed material coefficients
@@ -153,12 +164,24 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
                 // calculate the stress
                 s += m_pFmat->Stress(mp)*(R*wn);
             }
-            
         }
-        // CT case
-        else {
+    }
+    // tension along two eigenvectors and compression along third
+    else {
+        // swap first and last eigenvalues/eigenvectors to maintain consistency in formulas
+        ltmp = lE[2]; vtmp = vE[2];
+        lE[2] = lE[0]; vE[2] = vE[0];
+        lE[0] = ltmp; vE[0] = vtmp;
+        
+        // loop over all integration points
+        for (int i=0; i<m_nth; ++i) {
+            theta = i*dth;
             ksia = 0;
-            ksib = sqrt(den/(den-lE[2]));
+            double nu=lE[0]*SQR(cos(theta))+lE[1]*SQR(sin(theta));
+            if (nu<0) nu=0;
+            double de=lE[0]*SQR(cos(theta))+lE[1]*SQR(sin(theta))-lE[2];
+            if (de<=0) ksib=0;
+            else ksib = sqrt(nu)/sqrt(de);
             dksi = (ksib - ksia)/2;
             sksi = (ksib + ksia)/2;
             for (int j=0; j<m_nph; ++j) {
@@ -167,7 +190,7 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
                 phi = acos(ksi);
                 
                 // set fiber direction in global coordinate system
-                n0e = vC[0]*(cos(theta)*sin(phi)) + vC[1]*(sin(theta)*sin(phi)) + vC[2]*cos(phi);
+                n0e = vE[0]*(cos(theta)*sin(phi)) + vE[1]*(sin(theta)*sin(phi)) + vE[2]*cos(phi);
                 m_pFmat->SetFiberDirection(mp, n0e);
                 
                 // rotate to local configuration to evaluate ellipsoidally distributed material coefficients
@@ -177,12 +200,11 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
                 // calculate the stress
                 s += m_pFmat->Stress(mp)*(R*wn);
             }
-            
         }
     }
     
-	// we multiply by two to add contribution from other half-sphere
-	return s*(2.0);
+    // we multiply by two to add contribution from other half-sphere
+    return s*(2.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -193,22 +215,24 @@ tens4ds FEFiberIntegrationGaussKronrod::Tangent(FEMaterialPoint& mp)
     // get the element's local coordinate system
     mat3d QT = (pt.m_Q).transpose();
     
-    // Lagrangian strain tensor and its eigenvalues & eigenvectors
+    // right Cauchy-Green tensor and its eigenvalues & eigenvectors
     mat3ds E = pt.Strain();
-    mat3ds C = pt.RightCauchyGreen();
-    double lE[3], lC[3];
-    vec3d vE[3], vC[3];
-    E.eigen2(lE,vE);
-    C.eigen2(lC,vC);
+    double lE[3];
+    vec3d vE[3];
+    E.eigen2(lE, vE);
+    const double eps = std::numeric_limits<double>::epsilon();
     
-    // initialize tangent tensor
+    // initialize stress tensor
     tens4ds c;
     c.zero();
     
-    // check if there is no tension (C case)
+    // check if there is no tension
     if (lE[2] <= 0) {
         return c;
     }
+    
+    double ltmp;
+    vec3d vtmp;
     
     // check remaining stretch states
     double phi, theta;
@@ -219,16 +243,44 @@ tens4ds FEFiberIntegrationGaussKronrod::Tangent(FEMaterialPoint& mp)
     vec3d n0e, n0a;
     double wn;
     
-    // loop over all integration points
-    for (int i=0; i<m_nth; ++i) {
-        theta = i*dth;
-        double den = lE[0]*SQR(cos(theta)) + lE[1]*SQR(sin(theta));
+    // tension along all three eigenvectors (all directions)
+    if (lE[0] >=0) {
+        ksia = 0;
+        ksib = 1;
+        dksi = (ksib - ksia)/2;
+        sksi = (ksib + ksia)/2;
         
-        // check for T, TC or CT cases
-        
-        // T case
-        if (lE[0] >= 0) {
-            ksia = 0;
+        // loop over all integration points
+        for (int i=0; i<m_nth; ++i) {
+            theta = i*dth;
+            for (int j=0; j<m_nph; ++j) {
+                ksi = sksi + dksi*m_gp[j];
+                wn = m_gw[j]*dth*dksi;
+                phi = acos(ksi);
+                
+                // set fiber direction in global coordinate system
+                n0e = vE[0]*(cos(theta)*sin(phi)) + vE[1]*(sin(theta)*sin(phi)) + vE[2]*cos(phi);
+                m_pFmat->SetFiberDirection(mp, n0e);
+                
+                // rotate to local configuration to evaluate ellipsoidally distributed material coefficients
+                n0a = QT*n0e;
+                double R = m_pFDD->FiberDensity(n0a);
+                
+                // calculate the tangent
+                c += m_pFmat->Tangent(mp)*(R*wn);
+            }
+        }
+    }
+    // tension along one eigenvector and compression along other two
+    else if (lE[1] <= eps) {
+        // loop over all integration points
+        for (int i=0; i<m_nth; ++i) {
+            theta = i*dth;
+            double nu=-lE[0]*SQR(cos(theta))-lE[1]*SQR(sin(theta));
+            if (nu<0) nu=0;
+            double de=lE[2]-lE[0]*SQR(cos(theta))-lE[1]*SQR(sin(theta));
+            if (de<=0) ksia=1;
+            else ksia = sqrt(nu)/sqrt(de);
             ksib = 1;
             dksi = (ksib - ksia)/2;
             sksi = (ksib + ksia)/2;
@@ -238,45 +290,34 @@ tens4ds FEFiberIntegrationGaussKronrod::Tangent(FEMaterialPoint& mp)
                 phi = acos(ksi);
                 
                 // set fiber direction in global coordinate system
-                n0e = vC[0]*(cos(theta)*sin(phi)) + vC[1]*(sin(theta)*sin(phi)) + vC[2]*cos(phi);
+                n0e = vE[0]*(cos(theta)*sin(phi)) + vE[1]*(sin(theta)*sin(phi)) + vE[2]*cos(phi);
                 m_pFmat->SetFiberDirection(mp, n0e);
                 
                 // rotate to local configuration to evaluate ellipsoidally distributed material coefficients
                 n0a = QT*n0e;
                 double R = m_pFDD->FiberDensity(n0a);
                 
-                // calculate the stress
+                // calculate the tangent
                 c += m_pFmat->Tangent(mp)*(R*wn);
             }
         }
-        // TC case
-        else if (lE[1] <= 0) {
-            ksia = sqrt(den/(den-lE[2]));
-            ksib = 1;
-            dksi = (ksib - ksia)/2;
-            sksi = (ksib + ksia)/2;
-            for (int j=0; j<m_nph; ++j) {
-                ksi = sksi + dksi*m_gp[j];
-                wn = m_gw[j]*dth*dksi;
-                phi = acos(ksi);
-                
-                // set fiber direction in global coordinate system
-                n0e = vC[0]*(cos(theta)*sin(phi)) + vC[1]*(sin(theta)*sin(phi)) + vC[2]*cos(phi);
-                m_pFmat->SetFiberDirection(mp, n0e);
-                
-                // rotate to local configuration to evaluate ellipsoidally distributed material coefficients
-                n0a = QT*n0e;
-                double R = m_pFDD->FiberDensity(n0a);
-                
-                // calculate the stress
-                c += m_pFmat->Tangent(mp)*(R*wn);
-            }
-            
-        }
-        // CT case
-        else {
+    }
+    // tension along two eigenvectors and compression along third
+    else {
+        // swap first and last eigenvalues/eigenvectors to maintain consistency in formulas
+        ltmp = lE[2]; vtmp = vE[2];
+        lE[2] = lE[0]; vE[2] = vE[0];
+        lE[0] = ltmp; vE[0] = vtmp;
+        
+        // loop over all integration points
+        for (int i=0; i<m_nth; ++i) {
+            theta = i*dth;
             ksia = 0;
-            ksib = sqrt(den/(den-lE[2]));
+            double nu=lE[0]*SQR(cos(theta))+lE[1]*SQR(sin(theta));
+            if (nu<0) nu=0;
+            double de=lE[0]*SQR(cos(theta))+lE[1]*SQR(sin(theta))-lE[2];
+            if (de<=0) ksib=0;
+            else ksib = sqrt(nu)/sqrt(de);
             dksi = (ksib - ksia)/2;
             sksi = (ksib + ksia)/2;
             for (int j=0; j<m_nph; ++j) {
@@ -285,22 +326,21 @@ tens4ds FEFiberIntegrationGaussKronrod::Tangent(FEMaterialPoint& mp)
                 phi = acos(ksi);
                 
                 // set fiber direction in global coordinate system
-                n0e = vC[0]*(cos(theta)*sin(phi)) + vC[1]*(sin(theta)*sin(phi)) + vC[2]*cos(phi);
+                n0e = vE[0]*(cos(theta)*sin(phi)) + vE[1]*(sin(theta)*sin(phi)) + vE[2]*cos(phi);
                 m_pFmat->SetFiberDirection(mp, n0e);
                 
                 // rotate to local configuration to evaluate ellipsoidally distributed material coefficients
                 n0a = QT*n0e;
                 double R = m_pFDD->FiberDensity(n0a);
                 
-                // calculate the stress
+                // calculate the tangent
                 c += m_pFmat->Tangent(mp)*(R*wn);
             }
-            
         }
     }
     
-	// we multiply by two to add contribution from other half-sphere
-	return c*(2.0);
+    // we multiply by two to add contribution from other half-sphere
+    return c*(2.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -311,21 +351,24 @@ double FEFiberIntegrationGaussKronrod::StrainEnergyDensity(FEMaterialPoint& mp)
     // get the element's local coordinate system
     mat3d QT = (pt.m_Q).transpose();
     
-    // Lagrangian strain tensor and its eigenvalues & eigenvectors
+    // right Cauchy-Green tensor and its eigenvalues & eigenvectors
     mat3ds E = pt.Strain();
-    mat3ds C = pt.RightCauchyGreen();
-    double lE[3], lC[3];
-    vec3d vE[3], vC[3];
-    E.eigen2(lE,vE);
-    C.eigen2(lC,vC);
+    double lE[3];
+    vec3d vE[3];
+    E.eigen2(lE, vE);
+    const double eps = std::numeric_limits<double>::epsilon();
     
     // initialize strain energy density
     double sed = 0.0;
     
-    // check if there is no tension (C case)
+    // check if there is no tension
     if (lE[2] <= 0) {
         return sed;
     }
+    
+    // bubble sort eigenvalues & eigenvectors from smallest to largest
+    double ltmp;
+    vec3d vtmp;
     
     // check remaining stretch states
     double phi, theta;
@@ -336,26 +379,23 @@ double FEFiberIntegrationGaussKronrod::StrainEnergyDensity(FEMaterialPoint& mp)
     vec3d n0e, n0a;
     double wn;
     
-    // loop over all integration points
-    for (int i=0; i<m_nth; ++i) {
-        theta = i*dth;
-        double den = lE[0]*SQR(cos(theta)) + lE[1]*SQR(sin(theta));
+    // tension along all three eigenvectors (all directions)
+    if (lE[0] >=0) {
+        ksia = 0;
+        ksib = 1;
+        dksi = (ksib - ksia)/2;
+        sksi = (ksib + ksia)/2;
         
-        // check for T, TC or CT cases
-        
-        // T case
-        if (lE[0] >= 0) {
-            ksia = 0;
-            ksib = 1;
-            dksi = (ksib - ksia)/2;
-            sksi = (ksib + ksia)/2;
+        // loop over all integration points
+        for (int i=0; i<m_nth; ++i) {
+            theta = i*dth;
             for (int j=0; j<m_nph; ++j) {
                 ksi = sksi + dksi*m_gp[j];
                 wn = m_gw[j]*dth*dksi;
                 phi = acos(ksi);
                 
                 // set fiber direction in global coordinate system
-                n0e = vC[0]*(cos(theta)*sin(phi)) + vC[1]*(sin(theta)*sin(phi)) + vC[2]*cos(phi);
+                n0e = vE[0]*(cos(theta)*sin(phi)) + vE[1]*(sin(theta)*sin(phi)) + vE[2]*cos(phi);
                 m_pFmat->SetFiberDirection(mp, n0e);
                 
                 // rotate to local configuration to evaluate ellipsoidally distributed material coefficients
@@ -366,9 +406,17 @@ double FEFiberIntegrationGaussKronrod::StrainEnergyDensity(FEMaterialPoint& mp)
                 sed += m_pFmat->StrainEnergyDensity(mp)*(R*wn);
             }
         }
-        // TC case
-        else if (lE[1] <= 0) {
-            ksia = sqrt(den/(den-lE[2]));
+    }
+    // tension along one eigenvector and compression along other two
+    else if (lE[1] <= eps) {
+        // loop over all integration points
+        for (int i=0; i<m_nth; ++i) {
+            theta = i*dth;
+            double nu=-lE[0]*SQR(cos(theta))-lE[1]*SQR(sin(theta));
+            if (nu<0) nu=0;
+            double de=lE[2]-lE[0]*SQR(cos(theta))-lE[1]*SQR(sin(theta));
+            if (de<=0) ksia=1;
+            else ksia = sqrt(nu)/sqrt(de);
             ksib = 1;
             dksi = (ksib - ksia)/2;
             sksi = (ksib + ksia)/2;
@@ -378,7 +426,7 @@ double FEFiberIntegrationGaussKronrod::StrainEnergyDensity(FEMaterialPoint& mp)
                 phi = acos(ksi);
                 
                 // set fiber direction in global coordinate system
-                n0e = vC[0]*(cos(theta)*sin(phi)) + vC[1]*(sin(theta)*sin(phi)) + vC[2]*cos(phi);
+                n0e = vE[0]*(cos(theta)*sin(phi)) + vE[1]*(sin(theta)*sin(phi)) + vE[2]*cos(phi);
                 m_pFmat->SetFiberDirection(mp, n0e);
                 
                 // rotate to local configuration to evaluate ellipsoidally distributed material coefficients
@@ -388,12 +436,24 @@ double FEFiberIntegrationGaussKronrod::StrainEnergyDensity(FEMaterialPoint& mp)
                 // calculate the stress
                 sed += m_pFmat->StrainEnergyDensity(mp)*(R*wn);
             }
-            
         }
-        // CT case
-        else {
+    }
+    // tension along two eigenvectors and compression along third
+    else {
+        // swap first and last eigenvalues/eigenvectors to maintain consistency in formulas
+        ltmp = lE[2]; vtmp = vE[2];
+        lE[2] = lE[0]; vE[2] = vE[0];
+        lE[0] = ltmp; vE[0] = vtmp;
+        
+        // loop over all integration points
+        for (int i=0; i<m_nth; ++i) {
+            theta = i*dth;
             ksia = 0;
-            ksib = sqrt(den/(den-lE[2]));
+            double nu=lE[0]*SQR(cos(theta))+lE[1]*SQR(sin(theta));
+            if (nu<0) nu=0;
+            double de=lE[0]*SQR(cos(theta))+lE[1]*SQR(sin(theta))-lE[2];
+            if (de<=0) ksib=0;
+            else ksib = sqrt(nu)/sqrt(de);
             dksi = (ksib - ksia)/2;
             sksi = (ksib + ksia)/2;
             for (int j=0; j<m_nph; ++j) {
@@ -402,7 +462,7 @@ double FEFiberIntegrationGaussKronrod::StrainEnergyDensity(FEMaterialPoint& mp)
                 phi = acos(ksi);
                 
                 // set fiber direction in global coordinate system
-                n0e = vC[0]*(cos(theta)*sin(phi)) + vC[1]*(sin(theta)*sin(phi)) + vC[2]*cos(phi);
+                n0e = vE[0]*(cos(theta)*sin(phi)) + vE[1]*(sin(theta)*sin(phi)) + vE[2]*cos(phi);
                 m_pFmat->SetFiberDirection(mp, n0e);
                 
                 // rotate to local configuration to evaluate ellipsoidally distributed material coefficients
@@ -415,8 +475,8 @@ double FEFiberIntegrationGaussKronrod::StrainEnergyDensity(FEMaterialPoint& mp)
         }
     }
     
-	// we multiply by two to add contribution from other half-sphere
-	return sed*2.0;
+    // we multiply by two to add contribution from other half-sphere
+    return sed*2.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -461,6 +521,6 @@ void FEFiberIntegrationGaussKronrod::IntegratedFiberDensity(double& IFD)
         }
     }
     
-	// we multiply by two to add contribution from other half-sphere
-	IFD = C*2;
+    // we multiply by two to add contribution from other half-sphere
+    IFD = C*2;
 }
