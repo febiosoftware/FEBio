@@ -296,7 +296,7 @@ bool project2quad(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 bool project2quad9(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 {
 	double Q[2], u[2], D;
-	double H[9], Hr[9], Hs[9], Hrs[9];
+	double H[9], Hr[9], Hs[9], Hrr[9], Hss[9], Hrs[9];
 
 	int i, j;
 	int NMAX = 50, n=0;
@@ -324,6 +324,8 @@ bool project2quad9(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 		double S[3] = {0.5*s*(s-1.0), 0.5*s*(s+1.0), 1.0 - s*s};
 		double DR[3] = {r-0.5, r+0.5, -2.0*r};
 		double DS[3] = {s-0.5, s+0.5, -2.0*s};
+		double DDR[3] = {1.0, 1.0, -2.0};
+		double DDS[3] = {1.0, 1.0, -2.0};
 
 		H[0] = R[0]*S[0];
 		H[1] = R[1]*S[0];
@@ -335,25 +337,25 @@ bool project2quad9(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 		H[7] = R[0]*S[2];
 		H[8] = R[2]*S[2];
 
-		Hr[0] = DR[0]*S[0];
-		Hr[1] = DR[1]*S[0];
-		Hr[2] = DR[1]*S[1];
-		Hr[3] = DR[0]*S[1];
-		Hr[4] = DR[2]*S[0];
-		Hr[5] = DR[1]*S[2];
-		Hr[6] = DR[2]*S[1];
-		Hr[7] = DR[0]*S[2];
-		Hr[8] = DR[2]*S[2];
-
-		Hs[0] = R[0]*DS[0];
-		Hs[1] = R[1]*DS[0];
-		Hs[2] = R[1]*DS[1];
-		Hs[3] = R[0]*DS[1];
-		Hs[4] = R[2]*DS[0];
-		Hs[5] = R[1]*DS[2];
-		Hs[6] = R[2]*DS[1];
-		Hs[7] = R[0]*DS[2];
-		Hs[8] = R[2]*DS[2];
+		Hr[0] = DR[0]*S[0]; Hs[0] = R[0]*DS[0];
+		Hr[1] = DR[1]*S[0];	Hs[1] = R[1]*DS[0];
+		Hr[2] = DR[1]*S[1];	Hs[2] = R[1]*DS[1];
+		Hr[3] = DR[0]*S[1];	Hs[3] = R[0]*DS[1];
+		Hr[4] = DR[2]*S[0];	Hs[4] = R[2]*DS[0];
+		Hr[5] = DR[1]*S[2];	Hs[5] = R[1]*DS[2];
+		Hr[6] = DR[2]*S[1];	Hs[6] = R[2]*DS[1];
+		Hr[7] = DR[0]*S[2];	Hs[7] = R[0]*DS[2];
+		Hr[8] = DR[2]*S[2];	Hs[8] = R[2]*DS[2];
+	
+		Hrr[0] = DDR[0]*S[0]; Hrs[0] = DR[0]*DS[0]; Hss[0] = R[0]*DDS[0];
+		Hrr[1] = DDR[1]*S[0]; Hrs[1] = DR[1]*DS[0]; Hss[1] = R[1]*DDS[0];
+		Hrr[2] = DDR[1]*S[1]; Hrs[2] = DR[1]*DS[1]; Hss[2] = R[1]*DDS[1];
+		Hrr[3] = DDR[0]*S[1]; Hrs[3] = DR[0]*DS[1]; Hss[3] = R[0]*DDS[1];
+		Hrr[4] = DDR[2]*S[0]; Hrs[4] = DR[2]*DS[0]; Hss[4] = R[2]*DDS[0];
+		Hrr[5] = DDR[1]*S[2]; Hrs[5] = DR[1]*DS[2]; Hss[5] = R[1]*DDS[2];
+		Hrr[6] = DDR[2]*S[1]; Hrs[6] = DR[2]*DS[1]; Hss[6] = R[2]*DDS[1];
+		Hrr[7] = DDR[0]*S[2]; Hrs[7] = DR[0]*DS[2]; Hss[7] = R[0]*DDS[2];
+		Hrr[8] = DDR[2]*S[2]; Hrs[8] = DR[2]*DS[2]; Hss[8] = R[2]*DDS[2];		
 
 		// set up the system of equations
 		Q[0] = Q[1] = 0;
@@ -363,8 +365,10 @@ bool project2quad9(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 			Q[0] -= (xy[i])*Hr[i];
 			Q[1] -= (xy[i])*Hs[i];
 
+			A[0][0] += (xy[i])*Hrr[i];
 			A[0][1] += (xy[i])*Hrs[i];
 			A[1][0] += (xy[i])*Hrs[i];
+			A[1][1] += (xy[i])*Hss[i];
 
 			for (j=0; j<9; ++j)
 			{
@@ -372,11 +376,11 @@ bool project2quad9(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 				Q[0] -= -H[j]*Hr[i]*(yij);
 				Q[1] -= -H[j]*Hs[i]*(yij);
 
-				A[0][0] -= (yij)*(Hr[i]*Hr[j]);
-				A[1][1] -= (yij)*(Hs[i]*Hs[j]);
+				A[0][0] -= (yij)*(H[i]*Hrr[j] + Hr[i]*Hr[j]);
+				A[1][1] -= (yij)*(H[i]*Hss[j] + Hs[i]*Hs[j]);
 
-				A[0][1] -= (yij)*(Hr[i]*Hs[j]+Hrs[i]*H[j]);
-				A[1][0] -= (yij)*(Hs[i]*Hr[j]+Hrs[i]*H[j]);
+				A[0][1] -= (yij)*(Hrs[i]*H[j] + Hr[i]*Hs[j]);
+				A[1][0] -= (yij)*(Hrs[i]*H[j] + Hs[i]*Hr[j]);
 			}
 		}
 	
@@ -997,17 +1001,26 @@ vec3d FESurface::SurfaceNormal(FESurfaceElement &el, double r, double s)
 bool FESurface::IsInsideElement(FESurfaceElement& el, double r, double s, double tol)
 {
 	int ne = el.Nodes();
-	if (ne == 4)
+	switch (ne)
 	{
-		// check quads
-		if ((r >= -1-tol) && (r <= 1+tol) && (s >= -1-tol) && (s <= 1+tol)) return true;
-		else return false;
-	}
-	else
-	{
-		// check triangles
-		if ((r >= -tol) && (s >= -tol) && (r+s <= 1+tol)) return true;
-		else return false;
+	case 4:
+	case 8:
+	case 9:
+		{
+			// check quads
+			if ((r >= -1-tol) && (r <= 1+tol) && (s >= -1-tol) && (s <= 1+tol)) return true;
+			else return false;
+		}
+		break;
+	case 3:
+	case 6:
+	case 7:
+		{
+			// check triangles
+			if ((r >= -tol) && (s >= -tol) && (r+s <= 1+tol)) return true;
+			else return false;
+		}
+		break;
 	}
 	assert(false);
 	return false;

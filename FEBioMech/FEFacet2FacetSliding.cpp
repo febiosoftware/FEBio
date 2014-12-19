@@ -848,6 +848,10 @@ void FEFacet2FacetSliding::ContactStiffness(FESolver* psolver)
 
 					// gap function
 					double g = pt.m_gap;
+
+					// when the node is on the surface, the gap value
+					// can flip-flop between positive and negative.
+					if (fabs(g)<1e-20) g = 0;
 					
 					// lagrange multiplier
 					double Lm = pt.m_Lm;
@@ -862,6 +866,7 @@ void FEFacet2FacetSliding::ContactStiffness(FESolver* psolver)
 					double dtn = eps*HEAVYSIDE(Lm + eps*g);
 
 					// define buffer layer for penalty insertion
+					// TODO: I don't think this does anything since dtn cannot < 0
 					if ((dtn < 1e-7) && (g < 0) && (dxtol != 0))
 					{
 						if (dxtol < 0) dtn = eps*exp(-g/dxtol);
