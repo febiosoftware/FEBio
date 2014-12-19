@@ -129,7 +129,7 @@ FEMaterialPoint* FEReactiveViscoelasticMaterial::CreateMaterialPointData()
 bool FEReactiveViscoelasticMaterial::NewGeneration(FEMaterialPoint& mp)
 {
     double d;
-    double eps = 0;
+    double eps = std::numeric_limits<double>::epsilon();
 
     // get the elastic material poit data
     FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -174,6 +174,7 @@ bool FEReactiveViscoelasticMaterial::NewGeneration(FEMaterialPoint& mp)
             // trigger in response to dilatational strain
             d = fabs(log(Fu.det()));
         }
+            break;
             
         default:
             d = 0;
