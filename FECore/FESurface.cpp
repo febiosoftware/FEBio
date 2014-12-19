@@ -1304,7 +1304,7 @@ double FESurface::jac0(FESurfaceElement &el, int n)
 // This function calculates the intersection of a ray with a triangle
 // and returns true if the ray intersects the triangle.
 //
-bool FESurface::IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
+bool IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
 {
 	vec3d e[2], E[2];
 	mat2d G;
@@ -1356,7 +1356,7 @@ bool FESurface::IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g
 //! This function calculates the intersection of a ray with a quad
 //! and returns true if the ray intersected.
 //!
-bool FESurface::IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
+bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
 {
 	// first we're going to see if the ray intersects the two subtriangles
 	vec3d x1[3], x2[3];
@@ -1454,7 +1454,7 @@ bool FESurface::IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& 
 //! This function calculates the intersection of a ray with a quad
 //! and returns true if the ray intersected.
 //!
-bool FESurface::IntersectQuad8(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
+bool IntersectQuad8(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
 {
 	mat3d A;
 	vec3d dx;
@@ -1542,7 +1542,7 @@ bool FESurface::IntersectQuad8(vec3d* y, vec3d r, vec3d n, double rs[2], double&
 //! This function calculates the intersection of a ray with a quad
 //! and returns true if the ray intersected.
 //!
-bool FESurface::IntersectQuad9(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
+bool IntersectQuad9(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
 {
 	mat3d A;
 	vec3d dx;
@@ -1632,41 +1632,10 @@ bool FESurface::IntersectQuad9(vec3d* y, vec3d r, vec3d n, double rs[2], double&
 }
 
 //-----------------------------------------------------------------------------
-//! This function calculates the intersection of a ray with a surface element.
-//! It simply calls the tri or quad intersection function based on the type
-//! of element.
-//!
-bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps)
-{
-	int N = el.Nodes();
-
-	// get the element nodes
-	FEMesh& mesh = *m_pMesh;
-	vec3d y[FEElement::MAX_NODES];
-	for (int i=0; i<N; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
-
-	// call the correct intersection function
-	switch (N)
-	{
-	case 3: return IntersectTri  (y, r, n, rs, g, eps); break;
-	case 4: return IntersectQuad (y, r, n, rs, g, eps); break;
-	case 6: return IntersectTri6 (y, r, n, rs, g, eps); break;
-	case 8: return IntersectQuad8(y, r, n, rs, g, eps); break;
-	case 9: return IntersectQuad9(y, r, n, rs, g, eps); break;
-	default:
-		assert(false);
-	}
-
-	// if we get here, the ray did not intersect the element
-	return false;
-}
-
-
-//-----------------------------------------------------------------------------
 //! This function calculates the intersection of a ray with a 6-node triangle
 //! and returns true if the ray intersected.
 //!
-bool FESurface::IntersectTri6(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
+bool IntersectTri6(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
 {
 	// first we're going to see if the ray intersects the four subtriangles
 	vec3d x1[3], x2[3], x3[3], x4[3];
@@ -1783,6 +1752,36 @@ bool FESurface::IntersectTri6(vec3d* y, vec3d r, vec3d n, double rs[2], double& 
 		if ((rs[0] >= -eps) && (rs[1] >= -eps) && (rs[0]+rs[1] <= 1+eps)) return true;
 	}
 	
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the intersection of a ray with a surface element.
+//! It simply calls the correct intersection function based on the type
+//! of element.
+//!
+bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps)
+{
+	int N = el.Nodes();
+
+	// get the element nodes
+	FEMesh& mesh = *m_pMesh;
+	vec3d y[FEElement::MAX_NODES];
+	for (int i=0; i<N; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
+
+	// call the correct intersection function
+	switch (N)
+	{
+	case 3: return IntersectTri  (y, r, n, rs, g, eps); break;
+	case 4: return IntersectQuad (y, r, n, rs, g, eps); break;
+	case 6: return IntersectTri6 (y, r, n, rs, g, eps); break;
+	case 8: return IntersectQuad8(y, r, n, rs, g, eps); break;
+	case 9: return IntersectQuad9(y, r, n, rs, g, eps); break;
+	default:
+		assert(false);
+	}
+
+	// if we get here, the ray did not intersect the element
 	return false;
 }
 
