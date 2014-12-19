@@ -419,7 +419,7 @@ bool project2quad9(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 bool project2tri6(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 {
 	double R[2], u[2], D;
-	double H[6], Hr[6], Hs[6], Hrs[6];
+	double H[6], Hr[6], Hs[6], Hrr[6], Hss[6], Hrs[6];
 	
 	int i, j;
 	int NMAX = 50, n=0;
@@ -475,12 +475,12 @@ bool project2tri6(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 		Hs[4] =  4.0*r;
 		Hs[5] =  4.0 - 8.0*s - 4.0*r;
 
-		Hrs[0] =  4.0;
-		Hrs[1] =  0.0;
-		Hrs[2] =  0.0;
-		Hrs[3] = -4.0;
-		Hrs[4] =  4.0;
-		Hrs[5] = -4.0;
+		Hrr[0] =  4.0; Hrs[0] =  4.0; Hss[0] =  4.0;
+		Hrr[1] =  4.0; Hrs[1] =  0.0; Hss[1] =  0.0;
+		Hrr[2] =  0.0; Hrs[2] =  0.0; Hss[2] =  4.0;
+		Hrr[3] = -8.0; Hrs[3] = -4.0; Hss[3] =  0.0;
+		Hrr[4] =  0.0; Hrs[4] =  4.0; Hss[4] =  0.0;
+		Hrr[5] =  0.0; Hrs[5] = -4.0; Hss[5] = -8.0;
 
 		// set up the system of equations
 		R[0] = R[1] = 0;
@@ -489,21 +489,23 @@ bool project2tri6(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 		{
 			R[0] -= (xy[i])*Hr[i];
 			R[1] -= (xy[i])*Hs[i];
-			
+
+			A[0][0] += (xy[i])*Hrr[i];
 			A[0][1] += (xy[i])*Hrs[i];
 			A[1][0] += (xy[i])*Hrs[i];
-			
+			A[1][1] += (xy[i])*Hss[i];
+
 			for (j=0; j<6; ++j)
 			{
 				double yij = yy[i][j];
 				R[0] -= -H[j]*Hr[i]*(yij);
 				R[1] -= -H[j]*Hs[i]*(yij);
-				
-				A[0][0] -= (yij)*(Hr[i]*Hr[j]);
-				A[1][1] -= (yij)*(Hs[i]*Hs[j]);
-				
-				A[0][1] -= (yij)*(Hr[i]*Hs[j]+Hrs[i]*H[j]);
-				A[1][0] -= (yij)*(Hs[i]*Hr[j]+Hrs[i]*H[j]);
+
+				A[0][0] -= (yij)*(H[i]*Hrr[j] + Hr[i]*Hr[j]);
+				A[1][1] -= (yij)*(H[i]*Hss[j] + Hs[i]*Hs[j]);
+
+				A[0][1] -= (yij)*(Hrs[i]*H[j] + Hr[i]*Hs[j]);
+				A[1][0] -= (yij)*(Hrs[i]*H[j] + Hs[i]*Hr[j]);
 			}
 		}
 		
@@ -542,7 +544,7 @@ bool project2tri6(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 bool project2tri7(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 {
 	double R[2], u[2], D;
-	double H[7], Hr[7], Hs[7], Hrs[7];
+	double H[7], Hr[7], Hs[7], Hrr[7], Hss[7], Hrs[7];
 	
 	int i, j;
 	int NMAX = 50, n=0;
@@ -607,14 +609,16 @@ bool project2tri7(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 		Hs[4] =  4.0*r               - 4.0*Hs[6]/9.0;
 		Hs[5] =  4.0 - 8.0*s - 4.0*r - 4.0*Hs[6]/9.0;
 
-
+		Hrr[6] = -54.0*s;
+		Hss[6] = -54.0*r;
 		Hrs[6] = 27.0*(1.0 - 2.0*r - 2.0*s);
-		Hrs[0] =  4.0 +     Hrs[6]/9.0;
-		Hrs[1] =  0.0 +     Hrs[6]/9.0;
-		Hrs[2] =  0.0 +     Hrs[6]/9.0;
-		Hrs[3] = -4.0 - 4.0*Hrs[6]/9.0;
-		Hrs[4] =  4.0 - 4.0*Hrs[6]/9.0;
-		Hrs[5] = -4.0 - 4.0*Hrs[6]/9.0;
+
+		Hrr[0] =  4.0 +     Hrr[6]/9.0; Hrs[0] =  4.0 +     Hrs[6]/9.0; Hss[0] =  4.0 +     Hss[6]/9.0;
+		Hrr[1] =  4.0 +     Hrr[6]/9.0; Hrs[1] =  0.0 +     Hrs[6]/9.0; Hss[1] =  0.0 +     Hss[6]/9.0;
+		Hrr[2] =  0.0 +     Hrr[6]/9.0; Hrs[2] =  0.0 +     Hrs[6]/9.0; Hss[2] =  4.0 +     Hss[6]/9.0;
+		Hrr[3] = -8.0 - 4.0*Hrr[6]/9.0; Hrs[3] = -4.0 - 4.0*Hrs[6]/9.0; Hss[3] =  0.0 - 4.0*Hss[6]/9.0;
+		Hrr[4] =  0.0 - 4.0*Hrr[6]/9.0; Hrs[4] =  4.0 - 4.0*Hrs[6]/9.0; Hss[4] =  0.0 - 4.0*Hss[6]/9.0;
+		Hrr[5] =  0.0 - 4.0*Hrr[6]/9.0; Hrs[5] = -4.0 - 4.0*Hrs[6]/9.0; Hss[5] = -8.0 - 4.0*Hss[6]/9.0;
 
 		// set up the system of equations
 		R[0] = R[1] = 0;
@@ -623,21 +627,23 @@ bool project2tri7(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 		{
 			R[0] -= (xy[i])*Hr[i];
 			R[1] -= (xy[i])*Hs[i];
-			
+
+			A[0][0] += (xy[i])*Hrr[i];
 			A[0][1] += (xy[i])*Hrs[i];
 			A[1][0] += (xy[i])*Hrs[i];
-			
+			A[1][1] += (xy[i])*Hss[i];
+
 			for (j=0; j<7; ++j)
 			{
 				double yij = yy[i][j];
 				R[0] -= -H[j]*Hr[i]*(yij);
 				R[1] -= -H[j]*Hs[i]*(yij);
-				
-				A[0][0] -= (yij)*(Hr[i]*Hr[j]);
-				A[1][1] -= (yij)*(Hs[i]*Hs[j]);
-				
-				A[0][1] -= (yij)*(Hr[i]*Hs[j]+Hrs[i]*H[j]);
-				A[1][0] -= (yij)*(Hs[i]*Hr[j]+Hrs[i]*H[j]);
+
+				A[0][0] -= (yij)*(H[i]*Hrr[j] + Hr[i]*Hr[j]);
+				A[1][1] -= (yij)*(H[i]*Hss[j] + Hs[i]*Hs[j]);
+
+				A[0][1] -= (yij)*(Hrs[i]*H[j] + Hr[i]*Hs[j]);
+				A[1][0] -= (yij)*(Hrs[i]*H[j] + Hs[i]*Hr[j]);
 			}
 		}
 		
