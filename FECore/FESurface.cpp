@@ -415,6 +415,152 @@ bool project2quad9(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 }
 
 //-----------------------------------------------------------------------------
+// project onto a quadrilateral surface.
+bool project2quad8(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
+{
+	const int NE = 8;
+	double Q[2], u[2], D;
+	double H[NE], Hr[NE], Hs[NE], Hrr[NE], Hss[NE], Hrs[NE];
+
+	int i, j;
+	int NMAX = 50, n=0;
+
+	// evaulate scalar products
+	double xy[NE];
+	double yy[NE][NE];
+	for (i=0; i<NE; ++i)
+	{
+		xy[i] = x*y[i];
+		yy[i][i] = y[i]*y[i];
+		for (j=i+1; j<NE; ++j)
+		{
+			yy[i][j] = yy[j][i] = y[i]*y[j];
+		}
+	}
+
+	// loop until converged
+	bool bconv = false;
+	double normu;
+	do
+	{
+		// evaluate shape functions and shape function derivatives.
+		H[4] = 0.5*(1 - r*r)*(1 - s);
+		H[5] = 0.5*(1 - s*s)*(1 + r);
+		H[6] = 0.5*(1 - r*r)*(1 + s);
+		H[7] = 0.5*(1 - s*s)*(1 - r);
+		H[0] = 0.25*(1 - r)*(1 - s) - 0.5*(H[4] + H[7]);
+		H[1] = 0.25*(1 + r)*(1 - s) - 0.5*(H[4] + H[5]);
+		H[2] = 0.25*(1 + r)*(1 + s) - 0.5*(H[5] + H[6]);
+		H[3] = 0.25*(1 - r)*(1 + s) - 0.5*(H[6] + H[7]);
+
+		Hr[4] = -r*(1 - s);
+		Hr[5] = 0.5*(1 - s*s);
+		Hr[6] = -r*(1 + s);
+		Hr[7] = -0.5*(1 - s*s);
+
+		Hr[0] = -0.25*(1 - s) - 0.5*(Hr[4] + Hr[7]);
+		Hr[1] =  0.25*(1 - s) - 0.5*(Hr[4] + Hr[5]);
+		Hr[2] =  0.25*(1 + s) - 0.5*(Hr[5] + Hr[6]);
+		Hr[3] = -0.25*(1 + s) - 0.5*(Hr[6] + Hr[7]);
+
+		Hs[4] = -0.5*(1 - r*r);
+		Hs[5] = -s*(1 + r);
+		Hs[6] = 0.5*(1 - r*r);
+		Hs[7] = -s*(1 - r);
+
+		Hs[0] = -0.25*(1 - r) - 0.5*(Hs[4] + Hs[7]);
+		Hs[1] = -0.25*(1 + r) - 0.5*(Hs[4] + Hs[5]);
+		Hs[2] =  0.25*(1 + r) - 0.5*(Hs[5] + Hs[6]);
+		Hs[3] =  0.25*(1 - r) - 0.5*(Hs[6] + Hs[7]);
+
+		Hrr[4] = -(1 - s);
+		Hrr[5] = 0.0;
+		Hrr[6] = -(1 + s);
+		Hrr[7] = 0.0;
+
+		Hrs[4] = r;
+		Hrs[5] = -s;
+		Hrs[6] = -r;
+		Hrs[7] = s;
+
+		Hss[4] = 0.0;
+		Hss[5] = -(1 + r);
+		Hss[6] = 0.0;
+		Hss[7] = -(1 - r);
+
+		Hrr[0] = - 0.5*(Hrr[4] + Hrr[7]);
+		Hrr[1] = - 0.5*(Hrr[4] + Hrr[5]);
+		Hrr[2] = - 0.5*(Hrr[5] + Hrr[6]);
+		Hrr[3] = - 0.5*(Hrr[6] + Hrr[7]);
+
+		Hrs[0] =  0.25 - 0.5*(Hrs[4] + Hrs[7]);
+		Hrs[1] = -0.25 - 0.5*(Hrs[4] + Hrs[5]);
+		Hrs[2] =  0.25 - 0.5*(Hrs[5] + Hrs[6]);
+		Hrs[3] = -0.25 - 0.5*(Hrs[6] + Hrs[7]);
+
+		Hss[0] = - 0.5*(Hss[4] + Hss[7]);
+		Hss[1] = - 0.5*(Hss[4] + Hss[5]);
+		Hss[2] = - 0.5*(Hss[5] + Hss[6]);
+		Hss[3] = - 0.5*(Hss[6] + Hss[7]);
+
+		// set up the system of equations
+		Q[0] = Q[1] = 0;
+		double A[2][2] = {0};
+		for (i=0; i<NE; ++i)
+		{
+			Q[0] -= (xy[i])*Hr[i];
+			Q[1] -= (xy[i])*Hs[i];
+
+			A[0][0] += (xy[i])*Hrr[i];
+			A[0][1] += (xy[i])*Hrs[i];
+			A[1][0] += (xy[i])*Hrs[i];
+			A[1][1] += (xy[i])*Hss[i];
+
+			for (j=0; j<NE; ++j)
+			{
+				double yij = yy[i][j];
+				Q[0] -= -H[j]*Hr[i]*(yij);
+				Q[1] -= -H[j]*Hs[i]*(yij);
+
+				A[0][0] -= (yij)*(H[i]*Hrr[j] + Hr[i]*Hr[j]);
+				A[1][1] -= (yij)*(H[i]*Hss[j] + Hs[i]*Hs[j]);
+
+				A[0][1] -= (yij)*(Hrs[i]*H[j] + Hr[i]*Hs[j]);
+				A[1][0] -= (yij)*(Hrs[i]*H[j] + Hs[i]*Hr[j]);
+			}
+		}
+	
+		// determinant of A
+		D = A[0][0]*A[1][1] - A[0][1]*A[1][0];
+
+		// solve for u = A^(-1)*R
+		u[0] = (A[1][1]*Q[0] - A[0][1]*Q[1])/D;
+		u[1] = (A[0][0]*Q[1] - A[1][0]*Q[0])/D;
+
+		// calculate displacement norm
+		normu = u[0]*u[0]+u[1]*u[1];
+
+		// check for convergence
+		bconv = ((normu < 1e-10));
+		if (!bconv && (n <= NMAX))
+		{
+			// Don't update if converged otherwise the point q
+			// does not correspond with the current values for (r,s)
+			r += u[0];
+			s += u[1];
+			++n;
+		}
+		else break;
+	}
+	while (1);
+
+	// evaluate q
+	q = y[0]*H[0]+y[1]*H[1]+y[2]*H[2]+y[3]*H[3]+y[4]*H[4]+y[5]*H[5]+y[6]*H[6]+y[7]*H[7]+y[8]*H[8];
+
+	return bconv;
+}
+
+//-----------------------------------------------------------------------------
 // project onto a 6-node quadratic triangular element
 bool project2tri6(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 {
@@ -741,6 +887,12 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 		break;
 	case 7: 
 		if (project2tri7(y, x, r, s, q)==false)
+		{
+//			assert(false);
+		}
+		break;
+	case 8:
+		if (project2quad8(y,x,r,s,q) == false)
 		{
 //			assert(false);
 		}

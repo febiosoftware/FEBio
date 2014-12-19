@@ -1785,9 +1785,37 @@ void FEQuad8_::shape_deriv(double* Hr, double* Hs, double r, double s)
 //-----------------------------------------------------------------------------
 //! shape function derivatives at (r,s)
 //! \todo implement this
-void FEQuad8_::shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s)
+void FEQuad8_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
 {
-	
+	Hrr[4] = -(1 - s);
+	Hrr[5] = 0.0;
+	Hrr[6] = -(1 + s);
+	Hrr[7] = 0.0;
+
+	Hrs[4] = r;
+	Hrs[5] = -s;
+	Hrs[6] = -r;
+	Hrs[7] = s;
+
+	Hss[4] = 0.0;
+	Hss[5] = -(1 + r);
+	Hss[6] = 0.0;
+	Hss[7] = -(1 - r);
+
+	Hrr[0] = - 0.5*(Hrr[4] + Hrr[7]);
+	Hrr[1] = - 0.5*(Hrr[4] + Hrr[5]);
+	Hrr[2] = - 0.5*(Hrr[5] + Hrr[6]);
+	Hrr[3] = - 0.5*(Hrr[6] + Hrr[7]);
+
+	Hrs[0] =  0.25 - 0.5*(Hrs[4] + Hrs[7]);
+	Hrs[1] = -0.25 - 0.5*(Hrs[4] + Hrs[5]);
+	Hrs[2] =  0.25 - 0.5*(Hrs[5] + Hrs[6]);
+	Hrs[3] = -0.25 - 0.5*(Hrs[6] + Hrs[7]);
+
+	Hss[0] = - 0.5*(Hss[4] + Hss[7]);
+	Hss[1] = - 0.5*(Hss[4] + Hss[5]);
+	Hss[2] = - 0.5*(Hss[5] + Hss[6]);
+	Hss[3] = - 0.5*(Hss[6] + Hss[7]);
 }
 
 //=============================================================================
