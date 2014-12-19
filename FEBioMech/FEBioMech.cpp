@@ -230,8 +230,8 @@ REGISTER_FECORE_CLASS(FEFiberIntegrationGeodesic           , FEMATERIAL_ID, "fib
 REGISTER_FECORE_CLASS(FEFiberIntegrationGeodesicUC         , FEMATERIAL_ID, "fibers-3d-geodesic-uncoupled");
 REGISTER_FECORE_CLASS(FEFiberIntegrationGaussKronrod       , FEMATERIAL_ID, "fibers-3d-gkt");
 REGISTER_FECORE_CLASS(FEFiberIntegrationGaussKronrodUC     , FEMATERIAL_ID, "fibers-3d-gkt-uncoupled");
-REGISTER_FECORE_CLASS(FEFiberIntegrationTriangle           , FEMATERIAL_ID, "fibers-3d-triangle");
-REGISTER_FECORE_CLASS(FEFiberIntegrationTriangleUC         , FEMATERIAL_ID, "fibers-3d-triangle-uncoupled");
+REGISTER_FECORE_CLASS(FEFiberIntegrationTriangle           , FEMATERIAL_ID, "fibers-3d-fei");
+REGISTER_FECORE_CLASS(FEFiberIntegrationTriangleUC         , FEMATERIAL_ID, "fibers-3d-fei-uncoupled");
 REGISTER_FECORE_CLASS(FEFiberIntegrationTrapezoidal        , FEMATERIAL_ID, "fibers-2d-trapezoidal");
 REGISTER_FECORE_CLASS(FEFiberIntegrationTrapezoidalUC      , FEMATERIAL_ID, "fibers-2d-trapezoidal-uncoupled");
 REGISTER_FECORE_CLASS(FECoupledTransIsoVerondaWestmann     , FEMATERIAL_ID, "coupled trans-iso Veronda-Westmann");

@@ -12,7 +12,7 @@
 class FEFiberIntegrationGaussKronrod : public FEFiberIntegrationScheme
 {
 public:
-    FEFiberIntegrationGaussKronrod(FEModel* pfem) : FEFiberIntegrationScheme(pfem) { m_nph = 7; m_nth = 3; }
+    FEFiberIntegrationGaussKronrod(FEModel* pfem) : FEFiberIntegrationScheme(pfem) { m_nph = 7; m_nth = 31; }
     ~FEFiberIntegrationGaussKronrod() {}
 	
 	//! Initialization

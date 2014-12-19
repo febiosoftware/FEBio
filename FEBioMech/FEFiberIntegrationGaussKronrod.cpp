@@ -25,7 +25,6 @@ END_PARAMETER_LIST();
 
 void FEFiberIntegrationGaussKronrod::Init()
 {
-    if (m_nph < 1) throw MaterialError("nph must be strictly greater than zero.");
     if (m_nth < 1) throw MaterialError("nth must be strictly greater than zero.");
     
     m_bfirst = true;
