@@ -2,30 +2,32 @@
 #include "FEGasserOgdenHolzapfel.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEGasserOgdenHolzapfel, FEUncoupledMaterial)
+BEGIN_PARAMETER_LIST(FEGasserOgdenHolzapfel, FEElasticMaterial)
 	ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");
 	ADD_PARAMETER(m_k1, FE_PARAM_DOUBLE, "k1");
 	ADD_PARAMETER(m_k2, FE_PARAM_DOUBLE, "k2");
 	ADD_PARAMETER(m_kappa, FE_PARAM_DOUBLE, "kappa");
 	ADD_PARAMETER(m_g, FE_PARAM_DOUBLE, "gamma");
+    ADD_PARAMETER(m_k, FE_PARAM_DOUBLE, "k");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Data initialization
 void FEGasserOgdenHolzapfel::Init()
 {
-	FEUncoupledMaterial::Init();
+	FEElasticMaterial::Init();
 
 	if (m_c < 0) throw MaterialError("c should be positive");
 	if (m_k1 < 0) throw MaterialError("k1 should be positive");
 	if (m_k2 < 0) throw MaterialError("k2 should be positive");
 	if (!INRANGE(m_kappa, 0.0, 1./3.)) throw MaterialError("kappa must be in the range 0 <= kappa <= 1/3");
+    if (m_k < 0) throw MaterialError("k should be positive");
 	
 }
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric stress
-mat3ds FEGasserOgdenHolzapfel::DevStress(FEMaterialPoint& mp)
+mat3ds FEGasserOgdenHolzapfel::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -37,11 +39,11 @@ mat3ds FEGasserOgdenHolzapfel::DevStress(FEMaterialPoint& mp)
 	// determinant of deformation gradient
 	double J = pt.m_J;
 	
-	// Evaluate the distortional deformation gradient
-	mat3d F = pt.m_F*pow(J,-1./3.);
+	// Evaluate the deformation gradient
+	mat3d F = pt.m_F;
 	
-	// calculate deviatoric left Cauchy-Green tensor: b = F*Ft
-	mat3ds b = pt.DevLeftCauchyGreen();
+	// calculate left Cauchy-Green tensor: b = F*Ft
+	mat3ds b = pt.LeftCauchyGreen();
 	
 	// Copy the local element basis directions to n
 	n[0].x = pt.m_Q[0][0]; n[0].y = pt.m_Q[1][0]; n[0].z = pt.m_Q[2][0];
@@ -53,7 +55,7 @@ mat3ds FEGasserOgdenHolzapfel::DevStress(FEMaterialPoint& mp)
 	a[1] = F*(n[0]*cg - n[1]*sg);
 	
 	// Evaluate the ground matrix stress
-	mat3ds s = m_c/J*b;
+	mat3ds s = m_c/J*b + m_k*log(J)/J*mat3dd(1);
 	
 	// Evaluate the structural tensors in the current configuration
 	// and the fiber strains and stress contributions
@@ -69,12 +71,12 @@ mat3ds FEGasserOgdenHolzapfel::DevStress(FEMaterialPoint& mp)
 		s += 2./J*m_k1*E[1]*exp(m_k2*E[1]*E[1])*h[1];
 	}
 	
-	return s.dev();
+	return s;
 }
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric tangent
-tens4ds FEGasserOgdenHolzapfel::DevTangent(FEMaterialPoint& mp)
+tens4ds FEGasserOgdenHolzapfel::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -86,11 +88,11 @@ tens4ds FEGasserOgdenHolzapfel::DevTangent(FEMaterialPoint& mp)
 	// determinant of deformation gradient
 	double J = pt.m_J;
 	
-	// Evaluate the distortional deformation gradient
-	mat3d F = pt.m_F*pow(J,-1./3.);
+	// Evaluate the deformation gradient
+	mat3d F = pt.m_F;
 	
-	// calculate deviatoric left Cauchy-Green tensor: b = F*Ft
-	mat3ds b = pt.DevLeftCauchyGreen();
+	// calculate left Cauchy-Green tensor: b = F*Ft
+	mat3ds b = pt.LeftCauchyGreen();
 	
 	// Copy the local element basis directions to n
 	n[0].x = pt.m_Q[0][0]; n[0].y = pt.m_Q[1][0]; n[0].z = pt.m_Q[2][0];
@@ -121,8 +123,8 @@ tens4ds FEGasserOgdenHolzapfel::DevTangent(FEMaterialPoint& mp)
 	// Evaluate the elasticity tensor
 	mat3dd I(1);
 	tens4ds IxI = dyad1s(I);
-	tens4ds I4  = dyad4s(I);
-	tens4ds C = ((I4+IxI/3.)*s.tr()-dyad1s(s,I))*(2./3.);
+    tens4ds I4  = dyad4s(I);
+    tens4ds C = (IxI - I4*(2*log(J)))*(m_k/J);
 	if (a[0]*a[0] > 1)
 		C += 4./J*m_k1*(1+2*m_k2*E[0]*E[0])*exp(m_k2*E[0]*E[0])*
 		(dyad1s(h[0]) - h[0].tr()/3.*(dyad1s(h[0],I) - h[0].tr()/3.*IxI));
@@ -134,8 +136,8 @@ tens4ds FEGasserOgdenHolzapfel::DevTangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the deviatoric stress
-double FEGasserOgdenHolzapfel::DevStrainEnergyDensity(FEMaterialPoint& mp)
+//! Calculates the strain energy density
+double FEGasserOgdenHolzapfel::StrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -144,14 +146,15 @@ double FEGasserOgdenHolzapfel::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	mat3ds h[2];		// structural tensor in current configuration
 	double E[2];		// fiber strain
     
-	// determinant of deformation gradient
-	double J = pt.m_J;
+	// Evaluate the deformation gradient
+	mat3d F = pt.m_F;
 	
-	// Evaluate the distortional deformation gradient
-	mat3d F = pt.m_F*pow(J,-1./3.);
-	
-	// calculate deviatoric left Cauchy-Green tensor: b = F*Ft
-	mat3ds b = pt.DevLeftCauchyGreen();
+    // determinant of deformation gradient
+    double J = pt.m_J;
+    double lnJ = log(J);
+    
+	// calculate left Cauchy-Green tensor: b = F*Ft
+	mat3ds b = pt.LeftCauchyGreen();
     double I1 = b.tr();
 	
 	// Copy the local element basis directions to n
@@ -164,7 +167,7 @@ double FEGasserOgdenHolzapfel::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	a[1] = F*(n[0]*cg - n[1]*sg);
 	
 	// Evaluate the ground matrix strain energy density
-    double sed = 0.5*m_c*(I1 - 3);
+    double sed = 0.5*(m_c*(I1 - 3) + m_k*lnJ*lnJ);
 	
 	// Evaluate the structural tensors in the current configuration
 	// and the fiber strains and stress contributions

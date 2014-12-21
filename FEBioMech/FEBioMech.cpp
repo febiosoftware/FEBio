@@ -26,6 +26,7 @@
 #include "FEFungOrthoCompressible.h"
 #include "FEFungOrthotropic.h"
 #include "FEGasserOgdenHolzapfel.h"
+#include "FEGasserOgdenHolzapfelUC.h"
 #include "FEHolmesMow.h"
 #include "FEHuiskesSupply.h"
 #include "FEIncompNeoHookean.h"
@@ -175,6 +176,7 @@ REGISTER_FECORE_CLASS(FEFiberNeoHookean              ,FEMATERIAL_ID, "fiber neo-
 REGISTER_FECORE_CLASS(FEFungOrthoCompressible        ,FEMATERIAL_ID, "Fung-ortho-compressible"       );
 REGISTER_FECORE_CLASS(FEFungOrthotropic              ,FEMATERIAL_ID, "Fung orthotropic"              );
 REGISTER_FECORE_CLASS(FEGasserOgdenHolzapfel         ,FEMATERIAL_ID, "Gasser-Ogden-Holzapfel"        );
+REGISTER_FECORE_CLASS(FEGasserOgdenHolzapfelUC       ,FEMATERIAL_ID, "Gasser-Ogden-Holzapfel-uncoupled");
 REGISTER_FECORE_CLASS(FEHolmesMow                    ,FEMATERIAL_ID, "Holmes-Mow"                    );
 REGISTER_FECORE_CLASS(FEIncompNeoHookean             ,FEMATERIAL_ID, "incomp neo-Hookean"            );
 REGISTER_FECORE_CLASS(FEIsotropicElastic             ,FEMATERIAL_ID, "isotropic elastic"             );

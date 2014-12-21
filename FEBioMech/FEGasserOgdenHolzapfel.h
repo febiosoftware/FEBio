@@ -1,25 +1,26 @@
 #pragma once
-#include "FEUncoupledMaterial.h"
+#include "FEElasticMaterial.h"
 
-class FEGasserOgdenHolzapfel : public FEUncoupledMaterial
+class FEGasserOgdenHolzapfel : public FEElasticMaterial
 {
 public:
 	double	m_c;			// neo-Hookean c coefficient
 	double	m_k1,m_k2;		// fiber material constants
 	double	m_kappa;		// structure coefficient
 	double	m_g;			// fiber angle
+    double  m_k;            // bulk modulus
 		
 public:
-	FEGasserOgdenHolzapfel(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
+	FEGasserOgdenHolzapfel(FEModel* pfem) : FEElasticMaterial(pfem) {}
 		
-	//! calculate deviatoric stress at material point
-	mat3ds DevStress(FEMaterialPoint& pt);
+	//! calculate stress at material point
+	mat3ds Stress(FEMaterialPoint& pt);
 	
-	//! calculate deviatoric tangent stiffness at material point
-	tens4ds DevTangent(FEMaterialPoint& pt);
+	//! calculate tangent stiffness at material point
+	tens4ds Tangent(FEMaterialPoint& pt);
 		
-	//! calculate deviatoric strain energy density at material point
-	double DevStrainEnergyDensity(FEMaterialPoint& pt);
+	//! calculate strain energy density at material point
+	double StrainEnergyDensity(FEMaterialPoint& pt);
     
 	//! data initialization
 	void Init();

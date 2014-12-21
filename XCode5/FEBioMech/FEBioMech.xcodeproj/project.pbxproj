@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		CAA03F9018BFA51700EAF395 /* FECGSolidSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA03F8E18BFA51700EAF395 /* FECGSolidSolver.cpp */; };
 		CAA03F9118BFA51700EAF395 /* FECGSolidSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = CAA03F8F18BFA51700EAF395 /* FECGSolidSolver.h */; };
+		D509A2431A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D509A2411A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.h */; };
+		D509A2441A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D509A2421A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.cpp */; };
 		D515BD3A18DB3D7B00B661B2 /* FEPRLig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D515BD3818DB3D7B00B661B2 /* FEPRLig.cpp */; };
 		D515BD3B18DB3D7B00B661B2 /* FEPRLig.h in Headers */ = {isa = PBXBuildFile; fileRef = D515BD3918DB3D7B00B661B2 /* FEPRLig.h */; };
 		D51BB3F1198FCA6A00638A8B /* FEFiberIntegrationGaussKronrod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D51BB3ED198FCA6A00638A8B /* FEFiberIntegrationGaussKronrod.cpp */; };
@@ -310,6 +312,8 @@
 /* Begin PBXFileReference section */
 		CAA03F8E18BFA51700EAF395 /* FECGSolidSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECGSolidSolver.cpp; sourceTree = "<group>"; };
 		CAA03F8F18BFA51700EAF395 /* FECGSolidSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECGSolidSolver.h; sourceTree = "<group>"; };
+		D509A2411A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEGasserOgdenHolzapfelUC.h; sourceTree = "<group>"; };
+		D509A2421A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEGasserOgdenHolzapfelUC.cpp; sourceTree = "<group>"; };
 		D515BD3818DB3D7B00B661B2 /* FEPRLig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPRLig.cpp; sourceTree = "<group>"; };
 		D515BD3918DB3D7B00B661B2 /* FEPRLig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPRLig.h; sourceTree = "<group>"; };
 		D51BB3ED198FCA6A00638A8B /* FEFiberIntegrationGaussKronrod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFiberIntegrationGaussKronrod.cpp; sourceTree = "<group>"; };
@@ -786,6 +790,8 @@
 				D5E106F21865DFAC00B23922 /* FEFungOrthotropic.h */,
 				D5E106F31865DFAC00B23922 /* FEGasserOgdenHolzapfel.cpp */,
 				D5E106F41865DFAC00B23922 /* FEGasserOgdenHolzapfel.h */,
+				D509A2421A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.cpp */,
+				D509A2411A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.h */,
 				D5E106F51865DFAC00B23922 /* FEHolmesMow.cpp */,
 				D5E106F61865DFAC00B23922 /* FEHolmesMow.h */,
 				D5E106F71865DFAC00B23922 /* FEHuiskesSupply.cpp */,
@@ -1048,6 +1054,7 @@
 				D5E107CC1865DFAD00B23922 /* FEFiberIntegrationGeodesic.h in Headers */,
 				D5E107B81865DFAD00B23922 /* FEElasticSolidDomain.h in Headers */,
 				D5E1083E1865DFAD00B23922 /* FETransIsoMooneyRivlin.h in Headers */,
+				D509A2431A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.h in Headers */,
 				D5E108241865DFAD00B23922 /* FESolidDomainFactory.h in Headers */,
 				D5F407CC197D7DDE0059F0B1 /* FESolidSolver2.h in Headers */,
 				D5E1077F1865DFAD00B23922 /* FEAugLagLinearConstraint.h in Headers */,
@@ -1161,6 +1168,7 @@
 				D5E107EB1865DFAD00B23922 /* FELinearSolidSolver.cpp in Sources */,
 				D51BB3F3198FCA6A00638A8B /* FEFiberIntegrationTriangle.cpp in Sources */,
 				D5E107981865DFAD00B23922 /* FEDamageNeoHookean.cpp in Sources */,
+				D509A2441A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.cpp in Sources */,
 				D5E1079C1865DFAD00B23922 /* FEDiscreteSpringDomain.cpp in Sources */,
 				D5E1080D1865DFAD00B23922 /* FERemodelingElasticMaterial.cpp in Sources */,
 				D59D17D7192BD83B007C880C /* FECoupledVerondaWestmann.cpp in Sources */,
