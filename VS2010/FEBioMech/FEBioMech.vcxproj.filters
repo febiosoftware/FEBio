@@ -462,6 +462,9 @@
     <ClCompile Include="..\..\FEBioMech\FEUncoupledFiberExpLinear.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h">
@@ -924,6 +927,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEUncoupledFiberExpLinear.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
