@@ -8,6 +8,7 @@
 
 #include "FEUncoupledReactiveViscoelastic.h"
 #include "FECore/FECoreKernel.h"
+#include <limits>
 
 ///////////////////////////////////////////////////////////////////////////////
 //
