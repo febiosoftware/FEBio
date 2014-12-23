@@ -41,6 +41,132 @@ at http://mrlforums.sci.utah.edu/forums/.
 
 ===========================================================================
 
+ R E L E A S E   2.2  12/23/2014
+
+===========================================================================
+
+1. FEATURE: Tri6 Element Shape Functions
+-----------------------------------------
+Implemented modified shape functions for tri6 elements.
+
+2. FEATURE: Gasser, Ogden, Holzapfel material
+----------------------------------------------
+Added a compressible version of FEGasserOgdenHolzapfel material.
+
+3. FEATURE: Damage Plotting for Multigeneration Materials
+---------------------------------------------------------
+Added plotting of damage for multigeneration materials.
+
+4. FEATURE: Fiber Exp Linear Material
+-------------------------------------
+Added coupled and uncoupled fiber-exp-linear material.
+
+5. FEATURE: Reactive Viscoelasticity Material
+---------------------------------------------
+Added coupled and uncoupled reactive viscoelasticity materials.
+
+6. FEATURE: Ramp Rigid Body Force
+---------------------------------
+Implemented the "ramp" rigid body force which ramps the force from its current
+value to the desired value. This can be used to switch between displacement and
+load control in a multi-step analysis.
+
+7. FEATURE: Must-point Repeat Extend
+------------------------------------
+Must-point loadcurves now work with repeat extend type.
+
+8. FEATURE: Tied Interface Gap for Shells
+-----------------------------------------
+Tied interface now takes initial gap into account for shells (only on slave side).
+
+9. FEATURE: Quad9 Surfaces
+--------------------------
+Implemented FE_QUAD9 surface element.
+
+10. FEATURE: Hex27 Element
+--------------------------
+Implemented hex27 element.
+
+11. FEATURE: NANS in Convergence Norms
+--------------------------------------
+Checks for NANS in the convergence norms is now always done. When a NAN is detected, the time step is retried.
+
+12. FEATURE: Self-Contact
+-------------------------
+Added support for self-contact in FESlidingInterface.
+
+13. FEATURE: Osmotic Virial Expansion Material
+----------------------------------------------
+Added new FEOsmoticVirialExpansion material.  Added bond relaxation functions for reactive viscoelastic
+materials. Updated FEElasticMultigeneration to improve nesting of nested materials. Updated
+FEFiberIntegrationGaussKronrod.  Updated FEReactiveViscoelastic material.
+
+14. FEATURE: Damage Materials
+-----------------------------
+Implemented FEDamageMaterial and FEDamageMaterialUC to model damage in any FEElasticMaterial and
+FEUncoupledMaterial.  FEDamageCriterion and FEDamageCriterionUC are parent classes to a variety of
+damage criteria.  FEDamageCDF is a parent material to a variety of cumulative distribution functions
+that relate the damage to the damage criterion. 
+The existing FEDamageMaterialPoint class was moved to its own file.
+
+15. FEATURE: Strain Energy Density
+----------------------------------
+Introduced FEStrainEnergyDensity function in FEElasticMaterial and FEDevStrainEnergyDensity in
+FEUncoupledMaterial classes.  Implemented analytical expression for the calculation of the strain energy
+density in almost all the materials, except a few for which documentation is not available.
+Fixed bug in the calculation of the Tangent and Stress in FELinearOrthtropic and FELinearTransIso.
+Added link to GNU Scientific Library (http://www.gnu.org/software/gsl/) for the evaluation of special functions
+(namely, the exponential integral, for calculating strain energy density of fibers in FETransIsoMooneyRivlin
+and related materials). Use -DHAVE_GSL to compile and link with this library.
+
+16. FEATURE: Initial Temperature
+--------------------------------
+Added support for initial temperatures.
+
+17. FEATURE: Reaction Rate Nims
+-------------------------------
+Added FEReactionRateNims class for reaction rates.
+
+18. FEATURE: Continuous Fiber Distribution Material
+-------------------------------------------------------------
+Added uncoupled continuous fiber distribution material with all contingent material functions.
+Updated continuous fiber distribution models by adding two additional fiber integration schemes
+(Gauss-Kronrod and Triangular).  Fixed bug in the general scheme for continuous fiber distributions
+which prevented proper running on multiple threads. Removed obsolete FEEFD model (which had never been
+documented). Added the ability to define a local orientation for each continuous fiber distribution.
+
+1. BUG FIX: Tri6 and Tri7 Projection Algortithms
+------------------------------------------------
+Fixed bug in projection algorithms for tri6 and tri7.
+
+2. BUG FIX: Hex27 Contact
+-------------------------
+Fixed problems with hex27  contact.
+
+3. BUG FIX: Serialization
+-------------------------
+Fixed serialization in several materials.
+
+4. BUG FIX: Multistep Pressure Stiffness
+----------------------------------------
+Fixed bug in pressure stiffness evaluation for multistep problems.
+
+5. BUG FIX: Invalid Rigid Body
+------------------------------
+Added check for invalid rigid body reference in rigid contact section. Made sure that a model with zero
+equations doesn't crash FEBio.
+
+6. BUG FIX: Quadratic Quads
+---------------------------
+Fixed bug in xplt format related to storage of quadratic quads (now version 0.4). Added support for projection
+on quad8 facets and implemented project_to_nodes for this element.
+
+7. BUG FIX: Concentration DOFs
+------------------------------
+Fixed bug in parsing fixed concentration dofs.
+
+===========================================================================
+
  R E L E A S E   2.1  7/30/2014
 
 ===========================================================================

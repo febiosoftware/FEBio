@@ -1,4 +1,1205 @@
 ------------------------------------------------------------------------
+r6501 | maas | 2014-12-23 11:35:16 -0700 (Tue, 23 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEFacet2FacetSliding.cpp
+   M /FEBio2/FEBioXML/FEBioControlSection.cpp
+   M /FEBio2/FECore/FEElementLibrary.cpp
+   M /FEBio2/FECore/FEElementTraits.cpp
+   M /FEBio2/FECore/FEElementTraits.h
+   M /FEBio2/FECore/FESurface.cpp
+   M /FEBio2/FECore/FE_enum.h
+
+FEBio2: Implemented modified shape functions for tri6 elements. Implemented project2surf function which replaces most of the specific projection functions. Made a few tweaks to the facet-to-facet sliding which seems to help convergence a bit. 
+------------------------------------------------------------------------
+r6499 | rawlins | 2014-12-22 16:38:05 -0700 (Mon, 22 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj.filters
+
+FEBio2: Updated VS10 solution.
+------------------------------------------------------------------------
+r6496 | ateshian | 2014-12-21 15:24:27 -0700 (Sun, 21 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+   M /FEBio2/FEBioMech/FEGasserOgdenHolzapfel.cpp
+   M /FEBio2/FEBioMech/FEGasserOgdenHolzapfel.h
+   A /FEBio2/FEBioMech/FEGasserOgdenHolzapfelUC.cpp
+   A /FEBio2/FEBioMech/FEGasserOgdenHolzapfelUC.h
+   M /FEBio2/XCode5/FEBioMech/FEBioMech.xcodeproj/project.pbxproj
+
+febio2: added a compressible version of FEGasserOgdenHolzapfel material.
+------------------------------------------------------------------------
+r6494 | maas | 2014-12-19 16:38:04 -0700 (Fri, 19 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FECore/FESurface.cpp
+   M /FEBio2/FECore/FESurface.h
+
+FEBio2: removed the special intersection functions as member functions and made them stand-alone functions.
+------------------------------------------------------------------------
+r6492 | ateshian | 2014-12-19 16:05:21 -0700 (Fri, 19 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrod.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrod.h
+
+febio2: minor changes to continuous fiber integration model.
+------------------------------------------------------------------------
+r6489 | ateshian | 2014-12-19 13:38:50 -0700 (Fri, 19 Dec 2014) | 1 line
+Changed paths:
+   A /FEBio2/Documentation/FEBio_um_2.2.docx
+
+febio2: added User Manual 2.2
+------------------------------------------------------------------------
+r6488 | maas | 2014-12-19 10:53:22 -0700 (Fri, 19 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FECore/FEElementTraits.cpp
+   M /FEBio2/FECore/FESurface.cpp
+
+FEBio2: added support for projection to a quad8.
+------------------------------------------------------------------------
+r6487 | ateshian | 2014-12-19 05:42:34 -0700 (Fri, 19 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEReactiveViscoelastic.cpp
+   M /FEBio2/FEBioMech/FEUncoupledReactiveViscoelastic.cpp
+
+febio2: introduced machine epsilon in reactive viscoelastic generation threshold.
+------------------------------------------------------------------------
+r6486 | maas | 2014-12-18 18:32:39 -0700 (Thu, 18 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FECore/FESurface.cpp
+
+FEBio2: Fixed bug in projection algorithms for tri6 and tri7.
+------------------------------------------------------------------------
+r6485 | maas | 2014-12-18 17:35:49 -0700 (Thu, 18 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEFacet2FacetSliding.cpp
+   M /FEBio2/FECore/FESurface.cpp
+
+FEBio2: fixed some more problems with hex27 contact.
+------------------------------------------------------------------------
+r6484 | ateshian | 2014-12-18 16:39:42 -0700 (Thu, 18 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrod.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrodUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationTriangle.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationTriangleUC.cpp
+   M /FEBio2/FEBioMech/triangle_sphere.h
+
+febio2:  improved integration scheme for continuous fiber distributions in FEFiberIntegrationGaussKronrod, FEFiberIntegrationGaussKronrodUC, FEFiberIntegrationTriangle and FEFiberIntegrationTriangleUC.
+------------------------------------------------------------------------
+r6483 | maas | 2014-12-18 16:22:05 -0700 (Thu, 18 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FECore/FEElementTraits.cpp
+   M /FEBio2/FECore/FESurface.cpp
+
+FEBio2: fixed some bugs related to contact with hex27 elements.
+------------------------------------------------------------------------
+r6481 | rawlins | 2014-12-18 13:28:49 -0700 (Thu, 18 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2010/FEBioLib/FEBioLib.vcxproj
+
+FEBio2: Updated Release OpenMP config.
+------------------------------------------------------------------------
+r6478 | maas | 2014-12-17 15:55:18 -0700 (Wed, 17 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+   M /FEBio2/FEBioMech/FEBioMechPlot.cpp
+   M /FEBio2/FEBioMech/FEBioMechPlot.h
+
+FEBio2: Added nodal stresses (copied from FEBio 1.x).
+------------------------------------------------------------------------
+r6477 | ateshian | 2014-12-17 10:55:42 -0700 (Wed, 17 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMechPlot.cpp
+   M /FEBio2/FEBioMech/FEElasticMixture.h
+   M /FEBio2/FEBioMech/FEElasticMultigeneration.h
+   M /FEBio2/XCode5/FEBioMech/FEBioMech.xcodeproj/project.pbxproj
+
+febio2: Added plotting of damage for multigeneration materials.  Updated Xcode project.
+------------------------------------------------------------------------
+r6476 | rawlins | 2014-12-17 09:40:32 -0700 (Wed, 17 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj.filters
+
+FEBio2: Updated VS10 solution.
+------------------------------------------------------------------------
+r6475 | maas | 2014-12-16 15:26:36 -0700 (Tue, 16 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+   A /FEBio2/FEBioMech/FEFiberExpLinear.cpp
+   A /FEBio2/FEBioMech/FEFiberExpLinear.h
+   A /FEBio2/FEBioMech/FEUncoupledFiberExpLinear.cpp
+   A /FEBio2/FEBioMech/FEUncoupledFiberExpLinear.h
+   M /FEBio2/VS2013/FEBioMech/FEBioMech.vcxproj
+   M /FEBio2/VS2013/FEBioMech/FEBioMech.vcxproj.filters
+
+FEBio2: Added coupled and uncoupled fiber-exp-linear material.
+------------------------------------------------------------------------
+r6474 | maas | 2014-12-16 12:14:31 -0700 (Tue, 16 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2013/FEBioMech/FEBioMech.vcxproj
+   M /FEBio2/VS2013/FEBioMech/FEBioMech.vcxproj.filters
+
+FEBio2: updated VS13 solution.
+------------------------------------------------------------------------
+r6473 | ateshian | 2014-12-16 12:11:18 -0700 (Tue, 16 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FESolutesMaterialPoint.cpp
+
+febio2: updated ShallowCopy for FESolutesMaterialPoint class.
+------------------------------------------------------------------------
+r6472 | ateshian | 2014-12-16 08:05:44 -0700 (Tue, 16 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEReactiveViscoelastic.cpp
+   M /FEBio2/FEBioMech/FEUncoupledReactiveViscoelastic.cpp
+
+febio2: updated reactive viscoelasticity material to account for non-breaking bonds.
+------------------------------------------------------------------------
+r6471 | ateshian | 2014-12-15 14:17:47 -0700 (Mon, 15 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FESolutesMaterialPoint.cpp
+
+febio2: updated serialization of FESolutesMaterialPoint.
+------------------------------------------------------------------------
+r6470 | rawlins | 2014-12-15 12:06:14 -0700 (Mon, 15 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj.filters
+
+FEBio2: Updated VS10 solution.
+------------------------------------------------------------------------
+r6469 | ateshian | 2014-12-12 07:07:27 -0700 (Fri, 12 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+   M /FEBio2/FEBioMech/FEReactiveVEMaterialPoint.cpp
+   M /FEBio2/FEBioMech/FEReactiveVEMaterialPoint.h
+   A /FEBio2/FEBioMech/FEUncoupledReactiveViscoelastic.cpp
+   A /FEBio2/FEBioMech/FEUncoupledReactiveViscoelastic.h
+   M /FEBio2/XCode5/FEBioMech/FEBioMech.xcodeproj/project.pbxproj
+
+febio2: Added uncoupled reactive viscoelastic material.
+------------------------------------------------------------------------
+r6468 | ateshian | 2014-12-12 05:47:54 -0700 (Fri, 12 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+   M /FEBio2/FEBioMech/FEBondRelaxation.cpp
+   M /FEBio2/FEBioMech/FEBondRelaxation.h
+   A /FEBio2/FEBioMech/FEReactiveVEMaterialPoint.cpp
+   A /FEBio2/FEBioMech/FEReactiveVEMaterialPoint.h
+   M /FEBio2/FEBioMech/FEReactiveViscoelastic.cpp
+   M /FEBio2/FEBioMech/FEReactiveViscoelastic.h
+   A /FEBio2/FEBioMech/FERigidRevoluteJoint.cpp
+   A /FEBio2/FEBioMech/FERigidRevoluteJoint.h
+   M /FEBio2/FEBioMech/FESolidSolver2.cpp
+   M /FEBio2/FEBioMech/FEStiffnessMatrix.cpp
+   M /FEBio2/FEBioXML/FEBioBoundarySection.cpp
+   M /FEBio2/FEBioXML/FEBioContactSection.cpp
+   M /FEBio2/FEBioXML/FEBioContactSection.h
+   M /FEBio2/FECore/FERigidBody.cpp
+   M /FEBio2/FECore/FERigidBody.h
+   M /FEBio2/XCode5/FEBioMech/FEBioMech.xcodeproj/project.pbxproj
+
+febio2: Updated FEReactiveViscoelastic material framework. Added FERigidRevoluteJoint.
+------------------------------------------------------------------------
+r6467 | maas | 2014-12-09 16:02:04 -0700 (Tue, 09 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEStiffnessMatrix.cpp
+   M /FEBio2/FEBioMech/FEStiffnessMatrix.h
+   M /FEBio2/VS2013/FEBioMix/FEBioMix.vcxproj
+   M /FEBio2/VS2013/FEBioMix/FEBioMix.vcxproj.filters
+
+FEBio2: Removed static function parameter in FEStiffnessMatrix::Create (made it a member variable).
+------------------------------------------------------------------------
+r6466 | rawlins | 2014-12-09 12:57:40 -0700 (Tue, 09 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2010/FEBioMix/FEBioMix.vcxproj
+   M /FEBio2/VS2010/FEBioMix/FEBioMix.vcxproj.filters
+
+FEBio2: Updated VS10 solution.
+------------------------------------------------------------------------
+r6464 | ateshian | 2014-12-09 10:46:31 -0700 (Tue, 09 Dec 2014) | 1 line
+Changed paths:
+   A /FEBio2/FEBioMix/FEActiveConstantSupply.cpp
+   A /FEBio2/FEBioMix/FEActiveConstantSupply.h
+   A /FEBio2/FEBioMix/FEActiveMomentumSupply.cpp
+   A /FEBio2/FEBioMix/FEActiveMomentumSupply.h
+   M /FEBio2/FEBioMix/FEBioMix.cpp
+   M /FEBio2/FEBioMix/FEBiphasic.cpp
+   M /FEBio2/FEBioMix/FEBiphasic.h
+   M /FEBio2/XCode5/FEBioMix/FEBioMix.xcodeproj/project.pbxproj
+
+febio2: initial implementation of active momentum supply in biphasic materials.
+------------------------------------------------------------------------
+r6461 | maas | 2014-12-05 14:16:35 -0700 (Fri, 05 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2013/FEBioLib/FEBioLib.vcxproj
+
+FEBio2: Added PARDISO macro to VS2013 project.
+------------------------------------------------------------------------
+r6459 | maas | 2014-12-04 11:42:32 -0700 (Thu, 04 Dec 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FESolidAnalysis.cpp
+   M /FEBio2/FEBioMech/FESolidAnalysis.h
+   M /FEBio2/FEBioMech/FESolidSolver.cpp
+   M /FEBio2/FEBioXML/FEBioConstraintsSection.cpp
+   M /FEBio2/FECore/BC.h
+   M /FEBio2/FECore/FEAnalysis.cpp
+   M /FEBio2/FECore/FEAnalysis.h
+   M /FEBio2/FECore/FERigidBody.cpp
+   M /FEBio2/FECore/FERigidBody.h
+
+FEBio2: implemented the "ramp" rigid body force which ramps the force from its current value to the desired value. This can be used to switch between displacement and load control in a multi-step analysis.
+------------------------------------------------------------------------
+r6453 | maas | 2014-11-30 17:18:20 -0700 (Sun, 30 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FECore/FEAnalysis.cpp
+   M /FEBio2/FECore/FEAnalysis.h
+   M /FEBio2/FECore/LoadCurve.cpp
+   M /FEBio2/FECore/LoadCurve.h
+
+FEBio2: must-point loadcurves now work with repeat extend type. 
+------------------------------------------------------------------------
+r6448 | maas | 2014-11-21 15:32:34 -0700 (Fri, 21 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2013/FEBio2.sln
+   M /FEBio2/VS2013/FEBio2.vcxproj
+   M /FEBio2/VS2013/FEBioHeat/FEBioHeat.vcxproj
+   M /FEBio2/VS2013/FEBioLib/FEBioLib.vcxproj
+   M /FEBio2/VS2013/FEBioMech/FEBioMech.vcxproj
+   M /FEBio2/VS2013/FEBioMix/FEBioMix.vcxproj
+   M /FEBio2/VS2013/FEBioOpt/FEBioOpt.vcxproj
+   M /FEBio2/VS2013/FEBioPlot/FEBioPlot.vcxproj
+   M /FEBio2/VS2013/FEBioXML/FEBioXML.vcxproj
+   M /FEBio2/VS2013/FECore/FECore.vcxproj
+   M /FEBio2/VS2013/NumCore/NumCore.vcxproj
+
+FEBio2: created x64 configuration for VS2013.
+------------------------------------------------------------------------
+r6446 | maas | 2014-11-21 10:56:14 -0700 (Fri, 21 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FESolidSolver.cpp
+
+FEBio2: Fixed bug in pressure stiffness evaluation for multistep problems.
+------------------------------------------------------------------------
+r6445 | maas | 2014-11-20 14:26:16 -0700 (Thu, 20 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FETiedContactSurface.cpp
+   M /FEBio2/FEBioMech/FETiedContactSurface.h
+   M /FEBio2/FEBioMech/FETiedInterface.cpp
+   M /FEBio2/FEBioMech/FETiedInterface.h
+
+FEBio2: Tied interface now takes initial gap into account for shells (only on slave side).
+------------------------------------------------------------------------
+r6442 | maas | 2014-11-20 12:57:04 -0700 (Thu, 20 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioXML/FEBioGeometrySection.cpp
+
+FEBio2: Added support for reading quad9 surfaces.
+------------------------------------------------------------------------
+r6441 | maas | 2014-11-20 12:12:22 -0700 (Thu, 20 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FECore/FEPlotData.cpp
+
+FEBio2: fixed bug in FESurfaceData::Save.
+------------------------------------------------------------------------
+r6440 | maas | 2014-11-20 12:08:40 -0700 (Thu, 20 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioXML/FEBioGeometrySection.cpp
+
+FEBio2: fixed bug in ParseElementSection.
+------------------------------------------------------------------------
+r6437 | maas | 2014-11-19 19:08:17 -0700 (Wed, 19 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioHeat/FEConvectiveHeatFlux.cpp
+   M /FEBio2/FEBioHeat/FEConvectiveHeatFlux.h
+   M /FEBio2/FEBioHeat/FECoupledHeatSolidSolver.cpp
+   M /FEBio2/FEBioHeat/FEHeatFlux.cpp
+   M /FEBio2/FEBioHeat/FEHeatFlux.h
+   M /FEBio2/FEBioMech/FEElasticShellDomain.cpp
+   M /FEBio2/FEBioMech/FEPressureLoad.cpp
+   M /FEBio2/FEBioMech/FEPressureLoad.h
+   M /FEBio2/FEBioMech/FETractionLoad.cpp
+   M /FEBio2/FEBioMech/FETractionLoad.h
+   M /FEBio2/FEBioMix/FEFluidFlux.cpp
+   M /FEBio2/FEBioMix/FEFluidFlux.h
+   M /FEBio2/FEBioMix/FEPoroTraction.cpp
+   M /FEBio2/FEBioMix/FEPoroTraction.h
+   M /FEBio2/FEBioMix/FESoluteFlux.cpp
+   M /FEBio2/FEBioMix/FESoluteFlux.h
+   M /FEBio2/FEBioXML/FEBioBoundarySection.cpp
+   M /FEBio2/FEBioXML/FEBioConstraintsSection.cpp
+   M /FEBio2/FEBioXML/FEBioContactSection.cpp
+   M /FEBio2/FEBioXML/FEBioGeometrySection.cpp
+   M /FEBio2/FEBioXML/FEBioLoadsSection.cpp
+   M /FEBio2/FECore/FEElementLibrary.cpp
+   M /FEBio2/FECore/FEElementTraits.cpp
+   M /FEBio2/FECore/FEElementTraits.h
+   M /FEBio2/FECore/FEMesh.cpp
+   M /FEBio2/FECore/FEMesh.h
+   M /FEBio2/FECore/FESurface.cpp
+   M /FEBio2/FECore/FESurface.h
+   M /FEBio2/FECore/FE_enum.h
+
+FEBio2: Implemented FE_QUAD9 surface element.
+------------------------------------------------------------------------
+r6434 | maas | 2014-11-19 16:24:10 -0700 (Wed, 19 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioHeat/FEHeatDomainFactory.cpp
+   M /FEBio2/FEBioMech/FESolidDomainFactory.cpp
+   M /FEBio2/FEBioMix/FEMixDomainFactory.cpp
+   M /FEBio2/FEBioPlot/FEBioPlotFile.cpp
+   M /FEBio2/FEBioPlot/FEBioPlotFile.h
+   M /FEBio2/FEBioXML/FEBioGeometrySection.cpp
+   M /FEBio2/FECore/FEElement.h
+   M /FEBio2/FECore/FEElementLibrary.cpp
+   M /FEBio2/FECore/FEElementTraits.cpp
+   M /FEBio2/FECore/FEElementTraits.h
+   M /FEBio2/FECore/FEMesh.cpp
+   M /FEBio2/FECore/FE_enum.h
+   M /FEBio2/FECore/version.h
+
+FEBio2: implemented hex27 element.
+------------------------------------------------------------------------
+r6433 | maas | 2014-11-19 14:16:45 -0700 (Wed, 19 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioLib/version.h
+
+FEBio2: increased version to 2.2.0
+------------------------------------------------------------------------
+r6432 | rawlins | 2014-11-19 10:14:15 -0700 (Wed, 19 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/build/lnx64d.mk
+   M /FEBio2/build/lnx64g.mk
+
+FEBio2: Added SuperLU to the Linux build
+------------------------------------------------------------------------
+r6431 | maas | 2014-11-19 10:01:38 -0700 (Wed, 19 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FESolidSolver.cpp
+   M /FEBio2/FECore/FEAnalysis.cpp
+
+FEBio2: checks for NANS in the convergence norms is now always done. When a NAN is detected, the time step is retried. 
+------------------------------------------------------------------------
+r6429 | weiss | 2014-11-18 13:47:42 -0700 (Tue, 18 Nov 2014) | 1 line
+Changed paths:
+   A /FEBio2/Documentation/FEBio2.Data
+   A /FEBio2/Documentation/FEBio2.Data/Trash
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/csort.MYD
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/csort.MYI
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/csort.frm
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/db.opt
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/jterms.MYD
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/jterms.MYI
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/jterms.frm
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/misc.MYD
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/misc.MYI
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/misc.frm
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/pdf_index.MYD
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/pdf_index.MYI
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/pdf_index.frm
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/refs.MYD
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/refs.MYI
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/refs.frm
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/refs_ext.MYD
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/refs_ext.MYI
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/refs_ext.frm
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/terms.MYD
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/terms.MYI
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.Data/rdb/terms.frm
+   A /FEBio2/Documentation/FEBio2.Data/Trash/Trash.enl
+   A /FEBio2/Documentation/FEBio2.Data/rdb
+   A /FEBio2/Documentation/FEBio2.Data/rdb/csort.MYD
+   A /FEBio2/Documentation/FEBio2.Data/rdb/csort.MYI
+   A /FEBio2/Documentation/FEBio2.Data/rdb/csort.frm
+   A /FEBio2/Documentation/FEBio2.Data/rdb/db.opt
+   A /FEBio2/Documentation/FEBio2.Data/rdb/jterms.MYD
+   A /FEBio2/Documentation/FEBio2.Data/rdb/jterms.MYI
+   A /FEBio2/Documentation/FEBio2.Data/rdb/jterms.frm
+   A /FEBio2/Documentation/FEBio2.Data/rdb/misc.MYD
+   A /FEBio2/Documentation/FEBio2.Data/rdb/misc.MYI
+   A /FEBio2/Documentation/FEBio2.Data/rdb/misc.frm
+   A /FEBio2/Documentation/FEBio2.Data/rdb/pdf_index.MYD
+   A /FEBio2/Documentation/FEBio2.Data/rdb/pdf_index.MYI
+   A /FEBio2/Documentation/FEBio2.Data/rdb/pdf_index.frm
+   A /FEBio2/Documentation/FEBio2.Data/rdb/refs.MYD
+   A /FEBio2/Documentation/FEBio2.Data/rdb/refs.MYI
+   A /FEBio2/Documentation/FEBio2.Data/rdb/refs.frm
+   A /FEBio2/Documentation/FEBio2.Data/rdb/refs_ext.MYD
+   A /FEBio2/Documentation/FEBio2.Data/rdb/refs_ext.MYI
+   A /FEBio2/Documentation/FEBio2.Data/rdb/refs_ext.frm
+   A /FEBio2/Documentation/FEBio2.Data/rdb/terms.MYD
+   A /FEBio2/Documentation/FEBio2.Data/rdb/terms.MYI
+   A /FEBio2/Documentation/FEBio2.Data/rdb/terms.frm
+
+
+------------------------------------------------------------------------
+r6428 | rawlins | 2014-11-18 12:09:17 -0700 (Tue, 18 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioLib/FEBioModel.cpp
+
+FEBio2: Fixed typo in FEBioModel.
+------------------------------------------------------------------------
+r6427 | rawlins | 2014-11-18 12:07:54 -0700 (Tue, 18 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/NumCore/SuperLUSolver.cpp
+   M /FEBio2/NumCore/SuperLU_MT_Solver.cpp
+
+FEBio2: Fixed some bugs in SuperLU
+------------------------------------------------------------------------
+r6422 | ateshian | 2014-11-14 16:09:59 -0700 (Fri, 14 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FESoluteFlux.cpp
+
+febio2: fixed bug in FESoluteFlux
+------------------------------------------------------------------------
+r6420 | ateshian | 2014-11-14 11:36:32 -0700 (Fri, 14 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEDamageMaterial.cpp
+
+febio2: added initialization of nested materials in FEDamageMaterial::Init()
+------------------------------------------------------------------------
+r6418 | ateshian | 2014-11-13 17:29:44 -0700 (Thu, 13 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/FEBio_um_2.1.docx
+
+updated User Manual 2.1 to include description of fluid_density in biphasic materials subjected to body forces
+------------------------------------------------------------------------
+r6415 | rawlins | 2014-11-13 13:29:33 -0700 (Thu, 13 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/FEBio_um_2.1.pdf
+
+FEBio2: Updated the user's manual pdf.
+------------------------------------------------------------------------
+r6414 | rawlins | 2014-11-13 12:43:16 -0700 (Thu, 13 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FEBiphasic.h
+
+FEBio2: Fixed typo in FEBiphasic.h
+------------------------------------------------------------------------
+r6411 | ateshian | 2014-11-11 19:14:40 -0700 (Tue, 11 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEDamageMaterial.cpp
+
+febio2: updated calculation of stress and tangent in FEDamageMaterial to improve convergence.
+------------------------------------------------------------------------
+r6408 | maas | 2014-11-11 10:05:25 -0700 (Tue, 11 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioXML/FEBioGeometrySection.cpp
+
+FEBio2: modified format for specifying node sets.
+------------------------------------------------------------------------
+r6406 | maas | 2014-11-11 09:43:25 -0700 (Tue, 11 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/FEBio_um_2.1.docx
+
+FEBio2: updated documentation.
+------------------------------------------------------------------------
+r6404 | ateshian | 2014-11-07 17:51:08 -0700 (Fri, 07 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/FEBio_tm_2.1.docx
+
+updated Theory Manual to describe body forces in biphasic material
+------------------------------------------------------------------------
+r6403 | ateshian | 2014-11-07 17:50:09 -0700 (Fri, 07 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FEBiphasicSolidDomain.cpp
+
+febio2: minor tweak to formulation of biphasic stiffness matrix with body forces.
+------------------------------------------------------------------------
+r6398 | ateshian | 2014-11-06 11:40:50 -0700 (Thu, 06 Nov 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FEBiphasic.cpp
+   M /FEBio2/FEBioMix/FEBiphasic.h
+   M /FEBio2/FEBioMix/FEBiphasicSolidDomain.cpp
+   M /FEBio2/FEBioMix/FEBiphasicSolidDomain.h
+   M /FEBio2/FEBioMix/FEBiphasicSolver.cpp
+
+febio2: added body forces to biphasic material, domain and solver.
+------------------------------------------------------------------------
+r6394 | rawlins | 2014-10-29 15:45:17 -0600 (Wed, 29 Oct 2014) | 2 lines
+Changed paths:
+   M /FEBio2/FEBioMech/FEDamageMaterial.cpp
+   M /FEBio2/FEBioMech/FEDamageMaterial.h
+   M /FEBio2/FEBioMech/FEDamageMaterialUC.cpp
+
+FEBio2: FEBio2: Serialized FEDamageMaterial.
+
+------------------------------------------------------------------------
+r6393 | rawlins | 2014-10-29 15:11:50 -0600 (Wed, 29 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEDamageMaterialUC.cpp
+   M /FEBio2/FEBioMech/FEDamageMaterialUC.h
+
+FEBio2: Serialized FEDamageMaterialUC.
+------------------------------------------------------------------------
+r6392 | rawlins | 2014-10-29 13:45:21 -0600 (Wed, 29 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEUT4Domain.cpp
+
+FEBio2: Fixed FEUT4Domain serialization.
+------------------------------------------------------------------------
+r6384 | rawlins | 2014-10-28 12:26:50 -0600 (Tue, 28 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FEMultiphasic.cpp
+
+FEBio2: Fixed bug in Multiphasic serialization.
+------------------------------------------------------------------------
+r6383 | rawlins | 2014-10-27 17:39:17 -0600 (Mon, 27 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FERemodelingElasticMaterial.cpp
+   M /FEBio2/FEBioMech/FERemodelingElasticMaterial.h
+
+FEBio2: Serialized FERemodelingElasticMaterial
+------------------------------------------------------------------------
+r6382 | rawlins | 2014-10-27 12:43:23 -0600 (Mon, 27 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEElasticMultigeneration.cpp
+   M /FEBio2/FECore/FESolidDomain.cpp
+
+FEBio2: Fixed MultiGeneration serialization.
+------------------------------------------------------------------------
+r6374 | rawlins | 2014-10-24 15:21:35 -0600 (Fri, 24 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEElasticMultigeneration.cpp
+   M /FEBio2/FEBioMech/FEElasticMultigeneration.h
+   M /FEBio2/FECore/FESolidDomain.cpp
+
+FEBio2: Progress on MultiGeneration serialization.
+------------------------------------------------------------------------
+r6365 | maas | 2014-10-23 11:12:18 -0600 (Thu, 23 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FESlidingInterface.cpp
+   M /FEBio2/FEBioMech/FESlidingInterface.h
+   M /FEBio2/FECore/FEClosestPointProjection.h
+
+FEBio2: Added support for self-contact in FESlidingInterface.
+------------------------------------------------------------------------
+r6360 | maas | 2014-10-21 12:37:26 -0600 (Tue, 21 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2013/FEBioMech/FEBioMech.vcxproj
+   M /FEBio2/VS2013/FEBioMech/FEBioMech.vcxproj.filters
+
+FEBio2: updated vs13 configuration.
+------------------------------------------------------------------------
+r6359 | ateshian | 2014-10-15 03:51:14 -0600 (Wed, 15 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEElasticMultigeneration.cpp
+   M /FEBio2/FEBioMech/FEHolmesMow.cpp
+
+febio2: Added generation stress storage in FEElasticMultigeneration material points.  Modified FEHolmesMow to improve calculation of stress tangent.
+------------------------------------------------------------------------
+r6358 | maas | 2014-10-11 15:26:09 -0600 (Sat, 11 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj.filters
+
+FEBio2: updated vs13 solution.
+------------------------------------------------------------------------
+r6357 | ateshian | 2014-10-10 15:48:27 -0600 (Fri, 10 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+   M /FEBio2/FEBioMech/FEBondRelaxation.cpp
+   M /FEBio2/FEBioMech/FEBondRelaxation.h
+   M /FEBio2/FEBioMech/FEElasticMultigeneration.cpp
+   M /FEBio2/FEBioMech/FEElasticMultigeneration.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrod.cpp
+   A /FEBio2/FEBioMech/FEOsmoticVirialExpansion.cpp
+   A /FEBio2/FEBioMech/FEOsmoticVirialExpansion.h
+   M /FEBio2/FEBioMech/FEReactiveViscoelastic.cpp
+   M /FEBio2/FEBioMech/FEReactiveViscoelastic.h
+   M /FEBio2/XCode5/FEBioMech/FEBioMech.xcodeproj/project.pbxproj
+
+febio2: added new FEOsmoticVirialExpansion material.  Added bond relaxation functions for reactive viscoelastic materials. Updated FEElasticMultigeneration to improve nesting of nested materials. Updated FEFiberIntegrationGaussKronrod.  Updated FEReactiveViscoelastic material.
+------------------------------------------------------------------------
+r6354 | rawlins | 2014-10-08 09:59:18 -0600 (Wed, 08 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/build/lnx64d.mk
+
+FEBio2: Added GSL library to Linux64
+------------------------------------------------------------------------
+r6353 | rawlins | 2014-10-07 13:08:37 -0600 (Tue, 07 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioLib/FEBioModel.cpp
+   M /FEBio2/FEBioMix/FEChemicalReaction.cpp
+   M /FEBio2/FEBioMix/FEMultiphasic.cpp
+
+FEBio2: Fixed serialization for 64bit.  Cast vector.size to int.
+------------------------------------------------------------------------
+r6349 | maas | 2014-10-06 15:58:13 -0600 (Mon, 06 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FESolidSolver.cpp
+   M /FEBio2/FEBioXML/FEBioControlSection.cpp
+   M /FEBio2/FEBioXML/FERestartImport.cpp
+   M /FEBio2/FECore/FE_enum.h
+
+FEBio2: Added option to output state to plot file at augmentations.
+------------------------------------------------------------------------
+r6342 | maas | 2014-10-03 10:30:19 -0600 (Fri, 03 Oct 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FECGSolidSolver.cpp
+   M /FEBio2/FEBioMech/FECGSolidSolver.h
+   M /FEBio2/FEBioXML/FEBioControlSection.cpp
+   M /FEBio2/FEBioXML/FEBioImport.cpp
+   M /FEBio2/FEBioXML/FEBioModuleSection.cpp
+   M /FEBio2/FECore/FE_enum.h
+
+FEBio2: integrated FECGSolidSolver with framework.
+------------------------------------------------------------------------
+r6337 | maas | 2014-09-30 15:03:43 -0600 (Tue, 30 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2013/FEBio2.vcxproj
+   M /FEBio2/VS2013/NumCore/NumCore.vcxproj
+
+FEBio2: updated VS13 solution file.
+------------------------------------------------------------------------
+r6336 | rawlins | 2014-09-30 12:11:14 -0600 (Tue, 30 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEDamageMaterialPoint.h
+   M /FEBio2/FEBioMech/FEDamageTransIsoMooneyRivlin.h
+
+FEBio2: Fixed bug compiling on Linux
+------------------------------------------------------------------------
+r6335 | maas | 2014-09-29 17:06:42 -0600 (Mon, 29 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioLib/FEBioModel.cpp
+
+FEBio2: The plotfile is no longer opened in the FEBioModel::Reset function. (This was causing problems in some plugins).
+------------------------------------------------------------------------
+r6331 | maas | 2014-09-28 16:10:39 -0600 (Sun, 28 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FECore/FERigidBody.cpp
+
+FEBio2: commented out fatal error when mixed rigid dofs are defined.
+------------------------------------------------------------------------
+r6327 | maas | 2014-09-25 15:45:36 -0600 (Thu, 25 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioLib/FEBioModel.h
+   M /FEBio2/FECore/FEModel.h
+
+FEBio2: Removed obsolete forward declaration of the PlotFile class in FEModel.h.
+------------------------------------------------------------------------
+r6326 | maas | 2014-09-24 15:15:27 -0600 (Wed, 24 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEDamageMaterialPoint.h
+   M /FEBio2/FEBioMech/FEDamageTransIsoMooneyRivlin.h
+   M /FEBio2/FEBioMix/FEReactionRateNims.cpp
+   A /FEBio2/VS2013
+   A /FEBio2/VS2013/FEBio2.sln
+   A /FEBio2/VS2013/FEBio2.vcxproj
+   A /FEBio2/VS2013/FEBio2.vcxproj.filters
+   A /FEBio2/VS2013/FEBioHeat
+   A /FEBio2/VS2013/FEBioHeat/FEBioHeat.vcxproj
+   A /FEBio2/VS2013/FEBioHeat/FEBioHeat.vcxproj.filters
+   A /FEBio2/VS2013/FEBioHeat/ReadMe.txt
+   A /FEBio2/VS2013/FEBioLib
+   A /FEBio2/VS2013/FEBioLib/FEBioLib.vcxproj
+   A /FEBio2/VS2013/FEBioLib/FEBioLib.vcxproj.filters
+   A /FEBio2/VS2013/FEBioLib/ReadMe.txt
+   A /FEBio2/VS2013/FEBioMech
+   A /FEBio2/VS2013/FEBioMech/FEBioMech.vcxproj
+   A /FEBio2/VS2013/FEBioMech/FEBioMech.vcxproj.filters
+   A /FEBio2/VS2013/FEBioMech/ReadMe.txt
+   A /FEBio2/VS2013/FEBioMix
+   A /FEBio2/VS2013/FEBioMix/FEBioMix.vcxproj
+   A /FEBio2/VS2013/FEBioMix/FEBioMix.vcxproj.filters
+   A /FEBio2/VS2013/FEBioMix/ReadMe.txt
+   A /FEBio2/VS2013/FEBioOpt
+   A /FEBio2/VS2013/FEBioOpt/FEBioOpt.vcxproj
+   A /FEBio2/VS2013/FEBioOpt/FEBioOpt.vcxproj.filters
+   A /FEBio2/VS2013/FEBioOpt/ReadMe.txt
+   A /FEBio2/VS2013/FEBioPlot
+   A /FEBio2/VS2013/FEBioPlot/FEBioPlot.vcxproj
+   A /FEBio2/VS2013/FEBioPlot/FEBioPlot.vcxproj.filters
+   A /FEBio2/VS2013/FEBioPlot/ReadMe.txt
+   A /FEBio2/VS2013/FEBioXML
+   A /FEBio2/VS2013/FEBioXML/FEBioXML.vcxproj
+   A /FEBio2/VS2013/FEBioXML/FEBioXML.vcxproj.filters
+   A /FEBio2/VS2013/FEBioXML/ReadMe.txt
+   A /FEBio2/VS2013/FECore
+   A /FEBio2/VS2013/FECore/FECore.vcxproj
+   A /FEBio2/VS2013/FECore/FECore.vcxproj.filters
+   A /FEBio2/VS2013/FECore/ReadMe.txt
+   A /FEBio2/VS2013/NumCore
+   A /FEBio2/VS2013/NumCore/NumCore.vcxproj
+   A /FEBio2/VS2013/NumCore/NumCore.vcxproj.filters
+   A /FEBio2/VS2013/NumCore/ReadMe.txt
+
+FEBio2: added VS2013 solution and project files.
+------------------------------------------------------------------------
+r6324 | ateshian | 2014-09-24 12:37:37 -0600 (Wed, 24 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEReactiveViscoelastic.cpp
+   M /FEBio2/FEBioMech/FEReactiveViscoelastic.h
+
+febio2: added strain energy density calculation for FEReactiveViscoelasticMaterial
+------------------------------------------------------------------------
+r6323 | maas | 2014-09-23 16:59:09 -0600 (Tue, 23 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMechPlot.cpp
+
+FEBio2: implemented support for plotting damage variable for mixtures.
+------------------------------------------------------------------------
+r6322 | maas | 2014-09-22 10:59:28 -0600 (Mon, 22 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMechPlot.cpp
+   M /FEBio2/FEBioMech/FEElasticMaterial.cpp
+   M /FEBio2/FEBioMech/FEElasticMaterial.h
+   M /FEBio2/FEBioMech/FEElasticMixture.cpp
+   M /FEBio2/FEBioMech/FEElasticMixture.h
+   M /FEBio2/FEBioMech/FEUncoupledElasticMixture.cpp
+   M /FEBio2/FEBioMech/FEUncoupledElasticMixture.h
+   M /FEBio2/FEBioMech/FEUncoupledViscoElasticMaterial.h
+   M /FEBio2/FEBioMech/FEViscoElasticMaterial.h
+
+FEBio2: Removed Damage() member of FEElasticMaterial (and some derived classes). FEPlotDamage now accesses the damage material points directly.
+------------------------------------------------------------------------
+r6321 | ateshian | 2014-09-22 07:33:13 -0600 (Mon, 22 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMechPlot.cpp
+   M /FEBio2/FEBioMech/FEBondRelaxation.h
+   M /FEBio2/FEBioMech/FEDamageMaterial.cpp
+   M /FEBio2/FEBioMech/FEDamageMaterial.h
+   M /FEBio2/FEBioMech/FEDamageMaterialUC.cpp
+   M /FEBio2/FEBioMech/FEDamageMaterialUC.h
+   M /FEBio2/FEBioMech/FEDamageTransIsoMooneyRivlin.cpp
+   M /FEBio2/FEBioMech/FEDamageTransIsoMooneyRivlin.h
+   M /FEBio2/FEBioMech/FEElasticMaterial.cpp
+   M /FEBio2/FEBioMech/FEElasticMaterial.h
+   M /FEBio2/FEBioMech/FEElasticMixture.cpp
+   M /FEBio2/FEBioMech/FEElasticMixture.h
+   M /FEBio2/FEBioMech/FEUncoupledElasticMixture.cpp
+   M /FEBio2/FEBioMech/FEUncoupledElasticMixture.h
+   M /FEBio2/FEBioMech/FEUncoupledViscoElasticMaterial.h
+   M /FEBio2/FEBioMech/FEViscoElasticMaterial.h
+   M /FEBio2/XCode5/FEBio2/FEBio2.xcodeproj/project.pbxproj
+   M /FEBio2/XCode5/FECore/FECore.xcodeproj/project.pbxproj
+
+febio2: Added Damage virtual function in FEElasticMaterial to return value of damage in FEElasticMixture, FEUncoupledElasticMixture, FEViscoElasticMaterial, FEUncoupledViscoElasticMaterial, FEDamageMaterial and FEDamageMaterialUC. Updated XCode5 project.
+------------------------------------------------------------------------
+r6319 | maas | 2014-09-21 13:11:24 -0600 (Sun, 21 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioXML/FEBioImport.cpp
+   M /FEBio2/FEBioXML/FEBioImport.h
+
+FEBio2: when loading image data, the path of the input file will be used to locate the image files.
+------------------------------------------------------------------------
+r6318 | maas | 2014-09-20 13:15:34 -0600 (Sat, 20 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FECore/erf.cpp
+   M /FEBio2/FECore/erf.h
+
+FEBio2: erf and erfc are only defined for win32.
+------------------------------------------------------------------------
+r6317 | maas | 2014-09-19 17:38:25 -0600 (Fri, 19 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEDamageCDF.cpp
+   A /FEBio2/FECore/erf.cpp
+   A /FEBio2/FECore/erf.h
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj.filters
+   M /FEBio2/VS2010/FECore/FECore.vcxproj
+   M /FEBio2/VS2010/FECore/FECore.vcxproj.filters
+
+FEBio2: Updated vs10 solution (also added calculation for erf and erfc).
+------------------------------------------------------------------------
+r6316 | ateshian | 2014-09-19 15:45:54 -0600 (Fri, 19 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+   M /FEBio2/FEBioMech/FEBioMechPlot.cpp
+   A /FEBio2/FEBioMech/FEDamageCDF.cpp
+   A /FEBio2/FEBioMech/FEDamageCDF.h
+   A /FEBio2/FEBioMech/FEDamageCriterion.cpp
+   A /FEBio2/FEBioMech/FEDamageCriterion.h
+   A /FEBio2/FEBioMech/FEDamageCriterionUC.cpp
+   A /FEBio2/FEBioMech/FEDamageCriterionUC.h
+   A /FEBio2/FEBioMech/FEDamageMaterial.cpp
+   A /FEBio2/FEBioMech/FEDamageMaterial.h
+   A /FEBio2/FEBioMech/FEDamageMaterialPoint.cpp
+   A /FEBio2/FEBioMech/FEDamageMaterialPoint.h
+   A /FEBio2/FEBioMech/FEDamageMaterialUC.cpp
+   A /FEBio2/FEBioMech/FEDamageMaterialUC.h
+   M /FEBio2/FEBioMech/FEDamageMooneyRivlin.cpp
+   M /FEBio2/FEBioMech/FEDamageMooneyRivlin.h
+   M /FEBio2/FEBioMech/FEDamageNeoHookean.cpp
+   M /FEBio2/FEBioMech/FEDamageNeoHookean.h
+   M /FEBio2/FEBioMech/FEDamageTransIsoMooneyRivlin.cpp
+   M /FEBio2/FEBioMech/FEDamageTransIsoMooneyRivlin.h
+   M /FEBio2/FECore/mat3d.cpp
+   M /FEBio2/XCode5/FEBioMech/FEBioMech.xcodeproj/project.pbxproj
+
+febio2: implemented FEDamageMaterial and FEDamageMaterialUC to model damage in any FEElasticMaterial and FEUncoupledMaterial.  FEDamageCriterion and FEDamageCriterionUC are parent classes to a variety of damage criteria.  FEDamageCDF is a parent material to a variety of cumulative distribution functions that relate the damage to the damage criterion.  The existing FEDamageMaterialPoint class was moved to its own file.
+------------------------------------------------------------------------
+r6313 | maas | 2014-09-18 09:28:14 -0600 (Thu, 18 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioLib/version.h
+
+FEBio2: Increased version to 2.1.2
+------------------------------------------------------------------------
+r6308 | ateshian | 2014-09-15 16:38:02 -0600 (Mon, 15 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/XCode5/FEBio2/FEBio2.xcodeproj/project.pbxproj
+   M /FEBio2/XCode5/FEBioHeat/FEBioHeat.xcodeproj/project.pbxproj
+   M /FEBio2/XCode5/FEBioLib/FEBioLib.xcodeproj/project.pbxproj
+   M /FEBio2/XCode5/FEBioMech/FEBioMech.xcodeproj/project.pbxproj
+   M /FEBio2/XCode5/FEBioMix/FEBioMix.xcodeproj/project.pbxproj
+   M /FEBio2/XCode5/FEBioOpt/FEBioOpt.xcodeproj/project.pbxproj
+   M /FEBio2/XCode5/FEBioPlot/FEBioPlot.xcodeproj/project.pbxproj
+   M /FEBio2/XCode5/FEBioXML/FEBioXML.xcodeproj/project.pbxproj
+   M /FEBio2/XCode5/FECore/FECore.xcodeproj/project.pbxproj
+   M /FEBio2/XCode5/NumCore/NumCore.xcodeproj/project.pbxproj
+
+febio2: Updated XCode5 project to use Intel compiler v. 15
+------------------------------------------------------------------------
+r6307 | maas | 2014-09-15 10:07:54 -0600 (Mon, 15 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj.filters
+
+FEBio2: updated vs10 solution.
+------------------------------------------------------------------------
+r6306 | maas | 2014-09-15 09:55:50 -0600 (Mon, 15 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FECore/FEModel.cpp
+   M /FEBio2/FECore/FEModel.h
+   M /FEBio2/FECore/version.h
+
+FEBio2: Added some validation for BC's and nodal loads.
+------------------------------------------------------------------------
+r6305 | ateshian | 2014-09-14 14:46:42 -0600 (Sun, 14 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+   A /FEBio2/FEBioMech/FEBondRelaxation.cpp
+   A /FEBio2/FEBioMech/FEBondRelaxation.h
+   A /FEBio2/FEBioMech/FEReactiveViscoelastic.cpp
+   A /FEBio2/FEBioMech/FEReactiveViscoelastic.h
+   M /FEBio2/XCode5/FEBioMech/FEBioMech.xcodeproj/project.pbxproj
+
+febio2: added new FEReactiveViscoelastic material and related FEBondRelaxation material.
+------------------------------------------------------------------------
+r6304 | ateshian | 2014-09-14 14:43:22 -0600 (Sun, 14 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FEReactionRateNims.h
+
+febio2: Updated comment describing FEReactionRateNims.
+------------------------------------------------------------------------
+r6302 | wguss | 2014-09-12 17:18:55 -0600 (Fri, 12 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEElasticSolidDomain.cpp
+   M /FEBio2/FEBioMech/FEResidualVector.cpp
+   M /FEBio2/FEBioMix/FEBiphasicSolidDomain.cpp
+   M /FEBio2/FEBioMix/FEBiphasicSoluteDomain.cpp
+   M /FEBio2/FEBioMix/FEMultiphasicDomain.cpp
+
+Parallelization improvements through atomic locking in residual vector. [details: http://goo.gl/9RzZG9]
+------------------------------------------------------------------------
+r6295 | maas | 2014-09-09 18:05:38 -0600 (Tue, 09 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FECore/mat3d.h
+   M /FEBio2/FECore/mat3d.hpp
+
+FEBio2: Added mat3d::norm which calculates the one-norm for this matrix class.
+------------------------------------------------------------------------
+r6293 | maas | 2014-09-08 09:31:39 -0600 (Mon, 08 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FECoupledTransIsoMooneyRivlin.cpp
+   M /FEBio2/FEBioMech/FECoupledTransIsoVerondaWestmann.cpp
+
+FEBio2: placed the HAVE_GSL macro inside StrainEnergyDensity function so that the function compiles if the GSL library is not available.
+------------------------------------------------------------------------
+r6292 | ateshian | 2014-09-08 08:46:26 -0600 (Mon, 08 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/FEBio_tm_2.1.docx
+   M /FEBio2/Documentation/FEBio_um_2.1.docx
+
+febio2: Updated User Manual and Theory Manual.
+------------------------------------------------------------------------
+r6291 | ateshian | 2014-09-08 08:41:22 -0600 (Mon, 08 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEArrudaBoyce.cpp
+   M /FEBio2/FEBioMech/FEArrudaBoyce.h
+   M /FEBio2/FEBioMech/FEBioMech.cpp
+   M /FEBio2/FEBioMech/FEBioMechData.cpp
+   M /FEBio2/FEBioMech/FEBioMechData.h
+   M /FEBio2/FEBioMech/FEBioMechPlot.cpp
+   M /FEBio2/FEBioMech/FEBioMechPlot.h
+   M /FEBio2/FEBioMech/FEContinuousFiberDistribution.h
+   M /FEBio2/FEBioMech/FEContinuousFiberDistributionUC.h
+   M /FEBio2/FEBioMech/FECoupledMooneyRivlin.cpp
+   M /FEBio2/FEBioMech/FECoupledMooneyRivlin.h
+   M /FEBio2/FEBioMech/FECoupledTransIsoMooneyRivlin.cpp
+   M /FEBio2/FEBioMech/FECoupledTransIsoMooneyRivlin.h
+   M /FEBio2/FEBioMech/FECoupledTransIsoVerondaWestmann.cpp
+   M /FEBio2/FEBioMech/FECoupledTransIsoVerondaWestmann.h
+   M /FEBio2/FEBioMech/FECoupledVerondaWestmann.cpp
+   M /FEBio2/FEBioMech/FECoupledVerondaWestmann.h
+   M /FEBio2/FEBioMech/FEDamageMooneyRivlin.cpp
+   M /FEBio2/FEBioMech/FEDamageMooneyRivlin.h
+   M /FEBio2/FEBioMech/FEDamageNeoHookean.cpp
+   M /FEBio2/FEBioMech/FEDamageNeoHookean.h
+   M /FEBio2/FEBioMech/FEDamageTransIsoMooneyRivlin.cpp
+   M /FEBio2/FEBioMech/FEDamageTransIsoMooneyRivlin.h
+   M /FEBio2/FEBioMech/FEEFDDonnanEquilibrium.cpp
+   M /FEBio2/FEBioMech/FEEFDDonnanEquilibrium.h
+   M /FEBio2/FEBioMech/FEEFDMooneyRivlin.cpp
+   M /FEBio2/FEBioMech/FEEFDMooneyRivlin.h
+   M /FEBio2/FEBioMech/FEEFDNeoHookean.cpp
+   M /FEBio2/FEBioMech/FEEFDNeoHookean.h
+   M /FEBio2/FEBioMech/FEEFDUncoupled.cpp
+   M /FEBio2/FEBioMech/FEEFDUncoupled.h
+   M /FEBio2/FEBioMech/FEEFDVerondaWestmann.cpp
+   M /FEBio2/FEBioMech/FEEFDVerondaWestmann.h
+   M /FEBio2/FEBioMech/FEElasticFiberMaterial.cpp
+   M /FEBio2/FEBioMech/FEElasticFiberMaterial.h
+   M /FEBio2/FEBioMech/FEElasticFiberMaterialUC.cpp
+   M /FEBio2/FEBioMech/FEElasticFiberMaterialUC.h
+   M /FEBio2/FEBioMech/FEElasticMaterial.cpp
+   M /FEBio2/FEBioMech/FEElasticMaterial.h
+   M /FEBio2/FEBioMech/FEElasticMixture.cpp
+   M /FEBio2/FEBioMech/FEElasticMixture.h
+   M /FEBio2/FEBioMech/FEElasticMultigeneration.cpp
+   M /FEBio2/FEBioMech/FEElasticMultigeneration.h
+   M /FEBio2/FEBioMech/FEEllipsoidalFiberDistribution.cpp
+   M /FEBio2/FEBioMech/FEEllipsoidalFiberDistribution.h
+   M /FEBio2/FEBioMech/FEFiberExpPow.cpp
+   M /FEBio2/FEBioMech/FEFiberExpPow.h
+   M /FEBio2/FEBioMech/FEFiberExpPowUncoupled.cpp
+   M /FEBio2/FEBioMech/FEFiberExpPowUncoupled.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGauss.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGauss.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrod.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrod.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrodUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussKronrodUC.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGaussUC.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGeodesic.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGeodesic.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationGeodesicUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationGeodesicUC.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationTrapezoidal.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationTrapezoidal.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationTrapezoidalUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationTrapezoidalUC.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationTriangle.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationTriangle.h
+   M /FEBio2/FEBioMech/FEFiberIntegrationTriangleUC.cpp
+   M /FEBio2/FEBioMech/FEFiberIntegrationTriangleUC.h
+   M /FEBio2/FEBioMech/FEFiberMaterial.cpp
+   M /FEBio2/FEBioMech/FEFiberMaterial.h
+   M /FEBio2/FEBioMech/FEFiberNeoHookean.cpp
+   M /FEBio2/FEBioMech/FEFiberNeoHookean.h
+   M /FEBio2/FEBioMech/FEFungOrthoCompressible.cpp
+   M /FEBio2/FEBioMech/FEFungOrthoCompressible.h
+   M /FEBio2/FEBioMech/FEFungOrthotropic.cpp
+   M /FEBio2/FEBioMech/FEFungOrthotropic.h
+   M /FEBio2/FEBioMech/FEGasserOgdenHolzapfel.cpp
+   M /FEBio2/FEBioMech/FEGasserOgdenHolzapfel.h
+   M /FEBio2/FEBioMech/FEHolmesMow.cpp
+   M /FEBio2/FEBioMech/FEHolmesMow.h
+   M /FEBio2/FEBioMech/FEIsotropicElastic.cpp
+   M /FEBio2/FEBioMech/FEIsotropicElastic.h
+   M /FEBio2/FEBioMech/FELinearElastic.cpp
+   M /FEBio2/FEBioMech/FELinearElastic.h
+   M /FEBio2/FEBioMech/FELinearOrthotropic.cpp
+   M /FEBio2/FEBioMech/FELinearOrthotropic.h
+   M /FEBio2/FEBioMech/FELinearTransIso.cpp
+   M /FEBio2/FEBioMech/FELinearTransIso.h
+   M /FEBio2/FEBioMech/FEMooneyRivlin.cpp
+   M /FEBio2/FEBioMech/FEMooneyRivlin.h
+   M /FEBio2/FEBioMech/FENeoHookean.cpp
+   M /FEBio2/FEBioMech/FENeoHookean.h
+   M /FEBio2/FEBioMech/FEOgdenMaterial.cpp
+   M /FEBio2/FEBioMech/FEOgdenMaterial.h
+   M /FEBio2/FEBioMech/FEOgdenUnconstrained.cpp
+   M /FEBio2/FEBioMech/FEOgdenUnconstrained.h
+   M /FEBio2/FEBioMech/FEOrthoElastic.cpp
+   M /FEBio2/FEBioMech/FEOrthoElastic.h
+   M /FEBio2/FEBioMech/FERemodelingElasticMaterial.cpp
+   M /FEBio2/FEBioMech/FERemodelingElasticMaterial.h
+   M /FEBio2/FEBioMech/FESolidMaterial.cpp
+   M /FEBio2/FEBioMech/FESolidMaterial.h
+   M /FEBio2/FEBioMech/FESphericalFiberDistribution.cpp
+   M /FEBio2/FEBioMech/FESphericalFiberDistribution.h
+   M /FEBio2/FEBioMech/FEStVenantKirchhoff.cpp
+   M /FEBio2/FEBioMech/FEStVenantKirchhoff.h
+   M /FEBio2/FEBioMech/FETCNonlinearOrthotropic.cpp
+   M /FEBio2/FEBioMech/FETCNonlinearOrthotropic.h
+   M /FEBio2/FEBioMech/FETransIsoMooneyRivlin.cpp
+   M /FEBio2/FEBioMech/FETransIsoMooneyRivlin.h
+   M /FEBio2/FEBioMech/FETransIsoVerondaWestmann.cpp
+   M /FEBio2/FEBioMech/FETransIsoVerondaWestmann.h
+   M /FEBio2/FEBioMech/FEUncoupledElasticMixture.cpp
+   M /FEBio2/FEBioMech/FEUncoupledElasticMixture.h
+   M /FEBio2/FEBioMech/FEUncoupledMaterial.cpp
+   M /FEBio2/FEBioMech/FEUncoupledMaterial.h
+   M /FEBio2/FEBioMech/FEUncoupledViscoElasticMaterial.cpp
+   M /FEBio2/FEBioMech/FEUncoupledViscoElasticMaterial.h
+   M /FEBio2/FEBioMech/FEVerondaWestmann.cpp
+   M /FEBio2/FEBioMech/FEVerondaWestmann.h
+   M /FEBio2/FEBioMech/FEViscoElasticMaterial.cpp
+   M /FEBio2/FEBioMech/FEViscoElasticMaterial.h
+   M /FEBio2/FEBioMix/FESFDSBM.cpp
+   M /FEBio2/FEBioMix/FESFDSBM.h
+   M /FEBio2/FECore/mat3d.hpp
+   M /FEBio2/XCode5/FEBio2/FEBio2.xcodeproj/project.pbxproj
+   M /FEBio2/XCode5/FEBioMech/FEBioMech.xcodeproj/project.pbxproj
+
+febio2: Introduced FEStrainEnergyDensity function in FEElasticMaterial and FEDevStrainEnergyDensity in FEUncoupledMaterial classes.  Implemented analytical expression for the calculation of the strain energy density in almost all the materials, except a few for which documentation is not available.  Fixed bug in the calculation of the Tangent and Stress in FELinearOrthtropic and FELinearTransIso.  Added link to GNU Scientific Library (http://www.gnu.org/software/gsl/) for the evaluation of special functions (namely, the exponential integral, for calculating strain energy density of fibers in FETransIsoMooneyRivlin and related materials). Use -DHAVE_GSL to compile and link with this library.
+------------------------------------------------------------------------
+r6289 | maas | 2014-09-07 14:13:02 -0600 (Sun, 07 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FEBiphasicSoluteSolver.cpp
+   M /FEBio2/FEBioMix/FEMultiphasicSolver.cpp
+   M /FEBio2/FEBioMix/FESolute.cpp
+   M /FEBio2/FEBioXML/FEBioImport.cpp
+
+FEBio2: Solute concentration dofs are now determined when allocating FESoluteData. Removes need for parsing input file twice in search of  Globals section.
+------------------------------------------------------------------------
+r6285 | maas | 2014-09-02 12:18:46 -0600 (Tue, 02 Sep 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2010/FEBio2.sln
+
+FEBio2: updated project dependencies in vs10 solution.
+------------------------------------------------------------------------
+r6280 | maas | 2014-09-01 18:11:50 -0600 (Mon, 01 Sep 2014) | 2 lines
+Changed paths:
+   M /FEBio2/Documentation/FEBio_um_2.1.docx
+   M /FEBio2/FEBioXML/FEBioOutputSection.cpp
+   M /FEBio2/FEBioXML/XMLReader.cpp
+   M /FEBio2/FECore/DataStore.cpp
+   M /FEBio2/FECore/DataStore.h
+
+FEBio2: Added support for format strings for the log data output sections (updated documentation).
+
+------------------------------------------------------------------------
+r6276 | maas | 2014-08-29 12:36:27 -0600 (Fri, 29 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2008/FEBioMix/FEBioMix.vcproj
+
+FEBio2: updated vs08 solution.
+------------------------------------------------------------------------
+r6274 | maas | 2014-08-28 16:56:49 -0600 (Thu, 28 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioHeat/FEHeatSolver.cpp
+   M /FEBio2/FEBioXML/FEBioInitialSection.cpp
+   M /FEBio2/FECore/FEMesh.cpp
+   M /FEBio2/FECore/FEMesh.h
+
+FEBio2: Added support for initial temperatures. 
+------------------------------------------------------------------------
+r6272 | maas | 2014-08-28 10:32:12 -0600 (Thu, 28 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioXML/FEBioContactSection.cpp
+   M /FEBio2/FECore/BFGSSolver.cpp
+   M /FEBio2/FECore/MatrixProfile.cpp
+
+FEBio2: Added check for invalid rigid body reference in rigid contact section. Made sure that a model with zero equations doesn't crash FEBio. 
+------------------------------------------------------------------------
+r6270 | rawlins | 2014-08-27 16:43:54 -0600 (Wed, 27 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FEMultiphasic.cpp
+
+FEBio2: Fixed another bug in serializing multiphasic solid material.
+------------------------------------------------------------------------
+r6269 | rawlins | 2014-08-27 16:07:15 -0600 (Wed, 27 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FEMultiphasic.cpp
+
+FEBio2: Fixed bug in serializing multiphasic solid material.
+------------------------------------------------------------------------
+r6265 | rawlins | 2014-08-26 14:56:04 -0600 (Tue, 26 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FECore/FEModel.cpp
+
+FEBio2: Fixed bug in rigid body boundary conditions serialization.
+------------------------------------------------------------------------
+r6264 | ateshian | 2014-08-26 13:10:08 -0600 (Tue, 26 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FEReactionRateNims.cpp
+
+febio2: fixed bug in FEReactionRateNims
+------------------------------------------------------------------------
+r6262 | maas | 2014-08-25 21:17:24 -0600 (Mon, 25 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FECore/FEMesh.cpp
+   M /FEBio2/FECore/FEModel.cpp
+
+FEBio2: Moved call to FEMesh::RemoveIsolatedVertices from FEModel::Init to FEMesh::Init. Added check for return value from InitConstraints in FEModel::Init.
+------------------------------------------------------------------------
+r6261 | maas | 2014-08-25 16:40:38 -0600 (Mon, 25 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj
+   M /FEBio2/VS2010/FEBioMech/FEBioMech.vcxproj.filters
+
+FEBio2: updated vs10 solution.
+------------------------------------------------------------------------
+r6258 | rawlins | 2014-08-25 09:50:21 -0600 (Mon, 25 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2010/FEBioMix/FEBioMix.vcxproj
+   M /FEBio2/VS2010/FEBioMix/FEBioMix.vcxproj.filters
+
+FEBio2: Added FEReactionRateNims to VS10 solution file.
+------------------------------------------------------------------------
+r6257 | ateshian | 2014-08-25 09:01:51 -0600 (Mon, 25 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMech/FEElasticMultigeneration.cpp
+
+febio2: updated serialization and shallow copy of FEMultigenerationMaterialPoint.
+------------------------------------------------------------------------
+r6256 | ateshian | 2014-08-24 17:45:49 -0600 (Sun, 24 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FEChemicalReaction.cpp
+   M /FEBio2/FEBioMix/FEChemicalReaction.h
+   M /FEBio2/FEBioMix/FEMultiphasicDomain.cpp
+   M /FEBio2/FEBioMix/FEReactionRateNims.cpp
+   M /FEBio2/FEBioMix/FEReactionRateNims.h
+   M /FEBio2/FEBioMix/FESolutesMaterialPoint.cpp
+   M /FEBio2/FEBioMix/FESolutesMaterialPoint.h
+
+febio2: updated code for FEReactionRateNims and added optional chemical reaction data vectors in FESolutesMaterialPoint.
+------------------------------------------------------------------------
+r6255 | ateshian | 2014-08-24 08:03:29 -0600 (Sun, 24 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioMix/FEBioMix.cpp
+   A /FEBio2/FEBioMix/FEReactionRateNims.cpp
+   A /FEBio2/FEBioMix/FEReactionRateNims.h
+   M /FEBio2/XCode5/FEBioMix/FEBioMix.xcodeproj/project.pbxproj
+
+febio2: added FEReactionRateNims class for reaction rates.
+------------------------------------------------------------------------
+r6251 | rawlins | 2014-08-22 15:03:22 -0600 (Fri, 22 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/FEBioOpt/FEOptimizer.cpp
+
+FEBio2: Added option to import optimization loadcurve from a file"
+------------------------------------------------------------------------
+r6249 | maas | 2014-08-22 13:10:10 -0600 (Fri, 22 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/VS2008/FECore/FECore.vcproj
+
+FEBio2: updated vs08 solution.
+------------------------------------------------------------------------
+r6248 | rawlins | 2014-08-22 10:38:19 -0600 (Fri, 22 Aug 2014) | 1 line
+Changed paths:
+   A /FEBio2/Documentation/FEBio_tm_2.1.docx
+   A /FEBio2/Documentation/FEBio_tm_2.1.pdf
+   M /FEBio2/Documentation/FEBio_um_2.0.docx
+   A /FEBio2/Documentation/FEBio_um_2.1.docx
+   A /FEBio2/Documentation/FEBio_um_2.1.pdf
+
+FEBio2: Updated manuals to 2.1
+------------------------------------------------------------------------
+r6247 | rawlins | 2014-08-22 10:35:53 -0600 (Fri, 22 Aug 2014) | 1 line
+Changed paths:
+   M /FEBio2/Documentation/febio2_svn.log
+   M /FEBio2/FEBioLib/version.h
+   M /FEBio2/XCode5/FEBio2.xcworkspace/xcshareddata/FEBio2.xccheckout
+
+FEBio2: Updated version to 2.1.1
+------------------------------------------------------------------------
 r6246 | maas | 2014-08-21 15:05:06 -0600 (Thu, 21 Aug 2014) | 1 line
 Changed paths:
    M /FEBio2/FEBioPlot/PltArchive.cpp
