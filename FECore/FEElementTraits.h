@@ -771,6 +771,52 @@ public:
 
 //=============================================================================
 //
+//   FETri6m
+//   
+//=============================================================================
+
+//=============================================================================
+// Base class for 6-noded quadratic triangles with modified shape functions
+class FETri6m_ : public FESurfaceElementTraits
+{
+public:
+	enum { NELN = 6 };
+
+public:
+	FETri6m_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, et){}
+
+	// shape function at (r,s)
+	void shape(double* H, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv(double* Gr, double* Gs, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+};
+
+//=============================================================================
+// 6-node triangular element (with modified shape functions)
+// with 7-point gaussian quadrature
+//
+class FETri6mG7 : public FETri6m_
+{
+public:
+	enum { NINT = 7 };
+
+public:
+	// constructor
+	FETri6mG7();
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix	Ai;
+};
+
+//=============================================================================
+//
 //   FETri7
 //   
 //=============================================================================

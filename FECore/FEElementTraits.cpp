@@ -1643,6 +1643,148 @@ void FETri6NI::project_to_nodes(double* ai, double* ao)
 }
 
 //============================================================================
+//                             F E T R I 6 M
+//============================================================================
+
+// parameter used in the tri6m (6-node triangle with modified shape functions)
+const double fetri6m_alpha = 0.2;
+
+//-----------------------------------------------------------------------------
+void FETri6m_::shape(double* H, double r, double s)
+{
+	double r1 = 1.0 - r - s;
+	double r2 = r;
+	double r3 = s;
+
+	double N[6];
+	N[0] = r1*(2.0*r1 - 1.0);
+	N[1] = r2*(2.0*r2 - 1.0);
+	N[2] = r3*(2.0*r3 - 1.0);
+	N[3] = 4.0*r1*r2;
+	N[4] = 4.0*r2*r3;
+	N[5] = 4.0*r3*r1;
+
+	const double a = fetri6m_alpha;
+	const double b = 1.0 - 2.0*a;
+	H[0] = N[0] + a*(N[3] + N[5]);
+	H[1] = N[1] + a*(N[3] + N[4]);
+	H[2] = N[2] + a*(N[4] + N[5]);
+	H[3] = b*N[3];
+	H[4] = b*N[4];
+	H[5] = b*N[5];
+}
+
+//-----------------------------------------------------------------------------
+void FETri6m_::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	double Nr[6], Ns[6];
+	Nr[0] = -3.0 + 4.0*r + 4.0*s;
+	Nr[1] =  4.0*r - 1.0;
+	Nr[2] =  0.0;
+	Nr[3] =  4.0 - 8.0*r - 4.0*s;
+	Nr[4] =  4.0*s;
+	Nr[5] = -4.0*s;
+
+	Ns[0] = -3.0 + 4.0*s + 4.0*r;
+	Ns[1] =  0.0;
+	Ns[2] =  4.0*s - 1.0;
+	Ns[3] = -4.0*r;
+	Ns[4] =  4.0*r;
+	Ns[5] =  4.0 - 8.0*s - 4.0*r;
+
+	const double a = fetri6m_alpha;
+	const double b = 1.0 - 2.0*a;
+	Hr[0] = Nr[0] + a*(Nr[3] + Nr[5]);
+	Hr[1] = Nr[1] + a*(Nr[3] + Nr[4]);
+	Hr[2] = Nr[2] + a*(Nr[4] + Nr[5]);
+	Hr[3] = b*Nr[3];
+	Hr[4] = b*Nr[4];
+	Hr[5] = b*Nr[5];
+
+	Hs[0] = Ns[0] + a*(Ns[3] + Ns[5]);
+	Hs[1] = Ns[1] + a*(Ns[3] + Ns[4]);
+	Hs[2] = Ns[2] + a*(Ns[4] + Ns[5]);
+	Hs[3] = b*Ns[3];
+	Hs[4] = b*Ns[4];
+	Hs[5] = b*Ns[5];
+}
+
+//-----------------------------------------------------------------------------
+void FETri6m_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+{
+	double Nrr[6], Nrs[6], Nss[6];
+	Nrr[0] =  4.0; Nrs[0] =  4.0; Nss[0] =  4.0;
+	Nrr[1] =  4.0; Nrs[1] =  0.0; Nss[1] =  0.0;
+	Nrr[2] =  0.0; Nrs[2] =  0.0; Nss[2] =  4.0;
+	Nrr[3] = -8.0; Nrs[3] = -4.0; Nss[3] =  0.0;
+	Nrr[4] =  0.0; Nrs[4] =  4.0; Nss[4] =  0.0;
+	Nrr[5] =  0.0; Nrs[5] = -4.0; Nss[5] = -8.0;
+
+	const double a = fetri6m_alpha;
+	const double b = 1.0 - 2.0*a;
+	Hrr[0] = Nrr[0] + a*(Nrr[3] + Nrr[5]);
+	Hrr[1] = Nrr[1] + a*(Nrr[3] + Nrr[4]);
+	Hrr[2] = Nrr[2] + a*(Nrr[4] + Nrr[5]);
+	Hrr[3] = b*Nrr[3];
+	Hrr[4] = b*Nrr[4];
+	Hrr[5] = b*Nrr[5];
+
+	Hrs[0] = Nrs[0] + a*(Nrs[3] + Nrs[5]);
+	Hrs[1] = Nrs[1] + a*(Nrs[3] + Nrs[4]);
+	Hrs[2] = Nrs[2] + a*(Nrs[4] + Nrs[5]);
+	Hrs[3] = b*Nrs[3];
+	Hrs[4] = b*Nrs[4];
+	Hrs[5] = b*Nrs[5];
+
+	Hss[0] = Nss[0] + a*(Nss[3] + Nss[5]);
+	Hss[1] = Nss[1] + a*(Nss[3] + Nss[4]);
+	Hss[2] = Nss[2] + a*(Nss[4] + Nss[5]);
+	Hss[3] = b*Nss[3];
+	Hss[4] = b*Nss[4];
+	Hss[5] = b*Nss[5];
+}
+
+//=============================================================================
+//                          F E T R I 6 M G 7
+//=============================================================================
+
+FETri6mG7::FETri6mG7() : FETri6m_(NINT, FE_TRI6MG7) 
+{ 
+	const double w = 1.0/2.0;
+	gr[0] = 0.333333333333333; gs[0] = 0.333333333333333; gw[0] = w*0.225000000000000;
+	gr[1] = 0.797426985353087; gs[1] = 0.101286507323456; gw[1] = w*0.125939180544827;
+	gr[2] = 0.101286507323456; gs[2] = 0.797426985353087; gw[2] = w*0.125939180544827;
+	gr[3] = 0.101286507323456; gs[3] = 0.101286507323456; gw[3] = w*0.125939180544827;
+	gr[4] = 0.470142064105115; gs[4] = 0.470142064105115; gw[4] = w*0.132394152788506;
+	gr[5] = 0.470142064105115; gs[5] = 0.059715871789770; gw[5] = w*0.132394152788506;
+	gr[6] = 0.059715871789770; gs[6] = 0.470142064105115; gw[6] = w*0.132394152788506;
+	init(); 
+
+	// we need Ai to project integration point data to the nodes
+	matrix A(NELN,NELN);
+	Ai.resize(NELN,NELN);
+	A = H.transpose()*H;
+	Ai = A.inverse();
+}
+
+//-----------------------------------------------------------------------------
+void FETri6mG7::project_to_nodes(double* ai, double* ao)
+{
+	vector<double> b(NELN);
+	for (int i=0; i<NELN; ++i) 
+	{
+		b[i] = 0;
+		for (int j=0; j<NINT; ++j) b[i] += H[j][i]*ai[j];
+	}
+
+	for (int i=0; i<NELN; ++i) 
+	{
+		ao[i] = 0;
+		for (int j=0; j<NELN; ++j) ao[i] += Ai[i][j]*b[j];
+	}
+}
+
+//============================================================================
 //                             F E T R I 7
 //============================================================================
 

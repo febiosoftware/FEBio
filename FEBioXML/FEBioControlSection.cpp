@@ -189,11 +189,12 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 				}
 				else if (elem == "tri6")
 				{
-					if      (strcmp(szv, "GAUSS3"  ) == 0) m_pim->m_ntri6 = FE_TRI6G3;
-					else if (strcmp(szv, "GAUSS6"  ) == 0) m_pim->m_ntri6 = FE_TRI6NI;
-					else if (strcmp(szv, "GAUSS4"  ) == 0) m_pim->m_ntri6 = FE_TRI6G4;
-					else if (strcmp(szv, "GAUSS7"  ) == 0) m_pim->m_ntri6 = FE_TRI6G7;
-					else if (strcmp(szv, "LOBATTO7") == 0) m_pim->m_ntri6 = FE_TRI6GL7;
+					if      (strcmp(szv, "GAUSS3"    ) == 0) m_pim->m_ntri6 = FE_TRI6G3;
+					else if (strcmp(szv, "GAUSS6"    ) == 0) m_pim->m_ntri6 = FE_TRI6NI;
+					else if (strcmp(szv, "GAUSS4"    ) == 0) m_pim->m_ntri6 = FE_TRI6G4;
+					else if (strcmp(szv, "GAUSS7"    ) == 0) m_pim->m_ntri6 = FE_TRI6G7;
+					else if (strcmp(szv, "LOBATTO7"  ) == 0) m_pim->m_ntri6 = FE_TRI6GL7;
+					else if (strcmp(szv, "MOD_GAUSS7") == 0) m_pim->m_ntri6 = FE_TRI6MG7;
 					else throw XMLReader::InvalidValue(tag);
 				}
 				else if (elem == "tri7")

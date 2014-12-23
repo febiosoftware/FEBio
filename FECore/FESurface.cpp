@@ -292,147 +292,27 @@ bool project2quad(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 }
 
 //-----------------------------------------------------------------------------
-// project onto a quadrilateral surface.
-bool project2quad9(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
+// project to general surface element.
+bool project2surf(FESurfaceElement& el, vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 {
 	double Q[2], u[2], D;
-	double H[9], Hr[9], Hs[9], Hrr[9], Hss[9], Hrs[9];
-
-	int i, j;
-	int NMAX = 50, n=0;
-
-	// evaulate scalar products
-	double xy[9];
-	double yy[9][9];
-	for (i=0; i<9; ++i)
-	{
-		xy[i] = x*y[i];
-		yy[i][i] = y[i]*y[i];
-		for (j=i+1; j<9; ++j)
-		{
-			yy[i][j] = yy[j][i] = y[i]*y[j];
-		}
-	}
-
-	// loop until converged
-	bool bconv = false;
-	double normu;
-	do
-	{
-		// evaluate shape functions and shape function derivatives.
-		double R[3] = {0.5*r*(r-1.0), 0.5*r*(r+1.0), 1.0 - r*r};
-		double S[3] = {0.5*s*(s-1.0), 0.5*s*(s+1.0), 1.0 - s*s};
-		double DR[3] = {r-0.5, r+0.5, -2.0*r};
-		double DS[3] = {s-0.5, s+0.5, -2.0*s};
-		double DDR[3] = {1.0, 1.0, -2.0};
-		double DDS[3] = {1.0, 1.0, -2.0};
-
-		H[0] = R[0]*S[0];
-		H[1] = R[1]*S[0];
-		H[2] = R[1]*S[1];
-		H[3] = R[0]*S[1];
-		H[4] = R[2]*S[0];
-		H[5] = R[1]*S[2];
-		H[6] = R[2]*S[1];
-		H[7] = R[0]*S[2];
-		H[8] = R[2]*S[2];
-
-		Hr[0] = DR[0]*S[0]; Hs[0] = R[0]*DS[0];
-		Hr[1] = DR[1]*S[0];	Hs[1] = R[1]*DS[0];
-		Hr[2] = DR[1]*S[1];	Hs[2] = R[1]*DS[1];
-		Hr[3] = DR[0]*S[1];	Hs[3] = R[0]*DS[1];
-		Hr[4] = DR[2]*S[0];	Hs[4] = R[2]*DS[0];
-		Hr[5] = DR[1]*S[2];	Hs[5] = R[1]*DS[2];
-		Hr[6] = DR[2]*S[1];	Hs[6] = R[2]*DS[1];
-		Hr[7] = DR[0]*S[2];	Hs[7] = R[0]*DS[2];
-		Hr[8] = DR[2]*S[2];	Hs[8] = R[2]*DS[2];
-	
-		Hrr[0] = DDR[0]*S[0]; Hrs[0] = DR[0]*DS[0]; Hss[0] = R[0]*DDS[0];
-		Hrr[1] = DDR[1]*S[0]; Hrs[1] = DR[1]*DS[0]; Hss[1] = R[1]*DDS[0];
-		Hrr[2] = DDR[1]*S[1]; Hrs[2] = DR[1]*DS[1]; Hss[2] = R[1]*DDS[1];
-		Hrr[3] = DDR[0]*S[1]; Hrs[3] = DR[0]*DS[1]; Hss[3] = R[0]*DDS[1];
-		Hrr[4] = DDR[2]*S[0]; Hrs[4] = DR[2]*DS[0]; Hss[4] = R[2]*DDS[0];
-		Hrr[5] = DDR[1]*S[2]; Hrs[5] = DR[1]*DS[2]; Hss[5] = R[1]*DDS[2];
-		Hrr[6] = DDR[2]*S[1]; Hrs[6] = DR[2]*DS[1]; Hss[6] = R[2]*DDS[1];
-		Hrr[7] = DDR[0]*S[2]; Hrs[7] = DR[0]*DS[2]; Hss[7] = R[0]*DDS[2];
-		Hrr[8] = DDR[2]*S[2]; Hrs[8] = DR[2]*DS[2]; Hss[8] = R[2]*DDS[2];		
-
-		// set up the system of equations
-		Q[0] = Q[1] = 0;
-		double A[2][2] = {0};
-		for (i=0; i<9; ++i)
-		{
-			Q[0] -= (xy[i])*Hr[i];
-			Q[1] -= (xy[i])*Hs[i];
-
-			A[0][0] += (xy[i])*Hrr[i];
-			A[0][1] += (xy[i])*Hrs[i];
-			A[1][0] += (xy[i])*Hrs[i];
-			A[1][1] += (xy[i])*Hss[i];
-
-			for (j=0; j<9; ++j)
-			{
-				double yij = yy[i][j];
-				Q[0] -= -H[j]*Hr[i]*(yij);
-				Q[1] -= -H[j]*Hs[i]*(yij);
-
-				A[0][0] -= (yij)*(H[i]*Hrr[j] + Hr[i]*Hr[j]);
-				A[1][1] -= (yij)*(H[i]*Hss[j] + Hs[i]*Hs[j]);
-
-				A[0][1] -= (yij)*(Hrs[i]*H[j] + Hr[i]*Hs[j]);
-				A[1][0] -= (yij)*(Hrs[i]*H[j] + Hs[i]*Hr[j]);
-			}
-		}
-	
-		// determinant of A
-		D = A[0][0]*A[1][1] - A[0][1]*A[1][0];
-
-		// solve for u = A^(-1)*R
-		u[0] = (A[1][1]*Q[0] - A[0][1]*Q[1])/D;
-		u[1] = (A[0][0]*Q[1] - A[1][0]*Q[0])/D;
-
-		// calculate displacement norm
-		normu = u[0]*u[0]+u[1]*u[1];
-
-		// check for convergence
-		bconv = ((normu < 1e-10));
-		if (!bconv && (n <= NMAX))
-		{
-			// Don't update if converged otherwise the point q
-			// does not correspond with the current values for (r,s)
-			r += u[0];
-			s += u[1];
-			++n;
-		}
-		else break;
-	}
-	while (1);
-
-	// evaluate q
-	q = y[0]*H[0]+y[1]*H[1]+y[2]*H[2]+y[3]*H[3]+y[4]*H[4]+y[5]*H[5]+y[6]*H[6]+y[7]*H[7]+y[8]*H[8];
-
-	return bconv;
-}
-
-//-----------------------------------------------------------------------------
-// project onto a quadrilateral surface.
-bool project2quad8(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
-{
-	const int NE = 8;
-	double Q[2], u[2], D;
+	const int NE = FEElement::MAX_NODES;
 	double H[NE], Hr[NE], Hs[NE], Hrr[NE], Hss[NE], Hrs[NE];
 
 	int i, j;
 	int NMAX = 50, n=0;
 
+	// get number of nodes
+	int ne = el.Nodes();
+
 	// evaulate scalar products
 	double xy[NE];
 	double yy[NE][NE];
-	for (i=0; i<NE; ++i)
+	for (i=0; i<ne; ++i)
 	{
 		xy[i] = x*y[i];
 		yy[i][i] = y[i]*y[i];
-		for (j=i+1; j<NE; ++j)
+		for (j=i+1; j<ne; ++j)
 		{
 			yy[i][j] = yy[j][i] = y[i]*y[j];
 		}
@@ -444,69 +324,14 @@ bool project2quad8(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 	do
 	{
 		// evaluate shape functions and shape function derivatives.
-		H[4] = 0.5*(1 - r*r)*(1 - s);
-		H[5] = 0.5*(1 - s*s)*(1 + r);
-		H[6] = 0.5*(1 - r*r)*(1 + s);
-		H[7] = 0.5*(1 - s*s)*(1 - r);
-		H[0] = 0.25*(1 - r)*(1 - s) - 0.5*(H[4] + H[7]);
-		H[1] = 0.25*(1 + r)*(1 - s) - 0.5*(H[4] + H[5]);
-		H[2] = 0.25*(1 + r)*(1 + s) - 0.5*(H[5] + H[6]);
-		H[3] = 0.25*(1 - r)*(1 + s) - 0.5*(H[6] + H[7]);
-
-		Hr[4] = -r*(1 - s);
-		Hr[5] = 0.5*(1 - s*s);
-		Hr[6] = -r*(1 + s);
-		Hr[7] = -0.5*(1 - s*s);
-
-		Hr[0] = -0.25*(1 - s) - 0.5*(Hr[4] + Hr[7]);
-		Hr[1] =  0.25*(1 - s) - 0.5*(Hr[4] + Hr[5]);
-		Hr[2] =  0.25*(1 + s) - 0.5*(Hr[5] + Hr[6]);
-		Hr[3] = -0.25*(1 + s) - 0.5*(Hr[6] + Hr[7]);
-
-		Hs[4] = -0.5*(1 - r*r);
-		Hs[5] = -s*(1 + r);
-		Hs[6] = 0.5*(1 - r*r);
-		Hs[7] = -s*(1 - r);
-
-		Hs[0] = -0.25*(1 - r) - 0.5*(Hs[4] + Hs[7]);
-		Hs[1] = -0.25*(1 + r) - 0.5*(Hs[4] + Hs[5]);
-		Hs[2] =  0.25*(1 + r) - 0.5*(Hs[5] + Hs[6]);
-		Hs[3] =  0.25*(1 - r) - 0.5*(Hs[6] + Hs[7]);
-
-		Hrr[4] = -(1 - s);
-		Hrr[5] = 0.0;
-		Hrr[6] = -(1 + s);
-		Hrr[7] = 0.0;
-
-		Hrs[4] = r;
-		Hrs[5] = -s;
-		Hrs[6] = -r;
-		Hrs[7] = s;
-
-		Hss[4] = 0.0;
-		Hss[5] = -(1 + r);
-		Hss[6] = 0.0;
-		Hss[7] = -(1 - r);
-
-		Hrr[0] = - 0.5*(Hrr[4] + Hrr[7]);
-		Hrr[1] = - 0.5*(Hrr[4] + Hrr[5]);
-		Hrr[2] = - 0.5*(Hrr[5] + Hrr[6]);
-		Hrr[3] = - 0.5*(Hrr[6] + Hrr[7]);
-
-		Hrs[0] =  0.25 - 0.5*(Hrs[4] + Hrs[7]);
-		Hrs[1] = -0.25 - 0.5*(Hrs[4] + Hrs[5]);
-		Hrs[2] =  0.25 - 0.5*(Hrs[5] + Hrs[6]);
-		Hrs[3] = -0.25 - 0.5*(Hrs[6] + Hrs[7]);
-
-		Hss[0] = - 0.5*(Hss[4] + Hss[7]);
-		Hss[1] = - 0.5*(Hss[4] + Hss[5]);
-		Hss[2] = - 0.5*(Hss[5] + Hss[6]);
-		Hss[3] = - 0.5*(Hss[6] + Hss[7]);
+		el.shape_fnc(H, r, s);
+		el.shape_deriv(Hr, Hs, r, s);
+		el.shape_deriv2(Hrr, Hrs, Hrr, r, s);
 
 		// set up the system of equations
 		Q[0] = Q[1] = 0;
 		double A[2][2] = {0};
-		for (i=0; i<NE; ++i)
+		for (i=0; i<ne; ++i)
 		{
 			Q[0] -= (xy[i])*Hr[i];
 			Q[1] -= (xy[i])*Hs[i];
@@ -516,7 +341,7 @@ bool project2quad8(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 			A[1][0] += (xy[i])*Hrs[i];
 			A[1][1] += (xy[i])*Hss[i];
 
-			for (j=0; j<NE; ++j)
+			for (j=0; j<ne; ++j)
 			{
 				double yij = yy[i][j];
 				Q[0] -= -H[j]*Hr[i]*(yij);
@@ -555,271 +380,9 @@ bool project2quad8(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 	while (1);
 
 	// evaluate q
-	q = y[0]*H[0]+y[1]*H[1]+y[2]*H[2]+y[3]*H[3]+y[4]*H[4]+y[5]*H[5]+y[6]*H[6]+y[7]*H[7]+y[8]*H[8];
+	q = vec3d(0,0,0);
+	for (int i=0; i<ne; ++i) q += y[i]*H[i];
 
-	return bconv;
-}
-
-//-----------------------------------------------------------------------------
-// project onto a 6-node quadratic triangular element
-bool project2tri6(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
-{
-	double R[2], u[2], D;
-	double H[6], Hr[6], Hs[6], Hrr[6], Hss[6], Hrs[6];
-	
-	int i, j;
-	int NMAX = 50, n=0;
-	
-	// evaulate scalar products
-	double xy[6] = {x*y[0], x*y[1], x*y[2], x*y[3], x*y[4], x*y[5]};
-	double yy[6][6];
-	yy[0][0] = y[0]*y[0]; yy[1][1] = y[1]*y[1]; yy[2][2] = y[2]*y[2]; yy[3][3] = y[3]*y[3]; yy[4][4] = y[4]*y[4]; yy[5][5] = y[5]*y[5];
-	yy[0][1] = yy[1][0] = y[0]*y[1];
-	yy[0][2] = yy[2][0] = y[0]*y[2];
-	yy[0][3] = yy[3][0] = y[0]*y[3];
-	yy[0][4] = yy[4][0] = y[0]*y[4];
-	yy[0][5] = yy[5][0] = y[0]*y[5];
-	yy[1][2] = yy[2][1] = y[1]*y[2];
-	yy[1][3] = yy[3][1] = y[1]*y[3];
-	yy[1][4] = yy[4][1] = y[1]*y[4];
-	yy[1][5] = yy[5][1] = y[1]*y[5];
-	yy[2][3] = yy[3][2] = y[2]*y[3];
-	yy[2][4] = yy[4][2] = y[2]*y[4];
-	yy[2][5] = yy[5][2] = y[2]*y[5];
-	yy[3][4] = yy[4][3] = y[3]*y[4];
-	yy[3][5] = yy[5][3] = y[3]*y[5];
-	yy[4][5] = yy[5][4] = y[4]*y[5];
-	
-	// loop until converged
-	bool bconv = false;
-	double normu;
-	do
-	{
-		// evaluate shape functions and shape function derivatives.
-		double r1 = 1.0 - r - s;
-		double r2 = r;
-		double r3 = s;
-
-		H[0] = r1*(2.0*r1 - 1.0);
-		H[1] = r2*(2.0*r2 - 1.0);
-		H[2] = r3*(2.0*r3 - 1.0);
-		H[3] = 4.0*r1*r2;
-		H[4] = 4.0*r2*r3;
-		H[5] = 4.0*r3*r1;
-
-		Hr[0] = -3.0 + 4.0*r + 4.0*s;
-		Hr[1] =  4.0*r - 1.0;
-		Hr[2] =  0.0;
-		Hr[3] =  4.0 - 8.0*r - 4.0*s;
-		Hr[4] =  4.0*s;
-		Hr[5] = -4.0*s;
-
-		Hs[0] = -3.0 + 4.0*s + 4.0*r;
-		Hs[1] =  0.0;
-		Hs[2] =  4.0*s - 1.0;
-		Hs[3] = -4.0*r;
-		Hs[4] =  4.0*r;
-		Hs[5] =  4.0 - 8.0*s - 4.0*r;
-
-		Hrr[0] =  4.0; Hrs[0] =  4.0; Hss[0] =  4.0;
-		Hrr[1] =  4.0; Hrs[1] =  0.0; Hss[1] =  0.0;
-		Hrr[2] =  0.0; Hrs[2] =  0.0; Hss[2] =  4.0;
-		Hrr[3] = -8.0; Hrs[3] = -4.0; Hss[3] =  0.0;
-		Hrr[4] =  0.0; Hrs[4] =  4.0; Hss[4] =  0.0;
-		Hrr[5] =  0.0; Hrs[5] = -4.0; Hss[5] = -8.0;
-
-		// set up the system of equations
-		R[0] = R[1] = 0;
-		double A[2][2] = {0};
-		for (i=0; i<6; ++i)
-		{
-			R[0] -= (xy[i])*Hr[i];
-			R[1] -= (xy[i])*Hs[i];
-
-			A[0][0] += (xy[i])*Hrr[i];
-			A[0][1] += (xy[i])*Hrs[i];
-			A[1][0] += (xy[i])*Hrs[i];
-			A[1][1] += (xy[i])*Hss[i];
-
-			for (j=0; j<6; ++j)
-			{
-				double yij = yy[i][j];
-				R[0] -= -H[j]*Hr[i]*(yij);
-				R[1] -= -H[j]*Hs[i]*(yij);
-
-				A[0][0] -= (yij)*(H[i]*Hrr[j] + Hr[i]*Hr[j]);
-				A[1][1] -= (yij)*(H[i]*Hss[j] + Hs[i]*Hs[j]);
-
-				A[0][1] -= (yij)*(Hrs[i]*H[j] + Hr[i]*Hs[j]);
-				A[1][0] -= (yij)*(Hrs[i]*H[j] + Hs[i]*Hr[j]);
-			}
-		}
-		
-		// determinant of A
-		D = A[0][0]*A[1][1] - A[0][1]*A[1][0];
-		
-		// solve for u = A^(-1)*R
-		u[0] = (A[1][1]*R[0] - A[0][1]*R[1])/D;
-		u[1] = (A[0][0]*R[1] - A[1][0]*R[0])/D;
-		
-		// calculate displacement norm
-		normu = u[0]*u[0]+u[1]*u[1];
-		
-		// check for convergence
-		bconv = ((normu < 1e-10));
-		if (!bconv && (n <= NMAX))
-		{
-			// Don't update if converged otherwise the point q
-			// does not correspond with the current values for (r,s)
-			r += u[0];
-			s += u[1];
-			++n;
-		}
-		else break;
-	}
-	while (1);
-	
-	// evaluate q
-	q = y[0]*H[0] + y[1]*H[1] + y[2]*H[2] + y[3]*H[3]+ y[4]*H[4]+ y[5]*H[5];
-	
-	return bconv;
-}
-
-//-----------------------------------------------------------------------------
-// project onto a 7-node quadratic triangular element
-bool project2tri7(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
-{
-	double R[2], u[2], D;
-	double H[7], Hr[7], Hs[7], Hrr[7], Hss[7], Hrs[7];
-	
-	int i, j;
-	int NMAX = 50, n=0;
-	
-	// evaulate scalar products
-	double xy[7] = {x*y[0], x*y[1], x*y[2], x*y[3], x*y[4], x*y[5], x*y[6]};
-	double yy[7][7];
-	yy[0][0] = y[0]*y[0]; yy[1][1] = y[1]*y[1]; yy[2][2] = y[2]*y[2]; yy[3][3] = y[3]*y[3]; yy[4][4] = y[4]*y[4]; yy[5][5] = y[5]*y[5];  yy[6][6] = y[6]*y[6];
-	yy[0][1] = yy[1][0] = y[0]*y[1];
-	yy[0][2] = yy[2][0] = y[0]*y[2];
-	yy[0][3] = yy[3][0] = y[0]*y[3];
-	yy[0][4] = yy[4][0] = y[0]*y[4];
-	yy[0][5] = yy[5][0] = y[0]*y[5];
-	yy[0][6] = yy[6][0] = y[0]*y[6];
-	yy[1][2] = yy[2][1] = y[1]*y[2];
-	yy[1][3] = yy[3][1] = y[1]*y[3];
-	yy[1][4] = yy[4][1] = y[1]*y[4];
-	yy[1][5] = yy[5][1] = y[1]*y[5];
-	yy[1][6] = yy[6][1] = y[1]*y[6];
-	yy[2][3] = yy[3][2] = y[2]*y[3];
-	yy[2][4] = yy[4][2] = y[2]*y[4];
-	yy[2][5] = yy[5][2] = y[2]*y[5];
-	yy[2][6] = yy[6][2] = y[2]*y[6];
-	yy[3][4] = yy[4][3] = y[3]*y[4];
-	yy[3][5] = yy[5][3] = y[3]*y[5];
-	yy[3][6] = yy[6][3] = y[3]*y[6];
-	yy[4][5] = yy[5][4] = y[4]*y[5];
-	yy[4][6] = yy[6][4] = y[4]*y[6];
-	yy[5][6] = yy[6][5] = y[5]*y[6];
-	
-	// loop until converged
-	bool bconv = false;
-	double normu;
-	do
-	{
-		// evaluate shape functions and shape function derivatives.
-		double r1 = 1.0 - r - s;
-		double r2 = r;
-		double r3 = s;
-
-		H[6] = 27.0*r1*r2*r3;
-		H[0] = r1*(2.0*r1 - 1.0) + H[6]/9.0;
-		H[1] = r2*(2.0*r2 - 1.0) + H[6]/9.0;
-		H[2] = r3*(2.0*r3 - 1.0) + H[6]/9.0;
-		H[3] = 4.0*r1*r2 - 4.0*H[6]/9.0;
-		H[4] = 4.0*r2*r3 - 4.0*H[6]/9.0;
-		H[5] = 4.0*r3*r1 - 4.0*H[6]/9.0;
-
-		Hr[6] = 27.0*s*(1.0 - 2.0*r - s);
-		Hr[0] = -3.0 + 4.0*r + 4.0*s     + Hr[6]/9.0;
-		Hr[1] =  4.0*r - 1.0             + Hr[6]/9.0;
-		Hr[2] =  0.0                     + Hr[6]/9.0;
-		Hr[3] =  4.0 - 8.0*r - 4.0*s - 4.0*Hr[6]/9.0;
-		Hr[4] =  4.0*s               - 4.0*Hr[6]/9.0;
-		Hr[5] = -4.0*s               - 4.0*Hr[6]/9.0;
-
-		Hs[6] = 27.0*r*(1.0 - r - 2.0*s);
-		Hs[0] = -3.0 + 4.0*s + 4.0*r     + Hs[6]/9.0;
-		Hs[1] =  0.0                     + Hs[6]/9.0;
-		Hs[2] =  4.0*s - 1.0             + Hs[6]/9.0;
-		Hs[3] = -4.0*r               - 4.0*Hs[6]/9.0;
-		Hs[4] =  4.0*r               - 4.0*Hs[6]/9.0;
-		Hs[5] =  4.0 - 8.0*s - 4.0*r - 4.0*Hs[6]/9.0;
-
-		Hrr[6] = -54.0*s;
-		Hss[6] = -54.0*r;
-		Hrs[6] = 27.0*(1.0 - 2.0*r - 2.0*s);
-
-		Hrr[0] =  4.0 +     Hrr[6]/9.0; Hrs[0] =  4.0 +     Hrs[6]/9.0; Hss[0] =  4.0 +     Hss[6]/9.0;
-		Hrr[1] =  4.0 +     Hrr[6]/9.0; Hrs[1] =  0.0 +     Hrs[6]/9.0; Hss[1] =  0.0 +     Hss[6]/9.0;
-		Hrr[2] =  0.0 +     Hrr[6]/9.0; Hrs[2] =  0.0 +     Hrs[6]/9.0; Hss[2] =  4.0 +     Hss[6]/9.0;
-		Hrr[3] = -8.0 - 4.0*Hrr[6]/9.0; Hrs[3] = -4.0 - 4.0*Hrs[6]/9.0; Hss[3] =  0.0 - 4.0*Hss[6]/9.0;
-		Hrr[4] =  0.0 - 4.0*Hrr[6]/9.0; Hrs[4] =  4.0 - 4.0*Hrs[6]/9.0; Hss[4] =  0.0 - 4.0*Hss[6]/9.0;
-		Hrr[5] =  0.0 - 4.0*Hrr[6]/9.0; Hrs[5] = -4.0 - 4.0*Hrs[6]/9.0; Hss[5] = -8.0 - 4.0*Hss[6]/9.0;
-
-		// set up the system of equations
-		R[0] = R[1] = 0;
-		double A[2][2] = {0};
-		for (i=0; i<7; ++i)
-		{
-			R[0] -= (xy[i])*Hr[i];
-			R[1] -= (xy[i])*Hs[i];
-
-			A[0][0] += (xy[i])*Hrr[i];
-			A[0][1] += (xy[i])*Hrs[i];
-			A[1][0] += (xy[i])*Hrs[i];
-			A[1][1] += (xy[i])*Hss[i];
-
-			for (j=0; j<7; ++j)
-			{
-				double yij = yy[i][j];
-				R[0] -= -H[j]*Hr[i]*(yij);
-				R[1] -= -H[j]*Hs[i]*(yij);
-
-				A[0][0] -= (yij)*(H[i]*Hrr[j] + Hr[i]*Hr[j]);
-				A[1][1] -= (yij)*(H[i]*Hss[j] + Hs[i]*Hs[j]);
-
-				A[0][1] -= (yij)*(Hrs[i]*H[j] + Hr[i]*Hs[j]);
-				A[1][0] -= (yij)*(Hrs[i]*H[j] + Hs[i]*Hr[j]);
-			}
-		}
-		
-		// determinant of A
-		D = A[0][0]*A[1][1] - A[0][1]*A[1][0];
-		
-		// solve for u = A^(-1)*R
-		u[0] = (A[1][1]*R[0] - A[0][1]*R[1])/D;
-		u[1] = (A[0][0]*R[1] - A[1][0]*R[0])/D;
-		
-		// calculate displacement norm
-		normu = u[0]*u[0]+u[1]*u[1];
-		
-		// check for convergence
-		bconv = ((normu < 1e-10));
-		if (!bconv && (n <= NMAX))
-		{
-			// Don't update if converged otherwise the point q
-			// does not correspond with the current values for (r,s)
-			r += u[0];
-			s += u[1];
-			++n;
-		}
-		else break;
-	}
-	while (1);
-	
-	// evaluate q
-	q = y[0]*H[0] + y[1]*H[1] + y[2]*H[2] + y[3]*H[3]+ y[4]*H[4]+ y[5]*H[5]+ y[6]*H[6];
-	
 	return bconv;
 }
 
@@ -880,27 +443,12 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 		}
 		break;
 	case 6: 
-		if (project2tri6(y, x, r, s, q)==false)
-		{
-//			assert(false);
-		}
-		break;
 	case 7: 
-		if (project2tri7(y, x, r, s, q)==false)
-		{
-//			assert(false);
-		}
-		break;
 	case 8:
-		if (project2quad8(y,x,r,s,q) == false)
+	case 9:
+		if (project2surf(el, y, x, r, s, q)==false)
 		{
 //			assert(false);
-		}
-		break;
-	case 9:
-		if (project2quad9(y, x, r, s, q) == false)
-		{
-
 		}
 		break;
 	default:
