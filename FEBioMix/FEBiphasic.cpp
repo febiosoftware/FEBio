@@ -108,9 +108,7 @@ void FEBiphasic::Init()
 //! A biphasic material has three properties
 int FEBiphasic::Properties()
 {
-    int np = 2;
-    if (m_pSupp) ++np;
-    if (m_pAmom) ++np;
+    int np = 4;
 	return np;
 }
 

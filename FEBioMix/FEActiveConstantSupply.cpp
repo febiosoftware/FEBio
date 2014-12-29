@@ -25,6 +25,7 @@ FEActiveConstantSupply::FEActiveConstantSupply(FEModel* pfem) : FEActiveMomentum
 //! Initialization.
 void FEActiveConstantSupply::Init()
 {
+    FEMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------
