@@ -108,24 +108,25 @@ void FEPressureLoad::PressureStiffness(FESurfaceElement& el, matrix& ke, vector<
 			dxs += rt[i]*Gs[i];
 		}
 		
+        mat3d rw; rw.skew(dxr);
+        mat3d sw; sw.skew(dxs);
+        
 		// calculate stiffness component
 		for (i=0; i<neln; ++i)
 			for (j=0; j<neln; ++j)
 			{
-				kab = (dxr*(N[j]*Gs[i]-N[i]*Gs[j])
-					   -dxs*(N[j]*Gr[i]-N[i]*Gr[j]))*w[n]*0.5*tr;
-
-				ke[3*i  ][3*j  ] +=      0;
-				ke[3*i  ][3*j+1] += -kab.z;
-				ke[3*i  ][3*j+2] +=  kab.y;
-
-				ke[3*i+1][3*j  ] +=  kab.z;
-				ke[3*i+1][3*j+1] +=      0;
-				ke[3*i+1][3*j+2] += -kab.x;
-
-				ke[3*i+2][3*j  ] += -kab.y;
-				ke[3*i+2][3*j+1] +=  kab.x;
-				ke[3*i+2][3*j+2] +=      0;
+                mat3d Kab = (rw*Gs[j] - sw*Gr[j])*(tr*N[i]*w[n]);
+                ke[3*i  ][3*j  ] -=  Kab(0,0);
+                ke[3*i  ][3*j+1] -=  Kab(0,1);
+                ke[3*i  ][3*j+2] -=  Kab(0,2);
+                
+                ke[3*i+1][3*j  ] -=  Kab(1,0);
+                ke[3*i+1][3*j+1] -=  Kab(1,1);
+                ke[3*i+1][3*j+2] -=  Kab(1,2);
+                
+                ke[3*i+2][3*j  ] -=  Kab(2,0);
+                ke[3*i+2][3*j+1] -=  Kab(2,1);
+                ke[3*i+2][3*j+2] -=  Kab(2,2);
 			}
 	}
 }
