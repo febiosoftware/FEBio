@@ -375,7 +375,18 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	else if (strcmp(sztype, "quad4" ) == 0) etype = ET_QUAD4;
 	else if (strcmp(sztype, "tri3"  ) == 0) etype = ET_TRI3;
 	else if (strcmp(sztype, "truss2") == 0) etype = ET_TRUSS2;
-	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	else 
+	{
+		// new way for defining element type and integration rule at the same time
+		// this is useful for multi-step analyses where the geometry is read in before the control section.
+		if      (strcmp(sztype, "TET10G4"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G4; }
+		else if (strcmp(sztype, "TET10G8"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G8; }
+		else if (strcmp(sztype, "TET10GL11") == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; }
+		else if (strcmp(sztype, "TET15G11" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; }
+		else if (strcmp(sztype, "TET15G11" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; }
+		else if (strcmp(sztype, "TET15G15" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; }
+		else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	}
 
 	// get the domain's material class
 	FEMaterial* pmat = fem.GetMaterial(nmat);
