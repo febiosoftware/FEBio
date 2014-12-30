@@ -46,7 +46,7 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 
 		// the next tag has to be the archive
 		++tag;
-		if (tag != "DumpFile") return errf("FATAL ERROR: The first element must be the archive name\n");
+		if (tag != "Archive") return errf("FATAL ERROR: The first element must be the archive name\n");
 		char szar[256];
 		tag.value(szar);
 
