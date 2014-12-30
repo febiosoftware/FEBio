@@ -967,8 +967,8 @@ FETet15G15::FETet15G15() : FETet15_(NINT, FE_TET15G15)
 	init();
 
 	// setup the shape function matrix
-	N.resize(11, 4);
-	for (int i=0; i<11; ++i)
+	N.resize(NINT, 4);
+	for (int i=0; i<NINT; ++i)
 	{
 		N[i][0] = 1.0 - gr[i] - gs[i] - gt[i];
 		N[i][1] = gr[i];
