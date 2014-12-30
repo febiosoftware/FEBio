@@ -431,7 +431,9 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 		case FE_TET10G4  :
 		case FE_TET10G8  : 
 		case FE_TET10GL11: ne = 10; dtype = PLT_ELEM_TET10; break;
-		case FE_TET15G8  : ne = 15; dtype = PLT_ELEM_TET15; break;
+		case FE_TET15G8  : 
+		case FE_TET15G11 : 
+		case FE_TET15G15 : ne = 15; dtype = PLT_ELEM_TET15; break;
 		case FE_HEX20G27 : ne = 20; dtype = PLT_ELEM_HEX20; break;
 		case FE_HEX27G27 : ne = 27; dtype = PLT_ELEM_HEX27; break;
 		default:

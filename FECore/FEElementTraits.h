@@ -403,6 +403,40 @@ private:
 	matrix Ai;
 };
 
+//=============================================================================
+// 15-node tetrahedral element using a 11-point Gaussian integration rule
+class FETet15G11 : public FETet15_
+{
+public:
+	enum { NINT = 11 };
+
+public:
+	FETet15G11();
+
+	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix N;
+	matrix Ai;
+};
+
+//=============================================================================
+// 15-node tetrahedral element using a 15-point Gaussian integration rule
+class FETet15G15 : public FETet15_
+{
+public:
+	enum { NINT = 15 };
+
+public:
+	FETet15G15();
+
+	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix N;
+	matrix Ai;
+};
+
 
 //=============================================================================
 //

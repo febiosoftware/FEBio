@@ -324,7 +324,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir);$(LMDir)\lib;$(MKLDir)\em64t\lib;$(LibraryPath)</LibraryPath>
-    <TargetName>$(ProjectName)x64</TargetName>
+    <TargetName>$(ProjectName)x64mt</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">
     <LinkIncremental>false</LinkIncremental>
