@@ -51,6 +51,9 @@ protected:
 	//! calculate stiffness for an element
 	void PressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn);
 
+	void SymmetricPressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn);
+	void UnsymmetricPressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn);
+
 	//! Calculates external pressure forces
 	bool PressureForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
 
@@ -60,6 +63,7 @@ protected:
 protected:
 	bool			m_blinear;	//!< pressure load type (linear or nonlinear)
 	double			m_pressure;	//!< pressure value
+	bool			m_bsymm;	//!< use symmetric formulation
 	vector<LOAD>	m_PC;		//!< pressure load cards
 
 	DECLARE_PARAMETER_LIST();

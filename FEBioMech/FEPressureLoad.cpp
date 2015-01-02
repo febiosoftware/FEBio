@@ -14,6 +14,7 @@ FEPressureLoad::LOAD::LOAD()
 BEGIN_PARAMETER_LIST(FEPressureLoad, FESurfaceLoad)
 	ADD_PARAMETER(m_blinear , FE_PARAM_BOOL  , "linear"  );
 	ADD_PARAMETER(m_pressure, FE_PARAM_DOUBLE, "pressure");
+	ADD_PARAMETER(m_bsymm   , FE_PARAM_BOOL  , "symmetric_stiffness");
 END_PARAMETER_LIST()
 
 //-----------------------------------------------------------------------------
@@ -22,6 +23,7 @@ FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 { 
 	m_blinear = false;
 	m_pressure = 1.0;
+	m_bsymm = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -66,8 +68,84 @@ bool FEPressureLoad::SetFacetAttribute(int nface, const char* szatt, const char*
 
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to hydrostatic pressure
-
 void FEPressureLoad::PressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn)
+{
+	// choose the symmetric of unsymmetric formulation
+	if (m_bsymm) 
+		SymmetricPressureStiffness(el, ke, tn);
+	else
+		UnsymmetricPressureStiffness(el, ke, tn);
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the stiffness contribution due to hydrostatic pressure
+void FEPressureLoad::SymmetricPressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn)
+{
+	int i, j, n;
+
+	int nint = el.GaussPoints();
+	int neln = el.Nodes();
+
+	// traction at integration point
+	double tr;
+	
+	vec3d dxr, dxs;
+
+	// gauss weights
+	double* w = el.GaussWeights();
+
+	// nodal coordinates
+	vec3d rt[FEElement::MAX_NODES];
+	for (j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
+
+	vec3d kab;
+
+	ke.zero();
+
+	double* N, *Gr, *Gs;
+
+	// repeat over integration points
+	for (n=0; n<nint; ++n)
+	{
+		N = el.H(n);
+		Gr = el.Gr(n);
+		Gs = el.Gs(n);
+
+		tr = 0;
+		dxr = dxs = vec3d(0,0,0);
+		for (i=0; i<neln; ++i) 
+		{
+			tr += N[i]*tn[i];
+			dxr += rt[i]*Gr[i];
+			dxs += rt[i]*Gs[i];
+		}
+		
+		// calculate stiffness component
+		for (i=0; i<neln; ++i)
+			for (j=0; j<neln; ++j)
+			{
+				kab = (dxr*(N[j]*Gs[i]-N[i]*Gs[j])
+					   -dxs*(N[j]*Gr[i]-N[i]*Gr[j]))*w[n]*0.5*tr;
+
+				ke[3*i  ][3*j  ] +=      0;
+				ke[3*i  ][3*j+1] += -kab.z;
+				ke[3*i  ][3*j+2] +=  kab.y;
+
+				ke[3*i+1][3*j  ] +=  kab.z;
+				ke[3*i+1][3*j+1] +=      0;
+				ke[3*i+1][3*j+2] += -kab.x;
+
+				ke[3*i+2][3*j  ] += -kab.y;
+				ke[3*i+2][3*j+1] +=  kab.x;
+				ke[3*i+2][3*j+2] +=      0;
+			}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the stiffness contribution due to hydrostatic pressure
+
+void FEPressureLoad::UnsymmetricPressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn)
 {
 	int i, j, n;
 

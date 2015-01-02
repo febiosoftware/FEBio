@@ -379,6 +379,9 @@ void echo_input(FEBioModel& fem)
 		assert(false);
 		felog.printf("Unknown solver\n");
 	}
+	felog.printf("\tMatrix format ............................. : ");
+	if (step.GetFESolver()->m_bsymm) felog.printf("symmetric\n");
+	else felog.printf("unsymmetric\n");
 	felog.printf("\n\n");
 
 	// reset felog mode
