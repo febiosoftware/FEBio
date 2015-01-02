@@ -23,8 +23,8 @@
 // also offers several biologically relevant constitutive models.
 //
 // This software is developed at the Musculoskeletal Research Laboratories
-// at the University of Utah. All rights reserved.
-// Copyright (c) 2006 - 2014
+// at the University of Utah. FEBio is a registered trademark. All rights reserved. 
+// Copyright (c) 2006 - 2015
 //
 // The subversion (svn) revision number of this code can be found in the file
 // FEBio/svnrev.h
