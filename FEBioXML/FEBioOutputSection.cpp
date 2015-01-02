@@ -59,29 +59,14 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 				else if (strcmp(sz, "off") == 0) prec->SetComments(false); 
 			}
 
-			if (tag.isleaf()) prec->DataRecord::SetItemList(tag.szvalue());
-			else
+			sz = tag.AttributeValue("set", true);
+			if (sz)
 			{
-				++tag;
-				if (tag == "node_set")
-				{
-					FENodeSet* pns = 0;
-					const char* szid = tag.AttributeValue("id", true);
-					if (szid == 0)
-					{
-						const char* szname = tag.AttributeValue("name");
-						pns = mesh.FindNodeSet(szname);
-					}
-					else pns = mesh.FindNodeSet(atoi(szid));
-
-					if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "id", szid);
-
-					prec->SetItemList(pns);
-				}
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
-				assert(tag.isend());
+				FENodeSet* pns = mesh.FindNodeSet(sz);
+				if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", sz);
+				prec->SetItemList(pns);
 			}
+			else prec->DataRecord::SetItemList(tag.szvalue());
 
 			fem.AddDataRecord(prec);
 		}
@@ -109,7 +94,14 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 				else if (strcmp(sz, "off") == 0) prec->SetComments(false); 
 			}
 
-			prec->SetItemList(tag.szvalue());
+			sz = tag.AttributeValue("elset", true);
+			if (sz)
+			{
+				FEElementSet* pes = mesh.FindElementSet(sz);
+				if (pes == 0) throw XMLReader::InvalidAttributeValue(tag, "elset", sz);
+				prec->SetItemList(pes);
+			}
+			else prec->DataRecord::SetItemList(tag.szvalue());
 
 			fem.AddDataRecord(prec);
 		}

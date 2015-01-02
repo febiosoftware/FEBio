@@ -190,55 +190,27 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Class that defines a finite element part, that is, a list of elements.
-
-//! Note that this class is only a base class defining a common interface
-//! to all derived part classes. Part classes need to be specialized depending
-//! on the element type (solid, shell, truss, ...)
-class FEPart
+// This class defines a set of elements
+class FEElementSet
 {
 public:
 	//! constructor
-	FEPart(FEMesh* pm) : m_pmesh(pm) {}
+	FEElementSet(FEMesh* pm);
 
-	//! Get the mesh this part belongs to
-	FEMesh* GetMesh() { return m_pmesh; }
+	void create(int n);
 
-	//! Create a part
-	virtual void Create(int n) = 0;
+	int size() { return m_Elem.size(); }
 
-	//! Number of elements in domain
-	virtual int Elements() = 0;
+	int& operator [] (int i) { return m_Elem[i]; }
 
-	//! return reference to an element
-	virtual FEElement& ElementRef(int n) = 0;
-
-	//! Find an element based on its ID
-	FEElement* FindElementFromID(int nid);
+	void SetName(const char* sz);
+	const char* GetName() { return m_szname; }
 
 protected:
-	FEMesh*		m_pmesh;
+	char		m_szname[256];	//!< name of element set
+	FEMesh*		m_pmesh;		//!< pointer to parent mesh
+	vector<int>	m_Elem;			//!< list of elements
 };
-
-//-----------------------------------------------------------------------------
-template <class T> class FEPart_T : public FEPart
-{
-public:
-	FEPart_T(FEMesh* pm) : FEPart(pm) {}
-
-	void Create(int n) { m_Elem.resize(n); }
-	int Elements() { return (int) m_Elem.size(); }
-	FEElement& ElementRef(int n) { return m_Elem[n]; }
-
-protected:
-	vector<T>	m_Elem;
-};
-
-//-----------------------------------------------------------------------------
-typedef FEPart_T<FESolidElement>		FESolidPart;
-typedef FEPart_T<FEShellElement>		FEShellPart;
-typedef FEPart_T<FETrussElement>		FETrussPart;
-typedef FEPart_T<FEDiscreteElement>		FEDiscretePart;
 
 //-----------------------------------------------------------------------------
 //! Defines a finite element mesh
@@ -334,10 +306,13 @@ public:
 	//! Find a nodeset by name
 	FENodeSet* FindNodeSet(const char* szname);
 
-	// --- PARTS ---
-	int Parts() { return (int) m_Part.size(); }
-	FEPart& Part(int n) { return *m_Part[n]; }
-	void AddPart(FEPart* pg) { m_Part.push_back(pg); }
+	// --- ELEMENT SETS ---
+	int ElementSets() { return (int) m_ElSet.size(); }
+	FEElementSet& ElementSet(int n) { return *m_ElSet[n]; }
+	void AddElementSet(FEElementSet* pg) { m_ElSet.push_back(pg); }
+
+	//! Find a element set by name
+	FEElementSet* FindElementSet(const char* szname);
 
 	// --- DOMAINS ---
 	int Domains() { return (int) m_Domain.size(); }
@@ -376,9 +351,9 @@ protected:
 	vector<FEDomain*>	m_Domain;	//!< list of domains
 	vector<FESurface*>	m_Surf;		//!< surfaces
 
-	vector<FEPart*>		m_Part;		//!< parts
-	vector<FENodeSet*>	m_NodeSet;	//!< node sets
-	vector<FEFacetSet*>	m_FaceSet;	//!< facet sets
+	vector<FENodeSet*>		m_NodeSet;	//!< node sets
+	vector<FEFacetSet*>		m_FaceSet;	//!< facet sets
+	vector<FEElementSet*>	m_ElSet;	//!< element sets
 
 	FE_BOUNDING_BOX		m_box;	//!< bounding box
 

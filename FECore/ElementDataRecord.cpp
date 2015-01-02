@@ -75,3 +75,13 @@ void ElementDataRecord::SelectAllItems()
 	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = i+1;
 }
+
+//-----------------------------------------------------------------------------
+// This sets the item list based on a element set.
+void ElementDataRecord::SetItemList(FEElementSet* pg)
+{
+	int n = pg->size();
+	assert(n);
+	m_item.resize(n);
+	for (int i=0; i<n; ++i) m_item[i] = (*pg)[i];
+}

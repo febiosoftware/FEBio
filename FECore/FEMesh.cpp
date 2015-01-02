@@ -89,18 +89,24 @@ void FEFacetSet::SetName(const char* sz)
 }
 
 //=============================================================================
-// FEPart
+// FEElementSet
 //-----------------------------------------------------------------------------
-FEElement* FEPart::FindElementFromID(int nid)
+FEElementSet::FEElementSet(FEMesh* pm) : m_pmesh(pm)
 {
-	int NE = Elements();
-	for (int i=0; i<NE; ++i)
-	{
-		FEElement& el = ElementRef(i);
-		if (el.m_nID == nid) return &el;
-	}
+	m_szname[0] = 0;
+}
 
-	return 0;
+//-----------------------------------------------------------------------------
+void FEElementSet::create(int n)
+{
+	assert(n);
+	m_Elem.resize(n);
+}
+
+//-----------------------------------------------------------------------------
+void FEElementSet::SetName(const char* sz)
+{
+	strcpy(m_szname, sz); 
 }
 
 //=============================================================================
@@ -115,10 +121,10 @@ FEMesh::~FEMesh()
 {
 	for (size_t i=0; i<m_NodeSet.size(); ++i) delete m_NodeSet[i];
 	for (size_t i=0; i<m_FaceSet.size(); ++i) delete m_FaceSet[i];
-	for (size_t i=0; i<m_Part.size()   ; ++i) delete m_Part[i];
+	for (size_t i=0; i<m_ElSet.size()  ; ++i) delete m_ElSet[i];
 	m_NodeSet.clear();
 	m_FaceSet.clear();
-	m_Part.clear();
+	m_ElSet.clear();
 
 	ClearDomains();
 }
@@ -703,6 +709,15 @@ FENodeSet* FEMesh::FindNodeSet(int nid)
 FENodeSet* FEMesh::FindNodeSet(const char* szname)
 {
 	for (size_t i=0; i<m_NodeSet.size(); ++i) if (strcmp(m_NodeSet[i]->GetName(), szname) == 0) return m_NodeSet[i];
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Find a element set by name
+
+FEElementSet* FEMesh::FindElementSet(const char* szname)
+{
+	for (size_t i=0; i<m_ElSet.size(); ++i) if (strcmp(m_ElSet[i]->GetName(), szname) == 0) return m_ElSet[i];
 	return 0;
 }
 

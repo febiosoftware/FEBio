@@ -112,6 +112,17 @@ void echo_input(FEBioModel& fem)
 	felog.printf("\tLog file   : %s\n", fem.GetLogfileName());
 	felog.printf("\n\n");
 
+	// print mesh info
+	felog.printf(" MESH INFO\n");
+	felog.printf("===========================================================================\n");
+	felog.printf("\tNumber of materials ............................ : %d\n", fem.Materials());
+	felog.printf("\tNumber of domains .............................. : %d\n", mesh.Domains());
+	felog.printf("\tNumber of nodes ................................ : %d\n", mesh.Nodes());
+	felog.printf("\tNumber of solid elements ....................... : %d\n", mesh.SolidElements());
+	felog.printf("\tNumber of shell elements ....................... : %d\n", mesh.ShellElements());
+	felog.printf("\tNumber of truss elements ....................... : %d\n", mesh.TrussElements());
+	felog.printf("\n\n");
+
 	// print control info
 	felog.printf(" CONTROL DATA\n");
 	felog.printf("===========================================================================\n");
@@ -132,11 +143,6 @@ void echo_input(FEBioModel& fem)
 	felog.printf("\tAnalysis type .................................. : %s\n", szan);
 
 	felog.printf("\tPlane strain mode .............................. : %s\n", (fem.m_nplane_strain != -1? "yes" : "no"));
-	felog.printf("\tNumber of materials ............................ : %d\n", fem.Materials());
-	felog.printf("\tNumber of nodes ................................ : %d\n", mesh.Nodes() );
-	felog.printf("\tNumber of solid elements ....................... : %d\n", mesh.SolidElements());
-	felog.printf("\tNumber of shell elements ....................... : %d\n", mesh.ShellElements());
-	felog.printf("\tNumber of truss elements ....................... : %d\n", mesh.TrussElements());
 	if (step.m_ntime > 0)
 		felog.printf("\tNumber of timesteps ............................ : %d\n", step.m_ntime);
 	else

@@ -28,6 +28,7 @@ public:
 	void Parse(const char* sz);
 	void SelectAllItems();
 	int Size() { return (int) m_Data.size(); }
+	void SetItemList(FEElementSet* pg);
 
 protected:
 	void BuildELT();

@@ -36,8 +36,8 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 			else if (tag == "Elements"   ) ParseElementSection20  (tag);
 			else if (tag == "ElementData") ParseElementDataSection(tag);
 			else if (tag == "NodeSet"    ) ParseNodeSetSection    (tag);
-			else if (tag == "Part"       ) ParsePartSection       (tag);
 			else if (tag == "Surface"    ) ParseSurfaceSection    (tag);
+			else if (tag == "ElementSet" ) ParseElementSetSection (tag);
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
 		}
@@ -411,6 +411,16 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	mesh.AddDomain(pdom);
 	int nd = NDOM;
 
+	// for named domains, we'll also create an element set
+	FEElementSet* pg = 0;
+	if (szname)
+	{
+		pg = new FEElementSet(&mesh);
+		pg->SetName(szname);
+		pg->create(elems);
+		mesh.AddElementSet(pg);
+	}
+
 	// read element data
 	++tag;
 	int nid = m_pim->m_maxid + 1;
@@ -420,6 +430,9 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 
 		// keep track of the largest element ID
 		if (nid > m_pim->m_maxid) m_pim->m_maxid = nid;
+
+		// add to the element set (if we have one)
+		if (pg) (*pg)[i] = nid;
 
 		// read the element data
 		switch (etype)
@@ -663,107 +676,6 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 		// go to next tag
 		++tag;
 	}
-}
-
-//-----------------------------------------------------------------------------
-void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = *m_pim->GetFEMesh();
-
-	// get the element type
-	const char* szel = tag.AttributeValue("elem");
-
-	// determine element type
-	FE_Element_Shape etype;
-	if      (strcmp(szel, "hex8"  ) == 0) etype = ET_HEX8;
-	else if (strcmp(szel, "hex20" ) == 0) etype = ET_HEX20;
-	else if (strcmp(szel, "hex27" ) == 0) etype = ET_HEX27;
-	else if (strcmp(szel, "penta6") == 0) etype = ET_PENTA6;
-	else if (strcmp(szel, "tet4"  ) == 0) etype = ET_TET4;
-	else if (strcmp(szel, "quad4" ) == 0) etype = ET_QUAD4;
-	else if (strcmp(szel, "tri3"  ) == 0) etype = ET_TRI3;
-	else if (strcmp(szel, "truss2") == 0) etype = ET_TRUSS2;
-	else throw XMLReader::InvalidAttributeValue(tag, "elem", szel);
-
-	// get the material ID
-	const char* szmat = tag.AttributeValue("mat");
-	int nmat = atoi(szmat)-1;
-	if ((nmat < 0) || (nmat >= fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szmat);
-
-	// Count the elements
-	int nelems = tag.children();
-
-	// get the material class
-	FEMaterial* pmat = fem.GetMaterial(nmat);
-	assert(pmat);
-
-	// then, find the domain type depending on the 
-	// element and material types
-	int ndom = DomainType(etype, pmat);
-	if (ndom == 0) throw FEFEBioImport::InvalidDomainType();
-
-	// create the new domain
-	FEDomain* pdom = CreateDomain(ndom, &mesh, pmat);
-	if (pdom == 0) throw FEFEBioImport::FailedCreatingDomain();
-	mesh.AddDomain(pdom);
-	FEDomain& dom = *pdom;
-	dom.create(nelems);
-
-	// read all elements 
-	++tag;
-	for (int ne=0; ne<nelems; ++ne)
-	{
-		int nid = atoi(tag.AttributeValue("id"));
-
-		switch (etype)
-		{
-		case ET_HEX8:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nhex8, nid, nmat);
-			}
-			break;
-		case ET_PENTA6:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_PENTA6G6, nid, nmat);
-			}
-			break;
-		case ET_TET4:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), m_pim->m_ntet4, nid, nmat);
-			}
-			break;
-		case ET_QUAD4:
-			{
-				FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
-				ReadShellElement(tag, sd.Element(ne), FE_SHELL_QUAD, nid, nmat);
-			}
-			break;
-		case ET_TRI3:
-			{
-				FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
-				ReadShellElement(tag, sd.Element(ne), FE_SHELL_TRI, nid, nmat);
-			}
-			break;
-		case ET_TRUSS2:
-			{
-				FETrussDomain& td = static_cast<FETrussDomain&>(dom);
-				ReadTrussElement(tag, td.Element(ne), FE_TRUSS, nid, nmat);
-			}
-			break;
-		default:
-			throw FEFEBioImport::InvalidElementType();
-		}
-
-		// go to the next tag
-		++tag;
-	}
-
-	// assign material point data
-	dom.InitMaterialPointData();
 }
 
 //-----------------------------------------------------------------------------
@@ -1070,4 +982,47 @@ void FEBioGeometrySection::ParseSurfaceSection(XMLTag& tag)
 
 		++tag;
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Reads the Geometry::Groups section of the FEBio input file
+
+void FEBioGeometrySection::ParseElementSetSection(XMLTag& tag)
+{
+	FEMesh& mesh = *m_pim->GetFEMesh();
+
+	// get the name attribute
+	const char* szname = tag.AttributeValue("name");
+
+	// create a new element set
+	FEElementSet* pg = new FEElementSet(&mesh);
+	pg->SetName(szname);
+
+	vector<int> l;
+	++tag;
+	do
+	{
+		if (tag == "elem")
+		{
+			int nid = -1;
+			tag.AttributeValue("id", nid);
+			l.push_back(nid);
+		}
+		else { delete pg; throw XMLReader::InvalidTag(tag); }
+		++tag;
+	}
+	while (!tag.isend());
+
+	// only add non-empty element sets
+	if (l.empty() == false)
+	{
+		// assign indices to element set
+		int N = l.size();
+		pg->create(N);
+		for (int i=0; i<N; ++i) (*pg)[i] = l[i];
+
+		// add the element set to the mesh
+		mesh.AddElementSet(pg);
+	}
+	else delete pg;
 }

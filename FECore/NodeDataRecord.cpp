@@ -29,6 +29,7 @@ double NodeDataRecord::Evaluate(int item, int ndata)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	int nnode = item - 1;
+	assert((nnode>=0)&&(nnode<mesh.Nodes()));
 	if ((nnode < 0) || (nnode >= mesh.Nodes())) return 0;
 	return m_Data[ndata]->value(nnode);
 }
@@ -42,10 +43,13 @@ void NodeDataRecord::SelectAllItems()
 }
 
 //-----------------------------------------------------------------------------
+// This sets the item list based on a node set.
+// Note that node sets store the nodes in a zero-based list. However, we need
+// a one-base list here.
 void NodeDataRecord::SetItemList(FENodeSet* pns)
 {
 	int n = pns->size();
 	assert(n);
 	m_item.resize(n);
-	for (int i=0; i<n; ++i) m_item[i] = (*pns)[i];
+	for (int i=0; i<n; ++i) m_item[i] = (*pns)[i] + 1;
 }
