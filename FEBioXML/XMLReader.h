@@ -44,17 +44,6 @@ public:
 	};
 
 	//-------------------------------------------------------------------------
-	// The XMLReader support parameters
-	class XMLParam
-	{
-	public:
-		XMLParam() { m_szname[0] = 0; m_szval[0] = 0; }
-	public:
-		char	m_szname[MAX_TAG];	// parameter name
-		char	m_szval[MAX_TAG];	// parameter value
-	};
-	
-	//-------------------------------------------------------------------------
 	//! This class implements a xml-tag. The value and attributes of this tag
 	//! can be queried.
 	//! \todo I would like to get rid of the m_szroot element and replace it with a 
@@ -193,13 +182,6 @@ public:
 
 	void SkipTag(XMLTag& tag);
 
-public:
-	void ClearParams();
-
-	XMLParam* FindParameter(const char* sz);
-
-	void AddParameter(const char* szname, const char* szval);
-
 protected:
 	char GetChar();
 	void ReadTag(XMLTag& tag);
@@ -209,7 +191,6 @@ protected:
 protected:
 	FILE*	m_fp;		// the file pointer
 	int		m_nline;	// current line (used only as temp storage)
-	vector<XMLParam>	m_Param;	// parameter list
 };
 
 typedef XMLReader::XMLTag XMLTag;

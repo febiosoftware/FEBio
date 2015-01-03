@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FEBioImport.h"
 #include "FEBioParametersSection.h"
+#include "FEBioIncludeSection.h"
 #include "FEBioModuleSection.h"
 #include "FEBioControlSection.h"
 #include "FEBioGlobalsSection.h"
@@ -34,6 +35,12 @@ FEAnalysis* FEBioFileSection::GetStep() { return m_pim->GetStep(); }
 //-----------------------------------------------------------------------------
 FEBioFileSectionMap::~FEBioFileSectionMap()
 {
+	Clear();
+}
+
+//-----------------------------------------------------------------------------
+void FEBioFileSectionMap::Clear()
+{
 	// clear the map
 	FEBioFileSectionMap::iterator is;
 	for (is = begin(); is != end(); ++is)
@@ -44,16 +51,174 @@ FEBioFileSectionMap::~FEBioFileSectionMap()
 }
 
 //-----------------------------------------------------------------------------
-FEFEBioImport::FEPlotVariable::FEPlotVariable(const FEFEBioImport::FEPlotVariable& pv)
+FEFEBioImport::PlotVariable::PlotVariable(const FEFEBioImport::PlotVariable& pv)
 {
 	strcpy(m_szvar, pv.m_szvar);
 	m_item = pv.m_item;
 }
 
-FEFEBioImport::FEPlotVariable::FEPlotVariable(const char* szvar, vector<int>& item)
+FEFEBioImport::PlotVariable::PlotVariable(const char* szvar, vector<int>& item)
 {
 	strcpy(m_szvar, szvar);
 	m_item = item;
+}
+
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ClearParams()
+{
+	m_Param.clear();
+}
+
+//-----------------------------------------------------------------------------
+FEFEBioImport::XMLParam* FEFEBioImport::FindParameter(const char* sz)
+{
+	for (size_t i=0; i<m_Param.size(); ++i)
+	{
+		XMLParam& p = m_Param[i];
+		if (strcmp(p.m_szname, sz) == 0) return &p;
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::AddParameter(const char* szname, const char* szval)
+{
+	XMLParam p;
+	strcpy(p.m_szname, szname);
+	strcpy(p.m_szval , szval);
+	m_Param.push_back(p);
+}
+
+//-----------------------------------------------------------------------------
+const char* FEFEBioImport::get_value_string(XMLTag& tag)
+{
+	const char* sz = tag.szvalue();
+	if (sz[0]=='@')
+	{
+		XMLParam* p = FindParameter(sz+1);
+		if (p==0) throw XMLReader::InvalidValue(tag);
+		sz = p->m_szval;
+	}
+	return sz;
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::value(XMLTag& tag, int& n)
+{
+	const char* sz = get_value_string(tag);
+	n = atoi(sz);
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::value(XMLTag& tag, double& g)
+{
+	const char* sz = get_value_string(tag);
+	g = atof(sz);
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::value(XMLTag& tag, bool& b)
+{
+	const char* sz = get_value_string(tag);
+	int n=0; 
+	sscanf(sz, "%d", &n); 
+	b = (n != 0); 
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::value(XMLTag& tag, vec3d& v)
+{
+	const char* sz = get_value_string(tag);
+	int n = sscanf(sz, "%lg,%lg,%lg", &v.x, &v.y, &v.z);
+	if (n != 3) throw XMLReader::XMLSyntaxError();
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::value(XMLTag& tag, mat3d& m)
+{
+	const char* sz = get_value_string(tag);
+	double xx, xy, xz, yx, yy, yz, zx, zy, zz;
+	int n = sscanf(sz, "%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
+	if (n != 9) throw XMLReader::XMLSyntaxError();
+	m = mat3d(xx, xy, xz, yx, yy, yz, zx, zy, zz);
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::value(XMLTag& tag, mat3ds& m)
+{
+	const char* sz = get_value_string(tag);
+	double x, y, z, xy, yz, xz;
+	int n = sscanf(sz, "%lg,%lg,%lg,%lg,%lg,%lg", &x, &y, &z, &xy, &yz, &xz);
+	if (n != 6) throw XMLReader::XMLSyntaxError();
+	m = mat3ds(x, y, z, xy, yz, xz);
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::value(XMLTag& tag, char* szstr)
+{
+	const char* sz = get_value_string(tag);
+	strcpy(szstr, sz); 
+}
+
+//-----------------------------------------------------------------------------
+int FEFEBioImport::value(XMLTag& tag, int* pi, int n)
+{
+	const char* sz = get_value_string(tag);
+	int nr = 0;
+	for (int i=0; i<n; ++i)
+	{
+		const char* sze = strchr(sz, ',');
+
+		pi[i] = atoi(sz);
+		nr++;
+
+		if (sze) sz = sze+1;
+		else break;
+	}
+	return nr;
+}
+
+//-----------------------------------------------------------------------------
+int FEFEBioImport::value(XMLTag& tag, double* pf, int n)
+{
+	const char* sz = get_value_string(tag);
+	int nr = 0;
+	for (int i=0; i<n; ++i)
+	{
+		const char* sze = strchr(sz, ',');
+
+		pf[i] = atof(sz);
+		nr++;
+
+		if (sze) sz = sze+1;
+		else break;
+	}
+	return nr;
+}
+
+//-----------------------------------------------------------------------------
+FEFEBioImport::FEFEBioImport()
+{
+	// define the file structure
+	m_map["Module"     ] = new FEBioModuleSection     (this);
+	m_map["Control"    ] = new FEBioControlSection    (this);
+	m_map["Material"   ] = new FEBioMaterialSection   (this);
+	m_map["Geometry"   ] = new FEBioGeometrySection   (this);
+	m_map["Boundary"   ] = new FEBioBoundarySection   (this);
+	m_map["Loads"      ] = new FEBioLoadsSection      (this);
+	m_map["Initial"    ] = new FEBioInitialSection    (this);
+	m_map["LoadData"   ] = new FEBioLoadDataSection   (this);
+	m_map["Globals"    ] = new FEBioGlobalsSection    (this);
+	m_map["Output"     ] = new FEBioOutputSection     (this);
+	m_map["Constraints"] = new FEBioConstraintsSection(this);
+	m_map["Step"       ] = new FEBioStepSection       (this);
+
+	// version 2.0 only!
+	m_map["Parameters" ] = new FEBioParametersSection (this);
+	m_map["Include"    ] = new FEBioIncludeSection    (this);
+	m_map["Contact"    ] = new FEBioContactSection(this);
+	m_map["Discrete"   ] = new FEBioDiscreteSection(this);
 }
 
 //=============================================================================
@@ -62,10 +227,6 @@ FEFEBioImport::FEPlotVariable::FEPlotVariable(const char* szvar, vector<int>& it
 //
 bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 {
-	// Open the XML file
-	XMLReader xml;
-	if (xml.Open(szfile) == false) return errf("FATAL ERROR: Failed opening input file %s\n\n", szfile);
-
 	// keep a pointer to the fem object
 	m_pfem = &fem;
 
@@ -101,11 +262,29 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 	// UT4 formulation off by default
 	m_but4 = false;
 
+	// Reset degrees of freedom (TODO: Can I do this elsewhere?)
+    DOFS& fedofs = *DOFS::GetInstance();
+	fedofs.Reset();
+
 	// extract the path
 	strcpy(m_szpath, szfile);
 	char* ch = strrchr(m_szpath, '\\');
 	if (ch==0) ch = strrchr(m_szpath, '/');
 	if (ch==0) m_szpath[0] = 0; else *(ch+1)=0;
+
+	// clear the parameters 
+	ClearParams();
+
+	// read the file
+	return ReadFile(szfile);
+}
+
+//-----------------------------------------------------------------------------
+bool FEFEBioImport::ReadFile(const char* szfile)
+{
+	// Open the XML file
+	XMLReader xml;
+	if (xml.Open(szfile) == false) return errf("FATAL ERROR: Failed opening input file %s\n\n", szfile);
 
 	// Find the root element
 	XMLTag tag;
@@ -119,10 +298,6 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 		return false;
 	}
 
-	// Reset degrees of freedom (TODO: Can I do this elsewhere?)
-    DOFS& fedofs = *DOFS::GetInstance();
-	fedofs.Reset();
-    
 	// parse the file
 	try
 	{
@@ -133,38 +308,15 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 		if ((m_nversion != 0x0102) && 
 			(m_nversion != 0x0200)) throw InvalidVersion();
 
-		// define the file structure
-		FEBioFileSectionMap map;
-		map["Parameters" ] = new FEBioParametersSection (this);
-		map["Module"     ] = new FEBioModuleSection     (this);
-		map["Control"    ] = new FEBioControlSection    (this);
-		map["Material"   ] = new FEBioMaterialSection   (this);
-		map["Geometry"   ] = new FEBioGeometrySection   (this);
-		map["Boundary"   ] = new FEBioBoundarySection   (this);
-		map["Loads"      ] = new FEBioLoadsSection      (this);
-		map["Initial"    ] = new FEBioInitialSection    (this);
-		map["LoadData"   ] = new FEBioLoadDataSection   (this);
-		map["Globals"    ] = new FEBioGlobalsSection    (this);
-		map["Output"     ] = new FEBioOutputSection     (this);
-		map["Constraints"] = new FEBioConstraintsSection(this);
-		map["Step"       ] = new FEBioStepSection       (this);
-
-		// version 2.0 only!
-		if (m_nversion >= 0x0200)
-		{
-			map["Contact" ] = new FEBioContactSection(this);
-			map["Discrete"] = new FEBioDiscreteSection(this);
-		}
-
 		// parse the file
 		++tag;
 		do
 		{
 			// try to find a section parser
-			FEBioFileSectionMap::iterator is = map.find(tag.Name());
+			FEBioFileSectionMap::iterator is = m_map.find(tag.Name());
 
 			// make sure we found a section reader
-			if (is == map.end()) throw XMLReader::InvalidTag(tag);
+			if (is == m_map.end()) throw XMLReader::InvalidTag(tag);
 
 			// see if the file has the "from" attribute (for version 2.0 and up)
 			if (m_nversion >= 0x0200)
@@ -361,15 +513,15 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 	{
 		switch (pp->m_itype)
 		{
-		case FE_PARAM_DOUBLE : tag.value(pp->value<double>() ); break;
-		case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
-		case FE_PARAM_BOOL   : tag.value(pp->value<bool  >() ); break;
-		case FE_PARAM_VEC3D  : tag.value(pp->value<vec3d >() ); break;
-		case FE_PARAM_MAT3D  : tag.value(pp->value<mat3d >() ); break;
-		case FE_PARAM_MAT3DS : tag.value(pp->value<mat3ds>() ); break;
-		case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
-		case FE_PARAM_INTV   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
-		case FE_PARAM_DOUBLEV: tag.value(pp->pvalue<double>(), pp->m_ndim); break;
+		case FE_PARAM_DOUBLE : value(tag, pp->value<double>()); break;
+		case FE_PARAM_INT    : value(tag, pp->value<int   >()); break;
+		case FE_PARAM_BOOL   : value(tag, pp->value<bool  >()); break;
+		case FE_PARAM_VEC3D  : value(tag, pp->value<vec3d >()); break;
+		case FE_PARAM_MAT3D  : value(tag, pp->value<mat3d >()); break;
+		case FE_PARAM_MAT3DS : value(tag, pp->value<mat3ds>()); break;
+		case FE_PARAM_STRING : value(tag, pp->cvalue()); break;
+		case FE_PARAM_INTV   : value(tag, pp->pvalue<int   >(), pp->m_ndim); break;
+		case FE_PARAM_DOUBLEV: value(tag, pp->pvalue<double>(), pp->m_ndim); break;
 		case FE_PARAM_IMAGE_3D:
 			{
 				const char* szfile = tag.AttributeValue("file");
@@ -441,7 +593,7 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 }
 
 //-----------------------------------------------------------------------------
-//! This function parese a parameter list
+//! This function parses a parameter list
 bool FEFEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam)
 {
 	FEParameterList& pl = pc->GetParameterList();
@@ -452,13 +604,13 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 	{
 		switch (pp->m_itype)
 		{
-		case FE_PARAM_DOUBLE : tag.value(pp->value<double>() ); break;
-		case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
-		case FE_PARAM_BOOL   : tag.value(pp->value<bool  >() ); break;
-		case FE_PARAM_VEC3D  : tag.value(pp->value<vec3d >() ); break;
-		case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
-		case FE_PARAM_INTV   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
-		case FE_PARAM_DOUBLEV: tag.value(pp->pvalue<double>(), pp->m_ndim); break;
+		case FE_PARAM_DOUBLE : value(tag, pp->value<double>() ); break;
+		case FE_PARAM_INT    : value(tag, pp->value<int   >() ); break;
+		case FE_PARAM_BOOL   : value(tag, pp->value<bool  >() ); break;
+		case FE_PARAM_VEC3D  : value(tag, pp->value<vec3d >() ); break;
+		case FE_PARAM_STRING : value(tag, pp->cvalue() ); break;
+		case FE_PARAM_INTV   : value(tag, pp->pvalue<int   >(), pp->m_ndim); break;
+		case FE_PARAM_DOUBLEV: value(tag, pp->pvalue<double>(), pp->m_ndim); break;
 		case FE_PARAM_IMAGE_3D:
 			{
 				const char* szfile = tag.AttributeValue("file");
@@ -584,7 +736,7 @@ void FEFEBioImport::ReadList(XMLTag& tag, vector<int>& l)
 //-----------------------------------------------------------------------------
 void FEFEBioImport::AddPlotVariable(const char* szvar, vector<int>& item)
 {
-	FEPlotVariable var(szvar, item);
+	PlotVariable var(szvar, item);
 	m_plot.push_back(var);
 }
 

@@ -188,7 +188,7 @@ bool FEBioModel::Input(const char* szfile)
 	int NP = (int) fim.m_plot.size();
 	for (int i=0; i<NP; ++i)
 	{
-		FEFEBioImport::FEPlotVariable& var = fim.m_plot[i];
+		FEFEBioImport::PlotVariable& var = fim.m_plot[i];
 
 		vector<int> item = var.m_item;
 		if (item.empty() == false)
