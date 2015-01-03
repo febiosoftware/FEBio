@@ -72,6 +72,9 @@
     <ClCompile Include="..\..\FEBioXML\FEBioDiscreteSection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioXML\FEBioParametersSection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioXML\FEBioImport.h">
@@ -129,6 +132,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioXML\FEBioDiscreteSection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioXML\FEBioParametersSection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

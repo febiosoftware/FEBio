@@ -556,12 +556,24 @@ void XMLReader::ReadTag(XMLTag& tag)
 void XMLReader::ReadValue(XMLTag& tag)
 {
 	char ch;
+	char szbuf[128];
 	if (!tag.isend())
 	{
 		tag.m_szval.clear();
 		while ((ch=GetChar())!='<') 
 		{ 
-			tag.m_szval.push_back(ch);
+			if (ch=='@')
+			{
+				char* c = szbuf;
+				// read the parameter name
+				while ((ch=GetChar())!='<') {*c++ = ch; }
+				*c = 0;
+				XMLParam* p = FindParameter(szbuf);
+				if (p==0) throw XMLSyntaxError();
+				tag.m_szval = p->m_szval;
+				break;
+			}
+			else tag.m_szval.push_back(ch);
 		}
 		tag.m_szval.push_back(0);
 	}
@@ -679,4 +691,30 @@ void XMLReader::SkipTag(XMLTag& tag)
 	while (!tag.isend());
 
 	++tag;
+}
+
+//-----------------------------------------------------------------------------
+void XMLReader::ClearParams()
+{
+	m_Param.clear();
+}
+
+//-----------------------------------------------------------------------------
+XMLReader::XMLParam* XMLReader::FindParameter(const char* sz)
+{
+	for (size_t i=0; i<m_Param.size(); ++i)
+	{
+		XMLParam& p = m_Param[i];
+		if (strcmp(p.m_szname, sz) == 0) return &p;
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+void XMLReader::AddParameter(const char* szname, const char* szval)
+{
+	XMLParam p;
+	strcpy(p.m_szname, szname);
+	strcpy(p.m_szval , szval);
+	m_Param.push_back(p);
 }

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FEBioImport.h"
+#include "FEBioParametersSection.h"
 #include "FEBioModuleSection.h"
 #include "FEBioControlSection.h"
 #include "FEBioGlobalsSection.h"
@@ -134,6 +135,7 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 
 		// define the file structure
 		FEBioFileSectionMap map;
+		map["Parameters" ] = new FEBioParametersSection (this);
 		map["Module"     ] = new FEBioModuleSection     (this);
 		map["Control"    ] = new FEBioControlSection    (this);
 		map["Material"   ] = new FEBioMaterialSection   (this);
