@@ -77,7 +77,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	for (int i=0; i<nodes; ++i)
 	{
 		FENode& node = mesh.Node(N0 + i);
-		tag.value(node.m_r0);
+		m_pim->value(tag, node.m_r0);
 		node.m_rt = node.m_r0;
 		++tag;
 	}
@@ -770,7 +770,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 			if (tag == "fiber")
 			{
 				// read the fiber direction
-				tag.value(a);
+				m_pim->value(tag, a);
 
 				// normalize fiber
 				a.unit();
@@ -802,8 +802,8 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 				++tag;
 				do
 				{
-					if (tag == "a") tag.value(a);
-					else if (tag == "d") tag.value(d);
+					if      (tag == "a") m_pim->value(tag, a);
+					else if (tag == "d") m_pim->value(tag, d);
 					else throw XMLReader::InvalidTag(tag);
 
 					++tag;
@@ -843,7 +843,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 				FETrussElement* pt = static_cast<FETrussElement*>(pe);
 
 				// read truss area
-				tag.value(pt->m_a0);
+				m_pim->value(tag, pt->m_a0);
 			}
 			else
 			{

@@ -324,7 +324,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 
 		// get the scale factor
 		double s = 1;
-		tag.value(s);
+		m_pim->value(tag, s);
 
 		// loop over all nodes in the nodeset
 		FENodeSet& ns = *ps;
@@ -485,8 +485,8 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 			pdc->node = n;
 			pdc->bc = bc;
 			pdc->lc = lc;
-			tag.value(pdc->s);
 			pdc->br = br;
+			m_pim->value(tag, pdc->s);
 			fem.AddPrescribedBC(pdc);
 
 			// add this boundary condition to the current step
@@ -870,9 +870,9 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 				// add the linear constraint to the system
 				pLCS->add(pLC);
 			}
-			else if (tag == "tol"    ) tag.value(pLCS->m_tol);
-			else if (tag == "penalty") tag.value(pLCS->m_eps);
-			else if (tag == "maxaug") tag.value(pLCS->m_naugmax);
+			else if (tag == "tol"    ) m_pim->value(tag, pLCS->m_tol);
+			else if (tag == "penalty") m_pim->value(tag, pLCS->m_eps);
+			else if (tag == "maxaug" ) m_pim->value(tag, pLCS->m_naugmax);
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
 		}

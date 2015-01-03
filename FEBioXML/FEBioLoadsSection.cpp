@@ -56,11 +56,11 @@ void FEBioLoadsSection::ParseBodyForce(XMLTag &tag)
 			{
 				const char* szlc = tag.AttributeValue("lc");
 //						pf->lc[0] = pf->lc[1] = pf->lc[2] = atoi(szlc);
-				tag.value(pf->m_a);
+				m_pim->value(tag, pf->m_a);
 			}
 			else if (tag == "node")
 			{
-				tag.value(pf->m_inode); 
+				m_pim->value(tag, pf->m_inode); 
 				pf->m_inode -= 1;
 			}
 			else if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
@@ -209,7 +209,7 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 				pfc->node = n;
 				pfc->bc = bc;
 				pfc->lc = lc;
-				tag.value(pfc->s);
+				m_pim->value(tag, pfc->s);
 				fem.AddNodalLoad(pfc);
 
 				// add this boundary condition to the current step
@@ -250,7 +250,7 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 			pfc->node = n;
 			pfc->bc = bc;
 			pfc->lc = lc;
-			tag.value(pfc->s);
+			m_pim->value(tag, pfc->s);
 			fem.AddNodalLoad(pfc);
 
 			// add this boundary condition to the current step

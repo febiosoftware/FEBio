@@ -295,7 +295,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			pDC->bc = bc;
 			pDC->lc = lc;
 			pDC->brel = brel;
-			tag.value(pDC->sf);
+			m_pim->value(tag, pDC->sf);
 			fem.m_RDC.push_back(pDC);
 
 			// add this boundary condition to the current step
@@ -343,7 +343,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			pFC->id = nmat;
 			pFC->bc = bc;
 			pFC->lc = lc;
-			tag.value(pFC->sf);
+			m_pim->value(tag, pFC->sf);
 			fem.m_RFC.push_back(pFC);
 
 			// add this boundary condition to the current step
@@ -387,7 +387,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 		{
 			// get the initial velocity
 			vec3d v;
-			tag.value(v);
+			m_pim->value(tag, v);
 
 			// create the initial condition
 			FERigidBodyVelocity* pic = new FERigidBodyVelocity(&fem);
@@ -408,7 +408,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 		{
 			// get the initial angular velocity
 			vec3d w;
-			tag.value(w);
+			m_pim->value(tag, w);
 
 			// create the initial condition
 			FERigidBodyAngularVelocity* pic = new FERigidBodyAngularVelocity(&fem);

@@ -24,7 +24,6 @@ bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 	case FE_PARAM_DOUBLE : tag.value(pp->value<double>() ); break;
 	case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
 	case FE_PARAM_BOOL   : tag.value(pp->value<bool  >() ); break;
-	case FE_PARAM_VEC3D  : tag.value(pp->value<vec3d >() ); break;
 	case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
 	case FE_PARAM_INTV   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
 	case FE_PARAM_DOUBLEV: tag.value(pp->pvalue<double>(), pp->m_ndim); break;

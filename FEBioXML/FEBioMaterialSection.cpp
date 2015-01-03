@@ -31,7 +31,7 @@ FEMaterial* FEBioMaterialSection::CreateMaterial(XMLTag& tag)
 	// set the material attributes
 	for (int i=0; i<tag.m_natt; ++i)
 	{
-		XMLReader::XMLAtt& att = tag.m_att[i];
+		XMLAtt& att = tag.m_att[i];
 		if (pmat->SetAttribute(att.m_szatt, att.m_szatv) == false) { delete pmat; throw XMLReader::InvalidAttributeValue(tag, att.m_szatt); };
 	}
 
@@ -161,8 +161,8 @@ bool FEBioMaterialSection::ParseMatAxisTag(XMLTag &tag, FEMaterial *pm)
 		++tag;
 		do
 		{
-			if (tag == "a") tag.value(a);
-			else if (tag == "d") tag.value(d);
+			if      (tag == "a") m_pim->value(tag, a);
+			else if (tag == "d") m_pim->value(tag, d);
 			else throw XMLReader::InvalidTag(tag);
 			
 			++tag;
@@ -211,7 +211,7 @@ bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
 		pm->SetCoordinateSystemMap(pmap);
 
 		vec3d a;
-		tag.value(a);
+		m_pim->value(tag, a);
 		pmap->SetVectors(a, vec3d(0,0,1));
 	}
 	else

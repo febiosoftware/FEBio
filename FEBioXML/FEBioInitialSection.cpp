@@ -35,7 +35,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 				{
 					int nid = atoi(tag.AttributeValue("id"))-1;
 					vec3d v;
-					tag.value(v);
+					m_pim->value(tag, v);
 					mesh.Node(nid).m_v0 += v;
 				}
 				else throw XMLReader::InvalidTag(tag);
@@ -52,7 +52,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 				{
 					int nid = atoi(tag.AttributeValue("id"))-1;
 					double p;
-					tag.value(p);
+					m_pim->value(tag, p);
 					mesh.Node(nid).m_p0 += p;
 				}
 				else throw XMLReader::InvalidTag(tag);
@@ -74,7 +74,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 				{
 					int nid = atoi(tag.AttributeValue("id"))-1;
 					double c;
-					tag.value(c);
+					m_pim->value(tag, c);
 					mesh.Node(nid).m_c0[isol] += c;
 				}
 				else throw XMLReader::InvalidTag(tag);
@@ -91,7 +91,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 				{
 					int nid = atoi(tag.AttributeValue("id"))-1;
 					double T;
-					tag.value(T);
+					m_pim->value(tag, T);
 					mesh.Node(nid).m_T0 = T;
 				}
 				else throw XMLReader::InvalidTag(tag);

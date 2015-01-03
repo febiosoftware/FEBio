@@ -6,9 +6,12 @@
 #include "XMLReader.h"
 #include <assert.h>
 
+//=============================================================================
+// XMLAtt
+//=============================================================================
+
 //-----------------------------------------------------------------------------
-// XMLTag
-//-----------------------------------------------------------------------------
+//! The constructor sets the name and value to zero strings
 XMLAtt::XMLAtt()
 {
 	m_szatt[0] = 0;
@@ -16,15 +19,18 @@ XMLAtt::XMLAtt()
 }
 
 //-----------------------------------------------------------------------------
+//! Returns true if the attribute's name is the same as the string that is passed.
+//! Note that the comparison is case-sensitive 
 bool XMLAtt::operator == (const char* sz)
 {
 	return (strcmp(m_szatv, sz) == 0);
 }
 
-//////////////////////////////////////////////////////////////////////
+//=============================================================================
 // XMLTag
-//////////////////////////////////////////////////////////////////////
+//=============================================================================
 
+//-----------------------------------------------------------------------------
 XMLTag::XMLTag()
 {
 	m_preader = 0;
@@ -34,8 +40,7 @@ XMLTag::XMLTag()
 	m_nlevel = 0;
 
 	m_natt = 0;
-
-	for (int i=0; i<XMLReader::MAX_LEVEL; ++i) m_szroot[i][0] = 0;
+	for (int i=0; i<MAX_LEVEL; ++i) m_szroot[i][0] = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -113,8 +118,7 @@ int XMLTag::value(int* pi, int n)
 	return nr;
 }
 
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 void XMLTag::value(bool& val)
 { 
 	int n=0; 
@@ -122,31 +126,10 @@ void XMLTag::value(bool& val)
 	val = (n != 0); 
 }
 
+//-----------------------------------------------------------------------------
 void XMLTag::value(char* szstr)
 {
 	strcpy(szstr, m_szval.c_str()); 
-}
-
-void XMLTag::value(vec3d& v)
-{
-	int n = sscanf(m_szval.c_str(), "%lg,%lg,%lg", &v.x, &v.y, &v.z);
-	if (n != 3) throw XMLReader::XMLSyntaxError();
-}
-
-void XMLTag::value(mat3d& m)
-{
-	double xx, xy, xz, yx, yy, yz, zx, zy, zz;
-	int n = sscanf(m_szval.c_str(), "%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
-	if (n != 9) throw XMLReader::XMLSyntaxError();
-	m = mat3d(xx, xy, xz, yx, yy, yz, zx, zy, zz);
-}
-
-void XMLTag::value(mat3ds& m)
-{
-	double x, y, z, xy, yz, xz;
-	int n = sscanf(m_szval.c_str(), "%lg,%lg,%lg,%lg,%lg,%lg", &x, &y, &z, &xy, &yz, &xz);
-	if (n != 6) throw XMLReader::XMLSyntaxError();
-	m = mat3ds(x, y, z, xy, yz, xz);
 }
 
 //-----------------------------------------------------------------------------
@@ -246,7 +229,7 @@ const char* XMLTag::AttributeValue(const char* szat, bool bopt)
 
 //-----------------------------------------------------------------------------
 //! return the attribute
-XMLReader::XMLAtt* XMLTag::Attribute(const char* szat, bool bopt)
+XMLAtt* XMLTag::Attribute(const char* szat, bool bopt)
 {
 	// find the attribute
 	for (int i=0; i<m_natt; ++i)
@@ -261,7 +244,7 @@ XMLReader::XMLAtt* XMLTag::Attribute(const char* szat, bool bopt)
 
 //-----------------------------------------------------------------------------
 //! return the attribute
-XMLReader::XMLAtt& XMLTag::Attribute(const char* szat)
+XMLAtt& XMLTag::Attribute(const char* szat)
 {
 	// find the attribute
 	for (int i=0; i<m_natt; ++i)
@@ -282,8 +265,7 @@ bool XMLTag::AttributeValue(const char* szat, double& d, bool bopt)
 	return true;
 }
 
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 bool XMLTag::AttributeValue(const char* szat, int& n, bool bopt)
 {
 	const char* szv = AttributeValue(szat, bopt);
@@ -294,38 +276,41 @@ bool XMLTag::AttributeValue(const char* szat, int& n, bool bopt)
 	return true;
 }
 
-//////////////////////////////////////////////////////////////////////
+//=============================================================================
 // XMLReader - Exceptions
-//////////////////////////////////////////////////////////////////////
+//=============================================================================
 
-XMLReader::InvalidAttributeValue::InvalidAttributeValue(XMLReader::XMLTag& t, const char* sza, const char* szv) : tag(t)
+//-----------------------------------------------------------------------------
+XMLReader::InvalidAttributeValue::InvalidAttributeValue(XMLTag& t, const char* sza, const char* szv) : tag(t)
 { 
 	strcpy(szatt, sza);
 	if (szv) strcpy(szval, szv); else szval[0] = 0;
 }
 
+//-----------------------------------------------------------------------------
 XMLReader::MissingAttribute::MissingAttribute(XMLTag& t, const char* sza) : tag(t)
 { 
 	strcpy(szatt, sza); 
 }
 
-//////////////////////////////////////////////////////////////////////
+//=============================================================================
 // XMLReader
-//////////////////////////////////////////////////////////////////////
+//=============================================================================
 
+//-----------------------------------------------------------------------------
 XMLReader::XMLReader()
 {
 	m_fp = 0;
 	m_nline = 0;
 }
 
+//-----------------------------------------------------------------------------
 XMLReader::~XMLReader()
 {
 	Close();
 }
 
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 void XMLReader::Close()
 {
 	if (m_fp)
@@ -336,8 +321,7 @@ void XMLReader::Close()
 	}
 }
 
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 bool XMLReader::Open(const char* szfile)
 {
 	// make sure this reader has not been attached to a file yet
@@ -362,8 +346,7 @@ bool XMLReader::Open(const char* szfile)
 	return true;
 }
 
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 bool XMLReader::FindTag(const char* sztag, XMLTag& tag)
 {
 	// go to the beginning of the file
@@ -394,8 +377,7 @@ bool XMLReader::FindTag(const char* sztag, XMLTag& tag)
 	return true;
 }
 
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 void XMLReader::NextTag(XMLTag& tag)
 {
 	assert( tag.m_preader == this);
@@ -436,11 +418,13 @@ void XMLReader::NextTag(XMLTag& tag)
 	fgetpos(m_fp, &tag.m_fpos);
 }
 
+//-----------------------------------------------------------------------------
 inline bool isvalid(char c)
 {
 	return (isalnum(c) || (c=='_') || (c=='.'));
 }
 
+//-----------------------------------------------------------------------------
 void XMLReader::ReadTag(XMLTag& tag)
 {
 	// find the start token
@@ -553,6 +537,7 @@ void XMLReader::ReadTag(XMLTag& tag)
 	}
 }
 
+//-----------------------------------------------------------------------------
 void XMLReader::ReadValue(XMLTag& tag)
 {
 	char ch;
@@ -568,6 +553,7 @@ void XMLReader::ReadValue(XMLTag& tag)
 	else while ((ch=GetChar())!='<');
 }
 
+//-----------------------------------------------------------------------------
 void XMLReader::ReadEndTag(XMLTag& tag)
 {
 	char ch, *sz = tag.m_sztag;
