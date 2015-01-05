@@ -449,6 +449,8 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 
 		// see if the scale attribute is defined
 		// TODO: the scale attribute is obsolete. Use the tag's value instead
+		// TODO: instead of defining everything in attributes, perhaps I should
+		//       just make child elements.
 		double scale = 1.0;
 		tag.AttributeValue("scale", scale, true);
 		if (tag.isempty() == false) m_pim->value(tag, scale);
@@ -463,6 +465,7 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 			pbc->bc = bc;
 			pbc->lc = lc;
 			pbc->s = scale;
+			pbc->br = br;
 			fem.AddPrescribedBC(pbc);
 
 			// add this boundary condition to the current step
