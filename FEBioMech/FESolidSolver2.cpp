@@ -805,7 +805,6 @@ bool FESolidSolver2::SolveStep(double time)
 	{
 		// A negative jacobian was detected
 		felog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
-		if (m_fem.GetDebugFlag()) m_fem.Write();
 		return false;
 	}
 	catch (MaxStiffnessReformations)
@@ -847,7 +846,6 @@ bool FESolidSolver2::SolveStep(double time)
 	catch (DoRunningRestart)
 	{
 		// a request to fail the iteration and restart the time step
-		if (m_fem.GetDebugFlag()) m_fem.Write();
 		return false;
 	}
 

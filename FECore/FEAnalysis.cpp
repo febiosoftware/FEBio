@@ -357,6 +357,9 @@ bool FEAnalysis::Solve()
 			// Report the sad news to the user.
 			felog.printf("\n\n------- failed to converge at time : %lg\n\n", m_fem.m_ftime);
 
+			// plot the state when the debug flag is on
+			if (m_fem.GetDebugFlag()) m_fem.Write();
+
 			// If we have auto time stepping, decrease time step and let's retry
 			if (m_bautostep && (m_nretries < m_maxretries))
 			{
