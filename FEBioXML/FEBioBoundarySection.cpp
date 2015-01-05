@@ -448,8 +448,10 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 
 		// see if the scale attribute is defined
+		// TODO: the scale attribute is obsolete. Use the tag's value instead
 		double scale = 1.0;
 		tag.AttributeValue("scale", scale, true);
+		if (tag.isempty() == false) m_pim->value(tag, scale);
 
 		FENodeSet& ns = *pns;
 		int N = ns.size();
