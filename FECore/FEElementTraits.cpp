@@ -75,7 +75,7 @@ void FESolidElementTraits::init()
 		shape_deriv2(Hrr, Hss, Htt, Hrs, Hst, Hrt, gr[n], gs[n], gt[n]);
 		for (int i=0; i<neln; ++i)
 		{
-			Grr[n][i] = Hrr[i]; Grs[n][i] = Hrs[i]; Grr[n][i] = Hrr[i]; 
+			Grr[n][i] = Hrr[i]; Grs[n][i] = Hrs[i]; Grt[n][i] = Hrt[i]; 
 			Gsr[n][i] = Hrs[i]; Gss[n][i] = Hss[i]; Gst[n][i] = Hst[i]; 
 			Gtr[n][i] = Hrt[i]; Gts[n][i] = Hst[i]; Gtt[n][i] = Htt[i]; 
 		}
@@ -1936,6 +1936,67 @@ void FETri6mG7::project_to_nodes(double* ai, double* ao)
 	}
 }
 
+//=============================================================================
+//                          F E T R I 7 G 3
+//=============================================================================
+
+FETri7G3::FETri7G3() : FETri7_(NINT, FE_TRI7G3) 
+{ 
+	const double a = 1.0 / 6.0;
+	const double b = 2.0 / 3.0;
+	gr[0] = a; gs[0] = a; gw[0] = a;
+	gr[1] = b; gs[1] = a; gw[1] = a;
+	gr[2] = a; gs[2] = b; gw[2] = a;
+	init(); 
+}
+
+//-----------------------------------------------------------------------------
+void FETri7G3::project_to_nodes(double* ai, double* ao)
+{
+	matrix H(3, 3);
+	for (int n=0; n<3; ++n)
+	{
+		H[n][0] = 1.0 - gr[n] - gs[n];
+		H[n][1] = gr[n];
+		H[n][2] = gs[n];
+	}
+	H.inverse();
+
+	for (int i=0; i<3; ++i)
+	{
+		ao[i] = 0;
+		for (int j=0; j<3; ++j) ao[i] += H[i][j]*ai[j];
+	}
+
+	ao[3] = 0.5*(ao[0] + ao[1]);
+	ao[4] = 0.5*(ao[1] + ao[2]);
+	ao[5] = 0.5*(ao[2] + ao[0]);
+	ao[6] = (ao[0]+ao[1]+ao[2])/3.0;
+}
+
+//=============================================================================
+//                          F E T R I 6 G 4
+//=============================================================================
+
+FETri7G4::FETri7G4() : FETri7_(NINT, FE_TRI7G4) 
+{ 
+	const double a = 1.0/3.0;
+	const double b = 1.0/5.0;
+	const double c = 3.0/5.0;
+	gr[0] = a; gs[0] = a; gw[0] = -27.0/96.0;
+	gr[1] = c; gs[1] = b; gw[1] =  25.0/96.0;
+	gr[2] = b; gs[2] = b; gw[2] =  25.0/96.0;
+	gr[3] = b; gs[3] = c; gw[3] =  25.0/96.0;
+	init(); 
+}
+
+//-----------------------------------------------------------------------------
+//! \todo implement this
+void FETri7G4::project_to_nodes(double* ai, double* ao)
+{
+	
+}
+
 //============================================================================
 //                             F E T R I 7
 //============================================================================
@@ -2030,6 +2091,33 @@ void FETri7G7::project_to_nodes(double* ai, double* ao)
 		ao[i] = 0;
 		for (int j=0; j<NELN; ++j) ao[i] += Ai[i][j]*b[j];
 	}
+}
+
+
+//=============================================================================
+//                          F E T R I 7 G L 7
+//=============================================================================
+
+FETri7GL7::FETri7GL7() : FETri7_(NINT, FE_TRI7GL7) 
+{ 
+	const double a = 1.0/40.0;
+	const double b = 1.0/15.0;
+	gr[0] = 0.0; gs[0] = 0.0; gw[0] = a;
+	gr[1] = 1.0; gs[1] = 0.0; gw[1] = a;
+	gr[2] = 0.0; gs[2] = 1.0; gw[2] = a;
+	gr[3] = 0.5; gs[3] = 0.0; gw[3] = b;
+	gr[4] = 0.5; gs[4] = 0.5; gw[4] = b;
+	gr[5] = 0.0; gs[5] = 0.5; gw[5] = b;
+	gr[6] = 1.0/3.0; gs[6] = 1.0/3.0; gw[6] = 9.0*a;
+	init(); 
+}
+
+//-----------------------------------------------------------------------------
+void FETri7GL7::project_to_nodes(double* ai, double* ao)
+{
+	ao[0] = ai[0]; ao[1] = ai[1]; ao[2] = ai[2];
+	ao[3] = ai[3]; ao[4] = ai[4]; ao[5] = ai[5];
+	ao[6] = ai[6];
 }
 
 //=============================================================================

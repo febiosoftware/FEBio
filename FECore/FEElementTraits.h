@@ -876,6 +876,45 @@ public:
 };
 
 //=============================================================================
+//  7-node triangular element with 3-point gaussian quadrature
+//
+class FETri7G3 : public FETri7_
+{
+public:
+	enum { NINT = 3 };
+
+public:
+	// constructor
+	FETri7G3();
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix	Ai;
+};
+
+//=============================================================================
+//  7-node triangular element with 4-point gaussian quadrature
+//
+class FETri7G4 : public FETri7_
+{
+public:
+	enum { NINT = 4 };
+
+public:
+	// constructor
+	FETri7G4();
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix	Ai;
+};
+
+
+//=============================================================================
 //  7-node triangular element with 7-point gaussian quadrature
 //
 class FETri7G7 : public FETri7_
@@ -886,6 +925,25 @@ public:
 public:
 	// constructor
 	FETri7G7();
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix	Ai;
+};
+
+//=============================================================================
+//  7-node triangular element with 7-point Gauss-Lobatto quadrature
+//
+class FETri7GL7 : public FETri7_
+{
+public:
+	enum { NINT = 7 };
+
+public:
+	// constructor
+	FETri7GL7();
 
 	// project integration point data to nodes
 	void project_to_nodes(double* ai, double* ao);

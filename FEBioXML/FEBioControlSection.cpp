@@ -161,7 +161,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 			if (tag == "rule")
 			{
 				XMLAtt& elem = tag.Attribute("elem");
-				const char* szv = tag.szvalue();
+				const char* szv = m_pim->get_value_string(tag);
 
 				if (elem == "hex8")
 				{
@@ -202,7 +202,10 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 				}
 				else if (elem == "tri7")
 				{
-					if (strcmp(szv, "GAUSS7") == 0) m_pim->m_ntri7 = FE_TRI7G7;
+					if      (strcmp(szv, "GAUSS3"  ) == 0) m_pim->m_ntri7 = FE_TRI7G3;
+					else if (strcmp(szv, "GAUSS4"  ) == 0) m_pim->m_ntri7 = FE_TRI7G4;
+					else if (strcmp(szv, "GAUSS7"  ) == 0) m_pim->m_ntri7 = FE_TRI7G7;
+					else if (strcmp(szv, "LOBATTO7") == 0) m_pim->m_ntri7 = FE_TRI7GL7;
 					else throw XMLReader::InvalidValue(tag);
 				}
 				else if (elem == "tet4")
