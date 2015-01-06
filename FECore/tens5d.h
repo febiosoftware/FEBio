@@ -68,6 +68,8 @@ public:
 	// initialize to zero
 	void zero();
 
+	void unit();
+
 	mat3ds contract3rs(tens3drs H);
 	tens3drs contract2s(mat3ds s);
 
