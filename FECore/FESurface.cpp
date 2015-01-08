@@ -326,7 +326,7 @@ bool project2surf(FESurfaceElement& el, vec3d* y, vec3d x, double& r, double& s,
 		// evaluate shape functions and shape function derivatives.
 		el.shape_fnc(H, r, s);
 		el.shape_deriv(Hr, Hs, r, s);
-		el.shape_deriv2(Hrr, Hrs, Hrr, r, s);
+		el.shape_deriv2(Hrr, Hrs, Hss, r, s);
 
 		// set up the system of equations
 		Q[0] = Q[1] = 0;
