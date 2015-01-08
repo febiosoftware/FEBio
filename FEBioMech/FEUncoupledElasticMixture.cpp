@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEUncoupledElasticMixture.h"
+#include "FECore/FECoreKernel.h"
 
 // define the material parameters
 // BEGIN_PARAMETER_LIST(FEUncoupledElasticMixture, FEUncoupledMaterial)
@@ -174,4 +175,39 @@ FEParam* FEUncoupledElasticMixture::GetParameter(const ParamString& s)
 
 	// no match found
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! serialization
+void FEUncoupledElasticMixture::Serialize(DumpFile &ar)
+{
+	// serialize material parameters
+	FEUncoupledMaterial::Serialize(ar);
+
+	int nmat = 0;
+	// serialize sub-materials
+	if (ar.IsSaving())
+	{
+		nmat = m_pMat.size();
+		ar << nmat;
+		for (int i=0; i<nmat; ++i)
+		{
+			ar << m_pMat[i]->GetTypeStr();
+			m_pMat[i]->Serialize(ar);
+		}
+	}
+	else
+	{
+		char sz[256] = {0};
+		ar >> nmat;
+		m_pMat.resize(nmat);
+		for (int i=0; i<nmat; ++i)
+		{
+			ar >> sz;
+			m_pMat[i] = dynamic_cast<FEUncoupledMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+			assert(m_pMat[i]);
+			m_pMat[i]->Serialize(ar);
+			m_pMat[i]->Init();
+		}
+	}
 }

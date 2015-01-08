@@ -47,6 +47,9 @@ public:
 	//! set a material property (returns false on error)
 	bool SetProperty(int i, FECoreBase* pm);
 	
+	//! Serialization
+	void Serialize(DumpFile& ar);
+
 public:
 	//! calculate stress at material point
 	mat3ds DevStress(FEMaterialPoint& pt);
