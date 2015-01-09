@@ -13,6 +13,26 @@
 #include "FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
+class FEMRVonMisesMaterialPoint : public FEElasticMaterialPoint
+{
+public:
+	FEMRVonMisesMaterialPoint(){}
+
+	FEMaterialPoint* Copy();
+
+	void Init(bool bflag);
+
+	void Serialize(DumpFile& ar);
+
+public:
+	double	m_kf;
+	double	m_tp;
+
+	// declare parameter list
+	DECLARE_PARAMETER_LIST();
+};
+
+//-----------------------------------------------------------------------------
 //! Transversely Isotropic Multiple material
 
 //! This material has an isotopric Multiple basis and single preferred
@@ -39,10 +59,11 @@ public:
 	//! calculate tangent stiffness at material point
 	virtual tens4ds DevTangent(FEMaterialPoint& pt);
 
+	//! create material point data
+	FEMaterialPoint* CreateMaterialPointData();
+
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };
 
-
 #endif // !defined(AFX_FEVonMisesFibers_H__E918D89B_4CCD_44B9_9731_19CEC4EDF406__INCLUDED_)
-

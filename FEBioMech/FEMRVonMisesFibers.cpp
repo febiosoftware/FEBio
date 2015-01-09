@@ -4,8 +4,14 @@
 
 #include "stdafx.h"
 #include "FEMRVonMisesFibers.h"
-
 #include <fstream>
+
+// define the material point parameters
+BEGIN_PARAMETER_LIST(FEMRVonMisesMaterialPoint, FEElasticMaterialPoint)
+	ADD_PARAMETER(m_kf, FE_PARAM_DOUBLE, "kf");
+	ADD_PARAMETER(m_tp, FE_PARAM_DOUBLE, "tp");
+END_PARAMETER_LIST();
+
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMRVonMisesFibers, FETransverselyIsotropic)
@@ -22,6 +28,49 @@ BEGIN_PARAMETER_LIST(FEMRVonMisesFibers, FETransverselyIsotropic)
 	// Exponent for the constrained von Mises distribution
 	ADD_PARAMETER(var_n, FE_PARAM_DOUBLE, "var_n"); 
 END_PARAMETER_LIST();
+
+//=============================================================================
+FEMaterialPoint* FEMRVonMisesMaterialPoint::Copy()
+{
+	FEMRVonMisesMaterialPoint* pt = new FEMRVonMisesMaterialPoint(*this);
+	pt->m_kf = m_kf;
+	pt->m_pt = m_pt;
+	if (m_pt) pt->m_pt = m_pt->Copy();
+	return pt;
+}
+
+//-----------------------------------------------------------------------------
+void FEMRVonMisesMaterialPoint::Init(bool bflag)
+{
+	if (bflag)
+	{
+		// first initialization
+	}
+	else
+	{
+		// called before the start of every time step
+	}
+
+	// don't forget to intialize the nested data
+	if (m_pt) m_pt->Init(bflag);
+}
+
+//-----------------------------------------------------------------------------
+void FEMRVonMisesMaterialPoint::Serialize(DumpFile& ar)
+{
+	if (m_pt) m_pt->Serialize(ar);
+
+	if (ar.IsSaving())
+	{
+		ar << m_kf;
+		ar << m_tp;
+	}
+	else
+	{
+		ar >> m_kf;
+		ar >> m_tp;
+	}
+}
 
 //////////////////////////////////////////////////////////////////////
 // FEVonMisesFibers
@@ -103,15 +152,27 @@ double bessi1(double X)
 	}
 }
 
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FEMRVonMisesFibers::CreateMaterialPointData()
+{
+	FEMRVonMisesMaterialPoint* pt = new FEMRVonMisesMaterialPoint();
+	pt->m_kf = kf;
+	pt->m_tp = tp;
+	return pt;
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FEMRVonMisesFibers::DevStress(FEMaterialPoint& mp)
 {
+	FEMRVonMisesMaterialPoint& pt = *mp.ExtractData<FEMRVonMisesMaterialPoint>();
 
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	// get some of the material parmaters from the material point
+	double kf = pt.m_kf;
+	double tp = pt.m_tp;
 
 	// deformation gradient
 	mat3d& F = pt.m_F;
 	double J = pt.m_J;
-
 
 	//// FIRST, WE CALCULATE THE MOONEY RIVLIN PART OF THE STRESS
 	// calculate deviatoric left Cauchy-Green tensor
@@ -247,7 +308,11 @@ mat3ds FEMRVonMisesFibers::DevStress(FEMaterialPoint& mp)
 
 tens4ds FEMRVonMisesFibers::DevTangent(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEMRVonMisesMaterialPoint& pt = *mp.ExtractData<FEMRVonMisesMaterialPoint>();
+
+	// get some of the material parmaters from the material point
+	double kf = pt.m_kf;
+	double tp = pt.m_tp;
 
 	// deformation gradient
 	mat3d& F = pt.m_F;
