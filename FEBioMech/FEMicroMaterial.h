@@ -4,6 +4,30 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
+//! Material point class for the micro-material
+class FEMicroMaterialPoint : public FEMaterialPoint
+{
+public:
+	//! constructor
+	FEMicroMaterialPoint(FEMaterialPoint* mp);
+
+	//! Initialize material point data
+	void Init(bool bflag);
+
+	//! create a shallow copy
+	FEMaterialPoint* Copy();
+
+	//! serialize material point data
+	void Serialize(DumpFile& ar);
+
+	//! stream material point data
+	void ShallowCopy(DumpStream& dmp, bool bsave);
+
+public:
+	tens4ds	m_Ka;	//!< averaged material stiffness
+};
+
+//-----------------------------------------------------------------------------
 //! The micro-material implements material homogenization. The stress and tangents
 //! are calculated by solving a micro-structural RVE problem and return the
 //! averaged stress and condensed tangents.
@@ -32,9 +56,15 @@ public:
 	//! data initialization
 	void Init();
 
+	//! create material point data
+	FEMaterialPoint* CreateMaterialPointData();
+
 protected:
 	void PrepRVE();
+	bool SolveRVE(mat3d& F);
+	void UpdateBC(mat3d& F);
 	mat3ds AveragedStress(FEMaterialPoint& pt);
+	tens4ds AveragedStiffness(FEMaterialPoint& pt);
 
 public:
 	// declare the parameter list

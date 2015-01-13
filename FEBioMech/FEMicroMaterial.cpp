@@ -7,6 +7,57 @@
 #include "FECore/FEAnalysis.h"
 #include "FEBioXML/FEBioImport.h"
 
+//-----------------------------------------------------------------------------
+FEMicroMaterialPoint::FEMicroMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoint(mp)
+{
+}
+
+//-----------------------------------------------------------------------------
+//! Initialize material point data
+void FEMicroMaterialPoint::Init(bool bflag)
+{
+}
+
+//-----------------------------------------------------------------------------
+//! create a shallow copy
+FEMaterialPoint* FEMicroMaterialPoint::Copy()
+{
+	FEMicroMaterialPoint* pt = new FEMicroMaterialPoint(m_pt?m_pt->Copy():0);
+	pt->m_Ka = m_Ka;
+	return pt;
+}
+
+//-----------------------------------------------------------------------------
+//! serialize material point data
+void FEMicroMaterialPoint::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_Ka;
+	}
+	else
+	{
+		ar >> m_Ka;
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! stream material point data
+void FEMicroMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (bsave)
+	{
+		dmp << m_Ka;
+	}
+	else
+	{
+		dmp >> m_Ka;
+	}
+}
+
+//=============================================================================
+
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMicroMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_szrve, FE_PARAM_STRING, "RVE");
@@ -22,6 +73,12 @@ FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 //-----------------------------------------------------------------------------
 FEMicroMaterial::~FEMicroMaterial(void)
 {
+}
+
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FEMicroMaterial::CreateMaterialPointData()
+{
+	return new FEMicroMaterialPoint(new FEElasticMaterialPoint);
 }
 
 //-----------------------------------------------------------------------------
@@ -152,21 +209,9 @@ void FEMicroMaterial::PrepRVE()
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
+//! Assign the prescribed displacement to the boundary nodes.
+void FEMicroMaterial::UpdateBC(mat3d& F)
 {
-	// get the deformation gradient
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	mat3d F = pt.m_F;
-
-	// the logfile is a shared resource between the master FEM and the RVE
-	// in order not to corrupt the logfile we don't print anything for
-	// the RVE problem.
-	Logfile::MODE nmode = felog.GetMode();
-	felog.SetMode(Logfile::NEVER);
-
-	// reset the RVE
-	m_rve.Reset();
-
 	// get the mesh
 	FEMesh& m = m_rve.GetMesh();
 
@@ -187,6 +232,23 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 		dy.s = r1.y - r0.y;
 		dz.s = r1.z - r0.z;
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Solve the RVE model.
+bool FEMicroMaterial::SolveRVE(mat3d& F)
+{
+	// the logfile is a shared resource between the master FEM and the RVE
+	// in order not to corrupt the logfile we don't print anything for
+	// the RVE problem.
+	Logfile::MODE nmode = felog.GetMode();
+	felog.SetMode(Logfile::NEVER);
+
+	// reset the RVE
+	m_rve.Reset();
+
+	// apply the BC's
+	UpdateBC(F);
 
 	// solve the RVE
 	bool bret = m_rve.Solve();
@@ -194,14 +256,44 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	// reset the logfile mode
 	felog.SetMode(nmode);
 
-	if (bret == false) throw FEMultiScaleException();
-
-	// calculate the averaged stress
-	return AveragedStress(pt);
+	return bret;
 }
 
 //-----------------------------------------------------------------------------
+mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
+{
+	// get the deformation gradient
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
+	mat3d F = pt.m_F;
 
+	// solve the RVE model
+	bool bret = SolveRVE(F);
+
+	// make sure it converged
+	if (bret == false) throw FEMultiScaleException();
+
+	// calculate the averaged stress
+	mat3ds sa = AveragedStress(pt);
+
+	// calculate the averaged stiffness
+	mmpt.m_Ka = AveragedStiffness(mp);
+
+	return sa;
+}
+
+//-----------------------------------------------------------------------------
+// The stiffness is evaluated at the same time the stress is evaluated so we 
+// can just return it here. Note that this assumes that the stress function 
+// is always called prior to the tangent function.
+tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
+{
+	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
+	return mmpt.m_Ka;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the average stress from the RVE solution.
 mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 {
 	// get the deformation gradient
@@ -258,7 +350,8 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
+//! Calculate the average stiffness from the RVE solution.
+tens4ds FEMicroMaterial::AveragedStiffness(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
