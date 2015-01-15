@@ -379,12 +379,30 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	{
 		// new way for defining element type and integration rule at the same time
 		// this is useful for multi-step analyses where the geometry is read in before the control section.
-		if      (strcmp(sztype, "TET10G4"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G4; }
-		else if (strcmp(sztype, "TET10G8"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G8; }
-		else if (strcmp(sztype, "TET10GL11") == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; }
-		else if (strcmp(sztype, "TET15G11" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; }
+		if      (strcmp(sztype, "TET10G4"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G4;  }
+		else if (strcmp(sztype, "TET10G8"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G8;  }
+		else if (strcmp(sztype, "TET10GL11") == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11;}
+		else if (strcmp(sztype, "TET10G4_S3"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G4  ; m_pim->m_ntri6 = FE_TRI6G3; }
+		else if (strcmp(sztype, "TET10G8_S3"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G8  ; m_pim->m_ntri6 = FE_TRI6G3; }
+		else if (strcmp(sztype, "TET10GL11_S3") == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; m_pim->m_ntri6 = FE_TRI6G3; }
+		else if (strcmp(sztype, "TET10G4_S4"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G4  ; m_pim->m_ntri6 = FE_TRI6G4; }
+		else if (strcmp(sztype, "TET10G8_S4"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G8  ; m_pim->m_ntri6 = FE_TRI6G4; }
+		else if (strcmp(sztype, "TET10GL11_S4") == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; m_pim->m_ntri6 = FE_TRI6G4; }
+		else if (strcmp(sztype, "TET10G4_S7"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G4  ; m_pim->m_ntri6 = FE_TRI6G7; }
+		else if (strcmp(sztype, "TET10G8_S7"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G8  ; m_pim->m_ntri6 = FE_TRI6G7; }
+		else if (strcmp(sztype, "TET10GL11_S7") == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; m_pim->m_ntri6 = FE_TRI6G7; }
+		else if (strcmp(sztype, "TET15G8"  ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G8;  }
 		else if (strcmp(sztype, "TET15G11" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; }
 		else if (strcmp(sztype, "TET15G15" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; }
+		else if (strcmp(sztype, "TET15G8_S3"  ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G8 ; m_pim->m_ntri7 = FE_TRI7G3;}
+		else if (strcmp(sztype, "TET15G11_S3" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G3;}
+		else if (strcmp(sztype, "TET15G15_S3" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G3;}
+		else if (strcmp(sztype, "TET15G8_S4"  ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G8 ; m_pim->m_ntri7 = FE_TRI7G4;}
+		else if (strcmp(sztype, "TET15G11_S4" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G4;}
+		else if (strcmp(sztype, "TET15G15_S4" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G4;}
+		else if (strcmp(sztype, "TET15G8_S7"  ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G8 ; m_pim->m_ntri7 = FE_TRI7G7;}
+		else if (strcmp(sztype, "TET15G11_S7" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G7;}
+		else if (strcmp(sztype, "TET15G15_S7" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G7;}
 		else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 	}
 
