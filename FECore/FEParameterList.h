@@ -88,6 +88,9 @@ public:
 	FEParameterList(FEParamContainer* pc) : m_pc(pc) {}
 	virtual ~FEParameterList(){}
 
+	//! assignment operator
+	void operator = (FEParameterList& l);
+
 	//! Add a parameter to the list
 	void AddParameter(void* pv, FEParamType itype, int ndim, const char* sz);
 

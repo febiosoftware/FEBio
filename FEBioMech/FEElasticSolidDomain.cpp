@@ -19,12 +19,39 @@ extern "C" int omp_get_thread_num(void);
 //! to initialize another material. These derived classes will set the m_pMat variable as well.
 FEElasticSolidDomain::FEElasticSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_ELASTIC_SOLID_DOMAIN, pm)
 {
+	SetMaterial(pmat);
+}
+
+//-----------------------------------------------------------------------------
+// \todo I don't think this is being used
+FEElasticSolidDomain& FEElasticSolidDomain::operator = (FEElasticSolidDomain& d)
+{ 
+	m_Elem = d.m_Elem; 
+	m_pMesh = d.m_pMesh; 
+	return (*this); 
+}
+
+//-----------------------------------------------------------------------------
+//! Assign material
+void FEElasticSolidDomain::SetMaterial(FEMaterial* pmat)
+{
 	if (pmat)
 	{
 		m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
 		assert(m_pMat);
 	}
 	else m_pMat = 0;
+}
+
+//-----------------------------------------------------------------------------
+//! create a copy (overridden from FEDomain).
+//! Node that this creates a copy without a material assignment
+FEDomain* FEElasticSolidDomain::Copy()
+{
+	FEElasticSolidDomain* pd = new FEElasticSolidDomain(0, 0);
+	pd->m_Elem = m_Elem;
+	pd->m_Node = m_Node;
+	return this;
 }
 
 //-----------------------------------------------------------------------------

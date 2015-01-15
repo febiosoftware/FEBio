@@ -57,6 +57,9 @@ public:
 	//! \todo Delete this.
 	virtual FEMaterial* GetMaterial() { return 0; }
 
+	// assign a material to this domain
+	virtual void SetMaterial(FEMaterial* pm) {}
+
 	//! set the material ID of all elements
 	void SetMatID(int mid);
 
@@ -84,6 +87,9 @@ public: // optional functions to overload
 
 	//! reset the domain
 	virtual void Reset() {}
+
+	//! create a copy of this domain
+	virtual FEDomain* Copy() { return 0; }
 
 	//! serialize domain to archive
 	virtual void Serialize(DumpFile& ar) {}

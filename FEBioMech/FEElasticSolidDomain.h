@@ -13,8 +13,8 @@ public:
 	//! constructor
 	FEElasticSolidDomain(FEMesh* pm, FEMaterial* pmat);
 
-	//! \todo Do I really use this?
-	FEElasticSolidDomain& operator = (FEElasticSolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
+	//! assignment operator
+	FEElasticSolidDomain& operator = (FEElasticSolidDomain& d);
 
 	//! initialize class
 	bool Initialize(FEModel& fem);
@@ -25,8 +25,16 @@ public:
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
-	//! get the material (overridden from FEDomain)
+public: // overrides from FEDomain
+
+	//! get the material
 	FEMaterial* GetMaterial() { return m_pMat; }
+
+	//! set the material
+	void SetMaterial(FEMaterial* pm);
+
+	//! create a copy
+	FEDomain* Copy();
 
 public: // overrides from FEElasticDomain
 

@@ -4,6 +4,7 @@
 #include "FERigidBody.h"
 #include <string>
 #include "log.h"
+#include "FECoreKernel.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -28,6 +29,12 @@ FEModel::FEModel(void)
 //-----------------------------------------------------------------------------
 //! Delete all dynamically allocated data
 FEModel::~FEModel(void)
+{
+	Clear();
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::Clear()
 {
 	size_t i;
 	for (i=0; i<m_Step.size(); ++i) delete m_Step[i]; m_Step.clear();
@@ -931,4 +938,137 @@ FENLConstraint* FEModel::FindNLC(int nid)
 	for (int i=0; i<(int) m_NLC.size(); ++i) if (m_NLC[i]->GetID() == nid) return m_NLC[i];
 
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! This function copies the model data from the fem object. Note that it only copies
+//! the model definition, i.e. mesh, bc's, contact interfaces, etc..
+void FEModel::CopyFrom(FEModel& fem)
+{
+	// clear the current model data
+	Clear();
+
+	// --- Parameters ---
+
+	// copy parameters (not sure if I need/want to copy all of these)
+	m_nsolver = fem.m_nsolver;
+	m_bwopt   = fem.m_bwopt;
+	m_nStep   = fem.m_nStep;
+	m_ftime   = fem.m_ftime;
+	m_ftime0  = fem.m_ftime0;
+	m_nplane_strain = fem.m_nplane_strain;
+	m_debug   = fem.m_debug;
+	m_ut4_alpha = fem.m_ut4_alpha;
+	m_ut4_bdev  = fem.m_ut4_bdev;
+	m_udghex_hg = fem.m_udghex_hg;
+	m_pStep = 0;
+
+	// --- Steps ---
+
+	// copy the steps
+	// NOTE: This does not copy the boundary conditions of the steps
+	int NSTEP = fem.Steps();
+	for (int i=0; i<NSTEP; ++i)
+	{
+		// get the type string
+		FEAnalysis* ps = fem.GetStep(i);
+		const char* sztype = ps->GetTypeStr();
+
+		// create a new step
+		FEAnalysis* pnew = fecore_new<FEAnalysis>(FEANALYSIS_ID, sztype, this);
+		assert(pnew);
+
+		// copy parameter data
+		pnew->GetParameterList() = ps->GetParameterList();
+
+		// add the step
+		AddStep(pnew);
+	}
+
+	// --- Materials ---
+
+	// copy material data
+	int NMAT = fem.Materials();
+	for (int i=0; i<NMAT; ++i)
+	{
+		// get the type info from the old material
+		FEMaterial* pmat = fem.GetMaterial(i);
+		const char* sztype = pmat->GetTypeStr();
+
+		// create a new material
+		FEMaterial* pnew = fecore_new<FEMaterial>(FEMATERIAL_ID, sztype, this);
+		assert(pnew);
+
+		// copy material data
+		// we only copy material parameters
+		pnew->GetParameterList() = pmat->GetParameterList();
+
+		// add the material
+		AddMaterial(pnew);
+
+	}
+	assert(m_MAT.size() == fem.m_MAT.size());
+
+	// --- Mesh ---
+
+	// copy the mesh data
+	// NOTE: This will not assign materials to the new domains
+	m_mesh.CopyFrom(fem.m_mesh);
+	assert(m_mesh.Domains()==fem.m_mesh.Domains());
+
+	// next, we need to assign the new materials to the new domains
+	// let's first create a table of material indices for the old domains
+	int NDOM = fem.m_mesh.Domains();
+	vector<int> LUT(NDOM);
+	for (int i=0; i<NDOM; ++i)
+	{
+		FEMaterial* pm = fem.m_mesh.Domain(i).GetMaterial();
+		for (int j=0; j<NMAT; ++j)
+		{
+			if (pm == fem.m_MAT[j])
+			{
+				LUT[i] = j;
+				break;
+			}
+		}
+	}
+
+	// since both the domains and the materials are created in the same order
+	// we can use the lookup table to assign materials to domains
+	int ND = m_mesh.Domains();
+	for (int i=0; i<ND; ++i)
+	{
+		FEDomain& dom = m_mesh.Domain(i);
+		dom.SetMaterial(m_MAT[LUT[i]]);
+		assert(dom.GetMaterial());
+	}
+
+	// --- boundary conditions
+	int NDC = fem.PrescribedBCs();
+	for (int i=0; i<NDC; ++i)
+	{
+		FEPrescribedBC* pbc = fem.PrescribedBC(i);
+		FEPrescribedBC* pnew = new FEPrescribedBC(this);
+
+		// copy data
+		pnew->bc = pbc->bc;
+		pnew->br = pbc->br;
+		pnew->lc = pbc->lc;
+		pnew->node = pbc->node;
+		pnew->r = pbc->r;
+		pnew->s = pbc->s;
+
+		// add to model
+		AddPrescribedBC(pnew);
+	}
+
+	// --- Load curves ---
+
+	// copy load curves
+	int NLC = fem.LoadCurves();
+	for (int i=0; i<NLC; ++i)
+	{
+		FELoadCurve* plc = new FELoadCurve(*fem.m_LC[i]);
+		m_LC.push_back(plc);
+	}
 }

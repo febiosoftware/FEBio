@@ -85,7 +85,14 @@ struct FE_BOUNDING_BOX
 class FENode
 {
 public:
+	//! default constructor
 	FENode();
+
+	//! copy constructor
+	FENode(const FENode& n);
+
+	//! assignment operator
+	FENode& operator = (const FENode& n);
 	
 public:
 	// geometry data
@@ -231,6 +238,9 @@ public:
 
 	//! initialize mesh
 	bool Init();
+
+	//! copy the mesh
+	void CopyFrom(FEMesh& mesh);
 
 	//! allocate storage for mesh data
 	void CreateNodes(int nodes);

@@ -60,6 +60,12 @@ public:
 	// solve the model
 	virtual bool Solve();
 
+	// copy the model data
+	virtual void CopyFrom(FEModel& fem);
+
+	// clear all model data
+	void Clear();
+
 public:
 	// get the FE mesh
 	FEMesh& GetMesh() { return m_mesh; }

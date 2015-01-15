@@ -41,6 +41,66 @@ FENode::FENode()
 	m_rid = -1;
 }
 
+//-----------------------------------------------------------------------------
+FENode::FENode(const FENode& n)
+{
+	m_r0 = n.m_r0;
+	m_v0 = n.m_v0;
+	m_rt = n.m_rt;
+	m_vt = n.m_vt;
+	m_at = n.m_at;
+	m_rp = n.m_rp;
+	m_vp = n.m_vp;
+	m_ap = n.m_ap;
+	m_Fr = n.m_Fr;
+	m_D0 = n.m_D0;
+	m_Dt = n.m_Dt;
+	m_p0 = n.m_p0;
+	m_pt = n.m_pt;
+	m_T  = n.m_T;
+	m_T0 = n.m_T0;
+	m_c0 = n.m_c0;
+	m_ct = n.m_ct;
+	m_cp = n.m_cp;
+
+	m_rid = n.m_rid;
+	m_bshell = n.m_bshell;
+
+	m_ID = n.m_ID;
+	m_BC = n.m_BC;
+}
+
+//-----------------------------------------------------------------------------
+FENode& FENode::operator = (const FENode& n)
+{
+	m_r0 = n.m_r0;
+	m_v0 = n.m_v0;
+	m_rt = n.m_rt;
+	m_vt = n.m_vt;
+	m_at = n.m_at;
+	m_rp = n.m_rp;
+	m_vp = n.m_vp;
+	m_ap = n.m_ap;
+	m_Fr = n.m_Fr;
+	m_D0 = n.m_D0;
+	m_Dt = n.m_Dt;
+	m_p0 = n.m_p0;
+	m_pt = n.m_pt;
+	m_T  = n.m_T;
+	m_T0 = n.m_T0;
+	m_c0 = n.m_c0;
+	m_ct = n.m_ct;
+	m_cp = n.m_cp;
+
+	m_rid = n.m_rid;
+	m_bshell = n.m_bshell;
+
+	m_ID = n.m_ID;
+	m_BC = n.m_BC;
+
+	return (*this);
+}
+
 //=============================================================================
 // FENodeSet
 //-----------------------------------------------------------------------------
@@ -912,4 +972,29 @@ void FEMesh::DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom)
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Copy the mesh data from the passed mesh object
+void FEMesh::CopyFrom(FEMesh& mesh)
+{
+	// copy nodes
+	m_Node = mesh.m_Node;
+
+	// copy domains
+	// NOTE: This creates domains that don't have materials assigned to them
+	ClearDomains();
+	int ND = mesh.Domains();
+	for (int i=0; i<ND; ++i)
+	{
+		// copy this domain
+		FEDomain* pd = mesh.Domain(i).Copy();
+		assert(pd);
+
+		// assign the domain to this mesh
+		pd->SetMesh(this);
+
+		// add the domain
+		m_Domain.push_back(pd);
+	}	
 }

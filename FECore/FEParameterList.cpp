@@ -4,6 +4,47 @@
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
+//! This function copies the parameter data from the passed parameter list.
+//! This assumes that the two parameter lists are identical.
+void FEParameterList::operator = (FEParameterList& l)
+{
+	if (m_pl.size() != l.m_pl.size()) { assert(false); return; }
+
+	list<FEParam>::iterator ps, pd;
+	ps = l.m_pl.begin();
+	pd = m_pl.begin();
+	for (; pd != m_pl.end(); ++pd, ++ps)
+	{
+		FEParam& s = *ps;
+		FEParam& d = *pd;
+
+		if (s.m_itype != d.m_itype) { assert(false); return; }
+		if (s.m_ndim != d.m_ndim) { assert(false); return; }
+		switch (s.m_itype)
+		{
+		case FE_PARAM_INT   : d.value<int   >() = s.value<int   >(); break;
+		case FE_PARAM_BOOL  : d.value<bool  >() = s.value<bool  >(); break;
+		case FE_PARAM_DOUBLE: d.value<double>() = s.value<double>(); break;
+		case FE_PARAM_VEC3D : d.value<vec3d >() = s.value<vec3d >(); break;
+		case FE_PARAM_MAT3D : d.value<mat3d >() = s.value<mat3d >(); break;
+		case FE_PARAM_MAT3DS: d.value<mat3ds>() = s.value<mat3ds>(); break;
+		case FE_PARAM_INTV  :
+			{
+				for (int i=0; i<s.m_ndim; ++i) d.pvalue<int>()[i] = s.pvalue<int>()[i];
+			}
+			break;
+		case FE_PARAM_DOUBLEV:
+			{
+				for (int i=0; i<s.m_ndim; ++i) d.pvalue<double>()[i] = s.pvalue<double>()[i];
+			}
+			break;
+		default:
+			assert(false);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 // This function adds a parameter to the parameter list
 void FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, const char *sz)
 {
