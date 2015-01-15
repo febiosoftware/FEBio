@@ -588,6 +588,14 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		ar << (int) m_BC.size();
 		for (int i=0; i< (int) m_BC.size(); ++i) ar << m_BC[i]->GetID();
 
+		// contact interfaces
+		ar << (int) m_CI.size();
+		for (int i=0; i< (int) m_CI.size(); ++i) ar << m_CI[i]->GetID();
+
+		// non-linear constraints
+		ar << (int) m_NLC.size();
+		for (int i=0; i< (int) m_NLC.size(); ++i) ar << m_NLC[i]->GetID();
+
 		// Seriaize solver data
 		ar << m_psolver->GetTypeStr();
 		m_psolver->Serialize(ar);
@@ -641,6 +649,30 @@ void FEAnalysis::Serialize(DumpFile& ar)
 			FEBoundaryCondition* pbc = m_fem.FindBC(nbc);
 			assert(pbc);
 			m_BC.push_back(pbc);
+		}
+
+		// contact interfaces
+		int nci;
+		ar >> n;
+		m_CI.clear();
+		for (int i=0; i<n; ++i)
+		{
+			ar >> nci;
+			FESurfacePairInteraction* pci = m_fem.FindCI(nbc);
+			assert(pci);
+			m_CI.push_back(pci);
+		}
+
+		// nonlinear constraints
+		int nnlc;
+		ar >> n;
+		m_NLC.clear();
+		for (int i=0; i<n; ++i)
+		{
+			ar >> nnlc;
+			FENLConstraint* pnlc = m_fem.FindNLC(nnlc);
+			assert(pnlc);
+			m_NLC.push_back(pnlc);
 		}
 
 		// Serialize solver data

@@ -224,6 +224,12 @@ public:	// --- Miscellaneous routines ---
 	//! find a boundary condition from the ID
 	FEBoundaryCondition* FindBC(int nid);
 
+	//! find a contact interface from the ID
+	FESurfacePairInteraction* FindCI(int nid);
+
+	//! find a nonlinear constraint from the ID
+	FENLConstraint* FindNLC(int nid);
+
 	//! set callback function
 	void AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void* pd);
 

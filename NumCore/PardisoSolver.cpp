@@ -130,8 +130,11 @@ void PardisoSolver::Destroy()
 
 	//fprintf(stderr, "In Destroy\n");
 
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, m_pA->Pointers(), m_pA->Indices(),
-		 NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &m_error);
+	if (m_pA->Pointers())
+	{
+		pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, m_pA->Pointers(), m_pA->Indices(),
+			NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &m_error);
+	}
 
 	LinearSolver::Destroy();
 

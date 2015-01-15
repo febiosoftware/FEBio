@@ -914,3 +914,21 @@ FEBoundaryCondition* FEModel::FindBC(int nid)
 
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+//! Find a Contact Interface based on its ID. This is needed for restarts.
+FESurfacePairInteraction* FEModel::FindCI(int nid)
+{
+	for (int i=0; i<(int) m_CI.size(); ++i) if (m_CI[i]->GetID() == nid) return m_CI[i];
+
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Find a Nonlinear Constraint based on its ID. This is needed for restarts.
+FENLConstraint* FEModel::FindNLC(int nid)
+{
+	for (int i=0; i<(int) m_NLC.size(); ++i) if (m_NLC[i]->GetID() == nid) return m_NLC[i];
+
+	return 0;
+}

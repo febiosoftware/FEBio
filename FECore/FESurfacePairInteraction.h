@@ -35,6 +35,11 @@ public:
 	//! temporary construct to determine if contact interface uses nodal integration rule (or facet)
 	virtual bool UseNodalIntegration() = 0;
 
+	//! Get the Contact Interface ID
+	int GetID() { return m_nID; }
+
 protected:
 	int		m_nID;			//!< ID of interface
+
+	static int	m_ncount;	//!< used to create unique ID's for the contact interfaces
 };
