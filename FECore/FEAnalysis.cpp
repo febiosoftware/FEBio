@@ -318,7 +318,8 @@ bool FEAnalysis::Solve()
 		if (bconv)
 		{
 			// Yes! We have converged!
-			felog.printf("\n\n------- converged at time : %lg\n\n", m_fem.m_ftime);
+			if (GetPrintLevel() != FE_PRINT_NEVER)
+				felog.printf("\n\n------- converged at time : %lg\n\n", m_fem.m_ftime);
 
 			// update nr of completed timesteps
 			m_ntimesteps++;
@@ -405,19 +406,22 @@ bool FEAnalysis::Solve()
 		felog.SetMode(Logfile::FILE_AND_SCREEN);
 	}
 
-	// output report
-	felog.printf("\n\nN O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
-	felog.printf("\tNumber of time steps completed .................... : %d\n\n", m_ntimesteps);
-	felog.printf("\tTotal number of equilibrium iterations ............ : %d\n\n", m_ntotiter);
-	felog.printf("\tAverage number of equilibrium iterations .......... : %lg\n\n", (double) m_ntotiter / (double) m_ntimesteps);
-	felog.printf("\tTotal number of right hand evaluations ............ : %d\n\n", m_ntotrhs);
-	felog.printf("\tTotal number of stiffness reformations ............ : %d\n\n", m_ntotref);
+	if (GetPrintLevel() != FE_PRINT_NEVER)
+	{
+		// output report
+		felog.printf("\n\nN O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
+		felog.printf("\tNumber of time steps completed .................... : %d\n\n", m_ntimesteps);
+		felog.printf("\tTotal number of equilibrium iterations ............ : %d\n\n", m_ntotiter);
+		felog.printf("\tAverage number of equilibrium iterations .......... : %lg\n\n", (double) m_ntotiter / (double) m_ntimesteps);
+		felog.printf("\tTotal number of right hand evaluations ............ : %d\n\n", m_ntotrhs);
+		felog.printf("\tTotal number of stiffness reformations ............ : %d\n\n", m_ntotref);
 
-	// get and print elapsed time
-	char sztime[64];
+		// get and print elapsed time
+		char sztime[64];
 
-	m_psolver->m_SolverTime.time_str(sztime);
-	felog.printf("\tTime in solver: %s\n\n", sztime);
+		m_psolver->m_SolverTime.time_str(sztime);
+		felog.printf("\tTime in solver: %s\n\n", sztime);
+	}
 
 	return bconv;
 }

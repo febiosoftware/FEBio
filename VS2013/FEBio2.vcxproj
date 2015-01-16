@@ -140,7 +140,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug OMP|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)\..;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\Debug;$(MKLDir)\ia32\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\Debug OMP;$(MKLDir)\ia32\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>

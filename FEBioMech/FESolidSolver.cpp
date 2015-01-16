@@ -342,6 +342,8 @@ bool FESolidSolver::CreateStiffness(bool breset)
 	// clean up the stiffness matrix
 	m_pK->Clear();
 
+	int nmode = felog.GetMode();
+
 	// create the stiffness matrix
 	felog.printf("===== reforming stiffness matrix:\n");
 	if (m_pK->Create(&GetFEModel(), m_neq, breset) == false) 
@@ -1405,14 +1407,15 @@ bool FESolidSolver::Quasin(double time)
 	// print a convergence summary to the felog file
 	if (bconv)
 	{
-		Logfile::MODE mode = felog.SetMode(Logfile::FILE_ONLY);
+		Logfile::MODE mode = felog.GetMode();
 		if (mode != Logfile::NEVER)
 		{
+			felog.SetMode(Logfile::FILE_ONLY);
 			felog.printf("\nconvergence summary\n");
 			felog.printf("    number of iterations   : %d\n", m_niter);
 			felog.printf("    number of reformations : %d\n", m_nref);
+			felog.SetMode(mode);
 		}
-		felog.SetMode(mode);
 	}
 
 	// if converged we update the total displacements

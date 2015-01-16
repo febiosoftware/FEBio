@@ -702,6 +702,16 @@ void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 {
 	double dt = fem.GetCurrentStep()->m_dt;
 
+	// TODO: This is temporary hack for running micro-materials in parallel. 
+	//	     Evaluating the stress for a micro-material will make FEBio solve
+	//       a new FE problem. We don't want to see the output of that problem.
+	//       The logfile is a shared resource between the master FEM and the RVE
+	//       in order not to corrupt the logfile we don't print anything for
+	//       the RVE problem.
+	// TODO: Maybe I need to create a new domain class for micro-material.
+	Logfile::MODE nmode = felog.GetMode();
+	felog.SetMode(Logfile::NEVER);
+
 	bool berr = false;
 	int NE = (int) m_Elem.size();
 	#pragma omp parallel for shared(NE, berr)
@@ -713,12 +723,18 @@ void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 		}
 		catch (NegativeJacobian e)
 		{
+			// reset the logfile mode
+			felog.SetMode(nmode);
+
 			// A negative jacobian was detected
 			felog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
 			#pragma omp critical
 			berr = true;
 		}
 	}
+
+	// reset the logfile mode
+	felog.SetMode(nmode);
 
 	// if we encountered an error, we request a running restart
 	if (berr) throw DoRunningRestart();

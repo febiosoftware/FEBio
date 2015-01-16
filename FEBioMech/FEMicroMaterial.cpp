@@ -245,24 +245,16 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	// Create a local copy of the rve
 	FEModel rve;
 	rve.CopyFrom(m_rve);
+	rve.GetStep(0)->SetPrintLevel(FE_PRINT_NEVER);
 
 	// initialize
 	if (rve.Init() == false) throw FEMultiScaleException();
-
-	// the logfile is a shared resource between the master FEM and the RVE
-	// in order not to corrupt the logfile we don't print anything for
-	// the RVE problem.
-	Logfile::MODE nmode = felog.GetMode();
-	felog.SetMode(Logfile::NEVER);
 
 	// apply the BC's
 	UpdateBC(rve, F);
 
 	// solve the RVE
 	bool bret = rve.Solve();
-
-	// reset the logfile mode
-	felog.SetMode(nmode);
 
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException();
