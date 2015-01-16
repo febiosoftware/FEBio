@@ -51,6 +51,12 @@ FEAnalysis::FEAnalysis(FEModel* pfem, int ntype) : FECoreBase(FEANALYSIS_ID), m_
 }
 
 //-----------------------------------------------------------------------------
+FEAnalysis::~FEAnalysis()
+{
+	if (m_psolver) delete m_psolver;
+}
+
+//-----------------------------------------------------------------------------
 //! Return a domain
 FEDomain* FEAnalysis::Domain(int i)
 {

@@ -22,7 +22,7 @@ public:
 	FEAnalysis(FEModel* pfem, int ntype);
 
 	//! destructor
-	virtual ~FEAnalysis(){}
+	virtual ~FEAnalysis();
 
 	//! Data initialization
 	virtual bool Init();
