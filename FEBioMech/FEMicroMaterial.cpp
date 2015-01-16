@@ -210,18 +210,18 @@ void FEMicroMaterial::PrepRVE()
 
 //-----------------------------------------------------------------------------
 //! Assign the prescribed displacement to the boundary nodes.
-void FEMicroMaterial::UpdateBC(mat3d& F)
+void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 {
 	// get the mesh
-	FEMesh& m = m_rve.GetMesh();
+	FEMesh& m = rve.GetMesh();
 
 	// assign new DC's for the boundary nodes
-	int N = m_rve.PrescribedBCs()/3, i;
+	int N = rve.PrescribedBCs()/3, i;
 	for (i=0; i<N; ++i)
 	{
-		FEPrescribedBC& dx = *m_rve.PrescribedBC(3*i  );
-		FEPrescribedBC& dy = *m_rve.PrescribedBC(3*i+1);
-		FEPrescribedBC& dz = *m_rve.PrescribedBC(3*i+2);
+		FEPrescribedBC& dx = *rve.PrescribedBC(3*i  );
+		FEPrescribedBC& dy = *rve.PrescribedBC(3*i+1);
+		FEPrescribedBC& dz = *rve.PrescribedBC(3*i+2);
 
 		FENode& node = m.Node(dx.node);
 
@@ -235,31 +235,6 @@ void FEMicroMaterial::UpdateBC(mat3d& F)
 }
 
 //-----------------------------------------------------------------------------
-//! Solve the RVE model.
-bool FEMicroMaterial::SolveRVE(mat3d& F)
-{
-	// the logfile is a shared resource between the master FEM and the RVE
-	// in order not to corrupt the logfile we don't print anything for
-	// the RVE problem.
-	Logfile::MODE nmode = felog.GetMode();
-	felog.SetMode(Logfile::NEVER);
-
-	// reset the RVE
-	m_rve.Reset();
-
-	// apply the BC's
-	UpdateBC(F);
-
-	// solve the RVE
-	bool bret = m_rve.Solve();
-
-	// reset the logfile mode
-	felog.SetMode(nmode);
-
-	return bret;
-}
-
-//-----------------------------------------------------------------------------
 mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 {
 	// get the deformation gradient
@@ -267,17 +242,36 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
 	mat3d F = pt.m_F;
 
-	// solve the RVE model
-	bool bret = SolveRVE(F);
+	// Create a local copy of the rve
+	FEModel rve;
+	rve.CopyFrom(m_rve);
+
+	// initialize
+	if (rve.Init() == false) throw FEMultiScaleException();
+
+	// the logfile is a shared resource between the master FEM and the RVE
+	// in order not to corrupt the logfile we don't print anything for
+	// the RVE problem.
+	Logfile::MODE nmode = felog.GetMode();
+	felog.SetMode(Logfile::NEVER);
+
+	// apply the BC's
+	UpdateBC(rve, F);
+
+	// solve the RVE
+	bool bret = rve.Solve();
+
+	// reset the logfile mode
+	felog.SetMode(nmode);
 
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException();
 
 	// calculate the averaged stress
-	mat3ds sa = AveragedStress(pt);
+	mat3ds sa = AveragedStress(rve, mp);
 
 	// calculate the averaged stiffness
-	mmpt.m_Ka = AveragedStiffness(mp);
+	mmpt.m_Ka = AveragedStiffness(rve, mp);
 
 	return sa;
 }
@@ -294,50 +288,25 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the average stress from the RVE solution.
-mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
+mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 {
-	// get the deformation gradient
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	mat3d F = pt.m_F;
 	double J = pt.m_J;
 
-	// get the mesh
-	FEMesh& m = m_rve.GetMesh();
-/*
-	mat3ds s(0);
-	double V = 0, ve;
-	int nint, n, i;
-	double* w, J;
-	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(0));
-	for (i=0; i<bd.Elements(); ++i)
-	{
-		FESolidElement& el = bd.Element(i);
-		m.UnpackElement(el);
-		nint = el.GaussPoints();
-		w = el.GaussWeights();
-		ve = 0;
-		for (n=0; n<nint; ++n)
-		{
-			FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-			J = bd.detJt(el, n);
+	// get the RVE mesh
+	FEMesh& m = rve.GetMesh();
 
-			ve += J*w[n];
-			s += pt.s*(J*w[n]);
-		}
-		V += ve;
-	}
-	s /= V;
-*/
 	// get the reaction force vector from the solid solver
-	FEAnalysis* pstep = m_rve.GetCurrentStep();
+	FEAnalysis* pstep = rve.GetCurrentStep();
 	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 	mat3d T; T.zero();
-	int nbc = m_rve.PrescribedBCs();
+	int nbc = rve.PrescribedBCs();
 	for (int i=0; i<nbc/3; ++i)
 	{
-		FEPrescribedBC& dc = *m_rve.PrescribedBC(3*i);
+		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
 		FENode& n = m.Node(dc.node);
 		vec3d f;
 		f.x = R[-n.m_ID[DOF_X]-2];
@@ -345,21 +314,20 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 		f.z = R[-n.m_ID[DOF_Z]-2];
 		T += f & n.m_rt;
 	}
-	mat3ds s = T.sym() / (J*m_V0);
-	return s;
+	return T.sym() / (J*m_V0);
 }
 
 //-----------------------------------------------------------------------------
 //! Calculate the average stiffness from the RVE solution.
-tens4ds FEMicroMaterial::AveragedStiffness(FEMaterialPoint &mp)
+tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// get the mesh
-	FEMesh& m = m_rve.GetMesh();
+	FEMesh& m = rve.GetMesh();
 
 	// get the solver
-	FEAnalysis* pstep = m_rve.GetCurrentStep();
+	FEAnalysis* pstep = rve.GetCurrentStep();
 	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// the element's stiffness matrix
@@ -410,7 +378,7 @@ tens4ds FEMicroMaterial::AveragedStiffness(FEMaterialPoint &mp)
 				ke.zero();
 
 				// calculate the element's stiffness matrix
-				bd.ElementStiffness(m_rve, n, ke);
+				bd.ElementStiffness(rve, n, ke);
 
 				// create the element's residual
 				fe.assign(ndof, 0);
@@ -577,7 +545,7 @@ tens4ds FEMicroMaterial::AveragedStiffness(FEMaterialPoint &mp)
 				ke.zero();
 
 				// calculate the element's stiffness matrix
-				bd.ElementStiffness(m_rve, n, ke);
+				bd.ElementStiffness(rve, n, ke);
 
 				// create the element's residual
 				fe.assign(ndof, 0);

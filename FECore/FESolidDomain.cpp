@@ -15,6 +15,7 @@ bool FESolidDomain::Initialize(FEModel &fem)
 
 	int NE = Elements();
 	int n = 0;
+	m_Node.clear();
 	m_Node.reserve(N);
 	for (i=0; i<NE; ++i)
 	{

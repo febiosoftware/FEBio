@@ -51,7 +51,7 @@ FEDomain* FEElasticSolidDomain::Copy()
 	FEElasticSolidDomain* pd = new FEElasticSolidDomain(0, 0);
 	pd->m_Elem = m_Elem;
 	pd->m_Node = m_Node;
-	return this;
+	return pd;
 }
 
 //-----------------------------------------------------------------------------

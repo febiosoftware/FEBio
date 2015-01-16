@@ -981,6 +981,34 @@ void FEModel::CopyFrom(FEModel& fem)
 		// copy parameter data
 		pnew->GetParameterList() = ps->GetParameterList();
 
+		// copy additional info
+		pnew->m_nanalysis = ps->m_nanalysis;
+		pnew->m_istiffpr = ps->m_istiffpr;
+		pnew->m_baugment = ps->m_baugment;
+
+		pnew->m_ntime		= ps->m_ntime;
+		pnew->m_final_time	= ps->m_final_time;
+		pnew->m_dt			= ps->m_dt;
+		pnew->m_dt0			= ps->m_dt0;
+		pnew->m_tstart		= ps->m_tstart;
+		pnew->m_tend		= ps->m_tend;
+		pnew->m_bautostep	= ps->m_bautostep;
+		pnew->m_iteopt		= ps->m_iteopt;
+		pnew->m_dtmin		= ps->m_dtmin;
+		pnew->m_dtmax		= ps->m_dtmax;
+		pnew->m_ddt			= ps->m_ddt;
+		pnew->m_nmplc		= ps->m_nmplc;
+		pnew->m_naggr		= ps->m_naggr;
+
+		// copy the solver
+		FESolver* psolver = ps->m_psolver;
+		sztype = psolver->GetTypeStr();
+
+		// create a new solver
+		FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, sztype, this);
+		assert(pnew_solver);
+		pnew->m_psolver = pnew_solver;
+
 		// add the step
 		AddStep(pnew);
 	}
@@ -1043,7 +1071,8 @@ void FEModel::CopyFrom(FEModel& fem)
 		assert(dom.GetMaterial());
 	}
 
-	// --- boundary conditions
+	// --- boundary conditions ---
+
 	int NDC = fem.PrescribedBCs();
 	for (int i=0; i<NDC; ++i)
 	{

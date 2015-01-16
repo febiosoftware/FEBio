@@ -61,10 +61,9 @@ public:
 
 protected:
 	void PrepRVE();
-	bool SolveRVE(mat3d& F);
-	void UpdateBC(mat3d& F);
-	mat3ds AveragedStress(FEMaterialPoint& pt);
-	tens4ds AveragedStiffness(FEMaterialPoint& pt);
+	void UpdateBC(FEModel& rve, mat3d& F);
+	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint& pt);
+	tens4ds AveragedStiffness(FEModel& rve, FEMaterialPoint& pt);
 
 public:
 	// declare the parameter list
