@@ -13,7 +13,7 @@
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEOsmoticVirialExpansion, FEElasticMaterial)
     ADD_PARAMETER(m_phiwr, FE_PARAM_DOUBLE, "phiw0");
-    ADD_PARAMETER(m_cr, FE_PARAM_DOUBLE, "c0");
+    ADD_PARAMETER(m_cr, FE_PARAM_DOUBLE, "cr");
     ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");
     ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
     ADD_PARAMETER(m_c3, FE_PARAM_DOUBLE, "c3");
