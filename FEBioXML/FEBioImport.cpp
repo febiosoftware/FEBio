@@ -251,7 +251,7 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 	m_ntet4  = FE_TET4G1;
 	m_nhex8  = FE_HEX8G8;
 	m_ntet10 = FE_TET10G4;
-	m_ntet15 = FE_TET15G8;
+	m_ntet15 = FE_TET15G15;
 	m_ntri6  = FE_TRI6G3;
 	m_ntri3  = FE_TRI3G3;
 	m_ntri7  = FE_TRI7G7;
