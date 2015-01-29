@@ -37,16 +37,22 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 		{
 			const char* sz = tag.AttributeValue("file", true);
 
-			// if we have a path, prepend the path's name
-			const char* szpath = m_pim->m_szpath;
-			char szfile[1024] = {0};
-			if (szpath && szpath[0])
+			NodeDataRecord* prec = 0;
+			if (sz)
 			{
-				sprintf(szfile, "%s%s", szpath, sz);
-			}
-			else strcpy(szfile, sz);
+				// if we have a path, prepend the path's name
+				const char* szpath = m_pim->m_szpath;
+				char szfile[1024] = {0};
+				if (szpath && szpath[0])
+				{
+					sprintf(szfile, "%s%s", szpath, sz);
+				}
+				else strcpy(szfile, sz);
 
-			NodeDataRecord* prec = new NodeDataRecord(&fem, szfile);
+				prec = new NodeDataRecord(&fem, szfile);
+			}
+			else prec = new NodeDataRecord(&fem, 0);
+
 			const char* szdata = tag.AttributeValue("data");
 			prec->Parse(szdata);
 
@@ -81,16 +87,21 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 		{
 			const char* sz = tag.AttributeValue("file", true);
 
-			// if we have a path, prepend the path's name
-			const char* szpath = m_pim->m_szpath;
-			char szfile[1024] = {0};
-			if (szpath && szpath[0])
+			ElementDataRecord* prec = 0;
+			if (sz)
 			{
-				sprintf(szfile, "%s%s", szpath, sz);
+				// if we have a path, prepend the path's name
+				const char* szpath = m_pim->m_szpath;
+				char szfile[1024] = {0};
+				if (szpath && szpath[0])
+				{
+					sprintf(szfile, "%s%s", szpath, sz);
+				}
+				else strcpy(szfile, sz);
+				prec = new ElementDataRecord(&fem, szfile);
 			}
-			else strcpy(szfile, sz);
+			else prec = new ElementDataRecord(&fem, 0);
 
-			ElementDataRecord* prec = new ElementDataRecord(&fem, szfile);
 			const char* szdata = tag.AttributeValue("data");
 			prec->Parse(szdata);
 
@@ -125,16 +136,21 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 		{
 			const char* sz = tag.AttributeValue("file", true);
 
-			// if we have a path, prepend the path's name
-			const char* szpath = m_pim->m_szpath;
-			char szfile[1024] = {0};
-			if (szpath && szpath[0])
+			ObjectDataRecord* prec = 0;
+			if (sz)
 			{
-				sprintf(szfile, "%s%s", szpath, sz);
+				// if we have a path, prepend the path's name
+				const char* szpath = m_pim->m_szpath;
+				char szfile[1024] = {0};
+				if (szpath && szpath[0])
+				{
+					sprintf(szfile, "%s%s", szpath, sz);
+				}
+				else strcpy(szfile, sz);
+				prec = new ObjectDataRecord(&fem, szfile);
 			}
-			else strcpy(szfile, sz);
+			else prec = new ObjectDataRecord(&fem, 0);
 
-			ObjectDataRecord* prec = new ObjectDataRecord(&fem, szfile);
 			const char* szdata = tag.AttributeValue("data");
 			prec->Parse(szdata);
 
