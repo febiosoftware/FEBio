@@ -25,8 +25,6 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	const char* sz;
-
 	// see if the log file has any attributes
 	const char* szlog = tag.AttributeValue("file", true);
 	if (szlog) m_pim->SetLogfileName(szlog);
@@ -37,9 +35,18 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 	{
 		if (tag == "node_data")
 		{
-			sz = tag.AttributeValue("file", true);
+			const char* sz = tag.AttributeValue("file", true);
 
-			NodeDataRecord* prec = new NodeDataRecord(&fem, sz);
+			// if we have a path, prepend the path's name
+			const char* szpath = m_pim->m_szpath;
+			char szfile[1024] = {0};
+			if (szpath && szpath[0])
+			{
+				sprintf(szfile, "%s%s", szpath, sz);
+			}
+			else strcpy(szfile, sz);
+
+			NodeDataRecord* prec = new NodeDataRecord(&fem, szfile);
 			const char* szdata = tag.AttributeValue("data");
 			prec->Parse(szdata);
 
@@ -72,9 +79,18 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 		}
 		else if (tag == "element_data")
 		{
-			sz = tag.AttributeValue("file", true);
+			const char* sz = tag.AttributeValue("file", true);
 
-			ElementDataRecord* prec = new ElementDataRecord(&fem, sz);
+			// if we have a path, prepend the path's name
+			const char* szpath = m_pim->m_szpath;
+			char szfile[1024] = {0};
+			if (szpath && szpath[0])
+			{
+				sprintf(szfile, "%s%s", szpath, sz);
+			}
+			else strcpy(szfile, sz);
+
+			ElementDataRecord* prec = new ElementDataRecord(&fem, szfile);
 			const char* szdata = tag.AttributeValue("data");
 			prec->Parse(szdata);
 
@@ -107,9 +123,18 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 		}
 		else if (tag == "rigid_body_data")
 		{
-			sz = tag.AttributeValue("file", true);
+			const char* sz = tag.AttributeValue("file", true);
 
-			ObjectDataRecord* prec = new ObjectDataRecord(&fem, sz);
+			// if we have a path, prepend the path's name
+			const char* szpath = m_pim->m_szpath;
+			char szfile[1024] = {0};
+			if (szpath && szpath[0])
+			{
+				sprintf(szfile, "%s%s", szpath, sz);
+			}
+			else strcpy(szfile, sz);
+
+			ObjectDataRecord* prec = new ObjectDataRecord(&fem, szfile);
 			const char* szdata = tag.AttributeValue("data");
 			prec->Parse(szdata);
 

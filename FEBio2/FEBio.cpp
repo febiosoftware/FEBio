@@ -124,7 +124,11 @@ void update_console_cb(FEModel* pfem, void* pd)
 	Console* pShell = Console::GetHandle();
 
 	char szvers[32] = {0};
+#ifdef _DEBUG
+	sprintf(szvers, "FEBio (DEBUG BUILD) %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
+#else
 	sprintf(szvers, "FEBio %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
+#endif
 
 	// print progress in title bar
 	const char* szfile = fem.GetFileTitle();

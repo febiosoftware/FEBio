@@ -452,6 +452,9 @@ void FEAnalysis::Retry()
 	// increase retry counter
 	m_nretries++;
 
+	// the new time step cannot be a must-point
+	m_nmust = -1;
+
 	m_dt = dtn;
 }
 

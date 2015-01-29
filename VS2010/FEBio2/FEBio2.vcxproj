@@ -238,7 +238,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir);$(MKLDir)\ia32\lib;$(LMDir)\lib;$(ZLibDir)\lib;$(LibraryPath)</LibraryPath>
-    <TargetName>$(ProjectName)</TargetName>
+    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
     <LinkIncremental>true</LinkIncremental>
