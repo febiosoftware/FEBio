@@ -1,9 +1,7 @@
 //
 //  FEFiberIntegrationGaussKronrodUC.cpp
-//  FEBioMech
+//  FEBioXCode4
 //
-//  Created by Gerard Ateshian on 8/5/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
 //
 
 #include "stdafx.h"
@@ -21,19 +19,18 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberIntegrationGaussKronrodUC, FEFiberIntegrationSchemeUC)
-    ADD_PARAMETER(m_nph, FE_PARAM_INT, "nph");
-    ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
+ADD_PARAMETER(m_nph, FE_PARAM_INT, "nph");
+ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
 END_PARAMETER_LIST();
 
 void FEFiberIntegrationGaussKronrodUC::Init()
 {
-	if (m_nph < 1) throw MaterialError("nph must be strictly greater than zero.");
-	if (m_nth < 1) throw MaterialError("nth must be strictly greater than zero.");
+    if (m_nth < 1) throw MaterialError("nth must be strictly greater than zero.");
     
-	m_bfirst = true;
-	
-	if (m_bfirst)
-	{
+    m_bfirst = true;
+    
+    if (m_bfirst)
+    {
         switch (m_nph) {
             case 7:
                 m_gp.assign(gp7, gp7+nint7);
@@ -63,7 +60,7 @@ void FEFiberIntegrationGaussKronrodUC::Init()
                 throw MaterialError("nph must be 7, 11, 15, 19, 23, or 27.");
                 break;
         }
-		m_bfirst = false;
+        m_bfirst = false;
     }
     
     // also initialize the parent class
@@ -79,8 +76,8 @@ mat3ds FEFiberIntegrationGaussKronrodUC::DevStress(FEMaterialPoint& mp)
     mat3d QT = (pt.m_Q).transpose();
     
     // right Cauchy-Green tensor and its eigenvalues & eigenvectors
-    mat3ds E = pt.Strain();
-    mat3ds C = pt.RightCauchyGreen();
+    mat3ds C = pt.DevRightCauchyGreen();
+    mat3ds E = (C - mat3dd(1))/2;
     double lE[3], lC[3];
     vec3d vE[3], vC[3];
     E.eigen2(lE,vE);//lE[2]>lE[1]>lE[0]
@@ -218,7 +215,8 @@ tens4ds FEFiberIntegrationGaussKronrodUC::DevTangent(FEMaterialPoint& mp)
     mat3d QT = (pt.m_Q).transpose();
     
     // right Cauchy-Green tensor and its eigenvalues & eigenvectors
-    mat3ds E = pt.Strain();
+    mat3ds C = pt.DevRightCauchyGreen();
+    mat3ds E = (C - mat3dd(1))/2;
     double lE[3];
     vec3d vE[3];
     E.eigen2(lE, vE);
@@ -354,7 +352,8 @@ double FEFiberIntegrationGaussKronrodUC::DevStrainEnergyDensity(FEMaterialPoint&
     mat3d QT = (pt.m_Q).transpose();
     
     // right Cauchy-Green tensor and its eigenvalues & eigenvectors
-    mat3ds E = pt.Strain();
+    mat3ds C = pt.DevRightCauchyGreen();
+    mat3ds E = (C - mat3dd(1))/2;
     double lE[3];
     vec3d vE[3];
     E.eigen2(lE, vE);
@@ -523,6 +522,6 @@ void FEFiberIntegrationGaussKronrodUC::IntegratedFiberDensity(double& IFD)
         }
     }
     
-	// we multiply by two to add contribution from other half-sphere
-	IFD = C*2;
+    // we multiply by two to add contribution from other half-sphere
+    IFD = C*2;
 }
