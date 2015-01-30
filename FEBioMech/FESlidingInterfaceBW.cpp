@@ -529,6 +529,7 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
 				
 				if ((g > R) || ((!m_btension) && (Ln < 0)) ) {
 //				if ((g > R) || (Ln < 0) )
+                    data.m_Lmd = 0;
 					data.m_pme = 0;
 					data.m_gap = 0;
 				}

@@ -810,11 +810,11 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 				}
 				else
 				{
-//					pt.m_Lmd = 0;
+					pt.m_Lmd = 0;
 					pt.m_gap = 0;
 					pt.m_pme = 0;
 					if (sporo) {
-//						pt.m_Lmp = 0;
+						pt.m_Lmp = 0;
 						pt.m_pg = 0;
 					}
 				}
@@ -1814,7 +1814,7 @@ bool FESlidingInterface2::Augment(int naug)
 		felog.printf("    maximum pgap : %15le", maxpg);
 		if (m_ptol > 0) felog.printf("%15le\n", m_ptol); else felog.printf("       ***\n");
 	}
-	
+    
 	return bconv;
 }
 

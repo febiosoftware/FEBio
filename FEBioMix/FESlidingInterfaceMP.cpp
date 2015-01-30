@@ -1128,12 +1128,15 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
 				}
 				else
 				{
+                    pt.m_Lmd = 0;
 					pt.m_gap = 0;
 					pt.m_pme = 0;
 					if (sporo) {
+                        pt.m_Lmp = 0;
 						pt.m_pg = 0;
 					}
 					for (int isol=0; isol<nsol; ++isol) {
+                        pt.m_Lmc[m_ssl[isol]] = 0;
 						pt.m_cg[m_ssl[isol]] = 0;
 					}
 				}
