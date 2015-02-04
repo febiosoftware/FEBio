@@ -88,6 +88,7 @@ public:
 	double	m_stol;			//!< search tolerance
 	double  m_srad;			//!< search radius (%)
 	bool	m_btwo_pass;	//!< two-pass flag
+	vec3d	m_off;			//!< relative displacement offset
 
 	DECLARE_PARAMETER_LIST();
 };

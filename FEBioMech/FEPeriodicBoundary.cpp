@@ -12,7 +12,8 @@ BEGIN_PARAMETER_LIST(FEPeriodicBoundary, FEContactInterface)
 	ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"   );
 	ADD_PARAMETER(m_atol     , FE_PARAM_DOUBLE, "tolerance");
 	ADD_PARAMETER(m_eps      , FE_PARAM_DOUBLE, "penalty"  );
-	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"  );
+	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass" );
+	ADD_PARAMETER(m_off      , FE_PARAM_VEC3D , "offset"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -98,6 +99,7 @@ FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem)
 	m_atol = 0;
 	m_eps = 0;
 	m_btwo_pass = false;
+	m_off = vec3d(0,0,0);
 
 	m_nID = count++;
 
@@ -234,6 +236,9 @@ void FEPeriodicBoundary::Update(int niter)
 		FEPeriodicSurface& ss = (np == 0? m_ss : m_ms);
 		FEPeriodicSurface& ms = (np == 0? m_ms : m_ss);
 
+		// off-set sign
+		double s = (np==0?1.0:-1.0);
+
 		int N = ss.Nodes();
 
 		for (i=0; i<N; ++i)
@@ -255,7 +260,7 @@ void FEPeriodicBoundary::Update(int niter)
 			um = pme->eval(umi, ss.m_rs[i][0], ss.m_rs[i][1]);
 
 			// calculate gap function
-			ss.m_gap[i] = us - um;
+			ss.m_gap[i] = us - um + m_off*s;
 		}
 	}
 }
