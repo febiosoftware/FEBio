@@ -196,6 +196,22 @@ void FENodeElemList::Create(FEDomain& dom)
 	}
 }
 
+//-----------------------------------------------------------------------------
+//! Save data to dump file
+
+void FENodeElemList::Serialize(DumpFile& ar)
+{
+
+	if (ar.IsSaving())
+	{
+		ar << m_nval << m_eref << m_iref << m_pn;
+	}
+	else
+	{
+		ar >> m_nval >> m_eref >> m_iref >> m_pn;
+	}
+}
+
 
 //-----------------------------------------------------------------------------
 void FENodeElemTree::Create(FESurface* ps, int k)

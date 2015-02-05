@@ -618,6 +618,11 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 			ar << ntype << ne;
 			d.Serialize(ar);
 		}
+
+		// write node element list
+		FENodeElemList nel = m.NodeElementList();
+		nel.Serialize(ar);
+
 	}
 	else
 	{
@@ -678,6 +683,10 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 			m.AddDomain(pd);
 		}
 
+		// read node element list
+		FENodeElemList nel = m.NodeElementList();
+		nel.Serialize(ar);
+
 		m.UpdateBox();
 	}
 }
@@ -720,6 +729,11 @@ void FEBioModel::SerializeContactData(DumpFile &ar)
 
 			// add interface to list
 			AddSurfacePairInteraction(pci);
+
+			// add surfaces to mesh
+			FEMesh& m = m_mesh;
+			m.AddSurface(pci->GetMasterSurface());
+			m.AddSurface(pci->GetSlaveSurface());
 		}	
 	}
 }
@@ -790,7 +804,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		{
 			FERigidBodyForce& fc = *m_RFC[i];
 			ar << fc.GetID() << fc.IsActive();
-			ar << fc.bc << fc.id << fc.lc << fc.sf;
+			ar << fc.ntype << fc.bc << fc.id << fc.lc << fc.sf;
 		}
 
 		// rigid nodes
@@ -917,7 +931,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		{
 			FERigidBodyForce* pfc = new FERigidBodyForce(this);
 			ar >> nid >> bactive;
-			ar >> pfc->bc >> pfc->id >> pfc->lc >> pfc->sf;
+			ar >> pfc->ntype >> pfc->bc >> pfc->id >> pfc->lc >> pfc->sf;
 			pfc->SetID(nid);
 			if (bactive) pfc->Activate(); else pfc->Deactivate();
 			m_RFC.push_back(pfc);

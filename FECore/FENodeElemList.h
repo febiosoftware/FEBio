@@ -9,6 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "DumpFile.h"
 #include <vector>
 
 class FESurface;
@@ -37,6 +38,9 @@ public:
 
 	//! build the node-element list for a domain
 	void Create(FEDomain& dom);
+
+	//! serialize data to/from dump file
+	void Serialize(DumpFile& ar);
 
 	int MaxValence();
 	int Valence(int n) { return m_nval[n]; }
