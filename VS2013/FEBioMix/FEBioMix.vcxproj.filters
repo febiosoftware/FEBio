@@ -204,6 +204,9 @@
     <ClInclude Include="..\..\FEBioMix\FEActiveMomentumSupply.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMix\FEReactionRateExpSED.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMix\FEBioMix.cpp">
@@ -387,6 +390,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMix\FEActiveMomentumSupply.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMix\FEReactionRateExpSED.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
