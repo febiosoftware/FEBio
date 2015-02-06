@@ -34,6 +34,7 @@ public:
 	int			m_ndim;		// dimension of array
 	int			m_nlc;		// load curve number for dynamic parameters (-1 for static)
 	double		m_scl;		// load curve scale factor
+	vec3d		m_vscl;		// scale factor for vectors
 
 	FEParam()
 	{
@@ -42,6 +43,7 @@ public:
 		m_ndim = 1;
 		m_nlc = -1;
 		m_scl = 1.0;
+		m_vscl = vec3d(0,0,0);
 	}
 
 public:

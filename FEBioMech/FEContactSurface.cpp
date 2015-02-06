@@ -12,16 +12,16 @@ FEContactSurface::~FEContactSurface() { m_pSibling = 0; }
 void FEContactSurface::SetSibling(FEContactSurface* ps) { m_pSibling = ps; }
 
 //-----------------------------------------------------------------------------
-void FEContactSurface::GetNodalContactGap(int nface, double* pg) { assert(false); }
+void FEContactSurface::GetNodalContactGap(int nface, double* pg) {}
 
 //-----------------------------------------------------------------------------
-void FEContactSurface::GetNodalContactPressure(int nface, double* pg) { assert(false); }
+void FEContactSurface::GetNodalContactPressure(int nface, double* pg) {}
 
 //-----------------------------------------------------------------------------
-void FEContactSurface::GetNodalContactTraction(int nface, vec3d* pt) { assert(false); }
+void FEContactSurface::GetNodalContactTraction(int nface, vec3d* pt) {}
 
 //-----------------------------------------------------------------------------
-vec3d FEContactSurface::GetContactForce() { assert(false); return vec3d(0,0,0); }
+vec3d FEContactSurface::GetContactForce() { return vec3d(0,0,0); }
 
 //-----------------------------------------------------------------------------
-double FEContactSurface::GetContactArea() { assert(false); return 0; }
+double FEContactSurface::GetContactArea() { return 0; }

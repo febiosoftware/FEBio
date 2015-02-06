@@ -226,6 +226,7 @@ void FEParamContainer::Serialize(DumpFile& ar)
 			FEParam& p = *it++;
 			ar << p.m_nlc;
 			ar << p.m_scl;
+			ar << p.m_vscl;
 			ar << (int) p.m_itype;
 			switch (p.m_itype)
 			{
@@ -269,6 +270,7 @@ void FEParamContainer::Serialize(DumpFile& ar)
 				FEParam& p = *it++;
 				ar >> p.m_nlc;
 				ar >> p.m_scl;
+				ar >> p.m_vscl;
 				int ntype;
 				ar >> ntype;
 				if (ntype != p.m_itype) throw DumpFile::ReadError();

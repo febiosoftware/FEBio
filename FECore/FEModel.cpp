@@ -804,6 +804,7 @@ void FEModel::EvaluateParameterList(FEParameterList &pl)
 			case FE_PARAM_INT   : pi->value<int>() = (int) v; break;
 			case FE_PARAM_DOUBLE: pi->value<double>() = pi->m_scl*v; break;
 			case FE_PARAM_BOOL  : pi->value<bool>() = (v > 0? true : false); break;
+			case FE_PARAM_VEC3D : pi->value<vec3d>() = pi->m_vscl*v; break;
 			default: 
 				assert(false);
 			}

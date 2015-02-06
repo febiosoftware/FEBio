@@ -573,6 +573,7 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 					switch (pp->m_itype)
 					{
 					case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
+					case FE_PARAM_VEC3D : pp->m_vscl = pp->value<vec3d>(); break;
 					}
 				}
 /*				else 
@@ -649,6 +650,7 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 					switch (pp->m_itype)
 					{
 					case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
+					case FE_PARAM_VEC3D : pp->m_vscl = pp->value<vec3d>(); break;
 					}
 				}
 /*				else 
