@@ -2,6 +2,7 @@
 #include "FEElasticMaterial.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
+#include "FEBioMech/FEPeriodicBoundary.h"
 
 //-----------------------------------------------------------------------------
 //! Material point class for the micro-material
@@ -40,11 +41,13 @@ public:
 
 public:
 	char	m_szrve[256];	//!< filename for RVE file
+	char	m_szbc[256];	//!< name of nodeset defining boundary
+	bool	m_bperiodic;	//!< periodic bc flag
 
 protected:
-	FEModel		m_rve;	//!< the RVE (Representive Volume Element)
-	bool		m_brve;	//!< flag indicating whether RVE was read in
-	double		m_V0;	//!< initial volume of RVE
+	FEModel	m_rve;			//!< the RVE (Representive Volume Element)
+	bool	m_brve;			//!< flag indicating whether RVE was read in
+	double	m_V0;			//!< initial volume of RVE
 
 public:
 	//! calculate stress at material point
@@ -60,7 +63,10 @@ public:
 	FEMaterialPoint* CreateMaterialPointData();
 
 protected:
-	void PrepRVE();
+	bool PrepRVE();
+	bool PrepDisplacementBC();
+	bool PrepPeriodicBC();
+
 	void UpdateBC(FEModel& rve, mat3d& F);
 	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint& pt);
 	tens4ds AveragedStiffness(FEModel& rve, FEMaterialPoint& pt);

@@ -1028,6 +1028,8 @@ void FEModel::CopyFrom(FEModel& fem)
 		FEMaterial* pnew = fecore_new<FEMaterial>(FEMATERIAL_ID, sztype, this);
 		assert(pnew);
 
+		pnew->SetID(pmat->GetID());
+
 		// copy material data
 		// we only copy material parameters
 		pnew->GetParameterList() = pmat->GetParameterList();
@@ -1090,6 +1092,25 @@ void FEModel::CopyFrom(FEModel& fem)
 
 		// add to model
 		AddPrescribedBC(pnew);
+	}
+
+	// --- contact interfaces ---
+	int NCI = fem.SurfacePairInteractions();
+	for (int i=0; i<NCI; ++i)
+	{
+		// get the next interaction
+		FESurfacePairInteraction* pci = fem.SurfacePairInteraction(i);
+		const char* sztype = pci->GetTypeStr();
+
+		// create a new contact interface
+		FESurfacePairInteraction* pnew = fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, sztype, this);
+		assert(pnew);
+
+		// create a copy
+		pnew->CopyFrom(pci);
+
+		// add the new interface
+		AddSurfacePairInteraction(pnew);
 	}
 
 	// --- Load curves ---

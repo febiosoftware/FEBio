@@ -35,6 +35,9 @@ public:
 	//! temporary construct to determine if contact interface uses nodal integration rule (or facet)
 	virtual bool UseNodalIntegration() = 0;
 
+	//! create a copy of this interface
+	virtual void CopyFrom(FESurfacePairInteraction* pci) {}
+
 	//! Get the Contact Interface ID
 	int GetID() { return m_nID; }
 

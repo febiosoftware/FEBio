@@ -76,6 +76,9 @@ public:
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEStiffnessMatrix& K);
 
+	//! create a copy of this interface
+	void CopyFrom(FESurfacePairInteraction* pci);
+
 protected:
 	void ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface& ms, bool bmove);
 

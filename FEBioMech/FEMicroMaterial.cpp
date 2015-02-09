@@ -6,6 +6,7 @@
 #include "FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
 #include "FEBioXML/FEBioImport.h"
+#include "FEBioPlot/FEBioPlotFile.h"
 
 //-----------------------------------------------------------------------------
 FEMicroMaterialPoint::FEMicroMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoint(mp)
@@ -60,14 +61,20 @@ void FEMicroMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMicroMaterial, FEElasticMaterial)
-	ADD_PARAMETER(m_szrve, FE_PARAM_STRING, "RVE");
+	ADD_PARAMETER(m_szrve    , FE_PARAM_STRING, "RVE"     );
+	ADD_PARAMETER(m_szbc     , FE_PARAM_STRING, "bc_set"  );
+	ADD_PARAMETER(m_bperiodic, FE_PARAM_BOOL  , "periodic");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	m_szrve[0] = 0;
 	m_brve = false;
+
+	// initialize parameters
+	m_szrve[0] = 0;
+	m_szbc[0] = 0;
+	m_bperiodic = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -87,27 +94,84 @@ void FEMicroMaterial::Init()
 	// try to load the RVE model
 	if (m_brve == false)
 	{
+		// load the RVE model
 		FEFEBioImport fim;
 		if (fim.Load(m_rve, m_szrve) == false)
 		{
 			throw MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
 		}
 
-		// set the pardiso solver 
+		// set the pardiso solver as default
 		m_rve.m_nsolver = PARDISO_SOLVER;
 
 		// make sure the RVE problem doesn't output anything to a plot file
 		m_rve.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
 
-		// create the DC's for this RVE
-		PrepRVE();
+		// create the BC's for this RVE
+		if (PrepRVE() == false) throw MaterialError("An error occurred preparing RVE model");
 
+		// mark that we read and processed the RVE successfully
 		m_brve = true;
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEMicroMaterial::PrepRVE()
+bool FEMicroMaterial::PrepRVE()
+{
+	if (m_bperiodic == false)
+	{
+		// prep displacement BC's
+		if (PrepDisplacementBC() == false) return false;
+	}
+	else
+	{
+		// prep periodic BC's
+		if (PrepPeriodicBC() == false) return false;
+	}
+
+	// the logfile is a shared resource between the master FEM and the RVE
+	// in order not to corrupt the logfile we don't print anything for
+	// the RVE problem.
+	Logfile::MODE nmode = felog.GetMode();
+	felog.SetMode(Logfile::NEVER);
+
+	// initialize RVE
+	if (m_rve.Init() == false) return false;
+
+	// calculate intial RVE volume
+	m_V0 = 0;
+	double ve;
+	int nint;
+	double* w, J;
+	FEMesh& m = m_rve.GetMesh();
+	for (int k=0; k<m.Domains(); ++k)
+	{
+		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
+		for (int i=0; i<dom.Elements(); ++i)
+		{
+			FESolidElement& el = dom.Element(i);
+			nint = el.GaussPoints();
+			w = el.GaussWeights();
+			ve = 0;
+			for (int n=0; n<nint; ++n)
+			{
+				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
+				J = dom.detJt(el, n);
+
+				ve += J*w[n];
+			}
+			m_V0 += ve;
+		}
+	}
+
+	// reset the logfile mode
+	felog.SetMode(nmode);
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEMicroMaterial::PrepDisplacementBC()
 {
 	// first we need to find all the boundary nodes
 	FEMesh& m = m_rve.GetMesh();
@@ -170,42 +234,42 @@ void FEMicroMaterial::PrepRVE()
 			}
 		}
 
-	// the logfile is a shared resource between the master FEM and the RVE
-	// in order not to corrupt the logfile we don't print anything for
-	// the RVE problem.
-	Logfile::MODE nmode = felog.GetMode();
-	felog.SetMode(Logfile::NEVER);
+	return true;
+}
 
-	// initialize RVE
-	m_rve.Init();
+//-----------------------------------------------------------------------------
+bool FEMicroMaterial::PrepPeriodicBC()
+{
+	// get the RVE mesh
+	FEMesh& m = m_rve.GetMesh();
 
-	// calculate intial RVE volume
-	m_V0 = 0;
-	double ve;
-	int nint;
-	double* w, J;
-	for (int k=0; k<m.Domains(); ++k)
-	{
-		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
-		for (int i=0; i<dom.Elements(); ++i)
+	// create a load curve
+	FELoadCurve* plc = new FELoadCurve;
+	plc->SetInterpolation(FELoadCurve::LINEAR);
+	plc->Add(0.0, 0.0);
+	plc->Add(1.0, 1.0);
+	m_rve.AddLoadCurve(plc);
+	int NLC = m_rve.LoadCurves() - 1;
+
+	// find the node set that defines the corner nodes
+	FENodeSet* pset = m.FindNodeSet(m_szbc);
+	if (pset == 0) return false;
+
+	// create the DC's
+	m_rve.ClearBCs();
+	int N = pset->size();
+	for (int i=0; i<N; ++i)
+		for (int j=0; j<3; ++j)
 		{
-			FESolidElement& el = dom.Element(i);
-			nint = el.GaussPoints();
-			w = el.GaussWeights();
-			ve = 0;
-			for (int n=0; n<nint; ++n)
-			{
-				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
-				J = dom.detJt(el, n);
-
-				ve += J*w[n];
-			}
-			m_V0 += ve;
+			FEPrescribedBC* pdc = new FEPrescribedBC(&m_rve);
+			pdc->bc = j;
+			pdc->lc = NLC;
+			pdc->node = (*pset)[i];
+			pdc->s = 0;
+			m_rve.AddPrescribedBC(pdc);
 		}
-	}
 
-	// reset the logfile mode
-	felog.SetMode(nmode);
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -232,6 +296,43 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 		dy.s = r1.y - r0.y;
 		dz.s = r1.z - r0.z;
 	}
+
+	if (m_bperiodic)
+	{
+		// get the "displacement" component of the deformation gradient
+		mat3d U = F - mat3dd(1);
+
+		// set the offset for the periodic BC's
+		vec3d r[FEElement::MAX_NODES];
+
+		// loop over periodic boundaries
+		for (int i=0; i<3; ++i)
+		{
+			FEPeriodicBoundary* pc = dynamic_cast<FEPeriodicBoundary*>(rve.SurfacePairInteraction(i));
+			assert(pc);
+
+			// get the position of the first node
+			vec3d r0 = pc->m_ss.Node(0).m_r0;
+
+			// calculate the position of the projection
+			FESurfaceElement* pm = pc->m_ss.m_pme[0]; assert(pm);
+			for (int j=0; j<pm->Nodes(); ++j) r[j] = m.Node(pm->m_node[j]).m_r0;
+			vec2d q = pc->m_ss.m_rs[0];
+			vec3d r1 = pm->eval(r, q[0], q[1]);
+
+			// calculate the offset distance
+			vec3d u0 = r1 - r0;
+
+			// apply deformation
+			vec3d u1 = U*u0;
+
+			// set this as the scale parameter for the offset
+			FEParam* pp = pc->GetParameterList().Find("offset");
+			assert(pp);
+			pp->m_vscl = u1;
+			pp->m_nlc = 0;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -255,7 +356,16 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 
 	// solve the RVE
 	bool bret = rve.Solve();
-
+/*
+	// set the plot file
+	FEBioPlotFile* pplt = new FEBioPlotFile(rve);
+	vector<int> item;
+	pplt->AddVariable("displacement", item);
+	pplt->AddVariable("stress", item);
+	pplt->Open(rve, "rve.xplt");
+	pplt->Write(rve);
+	pplt->Close();
+*/
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException();
 
