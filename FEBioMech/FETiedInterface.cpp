@@ -12,13 +12,15 @@
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FETiedInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"          ); 
-	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"       );
-	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"         );
-	ADD_PARAMETER(m_naugmin, FE_PARAM_INT   , "minaug"          );
-	ADD_PARAMETER(m_naugmax, FE_PARAM_INT   , "maxaug"          );
-	ADD_PARAMETER(m_stol   , FE_PARAM_DOUBLE, "search_tolerance");
-	ADD_PARAMETER(m_boffset, FE_PARAM_BOOL  , "offset_shells"   );
+	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL  , "laugon"          ); 
+	ADD_PARAMETER(m_atol    , FE_PARAM_DOUBLE, "tolerance"       );
+	ADD_PARAMETER(m_eps     , FE_PARAM_DOUBLE, "penalty"         );
+	ADD_PARAMETER(m_naugmin , FE_PARAM_INT   , "minaug"          );
+	ADD_PARAMETER(m_naugmax , FE_PARAM_INT   , "maxaug"          );
+	ADD_PARAMETER(m_stol    , FE_PARAM_DOUBLE, "search_tolerance");
+	ADD_PARAMETER(m_boffset , FE_PARAM_BOOL  , "offset_shells"   );
+	ADD_PARAMETER(m_Dmax    , FE_PARAM_DOUBLE, "max_distance"    );
+	ADD_PARAMETER(m_bspecial, FE_PARAM_BOOL  , "special"         );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -39,6 +41,8 @@ FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&
 	m_naugmin = 0;
 	m_naugmax = 10;
 	m_boffset = false;
+	m_Dmax = 0.0;
+	m_bspecial = true;
 
 	// give this interface an ID (TODO: where is this actually used?)
 	m_nID = count++;
@@ -173,7 +177,7 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 	// closest point projection method
 	FEClosestPointProjection cpp(ms);
 	cpp.SetTolerance(m_stol);
-	cpp.HandleSpecialCases(true);
+	cpp.HandleSpecialCases(m_bspecial);
 	cpp.Init();
 
 	// loop over all slave nodes
@@ -191,26 +195,32 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 		FESurfaceElement* pme = cpp.Project(x, q, rs);
 		if (pme)
 		{
-			// store the master element
-			ss.m_pme[i] = pme;
-			ss.m_rs[i][0] = rs[0];
-			ss.m_rs[i][1] = rs[1];
-
-			// calculate the master normal
-			vec3d nu = ss.SurfaceNormal(*pme, rs[0], rs[1]);
-
-			// calculate gap
-			ss.m_gap[i] = (x - q) - nu*ss.m_off[i];
-
-			// move the node if necessary
-			if (bmove && (ss.m_gap[i].norm()>0))
+			// make sure we are within the max distance
+			double D = (x - q).norm();
+			if ((m_Dmax == 0.0) || (D <= m_Dmax))
 			{
-				node.m_r0 = node.m_rt = q + nu*ss.m_off[i];
-				ss.m_gap[i] = vec3d(0,0,0);
-			}
+				// store the master element
+				ss.m_pme[i] = pme;
 
-			// calculate force
-			ss.m_Tc[i] = ss.m_Lm[i] + ss.m_gap[i]*m_eps;
+				// store the natural coordinates of the projection on the master element
+				ss.m_rs[i] = rs;
+
+				// calculate the master normal
+				vec3d nu = ms.SurfaceNormal(*pme, rs[0], rs[1]);
+
+				// calculate gap
+				ss.m_gap[i] = (x - q) - nu*ss.m_off[i];
+
+				// move the node if necessary
+				if (bmove && (ss.m_gap[i].norm()>0))
+				{
+					node.m_r0 = node.m_rt = q + nu*ss.m_off[i];
+					ss.m_gap[i] = vec3d(0,0,0);
+				}
+
+				// calculate force
+				ss.m_Tc[i] = ss.m_Lm[i] + ss.m_gap[i]*m_eps;
+			}
 		}
 	}
 }

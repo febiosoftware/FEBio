@@ -69,15 +69,15 @@ public:
 	FETiedContactSurface	ss;	//!< slave surface
 	FETiedContactSurface	ms;	//!< master surface
 
-	int nse;	//!< number of slave elements
-	int nme;	//!< number of master elements
-
+public:
 	double		m_atol;		//!< augmentation tolerance
 	double		m_eps;		//!< penalty scale factor
 	double		m_stol;		//!< search tolerance
 	int			m_naugmax;	//!< maximum nr of augmentations
 	int			m_naugmin;	//!< minimum nr of augmentations
 	bool		m_boffset;	//!< offset slave surface for shells
+	double		m_Dmax;		//!< max distance for contact
+	bool		m_bspecial;	//!< handle special cases in projection
 
 	DECLARE_PARAMETER_LIST();
 };
