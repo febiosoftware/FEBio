@@ -36,6 +36,7 @@ public:
 	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
 	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
 	vector<vec3d>				m_Lm;	//!< Lagrange multipliers
+	vector<vec3d>				m_Tc;	//!< contact forces
 	vector<double>				m_off;	//!< offset values (used for shells)
 
 protected:

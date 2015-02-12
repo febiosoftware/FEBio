@@ -158,6 +158,9 @@ void FETiedInterface::Update(int niter)
 			// calculate the gap function
 			// (taking possible offset into account)
 			ss.m_gap[i] = (rt - q) - nu*ss.m_off[i];
+
+			// calculate force
+			ss.m_Tc[i] = ss.m_Lm[i] + ss.m_gap[i]*m_eps;
 		}
 	}
 }
@@ -170,6 +173,7 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 	// closest point projection method
 	FEClosestPointProjection cpp(ms);
 	cpp.SetTolerance(m_stol);
+	cpp.HandleSpecialCases(true);
 	cpp.Init();
 
 	// loop over all slave nodes
@@ -204,6 +208,9 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 				node.m_r0 = node.m_rt = q + nu*ss.m_off[i];
 				ss.m_gap[i] = vec3d(0,0,0);
 			}
+
+			// calculate force
+			ss.m_Tc[i] = ss.m_Lm[i] + ss.m_gap[i]*m_eps;
 		}
 	}
 }

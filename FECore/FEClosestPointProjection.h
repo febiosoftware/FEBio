@@ -1,6 +1,7 @@
 #pragma once
 #include "FESurface.h"
 #include "FENNQuery.h"
+#include "FEElemElemList.h"
 
 //-----------------------------------------------------------------------------
 // This class can be used to find the closest point projection of a point
@@ -30,12 +31,17 @@ public:
 	//! Set the search radius (used in self-projection)
 	void SetSearchRadius(double s) { m_rad = s; }
 
+	//! set if the projection should handle special cases
+	void HandleSpecialCases(bool b) { m_bspecial = b; }
+
 protected:
 	double	m_tol;	//!< projection tolerance
 	double	m_rad;	//!< search radius
+	bool	m_bspecial;	//!< try to handle special cases
 
 protected:
 	FESurface&		m_surf;		//!< reference to surface
 	FENNQuery		m_SNQ;		//!< used to find the nearest neighbour
-	FENodeElemTree	m_NET;		//!< node-element tree
+	FENodeElemList	m_NEL;		//!< node-element tree
+	FEElemElemList	m_EEL;		//!< element neighbor list
 };

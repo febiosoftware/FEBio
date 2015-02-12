@@ -18,6 +18,9 @@ public:
 	//! create the element-element list
 	void Create(FEMesh* pmesh);
 
+	//! create the element-element list for a surface
+	void Create(FESurface* psurf);
+
 	//! Find the j-th neighbor element of element n
 	FEElement* Neighbor(int n, int j) { return m_pel[ m_ref[n] + j]; }
 

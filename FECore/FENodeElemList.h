@@ -57,6 +57,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+//! Like the FEElemElemList, but can create multiple levels
 class FENodeElemTree
 {
 public:

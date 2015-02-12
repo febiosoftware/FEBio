@@ -22,12 +22,14 @@ bool FETiedContactSurface::Init()
 	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));	// penetrated master element
 	m_rs.resize(nn);		// natural coords of projected slave node on master element
 	m_Lm.resize(nn);		// Lagrangian multipliers
+	m_Tc.resize(nn);		// contact forces
 	m_off.resize(nn);		// surface offset values
 
 	// set initial values
 	zero(m_gap);
 	zero(m_Lm);
 	zero(m_off);
+	zero(m_Tc);
 
 	// we calculate the gap offset values
 	// This value is used to take the shell thickness into account
@@ -60,11 +62,11 @@ void FETiedContactSurface::ShallowCopy(DumpStream& dmp, bool bsave)
 {
 	if (bsave)
 	{
-		dmp << m_Lm << m_gap;
+		dmp << m_Lm << m_gap << m_Tc;
 	}
 	else
 	{
-		dmp >> m_Lm >> m_gap;
+		dmp >> m_Lm >> m_gap >> m_Tc;
 	}
 }
 
@@ -78,6 +80,7 @@ void FETiedContactSurface::Serialize(DumpFile &ar)
 		ar << m_rs;
 		ar << m_Lm;
 		ar << m_off;
+		ar << m_Tc;
 	}
 	else
 	{
@@ -85,6 +88,7 @@ void FETiedContactSurface::Serialize(DumpFile &ar)
 		ar >> m_rs;
 		ar >> m_Lm;
 		ar >> m_off;
+		ar >> m_Tc;
 	}
 }
 
@@ -109,5 +113,8 @@ void FETiedContactSurface::GetNodalContactTraction(int nface, vec3d* tn)
 {
 	FESurfaceElement& f = Element(nface);
 	int ne = f.m_lnode.size();
-	for (int j= 0; j< ne; ++j) tn[j] = m_Lm[f.m_lnode[j]];
+	for (int j= 0; j< ne; ++j) 
+	{
+		tn[j] = m_Tc[f.m_lnode[j]];
+	}
 }
