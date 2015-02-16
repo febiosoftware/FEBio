@@ -180,6 +180,24 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! fiber stretch
+class FEPlotFiberStretch : public FEDomainData
+{
+public:
+	FEPlotFiberStretch(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! deviatoric fiber stretch
+class FEPlotDevFiberStretch : public FEDomainData
+{
+public:
+	FEPlotDevFiberStretch(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Shell thicknesses
 class FEPlotShellThickness : public FEDomainData
 {

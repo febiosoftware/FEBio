@@ -321,6 +321,8 @@ REGISTER_FECORE_CLASS(FEPlotElementStress        , FEPLOTDATA_ID, "stress"      
 REGISTER_FECORE_CLASS(FEPlotElementElasticity    , FEPLOTDATA_ID, "elasticity"            );
 REGISTER_FECORE_CLASS(FEPlotRelativeVolume       , FEPLOTDATA_ID, "relative volume"       );
 REGISTER_FECORE_CLASS(FEPlotFiberVector          , FEPLOTDATA_ID, "fiber vector"          );
+REGISTER_FECORE_CLASS(FEPlotFiberStretch         , FEPLOTDATA_ID, "fiber stretch"         );
+REGISTER_FECORE_CLASS(FEPlotDevFiberStretch      , FEPLOTDATA_ID, "deviatoric fiber stretch");
 REGISTER_FECORE_CLASS(FEPlotShellThickness       , FEPLOTDATA_ID, "shell thickness"       );
 REGISTER_FECORE_CLASS(FEPlotDamage               , FEPLOTDATA_ID, "damage"                );
 REGISTER_FECORE_CLASS(FEPlotMixtureVolumeFraction, FEPLOTDATA_ID, "volume fraction"       );

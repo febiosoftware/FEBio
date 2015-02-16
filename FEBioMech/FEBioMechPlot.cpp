@@ -519,6 +519,86 @@ bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotFiberStretch::Save(FEDomain &dom, vector<float>& a)
+{
+	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+	if (pme == 0) return false;
+
+	if (dom.Class() == FE_DOMAIN_SOLID)
+	{
+		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+		int BE = bd.Elements();
+		for (int i=0; i<BE; ++i)
+		{
+			FESolidElement& el = bd.Element(i);
+			int n = el.GaussPoints();
+			double l = 0.0;
+			for (int j=0; j<n; ++j)
+			{
+				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
+				vec3d ri;
+				ri.x = pt.m_Q[0][0];
+				ri.y = pt.m_Q[1][0];
+				ri.z = pt.m_Q[2][0];
+
+				vec3d r = pt.m_F*ri;
+
+				l += r.norm();
+			}
+			l /= (double) n;
+			a.push_back((float) l);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotDevFiberStretch::Save(FEDomain &dom, vector<float>& a)
+{
+	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+	if (pme == 0) return false;
+
+	if (dom.Class() == FE_DOMAIN_SOLID)
+	{
+		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+		int BE = bd.Elements();
+		for (int i=0; i<BE; ++i)
+		{
+			FESolidElement& el = bd.Element(i);
+			int n = el.GaussPoints();
+			double lamd = 0.0;
+			for (int j=0; j<n; ++j)
+			{
+				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
+
+				// get the deformation gradient
+				mat3d& F = pt.m_F;
+				double J = pt.m_J;
+				double Jm13 = pow(J, -1.0/3.0);
+
+				// get the material fiber axis
+				vec3d ri;
+				ri.x = pt.m_Q[0][0];
+				ri.y = pt.m_Q[1][0];
+				ri.z = pt.m_Q[2][0];
+
+				// apply deformation
+				vec3d r = pt.m_F*ri;
+
+				// calculate the deviatoric fiber stretch
+				double lam = r.norm();
+				lamd += lam*Jm13;
+			}
+			lamd /= (double) n;
+			a.push_back((float) lamd);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 //! Store shell thicknesses
 bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
 {
