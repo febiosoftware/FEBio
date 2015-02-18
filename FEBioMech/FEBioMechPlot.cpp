@@ -502,7 +502,8 @@ bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 
 				r += pt.m_F*ri;
 			}
-			r /= (double) n;
+//			r /= (double) n;
+			r.unit();
 
 			float f[3];
 			f[0] = (float) r.x;
