@@ -118,6 +118,9 @@ void FEMicroMaterial::Init()
 //-----------------------------------------------------------------------------
 bool FEMicroMaterial::PrepRVE()
 {
+	// find all boundar nodes
+	FindBoundaryNodes();
+
 	if (m_bperiodic == false)
 	{
 		// prep displacement BC's
@@ -171,12 +174,12 @@ bool FEMicroMaterial::PrepRVE()
 }
 
 //-----------------------------------------------------------------------------
-bool FEMicroMaterial::PrepDisplacementBC()
+void FEMicroMaterial::FindBoundaryNodes()
 {
 	// first we need to find all the boundary nodes
 	FEMesh& m = m_rve.GetMesh();
 	int N = m.Nodes();
-	vector<int> tag; tag.assign(N, 0);
+	m_BN.assign(N, 0);
 
 	// create the element-element list
 	FEElemElemList EEL;
@@ -197,15 +200,23 @@ bool FEMicroMaterial::PrepDisplacementBC()
 				{
 					// mark all nodes
 					int nn = m.GetFace(el, j, fn);
-					for (int k=0; k<nn; ++k) tag[fn[k]] = 1;
+					for (int k=0; k<nn; ++k) m_BN[fn[k]] = 1;
 				}
 			}
 		}
 	}
 
+}
+
+//-----------------------------------------------------------------------------
+bool FEMicroMaterial::PrepDisplacementBC()
+{
+	FEMesh& m = m_rve.GetMesh();
+	int N = m.Nodes();
+
 	// count the nr of exterior nodes
 	int NN = 0, i;
-	for (i=0; i<N; ++i) if (tag[i] == 1) ++NN;
+	for (i=0; i<N; ++i) if (m_BN[i] == 1) ++NN;
 
 	assert(NN > 0);
 
@@ -221,7 +232,7 @@ bool FEMicroMaterial::PrepDisplacementBC()
 	NN = 0;
 	m_rve.ClearBCs();
 	for (i=0; i<N; ++i)
-		if (tag[i] == 1)
+		if (m_BN[i] == 1)
 		{
 			for (int j=0; j<3; ++j, ++NN)
 			{
@@ -483,7 +494,7 @@ tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
 	rc0 /= (double) m.Nodes();
 
 	// LTE - 
-	bool old_flag = false;
+	bool old_flag = true;
 	tens4ds c(0.);
 
 	if (old_flag)
@@ -522,7 +533,7 @@ tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
 					for (int j=0; j<ne; ++j)
 					{
 						FENode& nj = m.Node(e.m_node[j]);
-						if ((ni.m_ID[DOF_X] < 0) && (nj.m_ID[DOF_X] < 0))
+						if ((m_BN[e.m_node[i]] == 1) && (m_BN[e.m_node[j]] == 1))
 						{
 							// both nodes are boundary nodes
 							// so grab the element's submatrix

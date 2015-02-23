@@ -45,9 +45,10 @@ public:
 	bool	m_bperiodic;	//!< periodic bc flag
 
 protected:
-	FEModel	m_rve;			//!< the RVE (Representive Volume Element)
+	FEModel	m_rve;			//!< the master RVE (Representive Volume Element)
 	bool	m_brve;			//!< flag indicating whether RVE was read in
 	double	m_V0;			//!< initial volume of RVE
+	vector<int> m_BN;		//!< boundary node flags
 
 public:
 	//! calculate stress at material point
@@ -66,6 +67,7 @@ protected:
 	bool PrepRVE();
 	bool PrepDisplacementBC();
 	bool PrepPeriodicBC();
+	void FindBoundaryNodes();
 
 	void UpdateBC(FEModel& rve, mat3d& F);
 	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint& pt);
