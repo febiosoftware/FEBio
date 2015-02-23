@@ -14,6 +14,7 @@ BEGIN_PARAMETER_LIST(FEPeriodicBoundary, FEContactInterface)
 	ADD_PARAMETER(m_eps      , FE_PARAM_DOUBLE, "penalty"  );
 	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass" );
 	ADD_PARAMETER(m_off      , FE_PARAM_VEC3D , "offset"   );
+	ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -35,10 +36,12 @@ bool FEPeriodicSurface::Init()
 	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));		// penetrated master element
 	m_rs.resize(nn);		// natural coords of projected slave node on master element
 	m_Lm.resize(nn);		// Lagrangian multipliers
+	m_Fr.resize(nn);		// reaction forces
 
 	// set initial values
 	zero(m_gap);
 	zero(m_Lm);
+	zero(m_Fr);
 
 	return true;
 }
@@ -100,6 +103,7 @@ FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem)
 	m_eps = 0;
 	m_btwo_pass = false;
 	m_off = vec3d(0,0,0);
+	m_naugmin = 0;
 
 	m_nID = count++;
 
@@ -339,6 +343,8 @@ void FEPeriodicBoundary::ContactForces(FEGlobalVector& R)
 		FEPeriodicSurface& ss = (np == 0? m_ss : m_ms);
 		FEPeriodicSurface& ms = (np == 0? m_ms : m_ss);
 
+		zero(ss.m_Fr);
+
 		// loop over all slave facets
 		int ne = ss.Elements();
 		for (j=0; j<ne; ++j)
@@ -448,6 +454,12 @@ void FEPeriodicBoundary::ContactForces(FEGlobalVector& R)
 
 				// assemble into global force vector
 				R.Assemble(en, lm, fe);
+
+				// also store in the reaction force vector
+				vec3d& fr = ss.m_Fr[m];
+				fr.x += fe[0];
+				fr.y += fe[1];
+				fr.z += fe[2];
 			}
 		}
 	}
@@ -626,7 +638,6 @@ bool FEPeriodicBoundary::Augment(int naug)
 	if (!m_blaugon) return true;
 
 	int i;
-	bool bconv = true;
 
 	double g;
 	vec3d lm;
@@ -672,7 +683,6 @@ bool FEPeriodicBoundary::Augment(int naug)
 	normL1 = sqrt(normL1);
 	normgc = sqrt(normgc / N);
 
-	// check convergence of constraints
 	felog.printf(" tied interface # %d\n", m_nID);
 	felog.printf("                        CURRENT        REQUIRED\n");
 	double pctn = 0;
@@ -680,9 +690,14 @@ bool FEPeriodicBoundary::Augment(int naug)
 	felog.printf("    normal force : %15le %15le\n", pctn, m_atol);
 	felog.printf("    gap function : %15le       ***\n", normgc);
 
-	if (pctn >= m_atol)
+	// check convergence of constraints
+	bool bconv = true;
+	if (pctn >= m_atol) bconv = false;
+	if (m_naugmin > naug) bconv = false;
+
+	// update Lagrange multipliers if we did not converge
+	if (bconv == false)
 	{
-		bconv = false;
 		for (i=0; i<m_ss.Nodes(); ++i)
 		{
 			// update Lagrange multipliers

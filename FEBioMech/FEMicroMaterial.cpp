@@ -399,12 +399,38 @@ mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 	// get the RVE mesh
 	FEMesh& m = rve.GetMesh();
 
+	mat3d T; T.zero();
+
+	// for periodic BC's we take the reaction forces directly from the periodic constraints
+	if (m_bperiodic)
+	{
+		// get the reaction for from the periodic constraints
+		for (int i=0; i<3; ++i)
+		{
+			FEPeriodicBoundary* pbc = dynamic_cast<FEPeriodicBoundary*>(rve.SurfacePairInteraction(i));
+			assert(pbc);
+			FEPeriodicSurface& ss = pbc->m_ss;
+			int N = ss.Nodes();
+			for (int i=0; i<N; ++i)
+			{
+				FENode& node = ss.Node(i);
+				vec3d f = ss.m_Fr[i];
+
+				// We multiply by two since the reaction forces are only stored at the slave surface 
+				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
+				// store the reaction forces on the master nodes as well?)
+				T += (f & node.m_rt)*2.0;
+			}
+		}
+	}
+
 	// get the reaction force vector from the solid solver
+	// (We also need to do this for the periodic BC, since at the prescribed nodes,
+	// the contact forces will be zero). 
 	FEAnalysis* pstep = rve.GetCurrentStep();
 	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	mat3d T; T.zero();
 	int nbc = rve.PrescribedBCs();
 	for (int i=0; i<nbc/3; ++i)
 	{
@@ -416,6 +442,7 @@ mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 		f.z = R[-n.m_ID[DOF_Z]-2];
 		T += f & n.m_rt;
 	}
+
 	return T.sym() / (J*m_V0);
 }
 

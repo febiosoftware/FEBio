@@ -29,6 +29,7 @@ public:
 	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
 	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
 	vector<vec3d>				m_Lm;	//!< Lagrange multipliers
+	vector<vec3d>				m_Fr;	//!< reaction forces
 };
 
 //-----------------------------------------------------------------------------
@@ -91,6 +92,7 @@ public:
 	double	m_stol;			//!< search tolerance
 	double  m_srad;			//!< search radius (%)
 	bool	m_btwo_pass;	//!< two-pass flag
+	int		m_naugmin;		//!< minimum number of augmentations
 	vec3d	m_off;			//!< relative displacement offset
 
 	DECLARE_PARAMETER_LIST();
