@@ -16,6 +16,9 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 	// make sure there is something to read
 	if (tag.isleaf()) return;
 
+	FEModel& fem = *GetFEModel();
+	FEMesh& m = fem.GetMesh();
+
 	++tag;
 	do
 	{
@@ -39,10 +42,39 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 				{
 					if (tag == "surface")
 					{
-						const char* sztype = tag.AttributeValue("type");
-						FESurface* ps = plc->GetSurface(sztype);
-						if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-						ParseSurfaceSection(tag, *ps, 0, true);
+						const char* sztype = tag.AttributeValue("type", false);
+						FESurface* psurf = plc->GetSurface(sztype);
+						if (psurf == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+						m.AddSurface(psurf);
+
+						// see if the set attribute is defined
+						const char* szset = tag.AttributeValue("set", true);
+						if (szset)
+						{
+							// make sure this tag does not have any children
+							if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
+
+							// see if we can find the facet set
+							FEFacetSet* pset = 0;
+							for (int i=0; i<m.FacetSets(); ++i)
+							{
+								FEFacetSet& fi = m.FacetSet(i);
+								if (strcmp(fi.GetName(), szset) == 0)
+								{
+									pset = &fi;
+									break;
+								}
+							}
+
+							// create a surface from the facet set
+							if (pset)
+							{
+								if (BuildSurface(*psurf, *pset, true) == false) throw XMLReader::InvalidTag(tag);
+							}
+							else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
+						}
+						else ParseSurfaceSection(tag, *psurf, 0, true);
 					}
 					else throw XMLReader::InvalidTag(tag);
 				}
@@ -64,6 +96,52 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 		++tag;
 	}
 	while (!tag.isend());
+}
+
+//---------------------------------------------------------------------------------
+// parse a surface section for contact definitions
+//
+bool FEBioConstraintsSection::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& m = fem.GetMesh();
+	int NN = m.Nodes();
+
+	// count nr of faces
+	int faces = fs.Faces();
+
+	// allocate storage for faces
+	s.create(faces);
+
+	// read faces
+	for (int i=0; i<faces; ++i)
+	{
+		FESurfaceElement& el = s.Element(i);
+		FEFacetSet::FACET& fi = fs.Face(i);
+
+		// set the element type/integration rule
+		if (bnodal)
+		{
+			if      (fi.ntype == 4) el.SetType(FE_QUAD4NI);
+			else if (fi.ntype == 3) el.SetType(FE_TRI3NI );
+			else if (fi.ntype == 6) el.SetType(FE_TRI6NI );
+			else return false;
+		}
+		else
+		{
+			if      (fi.ntype == 4) el.SetType(FE_QUAD4G4);
+			else if (fi.ntype == 3) el.SetType(m_pim->m_ntri3);
+			else if (fi.ntype == 6) el.SetType(m_pim->m_ntri6);
+			else if (fi.ntype == 7) el.SetType(m_pim->m_ntri7);
+			else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
+			else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
+			else return false;
+		}
+
+		int N = el.Nodes(); assert(N == fi.ntype);
+		for (int j=0; j<N; ++j) el.m_node[j] = fi.node[j];
+	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------
