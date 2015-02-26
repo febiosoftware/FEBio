@@ -128,7 +128,7 @@ bool FERestartImport::ParseLoadSection(XMLTag& tag)
 			int nid = atoi(szid);
 
 			// find the loadcurve with this ID
-			FELoadCurve* plc = fem.GetLoadCurve(nid);
+			FELoadCurve* plc = fem.GetLoadCurve(nid-1);
 
 			// count how many points we have
 			XMLTag t(tag); ++t;
