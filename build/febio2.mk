@@ -4,7 +4,7 @@ SRC = $(wildcard $(FEBDIR)FEBio2/*.cpp)
 OBJ = $(patsubst $(FEBDIR)FEBio2/%.cpp, %.o, $(SRC))
 DEP = $(patsubst $(FEBDIR)FEBio2/%.cpp, %.d, $(SRC))
 
-TARGET =  $(FEBDIR)bin/febio2.$(PLAT)
+TARGET =  $(FEBDIR)build/bin/febio2.$(PLAT)
 
 FELIBS =  $(FEBDIR)build/lib/libfecore_$(PLAT).a
 FELIBS += $(FEBDIR)build/lib/libfebiolib_$(PLAT).a
