@@ -214,6 +214,7 @@ void FEStickyInterface::Update(int niter)
 {
 	// closest point projection method
 	FEClosestPointProjection cpp(ms);
+	cpp.HandleSpecialCases(true);
 	cpp.SetTolerance(m_stol);
 	cpp.Init();
 
@@ -289,6 +290,7 @@ void FEStickyInterface::ProjectSurface(FEStickySurface& ss, FEStickySurface& ms,
 {
 	// closest point projection method
 	FEClosestPointProjection cpp(ms);
+	cpp.HandleSpecialCases(true);
 	cpp.SetTolerance(m_stol);
 	cpp.Init();
 

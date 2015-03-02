@@ -238,6 +238,7 @@ void FEFacet2FacetTied::ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurfac
 
 	// closest point projection method
 	FEClosestPointProjection cpp(ms);
+	cpp.HandleSpecialCases(true);
 	cpp.SetTolerance(m_stol);
 	cpp.Init();
 

@@ -516,6 +516,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 	FEClosestPointProjection cpp(ms);
 	cpp.SetTolerance(m_stol);
 	cpp.SetSearchRadius(m_sradius);
+	cpp.HandleSpecialCases(true);
 	cpp.Init();
 
 	// loop over all slave nodes

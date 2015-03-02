@@ -467,6 +467,7 @@ void FEFacet2FacetSliding::CalcAutoPenalty(FEFacetSlidingSurface& s)
 void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlidingSurface &ms, bool bsegup)
 {
 	FEClosestPointProjection cpp(ms);
+	cpp.HandleSpecialCases(true);
 	cpp.SetTolerance(m_stol);
 	cpp.Init();
 
