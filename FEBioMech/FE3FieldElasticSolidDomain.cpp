@@ -156,14 +156,12 @@ void FE3FieldElasticSolidDomain::ElementDilatationalStiffness(FEModel& fem, int 
 	}
 
 	// get effective modulus
-//	double k = pmi->UJJ(elem.m_eJ);
 	double k = pmi->UJJ(ed.eJ);
 
 	// next, we add the Lagrangian contribution
 	// note that this term will always be zero if the material does not
 	// use the augmented lagrangian
-//	k += elem.m_Lk*pmi->hpp(elem.m_eJ);
-//	k += ed.Lk*pmi->hpp(ed.eJ);
+	k += ed.Lk*pmi->hpp(ed.eJ);
 
 	// divide by initial volume
 	k /= Ve;
@@ -457,9 +455,9 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel)
 	ed.eJ = v / V;
 
 	// Calculate pressure. This is a sum of a Lagrangian term and a penalty term
-	//        <----- Lag. mult. ----->   <------ penalty ----->
-//		el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + pmi->Up(el.m_eJ);
-	ed.ep = mat.UJ(ed.eJ);
+	//      <--- Lag. mult. -->  <-- penalty -->
+	ed.ep = ed.Lk*mat.hp(ed.eJ) + mat.UJ(ed.eJ);
+//	ed.ep = mat.UJ(ed.eJ);
 
 	// loop over the integration points and calculate
 	// the stress at the integration point
