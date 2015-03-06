@@ -540,6 +540,7 @@
     <ClCompile Include="..\..\FEBioMech\FEUT4Domain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEViscoElasticMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEVolumeConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEVonMisesPlasticity.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEReactionRateNims.cpp" />
   </ItemGroup>
@@ -692,6 +693,7 @@
     <ClInclude Include="..\..\FEBioMech\FEUT4Domain.h" />
     <ClInclude Include="..\..\FEBioMech\FEVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioMech\FEViscoElasticMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEVolumeConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEVonMisesPlasticity.h" />
     <ClInclude Include="..\..\FEBioMech\gauss.h" />
     <ClInclude Include="..\..\FEBioMech\gausskronrod.h" />

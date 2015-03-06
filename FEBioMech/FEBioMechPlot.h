@@ -112,6 +112,16 @@ public:
 	bool Save(FESurface& surf, vector<float>& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Pressure from volume constraint
+//!
+class FEPlotVolumePressure : public FESurfaceData
+{
+public:
+	FEPlotVolumePressure(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FESurface& S, vector<float>& a);
+};
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

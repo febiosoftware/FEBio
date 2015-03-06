@@ -14,6 +14,7 @@
 #include "FESPRProjection.h"
 #include "FEUncoupledElasticMixture.h"
 #include "FERigidMaterial.h"
+#include "FEVolumeConstraint.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -241,6 +242,21 @@ bool FEPlotContactArea::Save(FESurface &surf, vector<float>& a)
 		int ne = el.Nodes();
 		for (int k=0; k<ne; ++k) a[MFN*i + k] = (float) area;
 	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotVolumePressure::Save(FESurface& S, vector<float>& a)
+{
+	FEVolumeSurface* pvs = dynamic_cast<FEVolumeSurface*>(&S);
+	if (pvs == 0) return false;
+
+	FEVolumeSurface& s = *pvs;
+	double p = s.m_p;
+
+	int NE = s.Elements();
+	for (int i=0; i<NE; ++i) a.push_back((float)p);
+
 	return true;
 }
 

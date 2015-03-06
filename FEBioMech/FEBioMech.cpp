@@ -114,6 +114,7 @@
 #include "FERigidSphericalJoint.h"
 #include "FERigidPinJoint.h"
 #include "FERigidRevoluteJoint.h"
+#include "FEVolumeConstraint.h"
 
 #include "FESolidAnalysis.h"
 #include "FESolidSolver.h"
@@ -299,6 +300,7 @@ REGISTER_FECORE_CLASS(FERigidJoint         , FENLCONSTRAINT_ID, "rigid joint"   
 REGISTER_FECORE_CLASS(FERigidSphericalJoint, FENLCONSTRAINT_ID, "rigid spherical joint");
 REGISTER_FECORE_CLASS(FERigidPinJoint      , FENLCONSTRAINT_ID, "rigid pin joint"      );
 REGISTER_FECORE_CLASS(FERigidRevoluteJoint , FENLCONSTRAINT_ID, "rigid revolute joint" );
+REGISTER_FECORE_CLASS(FEVolumeConstraint   , FENLCONSTRAINT_ID, "volume"               );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface
@@ -339,6 +341,7 @@ REGISTER_FECORE_CLASS(FEPlotSPRPrincStresses     , FEPLOTDATA_ID, "SPR principal
 REGISTER_FECORE_CLASS(FEPlotSPRTestLinear		 , FEPLOTDATA_ID, "SPR test linear"       );
 REGISTER_FECORE_CLASS(FEPlotSPRTestQuadratic	 , FEPLOTDATA_ID, "SPR test quadratic"    );
 REGISTER_FECORE_CLASS(FEPlotNodalStresses		 , FEPLOTDATA_ID, "nodal stress"		  );
+REGISTER_FECORE_CLASS(FEPlotVolumePressure       , FEPLOTDATA_ID, "volume pressure"       );
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FEPlotNodeDisplacement   , FEPLOTDATA_ID, "displacement"   );
