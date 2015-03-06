@@ -16,9 +16,9 @@
 // Simo's damage criterion uses sqrt(2*strain energy density)
 double FEDamageCriterionUCSimo::DamageCriterion(FEMaterialPoint& pt)
 {
-    FEMaterial* m_pMat = GetParent();
-    FEDamageMaterialUC* m_pD = dynamic_cast<FEDamageMaterialUC*>(m_pMat);
-    double sed = m_pD->m_pBase->DevStrainEnergyDensity(pt);
+    FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>(GetParent());
+    FEUncoupledMaterial* m_pBase = dynamic_cast<FEUncoupledMaterial*>(m_pMat->GetElasticMaterial());
+    double sed = m_pBase->DevStrainEnergyDensity(pt);
     
     // clean up round-off errors
     if (sed < 0) sed = 0;
@@ -30,9 +30,9 @@ double FEDamageCriterionUCSimo::DamageCriterion(FEMaterialPoint& pt)
 // Strain energy density damage criterion
 double FEDamageCriterionUCSED::DamageCriterion(FEMaterialPoint& pt)
 {
-    FEMaterial* m_pMat = GetParent();
-    FEDamageMaterialUC* m_pD = dynamic_cast<FEDamageMaterialUC*>(m_pMat);
-    double sed = m_pD->m_pBase->DevStrainEnergyDensity(pt);
+    FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>(GetParent());
+    FEUncoupledMaterial* m_pBase = dynamic_cast<FEUncoupledMaterial*>(m_pMat->GetElasticMaterial());
+    double sed = m_pBase->DevStrainEnergyDensity(pt);
     
     return sed;
 }
@@ -41,9 +41,9 @@ double FEDamageCriterionUCSED::DamageCriterion(FEMaterialPoint& pt)
 // von Mises stress damage criterion
 double FEDamageCriterionUCVMS::DamageCriterion(FEMaterialPoint& pt)
 {
-    FEMaterial* m_pMat = GetParent();
-    FEDamageMaterialUC* m_pD = dynamic_cast<FEDamageMaterialUC*>(m_pMat);
-    mat3ds s = m_pD->m_pBase->DevStress(pt);
+    FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>(GetParent());
+    FEUncoupledMaterial* m_pBase = dynamic_cast<FEUncoupledMaterial*>(m_pMat->GetElasticMaterial());
+    mat3ds s = m_pBase->DevStress(pt);
     
     double vms = sqrt((SQR(s.xx()-s.yy()) + SQR(s.yy()-s.zz()) + SQR(s.zz()-s.xx())
                        + 6*(SQR(s.xy()) + SQR(s.yz()) + SQR(s.xz())))/2);
@@ -56,9 +56,9 @@ double FEDamageCriterionUCVMS::DamageCriterion(FEMaterialPoint& pt)
 double FEDamageCriterionUCMSS::DamageCriterion(FEMaterialPoint& pt)
 {
     // evaluate stress tensor
-    FEMaterial* m_pMat = GetParent();
-    FEDamageMaterialUC* m_pD = dynamic_cast<FEDamageMaterialUC*>(m_pMat);
-    mat3ds s = m_pD->m_pBase->DevStress(pt);
+    FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>(GetParent());
+    FEUncoupledMaterial* m_pBase = dynamic_cast<FEUncoupledMaterial*>(m_pMat->GetElasticMaterial());
+    mat3ds s = m_pBase->DevStress(pt);
     
     // evaluate principal normal stresses
     double ps[3], ms[3];
@@ -78,9 +78,9 @@ double FEDamageCriterionUCMSS::DamageCriterion(FEMaterialPoint& pt)
 double FEDamageCriterionUCMNS::DamageCriterion(FEMaterialPoint& pt)
 {
     // evaluate stress tensor
-    FEMaterial* m_pMat = GetParent();
-    FEDamageMaterialUC* m_pD = dynamic_cast<FEDamageMaterialUC*>(m_pMat);
-    mat3ds s = m_pD->m_pBase->DevStress(pt);
+    FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>(GetParent());
+    FEUncoupledMaterial* m_pBase = dynamic_cast<FEUncoupledMaterial*>(m_pMat->GetElasticMaterial());
+    mat3ds s = m_pBase->DevStress(pt);
     
     // evaluate principal normal stresses
     double ps[3];

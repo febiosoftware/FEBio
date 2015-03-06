@@ -41,12 +41,9 @@ void FEDamageMaterial::Init()
 //! calculate stress at material point
 mat3ds FEDamageMaterial::Stress(FEMaterialPoint& pt)
 {
-    // get the damage material point data
-	FEDamageMaterialPoint& pd = *pt.ExtractData<FEDamageMaterialPoint>();
+    // evaluate the damage
+    double d = Damage(pt);
     
-    // get the damage
-    double d = pd.m_D;
-
     // evaluate the stress
     mat3ds s = m_pBase->Stress(pt);
     
@@ -58,13 +55,6 @@ mat3ds FEDamageMaterial::Stress(FEMaterialPoint& pt)
 //! calculate tangent stiffness at material point
 tens4ds FEDamageMaterial::Tangent(FEMaterialPoint& pt)
 {
-    // get the damage material point data
-	FEDamageMaterialPoint& pd = *pt.ExtractData<FEDamageMaterialPoint>();
-    
-    // evaluate the trial value of the damage criterion
-    // this must be done before evaluating the damage
-    pd.m_Etrial = m_pCrit->DamageCriterion(pt);
-    
     // evaluate the damage
     double d = Damage(pt);
     
@@ -79,11 +69,8 @@ tens4ds FEDamageMaterial::Tangent(FEMaterialPoint& pt)
 //! calculate strain energy density at material point
 double FEDamageMaterial::StrainEnergyDensity(FEMaterialPoint& pt)
 {
-    // get the damage material point data
-	FEDamageMaterialPoint& pd = *pt.ExtractData<FEDamageMaterialPoint>();
-    
-    // get the damage
-    double d = pd.m_D;
+    // evaluate the damage
+    double d = Damage(pt);
     
     // evaluate the strain energy density
     double sed = m_pBase->StrainEnergyDensity(pt);

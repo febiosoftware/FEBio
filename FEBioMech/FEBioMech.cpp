@@ -267,6 +267,7 @@ REGISTER_FECORE_CLASS(FEDamageCDFStep                      , FEMATERIAL_ID, "CDF
 REGISTER_FECORE_CLASS(FEDamageCDFPQP                       , FEMATERIAL_ID, "CDF quintic"          );
 REGISTER_FECORE_CLASS(FEDamageCriterionSimo                , FEMATERIAL_ID, "DC Simo"              );
 REGISTER_FECORE_CLASS(FEDamageCriterionSED                 , FEMATERIAL_ID, "DC strain energy density");
+REGISTER_FECORE_CLASS(FEDamageCriterionSSE                 , FEMATERIAL_ID, "DC specific strain energy");
 REGISTER_FECORE_CLASS(FEDamageCriterionVMS                 , FEMATERIAL_ID, "DC von Mises stress"     );
 REGISTER_FECORE_CLASS(FEDamageCriterionMSS                 , FEMATERIAL_ID, "DC max shear stress"     );
 REGISTER_FECORE_CLASS(FEDamageCriterionMNS                 , FEMATERIAL_ID, "DC max normal stress"    );

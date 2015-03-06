@@ -7,6 +7,7 @@
 //
 
 #include "FEDamageCriterion.h"
+#include "FEDamageMaterial.h"
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -16,9 +17,9 @@
 // Simo's damage criterion uses sqrt(2*strain energy density)
 double FEDamageCriterionSimo::DamageCriterion(FEMaterialPoint& pt)
 {
-    FEMaterial* m_pMat = GetParent();
-    FEDamageMaterial* m_pD = dynamic_cast<FEDamageMaterial*>(m_pMat);
-    double sed = m_pD->m_pBase->StrainEnergyDensity(pt);
+    FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
+    FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
+    double sed = m_pBase->StrainEnergyDensity(pt);
     
     // clean up round-off errors
     if (sed < 0) sed = 0;
@@ -30,20 +31,32 @@ double FEDamageCriterionSimo::DamageCriterion(FEMaterialPoint& pt)
 // Strain energy density damage criterion
 double FEDamageCriterionSED::DamageCriterion(FEMaterialPoint& pt)
 {
-    FEMaterial* m_pMat = GetParent();
-    FEDamageMaterial* m_pD = dynamic_cast<FEDamageMaterial*>(m_pMat);
-    double sed = m_pD->m_pBase->StrainEnergyDensity(pt);
+    FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
+    FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
+    double sed = m_pBase->StrainEnergyDensity(pt);
     
     return sed;
+}
+
+//-----------------------------------------------------------------------------
+// Specific strain energy damage criterion
+double FEDamageCriterionSSE::DamageCriterion(FEMaterialPoint& pt)
+{
+    FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
+    FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
+    double sed = m_pBase->StrainEnergyDensity(pt);
+    double rho = m_pBase->Density();
+    
+    return sed/rho;
 }
 
 //-----------------------------------------------------------------------------
 // von Mises stress damage criterion
 double FEDamageCriterionVMS::DamageCriterion(FEMaterialPoint& pt)
 {
-    FEMaterial* m_pMat = GetParent();
-    FEDamageMaterial* m_pD = dynamic_cast<FEDamageMaterial*>(m_pMat);
-    mat3ds s = m_pD->m_pBase->Stress(pt);
+    FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
+    FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
+    mat3ds s = m_pBase->Stress(pt);
     
     double vms = sqrt((SQR(s.xx()-s.yy()) + SQR(s.yy()-s.zz()) + SQR(s.zz()-s.xx())
                        + 6*(SQR(s.xy()) + SQR(s.yz()) + SQR(s.xz())))/2);
@@ -56,9 +69,9 @@ double FEDamageCriterionVMS::DamageCriterion(FEMaterialPoint& pt)
 double FEDamageCriterionMSS::DamageCriterion(FEMaterialPoint& pt)
 {
     // evaluate stress tensor
-    FEMaterial* m_pMat = GetParent();
-    FEDamageMaterial* m_pD = dynamic_cast<FEDamageMaterial*>(m_pMat);
-    mat3ds s = m_pD->m_pBase->Stress(pt);
+    FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
+    FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
+    mat3ds s = m_pBase->Stress(pt);
     
     // evaluate principal normal stresses
     double ps[3], ms[3];
@@ -78,9 +91,9 @@ double FEDamageCriterionMSS::DamageCriterion(FEMaterialPoint& pt)
 double FEDamageCriterionMNS::DamageCriterion(FEMaterialPoint& pt)
 {
     // evaluate stress tensor
-    FEMaterial* m_pMat = GetParent();
-    FEDamageMaterial* m_pD = dynamic_cast<FEDamageMaterial*>(m_pMat);
-    mat3ds s = m_pD->m_pBase->Stress(pt);
+    FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
+    FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
+    mat3ds s = m_pBase->Stress(pt);
     
     // evaluate principal normal stresses
     double ps[3];

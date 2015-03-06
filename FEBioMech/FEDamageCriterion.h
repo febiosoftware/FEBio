@@ -10,7 +10,6 @@
 #define __FEBioMech__FEDamageCriterion__
 
 #include "FECore/FEMaterial.h"
-#include "FEDamageMaterial.h"
 
 //-----------------------------------------------------------------------------
 // Virtual base class for damage criterion
@@ -47,6 +46,18 @@ public:
     
 	//! damage
 	double DamageCriterion(FEMaterialPoint& pt);
+};
+
+//-----------------------------------------------------------------------------
+// Specific strain energy as damage criterion
+
+class FEDamageCriterionSSE : public FEDamageCriterion
+{
+public:
+    FEDamageCriterionSSE(FEModel* pfem) : FEDamageCriterion(pfem) {}
+    
+    //! damage
+    double DamageCriterion(FEMaterialPoint& pt);
 };
 
 //-----------------------------------------------------------------------------
