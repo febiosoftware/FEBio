@@ -426,6 +426,7 @@
     <ClCompile Include="..\..\FEBioMech\FEDamageNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDiscreteSpringDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDistanceConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDonnanEquilibrium.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEFD.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEFDDonnanEquilibrium.cpp" />
@@ -578,6 +579,7 @@
     <ClInclude Include="..\..\FEBioMech\FEDamageNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FEDiscreteSpringDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDistanceConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEDonnanEquilibrium.h" />
     <ClInclude Include="..\..\FEBioMech\FEEFD.h" />
     <ClInclude Include="..\..\FEBioMech\FEEFDDonnanEquilibrium.h" />

@@ -13,6 +13,7 @@
 #include "FERigidSphericalJoint.h"
 #include "FERigidPinJoint.h"
 #include "FERigidRevoluteJoint.h"
+#include "FEDistanceConstraint.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -299,6 +300,20 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
                     for (j=0; j<6; ++j) lm[j+6] = lm2[j];
                     build_add(lm);
                 }
+				else if (dynamic_cast<FEDistanceConstraint*>(pnlc))
+				{
+					FEDistanceConstraint* pdc = dynamic_cast<FEDistanceConstraint*>(pnlc);
+					vector<int> lm(6);
+					FENode& n0 = mesh.Node(pdc->m_node[0] - 1);
+					lm[0] = n0.m_ID[DOF_X];
+					lm[1] = n0.m_ID[DOF_Y];
+					lm[2] = n0.m_ID[DOF_Z];
+					FENode& n1 = mesh.Node(pdc->m_node[1] - 1);
+					lm[3] = n1.m_ID[DOF_X];
+					lm[4] = n1.m_ID[DOF_Y];
+					lm[5] = n1.m_ID[DOF_Z];
+                    build_add(lm);
+				}
 			}
 
 			// copy the static profile to the MP object

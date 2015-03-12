@@ -115,6 +115,7 @@
 #include "FERigidPinJoint.h"
 #include "FERigidRevoluteJoint.h"
 #include "FEVolumeConstraint.h"
+#include "FEDistanceConstraint.h"
 
 #include "FESolidAnalysis.h"
 #include "FESolidSolver.h"
@@ -301,6 +302,7 @@ REGISTER_FECORE_CLASS(FERigidSphericalJoint, FENLCONSTRAINT_ID, "rigid spherical
 REGISTER_FECORE_CLASS(FERigidPinJoint      , FENLCONSTRAINT_ID, "rigid pin joint"      );
 REGISTER_FECORE_CLASS(FERigidRevoluteJoint , FENLCONSTRAINT_ID, "rigid revolute joint" );
 REGISTER_FECORE_CLASS(FEVolumeConstraint   , FENLCONSTRAINT_ID, "volume"               );
+REGISTER_FECORE_CLASS(FEDistanceConstraint , FENLCONSTRAINT_ID, "node distance"        );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface
