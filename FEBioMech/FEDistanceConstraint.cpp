@@ -9,6 +9,8 @@ BEGIN_PARAMETER_LIST(FEDistanceConstraint, FENLConstraint);
 	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "augtol" );
 	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty");
 	ADD_PARAMETERV(m_node  , FE_PARAM_INTV  , 2, "node");
+	ADD_PARAMETER(m_nminaug, FE_PARAM_DOUBLE, "minaug");
+	ADD_PARAMETER(m_nmaxaug, FE_PARAM_DOUBLE, "maxaug");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -20,7 +22,10 @@ FEDistanceConstraint::FEDistanceConstraint(FEModel* pfem) : FENLConstraint(pfem)
 	m_blaugon = false;
 	m_node[0] = -1;
 	m_node[1] = -1;
-	m_L0 = 0.0;
+	m_l0 = 0.0;
+	m_Lm = 0.0;
+	m_nminaug = 0;
+	m_nmaxaug = 10;
 }
 
 //-----------------------------------------------------------------------------
@@ -41,7 +46,7 @@ bool FEDistanceConstraint::Init()
 	vec3d rb = mesh.Node(m_node[1] - 1).m_r0;
 
 	// set the initial length
-	m_L0 = (ra - rb).norm();
+	m_l0 = (ra - rb).norm();
 
 	return true;
 }
@@ -61,8 +66,9 @@ void FEDistanceConstraint::Residual(FEGlobalVector& R)
 	vec3d rb = nodeb.m_rt;
 
 	// calculate the force
-	double L = (ra - rb).norm();
-	vec3d Fc = m_Fc + (ra - rb)*(m_eps*(L - m_L0));
+	double lt = (ra - rb).norm();
+	double Lm = m_Lm + m_eps*(lt - m_l0);
+	vec3d Fc = (ra - rb)*(Lm/lt);
 
 	// setup the "element" force vector
 	vector<double> fe(6);
@@ -106,18 +112,20 @@ void FEDistanceConstraint::StiffnessMatrix(FESolver* psolver)
 	vec3d rb = nodeb.m_rt;
 	vec3d rab = ra - rb;
 
-	// calculate the "gap"
-	double L = rab.norm();
-	double g = m_eps*(L - m_L0);
+	// calculate the Lagrange mulitplier
+	double lt = rab.norm();
+	double l0 = m_l0;
+	double l3 = lt*lt*lt;
+	double Lm = m_Lm + m_eps*(lt - l0);
 
 	// calculate the stiffness
 	mat3d kab;
-	kab[0][0] = (m_eps*rab.x*rab.x/L + g);
-	kab[1][1] = (m_eps*rab.y*rab.y/L + g);
-	kab[2][2] = (m_eps*rab.z*rab.z/L + g);
-	kab[0][1] = kab[1][0] = (m_eps*rab.x*rab.y/L);
-	kab[0][2] = kab[2][0] = (m_eps*rab.x*rab.z/L);
-	kab[1][2] = kab[2][1] = (m_eps*rab.y*rab.z/L);
+	kab[0][0] = (m_eps*l0*rab.x*rab.x/l3 + Lm/lt);
+	kab[1][1] = (m_eps*l0*rab.y*rab.y/l3 + Lm/lt);
+	kab[2][2] = (m_eps*l0*rab.z*rab.z/l3 + Lm/lt);
+	kab[0][1] = kab[1][0] = (m_eps*l0*rab.x*rab.y/l3);
+	kab[0][2] = kab[2][0] = (m_eps*l0*rab.x*rab.z/l3);
+	kab[1][2] = kab[2][1] = (m_eps*l0*rab.y*rab.z/l3);
 
 	// element stiffness matrix
 	matrix ke(6, 6);
@@ -165,24 +173,32 @@ bool FEDistanceConstraint::Augment(int naug)
 	vec3d ra = nodea.m_rt;
 	vec3d rb = nodeb.m_rt;
 
-	// calculate the force
-	double L = (ra - rb).norm();
-	vec3d Fc = m_Fc + (ra - rb)*(m_eps*(L - m_L0));
+	// calculate the Lagrange multipler
+	double l = (ra - rb).norm();
+	double Lm = m_Lm + m_eps*(l - m_l0);
 
-	double err = (m_Fc - Fc).norm() / Fc.norm();
+	// calculate force
+	vec3d Fc = (ra - rb)*(Lm/l);
+
+	// calculate relative error
+	bool bconv = false;
+	double err = fabs((Lm - m_Lm)/Lm);
+	if (err < m_atol) bconv = true;
 
 	felog.printf("\ndistance constraint:\n");
-	felog.printf("\tforce    = %lg, %lg, %lg\n", Fc.x, Fc.y, Fc.z);
-	felog.printf("\terror    = %lg (%lg)\n", err, m_atol);
-	felog.printf("\tdistance = %lg (%lg)\n", L, m_L0);
+	felog.printf("\tmultiplier= %lg (error = %lg / %lg)\n", Lm, err, m_atol);
+	felog.printf("\tforce     = %lg, %lg, %lg\n", Fc.x, Fc.y, Fc.z);
+	felog.printf("\tdistance  = %lg (L0 = %lg)\n", l, m_l0);
 
 	// check convergence
-	if (err < m_atol) return true;
+	if (m_nminaug > naug) bconv = false;
+	if (m_nmaxaug <= naug) bconv = true;
 
 	// update Lagrange multiplier
-	m_Fc = Fc;
+	// (only when we did not converge)
+	if (bconv == false) m_Lm = Lm;
 
-	return false;
+	return bconv;
 }
 
 //-----------------------------------------------------------------------------
@@ -193,7 +209,7 @@ void FEDistanceConstraint::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FEDistanceConstraint::Reset()
 {
-	m_Fc = vec3d(0,0,0);
+	m_Lm = 0.0;
 }
 
 //-----------------------------------------------------------------------------
