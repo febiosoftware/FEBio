@@ -327,6 +327,7 @@
     <ClInclude Include="..\..\FEBioMech\FEDamageNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FEDiscreteSpringDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDistanceConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEDonnanEquilibrium.h" />
     <ClInclude Include="..\..\FEBioMech\FEEFD.h" />
     <ClInclude Include="..\..\FEBioMech\FEEFDDonnanEquilibrium.h" />
@@ -393,6 +394,12 @@
     <ClInclude Include="..\..\FEBioMech\FEPeriodicBoundary.h" />
     <ClInclude Include="..\..\FEBioMech\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEPointConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropic.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropicUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionTransIso.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionTransIsoUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxialUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEPressureLoad.h" />
     <ClInclude Include="..\..\FEBioMech\FEPRLig.h" />
     <ClInclude Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.h" />
@@ -442,6 +449,7 @@
     <ClInclude Include="..\..\FEBioMech\FEUT4Domain.h" />
     <ClInclude Include="..\..\FEBioMech\FEVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioMech\FEViscoElasticMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEVolumeConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEVonMisesPlasticity.h" />
     <ClInclude Include="..\..\FEBioMech\gauss.h" />
     <ClInclude Include="..\..\FEBioMech\gausskronrod.h" />
@@ -483,6 +491,7 @@
     <ClCompile Include="..\..\FEBioMech\FEDamageNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDiscreteSpringDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDistanceConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDonnanEquilibrium.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEFD.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEFDDonnanEquilibrium.cpp" />
@@ -548,6 +557,12 @@
     <ClCompile Include="..\..\FEBioMech\FEPeriodicBoundary.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPointConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropicUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionTransIso.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionTransIsoUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxialUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPressureLoad.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPRLig.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.cpp" />
@@ -597,6 +612,7 @@
     <ClCompile Include="..\..\FEBioMech\FEUT4Domain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEViscoElasticMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEVolumeConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEVonMisesPlasticity.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
