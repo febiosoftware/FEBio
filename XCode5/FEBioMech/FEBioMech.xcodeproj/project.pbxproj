@@ -43,6 +43,18 @@
 		D548B9BF19DB52D4005AF337 /* FEOsmoticVirialExpansion.h in Headers */ = {isa = PBXBuildFile; fileRef = D548B9BD19DB52D4005AF337 /* FEOsmoticVirialExpansion.h */; };
 		D54A4E4A1A2B65F50032E843 /* FEReactiveVEMaterialPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54A4E481A2B65F50032E843 /* FEReactiveVEMaterialPoint.cpp */; };
 		D54A4E4B1A2B65F50032E843 /* FEReactiveVEMaterialPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D54A4E491A2B65F50032E843 /* FEReactiveVEMaterialPoint.h */; };
+		D54CBEF81AB31FD3003CF33F /* FEPrescribedActiveContractionUniaxial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54CBEF61AB31FD3003CF33F /* FEPrescribedActiveContractionUniaxial.cpp */; };
+		D54CBEF91AB31FD3003CF33F /* FEPrescribedActiveContractionUniaxial.h in Headers */ = {isa = PBXBuildFile; fileRef = D54CBEF71AB31FD3003CF33F /* FEPrescribedActiveContractionUniaxial.h */; };
+		D54CBEFC1AB3289C003CF33F /* FEPrescribedActiveContractionUniaxialUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54CBEFA1AB3289C003CF33F /* FEPrescribedActiveContractionUniaxialUC.cpp */; };
+		D54CBEFD1AB3289C003CF33F /* FEPrescribedActiveContractionUniaxialUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D54CBEFB1AB3289C003CF33F /* FEPrescribedActiveContractionUniaxialUC.h */; };
+		D54CBF001AB33EE1003CF33F /* FEPrescribedActiveContractionTransIso.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54CBEFE1AB33EE1003CF33F /* FEPrescribedActiveContractionTransIso.cpp */; };
+		D54CBF011AB33EE1003CF33F /* FEPrescribedActiveContractionTransIso.h in Headers */ = {isa = PBXBuildFile; fileRef = D54CBEFF1AB33EE1003CF33F /* FEPrescribedActiveContractionTransIso.h */; };
+		D54CBF041AB340B1003CF33F /* FEPrescribedActiveContractionTransIsoUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54CBF021AB340B1003CF33F /* FEPrescribedActiveContractionTransIsoUC.cpp */; };
+		D54CBF051AB340B1003CF33F /* FEPrescribedActiveContractionTransIsoUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D54CBF031AB340B1003CF33F /* FEPrescribedActiveContractionTransIsoUC.h */; };
+		D54CBF081AB34286003CF33F /* FEPrescribedActiveContractionIsotropic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54CBF061AB34286003CF33F /* FEPrescribedActiveContractionIsotropic.cpp */; };
+		D54CBF091AB34286003CF33F /* FEPrescribedActiveContractionIsotropic.h in Headers */ = {isa = PBXBuildFile; fileRef = D54CBF071AB34286003CF33F /* FEPrescribedActiveContractionIsotropic.h */; };
+		D54CBF0C1AB34358003CF33F /* FEPrescribedActiveContractionIsotropicUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54CBF0A1AB34358003CF33F /* FEPrescribedActiveContractionIsotropicUC.cpp */; };
+		D54CBF0D1AB34358003CF33F /* FEPrescribedActiveContractionIsotropicUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D54CBF0B1AB34358003CF33F /* FEPrescribedActiveContractionIsotropicUC.h */; };
 		D553C6241A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D553C6221A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.cpp */; };
 		D553C6251A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.h in Headers */ = {isa = PBXBuildFile; fileRef = D553C6231A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.h */; };
 		D5558C0D1AB0E039001DBC72 /* FEVolumeConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5558C0B1AB0E039001DBC72 /* FEVolumeConstraint.cpp */; };
@@ -350,6 +362,18 @@
 		D548B9BD19DB52D4005AF337 /* FEOsmoticVirialExpansion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOsmoticVirialExpansion.h; sourceTree = "<group>"; };
 		D54A4E481A2B65F50032E843 /* FEReactiveVEMaterialPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactiveVEMaterialPoint.cpp; sourceTree = "<group>"; };
 		D54A4E491A2B65F50032E843 /* FEReactiveVEMaterialPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReactiveVEMaterialPoint.h; sourceTree = "<group>"; };
+		D54CBEF61AB31FD3003CF33F /* FEPrescribedActiveContractionUniaxial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPrescribedActiveContractionUniaxial.cpp; sourceTree = "<group>"; };
+		D54CBEF71AB31FD3003CF33F /* FEPrescribedActiveContractionUniaxial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPrescribedActiveContractionUniaxial.h; sourceTree = "<group>"; };
+		D54CBEFA1AB3289C003CF33F /* FEPrescribedActiveContractionUniaxialUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPrescribedActiveContractionUniaxialUC.cpp; sourceTree = "<group>"; };
+		D54CBEFB1AB3289C003CF33F /* FEPrescribedActiveContractionUniaxialUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPrescribedActiveContractionUniaxialUC.h; sourceTree = "<group>"; };
+		D54CBEFE1AB33EE1003CF33F /* FEPrescribedActiveContractionTransIso.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPrescribedActiveContractionTransIso.cpp; sourceTree = "<group>"; };
+		D54CBEFF1AB33EE1003CF33F /* FEPrescribedActiveContractionTransIso.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPrescribedActiveContractionTransIso.h; sourceTree = "<group>"; };
+		D54CBF021AB340B1003CF33F /* FEPrescribedActiveContractionTransIsoUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPrescribedActiveContractionTransIsoUC.cpp; sourceTree = "<group>"; };
+		D54CBF031AB340B1003CF33F /* FEPrescribedActiveContractionTransIsoUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPrescribedActiveContractionTransIsoUC.h; sourceTree = "<group>"; };
+		D54CBF061AB34286003CF33F /* FEPrescribedActiveContractionIsotropic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPrescribedActiveContractionIsotropic.cpp; sourceTree = "<group>"; };
+		D54CBF071AB34286003CF33F /* FEPrescribedActiveContractionIsotropic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPrescribedActiveContractionIsotropic.h; sourceTree = "<group>"; };
+		D54CBF0A1AB34358003CF33F /* FEPrescribedActiveContractionIsotropicUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPrescribedActiveContractionIsotropicUC.cpp; sourceTree = "<group>"; };
+		D54CBF0B1AB34358003CF33F /* FEPrescribedActiveContractionIsotropicUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPrescribedActiveContractionIsotropicUC.h; sourceTree = "<group>"; };
 		D553C6221A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEUncoupledReactiveViscoelastic.cpp; sourceTree = "<group>"; };
 		D553C6231A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEUncoupledReactiveViscoelastic.h; sourceTree = "<group>"; };
 		D5558C0B1AB0E039001DBC72 /* FEVolumeConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEVolumeConstraint.cpp; sourceTree = "<group>"; };
@@ -848,6 +872,18 @@
 				D5E107201865DFAD00B23922 /* FEPointBodyForce.h */,
 				D5E107211865DFAD00B23922 /* FEPointConstraint.cpp */,
 				D5E107221865DFAD00B23922 /* FEPointConstraint.h */,
+				D54CBF061AB34286003CF33F /* FEPrescribedActiveContractionIsotropic.cpp */,
+				D54CBF071AB34286003CF33F /* FEPrescribedActiveContractionIsotropic.h */,
+				D54CBF0A1AB34358003CF33F /* FEPrescribedActiveContractionIsotropicUC.cpp */,
+				D54CBF0B1AB34358003CF33F /* FEPrescribedActiveContractionIsotropicUC.h */,
+				D54CBEFE1AB33EE1003CF33F /* FEPrescribedActiveContractionTransIso.cpp */,
+				D54CBEFF1AB33EE1003CF33F /* FEPrescribedActiveContractionTransIso.h */,
+				D54CBF021AB340B1003CF33F /* FEPrescribedActiveContractionTransIsoUC.cpp */,
+				D54CBF031AB340B1003CF33F /* FEPrescribedActiveContractionTransIsoUC.h */,
+				D54CBEF61AB31FD3003CF33F /* FEPrescribedActiveContractionUniaxial.cpp */,
+				D54CBEF71AB31FD3003CF33F /* FEPrescribedActiveContractionUniaxial.h */,
+				D54CBEFA1AB3289C003CF33F /* FEPrescribedActiveContractionUniaxialUC.cpp */,
+				D54CBEFB1AB3289C003CF33F /* FEPrescribedActiveContractionUniaxialUC.h */,
 				D5E107231865DFAD00B23922 /* FEPressureLoad.cpp */,
 				D5E107241865DFAD00B23922 /* FEPressureLoad.h */,
 				D515BD3818DB3D7B00B661B2 /* FEPRLig.cpp */,
@@ -1026,6 +1062,7 @@
 				D5E107A91865DFAD00B23922 /* FEEFDUncoupled.h in Headers */,
 				D51BB3F7198FCDDA00638A8B /* gausskronrod.h in Headers */,
 				D5E107B41865DFAD00B23922 /* FEElasticMultigeneration.h in Headers */,
+				D54CBF051AB340B1003CF33F /* FEPrescribedActiveContractionTransIsoUC.h in Headers */,
 				D5E107F61865DFAD00B23922 /* FEMuscleMaterial.h in Headers */,
 				D5E108361865DFAD00B23922 /* FETendonMaterial.h in Headers */,
 				D5C69F931A41EA9000EB52B2 /* FEFiberExpLinear.h in Headers */,
@@ -1053,6 +1090,7 @@
 				D5E108181865DFAD00B23922 /* FERigidSolidDomain.h in Headers */,
 				D51BB41E19919E1100638A8B /* FEFiberIntegrationTrapezoidalUC.h in Headers */,
 				D5E107FE1865DFAD00B23922 /* FEOgdenUnconstrained.h in Headers */,
+				D54CBF0D1AB34358003CF33F /* FEPrescribedActiveContractionIsotropicUC.h in Headers */,
 				D5E107851865DFAD00B23922 /* FEBioMechPlot.h in Headers */,
 				D52D154B1A00D9A1005A6CB9 /* FERigidRevoluteJoint.h in Headers */,
 				D5E1078D1865DFAD00B23922 /* FEConstBodyForce.h in Headers */,
@@ -1070,6 +1108,7 @@
 				D5E108241865DFAD00B23922 /* FESolidDomainFactory.h in Headers */,
 				D5F407CC197D7DDE0059F0B1 /* FESolidSolver2.h in Headers */,
 				D5E1077F1865DFAD00B23922 /* FEAugLagLinearConstraint.h in Headers */,
+				D54CBF091AB34286003CF33F /* FEPrescribedActiveContractionIsotropic.h in Headers */,
 				D51BB3FE1991238100638A8B /* FEFiberMaterialPoint.h in Headers */,
 				D5E107D01865DFAD00B23922 /* FEFiberIntegrationTrapezoidal.h in Headers */,
 				D5E1080E1865DFAD00B23922 /* FERemodelingElasticMaterial.h in Headers */,
@@ -1101,6 +1140,8 @@
 				D5E107E01865DFAD00B23922 /* FEIncompNeoHookean.h in Headers */,
 				D5E107FC1865DFAD00B23922 /* FEOgdenMaterial.h in Headers */,
 				D5E107F41865DFAD00B23922 /* FEMRVonMisesFibers.h in Headers */,
+				D54CBEF91AB31FD3003CF33F /* FEPrescribedActiveContractionUniaxial.h in Headers */,
+				D54CBEFD1AB3289C003CF33F /* FEPrescribedActiveContractionUniaxialUC.h in Headers */,
 				D5E1079D1865DFAD00B23922 /* FEDiscreteSpringDomain.h in Headers */,
 				D5E108001865DFAD00B23922 /* FEOrthoElastic.h in Headers */,
 				D515BD3B18DB3D7B00B661B2 /* FEPRLig.h in Headers */,
@@ -1113,6 +1154,7 @@
 				D51BB4161991991800638A8B /* FEFiberIntegrationGaussKronrodUC.h in Headers */,
 				D5E108581865DFAD00B23922 /* geodesic.h in Headers */,
 				D5E108501865DFAD00B23922 /* FEUT4Domain.h in Headers */,
+				D54CBF011AB33EE1003CF33F /* FEPrescribedActiveContractionTransIso.h in Headers */,
 				D5E108481865DFAD00B23922 /* FEUncoupledActiveContraction.h in Headers */,
 				D5E107A31865DFAD00B23922 /* FEEFDDonnanEquilibrium.h in Headers */,
 				D5E107771865DFAD00B23922 /* FE2DTransIsoMooneyRivlin.h in Headers */,
@@ -1189,6 +1231,7 @@
 				D5E107761865DFAD00B23922 /* FE2DTransIsoMooneyRivlin.cpp in Sources */,
 				D553C6241A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.cpp in Sources */,
 				D5E108491865DFAD00B23922 /* FEUncoupledElasticMixture.cpp in Sources */,
+				D54CBF081AB34286003CF33F /* FEPrescribedActiveContractionIsotropic.cpp in Sources */,
 				D5E107E31865DFAD00B23922 /* FEIsotropicElastic.cpp in Sources */,
 				D5E108231865DFAD00B23922 /* FESolidDomainFactory.cpp in Sources */,
 				D5E1077E1865DFAD00B23922 /* FEAugLagLinearConstraint.cpp in Sources */,
@@ -1211,6 +1254,7 @@
 				D5E107801865DFAD00B23922 /* FEBioMech.cpp in Sources */,
 				D5E108171865DFAD00B23922 /* FERigidSolidDomain.cpp in Sources */,
 				D5E1083D1865DFAD00B23922 /* FETransIsoMooneyRivlin.cpp in Sources */,
+				D54CBF001AB33EE1003CF33F /* FEPrescribedActiveContractionTransIso.cpp in Sources */,
 				D51BB411199197A100638A8B /* FEFiberIntegrationGeodesicUC.cpp in Sources */,
 				D51BB40D1991841100638A8B /* FEFiberIntegrationGaussUC.cpp in Sources */,
 				D5E107F51865DFAD00B23922 /* FEMuscleMaterial.cpp in Sources */,
@@ -1225,6 +1269,7 @@
 				D5E1081F1865DFAD00B23922 /* FESlidingInterfaceBW.cpp in Sources */,
 				D51BB41919919CAC00638A8B /* FEFiberIntegrationTriangleUC.cpp in Sources */,
 				D5E107D31865DFAD00B23922 /* FEFiberNeoHookean.cpp in Sources */,
+				D54CBEFC1AB3289C003CF33F /* FEPrescribedActiveContractionUniaxialUC.cpp in Sources */,
 				D5E107A61865DFAD00B23922 /* FEEFDNeoHookean.cpp in Sources */,
 				D5E107ED1865DFAD00B23922 /* FELinearTransIso.cpp in Sources */,
 				D5E1077A1865DFAD00B23922 /* FE3FieldElasticSolidDomain.cpp in Sources */,
@@ -1244,6 +1289,7 @@
 				D5E107C51865DFAD00B23922 /* FEFiberExpPow.cpp in Sources */,
 				D5E107CF1865DFAD00B23922 /* FEFiberIntegrationTrapezoidal.cpp in Sources */,
 				D5E107E51865DFAD00B23922 /* FELinearElastic.cpp in Sources */,
+				D54CBF041AB340B1003CF33F /* FEPrescribedActiveContractionTransIsoUC.cpp in Sources */,
 				D5E107901865DFAD00B23922 /* FEContinuousFiberDistribution.cpp in Sources */,
 				D5E1078C1865DFAD00B23922 /* FEConstBodyForce.cpp in Sources */,
 				D5E1084F1865DFAD00B23922 /* FEUT4Domain.cpp in Sources */,
@@ -1261,6 +1307,7 @@
 				D5E107D11865DFAD00B23922 /* FEFiberMaterial.cpp in Sources */,
 				D51BB4091991830800638A8B /* FEFiberIntegrationSchemeUC.cpp in Sources */,
 				D5E107FD1865DFAD00B23922 /* FEOgdenUnconstrained.cpp in Sources */,
+				D54CBEF81AB31FD3003CF33F /* FEPrescribedActiveContractionUniaxial.cpp in Sources */,
 				D5E107B31865DFAD00B23922 /* FEElasticMultigeneration.cpp in Sources */,
 				D5E108251865DFAD00B23922 /* FESolidMaterial.cpp in Sources */,
 				D5E1082D1865DFAD00B23922 /* FEStiffnessMatrix.cpp in Sources */,
@@ -1294,6 +1341,7 @@
 				D5C6D41F19CCB16100E48AAF /* FEDamageCriterionUC.cpp in Sources */,
 				D52D154A1A00D9A1005A6CB9 /* FERigidRevoluteJoint.cpp in Sources */,
 				D5E107D71865DFAD00B23922 /* FEFungOrthotropic.cpp in Sources */,
+				D54CBF0C1AB34358003CF33F /* FEPrescribedActiveContractionIsotropicUC.cpp in Sources */,
 				D5E108371865DFAD00B23922 /* FETiedContactSurface.cpp in Sources */,
 				D5E108431865DFAD00B23922 /* FETrussMaterial.cpp in Sources */,
 				D56DC21F19532A83006C137D /* FERigidSphericalJoint.cpp in Sources */,
