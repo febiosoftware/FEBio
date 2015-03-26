@@ -7,6 +7,7 @@
 #include "FEArrudaBoyce.h"
 #include "FECarterHayesOld.h"
 #include "FECellGrowth.h"
+#include "FECubicCLE.h"
 #include "FEDamageMooneyRivlin.h"
 #include "FEDamageNeoHookean.h"
 #include "FEDamageTransIsoMooneyRivlin.h"
@@ -42,6 +43,7 @@
 #include "FEOgdenMaterial.h"
 #include "FEOgdenUnconstrained.h"
 #include "FEOrthoElastic.h"
+#include "FEOrthotropicCLE.h"
 #include "FEOsmoticVirialExpansion.h"
 #include "FEPerfectOsmometer.h"
 #include "FERemodelingElasticMaterial.h"
@@ -165,13 +167,14 @@ REGISTER_FECORE_CLASS(FE2DTransIsoMooneyRivlin       ,FEMATERIAL_ID, "2D trans i
 REGISTER_FECORE_CLASS(FE2DTransIsoVerondaWestmann    ,FEMATERIAL_ID, "2D trans iso Veronda-Westmann" );
 REGISTER_FECORE_CLASS(FEArrudaBoyce                  ,FEMATERIAL_ID, "Arruda-Boyce"                  );
 REGISTER_FECORE_CLASS(FECellGrowth                   ,FEMATERIAL_ID, "cell growth"                   );
+REGISTER_FECORE_CLASS(FECubicCLE                     ,FEMATERIAL_ID, "cubic CLE"                     );
 REGISTER_FECORE_CLASS(FEDamageMooneyRivlin           ,FEMATERIAL_ID, "damage Mooney-Rivlin"          );
 REGISTER_FECORE_CLASS(FEDamageNeoHookean             ,FEMATERIAL_ID, "damage neo-Hookean"            );
 REGISTER_FECORE_CLASS(FEDamageTransIsoMooneyRivlin   ,FEMATERIAL_ID, "damage trans iso Mooney-Rivlin");
 REGISTER_FECORE_CLASS(FEDonnanEquilibrium            ,FEMATERIAL_ID, "Donnan equilibrium"            );
 REGISTER_FECORE_CLASS(FEEFDDonnanEquilibrium         ,FEMATERIAL_ID, "EFD Donnan equilibrium"        );
 REGISTER_FECORE_CLASS(FEEFDMooneyRivlin              ,FEMATERIAL_ID, "EFD Mooney-Rivlin"             );
-REGISTER_FECORE_CLASS(FEEFDNeoHookean                ,FEMATERIAL_ID, "EFD neo-Hookean (new)"               );
+REGISTER_FECORE_CLASS(FEEFDNeoHookean                ,FEMATERIAL_ID, "EFD neo-Hookean (new)"         );
 REGISTER_FECORE_CLASS(FEEFDNeoHookeanOld             ,FEMATERIAL_ID, "EFD neo-Hookean"               );
 REGISTER_FECORE_CLASS(FEEFDUncoupled                 ,FEMATERIAL_ID, "EFD uncoupled"                 );
 REGISTER_FECORE_CLASS(FEEFDVerondaWestmann           ,FEMATERIAL_ID, "EFD Veronda-Westmann"          );
@@ -200,6 +203,7 @@ REGISTER_FECORE_CLASS(FENeoHookeanTransIso           ,FEMATERIAL_ID, "neo-Hookea
 REGISTER_FECORE_CLASS(FEOgdenMaterial                ,FEMATERIAL_ID, "Ogden"                         );
 REGISTER_FECORE_CLASS(FEOgdenUnconstrained           ,FEMATERIAL_ID, "Ogden unconstrained"           );
 REGISTER_FECORE_CLASS(FEOrthoElastic                 ,FEMATERIAL_ID, "orthotropic elastic"           );
+REGISTER_FECORE_CLASS(FEOrthotropicCLE               ,FEMATERIAL_ID, "orthotropic CLE"               );
 REGISTER_FECORE_CLASS(FEPerfectOsmometer             ,FEMATERIAL_ID, "perfect osmometer"             );
 REGISTER_FECORE_CLASS(FEOsmoticVirialExpansion       ,FEMATERIAL_ID, "osmotic virial expansion"      );    
 REGISTER_FECORE_CLASS(FERigidMaterial                ,FEMATERIAL_ID, "rigid body"                    );
