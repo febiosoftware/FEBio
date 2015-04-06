@@ -298,6 +298,23 @@ void FEVolumeConstraint::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+void FEVolumeConstraint::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (bsave)
+	{
+		dmp << m_s.m_Lp;
+		dmp << m_s.m_p;
+		dmp << m_s.m_Vt;
+	}
+	else
+	{
+		dmp >> m_s.m_Lp;
+		dmp >> m_s.m_p;
+		dmp >> m_s.m_Vt;
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEVolumeConstraint::Reset()
 {
 }

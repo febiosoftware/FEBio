@@ -36,6 +36,7 @@ public:
 	void StiffnessMatrix(FESolver* psolver);
 	bool Augment(int naug);
 	void Serialize(DumpFile& ar);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	// update state
 	void Reset();

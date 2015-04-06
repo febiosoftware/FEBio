@@ -29,6 +29,7 @@ public:
 	virtual void StiffnessMatrix(FESolver* psolver) = 0;
 	virtual bool Augment(int naug) = 0;
 	virtual void Serialize(DumpFile& ar) = 0;
+	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
 
 	// update state
 	virtual void Reset() {}

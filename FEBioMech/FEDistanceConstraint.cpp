@@ -207,6 +207,19 @@ void FEDistanceConstraint::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+void FEDistanceConstraint::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (bsave)
+	{
+		dmp << m_Lm; 
+	}
+	else
+	{
+		dmp >> m_Lm;
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEDistanceConstraint::Reset()
 {
 	m_Lm = 0.0;

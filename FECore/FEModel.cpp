@@ -667,6 +667,9 @@ void FEModel::ShallowCopy(DumpStream& dmp, bool bsave)
 
 	// stream contact data
 	for (int i=0; i<SurfacePairInteractions(); ++i) m_CI[i]->ShallowCopy(dmp, bsave);
+
+	// stream nonlinear constraints
+	for (int i=0; i<NonlinearConstraints(); ++i) m_NLC[i]->ShallowCopy(dmp, bsave);
 }
 
 //=============================================================================

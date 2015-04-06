@@ -59,6 +59,9 @@ public:
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
 
+	//! stream constraint data
+	void ShallowCopy(DumpStream& dmp, bool bsave);
+
 	//! add the linear constraint contributions to the residual
 	void Residual(FEGlobalVector& R);
 

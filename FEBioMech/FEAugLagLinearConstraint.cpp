@@ -208,7 +208,6 @@ void FELinearConstraintSet::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-
 void FELinearConstraintSet::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
@@ -230,5 +229,20 @@ void FELinearConstraintSet::Serialize(DumpFile& ar)
 			plc->Serialize(ar);
 			m_LC.push_back(plc);
 		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FELinearConstraintSet::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (bsave)
+	{
+		list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
+		for (int i=0; i<(int) m_LC.size(); ++i, ++it) dmp << (*it)->m_lam;
+	}
+	else
+	{
+		list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
+		for (int i=0; i<(int) m_LC.size(); ++i, ++it) dmp >> (*it)->m_lam;
 	}
 }
