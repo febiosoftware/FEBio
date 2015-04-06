@@ -78,6 +78,7 @@ public:
 	bool		m_boffset;	//!< offset slave surface for shells
 	double		m_Dmax;		//!< max distance for contact
 	bool		m_bspecial;	//!< handle special cases in projection
+	bool		m_breloc;	//!< node relocation on initialization
 
 	DECLARE_PARAMETER_LIST();
 };

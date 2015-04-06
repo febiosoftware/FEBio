@@ -21,6 +21,7 @@ BEGIN_PARAMETER_LIST(FESlidingInterfaceBW, FEContactInterface)
 	ADD_PARAMETER(m_btension , FE_PARAM_BOOL  , "tension"            );
 	ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"             );
 	ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"             );
+	ADD_PARAMETER(m_breloc   , FE_PARAM_BOOL  , "node_reloc"         );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -303,6 +304,7 @@ FESlidingInterfaceBW::FESlidingInterfaceBW(FEModel* pfem) : FEContactInterface(p
 	m_nsegup = 0;
 	m_bautopen = false;
 	m_btension = false;
+	m_breloc = false;
 	
 	m_naugmin = 0;
 	m_naugmax = 10;
@@ -453,7 +455,7 @@ void FESlidingInterfaceBW::CalcAutoPenalty(FESlidingSurfaceBW& s)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfaceBW& ms, bool bupseg)
+void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfaceBW& ms, bool bupseg, bool bmove)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	double R = m_srad*mesh.GetBoundingBox().radius();
@@ -463,6 +465,58 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
 	np.SetTolerance(m_stol);
 	np.SetSearchRadius(R);
 	np.Init();
+
+	// if we need to project the nodes onto the master surface,
+	// let's do this first
+	if (bmove)
+	{
+		int NN = ss.Nodes();
+		int NE = ss.Elements();
+		// first we need to calculate the node normals
+		vector<vec3d> normal; normal.assign(NN, vec3d(0,0,0));
+		for (int i=0; i<NE; ++i)
+		{
+			FESurfaceElement& el = ss.Element(i);
+			int ne = el.Nodes();
+			for (int j=0; j<ne; ++j)
+			{
+				vec3d r0 = ss.Node(el.m_lnode[ j         ]).m_rt;
+				vec3d rp = ss.Node(el.m_lnode[(j+   1)%ne]).m_rt;
+				vec3d rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).m_rt;
+				vec3d n = (rp - r0)^(rm - r0);
+				normal[el.m_lnode[j]] += n;
+			}
+		}
+		for (int i=0; i<NN; ++i) normal[i].unit();
+
+		// loop over all nodes
+		for (int i=0; i<NN; ++i)
+		{
+			FENode& node = ss.Node(i);
+
+			// get the spatial nodal coordinates
+			vec3d rt = node.m_rt;
+			vec3d nu = normal[i];
+
+			// project onto the master surface
+			vec3d q;
+			double rs[2] = {0,0};
+			FESurfaceElement* pme = np.Project(rt, nu, rs);
+			if (pme) 
+			{
+				// the node could potentially be in contact
+				// find the global location of the intersection point
+				vec3d q = ms.Local2Global(*pme, rs[0], rs[1]);
+
+				// calculate the gap function
+				// NOTE: this has the opposite sign compared
+				// to Gerard's notes.
+				double gap = nu*(rt - q);
+
+				if (gap>0) node.m_r0 = node.m_rt = q;
+			}
+		}
+	}
 	
 	// loop over all integration points
 //	#pragma omp parallel for shared(R, binit, bupseg)
@@ -572,7 +626,9 @@ void FESlidingInterfaceBW::Update(int nsolve_iter)
 	
 	// project the surfaces onto each other
 	// this will update the gap functions as well
-	ProjectSurface(m_ss, m_ms, bupseg);
+	static bool bfirst = true;
+	ProjectSurface(m_ss, m_ms, bupseg, (m_breloc && bfirst));
+	bfirst = false;
 	if (m_btwo_pass) ProjectSurface(m_ms, m_ss, bupseg);
 	
 	// Update the net contact pressures

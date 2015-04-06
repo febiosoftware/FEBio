@@ -104,7 +104,7 @@ public:
 	void BuildMatrixProfile(FEStiffnessMatrix& K);
 
 protected:
-	void ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfaceBW& ms, bool bupseg);
+	void ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfaceBW& ms, bool bupseg, bool bmove = false);
 	
 	//! calculate penalty factor
 	void CalcAutoPenalty(FESlidingSurfaceBW& s);
@@ -123,6 +123,7 @@ public:
 	int				m_naugmax;		//!< maximum nr of augmentations
 	int				m_naugmin;		//!< minimum nr of augmentations
 	int				m_nsegup;		//!< segment update parameter
+	bool			m_breloc;		//!< node relocation on activation
 	
 	double			m_epsn;			//!< normal penalty factor
 	bool			m_bautopen;		//!< use autopenalty factor

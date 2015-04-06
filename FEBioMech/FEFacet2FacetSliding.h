@@ -104,7 +104,7 @@ public:
 
 protected:
 	//! project slave surface onto master
-	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms, bool bsegup);
+	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms, bool bsegup, bool bmove = false);
 
 	//! calculate auto-penalty
 	void CalcAutoPenalty(FEFacetSlidingSurface& s);
@@ -117,6 +117,7 @@ public:
 	bool	m_bautopen;		//!< auto-penalty flag
 	double	m_srad;			//!< search radius (% of model size)
 	int		m_nsegup;		//!< segment update parameter
+	bool	m_breloc;	//!< node relocation on initilization
 
 	double	m_atol;			//!< aug lag tolernace
 	double	m_gtol;			//!< gap tolerance

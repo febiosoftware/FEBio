@@ -21,6 +21,7 @@ BEGIN_PARAMETER_LIST(FETiedInterface, FEContactInterface)
 	ADD_PARAMETER(m_boffset , FE_PARAM_BOOL  , "offset_shells"   );
 	ADD_PARAMETER(m_Dmax    , FE_PARAM_DOUBLE, "max_distance"    );
 	ADD_PARAMETER(m_bspecial, FE_PARAM_BOOL  , "special"         );
+	ADD_PARAMETER(m_breloc  , FE_PARAM_BOOL  , "node_reloc"      );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -43,6 +44,7 @@ FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&
 	m_boffset = false;
 	m_Dmax = 0.0;
 	m_bspecial = true;
+	m_breloc = false;
 
 	// give this interface an ID (TODO: where is this actually used?)
 	m_nID = count++;
@@ -115,7 +117,7 @@ void FETiedInterface::Activate()
 	FEContactInterface::Activate();
 
 	// project slave surface onto master surface
-	ProjectSurface(ss, ms, false);
+	ProjectSurface(ss, ms, m_breloc);
 }
 
 //-----------------------------------------------------------------------------

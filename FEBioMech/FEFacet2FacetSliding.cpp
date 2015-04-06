@@ -23,6 +23,7 @@ BEGIN_PARAMETER_LIST(FEFacet2FacetSliding, FEContactInterface)
 	ADD_PARAMETER(m_mu       , FE_PARAM_DOUBLE, "fric_coeff"   );
 	ADD_PARAMETER(m_epsf     , FE_PARAM_DOUBLE, "fric_penalty" );
 	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"       );
+	ADD_PARAMETER(m_breloc   , FE_PARAM_BOOL  , "node_reloc"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -301,6 +302,7 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(p
 	m_btwo_pass = false;
 	m_bautopen = false;
 	m_nsegup = 0;	// always do segment updates
+	m_breloc = false;
 
 	m_atol = 0.01;
 	m_gtol = 0;
@@ -404,7 +406,7 @@ void FEFacet2FacetSliding::Activate()
 	if (m_bautopen) CalcAutoPenalty(m_ss);
 
 	// project slave surface onto master surface
-	ProjectSurface(m_ss, m_ms, true);
+	ProjectSurface(m_ss, m_ms, true, m_breloc);
 
 	if (m_btwo_pass) 
 	{
@@ -464,12 +466,56 @@ void FEFacet2FacetSliding::CalcAutoPenalty(FEFacetSlidingSurface& s)
 //! In this function we project the integration points to the master surface,
 //! calculate the projection's natural coordinates and normal vector
 //
-void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlidingSurface &ms, bool bsegup)
+void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlidingSurface &ms, bool bsegup, bool bmove)
 {
 	FEClosestPointProjection cpp(ms);
 	cpp.HandleSpecialCases(true);
 	cpp.SetTolerance(m_stol);
 	cpp.Init();
+
+	// if we need to project the nodes onto the master surface,
+	// let's do this first
+	if (bmove)
+	{
+		int NN = ss.Nodes();
+		int NE = ss.Elements();
+		// first we need to calculate the node normals
+		vector<vec3d> normal; normal.assign(NN, vec3d(0,0,0));
+		for (int i=0; i<NE; ++i)
+		{
+			FESurfaceElement& el = ss.Element(i);
+			int ne = el.Nodes();
+			for (int j=0; j<ne; ++j)
+			{
+				vec3d r0 = ss.Node(el.m_lnode[ j         ]).m_rt;
+				vec3d rp = ss.Node(el.m_lnode[(j+   1)%ne]).m_rt;
+				vec3d rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).m_rt;
+				vec3d n = (rp - r0)^(rm - r0);
+				normal[el.m_lnode[j]] += n;
+			}
+		}
+		for (int i=0; i<NN; ++i) normal[i].unit();
+
+		// loop over all nodes
+		for (int i=0; i<NN; ++i)
+		{
+			FENode& node = ss.Node(i);
+
+			// get the spatial nodal coordinates
+			vec3d rt = node.m_rt;
+			vec3d nu = normal[i];
+
+			// project onto the master surface
+			vec3d q;
+			vec2d rs(0,0);
+			FESurfaceElement* pme = cpp.Project(rt, q, rs);
+			if (pme) 
+			{
+				double gap = (nu*(rt - q));
+				if (gap>0) node.m_r0 = node.m_rt = q;
+			}
+		}
+	}
 
 	// loop over all slave elements
 	for (int i=0; i<ss.Elements(); ++i)
