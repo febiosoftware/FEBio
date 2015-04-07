@@ -217,11 +217,28 @@ bool FEElasticMultigeneration::SetProperty(int n, FECoreBase* pm)
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+void FEElasticMultigeneration::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
+{
+    FEElasticMaterial::SetLocalCoordinateSystem(el, n, mp);
+    FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+    
+    // check the local coordinate systems for each component
+    for (int j=0; j<Materials(); ++j)
+    {
+        FEElasticMaterial* pmj = GetMaterial(j)->GetElasticMaterial();
+        FEMaterialPoint& mpj = *mp.GetPointData(j);
+        FEElasticMaterialPoint& pj = *(mpj.ExtractData<FEElasticMaterialPoint>());
+        pj.m_Q = pt.m_Q;    // copy mixture material's coordinate system into component
+        pmj->SetLocalCoordinateSystem(el, n, mpj);
+    }
+}
+
 //--------------------------------------------------------------------------------
 // Check if time t constitutes a new generation and return that generation
 int FEElasticMultigeneration::CheckGeneration(const double t)
 {
-	int ngen = m_MG.size();
+	int ngen = (int)m_MG.size();
 	for (int igen=1; igen<ngen; ++igen)
 	{
 		if (t < m_MG[igen]->btime) return igen - 1;

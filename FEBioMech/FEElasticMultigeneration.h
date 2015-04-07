@@ -38,6 +38,9 @@ public:
 	//! set a material property (returns false on error)
 	bool SetProperty(int i, FECoreBase* pm);
 
+    //! Get the elastic component
+    FEElasticMaterial* GetElasticMaterial() { return m_pMat; }
+    
 	//! data serialization
 	void Serialize(DumpFile& ar);
 
@@ -98,6 +101,9 @@ public:
     // return number of materials
     int Materials() const { return (int)m_MG.size(); }
     
+    // return a generation material component
+    FEGenerationMaterial* GetMaterial(int i) { return m_MG[i]; }
+    
 	void AddMaterial(FEElasticMaterial* pmat);
 	
 public:
@@ -113,6 +119,9 @@ public:
 	//! set a material property (returns false on error)
 	bool SetProperty(int i, FECoreBase* pm);
 
+    //! Set the local coordinate system for a material point (overridden from FEMaterial)
+    void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
+    
 public:
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
