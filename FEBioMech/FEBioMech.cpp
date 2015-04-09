@@ -290,12 +290,12 @@ REGISTER_FECORE_CLASS(FEDamageCriterionVMS                 , FEMATERIAL_ID, "DC 
 REGISTER_FECORE_CLASS(FEDamageCriterionMSS                 , FEMATERIAL_ID, "DC max shear stress"     );
 REGISTER_FECORE_CLASS(FEDamageCriterionMNS                 , FEMATERIAL_ID, "DC max normal stress"    );
 REGISTER_FECORE_CLASS(FEDamageCriterionMNLS                , FEMATERIAL_ID, "DC max normal Lagrange strain");
-REGISTER_FECORE_CLASS(FEDamageCriterionUCSimo              , FEMATERIAL_ID, "DC Simo"              );
-REGISTER_FECORE_CLASS(FEDamageCriterionUCSED               , FEMATERIAL_ID, "DC UC strain energy density");
-REGISTER_FECORE_CLASS(FEDamageCriterionUCVMS               , FEMATERIAL_ID, "DC UC von Mises stress"     );
-REGISTER_FECORE_CLASS(FEDamageCriterionUCMSS               , FEMATERIAL_ID, "DC UC max shear stress"     );
-REGISTER_FECORE_CLASS(FEDamageCriterionUCMNS               , FEMATERIAL_ID, "DC UC max normal stress"    );
-REGISTER_FECORE_CLASS(FEDamageCriterionUCMNLS              , FEMATERIAL_ID, "DC UC max normal Lagrange strain");
+REGISTER_FECORE_CLASS(FEDamageCriterionUCSimo              , FEMATERIAL_ID, "DC Simo uncoupled"              );
+REGISTER_FECORE_CLASS(FEDamageCriterionUCSED               , FEMATERIAL_ID, "DC strain energy density uncoupled");
+REGISTER_FECORE_CLASS(FEDamageCriterionUCVMS               , FEMATERIAL_ID, "DC von Mises stress uncoupled"     );
+REGISTER_FECORE_CLASS(FEDamageCriterionUCMSS               , FEMATERIAL_ID, "DC max shear stress uncoupled"     );
+REGISTER_FECORE_CLASS(FEDamageCriterionUCMNS               , FEMATERIAL_ID, "DC max normal stress uncoupled"    );
+REGISTER_FECORE_CLASS(FEDamageCriterionUCMNLS              , FEMATERIAL_ID, "DC max normal Lagrange strain uncoupled");
     
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad

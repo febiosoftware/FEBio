@@ -66,7 +66,7 @@ public:
     void Init();
     
 public:
-    double	m_tau;      //!< relaxation time
+    double	m_tau0;     //!< relaxation time
     double	m_tau1;     //!< relaxation time coeff. of 2nd term
     double  m_alpha;    //!< exponent of 2nd term for tau
     
@@ -137,9 +137,9 @@ public:
     void Init();
     
 public:
-    double	m_tau;      //!< relaxation time
+    double	m_tau0;      //!< relaxation time
     double	m_tau1;     //!< relaxation time coeff. of 2nd term
-    double  m_beta;     //!< exponent
+    double  m_beta0;     //!< exponent
     double  m_beta1;    //!< coefficient of 2nd for beta
     double  m_alpha;    //!< exponent of 2nd term for tau and beta
     
@@ -187,8 +187,8 @@ public:
     void Init();
     
 public:
-    double	m_tau;      //!< relaxation time at zero strain
-    double  m_beta;     //!< exponent of relaxation power law
+    double	m_tau0;      //!< relaxation time at zero strain
+    double  m_beta0;     //!< exponent of relaxation power law
     double	m_tau1;     //!< relaxation time coeff. of 2nd term
     double  m_beta1;    //!< coefficient of 2nd for beta
     double  m_alpha;    //!< exponent of 2nd term
