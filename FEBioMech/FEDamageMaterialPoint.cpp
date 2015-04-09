@@ -28,9 +28,7 @@ void FEDamageMaterialPoint::Init(bool bflag)
     }
     else
     {
-        if (m_pDC) m_Emax = max(m_Emax, m_pDC->DamageCriterion(*this));
-        else if (m_pDU) m_Emax = max(m_Emax, m_pDU->DamageCriterion(*this));
-        else m_Emax = max(m_Emax, m_Etrial);
+        m_Emax = max(m_Emax, m_Etrial);
     }
     
     // don't forget to intialize the nested data

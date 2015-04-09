@@ -23,9 +23,7 @@ class FEDamageCriterionUC;
 class FEDamageMaterialPoint : public FEMaterialPoint
 {
 public:
-    FEDamageMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) { m_pDC = 0; m_pDU = 0; }
-    FEDamageMaterialPoint(FEMaterialPoint *pt, FEDamageCriterion* pDC) : FEMaterialPoint(pt) { m_pDC = pDC; m_pDU = 0; }
-    FEDamageMaterialPoint(FEMaterialPoint *pt, FEDamageCriterionUC* pDU) : FEMaterialPoint(pt) { m_pDC = 0; m_pDU = pDU; }
+    FEDamageMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
     
     FEMaterialPoint* Copy();
     
@@ -39,8 +37,6 @@ public:
 	double	m_Etrial;		//!< trial damage criterion at time t
 	double	m_Emax;			//!< max damage criterion up to time t
 	double	m_D;			//!< damage (0 = no damage, 1 = complete damage)
-    FEDamageCriterion*  m_pDC;      //!< pointer to damage criterion material
-    FEDamageCriterionUC*  m_pDU;    //!< pointer to uncoupled damage criterion material
 };
 
 

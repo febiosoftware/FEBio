@@ -42,7 +42,7 @@ public:
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData()
 	{
-        return new FEDamageMaterialPoint(new FEElasticMaterialPoint, m_pCrit);
+        return new FEDamageMaterialPoint(new FEElasticMaterialPoint);
 	}
     
     // get the elastic material
