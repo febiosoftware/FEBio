@@ -125,6 +125,14 @@ public:
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================
+//-----------------------------------------------------------------------------
+//! Element norm for G
+class FEPlotElementGnorm : public FEDomainData
+{
+public:
+	FEPlotElementGnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
 
 //-----------------------------------------------------------------------------
 //! Element stresses
@@ -132,6 +140,15 @@ class FEPlotElementStress : public FEDomainData
 {
 public:
 	FEPlotElementStress(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element norm for Cauchy stress moment
+class FEPlotElementtaunorm : public FEDomainData
+{
+public:
+	FEPlotElementtaunorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 

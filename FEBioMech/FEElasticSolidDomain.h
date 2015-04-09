@@ -20,7 +20,7 @@ public:
 	bool Initialize(FEModel& fem);
 
 	//! initialize elements
-	void InitElements();
+	virtual void InitElements();
 
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
@@ -42,7 +42,7 @@ public: // overrides from FEElasticDomain
 	void UpdateStresses(FEModel& fem);
 
 	// update the element stress
-	void UpdateElementStress(int iel, double dt);
+	virtual void UpdateElementStress(int iel, double dt);
 
 	//! intertial forces for dynamic problems
 	void InertialForces(FEGlobalVector& R, vector<double>& F);
@@ -72,10 +72,10 @@ public:
 	virtual void ElementStiffness(FEModel& fem, int iel, matrix& ke);
 
 	//! geometrical stiffness (i.e. initial stress)
-	void ElementGeometricalStiffness(FESolidElement& el, matrix& ke);
+	virtual void ElementGeometricalStiffness(FESolidElement& el, matrix& ke);
 
 	//! material stiffness component
-	void ElementMaterialStiffness(FESolidElement& el, matrix& ke);
+	virtual void ElementMaterialStiffness(FESolidElement& el, matrix& ke);
 
 	//! calculates the solid element mass matrix
 	void ElementMassMatrix(FESolidElement& el, matrix& ke, double a);
@@ -86,7 +86,7 @@ public:
 	// --- R E S I D U A L ---
 
 	//! Calculates the internal stress vector for solid elements
-	void ElementInternalForce(FESolidElement& el, vector<double>& fe);
+	virtual void ElementInternalForce(FESolidElement& el, vector<double>& fe);
 
 	//! Calculatess external body forces for solid elements
 	void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe);

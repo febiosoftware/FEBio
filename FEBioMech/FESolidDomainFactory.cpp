@@ -16,6 +16,8 @@
 #include "FEDiscreteSpringDomain.h"
 #include "FERemodelingElasticMaterial.h"
 #include "FECore/FEDiscreteMaterial.h"
+#include "FEMicroMaterial2O.h"
+#include "FEElasticDomain2O.h"
 
 //-----------------------------------------------------------------------------
 int FESolidDomainFactory::GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat)
@@ -81,6 +83,9 @@ FEDomain* FESolidDomainFactory::CreateDomain(int dtype, FEMesh* pm, FEMaterial* 
 	if (dtype == FE_ELASTIC_SOLID_DOMAIN) 
 	{
 		if (dynamic_cast<FERemodelingElasticMaterial*>(pmat)) return new FERemodelingElasticDomain(pm, pmat);
+		
+		else if (dynamic_cast<FEMicroMaterial2O*>(pmat)) return new FEElasticDomain2O(pm, pmat);
+
 		else return new FEElasticSolidDomain(pm, pmat);
 	}
 	if (dtype == FE_ELASTIC_SHELL_DOMAIN) return new FEElasticShellDomain      (pm, pmat);

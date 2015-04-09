@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FEMicroMaterial.h"
+#include "FEMicroMaterial2O.h"
 #include "FECore/FEElemElemList.h"
 #include "FECore/log.h"
 #include "FESolidSolver.h"
@@ -7,53 +7,70 @@
 #include "FECore/FEAnalysis.h"
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioPlot/FEBioPlotFile.h"
+#include "FECore/tens3d.h"
 
 //-----------------------------------------------------------------------------
-FEMicroMaterialPoint::FEMicroMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoint(mp)
+FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterialPoint(mp)
 {
-	m_Ka.zero();
+	m_tau.zero();
+	m_G.zero();
+	m_Ca.zero();
+	m_Da.zero();
+	m_Ea.zero();
 }
 
 //-----------------------------------------------------------------------------
 //! Initialize material point data
-void FEMicroMaterialPoint::Init(bool bflag)
+void FEMicroMaterialPoint2O::Init(bool bflag)
 {
 }
 
 //-----------------------------------------------------------------------------
 //! create a shallow copy
-FEMaterialPoint* FEMicroMaterialPoint::Copy()
+FEMaterialPoint* FEMicroMaterialPoint2O::Copy()
 {
-	FEMicroMaterialPoint* pt = new FEMicroMaterialPoint(m_pt?m_pt->Copy():0);
-	pt->m_Ka = m_Ka;
+	FEMicroMaterialPoint2O* pt = new FEMicroMaterialPoint2O(m_pt?m_pt->Copy():0);
+	pt->m_tau = m_tau;
+	pt->m_G = m_G;
+	pt->m_Ca = m_Ca;
+	pt->m_Da = m_Da;
+	pt->m_Ea = m_Ea;
 	return pt;
 }
 
 //-----------------------------------------------------------------------------
 //! serialize material point data
-void FEMicroMaterialPoint::Serialize(DumpFile& ar)
+void FEMicroMaterialPoint2O::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_Ka;
+		ar << m_Ca;
+		ar << m_Da;
+		ar << m_Ea;
 	}
 	else
 	{
-		ar >> m_Ka;
+		ar >> m_Ca;
+		ar >> m_Da;
+		ar >> m_Ea;
 	}
 }
 
 //-----------------------------------------------------------------------------
 //! stream material point data
-void FEMicroMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+void FEMicroMaterialPoint2O::ShallowCopy(DumpStream& dmp, bool bsave)
 {
 	if (bsave)
 	{
-		dmp << m_Ka;
+		dmp << m_Ca;
+		dmp << m_Da;
+		dmp << m_Ea;
 	}
 	else
 	{
-		dmp >> m_Ka;
+		dmp >> m_Ca;
+		dmp >> m_Da;
+		dmp >> m_Ea;
 	}
 }
 
@@ -61,14 +78,14 @@ void FEMicroMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEMicroMaterial, FEElasticMaterial)
+BEGIN_PARAMETER_LIST(FEMicroMaterial2O, FEElasticMaterial)
 	ADD_PARAMETER(m_szrve    , FE_PARAM_STRING, "RVE"     );
 	ADD_PARAMETER(m_szbc     , FE_PARAM_STRING, "bc_set"  );
 	ADD_PARAMETER(m_bperiodic, FE_PARAM_BOOL  , "periodic");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
+FEMicroMaterial2O::FEMicroMaterial2O(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	m_brve = false;
 
@@ -82,18 +99,18 @@ FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
-FEMicroMaterial::~FEMicroMaterial(void)
+FEMicroMaterial2O::~FEMicroMaterial2O(void)
 {
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEMicroMaterial::CreateMaterialPointData()
+FEMaterialPoint* FEMicroMaterial2O::CreateMaterialPointData()
 {
-	return new FEMicroMaterialPoint(new FEElasticMaterialPoint);
+	return new FEMicroMaterialPoint2O(new FEElasticMaterialPoint);
 }
 
 //-----------------------------------------------------------------------------
-void FEMicroMaterial::Init()
+void FEMicroMaterial2O::Init()
 {
 	// try to load the RVE model
 	if (m_brve == false)
@@ -120,7 +137,7 @@ void FEMicroMaterial::Init()
 }
 
 //-----------------------------------------------------------------------------
-bool FEMicroMaterial::PrepRVE()
+bool FEMicroMaterial2O::PrepRVE()
 {
 	// find all boundar nodes
 	FindBoundaryNodes();
@@ -178,7 +195,7 @@ bool FEMicroMaterial::PrepRVE()
 }
 
 //-----------------------------------------------------------------------------
-void FEMicroMaterial::FindBoundaryNodes()
+void FEMicroMaterial2O::FindBoundaryNodes()
 {
 	// first we need to find all the boundary nodes
 	FEMesh& m = m_rve.GetMesh();
@@ -253,7 +270,7 @@ void FEMicroMaterial::FindBoundaryNodes()
 }
 
 //-----------------------------------------------------------------------------
-bool FEMicroMaterial::PrepDisplacementBC()
+bool FEMicroMaterial2O::PrepDisplacementBC()
 {
 	FEMesh& m = m_rve.GetMesh();
 	int N = m.Nodes();
@@ -294,7 +311,7 @@ bool FEMicroMaterial::PrepDisplacementBC()
 }
 
 //-----------------------------------------------------------------------------
-bool FEMicroMaterial::PrepPeriodicBC()
+bool FEMicroMaterial2O::PrepPeriodicBC()
 {
 	// get the RVE mesh
 	FEMesh& m = m_rve.GetMesh();
@@ -330,7 +347,7 @@ bool FEMicroMaterial::PrepPeriodicBC()
 
 //-----------------------------------------------------------------------------
 //! Assign the prescribed displacement to the boundary nodes.
-void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
+void FEMicroMaterial2O::UpdateBC(FEModel& rve, mat3d& F, tens3drs& G)
 {
 	// get the mesh
 	FEMesh& m = rve.GetMesh();
@@ -346,7 +363,10 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 		FENode& node = m.Node(dx.node);
 
 		vec3d r0 = node.m_r0;
-		vec3d r1 = F*r0;
+		
+		// LTE - Apply the second order boundary conditions to the RVE problem
+		vec3d r1 = F*r0 + G.contractdyad1(r0)*0.5;
+		//vec3d r1 = F*r0;
 
 		dx.s = r1.x - r0.x;
 		dy.s = r1.y - r0.y;
@@ -360,6 +380,9 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 
 		// set the offset for the periodic BC's
 		vec3d r[FEElement::MAX_NODES];
+
+		double Nstore[3][3] = {0.};
+		Nstore[0][0] = 1.; Nstore[1][1] = 1.; Nstore[2][2] = 1.;
 
 		// loop over periodic boundaries
 		for (int i=0; i<3; ++i)
@@ -380,7 +403,8 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 			vec3d u0 = r1 - r0;
 
 			// apply deformation
-			vec3d u1 = U*u0;
+			vec3d u1 = U*u0 + G.contractdyad1(r1)/2. - G.contractdyad1(r0)/2.;
+			//vec3d u1 = U*u0;
 
 			// set this as the scale parameter for the offset
 			FEParam* pp = pc->GetParameterList().Find("offset");
@@ -392,12 +416,23 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
+// The stiffness is evaluated at the same time the stress is evaluated so we 
+// can just return it here. Note that this assumes that the stress function 
+// is always called prior to the tangent function.
+tens4ds FEMicroMaterial2O::Tangent(FEMaterialPoint &mp)
+{
+	FEMicroMaterialPoint2O& mmpt = *mp.ExtractData<FEMicroMaterialPoint2O>();
+	return mmpt.m_Ca;
+}
+
+//-----------------------------------------------------------------------------
+mat3ds FEMicroMaterial2O::Stress(FEMaterialPoint &mp)
 {
 	// get the deformation gradient
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
+	FEMicroMaterialPoint2O& pt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
 	mat3d F = pt.m_F;
+	tens3drs G = pt2O.m_G;
 
 	// Create a local copy of the rve
 	FEModel rve;
@@ -408,7 +443,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	if (rve.Init() == false) throw FEMultiScaleException();
 
 	// apply the BC's
-	UpdateBC(rve, F);
+	UpdateBC(rve, F, G);
 
 	// solve the RVE
 	bool bret = rve.Solve();
@@ -429,24 +464,14 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	mat3ds sa = AveragedStress(rve, mp);
 
 	// calculate the averaged stiffness
-	mmpt.m_Ka = AveragedStiffness(rve, mp);
+	AveragedStiffness(rve, mp, pt2O.m_Ca, pt2O.m_Da, pt2O.m_Ea);
 
 	return sa;
 }
 
 //-----------------------------------------------------------------------------
-// The stiffness is evaluated at the same time the stress is evaluated so we 
-// can just return it here. Note that this assumes that the stress function 
-// is always called prior to the tangent function.
-tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
-{
-	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
-	return mmpt.m_Ka;
-}
-
-//-----------------------------------------------------------------------------
 //! Calculate the average stress from the RVE solution.
-mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
+mat3ds FEMicroMaterial2O::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	mat3d F = pt.m_F;
@@ -501,10 +526,156 @@ mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 
 	return T.sym() / (J*m_V0);
 }
+//-----------------------------------------------------------------------------
+// The stiffness is evaluated at the same time the stress is evaluated so we 
+// can just return it here. Note that this assumes that the stress function 
+// is always called prior to the tangent function.
+void  FEMicroMaterial2O::Tangent2O(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e)
+{
+	FEMicroMaterialPoint2O& mmpt = *mp.ExtractData<FEMicroMaterialPoint2O>();
+	c = mmpt.m_Ca;
+	d = mmpt.m_Da;
+	e = mmpt.m_Ea;
+}
+
+//-----------------------------------------------------------------------------
+void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, mat3ds &s, tens3ds &tau)
+{
+	// get the deformation gradient
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEMicroMaterialPoint2O& pt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
+	mat3d F = pt.m_F;
+	tens3drs G = pt2O.m_G;
+
+	// Create a local copy of the rve
+	FEModel rve;
+	rve.CopyFrom(m_rve);
+	rve.GetStep(0)->SetPrintLevel(FE_PRINT_NEVER);
+
+	// initialize
+	if (rve.Init() == false) throw FEMultiScaleException();
+
+	// apply the BC's
+	UpdateBC(rve, F, G);
+
+	// solve the RVE
+	bool bret = rve.Solve();
+
+	// set the plot file
+	FEBioPlotFile* pplt = new FEBioPlotFile(rve);
+	vector<int> item;
+	pplt->AddVariable("displacement", item);
+	pplt->AddVariable("stress", item);
+	pplt->Open(rve, "rve.xplt");
+	pplt->Write(rve);
+	pplt->Close();
+
+	// make sure it converged
+	if (bret == false) throw FEMultiScaleException();
+
+	// calculate the averaged stress
+	mat3ds sa; sa.zero();
+	tens3ds taua; taua.zero();
+
+	AveragedStress2O(rve, mp, sa, taua);
+
+	s = sa;
+	tau = taua;
+	
+	// calculate the averaged stiffness
+	AveragedStiffness(rve, mp, pt2O.m_Ca, pt2O.m_Da, pt2O.m_Ea);
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the average stress from the RVE solution.
+void FEMicroMaterial2O::AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3ds &sa, tens3ds &taua)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	mat3d F = pt.m_F;
+	double J = pt.m_J;
+
+	// get the RVE mesh
+	FEMesh& m = rve.GetMesh();
+
+	mat3d T; T.zero();
+	tens3ds tau; tau.zero();
+
+	// for periodic BC's we take the reaction forces directly from the periodic constraints
+	if (m_bperiodic)
+	{
+		// get the reaction for from the periodic constraints
+		for (int i=0; i<3; ++i)
+		{
+			FEPeriodicBoundary* pbc = dynamic_cast<FEPeriodicBoundary*>(rve.SurfacePairInteraction(i));
+			assert(pbc);
+			FEPeriodicSurface& ss = pbc->m_ss;
+			int N = ss.Nodes();
+			for (int i=0; i<N; ++i)
+			{
+				FENode& node = ss.Node(i);
+				vec3d f = ss.m_Fr[i];
+
+				// We multiply by two since the reaction forces are only stored at the slave surface 
+				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
+				// store the reaction forces on the master nodes as well?)
+				T += (f & node.m_rt)*2.0;
+
+				vec3d x; x = node.m_rt;
+		
+				tau.d[0] += (x.x*f.x*x.x)*2.0; 
+				tau.d[1] += ((x.x*f.x*x.y + x.x*f.y*x.x + x.y*f.x*x.x)/3.)*2.0; 
+				tau.d[2] += ((x.x*f.x*x.z + x.x*f.z*x.x + x.z*f.x*x.x)/3.)*2.0;
+				tau.d[3] += ((x.x*f.y*x.y + x.y*f.x*x.y + x.y*f.y*x.x)/3.)*2.0; 
+				tau.d[4] += ((x.x*f.y*x.z + x.y*f.x*x.z + x.z*f.y*x.x + x.x*f.z*x.y + x.z*f.x*x.y + x.y*f.z*x.x)/6.)*2.0; 
+				tau.d[5] += ((x.x*f.z*x.z + x.z*f.x*x.z + x.z*f.z*x.x)/3.)*2.0;
+				tau.d[6] += (x.y*f.y*x.y)*2.0; 
+				tau.d[7] += ((x.y*f.y*x.z + x.y*f.z*x.y + x.z*f.y*x.y)/3.)*2.0;
+				tau.d[8] += ((x.y*f.z*x.z + x.z*f.y*x.z + x.z*f.z*x.y)/3.)*2.0;
+				tau.d[9] += (x.z*f.z*x.z)*2.0;
+			}
+		}
+	}
+
+	// get the reaction force vector from the solid solver
+	// (We also need to do this for the periodic BC, since at the prescribed nodes,
+	// the contact forces will be zero). 
+	FEAnalysis* pstep = rve.GetCurrentStep();
+	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	assert(ps);
+	vector<double>& R = ps->m_Fr;
+	int nbc = rve.PrescribedBCs();
+	
+	for (int i=0; i<nbc/3; ++i)
+	{
+		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
+		FENode& n = m.Node(dc.node);
+		vec3d f;
+		f.x = R[-n.m_ID[DOF_X]-2];
+		f.y = R[-n.m_ID[DOF_Y]-2];
+		f.z = R[-n.m_ID[DOF_Z]-2];
+		T += f & n.m_rt;
+
+		vec3d x; x = n.m_rt;
+		
+		tau.d[0] += x.x*f.x*x.x; 
+		tau.d[1] += (x.x*f.x*x.y + x.x*f.y*x.x + x.y*f.x*x.x)/3.; 
+		tau.d[2] += (x.x*f.x*x.z + x.x*f.z*x.x + x.z*f.x*x.x)/3.;
+		tau.d[3] += (x.x*f.y*x.y + x.y*f.x*x.y + x.y*f.y*x.x)/3.; 
+		tau.d[4] += (x.x*f.y*x.z + x.y*f.x*x.z + x.z*f.y*x.x + x.x*f.z*x.y + x.z*f.x*x.y + x.y*f.z*x.x)/6.; 
+		tau.d[5] += (x.x*f.z*x.z + x.z*f.x*x.z + x.z*f.z*x.x)/3.;
+		tau.d[6] += x.y*f.y*x.y; 
+		tau.d[7] += (x.y*f.y*x.z + x.y*f.z*x.y + x.z*f.y*x.y)/3.;
+		tau.d[8] += (x.y*f.z*x.z + x.z*f.y*x.z + x.z*f.z*x.y)/3.;
+		tau.d[9] += x.z*f.z*x.z; 
+	}
+
+	sa = T.sym() / (J*m_V0);
+	taua = tau / 2*(J*m_V0);
+}
 
 //-----------------------------------------------------------------------------
 //! Calculate the average stiffness from the RVE solution.
-tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
+void FEMicroMaterial2O::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -538,9 +709,10 @@ tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
 	for (int k=0; k<m.Nodes(); ++k) rc0 += m.Node(k).m_r0;
 	rc0 /= (double) m.Nodes();
 
-	tens4ds c(0.);
+	c.zero();
+	d.zero();
+	e.zero();
 
-	
 	// LTE - elasticity tensor
 	double D[6][6] = {0};
 		
@@ -551,10 +723,10 @@ tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
 		int NS = bd.Elements();
 		for (int n=0; n<NS; ++n)
 		{
-			FESolidElement& e = bd.Element(n);
+			FESolidElement& el = bd.Element(n);
 
 			// create the element's stiffness matrix
-			int ne = e.Nodes();
+			int ne = el.Nodes();
 			int ndof = 3*ne;
 			ke.resize(ndof, ndof);
 			ke.zero();
@@ -566,16 +738,16 @@ tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
 			fe.assign(ndof, 0);
 
 			// calculate the element's residual
-			bd.ElementInternalForce(e, fe);
+			bd.ElementInternalForce(el, fe);
 
 			// loop over the element's nodes
 			for (int i=0; i<ne; ++i)
 			{
-				FENode& ni = m.Node(e.m_node[i]);
+				FENode& ni = m.Node(el.m_node[i]);
 				for (int j=0; j<ne; ++j)
 				{
-					FENode& nj = m.Node(e.m_node[j]);
-					if ((m_BN[e.m_node[i]] == 1) && (m_BN[e.m_node[j]] == 1))
+					FENode& nj = m.Node(el.m_node[j]);
+					if ((m_BN[el.m_node[i]] == 1) && (m_BN[el.m_node[j]] == 1))
 					{
 						// both nodes are boundary nodes
 						// so grab the element's submatrix
@@ -620,60 +792,120 @@ tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
 						D[4][5] += 0.25*(Ri[1]*K[2][0]*Rj[2] + Ri[2]*K[1][0]*Rj[2] + Ri[1]*K[2][2]*Rj[0] + Ri[2]*K[1][2]*Rj[0]);
 
 						D[5][5] += 0.25*(Ri[0]*K[2][0]*Rj[2] + Ri[2]*K[0][0]*Rj[2] + Ri[0]*K[2][2]*Rj[0] + Ri[2]*K[0][2]*Rj[0]);
+
+						calculate_d2O(d, K, Ri, Rj);
+						calculate_e2O(e, K, Ri, Rj);
 					}
 				}
-																														/*
-			if (ni.m_ID[DOF_X] < 0)
-			{
-				vec3d ri = ni.m_r0;
-
-				double Fi[3] = {fe[3*i], fe[3*i+1], fe[3*i+2] };
-				double Ri[3] = { ri.x, ri.y, ri.z };
-				double I[3][3] = {{1,0,0},{0,1,0},{0,0,1}};
-
-				D[0][0] += Fi[0]*Ri[0];
-				D[1][1] += Fi[1]*Ri[1];
-				D[2][2] += Fi[2]*Ri[2];
-
-//				D[0][1] += 0;
-//				D[0][2] += 0;
-//				D[1][2] += 0;
-
-				D[0][3] += 0.5*(Fi[0]*I[0][0]*Ri[1] + Fi[0]*I[0][1]*Ri[0]);
-				D[0][4] += 0.5*(Fi[0]*I[0][1]*Ri[2] + Fi[0]*I[0][2]*Ri[1]);
-				D[0][5] += 0.5*(Fi[0]*I[0][0]*Ri[2] + Fi[0]*I[0][2]*Ri[0]);
-
-				D[1][3] += 0.5*(Fi[1]*I[1][0]*Ri[1] + Fi[1]*I[1][1]*Ri[0]);
-				D[1][4] += 0.5*(Fi[1]*I[1][1]*Ri[2] + Fi[1]*I[1][2]*Ri[1]);
-				D[1][5] += 0.5*(Fi[1]*I[1][0]*Ri[2] + Fi[1]*I[1][2]*Ri[0]);
-
-				D[2][3] += 0.5*(Fi[2]*I[2][0]*Ri[1] + Fi[2]*I[2][1]*Ri[0]);
-				D[2][4] += 0.5*(Fi[2]*I[2][1]*Ri[2] + Fi[2]*I[2][2]*Ri[1]);
-				D[2][5] += 0.5*(Fi[2]*I[2][0]*Ri[2] + Fi[2]*I[2][2]*Ri[0]);
-
-				D[3][3] += 0.25*(Fi[0]*I[1][0]*Ri[1] + Fi[1]*I[0][0]*Ri[1] + Fi[0]*I[1][1]*Ri[0] + Fi[1]*I[0][1]*Ri[0]);
-				D[3][4] += 0.25*(Fi[0]*I[1][1]*Ri[2] + Fi[1]*I[0][1]*Ri[2] + Fi[0]*I[1][2]*Ri[1] + Fi[1]*I[0][2]*Ri[1]);
-				D[3][5] += 0.25*(Fi[0]*I[1][0]*Ri[2] + Fi[1]*I[0][0]*Ri[2] + Fi[0]*I[1][2]*Ri[0] + Fi[1]*I[0][2]*Ri[0]);
-
-				D[4][4] += 0.25*(Fi[1]*I[2][1]*Ri[2] + Fi[2]*I[1][1]*Ri[2] + Fi[1]*I[2][2]*Ri[1] + Fi[2]*I[1][2]*Ri[1]);
-				D[4][5] += 0.25*(Fi[1]*I[2][0]*Ri[2] + Fi[2]*I[1][0]*Ri[2] + Fi[1]*I[2][2]*Ri[0] + Fi[2]*I[1][2]*Ri[0]);
-
-				D[5][5] += 0.25*(Fi[0]*I[2][0]*Ri[2] + Fi[2]*I[0][0]*Ri[2] + Fi[0]*I[2][2]*Ri[0] + Fi[2]*I[0][2]*Ri[0]);
-			}
-*/
+				
 			}
 		}
 	}
 
-	// divide by volume
-	double Vi = 1.0/(pt.m_J * m_V0);
-	D[0][0] *= Vi; D[0][1] *= Vi; D[0][2] *= Vi; D[0][3] *= Vi; D[0][4] *= Vi; D[0][5] *= Vi;
-	D[1][1] *= Vi; D[1][2] *= Vi; D[1][3] *= Vi; D[1][4] *= Vi; D[1][5] *= Vi;
-	D[2][2] *= Vi; D[2][3] *= Vi; D[2][4] *= Vi; D[2][5] *= Vi;
-	D[3][3] *= Vi; D[3][4] *= Vi; D[3][5] *= Vi;
-	D[4][4] *= Vi; D[4][5] *= Vi;
-	D[5][5] *= Vi;
-																							
-	c = tens4ds(D);
-	return c;
+	// divide by volume																
+	c = tens4ds(D)/(pt.m_J * m_V0);
+	d = d/(2.*pt.m_J * m_V0);
+	e = e/(4.*pt.m_J * m_V0);
 }
+
+
+//-----------------------------------------------------------------------------
+void FEMicroMaterial2O::calculate_d2O(tens5ds& d, double K[3][3], double Ri[3], double Rj[3] )
+{
+	d.d[0] += 0.5*(Ri[0]*K[0][0]*Rj[0]*Rj[0] + Ri[0]*Ri[0]*K[0][0]*Rj[0]);
+	d.d[1] += 0.5*(Ri[0]*K[0][0]*Rj[0]*Rj[1] + Ri[0]*Ri[0]*K[0][0]*Rj[1]);
+	d.d[2] += 0.5*(Ri[0]*K[0][0]*Rj[0]*Rj[2] + Ri[0]*Ri[0]*K[0][0]*Rj[2]);
+	d.d[3] += 0.5*(Ri[0]*K[0][0]*Rj[1]*Rj[1] + Ri[0]*Ri[0]*K[0][1]*Rj[1]);
+	d.d[4] += 0.5*(Ri[0]*K[0][0]*Rj[1]*Rj[2] + Ri[0]*Ri[0]*K[0][1]*Rj[2]);
+	d.d[5] += 0.5*(Ri[0]*K[0][0]*Rj[2]*Rj[2] + Ri[0]*Ri[0]*K[0][2]*Rj[2]);
+	d.d[6] += 0.5*(Ri[0]*K[0][1]*Rj[1]*Rj[1] + Ri[0]*Ri[0]*K[1][1]*Rj[1]);
+	d.d[7] += 0.5*(Ri[0]*K[0][1]*Rj[1]*Rj[2] + Ri[0]*Ri[0]*K[1][1]*Rj[2]);
+	d.d[8] += 0.5*(Ri[0]*K[0][1]*Rj[2]*Rj[2] + Ri[0]*Ri[0]*K[1][2]*Rj[2]);
+	d.d[9] += 0.5*(Ri[0]*K[0][2]*Rj[2]*Rj[2] + Ri[0]*Ri[0]*K[2][2]*Rj[2]);
+	
+	d.d[10] += 0.5*(Ri[0]*K[1][0]*Rj[1]*Rj[1] + Ri[0]*Ri[1]*K[0][1]*Rj[1]);
+	d.d[11] += 0.5*(Ri[0]*K[1][0]*Rj[1]*Rj[2] + Ri[0]*Ri[1]*K[0][1]*Rj[2]);
+	d.d[12] += 0.5*(Ri[0]*K[1][0]*Rj[2]*Rj[2] + Ri[0]*Ri[1]*K[0][2]*Rj[2]);
+	d.d[13] += 0.5*(Ri[0]*K[1][1]*Rj[1]*Rj[1] + Ri[0]*Ri[1]*K[1][1]*Rj[1]);
+	d.d[14] += 0.5*(Ri[0]*K[1][1]*Rj[1]*Rj[2] + Ri[0]*Ri[1]*K[1][1]*Rj[2]);
+	d.d[15] += 0.5*(Ri[0]*K[1][1]*Rj[2]*Rj[2] + Ri[0]*Ri[1]*K[1][2]*Rj[2]);
+	d.d[16] += 0.5*(Ri[0]*K[1][2]*Rj[2]*Rj[2] + Ri[0]*Ri[1]*K[2][2]*Rj[2]);
+
+	d.d[17] += 0.5*(Ri[0]*K[2][0]*Rj[2]*Rj[2] + Ri[0]*Ri[2]*K[0][2]*Rj[2]);
+	d.d[18] += 0.5*(Ri[0]*K[2][1]*Rj[1]*Rj[1] + Ri[0]*Ri[2]*K[1][1]*Rj[1]);
+	d.d[19] += 0.5*(Ri[0]*K[2][1]*Rj[1]*Rj[2] + Ri[0]*Ri[2]*K[1][1]*Rj[2]);
+	d.d[20] += 0.5*(Ri[0]*K[2][1]*Rj[2]*Rj[2] + Ri[0]*Ri[2]*K[1][2]*Rj[2]);
+	d.d[21] += 0.5*(Ri[0]*K[2][2]*Rj[2]*Rj[2] + Ri[0]*Ri[2]*K[2][2]*Rj[2]);
+
+	d.d[22] += 0.5*(Ri[1]*K[1][1]*Rj[1]*Rj[1] + Ri[1]*Ri[1]*K[1][1]*Rj[1]);
+	d.d[23] += 0.5*(Ri[1]*K[1][1]*Rj[1]*Rj[2] + Ri[1]*Ri[1]*K[1][1]*Rj[2]);
+	d.d[24] += 0.5*(Ri[1]*K[1][1]*Rj[2]*Rj[2] + Ri[1]*Ri[1]*K[1][2]*Rj[2]);
+	d.d[25] += 0.5*(Ri[1]*K[1][2]*Rj[2]*Rj[2] + Ri[1]*Ri[1]*K[2][2]*Rj[2]);
+
+	d.d[26] += 0.5*(Ri[1]*K[2][1]*Rj[2]*Rj[2] + Ri[1]*Ri[2]*K[1][2]*Rj[2]);
+
+	d.d[27] += 0.5*(Ri[1]*K[2][2]*Rj[2]*Rj[2] + Ri[1]*Ri[2]*K[2][2]*Rj[2]);
+
+	d.d[28] += 0.5*(Ri[2]*K[2][2]*Rj[2]*Rj[2] + Ri[2]*Ri[2]*K[2][2]*Rj[2]);
+}
+
+//-----------------------------------------------------------------------------
+void FEMicroMaterial2O::calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], double Rj[3] )
+{
+	e.d[0] += Ri[0]*Ri[0]*K[0][0]*Rj[0]*Rj[0];
+	e.d[1] += Ri[0]*Ri[0]*K[0][0]*Rj[0]*Rj[1];
+	e.d[2] += Ri[0]*Ri[0]*K[0][0]*Rj[0]*Rj[2];
+	e.d[3] += Ri[0]*Ri[0]*K[0][0]*Rj[1]*Rj[1];
+	e.d[4] += Ri[0]*Ri[0]*K[0][0]*Rj[1]*Rj[2];
+	e.d[5] += Ri[0]*Ri[0]*K[0][0]*Rj[2]*Rj[2];
+	e.d[6] += Ri[0]*Ri[0]*K[0][1]*Rj[1]*Rj[1];
+	e.d[7] += Ri[0]*Ri[0]*K[0][1]*Rj[1]*Rj[2];
+	e.d[8] += Ri[0]*Ri[0]*K[0][1]*Rj[2]*Rj[2];
+	e.d[9] += Ri[0]*Ri[0]*K[0][2]*Rj[2]*Rj[2];
+	
+	e.d[10] += Ri[0]*Ri[0]*K[1][0]*Rj[1]*Rj[1];
+	e.d[11] += Ri[0]*Ri[0]*K[1][0]*Rj[1]*Rj[2];
+	e.d[12] += Ri[0]*Ri[0]*K[1][0]*Rj[2]*Rj[2];
+	e.d[13] += Ri[0]*Ri[0]*K[1][1]*Rj[1]*Rj[1];
+	e.d[14] += Ri[0]*Ri[0]*K[1][1]*Rj[1]*Rj[2];
+	e.d[15] += Ri[0]*Ri[0]*K[1][1]*Rj[2]*Rj[2];
+	e.d[16] += Ri[0]*Ri[0]*K[1][2]*Rj[2]*Rj[2];
+
+	e.d[17] += Ri[0]*Ri[0]*K[2][0]*Rj[1]*Rj[1];
+	e.d[18] += Ri[0]*Ri[0]*K[2][0]*Rj[1]*Rj[2];
+	e.d[19] += Ri[0]*Ri[0]*K[2][0]*Rj[2]*Rj[2];
+	e.d[20] += Ri[0]*Ri[0]*K[2][1]*Rj[1]*Rj[1];
+	e.d[21] += Ri[0]*Ri[0]*K[2][1]*Rj[1]*Rj[2];
+	e.d[22] += Ri[0]*Ri[0]*K[2][1]*Rj[2]*Rj[2];
+	e.d[23] += Ri[0]*Ri[0]*K[2][2]*Rj[2]*Rj[2];
+
+	e.d[24] += Ri[0]*Ri[1]*K[1][0]*Rj[2]*Rj[2];
+	e.d[25] += Ri[0]*Ri[1]*K[1][1]*Rj[1]*Rj[1];
+	e.d[26] += Ri[0]*Ri[1]*K[1][1]*Rj[1]*Rj[2];
+	e.d[27] += Ri[0]*Ri[1]*K[1][1]*Rj[2]*Rj[2];
+	e.d[28] += Ri[0]*Ri[1]*K[1][2]*Rj[2]*Rj[2];
+
+	e.d[29] += Ri[0]*Ri[1]*K[2][0]*Rj[2]*Rj[2];
+	e.d[30] += Ri[0]*Ri[1]*K[2][1]*Rj[1]*Rj[1];
+	e.d[31] += Ri[0]*Ri[1]*K[2][1]*Rj[1]*Rj[2];
+	e.d[32] += Ri[0]*Ri[1]*K[2][1]*Rj[2]*Rj[2];
+	e.d[33] += Ri[0]*Ri[1]*K[2][2]*Rj[2]*Rj[2];
+
+	e.d[34] += Ri[0]*Ri[2]*K[2][1]*Rj[1]*Rj[1];
+	e.d[35] += Ri[0]*Ri[2]*K[2][1]*Rj[1]*Rj[2];
+	e.d[36] += Ri[0]*Ri[2]*K[2][1]*Rj[2]*Rj[2];
+	e.d[37] += Ri[0]*Ri[2]*K[2][2]*Rj[2]*Rj[2];
+
+	e.d[38] += Ri[1]*Ri[1]*K[1][1]*Rj[1]*Rj[1];
+	e.d[39] += Ri[1]*Ri[1]*K[1][1]*Rj[1]*Rj[2];
+	e.d[40] += Ri[1]*Ri[1]*K[1][1]*Rj[2]*Rj[2];
+	e.d[41] += Ri[1]*Ri[1]*K[1][2]*Rj[2]*Rj[2];
+
+	e.d[42] += Ri[1]*Ri[1]*K[2][1]*Rj[2]*Rj[2];
+	e.d[43] += Ri[1]*Ri[1]*K[2][2]*Rj[2]*Rj[2];
+
+	e.d[44] += Ri[1]*Ri[2]*K[2][2]*Rj[2]*Rj[2];
+
+	e.d[45] += Ri[2]*Ri[2]*K[2][2]*Rj[2]*Rj[2];
+}
+

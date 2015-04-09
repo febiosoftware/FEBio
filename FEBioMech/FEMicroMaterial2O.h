@@ -3,14 +3,18 @@
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 #include "FEBioMech/FEPeriodicBoundary.h"
+#include "FECore/tens3d.h"
+#include "FECore/tens4d.h"
+#include "FECore/tens5d.h"
+#include "FECore/tens6d.h"
 
 //-----------------------------------------------------------------------------
 //! Material point class for the micro-material
-class FEMicroMaterialPoint : public FEMaterialPoint
+class FEMicroMaterialPoint2O : public FEMaterialPoint
 {
 public:
 	//! constructor
-	FEMicroMaterialPoint(FEMaterialPoint* mp);
+	FEMicroMaterialPoint2O(FEMaterialPoint* mp);
 
 	//! Initialize material point data
 	void Init(bool bflag);
@@ -25,7 +29,12 @@ public:
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 public:
-	tens4ds	m_Ka;	//!< averaged material stiffness
+	tens3drs   m_G;			// LTE - Deformation Hessian
+	tens3ds    m_tau;		// LTE - Cauchy Stress Moment
+	
+	tens4ds	m_Ca;	//!< averaged material stiffness
+	tens5ds m_Da;
+	tens6ds m_Ea;
 };
 
 //-----------------------------------------------------------------------------
@@ -33,11 +42,11 @@ public:
 //! are calculated by solving a micro-structural RVE problem and return the
 //! averaged stress and condensed tangents.
 //!
-class FEMicroMaterial :	public FEElasticMaterial
+class FEMicroMaterial2O :	public FEElasticMaterial
 {
 public:
-	FEMicroMaterial(FEModel* pfem);
-	~FEMicroMaterial(void);
+	FEMicroMaterial2O(FEModel* pfem);
+	~FEMicroMaterial2O(void);
 
 public:
 	char	m_szrve[256];	//!< filename for RVE file
@@ -55,10 +64,14 @@ protected:
 
 public:
 	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt);
+	void Stress2O(FEMaterialPoint &mp, mat3ds &s, tens3ds &tau);
 
 	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt);
+	void Tangent2O(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e);
+	void calculate_d2O(tens5ds& d, double K[3][3], double Ri[3], double Rj[3]);
+	void calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], double Rj[3]);
 
 	//! data initialization
 	void Init();
@@ -72,10 +85,11 @@ protected:
 	bool PrepPeriodicBC();
 	void FindBoundaryNodes();
 
-	void UpdateBC(FEModel& rve, mat3d& F);
+	void UpdateBC(FEModel& rve, mat3d& F, tens3drs& G);
 	
-	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint& pt);
-	tens4ds AveragedStiffness(FEModel& rve, FEMaterialPoint& pt);
+	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint &mp);
+	void AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3ds &sa, tens3ds &taua);
+	void AveragedStiffness(FEModel& rve, FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e);
 
 public:
 	// declare the parameter list

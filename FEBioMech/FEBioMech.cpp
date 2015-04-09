@@ -79,6 +79,7 @@
 #include "FECoupledTransIsoMooneyRivlin.h"
 #include "FECoupledTransIsoVerondaWestmann.h"
 #include "FEMicroMaterial.h"
+#include "FEMicroMaterial2O.h"
 #include "FESpringMaterial.h"
 #include "FEElasticMultigeneration.h"
 #include "FEPRLig.h"
@@ -251,6 +252,7 @@ REGISTER_FECORE_CLASS(FEFiberIntegrationTrapezoidalUC      , FEMATERIAL_ID, "fib
 REGISTER_FECORE_CLASS(FECoupledTransIsoVerondaWestmann     , FEMATERIAL_ID, "coupled trans-iso Veronda-Westmann");
 REGISTER_FECORE_CLASS(FECoupledTransIsoMooneyRivlin        , FEMATERIAL_ID, "coupled trans-iso Mooney-Rivlin");
 REGISTER_FECORE_CLASS(FEMicroMaterial                      , FEMATERIAL_ID, "micro-material");
+REGISTER_FECORE_CLASS(FEMicroMaterial2O                    , FEMATERIAL_ID, "micro-material2O");
 REGISTER_FECORE_CLASS(FEGenerationMaterial                 , FEMATERIAL_ID, "generation");
 REGISTER_FECORE_CLASS(FEPRLig					           , FEMATERIAL_ID, "PRLig");
 REGISTER_FECORE_CLASS(FEFiberExpLinear					   , FEMATERIAL_ID, "fiber-exp-linear");
@@ -360,6 +362,9 @@ REGISTER_FECORE_CLASS(FEPlotSPRTestLinear		 , FEPLOTDATA_ID, "SPR test linear"  
 REGISTER_FECORE_CLASS(FEPlotSPRTestQuadratic	 , FEPLOTDATA_ID, "SPR test quadratic"    );
 REGISTER_FECORE_CLASS(FEPlotNodalStresses		 , FEPLOTDATA_ID, "nodal stress"		  );
 REGISTER_FECORE_CLASS(FEPlotVolumePressure       , FEPLOTDATA_ID, "volume pressure"       );
+
+REGISTER_FECORE_CLASS(FEPlotElementGnorm         , FEPLOTDATA_ID, "G norm"                );              
+REGISTER_FECORE_CLASS(FEPlotElementtaunorm       , FEPLOTDATA_ID, "tau norm"			  );
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FEPlotNodeDisplacement   , FEPLOTDATA_ID, "displacement"   );
