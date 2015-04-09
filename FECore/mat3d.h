@@ -255,6 +255,7 @@ public:
 	// assignment operators
 	mat3d& operator = (const mat3dd& m);
 	mat3d& operator = (const mat3ds& m);
+	mat3d& operator = (const mat3d& m);
 	mat3d& operator = (const double m[3][3]);
 
 	// access operators

@@ -112,7 +112,6 @@ inline void tens3drs::unit()
 			d[i] = 0;
 }
 
-
 // contract the right two legs by the dyad formed by a vector  xi = GijkXjXk
 inline vec3d tens3drs::contractdyad1(vec3d v)
 {
@@ -142,4 +141,15 @@ inline double tens3drs::tripledot3rs(tens3drs H)
 	m = d[0]*H.d[0] + 2*d[1]*H.d[1] + 2*d[2]*H.d[2] + d[3]*H.d[3] + 2*d[4]*H.d[4] + d[5]*H.d[5]  + d[6]*H.d[6]  + 2*d[7]*H.d[7]  + 2*d[8]*H.d[8]  + d[9]*H.d[9]  + 2*d[10]*H.d[10]  + d[11]*H.d[11]  + d[12]*H.d[12]  + 2*d[13]*H.d[13]  + 2*d[14]*H.d[14]  + d[15]*H.d[15]  + 2*d[16]*H.d[16]  + d[17]*H.d[17];  
 
 	return m;
+}
+
+// contract the right two legs by the dyad formed by a vector  xi = GijkXjVk
+inline vec3d tens3drs::contractdyad2(vec3d v, vec3d w)
+{
+    vec3d x;
+	x.x = d[0]*v.x*w.x + d[1]*(v.x*w.y + v.y*w.x) + d[2]*(v.x*w.z + v.z*w.x) + d[3]*v.y*w.y + d[4]*(v.y*w.z + v.z*w.y) + d[5]*v.z*w.z;
+	x.y = d[6]*v.x*w.x + d[7]*(v.x*w.y + v.y*w.x) + d[8]*(v.x*w.z + v.z*w.x) + d[9]*v.y*w.y + d[10]*(v.y*w.z + v.z*w.y) + d[11]*v.z*w.z;
+	x.z = d[12]*v.x*w.x + d[13]*(v.x*w.y + v.y*w.x) + d[14]*(v.x*w.z + v.z*w.x) + d[15]*v.y*w.y + d[16]*(v.y*w.z + v.z*w.y) + d[17]*v.z*w.z;
+
+	return x;
 }
