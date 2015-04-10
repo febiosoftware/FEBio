@@ -15,6 +15,19 @@
 		D5307A4918B40A6B008C8463 /* FENormalProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A4718B40A6B008C8463 /* FENormalProjection.h */; };
 		D595BB421899C7B40028A7F3 /* svd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D595BB411899C7B40028A7F3 /* svd.cpp */; };
 		D5960230195B65E6000A675D /* quatd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D596022F195B65E6000A675D /* quatd.cpp */; };
+		D59BBBAF1AD771DD00E2991F /* tens3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59BBBA21AD771DD00E2991F /* tens3d.cpp */; };
+		D59BBBB01AD771DD00E2991F /* tens3d.h in Headers */ = {isa = PBXBuildFile; fileRef = D59BBBA31AD771DD00E2991F /* tens3d.h */; };
+		D59BBBB11AD771DD00E2991F /* tens3dls.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D59BBBA41AD771DD00E2991F /* tens3dls.hpp */; };
+		D59BBBB21AD771DD00E2991F /* tens3drs.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D59BBBA51AD771DD00E2991F /* tens3drs.hpp */; };
+		D59BBBB31AD771DD00E2991F /* tens3ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D59BBBA61AD771DD00E2991F /* tens3ds.hpp */; };
+		D59BBBB41AD771DD00E2991F /* tens5d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59BBBA71AD771DD00E2991F /* tens5d.cpp */; };
+		D59BBBB51AD771DD00E2991F /* tens5d.h in Headers */ = {isa = PBXBuildFile; fileRef = D59BBBA81AD771DD00E2991F /* tens5d.h */; };
+		D59BBBB61AD771DD00E2991F /* tens5d.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D59BBBA91AD771DD00E2991F /* tens5d.hpp */; };
+		D59BBBB71AD771DD00E2991F /* tens5ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D59BBBAA1AD771DD00E2991F /* tens5ds.hpp */; };
+		D59BBBB81AD771DD00E2991F /* tens6d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59BBBAB1AD771DD00E2991F /* tens6d.cpp */; };
+		D59BBBB91AD771DD00E2991F /* tens6d.h in Headers */ = {isa = PBXBuildFile; fileRef = D59BBBAC1AD771DD00E2991F /* tens6d.h */; };
+		D59BBBBA1AD771DD00E2991F /* tens6d.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D59BBBAD1AD771DD00E2991F /* tens6d.hpp */; };
+		D59BBBBB1AD771DD00E2991F /* tens6ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D59BBBAE1AD771DD00E2991F /* tens6ds.hpp */; };
 		D5A0A8F0186F4AC60046B0DE /* DOFS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A0A8EE186F4AC50046B0DE /* DOFS.cpp */; };
 		D5A0A8F1186F4AC60046B0DE /* DOFS.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A0A8EF186F4AC60046B0DE /* DOFS.h */; };
 		D5B572D7186CC76500D12E45 /* FECoreFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B572CF186CC76500D12E45 /* FECoreFactory.cpp */; };
@@ -175,6 +188,19 @@
 		D5307A4718B40A6B008C8463 /* FENormalProjection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENormalProjection.h; sourceTree = "<group>"; };
 		D595BB411899C7B40028A7F3 /* svd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = svd.cpp; sourceTree = "<group>"; };
 		D596022F195B65E6000A675D /* quatd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = quatd.cpp; sourceTree = "<group>"; };
+		D59BBBA21AD771DD00E2991F /* tens3d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tens3d.cpp; sourceTree = "<group>"; };
+		D59BBBA31AD771DD00E2991F /* tens3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tens3d.h; sourceTree = "<group>"; };
+		D59BBBA41AD771DD00E2991F /* tens3dls.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens3dls.hpp; sourceTree = "<group>"; };
+		D59BBBA51AD771DD00E2991F /* tens3drs.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens3drs.hpp; sourceTree = "<group>"; };
+		D59BBBA61AD771DD00E2991F /* tens3ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens3ds.hpp; sourceTree = "<group>"; };
+		D59BBBA71AD771DD00E2991F /* tens5d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tens5d.cpp; sourceTree = "<group>"; };
+		D59BBBA81AD771DD00E2991F /* tens5d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tens5d.h; sourceTree = "<group>"; };
+		D59BBBA91AD771DD00E2991F /* tens5d.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens5d.hpp; sourceTree = "<group>"; };
+		D59BBBAA1AD771DD00E2991F /* tens5ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens5ds.hpp; sourceTree = "<group>"; };
+		D59BBBAB1AD771DD00E2991F /* tens6d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tens6d.cpp; sourceTree = "<group>"; };
+		D59BBBAC1AD771DD00E2991F /* tens6d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tens6d.h; sourceTree = "<group>"; };
+		D59BBBAD1AD771DD00E2991F /* tens6d.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens6d.hpp; sourceTree = "<group>"; };
+		D59BBBAE1AD771DD00E2991F /* tens6ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens6ds.hpp; sourceTree = "<group>"; };
 		D5A0A8EE186F4AC50046B0DE /* DOFS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DOFS.cpp; sourceTree = "<group>"; };
 		D5A0A8EF186F4AC60046B0DE /* DOFS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DOFS.h; sourceTree = "<group>"; };
 		D5B572CF186CC76500D12E45 /* FECoreFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECoreFactory.cpp; sourceTree = "<group>"; };
@@ -502,11 +528,24 @@
 				D5E10A751865E15900B23922 /* stdafx.h */,
 				D595BB411899C7B40028A7F3 /* svd.cpp */,
 				D5E10A761865E15900B23922 /* targetver.h */,
+				D59BBBA21AD771DD00E2991F /* tens3d.cpp */,
+				D59BBBA31AD771DD00E2991F /* tens3d.h */,
+				D59BBBA41AD771DD00E2991F /* tens3dls.hpp */,
+				D59BBBA51AD771DD00E2991F /* tens3drs.hpp */,
+				D59BBBA61AD771DD00E2991F /* tens3ds.hpp */,
 				D5E10A771865E15900B23922 /* tens4d.cpp */,
 				D5E10A781865E15900B23922 /* tens4d.h */,
 				D5E10A791865E15900B23922 /* tens4d.hpp */,
 				D52A5B0C19A6815C009E3A47 /* tens4dms.hpp */,
 				D52A5B0D19A6815C009E3A47 /* tens4ds.hpp */,
+				D59BBBA71AD771DD00E2991F /* tens5d.cpp */,
+				D59BBBA81AD771DD00E2991F /* tens5d.h */,
+				D59BBBA91AD771DD00E2991F /* tens5d.hpp */,
+				D59BBBAA1AD771DD00E2991F /* tens5ds.hpp */,
+				D59BBBAB1AD771DD00E2991F /* tens6d.cpp */,
+				D59BBBAC1AD771DD00E2991F /* tens6d.h */,
+				D59BBBAD1AD771DD00E2991F /* tens6d.hpp */,
+				D59BBBAE1AD771DD00E2991F /* tens6ds.hpp */,
 				D5E10A7A1865E15900B23922 /* Timer.cpp */,
 				D5E10A7B1865E15900B23922 /* Timer.h */,
 				D5E10A7C1865E15900B23922 /* vec2d.h */,
@@ -546,15 +585,19 @@
 				D5E10AE21865E15900B23922 /* FESurfaceLoad.h in Headers */,
 				D5E10AAB1865E15900B23922 /* FEElemElemList.h in Headers */,
 				D5E10ADA1865E15900B23922 /* FEShellDomain.h in Headers */,
+				D59BBBBB1AD771DD00E2991F /* tens6ds.hpp in Headers */,
 				D50E7EB81992EB8300950744 /* eig3.h in Headers */,
 				D5E10AD01865E15900B23922 /* FEObject.h in Headers */,
 				D5E10AB71865E15900B23922 /* FEGlobalVector.h in Headers */,
 				D5E10B0B1865E15900B23922 /* Timer.h in Headers */,
 				D5E10AB11865E15900B23922 /* FEElementTraits.h in Headers */,
 				D5E10AC91865E15900B23922 /* FENNQuery.h in Headers */,
+				D59BBBB01AD771DD00E2991F /* tens3d.h in Headers */,
 				D5E10ADE1865E15900B23922 /* FESolver.h in Headers */,
 				D5E10ABB1865E15900B23922 /* FELinearConstraint.h in Headers */,
 				D5307A4918B40A6B008C8463 /* FENormalProjection.h in Headers */,
+				D59BBBB91AD771DD00E2991F /* tens6d.h in Headers */,
+				D59BBBB11AD771DD00E2991F /* tens3dls.hpp in Headers */,
 				D5E10ABF1865E15900B23922 /* FEMaterialPoint.h in Headers */,
 				D5E10ADC1865E15900B23922 /* FESolidDomain.h in Headers */,
 				D5E10AFD1865E15900B23922 /* NodeDataRecord.h in Headers */,
@@ -567,6 +610,7 @@
 				D5E10AD21865E15900B23922 /* FEOctree.h in Headers */,
 				D5E10A8D1865E15900B23922 /* ElementDataRecord.h in Headers */,
 				D5E10AC31865E15900B23922 /* FEModel.h in Headers */,
+				D59BBBBA1AD771DD00E2991F /* tens6d.hpp in Headers */,
 				D5B572DC186CC76500D12E45 /* FECoreTask.h in Headers */,
 				D5E10AF21865E15900B23922 /* mat2d.h in Headers */,
 				D5B572DE186CC76500D12E45 /* FEGlobalData.h in Headers */,
@@ -575,6 +619,8 @@
 				D5E10AB91865E15900B23922 /* FELevelStructure.h in Headers */,
 				D5E10AB31865E15900B23922 /* FEException.h in Headers */,
 				D5E10AA31865E15900B23922 /* FECoreBase.h in Headers */,
+				D59BBBB71AD771DD00E2991F /* tens5ds.hpp in Headers */,
+				D59BBBB21AD771DD00E2991F /* tens3drs.hpp in Headers */,
 				D5E10AE71865E15900B23922 /* FETypes.h in Headers */,
 				D5E10AFB1865E15900B23922 /* MatrixProfile.h in Headers */,
 				D5E10AC71865E15900B23922 /* FENLConstraint.h in Headers */,
@@ -584,6 +630,7 @@
 				D5E10AD41865E15900B23922 /* FEParameterList.h in Headers */,
 				D5E10AFF1865E15900B23922 /* ObjectDataRecord.h in Headers */,
 				D5E10A811865E15900B23922 /* Archive.h in Headers */,
+				D59BBBB31AD771DD00E2991F /* tens3ds.hpp in Headers */,
 				D5E10AA51865E15900B23922 /* FEDiscreteDomain.h in Headers */,
 				D5E10B051865E15900B23922 /* stdafx.h in Headers */,
 				D5E10AEE1865E15900B23922 /* LoadCurve.h in Headers */,
@@ -595,12 +642,14 @@
 				D5E10B061865E15900B23922 /* targetver.h in Headers */,
 				D5E10AF91865E15900B23922 /* matrix.h in Headers */,
 				D5BE04D619A5806400AD08F8 /* version.h in Headers */,
+				D59BBBB61AD771DD00E2991F /* tens5d.hpp in Headers */,
 				D5E10ACD1865E15900B23922 /* FENodeNodeList.h in Headers */,
 				D5E10A841865E15900B23922 /* BFGSSolver.h in Headers */,
 				D5E10A9F1865E15900B23922 /* FECoordSysMap.h in Headers */,
 				D5E10AD61865E15900B23922 /* FEPlotData.h in Headers */,
 				D52A5B0E19A6815C009E3A47 /* tens4dms.hpp in Headers */,
 				D5E10AD81865E15900B23922 /* FERigidBody.h in Headers */,
+				D59BBBB51AD771DD00E2991F /* tens5d.h in Headers */,
 				D5E10B0F1865E15900B23922 /* vector.h in Headers */,
 				D52A5B0F19A6815C009E3A47 /* tens4ds.hpp in Headers */,
 				D5E10AEC1865E15900B23922 /* LinearSolver.h in Headers */,
@@ -682,6 +731,7 @@
 				D5E10AF61865E15900B23922 /* MathParser.cpp in Sources */,
 				D5E10ACC1865E15900B23922 /* FENodeNodeList.cpp in Sources */,
 				D5E10AAE1865E15900B23922 /* FEElementLibrary.cpp in Sources */,
+				D59BBBB41AD771DD00E2991F /* tens5d.cpp in Sources */,
 				D5E10AFC1865E15900B23922 /* NodeDataRecord.cpp in Sources */,
 				D5F0E92619D05B9F0073F72C /* erf.cpp in Sources */,
 				D5E10AB01865E15900B23922 /* FEElementTraits.cpp in Sources */,
@@ -694,6 +744,7 @@
 				D5E10AED1865E15900B23922 /* LoadCurve.cpp in Sources */,
 				D5B572DB186CC76500D12E45 /* FECoreTask.cpp in Sources */,
 				D5E10AB61865E15900B23922 /* FEGlobalVector.cpp in Sources */,
+				D59BBBAF1AD771DD00E2991F /* tens3d.cpp in Sources */,
 				D5E10AE11865E15900B23922 /* FESurfaceLoad.cpp in Sources */,
 				D5E10AA41865E15900B23922 /* FEDiscreteDomain.cpp in Sources */,
 				D595BB421899C7B40028A7F3 /* svd.cpp in Sources */,
@@ -709,6 +760,7 @@
 				D5B572D7186CC76500D12E45 /* FECoreFactory.cpp in Sources */,
 				D5E10AF01865E15900B23922 /* Logfile.cpp in Sources */,
 				D5E10ADB1865E15900B23922 /* FESolidDomain.cpp in Sources */,
+				D59BBBB81AD771DD00E2991F /* tens6d.cpp in Sources */,
 				D5E10A851865E15900B23922 /* colsol.cpp in Sources */,
 				D5E10AFA1865E15900B23922 /* MatrixProfile.cpp in Sources */,
 				D5E10A961865E15900B23922 /* FEBodyLoad.cpp in Sources */,

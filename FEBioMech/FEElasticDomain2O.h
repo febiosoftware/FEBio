@@ -1,6 +1,6 @@
 #pragma once
 #include "FEElasticSolidDomain.h"
-#include "FECore\tens3d.h"
+#include "FECore/tens3d.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a domain used in an elastic remodeling problem.

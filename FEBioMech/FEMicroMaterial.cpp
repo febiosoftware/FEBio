@@ -241,9 +241,9 @@ void FEMicroMaterial::FindBoundaryNodes()
 					{
 					FENode& node = m.Node(fn[k]);
 						
-						if (abs(node.m_r0.x) == m_bb_x) m_BN[fn[k]] = 1;
-						if (abs(node.m_r0.y) == m_bb_y) m_BN[fn[k]] = 1;
-						if (abs(node.m_r0.z) == m_bb_z) m_BN[fn[k]] = 1;		
+						if (fabs(node.m_r0.x) == m_bb_x) m_BN[fn[k]] = 1;
+						if (fabs(node.m_r0.y) == m_bb_y) m_BN[fn[k]] = 1;
+						if (fabs(node.m_r0.z) == m_bb_z) m_BN[fn[k]] = 1;
 					}
 				}
 			}
