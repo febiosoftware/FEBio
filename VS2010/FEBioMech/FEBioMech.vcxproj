@@ -435,6 +435,7 @@
     <ClCompile Include="..\..\FEBioMech\FEEFDNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEFDUncoupled.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEFDVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticDomain2O.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticFiberMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticFiberMaterialUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticMaterial.cpp" />
@@ -480,6 +481,7 @@
     <ClCompile Include="..\..\FEBioMech\FELinearSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioMech\FELinearTransIso.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMicroMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMicroMaterial2O.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMRVonMisesFibers.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMuscleMaterial.cpp" />
@@ -597,6 +599,7 @@
     <ClInclude Include="..\..\FEBioMech\FEEFDUncoupled.h" />
     <ClInclude Include="..\..\FEBioMech\FEEFDVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticDomain2O.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticFiberMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticFiberMaterialUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticMaterial.h" />
@@ -642,6 +645,7 @@
     <ClInclude Include="..\..\FEBioMech\FELinearSolidSolver.h" />
     <ClInclude Include="..\..\FEBioMech\FELinearTransIso.h" />
     <ClInclude Include="..\..\FEBioMech\FEMicroMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMicroMaterial2O.h" />
     <ClInclude Include="..\..\FEBioMech\FEMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FEMRVonMisesFibers.h" />
     <ClInclude Include="..\..\FEBioMech\FEMuscleMaterial.h" />
