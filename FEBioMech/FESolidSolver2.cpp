@@ -994,6 +994,20 @@ void FESolidSolver2::PrepStep(double time)
 			FERigidBody& RB = *prb;
 			if (RB.m_prb == 0)
 			{
+                // if all rotation dofs are fixed or prescribed, set the flag
+                if (RB.m_pDC[3] || RB.m_pDC[4] || RB.m_pDC[5])
+                {
+                    bool bpofr[3] = {false};
+                    for (int j=3; j<6; ++j) if (RB.m_pDC[j] || (RB.m_LM[j] < 0)) bpofr[j-3] = true;
+                    if (bpofr[0] && bpofr[1] && bpofr[2]) RB.m_bpofr = true;
+                    else
+                    {
+                        printf("FATAL ERROR: Rigid body rotations cannot mix prescribed and free components.\n");
+                        printf("Rigid body: %d, Material: %d\n",RB.m_nID, RB.GetMaterialID());
+                        throw "FATAL ERROR";
+                    }
+                }
+                
 				for (int j=0; j<6; ++j) RB.m_du[j] = RB.m_dul[j];
 			}
 			else

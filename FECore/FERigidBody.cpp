@@ -86,23 +86,6 @@ void FERigidBody::Reset()
 	// reset reaction force and torque
 	m_Fr = vec3d(0,0,0);
 	m_Mr = vec3d(0,0,0);
-/*    
-    // if any of the rotation dofs is prescribed, all others should be
-    // prescribed or fixed.
-    m_bpofr = false;
-    if (m_pDC[3] || m_pDC[4] || m_pDC[5])
-    {
-        bool bpofr[3] = {false};
-        for (int j=3; j<6; ++j) if (m_pDC[j] || (m_LM[j] < 0)) bpofr[j-3] = true;
-        if (bpofr[0] && bpofr[1] && bpofr[2]) m_bpofr = true;
-        else
-        {
-            printf("FATAL ERROR: Rigid body rotations cannot mix prescribed and free components.\n");
-            printf("Rigid body: %d, Material: %d\n",m_nID, GetMaterialID());
-            throw "FATAL ERROR";
-        }
-    }
-*/
 }
 
 //-----------------------------------------------------------------------------
@@ -134,23 +117,6 @@ void FERigidBody::Init()
 	m_du[3] = m_dul[3] = 0.0;
 	m_du[4] = m_dul[4] = 0.0;
 	m_du[5] = m_dul[5] = 0.0;
-/*    
-    // if any of the rotation dofs is prescribed, all others should be
-    // prescribed or fixed.
-    m_bpofr = false;
-    if (m_pDC[3] || m_pDC[4] || m_pDC[5])
-    {
-        bool bpofr[3] = {false};
-        for (int j=3; j<6; ++j) if (m_pDC[j] || (m_LM[j] < 0)) bpofr[j-3] = true;
-        if (bpofr[0] && bpofr[1] && bpofr[2]) m_bpofr = true;
-        else
-        {
-            printf("FATAL ERROR: Rigid body rotations cannot mix prescribed and free components.\n");
-            printf("Rigid body: %d, Material: %d\n",m_nID, GetMaterialID());
-            throw "FATAL ERROR";
-        }
-    }
-*/
 }
 
 //-----------------------------------------------------------------------------
