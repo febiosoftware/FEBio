@@ -45,13 +45,13 @@ public:
     
 public:
 	//! calculate stress at material point
-	mat3ds DevStress(FEMaterialPoint& pt) { return m_pFint->Stress(pt); }
+	mat3ds DevStress(FEMaterialPoint& pt) { return m_pFint->DevStress(pt); }
     
 	//! calculate tangent stiffness at material point
-	tens4ds DevTangent(FEMaterialPoint& pt) { return m_pFint->Tangent(pt); }
+	tens4ds DevTangent(FEMaterialPoint& pt) { return m_pFint->DevTangent(pt); }
     
 	//! calculate deviatoric strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& pt) { return m_pFint->StrainEnergyDensity(pt); }
+	double DevStrainEnergyDensity(FEMaterialPoint& pt) { return m_pFint->DevStrainEnergyDensity(pt); }
     
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() {
