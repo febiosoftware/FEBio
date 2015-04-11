@@ -71,6 +71,9 @@ bool FEContinuousFiberDistributionUC::SetProperty(int i, FECoreBase* pm)
 //-----------------------------------------------------------------------------
 void FEContinuousFiberDistributionUC::Init()
 {
+    FEUncoupledMaterial::Init();
+    m_K = m_pFmat->m_K;
+    
     // set parent materials
     m_pFmat->SetParent(this);
     m_pFDD->SetParent(this);

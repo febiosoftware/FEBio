@@ -21,6 +21,8 @@ FEDamageMaterialUC::FEDamageMaterialUC(FEModel* pfem) : FEUncoupledMaterial(pfem
 //! Initialization.
 void FEDamageMaterialUC::Init()
 {
+    FEUncoupledMaterial::Init();
+    
     // set bulk modulus to that of base elastic material
     m_K = m_pBase->m_K;
     
