@@ -162,9 +162,9 @@ FEParam* FEDamageMaterial::GetParameter(const ParamString& s)
 {
 	if (s.count() == 1) return FEMaterial::GetParameter(s);
     
-	if      (s == "elastic"     ) return m_pBase->GetParameter(s.next());
-	else if (s == "damage"      ) return m_pDamg->GetParameter(s.next());
-	else if (s == "criterion"   ) return m_pCrit->GetParameter(s.next());
+	if      (s == m_pBase->GetName()) return m_pBase->GetParameter(s.next());
+	else if (s == m_pDamg->GetName()) return m_pDamg->GetParameter(s.next());
+	else if (s == m_pCrit->GetName()) return m_pCrit->GetParameter(s.next());
 	return 0;
 }
 
