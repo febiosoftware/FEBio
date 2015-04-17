@@ -83,9 +83,6 @@ bool FEHeatTransferAnalysis::Init()
 		if (plc->IsActive()) plc->Init();
 	}
 
-	// see if we have to do nonlinear constraint augmentations
-	if (m_fem.NonlinearConstraints() != 0) m_baugment = true;
-
 	// do one time initialization of solver data
 	if (m_psolver->Init() == false)
 	{

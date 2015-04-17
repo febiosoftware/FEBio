@@ -158,6 +158,7 @@ public:
 	int					m_neq;		//!< number of equations
 
 	BFGSSolver	m_bfgs;			//!< BFGS solver parameters
+	bool		m_baugment;		//!< augmentation flag
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

@@ -9,6 +9,7 @@
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
+#include "FEUncoupledMaterial.h"
 #include "NumCore/NumCore.h"
 
 #ifdef WIN32
@@ -67,6 +68,8 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FESolver(pfem)
     m_alpha = 0.5;
 	m_beta  = 0.5;
 	m_gamma = 1.0;
+
+	m_baugment = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1127,6 +1130,25 @@ void FESolidSolver2::PrepStep(double time)
 
 	// update stresses
 	UpdateStresses();
+
+	// see if we need to do contact augmentations
+	m_baugment = false;
+	for (int i = 0; i<m_fem.SurfacePairInteractions(); ++i)
+	{
+		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*m_fem.SurfacePairInteraction(i));
+		if (ci.IsActive() && ci.m_blaugon) m_baugment = true;
+	}
+
+	// see if we need to do incompressible augmentations
+	int nmat = m_fem.Materials();
+	for (int i = 0; i<nmat; ++i)
+	{
+		FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_fem.GetMaterial(i));
+		if (pmi && pmi->m_blaugon) m_baugment = true;
+	}
+
+	// see if we have to do nonlinear constraint augmentations
+	if (m_fem.NonlinearConstraints() != 0) m_baugment = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1357,7 +1379,7 @@ bool FESolidSolver2::Quasin(double time)
 			// copy last calculated residual
 			m_bfgs.m_R0 = m_bfgs.m_R1;
 		}
-		else if (pstep->m_baugment)
+		else if (m_baugment)
 		{
 			// we have converged, so let's see if the augmentations have converged as well
 

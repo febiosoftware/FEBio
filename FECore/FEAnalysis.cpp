@@ -18,7 +18,6 @@ FEAnalysis::FEAnalysis(FEModel* pfem, int ntype) : FECoreBase(FEANALYSIS_ID), m_
 	// --- Analysis data ---
 	m_nanalysis = FE_STATIC;	// do quasi-static analysis
 	m_istiffpr = 1;				// use pressure stiffness
-	m_baugment = false;			// no augmentations
 
 	// --- Time Step Data ---
 	m_ntime = -1;
@@ -568,7 +567,6 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		ar << m_ntype;
 		ar << m_nanalysis;
 		ar << m_istiffpr;
-		ar << m_baugment;
 
 		// --- Time Step Data ---
 		ar << m_ntime;
@@ -619,7 +617,6 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		ar >> m_ntype;
 		ar >> m_nanalysis;
 		ar >> m_istiffpr;
-		ar >> m_baugment;
 
 		// --- Time Step Data ---
 		ar >> m_ntime;

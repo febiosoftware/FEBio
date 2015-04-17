@@ -115,7 +115,6 @@ public:
 	//{
 		int		m_nanalysis;	//!< analysis type
 		int		m_istiffpr;		//!< calculate pressure stiffness \todo remove
-		bool	m_baugment;		//!< use Lagrangian augmentation \todo move to solver class?
 	//}
 
 	// --- Time Step Data ---

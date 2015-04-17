@@ -388,25 +388,6 @@ bool FEMultiphasicAnalysis::Init()
 		if (plc->IsActive()) plc->Init();
 	}
 
-	// see if we need to do contact augmentations
-	m_baugment = false;
-	for (int i=0; i<m_fem.SurfacePairInteractions(); ++i)
-	{
-		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*m_fem.SurfacePairInteraction(i));
-		if (ci.IsActive() && ci.m_blaugon) m_baugment = true;
-	}
-
-	// see if we need to do incompressible augmentations
-	int nmat = m_fem.Materials();
-	for (int i=0; i<nmat; ++i)
-	{
-		FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_fem.GetMaterial(i));
-		if (pmi && pmi->m_blaugon) m_baugment = true;
-	}
-
-	// see if we have to do nonlinear constraint augmentations
-	if (m_fem.NonlinearConstraints() != 0) m_baugment = true;
-
 	// do one time initialization of solver data
 	if (m_psolver->Init() == false)
 	{

@@ -414,7 +414,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 			// copy last calculated residual
 			m_bfgs.m_R0 = m_bfgs.m_R1;
 		}
-		else if (pstep->m_baugment)
+		else if (m_baugment)
 		{
 			// we have converged, so let's see if the augmentations have converged as well
 
