@@ -15,6 +15,7 @@
 #include "FEUncoupledElasticMixture.h"
 #include "FERigidMaterial.h"
 #include "FEVolumeConstraint.h"
+#include "FEMicroMaterial.h"
 #include "FEMicroMaterial2O.h"
 
 //=============================================================================
@@ -389,6 +390,52 @@ bool FEPlotElementtaunorm::Save(FEDomain& dom, vector<float>& a)
 		L2_norm = (float) sqrt(tau_avg.tripledot3s(tau_avg));
 
 		a.push_back(L2_norm);
+	}
+	
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Element macro-micro energy difference
+bool FEPlotElementenergydiff::Save(FEDomain& dom, vector<float>& a)
+{
+	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+	if ((pme == 0) || pme->IsRigid()) return false;
+	
+	float energy_diff = 0.;
+
+	// write solid element data
+	int N = dom.Elements();
+	for (int i=0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double) nint;
+
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		// we output the average stress values of the gauss points
+		for (int j=0; j<nint; ++j)
+		{
+			FEMicroMaterialPoint* mmppt = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint>());
+			
+			if (mmppt)
+			{
+				FEMicroMaterialPoint& mmpt = *mmppt;
+				energy_diff += (mmpt.m_energy_diff)*f;	
+			}
+			else
+			{
+				FEMicroMaterialPoint2O* mmppt2O = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
+				if (mmppt2O)
+				{
+					FEMicroMaterialPoint2O& mmpt2O = *mmppt2O;
+					energy_diff += (mmpt2O.m_energy_diff)*f;	
+				}
+			}
+		}
+
+		a.push_back(energy_diff);
 	}
 	
 	return true;

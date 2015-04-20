@@ -29,12 +29,14 @@ public:
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 public:
-	tens3drs   m_G;			// LTE - Deformation Hessian
-	tens3ds    m_tau;		// LTE - Cauchy Stress Moment
-	
-	tens4ds	m_Ca;	//!< averaged material stiffness
-	tens5ds m_Da;
-	tens6ds m_Ea;
+	tens3drs   m_G;				// LTE - Deformation Hessian
+	tens3ds    m_tau;			// LTE - Cauchy Stress Moment
+	double	   m_energy_diff;	// LTE - Difference between macro energy and volume averaged energy of RVE (should be zero) 
+
+
+	tens4ds	   m_Ca;	//!< averaged material stiffness
+	tens5ds    m_Da;
+	tens6ds    m_Ea;
 };
 
 //-----------------------------------------------------------------------------

@@ -153,6 +153,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element macro-micro energy difference
+class FEPlotElementenergydiff : public FEDomainData
+{
+public:
+	FEPlotElementenergydiff(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Strain energy density
 class FEPlotStrainEnergyDensity : public FEDomainData
 {

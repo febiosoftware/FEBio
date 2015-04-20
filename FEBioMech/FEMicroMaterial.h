@@ -25,6 +25,8 @@ public:
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 public:
+	double	   m_energy_diff;	// LTE - Difference between macro energy and volume averaged energy of RVE (should be zero)
+
 	tens4ds	m_Ka;	//!< averaged material stiffness
 };
 
