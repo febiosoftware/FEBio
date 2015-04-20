@@ -106,9 +106,9 @@ public:
 	
 	// initialize to zero
 	void zero();
-
+	
 	void unit();
-
+	
 	vec3d contractdyad1(vec3d v);
 	vec3d contract2s(mat3ds s);
 	vec3d contractdyad2(vec3d v, vec3d w);
@@ -180,7 +180,64 @@ public:
 	double d[NNZ];	// stored in column major order
 };
 
+//-----------------------------------------------------------------------------
+//! Class for 3rd order tensor with no symmetry (27 components)
+
+// Due to symmetry we can store this tensor as a 1x27 array.
+// [T] = [T111 T112 T113 T121 T122 T123 T131 T132 T133 T211 T212 T213 T221 T222 T223 T231 T232 T233 T311 T312 T313 T321 T322 T323 T331 T332 T333
+//     =    T0   T1   T2   T3   T4   T5   T6   T7   T8   T9  T10  T11  T12  T13  T14  T15  T16  T17  T18  T19  T20  T21  T22  T23  T24  T25  T26
+
+class tens3d
+{
+public:
+	enum { NNZ = 27 };
+
+	// default constructor
+	tens3d(){}
+	
+	tens3d(const double g)
+	{
+		for (int i = 0; i < NNZ; i++)
+			d[i] = g;
+	}
+
+	tens3d(double m[10])
+	{
+		for (int i = 0; i < NNZ; i++)
+			d[i] = m[i];
+	}
+
+	// arithmetic operators
+	tens3d operator + (const tens3d& t) const;
+	tens3d operator - (const tens3d& t) const;
+	tens3d operator * (double g) const;
+	tens3d operator / (double g) const;
+
+	// arithmetic assignment operators
+	tens3d& operator += (const tens3d& t);
+	tens3d& operator -= (const tens3d& t);
+	tens3d& operator *= (double g);
+	tens3d& operator /= (double g);
+
+	// unary operators
+	tens3d operator - () const;
+
+	// trace
+	double tr() const;
+	
+	// initialize to zero
+	void zero();
+
+	void unit();
+
+	tens3ds symm();
+	
+public:
+	double d[NNZ];	// stored in column major order
+};
+
 // The following file contains the actual definition of the class functions
 #include "tens3ds.hpp"
 #include "tens3drs.hpp"
 #include "tens3dls.hpp"
+#include "tens3d.hpp"
