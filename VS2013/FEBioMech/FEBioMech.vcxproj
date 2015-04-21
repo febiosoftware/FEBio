@@ -414,6 +414,7 @@
     <ClInclude Include="..\..\FEBioMech\FERigidJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidPinJoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidPrismaticJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidRevoluteJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidShellDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidSolidDomain.h" />
@@ -581,6 +582,7 @@
     <ClCompile Include="..\..\FEBioMech\FERigidJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidPinJoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidPrismaticJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidRevoluteJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSolidDomain.cpp" />
