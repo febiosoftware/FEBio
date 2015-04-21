@@ -363,6 +363,14 @@ inline mat3ds dyads(const vec3d& a, const vec3d& b)
 	return mat3ds(2.0*a.x*b.x, 2.0*a.y*b.y, 2.0*a.z*b.z, a.x*b.y + a.y*b.x, a.y*b.z + a.z*b.y, a.x*b.z + a.y*b.z);
 }
 
+// skew-symmetric matrix of dual vector
+inline mat3d skew(const vec3d& a)
+{
+    return mat3d(   0, -a.z,  a.y,
+                  a.z,    0, -a.x,
+                 -a.y,  a.x,    0);
+}
+
 // The following file contains the actual definition of the class functions
 #include "mat3d.hpp"
 

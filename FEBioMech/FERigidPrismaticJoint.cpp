@@ -1,35 +1,35 @@
 //
-//  FERigidRevoluteJoint.cpp
+//  FERigidPrismaticJoint.cpp
 //  FEBioMech
 //
-//  Created by Gerard Ateshian on 10/29/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
+//  Created by Gerard Ateshian on 4/20/15.
+//  Copyright (c) 2015 febio.org. All rights reserved.
 //
 
+#include "FERigidPrismaticJoint.h"
 #include "stdafx.h"
-#include "FERigidRevoluteJoint.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FESolidSolver2.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidRevoluteJoint, FENLConstraint);
-ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
-ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
-ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
-ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
-ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
-ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"        );
-ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"        );
-ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint"  );
-ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "rotation_axis" );
-ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "transverse_axis");
-ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
-ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
+BEGIN_PARAMETER_LIST(FERigidPrismaticJoint, FENLConstraint);
+    ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
+    ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
+    ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
+    ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
+    ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
+    ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"        );
+    ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"        );
+    ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint"  );
+    ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "translation_axis" );
+    ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "transverse_axis");
+    ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
+    ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FERigidRevoluteJoint::FERigidRevoluteJoint(FEModel* pfem) : FENLConstraint(pfem)
+FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FENLConstraint(pfem)
 {
     static int count = 1;
     m_nID = count++;
@@ -45,7 +45,7 @@ FERigidRevoluteJoint::FERigidRevoluteJoint(FEModel* pfem) : FENLConstraint(pfem)
 //-----------------------------------------------------------------------------
 //! TODO: This function is called twice: once in the Init and once in the Solve
 //!       phase. Is that necessary?
-bool FERigidRevoluteJoint::Init()
+bool FERigidPrismaticJoint::Init()
 {
     if (m_binit) return true;
     
@@ -95,7 +95,7 @@ bool FERigidRevoluteJoint::Init()
 
 //-----------------------------------------------------------------------------
 //! create a shallow copy
-void FERigidRevoluteJoint::ShallowCopy(DumpStream& dmp, bool bsave)
+void FERigidPrismaticJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
     if (bsave)
     {
@@ -117,7 +117,7 @@ void FERigidRevoluteJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidRevoluteJoint::Residual(FEGlobalVector& R)
+void FERigidPrismaticJoint::Residual(FEGlobalVector& R)
 {
     vector<double> fa(6);
     vector<double> fb(6);
@@ -134,14 +134,14 @@ void FERigidRevoluteJoint::Residual(FEGlobalVector& R)
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     vec3d za = zat*m_alpha + zap*(1-m_alpha);
     eat[0] = m_ea0[0]; RBa.m_qt.RotateVector(eat[0]);
-//    eat[1] = m_ea0[1]; RBa.m_qt.RotateVector(eat[1]);
-//    eat[2] = m_ea0[2]; RBa.m_qt.RotateVector(eat[2]);
+    eat[1] = m_ea0[1]; RBa.m_qt.RotateVector(eat[1]);
+    eat[2] = m_ea0[2]; RBa.m_qt.RotateVector(eat[2]);
     eap[0] = m_ea0[0]; RBa.m_qp.RotateVector(eap[0]);
-//    eap[1] = m_ea0[1]; RBa.m_qp.RotateVector(eap[1]);
-//    eap[2] = m_ea0[2]; RBa.m_qp.RotateVector(eap[2]);
+    eap[1] = m_ea0[1]; RBa.m_qp.RotateVector(eap[1]);
+    eap[2] = m_ea0[2]; RBa.m_qp.RotateVector(eap[2]);
     ea[0] = eat[0]*m_alpha + eap[0]*(1-m_alpha);
-//    ea[1] = eat[1]*m_alpha + eap[1]*(1-m_alpha);
-//    ea[2] = eat[2]*m_alpha + eap[2]*(1-m_alpha);
+    ea[1] = eat[1]*m_alpha + eap[1]*(1-m_alpha);
+    ea[2] = eat[2]*m_alpha + eap[2]*(1-m_alpha);
     
     // body b
     vec3d rb = RBb.m_rt*m_alpha + RBb.m_rp*(1-m_alpha);
@@ -149,27 +149,27 @@ void FERigidRevoluteJoint::Residual(FEGlobalVector& R)
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     vec3d zb = zbt*m_alpha + zbp*(1-m_alpha);
     ebt[0] = m_eb0[0]; RBb.m_qt.RotateVector(ebt[0]);
-//    ebt[1] = m_eb0[1]; RBb.m_qt.RotateVector(ebt[1]);
-//    ebt[2] = m_eb0[2]; RBb.m_qt.RotateVector(ebt[2]);
+    ebt[1] = m_eb0[1]; RBb.m_qt.RotateVector(ebt[1]);
+    ebt[2] = m_eb0[2]; RBb.m_qt.RotateVector(ebt[2]);
     ebp[0] = m_eb0[0]; RBb.m_qp.RotateVector(ebp[0]);
-//    ebp[1] = m_eb0[1]; RBb.m_qp.RotateVector(ebp[1]);
-//    ebp[2] = m_eb0[2]; RBb.m_qp.RotateVector(ebp[2]);
+    ebp[1] = m_eb0[1]; RBb.m_qp.RotateVector(ebp[1]);
+    ebp[2] = m_eb0[2]; RBb.m_qp.RotateVector(ebp[2]);
     eb[0] = ebt[0]*m_alpha + ebp[0]*(1-m_alpha);
-//    eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
-//    eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
-
-    // incremental compound rotation of B w.r.t. A
-//    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
+    eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
+    eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
     
-    mat3ds P = mat3dd(1);
+    // incremental compound rotation of B w.r.t. A
+    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
+    
+    mat3ds P = mat3dd(1) - dyad(ea[0]);
     vec3d p(0,0,0);
     vec3d c = P*(rb + zb - ra - za) - p;
     m_F = m_L + c*m_eps;
     
-//    mat3ds Q = mat3dd(1) - dyad(ea[0]);
-//    vec3d q(0,0,0);
-//    vec3d ksi = Q*vth - q;
-    vec3d ksi = ea[0] ^ eb[0];
+    //    mat3ds Q = mat3dd(1) - dyad(ea[0]);
+    //    vec3d q(0,0,0);
+    //    vec3d ksi = Q*vth - q;
+    vec3d ksi = vth;
     m_M = m_U + ksi*m_ups;
     
     fa[0] = m_F.x;
@@ -194,7 +194,7 @@ void FERigidRevoluteJoint::Residual(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
+void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver)
 {
     // get m_alpha from solver
     m_alpha = dynamic_cast<FESolidSolver2*>(psolver)->m_alpha;
@@ -217,14 +217,14 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     vec3d za = zat*m_alpha + zap*(1-m_alpha);
     eat[0] = m_ea0[0]; RBa.m_qt.RotateVector(eat[0]);
-//    eat[1] = m_ea0[1]; RBa.m_qt.RotateVector(eat[1]);
-//    eat[2] = m_ea0[2]; RBa.m_qt.RotateVector(eat[2]);
+    eat[1] = m_ea0[1]; RBa.m_qt.RotateVector(eat[1]);
+    eat[2] = m_ea0[2]; RBa.m_qt.RotateVector(eat[2]);
     eap[0] = m_ea0[0]; RBa.m_qp.RotateVector(eap[0]);
-//    eap[1] = m_ea0[1]; RBa.m_qp.RotateVector(eap[1]);
-//    eap[2] = m_ea0[2]; RBa.m_qp.RotateVector(eap[2]);
+    eap[1] = m_ea0[1]; RBa.m_qp.RotateVector(eap[1]);
+    eap[2] = m_ea0[2]; RBa.m_qp.RotateVector(eap[2]);
     ea[0] = eat[0]*m_alpha + eap[0]*(1-m_alpha);
-//    ea[1] = eat[1]*m_alpha + eap[1]*(1-m_alpha);
-//    ea[2] = eat[2]*m_alpha + eap[2]*(1-m_alpha);
+    ea[1] = eat[1]*m_alpha + eap[1]*(1-m_alpha);
+    ea[2] = eat[2]*m_alpha + eap[2]*(1-m_alpha);
     mat3d zahat; zahat.skew(za);
     mat3d zathat; zathat.skew(zat);
     
@@ -234,131 +234,135 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     vec3d zb = zbt*m_alpha + zbp*(1-m_alpha);
     ebt[0] = m_eb0[0]; RBb.m_qt.RotateVector(ebt[0]);
-//    ebt[1] = m_eb0[1]; RBb.m_qt.RotateVector(ebt[1]);
-//    ebt[2] = m_eb0[2]; RBb.m_qt.RotateVector(ebt[2]);
+    ebt[1] = m_eb0[1]; RBb.m_qt.RotateVector(ebt[1]);
+    ebt[2] = m_eb0[2]; RBb.m_qt.RotateVector(ebt[2]);
     ebp[0] = m_eb0[0]; RBb.m_qp.RotateVector(ebp[0]);
-//    ebp[1] = m_eb0[1]; RBb.m_qp.RotateVector(ebp[1]);
-//    ebp[2] = m_eb0[2]; RBb.m_qp.RotateVector(ebp[2]);
+    ebp[1] = m_eb0[1]; RBb.m_qp.RotateVector(ebp[1]);
+    ebp[2] = m_eb0[2]; RBb.m_qp.RotateVector(ebp[2]);
     eb[0] = ebt[0]*m_alpha + ebp[0]*(1-m_alpha);
-//    eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
-//    eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
+    eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
+    eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
     mat3d zbhat; zbhat.skew(zb);
     mat3d zbthat; zbthat.skew(zbt);
     
     // incremental compound rotation of B w.r.t. A
-//    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
+    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
-    mat3ds P = mat3dd(1);
+    mat3ds P = mat3dd(1) - dyad(ea[0]);
     vec3d p(0,0,0);
-    vec3d c = P*(rb + zb - ra - za) - p;
+    vec3d d = rb + zb - ra - za;
+    vec3d c = P*d - p;
     m_F = m_L + c*m_eps;
-    mat3dd I(1);
     
-    vec3d ksi = ea[0] ^ eb[0];
+    vec3d ksi = vth;
     m_M = m_U + ksi*m_ups;
     
-    mat3d eahat, ebhat;
-    eahat.skew(ea[0]);
-    ebhat.skew(eb[0]);
-    mat3d eathat, ebthat;
-    eathat.skew(eat[0]);
-    ebthat.skew(ebt[0]);
+    mat3d eahat[3], ebhat[3], eathat[3], ebthat[3];
+    for (j=0; j<3; ++j) {
+        eahat[j] = skew(ea[j]);
+        ebhat[j] = skew(eb[j]);
+        eathat[j] = skew(eat[j]);
+        ebthat[j] = skew(ebt[j]);
+    }
+    mat3d Q = ((ea[0] & d) + mat3dd(1)*(ea[0]*d))*eathat[0];
+    mat3d Wba = (ebhat[0]*eathat[0]+ebhat[1]*eathat[1]+ebhat[1]*eathat[1])/2;
+    mat3d Wab = (eahat[0]*ebthat[0]+eahat[1]*ebthat[1]+eahat[1]*ebthat[1])/2;
     mat3d K;
     
     // (1,1)
-    K = I*(m_alpha*m_eps);
+    K = P*(m_alpha*m_eps);
     ke[0][0] = K[0][0]; ke[0][1] = K[0][1]; ke[0][2] = K[0][2];
     ke[1][0] = K[1][0]; ke[1][1] = K[1][1]; ke[1][2] = K[1][2];
     ke[2][0] = K[2][0]; ke[2][1] = K[2][1]; ke[2][2] = K[2][2];
     
     // (1,2)
-    K = zathat*(-m_eps*m_alpha);
+    K = (P*zathat+Q)*(-m_eps*m_alpha);
     ke[0][3] = K[0][0]; ke[0][4] = K[0][1]; ke[0][5] = K[0][2];
     ke[1][3] = K[1][0]; ke[1][4] = K[1][1]; ke[1][5] = K[1][2];
     ke[2][3] = K[2][0]; ke[2][4] = K[2][1]; ke[2][5] = K[2][2];
     
     // (1,3)
-    K = I*(-m_alpha*m_eps);
+    K = P*(-m_alpha*m_eps);
     ke[0][6] = K[0][0]; ke[0][7] = K[0][1]; ke[0][8] = K[0][2];
     ke[1][6] = K[1][0]; ke[1][7] = K[1][1]; ke[1][8] = K[1][2];
     ke[2][6] = K[2][0]; ke[2][7] = K[2][1]; ke[2][8] = K[2][2];
     
     // (1,4)
-    K = zbthat*(m_alpha*m_eps);
+    K = P*zbthat*(m_alpha*m_eps);
     ke[0][9] = K[0][0]; ke[0][10] = K[0][1]; ke[0][11] = K[0][2];
     ke[1][9] = K[1][0]; ke[1][10] = K[1][1]; ke[1][11] = K[1][2];
     ke[2][9] = K[2][0]; ke[2][10] = K[2][1]; ke[2][11] = K[2][2];
     
     // (2,1)
-    K = zahat*(m_alpha*m_eps);
+    K = zahat*P*(m_alpha*m_eps);
     ke[3][0] = K[0][0]; ke[3][1] = K[0][1]; ke[3][2] = K[0][2];
     ke[4][0] = K[1][0]; ke[4][1] = K[1][1]; ke[4][2] = K[1][2];
     ke[5][0] = K[2][0]; ke[5][1] = K[2][1]; ke[5][2] = K[2][2];
     
     // (2,2)
-    K = (zahat*zathat*m_eps + ebhat*eathat*m_ups)*(-m_alpha);
+    K = (zahat*(P*zathat+Q)*m_eps + Wba*m_ups)*(-m_alpha);
     ke[3][3] = K[0][0]; ke[3][4] = K[0][1]; ke[3][5] = K[0][2];
     ke[4][3] = K[1][0]; ke[4][4] = K[1][1]; ke[4][5] = K[1][2];
     ke[5][3] = K[2][0]; ke[5][4] = K[2][1]; ke[5][5] = K[2][2];
     
     // (2,3)
-    K = zahat*(-m_alpha*m_eps);
+    K = zahat*P*(-m_alpha*m_eps);
     ke[3][6] = K[0][0]; ke[3][7] = K[0][1]; ke[3][8] = K[0][2];
     ke[4][6] = K[1][0]; ke[4][7] = K[1][1]; ke[4][8] = K[1][2];
     ke[5][6] = K[2][0]; ke[5][7] = K[2][1]; ke[5][8] = K[2][2];
     
     // (2,4)
-    K = (zahat*zbthat*m_eps + eahat*ebthat*m_ups)*m_alpha;
+    K = (zahat*P*zbthat*m_eps + Wab*m_ups)*m_alpha;
     ke[3][9] = K[0][0]; ke[3][10] = K[0][1]; ke[3][11] = K[0][2];
     ke[4][9] = K[1][0]; ke[4][10] = K[1][1]; ke[4][11] = K[1][2];
     ke[5][9] = K[2][0]; ke[5][10] = K[2][1]; ke[5][11] = K[2][2];
     
     
     // (3,1)
-    K = I*(-m_alpha*m_eps);
+    K = P*(-m_alpha*m_eps);
     ke[6][0] = K[0][0]; ke[6][1] = K[0][1]; ke[6][2] = K[0][2];
     ke[7][0] = K[1][0]; ke[7][1] = K[1][1]; ke[7][2] = K[1][2];
     ke[8][0] = K[2][0]; ke[8][1] = K[2][1]; ke[8][2] = K[2][2];
     
     // (3,2)
-    K = zathat*(m_eps*m_alpha);
+    K = (P*zathat+Q)*(m_eps*m_alpha);
     ke[6][3] = K[0][0]; ke[6][4] = K[0][1]; ke[6][5] = K[0][2];
     ke[7][3] = K[1][0]; ke[7][4] = K[1][1]; ke[7][5] = K[1][2];
     ke[8][3] = K[2][0]; ke[8][4] = K[2][1]; ke[8][5] = K[2][2];
     
     // (3,3)
-    K = I*(m_alpha*m_eps);
+    K = P*(m_alpha*m_eps);
     ke[6][6] = K[0][0]; ke[6][7] = K[0][1]; ke[6][8] = K[0][2];
     ke[7][6] = K[1][0]; ke[7][7] = K[1][1]; ke[7][8] = K[1][2];
     ke[8][6] = K[2][0]; ke[8][7] = K[2][1]; ke[8][8] = K[2][2];
     
     // (3,4)
-    K = zbthat*(-m_alpha*m_eps);
+    K = P*zbthat*(-m_alpha*m_eps);
     ke[6][9] = K[0][0]; ke[6][10] = K[0][1]; ke[6][11] = K[0][2];
     ke[7][9] = K[1][0]; ke[7][10] = K[1][1]; ke[7][11] = K[1][2];
     ke[8][9] = K[2][0]; ke[8][10] = K[2][1]; ke[8][11] = K[2][2];
     
-
+    
     // (4,1)
-    K = zbhat*(-m_alpha*m_eps);
+    K = zbhat*P*(-m_alpha*m_eps);
     ke[9 ][0] = K[0][0]; ke[ 9][1] = K[0][1]; ke[ 9][2] = K[0][2];
     ke[10][0] = K[1][0]; ke[10][1] = K[1][1]; ke[10][2] = K[1][2];
     ke[11][0] = K[2][0]; ke[11][1] = K[2][1]; ke[11][2] = K[2][2];
     
     // (4,2)
-    K = (zbhat*zathat*m_eps + ebhat*eathat*m_ups)*m_alpha;
+    K = (zbhat*(P*zathat+Q)*m_eps + Wba*m_ups)*m_alpha;
     ke[9 ][3] = K[0][0]; ke[ 9][4] = K[0][1]; ke[ 9][5] = K[0][2];
     ke[10][3] = K[1][0]; ke[10][4] = K[1][1]; ke[10][5] = K[1][2];
     ke[11][3] = K[2][0]; ke[11][4] = K[2][1]; ke[11][5] = K[2][2];
     
     // (4,3)
-    K = zbhat*(m_alpha*m_eps);
+    K = zbhat*P*(m_alpha*m_eps);
     ke[9 ][6] = K[0][0]; ke[ 9][7] = K[0][1]; ke[ 9][8] = K[0][2];
     ke[10][6] = K[1][0]; ke[10][7] = K[1][1]; ke[10][8] = K[1][2];
     ke[11][6] = K[2][0]; ke[11][7] = K[2][1]; ke[11][8] = K[2][2];
     
     // (4,4)
-    K = (zbhat*zbthat*m_eps + eahat*ebthat*m_ups)*(-m_alpha);
+    K = (zbhat*P*zbthat*m_eps + Wab*m_ups)*(-m_alpha);
     ke[9 ][9] = K[0][0]; ke[ 9][10] = K[0][1]; ke[ 9][11] = K[0][2];
     ke[10][9] = K[1][0]; ke[10][10] = K[1][1]; ke[10][11] = K[1][2];
     ke[11][9] = K[2][0]; ke[11][10] = K[2][1]; ke[11][11] = K[2][2];
@@ -373,7 +377,7 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidRevoluteJoint::Augment(int naug)
+bool FERigidPrismaticJoint::Augment(int naug)
 {
     vec3d ra, rb, qa, qb, c, ksi, Lm;
     vec3d za, zb;
@@ -394,32 +398,32 @@ bool FERigidRevoluteJoint::Augment(int naug)
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     za = zat*m_alpha + zap*(1-m_alpha);
     eat[0] = m_ea0[0]; RBa.m_qt.RotateVector(eat[0]);
-//    eat[1] = m_ea0[1]; RBa.m_qt.RotateVector(eat[1]);
-//    eat[2] = m_ea0[2]; RBa.m_qt.RotateVector(eat[2]);
+    eat[1] = m_ea0[1]; RBa.m_qt.RotateVector(eat[1]);
+    eat[2] = m_ea0[2]; RBa.m_qt.RotateVector(eat[2]);
     eap[0] = m_ea0[0]; RBa.m_qp.RotateVector(eap[0]);
-//    eap[1] = m_ea0[1]; RBa.m_qp.RotateVector(eap[1]);
-//    eap[2] = m_ea0[2]; RBa.m_qp.RotateVector(eap[2]);
+    eap[1] = m_ea0[1]; RBa.m_qp.RotateVector(eap[1]);
+    eap[2] = m_ea0[2]; RBa.m_qp.RotateVector(eap[2]);
     ea[0] = eat[0]*m_alpha + eap[0]*(1-m_alpha);
-//    ea[1] = eat[1]*m_alpha + eap[1]*(1-m_alpha);
-//    ea[2] = eat[2]*m_alpha + eap[2]*(1-m_alpha);
+    ea[1] = eat[1]*m_alpha + eap[1]*(1-m_alpha);
+    ea[2] = eat[2]*m_alpha + eap[2]*(1-m_alpha);
     
     vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     zb = zbt*m_alpha + zbp*(1-m_alpha);
     ebt[0] = m_eb0[0]; RBb.m_qt.RotateVector(ebt[0]);
-//    ebt[1] = m_eb0[1]; RBb.m_qt.RotateVector(ebt[1]);
-//    ebt[2] = m_eb0[2]; RBb.m_qt.RotateVector(ebt[2]);
+    ebt[1] = m_eb0[1]; RBb.m_qt.RotateVector(ebt[1]);
+    ebt[2] = m_eb0[2]; RBb.m_qt.RotateVector(ebt[2]);
     ebp[0] = m_eb0[0]; RBb.m_qp.RotateVector(ebp[0]);
-//    ebp[1] = m_eb0[1]; RBb.m_qp.RotateVector(ebp[1]);
-//    ebp[2] = m_eb0[2]; RBb.m_qp.RotateVector(ebp[2]);
+    ebp[1] = m_eb0[1]; RBb.m_qp.RotateVector(ebp[1]);
+    ebp[2] = m_eb0[2]; RBb.m_qp.RotateVector(ebp[2]);
     eb[0] = ebt[0]*m_alpha + ebp[0]*(1-m_alpha);
-//    eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
-//    eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
+    eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
+    eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
     
     // incremental compound rotation of B w.r.t. A
-//    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
+    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
-    mat3ds P = mat3dd(1);
+    mat3ds P = mat3dd(1) - dyad(ea[0]);
     vec3d p(0,0,0);
     c = P*(rb + zb - ra - za) - p;
     
@@ -430,10 +434,10 @@ bool FERigidRevoluteJoint::Augment(int naug)
     
     normF1 = sqrt(Lm*Lm);
     
-//    mat3ds Q = mat3dd(1) - dyad(ea[0]);
-//    vec3d q(0,0,0);
-//    ksi = Q*vth - q;
-    ksi = ea[0] ^ eb[0];
+    //    mat3ds Q = mat3dd(1) - dyad(ea[0]);
+    //    vec3d q(0,0,0);
+    //    ksi = Q*vth - q;
+    ksi = vth;
     
     normM0 = sqrt(m_U*m_U);
     
@@ -477,7 +481,7 @@ bool FERigidRevoluteJoint::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidRevoluteJoint::Serialize(DumpFile& ar)
+void FERigidPrismaticJoint::Serialize(DumpFile& ar)
 {
     if (ar.IsSaving())
     {
@@ -502,7 +506,7 @@ void FERigidRevoluteJoint::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidRevoluteJoint::Update()
+void FERigidPrismaticJoint::Update()
 {
     vec3d ra, rb;
     vec3d za, zb;
@@ -519,46 +523,46 @@ void FERigidRevoluteJoint::Update()
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     za = zat*m_alpha + zap*(1-m_alpha);
     eat[0] = m_ea0[0]; RBa.m_qt.RotateVector(eat[0]);
-//    eat[1] = m_ea0[1]; RBa.m_qt.RotateVector(eat[1]);
-//    eat[2] = m_ea0[2]; RBa.m_qt.RotateVector(eat[2]);
+    eat[1] = m_ea0[1]; RBa.m_qt.RotateVector(eat[1]);
+    eat[2] = m_ea0[2]; RBa.m_qt.RotateVector(eat[2]);
     eap[0] = m_ea0[0]; RBa.m_qp.RotateVector(eap[0]);
-//    eap[1] = m_ea0[1]; RBa.m_qp.RotateVector(eap[1]);
-//    eap[2] = m_ea0[2]; RBa.m_qp.RotateVector(eap[2]);
+    eap[1] = m_ea0[1]; RBa.m_qp.RotateVector(eap[1]);
+    eap[2] = m_ea0[2]; RBa.m_qp.RotateVector(eap[2]);
     ea[0] = eat[0]*m_alpha + eap[0]*(1-m_alpha);
-//    ea[1] = eat[1]*m_alpha + eap[1]*(1-m_alpha);
-//    ea[2] = eat[2]*m_alpha + eap[2]*(1-m_alpha);
+    ea[1] = eat[1]*m_alpha + eap[1]*(1-m_alpha);
+    ea[2] = eat[2]*m_alpha + eap[2]*(1-m_alpha);
     
     vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     zb = zbt*m_alpha + zbp*(1-m_alpha);
     ebt[0] = m_eb0[0]; RBb.m_qt.RotateVector(ebt[0]);
-//    ebt[1] = m_eb0[1]; RBb.m_qt.RotateVector(ebt[1]);
-//    ebt[2] = m_eb0[2]; RBb.m_qt.RotateVector(ebt[2]);
+    ebt[1] = m_eb0[1]; RBb.m_qt.RotateVector(ebt[1]);
+    ebt[2] = m_eb0[2]; RBb.m_qt.RotateVector(ebt[2]);
     ebp[0] = m_eb0[0]; RBb.m_qp.RotateVector(ebp[0]);
-//    ebp[1] = m_eb0[1]; RBb.m_qp.RotateVector(ebp[1]);
-//    ebp[2] = m_eb0[2]; RBb.m_qp.RotateVector(ebp[2]);
+    ebp[1] = m_eb0[1]; RBb.m_qp.RotateVector(ebp[1]);
+    ebp[2] = m_eb0[2]; RBb.m_qp.RotateVector(ebp[2]);
     eb[0] = ebt[0]*m_alpha + ebp[0]*(1-m_alpha);
-//    eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
-//    eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
+    eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
+    eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
     
     // incremental compound rotation of B w.r.t. A
-//    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
+    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
-    mat3ds P = mat3dd(1);
+    mat3ds P = mat3dd(1) - dyad(ea[0]);
     vec3d p(0,0,0);
     vec3d c = P*(rb + zb - ra - za) - p;
     m_F = m_L + c*m_eps;
     
-//    mat3ds Q = mat3dd(1) - dyad(ea[0]);
-//    vec3d q(0,0,0);
-//    vec3d ksi = Q*vth - q;
-    vec3d ksi = ea[0] ^ eb[0];
+    //    mat3ds Q = mat3dd(1) - dyad(ea[0]);
+    //    vec3d q(0,0,0);
+    //    vec3d ksi = Q*vth - q;
+    vec3d ksi = vth;
     m_M = m_U + ksi*m_ups;
     
 }
 
 //-----------------------------------------------------------------------------
-void FERigidRevoluteJoint::Reset()
+void FERigidPrismaticJoint::Reset()
 {
     m_F = vec3d(0,0,0);
     m_L = vec3d(0,0,0);

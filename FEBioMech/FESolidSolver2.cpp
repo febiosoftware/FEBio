@@ -647,6 +647,12 @@ void FESolidSolver2::UpdateRigidBodies(vector<double>& ui)
 {
 	FEMesh& mesh = m_fem.GetMesh();
 
+    double dt = m_fem.GetCurrentStep()->m_dt;
+    // Newmark rule
+    double a = 1.0 / (m_beta*dt);
+    double b = a / dt;
+    double c = 1.0 - 0.5/m_beta;
+    
 	// update rigid bodies
 	int nrb = m_fem.Objects();
 	for (int i=0; i<nrb; ++i)
@@ -736,6 +742,17 @@ void FESolidSolver2::UpdateRigidBodies(vector<double>& ui)
 			RB.m_Ut[4] = vUt.y;
 			RB.m_Ut[5] = vUt.z;
     
+            // acceleration and velocity of center of mass
+            RB.m_at = (RB.m_rt - RB.m_rp)*b - RB.m_vp*a + RB.m_ap*c;
+            RB.m_vt = RB.m_vp + (RB.m_ap*(1.0 - m_gamma) + RB.m_at*m_gamma)*dt;
+            // angular acceleration and velocity of rigid body
+            quatd q = RB.m_qt*RB.m_qp.Inverse();
+            q.MakeUnit();
+            vec3d vq = q.GetVector()*(2*tan(q.GetAngle()/2));  // Cayley transform
+            RB.m_wt = vq*(a*m_gamma) - RB.m_wp + (RB.m_wp + RB.m_alp*dt/2.)*(2-m_gamma/m_beta);
+            q.RotateVector(RB.m_wt);
+            RB.m_alt = vq*b - RB.m_wp*a + RB.m_alp*c;
+            q.RotateVector(RB.m_alt);
     
 			// update the mesh' nodes
 			FEMesh& mesh = m_fem.GetMesh();

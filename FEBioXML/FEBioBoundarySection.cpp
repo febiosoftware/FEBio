@@ -8,6 +8,7 @@
 #include "FEBioMech/FERigidSphericalJoint.h"
 #include "FEBioMech/FERigidPinJoint.h"
 #include "FEBioMech/FERigidRevoluteJoint.h"
+#include "FEBioMech/FERigidPrismaticJoint.h"
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
@@ -817,6 +818,23 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
         // --- R I G I D   R E V O L U T E  J O I N T   I N T E R F A C E ---
         
         FERigidRevoluteJoint* prj = dynamic_cast<FERigidRevoluteJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
+        FEParameterList& pl = prj->GetParameterList();
+        ++tag;
+        do
+        {
+            if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+            ++tag;
+        }
+        while (!tag.isend());
+        prj->m_nRBa--;
+        prj->m_nRBb--;
+        fem.AddNonlinearConstraint(prj);
+    }
+    else if (strcmp(szt, "rigid prismatic joint") == 0)
+    {
+        // --- R I G I D   P R I S M A T I C  J O I N T   I N T E R F A C E ---
+        
+        FERigidPrismaticJoint* prj = dynamic_cast<FERigidPrismaticJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
         FEParameterList& pl = prj->GetParameterList();
         ++tag;
         do

@@ -105,6 +105,8 @@
 		D5C6D41C19CCAAD400E48AAF /* FEDamageMaterialUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C6D41A19CCAAD400E48AAF /* FEDamageMaterialUC.h */; };
 		D5C6D41F19CCB16100E48AAF /* FEDamageCriterionUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C6D41D19CCB16100E48AAF /* FEDamageCriterionUC.cpp */; };
 		D5C6D42019CCB16100E48AAF /* FEDamageCriterionUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C6D41E19CCB16100E48AAF /* FEDamageCriterionUC.h */; };
+		D5C8AAB91AE5D73000E36822 /* FERigidPrismaticJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C8AAB71AE5D73000E36822 /* FERigidPrismaticJoint.cpp */; };
+		D5C8AABA1AE5D73000E36822 /* FERigidPrismaticJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C8AAB81AE5D73000E36822 /* FERigidPrismaticJoint.h */; };
 		D5E107741865DFAD00B23922 /* FE2DFiberNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1068D1865DFAC00B23922 /* FE2DFiberNeoHookean.cpp */; };
 		D5E107751865DFAD00B23922 /* FE2DFiberNeoHookean.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1068E1865DFAC00B23922 /* FE2DFiberNeoHookean.h */; };
 		D5E107761865DFAD00B23922 /* FE2DTransIsoMooneyRivlin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1068F1865DFAC00B23922 /* FE2DTransIsoMooneyRivlin.cpp */; };
@@ -432,6 +434,8 @@
 		D5C6D41A19CCAAD400E48AAF /* FEDamageMaterialUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDamageMaterialUC.h; sourceTree = "<group>"; };
 		D5C6D41D19CCB16100E48AAF /* FEDamageCriterionUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDamageCriterionUC.cpp; sourceTree = "<group>"; };
 		D5C6D41E19CCB16100E48AAF /* FEDamageCriterionUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDamageCriterionUC.h; sourceTree = "<group>"; };
+		D5C8AAB71AE5D73000E36822 /* FERigidPrismaticJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidPrismaticJoint.cpp; sourceTree = "<group>"; };
+		D5C8AAB81AE5D73000E36822 /* FERigidPrismaticJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidPrismaticJoint.h; sourceTree = "<group>"; };
 		D5E106851865DF9F00B23922 /* libFEBioMech.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioMech.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E1068D1865DFAC00B23922 /* FE2DFiberNeoHookean.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FE2DFiberNeoHookean.cpp; sourceTree = "<group>"; };
 		D5E1068E1865DFAC00B23922 /* FE2DFiberNeoHookean.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FE2DFiberNeoHookean.h; sourceTree = "<group>"; };
@@ -928,6 +932,8 @@
 				D5E1072E1865DFAD00B23922 /* FERigidMaterial.h */,
 				D56DC21919532A83006C137D /* FERigidPinJoint.cpp */,
 				D56DC21A19532A83006C137D /* FERigidPinJoint.h */,
+				D5C8AAB71AE5D73000E36822 /* FERigidPrismaticJoint.cpp */,
+				D5C8AAB81AE5D73000E36822 /* FERigidPrismaticJoint.h */,
 				D52D15481A00D9A1005A6CB9 /* FERigidRevoluteJoint.cpp */,
 				D52D15491A00D9A1005A6CB9 /* FERigidRevoluteJoint.h */,
 				D5E1072F1865DFAD00B23922 /* FERigidShellDomain.cpp */,
@@ -1126,6 +1132,7 @@
 				D51BB41A19919CAC00638A8B /* FEFiberIntegrationTriangleUC.h in Headers */,
 				D5E107931865DFAD00B23922 /* FECoupledTransIsoMooneyRivlin.h in Headers */,
 				D5E107871865DFAD00B23922 /* FEBodyForce.h in Headers */,
+				D5C8AABA1AE5D73000E36822 /* FERigidPrismaticJoint.h in Headers */,
 				D5E1080A1865DFAD00B23922 /* FEPressureLoad.h in Headers */,
 				D54A4E4B1A2B65F50032E843 /* FEReactiveVEMaterialPoint.h in Headers */,
 				D5E108101865DFAD00B23922 /* FEResidualVector.h in Headers */,
@@ -1266,6 +1273,7 @@
 				D515BD3A18DB3D7B00B661B2 /* FEPRLig.cpp in Sources */,
 				D5E107BD1865DFAD00B23922 /* FEExplicitSolidSolver.cpp in Sources */,
 				D5E108351865DFAD00B23922 /* FETendonMaterial.cpp in Sources */,
+				D5C8AAB91AE5D73000E36822 /* FERigidPrismaticJoint.cpp in Sources */,
 				D5E108111865DFAD00B23922 /* FERigidJoint.cpp in Sources */,
 				D5E1084B1865DFAD00B23922 /* FEUncoupledMaterial.cpp in Sources */,
 				D5E108531865DFAD00B23922 /* FEViscoElasticMaterial.cpp in Sources */,
