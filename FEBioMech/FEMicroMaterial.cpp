@@ -433,46 +433,8 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	// calculate the averaged stiffness
 	mmpt.m_Ka = AveragedStiffness(rve, mp);
 
-	// calculate the energy difference between macro point and RVE
-	// to verify that we have satisfied the Hill-Mandel condition
-	mat3ds inf_strain = ((F.transpose() + F)*0.5 - mat3dd(1)).sym();
-	double macro_energy = sa.dotdot(inf_strain);
+	calc_energy_diff(rve, mp, sa);
 	
-	double rve_energy_avg = 0.;
-	int nint; 
-	double* w, J;
-	double v = 0.;
-
-	FEMesh& m = rve.GetMesh();
-	for (int k=0; k<m.Domains(); ++k)
-	{
-		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
-		for (int i=0; i<dom.Elements(); ++i)
-		{
-			FESolidElement& el = dom.Element(i);
-			nint = el.GaussPoints();
-			w = el.GaussWeights();
-			
-			for (int n=0; n<nint; ++n)
-			{
-				FEElasticMaterialPoint& rve_pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
-				mat3d rve_F = rve_pt.m_F;
-
-				mat3ds rve_inf_strain = ((rve_F.transpose() + rve_F)*0.5 - mat3dd(1)).sym();
-				mat3ds rve_s = rve_pt.m_s;
-
-				rve_energy_avg += rve_s.dotdot(rve_inf_strain)*rve_pt.m_J*w[n];
-				
-				v += rve_pt.m_J*w[n];
-			}
-		}
-	}
-
-	rve_energy_avg /= v;
-	mmpt.m_energy_diff = fabs(macro_energy - rve_energy_avg);
-
-
-
 	return sa;
 }
 
@@ -718,4 +680,53 @@ tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
 																							
 	c = tens4ds(D);
 	return c;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the energy difference between the RVE problem and the macro material point
+void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3ds& sa)
+{
+	double energy_diff = 0.;
+	
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
+	mat3d F = pt.m_F;
+
+	// calculate the energy difference between macro point and RVE
+	// to verify that we have satisfied the Hill-Mandel condition
+	mat3ds inf_strain = ((F.transpose() + F)*0.5 - mat3dd(1)).sym();
+	double macro_energy = sa.dotdot(inf_strain);
+	
+	double rve_energy_avg = 0.;
+	int nint; 
+	double* w;
+	double v = 0.;
+
+	FEMesh& m = rve.GetMesh();
+	for (int k=0; k<m.Domains(); ++k)
+	{
+		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
+		for (int i=0; i<dom.Elements(); ++i)
+		{
+			FESolidElement& el = dom.Element(i);
+			nint = el.GaussPoints();
+			w = el.GaussWeights();
+			
+			for (int n=0; n<nint; ++n)
+			{
+				FEElasticMaterialPoint& rve_pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
+				mat3d rve_F = rve_pt.m_F;
+
+				mat3ds rve_inf_strain = ((rve_F.transpose() + rve_F)*0.5 - mat3dd(1)).sym();
+				mat3ds rve_s = rve_pt.m_s;
+
+				rve_energy_avg += rve_s.dotdot(rve_inf_strain)*rve_pt.m_J*w[n];
+				
+				v += rve_pt.m_J*w[n];
+			}
+		}
+	}
+
+	rve_energy_avg /= v;
+	mmpt.m_energy_diff = fabs(macro_energy - rve_energy_avg);
 }

@@ -583,77 +583,7 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, mat3ds &s, tens3ds &tau)
 	// calculate the averaged stiffness
 	AveragedStiffness(rve, mp, mmpt2O.m_Ca, mmpt2O.m_Da, mmpt2O.m_Ea);
 
-	// calculate the energy difference between macro point and RVE
-	// to verify that we have satisfied the Hill-Mandel condition
-	mat3ds inf_strain = ((F.transpose() + F)*0.5 - mat3dd(1)).sym();
-	tens3d inf_strain_grad_nosym;
-
-	inf_strain_grad_nosym.d[0] =  G.d[0];
-	inf_strain_grad_nosym.d[1] =  G.d[1];
-	inf_strain_grad_nosym.d[2] =  G.d[2];
-	inf_strain_grad_nosym.d[3] =  0.5*(G.d[1] + G.d[6]);
-	inf_strain_grad_nosym.d[4] =  0.5*(G.d[3] + G.d[7]);
-	inf_strain_grad_nosym.d[5] =  0.5*(G.d[4] + G.d[8]);
-	inf_strain_grad_nosym.d[6] =  0.5*(G.d[2] + G.d[12]);
-	inf_strain_grad_nosym.d[7] =  0.5*(G.d[4] + G.d[13]);
-	inf_strain_grad_nosym.d[8] =  0.5*(G.d[5] + G.d[14]);
-	
-	inf_strain_grad_nosym.d[9] =  0.5*(G.d[6] + G.d[1]);
-	inf_strain_grad_nosym.d[10] = 0.5*(G.d[7] + G.d[3]);
-	inf_strain_grad_nosym.d[11] = 0.5*(G.d[8] + G.d[4]);
-	inf_strain_grad_nosym.d[12] = G.d[7];
-	inf_strain_grad_nosym.d[13] = G.d[9];
-	inf_strain_grad_nosym.d[14] = G.d[10];
-	inf_strain_grad_nosym.d[15] = 0.5*(G.d[8] + G.d[13]);
-	inf_strain_grad_nosym.d[16] = 0.5*(G.d[10] + G.d[15]);
-	inf_strain_grad_nosym.d[17] = 0.5*(G.d[11] + G.d[16]);
-	
-	inf_strain_grad_nosym.d[18] = 0.5*(G.d[12] + G.d[2]);
-	inf_strain_grad_nosym.d[19] = 0.5*(G.d[13] + G.d[4]);
-	inf_strain_grad_nosym.d[20] = 0.5*(G.d[14] + G.d[5]);
-	inf_strain_grad_nosym.d[21] = 0.5*(G.d[13] + G.d[8]);
-	inf_strain_grad_nosym.d[22] = 0.5*(G.d[15] + G.d[10]);
-	inf_strain_grad_nosym.d[23] = 0.5*(G.d[16] + G.d[11]);
-	inf_strain_grad_nosym.d[24] = G.d[14];
-	inf_strain_grad_nosym.d[25] = G.d[16];
-	inf_strain_grad_nosym.d[26] = G.d[17];
-
-	tens3ds inf_strain_grad = inf_strain_grad_nosym.symm();
-
-	double macro_energy = sa.dotdot(inf_strain) + taua.tripledot3s(inf_strain_grad);
-	
-	double rve_energy_avg = 0.;
-	int nint; 
-	double* w, J;
-	double v = 0.;
-
-	FEMesh& m = rve.GetMesh();
-	for (int k=0; k<m.Domains(); ++k)
-	{
-		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
-		for (int i=0; i<dom.Elements(); ++i)
-		{
-			FESolidElement& el = dom.Element(i);
-			nint = el.GaussPoints();
-			w = el.GaussWeights();
-			
-			for (int n=0; n<nint; ++n)
-			{
-				FEElasticMaterialPoint& rve_pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
-				mat3d rve_F = rve_pt.m_F;
-
-				mat3ds rve_inf_strain = ((rve_F.transpose() + rve_F)*0.5 - mat3dd(1)).sym();
-				mat3ds rve_s = rve_pt.m_s;
-
-				rve_energy_avg += rve_s.dotdot(rve_inf_strain)*rve_pt.m_J*w[n];
-				
-				v += rve_pt.m_J*w[n];
-			}
-		}
-	}
-
-	rve_energy_avg /= v;
-	mmpt2O.m_energy_diff = fabs(macro_energy - rve_energy_avg);
+	calc_energy_diff(rve, mp, sa, taua);	
 }
 
 //-----------------------------------------------------------------------------
@@ -979,3 +909,86 @@ void FEMicroMaterial2O::calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], 
 	e.d[45] += Ri[2]*Ri[2]*K[2][2]*Rj[2]*Rj[2];
 }
 
+
+//-----------------------------------------------------------------------------
+//! Calculate the energy difference between the RVE problem and the macro material point
+void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3ds& sa, tens3ds& taua)
+{
+	// get the deformation gradient
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
+	mat3d F = pt.m_F;
+	tens3drs G = mmpt2O.m_G;
+
+	// calculate the energy difference between macro point and RVE
+	// to verify that we have satisfied the Hill-Mandel condition
+	mat3ds inf_strain = ((F.transpose() + F)*0.5 - mat3dd(1)).sym();
+	tens3d inf_strain_grad_nosym;
+
+	inf_strain_grad_nosym.d[0] =  G.d[0];
+	inf_strain_grad_nosym.d[1] =  G.d[1];
+	inf_strain_grad_nosym.d[2] =  G.d[2];
+	inf_strain_grad_nosym.d[3] =  0.5*(G.d[1] + G.d[6]);
+	inf_strain_grad_nosym.d[4] =  0.5*(G.d[3] + G.d[7]);
+	inf_strain_grad_nosym.d[5] =  0.5*(G.d[4] + G.d[8]);
+	inf_strain_grad_nosym.d[6] =  0.5*(G.d[2] + G.d[12]);
+	inf_strain_grad_nosym.d[7] =  0.5*(G.d[4] + G.d[13]);
+	inf_strain_grad_nosym.d[8] =  0.5*(G.d[5] + G.d[14]);
+	
+	inf_strain_grad_nosym.d[9] =  0.5*(G.d[6] + G.d[1]);
+	inf_strain_grad_nosym.d[10] = 0.5*(G.d[7] + G.d[3]);
+	inf_strain_grad_nosym.d[11] = 0.5*(G.d[8] + G.d[4]);
+	inf_strain_grad_nosym.d[12] = G.d[7];
+	inf_strain_grad_nosym.d[13] = G.d[9];
+	inf_strain_grad_nosym.d[14] = G.d[10];
+	inf_strain_grad_nosym.d[15] = 0.5*(G.d[8] + G.d[13]);
+	inf_strain_grad_nosym.d[16] = 0.5*(G.d[10] + G.d[15]);
+	inf_strain_grad_nosym.d[17] = 0.5*(G.d[11] + G.d[16]);
+	
+	inf_strain_grad_nosym.d[18] = 0.5*(G.d[12] + G.d[2]);
+	inf_strain_grad_nosym.d[19] = 0.5*(G.d[13] + G.d[4]);
+	inf_strain_grad_nosym.d[20] = 0.5*(G.d[14] + G.d[5]);
+	inf_strain_grad_nosym.d[21] = 0.5*(G.d[13] + G.d[8]);
+	inf_strain_grad_nosym.d[22] = 0.5*(G.d[15] + G.d[10]);
+	inf_strain_grad_nosym.d[23] = 0.5*(G.d[16] + G.d[11]);
+	inf_strain_grad_nosym.d[24] = G.d[14];
+	inf_strain_grad_nosym.d[25] = G.d[16];
+	inf_strain_grad_nosym.d[26] = G.d[17];
+
+	tens3ds inf_strain_grad = inf_strain_grad_nosym.symm();
+
+	double macro_energy = sa.dotdot(inf_strain) + taua.tripledot3s(inf_strain_grad);
+	
+	double rve_energy_avg = 0.;
+	int nint; 
+	double* w;
+	double v = 0.;
+
+	FEMesh& m = rve.GetMesh();
+	for (int k=0; k<m.Domains(); ++k)
+	{
+		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
+		for (int i=0; i<dom.Elements(); ++i)
+		{
+			FESolidElement& el = dom.Element(i);
+			nint = el.GaussPoints();
+			w = el.GaussWeights();
+			
+			for (int n=0; n<nint; ++n)
+			{
+				FEElasticMaterialPoint& rve_pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
+				mat3d rve_F = rve_pt.m_F;
+
+				mat3ds rve_inf_strain = ((rve_F.transpose() + rve_F)*0.5 - mat3dd(1)).sym();
+				mat3ds rve_s = rve_pt.m_s;
+
+				rve_energy_avg += rve_s.dotdot(rve_inf_strain)*rve_pt.m_J*w[n];
+				
+				v += rve_pt.m_J*w[n];
+			}
+		}
+	}
+
+	rve_energy_avg /= v;
+	mmpt2O.m_energy_diff = fabs(macro_energy - rve_energy_avg);
+}

@@ -79,6 +79,8 @@ protected:
 	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint& pt);
 	tens4ds AveragedStiffness(FEModel& rve, FEMaterialPoint& pt);
 
+	void calc_energy_diff(FEModel& rve, FEMaterialPoint& pt, mat3ds& sa);
+
 public:
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

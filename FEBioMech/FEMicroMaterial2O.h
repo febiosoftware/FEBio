@@ -72,8 +72,7 @@ public:
 	//! calculate tangent stiffness at material point
 	tens4ds Tangent(FEMaterialPoint& pt);
 	void Tangent2O(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e);
-	void calculate_d2O(tens5ds& d, double K[3][3], double Ri[3], double Rj[3]);
-	void calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], double Rj[3]);
+	
 
 	//! data initialization
 	void Init();
@@ -92,6 +91,11 @@ protected:
 	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint &mp);
 	void AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3ds &sa, tens3ds &taua);
 	void AveragedStiffness(FEModel& rve, FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e);
+
+	void calculate_d2O(tens5ds& d, double K[3][3], double Ri[3], double Rj[3]);
+	void calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], double Rj[3]);
+	
+	void calc_energy_diff(FEModel& rve, FEMaterialPoint& pt, mat3ds& sa, tens3ds& taua);
 
 public:
 	// declare the parameter list
