@@ -649,6 +649,7 @@
     <ClInclude Include="..\..\FECore\SparseMatrix.h" />
     <ClInclude Include="..\..\FECore\stdafx.h" />
     <ClInclude Include="..\..\FECore\targetver.h" />
+    <ClInclude Include="..\..\FECore\tens3d.hpp" />
     <ClInclude Include="..\..\FECore\tens3dls.hpp" />
     <ClInclude Include="..\..\FECore\tens4d.h" />
     <ClInclude Include="..\..\FECore\tens4d.hpp" />

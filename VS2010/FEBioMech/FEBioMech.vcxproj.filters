@@ -501,6 +501,9 @@
     <ClCompile Include="..\..\FEBioMech\FEMicroMaterial2O.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FERigidPrismaticJoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h">
@@ -1002,6 +1005,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEMicroMaterial2O.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FERigidPrismaticJoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
