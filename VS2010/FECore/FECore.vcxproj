@@ -649,12 +649,20 @@
     <ClInclude Include="..\..\FECore\SparseMatrix.h" />
     <ClInclude Include="..\..\FECore\stdafx.h" />
     <ClInclude Include="..\..\FECore\targetver.h" />
+    <ClInclude Include="..\..\FECore\tens3d.h" />
     <ClInclude Include="..\..\FECore\tens3d.hpp" />
     <ClInclude Include="..\..\FECore\tens3dls.hpp" />
+    <ClInclude Include="..\..\FECore\tens3drs.hpp" />
+    <ClInclude Include="..\..\FECore\tens3ds.hpp" />
     <ClInclude Include="..\..\FECore\tens4d.h" />
     <ClInclude Include="..\..\FECore\tens4d.hpp" />
     <ClInclude Include="..\..\FECore\tens4dms.hpp" />
     <ClInclude Include="..\..\FECore\tens4ds.hpp" />
+    <ClInclude Include="..\..\FECore\tens5d.h" />
+    <ClInclude Include="..\..\FECore\tens5d.hpp" />
+    <ClInclude Include="..\..\FECore\tens5ds.hpp" />
+    <ClInclude Include="..\..\FECore\tens6d.h" />
+    <ClInclude Include="..\..\FECore\tens6d.hpp" />
     <ClInclude Include="..\..\FECore\tens6ds.hpp" />
     <ClInclude Include="..\..\FECore\Timer.h" />
     <ClInclude Include="..\..\FECore\vec2d.h" />
@@ -733,7 +741,10 @@
     <ClCompile Include="..\..\FECore\SparseMatrix.cpp" />
     <ClCompile Include="..\..\FECore\stdafx.cpp" />
     <ClCompile Include="..\..\FECore\svd.cpp" />
+    <ClCompile Include="..\..\FECore\tens3d.cpp" />
     <ClCompile Include="..\..\FECore\tens4d.cpp" />
+    <ClCompile Include="..\..\FECore\tens5d.cpp" />
+    <ClCompile Include="..\..\FECore\tens6d.cpp" />
     <ClCompile Include="..\..\FECore\Timer.cpp" />
     <ClCompile Include="..\..\FECore\vector.cpp" />
   </ItemGroup>
