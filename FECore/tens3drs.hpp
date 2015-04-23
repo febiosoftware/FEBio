@@ -291,7 +291,7 @@ inline void tens3drs::contractleg2(mat3d F, int leg)
 inline tens3drs tens3drs::multiply2left(mat3d F)
 {
 	tens3drs G;
-
+/*
 	G.d[0] = F[0][0]*d.[0] + F[0][1]*d.[6] + F[0][2]*d.[12];
 	G.d[1] = F[0][0]*d.[1] + F[0][1]*d.[7] + F[0][2]*d.[13];
 	G.d[2] = F[0][0]*d.[2] + F[0][1]*d.[8] + F[0][2]*d.[14];
@@ -312,6 +312,6 @@ inline tens3drs tens3drs::multiply2left(mat3d F)
 	G.d[15] = F[2][0]*d.[3] + F[2][1]*d.[9] + F[2][2]*d.[15];
 	G.d[16] = F[2][0]*d.[4] + F[2][1]*d.[10] + F[2][2]*d.[16];
 	G.d[17] = F[2][0]*d.[5] + F[2][1]*d.[11] + F[2][2]*d.[17];
-
+*/
 	return G;
 }
