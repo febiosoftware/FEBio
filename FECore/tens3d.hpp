@@ -103,6 +103,7 @@ inline void tens3d::zero()
 		d[i] = 0;
 }
 
+// unit tensor???
 inline void tens3d::unit()
 {
 	for (int i = 0; i < NNZ; i++)
@@ -112,20 +113,21 @@ inline void tens3d::unit()
 			d[i] = 0;
 }
 
+// symmetrize a general 3o tensor
 inline tens3ds tens3d::symm()
 {
 	tens3ds t;
 
-	t.d[0] +=  d[0]; 
-	t.d[1] += (d[1] + d[3]  + d[9])/3.; 
-	t.d[2] += (d[2] + d[6]  + d[18])/3.;
-	t.d[3] += (d[4] + d[10] + d[12])/3.; 
-	t.d[4] += (d[5] + d[11] + d[21] + d[7] + d[19] + d[15])/6.; 
-	t.d[5] += (d[8] + d[20] + d[24])/3.;
-	t.d[6] +=  d[13]; 
-	t.d[7] += (d[14] + d[16] + d[22])/3.;
-	t.d[8] += (d[17] + d[23] + d[25])/3.;
-	t.d[9] +=  d[26]; 
+	t.d[0] =  d[0]; 
+	t.d[1] = (d[1] + d[3]  + d[9])/3.; 
+	t.d[2] = (d[2] + d[6]  + d[18])/3.;
+	t.d[3] = (d[4] + d[10] + d[12])/3.; 
+	t.d[4] = (d[5] + d[11] + d[21] + d[7] + d[19] + d[15])/6.; 
+	t.d[5] = (d[8] + d[20] + d[24])/3.;
+	t.d[6] =  d[13]; 
+	t.d[7] = (d[14] + d[16] + d[22])/3.;
+	t.d[8] = (d[17] + d[23] + d[25])/3.;
+	t.d[9] =  d[26]; 
 
 	return t;
 }
