@@ -3,6 +3,13 @@
 #include "mat3d.h"
 
 //-----------------------------------------------------------------------------
+// The following classes are defined in this file
+class tens3ds;	// symmetric 3o tensor
+class tens3drs;	// right-conjugate symmetric 3o tensor
+class tens3dls;	// left-conjugate symmetric 3o tensor
+class tens3d;	// general 3o tensor (no symmetry)
+
+//-----------------------------------------------------------------------------
 //! Class for 3rd order tensor with full symmetry Tijk = Tjik = Tkji = Tikj = Tkij = Tjki (only 10 out of 27 components are unique)
 
 // Due to symmetry we can store this tensor as a 1x10 array.
@@ -111,9 +118,12 @@ public:
 	
 	vec3d contractdyad1(vec3d v);
 	vec3d contract2s(mat3ds s);
-	vec3d contractdyad2(vec3d v, vec3d w);
-
 	double tripledot3rs(tens3drs H);
+	vec3d contractdyad2(vec3d v, vec3d w);
+	tens3d RStoUnsym();
+	tens3dls transpose();
+	void contractleg2(mat3d F, int leg);
+	tens3drs multiply2left(mat3d F);
 
 public:
 	double d[NNZ];	// stored in column major order
@@ -168,13 +178,9 @@ public:
 	void zero();
 
 	void unit();
-
+	tens3d LStoUnsym();
 	tens3drs transpose();
-
-	//vec3d contractdyad1(vec3d v);
-	//vec3d contract2s(mat3ds s);
-	
-	//double tripledot3rs(tens3drs H);
+	tens3dls multiply2right(mat3d F);
 
 public:
 	double d[NNZ];	// stored in column major order
