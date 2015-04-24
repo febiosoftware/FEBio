@@ -81,7 +81,6 @@ void FEElasticDomain2O::ElementInternalForce(FESolidElement& el, vector<double>&
 
 		// get the stress vector for this integration point
 		s = pt.m_s;
-
 		tau = pt2O.m_tau;
 
 		Gr = el.Gr(n);
@@ -202,7 +201,7 @@ void FEElasticDomain2O::UpdateElementStress(int iel, double dt)
 		FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(m_pMat);
 		
 		// calculate the stress at this material point
-		pmat->Stress2O(mp, pt.m_s, pt2O.m_tau);
+		pmat->Stress2O(mp);
 	}
 }
 

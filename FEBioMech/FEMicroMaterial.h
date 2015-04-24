@@ -25,6 +25,9 @@ public:
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 public:
+	mat3d      m_PK1;			// LTE - 1st Piola-Kirchhoff stress
+	mat3ds     m_S;				// LTE - 2nd Piola-Kirchhoff stress
+	
 	mat3ds     m_inf_str;		// LTE - infinitesimal strain
 	mat3ds     m_E;				// LTE - Green-Lagrange strain
 	mat3ds     m_e;				// LTE - Euler-Almansi strain
@@ -82,6 +85,9 @@ protected:
 	
 	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint& pt);
 	tens4ds AveragedStiffness(FEModel& rve, FEMaterialPoint& pt);
+
+	mat3d AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp);
+	mat3ds AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp);
 
 	void calc_energy_diff(FEModel& rve, FEMaterialPoint& pt, mat3ds& sa);
 

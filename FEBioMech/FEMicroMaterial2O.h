@@ -30,8 +30,14 @@ public:
 
 public:
 	tens3drs   m_G;				// LTE - Deformation Hessian
-	tens3ds    m_tau;			// LTE - Cauchy Stress Moment
+	tens3ds    m_tau;			// LTE - Cauchy stress moment
 	
+	mat3d      m_PK1;			// LTE - 1st Piola-Kirchhoff stress
+	tens3drs   m_QK1;			// LTE - 1st Piola-Kirchhoff stress moment
+
+	mat3ds     m_S;				// LTE - 2nd Piola-Kirchhoff stress
+	tens3ds    m_T;				// LTE - 2nd Piola-Kirchhoff stress moment
+
 	mat3ds     m_inf_str;		// LTE - infinitesimal strain
 	tens3ds    m_inf_str_grad;	// LTE - infinitesimal strain gradient
 	
@@ -76,13 +82,12 @@ protected:
 public:
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
-	void Stress2O(FEMaterialPoint &mp, mat3ds &s, tens3ds &tau);
+	void Stress2O(FEMaterialPoint &mp);
 
 	//! calculate tangent stiffness at material point
 	tens4ds Tangent(FEMaterialPoint& pt);
 	void Tangent2O(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e);
 	
-
 	//! data initialization
 	void Init();
 
@@ -105,6 +110,9 @@ protected:
 	void calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], double Rj[3]);
 	
 	void calc_energy_diff(FEModel& rve, FEMaterialPoint& pt, mat3ds& sa, tens3ds& taua);
+
+	void AveragedStress2OPK1(FEModel& rve, FEMaterialPoint &mp, mat3d &PK1a, tens3drs &QK1a);
+	void AveragedStress2OPK2(FEModel& rve, FEMaterialPoint &mp, mat3ds &Sa, tens3ds &Ta);
 
 public:
 	// declare the parameter list

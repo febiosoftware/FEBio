@@ -144,11 +144,56 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element norm for Cauchy stress
+class FEPlotElementsnorm : public FEDomainData
+{
+public:
+	FEPlotElementsnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element norm for Cauchy stress moment
 class FEPlotElementtaunorm : public FEDomainData
 {
 public:
 	FEPlotElementtaunorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element norm for PK1 stress
+class FEPlotElementPK1norm : public FEDomainData
+{
+public:
+	FEPlotElementPK1norm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element norm for PK1 stress moment
+class FEPlotElementQK1norm : public FEDomainData
+{
+public:
+	FEPlotElementQK1norm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element norm for PK2 stress
+class FEPlotElementSnorm : public FEDomainData
+{
+public:
+	FEPlotElementSnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element norm for PK2 stress moment
+class FEPlotElementTnorm : public FEDomainData
+{
+public:
+	FEPlotElementTnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 

@@ -365,8 +365,14 @@ REGISTER_FECORE_CLASS(FEPlotSPRTestQuadratic	 , FEPLOTDATA_ID, "SPR test quadrat
 REGISTER_FECORE_CLASS(FEPlotNodalStresses		 , FEPLOTDATA_ID, "nodal stress"		  );
 REGISTER_FECORE_CLASS(FEPlotVolumePressure       , FEPLOTDATA_ID, "volume pressure"       );
 
+// LTE - 2O continuum fields
 REGISTER_FECORE_CLASS(FEPlotElementGnorm         , FEPLOTDATA_ID, "G norm"                );              
+REGISTER_FECORE_CLASS(FEPlotElementsnorm         , FEPLOTDATA_ID, "s norm"   			  );
 REGISTER_FECORE_CLASS(FEPlotElementtaunorm       , FEPLOTDATA_ID, "tau norm"			  );
+REGISTER_FECORE_CLASS(FEPlotElementPK1norm       , FEPLOTDATA_ID, "PK1 norm"   			  );
+REGISTER_FECORE_CLASS(FEPlotElementQK1norm       , FEPLOTDATA_ID, "QK1 norm"			  );
+REGISTER_FECORE_CLASS(FEPlotElementSnorm         , FEPLOTDATA_ID, "S norm"   			  );
+REGISTER_FECORE_CLASS(FEPlotElementTnorm         , FEPLOTDATA_ID, "T norm"  			  );
 REGISTER_FECORE_CLASS(FEPlotElementenergydiff    , FEPLOTDATA_ID, "M-m energy diff"       );
 REGISTER_FECORE_CLASS(FEPlotElementinfstrnorm    , FEPLOTDATA_ID, "inf strain grad norm"  );
 REGISTER_FECORE_CLASS(FEPlotElementGLstrnorm     , FEPLOTDATA_ID, "GL strain grad norm"   );

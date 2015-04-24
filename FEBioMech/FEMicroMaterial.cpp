@@ -429,6 +429,8 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 
 	// calculate the averaged stress
 	mat3ds sa = AveragedStress(rve, mp);
+	mmpt.m_PK1 = AveragedStressPK1(rve, mp);
+	mmpt.m_S = AveragedStressPK2(rve, mp);
 
 	// calculate the averaged stiffness
 	mmpt.m_Ka = AveragedStiffness(rve, mp);
@@ -626,45 +628,6 @@ tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
 						D[5][5] += 0.25*(Ri[0]*K[2][0]*Rj[2] + Ri[2]*K[0][0]*Rj[2] + Ri[0]*K[2][2]*Rj[0] + Ri[2]*K[0][2]*Rj[0]);
 					}
 				}
-																														/*
-			if (ni.m_ID[DOF_X] < 0)
-			{
-				vec3d ri = ni.m_r0;
-
-				double Fi[3] = {fe[3*i], fe[3*i+1], fe[3*i+2] };
-				double Ri[3] = { ri.x, ri.y, ri.z };
-				double I[3][3] = {{1,0,0},{0,1,0},{0,0,1}};
-
-				D[0][0] += Fi[0]*Ri[0];
-				D[1][1] += Fi[1]*Ri[1];
-				D[2][2] += Fi[2]*Ri[2];
-
-//				D[0][1] += 0;
-//				D[0][2] += 0;
-//				D[1][2] += 0;
-
-				D[0][3] += 0.5*(Fi[0]*I[0][0]*Ri[1] + Fi[0]*I[0][1]*Ri[0]);
-				D[0][4] += 0.5*(Fi[0]*I[0][1]*Ri[2] + Fi[0]*I[0][2]*Ri[1]);
-				D[0][5] += 0.5*(Fi[0]*I[0][0]*Ri[2] + Fi[0]*I[0][2]*Ri[0]);
-
-				D[1][3] += 0.5*(Fi[1]*I[1][0]*Ri[1] + Fi[1]*I[1][1]*Ri[0]);
-				D[1][4] += 0.5*(Fi[1]*I[1][1]*Ri[2] + Fi[1]*I[1][2]*Ri[1]);
-				D[1][5] += 0.5*(Fi[1]*I[1][0]*Ri[2] + Fi[1]*I[1][2]*Ri[0]);
-
-				D[2][3] += 0.5*(Fi[2]*I[2][0]*Ri[1] + Fi[2]*I[2][1]*Ri[0]);
-				D[2][4] += 0.5*(Fi[2]*I[2][1]*Ri[2] + Fi[2]*I[2][2]*Ri[1]);
-				D[2][5] += 0.5*(Fi[2]*I[2][0]*Ri[2] + Fi[2]*I[2][2]*Ri[0]);
-
-				D[3][3] += 0.25*(Fi[0]*I[1][0]*Ri[1] + Fi[1]*I[0][0]*Ri[1] + Fi[0]*I[1][1]*Ri[0] + Fi[1]*I[0][1]*Ri[0]);
-				D[3][4] += 0.25*(Fi[0]*I[1][1]*Ri[2] + Fi[1]*I[0][1]*Ri[2] + Fi[0]*I[1][2]*Ri[1] + Fi[1]*I[0][2]*Ri[1]);
-				D[3][5] += 0.25*(Fi[0]*I[1][0]*Ri[2] + Fi[1]*I[0][0]*Ri[2] + Fi[0]*I[1][2]*Ri[0] + Fi[1]*I[0][2]*Ri[0]);
-
-				D[4][4] += 0.25*(Fi[1]*I[2][1]*Ri[2] + Fi[2]*I[1][1]*Ri[2] + Fi[1]*I[2][2]*Ri[1] + Fi[2]*I[1][2]*Ri[1]);
-				D[4][5] += 0.25*(Fi[1]*I[2][0]*Ri[2] + Fi[2]*I[1][0]*Ri[2] + Fi[1]*I[2][2]*Ri[0] + Fi[2]*I[1][2]*Ri[0]);
-
-				D[5][5] += 0.25*(Fi[0]*I[2][0]*Ri[2] + Fi[2]*I[0][0]*Ri[2] + Fi[0]*I[2][2]*Ri[0] + Fi[2]*I[0][2]*Ri[0]);
-			}
-*/
 			}
 		}
 	}
@@ -726,16 +689,10 @@ void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3ds
 			for (int n=0; n<nint; ++n)
 			{
 				FEElasticMaterialPoint& rve_pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
-				mat3d rve_F = rve_pt.m_F;
-
-				mat3ds rve_inf_strain = ((rve_F.transpose() + rve_F)*0.5 - mat3dd(1)).sym();
-				
+				mat3d rve_F = rve_pt.m_F;			
 				mat3ds rve_e = ((mat3dd(1) - rve_F.transinv()*rve_F.inverse())*0.5).sym();
-				
 				mat3ds rve_s = rve_pt.m_s;
-
 				rve_energy_avg += rve_s.dotdot(rve_e)*rve_pt.m_J*w[n];
-				
 				v += rve_pt.m_J*w[n];
 			}
 		}
@@ -743,4 +700,123 @@ void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3ds
 
 	rve_energy_avg /= v;
 	mmpt.m_energy_diff = fabs(macro_energy - rve_energy_avg);
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the average stress from the RVE solution.
+mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	mat3d F = pt.m_F;
+	double J = pt.m_J;
+
+	// get the RVE mesh
+	FEMesh& m = rve.GetMesh();
+
+	mat3d PK1; PK1.zero();
+
+	// for periodic BC's we take the reaction forces directly from the periodic constraints
+	if (m_bperiodic)
+	{
+		// get the reaction for from the periodic constraints
+		for (int i=0; i<3; ++i)
+		{
+			FEPeriodicBoundary* pbc = dynamic_cast<FEPeriodicBoundary*>(rve.SurfacePairInteraction(i));
+			assert(pbc);
+			FEPeriodicSurface& ss = pbc->m_ss;
+			int N = ss.Nodes();
+			for (int i=0; i<N; ++i)
+			{
+				FENode& node = ss.Node(i);
+				vec3d f = ss.m_Fr[i];
+
+				// We multiply by two since the reaction forces are only stored at the slave surface 
+				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
+				// store the reaction forces on the master nodes as well?)
+				PK1 += (f & node.m_r0)*2.0;
+			}
+		}
+	}
+
+	// get the reaction force vector from the solid solver
+	// (We also need to do this for the periodic BC, since at the prescribed nodes,
+	// the contact forces will be zero). 
+	FEAnalysis* pstep = rve.GetCurrentStep();
+	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	assert(ps);
+	vector<double>& R = ps->m_Fr;
+	int nbc = rve.PrescribedBCs();
+	for (int i=0; i<nbc/3; ++i)
+	{
+		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
+		FENode& n = m.Node(dc.node);
+		vec3d f;
+		f.x = R[-n.m_ID[DOF_X]-2];
+		f.y = R[-n.m_ID[DOF_Y]-2];
+		f.z = R[-n.m_ID[DOF_Z]-2];
+		PK1 += f & n.m_r0;
+	}
+
+	return PK1 / m_V0;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the average stress from the RVE solution.
+mat3ds FEMicroMaterial::AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	mat3d F = pt.m_F;
+	double J = pt.m_J;
+	mat3d Finv = F.inverse();
+
+	// get the RVE mesh
+	FEMesh& m = rve.GetMesh();
+
+	mat3d S; S.zero();
+
+	// for periodic BC's we take the reaction forces directly from the periodic constraints
+	if (m_bperiodic)
+	{
+		// get the reaction for from the periodic constraints
+		for (int i=0; i<3; ++i)
+		{
+			FEPeriodicBoundary* pbc = dynamic_cast<FEPeriodicBoundary*>(rve.SurfacePairInteraction(i));
+			assert(pbc);
+			FEPeriodicSurface& ss = pbc->m_ss;
+			int N = ss.Nodes();
+			for (int i=0; i<N; ++i)
+			{
+				FENode& node = ss.Node(i);
+				vec3d f = ss.m_Fr[i];
+				vec3d f0 = Finv*f;
+
+				// We multiply by two since the reaction forces are only stored at the slave surface 
+				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
+				// store the reaction forces on the master nodes as well?)
+				S += (f0 & node.m_r0)*2.0;
+			}
+		}
+	}
+
+	// get the reaction force vector from the solid solver
+	// (We also need to do this for the periodic BC, since at the prescribed nodes,
+	// the contact forces will be zero). 
+	FEAnalysis* pstep = rve.GetCurrentStep();
+	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	assert(ps);
+	vector<double>& R = ps->m_Fr;
+	int nbc = rve.PrescribedBCs();
+	for (int i=0; i<nbc/3; ++i)
+	{
+		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
+		FENode& n = m.Node(dc.node);
+		vec3d f;
+		f.x = R[-n.m_ID[DOF_X]-2];
+		f.y = R[-n.m_ID[DOF_Y]-2];
+		f.z = R[-n.m_ID[DOF_Z]-2];
+		vec3d f0 = Finv*f;
+		S += f0 & n.m_r0;
+	}
+
+	return S.sym() / m_V0;
 }
