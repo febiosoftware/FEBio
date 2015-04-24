@@ -22,7 +22,7 @@ public:
 	enum { NNZ = 10 };
 
 	// default constructor
-	tens3ds(){}
+	tens3ds(){for (int i = 0; i < NNZ; i++) d[i] = 0.;}
 	
 	tens3ds(const double g)
 	{
@@ -79,7 +79,7 @@ public:
 	enum { NNZ = 18 };
 
 	// default constructor
-	tens3drs(){}
+	tens3drs(){for (int i = 0; i < NNZ; i++) d[i] = 0.;}
 	
 	tens3drs(const double g)
 	{
@@ -142,7 +142,7 @@ public:
 	enum { NNZ = 18 };
 
 	// default constructor
-	tens3dls(){}
+	tens3dls(){for (int i = 0; i < NNZ; i++) d[i] = 0.;}
 	
 	tens3dls(const double g)
 	{
@@ -199,7 +199,7 @@ public:
 	enum { NNZ = 27 };
 
 	// default constructor
-	tens3d(){}
+	tens3d(){for (int i = 0; i < NNZ; i++) d[i] = 0.;}
 	
 	tens3d(const double g)
 	{
