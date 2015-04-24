@@ -109,7 +109,7 @@ protected:
 	void calculate_d2O(tens5ds& d, double K[3][3], double Ri[3], double Rj[3]);
 	void calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], double Rj[3]);
 	
-	void calc_energy_diff(FEModel& rve, FEMaterialPoint& pt, mat3ds& sa, tens3ds& taua);
+	void calc_energy_diff(FEModel& rve, FEMaterialPoint& pt);
 
 	void AveragedStress2OPK1(FEModel& rve, FEMaterialPoint &mp, mat3d &PK1a, tens3drs &QK1a);
 	void AveragedStress2OPK2(FEModel& rve, FEMaterialPoint &mp, mat3ds &Sa, tens3ds &Ta);

@@ -57,8 +57,9 @@ void FEElasticDomain2O::ElementInternalForce(FESolidElement& el, vector<double>&
 	double Ji[3][3], detJt;
 
 	double Gx, Gy, Gz;
-	mat3ds s;
-	tens3ds tau;
+	
+	mat3ds s; s.zero();
+	tens3ds tau; tau.zero();
 
 	const double* Gr, *Gs, *Gt;
 
@@ -243,7 +244,6 @@ void FEElasticDomain2O::ElementGeometricalStiffness(FESolidElement &el, matrix &
 		Gtn = el.Gt(n);
 
 		//// LTE 
-		// Calculate G (Deformation Hessian)
 		double *Grrn = el.Grr(n);
 		double *Grsn = el.Grs(n);
 		double *Grtn = el.Grt(n);
@@ -277,9 +277,8 @@ void FEElasticDomain2O::ElementGeometricalStiffness(FESolidElement &el, matrix &
 		
 		// element's Cauchy-stress tensor at gauss point n
 		// s is the voight vector
-		mat3ds& s = pt.m_s;
-
-		tens3ds& tau = pt2O.m_tau;
+		mat3ds s = pt.m_s;
+		tens3ds tau = pt2O.m_tau;
 
 		double Grrj, Grsj, Grtj, Gsrj, Gssj, Gstj, Gtrj, Gtsj, Gttj;
 
@@ -366,7 +365,6 @@ void FEElasticDomain2O::ElementMaterialStiffness(FESolidElement &el, matrix &ke)
 	{
 		// calculate jacobian
 		detJt = invjact(el, Ji, n)*gw[n];
-
 		Grn = el.Gr(n);
 		Gsn = el.Gs(n);
 		Gtn = el.Gt(n);

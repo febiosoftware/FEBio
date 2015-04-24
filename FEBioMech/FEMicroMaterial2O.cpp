@@ -591,7 +591,7 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp)
 	// calculate the averaged stiffness
 	AveragedStiffness(rve, mp, mmpt2O.m_Ca, mmpt2O.m_Da, mmpt2O.m_Ea);
 
-	calc_energy_diff(rve, mp, sa, taua);	
+	calc_energy_diff(rve, mp);	
 }
 
 //-----------------------------------------------------------------------------
@@ -605,7 +605,7 @@ void FEMicroMaterial2O::AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3
 	// get the RVE mesh
 	FEMesh& m = rve.GetMesh();
 
-	mat3d T; T.zero();
+	mat3d s; s.zero();
 	tens3ds tau; tau.zero();
 
 	// for periodic BC's we take the reaction forces directly from the periodic constraints
@@ -622,11 +622,11 @@ void FEMicroMaterial2O::AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3
 			{
 				FENode& node = ss.Node(i);
 				vec3d f = ss.m_Fr[i];
-
+				
 				// We multiply by two since the reaction forces are only stored at the slave surface 
 				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
 				// store the reaction forces on the master nodes as well?)
-				T += (f & node.m_rt)*2.0;
+				s += (f & node.m_rt)*2.0;
 
 				vec3d x; x = node.m_rt;
 		
@@ -661,7 +661,8 @@ void FEMicroMaterial2O::AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3
 		f.x = R[-n.m_ID[DOF_X]-2];
 		f.y = R[-n.m_ID[DOF_Y]-2];
 		f.z = R[-n.m_ID[DOF_Z]-2];
-		T += f & n.m_rt;
+				
+		s += f & n.m_rt;
 
 		vec3d x; x = n.m_rt;
 		
@@ -677,8 +678,8 @@ void FEMicroMaterial2O::AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3
 		tau.d[9] += x.z*f.z*x.z; 
 	}
 
-	sa = T.sym() / (J*m_V0);
-	taua = tau / 2*(J*m_V0);
+	sa = s.sym() / (J*m_V0);
+	taua = tau / (2*J*m_V0);
 }
 
 //-----------------------------------------------------------------------------
@@ -703,9 +704,10 @@ void FEMicroMaterial2O::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp, ten
 	// get deformation gradient and its inverse
 	mat3d F = pt.m_F;
 	mat3d Fi = F.inverse();
+	double J = pt.m_J;
 
 	// get the stress
-	mat3ds s = pt.m_s;
+	//mat3ds s = pt.m_s;
 
 	// calculate the center point
 	vec3d rc(0,0,0);
@@ -765,9 +767,9 @@ void FEMicroMaterial2O::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp, ten
 						K[2][0] = ke[3*i+2][3*j  ]; K[2][1] = ke[3*i+2][3*j+1]; K[2][2] = ke[3*i+2][3*j+2];
 
 						// get the nodal positions
-						vec3d ri = ni.m_rt - rc;
-						vec3d rj = nj.m_rt - rc;
-
+						vec3d ri = ni.m_rt;
+						vec3d rj = nj.m_rt;
+						
 						double Ri[3] = { ri.x, ri.y, ri.z };
 						double Rj[3] = { rj.x, rj.y, rj.z };
 
@@ -920,7 +922,7 @@ void FEMicroMaterial2O::calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], 
 
 //-----------------------------------------------------------------------------
 //! Calculate the energy difference between the RVE problem and the macro material point
-void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3ds& sa, tens3ds& taua)
+void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 {
 	// get the deformation gradient and deformation hessian
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -982,8 +984,8 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3
 	
 	// calculate the energy difference between macro point and RVE
 	// to verify that we have satisfied the Hill-Mandel condition
-	double macro_energy = sa.dotdot(mmpt2O.m_e) + taua.tripledot3s(mmpt2O.m_h);
-	
+	double macro_energy = pt.m_s.dotdot(mmpt2O.m_e) + mmpt2O.m_tau.tripledot3s(mmpt2O.m_h);
+
 	double rve_energy_avg = 0.;
 	int nint; 
 	double* w;
