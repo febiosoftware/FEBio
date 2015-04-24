@@ -336,6 +336,9 @@ public:
 	// calculate the one-norm
 	double norm() const;
 
+	// double contraction
+	double dotdot(mat3d& T);
+
 protected:
 	double d[3][3];	// matrix data
 

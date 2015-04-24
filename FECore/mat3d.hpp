@@ -845,3 +845,9 @@ inline double mat3d::norm() const
 	sc = fabs(d[0][2]) + fabs(d[1][2]) + fabs(d[2][2]); if (sc > s) s = sc;
 	return s;
 }
+
+// double contraction
+inline double mat3d::dotdot(mat3d& T)
+{
+	return (T.d[0][0]*d[0][0] + T.d[0][1]*d[0][1] + T.d[0][2]*d[0][2] + T.d[1][0]*d[1][0] + T.d[1][1]*d[1][1] + T.d[1][2]*d[1][2] + T.d[2][0]*d[2][0] + T.d[2][1]*d[2][1] + T.d[2][2]*d[2][2]);
+}
