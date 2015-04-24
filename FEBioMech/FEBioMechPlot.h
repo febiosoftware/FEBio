@@ -162,6 +162,33 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element infinitesimal strain gradiet norm
+class FEPlotElementinfstrnorm : public FEDomainData
+{
+public:
+	FEPlotElementinfstrnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element Green-Lagrange strain gradient norm
+class FEPlotElementGLstrnorm : public FEDomainData
+{
+public:
+	FEPlotElementGLstrnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element Euler-Almansi strain gradient norm
+class FEPlotElementEAstrnorm : public FEDomainData
+{
+public:
+	FEPlotElementEAstrnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Strain energy density
 class FEPlotStrainEnergyDensity : public FEDomainData
 {

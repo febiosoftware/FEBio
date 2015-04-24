@@ -14,6 +14,12 @@ FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterial
 {
 	m_tau.zero();
 	m_G.zero();
+	m_inf_str.zero();
+	m_inf_str_grad.zero();
+	m_E.zero();
+	m_H.zero();
+	m_e.zero();
+	m_h.zero();
 	m_energy_diff = 0.;
 
 	m_Ca.zero();
@@ -545,6 +551,20 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, mat3ds &s, tens3ds &tau)
 	mat3d F = pt.m_F;
 	tens3drs G = mmpt2O.m_G;
 
+	vec3d X = pt.m_r0;
+	vec3d x = pt.m_rt;
+
+	vec3d xnew = F*X + G.contractdyad1(X)*0.5;
+
+	mat3d Finv; Finv = F.inverse();
+	tens3drs Ginv; Ginv = G;
+
+	Ginv.contractleg2(Finv,1);
+	Ginv.contractleg2(Finv,2);
+	Ginv.contractleg2(Finv,3);
+
+	vec3d Xnew = Finv*x + Ginv.contractdyad1(x)*0.5;
+
 	// Create a local copy of the rve
 	FEModel rve;
 	rve.CopyFrom(m_rve);
@@ -914,15 +934,22 @@ void FEMicroMaterial2O::calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], 
 //! Calculate the energy difference between the RVE problem and the macro material point
 void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3ds& sa, tens3ds& taua)
 {
-	// get the deformation gradient
+	// get the deformation gradient and deformation hessian
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
 	mat3d F = pt.m_F;
 	tens3drs G = mmpt2O.m_G;
 
-	// calculate the energy difference between macro point and RVE
-	// to verify that we have satisfied the Hill-Mandel condition
-	mat3ds inf_strain = ((F.transpose() + F)*0.5 - mat3dd(1)).sym();
+	mat3d Ftrans = F.transpose();
+	tens3dls Gtrans = G.transpose();
+
+	mat3d Finv = F.inverse();
+	mat3d Finvtrans = Finv.transpose();
+	tens3drs Ginv; Ginv = G; Ginv.contractleg2(Finv,1); Ginv.contractleg2(Finv,2); Ginv.contractleg2(Finv,3);
+	tens3dls Ginvtrans = Ginv.transpose();
+	
+	// calculate infinitesimal strain
+	mmpt2O.m_inf_str = ((F.transpose() + F)*0.5 - mat3dd(1)).sym();
 	tens3d inf_strain_grad_nosym;
 
 	inf_strain_grad_nosym.d[0] =  G.d[0];
@@ -955,9 +982,19 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3
 	inf_strain_grad_nosym.d[25] = G.d[16];
 	inf_strain_grad_nosym.d[26] = G.d[17];
 
-	tens3ds inf_strain_grad = inf_strain_grad_nosym.symm();
+	mmpt2O.m_inf_str_grad = inf_strain_grad_nosym.symm();
 
-	double macro_energy = sa.dotdot(inf_strain) + taua.tripledot3s(inf_strain_grad);
+	// calculate Green-Lagrange strain
+	mmpt2O.m_E = ((Ftrans*F - mat3dd(1))*0.5).sym();
+	mmpt2O.m_H = ((Gtrans.multiply2right(F).LStoUnsym() + G.multiply2left(Ftrans).RStoUnsym())*0.5).symm();
+
+	// calculate Euler-Almansi strain
+	mmpt2O.m_e = ((mat3dd(1) - Finvtrans*Finv)*0.5).sym();
+	mmpt2O.m_h = ((Ginvtrans.multiply2right(Finv).LStoUnsym() - Ginv.multiply2left(Finvtrans).RStoUnsym())*-0.5).symm();
+	
+	// calculate the energy difference between macro point and RVE
+	// to verify that we have satisfied the Hill-Mandel condition
+	double macro_energy = sa.dotdot(mmpt2O.m_E) + taua.tripledot3s(mmpt2O.m_H);
 	
 	double rve_energy_avg = 0.;
 	int nint; 
@@ -980,9 +1017,12 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3
 				mat3d rve_F = rve_pt.m_F;
 
 				mat3ds rve_inf_strain = ((rve_F.transpose() + rve_F)*0.5 - mat3dd(1)).sym();
+				mat3ds rve_E = ((rve_F.transpose()*rve_F - mat3dd(1))*0.5).sym();
+				mat3ds rve_e = ((mat3dd(1) - rve_F.transinv()*rve_F.inverse())*0.5).sym();
+				
 				mat3ds rve_s = rve_pt.m_s;
 
-				rve_energy_avg += rve_s.dotdot(rve_inf_strain)*rve_pt.m_J*w[n];
+				rve_energy_avg += rve_s.dotdot(rve_E)*rve_pt.m_J*w[n];
 				
 				v += rve_pt.m_J*w[n];
 			}

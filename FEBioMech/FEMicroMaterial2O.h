@@ -31,10 +31,19 @@ public:
 public:
 	tens3drs   m_G;				// LTE - Deformation Hessian
 	tens3ds    m_tau;			// LTE - Cauchy Stress Moment
+	
+	mat3ds     m_inf_str;		// LTE - infinitesimal strain
+	tens3ds    m_inf_str_grad;	// LTE - infinitesimal strain gradient
+	
+	mat3ds     m_E;				// LTE - Green-Lagrange strain
+	tens3ds    m_H;				// LTE - Green-Lagrange strain gradient
+	
+	mat3ds     m_e;				// LTE - Euler-Almansi strain
+	tens3ds    m_h;				// LTE - Euler-Almansi strain graident
+
 	double	   m_energy_diff;	// LTE - Difference between macro energy and volume averaged energy of RVE (should be zero) 
 
-
-	tens4ds	   m_Ca;	//!< averaged material stiffness
+	tens4ds	   m_Ca;			//!< averaged material stiffness
 	tens5ds    m_Da;
 	tens6ds    m_Ea;
 };

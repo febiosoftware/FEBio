@@ -442,6 +442,132 @@ bool FEPlotElementenergydiff::Save(FEDomain& dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
+//! Store the average infinitesimal strain gradient for each element. 
+bool FEPlotElementinfstrnorm::Save(FEDomain& dom, vector<float>& a)
+{
+	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+	if ((pme == 0) || pme->IsRigid()) return false;
+	
+	float L2_norm; L2_norm = 0.;
+	tens3ds inf_strain_avg; inf_strain_avg.zero();
+
+	// write solid element data
+	int N = dom.Elements();
+	for (int i=0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double) nint;
+		inf_strain_avg.zero();
+
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		// we output the average stress values of the gauss points
+		for (int j=0; j<nint; ++j)
+		{
+			FEMicroMaterialPoint2O* ppt2O = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
+			
+			if (ppt2O)
+			{
+				FEMicroMaterialPoint2O& pt2O = *ppt2O;
+				inf_strain_avg += (pt2O.m_inf_str_grad)*f;
+				
+			}
+		}
+
+		L2_norm = (float) sqrt(inf_strain_avg.tripledot3s(inf_strain_avg));
+
+		a.push_back(L2_norm);
+	}
+	
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Store the average Green-Lagrange strain gradient for each element. 
+bool FEPlotElementGLstrnorm::Save(FEDomain& dom, vector<float>& a)
+{
+	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+	if ((pme == 0) || pme->IsRigid()) return false;
+	
+	float L2_norm; L2_norm = 0.;
+	tens3ds Havg; Havg.zero();
+
+	// write solid element data
+	int N = dom.Elements();
+	for (int i=0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double) nint;
+		Havg.zero();
+
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		// we output the average stress values of the gauss points
+		for (int j=0; j<nint; ++j)
+		{
+			FEMicroMaterialPoint2O* ppt2O = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
+			
+			if (ppt2O)
+			{
+				FEMicroMaterialPoint2O& pt2O = *ppt2O;
+				Havg += (pt2O.m_H)*f;
+				
+			}
+		}
+
+		L2_norm = (float) sqrt(Havg.tripledot3s(Havg));
+
+		a.push_back(L2_norm);
+	}
+	
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Store the average Euler-Almansi strain gradient for each element. 
+bool FEPlotElementEAstrnorm::Save(FEDomain& dom, vector<float>& a)
+{
+	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+	if ((pme == 0) || pme->IsRigid()) return false;
+	
+	float L2_norm; L2_norm = 0.;
+	tens3ds havg; havg.zero();
+
+	// write solid element data
+	int N = dom.Elements();
+	for (int i=0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double) nint;
+		havg.zero();
+
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		// we output the average stress values of the gauss points
+		for (int j=0; j<nint; ++j)
+		{
+			FEMicroMaterialPoint2O* ppt2O = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
+			
+			if (ppt2O)
+			{
+				FEMicroMaterialPoint2O& pt2O = *ppt2O;
+				havg += (pt2O.m_h)*f;
+				
+			}
+		}
+
+		L2_norm = (float) sqrt(havg.tripledot3s(havg));
+
+		a.push_back(L2_norm);
+	}
+	
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! Store the average elasticity for each element.
 bool FEPlotElementElasticity::Save(FEDomain& dom, vector<float>& a)
 {
