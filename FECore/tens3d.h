@@ -59,8 +59,8 @@ public:
 
 	void unit();
 
-	vec3d contractdyad1(vec3d v);
-	double tripledot3s(tens3ds H);
+	vec3d contractdyad1(const vec3d& v);
+	double tripledot3s(const tens3ds& H);
 	
 public:
 	double d[NNZ];	// stored in column major order
@@ -116,14 +116,14 @@ public:
 	
 	void unit();
 	
-	vec3d contractdyad1(vec3d v);
-	vec3d contract2s(mat3ds s);
-	double tripledot3rs(tens3drs H);
-	vec3d contractdyad2(vec3d v, vec3d w);
+	vec3d contractdyad1(const vec3d& v);
+	vec3d contract2s(const mat3ds& s);
+	double tripledot3rs(const tens3drs& H);
+	vec3d contractdyad2(const vec3d& v, const vec3d& w);
 	tens3d RStoUnsym();
 	tens3dls transpose();
-	void contractleg2(mat3d F, int leg);
-	tens3drs multiply2left(mat3d F);
+	void contractleg2(const mat3d& F, int leg);
+	tens3drs multiply2left(const mat3d& F);
 
 public:
 	double d[NNZ];	// stored in column major order
@@ -180,7 +180,7 @@ public:
 	void unit();
 	tens3d LStoUnsym();
 	tens3drs transpose();
-	tens3dls multiply2right(mat3d F);
+	tens3dls multiply2right(const mat3d& F);
 
 public:
 	double d[NNZ];	// stored in column major order

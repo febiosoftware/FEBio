@@ -113,7 +113,7 @@ inline void tens3ds::unit()
 }
 
 // contract the right two legs by the dyad formed by a vector  xj = XiTijkXk
-inline vec3d tens3ds::contractdyad1(vec3d v)
+inline vec3d tens3ds::contractdyad1(const vec3d& v)
 {
     vec3d x;
 	x.x = d[0]*v.x*v.x + 2*d[1]*v.x*v.y + 2*d[2]*v.x*v.z + d[3]*v.y*v.y + 2*d[4]*v.y*v.z + d[5]*v.z*v.z;
@@ -124,7 +124,7 @@ inline vec3d tens3ds::contractdyad1(vec3d v)
 }
 
 // triple contraction by a similar 3o tensor m = TijkHijk
-inline double tens3ds::tripledot3s(tens3ds H)
+inline double tens3ds::tripledot3s(const tens3ds& H)
 {
 	double m;
 	m = d[0]*H.d[0] + 3*d[1]*H.d[1] + 3*d[2]*H.d[2] + 3*d[3]*H.d[3] + 6*d[4]*H.d[4] + 3*d[5]*H.d[5]  + d[6]*H.d[6]  + 3*d[7]*H.d[7]  + 3*d[8]*H.d[8]  + d[9]*H.d[9];
