@@ -1147,8 +1147,11 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// see if we have to do nonlinear constraint augmentations
-	if (m_fem.NonlinearConstraints() != 0) m_baugment = true;
-
+	for (int i=0; i<m_fem.NonlinearConstraints(); ++i)
+	{
+		FENLConstraint& ci = *m_fem.NonlinearConstraint(i);
+		if (ci.IsActive()) m_baugment = true;
+	}
 }
 
 //-----------------------------------------------------------------------------
