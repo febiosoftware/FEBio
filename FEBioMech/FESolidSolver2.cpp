@@ -64,11 +64,20 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FESolver(pfem)
 	m_neq = 0;
 	m_plinsolve = 0;
 
-
-	// default Newmark parameters for unconditionally stable midpoint time integration
-    m_alpha = 0.5;
-	m_beta  = 0.5;
-	m_gamma = 1.0;
+    FEAnalysis* pstep = m_fem.GetCurrentStep();
+    
+    // see if this is a dynamic problem
+    if (pstep->m_nanalysis == FE_DYNAMIC) {
+        // default Hilber-Hughes-Taylor parameters for unconditionally stable midpoint time integration
+        m_alpha = 0.5;
+        m_beta  = 0.5;
+        m_gamma = 1.0;
+    } else {
+        // use trapezoidal integration for static analyses
+        m_alpha = 1.0;
+        m_beta  = 0.25;
+        m_gamma = 0.5;
+    }
 
 	m_baugment = false;
 }
