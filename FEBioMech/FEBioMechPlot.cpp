@@ -101,6 +101,30 @@ bool FEPlotNodeReactionForces::Save(FEMesh& m, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotRigidReactionForce::Save(FEMesh& m, vector<float>& a)
+{
+    int N = m.Nodes();
+    for (int i=0; i<N; ++i)
+    {
+        FENode& node = m.Node(i);
+        if (node.m_rid >= 0)
+        {
+            FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(node.m_rid));
+            a.push_back((float)rb.m_Fr.x);
+            a.push_back((float)rb.m_Fr.y);
+            a.push_back((float)rb.m_Fr.z);
+        }
+        else
+        {
+            a.push_back(0.f);
+            a.push_back(0.f);
+            a.push_back(0.f);
+        }
+    }
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotRigidReactionTorque::Save(FEMesh& m, vector<float>& a)
 {
 	int N = m.Nodes();

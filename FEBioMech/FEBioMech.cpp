@@ -383,6 +383,7 @@ REGISTER_FECORE_CLASS(FEPlotNodeDisplacement   , FEPLOTDATA_ID, "displacement"  
 REGISTER_FECORE_CLASS(FEPlotNodeVelocity       , FEPLOTDATA_ID, "velocity"       );
 REGISTER_FECORE_CLASS(FEPlotNodeAcceleration   , FEPLOTDATA_ID, "acceleration"   );
 REGISTER_FECORE_CLASS(FEPlotNodeReactionForces , FEPLOTDATA_ID, "reaction forces");
+REGISTER_FECORE_CLASS(FEPlotRigidReactionForce , FEPLOTDATA_ID, "rigid force"    );
 REGISTER_FECORE_CLASS(FEPlotRigidReactionTorque, FEPLOTDATA_ID, "rigid torque"   );
 REGISTER_FECORE_CLASS(FEPlotRigidDisplacement       , FEPLOTDATA_ID, "rigid position"            );
 REGISTER_FECORE_CLASS(FEPlotRigidVelocity           , FEPLOTDATA_ID, "rigid velocity"            );

@@ -48,14 +48,25 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Rigid body reaction force
+class FEPlotRigidReactionForce : public FENodeData
+{
+public:
+	FEPlotRigidReactionForce(FEModel* pfem) : FENodeData(PLT_VEC3F, FMT_NODE),  m_pfem(pfem) {}
+	bool Save(FEMesh& m, vector<float>& a);
+private:
+	FEModel* m_pfem;
+};
+
+//-----------------------------------------------------------------------------
 //! Rigid body reaction torque
 class FEPlotRigidReactionTorque : public FENodeData
 {
 public:
-	FEPlotRigidReactionTorque(FEModel* pfem) : FENodeData(PLT_VEC3F, FMT_NODE),  m_pfem(pfem) {}
-	bool Save(FEMesh& m, vector<float>& a);
+    FEPlotRigidReactionTorque(FEModel* pfem) : FENodeData(PLT_VEC3F, FMT_NODE),  m_pfem(pfem) {}
+    bool Save(FEMesh& m, vector<float>& a);
 private:
-	FEModel* m_pfem;
+    FEModel* m_pfem;
 };
 
 //=============================================================================
