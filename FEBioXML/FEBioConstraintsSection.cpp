@@ -42,7 +42,7 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 				{
 					if (tag == "surface")
 					{
-						const char* sztype = tag.AttributeValue("type", false);
+						const char* sztype = tag.AttributeValue("type", true);
 						FESurface* psurf = plc->GetSurface(sztype);
 						if (psurf == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 

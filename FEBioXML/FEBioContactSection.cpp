@@ -17,6 +17,9 @@ void FEBioContactSection::Parse(XMLTag& tag)
 	int nversion = m_pim->Version();
 	if (nversion < 0x0200) throw XMLReader::InvalidTag(tag);
 
+	// make sure there are children
+	if (tag.isleaf()) return;
+
 	FEModel& fem = *GetFEModel();
 
 	// loop over tags
