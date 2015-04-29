@@ -40,15 +40,26 @@ bool FEDistanceConstraint::Init()
 	// (remember, they are one-based since they are defined in the input file)
 	if ((m_node[0] <= 0)||(m_node[0] > NN)) return false;
 	if ((m_node[1] <= 0)||(m_node[1] > NN)) return false;
-	
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEDistanceConstraint::Activate()
+{
+	// don't forget to call base class
+	FENLConstraint::Activate();
+
+	// get the FE mesh
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	int NN = mesh.Nodes();
+
 	// get the initial position of the two nodes
-	vec3d ra = mesh.Node(m_node[0] - 1).m_r0;
-	vec3d rb = mesh.Node(m_node[1] - 1).m_r0;
+	vec3d ra = mesh.Node(m_node[0] - 1).m_rt;
+	vec3d rb = mesh.Node(m_node[1] - 1).m_rt;
 
 	// set the initial length
 	m_l0 = (ra - rb).norm();
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------

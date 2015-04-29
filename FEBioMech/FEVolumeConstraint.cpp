@@ -82,6 +82,7 @@ FEVolumeConstraint::FEVolumeConstraint(FEModel* pfem) : FENLConstraint(pfem), m_
 	m_eps = 0.0;
 	m_atol = 0.0;
 	m_blaugon = false;
+	m_binit = false;	// will be set to true during activation
 }
 
 //-----------------------------------------------------------------------------
@@ -93,10 +94,16 @@ FESurface* FEVolumeConstraint::GetSurface(const char* sz)
 
 //-----------------------------------------------------------------------------
 //! Initializes data structures. 
-bool FEVolumeConstraint::Init()
+void FEVolumeConstraint::Activate()
 {
+	// don't forget to call base class
+	FENLConstraint::Activate();
+
 	// initialize the surface
-	return m_s.Init();
+	if (m_binit == false) m_s.Init();
+
+	// set flag that initial volume is calculated
+	m_binit = true;
 }
 
 //-----------------------------------------------------------------------------

@@ -24,7 +24,6 @@ public:
 	virtual ~FENLConstraint();
 
 public:
-	virtual bool Init() = 0;
 	virtual void Residual(FEGlobalVector& R) = 0;
 	virtual void StiffnessMatrix(FESolver* psolver) = 0;
 	virtual bool Augment(int naug) = 0;

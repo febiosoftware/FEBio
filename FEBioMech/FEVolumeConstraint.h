@@ -31,7 +31,7 @@ public:
 	//! constructor
 	FEVolumeConstraint(FEModel* pfem);
 
-	bool Init();
+	void Activate();
 	void Residual(FEGlobalVector& R);
 	void StiffnessMatrix(FESolver* psolver);
 	bool Augment(int naug);
@@ -51,6 +51,9 @@ public:
 	double	m_eps;		//!< penalty parameter
 	double	m_atol;		//!< augmented Lagrangian tolerance
 	bool	m_blaugon;	//!< augmentation flag
+
+private:
+	bool	m_binit;	//!< flag indicating whether the constraint is initialized
 
 	DECLARE_PARAMETER_LIST();
 };

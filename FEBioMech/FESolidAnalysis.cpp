@@ -162,7 +162,7 @@ bool FESolidAnalysis::Init()
 
 	// initialize linear constraints
 	// Must be done after equations are initialized
-	if (InitConstraints() == false) return false;
+	if (InitLinearConstraints() == false) return false;
 	// ----->
 
 	// Now we adjust the equation numbers of prescribed dofs according to the above rule
@@ -264,15 +264,6 @@ bool FESolidAnalysis::Init()
 				is->neq = m_fem.GetMesh().Node(is->node).m_ID[is->bc];
 			}
 		}
-	}
-
-	// modify the (aug lag) nonlinear constraints
-	// TODO: I think this is already done in FEM::Init. Why do I need to do this again?
-	int M = m_fem.NonlinearConstraints();
-	for (int m=0; m<M; ++m) 
-	{
-		FENLConstraint* plc = m_fem.NonlinearConstraint(m);
-		if (plc->IsActive()) plc->Init();
 	}
 
 	if (m_nanalysis == FE_DYNAMIC)
@@ -490,7 +481,7 @@ bool FEExplicitSolidAnalysis::Init()
 
 	// initialize linear constraints
 	// Must be done after equations are initialized
-	if (InitConstraints() == false) return false;
+	if (InitLinearConstraints() == false) return false;
 	// ----->
 
 	// Now we adjust the equation numbers of prescribed dofs according to the above rule
@@ -594,15 +585,6 @@ bool FEExplicitSolidAnalysis::Init()
 		}
 	}
 
-	// modify the (aug lag) nonlinear constraints
-	// TODO: I think this is already done in FEM::Init. Why do I need to do this again?
-	int M = m_fem.NonlinearConstraints();
-	for (int m=0; m<M; ++m) 
-	{
-		FENLConstraint* plc = m_fem.NonlinearConstraint(m);
-		if (plc->IsActive()) plc->Init();
-	}
-
 	// do one time initialization of solver data
 	if (m_psolver->Init() == false)
 	{
@@ -643,7 +625,7 @@ bool FELinearSolidAnalysis::Init()
 
 	// initialize linear constraints
 	// Must be done after equations are initialized
-	if (InitConstraints() == false) return false;
+	if (InitLinearConstraints() == false) return false;
 	// ----->
 
 	// Now we adjust the equation numbers of prescribed dofs according to the above rule
@@ -717,15 +699,6 @@ bool FELinearSolidAnalysis::Init()
 				is->neq = m_fem.GetMesh().Node(is->node).m_ID[is->bc];
 			}
 		}
-	}
-
-	// modify the (aug lag) nonlinear constraints
-	// TODO: I think this is already done in FEM::Init. Why do I need to do this again?
-	int M = m_fem.NonlinearConstraints();
-	for (int m=0; m<M; ++m) 
-	{
-		FENLConstraint* plc = m_fem.NonlinearConstraint(m);
-		if (plc->IsActive()) plc->Init();
 	}
 
 	// do one time initialization of solver data

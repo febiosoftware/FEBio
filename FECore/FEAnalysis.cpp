@@ -127,7 +127,7 @@ void FEAnalysis::Finish()
 //! contains for each dof the linear constraint it belongs to. (or -1 if it is
 //! not constraint)
 
-bool FEAnalysis::InitConstraints()
+bool FEAnalysis::InitLinearConstraints()
 {
 	int nlin = m_fem.m_LinC.size();
 	if (nlin == 0) return true;
@@ -177,11 +177,6 @@ bool FEAnalysis::InitConstraints()
 	m_fem.m_LCA.resize(nlin);
 	ic = m_fem.m_LinC.begin();
 	for (i=0; i<nlin; ++i, ++ic) m_fem.m_LCA[i] = &(*ic);
-
-	// let's do the aug lag linear constraints
-	// TODO: This is also done in FEM::Init and FEAnalysis::Init. Where do I really need to do this?
-	int N = m_fem.NonlinearConstraints();
-	for (i=0; i<N; ++i) m_fem.NonlinearConstraint(i)->Init();
 
 	return true;
 }

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEModelComponent.h"
+#include <string.h>
 
 //-----------------------------------------------------------------------------
 //! The constructor takes two arguments: the SUPER_CLASS_ID which defines the 
@@ -9,12 +10,13 @@ FEModelComponent::FEModelComponent(SUPER_CLASS_ID sid, FEModel* pfem) : FECoreBa
 {
 	m_pfem = pfem;
 	m_bactive = true;
+	m_szname = 0;
 }
 
 //-----------------------------------------------------------------------------
 FEModelComponent::~FEModelComponent()
 {
-
+	if (m_szname) delete [] m_szname;
 }
 
 //-----------------------------------------------------------------------------
@@ -24,6 +26,30 @@ FEModel* FEModelComponent::GetFEModel()
 }
 
 //-----------------------------------------------------------------------------
+const char* FEModelComponent::GetName()
+{
+	return m_szname;
+}
+
+//-----------------------------------------------------------------------------
+void FEModelComponent::SetName(const char* sz)
+{
+	if (sz == 0) return;
+	int l = strlen(sz);
+	if (m_szname) delete [] m_szname;
+	m_szname = new char[l+1];
+	if (l > 0) strncpy(m_szname, sz, l);
+	m_szname[l] = 0;
+}
+
+//-----------------------------------------------------------------------------
+bool FEModelComponent::Init()
+{
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! This function checks if the 
 bool FEModelComponent::IsActive()
 { 
 	return m_bactive; 

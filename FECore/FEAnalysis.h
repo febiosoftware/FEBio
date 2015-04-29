@@ -94,7 +94,7 @@ public:
 
 protected:
 	//! initialize constraint data
-	bool InitConstraints();
+	bool InitLinearConstraints();
 
 	//! Do a running restart
 	void Retry();

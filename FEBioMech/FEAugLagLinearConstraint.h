@@ -54,7 +54,7 @@ public:
 
 public:
 	//! initialization
-	bool Init();
+	void Activate();
 
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);

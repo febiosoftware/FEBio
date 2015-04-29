@@ -10,6 +10,7 @@ public:
 	FEDistanceConstraint(FEModel* pfem);
 
 	bool Init();
+	void Activate();
 	void Residual(FEGlobalVector& R);
 	void StiffnessMatrix(FESolver* psolver);
 	bool Augment(int naug);

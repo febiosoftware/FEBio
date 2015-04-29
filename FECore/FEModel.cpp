@@ -124,7 +124,6 @@ bool FEModel::Init()
 	if (InitBodyLoads() == false) return false;
 
 	// initialize nonlinear constraints
-	// TODO: This is also initialized in the analysis step. Do I need to do this here?
 	if (InitConstraints() == false) return false;
 
 	return true;
@@ -531,6 +530,8 @@ bool FEModel::InitContact()
 }
 
 //-----------------------------------------------------------------------------
+//! Initialize the nonlinear constraints.
+//! This function is called during model initialization (\sa FEModel::Init)
 bool FEModel::InitConstraints()
 {
 	for (int i=0; i<(int) m_NLC.size(); ++i)

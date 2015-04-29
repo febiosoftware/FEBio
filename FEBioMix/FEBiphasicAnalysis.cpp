@@ -213,7 +213,7 @@ bool FEBiphasicAnalysis::Init()
 
 	// initialize linear constraints
 	// Must be done after equations are initialized
-	if (InitConstraints() == false) return false;
+	if (InitLinearConstraints() == false) return false;
 	// ----->
 
 	// Now we adjust the equation numbers of prescribed dofs according to the above rule

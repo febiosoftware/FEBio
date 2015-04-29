@@ -29,67 +29,101 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 		}
 		else if (tag == "constraint")
 		{
-			const char* sztype = tag.AttributeValue("type");
-			FENLConstraint* plc = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, m_pim->GetFEModel());
-			if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-
-			FEParameterList& pl = plc->GetParameterList();
-
-			++tag;
-			do
+			const char* sztype = tag.AttributeValue("type", true);
+			if (sztype == 0)
 			{
-				if (m_pim->ReadParameter(tag, pl) == false)
+				// check the name attribute
+				const char* szname = tag.AttributeValue("name");
+				if (szname == 0) throw XMLReader::InvalidAttributeValue(tag, "name", "(unknown)");
+
+				// make sure this is a leaf
+				if (tag.isempty() == false) throw XMLReader::InvalidValue(tag);
+
+				// see if we can find this constraint
+				FEModel& fem = *GetFEModel();
+				int NLC = fem.NonlinearConstraints();
+				FENLConstraint* plc = 0;
+				for (int i=0; i<NLC; ++i)
 				{
-					if (tag == "surface")
-					{
-						const char* sztype = tag.AttributeValue("type", true);
-						FESurface* psurf = plc->GetSurface(sztype);
-						if (psurf == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-
-						m.AddSurface(psurf);
-
-						// see if the set attribute is defined
-						const char* szset = tag.AttributeValue("set", true);
-						if (szset)
-						{
-							// make sure this tag does not have any children
-							if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
-
-							// see if we can find the facet set
-							FEFacetSet* pset = 0;
-							for (int i=0; i<m.FacetSets(); ++i)
-							{
-								FEFacetSet& fi = m.FacetSet(i);
-								if (strcmp(fi.GetName(), szset) == 0)
-								{
-									pset = &fi;
-									break;
-								}
-							}
-
-							// create a surface from the facet set
-							if (pset)
-							{
-								if (BuildSurface(*psurf, *pset, true) == false) throw XMLReader::InvalidTag(tag);
-							}
-							else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
-						}
-						else ParseSurfaceSection(tag, *psurf, 0, true);
-					}
-					else throw XMLReader::InvalidTag(tag);
+					FENLConstraint* pci = fem.NonlinearConstraint(i);
+					const char* szc = pci->GetName();
+					if (szc && (strcmp(szname, szc) == 0)) { plc = pci; }
 				}
-				++tag;
+				if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "name", szname);
+
+				// add this boundary condition to the current step
+				if (m_pim->m_nsteps > 0)
+				{
+					GetStep()->AddConstraint(plc);
+					plc->Deactivate();
+				}
 			}
-			while (!tag.isend());
-
-			FEModel& fem = *GetFEModel();
-			fem.AddNonlinearConstraint(plc);
-
-			// add this boundary condition to the current step
-			if (m_pim->m_nsteps > 0)
+			else
 			{
-				GetStep()->AddConstraint(plc);
-				plc->Deactivate();
+				FENLConstraint* plc = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, m_pim->GetFEModel());
+				if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+				const char* szname = tag.AttributeValue("name", true);
+				if (szname) plc->SetName(szname);
+
+				FEParameterList& pl = plc->GetParameterList();
+
+				++tag;
+				do
+				{
+					if (m_pim->ReadParameter(tag, pl) == false)
+					{
+						if (tag == "surface")
+						{
+							const char* sztype = tag.AttributeValue("type", true);
+							FESurface* psurf = plc->GetSurface(sztype);
+							if (psurf == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+							m.AddSurface(psurf);
+
+							// see if the set attribute is defined
+							const char* szset = tag.AttributeValue("set", true);
+							if (szset)
+							{
+								// make sure this tag does not have any children
+								if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
+
+								// see if we can find the facet set
+								FEFacetSet* pset = 0;
+								for (int i=0; i<m.FacetSets(); ++i)
+								{
+									FEFacetSet& fi = m.FacetSet(i);
+									if (strcmp(fi.GetName(), szset) == 0)
+									{
+										pset = &fi;
+										break;
+									}
+								}
+
+								// create a surface from the facet set
+								if (pset)
+								{
+									if (BuildSurface(*psurf, *pset, true) == false) throw XMLReader::InvalidTag(tag);
+								}
+								else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
+							}
+							else ParseSurfaceSection(tag, *psurf, 0, true);
+						}
+						else throw XMLReader::InvalidTag(tag);
+					}
+					++tag;
+				}
+				while (!tag.isend());
+
+				FEModel& fem = *GetFEModel();
+				fem.AddNonlinearConstraint(plc);
+
+				// add this boundary condition to the current step
+				if (m_pim->m_nsteps > 0)
+				{
+					GetStep()->AddConstraint(plc);
+					plc->Deactivate();
+				}
 			}
 		}
 		else throw XMLReader::InvalidTag(tag);
