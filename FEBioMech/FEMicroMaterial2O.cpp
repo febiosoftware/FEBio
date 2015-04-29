@@ -546,7 +546,7 @@ void  FEMicroMaterial2O::Tangent2O(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, 
 }
 
 //-----------------------------------------------------------------------------
-void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp)
+void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, bool plot_on)
 {
 	// get the deformation gradient
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -569,13 +569,16 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp)
 	bool bret = rve.Solve();
 
 	// set the plot file
-	FEBioPlotFile* pplt = new FEBioPlotFile(rve);
-	vector<int> item;
-	pplt->AddVariable("displacement", item);
-	pplt->AddVariable("stress", item);
-	pplt->Open(rve, "rve.xplt");
-	pplt->Write(rve);
-	pplt->Close();
+	if (plot_on == true)
+	{
+		FEBioPlotFile* pplt = new FEBioPlotFile(rve);
+		vector<int> item;
+		pplt->AddVariable("displacement", item);
+		pplt->AddVariable("stress", item);
+		pplt->Open(rve, "rve.xplt");
+		pplt->Write(rve);
+		pplt->Close();
+	}
 
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException();

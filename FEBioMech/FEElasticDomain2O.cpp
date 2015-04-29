@@ -161,7 +161,7 @@ void FEElasticDomain2O::UpdateElementStress(int iel, double dt)
 {
 	// get the solid element
 	FESolidElement& el = m_Elem[iel];
-
+	
 	// get the number of integration points
 	int nint = el.GaussPoints();
 
@@ -202,7 +202,13 @@ void FEElasticDomain2O::UpdateElementStress(int iel, double dt)
 		FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(m_pMat);
 		
 		// calculate the stress at this material point
-		pmat->Stress2O(mp);
+		bool plot_on = false;
+		int num_elem = Elements();
+
+		if ((el.m_nID == num_elem) && (n == nint-1))
+			plot_on = true;
+
+		pmat->Stress2O(mp, plot_on);
 	}
 }
 
@@ -326,7 +332,6 @@ void FEElasticDomain2O::ElementGeometricalStiffness(FESolidElement &el, matrix &
 
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
-
 void FEElasticDomain2O::ElementMaterialStiffness(FESolidElement &el, matrix &ke)
 {
 	int i, i3, j, j3, n;
