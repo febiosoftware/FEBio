@@ -24,7 +24,7 @@ public:
 	enum { NNZ = 21 };
 
 	// default constructor
-	tens4ds(){}
+	tens4ds(){zero();}
 	tens4ds(const double g)
 	{
 		d[ 0] = g;
@@ -154,7 +154,7 @@ public:
 	// Declare and define functions:
 	
 	// Default constructor
-	tens4dms(){}
+	tens4dms(){zero();}
 	
 	tens4dms(const double g)
 	{
@@ -283,7 +283,7 @@ public:
 	// Declare and define functions:
 	
 	// Default constructor
-	tens4d(){}
+	tens4d(){zero();}
 	
 	tens4d(const double g)
 	{

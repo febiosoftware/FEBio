@@ -37,7 +37,7 @@ public:
 	enum { NNZ = 29 };
 
 	// default constructor
-	tens5ds(){for (int i = 0; i < NNZ; i++) d[i] = 0.;}
+	tens5ds(){zero();}
 	
 	tens5ds(const double g)
 	{

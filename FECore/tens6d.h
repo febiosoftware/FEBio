@@ -36,7 +36,7 @@ public:
 	enum { NNZ = 46 };
 
 	// default constructor
-	tens6ds(){for (int i = 0; i < NNZ; i++) d[i] = 0.;}
+	tens6ds(){zero();}
 	
 	tens6ds(const double g)
 	{
