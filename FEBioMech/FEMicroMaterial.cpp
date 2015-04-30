@@ -12,7 +12,6 @@
 FEMicroMaterialPoint::FEMicroMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoint(mp)
 {
 	m_energy_diff = 0.;
-
 	m_Ka.zero();
 }
 
@@ -657,7 +656,9 @@ void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3ds
 	mat3d Finv = F.inverse();
 	mat3d Finvtrans = Finv.transpose();
 	mat3d Ftrans = F.transpose();
-	
+	vec3d x = pt.m_rt;
+	vec3d X = pt.m_r0;
+
 	// calculate infinitesimal strain
 	mmpt.m_inf_str = ((F.transpose() + F)*0.5 - mat3dd(1)).sym();
 	

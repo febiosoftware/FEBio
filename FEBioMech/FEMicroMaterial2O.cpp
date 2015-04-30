@@ -22,7 +22,6 @@ FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterial
 	m_e.zero();
 	m_h.zero();
 	m_energy_diff = 0.;
-
 	m_Ca.zero();
 	m_Da.zero();
 	m_Ea.zero();
@@ -945,6 +944,9 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	tens3drs Ginv; Ginv = G; Ginv.contractleg2(Finv,1); Ginv.contractleg2(Finv,2); Ginv.contractleg2(Finv,3);
 	tens3dls Ginvtrans = Ginv.transpose();
 	
+	vec3d x = pt.m_rt;
+	vec3d X = pt.m_r0;
+
 	// calculate infinitesimal strain
 	mmpt2O.m_inf_str = ((F.transpose() + F)*0.5 - mat3dd(1)).sym();
 	tens3d inf_strain_grad_nosym;
