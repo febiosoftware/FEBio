@@ -82,7 +82,7 @@ protected:
 public:
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
-	void Stress2O(FEMaterialPoint &mp, bool plot_on);
+	void Stress2O(FEMaterialPoint &mp, int plot_on);
 
 	//! calculate tangent stiffness at material point
 	tens4ds Tangent(FEMaterialPoint& pt);

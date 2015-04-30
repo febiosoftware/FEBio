@@ -8,6 +8,7 @@
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FECore/tens3d.h"
+#include <sstream>
 
 //-----------------------------------------------------------------------------
 FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterialPoint(mp)
@@ -546,7 +547,7 @@ void  FEMicroMaterial2O::Tangent2O(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, 
 }
 
 //-----------------------------------------------------------------------------
-void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, bool plot_on)
+void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on)
 {
 	// get the deformation gradient
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -569,13 +570,16 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, bool plot_on)
 	bool bret = rve.Solve();
 
 	// set the plot file
-	if (plot_on == true)
+	if (plot_on)
 	{
 		FEBioPlotFile* pplt = new FEBioPlotFile(rve);
 		vector<int> item;
 		pplt->AddVariable("displacement", item);
 		pplt->AddVariable("stress", item);
-		pplt->Open(rve, "rve.xplt");
+		stringstream ss;
+		ss << "rve_elem_" << plot_on << ".xplt";
+		string plot_name = ss.str();
+		pplt->Open(rve, plot_name.c_str());
 		pplt->Write(rve);
 		pplt->Close();
 	}

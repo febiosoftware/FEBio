@@ -202,11 +202,11 @@ void FEElasticDomain2O::UpdateElementStress(int iel, double dt)
 		FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(m_pMat);
 		
 		// calculate the stress at this material point
-		bool plot_on = false;
+		int plot_on = 0;
 		int num_elem = Elements();
 
-		if ((el.m_nID == num_elem) && (n == nint-1))
-			plot_on = true;
+		if ((el.m_nID == 1 || el.m_nID == num_elem) && (n == nint-1))
+			plot_on = el.m_nID;
 
 		pmat->Stress2O(mp, plot_on);
 	}
