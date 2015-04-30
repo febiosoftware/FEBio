@@ -536,8 +536,17 @@ bool FEModel::InitConstraints()
 {
 	for (int i=0; i<(int) m_NLC.size(); ++i)
 	{
-		if (m_NLC[i]->Init() == false) return false;
+		FENLConstraint* plc = m_NLC[i];
+
+		// initialize
+		if (plc->Init() == false) return false;
+
+		// constraints that are active at startup need to have their Activate() member
+		// called, since no analysis will call this member
+		// TODO: Is this a good place to do it? Perhaps I should do it in the Solve function?
+		if (plc->IsActive()) plc->Activate();
 	}
+
 	return true;
 }
 
