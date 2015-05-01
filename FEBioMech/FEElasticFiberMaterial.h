@@ -76,3 +76,33 @@ public:
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };
+
+//-----------------------------------------------------------------------------
+//! Power toe - linear
+
+class FEFiberPowerToeLinear : public FEElasticFiberMaterial
+{
+public:
+    FEFiberPowerToeLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem) {
+        m_E = 0; m_lam0 = 1; m_beta = 3; }
+    
+    //! Initialization
+    void Init();
+    
+    //! Cauchy stress
+    mat3ds Stress(FEMaterialPoint& mp);
+    
+    // Spatial tangent
+    tens4ds Tangent(FEMaterialPoint& mp);
+    
+    //! Strain energy density
+    double StrainEnergyDensity(FEMaterialPoint& mp);
+    
+public:
+    double	m_E;		// fiber modulus
+    double  m_lam0;     // stretch ratio at end of toe region
+    double  m_beta;     // power law exponent in toe region
+    
+    // declare the parameter list
+    DECLARE_PARAMETER_LIST();
+};

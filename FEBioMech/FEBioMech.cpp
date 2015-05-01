@@ -232,6 +232,7 @@ REGISTER_FECORE_CLASS(FEFiberExponentialPower        ,FEMATERIAL_ID, "fiber-expo
 REGISTER_FECORE_CLASS(FEFiberExponentialPowerUC      ,FEMATERIAL_ID, "fiber-exponential-power-law-uncoupled");
 REGISTER_FECORE_CLASS(FEFiberNH                      ,FEMATERIAL_ID, "fiber-NH"                      );
 REGISTER_FECORE_CLASS(FEFiberNHUC                    ,FEMATERIAL_ID, "fiber-NH-uncoupled"            );
+REGISTER_FECORE_CLASS(FEFiberPowerToeLinear          ,FEMATERIAL_ID, "fiber-power-toe-linear"        );
 REGISTER_FECORE_CLASS(FESphericalFiberDensityDistribution  , FEMATERIAL_ID, "spherical"   );
 REGISTER_FECORE_CLASS(FEEllipsodialFiberDensityDistribution, FEMATERIAL_ID, "ellipsoidal" );
 REGISTER_FECORE_CLASS(FEVonMises3DFiberDensityDistribution , FEMATERIAL_ID, "von-Mises-3d");
