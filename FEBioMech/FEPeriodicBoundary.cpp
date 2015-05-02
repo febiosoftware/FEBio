@@ -36,12 +36,14 @@ bool FEPeriodicSurface::Init()
 	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));		// penetrated master element
 	m_rs.resize(nn);		// natural coords of projected slave node on master element
 	m_Lm.resize(nn);		// Lagrangian multipliers
-	m_Fr.resize(nn);		// reaction forces
+	m_Fr.resize(nn);		// equivalent nodal forces
+	m_Tn.resize(nn);		// nodal traction
 
 	// set initial values
 	zero(m_gap);
 	zero(m_Lm);
 	zero(m_Fr);
+	zero(m_Tn);
 
 	return true;
 }
@@ -86,6 +88,40 @@ void FEPeriodicSurface::Serialize(DumpFile& ar)
 		ar >> m_gap;
 		ar >> m_rs;
 		ar >> m_Lm;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEPeriodicSurface::GetNodalContactGap(int nface, double* pg)
+{
+	FESurfaceElement& el = Element(nface);
+	int ne = el.Nodes();
+	for (int i=0; i<ne; ++i)
+	{
+		pg[i] = m_gap[el.m_lnode[i]].norm();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEPeriodicSurface::GetNodalContactPressure(int nface, double* pg)
+{
+	FESurfaceElement& el = Element(nface);
+	int ne = el.Nodes();
+	for (int i=0; i<ne; ++i)
+	{
+		vec3d tn = m_Tn[el.m_lnode[i]];
+		pg[i] = tn.norm();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEPeriodicSurface::GetNodalContactTraction(int nface, vec3d* tn)
+{
+	FESurfaceElement& el = Element(nface);
+	int ne = el.Nodes();
+	for (int i=0; i<ne; ++i)
+	{
+		tn[i] = m_Tn[el.m_lnode[i]];
 	}
 }
 
@@ -389,6 +425,7 @@ void FEPeriodicBoundary::ContactForces(FEGlobalVector& R)
 
 				// get slave node contact force
 				tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps;
+				ss.m_Tn[m] = tc;
 
 				// get the master element
 				FESurfaceElement& mel = *ss.m_pme[m];

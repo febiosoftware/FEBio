@@ -25,10 +25,16 @@ public:
 	void Serialize(DumpFile& ar);
 
 public:
+	void GetNodalContactGap     (int nface, double* pg);
+	void GetNodalContactPressure(int nface, double* pg);
+	void GetNodalContactTraction(int nface, vec3d* pt);
+
+public:
 	vector<vec3d>				m_gap;	//!< gap function at nodes
 	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
 	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
 	vector<vec3d>				m_Lm;	//!< Lagrange multipliers
+	vector<vec3d>				m_Tn;	//!< nodal traction forces
 	vector<vec3d>				m_Fr;	//!< reaction forces
 };
 
