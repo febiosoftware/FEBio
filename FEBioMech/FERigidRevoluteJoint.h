@@ -77,6 +77,10 @@ public:
     int     m_naugmin;  //! minimum number of augmentations
     int     m_naugmax;  //! maximum number of augmentations
     
+    double  m_qp;   //! prescribed rotation
+    bool    m_bq;   //! flag for prescribing rotation
+    double  m_Mp;   //! prescribed moment
+    
 protected:
     int		m_nID;	//!< ID of rigid joint
     bool	m_binit;
