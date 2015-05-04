@@ -1123,6 +1123,10 @@ void FEModel::CopyFrom(FEModel& fem)
 
 		// add the new interface
 		AddSurfacePairInteraction(pnew);
+
+		// add the surfaces to the surface list
+		m_mesh.AddSurface(pnew->GetMasterSurface());
+		m_mesh.AddSurface(pnew->GetSlaveSurface ());
 	}
 
 	// --- Load curves ---
