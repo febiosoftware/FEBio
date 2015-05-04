@@ -77,6 +77,10 @@ public:
     int     m_naugmin;  //! minimum number of augmentations
     int     m_naugmax;  //! maximum number of augmentations
     
+    double  m_dp;   //! prescribed translation
+    bool    m_bd;   //! flag for prescribing translation
+    double  m_Fp;   //! prescribed force
+    
 protected:
     int		m_nID;	//!< ID of rigid joint
     bool	m_binit;

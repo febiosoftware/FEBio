@@ -21,11 +21,14 @@ BEGIN_PARAMETER_LIST(FERigidPrismaticJoint, FENLConstraint);
     ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
     ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"        );
     ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"        );
-    ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint"  );
+    ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint"         );
     ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "translation_axis" );
     ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "transverse_axis");
     ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
     ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
+    ADD_PARAMETER(m_bd  , FE_PARAM_BOOL  , "prescribed_translation");
+    ADD_PARAMETER(m_dp  , FE_PARAM_DOUBLE, "translation"   );
+    ADD_PARAMETER(m_Fp  , FE_PARAM_DOUBLE, "force"         );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -40,6 +43,9 @@ FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FENLConstraint(pfe
     m_naugmin = 0;
     m_naugmax = 10;
     m_alpha = 0.5;
+    m_dp = 0;
+    m_Fp = 0;
+    m_bd = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -47,6 +53,11 @@ FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FENLConstraint(pfe
 //!       phase. Is that necessary?
 bool FERigidPrismaticJoint::Init()
 {
+    if (m_bd && (m_Fp != 0)) {
+        felog.printbox("FATAL ERROR", "Translation and force cannot be prescribed simultaneously in rigid prismatic joint %d\n", m_nID);
+        return false;
+    }
+    
     if (m_binit) return true;
     
     // initialize joint basis
@@ -161,14 +172,11 @@ void FERigidPrismaticJoint::Residual(FEGlobalVector& R)
     // incremental compound rotation of B w.r.t. A
     vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
-    mat3ds P = mat3dd(1) - dyad(ea[0]);
-    vec3d p(0,0,0);
+    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
+    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
     vec3d c = P*(rb + zb - ra - za) - p;
     m_F = m_L + c*m_eps;
     
-    //    mat3ds Q = mat3dd(1) - dyad(ea[0]);
-    //    vec3d q(0,0,0);
-    //    vec3d ksi = Q*vth - q;
     vec3d ksi = vth;
     m_M = m_U + ksi*m_ups;
     
@@ -248,8 +256,8 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver)
     // incremental compound rotation of B w.r.t. A
     vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
-    mat3ds P = mat3dd(1) - dyad(ea[0]);
-    vec3d p(0,0,0);
+    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
+    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
     vec3d d = rb + zb - ra - za;
     vec3d c = P*d - p;
     m_F = m_L + c*m_eps;
@@ -264,7 +272,7 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver)
         eathat[j] = skew(eat[j]);
         ebthat[j] = skew(ebt[j]);
     }
-    mat3d Q = ((ea[0] & d) + mat3dd(1)*(ea[0]*d))*eathat[0];
+    mat3d Q = m_bd ? eathat[0]*m_dp : ((ea[0] & d) + mat3dd(1)*(ea[0]*d))*eathat[0];
     mat3d Wba = (ebhat[0]*eathat[0]+ebhat[1]*eathat[1]+ebhat[1]*eathat[1])/2;
     mat3d Wab = (eahat[0]*ebthat[0]+eahat[1]*ebthat[1]+eahat[1]*ebthat[1])/2;
     mat3d K;
@@ -423,8 +431,8 @@ bool FERigidPrismaticJoint::Augment(int naug)
     // incremental compound rotation of B w.r.t. A
     vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
-    mat3ds P = mat3dd(1) - dyad(ea[0]);
-    vec3d p(0,0,0);
+    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
+    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
     c = P*(rb + zb - ra - za) - p;
     
     normF0 = sqrt(m_L*m_L);
@@ -548,8 +556,8 @@ void FERigidPrismaticJoint::Update()
     // incremental compound rotation of B w.r.t. A
     vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
-    mat3ds P = mat3dd(1) - dyad(ea[0]);
-    vec3d p(0,0,0);
+    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
+    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
     vec3d c = P*(rb + zb - ra - za) - p;
     m_F = m_L + c*m_eps;
     
