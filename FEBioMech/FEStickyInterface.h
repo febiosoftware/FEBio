@@ -21,6 +21,7 @@ public:
 		vec3d				gap;	//!< "gap" function
 		vec2d				rs;		//!< natural coordinates of slave projection on master element
 		vec3d				Lm;		//!< Lagrange multiplier
+		vec3d				tn;		//!< traction vector
 		FESurfaceElement*	pme;	//!< master element a slave node penetrates
 	};
 
@@ -43,11 +44,6 @@ public:
 	void GetNodalContactTraction(int nface, vec3d* tn);
 
 public:
-//	vector<vec3d>				m_gap;	//!< gap function at nodes
-//	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
-//	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
-//	vector<vec3d>				m_Lm;	//!< Lagrange multipliers
-
 	vector<NODE>	m_Node;	//!< node contact data
 };
 
@@ -118,6 +114,8 @@ public:
 	double		m_stol;		//!< search tolerance
 	int			m_naugmax;	//!< maximum nr of augmentations
 	int			m_naugmin;	//!< minimum nr of augmentations
+	double		m_tmax;		//!< max traction
+	double		m_snap;		//!< snap tolerance
 
 	DECLARE_PARAMETER_LIST();
 };

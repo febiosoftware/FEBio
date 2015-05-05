@@ -14,6 +14,8 @@ BEGIN_PARAMETER_LIST(FEStickyInterface, FEContactInterface)
 	ADD_PARAMETER(m_naugmin, FE_PARAM_INT   , "minaug"          );
 	ADD_PARAMETER(m_naugmax, FE_PARAM_INT   , "maxaug"          );
 	ADD_PARAMETER(m_stol   , FE_PARAM_DOUBLE, "search_tolerance");
+	ADD_PARAMETER(m_tmax   , FE_PARAM_DOUBLE, "max_traction"    );
+	ADD_PARAMETER(m_snap   , FE_PARAM_DOUBLE, "snap_tol"        );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -92,7 +94,7 @@ void FEStickySurface::GetNodalContactPressure(int nface, double* pn)
 {
 	FESurfaceElement& f = Element(nface);
 	int ne = f.m_lnode.size();
-	for (int j= 0; j< ne; ++j) pn[j] = m_Node[f.m_lnode[j]].Lm.norm();
+	for (int j= 0; j< ne; ++j) pn[j] = m_Node[f.m_lnode[j]].tn.norm();
 }
 
 //-----------------------------------------------------------------------------
@@ -100,7 +102,7 @@ void FEStickySurface::GetNodalContactTraction(int nface, vec3d* tn)
 {
 	FESurfaceElement& f = Element(nface);
 	int ne = f.m_lnode.size();
-	for (int j= 0; j< ne; ++j) tn[j] = m_Node[f.m_lnode[j]].Lm;
+	for (int j= 0; j< ne; ++j) tn[j] = m_Node[f.m_lnode[j]].tn;
 }
 
 //=============================================================================
@@ -126,6 +128,8 @@ FEStickyInterface::FEStickyInterface(FEModel* pfem) : FEContactInterface(pfem), 
 	m_stol = 0.0001;
 	m_naugmin = 0;
 	m_naugmax = 10;
+	m_tmax = 0.0;
+	m_snap = 0.0;
 
 	// give this interface an ID (TODO: where is this actually used?)
 	m_nID = count++;
@@ -249,6 +253,25 @@ void FEStickyInterface::Update(int niter)
 
 			// calculate the gap function
 			sni.gap = rt - q;
+
+			// see if the max traction was exceded
+			if (m_tmax > 0.0)
+			{
+				// get slave node contact force
+				vec3d tc = sni.Lm + sni.gap*m_eps;
+
+				// calculate the master normal
+				vec3d nu = ms.SurfaceNormal(*sni.pme, sni.rs[0], sni.rs[1]);
+				double t = nu*tc;
+				if (t > m_tmax)
+				{
+					// detach this node
+					sni.gap = vec3d(0,0,0);
+					sni.pme = 0;
+					sni.Lm = vec3d(0,0,0);
+					sni.tn = vec3d(0,0,0);
+				}
+			}
 		}
 		else
 		{
@@ -268,7 +291,7 @@ void FEStickyInterface::Update(int niter)
 				double d = nu*(q - x);
 
 				// only allow contact after penetration
-				if (d > 0)
+				if (d > -m_snap)
 				{
 					// calculate signed distance
 					sni.gap = x - q;
@@ -393,6 +416,18 @@ void FEStickyInterface::ContactForces(FEGlobalVector& R)
 
 				// get slave node contact force
 				vec3d tc = sm.Lm + sm.gap*m_eps;
+
+				// cap it
+				if (m_tmax > 0.0)
+				{
+					// calculate the master normal
+					vec3d nu = ms.SurfaceNormal(*sm.pme, sm.rs[0], sm.rs[1]);
+					double t = nu*tc;
+					if (t > m_tmax) tc = vec3d(0,0,0);
+				}
+
+				// store traction
+				sm.tn = tc;
 
 				// get the master element
 				FESurfaceElement& mel = *sm.pme;
