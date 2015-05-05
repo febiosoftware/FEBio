@@ -374,7 +374,6 @@ void FEMicroMaterial2O::UpdateBC(FEModel& rve, mat3d& F, tens3drs& G)
 		
 		// LTE - Apply the second order boundary conditions to the RVE problem
 		vec3d r1 = F*r0 + G.contractdyad1(r0)*0.5;
-		//vec3d r1 = F*r0;
 
 		dx.s = r1.x - r0.x;
 		dy.s = r1.y - r0.y;
@@ -392,29 +391,11 @@ void FEMicroMaterial2O::UpdateBC(FEModel& rve, mat3d& F, tens3drs& G)
 		// loop over periodic boundaries
 		for (int i=0; i<3; ++i)
 		{
-			FEPeriodicBoundary* pc = dynamic_cast<FEPeriodicBoundary*>(rve.SurfacePairInteraction(i));
+			FEPeriodicBoundary2O* pc = dynamic_cast<FEPeriodicBoundary2O*>(rve.SurfacePairInteraction(i));
 			assert(pc);
 
-			// get the position of the first node
-			vec3d r0 = pc->m_ss.Node(0).m_r0;
-
-			// calculate the position of the projection
-			FESurfaceElement* pm = pc->m_ss.m_pme[0]; assert(pm);
-			for (int j=0; j<pm->Nodes(); ++j) r[j] = m.Node(pm->m_node[j]).m_r0;
-			vec2d q = pc->m_ss.m_rs[0];
-			vec3d r1 = pm->eval(r, q[0], q[1]);
-
-			// calculate the offset distance
-			vec3d u0 = r1 - r0;
-
-			// apply deformation
-			vec3d u1 = U*u0 + G.contractdyad1(r1)/2. - G.contractdyad1(r0)/2.;
-
-			// set this as the scale parameter for the offset
-			FEParam* pp = pc->GetParameterList().Find("offset");
-			assert(pp);
-			pp->m_vscl = u1;
-			pp->m_nlc = 0;
+			pc->m_Fmacro = F;
+			pc->m_Gmacro = G;
 		}
 	}
 }
@@ -575,6 +556,14 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on)
 		vector<int> item;
 		pplt->AddVariable("displacement", item);
 		pplt->AddVariable("stress", item);
+	
+		if (m_bperiodic)
+		{
+			pplt->AddVariable("contact gap", item);
+			pplt->AddVariable("contact traction", item);
+			pplt->AddVariable("contact pressure", item);
+		}
+
 		stringstream ss;
 		ss << "rve_elem_" << plot_on << ".xplt";
 		string plot_name = ss.str();
@@ -620,7 +609,7 @@ void FEMicroMaterial2O::AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3
 		// get the reaction for from the periodic constraints
 		for (int i=0; i<3; ++i)
 		{
-			FEPeriodicBoundary* pbc = dynamic_cast<FEPeriodicBoundary*>(rve.SurfacePairInteraction(i));
+			FEPeriodicBoundary2O* pbc = dynamic_cast<FEPeriodicBoundary2O*>(rve.SurfacePairInteraction(i));
 			assert(pbc);
 			FEPeriodicSurface& ss = pbc->m_ss;
 			int N = ss.Nodes();
@@ -1046,7 +1035,7 @@ void FEMicroMaterial2O::AveragedStress2OPK1(FEModel& rve, FEMaterialPoint &mp, m
 		// get the reaction for from the periodic constraints
 		for (int i=0; i<3; ++i)
 		{
-			FEPeriodicBoundary* pbc = dynamic_cast<FEPeriodicBoundary*>(rve.SurfacePairInteraction(i));
+			FEPeriodicBoundary2O* pbc = dynamic_cast<FEPeriodicBoundary2O*>(rve.SurfacePairInteraction(i));
 			assert(pbc);
 			FEPeriodicSurface& ss = pbc->m_ss;
 			int N = ss.Nodes();
@@ -1150,7 +1139,7 @@ void FEMicroMaterial2O::AveragedStress2OPK2(FEModel& rve, FEMaterialPoint &mp, m
 		// get the reaction for from the periodic constraints
 		for (int i=0; i<3; ++i)
 		{
-			FEPeriodicBoundary* pbc = dynamic_cast<FEPeriodicBoundary*>(rve.SurfacePairInteraction(i));
+			FEPeriodicBoundary2O* pbc = dynamic_cast<FEPeriodicBoundary2O*>(rve.SurfacePairInteraction(i));
 			assert(pbc);
 			FEPeriodicSurface& ss = pbc->m_ss;
 			int N = ss.Nodes();

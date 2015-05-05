@@ -2,7 +2,7 @@
 #include "FEElasticMaterial.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
-#include "FEBioMech/FEPeriodicBoundary.h"
+#include "FEBioMech/FEPeriodicBoundary2O.h"
 #include "FECore/tens3d.h"
 #include "FECore/tens4d.h"
 #include "FECore/tens5d.h"

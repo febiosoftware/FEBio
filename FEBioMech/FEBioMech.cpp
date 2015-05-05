@@ -329,6 +329,8 @@ REGISTER_FECORE_CLASS(FEDistanceConstraint , FENLCONSTRAINT_ID, "node distance" 
 // classes derived from FEContactInterface
 REGISTER_FECORE_CLASS(FEFacet2FacetSliding   , FESURFACEPAIRINTERACTION_ID, "facet-to-facet sliding"     );
 REGISTER_FECORE_CLASS(FEPeriodicBoundary     , FESURFACEPAIRINTERACTION_ID, "periodic boundary"          );
+REGISTER_FECORE_CLASS(FEPeriodicBoundary1O   , FESURFACEPAIRINTERACTION_ID, "periodic boundary1O"        );
+REGISTER_FECORE_CLASS(FEPeriodicBoundary2O   , FESURFACEPAIRINTERACTION_ID, "periodic boundary2O"        );
 REGISTER_FECORE_CLASS(FERigidWallInterface   , FESURFACEPAIRINTERACTION_ID, "rigid_wall"                 );
 REGISTER_FECORE_CLASS(FESlidingInterface     , FESURFACEPAIRINTERACTION_ID, "sliding_with_gaps"          );
 REGISTER_FECORE_CLASS(FESlidingInterfaceBW   , FESURFACEPAIRINTERACTION_ID, "sliding-tension-compression");

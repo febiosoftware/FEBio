@@ -2,7 +2,7 @@
 #include "FEElasticMaterial.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
-#include "FEBioMech/FEPeriodicBoundary.h"
+#include "FEBioMech/FEPeriodicBoundary1O.h"
 
 //-----------------------------------------------------------------------------
 //! Material point class for the micro-material
