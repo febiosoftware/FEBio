@@ -274,7 +274,7 @@ bool FESolidAnalysis::Init()
 			FERigidBodyVelocity* pv = m_fem.m_RBV[i];
 			if (pv->IsActive())
 			{
-				FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(i));
+                FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(pv->id));
 				rb.m_vp = rb.m_vt = pv->v;
 			}
 		}
@@ -285,7 +285,7 @@ bool FESolidAnalysis::Init()
 			FERigidBodyAngularVelocity* pw = m_fem.m_RBW[i];
 			if (pw->IsActive())
 			{
-				FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(i));
+                FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(pw->id));
 				rb.m_wp = rb.m_wt = pw->w;
 			}
 		}
