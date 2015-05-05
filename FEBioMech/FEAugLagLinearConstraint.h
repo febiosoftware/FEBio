@@ -18,11 +18,10 @@ public:
 	class DOF
 	{
 	public:
-		DOF() { node = bc = neq = -1; val = 0; }
+		DOF() { node = bc = 0; val = 0.0; }
 	public:
 		int	node;		// the node to which this dof belongs to
 		int	bc;			// the degree of freedom
-		int	neq;		// the equation number (or -1 if none)
 		double	val;	// coefficient value
 	};
 
@@ -53,9 +52,6 @@ public:
 	void add(FEAugLagLinearConstraint* plc) { m_LC.push_back(plc); }
 
 public:
-	//! initialization
-	void Activate();
-
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
 

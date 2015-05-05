@@ -12,7 +12,7 @@ void FEAugLagLinearConstraint::Serialize(DumpFile& ar)
 
 		ar << (int) m_dof.size();
 		list<DOF>::iterator it = m_dof.begin();
-		for (int i=0; i<(int) m_dof.size(); ++i, ++it) ar << it->bc << it->neq << it->node << it->val;
+		for (int i=0; i<(int) m_dof.size(); ++i, ++it) ar << it->bc << it->node << it->val;
 	}
 	else
 	{
@@ -24,7 +24,7 @@ void FEAugLagLinearConstraint::Serialize(DumpFile& ar)
 		m_dof.clear();
 		for (int i=0; i<n; ++i)
 		{
-			ar >> dof.bc >> dof.neq >> dof.node >> dof.val;
+			ar >> dof.bc >> dof.node >> dof.val;
 			m_dof.push_back(dof);
 		}
 	}
@@ -39,31 +39,6 @@ FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FENLConstraint(pfe
 	m_eps = 1;
 	m_tol = 0.1;
 	m_naugmax = 50;
-}
-
-//-----------------------------------------------------------------------------
-void FELinearConstraintSet::Activate()
-{
-	// don't forget to call base class
-	FENLConstraint::Activate();
-
-	// set the equation numbers for the linear constraints
-	list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
-	int N = m_LC.size();
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	for (int i=0; i<N; ++i, ++it)
-	{
-		FEAugLagLinearConstraint& lc = *(*it);
-
-		// set the slave equation numbers
-		FEAugLagLinearConstraint::Iterator is = lc.m_dof.begin();
-		int nn = lc.m_dof.size();
-		for (int n=0; n<nn; ++n, ++is)
-		{
-			FEAugLagLinearConstraint::DOF& sn = *is;
-			sn.neq = mesh.Node(sn.node).m_ID[sn.bc];
-		}		
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -152,6 +127,8 @@ bool FELinearConstraintSet::Augment(int naug)
 
 void FELinearConstraintSet::Residual(FEGlobalVector& R)
 {
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
 	int M = m_LC.size();
 	list<FEAugLagLinearConstraint*>::iterator  im = m_LC.begin();
 	for (int m=0; m<M; ++m, ++im)
@@ -162,9 +139,10 @@ void FELinearConstraintSet::Residual(FEGlobalVector& R)
 		FEAugLagLinearConstraint::Iterator it = LC.m_dof.begin();
 		for (int i=0; i<n; ++i, ++it)
 		{
-			if (it->neq >= 0)
+			int neq = mesh.Node(it->node).m_ID[it->bc];
+			if (neq >= 0)
 			{
-				R[it->neq] -= (LC.m_lam+m_eps*c)*it->val;
+				R[neq] -= (LC.m_lam+m_eps*c)*it->val;
 			}		
 		}
 	}
@@ -175,6 +153,8 @@ void FELinearConstraintSet::Residual(FEGlobalVector& R)
 
 void FELinearConstraintSet::StiffnessMatrix(FESolver* psolver)
 {
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
 	vector<int> en;
 	vector<int> elm;
 	matrix ke;
@@ -202,7 +182,8 @@ void FELinearConstraintSet::StiffnessMatrix(FESolver* psolver)
 		for (i=0; i<n; ++i, ++it)
 		{
 			en[i] = it->node;
-			elm[i] = it->neq;
+			int neq = mesh.Node(it->node).m_ID[it->bc];
+			elm[i] = neq;
 		}
 
 		psolver->AssembleStiffness(en, elm, ke);

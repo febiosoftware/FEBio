@@ -247,7 +247,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 						int n = (*it)->m_dof.size();
 						lm.resize(n);
 						FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
-						for (j=0; j<n; ++j, ++is) lm[j] = is->neq;
+						for (j = 0; j<n; ++j, ++is) lm[j] = mesh.Node(is->node).m_ID[is->bc];;
 		
 						build_add(lm);
 					}
