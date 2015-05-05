@@ -105,7 +105,7 @@ void FETiedContactSurface::GetNodalContactPressure(int nface, double* pn)
 {
 	FESurfaceElement& f = Element(nface);
 	int ne = f.m_lnode.size();
-	for (int j= 0; j< ne; ++j) pn[j] = m_Lm[f.m_lnode[j]].norm();
+	for (int j= 0; j< ne; ++j) pn[j] = m_Tc[f.m_lnode[j]].norm();
 }
 
 //-----------------------------------------------------------------------------
