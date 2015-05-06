@@ -494,6 +494,8 @@
     <ClCompile Include="..\..\FEBioMech\FEOsmoticVirialExpansion.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPerfectOsmometer.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPeriodicBoundary.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPeriodicBoundary1O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPeriodicBoundary2O.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPointConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropic.cpp" />
@@ -659,6 +661,8 @@
     <ClInclude Include="..\..\FEBioMech\FEOsmoticVirialExpansion.h" />
     <ClInclude Include="..\..\FEBioMech\FEPerfectOsmometer.h" />
     <ClInclude Include="..\..\FEBioMech\FEPeriodicBoundary.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPeriodicBoundary1O.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPeriodicBoundary2O.h" />
     <ClInclude Include="..\..\FEBioMech\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEPointConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropic.h" />
