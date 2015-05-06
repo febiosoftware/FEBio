@@ -27,10 +27,13 @@ void FEPrescribedActiveContractionIsotropic::Init()
 //-----------------------------------------------------------------------------
 mat3ds FEPrescribedActiveContractionIsotropic::Stress(FEMaterialPoint &mp)
 {
-    mat3dd I(1);
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+    double J = pt.m_J;
+    mat3ds b = pt.LeftCauchyGreen();
     
     // evaluate the active stress
-    mat3ds s = I*m_T0;
+    mat3ds s = b*(m_T0/J);
     
     return s;
 }
@@ -38,9 +41,8 @@ mat3ds FEPrescribedActiveContractionIsotropic::Stress(FEMaterialPoint &mp)
 //-----------------------------------------------------------------------------
 tens4ds FEPrescribedActiveContractionIsotropic::Tangent(FEMaterialPoint &mp)
 {
-    mat3dd I(1);
-    
-    tens4ds c = (dyad1s(I) - dyad4s(I)*2)*m_T0;
+    tens4ds c;
+    c.zero();
     
     return c;
 }

@@ -43,6 +43,8 @@ mat3ds FEPrescribedActiveContractionTransIso::Stress(FEMaterialPoint &mp)
     
     // deformation gradient
     mat3d &F = pt.m_F;
+    double J = pt.m_J;
+    mat3ds b = pt.LeftCauchyGreen();
     
     // get the initial fiber direction
     vec3d n0, nt;
@@ -52,12 +54,10 @@ mat3ds FEPrescribedActiveContractionTransIso::Stress(FEMaterialPoint &mp)
     
     // evaluate the deformed fiber direction
     nt = F*n0;
-    nt.unit();
     mat3ds N = dyad(nt);
-    mat3dd I(1);
     
     // evaluate the active stress
-    mat3ds s = (I-N)*m_T0;
+    mat3ds s = (b-N)*(m_T0/J);
     
     return s;
 }
@@ -65,24 +65,8 @@ mat3ds FEPrescribedActiveContractionTransIso::Stress(FEMaterialPoint &mp)
 //-----------------------------------------------------------------------------
 tens4ds FEPrescribedActiveContractionTransIso::Tangent(FEMaterialPoint &mp)
 {
-    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    
-    // deformation gradient
-    mat3d &F = pt.m_F;
-    
-    // get the initial fiber direction
-    vec3d n0, nt;
-    
-    // evaluate fiber direction in global coordinate system
-    n0 = pt.m_Q*m_n0;
-    
-    // evaluate the deformed fiber direction
-    nt = F*n0;
-    nt.unit();
-    mat3ds N = dyad(nt);
-    mat3dd I(1);
-    
-    tens4ds c = (dyad1s(I) - dyad4s(I)*2 + dyad1s(N)*2 - dyad1s(I, N)/2.0)*m_T0;
+    tens4ds c;
+    c.zero();
     
     return c;
 }

@@ -37,15 +37,13 @@ void FEPrescribedActiveContractionUniaxialUC::Init()
 }
 
 //-----------------------------------------------------------------------------
-// Since the prescribed active contraction stress is not dependent on a strain
-// energy density function, we don't return the deviatoric part of the
-// stress.  Instead, we return the actual stress.
 mat3ds FEPrescribedActiveContractionUniaxialUC::DevStress(FEMaterialPoint &mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // deformation gradient
-    mat3d &F = pt.m_F;
+    double J = pt.m_J;
+    mat3d F = pt.m_F;
     
     // get the initial fiber direction
     vec3d n0, nt;
@@ -55,39 +53,16 @@ mat3ds FEPrescribedActiveContractionUniaxialUC::DevStress(FEMaterialPoint &mp)
     
     // evaluate the deformed fiber direction
     nt = F*n0;
-    nt.unit();
     mat3ds N = dyad(nt);
     
     // evaluate the active stress
-    mat3ds s = N*m_T0;
+    mat3ds s = N*(m_T0/J);
     
     return s;
 }
 
 //-----------------------------------------------------------------------------
-// Since the prescribed active contraction stress is not dependent on a strain
-// energy density function, we don't return the deviatoric part of the
-// tangent.  Instead, we return the actual tangent.
 tens4ds FEPrescribedActiveContractionUniaxialUC::DevTangent(FEMaterialPoint &mp)
 {
-    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    
-    // deformation gradient
-    mat3d &F = pt.m_F;
-    
-    // get the initial fiber direction
-    vec3d n0, nt;
-    
-    // evaluate fiber direction in global coordinate system
-    n0 = pt.m_Q*m_n0;
-    
-    // evaluate the deformed fiber direction
-    nt = F*n0;
-    nt.unit();
-    mat3ds N = dyad(nt);
-    mat3dd I(1);
-    
-    tens4ds c = (dyad1s(I, N)/2.0 - dyad1s(N)*2)*m_T0;
-    
-    return c;
+    return tens4ds(0.0);
 }

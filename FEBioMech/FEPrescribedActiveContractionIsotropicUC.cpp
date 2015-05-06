@@ -25,28 +25,20 @@ void FEPrescribedActiveContractionIsotropicUC::Init()
 }
 
 //-----------------------------------------------------------------------------
-// Since the prescribed active contraction stress is not dependent on a strain
-// energy density function, we don't return the deviatoric part of the
-// stress.  Instead, we return the actual stress.
 mat3ds FEPrescribedActiveContractionIsotropicUC::DevStress(FEMaterialPoint &mp)
 {
-    mat3dd I(1);
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    double J = pt.m_J;
+    mat3ds b = pt.LeftCauchyGreen();
     
     // evaluate the active stress
-    mat3ds s = I*m_T0;
+    mat3ds s = b*(m_T0/J);
     
     return s;
 }
 
 //-----------------------------------------------------------------------------
-// Since the prescribed active contraction stress is not dependent on a strain
-// energy density function, we don't return the deviatoric part of the
-// tangent.  Instead, we return the actual tangent.
 tens4ds FEPrescribedActiveContractionIsotropicUC::DevTangent(FEMaterialPoint &mp)
 {
-    mat3dd I(1);
-    
-    tens4ds c = (dyad1s(I) - dyad4s(I)*2)*m_T0;
-    
-    return c;
+    return tens4ds(0.0);
 }
