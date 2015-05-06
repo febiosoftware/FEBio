@@ -24,6 +24,7 @@
 #include "FEFiberExpPow.h"
 #include "FEFiberExpPowUncoupled.h"
 #include "FEFiberNeoHookean.h"
+#include "FEFiberPowLinear.h"
 #include "FEFungOrthoCompressible.h"
 #include "FEFungOrthotropic.h"
 #include "FEGasserOgdenHolzapfel.h"
@@ -186,6 +187,7 @@ REGISTER_FECORE_CLASS(FEEllipsoidalFiberDistributionOld,FEMATERIAL_ID, "ellipsoi
 REGISTER_FECORE_CLASS(FEFiberExpPow                  ,FEMATERIAL_ID, "fiber-exp-pow"                 );
 REGISTER_FECORE_CLASS(FEFiberExpPowUncoupled         ,FEMATERIAL_ID, "fiber-exp-pow-uncoupled"       );
 REGISTER_FECORE_CLASS(FEFiberNeoHookean              ,FEMATERIAL_ID, "fiber neo-Hookean"             );
+REGISTER_FECORE_CLASS(FEFiberPowLinear               ,FEMATERIAL_ID, "fiber-pow-linear"              );
 REGISTER_FECORE_CLASS(FEFungOrthoCompressible        ,FEMATERIAL_ID, "Fung-ortho-compressible"       );
 REGISTER_FECORE_CLASS(FEFungOrthotropic              ,FEMATERIAL_ID, "Fung orthotropic"              );
 REGISTER_FECORE_CLASS(FEGasserOgdenHolzapfel         ,FEMATERIAL_ID, "Gasser-Ogden-Holzapfel"        );
@@ -232,7 +234,7 @@ REGISTER_FECORE_CLASS(FEFiberExponentialPower        ,FEMATERIAL_ID, "fiber-expo
 REGISTER_FECORE_CLASS(FEFiberExponentialPowerUC      ,FEMATERIAL_ID, "fiber-exponential-power-law-uncoupled");
 REGISTER_FECORE_CLASS(FEFiberNH                      ,FEMATERIAL_ID, "fiber-NH"                      );
 REGISTER_FECORE_CLASS(FEFiberNHUC                    ,FEMATERIAL_ID, "fiber-NH-uncoupled"            );
-REGISTER_FECORE_CLASS(FEFiberPowerToeLinear          ,FEMATERIAL_ID, "fiber-power-toe-linear"        );
+REGISTER_FECORE_CLASS(FEFiberPowerLinear             ,FEMATERIAL_ID, "fiber-power-linear"            );
 REGISTER_FECORE_CLASS(FESphericalFiberDensityDistribution  , FEMATERIAL_ID, "spherical"   );
 REGISTER_FECORE_CLASS(FEEllipsodialFiberDensityDistribution, FEMATERIAL_ID, "ellipsoidal" );
 REGISTER_FECORE_CLASS(FEVonMises3DFiberDensityDistribution , FEMATERIAL_ID, "von-Mises-3d");

@@ -78,12 +78,12 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Power toe - linear
+//! Power law toe region - linear
 
-class FEFiberPowerToeLinear : public FEElasticFiberMaterial
+class FEFiberPowerLinear : public FEElasticFiberMaterial
 {
 public:
-    FEFiberPowerToeLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem) {
+    FEFiberPowerLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem) {
         m_E = 0; m_lam0 = 1; m_beta = 3; }
     
     //! Initialization

@@ -301,18 +301,18 @@ double FEFiberNH::StrainEnergyDensity(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-// FEFiberPowerToeLinear
+// FEFiberPowerLinear
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberPowerToeLinear, FEElasticFiberMaterial)
+BEGIN_PARAMETER_LIST(FEFiberPowerLinear, FEElasticFiberMaterial)
     ADD_PARAMETER(m_E    , FE_PARAM_DOUBLE, "E"    );
     ADD_PARAMETER(m_beta , FE_PARAM_DOUBLE, "beta" );
     ADD_PARAMETER(m_lam0 , FE_PARAM_DOUBLE, "lam0" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-void FEFiberPowerToeLinear::Init()
+void FEFiberPowerLinear::Init()
 {
     FEMaterial::Init();
     if (m_E < 0) throw MaterialError("E must be positive.");
@@ -321,7 +321,7 @@ void FEFiberPowerToeLinear::Init()
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberPowerToeLinear::Stress(FEMaterialPoint& mp)
+mat3ds FEFiberPowerLinear::Stress(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     FEFiberMaterialPoint& pf = *mp.ExtractData<FEFiberMaterialPoint>();
@@ -347,7 +347,7 @@ mat3ds FEFiberPowerToeLinear::Stress(FEMaterialPoint& mp)
     if (In - 1 > eps)
     {
         double I0 = m_lam0*m_lam0;
-        double ksi = 0.5*m_beta*m_E*(I0-1-log(I0))/pow(I0-1, m_beta);
+        double E = m_E*pow(I0, -3./2.);
         
         // get the global spatial fiber direction in current configuration
         nt = F*n0/sqrt(In);
@@ -356,7 +356,9 @@ mat3ds FEFiberPowerToeLinear::Stress(FEMaterialPoint& mp)
         mat3ds N = dyad(nt);
         
         // calculate the fiber stress magnitude
-        sn = (In < I0) ? ksi*In*pow(In-1, m_beta-1) : 0.5*m_E*(In-1);
+        sn = (In < I0) ?
+        0.5*In*E*(I0-1)/(m_beta-1)*pow((In-1)/(I0-1), m_beta-1) :
+        In*E*((I0-1)/2/(m_beta-1) + I0*(1-sqrt(I0/In)));
         
         // calculate the fiber stress
         s = N*(sn/J);
@@ -370,7 +372,7 @@ mat3ds FEFiberPowerToeLinear::Stress(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberPowerToeLinear::Tangent(FEMaterialPoint& mp)
+tens4ds FEFiberPowerLinear::Tangent(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     FEFiberMaterialPoint& pf = *mp.ExtractData<FEFiberMaterialPoint>();
@@ -395,7 +397,7 @@ tens4ds FEFiberPowerToeLinear::Tangent(FEMaterialPoint& mp)
     if (In - 1 > eps)
     {
         double I0 = m_lam0*m_lam0;
-        double ksi = 0.5*m_beta*m_E*(I0-1-log(I0))/pow(I0-1, m_beta);
+        double E = m_E*pow(I0, -3./2.);
         
         // get the global spatial fiber direction in current configuration
         nt = F*n0/sqrt(In);
@@ -405,7 +407,9 @@ tens4ds FEFiberPowerToeLinear::Tangent(FEMaterialPoint& mp)
         tens4ds NxN = dyad1s(N);
         
         // calculate modulus
-        cn = (In < I0) ? 2*ksi*(m_beta-1)*In*In*pow(In-1, m_beta-2) : m_E;
+        cn = (In < I0) ?
+        In*In*E*pow((In-1)/(I0-1), m_beta-2) :
+        In*In*m_E*pow(In, -3./2.);
         
         // calculate the fiber tangent
         c = NxN*(cn/J);
@@ -420,7 +424,7 @@ tens4ds FEFiberPowerToeLinear::Tangent(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Strain energy density
-double FEFiberPowerToeLinear::StrainEnergyDensity(FEMaterialPoint& mp)
+double FEFiberPowerLinear::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     double sed = 0.0;
     
@@ -444,8 +448,11 @@ double FEFiberPowerToeLinear::StrainEnergyDensity(FEMaterialPoint& mp)
     {
         // calculate strain energy density
         double I0 = m_lam0*m_lam0;
-        double ksi = 0.5*m_beta*m_E*(I0-1-log(I0))/pow(I0-1, m_beta);
-        sed = (In < I0) ? 0.5*ksi/m_beta*pow(In-1, m_beta) : 0.25*m_E*(In-1-log(In));
+        double E = m_E*pow(I0, -3./2.);
+        double B = 0.5*E*(I0+(I0-1)/2/(m_beta-1));
+        sed = (In < I0) ?
+        E*pow(I0-1, 2)/(4*m_beta*(m_beta-1))*pow((In-1)/(I0-1), m_beta) :
+        E*pow(I0-1, 2)/(4*m_beta*(m_beta-1)) + B*(In-I0) - E*(sqrt(In) - sqrt(I0));
     }
     
     return sed;
