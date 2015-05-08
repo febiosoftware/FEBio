@@ -1,34 +1,34 @@
 //
-//  FEFiberPowLinear.h
+//  FEFiberPowLinearUncoupled.h
 //  FEBioMech
 //
-//  Created by Gerard Ateshian on 5/2/15.
+//  Created by Gerard Ateshian on 5/6/15.
 //  Copyright (c) 2015 febio.org. All rights reserved.
 //
 
 #pragma once
-#include "FEElasticMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Material class for single fiber, tension only
-//! Power law - linear
+//! Power-law linear response (uncoupled)
 
-class FEFiberPowLinear : public FEElasticMaterial
+class FEFiberPowLinearUncoupled : public FEUncoupledMaterial
 {
 public:
-    FEFiberPowLinear(FEModel* pfem) : FEElasticMaterial(pfem) { m_thd = 0; m_phd = 90; }
+    FEFiberPowLinearUncoupled(FEModel* pfem) : FEUncoupledMaterial(pfem) { m_thd = 0; m_phd = 90; }
     
     //! Initialization
     void Init();
     
     //! Cauchy stress
-    mat3ds Stress(FEMaterialPoint& mp);
+    virtual mat3ds DevStress(FEMaterialPoint& mp);
     
     // Spatial tangent
-    tens4ds Tangent(FEMaterialPoint& mp);
+    virtual tens4ds DevTangent(FEMaterialPoint& mp);
     
     //! Strain energy density
-    double StrainEnergyDensity(FEMaterialPoint& mp);
+    virtual double DevStrainEnergyDensity(FEMaterialPoint& mp);
     
     // declare the parameter list
     DECLARE_PARAMETER_LIST();

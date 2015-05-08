@@ -101,7 +101,10 @@ public:
 public:
     double	m_E;		// fiber modulus
     double  m_lam0;     // stretch ratio at end of toe region
+    double  m_I0;       // m_lam0^2
+    double  m_ksi;      // power law coefficient in toe region
     double  m_beta;     // power law exponent in toe region
+    double  m_b;        // coefficient in linear region
     
     // declare the parameter list
     DECLARE_PARAMETER_LIST();

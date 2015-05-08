@@ -60,6 +60,8 @@ bool FERigidRevoluteJoint::Init()
     
     if (m_binit) return true;
     
+    FEModel& fem = *GetFEModel();
+    
     // initialize joint basis
     m_e0[0].unit();
     m_e0[2] = m_e0[0] ^ m_e0[1]; m_e0[2].unit();
@@ -68,8 +70,6 @@ bool FERigidRevoluteJoint::Init()
     // reset force
     m_F = vec3d(0,0,0); m_L = vec3d(0,0,0);
     m_M = vec3d(0,0,0); m_U = vec3d(0,0,0);
-    
-    FEModel& fem = *GetFEModel();
     
     // When the rigid joint is read in, the ID's correspond to the rigid materials.
     // Now we want to make the ID's refer to the rigid body ID's
@@ -99,6 +99,11 @@ bool FERigidRevoluteJoint::Init()
     m_ea0[0] = m_e0[0]; m_ea0[1] = m_e0[1]; m_ea0[2] = m_e0[2];
     m_eb0[0] = m_e0[0]; m_eb0[1] = m_e0[1]; m_eb0[2] = m_e0[2];
     
+    FEParameterList& pl = GetParameterList();
+    FEParam* p = pl.Find("rotation");
+    m_pqLC = fem.GetLoadCurve(p->m_nlc);
+    m_qpscl = p->m_scl;
+    
     m_binit = true;
     
     return true;
@@ -124,7 +129,7 @@ void FERigidRevoluteJoint::ShallowCopy(DumpStream& dmp, bool bsave)
         dmp >> m_ea0[0] >> m_ea0[1] >> m_ea0[2];
         dmp >> m_eb0[0] >> m_eb0[1] >> m_eb0[2];
         dmp >> m_M >> m_U;
-        dmp >> m_qp << m_Mp;
+        dmp >> m_qp >> m_Mp;
     }
 }
 
@@ -132,6 +137,12 @@ void FERigidRevoluteJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidRevoluteJoint::Residual(FEGlobalVector& R)
 {
+    // get time at intermediate step
+    FEModel& fem = *GetFEModel();
+    double t = fem.m_ftime;
+    double dt = fem.GetCurrentStep()->m_dt;
+    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
+    
     vector<double> fa(6);
     vector<double> fb(6);
     
@@ -179,7 +190,8 @@ void FERigidRevoluteJoint::Residual(FEGlobalVector& R)
     vec3d ksi = (ea[0] ^ eb[0])/2;
     if (m_bq) {
         quatd q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
-        quatd a(m_qp,ea[0]);
+        double qp = m_pqLC->Value(m_time)*m_qpscl;
+        quatd a(qp,ea[0]);
         quatd r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
@@ -210,6 +222,12 @@ void FERigidRevoluteJoint::Residual(FEGlobalVector& R)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
 {
+    // get time at intermediate step
+    FEModel& fem = *GetFEModel();
+    double t = fem.m_ftime;
+    double dt = fem.GetCurrentStep()->m_dt;
+    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
+    
     // get m_alpha from solver
     m_alpha = dynamic_cast<FESolidSolver2*>(psolver)->m_alpha;
     
@@ -269,7 +287,8 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
     quatd q, a, r;
     if (m_bq) {
         q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
-        a = quatd(m_qp,ea[0]);
+        double qp = m_pqLC->Value(m_time)*m_qpscl;
+        a = quatd(qp,ea[0]);
         r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
@@ -412,6 +431,12 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
 //-----------------------------------------------------------------------------
 bool FERigidRevoluteJoint::Augment(int naug)
 {
+    // get time at intermediate step
+    FEModel& fem = *GetFEModel();
+    double t = fem.m_ftime;
+    double dt = fem.GetCurrentStep()->m_dt;
+    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
+    
     vec3d ra, rb, qa, qb, c, ksi, Lm;
     vec3d za, zb;
     vec3d eat[3], eap[3], ea[3];
@@ -467,7 +492,8 @@ bool FERigidRevoluteJoint::Augment(int naug)
     ksi = (ea[0] ^ eb[0])/2;
     if (m_bq) {
         quatd q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
-        quatd a(m_qp,ea[0]);
+        double qp = m_pqLC->Value(m_time)*m_qpscl;
+        quatd a(qp,ea[0]);
         quatd r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
@@ -542,6 +568,12 @@ void FERigidRevoluteJoint::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FERigidRevoluteJoint::Update()
 {
+    // get time at intermediate step
+    FEModel& fem = *GetFEModel();
+    double t = fem.m_ftime;
+    double dt = fem.GetCurrentStep()->m_dt;
+    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
+    
     vec3d ra, rb;
     vec3d za, zb;
     vec3d eat[3], eap[3], ea[3];
@@ -587,7 +619,8 @@ void FERigidRevoluteJoint::Update()
     vec3d ksi = (ea[0] ^ eb[0])/2;
     if (m_bq) {
         quatd q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
-        quatd a(m_qp,ea[0]);
+        double qp = m_pqLC->Value(m_time)*m_qpscl;
+        quatd a(qp,ea[0]);
         quatd r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();

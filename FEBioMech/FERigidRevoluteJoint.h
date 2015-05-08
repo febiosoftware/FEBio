@@ -12,6 +12,7 @@
 #include "FECore/vec3d.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FENLConstraint.h"
+#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 //! The FERigidRevoluteJoint class implements a revolute joint. The rigid joint
@@ -78,6 +79,9 @@ public:
     int     m_naugmax;  //! maximum number of augmentations
     
     double  m_qp;   //! prescribed rotation
+    FELoadCurve* m_pqLC;    // pointer to loadcurve for prescribed rotation
+    double  m_qpscl;    //! scale factor for prescribed rotation
+    double  m_time;
     bool    m_bq;   //! flag for prescribing rotation
     double  m_Mp;   //! prescribed moment
     

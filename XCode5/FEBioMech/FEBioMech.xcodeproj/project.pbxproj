@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		CAA03F9018BFA51700EAF395 /* FECGSolidSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA03F8E18BFA51700EAF395 /* FECGSolidSolver.cpp */; };
 		CAA03F9118BFA51700EAF395 /* FECGSolidSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = CAA03F8F18BFA51700EAF395 /* FECGSolidSolver.h */; };
+		D50824A61AFAFC860094BC4C /* FEFiberPowLinearUncoupled.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50824A41AFAFC860094BC4C /* FEFiberPowLinearUncoupled.cpp */; };
+		D50824A71AFAFC860094BC4C /* FEFiberPowLinearUncoupled.h in Headers */ = {isa = PBXBuildFile; fileRef = D50824A51AFAFC860094BC4C /* FEFiberPowLinearUncoupled.h */; };
 		D509A2431A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D509A2411A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.h */; };
 		D509A2441A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D509A2421A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.cpp */; };
 		D515BD3A18DB3D7B00B661B2 /* FEPRLig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D515BD3818DB3D7B00B661B2 /* FEPRLig.cpp */; };
@@ -344,6 +346,8 @@
 /* Begin PBXFileReference section */
 		CAA03F8E18BFA51700EAF395 /* FECGSolidSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECGSolidSolver.cpp; sourceTree = "<group>"; };
 		CAA03F8F18BFA51700EAF395 /* FECGSolidSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECGSolidSolver.h; sourceTree = "<group>"; };
+		D50824A41AFAFC860094BC4C /* FEFiberPowLinearUncoupled.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFiberPowLinearUncoupled.cpp; sourceTree = "<group>"; };
+		D50824A51AFAFC860094BC4C /* FEFiberPowLinearUncoupled.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFiberPowLinearUncoupled.h; sourceTree = "<group>"; };
 		D509A2411A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEGasserOgdenHolzapfelUC.h; sourceTree = "<group>"; };
 		D509A2421A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEGasserOgdenHolzapfelUC.cpp; sourceTree = "<group>"; };
 		D515BD3818DB3D7B00B661B2 /* FEPRLig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPRLig.cpp; sourceTree = "<group>"; };
@@ -856,6 +860,8 @@
 				D5E106EE1865DFAC00B23922 /* FEFiberNeoHookean.h */,
 				D5EDA6911AFAC7AE00C48076 /* FEFiberPowLinear.cpp */,
 				D5EDA6921AFAC7AE00C48076 /* FEFiberPowLinear.h */,
+				D50824A41AFAFC860094BC4C /* FEFiberPowLinearUncoupled.cpp */,
+				D50824A51AFAFC860094BC4C /* FEFiberPowLinearUncoupled.h */,
 				D5E106EF1865DFAC00B23922 /* FEFungOrthoCompressible.cpp */,
 				D5E106F01865DFAC00B23922 /* FEFungOrthoCompressible.h */,
 				D5E106F11865DFAC00B23922 /* FEFungOrthotropic.cpp */,
@@ -1155,6 +1161,7 @@
 				D5E1080A1865DFAD00B23922 /* FEPressureLoad.h in Headers */,
 				D54A4E4B1A2B65F50032E843 /* FEReactiveVEMaterialPoint.h in Headers */,
 				D5E108101865DFAD00B23922 /* FEResidualVector.h in Headers */,
+				D50824A71AFAFC860094BC4C /* FEFiberPowLinearUncoupled.h in Headers */,
 				D5E107CC1865DFAD00B23922 /* FEFiberIntegrationGeodesic.h in Headers */,
 				D5E107B81865DFAD00B23922 /* FEElasticSolidDomain.h in Headers */,
 				D5E1083E1865DFAD00B23922 /* FETransIsoMooneyRivlin.h in Headers */,
@@ -1367,6 +1374,7 @@
 				D5E108151865DFAD00B23922 /* FERigidShellDomain.cpp in Sources */,
 				D5E107AF1865DFAD00B23922 /* FEElasticMaterial.cpp in Sources */,
 				D5E108291865DFAD00B23922 /* FESphericalFiberDistribution.cpp in Sources */,
+				D50824A61AFAFC860094BC4C /* FEFiberPowLinearUncoupled.cpp in Sources */,
 				D5E107F11865DFAD00B23922 /* FEMooneyRivlin.cpp in Sources */,
 				D5E107D11865DFAD00B23922 /* FEFiberMaterial.cpp in Sources */,
 				D51BB4091991830800638A8B /* FEFiberIntegrationSchemeUC.cpp in Sources */,

@@ -1,27 +1,27 @@
 //
-//  FEFiberPowLinear.cpp
+//  FEFiberPowLinearUncoupled.cpp
 //  FEBioMech
 //
-//  Created by Gerard Ateshian on 5/2/15.
+//  Created by Gerard Ateshian on 5/6/15.
 //  Copyright (c) 2015 febio.org. All rights reserved.
 //
 
-#include "FEFiberPowLinear.h"
+#include "FEFiberPowLinearUncoupled.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberPowLinear, FEElasticMaterial)
-    ADD_PARAMETER(m_E    , FE_PARAM_DOUBLE, "E"    );
-    ADD_PARAMETER(m_lam0 , FE_PARAM_DOUBLE, "lam0" );
-    ADD_PARAMETER(m_beta , FE_PARAM_DOUBLE, "beta" );
-    ADD_PARAMETER(m_thd  , FE_PARAM_DOUBLE, "theta");
-    ADD_PARAMETER(m_phd  , FE_PARAM_DOUBLE, "phi"  );
+BEGIN_PARAMETER_LIST(FEFiberPowLinearUncoupled, FEElasticMaterial)
+ADD_PARAMETER(m_E    , FE_PARAM_DOUBLE, "E"    );
+ADD_PARAMETER(m_lam0 , FE_PARAM_DOUBLE, "lam0" );
+ADD_PARAMETER(m_beta , FE_PARAM_DOUBLE, "beta" );
+ADD_PARAMETER(m_thd  , FE_PARAM_DOUBLE, "theta");
+ADD_PARAMETER(m_phd  , FE_PARAM_DOUBLE, "phi"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-// FEFiberPowLinear
+// FEFiberPowLinearUncoupled.h
 //-----------------------------------------------------------------------------
 
-void FEFiberPowLinear::Init()
+void FEFiberPowLinearUncoupled::Init()
 {
     if (m_E < 0) throw MaterialError("E must be positive.");
     if (m_lam0 <= 1) throw MaterialError("lam0 must be >1.");
@@ -38,24 +38,24 @@ void FEFiberPowLinear::Init()
     
     // initialize material constants
     m_I0 = m_lam0*m_lam0;
-    m_ksi = m_E/4/(m_beta-1)*pow(m_I0, -3./2.)*pow(m_I0-1, 2-m_beta);
-    m_b = m_ksi*pow(m_I0-1, m_beta-1) + m_E/2/sqrt(m_I0);
+    m_ksi = m_E/(4*m_I0*m_I0)/(m_beta-1)*pow(m_I0-1, 2-m_beta);
+    m_b = m_ksi*pow(m_I0-1, m_beta-1) + m_E/4/m_I0;
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberPowLinear::Stress(FEMaterialPoint& mp)
+mat3ds FEFiberPowLinearUncoupled::DevStress(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // deformation gradient
-    mat3d &F = pt.m_F;
     double J = pt.m_J;
+    mat3d F = pt.m_F*pow(J, -1./3.);
     
     // loop over all integration points
     vec3d n0, nt;
     double In, sn;
     const double eps = 0;
-    mat3ds C = pt.RightCauchyGreen();
+    mat3ds C = pt.DevRightCauchyGreen();
     mat3ds s;
     
     // evaluate fiber direction in global coordinate system
@@ -76,7 +76,7 @@ mat3ds FEFiberPowLinear::Stress(FEMaterialPoint& mp)
         // calculate the fiber stress magnitude
         sn = (In < m_I0) ?
         2*In*m_ksi*pow(In-1, m_beta-1) :
-        2*m_b*In - m_E*sqrt(In);
+        2*m_b*In - m_E/2;
         
         // calculate the fiber stress
         s = N*(sn/J);
@@ -86,23 +86,24 @@ mat3ds FEFiberPowLinear::Stress(FEMaterialPoint& mp)
         s.zero();
     }
     
-    return s;
+    return s.dev();
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberPowLinear::Tangent(FEMaterialPoint& mp)
+tens4ds FEFiberPowLinearUncoupled::DevTangent(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // deformation gradient
-    mat3d &F = pt.m_F;
     double J = pt.m_J;
+    mat3d F = pt.m_F*pow(J, -1./3.);
     
     // loop over all integration points
     vec3d n0, nt;
-    double In, cn;
+    double In, sn, cn;
     const double eps = 0;
-    mat3ds C = pt.RightCauchyGreen();
+    mat3ds C = pt.DevRightCauchyGreen();
+    mat3ds s;
     tens4ds c;
     
     // evaluate fiber direction in global coordinate system
@@ -121,13 +122,28 @@ tens4ds FEFiberPowLinear::Tangent(FEMaterialPoint& mp)
         mat3ds N = dyad(nt);
         tens4ds NxN = dyad1s(N);
         
+        // calculate the fiber stress magnitude
+        sn = (In < m_I0) ?
+        2*In*m_ksi*pow(In-1, m_beta-1) :
+        2*m_b*In - m_E/2;
+        
+        // calculate the fiber stress
+        s = N*(sn/J);
+        
         // calculate modulus
         cn = (In < m_I0) ?
         4*In*In*m_ksi*(m_beta-1)*pow(In-1, m_beta-2) :
-        m_E*sqrt(In);
+        m_E;
         
         // calculate the fiber tangent
         c = NxN*(cn/J);
+
+        // This is the final value of the elasticity tensor
+        mat3dd I(1);
+        tens4ds IxI = dyad1s(I);
+        tens4ds I4  = dyad4s(I);
+        c += ((I4+IxI/3.0)*s.tr() - dyad1s(I,s))*(2./3.)
+        - (ddots(IxI, c)-IxI*(c.tr()/3.))/3.;
     }
     else
     {
@@ -138,7 +154,7 @@ tens4ds FEFiberPowLinear::Tangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-double FEFiberPowLinear::StrainEnergyDensity(FEMaterialPoint& mp)
+double FEFiberPowLinearUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
     double sed = 0.0;
     
@@ -148,7 +164,7 @@ double FEFiberPowLinear::StrainEnergyDensity(FEMaterialPoint& mp)
     vec3d n0;
     double In;
     const double eps = 0;
-    mat3ds C = pt.RightCauchyGreen();
+    mat3ds C = pt.DevRightCauchyGreen();
     
     // evaluate fiber direction in global coordinate system
     n0 = pt.m_Q*m_n0;
@@ -162,7 +178,7 @@ double FEFiberPowLinear::StrainEnergyDensity(FEMaterialPoint& mp)
         // calculate strain energy density
         sed = (In < m_I0) ?
         m_ksi/m_beta*pow(In-1, m_beta) :
-        m_b*(In-m_I0) - m_E*(sqrt(In)-sqrt(m_I0)) + m_ksi/m_beta*pow(m_I0-1, m_beta);
+        m_b*(In-m_I0) - m_E/4*log(In/m_I0) + m_ksi/m_beta*pow(m_I0-1, m_beta);
     }
     
     return sed;

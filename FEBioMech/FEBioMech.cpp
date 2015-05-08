@@ -25,6 +25,7 @@
 #include "FEFiberExpPowUncoupled.h"
 #include "FEFiberNeoHookean.h"
 #include "FEFiberPowLinear.h"
+#include "FEFiberPowLinearUncoupled.h"
 #include "FEFungOrthoCompressible.h"
 #include "FEFungOrthotropic.h"
 #include "FEGasserOgdenHolzapfel.h"
@@ -188,6 +189,7 @@ REGISTER_FECORE_CLASS(FEFiberExpPow                  ,FEMATERIAL_ID, "fiber-exp-
 REGISTER_FECORE_CLASS(FEFiberExpPowUncoupled         ,FEMATERIAL_ID, "fiber-exp-pow-uncoupled"       );
 REGISTER_FECORE_CLASS(FEFiberNeoHookean              ,FEMATERIAL_ID, "fiber neo-Hookean"             );
 REGISTER_FECORE_CLASS(FEFiberPowLinear               ,FEMATERIAL_ID, "fiber-pow-linear"              );
+REGISTER_FECORE_CLASS(FEFiberPowLinearUncoupled      ,FEMATERIAL_ID, "fiber-pow-linear-uncoupled"    );
 REGISTER_FECORE_CLASS(FEFungOrthoCompressible        ,FEMATERIAL_ID, "Fung-ortho-compressible"       );
 REGISTER_FECORE_CLASS(FEFungOrthotropic              ,FEMATERIAL_ID, "Fung orthotropic"              );
 REGISTER_FECORE_CLASS(FEGasserOgdenHolzapfel         ,FEMATERIAL_ID, "Gasser-Ogden-Holzapfel"        );
