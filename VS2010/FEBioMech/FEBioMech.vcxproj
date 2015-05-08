@@ -467,6 +467,8 @@
     <ClCompile Include="..\..\FEBioMech\FEFiberMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberMaterialPoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberPowLinear.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberPowLinearUncoupled.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFungOrthoCompressible.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFungOrthotropic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.cpp" />
@@ -634,6 +636,8 @@
     <ClInclude Include="..\..\FEBioMech\FEFiberMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberMaterialPoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberPowLinear.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberPowLinearUncoupled.h" />
     <ClInclude Include="..\..\FEBioMech\FEFungOrthoCompressible.h" />
     <ClInclude Include="..\..\FEBioMech\FEFungOrthotropic.h" />
     <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.h" />
