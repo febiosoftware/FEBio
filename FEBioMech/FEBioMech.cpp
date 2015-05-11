@@ -123,9 +123,9 @@
 #include "FEAugLagLinearConstraint.h"
 #include "FERigidJoint.h"
 #include "FERigidSphericalJoint.h"
-#include "FERigidPinJoint.h"
 #include "FERigidRevoluteJoint.h"
 #include "FERigidPrismaticJoint.h"
+#include "FERigidCylindricalJoint.h"
 #include "FEVolumeConstraint.h"
 #include "FEDistanceConstraint.h"
 
@@ -319,15 +319,15 @@ REGISTER_FECORE_CLASS(FEPointBodyForce      , FEBODYLOAD_ID, "point"      );
 
 //-----------------------------------------------------------------------------
 // constraint classes
-REGISTER_FECORE_CLASS(FEPointConstraint    , FENLCONSTRAINT_ID, "point"                );
-REGISTER_FECORE_CLASS(FELinearConstraintSet, FENLCONSTRAINT_ID, "linear constraint"    );
-REGISTER_FECORE_CLASS(FERigidJoint         , FENLCONSTRAINT_ID, "rigid joint"          );
-REGISTER_FECORE_CLASS(FERigidSphericalJoint, FENLCONSTRAINT_ID, "rigid spherical joint");
-REGISTER_FECORE_CLASS(FERigidPinJoint      , FENLCONSTRAINT_ID, "rigid pin joint"      );
-REGISTER_FECORE_CLASS(FERigidRevoluteJoint , FENLCONSTRAINT_ID, "rigid revolute joint" );
-REGISTER_FECORE_CLASS(FERigidPrismaticJoint, FENLCONSTRAINT_ID, "rigid prismatic joint");
-REGISTER_FECORE_CLASS(FEVolumeConstraint   , FENLCONSTRAINT_ID, "volume"               );
-REGISTER_FECORE_CLASS(FEDistanceConstraint , FENLCONSTRAINT_ID, "node distance"        );
+REGISTER_FECORE_CLASS(FEPointConstraint      , FENLCONSTRAINT_ID, "point"                  );
+REGISTER_FECORE_CLASS(FELinearConstraintSet  , FENLCONSTRAINT_ID, "linear constraint"      );
+REGISTER_FECORE_CLASS(FERigidJoint           , FENLCONSTRAINT_ID, "rigid joint"            );
+REGISTER_FECORE_CLASS(FERigidSphericalJoint  , FENLCONSTRAINT_ID, "rigid spherical joint"  );
+REGISTER_FECORE_CLASS(FERigidRevoluteJoint   , FENLCONSTRAINT_ID, "rigid revolute joint"   );
+REGISTER_FECORE_CLASS(FERigidPrismaticJoint  , FENLCONSTRAINT_ID, "rigid prismatic joint"  );
+REGISTER_FECORE_CLASS(FERigidCylindricalJoint, FENLCONSTRAINT_ID, "rigid cylindrical joint");
+REGISTER_FECORE_CLASS(FEVolumeConstraint     , FENLCONSTRAINT_ID, "volume"                 );
+REGISTER_FECORE_CLASS(FEDistanceConstraint   , FENLCONSTRAINT_ID, "node distance"          );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface

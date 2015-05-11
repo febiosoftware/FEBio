@@ -3,9 +3,9 @@
 #include "FEBioMech/FERigidWallInterface.h"
 #include "FEBioMech/FERigidJoint.h"
 #include "FEBioMech/FERigidSphericalJoint.h"
-#include "FEBioMech/FERigidPinJoint.h"
 #include "FEBioMech/FERigidRevoluteJoint.h"
 #include "FEBioMech/FERigidPrismaticJoint.h"
+#include "FEBioMech/FERigidCylindricalJoint.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FECore/FECoreKernel.h"
 
@@ -32,14 +32,14 @@ void FEBioContactSection::Parse(XMLTag& tag)
 			const char* sztype = tag.AttributeValue("type");
 
 			// Not all contact interfaces can be automated, so we first handle these special cases
-			if      (strcmp(sztype, "rigid_wall"            ) == 0) ParseRigidWall            (tag);
-			else if (strcmp(sztype, "rigid"                 ) == 0) ParseRigidInterface       (tag);
-			else if (strcmp(sztype, "rigid joint"           ) == 0) ParseRigidJoint           (tag);
-			else if (strcmp(sztype, "rigid spherical joint" ) == 0) ParseRigidSphericalJoint  (tag);
-			else if (strcmp(sztype, "rigid pin joint"       ) == 0) ParseRigidPinJoint        (tag);
-            else if (strcmp(sztype, "rigid revolute joint"  ) == 0) ParseRigidRevoluteJoint   (tag);
-            else if (strcmp(sztype, "rigid prismatic joint" ) == 0) ParseRigidPrismaticJoint   (tag);
-			else if (strcmp(sztype, "linear constraint"     ) == 0) ParseLinearConstraint     (tag);
+			if      (strcmp(sztype, "rigid_wall"             ) == 0) ParseRigidWall            (tag);
+			else if (strcmp(sztype, "rigid"                  ) == 0) ParseRigidInterface       (tag);
+			else if (strcmp(sztype, "rigid joint"            ) == 0) ParseRigidJoint           (tag);
+			else if (strcmp(sztype, "rigid spherical joint"  ) == 0) ParseRigidSphericalJoint  (tag);
+            else if (strcmp(sztype, "rigid revolute joint"   ) == 0) ParseRigidRevoluteJoint   (tag);
+            else if (strcmp(sztype, "rigid prismatic joint"  ) == 0) ParseRigidPrismaticJoint  (tag);
+            else if (strcmp(sztype, "rigid cylindrical joint") == 0) ParseRigidCylindricalJoint(tag);
+			else if (strcmp(sztype, "linear constraint"      ) == 0) ParseLinearConstraint     (tag);
 			else 
 			{
 				// If we get here, we try to create a contact interface
@@ -259,27 +259,6 @@ void FEBioContactSection::ParseRigidSphericalJoint(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-// --- R I G I D   P I N   J O I N T   I N T E R F A C E ---
-void FEBioContactSection::ParseRigidPinJoint(XMLTag& tag)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
-    
-	FERigidPinJoint* prj = new FERigidPinJoint(&fem);
-	FEParameterList& pl = prj->GetParameterList();
-	++tag;
-	do
-	{
-		if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-		++tag;
-	}
-	while (!tag.isend());
-	prj->m_nRBa--;
-	prj->m_nRBb--;
-	fem.AddNonlinearConstraint(prj);
-}
-
-//-----------------------------------------------------------------------------
 // --- R I G I D   R E V O L U T E   J O I N T   I N T E R F A C E ---
 void FEBioContactSection::ParseRigidRevoluteJoint(XMLTag& tag)
 {
@@ -308,6 +287,27 @@ void FEBioContactSection::ParseRigidPrismaticJoint(XMLTag& tag)
     FEMesh& m = fem.GetMesh();
     
     FERigidPrismaticJoint* prj = new FERigidPrismaticJoint(&fem);
+    FEParameterList& pl = prj->GetParameterList();
+    ++tag;
+    do
+    {
+        if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+        ++tag;
+    }
+    while (!tag.isend());
+    prj->m_nRBa--;
+    prj->m_nRBb--;
+    fem.AddNonlinearConstraint(prj);
+}
+
+//-----------------------------------------------------------------------------
+// --- R I G I D   C Y L I N D R I C A L   J O I N T   I N T E R F A C E ---
+void FEBioContactSection::ParseRigidCylindricalJoint(XMLTag& tag)
+{
+    FEModel& fem = *GetFEModel();
+    FEMesh& m = fem.GetMesh();
+    
+    FERigidCylindricalJoint* prj = new FERigidCylindricalJoint(&fem);
     FEParameterList& pl = prj->GetParameterList();
     ++tag;
     do

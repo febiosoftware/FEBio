@@ -99,6 +99,13 @@ bool FERigidPrismaticJoint::Init()
     m_ea0[0] = m_e0[0]; m_ea0[1] = m_e0[1]; m_ea0[2] = m_e0[2];
     m_eb0[0] = m_e0[0]; m_eb0[1] = m_e0[1]; m_eb0[2] = m_e0[2];
     
+    FEParameterList& pl = GetParameterList();
+    FEParam* pd = pl.Find("translation");
+    if (pd) {
+        m_pdLC = fem.GetLoadCurve(pd->m_nlc);
+        m_dpscl = pd->m_scl;
+    }
+    
     m_binit = true;
     
     return true;
@@ -130,6 +137,12 @@ void FERigidPrismaticJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidPrismaticJoint::Residual(FEGlobalVector& R)
 {
+    // get time at intermediate step
+    FEModel& fem = *GetFEModel();
+    double t = fem.m_ftime;
+    double dt = fem.GetCurrentStep()->m_dt;
+    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
+    
     vector<double> fa(6);
     vector<double> fb(6);
     
@@ -173,9 +186,11 @@ void FERigidPrismaticJoint::Residual(FEGlobalVector& R)
     vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
     mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
+    double dp;
+    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
+    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
     vec3d c = P*(rb + zb - ra - za) - p;
-    m_F = m_L + c*m_eps;
+    m_F = m_L + c*m_eps + ea[0]*m_Fp;
     
     vec3d ksi = vth;
     m_M = m_U + ksi*m_ups;
@@ -204,6 +219,12 @@ void FERigidPrismaticJoint::Residual(FEGlobalVector& R)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver)
 {
+    // get time at intermediate step
+    FEModel& fem = *GetFEModel();
+    double t = fem.m_ftime;
+    double dt = fem.GetCurrentStep()->m_dt;
+    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
+    
     // get m_alpha from solver
     m_alpha = dynamic_cast<FESolidSolver2*>(psolver)->m_alpha;
     
@@ -257,10 +278,12 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver)
     vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
     mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
+    double dp;
+    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
+    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
     vec3d d = rb + zb - ra - za;
     vec3d c = P*d - p;
-    m_F = m_L + c*m_eps;
+    m_F = m_L + c*m_eps + ea[0]*m_Fp;
     
     vec3d ksi = vth;
     m_M = m_U + ksi*m_ups;
@@ -284,7 +307,8 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver)
     ke[2][0] = K[2][0]; ke[2][1] = K[2][1]; ke[2][2] = K[2][2];
     
     // (1,2)
-    K = (P*zathat+Q)*(-m_eps*m_alpha);
+    K = (P*zathat+Q)*(-m_eps*m_alpha)
+    + eathat[0]*(m_Fp*m_alpha);
     ke[0][3] = K[0][0]; ke[0][4] = K[0][1]; ke[0][5] = K[0][2];
     ke[1][3] = K[1][0]; ke[1][4] = K[1][1]; ke[1][5] = K[1][2];
     ke[2][3] = K[2][0]; ke[2][4] = K[2][1]; ke[2][5] = K[2][2];
@@ -333,7 +357,8 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver)
     ke[8][0] = K[2][0]; ke[8][1] = K[2][1]; ke[8][2] = K[2][2];
     
     // (3,2)
-    K = (P*zathat+Q)*(m_eps*m_alpha);
+    K = (P*zathat+Q)*(m_eps*m_alpha)
+    - eathat[0]*(m_Fp*m_alpha);
     ke[6][3] = K[0][0]; ke[6][4] = K[0][1]; ke[6][5] = K[0][2];
     ke[7][3] = K[1][0]; ke[7][4] = K[1][1]; ke[7][5] = K[1][2];
     ke[8][3] = K[2][0]; ke[8][4] = K[2][1]; ke[8][5] = K[2][2];
@@ -432,7 +457,9 @@ bool FERigidPrismaticJoint::Augment(int naug)
     vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
     mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
+    double dp;
+    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
+    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
     c = P*(rb + zb - ra - za) - p;
     
     normF0 = sqrt(m_L*m_L);
@@ -557,9 +584,11 @@ void FERigidPrismaticJoint::Update()
     vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
     mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
+    double dp;
+    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
+    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
     vec3d c = P*(rb + zb - ra - za) - p;
-    m_F = m_L + c*m_eps;
+    m_F = m_L + c*m_eps + ea[0]*m_Fp;
     
     //    mat3ds Q = mat3dd(1) - dyad(ea[0]);
     //    vec3d q(0,0,0);

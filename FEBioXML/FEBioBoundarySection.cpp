@@ -6,9 +6,9 @@
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FEBioMech/FERigidJoint.h"
 #include "FEBioMech/FERigidSphericalJoint.h"
-#include "FEBioMech/FERigidPinJoint.h"
 #include "FEBioMech/FERigidRevoluteJoint.h"
 #include "FEBioMech/FERigidPrismaticJoint.h"
+#include "FEBioMech/FERigidCylindricalJoint.h"
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
@@ -796,23 +796,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		prj->m_nRBb--;
 		fem.AddNonlinearConstraint(prj);
 	}
-	else if (strcmp(szt, "rigid pin joint") == 0)
-	{
-		// --- R I G I D   P I N  J O I N T   I N T E R F A C E ---
-        
-		FERigidPinJoint* prj = dynamic_cast<FERigidPinJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
-		FEParameterList& pl = prj->GetParameterList();
-		++tag;
-		do
-		{
-			if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-			++tag;
-		}
-		while (!tag.isend());
-		prj->m_nRBa--;
-		prj->m_nRBb--;
-		fem.AddNonlinearConstraint(prj);
-	}
     else if (strcmp(szt, "rigid revolute joint") == 0)
     {
         // --- R I G I D   R E V O L U T E  J O I N T   I N T E R F A C E ---
@@ -835,6 +818,23 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
         // --- R I G I D   P R I S M A T I C  J O I N T   I N T E R F A C E ---
         
         FERigidPrismaticJoint* prj = dynamic_cast<FERigidPrismaticJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
+        FEParameterList& pl = prj->GetParameterList();
+        ++tag;
+        do
+        {
+            if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+            ++tag;
+        }
+        while (!tag.isend());
+        prj->m_nRBa--;
+        prj->m_nRBb--;
+        fem.AddNonlinearConstraint(prj);
+    }
+    else if (strcmp(szt, "rigid cylindrical joint") == 0)
+    {
+        // --- R I G I D   C Y L I N D R I C A L  J O I N T   I N T E R F A C E ---
+        
+        FERigidCylindricalJoint* prj = dynamic_cast<FERigidCylindricalJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
         FEParameterList& pl = prj->GetParameterList();
         ++tag;
         do

@@ -1,13 +1,13 @@
 //
-//  FERigidPrismaticJoint.h
+//  FERigidCylindricalJoint.h
 //  FEBioMech
 //
-//  Created by Gerard Ateshian on 4/20/15.
+//  Created by Gerard Ateshian on 5/9/15.
 //  Copyright (c) 2015 febio.org. All rights reserved.
 //
 
-#ifndef __FEBioMech__FERigidPrismaticJoint__
-#define __FEBioMech__FERigidPrismaticJoint__
+#ifndef __FEBioMech__FERigidCylindricalJoint__
+#define __FEBioMech__FERigidCylindricalJoint__
 
 #include "FECore/vec3d.h"
 #include "FECore/DumpFile.h"
@@ -15,18 +15,18 @@
 #include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
-//! The FERigidPrismaticJoint class implements a prismatic joint. The rigid joint
+//! The FERigidCylindricalJoint class implements a cylindrical joint. The rigid joint
 //! allows the user to connect two rigid bodies at a point in space
-//! and allow translation along a single prescribed axis.
+//! and allow rotation about, and translation along, a single prescribed axis.
 
-class FERigidPrismaticJoint : public FENLConstraint
+class FERigidCylindricalJoint : public FENLConstraint
 {
 public:
     //! constructor
-    FERigidPrismaticJoint(FEModel* pfem);
+    FERigidCylindricalJoint(FEModel* pfem);
     
     //! destructor
-    virtual ~FERigidPrismaticJoint() {}
+    virtual ~FERigidCylindricalJoint() {}
     
     //! initialization
     bool Init();
@@ -79,11 +79,16 @@ public:
     int     m_naugmax;  //! maximum number of augmentations
     
     double  m_dp;   //! prescribed translation
+    double  m_qp;   //! prescribed rotation
     FELoadCurve* m_pdLC;    // pointer to loadcurve for prescribed translation
+    FELoadCurve* m_pqLC;    // pointer to loadcurve for prescribed rotation
     double  m_dpscl;    //! scale factor for prescribed translation
+    double  m_qpscl;    //! scale factor for prescribed rotation
     double  m_time;
     bool    m_bd;   //! flag for prescribing translation
+    bool    m_bq;   //! flag for prescribing rotation
     double  m_Fp;   //! prescribed force
+    double  m_Mp;   //! prescribed moment
     
 protected:
     int		m_nID;	//!< ID of rigid joint
@@ -93,4 +98,4 @@ protected:
     DECLARE_PARAMETER_LIST();
 };
 
-#endif /* defined(__FEBioMech__FERigidPrismaticJoint__) */
+#endif /* defined(__FEBioMech__FERigidCylindricalJoint__) */

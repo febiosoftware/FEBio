@@ -5,7 +5,6 @@
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioMech/FERigidJoint.h"
 #include "FEBioMech/FERigidSphericalJoint.h"
-#include "FEBioMech/FERigidPinJoint.h"
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSoluteSolver.h"
 #include "FEBioMix/FEMultiphasicSolver.h"

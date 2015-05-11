@@ -1,38 +1,40 @@
 //
-//  FERigidRevoluteJoint.cpp
+//  FERigidCylindricalJoint.cpp
 //  FEBioMech
 //
-//  Created by Gerard Ateshian on 10/29/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
+//  Created by Gerard Ateshian on 5/9/15.
+//  Copyright (c) 2015 febio.org. All rights reserved.
 //
 
-#include "stdafx.h"
-#include "FERigidRevoluteJoint.h"
+#include "FERigidCylindricalJoint.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FESolidSolver2.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidRevoluteJoint, FENLConstraint);
-    ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
-    ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
-    ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
-    ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
-    ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
-    ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"        );
-    ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"        );
-    ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint"  );
-    ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "rotation_axis" );
-    ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "transverse_axis");
-    ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
-    ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
-    ADD_PARAMETER(m_bq  , FE_PARAM_BOOL  , "prescribed_rotation");
-    ADD_PARAMETER(m_qp  , FE_PARAM_DOUBLE, "rotation"      );
-    ADD_PARAMETER(m_Mp  , FE_PARAM_DOUBLE, "moment"        );
+BEGIN_PARAMETER_LIST(FERigidCylindricalJoint, FENLConstraint);
+ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
+ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
+ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
+ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
+ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
+ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"        );
+ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"        );
+ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint"         );
+ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "joint_axis"    );
+ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "transverse_axis");
+ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
+ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
+ADD_PARAMETER(m_bd  , FE_PARAM_BOOL  , "prescribed_translation");
+ADD_PARAMETER(m_dp  , FE_PARAM_DOUBLE, "translation"   );
+ADD_PARAMETER(m_Fp  , FE_PARAM_DOUBLE, "force"         );
+ADD_PARAMETER(m_bq  , FE_PARAM_BOOL  , "prescribed_rotation");
+ADD_PARAMETER(m_qp  , FE_PARAM_DOUBLE, "rotation"      );
+ADD_PARAMETER(m_Mp  , FE_PARAM_DOUBLE, "moment"        );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FERigidRevoluteJoint::FERigidRevoluteJoint(FEModel* pfem) : FENLConstraint(pfem)
+FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FENLConstraint(pfem)
 {
     static int count = 1;
     m_nID = count++;
@@ -43,6 +45,9 @@ FERigidRevoluteJoint::FERigidRevoluteJoint(FEModel* pfem) : FENLConstraint(pfem)
     m_naugmin = 0;
     m_naugmax = 10;
     m_alpha = 0.5;
+    m_dp = 0;
+    m_Fp = 0;
+    m_bd = false;
     m_qp = 0;
     m_Mp = 0;
     m_bq = false;
@@ -51,8 +56,13 @@ FERigidRevoluteJoint::FERigidRevoluteJoint(FEModel* pfem) : FENLConstraint(pfem)
 //-----------------------------------------------------------------------------
 //! TODO: This function is called twice: once in the Init and once in the Solve
 //!       phase. Is that necessary?
-bool FERigidRevoluteJoint::Init()
+bool FERigidCylindricalJoint::Init()
 {
+    if (m_bd && (m_Fp != 0)) {
+        felog.printbox("FATAL ERROR", "Translation and force cannot be prescribed simultaneously in rigid prismatic joint %d\n", m_nID);
+        return false;
+    }
+    
     if (m_bq && (m_Mp != 0)) {
         felog.printbox("FATAL ERROR", "Rotation and moment cannot be prescribed simultaneously in rigid revolute joint %d\n", m_nID);
         return false;
@@ -100,10 +110,17 @@ bool FERigidRevoluteJoint::Init()
     m_eb0[0] = m_e0[0]; m_eb0[1] = m_e0[1]; m_eb0[2] = m_e0[2];
     
     FEParameterList& pl = GetParameterList();
-    FEParam* p = pl.Find("rotation");
-    if (p) {
-        m_pqLC = fem.GetLoadCurve(p->m_nlc);
-        m_qpscl = p->m_scl;
+    
+    FEParam* pd = pl.Find("translation");
+    if (pd) {
+        m_pdLC = fem.GetLoadCurve(pd->m_nlc);
+        m_dpscl = pd->m_scl;
+    }
+    
+    FEParam* pq = pl.Find("rotation");
+    if (pq) {
+        m_pqLC = fem.GetLoadCurve(pq->m_nlc);
+        m_qpscl = pq->m_scl;
     }
     
     m_binit = true;
@@ -113,7 +130,7 @@ bool FERigidRevoluteJoint::Init()
 
 //-----------------------------------------------------------------------------
 //! create a shallow copy
-void FERigidRevoluteJoint::ShallowCopy(DumpStream& dmp, bool bsave)
+void FERigidCylindricalJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
     if (bsave)
     {
@@ -122,6 +139,7 @@ void FERigidRevoluteJoint::ShallowCopy(DumpStream& dmp, bool bsave)
         dmp << m_ea0[0] << m_ea0[1] << m_ea0[2];
         dmp << m_eb0[0] << m_eb0[1] << m_eb0[2];
         dmp << m_M << m_U;
+        dmp << m_dp << m_Fp;
         dmp << m_qp << m_Mp;
     }
     else
@@ -131,13 +149,14 @@ void FERigidRevoluteJoint::ShallowCopy(DumpStream& dmp, bool bsave)
         dmp >> m_ea0[0] >> m_ea0[1] >> m_ea0[2];
         dmp >> m_eb0[0] >> m_eb0[1] >> m_eb0[2];
         dmp >> m_M >> m_U;
+        dmp >> m_dp >> m_Fp;
         dmp >> m_qp >> m_Mp;
     }
 }
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidRevoluteJoint::Residual(FEGlobalVector& R)
+void FERigidCylindricalJoint::Residual(FEGlobalVector& R)
 {
     // get time at intermediate step
     FEModel& fem = *GetFEModel();
@@ -183,11 +202,13 @@ void FERigidRevoluteJoint::Residual(FEGlobalVector& R)
     eb[0] = ebt[0]*m_alpha + ebp[0]*(1-m_alpha);
     eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
     eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
-
-    mat3ds P = mat3dd(1);
-    vec3d p(0,0,0);
+    
+    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
+    double dp;
+    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
+    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
     vec3d c = P*(rb + zb - ra - za) - p;
-    m_F = m_L + c*m_eps;
+    m_F = m_L + c*m_eps + ea[0]*m_Fp;
     
     vec3d ksi = (ea[0] ^ eb[0])/2;
     if (m_bq) {
@@ -222,7 +243,7 @@ void FERigidRevoluteJoint::Residual(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
+void FERigidCylindricalJoint::StiffnessMatrix(FESolver* psolver)
 {
     // get time at intermediate step
     FEModel& fem = *GetFEModel();
@@ -279,10 +300,13 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
     mat3d zbhat; zbhat.skew(zb);
     mat3d zbthat; zbthat.skew(zbt);
     
-    mat3ds P = mat3dd(1);
-    vec3d p(0,0,0);
-    vec3d c = P*(rb + zb - ra - za) - p;
-    m_F = m_L + c*m_eps;
+    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
+    double dp;
+    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
+    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
+    vec3d d = rb + zb - ra - za;
+    vec3d c = P*d - p;
+    m_F = m_L + c*m_eps + ea[0]*m_Fp;
     mat3dd I(1);
     
     vec3d ksi = (ea[0] ^ eb[0])/2;
@@ -304,6 +328,7 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
         eathat[j] = skew(eat[j]);
         ebthat[j] = skew(ebt[j]);
     }
+    mat3d Q = m_bd ? eathat[0]*m_dp : ((ea[0] & d) + mat3dd(1)*(ea[0]*d))*eathat[0];
     mat3d K, Wba, Wab;
     Wba = (ebhat[0]*eathat[0])/2;
     Wab = (eahat[0]*ebthat[0])/2;
@@ -322,101 +347,103 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
     }
     
     // (1,1)
-    K = I*(m_alpha*m_eps);
+    K = P*(m_alpha*m_eps);
     ke[0][0] = K[0][0]; ke[0][1] = K[0][1]; ke[0][2] = K[0][2];
     ke[1][0] = K[1][0]; ke[1][1] = K[1][1]; ke[1][2] = K[1][2];
     ke[2][0] = K[2][0]; ke[2][1] = K[2][1]; ke[2][2] = K[2][2];
     
     // (1,2)
-    K = zathat*(-m_eps*m_alpha);
+    K = (P*zathat+Q)*(-m_eps*m_alpha)
+    + eathat[0]*(m_Fp*m_alpha);
     ke[0][3] = K[0][0]; ke[0][4] = K[0][1]; ke[0][5] = K[0][2];
     ke[1][3] = K[1][0]; ke[1][4] = K[1][1]; ke[1][5] = K[1][2];
     ke[2][3] = K[2][0]; ke[2][4] = K[2][1]; ke[2][5] = K[2][2];
     
     // (1,3)
-    K = I*(-m_alpha*m_eps);
+    K = P*(-m_alpha*m_eps);
     ke[0][6] = K[0][0]; ke[0][7] = K[0][1]; ke[0][8] = K[0][2];
     ke[1][6] = K[1][0]; ke[1][7] = K[1][1]; ke[1][8] = K[1][2];
     ke[2][6] = K[2][0]; ke[2][7] = K[2][1]; ke[2][8] = K[2][2];
     
     // (1,4)
-    K = zbthat*(m_alpha*m_eps);
+    K = P*zbthat*(m_alpha*m_eps);
     ke[0][9] = K[0][0]; ke[0][10] = K[0][1]; ke[0][11] = K[0][2];
     ke[1][9] = K[1][0]; ke[1][10] = K[1][1]; ke[1][11] = K[1][2];
     ke[2][9] = K[2][0]; ke[2][10] = K[2][1]; ke[2][11] = K[2][2];
     
     // (2,1)
-    K = zahat*(m_alpha*m_eps);
+    K = zahat*P*(m_alpha*m_eps);
     ke[3][0] = K[0][0]; ke[3][1] = K[0][1]; ke[3][2] = K[0][2];
     ke[4][0] = K[1][0]; ke[4][1] = K[1][1]; ke[4][2] = K[1][2];
     ke[5][0] = K[2][0]; ke[5][1] = K[2][1]; ke[5][2] = K[2][2];
     
     // (2,2)
-    K = (zahat*zathat*m_eps + Wba*m_ups)*(-m_alpha)
+    K = (zahat*(P*zathat+Q)*m_eps + Wba*m_ups)*(-m_alpha)
     + eathat[0]*(m_Mp*m_alpha);
     ke[3][3] = K[0][0]; ke[3][4] = K[0][1]; ke[3][5] = K[0][2];
     ke[4][3] = K[1][0]; ke[4][4] = K[1][1]; ke[4][5] = K[1][2];
     ke[5][3] = K[2][0]; ke[5][4] = K[2][1]; ke[5][5] = K[2][2];
     
     // (2,3)
-    K = zahat*(-m_alpha*m_eps);
+    K = zahat*P*(-m_alpha*m_eps);
     ke[3][6] = K[0][0]; ke[3][7] = K[0][1]; ke[3][8] = K[0][2];
     ke[4][6] = K[1][0]; ke[4][7] = K[1][1]; ke[4][8] = K[1][2];
     ke[5][6] = K[2][0]; ke[5][7] = K[2][1]; ke[5][8] = K[2][2];
     
     // (2,4)
-    K = (zahat*zbthat*m_eps + Wab*m_ups)*m_alpha;
+    K = (zahat*P*zbthat*m_eps + Wab*m_ups)*m_alpha;
     ke[3][9] = K[0][0]; ke[3][10] = K[0][1]; ke[3][11] = K[0][2];
     ke[4][9] = K[1][0]; ke[4][10] = K[1][1]; ke[4][11] = K[1][2];
     ke[5][9] = K[2][0]; ke[5][10] = K[2][1]; ke[5][11] = K[2][2];
     
     
     // (3,1)
-    K = I*(-m_alpha*m_eps);
+    K = P*(-m_alpha*m_eps);
     ke[6][0] = K[0][0]; ke[6][1] = K[0][1]; ke[6][2] = K[0][2];
     ke[7][0] = K[1][0]; ke[7][1] = K[1][1]; ke[7][2] = K[1][2];
     ke[8][0] = K[2][0]; ke[8][1] = K[2][1]; ke[8][2] = K[2][2];
     
     // (3,2)
-    K = zathat*(m_eps*m_alpha);
+    K = (P*zathat+Q)*(m_eps*m_alpha)
+    - eathat[0]*(m_Fp*m_alpha);
     ke[6][3] = K[0][0]; ke[6][4] = K[0][1]; ke[6][5] = K[0][2];
     ke[7][3] = K[1][0]; ke[7][4] = K[1][1]; ke[7][5] = K[1][2];
     ke[8][3] = K[2][0]; ke[8][4] = K[2][1]; ke[8][5] = K[2][2];
     
     // (3,3)
-    K = I*(m_alpha*m_eps);
+    K = P*(m_alpha*m_eps);
     ke[6][6] = K[0][0]; ke[6][7] = K[0][1]; ke[6][8] = K[0][2];
     ke[7][6] = K[1][0]; ke[7][7] = K[1][1]; ke[7][8] = K[1][2];
     ke[8][6] = K[2][0]; ke[8][7] = K[2][1]; ke[8][8] = K[2][2];
     
     // (3,4)
-    K = zbthat*(-m_alpha*m_eps);
+    K = P*zbthat*(-m_alpha*m_eps);
     ke[6][9] = K[0][0]; ke[6][10] = K[0][1]; ke[6][11] = K[0][2];
     ke[7][9] = K[1][0]; ke[7][10] = K[1][1]; ke[7][11] = K[1][2];
     ke[8][9] = K[2][0]; ke[8][10] = K[2][1]; ke[8][11] = K[2][2];
     
-
+    
     // (4,1)
-    K = zbhat*(-m_alpha*m_eps);
+    K = zbhat*P*(-m_alpha*m_eps);
     ke[9 ][0] = K[0][0]; ke[ 9][1] = K[0][1]; ke[ 9][2] = K[0][2];
     ke[10][0] = K[1][0]; ke[10][1] = K[1][1]; ke[10][2] = K[1][2];
     ke[11][0] = K[2][0]; ke[11][1] = K[2][1]; ke[11][2] = K[2][2];
     
     // (4,2)
-    K = (zbhat*zathat*m_eps + Wba*m_ups)*m_alpha
+    K = (zbhat*(P*zathat+Q)*m_eps + Wba*m_ups)*m_alpha
     - eathat[0]*(m_Mp*m_alpha);
     ke[9 ][3] = K[0][0]; ke[ 9][4] = K[0][1]; ke[ 9][5] = K[0][2];
     ke[10][3] = K[1][0]; ke[10][4] = K[1][1]; ke[10][5] = K[1][2];
     ke[11][3] = K[2][0]; ke[11][4] = K[2][1]; ke[11][5] = K[2][2];
     
     // (4,3)
-    K = zbhat*(m_alpha*m_eps);
+    K = zbhat*P*(m_alpha*m_eps);
     ke[9 ][6] = K[0][0]; ke[ 9][7] = K[0][1]; ke[ 9][8] = K[0][2];
     ke[10][6] = K[1][0]; ke[10][7] = K[1][1]; ke[10][8] = K[1][2];
     ke[11][6] = K[2][0]; ke[11][7] = K[2][1]; ke[11][8] = K[2][2];
     
     // (4,4)
-    K = (zbhat*zbthat*m_eps + Wab*m_ups)*(-m_alpha);
+    K = (zbhat*P*zbthat*m_eps + Wab*m_ups)*(-m_alpha);
     ke[9 ][9] = K[0][0]; ke[ 9][10] = K[0][1]; ke[ 9][11] = K[0][2];
     ke[10][9] = K[1][0]; ke[10][10] = K[1][1]; ke[10][11] = K[1][2];
     ke[11][9] = K[2][0]; ke[11][10] = K[2][1]; ke[11][11] = K[2][2];
@@ -431,7 +458,7 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidRevoluteJoint::Augment(int naug)
+bool FERigidCylindricalJoint::Augment(int naug)
 {
     // get time at intermediate step
     FEModel& fem = *GetFEModel();
@@ -480,8 +507,10 @@ bool FERigidRevoluteJoint::Augment(int naug)
     eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
     eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
     
-    mat3ds P = mat3dd(1);
-    vec3d p(0,0,0);
+    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
+    double dp;
+    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
+    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
     c = P*(rb + zb - ra - za) - p;
     
     normF0 = sqrt(m_L*m_L);
@@ -543,7 +572,7 @@ bool FERigidRevoluteJoint::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidRevoluteJoint::Serialize(DumpFile& ar)
+void FERigidCylindricalJoint::Serialize(DumpFile& ar)
 {
     if (ar.IsSaving())
     {
@@ -568,7 +597,7 @@ void FERigidRevoluteJoint::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidRevoluteJoint::Update()
+void FERigidCylindricalJoint::Update()
 {
     // get time at intermediate step
     FEModel& fem = *GetFEModel();
@@ -613,10 +642,12 @@ void FERigidRevoluteJoint::Update()
     eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
     eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
     
-    mat3ds P = mat3dd(1);
-    vec3d p(0,0,0);
+    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
+    double dp;
+    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
+    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
     vec3d c = P*(rb + zb - ra - za) - p;
-    m_F = m_L + c*m_eps;
+    m_F = m_L + c*m_eps + ea[0]*m_Fp;
     
     vec3d ksi = (ea[0] ^ eb[0])/2;
     if (m_bq) {
@@ -632,7 +663,7 @@ void FERigidRevoluteJoint::Update()
 }
 
 //-----------------------------------------------------------------------------
-void FERigidRevoluteJoint::Reset()
+void FERigidCylindricalJoint::Reset()
 {
     m_F = vec3d(0,0,0);
     m_L = vec3d(0,0,0);
