@@ -64,20 +64,11 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FESolver(pfem)
 	m_neq = 0;
 	m_plinsolve = 0;
 
-    FEAnalysis* pstep = m_fem.GetCurrentStep();
-    
-    // see if this is a dynamic problem
-    if (pstep->m_nanalysis == FE_DYNAMIC) {
-        // default Hilber-Hughes-Taylor parameters for unconditionally stable midpoint time integration
-        m_alpha = 0.5;
-        m_beta  = 0.5;
-        m_gamma = 1.0;
-    } else {
-        // use trapezoidal integration for static analyses
-        m_alpha = 1.0;
-        m_beta  = 0.25;
-        m_gamma = 0.5;
-    }
+
+	// default Newmark parameters for trapezoidal time integration
+    m_alpha = 1.0;
+	m_beta  = 0.25;
+	m_gamma = 0.5;
 
 	m_baugment = false;
 }
@@ -451,9 +442,23 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 		if ((n = node.m_ID[DOF_Z]) >= 0) node.m_rt.z = node.m_r0.z + m_Ut[n] + m_Ui[n] + ui[n];
 
 		// rotational dofs
-		if ((n = node.m_ID[DOF_U]) >= 0) node.m_Dt.x = node.m_D0.x + m_Ut[n] + m_Ui[n] + ui[n];
-		if ((n = node.m_ID[DOF_V]) >= 0) node.m_Dt.y = node.m_D0.y + m_Ut[n] + m_Ui[n] + ui[n];
-		if ((n = node.m_ID[DOF_W]) >= 0) node.m_Dt.z = node.m_D0.z + m_Ut[n] + m_Ui[n] + ui[n];
+        vec3d vD0 = vec3d(0,0,0), vDt = vec3d(0,0,0), vUt = vec3d(0,0,0), vUi = vec3d(0,0,0), vui = vec3d(0,0,0);
+        double tD0 = 0, tUt = 0, tUi = 0, tDt = 0;
+        double dtUt = 0, dtUi = 0, dtui = 0;
+        vec3d dqUt, dqUi, dqui;
+        quatd qUt, qUi, qui;
+//		if ((n = node.m_ID[DOF_U]) >= 0) node.m_Dt.x = node.m_D0.x + m_Ut[n] + m_Ui[n] + ui[n];
+//		if ((n = node.m_ID[DOF_V]) >= 0) node.m_Dt.y = node.m_D0.y + m_Ut[n] + m_Ui[n] + ui[n];
+//		if ((n = node.m_ID[DOF_W]) >= 0) node.m_Dt.z = node.m_D0.z + m_Ut[n] + m_Ui[n] + ui[n];
+        if ((n = node.m_ID[DOF_U]) >= 0) {vD0.x = node.m_D0.x; vUt.x = m_Ut[n] + m_Ui[n] + ui[n];}
+        if ((n = node.m_ID[DOF_V]) >= 0) {vD0.y = node.m_D0.y; vUt.y = m_Ut[n] + m_Ui[n] + ui[n];}
+        if ((n = node.m_ID[DOF_W]) >= 0) {vD0.z = node.m_D0.z; vUt.z = m_Ut[n] + m_Ui[n] + ui[n];}
+        tD0 = vD0.unit(); if (tD0 > 0) { dtUt = vD0*vUt; dqUt = (vD0 ^ vUt)/tD0; qUt = quatd(dqUt); qUt.RotateVector(vD0); }
+        tDt = tD0 + dtUt;
+        vDt = vD0*tDt;
+        if ((n = node.m_ID[DOF_U]) >= 0) node.m_Dt.x = vDt.x;
+        if ((n = node.m_ID[DOF_V]) >= 0) node.m_Dt.y = vDt.y;
+        if ((n = node.m_ID[DOF_W]) >= 0) node.m_Dt.z = vDt.z;
 	}
 
 	// make sure the prescribed displacements are fullfilled
@@ -613,11 +618,30 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
 		if ((n = node.m_ID[DOF_Y]) >= 0) Ui[n] += ui[n];
 		if ((n = node.m_ID[DOF_Z]) >= 0) Ui[n] += ui[n];
         
-		// rotational dofs
         // TODO: modify rotational update to account for exponential map or Cayley transform
-		if ((n = node.m_ID[DOF_U]) >= 0) Ui[n] += ui[n];
-		if ((n = node.m_ID[DOF_V]) >= 0) Ui[n] += ui[n];
-		if ((n = node.m_ID[DOF_W]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[DOF_U]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[DOF_V]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[DOF_W]) >= 0) Ui[n] += ui[n];
+		// rotational dofs account for exponential map or Cayley transform
+/*        quatd qui;
+        vec3d vUi(0,0,0);
+        vec3d vui(0,0,0);
+        if ((n = node.m_ID[DOF_U]) >= 0) { vUi.x = Ui[n]; vui.x = ui[n]; }
+        if ((n = node.m_ID[DOF_V]) >= 0) { vUi.y = Ui[n]; vui.y = ui[n]; }
+        if ((n = node.m_ID[DOF_W]) >= 0) { vUi.z = Ui[n]; vui.z = ui[n]; }
+        double t = vUi.unit();
+        if (t > 0) {
+            double dt = vUi*vui;
+            vec3d dq = (vUi ^ vui)/t;
+            if (emap) qui = quatd(dq);
+            else qui = quatd(2*atan(dq.norm()/2),dq);     // Cayley transform
+            qui.RotateVector(vUi);
+            t += dt;
+            vUi *= t;
+            if ((n = node.m_ID[DOF_U]) >= 0) Ui[n] = vUi.x;
+            if ((n = node.m_ID[DOF_V]) >= 0) Ui[n] = vUi.y;
+            if ((n = node.m_ID[DOF_W]) >= 0) Ui[n] = vUi.z;
+        }*/
 	}
     
 }
@@ -751,17 +775,6 @@ void FESolidSolver2::UpdateRigidBodies(vector<double>& ui)
 			RB.m_Ut[4] = vUt.y;
 			RB.m_Ut[5] = vUt.z;
     
-            // acceleration and velocity of center of mass
-            RB.m_at = (RB.m_rt - RB.m_rp)*b - RB.m_vp*a + RB.m_ap*c;
-            RB.m_vt = RB.m_vp + (RB.m_ap*(1.0 - m_gamma) + RB.m_at*m_gamma)*dt;
-            // angular acceleration and velocity of rigid body
-            quatd q = RB.m_qt*RB.m_qp.Inverse();
-            q.MakeUnit();
-            vec3d vq = q.GetVector()*(2*tan(q.GetAngle()/2));  // Cayley transform
-            RB.m_wt = vq*(a*m_gamma) - RB.m_wp + (RB.m_wp + RB.m_alp*dt/2.)*(2-m_gamma/m_beta);
-            q.RotateVector(RB.m_wt);
-            RB.m_alt = vq*b - RB.m_wp*a + RB.m_alp*c;
-            q.RotateVector(RB.m_alt);
     
 			// update the mesh' nodes
 			FEMesh& mesh = m_fem.GetMesh();

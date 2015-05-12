@@ -9,6 +9,8 @@
 #include "FEBioMech/FERigidRevoluteJoint.h"
 #include "FEBioMech/FERigidPrismaticJoint.h"
 #include "FEBioMech/FERigidCylindricalJoint.h"
+#include "FEBioMech/FERigidSpring.h"
+#include "FEBioMech/FERigidDamper.h"
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
@@ -835,6 +837,40 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
         // --- R I G I D   C Y L I N D R I C A L  J O I N T   I N T E R F A C E ---
         
         FERigidCylindricalJoint* prj = dynamic_cast<FERigidCylindricalJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
+        FEParameterList& pl = prj->GetParameterList();
+        ++tag;
+        do
+        {
+            if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+            ++tag;
+        }
+        while (!tag.isend());
+        prj->m_nRBa--;
+        prj->m_nRBb--;
+        fem.AddNonlinearConstraint(prj);
+    }
+    else if (strcmp(szt, "rigid spring") == 0)
+    {
+        // --- R I G I D   S P R I N G   I N T E R F A C E ---
+        
+        FERigidSpring* prj = dynamic_cast<FERigidSpring*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
+        FEParameterList& pl = prj->GetParameterList();
+        ++tag;
+        do
+        {
+            if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+            ++tag;
+        }
+        while (!tag.isend());
+        prj->m_nRBa--;
+        prj->m_nRBb--;
+        fem.AddNonlinearConstraint(prj);
+    }
+    else if (strcmp(szt, "rigid damper") == 0)
+    {
+        // --- R I G I D   D A M P E R   I N T E R F A C E ---
+        
+        FERigidDamper* prj = dynamic_cast<FERigidDamper*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
         FEParameterList& pl = prj->GetParameterList();
         ++tag;
         do

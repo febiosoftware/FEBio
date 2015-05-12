@@ -7,6 +7,8 @@
 #include "FEBioMech/FERigidPrismaticJoint.h"
 #include "FEBioMech/FERigidCylindricalJoint.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
+#include "FEBioMech/FERigidSpring.h"
+#include "FEBioMech/FERigidDamper.h"
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
@@ -39,6 +41,8 @@ void FEBioContactSection::Parse(XMLTag& tag)
             else if (strcmp(sztype, "rigid revolute joint"   ) == 0) ParseRigidRevoluteJoint   (tag);
             else if (strcmp(sztype, "rigid prismatic joint"  ) == 0) ParseRigidPrismaticJoint  (tag);
             else if (strcmp(sztype, "rigid cylindrical joint") == 0) ParseRigidCylindricalJoint(tag);
+            else if (strcmp(sztype, "rigid spring"           ) == 0) ParseRigidSpring          (tag);
+            else if (strcmp(sztype, "rigid damper"           ) == 0) ParseRigidDamper          (tag);
 			else if (strcmp(sztype, "linear constraint"      ) == 0) ParseLinearConstraint     (tag);
 			else 
 			{
@@ -84,7 +88,7 @@ void FEBioContactSection::ParseContactInterface(XMLTag& tag, FESurfacePairIntera
 			if (tag == "surface")
 			{
 				const char* sztype = tag.AttributeValue("type");
-				int ntype;
+				int ntype = 0;
 				if (strcmp(sztype, "master") == 0) ntype = 1;
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
@@ -144,7 +148,6 @@ void FEBioContactSection::ParseContactInterface(XMLTag& tag, FESurfacePairIntera
 void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
 
 	FERigidWallInterface* ps = new FERigidWallInterface(&fem);
 	fem.AddSurfacePairInteraction(ps);
@@ -181,7 +184,6 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
 
 	int NMAT = fem.Materials();
 
@@ -221,7 +223,6 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 void FEBioContactSection::ParseRigidJoint(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
 
 	FERigidJoint* prj = new FERigidJoint(&fem);
 	FEParameterList& pl = prj->GetParameterList();
@@ -242,7 +243,6 @@ void FEBioContactSection::ParseRigidJoint(XMLTag& tag)
 void FEBioContactSection::ParseRigidSphericalJoint(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
     
 	FERigidSphericalJoint* prj = new FERigidSphericalJoint(&fem);
 	FEParameterList& pl = prj->GetParameterList();
@@ -263,7 +263,6 @@ void FEBioContactSection::ParseRigidSphericalJoint(XMLTag& tag)
 void FEBioContactSection::ParseRigidRevoluteJoint(XMLTag& tag)
 {
     FEModel& fem = *GetFEModel();
-    FEMesh& m = fem.GetMesh();
     
     FERigidRevoluteJoint* prj = new FERigidRevoluteJoint(&fem);
     FEParameterList& pl = prj->GetParameterList();
@@ -284,7 +283,6 @@ void FEBioContactSection::ParseRigidRevoluteJoint(XMLTag& tag)
 void FEBioContactSection::ParseRigidPrismaticJoint(XMLTag& tag)
 {
     FEModel& fem = *GetFEModel();
-    FEMesh& m = fem.GetMesh();
     
     FERigidPrismaticJoint* prj = new FERigidPrismaticJoint(&fem);
     FEParameterList& pl = prj->GetParameterList();
@@ -305,9 +303,48 @@ void FEBioContactSection::ParseRigidPrismaticJoint(XMLTag& tag)
 void FEBioContactSection::ParseRigidCylindricalJoint(XMLTag& tag)
 {
     FEModel& fem = *GetFEModel();
-    FEMesh& m = fem.GetMesh();
     
     FERigidCylindricalJoint* prj = new FERigidCylindricalJoint(&fem);
+    FEParameterList& pl = prj->GetParameterList();
+    ++tag;
+    do
+    {
+        if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+        ++tag;
+    }
+    while (!tag.isend());
+    prj->m_nRBa--;
+    prj->m_nRBb--;
+    fem.AddNonlinearConstraint(prj);
+}
+
+//-----------------------------------------------------------------------------
+// --- R I G I D   S P R I N G   I N T E R F A C E ---
+void FEBioContactSection::ParseRigidSpring(XMLTag& tag)
+{
+    FEModel& fem = *GetFEModel();
+    
+    FERigidSpring* prj = new FERigidSpring(&fem);
+    FEParameterList& pl = prj->GetParameterList();
+    ++tag;
+    do
+    {
+        if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+        ++tag;
+    }
+    while (!tag.isend());
+    prj->m_nRBa--;
+    prj->m_nRBb--;
+    fem.AddNonlinearConstraint(prj);
+}
+
+//-----------------------------------------------------------------------------
+// --- R I G I D   D A M P E R   I N T E R F A C E ---
+void FEBioContactSection::ParseRigidDamper(XMLTag& tag)
+{
+    FEModel& fem = *GetFEModel();
+    
+    FERigidDamper* prj = new FERigidDamper(&fem);
     FEParameterList& pl = prj->GetParameterList();
     ++tag;
     do

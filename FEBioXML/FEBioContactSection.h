@@ -18,6 +18,8 @@ protected:
     void ParseRigidRevoluteJoint   (XMLTag& tag);
     void ParseRigidPrismaticJoint  (XMLTag& tag);
     void ParseRigidCylindricalJoint(XMLTag& tag);
+    void ParseRigidSpring          (XMLTag& tag);
+    void ParseRigidDamper          (XMLTag& tag);
 	void ParseLinearConstraint     (XMLTag& tag);
 
 protected:
