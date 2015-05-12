@@ -1781,3 +1781,51 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, vector<float>& a)
 	}
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+//! Store the average Euler-lagrange strain
+bool FEPlotLagrangeStrain::Save(FEDomain& dom, vector<float>& a)
+{
+	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+	if ((pme == 0) || pme->IsRigid()) return false;
+
+	// write solid element data
+	int N = dom.Elements();
+	for (int i = 0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		float s[6] = { 0 };
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double)nint;
+		mat3dd I(1.0); // identity tensor
+
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		// we output the average stress values of the gauss points
+		for (int j = 0; j<nint; ++j)
+		{
+			FEElasticMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+			if (ppt)
+			{
+				mat3d C = ppt->RightCauchyGreen();
+				mat3ds E = ((C - I)*0.5).sym();
+				s[0] += (float)(f*E.xx());
+				s[1] += (float)(f*E.yy());
+				s[2] += (float)(f*E.zz());
+				s[3] += (float)(f*E.xy());
+				s[4] += (float)(f*E.yz());
+				s[5] += (float)(f*E.xz());
+			}
+		}
+
+		a.push_back(s[0]);
+		a.push_back(s[1]);
+		a.push_back(s[2]);
+		a.push_back(s[3]);
+		a.push_back(s[4]);
+		a.push_back(s[5]);
+	}
+
+	return true;
+}

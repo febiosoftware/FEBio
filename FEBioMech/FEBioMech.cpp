@@ -375,6 +375,7 @@ REGISTER_FECORE_CLASS(FEPlotSPRTestLinear		 , FEPLOTDATA_ID, "SPR test linear"  
 REGISTER_FECORE_CLASS(FEPlotSPRTestQuadratic	 , FEPLOTDATA_ID, "SPR test quadratic"    );
 REGISTER_FECORE_CLASS(FEPlotNodalStresses		 , FEPLOTDATA_ID, "nodal stress"		  );
 REGISTER_FECORE_CLASS(FEPlotVolumePressure       , FEPLOTDATA_ID, "volume pressure"       );
+REGISTER_FECORE_CLASS(FEPlotLagrangeStrain       , FEPLOTDATA_ID, "Lagrange strain"       );
 
 // LTE - 2O continuum fields
 REGISTER_FECORE_CLASS(FEPlotElementGnorm         , FEPLOTDATA_ID, "G norm"                );              

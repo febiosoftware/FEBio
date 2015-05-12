@@ -507,3 +507,12 @@ public:
 	FEPlotNodalStresses(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_MULT){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Lagrange strains
+class FEPlotLagrangeStrain : public FEDomainData
+{
+public:
+	FEPlotLagrangeStrain(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
