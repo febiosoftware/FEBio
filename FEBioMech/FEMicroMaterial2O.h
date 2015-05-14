@@ -31,7 +31,11 @@ public:
 public:
 	tens3drs   m_G;				// LTE - Deformation Hessian
 	tens3ds    m_tau;			// LTE - Cauchy stress moment
-	
+	tens3drs   m_Gi;
+
+	tens3drs   m_G_prev; 		// LTE - Deformation Hessian
+	tens3ds    m_tau_prev;		// LTE - Cauchy stress moment
+
 	mat3d      m_PK1;			// LTE - 1st Piola-Kirchhoff stress
 	tens3drs   m_QK1;			// LTE - 1st Piola-Kirchhoff stress moment
 
@@ -47,6 +51,8 @@ public:
 	mat3ds     m_e;				// LTE - Euler-Almansi strain
 	tens3ds    m_h;				// LTE - Euler-Almansi strain graident
 
+	double     m_macro_energy;	// LTE - Macroscopic strain energy
+	double	   m_micro_energy;	// LTE - Volume-average of strain energy throughout the RVE solution
 	double	   m_energy_diff;	// LTE - Difference between macro energy and volume averaged energy of RVE (should be zero) 
 
 	tens4ds	   m_Ca;			//!< averaged material stiffness

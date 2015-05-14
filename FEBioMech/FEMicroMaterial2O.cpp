@@ -15,16 +15,23 @@ FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterial
 {
 	m_tau.zero();
 	m_G.zero();
+	m_Gi.zero();
+
 	m_inf_str.zero();
 	m_inf_str_grad.zero();
 	m_E.zero();
 	m_H.zero();
 	m_e.zero();
 	m_h.zero();
+	m_macro_energy = 0.;
+	m_micro_energy = 0.;
 	m_energy_diff = 0.;
 	m_Ca.zero();
 	m_Da.zero();
 	m_Ea.zero();
+	
+	m_G_prev.zero();
+	m_tau_prev.zero();
 }
 
 //-----------------------------------------------------------------------------
@@ -534,6 +541,7 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on)
 	FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
 	mat3d F = pt.m_F;
 	tens3drs G = mmpt2O.m_G;
+	mmpt2O.m_tau_prev = mmpt2O.m_tau;
 
 	// Create a local copy of the rve
 	FEModel rve;
@@ -930,12 +938,13 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 
 	mat3d Finv = F.inverse();
 	mat3d Finvtrans = Finv.transpose();
-	tens3drs Ginv; Ginv = G; Ginv.contractleg2(Finv,1); Ginv.contractleg2(Finv,2); Ginv.contractleg2(Finv,3);
+	tens3drs Ginv; Ginv = G; Ginv.contractleg2(Finv,1); Ginv.contractleg2(Finv,2); Ginv.contractleg2(Finv,3); Ginv /= 27;
 	tens3dls Ginvtrans = Ginv.transpose();
 	
 	vec3d x = pt.m_rt;
 	vec3d X = pt.m_r0;
 
+	
 	// calculate infinitesimal strain
 	mmpt2O.m_inf_str = ((F.transpose() + F)*0.5 - mat3dd(1)).sym();
 	tens3d inf_strain_grad_nosym;
@@ -982,8 +991,8 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	
 	// calculate the energy difference between macro point and RVE
 	// to verify that we have satisfied the Hill-Mandel condition
-	double macro_energy = pt.m_s.dotdot(mmpt2O.m_e) + mmpt2O.m_tau.tripledot3s(mmpt2O.m_h);
-
+	mmpt2O.m_macro_energy = pt.m_s.dotdot(mmpt2O.m_e) + mmpt2O.m_tau.tripledot3s(mmpt2O.m_h);
+	
 	double rve_energy_avg = 0.;
 	int nint; 
 	double* w;
@@ -1011,8 +1020,9 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 		}
 	}
 
-	rve_energy_avg /= v;
-	mmpt2O.m_energy_diff = fabs(macro_energy - rve_energy_avg);
+
+	mmpt2O.m_micro_energy = rve_energy_avg/v;
+	mmpt2O.m_energy_diff = fabs(mmpt2O.m_macro_energy - mmpt2O.m_micro_energy);
 }
 
 //-----------------------------------------------------------------------------

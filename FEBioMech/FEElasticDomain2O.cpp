@@ -40,6 +40,7 @@ void FEElasticDomain2O::InitElements()
 			pt.m_rt = rt;
 
 			pt.m_J = defgrad(el, pt.m_F, j);
+			pt2O.m_G_prev = pt2O.m_G;
 			defhess(el, pt2O.m_G, j);
 			mp.Init(false);
 		}
@@ -48,7 +49,6 @@ void FEElasticDomain2O::InitElements()
 
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
-
 void FEElasticDomain2O::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
@@ -156,7 +156,6 @@ void FEElasticDomain2O::ElementInternalForce(FESolidElement& el, vector<double>&
 //-----------------------------------------------------------------------------
 //! Update element state data (mostly stresses, but some other stuff as well)
 //! \todo Remove the remodeling solid stuff
-
 void FEElasticDomain2O::UpdateElementStress(int iel, double dt)
 {
 	// get the solid element
@@ -196,6 +195,7 @@ void FEElasticDomain2O::UpdateElementStress(int iel, double dt)
 
 		// get the deformation gradient and determinant
 		pt.m_J = defgrad(el, pt.m_F, n);
+		pt2O.m_G_prev = pt2O.m_G;
 		defhess(el, pt2O.m_G, n);
 
 		// calculate the stress at this material point

@@ -669,6 +669,7 @@ void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3ds
 	mat3d Finv = F.inverse();
 	mat3d Finvtrans = Finv.transpose();
 	mat3d Ftrans = F.transpose();
+	
 	vec3d x = pt.m_rt;
 	vec3d X = pt.m_r0;
 

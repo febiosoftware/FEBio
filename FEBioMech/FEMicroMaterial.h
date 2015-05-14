@@ -31,7 +31,7 @@ public:
 	mat3ds     m_inf_str;		// LTE - infinitesimal strain
 	mat3ds     m_E;				// LTE - Green-Lagrange strain
 	mat3ds     m_e;				// LTE - Euler-Almansi strain
-
+	
 	double	   m_energy_diff;	// LTE - Difference between macro energy and volume averaged energy of RVE (should be zero)
 
 	tens4ds	m_Ka;	//!< averaged material stiffness
