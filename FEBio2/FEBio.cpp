@@ -587,6 +587,12 @@ bool Configure(FEBioModel& fem, const char *szfile)
 						tag.value(n);
 						  //						omp_set_num_threads(n);
 					}
+					else if (tag == "output_negative_jacobians")
+					{
+						int n;
+						tag.value(n);
+						NegativeJacobian::m_boutput = (n != 0);
+					}
 					else throw XMLReader::InvalidTag(tag);
 
 					// go to the next tag

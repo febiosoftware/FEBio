@@ -2211,17 +2211,18 @@ void FETriphasicDomain::UpdateStresses(FEModel &fem)
 		}
 		catch (NegativeJacobian e)
 		{
-			// A negative jacobian was detected
-//			felog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
 			#pragma omp critical
-			berr = true;
+			{
+				berr = true;
+				if (NegativeJacobian::m_boutput) e.print();
+			}
 		}
 	}
 
 	// if we encountered an error, we request a running restart
 	if (berr)
 	{
-		felog.printbox("ERROR","Negative jacobian was detected.");
+		if (NegativeJacobian::m_boutput == false) felog.printbox("ERROR", "Negative jacobian was detected.");
 		throw DoRunningRestart();
 	}
 }

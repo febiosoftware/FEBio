@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FEException.h"
+#include "log.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -92,3 +93,20 @@ ZeroDiagonal::ZeroDiagonal(vector<int>& l, FEM& fem)
 
 }
 */
+//=============================================================================
+bool NegativeJacobian::m_boutput = true;
+
+//-----------------------------------------------------------------------------
+NegativeJacobian::NegativeJacobian(int iel, int ng, double vol, FEElement* pe)
+{
+	m_iel = iel;
+	m_ng = ng;
+	m_vol = vol;
+	m_pel = pe;
+}
+
+//-----------------------------------------------------------------------------
+void NegativeJacobian::print()
+{
+	felog.printbox("ERROR", "Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", m_iel, m_ng + 1, m_vol);
+}
