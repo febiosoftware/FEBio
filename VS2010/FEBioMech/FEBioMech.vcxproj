@@ -514,6 +514,7 @@
     <ClCompile Include="..\..\FEBioMech\FERemodelingElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEResidualVector.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidCylindricalJoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidDamper.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidPinJoint.cpp" />
@@ -522,6 +523,7 @@
     <ClCompile Include="..\..\FEBioMech\FERigidShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSphericalJoint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidSpring.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidWallInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESlidingInterface.cpp" />
@@ -684,6 +686,7 @@
     <ClInclude Include="..\..\FEBioMech\FERemodelingElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEResidualVector.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidCylindricalJoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidDamper.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidPinJoint.h" />
@@ -692,6 +695,7 @@
     <ClInclude Include="..\..\FEBioMech\FERigidShellDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidSphericalJoint.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidSpring.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidSurface.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidWallInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FESlidingInterface.h" />
