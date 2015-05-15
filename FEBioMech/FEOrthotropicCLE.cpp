@@ -69,6 +69,14 @@ mat3ds FEOrthotropicCLE::Stress(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
+    // Evaluate Lame coefficients
+    mu[0] = mu1;
+    mu[1] = mu2;
+    mu[2] = mu3;
+    lam[0][0] = lm11; lam[0][1] = l12 ; lam[0][2] = l31;
+    lam[1][0] = l12 ; lam[1][1] = lm22; lam[1][2] = l23;
+    lam[2][0] = l31 ; lam[2][1] = l23 ; lam[2][2] = lm33;
+    
     int i,j;
     vec3d a0;           // texture direction in reference configuration
     mat3ds A[3];		// texture tensor in current configuration
@@ -107,6 +115,14 @@ mat3ds FEOrthotropicCLE::Stress(FEMaterialPoint& mp)
 tens4ds FEOrthotropicCLE::Tangent(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // Evaluate Lame coefficients
+    mu[0] = mu1;
+    mu[1] = mu2;
+    mu[2] = mu3;
+    lam[0][0] = lm11; lam[0][1] = l12 ; lam[0][2] = l31;
+    lam[1][0] = l12 ; lam[1][1] = lm22; lam[1][2] = l23;
+    lam[2][0] = l31 ; lam[2][1] = l23 ; lam[2][2] = lm33;
     
     int i,j;
     vec3d a0;           // texture direction in reference configuration
@@ -147,6 +163,14 @@ tens4ds FEOrthotropicCLE::Tangent(FEMaterialPoint& mp)
 double FEOrthotropicCLE::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // Evaluate Lame coefficients
+    mu[0] = mu1;
+    mu[1] = mu2;
+    mu[2] = mu3;
+    lam[0][0] = lm11; lam[0][1] = l12 ; lam[0][2] = l31;
+    lam[1][0] = l12 ; lam[1][1] = lm22; lam[1][2] = l23;
+    lam[2][0] = l31 ; lam[2][1] = l23 ; lam[2][2] = lm33;
     
     int i,j;
     vec3d a0;           // texture direction in reference configuration
