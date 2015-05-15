@@ -37,6 +37,8 @@ void FEOrthotropicCLE::Init()
     if (mu3 < 0) throw MaterialError("mu3 should be positive");
     
     // Evaluate Lame coefficients
+    double	lam[3][3];
+    double	mu[3];
     mu[0] = mu1;
     mu[1] = mu2;
     mu[2] = mu3;
@@ -70,6 +72,8 @@ mat3ds FEOrthotropicCLE::Stress(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // Evaluate Lame coefficients
+    double	lam[3][3];
+    double	mu[3];
     mu[0] = mu1;
     mu[1] = mu2;
     mu[2] = mu3;
@@ -117,6 +121,8 @@ tens4ds FEOrthotropicCLE::Tangent(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // Evaluate Lame coefficients
+    double	lam[3][3];
+    double	mu[3];
     mu[0] = mu1;
     mu[1] = mu2;
     mu[2] = mu3;
@@ -165,6 +171,8 @@ double FEOrthotropicCLE::StrainEnergyDensity(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // Evaluate Lame coefficients
+    double	lam[3][3];
+    double	mu[3];
     mu[0] = mu1;
     mu[1] = mu2;
     mu[2] = mu3;

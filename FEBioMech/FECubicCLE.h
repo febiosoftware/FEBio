@@ -18,8 +18,6 @@ public:
     double	m_lm1;      // diagonal first lamé constants (compression)
     double	m_l2;       // off-diagonal first lamé constants
     double	m_mu;       // shear moduli
-    double	lam[3][3];	// first Lame coefficients
-    double	mu[3];		// second Lame coefficients
     
 public:
     FECubicCLE(FEModel* pfem) : FEElasticMaterial(pfem) {}

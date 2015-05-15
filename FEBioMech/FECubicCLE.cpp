@@ -25,6 +25,8 @@ void FECubicCLE::Init()
     if (m_mu < 0) throw MaterialError("mu should be positive");
     
     // Evaluate Lame coefficients
+    double	lam[3][3];
+    double	mu[3];
     mu[0] = m_mu;
     mu[1] = m_mu;
     mu[2] = m_mu;
@@ -58,6 +60,8 @@ mat3ds FECubicCLE::Stress(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // Evaluate Lame coefficients
+    double	lam[3][3];
+    double	mu[3];
     mu[0] = m_mu;
     mu[1] = m_mu;
     mu[2] = m_mu;
@@ -105,6 +109,8 @@ tens4ds FECubicCLE::Tangent(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // Evaluate Lame coefficients
+    double	lam[3][3];
+    double	mu[3];
     mu[0] = m_mu;
     mu[1] = m_mu;
     mu[2] = m_mu;
@@ -153,6 +159,8 @@ double FECubicCLE::StrainEnergyDensity(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // Evaluate Lame coefficients
+    double	lam[3][3];
+    double	mu[3];
     mu[0] = m_mu;
     mu[1] = m_mu;
     mu[2] = m_mu;

@@ -18,8 +18,6 @@ public:
     double	lm11, lm22, lm33;	// diagonal first lamé constants (compression)
     double	l12, l23, l31;	// off-diagonal first lamé constants
     double	mu1, mu2, mu3;	// shear moduli
-    double	lam[3][3];		// first Lame coefficients
-    double	mu[3];			// second Lame coefficients
     
 public:
     FEOrthotropicCLE(FEModel* pfem) : FEElasticMaterial(pfem) {}
