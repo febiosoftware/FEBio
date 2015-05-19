@@ -95,8 +95,8 @@ void FEElasticMixture::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterial
 		FEElasticMaterial* pmj = GetMaterial(j)->GetElasticMaterial();
 		FEMaterialPoint& mpj = *mp.GetPointData(j);
         FEElasticMaterialPoint& pj = *(mpj.ExtractData<FEElasticMaterialPoint>());
-        pj.m_Q = pt.m_Q;    // copy mixture material's coordinate system into component
 		pmj->SetLocalCoordinateSystem(el, n, mpj);
+        pj.m_Q = pt.m_Q*pj.m_Q;
 	}
 }
 

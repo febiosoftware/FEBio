@@ -25,8 +25,9 @@ const char* FECore::get_version_string()
 //-----------------------------------------------------------------------------
 void FECore::InitModule()
 {
-REGISTER_FECORE_CLASS(FELocalMap      , FECOORDSYSMAP_ID, "local"      );
-REGISTER_FECORE_CLASS(FESphericalMap  , FECOORDSYSMAP_ID, "spherical"  );
-REGISTER_FECORE_CLASS(FECylindricalMap, FECOORDSYSMAP_ID, "cylindrical");
-REGISTER_FECORE_CLASS(FEVectorMap     , FECOORDSYSMAP_ID, "vector"     );
+REGISTER_FECORE_CLASS(FELocalMap         , FECOORDSYSMAP_ID, "local"      );
+REGISTER_FECORE_CLASS(FESphericalMap     , FECOORDSYSMAP_ID, "spherical"  );
+REGISTER_FECORE_CLASS(FECylindricalMap   , FECOORDSYSMAP_ID, "cylindrical");
+REGISTER_FECORE_CLASS(FEVectorMap        , FECOORDSYSMAP_ID, "vector"     );
+REGISTER_FECORE_CLASS(FESphericalAngleMap, FECOORDSYSMAP_ID, "angles"     );
 }

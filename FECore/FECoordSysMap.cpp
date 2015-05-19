@@ -286,3 +286,67 @@ void FEVectorMap::Serialize(DumpFile &ar)
 		ar >> m_a >> m_d;
 	}
 }
+
+//=============================================================================
+// FESphericalAngleMap
+//-----------------------------------------------------------------------------
+
+BEGIN_PARAMETER_LIST(FESphericalAngleMap, FECoordSysMap)
+	ADD_PARAMETER(m_theta, FE_PARAM_DOUBLE, "theta");
+	ADD_PARAMETER(m_phi  , FE_PARAM_DOUBLE, "phi"  );
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+void FESphericalAngleMap::Init()
+{
+	m_theta = 0.0;
+	m_phi   = 90.0;
+}
+
+//-----------------------------------------------------------------------------
+mat3d FESphericalAngleMap::LocalElementCoord(FEElement& el, int n)
+{
+	// convert from degress to radians
+	const double pi = 4*atan(1.0);
+	const double the = m_theta*pi/180.;
+	const double phi = m_phi*pi/180.;
+
+	// define the first axis (i.e. the fiber vector)
+	vec3d a;
+	a.x = cos(the)*sin(phi);
+	a.y = sin(the)*sin(phi);
+	a.z = cos(phi);
+
+	// define the second axis
+	// and make sure it is not colinear with the first
+	vec3d d(0,0,1);
+	if (fabs(a*d) > 0.9) d = vec3d(0,1,0);
+
+	// calculate the orthonormal axes
+	vec3d c = a^d;
+	vec3d b = c^a;
+	a.unit();
+	b.unit();
+	c.unit();
+
+	// setup the rotation matrix
+	mat3d Q;
+	Q[0][0] = a.x; Q[0][1] = b.x; Q[0][2] = c.x;
+	Q[1][0] = a.y; Q[1][1] = b.y; Q[1][2] = c.y;
+	Q[2][0] = a.z; Q[2][1] = b.z; Q[2][2] = c.z;
+
+	return Q;
+}
+
+//-----------------------------------------------------------------------------
+void FESphericalAngleMap::Serialize(DumpFile &ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_theta << m_phi;
+	}
+	else
+	{
+		ar >> m_theta >> m_phi;
+	}
+}

@@ -170,6 +170,23 @@ bool FEBioMaterialSection::ParseMatAxisTag(XMLTag &tag, FEMaterial *pm)
 		while (!tag.isend());
 		pmap->SetVectors(a, d);
 	}
+	else if (type == "angles")
+	{
+		FESphericalAngleMap* pmap = new FESphericalAngleMap(&fem);
+		pm->SetCoordinateSystemMap(pmap);
+
+		double theta = 0.0, phi = 90.0;
+		++tag;
+		do
+		{
+			if      (tag == "theta") m_pim->value(tag, theta);
+			else if (tag == "phi"  ) m_pim->value(tag, phi  );
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+		pmap->SetAngles(theta, phi);
+	}
 	else if (type == "user")
 	{
 		// material axis are read in from the ElementData section
@@ -213,6 +230,23 @@ bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
 		vec3d a;
 		m_pim->value(tag, a);
 		pmap->SetVectors(a, vec3d(0,0,1));
+	}
+	else if (type == "angles")
+	{
+		FESphericalAngleMap* pmap = new FESphericalAngleMap(&fem);
+		pm->SetCoordinateSystemMap(pmap);
+
+		double theta = 0.0, phi = 90.0;
+		++tag;
+		do
+		{
+			if      (tag == "theta") m_pim->value(tag, theta);
+			else if (tag == "phi"  ) m_pim->value(tag, phi  );
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+		pmap->SetAngles(theta, phi);
 	}
 	else
 	{

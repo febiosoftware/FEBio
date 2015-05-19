@@ -22,6 +22,7 @@ class FEMesh;
 #define FE_MAP_SPHERE	2
 #define FE_MAP_VECTOR	3
 #define FE_MAP_CYLINDER	4
+#define FE_MAP_ANGLES	5
 
 //-----------------------------------------------------------------------------
 //! The FECoordSysMap class is used to create local coordinate systems.
@@ -141,6 +142,27 @@ public:
 
 public:
 	vec3d	m_a, m_d;
+
+	DECLARE_PARAMETER_LIST();
+};
+
+//-----------------------------------------------------------------------------
+class FESphericalAngleMap : public FECoordSysMap
+{
+public:
+	FESphericalAngleMap(FEModel* pfem) : FECoordSysMap(FE_MAP_ANGLES){}
+
+	void Init();
+
+	void SetAngles(double theta, double phi) { m_theta = theta; m_phi = phi; }
+
+	mat3d LocalElementCoord(FEElement& el, int n);
+
+	virtual void Serialize(DumpFile& ar);
+
+public:
+	double	m_theta;
+	double	m_phi;
 
 	DECLARE_PARAMETER_LIST();
 };
