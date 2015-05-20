@@ -1474,7 +1474,7 @@ bool FESolidSolver::ReformStiffness()
 	}
 
 	// calculate the global stiffness matrix
-	FETimePoint tp = m_fem.GetCurrentTime();
+	FETimePoint tp = m_fem.GetTime();
 	bool bret = StiffnessMatrix(tp);
 
 	if (bret)

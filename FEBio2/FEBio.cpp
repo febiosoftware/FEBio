@@ -141,6 +141,22 @@ void update_console_cb(FEModel* pfem, void* pd)
 }
 
 //-----------------------------------------------------------------------------
+vector<pair<double,int> > break_points;
+
+void clear_break_points()
+{
+	break_points.clear();
+}
+
+void add_break_point(double t)
+{
+	pair<double,int> bp;
+	bp.first = t;
+	bp.second = 1;
+	break_points.push_back(bp);
+}
+
+//-----------------------------------------------------------------------------
 // callback for ctrl+c interruptions
 void interrupt_cb(FEModel* pfem, void* pd)
 {
@@ -149,6 +165,22 @@ void interrupt_cb(FEModel* pfem, void* pd)
 	{
 		itr.m_bsig = false;
 		itr.interrupt();
+	}
+	else
+	{
+		// see if a break-point has been reached
+		double t = pfem->GetTime().t;
+
+		int nbp = break_points.size();
+		for (int i=0; i<nbp; ++i)
+		{
+			pair<double, int>& bpi = break_points[i];
+			if (bpi.second && (bpi.first < t))
+			{
+				itr.interrupt();
+				bpi.second = 0;
+			}
+		}
 	}
 }
 
@@ -290,6 +322,13 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 					strcpy(ops.szctrl, argv[++i]);
 				}
 			}
+		}
+		else if (strcmp(sz, "-break") == 0)
+		{
+			char szbuf[32]={0};
+			strcpy(szbuf, argv[++i]);
+			double f = atof(szbuf);
+			add_break_point(f);
 		}
 		else if (strcmp(sz, "-info")==0)
 		{

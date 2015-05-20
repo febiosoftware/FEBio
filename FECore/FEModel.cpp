@@ -643,7 +643,7 @@ bool FEModel::Reset()
 
 //-----------------------------------------------------------------------------
 //! Get the current time information.
-FETimePoint FEModel::GetCurrentTime()
+FETimePoint FEModel::GetTime()
 {
 	FETimePoint pt;
 	pt.t = m_ftime;
