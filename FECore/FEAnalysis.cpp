@@ -46,6 +46,7 @@ FEAnalysis::FEAnalysis(FEModel* pfem, int ntype) : FECoreBase(FEANALYSIS_ID), m_
 	bool bdebug = m_fem.GetDebugFlag();
 	m_nplot  = (bdebug?FE_PLOT_MINOR_ITRS     : FE_PLOT_MAJOR_ITRS );
 	m_nprint = (bdebug?FE_PRINT_MINOR_ITRS_EXP: FE_PRINT_MINOR_ITRS);
+	m_noutput = FE_OUTPUT_MAJOR_ITRS;
 	m_nplot_stride = 1;
 }
 
@@ -219,9 +220,10 @@ bool FEAnalysis::Solve()
 	// dump stream for running restarts
 	DumpStream dmp;
 
-	// Flag used to note whether the last converged time step was plotted.
-	// This is used by to make sure that the final time step is stored to the plot file.
+	// Flags used to note whether the last converged time step was stored.
+	// This is used by to make sure that the final time step is stored to the plot file and data files.
 	bool bplot = false;
+	bool boutput = false;
 
 	// repeat for all timesteps
 	m_nretries = 0;
@@ -342,7 +344,18 @@ bool FEAnalysis::Solve()
 			if (m_bDump) m_fem.DumpData();
 
 			// store additional data to the logfile
-			m_fem.WriteData();
+			boutput = false;
+			if ((m_noutput != FE_OUTPUT_NEVER) && (m_noutput != FE_OUTPUT_FINAL))
+			{
+				if (m_noutput == FE_OUTPUT_MUST_POINTS)
+				{
+					if (m_nmust >= 0) { m_fem.WriteData(); boutput = true; }
+				}
+				else
+				{
+					m_fem.WriteData(); boutput = true;
+				}
+			}
 
 			// update time step
 			if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(m_psolver->m_niter);
@@ -397,6 +410,10 @@ bool FEAnalysis::Solve()
 	if (m_nplot != FE_PLOT_NEVER)
 	{
 		if (bconv && (bplot == false)) m_fem.Write();
+	}
+	if (m_noutput != FE_OUTPUT_NEVER)
+	{
+		if (bconv && (boutput == false)) m_fem.WriteData();
 	}
 
 	m_fem.m_ftime0 = m_fem.m_ftime;
@@ -587,6 +604,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		// --- I/O Data ---
 		ar << m_nplot;
 		ar << m_nprint;
+		ar << m_noutput;
 		ar << m_bDump;
 		ar << m_nplot_stride;
 
@@ -637,6 +655,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		// --- I/O Data ---
 		ar >> m_nplot;
 		ar >> m_nprint;
+		ar >> m_noutput;
 		ar >> m_bDump;
 		ar >> m_nplot_stride;
 

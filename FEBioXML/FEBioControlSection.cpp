@@ -152,6 +152,17 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 		else if (strcmp(szval, "PRINT_MINOR_ITRS_EXP") == 0) pstep->SetPrintLevel(FE_PRINT_MINOR_ITRS_EXP);
 		else throw XMLReader::InvalidTag(tag);
 	}
+	else if (tag == "output_level")
+	{
+		char szval[256];
+		tag.value(szval);
+		if      (strcmp(szval, "OUTPUT_NEVER"      ) == 0) pstep->SetOutputLevel(FE_OUTPUT_NEVER);
+		else if (strcmp(szval, "OUTPUT_MAJOR_ITRS" ) == 0) pstep->SetOutputLevel(FE_OUTPUT_MAJOR_ITRS);
+		else if (strcmp(szval, "OUTPUT_MINOR_ITRS" ) == 0) pstep->SetOutputLevel(FE_OUTPUT_MINOR_ITRS);
+		else if (strcmp(szval, "OUTPUT_MUST_POINTS") == 0) pstep->SetOutputLevel(FE_OUTPUT_MUST_POINTS);
+		else if (strcmp(szval, "OUTPUT_FINAL"      ) == 0) pstep->SetOutputLevel(FE_OUTPUT_FINAL);
+		else throw XMLReader::InvalidTag(tag);
+	}
 	else if (tag == "use_three_field_hex") tag.value(m_pim->m_b3field);
 	else if (tag == "integration")
 	{

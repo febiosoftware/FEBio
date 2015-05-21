@@ -92,6 +92,12 @@ public:
 	//! get the print level
 	int GetPrintLevel() { return m_nprint; }
 
+	//! Set the output level
+	void SetOutputLevel(int n) { m_noutput = n; }
+
+	//! Get the output level
+	int GetOutputLevel() { return m_noutput; }
+
 protected:
 	//! initialize constraint data
 	bool InitLinearConstraints();
@@ -152,6 +158,7 @@ public:
 	//{
 		int		m_nprint;		//!< print level
 		int		m_nplot;		//!< plot level
+		int		m_noutput;		//!< data output level
 		int		m_nplot_stride;	//!< stride for plotting
 		bool	m_bDump;		//!< create a restart file or not
 	//}

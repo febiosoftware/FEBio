@@ -172,8 +172,8 @@ enum FE_Rigid_Surface_Type {
 	FE_RIGID_SPHERE
 };
 
-///////////////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
+// Plot level sets the frequency of writes to the plot file.
 enum FE_Plot_Level {
 	FE_PLOT_NEVER,			// don't output anything
 	FE_PLOT_MAJOR_ITRS,		// only output major iterations (i.e. converged time steps)
@@ -183,8 +183,8 @@ enum FE_Plot_Level {
 	FE_PLOT_AUGMENTATIONS	// plot state before augmentations
 };
 
-///////////////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
+// Print level sets the frequency of output to the screen and log file
 enum FE_Print_Level {
 	FE_PRINT_DEFAULT,
 	FE_PRINT_NEVER,
@@ -192,6 +192,16 @@ enum FE_Print_Level {
 	FE_PRINT_MAJOR_ITRS,
 	FE_PRINT_MINOR_ITRS,
 	FE_PRINT_MINOR_ITRS_EXP,
+};
+
+//-----------------------------------------------------------------------------
+// Output level sets the frequency of data output is written to the log or data files.
+enum FE_Output_Level {
+	FE_OUTPUT_NEVER,
+	FE_OUTPUT_MAJOR_ITRS,
+	FE_OUTPUT_MINOR_ITRS,
+	FE_OUTPUT_MUST_POINTS,
+	FE_OUTPUT_FINAL
 };
 
 //-----------------------------------------------------------------------------
