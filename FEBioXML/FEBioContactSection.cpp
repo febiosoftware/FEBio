@@ -533,5 +533,9 @@ bool FEBioContactSection::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal
 		int N = el.Nodes(); assert(N == fi.ntype);
 		for (int j=0; j<N; ++j) el.m_node[j] = fi.node[j];
 	}
+
+	// copy the name
+	s.SetName(fs.GetName());
+
 	return true;
 }
