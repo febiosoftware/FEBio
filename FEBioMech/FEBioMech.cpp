@@ -128,6 +128,7 @@
 #include "FERigidCylindricalJoint.h"
 #include "FERigidSpring.h"
 #include "FERigidDamper.h"
+#include "FERigidContractileForce.h"
 #include "FEVolumeConstraint.h"
 #include "FEDistanceConstraint.h"
 
@@ -330,6 +331,7 @@ REGISTER_FECORE_CLASS(FERigidPrismaticJoint  , FENLCONSTRAINT_ID, "rigid prismat
 REGISTER_FECORE_CLASS(FERigidCylindricalJoint, FENLCONSTRAINT_ID, "rigid cylindrical joint");
 REGISTER_FECORE_CLASS(FERigidSpring          , FENLCONSTRAINT_ID, "rigid spring"           );
 REGISTER_FECORE_CLASS(FERigidDamper          , FENLCONSTRAINT_ID, "rigid damper"           );
+REGISTER_FECORE_CLASS(FERigidContractileForce, FENLCONSTRAINT_ID, "rigid contractile force");
 REGISTER_FECORE_CLASS(FEVolumeConstraint     , FENLCONSTRAINT_ID, "volume"                 );
 REGISTER_FECORE_CLASS(FEDistanceConstraint   , FENLCONSTRAINT_ID, "node distance"          );
 

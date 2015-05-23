@@ -11,6 +11,7 @@
 #include "FEBioMech/FERigidCylindricalJoint.h"
 #include "FEBioMech/FERigidSpring.h"
 #include "FEBioMech/FERigidDamper.h"
+#include "FEBioMech/FERigidContractileForce.h"
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
@@ -871,6 +872,23 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
         // --- R I G I D   D A M P E R   I N T E R F A C E ---
         
         FERigidDamper* prj = dynamic_cast<FERigidDamper*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
+        FEParameterList& pl = prj->GetParameterList();
+        ++tag;
+        do
+        {
+            if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+            ++tag;
+        }
+        while (!tag.isend());
+        prj->m_nRBa--;
+        prj->m_nRBb--;
+        fem.AddNonlinearConstraint(prj);
+    }
+    else if (strcmp(szt, "rigid contractile force") == 0)
+    {
+        // --- R I G I D   C O N T R A C T I L E F O R C E   I N T E R F A C E ---
+        
+        FERigidContractileForce* prj = dynamic_cast<FERigidContractileForce*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
         FEParameterList& pl = prj->GetParameterList();
         ++tag;
         do

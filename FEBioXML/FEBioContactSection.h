@@ -20,6 +20,7 @@ protected:
     void ParseRigidCylindricalJoint(XMLTag& tag);
     void ParseRigidSpring          (XMLTag& tag);
     void ParseRigidDamper          (XMLTag& tag);
+    void ParseRigidContractileForce(XMLTag& tag);
 	void ParseLinearConstraint     (XMLTag& tag);
 
 protected:

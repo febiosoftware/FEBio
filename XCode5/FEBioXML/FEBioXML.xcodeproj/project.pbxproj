@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D59D21D61A5876010053C314 /* FEBioIncludeSection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59D21D21A5876010053C314 /* FEBioIncludeSection.cpp */; };
+		D59D21D71A5876010053C314 /* FEBioIncludeSection.h in Headers */ = {isa = PBXBuildFile; fileRef = D59D21D31A5876010053C314 /* FEBioIncludeSection.h */; };
+		D59D21D81A5876010053C314 /* FEBioParametersSection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59D21D41A5876010053C314 /* FEBioParametersSection.cpp */; };
+		D59D21D91A5876010053C314 /* FEBioParametersSection.h in Headers */ = {isa = PBXBuildFile; fileRef = D59D21D51A5876010053C314 /* FEBioParametersSection.h */; };
 		D5E109B91865E11600B23922 /* FEBioBoundarySection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E109931865E11600B23922 /* FEBioBoundarySection.cpp */; };
 		D5E109BA1865E11600B23922 /* FEBioBoundarySection.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E109941865E11600B23922 /* FEBioBoundarySection.h */; };
 		D5E109BB1865E11600B23922 /* FEBioConstraintsSection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E109951865E11600B23922 /* FEBioConstraintsSection.cpp */; };
@@ -51,6 +55,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D59D21D21A5876010053C314 /* FEBioIncludeSection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioIncludeSection.cpp; sourceTree = "<group>"; };
+		D59D21D31A5876010053C314 /* FEBioIncludeSection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioIncludeSection.h; sourceTree = "<group>"; };
+		D59D21D41A5876010053C314 /* FEBioParametersSection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioParametersSection.cpp; sourceTree = "<group>"; };
+		D59D21D51A5876010053C314 /* FEBioParametersSection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioParametersSection.h; sourceTree = "<group>"; };
 		D5E1098B1865E10A00B23922 /* libFEBioXML.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioXML.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E109931865E11600B23922 /* FEBioBoundarySection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioBoundarySection.cpp; sourceTree = "<group>"; };
 		D5E109941865E11600B23922 /* FEBioBoundarySection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioBoundarySection.h; sourceTree = "<group>"; };
