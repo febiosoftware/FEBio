@@ -16,6 +16,8 @@
 #include "FEPermRefTransIso.h"
 #include "FEOsmCoefConst.h"
 #include "FESFDSBM.h"
+#include "FEFiberExpPowSBM.h"
+#include "FEFiberPowLinearSBM.h"
 #include "FESolventSupplyStarling.h"
 #include "FESolubConst.h"
 #include "FESupplyBinding.h"
@@ -100,6 +102,8 @@ REGISTER_FECORE_CLASS(FEPermRefOrtho                      ,FEMATERIAL_ID, "perm-
 REGISTER_FECORE_CLASS(FEPermRefTransIso                   ,FEMATERIAL_ID, "perm-ref-trans-iso");
 REGISTER_FECORE_CLASS(FEOsmCoefConst                      ,FEMATERIAL_ID, "osm-coef-const"    );
 REGISTER_FECORE_CLASS(FESFDSBM                            ,FEMATERIAL_ID, "spherical fiber distribution sbm");
+REGISTER_FECORE_CLASS(FEFiberExpPowSBM                    ,FEMATERIAL_ID, "fiber-exp-pow sbm" );
+REGISTER_FECORE_CLASS(FEFiberPowLinearSBM                 ,FEMATERIAL_ID, "fiber-pow-linear sbm");
 REGISTER_FECORE_CLASS(FESolventSupplyStarling             ,FEMATERIAL_ID, "Starling"          );
 REGISTER_FECORE_CLASS(FESolubConst                        ,FEMATERIAL_ID, "solub-const"       );
 REGISTER_FECORE_CLASS(FESupplyBinding                     ,FEMATERIAL_ID, "supply-binding"           );

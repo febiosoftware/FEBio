@@ -1,31 +1,45 @@
 //
-//  FEFiberPowLinear.cpp
-//  FEBioMech
+//  FEFiberPowLinearSBM.cpp
+//  FEBioMix
 //
-//  Created by Gerard Ateshian on 5/2/15.
+//  Created by Gerard Ateshian on 5/24/15.
 //  Copyright (c) 2015 febio.org. All rights reserved.
 //
 
-#include "FEFiberPowLinear.h"
+#include "FEFiberPowLinearSBM.h"
+#include "FEMultiphasic.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberPowLinear, FEElasticMaterial)
-    ADD_PARAMETER(m_E    , FE_PARAM_DOUBLE, "E"    );
-    ADD_PARAMETER(m_lam0 , FE_PARAM_DOUBLE, "lam0" );
-    ADD_PARAMETER(m_beta , FE_PARAM_DOUBLE, "beta" );
-    ADD_PARAMETER(m_thd  , FE_PARAM_DOUBLE, "theta");
-    ADD_PARAMETER(m_phd  , FE_PARAM_DOUBLE, "phi"  );
+BEGIN_PARAMETER_LIST(FEFiberPowLinearSBM, FEElasticMaterial)
+ADD_PARAMETER(m_E0   , FE_PARAM_DOUBLE, "E0"   );
+ADD_PARAMETER(m_lam0 , FE_PARAM_DOUBLE, "lam0" );
+ADD_PARAMETER(m_beta , FE_PARAM_DOUBLE, "beta" );
+ADD_PARAMETER(m_rho0 , FE_PARAM_DOUBLE, "rho0" );
+ADD_PARAMETER(m_g    , FE_PARAM_DOUBLE, "gamma");
+ADD_PARAMETER(m_sbm  , FE_PARAM_INT   , "sbm"  );
+ADD_PARAMETER(m_thd  , FE_PARAM_DOUBLE, "theta");
+ADD_PARAMETER(m_phd  , FE_PARAM_DOUBLE, "phi"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 // FEFiberPowLinear
 //-----------------------------------------------------------------------------
 
-void FEFiberPowLinear::Init()
+void FEFiberPowLinearSBM::Init()
 {
-    if (m_E < 0) throw MaterialError("E must be positive.");
+    if (m_E0 < 0) throw MaterialError("E0 must be positive.");
     if (m_lam0 <= 1) throw MaterialError("lam0 must be >1.");
     if (m_beta <  2) throw MaterialError("beta must be >= 2.");
+    if (m_rho0 < 0) throw MaterialError("rho0 must be positive.");
+    if (m_g < 0) throw MaterialError("gamma must be positive.");
+    
+    // get the parent material which must be a multiphasic material
+    FEMultiphasic* pMP = dynamic_cast<FEMultiphasic*> (GetAncestor());
+    if (pMP == 0) throw MaterialError("Parent material must be multiphasic");
+    
+    // extract the local id of the SBM whose density controls Young's modulus from the global id
+    m_lsbm = pMP->FindLocalSBMID(m_sbm);
+    if (m_lsbm == -1) throw MaterialError("Invalid value for sbm");
     
     // convert angles from degrees to radians
     double pi = 4*atan(1.0);
@@ -38,14 +52,17 @@ void FEFiberPowLinear::Init()
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberPowLinear::Stress(FEMaterialPoint& mp)
+mat3ds FEFiberPowLinearSBM::Stress(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
     // initialize material constants
+    double rhor = spt.m_sbmr[m_lsbm];
+    double E = FiberModulus(rhor);
     double I0 = m_lam0*m_lam0;
-    double ksi = m_E/4/(m_beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-m_beta);
-    double b = ksi*pow(I0-1, m_beta-1) + m_E/2/sqrt(I0);
+    double ksi = E/4/(m_beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-m_beta);
+    double b = ksi*pow(I0-1, m_beta-1) + E/2/sqrt(I0);
     
     // deformation gradient
     mat3d &F = pt.m_F;
@@ -76,7 +93,7 @@ mat3ds FEFiberPowLinear::Stress(FEMaterialPoint& mp)
         // calculate the fiber stress magnitude
         sn = (In < I0) ?
         2*In*ksi*pow(In-1, m_beta-1) :
-        2*b*In - m_E*sqrt(In);
+        2*b*In - E*sqrt(In);
         
         // calculate the fiber stress
         s = N*(sn/J);
@@ -90,13 +107,16 @@ mat3ds FEFiberPowLinear::Stress(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberPowLinear::Tangent(FEMaterialPoint& mp)
+tens4ds FEFiberPowLinearSBM::Tangent(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
     // initialize material constants
+    double rhor = spt.m_sbmr[m_lsbm];
+    double E = FiberModulus(rhor);
     double I0 = m_lam0*m_lam0;
-    double ksi = m_E/4/(m_beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-m_beta);
+    double ksi = E/4/(m_beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-m_beta);
     
     // deformation gradient
     mat3d &F = pt.m_F;
@@ -128,7 +148,7 @@ tens4ds FEFiberPowLinear::Tangent(FEMaterialPoint& mp)
         // calculate modulus
         cn = (In < I0) ?
         4*In*In*ksi*(m_beta-1)*pow(In-1, m_beta-2) :
-        m_E*sqrt(In);
+        E*sqrt(In);
         
         // calculate the fiber tangent
         c = NxN*(cn/J);
@@ -142,16 +162,19 @@ tens4ds FEFiberPowLinear::Tangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-double FEFiberPowLinear::StrainEnergyDensity(FEMaterialPoint& mp)
+double FEFiberPowLinearSBM::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     double sed = 0.0;
     
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
     // initialize material constants
+    double rhor = spt.m_sbmr[m_lsbm];
+    double E = FiberModulus(rhor);
     double I0 = m_lam0*m_lam0;
-    double ksi = m_E/4/(m_beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-m_beta);
-    double b = ksi*pow(I0-1, m_beta-1) + m_E/2/sqrt(I0);
+    double ksi = E/4/(m_beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-m_beta);
+    double b = ksi*pow(I0-1, m_beta-1) + E/2/sqrt(I0);
     
     // loop over all integration points
     vec3d n0;
@@ -171,7 +194,7 @@ double FEFiberPowLinear::StrainEnergyDensity(FEMaterialPoint& mp)
         // calculate strain energy density
         sed = (In < I0) ?
         ksi/m_beta*pow(In-1, m_beta) :
-        b*(In-I0) - m_E*(sqrt(In)-sqrt(I0)) + ksi/m_beta*pow(I0-1, m_beta);
+        b*(In-I0) - E*(sqrt(In)-sqrt(I0)) + ksi/m_beta*pow(I0-1, m_beta);
     }
     
     return sed;
