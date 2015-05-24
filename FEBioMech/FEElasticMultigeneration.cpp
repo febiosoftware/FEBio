@@ -58,6 +58,7 @@ void FEGenerationMaterial::Serialize(DumpFile& ar)
 void FEGenerationMaterial::Init()
 {
 	assert(m_pMat);
+    m_pMat->SetParent(this);
 	m_pMat->Init();
 }
 
@@ -250,7 +251,10 @@ int FEElasticMultigeneration::CheckGeneration(const double t)
 void FEElasticMultigeneration::Init()
 {
 	FEElasticMaterial::Init();
-	for (int i=0; i<(int)m_MG.size(); i++) m_MG[i]->Init();
+    for (int i=0; i<(int)m_MG.size(); i++) {
+        m_MG[i]->SetParent(this);
+        m_MG[i]->Init();
+    }
 }
 
 //-----------------------------------------------------------------------------
