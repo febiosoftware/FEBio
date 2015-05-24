@@ -101,7 +101,7 @@ mat3ds FEUncoupledElasticMixture::DevStress(FEMaterialPoint& mp)
         // temporarily copy this material point to the parent material point
         pt.ReplaceNext(pt.m_mp[i]);
         
-		s += epi.m_s = m_pMat[i]->DevStress(*pt.m_mp[i])*w[i];
+		s += epi.m_s = m_pMat[i]->DevStress(mp)*w[i];
 	}
 	
     // restore the material point
