@@ -403,6 +403,8 @@
     <ClCompile Include="..\..\FEBioMix\FEBiphasicContactSurface.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSoluteAnalysis.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEDiffAlbroIso.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEFiberExpPowSBM.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEFiberPowLinearSBM.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEHydraulicPermeability.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMixDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolidDomain.cpp" />
@@ -467,6 +469,8 @@
     <ClInclude Include="..\..\FEBioMix\FEBiphasicContactSurface.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSoluteAnalysis.h" />
     <ClInclude Include="..\..\FEBioMix\FEDiffAlbroIso.h" />
+    <ClInclude Include="..\..\FEBioMix\FEFiberExpPowSBM.h" />
+    <ClInclude Include="..\..\FEBioMix\FEFiberPowLinearSBM.h" />
     <ClInclude Include="..\..\FEBioMix\FEHydraulicPermeability.h" />
     <ClInclude Include="..\..\FEBioMix\FEMixDomainFactory.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolidDomain.h" />

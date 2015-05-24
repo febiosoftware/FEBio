@@ -525,6 +525,9 @@
     <ClCompile Include="..\..\FEBioMech\FERigidSpring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FERigidContractileForce.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h">
@@ -1050,6 +1053,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FERigidSpring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FERigidContractileForce.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
