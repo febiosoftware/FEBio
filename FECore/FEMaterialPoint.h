@@ -36,6 +36,9 @@ public:
 
 	//! Get the nested material point data
 	FEMaterialPoint* Next() { return m_pt; }
+    
+    //! Replace the nested material point data
+    void ReplaceNext(FEMaterialPoint* pt) { m_pt = pt; }
 
 	//! Extract data (\todo Is it safe for a plugin to use this function?)
 	template <class T> T* ExtractData();

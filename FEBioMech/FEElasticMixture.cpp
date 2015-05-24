@@ -139,13 +139,10 @@ bool FEElasticMixture::SetProperty(int n, FECoreBase* pm)
 //-----------------------------------------------------------------------------
 //! This function evaluates the stress at the material point by evaluating the
 //! individual stress components. 
-
-//! \todo This function copies some material point data from the mixture material
-//!       to the component materials, but not all. I need to check if more data needs
-//!       to be copied.
 mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+    FEMaterialPoint* psafe = pt.Next();
 	vector<double>& w = pt.m_w;
 	assert(w.size() == m_pMat.size());
 
@@ -163,8 +160,15 @@ mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-		s += epi.m_s = m_pMat[i]->Stress(*pt.m_mp[i])*w[i];
+
+        // temporarily copy this material point to the parent material point
+        pt.ReplaceNext(pt.m_mp[i]);
+        
+        s += epi.m_s = m_pMat[i]->Stress(mp)*w[i];
 	}
+    
+    // restore the material point
+    pt.ReplaceNext(psafe);
 
 	return s;
 }
@@ -174,6 +178,7 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
 	vector<double>& w = pt.m_w;
+    FEMaterialPoint* psafe = pt.Next();
 	assert(w.size() == m_pMat.size());
 
 	// get the elastic material point
@@ -190,8 +195,15 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-		c += m_pMat[i]->Tangent(*pt.m_mp[i])*w[i];
+        
+        // temporarily copy this material point to the parent material point
+        pt.ReplaceNext(pt.m_mp[i]);
+        
+		c += m_pMat[i]->Tangent(mp)*w[i];
 	}
+    
+    // restore the material point
+    pt.ReplaceNext(psafe);
 
 	return c;
 }
@@ -202,6 +214,7 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 double FEElasticMixture::StrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+    FEMaterialPoint* psafe = pt.Next();
 	vector<double>& w = pt.m_w;
 	assert(w.size() == m_pMat.size());
     
@@ -219,8 +232,15 @@ double FEElasticMixture::StrainEnergyDensity(FEMaterialPoint& mp)
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-		sed += m_pMat[i]->StrainEnergyDensity(*pt.m_mp[i])*w[i];
+        
+        // temporarily copy this material point to the parent material point
+        pt.ReplaceNext(pt.m_mp[i]);
+        
+		sed += m_pMat[i]->StrainEnergyDensity(mp)*w[i];
 	}
+    
+    // restore the material point
+    pt.ReplaceNext(psafe);
     
 	return sed;
 }

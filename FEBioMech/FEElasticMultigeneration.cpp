@@ -294,6 +294,7 @@ mat3ds FEElasticMultigeneration::Stress(FEMaterialPoint& mp)
 {
 	FEMultigenerationMaterialPoint& pt = *mp.ExtractData<FEMultigenerationMaterialPoint>();
 	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEMaterialPoint* psafe = pt.Next();
 
 	mat3ds s;
 	
@@ -322,14 +323,20 @@ mat3ds FEElasticMultigeneration::Stress(FEMaterialPoint& mp)
        	epi.m_F = Fs*Fi;
         epi.m_J = Js*Ji;
         
+        // temporarily copy this generation's material point to the parent material point
+        pt.ReplaceNext(pt.m_mp[i]);
+        
         // evaluate stress for this generation
-        s += epi.m_s = Ji*m_MG[i]->Stress(*pt.m_mp[i]);
+        s += epi.m_s = Ji*m_MG[i]->Stress(mp);
         
         // restore the material point deformation gradient
         epi.m_F = Fi;
         epi.m_J = Ji;
 	}
 
+    // restore the material point
+    pt.ReplaceNext(psafe);
+    
 	return s;
 }
 
@@ -338,6 +345,7 @@ tens4ds FEElasticMultigeneration::Tangent(FEMaterialPoint& mp)
 {
 	FEMultigenerationMaterialPoint& pt = *mp.ExtractData<FEMultigenerationMaterialPoint>();
 	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEMaterialPoint* psafe = pt.Next();
 	
 	tens4ds c(0.);
 	
@@ -363,14 +371,20 @@ tens4ds FEElasticMultigeneration::Tangent(FEMaterialPoint& mp)
        	epi.m_F = Fs*Fi;
         epi.m_J = Js*Ji;
         
+        // temporarily copy this generation's material point to the parent material point
+        pt.ReplaceNext(pt.m_mp[i]);
+        
 		// evaluate tangent for this generation
-		c += Ji*m_MG[i]->Tangent(*pt.m_mp[i]);
+		c += Ji*m_MG[i]->Tangent(mp);
 
         // restore the material point deformation gradient
         epi.m_F = Fi;
         epi.m_J = Ji;
 	}
 	
+    // restore the material point
+    pt.ReplaceNext(psafe);
+    
 	return c;
 }
 
@@ -379,6 +393,7 @@ double FEElasticMultigeneration::StrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEMultigenerationMaterialPoint& pt = *mp.ExtractData<FEMultigenerationMaterialPoint>();
 	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEMaterialPoint* psafe = pt.Next();
     
 	double sed = 0.0;
 	
@@ -404,17 +419,21 @@ double FEElasticMultigeneration::StrainEnergyDensity(FEMaterialPoint& mp)
        	epi.m_F = Fs*Fi;
         epi.m_J = Js*Ji;
         
+        // temporarily copy this generation's material point to the parent material point
+        pt.ReplaceNext(pt.m_mp[i]);
+        
         // evaluate strain energy density for this generation
-//        sed += Ji*m_MG[i]->StrainEnergyDensity(*pt.m_mp[i]);
-        double dsed = Ji*m_MG[i]->StrainEnergyDensity(*pt.m_mp[i]);
-//        fprintf(stderr, "gen %d sed=%g\n",i,dsed);
-        felog.printf("Time: %g, gen: %d, sed: %g\n",FEMaterialPoint::time,i,dsed);
+//        sed += Ji*m_MG[i]->StrainEnergyDensity(mp);
+        double dsed = Ji*m_MG[i]->StrainEnergyDensity(mp);
         sed += dsed;
         
         // restore the material point deformation gradient
         epi.m_F = Fi;
         epi.m_J = Ji;
 	}
+    
+    // restore the material point
+    pt.ReplaceNext(psafe);
     
 	return sed;
 }

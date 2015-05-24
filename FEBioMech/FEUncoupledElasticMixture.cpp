@@ -79,6 +79,7 @@ bool FEUncoupledElasticMixture::SetProperty(int n, FECoreBase* pm)
 mat3ds FEUncoupledElasticMixture::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+    FEMaterialPoint* psafe = pt.Next();
 	vector<double>& w = pt.m_w;
 	assert(w.size() == m_pMat.size());
 
@@ -96,10 +97,16 @@ mat3ds FEUncoupledElasticMixture::DevStress(FEMaterialPoint& mp)
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-		epi.m_s = m_pMat[i]->DevStress(*pt.m_mp[i])*w[i];
-		s += epi.m_s;
+
+        // temporarily copy this material point to the parent material point
+        pt.ReplaceNext(pt.m_mp[i]);
+        
+		s += epi.m_s = m_pMat[i]->DevStress(*pt.m_mp[i])*w[i];
 	}
 	
+    // restore the material point
+    pt.ReplaceNext(psafe);
+    
 	return s;
 }
 
@@ -107,6 +114,7 @@ mat3ds FEUncoupledElasticMixture::DevStress(FEMaterialPoint& mp)
 tens4ds FEUncoupledElasticMixture::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+    FEMaterialPoint* psafe = pt.Next();
 	vector<double>& w = pt.m_w;
 	assert(w.size() == m_pMat.size());
 
@@ -124,9 +132,16 @@ tens4ds FEUncoupledElasticMixture::DevTangent(FEMaterialPoint& mp)
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-		c += m_pMat[i]->DevTangent(*pt.m_mp[i])*w[i];
+        
+        // temporarily copy this material point to the parent material point
+        pt.ReplaceNext(pt.m_mp[i]);
+        
+		c += m_pMat[i]->DevTangent(mp)*w[i];
 	}
 	
+    // restore the material point
+    pt.ReplaceNext(psafe);
+    
 	return c;
 }
 
@@ -134,6 +149,7 @@ tens4ds FEUncoupledElasticMixture::DevTangent(FEMaterialPoint& mp)
 double FEUncoupledElasticMixture::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+    FEMaterialPoint* psafe = pt.Next();
 	vector<double>& w = pt.m_w;
 	assert(w.size() == m_pMat.size());
     
@@ -151,9 +167,16 @@ double FEUncoupledElasticMixture::DevStrainEnergyDensity(FEMaterialPoint& mp)
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-		sed += m_pMat[i]->DevStrainEnergyDensity(*pt.m_mp[i])*w[i];;
+        
+        // temporarily copy this material point to the parent material point
+        pt.ReplaceNext(pt.m_mp[i]);
+        
+		sed += m_pMat[i]->DevStrainEnergyDensity(mp)*w[i];;
 	}
 	
+    // restore the material point
+    pt.ReplaceNext(psafe);
+    
 	return sed;
 }
 
