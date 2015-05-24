@@ -126,6 +126,9 @@ public:
 
 	//! Get the parent of this material (zero if none)
 	FEMaterial* GetParent() { return m_pParent; }
+    
+    //! Get the ancestor of this material (this if none)
+    FEMaterial* GetAncestor() { FEMaterial* mp = GetParent(); return (mp ? mp->GetAncestor() : this); }
 
 	//! Set the parent of this material
 	void SetParent(FEMaterial* pmat) { m_pParent = pmat; }
