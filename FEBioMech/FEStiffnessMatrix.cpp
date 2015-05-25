@@ -14,6 +14,9 @@
 #include "FERigidRevoluteJoint.h"
 #include "FERigidPrismaticJoint.h"
 #include "FERigidCylindricalJoint.h"
+#include "FERigidSpring.h"
+#include "FERigidDamper.h"
+#include "FERigidContractileForce.h"
 #include "FEDistanceConstraint.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -304,6 +307,42 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
                 else if (dynamic_cast<FERigidCylindricalJoint*>(pnlc))
                 {
                     FERigidCylindricalJoint& rj = dynamic_cast<FERigidCylindricalJoint&>(*pnlc);
+                    vector<int> lm(12);
+                    
+                    int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
+                    int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
+                    
+                    for (j=0; j<6; ++j) lm[j  ] = lm1[j];
+                    for (j=0; j<6; ++j) lm[j+6] = lm2[j];
+                    build_add(lm);
+                }
+                else if (dynamic_cast<FERigidSpring*>(pnlc))
+                {
+                    FERigidSpring& rj = dynamic_cast<FERigidSpring&>(*pnlc);
+                    vector<int> lm(12);
+                    
+                    int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
+                    int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
+                    
+                    for (j=0; j<6; ++j) lm[j  ] = lm1[j];
+                    for (j=0; j<6; ++j) lm[j+6] = lm2[j];
+                    build_add(lm);
+                }
+                else if (dynamic_cast<FERigidDamper*>(pnlc))
+                {
+                    FERigidDamper& rj = dynamic_cast<FERigidDamper&>(*pnlc);
+                    vector<int> lm(12);
+                    
+                    int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
+                    int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
+                    
+                    for (j=0; j<6; ++j) lm[j  ] = lm1[j];
+                    for (j=0; j<6; ++j) lm[j+6] = lm2[j];
+                    build_add(lm);
+                }
+                else if (dynamic_cast<FERigidContractileForce*>(pnlc))
+                {
+                    FERigidContractileForce& rj = dynamic_cast<FERigidContractileForce&>(*pnlc);
                     vector<int> lm(12);
                     
                     int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
