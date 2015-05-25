@@ -15,13 +15,13 @@ public:
 	FEMaterialPoint* Copy()
 	{
 		FETIMRDamageMaterialPoint* pt = new FETIMRDamageMaterialPoint(*this);
-		if (m_pt) pt->m_pt = m_pt->Copy();
+		if (m_pNext) pt->m_pNext = m_pNext->Copy();
 		return pt;
 	}
 
 	void Init(bool bflag)
 	{
-		FEElasticMaterialPoint& pt = *m_pt->ExtractData<FEElasticMaterialPoint>();
+		FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
 		if (bflag)
 		{
 			// intialize data to zero
@@ -40,7 +40,7 @@ public:
 		}
 
 		// don't forget to intialize the nested data
-		if (m_pt) m_pt->Init(bflag);
+		if (m_pNext) m_pNext->Init(bflag);
 	}
 
 	void ShallowCopy(DumpStream& dmp, bool bsave)
@@ -55,7 +55,7 @@ public:
 			dmp >> m_MEtrial >> m_MEmax >> m_Dm;
 			dmp >> m_FEtrial >> m_FEmax >> m_Df;
 		}
-		if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+		if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
 	}
 
 	void Serialize(DumpFile& ar)

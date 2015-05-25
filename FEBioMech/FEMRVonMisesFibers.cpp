@@ -34,8 +34,8 @@ FEMaterialPoint* FEMRVonMisesMaterialPoint::Copy()
 {
 	FEMRVonMisesMaterialPoint* pt = new FEMRVonMisesMaterialPoint(*this);
 	pt->m_kf = m_kf;
-	pt->m_pt = m_pt;
-	if (m_pt) pt->m_pt = m_pt->Copy();
+	pt->m_pNext = m_pNext;
+	if (m_pNext) pt->m_pNext = m_pNext->Copy();
 	return pt;
 }
 
@@ -51,14 +51,14 @@ void FEMRVonMisesMaterialPoint::Init(bool bflag)
 		// called before the start of every time step
 	}
 
-	// don't forget to intialize the nested data
-	if (m_pt) m_pt->Init(bflag);
+	// don't forget to intialize the base data
+	FEElasticMaterialPoint::Init(bflag);
 }
 
 //-----------------------------------------------------------------------------
 void FEMRVonMisesMaterialPoint::Serialize(DumpFile& ar)
 {
-	if (m_pt) m_pt->Serialize(ar);
+	if (m_pNext) m_pNext->Serialize(ar);
 
 	if (ar.IsSaving())
 	{

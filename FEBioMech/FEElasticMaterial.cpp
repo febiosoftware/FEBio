@@ -17,7 +17,7 @@ FEElasticMaterialPoint::FEElasticMaterialPoint()
 FEMaterialPoint* FEElasticMaterialPoint::Copy()
 {
 	FEElasticMaterialPoint* pt = new FEElasticMaterialPoint(*this);
-	if (m_pt) pt->m_pt = m_pt->Copy();
+	if (m_pNext) pt->m_pNext = m_pNext->Copy();
 	return pt;
 }
 
@@ -36,7 +36,8 @@ void FEElasticMaterialPoint::Init(bool bflag)
 //		m_Q.unit();
 	}
 
-	if (m_pt) m_pt->Init(bflag);
+	// don't forget to initialize the base class
+    FEMaterialPoint::Init(bflag);
 }
 
 //-----------------------------------------------------------------------------
@@ -51,7 +52,7 @@ void FEElasticMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 		dmp >> m_F >> m_J >> m_Q >> m_s >> m_s0;
 	}
 
-	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------
@@ -66,7 +67,7 @@ void FEElasticMaterialPoint::Serialize(DumpFile& ar)
 		ar >> m_F >> m_J >> m_Q >> m_s >> m_s0;
 	}
 
-	if (m_pt) m_pt->Serialize(ar);
+	if (m_pNext) m_pNext->Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

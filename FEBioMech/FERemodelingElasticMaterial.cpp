@@ -6,7 +6,7 @@
 FEMaterialPoint* FERemodelingMaterialPoint::Copy()
 {
 	FERemodelingMaterialPoint* pt = new FERemodelingMaterialPoint(*this);
-	if (m_pt) pt->m_pt = m_pt->Copy();
+	if (m_pNext) pt->m_pNext = m_pNext->Copy();
 	return pt;
 }
 
@@ -24,14 +24,14 @@ void FERemodelingMaterialPoint::Init(bool bflag)
 		m_rhorp = m_rhor;
 	}
         
-	// don't forget to intialize the nested data
-	if (m_pt) m_pt->Init(bflag);
+	// don't forget to initialize the base class
+    FEMaterialPoint::Init(bflag);
 }
 
 //-----------------------------------------------------------------------------
 void FERemodelingMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
         
 	if (bsave)
 	{
@@ -48,7 +48,7 @@ void FERemodelingMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 //-----------------------------------------------------------------------------
 void FERemodelingMaterialPoint::Serialize(DumpFile& ar)
 {
-	if (m_pt) m_pt->Serialize(ar);
+	if (m_pNext) m_pNext->Serialize(ar);
         
 	if (ar.IsSaving())
 	{

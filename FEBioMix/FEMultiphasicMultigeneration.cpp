@@ -164,14 +164,14 @@ FEMaterialPoint* FEMultigenSBMMaterialPoint::Copy()
     pt->m_gsbmrp = m_gsbmrp;
     pt->m_lsbmr = m_lsbmr;
     pt->m_tgen = m_tgen;
-	if (m_pt) pt->m_pt = m_pt->Copy();
+	if (m_pNext) pt->m_pNext = m_pNext->Copy();
 	return pt;
 }
 
 //-----------------------------------------------------------------------------
 void FEMultigenSBMMaterialPoint::Serialize(DumpFile& ar)
 {
-	if (m_pt) m_pt->Serialize(ar);
+	if (m_pNext) m_pNext->Serialize(ar);
     
 	if (ar.IsSaving())
 	{
@@ -205,13 +205,13 @@ void FEMultigenSBMMaterialPoint::Serialize(DumpFile& ar)
             ar >> m_lsbmr[j];
 	}
     
-	if (m_pt) m_pt->Serialize(ar);
+	if (m_pNext) m_pNext->Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
 void FEMultigenSBMMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
     
 	if (bsave)
 	{
@@ -249,7 +249,7 @@ void FEMultigenSBMMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 //-----------------------------------------------------------------------------
 void FEMultigenSBMMaterialPoint::Init(bool bflag)
 {
-	if (m_pt) m_pt->Init(bflag);
+	FEMaterialPoint::Init(bflag);
     
 	if (bflag)
 	{

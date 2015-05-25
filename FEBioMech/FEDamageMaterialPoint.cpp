@@ -13,7 +13,7 @@
 FEMaterialPoint* FEDamageMaterialPoint::Copy()
 {
     FEDamageMaterialPoint* pt = new FEDamageMaterialPoint(*this);
-    if (m_pt) pt->m_pt = m_pt->Copy();
+    if (m_pNext) pt->m_pNext = m_pNext->Copy();
     return pt;
 }
 
@@ -32,7 +32,7 @@ void FEDamageMaterialPoint::Init(bool bflag)
     }
     
     // don't forget to intialize the nested data
-    if (m_pt) m_pt->Init(bflag);
+    if (m_pNext) m_pNext->Init(bflag);
 }
 
 void FEDamageMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
@@ -45,7 +45,7 @@ void FEDamageMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
     {
         dmp >> m_Etrial >> m_Emax >> m_D;
     }
-    if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+    if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
 }
 
 void FEDamageMaterialPoint::Serialize(DumpFile& ar)

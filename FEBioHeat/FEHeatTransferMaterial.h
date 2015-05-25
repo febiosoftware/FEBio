@@ -9,24 +9,24 @@ public:
 	FEMaterialPoint* Copy()
 	{
 		FEHeatMaterialPoint* pt = new FEHeatMaterialPoint(*this);
-		if (m_pt) pt->m_pt = m_pt->Copy();
+		if (m_pNext) pt->m_pNext = m_pNext->Copy();
 		return pt;
 	}
 
 	void ShallowCopy(DumpStream& dmp, bool bsave)
 	{
 		if (bsave) { dmp << m_q; } else { dmp >> m_q; }
-		if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+		if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
 	}
 
 	void Serialize(DumpFile& ar)
 	{
-		if (m_pt) m_pt->Serialize(ar);
+		if (m_pNext) m_pNext->Serialize(ar);
 	}
 
 	void Init(bool bflag)
 	{
-		if (m_pt) m_pt->Init(bflag);
+		if (m_pNext) m_pNext->Init(bflag);
 	}
 
 public:

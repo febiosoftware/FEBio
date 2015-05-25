@@ -19,11 +19,12 @@ using namespace std;
 class FEMaterialPoint : public FEParamContainer
 {
 public:
-	FEMaterialPoint(FEMaterialPoint* ppt = 0) : m_pt(ppt){}
-	virtual ~FEMaterialPoint() { if (m_pt) { delete m_pt; m_pt = 0; } }
+	FEMaterialPoint(FEMaterialPoint* ppt = 0);
+	virtual ~FEMaterialPoint();
 
+public:
 	//! The init function is used to intialize data
-	virtual void Init(bool bflag) = 0;
+	virtual void Init(bool bflag);
 
 	//! copy material point data (for running restarts) \todo Is this still used?
 	virtual FEMaterialPoint* Copy() = 0;
@@ -34,17 +35,21 @@ public:
 	//! Get the material point data
 	virtual FEMaterialPoint* GetPointData(int i) { return this; }
 
-	//! Get the nested material point data
-	FEMaterialPoint* Next() { return m_pt; }
-    
-    //! Replace the nested material point data
-    void ReplaceNext(FEMaterialPoint* pt) { m_pt = pt; }
+	//! Get the next material point data
+	FEMaterialPoint* Next() { return m_pNext; }
 
+	//! Get the previous (parent) material point data
+	FEMaterialPoint* Prev() { return m_pPrev; }
+    
 	//! Extract data (\todo Is it safe for a plugin to use this function?)
 	template <class T> T* ExtractData();
 
+	// assign the previous pointer
+	void SetPrev(FEMaterialPoint* pt);
+
 protected:
-	FEMaterialPoint*	m_pt;	//<! nested point data
+	FEMaterialPoint*	m_pNext;	//<! next data in the list
+	FEMaterialPoint*	m_pPrev;	//<! previous data in the list
 
 public:
 	static double time;	// time value
@@ -54,11 +59,28 @@ public:
 //-----------------------------------------------------------------------------
 template <class T> inline T* FEMaterialPoint::ExtractData()
 {
+	// first see if this is the correct type
 	T* p = dynamic_cast<T*>(this);
-	if (p) return p; 
-	else
+	if (p) return p;
+
+	// check all the child classes 
+	FEMaterialPoint* pt = this;
+	while (pt->m_pNext)
 	{
-		if (m_pt) return m_pt->ExtractData<T>();
-		else return 0;
+		pt = pt->m_pNext;
+		p = dynamic_cast<T*>(pt);
+		if (p) return p;
 	}
+
+	// search up
+	pt = this;
+	while (pt->m_pPrev)
+	{
+		pt = pt->m_pPrev;
+		p = dynamic_cast<T*>(pt);
+		if (p) return p;
+	}
+
+	// Everything has failed. Material point data can not be found
+	return 0;
 }

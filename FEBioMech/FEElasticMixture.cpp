@@ -3,9 +3,16 @@
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
-FEElasticMixtureMaterialPoint::FEElasticMixtureMaterialPoint()
+FEElasticMixtureMaterialPoint::FEElasticMixtureMaterialPoint() : FEMaterialPoint(new FEElasticMaterialPoint)
 { 
-	m_pt = new FEElasticMaterialPoint; 
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticMixtureMaterialPoint::AddMaterialPoint(FEMaterialPoint* pt)
+{
+	m_mp.push_back(pt);
+	pt->SetPrev(this);
+	m_w.push_back(1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -14,7 +21,7 @@ FEMaterialPoint* FEElasticMixtureMaterialPoint::Copy()
 	FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint;
 	pt->m_w = m_w;
 	pt->m_mp = m_mp;
-	if (m_pt) pt->m_pt = m_pt->Copy();
+	if (m_pNext) pt->m_pNext = m_pNext->Copy();
 	return pt;
 }
 
@@ -26,7 +33,9 @@ void FEElasticMixtureMaterialPoint::Init(bool bflag)
 		for (int i=0; i<(int) m_w.size(); ++i) m_w[i] = 1.0;
 	}
 
-	m_pt->Init(bflag);
+	// don't forget to initialize the base class
+    FEMaterialPoint::Init(bflag);
+
 	for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Init(bflag);
 }
 
@@ -43,7 +52,7 @@ void FEElasticMixtureMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 	}
 	for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->ShallowCopy(dmp, bsave);
 
-	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------
@@ -59,7 +68,7 @@ void FEElasticMixtureMaterialPoint::Serialize(DumpFile& ar)
 	}
 	for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Serialize(ar);
     
-	if (m_pt) m_pt->Serialize(ar);
+	if (m_pNext) m_pNext->Serialize(ar);
 }
 
 //=============================================================================
@@ -77,9 +86,7 @@ FEMaterialPoint* FEElasticMixture::CreateMaterialPointData()
 { 
 	FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint();
 	int NMAT = Materials();
-	pt->m_w.resize(NMAT);
-	pt->m_mp.resize(NMAT);
-	for (int i=0; i<NMAT; ++i) pt->m_mp[i] = m_pMat[i]->CreateMaterialPointData();
+	for (int i=0; i<NMAT; ++i) pt->AddMaterialPoint(m_pMat[i]->CreateMaterialPointData());
 	return pt;
 }
 
@@ -142,7 +149,6 @@ bool FEElasticMixture::SetProperty(int n, FECoreBase* pm)
 mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
-    FEMaterialPoint* psafe = pt.Next();
 	vector<double>& w = pt.m_w;
 	assert(w.size() == m_pMat.size());
 
@@ -161,14 +167,8 @@ mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
 
-        // temporarily copy this material point to the parent material point
-        pt.ReplaceNext(pt.m_mp[i]);
-        
-        s += epi.m_s = m_pMat[i]->Stress(mp)*w[i];
+        s += epi.m_s = m_pMat[i]->Stress(*pt.m_mp[i])*w[i];
 	}
-    
-    // restore the material point
-    pt.ReplaceNext(psafe);
 
 	return s;
 }
@@ -178,7 +178,6 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
 	vector<double>& w = pt.m_w;
-    FEMaterialPoint* psafe = pt.Next();
 	assert(w.size() == m_pMat.size());
 
 	// get the elastic material point
@@ -196,14 +195,8 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
         
-        // temporarily copy this material point to the parent material point
-        pt.ReplaceNext(pt.m_mp[i]);
-        
-		c += m_pMat[i]->Tangent(mp)*w[i];
+		c += m_pMat[i]->Tangent(*pt.m_mp[i])*w[i];
 	}
-    
-    // restore the material point
-    pt.ReplaceNext(psafe);
 
 	return c;
 }
@@ -214,7 +207,6 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 double FEElasticMixture::StrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
-    FEMaterialPoint* psafe = pt.Next();
 	vector<double>& w = pt.m_w;
 	assert(w.size() == m_pMat.size());
     
@@ -233,14 +225,8 @@ double FEElasticMixture::StrainEnergyDensity(FEMaterialPoint& mp)
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
         
-        // temporarily copy this material point to the parent material point
-        pt.ReplaceNext(pt.m_mp[i]);
-        
-		sed += m_pMat[i]->StrainEnergyDensity(mp)*w[i];
+		sed += m_pMat[i]->StrainEnergyDensity(*pt.m_mp[i])*w[i];
 	}
-    
-    // restore the material point
-    pt.ReplaceNext(psafe);
     
 	return sed;
 }

@@ -10,6 +10,9 @@ public:
 	//! constructor
 	FEElasticMixtureMaterialPoint();
 
+	//! Add a child material point
+	void AddMaterialPoint(FEMaterialPoint* pt);
+
 	//! Copy material point data
 	FEMaterialPoint* Copy();
 
@@ -22,6 +25,7 @@ public:
 	//! stream material point data
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
+	//! retrieve point data
 	FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }
 
 public:

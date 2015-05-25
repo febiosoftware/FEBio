@@ -17,7 +17,7 @@ FEBiphasicMaterialPoint::FEBiphasicMaterialPoint(FEMaterialPoint* ppt) : FEMater
 FEMaterialPoint* FEBiphasicMaterialPoint::Copy()
 {
 	FEBiphasicMaterialPoint* pt = new FEBiphasicMaterialPoint(*this);
-	if (m_pt) pt->m_pt = m_pt->Copy();
+	if (m_pNext) pt->m_pNext = m_pNext->Copy();
 	return pt;
 }
 
@@ -33,7 +33,7 @@ void FEBiphasicMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 		dmp >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p >> m_phi0hat;
 	}
 
-	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ void FEBiphasicMaterialPoint::Serialize(DumpFile& ar)
 		ar >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p >> m_phi0hat;
 	}
 
-	if (m_pt) m_pt->Serialize(ar);
+	if (m_pNext) m_pNext->Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ void FEBiphasicMaterialPoint::Init(bool bflag)
 		m_phi0hat = 0;
 	}
 
-	if (m_pt) m_pt->Init(bflag);
+	if (m_pNext) m_pNext->Init(bflag);
 }
 
 //============================================================================

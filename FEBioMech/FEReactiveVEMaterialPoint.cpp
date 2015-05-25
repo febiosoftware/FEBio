@@ -20,7 +20,7 @@
 FEMaterialPoint* FEReactiveVEMaterialPoint::Copy()
 {
     FEReactiveVEMaterialPoint* pt = new FEReactiveVEMaterialPoint(*this);
-    if (m_pt) pt->m_pt = m_pt->Copy();
+    if (m_pNext) pt->m_pNext = m_pNext->Copy();
     return pt;
 }
 
@@ -28,7 +28,7 @@ FEMaterialPoint* FEReactiveVEMaterialPoint::Copy()
 //! Initializes material point data.
 void FEReactiveVEMaterialPoint::Init(bool bflag)
 {
-    FEElasticMaterialPoint& pt = *m_pt->ExtractData<FEElasticMaterialPoint>();
+    FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
     if (bflag)
     {
         // initialize data to zero
@@ -61,15 +61,15 @@ void FEReactiveVEMaterialPoint::Init(bool bflag)
         }
     }
     
-    // don't forget to initialize the nested data
-    if (m_pt) m_pt->Init(bflag);
+    // don't forget to initialize the base class
+    FEMaterialPoint::Init(bflag);
 }
 
 //-----------------------------------------------------------------------------
 //! Serialize data to the archive
 void FEReactiveVEMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-    if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+    if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
     
     if (bsave)
     {
@@ -89,7 +89,7 @@ void FEReactiveVEMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 //! Serialize data to the archive
 void FEReactiveVEMaterialPoint::Serialize(DumpFile& ar)
 {
-    if (m_pt) m_pt->Serialize(ar);
+    if (m_pNext) m_pNext->Serialize(ar);
     
     if (ar.IsSaving())
     {

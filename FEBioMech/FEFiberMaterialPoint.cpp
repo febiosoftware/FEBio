@@ -13,7 +13,7 @@
 FEMaterialPoint* FEFiberMaterialPoint::Copy()
 {
 	FEFiberMaterialPoint* pt = new FEFiberMaterialPoint(*this);
-	if (m_pt) pt->m_pt = m_pt->Copy();
+	if (m_pNext) pt->m_pNext = m_pNext->Copy();
 	return pt;
 }
 
@@ -26,15 +26,15 @@ void FEFiberMaterialPoint::Init(bool bflag)
         m_n0 = vec3d(1,0,0);
 	}
     
-	// don't forget to intialize the nested data
-	if (m_pt) m_pt->Init(bflag);
+	// don't forget to intialize the base class data
+	FEMaterialPoint::Init(bflag);
 }
 
 //-----------------------------------------------------------------------------
 //! Serialize data to the archive
 void FEFiberMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
     
 	if (bsave)
 	{
@@ -50,7 +50,7 @@ void FEFiberMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 //! Serialize data to the archive
 void FEFiberMaterialPoint::Serialize(DumpFile& ar)
 {
-	if (m_pt) m_pt->Serialize(ar);
+	if (m_pNext) m_pNext->Serialize(ar);
     
 	if (ar.IsSaving())
 	{

@@ -69,6 +69,9 @@ public:
     FEMultigenerationMaterialPoint();
 		
 	FEMaterialPoint* Copy();
+
+	//! Add a child material point
+	void AddMaterialPoint(FEMaterialPoint* pt);
 		
 	//! data serialization
 	void Serialize(DumpFile& ar);

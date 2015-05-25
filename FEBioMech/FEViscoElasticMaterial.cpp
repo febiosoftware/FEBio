@@ -26,7 +26,7 @@ END_PARAMETER_LIST();
 FEMaterialPoint* FEViscoElasticMaterialPoint::Copy()
 {
 	FEViscoElasticMaterialPoint* pt = new FEViscoElasticMaterialPoint(*this);
-	if (m_pt) pt->m_pt = m_pt->Copy();
+	if (m_pNext) pt->m_pNext = m_pNext->Copy();
 	return pt;
 }
 
@@ -34,7 +34,7 @@ FEMaterialPoint* FEViscoElasticMaterialPoint::Copy()
 //! Initializes material point data.
 void FEViscoElasticMaterialPoint::Init(bool bflag)
 {
-	FEElasticMaterialPoint& pt = *m_pt->ExtractData<FEElasticMaterialPoint>();
+	FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
 	if (bflag)
 	{
 		// intialize data to zero
@@ -63,15 +63,15 @@ void FEViscoElasticMaterialPoint::Init(bool bflag)
         }
 	}
 
-	// don't forget to intialize the nested data
-	if (m_pt) m_pt->Init(bflag);
+    // don't forget to initialize the base class
+    FEMaterialPoint::Init(bflag);
 }
 
 //-----------------------------------------------------------------------------
 //! Serialize data to the archive
 void FEViscoElasticMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
 
 	if (bsave)
 	{
@@ -91,7 +91,7 @@ void FEViscoElasticMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 //! Serialize data to the archive
 void FEViscoElasticMaterialPoint::Serialize(DumpFile& ar)
 {
-	if (m_pt) m_pt->Serialize(ar);
+	if (m_pNext) m_pNext->Serialize(ar);
 
 	if (ar.IsSaving())
 	{

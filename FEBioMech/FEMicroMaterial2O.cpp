@@ -38,13 +38,14 @@ FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterial
 //! Initialize material point data
 void FEMicroMaterialPoint2O::Init(bool bflag)
 {
+	FEMaterialPoint::Init(bflag);
 }
 
 //-----------------------------------------------------------------------------
 //! create a shallow copy
 FEMaterialPoint* FEMicroMaterialPoint2O::Copy()
 {
-	FEMicroMaterialPoint2O* pt = new FEMicroMaterialPoint2O(m_pt?m_pt->Copy():0);
+	FEMicroMaterialPoint2O* pt = new FEMicroMaterialPoint2O(m_pNext?m_pNext->Copy():0);
 	pt->m_tau = m_tau;
 	pt->m_G = m_G;
 	pt->m_Ca = m_Ca;
