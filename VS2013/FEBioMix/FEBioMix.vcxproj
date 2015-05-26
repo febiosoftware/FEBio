@@ -315,6 +315,8 @@
     <ClInclude Include="..\..\FEBioMix\FEDiffConstIso.h" />
     <ClInclude Include="..\..\FEBioMix\FEDiffConstOrtho.h" />
     <ClInclude Include="..\..\FEBioMix\FEDiffRefIso.h" />
+    <ClInclude Include="..\..\FEBioMix\FEFiberExpPowSBM.h" />
+    <ClInclude Include="..\..\FEBioMix\FEFiberPowLinearSBM.h" />
     <ClInclude Include="..\..\FEBioMix\FEFluidFlux.h" />
     <ClInclude Include="..\..\FEBioMix\FEHydraulicPermeability.h" />
     <ClInclude Include="..\..\FEBioMix\FEMassActionForward.h" />
@@ -380,6 +382,8 @@
     <ClCompile Include="..\..\FEBioMix\FEDiffConstIso.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEDiffConstOrtho.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEDiffRefIso.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEFiberExpPowSBM.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEFiberPowLinearSBM.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEFluidFlux.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEHydraulicPermeability.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMassActionForward.cpp" />
