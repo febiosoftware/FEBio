@@ -9,7 +9,7 @@
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FEBioMech/FERigidSpring.h"
 #include "FEBioMech/FERigidDamper.h"
-#include "FEBiomech/FERigidContractileForce.h"
+#include "FEBioMech/FERigidContractileForce.h"
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
