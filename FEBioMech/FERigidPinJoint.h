@@ -31,13 +31,13 @@ public:
 	bool Init();
     
 	//! calculates the joint forces
-	void Residual(FEGlobalVector& R);
+	void Residual(FEGlobalVector& R, const FETimePoint& tp);
     
 	//! calculates the joint stiffness
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
     
 	//! calculate Lagrangian augmentation
-	bool Augment(int naug);
+	bool Augment(int naug, const FETimePoint& tp);
     
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
@@ -46,7 +46,7 @@ public:
 	void ShallowCopy(DumpStream& dmp, bool bsave);
     
 	//! update state
-	void Update();
+	void Update(const FETimePoint& tp);
     
 	//! Reset data
 	void Reset();
@@ -80,7 +80,6 @@ public:
 protected:
 	int		m_nID;	//!< ID of rigid joint
 	bool	m_binit;
-    double  m_alpha;    //! alpha from solver
     
 	DECLARE_PARAMETER_LIST();
 };

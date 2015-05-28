@@ -9,7 +9,6 @@
 #include "FERigidContractileForce.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
-#include "FESolidSolver2.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidContractileForce, FERigidConnector);
@@ -24,7 +23,6 @@ FERigidContractileForce::FERigidContractileForce(FEModel* pfem) : FERigidConnect
     static int count = 1;
     m_nID = count++;
     m_binit = false;
-    m_alpha = 1.0;
     m_f0 = 0;
 }
 
@@ -89,25 +87,27 @@ void FERigidContractileForce::ShallowCopy(DumpStream& dmp, bool bsave)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidContractileForce::Residual(FEGlobalVector& R)
+void FERigidContractileForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {
     vector<double> fa(6);
     vector<double> fb(6);
     
     FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
     FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+
+	double alpha = tp.alpha;
     
     // body A
-    vec3d ra = RBa.m_rt*m_alpha + RBa.m_rp*(1-m_alpha);
+    vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
-    vec3d za = zat*m_alpha + zap*(1-m_alpha);
+    vec3d za = zat*alpha + zap*(1-alpha);
     
     // body b
-    vec3d rb = RBb.m_rt*m_alpha + RBb.m_rp*(1-m_alpha);
+    vec3d rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
-    vec3d zb = zbt*m_alpha + zbp*(1-m_alpha);
+    vec3d zb = zbt*alpha + zbp*(1-alpha);
     
     vec3d n = rb + zb - ra - za;
     n.unit();
@@ -135,12 +135,10 @@ void FERigidContractileForce::Residual(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidContractileForce::StiffnessMatrix(FESolver* psolver)
+void FERigidContractileForce::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
 {
-    // get m_alpha from solver
-    FESolidSolver2* ps2 = dynamic_cast<FESolidSolver2*>(psolver);
-    if (ps2) m_alpha = ps2->m_alpha;
-    
+ 	double alpha = tp.alpha;
+     
     int j;
     
     vector<int> LM(12);
@@ -151,18 +149,18 @@ void FERigidContractileForce::StiffnessMatrix(FESolver* psolver)
     FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
     
     // body A
-    vec3d ra = RBa.m_rt*m_alpha + RBa.m_rp*(1-m_alpha);
+    vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
-    vec3d za = zat*m_alpha + zap*(1-m_alpha);
+    vec3d za = zat*alpha + zap*(1-alpha);
     mat3d zahat; zahat.skew(za);
     mat3d zathat; zathat.skew(zat);
     
     // body b
-    vec3d rb = RBb.m_rt*m_alpha + RBb.m_rp*(1-m_alpha);
+    vec3d rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
-    vec3d zb = zbt*m_alpha + zbp*(1-m_alpha);
+    vec3d zb = zbt*alpha + zbp*(1-alpha);
     mat3d zbhat; zbhat.skew(zb);
     mat3d zbthat; zbthat.skew(zbt);
     
@@ -177,99 +175,99 @@ void FERigidContractileForce::StiffnessMatrix(FESolver* psolver)
     mat3d K;
     
     // (1,1)
-    K = P*(m_alpha*k);
+    K = P*(alpha*k);
     ke[0][0] = K[0][0]; ke[0][1] = K[0][1]; ke[0][2] = K[0][2];
     ke[1][0] = K[1][0]; ke[1][1] = K[1][1]; ke[1][2] = K[1][2];
     ke[2][0] = K[2][0]; ke[2][1] = K[2][1]; ke[2][2] = K[2][2];
     
     // (1,2)
-    K = (P*zathat)*(-m_alpha*k);
+    K = (P*zathat)*(-alpha*k);
     ke[0][3] = K[0][0]; ke[0][4] = K[0][1]; ke[0][5] = K[0][2];
     ke[1][3] = K[1][0]; ke[1][4] = K[1][1]; ke[1][5] = K[1][2];
     ke[2][3] = K[2][0]; ke[2][4] = K[2][1]; ke[2][5] = K[2][2];
     
     // (1,3)
-    K = P*(-m_alpha*k);
+    K = P*(-alpha*k);
     ke[0][6] = K[0][0]; ke[0][7] = K[0][1]; ke[0][8] = K[0][2];
     ke[1][6] = K[1][0]; ke[1][7] = K[1][1]; ke[1][8] = K[1][2];
     ke[2][6] = K[2][0]; ke[2][7] = K[2][1]; ke[2][8] = K[2][2];
     
     // (1,4)
-    K = P*zbthat*(m_alpha*k);
+    K = P*zbthat*(alpha*k);
     ke[0][9] = K[0][0]; ke[0][10] = K[0][1]; ke[0][11] = K[0][2];
     ke[1][9] = K[1][0]; ke[1][10] = K[1][1]; ke[1][11] = K[1][2];
     ke[2][9] = K[2][0]; ke[2][10] = K[2][1]; ke[2][11] = K[2][2];
     
     // (2,1)
-    K = zahat*P*(m_alpha*k);
+    K = zahat*P*(alpha*k);
     ke[3][0] = K[0][0]; ke[3][1] = K[0][1]; ke[3][2] = K[0][2];
     ke[4][0] = K[1][0]; ke[4][1] = K[1][1]; ke[4][2] = K[1][2];
     ke[5][0] = K[2][0]; ke[5][1] = K[2][1]; ke[5][2] = K[2][2];
     
     // (2,2)
-    K = (zahat*P*zathat)*(-m_alpha*k);
+    K = (zahat*P*zathat)*(-alpha*k);
     ke[3][3] = K[0][0]; ke[3][4] = K[0][1]; ke[3][5] = K[0][2];
     ke[4][3] = K[1][0]; ke[4][4] = K[1][1]; ke[4][5] = K[1][2];
     ke[5][3] = K[2][0]; ke[5][4] = K[2][1]; ke[5][5] = K[2][2];
     
     // (2,3)
-    K = zahat*P*(-m_alpha*k);
+    K = zahat*P*(-alpha*k);
     ke[3][6] = K[0][0]; ke[3][7] = K[0][1]; ke[3][8] = K[0][2];
     ke[4][6] = K[1][0]; ke[4][7] = K[1][1]; ke[4][8] = K[1][2];
     ke[5][6] = K[2][0]; ke[5][7] = K[2][1]; ke[5][8] = K[2][2];
     
     // (2,4)
-    K = (zahat*P*zbthat)*(m_alpha*k);
+    K = (zahat*P*zbthat)*(alpha*k);
     ke[3][9] = K[0][0]; ke[3][10] = K[0][1]; ke[3][11] = K[0][2];
     ke[4][9] = K[1][0]; ke[4][10] = K[1][1]; ke[4][11] = K[1][2];
     ke[5][9] = K[2][0]; ke[5][10] = K[2][1]; ke[5][11] = K[2][2];
     
     
     // (3,1)
-    K = P*(-m_alpha*k);
+    K = P*(-alpha*k);
     ke[6][0] = K[0][0]; ke[6][1] = K[0][1]; ke[6][2] = K[0][2];
     ke[7][0] = K[1][0]; ke[7][1] = K[1][1]; ke[7][2] = K[1][2];
     ke[8][0] = K[2][0]; ke[8][1] = K[2][1]; ke[8][2] = K[2][2];
     
     // (3,2)
-    K = (P*zathat)*(m_alpha*k);
+    K = (P*zathat)*(alpha*k);
     ke[6][3] = K[0][0]; ke[6][4] = K[0][1]; ke[6][5] = K[0][2];
     ke[7][3] = K[1][0]; ke[7][4] = K[1][1]; ke[7][5] = K[1][2];
     ke[8][3] = K[2][0]; ke[8][4] = K[2][1]; ke[8][5] = K[2][2];
     
     // (3,3)
-    K = P*(m_alpha*k);
+    K = P*(alpha*k);
     ke[6][6] = K[0][0]; ke[6][7] = K[0][1]; ke[6][8] = K[0][2];
     ke[7][6] = K[1][0]; ke[7][7] = K[1][1]; ke[7][8] = K[1][2];
     ke[8][6] = K[2][0]; ke[8][7] = K[2][1]; ke[8][8] = K[2][2];
     
     // (3,4)
-    K = P*zbthat*(-m_alpha*k);
+    K = P*zbthat*(-alpha*k);
     ke[6][9] = K[0][0]; ke[6][10] = K[0][1]; ke[6][11] = K[0][2];
     ke[7][9] = K[1][0]; ke[7][10] = K[1][1]; ke[7][11] = K[1][2];
     ke[8][9] = K[2][0]; ke[8][10] = K[2][1]; ke[8][11] = K[2][2];
     
     
     // (4,1)
-    K = zbhat*P*(-m_alpha*k);
+    K = zbhat*P*(-alpha*k);
     ke[9 ][0] = K[0][0]; ke[ 9][1] = K[0][1]; ke[ 9][2] = K[0][2];
     ke[10][0] = K[1][0]; ke[10][1] = K[1][1]; ke[10][2] = K[1][2];
     ke[11][0] = K[2][0]; ke[11][1] = K[2][1]; ke[11][2] = K[2][2];
     
     // (4,2)
-    K = (zbhat*P*zathat)*(m_alpha*k);
+    K = (zbhat*P*zathat)*(alpha*k);
     ke[9 ][3] = K[0][0]; ke[ 9][4] = K[0][1]; ke[ 9][5] = K[0][2];
     ke[10][3] = K[1][0]; ke[10][4] = K[1][1]; ke[10][5] = K[1][2];
     ke[11][3] = K[2][0]; ke[11][4] = K[2][1]; ke[11][5] = K[2][2];
     
     // (4,3)
-    K = zbhat*P*(m_alpha*k);
+    K = zbhat*P*(alpha*k);
     ke[9 ][6] = K[0][0]; ke[ 9][7] = K[0][1]; ke[ 9][8] = K[0][2];
     ke[10][6] = K[1][0]; ke[10][7] = K[1][1]; ke[10][8] = K[1][2];
     ke[11][6] = K[2][0]; ke[11][7] = K[2][1]; ke[11][8] = K[2][2];
     
     // (4,4)
-    K = (zbhat*P*zbthat)*(-m_alpha*k);
+    K = (zbhat*P*zbthat)*(-alpha*k);
     ke[9 ][9] = K[0][0]; ke[ 9][10] = K[0][1]; ke[ 9][11] = K[0][2];
     ke[10][9] = K[1][0]; ke[10][10] = K[1][1]; ke[10][11] = K[1][2];
     ke[11][9] = K[2][0]; ke[11][10] = K[2][1]; ke[11][11] = K[2][2];
@@ -284,7 +282,7 @@ void FERigidContractileForce::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidContractileForce::Augment(int naug)
+bool FERigidContractileForce::Augment(int naug, const FETimePoint& tp)
 {
     return true;
 }
@@ -309,7 +307,7 @@ void FERigidContractileForce::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidContractileForce::Update()
+void FERigidContractileForce::Update(const FETimePoint& tp)
 {
     vec3d ra, rb, c;
     vec3d za, zb;
@@ -317,16 +315,18 @@ void FERigidContractileForce::Update()
     FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
     FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
     
-    ra = RBa.m_rt*m_alpha + RBa.m_rp*(1-m_alpha);
-    rb = RBb.m_rt*m_alpha + RBb.m_rp*(1-m_alpha);
+	double alpha = tp.alpha;
+
+    ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
+    rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     
     vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
-    za = zat*m_alpha + zap*(1-m_alpha);
+    za = zat*alpha + zap*(1-alpha);
     
     vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
-    zb = zbt*m_alpha + zbp*(1-m_alpha);
+    zb = zbt*alpha + zbp*(1-alpha);
     
     vec3d n = rb + zb - ra - za;
     n.unit();

@@ -10,7 +10,6 @@
 #include "FERigidPinJoint.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
-#include "FESolidSolver2.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidPinJoint, FENLConstraint);
@@ -38,7 +37,6 @@ FERigidPinJoint::FERigidPinJoint(FEModel* pfem) : FENLConstraint(pfem)
     m_qtol = 0;
 	m_naugmin = 0;
 	m_naugmax = 10;
-    m_alpha = 0.5;
 }
 
 //-----------------------------------------------------------------------------
@@ -109,31 +107,33 @@ void FERigidPinJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidPinJoint::Residual(FEGlobalVector& R)
+void FERigidPinJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {
 	vector<double> fa(6);
 	vector<double> fb(6);
     
 	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
 	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+
+	double alpha = tp.alpha;
     
 	// body A
-    vec3d ra = RBa.m_rt*m_alpha + RBa.m_rp*(1-m_alpha);
+    vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
-    vec3d za = zat*m_alpha + zap*(1-m_alpha);
+    vec3d za = zat*alpha + zap*(1-alpha);
 	vec3d nat = m_na0; RBa.m_qt.RotateVector(nat);
 	vec3d nap = m_na0; RBa.m_qp.RotateVector(nap);
-    vec3d na = nat*m_alpha + nap*(1-m_alpha);
+    vec3d na = nat*alpha + nap*(1-alpha);
     
 	// body b
-    vec3d rb = RBb.m_rt*m_alpha + RBb.m_rp*(1-m_alpha);
+    vec3d rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
-    vec3d zb = zbt*m_alpha + zbp*(1-m_alpha);
+    vec3d zb = zbt*alpha + zbp*(1-alpha);
 	vec3d nbt = m_nb0; RBb.m_qt.RotateVector(nbt);
 	vec3d nbp = m_nb0; RBb.m_qp.RotateVector(nbp);
-    vec3d nb = nbt*m_alpha + nbp*(1-m_alpha);
+    vec3d nb = nbt*alpha + nbp*(1-alpha);
     
 	vec3d c = rb + zb - ra - za;
 	m_F = m_L + c*m_eps;
@@ -163,10 +163,9 @@ void FERigidPinJoint::Residual(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidPinJoint::StiffnessMatrix(FESolver* psolver)
+void FERigidPinJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
 {
-    // get m_alpha from solver
-    m_alpha = dynamic_cast<FESolidSolver2*>(psolver)->m_alpha;
+	double alpha = tp.alpha;
     
 	int j, k;
     
@@ -185,7 +184,7 @@ void FERigidPinJoint::StiffnessMatrix(FESolver* psolver)
 	// body A
     at = m_qa0; RBa.m_qt.RotateVector(at);
     ap = m_qa0; RBa.m_qp.RotateVector(ap);
-    a = at*m_alpha + ap*(1-m_alpha);
+    a = at*alpha + ap*(1-alpha);
     
 	y1h[0][0] =    0; y1h[0][1] =  a.z; y1h[0][2] = -a.y;
 	y1h[1][0] = -a.z; y1h[1][1] =    0; y1h[1][2] =  a.x;
@@ -198,7 +197,7 @@ void FERigidPinJoint::StiffnessMatrix(FESolver* psolver)
 	// body b
     at = m_qb0; RBb.m_qt.RotateVector(at);
     ap = m_qb0; RBb.m_qp.RotateVector(ap);
-    a = at*m_alpha + ap*(1-m_alpha);
+    a = at*alpha + ap*(1-alpha);
     
 	y2h[0][0] =    0; y2h[0][1] =  a.z; y2h[0][2] = -a.y;
 	y2h[1][0] = -a.z; y2h[1][1] =    0; y2h[1][2] =  a.x;
@@ -210,11 +209,11 @@ void FERigidPinJoint::StiffnessMatrix(FESolver* psolver)
     
 	nat = m_na0; RBa.m_qt.RotateVector(nat);
 	nap = m_na0; RBa.m_qp.RotateVector(nap);
-    na = nat*m_alpha + nap*(1-m_alpha);
+    na = nat*alpha + nap*(1-alpha);
 	nbt = m_nb0; RBb.m_qt.RotateVector(nbt);
 	nbp = m_nb0; RBb.m_qp.RotateVector(nbp);
-    nb = nbt*m_alpha + nbp*(1-m_alpha);
-    mat3d Nab = ((na*nb)*mat3dd(1) - (na & nb))*(m_ups*m_alpha);
+    nb = nbt*alpha + nbp*(1-alpha);
+    mat3d Nab = ((na*nb)*mat3dd(1) - (na & nb))*(m_ups*alpha);
     mat3d Nba = Nab.transpose();
     
 	for (j=0; j<3; ++j)
@@ -292,7 +291,7 @@ void FERigidPinJoint::StiffnessMatrix(FESolver* psolver)
 	for (j=0; j<12; ++j)
 		for (k=0; k<12; ++k)
 		{
-			ke[j][k] *= m_eps*m_alpha;
+			ke[j][k] *= m_eps*alpha;
 		}
     
 	ke[3][3] += Nab(0,0); ke[3][4] += Nab(0,1); ke[3][5] += Nab(0,2);
@@ -321,7 +320,7 @@ void FERigidPinJoint::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidPinJoint::Augment(int naug)
+bool FERigidPinJoint::Augment(int naug, const FETimePoint& tp)
 {
 	vec3d ra, rb, qa, qb, c,  Lm;
     vec3d za, zb;
@@ -330,20 +329,22 @@ bool FERigidPinJoint::Augment(int naug)
     vec3d q,  Um;
 	double normM0, normM1;
 	bool bconv = true;
-    
+
+	double alpha = tp.alpha;
+
 	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
 	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
     
-    ra = RBa.m_rt*m_alpha + RBa.m_rp*(1-m_alpha);
-    rb = RBb.m_rt*m_alpha + RBb.m_rp*(1-m_alpha);
+    ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
+    rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     
     vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
-    za = zat*m_alpha + zap*(1-m_alpha);
+    za = zat*alpha + zap*(1-alpha);
     
     vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
-    zb = zbt*m_alpha + zbp*(1-m_alpha);
+    zb = zbt*alpha + zbp*(1-alpha);
     
 	c = rb + zb - ra - za;
     
@@ -356,10 +357,10 @@ bool FERigidPinJoint::Augment(int naug)
     
 	nat = m_na0; RBa.m_qt.RotateVector(nat);
 	nap = m_na0; RBa.m_qp.RotateVector(nap);
-    na = nat*m_alpha + nap*(1-m_alpha);
+    na = nat*alpha + nap*(1-alpha);
 	nbt = m_nb0; RBb.m_qt.RotateVector(nbt);
 	nbp = m_nb0; RBb.m_qp.RotateVector(nbp);
-    nb = nbt*m_alpha + nbp*(1-m_alpha);
+    nb = nbt*alpha + nbp*(1-alpha);
     
     q = na ^ nb;
     
@@ -428,7 +429,7 @@ void FERigidPinJoint::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidPinJoint::Update()
+void FERigidPinJoint::Update(const FETimePoint& tp)
 {
 	vec3d ra, rb, c;
     vec3d za, zb;
@@ -436,17 +437,19 @@ void FERigidPinJoint::Update()
     
 	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
 	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
-    
-    ra = RBa.m_rt*m_alpha + RBa.m_rp*(1-m_alpha);
-    rb = RBb.m_rt*m_alpha + RBb.m_rp*(1-m_alpha);
+ 
+	double alpha = tp.alpha;
+
+    ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
+    rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     
     vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
-    za = zat*m_alpha + zap*(1-m_alpha);
+    za = zat*alpha + zap*(1-alpha);
     
     vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
-    zb = zbt*m_alpha + zbp*(1-m_alpha);
+    zb = zbt*alpha + zbp*(1-alpha);
     
 	c = rb + zb - ra - za;
     
@@ -454,10 +457,10 @@ void FERigidPinJoint::Update()
     
 	nat = m_na0; RBa.m_qt.RotateVector(nat);
 	nap = m_na0; RBa.m_qp.RotateVector(nap);
-    na = nat*m_alpha + nap*(1-m_alpha);
+    na = nat*alpha + nap*(1-alpha);
 	nbt = m_nb0; RBb.m_qt.RotateVector(nbt);
 	nbp = m_nb0; RBb.m_qp.RotateVector(nbp);
-    nb = nbt*m_alpha + nbp*(1-m_alpha);
+    nb = nbt*alpha + nbp*(1-alpha);
     
     vec3d q = na ^ nb;
     m_M = m_U + q*m_ups;

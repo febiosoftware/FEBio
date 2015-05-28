@@ -4,6 +4,7 @@
 #include "FEModelComponent.h"
 #include "FEGlobalVector.h"
 #include "FESurface.h"
+#include "FETypes.h"
 #include <vector>
 using namespace std;
 
@@ -24,15 +25,15 @@ public:
 	virtual ~FENLConstraint();
 
 public:
-	virtual void Residual(FEGlobalVector& R) = 0;
-	virtual void StiffnessMatrix(FESolver* psolver) = 0;
-	virtual bool Augment(int naug) = 0;
+	virtual void Residual(FEGlobalVector& R, const FETimePoint& tp) = 0;
+	virtual void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp) = 0;
+	virtual bool Augment(int naug, const FETimePoint& tp) = 0;
 	virtual void Serialize(DumpFile& ar) = 0;
 	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
 
 	// update state
 	virtual void Reset() {}
-	virtual void Update() {}
+	virtual void Update(const FETimePoint& tp) {}
 
 	virtual FESurface* GetSurface(const char* sz) { return 0; }
 

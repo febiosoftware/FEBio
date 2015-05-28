@@ -63,7 +63,7 @@ void FEDistanceConstraint::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FEDistanceConstraint::Residual(FEGlobalVector& R)
+void FEDistanceConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {
 	// get the FE mesh
 	FEMesh& mesh = GetFEModel()->GetMesh();
@@ -109,7 +109,7 @@ void FEDistanceConstraint::Residual(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FEDistanceConstraint::StiffnessMatrix(FESolver* psolver)
+void FEDistanceConstraint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
 {
 	// get the FE mesh
 	FEMesh& mesh = GetFEModel()->GetMesh();
@@ -168,7 +168,7 @@ void FEDistanceConstraint::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-bool FEDistanceConstraint::Augment(int naug)
+bool FEDistanceConstraint::Augment(int naug, const FETimePoint& tp)
 {
 	// make sure we are augmenting
 	if ((m_blaugon == false) || (m_atol <= 0.0)) return true;
@@ -238,7 +238,7 @@ void FEDistanceConstraint::Reset()
 
 //-----------------------------------------------------------------------------
 // This function is called when the FE model's state needs to be updated.
-void FEDistanceConstraint::Update()
+void FEDistanceConstraint::Update(const FETimePoint& tp)
 {
 
 }

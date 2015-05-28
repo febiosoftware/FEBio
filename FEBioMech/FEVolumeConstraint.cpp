@@ -107,7 +107,7 @@ void FEVolumeConstraint::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FEVolumeConstraint::Residual(FEGlobalVector& R)
+void FEVolumeConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {
 	FEMesh& mesh = *m_s.GetMesh();
 
@@ -171,7 +171,7 @@ void FEVolumeConstraint::Residual(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FEVolumeConstraint::StiffnessMatrix(FESolver* psolver)
+void FEVolumeConstraint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
 {
 	FEMesh& mesh = *m_s.GetMesh();
 
@@ -275,7 +275,7 @@ void FEVolumeConstraint::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-bool FEVolumeConstraint::Augment(int naug)
+bool FEVolumeConstraint::Augment(int naug, const FETimePoint& tp)
 {
 	// make sure we are augmenting
 	if ((m_blaugon == false) || (m_atol <= 0.0)) return true;
@@ -328,7 +328,7 @@ void FEVolumeConstraint::Reset()
 
 //-----------------------------------------------------------------------------
 // This function is called when the FE model's state needs to be updated.
-void FEVolumeConstraint::Update()
+void FEVolumeConstraint::Update(const FETimePoint& tp)
 {
 	// calculate the current volume
 	m_s.m_Vt = m_s.Volume();

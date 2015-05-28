@@ -84,7 +84,7 @@ void FERigidJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidJoint::Residual(FEGlobalVector& R)
+void FERigidJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {
 	vector<double> fa(6);
 	vector<double> fb(6);
@@ -130,7 +130,7 @@ void FERigidJoint::Residual(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidJoint::StiffnessMatrix(FESolver* psolver)
+void FERigidJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
 {
 	int j, k;
 
@@ -242,7 +242,7 @@ void FERigidJoint::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidJoint::Augment(int naug)
+bool FERigidJoint::Augment(int naug, const FETimePoint& tp)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;
@@ -314,7 +314,7 @@ void FERigidJoint::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidJoint::Update()
+void FERigidJoint::Update(const FETimePoint& tp)
 {
 	FERigidBody& RBa = static_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
 	FERigidBody& RBb = static_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));

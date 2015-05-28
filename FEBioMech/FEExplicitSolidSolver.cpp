@@ -357,6 +357,8 @@ void FEExplicitSolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, 
 //! Updates the current state of the model
 void FEExplicitSolidSolver::Update(vector<double>& ui)
 {
+	FETimePoint tp = m_fem.GetTime();
+
 	// update kinematics
 	UpdateKinematics(ui);
 
@@ -372,7 +374,7 @@ void FEExplicitSolidSolver::Update(vector<double>& ui)
 	for (int i=0; i<NC; ++i)
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
-		if (plc->IsActive()) plc->Update();
+		if (plc->IsActive()) plc->Update(tp);
 	}
 
 	// update element stresses
@@ -1245,10 +1247,13 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 		ContactForces(RHS);
 	}
 
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
+
 	// calculate nonlinear constraint forces
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
-	NonLinearConstraintForces(RHS);
+	NonLinearConstraintForces(RHS, tp);
 
 	// forces due to point constraints
 //	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
@@ -1286,13 +1291,13 @@ void FEExplicitSolidSolver::ContactForces(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! calculate the nonlinear constraint forces 
-void FEExplicitSolidSolver::NonLinearConstraintForces(FEGlobalVector& R)
+void FEExplicitSolidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp)
 {
 	int N = m_fem.NonlinearConstraints();
 	for (int i=0; i<N; ++i) 
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
-		if (plc->IsActive()) plc->Residual(R);
+		if (plc->IsActive()) plc->Residual(R, tp);
 	}
 }
 

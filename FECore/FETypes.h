@@ -3,6 +3,19 @@
 //-----------------------------------------------------------------------------
 struct FETimePoint
 {
+	FETimePoint()
+	{
+		t = dt = 0.0;
+		alpha = 1.0;
+		beta = 0.25;
+		gamma = 0.5;
+	}
+
 	double	t;		// current time value
-	double	dt;		// current time step (distance between this time and previous one)
+	double	dt;		// current time step (difference between this time and previous one)
+
+	// HHT time integration parameters
+	double	alpha;
+	double	beta;
+	double	gamma;
 };

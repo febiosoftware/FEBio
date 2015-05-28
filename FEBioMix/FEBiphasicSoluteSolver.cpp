@@ -571,10 +571,13 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 		ContactForces(RHS);
 	}
 
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
+
 	// calculate linear constraint forces
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
-	NonLinearConstraintForces(RHS);
+	NonLinearConstraintForces(RHS, tp);
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
@@ -672,7 +675,7 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix(const FETimePoint& tp)
 	// calculate nonlinear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian
-	NonLinearConstraintStiffness();
+	NonLinearConstraintStiffness(tp);
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.

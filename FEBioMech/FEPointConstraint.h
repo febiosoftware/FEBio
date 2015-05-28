@@ -23,13 +23,13 @@ public:
 	void ShallowCopy(DumpStream& dmp, bool bsave) {}
 
 	//! Calculate the constraint force
-	void Residual(FEGlobalVector& R);
+	void Residual(FEGlobalVector& R, const FETimePoint& tp);
 
 	//! calculate the constraint stiffness
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
 
 	//! augmentations \todo implement this
-	bool Augment(int naug) { return true; }
+	bool Augment(int naug, const FETimePoint& tp) { return true; }
 
 public:
 	double		m_eps;		//!< penalty parameter

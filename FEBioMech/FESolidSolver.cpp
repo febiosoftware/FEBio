@@ -388,6 +388,8 @@ bool FESolidSolver::CreateStiffness(bool breset)
 //
 bool FESolidSolver::Augment()
 {
+	FETimePoint tp = m_fem.GetTime();
+
 	// Assume we will pass (can't hurt to be optimistic)
 	bool bconv = true;
 
@@ -407,7 +409,7 @@ bool FESolidSolver::Augment()
 	for (int i=0; i<n; ++i) 
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
-		if (plc->IsActive()) bconv = plc->Augment(m_naug) && bconv;
+		if (plc->IsActive()) bconv = plc->Augment(m_naug, tp) && bconv;
 	}
 
 	// do incompressibility multipliers for 3Field domains
@@ -783,11 +785,13 @@ void FESolidSolver::UpdateContact()
 //! Update nonlinear constraints
 void FESolidSolver::UpdateConstraints()
 {
+	FETimePoint tp = m_fem.GetTime();
+
 	// Update all nonlinear constraints
 	for (int i=0; i<m_fem.NonlinearConstraints(); ++i) 
 	{
 		FENLConstraint* pci = m_fem.NonlinearConstraint(i);
-		if (pci->IsActive()) pci->Update();
+		if (pci->IsActive()) pci->Update(tp);
 	}
 }
 
@@ -1575,7 +1579,7 @@ bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 	// calculate nonlinear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian
-	NonLinearConstraintStiffness();
+	NonLinearConstraintStiffness(tp);
 
 	// point constraints
 //	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->StiffnessMatrix(this);
@@ -1614,13 +1618,13 @@ bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the stiffness contribution due to nonlinear constraints
-void FESolidSolver::NonLinearConstraintStiffness()
+void FESolidSolver::NonLinearConstraintStiffness(const FETimePoint& tp)
 {
 	int N = m_fem.NonlinearConstraints();
 	for (int i=0; i<N; ++i) 
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
-		if (plc->IsActive()) plc->StiffnessMatrix(this);
+		if (plc->IsActive()) plc->StiffnessMatrix(this, tp);
 	}
 }
 
@@ -2161,10 +2165,13 @@ bool FESolidSolver::Residual(vector<double>& R)
 		ContactForces(RHS);
 	}
 
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
+
 	// calculate nonlinear constraint forces
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
-	NonLinearConstraintForces(RHS);
+	NonLinearConstraintForces(RHS, tp);
 
 	// forces due to point constraints
 //	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
@@ -2190,13 +2197,13 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 //-----------------------------------------------------------------------------
 //! calculate the nonlinear constraint forces 
-void FESolidSolver::NonLinearConstraintForces(FEGlobalVector& R)
+void FESolidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp)
 {
 	int N = m_fem.NonlinearConstraints();
 	for (int i=0; i<N; ++i) 
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
-		if (plc->IsActive()) plc->Residual(R);
+		if (plc->IsActive()) plc->Residual(R, tp);
 	}
 }
 

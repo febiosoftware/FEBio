@@ -38,7 +38,7 @@ bool FEPointConstraint::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEPointConstraint::Residual(FEGlobalVector& R)
+void FEPointConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {
 	int i;
 	FEMesh& m = GetFEModel()->GetMesh();
@@ -96,7 +96,7 @@ void FEPointConstraint::Residual(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FEPointConstraint::StiffnessMatrix(FESolver* psolver)
+void FEPointConstraint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
 {
 	int i, j;
 	FEMesh& m = GetFEModel()->GetMesh();

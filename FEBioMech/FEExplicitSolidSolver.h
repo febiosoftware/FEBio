@@ -1,6 +1,7 @@
 #pragma once
 #include "FECore/FESolver.h"
 #include "FECore/FEGlobalVector.h"
+#include "FECore/FETypes.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a nonlinear explicit solver for solid mechanics
@@ -57,7 +58,7 @@ public:
 
 	bool Residual(vector<double>& R);
 
-	void NonLinearConstraintForces(FEGlobalVector& R);
+	void NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp);
 
 	void InertialForces(FEGlobalVector& R);
 	

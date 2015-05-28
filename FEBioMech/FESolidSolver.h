@@ -101,7 +101,7 @@ public:
 		void RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
 
 		//! calculates stiffness contributon of nonlinear constraints
-		void NonLinearConstraintStiffness();
+		void NonLinearConstraintStiffness(const FETimePoint& tp);
 	//}
 
 	//{ --- Residual routines ---
@@ -119,7 +119,7 @@ public:
 		virtual bool Residual(vector<double>& R);
 
 		//! Calculate nonlinear constraint forces
-		void NonLinearConstraintForces(FEGlobalVector& R);
+		void NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp);
 	//}
 
 public:

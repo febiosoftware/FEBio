@@ -59,13 +59,13 @@ public:
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! add the linear constraint contributions to the residual
-	void Residual(FEGlobalVector& R);
+	void Residual(FEGlobalVector& R, const FETimePoint& tp);
 
 	//! add the linear constraint contributions to the stiffness matrix
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
 
 	//! do the augmentation
-	bool Augment(int naug);
+	bool Augment(int naug, const FETimePoint& tp);
 
 protected:
 	//! calculate the constraint value

@@ -11,16 +11,16 @@ public:
 
 	bool Init();
 	void Activate();
-	void Residual(FEGlobalVector& R);
-	void StiffnessMatrix(FESolver* psolver);
-	bool Augment(int naug);
+	void Residual(FEGlobalVector& R, const FETimePoint& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
+	bool Augment(int naug, const FETimePoint& tp);
 	void Serialize(DumpFile& ar);
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 
 	// update state
 	void Reset();
-	void Update();
+	void Update(const FETimePoint& tp);
 
 	//! define matrix profile for constraint
 	void BuildMatrixProfile();
