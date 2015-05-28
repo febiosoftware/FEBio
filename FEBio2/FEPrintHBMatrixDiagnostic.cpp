@@ -75,7 +75,9 @@ bool FEPrintHBMatrixDiagnostic::Run()
 	if (!solver.CreateStiffness(true)) return false;
 
 	// calculate the stiffness matrices
-	FETimePoint tp = {0.0, 0.0};
+	FETimePoint tp; 
+	tp.t = 0.0;
+	tp.dt = 0.0;
 	solver.StiffnessMatrix(tp);
 
 	// get the matrix
