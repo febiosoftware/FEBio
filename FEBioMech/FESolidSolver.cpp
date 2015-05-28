@@ -689,7 +689,7 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 					{
 						int lc = pdc->lc;
 						// TODO: do I need to take the line search step into account here?
-						du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc)->Value() - RB.m_Up[j] + pdc->ref);
+						du[j] = (lc < 0? 0 : pdc->Value() - RB.m_Up[j]);
 					}
 					else 
 					{
@@ -697,10 +697,6 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 					}
 				}
 			}
-
-			RB.m_rt.x = RB.m_rp.x + du[0];
-			RB.m_rt.y = RB.m_rp.y + du[1];
-			RB.m_rt.z = RB.m_rp.z + du[2];
 
 			// next, we do the rotations. We do this seperatly since
 			// they need to be interpreted differently than displacements
@@ -714,18 +710,11 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 					{
 						int lc = pdc->lc;
 						// TODO: do I need to take the line search step into account here?
-						du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc)->Value() - RB.m_Up[j]);
+						du[j] = (lc < 0? 0 : pdc->Value() - RB.m_Up[j]);
 					}
 					else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + ui[lm[j]] : 0);
 				}
 			}
-
-			vec3d r = vec3d(du[3], du[4], du[5]);
-			double w = sqrt(r.x*r.x + r.y*r.y + r.z*r.z);
-			quatd dq = quatd(w, r);
-
-			RB.m_qt = dq*RB.m_qp;
-			RB.m_qt.MakeUnit();
 
 			if (RB.m_prb) du = RB.m_dul;
 			RB.m_Ut[0] = RB.m_Up[0] + du[0];
@@ -734,6 +723,18 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 			RB.m_Ut[3] = RB.m_Up[3] + du[3];
 			RB.m_Ut[4] = RB.m_Up[4] + du[4];
 			RB.m_Ut[5] = RB.m_Up[5] + du[5];
+
+			RB.m_rt = RB.m_r0 + vec3d(RB.m_Ut[0], RB.m_Ut[1], RB.m_Ut[2]);
+
+			vec3d Rt(RB.m_Ut[3],RB.m_Ut[4],RB.m_Ut[5]);
+			RB.m_qt = quatd(Rt);
+
+			RB.m_du[0] = du[0];
+			RB.m_du[1] = du[1];
+			RB.m_du[2] = du[2];
+			RB.m_du[3] = du[3];
+			RB.m_du[4] = du[4];
+			RB.m_du[5] = du[5];
 
 			// update the mesh' nodes
 			FEMesh& mesh = m_fem.GetMesh();

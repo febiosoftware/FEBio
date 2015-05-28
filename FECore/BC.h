@@ -83,6 +83,8 @@ class FERigidBodyDisplacement : public FEBoundaryCondition
 public:
 	FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem) { ref= 0.0; brel = false; }
 
+	double Value();
+
 public:
 	int		id;		//!< rigid body id
 	int		bc;		//!< displacement direction

@@ -499,6 +499,17 @@ private:
 };
 
 //-----------------------------------------------------------------------------
+//! Rotation vector
+class FEPlotRigidRotationVector : public FEDomainData
+{
+public:
+	FEPlotRigidRotationVector(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_NODE), m_pfem(pfem) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+private:
+	FEModel* m_pfem;
+};
+
+//-----------------------------------------------------------------------------
 //! Class that projects stresses from integration points to the nodes
 //! TODO: This only works with tet10 and hex8 -domains
 class FEPlotNodalStresses : public FEDomainData

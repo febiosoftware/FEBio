@@ -190,6 +190,14 @@ public:
 		return r;
 	}
 
+	vec3d GetRotationVector() const
+	{
+		vec3d r(x,y,z);
+		r.unit();
+		double a = (double)(acos(w)*2.0);
+		return r*a;
+	}
+
 	double GetAngle() const
 	{
 		return (double)(acos(w)*2.0);

@@ -1726,6 +1726,33 @@ bool FEPlotRigidEuler::Save(FEDomain& dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotRigidRotationVector::Save(FEDomain& dom, vector<float>& a)
+{
+	// get the rigid material
+	FEMaterial* pm = dom.GetMaterial();
+	if (pm->IsRigid() == false) return false;
+	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
+    
+	// get the rigid body
+	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+
+	// get the rotation vector and angle
+	double w = rb.m_qt.GetAngle();
+	vec3d r = rb.m_qt.GetVector()*w;
+    
+	// copy results to archive
+	int NN = dom.Nodes();
+	for (int i=0; i<NN; ++i)
+	{
+		a.push_back((float) r.x);
+		a.push_back((float) r.y);
+		a.push_back((float) r.z);
+	}
+    
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotNodalStresses::Save(FEDomain& dom, vector<float>& a)
 {
 	// make sure this is a solid-domain class
