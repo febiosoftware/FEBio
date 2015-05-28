@@ -4,7 +4,6 @@
 #include "FECoreKernel.h"
 #include "log.h"
 #include "DOFS.h"
-#include "FEBioMech/FESolidSolver2.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -237,24 +236,10 @@ bool FEAnalysis::Solve()
 		// update time
 		m_fem.m_ftime += m_dt;
 
-		int i;
-
-		// evaluate load curve values at current (or intermediate) time
-        FESolidSolver2* psolver2 = dynamic_cast<FESolidSolver2*>(m_psolver);
-        double alpha = (psolver2) ? psolver2->m_alpha : 1;
-        double t = m_fem.m_ftime;
-        double dt = m_dt;
-        double ta = (t > 0) ? t - (1-alpha)*dt : alpha*dt;
-        for (i=0; i<m_fem.LoadCurves(); ++i) m_fem.GetLoadCurve(i)->Evaluate(ta);
-
-		// evaluate the parameter lists
-		m_fem.EvaluateAllParameterLists();
-
-		// re-initialize materials
-		// TODO: I need to do this since the material parameters can have changed and thus a new initialization
-		//       needs to be done to see if the material parameters are still valid. I would like to add value checking
-		//       directly in the parameter evaluation above so this can be removed.
-		if (m_fem.InitMaterials() == false)
+		// initialize the solver step
+		// (This basically evaluates all the parameter lists, but let's the solver
+		//  customize this process to the specific needs of the solver)
+		if (m_psolver->InitStep(m_fem.m_ftime) == false)
 		{
 			bconv = false;
 			break;

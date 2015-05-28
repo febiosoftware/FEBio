@@ -761,6 +761,14 @@ double* FEModel::FindParameter(const char* szparam)
 }
 
 //-----------------------------------------------------------------------------
+//! Evaluates all load curves at the specified time
+void FEModel::EvaluateLoadCurves(double time)
+{
+	const int NLC = LoadCurves();
+	for (int i=0; i<NLC; ++i) GetLoadCurve(i)->Evaluate(time);
+}
+
+//-----------------------------------------------------------------------------
 void FEModel::EvaluateAllParameterLists()
 {
 	// evaluate material parameter lists

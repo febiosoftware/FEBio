@@ -802,6 +802,19 @@ void FESolidSolver2::UpdateConstraints()
 }
 
 //-----------------------------------------------------------------------------
+bool FESolidSolver2::InitStep(double time)
+{
+	FEModel& fem = GetFEModel();
+
+	// evaluate load curve values at current (or intermediate) time
+	double t = time;
+	double dt = fem.GetCurrentStep()->m_dt;
+	double ta = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
+
+	return FESolver::InitStep(ta);
+}
+
+//-----------------------------------------------------------------------------
 //!  This function mainly calls the Quasin routine 
 //!  and deals with exceptions that require the immediate termination of
 //!	quasi-Newton iterations.

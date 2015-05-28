@@ -210,6 +210,9 @@ public: // --- Nonlinear constraints functions ---
 
 public: // --- parameter functions ---
 
+	//! evaluate all load curves at some time
+	void EvaluateLoadCurves(double time);
+
 	//! evaluate all parameter lists
 	void EvaluateAllParameterLists();
 

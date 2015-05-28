@@ -27,6 +27,9 @@ public:
 	//! Initializes data structures
 	bool Init();
 
+	//! initialize the step
+	bool InitStep(double time);
+
 	//! solves a single time step
 	bool SolveStep(double time);
 

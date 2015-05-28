@@ -40,6 +40,9 @@ public:
 	// Initialize linear equation system (TODO: Is this the right place to do this?)
 	virtual bool InitEquations() = 0;
 
+	//! initialize the step
+	virtual bool InitStep(double time);
+
 	//! Solve an analysis step
 	virtual bool SolveStep(double time) = 0;
 
