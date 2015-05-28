@@ -11,15 +11,15 @@
 
 #include "FECore/vec3d.h"
 #include "FECore/DumpFile.h"
-#include "FECore/FENLConstraint.h"
 #include "FECore/LoadCurve.h"
+#include "FERigidConnector.h"
 
 //-----------------------------------------------------------------------------
 //! The FERigidRevoluteJoint class implements a revolute joint. The rigid joint
 //! allows the user to connect two rigid bodies at a point in space
 //! and allow rotation about a single prescribed axis.
 
-class FERigidRevoluteJoint : public FENLConstraint
+class FERigidRevoluteJoint : public FERigidConnector
 {
 public:
     //! constructor
@@ -53,9 +53,6 @@ public:
     void Reset();
     
 public:
-    int	m_nRBa;		//!< rigid body A that the joint connects
-    int	m_nRBb;		//!< rigid body B that the joint connects
-    
     vec3d	m_q0;	//! initial position of joint
     vec3d	m_qa0;	//! initial relative position vector of joint w.r.t. A
     vec3d	m_qb0;	//! initial relative position vector of joint w.r.t. B
@@ -64,11 +61,9 @@ public:
     vec3d	m_ea0[3];	//! initial joint basis w.r.t. A
     vec3d	m_eb0[3];	//! initial joint basis w.r.t. B
     
-    vec3d	m_F;	//! constraining force
     vec3d	m_L;	//! Lagrange multiplier for constraining force
     double	m_eps;	//! penalty factor for constraining force
     
-    vec3d	m_M;	//! constraining moment
     vec3d	m_U;	//! Lagrange multiplier for constraining moment
     double	m_ups;	//! penalty factor for constraining moment
     
@@ -79,9 +74,6 @@ public:
     int     m_naugmax;  //! maximum number of augmentations
     
     double  m_qp;   //! prescribed rotation
-    FELoadCurve* m_pqLC;    // pointer to loadcurve for prescribed rotation
-    double  m_qpscl;    //! scale factor for prescribed rotation
-    double  m_time;
     bool    m_bq;   //! flag for prescribing rotation
     double  m_Mp;   //! prescribed moment
     

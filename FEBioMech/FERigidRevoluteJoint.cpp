@@ -13,15 +13,13 @@
 #include "FESolidSolver2.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidRevoluteJoint, FENLConstraint);
+BEGIN_PARAMETER_LIST(FERigidRevoluteJoint, FERigidConnector);
     ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
     ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
     ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
     ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
     ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
-    ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"        );
-    ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"        );
-    ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint"  );
+    ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint_origin"  );
     ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "rotation_axis" );
     ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "transverse_axis");
     ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
@@ -32,7 +30,7 @@ BEGIN_PARAMETER_LIST(FERigidRevoluteJoint, FENLConstraint);
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FERigidRevoluteJoint::FERigidRevoluteJoint(FEModel* pfem) : FENLConstraint(pfem)
+FERigidRevoluteJoint::FERigidRevoluteJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
     static int count = 1;
     m_nID = count++;
@@ -42,7 +40,7 @@ FERigidRevoluteJoint::FERigidRevoluteJoint(FEModel* pfem) : FENLConstraint(pfem)
     m_qtol = 0;
     m_naugmin = 0;
     m_naugmax = 10;
-    m_alpha = 0.5;
+    m_alpha = 1.0;
     m_qp = 0;
     m_Mp = 0;
     m_bq = false;
@@ -99,13 +97,6 @@ bool FERigidRevoluteJoint::Init()
     m_ea0[0] = m_e0[0]; m_ea0[1] = m_e0[1]; m_ea0[2] = m_e0[2];
     m_eb0[0] = m_e0[0]; m_eb0[1] = m_e0[1]; m_eb0[2] = m_e0[2];
     
-    FEParameterList& pl = GetParameterList();
-    FEParam* p = pl.Find("rotation");
-    if (p) {
-        m_pqLC = fem.GetLoadCurve(p->m_nlc);
-        m_qpscl = p->m_scl;
-    }
-    
     m_binit = true;
     
     return true;
@@ -139,12 +130,6 @@ void FERigidRevoluteJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidRevoluteJoint::Residual(FEGlobalVector& R)
 {
-    // get time at intermediate step
-    FEModel& fem = *GetFEModel();
-    double t = fem.m_ftime;
-    double dt = fem.GetCurrentStep()->m_dt;
-    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
-    
     vector<double> fa(6);
     vector<double> fb(6);
     
@@ -184,21 +169,19 @@ void FERigidRevoluteJoint::Residual(FEGlobalVector& R)
     eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
     eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
 
-    mat3ds P = mat3dd(1);
-    vec3d p(0,0,0);
-    vec3d c = P*(rb + zb - ra - za) - p;
+    vec3d c = rb + zb - ra - za;
     m_F = m_L + c*m_eps;
     
     vec3d ksi = (ea[0] ^ eb[0])/2;
     if (m_bq) {
         quatd q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
-        double qp = m_pqLC->Value(m_time)*m_qpscl;
-        quatd a(qp,ea[0]);
+        quatd a(m_qp,ea[0]);
         quatd r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
+        m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
     }
-    m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
+    else m_M = ea[0]*m_Mp;
     
     fa[0] = m_F.x;
     fa[1] = m_F.y;
@@ -224,14 +207,9 @@ void FERigidRevoluteJoint::Residual(FEGlobalVector& R)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
 {
-    // get time at intermediate step
-    FEModel& fem = *GetFEModel();
-    double t = fem.m_ftime;
-    double dt = fem.GetCurrentStep()->m_dt;
-    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
-    
     // get m_alpha from solver
-    m_alpha = dynamic_cast<FESolidSolver2*>(psolver)->m_alpha;
+    FESolidSolver2* ps2 = dynamic_cast<FESolidSolver2*>(psolver);
+    if (ps2) m_alpha = ps2->m_alpha;
     
     vec3d eat[3], eap[3], ea[3];
     vec3d ebt[3], ebp[3], eb[3];
@@ -279,9 +257,7 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
     mat3d zbhat; zbhat.skew(zb);
     mat3d zbthat; zbthat.skew(zbt);
     
-    mat3ds P = mat3dd(1);
-    vec3d p(0,0,0);
-    vec3d c = P*(rb + zb - ra - za) - p;
+    vec3d c = rb + zb - ra - za;
     m_F = m_L + c*m_eps;
     mat3dd I(1);
     
@@ -289,13 +265,13 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
     quatd q, a, r;
     if (m_bq) {
         q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
-        double qp = m_pqLC->Value(m_time)*m_qpscl;
-        a = quatd(qp,ea[0]);
+        a = quatd(m_qp,ea[0]);
         r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
+        m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
     }
-    m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
+    else m_M = ea[0]*m_Mp;
     
     mat3d eahat[3], ebhat[3], eathat[3], ebthat[3];
     for (j=0; j<3; ++j) {
@@ -433,12 +409,6 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver)
 //-----------------------------------------------------------------------------
 bool FERigidRevoluteJoint::Augment(int naug)
 {
-    // get time at intermediate step
-    FEModel& fem = *GetFEModel();
-    double t = fem.m_ftime;
-    double dt = fem.GetCurrentStep()->m_dt;
-    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
-    
     vec3d ra, rb, qa, qb, c, ksi, Lm;
     vec3d za, zb;
     vec3d eat[3], eap[3], ea[3];
@@ -480,9 +450,7 @@ bool FERigidRevoluteJoint::Augment(int naug)
     eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
     eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
     
-    mat3ds P = mat3dd(1);
-    vec3d p(0,0,0);
-    c = P*(rb + zb - ra - za) - p;
+    c = rb + zb - ra - za;
     
     normF0 = sqrt(m_L*m_L);
     
@@ -494,8 +462,7 @@ bool FERigidRevoluteJoint::Augment(int naug)
     ksi = (ea[0] ^ eb[0])/2;
     if (m_bq) {
         quatd q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
-        double qp = m_pqLC->Value(m_time)*m_qpscl;
-        quatd a(qp,ea[0]);
+        quatd a(m_qp,ea[0]);
         quatd r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
@@ -570,12 +537,6 @@ void FERigidRevoluteJoint::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FERigidRevoluteJoint::Update()
 {
-    // get time at intermediate step
-    FEModel& fem = *GetFEModel();
-    double t = fem.m_ftime;
-    double dt = fem.GetCurrentStep()->m_dt;
-    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
-    
     vec3d ra, rb;
     vec3d za, zb;
     vec3d eat[3], eap[3], ea[3];
@@ -613,21 +574,19 @@ void FERigidRevoluteJoint::Update()
     eb[1] = ebt[1]*m_alpha + ebp[1]*(1-m_alpha);
     eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
     
-    mat3ds P = mat3dd(1);
-    vec3d p(0,0,0);
-    vec3d c = P*(rb + zb - ra - za) - p;
+    vec3d c = rb + zb - ra - za;
     m_F = m_L + c*m_eps;
     
     vec3d ksi = (ea[0] ^ eb[0])/2;
     if (m_bq) {
         quatd q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
-        double qp = m_pqLC->Value(m_time)*m_qpscl;
-        quatd a(qp,ea[0]);
+        quatd a(m_qp,ea[0]);
         quatd r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
+        m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
     }
-    m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
+    else m_M = ea[0]*m_Mp;
     
 }
 

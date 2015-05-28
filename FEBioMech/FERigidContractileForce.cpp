@@ -12,21 +12,19 @@
 #include "FESolidSolver2.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidContractileForce, FENLConstraint);
+BEGIN_PARAMETER_LIST(FERigidContractileForce, FERigidConnector);
 ADD_PARAMETER(m_f0  , FE_PARAM_DOUBLE, "f0"         );
-ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"     );
-ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"     );
 ADD_PARAMETER(m_a0  , FE_PARAM_VEC3D , "insertion_a");
 ADD_PARAMETER(m_b0  , FE_PARAM_VEC3D , "insertion_b");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FERigidContractileForce::FERigidContractileForce(FEModel* pfem) : FENLConstraint(pfem)
+FERigidContractileForce::FERigidContractileForce(FEModel* pfem) : FERigidConnector(pfem)
 {
     static int count = 1;
     m_nID = count++;
     m_binit = false;
-    m_alpha = 0.5;
+    m_alpha = 1.0;
     m_f0 = 0;
 }
 
@@ -140,7 +138,8 @@ void FERigidContractileForce::Residual(FEGlobalVector& R)
 void FERigidContractileForce::StiffnessMatrix(FESolver* psolver)
 {
     // get m_alpha from solver
-    m_alpha = dynamic_cast<FESolidSolver2*>(psolver)->m_alpha;
+    FESolidSolver2* ps2 = dynamic_cast<FESolidSolver2*>(psolver);
+    if (ps2) m_alpha = ps2->m_alpha;
     
     int j;
     

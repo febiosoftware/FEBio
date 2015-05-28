@@ -13,15 +13,13 @@
 #include "FESolidSolver2.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidPrismaticJoint, FENLConstraint);
+BEGIN_PARAMETER_LIST(FERigidPrismaticJoint, FERigidConnector);
     ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
     ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
     ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
     ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
     ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
-    ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"        );
-    ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"        );
-    ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint"         );
+    ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint_origin"  );
     ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "translation_axis" );
     ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "transverse_axis");
     ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
@@ -32,7 +30,7 @@ BEGIN_PARAMETER_LIST(FERigidPrismaticJoint, FENLConstraint);
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FENLConstraint(pfem)
+FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
     static int count = 1;
     m_nID = count++;
@@ -42,7 +40,7 @@ FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FENLConstraint(pfe
     m_qtol = 0;
     m_naugmin = 0;
     m_naugmax = 10;
-    m_alpha = 0.5;
+    m_alpha = 1.0;
     m_dp = 0;
     m_Fp = 0;
     m_bd = false;
@@ -99,13 +97,6 @@ bool FERigidPrismaticJoint::Init()
     m_ea0[0] = m_e0[0]; m_ea0[1] = m_e0[1]; m_ea0[2] = m_e0[2];
     m_eb0[0] = m_e0[0]; m_eb0[1] = m_e0[1]; m_eb0[2] = m_e0[2];
     
-    FEParameterList& pl = GetParameterList();
-    FEParam* pd = pl.Find("translation");
-    if (pd) {
-        m_pdLC = fem.GetLoadCurve(pd->m_nlc);
-        m_dpscl = pd->m_scl;
-    }
-    
     m_binit = true;
     
     return true;
@@ -137,12 +128,6 @@ void FERigidPrismaticJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidPrismaticJoint::Residual(FEGlobalVector& R)
 {
-    // get time at intermediate step
-    FEModel& fem = *GetFEModel();
-    double t = fem.m_ftime;
-    double dt = fem.GetCurrentStep()->m_dt;
-    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
-    
     vector<double> fa(6);
     vector<double> fb(6);
     
@@ -186,9 +171,7 @@ void FERigidPrismaticJoint::Residual(FEGlobalVector& R)
     vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
     mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    double dp;
-    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
-    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
+    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
     vec3d c = P*(rb + zb - ra - za) - p;
     m_F = m_L + c*m_eps + ea[0]*m_Fp;
     
@@ -219,14 +202,9 @@ void FERigidPrismaticJoint::Residual(FEGlobalVector& R)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver)
 {
-    // get time at intermediate step
-    FEModel& fem = *GetFEModel();
-    double t = fem.m_ftime;
-    double dt = fem.GetCurrentStep()->m_dt;
-    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
-    
     // get m_alpha from solver
-    m_alpha = dynamic_cast<FESolidSolver2*>(psolver)->m_alpha;
+    FESolidSolver2* ps2 = dynamic_cast<FESolidSolver2*>(psolver);
+    if (ps2) m_alpha = ps2->m_alpha;
     
     vec3d eat[3], eap[3], ea[3];
     vec3d ebt[3], ebp[3], eb[3];
@@ -278,9 +256,7 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver)
     vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
     mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    double dp;
-    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
-    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
+    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
     vec3d d = rb + zb - ra - za;
     vec3d c = P*d - p;
     m_F = m_L + c*m_eps + ea[0]*m_Fp;
@@ -457,9 +433,7 @@ bool FERigidPrismaticJoint::Augment(int naug)
     vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
     mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    double dp;
-    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
-    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
+    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
     c = P*(rb + zb - ra - za) - p;
     
     normF0 = sqrt(m_L*m_L);
@@ -584,9 +558,7 @@ void FERigidPrismaticJoint::Update()
     vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
     
     mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    double dp;
-    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
-    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
+    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
     vec3d c = P*(rb + zb - ra - za) - p;
     m_F = m_L + c*m_eps + ea[0]*m_Fp;
     

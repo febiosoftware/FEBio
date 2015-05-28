@@ -11,13 +11,13 @@
 
 #include "FECore/vec3d.h"
 #include "FECore/DumpFile.h"
-#include "FECore/FENLConstraint.h"
+#include "FERigidConnector.h"
 
 //-----------------------------------------------------------------------------
 //! The FERigidDamper class implements a linear damper that connects
 //! two rigid bodies at arbitrary points (not necessarily nodes).
 
-class FERigidDamper : public FENLConstraint
+class FERigidDamper : public FERigidConnector
 {
 public:
     //! constructor
@@ -51,15 +51,11 @@ public:
     void Reset();
     
 public:
-    int	m_nRBa;         //!< rigid body A that the spring connects
-    int	m_nRBb;         //!< rigid body B that the spring connects
-    
     vec3d	m_a0;       //! initial absolute position vector of spring on body A
     vec3d	m_b0;       //! initial absolute position vector of spring on body B
     vec3d	m_qa0;      //! initial relative position vector of spring on body A
     vec3d	m_qb0;      //! initial relative position vector of spring on body B
     
-    vec3d	m_F;		//! constraining force
     double	m_c;        //! damping constant
     
 protected:

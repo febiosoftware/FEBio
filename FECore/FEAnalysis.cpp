@@ -4,6 +4,7 @@
 #include "FECoreKernel.h"
 #include "log.h"
 #include "DOFS.h"
+#include "FEBioMech/FESolidSolver2.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -238,8 +239,13 @@ bool FEAnalysis::Solve()
 
 		int i;
 
-		// evaluate load curve values at current time
-		for (i=0; i<m_fem.LoadCurves(); ++i) m_fem.GetLoadCurve(i)->Evaluate(m_fem.m_ftime);
+		// evaluate load curve values at current (or intermediate) time
+        FESolidSolver2* psolver2 = dynamic_cast<FESolidSolver2*>(m_psolver);
+        double alpha = (psolver2) ? psolver2->m_alpha : 1;
+        double t = m_fem.m_ftime;
+        double dt = m_dt;
+        double ta = (t > 0) ? t - (1-alpha)*dt : alpha*dt;
+        for (i=0; i<m_fem.LoadCurves(); ++i) m_fem.GetLoadCurve(i)->Evaluate(ta);
 
 		// evaluate the parameter lists
 		m_fem.EvaluateAllParameterLists();

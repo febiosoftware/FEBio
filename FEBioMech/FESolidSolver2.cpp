@@ -442,23 +442,9 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 		if ((n = node.m_ID[DOF_Z]) >= 0) node.m_rt.z = node.m_r0.z + m_Ut[n] + m_Ui[n] + ui[n];
 
 		// rotational dofs
-        vec3d vD0 = vec3d(0,0,0), vDt = vec3d(0,0,0), vUt = vec3d(0,0,0), vUi = vec3d(0,0,0), vui = vec3d(0,0,0);
-        double tD0 = 0, tUt = 0, tUi = 0, tDt = 0;
-        double dtUt = 0, dtUi = 0, dtui = 0;
-        vec3d dqUt, dqUi, dqui;
-        quatd qUt, qUi, qui;
-//		if ((n = node.m_ID[DOF_U]) >= 0) node.m_Dt.x = node.m_D0.x + m_Ut[n] + m_Ui[n] + ui[n];
-//		if ((n = node.m_ID[DOF_V]) >= 0) node.m_Dt.y = node.m_D0.y + m_Ut[n] + m_Ui[n] + ui[n];
-//		if ((n = node.m_ID[DOF_W]) >= 0) node.m_Dt.z = node.m_D0.z + m_Ut[n] + m_Ui[n] + ui[n];
-        if ((n = node.m_ID[DOF_U]) >= 0) {vD0.x = node.m_D0.x; vUt.x = m_Ut[n] + m_Ui[n] + ui[n];}
-        if ((n = node.m_ID[DOF_V]) >= 0) {vD0.y = node.m_D0.y; vUt.y = m_Ut[n] + m_Ui[n] + ui[n];}
-        if ((n = node.m_ID[DOF_W]) >= 0) {vD0.z = node.m_D0.z; vUt.z = m_Ut[n] + m_Ui[n] + ui[n];}
-        tD0 = vD0.unit(); if (tD0 > 0) { dtUt = vD0*vUt; dqUt = (vD0 ^ vUt)/tD0; qUt = quatd(dqUt); qUt.RotateVector(vD0); }
-        tDt = tD0 + dtUt;
-        vDt = vD0*tDt;
-        if ((n = node.m_ID[DOF_U]) >= 0) node.m_Dt.x = vDt.x;
-        if ((n = node.m_ID[DOF_V]) >= 0) node.m_Dt.y = vDt.y;
-        if ((n = node.m_ID[DOF_W]) >= 0) node.m_Dt.z = vDt.z;
+        if ((n = node.m_ID[DOF_U]) >= 0) node.m_Dt.x = node.m_D0.x + m_Ut[n] + m_Ui[n] + ui[n];
+        if ((n = node.m_ID[DOF_V]) >= 0) node.m_Dt.y = node.m_D0.y + m_Ut[n] + m_Ui[n] + ui[n];
+        if ((n = node.m_ID[DOF_W]) >= 0) node.m_Dt.z = node.m_D0.z + m_Ut[n] + m_Ui[n] + ui[n];
 	}
 
 	// make sure the prescribed displacements are fullfilled
@@ -618,30 +604,10 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
 		if ((n = node.m_ID[DOF_Y]) >= 0) Ui[n] += ui[n];
 		if ((n = node.m_ID[DOF_Z]) >= 0) Ui[n] += ui[n];
         
-        // TODO: modify rotational update to account for exponential map or Cayley transform
+        // rotational dofs
         if ((n = node.m_ID[DOF_U]) >= 0) Ui[n] += ui[n];
         if ((n = node.m_ID[DOF_V]) >= 0) Ui[n] += ui[n];
         if ((n = node.m_ID[DOF_W]) >= 0) Ui[n] += ui[n];
-		// rotational dofs account for exponential map or Cayley transform
-/*        quatd qui;
-        vec3d vUi(0,0,0);
-        vec3d vui(0,0,0);
-        if ((n = node.m_ID[DOF_U]) >= 0) { vUi.x = Ui[n]; vui.x = ui[n]; }
-        if ((n = node.m_ID[DOF_V]) >= 0) { vUi.y = Ui[n]; vui.y = ui[n]; }
-        if ((n = node.m_ID[DOF_W]) >= 0) { vUi.z = Ui[n]; vui.z = ui[n]; }
-        double t = vUi.unit();
-        if (t > 0) {
-            double dt = vUi*vui;
-            vec3d dq = (vUi ^ vui)/t;
-            if (emap) qui = quatd(dq);
-            else qui = quatd(2*atan(dq.norm()/2),dq);     // Cayley transform
-            qui.RotateVector(vUi);
-            t += dt;
-            vUi *= t;
-            if ((n = node.m_ID[DOF_U]) >= 0) Ui[n] = vUi.x;
-            if ((n = node.m_ID[DOF_V]) >= 0) Ui[n] = vUi.y;
-            if ((n = node.m_ID[DOF_W]) >= 0) Ui[n] = vUi.z;
-        }*/
 	}
     
 }
@@ -678,13 +644,7 @@ void FESolidSolver2::Update(vector<double>& ui)
 //! Updates the rigid body data
 void FESolidSolver2::UpdateRigidBodies(vector<double>& ui)
 {
-	FEMesh& mesh = m_fem.GetMesh();
-
     double dt = m_fem.GetCurrentStep()->m_dt;
-    // Newmark rule
-    double a = 1.0 / (m_beta*dt);
-    double b = a / dt;
-    double c = 1.0 - 0.5/m_beta;
     
 	// update rigid bodies
 	int nrb = m_fem.Objects();
@@ -2383,7 +2343,6 @@ void FESolidSolver2::InertialForces(FEGlobalVector& R)
 {
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
-    FEModel& fem = GetFEModel();
     
 	// allocate F
 	vector<double> F(3*mesh.Nodes());
@@ -2401,6 +2360,10 @@ void FESolidSolver2::InertialForces(FEGlobalVector& R)
 		FENode& node = mesh.Node(i);
         node.m_at = (node.m_rt - node.m_rp)*b - node.m_vp*a + node.m_ap*c;
         node.m_vt = node.m_vp + (node.m_ap*(1.0 - m_gamma) + node.m_at*m_gamma)*dt;
+        
+        F[3*i  ] = node.m_at.x;
+        F[3*i+1] = node.m_at.y;
+        F[3*i+2] = node.m_at.z;
 	}
     
 	// update rigid bodies
@@ -2432,7 +2395,7 @@ void FESolidSolver2::InertialForces(FEGlobalVector& R)
 		if (dom.GetMaterial()->IsRigid() == false)
 		{
 			FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
-			edom.InertialForces2(R, F);
+			edom.InertialForces(R, F);
 		}
 	}
 

@@ -9,28 +9,39 @@
 #include "FESolidSolver2.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidSphericalJoint, FENLConstraint);
-ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance");
-ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"   );
-ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "penalty"  );
-ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"   );
-ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"   );
-ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint"    );
-ADD_PARAMETER(m_naugmin,FE_PARAM_INT, "minaug"    );
-ADD_PARAMETER(m_naugmax,FE_PARAM_INT, "maxaug"    );
+BEGIN_PARAMETER_LIST(FERigidSphericalJoint, FERigidConnector);
+ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
+ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
+ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
+ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
+ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
+ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint_origin"  );
+ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
+ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
+ADD_PARAMETER(m_bq     , FE_PARAM_BOOL  , "prescribed_rotation");
+ADD_PARAMETER(m_qpx    , FE_PARAM_DOUBLE, "rotation_x" );
+ADD_PARAMETER(m_qpy    , FE_PARAM_DOUBLE, "rotation_y" );
+ADD_PARAMETER(m_qpz    , FE_PARAM_DOUBLE, "rotation_z" );
+ADD_PARAMETER(m_Mpx    , FE_PARAM_DOUBLE, "moment_x"   );
+ADD_PARAMETER(m_Mpy    , FE_PARAM_DOUBLE, "moment_y"   );
+ADD_PARAMETER(m_Mpz    , FE_PARAM_DOUBLE, "moment_z"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FERigidSphericalJoint::FERigidSphericalJoint(FEModel* pfem) : FENLConstraint(pfem)
+FERigidSphericalJoint::FERigidSphericalJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
-	static int count = 1;
-	m_nID = count++;
-	m_binit = false;
+    static int count = 1;
+    m_nID = count++;
+    m_binit = false;
     m_atol = 0;
     m_gtol = 0;
-	m_naugmin = 0;
-	m_naugmax = 10;
-    m_alpha = 0.5;
+    m_qtol = 0;
+    m_naugmin = 0;
+    m_naugmax = 10;
+    m_alpha = 1.0;
+    m_qpx = m_qpy = m_qpz = 0;
+    m_Mpx = m_Mpy = m_Mpz = 0;
+    m_bq = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -38,102 +49,125 @@ FERigidSphericalJoint::FERigidSphericalJoint(FEModel* pfem) : FENLConstraint(pfe
 //!       phase. Is that necessary?
 bool FERigidSphericalJoint::Init()
 {
-	if (m_binit) return true;
+    if (m_bq && ((m_Mpx != 0) || (m_Mpy != 0) || (m_Mpz != 0))) {
+        felog.printbox("FATAL ERROR", "Rotation and moment cannot be prescribed simultaneously in rigid spherical joint %d\n", m_nID);
+        return false;
+    }
     
-	// reset force
-	m_F = vec3d(0,0,0);
+    if (m_binit) return true;
     
-	FEModel& fem = *GetFEModel();
+    FEModel& fem = *GetFEModel();
     
-	// When the rigid joint is read in, the ID's correspond to the rigid materials.
-	// Now we want to make the ID's refer to the rigid body ID's
+    // reset force
+    m_F = vec3d(0,0,0); m_L = vec3d(0,0,0);
+    m_M = vec3d(0,0,0); m_U = vec3d(0,0,0);
     
-	FEMaterial* pm = fem.GetMaterial(m_nRBa);
-	if (pm->IsRigid() == false)
-	{
-		felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
-		return false;
-	}
-	m_nRBa = pm->GetRigidBodyID();
+    // When the rigid joint is read in, the ID's correspond to the rigid materials.
+    // Now we want to make the ID's refer to the rigid body ID's
     
-	pm = fem.GetMaterial(m_nRBb);
-	if (pm->IsRigid() == false)
-	{
-		felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
-		return false;
-	}
-	m_nRBb = pm->GetRigidBodyID();
+    FEMaterial* pm = fem.GetMaterial(m_nRBa);
+    if (pm->IsRigid() == false)
+    {
+        felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
+        return false;
+    }
+    m_nRBa = pm->GetRigidBodyID();
     
-	FERigidBody& ra = dynamic_cast<FERigidBody&>(*fem.Object(m_nRBa));
-	FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.Object(m_nRBb));
+    pm = fem.GetMaterial(m_nRBb);
+    if (pm->IsRigid() == false)
+    {
+        felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
+        return false;
+    }
+    m_nRBb = pm->GetRigidBodyID();
     
-	m_qa0 = m_q0 - ra.m_r0;
-	m_qb0 = m_q0 - rb.m_r0;
+    FERigidBody& ra = dynamic_cast<FERigidBody&>(*fem.Object(m_nRBa));
+    FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.Object(m_nRBb));
     
-	m_binit = true;
+    m_qa0 = m_q0 - ra.m_r0;
+    m_qb0 = m_q0 - rb.m_r0;
     
-	return true;
+    m_ea0[0] = m_e0[0]; m_ea0[1] = m_e0[1]; m_ea0[2] = m_e0[2];
+    m_eb0[0] = m_e0[0]; m_eb0[1] = m_e0[1]; m_eb0[2] = m_e0[2];
+    
+    m_binit = true;
+    
+    return true;
 }
 
 //-----------------------------------------------------------------------------
 //! create a shallow copy
 void FERigidSphericalJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	if (bsave)
-	{
-		dmp << m_q0 << m_qa0 << m_qb0;
-		dmp << m_F << m_L;
-	}
-	else
-	{
-		dmp >> m_q0 >> m_qa0 >> m_qb0;
-		dmp >> m_F >> m_L;
-	}
+    if (bsave)
+    {
+        dmp << m_q0 << m_qa0 << m_qb0;
+        dmp << m_F << m_L;
+        dmp << m_M << m_U;
+        dmp << m_qpx << m_qpy << m_qpz << m_Mpx << m_Mpy << m_Mpz;
+    }
+    else
+    {
+        dmp >> m_q0 >> m_qa0 >> m_qb0;
+        dmp >> m_F >> m_L;
+        dmp >> m_M >> m_U;
+        dmp >> m_qpx >> m_qpy >> m_qpz >> m_Mpx >> m_Mpy >> m_Mpz;
+    }
 }
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidSphericalJoint::Residual(FEGlobalVector& R)
 {
-	vector<double> fa(6);
-	vector<double> fb(6);
+    vector<double> fa(6);
+    vector<double> fb(6);
     
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
+    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
     
-	// body A
+    // body A
     vec3d ra = RBa.m_rt*m_alpha + RBa.m_rp*(1-m_alpha);
     vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     vec3d za = zat*m_alpha + zap*(1-m_alpha);
     
-	// body b
+    // body b
     vec3d rb = RBb.m_rt*m_alpha + RBb.m_rp*(1-m_alpha);
     vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     vec3d zb = zbt*m_alpha + zbp*(1-m_alpha);
     
-	vec3d c = rb + zb - ra - za;
-	m_F = m_L + c*m_eps;
+    vec3d c = rb + zb - ra - za;
+    m_F = m_L + c*m_eps;
     
-	fa[0] = m_F.x;
-	fa[1] = m_F.y;
-	fa[2] = m_F.z;
+    if (m_bq) {
+        quatd q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
+        quatd a(vec3d(m_qpx,m_qpy,m_qpz));
+        quatd r = a*q.Inverse();
+        r.MakeUnit();
+        vec3d ksi = r.GetVector()*r.GetAngle();
+        m_M = m_U + ksi*m_ups;
+    }
+    else m_M = vec3d(m_Mpx,m_Mpy,m_Mpz);
     
-	fa[3] = za.y*m_F.z-za.z*m_F.y;
-	fa[4] = za.z*m_F.x-za.x*m_F.z;
-	fa[5] = za.x*m_F.y-za.y*m_F.x;
+    fa[0] = m_F.x;
+    fa[1] = m_F.y;
+    fa[2] = m_F.z;
     
-	fb[0] = -m_F.x;
-	fb[1] = -m_F.y;
-	fb[2] = -m_F.z;
+    fa[3] = za.y*m_F.z-za.z*m_F.y + m_M.x;
+    fa[4] = za.z*m_F.x-za.x*m_F.z + m_M.y;
+    fa[5] = za.x*m_F.y-za.y*m_F.x + m_M.z;
     
-	fb[3] = -zb.y*m_F.z+zb.z*m_F.y;
-	fb[4] = -zb.z*m_F.x+zb.x*m_F.z;
-	fb[5] = -zb.x*m_F.y+zb.y*m_F.x;
+    fb[0] = -m_F.x;
+    fb[1] = -m_F.y;
+    fb[2] = -m_F.z;
     
-	for (int i=0; i<6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] += fa[i];
-	for (int i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fb[i];
+    fb[3] = -zb.y*m_F.z+zb.z*m_F.y - m_M.x;
+    fb[4] = -zb.z*m_F.x+zb.x*m_F.z - m_M.y;
+    fb[5] = -zb.x*m_F.y+zb.y*m_F.x - m_M.z;
+    
+    for (int i=0; i<6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] += fa[i];
+    for (int i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fb[i];
 }
 
 //-----------------------------------------------------------------------------
@@ -141,144 +175,183 @@ void FERigidSphericalJoint::Residual(FEGlobalVector& R)
 void FERigidSphericalJoint::StiffnessMatrix(FESolver* psolver)
 {
     // get m_alpha from solver
-    m_alpha = dynamic_cast<FESolidSolver2*>(psolver)->m_alpha;
+    FESolidSolver2* ps2 = dynamic_cast<FESolidSolver2*>(psolver);
+    if (ps2) m_alpha = ps2->m_alpha;
     
-	int j, k;
+    int j;
     
-	vector<int> LM(12);
-	matrix ke(12,12);
-	ke.zero();
-    vec3d a;
+    vector<int> LM(12);
+    matrix ke(12,12);
+    ke.zero();
     
-	double y1[3][3], y2[3][3], y1h[3][3], y2h[3][3];
-    double y11[3][3], y12[3][3], y21[3][3], y22[3][3];
+    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
+    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
     
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+    // body A
+    vec3d ra = RBa.m_rt*m_alpha + RBa.m_rp*(1-m_alpha);
+    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+    vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
+    vec3d za = zat*m_alpha + zap*(1-m_alpha);
+    mat3d zahat; zahat.skew(za);
+    mat3d zathat; zathat.skew(zat);
     
-	// body A
-    vec3d at = m_qa0; RBa.m_qt.RotateVector(at);
-    vec3d ap = m_qa0; RBa.m_qp.RotateVector(ap);
-    a = at*m_alpha + ap*(1-m_alpha);
+    // body b
+    vec3d rb = RBb.m_rt*m_alpha + RBb.m_rp*(1-m_alpha);
+    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+    vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
+    vec3d zb = zbt*m_alpha + zbp*(1-m_alpha);
+    mat3d zbhat; zbhat.skew(zb);
+    mat3d zbthat; zbthat.skew(zbt);
     
-	y1h[0][0] =    0; y1h[0][1] =  a.z; y1h[0][2] = -a.y;
-	y1h[1][0] = -a.z; y1h[1][1] =    0; y1h[1][2] =  a.x;
-	y1h[2][0] =  a.y; y1h[2][1] = -a.x; y1h[2][2] =    0;
+    vec3d c = rb + zb - ra - za;
+    m_F = m_L + c*m_eps;
+    mat3dd I(1);
     
-	y1[0][0] =     0; y1[0][1] =  at.z; y1[0][2] = -at.y;
-	y1[1][0] = -at.z; y1[1][1] =     0; y1[1][2] =  at.x;
-	y1[2][0] =  at.y; y1[2][1] = -at.x; y1[2][2] =     0;
+    quatd q, a, r;
+    if (m_bq) {
+        q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
+        a = quatd(vec3d(m_qpx,m_qpy,m_qpz));
+        r = a*q.Inverse();
+        r.MakeUnit();
+        vec3d ksi = r.GetVector()*r.GetAngle();
+        m_M = m_U + ksi*m_ups;
+    }
+    else m_M = vec3d(m_Mpx,m_Mpy,m_Mpz);
     
-	// body b
-    at = m_qb0; RBb.m_qt.RotateVector(at);
-    ap = m_qb0; RBb.m_qp.RotateVector(ap);
-    a = at*m_alpha + ap*(1-m_alpha);
+    mat3d K, Wba(0,0,0,0,0,0,0,0,0), Wab(0,0,0,0,0,0,0,0,0);
+    if (m_bq) {
+        quatd qa = RBa.m_qt*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
+        quatd qb = RBb.m_qt*(m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp).Inverse();
+        qa.MakeUnit();
+        qb.MakeUnit();
+        mat3d Qa = qa.RotationMatrix();
+        mat3d Qb = qb.RotationMatrix();
+        mat3d A = a.RotationMatrix();
+        mat3d R = r.RotationMatrix();
+        mat3dd I(1);
+        Wba = A*(I*Qa.trace()-Qa)/2;
+        Wab = R*(I*Qb.trace()-Qb)/2;
+    }
     
-	y2h[0][0] =    0; y2h[0][1] =  a.z; y2h[0][2] = -a.y;
-	y2h[1][0] = -a.z; y2h[1][1] =    0; y2h[1][2] =  a.x;
-	y2h[2][0] =  a.y; y2h[2][1] = -a.x; y2h[2][2] =    0;
+    // (1,1)
+    K = I*(m_alpha*m_eps);
+    ke[0][0] = K[0][0]; ke[0][1] = K[0][1]; ke[0][2] = K[0][2];
+    ke[1][0] = K[1][0]; ke[1][1] = K[1][1]; ke[1][2] = K[1][2];
+    ke[2][0] = K[2][0]; ke[2][1] = K[2][1]; ke[2][2] = K[2][2];
     
-	y2[0][0] =     0; y2[0][1] =  at.z; y2[0][2] = -at.y;
-	y2[1][0] = -at.z; y2[1][1] =     0; y2[1][2] =  at.x;
-	y2[2][0] =  at.y; y2[2][1] = -at.x; y2[2][2] =     0;
+    // (1,2)
+    K = zathat*(-m_eps*m_alpha);
+    ke[0][3] = K[0][0]; ke[0][4] = K[0][1]; ke[0][5] = K[0][2];
+    ke[1][3] = K[1][0]; ke[1][4] = K[1][1]; ke[1][5] = K[1][2];
+    ke[2][3] = K[2][0]; ke[2][4] = K[2][1]; ke[2][5] = K[2][2];
     
-	for (j=0; j<3; ++j)
-	{
-		y11[j][0] = y1h[0][j]*y1[0][0]+y1h[1][j]*y1[1][0]+y1h[2][j]*y1[2][0];
-		y11[j][1] = y1h[0][j]*y1[0][1]+y1h[1][j]*y1[1][1]+y1h[2][j]*y1[2][1];
-		y11[j][2] = y1h[0][j]*y1[0][2]+y1h[1][j]*y1[1][2]+y1h[2][j]*y1[2][2];
-        
-		y12[j][0] = y1h[0][j]*y2[0][0]+y1h[1][j]*y2[1][0]+y1h[2][j]*y2[2][0];
-		y12[j][1] = y1h[0][j]*y2[0][1]+y1h[1][j]*y2[1][1]+y1h[2][j]*y2[2][1];
-		y12[j][2] = y1h[0][j]*y2[0][2]+y1h[1][j]*y2[1][2]+y1h[2][j]*y2[2][2];
-        
-		y21[j][0] = y2h[0][j]*y1[0][0]+y2h[1][j]*y1[1][0]+y2h[2][j]*y1[2][0];
-		y21[j][1] = y2h[0][j]*y1[0][1]+y2h[1][j]*y1[1][1]+y2h[2][j]*y1[2][1];
-		y21[j][2] = y2h[0][j]*y1[0][2]+y2h[1][j]*y1[1][2]+y2h[2][j]*y1[2][2];
-        
-		y22[j][0] = y2h[0][j]*y2[0][0]+y2h[1][j]*y2[1][0]+y2h[2][j]*y2[2][0];
-		y22[j][1] = y2h[0][j]*y2[0][1]+y2h[1][j]*y2[1][1]+y2h[2][j]*y2[2][1];
-		y22[j][2] = y2h[0][j]*y2[0][2]+y2h[1][j]*y2[1][2]+y2h[2][j]*y2[2][2];
-	}
+    // (1,3)
+    K = I*(-m_alpha*m_eps);
+    ke[0][6] = K[0][0]; ke[0][7] = K[0][1]; ke[0][8] = K[0][2];
+    ke[1][6] = K[1][0]; ke[1][7] = K[1][1]; ke[1][8] = K[1][2];
+    ke[2][6] = K[2][0]; ke[2][7] = K[2][1]; ke[2][8] = K[2][2];
     
-	ke[0][0] = ke[1][1] = ke[2][2] =  1;
-	ke[0][6] = ke[1][7] = ke[2][8] = -1;
-	ke[6][0] = ke[7][1] = ke[8][2] = -1;
-	ke[6][6] = ke[7][7] = ke[8][8] =  1;
+    // (1,4)
+    K = zbthat*(m_alpha*m_eps);
+    ke[0][9] = K[0][0]; ke[0][10] = K[0][1]; ke[0][11] = K[0][2];
+    ke[1][9] = K[1][0]; ke[1][10] = K[1][1]; ke[1][11] = K[1][2];
+    ke[2][9] = K[2][0]; ke[2][10] = K[2][1]; ke[2][11] = K[2][2];
     
-	ke[0][3] = y1[0][0]; ke[0][4] = y1[0][1]; ke[0][5] = y1[0][2];
-	ke[1][3] = y1[1][0]; ke[1][4] = y1[1][1]; ke[1][5] = y1[1][2];
-	ke[2][3] = y1[2][0]; ke[2][4] = y1[2][1]; ke[2][5] = y1[2][2];
+    // (2,1)
+    K = zahat*(m_alpha*m_eps);
+    ke[3][0] = K[0][0]; ke[3][1] = K[0][1]; ke[3][2] = K[0][2];
+    ke[4][0] = K[1][0]; ke[4][1] = K[1][1]; ke[4][2] = K[1][2];
+    ke[5][0] = K[2][0]; ke[5][1] = K[2][1]; ke[5][2] = K[2][2];
     
-	ke[0][9] = -y2[0][0]; ke[0][10] = -y2[0][1]; ke[0][11] = -y2[0][2];
-	ke[1][9] = -y2[1][0]; ke[1][10] = -y2[1][1]; ke[1][11] = -y2[1][2];
-	ke[2][9] = -y2[2][0]; ke[2][10] = -y2[2][1]; ke[2][11] = -y2[2][2];
+    // (2,2)
+    K = (zahat*zathat*m_eps + Wba*m_ups)*(-m_alpha);
+    ke[3][3] = K[0][0]; ke[3][4] = K[0][1]; ke[3][5] = K[0][2];
+    ke[4][3] = K[1][0]; ke[4][4] = K[1][1]; ke[4][5] = K[1][2];
+    ke[5][3] = K[2][0]; ke[5][4] = K[2][1]; ke[5][5] = K[2][2];
     
-	ke[3][0] = y1h[0][0]; ke[3][1] = y1h[1][0]; ke[3][2] = y1h[2][0];
-	ke[4][0] = y1h[0][1]; ke[4][1] = y1h[1][1]; ke[4][2] = y1h[2][1];
-	ke[5][0] = y1h[0][2]; ke[5][1] = y1h[1][2]; ke[5][2] = y1h[2][2];
+    // (2,3)
+    K = zahat*(-m_alpha*m_eps);
+    ke[3][6] = K[0][0]; ke[3][7] = K[0][1]; ke[3][8] = K[0][2];
+    ke[4][6] = K[1][0]; ke[4][7] = K[1][1]; ke[4][8] = K[1][2];
+    ke[5][6] = K[2][0]; ke[5][7] = K[2][1]; ke[5][8] = K[2][2];
     
-	ke[3][3] = y11[0][0]; ke[3][4] = y11[0][1]; ke[3][5] = y11[0][2];
-	ke[4][3] = y11[1][0]; ke[4][4] = y11[1][1]; ke[4][5] = y11[1][2];
-	ke[5][3] = y11[2][0]; ke[5][4] = y11[2][1]; ke[5][5] = y11[2][2];
+    // (2,4)
+    K = (zahat*zbthat*m_eps + Wab*m_ups)*m_alpha;
+    ke[3][9] = K[0][0]; ke[3][10] = K[0][1]; ke[3][11] = K[0][2];
+    ke[4][9] = K[1][0]; ke[4][10] = K[1][1]; ke[4][11] = K[1][2];
+    ke[5][9] = K[2][0]; ke[5][10] = K[2][1]; ke[5][11] = K[2][2];
     
-	ke[3][6] = -y1h[0][0]; ke[3][7] = -y1h[1][0]; ke[3][8] = -y1h[2][0];
-	ke[4][6] = -y1h[0][1]; ke[4][7] = -y1h[1][1]; ke[4][8] = -y1h[2][1];
-	ke[5][6] = -y1h[0][2]; ke[5][7] = -y1h[1][2]; ke[5][8] = -y1h[2][2];
     
-	ke[3][9] = -y12[0][0]; ke[3][10] = -y12[0][1]; ke[3][11] = -y12[0][2];
-	ke[4][9] = -y12[1][0]; ke[4][10] = -y12[1][1]; ke[4][11] = -y12[1][2];
-	ke[5][9] = -y12[2][0]; ke[5][10] = -y12[2][1]; ke[5][11] = -y12[2][2];
+    // (3,1)
+    K = I*(-m_alpha*m_eps);
+    ke[6][0] = K[0][0]; ke[6][1] = K[0][1]; ke[6][2] = K[0][2];
+    ke[7][0] = K[1][0]; ke[7][1] = K[1][1]; ke[7][2] = K[1][2];
+    ke[8][0] = K[2][0]; ke[8][1] = K[2][1]; ke[8][2] = K[2][2];
     
-	ke[6][3] = -y1[0][0]; ke[6][4] = -y1[0][1]; ke[6][5] = -y1[0][2];
-	ke[7][3] = -y1[1][0]; ke[7][4] = -y1[1][1]; ke[7][5] = -y1[1][2];
-	ke[8][3] = -y1[2][0]; ke[8][4] = -y1[2][1]; ke[8][5] = -y1[2][2];
+    // (3,2)
+    K = zathat*(m_eps*m_alpha);
+    ke[6][3] = K[0][0]; ke[6][4] = K[0][1]; ke[6][5] = K[0][2];
+    ke[7][3] = K[1][0]; ke[7][4] = K[1][1]; ke[7][5] = K[1][2];
+    ke[8][3] = K[2][0]; ke[8][4] = K[2][1]; ke[8][5] = K[2][2];
     
-	ke[6][9] = y2[0][0]; ke[6][10] = y2[0][1]; ke[6][11] = y2[0][2];
-	ke[7][9] = y2[1][0]; ke[7][10] = y2[1][1]; ke[7][11] = y2[1][2];
-	ke[8][9] = y2[2][0]; ke[8][10] = y2[2][1]; ke[8][11] = y2[2][2];
+    // (3,3)
+    K = I*(m_alpha*m_eps);
+    ke[6][6] = K[0][0]; ke[6][7] = K[0][1]; ke[6][8] = K[0][2];
+    ke[7][6] = K[1][0]; ke[7][7] = K[1][1]; ke[7][8] = K[1][2];
+    ke[8][6] = K[2][0]; ke[8][7] = K[2][1]; ke[8][8] = K[2][2];
     
-	ke[ 9][0] = -y2h[0][0]; ke[ 9][1] = -y2h[1][0]; ke[ 9][2] = -y2h[2][0];
-	ke[10][0] = -y2h[0][1]; ke[10][1] = -y2h[1][1]; ke[10][2] = -y2h[2][1];
-	ke[11][0] = -y2h[0][2]; ke[11][1] = -y2h[1][2]; ke[11][2] = -y2h[2][2];
+    // (3,4)
+    K = zbthat*(-m_alpha*m_eps);
+    ke[6][9] = K[0][0]; ke[6][10] = K[0][1]; ke[6][11] = K[0][2];
+    ke[7][9] = K[1][0]; ke[7][10] = K[1][1]; ke[7][11] = K[1][2];
+    ke[8][9] = K[2][0]; ke[8][10] = K[2][1]; ke[8][11] = K[2][2];
     
-	ke[ 9][3] = -y21[0][0]; ke[ 9][4] = -y21[0][1]; ke[ 9][5] = -y21[0][2];
-	ke[10][3] = -y21[1][0]; ke[10][4] = -y21[1][1]; ke[10][5] = -y21[1][2];
-	ke[11][3] = -y21[2][0]; ke[11][4] = -y21[2][1]; ke[11][5] = -y21[2][2];
     
-	ke[ 9][6] = y2h[0][0]; ke[ 9][7] = y2h[1][0]; ke[ 9][8] = y2h[2][0];
-	ke[10][6] = y2h[0][1]; ke[10][7] = y2h[1][1]; ke[10][8] = y2h[2][1];
-	ke[11][6] = y2h[0][2]; ke[11][7] = y2h[1][2]; ke[11][8] = y2h[2][2];
+    // (4,1)
+    K = zbhat*(-m_alpha*m_eps);
+    ke[9 ][0] = K[0][0]; ke[ 9][1] = K[0][1]; ke[ 9][2] = K[0][2];
+    ke[10][0] = K[1][0]; ke[10][1] = K[1][1]; ke[10][2] = K[1][2];
+    ke[11][0] = K[2][0]; ke[11][1] = K[2][1]; ke[11][2] = K[2][2];
     
-	ke[ 9][9] = y22[0][0]; ke[ 9][10] = y22[0][1]; ke[ 9][11] = y22[0][2];
-	ke[10][9] = y22[1][0]; ke[10][10] = y22[1][1]; ke[10][11] = y22[1][2];
-	ke[11][9] = y22[2][0]; ke[11][10] = y22[2][1]; ke[11][11] = y22[2][2];
+    // (4,2)
+    K = (zbhat*zathat*m_eps + Wba*m_ups)*m_alpha;
+    ke[9 ][3] = K[0][0]; ke[ 9][4] = K[0][1]; ke[ 9][5] = K[0][2];
+    ke[10][3] = K[1][0]; ke[10][4] = K[1][1]; ke[10][5] = K[1][2];
+    ke[11][3] = K[2][0]; ke[11][4] = K[2][1]; ke[11][5] = K[2][2];
     
-	for (j=0; j<12; ++j)
-		for (k=0; k<12; ++k)
-		{
-			ke[j][k] *= m_eps*m_alpha;
-		}
+    // (4,3)
+    K = zbhat*(m_alpha*m_eps);
+    ke[9 ][6] = K[0][0]; ke[ 9][7] = K[0][1]; ke[ 9][8] = K[0][2];
+    ke[10][6] = K[1][0]; ke[10][7] = K[1][1]; ke[10][8] = K[1][2];
+    ke[11][6] = K[2][0]; ke[11][7] = K[2][1]; ke[11][8] = K[2][2];
     
-	for (j=0; j<6; ++j)
-	{
-		LM[j  ] = RBa.m_LM[j];
-		LM[j+6] = RBb.m_LM[j];
-	}
+    // (4,4)
+    K = (zbhat*zbthat*m_eps + Wab*m_ups)*(-m_alpha);
+    ke[9 ][9] = K[0][0]; ke[ 9][10] = K[0][1]; ke[ 9][11] = K[0][2];
+    ke[10][9] = K[1][0]; ke[10][10] = K[1][1]; ke[10][11] = K[1][2];
+    ke[11][9] = K[2][0]; ke[11][10] = K[2][1]; ke[11][11] = K[2][2];
     
-	psolver->AssembleStiffness(LM, ke);
+    for (j=0; j<6; ++j)
+    {
+        LM[j  ] = RBa.m_LM[j];
+        LM[j+6] = RBb.m_LM[j];
+    }
+    
+    psolver->AssembleStiffness(LM, ke);
 }
 
 //-----------------------------------------------------------------------------
 bool FERigidSphericalJoint::Augment(int naug)
 {
-	vec3d ra, rb, c,  Lm;
+    vec3d ra, rb, qa, qb, c, ksi, Lm;
     vec3d za, zb;
-	double normF0, normF1;
-	bool bconv = true;
+    double normF0, normF1;
+    vec3d Um;
+    double normM0, normM1;
+    bool bconv = true;
     
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
+    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
     
     ra = RBa.m_rt*m_alpha + RBa.m_rp*(1-m_alpha);
     rb = RBb.m_rt*m_alpha + RBb.m_rp*(1-m_alpha);
@@ -286,69 +359,99 @@ bool FERigidSphericalJoint::Augment(int naug)
     vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     za = zat*m_alpha + zap*(1-m_alpha);
-
+    
     vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     zb = zbt*m_alpha + zbp*(1-m_alpha);
     
-	c = rb + zb - ra - za;
+    c = rb + zb - ra - za;
     
-	normF0 = m_L.norm();
+    normF0 = sqrt(m_L*m_L);
     
-	// calculate trial multiplier
-	Lm = m_L + c*m_eps;
+    // calculate trial multiplier
+    Lm = m_L + c*m_eps;
     
-	normF1 = Lm.norm();
+    normF1 = sqrt(Lm*Lm);
     
-	// check convergence of constraints
-	felog.printf(" rigid joint # %d\n", m_nID);
-	felog.printf("                  CURRENT        REQUIRED\n");
-	double pctn = 0;
-	if (fabs(normF1) > 1e-10) pctn = fabs((normF1 - normF0)/normF1);
+    // check convergence of constraints
+    felog.printf(" rigid joint # %d\n", m_nID);
+    felog.printf("                  CURRENT        REQUIRED\n");
+    double pctn = 0;
     double gap = c.norm();
+    double qap = ksi.norm();
+    if (fabs(normF1) > 1e-10) pctn = fabs((normF1 - normF0)/normF1);
     if (m_atol) felog.printf("    force : %15le %15le\n", pctn, m_atol);
     else        felog.printf("    force : %15le        ***\n", pctn);
     if (m_gtol) felog.printf("    gap   : %15le %15le\n", gap, m_gtol);
     else        felog.printf("    gap   : %15le        ***\n", gap);
+    if (m_atol && (pctn >= m_atol)) bconv = false;
+    if (m_gtol && (gap >= m_gtol)) bconv = false;
+
+    if (m_bq) {
+        quatd q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
+        quatd a(vec3d(m_qpx,m_qpy,m_qpz));
+        quatd r = a*q.Inverse();
+        r.MakeUnit();
+        vec3d ksi = r.GetVector()*r.GetAngle();
+        normM0 = sqrt(m_U*m_U);
+        
+        // calculate trial multiplier
+        Um = m_U + ksi*m_ups;
+        
+        normM1 = sqrt(Um*Um);
+        
+        double qctn = 0;
+        if (fabs(normM1) > 1e-10) qctn = fabs((normM1 - normM0)/normM1);
+        if (m_atol) felog.printf("    moment: %15le %15le\n", qctn, m_atol);
+        else        felog.printf("    moment: %15le        ***\n", qctn);
+        if (m_qtol) felog.printf("    angle : %15le %15le\n", qap, m_qtol);
+        else        felog.printf("    angle : %15le        ***\n", qap);
+        if (m_atol && (qctn >= m_atol)) bconv = false;
+        if (m_qtol && (qap >= m_qtol)) bconv = false;
+    }
     
-    if ((m_atol > 0) && (pctn >= m_atol)) bconv = false;
-    if ((m_gtol > 0) && (gap  >= m_gtol)) bconv = false;
-	if (naug < m_naugmin ) bconv = false;
-	if (naug >= m_naugmax) bconv = true;
+    if (naug < m_naugmin ) bconv = false;
+    if (naug >= m_naugmax) bconv = true;
     
-    // update multiplier
-	if (!bconv) m_L = Lm;
-	
-	return bconv;
+    if (!bconv)
+    {
+        // update multipliers
+        m_L = Lm;
+        m_U = Um;
+    }
+    
+    return bconv;
 }
 
 //-----------------------------------------------------------------------------
 void FERigidSphericalJoint::Serialize(DumpFile& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_nID;
-		ar << m_nRBa << m_nRBb;
-		ar << m_q0 << m_qa0 << m_qb0;
-		ar << m_F << m_L << m_eps << m_atol;
-	}
-	else
-	{
-		ar >> m_nID;
-		ar >> m_nRBa >> m_nRBb;
-		ar >> m_q0 >> m_qa0 >> m_qb0;
-		ar >> m_F >> m_L >> m_eps >> m_atol;
-	}
+    if (ar.IsSaving())
+    {
+        ar << m_nID;
+        ar << m_nRBa << m_nRBb;
+        ar << m_q0 << m_qa0 << m_qb0;
+        ar << m_F << m_L << m_eps << m_atol;
+        ar << m_M << m_U << m_ups;
+    }
+    else
+    {
+        ar >> m_nID;
+        ar >> m_nRBa >> m_nRBb;
+        ar >> m_q0 >> m_qa0 >> m_qb0;
+        ar >> m_F >> m_L >> m_eps >> m_atol;
+        ar >> m_M >> m_U >> m_ups;
+    }
 }
 
 //-----------------------------------------------------------------------------
 void FERigidSphericalJoint::Update()
 {
-	vec3d ra, rb, c;
+    vec3d ra, rb;
     vec3d za, zb;
     
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
+    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
     
     ra = RBa.m_rt*m_alpha + RBa.m_rp*(1-m_alpha);
     rb = RBb.m_rt*m_alpha + RBb.m_rp*(1-m_alpha);
@@ -361,20 +464,32 @@ void FERigidSphericalJoint::Update()
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     zb = zbt*m_alpha + zbp*(1-m_alpha);
     
-	c = rb + zb - ra - za;
+    vec3d c = rb + zb - ra - za;
+    m_F = m_L + c*m_eps;
     
-	m_F = m_L + c*m_eps;
+    if (m_bq) {
+        quatd q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
+        quatd a(vec3d(m_qpx,m_qpy,m_qpz));
+        quatd r = a*q.Inverse();
+        r.MakeUnit();
+        vec3d ksi = r.GetVector()*r.GetAngle();
+        m_M = m_U + ksi*m_ups;
+    }
+    else m_M = vec3d(m_Mpx,m_Mpy,m_Mpz);
+    
 }
 
 //-----------------------------------------------------------------------------
 void FERigidSphericalJoint::Reset()
 {
-	m_F = vec3d(0,0,0);
-	m_L = vec3d(0,0,0);
+    m_F = vec3d(0,0,0);
+    m_L = vec3d(0,0,0);
+    m_M = vec3d(0,0,0);
+    m_U = vec3d(0,0,0);
     
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
+    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
     
-	m_qa0 = m_q0 - RBa.m_r0;
-	m_qb0 = m_q0 - RBb.m_r0;
+    m_qa0 = m_q0 - RBa.m_r0;
+    m_qb0 = m_q0 - RBb.m_r0;
 }

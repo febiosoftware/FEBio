@@ -11,13 +11,13 @@
 
 #include "FECore/vec3d.h"
 #include "FECore/DumpFile.h"
-#include "FECore/FENLConstraint.h"
+#include "FERigidConnector.h"
 
 //-----------------------------------------------------------------------------
 //! The FERigidContractileForce class implements a contractile force between
 //! arbitrary points (not necessarily nodes) on two rigid bodies.
 
-class FERigidContractileForce : public FENLConstraint
+class FERigidContractileForce : public FERigidConnector
 {
 public:
     //! constructor
@@ -51,15 +51,11 @@ public:
     void Reset();
     
 public:
-    int	m_nRBa;         //!< rigid body A for contractile force insertion
-    int	m_nRBb;         //!< rigid body B for contractile force insertion
-    
     vec3d	m_a0;       //! initial absolute position vector of insertion on body A
     vec3d	m_b0;       //! initial absolute position vector of insertion on body B
     vec3d	m_qa0;      //! initial relative position vector of insertion on body A
     vec3d	m_qb0;      //! initial relative position vector of insertion on body B
     
-    vec3d	m_F;		//! constraining force
     double	m_f0;       //! contractile force
     
 protected:

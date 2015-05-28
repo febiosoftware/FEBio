@@ -13,23 +13,21 @@
 #include "FESolidSolver2.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidDamper, FENLConstraint);
+BEGIN_PARAMETER_LIST(FERigidDamper, FERigidConnector);
 ADD_PARAMETER(m_c   , FE_PARAM_DOUBLE, "c"          );
-ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"     );
-ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"     );
 ADD_PARAMETER(m_a0  , FE_PARAM_VEC3D , "insertion_a");
 ADD_PARAMETER(m_b0  , FE_PARAM_VEC3D , "insertion_b");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FERigidDamper::FERigidDamper(FEModel* pfem) : FENLConstraint(pfem)
+FERigidDamper::FERigidDamper(FEModel* pfem) : FERigidConnector(pfem)
 {
     static int count = 1;
     m_nID = count++;
     m_binit = false;
-    m_alpha = 0.5;
-    m_beta = 0.5;
-    m_gamma = 1.0;
+    m_alpha = 1.0;
+    m_beta = 0.25;
+    m_gamma = 0.5;
 }
 
 //-----------------------------------------------------------------------------
@@ -144,9 +142,12 @@ void FERigidDamper::Residual(FEGlobalVector& R)
 void FERigidDamper::StiffnessMatrix(FESolver* psolver)
 {
     // get m_alpha, m_beta, m_gamma from solver
-    m_alpha = dynamic_cast<FESolidSolver2*>(psolver)->m_alpha;
-    m_beta = dynamic_cast<FESolidSolver2*>(psolver)->m_beta;
-    m_gamma = dynamic_cast<FESolidSolver2*>(psolver)->m_gamma;
+    FESolidSolver2* ps2 = dynamic_cast<FESolidSolver2*>(psolver);
+    if (ps2) {
+        m_alpha = ps2->m_alpha;
+        m_beta = ps2->m_beta;
+        m_gamma = ps2->m_gamma;
+    }
     
     // get time increment
     FEModel& fem = *GetFEModel();

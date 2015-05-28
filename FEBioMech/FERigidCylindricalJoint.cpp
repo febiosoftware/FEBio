@@ -12,15 +12,13 @@
 #include "FESolidSolver2.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidCylindricalJoint, FENLConstraint);
+BEGIN_PARAMETER_LIST(FERigidCylindricalJoint, FERigidConnector);
 ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
 ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
 ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
 ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
 ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
-ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"        );
-ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"        );
-ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint"         );
+ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint_origin"  );
 ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "joint_axis"    );
 ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "transverse_axis");
 ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
@@ -34,7 +32,8 @@ ADD_PARAMETER(m_Mp  , FE_PARAM_DOUBLE, "moment"        );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FENLConstraint(pfem)
+//FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FENLConstraint(pfem)
+FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
     static int count = 1;
     m_nID = count++;
@@ -44,7 +43,7 @@ FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FENLConstraint
     m_qtol = 0;
     m_naugmin = 0;
     m_naugmax = 10;
-    m_alpha = 0.5;
+    m_alpha = 1.0;
     m_dp = 0;
     m_Fp = 0;
     m_bd = false;
@@ -75,7 +74,7 @@ bool FERigidCylindricalJoint::Init()
     // initialize joint basis
     m_e0[0].unit();
     m_e0[2] = m_e0[0] ^ m_e0[1]; m_e0[2].unit();
-    m_e0[1] = m_e0[2] ^ m_e0[0];
+    m_e0[1] = m_e0[2] ^ m_e0[0]; m_e0[1].unit();
     
     // reset force
     m_F = vec3d(0,0,0); m_L = vec3d(0,0,0);
@@ -108,20 +107,6 @@ bool FERigidCylindricalJoint::Init()
     
     m_ea0[0] = m_e0[0]; m_ea0[1] = m_e0[1]; m_ea0[2] = m_e0[2];
     m_eb0[0] = m_e0[0]; m_eb0[1] = m_e0[1]; m_eb0[2] = m_e0[2];
-    
-    FEParameterList& pl = GetParameterList();
-    
-    FEParam* pd = pl.Find("translation");
-    if (pd) {
-        m_pdLC = fem.GetLoadCurve(pd->m_nlc);
-        m_dpscl = pd->m_scl;
-    }
-    
-    FEParam* pq = pl.Find("rotation");
-    if (pq) {
-        m_pqLC = fem.GetLoadCurve(pq->m_nlc);
-        m_qpscl = pq->m_scl;
-    }
     
     m_binit = true;
     
@@ -158,12 +143,6 @@ void FERigidCylindricalJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidCylindricalJoint::Residual(FEGlobalVector& R)
 {
-    // get time at intermediate step
-    FEModel& fem = *GetFEModel();
-    double t = fem.m_ftime;
-    double dt = fem.GetCurrentStep()->m_dt;
-    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
-    
     vector<double> fa(6);
     vector<double> fb(6);
     
@@ -204,17 +183,14 @@ void FERigidCylindricalJoint::Residual(FEGlobalVector& R)
     eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
     
     mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    double dp;
-    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
-    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
+    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
     vec3d c = P*(rb + zb - ra - za) - p;
     m_F = m_L + c*m_eps + ea[0]*m_Fp;
     
     vec3d ksi = (ea[0] ^ eb[0])/2;
     if (m_bq) {
         quatd q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
-        double qp = m_pqLC->Value(m_time)*m_qpscl;
-        quatd a(qp,ea[0]);
+        quatd a(m_qp,ea[0]);
         quatd r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
@@ -245,14 +221,9 @@ void FERigidCylindricalJoint::Residual(FEGlobalVector& R)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidCylindricalJoint::StiffnessMatrix(FESolver* psolver)
 {
-    // get time at intermediate step
-    FEModel& fem = *GetFEModel();
-    double t = fem.m_ftime;
-    double dt = fem.GetCurrentStep()->m_dt;
-    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
-    
     // get m_alpha from solver
-    m_alpha = dynamic_cast<FESolidSolver2*>(psolver)->m_alpha;
+    FESolidSolver2* ps2 = dynamic_cast<FESolidSolver2*>(psolver);
+    if (ps2) m_alpha = ps2->m_alpha;
     
     vec3d eat[3], eap[3], ea[3];
     vec3d ebt[3], ebp[3], eb[3];
@@ -301,9 +272,7 @@ void FERigidCylindricalJoint::StiffnessMatrix(FESolver* psolver)
     mat3d zbthat; zbthat.skew(zbt);
     
     mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    double dp;
-    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
-    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
+    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
     vec3d d = rb + zb - ra - za;
     vec3d c = P*d - p;
     m_F = m_L + c*m_eps + ea[0]*m_Fp;
@@ -313,8 +282,7 @@ void FERigidCylindricalJoint::StiffnessMatrix(FESolver* psolver)
     quatd q, a, r;
     if (m_bq) {
         q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
-        double qp = m_pqLC->Value(m_time)*m_qpscl;
-        a = quatd(qp,ea[0]);
+        a = quatd(m_qp,ea[0]);
         r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
@@ -460,12 +428,6 @@ void FERigidCylindricalJoint::StiffnessMatrix(FESolver* psolver)
 //-----------------------------------------------------------------------------
 bool FERigidCylindricalJoint::Augment(int naug)
 {
-    // get time at intermediate step
-    FEModel& fem = *GetFEModel();
-    double t = fem.m_ftime;
-    double dt = fem.GetCurrentStep()->m_dt;
-    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
-    
     vec3d ra, rb, qa, qb, c, ksi, Lm;
     vec3d za, zb;
     vec3d eat[3], eap[3], ea[3];
@@ -508,9 +470,7 @@ bool FERigidCylindricalJoint::Augment(int naug)
     eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
     
     mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    double dp;
-    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
-    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
+    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
     c = P*(rb + zb - ra - za) - p;
     
     normF0 = sqrt(m_L*m_L);
@@ -523,8 +483,7 @@ bool FERigidCylindricalJoint::Augment(int naug)
     ksi = (ea[0] ^ eb[0])/2;
     if (m_bq) {
         quatd q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
-        double qp = m_pqLC->Value(m_time)*m_qpscl;
-        quatd a(qp,ea[0]);
+        quatd a(m_qp,ea[0]);
         quatd r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
@@ -599,12 +558,6 @@ void FERigidCylindricalJoint::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FERigidCylindricalJoint::Update()
 {
-    // get time at intermediate step
-    FEModel& fem = *GetFEModel();
-    double t = fem.m_ftime;
-    double dt = fem.GetCurrentStep()->m_dt;
-    m_time = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
-    
     vec3d ra, rb;
     vec3d za, zb;
     vec3d eat[3], eap[3], ea[3];
@@ -643,17 +596,14 @@ void FERigidCylindricalJoint::Update()
     eb[2] = ebt[2]*m_alpha + ebp[2]*(1-m_alpha);
     
     mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    double dp;
-    if (m_bd) dp = m_pdLC->Value(m_time)*m_dpscl;
-    vec3d p = m_bd ? ea[0]*dp : vec3d(0,0,0);
+    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
     vec3d c = P*(rb + zb - ra - za) - p;
     m_F = m_L + c*m_eps + ea[0]*m_Fp;
     
     vec3d ksi = (ea[0] ^ eb[0])/2;
     if (m_bq) {
         quatd q = (m_alpha*RBb.m_qt+(1-m_alpha)*RBb.m_qp)*(m_alpha*RBa.m_qt+(1-m_alpha)*RBa.m_qp).Inverse();
-        double qp = m_pqLC->Value(m_time)*m_qpscl;
-        quatd a(qp,ea[0]);
+        quatd a(m_qp,ea[0]);
         quatd r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
