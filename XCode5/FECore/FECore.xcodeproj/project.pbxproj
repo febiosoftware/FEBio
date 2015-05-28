@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D50CB99B1B177CCC006E43E6 /* BC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50CB99A1B177CCC006E43E6 /* BC.cpp */; };
 		D50E7EB71992EB8300950744 /* eig3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50E7EB51992EB8300950744 /* eig3.cpp */; };
 		D50E7EB81992EB8300950744 /* eig3.h in Headers */ = {isa = PBXBuildFile; fileRef = D50E7EB61992EB8300950744 /* eig3.h */; };
 		D52A5B0E19A6815C009E3A47 /* tens4dms.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D52A5B0C19A6815C009E3A47 /* tens4dms.hpp */; };
@@ -180,6 +181,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D50CB99A1B177CCC006E43E6 /* BC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BC.cpp; sourceTree = "<group>"; };
 		D50E7EB51992EB8300950744 /* eig3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = eig3.cpp; sourceTree = "<group>"; };
 		D50E7EB61992EB8300950744 /* eig3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eig3.h; sourceTree = "<group>"; };
 		D52A5B0C19A6815C009E3A47 /* tens4dms.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens4dms.hpp; sourceTree = "<group>"; };
@@ -385,6 +387,7 @@
 			children = (
 				D5E109EF1865E15900B23922 /* Archive.cpp */,
 				D5E109F01865E15900B23922 /* Archive.h */,
+				D50CB99A1B177CCC006E43E6 /* BC.cpp */,
 				D5E109F11865E15900B23922 /* BC.h */,
 				D5E109F21865E15900B23922 /* BFGSSolver.cpp */,
 				D5E109F31865E15900B23922 /* BFGSSolver.h */,
@@ -756,6 +759,7 @@
 				D5E10AC01865E15900B23922 /* FEMesh.cpp in Sources */,
 				D5E10A981865E15900B23922 /* FEBoundaryCondition.cpp in Sources */,
 				D5E10AE81865E15900B23922 /* Image.cpp in Sources */,
+				D50CB99B1B177CCC006E43E6 /* BC.cpp in Sources */,
 				D5E10AD71865E15900B23922 /* FERigidBody.cpp in Sources */,
 				D5B572D7186CC76500D12E45 /* FECoreFactory.cpp in Sources */,
 				D5E10AF01865E15900B23922 /* Logfile.cpp in Sources */,
