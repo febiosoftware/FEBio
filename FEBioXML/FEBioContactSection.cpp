@@ -6,6 +6,7 @@
 #include "FEBioMech/FERigidRevoluteJoint.h"
 #include "FEBioMech/FERigidPrismaticJoint.h"
 #include "FEBioMech/FERigidCylindricalJoint.h"
+#include "FEBioMech/FERigidPlanarJoint.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FEBioMech/FERigidSpring.h"
 #include "FEBioMech/FERigidDamper.h"
@@ -42,6 +43,7 @@ void FEBioContactSection::Parse(XMLTag& tag)
             else if (strcmp(sztype, "rigid revolute joint"   ) == 0) ParseRigidRevoluteJoint   (tag);
             else if (strcmp(sztype, "rigid prismatic joint"  ) == 0) ParseRigidPrismaticJoint  (tag);
             else if (strcmp(sztype, "rigid cylindrical joint") == 0) ParseRigidCylindricalJoint(tag);
+            else if (strcmp(sztype, "rigid planar joint"     ) == 0) ParseRigidPlanarJoint     (tag);
             else if (strcmp(sztype, "rigid spring"           ) == 0) ParseRigidSpring          (tag);
             else if (strcmp(sztype, "rigid damper"           ) == 0) ParseRigidDamper          (tag);
             else if (strcmp(sztype, "rigid contractile force") == 0) ParseRigidContractileForce(tag);
@@ -307,6 +309,26 @@ void FEBioContactSection::ParseRigidCylindricalJoint(XMLTag& tag)
     FEModel& fem = *GetFEModel();
     
     FERigidCylindricalJoint* prj = new FERigidCylindricalJoint(&fem);
+    FEParameterList& pl = prj->GetParameterList();
+    ++tag;
+    do
+    {
+        if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+        ++tag;
+    }
+    while (!tag.isend());
+    prj->m_nRBa--;
+    prj->m_nRBb--;
+    fem.AddNonlinearConstraint(prj);
+}
+
+//-----------------------------------------------------------------------------
+// --- R I G I D   P L A N A R   J O I N T   I N T E R F A C E ---
+void FEBioContactSection::ParseRigidPlanarJoint(XMLTag& tag)
+{
+    FEModel& fem = *GetFEModel();
+    
+    FERigidPlanarJoint* prj = new FERigidPlanarJoint(&fem);
     FEParameterList& pl = prj->GetParameterList();
     ++tag;
     do

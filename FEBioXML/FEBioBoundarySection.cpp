@@ -9,6 +9,7 @@
 #include "FEBioMech/FERigidRevoluteJoint.h"
 #include "FEBioMech/FERigidPrismaticJoint.h"
 #include "FEBioMech/FERigidCylindricalJoint.h"
+#include "FEBioMech/FERigidPlanarJoint.h"
 #include "FEBioMech/FERigidSpring.h"
 #include "FEBioMech/FERigidDamper.h"
 #include "FEBioMech/FERigidContractileForce.h"
@@ -838,6 +839,23 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
         // --- R I G I D   C Y L I N D R I C A L  J O I N T   I N T E R F A C E ---
         
         FERigidCylindricalJoint* prj = dynamic_cast<FERigidCylindricalJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
+        FEParameterList& pl = prj->GetParameterList();
+        ++tag;
+        do
+        {
+            if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+            ++tag;
+        }
+        while (!tag.isend());
+        prj->m_nRBa--;
+        prj->m_nRBb--;
+        fem.AddNonlinearConstraint(prj);
+    }
+    else if (strcmp(szt, "rigid planar joint") == 0)
+    {
+        // --- R I G I D   P L A N A R  J O I N T   I N T E R F A C E ---
+        
+        FERigidPlanarJoint* prj = dynamic_cast<FERigidPlanarJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
         FEParameterList& pl = prj->GetParameterList();
         ++tag;
         do

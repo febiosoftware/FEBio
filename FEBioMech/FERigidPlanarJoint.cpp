@@ -1,35 +1,37 @@
 //
-//  FERigidPrismaticJoint.cpp
+//  FERigidPlanarJoint.cpp
 //  FEBioMech
 //
-//  Created by Gerard Ateshian on 4/20/15.
+//  Created by Gerard Ateshian on 5/28/15.
 //  Copyright (c) 2015 febio.org. All rights reserved.
 //
 
-#include "FERigidPrismaticJoint.h"
-#include "stdafx.h"
+#include "FERigidPlanarJoint.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidPrismaticJoint, FERigidConnector);
-    ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
-    ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
-    ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
-    ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
-    ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
-    ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint_origin"  );
-    ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "translation_axis" );
-    ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "transverse_axis");
-    ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
-    ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
-    ADD_PARAMETER(m_bd  , FE_PARAM_BOOL  , "prescribed_translation");
-    ADD_PARAMETER(m_dp  , FE_PARAM_DOUBLE, "translation"   );
-    ADD_PARAMETER(m_Fp  , FE_PARAM_DOUBLE, "force"         );
+BEGIN_PARAMETER_LIST(FERigidPlanarJoint, FERigidConnector);
+ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
+ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
+ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
+ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
+ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
+ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint_origin"  );
+ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "rotation_axis" );
+ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "translation_axis_1");
+ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
+ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
+ADD_PARAMETER(m_bqx , FE_PARAM_BOOL  , "prescribed_rotation");
+ADD_PARAMETER(m_qpx , FE_PARAM_DOUBLE, "rotation"      );
+ADD_PARAMETER(m_bdy , FE_PARAM_BOOL  , "prescribed_translation_1");
+ADD_PARAMETER(m_dpy , FE_PARAM_DOUBLE, "translation_1" );
+ADD_PARAMETER(m_bdz , FE_PARAM_BOOL  , "prescribed_translation_2");
+ADD_PARAMETER(m_dpz , FE_PARAM_DOUBLE, "translation_2" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FERigidConnector(pfem)
+FERigidPlanarJoint::FERigidPlanarJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
     static int count = 1;
     m_nID = count++;
@@ -39,21 +41,19 @@ FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FERigidConnector(p
     m_qtol = 0;
     m_naugmin = 0;
     m_naugmax = 10;
-    m_dp = 0;
-    m_Fp = 0;
-    m_bd = false;
+    m_qpx = 0;
+    m_dpy = 0;
+    m_dpz = 0;
+    m_bqx = false;
+    m_bdy = false;
+    m_bdz = false;
 }
 
 //-----------------------------------------------------------------------------
 //! TODO: This function is called twice: once in the Init and once in the Solve
 //!       phase. Is that necessary?
-bool FERigidPrismaticJoint::Init()
+bool FERigidPlanarJoint::Init()
 {
-    if (m_bd && (m_Fp != 0)) {
-        felog.printbox("FATAL ERROR", "Translation and force cannot be prescribed simultaneously in rigid prismatic joint %d\n", m_nID);
-        return false;
-    }
-    
     if (m_binit) return true;
     
     // initialize joint basis
@@ -102,7 +102,7 @@ bool FERigidPrismaticJoint::Init()
 
 //-----------------------------------------------------------------------------
 //! create a shallow copy
-void FERigidPrismaticJoint::ShallowCopy(DumpStream& dmp, bool bsave)
+void FERigidPlanarJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
     if (bsave)
     {
@@ -124,7 +124,7 @@ void FERigidPrismaticJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidPrismaticJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
+void FERigidPlanarJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {
     vector<double> fa(6);
     vector<double> fb(6);
@@ -134,9 +134,9 @@ void FERigidPrismaticJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
     
     FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
     FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
-
-	double alpha = tp.alpha;
-
+    
+    double alpha = tp.alpha;
+    
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
@@ -167,15 +167,39 @@ void FERigidPrismaticJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
     eb[1] = ebt[1]*alpha + ebp[1]*(1-alpha);
     eb[2] = ebt[2]*alpha + ebp[2]*(1-alpha);
     
-    // incremental compound rotation of B w.r.t. A
-    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
-    
-    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
+    mat3ds P;
+    vec3d p;
+    if (m_bdy && m_bdz) {
+        P = mat3dd(1);
+        p = ea[1]*m_dpy + ea[2]*m_dpz;
+    }
+    else if (m_bdy) {
+        P = mat3dd(1) - dyad(ea[2]);
+        p = ea[1]*m_dpy;
+    }
+    else if (m_bdz) {
+        P = mat3dd(1) - dyad(ea[1]);
+        p = ea[2]*m_dpz;
+    }
+    else {
+        P = dyad(ea[0]);
+        p = vec3d(0, 0, 0);
+    }
     vec3d c = P*(rb + zb - ra - za) - p;
-    m_F = m_L + c*m_eps + ea[0]*m_Fp;
+    m_F = m_L + c*m_eps;
     
-    vec3d ksi = vth;
+    vec3d ksi;
+    if (m_bqx) {
+        quatd q = (alpha*RBb.m_qt+(1-alpha)*RBb.m_qp)*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
+        quatd a(m_qpx,ea[0]);
+        quatd r = a*q.Inverse();
+        r.MakeUnit();
+        ksi = r.GetVector()*r.GetAngle();
+    }
+    else
+    {
+        ksi = (ea[0] ^ eb[0])/2;
+    }
     m_M = m_U + ksi*m_ups;
     
     fa[0] = m_F.x;
@@ -200,9 +224,9 @@ void FERigidPrismaticJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
+void FERigidPlanarJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
 {
-	double alpha = tp.alpha;
+    double alpha = tp.alpha;
     
     vec3d eat[3], eap[3], ea[3];
     vec3d ebt[3], ebp[3], eb[3];
@@ -250,18 +274,6 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint
     mat3d zbhat; zbhat.skew(zb);
     mat3d zbthat; zbthat.skew(zbt);
     
-    // incremental compound rotation of B w.r.t. A
-    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
-    
-    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
-    vec3d d = rb + zb - ra - za;
-    vec3d c = P*d - p;
-    m_F = m_L + c*m_eps + ea[0]*m_Fp;
-    
-    vec3d ksi = vth;
-    m_M = m_U + ksi*m_ups;
-    
     mat3d eahat[3], ebhat[3], eathat[3], ebthat[3];
     for (j=0; j<3; ++j) {
         eahat[j] = skew(ea[j]);
@@ -269,9 +281,61 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint
         eathat[j] = skew(eat[j]);
         ebthat[j] = skew(ebt[j]);
     }
-    mat3d Q = m_bd ? eathat[0]*m_dp : ((ea[0] & d) + mat3dd(1)*(ea[0]*d))*eathat[0];
-    mat3d Wba = (ebhat[0]*eathat[0]+ebhat[1]*eathat[1]+ebhat[1]*eathat[1])/2;
-    mat3d Wab = (eahat[0]*ebthat[0]+eahat[1]*ebthat[1]+eahat[1]*ebthat[1])/2;
+    
+    mat3ds P;
+    vec3d p;
+    mat3d Q, Wba, Wab;
+    vec3d d = rb + zb - ra - za;
+    if (m_bdy && m_bdz) {
+        P = mat3dd(1);
+        p = ea[1]*m_dpy + ea[2]*m_dpz;
+        Q = mat3dd(0);
+    }
+    else if (m_bdy) {
+        P = mat3dd(1) - dyad(ea[2]);
+        p = ea[1]*m_dpy;
+        Q = ((ea[2] & d) + mat3dd(1)*(ea[2]*d))*eathat[2];
+    }
+    else if (m_bdz) {
+        P = mat3dd(1) - dyad(ea[1]);
+        p = ea[2]*m_dpz;
+        Q = ((ea[1] & d) + mat3dd(1)*(ea[1]*d))*eathat[1];
+    }
+    else {
+        P = dyad(ea[0]);
+        p = vec3d(0, 0, 0);
+        Q = ((ea[0] & d) + mat3dd(1)*(ea[0]*d))*eathat[0]*(-1);
+    }
+    vec3d c = P*d - p;
+    m_F = m_L + c*m_eps;
+    
+    vec3d ksi;
+    if (m_bqx) {
+        quatd q = (alpha*RBb.m_qt+(1-alpha)*RBb.m_qp)*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
+        quatd a(m_qpx,ea[0]);
+        quatd r = a*q.Inverse();
+        r.MakeUnit();
+        ksi = r.GetVector()*r.GetAngle();
+        quatd qa = RBa.m_qt*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
+        quatd qb = RBb.m_qt*(alpha*RBb.m_qt+(1-alpha)*RBb.m_qp).Inverse();
+        qa.MakeUnit();
+        qb.MakeUnit();
+        mat3d Qa = qa.RotationMatrix();
+        mat3d Qb = qb.RotationMatrix();
+        mat3d A = a.RotationMatrix();
+        mat3d R = r.RotationMatrix();
+        mat3dd I(1);
+        Wba = A*(I*Qa.trace()-Qa)/2;
+        Wab = R*(I*Qb.trace()-Qb)/2;
+    }
+    else
+    {
+        ksi = (ea[0] ^ eb[0])/2;
+        Wba = (ebhat[0]*eathat[0])/2;
+        Wab = (eahat[0]*ebthat[0])/2;
+    }
+    m_M = m_U + ksi*m_ups;
+    
     mat3d K;
     
     // (1,1)
@@ -281,8 +345,7 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint
     ke[2][0] = K[2][0]; ke[2][1] = K[2][1]; ke[2][2] = K[2][2];
     
     // (1,2)
-    K = (P*zathat+Q)*(-m_eps*alpha)
-    + eathat[0]*(m_Fp*alpha);
+    K = (P*zathat+Q)*(-m_eps*alpha);
     ke[0][3] = K[0][0]; ke[0][4] = K[0][1]; ke[0][5] = K[0][2];
     ke[1][3] = K[1][0]; ke[1][4] = K[1][1]; ke[1][5] = K[1][2];
     ke[2][3] = K[2][0]; ke[2][4] = K[2][1]; ke[2][5] = K[2][2];
@@ -331,8 +394,7 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint
     ke[8][0] = K[2][0]; ke[8][1] = K[2][1]; ke[8][2] = K[2][2];
     
     // (3,2)
-    K = (P*zathat+Q)*(m_eps*alpha)
-    - eathat[0]*(m_Fp*alpha);
+    K = (P*zathat+Q)*(m_eps*alpha);
     ke[6][3] = K[0][0]; ke[6][4] = K[0][1]; ke[6][5] = K[0][2];
     ke[7][3] = K[1][0]; ke[7][4] = K[1][1]; ke[7][5] = K[1][2];
     ke[8][3] = K[2][0]; ke[8][4] = K[2][1]; ke[8][5] = K[2][2];
@@ -384,7 +446,7 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidPrismaticJoint::Augment(int naug, const FETimePoint& tp)
+bool FERigidPlanarJoint::Augment(int naug, const FETimePoint& tp)
 {
     vec3d ra, rb, qa, qb, c, ksi, Lm;
     vec3d za, zb;
@@ -397,9 +459,9 @@ bool FERigidPrismaticJoint::Augment(int naug, const FETimePoint& tp)
     
     FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
     FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
-
-	double alpha = tp.alpha;
-
+    
+    double alpha = tp.alpha;
+    
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     
@@ -429,12 +491,37 @@ bool FERigidPrismaticJoint::Augment(int naug, const FETimePoint& tp)
     eb[1] = ebt[1]*alpha + ebp[1]*(1-alpha);
     eb[2] = ebt[2]*alpha + ebp[2]*(1-alpha);
     
-    // incremental compound rotation of B w.r.t. A
-    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
-    
-    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
+    mat3ds P;
+    vec3d p;
+    if (m_bdy && m_bdz) {
+        P = mat3dd(1);
+        p = ea[1]*m_dpy + ea[2]*m_dpz;
+    }
+    else if (m_bdy) {
+        P = mat3dd(1) - dyad(ea[2]);
+        p = ea[1]*m_dpy;
+    }
+    else if (m_bdz) {
+        P = mat3dd(1) - dyad(ea[1]);
+        p = ea[2]*m_dpz;
+    }
+    else {
+        P = dyad(ea[0]);
+        p = vec3d(0, 0, 0);
+    }
     c = P*(rb + zb - ra - za) - p;
+    
+    if (m_bqx) {
+        quatd q = (alpha*RBb.m_qt+(1-alpha)*RBb.m_qp)*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
+        quatd a(m_qpx,ea[0]);
+        quatd r = a*q.Inverse();
+        r.MakeUnit();
+        ksi = r.GetVector()*r.GetAngle();
+    }
+    else
+    {
+        ksi = (ea[0] ^ eb[0])/2;
+    }
     
     normF0 = sqrt(m_L*m_L);
     
@@ -442,8 +529,6 @@ bool FERigidPrismaticJoint::Augment(int naug, const FETimePoint& tp)
     Lm = m_L + c*m_eps;
     
     normF1 = sqrt(Lm*Lm);
-    
-    ksi = vth;
     
     normM0 = sqrt(m_U*m_U);
     
@@ -487,7 +572,7 @@ bool FERigidPrismaticJoint::Augment(int naug, const FETimePoint& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidPrismaticJoint::Serialize(DumpFile& ar)
+void FERigidPlanarJoint::Serialize(DumpFile& ar)
 {
     if (ar.IsSaving())
     {
@@ -512,7 +597,7 @@ void FERigidPrismaticJoint::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidPrismaticJoint::Update(const FETimePoint& tp)
+void FERigidPlanarJoint::Update(const FETimePoint& tp)
 {
     vec3d ra, rb;
     vec3d za, zb;
@@ -521,9 +606,9 @@ void FERigidPrismaticJoint::Update(const FETimePoint& tp)
     
     FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
     FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
-
-	double alpha = tp.alpha;
-
+    
+    double alpha = tp.alpha;
+    
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     
@@ -553,21 +638,45 @@ void FERigidPrismaticJoint::Update(const FETimePoint& tp)
     eb[1] = ebt[1]*alpha + ebp[1]*(1-alpha);
     eb[2] = ebt[2]*alpha + ebp[2]*(1-alpha);
     
-    // incremental compound rotation of B w.r.t. A
-    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
-    
-    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
+    mat3ds P;
+    vec3d p;
+    if (m_bdy && m_bdz) {
+        P = mat3dd(1);
+        p = ea[1]*m_dpy + ea[2]*m_dpz;
+    }
+    else if (m_bdy) {
+        P = mat3dd(1) - dyad(ea[2]);
+        p = ea[1]*m_dpy;
+    }
+    else if (m_bdz) {
+        P = mat3dd(1) - dyad(ea[1]);
+        p = ea[2]*m_dpz;
+    }
+    else {
+        P = dyad(ea[0]);
+        p = vec3d(0, 0, 0);
+    }
     vec3d c = P*(rb + zb - ra - za) - p;
-    m_F = m_L + c*m_eps + ea[0]*m_Fp;
+    m_F = m_L + c*m_eps;
     
-    vec3d ksi = vth;
+    vec3d ksi;
+    if (m_bqx) {
+        quatd q = (alpha*RBb.m_qt+(1-alpha)*RBb.m_qp)*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
+        quatd a(m_qpx,ea[0]);
+        quatd r = a*q.Inverse();
+        r.MakeUnit();
+        ksi = r.GetVector()*r.GetAngle();
+    }
+    else
+    {
+        ksi = (ea[0] ^ eb[0])/2;
+    }
     m_M = m_U + ksi*m_ups;
     
 }
 
 //-----------------------------------------------------------------------------
-void FERigidPrismaticJoint::Reset()
+void FERigidPlanarJoint::Reset()
 {
     m_F = vec3d(0,0,0);
     m_L = vec3d(0,0,0);

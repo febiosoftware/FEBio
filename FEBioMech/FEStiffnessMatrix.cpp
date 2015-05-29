@@ -14,6 +14,7 @@
 #include "FERigidRevoluteJoint.h"
 #include "FERigidPrismaticJoint.h"
 #include "FERigidCylindricalJoint.h"
+#include "FERigidPlanarJoint.h"
 #include "FERigidSpring.h"
 #include "FERigidDamper.h"
 #include "FERigidContractileForce.h"
@@ -143,7 +144,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 			// this type of "elements". Now we allocate too much memory
 			if (fem.m_LinC.size() > 0)
 			{
-				int nlin = fem.m_LinC.size();
+				int nlin = (int)fem.m_LinC.size();
 				vector<int> lm, elm;
 				
 				// do the cross-term
@@ -162,7 +163,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 							if (!el.IsRigid())
 							{
 								pbd->UnpackLM(el, elm);
-								int ne = elm.size();
+								int ne = (int)elm.size();
 
 								// see if this element connects to the 
 								// master node of a linear constraint ...
@@ -179,7 +180,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 											// element to the linear constraint
 											FELinearConstraint* plc = fem.m_LCA[n];
 
-											int ns = plc->slave.size();
+											int ns = (int)plc->slave.size();
 
 											lm.resize(ne + ns);
 											for (l=0; l<ne; ++l) lm[l] = elm[l];
@@ -210,7 +211,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 				n = 0;
 				for (i=0; i<nlin; ++i, ++ic)
 				{
-					ni = ic->slave.size();
+					ni = (int)ic->slave.size();
 					list<FELinearConstraint::SlaveDOF>::iterator is = ic->slave.begin();
 					for (j=0; j<ni; ++j, ++is) lm[n++] = is->neq;
 				}
@@ -244,11 +245,11 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 					FELinearConstraintSet& lcs = dynamic_cast<FELinearConstraintSet&>(*pnlc);
 					list<FEAugLagLinearConstraint*>& LC = lcs.m_LC;
 					vector<int> lm;
-					int N = LC.size();
+					int N = (int)LC.size();
 					list<FEAugLagLinearConstraint*>::iterator it = LC.begin();
 					for (i=0; i<N; ++i, ++it)
 					{
-						int n = (*it)->m_dof.size();
+						int n = (int)(*it)->m_dof.size();
 						lm.resize(n);
 						FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
 						for (j = 0; j<n; ++j, ++is) lm[j] = mesh.Node(is->node).m_ID[is->bc];;
@@ -268,81 +269,9 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 					for (j=0; j<6; ++j) lm[j+6] = lm2[j];
 					build_add(lm);
 				}
-				else if (dynamic_cast<FERigidSphericalJoint*>(pnlc))
-				{
-					FERigidSphericalJoint& rj = dynamic_cast<FERigidSphericalJoint&>(*pnlc);
-					vector<int> lm(12);
-                    
-					int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
-					int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
-                    
-					for (j=0; j<6; ++j) lm[j  ] = lm1[j];
-					for (j=0; j<6; ++j) lm[j+6] = lm2[j];
-					build_add(lm);
-				}
-                else if (dynamic_cast<FERigidRevoluteJoint*>(pnlc))
+                else if (dynamic_cast<FERigidConnector*>(pnlc))
                 {
-                    FERigidRevoluteJoint& rj = dynamic_cast<FERigidRevoluteJoint&>(*pnlc);
-                    vector<int> lm(12);
-                    
-                    int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
-                    int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
-                    
-                    for (j=0; j<6; ++j) lm[j  ] = lm1[j];
-                    for (j=0; j<6; ++j) lm[j+6] = lm2[j];
-                    build_add(lm);
-                }
-                else if (dynamic_cast<FERigidPrismaticJoint*>(pnlc))
-                {
-                    FERigidPrismaticJoint& rj = dynamic_cast<FERigidPrismaticJoint&>(*pnlc);
-                    vector<int> lm(12);
-                    
-                    int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
-                    int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
-                    
-                    for (j=0; j<6; ++j) lm[j  ] = lm1[j];
-                    for (j=0; j<6; ++j) lm[j+6] = lm2[j];
-                    build_add(lm);
-                }
-                else if (dynamic_cast<FERigidCylindricalJoint*>(pnlc))
-                {
-                    FERigidCylindricalJoint& rj = dynamic_cast<FERigidCylindricalJoint&>(*pnlc);
-                    vector<int> lm(12);
-                    
-                    int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
-                    int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
-                    
-                    for (j=0; j<6; ++j) lm[j  ] = lm1[j];
-                    for (j=0; j<6; ++j) lm[j+6] = lm2[j];
-                    build_add(lm);
-                }
-                else if (dynamic_cast<FERigidSpring*>(pnlc))
-                {
-                    FERigidSpring& rj = dynamic_cast<FERigidSpring&>(*pnlc);
-                    vector<int> lm(12);
-                    
-                    int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
-                    int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
-                    
-                    for (j=0; j<6; ++j) lm[j  ] = lm1[j];
-                    for (j=0; j<6; ++j) lm[j+6] = lm2[j];
-                    build_add(lm);
-                }
-                else if (dynamic_cast<FERigidDamper*>(pnlc))
-                {
-                    FERigidDamper& rj = dynamic_cast<FERigidDamper&>(*pnlc);
-                    vector<int> lm(12);
-                    
-                    int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
-                    int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
-                    
-                    for (j=0; j<6; ++j) lm[j  ] = lm1[j];
-                    for (j=0; j<6; ++j) lm[j+6] = lm2[j];
-                    build_add(lm);
-                }
-                else if (dynamic_cast<FERigidContractileForce*>(pnlc))
-                {
-                    FERigidContractileForce& rj = dynamic_cast<FERigidContractileForce&>(*pnlc);
+                    FERigidConnector& rj = dynamic_cast<FERigidConnector&>(*pnlc);
                     vector<int> lm(12);
                     
                     int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
