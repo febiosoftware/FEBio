@@ -21,6 +21,7 @@ protected:
     void ParseRigidPlanarJoint     (XMLTag& tag);
     void ParseRigidSpring          (XMLTag& tag);
     void ParseRigidDamper          (XMLTag& tag);
+    void ParseRigidAngularDamper   (XMLTag& tag);
     void ParseRigidContractileForce(XMLTag& tag);
 	void ParseLinearConstraint     (XMLTag& tag);
 

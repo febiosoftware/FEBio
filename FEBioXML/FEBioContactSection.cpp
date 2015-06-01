@@ -10,6 +10,7 @@
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FEBioMech/FERigidSpring.h"
 #include "FEBioMech/FERigidDamper.h"
+#include "FEBioMech/FERigidAngularDamper.h"
 #include "FEBioMech/FERigidContractileForce.h"
 #include "FECore/FECoreKernel.h"
 
@@ -46,6 +47,7 @@ void FEBioContactSection::Parse(XMLTag& tag)
             else if (strcmp(sztype, "rigid planar joint"     ) == 0) ParseRigidPlanarJoint     (tag);
             else if (strcmp(sztype, "rigid spring"           ) == 0) ParseRigidSpring          (tag);
             else if (strcmp(sztype, "rigid damper"           ) == 0) ParseRigidDamper          (tag);
+            else if (strcmp(sztype, "rigid angular damper"   ) == 0) ParseRigidAngularDamper   (tag);
             else if (strcmp(sztype, "rigid contractile force") == 0) ParseRigidContractileForce(tag);
 			else if (strcmp(sztype, "linear constraint"      ) == 0) ParseLinearConstraint     (tag);
 			else 
@@ -369,6 +371,26 @@ void FEBioContactSection::ParseRigidDamper(XMLTag& tag)
     FEModel& fem = *GetFEModel();
     
     FERigidDamper* prj = new FERigidDamper(&fem);
+    FEParameterList& pl = prj->GetParameterList();
+    ++tag;
+    do
+    {
+        if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+        ++tag;
+    }
+    while (!tag.isend());
+    prj->m_nRBa--;
+    prj->m_nRBb--;
+    fem.AddNonlinearConstraint(prj);
+}
+
+//-----------------------------------------------------------------------------
+// --- R I G I D   A N G U L A R D A M P E R   I N T E R F A C E ---
+void FEBioContactSection::ParseRigidAngularDamper(XMLTag& tag)
+{
+    FEModel& fem = *GetFEModel();
+    
+    FERigidAngularDamper* prj = new FERigidAngularDamper(&fem);
     FEParameterList& pl = prj->GetParameterList();
     ++tag;
     do

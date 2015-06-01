@@ -17,6 +17,7 @@
 #include "FERigidPlanarJoint.h"
 #include "FERigidSpring.h"
 #include "FERigidDamper.h"
+#include "FERigidAngularDamper.h"
 #include "FERigidContractileForce.h"
 #include "FEDistanceConstraint.h"
 
