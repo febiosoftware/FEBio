@@ -160,6 +160,8 @@ public:
 	BFGSSolver	m_bfgs;			//!< BFGS solver parameters
 	bool		m_baugment;		//!< augmentation flag
 
+	bool	m_bnew_update;	//!< use new rigid body update algorithm
+
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

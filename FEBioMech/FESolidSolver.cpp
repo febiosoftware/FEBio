@@ -46,6 +46,7 @@ BEGIN_PARAMETER_LIST(FESolidSolver, FESolver)
 	ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
 	ADD_PARAMETER(m_bdoreforms   , FE_PARAM_BOOL  , "do_reforms"  );
 	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
+	ADD_PARAMETER(m_bnew_update  , FE_PARAM_BOOL  , "use_new_rigid_update");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -74,6 +75,8 @@ FESolidSolver::FESolidSolver(FEModel* pfem) : FESolver(pfem)
 	m_gamma = 0.5;
 
 	m_baugment = false;
+
+	m_bnew_update = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -718,25 +721,48 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 				}
 			}
 
-			if (RB.m_prb) du = RB.m_dul;
-			RB.m_Ut[0] = RB.m_Up[0] + du[0];
-			RB.m_Ut[1] = RB.m_Up[1] + du[1];
-			RB.m_Ut[2] = RB.m_Up[2] + du[2];
-			RB.m_Ut[3] = RB.m_Up[3] + du[3];
-			RB.m_Ut[4] = RB.m_Up[4] + du[4];
-			RB.m_Ut[5] = RB.m_Up[5] + du[5];
+			if (m_bnew_update)
+			{
+				// This is the "new" update algorithm which addressesses a couple issues
+				// with the old method, namely that prescribed rotational dofs aren't update correctly.
+				// Unfortunately, it seems to produce worse convergence in some cases, especially with line search
+				// and it doesn't work when rigid bodies are used in a hierarchy
+				if (RB.m_prb) du = RB.m_dul;
+				RB.m_Ut[0] = RB.m_Up[0] + du[0];
+				RB.m_Ut[1] = RB.m_Up[1] + du[1];
+				RB.m_Ut[2] = RB.m_Up[2] + du[2];
+				RB.m_Ut[3] = RB.m_Up[3] + du[3];
+				RB.m_Ut[4] = RB.m_Up[4] + du[4];
+				RB.m_Ut[5] = RB.m_Up[5] + du[5];
 
-			RB.m_rt = RB.m_r0 + vec3d(RB.m_Ut[0], RB.m_Ut[1], RB.m_Ut[2]);
+				RB.m_rt = RB.m_r0 + vec3d(RB.m_Ut[0], RB.m_Ut[1], RB.m_Ut[2]);
 
-			vec3d Rt(RB.m_Ut[3],RB.m_Ut[4],RB.m_Ut[5]);
-			RB.m_qt = quatd(Rt);
+				vec3d Rt(RB.m_Ut[3],RB.m_Ut[4],RB.m_Ut[5]);
+				RB.m_qt = quatd(Rt);
+			}
+			else
+			{
+				// This is the "old" update algorithm which has some issues. It does not produce the correct
+				// rigid body orientation when the rotational degrees of freedom are prescribed.
+				RB.m_rt.x = RB.m_rp.x + du[0];
+				RB.m_rt.y = RB.m_rp.y + du[1];
+				RB.m_rt.z = RB.m_rp.z + du[2];
 
-			RB.m_du[0] = du[0];
-			RB.m_du[1] = du[1];
-			RB.m_du[2] = du[2];
-			RB.m_du[3] = du[3];
-			RB.m_du[4] = du[4];
-			RB.m_du[5] = du[5];
+				vec3d r = vec3d(du[3], du[4], du[5]);
+				double w = sqrt(r.x*r.x + r.y*r.y + r.z*r.z);
+				quatd dq = quatd(w, r);
+
+				RB.m_qt = dq*RB.m_qp;
+				RB.m_qt.MakeUnit();
+
+				if (RB.m_prb) du = RB.m_dul;
+				RB.m_Ut[0] = RB.m_Up[0] + du[0];
+				RB.m_Ut[1] = RB.m_Up[1] + du[1];
+				RB.m_Ut[2] = RB.m_Up[2] + du[2];
+				RB.m_Ut[3] = RB.m_Up[3] + du[3];
+				RB.m_Ut[4] = RB.m_Up[4] + du[4];
+				RB.m_Ut[5] = RB.m_Up[5] + du[5];
+			}
 
 			// update the mesh' nodes
 			FEMesh& mesh = m_fem.GetMesh();
