@@ -521,5 +521,8 @@
     <ClCompile Include="..\..\FECore\tens6d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FECore\BC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
