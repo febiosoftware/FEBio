@@ -41,6 +41,188 @@ at http://mrlforums.sci.utah.edu/forums/.
 
 ===========================================================================
 
+ R E L E A S E   2.3  5/28/2015
+
+===========================================================================
+
+1. FEATURE: Pressure Boundary Load
+---------------------------------------
+The pressure boundary load now implements a non-symmetric stiffness matrix in addition to the symmetric
+formulation. Although the symmetric formulation often results in good convergence behavior, it is not
+consistent with the pressure residual unless the boundary of the pressure load surface is constrained.
+It this latter condition is not satisfied, the consistent non-symmetric formulation can result in better
+convergence behavior. To use the non-symmetric formulation, add the following to the pressure load definition.
+
+<symmetric_stiffness>1</symmetric_stiffness>
+
+2. FEATURE: Element, Surface and Node Sets
+------------------------------------------
+Elements sets, surface, and node sets can now be defined in the input file. These can be used to define
+boundary conditions, loads, and contact definitions more concisely. See sections 3.8.4 of the FEBio user's
+manual and following for an in-depth discussion.
+
+3. FEATURE: Parameters Section
+------------------------------
+A new Parameters section was added to FEBio file format, where users can define parameters that can be used
+in most variable definitions. Parameters are defined by name/value pairs in the Parameters section.
+
+<Parameters>
+  <param name="var1">1.0</param>
+</Parameter>
+
+Then, parameters can be used as the values of most xml tags by preceding the parameter name with the '@' symbol. 
+
+<material id="1" type="neo-Hookean">
+  <E>@var</E>
+</material>
+
+4. FEATURE: Include Section
+---------------------------
+Added new Include section to the FEBio file format, which will include another .feb file verbatim. This can
+be used (in addition to the "from" attribute) to split the model definition across multiple files.
+
+5. FEATURE: New Reaction Rate
+-----------------------------
+A new reaction rate was implemented where the reaction rate is proportional to exponential of strain energy density.
+
+6. FEATURE: Vector Load Curve
+-----------------------------
+A loadcurve can now be defined for vector parameters. The loadcurve will scale the vector.
+
+7. FEATURE: Improved Contact Detection
+--------------------------------------
+Improved contact detection for several contact implementations (sliding_with_gaps, facet-to-facet sliding, tied,
+facet-to-facet tied, sticky). Certain special cases in the contact projection are now handled correctly. This
+results in fewer contact detection failures which could cause stability issues in some contact problems.
+
+8. FEATURE: Volume Constraint
+-----------------------------
+A volume constraint is added that can be used to preserve the volume of an enclosed space. This could be used to
+model the containment of an incompressible fluid inside a solid.
+
+9. FEATURE: Point-to-Point Constraint
+-------------------------------------
+A point-to-point distance constraint was implemented which enforces a constant distance between two points.
+
+10. FEATURE: Conewise Materials
+-------------------------------
+Two new materials have been introduced to model Conewise Linear Elastic solids (cubic and orthotropic symmetry):
+"cubic CLE" and "orthotropic CLE".
+
+11. FEATURE: Contact Node Relocation
+------------------------------------
+Support was added for node relocation on initial contact for all contact interfaces. This feature forces nodes
+that have an initial penetration to lie on the contact surface. To use this feature add <node_reloc>1</node_reloc>
+to the contact definition.
+
+12. FEATURE: Augmentation Load Curve
+------------------------------------
+The augmentation flag of most contact interfaces now accepts a loadcurve attribute which can be used to control
+when augmentations are performed. This can be used for instance to enforce augmentation only on the last time step.
+
+13. FEATURE: Negative Jacobian Output
+-------------------------------------
+Output of negative Jacobians can now be controlled via a flag in the configuration file. Set the
+<output_negative_jacobians> flag to 0 to turn off printing of all the negative jacobians. (By default, FEBio
+prints all the negative Jacobians). When set to 0 FEBio will only print a single warning when the time step
+has to restart due to negative Jacobians.
+
+14. FEATURE: Retry after NANs
+-----------------------------
+FEBio will now retry the time step when NANs are encountered. (Previously, FEBio simply terminated.)
+
+15. FEATURE: Updated Sticky Interface
+-------------------------------------
+The sticky interface (a variation of tied which allows for initial separation) now has two new parameters:
+the <max_traction> parameter can be used to release the tie when the normal traction exceeds this value.
+The <snap> parameter sets an initial distance of penetration before the slave node is tied to the master surface. 
+
+16. FEATURE: Euler-Lagrange Strain Output
+-----------------------------------------
+A new output variable was added to output the Euler-Lagrange strain. Add <var type="Lagrange strain"/> to the
+plotfile section to output the Lagrange strain directly to the plotfile. 
+
+17. FEATURE: Constraints Repeated in Multiple Steps
+---------------------------------------------------
+Constraints can now be repeated in multiple steps. This can be useful when a constraint has to persist across
+multiple steps. Assuming a constraint was defined in some step,
+
+<constraint name="my_constraint" type="volume">
+ ...
+</constraint>
+
+to repeat the constraint in a subsequent step, simply reference it by name:
+<constraint name="my_constraint"/>
+
+18. FEATURE: Break Points
+-------------------------
+Break-points can be defined which will pause the run at the specified time and show the FEBio prompt. This can
+be used for debugging application after a certain time has reached. To define a break-point, add the –break
+command line option followed by the time value after which FEBio will pause. E.g.
+
+febio2 –i input.feb –break 0.5
+
+This will pause FEBio after time 0.5 has been reached. 
+
+19. FEATURE: New Output Level
+-----------------------------
+- A new output_level flag is implemented that controls the frequency of writing log data to file. Add it to
+the Control section of the input file.
+
+<output_level>OUTPUT_MAJOR_ITRS</output_level>
+
+The possible values are:
+- OUTPUT_NEVER: Don't output anything
+- OUTPUT_MAJOR_ITRS: Output at the converged time step solutions (default)
+- OUTPUT_MUST_POINTS: Only output at must points
+- OUTPUT_FINAL: Only output final converged solution.
+
+20. FEATURE: Prescribed Active Contraction Materials
+----------------------------------------------------
+Six new materials have been introduced to model prescribed active contraction: "prescribed uniaxial active
+contraction", "uncoupled prescribed uniaxial active contraction", "prescribed trans iso active contraction",
+"uncoupled prescribed trans iso active contraction", "prescribed isotropic active contraction", and
+"uncoupled prescribed isotropic active contraction".
+
+21. FEATURE: New Viscoelastic Material Classes
+----------------------------------------------
+Two new classes of viscoelastic materials have been introduced: "reactive viscoelastic" and "uncoupled
+reactive viscoelastic" which may be used to model quasi-linear and nonlinear viscoelasticity.
+
+22. FEATURE: Local Coordinate Systems in Multigeneration Materials
+------------------------------------------------------------------
+- The "multigeneration" material has been updated to pass local coordinate systems down from parent to
+children materials.
+
+23. FEATURE: New Continuous Fiber Distribution Classes
+------------------------------------------------------
+Introduced two new classes of continuous fiber distributions: "continuous fiber distribution" and
+"continuous fiber distribution uncoupled".  These materials provide a variety of fiber constitutive models,
+fiber distribution densities (2D and 3D), and integration schemes.
+
+24. FEATURE: Contact Gap and Traction Output for Periodic Boundary Conditions
+-----------------------------------------------------------------------------
+Periodic boundary conditions now also output the contact gap and contact traction. (The contact gap is the
+deviation from periodicity). 
+
+1. BUG FIX: Restart Feature
+---------------------------
+Several issues with the restart feature were fixed.
+
+2. BUG FIX: Augmented Lagrangian for Incompressibility
+------------------------------------------------------
+Augmented Lagrangian formulation for incompressibility is fixed. 
+
+3. BUG FIX: Contact Traction Export
+-----------------------------------
+A bug was fixed in the export of contact tractions of tied interface.
+
+4. BUG FIX: Multi-Step Constraints
+----------------------------------
+Several issues were fixed with using constraints in multi-step analyses.
+
+===========================================================================
+
  R E L E A S E   2.2  12/23/2014
 
 ===========================================================================
