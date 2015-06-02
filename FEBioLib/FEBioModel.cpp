@@ -803,8 +803,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		for (int i=0; i<(int) m_RFC.size(); ++i)
 		{
 			FERigidBodyForce& fc = *m_RFC[i];
-			ar << fc.GetID() << fc.IsActive();
-			ar << fc.ntype << fc.bc << fc.id << fc.lc << fc.sf;
+			fc.Serialize(ar);
 		}
 
 		// rigid nodes
@@ -930,10 +929,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		for (int i=0; i<n; ++i)
 		{
 			FERigidBodyForce* pfc = new FERigidBodyForce(this);
-			ar >> nid >> bactive;
-			ar >> pfc->ntype >> pfc->bc >> pfc->id >> pfc->lc >> pfc->sf;
-			pfc->SetID(nid);
-			if (bactive) pfc->Activate(); else pfc->Deactivate();
+			pfc->Serialize(ar);
 			m_RFC.push_back(pfc);
 		}
 

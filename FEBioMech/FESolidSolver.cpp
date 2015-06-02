@@ -1108,7 +1108,7 @@ void FESolidSolver::PrepStep(double time)
 	{
 		FERigidBodyForce& FC = *m_fem.m_RFC[i];
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(FC.id));
-		if (RB.IsActive() && FC.IsActive())
+		if (RB.IsActive() && FC.IsActive() && (FC.m_bfollow == false))
 		{
 			int I  = RB.m_LM[FC.bc];
 			if (FC.ntype == 0)
@@ -2201,6 +2201,17 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 	// forces due to point constraints
 //	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
+
+	// add rigid body forces
+	int NRF = m_fem.m_RFC.size();
+	for (i=0; i<NRF; ++i)
+	{
+		FERigidBodyForce& FC = *m_fem.m_RFC[i];
+		if (FC.IsActive() && FC.m_bfollow)
+		{
+			FC.Residual(RHS, tp);
+		}
+	}
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?

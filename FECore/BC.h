@@ -1,6 +1,11 @@
 #pragma once
 #include "FEBoundaryCondition.h"
+#include "FEGlobalVector.h"
+#include "FETypes.h"
+
 using namespace FECore;
+
+class FESolver;
 
 //-----------------------------------------------------------------------------
 //! concentrated nodal force boundary condition
@@ -53,7 +58,19 @@ public:
 class FERigidBodyForce : public FEBoundaryCondition
 {
 public:
-	FERigidBodyForce(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+	FERigidBodyForce(FEModel* pfem);
+
+	//! get the current force value
+	double Value();
+
+	//! Serialization
+	void Serialize(DumpFile& ar);
+
+	//! Residual
+	void Residual(FEGlobalVector& R, FETimePoint& tp);
+
+	//! Stiffness matrix
+	void StiffnessMatrix(FESolver* psolver, FETimePoint& tp);
 
 public:
 	int		ntype;	//!< type of force (0=loadcurve, 1=target)
@@ -61,6 +78,7 @@ public:
 	int		bc;		// force direction
 	int		lc;		// load curve number
 	double	sf;		// scale factor
+	bool	m_bfollow;	//!< follower force if true
 };
 
 //-----------------------------------------------------------------------------

@@ -434,10 +434,12 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 
 			// get the type
 			int ntype = 0;
+			bool bfollow = false;
 			const char* sztype = tag.AttributeValue("type", true);
 			if (sztype)
 			{
 				if (strcmp(sztype, "ramp") == 0) ntype = 1;
+				else if (strcmp(sztype, "follow") == 0) bfollow = true;
 				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 			}
 
@@ -455,6 +457,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			pFC->id = nmat;
 			pFC->bc = bc;
 			pFC->lc = lc;
+			pFC->m_bfollow = bfollow;
 			m_pim->value(tag, pFC->sf);
 			fem.m_RFC.push_back(pFC);
 
