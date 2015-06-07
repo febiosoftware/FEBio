@@ -9,11 +9,12 @@ int FEPlotData::VarSize(Var_Type t)
 	int ndata = 0;
 	switch (DataType())
 	{
-	case PLT_FLOAT: ndata = 1; break;
-	case PLT_VEC3F: ndata = 3; break;
-	case PLT_MAT3FS: ndata = 6; break;
-	case PLT_MAT3FD: ndata = 3; break;
+	case PLT_FLOAT  : ndata =  1; break;
+	case PLT_VEC3F  : ndata =  3; break;
+	case PLT_MAT3FS : ndata =  6; break;
+	case PLT_MAT3FD : ndata =  3; break;
     case PLT_TENS4FS: ndata = 21; break;
+	case PLT_MAT3F  : ndata =  9; break;
 	}
 	assert(ndata);
 	return ndata;

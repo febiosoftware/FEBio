@@ -235,11 +235,12 @@ void echo_input(FEBioModel& fem)
 					const char* szt = 0;
 					switch (it->m_ntype)
 					{
-					case PLT_FLOAT : szt = "float"; break;
-					case PLT_VEC3F : szt = "vec3f"; break;
-					case PLT_MAT3FS: szt = "mat3fs"; break;
-					case PLT_MAT3FD: szt = "mat3fd"; break;
+					case PLT_FLOAT  : szt = "float"  ; break;
+					case PLT_VEC3F  : szt = "vec3f"  ; break;
+					case PLT_MAT3FS : szt = "mat3fs" ; break;
+					case PLT_MAT3FD : szt = "mat3fd" ; break;
                     case PLT_TENS4FS: szt = "tens4fs"; break;
+					case PLT_MAT3F  : szt = "mat3f"  ; break;
 					}
 
 					const char* szf = 0;
