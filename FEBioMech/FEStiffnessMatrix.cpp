@@ -328,3 +328,31 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+//! Constructs the stiffness matrix from a FEMesh object. 
+bool FEStiffnessMatrix::Create(FEMesh& mesh, int neq)
+{
+	// begin building the profile
+	build_begin(neq);
+	{
+		// Add all elements to the profile
+		// Loop over all active domains
+		vector<int> elm;
+		for (int nd=0; nd<mesh.Domains(); ++nd)
+		{
+			FEDomain& d = mesh.Domain(nd);
+			for (int j=0; j<d.Elements(); ++j)
+			{
+				FEElement& el = d.ElementRef(j);
+				d.UnpackLM(el, elm);
+				build_add(elm);
+			}
+		}
+	}
+	// All done! We can now finish building the profile and create 
+	// the actual sparse matrix. This is done in the following function
+	build_end();
+
+	return true;
+}

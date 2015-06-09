@@ -30,6 +30,9 @@ public:
 	//! construct the stiffness matrix from a FEM object
 	bool Create(FEModel* pfem, int neq, bool breset);
 
+	//! construct the stiffness matrix from a mesh
+	bool Create(FEMesh& mesh, int neq);
+
 protected:
 	FEModel*			m_pfem;	//!< pointer to model
 	SparseMatrixProfile m_MPs;	//!< the "static" part of the matrix profile

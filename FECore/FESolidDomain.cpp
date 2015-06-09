@@ -284,6 +284,68 @@ double FESolidDomain::invjac0(FESolidElement& el, double Ji[3][3], int n)
 	return det;
 }
 
+//-----------------------------------------------------------------------------
+//! Calculate the inverse jacobian with respect to the reference frame at  
+//! integration point n. The inverse jacobian is retured in Ji
+//! The return value is the determinant of the Jacobian (not the inverse!)
+double FESolidDomain::invjac0(FESolidElement& el, double Ji[3][3], double r, double s, double t)
+{
+	int i;
+
+	// number of nodes
+	int neln = el.Nodes();
+
+	// nodal coordinates
+	const int NMAX = FEElement::MAX_NODES;
+	vec3d r0[NMAX];
+	for (i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+
+	// evaluate shape function derivatives
+	double Gr[NMAX], Gs[NMAX], Gt[NMAX];
+	el.shape_deriv(Gr, Gs, Gt, r, s, t);
+
+	// calculate Jacobian
+	double J[3][3] = {0};
+	for (i=0; i<neln; ++i)
+	{
+		const double& Gri = Gr[i];
+		const double& Gsi = Gs[i];
+		const double& Gti = Gt[i];
+		
+		const double& x = r0[i].x;
+		const double& y = r0[i].y;
+		const double& z = r0[i].z;
+		
+		J[0][0] += Gri*x; J[0][1] += Gsi*x; J[0][2] += Gti*x;
+		J[1][0] += Gri*y; J[1][1] += Gsi*y; J[1][2] += Gti*y;
+		J[2][0] += Gri*z; J[2][1] += Gsi*z; J[2][2] += Gti*z;
+	}
+		
+	// calculate the determinant
+	double det =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1]) 
+				+ J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0]) 
+				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+		
+	// make sure the determinant is positive
+	if (det <= 0) throw NegativeJacobian(el.m_nID, -1, det);
+
+	// calculate the inverse jacobian
+	double deti = 1.0 / det;
+			
+	Ji[0][0] =  deti*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
+	Ji[1][0] =  deti*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
+	Ji[2][0] =  deti*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+	
+	Ji[0][1] =  deti*(J[0][2]*J[2][1] - J[0][1]*J[2][2]);
+	Ji[1][1] =  deti*(J[0][0]*J[2][2] - J[0][2]*J[2][0]);
+	Ji[2][1] =  deti*(J[0][1]*J[2][0] - J[0][0]*J[2][1]);
+	
+	Ji[0][2] =  deti*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
+	Ji[1][2] =  deti*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
+	Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
+
+	return det;
+}
 
 //-----------------------------------------------------------------------------
 //! Calculate the inverse jacobian with respect to the current frame at  
