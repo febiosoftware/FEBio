@@ -153,7 +153,7 @@ bool FESolidAnalysis::Init()
 		{
 			FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
 			felog.printbox("WARNING", "Rigid body %d is not being used.", RB.m_mat+1);
-			RB.Activate(false);
+//			RB.Activate(false);
 		}
 
 	// initialize equations
