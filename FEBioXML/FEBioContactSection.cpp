@@ -226,6 +226,8 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 
 //-----------------------------------------------------------------------------
 // --- R I G I D   J O I N T   I N T E R F A C E ---
+// NOTE: The rigid joint has been moved to the Constraints section. This function
+//       still remains for backward compatibility but should be considered obsolete.
 void FEBioContactSection::ParseRigidJoint(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
@@ -239,9 +241,12 @@ void FEBioContactSection::ParseRigidJoint(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
-	prj->m_nRBa--;
-	prj->m_nRBb--;
 	fem.AddNonlinearConstraint(prj);
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddConstraint(prj);
+		prj->Deactivate();
+	}
 }
 
 //-----------------------------------------------------------------------------
