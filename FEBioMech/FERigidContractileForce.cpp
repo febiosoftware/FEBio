@@ -41,7 +41,7 @@ bool FERigidContractileForce::Init()
     // When the rigid contractile force is read in, the ID's correspond to the rigid materials.
     // Now we want to make the ID's refer to the rigid body ID's
     
-    FEMaterial* pm = fem.GetMaterial(m_nRBa);
+    FEMaterial* pm = fem.GetMaterial(m_nRBa-1);
     if (pm->IsRigid() == false)
     {
         felog.printbox("FATAL ERROR", "Rigid spring %d does not connect two rigid bodies\n", m_nID);
@@ -49,7 +49,7 @@ bool FERigidContractileForce::Init()
     }
     m_nRBa = pm->GetRigidBodyID();
     
-    pm = fem.GetMaterial(m_nRBb);
+    pm = fem.GetMaterial(m_nRBb-1);
     if (pm->IsRigid() == false)
     {
         felog.printbox("FATAL ERROR", "Rigid spring %d does not connect two rigid bodies\n", m_nID);
