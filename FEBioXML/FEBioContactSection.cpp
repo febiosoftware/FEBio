@@ -282,6 +282,12 @@ void FEBioContactSection::ParseRigidRevoluteJoint(XMLTag& tag)
     prj->m_nRBa--;
     prj->m_nRBb--;
     fem.AddNonlinearConstraint(prj);
+	// add this boundary condition to the current step
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddConstraint(prj);
+		prj->Deactivate();
+	}
 }
 
 //-----------------------------------------------------------------------------

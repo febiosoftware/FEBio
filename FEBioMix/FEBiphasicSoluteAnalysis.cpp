@@ -153,7 +153,7 @@ bool FEBiphasicSoluteAnalysis::Init()
 	{
 		FERigidBodyFixedBC* pbc = m_fem.m_RBC[i];
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(pbc->id));
-		if (RB.IsActive() && pbc->IsActive()) RB.m_BC[pbc->bc] = -1;
+		if (pbc->IsActive()) RB.m_BC[pbc->bc] = -1;
 	}
 
 	// set the active rigid bodies BC's
@@ -161,7 +161,7 @@ bool FEBiphasicSoluteAnalysis::Init()
 	{
 		FERigidBodyDisplacement& DC = *(m_fem.m_RDC[i]);
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(DC.id));
-		if (RB.IsActive() && DC.IsActive())
+		if (DC.IsActive())
 		{
 			assert(RB.m_BC[DC.bc] == 0);	// make sure we are not overriding a fixed bc
 			RB.m_pDC[DC.bc] = &DC;
@@ -235,26 +235,6 @@ bool FEBiphasicSoluteAnalysis::Init()
 	}
 
 	if (bdisp) felog.printbox("WARNING", "Rigid degrees of freedom cannot be prescribed.");
-
-	// Sometimes an (ignorant) user might have added a rigid body
-	// that is not being used. Since this can cause problems we need
-	// to find these rigid bodies.
-	int nrb = m_fem.Objects();
-	vector<int> mec; mec.assign(nrb, 0);
-	for (int i=0; i<m_fem.GetMesh().Nodes(); ++i)
-	{
-		FENode& node = m_fem.GetMesh().Node(i);
-		int n = node.m_rid;
-		if (n >= 0) mec[n]++;
-	}
-
-	for (int i=0; i<nrb; ++i)
-		if (mec[i] == 0)
-		{
-			FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
-			felog.printbox("WARNING", "Rigid body %d is not being used.", RB.m_mat+1);
-			RB.Activate(false);
-		}
 
 	// initialize equations
 	// ----->

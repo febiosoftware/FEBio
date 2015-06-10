@@ -20,7 +20,6 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FERigidBody::FERigidBody(FEModel* pfem) : FEObject(pfem)
 {
-	m_bActive = true;
     m_bpofr = false;
 	for (int i=0; i<6; ++i)
 	{
@@ -247,7 +246,6 @@ void FERigidBody::ShallowCopy(DumpStream& dmp, bool bsave)
 		dmp << m_qp << m_qt;
 		dmp << m_wp << m_wt;
 		dmp << m_alp << m_alt;
-		dmp << m_bActive;
 		for (int i=0; i<6; ++i)
 		{
 			dmp << m_Up[i];
@@ -267,7 +265,6 @@ void FERigidBody::ShallowCopy(DumpStream& dmp, bool bsave)
 		dmp >> m_qp >> m_qt;
 		dmp >> m_wp >> m_wt;
 		dmp >> m_alp >> m_alt;
-		dmp >> m_bActive;
 		for (int i=0; i<6; ++i)
 		{
 			dmp >> m_Up[i];
@@ -287,7 +284,7 @@ void FERigidBody::Serialize(DumpFile& ar)
 		ar << m_nID << m_mat << m_mass << m_moi << m_Fr << m_Mr;
 		ar << m_r0 << m_rt << m_rp << m_vt << m_vp << m_at << m_ap;
         ar << m_qt << m_qp << m_wt << m_wp << m_alt << m_alp;
-		ar << m_bActive << m_bpofr;
+		ar << m_bpofr;
 		ar.write(m_LM , sizeof(int), 6);
 		ar.write(m_Up , sizeof(double), 6);
 		ar.write(m_Ut , sizeof(double), 6);
@@ -299,7 +296,7 @@ void FERigidBody::Serialize(DumpFile& ar)
 		ar >> m_nID >> m_mat >> m_mass >> m_moi >> m_Fr >> m_Mr;
 		ar >> m_r0 >> m_rt >> m_rp >> m_vt >> m_vp >> m_at >> m_ap;
         ar >> m_qt >> m_qp >> m_wt >> m_wp >> m_alt >> m_alp;
-		ar >> m_bActive >> m_bpofr;
+		ar >> m_bpofr;
 		ar.read(m_LM , sizeof(int   ), 6);
 		ar.read(m_Up , sizeof(double), 6);
 		ar.read(m_Ut , sizeof(double), 6);

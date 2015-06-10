@@ -49,10 +49,6 @@ public:
 	//! shallow copy
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
-	//! State managment
-	bool IsActive() { return m_bActive; }
-	void Activate(bool b) { m_bActive = b; }
-
 	//! get the material ID
 	int GetMaterialID() { return m_mat; }
     
@@ -98,9 +94,6 @@ public:
 public:
 	FERigidBodyDisplacement*	m_pDC[6];	//!< active displacement constraints
 	FERigidBody*	m_prb;	//!< parent rigid body
-
-protected:
-	bool	m_bActive;	// activation flag
 
 public:
 	DECLARE_PARAMETER_LIST();

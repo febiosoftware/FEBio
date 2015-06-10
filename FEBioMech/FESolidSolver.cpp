@@ -678,104 +678,101 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 	{
 		// get the rigid body
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
-		if (RB.IsActive())
+		int *lm = RB.m_LM;
+		double* du = RB.m_du;
+
+		// first do the displacements
+		if (RB.m_prb == 0)
 		{
-			int *lm = RB.m_LM;
-			double* du = RB.m_du;
-
-			// first do the displacements
-			if (RB.m_prb == 0)
+			FERigidBodyDisplacement* pdc;
+			for (int j=0; j<3; ++j)
 			{
-				FERigidBodyDisplacement* pdc;
-				for (int j=0; j<3; ++j)
+				pdc = RB.m_pDC[j];
+				if (pdc)
 				{
-					pdc = RB.m_pDC[j];
-					if (pdc)
-					{
-						int lc = pdc->lc;
-						// TODO: do I need to take the line search step into account here?
-						du[j] = (lc < 0? 0 : pdc->Value() - RB.m_Up[j]);
-					}
-					else 
-					{
-						du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + ui[lm[j]] : 0);
-					}
+					int lc = pdc->lc;
+					// TODO: do I need to take the line search step into account here?
+					du[j] = (lc < 0? 0 : pdc->Value() - RB.m_Up[j]);
+				}
+				else 
+				{
+					du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + ui[lm[j]] : 0);
 				}
 			}
+		}
 
-			// next, we do the rotations. We do this seperatly since
-			// they need to be interpreted differently than displacements
-			if (RB.m_prb == 0)
+		// next, we do the rotations. We do this seperatly since
+		// they need to be interpreted differently than displacements
+		if (RB.m_prb == 0)
+		{
+			FERigidBodyDisplacement* pdc;
+			for (int j=3; j<6; ++j)
 			{
-				FERigidBodyDisplacement* pdc;
-				for (int j=3; j<6; ++j)
+				pdc = RB.m_pDC[j];
+				if (pdc)
 				{
-					pdc = RB.m_pDC[j];
-					if (pdc)
-					{
-						int lc = pdc->lc;
-						// TODO: do I need to take the line search step into account here?
-						du[j] = (lc < 0? 0 : pdc->Value() - RB.m_Up[j]);
-					}
-					else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + ui[lm[j]] : 0);
+					int lc = pdc->lc;
+					// TODO: do I need to take the line search step into account here?
+					du[j] = (lc < 0? 0 : pdc->Value() - RB.m_Up[j]);
 				}
+				else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + ui[lm[j]] : 0);
 			}
+		}
 
-			if (m_bnew_update)
+		if (m_bnew_update)
+		{
+			// This is the "new" update algorithm which addressesses a couple issues
+			// with the old method, namely that prescribed rotational dofs aren't update correctly.
+			// Unfortunately, it seems to produce worse convergence in some cases, especially with line search
+			// and it doesn't work when rigid bodies are used in a hierarchy
+			if (RB.m_prb) du = RB.m_dul;
+			RB.m_Ut[0] = RB.m_Up[0] + du[0];
+			RB.m_Ut[1] = RB.m_Up[1] + du[1];
+			RB.m_Ut[2] = RB.m_Up[2] + du[2];
+			RB.m_Ut[3] = RB.m_Up[3] + du[3];
+			RB.m_Ut[4] = RB.m_Up[4] + du[4];
+			RB.m_Ut[5] = RB.m_Up[5] + du[5];
+
+			RB.m_rt = RB.m_r0 + vec3d(RB.m_Ut[0], RB.m_Ut[1], RB.m_Ut[2]);
+
+			vec3d Rt(RB.m_Ut[3],RB.m_Ut[4],RB.m_Ut[5]);
+			RB.m_qt = quatd(Rt);
+		}
+		else
+		{
+			// This is the "old" update algorithm which has some issues. It does not produce the correct
+			// rigid body orientation when the rotational degrees of freedom are prescribed.
+			RB.m_rt.x = RB.m_rp.x + du[0];
+			RB.m_rt.y = RB.m_rp.y + du[1];
+			RB.m_rt.z = RB.m_rp.z + du[2];
+
+			vec3d r = vec3d(du[3], du[4], du[5]);
+			double w = sqrt(r.x*r.x + r.y*r.y + r.z*r.z);
+			quatd dq = quatd(w, r);
+
+			RB.m_qt = dq*RB.m_qp;
+			RB.m_qt.MakeUnit();
+
+			if (RB.m_prb) du = RB.m_dul;
+			RB.m_Ut[0] = RB.m_Up[0] + du[0];
+			RB.m_Ut[1] = RB.m_Up[1] + du[1];
+			RB.m_Ut[2] = RB.m_Up[2] + du[2];
+			RB.m_Ut[3] = RB.m_Up[3] + du[3];
+			RB.m_Ut[4] = RB.m_Up[4] + du[4];
+			RB.m_Ut[5] = RB.m_Up[5] + du[5];
+		}
+
+		// update the mesh' nodes
+		FEMesh& mesh = m_fem.GetMesh();
+		int N = mesh.Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = mesh.Node(i);
+			if (node.m_rid == RB.m_nID)
 			{
-				// This is the "new" update algorithm which addressesses a couple issues
-				// with the old method, namely that prescribed rotational dofs aren't update correctly.
-				// Unfortunately, it seems to produce worse convergence in some cases, especially with line search
-				// and it doesn't work when rigid bodies are used in a hierarchy
-				if (RB.m_prb) du = RB.m_dul;
-				RB.m_Ut[0] = RB.m_Up[0] + du[0];
-				RB.m_Ut[1] = RB.m_Up[1] + du[1];
-				RB.m_Ut[2] = RB.m_Up[2] + du[2];
-				RB.m_Ut[3] = RB.m_Up[3] + du[3];
-				RB.m_Ut[4] = RB.m_Up[4] + du[4];
-				RB.m_Ut[5] = RB.m_Up[5] + du[5];
-
-				RB.m_rt = RB.m_r0 + vec3d(RB.m_Ut[0], RB.m_Ut[1], RB.m_Ut[2]);
-
-				vec3d Rt(RB.m_Ut[3],RB.m_Ut[4],RB.m_Ut[5]);
-				RB.m_qt = quatd(Rt);
-			}
-			else
-			{
-				// This is the "old" update algorithm which has some issues. It does not produce the correct
-				// rigid body orientation when the rotational degrees of freedom are prescribed.
-				RB.m_rt.x = RB.m_rp.x + du[0];
-				RB.m_rt.y = RB.m_rp.y + du[1];
-				RB.m_rt.z = RB.m_rp.z + du[2];
-
-				vec3d r = vec3d(du[3], du[4], du[5]);
-				double w = sqrt(r.x*r.x + r.y*r.y + r.z*r.z);
-				quatd dq = quatd(w, r);
-
-				RB.m_qt = dq*RB.m_qp;
-				RB.m_qt.MakeUnit();
-
-				if (RB.m_prb) du = RB.m_dul;
-				RB.m_Ut[0] = RB.m_Up[0] + du[0];
-				RB.m_Ut[1] = RB.m_Up[1] + du[1];
-				RB.m_Ut[2] = RB.m_Up[2] + du[2];
-				RB.m_Ut[3] = RB.m_Up[3] + du[3];
-				RB.m_Ut[4] = RB.m_Up[4] + du[4];
-				RB.m_Ut[5] = RB.m_Up[5] + du[5];
-			}
-
-			// update the mesh' nodes
-			FEMesh& mesh = m_fem.GetMesh();
-			int N = mesh.Nodes();
-			for (int i=0; i<N; ++i)
-			{
-				FENode& node = mesh.Node(i);
-				if (node.m_rid == RB.m_nID)
-				{
-					vec3d a0 = node.m_r0 - RB.m_r0;
-					vec3d at = RB.m_qt*a0;
-					node.m_rt = RB.m_rt + at;
-				}
+				vec3d a0 = node.m_r0 - RB.m_r0;
+				vec3d at = RB.m_qt*a0;
+				node.m_rt = RB.m_rt + at;
 			}
 		}
 	}
@@ -1007,7 +1004,7 @@ void FESolidSolver::PrepStep(double time)
 	{
 		FERigidBodyDisplacement& DC = *m_fem.m_RDC[i];
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(DC.id));
-		if (RB.IsActive() && DC.IsActive())
+		if (DC.IsActive())
 		{
 			int I = DC.bc;
 			int lc = DC.lc;
@@ -1108,7 +1105,7 @@ void FESolidSolver::PrepStep(double time)
 	{
 		FERigidBodyForce& FC = *m_fem.m_RFC[i];
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(FC.id));
-		if (RB.IsActive() && FC.IsActive() && (FC.m_bfollow == false))
+		if (FC.IsActive() && (FC.m_bfollow == false))
 		{
 			int I  = RB.m_LM[FC.bc];
 			if (FC.ntype == 0)
