@@ -13,16 +13,6 @@ public:
 protected:
 	void ParseRigidWall            (XMLTag& tag);
 	void ParseRigidInterface       (XMLTag& tag);
-	void ParseRigidJoint           (XMLTag& tag);
-	void ParseRigidSphericalJoint  (XMLTag& tag);
-    void ParseRigidRevoluteJoint   (XMLTag& tag);
-    void ParseRigidPrismaticJoint  (XMLTag& tag);
-    void ParseRigidCylindricalJoint(XMLTag& tag);
-    void ParseRigidPlanarJoint     (XMLTag& tag);
-    void ParseRigidSpring          (XMLTag& tag);
-    void ParseRigidDamper          (XMLTag& tag);
-    void ParseRigidAngularDamper   (XMLTag& tag);
-    void ParseRigidContractileForce(XMLTag& tag);
 	void ParseLinearConstraint     (XMLTag& tag);
 
 protected:

@@ -1,17 +1,7 @@
 #include "stdafx.h"
 #include "FEBioContactSection.h"
 #include "FEBioMech/FERigidWallInterface.h"
-#include "FEBioMech/FERigidJoint.h"
-#include "FEBioMech/FERigidSphericalJoint.h"
-#include "FEBioMech/FERigidRevoluteJoint.h"
-#include "FEBioMech/FERigidPrismaticJoint.h"
-#include "FEBioMech/FERigidCylindricalJoint.h"
-#include "FEBioMech/FERigidPlanarJoint.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
-#include "FEBioMech/FERigidSpring.h"
-#include "FEBioMech/FERigidDamper.h"
-#include "FEBioMech/FERigidAngularDamper.h"
-#include "FEBioMech/FERigidContractileForce.h"
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
@@ -39,22 +29,12 @@ void FEBioContactSection::Parse(XMLTag& tag)
 			// Not all contact interfaces can be automated, so we first handle these special cases
 			if      (strcmp(sztype, "rigid_wall"             ) == 0) ParseRigidWall            (tag);
 			else if (strcmp(sztype, "rigid"                  ) == 0) ParseRigidInterface       (tag);
-			else if (strcmp(sztype, "rigid joint"            ) == 0) ParseRigidJoint           (tag);
-			else if (strcmp(sztype, "rigid spherical joint"  ) == 0) ParseRigidSphericalJoint  (tag);
-            else if (strcmp(sztype, "rigid revolute joint"   ) == 0) ParseRigidRevoluteJoint   (tag);
-            else if (strcmp(sztype, "rigid prismatic joint"  ) == 0) ParseRigidPrismaticJoint  (tag);
-            else if (strcmp(sztype, "rigid cylindrical joint") == 0) ParseRigidCylindricalJoint(tag);
-            else if (strcmp(sztype, "rigid planar joint"     ) == 0) ParseRigidPlanarJoint     (tag);
-            else if (strcmp(sztype, "rigid spring"           ) == 0) ParseRigidSpring          (tag);
-            else if (strcmp(sztype, "rigid damper"           ) == 0) ParseRigidDamper          (tag);
-            else if (strcmp(sztype, "rigid angular damper"   ) == 0) ParseRigidAngularDamper   (tag);
-            else if (strcmp(sztype, "rigid contractile force") == 0) ParseRigidContractileForce(tag);
 			else if (strcmp(sztype, "linear constraint"      ) == 0) ParseLinearConstraint     (tag);
 			else 
 			{
 				// If we get here, we try to create a contact interface
 				// using the FEBio kernel. 
-				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, sztype, GetFEModel()));
+				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, sztype, &fem));
 				if (pci)
 				{
 					fem.AddSurfacePairInteraction(pci);
@@ -66,7 +46,33 @@ void FEBioContactSection::Parse(XMLTag& tag)
 						pci->Deactivate();
 					}
 				}
-				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+				else
+				{
+					FEModel& fem = *GetFEModel();
+
+					// Some constraints were initially defined in the Contact section, although
+					// now it is preferred that they are defined in the Constraints section. For backward
+					// compatibility we still allow constraints to be defined in this section. 
+					FENLConstraint* pc = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, &fem);
+					if (pc)
+					{
+						FEParameterList& pl = pc->GetParameterList();
+						++tag;
+						do
+						{
+							if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+							++tag;
+						}
+						while (!tag.isend());
+						fem.AddNonlinearConstraint(pc);
+						if (m_pim->m_nsteps > 0)
+						{
+							GetStep()->AddConstraint(pc);
+							pc->Deactivate();
+						}
+					}
+					else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+				}
 			}
 		}
 		else throw XMLReader::InvalidTag(tag);
@@ -222,217 +228,6 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 
 		++tag;
 	}
-}
-
-//-----------------------------------------------------------------------------
-// --- R I G I D   J O I N T   I N T E R F A C E ---
-// NOTE: The rigid joint has been moved to the Constraints section. This function
-//       still remains for backward compatibility but should be considered obsolete.
-void FEBioContactSection::ParseRigidJoint(XMLTag& tag)
-{
-	FEModel& fem = *GetFEModel();
-
-	FERigidJoint* prj = new FERigidJoint(&fem);
-	FEParameterList& pl = prj->GetParameterList();
-	++tag;
-	do
-	{
-		if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-		++tag;
-	}
-	while (!tag.isend());
-	fem.AddNonlinearConstraint(prj);
-	if (m_pim->m_nsteps > 0)
-	{
-		GetStep()->AddConstraint(prj);
-		prj->Deactivate();
-	}
-}
-
-//-----------------------------------------------------------------------------
-// --- R I G I D   S P H E R I C A L   J O I N T   I N T E R F A C E ---
-void FEBioContactSection::ParseRigidSphericalJoint(XMLTag& tag)
-{
-	FEModel& fem = *GetFEModel();
-    
-	FERigidSphericalJoint* prj = new FERigidSphericalJoint(&fem);
-	FEParameterList& pl = prj->GetParameterList();
-	++tag;
-	do
-	{
-		if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-		++tag;
-	}
-	while (!tag.isend());
-	prj->m_nRBa--;
-	prj->m_nRBb--;
-	fem.AddNonlinearConstraint(prj);
-}
-
-//-----------------------------------------------------------------------------
-// --- R I G I D   R E V O L U T E   J O I N T   I N T E R F A C E ---
-void FEBioContactSection::ParseRigidRevoluteJoint(XMLTag& tag)
-{
-    FEModel& fem = *GetFEModel();
-    
-    FERigidRevoluteJoint* prj = new FERigidRevoluteJoint(&fem);
-    FEParameterList& pl = prj->GetParameterList();
-    ++tag;
-    do
-    {
-        if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-        ++tag;
-    }
-    while (!tag.isend());
-    prj->m_nRBa--;
-    prj->m_nRBb--;
-    fem.AddNonlinearConstraint(prj);
-	// add this boundary condition to the current step
-	if (m_pim->m_nsteps > 0)
-	{
-		GetStep()->AddConstraint(prj);
-		prj->Deactivate();
-	}
-}
-
-//-----------------------------------------------------------------------------
-// --- R I G I D   P R I S M A T I C   J O I N T   I N T E R F A C E ---
-void FEBioContactSection::ParseRigidPrismaticJoint(XMLTag& tag)
-{
-    FEModel& fem = *GetFEModel();
-    
-    FERigidPrismaticJoint* prj = new FERigidPrismaticJoint(&fem);
-    FEParameterList& pl = prj->GetParameterList();
-    ++tag;
-    do
-    {
-        if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-        ++tag;
-    }
-    while (!tag.isend());
-    prj->m_nRBa--;
-    prj->m_nRBb--;
-    fem.AddNonlinearConstraint(prj);
-}
-
-//-----------------------------------------------------------------------------
-// --- R I G I D   C Y L I N D R I C A L   J O I N T   I N T E R F A C E ---
-void FEBioContactSection::ParseRigidCylindricalJoint(XMLTag& tag)
-{
-    FEModel& fem = *GetFEModel();
-    
-    FERigidCylindricalJoint* prj = new FERigidCylindricalJoint(&fem);
-    FEParameterList& pl = prj->GetParameterList();
-    ++tag;
-    do
-    {
-        if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-        ++tag;
-    }
-    while (!tag.isend());
-    prj->m_nRBa--;
-    prj->m_nRBb--;
-    fem.AddNonlinearConstraint(prj);
-}
-
-//-----------------------------------------------------------------------------
-// --- R I G I D   P L A N A R   J O I N T   I N T E R F A C E ---
-void FEBioContactSection::ParseRigidPlanarJoint(XMLTag& tag)
-{
-    FEModel& fem = *GetFEModel();
-    
-    FERigidPlanarJoint* prj = new FERigidPlanarJoint(&fem);
-    FEParameterList& pl = prj->GetParameterList();
-    ++tag;
-    do
-    {
-        if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-        ++tag;
-    }
-    while (!tag.isend());
-    prj->m_nRBa--;
-    prj->m_nRBb--;
-    fem.AddNonlinearConstraint(prj);
-}
-
-//-----------------------------------------------------------------------------
-// --- R I G I D   S P R I N G   I N T E R F A C E ---
-void FEBioContactSection::ParseRigidSpring(XMLTag& tag)
-{
-    FEModel& fem = *GetFEModel();
-    
-    FERigidSpring* prj = new FERigidSpring(&fem);
-    FEParameterList& pl = prj->GetParameterList();
-    ++tag;
-    do
-    {
-        if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-        ++tag;
-    }
-    while (!tag.isend());
-    prj->m_nRBa--;
-    prj->m_nRBb--;
-    fem.AddNonlinearConstraint(prj);
-}
-
-//-----------------------------------------------------------------------------
-// --- R I G I D   D A M P E R   I N T E R F A C E ---
-void FEBioContactSection::ParseRigidDamper(XMLTag& tag)
-{
-    FEModel& fem = *GetFEModel();
-    
-    FERigidDamper* prj = new FERigidDamper(&fem);
-    FEParameterList& pl = prj->GetParameterList();
-    ++tag;
-    do
-    {
-        if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-        ++tag;
-    }
-    while (!tag.isend());
-    prj->m_nRBa--;
-    prj->m_nRBb--;
-    fem.AddNonlinearConstraint(prj);
-}
-
-//-----------------------------------------------------------------------------
-// --- R I G I D   A N G U L A R D A M P E R   I N T E R F A C E ---
-void FEBioContactSection::ParseRigidAngularDamper(XMLTag& tag)
-{
-    FEModel& fem = *GetFEModel();
-    
-    FERigidAngularDamper* prj = new FERigidAngularDamper(&fem);
-    FEParameterList& pl = prj->GetParameterList();
-    ++tag;
-    do
-    {
-        if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-        ++tag;
-    }
-    while (!tag.isend());
-    prj->m_nRBa--;
-    prj->m_nRBb--;
-    fem.AddNonlinearConstraint(prj);
-}
-
-//-----------------------------------------------------------------------------
-// --- R I G I D   C O N T R A C T I L E F O R C E   I N T E R F A C E ---
-void FEBioContactSection::ParseRigidContractileForce(XMLTag& tag)
-{
-    FEModel& fem = *GetFEModel();
-    
-    FERigidContractileForce* prj = new FERigidContractileForce(&fem);
-    FEParameterList& pl = prj->GetParameterList();
-    ++tag;
-    do
-    {
-        if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-        ++tag;
-    }
-    while (!tag.isend());
-    prj->m_nRBa--;
-    prj->m_nRBb--;
-    fem.AddNonlinearConstraint(prj);
 }
 
 //-----------------------------------------------------------------------------
