@@ -1187,7 +1187,17 @@ bool FEPlotDamage::Save(FEDomain &dom, vector<float>& a)
                 for (int k=0; k<NC; ++k)
                 {
                     FEDamageMaterialPoint* ppd = pt.GetPointData(k)->ExtractData<FEDamageMaterialPoint>();
+                    FEElasticMixtureMaterialPoint* pem = pt.GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
                     if (ppd) D += (float) ppd->m_D;
+                    else if (pem)
+                    {
+                        int NE = (int)pem->m_w.size();
+                        for (int l=0; l<NE; ++l)
+                        {
+                            FEDamageMaterialPoint* ppd = pem->GetPointData(l)->ExtractData<FEDamageMaterialPoint>();
+                            if (ppd) D += (float) ppd->m_D;
+                        }
+                    }
                 }
             }
             D /= (float) nint;
