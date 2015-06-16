@@ -864,3 +864,11 @@ public:
 	double value(FEObject& rb);
 };
 
+//-----------------------------------------------------------------------------
+class FELogRigidBodyKineticEnergy : public FELogObjectData
+{
+public:
+    FELogRigidBodyKineticEnergy(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FEObject& rb);
+};
+

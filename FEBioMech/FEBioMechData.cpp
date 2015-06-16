@@ -1040,3 +1040,9 @@ double FELogRigidBodyForceZ::value(FEObject& rb) { return static_cast<FERigidBod
 double FELogRigidBodyTorqueX::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_Mr.x; }
 double FELogRigidBodyTorqueY::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_Mr.y; }
 double FELogRigidBodyTorqueZ::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_Mr.z; }
+
+//-----------------------------------------------------------------------------
+double FELogRigidBodyKineticEnergy::value(FEObject& rb) {
+    FERigidBody&rbl = static_cast<FERigidBody&>(rb);
+    return (rbl.m_mass*(rbl.m_vt*rbl.m_vt) + rbl.m_wt*(rbl.m_moi*rbl.m_wt))/2;
+}
