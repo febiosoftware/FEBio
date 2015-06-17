@@ -528,4 +528,13 @@ REGISTER_FECORE_CLASS(FELogRigidBodyTorqueX, FEOBJLOGDATA_ID, "Mx");
 REGISTER_FECORE_CLASS(FELogRigidBodyTorqueY, FEOBJLOGDATA_ID, "My");
 REGISTER_FECORE_CLASS(FELogRigidBodyTorqueZ, FEOBJLOGDATA_ID, "Mz");
 REGISTER_FECORE_CLASS(FELogRigidBodyKineticEnergy, FEOBJLOGDATA_ID, "KE");
+
+//-----------------------------------------------------------------------------
+    // Derived from FELogConnectorData
+REGISTER_FECORE_CLASS(FELogRigidConnectorForceX , FENLCLOGDATA_ID, "RCFx");
+REGISTER_FECORE_CLASS(FELogRigidConnectorForceY , FENLCLOGDATA_ID, "RCFy");
+REGISTER_FECORE_CLASS(FELogRigidConnectorForceZ , FENLCLOGDATA_ID, "RCFz");
+REGISTER_FECORE_CLASS(FELogRigidConnectorMomentX, FENLCLOGDATA_ID, "RCMx");
+REGISTER_FECORE_CLASS(FELogRigidConnectorMomentY, FENLCLOGDATA_ID, "RCMy");
+REGISTER_FECORE_CLASS(FELogRigidConnectorMomentZ, FENLCLOGDATA_ID, "RCMz");
 }

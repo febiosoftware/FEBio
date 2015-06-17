@@ -34,8 +34,7 @@ END_PARAMETER_LIST();
 //FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FENLConstraint(pfem)
 FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
-    static int count = 1;
-    m_nID = count++;
+    m_nID = m_ncount++;
     m_binit = false;
     m_atol = 0;
     m_gtol = 0;
@@ -56,12 +55,12 @@ FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FERigidConnect
 bool FERigidCylindricalJoint::Init()
 {
     if (m_bd && (m_Fp != 0)) {
-        felog.printbox("FATAL ERROR", "Translation and force cannot be prescribed simultaneously in rigid prismatic joint %d\n", m_nID);
+        felog.printbox("FATAL ERROR", "Translation and force cannot be prescribed simultaneously in rigid connector %d (cylindrical joint)\n", m_nID+1);
         return false;
     }
     
     if (m_bq && (m_Mp != 0)) {
-        felog.printbox("FATAL ERROR", "Rotation and moment cannot be prescribed simultaneously in rigid revolute joint %d\n", m_nID);
+        felog.printbox("FATAL ERROR", "Rotation and moment cannot be prescribed simultaneously in rigid connector %d (cylindrical joint)\n", m_nID+1);
         return false;
     }
     
@@ -84,7 +83,7 @@ bool FERigidCylindricalJoint::Init()
     FEMaterial* pm = fem.GetMaterial(m_nRBa-1);
     if (pm->IsRigid() == false)
     {
-        felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
+        felog.printbox("FATAL ERROR", "Rigid connector %d (cylindrical joint) does not connect two rigid bodies\n", m_nID+1);
         return false;
     }
     m_nRBa = pm->GetRigidBodyID();
@@ -92,7 +91,7 @@ bool FERigidCylindricalJoint::Init()
     pm = fem.GetMaterial(m_nRBb-1);
     if (pm->IsRigid() == false)
     {
-        felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
+        felog.printbox("FATAL ERROR", "Rigid connector %d (cylindrical joint) does not connect two rigid bodies\n", m_nID+1);
         return false;
     }
     m_nRBb = pm->GetRigidBodyID();
@@ -497,7 +496,7 @@ bool FERigidCylindricalJoint::Augment(int naug, const FETimePoint& tp)
     normM1 = sqrt(Um*Um);
     
     // check convergence of constraints
-    felog.printf(" rigid joint # %d\n", m_nID);
+    felog.printf(" rigid connector # %d (cylindrical joint)\n", m_nID+1);
     felog.printf("                  CURRENT        REQUIRED\n");
     double pctn = 0;
     double gap = c.norm();

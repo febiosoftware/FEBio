@@ -5,6 +5,7 @@
 #include "FERigidMaterial.h"
 #include "FESolidSolver.h"
 #include "FECore/FERigidBody.h"
+#include "FERigidConnector.h"
 
 //-----------------------------------------------------------------------------
 double FENodeXPos::value(int nnode) 
@@ -1046,3 +1047,13 @@ double FELogRigidBodyKineticEnergy::value(FEObject& rb) {
     FERigidBody&rbl = static_cast<FERigidBody&>(rb);
     return (rbl.m_mass*(rbl.m_vt*rbl.m_vt) + rbl.m_wt*(rbl.m_moi*rbl.m_wt))/2;
 }
+
+//-----------------------------------------------------------------------------
+double FELogRigidConnectorForceX::value(FENLConstraint& rc) { return static_cast<FERigidConnector&>(rc).m_F.x; }
+double FELogRigidConnectorForceY::value(FENLConstraint& rc) { return static_cast<FERigidConnector&>(rc).m_F.y; }
+double FELogRigidConnectorForceZ::value(FENLConstraint& rc) { return static_cast<FERigidConnector&>(rc).m_F.z; }
+
+//-----------------------------------------------------------------------------
+double FELogRigidConnectorMomentX::value(FENLConstraint& rc) { return static_cast<FERigidConnector&>(rc).m_M.x; }
+double FELogRigidConnectorMomentY::value(FENLConstraint& rc) { return static_cast<FERigidConnector&>(rc).m_M.y; }
+double FELogRigidConnectorMomentZ::value(FENLConstraint& rc) { return static_cast<FERigidConnector&>(rc).m_M.z; }

@@ -29,8 +29,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FERigidSphericalJoint::FERigidSphericalJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
-    static int count = 1;
-    m_nID = count++;
+    m_nID = m_ncount++;
     m_binit = false;
     m_atol = 0;
     m_gtol = 0;
@@ -48,7 +47,7 @@ FERigidSphericalJoint::FERigidSphericalJoint(FEModel* pfem) : FERigidConnector(p
 bool FERigidSphericalJoint::Init()
 {
     if (m_bq && ((m_Mpx != 0) || (m_Mpy != 0) || (m_Mpz != 0))) {
-        felog.printbox("FATAL ERROR", "Rotation and moment cannot be prescribed simultaneously in rigid spherical joint %d\n", m_nID);
+        felog.printbox("FATAL ERROR", "Rotation and moment cannot be prescribed simultaneously in rigid connector %d (spherical joint)\n", m_nID+1);
         return false;
     }
     
@@ -66,7 +65,7 @@ bool FERigidSphericalJoint::Init()
     FEMaterial* pm = fem.GetMaterial(m_nRBa-1);
     if (pm->IsRigid() == false)
     {
-        felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
+        felog.printbox("FATAL ERROR", "Rigid connector %d (spherical joint) does not connect two rigid bodies\n", m_nID+1);
         return false;
     }
     m_nRBa = pm->GetRigidBodyID();
@@ -74,7 +73,7 @@ bool FERigidSphericalJoint::Init()
     pm = fem.GetMaterial(m_nRBb-1);
     if (pm->IsRigid() == false)
     {
-        felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
+        felog.printbox("FATAL ERROR", "Rigid connector %d (spherical joint) does not connect two rigid bodies\n", m_nID+1);
         return false;
     }
     m_nRBb = pm->GetRigidBodyID();
@@ -374,7 +373,7 @@ bool FERigidSphericalJoint::Augment(int naug, const FETimePoint& tp)
     normF1 = sqrt(Lm*Lm);
     
     // check convergence of constraints
-    felog.printf(" rigid joint # %d\n", m_nID);
+    felog.printf(" rigid connector # %d (spherical joint)\n", m_nID+1);
     felog.printf("                  CURRENT        REQUIRED\n");
     double pctn = 0;
     double gap = c.norm();

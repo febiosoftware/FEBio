@@ -59,7 +59,6 @@ public:
     double	m_f0;       //! contractile force
     
 protected:
-    int		m_nID;      //!< ID of rigid joint
     bool	m_binit;
     
     DECLARE_PARAMETER_LIST();

@@ -3,6 +3,8 @@
 #include "FECore/NodeDataRecord.h"
 #include "FECore/ElementDataRecord.h"
 #include "FECore/ObjectDataRecord.h"
+#include "FECore/NLConstraintDataRecord.h"
+#include "FECore/FENLConstraint.h"
 
 //=============================================================================
 // N O D E  D A T A
@@ -870,5 +872,53 @@ class FELogRigidBodyKineticEnergy : public FELogObjectData
 public:
     FELogRigidBodyKineticEnergy(FEModel* pfem) : FELogObjectData(pfem){}
     double value(FEObject& rb);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorForceX : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorForceX(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorForceY : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorForceY(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorForceZ : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorForceZ(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorMomentX : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorMomentX(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorMomentY : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorMomentY(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorMomentZ : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorMomentZ(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
 };
 

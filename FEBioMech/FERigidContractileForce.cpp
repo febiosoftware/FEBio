@@ -20,8 +20,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FERigidContractileForce::FERigidContractileForce(FEModel* pfem) : FERigidConnector(pfem)
 {
-    static int count = 1;
-    m_nID = count++;
+    m_nID = m_ncount++;
     m_binit = false;
     m_f0 = 0;
 }
@@ -44,7 +43,7 @@ bool FERigidContractileForce::Init()
     FEMaterial* pm = fem.GetMaterial(m_nRBa-1);
     if (pm->IsRigid() == false)
     {
-        felog.printbox("FATAL ERROR", "Rigid spring %d does not connect two rigid bodies\n", m_nID);
+        felog.printbox("FATAL ERROR", "Rigid connector %d (contractile force) does not connect two rigid bodies\n", m_nID+1);
         return false;
     }
     m_nRBa = pm->GetRigidBodyID();
@@ -52,7 +51,7 @@ bool FERigidContractileForce::Init()
     pm = fem.GetMaterial(m_nRBb-1);
     if (pm->IsRigid() == false)
     {
-        felog.printbox("FATAL ERROR", "Rigid spring %d does not connect two rigid bodies\n", m_nID);
+        felog.printbox("FATAL ERROR", "Rigid connector %d (contractile force) does not connect two rigid bodies\n", m_nID+1);
         return false;
     }
     m_nRBb = pm->GetRigidBodyID();

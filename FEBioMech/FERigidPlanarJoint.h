@@ -78,7 +78,6 @@ public:
     bool    m_bdz;   //! flag for prescribing translation along third axis
     
 protected:
-    int		m_nID;	//!< ID of rigid joint
     bool	m_binit;
     
     DECLARE_PARAMETER_LIST();

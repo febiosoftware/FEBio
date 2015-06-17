@@ -52,7 +52,6 @@ public:
     double	m_c;        //! damping constant
     
 protected:
-    int		m_nID;      //!< ID of rigid joint
     bool	m_binit;
     
     DECLARE_PARAMETER_LIST();

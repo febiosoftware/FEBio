@@ -31,8 +31,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
-    static int count = 1;
-    m_nID = count++;
+    m_nID = m_ncount++;
     m_binit = false;
     m_atol = 0;
     m_gtol = 0;
@@ -50,7 +49,7 @@ FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FERigidConnector(p
 bool FERigidPrismaticJoint::Init()
 {
     if (m_bd && (m_Fp != 0)) {
-        felog.printbox("FATAL ERROR", "Translation and force cannot be prescribed simultaneously in rigid prismatic joint %d\n", m_nID);
+        felog.printbox("FATAL ERROR", "Translation and force cannot be prescribed simultaneously in rigid connector %d (prismatic joint)\n", m_nID+1);
         return false;
     }
     
@@ -73,7 +72,7 @@ bool FERigidPrismaticJoint::Init()
     FEMaterial* pm = fem.GetMaterial(m_nRBa-1);
     if (pm->IsRigid() == false)
     {
-        felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
+        felog.printbox("FATAL ERROR", "Rigid conenctor %d (prismatic joint) does not connect two rigid bodies\n", m_nID+1);
         return false;
     }
     m_nRBa = pm->GetRigidBodyID();
@@ -81,7 +80,7 @@ bool FERigidPrismaticJoint::Init()
     pm = fem.GetMaterial(m_nRBb-1);
     if (pm->IsRigid() == false)
     {
-        felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
+        felog.printbox("FATAL ERROR", "Rigid connector %d (prismatic joint) does not connect two rigid bodies\n", m_nID+1);
         return false;
     }
     m_nRBb = pm->GetRigidBodyID();
@@ -453,7 +452,7 @@ bool FERigidPrismaticJoint::Augment(int naug, const FETimePoint& tp)
     normM1 = sqrt(Um*Um);
     
     // check convergence of constraints
-    felog.printf(" rigid joint # %d\n", m_nID);
+    felog.printf(" rigid connector # %d (prismatic joint)\n", m_nID+1);
     felog.printf("                  CURRENT        REQUIRED\n");
     double pctn = 0;
     double gap = c.norm();

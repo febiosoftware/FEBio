@@ -3,6 +3,7 @@
 #include "FECore/NodeDataRecord.h"
 #include "FECore/ElementDataRecord.h"
 #include "FECore/ObjectDataRecord.h"
+#include "FECore/NLConstraintDataRecord.h"
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
@@ -174,6 +175,48 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 			fem.AddDataRecord(prec);
 		}
+        else if (tag == "rigid_connector_data")
+        {
+            const char* sz = tag.AttributeValue("file", true);
+            
+            NLConstraintDataRecord* prec = 0;
+            if (sz)
+            {
+                // if we have a path, prepend the path's name
+                const char* szpath = m_pim->m_szpath;
+                char szfile[1024] = {0};
+                if (szpath && szpath[0])
+                {
+                    sprintf(szfile, "%s%s", szpath, sz);
+                }
+                else strcpy(szfile, sz);
+                prec = new NLConstraintDataRecord(&fem, szfile);
+            }
+            else prec = new NLConstraintDataRecord(&fem, 0);
+            
+            const char* szdata = tag.AttributeValue("data");
+            prec->Parse(szdata);
+            
+            const char* szname = tag.AttributeValue("name", true);
+            if (szname != 0) prec->SetName(szname); else prec->SetName(szdata);
+            
+            sz = tag.AttributeValue("delim", true);
+            if (sz != 0) prec->SetDelim(sz);
+            
+            sz = tag.AttributeValue("format", true);
+            if (sz!=0) prec->SetFormat(sz);
+            
+            sz = tag.AttributeValue("comments", true);
+            if (sz != 0)
+            {
+                if      (strcmp(sz, "on") == 0) prec->SetComments(true);
+                else if (strcmp(sz, "off") == 0) prec->SetComments(false); 
+            }
+            
+            prec->SetItemList(tag.szvalue());
+            
+            fem.AddDataRecord(prec);
+        }
 		else throw XMLReader::InvalidTag(tag);
 
 		++tag;

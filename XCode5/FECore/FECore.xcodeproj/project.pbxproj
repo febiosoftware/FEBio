@@ -176,6 +176,8 @@
 		D5E10B0D1865E15900B23922 /* vec3d.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A7D1865E15900B23922 /* vec3d.h */; };
 		D5E10B0E1865E15900B23922 /* vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A7E1865E15900B23922 /* vector.cpp */; };
 		D5E10B0F1865E15900B23922 /* vector.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A7F1865E15900B23922 /* vector.h */; };
+		D5E365F31B32031200263DAD /* NLConstraintDataRecord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E365F11B32031200263DAD /* NLConstraintDataRecord.cpp */; };
+		D5E365F41B32031200263DAD /* NLConstraintDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E365F21B32031200263DAD /* NLConstraintDataRecord.h */; };
 		D5F0E92619D05B9F0073F72C /* erf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F0E92419D05B9F0073F72C /* erf.cpp */; };
 		D5F0E92719D05B9F0073F72C /* erf.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F0E92519D05B9F0073F72C /* erf.h */; };
 /* End PBXBuildFile section */
@@ -351,6 +353,8 @@
 		D5E10A7D1865E15900B23922 /* vec3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vec3d.h; sourceTree = "<group>"; };
 		D5E10A7E1865E15900B23922 /* vector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector.cpp; sourceTree = "<group>"; };
 		D5E10A7F1865E15900B23922 /* vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vector.h; sourceTree = "<group>"; };
+		D5E365F11B32031200263DAD /* NLConstraintDataRecord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NLConstraintDataRecord.cpp; sourceTree = "<group>"; };
+		D5E365F21B32031200263DAD /* NLConstraintDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NLConstraintDataRecord.h; sourceTree = "<group>"; };
 		D5F0E92419D05B9F0073F72C /* erf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = erf.cpp; sourceTree = "<group>"; };
 		D5F0E92519D05B9F0073F72C /* erf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = erf.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -518,6 +522,8 @@
 				D5E10A691865E15900B23922 /* matrix.h */,
 				D5E10A6A1865E15900B23922 /* MatrixProfile.cpp */,
 				D5E10A6B1865E15900B23922 /* MatrixProfile.h */,
+				D5E365F11B32031200263DAD /* NLConstraintDataRecord.cpp */,
+				D5E365F21B32031200263DAD /* NLConstraintDataRecord.h */,
 				D5E10A6C1865E15900B23922 /* NodeDataRecord.cpp */,
 				D5E10A6D1865E15900B23922 /* NodeDataRecord.h */,
 				D5E10A6E1865E15900B23922 /* ObjectDataRecord.cpp */,
@@ -626,6 +632,7 @@
 				D59BBBB21AD771DD00E2991F /* tens3drs.hpp in Headers */,
 				D5E10AE71865E15900B23922 /* FETypes.h in Headers */,
 				D5E10AFB1865E15900B23922 /* MatrixProfile.h in Headers */,
+				D5E365F41B32031200263DAD /* NLConstraintDataRecord.h in Headers */,
 				D5E10AC71865E15900B23922 /* FENLConstraint.h in Headers */,
 				D5E10AF51865E15900B23922 /* mat3d.hpp in Headers */,
 				D5E10ACB1865E15900B23922 /* FENodeElemList.h in Headers */,
@@ -765,6 +772,7 @@
 				D5E10AF01865E15900B23922 /* Logfile.cpp in Sources */,
 				D5E10ADB1865E15900B23922 /* FESolidDomain.cpp in Sources */,
 				D59BBBB81AD771DD00E2991F /* tens6d.cpp in Sources */,
+				D5E365F31B32031200263DAD /* NLConstraintDataRecord.cpp in Sources */,
 				D5E10A851865E15900B23922 /* colsol.cpp in Sources */,
 				D5E10AFA1865E15900B23922 /* MatrixProfile.cpp in Sources */,
 				D5E10A961865E15900B23922 /* FEBodyLoad.cpp in Sources */,

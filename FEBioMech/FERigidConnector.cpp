@@ -14,6 +14,8 @@ ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"        );
 ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"        );
 END_PARAMETER_LIST();
 
+int FERigidConnector::m_ncount = 0;
+
 //-----------------------------------------------------------------------------
 FERigidConnector::FERigidConnector(FEModel* pfem) : FENLConstraint(pfem) {
     m_F = m_M = vec3d(0, 0, 0);

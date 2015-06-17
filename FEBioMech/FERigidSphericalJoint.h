@@ -82,7 +82,6 @@ public:
     double  m_Mpz;          //! prescribed moment along z
     
 protected:
-    int		m_nID;          //!< ID of rigid joint
     bool	m_binit;
     
     DECLARE_PARAMETER_LIST();

@@ -14,7 +14,8 @@ enum FE_Element_Class {
 	FE_ELEM_BEAM,
 	FE_ELEM_SURFACE,
 	FE_ELEM_TRUSS,
-	FE_ELEM_DISCRETE
+	FE_ELEM_DISCRETE,
+    FE_ELEM_FERGUSON_SHELL
 };
 
 //-----------------------------------------------------------------------------
@@ -80,6 +81,7 @@ enum FE_Element_Type {
 	// shell elements
 	FE_SHELL_QUAD,
 	FE_SHELL_TRI,
+    FE_FERGUSON_SHELL_QUAD,
 
 	// truss elements
 	FE_TRUSS,
@@ -119,6 +121,7 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FEBC_ID						0x000E	// derived from FEBoundaryCondition (TODO: This does not work yet)
 #define FEGLOBALDATA_ID				0x000F	// derived from FEGlobalData
 #define FERIGIDOBJECT_ID			0x0010	// derived from FECoreBase (TODO: work in progress)
+#define FENLCLOGDATA_ID             0x0011	// derived from FELogNLConstraintData
 
 /////////////////////////////////////////////////////////////////////////////
 // ENUM: Linear solvers
