@@ -301,6 +301,9 @@
     <ClInclude Include="..\..\FECore\tens6ds.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FECore\NLConstraintDataRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\DumpFile.cpp">
@@ -532,6 +535,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\BC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FECore\NLConstraintDataRecord.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
