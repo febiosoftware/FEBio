@@ -395,8 +395,8 @@ REGISTER_FECORE_CLASS(FEPlotElementinfstrnorm    , FEPLOTDATA_ID, "inf strain gr
 REGISTER_FECORE_CLASS(FEPlotElementGLstrnorm     , FEPLOTDATA_ID, "GL strain grad norm"   );
 REGISTER_FECORE_CLASS(FEPlotElementEAstrnorm     , FEPLOTDATA_ID, "EA strain grad norm"   );
 
-REGISTER_FECORE_CLASS(FEPlotElementMacroEnergy   , FEPLOTDATA_ID, "M energy"			  );
-REGISTER_FECORE_CLASS(FEPlotElementMicroEnergy   , FEPLOTDATA_ID, "m energy"			  );
+//REGISTER_FECORE_CLASS(FEPlotElementMacroEnergy   , FEPLOTDATA_ID, "M energy"			  );
+//REGISTER_FECORE_CLASS(FEPlotElementMicroEnergy   , FEPLOTDATA_ID, "m energy"			  );
 REGISTER_FECORE_CLASS(FEPlotElementenergydiff    , FEPLOTDATA_ID, "M-m energy diff"       );
 
 //-----------------------------------------------------------------------------

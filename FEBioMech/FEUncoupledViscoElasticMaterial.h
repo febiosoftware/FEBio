@@ -16,9 +16,6 @@ public:
 	//! default constructor
 	FEUncoupledViscoElasticMaterial(FEModel* pfem);
 
-	// get the elastic material \todo Is this right to overload this function?
-	FEElasticMaterial* GetElasticMaterial() { return m_pBase; }
-
 	// get the elastic base material
 	FEElasticMaterial* GetBaseMaterial() { return m_pBase; }
 
