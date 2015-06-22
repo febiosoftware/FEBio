@@ -40,7 +40,6 @@ void FEElasticDomain2O::InitElements()
 			pt.m_rt = rt;
 
 			pt.m_J = defgrad(el, pt.m_F, j);
-			pt2O.m_G_prev = pt2O.m_G;
 			defhess(el, pt2O.m_G, j);
 			mp.Init(false);
 		}
@@ -195,7 +194,6 @@ void FEElasticDomain2O::UpdateElementStress(int iel, double dt)
 
 		// get the deformation gradient and determinant
 		pt.m_J = defgrad(el, pt.m_F, n);
-		pt2O.m_G_prev = pt2O.m_G;
 		defhess(el, pt2O.m_G, n);
 
 		// calculate the stress at this material point
@@ -209,6 +207,7 @@ void FEElasticDomain2O::UpdateElementStress(int iel, double dt)
 			plot_on = el.m_nID;
 
 		pmat->Stress2O(mp, plot_on);
+
 	}
 }
 
