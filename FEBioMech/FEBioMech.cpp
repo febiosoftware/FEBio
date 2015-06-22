@@ -391,10 +391,13 @@ REGISTER_FECORE_CLASS(FEPlotElementPK1norm       , FEPLOTDATA_ID, "PK1 norm"   	
 REGISTER_FECORE_CLASS(FEPlotElementQK1norm       , FEPLOTDATA_ID, "QK1 norm"			  );
 REGISTER_FECORE_CLASS(FEPlotElementSnorm         , FEPLOTDATA_ID, "S norm"   			  );
 REGISTER_FECORE_CLASS(FEPlotElementTnorm         , FEPLOTDATA_ID, "T norm"  			  );
-REGISTER_FECORE_CLASS(FEPlotElementenergydiff    , FEPLOTDATA_ID, "M-m energy diff"       );
 REGISTER_FECORE_CLASS(FEPlotElementinfstrnorm    , FEPLOTDATA_ID, "inf strain grad norm"  );
 REGISTER_FECORE_CLASS(FEPlotElementGLstrnorm     , FEPLOTDATA_ID, "GL strain grad norm"   );
 REGISTER_FECORE_CLASS(FEPlotElementEAstrnorm     , FEPLOTDATA_ID, "EA strain grad norm"   );
+
+REGISTER_FECORE_CLASS(FEPlotElementMacroEnergy   , FEPLOTDATA_ID, "M energy"			  );
+REGISTER_FECORE_CLASS(FEPlotElementMicroEnergy   , FEPLOTDATA_ID, "m energy"			  );
+REGISTER_FECORE_CLASS(FEPlotElementenergydiff    , FEPLOTDATA_ID, "M-m energy diff"       );
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FEPlotNodeDisplacement   , FEPLOTDATA_ID, "displacement"   );
