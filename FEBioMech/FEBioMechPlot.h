@@ -209,15 +209,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Element macro-micro energy difference
-class FEPlotElementenergydiff : public FEDomainData
-{
-public:
-	FEPlotElementenergydiff(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, vector<float>& a);
-};
-
-//-----------------------------------------------------------------------------
 //! Element infinitesimal strain gradiet norm
 class FEPlotElementinfstrnorm : public FEDomainData
 {
@@ -241,6 +232,33 @@ class FEPlotElementEAstrnorm : public FEDomainData
 {
 public:
 	FEPlotElementEAstrnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element macro energy
+class FEPlotElementMacroEnergy : public FEDomainData
+{
+public:
+	FEPlotElementMacroEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element micro energy
+class FEPlotElementMicroEnergy : public FEDomainData
+{
+public:
+	FEPlotElementMicroEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element difference between macro and micro energy
+class FEPlotElementenergydiff : public FEDomainData
+{
+public:
+	FEPlotElementenergydiff(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
