@@ -7,10 +7,29 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 {
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 
-	FEPlotData* ps = fecore_new<FEPlotData>(FEPLOTDATA_ID, szname, pfem);
+	// strip the name from the filter
+	char sz[1024] = {0};
+	strcpy(sz, szname);
+	char* szflt = strchr(sz, '[');
+	if (szflt)
+	{
+		*szflt++ = 0;
+		char* ch = strrchr(szflt, ']');
+		if (ch == 0) return false;
+		*ch = 0;
+	}
+
+	FEPlotData* ps = fecore_new<FEPlotData>(FEPLOTDATA_ID, sz, pfem);
 	if (ps)
 	{
+		// set the optional item list and filter
 		ps->SetItemList(item);
+		if (szflt) 
+		{
+			if (ps->SetFilter(szflt) == false) return false;
+		}
+
+		// add the field to the plot file
 		if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname, item);
 		else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname, item);
 		else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, szname, item);

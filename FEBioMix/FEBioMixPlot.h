@@ -33,8 +33,12 @@ public:
 class FEPlotActualSoluteConcentration : public FEDomainData
 {
 public:
-	FEPlotActualSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotActualSoluteConcentration(FEModel* pfem);
 	bool Save(FEDomain& dom, vector<float>& a);
+	bool SetFilter(const char* sz);
+protected:
+	int			m_nsol;
+	FEModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------

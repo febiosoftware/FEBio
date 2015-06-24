@@ -30,6 +30,11 @@ public:
 	FEPlotData(Var_Type t, Storage_Fmt s) : FECoreBase(FEPLOTDATA_ID) { m_ntype = t; m_sfmt = s; }
 	virtual void Save(FEModel& fem, Archive& ar) = 0;
 
+	// The filter can be used to pass additional information to the plot field.
+	// The interpretation of this filter is up to the derived class, but could
+	// be used e.g. for disambiguation.
+	virtual bool SetFilter(const char* sz) { return true; }
+
 	Var_Type DataType() { return m_ntype; }
 	Storage_Fmt StorageFormat() { return m_sfmt; }
 
