@@ -108,4 +108,28 @@ public:
 	double DamageCriterion(FEMaterialPoint& pt);
 };
 
+//-----------------------------------------------------------------------------
+// max principal stretch ratio as damage criterion
+
+class FEDamageCriterionMPSR : public FEDamageCriterion
+{
+public:
+    FEDamageCriterionMPSR(FEModel* pfem) : FEDamageCriterion(pfem) {}
+    
+    //! damage
+    double DamageCriterion(FEMaterialPoint& pt);
+};
+
+//-----------------------------------------------------------------------------
+// volume ratio as damage criterion
+
+class FEDamageCriterionJ : public FEDamageCriterion
+{
+public:
+    FEDamageCriterionJ(FEModel* pfem) : FEDamageCriterion(pfem) {}
+    
+    //! damage
+    double DamageCriterion(FEMaterialPoint& pt);
+};
+
 #endif /* defined(__FEBioMech__FEDamageCriterion__) */
