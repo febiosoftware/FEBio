@@ -31,10 +31,8 @@ public:
 public:
 	tens3drs   m_G;				// LTE - Deformation Hessian
 	tens3ds    m_tau;			// LTE - Cauchy stress moment
-	tens3drs   m_Gi;
 
 	tens3drs   m_G_prev; 		// LTE - Deformation Hessian
-	tens3ds    m_tau_prev;		// LTE - Cauchy stress moment
 
 	mat3d      m_PK1;			// LTE - 1st Piola-Kirchhoff stress
 	tens3drs   m_QK1;			// LTE - 1st Piola-Kirchhoff stress moment
@@ -113,8 +111,11 @@ protected:
 	void AveragedStiffness(FEModel& rve, FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e);
 
 	void calculate_d2O(tens5ds& d, double K[3][3], double Ri[3], double Rj[3]);
+	double calc_5ds_comp(double K[3][3], double Ri[3], double Rj[3], int i, int j, int k, int l, int m);
+
 	void calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], double Rj[3]);
-	
+	double calc_6ds_comp(double K[3][3], double Ri[3], double Rj[3], int i, int j, int k, int l, int m, int n);
+
 	void calc_energy_diff(FEModel& rve, FEMaterialPoint& pt);
 
 	void AveragedStress2OPK1(FEModel& rve, FEMaterialPoint &mp, mat3d &PK1a, tens3drs &QK1a);

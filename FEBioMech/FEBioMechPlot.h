@@ -237,7 +237,6 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Element macro energy
-/*
 class FEPlotElementMacroEnergy : public FEDomainData
 {
 public:
@@ -253,7 +252,7 @@ public:
 	FEPlotElementMicroEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
-*/
+
 
 //-----------------------------------------------------------------------------
 //! Element difference between macro and micro energy

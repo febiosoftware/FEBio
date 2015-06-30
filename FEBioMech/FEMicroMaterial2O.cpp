@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "FEMicroMaterial2O.h"
-#include "FECore/FEElemElemList.h"
+#include "FECore/FEElemElemlist.h"
 #include "FECore/log.h"
 #include "FESolidSolver.h"
 #include "FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
-#include "FEBioXML/FEBioImport.h"
+#include "FEBioXMl/FEBioImport.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FECore/tens3d.h"
 #include <sstream>
@@ -15,7 +15,6 @@ FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterial
 {
 	m_tau.zero();
 	m_G.zero();
-	m_Gi.zero();
 
 	m_inf_str.zero();
 	m_inf_str_grad.zero();
@@ -31,7 +30,6 @@ FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterial
 	m_Ea.zero();
 	
 	m_G_prev.zero();
-	m_tau_prev.zero();
 }
 
 //-----------------------------------------------------------------------------
@@ -252,7 +250,7 @@ void FEMicroMaterial2O::FindBoundaryNodes()
 		node.m_rt.x = node.m_r0.x; node.m_rt.y = node.m_r0.y; node.m_rt.z = node.m_r0.z;
 	}
 	
-	// LTE - Find the bounding box for the RVE (+/- Lx, Ly, Lz)
+	// LTE - Find the bounding box for the RVE (+/- lx, ly, lz)
 	m_bb_x = xmax - centx; m_bb_y = ymax - centy; m_bb_z = zmax - centz;
 	
 	// use the E-E list to tag all exterior nodes
@@ -274,9 +272,13 @@ void FEMicroMaterial2O::FindBoundaryNodes()
 					{
 					FENode& node = m.Node(fn[k]);
 						
-						if (fabs(node.m_r0.x) == m_bb_x) m_BN[fn[k]] = 1;
-						if (fabs(node.m_r0.y) == m_bb_y) m_BN[fn[k]] = 1;
-						if (fabs(node.m_r0.z) == m_bb_z) m_BN[fn[k]] = 1;
+					/*if (fabs(node.m_r0.x) == m_bb_x) m_BN[fn[k]] = 1;
+					if (fabs(node.m_r0.y) == m_bb_y) m_BN[fn[k]] = 1;
+					if (fabs(node.m_r0.z) == m_bb_z) m_BN[fn[k]] = 1;*/
+
+					if (fabs(node.m_r0.x) >= 0.999*m_bb_x) m_BN[fn[k]] = 1;
+					if (fabs(node.m_r0.y) >= 0.999*m_bb_y) m_BN[fn[k]] = 1;
+					if (fabs(node.m_r0.z) >= 0.999*m_bb_z) m_BN[fn[k]] = 1;
 					}
 				}
 			}
@@ -542,8 +544,22 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on)
 	FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
 	mat3d F = pt.m_F;
 	tens3drs G = mmpt2O.m_G;
-	mmpt2O.m_tau_prev = mmpt2O.m_tau;
 
+	bool verification = false;
+
+	if (verification){
+		mat3d U_grad = F - mat3dd(1);
+		mat3d s;
+		tens3ds tau;
+		double mu = 10;
+		double kappa = 0.01*mu;
+
+		pt.m_s.zero(); pt.m_s(0,1) = mu*U_grad[0][1];
+		mmpt2O.m_tau.zero(); mmpt2O.m_tau.d[3] = kappa*G.d[3];
+
+		return;
+	}
+	
 	// Create a local copy of the rve
 	FEModel rve;
 	rve.CopyFrom(m_rve);
@@ -557,29 +573,6 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on)
 
 	// solve the RVE
 	bool bret = rve.Solve();
-
-	// set the plot file
-	if (plot_on)
-	{
-		FEBioPlotFile* pplt = new FEBioPlotFile(rve);
-		vector<int> item;
-		pplt->AddVariable("displacement", item);
-		pplt->AddVariable("stress", item);
-	
-		if (m_bperiodic)
-		{
-			pplt->AddVariable("contact gap", item);
-			pplt->AddVariable("contact traction", item);
-			pplt->AddVariable("contact pressure", item);
-		}
-
-		stringstream ss;
-		ss << "rve_elem_" << plot_on << ".xplt";
-		string plot_name = ss.str();
-		pplt->Open(rve, plot_name.c_str());
-		pplt->Write(rve);
-		pplt->Close();
-	}
 
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException();
@@ -596,6 +589,31 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on)
 	AveragedStiffness(rve, mp, mmpt2O.m_Ca, mmpt2O.m_Da, mmpt2O.m_Ea);
 
 	calc_energy_diff(rve, mp);	
+
+	// set the plot file
+	if (plot_on)
+	{
+		FEBioPlotFile* pplt = new FEBioPlotFile(rve);
+		vector<int> item;
+		pplt->AddVariable("displacement", item);
+		pplt->AddVariable("stress", item);
+
+		if (m_bperiodic)
+		{
+			pplt->AddVariable("contact gap", item);
+			pplt->AddVariable("contact traction", item);
+			pplt->AddVariable("contact pressure", item);
+		}
+
+		stringstream ss;
+		ss << "rve_elem_" << plot_on << ".xplt";
+		string plot_name = ss.str();
+		pplt->Open(rve, plot_name.c_str());
+		pplt->Write(rve);
+		pplt->Close();
+	}
+
+	return;
 }
 
 //-----------------------------------------------------------------------------
@@ -826,103 +844,136 @@ void FEMicroMaterial2O::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp, ten
 //-----------------------------------------------------------------------------
 void FEMicroMaterial2O::calculate_d2O(tens5ds& d, double K[3][3], double Ri[3], double Rj[3] )
 {
-	d.d[0] += 0.5*(Ri[0]*K[0][0]*Rj[0]*Rj[0] + Ri[0]*Ri[0]*K[0][0]*Rj[0]);
-	d.d[1] += 0.5*(Ri[0]*K[0][0]*Rj[0]*Rj[1] + Ri[0]*Ri[0]*K[0][0]*Rj[1]);
-	d.d[2] += 0.5*(Ri[0]*K[0][0]*Rj[0]*Rj[2] + Ri[0]*Ri[0]*K[0][0]*Rj[2]);
-	d.d[3] += 0.5*(Ri[0]*K[0][0]*Rj[1]*Rj[1] + Ri[0]*Ri[0]*K[0][1]*Rj[1]);
-	d.d[4] += 0.5*(Ri[0]*K[0][0]*Rj[1]*Rj[2] + Ri[0]*Ri[0]*K[0][1]*Rj[2]);
-	d.d[5] += 0.5*(Ri[0]*K[0][0]*Rj[2]*Rj[2] + Ri[0]*Ri[0]*K[0][2]*Rj[2]);
-	d.d[6] += 0.5*(Ri[0]*K[0][1]*Rj[1]*Rj[1] + Ri[0]*Ri[0]*K[1][1]*Rj[1]);
-	d.d[7] += 0.5*(Ri[0]*K[0][1]*Rj[1]*Rj[2] + Ri[0]*Ri[0]*K[1][1]*Rj[2]);
-	d.d[8] += 0.5*(Ri[0]*K[0][1]*Rj[2]*Rj[2] + Ri[0]*Ri[0]*K[1][2]*Rj[2]);
-	d.d[9] += 0.5*(Ri[0]*K[0][2]*Rj[2]*Rj[2] + Ri[0]*Ri[0]*K[2][2]*Rj[2]);
+	d.d[ 0] += calc_5ds_comp(K, Ri, Rj, 1, 1, 1, 1, 1);
+	d.d[ 1] += calc_5ds_comp(K, Ri, Rj, 1, 1, 1, 1, 2);
+	d.d[ 2] += calc_5ds_comp(K, Ri, Rj, 1, 1, 1, 1, 3);
+	d.d[ 3] += calc_5ds_comp(K, Ri, Rj, 1, 1, 1, 2, 2);
+	d.d[ 4] += calc_5ds_comp(K, Ri, Rj, 1, 1, 1, 2, 3);
+	d.d[ 5] += calc_5ds_comp(K, Ri, Rj, 1, 1, 1, 3, 3);
+	d.d[ 6] += calc_5ds_comp(K, Ri, Rj, 1, 1, 2, 2, 2);
+	d.d[ 7] += calc_5ds_comp(K, Ri, Rj, 1, 1, 2, 2, 3);
+	d.d[ 8] += calc_5ds_comp(K, Ri, Rj, 1, 1, 2, 3, 3);
+	d.d[ 9] += calc_5ds_comp(K, Ri, Rj, 1, 1, 3, 3, 3);
 	
-	d.d[10] += 0.5*(Ri[0]*K[1][0]*Rj[1]*Rj[1] + Ri[0]*Ri[1]*K[0][1]*Rj[1]);
-	d.d[11] += 0.5*(Ri[0]*K[1][0]*Rj[1]*Rj[2] + Ri[0]*Ri[1]*K[0][1]*Rj[2]);
-	d.d[12] += 0.5*(Ri[0]*K[1][0]*Rj[2]*Rj[2] + Ri[0]*Ri[1]*K[0][2]*Rj[2]);
-	d.d[13] += 0.5*(Ri[0]*K[1][1]*Rj[1]*Rj[1] + Ri[0]*Ri[1]*K[1][1]*Rj[1]);
-	d.d[14] += 0.5*(Ri[0]*K[1][1]*Rj[1]*Rj[2] + Ri[0]*Ri[1]*K[1][1]*Rj[2]);
-	d.d[15] += 0.5*(Ri[0]*K[1][1]*Rj[2]*Rj[2] + Ri[0]*Ri[1]*K[1][2]*Rj[2]);
-	d.d[16] += 0.5*(Ri[0]*K[1][2]*Rj[2]*Rj[2] + Ri[0]*Ri[1]*K[2][2]*Rj[2]);
+	d.d[10] += calc_5ds_comp(K, Ri, Rj, 1, 2, 1, 2, 2);
+	d.d[11] += calc_5ds_comp(K, Ri, Rj, 1, 2, 1, 2, 3);
+	d.d[12] += calc_5ds_comp(K, Ri, Rj, 1, 2, 1, 3, 3);
+	d.d[13] += calc_5ds_comp(K, Ri, Rj, 1, 2, 2, 2, 2);
+	d.d[14] += calc_5ds_comp(K, Ri, Rj, 1, 2, 2, 2, 3);
+	d.d[15] += calc_5ds_comp(K, Ri, Rj, 1, 2, 2, 3, 3);
+	d.d[16] += calc_5ds_comp(K, Ri, Rj, 1, 2, 3, 3, 3);
 
-	d.d[17] += 0.5*(Ri[0]*K[2][0]*Rj[2]*Rj[2] + Ri[0]*Ri[2]*K[0][2]*Rj[2]);
-	d.d[18] += 0.5*(Ri[0]*K[2][1]*Rj[1]*Rj[1] + Ri[0]*Ri[2]*K[1][1]*Rj[1]);
-	d.d[19] += 0.5*(Ri[0]*K[2][1]*Rj[1]*Rj[2] + Ri[0]*Ri[2]*K[1][1]*Rj[2]);
-	d.d[20] += 0.5*(Ri[0]*K[2][1]*Rj[2]*Rj[2] + Ri[0]*Ri[2]*K[1][2]*Rj[2]);
-	d.d[21] += 0.5*(Ri[0]*K[2][2]*Rj[2]*Rj[2] + Ri[0]*Ri[2]*K[2][2]*Rj[2]);
+	d.d[17] += calc_5ds_comp(K, Ri, Rj, 1, 3, 1, 3, 3);
+	d.d[18] += calc_5ds_comp(K, Ri, Rj, 1, 3, 2, 2, 2);
+	d.d[19] += calc_5ds_comp(K, Ri, Rj, 1, 3, 2, 2, 3);
+	d.d[20] += calc_5ds_comp(K, Ri, Rj, 1, 3, 2, 3, 3);
+	d.d[21] += calc_5ds_comp(K, Ri, Rj, 1, 3, 3, 3, 3);
 
-	d.d[22] += 0.5*(Ri[1]*K[1][1]*Rj[1]*Rj[1] + Ri[1]*Ri[1]*K[1][1]*Rj[1]);
-	d.d[23] += 0.5*(Ri[1]*K[1][1]*Rj[1]*Rj[2] + Ri[1]*Ri[1]*K[1][1]*Rj[2]);
-	d.d[24] += 0.5*(Ri[1]*K[1][1]*Rj[2]*Rj[2] + Ri[1]*Ri[1]*K[1][2]*Rj[2]);
-	d.d[25] += 0.5*(Ri[1]*K[1][2]*Rj[2]*Rj[2] + Ri[1]*Ri[1]*K[2][2]*Rj[2]);
+	d.d[22] += calc_5ds_comp(K, Ri, Rj, 2, 2, 2, 2, 2);
+	d.d[23] += calc_5ds_comp(K, Ri, Rj, 2, 2, 2, 2, 3);
+	d.d[24] += calc_5ds_comp(K, Ri, Rj, 2, 2, 2, 3, 3);
+	d.d[25] += calc_5ds_comp(K, Ri, Rj, 2, 2, 3, 3, 3);
 
-	d.d[26] += 0.5*(Ri[1]*K[2][1]*Rj[2]*Rj[2] + Ri[1]*Ri[2]*K[1][2]*Rj[2]);
+	d.d[26] += calc_5ds_comp(K, Ri, Rj, 2, 3, 2, 3, 3);
 
-	d.d[27] += 0.5*(Ri[1]*K[2][2]*Rj[2]*Rj[2] + Ri[1]*Ri[2]*K[2][2]*Rj[2]);
+	d.d[27] += calc_5ds_comp(K, Ri, Rj, 2, 3, 3, 3, 3);
 
-	d.d[28] += 0.5*(Ri[2]*K[2][2]*Rj[2]*Rj[2] + Ri[2]*Ri[2]*K[2][2]*Rj[2]);
+	d.d[28] += calc_5ds_comp(K, Ri, Rj, 3, 3, 3, 3, 3);
+}
+
+//-----------------------------------------------------------------------------
+double FEMicroMaterial2O::calc_5ds_comp(double K[3][3], double Ri[3], double Rj[3], int i, int j, int k, int l, int m)
+{
+	i -= 1; j -= 1;  k -= 1; l -= 1; m -= 1; 
+		
+	return (1/2)*((1/24)*(   Ri[i]*K[j][k]*Rj[l]*Rj[m] + Ri[i]*K[j][m]*Rj[l]*Rj[k] + Ri[i]*K[j][l]*Rj[k]*Rj[m] + Ri[i]*K[j][k]*Rj[m]*Rj[l] + Ri[i]*K[j][l]*Rj[m]*Rj[k] + Ri[i]*K[j][m]*Rj[k]*Rj[l]
+					       + Ri[j]*K[i][k]*Rj[l]*Rj[m] + Ri[j]*K[i][m]*Rj[l]*Rj[k] + Ri[j]*K[i][l]*Rj[k]*Rj[m] + Ri[j]*K[i][k]*Rj[m]*Rj[l] + Ri[j]*K[i][l]*Rj[m]*Rj[k] + Ri[j]*K[i][m]*Rj[k]*Rj[l]
+					       + Ri[l]*K[m][i]*Rj[j]*Rj[k] + Ri[l]*K[m][k]*Rj[j]*Rj[i] + Ri[l]*K[m][j]*Rj[i]*Rj[k] + Ri[l]*K[m][i]*Rj[k]*Rj[j] + Ri[l]*K[m][j]*Rj[k]*Rj[i] + Ri[l]*K[m][k]*Rj[i]*Rj[j]
+					       + Ri[m]*K[l][i]*Rj[j]*Rj[k] + Ri[m]*K[l][k]*Rj[j]*Rj[i] + Ri[m]*K[l][j]*Rj[i]*Rj[k] + Ri[m]*K[l][i]*Rj[k]*Rj[j] + Ri[m]*K[l][j]*Rj[k]*Rj[i] + Ri[m]*K[l][k]*Rj[i]*Rj[j])
+		        + (1/24)*(   Ri[i]*Ri[j]*K[k][l]*Rj[m] + Ri[i]*Ri[j]*K[m][l]*Rj[k] + Ri[i]*Ri[j]*K[l][k]*Rj[m] + Ri[i]*Ri[j]*K[k][m]*Rj[l] + Ri[i]*Ri[j]*K[l][m]*Rj[k] + Ri[i]*Ri[j]*K[m][k]*Rj[l]
+					       + Ri[j]*Ri[i]*K[k][l]*Rj[m] + Ri[j]*Ri[i]*K[m][l]*Rj[k] + Ri[j]*Ri[i]*K[l][k]*Rj[m] + Ri[j]*Ri[i]*K[k][m]*Rj[l] + Ri[j]*Ri[i]*K[l][m]*Rj[k] + Ri[j]*Ri[i]*K[m][k]*Rj[l]
+					       + Ri[l]*Ri[m]*K[i][j]*Rj[k] + Ri[l]*Ri[m]*K[k][j]*Rj[i] + Ri[l]*Ri[m]*K[j][i]*Rj[k] + Ri[l]*Ri[m]*K[i][k]*Rj[j] + Ri[l]*Ri[m]*K[j][k]*Rj[i] + Ri[l]*Ri[m]*K[k][i]*Rj[j]
+					       + Ri[m]*Ri[l]*K[i][j]*Rj[k] + Ri[m]*Ri[l]*K[k][j]*Rj[i] + Ri[m]*Ri[l]*K[j][i]*Rj[k] + Ri[m]*Ri[l]*K[i][k]*Rj[j] + Ri[m]*Ri[l]*K[j][k]*Rj[i] + Ri[m]*Ri[l]*K[k][i]*Rj[j]));
 }
 
 //-----------------------------------------------------------------------------
 void FEMicroMaterial2O::calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], double Rj[3] )
 {
-	e.d[0] += Ri[0]*Ri[0]*K[0][0]*Rj[0]*Rj[0];
-	e.d[1] += Ri[0]*Ri[0]*K[0][0]*Rj[0]*Rj[1];
-	e.d[2] += Ri[0]*Ri[0]*K[0][0]*Rj[0]*Rj[2];
-	e.d[3] += Ri[0]*Ri[0]*K[0][0]*Rj[1]*Rj[1];
-	e.d[4] += Ri[0]*Ri[0]*K[0][0]*Rj[1]*Rj[2];
-	e.d[5] += Ri[0]*Ri[0]*K[0][0]*Rj[2]*Rj[2];
-	e.d[6] += Ri[0]*Ri[0]*K[0][1]*Rj[1]*Rj[1];
-	e.d[7] += Ri[0]*Ri[0]*K[0][1]*Rj[1]*Rj[2];
-	e.d[8] += Ri[0]*Ri[0]*K[0][1]*Rj[2]*Rj[2];
-	e.d[9] += Ri[0]*Ri[0]*K[0][2]*Rj[2]*Rj[2];
+	e.d[ 0] += calc_6ds_comp(K, Ri, Rj, 1, 1, 1, 1, 1, 1);
+	e.d[ 1] += calc_6ds_comp(K, Ri, Rj, 1, 1, 1, 1, 1, 2);
+	e.d[ 2] += calc_6ds_comp(K, Ri, Rj, 1, 1, 1, 1, 1, 3);
+	e.d[ 3] += calc_6ds_comp(K, Ri, Rj, 1, 1, 1, 1, 2, 2);
+	e.d[ 4] += calc_6ds_comp(K, Ri, Rj, 1, 1, 1, 1, 2, 3);
+	e.d[ 5] += calc_6ds_comp(K, Ri, Rj, 1, 1, 1, 1, 3, 3);
+	e.d[ 6] += calc_6ds_comp(K, Ri, Rj, 1, 1, 1, 2, 2, 2);
+	e.d[ 7] += calc_6ds_comp(K, Ri, Rj, 1, 1, 1, 2, 2, 3);
+	e.d[ 8] += calc_6ds_comp(K, Ri, Rj, 1, 1, 1, 2, 3, 3);
+	e.d [9] += calc_6ds_comp(K, Ri, Rj, 1, 1, 1, 3, 3, 3);
 	
-	e.d[10] += Ri[0]*Ri[0]*K[1][0]*Rj[1]*Rj[1];
-	e.d[11] += Ri[0]*Ri[0]*K[1][0]*Rj[1]*Rj[2];
-	e.d[12] += Ri[0]*Ri[0]*K[1][0]*Rj[2]*Rj[2];
-	e.d[13] += Ri[0]*Ri[0]*K[1][1]*Rj[1]*Rj[1];
-	e.d[14] += Ri[0]*Ri[0]*K[1][1]*Rj[1]*Rj[2];
-	e.d[15] += Ri[0]*Ri[0]*K[1][1]*Rj[2]*Rj[2];
-	e.d[16] += Ri[0]*Ri[0]*K[1][2]*Rj[2]*Rj[2];
+	e.d[10] += calc_6ds_comp(K, Ri, Rj, 1, 1, 2, 1, 2, 2);
+	e.d[11] += calc_6ds_comp(K, Ri, Rj, 1, 1, 2, 1, 2, 3);
+	e.d[12] += calc_6ds_comp(K, Ri, Rj, 1, 1, 2, 1, 3, 3);
+	e.d[13] += calc_6ds_comp(K, Ri, Rj, 1, 1, 2, 2, 2, 2);
+	e.d[14] += calc_6ds_comp(K, Ri, Rj, 1, 1, 2, 2, 2, 3);
+	e.d[15] += calc_6ds_comp(K, Ri, Rj, 1, 1, 2, 2, 3, 3);
+	e.d[16] += calc_6ds_comp(K, Ri, Rj, 1, 1, 2, 3, 3, 3);
 
-	e.d[17] += Ri[0]*Ri[0]*K[2][0]*Rj[1]*Rj[1];
-	e.d[18] += Ri[0]*Ri[0]*K[2][0]*Rj[1]*Rj[2];
-	e.d[19] += Ri[0]*Ri[0]*K[2][0]*Rj[2]*Rj[2];
-	e.d[20] += Ri[0]*Ri[0]*K[2][1]*Rj[1]*Rj[1];
-	e.d[21] += Ri[0]*Ri[0]*K[2][1]*Rj[1]*Rj[2];
-	e.d[22] += Ri[0]*Ri[0]*K[2][1]*Rj[2]*Rj[2];
-	e.d[23] += Ri[0]*Ri[0]*K[2][2]*Rj[2]*Rj[2];
+	e.d[17] += calc_6ds_comp(K, Ri, Rj, 1, 1, 3, 1, 2, 2);
+	e.d[18] += calc_6ds_comp(K, Ri, Rj, 1, 1, 3, 1, 2, 3);
+	e.d[19] += calc_6ds_comp(K, Ri, Rj, 1, 1, 3, 1, 3, 3);
+	e.d[20] += calc_6ds_comp(K, Ri, Rj, 1, 1, 3, 2, 2, 2);
+	e.d[21] += calc_6ds_comp(K, Ri, Rj, 1, 1, 3, 2, 2, 3);
+	e.d[22] += calc_6ds_comp(K, Ri, Rj, 1, 1, 3, 2, 3, 3);
+	e.d[23] += calc_6ds_comp(K, Ri, Rj, 1, 1, 3, 3, 3, 3);
 
-	e.d[24] += Ri[0]*Ri[1]*K[1][0]*Rj[2]*Rj[2];
-	e.d[25] += Ri[0]*Ri[1]*K[1][1]*Rj[1]*Rj[1];
-	e.d[26] += Ri[0]*Ri[1]*K[1][1]*Rj[1]*Rj[2];
-	e.d[27] += Ri[0]*Ri[1]*K[1][1]*Rj[2]*Rj[2];
-	e.d[28] += Ri[0]*Ri[1]*K[1][2]*Rj[2]*Rj[2];
+	e.d[24] += calc_6ds_comp(K, Ri, Rj, 1, 2, 2, 1, 3, 3);
+	e.d[25] += calc_6ds_comp(K, Ri, Rj, 1, 2, 2, 2, 2, 2);
+	e.d[26] += calc_6ds_comp(K, Ri, Rj, 1, 2, 2, 2, 2, 3);
+	e.d[27] += calc_6ds_comp(K, Ri, Rj, 1, 2, 2, 2, 3, 3);
+	e.d[28] += calc_6ds_comp(K, Ri, Rj, 1, 2, 2, 3, 3, 3);
 
-	e.d[29] += Ri[0]*Ri[1]*K[2][0]*Rj[2]*Rj[2];
-	e.d[30] += Ri[0]*Ri[1]*K[2][1]*Rj[1]*Rj[1];
-	e.d[31] += Ri[0]*Ri[1]*K[2][1]*Rj[1]*Rj[2];
-	e.d[32] += Ri[0]*Ri[1]*K[2][1]*Rj[2]*Rj[2];
-	e.d[33] += Ri[0]*Ri[1]*K[2][2]*Rj[2]*Rj[2];
+	e.d[29] += calc_6ds_comp(K, Ri, Rj, 1, 2, 3, 1, 3, 3);
+	e.d[30] += calc_6ds_comp(K, Ri, Rj, 1, 2, 3, 2, 2, 2);
+	e.d[31] += calc_6ds_comp(K, Ri, Rj, 1, 2, 3, 2, 2, 3);
+	e.d[32] += calc_6ds_comp(K, Ri, Rj, 1, 2, 3, 2, 3, 3);
+	e.d[33] += calc_6ds_comp(K, Ri, Rj, 1, 2, 3, 3, 3, 3);
 
-	e.d[34] += Ri[0]*Ri[2]*K[2][1]*Rj[1]*Rj[1];
-	e.d[35] += Ri[0]*Ri[2]*K[2][1]*Rj[1]*Rj[2];
-	e.d[36] += Ri[0]*Ri[2]*K[2][1]*Rj[2]*Rj[2];
-	e.d[37] += Ri[0]*Ri[2]*K[2][2]*Rj[2]*Rj[2];
+	e.d[34] += calc_6ds_comp(K, Ri, Rj, 1, 3, 3, 2, 2, 2);
+	e.d[35] += calc_6ds_comp(K, Ri, Rj, 1, 3, 3, 2, 2, 3);
+	e.d[36] += calc_6ds_comp(K, Ri, Rj, 1, 3, 3, 2, 3, 3);
+	e.d[37] += calc_6ds_comp(K, Ri, Rj, 1, 3, 3, 3, 3, 3);
 
-	e.d[38] += Ri[1]*Ri[1]*K[1][1]*Rj[1]*Rj[1];
-	e.d[39] += Ri[1]*Ri[1]*K[1][1]*Rj[1]*Rj[2];
-	e.d[40] += Ri[1]*Ri[1]*K[1][1]*Rj[2]*Rj[2];
-	e.d[41] += Ri[1]*Ri[1]*K[1][2]*Rj[2]*Rj[2];
+	e.d[38] += calc_6ds_comp(K, Ri, Rj, 2, 2, 2, 2, 2, 2);
+	e.d[39] += calc_6ds_comp(K, Ri, Rj, 2, 2, 2, 2, 2, 3);
+	e.d[40] += calc_6ds_comp(K, Ri, Rj, 2, 2, 2, 2, 3, 3);
+	e.d[41] += calc_6ds_comp(K, Ri, Rj, 2, 2, 2, 3, 3, 3);
 
-	e.d[42] += Ri[1]*Ri[1]*K[2][1]*Rj[2]*Rj[2];
-	e.d[43] += Ri[1]*Ri[1]*K[2][2]*Rj[2]*Rj[2];
+	e.d[42] += calc_6ds_comp(K, Ri, Rj, 2, 2, 3, 2, 3, 3);
+	e.d[43] += calc_6ds_comp(K, Ri, Rj, 2, 2, 3, 3, 3, 3);
 
-	e.d[44] += Ri[1]*Ri[2]*K[2][2]*Rj[2]*Rj[2];
+	e.d[44] += calc_6ds_comp(K, Ri, Rj, 2, 3, 3, 3, 3, 3);
 
-	e.d[45] += Ri[2]*Ri[2]*K[2][2]*Rj[2]*Rj[2];
+	e.d[45] += calc_6ds_comp(K, Ri, Rj, 3, 3, 3, 3, 3, 3);
 }
 
+//-----------------------------------------------------------------------------
+double FEMicroMaterial2O::calc_6ds_comp(double K[3][3], double Ri[3], double Rj[3], int i, int j, int k, int l, int m, int n)
+{
+	i -= 1; j -= 1;  k -= 1; l -= 1; m -= 1; n -= 1;
+		
+	return (1/72)*(   Ri[i]*Ri[j]*K[k][l]*Rj[m]*Rj[n] + Ri[i]*Ri[j]*K[k][n]*Rj[m]*Rj[l] + Ri[i]*Ri[j]*K[k][m]*Rj[l]*Rj[n] + Ri[i]*Ri[j]*K[k][l]*Rj[n]*Rj[m] + Ri[i]*Ri[j]*K[k][m]*Rj[n]*Rj[l] + Ri[i]*Ri[j]*K[k][n]*Rj[l]*Rj[m]     
+	                + Ri[k]*Ri[j]*K[i][l]*Rj[m]*Rj[n] + Ri[k]*Ri[j]*K[i][n]*Rj[m]*Rj[l] + Ri[k]*Ri[j]*K[i][m]*Rj[l]*Rj[n] + Ri[k]*Ri[j]*K[i][l]*Rj[n]*Rj[m] + Ri[k]*Ri[j]*K[i][m]*Rj[n]*Rj[l] + Ri[k]*Ri[j]*K[i][n]*Rj[l]*Rj[m]
+				    + Ri[j]*Ri[i]*K[k][l]*Rj[m]*Rj[n] + Ri[j]*Ri[i]*K[k][n]*Rj[m]*Rj[l] + Ri[j]*Ri[i]*K[k][m]*Rj[l]*Rj[n] + Ri[j]*Ri[i]*K[k][l]*Rj[n]*Rj[m] + Ri[j]*Ri[i]*K[k][m]*Rj[n]*Rj[l] + Ri[j]*Ri[i]*K[k][n]*Rj[l]*Rj[m]
+					+ Ri[i]*Ri[k]*K[j][l]*Rj[m]*Rj[n] + Ri[i]*Ri[k]*K[j][n]*Rj[m]*Rj[l] + Ri[i]*Ri[k]*K[j][m]*Rj[l]*Rj[n] + Ri[i]*Ri[k]*K[j][l]*Rj[n]*Rj[m] + Ri[i]*Ri[k]*K[j][m]*Rj[n]*Rj[l] + Ri[i]*Ri[k]*K[j][n]*Rj[l]*Rj[m]
+					+ Ri[j]*Ri[k]*K[i][l]*Rj[m]*Rj[n] + Ri[j]*Ri[k]*K[i][n]*Rj[m]*Rj[l] + Ri[j]*Ri[k]*K[i][m]*Rj[l]*Rj[n] + Ri[j]*Ri[k]*K[i][l]*Rj[n]*Rj[m] + Ri[j]*Ri[k]*K[i][m]*Rj[n]*Rj[l] + Ri[j]*Ri[k]*K[i][n]*Rj[l]*Rj[m]
+					+ Ri[k]*Ri[i]*K[j][l]*Rj[m]*Rj[n] + Ri[k]*Ri[i]*K[j][n]*Rj[m]*Rj[l] + Ri[k]*Ri[i]*K[j][m]*Rj[l]*Rj[n] + Ri[k]*Ri[i]*K[j][l]*Rj[n]*Rj[m] + Ri[k]*Ri[i]*K[j][m]*Rj[n]*Rj[l] + Ri[k]*Ri[i]*K[j][n]*Rj[l]*Rj[m]
+					+ Ri[l]*Ri[m]*K[n][i]*Rj[j]*Rj[k] + Ri[l]*Ri[m]*K[n][k]*Rj[j]*Rj[i] + Ri[l]*Ri[m]*K[n][j]*Rj[i]*Rj[k] + Ri[l]*Ri[m]*K[n][i]*Rj[k]*Rj[j] + Ri[l]*Ri[m]*K[n][j]*Rj[k]*Rj[i] + Ri[l]*Ri[m]*K[n][k]*Rj[i]*Rj[j]
+					+ Ri[n]*Ri[m]*K[l][i]*Rj[j]*Rj[k] + Ri[n]*Ri[m]*K[l][k]*Rj[j]*Rj[i] + Ri[n]*Ri[m]*K[l][j]*Rj[i]*Rj[k] + Ri[n]*Ri[m]*K[l][i]*Rj[k]*Rj[j] + Ri[n]*Ri[m]*K[l][j]*Rj[k]*Rj[i] + Ri[n]*Ri[m]*K[l][k]*Rj[i]*Rj[j]
+					+ Ri[m]*Ri[l]*K[n][i]*Rj[j]*Rj[k] + Ri[m]*Ri[l]*K[n][k]*Rj[j]*Rj[i] + Ri[m]*Ri[l]*K[n][j]*Rj[i]*Rj[k] + Ri[m]*Ri[l]*K[n][i]*Rj[k]*Rj[j] + Ri[m]*Ri[l]*K[n][j]*Rj[k]*Rj[i] + Ri[m]*Ri[l]*K[n][k]*Rj[i]*Rj[j]
+					+ Ri[l]*Ri[n]*K[m][i]*Rj[j]*Rj[k] + Ri[l]*Ri[n]*K[m][k]*Rj[j]*Rj[i] + Ri[l]*Ri[n]*K[m][j]*Rj[i]*Rj[k] + Ri[l]*Ri[n]*K[m][i]*Rj[k]*Rj[j] + Ri[l]*Ri[n]*K[m][j]*Rj[k]*Rj[i] + Ri[l]*Ri[n]*K[m][k]*Rj[i]*Rj[j]
+					+ Ri[m]*Ri[n]*K[l][i]*Rj[j]*Rj[k] + Ri[m]*Ri[n]*K[l][k]*Rj[j]*Rj[i] + Ri[m]*Ri[n]*K[l][j]*Rj[i]*Rj[k] + Ri[m]*Ri[n]*K[l][i]*Rj[k]*Rj[j] + Ri[m]*Ri[n]*K[l][j]*Rj[k]*Rj[i] + Ri[m]*Ri[n]*K[l][k]*Rj[i]*Rj[j]
+					+ Ri[n]*Ri[l]*K[m][i]*Rj[j]*Rj[k] + Ri[n]*Ri[l]*K[m][k]*Rj[j]*Rj[i] + Ri[n]*Ri[l]*K[m][j]*Rj[i]*Rj[k] + Ri[n]*Ri[l]*K[m][i]*Rj[k]*Rj[j] + Ri[n]*Ri[l]*K[m][j]*Rj[k]*Rj[i] + Ri[n]*Ri[l]*K[m][k]*Rj[i]*Rj[j]);
+}
 
 //-----------------------------------------------------------------------------
 //! Calculate the energy difference between the RVE problem and the macro material point
@@ -939,12 +990,8 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 
 	mat3d Finv = F.inverse();
 	mat3d Finvtrans = Finv.transpose();
-	tens3drs Ginv; Ginv = G; Ginv.contractleg2(Finv,1); Ginv.contractleg2(Finv,2); Ginv.contractleg2(Finv,3); Ginv /= 27;
+	tens3drs Ginv; Ginv = G; Ginv.contractleg2(Finv,1); Ginv.contractleg2(Finv,2); Ginv.contractleg2(Finv,3);
 	tens3dls Ginvtrans = Ginv.transpose();
-	
-	vec3d x = pt.m_rt;
-	vec3d X = pt.m_r0;
-
 	
 	// calculate infinitesimal strain
 	mmpt2O.m_inf_str = ((F.transpose() + F)*0.5 - mat3dd(1)).sym();
@@ -992,12 +1039,23 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	
 	// calculate the energy difference between macro point and RVE
 	// to verify that we have satisfied the Hill-Mandel condition
-	mmpt2O.m_macro_energy = pt.m_s.dotdot(mmpt2O.m_e) + mmpt2O.m_tau.tripledot3s(mmpt2O.m_h);
+	mat3ds e_prev = ((mat3dd(1) - pt.m_F_prev.transinv()*pt.m_F_prev.inverse())*0.5).sym();
+	tens3drs Ginv_prev; Ginv_prev = mmpt2O.m_G_prev; Ginv_prev.contractleg2(pt.m_F_prev.inverse(),1); Ginv_prev.contractleg2(pt.m_F_prev.inverse(),2); Ginv_prev.contractleg2(pt.m_F_prev.inverse(),3);
+	tens3dls Ginvtrans_prev = Ginv_prev.transpose();
+	tens3ds h_prev = ((Ginvtrans_prev.multiply2right(pt.m_F_prev.inverse()).LStoUnsym() + Ginv_prev.multiply2left(pt.m_F_prev.transinv()).RStoUnsym())*-0.5).symm();
+	
+	mmpt2O.m_macro_energy = pt.m_s.dotdot(mmpt2O.m_e - e_prev) + mmpt2O.m_tau.tripledot3s(mmpt2O.m_h - h_prev);
 	
 	double rve_energy_avg = 0.;
+	double J = 0.;
 	int nint; 
 	double* w;
 	double v = 0.;
+	mat3d rve_F;		
+	mat3d rve_F_prev;
+	mat3ds rve_e;
+	mat3ds rve_e_prev;
+	mat3ds rve_s;
 
 	FEMesh& m = rve.GetMesh();
 	for (int k=0; k<m.Domains(); ++k)
@@ -1012,17 +1070,21 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 			for (int n=0; n<nint; ++n)
 			{
 				FEElasticMaterialPoint& rve_pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
-				mat3d rve_F = rve_pt.m_F;
-				mat3ds rve_e = ((mat3dd(1) - rve_F.transinv()*rve_F.inverse())*0.5).sym();
-				mat3ds rve_s = rve_pt.m_s;
-				rve_energy_avg += rve_s.dotdot(rve_e)*rve_pt.m_J*w[n];
-				v += rve_pt.m_J*w[n];
+				
+				rve_F = rve_pt.m_F;
+				rve_e = ((mat3dd(1) - rve_F.transinv()*rve_F.inverse())*0.5).sym();
+				rve_s = rve_pt.m_s;
+				rve_F_prev = rve_pt.m_F_prev;
+				rve_e_prev = ((mat3dd(1) - rve_F_prev.transinv()*rve_F_prev.inverse())*0.5).sym();
+				
+				J = dom.detJt(el, n);
+				rve_energy_avg += rve_s.dotdot(rve_e - rve_e_prev)*J*w[n];
+				v += J*w[n];
 			}
 		}
 	}
 
-
-	mmpt2O.m_micro_energy = rve_energy_avg/v;
+	mmpt2O.m_micro_energy += rve_energy_avg/v;
 	mmpt2O.m_energy_diff = fabs(mmpt2O.m_macro_energy - mmpt2O.m_micro_energy);
 }
 

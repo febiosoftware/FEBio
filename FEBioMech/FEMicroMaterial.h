@@ -27,12 +27,15 @@ public:
 public:
 	mat3d      m_PK1;			// LTE - 1st Piola-Kirchhoff stress
 	mat3ds     m_S;				// LTE - 2nd Piola-Kirchhoff stress
-	
+	mat3d      m_PK1_prev;
+
 	mat3ds     m_inf_str;		// LTE - infinitesimal strain
 	mat3ds     m_E;				// LTE - Green-Lagrange strain
 	mat3ds     m_e;				// LTE - Euler-Almansi strain
 	
-	double	   m_energy_diff;	// LTE - Difference between macro energy and volume averaged energy of RVE (should be zero)
+	double     m_macro_energy;	// LTE - Macroscopic strain energy
+	double	   m_micro_energy;	// LTE - Volume-average of strain energy throughout the RVE solution
+	double	   m_energy_diff;	// LTE - Difference between macro energy and volume averaged energy of RVE (should be zero) 
 
 	tens4ds	m_Ka;	//!< averaged material stiffness
 };
@@ -89,7 +92,7 @@ protected:
 	mat3d AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp);
 	mat3ds AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp);
 
-	void calc_energy_diff(FEModel& rve, FEMaterialPoint& pt, mat3ds& sa);
+	void calc_energy_diff(FEModel& rve, FEMaterialPoint& pt);
 
 public:
 	// declare the parameter list

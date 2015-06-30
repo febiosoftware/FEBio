@@ -50,6 +50,8 @@ public:
 	// solid material data
 	mat3ds		m_s;		//!< Cauchy stress
 	mat3ds		m_s0;		//!< Initial stress (only used by linear solid solver)
+
+	mat3d m_F_prev;
 };
 
 //-----------------------------------------------------------------------------

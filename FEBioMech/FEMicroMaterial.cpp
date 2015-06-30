@@ -11,6 +11,8 @@
 //-----------------------------------------------------------------------------
 FEMicroMaterialPoint::FEMicroMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoint(mp)
 {
+	m_macro_energy = 0.;
+	m_micro_energy = 0.;
 	m_energy_diff = 0.;
 	m_Ka.zero();
 }
@@ -243,9 +245,9 @@ void FEMicroMaterial::FindBoundaryNodes()
 					{
 					FENode& node = m.Node(fn[k]);
 						
-						if (fabs(node.m_r0.x) == m_bb_x) m_BN[fn[k]] = 1;
-						if (fabs(node.m_r0.y) == m_bb_y) m_BN[fn[k]] = 1;
-						if (fabs(node.m_r0.z) == m_bb_z) m_BN[fn[k]] = 1;
+					if (fabs(node.m_r0.x) >= 0.999*m_bb_x) m_BN[fn[k]] = 1;
+					if (fabs(node.m_r0.y) >= 0.999*m_bb_y) m_BN[fn[k]] = 1;
+					if (fabs(node.m_r0.z) >= 0.999*m_bb_z) m_BN[fn[k]] = 1;
 					}
 				}
 			}
@@ -405,7 +407,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
 	mat3d F = pt.m_F;
-
+	
 	// Create a local copy of the rve
 	FEModel rve;
 	rve.CopyFrom(m_rve);
@@ -420,12 +422,27 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	// solve the RVE
 	bool bret = rve.Solve();
 
+	// make sure it converged
+	if (bret == false) throw FEMultiScaleException();
+
+	// calculate the averaged stress
+	mat3ds sa = AveragedStress(rve, mp);
+	
+	mmpt.m_PK1_prev = mmpt.m_PK1;
+	mmpt.m_PK1 = AveragedStressPK1(rve, mp);
+	mmpt.m_S = AveragedStressPK2(rve, mp);
+
+	// calculate the averaged stiffness
+	mmpt.m_Ka = AveragedStiffness(rve, mp);
+
+	calc_energy_diff(rve, mp);	
+	
 	// set the plot file
 	FEBioPlotFile* pplt = new FEBioPlotFile(rve);
 	vector<int> item;
 	pplt->AddVariable("displacement", item);
 	pplt->AddVariable("stress", item);
-	
+
 	if (m_bperiodic)
 	{
 		pplt->AddVariable("contact gap", item);
@@ -437,19 +454,6 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	pplt->Write(rve);
 	pplt->Close();
 
-	// make sure it converged
-	if (bret == false) throw FEMultiScaleException();
-
-	// calculate the averaged stress
-	mat3ds sa = AveragedStress(rve, mp);
-	mmpt.m_PK1 = AveragedStressPK1(rve, mp);
-	mmpt.m_S = AveragedStressPK2(rve, mp);
-
-	// calculate the averaged stiffness
-	mmpt.m_Ka = AveragedStiffness(rve, mp);
-
-	calc_energy_diff(rve, mp, sa);
-	
 	return sa;
 }
 
@@ -660,7 +664,7 @@ tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the energy difference between the RVE problem and the macro material point
-void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3ds& sa)
+void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 {
 	double energy_diff = 0.;
 	
@@ -685,12 +689,19 @@ void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3ds
 	
 	// calculate the energy difference between macro point and RVE
 	// to verify that we have satisfied the Hill-Mandel condition
-	double macro_energy = sa.dotdot(mmpt.m_e);
+	mat3ds e_prev = ((mat3dd(1) - pt.m_F_prev.transinv()*pt.m_F_prev.inverse())*0.5).sym();
+	mmpt.m_macro_energy += pt.m_s.dotdot(mmpt.m_e - e_prev);
 	
 	double rve_energy_avg = 0.;
+	double J = 0.;
 	int nint; 
 	double* w;
 	double v = 0.;
+	mat3d rve_F;		
+	mat3d rve_F_prev;
+	mat3ds rve_e;
+	mat3ds rve_e_prev;
+	mat3ds rve_s;
 
 	FEMesh& m = rve.GetMesh();
 	for (int k=0; k<m.Domains(); ++k)
@@ -705,17 +716,22 @@ void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp, mat3ds
 			for (int n=0; n<nint; ++n)
 			{
 				FEElasticMaterialPoint& rve_pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
-				mat3d rve_F = rve_pt.m_F;			
-				mat3ds rve_e = ((mat3dd(1) - rve_F.transinv()*rve_F.inverse())*0.5).sym();
-				mat3ds rve_s = rve_pt.m_s;
-				rve_energy_avg += rve_s.dotdot(rve_e)*rve_pt.m_J*w[n];
-				v += rve_pt.m_J*w[n];
+				
+				rve_F = rve_pt.m_F;
+				rve_e = ((mat3dd(1) - rve_F.transinv()*rve_F.inverse())*0.5).sym();
+				rve_s = rve_pt.m_s;
+				rve_F_prev = rve_pt.m_F_prev;
+				rve_e_prev = ((mat3dd(1) - rve_F_prev.transinv()*rve_F_prev.inverse())*0.5).sym();
+				
+				J = dom.detJt(el, n);
+				rve_energy_avg += rve_s.dotdot(rve_e - rve_e_prev)*J*w[n];
+				v += J*w[n];
 			}
 		}
 	}
 
-	rve_energy_avg /= v;
-	mmpt.m_energy_diff = fabs(macro_energy - rve_energy_avg);
+	mmpt.m_micro_energy += rve_energy_avg/v;
+	mmpt.m_energy_diff = fabs(mmpt.m_macro_energy - mmpt.m_micro_energy);
 }
 
 //-----------------------------------------------------------------------------
@@ -725,7 +741,7 @@ mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	mat3d F = pt.m_F;
 	double J = pt.m_J;
-
+	
 	// get the RVE mesh
 	FEMesh& m = rve.GetMesh();
 
