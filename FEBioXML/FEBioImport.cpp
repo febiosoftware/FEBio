@@ -482,7 +482,7 @@ FEAnalysis* FEFEBioImport::CreateNewStep()
 	case FE_POROSOLUTE    : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "biphasic-solute", m_pfem); break;
 	case FE_MULTIPHASIC   : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "multiphasic"    , m_pfem); break;
 	case FE_HEAT          : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "heat transfer"  , m_pfem); break;
-//	case FE_HEAT_SOLID    : pstep = new FEThermoElasticAnalysis (*m_pfem); break;
+	case FE_THERMO_ELASTIC: pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "thermo-elastic" , m_pfem); break;
 	default:
 		assert(false);
 	}

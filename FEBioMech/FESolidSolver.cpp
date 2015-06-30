@@ -955,6 +955,13 @@ void FESolidSolver::PrepStep(double time)
 					if (I>=0 && I<neq) 
 						ui[I] = dq - (node.m_rt.z - node.m_r0.z); 
 					break;
+					// ----> TODO: move to the FEThermoElasticSolver
+					//             Even better: let the FEPrescribedBC handle these cases.
+				case DOF_T:
+					I = -node.m_ID[bc]-2;
+					if (I>=0 && I<neq) 
+						ui[I] = dq - node.m_T; 
+					break;
 					// ---> TODO: move to the FEPoroSolidSolver
 				case DOF_P: 
 					I = -node.m_ID[bc]-2;

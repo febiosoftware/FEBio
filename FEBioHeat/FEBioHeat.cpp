@@ -10,6 +10,11 @@
 #include "FEHeatDomainFactory.h"
 #include "FEHeatSource.h"
 #include "FEBioHeatData.h"
+#include "FEThermoElasticAnalysis.h"
+#include "FEThermoElasticSolver.h"
+#include "FEThermoElasticMaterial.h"
+#include "FEThermoNeoHookean.h"
+#include "FEThermalConductivity.h"
 
 namespace FEBioHeat {
 
@@ -22,12 +27,17 @@ void InitModule()
 
 	// Analysis
 	REGISTER_FECORE_CLASS(FEHeatTransferAnalysis, FEANALYSIS_ID, "heat transfer");
+	REGISTER_FECORE_CLASS(FEThermoElasticAnalysis, FEANALYSIS_ID, "thermo-elastic");
 
 	// Solvers
-	REGISTER_FECORE_CLASS(FEHeatSolver, FESOLVER_ID, "heat transfer");
+	REGISTER_FECORE_CLASS(FEHeatSolver         , FESOLVER_ID, "heat transfer" );
+	REGISTER_FECORE_CLASS(FEThermoElasticSolver, FESOLVER_ID, "thermo-elastic");
 
 	// Materials
-	REGISTER_FECORE_CLASS(FEIsotropicFourier, FEMATERIAL_ID, "isotropic Fourier");
+	REGISTER_FECORE_CLASS(FEIsotropicFourier     , FEMATERIAL_ID, "isotropic Fourier");
+	REGISTER_FECORE_CLASS(FEThermoElasticMaterial, FEMATERIAL_ID, "thermo-elastic"   );
+	REGISTER_FECORE_CLASS(FEThermoNeoHookean     , FEMATERIAL_ID, "thermo-neo-Hookean");
+	REGISTER_FECORE_CLASS(FEConstReferenceThermalConductivity, FEMATERIAL_ID, "cond-ref-iso");
 
 	// Body loads
 	REGISTER_FECORE_CLASS(FEHeatSource, FEBODYLOAD_ID, "heat_source");

@@ -152,7 +152,8 @@ enum FE_Step_Type {
 	FE_LINEAR_SOLID,
 	FE_HEAT_SOLID,
 	FE_EXPLICIT_SOLID,
-	FE_CG_SOLID
+	FE_CG_SOLID,
+	FE_THERMO_ELASTIC
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -236,5 +237,6 @@ enum FE_Output_Level {
 #define FE_LINEAR_SOLID_DOMAIN		14
 #define FE_TRIPHASIC_DOMAIN			15
 #define FE_MULTIPHASIC_DOMAIN		16
+#define FE_THERMOELASTIC_DOMAIN		17
 
 #endif // _FE_ENUM_H_05132007_

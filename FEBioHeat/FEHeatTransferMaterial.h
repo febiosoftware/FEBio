@@ -6,6 +6,12 @@
 class FEHeatMaterialPoint : public FEMaterialPoint
 {
 public:
+	FEHeatMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoint(mp)
+	{
+		m_T = m_T0 = 0.0;
+		m_q = vec3d(0,0,0);
+	}
+
 	FEMaterialPoint* Copy()
 	{
 		FEHeatMaterialPoint* pt = new FEHeatMaterialPoint(*this);
@@ -30,6 +36,8 @@ public:
 	}
 
 public:
+	double	m_T;	//!< current temperature
+	double	m_T0;	//!< reference temperature
 	vec3d	m_q;	//!< heat flux
 };
 
@@ -42,7 +50,7 @@ public:
 	FEHeatTransferMaterial(FEModel* pfem) : FEMaterial(pfem) {}
 
 	//! create material point data
-	FEMaterialPoint* CreateMaterialPointData() { return new FEHeatMaterialPoint; }
+	FEMaterialPoint* CreateMaterialPointData() { return new FEHeatMaterialPoint(0); }
 
 	//! get the material's conductivity
 	virtual void Conductivity(double D[3][3]) = 0;

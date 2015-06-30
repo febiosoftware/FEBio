@@ -19,6 +19,7 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 	else if (strcmp(szt, "solute"        ) == 0) m_pim->m_nstep_type = FE_POROSOLUTE;	// obsolete in 2.0
 	else if (strcmp(szt, "multiphasic"   ) == 0) m_pim->m_nstep_type = FE_MULTIPHASIC;
 	else if (strcmp(szt, "heat"          ) == 0) m_pim->m_nstep_type = FE_HEAT;
-	else if (strcmp(szt, "heat-solid"    ) == 0) m_pim->m_nstep_type = FE_HEAT_SOLID;
+//	else if (strcmp(szt, "heat-solid"    ) == 0) m_pim->m_nstep_type = FE_HEAT_SOLID;
+	else if (strcmp(szt, "thermo-elastic") == 0) m_pim->m_nstep_type = FE_THERMO_ELASTIC;
 	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 }

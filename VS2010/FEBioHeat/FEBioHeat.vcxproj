@@ -412,6 +412,13 @@
     <ClInclude Include="..\..\FEBioHeat\FEIsotropicFourier.h" />
     <ClInclude Include="..\..\FEBioHeat\FEPlotHeatFlux.h" />
     <ClInclude Include="..\..\FEBioHeat\FEPlotNodeTemperature.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEThermalConductivity.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEThermalElastic.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEThermoElasticAnalysis.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEThermoElasticMaterial.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEThermoElasticSolidDomain.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEThermoElasticSolver.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEThermoNeoHookean.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioHeat\FEBioHeat.cpp" />
@@ -428,6 +435,12 @@
     <ClCompile Include="..\..\FEBioHeat\FEIsotropicFourier.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEPlotHeatFlux.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEPlotNodeTemperature.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEThermalConductivity.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEThermoElasticAnalysis.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEThermoElasticMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEThermoElasticSolidDomain.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEThermoElasticSolver.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEThermoNeoHookean.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
