@@ -78,7 +78,7 @@ tens4ds FEThermoNeoHookean::Tangent(FEMaterialPoint& mp)
 	tens4ds IxI = dyad1s(I);
 	tens4ds I4  = dyad4s(I);
 
-	tens4ds c = I4*(2.0*(mu - k*lnJ)/J) + IxI*(k/J) - (IxI - I4*2.0)*(3.0*m_a0*m_k*Jg*(T - T0));
+	tens4ds c = I4*(2.0*(mu - k*lnJ)/J) + IxI*(k/J) - (IxI*m_gamma - I4*2.0)*(3.0*m_a0*m_k*Jg*(T - T0));
 
 	return c;
 }
