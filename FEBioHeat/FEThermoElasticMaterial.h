@@ -35,6 +35,9 @@ public:
 	//! calculate the spatial thermal tangent (derivative of stress w.r.t. temperature)
 	mat3ds ThermalTangent(FEMaterialPoint& pt);
 
+	//! calculate the conductivity gradient
+	tens4ds ConductivityGradient(FEMaterialPoint& pt);
+
 	//! Serialization
 	void Serialize(DumpFile& ar);
 

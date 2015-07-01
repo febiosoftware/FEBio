@@ -101,6 +101,12 @@ mat3ds FEThermoElasticMaterial::ThermalTangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
+tens4ds FEThermoElasticMaterial::ConductivityGradient(FEMaterialPoint& mp)
+{
+	return m_pCond->Tangent_Conductivity_Strain(mp);
+}
+
+//-----------------------------------------------------------------------------
 //! serialization
 void FEThermoElasticMaterial::Serialize(DumpFile &ar)
 {

@@ -44,3 +44,30 @@ public:
 
 	DECLARE_PARAMETER_LIST();
 };
+
+//-----------------------------------------------------------------------------
+//! This class implements a conductivity tensor which is contant in the current configuration
+class FEConstThermalConductivity : public FEThermalConductivity
+{
+public:
+	FEConstThermalConductivity(FEModel* pfem);
+
+	// initialization
+	void Init();
+
+public:
+	// evaluate conductivity
+	mat3ds Conductivity(FEMaterialPoint& mp);
+
+	// evaluate the derivative of the conductivity with respect to C
+	tens4ds Tangent_Conductivity_Strain(FEMaterialPoint& mp);
+
+	// evaluate the derivative of the conductivity with respect to temperature
+	mat3ds Tangent_Conductivity_Temperature(FEMaterialPoint& mp);
+
+public:
+	double	m_k0;	//!< reference thermal conductivity
+	double	m_wt;	//!< thermal relaxation parameter
+
+	DECLARE_PARAMETER_LIST();
+};

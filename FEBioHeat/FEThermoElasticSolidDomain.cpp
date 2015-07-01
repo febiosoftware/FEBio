@@ -730,10 +730,91 @@ void FEThermoElasticSolidDomain::ElementThermalStiffness(FESolidElement &el, mat
 }
 
 //-----------------------------------------------------------------------------
+// implements the weird product.
+vec3d weird_product(double Ga[3], double Gb[3], double GT[3], const tens4ds& t)
+{
+	vec3d r(0,0,0);
+
+	for (int i=0; i<3; ++i)
+		for (int j=0; j<3; ++j)
+			for (int k=0; k<3; ++k)
+			{
+				double G3 = Ga[i]*GT[j]*Gb[k];
+				r.x += G3*t(i,j,k,0);
+				r.y += G3*t(i,j,k,1);
+				r.z += G3*t(i,j,k,2);
+			}
+
+	return r;
+}
+
+//-----------------------------------------------------------------------------
 //! Conductivity gradient stiffness (i.e. derivative of conductivity wrt strain
 void FEThermoElasticSolidDomain::ElementGradientStiffness(FESolidElement &el, matrix& ke)
 {
-	// TODO: implement this
+	// global derivatives of shape functions
+	// Gx = dH/dx
+	const int EN = FEElement::MAX_NODES;
+	vec3d G[EN];
+
+	// jacobian
+	double Ji[3][3];
+
+	// weights at gauss points
+	const double *gw = el.GaussWeights();
+
+	// current nodal temperatures
+	FEMesh& mesh = *GetMesh();
+	double T[EN];
+	const int ne = el.Nodes();
+	for (int i=0; i<ne; ++i) T[i] = mesh.Node(el.m_node[i]).m_T;
+
+	// loop over all integration points
+	const int ni = el.GaussPoints();
+	for (int n=0; n<ni; ++n)
+	{
+		// calculate jacobian
+		double detJt = invjact(el, Ji, n);
+
+		// evaluate the conductivity gradient
+		// (i.e. the derivative of the conductivity with respect with to strain)
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		tens4ds D = m_pMat->ConductivityGradient(mp);
+
+		// calculate the spatial gradients of the shape functions
+		for (int i=0; i<ne; ++i)
+		{
+			double Gr = el.Gr(n)[i];
+			double Gs = el.Gs(n)[i];
+			double Gt = el.Gt(n)[i];
+
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			G[i].x = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
+			G[i].y = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
+			G[i].z = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
+		}
+
+		// evaluate the gradient at the integration point
+		vec3d Tgrad = gradient(el, T, n);
+		double GT[3] = {Tgrad.x, Tgrad.y, Tgrad.z};
+
+		// loop over temperature dofs
+		for (int i=0; i<ne; ++i)
+		{
+			double Ga[3] = {G[i].x, G[i].y, G[i].z};
+			// loop over displacement dofs
+			for (int j=0; j<ne; ++j)
+			{
+				double Gb[3] = {G[j].x, G[j].y, G[j].z};
+
+				vec3d r = weird_product(Ga, Gb, GT, D);
+				ke[i][3*j  ] += detJt*gw[n]*r.x;
+				ke[i][3*j+1] += detJt*gw[n]*r.y;
+				ke[i][3*j+2] += detJt*gw[n]*r.z;
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

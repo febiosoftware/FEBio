@@ -38,6 +38,7 @@ void InitModule()
 	REGISTER_FECORE_CLASS(FEThermoElasticMaterial, FEMATERIAL_ID, "thermo-elastic"   );
 	REGISTER_FECORE_CLASS(FEThermoNeoHookean     , FEMATERIAL_ID, "thermo-neo-Hookean");
 	REGISTER_FECORE_CLASS(FEConstReferenceThermalConductivity, FEMATERIAL_ID, "cond-ref-iso");
+	REGISTER_FECORE_CLASS(FEConstThermalConductivity         , FEMATERIAL_ID, "cond-const"  );
 
 	// Body loads
 	REGISTER_FECORE_CLASS(FEHeatSource, FEBODYLOAD_ID, "heat_source");
