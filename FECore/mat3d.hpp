@@ -393,9 +393,9 @@ inline double mat3ds::norm()
 }
 
 // double contraction
-inline double mat3ds::dotdot(mat3ds& B)
+inline double mat3ds::dotdot(const mat3ds& B)
 {
-	double* n = B.m;
+	const double* n = B.m;
 	return m[XX]*n[XX] + m[YY]*n[YY] + m[ZZ]*n[ZZ] + 2.0*(m[XY]*n[XY] + m[YZ]*n[YZ] + m[XZ]*n[XZ]);
 }
 

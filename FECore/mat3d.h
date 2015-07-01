@@ -195,7 +195,7 @@ public:
 	double norm();
 
 	// double contraction
-	double dotdot(mat3ds& S);
+	double dotdot(const mat3ds& S);
 
 protected:
 	double m[6];	// stores data in the order xx, xy, yy, xz, yz, zz
