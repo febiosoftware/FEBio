@@ -1,5 +1,5 @@
 #pragma once
-#include <FEBioMech\FEElasticMaterial.h>
+#include <FEBioMech/FEElasticMaterial.h>
 
 //-----------------------------------------------------------------------------
 //! This class is the base class of elastic materials that are used in a thermo-elastic

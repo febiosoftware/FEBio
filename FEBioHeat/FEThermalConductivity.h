@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore\FEMaterial.h>
+#include <FECore/FEMaterial.h>
 
 //-----------------------------------------------------------------------------
 //! This class implements the thermal conductivity material property.

@@ -1,9 +1,9 @@
 #include "FEThermoElasticSolver.h"
 #include "FEBioMech/FEResidualVector.h"
-#include <FEBioMech\FEElasticDomain.h>
+#include <FEBioMech/FEElasticDomain.h>
 #include "FEThermoElasticSolidDomain.h"
-#include <FECore\FERigidBody.h>
-#include <FECore\log.h>
+#include <FECore/FERigidBody.h>
+#include <FECore/log.h>
 
 #ifdef WIN32
 	#include <float.h>

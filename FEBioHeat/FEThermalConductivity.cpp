@@ -1,5 +1,5 @@
 #include "FEThermalConductivity.h"
-#include <FEBioMech\FEElasticMaterial.h>
+#include <FEBioMech/FEElasticMaterial.h>
 #include "FEHeatTransferMaterial.h"
 
 //-----------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #pragma once
-#include <FEBioMech\FEElasticMaterial.h>
+#include <FEBioMech/FEElasticMaterial.h>
 #include "FEHeatTransferMaterial.h"
 #include "FEThermalElastic.h"
 #include "FEThermalConductivity.h"

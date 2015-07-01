@@ -1,5 +1,5 @@
 #pragma once
-#include <FEBioMech\FESolidSolver.h>
+#include <FEBioMech/FESolidSolver.h>
 
 //-----------------------------------------------------------------------------
 // This class implements a solver for non-linear, thermo-elastic problems

@@ -1,6 +1,6 @@
 #pragma once
-#include <FECore\FESolidDomain.h>
-#include <FEBioMech\FEElasticDomain.h>
+#include <FECore/FESolidDomain.h>
+#include <FEBioMech/FEElasticDomain.h>
 #include "FEThermoElasticMaterial.h"
 
 //-----------------------------------------------------------------------------

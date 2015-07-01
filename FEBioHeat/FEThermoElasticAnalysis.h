@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore\FEAnalysis.h>
+#include <FECore/FEAnalysis.h>
 using namespace FECore;
 
 //-----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 #include "FEThermoElasticSolidDomain.h"
 #include "FECore/FEMesh.h"
-#include <FEBioMech\FEElasticMaterial.h>
+#include <FEBioMech/FEElasticMaterial.h>
 #include "FEHeatTransferMaterial.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
