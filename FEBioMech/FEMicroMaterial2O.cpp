@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "FEMicroMaterial2O.h"
-#include "FECore/FEElemElemlist.h"
+#include "FECore/FEElemElemList.h"
 #include "FECore/log.h"
 #include "FESolidSolver.h"
 #include "FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
-#include "FEBioXMl/FEBioImport.h"
+#include "FEBioXML/FEBioImport.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FECore/tens3d.h"
 #include <sstream>
