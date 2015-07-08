@@ -203,10 +203,15 @@ void FEElasticDomain2O::UpdateElementStress(int iel, double dt)
 		int plot_on = 0;
 		int num_elem = Elements();
 
-		if ((el.m_nID == 1 || el.m_nID == num_elem) && (n == nint-1))
-			plot_on = el.m_nID;
+		// If it is a multi-element problem, plot for the last integration point in the first and last element
+		if ((el.m_nID == 1 || el.m_nID == num_elem) && (n == nint-1)){
+			plot_on = el.m_nID;}
+		
+		// If it is a single-element problem, plot for each intergration point of the element
+		if (num_elem == 1){
+			plot_on = num_elem;}
 
-		pmat->Stress2O(mp, plot_on);
+		pmat->Stress2O(mp, plot_on, n+1);
 
 	}
 }

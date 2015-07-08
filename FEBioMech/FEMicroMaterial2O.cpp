@@ -403,9 +403,13 @@ void FEMicroMaterial2O::UpdateBC(FEModel& rve, mat3d& F, tens3drs& G)
 		{
 			FEPeriodicBoundary2O* pc = dynamic_cast<FEPeriodicBoundary2O*>(rve.SurfacePairInteraction(i));
 			assert(pc);
-
 			pc->m_Fmacro = F;
 			pc->m_Gmacro = G;
+
+			FE2OMicroConstraint* pmc = dynamic_cast<FE2OMicroConstraint*>(rve.NonlinearConstraint(i));
+			assert(pmc);
+			pmc->m_s.m_Fm = F;
+			pmc->m_s.m_Gm = G;
 		}
 	}
 }
@@ -537,7 +541,7 @@ void  FEMicroMaterial2O::Tangent2O(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, 
 }
 
 //-----------------------------------------------------------------------------
-void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on)
+void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 {
 	// get the deformation gradient
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -606,7 +610,7 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on)
 		}
 
 		stringstream ss;
-		ss << "rve_elem_" << plot_on << ".xplt";
+		ss << "rve_elem_" << plot_on << "_ipt_" << int_pt << ".xplt";
 		string plot_name = ss.str();
 		pplt->Open(rve, plot_name.c_str());
 		pplt->Write(rve);

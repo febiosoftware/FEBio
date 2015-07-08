@@ -7,6 +7,7 @@
 #include "FECore/tens4d.h"
 #include "FECore/tens5d.h"
 #include "FECore/tens6d.h"
+#include "FEBioMech/FE2OMicroConstraint.h"
 
 //-----------------------------------------------------------------------------
 //! Material point class for the micro-material
@@ -86,7 +87,7 @@ protected:
 public:
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
-	void Stress2O(FEMaterialPoint &mp, int plot_on);
+	void Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt);
 
 	//! calculate tangent stiffness at material point
 	tens4ds Tangent(FEMaterialPoint& pt);
