@@ -30,6 +30,7 @@ public:
 	virtual bool Augment(int naug, const FETimePoint& tp) = 0;
 	virtual void Serialize(DumpFile& ar) = 0;
 	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
+	virtual void CopyFrom(FENLConstraint* plc) {}
 
 	// update state
 	virtual void Reset() {}

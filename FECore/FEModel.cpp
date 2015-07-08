@@ -1137,11 +1137,34 @@ void FEModel::CopyFrom(FEModel& fem)
 		m_mesh.AddSurface(pnew->GetSlaveSurface ());
 	}
 
+	// --- nonlinear constraints ---
+	int NLC = fem.NonlinearConstraints();
+	for (int i=0; i<NLC; ++i)
+	{
+		// get the next constraint
+		FENLConstraint* plc = fem.NonlinearConstraint(i);
+		const char* sztype = plc->GetTypeStr();
+
+		// create a new nonlinear constraint
+		FENLConstraint* plc_new = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, this);
+		assert(plc_new);
+
+		// create a copy
+		plc_new->CopyFrom(plc);
+
+		// add the nonlinear constraint
+		AddNonlinearConstraint(plc_new);
+
+		// add the surface to the mesh (if any)
+		FESurface* ps = plc_new->GetSurface(0);
+		if (ps) m_mesh.AddSurface(ps);
+	}
+
 	// --- Load curves ---
 
 	// copy load curves
-	int NLC = fem.LoadCurves();
-	for (int i=0; i<NLC; ++i)
+	int NLD = fem.LoadCurves();
+	for (int i=0; i<NLD; ++i)
 	{
 		FELoadCurve* plc = new FELoadCurve(*fem.m_LC[i]);
 		m_LC.push_back(plc);

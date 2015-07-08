@@ -86,6 +86,30 @@ FEVolumeConstraint::FEVolumeConstraint(FEModel* pfem) : FENLConstraint(pfem), m_
 }
 
 //-----------------------------------------------------------------------------
+void FEVolumeConstraint::CopyFrom(FENLConstraint* plc)
+{
+	// cast to a periodic boundary
+	FEVolumeConstraint& vc = dynamic_cast<FEVolumeConstraint&>(*plc);
+
+	// copy parameters
+	GetParameterList() = vc.GetParameterList();
+
+	// copy nodes
+	m_s.m_node = vc.m_s.m_node;
+
+	// create elements
+	int NE = vc.m_s.Elements();
+	m_s.create(NE);
+	for (int i=0; i<NE; ++i) m_s.Element(i) = vc.m_s.Element(i);
+
+	// copy surface data
+	m_s.m_Lp = vc.m_s.m_Lp;
+	m_s.m_p  = vc.m_s.m_p;
+	m_s.m_V0 = vc.m_s.m_V0;
+	m_s.m_Vt = vc.m_s.m_Vt;
+}
+
+//-----------------------------------------------------------------------------
 //! Returns the surface
 FESurface* FEVolumeConstraint::GetSurface(const char* sz)
 {

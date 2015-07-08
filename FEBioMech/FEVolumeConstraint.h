@@ -37,6 +37,7 @@ public:
 	bool Augment(int naug, const FETimePoint& tp);
 	void Serialize(DumpFile& ar);
 	void ShallowCopy(DumpStream& dmp, bool bsave);
+	void CopyFrom(FENLConstraint* plc);
 
 	// update state
 	void Reset();
