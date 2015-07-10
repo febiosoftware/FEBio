@@ -406,11 +406,11 @@ void FEMicroMaterial2O::UpdateBC(FEModel& rve, mat3d& F, tens3drs& G)
 			pc->m_Fmacro = F;
 			pc->m_Gmacro = G;
 
-			FE2OMicroConstraint* pmc = dynamic_cast<FE2OMicroConstraint*>(rve.NonlinearConstraint(i));
+/*			FE2OMicroConstraint* pmc = dynamic_cast<FE2OMicroConstraint*>(rve.NonlinearConstraint(i));
 			assert(pmc);
 			pmc->m_s.m_Fm = F;
 			pmc->m_s.m_Gm = G;
-		}
+*/		}
 	}
 }
 

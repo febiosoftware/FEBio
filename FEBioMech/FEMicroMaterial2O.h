@@ -7,7 +7,7 @@
 #include "FECore/tens4d.h"
 #include "FECore/tens5d.h"
 #include "FECore/tens6d.h"
-#include "FEBioMech/FE2OMicroConstraint.h"
+//#include "FEBioMech/FE2OMicroConstraint.h"
 
 //-----------------------------------------------------------------------------
 //! Material point class for the micro-material
