@@ -23,7 +23,8 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 void FECoupledTransIsoMooneyRivlin::Init()
 {
-	if (m_c1 <= 0) throw MaterialError("c1 must be positive");
+	if (m_c1   <= 0 ) throw MaterialError("c1 must be positive");
+	if (m_flam < 1.0) throw MaterialError("lambda must be larger than 1.0");
 	FEElasticMaterial::Init();
 }
 
