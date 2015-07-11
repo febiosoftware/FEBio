@@ -17,6 +17,7 @@
 #include "FEVolumeConstraint.h"
 #include "FEMicroMaterial.h"
 #include "FEMicroMaterial2O.h"
+#include "FEFacet2FacetSliding.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -269,6 +270,33 @@ bool FEPlotContactArea::Save(FESurface &surf, vector<float>& a)
 		for (int k=0; k<ne; ++k) a[MFN*i + k] = (float) area;
 	}
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot contact penalty parameter
+bool FEPlotContactPenalty::Save(FESurface& surf, vector<float>& a)
+{
+	FEFacetSlidingSurface* ps = dynamic_cast<FEFacetSlidingSurface*>(&surf);
+	if (ps)
+	{
+		int NF = ps->Elements();
+		for (int i=0; i<NF; ++i)
+		{
+			FESurfaceElement& el = ps->Element(i);
+			int ni = el.GaussPoints();
+			double p = 0.0;
+			for (int n=0; n<ni; ++n)
+			{
+				FEFacetSlidingSurface::Data& pt = ps->m_Data[i][n];
+				p += pt.m_eps;
+			}
+			if (ni > 0) p /= (double) ni;
+
+			a.push_back((float) p);
+		}
+		return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------

@@ -124,6 +124,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Contact penalty parameter
+class FEPlotContactPenalty : public FESurfaceData
+{
+public:
+	FEPlotContactPenalty(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FESurface& surf, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Pressure from volume constraint
 //!
 class FEPlotVolumePressure : public FESurfaceData

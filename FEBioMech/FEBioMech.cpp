@@ -379,6 +379,7 @@ REGISTER_FECORE_CLASS(FEPlotContactPressure		 , FEPLOTDATA_ID, "contact pressure
 REGISTER_FECORE_CLASS(FEPlotContactTraction		 , FEPLOTDATA_ID, "contact traction"      );
 REGISTER_FECORE_CLASS(FEPlotContactForce 		 , FEPLOTDATA_ID, "contact force"         );
 REGISTER_FECORE_CLASS(FEPlotContactArea 		 , FEPLOTDATA_ID, "contact area"          );
+REGISTER_FECORE_CLASS(FEPlotContactPenalty 		 , FEPLOTDATA_ID, "contact penalty"       );
 REGISTER_FECORE_CLASS(FEPlotSPRStresses          , FEPLOTDATA_ID, "SPR stress"            );
 REGISTER_FECORE_CLASS(FEPlotSPRPrincStresses     , FEPLOTDATA_ID, "SPR principal stress"  );
 REGISTER_FECORE_CLASS(FEPlotSPRTestLinear		 , FEPLOTDATA_ID, "SPR test linear"       );
