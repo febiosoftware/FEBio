@@ -38,7 +38,7 @@ public:
 class DataRecord
 {
 public:
-	enum {MAX_DELIM=16, MAX_STRING=128};
+	enum {MAX_DELIM=16, MAX_STRING=1024};
 public:
 	DataRecord(FEModel* pfem, const char* szfile);
 	virtual ~DataRecord();

@@ -175,7 +175,6 @@ void FERigidBody::UpdateCOM()
 
 					// number of nodes
 					int neln = el.Nodes();
-					assert(neln <= 8);
 
 					// initial coordinates
 					for (int i=0; i<neln; ++i) r0[i] = pbd->GetMesh()->Node(el.m_node[i]).m_r0;
