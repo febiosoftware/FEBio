@@ -106,19 +106,9 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		fprintf(stderr, "FATAL ERROR: there is nothing to optimize.\n\n");
 		return false;
 	}
-	catch (XMLReader::InvalidTag e)
+	catch (XMLReader::Error& e)
 	{
-		fprintf(stderr, "FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
-		return false;
-	}
-	catch (XMLReader::InvalidValue e)
-	{
-		fprintf(stderr, "FATAL ERROR: The element %s has an invalid value (%s).\n\n", e.tag.Name(), e.tag.szvalue());
-		return false;
-	}
-	catch (XMLReader::InvalidAttributeValue e)
-	{
-		fprintf(stderr, "FATAL ERROR: Invalid attribute value (line %d)\n", e.tag.m_nstart_line);
+		fprintf(stderr, "FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 		return false;
 	}
 	catch (...)

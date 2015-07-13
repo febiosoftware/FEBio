@@ -40,7 +40,6 @@ FEMaterial* FEBioMaterialSection::CreateMaterial(XMLTag& tag)
 
 //-----------------------------------------------------------------------------
 //! Parse the Materials section. 
-//! \todo I should probably check that all tags are material tags.
 void FEBioMaterialSection::Parse(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
@@ -54,18 +53,29 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 	++tag;
 	do
 	{
-		// create a material from this tag
-		FEMaterial* pmat = CreateMaterial(tag); assert(pmat);
+		if (tag == "material")
+		{
+			// create a material from this tag
+			FEMaterial* pmat = CreateMaterial(tag); assert(pmat);
 
-		// add the material
-		fem.AddMaterial(pmat);
-		++m_nmat;
+			// check that the ID attribute is defined and that it 
+			// equals the number of materials + 1.
+			int nid = -1;
+			tag.AttributeValue("id", nid);
+			int nmat = fem.Materials();
+			if (nid != nmat+1) throw XMLReader::InvalidAttributeValue(tag, "id");
 
-		// set the material's ID
-		pmat->SetID(m_nmat);
+			// add the material
+			fem.AddMaterial(pmat);
+			++m_nmat;
 
-		// parse the material parameters
-		ParseMaterial(tag, pmat);
+			// set the material's ID
+			pmat->SetID(m_nmat);
+
+			// parse the material parameters
+			ParseMaterial(tag, pmat);
+		}
+		else throw XMLReader::InvalidTag(tag);
 
 		// read next tag
 		++tag;

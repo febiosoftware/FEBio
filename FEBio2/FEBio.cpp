@@ -646,39 +646,9 @@ bool Configure(FEBioModel& fem, const char *szfile)
 			return false;
 		}
 	}
-	catch (XMLReader::XMLSyntaxError)
+	catch (XMLReader::Error& e)
 	{
-		felog.printf("FATAL ERROR: Syntax error (line %d)\n", xml.GetCurrentLine());
-		return false;
-	}
-	catch (XMLReader::InvalidTag e)
-	{
-		felog.printf("FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
-		return false;
-	}
-	catch (XMLReader::InvalidAttributeValue e)
-	{
-		const char* szt = e.tag.m_sztag;
-		const char* sza = e.szatt;
-		const char* szv = e.szval;
-		int l = e.tag.m_nstart_line;
-		felog.printf("FATAL ERROR: unrecognized value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
-		return false;
-	}
-	catch (XMLReader::InvalidValue e)
-	{
-		felog.printf("FATAL ERROR: the value for tag \"%s\" is invalid (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
-		return false;
-	}
-	catch (XMLReader::MissingAttribute e)
-	{
-		felog.printf("FATAL ERROR: Missing attribute \"%s\" of tag \"%s\" (line %d)\n", e.szatt, e.tag.m_sztag, e.tag.m_nstart_line);
-		return false;
-	}
-	catch (XMLReader::UnmatchedEndTag e)
-	{
-		const char* sz = e.tag.m_szroot[e.tag.m_nlevel];
-		felog.printf("FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
+		felog.printf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 		return false;
 	}
 	catch (...)

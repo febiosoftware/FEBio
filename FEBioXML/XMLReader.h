@@ -126,50 +126,72 @@ public:
 	enum {MAX_TAG   = 128};
 
 public:
-	// exceptions -----------
-	class Error{};
-
-	class EndOfFile{};
-
-	class UnexpectedEOF{};
-
-	class XMLSyntaxError{};
-
-	class UnmatchedEndTag
+	// Base class for Exceptions
+	class Error
 	{
 	public:
-		XMLTag tag;
-		UnmatchedEndTag(XMLTag& t) : tag(t) {}
+		enum { MAX_ERROR_STRING = 128 };
+
+	public:
+		Error() { m_szerr[0] = 0; }
+		virtual ~Error(){}
+
+		// retrieve the error string
+		const char* GetErrorString() const { return m_szerr; }
+
+	protected:
+		// derived classes use this function to set the error string
+		void SetErrorString(const char* sz, ...);
+
+	protected:
+		char	m_szerr[MAX_ERROR_STRING];
 	};
 
-	class InvalidTag
+	// End of file was discovered 
+	class EndOfFile : public Error {};
+
+	// the end of file was detected unexpectedly.
+	class UnexpectedEOF : public Error {};
+
+	// A syntax error was found
+	class XMLSyntaxError : public Error
 	{
 	public:
-		XMLTag tag;
-		InvalidTag(XMLTag& t) : tag(t) {}
+		XMLSyntaxError();
 	};
 
-	class InvalidValue
+	// an end tag was not matched
+	class UnmatchedEndTag : public Error
 	{
 	public:
-		XMLTag tag;
-		InvalidValue(XMLTag& t) : tag(t) {}
+		UnmatchedEndTag(XMLTag& t);
 	};
 
-	class InvalidAttributeValue
+	// an unknown tag was encountered 
+	class InvalidTag : public Error
 	{
 	public:
-		XMLTag tag;
-		char szatt[MAX_TAG];
-		char szval[MAX_TAG];
+		InvalidTag(XMLTag& t);
+	};
+
+	// The value of a tag was invald 
+	class InvalidValue : public Error
+	{
+	public:
+		InvalidValue(XMLTag& t);
+	};
+
+	// the value of an attribute was invalid 
+	class InvalidAttributeValue : public Error
+	{
+	public:
 		InvalidAttributeValue(XMLTag& t, const char* sza, const char* szv = 0);
 	};
 
-	class MissingAttribute
+	// an attribute was missing
+	class MissingAttribute : public Error
 	{
 	public:
-		XMLTag tag;
-		char szatt[MAX_TAG];
 		MissingAttribute(XMLTag& t, const char* sza);
 	};
 	//------------------------

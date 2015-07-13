@@ -25,6 +25,11 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 			int nid;
 			tag.AttributeValue("id", nid);
 
+			// check that the ID is one more than the number of load curves defined
+			// This is to make sure that the ID's are in numerical order and no values are skipped.
+			int nlc = fem.LoadCurves();
+			if (nid != nlc+1) throw XMLReader::InvalidAttributeValue(tag, "id");
+
 			// default type and extend mode
 			FELoadCurve::INTFUNC ntype = FELoadCurve::LINEAR;
 			FELoadCurve::EXTMODE nextm = FELoadCurve::CONSTANT;

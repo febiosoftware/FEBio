@@ -68,34 +68,9 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 			++tag;
 		}
 	}
-	catch (XMLReader::XMLSyntaxError)
+	catch (XMLReader::Error& e)
 	{
-		fprintf(stderr, "FATAL ERROR: Syntax error (line %d)\n", m_xml.GetCurrentLine());
-		return false;
-	}
-	catch (XMLReader::InvalidTag e)
-	{
-		fprintf(stderr, "FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
-		return false;
-	}
-	catch (XMLReader::InvalidAttributeValue e)
-	{
-		const char* szt = e.tag.m_sztag;
-		const char* sza = e.szatt;
-		const char* szv = e.szval;
-		int l = e.tag.m_nstart_line;
-		fprintf(stderr, "FATAL ERROR: unrecognized value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
-		return false;
-	}
-	catch (XMLReader::MissingAttribute e)
-	{
-		fprintf(stderr, "FATAL ERROR: Missing attribute \"%s\" of tag \"%s\" (line %d)\n", e.szatt, e.tag.m_sztag, e.tag.m_nstart_line);
-		return false;
-	}
-	catch (XMLReader::UnmatchedEndTag e)
-	{
-		const char* sz = e.tag.m_szroot[e.tag.m_nlevel];
-		fprintf(stderr, "FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
+		fprintf(stderr, "FATAL ERROR: %s (line %d)\n", e.GetErrorString(), m_xml.GetCurrentLine());
 		return false;
 	}
 	catch (...)
