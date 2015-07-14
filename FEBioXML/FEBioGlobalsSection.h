@@ -6,7 +6,7 @@
 class FEBioGlobalsSection : public FEBioFileSection
 {
 public:
-	FEBioGlobalsSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioGlobalsSection(FEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse            (XMLTag& tag);
 
 protected:

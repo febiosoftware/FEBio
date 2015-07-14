@@ -164,7 +164,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		// get the material ID
 		const char* szmat = t.AttributeValue("mat");
 		int nmat = atoi(szmat)-1;
-		if ((nmat < 0) || (nmat >= fem.Materials())) throw FEFEBioImport::InvalidMaterial(elems+1);
+		if ((nmat < 0) || (nmat >= fem.Materials())) throw FEBioImport::InvalidMaterial(elems+1);
 
 		// get the element type
 		FE_Element_Shape etype = ElementShape(t);
@@ -214,11 +214,11 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		// then, find the domain type depending on the 
 		// element and material types
 		int ntype = DomainType(d.elem, pmat);
-		if (ntype == 0) throw FEFEBioImport::InvalidDomainType();
+		if (ntype == 0) throw FEBioImport::InvalidDomainType();
 
 		// create the new domain
 		FEDomain* pdom = CreateDomain(ntype, &mesh, pmat);
-		if (pdom == 0) throw FEFEBioImport::FailedCreatingDomain();
+		if (pdom == 0) throw FEBioImport::FailedCreatingDomain();
 
 
 		// add it to the mesh
@@ -326,7 +326,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 			}
 			break;
 		default:
-			throw FEFEBioImport::InvalidElementType();
+			throw FEBioImport::InvalidElementType();
 		}
 
 		// go to next tag
@@ -357,7 +357,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	// get the material ID
 	const char* szmat = tag.AttributeValue("mat");
 	int nmat = atoi(szmat)-1;
-	if ((nmat < 0) || (nmat >= fem.Materials())) throw FEFEBioImport::InvalidDomainMaterial(NDOM+1);
+	if ((nmat < 0) || (nmat >= fem.Materials())) throw FEBioImport::InvalidDomainMaterial();
 
 	// get the name
 	const char* szname = tag.AttributeValue("elset", true);
@@ -412,11 +412,11 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	// then, find the domain type depending on the 
 	// element and material types
 	int ndomtype = DomainType(etype, pmat);
-	if (ndomtype == 0) throw FEFEBioImport::InvalidDomainType();
+	if (ndomtype == 0) throw FEBioImport::InvalidDomainType();
 
 	// create the new domain
 	FEDomain* pdom = CreateDomain(ndomtype, &mesh, pmat);
-	if (pdom == 0) throw FEFEBioImport::FailedCreatingDomain();
+	if (pdom == 0) throw FEBioImport::FailedCreatingDomain();
 	FEDomain& dom = *pdom;
 	dom.SetName(szname);
 
@@ -516,7 +516,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 			}
 			break;
 		default:
-			throw FEFEBioImport::InvalidElementType();
+			throw FEBioImport::InvalidElementType();
 		}
 
 		// go to next tag
@@ -583,11 +583,11 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 		// then, find the domain type depending on the 
 		// element and material types
 		int ntype = DomainType(d.elem, 0);
-		if (ntype == 0) throw FEFEBioImport::InvalidDomainType();
+		if (ntype == 0) throw FEBioImport::InvalidDomainType();
 
 		// create the new domain
 		FEDomain* pdom = CreateDomain(ntype, &mesh, 0);
-		if (pdom == 0) throw FEFEBioImport::FailedCreatingDomain();
+		if (pdom == 0) throw FEBioImport::FailedCreatingDomain();
 
 
 		// add it to the mesh
@@ -688,7 +688,7 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 			}
 			break;
 		default:
-			throw FEFEBioImport::InvalidElementType();
+			throw FEBioImport::InvalidElementType();
 		}
 
 		// go to next tag

@@ -14,7 +14,7 @@ private:
 	};
 	
 public:
-	FEBioGeometrySection(FEFEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioGeometrySection(FEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:

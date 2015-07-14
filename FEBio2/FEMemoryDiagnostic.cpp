@@ -19,7 +19,7 @@ bool FEMemoryDiagnostic::Init()
 	FEModel& fem = m_fem;
 
 	// try to open the file
-	FEFEBioImport im;
+	FEBioImport im;
 	if (im.Load(fem, m_szfile) == false)
 	{
 		return false;

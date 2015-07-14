@@ -130,7 +130,7 @@ void FEMicroMaterial2O::Init()
 	if (m_brve == false)
 	{
 		// load the RVE model
-		FEFEBioImport fim;
+		FEBioImport fim;
 		if (fim.Load(m_rve, m_szrve) == false)
 		{
 			throw MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);

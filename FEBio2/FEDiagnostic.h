@@ -43,7 +43,7 @@ public:
 class FEBioScenarioSection : public FEBioFileSection
 {
 public:
-	FEBioScenarioSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioScenarioSection(FEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 };
 
@@ -51,7 +51,7 @@ public:
 //! The FEDiagnosticImport class creates a specific diagnostic test. Currently
 //! the only way to create a diagnostic is to load a diagnostic from file
 
-class FEDiagnosticImport : public FEFEBioImport
+class FEDiagnosticImport : public FEBioImport
 {
 public:
 	FEDiagnostic* LoadFile(FEModel& fem, const char* szfile);

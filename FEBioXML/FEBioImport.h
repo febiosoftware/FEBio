@@ -7,14 +7,14 @@
 #include <string>
 using namespace std;
 
-class FEFEBioImport;
+class FEBioImport;
 
 //-----------------------------------------------------------------------------
 // Base class for XML sections parsers
 class FEBioFileSection
 {
 public:
-	FEBioFileSection(FEFEBioImport* pim) { m_pim = pim; }
+	FEBioFileSection(FEBioImport* pim) { m_pim = pim; }
 
 	virtual void Parse(XMLTag& tag) = 0;
 
@@ -22,7 +22,7 @@ public:
 	FECore::FEAnalysis* GetStep();
 
 protected:
-	FEFEBioImport*	m_pim;
+	FEBioImport*	m_pim;
 };
 
 //-----------------------------------------------------------------------------
@@ -37,33 +37,71 @@ public:
 //=============================================================================
 //! Implements a class to import FEBio input files
 //!
-class FEFEBioImport : public FEFileImport
+class FEBioImport : public FEFileImport
 {
 public:
-	class InvalidVersion{};
-	class InvalidMaterial
-	{ 
-	public: 
-		InvalidMaterial(int nel) : m_nel(nel){}
-		int m_nel; 
-	};
-	class InvalidDomainType{};
-	class FailedCreatingDomain{};
-	class InvalidElementType{};
-	class FailedLoadingPlugin
+	// Base class for FEBio import exceptions
+	// Derived classes should set the error string in their constructor
+	class Exception
 	{
 	public:
-		FailedLoadingPlugin(const char* sz) : m_szfile(sz) {}
-		const char* FileName() { return m_szfile.c_str(); }
+		enum {MAX_ERR_STRING = 1024};
 	public:
-		string	m_szfile;
+		// retrieve the error string
+		const char* GetErrorString() const { return m_szerr; }
+	protected:
+		// set the error string (used by derived classes)
+		void SetErrorString(const char* sz, ...);
+	protected:
+		char	m_szerr[MAX_ERR_STRING];
 	};
-	class DuplicateMaterialSection {};
-	class InvalidDomainMaterial
+
+	// invalid version
+	class InvalidVersion : public Exception
+	{
+	public: InvalidVersion();
+	};
+
+	// invalid material defintion
+	class InvalidMaterial : public Exception
 	{ 
-	public: 
-		InvalidDomainMaterial(int ndom) : m_ndom(ndom){}
-		int m_ndom; 
+	public: InvalidMaterial(int nel);
+	};
+
+	// invalid domain type
+	class InvalidDomainType : public Exception
+	{
+	public: InvalidDomainType();
+	};
+
+	// cannot create domain
+	class FailedCreatingDomain : public Exception
+	{
+	public: FailedCreatingDomain();
+	};
+
+	// invalid element type
+	class InvalidElementType : public Exception
+	{
+	public: InvalidElementType();
+	};
+
+	// failed loading plugin
+	class FailedLoadingPlugin : public Exception
+	{
+	public: FailedLoadingPlugin(const char* sz);
+	};
+
+	// duplicate material section
+	class DuplicateMaterialSection : public Exception
+	{
+	public: DuplicateMaterialSection();
+	};
+
+	// invalid domain material
+	class InvalidDomainMaterial : public Exception
+	{ 
+	public: InvalidDomainMaterial();
 	};
 
 public:
@@ -93,7 +131,7 @@ public:
 
 public:
 	//! constructor
-	FEFEBioImport();
+	FEBioImport();
 
 	//! Load the model data from file.
 	bool Load(FEModel& fem, const char* szfile);

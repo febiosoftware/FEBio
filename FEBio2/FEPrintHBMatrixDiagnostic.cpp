@@ -38,7 +38,7 @@ bool FEPrintHBMatrixDiagnostic::ParseSection(XMLTag &tag)
 		const char* szfile = tag.szvalue();
 
 		// try to read the file
-		FEFEBioImport im;
+		FEBioImport im;
 		if (im.Load(fem, szfile) == false)
 		{
 			char szerr[256];

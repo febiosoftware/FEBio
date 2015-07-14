@@ -45,7 +45,7 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 
 	// Make sure no materials are defined
-	if (fem.Materials() != 0) throw FEFEBioImport::DuplicateMaterialSection();
+	if (fem.Materials() != 0) throw FEBioImport::DuplicateMaterialSection();
 
 	// reset material counter
 	m_nmat = 0;

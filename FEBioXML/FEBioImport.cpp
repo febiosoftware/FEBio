@@ -1,4 +1,4 @@
-// FEBioImport.cpp: implementation of the FEFEBioImport class.
+// FEBioImport.cpp: implementation of the FEBioImport class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -27,6 +27,67 @@
 #include "FECore/FECoreKernel.h"
 #include "FECore/DOFS.h"
 #include <string.h>
+#include <stdarg.h>
+
+//-----------------------------------------------------------------------------
+void FEBioImport::Exception::SetErrorString(const char* sz, ...)
+{
+	// get a pointer to the argument list
+	va_list	args;
+
+	// make the message
+	va_start(args, sz);
+	vsprintf(m_szerr, sz, args);
+	va_end(args);
+}
+
+//-----------------------------------------------------------------------------
+FEBioImport::InvalidVersion::InvalidVersion()
+{
+	SetErrorString("Invalid version");
+}
+
+//-----------------------------------------------------------------------------
+FEBioImport::InvalidMaterial::InvalidMaterial(int nel)
+{
+	SetErrorString("Element %d has an invalid material type", nel);
+}
+
+//-----------------------------------------------------------------------------
+FEBioImport::InvalidDomainType::InvalidDomainType()	
+{
+	SetErrorString("Invalid domain type");
+}
+
+//-----------------------------------------------------------------------------
+FEBioImport::InvalidDomainMaterial::InvalidDomainMaterial()
+{
+	SetErrorString("Invalid domain material");
+}
+
+//-----------------------------------------------------------------------------
+FEBioImport::FailedCreatingDomain::FailedCreatingDomain()
+{
+	SetErrorString("Failed creating domain");
+}
+
+//-----------------------------------------------------------------------------
+FEBioImport::InvalidElementType::InvalidElementType()
+{
+	SetErrorString("Invalid element type\n");
+}
+
+//-----------------------------------------------------------------------------
+FEBioImport::FailedLoadingPlugin::FailedLoadingPlugin(const char* szfile)
+{
+	SetErrorString("failed loading plugin %s\n", szfile);
+}
+
+//-----------------------------------------------------------------------------
+FEBioImport::DuplicateMaterialSection::DuplicateMaterialSection()
+{
+	SetErrorString("Material section has already been defined");
+}
 
 //-----------------------------------------------------------------------------
 FEModel* FEBioFileSection::GetFEModel() { return m_pim->GetFEModel(); }
@@ -51,13 +112,13 @@ void FEBioFileSectionMap::Clear()
 }
 
 //-----------------------------------------------------------------------------
-FEFEBioImport::PlotVariable::PlotVariable(const FEFEBioImport::PlotVariable& pv)
+FEBioImport::PlotVariable::PlotVariable(const FEBioImport::PlotVariable& pv)
 {
 	strcpy(m_szvar, pv.m_szvar);
 	m_item = pv.m_item;
 }
 
-FEFEBioImport::PlotVariable::PlotVariable(const char* szvar, vector<int>& item)
+FEBioImport::PlotVariable::PlotVariable(const char* szvar, vector<int>& item)
 {
 	strcpy(m_szvar, szvar);
 	m_item = item;
@@ -65,13 +126,13 @@ FEFEBioImport::PlotVariable::PlotVariable(const char* szvar, vector<int>& item)
 
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ClearParams()
+void FEBioImport::ClearParams()
 {
 	m_Param.clear();
 }
 
 //-----------------------------------------------------------------------------
-FEFEBioImport::XMLParam* FEFEBioImport::FindParameter(const char* sz)
+FEBioImport::XMLParam* FEBioImport::FindParameter(const char* sz)
 {
 	for (size_t i=0; i<m_Param.size(); ++i)
 	{
@@ -82,7 +143,7 @@ FEFEBioImport::XMLParam* FEFEBioImport::FindParameter(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::AddParameter(const char* szname, const char* szval)
+void FEBioImport::AddParameter(const char* szname, const char* szval)
 {
 	XMLParam p;
 	strcpy(p.m_szname, szname);
@@ -91,7 +152,7 @@ void FEFEBioImport::AddParameter(const char* szname, const char* szval)
 }
 
 //-----------------------------------------------------------------------------
-const char* FEFEBioImport::get_value_string(XMLTag& tag)
+const char* FEBioImport::get_value_string(XMLTag& tag)
 {
 	const char* sz = tag.szvalue();
 	if (sz[0]=='@')
@@ -104,21 +165,21 @@ const char* FEFEBioImport::get_value_string(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::value(XMLTag& tag, int& n)
+void FEBioImport::value(XMLTag& tag, int& n)
 {
 	const char* sz = get_value_string(tag);
 	n = atoi(sz);
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::value(XMLTag& tag, double& g)
+void FEBioImport::value(XMLTag& tag, double& g)
 {
 	const char* sz = get_value_string(tag);
 	g = atof(sz);
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::value(XMLTag& tag, bool& b)
+void FEBioImport::value(XMLTag& tag, bool& b)
 {
 	const char* sz = get_value_string(tag);
 	int n=0; 
@@ -127,7 +188,7 @@ void FEFEBioImport::value(XMLTag& tag, bool& b)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::value(XMLTag& tag, vec3d& v)
+void FEBioImport::value(XMLTag& tag, vec3d& v)
 {
 	const char* sz = get_value_string(tag);
 	int n = sscanf(sz, "%lg,%lg,%lg", &v.x, &v.y, &v.z);
@@ -135,7 +196,7 @@ void FEFEBioImport::value(XMLTag& tag, vec3d& v)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::value(XMLTag& tag, mat3d& m)
+void FEBioImport::value(XMLTag& tag, mat3d& m)
 {
 	const char* sz = get_value_string(tag);
 	double xx, xy, xz, yx, yy, yz, zx, zy, zz;
@@ -145,7 +206,7 @@ void FEFEBioImport::value(XMLTag& tag, mat3d& m)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::value(XMLTag& tag, mat3ds& m)
+void FEBioImport::value(XMLTag& tag, mat3ds& m)
 {
 	const char* sz = get_value_string(tag);
 	double x, y, z, xy, yz, xz;
@@ -155,14 +216,14 @@ void FEFEBioImport::value(XMLTag& tag, mat3ds& m)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::value(XMLTag& tag, char* szstr)
+void FEBioImport::value(XMLTag& tag, char* szstr)
 {
 	const char* sz = get_value_string(tag);
 	strcpy(szstr, sz); 
 }
 
 //-----------------------------------------------------------------------------
-int FEFEBioImport::value(XMLTag& tag, int* pi, int n)
+int FEBioImport::value(XMLTag& tag, int* pi, int n)
 {
 	const char* sz = get_value_string(tag);
 	int nr = 0;
@@ -180,7 +241,7 @@ int FEFEBioImport::value(XMLTag& tag, int* pi, int n)
 }
 
 //-----------------------------------------------------------------------------
-int FEFEBioImport::value(XMLTag& tag, double* pf, int n)
+int FEBioImport::value(XMLTag& tag, double* pf, int n)
 {
 	const char* sz = get_value_string(tag);
 	int nr = 0;
@@ -198,7 +259,7 @@ int FEFEBioImport::value(XMLTag& tag, double* pf, int n)
 }
 
 //-----------------------------------------------------------------------------
-FEFEBioImport::FEFEBioImport()
+FEBioImport::FEBioImport()
 {
 	// define the file structure
 	m_map["Module"     ] = new FEBioModuleSection     (this);
@@ -225,7 +286,7 @@ FEFEBioImport::FEFEBioImport()
 //  The FEBioImport class imports an XML formatted FEBio input file.
 //  The actual file is parsed using the XMLReader class.
 //
-bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
+bool FEBioImport::Load(FEModel& fem, const char* szfile)
 {
 	// keep a pointer to the fem object
 	m_pfem = &fem;
@@ -280,7 +341,7 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 }
 
 //-----------------------------------------------------------------------------
-bool FEFEBioImport::ReadFile(const char* szfile)
+bool FEBioImport::ReadFile(const char* szfile)
 {
 	// Open the XML file
 	XMLReader xml;
@@ -360,50 +421,16 @@ bool FEFEBioImport::ReadFile(const char* szfile)
 		felog.printf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 		return false;
 	}
-	// --- FEBio Exceptions ---
-	catch (InvalidVersion)
+	// --- FEBioImport Exceptions ---
+	catch (FEBioImport::Exception& e)
 	{
-		felog.printbox("FATAL ERROR", "Invalid version for FEBio specification.");
+		felog.printf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 		return false;
 	}
-	catch (InvalidMaterial e)
-	{
-		felog.printbox("FATAL ERROR:", "Element %d has an invalid material type.", e.m_nel);
-		return false;
-	}
-	catch (InvalidDomainType)	
-	{
-		felog.printf("Fatal Error: Invalid domain type\n");
-		return false;
-	}
-	catch (InvalidDomainMaterial)
-	{
-		felog.printf("Fatal Error: Invalid domain material (line %d)\n", xml.GetCurrentLine());
-		return false;
-	}
-	catch (FailedCreatingDomain)
-	{
-		felog.printf("Fatal Error: Failed creating domain\n");
-		return false;
-	}
-	catch (InvalidElementType)
-	{
-		felog.printf("Fatal Error: Invalid element type\n");
-		return false;
-	}
-	catch (FailedLoadingPlugin e)
-	{
-		felog.printf("Fatal Error: failed loading plugin %s\n", e.FileName());
-		return false;
-	}
-	catch (UnknownDataField e)
+	// --- Exception from DataStore ---
+	catch (UnknownDataField& e)
 	{
 		felog.printf("Fatal Error: \"%s\" is not a valid field variable name (line %d)\n", e.m_szdata, xml.GetCurrentLine()-1);
-		return false;
-	}
-	catch (DuplicateMaterialSection)
-	{
-		felog.printf("Fatal Error: Material section has already been defined (line %d).\n", xml.GetCurrentLine()-1);
 		return false;
 	}
 	// --- Unknown exceptions ---
@@ -421,7 +448,7 @@ bool FEFEBioImport::ReadFile(const char* szfile)
 }
 
 //-----------------------------------------------------------------------------
-FEAnalysis* FEFEBioImport::GetStep()
+FEAnalysis* FEBioImport::GetStep()
 {
 	if (m_pStep == 0)
 	{
@@ -437,7 +464,7 @@ FEAnalysis* FEFEBioImport::GetStep()
 }
 
 //-----------------------------------------------------------------------------
-FEAnalysis* FEFEBioImport::CreateNewStep()
+FEAnalysis* FEBioImport::CreateNewStep()
 {
 	FEAnalysis* pstep = 0;
 	
@@ -461,7 +488,7 @@ FEAnalysis* FEFEBioImport::CreateNewStep()
 
 //-----------------------------------------------------------------------------
 //! This function parses the febio_spec tag for the version number
-void FEFEBioImport::ParseVersion(XMLTag &tag)
+void FEBioImport::ParseVersion(XMLTag &tag)
 {
 	const char* szv = tag.AttributeValue("version");
 	assert(szv);
@@ -475,7 +502,7 @@ void FEFEBioImport::ParseVersion(XMLTag &tag)
 
 //-----------------------------------------------------------------------------
 //! This function parese a parameter list
-bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam)
+bool FEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam)
 {
 	// see if we can find this parameter
 	FEParam* pp = pl.Find((szparam == 0 ? tag.Name() : szparam));
@@ -565,7 +592,7 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 //-----------------------------------------------------------------------------
 //! This function parses a parameter list
-bool FEFEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam)
+bool FEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam)
 {
 	FEParameterList& pl = pc->GetParameterList();
 
@@ -672,7 +699,7 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ReadList(XMLTag& tag, vector<int>& l)
+void FEBioImport::ReadList(XMLTag& tag, vector<int>& l)
 {
 	// make sure the list is empty
 	l.clear();
@@ -706,14 +733,14 @@ void FEFEBioImport::ReadList(XMLTag& tag, vector<int>& l)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::AddPlotVariable(const char* szvar, vector<int>& item)
+void FEBioImport::AddPlotVariable(const char* szvar, vector<int>& item)
 {
 	PlotVariable var(szvar, item);
 	m_plot.push_back(var);
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::SetPlotCompression(int n)
+void FEBioImport::SetPlotCompression(int n)
 {
 	m_nplot_compression = n;
 }

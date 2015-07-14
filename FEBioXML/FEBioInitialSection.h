@@ -6,6 +6,6 @@
 class FEBioInitialSection : public FEBioFileSection
 {
 public:
-	FEBioInitialSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioInitialSection(FEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 };

@@ -6,7 +6,7 @@
 class FEBioOutputSection : public FEBioFileSection
 {
 public:
-	FEBioOutputSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioOutputSection(FEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:

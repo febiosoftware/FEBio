@@ -159,7 +159,7 @@ const char* FEBioModel::GetFileTitle()
 bool FEBioModel::Input(const char* szfile)
 {
 	// create file reader
-	FEFEBioImport fim;
+	FEBioImport fim;
 
 	// Load the file
 	if (fim.Load(*this, szfile) == false)
@@ -188,7 +188,7 @@ bool FEBioModel::Input(const char* szfile)
 	int NP = (int) fim.m_plot.size();
 	for (int i=0; i<NP; ++i)
 	{
-		FEFEBioImport::PlotVariable& var = fim.m_plot[i];
+		FEBioImport::PlotVariable& var = fim.m_plot[i];
 
 		vector<int> item = var.m_item;
 		if (item.empty() == false)

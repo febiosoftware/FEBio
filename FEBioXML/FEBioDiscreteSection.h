@@ -5,7 +5,7 @@
 class FEBioDiscreteSection : public FEBioFileSection
 {
 public:
-	FEBioDiscreteSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioDiscreteSection(FEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:

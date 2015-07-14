@@ -88,17 +88,12 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 		}
 		while (!tag.isend());
 	}
-	catch (InvalidVersion)
-	{
-		felog.printbox("FATAL ERROR", "Invalid version for FEBio specification.");
-		return 0;
-	}
-	catch (InvalidMaterial e)
-	{
-		felog.printbox("FATAL ERROR:", "Element %d has an invalid material type.", e.m_nel);
-		return 0;
-	}
 	catch (XMLReader::Error& e)
+	{
+		felog.printf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
+		return 0;
+	}
+	catch (FEBioImport::Exception& e)
 	{
 		felog.printf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 		return 0;
