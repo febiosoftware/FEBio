@@ -297,6 +297,7 @@
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FE2DTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FE2DTransIsoVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBioMech\FE2OMicroConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FE3FieldElasticSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBioMech\FEAugLagLinearConstraint.h" />
@@ -477,6 +478,7 @@
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FE2DTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FE2DTransIsoVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FE2OMicroConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FE3FieldElasticSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEAugLagLinearConstraint.cpp" />

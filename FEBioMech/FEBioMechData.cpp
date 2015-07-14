@@ -1049,11 +1049,39 @@ double FELogRigidBodyKineticEnergy::value(FEObject& rb) {
 }
 
 //-----------------------------------------------------------------------------
-double FELogRigidConnectorForceX::value(FENLConstraint& rc) { return static_cast<FERigidConnector&>(rc).m_F.x; }
-double FELogRigidConnectorForceY::value(FENLConstraint& rc) { return static_cast<FERigidConnector&>(rc).m_F.y; }
-double FELogRigidConnectorForceZ::value(FENLConstraint& rc) { return static_cast<FERigidConnector&>(rc).m_F.z; }
+double FELogRigidConnectorForceX::value(FENLConstraint& rc) 
+{ 
+	FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+	return (prc ? prc->m_F.x : 0); 
+}
+
+double FELogRigidConnectorForceY::value(FENLConstraint& rc)
+{
+	FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+	return (prc ? prc->m_F.y : 0);
+}
+
+double FELogRigidConnectorForceZ::value(FENLConstraint& rc)
+{
+	FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+	return (prc ? prc->m_F.z : 0);
+}
 
 //-----------------------------------------------------------------------------
-double FELogRigidConnectorMomentX::value(FENLConstraint& rc) { return static_cast<FERigidConnector&>(rc).m_M.x; }
-double FELogRigidConnectorMomentY::value(FENLConstraint& rc) { return static_cast<FERigidConnector&>(rc).m_M.y; }
-double FELogRigidConnectorMomentZ::value(FENLConstraint& rc) { return static_cast<FERigidConnector&>(rc).m_M.z; }
+double FELogRigidConnectorMomentX::value(FENLConstraint& rc)
+{ 
+	FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+	return (prc ? prc->m_M.x : 0);
+}
+
+double FELogRigidConnectorMomentY::value(FENLConstraint& rc)
+{ 
+	FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+	return (prc ? prc->m_M.y : 0);
+}
+
+double FELogRigidConnectorMomentZ::value(FENLConstraint& rc)
+{
+	FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+	return (prc ? prc->m_M.z : 0);
+}
