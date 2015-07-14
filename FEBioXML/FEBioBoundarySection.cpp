@@ -21,8 +21,9 @@
 //!
 void FEBioBoundarySection::Parse(XMLTag& tag)
 {
-	// make sure this tag has children
-	if (tag.isleaf()) return;
+	// make sure this tag has children (for older versions)
+	if (m_pim->Version() < 0x0200) 
+		if (tag.isleaf()) return;
 
 	++tag;
 	do
