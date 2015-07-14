@@ -13,6 +13,12 @@ CompactMatrix::~CompactMatrix()
 }
 
 //-----------------------------------------------------------------------------
+void CompactMatrix::zero()
+{
+	memset(m_pd, 0, m_nsize*sizeof(double)); 
+}
+
+//-----------------------------------------------------------------------------
 void CompactMatrix::Clear()
 {
 	if (m_pd) delete [] m_pd; m_pd = 0;
@@ -29,7 +35,7 @@ CompactMatrix::CompactMatrix(int offset)
 }
 
 //-----------------------------------------------------------------------------
-void CompactMatrix::Create(int N, int nz, double* pv, int* pi, int* pp)
+void CompactMatrix::alloc(int N, int nz, double* pv, int* pi, int* pp)
 {
 	if (m_pd  ) delete [] m_pd; m_pd = pv;
 	if (m_pindices ) delete [] m_pindices; m_pindices = pi;
@@ -176,7 +182,7 @@ void CompactSymmMatrix::Create(SparseMatrixProfile& mp)
 	if (pvalues == 0) throw MemException(sizeof(double)*nsize);
 
 	// create the stiffness matrix
-	CompactMatrix::Create(neq, nsize, pvalues, pindices, pointers);
+	CompactMatrix::alloc(neq, nsize, pvalues, pindices, pointers);
 }
 
 //-----------------------------------------------------------------------------
@@ -433,7 +439,7 @@ void CompactUnSymmMatrix::Create(SparseMatrixProfile& mp)
 	if (pvalues == 0) throw MemException(sizeof(double)*nsize);
 
 	// create the stiffness matrix
-	CompactMatrix::Create(neq, nsize, pvalues, pindices, pointers);
+	CompactMatrix::alloc(neq, nsize, pvalues, pindices, pointers);
 }
 
 //-----------------------------------------------------------------------------

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "MatrixProfile.h"
+#include <assert.h>
 
 //-----------------------------------------------------------------------------
 //! MatrixProfile constructor. Takes the nr of equations as input argument.
@@ -193,4 +194,41 @@ void SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 	delete [] ppelc;
 	delete [] pelc;
 	delete [] pval;
+}
+
+//-----------------------------------------------------------------------------
+// extract the matrix profile of a block
+SparseMatrixProfile SparseMatrixProfile::GetBlockProfile(int nrow0, int ncol0, int nrow1, int ncol1) const
+{
+	// This will store the block profile
+	SparseMatrixProfile bMP;
+
+	// number of columns in block
+	int NC = ncol1 - ncol0 + 1;
+	assert(NC > 0);
+	bMP.m_prof.resize(NC);
+
+	for (int j=0; j<NC; ++j)
+	{
+		const vector<int>& sj = m_prof[ncol0+j];
+		vector<int>& dj = bMP.m_prof[j];
+		int nr = sj.size();
+		for (int i=0; i<nr; i+=2)
+		{
+			int n0 = sj[2*i  ];
+			int n1 = sj[2*i+1];
+			assert(n0<=n1);
+
+			if ((n1 >= nrow0)&&(n0 <= nrow1))
+			{
+				if (n0 < nrow0) n0 = nrow0;
+				if (n1 > nrow1) n1 = nrow1;
+
+				dj.push_back(n0);
+				dj.push_back(n1);
+			}
+		}
+	}
+
+	return bMP;
 }

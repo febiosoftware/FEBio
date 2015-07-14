@@ -11,7 +11,10 @@ class DenseMatrix : public SparseMatrix
 public:
 	// con/de-structor
 	DenseMatrix();
-	virtual ~DenseMatrix();
+	~DenseMatrix();
+
+	// zero matrix elements
+	void zero();
 
 	// create a matrix from a spares matrix profile
 	void Create(SparseMatrixProfile& mp) { Create(mp.size()); }
@@ -23,12 +26,7 @@ public:
 	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj);
 
 	// clear all data
-	void Clear()
-	{
-		if (m_pd) delete [] m_pd; m_pd = 0;
-		if (m_pr) delete [] m_pr; m_pr = 0;
-		m_ndim = 0;
-	}
+	void Clear();
 
 	// create a matrix of size N x N
 	void Create(int N);
@@ -42,5 +40,6 @@ public:
 	double diag(int i) { return m_pr[i][i]; }
 
 protected:
+	double*		m_pd;	//!< matrix values
 	double**	m_pr;	//!< pointers to rows
 };

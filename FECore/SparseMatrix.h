@@ -32,10 +32,10 @@ public:
 	//! return size, i.e. number of rows (or columns)
 	int Size() { return m_ndim; }
 
-	//! set all matrix elements to zero
-	void zero();
-
 public: // functions to be overwritten in derived classes
+
+	//! set all matrix elements to zero
+	virtual void zero() = 0;
 
 	//! Create a sparse matrix from a sparse-matrix profile
 	virtual void Create(SparseMatrixProfile& MP) = 0;
@@ -59,13 +59,11 @@ public: // functions to be overwritten in derived classes
 	virtual double diag(int i) = 0;
 
 	//! release memory for storing data
-	virtual void Clear();
+	virtual void Clear() = 0;
 
 protected:
 	int	m_ndim;		//!< dimension of matrix
 	int	m_nsize;	//!< size of m_pd array
-
-	double*	m_pd;	//!< matrix values
 };
 
 #endif // !defined(AFX_SPARSEMATRIX_H__B6DFA524_679D_4A35_86F8_D7F080D0ACD5__INCLUDED_)

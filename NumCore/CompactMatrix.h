@@ -15,12 +15,11 @@ public:
 	//! destructor
 	virtual ~CompactMatrix();
 
+	//! zero matrix elements
+	void zero();
+
 	//! Clear 
 	void Clear();
-
-public:
-	//! Create the matrix
-	virtual void Create(int N, int nz, double* pv, int *pi, int* pp);
 
 public:
 	//! Pointer to matrix values
@@ -36,6 +35,11 @@ public:
 	int     Offset  () { return m_offset; }
 
 protected:
+	//! Create the matrix
+	void alloc(int N, int nz, double* pv, int *pi, int* pp);
+
+protected:
+	double*	m_pd;			//!< matrix values
 	int*	m_pindices;		//!< indices
 	int*	m_ppointers;	//!< pointers
 	int		m_offset;		//!< adjust array indices for fortran arrays
@@ -55,9 +59,6 @@ public:
 
 	//! Create the matrix structure from the SparseMatrixProfile.
 	void Create(SparseMatrixProfile& mp);
-
-	//! Allocate storage for matrix data
-	void Create(int N, int nz, double* pv, int *pi, int* pp) { CompactMatrix::Create(N, nz, pv, pi, pp); }
 
 	//! Assemble an element matrix into the global matrix
 	void Assemble(matrix& ke, vector<int>& lm);

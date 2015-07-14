@@ -31,7 +31,7 @@ public:
 //! identifies the start and end row index of the nonzero elements in that column.
 //! The matrix profile is used to build the sparse matrix structure 
 //! in an efficient way.
-//! It is currently assumed that the sparse matrix is square and symmetric
+//! It is currently assumed that the sparse matrix is square and symmetric (TODO: Is this true?)
 
 class SparseMatrixProfile
 {
@@ -59,6 +59,9 @@ public:
 
 	//! returns the non-zero row indices (in condensed format) for a column
 	vector<int>& column(int i) { return m_prof[i]; }
+
+public:
+	SparseMatrixProfile GetBlockProfile(int nrow0, int ncol0, int nrow1, int ncol1) const;
 
 protected:
 	vector< vector<int> >	m_prof;	//!< the actual profile in condensed format

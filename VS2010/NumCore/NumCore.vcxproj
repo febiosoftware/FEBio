@@ -404,6 +404,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\NumCore\BlockMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\CompactMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\ConjGradIterSolver.cpp" />
     <ClCompile Include="..\..\NumCore\DenseMatrix.cpp" />
@@ -421,6 +422,7 @@
     <ClCompile Include="..\..\NumCore\WSMPSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\NumCore\BlockMatrix.h" />
     <ClInclude Include="..\..\NumCore\CompactMatrix.h" />
     <ClInclude Include="..\..\NumCore\ConjGradIterSolver.h" />
     <ClInclude Include="..\..\NumCore\DenseMatrix.h" />
