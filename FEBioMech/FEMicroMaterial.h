@@ -37,6 +37,9 @@ public:
 	double	   m_micro_energy;	// LTE - Volume-average of strain energy throughout the RVE solution
 	double	   m_energy_diff;	// LTE - Difference between macro energy and volume averaged energy of RVE (should be zero) 
 
+	double	   m_macro_energy_inc;
+	double	   m_micro_energy_inc;
+
 	tens4ds	m_Ka;	//!< averaged material stiffness
 };
 

@@ -393,6 +393,16 @@ bool FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
 				s[5] += (float) (f*pt.m_s.xz());
 
 				pt.m_F_prev = pt.m_F;
+
+				FEMicroMaterialPoint* mmppt = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint>());
+
+				if (mmppt)
+				{
+					FEMicroMaterialPoint& mmpt = *mmppt;
+					mmpt.m_macro_energy += mmpt.m_macro_energy_inc;
+					mmpt.m_micro_energy += mmpt.m_micro_energy_inc;
+					mmpt.m_energy_diff = fabs(mmpt.m_macro_energy - mmpt.m_micro_energy); 
+				}
 			}
 		}
 
@@ -479,6 +489,10 @@ bool FEPlotElementtaunorm::Save(FEDomain& dom, vector<float>& a)
 				tau_avg += (pt2O.m_tau)*f;
 				
 				pt2O.m_G_prev = pt2O.m_G;
+
+				pt2O.m_macro_energy += pt2O.m_macro_energy_inc;
+				pt2O.m_micro_energy += pt2O.m_micro_energy_inc;
+				pt2O.m_energy_diff = fabs(pt2O.m_macro_energy - pt2O.m_micro_energy); 
 			}
 		}
 

@@ -25,6 +25,10 @@ FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterial
 	m_macro_energy = 0.;
 	m_micro_energy = 0.;
 	m_energy_diff = 0.;
+	
+	m_macro_energy_inc = 0.;
+	m_micro_energy_inc = 0.;
+	
 	m_Ca.zero();
 	m_Da.zero();
 	m_Ea.zero();
@@ -272,10 +276,6 @@ void FEMicroMaterial2O::FindBoundaryNodes()
 					{
 					FENode& node = m.Node(fn[k]);
 						
-					/*if (fabs(node.m_r0.x) == m_bb_x) m_BN[fn[k]] = 1;
-					if (fabs(node.m_r0.y) == m_bb_y) m_BN[fn[k]] = 1;
-					if (fabs(node.m_r0.z) == m_bb_z) m_BN[fn[k]] = 1;*/
-
 					if (fabs(node.m_r0.x) >= 0.999*m_bb_x) m_BN[fn[k]] = 1;
 					if (fabs(node.m_r0.y) >= 0.999*m_bb_y) m_BN[fn[k]] = 1;
 					if (fabs(node.m_r0.z) >= 0.999*m_bb_z) m_BN[fn[k]] = 1;
@@ -427,45 +427,8 @@ tens4ds FEMicroMaterial2O::Tangent(FEMaterialPoint &mp)
 //-----------------------------------------------------------------------------
 mat3ds FEMicroMaterial2O::Stress(FEMaterialPoint &mp)
 {
-	//// get the deformation gradient
-	//FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	//FEMicroMaterialPoint2O& pt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
-	//mat3d F = pt.m_F;
-	//tens3drs G = pt2O.m_G;
-
-	//// Create a local copy of the rve
-	//FEModel rve;
-	//rve.CopyFrom(m_rve);
-	//rve.GetStep(0)->SetPrintLevel(FE_PRINT_NEVER);
-
-	//// initialize
-	//if (rve.Init() == false) throw FEMultiScaleException();
-
-	//// apply the BC's
-	//UpdateBC(rve, F, G);
-
-	//// solve the RVE
-	//bool bret = rve.Solve();
-
-	//// set the plot file
-	//FEBioPlotFile* pplt = new FEBioPlotFile(rve);
-	//vector<int> item;
-	//pplt->AddVariable("displacement", item);
-	//pplt->AddVariable("stress", item);
-	//pplt->Open(rve, "rve.xplt");
-	//pplt->Write(rve);
-	//pplt->Close();
-
-	//// make sure it converged
-	//if (bret == false) throw FEMultiScaleException();
-
-	//// calculate the averaged stress
-	//mat3ds sa = AveragedStress(rve, mp);
-
-	//// calculate the averaged stiffness
-	//AveragedStiffness(rve, mp, pt2O.m_Ca, pt2O.m_Da, pt2O.m_Ea);
-	
 	mat3ds sa; sa.zero();
+	
 	return sa;
 }
 
@@ -473,58 +436,8 @@ mat3ds FEMicroMaterial2O::Stress(FEMaterialPoint &mp)
 //! Calculate the average stress from the RVE solution.
 mat3ds FEMicroMaterial2O::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 {
-	//FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	//mat3d F = pt.m_F;
-	//double J = pt.m_J;
-
-	//// get the RVE mesh
-	//FEMesh& m = rve.GetMesh();
-
-	//mat3d T; T.zero();
-
-	//// for periodic BC's we take the reaction forces directly from the periodic constraints
-	//if (m_bperiodic)
-	//{
-	//	// get the reaction for from the periodic constraints
-	//	for (int i=0; i<3; ++i)
-	//	{
-	//		FEPeriodicBoundary* pbc = dynamic_cast<FEPeriodicBoundary*>(rve.SurfacePairInteraction(i));
-	//		assert(pbc);
-	//		FEPeriodicSurface& ss = pbc->m_ss;
-	//		int N = ss.Nodes();
-	//		for (int i=0; i<N; ++i)
-	//		{
-	//			FENode& node = ss.Node(i);
-	//			vec3d f = ss.m_Fr[i];
-
-	//			// We multiply by two since the reaction forces are only stored at the slave surface 
-	//			// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
-	//			// store the reaction forces on the master nodes as well?)
-	//			T += (f & node.m_rt)*2.0;
-	//		}
-	//	}
-	//}
-
-	//// get the reaction force vector from the solid solver
-	//// (We also need to do this for the periodic BC, since at the prescribed nodes,
-	//// the contact forces will be zero). 
-	//FEAnalysis* pstep = rve.GetCurrentStep();
-	//FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
-	//assert(ps);
-	//vector<double>& R = ps->m_Fr;
-	//int nbc = rve.PrescribedBCs();
-	//for (int i=0; i<nbc/3; ++i)
-	//{
-	//	FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
-	//	FENode& n = m.Node(dc.node);
-	//	vec3d f;
-	//	f.x = R[-n.m_ID[DOF_X]-2];
-	//	f.y = R[-n.m_ID[DOF_Y]-2];
-	//	f.z = R[-n.m_ID[DOF_Z]-2];
-	//	T += f & n.m_rt;
-	//}
-
 	mat3ds sa; sa.zero();
+	
 	return sa;
 }
 
@@ -1048,8 +961,8 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	tens3dls Ginvtrans_prev = Ginv_prev.transpose();
 	tens3ds h_prev = ((Ginvtrans_prev.multiply2right(pt.m_F_prev.inverse()).LStoUnsym() + Ginv_prev.multiply2left(pt.m_F_prev.transinv()).RStoUnsym())*-0.5).symm();
 	
-	mmpt2O.m_macro_energy = pt.m_s.dotdot(mmpt2O.m_e - e_prev) + mmpt2O.m_tau.tripledot3s(mmpt2O.m_h - h_prev);
-	
+	mmpt2O.m_macro_energy_inc = pt.m_s.dotdot(mmpt2O.m_e - e_prev) + mmpt2O.m_tau.tripledot3s(mmpt2O.m_h - h_prev);
+
 	double rve_energy_avg = 0.;
 	double J = 0.;
 	int nint; 
@@ -1088,8 +1001,7 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 		}
 	}
 
-	mmpt2O.m_micro_energy += rve_energy_avg/v;
-	mmpt2O.m_energy_diff = fabs(mmpt2O.m_macro_energy - mmpt2O.m_micro_energy);
+	mmpt2O.m_micro_energy_inc = rve_energy_avg/v;
 }
 
 //-----------------------------------------------------------------------------

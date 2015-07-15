@@ -305,7 +305,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKLDir)\ia32\lib;$(LMDir)\lib;$(ZLibDir)\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(MKLDir)\ia32\lib;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|Win32'">
@@ -349,7 +349,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fecored.lib;numcored.lib;febiolibd.lib;febiomechd.lib;febioheatd.lib;febiomixd.lib;febiooptd.lib;febioplotd.lib;febioxmld.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;levmard.lib;zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecored.lib;numcored.lib;febiolibd.lib;febiomechd.lib;febioheatd.lib;febiomixd.lib;febiooptd.lib;febioplotd.lib;febioxmld.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
@@ -535,7 +535,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febiolib.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioplot.lib;febioxml.lib;febioopt.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;levmar.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;febiolib.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioplot.lib;febioxml.lib;febioopt.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|Win32'">

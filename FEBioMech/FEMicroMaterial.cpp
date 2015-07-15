@@ -14,6 +14,10 @@ FEMicroMaterialPoint::FEMicroMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoin
 	m_macro_energy = 0.;
 	m_micro_energy = 0.;
 	m_energy_diff = 0.;
+	
+	m_macro_energy_inc = 0.;
+	m_micro_energy_inc = 0.;
+
 	m_Ka.zero();
 }
 
@@ -372,30 +376,6 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 			assert(pc);
 
 			pc->m_Fmacro = F;
-			
-			//FEPeriodicBoundary* pc = dynamic_cast<FEPeriodicBoundary*>(rve.SurfacePairInteraction(i));
-			//assert(pc);
-
-			//// get the position of the first node
-			//vec3d r0 = pc->m_ss.Node(0).m_r0;
-
-			//// calculate the position of the projection
-			//FESurfaceElement* pm = pc->m_ss.m_pme[0]; assert(pm);
-			//for (int j=0; j<pm->Nodes(); ++j) r[j] = m.Node(pm->m_node[j]).m_r0;
-			//vec2d q = pc->m_ss.m_rs[0];
-			//vec3d r1 = pm->eval(r, q[0], q[1]);
-
-			//// calculate the offset distance
-			//vec3d u0 = r1 - r0;
-
-			//// apply deformation
-			//vec3d u1 = U*u0;
-
-			//// set this as the scale parameter for the offset
-			//FEParam* pp = pc->GetParameterList().Find("offset");
-			//assert(pp);
-			//pp->m_vscl = u1;
-			//pp->m_nlc = 0;
 		}
 	}
 }
@@ -690,7 +670,8 @@ void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	// calculate the energy difference between macro point and RVE
 	// to verify that we have satisfied the Hill-Mandel condition
 	mat3ds e_prev = ((mat3dd(1) - pt.m_F_prev.transinv()*pt.m_F_prev.inverse())*0.5).sym();
-	mmpt.m_macro_energy += pt.m_s.dotdot(mmpt.m_e - e_prev);
+	
+	mmpt.m_macro_energy_inc = pt.m_s.dotdot(mmpt.m_e - e_prev);
 	
 	double rve_energy_avg = 0.;
 	double J = 0.;
@@ -730,8 +711,7 @@ void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 		}
 	}
 
-	mmpt.m_micro_energy += rve_energy_avg/v;
-	mmpt.m_energy_diff = fabs(mmpt.m_macro_energy - mmpt.m_micro_energy);
+	mmpt.m_micro_energy_inc = rve_energy_avg/v;
 }
 
 //-----------------------------------------------------------------------------
