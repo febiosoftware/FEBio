@@ -50,6 +50,7 @@ public:
 	void Destroy();
 
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
+	void SetSparseMatrix(CompactMatrix* pA);
 
 protected:
 

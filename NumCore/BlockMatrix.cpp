@@ -49,10 +49,12 @@ void BlockMatrix::Partition(const vector<int>& part)
 			Bij.nstart_col = ncol;
 			Bij.nend_col   = Bij.nstart_col + part[j] - 1;
 
+			// Note the parameters in the constructors.
+			// This is because we are using Pardiso for this
 			if (i==j)
-				Bij.pA = new CompactSymmMatrix();
+				Bij.pA = new CompactSymmMatrix(1);
 			else
-				Bij.pA = new CompactUnSymmMatrix();
+				Bij.pA = new CompactUnSymmMatrix(1, true);
 			
 			ncol += part[j];
 		}

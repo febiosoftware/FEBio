@@ -22,6 +22,10 @@ public:
 	void Clear();
 
 public:
+	//! multiply with vector
+	virtual void mult_vector(const vector<double>& x, vector<double>& r) = 0;
+
+public:
 	//! Pointer to matrix values
 	double* Values  () { return m_pd;   }
 
@@ -118,6 +122,9 @@ public:
 
 	//! return the diagonal value
 	double diag(int i);
+
+	//! multiply with vector
+	void mult_vector(const vector<double>& x, vector<double>& r);
 
 protected:
 	bool m_brow_based;	//!< flag indicating whether the matrix is stored row-based on column-based

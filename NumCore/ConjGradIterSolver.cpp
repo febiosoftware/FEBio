@@ -74,6 +74,7 @@ bool ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
 
 	// initial residual vector
 	vector<double> r(N);
+	for (i=0; i<N; ++i) r[i] = 0.0;
 	m_pA->mult_vector(x, r);
 	for (i=0; i<N; ++i) r[i] = b[i] - r[i];
 
@@ -104,6 +105,7 @@ bool ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
 		beta = rho1/rho2;
 		for (i=0; i<N; ++i) p[i] = r[i] + p[i]*beta;
 
+		for (i=0; i<N; ++i) w[i] = 0.0;
 		m_pA->mult_vector(p, w);
 		alpha = rho1 / (p*w);
 

@@ -29,6 +29,7 @@ void CompactMatrix::Clear()
 //-----------------------------------------------------------------------------
 CompactMatrix::CompactMatrix(int offset)
 {
+	m_pd = 0;
 	m_pindices = 0;
 	m_ppointers = 0;
 	m_offset = offset;
@@ -69,8 +70,6 @@ void CompactSymmMatrix::mult_vector(const double* x, double* r)
 
 	double* pv, rj;
 	int* pi;
-
-	for (i=0; i<N; ++i) r[i] = 0.0;
 
 	// loop over all columns
 	for (j=0; j<N; ++j)
@@ -565,4 +564,59 @@ double CompactUnSymmMatrix::diag(int i)
 	assert(false);
 
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+void CompactUnSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r)
+{
+	int j, i, n;
+	int N = Size();
+
+	double* pv, rj;
+	int* pi;
+
+	// loop over all columns
+	for (j=0; j<N; ++j)
+	{
+		pv = m_pd  + m_ppointers[j] - m_offset;
+		pi = m_pindices + m_ppointers[j]  - m_offset;
+		n = m_ppointers[j+1] - m_ppointers[j];
+
+		// add off-diagonal elements
+		for (i=1; i<n-7; i+=8)
+		{
+			// add lower triangular element
+			r[pi[i  ] - m_offset] += pv[i  ]*x[j];
+			r[pi[i+1] - m_offset] += pv[i+1]*x[j];
+			r[pi[i+2] - m_offset] += pv[i+2]*x[j];
+			r[pi[i+3] - m_offset] += pv[i+3]*x[j];
+			r[pi[i+4] - m_offset] += pv[i+4]*x[j];
+			r[pi[i+5] - m_offset] += pv[i+5]*x[j];
+			r[pi[i+6] - m_offset] += pv[i+6]*x[j];
+			r[pi[i+7] - m_offset] += pv[i+7]*x[j];
+		}
+		for (i=0; i<(n-1)%8; ++i)
+			r[pi[n-1-i] - m_offset] += pv[n-1-i]*x[j];
+
+		// add diagonal element
+		rj = pv[0]*x[j]; 
+
+		// add upper-triangular elements
+		for (i=1; i<n-7; i+=8)
+		{
+			// add upper triangular element
+			rj += pv[i  ]*x[pi[i  ] - m_offset];
+			rj += pv[i+1]*x[pi[i+1] - m_offset];
+			rj += pv[i+2]*x[pi[i+2] - m_offset];
+			rj += pv[i+3]*x[pi[i+3] - m_offset];
+			rj += pv[i+4]*x[pi[i+4] - m_offset];
+			rj += pv[i+5]*x[pi[i+5] - m_offset];
+			rj += pv[i+6]*x[pi[i+6] - m_offset];
+			rj += pv[i+7]*x[pi[i+7] - m_offset];
+		}
+		for (i=0; i<(n-1)%8; ++i)
+			rj += pv[n-1-i]*x[pi[n-1-i] - m_offset];
+
+		r[j] += rj;
+	}
 }

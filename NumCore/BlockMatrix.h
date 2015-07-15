@@ -8,6 +8,7 @@
 // matrices can be unsymmetric.
 class BlockMatrix : public SparseMatrix
 {
+public:
 	struct BLOCK
 	{
 		int		nstart_row, nend_row;
@@ -51,9 +52,24 @@ public:
 	//! zero matrix elements
 	void zero();
 
-protected:
-	int find_partition(int i);
+public:
+	//! return number of blocks
+	int Blocks() const { return (int) m_Block.size(); }
+
+	//! get a block
 	BLOCK& Block(int i, int j);
+
+	//! find the partition index of an equation number i
+	int find_partition(int i);
+
+	//! return number of partitions
+	int Partitions() const { return (int) m_part.size() - 1; }
+
+	//! Start equation index of partition i
+	int StartEquationIndex(int i) { return m_part[i]; }
+
+	//! number of equations in partition i
+	int PartitionEquations(int i) { return m_part[i+1]-m_part[i]; }
 
 protected:
 	vector<int>		m_part;		//!< partition list

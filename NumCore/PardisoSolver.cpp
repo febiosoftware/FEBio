@@ -33,6 +33,12 @@ SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype)
 }
 
 //-----------------------------------------------------------------------------
+void PardisoSolver::SetSparseMatrix(CompactMatrix* pA)
+{
+	m_pA = pA;
+}
+
+//-----------------------------------------------------------------------------
 bool PardisoSolver::PreProcess()
 {
 	m_mtype = (m_bsymm ? -2 : 11); /* Real symmetric matrix */
