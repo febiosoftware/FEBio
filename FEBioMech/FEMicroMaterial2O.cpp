@@ -418,6 +418,7 @@ void FEMicroMaterial2O::UpdateBC(FEModel& rve, mat3d& F, tens3drs& G)
 // The stiffness is evaluated at the same time the stress is evaluated so we 
 // can just return it here. Note that this assumes that the stress function 
 // is always called prior to the tangent function.
+// LTE - Note that this function is not used in the second-order implemenetation
 tens4ds FEMicroMaterial2O::Tangent(FEMaterialPoint &mp)
 {
 	FEMicroMaterialPoint2O& mmpt = *mp.ExtractData<FEMicroMaterialPoint2O>();
@@ -425,6 +426,7 @@ tens4ds FEMicroMaterial2O::Tangent(FEMaterialPoint &mp)
 }
 
 //-----------------------------------------------------------------------------
+// LTE - Note that this function is not used in the second-order implemenetation
 mat3ds FEMicroMaterial2O::Stress(FEMaterialPoint &mp)
 {
 	mat3ds sa; sa.zero();
@@ -434,6 +436,7 @@ mat3ds FEMicroMaterial2O::Stress(FEMaterialPoint &mp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the average stress from the RVE solution.
+// LTE - Note that this function is not used in the second-order implemenetation
 mat3ds FEMicroMaterial2O::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 {
 	mat3ds sa; sa.zero();
@@ -462,8 +465,8 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 	mat3d F = pt.m_F;
 	tens3drs G = mmpt2O.m_G;
 
+	// If running the verification problem from Nguygen et al...
 	bool verification = false;
-
 	if (verification){
 		mat3d U_grad = F - mat3dd(1);
 		mat3d s;
@@ -494,17 +497,21 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException();
 
-	// calculate the averaged stress
+	// calculate the averaged Cauchy stress
 	mat3ds sa; sa.zero();
 	tens3ds taua; taua.zero();
-
 	AveragedStress2O(rve, mp, pt.m_s, mmpt2O.m_tau);
+	
+	// calculate the averaged PK1 stress
 	AveragedStress2OPK1(rve, mp, mmpt2O.m_PK1, mmpt2O.m_QK1);
+	
+	// calculate the averaged PK2 stress
 	AveragedStress2OPK2(rve, mp, mmpt2O.m_S, mmpt2O.m_T);
 
 	// calculate the averaged stiffness
 	AveragedStiffness(rve, mp, mmpt2O.m_Ca, mmpt2O.m_Da, mmpt2O.m_Ea);
 
+	// calculate the difference between the macro and micro energy for Hill-Mandel condition
 	calc_energy_diff(rve, mp);	
 
 	// set the plot file
@@ -956,23 +963,20 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	
 	// calculate the energy difference between macro point and RVE
 	// to verify that we have satisfied the Hill-Mandel condition
-	mat3ds e_prev = ((mat3dd(1) - pt.m_F_prev.transinv()*pt.m_F_prev.inverse())*0.5).sym();
-	tens3drs Ginv_prev; Ginv_prev = mmpt2O.m_G_prev; Ginv_prev.contractleg2(pt.m_F_prev.inverse(),1); Ginv_prev.contractleg2(pt.m_F_prev.inverse(),2); Ginv_prev.contractleg2(pt.m_F_prev.inverse(),3);
-	tens3dls Ginvtrans_prev = Ginv_prev.transpose();
-	tens3ds h_prev = ((Ginvtrans_prev.multiply2right(pt.m_F_prev.inverse()).LStoUnsym() + Ginv_prev.multiply2left(pt.m_F_prev.transinv()).RStoUnsym())*-0.5).symm();
 	
-	mmpt2O.m_macro_energy_inc = pt.m_s.dotdot(mmpt2O.m_e - e_prev) + mmpt2O.m_tau.tripledot3s(mmpt2O.m_h - h_prev);
+	// calculate the macroscopic strain energy increment
+	mmpt2O.m_macro_energy_inc = mmpt2O.m_PK1.dotdot(pt.m_F - pt.m_F_prev) + mmpt2O.m_QK1.tripledot3rs(mmpt2O.m_G - mmpt2O.m_G_prev);
 
+	// calculate the microscopic strain energy increment
 	double rve_energy_avg = 0.;
-	double J = 0.;
 	int nint; 
 	double* w;
-	double v = 0.;
 	mat3d rve_F;		
 	mat3d rve_F_prev;
-	mat3ds rve_e;
-	mat3ds rve_e_prev;
 	mat3ds rve_s;
+	mat3d rve_PK1;
+	double J0 = 0.;
+	double V0 = 0.;
 
 	FEMesh& m = rve.GetMesh();
 	for (int k=0; k<m.Domains(); ++k)
@@ -989,19 +993,18 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 				FEElasticMaterialPoint& rve_pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
 				
 				rve_F = rve_pt.m_F;
-				rve_e = ((mat3dd(1) - rve_F.transinv()*rve_F.inverse())*0.5).sym();
 				rve_s = rve_pt.m_s;
 				rve_F_prev = rve_pt.m_F_prev;
-				rve_e_prev = ((mat3dd(1) - rve_F_prev.transinv()*rve_F_prev.inverse())*0.5).sym();
 				
-				J = dom.detJt(el, n);
-				rve_energy_avg += rve_s.dotdot(rve_e - rve_e_prev)*J*w[n];
-				v += J*w[n];
+				rve_PK1 = rve_F.det()*rve_s*rve_F.transinv();
+				J0 = dom.detJ0(el, n);
+				rve_energy_avg += rve_PK1.dotdot(rve_F - rve_F_prev)*J0*w[n];
+				V0 += J0*w[n];
 			}
 		}
 	}
 
-	mmpt2O.m_micro_energy_inc = rve_energy_avg/v;
+	mmpt2O.m_micro_energy_inc = rve_energy_avg/V0;
 }
 
 //-----------------------------------------------------------------------------

@@ -50,12 +50,12 @@ public:
 	mat3ds     m_e;				// LTE - Euler-Almansi strain
 	tens3ds    m_h;				// LTE - Euler-Almansi strain graident
 
-	double     m_macro_energy;	// LTE - Macroscopic strain energy
-	double	   m_micro_energy;	// LTE - Volume-average of strain energy throughout the RVE solution
+	double     m_macro_energy;	// LTE - Total macroscopic strain energy
+	double	   m_micro_energy;	// LTE - Total volume-average of strain energy throughout the RVE solution
 	double	   m_energy_diff;	// LTE - Difference between macro energy and volume averaged energy of RVE (should be zero) 
 
-	double	   m_macro_energy_inc;
-	double	   m_micro_energy_inc;
+	double	   m_macro_energy_inc;	// LTE - Macroscopic strain energy increment
+	double	   m_micro_energy_inc;	// LTE - Microscopic strain energy increment
 
 	tens4ds	   m_Ca;			//!< averaged material stiffness
 	tens5ds    m_Da;

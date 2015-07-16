@@ -669,20 +669,20 @@ void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	
 	// calculate the energy difference between macro point and RVE
 	// to verify that we have satisfied the Hill-Mandel condition
-	mat3ds e_prev = ((mat3dd(1) - pt.m_F_prev.transinv()*pt.m_F_prev.inverse())*0.5).sym();
-	
-	mmpt.m_macro_energy_inc = pt.m_s.dotdot(mmpt.m_e - e_prev);
-	
+
+	// calculate the macroscopic strain energy increment
+	mmpt.m_macro_energy_inc = mmpt.m_PK1.dotdot(pt.m_F - pt.m_F_prev);
+
+	// calculate the microscopic strain energy increment
 	double rve_energy_avg = 0.;
-	double J = 0.;
 	int nint; 
 	double* w;
-	double v = 0.;
 	mat3d rve_F;		
 	mat3d rve_F_prev;
-	mat3ds rve_e;
-	mat3ds rve_e_prev;
 	mat3ds rve_s;
+	mat3d rve_PK1;
+	double J0 = 0.;
+	double V0 = 0.;
 
 	FEMesh& m = rve.GetMesh();
 	for (int k=0; k<m.Domains(); ++k)
@@ -699,19 +699,18 @@ void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 				FEElasticMaterialPoint& rve_pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
 				
 				rve_F = rve_pt.m_F;
-				rve_e = ((mat3dd(1) - rve_F.transinv()*rve_F.inverse())*0.5).sym();
 				rve_s = rve_pt.m_s;
 				rve_F_prev = rve_pt.m_F_prev;
-				rve_e_prev = ((mat3dd(1) - rve_F_prev.transinv()*rve_F_prev.inverse())*0.5).sym();
-				
-				J = dom.detJt(el, n);
-				rve_energy_avg += rve_s.dotdot(rve_e - rve_e_prev)*J*w[n];
-				v += J*w[n];
+
+				rve_PK1 = rve_F.det()*rve_s*rve_F.transinv();
+				J0 = dom.detJ0(el, n);
+				rve_energy_avg += rve_PK1.dotdot(rve_F - rve_F_prev)*J0*w[n];
+				V0 += J0*w[n];
 			}
 		}
 	}
 
-	mmpt.m_micro_energy_inc = rve_energy_avg/v;
+	mmpt.m_micro_energy_inc = rve_energy_avg/V0;
 }
 
 //-----------------------------------------------------------------------------
