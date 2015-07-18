@@ -1140,9 +1140,6 @@ bool FEBioModel::Init()
 	//       the case, otherwise we should also solve for t=0
 	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER) m_plot->Write(*this);
 
-	// do the callback
-	DoCallback(CB_MAJOR_ITERS);
-
 	// Alright, all initialization is done, so let's get busy !
 	return true;
 }
@@ -1192,7 +1189,7 @@ bool FEBioModel::Reset()
 	}
 */
 	// do the callback
-	DoCallback(CB_MAJOR_ITERS);
+	DoCallback(CB_INIT);
 
 	// All data is reset successfully
 	return true;

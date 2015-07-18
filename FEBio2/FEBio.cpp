@@ -103,7 +103,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // callback to update window title
-void update_console_cb(FEModel* pfem, void* pd)
+void update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 {
 	FEBioModel& fem = static_cast<FEBioModel&>(*pfem);
 
@@ -158,7 +158,7 @@ void add_break_point(double t)
 
 //-----------------------------------------------------------------------------
 // callback for ctrl+c interruptions
-void interrupt_cb(FEModel* pfem, void* pd)
+void interrupt_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 {
 	Interruption itr;
 	if (itr.m_bsig)
@@ -455,7 +455,7 @@ int Run(CMDOPTIONS& ops)
 		FEBioModel fem;
 
 		// register callbacks
-		fem.AddCallback(update_console_cb, CB_MAJOR_ITERS, 0);
+		fem.AddCallback(update_console_cb, CB_MAJOR_ITERS | CB_INIT, 0);
 		fem.AddCallback(interrupt_cb     , CB_MINOR_ITERS, 0);
 
 		// intialize the framework

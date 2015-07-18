@@ -35,7 +35,7 @@ void mrqcof(vector<double>& x,
 			double& chisq,
 			void funcs(vector<double>& , vector<double>&, vector<double>&, matrix&));
 
-extern void fecb(FEModel* pfem, void* pd);
+extern void fecb(FEModel* pfem, unsigned int nwhen, void* pd);
 
 //-----------------------------------------------------------------------------
 FELMOptimizeMethod::FELMOptimizeMethod()
@@ -86,7 +86,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 
 	// set the FEM callback function
 	FEModel& fem = opt.GetFEM();
-	fem.AddCallback(fecb, CB_MAJOR_ITERS, &opt);
+	fem.AddCallback(fecb, CB_MAJOR_ITERS | CB_INIT, &opt);
 
 	// don't plot anything
 	fem.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);

@@ -7,7 +7,7 @@
 void linmin(double* p, double* xi, int n, double* fret, double (*fnc)(double[]));
 void powell(double* p, double* xi, int n, double ftol, int* iter, double* fret, double (*fnc)(double[]));
 double brent(double ax, double bx, double cx, double (*f)(double), double tol, double* xmin);
-void fecb(FEModel* pfem, void* pd);
+void fecb(FEModel* pfem, unsigned int nwhen, void* pd);
 void mnbrak(double* ax, double* bx, double* cx, double* fa, double* fb, double* fc, double (*fnc)(double));
 double golden(double ax, double bx, double cx, double (*f)(double), double tol, double* xmin);
 
@@ -48,7 +48,7 @@ bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt)
 
 	// set the FEM callback function
 	FEModel& fem = opt.GetFEM();
-	fem.AddCallback(fecb, CB_MAJOR_ITERS, &opt);
+	fem.AddCallback(fecb, CB_MAJOR_ITERS | CB_INIT, &opt);
 
 	// don't plot anything
 	fem.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
@@ -99,7 +99,7 @@ bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt)
 }
 
 //-------------------------------------------------------------------
-void fecb(FEModel* pmdl, void* pd)
+void fecb(FEModel* pmdl, unsigned int nwhen, void* pd)
 {
 	// get the optimizaton data
 	FEOptimizeData& opt = *((FEOptimizeData*) pd);

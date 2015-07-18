@@ -25,12 +25,13 @@ class DataRecord;
 
 //-----------------------------------------------------------------------------
 // callback structure
-#define CB_ALWAYS		0x00000011
-#define CB_MAJOR_ITERS	0x00000001
-#define CB_MINOR_ITERS	0x00000010
+#define CB_ALWAYS		0x00000111		//!< Call for all reasons
+#define CB_INIT			0x00000001		//!< Call after model initialization (i.e. FEModel::Init())
+#define CB_MAJOR_ITERS	0x00000010		//!< Call at the end of each major converged iteration
+#define CB_MINOR_ITERS	0x00000100		//!< Call for each minor iteration
 
 typedef unsigned int FECORE_CB_WHEN;
-typedef void (*FECORE_CB_FNC)(FEModel*,void*);
+typedef void (*FECORE_CB_FNC)(FEModel*,unsigned int,void*);
 struct FECORE_CALLBACK {
 	FECORE_CB_FNC	m_pcb;		// pointer to callback function
 	void*			m_pd;		// pointer to user data

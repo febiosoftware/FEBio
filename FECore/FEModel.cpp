@@ -126,6 +126,9 @@ bool FEModel::Init()
 	// initialize nonlinear constraints
 	if (InitConstraints() == false) return false;
 
+	// do the callback
+	DoCallback(CB_INIT);
+
 	return true;
 }
 
@@ -873,7 +876,7 @@ void FEModel::DoCallback(unsigned int nevent)
 	for (int i=0; i<(int) m_pcb.size(); ++i, ++it)
 	{
 		// call the callback function
-		if (it->m_nwhen & nevent) (it->m_pcb)(this, it->m_pd);
+		if (it->m_nwhen & nevent) (it->m_pcb)(this, nevent, it->m_pd);
 	}
 }
 

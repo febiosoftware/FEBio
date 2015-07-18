@@ -94,7 +94,7 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 
 	// set the FEM callback function
 	FEModel& fem = opt.GetFEM();
-	fem.AddCallback(fecb, CB_MAJOR_ITERS, &opt);
+	fem.AddCallback(fecb, CB_MAJOR_ITERS | CB_INIT, &opt);
 
 	// don't plot anything
 	fem.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);

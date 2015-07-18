@@ -11,7 +11,7 @@ END_PARAMETER_LIST();
 // FEScanOptimizeMethod
 //-----------------------------------------------------------------------------
 
-void fecb(FEModel* pfem, void* pd);
+void fecb(FEModel* pfem, unsigned int nwhen, void* pd);
 
 bool FEScanOptimizeMethod::Solve(FEOptimizeData* pOpt)
 {
@@ -29,7 +29,7 @@ bool FEScanOptimizeMethod::Solve(FEOptimizeData* pOpt)
 
 	// set the FEM callback function
 	FEModel& fem = opt.GetFEM();
-	fem.AddCallback(fecb, CB_MAJOR_ITERS, &opt);
+	fem.AddCallback(fecb, CB_MAJOR_ITERS | CB_INIT, &opt);
 
 	// set the data
 	OPT_OBJECTIVE& obj = opt.GetObjective();
