@@ -20,6 +20,7 @@
 #include "FEBioOutputSection.h"
 #include "FEBioStepSection.h"
 #include "FEBioDiscreteSection.h"
+#include "FEBioCodeSection.h"
 #include "FECore/DataStore.h"
 #include "FECore/log.h"
 #include "FECore/Image.h"
@@ -278,8 +279,9 @@ FEBioImport::FEBioImport()
 	// version 2.0 only!
 	m_map["Parameters" ] = new FEBioParametersSection (this);
 	m_map["Include"    ] = new FEBioIncludeSection    (this);
-	m_map["Contact"    ] = new FEBioContactSection(this);
-	m_map["Discrete"   ] = new FEBioDiscreteSection(this);
+	m_map["Contact"    ] = new FEBioContactSection    (this);
+	m_map["Discrete"   ] = new FEBioDiscreteSection   (this);
+	m_map["Code"       ] = new FEBioCodeSection       (this);	// added in FEBio 2.4 (experimental feature!)
 }
 
 //=============================================================================

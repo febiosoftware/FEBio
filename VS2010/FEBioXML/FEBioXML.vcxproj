@@ -403,6 +403,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioXML\FEBioBoundarySection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioCodeSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioConstraintsSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioContactSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioControlSection.cpp" />
@@ -425,6 +426,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioXML\FEBioBoundarySection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioCodeSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioConstraintsSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioContactSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioControlSection.h" />

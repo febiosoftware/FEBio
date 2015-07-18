@@ -120,6 +120,7 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FEGLOBALDATA_ID				0x000F	// derived from FEGlobalData
 #define FERIGIDOBJECT_ID			0x0010	// derived from FECoreBase (TODO: work in progress)
 #define FENLCLOGDATA_ID             0x0011	// derived from FELogNLConstraintData
+#define FECALLBACK_ID				0x0012	// derived from FECallBack
 
 /////////////////////////////////////////////////////////////////////////////
 // ENUM: Linear solvers
