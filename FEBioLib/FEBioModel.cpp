@@ -20,19 +20,6 @@ extern void echo_input(FEBioModel& fem);
 // Constructor of FEBioModel class.
 FEBioModel::FEBioModel()
 {
-	// --- Direct Solver Data ---
-	// set the default linear solver
-	// TODO: I don't want to do this here. In fact, I want
-	//       to be able to use different solvers even if 
-	//       when these directives are not declared.
-#ifdef PARDISO
-	m_nsolver = PARDISO_SOLVER;
-#elif PSLDLT
-	m_nsolver = PSLDLT_SOLVER;
-#else
-	m_nsolver = SKYLINE_SOLVER;
-#endif
-
 	// --- I/O-Data ---
 	m_szfile_title = 0;
 	m_szfile[0] = 0;

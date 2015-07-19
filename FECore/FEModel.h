@@ -335,4 +335,8 @@ protected:
 protected: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
 	vector<FEGlobalData*>	m_GD;		//!< global data structures
+
+public:
+	static void SetDefaultSolver(int nsolver) { m_ndefault_solver = nsolver; } 
+	static int m_ndefault_solver;
 };

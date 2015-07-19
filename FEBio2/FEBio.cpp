@@ -91,7 +91,8 @@ int Run(CMDOPTIONS& ops);
 int prompt(CMDOPTIONS& ops);
 int get_app_path (char *pname, size_t pathsize);
 extern void InitFEBioLibrary();
-bool Configure(FEBioModel& fem, const char *szfile);
+bool Configure(const char *szfile);
+void LoadPlugin(const char* szfile);
 
 //-----------------------------------------------------------------------------
 // we use the console to log output 
@@ -202,15 +203,29 @@ int main(int argc, char* argv[])
 	// print welcome message
 	if (ops.bsplash && (!ops.bsilent)) Hello();
 
-
-	//-------------------------
-	// Begin FEBio instance
-	// ------------------------
+	// Initialize FEBio library
 	InitFEBioLibrary();
+
+	// set default linear solver
+	// (Set this before the configuration is read in because
+	//  the configuration can change the default linear solver.)
+#ifdef PARDISO
+	FEModel::SetDefaultSolver(PARDISO_SOLVER);
+#else
+	FEModel::SetDefaultSolver(SKYLINE_SOLVER);
+#endif
+
+	// read the configration file if specified
+	if (ops.szcnf[0])
+		if (Configure(ops.szcnf) == false) return 1;
 
 	// if there are no arguments, print the FEBio prompt
 	if (argc == 1)	 return (prompt(ops));
 	else			 return Run(ops);
+
+	// Don't forget to cleanup the plugins
+	FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
+	pPM->DeleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -228,7 +243,6 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	bool bdmp = false;
 	bool brun = true;
 	
-
 	ops.szfile[0] = 0;
 	ops.sztask[0] = 0;
 	ops.szctrl[0] = 0;
@@ -440,68 +454,58 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	return brun;
 }
 
-
-
+//-----------------------------------------------------------------------------
+// Run an FEBio input file. 
 int Run(CMDOPTIONS& ops)
 {
-		// if silent mode only output to file
-		if (ops.bsilent)
-		{
-			felog.SetMode(Logfile::FILE_ONLY);
-			Console::GetHandle()->Deactivate();
-		}
+	// if silent mode only output to file
+	if (ops.bsilent)
+	{
+		felog.SetMode(Logfile::FILE_ONLY);
+		Console::GetHandle()->Deactivate();
+	}
 
-		// create the one and only FEBioModel object
-		FEBioModel fem;
+	// create the one and only FEBioModel object
+	FEBioModel fem;
 
-		// register callbacks
-		fem.AddCallback(update_console_cb, CB_MAJOR_ITERS | CB_INIT, 0);
-		fem.AddCallback(interrupt_cb     , CB_MINOR_ITERS, 0);
+	// register callbacks
+	fem.AddCallback(update_console_cb, CB_MAJOR_ITERS | CB_INIT, 0);
+	fem.AddCallback(interrupt_cb     , CB_MINOR_ITERS, 0);
 
-		// intialize the framework
-		FEBioCommand::SetFEM(&fem);
+	// intialize the framework
+	FEBioCommand::SetFEM(&fem);
 
-				// read the configration file if specified
-		if (ops.szcnf[0])
-			if (Configure(fem, ops.szcnf) == false) return 1;
+	// set options that were passed on the command line
+	fem.SetDebugFlag(ops.bdebug);
+
+	// set the output filenames
+	fem.SetLogFilename (ops.szlog);
+	fem.SetPlotFilename(ops.szplt);  
+	fem.SetDumpFilename(ops.szdmp);
 		
+	// read the input file if specified
+	if (ops.szfile[0])
+	{
+		// store the input file name
+		fem.SetInputFilename(ops.szfile);
 
-		// set options that were passed on the command line
-		fem.SetDebugFlag(ops.bdebug);
+		// read the input file
+		if (fem.Input(ops.szfile) == false) return 1;
+	}
 
-		// set the output filenames
-		fem.SetLogFilename (ops.szlog);
-		fem.SetPlotFilename(ops.szplt);  
-		fem.SetDumpFilename(ops.szdmp);
-		
-		// read the input file if specified
-		if (ops.szfile[0])
-		{
-			// store the input file name
-			fem.SetInputFilename(ops.szfile);
+	// find a task
+	FECoreTask* ptask = fecore_new<FECoreTask>(FETASK_ID, ops.sztask, &fem);
+	if (ptask == 0)
+	{
+		fprintf(stderr, "Don't know how to do task: %s\n", ops.sztask);
+		return 1;
+	}
 
-			// read the input file
-			if (fem.Input(ops.szfile) == false) return 1;
-		}
+	// run the FEBio task (and pass the optional control file)
+	bool bret = ptask->Run(ops.szctrl);
 
-		// find a task
-		FECoreTask* ptask = fecore_new<FECoreTask>(FETASK_ID, ops.sztask, &fem);
-		if (ptask == 0)
-		{
-			fprintf(stderr, "Don't know how to do task: %s\n", ops.sztask);
-			return 1;
-		}
-
-		// run the FEBio task (and pass the optional control file)
-		bool bret = ptask->Run(ops.szctrl);
-
-		// Don't forget to cleanup the plugins
-		FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
-		pPM->DeleteThis();
-
-		return (bret?0:1);
+	return (bret?0:1);
 }
-
 
 //-----------------------------------------------------------------------------
 //! Prints the FEBio prompt. If the user did not enter anything on the command
@@ -528,6 +532,7 @@ int prompt(CMDOPTIONS& ops)
 			{
 				fprintf(stderr, "\n");
 				fprintf(stderr, "help - print this info\n");
+				fprintf(stderr, "import - load a plugin\n");
 				fprintf(stderr, "quit - exits the application\n");
 				fprintf(stderr, "run [-i,-s] <file> [OPTIONS] - run an FEBio input file\n");
 				fprintf(stderr, "version - print version information\n");
@@ -535,12 +540,17 @@ int prompt(CMDOPTIONS& ops)
 			else if (strcmp(argv[0], "run") == 0)
 			{
 				ParseCmdLine(nargs, argv, ops);
+
 				// run the FEBio2 on the ops
-				// in the case that no config file is found return 1;
 				Run(ops);
 					
 				// reset the title after computation.
 				pShell->SetTitle("FEBio2");
+			}
+			else if (strcmp(argv[0], "import") == 0)
+			{
+				if (nargs < 2) fprintf(stderr, "missing file name\n");
+				else LoadPlugin(argv[1]);
 			}
 			else if (strcmp(argv[0], "version") == 0)
 			{
@@ -561,7 +571,7 @@ int prompt(CMDOPTIONS& ops)
 //-----------------------------------------------------------------------------
 //! Reads the FEBio configuration file. This file contains some default settings.
 
-bool Configure(FEBioModel& fem, const char *szfile)
+bool Configure(const char *szfile)
 {
 	// open the configuration file
 	XMLReader xml;
@@ -589,31 +599,18 @@ bool Configure(FEBioModel& fem, const char *szfile)
 					if (tag == "linear_solver")
 					{
 						const char* szt = tag.AttributeValue("type");
-						if      (strcmp(szt, "skyline"           ) == 0) fem.m_nsolver = SKYLINE_SOLVER;
-						else if (strcmp(szt, "psldlt"            ) == 0) fem.m_nsolver = PSLDLT_SOLVER;
-						else if (strcmp(szt, "superlu"           ) == 0) fem.m_nsolver = SUPERLU_SOLVER;
-						else if (strcmp(szt, "superlu_mt"        ) == 0) fem.m_nsolver = SUPERLU_MT_SOLVER;
-						else if (strcmp(szt, "pardiso"           ) == 0) fem.m_nsolver = PARDISO_SOLVER;
-						else if (strcmp(szt, "rcicg"             ) == 0) fem.m_nsolver = RCICG_SOLVER;
-						else if (strcmp(szt, "wsmp"              ) == 0) fem.m_nsolver = WSMP_SOLVER;
+						if      (strcmp(szt, "skyline"           ) == 0) FEModel::SetDefaultSolver(SKYLINE_SOLVER   );
+						else if (strcmp(szt, "psldlt"            ) == 0) FEModel::SetDefaultSolver(PSLDLT_SOLVER    );
+						else if (strcmp(szt, "superlu"           ) == 0) FEModel::SetDefaultSolver(SUPERLU_SOLVER   );
+						else if (strcmp(szt, "superlu_mt"        ) == 0) FEModel::SetDefaultSolver(SUPERLU_MT_SOLVER);
+						else if (strcmp(szt, "pardiso"           ) == 0) FEModel::SetDefaultSolver(PARDISO_SOLVER   );
+						else if (strcmp(szt, "rcicg"             ) == 0) FEModel::SetDefaultSolver(RCICG_SOLVER     );
+						else if (strcmp(szt, "wsmp"              ) == 0) FEModel::SetDefaultSolver(WSMP_SOLVER      );
 					}
 					else if (tag == "import")
 					{
 						const char* szfile = tag.szvalue();
-						FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
-						int nerr = pPM->LoadPlugin(szfile);
-						switch (nerr)
-						{
-						case 0: fprintf(stderr, "Success loading plugin %s\n", szfile); break;
-						case 1: fprintf(stderr, "Failed loading plugin %s\n Reason: Failed to load the file.\n\n", szfile); break;
-						case 2: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginNumClasses not found.\n\n", szfile); break;
-						case 3: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginGetFactory not found.\n\n", szfile); break;
-						case 4: fprintf(stderr, "Failed loading plugin %s\n Reason: Invalid number of classes returned by PluginNumClasses.\n\n", szfile); break;
-						case 5: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function GetSDKVersion not found.\n\n", szfile); break;
-						case 6: fprintf(stderr, "Failed loading plugin %s\n Reason: Invalid SDK version.\n\n", szfile); break;
-						default:
-							fprintf(stderr, "Failed loading plugin %s\n Reason: unspecified.\n\n", szfile); break;
-						}
+						LoadPlugin(szfile);
 					}
 /*					else if (tag == "import_folder")
 					{
@@ -660,4 +657,36 @@ bool Configure(FEBioModel& fem, const char *szfile)
 	xml.Close();
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+const char* GetFileTitle(const char* szfile)
+{
+	const char* ch = strrchr(szfile, '\\');
+	if (ch == 0) { 
+		ch = strrchr(szfile, '/');
+		if (ch == 0) ch = szfile; else ch++;
+	}
+	else ch++;
+	return ch;
+}
+
+//-----------------------------------------------------------------------------
+void LoadPlugin(const char* szfile)
+{
+	const char* sztitle = GetFileTitle(szfile);
+	FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
+	int nerr = pPM->LoadPlugin(szfile);
+	switch (nerr)
+	{
+	case 0: fprintf(stderr, "Success loading plugin %s\n", sztitle); break;
+	case 1: fprintf(stderr, "Failed loading plugin %s\n Reason: Failed to load the file.\n\n", szfile); break;
+	case 2: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginNumClasses not found.\n\n", szfile); break;
+	case 3: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginGetFactory not found.\n\n", szfile); break;
+	case 4: fprintf(stderr, "Failed loading plugin %s\n Reason: Invalid number of classes returned by PluginNumClasses.\n\n", szfile); break;
+	case 5: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function GetSDKVersion not found.\n\n", szfile); break;
+	case 6: fprintf(stderr, "Failed loading plugin %s\n Reason: Invalid SDK version.\n\n", szfile); break;
+	default:
+		fprintf(stderr, "Failed loading plugin %s\n Reason: unspecified.\n\n", szfile); break;
+	}
 }

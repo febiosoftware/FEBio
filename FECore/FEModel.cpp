@@ -7,6 +7,9 @@
 #include "FECoreKernel.h"
 using namespace std;
 
+// set the default linear solver (0 is equivalent to skyline solver)
+int FEModel::m_ndefault_solver = 0;
+
 //-----------------------------------------------------------------------------
 FEModel::FEModel(void)
 {
@@ -24,6 +27,7 @@ FEModel::FEModel(void)
 	m_ut4_alpha = 0.05;
 	m_ut4_bdev = false;
 	m_udghex_hg = 1.0;
+	m_nsolver = m_ndefault_solver;
 }
 
 //-----------------------------------------------------------------------------
