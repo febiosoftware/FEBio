@@ -1,0 +1,16 @@
+/**
+\page plugin_log Accessing the FEBio Log file
+By default FEBio writes all output to a log file. More precisely, it uses the Logfile class which writes to both the standard output as well as to a file. FEBio also
+defines a felog variable, an instance of Logfile, that developers can use to write to the log file. Although plugins also define an felog variable (by including FECore\log.h) it is important to realize that this is not the same log file that is being used by FEBio. Instead, it is a variable that is only local to the plugin. Although a plugin could use this variable to output information, that information will not be stored in the log file.
+
+In order to access the FEBio log file, you must call the FECoreKernel::GetLogfile during the PluginInitialize function. The pointer returned by this function
+can then be stored and used to write to the actual FEBio log file. 
+
+\code
+Logfile* plog = 0;
+FECORE_EXPORT void PluginInitialize(FECoreKernel& febio)
+{
+	plog = febio.GetLogfile();
+}
+\endcode
+*/

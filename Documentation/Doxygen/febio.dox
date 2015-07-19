@@ -1,19 +1,54 @@
 /** 
 \page febio Overview of FEBio
 
-As of FEBio 2.0, the source code is organized into different modules, each module implemented in a separate library.
-Each library collects a set of classes and functions to solve a specific task. The following list shows the different
-libraries and the functionality they implement.
+As of FEBio 2.0, the source code is organized into different modules, each module implemented in a separate library. 
+The following figure shows the relationship between the different modules.
 
-\li FECore: a library containing most base classes that define the FEBio framework.
-\li FEBioMech: a library implementing solution algorithms for solving 3D structural mechanics problems.
-\li FEBioMix: this library extends FEBioMech and adds support for biphasic and materials with solutes (e.g. triphasic and multiphasic), as well as chemical reactions.
-\li FEBioHeat: a library implementing solution algorithms for 3D linear static and transient heat problems.
+\image html febio.png "Overview of FEBio"
+
+Each library collects a set of classes and functions to solve a specific task. The following list shows the different
+libraries and the functionality they implement. A more detailed description is provided below.
+
+\li <b>FECore</b>: a library containing most base classes that define the FEBio framework.
+\li <b>FEBioMech</b>: a library implementing solution algorithms for solving 3D structural mechanics problems.
+\li <b>FEBioMix</b>: this library extends FEBioMech and adds support for biphasic and materials with solutes (e.g. triphasic and multiphasic), as well as chemical reactions.
+\li <b>FEBioHeat</b>: a library implementing solution algorithms for 3D linear static and transient heat problems.
 
 Additional libraries are provided to assist in running FEBio problems.
 
-\li NumCore: a library of numerical algorithms useful for finite element solvers (e.g. sparse linear solvers)
-\li FEBioXML: An xml-parser for reading the FEBio input files
-\li FEBioPlot: library for creating the FEBio plot files. 
+\li <b>NumCore</b>: a library of numerical algorithms useful for finite element solvers (e.g. sparse linear solvers)
+\li <b>FEBioXML</b>: An xml-parser for reading the FEBio input files
+\li <b>FEBioPlot</b>: library for creating the FEBio plot files. 
 
+The FEBio executable needs two more modules. 
+
+\li <b>FEBioLib</b>: This library helps in initialization of all the modules.
+\li <b>FEBio</b>: This module implements the command line front-end to FEBio.
+
+\section FECore FECore
+The FECore library contains all the base classes. New features are implemented by deriving new classes from some of these base classes and overriding some of the virtual functions. This library also implements the FECore kernel class, which is used for registering classes with the FEBio framework. Registering classes with FEBio is part of the automation mechanism which allows other modules to allocate classes. For instance, this makes it possible for users to implement a new feature that will automatically be recognized in the FEBio input file. When the user registers the new class with the FEBio framework, no additional I/O code needs to be written.
+
+\section FEBioMech FEBioMech
+This library implements algorithms for solving 3D quasi-static and dynamic structural mechanics problems. It also contains a large number of nonlinear, constitutive models. Contact algorithms for various types of tied and sliding interfaces can be found in this library as well. 
+
+\section FEBioMix FEBioMix
+The FEBioMix library extends the FEBioMech library by solving a type of coupled fluid-mechanics problem where the domain is assumed to be solid-fluid mixture. The fluid is assumed to be composed of a solvent and none, one or more solutes. Optionally, the solute concentrations can be affected by chemical reactions. This library also implements contact algorithms for handling fluid flow across contacting interfaces. Both quasi-static as well as transient conditions can be modeled. 
+
+\section FEBioHeat FEBioHeat
+This library implements steady-state and transient linear heat transfer. 
+
+\section NumCore NumCore
+The NumCore library implements algorithms for solving linear system of equations. Most of these classes are wrappers of third-party linear solver packages, such as Pardiso, SuperLU, WSMP. Most of these classes are designed for dealing with sparse matrices, although a dense matrix class and a linear solver for dense systems is implemented as well. 
+
+\section FEBioXML FEBioXML
+The FEBioXML library implements an XML-based parser that reads the FEBio input file. This library makes extensive use of the automation mechanism that is implemented in FEBio which facilitates the interaction between modules such that explicit knowledge of the contents of each module is not required. A great advantage of this is that users rarely have to modify this library directly. 
+
+\section FEBioPlot FEBioPlot
+This library implements the XPLT format that is used for storing the FEBio output results. The XPLT format is an extendible data format that can easily by customized to the needs of the model. As in the FEBioXML library, the automation mechanism is used to define the contents of the xplt file and developers will rarely need to modify this library directly.
+
+\section FEBioLib FEBioLib
+The FEBio library is a library that handles initialization of all the modules. It also defines the FEBioModel class, derived from FEModel, which handles most of the file management. This library also manages all the plugins.
+
+\section FEBio FEBio
+The FEBio module brings everything together by providing a command line front-end to the FEBio libraries. This project effectively builds the executable that is run by the users. It also implements a command manager, used on the FEBio prompt, manages the configuration file and offers several diagnostic tools for debugging implementations.
 */

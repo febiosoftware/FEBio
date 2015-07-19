@@ -73,7 +73,7 @@ In addition, classes for writing the internal variables to the plotfile can be d
 This function is used to register the individual factory classes with FEBio.
 
 \code
-FECORE_EXPORT PluginGetFactory(int i);
+FECORE_EXPORT FECoreFactory* PluginGetFactory(int i);
 \endcode
 
 This function will be called as many times as there are factory classes (i.e. the value returned by PluginNumClasses). In each call, it should return

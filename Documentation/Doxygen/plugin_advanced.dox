@@ -1,0 +1,8 @@
+/**
+\page plugin_advanced Advanced Plugin Topics
+
+The following articles discuss some advanced topics related to the FEBio plugin framework.
+
+\li \subpage plugin_log
+
+*/
