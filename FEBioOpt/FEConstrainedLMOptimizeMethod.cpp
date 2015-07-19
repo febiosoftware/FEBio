@@ -17,7 +17,7 @@ END_PARAMETER_LIST();
 FEConstrainedLMOptimizeMethod* FEConstrainedLMOptimizeMethod::m_pThis = 0;
 
 //-----------------------------------------------------------------------------
-extern void fecb(FEModel* pfem, void* pd);
+extern void fecb(FEModel* pfem, unsigned int, void* pd);
 
 //-----------------------------------------------------------------------------
 void clevmar_cb(double *p, double *hx, int m, int n, void *adata)
