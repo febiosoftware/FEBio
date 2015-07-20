@@ -92,7 +92,7 @@ int prompt(CMDOPTIONS& ops);
 int get_app_path (char *pname, size_t pathsize);
 extern void InitFEBioLibrary();
 bool Configure(const char *szfile);
-void LoadPlugin(const char* szfile);
+void ImportPlugin(const char* szfile);
 
 //-----------------------------------------------------------------------------
 // we use the console to log output 
@@ -550,7 +550,7 @@ int prompt(CMDOPTIONS& ops)
 			else if (strcmp(argv[0], "import") == 0)
 			{
 				if (nargs < 2) fprintf(stderr, "missing file name\n");
-				else LoadPlugin(argv[1]);
+				else ImportPlugin(argv[1]);
 			}
 			else if (strcmp(argv[0], "version") == 0)
 			{
@@ -610,7 +610,7 @@ bool Configure(const char *szfile)
 					else if (tag == "import")
 					{
 						const char* szfile = tag.szvalue();
-						LoadPlugin(szfile);
+						ImportPlugin(szfile);
 					}
 /*					else if (tag == "import_folder")
 					{
@@ -672,7 +672,7 @@ const char* GetFileTitle(const char* szfile)
 }
 
 //-----------------------------------------------------------------------------
-void LoadPlugin(const char* szfile)
+void ImportPlugin(const char* szfile)
 {
 	const char* sztitle = GetFileTitle(szfile);
 	FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
