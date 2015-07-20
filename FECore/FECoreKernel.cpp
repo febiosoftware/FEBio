@@ -20,6 +20,12 @@ Logfile& FECoreKernel::GetLogfile()
 }
 
 //-----------------------------------------------------------------------------
+void FECoreKernel::RegisterClass(FECoreFactory* ptf)
+{
+	m_Fac.push_back(ptf); 
+}
+
+//-----------------------------------------------------------------------------
 //! Create an object. An object is created by specifying the super-class id
 //! and the type-string. 
 void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
@@ -73,6 +79,13 @@ void FECoreKernel::List(SUPER_CLASS_ID sid)
 FECoreKernel::FECoreKernel()
 {
 	m_plog = Logfile::GetInstance();
+}
+
+//-----------------------------------------------------------------------------
+//! Register a new domain class
+void FECoreKernel::RegisterDomain(FEDomainFactory* pf)
+{
+	m_Dom.push_back(pf); 
 }
 
 //-----------------------------------------------------------------------------

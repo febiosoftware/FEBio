@@ -28,4 +28,6 @@ The model reset allows the user to reset the model to the initial configuration 
 
 This feature is used in FEBio by the optimization module, which resets the model at the beginning of each optimization iteration. 
 
+This page was edited last on Mon Jun 20 2015.
+
 */

@@ -1,6 +1,9 @@
 /** 
 \page febio Overview of FEBio
 
+FEBio is a finite element solver that is specifically designed for threedimensional biomechanical applications. It solves the nonlinear finite
+element equations using a quasi-Newton method called the BFGS-method. It offers  biologically relevant constitutive models and modeling scenarios.
+
 As of FEBio 2.0, the source code is organized into different modules, each module implemented in a separate library. 
 The following figure shows the relationship between the different modules.
 
@@ -51,4 +54,6 @@ The FEBio library is a library that handles initialization of all the modules. I
 
 \section FEBio FEBio
 The FEBio module brings everything together by providing a command line front-end to the FEBio libraries. This project effectively builds the executable that is run by the users. It also implements a command manager, used on the FEBio prompt, manages the configuration file and offers several diagnostic tools for debugging implementations.
+
+This page was edited last on Mon Jun 20 2015.
 */

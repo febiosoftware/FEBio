@@ -55,8 +55,7 @@ This function will be the first function called by FEBio and can be used to allo
 FECORE_EXPORT void PluginInitialize(FECoreKernel&);
 \endcode
 
-It takes one parameter, a reference to the kernel object. This object is used for accessing the resources managed by this class, such as logging.
-Since use of this class is an advanced feature, for most plugins it is advised to ignore it.
+It takes one parameter, a reference to the kernel object. This object is used for accessing the resources managed by this class, such as the \ref plugin_log "log file". This is also a good place to allocate any resources that the plugin may need. 
 
 \subsection PluginNumClasses
 This functions returns the number of classes that the plugin defines. 
@@ -119,5 +118,7 @@ Add the following line to this configuration file.
 \endcode
 
 That is, enclose the full path and filename of the plugin between "import" tags. When FEBio starts it will read all plugins listed in the configuration file. A message will be printed on the screen at the start of an FEBio analysis indicating if FEBio was successful in loading the plugin.
+
+This page was edited last on Mon Jun 20 2015.
 
 */

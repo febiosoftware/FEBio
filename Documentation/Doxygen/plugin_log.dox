@@ -13,4 +13,7 @@ FECORE_EXPORT void PluginInitialize(FECoreKernel& febio)
 	plog = febio.GetLogfile();
 }
 \endcode
+
+This page was edited last on Mon Jun 20 2015.
+
 */

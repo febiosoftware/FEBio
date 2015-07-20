@@ -30,7 +30,7 @@ public:
 
 public:
 	//! Register a class with the framework
-	void RegisterClass(FECoreFactory* ptf) { m_Fac.push_back(ptf); }
+	void RegisterClass(FECoreFactory* ptf);
 
 	//! Create a specific class
 	void* Create(SUPER_CLASS_ID, const char* sztag, FEModel* pfem);
@@ -43,7 +43,7 @@ public:
 
 public:
 	//! Register a new domain class
-	void RegisterDomain(FEDomainFactory* pf) { m_Dom.push_back(pf); }
+	void RegisterDomain(FEDomainFactory* pf);
 
 	//! Find the domain type given an element spec and material
 	int GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat);
