@@ -126,9 +126,9 @@ void update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 
 	char szvers[32] = {0};
 #ifdef _DEBUG
-	sprintf(szvers, "FEBio (DEBUG BUILD) %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
+	sprintf(szvers, "FEBio (DEBUG BUILD) %d.%d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION, SVNREVISION);
 #else
-	sprintf(szvers, "FEBio %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
+	sprintf(szvers, "FEBio %d.%d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION, SVNREVISION);
 #endif
 
 	// print progress in title bar
@@ -354,6 +354,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 			}
 			fprintf(fp, "compiled on " __DATE__ "\n");
 			fprintf(fp, "FEBio version  = %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
+			if (SVNREVISION) fprintf(fp, "SVN revision: %d\n", SVNREVISION);
 			fprintf(fp, "FECore version = %s\n", FECore::get_version_string());
 			fprintf(fp, "SVN revision   = %d\n", SVNREVISION);
 			if (fp != stdout) fclose(fp);
@@ -555,6 +556,7 @@ int prompt(CMDOPTIONS& ops)
 			else if (strcmp(argv[0], "version") == 0)
 			{
 				fprintf(stderr, "\nFEBio version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
+				fprintf(stderr, "SVN revision: %d\n", SVNREVISION);
 				fprintf(stderr, "compiled on " __DATE__ "\n");
 				fprintf(stderr, "using FECore version %s\n\n", FECore::get_version_string());
 			}

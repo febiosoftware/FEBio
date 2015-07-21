@@ -342,7 +342,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;PARDISO;MKL_ISS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;SVN;_CRT_SECURE_NO_WARNINGS;PARDISO;MKL_ISS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>
       </MultiProcessorCompilation>
     </ClCompile>
@@ -351,6 +351,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>fecored.lib;numcored.lib;febiolibd.lib;febiomechd.lib;febioheatd.lib;febiomixd.lib;febiooptd.lib;febioplotd.lib;febioxmld.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
     <ClCompile>

@@ -295,7 +295,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;PARDISO;MKL_ISS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;SVN;_CRT_SECURE_NO_WARNINGS;PARDISO;MKL_ISS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>
       </MultiProcessorCompilation>
     </ClCompile>
@@ -306,6 +306,9 @@
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
     </Lib>
+    <PreBuildEvent>
+      <Command>subwcrev . "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
     <ClCompile>
