@@ -8,6 +8,7 @@
 
 #include "FECore/LinearSolver.h"
 #include "CompactMatrix.h"
+#include <cstdio>
 
 #ifdef PARDISO
 	/* Pardiso prototypes for MKL version */

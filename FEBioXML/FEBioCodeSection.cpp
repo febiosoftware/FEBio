@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEBioCodeSection.h"
 #include "FECore/FECallBack.h"
-#include <FECore\FECoreKernel.h>
+#include "FECore/FECoreKernel.h"
 
 void FEBioCodeSection::Parse(XMLTag& tag)
 {
