@@ -41,6 +41,9 @@ public:
 	//! Create material point data
 	FEMaterialPoint* CreateMaterialPointData();
 	
+    //! calculate strain energy density at material point
+    double StrainEnergyDensity(FEMaterialPoint& pt) { return StrainEnergy(pt); }
+    
 public: // --- remodeling interface ---
 
 	//! calculate strain energy density at material point
