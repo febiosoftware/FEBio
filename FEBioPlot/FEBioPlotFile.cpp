@@ -10,6 +10,13 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 	// strip the name from the filter
 	char sz[1024] = {0};
 	strcpy(sz, szname);
+
+	// extract the (optional) title
+	char* ch = strrchr(sz, '=');
+	if (ch) *ch++ = 0;
+	const char* sztitle = (ch ? ch : szname);
+
+	// extract the filter
 	char* szflt = strchr(sz, '[');
 	if (szflt)
 	{
@@ -19,6 +26,7 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 		*ch = 0;
 	}
 
+	// create the plot variable
 	FEPlotData* ps = fecore_new<FEPlotData>(FEPLOTDATA_ID, sz, pfem);
 	if (ps)
 	{
@@ -30,9 +38,9 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 		}
 
 		// add the field to the plot file
-		if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname, item);
-		else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname, item);
-		else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, szname, item);
+		if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, sztitle, item);
+		else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, sztitle, item);
+		else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, sztitle, item);
 	}
 	return false;
 }
