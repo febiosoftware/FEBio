@@ -410,6 +410,7 @@
 		D5E10B721865E23500B23922 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (

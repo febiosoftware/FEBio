@@ -75,6 +75,8 @@
 		D57C1D0619AB8AC20091EAE4 /* FEReactiveViscoelastic.h in Headers */ = {isa = PBXBuildFile; fileRef = D57C1D0419AB8AC20091EAE4 /* FEReactiveViscoelastic.h */; };
 		D57C1D0919ABB99F0091EAE4 /* FEBondRelaxation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57C1D0719ABB99F0091EAE4 /* FEBondRelaxation.cpp */; };
 		D57C1D0A19ABB99F0091EAE4 /* FEBondRelaxation.h in Headers */ = {isa = PBXBuildFile; fileRef = D57C1D0819ABB99F0091EAE4 /* FEBondRelaxation.h */; };
+		D58D4D0F1B5D7E48002BB72A /* FE2OMicroConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58D4D0D1B5D7E48002BB72A /* FE2OMicroConstraint.cpp */; };
+		D58D4D101B5D7E48002BB72A /* FE2OMicroConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D58D4D0E1B5D7E48002BB72A /* FE2OMicroConstraint.h */; };
 		D58EEA111AC463950020B7CB /* FECubicCLE.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58EEA0F1AC463950020B7CB /* FECubicCLE.cpp */; };
 		D58EEA121AC463950020B7CB /* FECubicCLE.h in Headers */ = {isa = PBXBuildFile; fileRef = D58EEA101AC463950020B7CB /* FECubicCLE.h */; };
 		D593574C1B11046A00AF4DF8 /* FERigidContractileForce.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D593574A1B11046A00AF4DF8 /* FERigidContractileForce.cpp */; };
@@ -424,6 +426,8 @@
 		D57C1D0419AB8AC20091EAE4 /* FEReactiveViscoelastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReactiveViscoelastic.h; sourceTree = "<group>"; };
 		D57C1D0719ABB99F0091EAE4 /* FEBondRelaxation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBondRelaxation.cpp; sourceTree = "<group>"; };
 		D57C1D0819ABB99F0091EAE4 /* FEBondRelaxation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBondRelaxation.h; sourceTree = "<group>"; };
+		D58D4D0D1B5D7E48002BB72A /* FE2OMicroConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FE2OMicroConstraint.cpp; sourceTree = "<group>"; };
+		D58D4D0E1B5D7E48002BB72A /* FE2OMicroConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FE2OMicroConstraint.h; sourceTree = "<group>"; };
 		D58EEA0F1AC463950020B7CB /* FECubicCLE.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECubicCLE.cpp; sourceTree = "<group>"; };
 		D58EEA101AC463950020B7CB /* FECubicCLE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECubicCLE.h; sourceTree = "<group>"; };
 		D593574A1B11046A00AF4DF8 /* FERigidContractileForce.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidContractileForce.cpp; sourceTree = "<group>"; };
@@ -741,6 +745,8 @@
 				D5E106901865DFAC00B23922 /* FE2DTransIsoMooneyRivlin.h */,
 				D5E106911865DFAC00B23922 /* FE2DTransIsoVerondaWestmann.cpp */,
 				D5E106921865DFAC00B23922 /* FE2DTransIsoVerondaWestmann.h */,
+				D58D4D0D1B5D7E48002BB72A /* FE2OMicroConstraint.cpp */,
+				D58D4D0E1B5D7E48002BB72A /* FE2OMicroConstraint.h */,
 				D5E106931865DFAC00B23922 /* FE3FieldElasticSolidDomain.cpp */,
 				D5E106941865DFAC00B23922 /* FE3FieldElasticSolidDomain.h */,
 				D5E106951865DFAC00B23922 /* FEArrudaBoyce.cpp */,
@@ -1167,6 +1173,7 @@
 				D5E107811865DFAD00B23922 /* FEBioMech.h in Headers */,
 				D5E1081A1865DFAD00B23922 /* FERigidSurface.h in Headers */,
 				D5E107AC1865DFAD00B23922 /* FEElasticDomain.h in Headers */,
+				D58D4D101B5D7E48002BB72A /* FE2OMicroConstraint.h in Headers */,
 				D561928E1B0188200034DD51 /* FERigidSpring.h in Headers */,
 				D5E107AB1865DFAD00B23922 /* FEEFDVerondaWestmann.h in Headers */,
 				D57C1D0619AB8AC20091EAE4 /* FEReactiveViscoelastic.h in Headers */,
@@ -1452,6 +1459,7 @@
 				D5E107DF1865DFAD00B23922 /* FEIncompNeoHookean.cpp in Sources */,
 				D5E107B11865DFAD00B23922 /* FEElasticMixture.cpp in Sources */,
 				D5E107D51865DFAD00B23922 /* FEFungOrthoCompressible.cpp in Sources */,
+				D58D4D0F1B5D7E48002BB72A /* FE2OMicroConstraint.cpp in Sources */,
 				D5E108551865DFAD00B23922 /* FEVonMisesPlasticity.cpp in Sources */,
 				CAA03F9018BFA51700EAF395 /* FECGSolidSolver.cpp in Sources */,
 				D5C6D41719CB640D00E48AAF /* FEDamageCDF.cpp in Sources */,
