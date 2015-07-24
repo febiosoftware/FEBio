@@ -583,9 +583,12 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 		{
             // Biphasic analyses may include biphasic and elastic domains
 			FEBiphasicSolidDomain* pbdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-			FEElasticSolidDomain* pedom = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
 			if (pbdom) pbdom->StiffnessMatrixSS(this, bsymm, dt);
-            else if (pedom) pedom->StiffnessMatrix(this);
+            else
+			{
+				FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
+				if (pedom) pedom->StiffnessMatrix(this);
+			}
 		}
 	}
 	else
@@ -594,13 +597,17 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 		{
             // Biphasic analyses may include biphasic and elastic domains
 			FEBiphasicSolidDomain* pbdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-			FEElasticSolidDomain* pedom = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
 			if (pbdom) pbdom->StiffnessMatrix(this, bsymm, dt);
-            else if (pedom) pedom->StiffnessMatrix(this);
+            else 
+			{
+				FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
+				if (pedom) pedom->StiffnessMatrix(this);
+			}
 		}
 	}
 
     // calculate the body force stiffness matrix for each domain
+	// TODO: This is not  going to work with FEDiscreteSpringDomain
     for (i=0; i<mesh.Domains(); ++i)
     {
         FEBiphasicSolidDomain* pbdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
