@@ -337,7 +337,7 @@ public:
 	double norm() const;
 
 	// double contraction
-	double dotdot(mat3d& T);
+	double dotdot(const mat3d& T);
 
 protected:
 	double d[3][3];	// matrix data
