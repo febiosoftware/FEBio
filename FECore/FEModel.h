@@ -320,6 +320,7 @@ public:
 	vector<FERigidBodyFixedBC*>			m_RBC;	//!< rigid body fixed
 	vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
 	vector<FERigidBodyForce*>			m_RFC;	//!< rigid body forces
+	vector<FERigidAxialForce*>			m_RAF;	//!< rigid axial forces (TODO: Integrate this in a better way so we can remove this)
 	vector<FERigidBodyVelocity*>		m_RBV;	//!< rigid body initial velocities
 	vector<FERigidBodyAngularVelocity*>	m_RBW;	//!< rigid body initial angular velocities
 

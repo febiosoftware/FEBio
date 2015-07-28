@@ -18,6 +18,7 @@ protected:
 	void ParseContactSection      (XMLTag& tag);
 	void ParseConstraints         (XMLTag& tag);
 	void ParseSpringSection       (XMLTag& tag);
+	void ParseRigidAxialForce     (XMLTag& tag);
 
 protected:
 	void ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* psi);

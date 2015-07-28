@@ -793,6 +793,14 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			fc.Serialize(ar);
 		}
 
+		// rigid axial forces
+		ar << (int) m_RAF.size();
+		for (int i=0; i<(int) m_RAF.size(); ++i)
+		{
+			FERigidAxialForce& fc = *m_RAF[i];
+			fc.Serialize(ar);
+		}
+
 		// rigid nodes
 		ar << (int) m_RN.size();
 		for (int i=0; i<(int) m_RN.size(); ++i)
@@ -918,6 +926,16 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			FERigidBodyForce* pfc = new FERigidBodyForce(this);
 			pfc->Serialize(ar);
 			m_RFC.push_back(pfc);
+		}
+
+		// rigid body forces
+		ar >> n;
+		m_RAF.clear();
+		for (int i=0; i<n; ++i)
+		{
+			FERigidAxialForce* pfc = new FERigidAxialForce(this);
+			pfc->Serialize(ar);
+			m_RAF.push_back(pfc);
 		}
 
 		// rigid nodes

@@ -82,6 +82,32 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! an axial force between two rigid bodies
+class FERigidAxialForce : public FEBoundaryCondition
+{
+public:
+	FERigidAxialForce(FEModel* pfem);
+
+	//! Serialization
+	void Serialize(DumpFile& ar);
+
+	//! Residual
+	void Residual(FEGlobalVector& R, FETimePoint& tp);
+
+	//! Stiffness matrix
+	void StiffnessMatrix(FESolver* psolver, FETimePoint& tp);
+
+	//! get the current force value
+	double Value();
+
+public:
+	int		m_ida, m_idb;		//!< rigid body ID's
+	vec3d	m_ra0, m_rb0;		//!< coordinates of attachements in reference state
+	double	m_s;				//!< scale factor
+	int		m_lc;				//!< load curve
+};
+
+//-----------------------------------------------------------------------------
 //! fixed rigid body constraint
 class FERigidBodyFixedBC : public FEBoundaryCondition
 {

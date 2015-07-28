@@ -51,6 +51,7 @@ void FEModel::Clear()
 	for (i=0; i<m_SL.size  (); ++i) delete m_SL [i] ; m_SL.clear  ();
 	for (i=0; i<m_RDC.size (); ++i) delete m_RDC[i] ; m_RDC.clear ();
 	for (i=0; i<m_RFC.size (); ++i) delete m_RFC[i] ; m_RFC.clear ();
+	for (i=0; i<m_RAF.size (); ++i) delete m_RAF[i] ; m_RAF.clear ();
 	for (i=0; i<m_RBV.size (); ++i) delete m_RBV[i] ; m_RBV.clear ();
 	for (i=0; i<m_RBW.size (); ++i) delete m_RBW[i] ; m_RBW.clear ();
 	for (i=0; i<m_RN.size  (); ++i) delete m_RN [i] ; m_RN.clear  ();
@@ -487,6 +488,14 @@ bool FEModel::InitObjects()
 		FERigidBodyForce& FC = *m_RFC[i];
 		FEMaterial* pm = GetMaterial(FC.id-1);
 		FC.id = pm->GetRigidBodyID(); assert(FC.id >= 0);
+	}
+	for (int i=0; i<(int) m_RAF.size(); ++i)
+	{
+		FERigidAxialForce& AF = *m_RAF[i];
+		FEMaterial* pm = GetMaterial(AF.m_ida-1);
+		AF.m_ida = pm->GetRigidBodyID(); assert(AF.m_ida >= 0);
+		pm = GetMaterial(AF.m_idb-1);
+		AF.m_idb = pm->GetRigidBodyID(); assert(AF.m_idb >= 0);
 	}
 	for (int i=0; i<(int) m_RBV.size(); ++i)
 	{
@@ -945,6 +954,8 @@ FEBoundaryCondition* FEModel::FindBC(int nid)
 	for (i=0; i<(int) m_RDC.size(); ++i) if (m_RDC[i]->GetID() == nid) return m_RDC[i];
 
 	for (i=0; i<(int) m_RFC.size(); ++i) if (m_RFC[i]->GetID() == nid) return m_RFC[i];
+
+	for (i=0; i<(int) m_RAF.size(); ++i) if (m_RAF[i]->GetID() == nid) return m_RAF[i];
 
 	for (i=0; i<(int) m_RN.size(); ++i) if (m_RN[i]->GetID() == nid) return m_RN[i];
 

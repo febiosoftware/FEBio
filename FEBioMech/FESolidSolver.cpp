@@ -2217,6 +2217,17 @@ bool FESolidSolver::Residual(vector<double>& R)
 		}
 	}
 
+	// add rigid axial forces
+	int NAF = m_fem.m_RAF.size();
+	for (i=0; i<NAF; ++i)
+	{
+		FERigidAxialForce& FC = *m_fem.m_RAF[i];
+		if (FC.IsActive())
+		{
+			FC.Residual(RHS, tp);
+		}
+	}
+
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
 	for (i=0; i<mesh.Nodes(); ++i)

@@ -42,6 +42,7 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 			if      (tag == "fix"              ) ParseBCFix20      (tag);
 			else if (tag == "prescribe"        ) ParseBCPrescribe20(tag);
 			else if (tag == "linear_constraint") ParseConstraints  (tag);
+			else if (tag == "rigid_axial_force") ParseRigidAxialForce(tag);
 			else throw XMLReader::InvalidTag(tag);
 		}
 		++tag;
@@ -1010,4 +1011,40 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		}
 		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 	}
+}
+
+//---------------------------------------------------------------------------------
+void FEBioBoundarySection::ParseRigidAxialForce(XMLTag& tag)
+{
+	int nidA, nidB;
+	double s;
+	int lc = -1;
+	double a[3], b[3];
+	++tag;
+	do
+	{
+		if      (tag == "rbA") tag.value(nidA);
+		else if (tag == "rbB") tag.value(nidB);
+		else if (tag == "ra" ) tag.value(a, 3);
+		else if (tag == "rb" ) tag.value(b, 3);
+		else if (tag == "force")
+		{
+			tag.AttributeValue("lc", lc, true);
+			tag.value(s);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+
+	FERigidAxialForce* paf = new FERigidAxialForce(GetFEModel());
+	paf->m_ida = nidA;
+	paf->m_idb = nidB;
+	paf->m_s = s;
+	paf->m_lc = lc;
+	paf->m_ra0 = vec3d(a[0], a[1], a[2]);
+	paf->m_rb0 = vec3d(b[0], b[1], b[2]);
+
+	FEModel& fem = *GetFEModel();
+	fem.m_RAF.push_back(paf);
 }
