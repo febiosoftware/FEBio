@@ -95,7 +95,7 @@ public:
 	void Residual(FEGlobalVector& R, FETimePoint& tp);
 
 	//! Stiffness matrix
-	void StiffnessMatrix(FESolver* psolver, FETimePoint& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
 
 	//! get the current force value
 	double Value();

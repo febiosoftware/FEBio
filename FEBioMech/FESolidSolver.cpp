@@ -1611,6 +1611,9 @@ bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 	// constrainst enforced with augmented lagrangian
 	NonLinearConstraintStiffness(tp);
 
+	// calculate the stiffness contributions for the rigid forces
+	for (i=0; i<m_fem.m_RAF.size(); ++i) m_fem.m_RAF[i]->StiffnessMatrix(this, tp);
+
 	// point constraints
 //	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->StiffnessMatrix(this);
 
