@@ -31,7 +31,7 @@ SparseMatrixProfile::SparseMatrixProfile(int n)
 //-----------------------------------------------------------------------------
 //! Copy constructor. Simply copies the profile
 
-SparseMatrixProfile::SparseMatrixProfile(SparseMatrixProfile& mp)
+SparseMatrixProfile::SparseMatrixProfile(const SparseMatrixProfile& mp)
 {
 	m_prof = mp.m_prof;
 }
@@ -39,7 +39,7 @@ SparseMatrixProfile::SparseMatrixProfile(SparseMatrixProfile& mp)
 //-----------------------------------------------------------------------------
 //! Assignment operator. Copies the profile.
  
-SparseMatrixProfile& SparseMatrixProfile::operator =(SparseMatrixProfile& mp)
+SparseMatrixProfile& SparseMatrixProfile::operator =(const SparseMatrixProfile& mp)
 {
 	if (m_prof.size() != mp.m_prof.size()) m_prof = mp.m_prof;
 	else

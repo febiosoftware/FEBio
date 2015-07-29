@@ -46,10 +46,10 @@ public:
 	void clear() { m_prof.clear(); }
 
 	//! copy constructor
-	SparseMatrixProfile(SparseMatrixProfile& mp);
+	SparseMatrixProfile(const SparseMatrixProfile& mp);
 
 	//! assignment operator
-	SparseMatrixProfile& operator = (SparseMatrixProfile& mp);
+	SparseMatrixProfile& operator = (const SparseMatrixProfile& mp);
 
 	//! updates the profile for an array of elements
 	void UpdateProfile(vector< vector<int> >& LM, int N);
