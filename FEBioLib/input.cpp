@@ -285,6 +285,21 @@ void echo_input(FEBioModel& fem)
 	}
 	felog.printf("\n\n");
 
+	if (fem.Objects())
+	{
+		felog.printf(" RIGID BODY DATA\n");
+		felog.printf("===========================================================================\n");
+		for (int i=0; i<fem.Objects(); ++i)
+		{
+			FERigidBody& rb = static_cast<FERigidBody&>(*fem.Object(i));
+			if (i>0) felog.printf("---------------------------------------------------------------------------\n");
+			felog.printf("Rigid Body %d:\n", rb.m_nID+1);
+			felog.printf("\tmaterial id    : %d\n", rb.m_mat+1);
+			felog.printf("\tcenter of mass : %lg, %lg, %lg\n", rb.m_r0.x, rb.m_r0.y, rb.m_r0.z);
+		}
+		felog.printf("\n\n");
+	}
+
 	if (fem.HasBodyLoads())
 	{
 		felog.printf(" BODY LOAD DATA\n");

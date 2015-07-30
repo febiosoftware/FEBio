@@ -102,6 +102,7 @@ public:
 	int		m_ida, m_idb;		//!< rigid body ID's
 	vec3d	m_ra0, m_rb0;		//!< coordinates of attachements in reference state
 	double	m_s;				//!< scale factor
+	bool	m_brelative;		//!< if active, the ra0 and rb0 are relative w.r.t. the COM
 
 	DECLARE_PARAMETER_LIST();
 };

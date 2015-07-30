@@ -85,6 +85,7 @@ BEGIN_PARAMETER_LIST(FERigidAxialForce, FEBoundaryCondition);
 	ADD_PARAMETER(m_ra0, FE_PARAM_VEC3D, "ra");
 	ADD_PARAMETER(m_rb0, FE_PARAM_VEC3D, "rb");
 	ADD_PARAMETER(m_s  , FE_PARAM_DOUBLE, "force");
+	ADD_PARAMETER(m_brelative, FE_PARAM_BOOL, "relative");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -93,6 +94,7 @@ FERigidAxialForce::FERigidAxialForce(FEModel* pfem) : FEBoundaryCondition(FEBC_I
 	m_ida = m_idb = -1;
 	m_ra0 = m_rb0 = vec3d(0,0,0);
 	m_s = 0.0;
+	m_brelative = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -122,12 +124,12 @@ void FERigidAxialForce::Residual(FEGlobalVector& R, FETimePoint& tp)
 	FERigidBody& bodyB = static_cast<FERigidBody&>(*fem.Object(m_idb));
 
 	// get the attachment position in global coordinates for body A
-	vec3d da0 = m_ra0 - bodyA.m_r0;
+	vec3d da0 = (m_brelative ? m_ra0 : m_ra0 - bodyA.m_r0);
 	vec3d da = bodyA.m_qt*da0;
 	vec3d a = da + bodyA.m_rt;
 
 	// get the attachment position in global coordinates for body B
-	vec3d db0 = m_rb0 - bodyB.m_r0;
+	vec3d db0 = (m_brelative ? m_rb0 : m_rb0 - bodyB.m_r0);
 	vec3d db = bodyB.m_qt*db0;
 	vec3d b = db + bodyB.m_rt;
 
@@ -172,12 +174,12 @@ void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp
 	FERigidBody& bodyB = static_cast<FERigidBody&>(*fem.Object(m_idb));
 
 	// get the attachment position in global coordinates for body A
-	vec3d da0 = m_ra0 - bodyA.m_r0;
+	vec3d da0 = (m_brelative ? m_ra0 : m_ra0 - bodyA.m_r0);
 	vec3d da = bodyA.m_qt*da0;
 	vec3d pa = da + bodyA.m_rt;
 
 	// get the attachment position in global coordinates for body B
-	vec3d db0 = m_rb0 - bodyB.m_r0;
+	vec3d db0 = (m_brelative ? m_rb0 : m_rb0 - bodyB.m_r0);
 	vec3d db = bodyB.m_qt*db0;
 	vec3d pb = db + bodyB.m_rt;
 
