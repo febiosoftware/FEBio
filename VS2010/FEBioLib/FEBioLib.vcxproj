@@ -614,6 +614,7 @@
     <ClInclude Include="..\..\FEBioLib\FEBox.h" />
     <ClInclude Include="..\..\FEBioLib\plugin.h" />
     <ClInclude Include="..\..\FEBioLib\stdafx.h" />
+    <ClInclude Include="..\..\FEBioLib\svnrev.h" />
     <ClInclude Include="..\..\FEBioLib\targetver.h" />
     <ClInclude Include="..\..\FEBioLib\validate.h" />
     <ClInclude Include="..\..\FEBioLib\version.h" />
