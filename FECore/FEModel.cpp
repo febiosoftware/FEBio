@@ -824,6 +824,13 @@ void FEModel::EvaluateAllParameterLists()
 		FEParameterList& pl = NonlinearConstraint(i)->GetParameterList();
 		EvaluateParameterList(pl);
 	}
+
+	// evaluate rigid forces
+	for (int i=0; i<(int)m_RAF.size(); ++i)
+	{
+		FEParameterList& pl = m_RAF[i]->GetParameterList();
+		EvaluateParameterList(pl);
+	}
 }
 
 //-----------------------------------------------------------------------------

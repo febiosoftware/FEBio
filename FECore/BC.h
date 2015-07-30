@@ -86,6 +86,7 @@ public:
 class FERigidAxialForce : public FEBoundaryCondition
 {
 public:
+	//! constructor
 	FERigidAxialForce(FEModel* pfem);
 
 	//! Serialization
@@ -97,14 +98,12 @@ public:
 	//! Stiffness matrix
 	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
 
-	//! get the current force value
-	double Value();
-
 public:
 	int		m_ida, m_idb;		//!< rigid body ID's
 	vec3d	m_ra0, m_rb0;		//!< coordinates of attachements in reference state
 	double	m_s;				//!< scale factor
-	int		m_lc;				//!< load curve
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------

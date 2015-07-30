@@ -78,17 +78,27 @@ double FERigidBodyDisplacement::Value()
 }
 
 //=============================================================================
+
+BEGIN_PARAMETER_LIST(FERigidAxialForce, FEBoundaryCondition);
+	ADD_PARAMETER(m_ida, FE_PARAM_INT, "rbA");
+	ADD_PARAMETER(m_idb, FE_PARAM_INT, "rbB");
+	ADD_PARAMETER(m_ra0, FE_PARAM_VEC3D, "ra");
+	ADD_PARAMETER(m_rb0, FE_PARAM_VEC3D, "rb");
+	ADD_PARAMETER(m_s  , FE_PARAM_DOUBLE, "force");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 FERigidAxialForce::FERigidAxialForce(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
 {
 	m_ida = m_idb = -1;
 	m_ra0 = m_rb0 = vec3d(0,0,0);
 	m_s = 0.0;
-	m_lc = -1;
 }
 
 //-----------------------------------------------------------------------------
 void FERigidAxialForce::Serialize(DumpFile& ar)
 {
+	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
 		ar << GetID() << IsActive();
@@ -101,16 +111,6 @@ void FERigidAxialForce::Serialize(DumpFile& ar)
 		SetID(nid);
 		if (bactive) Activate(); else Deactivate();
 	}
-}
-
-//-----------------------------------------------------------------------------
-double FERigidAxialForce::Value()
-{
-	FEModel& fem = *GetFEModel();
-	if (m_lc > 0)
-		return fem.GetLoadCurve(m_lc - 1)->Value()*m_s;
-	else
-		return m_s;
 }
 
 //-----------------------------------------------------------------------------
@@ -135,7 +135,7 @@ void FERigidAxialForce::Residual(FEGlobalVector& R, FETimePoint& tp)
 	vec3d N = b - a; N.unit();
 
 	// calculate the force value
-	double f = Value();
+	double f = m_s;
 
 	// get the axial force and torques
 	vec3d F = N*f;
@@ -186,7 +186,7 @@ void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp
 	double L = N.unit();
 
 	// calculate the force value
-	double f = -Value() / L;
+	double f = - m_s / L;
 
 	// build the stiffness matrix
 	double M[3][3];

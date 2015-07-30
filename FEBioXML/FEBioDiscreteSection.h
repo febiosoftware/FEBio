@@ -9,5 +9,6 @@ public:
 	void Parse(XMLTag& tag);
 
 protected:
-	void ParseSpringSection(XMLTag& tag);
+	void ParseSpringSection  (XMLTag& tag);
+	void ParseRigidAxialForce(XMLTag& tag);
 };

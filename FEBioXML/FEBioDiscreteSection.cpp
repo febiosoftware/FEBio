@@ -14,7 +14,8 @@ void FEBioDiscreteSection::Parse(XMLTag& tag)
 	++tag;
 	do
 	{
-		if (tag == "spring") ParseSpringSection(tag);
+		if      (tag == "spring"           ) ParseSpringSection  (tag);
+		else if (tag == "rigid_axial_force") ParseRigidAxialForce(tag);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
@@ -79,4 +80,25 @@ void FEBioDiscreteSection::ParseSpringSection(XMLTag &tag)
 	while (!tag.isend());
 
 	pd->InitMaterialPointData();
+}
+
+//---------------------------------------------------------------------------------
+void FEBioDiscreteSection::ParseRigidAxialForce(XMLTag& tag)
+{
+	// create a new rigid constraint
+	FERigidAxialForce* paf = new FERigidAxialForce(GetFEModel());
+
+	// read the parameters
+	FEParameterList& pl = paf->GetParameterList();
+	++tag;
+	do
+	{
+		if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+
+	// add it to the model
+	FEModel& fem = *GetFEModel();
+	fem.m_RAF.push_back(paf);
 }
