@@ -246,6 +246,9 @@ public:	// --- Miscellaneous routines ---
 	//! call the callback function
 	void DoCallback(unsigned int nevent);
 
+	//! initialize rigid forces
+	bool InitRigidForces();
+
 public: // --- I/O functions
 
 	//! write to plot file

@@ -98,6 +98,34 @@ FERigidAxialForce::FERigidAxialForce(FEModel* pfem) : FEBoundaryCondition(FEBC_I
 }
 
 //-----------------------------------------------------------------------------
+//! do some sanity checks
+bool FERigidAxialForce::Init()
+{
+	FEModel& fem = *GetFEModel();
+	FERigidBody& bodyA = static_cast<FERigidBody&>(*fem.Object(m_ida));
+	FERigidBody& bodyB = static_cast<FERigidBody&>(*fem.Object(m_idb));
+
+	// get the attachment position in global coordinates for body A
+	vec3d da0 = (m_brelative ? m_ra0 : m_ra0 - bodyA.m_r0);
+	vec3d da = bodyA.m_qt*da0;
+	vec3d a = da + bodyA.m_rt;
+
+	// get the attachment position in global coordinates for body B
+	vec3d db0 = (m_brelative ? m_rb0 : m_rb0 - bodyB.m_r0);
+	vec3d db = bodyB.m_qt*db0;
+	vec3d b = db + bodyB.m_rt;
+
+	// get the unit axial vector
+	// and make sure it is of finite length
+	vec3d N = b - a; 
+	double L = N.unit();
+	if (L < 1e-17) return false;
+
+	// all is well in the world
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 void FERigidAxialForce::Serialize(DumpFile& ar)
 {
 	FEBoundaryCondition::Serialize(ar);

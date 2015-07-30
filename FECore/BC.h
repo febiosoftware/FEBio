@@ -89,6 +89,9 @@ public:
 	//! constructor
 	FERigidAxialForce(FEModel* pfem);
 
+	//! initialization
+	bool Init();
+
 	//! Serialization
 	void Serialize(DumpFile& ar);
 

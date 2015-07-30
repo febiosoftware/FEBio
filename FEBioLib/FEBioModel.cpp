@@ -1121,7 +1121,11 @@ bool FEBioModel::Init()
 	}
 
 	// initialize model data
-	if (FEModel::Init() == false) return false;
+	if (FEModel::Init() == false) 
+	{
+		felog.printf("FATAL ERROR: Model initialization failed\n\n");
+		return false;
+	}
 
 	// open plot database file
 	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER)

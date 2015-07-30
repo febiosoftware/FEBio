@@ -113,8 +113,15 @@ bool FEModel::Init()
 
 	// initialize material data
 	// NOTE: call this before InitMesh since we need to initialize the FECoordSysMap
-	// before we can calculate the local element coordinate systems.
+	//       before we can calculate the local element coordinate systems.
+	// NOTE: This must be called after the InitObjects since the rigid materials will
+	//       reference the rigid bodies
 	if (InitMaterials() == false) return false;
+
+	// initialize rigid forces
+	// NOTE: This must be called after the InitMaterials since the COM of the rigid bodies
+	//       are set in that function. 
+	if (InitRigidForces() == false) return false;
 
 	// initialize mesh data
 	// NOTE: this must be done AFTER the elements have been assigned material point data !
@@ -509,7 +516,24 @@ bool FEModel::InitObjects()
 		FEMaterial* pm = GetMaterial(RW.id-1);
 		RW.id = pm->GetRigidBodyID(); assert(RW.id>=0);
 	}
+	return true;
+}
 
+//-----------------------------------------------------------------------------
+//! Initialize rigid force data
+bool FEModel::InitRigidForces()
+{
+	// call the Init() function of all rigid forces
+	for (int i=0; i<(int) m_RFC.size(); ++i)
+	{
+		FERigidBodyForce& FC = *m_RFC[i];
+		if (FC.Init() == false) return false;
+	}
+	for (int i=0; i<(int) m_RAF.size(); ++i)
+	{
+		FERigidAxialForce& AF = *m_RAF[i];
+		if (AF.Init() == false) return false;
+	}
 	return true;
 }
 
