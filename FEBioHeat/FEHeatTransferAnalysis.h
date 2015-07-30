@@ -11,5 +11,5 @@ public:
 	FEHeatTransferAnalysis(FEModel* pfem);
 
 	//! Initialization
-	bool Init();
+	bool Activate();
 };

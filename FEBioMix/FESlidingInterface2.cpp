@@ -447,7 +447,7 @@ void FESlidingSurface2::GetNodalContactTraction(int nface, vec3d* pt)
 FESlidingInterface2::FESlidingInterface2(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
 	static int count = 1;
-	m_nID = count++;
+	SetID(count++);
 
 	// initial values
 	m_knmult = 1;
@@ -1859,7 +1859,7 @@ bool FESlidingInterface2::Augment(int naug)
 	if (naug < m_naugmin ) bconv = false;
 	if (naug >= m_naugmax) bconv = true;
 
-	felog.printf(" sliding interface # %d\n", m_nID);
+	felog.printf(" sliding interface # %d\n", GetID());
 	felog.printf("                        CURRENT        REQUIRED\n");
 	felog.printf("    D multiplier : %15le", lnorm); if (m_atol > 0) felog.printf("%15le\n", m_atol); else felog.printf("       ***\n");
 	if (bporo) { felog.printf("    P gap        : %15le", pnorm); if (m_atol > 0) felog.printf("%15le\n", m_atol); else felog.printf("       ***\n"); }

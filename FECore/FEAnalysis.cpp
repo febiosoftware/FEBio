@@ -64,6 +64,18 @@ FEDomain* FEAnalysis::Domain(int i)
 }
 
 //-----------------------------------------------------------------------------
+void FEAnalysis::AddModelComponent(FEModelComponent* pmc)
+{
+	if (pmc) m_MC.push_back(pmc);
+}
+
+//-----------------------------------------------------------------------------
+int FEAnalysis::ModelComponents() const
+{
+	return (int) m_MC.size();
+}
+
+//-----------------------------------------------------------------------------
 void FEAnalysis::Reset()
 {
 	m_dt = m_dt0;
@@ -74,7 +86,23 @@ void FEAnalysis::Reset()
 }
 
 //-----------------------------------------------------------------------------
+//! Data initialization and data chekcing.
 bool FEAnalysis::Init()
+{
+	if ((m_ntime <= 0) && (m_final_time <= 0.0)) { felog.printf("Invalid number of time steps for analysis step.\n"); return false; }
+	if ((m_ntime >  0) && (m_final_time >  0.0)) { felog.printf("You must either set the number of time steps or the final time but not both.\n"); return false; }
+	if (m_dt0   <= 0) { felog.printf("Invalid time step size for analysis step\n"); return false; }
+	if (m_bautostep)
+	{
+//		if (m_pStep->m_dtmin <= 0) return err("Invalid minimum time step size");
+//		if (m_pStep->m_dtmax <= 0) return err("Invalid maximum time step size");
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! This function gets called right before the step needs to be solved.
+bool FEAnalysis::Activate()
 {
 	// set first time step
 	// We can't do this since it will mess up the value from a restart
@@ -92,14 +120,8 @@ bool FEAnalysis::Init()
 	ClearDomains();
 	for (int i=0; i<ndom; ++i) AddDomain(i);
 
-	// activate the boundary conditions
-	for (int i=0; i<(int) m_BC.size(); ++i) m_BC[i]->Activate();
-
-	// activate contact interface
-	for (int i=0; i<(int) m_CI.size(); ++i) m_CI[i]->Activate();
-
-	// activate non-linear constraints
-	for (int i=0; i<(int) m_NLC.size(); ++i) m_NLC[i]->Activate();
+	// activate the model components
+	for (int i=0; i<(int) m_MC.size(); ++i) m_MC[i]->Activate();
 	
 	return true;
 }
@@ -108,16 +130,10 @@ bool FEAnalysis::Init()
 //! This function deactivates all boundary conditions and contact interfaces.
 //! It also gives the linear solver to clean its data.
 //! This is called at the completion of an analysis step.
-void FEAnalysis::Finish()
+void FEAnalysis::Deactivate()
 {
-	// deactivate the boundary conditions
-	for (size_t i=0; i<m_BC.size(); ++i) m_BC[i]->Deactivate();
-
-	// deactivate contact interfaces
-	for (size_t i=0; i<m_CI.size(); ++i) m_CI[i]->Deactivate();
-
-	// deactive non-linear constraints
-	for (size_t i=0; i<m_NLC.size(); ++i) m_NLC[i]->Deactivate();
+	// deactivate the model components
+	for (size_t i=0; i<(int) m_MC.size(); ++i) m_MC[i]->Deactivate();
 
 	// clean up solver data (i.e. destroy linear solver)
 	m_psolver->Clean();
@@ -599,17 +615,9 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		ar << m_bDump;
 		ar << m_nplot_stride;
 
-		// boundary conditions
-		ar << (int) m_BC.size();
-		for (int i=0; i< (int) m_BC.size(); ++i) ar << m_BC[i]->GetID();
-
-		// contact interfaces
-		ar << (int) m_CI.size();
-		for (int i=0; i< (int) m_CI.size(); ++i) ar << m_CI[i]->GetID();
-
-		// non-linear constraints
-		ar << (int) m_NLC.size();
-		for (int i=0; i< (int) m_NLC.size(); ++i) ar << m_NLC[i]->GetID();
+		// store the class IDs for the active model components
+		ar << (int) m_MC.size();
+		for (int i=0; i< (int) m_MC.size(); ++i) ar << m_MC[i]->GetClassID();
 
 		// Seriaize solver data
 		ar << m_psolver->GetTypeStr();
@@ -654,40 +662,16 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		m_bDump = false;
 #endif
 
-		// boundary conditions
-		int n, nbc;
+		// read the active model components
+		int n, nid;
 		ar >> n;
-		m_BC.clear();
+		m_MC.clear();
 		for (int i=0; i<n; ++i)
 		{
-			ar >> nbc;
-			FEBoundaryCondition* pbc = m_fem.FindBC(nbc);
-			assert(pbc);
-			m_BC.push_back(pbc);
-		}
-
-		// contact interfaces
-		int nci;
-		ar >> n;
-		m_CI.clear();
-		for (int i=0; i<n; ++i)
-		{
-			ar >> nci;
-			FESurfacePairInteraction* pci = m_fem.FindCI(nbc);
-			assert(pci);
-			m_CI.push_back(pci);
-		}
-
-		// nonlinear constraints
-		int nnlc;
-		ar >> n;
-		m_NLC.clear();
-		for (int i=0; i<n; ++i)
-		{
-			ar >> nnlc;
-			FENLConstraint* pnlc = m_fem.FindNLC(nnlc);
-			assert(pnlc);
-			m_NLC.push_back(pnlc);
+			ar >> nid;
+			FEModelComponent* pmc = m_fem.FindModelComponent(nid);
+			assert(pmc);
+			AddModelComponent(pmc);
 		}
 
 		// Serialize solver data

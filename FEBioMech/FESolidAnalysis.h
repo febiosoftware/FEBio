@@ -11,10 +11,10 @@ public:
 	FESolidAnalysis(FEModel* pfem);
 
 	//! initialization
-	bool Init();
+	bool Activate();
 
 	//! finish
-	void Finish();
+	void Deactivate();
 };
 
 //-----------------------------------------------------------------------------
@@ -26,7 +26,7 @@ public:
 	FEExplicitSolidAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_EXPLICIT_SOLID){}
 
 	//! initialization
-	bool Init();
+	bool Activate();
 };
 
 //-----------------------------------------------------------------------------
@@ -38,5 +38,5 @@ public:
 	FELinearSolidAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_LINEAR_SOLID) {}
 
 	//! initialization
-	bool Init();
+	bool Activate();
 };

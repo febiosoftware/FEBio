@@ -738,8 +738,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		for (int i=0; i<(int) m_DC.size(); ++i) 
 		{
 			FEPrescribedBC& dc = *m_DC[i];
-			ar << dc.GetID() << dc.IsActive();
-			ar << dc.bc << dc.lc << dc.node << dc.s << dc.br << dc.r; //DSR
+			dc.Serialize(ar);
 		}
 
 		// nodal loads
@@ -747,8 +746,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		for (int i=0; i<(int) m_FC.size(); ++i)
 		{
 			FENodalForce& fc = *m_FC[i];
-			ar << fc.GetID() << fc.IsActive();
-			ar << fc.bc << fc.lc << fc.node << fc.s;
+			fc.Serialize(ar);
 		}
 
 		// surface loads
@@ -763,7 +761,6 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 
 			// save the load data
 			ar << psl->GetTypeStr();
-			ar << psl->GetID() << psl->IsActive();
 			psl->Serialize(ar);
 		}
 
@@ -772,8 +769,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		for (int i=0; i<(int) m_RBC.size(); ++i)
 		{
 			FERigidBodyFixedBC& bc = *m_RBC[i];
-			ar << bc.GetID() << bc.IsActive();
-			ar << bc.bc << bc.id;
+			bc.Serialize(ar);
 		}
 
 		// rigid body displacements
@@ -781,8 +777,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		for (int i=0; i<(int) m_RDC.size(); ++i)
 		{
 			FERigidBodyDisplacement& dc = *m_RDC[i];
-			ar << dc.GetID() << dc.IsActive();
-			ar << dc.bc << dc.id << dc.lc << dc.sf;
+			dc.Serialize(ar);
 		}
 
 		// rigid body forces
@@ -806,8 +801,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		for (int i=0; i<(int) m_RN.size(); ++i)
 		{
 			FERigidNode& rn = *m_RN[i];
-			ar << rn.GetID() << rn.IsActive();
-			ar << rn.nid << rn.rid;
+			rn.Serialize(ar);
 		}
 
 		// linear constraints
@@ -839,7 +833,6 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 	else
 	{
 		int n;
-		int nid; bool bactive;
 
 		// displacements
 		ar >> n;
@@ -847,10 +840,8 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		for (int i=0; i<n; ++i) 
 		{
 			FEPrescribedBC* pdc = new FEPrescribedBC(this);
-			ar >> nid >> bactive;
-			ar >> pdc->bc >> pdc->lc >> pdc->node >> pdc->s >> pdc->br >> pdc->r;
-			pdc->SetID(nid);
-			if (bactive) pdc->Activate(); else pdc->Deactivate();
+			pdc->Serialize(ar);
+			if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
 			m_DC.push_back(pdc);
 		}
 		
@@ -860,10 +851,8 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		for (int i=0; i<n; ++i)
 		{
 			FENodalForce* pfc = new FENodalForce(this);
-			ar >> nid >> bactive;
-			ar >> pfc->bc >> pfc->lc >> pfc->node >> pfc->s;
-			pfc->SetID(nid);
-			if (bactive) pfc->Activate(); else pfc->Deactivate();
+			pfc->Serialize(ar);
+			if (pfc->IsActive()) pfc->Activate(); else pfc->Deactivate();
 			m_FC.push_back(pfc);
 		}
 
@@ -883,11 +872,9 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			assert(ps);
 			ps->SetSurface(psurf);
 
-			ar >> nid >> bactive;
-			ps->SetID(nid);
-			if (bactive) ps->Activate(); else ps->Deactivate();
-
 			ps->Serialize(ar);
+			if (ps->IsActive()) ps->Activate(); else ps->Deactivate();
+
 			m_SL.push_back(ps);
 			m_mesh.AddSurface(psurf);
 		}
@@ -898,10 +885,8 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		for (int i=0; i<n; ++i)
 		{
 			FERigidBodyFixedBC* pbc = new FERigidBodyFixedBC(this);
-			ar >> nid >> bactive;
-			ar >> pbc->bc >> pbc->id;
-			pbc->SetID(nid);
-			if (bactive) pbc->Activate(); else pbc->Deactivate();
+			pbc->Serialize(ar);
+			if (pbc->IsActive()) pbc->Activate(); else pbc->Deactivate();
 			m_RBC.push_back(pbc);
 		}
 
@@ -911,10 +896,8 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		for (int i=0; i<n; ++i)
 		{
 			FERigidBodyDisplacement* pdc = new FERigidBodyDisplacement(this);
-			ar >> nid >> bactive;
-			ar >> pdc->bc >> pdc->id >> pdc->lc >> pdc->sf;
-			pdc->SetID(nid);
-			if (bactive) pdc->Activate(); else pdc->Deactivate();
+			pdc->Serialize(ar);
+			if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
 			m_RDC.push_back(pdc);
 		}
 
@@ -925,6 +908,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		{
 			FERigidBodyForce* pfc = new FERigidBodyForce(this);
 			pfc->Serialize(ar);
+			if (pfc->IsActive()) pfc->Activate(); else pfc->Deactivate();
 			m_RFC.push_back(pfc);
 		}
 
@@ -935,6 +919,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		{
 			FERigidAxialForce* pfc = new FERigidAxialForce(this);
 			pfc->Serialize(ar);
+			if (pfc->IsActive()) pfc->Activate(); else pfc->Deactivate();
 			m_RAF.push_back(pfc);
 		}
 
@@ -944,10 +929,8 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		for (int i=0; i<n; ++i)
 		{
 			FERigidNode* prn = new FERigidNode(this);
-			ar >> nid >> bactive;
-			ar >> prn->nid >> prn->rid;
-			prn->SetID(nid);
-			if (bactive) prn->Activate(); else prn->Deactivate();
+			prn->Serialize(ar);
+			if (prn->IsActive()) prn->Activate(); else prn->Deactivate();
 			m_RN.push_back(prn);
 		}
 

@@ -94,14 +94,13 @@ void FESurfaceConstraintSurface::Serialize(DumpFile& ar)
 FESurfaceConstraint::FESurfaceConstraint(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
 	static int count = 1;
+	SetID(count++);
 
 	m_stol = 0.01;
 	m_srad = 1.0;
 	m_atol = 0;
 	m_eps = 0;
 	m_btwo_pass = false;
-
-	m_nID = count++;
 
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
@@ -748,7 +747,7 @@ bool FESurfaceConstraint::Augment(int naug)
 	normgc = sqrt(normgc / N);
 
 	// check convergence of constraints
-	felog.printf(" surface constraint# %d\n", m_nID);
+	felog.printf(" surface constraint# %d\n", GetID());
 	felog.printf("                        CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);

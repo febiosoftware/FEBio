@@ -37,12 +37,4 @@ public:
 	virtual void Update(const FETimePoint& tp) {}
 
 	virtual FESurface* GetSurface(const char* sz) { return 0; }
-
-	//! Get the NLC ID
-	int GetID() { return m_nID; }
-
-protected:
-	int		m_nID;		//!< ID of nonlinear constraint
-
-	static int	m_ncount;	//!< used to create unique ID's for the nonlinear constraints
 };

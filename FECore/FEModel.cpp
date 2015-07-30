@@ -82,14 +82,7 @@ bool FEModel::Init()
 	for (int i=0; i<(int) m_Step.size(); ++i)
 	{
 		FEAnalysis& step = *m_Step[i];
-		if ((step.m_ntime <= 0) && (step.m_final_time <= 0.0)) { felog.printf("Invalid number of time steps for analysis step %d", i+1); return false; }
-		if ((step.m_ntime >  0) && (step.m_final_time >  0.0)) { felog.printf("You must either set the number of time steps or the final time but not both.\n"); return false; }
-		if (step.m_dt0   <= 0) { felog.printf("Invalid time step size for analysis step %d", i+1); return false; }
-		if (step.m_bautostep)
-		{
-//			if (m_pStep->m_dtmin <= 0) return err("Invalid minimum time step size");
-//			if (m_pStep->m_dtmax <= 0) return err("Invalid maximum time step size");
-		}
+		if (step.Init() == false) return false;
 	}
 
 	// evaluate all loadcurves at the initial time
@@ -618,7 +611,7 @@ bool FEModel::Solve()
 		m_pStep = m_Step[nstep];
 
 		// intitialize step data
-		if (m_pStep->Init() == false)
+		if (m_pStep->Activate() == false)
 		{
 			bconv = false;
 			break;
@@ -631,7 +624,7 @@ bool FEModel::Solve()
 		if (bconv == false) break;
 
 		// wrap it up
-		m_pStep->Finish();
+		m_pStep->Deactivate();
 	}
 
 	return bconv;
@@ -984,43 +977,19 @@ const char* FEModel::GetTitle()
 
 //-----------------------------------------------------------------------------
 //! Find a BC based on its ID. This is needed for restarts.
-FEBoundaryCondition* FEModel::FindBC(int nid)
+FEModelComponent* FEModel::FindModelComponent(int nid)
 {
 	int i;
-	for (i=0; i<(int) m_DC.size(); ++i) if (m_DC[i]->GetID() == nid) return m_DC[i];
-
-	for (i=0; i<(int) m_FC.size(); ++i) if (m_FC[i]->GetID() == nid) return m_FC[i];
-
-	for (i=0; i<(int) m_SL.size(); ++i) if (m_SL[i]->GetID() == nid) return m_SL[i];
-
-	for (i=0; i<(int) m_RBC.size(); ++i) if (m_RBC[i]->GetID() == nid) return m_RBC[i];
-
-	for (i=0; i<(int) m_RDC.size(); ++i) if (m_RDC[i]->GetID() == nid) return m_RDC[i];
-
-	for (i=0; i<(int) m_RFC.size(); ++i) if (m_RFC[i]->GetID() == nid) return m_RFC[i];
-
-	for (i=0; i<(int) m_RAF.size(); ++i) if (m_RAF[i]->GetID() == nid) return m_RAF[i];
-
-	for (i=0; i<(int) m_RN.size(); ++i) if (m_RN[i]->GetID() == nid) return m_RN[i];
-
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Find a Contact Interface based on its ID. This is needed for restarts.
-FESurfacePairInteraction* FEModel::FindCI(int nid)
-{
-	for (int i=0; i<(int) m_CI.size(); ++i) if (m_CI[i]->GetID() == nid) return m_CI[i];
-
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Find a Nonlinear Constraint based on its ID. This is needed for restarts.
-FENLConstraint* FEModel::FindNLC(int nid)
-{
-	for (int i=0; i<(int) m_NLC.size(); ++i) if (m_NLC[i]->GetID() == nid) return m_NLC[i];
-
+	for (i=0; i<(int) m_DC.size (); ++i) if (m_DC [i]->GetClassID() == nid) return m_DC [i];
+	for (i=0; i<(int) m_FC.size (); ++i) if (m_FC [i]->GetClassID() == nid) return m_FC [i];
+	for (i=0; i<(int) m_SL.size (); ++i) if (m_SL [i]->GetClassID() == nid) return m_SL [i];
+	for (i=0; i<(int) m_RBC.size(); ++i) if (m_RBC[i]->GetClassID() == nid) return m_RBC[i];
+	for (i=0; i<(int) m_RDC.size(); ++i) if (m_RDC[i]->GetClassID() == nid) return m_RDC[i];
+	for (i=0; i<(int) m_RFC.size(); ++i) if (m_RFC[i]->GetClassID() == nid) return m_RFC[i];
+	for (i=0; i<(int) m_RAF.size(); ++i) if (m_RAF[i]->GetClassID() == nid) return m_RAF[i];
+	for (i=0; i<(int) m_RN.size (); ++i) if (m_RN [i]->GetClassID() == nid) return m_RN [i];
+	for (i=0; i<(int) m_CI.size (); ++i) if (m_CI [i]->GetClassID() == nid) return m_CI [i];
+	for (i=0; i<(int) m_NLC.size(); ++i) if (m_NLC[i]->GetClassID() == nid) return m_NLC[i];
 	return 0;
 }
 

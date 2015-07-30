@@ -24,8 +24,11 @@ public:
 	//! destructor
 	virtual ~FEAnalysis();
 
-	//! Data initialization
+	//! Initialization
 	virtual bool Init();
+
+	//! Activation
+	virtual bool Activate();
 
 	//! Reset analysis data
 	virtual void Reset();
@@ -34,7 +37,7 @@ public:
 	virtual bool Solve();
 
 	//! wrap it up
-	virtual void Finish();
+	virtual void Deactivate();
 
 	//! Serialize data from and to a binary archive
 	virtual void Serialize(DumpFile& ar);
@@ -64,17 +67,11 @@ public:
 	void ClearDomains() { m_Dom.clear(); }
 
 public:
-	//! add a boundary condition to the analysis
-	void AddBoundaryCondition(FEBoundaryCondition* pbc) { m_BC.push_back(pbc); }
+	//! add a model component
+	void AddModelComponent(FEModelComponent* pmc);
 
-	//! return number of boundary conditions
-	int BoundaryConditions() { return (int) m_BC.size(); }
-
-	//! add a surface pair interaction to the analysis
-	void AddSurfacePairInteraction(FESurfacePairInteraction* pci) { m_CI.push_back(pci); }
-
-	//! Add a non-linear constraint to the analysis
-	void AddConstraint(FENLConstraint* pnlc) { m_NLC.push_back(pnlc); }
+	//! return number of model components
+	int ModelComponents() const;
 
 public:
 	//! sets the plot level
@@ -164,10 +161,8 @@ public:
 	//}
 
 protected:
-	std::vector<int>						m_Dom;	//!< list of active domains for this analysis
-	std::vector<FEBoundaryCondition*>		m_BC;	//!< array of boundary conditions
-	std::vector<FESurfacePairInteraction* >	m_CI;	//!< active surface pair interactions
-	std::vector<FENLConstraint*>			m_NLC;	//!< non-linear constraints
+	std::vector<int>				m_Dom;	//!< list of active domains for this analysis
+	std::vector<FEModelComponent*>	m_MC;	//!< array of model components active during this step
 
 protected:
 	int		m_nmust;		//!< current must-point

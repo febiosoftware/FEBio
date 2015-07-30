@@ -190,7 +190,7 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
 				{
-					GetStep()->AddBoundaryCondition(pfc);
+					GetStep()->AddModelComponent(pfc);
 					pfc->Deactivate();
 				}
 			}
@@ -215,7 +215,7 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
 				{
-					GetStep()->AddBoundaryCondition(pfc);
+					GetStep()->AddModelComponent(pfc);
 					pfc->Deactivate();
 				}
 
@@ -256,7 +256,7 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)
 			{
-				GetStep()->AddBoundaryCondition(pfc);
+				GetStep()->AddModelComponent(pfc);
 				pfc->Deactivate();
 			}
 
@@ -326,7 +326,7 @@ void FEBioLoadsSection::ParseSurfaceLoad(XMLTag& tag)
 	// add this boundary condition to the current step
 	if (m_pim->m_nsteps > 0)
 	{
-		GetStep()->AddBoundaryCondition(ps);
+		GetStep()->AddModelComponent(ps);
 		ps->Deactivate();
 	}
 }
@@ -433,7 +433,7 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 	// add this boundary condition to the current step
 	if (m_pim->m_nsteps > 0)
 	{
-		GetStep()->AddBoundaryCondition(psl);
+		GetStep()->AddModelComponent(psl);
 		psl->Deactivate();
 	}
 }

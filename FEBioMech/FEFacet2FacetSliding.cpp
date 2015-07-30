@@ -293,7 +293,7 @@ void FEFacetSlidingSurface::GetNodalContactTraction(int nface, vec3d* tn)
 FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
 	static int ncount = 1;
-	m_nID = ncount++;
+	SetID(ncount++);
 
 	// default parameters
 	m_epsn = 1.0;
@@ -1215,7 +1215,7 @@ bool FEFacet2FacetSliding::Augment(int naug)
 //	if (normg1 != 0) gnorm = fabs(normg1 - m_normg0)/normg1; else gnorm = fabs(normg1 - m_normg0);
 	gnorm = normg1;
 
-	felog.printf(" sliding interface # %d\n", m_nID);
+	felog.printf(" sliding interface # %d\n", GetID());
 	felog.printf("                        CURRENT        REQUIRED\n");
 	felog.printf("    normal force : %15le", lnorm);
 	if (m_atol > 0) felog.printf("%15le\n", m_atol); else felog.printf("       ***\n");

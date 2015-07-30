@@ -37,12 +37,4 @@ public:
 
 	//! create a copy of this interface
 	virtual void CopyFrom(FESurfacePairInteraction* pci) {}
-
-	//! Get the Contact Interface ID
-	int GetID() { return m_nID; }
-
-protected:
-	int		m_nID;			//!< ID of interface
-
-	static int	m_ncount;	//!< used to create unique ID's for the contact interfaces
 };

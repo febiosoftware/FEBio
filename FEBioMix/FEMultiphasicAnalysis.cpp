@@ -149,10 +149,10 @@ void FEMultiphasicAnalysis::InitNodes()
 //! This function is called before the analysis is solved and initializes all
 //! analysis data, such as determine active boundary conditions, initializes
 //! equation numbers (the latter is actually done by the FESolver class).
-bool FEMultiphasicAnalysis::Init()
+bool FEMultiphasicAnalysis::Activate()
 {
 	// initialize base class data
-	FEAnalysis::Init();
+	FEAnalysis::Activate();
 
 	// clear the active rigid body BC's
 	int NRB = m_fem.Objects();

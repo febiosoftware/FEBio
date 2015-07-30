@@ -9,7 +9,7 @@ class FEMultiphasicAnalysis : public FEAnalysis
 public:
 	FEMultiphasicAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_MULTIPHASIC) {}
 
-	bool Init();
+	bool Activate();
 
 protected:
 	void InitNodes();

@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "FENLConstraint.h"
 
-
-int FENLConstraint::m_ncount = 0;
-
 //-----------------------------------------------------------------------------
 FENLConstraint::FENLConstraint(FEModel* pfem) : FEModelComponent(FENLCONSTRAINT_ID, pfem)
 {
-	m_nID = m_ncount++;
+	static int ncount = 1;
+	SetID(ncount++);
 }
 
 //-----------------------------------------------------------------------------
-FENLConstraint::~FENLConstraint(){}
+FENLConstraint::~FENLConstraint()
+{
+}

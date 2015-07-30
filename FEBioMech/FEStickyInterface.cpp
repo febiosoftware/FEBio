@@ -116,6 +116,7 @@ void FEStickySurface::GetNodalContactTraction(int nface, vec3d* tn)
 FEStickyInterface::FEStickyInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&pfem->GetMesh()), ms(&pfem->GetMesh())
 {
 	static int count = 1;
+	SetID(count++);
 
 	// define sibling relationships
 	ss.SetSibling(&ms);
@@ -130,9 +131,6 @@ FEStickyInterface::FEStickyInterface(FEModel* pfem) : FEContactInterface(pfem), 
 	m_naugmax = 10;
 	m_tmax = 0.0;
 	m_snap = 0.0;
-
-	// give this interface an ID (TODO: where is this actually used?)
-	m_nID = count++;
 }
 
 //-----------------------------------------------------------------------------
@@ -624,7 +622,7 @@ bool FEStickyInterface::Augment(int naug)
 	normgc = sqrt(normgc / N);
 
 	// check convergence of constraints
-	felog.printf(" tied interface # %d\n", m_nID);
+	felog.printf(" tied interface # %d\n", GetID());
 	felog.printf("                        CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);

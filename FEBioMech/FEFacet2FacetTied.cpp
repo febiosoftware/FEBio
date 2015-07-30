@@ -126,7 +126,9 @@ void FEFacetTiedSurface::Serialize(DumpFile &ar)
 //=============================================================================
 FEFacet2FacetTied::FEFacet2FacetTied(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
+	// give this interface an ID
 	static int count = 1;
+	SetID(count++);
 
 	// define sibling relationships
 	m_ss.SetSibling(&m_ms);
@@ -139,9 +141,6 @@ FEFacet2FacetTied::FEFacet2FacetTied(FEModel* pfem) : FEContactInterface(pfem), 
 	m_naugmin = 0;
 	m_naugmax = 10;
 	m_stol    = 0.0001;
-
-	// give this interface an ID (TODO: where is this actually used?)
-	m_nID = count++;
 }
 
 //-----------------------------------------------------------------------------
@@ -610,7 +609,7 @@ bool FEFacet2FacetTied::Augment(int naug)
 	normgc = sqrt(normgc / N);
 
 	// check convergence of constraints
-	felog.printf(" tied interface # %d\n", m_nID);
+	felog.printf(" tied interface # %d\n", GetID());
 	felog.printf("                        CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);

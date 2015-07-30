@@ -73,17 +73,16 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 //-----------------------------------------------------------------------------
 void FEContactInterface::Serialize(DumpFile& ar)
 {
+	// store base class
+	FEModelComponent::Serialize(ar);
+
+	// save parameters
 	if (ar.IsSaving())
 	{
-		ar << m_nID;
 		ar << m_blaugon;
 	}
 	else
 	{
-		ar >> m_nID;
 		ar >> m_blaugon;
 	}
-
-	// store parameters
-	FEParamContainer::Serialize(ar);
 }

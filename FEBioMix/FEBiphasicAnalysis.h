@@ -9,7 +9,7 @@ class FEBiphasicAnalysis : public FEAnalysis
 public:
 	FEBiphasicAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_BIPHASIC) {}
 
-	bool Init();
+	bool Activate();
 
 protected:
 	void InitNodes();

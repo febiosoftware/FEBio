@@ -15,6 +15,8 @@ class FENodalForce : public FEBoundaryCondition
 public:
 	FENodalForce(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
 
+	void Serialize(DumpFile& ar);
+
 public:
 	double	s;		// scale factor
 	int		node;	// node number
@@ -29,6 +31,8 @@ class FEPrescribedBC : public FEBoundaryCondition
 {
 public:
 	FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+
+	void Serialize(DumpFile& ar);
 
 public:
 	double	s;		// scale factor
@@ -46,6 +50,8 @@ class FERigidNode : public FEBoundaryCondition
 {
 public:
 	FERigidNode(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+
+	void Serialize(DumpFile& ar);
 
 public:
 	int	nid;	// node number
@@ -117,6 +123,8 @@ class FERigidBodyFixedBC : public FEBoundaryCondition
 public:
 	FERigidBodyFixedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
 
+	void Serialize(DumpFile& ar);
+
 public:
 	int		id;	//!< rigid body ID
 	int		bc;	//!< constrained dof
@@ -131,6 +139,8 @@ public:
 	FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem) { ref= 0.0; brel = false; }
 
 	double Value();
+
+	void Serialize(DumpFile& ar);
 
 public:
 	int		id;		//!< rigid body id

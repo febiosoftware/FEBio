@@ -184,13 +184,12 @@ void FERigidWallSurface::Serialize(DumpFile &ar)
 FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh())
 {
 	static int count = 1;
+	SetID(count++);
 
 	m_mp = 0;
 
 	m_eps = 0;
 	m_atol = 0;
-
-	m_nID = count++;
 };
 
 //-----------------------------------------------------------------------------
@@ -592,7 +591,7 @@ bool FERigidWallInterface::Augment(int naug)
 	normgc = sqrt(normgc / N);
 
 	// check convergence of constraints
-	felog.printf(" rigid wall interface # %d\n", m_nID);
+	felog.printf(" rigid wall interface # %d\n", GetID());
 	felog.printf("                        CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);

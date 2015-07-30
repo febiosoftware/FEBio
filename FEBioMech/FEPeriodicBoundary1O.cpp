@@ -24,6 +24,7 @@ END_PARAMETER_LIST();
 FEPeriodicBoundary1O::FEPeriodicBoundary1O(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
 	static int count = 1;
+	SetID(count++);
 
 	m_stol = 0.01;
 	m_srad = 1.0;
@@ -32,8 +33,6 @@ FEPeriodicBoundary1O::FEPeriodicBoundary1O(FEModel* pfem) : FEContactInterface(p
 	m_btwo_pass = false;
 	m_off = vec3d(0,0,0);
 	m_naugmin = 0;
-
-	m_nID = count++;
 
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
@@ -617,7 +616,7 @@ bool FEPeriodicBoundary1O::Augment(int naug)
 	normL1 = sqrt(normL1);
 	normgc = sqrt(normgc / N);
 
-	felog.printf(" tied interface # %d\n", m_nID);
+	felog.printf(" tied interface # %d\n", GetID());
 	felog.printf("                        CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);

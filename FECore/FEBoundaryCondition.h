@@ -15,17 +15,6 @@ public:
 
 	//! desctructor
 	virtual ~FEBoundaryCondition(){}
-
-	//! Get the BC ID
-	int GetID() { return m_nID; }
-
-	//! Set the BC ID
-	void SetID(int nid);
-
-protected:
-	int		m_nID;		//!< unique ID for this BC.
-
-	static int	m_ncount;	//!< used to create unique ID's for the boundary conditions \todo is this really used?
 };
 
 } // namespace FECore

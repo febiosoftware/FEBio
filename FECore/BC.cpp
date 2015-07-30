@@ -5,6 +5,76 @@
 #include "FERigidBody.h"
 
 //-----------------------------------------------------------------------------
+void FENodalForce::Serialize(DumpFile& ar)
+{
+	FEBoundaryCondition::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << bc << lc << node << s;
+	}
+	else
+	{
+		ar >> bc >> lc >> node >> s;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEPrescribedBC::Serialize(DumpFile& ar)
+{
+	FEBoundaryCondition::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << bc << lc << node << s << br << r;
+	}
+	else
+	{
+		ar >> bc >> lc >> node >> s >> br >> r;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FERigidBodyFixedBC::Serialize(DumpFile& ar)
+{
+	FEBoundaryCondition::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << bc << id;
+	}
+	else
+	{
+		ar >> bc >> id;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FERigidBodyDisplacement::Serialize(DumpFile& ar)
+{
+	FEBoundaryCondition::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << bc << id << lc << sf;
+	}
+	else
+	{
+		ar >> bc >> id >> lc >> sf;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FERigidNode::Serialize(DumpFile& ar)
+{
+	FEBoundaryCondition::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << nid << rid;		
+	}
+	else
+	{
+		ar >> nid >> rid;		
+	}
+}
+
+//-----------------------------------------------------------------------------
 FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
 {
 	m_bfollow = false;
@@ -13,19 +83,14 @@ FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FEBoundaryCondition(FEBC_ID,
 //-----------------------------------------------------------------------------
 void FERigidBodyForce::Serialize(DumpFile& ar)
 {
+	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << GetID() << IsActive();
 		ar << ntype << bc << id << lc << sf;
 	}
 	else
 	{
-		int nid;
-		bool bactive;
-		ar >> nid >> bactive;
 		ar >> ntype >> bc >> id >> lc >> sf;
-		SetID(nid);
-		if (bactive) Activate(); else Deactivate();
 	}
 }
 
@@ -131,15 +196,15 @@ void FERigidAxialForce::Serialize(DumpFile& ar)
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << GetID() << IsActive();
+		ar << m_ida << m_idb;
+		ar << m_ra0 << m_rb0;
+		ar << m_s << m_brelative;
 	}
 	else
 	{
-		int nid;
-		bool bactive;
-		ar >> nid >> bactive;
-		SetID(nid);
-		if (bactive) Activate(); else Deactivate();
+		ar >> m_ida >> m_idb;
+		ar >> m_ra0 >> m_rb0;
+		ar >> m_s >> m_brelative;
 	}
 }
 

@@ -10,5 +10,5 @@ public:
 	FEThermoElasticAnalysis(FEModel* pfem);
 
 	//! Initialization
-	bool Init();
+	bool Activate();
 };

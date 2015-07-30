@@ -9,10 +9,10 @@ FEHeatTransferAnalysis::FEHeatTransferAnalysis(FEModel* pfem) : FEAnalysis(pfem,
 }
 
 //-----------------------------------------------------------------------------
-bool FEHeatTransferAnalysis::Init()
+bool FEHeatTransferAnalysis::Activate()
 {
 	// initialize base class data
-	FEAnalysis::Init();
+	FEAnalysis::Activate();
 
 	// reset nodal ID's
 	FEMesh& mesh = m_fem.GetMesh();

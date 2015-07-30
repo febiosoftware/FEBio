@@ -380,6 +380,7 @@ void FESlidingSurface::GetNodalContactTraction(int nface, vec3d* tn)
 FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
 	static int count = 1;
+	SetID(count++);
 
 	m_mu = 0;
 	m_epsf = 0;
@@ -401,7 +402,6 @@ FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem)
 	m_btwo_pass = false; // don't use two-pass
 	m_bself_contact = false;	// no self-contact
 	m_sradius = 0;				// no search radius limitation
-	m_nID = count++;
 
 	// set the siblings
 	m_ms.SetSibling(&m_ss);
@@ -1662,7 +1662,7 @@ bool FESlidingInterface::Augment(int naug)
 	if (normL1 != 0) lnorm = fabs(normL1 - normL0)/normL1; else lnorm = fabs(normL1 - normL0);
 	if (normg1 != 0) gnorm = fabs(normg1 - m_normg0)/normg1; else gnorm = fabs(normg1 - m_normg0);
 
-	felog.printf(" sliding interface # %d\n", m_nID);
+	felog.printf(" sliding interface # %d\n", GetID());
 	felog.printf("                        CURRENT        REQUIRED\n");
 	felog.printf("    normal force : %15le", lnorm);
 	if (m_atol > 0) felog.printf("%15le\n", m_atol); else felog.printf("       ***\n");

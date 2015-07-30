@@ -9,10 +9,10 @@ FEThermoElasticAnalysis::FEThermoElasticAnalysis(FEModel* pfem) : FEAnalysis(pfe
 }
 
 //-----------------------------------------------------------------------------
-bool FEThermoElasticAnalysis::Init()
+bool FEThermoElasticAnalysis::Activate()
 {
 	// initialize base class data
-	FEAnalysis::Init();
+	FEAnalysis::Activate();
 
 	// reset nodal ID's
 	FEMesh& mesh = m_fem.GetMesh();

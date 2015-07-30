@@ -17,10 +17,10 @@ FESolidAnalysis::FESolidAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_SOLID)
 //! This function is called before the analysis is solved and initializes all
 //! analysis data, such as determine active boundary conditions, initializes
 //! equation numbers (the latter is actually done by the FESolver class).
-bool FESolidAnalysis::Init()
+bool FESolidAnalysis::Activate()
 {
 	// initialize base class data
-	FEAnalysis::Init();
+	FEAnalysis::Activate();
 
 	// clear the rigid body BC's
 	int NRB = m_fem.Objects();
@@ -302,9 +302,9 @@ bool FESolidAnalysis::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESolidAnalysis::Finish()
+void FESolidAnalysis::Deactivate()
 {
-	FEAnalysis::Finish();
+	FEAnalysis::Deactivate();
 
 	// store the current rigid body reaction forces
 	for (int i=0; i<m_fem.Objects(); ++i)
@@ -319,10 +319,10 @@ void FESolidAnalysis::Finish()
 //! This function is called before the analysis is solved and initializes all
 //! analysis data, such as determine active boundary conditions, initializes
 //! equation numbers (the latter is actually done by the FESolver class).
-bool FEExplicitSolidAnalysis::Init()
+bool FEExplicitSolidAnalysis::Activate()
 {
 	// initialize base class data
-	FEAnalysis::Init();
+	FEAnalysis::Activate();
 
 	// clear the active rigid body BC's
 	int NRB = m_fem.Objects();
@@ -560,10 +560,10 @@ bool FEExplicitSolidAnalysis::Init()
 //! This function is called before the analysis is solved and initializes all
 //! analysis data, such as determine active boundary conditions, initializes
 //! equation numbers (the latter is actually done by the FESolver class).
-bool FELinearSolidAnalysis::Init()
+bool FELinearSolidAnalysis::Activate()
 {
 	// initialize base class data
-	FEAnalysis::Init();
+	FEAnalysis::Activate();
 
 	// reset nodal ID's
 	FEMesh& mesh = m_fem.GetMesh();

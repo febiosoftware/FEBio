@@ -348,7 +348,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)
 			{
-				GetStep()->AddBoundaryCondition(pdc);
+				GetStep()->AddModelComponent(pdc);
 				pdc->Deactivate();
 			}
 		}
@@ -397,7 +397,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)
 			{
-				GetStep()->AddBoundaryCondition(pdc);
+				GetStep()->AddModelComponent(pdc);
 				pdc->Deactivate();
 			}
 			++tag;
@@ -478,7 +478,7 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)
 			{
-				GetStep()->AddBoundaryCondition(pbc);
+				GetStep()->AddModelComponent(pbc);
 				pbc->Deactivate();
 			}
 		}
@@ -504,7 +504,7 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)
 			{
-				GetStep()->AddBoundaryCondition(pdc);
+				GetStep()->AddModelComponent(pdc);
 				pdc->Deactivate();
 			}
 			++tag;
@@ -761,7 +761,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 			if (m_pim->m_nsteps > 0)
 			{
-				GetStep()->AddBoundaryCondition(prn);
+				GetStep()->AddModelComponent(prn);
 				prn->Deactivate();
 			}
 
@@ -1004,7 +1004,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)
 			{
-				GetStep()->AddSurfacePairInteraction(pci);
+				GetStep()->AddModelComponent(pci);
 				pci->Deactivate();
 			}
 		}
