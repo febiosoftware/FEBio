@@ -215,13 +215,13 @@ public: // --- parameter functions ---
 	void EvaluateLoadCurves(double time);
 
 	//! evaluate all parameter lists
-	void EvaluateAllParameterLists();
+	bool EvaluateAllParameterLists();
 
 	//! Evaluate parameter list
-	void EvaluateParameterList(FEParameterList& pl);
+	bool EvaluateParameterList(FEParameterList& pl);
 
 	//! Evaluate parameter list
-	void EvaluateParameterList(FECoreBase* pc);
+	bool EvaluateParameterList(FECoreBase* pc);
 
 	//! return a pointer to the named variable
 	double* FindParameter(const char* szname);

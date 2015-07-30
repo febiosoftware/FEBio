@@ -96,14 +96,7 @@ bool FEModel::Init()
 	for (int i=0; i<LoadCurves(); ++i) m_LC[i]->Evaluate(0);
     
     // evaluate all parameter lists
-    EvaluateAllParameterLists();
-
-	// if the analysis is run in plane-strain mode we fix all the z-dofs of all nodes
-	if (m_nplane_strain >= 0)
-	{
-		int bc = m_nplane_strain;
-		for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_BC[bc] = -1;
-	}
+    if (EvaluateAllParameterLists() == false) return false;
 
 	// validate BC's
 	if (InitBCs() == false) return false;
@@ -148,6 +141,13 @@ bool FEModel::Init()
 //! See if the BC's are setup correctly.
 bool FEModel::InitBCs()
 {
+	// if the analysis is run in plane-strain mode we fix all the z-dofs of all nodes
+	if (m_nplane_strain >= 0)
+	{
+		int bc = m_nplane_strain;
+		for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_BC[bc] = -1;
+	}
+
 	// get the number of loadcurves
 	int NLC = LoadCurves();
 
@@ -809,7 +809,7 @@ void FEModel::EvaluateLoadCurves(double time)
 }
 
 //-----------------------------------------------------------------------------
-void FEModel::EvaluateAllParameterLists()
+bool FEModel::EvaluateAllParameterLists()
 {
 	// evaluate material parameter lists
 	for (int i=0; i<Materials(); ++i)
@@ -818,55 +818,61 @@ void FEModel::EvaluateAllParameterLists()
 		FEMaterial* pm = GetMaterial(i);
 
 		// evaluate its parameter list
-		EvaluateParameterList(pm);
+		if (EvaluateParameterList(pm) == false) return false;
 	}
 
 	// evaluate surface load parameter lists
 	for (int i=0; i<SurfaceLoads(); ++i)
 	{
 		FEParameterList& pl = SurfaceLoad(i)->GetParameterList();
-		EvaluateParameterList(pl);
+		if (EvaluateParameterList(pl) == false) return false;
 	}
 
 	// evaluate body load parameter lists
 	for (int i=0; i<BodyLoads(); ++i)
 	{
 		FEParameterList& pl = GetBodyLoad(i)->GetParameterList();
-		EvaluateParameterList(pl);
+		if (EvaluateParameterList(pl) == false) return false;
 	}
 
 	// evaluate contact interface parameter lists
 	for (int i=0; i<SurfacePairInteractions(); ++i)
 	{
 		FEParameterList& pl = SurfacePairInteraction(i)->GetParameterList();
-		EvaluateParameterList(pl);
+		if (EvaluateParameterList(pl) == false) return false;
 	}
 
 	// evaluate constraint parameter lists
 	for (int i=0; i<NonlinearConstraints(); ++i)
 	{
 		FEParameterList& pl = NonlinearConstraint(i)->GetParameterList();
-		EvaluateParameterList(pl);
+		if (EvaluateParameterList(pl) == false) return false;
 	}
 
 	// evaluate rigid forces
 	for (int i=0; i<(int)m_RAF.size(); ++i)
 	{
 		FEParameterList& pl = m_RAF[i]->GetParameterList();
-		EvaluateParameterList(pl);
+		if (EvaluateParameterList(pl) == false) return false;
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! Evaluate a parameter list
-void FEModel::EvaluateParameterList(FEParameterList &pl)
+bool FEModel::EvaluateParameterList(FEParameterList &pl)
 {
+	const int NLC = LoadCurves();
 	list<FEParam>::iterator pi = pl.first();
 	for (int j=0; j<pl.Parameters(); ++j, ++pi)
 	{
+		int nlc = pi->m_nlc;
 		if (pi->m_nlc >= 0)
 		{
-			double v = GetLoadCurve(pi->m_nlc)->Value();
+			if (nlc >= NLC) return false;
+
+			double v = GetLoadCurve(nlc)->Value();
 			switch (pi->m_itype)
 			{
 			case FE_PARAM_INT   : pi->value<int>() = (int) v; break;
@@ -878,24 +884,31 @@ void FEModel::EvaluateParameterList(FEParameterList &pl)
 			}
 		}
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! This function evaluates parameter lists. First the FECoreBase's parameter
 //! list is evaluated. Then, the parameter lists of all the properties are 
 //! evaluated recursively.
-void FEModel::EvaluateParameterList(FECoreBase* pc)
+bool FEModel::EvaluateParameterList(FECoreBase* pc)
 {
 	// evaluate the component's parameter list
-	EvaluateParameterList(pc->GetParameterList());
+	if (EvaluateParameterList(pc->GetParameterList()) == false) return false;
 
 	// evaluate the properties' parameter lists
 	int N = pc->Properties();
 	for (int i=0; i<N; ++i)
 	{
 		FECoreBase* pci = pc->GetProperty(i);
-		if (pci) EvaluateParameterList(pci);
+		if (pci)
+		{
+			if (EvaluateParameterList(pci) == false) return false;
+		}
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
