@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "version.h"
+#include "svnrev.h"
 #include "validate.h"
 #include "FECore/log.h"
 #include <stdio.h>
