@@ -33,6 +33,15 @@ void FEPrescribedBC::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+bool FERigidBodyFixedBC::Init()
+{
+	FEModel& fem = *GetFEModel();
+	FEMaterial* pm = fem.GetMaterial(id-1);
+	id = pm->GetRigidBodyID(); if (id < 0) return false;
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 void FERigidBodyFixedBC::Serialize(DumpFile& ar)
 {
 	FEBoundaryCondition::Serialize(ar);
@@ -47,6 +56,15 @@ void FERigidBodyFixedBC::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+bool FERigidBodyDisplacement::Init()
+{
+	FEModel& fem = *GetFEModel();
+	FEMaterial* pm = fem.GetMaterial(id-1);
+	id = pm->GetRigidBodyID(); if (id < 0) return false;
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 void FERigidBodyDisplacement::Serialize(DumpFile& ar)
 {
 	FEBoundaryCondition::Serialize(ar);
@@ -58,6 +76,24 @@ void FERigidBodyDisplacement::Serialize(DumpFile& ar)
 	{
 		ar >> bc >> id >> lc >> sf;
 	}
+}
+
+//-----------------------------------------------------------------------------
+bool FERigidBodyVelocity::Init()
+{
+	FEModel& fem = *GetFEModel();
+	FEMaterial* pm = fem.GetMaterial(id-1);
+	id = pm->GetRigidBodyID(); if (id < 0) return false;
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FERigidBodyAngularVelocity::Init()
+{
+	FEModel& fem = *GetFEModel();
+	FEMaterial* pm = fem.GetMaterial(id-1);
+	id = pm->GetRigidBodyID(); if (id < 0) return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------

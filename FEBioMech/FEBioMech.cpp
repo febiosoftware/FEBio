@@ -119,6 +119,9 @@
 #include "FEStickyInterface.h"
 #include "FEPointConstraint.h"
 #include "FEFacet2FacetTied.h"
+#include "FEVolumeConstraint.h"
+#include "FEDistanceConstraint.h"
+#include "FE2OMicroConstraint.h"
 
 #include "FEAugLagLinearConstraint.h"
 #include "FERigidJoint.h"
@@ -131,9 +134,7 @@
 #include "FERigidDamper.h"
 #include "FERigidAngularDamper.h"
 #include "FERigidContractileForce.h"
-#include "FEVolumeConstraint.h"
-#include "FEDistanceConstraint.h"
-#include "FE2OMicroConstraint.h"
+#include "FERigidForce.h"
 
 #include "FESolidAnalysis.h"
 #include "FESolidSolver.h"

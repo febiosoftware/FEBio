@@ -473,44 +473,22 @@ bool FEModel::InitObjects()
 	for (int i=0; i<(int) m_RBC.size(); ++i)
 	{
 		FERigidBodyFixedBC& BC = *m_RBC[i];
-		FEMaterial* pm = GetMaterial(BC.id-1);
-		BC.id = pm->GetRigidBodyID(); assert(BC.id >= 0);
+		if (BC.Init() == false) return false;
 	}
 	for (int i=0; i<(int) m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *m_RDC[i];
-		FEMaterial* pm = GetMaterial(DC.id-1);
-		DC.id = pm->GetRigidBodyID(); assert(DC.id >= 0);
-	}
-	for (int i=0; i<(int) m_ML.size(); ++i)
-	{
-		FEModelLoad* pml = m_ML[i];
-		FERigidBodyForce* pRF = dynamic_cast<FERigidBodyForce*>(pml);
-		if (pRF)
-		{
-			FEMaterial* pm = GetMaterial(pRF->id-1);
-			pRF->id = pm->GetRigidBodyID(); assert(pRF->id >= 0);
-		}
-		FERigidAxialForce* pAF = dynamic_cast<FERigidAxialForce*>(pml);
-		if (pAF)
-		{
-			FEMaterial* pm = GetMaterial(pAF->m_ida-1);
-			pAF->m_ida = pm->GetRigidBodyID(); assert(pAF->m_ida >= 0);
-			pm = GetMaterial(pAF->m_idb-1);
-			pAF->m_idb = pm->GetRigidBodyID(); assert(pAF->m_idb >= 0);
-		}
+		if (DC.Init() == false) return false;
 	}
 	for (int i=0; i<(int) m_RBV.size(); ++i)
 	{
 		FERigidBodyVelocity& RV = *m_RBV[i];
-		FEMaterial* pm = GetMaterial(RV.id-1);
-		RV.id = pm->GetRigidBodyID(); assert(RV.id>=0);
+		if (RV.Init() == false) return false;
 	}
 	for (int i=0; i<(int) m_RBW.size(); ++i)
 	{
 		FERigidBodyAngularVelocity& RW = *m_RBW[i];
-		FEMaterial* pm = GetMaterial(RW.id-1);
-		RW.id = pm->GetRigidBodyID(); assert(RW.id>=0);
+		if (RW.Init() == false) return false;
 	}
 	return true;
 }
@@ -540,7 +518,8 @@ bool FEModel::InitModelLoads()
 //!   I am not entirely a fan of this approach but it does solve the problem that contact
 //!   interface shoulds only do work (e.g. update projection status) when they are active, but
 //!   have to allocate memory during the initialization fase.
-//!
+//! \todo I need to check if this is still the case. That is, if I really need to call Activate
+//!       here for global interfaces.
 bool FEModel::InitContact()
 {
 	// loop over all contact interfaces

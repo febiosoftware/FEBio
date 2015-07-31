@@ -65,6 +65,8 @@ class FERigidBodyFixedBC : public FEBoundaryCondition
 public:
 	FERigidBodyFixedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
 
+	bool Init();
+
 	void Serialize(DumpFile& ar);
 
 public:
@@ -79,6 +81,8 @@ class FERigidBodyDisplacement : public FEBoundaryCondition
 {
 public:
 	FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem) { ref= 0.0; brel = false; }
+
+	bool Init();
 
 	double Value();
 
@@ -100,6 +104,8 @@ class FERigidBodyVelocity : public FEBoundaryCondition
 public:
 	FERigidBodyVelocity(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
 
+	bool Init();
+
 public:
 	int		id;	//!< rigid body ID
 	vec3d	v;	//!< value
@@ -111,6 +117,8 @@ class FERigidBodyAngularVelocity : public FEBoundaryCondition
 {
 public:
 	FERigidBodyAngularVelocity(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+
+	bool Init();
 
 public:
 	int		id;	//!< rigid body ID
