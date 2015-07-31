@@ -63,7 +63,7 @@ bool FETangentDiagnostic::Init()
 // Build the uni-axial scenario
 void FETangentDiagnostic::BuildUniaxial()
 {
-	int i, j;
+	int i;
 	vec3d r[8] = {
 		vec3d(0,0,0), vec3d(1,0,0), vec3d(1,1,0), vec3d(0,1,0),
 		vec3d(0,0,1), vec3d(1,0,1), vec3d(1,1,1), vec3d(0,1,1)
@@ -85,12 +85,9 @@ void FETangentDiagnostic::BuildUniaxial()
 		n.m_rid = -1;
 
 		// set displacement BC's
-		n.m_BC[DOF_X] = BC[i][0];
-		n.m_BC[DOF_Y] = BC[i][1];
-		n.m_BC[DOF_Z] = BC[i][2];
-
-		// fix all DOFS
-		for (j=3; j<(int)n.m_BC.size(); ++j) n.m_BC[j] = -1;
+		if (BC[i][0] == -1) m_fem.AddFixedBC(i, DOF_X);
+		if (BC[i][1] == -1) m_fem.AddFixedBC(i, DOF_Y);
+		if (BC[i][2] == -1) m_fem.AddFixedBC(i, DOF_Z);
 	}
 
 	// get the material
@@ -134,7 +131,7 @@ void FETangentDiagnostic::BuildUniaxial()
 // Build the simple shear scenario
 void FETangentDiagnostic::BuildSimpleShear()
 {
-	int i, j;
+	int i;
 	vec3d r[8] = {
 		vec3d(0,0,0), vec3d(1,0,0), vec3d(1,1,0), vec3d(0,1,0),
 		vec3d(0,0,1), vec3d(1,0,1), vec3d(1,1,1), vec3d(0,1,1)
@@ -156,12 +153,9 @@ void FETangentDiagnostic::BuildSimpleShear()
 		n.m_rid = -1;
 
 		// set displacement BC's
-		n.m_BC[DOF_X] = BC[i][0];
-		n.m_BC[DOF_Y] = BC[i][1];
-		n.m_BC[DOF_Z] = BC[i][2];
-
-		// fix all DOFS
-		for (j=3; j<(int) n.m_BC.size(); ++j) n.m_BC[j] = -1;
+		if (BC[i][0] == -1) m_fem.AddFixedBC(i, DOF_X);
+		if (BC[i][1] == -1) m_fem.AddFixedBC(i, DOF_Y);
+		if (BC[i][2] == -1) m_fem.AddFixedBC(i, DOF_Z);
 	}
 
 	// get the material

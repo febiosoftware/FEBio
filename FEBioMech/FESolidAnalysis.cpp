@@ -72,15 +72,41 @@ bool FESolidAnalysis::Activate()
 	FEMesh& mesh = m_fem.GetMesh();
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
+		// fix all degrees of freedom
 		FENode& node = mesh.Node(i);
 		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = -1;
 
-		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
-		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;
-		if (node.m_BC[DOF_Z] != -1) node.m_ID[DOF_Z] = 0;
-		if (node.m_BC[DOF_U] != -1) node.m_ID[DOF_U] = 0;
-		if (node.m_BC[DOF_V] != -1) node.m_ID[DOF_V] = 0;
-		if (node.m_BC[DOF_W] != -1) node.m_ID[DOF_W] = 0;
+		// open degrees of freedom
+		if (node.m_bexclude == false)
+		{
+			// turn on displacement dofs (for non-rigid nodes)
+			if (node.m_rid < 0)
+			{
+				node.m_ID[DOF_X] = 0;
+				node.m_ID[DOF_Y] = 0;
+				node.m_ID[DOF_Z] = 0;
+			}
+
+			// turn on rotation dofs for non-rigid shell nodes
+			if (node.m_bshell)
+			{
+				node.m_ID[DOF_U] = 0;
+				node.m_ID[DOF_V] = 0;
+				node.m_ID[DOF_W] = 0;
+			}
+		}
+	}
+
+	// apply fixed BC's
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		if (node.m_BC[DOF_X] == -1) node.m_ID[DOF_X] = -1;
+		if (node.m_BC[DOF_Y] == -1) node.m_ID[DOF_Y] = -1;
+		if (node.m_BC[DOF_Z] == -1) node.m_ID[DOF_Z] = -1;
+		if (node.m_BC[DOF_U] == -1) node.m_ID[DOF_U] = -1;
+		if (node.m_BC[DOF_V] == -1) node.m_ID[DOF_V] = -1;
+		if (node.m_BC[DOF_W] == -1) node.m_ID[DOF_W] = -1;
 	}
 
 	// set the rigid nodes
@@ -374,13 +400,36 @@ bool FEExplicitSolidAnalysis::Activate()
 		FENode& node = mesh.Node(i);
 		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = -1;
 
-		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
-		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;
-		if (node.m_BC[DOF_Z] != -1) node.m_ID[DOF_Z] = 0;
-		if (node.m_BC[DOF_U] != -1) node.m_ID[DOF_U] = 0;
-		if (node.m_BC[DOF_V] != -1) node.m_ID[DOF_V] = 0;
-		if (node.m_BC[DOF_W] != -1) node.m_ID[DOF_W] = 0;
+		if (node.m_bexclude == false)
+		{
+			if (node.m_rid < 0)
+			{
+				node.m_ID[DOF_X] = 0;
+				node.m_ID[DOF_Y] = 0;
+				node.m_ID[DOF_Z] = 0;
+			}
+
+			if (node.m_bshell)
+			{
+				node.m_ID[DOF_U] = 0;
+				node.m_ID[DOF_V] = 0;
+				node.m_ID[DOF_W] = 0;
+			}
+		}
 	}
+
+	// apply fixed bc's
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		if (node.m_BC[DOF_X] == -1) node.m_ID[DOF_X] = -1;
+		if (node.m_BC[DOF_Y] == -1) node.m_ID[DOF_Y] = -1;
+		if (node.m_BC[DOF_Z] == -1) node.m_ID[DOF_Z] = -1;
+		if (node.m_BC[DOF_U] == -1) node.m_ID[DOF_U] = -1;
+		if (node.m_BC[DOF_V] == -1) node.m_ID[DOF_V] = -1;
+		if (node.m_BC[DOF_W] == -1) node.m_ID[DOF_W] = -1;
+	}
+
 
 	// set the rigid nodes
 	// Note that also the rotational degrees of freedom are fixed
@@ -572,12 +621,35 @@ bool FELinearSolidAnalysis::Activate()
 		FENode& node = mesh.Node(i);
 		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = -1;
 
-		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
-		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;
-		if (node.m_BC[DOF_Z] != -1) node.m_ID[DOF_Z] = 0;
-		if (node.m_BC[DOF_U] != -1) node.m_ID[DOF_U] = 0;
-		if (node.m_BC[DOF_V] != -1) node.m_ID[DOF_V] = 0;
-		if (node.m_BC[DOF_W] != -1) node.m_ID[DOF_W] = 0;
+		if (node.m_bexclude == false)
+		{
+			if (node.m_rid < 0)
+			{
+				node.m_ID[DOF_X] = 0;
+				node.m_ID[DOF_Y] = 0;
+				node.m_ID[DOF_Z] = 0;
+			}
+
+			if (node.m_bshell)
+			{
+				node.m_ID[DOF_U] = 0;
+				node.m_ID[DOF_V] = 0;
+				node.m_ID[DOF_W] = 0;
+			}
+		}
+	}
+
+	// apply fixed bc's
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+
+		if (node.m_BC[DOF_X] == -1) node.m_ID[DOF_X] = -1;
+		if (node.m_BC[DOF_Y] == -1) node.m_ID[DOF_Y] = -1;
+		if (node.m_BC[DOF_Z] == -1) node.m_ID[DOF_Z] = -1;
+		if (node.m_BC[DOF_U] == -1) node.m_ID[DOF_U] = -1;
+		if (node.m_BC[DOF_V] == -1) node.m_ID[DOF_V] = -1;
+		if (node.m_BC[DOF_W] == -1) node.m_ID[DOF_W] = -1;
 	}
 
 	// initialize equations

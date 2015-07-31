@@ -23,8 +23,15 @@ bool FEHeatTransferAnalysis::Activate()
 		// fix all degrees of freedom
 		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = -1;
 
-		// open the temperature dof for non-fixed nodes
-		if (node.m_BC[DOF_T] != -1) node.m_ID[DOF_T] = 0;
+		// open the temperature dof
+		node.m_ID[DOF_T] = 0;
+	}
+
+	// apply fixed dofs
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		if (node.m_BC[DOF_T] == -1) node.m_ID[DOF_T] = -1;
 	}
 
 	// initialize equations

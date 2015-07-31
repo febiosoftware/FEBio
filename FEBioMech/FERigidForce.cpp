@@ -289,6 +289,7 @@ void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp
 FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FEModelLoad(FEBC_ID, pfem)
 {
 	m_bfollow = false;
+	m_ntype = RAMP;
 }
 
 //-----------------------------------------------------------------------------
@@ -308,11 +309,11 @@ void FERigidBodyForce::Serialize(DumpFile& ar)
 	FEModelLoad::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << ntype << bc << id << lc << sf;
+		ar << m_ntype << bc << id << lc << sf;
 	}
 	else
 	{
-		ar >> ntype >> bc >> id >> lc >> sf;
+		ar >> m_ntype >> bc >> id >> lc >> sf;
 	}
 }
 
@@ -336,7 +337,7 @@ void FERigidBodyForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
 	if (m_bfollow == false)
 	{
 		int I  = rb.m_LM[bc];
-		if (ntype == 0)
+		if (m_ntype == RAMP)
 		{
 			if ((I>=0) && (lc >= 0))
 			{
@@ -344,7 +345,7 @@ void FERigidBodyForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
 				R[I] += f;
 			}
 		}
-		else if (ntype == 1)
+		else if (m_ntype == TARGET)
 		{
 			// get the current analysis step
 			FEAnalysis* pstep = fem.GetCurrentStep();

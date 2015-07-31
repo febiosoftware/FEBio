@@ -34,8 +34,15 @@ FENode::FENode()
     m_cp.assign(MAX_CDOFS, 0);
 
 	// initialize dof stuff
-    m_BC.assign(MAX_NDOFS,0);
+    m_BC.assign(MAX_NDOFS,  0);
     m_ID.assign(MAX_NDOFS, -1);
+
+	// exclude flag (true if the node should not be part of the analysis.
+	// For instance, if it is isolated).
+	m_bexclude = false;
+
+	// shell flag (true if the node belongs to a non-rigid shell)
+	m_bshell = false;
 
 	// rigid body data
 	m_rid = -1;
@@ -65,6 +72,7 @@ FENode::FENode(const FENode& n)
 
 	m_rid = n.m_rid;
 	m_bshell = n.m_bshell;
+	m_bexclude = n.m_bexclude;
 
 	m_ID = n.m_ID;
 	m_BC = n.m_BC;
@@ -94,6 +102,7 @@ FENode& FENode::operator = (const FENode& n)
 
 	m_rid = n.m_rid;
 	m_bshell = n.m_bshell;
+	m_bexclude = n.m_bexclude;
 
 	m_ID = n.m_ID;
 	m_BC = n.m_BC;
@@ -388,14 +397,16 @@ int FEMesh::RemoveIsolatedVertices()
 		}
 	}
 
-	// see if there are any isolated nodes
+	// See if there are any isolated nodes
+	// Exclude them from the analysis
 	int ni = 0;
 	for (i=0; i<N; ++i)
 		if (val[i] == 0)
 		{
 			++ni;
 			FENode& node = Node(i);
-			for (k=0; k<(int)node.m_BC.size(); ++k) node.m_BC[k] = -1;
+//			for (k=0; k<(int)node.m_BC.size(); ++k) node.m_BC[k] = -1;
+			node.m_bexclude = true;
 		}
 
 	return ni;
@@ -562,26 +573,29 @@ bool FEMesh::Init()
 		return false;
 	}
 
-	// next if a node does not belong to a shell
-	// we turn of the rotational degrees of freedom
-	// To do this, we first tag all shell nodes
-	vector<int> tag(Nodes());
-	zero(tag);
-	for (int nd = 0; nd < Domains(); ++nd)
+
+	// Find the nodes that are on a non-rigid shell. 
+	// These nodes will be assigned rotational degrees of freedom
+	for (int i=0; i<Nodes(); ++i) Node(i).m_bshell = false;
+	for (int nd = 0; nd<Domains(); ++nd)
 	{
-		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
+		FEDomain& dom = Domain(nd);
+		if (dom.Class() == FE_DOMAIN_SHELL)
 		{
-			FEShellDomain& sd = static_cast<FEShellDomain&>(Domain(nd));
-			for (int i=0; i<sd.Elements(); ++i)
+			int N = dom.Elements();
+			for (int i=0; i<N; ++i)
 			{
-				FEShellElement& el = sd.Element(i);
-				int n = el.Nodes();
-				int* en = &el.m_node[0];
-				for (int j=0; j<n; ++j) tag[en[j]] = 1;
+				FEElement& el = dom.ElementRef(i);
+				if (el.m_nrigid < 0)
+				{
+					int n = el.Nodes();
+					for (int j=0; j<n; ++j) Node(el.m_node[j]).m_bshell = true;
+				}
 			}
 		}
 	}
 
+/*
 	// fix rotational degrees of freedom of tagged nodes
 	for (int i=0; i<Nodes(); ++i) 
 	{
@@ -593,6 +607,7 @@ bool FEMesh::Init()
 			node.m_BC[DOF_W] = -1;
 		}
 	}
+*/
 
 	// reset data
 	// TODO: Not sure why this is here

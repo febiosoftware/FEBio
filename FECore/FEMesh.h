@@ -127,8 +127,9 @@ public:
 	vector<double>	m_cp;	//!< effective concentration at previous time step
 	
 	// rigid body data
-	int		m_rid;	//!< rigid body number
+	int		m_rid;		//!< rigid body number
 	bool	m_bshell;	//!< does this node belong to a non-rigid shell element?
+	bool	m_bexclude;	//!< exclude this node from the analysis
 
 public:
 	vector<int>		m_ID;	//!< nodal equation numbers

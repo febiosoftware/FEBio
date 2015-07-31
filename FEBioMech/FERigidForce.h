@@ -40,6 +40,9 @@ public:
 class FERigidBodyForce : public FEModelLoad
 {
 public:
+	enum { RAMP, TARGET };	// values for m_ntype
+
+public:
 	FERigidBodyForce(FEModel* pfem);
 
 	//! initialization
@@ -58,7 +61,7 @@ public:
 	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
 
 public:
-	int		ntype;	//!< type of force (0=loadcurve, 1=target)
+	int		m_ntype;	//!< type of force (0=loadcurve, 1=target)
 	int		id;		// rigid body id
 	int		bc;		// force direction
 	int		lc;		// load curve number

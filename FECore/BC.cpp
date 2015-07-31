@@ -19,6 +19,34 @@ void FENodalForce::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+FEFixedBC::FEFixedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+{ 
+	m_node = -1; 
+	m_dof = -1; 
+}
+
+//-----------------------------------------------------------------------------
+FEFixedBC::FEFixedBC(FEModel* pfem, int node, int dof) : FEBoundaryCondition(FEBC_ID, pfem)
+{ 
+	m_node = node; 
+	m_dof = dof; 
+}
+
+//-----------------------------------------------------------------------------
+void FEFixedBC::Serialize(DumpFile& ar)
+{
+	FEBoundaryCondition::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << m_node << m_dof;
+	}
+	else
+	{
+		ar >> m_node >> m_dof;
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEPrescribedBC::Serialize(DumpFile& ar)
 {
 	FEBoundaryCondition::Serialize(ar);

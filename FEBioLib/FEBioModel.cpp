@@ -571,7 +571,7 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 		{
 			ar << m.Node(i).m_ap;
 			ar << m.Node(i).m_at;
-			ar << m.Node(i).m_BC;
+			ar << m.Node(i).m_BC;		// delete this
 			ar << m.Node(i).m_bshell;
 			ar << m.Node(i).m_c0;
 			ar << m.Node(i).m_cp;
@@ -629,7 +629,7 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 		{
 			ar >> m.Node(i).m_ap;
 			ar >> m.Node(i).m_at;
-			ar >> m.Node(i).m_BC;
+			ar >> m.Node(i).m_BC;		// delete this
 			ar >> m.Node(i).m_bshell;
 			ar >> m.Node(i).m_c0;
 			ar >> m.Node(i).m_cp;
@@ -733,6 +733,14 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 
 	if (ar.IsSaving())
 	{
+		// fixed bc's
+		ar << (int) m_BC.size();
+		for (int i=0; i<(int) m_BC.size(); ++i) 
+		{
+			FEFixedBC& bc = *m_BC[i];
+			bc.Serialize(ar);
+		}
+
 		// displacements
 		ar << (int) m_DC.size();
 		for (int i=0; i<(int) m_DC.size(); ++i) 
@@ -826,6 +834,18 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 	else
 	{
 		int n;
+
+		// fixed bc's
+		// NOTE: I think this may create a memory leak if m_BC is not empty
+		ar >> n;
+		m_BC.clear();
+		for (int i=0; i<n; ++i) 
+		{
+			FEFixedBC* pbc = new FEFixedBC(this);
+			pbc->Serialize(ar);
+			if (pbc->IsActive()) pbc->Activate(); else pbc->Deactivate();
+			m_BC.push_back(pbc);
+		}
 
 		// displacements
 		ar >> n;

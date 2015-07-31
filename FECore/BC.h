@@ -25,6 +25,20 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FEFixedBC : public FEBoundaryCondition
+{
+public:
+	FEFixedBC(FEModel* pfem);
+	FEFixedBC(FEModel* pfem, int node, int dof);
+
+	void Serialize(DumpFile& ar);
+
+public:
+	int		m_node;
+	int		m_dof;
+};
+
+//-----------------------------------------------------------------------------
 //! prescribed boundary condition data
 
 class FEPrescribedBC : public FEBoundaryCondition

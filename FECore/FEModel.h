@@ -120,6 +120,11 @@ public: // --- Material functions ---
 	bool InitMaterials();
 
 public: // --- Boundary Conditions functions ---
+	// fixed BC
+	int FixedBCs() { return (int) m_BC.size(); }
+	FEFixedBC* FixedBC(int i) { return m_BC[i]; }
+	void AddFixedBC(FEFixedBC* pbc) { m_BC.push_back(pbc); }
+	void AddFixedBC(int node, int bc);
 
 	// prescribed BC's
 	int PrescribedBCs() { return (int) m_DC.size(); }
@@ -302,6 +307,7 @@ public: // TODO: Find a better place for these parameters
 protected:
 	std::vector<FELoadCurve*>				m_LC;	//!< load curve data
 	std::vector<FEMaterial*>				m_MAT;	//!< array of materials
+	std::vector<FEFixedBC*>					m_BC;	//!< fixed constraints
 	std::vector<FEPrescribedBC*>			m_DC;	//!< prescribed constraints
 	std::vector<FENodalForce*>				m_FC;	//!< concentrated nodal loads
 	std::vector<FESurfaceLoad*>				m_SL;	//!< surface loads

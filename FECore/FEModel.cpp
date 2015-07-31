@@ -46,6 +46,7 @@ void FEModel::Clear()
 	for (i=0; i<m_MAT.size (); ++i) delete m_MAT[i] ; m_MAT.clear ();
 	for (i=0; i<m_LC.size  (); ++i) delete m_LC [i] ; m_LC.clear  ();
 	for (i=0; i<m_BL.size  (); ++i) delete m_BL [i] ; m_BL.clear  ();
+	for (i=0; i<m_BC.size  (); ++i) delete m_BC [i] ; m_BC.clear  ();
 	for (i=0; i<m_DC.size  (); ++i) delete m_DC [i] ; m_DC.clear  ();
 	for (i=0; i<m_FC.size  (); ++i) delete m_FC [i] ; m_FC.clear  ();
 	for (i=0; i<m_SL.size  (); ++i) delete m_SL [i] ; m_SL.clear  ();
@@ -63,10 +64,19 @@ void FEModel::Clear()
 }
 
 //-----------------------------------------------------------------------------
+void FEModel::AddFixedBC(int node, int bc)
+{
+	FEMesh& mesh = GetMesh();
+	mesh.Node(node).m_BC[bc] = -1;
+}
+
+//-----------------------------------------------------------------------------
 void FEModel::ClearBCs()
 {
 	for (size_t i=0; i<m_DC.size  (); ++i) delete m_DC[i];
+	for (size_t i=0; i<m_BC.size  (); ++i) delete m_BC[i];
 	m_DC.clear();
+	m_BC.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -134,11 +144,14 @@ bool FEModel::Init()
 bool FEModel::InitBCs()
 {
 	// if the analysis is run in plane-strain mode we fix all the z-dofs of all nodes
+//--> I want to remove this. Perhaps I can make a new class for this. (derived from FEFixedBC?)
 	if (m_nplane_strain >= 0)
 	{
 		int bc = m_nplane_strain;
-		for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_BC[bc] = -1;
+//		for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_BC[bc] = -1;
+		for (int i=0; i<m_mesh.Nodes(); ++i) AddFixedBC(i, bc);
 	}
+//-->
 
 	// get the number of loadcurves
 	int NLC = LoadCurves();
@@ -396,32 +409,14 @@ bool FEModel::InitObjects()
 		m_Obj.push_back(prb);
 	}
 
-	// overwrite rigid nodes degrees of freedom
-	// We do this so that these dofs do not
-	// get equation numbers assigned to them. Later we'll assign
-	// the rigid dofs equations numbers to these nodes
-	for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_bshell = false;
-	for (int nd = 0; nd<m_mesh.Domains(); ++nd)
-	{
-		FEDomain& dom = m_mesh.Domain(nd);
-		if (dom.Class() == FE_DOMAIN_SHELL)
-		{
-			int N = dom.Elements();
-			for (int i=0; i<N; ++i)
-			{
-				FEElement& el = dom.ElementRef(i);
-				if (el.m_nrigid < 0)
-				{
-					int n = el.Nodes();
-					for (int j=0; j<n; ++j) m_mesh.Node(el.m_node[j]).m_bshell = true;
-				}
-			}
-		}
-	}
-
-	// The following fixes the degrees of freedom for rigid nodes.
+/*
+	// The following fixes the degrees of freedom for rigid nodes. This is necessary to make
+	// sure that they are not assigned equation numbers.
 	// Note that also the rotational degrees of freedom are fixed
-	// for rigid nodes that do not belong to a non-rigid shell element.
+	// for rigid nodes that do not belong to a non-rigid shell element. Again, this is to make
+	// sure the rotational dofs are not assigned equations. If the node belongs to a non-rigid
+	// shell element we leave the dofs open so that we can create hinged shells.
+//--> This should be moved as well to the FESolidAnalysis::Activate member
 	for (int i=0; i<m_mesh.Nodes(); ++i)
 	{
 		FENode& node = m_mesh.Node(i);
@@ -438,7 +433,8 @@ bool FEModel::InitObjects()
 			}
 		}
 	}
-
+//-->
+*/
 	// assign correct rigid body ID's to rigid nodes
 	for (int i=0; i<(int) m_RN.size(); ++i)
 	{
@@ -957,6 +953,7 @@ const char* FEModel::GetTitle()
 FEModelComponent* FEModel::FindModelComponent(int nid)
 {
 	int i;
+	for (i=0; i<(int) m_BC.size (); ++i) if (m_BC [i]->GetClassID() == nid) return m_BC [i];
 	for (i=0; i<(int) m_DC.size (); ++i) if (m_DC [i]->GetClassID() == nid) return m_DC [i];
 	for (i=0; i<(int) m_FC.size (); ++i) if (m_FC [i]->GetClassID() == nid) return m_FC [i];
 	for (i=0; i<(int) m_SL.size (); ++i) if (m_SL [i]->GetClassID() == nid) return m_SL [i];

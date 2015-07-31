@@ -24,17 +24,46 @@ void FEBiphasicSoluteAnalysis::InitNodes()
 		FENode& node = mesh.Node(i);
 		for (int i=0; i<(int)node.m_ID.size(); ++i) node.m_ID[i] = -1;
 
-		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
-		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;
-		if (node.m_BC[DOF_Z] != -1) node.m_ID[DOF_Z] = 0;
-		if (node.m_BC[DOF_U] != -1) node.m_ID[DOF_U] = 0;
-		if (node.m_BC[DOF_V] != -1) node.m_ID[DOF_V] = 0;
-		if (node.m_BC[DOF_W] != -1) node.m_ID[DOF_W] = 0;
-		if (node.m_BC[DOF_P] != -1) node.m_ID[DOF_P] = 0;
+		if (node.m_bexclude == false)
+		{
+			if (node.m_rid < 0)
+			{
+				node.m_ID[DOF_X] = 0;
+				node.m_ID[DOF_Y] = 0;
+				node.m_ID[DOF_Z] = 0;
+				node.m_ID[DOF_P] = 0;
+
+				for (int k=0; k<MAX_CDOFS; ++k) {
+					int dofc = DOF_C + k;
+					node.m_ID[dofc] = 0;
+				}
+			}
+
+			if (node.m_bshell)
+			{
+				node.m_ID[DOF_U] = 0;
+				node.m_ID[DOF_V] = 0;
+				node.m_ID[DOF_W] = 0;
+			}
+		}
+	}
+
+	// apply fixed bc
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+
+		if (node.m_BC[DOF_X] == -1) node.m_ID[DOF_X] = -1;
+		if (node.m_BC[DOF_Y] == -1) node.m_ID[DOF_Y] = -1;
+		if (node.m_BC[DOF_Z] == -1) node.m_ID[DOF_Z] = -1;
+		if (node.m_BC[DOF_U] == -1) node.m_ID[DOF_U] = -1;
+		if (node.m_BC[DOF_V] == -1) node.m_ID[DOF_V] = -1;
+		if (node.m_BC[DOF_W] == -1) node.m_ID[DOF_W] = -1;
+		if (node.m_BC[DOF_P] == -1) node.m_ID[DOF_P] = -1;
 
 		for (int k=0; k<MAX_CDOFS; ++k) {
 			int dofc = DOF_C + k;
-			if (node.m_BC[dofc] != -1) node.m_ID[dofc] = 0;
+			if (node.m_BC[dofc] == -1) node.m_ID[dofc] = -1;
 		}
 	}
 

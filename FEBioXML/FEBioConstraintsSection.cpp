@@ -446,7 +446,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 
 			// create the rigid body force
 			FERigidBodyForce* pFC = new FERigidBodyForce(&fem);
-			pFC->ntype = ntype;
+			pFC->m_ntype = ntype;
 			pFC->id = nmat;
 			pFC->bc = bc;
 			pFC->lc = lc;

@@ -151,24 +151,24 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 		int N = s.size();
 		for (int i=0; i<N; ++i)
 		{
-			FENode& node = mesh.Node(s[i]);
-			if      (strcmp(sz, "x"  ) == 0) { node.m_BC[DOF_X] = -1; }
-			else if (strcmp(sz, "y"  ) == 0) { node.m_BC[DOF_Y] = -1; }
-			else if (strcmp(sz, "z"  ) == 0) { node.m_BC[DOF_Z] = -1; }
-			else if (strcmp(sz, "xy" ) == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Y] = -1; }
-			else if (strcmp(sz, "yz" ) == 0) { node.m_BC[DOF_Y] = node.m_BC[DOF_Z] = -1; }
-			else if (strcmp(sz, "xz" ) == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Z] = -1; }
-			else if (strcmp(sz, "xyz") == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Y] = node.m_BC[DOF_Z] = -1; }
-			else if (strcmp(sz, "p"  ) == 0) { node.m_BC[DOF_P] = -1; }
-			else if (strcmp(sz, "u"  ) == 0) { node.m_BC[DOF_U] = -1; }
-			else if (strcmp(sz, "v"  ) == 0) { node.m_BC[DOF_V] = -1; }
-			else if (strcmp(sz, "w"  ) == 0) { node.m_BC[DOF_W] = -1; }
-			else if (strcmp(sz, "uv" ) == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_V] = -1; }
-			else if (strcmp(sz, "vw" ) == 0) { node.m_BC[DOF_V] = node.m_BC[DOF_W] = -1; }
-			else if (strcmp(sz, "uw" ) == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_W] = -1; }
-			else if (strcmp(sz, "uvw") == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_V] = node.m_BC[DOF_W] = -1; }
-			else if (strcmp(sz, "t"  ) == 0) { node.m_BC[DOF_T] = -1; }
-			else if (strcmp(sz, "c"  ) == 0) { node.m_BC[DOF_C] = -1; }
+			int n = s[i];
+			if      (strcmp(sz, "x"  ) == 0) { fem.AddFixedBC(n, DOF_X); }
+			else if (strcmp(sz, "y"  ) == 0) { fem.AddFixedBC(n, DOF_Y); }
+			else if (strcmp(sz, "z"  ) == 0) { fem.AddFixedBC(n, DOF_Z); }
+			else if (strcmp(sz, "xy" ) == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Y); }
+			else if (strcmp(sz, "yz" ) == 0) { fem.AddFixedBC(n, DOF_Y); fem.AddFixedBC(n, DOF_Z); }
+			else if (strcmp(sz, "xz" ) == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Z); }
+			else if (strcmp(sz, "xyz") == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Y); fem.AddFixedBC(n, DOF_Z); }
+			else if (strcmp(sz, "p"  ) == 0) { fem.AddFixedBC(n, DOF_P); }
+			else if (strcmp(sz, "u"  ) == 0) { fem.AddFixedBC(n, DOF_U); }
+			else if (strcmp(sz, "v"  ) == 0) { fem.AddFixedBC(n, DOF_V); }
+			else if (strcmp(sz, "w"  ) == 0) { fem.AddFixedBC(n, DOF_W); }
+			else if (strcmp(sz, "uv" ) == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_V); }
+			else if (strcmp(sz, "vw" ) == 0) { fem.AddFixedBC(n, DOF_V); fem.AddFixedBC(n, DOF_W); }
+			else if (strcmp(sz, "uw" ) == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_W); }
+			else if (strcmp(sz, "uvw") == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_V); fem.AddFixedBC(n, DOF_W); }
+			else if (strcmp(sz, "t"  ) == 0) { fem.AddFixedBC(n, DOF_T); }
+			else if (strcmp(sz, "c"  ) == 0) { fem.AddFixedBC(n, DOF_C); }
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 		}
 	}
@@ -179,26 +179,25 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 		do
 		{
 			int n = atoi(tag.AttributeValue("id"))-1;
-			FENode& node = fem.GetMesh().Node(n);
 			const char* sz = tag.AttributeValue("bc");
-			if      (strcmp(sz, "x"  ) == 0) { node.m_BC[DOF_X] = -1; }
-			else if (strcmp(sz, "y"  ) == 0) { node.m_BC[DOF_Y] = -1; }
-			else if (strcmp(sz, "z"  ) == 0) { node.m_BC[DOF_Z] = -1; }
-			else if (strcmp(sz, "xy" ) == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Y] = -1; }
-			else if (strcmp(sz, "yz" ) == 0) { node.m_BC[DOF_Y] = node.m_BC[DOF_Z] = -1; }
-			else if (strcmp(sz, "xz" ) == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Z] = -1; }
-			else if (strcmp(sz, "xyz") == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Y] = node.m_BC[DOF_Z] = -1; }
-			else if (strcmp(sz, "p"  ) == 0) { node.m_BC[DOF_P] = -1; }
-			else if (strcmp(sz, "u"  ) == 0) { node.m_BC[DOF_U] = -1; }
-			else if (strcmp(sz, "v"  ) == 0) { node.m_BC[DOF_V] = -1; }
-			else if (strcmp(sz, "w"  ) == 0) { node.m_BC[DOF_W] = -1; }
-			else if (strcmp(sz, "uv" ) == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_V] = -1; }
-			else if (strcmp(sz, "vw" ) == 0) { node.m_BC[DOF_V] = node.m_BC[DOF_W] = -1; }
-			else if (strcmp(sz, "uw" ) == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_W] = -1; }
-			else if (strcmp(sz, "uvw") == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_V] = node.m_BC[DOF_W] = -1; }
-			else if (strcmp(sz, "t"  ) == 0) { node.m_BC[DOF_T] = -1; }
-			else if (strcmp(sz, "c"  ) == 0) { node.m_BC[DOF_C] = -1; }
-			else if (strncmp(sz, "c", 1) == 0) node.m_BC[DOF_C + atoi(&sz[1]) - 1] = -1;
+			if      (strcmp(sz, "x"  ) == 0) { fem.AddFixedBC(n, DOF_X); }
+			else if (strcmp(sz, "y"  ) == 0) { fem.AddFixedBC(n, DOF_Y); }
+			else if (strcmp(sz, "z"  ) == 0) { fem.AddFixedBC(n, DOF_Z); }
+			else if (strcmp(sz, "xy" ) == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Y); }
+			else if (strcmp(sz, "yz" ) == 0) { fem.AddFixedBC(n, DOF_Y); fem.AddFixedBC(n, DOF_Z); }
+			else if (strcmp(sz, "xz" ) == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Z); }
+			else if (strcmp(sz, "xyz") == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Y); fem.AddFixedBC(n, DOF_Z); }
+			else if (strcmp(sz, "p"  ) == 0) { fem.AddFixedBC(n, DOF_P); }
+			else if (strcmp(sz, "u"  ) == 0) { fem.AddFixedBC(n, DOF_U); }
+			else if (strcmp(sz, "v"  ) == 0) { fem.AddFixedBC(n, DOF_V); }
+			else if (strcmp(sz, "w"  ) == 0) { fem.AddFixedBC(n, DOF_W); }
+			else if (strcmp(sz, "uv" ) == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_V); }
+			else if (strcmp(sz, "vw" ) == 0) { fem.AddFixedBC(n, DOF_V); fem.AddFixedBC(n, DOF_W); }
+			else if (strcmp(sz, "uw" ) == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_W); }
+			else if (strcmp(sz, "uvw") == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_V); fem.AddFixedBC(n, DOF_W); }
+			else if (strcmp(sz, "t"  ) == 0) { fem.AddFixedBC(n, DOF_T); }
+			else if (strcmp(sz, "c"  ) == 0) { fem.AddFixedBC(n, DOF_C); }
+			else if (strncmp(sz, "c", 1) == 0) { fem.AddFixedBC(n, DOF_C + atoi(&sz[1]) - 1); }
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 			++tag;
 		}
@@ -268,8 +267,7 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 		{
 			int n = ns[i];
 			if ((n < 0)||(n >= NN)) throw XMLReader::InvalidTag(tag);
-			FENode& node = mesh.Node(n);
-			for (int j=0; j<nbc; ++j) node.m_BC[bc[j]] = -1;
+			for (int j=0; j<nbc; ++j) fem.AddFixedBC(n, bc[j]);
 		}
 	}
 	else
@@ -280,8 +278,7 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 		{
 			int n = atoi(tag.AttributeValue("id"))-1;
 			if ((n<0) || (n >= NN)) throw XMLReader::InvalidAttributeValue(tag, "id");
-			FENode& node = fem.GetMesh().Node(n);
-			for (int j=0; j<nbc; ++j) node.m_BC[bc[j]] = -1;
+			for (int j=0; j<nbc; ++j) fem.AddFixedBC(n, bc[j]);
 			++tag;
 		}
 		while (!tag.isend());
@@ -596,7 +593,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 
 	// we must deactive the master dof
 	// so that it does not get assigned an equation
-	fem.GetMesh().Node(node-1).m_BC[LC.master.bc] = -1;
+	fem.AddFixedBC(node-1, LC.master.bc);
 
 	// read the slave nodes
 	++tag;
@@ -781,8 +778,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			++tag;
 		}
 		while (!tag.isend());
-		prj->m_nRBa--;
-		prj->m_nRBb--;
 		fem.AddNonlinearConstraint(prj);
 	}
 	else if (strcmp(szt, "rigid spherical joint") == 0)
@@ -798,8 +793,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			++tag;
 		}
 		while (!tag.isend());
-		prj->m_nRBa--;
-		prj->m_nRBb--;
 		fem.AddNonlinearConstraint(prj);
 	}
     else if (strcmp(szt, "rigid revolute joint") == 0)
@@ -815,8 +808,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
             ++tag;
         }
         while (!tag.isend());
-        prj->m_nRBa--;
-        prj->m_nRBb--;
         fem.AddNonlinearConstraint(prj);
     }
     else if (strcmp(szt, "rigid prismatic joint") == 0)
@@ -832,8 +823,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
             ++tag;
         }
         while (!tag.isend());
-        prj->m_nRBa--;
-        prj->m_nRBb--;
         fem.AddNonlinearConstraint(prj);
     }
     else if (strcmp(szt, "rigid cylindrical joint") == 0)
@@ -849,8 +838,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
             ++tag;
         }
         while (!tag.isend());
-        prj->m_nRBa--;
-        prj->m_nRBb--;
         fem.AddNonlinearConstraint(prj);
     }
     else if (strcmp(szt, "rigid planar joint") == 0)
@@ -866,8 +853,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
             ++tag;
         }
         while (!tag.isend());
-        prj->m_nRBa--;
-        prj->m_nRBb--;
         fem.AddNonlinearConstraint(prj);
     }
     else if (strcmp(szt, "rigid spring") == 0)
@@ -883,8 +868,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
             ++tag;
         }
         while (!tag.isend());
-        prj->m_nRBa--;
-        prj->m_nRBb--;
         fem.AddNonlinearConstraint(prj);
     }
     else if (strcmp(szt, "rigid damper") == 0)
@@ -900,8 +883,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
             ++tag;
         }
         while (!tag.isend());
-        prj->m_nRBa--;
-        prj->m_nRBb--;
         fem.AddNonlinearConstraint(prj);
     }
     else if (strcmp(szt, "rigid angular damper") == 0)
@@ -917,8 +898,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
             ++tag;
         }
         while (!tag.isend());
-        prj->m_nRBa--;
-        prj->m_nRBb--;
         fem.AddNonlinearConstraint(prj);
     }
     else if (strcmp(szt, "rigid contractile force") == 0)
@@ -934,8 +913,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
             ++tag;
         }
         while (!tag.isend());
-        prj->m_nRBa--;
-        prj->m_nRBb--;
         fem.AddNonlinearConstraint(prj);
     }
 	else if (strcmp(szt, "linear constraint") == 0)
