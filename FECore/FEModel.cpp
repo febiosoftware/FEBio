@@ -49,9 +49,8 @@ void FEModel::Clear()
 	for (i=0; i<m_DC.size  (); ++i) delete m_DC [i] ; m_DC.clear  ();
 	for (i=0; i<m_FC.size  (); ++i) delete m_FC [i] ; m_FC.clear  ();
 	for (i=0; i<m_SL.size  (); ++i) delete m_SL [i] ; m_SL.clear  ();
+	for (i=0; i<m_ML.size  (); ++i) delete m_ML [i] ; m_ML.clear  ();
 	for (i=0; i<m_RDC.size (); ++i) delete m_RDC[i] ; m_RDC.clear ();
-	for (i=0; i<m_RFC.size (); ++i) delete m_RFC[i] ; m_RFC.clear ();
-	for (i=0; i<m_RAF.size (); ++i) delete m_RAF[i] ; m_RAF.clear ();
 	for (i=0; i<m_RBV.size (); ++i) delete m_RBV[i] ; m_RBV.clear ();
 	for (i=0; i<m_RBW.size (); ++i) delete m_RBW[i] ; m_RBW.clear ();
 	for (i=0; i<m_RN.size  (); ++i) delete m_RN [i] ; m_RN.clear  ();
@@ -483,19 +482,23 @@ bool FEModel::InitObjects()
 		FEMaterial* pm = GetMaterial(DC.id-1);
 		DC.id = pm->GetRigidBodyID(); assert(DC.id >= 0);
 	}
-	for (int i=0; i<(int) m_RFC.size(); ++i)
+	for (int i=0; i<(int) m_ML.size(); ++i)
 	{
-		FERigidBodyForce& FC = *m_RFC[i];
-		FEMaterial* pm = GetMaterial(FC.id-1);
-		FC.id = pm->GetRigidBodyID(); assert(FC.id >= 0);
-	}
-	for (int i=0; i<(int) m_RAF.size(); ++i)
-	{
-		FERigidAxialForce& AF = *m_RAF[i];
-		FEMaterial* pm = GetMaterial(AF.m_ida-1);
-		AF.m_ida = pm->GetRigidBodyID(); assert(AF.m_ida >= 0);
-		pm = GetMaterial(AF.m_idb-1);
-		AF.m_idb = pm->GetRigidBodyID(); assert(AF.m_idb >= 0);
+		FEModelLoad* pml = m_ML[i];
+		FERigidBodyForce* pRF = dynamic_cast<FERigidBodyForce*>(pml);
+		if (pRF)
+		{
+			FEMaterial* pm = GetMaterial(pRF->id-1);
+			pRF->id = pm->GetRigidBodyID(); assert(pRF->id >= 0);
+		}
+		FERigidAxialForce* pAF = dynamic_cast<FERigidAxialForce*>(pml);
+		if (pAF)
+		{
+			FEMaterial* pm = GetMaterial(pAF->m_ida-1);
+			pAF->m_ida = pm->GetRigidBodyID(); assert(pAF->m_ida >= 0);
+			pm = GetMaterial(pAF->m_idb-1);
+			pAF->m_idb = pm->GetRigidBodyID(); assert(pAF->m_idb >= 0);
+		}
 	}
 	for (int i=0; i<(int) m_RBV.size(); ++i)
 	{
@@ -517,15 +520,10 @@ bool FEModel::InitObjects()
 bool FEModel::InitRigidForces()
 {
 	// call the Init() function of all rigid forces
-	for (int i=0; i<(int) m_RFC.size(); ++i)
+	for (int i=0; i<(int) m_ML.size(); ++i)
 	{
-		FERigidBodyForce& FC = *m_RFC[i];
+		FEModelLoad& FC = *m_ML[i];
 		if (FC.Init() == false) return false;
-	}
-	for (int i=0; i<(int) m_RAF.size(); ++i)
-	{
-		FERigidAxialForce& AF = *m_RAF[i];
-		if (AF.Init() == false) return false;
 	}
 	return true;
 }
@@ -842,10 +840,10 @@ bool FEModel::EvaluateAllParameterLists()
 		if (EvaluateParameterList(pl) == false) return false;
 	}
 
-	// evaluate rigid forces
-	for (int i=0; i<(int)m_RAF.size(); ++i)
+	// evaluate model loads
+	for (int i=0; i<(int)m_ML.size(); ++i)
 	{
-		FEParameterList& pl = m_RAF[i]->GetParameterList();
+		FEParameterList& pl = m_ML[i]->GetParameterList();
 		if (EvaluateParameterList(pl) == false) return false;
 	}
 
@@ -983,10 +981,9 @@ FEModelComponent* FEModel::FindModelComponent(int nid)
 	for (i=0; i<(int) m_DC.size (); ++i) if (m_DC [i]->GetClassID() == nid) return m_DC [i];
 	for (i=0; i<(int) m_FC.size (); ++i) if (m_FC [i]->GetClassID() == nid) return m_FC [i];
 	for (i=0; i<(int) m_SL.size (); ++i) if (m_SL [i]->GetClassID() == nid) return m_SL [i];
+	for (i=0; i<(int) m_ML.size (); ++i) if (m_ML [i]->GetClassID() == nid) return m_ML [i];
 	for (i=0; i<(int) m_RBC.size(); ++i) if (m_RBC[i]->GetClassID() == nid) return m_RBC[i];
 	for (i=0; i<(int) m_RDC.size(); ++i) if (m_RDC[i]->GetClassID() == nid) return m_RDC[i];
-	for (i=0; i<(int) m_RFC.size(); ++i) if (m_RFC[i]->GetClassID() == nid) return m_RFC[i];
-	for (i=0; i<(int) m_RAF.size(); ++i) if (m_RAF[i]->GetClassID() == nid) return m_RAF[i];
 	for (i=0; i<(int) m_RN.size (); ++i) if (m_RN [i]->GetClassID() == nid) return m_RN [i];
 	for (i=0; i<(int) m_CI.size (); ++i) if (m_CI [i]->GetClassID() == nid) return m_CI [i];
 	for (i=0; i<(int) m_NLC.size(); ++i) if (m_NLC[i]->GetClassID() == nid) return m_NLC[i];

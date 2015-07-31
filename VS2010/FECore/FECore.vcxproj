@@ -616,6 +616,7 @@
     <ClInclude Include="..\..\FECore\FEMesh.h" />
     <ClInclude Include="..\..\FECore\FEModel.h" />
     <ClInclude Include="..\..\FECore\FEModelComponent.h" />
+    <ClInclude Include="..\..\FECore\FEModelLoad.h" />
     <ClInclude Include="..\..\FECore\FENLConstraint.h" />
     <ClInclude Include="..\..\FECore\FENNQuery.h" />
     <ClInclude Include="..\..\FECore\FENodeElemList.h" />
@@ -715,6 +716,7 @@
     <ClCompile Include="..\..\FECore\FEMesh.cpp" />
     <ClCompile Include="..\..\FECore\FEModel.cpp" />
     <ClCompile Include="..\..\FECore\FEModelComponent.cpp" />
+    <ClCompile Include="..\..\FECore\FEModelLoad.cpp" />
     <ClCompile Include="..\..\FECore\FENLConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FENNQuery.cpp" />
     <ClCompile Include="..\..\FECore\FENodeElemList.cpp" />

@@ -86,7 +86,7 @@ void FEBioDiscreteSection::ParseSpringSection(XMLTag &tag)
 void FEBioDiscreteSection::ParseRigidAxialForce(XMLTag& tag)
 {
 	// create a new rigid constraint
-	FERigidAxialForce* paf = new FERigidAxialForce(GetFEModel());
+	FEModelLoad* paf = fecore_new<FEModelLoad>(FEBC_ID, tag.Name(), GetFEModel());
 
 	// read the parameters
 	FEParameterList& pl = paf->GetParameterList();
@@ -100,5 +100,5 @@ void FEBioDiscreteSection::ParseRigidAxialForce(XMLTag& tag)
 
 	// add it to the model
 	FEModel& fem = *GetFEModel();
-	fem.m_RAF.push_back(paf);
+	fem.m_ML.push_back(paf);
 }

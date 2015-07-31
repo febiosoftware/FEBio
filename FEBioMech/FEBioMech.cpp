@@ -358,6 +358,11 @@ REGISTER_FECORE_CLASS(FEStickyInterface      , FESURFACEPAIRINTERACTION_ID, "sti
 REGISTER_FECORE_CLASS(FEFacet2FacetTied      , FESURFACEPAIRINTERACTION_ID, "facet-to-facet tied"        );
 
 //-----------------------------------------------------------------------------
+// classes derived directly from FEModelLoad
+// TODO: define another SUPER_CLASS_ID for this
+REGISTER_FECORE_CLASS(FERigidAxialForce, FEBC_ID, "rigid_axial_force");
+
+//-----------------------------------------------------------------------------
 // classes derived from FEPlotData
 REGISTER_FECORE_CLASS(FEPlotStrainEnergyDensity  , FEPLOTDATA_ID, "strain energy density" );
 REGISTER_FECORE_CLASS(FEPlotDevStrainEnergyDensity  , FEPLOTDATA_ID, "deviatoric strain energy density" );

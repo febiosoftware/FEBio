@@ -249,13 +249,11 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				pFC->bc = bc;
 				pFC->lc = lc;
 				tag.value(pFC->sf);
-				fem.m_RFC.push_back(pFC);
+				fem.m_ML.push_back(pFC);
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
 				{
-					int n = fem.m_RFC.size()-1;
-					FERigidBodyForce* pFC = fem.m_RFC[n];
 					pStep->AddModelComponent(pFC);
 					pFC->Deactivate();
 				}
@@ -270,8 +268,6 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
 				{
-					int n = fem.m_RBC.size()-1;
-					FERigidBodyFixedBC* pBC = fem.m_RBC[n];
 					pStep->AddModelComponent(pBC);
 					pBC->Deactivate();
 				}
@@ -303,8 +299,6 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
 				{
-					int n = fem.m_RDC.size()-1;
-					FERigidBodyDisplacement* pDC = fem.m_RDC[n];
 					pStep->AddModelComponent(pDC);
 					pDC->Deactivate();
 				}
@@ -319,13 +313,11 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				pFC->bc = bc;
 				pFC->lc = lc;
 				tag.value(pFC->sf);
-				fem.m_RFC.push_back(pFC);
+				fem.m_ML.push_back(pFC);
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
 				{
-					int n = fem.m_RFC.size()-1;
-					FERigidBodyForce* pFC = fem.m_RFC[n];
 					pStep->AddModelComponent(pFC);
 					pFC->Deactivate();
 				}
@@ -459,13 +451,11 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			pFC->lc = lc;
 			pFC->m_bfollow = bfollow;
 			m_pim->value(tag, pFC->sf);
-			fem.m_RFC.push_back(pFC);
+			fem.m_ML.push_back(pFC);
 
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)
 			{
-				int n = fem.m_RFC.size()-1;
-				FERigidBodyForce* pFC = fem.m_RFC[n];
 				pStep->AddModelComponent(pFC);
 				pFC->Deactivate();
 			}
@@ -492,8 +482,6 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)
 			{
-				int n = fem.m_RBC.size()-1;
-				FERigidBodyFixedBC* pBC = fem.m_RBC[n];
 				pStep->AddModelComponent(pBC);
 				pBC->Deactivate();
 			}
@@ -513,8 +501,6 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			// add this initial condition to the current step
 			if (m_pim->m_nsteps > 0)
 			{
-				int n = fem.m_RBV.size() - 1;
-				FERigidBodyVelocity* pic = fem.m_RBV[n];
 				pStep->AddModelComponent(pic);
 				pic->Deactivate();
 			}
@@ -534,8 +520,6 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			// add this initial condition to the current step
 			if (m_pim->m_nsteps > 0)
 			{
-				int n = fem.m_RBW.size() - 1;
-				FERigidBodyAngularVelocity* pic = new FERigidBodyAngularVelocity(&fem);
 				pStep->AddModelComponent(pic);
 				pic->Deactivate();
 			}

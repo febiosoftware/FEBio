@@ -1104,49 +1104,6 @@ void FESolidSolver::PrepStep(double time)
 		}
 	}
 
-	// get the current analysis step
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
-
-	// apply prescribed rigid body forces
-	for (int i=0; i<(int) m_fem.m_RFC.size(); ++i)
-	{
-		FERigidBodyForce& FC = *m_fem.m_RFC[i];
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(FC.id));
-		if (FC.IsActive() && (FC.m_bfollow == false))
-		{
-			int I  = RB.m_LM[FC.bc];
-			if (FC.ntype == 0)
-			{
-				int lc = FC.lc;
-				if ((I>=0) && (lc >= 0))
-				{
-					double f = m_fem.GetLoadCurve(lc)->Value()*FC.sf;
-					m_Fn[I] += f;
-				}
-			}
-			else if (FC.ntype == 1)
-			{
-				double t0 = pstep->m_tstart;
-				double t1 = pstep->m_tend;
-				double w = (time - t0)/(t1 - t0);
-				assert((w>=-0.0000001)&&(w<=1.0000001));
-				double f0 = 0.0, f1 = FC.sf;
-				switch (FC.bc)
-				{
-				case 0: f0 = RB.m_Fp.x; break;
-				case 1: f0 = RB.m_Fp.y; break;
-				case 2: f0 = RB.m_Fp.z; break;
-				case 3: f0 = RB.m_Mp.x; break;
-				case 4: f0 = RB.m_Mp.y; break;
-				case 5: f0 = RB.m_Mp.z; break;
-				}
-
-				double f = f0*(1.0 - w) + f1*w;
-				m_Fn[I] += f;
-			}
-		}
-	}
-
 	// initialize contact
 	if (m_fem.SurfacePairInteractions() > 0) UpdateContact();
 
@@ -1612,10 +1569,7 @@ bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 	NonLinearConstraintStiffness(tp);
 
 	// calculate the stiffness contributions for the rigid forces
-	for (i=0; i<m_fem.m_RAF.size(); ++i) m_fem.m_RAF[i]->StiffnessMatrix(this, tp);
-
-	// point constraints
-//	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->StiffnessMatrix(this);
+	for (i=0; i<m_fem.m_ML.size(); ++i) m_fem.m_ML[i]->StiffnessMatrix(this, tp);
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
@@ -2209,25 +2163,14 @@ bool FESolidSolver::Residual(vector<double>& R)
 	// forces due to point constraints
 //	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
 
-	// add rigid body forces
-	int NRF = m_fem.m_RFC.size();
-	for (i=0; i<NRF; ++i)
+	// add model loads
+	int NML = m_fem.m_ML.size();
+	for (i=0; i<NML; ++i)
 	{
-		FERigidBodyForce& FC = *m_fem.m_RFC[i];
-		if (FC.IsActive() && FC.m_bfollow)
+		FEModelLoad& mli = *m_fem.m_ML[i];
+		if (mli.IsActive())
 		{
-			FC.Residual(RHS, tp);
-		}
-	}
-
-	// add rigid axial forces
-	int NAF = m_fem.m_RAF.size();
-	for (i=0; i<NAF; ++i)
-	{
-		FERigidAxialForce& FC = *m_fem.m_RAF[i];
-		if (FC.IsActive())
-		{
-			FC.Residual(RHS, tp);
+			mli.Residual(RHS, tp);
 		}
 	}
 

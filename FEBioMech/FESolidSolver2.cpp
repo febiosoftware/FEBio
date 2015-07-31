@@ -1101,35 +1101,6 @@ void FESolidSolver2::PrepStep(double time)
 		}
 	}
 
-	// apply prescribed rigid body forces
-	// TODO: I don't think this does anything since
-	//       the reaction forces are zeroed in the FESolidSolver2::Residual function
-	for (int i=0; i<(int) m_fem.m_RFC.size(); ++i)
-	{
-		FERigidBodyForce& FC = *m_fem.m_RFC[i];
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(FC.id));
-		if (FC.IsActive())
-		{
-			int lc = FC.lc;
-			int I  = RB.m_LM[FC.bc];
-			if ((I>=0) && (lc >= 0))
-			{
-				double f = m_fem.GetLoadCurve(lc)->Value()*FC.sf;
-				m_Fn[I] += f;
-
-				switch (FC.bc)
-				{
-				case 0: RB.m_Fr.x += f; break;
-				case 1: RB.m_Fr.y += f; break;
-				case 2: RB.m_Fr.z += f; break;
-				case 3: RB.m_Mr.x += f; break;
-				case 4: RB.m_Mr.y += f; break;
-				case 5: RB.m_Mr.z += f; break;
-				}
-			}
-		}
-	}
-
 	// initialize contact
 	if (m_fem.SurfacePairInteractions() > 0) UpdateContact();
 

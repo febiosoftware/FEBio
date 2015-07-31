@@ -780,20 +780,13 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			dc.Serialize(ar);
 		}
 
-		// rigid body forces
-		ar << (int) m_RFC.size();
-		for (int i=0; i<(int) m_RFC.size(); ++i)
+		// model loads
+		ar << (int) m_ML.size();
+		for (int i=0; i<(int) m_ML.size(); ++i)
 		{
-			FERigidBodyForce& fc = *m_RFC[i];
-			fc.Serialize(ar);
-		}
-
-		// rigid axial forces
-		ar << (int) m_RAF.size();
-		for (int i=0; i<(int) m_RAF.size(); ++i)
-		{
-			FERigidAxialForce& fc = *m_RAF[i];
-			fc.Serialize(ar);
+			FEModelLoad& ml = *m_ML[i];
+			ar << ml.GetTypeStr();
+			ml.Serialize(ar);
 		}
 
 		// rigid nodes
@@ -901,26 +894,20 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			m_RDC.push_back(pdc);
 		}
 
-		// rigid body forces
+		// model loads
 		ar >> n;
-		m_RFC.clear();
+		m_ML.clear();
 		for (int i=0; i<n; ++i)
 		{
-			FERigidBodyForce* pfc = new FERigidBodyForce(this);
-			pfc->Serialize(ar);
-			if (pfc->IsActive()) pfc->Activate(); else pfc->Deactivate();
-			m_RFC.push_back(pfc);
-		}
+			// read load data
+			char sztype[256] = {0};
+			ar >> sztype;
+			FEModelLoad* pml = fecore_new<FEModelLoad>(FEBC_ID, sztype, this);
+			assert(pml);
 
-		// rigid body forces
-		ar >> n;
-		m_RAF.clear();
-		for (int i=0; i<n; ++i)
-		{
-			FERigidAxialForce* pfc = new FERigidAxialForce(this);
-			pfc->Serialize(ar);
-			if (pfc->IsActive()) pfc->Activate(); else pfc->Deactivate();
-			m_RAF.push_back(pfc);
+			pml->Serialize(ar);
+			if (pml->IsActive()) pml->Activate(); else pml->Deactivate();
+			m_ML.push_back(pml);
 		}
 
 		// rigid nodes
