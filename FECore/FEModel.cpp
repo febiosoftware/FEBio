@@ -103,10 +103,10 @@ bool FEModel::Init()
 	//       reference the rigid bodies
 	if (InitMaterials() == false) return false;
 
-	// initialize rigid forces
+	// initialize model loads
 	// NOTE: This must be called after the InitMaterials since the COM of the rigid bodies
 	//       are set in that function. 
-	if (InitRigidForces() == false) return false;
+	if (InitModelLoads() == false) return false;
 
 	// initialize mesh data
 	// NOTE: this must be done AFTER the elements have been assigned material point data !
@@ -517,7 +517,7 @@ bool FEModel::InitObjects()
 
 //-----------------------------------------------------------------------------
 //! Initialize rigid force data
-bool FEModel::InitRigidForces()
+bool FEModel::InitModelLoads()
 {
 	// call the Init() function of all rigid forces
 	for (int i=0; i<(int) m_ML.size(); ++i)

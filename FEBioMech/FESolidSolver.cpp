@@ -1569,7 +1569,7 @@ bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 	NonLinearConstraintStiffness(tp);
 
 	// calculate the stiffness contributions for the rigid forces
-	for (i=0; i<m_fem.m_ML.size(); ++i) m_fem.m_ML[i]->StiffnessMatrix(this, tp);
+	for (i=0; i<m_fem.ModelLoads(); ++i) m_fem.ModelLoad(i)->StiffnessMatrix(this, tp);
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
@@ -2164,10 +2164,10 @@ bool FESolidSolver::Residual(vector<double>& R)
 //	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
 
 	// add model loads
-	int NML = m_fem.m_ML.size();
+	int NML = m_fem.ModelLoads();
 	for (i=0; i<NML; ++i)
 	{
-		FEModelLoad& mli = *m_fem.m_ML[i];
+		FEModelLoad& mli = *m_fem.ModelLoad(i);
 		if (mli.IsActive())
 		{
 			mli.Residual(RHS, tp);

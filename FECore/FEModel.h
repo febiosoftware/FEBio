@@ -210,6 +210,19 @@ public: // --- Nonlinear constraints functions ---
 	//! Initialize constraint data
 	bool InitConstraints();
 
+public:	// --- Model Loads ----
+	//! return the number of model loads
+	int ModelLoads() { return (int) m_ML.size(); }
+
+	//! retrieve a model load
+	FEModelLoad* ModelLoad(int i) { return m_ML[i]; }
+
+	//! Add a model load
+	void AddModelLoad(FEModelLoad* pml) { m_ML.push_back(pml); }
+
+	//! initialize model loads
+	bool InitModelLoads();
+
 public: // --- parameter functions ---
 
 	//! evaluate all load curves at some time
@@ -240,9 +253,6 @@ public:	// --- Miscellaneous routines ---
 
 	//! call the callback function
 	void DoCallback(unsigned int nevent);
-
-	//! initialize rigid forces
-	bool InitRigidForces();
 
 public: // --- I/O functions
 
@@ -292,9 +302,14 @@ public: // TODO: Find a better place for these parameters
 protected:
 	std::vector<FELoadCurve*>				m_LC;	//!< load curve data
 	std::vector<FEMaterial*>				m_MAT;	//!< array of materials
-	std::vector<FEBodyLoad*>				m_BL;	//!< body load data
+	std::vector<FEPrescribedBC*>			m_DC;	//!< prescribed constraints
+	std::vector<FENodalForce*>				m_FC;	//!< concentrated nodal loads
+	std::vector<FESurfaceLoad*>				m_SL;	//!< surface loads
 	std::vector<FESurfacePairInteraction*>	m_CI;	//!< contact interface array
+	std::vector<FEBodyLoad*>				m_BL;	//!< body load data
 	std::vector<FENLConstraint*>			m_NLC;	//!< nonlinear constraints
+	std::vector<FERigidNode*>				m_RN;	//!< rigid nodes
+	std::vector<FEModelLoad*>				m_ML;	//!< model loads
 
 protected:
 	std::vector<FEAnalysis*>	m_Step;		//!< array of analysis steps
@@ -305,13 +320,6 @@ protected:
 	FEMesh		m_mesh;					//!< the one and only FE mesh
 	std::vector<FEObject*>		m_Obj;	//!< FE Object array (NOTE: only used for rigid bodies)
 
-protected:
-	// Boundary Conditions
-	std::vector<FEPrescribedBC*>	m_DC;	//!< prescribed constraints
-	std::vector<FENodalForce*>		m_FC;	//!< concentrated nodal loads
-	std::vector<FESurfaceLoad*>		m_SL;	//!< surface loads
-	std::vector<FERigidNode*>		m_RN;	//!< rigid nodes
-
 public:
 	// Boundary/Initial conditions for rigid bodies
 	// TODO: I'd like to do something different with this. Perhaps place them in the BC or in some constraint section.
@@ -319,7 +327,6 @@ public:
 	vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
 	vector<FERigidBodyVelocity*>		m_RBV;	//!< rigid body initial velocities
 	vector<FERigidBodyAngularVelocity*>	m_RBW;	//!< rigid body initial angular velocities
-	std::vector<FEModelLoad*>		m_ML;	//!< model loads
 
 	// linear constraint data
 	list<FELinearConstraint>	m_LinC;		//!< linear constraints data

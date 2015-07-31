@@ -249,7 +249,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				pFC->bc = bc;
 				pFC->lc = lc;
 				tag.value(pFC->sf);
-				fem.m_ML.push_back(pFC);
+				fem.AddModelLoad(pFC);
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -313,7 +313,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				pFC->bc = bc;
 				pFC->lc = lc;
 				tag.value(pFC->sf);
-				fem.m_ML.push_back(pFC);
+				fem.AddModelLoad(pFC);
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -451,7 +451,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			pFC->lc = lc;
 			pFC->m_bfollow = bfollow;
 			m_pim->value(tag, pFC->sf);
-			fem.m_ML.push_back(pFC);
+			fem.AddModelLoad(pFC);
 
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)

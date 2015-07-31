@@ -100,5 +100,5 @@ void FEBioDiscreteSection::ParseRigidAxialForce(XMLTag& tag)
 
 	// add it to the model
 	FEModel& fem = *GetFEModel();
-	fem.m_ML.push_back(paf);
+	fem.AddModelLoad(paf);
 }

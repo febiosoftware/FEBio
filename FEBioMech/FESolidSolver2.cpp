@@ -2233,6 +2233,17 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	// forces due to point constraints
 //	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
 
+	// add model loads
+	int NML = m_fem.ModelLoads();
+	for (i=0; i<NML; ++i)
+	{
+		FEModelLoad& mli = *m_fem.ModelLoad(i);
+		if (mli.IsActive())
+		{
+			mli.Residual(RHS, tp);
+		}
+	}
+
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
 	for (i=0; i<mesh.Nodes(); ++i)
