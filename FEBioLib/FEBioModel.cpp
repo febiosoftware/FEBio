@@ -569,27 +569,28 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 		ar << nn;
 		for (i=0; i<nn; ++i)
 		{
-			ar << m.Node(i).m_ap;
-			ar << m.Node(i).m_at;
-			ar << m.Node(i).m_BC;		// delete this
-			ar << m.Node(i).m_bshell;
-			ar << m.Node(i).m_c0;
-			ar << m.Node(i).m_cp;
-			ar << m.Node(i).m_ct;
-			ar << m.Node(i).m_D0;
-			ar << m.Node(i).m_Dt;
-			ar << m.Node(i).m_Fr;
-			ar << m.Node(i).m_ID;
-			ar << m.Node(i).m_p0;
-			ar << m.Node(i).m_pt;
-			ar << m.Node(i).m_r0;
-			ar << m.Node(i).m_rid;
-			ar << m.Node(i).m_rp;
-			ar << m.Node(i).m_rt;
-			ar << m.Node(i).m_T;
-			ar << m.Node(i).m_v0;
-			ar << m.Node(i).m_vp;
-			ar << m.Node(i).m_vt;
+			FENode& node = m.Node(i);
+			ar << node.m_ap;
+			ar << node.m_at;
+			ar << node.m_bshell;
+			ar << node.m_bexclude;
+			ar << node.m_c0;
+			ar << node.m_cp;
+			ar << node.m_ct;
+			ar << node.m_D0;
+			ar << node.m_Dt;
+			ar << node.m_Fr;
+			ar << node.m_ID;
+			ar << node.m_p0;
+			ar << node.m_pt;
+			ar << node.m_r0;
+			ar << node.m_rid;
+			ar << node.m_rp;
+			ar << node.m_rt;
+			ar << node.m_T;
+			ar << node.m_v0;
+			ar << node.m_vp;
+			ar << node.m_vt;
 		}
 
 		// write domain data
@@ -627,27 +628,28 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 		m.CreateNodes(nn);
 		for (int i=0; i<nn; ++i)
 		{
-			ar >> m.Node(i).m_ap;
-			ar >> m.Node(i).m_at;
-			ar >> m.Node(i).m_BC;		// delete this
-			ar >> m.Node(i).m_bshell;
-			ar >> m.Node(i).m_c0;
-			ar >> m.Node(i).m_cp;
-			ar >> m.Node(i).m_ct;
-			ar >> m.Node(i).m_D0;
-			ar >> m.Node(i).m_Dt;
-			ar >> m.Node(i).m_Fr;
-			ar >> m.Node(i).m_ID;
-			ar >> m.Node(i).m_p0;
-			ar >> m.Node(i).m_pt;
-			ar >> m.Node(i).m_r0;
-			ar >> m.Node(i).m_rid;
-			ar >> m.Node(i).m_rp;
-			ar >> m.Node(i).m_rt;
-			ar >> m.Node(i).m_T;
-			ar >> m.Node(i).m_v0;
-			ar >> m.Node(i).m_vp;
-			ar >> m.Node(i).m_vt;
+			FENode& node = m.Node(i);
+			ar >> node.m_ap;
+			ar >> node.m_at;
+			ar >> node.m_bshell;
+			ar >> node.m_bexclude;
+			ar >> node.m_c0;
+			ar >> node.m_cp;
+			ar >> node.m_ct;
+			ar >> node.m_D0;
+			ar >> node.m_Dt;
+			ar >> node.m_Fr;
+			ar >> node.m_ID;
+			ar >> node.m_p0;
+			ar >> node.m_pt;
+			ar >> node.m_r0;
+			ar >> node.m_rid;
+			ar >> node.m_rp;
+			ar >> node.m_rt;
+			ar >> node.m_T;
+			ar >> node.m_v0;
+			ar >> node.m_vp;
+			ar >> node.m_vt;
 		}
 
 		// read domain data
@@ -943,7 +945,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 
 		// linear constraints
 		ar >> n;
-		FELinearConstraint LC;
+		FELinearConstraint LC(this);
 		for (int i=0; i<n; ++i)
 		{
 			LC.Serialize(ar);

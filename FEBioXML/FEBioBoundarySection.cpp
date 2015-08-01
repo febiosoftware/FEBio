@@ -580,7 +580,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 	if (tag.isleaf()) return;
 
 	// read the master node
-	FELinearConstraint LC;
+	FELinearConstraint LC(&fem);
 	int node;
 	tag.AttributeValue("node", node);
 	LC.master.node = node-1;

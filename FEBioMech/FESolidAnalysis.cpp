@@ -97,16 +97,11 @@ bool FESolidAnalysis::Activate()
 		}
 	}
 
-	// apply fixed BC's
-	for (int i=0; i<mesh.Nodes(); ++i)
+	// apply fixed dofs
+	for (int i=0; i<m_fem.FixedBCs(); ++i)
 	{
-		FENode& node = mesh.Node(i);
-		if (node.m_BC[DOF_X] == -1) node.m_ID[DOF_X] = -1;
-		if (node.m_BC[DOF_Y] == -1) node.m_ID[DOF_Y] = -1;
-		if (node.m_BC[DOF_Z] == -1) node.m_ID[DOF_Z] = -1;
-		if (node.m_BC[DOF_U] == -1) node.m_ID[DOF_U] = -1;
-		if (node.m_BC[DOF_V] == -1) node.m_ID[DOF_V] = -1;
-		if (node.m_BC[DOF_W] == -1) node.m_ID[DOF_W] = -1;
+		FEFixedBC& bc = *m_fem.FixedBC(i);
+		mesh.Node(bc.m_node).m_ID[bc.m_dof] = -1;
 	}
 
 	// set the rigid nodes
@@ -259,18 +254,11 @@ bool FESolidAnalysis::Activate()
 		}
 	}
 
-	// modify the linear constraints
+	// activate the linear constraints
 	if (m_fem.m_LinC.size())
 	{
 		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
-		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il)
-		{
-			list<FELinearConstraint::SlaveDOF>::iterator is = il->slave.begin();
-			for (int i=0; i<(int) il->slave.size(); ++i, ++is)
-			{
-				is->neq = m_fem.GetMesh().Node(is->node).m_ID[is->bc];
-			}
-		}
+		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il) il->Activate();
 	}
 
 	if (m_nanalysis == FE_DYNAMIC)
@@ -418,18 +406,12 @@ bool FEExplicitSolidAnalysis::Activate()
 		}
 	}
 
-	// apply fixed bc's
-	for (int i=0; i<mesh.Nodes(); ++i)
+	// apply fixed dofs
+	for (int i=0; i<m_fem.FixedBCs(); ++i)
 	{
-		FENode& node = mesh.Node(i);
-		if (node.m_BC[DOF_X] == -1) node.m_ID[DOF_X] = -1;
-		if (node.m_BC[DOF_Y] == -1) node.m_ID[DOF_Y] = -1;
-		if (node.m_BC[DOF_Z] == -1) node.m_ID[DOF_Z] = -1;
-		if (node.m_BC[DOF_U] == -1) node.m_ID[DOF_U] = -1;
-		if (node.m_BC[DOF_V] == -1) node.m_ID[DOF_V] = -1;
-		if (node.m_BC[DOF_W] == -1) node.m_ID[DOF_W] = -1;
+		FEFixedBC& bc = *m_fem.FixedBC(i);
+		mesh.Node(bc.m_node).m_ID[bc.m_dof] = -1;
 	}
-
 
 	// set the rigid nodes
 	// Note that also the rotational degrees of freedom are fixed
@@ -581,18 +563,11 @@ bool FEExplicitSolidAnalysis::Activate()
 		}
 	}
 
-	// modify the linear constraints
+	// activate the linear constraints
 	if (m_fem.m_LinC.size())
 	{
 		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
-		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il)
-		{
-			list<FELinearConstraint::SlaveDOF>::iterator is = il->slave.begin();
-			for (int i=0; i<(int) il->slave.size(); ++i, ++is)
-			{
-				is->neq = m_fem.GetMesh().Node(is->node).m_ID[is->bc];
-			}
-		}
+		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il) il->Activate();
 	}
 
 	// do one time initialization of solver data
@@ -639,17 +614,11 @@ bool FELinearSolidAnalysis::Activate()
 		}
 	}
 
-	// apply fixed bc's
-	for (int i=0; i<mesh.Nodes(); ++i)
+	// apply fixed dofs
+	for (int i=0; i<m_fem.FixedBCs(); ++i)
 	{
-		FENode& node = mesh.Node(i);
-
-		if (node.m_BC[DOF_X] == -1) node.m_ID[DOF_X] = -1;
-		if (node.m_BC[DOF_Y] == -1) node.m_ID[DOF_Y] = -1;
-		if (node.m_BC[DOF_Z] == -1) node.m_ID[DOF_Z] = -1;
-		if (node.m_BC[DOF_U] == -1) node.m_ID[DOF_U] = -1;
-		if (node.m_BC[DOF_V] == -1) node.m_ID[DOF_V] = -1;
-		if (node.m_BC[DOF_W] == -1) node.m_ID[DOF_W] = -1;
+		FEFixedBC& bc = *m_fem.FixedBC(i);
+		mesh.Node(bc.m_node).m_ID[bc.m_dof] = -1;
 	}
 
 	// initialize equations
@@ -720,18 +689,11 @@ bool FELinearSolidAnalysis::Activate()
 		}
 	}
 
-	// modify the linear constraints
+	// activate the linear constraints
 	if (m_fem.m_LinC.size())
 	{
 		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
-		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il)
-		{
-			list<FELinearConstraint::SlaveDOF>::iterator is = il->slave.begin();
-			for (int i=0; i<(int) il->slave.size(); ++i, ++is)
-			{
-				is->neq = m_fem.GetMesh().Node(is->node).m_ID[is->bc];
-			}
-		}
+		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il) il->Activate();
 	}
 
 	// do one time initialization of solver data

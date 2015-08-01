@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "FELinearConstraint.h"
+#include "FEMesh.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
-FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC)
+FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC) : FEModelComponent(FEBC_ID, LC.GetFEModel())
 {
 	master = LC.master;
 	int n = (int) LC.slave.size();
@@ -18,6 +20,17 @@ double FELinearConstraint::FindDOF(int n)
 	for (int i=0; i<N; ++i, ++it) if (it->neq == n) return it->val;
 
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+void FELinearConstraint::Activate()
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	list<FELinearConstraint::SlaveDOF>::iterator is = slave.begin();
+	for (int i=0; i<(int) slave.size(); ++i, ++is)
+	{
+		is->neq = mesh.Node(is->node).m_ID[is->bc];
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -48,23 +48,11 @@ void FEBiphasicSoluteAnalysis::InitNodes()
 		}
 	}
 
-	// apply fixed bc
-	for (int i=0; i<mesh.Nodes(); ++i)
+	// apply fixed dofs
+	for (int i=0; i<m_fem.FixedBCs(); ++i)
 	{
-		FENode& node = mesh.Node(i);
-
-		if (node.m_BC[DOF_X] == -1) node.m_ID[DOF_X] = -1;
-		if (node.m_BC[DOF_Y] == -1) node.m_ID[DOF_Y] = -1;
-		if (node.m_BC[DOF_Z] == -1) node.m_ID[DOF_Z] = -1;
-		if (node.m_BC[DOF_U] == -1) node.m_ID[DOF_U] = -1;
-		if (node.m_BC[DOF_V] == -1) node.m_ID[DOF_V] = -1;
-		if (node.m_BC[DOF_W] == -1) node.m_ID[DOF_W] = -1;
-		if (node.m_BC[DOF_P] == -1) node.m_ID[DOF_P] = -1;
-
-		for (int k=0; k<MAX_CDOFS; ++k) {
-			int dofc = DOF_C + k;
-			if (node.m_BC[dofc] == -1) node.m_ID[dofc] = -1;
-		}
+		FEFixedBC& bc = *m_fem.FixedBC(i);
+		mesh.Node(bc.m_node).m_ID[bc.m_dof] = -1;
 	}
 
 	// fix all mixture dofs that are not used that is, that are not part of a biphasic material.

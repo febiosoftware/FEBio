@@ -1,5 +1,6 @@
 #pragma once
 #include "DumpFile.h"
+#include "FEModelComponent.h"
 #include <list>
 using namespace std;
 
@@ -17,7 +18,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! linear constraint
-class FELinearConstraint
+class FELinearConstraint : public FEModelComponent
 {
 public:
 	class SlaveDOF : public DOF
@@ -28,12 +29,14 @@ public:
 	};
 
 public:
-	FELinearConstraint(){}
+	FELinearConstraint(FEModel* pfem) : FEModelComponent(FEBC_ID, pfem) {}
 	FELinearConstraint(const FELinearConstraint& LC);
 
 	double FindDOF(int n);
 
 	void Serialize(DumpFile& ar);
+
+	void Activate();
 
 public:
 	DOF				master;	// master degree of freedom

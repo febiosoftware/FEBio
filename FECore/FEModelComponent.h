@@ -49,7 +49,7 @@ public:
 
 public:
 	//! return the FE model
-	FEModel* GetFEModel();
+	FEModel* GetFEModel() const;
 
 	//! return the name of the component
 	const char* GetName();

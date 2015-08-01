@@ -34,7 +34,6 @@ FENode::FENode()
     m_cp.assign(MAX_CDOFS, 0);
 
 	// initialize dof stuff
-    m_BC.assign(MAX_NDOFS,  0);
     m_ID.assign(MAX_NDOFS, -1);
 
 	// exclude flag (true if the node should not be part of the analysis.
@@ -75,7 +74,6 @@ FENode::FENode(const FENode& n)
 	m_bexclude = n.m_bexclude;
 
 	m_ID = n.m_ID;
-	m_BC = n.m_BC;
 }
 
 //-----------------------------------------------------------------------------
@@ -105,7 +103,6 @@ FENode& FENode::operator = (const FENode& n)
 	m_bexclude = n.m_bexclude;
 
 	m_ID = n.m_ID;
-	m_BC = n.m_BC;
 
 	return (*this);
 }
@@ -405,7 +402,6 @@ int FEMesh::RemoveIsolatedVertices()
 		{
 			++ni;
 			FENode& node = Node(i);
-//			for (k=0; k<(int)node.m_BC.size(); ++k) node.m_BC[k] = -1;
 			node.m_bexclude = true;
 		}
 
@@ -594,20 +590,6 @@ bool FEMesh::Init()
 			}
 		}
 	}
-
-/*
-	// fix rotational degrees of freedom of tagged nodes
-	for (int i=0; i<Nodes(); ++i) 
-	{
-		FENode& node = Node(i);
-		if (tag[i] == 0)
-		{
-			node.m_BC[DOF_U] = -1;
-			node.m_BC[DOF_V] = -1;
-			node.m_BC[DOF_W] = -1;
-		}
-	}
-*/
 
 	// reset data
 	// TODO: Not sure why this is here

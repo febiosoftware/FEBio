@@ -38,19 +38,11 @@ void FEBiphasicAnalysis::InitNodes()
 		}
 	}
 
-	// apply fixed bc's
-	for (int i=0; i<mesh.Nodes(); ++i)
+	// apply fixed dofs
+	for (int i=0; i<m_fem.FixedBCs(); ++i)
 	{
-		FENode& node = mesh.Node(i);
-
-		// open the dofs for non-fixed nodes
-		if (node.m_BC[DOF_X] == -1) node.m_ID[DOF_X] = -1;
-		if (node.m_BC[DOF_Y] == -1) node.m_ID[DOF_Y] = -1;
-		if (node.m_BC[DOF_Z] == -1) node.m_ID[DOF_Z] = -1;
-		if (node.m_BC[DOF_U] == -1) node.m_ID[DOF_U] = -1;
-		if (node.m_BC[DOF_V] == -1) node.m_ID[DOF_V] = -1;
-		if (node.m_BC[DOF_W] == -1) node.m_ID[DOF_W] = -1;
-		if (node.m_BC[DOF_P] == -1) node.m_ID[DOF_P] = -1;
+		FEFixedBC& bc = *m_fem.FixedBC(i);
+		mesh.Node(bc.m_node).m_ID[bc.m_dof] = -1;
 	}
 
 	// fix all mixture dofs that are not used that is, that are not part of a biphasic material.
@@ -290,14 +282,7 @@ bool FEBiphasicAnalysis::Activate()
 	if (m_fem.m_LinC.size())
 	{
 		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
-		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il)
-		{
-			list<FELinearConstraint::SlaveDOF>::iterator is = il->slave.begin();
-			for (int i=0; i<(int) il->slave.size(); ++i, ++is)
-			{
-				is->neq = m_fem.GetMesh().Node(is->node).m_ID[is->bc];
-			}
-		}
+		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il) il->Activate();
 	}
 
 	// modify the (aug lag) nonlinear constraints

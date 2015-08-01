@@ -66,8 +66,7 @@ void FEModel::Clear()
 //-----------------------------------------------------------------------------
 void FEModel::AddFixedBC(int node, int bc)
 {
-	FEMesh& mesh = GetMesh();
-	mesh.Node(node).m_BC[bc] = -1;
+	AddFixedBC(new FEFixedBC(this, node, bc));
 }
 
 //-----------------------------------------------------------------------------
@@ -148,7 +147,6 @@ bool FEModel::InitBCs()
 	if (m_nplane_strain >= 0)
 	{
 		int bc = m_nplane_strain;
-//		for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_BC[bc] = -1;
 		for (int i=0; i<m_mesh.Nodes(); ++i) AddFixedBC(i, bc);
 	}
 //-->
@@ -409,32 +407,6 @@ bool FEModel::InitObjects()
 		m_Obj.push_back(prb);
 	}
 
-/*
-	// The following fixes the degrees of freedom for rigid nodes. This is necessary to make
-	// sure that they are not assigned equation numbers.
-	// Note that also the rotational degrees of freedom are fixed
-	// for rigid nodes that do not belong to a non-rigid shell element. Again, this is to make
-	// sure the rotational dofs are not assigned equations. If the node belongs to a non-rigid
-	// shell element we leave the dofs open so that we can create hinged shells.
-//--> This should be moved as well to the FESolidAnalysis::Activate member
-	for (int i=0; i<m_mesh.Nodes(); ++i)
-	{
-		FENode& node = m_mesh.Node(i);
-		if (node.m_rid >= 0)
-		{
-			node.m_BC[DOF_X] = -1;
-			node.m_BC[DOF_Y] = -1;
-			node.m_BC[DOF_Z] = -1;
-			if (node.m_bshell == false)
-			{
-				node.m_BC[DOF_U] = -1;
-				node.m_BC[DOF_V] = -1;
-				node.m_BC[DOF_W] = -1;
-			}
-		}
-	}
-//-->
-*/
 	// assign correct rigid body ID's to rigid nodes
 	for (int i=0; i<(int) m_RN.size(); ++i)
 	{

@@ -43,19 +43,11 @@ bool FEThermoElasticAnalysis::Activate()
 		}
 	}
 
-	// apply fixed bc's
-	for (int i=0; i<mesh.Nodes(); ++i)
+	// apply fixed dofs
+	for (int i=0; i<m_fem.FixedBCs(); ++i)
 	{
-		FENode& node = mesh.Node(i);
-
-		// open the dofs for non-fixed nodes
-		if (node.m_BC[DOF_X] == -1) node.m_ID[DOF_X] = -1;
-		if (node.m_BC[DOF_Y] == -1) node.m_ID[DOF_Y] = -1;
-		if (node.m_BC[DOF_Z] == -1) node.m_ID[DOF_Z] = -1;
-		if (node.m_BC[DOF_U] == -1) node.m_ID[DOF_U] = -1;
-		if (node.m_BC[DOF_V] == -1) node.m_ID[DOF_V] = -1;
-		if (node.m_BC[DOF_W] == -1) node.m_ID[DOF_W] = -1;
-		if (node.m_BC[DOF_T] == -1) node.m_ID[DOF_T] = -1;
+		FEFixedBC& bc = *m_fem.FixedBC(i);
+		mesh.Node(bc.m_node).m_ID[bc.m_dof] = -1;
 	}
 
 	// initialize equations

@@ -71,11 +71,6 @@ struct FE_BOUNDING_BOX
 
 //! It stores nodal positions and nodal equations numbers and more.
 //!
-//! The m_BC array stores the status of the degrees of freedom. For a given
-//! dof, the value can be 0 = free or -1 = fixed. The array
-//! is initialized to 0 and then the different analysis classes
-//! will open the degrees of freedom they need to solve the analysis. 
-//!
 //! The m_ID array will store the equation number for the corresponding
 //! degree of freedom. Its values can be (a) non-negative (0 or higher) which
 //! gives the equation number in the linear system of equations, (b) -1 if the
@@ -133,7 +128,6 @@ public:
 
 public:
 	vector<int>		m_ID;	//!< nodal equation numbers
-	vector<int>		m_BC;	//!< boundary condition
 };
 
 //-----------------------------------------------------------------------------

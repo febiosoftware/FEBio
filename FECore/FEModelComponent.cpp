@@ -29,7 +29,7 @@ FEModelComponent::~FEModelComponent()
 }
 
 //-----------------------------------------------------------------------------
-FEModel* FEModelComponent::GetFEModel()
+FEModel* FEModelComponent::GetFEModel() const
 {
 	return m_pfem;
 }
