@@ -3,6 +3,7 @@
 #include "FEModel.h"
 #include "FESolver.h"
 #include "FERigidBody.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 void FENodalForce::Serialize(DumpFile& ar)
@@ -16,6 +17,18 @@ void FENodalForce::Serialize(DumpFile& ar)
 	{
 		ar >> bc >> lc >> node >> s;
 	}
+}
+
+//-----------------------------------------------------------------------------
+bool FENodalForce::Init()
+{
+	int NLC = GetFEModel()->LoadCurves();
+	if ((lc < 0)||(lc >= NLC))
+	{
+		felog.printf("ERROR: Invalid loadcurve in nodal load %d\n", GetID());
+		return false;
+	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -44,6 +57,25 @@ void FEFixedBC::Serialize(DumpFile& ar)
 	{
 		ar >> m_node >> m_dof;
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEFixedBC::Activate()
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	mesh.Node(m_node).m_ID[m_dof] = -1;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPrescribedBC::Init()
+{
+	int NLC = GetFEModel()->LoadCurves();
+	if ((lc < 0)||(lc >= NLC))
+	{
+		felog.printf("ERROR: Invalid loadcurve in prescribed BC %d\n", GetID());
+		return false;
+	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -138,18 +170,34 @@ void FERigidBodyDisplacement::Serialize(DumpFile& ar)
 bool FERigidBodyVelocity::Init()
 {
 	FEModel& fem = *GetFEModel();
-	FEMaterial* pm = fem.GetMaterial(id-1);
-	id = pm->GetRigidBodyID(); if (id < 0) return false;
+	FEMaterial* pm = fem.GetMaterial(m_rid-1);
+	m_rid = pm->GetRigidBodyID(); if (m_rid < 0) return false;
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidBodyVelocity::Activate()
+{
+	FEModel& fem = *GetFEModel();
+	FERigidBody& rb = static_cast<FERigidBody&>(*fem.Object(m_rid));
+	rb.m_vp = rb.m_vt = m_vel;
 }
 
 //-----------------------------------------------------------------------------
 bool FERigidBodyAngularVelocity::Init()
 {
 	FEModel& fem = *GetFEModel();
-	FEMaterial* pm = fem.GetMaterial(id-1);
-	id = pm->GetRigidBodyID(); if (id < 0) return false;
+	FEMaterial* pm = fem.GetMaterial(m_rid-1);
+	m_rid = pm->GetRigidBodyID(); if (m_rid < 0) return false;
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidBodyAngularVelocity::Activate()
+{
+	FEModel& fem = *GetFEModel();
+    FERigidBody& rb = static_cast<FERigidBody&>(*fem.Object(m_rid));
+	rb.m_wp = rb.m_wt = m_w;
 }
 
 //-----------------------------------------------------------------------------

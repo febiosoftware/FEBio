@@ -31,7 +31,7 @@ bool FEHeatTransferAnalysis::Activate()
 	for (int i=0; i<m_fem.FixedBCs(); ++i)
 	{
 		FEFixedBC& bc = *m_fem.FixedBC(i);
-		mesh.Node(bc.m_node).m_ID[bc.m_dof] = -1;
+		bc.Activate();
 	}
 
 	// initialize equations

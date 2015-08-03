@@ -53,7 +53,7 @@ void FEMultiphasicAnalysis::InitNodes()
 	for (int i=0; i<m_fem.FixedBCs(); ++i)
 	{
 		FEFixedBC& bc = *m_fem.FixedBC(i);
-		mesh.Node(bc.m_node).m_ID[bc.m_dof] = -1;
+		bc.Activate();
 	}
 
 	// fix all mixture dofs that are not used that is, that are not part of a biphasic material.

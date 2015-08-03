@@ -495,8 +495,8 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 
 			// create the initial condition
 			FERigidBodyVelocity* pic = new FERigidBodyVelocity(&fem);
-			pic->id = nmat;
-			pic->v = v;
+			pic->m_rid = nmat;
+			pic->m_vel = v;
 			fem.m_RBV.push_back(pic);
 
 			// add this initial condition to the current step
@@ -514,8 +514,8 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 
 			// create the initial condition
 			FERigidBodyAngularVelocity* pic = new FERigidBodyAngularVelocity(&fem);
-			pic->id = nmat;
-			pic->w = w;
+			pic->m_rid = nmat;
+			pic->m_w = w;
 			fem.m_RBW.push_back(pic);
 
 			// add this initial condition to the current step

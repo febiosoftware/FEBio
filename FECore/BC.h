@@ -15,6 +15,8 @@ class FENodalForce : public FEBoundaryCondition
 public:
 	FENodalForce(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
 
+	bool Init();
+
 	void Serialize(DumpFile& ar);
 
 public:
@@ -33,6 +35,8 @@ public:
 
 	void Serialize(DumpFile& ar);
 
+	void Activate();
+
 public:
 	int		m_node;
 	int		m_dof;
@@ -47,6 +51,8 @@ public:
 	FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
 
 	void Serialize(DumpFile& ar);
+
+	bool Init();
 
 public:
 	double	s;		// scale factor
@@ -125,9 +131,11 @@ public:
 
 	bool Init();
 
+	void Activate();
+
 public:
-	int		id;	//!< rigid body ID
-	vec3d	v;	//!< value
+	int		m_rid;	//!< rigid body ID
+	vec3d	m_vel;	//!< initial velocity
 };
 
 //-----------------------------------------------------------------------------
@@ -139,7 +147,9 @@ public:
 
 	bool Init();
 
+	void Activate();
+
 public:
-	int		id;	//!< rigid body ID
-	vec3d	w;	//!< value
+	int		m_rid;	//!< rigid body ID
+	vec3d	m_w;	//!< value
 };

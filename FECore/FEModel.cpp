@@ -159,11 +159,7 @@ bool FEModel::InitBCs()
 	for (int i=0; i<NBC; ++i)
 	{
 		FEPrescribedBC* pbc = PrescribedBC(i);
-		if ((pbc->lc < 0)||(pbc->lc >= NLC))
-		{
-			felog.printf("ERROR: Invalid loadcurve in prescribed BC %d\n", i+1);
-			return false;
-		}
+		if (pbc->Init() == false) return false;
 	}
 
 	// check the nodal loads
@@ -171,11 +167,7 @@ bool FEModel::InitBCs()
 	for (int i=0; i<NNL; ++i)
 	{
 		FENodalForce* pbc = NodalLoad(i);
-		if ((pbc->lc < 0)||(pbc->lc >= NLC))
-		{
-			felog.printf("ERROR: Invalid loadcurve in nodal load %d\n", i+1);
-			return false;
-		}
+		if (pbc->Init() == false) return false;
 	}
 
 	return true;
@@ -455,11 +447,15 @@ bool FEModel::InitObjects()
 	{
 		FERigidBodyVelocity& RV = *m_RBV[i];
 		if (RV.Init() == false) return false;
+
+		if (RV.IsActive()) RV.Activate();
 	}
 	for (int i=0; i<(int) m_RBW.size(); ++i)
 	{
 		FERigidBodyAngularVelocity& RW = *m_RBW[i];
 		if (RW.Init() == false) return false;
+
+		if (RW.IsActive()) RW.Activate();
 	}
 	return true;
 }

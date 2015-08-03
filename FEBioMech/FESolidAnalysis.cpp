@@ -97,7 +97,7 @@ bool FESolidAnalysis::Activate()
 	for (int i=0; i<m_fem.FixedBCs(); ++i)
 	{
 		FEFixedBC& bc = *m_fem.FixedBC(i);
-		mesh.Node(bc.m_node).m_ID[bc.m_dof] = -1;
+		bc.Activate();
 	}
 
 	// override prescribed displacements for rigid nodes
@@ -229,29 +229,7 @@ bool FESolidAnalysis::Activate()
 
 	if (m_nanalysis == FE_DYNAMIC)
 	{
-		// Set the initial velocity for rigid bodies
-		for (int i=0; i<(int)m_fem.m_RBV.size(); ++i)
-		{
-			FERigidBodyVelocity* pv = m_fem.m_RBV[i];
-			if (pv->IsActive())
-			{
-                FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(pv->id));
-				rb.m_vp = rb.m_vt = pv->v;
-			}
-		}
-
-		// Set the initial angular velocity for rigid bodies
-		for (int i=0; i<(int)m_fem.m_RBW.size(); ++i)
-		{
-			FERigidBodyAngularVelocity* pw = m_fem.m_RBW[i];
-			if (pw->IsActive())
-			{
-                FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(pw->id));
-				rb.m_wp = rb.m_wt = pw->w;
-			}
-		}
-
-		// now set the initial velocities of all rigid nodes
+		// set the initial velocities of all rigid nodes
 		for (int i=0; i<mesh.Nodes(); ++i)
 		{
 			FENode& n = mesh.Node(i);
@@ -375,7 +353,7 @@ bool FEExplicitSolidAnalysis::Activate()
 	for (int i=0; i<m_fem.FixedBCs(); ++i)
 	{
 		FEFixedBC& bc = *m_fem.FixedBC(i);
-		mesh.Node(bc.m_node).m_ID[bc.m_dof] = -1;
+		bc.Activate();
 	}
 
 	// override prescribed displacements for rigid nodes
@@ -553,7 +531,7 @@ bool FELinearSolidAnalysis::Activate()
 	for (int i=0; i<m_fem.FixedBCs(); ++i)
 	{
 		FEFixedBC& bc = *m_fem.FixedBC(i);
-		mesh.Node(bc.m_node).m_ID[bc.m_dof] = -1;
+		bc.Activate();
 	}
 
 	// initialize equations
