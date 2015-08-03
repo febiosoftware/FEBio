@@ -113,7 +113,7 @@ bool FEBiphasicAnalysis::Activate()
 		for (int j=0; j<6; ++j)
 		{
 			RB.m_pDC[j] = 0;
-			RB.m_BC[j] = 0;
+			RB.m_LM[j] = 0;
 		}
 	}
 
@@ -122,7 +122,7 @@ bool FEBiphasicAnalysis::Activate()
 	{
 		FERigidBodyFixedBC* pbc = m_fem.m_RBC[i];
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(pbc->id));
-		if (pbc->IsActive()) RB.m_BC[pbc->bc] = -1;
+		if (pbc->IsActive()) RB.m_LM[pbc->bc] = -1;
 	}
 
 	// set the active rigid bodies BC's
@@ -132,9 +132,8 @@ bool FEBiphasicAnalysis::Activate()
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(DC.id));
 		if (DC.IsActive())
 		{
-			assert(RB.m_BC[DC.bc] == 0);	// make sure we are not overriding a fixed bc
 			RB.m_pDC[DC.bc] = &DC;
-			RB.m_BC[DC.bc] = 1;
+			RB.m_LM[DC.bc] = 0;		// make sure this dof is free
 			DC.ref = 0.0;
 			if (DC.brel)
 			{

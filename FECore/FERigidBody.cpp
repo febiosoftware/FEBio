@@ -23,7 +23,6 @@ FERigidBody::FERigidBody(FEModel* pfem) : FEObject(pfem)
     m_bpofr = false;
 	for (int i=0; i<6; ++i)
 	{
-		m_BC[i] = 0;
 		m_pDC[i] = 0;
 	}
 	m_prb = 0;

@@ -286,7 +286,7 @@ bool FESolidSolver2::InitEquations()
 	{
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
 		for (j=0; j<6; ++j)
-			if (RB.m_BC[j] >= 0)
+			if (RB.m_LM[j] >= 0)
 			{
 				RB.m_LM[j] = neq++;
 			}
@@ -323,7 +323,10 @@ bool FESolidSolver2::InitEquations()
 		for (j=0; j<6; ++j)
 		{
 			n = RB.m_LM[j];
-			if (RB.m_BC[j] > 0) RB.m_LM[j] = -n-2;
+			if (RB.m_pDC[j] && RB.m_pDC[j]->IsActive()) RB.m_LM[j] = -n - 2;
+
+			// rigid bodies that parents also required prescribed displacement conditions
+			if (RB.m_prb) RB.m_LM[j] = -n-2;
 		}
 	}
 

@@ -93,6 +93,34 @@ bool FERigidBodyDisplacement::Init()
 }
 
 //-----------------------------------------------------------------------------
+/*
+void FERigidBodyDisplacement::Activate()
+{
+	// don't forget to call the base class
+	FEBoundaryCondition::Activate();
+
+	// get the rigid body
+	FEModel& fem = *GetFEModel();
+	FERigidBody& RB = static_cast<FERigidBody&>(*fem.Object(id));
+
+	// set some stuff
+	RB.m_pDC[bc] = this;
+	RB.m_BC[bc] = 1;
+
+	// set the relative offset
+	ref = 0.0;
+	if (brel)
+	{
+		switch (bc)
+		{
+		case 0: ref = RB.m_rt.x - RB.m_r0.x; break;
+		case 1: ref = RB.m_rt.y - RB.m_r0.y; break;
+		case 2: ref = RB.m_rt.z - RB.m_r0.z; break;
+	}
+}
+*/
+
+//-----------------------------------------------------------------------------
 void FERigidBodyDisplacement::Serialize(DumpFile& ar)
 {
 	FEBoundaryCondition::Serialize(ar);

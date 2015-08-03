@@ -105,6 +105,8 @@ public:
 
 	void Serialize(DumpFile& ar);
 
+//	void Activate();
+
 public:
 	int		id;		//!< rigid body id
 	int		bc;		//!< displacement direction
