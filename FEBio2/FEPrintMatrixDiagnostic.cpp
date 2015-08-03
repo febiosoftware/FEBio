@@ -74,6 +74,7 @@ bool FEPrintMatrixDiagnostic::Run()
 {
 	// get and initialize the first step
 	FEAnalysis* pstep = m_fem.GetStep(0);
+	pstep->Init();
 	pstep->Activate();
 
 	// get and initialize the solver

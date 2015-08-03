@@ -25,6 +25,7 @@ double FELinearConstraint::FindDOF(int n)
 //-----------------------------------------------------------------------------
 void FELinearConstraint::Activate()
 {
+	FEModelComponent::Activate();
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	list<FELinearConstraint::SlaveDOF>::iterator is = slave.begin();
 	for (int i=0; i<(int) slave.size(); ++i, ++is)

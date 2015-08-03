@@ -104,36 +104,6 @@ bool FESolidAnalysis::Activate()
 		mesh.Node(bc.m_node).m_ID[bc.m_dof] = -1;
 	}
 
-	// set the rigid nodes
-	// Note that also the rotational degrees of freedom are fixed
-	// for rigid nodes that do not belong to a non-rigid shell element.
-	int nrn = m_fem.RigidNodes();
-	for (int i=0; i<nrn; ++i)
-	{
-		FERigidNode& rn = *m_fem.RigidNode(i);
-		if (rn.IsActive())
-		{
-			FENode& node = m_fem.GetMesh().Node(rn.nid);
-			node.m_rid = rn.rid;
-
-			// fix degrees of freedom
-			node.m_ID[DOF_X] = -1;
-			node.m_ID[DOF_Y] = -1;
-			node.m_ID[DOF_Z] = -1;
-			if (node.m_bshell == false)
-			{
-				node.m_ID[DOF_U] = -1;
-				node.m_ID[DOF_V] = -1;
-				node.m_ID[DOF_W] = -1;
-			}
-		}
-		else 
-		{
-			FENode& node = m_fem.GetMesh().Node(rn.nid);
-			node.m_rid = -1;
-		}
-	}
-
 	// override prescribed displacements for rigid nodes
 	bool bdisp = false;
 	int nbc = m_fem.PrescribedBCs();
@@ -411,36 +381,6 @@ bool FEExplicitSolidAnalysis::Activate()
 	{
 		FEFixedBC& bc = *m_fem.FixedBC(i);
 		mesh.Node(bc.m_node).m_ID[bc.m_dof] = -1;
-	}
-
-	// set the rigid nodes
-	// Note that also the rotational degrees of freedom are fixed
-	// for rigid nodes that do not belong to a non-rigid shell element.
-	int nrn = m_fem.RigidNodes();
-	for (int i=0; i<nrn; ++i)
-	{
-		FERigidNode& rn = *m_fem.RigidNode(i);
-		if (rn.IsActive())
-		{
-			FENode& node = m_fem.GetMesh().Node(rn.nid);
-			node.m_rid = rn.rid;
-
-			// fix degrees of freedom
-			node.m_ID[DOF_X] = -1;
-			node.m_ID[DOF_Y] = -1;
-			node.m_ID[DOF_Z] = -1;
-			if (node.m_bshell == false)
-			{
-				node.m_ID[DOF_U] = -1;
-				node.m_ID[DOF_V] = -1;
-				node.m_ID[DOF_W] = -1;
-			}
-		}
-		else 
-		{
-			FENode& node = m_fem.GetMesh().Node(rn.nid);
-			node.m_rid = -1;
-		}
 	}
 
 	// override prescribed displacements for rigid nodes

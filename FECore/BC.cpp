@@ -125,6 +125,24 @@ bool FERigidBodyAngularVelocity::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FERigidNode::Activate()
+{
+	FEBoundaryCondition::Activate();
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	FENode& node = mesh.Node(nid);
+	node.m_rid = rid;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidNode::Deactivate()
+{
+	FEBoundaryCondition::Deactivate();
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	FENode& node = mesh.Node(nid);
+	node.m_rid = -1;
+}
+
+//-----------------------------------------------------------------------------
 void FERigidNode::Serialize(DumpFile& ar)
 {
 	FEBoundaryCondition::Serialize(ar);

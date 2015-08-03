@@ -61,6 +61,7 @@ bool FEPrintHBMatrixDiagnostic::Run()
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// initialize the step
+	pstep->Init();
 	pstep->Activate();
 
 	// get and initialize the FE solver

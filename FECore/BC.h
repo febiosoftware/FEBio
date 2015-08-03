@@ -67,6 +67,9 @@ public:
 
 	void Serialize(DumpFile& ar);
 
+	void Activate();
+	void Deactivate();
+
 public:
 	int	nid;	// node number
 	int	rid;	// rigid body number

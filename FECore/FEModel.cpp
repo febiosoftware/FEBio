@@ -412,6 +412,9 @@ bool FEModel::InitObjects()
 	{
 		FERigidNode& rn = *m_RN[i];
 		rn.rid = mrb[rn.rid];
+
+		// if the rigid node is active, make sure to call the Activate member
+		if (rn.IsActive()) rn.Activate();
 	}
 
 	// let's find all rigid surface elements
@@ -470,6 +473,10 @@ bool FEModel::InitModelLoads()
 	{
 		FEModelLoad& FC = *m_ML[i];
 		if (FC.Init() == false) return false;
+
+		// If the constraint is active
+		// we have to call the Activate() member. 
+		if (FC.IsActive()) FC.Activate();
 	}
 	return true;
 }
