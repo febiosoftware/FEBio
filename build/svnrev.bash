@@ -6,4 +6,4 @@
 temp=$(svnversion -n)
 svnrev=$( echo $temp | cut -f1 -d'M')
 
-sed s/[$]WCREV[$]/$svnrev/ ../VS2010/svnrev_tpl.txt > ../FEBioLib/svnrev.h
+sed s/[$]WCRANGE[$]/$svnrev/ ../VS2010/svnrev_tpl.txt > ../FEBioLib/svnrev.h
