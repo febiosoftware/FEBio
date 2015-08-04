@@ -21,20 +21,26 @@ void FEBiphasicAnalysis::InitNodes()
 		// open the dofs for non-fixed nodes
 		if (node.m_bexclude == false)
 		{
+			// Open displacement DOFs for non-rigid nodes
+			// (rigid nodes are assigned the rigid body's equation numbers)
 			if (node.m_rid < 0)
 			{
 				node.m_ID[DOF_X] = 0;
 				node.m_ID[DOF_Y] = 0;
 				node.m_ID[DOF_Z] = 0;
-				node.m_ID[DOF_P] = 0;
 			}
 
+			// Open rotational degrees of freedom for non-rigid shell nodes
 			if (node.m_bshell)
 			{
 				node.m_ID[DOF_U] = 0;
 				node.m_ID[DOF_V] = 0;
 				node.m_ID[DOF_W] = 0;
 			}
+
+			// Open pressure DOF for all nodes
+			// (These will be closed below for non-poro nodes)
+			node.m_ID[DOF_P] = 0;
 		}
 	}
 

@@ -31,12 +31,6 @@ void FEBiphasicSoluteAnalysis::InitNodes()
 				node.m_ID[DOF_X] = 0;
 				node.m_ID[DOF_Y] = 0;
 				node.m_ID[DOF_Z] = 0;
-				node.m_ID[DOF_P] = 0;
-
-				for (int k=0; k<MAX_CDOFS; ++k) {
-					int dofc = DOF_C + k;
-					node.m_ID[dofc] = 0;
-				}
 			}
 
 			if (node.m_bshell)
@@ -44,6 +38,13 @@ void FEBiphasicSoluteAnalysis::InitNodes()
 				node.m_ID[DOF_U] = 0;
 				node.m_ID[DOF_V] = 0;
 				node.m_ID[DOF_W] = 0;
+			}
+
+			node.m_ID[DOF_P] = 0;
+
+			for (int k=0; k<MAX_CDOFS; ++k) {
+				int dofc = DOF_C + k;
+				node.m_ID[dofc] = 0;
 			}
 		}
 	}
