@@ -671,7 +671,7 @@ void FESolidSolver2::UpdateRigidBodies(vector<double>& ui)
 				{
 					int lc = pdc->lc;
 					// TODO: do I need to take the line search step into account here?
-					du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc)->Value() - RB.m_Up[j] + pdc->ref);
+					du[j] = pdc->Value();
 				}
 				else 
 				{
@@ -697,7 +697,7 @@ void FESolidSolver2::UpdateRigidBodies(vector<double>& ui)
 				for (int j=3; j<6; ++j) {
 					if (RB.m_pDC[j]) {
 						int lc = RB.m_pDC[j]->lc;
-						Ut[j-3] = (lc < 0? 0 : RB.m_pDC[j]->sf*m_fem.GetLoadCurve(lc)->Value());
+						Ut[j-3] = RB.m_pDC[j]->Value();
 					}
 				}
 				quatd qUt(vec3d(Ut[0],Ut[1],Ut[2]));
