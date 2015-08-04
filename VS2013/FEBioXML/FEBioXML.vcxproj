@@ -296,6 +296,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioXML\FEBioBoundarySection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioCodeSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioConstraintsSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioContactSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioControlSection.h" />
@@ -316,9 +317,11 @@
     <ClInclude Include="..\..\FEBioXML\FileImport.h" />
     <ClInclude Include="..\..\FEBioXML\stdafx.h" />
     <ClInclude Include="..\..\FEBioXML\XMLReader.h" />
+    <ClInclude Include="..\..\FECore\FEModelLoad.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioXML\FEBioBoundarySection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioCodeSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioConstraintsSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioContactSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioControlSection.cpp" />
@@ -338,6 +341,7 @@
     <ClCompile Include="..\..\FEBioXML\FERestartImport.cpp" />
     <ClCompile Include="..\..\FEBioXML\FileImport.cpp" />
     <ClCompile Include="..\..\FEBioXML\XMLReader.cpp" />
+    <ClCompile Include="..\..\FECore\FEModelLoad.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

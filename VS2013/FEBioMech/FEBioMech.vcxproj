@@ -421,6 +421,7 @@
     <ClInclude Include="..\..\FEBioMech\FERigidContractileForce.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidCylindricalJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidDamper.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidForce.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidPinJoint.h" />
@@ -601,6 +602,7 @@
     <ClCompile Include="..\..\FEBioMech\FERigidContractileForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidCylindricalJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidDamper.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidPinJoint.cpp" />
