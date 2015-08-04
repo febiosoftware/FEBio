@@ -307,7 +307,7 @@
       <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
     </Lib>
     <PreBuildEvent>
-      <Command>subwcrev . "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
+      <Command>subwcrev .. "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
@@ -410,6 +410,9 @@
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
     </Lib>
+    <PreBuildEvent>
+      <Command>subwcrev .. "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|x64'">
     <ClCompile>
@@ -508,7 +511,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>subwcrev . "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
+      <Command>subwcrev .. "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|Win32'">
@@ -529,7 +532,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>subwcrev . "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
+      <Command>subwcrev .. "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">
@@ -583,6 +586,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PreBuildEvent>
+      <Command>subwcrev .. "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|x64'">
     <ClCompile>
@@ -603,7 +609,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>subwcrev . "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
+      <Command>subwcrev .. "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
