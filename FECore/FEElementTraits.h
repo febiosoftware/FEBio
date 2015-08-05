@@ -16,6 +16,12 @@
 #include <vector>
 
 //-----------------------------------------------------------------------------
+// Degree of freedom types
+#define DOF_OPEN		0		// the dof is open and will be given an equation number
+#define DOF_FIXED		1		// the dof is fixed and will not be given an equation number
+#define DOF_PRESCRIBED	2		// the dof is prescribed. It will be given a negative equation number (equation = - index - 2)
+
+//-----------------------------------------------------------------------------
 // Max nr of nodal degrees of freedom
 
 // At this point the nodal dofs are used as follows:

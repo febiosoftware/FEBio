@@ -23,11 +23,12 @@ bool FESolidAnalysis::Activate()
 	FEAnalysis::Activate();
 
 	// clear the active rigid body BC's
+	// (don't overwrite prescribed displacements)
 	int NRB = m_fem.Objects();
 	for (int i=0; i<NRB; ++i)
 	{
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
-		for (int j=0; j<6; ++j) RB.m_LM[j] = 0;
+		for (int j=0; j<6; ++j) if (RB.m_LM[j] != DOF_PRESCRIBED) RB.m_LM[j] = DOF_OPEN;
 	}
 
 	// set the fixed rigid body BC's
@@ -36,7 +37,7 @@ bool FESolidAnalysis::Activate()
 	{
 		FERigidBodyFixedBC* pbc = m_fem.m_RBC[i];
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(pbc->id));
-		if (pbc->IsActive() && (RB.m_pDC[pbc->bc]==0)) RB.m_LM[pbc->bc] = -1;
+		if (pbc->IsActive() && (RB.m_LM[pbc->bc] != DOF_PRESCRIBED)) RB.m_LM[pbc->bc] = DOF_FIXED;
 	}
 
 	// reset nodal ID's
@@ -254,23 +255,23 @@ void FESolidAnalysis::Deactivate()
 //! equation numbers (the latter is actually done by the FESolver class).
 bool FEExplicitSolidAnalysis::Activate()
 {
+	// initialize base class data
+	FEAnalysis::Activate();
+
 	// clear the active rigid body BC's
 	int NRB = m_fem.Objects();
 	for (int i=0; i<NRB; ++i)
 	{
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
-		for (int j=0; j<6; ++j) RB.m_LM[j] = 0;
+		for (int j=0; j<6; ++j) if (RB.m_LM[j] != DOF_PRESCRIBED) RB.m_LM[j] = DOF_OPEN;
 	}
-
-	// initialize base class data
-	FEAnalysis::Activate();
 
 	// set the fixed rigid body BC's
 	for (int i=0;i<(int) m_fem.m_RBC.size(); ++i)
 	{
 		FERigidBodyFixedBC* pbc = m_fem.m_RBC[i];
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(pbc->id));
-		if (pbc->IsActive()) RB.m_LM[pbc->bc] = -1;
+		if (pbc->IsActive() && (RB.m_LM[pbc->bc] != DOF_PRESCRIBED)) RB.m_LM[pbc->bc] = DOF_FIXED;
 	}
 
 	// reset nodal ID's

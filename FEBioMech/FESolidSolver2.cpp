@@ -244,7 +244,7 @@ void FESolidSolver2::Serialize(DumpFile& ar)
 //!
 bool FESolidSolver2::InitEquations()
 {
-	int i, j, n;
+	int i, j;
 
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
@@ -286,14 +286,13 @@ bool FESolidSolver2::InitEquations()
 	{
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
 		for (j=0; j<6; ++j)
-			if (RB.m_LM[j] >= 0)
-			{
-				RB.m_LM[j] = neq++;
-			}
-			else
-			{
-				RB.m_LM[j] = -1;
-			}
+		{
+			int lmj = RB.m_LM[j];
+			if      (lmj == DOF_OPEN      ) { RB.m_LM[j] =  neq  ; neq++; }
+			else if (lmj == DOF_PRESCRIBED) { RB.m_LM[j] = -neq-2; neq++; }
+			else if (lmj == DOF_FIXED     ) RB.m_LM[j] = -1;
+			else { assert(false); return false; }
+		}
 	}
 
 	// store the number of equations
@@ -307,26 +306,12 @@ bool FESolidSolver2::InitEquations()
 		if (node.m_rid >= 0)
 		{
 			FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(node.m_rid));
-			node.m_ID[DOF_X] = -RB.m_LM[0]-2;
-			node.m_ID[DOF_Y] = -RB.m_LM[1]-2;
-			node.m_ID[DOF_Z] = -RB.m_LM[2]-2;
-			node.m_ID[DOF_RU] = -RB.m_LM[3]-2;
-			node.m_ID[DOF_RV] = -RB.m_LM[4]-2;
-			node.m_ID[DOF_RW] = -RB.m_LM[5]-2;
-		}
-	}
-
-	// adjust the rigid dofs that are prescribed
-	for (i=0; i<nrb; ++i)
-	{
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
-		for (j=0; j<6; ++j)
-		{
-			n = RB.m_LM[j];
-			if (RB.m_pDC[j] && RB.m_pDC[j]->IsActive()) RB.m_LM[j] = -n - 2;
-
-			// rigid bodies that parents also required prescribed displacement conditions
-			if (RB.m_prb) RB.m_LM[j] = -n-2;
+			node.m_ID[DOF_X ] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0]-2 : RB.m_LM[0]);
+			node.m_ID[DOF_Y ] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1]-2 : RB.m_LM[1]);
+			node.m_ID[DOF_Z ] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2]-2 : RB.m_LM[2]);
+			node.m_ID[DOF_RU] = (RB.m_LM[3] >= 0 ? -RB.m_LM[3]-2 : RB.m_LM[3]);
+			node.m_ID[DOF_RV] = (RB.m_LM[4] >= 0 ? -RB.m_LM[4]-2 : RB.m_LM[4]);
+			node.m_ID[DOF_RW] = (RB.m_LM[5] >= 0 ? -RB.m_LM[5]-2 : RB.m_LM[5]);
 		}
 	}
 
@@ -671,7 +656,7 @@ void FESolidSolver2::UpdateRigidBodies(vector<double>& ui)
 				{
 					int lc = pdc->lc;
 					// TODO: do I need to take the line search step into account here?
-					du[j] = pdc->Value();
+					du[j] = (lc < 0 ? 0 : pdc->Value() - RB.m_Up[j]);
 				}
 				else 
 				{

@@ -147,9 +147,8 @@ void FERigidBodyDisplacement::Activate()
 	// set some stuff
 	RB.m_pDC[bc] = this;
 
-	// make sure this dof is free
-	// I don't think this is necessary since all rigid DOFs are active by default.
-	RB.m_LM[bc] = 0;		
+	// mark the dof as prescribed
+	RB.m_LM[bc] = DOF_PRESCRIBED;
 
 	// set the relative offset
 	ref = 0.0;
@@ -179,6 +178,7 @@ void FERigidBodyDisplacement::Deactivate()
 
 		// turn off the prescribed displacement
 		RB.m_pDC[bc] = 0;
+		RB.m_LM[bc] = DOF_OPEN;
 	}
 }
 

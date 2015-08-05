@@ -112,11 +112,12 @@ bool FEBiphasicAnalysis::Activate()
 	FEAnalysis::Activate();
 
 	// clear the active rigid body BC's
+	// (don't overwrite prescribed displacements)
 	int NRB = m_fem.Objects();
 	for (int i=0; i<NRB; ++i)
 	{
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
-		for (int j=0; j<6; ++j) RB.m_LM[j] = 0;
+		for (int j=0; j<6; ++j) if (RB.m_LM[j] != DOF_PRESCRIBED) RB.m_LM[j] = DOF_OPEN;
 	}
 
 	// set the fixed rigid body BC's
@@ -125,7 +126,7 @@ bool FEBiphasicAnalysis::Activate()
 	{
 		FERigidBodyFixedBC* pbc = m_fem.m_RBC[i];
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(pbc->id));
-		if (pbc->IsActive() && (RB.m_pDC[pbc->bc]==0)) RB.m_LM[pbc->bc] = -1;
+		if (pbc->IsActive() && (RB.m_LM[pbc->bc] != DOF_PRESCRIBED)) RB.m_LM[pbc->bc] = DOF_FIXED;
 	}
 
 	// reset nodal ID's

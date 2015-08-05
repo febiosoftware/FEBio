@@ -24,6 +24,7 @@ FERigidBody::FERigidBody(FEModel* pfem) : FEObject(pfem)
 	for (int i=0; i<6; ++i)
 	{
 		m_pDC[i] = 0;
+		m_LM[i] = DOF_OPEN;
 	}
 	m_prb = 0;
 
