@@ -527,7 +527,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 				{
 					int lc = pdc->lc;
 					// TODO: do I need to take the line search step into account here?
-					du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc)->Value() - RB.m_Up[j] + pdc->ref);
+					du[j] = (lc < 0? 0 : pdc->Value() - RB.m_Up[j] + pdc->ref);
 				}
 				else 
 				{
@@ -552,7 +552,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 				{
 					int lc = pdc->lc;
 					// TODO: do I need to take the line search step into account here?
-					du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc)->Value() - RB.m_Up[j]);
+					du[j] = (lc < 0? 0 : pdc->Value() - RB.m_Up[j]);
 				}
 				else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + ui[lm[j]] : 0);
 			}
@@ -816,7 +816,7 @@ void FEExplicitSolidSolver::PrepStep(double time)
 			int lc = DC.lc;
 			if (lc >= 0)
 			{
-				RB.m_dul[I] = DC.sf*m_fem.GetLoadCurve(lc)->Value() - RB.m_Ut[DC.bc];
+				RB.m_dul[I] = DC.Value() - RB.m_Ut[DC.bc];
 			}
 		}
 	}

@@ -177,41 +177,16 @@ bool FEMultiphasicAnalysis::Activate()
 	for (int i=0; i<NRB; ++i)
 	{
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
-		for (int j=0; j<6; ++j)
-		{
-			RB.m_pDC[j] = 0;
-			RB.m_LM[j] = 0;
-		}
+		for (int j=0; j<6; ++j)	RB.m_LM[j] = 0;
 	}
 
 	// set the fixed rigid body BC's
+	// (don't overwrite prescribed displacements)
 	for (int i=0;i<(int) m_fem.m_RBC.size(); ++i)
 	{
 		FERigidBodyFixedBC* pbc = m_fem.m_RBC[i];
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(pbc->id));
-		if (pbc->IsActive()) RB.m_LM[pbc->bc] = -1;
-	}
-
-	// set the active rigid bodies BC's
-	for (int i=0; i<(int) m_fem.m_RDC.size(); ++i)
-	{
-		FERigidBodyDisplacement& DC = *(m_fem.m_RDC[i]);
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(DC.id));
-		if (DC.IsActive())
-		{
-			RB.m_pDC[DC.bc] = &DC;
-			RB.m_LM[DC.bc] = 0;		// make sure this dof is free
-			DC.ref = 0.0;
-			if (DC.brel)
-			{
-				switch (DC.bc)
-				{
-				case 0: DC.ref = RB.m_rt.x - RB.m_r0.x; break;
-				case 1: DC.ref = RB.m_rt.y - RB.m_r0.y; break;
-				case 2: DC.ref = RB.m_rt.z - RB.m_r0.z; break;
-				}
-			}
-		}
+		if (pbc->IsActive() && (RB.m_pDC[pbc->bc]==0)) RB.m_LM[pbc->bc] = -1;
 	}
 
 	// reset nodal ID's

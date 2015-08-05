@@ -103,7 +103,7 @@ public:
 class FERigidBodyDisplacement : public FEBoundaryCondition
 {
 public:
-	FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem) { ref= 0.0; brel = false; }
+	FERigidBodyDisplacement(FEModel* pfem);
 
 	bool Init();
 
@@ -111,7 +111,9 @@ public:
 
 	void Serialize(DumpFile& ar);
 
-//	void Activate();
+	void Activate();
+
+	void Deactivate();
 
 public:
 	int		id;		//!< rigid body id
@@ -120,6 +122,9 @@ public:
 	double	sf;		//!< scale factor
 	double	ref;	//!< reference value for relative displacement
 	bool	brel;	//!< relative displacement flag
+
+private:
+	bool	m_binit;	//!init flag
 };
 
 //-----------------------------------------------------------------------------

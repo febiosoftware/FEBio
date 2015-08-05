@@ -159,21 +159,18 @@ bool FEBiphasicSoluteAnalysis::Activate()
 	for (int i=0; i<NRB; ++i)
 	{
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
-		for (int j=0; j<6; ++j)
-		{
-			RB.m_pDC[j] = 0;
-			RB.m_LM[j] = 0;
-		}
+		for (int j=0; j<6; ++j) RB.m_LM[j] = 0;
 	}
 
 	// set the fixed rigid body BC's
+	// (don't overwrite prescribed displacements)
 	for (int i=0;i<(int) m_fem.m_RBC.size(); ++i)
 	{
 		FERigidBodyFixedBC* pbc = m_fem.m_RBC[i];
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(pbc->id));
-		if (pbc->IsActive()) RB.m_LM[pbc->bc] = -1;
+		if (pbc->IsActive() && (RB.m_pDC[pbc->bc]==0)) RB.m_LM[pbc->bc] = -1;
 	}
-
+/*
 	// set the active rigid bodies BC's
 	for (int i=0; i<(int) m_fem.m_RDC.size(); ++i)
 	{
@@ -195,6 +192,7 @@ bool FEBiphasicSoluteAnalysis::Activate()
 			}
 		}
 	}
+*/
 
 	// reset nodal ID's
 	InitNodes();

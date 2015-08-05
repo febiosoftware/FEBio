@@ -442,6 +442,8 @@ bool FEModel::InitObjects()
 	{
 		FERigidBodyDisplacement& DC = *m_RDC[i];
 		if (DC.Init() == false) return false;
+		
+		if (DC.IsActive()) DC.Activate();
 	}
 	for (int i=0; i<(int) m_RBV.size(); ++i)
 	{

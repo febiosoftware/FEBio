@@ -234,8 +234,6 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
 				{
-					int n = fem.m_RDC.size()-1;
-					FERigidBodyDisplacement* pDC = fem.m_RDC[n];
 					pStep->AddModelComponent(pDC);
 					pDC->Deactivate();
 				}

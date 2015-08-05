@@ -116,16 +116,25 @@ void FERigidBodyFixedBC::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+FERigidBodyDisplacement::FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+{
+	id = -1;
+	ref= 0.0; 
+	brel = false; 
+	m_binit = false;
+}
+
+//-----------------------------------------------------------------------------
 bool FERigidBodyDisplacement::Init()
 {
 	FEModel& fem = *GetFEModel();
 	FEMaterial* pm = fem.GetMaterial(id-1);
 	id = pm->GetRigidBodyID(); if (id < 0) return false;
+	m_binit = true;
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-/*
 void FERigidBodyDisplacement::Activate()
 {
 	// don't forget to call the base class
@@ -137,7 +146,10 @@ void FERigidBodyDisplacement::Activate()
 
 	// set some stuff
 	RB.m_pDC[bc] = this;
-	RB.m_BC[bc] = 1;
+
+	// make sure this dof is free
+	// I don't think this is necessary since all rigid DOFs are active by default.
+	RB.m_LM[bc] = 0;		
 
 	// set the relative offset
 	ref = 0.0;
@@ -148,9 +160,27 @@ void FERigidBodyDisplacement::Activate()
 		case 0: ref = RB.m_rt.x - RB.m_r0.x; break;
 		case 1: ref = RB.m_rt.y - RB.m_r0.y; break;
 		case 2: ref = RB.m_rt.z - RB.m_r0.z; break;
+		}
 	}
 }
-*/
+
+//-----------------------------------------------------------------------------
+void FERigidBodyDisplacement::Deactivate()
+{
+	FEBoundaryCondition::Deactivate();
+
+	// get the rigid body
+	// Since Deactivate is called before Init (for multi-step analysis; in the FEBio input)
+	// we have to make sure the data is initialized
+	if (m_binit)
+	{
+		FEModel& fem = *GetFEModel();
+		FERigidBody& RB = static_cast<FERigidBody&>(*fem.Object(id));
+
+		// turn off the prescribed displacement
+		RB.m_pDC[bc] = 0;
+	}
+}
 
 //-----------------------------------------------------------------------------
 void FERigidBodyDisplacement::Serialize(DumpFile& ar)
@@ -164,6 +194,14 @@ void FERigidBodyDisplacement::Serialize(DumpFile& ar)
 	{
 		ar >> bc >> id >> lc >> sf;
 	}
+}
+
+//-----------------------------------------------------------------------------
+double FERigidBodyDisplacement::Value()
+{
+	FEModel& fem = *GetFEModel();
+	if (lc < 0) return 0;
+	else return sf*fem.GetLoadCurve(lc)->Value() + ref;
 }
 
 //-----------------------------------------------------------------------------
@@ -230,12 +268,4 @@ void FERigidNode::Serialize(DumpFile& ar)
 	{
 		ar >> nid >> rid;		
 	}
-}
-
-//-----------------------------------------------------------------------------
-double FERigidBodyDisplacement::Value()
-{
-	FEModel& fem = *GetFEModel();
-	if (lc < 0) return 0;
-	else return sf*fem.GetLoadCurve(lc)->Value() + ref;
 }
