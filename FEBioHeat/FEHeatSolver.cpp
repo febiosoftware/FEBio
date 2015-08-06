@@ -151,7 +151,10 @@ bool FEHeatSolver::InitEquations()
 		for (int i=0; i<mesh.Nodes(); ++i)
 		{
 			FENode& node = mesh.Node(P[i]);
-			if (node.m_ID[DOF_T] >= 0) node.m_ID[DOF_T] = neq++;
+			if      (node.m_ID[DOF_T] == DOF_FIXED     ) { node.m_ID[DOF_T] = -1; }
+			else if (node.m_ID[DOF_T] == DOF_OPEN      ) { node.m_ID[DOF_T] =  neq++; }
+			else if (node.m_ID[DOF_T] == DOF_PRESCRIBED) { node.m_ID[DOF_T] = -neq-2; neq++; }
+			else { assert(false); return false; }
 		}
 	}
 	else
@@ -160,7 +163,10 @@ bool FEHeatSolver::InitEquations()
 		for (int i=0; i<mesh.Nodes(); ++i)
 		{
 			FENode& node = mesh.Node(i);
-			if (node.m_ID[DOF_T] >= 0) node.m_ID[DOF_T] = neq++;
+			if      (node.m_ID[DOF_T] == DOF_FIXED     ) { node.m_ID[DOF_T] = -1; }
+			else if (node.m_ID[DOF_T] == DOF_OPEN      ) { node.m_ID[DOF_T] =  neq++; }
+			else if (node.m_ID[DOF_T] == DOF_PRESCRIBED) { node.m_ID[DOF_T] = -neq-2; neq++; }
+			else { assert(false); return false; }
 		}
 	}
 

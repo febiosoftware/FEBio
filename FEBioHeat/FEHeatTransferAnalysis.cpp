@@ -21,10 +21,10 @@ bool FEHeatTransferAnalysis::Activate()
 		FENode& node = mesh.Node(i);
 
 		// fix all degrees of freedom
-		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = -1;
+		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = DOF_FIXED;
 
 		// open the temperature dof
-		node.m_ID[DOF_T] = 0;
+		node.m_ID[DOF_T] = DOF_OPEN;
 	}
 
 	// apply fixed dofs
@@ -32,6 +32,18 @@ bool FEHeatTransferAnalysis::Activate()
 	{
 		FEFixedBC& bc = *m_fem.FixedBC(i);
 		bc.Activate();
+	}
+
+	// apply prescribed dofs
+	int ndis = m_fem.PrescribedBCs();
+	for (int i=0; i<ndis; ++i)
+	{
+		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
+		if (DC.IsActive())
+		{
+			FENode& node = m_fem.GetMesh().Node(DC.node);
+			if (DC.bc == DOF_T) node.m_ID[DC.bc] = DOF_PRESCRIBED;
+		}
 	}
 
 	// initialize equations
@@ -46,7 +58,6 @@ bool FEHeatTransferAnalysis::Activate()
 	// Now we adjust the equation numbers of prescribed dofs according to the above rule
 	// Make sure that a prescribed dof has not been fixed
 	// TODO: maybe this can be moved to the FESolver::InitEquations function
-	int ndis = m_fem.PrescribedBCs();
 	for (int i=0; i<ndis; ++i)
 	{
 		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
@@ -60,9 +71,7 @@ bool FEHeatTransferAnalysis::Activate()
 		{
 			if (bc == DOF_T)
 			{
-				int n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = 0;
+				DC.r = (br ? node.m_T    - node.m_T0   : 0);
 			}
 		}
 	}

@@ -82,6 +82,7 @@ public:
     vec3d   m_alp;  //!< previous angular acceleration of rigid body
     vec3d   m_alt;  //!< current angular acceleration of rigid body
     
+	int		m_BC[6];	//!< DOF types
 	int		m_LM[6];	//!< dof equation numbers
 	double	m_Up[6];	//!< previous displacement/rotation vector
 	double	m_Ut[6];	//!< total displacement/rotation vector

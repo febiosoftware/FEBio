@@ -200,7 +200,12 @@ bool FEExplicitSolidSolver::InitEquations()
 	{
 		FENode& node = mesh.Node(i);
 		for (j=0; j<MAX_NDOFS; ++j)
-			if (node.m_ID[j] >= 0) node.m_ID[j] = neq++;
+		{
+			if      (node.m_ID[j] == DOF_FIXED     ) { node.m_ID[j] = -1; }
+			else if (node.m_ID[j] == DOF_OPEN      ) { node.m_ID[j] =  neq++; }
+			else if (node.m_ID[j] == DOF_PRESCRIBED) { node.m_ID[j] = -neq-2; neq++; }
+			else { assert(false); return false; }
+		}
 	}
 
 	// Next, we assign equation numbers to the rigid body degrees of freedom
@@ -211,11 +216,11 @@ bool FEExplicitSolidSolver::InitEquations()
 		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
 		for (j=0; j<6; ++j)
 		{
+			int bcj = RB.m_BC[j];
 			int lmj = RB.m_LM[j];
-			if      (lmj == DOF_OPEN      ) { RB.m_LM[j] =  neq  ; neq++; }
-			else if (lmj == DOF_PRESCRIBED) { RB.m_LM[j] = -neq-2; neq++; }
-			else if (lmj == DOF_FIXED     ) RB.m_LM[j] = -1;
-			else { assert(false); return false; }
+			if      (bcj == DOF_OPEN      ) { RB.m_LM[j] =  neq  ; neq++; }
+			else if (bcj == DOF_PRESCRIBED) { RB.m_LM[j] = -neq-2; neq++; }
+			else if (bcj == DOF_FIXED     ) { RB.m_LM[j] = -1; }
 		}
 	}
 

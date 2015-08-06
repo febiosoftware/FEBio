@@ -50,6 +50,18 @@ bool FEThermoElasticAnalysis::Activate()
 		bc.Activate();
 	}
 
+	// apply prescribed dofs
+	int ndis = m_fem.PrescribedBCs();
+	for (int i=0; i<ndis; ++i)
+	{
+		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
+		if (DC.IsActive())
+		{
+			FENode& node = m_fem.GetMesh().Node(DC.node);
+			node.m_ID[DC.bc] = DOF_PRESCRIBED;
+		}
+	}
+
 	// initialize equations
 	// ----->
 	if (m_psolver->InitEquations() == false) return false;
@@ -62,7 +74,6 @@ bool FEThermoElasticAnalysis::Activate()
 	// Now we adjust the equation numbers of prescribed dofs according to the above rule
 	// Make sure that a prescribed dof has not been fixed
 	// TODO: maybe this can be moved to the FESolver::InitEquations function
-	int ndis = m_fem.PrescribedBCs(), n;
 	for (int i=0; i<ndis; ++i)
 	{
 		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
@@ -76,26 +87,10 @@ bool FEThermoElasticAnalysis::Activate()
 		{
 			switch (bc)
 			{
-			case DOF_X: // x-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.x - node.m_r0.x : 0;
-				break;
-			case DOF_Y: // y-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.y - node.m_r0.y : 0;
-				break;
-			case DOF_Z: // z-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.z - node.m_r0.z : 0;
-				break;
-			case DOF_T:
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_T - node.m_T0 : 0;
-				break;
+			case DOF_X: DC.r = br ? node.m_rt.x - node.m_r0.x : 0; break;
+			case DOF_Y: DC.r = br ? node.m_rt.y - node.m_r0.y : 0; break;
+			case DOF_Z: DC.r = br ? node.m_rt.z - node.m_r0.z : 0; break;
+			case DOF_T: DC.r = br ? node.m_T    - node.m_T0   : 0; break;
 			}
 		}
 	}
@@ -104,14 +99,7 @@ bool FEThermoElasticAnalysis::Activate()
 	if (m_fem.m_LinC.size())
 	{
 		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
-		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il)
-		{
-			list<FELinearConstraint::SlaveDOF>::iterator is = il->slave.begin();
-			for (int i=0; i<(int) il->slave.size(); ++i, ++is)
-			{
-				is->neq = m_fem.GetMesh().Node(is->node).m_ID[is->bc];
-			}
-		}
+		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il) il->Activate();
 	}
 
 	// modify the (aug lag) nonlinear constraints

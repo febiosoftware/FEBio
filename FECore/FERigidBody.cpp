@@ -24,7 +24,8 @@ FERigidBody::FERigidBody(FEModel* pfem) : FEObject(pfem)
 	for (int i=0; i<6; ++i)
 	{
 		m_pDC[i] = 0;
-		m_LM[i] = DOF_OPEN;
+		m_LM[i] = -1;
+		m_BC[i] = DOF_OPEN;
 	}
 	m_prb = 0;
 
@@ -85,6 +86,14 @@ void FERigidBody::Reset()
 	// reset reaction force and torque
 	m_Fr = vec3d(0,0,0);
 	m_Mr = vec3d(0,0,0);
+
+	// reset degree of freedom data
+	for (int i=0; i<6; ++i)
+	{
+		m_BC[i] = DOF_OPEN;
+		m_LM[i] = -1;
+		m_pDC[i] = 0;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -284,6 +293,7 @@ void FERigidBody::Serialize(DumpFile& ar)
 		ar << m_r0 << m_rt << m_rp << m_vt << m_vp << m_at << m_ap;
         ar << m_qt << m_qp << m_wt << m_wp << m_alt << m_alp;
 		ar << m_bpofr;
+		ar.write(m_BC , sizeof(int), 6);
 		ar.write(m_LM , sizeof(int), 6);
 		ar.write(m_Up , sizeof(double), 6);
 		ar.write(m_Ut , sizeof(double), 6);
@@ -296,6 +306,7 @@ void FERigidBody::Serialize(DumpFile& ar)
 		ar >> m_r0 >> m_rt >> m_rp >> m_vt >> m_vp >> m_at >> m_ap;
         ar >> m_qt >> m_qp >> m_wt >> m_wp >> m_alt >> m_alp;
 		ar >> m_bpofr;
+		ar.read(m_BC , sizeof(int), 6);
 		ar.read(m_LM , sizeof(int   ), 6);
 		ar.read(m_Up , sizeof(double), 6);
 		ar.read(m_Ut , sizeof(double), 6);

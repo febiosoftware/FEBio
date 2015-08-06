@@ -141,9 +141,9 @@ bool FELinearSolidSolver::InitEquations()
 		for (int i=0; i<mesh.Nodes(); ++i)
 		{
 			FENode& node = mesh.Node(P[i]);
-			if (node.m_ID[DOF_X] >= 0) node.m_ID[DOF_X] = neq++;
-			if (node.m_ID[DOF_Y] >= 0) node.m_ID[DOF_Y] = neq++;
-			if (node.m_ID[DOF_Z] >= 0) node.m_ID[DOF_Z] = neq++;
+			if (node.m_ID[DOF_X] != DOF_FIXED) node.m_ID[DOF_X] = neq++;
+			if (node.m_ID[DOF_Y] != DOF_FIXED) node.m_ID[DOF_Y] = neq++;
+			if (node.m_ID[DOF_Z] != DOF_FIXED) node.m_ID[DOF_Z] = neq++;
 		}
 	}
 	else
@@ -152,9 +152,9 @@ bool FELinearSolidSolver::InitEquations()
 		for (int i=0; i<mesh.Nodes(); ++i)
 		{
 			FENode& node = mesh.Node(i);
-			if (node.m_ID[DOF_X] >= 0) node.m_ID[DOF_X] = neq++;
-			if (node.m_ID[DOF_Y] >= 0) node.m_ID[DOF_Y] = neq++;
-			if (node.m_ID[DOF_Z] >= 0) node.m_ID[DOF_Z] = neq++;
+			if (node.m_ID[DOF_X] != DOF_FIXED) node.m_ID[DOF_X] = neq++;
+			if (node.m_ID[DOF_Y] != DOF_FIXED) node.m_ID[DOF_Y] = neq++;
+			if (node.m_ID[DOF_Z] != DOF_FIXED) node.m_ID[DOF_Z] = neq++;
 		}
 	}
 

@@ -57,9 +57,24 @@ void FEMultiphasicAnalysis::InitNodes()
 		bc.Activate();
 	}
 
+	// apply prescribed dofs
+	int ndis = m_fem.PrescribedBCs();
+	for (int i=0; i<ndis; ++i)
+	{
+		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
+		if (DC.IsActive())
+		{
+			FENode& node = m_fem.GetMesh().Node(DC.node);
+			node.m_ID[DC.bc] = DOF_PRESCRIBED;
+		}
+	}
+
 	// fix all mixture dofs that are not used that is, that are not part of a biphasic material.
-	// This is done in three steps.
-	// step 1. mark all pressure nodes
+	const int NN = mesh.Nodes();
+	vector<int> tag;
+
+	// do the pressure dofs first
+	tag.assign(NN, 0);
 	for (int nd = 0; nd<mesh.Domains(); ++nd)
 	{
 		FEDomain& dom = mesh.Domain(nd);
@@ -75,88 +90,81 @@ void FEMultiphasicAnalysis::InitNodes()
 				int N = el.Nodes();
 				int* n = &el.m_node[0];
 				for (int j=0; j<N; ++j) 
-					if (mesh.Node(n[j]).m_ID[DOF_P] == 0) mesh.Node(n[j]).m_ID[DOF_P] = 1;
+					if (mesh.Node(n[j]).m_ID[DOF_P] != DOF_FIXED) tag[ n[j] ] = 1;
 			}
 		}
-		if (bsm)
+	}
+
+	// fix pressure dofs of all unmarked nodes
+	for (int nd = 0; nd<mesh.Domains(); ++nd)
+	{
+		FEDomain& dom = mesh.Domain(nd);
+		for (int i=0; i<dom.Elements(); ++i)
 		{
-			for (int i=0; i<dom.Elements(); ++i)
-			{
-				FEElement& el = dom.ElementRef(i);
-				int N = el.Nodes();
-				int* n = &el.m_node[0];
-				for (int j=0; j<N; ++j) {
-					int dofc = DOF_C + bsm->GetSolute()->GetSoluteID();
-					if (mesh.Node(n[j]).m_ID[dofc] == 0) mesh.Node(n[j]).m_ID[dofc] = 1;
-				}
+			FEElement& el = dom.ElementRef(i);
+			int N = el.Nodes();
+			int* n = &el.m_node[0];
+			for (int j=0; j<N; ++j) {
+				if (tag[ n[j] ] != 1) mesh.Node(n[j]).m_ID[DOF_P] = DOF_FIXED;
 			}
 		}
-		else if (btm)
+	}
+
+	// now do the concentration dofs
+	for (int k=0; k<MAX_CDOFS; ++k)
+	{
+		int dofc = DOF_C + k;
+		tag.assign(NN, 0);
+		for (int nd = 0; nd<mesh.Domains(); ++nd)
 		{
-			for (int i=0; i<dom.Elements(); ++i)
+			FEDomain& dom = mesh.Domain(nd);
+
+			// get the material
+			FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(dom.GetMaterial());
+			FETriphasic*      btm = dynamic_cast<FETriphasic*     >(dom.GetMaterial());
+			FEMultiphasic*    bmm = dynamic_cast<FEMultiphasic*   >(dom.GetMaterial());
+
+			// see if the material has this dof
+			bool has_c = false;
+			if (bsm && (dofc == DOF_C + bsm->GetSolute()->GetSoluteID())) has_c = true;
+			if (btm)
 			{
-				FEElement& el = dom.ElementRef(i);
-				int N = el.Nodes();
-				int* n = &el.m_node[0];
-				for (int j=0; j<N; ++j) {
-					for (int k=0; k<2; ++k) {
-						int dofc = DOF_C + btm->m_pSolute[k]->GetSoluteID();
-						if (mesh.Node(n[j]).m_ID[dofc] == 0) mesh.Node(n[j]).m_ID[dofc] = 1;
-					}
-				}
+				if (dofc == DOF_C + btm->m_pSolute[0]->GetSoluteID()) has_c = true;
+				if (dofc == DOF_C + btm->m_pSolute[1]->GetSoluteID()) has_c = true;
 			}
-		}
-		else if (bmm)
-		{
-			for (int i=0; i<dom.Elements(); ++i)
+			if (bmm)
 			{
-				FEElement& el = dom.ElementRef(i);
-				int N = el.Nodes();
-				int* n = &el.m_node[0];
 				int nsol = bmm->Solutes();
-				for (int j=0; j<N; ++j) {
-					for (int k=0; k<nsol; ++k) {
-						int dofc = DOF_C + bmm->GetSolute(k)->GetSoluteID();
-						if (mesh.Node(n[j]).m_ID[dofc] == 0) mesh.Node(n[j]).m_ID[dofc] = 1;
+				for (int l=0; l<nsol; ++l)
+					if (dofc == DOF_C + bmm->GetSolute(l)->GetSoluteID()) has_c = true;
+			}
+
+			// if so, mark all non-fixed dofs
+			if (has_c)
+			{
+				for (int i=0; i<dom.Elements(); ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					int N = el.Nodes();
+					int* n = &el.m_node[0];
+					for (int j=0; j<N; ++j) {
+						if (mesh.Node(n[j]).m_ID[dofc] != DOF_FIXED) tag[ n[j] ] = 1;
 					}
 				}
 			}
-		}	
-	}
-	
-	// step 2. fix pressure dofs of all unmarked nodes
-	for (int nd = 0; nd<mesh.Domains(); ++nd)
-	{
-		FEDomain& dom = mesh.Domain(nd);
-		for (int i=0; i<dom.Elements(); ++i)
-		{
-			FEElement& el = dom.ElementRef(i);
-			int N = el.Nodes();
-			int* n = &el.m_node[0];
-			for (int j=0; j<N; ++j) {
-				if (mesh.Node(n[j]).m_ID[DOF_P] != 1) mesh.Node(n[j]).m_ID[DOF_P] = -1;
-				for (int k=0; k<MAX_CDOFS; ++k) {
-					int dofc = DOF_C + k;
-					if (mesh.Node(n[j]).m_ID[dofc] != 1) mesh.Node(n[j]).m_ID[dofc] = -1;
-				}
-			}
 		}
-	}
 	
-	// step 3. free all marked dofs
-	for (int nd = 0; nd<mesh.Domains(); ++nd)
-	{
-		FEDomain& dom = mesh.Domain(nd);
-		for (int i=0; i<dom.Elements(); ++i)
+		// step 2. fix concentration dofs of all unmarked nodes
+		for (int nd = 0; nd<mesh.Domains(); ++nd)
 		{
-			FEElement& el = dom.ElementRef(i);
-			int N = el.Nodes();
-			int* n = &el.m_node[0];
-			for (int j=0; j<N; ++j) {
-				if (mesh.Node(n[j]).m_ID[DOF_P] == 1) mesh.Node(n[j]).m_ID[DOF_P] = 0;
-				for (int k=0; k<MAX_CDOFS; ++k) {
-					int dofc = DOF_C + k;
-					if (mesh.Node(n[j]).m_ID[dofc] == 1) mesh.Node(n[j]).m_ID[dofc] = 0;
+			FEDomain& dom = mesh.Domain(nd);
+			for (int i=0; i<dom.Elements(); ++i)
+			{
+				FEElement& el = dom.ElementRef(i);
+				int N = el.Nodes();
+				int* n = &el.m_node[0];
+				for (int j=0; j<N; ++j) {
+					if (tag[ n[j] ] != 1) mesh.Node(n[j]).m_ID[dofc] = DOF_FIXED;
 				}
 			}
 		}
@@ -172,50 +180,8 @@ bool FEMultiphasicAnalysis::Activate()
 	// initialize base class data
 	FEAnalysis::Activate();
 
-	// clear the active rigid body BC's
-	// (don't overwrite prescribed displacements)
-	int NRB = m_fem.Objects();
-	for (int i=0; i<NRB; ++i)
-	{
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
-		for (int j=0; j<6; ++j) if (RB.m_LM[j] != DOF_PRESCRIBED) RB.m_LM[j] = DOF_OPEN;
-	}
-
-	// set the fixed rigid body BC's
-	// (don't overwrite prescribed displacements)
-	for (int i=0;i<(int) m_fem.m_RBC.size(); ++i)
-	{
-		FERigidBodyFixedBC* pbc = m_fem.m_RBC[i];
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(pbc->id));
-		if (pbc->IsActive() && (RB.m_LM[pbc->bc] != DOF_PRESCRIBED)) RB.m_LM[pbc->bc] = DOF_FIXED;
-	}
-
 	// reset nodal ID's
 	InitNodes();
-
-	// override prescribed displacements for rigid nodes
-	bool bdisp = false;
-	int nbc = m_fem.PrescribedBCs();
-	for (int i=0; i<nbc; ++i)
-	{
-		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
-		if (dc.IsActive())
-		{
-			// if the node is not free we don't use this prescribed displacement
-			// note that we don't do this for prescribed pressures and concentrations
-			if ((dc.bc != DOF_P) && (dc.bc < DOF_C))
-			{
-				FENode& node = m_fem.GetMesh().Node(dc.node);
-				if (node.m_rid >= 0) 
-				{
-					dc.Deactivate();
-					bdisp = true;
-				}
-			}
-		}
-	}
-
-	if (bdisp) felog.printbox("WARNING", "Rigid degrees of freedom cannot be prescribed.");
 
 	// initialize equations
 	// ----->
@@ -241,66 +207,17 @@ bool FEMultiphasicAnalysis::Activate()
 
 		if (DC.IsActive())
 		{
-			int n;
 			switch (bc)
 			{
-			case DOF_X: // x-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.x - node.m_r0.x : 0;
-				break;
-			case DOF_Y: // y-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.y - node.m_r0.y : 0;
-				break;
-			case DOF_Z: // z-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.z - node.m_r0.z : 0;
-				break;
-			case DOF_U: // x-rotation
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_Dt.x - node.m_D0.x : 0;
-				break;
-			case DOF_V: // y-rotation
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_Dt.y - node.m_D0.y : 0;
-				break;
-			case DOF_W: // z-rotation
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_Dt.z - node.m_D0.z : 0;
-				break;
-			case DOF_P: // prescribed pressure
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_pt - node.m_p0 : 0;
-				break;
-/*			case DOF_C: // precribed concentration
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_ct[0] - node.m_c0[0] : 0;
-				break;
-			case DOF_C+1: // precribed concentration
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_ct[1] - node.m_c0[1] : 0;
-				break;*/
-				//--> TODO: change bc=20 to something else
-			case 20: // y-z radial displacement
-				n = node.m_ID[DOF_Y];
-				node.m_ID[DOF_Y] = (n<0?n:-n-2);
-				n = node.m_ID[DOF_Z];
-				node.m_ID[DOF_Z] = (n<0?n:-n-2);
-				DC.r = 0;
-				break;
+			case DOF_X: DC.r = br ? node.m_rt.x - node.m_r0.x : 0; break;
+			case DOF_Y: DC.r = br ? node.m_rt.y - node.m_r0.y : 0; break;
+			case DOF_Z: DC.r = br ? node.m_rt.z - node.m_r0.z : 0; break;
+			case DOF_U: DC.r = br ? node.m_Dt.x - node.m_D0.x : 0; break;
+			case DOF_V: DC.r = br ? node.m_Dt.y - node.m_D0.y : 0; break;
+			case DOF_W: DC.r = br ? node.m_Dt.z - node.m_D0.z : 0; break;
+			case DOF_P: DC.r = br ? node.m_pt   - node.m_p0   : 0; break;
 			default:	// all prescribed concentrations
 				if ((bc >= DOF_C) && (bc < (int)node.m_ID.size())) {
-					n = node.m_ID[bc];
-					node.m_ID[bc] = (n<0?n:-n-2);
 					int sid = bc - DOF_C;
 					DC.r = br ? node.m_ct[sid] - node.m_c0[sid] : 0;
 				}
@@ -312,14 +229,7 @@ bool FEMultiphasicAnalysis::Activate()
 	if (m_fem.m_LinC.size())
 	{
 		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
-		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il)
-		{
-			list<FELinearConstraint::SlaveDOF>::iterator is = il->slave.begin();
-			for (int i=0; i<(int) il->slave.size(); ++i, ++is)
-			{
-				is->neq = m_fem.GetMesh().Node(is->node).m_ID[is->bc];
-			}
-		}
+		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il) il->Activate();
 	}
 
 	// modify the (aug lag) nonlinear constraints

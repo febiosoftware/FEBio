@@ -69,12 +69,27 @@ void FEFixedBC::Activate()
 //-----------------------------------------------------------------------------
 bool FEPrescribedBC::Init()
 {
-	int NLC = GetFEModel()->LoadCurves();
+	// don't forget to call the base class
+	if (FEBoundaryCondition::Init() == false) return false;
+
+	// check the load curve ID
+	FEModel& fem = *GetFEModel();
+	int NLC = fem.LoadCurves();
 	if ((lc < 0)||(lc >= NLC))
 	{
 		felog.printf("ERROR: Invalid loadcurve in prescribed BC %d\n", GetID());
 		return false;
 	}
+
+	// make sure this is not a rigid node
+	FEMesh& mesh = fem.GetMesh();
+	if ((node < 0) || (node >= mesh.Nodes())) return false;
+	if (mesh.Node(node).m_rid != -1) 
+	{
+		felog.printf("ERROR: Rigid nodes cannot be prescribed.\n");
+		return false;
+	}
+
 	return true;
 }
 
@@ -93,12 +108,56 @@ void FEPrescribedBC::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+FERigidBodyFixedBC::FERigidBodyFixedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+{
+	id = -1;
+	bc = -1;
+	m_binit = false;
+}
+
+//-----------------------------------------------------------------------------
 bool FERigidBodyFixedBC::Init()
 {
+	// At this point, the id variable points to the material.
+	// We need to associate it with a rigid body.
 	FEModel& fem = *GetFEModel();
 	FEMaterial* pm = fem.GetMaterial(id-1);
 	id = pm->GetRigidBodyID(); if (id < 0) return false;
+
+	// make sure we have a valid dof
+	if ((bc < 0)||(bc>=6)) return false;
+
+	m_binit = true;
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidBodyFixedBC::Activate()
+{
+	FEModel& fem = *GetFEModel();
+	if (m_binit)
+	{
+		FERigidBody& RB = static_cast<FERigidBody&>(*fem.Object(id));
+
+		// we only fix the open dofs. If a user accidentally applied a fixed and prescribed
+		// rigid degree of freedom, then we make sure the prescribed takes precedence.
+		if (RB.m_BC[bc] == DOF_OPEN) RB.m_BC[bc] = DOF_FIXED;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FERigidBodyFixedBC::Deactivate()
+{
+	FEModel& fem = *GetFEModel();
+
+	if (m_binit)
+	{
+		FERigidBody& RB = static_cast<FERigidBody&>(*fem.Object(id));
+
+		// Since fixed rigid dofs can be overwritten by prescribed dofs, 
+		// we have to make sure that this dof is actually a fixed dof.
+		if (RB.m_BC[bc] == DOF_FIXED) RB.m_BC[bc] = DOF_OPEN;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -130,6 +189,10 @@ bool FERigidBodyDisplacement::Init()
 	FEModel& fem = *GetFEModel();
 	FEMaterial* pm = fem.GetMaterial(id-1);
 	id = pm->GetRigidBodyID(); if (id < 0) return false;
+
+	// make sure we have a valid dof
+	if ((bc < 0)||(bc>=6)) return false;
+
 	m_binit = true;
 	return true;
 }
@@ -148,7 +211,7 @@ void FERigidBodyDisplacement::Activate()
 	RB.m_pDC[bc] = this;
 
 	// mark the dof as prescribed
-	RB.m_LM[bc] = DOF_PRESCRIBED;
+	RB.m_BC[bc] = DOF_PRESCRIBED;
 
 	// set the relative offset
 	ref = 0.0;
@@ -178,7 +241,7 @@ void FERigidBodyDisplacement::Deactivate()
 
 		// turn off the prescribed displacement
 		RB.m_pDC[bc] = 0;
-		RB.m_LM[bc] = DOF_OPEN;
+		RB.m_BC[bc] = DOF_OPEN;
 	}
 }
 

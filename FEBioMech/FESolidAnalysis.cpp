@@ -22,31 +22,13 @@ bool FESolidAnalysis::Activate()
 	// initialize base class data
 	FEAnalysis::Activate();
 
-	// clear the active rigid body BC's
-	// (don't overwrite prescribed displacements)
-	int NRB = m_fem.Objects();
-	for (int i=0; i<NRB; ++i)
-	{
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
-		for (int j=0; j<6; ++j) if (RB.m_LM[j] != DOF_PRESCRIBED) RB.m_LM[j] = DOF_OPEN;
-	}
-
-	// set the fixed rigid body BC's
-	// (don't overwrite prescribed displacements)
-	for (int i=0;i<(int) m_fem.m_RBC.size(); ++i)
-	{
-		FERigidBodyFixedBC* pbc = m_fem.m_RBC[i];
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(pbc->id));
-		if (pbc->IsActive() && (RB.m_LM[pbc->bc] != DOF_PRESCRIBED)) RB.m_LM[pbc->bc] = DOF_FIXED;
-	}
-
 	// reset nodal ID's
 	FEMesh& mesh = m_fem.GetMesh();
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		// fix all degrees of freedom
 		FENode& node = mesh.Node(i);
-		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = -1;
+		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = DOF_FIXED;
 
 		// open degrees of freedom
 		if (node.m_bexclude == false)
@@ -54,17 +36,17 @@ bool FESolidAnalysis::Activate()
 			// turn on displacement dofs (for non-rigid nodes)
 			if (node.m_rid < 0)
 			{
-				node.m_ID[DOF_X] = 0;
-				node.m_ID[DOF_Y] = 0;
-				node.m_ID[DOF_Z] = 0;
+				node.m_ID[DOF_X] = DOF_OPEN;
+				node.m_ID[DOF_Y] = DOF_OPEN;
+				node.m_ID[DOF_Z] = DOF_OPEN;
 			}
 
 			// turn on rotation dofs for non-rigid shell nodes
 			if (node.m_bshell)
 			{
-				node.m_ID[DOF_U] = 0;
-				node.m_ID[DOF_V] = 0;
-				node.m_ID[DOF_W] = 0;
+				node.m_ID[DOF_U] = DOF_OPEN;
+				node.m_ID[DOF_V] = DOF_OPEN;
+				node.m_ID[DOF_W] = DOF_OPEN;
 			}
 		}
 	}
@@ -76,29 +58,17 @@ bool FESolidAnalysis::Activate()
 		bc.Activate();
 	}
 
-	// override prescribed displacements for rigid nodes
-	bool bdisp = false;
-	int nbc = m_fem.PrescribedBCs();
-	for (int i=0; i<nbc; ++i)
+	// apply prescribed dofs
+	int ndis = m_fem.PrescribedBCs();
+	for (int i=0; i<ndis; ++i)
 	{
-		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
-		if (dc.IsActive())
+		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
+		if (DC.IsActive())
 		{
-			// if the node is not free we don't use this prescribed displacement
-			// note that we don't do this for prescribed pressures and concentrations
-			if ((dc.bc != DOF_P) && (dc.bc < DOF_C))
-			{
-				FENode& node = m_fem.GetMesh().Node(dc.node);
-				if (node.m_rid >= 0) 
-				{
-					dc.Deactivate();
-					bdisp = true;
-				}
-			}
+			FENode& node = m_fem.GetMesh().Node(DC.node);
+			node.m_ID[DC.bc] = DOF_PRESCRIBED;
 		}
 	}
-
-	if (bdisp) felog.printbox("WARNING", "Rigid degrees of freedom cannot be prescribed.");
 
 	// initialize equations
 	// ----->
@@ -109,10 +79,7 @@ bool FESolidAnalysis::Activate()
 	if (InitLinearConstraints() == false) return false;
 	// ----->
 
-	// Now we adjust the equation numbers of prescribed dofs according to the above rule
-	// Make sure that a prescribed dof has not been fixed
-	// TODO: maybe this can be moved to the FESolver::InitEquations function
-	int ndis = m_fem.PrescribedBCs();
+	// evaluate the relative prescribed values
 	for (int i=0; i<ndis; ++i)
 	{
 		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
@@ -124,74 +91,14 @@ bool FESolidAnalysis::Activate()
 
 		if (DC.IsActive())
 		{
-			int n;
 			switch (bc)
 			{
-			case DOF_X: // x-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.x - node.m_r0.x : 0;
-				break;
-			case DOF_Y: // y-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.y - node.m_r0.y : 0;
-				break;
-			case DOF_Z: // z-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.z - node.m_r0.z : 0;
-				break;
-			case DOF_U: // x-rotation
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_Dt.x - node.m_D0.x : 0;
-				break;
-			case DOF_V: // y-rotation
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_Dt.y - node.m_D0.y : 0;
-				break;
-			case DOF_W: // z-rotation
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_Dt.z - node.m_D0.z : 0;
-				break;
-			case DOF_P: // prescribed pressure
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_pt - node.m_p0 : 0;
-				break;
-			case DOF_T: // precribed temperature
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = 0;
-				break;
-/*			case DOF_C: // precribed concentration
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_ct[0] - node.m_c0[0] : 0;
-				break;
-			case DOF_C+1: // precribed concentration
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_ct[1] - node.m_c0[1] : 0;
-				break;*/
-				//--> TODO: change bc=20 to something else
-			case 20: // y-z radial displacement
-				n = node.m_ID[DOF_Y];
-				node.m_ID[DOF_Y] = (n<0?n:-n-2);
-				n = node.m_ID[DOF_Z];
-				node.m_ID[DOF_Z] = (n<0?n:-n-2);
-				DC.r = 0;
-				break;
-			default:	// all prescribed concentrations
-				if ((bc >= DOF_C) && (bc < (int)node.m_ID.size())) {
-					n = node.m_ID[bc];
-					node.m_ID[bc] = (n<0?n:-n-2);
-					int sid = bc - DOF_C;
-					DC.r = br ? node.m_ct[sid] - node.m_c0[sid] : 0;
-				}
+			case DOF_X: DC.r = br ? node.m_rt.x - node.m_r0.x : 0; break;
+			case DOF_Y: DC.r = br ? node.m_rt.y - node.m_r0.y : 0; break;
+			case DOF_Z: DC.r = br ? node.m_rt.z - node.m_r0.z : 0; break;
+			case DOF_U: DC.r = br ? node.m_Dt.x - node.m_D0.x : 0; break;
+			case DOF_V: DC.r = br ? node.m_Dt.y - node.m_D0.y : 0; break;
+			case DOF_W: DC.r = br ? node.m_Dt.z - node.m_D0.z : 0; break;
 			}
 		}
 	}
@@ -258,28 +165,12 @@ bool FEExplicitSolidAnalysis::Activate()
 	// initialize base class data
 	FEAnalysis::Activate();
 
-	// clear the active rigid body BC's
-	int NRB = m_fem.Objects();
-	for (int i=0; i<NRB; ++i)
-	{
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
-		for (int j=0; j<6; ++j) if (RB.m_LM[j] != DOF_PRESCRIBED) RB.m_LM[j] = DOF_OPEN;
-	}
-
-	// set the fixed rigid body BC's
-	for (int i=0;i<(int) m_fem.m_RBC.size(); ++i)
-	{
-		FERigidBodyFixedBC* pbc = m_fem.m_RBC[i];
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(pbc->id));
-		if (pbc->IsActive() && (RB.m_LM[pbc->bc] != DOF_PRESCRIBED)) RB.m_LM[pbc->bc] = DOF_FIXED;
-	}
-
 	// reset nodal ID's
 	FEMesh& mesh = m_fem.GetMesh();
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = -1;
+		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = DOF_FIXED;
 
 		if (node.m_bexclude == false)
 		{
@@ -306,29 +197,17 @@ bool FEExplicitSolidAnalysis::Activate()
 		bc.Activate();
 	}
 
-	// override prescribed displacements for rigid nodes
-	bool bdisp = false;
-	int nbc = m_fem.PrescribedBCs();
-	for (int i=0; i<nbc; ++i)
+	// apply prescribed dofs
+	int ndis = m_fem.PrescribedBCs();
+	for (int i=0; i<ndis; ++i)
 	{
-		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
-		if (dc.IsActive())
+		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
+		if (DC.IsActive())
 		{
-			// if the node is not free we don't use this prescribed displacement
-			// note that we don't do this for prescribed pressures and concentrations
-			if ((dc.bc != DOF_P) && (dc.bc < DOF_C))
-			{
-				FENode& node = m_fem.GetMesh().Node(dc.node);
-				if (node.m_rid >= 0) 
-				{
-					dc.Deactivate();
-					bdisp = true;
-				}
-			}
+			FENode& node = m_fem.GetMesh().Node(DC.node);
+			node.m_ID[DC.bc] = DOF_PRESCRIBED;
 		}
 	}
-
-	if (bdisp) felog.printbox("WARNING", "Rigid degrees of freedom cannot be prescribed.");
 
 	// initialize equations
 	// ----->
@@ -342,7 +221,6 @@ bool FEExplicitSolidAnalysis::Activate()
 	// Now we adjust the equation numbers of prescribed dofs according to the above rule
 	// Make sure that a prescribed dof has not been fixed
 	// TODO: maybe this can be moved to the FESolver::InitEquations function
-	int ndis = m_fem.PrescribedBCs();
 	for (int i=0; i<ndis; ++i)
 	{
 		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
@@ -354,74 +232,14 @@ bool FEExplicitSolidAnalysis::Activate()
 
 		if (DC.IsActive())
 		{
-			int n;
 			switch (bc)
 			{
-			case DOF_X: // x-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.x - node.m_r0.x : 0;
-				break;
-			case DOF_Y: // y-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.y - node.m_r0.y : 0;
-				break;
-			case DOF_Z: // z-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.z - node.m_r0.z : 0;
-				break;
-			case DOF_U: // x-rotation
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_Dt.x - node.m_D0.x : 0;
-				break;
-			case DOF_V: // y-rotation
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_Dt.y - node.m_D0.y : 0;
-				break;
-			case DOF_W: // z-rotation
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_Dt.z - node.m_D0.z : 0;
-				break;
-			case DOF_P: // prescribed pressure
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_pt - node.m_p0 : 0;
-				break;
-			case DOF_T: // precribed temperature
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = 0;
-				break;
-/*			case DOF_C: // precribed concentration
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_ct[0] - node.m_c0[0] : 0;
-				break;
-			case DOF_C+1: // precribed concentration
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_ct[1] - node.m_c0[1] : 0;
-				break;*/
-				//--> TODO: change bc=20 to something else
-			case 20: // y-z radial displacement
-				n = node.m_ID[DOF_Y];
-				node.m_ID[DOF_Y] = (n<0?n:-n-2);
-				n = node.m_ID[DOF_Z];
-				node.m_ID[DOF_Z] = (n<0?n:-n-2);
-				DC.r = 0;
-				break;
-			default:	// all prescribed concentrations
-				if ((bc >= DOF_C) && (bc < (int)node.m_ID.size())) {
-					n = node.m_ID[bc];
-					node.m_ID[bc] = (n<0?n:-n-2);
-					int sid = bc - DOF_C;
-					DC.r = br ? node.m_ct[sid] - node.m_c0[sid] : 0;
-				}
+			case DOF_X: DC.r = br ? node.m_rt.x - node.m_r0.x : 0; break;
+			case DOF_Y: DC.r = br ? node.m_rt.y - node.m_r0.y : 0; break;
+			case DOF_Z: DC.r = br ? node.m_rt.z - node.m_r0.z : 0; break;
+			case DOF_U: DC.r = br ? node.m_Dt.x - node.m_D0.x : 0; break;
+			case DOF_V: DC.r = br ? node.m_Dt.y - node.m_D0.y : 0; break;
+			case DOF_W: DC.r = br ? node.m_Dt.z - node.m_D0.z : 0; break;
 			}
 		}
 	}
@@ -484,6 +302,18 @@ bool FELinearSolidAnalysis::Activate()
 		bc.Activate();
 	}
 
+	// apply prescribed dofs
+	int ndis = m_fem.PrescribedBCs();
+	for (int i=0; i<ndis; ++i)
+	{
+		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
+		if (DC.IsActive())
+		{
+			FENode& node = m_fem.GetMesh().Node(DC.node);
+			node.m_ID[DC.bc] = DOF_PRESCRIBED;
+		}
+	}
+
 	// initialize equations
 	// ----->
 	if (m_psolver->InitEquations() == false) return false;
@@ -496,7 +326,6 @@ bool FELinearSolidAnalysis::Activate()
 	// Now we adjust the equation numbers of prescribed dofs according to the above rule
 	// Make sure that a prescribed dof has not been fixed
 	// TODO: maybe this can be moved to the FESolver::InitEquations function
-	int ndis = m_fem.PrescribedBCs();
 	for (int i=0; i<ndis; ++i)
 	{
 		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
@@ -508,46 +337,14 @@ bool FELinearSolidAnalysis::Activate()
 
 		if (DC.IsActive())
 		{
-			int n;
 			switch (bc)
 			{
-			case DOF_X: // x-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.x - node.m_r0.x : 0;
-				break;
-			case DOF_Y: // y-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.y - node.m_r0.y : 0;
-				break;
-			case DOF_Z: // z-displacement
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_rt.z - node.m_r0.z : 0;
-				break;
-			case DOF_U: // x-rotation
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_Dt.x - node.m_D0.x : 0;
-				break;
-			case DOF_V: // y-rotation
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_Dt.y - node.m_D0.y : 0;
-				break;
-			case DOF_W: // z-rotation
-				n = node.m_ID[bc];
-				node.m_ID[bc] = (n<0?n:-n-2);
-				DC.r = br ? node.m_Dt.z - node.m_D0.z : 0;
-				break;
-			case 20: // y-z radial displacement
-				n = node.m_ID[DOF_Y];
-				node.m_ID[DOF_Y] = (n<0?n:-n-2);
-				n = node.m_ID[DOF_Z];
-				node.m_ID[DOF_Z] = (n<0?n:-n-2);
-				DC.r = 0;
-				break;
+			case DOF_X: DC.r = br ? node.m_rt.x - node.m_r0.x : 0; break;
+			case DOF_Y: DC.r = br ? node.m_rt.y - node.m_r0.y : 0; break;
+			case DOF_Z: DC.r = br ? node.m_rt.z - node.m_r0.z : 0; break;
+			case DOF_U: DC.r = br ? node.m_Dt.x - node.m_D0.x : 0; break;
+			case DOF_V: DC.r = br ? node.m_Dt.y - node.m_D0.y : 0; break;
+			case DOF_W: DC.r = br ? node.m_Dt.z - node.m_D0.z : 0; break;
 			}
 		}
 	}

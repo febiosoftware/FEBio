@@ -34,7 +34,7 @@ FENode::FENode()
     m_cp.assign(MAX_CDOFS, 0);
 
 	// initialize dof stuff
-    m_ID.assign(MAX_NDOFS, -1);
+    m_ID.assign(MAX_NDOFS, DOF_FIXED);
 
 	// exclude flag (true if the node should not be part of the analysis.
 	// For instance, if it is isolated).
@@ -624,6 +624,10 @@ void FEMesh::Reset()
 
 		node.m_Fr = vec3d(0,0,0);
 		node.m_Dt = node.m_D0;
+
+		// reset ID arrays
+		int ndof = node.m_ID.size();
+		for (int i=0; i<ndof; ++i) node.m_ID[i] = DOF_FIXED;
 	}
 
 	// update the mesh

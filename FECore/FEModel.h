@@ -68,6 +68,9 @@ public:
 	// clear all model data
 	void Clear();
 
+	// model activation
+	void Activate();
+
 public:
 	// get the FE mesh
 	FEMesh& GetMesh() { return m_mesh; }

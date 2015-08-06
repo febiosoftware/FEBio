@@ -99,11 +99,12 @@ bool FEModel::Init()
     // evaluate all parameter lists
     if (EvaluateAllParameterLists() == false) return false;
 
+	// create and initialize the rigid body data
+	// NOTE: Do this first, since some BC's look at the nodes' rigid id.
+	if (InitObjects() == false) return false;
+
 	// validate BC's
 	if (InitBCs() == false) return false;
-
-	// create and initialize the rigid body data
-	if (InitObjects() == false) return false;
 
 	// initialize material data
 	// NOTE: call this before InitMesh since we need to initialize the FECoordSysMap
@@ -131,6 +132,9 @@ bool FEModel::Init()
 
 	// initialize nonlinear constraints
 	if (InitConstraints() == false) return false;
+
+	// activate all permanent dofs
+	Activate();
 
 	// do the callback
 	DoCallback(CB_INIT);
@@ -404,9 +408,6 @@ bool FEModel::InitObjects()
 	{
 		FERigidNode& rn = *m_RN[i];
 		rn.rid = mrb[rn.rid];
-
-		// if the rigid node is active, make sure to call the Activate member
-		if (rn.IsActive()) rn.Activate();
 	}
 
 	// let's find all rigid surface elements
@@ -442,22 +443,16 @@ bool FEModel::InitObjects()
 	{
 		FERigidBodyDisplacement& DC = *m_RDC[i];
 		if (DC.Init() == false) return false;
-		
-		if (DC.IsActive()) DC.Activate();
 	}
 	for (int i=0; i<(int) m_RBV.size(); ++i)
 	{
 		FERigidBodyVelocity& RV = *m_RBV[i];
 		if (RV.Init() == false) return false;
-
-		if (RV.IsActive()) RV.Activate();
 	}
 	for (int i=0; i<(int) m_RBW.size(); ++i)
 	{
 		FERigidBodyAngularVelocity& RW = *m_RBW[i];
 		if (RW.Init() == false) return false;
-
-		if (RW.IsActive()) RW.Activate();
 	}
 	return true;
 }
@@ -471,28 +466,12 @@ bool FEModel::InitModelLoads()
 	{
 		FEModelLoad& FC = *m_ML[i];
 		if (FC.Init() == false) return false;
-
-		// If the constraint is active
-		// we have to call the Activate() member. 
-		if (FC.IsActive()) FC.Activate();
 	}
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! Initializes contact data
-//! \todo Contact interfaces have two initialization functions: Init() and
-//!   Activate(). The Init member is called here and allocates the required memory
-//!   for each interface. The Activate() member is called during the step initialization
-//!   which is called later during the solve phase. However, for global interfaces (i.e.
-//!   interfaces that are active during the entire simulation), the Activate() member is
-//!   not called in the solve phase. That is why we have to call it here. Global interfaces
-//!   can be idenfitifed since they are active during the initialization. 
-//!   I am not entirely a fan of this approach but it does solve the problem that contact
-//!   interface shoulds only do work (e.g. update projection status) when they are active, but
-//!   have to allocate memory during the initialization fase.
-//! \todo I need to check if this is still the case. That is, if I really need to call Activate
-//!       here for global interfaces.
 bool FEModel::InitContact()
 {
 	// loop over all contact interfaces
@@ -503,10 +482,6 @@ bool FEModel::InitContact()
 
 		// initializes contact interface data
 		if (ci.Init() == false) return false;
-
-		// If the contact interface is active
-		// we have to call the Activate() member. 
-		if (ci.IsActive()) ci.Activate();
 	}
 
 	return true;
@@ -523,11 +498,6 @@ bool FEModel::InitConstraints()
 
 		// initialize
 		if (plc->Init() == false) return false;
-
-		// constraints that are active at startup need to have their Activate() member
-		// called, since no analysis will call this member
-		// TODO: Is this a good place to do it? Perhaps I should do it in the Solve function?
-		if (plc->IsActive()) plc->Activate();
 	}
 
 	return true;
@@ -581,6 +551,71 @@ bool FEModel::Solve()
 }
 
 //-----------------------------------------------------------------------------
+// Model activation.
+// BC's that are not assigned to a step will not have their Activate() member called
+// so we do it here. This function is called in Init() and Reset()
+void FEModel::Activate()
+{
+	// model loads
+	for (int i=0; i<(int) m_ML.size(); ++i)
+	{
+		FEModelLoad& FC = *m_ML[i];
+		if (FC.IsActive()) FC.Activate();
+	}
+
+	// nonlinear constraints
+	for (int i=0; i<(int) m_NLC.size(); ++i)
+	{
+		FENLConstraint* plc = m_NLC[i];
+		if (plc->IsActive()) plc->Activate();
+	}
+
+	// contact interfaces
+	for (int i=0; i<SurfacePairInteractions(); ++i)
+	{
+		FESurfacePairInteraction& ci = *m_CI[i];
+		if (ci.IsActive()) ci.Activate();
+	}
+
+	// rigid nodes
+	for (int i=0; i<(int) m_RN.size(); ++i)
+	{
+		FERigidNode& rn = *m_RN[i];
+		if (rn.IsActive()) rn.Activate();
+	}
+
+	// rigid body displacements
+	for (int i=0; i<(int)m_RDC.size(); ++i)
+	{
+		FERigidBodyDisplacement& rc = *m_RDC[i];
+		if (rc.IsActive()) rc.Activate();
+	}
+
+	// fixed rigid body dofs
+	for (int i=0; i<(int)m_RBC.size(); ++i)
+	{
+		FERigidBodyFixedBC& rc = *m_RBC[i];
+		if (rc.IsActive()) rc.Activate();
+	}
+
+	// initial rigid velocity
+	for (int i=0; i<(int) m_RBV.size(); ++i)
+	{
+		FERigidBodyVelocity& RV = *m_RBV[i];
+		if (RV.IsActive()) RV.Activate();
+	}
+
+	// initial rigid angular velocity
+	for (int i=0; i<(int) m_RBW.size(); ++i)
+	{
+		FERigidBodyAngularVelocity& RW = *m_RBW[i];
+		if (RW.IsActive()) RW.Activate();
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! \todo Do I really need this function. I think calling FEModel::Init achieves the
+//! same effect.
 bool FEModel::Reset()
 {
 	// initialize materials
@@ -621,15 +656,8 @@ bool FEModel::Reset()
 	// TODO: I just call Init which I think is okay
 	InitContact();
 
-	// Call activate on the rigid body displacements
-	// NOTE: Rigid body displacements need to be reactivated.
-	//       If the RBD is active, the step analysis won't
-	//       call the Active() member, so we need to do it here.
-	for (int i=0; i<(int)m_RDC.size(); ++i)
-	{
-		FERigidBodyDisplacement& rc = *m_RDC[i];
-		if (rc.IsActive()) rc.Activate();
-	}
+	// Call Activate() to activate all permanent BC's
+	Activate();
 
 	return true;
 }

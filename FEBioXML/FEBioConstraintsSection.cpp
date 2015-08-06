@@ -331,8 +331,6 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
 				{
-					int n = fem.m_RBC.size()-1;
-					FERigidBodyFixedBC* pBC = fem.m_RBC[n];
 					pStep->AddModelComponent(pBC);
 					pBC->Deactivate();
 				}

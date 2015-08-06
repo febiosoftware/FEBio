@@ -86,15 +86,22 @@ public:
 class FERigidBodyFixedBC : public FEBoundaryCondition
 {
 public:
-	FERigidBodyFixedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+	FERigidBodyFixedBC(FEModel* pfem);
 
 	bool Init();
 
 	void Serialize(DumpFile& ar);
 
+	void Activate();
+
+	void Deactivate();
+
 public:
 	int		id;	//!< rigid body ID
 	int		bc;	//!< constrained dof
+
+private:
+	bool	m_binit;
 };
 
 //-----------------------------------------------------------------------------
