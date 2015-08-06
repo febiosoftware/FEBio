@@ -621,6 +621,16 @@ bool FEModel::Reset()
 	// TODO: I just call Init which I think is okay
 	InitContact();
 
+	// Call activate on the rigid body displacements
+	// NOTE: Rigid body displacements need to be reactivated.
+	//       If the RBD is active, the step analysis won't
+	//       call the Active() member, so we need to do it here.
+	for (int i=0; i<(int)m_RDC.size(); ++i)
+	{
+		FERigidBodyDisplacement& rc = *m_RDC[i];
+		if (rc.IsActive()) rc.Activate();
+	}
+
 	return true;
 }
 
