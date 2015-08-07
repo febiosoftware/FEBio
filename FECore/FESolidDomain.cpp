@@ -581,7 +581,6 @@ void FESolidDomain::Serialize(DumpFile &ar)
 			ar << el.Type();
 			
 			ar << nmat;
-			ar << el.m_nrigid;
 			ar << el.m_nID;
 			ar << el.m_node;
 
@@ -602,7 +601,6 @@ void FESolidDomain::Serialize(DumpFile &ar)
 			el.SetType(n);
 
 			ar >> mat; el.SetMatID(mat);
-			ar >> el.m_nrigid;
 			ar >> el.m_nID;
 			ar >> el.m_node;
 

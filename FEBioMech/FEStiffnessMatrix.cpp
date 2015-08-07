@@ -56,6 +56,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 	FEModel& fem = *m_pfem;
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	FEMesh& mesh = fem.GetMesh();
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 
 	// The first time we come here we build the "static" profile.
 	// This static profile stores the contribution to the matrix profile
@@ -92,11 +93,8 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 					for (int j=0; j<d.Elements(); ++j)
 					{
 						FEElement& el = d.ElementRef(j);
-						if (!el.IsRigid())
-						{
-							d.UnpackLM(el, elm);
-							build_add(elm);
-						}
+						d.UnpackLM(el, elm);
+						build_add(elm);
 					}
 				}
 				else
@@ -119,7 +117,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 							for (int n=0; n<NE; ++n)
 							{
 								ut4.UnpackLM(*ppe[n], elm);
-								for (int j=0; j<elm.size(); ++j) LM[n*4*MAX_NDOFS + j] = elm[j];
+								for (int j=0; j<(int)elm.size(); ++j) LM[n*4*MAX_NDOFS + j] = elm[j];
 							}
 							build_add(LM);
 						}
@@ -128,13 +126,13 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 			}
 
 			// Add rigid bodies to the profile
-			if (fem.Objects())
+			if (rigid.Objects())
 			{
 				vector<int> lm(6);
-				int nrb = fem.Objects();
+				int nrb = rigid.Objects();
 				for (int i=0; i<nrb; ++i)
 				{
-					FERigidBody& rb = static_cast<FERigidBody&>(*fem.Object(i));
+					FERigidBody& rb = *rigid.Object(i);
 					for (int j=0; j<6; ++j) lm[j] = rb.m_LM[j];
 					build_add(lm);
 				}
@@ -156,43 +154,40 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 				for (int nd=0; nd<pstep->Domains(); ++nd)
 				{
 					FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(pstep->Domain(nd));
-					if (pbd)
+					if (pbd && (pbd->GetMaterial()->IsRigid() == false))
 					{
 						for (i=0; i<pbd->Elements(); ++i)
 						{
 							FESolidElement& el = pbd->Element(i);
-							if (!el.IsRigid())
+							pbd->UnpackLM(el, elm);
+							int ne = (int)elm.size();
+
+							// see if this element connects to the 
+							// master node of a linear constraint ...
+							m = el.Nodes();
+							for (j=0; j<m; ++j)
 							{
-								pbd->UnpackLM(el, elm);
-								int ne = (int)elm.size();
-
-								// see if this element connects to the 
-								// master node of a linear constraint ...
-								m = el.Nodes();
-								for (j=0; j<m; ++j)
+								for (k=0; k<MAX_NDOFS; ++k)
 								{
-									for (k=0; k<MAX_NDOFS; ++k)
+									n = fem.m_LCT[el.m_node[j]*MAX_NDOFS + k];
+
+									if (n >= 0)
 									{
-										n = fem.m_LCT[el.m_node[j]*MAX_NDOFS + k];
+										// ... it does so we need to connect the 
+										// element to the linear constraint
+										FELinearConstraint* plc = fem.m_LCA[n];
 
-										if (n >= 0)
-										{
-											// ... it does so we need to connect the 
-											// element to the linear constraint
-											FELinearConstraint* plc = fem.m_LCA[n];
+										int ns = (int)plc->slave.size();
 
-											int ns = (int)plc->slave.size();
+										lm.resize(ne + ns);
+										for (l=0; l<ne; ++l) lm[l] = elm[l];
 
-											lm.resize(ne + ns);
-											for (l=0; l<ne; ++l) lm[l] = elm[l];
+										list<FELinearConstraint::SlaveDOF>::iterator is = plc->slave.begin();
+										for (l=ne; l<ne+ns; ++l, ++is) lm[l] = is->neq;
 
-											list<FELinearConstraint::SlaveDOF>::iterator is = plc->slave.begin();
-											for (l=ne; l<ne+ns; ++l, ++is) lm[l] = is->neq;
-
-											build_add(lm);
+										build_add(lm);
 		
-											break;
-										}
+										break;
 									}
 								}
 							}
@@ -263,8 +258,8 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 					FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*pnlc);
 					vector<int> lm(12);
 			
-					int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
-					int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
+					int* lm1 = rigid.Object(rj.m_nRBa)->m_LM;
+					int* lm2 = rigid.Object(rj.m_nRBb)->m_LM;
 
 					for (j=0; j<6; ++j) lm[j  ] = lm1[j];
 					for (j=0; j<6; ++j) lm[j+6] = lm2[j];
@@ -275,8 +270,8 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
                     FERigidConnector& rj = dynamic_cast<FERigidConnector&>(*pnlc);
                     vector<int> lm(12);
                     
-                    int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
-                    int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
+                    int* lm1 = rigid.Object(rj.m_nRBa)->m_LM;
+                    int* lm2 = rigid.Object(rj.m_nRBb)->m_LM;
                     
                     for (j=0; j<6; ++j) lm[j  ] = lm1[j];
                     for (j=0; j<6; ++j) lm[j+6] = lm2[j];

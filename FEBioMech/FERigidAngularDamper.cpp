@@ -9,6 +9,7 @@
 #include "FERigidAngularDamper.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidAngularDamper, FERigidConnector);
@@ -79,8 +80,9 @@ void FERigidAngularDamper::Residual(FEGlobalVector& R, const FETimePoint& tp)
     vector<double> fa(6);
     vector<double> fb(6);
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+ 	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rigid.Object(m_nRBa);
+    FERigidBody& RBb = *rigid.Object(m_nRBb);
     
     double alpha = tp.alpha;
     
@@ -130,8 +132,9 @@ void FERigidAngularDamper::StiffnessMatrix(FESolver* psolver, const FETimePoint&
     matrix ke(12,12);
     ke.zero();
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rigid.Object(m_nRBa);
+    FERigidBody& RBb = *rigid.Object(m_nRBb);
     
     mat3dd I(1);
     
@@ -215,8 +218,9 @@ void FERigidAngularDamper::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FERigidAngularDamper::Update(const FETimePoint& tp)
 {
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rigid.Object(m_nRBa);
+    FERigidBody& RBb = *rigid.Object(m_nRBb);
     
     double alpha = tp.alpha;
     

@@ -2,6 +2,7 @@
 #include "FEResidualVector.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/DOFS.h"
+#include "FECore/FEModel.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -90,7 +91,8 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
         
         // If there are rigid bodies we need to look for rigid dofs
         
-        if (m_fem.Objects() > 0)
+		FERigidSystem& rigid = *m_fem.GetRigidSystem();
+        if (rigid.Objects() > 0)
         {
             int *lm;
             //#pragma omp critical
@@ -105,7 +107,7 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
                         
                         // this is an interface dof
                         // get the rigid body this node is connected to
-                        FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(node.m_rid));
+                        FERigidBody& RB = *rigid.Object(node.m_rid);
                         lm = RB.m_LM;
                         
                         // add to total torque of this body

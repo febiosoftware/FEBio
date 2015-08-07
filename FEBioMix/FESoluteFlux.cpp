@@ -292,48 +292,43 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 		// get the surface element
 		FESurfaceElement& el = m_psurf->Element(m);
 			
-		// skip rigid surface elements
-		// TODO: do we really need to skip rigid elements?
-		if (!el.IsRigid())
-		{
-			// calculate nodal normal solute flux
-			int neln = el.Nodes();
-			vector<double> wn(neln);
+		// calculate nodal normal solute flux
+		int neln = el.Nodes();
+		vector<double> wn(neln);
 				
-			if (m_blinear == false)
-			{
-				double g = m_flux;
-				if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
+		if (m_blinear == false)
+		{
+			double g = m_flux;
+			if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
 					
-				for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
+			for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
 					
-				// get the element stiffness matrix
-				int ndof = neln*4;
-				ke.resize(ndof, ndof);
+			// get the element stiffness matrix
+			int ndof = neln*4;
+			ke.resize(ndof, ndof);
 					
-				// calculate pressure stiffness
-				FluxStiffness(el, ke, wn, dt);
+			// calculate pressure stiffness
+			FluxStiffness(el, ke, wn, dt);
 
-				// get the element's LM vector
-				m_psurf->UnpackLM(el, elm);
+			// get the element's LM vector
+			m_psurf->UnpackLM(el, elm);
 					
-				// TODO: the problem here is that the LM array that is returned by the UnpackElement
-				// function does not give the equation numbers in the right order. For this reason we
-				// have to create a new lm array and place the equation numbers in the right order.
-				// What we really ought to do is fix the UnpackElement function so that it returns
-				// the LM vector in the right order for solute-solid elements.
-				vector<int> lm(ndof);
-				for (int i=0; i<neln; ++i)
-				{
-					lm[4*i  ] = elm[3*i];
-					lm[4*i+1] = elm[3*i+1];
-					lm[4*i+2] = elm[3*i+2];
-					lm[4*i+3] = elm[(11+m_isol-1)*neln+i];  // m_isol is 1-based
-				}
-					
-				// assemble element matrix in global stiffness matrix
-				psolver->AssembleStiffness(el.m_node, lm, ke);
+			// TODO: the problem here is that the LM array that is returned by the UnpackElement
+			// function does not give the equation numbers in the right order. For this reason we
+			// have to create a new lm array and place the equation numbers in the right order.
+			// What we really ought to do is fix the UnpackElement function so that it returns
+			// the LM vector in the right order for solute-solid elements.
+			vector<int> lm(ndof);
+			for (int i=0; i<neln; ++i)
+			{
+				lm[4*i  ] = elm[3*i];
+				lm[4*i+1] = elm[3*i+1];
+				lm[4*i+2] = elm[3*i+2];
+				lm[4*i+3] = elm[(11+m_isol-1)*neln+i];  // m_isol is 1-based
 			}
+					
+			// assemble element matrix in global stiffness matrix
+			psolver->AssembleStiffness(el.m_node, lm, ke);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FERigidForce.h"
 #include "FECore/FERigidBody.h"
+#include "FECore/FEModel.h"
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FERigidAxialForce, FEModelLoad);
@@ -34,8 +35,9 @@ bool FERigidAxialForce::Init()
 	m_idb = pm->GetRigidBodyID(); if (m_idb < 0) return false;
 
 	// get the actual rigid bodies
-	FERigidBody& bodyA = static_cast<FERigidBody&>(*fem.Object(m_ida));
-	FERigidBody& bodyB = static_cast<FERigidBody&>(*fem.Object(m_idb));
+	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+	FERigidBody& bodyA = *rigid.Object(m_ida);
+	FERigidBody& bodyB = *rigid.Object(m_idb);
 
 	// get the attachment position in global coordinates for body A
 	vec3d da0 = (m_brelative ? m_ra0 : m_ra0 - bodyA.m_r0);
@@ -79,9 +81,9 @@ void FERigidAxialForce::Serialize(DumpFile& ar)
 //! Residual
 void FERigidAxialForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {
-	FEModel& fem = *GetFEModel();
-	FERigidBody& bodyA = static_cast<FERigidBody&>(*fem.Object(m_ida));
-	FERigidBody& bodyB = static_cast<FERigidBody&>(*fem.Object(m_idb));
+	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+	FERigidBody& bodyA = *rigid.Object(m_ida);
+	FERigidBody& bodyB = *rigid.Object(m_idb);
 
 	// get the attachment position in global coordinates for body A
 	vec3d da0 = (m_brelative ? m_ra0 : m_ra0 - bodyA.m_r0);
@@ -129,9 +131,9 @@ void FERigidAxialForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
 void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
 {
 	// Get the rigid bodies
-	FEModel& fem = *GetFEModel();
-	FERigidBody& bodyA = static_cast<FERigidBody&>(*fem.Object(m_ida));
-	FERigidBody& bodyB = static_cast<FERigidBody&>(*fem.Object(m_idb));
+	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+	FERigidBody& bodyA = *rigid.Object(m_ida);
+	FERigidBody& bodyB = *rigid.Object(m_idb);
 
 	// get the attachment position in global coordinates for body A
 	vec3d da0 = (m_brelative ? m_ra0 : m_ra0 - bodyA.m_r0);
@@ -332,7 +334,8 @@ double FERigidBodyForce::Value()
 void FERigidBodyForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {
 	FEModel& fem = *GetFEModel();
-	FERigidBody& rb = static_cast<FERigidBody&>(*fem.Object(id));
+	FERigidSystem& rigid = *fem.GetRigidSystem();
+	FERigidBody& rb = *rigid.Object(id);
 
 	if (m_bfollow == false)
 	{

@@ -9,6 +9,7 @@
 #include "FERigidContractileForce.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidContractileForce, FERigidConnector);
@@ -56,12 +57,13 @@ bool FERigidContractileForce::Init()
     }
     m_nRBb = pm->GetRigidBodyID();
     
-    FERigidBody& ra = dynamic_cast<FERigidBody&>(*fem.Object(m_nRBa));
-    FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.Object(m_nRBb));
+	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rigid.Object(m_nRBa);
+    FERigidBody& RBb = *rigid.Object(m_nRBb);
     
     // set force insertions relative to rigid body center of mass
-    m_qa0 = m_a0 - ra.m_r0;
-    m_qb0 = m_b0 - rb.m_r0;
+    m_qa0 = m_a0 - RBa.m_r0;
+    m_qb0 = m_b0 - RBb.m_r0;
     
     m_binit = true;
     
@@ -91,8 +93,9 @@ void FERigidContractileForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
     vector<double> fa(6);
     vector<double> fb(6);
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rigid.Object(m_nRBa);
+    FERigidBody& RBb = *rigid.Object(m_nRBb);
 
 	double alpha = tp.alpha;
     
@@ -144,9 +147,10 @@ void FERigidContractileForce::StiffnessMatrix(FESolver* psolver, const FETimePoi
     matrix ke(12,12);
     ke.zero();
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
-    
+	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rigid.Object(m_nRBa);
+    FERigidBody& RBb = *rigid.Object(m_nRBb);
+   
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
@@ -311,8 +315,9 @@ void FERigidContractileForce::Update(const FETimePoint& tp)
     vec3d ra, rb, c;
     vec3d za, zb;
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rigid.Object(m_nRBa);
+    FERigidBody& RBb = *rigid.Object(m_nRBb);
     
 	double alpha = tp.alpha;
 
@@ -337,9 +342,10 @@ void FERigidContractileForce::Reset()
 {
     m_F = vec3d(0,0,0);
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
-    
+ 	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rigid.Object(m_nRBa);
+    FERigidBody& RBb = *rigid.Object(m_nRBb);
+   
     m_qa0 = m_a0 - RBa.m_r0;
     m_qb0 = m_b0 - RBb.m_r0;
 }

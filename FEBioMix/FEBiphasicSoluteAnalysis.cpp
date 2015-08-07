@@ -9,6 +9,7 @@
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteAnalysis::InitNodes()

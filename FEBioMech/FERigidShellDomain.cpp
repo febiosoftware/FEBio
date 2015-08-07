@@ -2,8 +2,11 @@
 #include "FERigidShellDomain.h"
 
 //-----------------------------------------------------------------------------
+// NOTE: Although this function doesn't do anything, we need it since 
+//       for rigid shell domains we don't want to call the FEElasticShellDomain::Initialize member.
 bool FERigidShellDomain::Initialize(FEModel& fem)
 {
+	// just call the base class
 	return FEShellDomain::Initialize(fem);
 }
 

@@ -285,13 +285,14 @@ void echo_input(FEBioModel& fem)
 	}
 	felog.printf("\n\n");
 
-	if (fem.Objects())
+	FERigidSystem& rigid = *fem.GetRigidSystem();
+	if (rigid.Objects())
 	{
 		felog.printf(" RIGID BODY DATA\n");
 		felog.printf("===========================================================================\n");
-		for (int i=0; i<fem.Objects(); ++i)
+		for (int i=0; i<rigid.Objects(); ++i)
 		{
-			FERigidBody& rb = static_cast<FERigidBody&>(*fem.Object(i));
+			FERigidBody& rb = *rigid.Object(i);
 			if (i>0) felog.printf("---------------------------------------------------------------------------\n");
 			felog.printf("Rigid Body %d:\n", rb.m_nID+1);
 			felog.printf("\tmaterial id    : %d\n", rb.m_mat+1);
@@ -353,8 +354,8 @@ void echo_input(FEBioModel& fem)
 			if (dynamic_cast<FERigidJoint*>(plc))
 			{
 				FERigidJoint& rj = static_cast<FERigidJoint&>(*plc);
-				FERigidBody& ra = static_cast<FERigidBody&>(*fem.Object(rj.m_nRBa));
-				FERigidBody& rb = static_cast<FERigidBody&>(*fem.Object(rj.m_nRBb));
+				FERigidBody& ra = *rigid.Object(rj.m_nRBa);
+				FERigidBody& rb = *rigid.Object(rj.m_nRBb);
 				felog.printf("rigid joint %d:\n", i+1);
 				felog.printf("\tRigid body A                   : %d\n", ra.m_mat + 1);
 				felog.printf("\tRigid body B                   : %d\n", rb.m_mat + 1);

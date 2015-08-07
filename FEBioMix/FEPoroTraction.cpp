@@ -356,44 +356,38 @@ void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 		LOAD& pc = m_PC[m];
 		// get the surface element
 		FESurfaceElement& el = m_psurf->Element(m);
+		int neln = el.Nodes();
 
-		// skip rigid surface elements
-		// TODO: do we really need to skip rigid elements?
-		if (!el.IsRigid())
-		{
-			int neln = el.Nodes();
-
-			// fluid pressure
-			double pt[FEElement::MAX_NODES];
-			for (int i=0; i<neln; ++i) pt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_pt;
+		// fluid pressure
+		double pt[FEElement::MAX_NODES];
+		for (int i=0; i<neln; ++i) pt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_pt;
 			
-			// calculate nodal normal tractions
-			vector<double> tn(neln);
+		// calculate nodal normal tractions
+		vector<double> tn(neln);
 
-			if (m_blinear == false)
-			{
-				double g = m_traction;
-				if (pc.lc >= 0) g *= fem.GetLoadCurve(pc.lc)->Value();
+		if (m_blinear == false)
+		{
+			double g = m_traction;
+			if (pc.lc >= 0) g *= fem.GetLoadCurve(pc.lc)->Value();
 
-				// evaluate the prescribed traction.
-				for (int j=0; j<neln; ++j) tn[j] = g*pc.s[j];
+			// evaluate the prescribed traction.
+			for (int j=0; j<neln; ++j) tn[j] = g*pc.s[j];
 
-				// if the prescribed traction is effective, evaluate the total traction
-				if (m_beffective) for (int j=0; j<neln; ++j) tn[j] -= pt[j];
+			// if the prescribed traction is effective, evaluate the total traction
+			if (m_beffective) for (int j=0; j<neln; ++j) tn[j] -= pt[j];
 				
-				// get the element stiffness matrix
-				int ndof = (m_beffective ? 4*neln : 3*neln);
-				ke.resize(ndof, ndof);
+			// get the element stiffness matrix
+			int ndof = (m_beffective ? 4*neln : 3*neln);
+			ke.resize(ndof, ndof);
 
-				// calculate pressure stiffness
-				TractionStiffness(el, ke, tn, m_beffective, psolver->m_bsymm);
+			// calculate pressure stiffness
+			TractionStiffness(el, ke, tn, m_beffective, psolver->m_bsymm);
 
-				// get the element's LM vector
-				m_psurf->UnpackLM(el, lm);
+			// get the element's LM vector
+			m_psurf->UnpackLM(el, lm);
 
-				// assemble element matrix in global stiffness matrix
-				psolver->AssembleStiffness(el.m_node, lm, ke);
-			}
+			// assemble element matrix in global stiffness matrix
+			psolver->AssembleStiffness(el.m_node, lm, ke);
 		}
 	}
 }

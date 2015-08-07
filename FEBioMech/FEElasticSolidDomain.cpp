@@ -64,13 +64,42 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 	// get the elements material
 	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
 
+	// assign local coordinate system to each integration point
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
 		for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
 	}
 
-	return true;
+	// check for initially inverted elements
+	int ninverted = 0;
+	for (int i=0; i<Elements(); ++i)
+	{
+		FESolidElement& el = Element(i);
+
+		int nint = el.GaussPoints();
+		for (int n=0; n<nint; ++n)
+		{
+			double J0 = detJ0(el, n);
+			if (J0 <= 0)
+			{
+				felog.printf("**************************** E R R O R ****************************\n");
+				felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
+				felog.printf("Jacobian = %lg\n", J0);
+				felog.printf("Did you use the right node numbering?\n");
+				felog.printf("Nodes:");
+				for (int l=0; l<el.Nodes(); ++l)
+				{
+					felog.printf("%d", el.m_node[l]+1);
+					if (l+1 != el.Nodes()) felog.printf(","); else felog.printf("\n");
+				}
+				felog.printf("*******************************************************************\n\n");
+				++ninverted;
+			}
+		}
+	}
+
+	return (ninverted == 0);
 }
 
 

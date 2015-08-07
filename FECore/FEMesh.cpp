@@ -40,7 +40,7 @@ FENode::FENode()
 	// For instance, if it is isolated).
 	m_bexclude = false;
 
-	// shell flag (true if the node belongs to a non-rigid shell)
+	// shell flag
 	m_bshell = false;
 
 	// rigid body data
@@ -458,85 +458,6 @@ void FEMesh::InitShellNormals()
 	}
 }
 
-//-----------------------------------------------------------------------------
-//! Find all elements that inverted. That is, the elements whose jacobian with 
-//! respect to the reference configuration is negative. Negative initial jacobians
-//! may indicate a problem with the mesh (e.g. incorrect node numbering).
-int FEMesh::FindInvertedElements()
-{
-	// loop over all domains
-	int ninverted = 0;
-	for (int nd = 0; nd < Domains(); ++nd)
-	{
-		// check solid domains
-		if (Domain(nd).Class() == FE_DOMAIN_SOLID)
-		{
-			FESolidDomain& bd = static_cast<FESolidDomain&>(Domain(nd));
-			for (int i=0; i<bd.Elements(); ++i)
-			{
-				FESolidElement& el = bd.Element(i);
-
-				int nint = el.GaussPoints();
-				for (int n=0; n<nint; ++n)
-				{
-					double J0 = bd.detJ0(el, n);
-					if (J0 <= 0)
-					{
-						felog.printf("**************************** E R R O R ****************************\n");
-						felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
-						felog.printf("Jacobian = %lg\n", J0);
-						felog.printf("Did you use the right node numbering?\n");
-						felog.printf("Nodes:");
-						for (int l=0; l<el.Nodes(); ++l)
-						{
-							felog.printf("%d", el.m_node[l]+1);
-							if (l+1 != el.Nodes()) felog.printf(","); else felog.printf("\n");
-						}
-						felog.printf("*******************************************************************\n\n");
-						++ninverted;
-					}
-				}
-			}
-		}
-
-		// check shell domains (we don't care about rigid domains)
-		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
-		{
-			FEShellDomain& sd = static_cast<FEShellDomain&>(Domain(nd));
-			// check the connectivity of the shells
-			for (int i=0; i<sd.Elements(); ++i)
-			{
-				FEShellElement& el = sd.Element(i);
-				if (!el.IsRigid())
-				{
-					int nint = el.GaussPoints();
-					for (int n=0; n<nint; ++n)
-					{
-						double J0 = sd.detJ0(el, n);
-						if (J0 <= 0)
-						{
-							felog.printf("**************************** E R R O R ****************************\n");
-							felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
-							felog.printf("Jacobian = %lg\n", J0);
-							felog.printf("Did you use the right node numbering?\n");
-							felog.printf("Nodes:");
-							for (int l=0; l<el.Nodes(); ++l)
-							{
-								felog.printf("%d", el.m_node[l]+1);
-								if (l+1 != el.Nodes()) felog.printf(","); else felog.printf("\n");
-							}
-							felog.printf("*******************************************************************\n\n");
-							++ninverted;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// return the number of inverted elements
-	return ninverted;
-}
 
 //-----------------------------------------------------------------------------
 //! Does one-time initialization of the Mesh data. Call FEMesh::Reset for resetting 
@@ -557,39 +478,6 @@ bool FEMesh::Init()
 	// NOTE: we do this before we check for inverted elements since the jacobian of a shell
 	//       depends on its normal.
 	InitShellNormals();
-
-	// look for any initially inverted elements
-	int ninverted = FindInvertedElements();
-	if (ninverted != 0)
-	{
-		felog.printf("**************************** E R R O R ****************************\n");
-		felog.printf(" Found %d initially inverted elements.\n", ninverted);
-		felog.printf(" Run will be aborted.\n");
-		felog.printf("*******************************************************************\n\n");
-		return false;
-	}
-
-
-	// Find the nodes that are on a non-rigid shell. 
-	// These nodes will be assigned rotational degrees of freedom
-	for (int i=0; i<Nodes(); ++i) Node(i).m_bshell = false;
-	for (int nd = 0; nd<Domains(); ++nd)
-	{
-		FEDomain& dom = Domain(nd);
-		if (dom.Class() == FE_DOMAIN_SHELL)
-		{
-			int N = dom.Elements();
-			for (int i=0; i<N; ++i)
-			{
-				FEElement& el = dom.ElementRef(i);
-				if (el.m_nrigid < 0)
-				{
-					int n = el.Nodes();
-					for (int j=0; j<n; ++j) Node(el.m_node[j]).m_bshell = true;
-				}
-			}
-		}
-	}
 
 	// reset data
 	// TODO: Not sure why this is here

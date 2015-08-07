@@ -85,9 +85,6 @@ public:
 	//! Set the element's material ID
 	void SetMatID(int id) { m_mat = id; }
 
-	//! returs if the element is part of a rigid body \todo I may not need this function anymore
-	bool IsRigid() { return (m_nrigid >= 0); }
-
 	//! return number of integration points
 	int GaussPoints() const { return m_pT->nint; } 
 
@@ -113,7 +110,6 @@ protected:
 	int		m_mat;		//!< material index
 
 public:
-	int				m_nrigid;	//!< rigid body number that this element is attached to
 	int				m_nID;		//!< element ID
 	vector<int>		m_node;		//!< connectivity
 
@@ -190,7 +186,6 @@ public:
 
 		// copy base class data
 		m_mat = el.m_mat;
-		m_nrigid = el.m_nrigid;
 		m_node = el.m_node;
 		m_nID = el.m_nID;
 		m_lid = el.m_lid;
@@ -208,7 +203,6 @@ public:
 
 		// copy base class data
 		m_mat = el.m_mat;
-		m_nrigid = el.m_nrigid;
 		m_node = el.m_node;
 		m_nID = el.m_nID;
 		m_lid = el.m_lid;

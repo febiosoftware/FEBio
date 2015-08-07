@@ -14,8 +14,10 @@
 #include "quatd.h"
 #include "BC.h"
 #include "DumpFile.h"
-#include "FEModel.h"
 #include "FEObject.h"
+
+//-----------------------------------------------------------------------------
+class FEModel;
 
 //-----------------------------------------------------------------------------
 //! rigid body class
@@ -57,7 +59,7 @@ public:
 
 public:
 	int		m_nID;		//!< ID of rigid body
-	int		m_mat;		//!< material ID
+	int		m_mat;		//!< material ID (TODO: Since rigid bodies can have multiple materials, I want to remove this)
 	double	m_mass;		//!< total mass of rigid body
     mat3ds  m_moi;      //!< mass moment of inertia about center of mass
 	vec3d	m_Fr, m_Mr;	//!< reaction force and torque

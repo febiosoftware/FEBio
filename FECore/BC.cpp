@@ -134,10 +134,11 @@ bool FERigidBodyFixedBC::Init()
 //-----------------------------------------------------------------------------
 void FERigidBodyFixedBC::Activate()
 {
-	FEModel& fem = *GetFEModel();
 	if (m_binit)
 	{
-		FERigidBody& RB = static_cast<FERigidBody&>(*fem.Object(id));
+		FEModel& fem = *GetFEModel();
+		FERigidSystem& rs = *fem.GetRigidSystem();
+		FERigidBody& RB = *rs.Object(id);
 
 		// we only fix the open dofs. If a user accidentally applied a fixed and prescribed
 		// rigid degree of freedom, then we make sure the prescribed takes precedence.
@@ -148,11 +149,11 @@ void FERigidBodyFixedBC::Activate()
 //-----------------------------------------------------------------------------
 void FERigidBodyFixedBC::Deactivate()
 {
-	FEModel& fem = *GetFEModel();
-
 	if (m_binit)
 	{
-		FERigidBody& RB = static_cast<FERigidBody&>(*fem.Object(id));
+		FEModel& fem = *GetFEModel();
+		FERigidSystem& rs = *fem.GetRigidSystem();
+		FERigidBody& RB = *rs.Object(id);
 
 		// Since fixed rigid dofs can be overwritten by prescribed dofs, 
 		// we have to make sure that this dof is actually a fixed dof.
@@ -205,7 +206,8 @@ void FERigidBodyDisplacement::Activate()
 
 	// get the rigid body
 	FEModel& fem = *GetFEModel();
-	FERigidBody& RB = static_cast<FERigidBody&>(*fem.Object(id));
+	FERigidSystem& rs = *fem.GetRigidSystem();
+	FERigidBody& RB = *rs.Object(id);
 
 	// set some stuff
 	RB.m_pDC[bc] = this;
@@ -237,7 +239,8 @@ void FERigidBodyDisplacement::Deactivate()
 	if (m_binit)
 	{
 		FEModel& fem = *GetFEModel();
-		FERigidBody& RB = static_cast<FERigidBody&>(*fem.Object(id));
+		FERigidSystem& rs = *fem.GetRigidSystem();
+		FERigidBody& RB = *rs.Object(id);
 
 		// turn off the prescribed displacement
 		RB.m_pDC[bc] = 0;
@@ -280,8 +283,10 @@ bool FERigidBodyVelocity::Init()
 void FERigidBodyVelocity::Activate()
 {
 	FEModel& fem = *GetFEModel();
-	FERigidBody& rb = static_cast<FERigidBody&>(*fem.Object(m_rid));
-	rb.m_vp = rb.m_vt = m_vel;
+	FERigidSystem& rs = *fem.GetRigidSystem();
+	FERigidBody& RB = *rs.Object(m_rid);
+
+	RB.m_vp = RB.m_vt = m_vel;
 }
 
 //-----------------------------------------------------------------------------
@@ -297,8 +302,9 @@ bool FERigidBodyAngularVelocity::Init()
 void FERigidBodyAngularVelocity::Activate()
 {
 	FEModel& fem = *GetFEModel();
-    FERigidBody& rb = static_cast<FERigidBody&>(*fem.Object(m_rid));
-	rb.m_wp = rb.m_wt = m_w;
+	FERigidSystem& rs = *fem.GetRigidSystem();
+	FERigidBody& RB = *rs.Object(m_rid);
+	RB.m_wp = RB.m_wt = m_w;
 }
 
 //-----------------------------------------------------------------------------

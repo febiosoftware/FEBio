@@ -533,34 +533,28 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 
 			// get the surface element
 			FESurfaceElement& el = m_psurf->Element(m);
+			m_psurf->UnpackLM(el, elm);
 				
-			// skip rigid surface elements
-			// TODO: do we really need to skip rigid elements?
-			if (!el.IsRigid())
+			// calculate nodal normal fluid flux
+			int neln = el.Nodes();
+			vector<double> wn(neln);
+					
+			if (!m_blinear || m_bmixture)
 			{
-				m_psurf->UnpackLM(el, elm);
-					
-				// calculate nodal normal fluid flux
-				int neln = el.Nodes();
-				vector<double> wn(neln);
-					
-				if (!m_blinear || m_bmixture)
-				{
-					double g = m_flux;
-					if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
+				double g = m_flux;
+				if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
 						
-					for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
+				for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
 						
-					// get the element stiffness matrix
-					int ndof = neln*4;
-					ke.resize(ndof, ndof);
+				// get the element stiffness matrix
+				int ndof = neln*4;
+				ke.resize(ndof, ndof);
 						
-					// calculate pressure stiffness
-					FluxStiffnessSS(el, ke, wn, dt, m_bmixture);
+				// calculate pressure stiffness
+				FluxStiffnessSS(el, ke, wn, dt, m_bmixture);
 						
-					// assemble element matrix in global stiffness matrix
-					psolver->AssembleStiffness(el.m_node, elm, ke);
-				}
+				// assemble element matrix in global stiffness matrix
+				psolver->AssembleStiffness(el.m_node, elm, ke);
 			}
 		}
 	}
@@ -572,38 +566,31 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 
 			// get the surface element
 			FESurfaceElement& el = m_psurf->Element(m);
-				
-			// skip rigid surface elements
-			// TODO: do we really need to skip rigid elements?
-			if (!el.IsRigid())
+			m_psurf->UnpackLM(el, elm);
+					
+			// calculate nodal normal fluid flux
+			int neln = el.Nodes();
+			vector<double> wn(neln);
+					
+			if (!m_blinear || m_bmixture)
 			{
-				m_psurf->UnpackLM(el, elm);
-					
-				// calculate nodal normal fluid flux
-				int neln = el.Nodes();
-				vector<double> wn(neln);
-					
-				if (!m_blinear || m_bmixture)
-				{
-					double g = m_flux;
-					if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
+				double g = m_flux;
+				if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
 						
-					for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
+				for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
 						
-					// get the element stiffness matrix
-					int ndof = neln*4;
-					ke.resize(ndof, ndof);
+				// get the element stiffness matrix
+				int ndof = neln*4;
+				ke.resize(ndof, ndof);
 						
-					// calculate pressure stiffness
-					FluxStiffness(el, ke, wn, dt, m_bmixture);
+				// calculate pressure stiffness
+				FluxStiffness(el, ke, wn, dt, m_bmixture);
 						
-					// assemble element matrix in global stiffness matrix
-					psolver->AssembleStiffness(el.m_node, elm, ke);
-				}
+				// assemble element matrix in global stiffness matrix
+				psolver->AssembleStiffness(el.m_node, elm, ke);
 			}
 		}
 	}
-
 }
 
 //-----------------------------------------------------------------------------

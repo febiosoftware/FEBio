@@ -17,10 +17,11 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 	// initialize base class
 	FEShellDomain::Initialize(mdl);
 
+	// error flag (set true on error)
 	bool bmerr = false;
 
+	// set the local coordinate system for each integration point
 	FECoordSysMap* pmap = m_pMat->GetElasticMaterial()->GetCoordinateSystemMap();
-
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		// unpack element data
@@ -55,6 +56,33 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 			}
 		}
 	}
+
+	// check for initially inverted shells
+	for (int i=0; i<Elements(); ++i)
+	{
+		FEShellElement& el = Element(i);
+		int nint = el.GaussPoints();
+		for (int n=0; n<nint; ++n)
+		{
+			double J0 = detJ0(el, n);
+			if (J0 <= 0)
+			{
+				felog.printf("**************************** E R R O R ****************************\n");
+				felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
+				felog.printf("Jacobian = %lg\n", J0);
+				felog.printf("Did you use the right node numbering?\n");
+				felog.printf("Nodes:");
+				for (int l=0; l<el.Nodes(); ++l)
+				{
+					felog.printf("%d", el.m_node[l]+1);
+					if (l+1 != el.Nodes()) felog.printf(","); else felog.printf("\n");
+				}
+				felog.printf("*******************************************************************\n\n");
+				bmerr = true;
+			}
+		}
+	}
+
 	return (bmerr == false);
 }
 

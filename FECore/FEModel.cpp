@@ -28,6 +28,10 @@ FEModel::FEModel(void)
 	m_ut4_bdev = false;
 	m_udghex_hg = 1.0;
 	m_nsolver = m_ndefault_solver;
+
+	// create a rigid system
+	// TODO: Perhaps I can set it inially to zero and only allocate it if a rigid body is defined
+	m_prs = new FERigidSystem(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -56,11 +60,13 @@ void FEModel::Clear()
 	for (i=0; i<m_RBW.size (); ++i) delete m_RBW[i] ; m_RBW.clear ();
 	for (i=0; i<m_RN.size  (); ++i) delete m_RN [i] ; m_RN.clear  ();
 	for (i=0; i<m_NLC.size (); ++i) delete m_NLC[i] ; m_NLC.clear ();
-	for (i=0; i<m_Obj.size (); ++i) delete m_Obj[i] ; m_Obj.clear ();
 
 	// global data
 	for (i=0; i<m_GD.size(); ++i) delete m_GD[i]; m_GD.clear();
 	m_Const.clear();
+
+	// clear the rigid system (if there is one)
+	if (m_prs) m_prs->Clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -86,7 +92,6 @@ bool FEModel::Init()
 	m_ftime0 = 0;
 
 	// check step data
-	// TODO: should I let the Steps take care of this instead?
 	for (int i=0; i<(int) m_Step.size(); ++i)
 	{
 		FEAnalysis& step = *m_Step[i];
@@ -101,7 +106,7 @@ bool FEModel::Init()
 
 	// create and initialize the rigid body data
 	// NOTE: Do this first, since some BC's look at the nodes' rigid id.
-	if (InitObjects() == false) return false;
+	if (m_prs && (m_prs->Init() == false)) return false;
 
 	// validate BC's
 	if (InitBCs() == false) return false;
@@ -109,7 +114,7 @@ bool FEModel::Init()
 	// initialize material data
 	// NOTE: call this before InitMesh since we need to initialize the FECoordSysMap
 	//       before we can calculate the local element coordinate systems.
-	// NOTE: This must be called after the InitObjects since the rigid materials will
+	// NOTE: This must be called after the rigid system is initialiazed since the rigid materials will
 	//       reference the rigid bodies
 	if (InitMaterials() == false) return false;
 
@@ -191,7 +196,10 @@ bool FEModel::InitMesh()
 
 	// intialize domain data
 	// TODO: I'd like the mesh to take care of this, but I need to pass a FEModel pointer for some reason.
-	for (int i=0; i<m_mesh.Domains(); ++i) m_mesh.Domain(i).Initialize(*this);
+	for (int i=0; i<m_mesh.Domains(); ++i)
+	{
+		if (m_mesh.Domain(i).Initialize(*this) == false) return false;
+	}
 
 	return true;
 }
@@ -234,226 +242,6 @@ bool FEModel::InitMaterials()
 		}
 	}
 
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! This function creates and initializes the rigid bodies, the only non-deformable
-//! "objects" supported so far.
-bool FEModel::InitObjects()
-{
-	// count the number of rigid materials
-	int nrm = 0;
-	for (int i=0; i<Materials(); ++i)
-	{
-		if (GetMaterial(i)->IsRigid()) nrm++;
-	}
-	
-	// make sure there are rigid materials
-	if (nrm == 0) return true;
-
-	// First we need to figure out how many rigid bodies there are.
-	// This is not the same as rigid materials, since a rigid body
-	// may be composed of different rigid materials (similarly to a deformable
-	// body that may contain different materials). Although there can
-	// only be one deformable mesh, there can be several rigid bodies.
-
-	// The mrb array will contain an index to the rigid body the material
-	// is attached too.
-	vector<int> mrb(Materials());
-	int n = 0;
-	for (int i=0; i<Materials(); ++i)
-	{
-		if (GetMaterial(i)->IsRigid()) mrb[i] = n++;
-		else mrb[i] = -1;
-	}
-
-	// Next, we assign to all nodes a rigid node number
-	// This number is preliminary since rigid materials can be merged
-	for (int nd = 0; nd < m_mesh.Domains(); ++nd)
-	{
-		FEDomain& dom = m_mesh.Domain(nd);
-		FEMaterial* pmat = dom.GetMaterial();
-		if (pmat->IsRigid())
-		{
-			for (int i=0; i<dom.Elements(); ++i)
-			{
-				FEElement& el = dom.ElementRef(i);
-				el.m_nrigid = pmat->GetID() - 1;
-				for (int j=0; j<el.Nodes(); ++j)
-				{
-					int n = el.m_node[j];
-					FENode& node = m_mesh.Node(n);
-					node.m_rid = pmat->GetID() - 1;
-				}
-			}
-		}
-		else 
-		{
-			for (int i=0; i<dom.Elements(); ++i)
-			{
-				FEElement& el = dom.ElementRef(i);
-				el.m_nrigid = -1;
-			}
-		}
-	}
-
-	// now we can merge rigid materials
-	// if a rigid element has two nodes that connect to two different
-	// rigid materials we need to merge. 
-	bool bdone;
-	do
-	{
-		bdone = true;
-		for (int nd=0; nd<m_mesh.Domains(); ++nd)
-		{
-			FEDomain& dom = m_mesh.Domain(nd);
-			for (int i=0; i<dom.Elements(); ++i)
-			{
-				FEElement& el = dom.ElementRef(i);
-				if (el.m_nrigid >= 0)
-				{
-					int m = m_mesh.Node(el.m_node[0]).m_rid;
-					for (int j=1; j<el.Nodes(); ++j)
-					{
-						int n = m_mesh.Node(el.m_node[j]).m_rid;
-						if (mrb[n] != mrb[m])
-						{
-							if (mrb[n]<mrb[m]) mrb[m] = mrb[n]; else mrb[n] = mrb[m];
-							bdone = false;
-						}
-					}
-				}
-			}
-		}
-	}
-	while (!bdone);
-
-	// since we may have lost a rigid body in the merge process
-	// we reindex the RB's.
-	int nmat = Materials();
-	vector<int> mrc; mrc.assign(nmat, -1);
-	for (int i=0; i<nmat; ++i) if (mrb[i] >= 0) mrc[mrb[i]] = 0;
-	int nrb = 0;
-	for (int i=0; i<nmat; ++i)
-	{
-		if (mrc[i] == 0) mrc[i] = nrb++;
-	}
-
-	for (int i=0; i<nmat; ++i) 
-	{
-		if (mrb[i] >= 0) mrb[i] = mrc[mrb[i]];
-	}
-
-	// set rigid body index for materials
-	for (int i=0; i<Materials(); ++i)
-	{
-		FEMaterial* pm = GetMaterial(i);
-		if (pm->IsRigid())	
-		{
-			pm->SetRigidBodyID(mrb[i]);
-		}
-	}
-
-	// assign rigid body index to rigid elements
-	for (int nd=0; nd<m_mesh.Domains(); ++nd)
-	{
-		FEDomain& dom = m_mesh.Domain(nd);
-		FEMaterial* pm = dom.GetMaterial();
-		for (int i=0; i<dom.Elements(); ++i)
-		{
-			FEElement& el = dom.ElementRef(i);
-			if (pm->IsRigid())
-				el.m_nrigid = pm->GetRigidBodyID();
-			else
-				el.m_nrigid = -1;
-		}
-	}
-
-	// assign rigid body index to nodes
-	for (int i=0; i<m_mesh.Nodes(); ++i)
-	{
-		FENode& node = m_mesh.Node(i);
-		if (node.m_rid >= 0) node.m_rid = mrb[ node.m_rid ];
-	}
-
-	// Ok, we now know how many rigid bodies there are
-	// so let's create them
-	m_Obj.clear();
-	for (int i=0; i<nrb; ++i)
-	{
-		// create a new rigid body
-		FERigidBody* prb = new FERigidBody(this);
-		prb->m_nID = i;
-
-		// Since a rigid body may contain several rigid materials
-		// we find the first material that this body has and use
-		// that materials data to set up the rigid body data
-		int j;
-		FEMaterial* pm = 0;
-		for (j=0; j<Materials(); ++j)
-		{
-			pm = GetMaterial(j);
-			if (pm && (pm->GetRigidBodyID() == i))	break;
-		}
-		assert(j<Materials());
-		prb->m_mat = j;
-
-		// add it to the pile
-		m_Obj.push_back(prb);
-	}
-
-	// assign correct rigid body ID's to rigid nodes
-	for (int i=0; i<(int) m_RN.size(); ++i)
-	{
-		FERigidNode& rn = *m_RN[i];
-		rn.rid = mrb[rn.rid];
-	}
-
-	// let's find all rigid surface elements
-	// a surface element is rigid when it has no free nodes
-	for (int is = 0; is < (int) m_SL.size(); ++is)
-	{
-		FESurfaceLoad* ps = m_SL[is];
-		for (int i=0; i<ps->Surface().Elements(); ++i)
-		{
-			FESurfaceElement& el = ps->Surface().Element(i);
-			int N = el.Nodes();
-			el.m_nrigid = 0;
-			for (int j=0; j<N; ++j) 
-			{
-				FENode& node = m_mesh.Node(el.m_node[j]);
-				if (node.m_rid < 0) 
-				{
-					el.m_nrigid = -1;
-					break;
-				}
-			}
-		}
-	}
-
-	// the rigid body constraints are still associated with the rigid materials
-	// so we now associate them with the rigid bodies
-	for (int i=0; i<(int) m_RBC.size(); ++i)
-	{
-		FERigidBodyFixedBC& BC = *m_RBC[i];
-		if (BC.Init() == false) return false;
-	}
-	for (int i=0; i<(int) m_RDC.size(); ++i)
-	{
-		FERigidBodyDisplacement& DC = *m_RDC[i];
-		if (DC.Init() == false) return false;
-	}
-	for (int i=0; i<(int) m_RBV.size(); ++i)
-	{
-		FERigidBodyVelocity& RV = *m_RBV[i];
-		if (RV.Init() == false) return false;
-	}
-	for (int i=0; i<(int) m_RBW.size(); ++i)
-	{
-		FERigidBodyAngularVelocity& RW = *m_RBW[i];
-		if (RW.Init() == false) return false;
-	}
 	return true;
 }
 
@@ -629,8 +417,7 @@ bool FEModel::Reset()
 	m_mesh.Reset();
 
 	// reset object data
-	int nrb = m_Obj.size();
-	for (int i=0; i<nrb; ++i) m_Obj[i]->Reset();
+	if (m_prs && (m_prs->Reset() == false)) return false;
 
 	// set up rigid joints
 	if (!m_NLC.empty())
@@ -694,7 +481,7 @@ void FEModel::ShallowCopy(DumpStream& dmp, bool bsave)
 	m_mesh.ShallowCopy(dmp, bsave);
 
 	// stream rigid body data
-	for (int i=0; i<(int) m_Obj.size(); ++i) m_Obj[i]->ShallowCopy(dmp, bsave);
+	if (m_prs) m_prs->ShallowCopy(dmp, bsave);
 
 	// stream contact data
 	for (int i=0; i<SurfacePairInteractions(); ++i) m_CI[i]->ShallowCopy(dmp, bsave);
@@ -765,17 +552,9 @@ double* FEModel::FindParameter(const char* szparam)
 	FEParam* pp = pmat->GetParameter(sz);
 	if (pp) return pp->pvalue<double>(index);
 
-	// the rigid bodies are dealt with differently
-	int nrb = m_Obj.size();
-	for (int i=0; i<nrb; ++i)
-	{
-		FEObject& ob = *m_Obj[i];
-		if (ob.GetMaterialID() == nmat)
-		{
-			FEParam* pp = ob.GetParameter(sz);
-			if (pp) return pp->pvalue<double>(index);
-		}
-	}
+	// if we get here we didn't find
+	// Let's try the rigid system
+	if (m_prs) return m_prs->FindParameter(nmat, sz, index);
 
 	// oh, oh, we didn't find it
 	return 0;

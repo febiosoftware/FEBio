@@ -105,12 +105,13 @@ bool FEPlotNodeReactionForces::Save(FEMesh& m, vector<float>& a)
 bool FEPlotRigidReactionForce::Save(FEMesh& m, vector<float>& a)
 {
     int N = m.Nodes();
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
     for (int i=0; i<N; ++i)
     {
         FENode& node = m.Node(i);
         if (node.m_rid >= 0)
         {
-            FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(node.m_rid));
+            FERigidBody& rb = *rigid.Object(node.m_rid);
             a.push_back((float)rb.m_Fr.x);
             a.push_back((float)rb.m_Fr.y);
             a.push_back((float)rb.m_Fr.z);
@@ -128,13 +129,14 @@ bool FEPlotRigidReactionForce::Save(FEMesh& m, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotRigidReactionTorque::Save(FEMesh& m, vector<float>& a)
 {
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
 	int N = m.Nodes();
 	for (int i=0; i<N; ++i)
 	{
 		FENode& node = m.Node(i);
 		if (node.m_rid >= 0)
 		{
-			FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(node.m_rid));
+			FERigidBody& rb = *rigid.Object(node.m_rid);
 			a.push_back((float)rb.m_Mr.x);
 			a.push_back((float)rb.m_Mr.y);
 			a.push_back((float)rb.m_Mr.z);
@@ -1691,7 +1693,8 @@ bool FEPlotRigidDisplacement::Save(FEDomain& dom, vector<float>& a)
 	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
     
 	// get the rigid body
-	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
     
 	// copy results to archive
 	int NN = dom.Nodes();
@@ -1714,7 +1717,8 @@ bool FEPlotRigidVelocity::Save(FEDomain& dom, vector<float>& a)
 	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
     
 	// get the rigid body
-	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
     
 	// copy results to archive
 	int NN = dom.Nodes();
@@ -1737,7 +1741,8 @@ bool FEPlotRigidAcceleration::Save(FEDomain& dom, vector<float>& a)
 	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
     
 	// get the rigid body
-	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
     
 	// copy results to archive
 	int NN = dom.Nodes();
@@ -1760,7 +1765,8 @@ bool FEPlotRigidRotation::Save(FEDomain& dom, vector<float>& a)
 	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
     
 	// get the rigid body
-	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
     vec3d q = rb.m_qt.GetVector()*rb.m_qt.GetAngle();
     
 	// copy results to archive
@@ -1784,7 +1790,8 @@ bool FEPlotRigidAngularVelocity::Save(FEDomain& dom, vector<float>& a)
 	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
     
 	// get the rigid body
-	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
     
 	// copy results to archive
 	int NN = dom.Nodes();
@@ -1807,7 +1814,8 @@ bool FEPlotRigidAngularAcceleration::Save(FEDomain& dom, vector<float>& a)
 	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
     
 	// get the rigid body
-	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
     
 	// copy results to archive
 	int NN = dom.Nodes();
@@ -1830,7 +1838,8 @@ bool FEPlotRigidKineticEnergy::Save(FEDomain& dom, vector<float>& a)
 	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
     
 	// get the rigid body
-	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
     vec3d v = rb.m_vt;
     double m = rb.m_mass;
     vec3d w = rb.m_wt;
@@ -1854,7 +1863,8 @@ bool FEPlotRigidEuler::Save(FEDomain& dom, vector<float>& a)
 	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
     
 	// get the rigid body
-	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
 
 	// get the Euler angles
 	double E[3];
@@ -1881,7 +1891,8 @@ bool FEPlotRigidRotationVector::Save(FEDomain& dom, vector<float>& a)
 	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
     
 	// get the rigid body
-	FERigidBody& rb = static_cast<FERigidBody&>(*m_pfem->Object(prm->GetRigidBodyID()));
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
 
 	// get the rotation vector and angle
 	double w = rb.m_qt.GetAngle();

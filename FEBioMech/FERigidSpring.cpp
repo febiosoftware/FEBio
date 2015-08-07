@@ -10,6 +10,7 @@
 #include "FERigidSpring.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidSpring, FERigidConnector);
@@ -56,9 +57,10 @@ bool FERigidSpring::Init()
         return false;
     }
     m_nRBb = pm->GetRigidBodyID();
-    
-    FERigidBody& ra = dynamic_cast<FERigidBody&>(*fem.Object(m_nRBa));
-    FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.Object(m_nRBb));
+
+	FERigidSystem& rs = *fem.GetRigidSystem();
+    FERigidBody& ra = *rs.Object(m_nRBa);
+    FERigidBody& rb = *rs.Object(m_nRBb);
 
     // get initial length of spring
     m_L0 = (m_b0 - m_a0).norm();
@@ -94,8 +96,9 @@ void FERigidSpring::Residual(FEGlobalVector& R, const FETimePoint& tp)
     vector<double> fa(6);
     vector<double> fb(6);
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rs.Object(m_nRBa);
+    FERigidBody& RBb = *rs.Object(m_nRBb);
 
 	double alpha = tp.alpha;
 
@@ -147,8 +150,9 @@ void FERigidSpring::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
     matrix ke(12,12);
     ke.zero();
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rs.Object(m_nRBa);
+    FERigidBody& RBb = *rs.Object(m_nRBb);
     
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
@@ -314,8 +318,9 @@ void FERigidSpring::Update(const FETimePoint& tp)
     vec3d ra, rb, c;
     vec3d za, zb;
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rs.Object(m_nRBa);
+    FERigidBody& RBb = *rs.Object(m_nRBb);
 
 	double alpha = tp.alpha;
 
@@ -340,8 +345,9 @@ void FERigidSpring::Reset()
 {
     m_F = vec3d(0,0,0);
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rs.Object(m_nRBa);
+    FERigidBody& RBb = *rs.Object(m_nRBb);
     
     m_qa0 = m_a0 - RBa.m_r0;
     m_qb0 = m_b0 - RBb.m_r0;

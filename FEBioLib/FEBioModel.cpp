@@ -502,7 +502,7 @@ void FEBioModel::SerializeMaterials(DumpFile& ar)
 			AddMaterial(pmat);
 
 			// initialize the rigid bodies
-			FEModel::InitObjects();
+			if (m_prs) m_prs->Init();
 
 			// call init in case this function initializes other data
 			pmat->Init();
@@ -516,6 +516,7 @@ void FEBioModel::SerializeGeometry(DumpFile &ar)
 {
 	// serialize the mesh first 
 	SerializeMesh(ar);
+	FERigidSystem& rigid = *GetRigidSystem();
 
 	// serialize the other geometry data
 	if (ar.IsSaving())
@@ -523,9 +524,9 @@ void FEBioModel::SerializeGeometry(DumpFile &ar)
 		int i;
 
 		// FE objects
-		int nrb = m_Obj.size();
+		int nrb = rigid.Objects();
 		ar << nrb;
-		for (i=0; i<nrb; ++i) m_Obj[i]->Serialize(ar);
+		for (i=0; i<nrb; ++i) rigid.Object(i)->Serialize(ar);
 	}
 	else
 	{
@@ -534,12 +535,12 @@ void FEBioModel::SerializeGeometry(DumpFile &ar)
 		// rigid bodies
 		int nrb;
 		ar >> nrb;
-		m_Obj.clear();
+		rigid.Clear();
 		for (i=0; i<nrb; ++i)
 		{
 			FERigidBody* prb = new FERigidBody(this);
 			prb->Serialize(ar);
-			m_Obj.push_back(prb);
+			rigid.AddRigidBody(prb);
 		}
 	}
 }

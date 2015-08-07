@@ -1,6 +1,7 @@
 #pragma once
 #include "DumpFile.h"
 #include "FEParameterList.h"
+#include "DumpStream.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------

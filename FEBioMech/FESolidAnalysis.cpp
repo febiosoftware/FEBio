@@ -6,6 +6,7 @@
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 FESolidAnalysis::FESolidAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_SOLID) 
@@ -112,13 +113,15 @@ bool FESolidAnalysis::Activate()
 
 	if (m_nanalysis == FE_DYNAMIC)
 	{
+		FERigidSystem& rigid = *m_fem.GetRigidSystem();
+
 		// set the initial velocities of all rigid nodes
 		for (int i=0; i<mesh.Nodes(); ++i)
 		{
 			FENode& n = mesh.Node(i);
 			if (n.m_rid >= 0)
 			{
-				FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(n.m_rid));
+				FERigidBody& rb = *rigid.Object(n.m_rid);
 				vec3d V = rb.m_vt;
 				vec3d W = rb.m_wt;
 				vec3d r = n.m_rt - rb.m_rt;
@@ -148,9 +151,10 @@ void FESolidAnalysis::Deactivate()
 	FEAnalysis::Deactivate();
 
 	// store the current rigid body reaction forces
-	for (int i=0; i<m_fem.Objects(); ++i)
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	for (int i=0; i<rigid.Objects(); ++i)
 	{
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = *rigid.Object(i);
 		RB.m_Fp = RB.m_Fr;
 		RB.m_Mp = RB.m_Mr;
 	}

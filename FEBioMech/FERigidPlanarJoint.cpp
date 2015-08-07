@@ -9,6 +9,7 @@
 #include "FERigidPlanarJoint.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidPlanarJoint, FERigidConnector);
@@ -85,11 +86,12 @@ bool FERigidPlanarJoint::Init()
     }
     m_nRBb = pm->GetRigidBodyID();
     
-    FERigidBody& ra = dynamic_cast<FERigidBody&>(*fem.Object(m_nRBa));
-    FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.Object(m_nRBb));
+	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rs.Object(m_nRBa);
+    FERigidBody& RBb = *rs.Object(m_nRBb);
     
-    m_qa0 = m_q0 - ra.m_r0;
-    m_qb0 = m_q0 - rb.m_r0;
+    m_qa0 = m_q0 - RBa.m_r0;
+    m_qb0 = m_q0 - RBb.m_r0;
     
     m_ea0[0] = m_e0[0]; m_ea0[1] = m_e0[1]; m_ea0[2] = m_e0[2];
     m_eb0[0] = m_e0[0]; m_eb0[1] = m_e0[1]; m_eb0[2] = m_e0[2];
@@ -131,8 +133,9 @@ void FERigidPlanarJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
     vec3d eat[3], eap[3], ea[3];
     vec3d ebt[3], ebp[3], eb[3];
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rs.Object(m_nRBa);
+    FERigidBody& RBb = *rs.Object(m_nRBb);
     
     double alpha = tp.alpha;
     
@@ -236,8 +239,9 @@ void FERigidPlanarJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint& t
     matrix ke(12,12);
     ke.zero();
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rs.Object(m_nRBa);
+    FERigidBody& RBb = *rs.Object(m_nRBb);
     
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
@@ -456,8 +460,9 @@ bool FERigidPlanarJoint::Augment(int naug, const FETimePoint& tp)
     double normM0, normM1;
     bool bconv = true;
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rs.Object(m_nRBa);
+    FERigidBody& RBb = *rs.Object(m_nRBb);
     
     double alpha = tp.alpha;
     
@@ -603,8 +608,9 @@ void FERigidPlanarJoint::Update(const FETimePoint& tp)
     vec3d eat[3], eap[3], ea[3];
     vec3d ebt[3], ebp[3], eb[3];
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rs.Object(m_nRBa);
+    FERigidBody& RBb = *rs.Object(m_nRBb);
     
     double alpha = tp.alpha;
     
@@ -682,8 +688,9 @@ void FERigidPlanarJoint::Reset()
     m_M = vec3d(0,0,0);
     m_U = vec3d(0,0,0);
     
-    FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
-    FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
+	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
+    FERigidBody& RBa = *rs.Object(m_nRBa);
+    FERigidBody& RBb = *rs.Object(m_nRBb);
     
     m_qa0 = m_q0 - RBa.m_r0;
     m_qb0 = m_q0 - RBb.m_r0;

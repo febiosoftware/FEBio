@@ -1,4 +1,5 @@
 #pragma once
+#include "FERigidSystem.h"
 #include "FEMaterial.h"
 #include "FEMesh.h"
 #include "LoadCurve.h"
@@ -75,17 +76,11 @@ public:
 	// get the FE mesh
 	FEMesh& GetMesh() { return m_mesh; }
 
-	// get the rigid object
-	FEObject* Object(int i) { return m_Obj[i]; }
-
-	// return number of rigid objects
-	int Objects() { return (int) m_Obj.size(); }
+	// get the rigid system
+	FERigidSystem* GetRigidSystem() { return m_prs; }
 
 	//! Initialize mesh data
 	bool InitMesh();
-
-	//! Initialize the objects
-	bool InitObjects();
 
 	//! Validate BC's
 	bool InitBCs();
@@ -317,7 +312,6 @@ protected:
 	std::vector<FESurfacePairInteraction*>	m_CI;	//!< contact interface array
 	std::vector<FEBodyLoad*>				m_BL;	//!< body load data
 	std::vector<FENLConstraint*>			m_NLC;	//!< nonlinear constraints
-	std::vector<FERigidNode*>				m_RN;	//!< rigid nodes
 	std::vector<FEModelLoad*>				m_ML;	//!< model loads
 
 protected:
@@ -326,12 +320,15 @@ protected:
 
 protected:
 	// Geometry data
-	FEMesh		m_mesh;					//!< the one and only FE mesh
-	std::vector<FEObject*>		m_Obj;	//!< FE Object array (NOTE: only used for rigid bodies)
+	FEMesh		m_mesh;			//!< the one and only FE mesh
+
+	// the rigid body system
+	FERigidSystem*		m_prs;	//!< the rigid body system manages rigid bodies
 
 public:
 	// Boundary/Initial conditions for rigid bodies
 	// TODO: I'd like to do something different with this. Perhaps place them in the BC or in some constraint section.
+	vector<FERigidNode*>				m_RN;	//!< rigid nodes
 	vector<FERigidBodyFixedBC*>			m_RBC;	//!< rigid body fixed
 	vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
 	vector<FERigidBodyVelocity*>		m_RBV;	//!< rigid body initial velocities

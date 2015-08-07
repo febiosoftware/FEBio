@@ -506,10 +506,11 @@ bool FEThermoElasticSolver::Residual(vector<double>& R)
 	FEResidualVector RHS(GetFEModel(), R, m_Fr);
 
 	// zero rigid body reaction forces
-	int NRB = m_fem.Objects();
+	FERigidSystem& rs = *m_fem.GetRigidSystem();
+	int NRB = rs.Objects();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = *rs.Object(i);
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
 	}
 

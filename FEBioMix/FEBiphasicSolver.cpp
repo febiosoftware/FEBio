@@ -459,10 +459,11 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	FEResidualVector RHS(GetFEModel(), R, m_Fr);
 
 	// zero rigid body reaction forces
-	int NRB = m_fem.Objects();
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	int NRB = rigid.Objects();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = *rigid.Object(i);
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
 	}
 
@@ -657,10 +658,11 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
-	int NRB = m_fem.Objects();
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	int NRB = rigid.Objects();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& rb = static_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& rb = *rigid.Object(i);
 		for (j=0; j<6; ++j)
 			if (rb.m_LM[j] < -1)
 			{

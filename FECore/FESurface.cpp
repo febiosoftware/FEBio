@@ -1473,7 +1473,7 @@ void FESurface::Serialize(DumpFile &ar)
 		{
 			FESurfaceElement& el = Element(k);
 			ar << el.Type();
-			ar << el.GetMatID() << el.m_nID << el.m_nrigid;
+			ar << el.GetMatID() << el.m_nID;
 			ar << el.m_node;
 			ar << el.m_lnode;
 			ar << el.m_nelem;
@@ -1493,7 +1493,7 @@ void FESurface::Serialize(DumpFile &ar)
 			ar >> n;
 			el.SetType(n);
 
-			ar >> mat >> el.m_nID >> el.m_nrigid;
+			ar >> mat >> el.m_nID;
 			ar >> el.m_node;
 			ar >> el.m_lnode;
 			ar >> el.m_nelem;

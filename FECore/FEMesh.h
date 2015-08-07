@@ -342,9 +342,6 @@ protected:
 	double SolidElementVolume(FESolidElement& el);
 	double ShellElementVolume(FEShellElement& el);
 
-	//! Look for any inverted elements
-	int FindInvertedElements();
-	
 	//! Initialize shell normals
 	void InitShellNormals();
 

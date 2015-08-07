@@ -55,11 +55,8 @@ bool FEHeatStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 				for (int j=0; j<d.Elements(); ++j)
 				{
 					FEElement& el = d.ElementRef(j);
-					if (!el.IsRigid())
-					{
-						d.UnpackLM(el, elm);
-						build_add(elm);
-					}
+					d.UnpackLM(el, elm);
+					build_add(elm);
 				}
 			}
 		}

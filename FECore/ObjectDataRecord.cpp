@@ -36,10 +36,11 @@ double ObjectDataRecord::Evaluate(int item, int ndata)
 	if (pm == 0) return 0;
 
 	// find the rigid body that has this material
-	int NRB = m_pfem->Objects();
+	FERigidSystem& rs = *m_pfem->GetRigidSystem();
+	int NRB = rs.Objects();
 	for (int i=0; i<NRB; ++i)
 	{
-		FEObject& obj = *m_pfem->Object(i);
+		FERigidBody& obj = *rs.Object(i);
 		if (obj.GetMaterialID() == nrb) return m_Data[ndata]->value(obj);
 	}
 

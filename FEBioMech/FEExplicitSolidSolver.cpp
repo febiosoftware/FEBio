@@ -210,10 +210,11 @@ bool FEExplicitSolidSolver::InitEquations()
 
 	// Next, we assign equation numbers to the rigid body degrees of freedom
 	m_nreq = neq;
-	int nrb = m_fem.Objects();
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	int nrb = rigid.Objects();
 	for (i=0; i<nrb; ++i)
 	{
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = *rigid.Object(i);
 		for (j=0; j<6; ++j)
 		{
 			int bcj = RB.m_BC[j];
@@ -234,7 +235,7 @@ bool FEExplicitSolidSolver::InitEquations()
 		FENode& node = mesh.Node(i);
 		if (node.m_rid >= 0)
 		{
-			FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(node.m_rid));
+			FERigidBody& RB = *rigid.Object(node.m_rid);
 			node.m_ID[DOF_X ] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0]-2 : RB.m_LM[0]);
 			node.m_ID[DOF_Y ] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1]-2 : RB.m_LM[1]);
 			node.m_ID[DOF_Z ] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2]-2 : RB.m_LM[2]);
@@ -401,13 +402,14 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 {
 	// get the number of rigid bodies
-	const int NRB = m_fem.Objects();
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	const int NRB = rigid.Objects();
 
 	// first calculate the rigid body displacement increments
 	for (int i=0; i<NRB; ++i)
 	{
 		// get the rigid body
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = *rigid.Object(i);
 		int *lm = RB.m_LM;
 		double* du = RB.m_du;
 
@@ -428,7 +430,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 		FERigidBodyDisplacement& dc = *m_fem.m_RDC[i];
 		if (dc.IsActive() && (dc.lc >= 0))
 		{
-			FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(dc.id));
+			FERigidBody& RB = *rigid.Object(dc.id);
 			RB.m_du[dc.bc] = dc.Value() - RB.m_Up[dc.bc];
 		}
 	}
@@ -437,7 +439,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 	for (int i=0; i<NRB; ++i)
 	{
 		// get the rigid body
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = *rigid.Object(i);
 		double* du = RB.m_du;
 
 		// This is the "old" update algorithm which has some issues. It does not produce the correct
@@ -467,7 +469,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 	for (int i=0; i<NRB; ++i)
 	{
 		// get the rigid body
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = *rigid.Object(i);
 
 		// update the mesh' nodes
 		int N = mesh.Nodes();
@@ -698,14 +700,15 @@ void FEExplicitSolidSolver::PrepStep(double time)
 	}
 
 	// initialize rigid bodies
-	int NO = m_fem.Objects();
-	for (i=0; i<NO; ++i) m_fem.Object(i)->Init();
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	int NO = rigid.Objects();
+	for (i=0; i<NO; ++i) rigid.Object(i)->Init();
 
 	// calculate local rigid displacements
 	for (i=0; i<(int) m_fem.m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *m_fem.m_RDC[i];
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(DC.id));
+		FERigidBody& RB = *rigid.Object(DC.id);
 		if (DC.IsActive())
 		{
 			int I = DC.bc;
@@ -720,7 +723,7 @@ void FEExplicitSolidSolver::PrepStep(double time)
 	// calculate global rigid displacements
 	for (i=0; i<NO; ++i)
 	{
-		FERigidBody* prb = dynamic_cast<FERigidBody*>(m_fem.Object(i));
+		FERigidBody* prb = rigid.Object(i);
 		if (prb)
 		{
 			FERigidBody& RB = *prb;
@@ -791,7 +794,7 @@ void FEExplicitSolidSolver::PrepStep(double time)
 	// store rigid displacements in Ui vector
 	for (i=0; i<NO; ++i)
 	{
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = *rigid.Object(i);
 		for (j=0; j<6; ++j)
 		{
 			int I = -RB.m_LM[j]-2;
@@ -832,6 +835,7 @@ void FEExplicitSolidSolver::NodalForces(vector<double>& F)
 	zero(F);
 
 	FEMesh& mesh = m_fem.GetMesh();
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
 
 	// loop over nodal force cards
 	int ncnf = m_fem.NodalLoads();
@@ -860,7 +864,7 @@ void FEExplicitSolidSolver::NodalForces(vector<double>& F)
 			else if (node.m_rid >=0)
 			{
 				// this is a rigid body node
-				FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(node.m_rid));
+				FERigidBody& RB = *rigid.Object(node.m_rid);
 
 				// get the relative position
 				a = node.m_rt - RB.m_rt;
@@ -1052,10 +1056,11 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	FEGlobalVector RHS(GetFEModel(), R, m_Fr);
 
 	// zero rigid body reaction forces
-	int NRB = m_fem.Objects();
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	int NRB = rigid.Objects();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(i));
+		FERigidBody& RB = *rigid.Object(i);
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
 	}
 

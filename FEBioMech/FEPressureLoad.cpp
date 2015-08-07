@@ -375,37 +375,32 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 		// get the surface element
 		FESurfaceElement& el = m_psurf->Element(m);
 
-		// skip rigid surface elements
-		// TODO: do we really need to skip rigid elements?
-		if (!el.IsRigid())
+		// calculate nodal normal tractions
+		int neln = el.Nodes();
+		vector<double> tn(neln);
+
+		if (m_blinear == false)
 		{
-			// calculate nodal normal tractions
-			int neln = el.Nodes();
-			vector<double> tn(neln);
+			double g = m_pressure;
+			if (pc.lc >= 0) g *= fem.GetLoadCurve(pc.lc)->Value();
 
-			if (m_blinear == false)
-			{
-				double g = m_pressure;
-				if (pc.lc >= 0) g *= fem.GetLoadCurve(pc.lc)->Value();
+			// evaluate the prescribed traction.
+			// note the negative sign. This is because this boundary condition uses the 
+			// convention that a positive pressure is compressive
+			for (int j=0; j<neln; ++j) tn[j] = -g*pc.s[j];
 
-				// evaluate the prescribed traction.
-				// note the negative sign. This is because this boundary condition uses the 
-				// convention that a positive pressure is compressive
-				for (int j=0; j<neln; ++j) tn[j] = -g*pc.s[j];
+			// get the element stiffness matrix
+			int ndof = 3*neln;
+			ke.resize(ndof, ndof);
 
-				// get the element stiffness matrix
-				int ndof = 3*neln;
-				ke.resize(ndof, ndof);
+			// calculate pressure stiffness
+			PressureStiffness(el, ke, tn);
 
-				// calculate pressure stiffness
-				PressureStiffness(el, ke, tn);
+			// get the element's LM vector
+			m_psurf->UnpackLM(el, lm);
 
-				// get the element's LM vector
-				m_psurf->UnpackLM(el, lm);
-
-				// assemble element matrix in global stiffness matrix
-				psolver->AssembleStiffness(el.m_node, lm, ke);
-			}
+			// assemble element matrix in global stiffness matrix
+			psolver->AssembleStiffness(el.m_node, lm, ke);
 		}
 	}
 }
