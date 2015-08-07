@@ -307,7 +307,7 @@
       <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
     </Lib>
     <PreBuildEvent>
-      <Command>subwcrev .. "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
+      <Command>python $(SolutionDir)svnrev.py</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
@@ -328,6 +328,9 @@
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
     </Lib>
+    <PreBuildEvent>
+      <Command>python $(SolutionDir)svnrev.py</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug OpenMP|Win32'">
     <ClCompile>
@@ -346,6 +349,9 @@
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
     </Lib>
+    <PreBuildEvent>
+      <Command>python $(SolutionDir)svnrev.py</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">
     <ClCompile>
@@ -411,7 +417,7 @@
       <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
     </Lib>
     <PreBuildEvent>
-      <Command>subwcrev .. "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
+      <Command>python $(SolutionDir)svnrev.py</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|x64'">
@@ -429,6 +435,9 @@
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
     </Lib>
+    <PreBuildEvent>
+      <Command>python $(SolutionDir)svnrev.py</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug OpenMP|x64'">
     <ClCompile>
@@ -445,6 +454,9 @@
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
     </Lib>
+    <PreBuildEvent>
+      <Command>python $(SolutionDir)svnrev.py</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Skyline Only|Win32'">
     <ClCompile>
@@ -461,6 +473,9 @@
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
     </Lib>
+    <PreBuildEvent>
+      <Command>python $(SolutionDir)svnrev.py</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Skyline Only|Itanium'">
     <ClCompile>
@@ -493,6 +508,9 @@
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
     </Lib>
+    <PreBuildEvent>
+      <Command>python $(SolutionDir)svnrev.py</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -511,7 +529,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>subwcrev .. "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
+      <Command>python $(SolutionDir)svnrev.py</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|Win32'">
@@ -532,7 +550,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>subwcrev .. "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
+      <Command>python $(SolutionDir)svnrev.py</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">
@@ -587,7 +605,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>subwcrev .. "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
+      <Command>python $(SolutionDir)svnrev.py</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|x64'">
@@ -609,7 +627,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>subwcrev .. "$(SolutionDir)svnrev_tpl.txt" "$(SolutionDir)..\FEBioLib\svnrev.h"</Command>
+      <Command>python $(SolutionDir)svnrev.py</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
