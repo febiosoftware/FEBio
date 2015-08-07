@@ -695,10 +695,13 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 	for (int i=0; i<NRD; ++i)
 	{
 		FERigidBodyDisplacement& dc = *m_fem.m_RDC[i];
-		if (dc.IsActive() && (dc.lc >= 0))
+		if (dc.IsActive())
 		{
 			FERigidBody& RB = static_cast<FERigidBody&>(*m_fem.Object(dc.id));
-			RB.m_du[dc.bc] = dc.Value() - RB.m_Up[dc.bc];
+			if (RB.m_prb == 0)
+			{
+				RB.m_du[dc.bc] = (dc.lc < 0 ? 0 : dc.Value() - RB.m_Up[dc.bc]);
+			}
 		}
 	}
 
@@ -762,9 +765,9 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 
 		// update the mesh' nodes
 		int N = mesh.Nodes();
-		for (int i=0; i<N; ++i)
+		for (int j=0; j<N; ++j)
 		{
-			FENode& node = mesh.Node(i);
+			FENode& node = mesh.Node(j);
 			if (node.m_rid == RB.m_nID)
 			{
 				vec3d a0 = node.m_r0 - RB.m_r0;
