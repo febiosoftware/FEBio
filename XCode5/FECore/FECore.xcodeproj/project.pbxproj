@@ -183,6 +183,8 @@
 		D5E365F41B32031200263DAD /* NLConstraintDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E365F21B32031200263DAD /* NLConstraintDataRecord.h */; };
 		D5F0E92619D05B9F0073F72C /* erf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F0E92419D05B9F0073F72C /* erf.cpp */; };
 		D5F0E92719D05B9F0073F72C /* erf.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F0E92519D05B9F0073F72C /* erf.h */; };
+		D5FA1BE21B74CDCB00EA5913 /* FEModelLoad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FA1BE01B74CDCB00EA5913 /* FEModelLoad.cpp */; };
+		D5FA1BE31B74CDCB00EA5913 /* FEModelLoad.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FA1BE11B74CDCB00EA5913 /* FEModelLoad.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -363,6 +365,8 @@
 		D5E365F21B32031200263DAD /* NLConstraintDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NLConstraintDataRecord.h; sourceTree = "<group>"; };
 		D5F0E92419D05B9F0073F72C /* erf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = erf.cpp; sourceTree = "<group>"; };
 		D5F0E92519D05B9F0073F72C /* erf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = erf.h; sourceTree = "<group>"; };
+		D5FA1BE01B74CDCB00EA5913 /* FEModelLoad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEModelLoad.cpp; sourceTree = "<group>"; };
+		D5FA1BE11B74CDCB00EA5913 /* FEModelLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEModelLoad.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -475,6 +479,8 @@
 				D5E10A331865E15900B23922 /* FEModel.h */,
 				D5E10A341865E15900B23922 /* FEModelComponent.cpp */,
 				D5E10A351865E15900B23922 /* FEModelComponent.h */,
+				D5FA1BE01B74CDCB00EA5913 /* FEModelLoad.cpp */,
+				D5FA1BE11B74CDCB00EA5913 /* FEModelLoad.h */,
 				D5E10A361865E15900B23922 /* FENLConstraint.cpp */,
 				D5E10A371865E15900B23922 /* FENLConstraint.h */,
 				D5E10A381865E15900B23922 /* FENNQuery.cpp */,
@@ -592,6 +598,7 @@
 				D5A0A8F1186F4AC60046B0DE /* DOFS.h in Headers */,
 				D5E10B031865E15900B23922 /* SparseMatrix.h in Headers */,
 				D5E10AE91865E15900B23922 /* Image.h in Headers */,
+				D5FA1BE31B74CDCB00EA5913 /* FEModelLoad.h in Headers */,
 				D5E10AC11865E15900B23922 /* FEMesh.h in Headers */,
 				D5E10AAF1865E15900B23922 /* FEElementLibrary.h in Headers */,
 				D5E10A991865E15900B23922 /* FEBoundaryCondition.h in Headers */,
@@ -778,6 +785,7 @@
 				D5E10AC01865E15900B23922 /* FEMesh.cpp in Sources */,
 				D5E10A981865E15900B23922 /* FEBoundaryCondition.cpp in Sources */,
 				D5E10AE81865E15900B23922 /* Image.cpp in Sources */,
+				D5FA1BE21B74CDCB00EA5913 /* FEModelLoad.cpp in Sources */,
 				D50CB99B1B177CCC006E43E6 /* BC.cpp in Sources */,
 				D5E10AD71865E15900B23922 /* FERigidBody.cpp in Sources */,
 				D5B572D7186CC76500D12E45 /* FECoreFactory.cpp in Sources */,

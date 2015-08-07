@@ -355,6 +355,8 @@
 		D5F407CC197D7DDE0059F0B1 /* FESolidSolver2.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F407CA197D7DDE0059F0B1 /* FESolidSolver2.h */; };
 		D5F65D9A1B1BD25F004C648D /* FERigidAngularDamper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F65D981B1BD25F004C648D /* FERigidAngularDamper.cpp */; };
 		D5F65D9B1B1BD25F004C648D /* FERigidAngularDamper.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F65D991B1BD25F004C648D /* FERigidAngularDamper.h */; };
+		D5FA1BDE1B74CD9000EA5913 /* FERigidForce.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FA1BDC1B74CD9000EA5913 /* FERigidForce.cpp */; };
+		D5FA1BDF1B74CD9000EA5913 /* FERigidForce.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FA1BDD1B74CD9000EA5913 /* FERigidForce.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -707,6 +709,8 @@
 		D5F407CA197D7DDE0059F0B1 /* FESolidSolver2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolidSolver2.h; sourceTree = "<group>"; };
 		D5F65D981B1BD25F004C648D /* FERigidAngularDamper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidAngularDamper.cpp; sourceTree = "<group>"; };
 		D5F65D991B1BD25F004C648D /* FERigidAngularDamper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidAngularDamper.h; sourceTree = "<group>"; };
+		D5FA1BDC1B74CD9000EA5913 /* FERigidForce.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidForce.cpp; sourceTree = "<group>"; };
+		D5FA1BDD1B74CD9000EA5913 /* FERigidForce.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidForce.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -990,6 +994,8 @@
 				D594FB3B1AFEE10300F82D29 /* FERigidCylindricalJoint.h */,
 				D5B6ED7D1B02306600126821 /* FERigidDamper.cpp */,
 				D5B6ED7E1B02306600126821 /* FERigidDamper.h */,
+				D5FA1BDC1B74CD9000EA5913 /* FERigidForce.cpp */,
+				D5FA1BDD1B74CD9000EA5913 /* FERigidForce.h */,
 				D5E1072B1865DFAD00B23922 /* FERigidJoint.cpp */,
 				D5E1072C1865DFAD00B23922 /* FERigidJoint.h */,
 				D5E1072D1865DFAD00B23922 /* FERigidMaterial.cpp */,
@@ -1164,6 +1170,7 @@
 				D5E108341865DFAD00B23922 /* FETCNonlinearOrthotropic.h in Headers */,
 				D5E108591865DFAD00B23922 /* stdafx.h in Headers */,
 				D5E107A91865DFAD00B23922 /* FEEFDUncoupled.h in Headers */,
+				D5FA1BDF1B74CD9000EA5913 /* FERigidForce.h in Headers */,
 				D51BB3F7198FCDDA00638A8B /* gausskronrod.h in Headers */,
 				D5E107B41865DFAD00B23922 /* FEElasticMultigeneration.h in Headers */,
 				D54CBF051AB340B1003CF33F /* FEPrescribedActiveContractionTransIsoUC.h in Headers */,
@@ -1428,6 +1435,7 @@
 				D5E107F11865DFAD00B23922 /* FEMooneyRivlin.cpp in Sources */,
 				D5E107D11865DFAD00B23922 /* FEFiberMaterial.cpp in Sources */,
 				D51BB4091991830800638A8B /* FEFiberIntegrationSchemeUC.cpp in Sources */,
+				D5FA1BDE1B74CD9000EA5913 /* FERigidForce.cpp in Sources */,
 				D5D2E4021B16382D00E7089B /* FERigidConnector.cpp in Sources */,
 				D5E107FD1865DFAD00B23922 /* FEOgdenUnconstrained.cpp in Sources */,
 				D54CBEF81AB31FD3003CF33F /* FEPrescribedActiveContractionUniaxial.cpp in Sources */,
