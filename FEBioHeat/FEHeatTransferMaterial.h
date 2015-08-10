@@ -53,14 +53,11 @@ public:
 	FEMaterialPoint* CreateMaterialPointData() { return new FEHeatMaterialPoint(0); }
 
 	//! get the material's conductivity
-	virtual void Conductivity(double D[3][3]) = 0;
+	virtual mat3ds Conductivity(FEMaterialPoint& mp) = 0;
 
 	//! get the material's capacitance
 	virtual double Capacitance() = 0;
 
 	//! get the material's density
 	virtual double Density() = 0;
-
-	//! get the heat flux
-	virtual vec3d HeatFlux(vec3d gradT) = 0;
 };

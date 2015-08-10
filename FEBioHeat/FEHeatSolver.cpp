@@ -280,7 +280,8 @@ void FEHeatSolver::Update(vector<double>& u)
 					assert(pt);
 
 					vec3d gradT = pbd->gradient(el, T, n);
-					pt->m_q = pmat->HeatFlux(gradT);
+					mat3ds D = pmat->Conductivity(mp);
+					pt->m_q = -(D*gradT);
 				}
 			}
 		}

@@ -106,9 +106,6 @@ void FEHeatSolidDomain::ElementConduction(FESolidElement& el, matrix& ke)
 	// zero stiffness matrix
 	ke.zero();
 
-	// conductivity matrix
-	double D[3][3];
-
 	// loop over all integration points
 	for (n=0; n<ni; ++n)
 	{
@@ -116,7 +113,8 @@ void FEHeatSolidDomain::ElementConduction(FESolidElement& el, matrix& ke)
 		detJt = invjact(el, Ji, n);
 
 		// evaluate the conductivity
-		m_pMat->Conductivity(D);
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		mat3ds D = m_pMat->Conductivity(mp);
 
 		for (i=0; i<ne; ++i)
 		{
@@ -143,9 +141,9 @@ void FEHeatSolidDomain::ElementConduction(FESolidElement& el, matrix& ke)
 				Gj[1] = Gy[j];
 				Gj[2] = Gz[j];
 
-				DB[0] = D[0][0]*Gj[0] + D[0][1]*Gj[1] + D[0][2]*Gj[2];
-				DB[1] = D[1][0]*Gj[0] + D[1][1]*Gj[1] + D[1][2]*Gj[2];
-				DB[2] = D[2][0]*Gj[0] + D[2][1]*Gj[1] + D[2][2]*Gj[2];
+				DB[0] = D(0,0)*Gj[0] + D(0,1)*Gj[1] + D(0,2)*Gj[2];
+				DB[1] = D(1,0)*Gj[0] + D(1,1)*Gj[1] + D(1,2)*Gj[2];
+				DB[2] = D(2,0)*Gj[0] + D(2,1)*Gj[1] + D(2,2)*Gj[2];
 
 				ke[i][j] += (Gi[0]*DB[0] + Gi[1]*DB[1] + Gi[2]*DB[2] )*detJt*gw[n];
 			}

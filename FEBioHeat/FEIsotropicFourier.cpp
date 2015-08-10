@@ -18,12 +18,9 @@ void FEIsotropicFourier::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEIsotropicFourier::Conductivity(double D[3][3])
+mat3ds FEIsotropicFourier::Conductivity(FEMaterialPoint& mp)
 {
-	D[0][0] = D[1][1] = D[2][2] = m_k;
-	D[0][1] = D[1][0] = 0;
-	D[0][2] = D[2][0] = 0;
-	D[1][2] = D[2][1] = 0;
+	return mat3dd(m_k);
 }
 
 //-----------------------------------------------------------------------------

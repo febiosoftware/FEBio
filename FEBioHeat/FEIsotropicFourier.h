@@ -16,16 +16,13 @@ public:
 
 public:
 	//! get the material's conductivity tensor
-	void Conductivity(double D[3][3]);
+	mat3ds Conductivity(FEMaterialPoint& mp);
 
 	//! get the material's capacitance
 	double Capacitance() { return m_c; }
 
 	//! get the material's density
 	double Density() { return m_rho; }
-
-	//! get the heat flux
-	vec3d HeatFlux(vec3d gradT) { return gradT*(-m_k); }
 
 	//! serialization
 	void Serialize(DumpFile& ar);
