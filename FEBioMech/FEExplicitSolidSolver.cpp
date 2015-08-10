@@ -614,10 +614,12 @@ void FEExplicitSolidSolver::PrepStep(double time)
 		for (int k=0; k<(int)ni.m_cp.size(); ++k) ni.m_cp[k] = ni.m_ct[k];
 	}
 
+	FETimePoint tp = m_fem.GetTime();
+
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry
 	// we can do this once outside the NR loop.
-	NodalForces(m_Fn);
+	NodalForces(m_Fn, tp);
 
 	// apply prescribed displacements
 	// we save the prescribed displacements increments in the ui vector
@@ -824,13 +826,8 @@ void FEExplicitSolidSolver::PrepStep(double time)
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
 
-void FEExplicitSolidSolver::NodalForces(vector<double>& F)
+void FEExplicitSolidSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
 {
-	int i, id, bc, lc, n;
-	double s, f;
-	vec3d a;
-	int* lm;
-
 	// zero nodal force vector
 	zero(F);
 
@@ -839,26 +836,23 @@ void FEExplicitSolidSolver::NodalForces(vector<double>& F)
 
 	// loop over nodal force cards
 	int ncnf = m_fem.NodalLoads();
-	for (i=0; i<ncnf; ++i)
+	for (int i=0; i<ncnf; ++i)
 	{
-		FENodalForce& fc = *m_fem.NodalLoad(i);
+		FENodalLoad& fc = *m_fem.NodalLoad(i);
 		if (fc.IsActive())
 		{
-			id	 = fc.node;	// node ID
-			bc   = fc.bc;	// direction of force
-			lc   = fc.lc;	// loadcurve number
-			s    = fc.s;		// force scale factor
+			int id	 = fc.m_node;	// node ID
+			int bc   = fc.m_bc;	// direction of force
 
 			FENode& node = mesh.Node(id);
 
-			n = node.m_ID[bc];
+			int n = node.m_ID[bc];
 		
-			f = s*m_fem.GetLoadCurve(lc)->Value();
+			double f = fc.Value();
 			
 			// For pressure and concentration loads, multiply by dt
 			// for consistency with evaluation of residual and stiffness matrix
-			if ((bc == DOF_P) || (bc >= DOF_C))
-				f *= m_fem.GetCurrentStep()->m_dt;
+			if ((bc == DOF_P) || (bc >= DOF_C)) f *= tp.dt;
 
 			if (n >= 0) F[n] = f;
 			else if (node.m_rid >=0)
@@ -867,9 +861,9 @@ void FEExplicitSolidSolver::NodalForces(vector<double>& F)
 				FERigidBody& RB = *rigid.Object(node.m_rid);
 
 				// get the relative position
-				a = node.m_rt - RB.m_rt;
+				vec3d a = node.m_rt - RB.m_rt;
 
-				lm = RB.m_LM;
+				int* lm = RB.m_LM;
 				switch (bc)
 				{
 				case 0:

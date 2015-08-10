@@ -6,29 +6,46 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
-void FENodalForce::Serialize(DumpFile& ar)
+FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+{
+	m_s = 1.0;
+	m_lc = -1;
+	m_bc = -1;
+	m_node = -1;
+}
+
+//-----------------------------------------------------------------------------
+void FENodalLoad::Serialize(DumpFile& ar)
 {
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << bc << lc << node << s;
+		ar << m_bc << m_lc << m_node << m_s;
 	}
 	else
 	{
-		ar >> bc >> lc >> node >> s;
+		ar >> m_bc >> m_lc >> m_node >> m_s;
 	}
 }
 
 //-----------------------------------------------------------------------------
-bool FENodalForce::Init()
+bool FENodalLoad::Init()
 {
 	int NLC = GetFEModel()->LoadCurves();
-	if ((lc < 0)||(lc >= NLC))
+	if ((m_lc < 0)||(m_lc >= NLC))
 	{
 		felog.printf("ERROR: Invalid loadcurve in nodal load %d\n", GetID());
 		return false;
 	}
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Return the current value of the nodal load
+double FENodalLoad::Value()
+{
+	FEModel& fem = *GetFEModel();
+	return m_s*fem.GetLoadCurve(m_lc)->Value();
 }
 
 //-----------------------------------------------------------------------------

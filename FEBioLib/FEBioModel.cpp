@@ -756,7 +756,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		ar << (int) m_FC.size();
 		for (int i=0; i<(int) m_FC.size(); ++i)
 		{
-			FENodalForce& fc = *m_FC[i];
+			FENodalLoad& fc = *m_FC[i];
 			fc.Serialize(ar);
 		}
 
@@ -866,7 +866,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		m_FC.clear();
 		for (int i=0; i<n; ++i)
 		{
-			FENodalForce* pfc = new FENodalForce(this);
+			FENodalLoad* pfc = new FENodalLoad(this);
 			pfc->Serialize(ar);
 			if (pfc->IsActive()) pfc->Activate(); else pfc->Deactivate();
 			m_FC.push_back(pfc);

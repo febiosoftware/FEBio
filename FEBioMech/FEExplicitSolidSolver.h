@@ -54,7 +54,7 @@ public:
 
 	void PrepStep(double time);
 
-	void NodalForces(vector<double>& F);
+	void NodalForces(vector<double>& F, const FETimePoint& tp);
 
 	bool Residual(vector<double>& R);
 

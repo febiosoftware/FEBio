@@ -294,17 +294,15 @@ void FELinearSolidSolver::Residual()
 	int ncnf = m_fem.NodalLoads();
 	for (int i=0; i<ncnf; ++i)
 	{
-		FENodalForce& fc = *m_fem.NodalLoad(i);
+		FENodalLoad& fc = *m_fem.NodalLoad(i);
 		if (fc.IsActive())
 		{
-			int id	 = fc.node;	// node ID
-			int bc   = fc.bc;	// direction of force
-			int lc   = fc.lc;	// loadcurve number
-			double s = fc.s;	// force scale factor
+			int id	 = fc.m_node;	// node ID
+			int bc   = fc.m_bc;	// direction of force
 
 			FENode& node = mesh.Node(id);
 
-			double f = s*m_fem.GetLoadCurve(lc)->Value();
+			double f = fc.Value();
 
 			int n = node.m_ID[bc];
 			if ((bc == 0) && (n >= 0)) m_R[n] = f;

@@ -318,31 +318,25 @@ void FEHeatSolver::Residual()
 //! Add nodal fluxes to residual
 void FEHeatSolver::NodalFluxes(FEGlobalVector& R)
 {
-	int i, id, bc, lc, n;
-	double s, f;
-
 	// get the FE mesh
 	FEMesh& mesh = m_fem.GetMesh();
 
-	// loop over nodal force cards
+	// loop over nodal loads
 	int ncnf = m_fem.NodalLoads();
-	for (i=0; i<ncnf; ++i)
+	for (int i=0; i<ncnf; ++i)
 	{
-		FENodalForce& fc = *m_fem.NodalLoad(i);
+		FENodalLoad& fc = *m_fem.NodalLoad(i);
 		if (fc.IsActive())
 		{
-			id	 = fc.node;	// node ID
-			bc   = fc.bc;	// direction of force
-			lc   = fc.lc;	// loadcurve number
-			s    = fc.s;	// force scale factor
+			int id	 = fc.m_node;	// node ID
+			int bc   = fc.m_bc;		// direction of force
 
 			FENode& node = mesh.Node(id);
 
-			n = node.m_ID[bc];
+			int n = node.m_ID[bc];
 			if ((n >= 0) && (bc == DOF_T)) 
 			{
-				f = s*m_fem.GetLoadCurve(lc)->Value();
-				R[n] = f;
+				R[n] = fc.Value();
 			}
 		}
 	}

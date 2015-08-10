@@ -38,7 +38,8 @@ public:
 
 public:
 	//! assemble the element residual into the global residual
-//	void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R);
+	//! \todo This was implemented for nodal forces
+	void AssembleResidual(int node, int dof, double f, vector<double>& R);
 
 	//! adjust the residual matrix for prescribed displacements
 	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
@@ -111,7 +112,7 @@ public:
 	//{ --- Residual routines ---
 
 		//! Calculates concentrated nodal forces
-		void NodalForces(vector<double>& F);
+		void NodalForces(vector<double>& F, const FETimePoint& tp);
 
 		//! Calculate inertial forces for dynamic problems
 		void InertialForces(FEGlobalVector& R);

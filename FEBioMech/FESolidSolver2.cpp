@@ -902,10 +902,12 @@ void FESolidSolver2::PrepStep(double time)
 		for (int k=0; k<(int)ni.m_cp.size(); ++k) ni.m_cp[k] = ni.m_ct[k];
 	}
 
+	FETimePoint tp = m_fem.GetTime();
+
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry
 	// we can do this once outside the NR loop.
-	NodalForces(m_Fn);
+	NodalForces(m_Fn, tp);
 
 	// apply prescribed displacements
 	// we save the prescribed displacements increments in the ui vector
@@ -1960,6 +1962,55 @@ void FESolidSolver2::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& k
 }
 
 //-----------------------------------------------------------------------------
+// \todo I'd like to do something different with this. Right now, if a nodal load
+//       it applied to a rigid body, the load has to be translated to a force and 
+//       torque applied to the rigid body. Perhaps we should really define two types
+//       of nodal loads, one for the deformable body and for the rigid body. This can
+//       be done in a pre-processor phase. That way, standard assembly routines can be
+//       used to assemble to loads into the global vector.
+void FESolidSolver2::AssembleResidual(int node_id, int dof, double f, vector<double>& R)
+{
+	// get the mesh
+	FEMesh& mesh = m_fem.GetMesh();
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+
+	// get the equation number
+	FENode& node = mesh.Node(node_id);
+	int n = node.m_ID[dof];
+
+	// assemble into global vector
+	if (n >= 0) R[n] += f;
+	else if (node.m_rid >=0)
+	{
+		// this is a rigid body node
+		FERigidBody& RB = *rigid.Object(node.m_rid);
+
+		// get the relative position
+		vec3d a = node.m_rt - RB.m_rt;
+
+		int* lm = RB.m_LM;
+		switch (dof)
+		{
+		case DOF_X:
+			if (lm[0] >= 0) R[lm[0]] +=  f;
+			if (lm[4] >= 0) R[lm[4]] +=  a.z*f;
+			if (lm[5] >= 0) R[lm[5]] += -a.y*f;
+			break;
+		case DOF_Y:
+			if (lm[1] >= 0) R[lm[1]] +=  f;
+			if (lm[3] >= 0) R[lm[3]] += -a.z*f;
+			if (lm[5] >= 0) R[lm[5]] +=  a.x*f;
+			break;
+		case DOF_Z:
+			if (lm[2] >= 0) R[lm[2]] +=  f;
+			if (lm[3] >= 0) R[lm[3]] +=  a.y*f;
+			if (lm[4] >= 0) R[lm[4]] += -a.x*f;
+			break;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! \todo This function is only used for rigid joints. I need to figure out if
 //!       I can use the other assembly function.
 void FESolidSolver2::AssembleStiffness(std::vector<int>& lm, matrix& ke)
@@ -2285,71 +2336,30 @@ void FESolidSolver2::NonLinearConstraintForces(FEGlobalVector& R, const FETimePo
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
 
-void FESolidSolver2::NodalForces(vector<double>& F)
+void FESolidSolver2::NodalForces(vector<double>& F, const FETimePoint& tp)
 {
-	int i, id, bc, lc, n;
-	double s, f;
-	vec3d a;
-	int* lm;
-
 	// zero nodal force vector
 	zero(F);
 
-	FEMesh& mesh = m_fem.GetMesh();
-	FERigidSystem& rigid = *m_fem.GetRigidSystem();
-
-	// loop over nodal force cards
-	int ncnf = m_fem.NodalLoads();
-	for (i=0; i<ncnf; ++i)
+	// loop over nodal loads
+	int NNL = m_fem.NodalLoads();
+	for (int i=0; i<NNL; ++i)
 	{
-		FENodalForce& fc = *m_fem.NodalLoad(i);
+		FENodalLoad& fc = *m_fem.NodalLoad(i);
 		if (fc.IsActive())
 		{
-			id	 = fc.node;	// node ID
-			bc   = fc.bc;	// direction of force
-			lc   = fc.lc;	// loadcurve number
-			s    = fc.s;		// force scale factor
+			int nid	= fc.m_node;	// node ID
+			int dof = fc.m_bc;		// degree of freedom
 
-			FENode& node = mesh.Node(id);
-
-			n = node.m_ID[bc];
-		
-			f = s*m_fem.GetLoadCurve(lc)->Value();
+			// get the nodal load value
+			double f = fc.Value();
 			
 			// For pressure and concentration loads, multiply by dt
 			// for consistency with evaluation of residual and stiffness matrix
-			if ((bc == DOF_P) || (bc >= DOF_C))
-				f *= m_fem.GetCurrentStep()->m_dt;
+			if ((dof == DOF_P) || (dof >= DOF_C)) f *= tp.dt;
 
-			if (n >= 0) F[n] = f;
-			else if (node.m_rid >=0)
-			{
-				// this is a rigid body node
-				FERigidBody& RB = *rigid.Object(node.m_rid);
-
-				// get the relative position
-				a = node.m_rt - RB.m_rt;
-
-				lm = RB.m_LM;
-				switch (bc)
-				{
-				case 0:
-					if (lm[0] >= 0) F[lm[0]] +=  f;
-					if (lm[4] >= 0) F[lm[4]] +=  a.z*f;
-					if (lm[5] >= 0) F[lm[5]] += -a.y*f;
-					break;
-				case 1:
-					if (lm[1] >= 0) F[lm[1]] +=  f;
-					if (lm[3] >= 0) F[lm[3]] += -a.z*f;
-					if (lm[5] >= 0) F[lm[5]] +=  a.x*f;
-					break;
-				case 2:
-					if (lm[2] >= 0) F[lm[2]] +=  f;
-					if (lm[3] >= 0) F[lm[3]] +=  a.y*f;
-					if (lm[4] >= 0) F[lm[4]] += -a.x*f;
-					break;
-				}
-			}
+			// assemble into residual
+			AssembleResidual(nid, dof, f, F);
 		}
 	}
 }

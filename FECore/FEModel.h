@@ -132,8 +132,8 @@ public: // --- Boundary Conditions functions ---
 
 	// nodal loads
 	int NodalLoads() { return (int) m_FC.size(); }
-	FENodalForce* NodalLoad(int i) { return m_FC[i]; }
-	void AddNodalLoad(FENodalForce* pfc) { m_FC.push_back(pfc); }
+	FENodalLoad* NodalLoad(int i) { return m_FC[i]; }
+	void AddNodalLoad(FENodalLoad* pfc) { m_FC.push_back(pfc); }
 
 	// surface loads
 	int SurfaceLoads() { return (int) m_SL.size(); }
@@ -307,7 +307,7 @@ protected:
 	std::vector<FEMaterial*>				m_MAT;	//!< array of materials
 	std::vector<FEFixedBC*>					m_BC;	//!< fixed constraints
 	std::vector<FEPrescribedBC*>			m_DC;	//!< prescribed constraints
-	std::vector<FENodalForce*>				m_FC;	//!< concentrated nodal loads
+	std::vector<FENodalLoad*>				m_FC;	//!< concentrated nodal loads
 	std::vector<FESurfaceLoad*>				m_SL;	//!< surface loads
 	std::vector<FESurfacePairInteraction*>	m_CI;	//!< contact interface array
 	std::vector<FEBodyLoad*>				m_BL;	//!< body load data

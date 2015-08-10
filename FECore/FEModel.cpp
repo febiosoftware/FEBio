@@ -175,7 +175,7 @@ bool FEModel::InitBCs()
 	int NNL = NodalLoads();
 	for (int i=0; i<NNL; ++i)
 	{
-		FENodalForce* pbc = NodalLoad(i);
+		FENodalLoad* pbc = NodalLoad(i);
 		if (pbc->Init() == false) return false;
 	}
 

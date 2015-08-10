@@ -8,22 +8,23 @@ using namespace FECore;
 class FESolver;
 
 //-----------------------------------------------------------------------------
-//! concentrated nodal force boundary condition
-
-class FENodalForce : public FEBoundaryCondition
+//! Nodal load boundary condition
+class FENodalLoad : public FEBoundaryCondition
 {
 public:
-	FENodalForce(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+	FENodalLoad(FEModel* pfem);
 
 	bool Init();
 
 	void Serialize(DumpFile& ar);
 
+	double Value();
+
 public:
-	double	s;		// scale factor
-	int		node;	// node number
-	int		bc;		// force direction
-	int		lc;		// load curve
+	double	m_s;		// scale factor
+	int		m_node;	// node number
+	int		m_bc;		// dof
+	int		m_lc;		// load curve
 };
 
 //-----------------------------------------------------------------------------

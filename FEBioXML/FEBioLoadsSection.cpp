@@ -180,11 +180,11 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 			{
 				int n = ns[i];
 				// create new nodal force
-				FENodalForce* pfc = new FENodalForce(&fem);
-				pfc->node = n;
-				pfc->bc = bc;
-				pfc->lc = lc;
-				pfc->s = scale;
+				FENodalLoad* pfc = new FENodalLoad(&fem);
+				pfc->m_node = n;
+				pfc->m_bc = bc;
+				pfc->m_lc = lc;
+				pfc->m_s = scale;
 				fem.AddNodalLoad(pfc);
 
 				// add this boundary condition to the current step
@@ -205,11 +205,11 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 				int n = atoi(tag.AttributeValue("id"))-1;
 
 				// create new nodal force
-				FENodalForce* pfc = new FENodalForce(&fem);
-				pfc->node = n;
-				pfc->bc = bc;
-				pfc->lc = lc;
-				m_pim->value(tag, pfc->s);
+				FENodalLoad* pfc = new FENodalLoad(&fem);
+				pfc->m_node = n;
+				pfc->m_bc = bc;
+				pfc->m_lc = lc;
+				m_pim->value(tag, pfc->m_s);
 				fem.AddNodalLoad(pfc);
 
 				// add this boundary condition to the current step
@@ -246,11 +246,11 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 			sz = tag.AttributeValue("lc");
 			int lc = atoi(sz) - 1;
 
-			FENodalForce* pfc = new FENodalForce(&fem);
-			pfc->node = n;
-			pfc->bc = bc;
-			pfc->lc = lc;
-			m_pim->value(tag, pfc->s);
+			FENodalLoad* pfc = new FENodalLoad(&fem);
+			pfc->m_node = n;
+			pfc->m_bc = bc;
+			pfc->m_lc = lc;
+			m_pim->value(tag, pfc->m_s);
 			fem.AddNodalLoad(pfc);
 
 			// add this boundary condition to the current step
