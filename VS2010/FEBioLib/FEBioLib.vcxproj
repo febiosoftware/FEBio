@@ -307,7 +307,7 @@
       <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
     </Lib>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)svnrev.py</Command>
+      <Command>python "$(SolutionDir)svnrev.py"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
