@@ -87,8 +87,10 @@ FEBiphasic::FEBiphasic(FEModel* pfem) : FEMaterial(pfem)
 //-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
 FEMaterialPoint* FEBiphasic::CreateMaterialPointData() 
-{ 
-	return new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData());
+{
+	FEBiphasicMaterialPoint* pt = new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData());
+	pt->m_phi0 = m_phi0;
+	return pt;
 }
 
 //-----------------------------------------------------------------------------

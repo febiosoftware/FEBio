@@ -33,8 +33,10 @@ FEBiphasicSolute::FEBiphasicSolute(FEModel* pfem) : FEMaterial(pfem)
 
 //-----------------------------------------------------------------------------
 FEMaterialPoint* FEBiphasicSolute::CreateMaterialPointData() 
-{ 
-	return new FESolutesMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
+{
+	FEBiphasicMaterialPoint* pbp = new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData());
+	pbp->m_phi0 = m_phi0;
+	return new FESolutesMaterialPoint(pbp);
 }
 
 //-----------------------------------------------------------------------------
