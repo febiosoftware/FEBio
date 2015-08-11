@@ -176,22 +176,13 @@ public:
 	
 	//! get solute local ID
 	int GetSoluteLocalID() {return m_LID;}
-    
-	//! Find a material parameter
-	FEParam* GetParameter(const ParamString& s);
-
+  
 public:
 	//! return number of material properties
-	int Properties();
+	int MaterialProperties();
 
 	//! return a material property
-	FECoreBase* GetProperty(int i);
-
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
+	FEProperty* GetMaterialProperty(int i);
 
 	//! set the material attribute
 	bool SetAttribute(const char* szname, const char* szval);
@@ -209,9 +200,9 @@ public: // material parameters
 	int						m_z;		//!< charge number of solute
 
 public: // material properties
-	FESoluteDiffusivity*	m_pDiff;	//!< pointer to diffusivity material
-	FESoluteSolubility*		m_pSolub;	//!< pointer to solubility material
-	FESoluteSupply*			m_pSupp;	//!< pointer to solute supply material
+	FEPropertyT<FESoluteDiffusivity>	m_pDiff;	//!< pointer to diffusivity material
+	FEPropertyT<FESoluteSolubility>		m_pSolub;	//!< pointer to solubility material
+	FEPropertyT<FESoluteSupply>			m_pSupp;	//!< pointer to solute supply material
 };
 
 //-----------------------------------------------------------------------------
@@ -269,9 +260,6 @@ public:
 public:
 	//! set the material attribute
 	bool SetAttribute(const char* szname, const char* szval);
-
-	//! Find a material parameter
-	FEParam* GetParameter(const ParamString& s);
 
 private:
 	FESBMData* FindSBMData(int nid);

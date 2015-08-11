@@ -30,84 +30,39 @@ FETriphasic::FETriphasic(FEModel* pfem) : FEMaterial(pfem)
 	m_rhoTw = 0;
 	m_penalty = 1;
 
-	m_pSolid = 0;
-	m_pPerm = 0;
-	m_pOsmC = 0;
+	m_pSolid.SetName("solid"              ).SetID(0);
+	m_pPerm .SetName("permeability"       ).SetID(1);
+	m_pOsmC .SetName("osmotic_coefficient").SetID(2);
+	m_pSolid.SetName("solute"             ).SetID(3);
 }
 
 //-----------------------------------------------------------------------------
 void FETriphasic::AddSolute(FESolute* ps)
 {
 	int n = (int) m_pSolute.size();
-	m_pSolute.push_back(ps);
+	m_pSolute.SetProperty(ps);
 }
 
 //-----------------------------------------------------------------------------
 //! A triphasic has five properties
-int FETriphasic::Properties()
+int FETriphasic::MaterialProperties()
 {
-	return 5;
+	return 4;
 }
 
 //-----------------------------------------------------------------------------
 //! return a triphasic material property
-FECoreBase* FETriphasic::GetProperty(int i)
+FEProperty* FETriphasic::GetMaterialProperty(int i)
 {
 	switch (i)
 	{
-	case 0: return m_pSolid;
-	case 1: return m_pPerm;
-	case 2: return m_pOsmC;
-	case 3: return m_pSolute[0];
-	case 4: return m_pSolute[1];
+	case 0: return &m_pSolid;
+	case 1: return &m_pPerm;
+	case 2: return &m_pOsmC;
+	case 3: return &m_pSolute;
 	}
 	assert(false);
 	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Find the index of a material property
-int FETriphasic::FindPropertyIndex(const char* szname)
-{
-	if (strcmp(szname, "solid"              ) == 0) return 0;
-	if (strcmp(szname, "permeability"       ) == 0) return 1;
-	if (strcmp(szname, "osmotic_coefficient") == 0) return 2;
-	if (strcmp(szname, "solute"             ) == 0) return 3 + (int) m_pSolute.size(); 
-	return -1;
-}
-
-//-----------------------------------------------------------------------------
-//! Set a material property
-bool FETriphasic::SetProperty(int n, FECoreBase* pm)
-{
-	switch(n)
-	{
-	case 0:
-		{
-			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-			if (pme) { m_pSolid = pme; return true; }
-		}
-		break;
-	case 1: 
-		{
-			FEHydraulicPermeability* pmp = dynamic_cast<FEHydraulicPermeability*>(pm);
-			if (pmp) { m_pPerm = pmp; return true; }
-		}
-		break;
-	case 2:
-		{
-			FEOsmoticCoefficient* pmc = dynamic_cast<FEOsmoticCoefficient*>(pm);
-			if (pmc) { m_pOsmC = pmc; return true; }
-		}
-	case 3:
-	case 4:
-		{
-			FESolute* ps = dynamic_cast<FESolute*>(pm);
-			if (ps) { AddSolute(ps); return true; }
-		}
-		break;
-	}
-	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -475,77 +430,4 @@ vec3d FETriphasic::CurrentDensity(FEMaterialPoint& pt)
 	vec3d Ie = (j[0]*z[0] + j[1]*z[1])*m_Fc;
 	
 	return Ie;
-}
-
-//-----------------------------------------------------------------------------
-//! Data serialization
-void FETriphasic::Serialize(DumpFile& ar)
-{
-	FEParamContainer::Serialize(ar);
-	FEMaterial::Serialize(ar);
-	FECoreKernel& febio = FECoreKernel::GetInstance();
-	
-	if (ar.IsSaving())
-	{
-		ar << m_phi0 << m_rhoTw << m_cFr << m_Rgas << m_Tabs << m_Fc;
-		
-		ar << m_pSolid    ->GetTypeStr(); m_pSolid->Serialize(ar);
-		ar << m_pPerm     ->GetTypeStr(); m_pPerm ->Serialize(ar);
-		ar << m_pSolute[0]->GetTypeStr(); m_pSolute[0] ->Serialize(ar);
-		ar << m_pSolute[1]->GetTypeStr(); m_pSolute[1] ->Serialize(ar);
-		ar << m_pOsmC     ->GetTypeStr(); m_pOsmC ->Serialize(ar);
-	}
-	else
-	{
-		ar >> m_phi0 >> m_rhoTw >> m_cFr >> m_Rgas >> m_Tabs >> m_Fc;
-		
-		char sz[256] = {0};
-		ar >> sz;
-		m_pSolid = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pSolid); m_pSolid->Serialize(ar);
-		m_pSolid->Init();
-		
-		ar >> sz;
-		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pPerm); m_pPerm->Serialize(ar);
-		m_pPerm->Init();
-		
-		m_pSolute.resize(2);
-		
-		ar >> sz;
-		m_pSolute[0] = dynamic_cast<FESolute*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pSolute[0]); m_pSolute[0]->Serialize(ar);
-		m_pSolute[0]->Init();
-		
-		ar >> sz;
-		m_pSolute[1] = dynamic_cast<FESolute*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pSolute[1]); m_pSolute[1]->Serialize(ar);
-		m_pSolute[1]->Init();
-
-		ar >> sz;
-		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pOsmC); m_pOsmC->Serialize(ar);
-		m_pOsmC->Init();
-	}
-}
-
-//-----------------------------------------------------------------------------
-FEParam* FETriphasic::GetParameter(const ParamString& s)
-{
-	if (s.count() == 1) return FEMaterial::GetParameter(s);
-	if      (s == "solid"              ) return m_pSolid->GetParameter(s.next());
-	else if (s == "permeability"       ) return m_pPerm ->GetParameter(s.next());
-	else if (s == "osmotic_coefficient") return m_pOsmC ->GetParameter(s.next());
-	else if (s == "solute"             )
-	{
-		ParamString s2 = s.next();
-		
-		int NSOL = (int)m_pSolute.size();
-		for (int i=0; i<NSOL; ++i) 
-		{
-			FESolute* psi = m_pSolute[i];
-			if (s2 == psi->GetName()) return psi->GetParameter(s2.next());
-		}
-	}
-	return 0;
 }

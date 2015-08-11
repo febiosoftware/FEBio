@@ -235,34 +235,38 @@ bool solvepoly(int n, vector<double> a, double& x)
 //! FEMultiphasic constructor
 FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMaterial(pfem)
 {	
-	m_pSolid = 0;
-	m_pPerm = 0;
-	m_pOsmC = 0;
-	m_pSupp = 0;
-
 	m_phi0 = 0;
 	m_rhoTw = 0;
 	m_cFr = 0;
 	m_Rgas = 0; m_Tabs = 0; m_Fc = 0;
 	m_penalty = 1;
+
+	// define the material properties
+	m_pSolid .SetName("solid"              ).SetID(0);
+	m_pPerm  .SetName("permeability"       ).SetID(1);
+	m_pOsmC  .SetName("osmotic_coefficient").SetID(2);
+	m_pSupp  .SetName("solvent_supply"     ).SetID(3);
+	m_pSolute.SetName("solute"             ).SetID(4);
+	m_pSBM   .SetName("solid_bound"        ).SetID(5);
+	m_pReact .SetName("reaction"           ).SetID(6);
 }
 
 //-----------------------------------------------------------------------------
 void FEMultiphasic::AddSolute(FESolute* psol)
 {
-	m_pSolute.push_back(psol);
+	m_pSolute.SetProperty(psol);
 }
 
 //-----------------------------------------------------------------------------
 void FEMultiphasic::AddSolidBoundMolecule(FESolidBoundMolecule* psbm)
 {
-	m_pSBM.push_back(psbm);
+	m_pSBM.SetProperty(psbm);
 }
 
 //-----------------------------------------------------------------------------
 void FEMultiphasic::AddChemicalReaction(FEChemicalReaction* pcr)
 {
-	m_pReact.push_back(pcr);
+	m_pReact.SetProperty(pcr);
 }
 
 //-----------------------------------------------------------------------------
@@ -1017,243 +1021,20 @@ vec3d FEMultiphasic::CurrentDensity(FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
-//! Data serialization
-void FEMultiphasic::Serialize(DumpFile& ar)
+int FEMultiphasic::MaterialProperties()
 {
-	int i, nsol, nsbm, nreact;
-	
-	FEMaterial::Serialize(ar);
-	
-	int nSupp = 0;
-	if (ar.IsSaving())
-	{
-		ar << m_phi0 << m_rhoTw << m_cFr << m_Rgas << m_Tabs << m_Fc << m_penalty << m_zmin << m_ndeg;
-        ar << (int) m_pSolute.size() << (int) m_pSBM.size() << (int) m_pReact.size();
-		ar << m_pPerm ->GetTypeStr(); m_pPerm ->Serialize(ar);
-
-		if (m_pSupp == 0) ar << nSupp;
-		else
-		{
-			nSupp = 1;
-			ar << nSupp;
-			ar << m_pSupp->GetTypeStr();
-			m_pSupp ->Serialize(ar);
-		}
-		ar << m_pOsmC ->GetTypeStr(); m_pOsmC ->Serialize(ar);
-		for (i=0; i<(int)m_pSolute.size(); ++i) {
-			ar << m_pSolute[i]->GetTypeStr();
-			m_pSolute[i] ->Serialize(ar);
-		}
-		for (i=0; i<(int)m_pSBM.size(); ++i) {
-			ar << m_pSBM[i]->GetTypeStr();
-			m_pSBM[i] ->Serialize(ar);
-		}
-		for (i=0; i<(int)m_pReact.size(); ++i) {
-			ar << m_pReact[i]->GetTypeStr();
-			m_pReact[i] ->Serialize(ar);
-		}
-
-		ar << m_pSolid->GetTypeStr(); m_pSolid->Serialize(ar);
-	}
-	else
-	{
-		ar >> m_phi0 >> m_rhoTw >> m_cFr >> m_Rgas >> m_Tabs >> m_Fc >> m_penalty >> m_zmin >> m_ndeg;
-        ar >> nsol >> nsbm >> nreact;
-		
-		char sz[256] = {0};
-		ar >> sz;
-		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pPerm); m_pPerm->Serialize(ar);
-		m_pPerm->Init();
-
-		ar >> nSupp;
-		if (nSupp)
-		{
-			ar >> sz;
-			m_pSupp = dynamic_cast<FESolventSupply*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-			assert(m_pSupp); m_pSupp->Serialize(ar);
-			m_pSupp->Init();
-		}
-		
-		ar >> sz;
-		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pOsmC); m_pOsmC->Serialize(ar);
-		m_pOsmC->Init();
-		
-		for (i=0; i<nsol; ++i) {
-			ar >> sz;
-			m_pSolute.push_back(dynamic_cast<FESolute*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel())));
-			assert(m_pSolute[i]); m_pSolute[i]->Serialize(ar);
-			m_pSolute[i]->Init();
-		}
-		
-		for (i=0; i<nsbm; ++i) {
-			ar >> sz;
-			m_pSBM.push_back(dynamic_cast<FESolidBoundMolecule*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel())));
-			assert(m_pSBM[i]); m_pSBM[i]->Serialize(ar);
-			m_pSBM[i]->Init();
-		}
-		
-		for (i=0; i<nreact; ++i) {
-			ar >> sz;
-			m_pReact.push_back(dynamic_cast<FEChemicalReaction*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel())));
-			assert(m_pReact[i]); m_pReact[i]->Serialize(ar);
-			m_pReact[i]->Init();
-		}
-
-		ar >> sz;
-		m_pSolid = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pSolid); m_pSolid->Serialize(ar);
-		m_pSolid->SetParent(this);
-		m_pSolid->Init();
-		
-	}
+	return 6;
 }
 
 //-----------------------------------------------------------------------------
-//! This material number of properties varies depending on the number solutes
-//! solid-bound molecules and chemical reactions defined.
-int FEMultiphasic::Properties()
+FEProperty* FEMultiphasic::GetMaterialProperty(int nid)
 {
-	return 4 + (int) m_pSolute.size() + (int) m_pSBM.size() + (int) m_pReact.size();
-}
-
-//-----------------------------------------------------------------------------
-FECoreBase* FEMultiphasic::GetProperty(int i)
-{
-	if (i < 0) { assert(false); return 0; }
-	if (i < 4)
-	{
-		switch (i)
-		{
-		case 0: return m_pSolid;
-		case 1: return m_pPerm;
-		case 2: return m_pOsmC;
-		case 3: return m_pSupp;
-		}
-	}
-	i -= 4;
-
-	int NS = (int) m_pSolute.size();
-	if (i < NS) return m_pSolute[i];
-	i -= NS;
-
-	int NM = (int) m_pSBM.size();
-	if (i < NM) return m_pSBM[i];
-	i -= NM;
-
-	int NR = (int) m_pReact.size();
-	if (i < NR) return m_pReact[i];
-	assert(false);
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Find the index of a material property
-int FEMultiphasic::FindPropertyIndex(const char* szname)
-{
-	if (strcmp(szname, "solid"              ) == 0) return 0;
-	if (strcmp(szname, "permeability"       ) == 0) return 1;
-	if (strcmp(szname, "osmotic_coefficient") == 0) return 2;
-	if (strcmp(szname, "solvent_supply"     ) == 0) return 3;
-	if (strcmp(szname, "solute"             ) == 0) return 4;
-	if (strcmp(szname, "solid_bound"        ) == 0) return 5;
-	if (strcmp(szname, "reaction"           ) == 0) return 6;
-	return -1;
-}
-
-//-----------------------------------------------------------------------------
-//! Set a material property
-bool FEMultiphasic::SetProperty(int n, FECoreBase* pm)
-{
-	switch(n)
-	{
-	case 0:
-		{
-			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-			if (pme) { m_pSolid = pme; return true; }
-		}
-		break;
-	case 1: 
-		{
-			FEHydraulicPermeability* pmp = dynamic_cast<FEHydraulicPermeability*>(pm);
-			if (pmp) { m_pPerm = pmp; return true; }
-		}
-		break;
-	case 2:
-		{
-			FEOsmoticCoefficient* pmc = dynamic_cast<FEOsmoticCoefficient*>(pm);
-			if (pmc) { m_pOsmC = pmc; return true; }
-		}
-		break;
-	case 3:
-		{
-			FESolventSupply* pms = dynamic_cast<FESolventSupply*>(pm);
-			if (pms) { m_pSupp = pms; return true; }
-		}
-		break;
-	case 4:
-		{
-			FESolute* pms = dynamic_cast<FESolute*>(pm);
-			if (pms) { AddSolute(pms); return true; }
-		}
-		break;
-	case 5:
-		{
-			FESolidBoundMolecule* pmb = dynamic_cast<FESolidBoundMolecule*>(pm);
-			if (pmb) { AddSolidBoundMolecule(pmb); return true; }
-		}
-		break;
-	case 6:
-		{
-			FEChemicalReaction* pmr = dynamic_cast<FEChemicalReaction*>(pm);
-			if (pmr) { AddChemicalReaction(pmr); return true; }
-		}
-		break;
-	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-FEParam* FEMultiphasic::GetParameter(const ParamString& s)
-{
-	if (s.count() == 1) return FEMaterial::GetParameter(s);
-		
-	if      (s == "solid"              ) return m_pSolid->GetParameter(s.next());
-	else if (s == "permeability"       ) return m_pPerm ->GetParameter(s.next());
-	else if (s == "osmotic_coefficient") return m_pOsmC ->GetParameter(s.next());
-	else if (s == "solute"             )
-	{
-		ParamString s2 = s.next();
-		
-		int NSOL = (int)m_pSolute.size();
-		for (int i=0; i<NSOL; ++i) 
-		{
-			FESolute* psi = m_pSolute[i];
-			if (s2 == psi->GetName()) return psi->GetParameter(s2.next());
-		}
-	}
-	else if (s == "solid_bound"             )
-	{
-		ParamString s2 = s.next();
-		
-		int NSBM = (int)m_pSBM.size();
-		for (int i=0; i<NSBM; ++i) 
-		{
-			FESolidBoundMolecule* psi = m_pSBM[i];
-			if (s2 == psi->GetName()) return psi->GetParameter(s2.next());
-		}
-	}
-	else if (s == "reaction"             )
-	{
-		ParamString s2 = s.next();
-		
-		int NREACT = (int)m_pReact.size();
-		for (int i=0; i<NREACT; ++i) 
-		{
-			FEChemicalReaction* psi = m_pReact[i];
-			if (s2 == psi->GetName()) return psi->GetParameter(s2.next());
-		}
-	}
+	if (nid == 0) return &m_pSolid;
+	if (nid == 1) return &m_pPerm;
+	if (nid == 2) return &m_pOsmC;
+	if (nid == 3) return &m_pSupp;
+	if (nid == 4) return &m_pSolute;
+	if (nid == 5) return &m_pSBM;
+	if (nid == 6) return &m_pReact;
 	return 0;
 }

@@ -7,8 +7,6 @@
 //
 
 #include "FEDamageMaterialPoint.h"
-#include "FEDamageCriterion.h"
-#include "FEDamageCriterionUC.h"
 
 FEMaterialPoint* FEDamageMaterialPoint::Copy()
 {

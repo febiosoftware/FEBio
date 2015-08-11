@@ -121,7 +121,23 @@ FEViscoElasticMaterial::FEViscoElasticMaterial(FEModel* pfem) : FEElasticMateria
 		m_t[i] = 1;
 		m_g[i] = 0;
 	}
-	m_pBase = 0;
+
+	// define the material properties
+	m_Base.SetName("elastic").SetID(0);
+}
+
+//-----------------------------------------------------------------------------
+//! get the elastic base material \todo I want to call this GetElasticMaterial, but this name is being used
+FEElasticMaterial* FEViscoElasticMaterial::GetBaseMaterial()
+{ 
+	return m_Base; 
+}
+
+//-----------------------------------------------------------------------------
+//! Set the base material
+void FEViscoElasticMaterial::SetBaseMaterial(FEElasticMaterial* pbase)
+{ 
+	m_Base = pbase; 
 }
 
 //-----------------------------------------------------------------------------
@@ -138,54 +154,31 @@ void FEViscoElasticMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMa
 void FEViscoElasticMaterial::Init()
 {
 	FEElasticMaterial::Init();
-	if (m_pBase == 0) throw MaterialError("This material needs an elastic base.");
-	m_pBase->SetParent(GetParent());
-	m_pBase->Init();
+	if (m_Base == 0) throw MaterialError("This material needs an elastic base.");
+	m_Base->SetParent(GetParent());
+	m_Base->Init();
 }
 
 //-----------------------------------------------------------------------------
 //! This material only has one property
-int FEViscoElasticMaterial::Properties()
+int FEViscoElasticMaterial::MaterialProperties()
 {
 	return 1;
 }
 
 //-----------------------------------------------------------------------------
-FECoreBase* FEViscoElasticMaterial::GetProperty(int i)
+FEProperty* FEViscoElasticMaterial::GetMaterialProperty(int nid)
 {
-	if (i == 0) return m_pBase;
+	if (nid == 0) return &m_Base;
 	assert(false);
 	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! find a material property index ( returns <0 for error)
-int FEViscoElasticMaterial::FindPropertyIndex(const char* szname)
-{
-	if (strcmp(szname, "elastic") == 0) return 0; else return -1;
-}
-
-//-----------------------------------------------------------------------------
-//! set a material property (returns false on error)
-bool FEViscoElasticMaterial::SetProperty(int i, FECoreBase* pm)
-{
-	if (i==0)
-	{
-		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-		if (pme && (dynamic_cast<FEUncoupledMaterial*>(pme) == 0))
-		{ 
-			SetBaseMaterial(pme);
-			return true;
-		}
-	}
-	return false;
 }
 
 //-----------------------------------------------------------------------------
 //! Create material point data for this material
 FEMaterialPoint* FEViscoElasticMaterial::CreateMaterialPointData()
 { 
-	return new FEViscoElasticMaterialPoint(m_pBase->CreateMaterialPointData());
+	return new FEViscoElasticMaterialPoint(m_Base->CreateMaterialPointData());
 }
 
 //-----------------------------------------------------------------------------
@@ -201,7 +194,7 @@ mat3ds FEViscoElasticMaterial::Stress(FEMaterialPoint& mp)
 	FEViscoElasticMaterialPoint& pt = *mp.ExtractData<FEViscoElasticMaterialPoint>();
 
 	// Calculate the new elastic Cauchy stress
-	pt.m_se = m_pBase->Stress(mp);
+	pt.m_se = m_Base->Stress(mp);
 
 	// pull-back to get PK2 stress
 	mat3ds Se = ep.pull_back(pt.m_se);
@@ -232,7 +225,7 @@ mat3ds FEViscoElasticMaterial::Stress(FEMaterialPoint& mp)
 tens4ds FEViscoElasticMaterial::Tangent(FEMaterialPoint& pt)
 {
 	// calculate the spatial elastic tangent
-	tens4ds C = m_pBase->Tangent(pt);
+	tens4ds C = m_Base->Tangent(pt);
 	if (pt.dt == 0.0) return C;
 
 	// calculate the visco scale factor
@@ -282,36 +275,3 @@ double FEViscoElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 	return sedt; */
     return 0;
 }
-
-//-----------------------------------------------------------------------------
-//! Get a material parameter
-FEParam* FEViscoElasticMaterial::GetParameter(const ParamString& s)
-{
-	if (s.count() == 1) return FEElasticMaterial::GetParameter(s);
-	if (s == "elastic") return m_pBase->GetParameter(s.next());
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Save data to dump file
-
-void FEViscoElasticMaterial::Serialize(DumpFile& ar)
-{
-	// Serialize parameters
-	FEElasticMaterial::Serialize(ar);
-	
-	if (ar.IsSaving())
-	{
-		ar << m_pBase->GetTypeStr();
-		m_pBase->Serialize(ar);
-	}
-	else
-	{
-		char szmat[256] = {0};
-		ar >> szmat;
-		m_pBase = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, szmat, ar.GetFEModel()));
-		assert(m_pBase); m_pBase->Serialize(ar);
-		m_pBase->Init();
-	}
-}
-

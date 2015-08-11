@@ -11,49 +11,11 @@ BEGIN_PARAMETER_LIST(FEGenerationMaterial, FEElasticMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-//! find a material property index ( returns <0 for error)
-int FEGenerationMaterial::FindPropertyIndex(const char* szname)
+FEGenerationMaterial::FEGenerationMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	if (strcmp(szname, "solid") == 0) return 0;
-	else return -1;
+	m_pMat.SetName("solid").SetID(0);
 }
 
-//-----------------------------------------------------------------------------
-//! set a material property (returns false on error)
-bool FEGenerationMaterial::SetProperty(int i, FECoreBase* pm)
-{
-	if (i==0)
-	{
-		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-		if (pme == 0) return false;
-		m_pMat = pme;
-	}
-	else return false;
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEGenerationMaterial::Serialize(DumpFile& ar)
-{
-	// serialize material parameters
-	FEElasticMaterial::Serialize(ar);
-	
-	if (ar.IsSaving())
-	{
-		ar << m_pMat->GetTypeStr();
-		m_pMat->Serialize(ar);
-	}
-	else
-	{
-		char sz[256] = {0};
-		ar >> sz;
-		m_pMat = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pMat);
-		m_pMat->Serialize(ar);
-		m_pMat->Init();
-	}
-}
 //-----------------------------------------------------------------------------
 void FEGenerationMaterial::Init()
 {
@@ -189,6 +151,12 @@ void FEMultigenerationMaterialPoint::Init(bool bflag)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
+FEElasticMultigeneration::FEElasticMultigeneration(FEModel* pfem) : FEElasticMaterial(pfem)
+{
+	m_MG.SetName("generation").SetID(0);
+}
+
+//-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
 FEMaterialPoint* FEElasticMultigeneration::CreateMaterialPointData()
 {
@@ -198,28 +166,6 @@ FEMaterialPoint* FEElasticMultigeneration::CreateMaterialPointData()
     int NMAT = Materials();
     for (int i=0; i<NMAT; ++i) pt->AddMaterialPoint(m_MG[i]->CreateMaterialPointData());
     return pt;
-}
-
-//-----------------------------------------------------------------------------
-//! Find the index of a material property
-int FEElasticMultigeneration::FindPropertyIndex(const char* szname)
-{
-	if (strcmp(szname, "generation") == 0) return (int) m_MG.size();
-	return -1;
-}
-
-//-----------------------------------------------------------------------------
-//! Set a material property
-bool FEElasticMultigeneration::SetProperty(int n, FECoreBase* pm)
-{
-	assert(n == (int)m_MG.size());
-	FEGenerationMaterial* pmg = dynamic_cast<FEGenerationMaterial*>(pm);
-	if (pmg)
-	{
-		m_MG.push_back(pmg);
-		return true;
-	}
-	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -261,38 +207,6 @@ void FEElasticMultigeneration::Init()
     }
 }
 
-//-----------------------------------------------------------------------------
-void FEElasticMultigeneration::Serialize(DumpFile& ar)
-{
-	// serialize material parameters
-	FEElasticMaterial::Serialize(ar);
-	
-	// serialize sub-materials
-	if (ar.IsSaving())
-	{
-		ar << (int)m_MG.size();
-		for (int i=0; i<(int)m_MG.size(); i++)
-		{
-			ar << m_MG[i]->GetTypeStr();
-			m_MG[i]->Serialize(ar);
-		}
-	}
-	else
-	{
-		int MG_size;
-		char sz[256] = {0};
-		ar >> MG_size;
-		m_MG.resize(MG_size);
-		for (int i=0; i<MG_size; i++)
-		{
-			ar >> sz;
-			m_MG[i] = dynamic_cast<FEGenerationMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-			assert(m_MG[i]);
-			m_MG[i]->Serialize(ar);
-			m_MG[i]->Init();
-		}
-	}
-}
 //-----------------------------------------------------------------------------
 mat3ds FEElasticMultigeneration::Stress(FEMaterialPoint& mp)
 {

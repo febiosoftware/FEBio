@@ -21,27 +21,18 @@
 class FEContinuousFiberDistributionUC : public FEUncoupledMaterial
 {
 public:
-    FEContinuousFiberDistributionUC(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
-    ~FEContinuousFiberDistributionUC() {}
+    FEContinuousFiberDistributionUC(FEModel* pfem);
+    ~FEContinuousFiberDistributionUC();
     
     // Initialization
     void Init();
-    
-	// get a material parameter
-	FEParam* GetParameter(const ParamString& s);
-    
+     
 public:
 	//! get the number of material properties
-	int Properties();
+	int MaterialProperties();
     
 	//! get a specific material property
-	FECoreBase* GetProperty(int i);
-    
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-    
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
+	FEProperty* GetMaterialProperty(int i);
     
 public:
 	//! calculate stress at material point
@@ -59,9 +50,9 @@ public:
     }
     
 public:
-    FEElasticFiberMaterialUC*   m_pFmat;    // pointer to fiber material
-    FEFiberDensityDistribution* m_pFDD;     // pointer to fiber density distribution
-    FEFiberIntegrationSchemeUC* m_pFint;    // pointer to fiber integration scheme
+    FEPropertyT<FEElasticFiberMaterialUC>   m_pFmat;    // pointer to fiber material
+	FEPropertyT<FEFiberDensityDistribution> m_pFDD;     // pointer to fiber density distribution
+	FEPropertyT<FEFiberIntegrationSchemeUC> m_pFint;    // pointer to fiber integration scheme
 };
 
 #endif /* defined(__FEBioMech__FEContinuousFiberDistributionUC__) */

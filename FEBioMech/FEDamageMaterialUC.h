@@ -11,9 +11,9 @@
 
 #include "FEUncoupledMaterial.h"
 #include "FEDamageMaterialPoint.h"
+#include "FEDamageCDF.h"
 
 class FEDamageCriterionUC;
-class FEDamageCDF;
 
 //-----------------------------------------------------------------------------
 // This material models damage in any hyper-elastic materials.
@@ -48,32 +48,20 @@ public:
     // get the elastic material
     FEUncoupledMaterial* GetElasticMaterial() { return m_pBase; }
     
-public:
-	// get a material parameter
-	FEParam* GetParameter(const ParamString& s);
-    
+public:   
 	//! get the number of material properties
-	int Properties();
+	int MaterialProperties();
     
 	//! get a specific material property
-	FECoreBase* GetProperty(int i);
-    
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-    
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
+	FEProperty* GetMaterialProperty(int i);
     
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
 	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
     
-	//! data serialization
-	void Serialize(DumpFile& ar);
-
 public:
-    FEUncoupledMaterial*    m_pBase;    // base elastic material
-    FEDamageCDF*            m_pDamg;    // damage model
-    FEDamageCriterionUC*    m_pCrit;    // damage criterion
+    FEPropertyT<FEUncoupledMaterial>    m_pBase;    // base elastic material
+	FEPropertyT<FEDamageCDF>            m_pDamg;    // damage model
+	FEPropertyT<FEDamageCriterionUC>    m_pCrit;    // damage criterion
 };
 
 #endif /* defined(__FEBioMech__FEDamageMaterialUC__) */

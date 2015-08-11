@@ -51,7 +51,7 @@ public:
 	FEMaterialPoint* CreateMaterialPointData();
 
 	// return number of materials
-	int Materials() const { return (int)m_pMat.size(); }
+	int Materials() { return (int)m_pMat.size(); }
 
 	// return a material component
 	FEElasticMaterial* GetMaterial(int i) { return m_pMat[i]; }
@@ -59,28 +59,16 @@ public:
 	// Add a material component
 	void AddMaterial(FEElasticMaterial* pm);
 
-	// get a material parameter
-	FEParam* GetParameter(const ParamString& s);
-    
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
 	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
 
-	//! data serialization
-	void Serialize(DumpFile& ar);
-
 public:
 	//! return number of properties
-	int Properties() { return (int) m_pMat.size(); }
+	int MaterialProperties();
 
 	//! return a material property
-	FECoreBase* GetProperty(int i) { return m_pMat[i]; }
+	FEProperty* GetMaterialProperty(int i);
 
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
-	
 public:
 	//! calculate stress at material point
 	virtual mat3ds Stress(FEMaterialPoint& pt);
@@ -95,5 +83,5 @@ public:
 	void Init();
 
 private:
-	vector <FEElasticMaterial*>	m_pMat;	//!< pointers to elastic materials
+	FEVecPropertyT<FEElasticMaterial>	m_pMat;	//!< pointers to elastic materials
 };

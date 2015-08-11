@@ -23,24 +23,15 @@ public:
 	// return elastic material component
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
 
-	// find a material parameter
-	FEParam* GetParameter(const ParamString& s);
-	
     //! Update solid bound molecules
     virtual void UpdateSolidBoundMolecules(FEMaterialPoint& mp, const double dt) = 0;
     
 public:
-	//! return number of material properties
-	int Properties();
+	//! return material property classes
+	int MaterialProperties();
 
-	//! return a material property
-	FECoreBase* GetProperty(int i);
-
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
+	//! Get the material property class by ID
+	FEProperty* GetMaterialProperty(int nid);
 
 public:
 	
@@ -132,9 +123,6 @@ public:
 	//! find local SBM ID from global one
 	int FindLocalSBMID(int nid);
 	
-	//! Serialization
-	void Serialize(DumpFile& ar);
-
 	// initialize chemical reaction
 	void InitializeReaction(FEChemicalReaction* m_pReact);
 
@@ -172,13 +160,14 @@ public:
 	int							m_ndeg;			//!< polynomial degree of zeta in electroneutrality
 
 protected:
-	FEElasticMaterial*				m_pSolid;		//!< pointer to elastic solid material
-	FEHydraulicPermeability*		m_pPerm;		//!< pointer to permeability material
-	FEOsmoticCoefficient*			m_pOsmC;		//!< pointer to osmotic coefficient material
-	FESolventSupply*				m_pSupp;		//!< pointer to solvent supply material
-	vector<FESolute*>				m_pSolute;		//!< pointer to solute materials
-	vector<FESolidBoundMolecule*>	m_pSBM;			//!< pointer to solid-bound molecule materials
-	vector<FEChemicalReaction*>		m_pReact;		//!< pointer to chemical reactions
+	// material properties
+	FEPropertyT<FEElasticMaterial>			m_pSolid;		//!< pointer to elastic solid material
+	FEPropertyT<FEHydraulicPermeability>	m_pPerm;		//!< pointer to permeability material
+	FEPropertyT<FEOsmoticCoefficient>		m_pOsmC;		//!< pointer to osmotic coefficient material
+	FEPropertyT<FESolventSupply>			m_pSupp;		//!< pointer to solvent supply material
+	FEVecPropertyT<FESolute>				m_pSolute;		//!< pointer to solute materials
+	FEVecPropertyT<FESolidBoundMolecule>	m_pSBM;			//!< pointer to solid-bound molecule materials
+	FEVecPropertyT<FEChemicalReaction>		m_pReact;		//!< pointer to chemical reactions
 
 	DECLARE_PARAMETER_LIST();
 };

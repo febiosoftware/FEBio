@@ -14,13 +14,13 @@
 class FEUncoupledElasticMixture : public FEUncoupledMaterial
 {
 public:
-	FEUncoupledElasticMixture(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
+	FEUncoupledElasticMixture(FEModel* pfem);
 
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData();
 
 	// return number of materials
-	int Materials() const { return (int)m_pMat.size(); }
+	int Materials() { return (int)m_pMat.size(); }
 
 	// return a material component
 	FEUncoupledMaterial* GetMaterial(int i) { return m_pMat[i]; }
@@ -28,27 +28,15 @@ public:
 	// Add a material component
 	void AddMaterial(FEUncoupledMaterial* pm);
 
-	// get a material parameter
-	FEParam* GetParameter(const ParamString& s);
-
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
 	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
 
 public:
 	//! get number of material properties
-	int Properties() { return (int)m_pMat.size(); }
+	int MaterialProperties() { return 1; }
 
 	//! return a material property
-	FECoreBase* GetProperty(int n) { return m_pMat[n]; }
-
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
-	
-	//! Serialization
-	void Serialize(DumpFile& ar);
+	FEProperty* GetMaterialProperty(int n) { return &m_pMat; }
 
 public:
 	//! calculate stress at material point
@@ -64,5 +52,5 @@ public:
 	void Init();
 
 private:
-	vector <FEUncoupledMaterial*>	m_pMat;	//!< pointers to elastic materials
+	FEVecPropertyT<FEUncoupledMaterial>	m_pMat;	//!< pointers to elastic materials
 };

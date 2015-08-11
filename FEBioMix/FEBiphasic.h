@@ -55,9 +55,6 @@ public:
 
 	// Get the elastic component (overridden from FEMaterial)
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
-
-	// find a material parameter
-	FEParam* GetParameter(const ParamString& s);
 	
 public:
 	void Init();
@@ -100,16 +97,10 @@ public:
 
 public:
 	//! return number of material properties
-	int Properties();
+	int MaterialProperties();
 
 	//! return a material property
-	FECoreBase* GetProperty(int n);
-
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
+	FEProperty* GetMaterialProperty(int n);
 
 public: // material parameters
 	double						m_rhoTw;	//!< true fluid density
@@ -117,10 +108,10 @@ public: // material parameters
     vector<FEBodyForce*>        m_bf;       //!< body forces acting on this biphasic material
 
 private: // material properties
-	FEElasticMaterial*			m_pSolid;	//!< pointer to elastic solid material
-	FEHydraulicPermeability*	m_pPerm;	//!< pointer to permeability material
-	FESolventSupply*			m_pSupp;	//!< pointer to solvent supply
-    FEActiveMomentumSupply*		m_pAmom;	//!< pointer to active momentum supply
+	FEPropertyT<FEElasticMaterial>			m_pSolid;	//!< pointer to elastic solid material
+	FEPropertyT<FEHydraulicPermeability>	m_pPerm;	//!< pointer to permeability material
+	FEPropertyT<FESolventSupply>			m_pSupp;	//!< pointer to solvent supply
+	FEPropertyT<FEActiveMomentumSupply>		m_pAmom;	//!< pointer to active momentum supply
 	
 	DECLARE_PARAMETER_LIST();
 };

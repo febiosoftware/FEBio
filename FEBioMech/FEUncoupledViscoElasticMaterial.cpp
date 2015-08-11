@@ -30,8 +30,9 @@ FEUncoupledViscoElasticMaterial::FEUncoupledViscoElasticMaterial(FEModel* pfem) 
 		m_t[i] = 1;
 		m_g[i] = 0;
 	}
-	m_pBase = 0;
 	m_binit = false;
+
+	m_pBase.SetName("elastic").SetID(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -58,15 +59,15 @@ void FEUncoupledViscoElasticMaterial::Init()
 
 //-----------------------------------------------------------------------------
 //! This material only has one property
-int FEUncoupledViscoElasticMaterial::Properties()
+int FEUncoupledViscoElasticMaterial::MaterialProperties()
 {
 	return 1;
 }
 
 //-----------------------------------------------------------------------------
-FECoreBase* FEUncoupledViscoElasticMaterial::GetProperty(int i)
+FEProperty* FEUncoupledViscoElasticMaterial::GetMaterialProperty(int i)
 {
-	if (i == 0) return m_pBase;
+	if (i == 0) return &m_pBase;
 	assert(false);
 	return 0;
 }
@@ -76,29 +77,6 @@ FECoreBase* FEUncoupledViscoElasticMaterial::GetProperty(int i)
 FEMaterialPoint* FEUncoupledViscoElasticMaterial::CreateMaterialPointData()
 { 
 	return new FEViscoElasticMaterialPoint(m_pBase->CreateMaterialPointData());
-}
-
-//-----------------------------------------------------------------------------
-//! find a material property index ( returns <0 for error)
-int FEUncoupledViscoElasticMaterial::FindPropertyIndex(const char* szname)
-{
-	if (strcmp(szname, "elastic") == 0) return 0; else return -1;
-}
-
-//-----------------------------------------------------------------------------
-//! set a material property (returns false on error)
-bool FEUncoupledViscoElasticMaterial::SetProperty(int i, FECoreBase* pm)
-{
-	if (i==0)
-	{
-		FEUncoupledMaterial* pme = dynamic_cast<FEUncoupledMaterial*>(pm);
-		if (pme)
-		{ 
-			SetBaseMaterial(pme);
-			return true;
-		}
-	}
-	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -195,39 +173,3 @@ double FEUncoupledViscoElasticMaterial::DevStrainEnergyDensity(FEMaterialPoint& 
 	return sedt;*/
     return 0;
 }
-
-//-----------------------------------------------------------------------------
-//! Get a material parameter
-FEParam* FEUncoupledViscoElasticMaterial::GetParameter(const ParamString& s)
-{
-	if (s.count() == 1) return FEUncoupledMaterial::GetParameter(s);
-	if (s == "elastic") return m_pBase->GetParameter(s.next());
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Save data to dump file
-
-void FEUncoupledViscoElasticMaterial::Serialize(DumpFile& ar)
-{
-	// Serialize parameters
-	FEUncoupledMaterial::Serialize(ar);
-	
-	if (ar.IsSaving())
-	{
-		ar << m_binit;
-		ar << m_pBase->GetTypeStr();
-		m_pBase->Serialize(ar);
-	}
-	else
-	{
-		ar >> m_binit;
-
-		char szmat[256] = {0};
-		ar >> szmat;
-		m_pBase = dynamic_cast<FEUncoupledMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, szmat, ar.GetFEModel()));
-		assert(m_pBase); m_pBase->Serialize(ar);
-		m_pBase->Init();
-	}
-}
-

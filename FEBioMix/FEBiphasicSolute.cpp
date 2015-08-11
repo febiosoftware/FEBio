@@ -25,10 +25,11 @@ FEBiphasicSolute::FEBiphasicSolute(FEModel* pfem) : FEMaterial(pfem)
 	m_Rgas = 0;
 	m_Tabs = 0; 
 
-	m_pSolid = 0;
-	m_pPerm = 0;
-	m_pOsmC = 0;
-	m_pSolute = 0;
+	// set material properties
+	m_pSolid .SetName("solid"              ).SetID(0);
+	m_pPerm  .SetName("permeability"       ).SetID(1);
+	m_pOsmC  .SetName("osmotic_coefficient").SetID(2);
+	m_pSolute.SetName("solute"             ).SetID(3);
 }
 
 //-----------------------------------------------------------------------------
@@ -284,80 +285,21 @@ double FEBiphasicSolute::ReferentialConcentration(FEMaterialPoint& pt)
 
 //-----------------------------------------------------------------------------
 //! A biphasic-solute material has four properties
-int FEBiphasicSolute::Properties()
+int FEBiphasicSolute::MaterialProperties()
 {
 	return 4;
 }
 
 //-----------------------------------------------------------------------------
-FECoreBase* FEBiphasicSolute::GetProperty(int i)
+FEProperty* FEBiphasicSolute::GetMaterialProperty(int i)
 {
 	switch (i)
 	{
-	case 0: return m_pSolid;
-	case 1: return m_pPerm;
-	case 2: return m_pOsmC;
-	case 3: return m_pSolute;
+	case 0: return &m_pSolid;
+	case 1: return &m_pPerm;
+	case 2: return &m_pOsmC;
+	case 3: return &m_pSolute;
 	}
 	assert(false);
 	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Find the index of a material property
-int FEBiphasicSolute::FindPropertyIndex(const char* szname)
-{
-	if (strcmp(szname, "solid"              ) == 0) return 0;
-	if (strcmp(szname, "permeability"       ) == 0) return 1;
-	if (strcmp(szname, "osmotic_coefficient") == 0) return 2;
-	if (strcmp(szname, "solute"             ) == 0) return 3;
-	return -1;
-}
-
-//-----------------------------------------------------------------------------
-//! Set a material property
-bool FEBiphasicSolute::SetProperty(int n, FECoreBase* pm)
-{
-	switch(n)
-	{
-	case 0:
-		{
-			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-			if (pme) { m_pSolid = pme; return true; }
-		}
-		break;
-	case 1: 
-		{
-			FEHydraulicPermeability* pmp = dynamic_cast<FEHydraulicPermeability*>(pm);
-			if (pmp) { m_pPerm = pmp; return true; }
-		}
-		break;
-	case 2:
-		{
-			FEOsmoticCoefficient* pmc = dynamic_cast<FEOsmoticCoefficient*>(pm);
-			if (pmc) { m_pOsmC = pmc; return true; }
-		}
-		break;
-	case 3:
-		{
-			FESolute* pms = dynamic_cast<FESolute*>(pm);
-			if (pms) { m_pSolute = pms; return true; }
-		}
-		break;
-	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-FEParam* FEBiphasicSolute::GetParameter(const ParamString& s)
-{
-	// see if this is a composite material parameter
-	if (s.count() == 1) return FEMaterial::GetParameter(s);
-
-	// otherwise, search the material components
-	if      (s == "solid"              ) return m_pSolid ->GetParameter(s.next());
-	else if (s == "permeability"       ) return m_pPerm  ->GetParameter(s.next());
-	else if (s == "osmotic_coefficient") return m_pOsmC  ->GetParameter(s.next());
-	else if (s == "solute"             ) return m_pSolute->GetParameter(s.next());
-	else return 0;
 }

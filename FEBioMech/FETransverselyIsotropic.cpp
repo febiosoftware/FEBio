@@ -59,6 +59,16 @@ bool FETransverselyIsotropic::SetProperty(int i, FECoreBase* pm)
 }
 
 //-----------------------------------------------------------------------------
+//! set a material property (returns false on error)
+bool FETransverselyIsotropic::SetProperty(FECoreBase* pm)
+{
+	FEActiveFiberContraction* pma = dynamic_cast<FEActiveFiberContraction*>(pm);
+	if (pma) { m_fib.SetActiveContraction(pma); return true; }
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 //! Serialize data to or from the dump file 
 void FETransverselyIsotropic::Serialize(DumpFile &ar)
 {

@@ -53,33 +53,21 @@ public:
 	//! default constructor
 	FEViscoElasticMaterial(FEModel* pfem);
 
-	//! Get a parameter
-	FEParam* GetParameter(const ParamString& s);
-
-	//! get the elastic base material \todo I want to call this GetElasticMaterial, but this name is being used
-	FEElasticMaterial* GetBaseMaterial() { return m_pBase; }
+	//! get the elastic base material
+	FEElasticMaterial* GetBaseMaterial();
 
 	//! Set the base material
-	void SetBaseMaterial(FEElasticMaterial* pbase) { m_pBase = pbase; }
+	void SetBaseMaterial(FEElasticMaterial* pbase);
 
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
 	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
 
-	//! serialize data to/from dump file
-	void Serialize(DumpFile& ar);
-
 public:
 	//! return number of properties
-	int Properties();
+	int MaterialProperties();
 
-	//! return a material property
-	FECoreBase* GetProperty(int i);
-
-	//! find a material property index ( returns <0 for error)
-	virtual int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	virtual bool SetProperty(int i, FECoreBase* pm);
+	//! get the material property by ID
+	virtual FEProperty* GetMaterialProperty(int nid);
 
 public:
 	//! data initialization
@@ -104,7 +92,7 @@ public:
 	double	m_t[MAX_TERMS];	//!< relaxation times
 
 private:
-	FEElasticMaterial*	m_pBase;	//!< pointer to elastic solid material
+	FEPropertyT<FEElasticMaterial>	m_Base;	//!< pointer to elastic solid material
 
 public:
 	// declare parameter list

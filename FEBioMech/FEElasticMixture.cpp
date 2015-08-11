@@ -78,7 +78,7 @@ void FEElasticMixtureMaterialPoint::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 FEElasticMixture::FEElasticMixture(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-
+	m_pMat.SetName("solid").SetID(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -122,26 +122,19 @@ void FEElasticMixture::Init()
 //-----------------------------------------------------------------------------
 void FEElasticMixture::AddMaterial(FEElasticMaterial* pm) 
 { 
-	m_pMat.push_back(pm); 
+	m_pMat.SetProperty(pm); 
 }
 
 //-----------------------------------------------------------------------------
-//! Find the index of a material property
-int FEElasticMixture::FindPropertyIndex(const char* szname)
+int FEElasticMixture::MaterialProperties()
 {
-	if (strcmp(szname, "solid") == 0) return (int) m_pMat.size();
-	return -1;
+	return 1;
 }
 
 //-----------------------------------------------------------------------------
-//! Set a material property
-bool FEElasticMixture::SetProperty(int n, FECoreBase* pm)
+FEProperty* FEElasticMixture::GetMaterialProperty(int i)
 {
-	assert(n <= (int) m_pMat.size());
-	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-	if (pme == 0) return false;
-	AddMaterial(pme);
-	return true;
+	return &m_pMat;
 }
 
 //-----------------------------------------------------------------------------
@@ -231,58 +224,3 @@ double FEElasticMixture::StrainEnergyDensity(FEMaterialPoint& mp)
     
 	return sed;
 }
-
-//-----------------------------------------------------------------------------
-//! For elastic mixtures, the parameter name is defined as follows:
-//!		material.param
-//! where material refers to the name of one of the mixture components and
-//! param is the parameter name.
-//!
-FEParam* FEElasticMixture::GetParameter(const ParamString& s)
-{
-	// see if this is a composite name
-	if (s.count() == 1) return FEElasticMaterial::GetParameter(s);
-
-	// else, find the variable name and search the mixture components
-	int NMAT = Materials();
-	for (int i=0; i<NMAT; ++i) 
-	{
-		FEElasticMaterial* pmi = GetMaterial(i);
-		if (s == pmi->GetName()) return pmi->GetParameter(s.next());
-	}
-
-	// no match found
-	return 0;
-}
-//-----------------------------------------------------------------------------
-void FEElasticMixture::Serialize(DumpFile& ar)
-{
-	FEElasticMaterial::Serialize(ar);
-
-	if (ar.IsSaving())
-	{
-		int nMat = m_pMat.size();
-		ar << nMat;
-		for (int i=0; i<nMat; ++i)
-		{
-			ar << m_pMat[i]->GetTypeStr();
-			m_pMat[i]->Serialize(ar);
-		}
-	}
-	else
-	{
-		int nMat;
-		char sz[256] = {0};
-		ar >> nMat;
-		m_pMat.resize(nMat);
-		for (int i=0; i<nMat; ++i)
-		{
-			ar >> sz;
-			m_pMat[i] = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-			assert(m_pMat[i]);
-			m_pMat[i]->Serialize(ar);
-			m_pMat[i]->Init();
-		}
-	}
-}
-

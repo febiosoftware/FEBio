@@ -17,28 +17,19 @@
 class FEContinuousFiberDistribution : public FEElasticMaterial
 {
 public:
-    FEContinuousFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem) {}
-    ~FEContinuousFiberDistribution() {}
+    FEContinuousFiberDistribution(FEModel* pfem);
+    ~FEContinuousFiberDistribution();
     
     // Initialization
     void Init();
     
-	// get a material parameter
-	FEParam* GetParameter(const ParamString& s);
-
 public:
 	//! get the number of material properties
-	int Properties();
+	int MaterialProperties();
 
 	//! get a specific material property
-	FECoreBase* GetProperty(int i);
+	FEProperty* GetMaterialProperty(int i);
 
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
-    
 public:
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt) { return m_pFint->Stress(pt); }
@@ -55,7 +46,7 @@ public:
     }
     
 public:
-    FEElasticFiberMaterial*     m_pFmat;    // pointer to fiber material
-    FEFiberDensityDistribution* m_pFDD;     // pointer to fiber density distribution
-    FEFiberIntegrationScheme*   m_pFint;    // pointer to fiber integration scheme
+    FEPropertyT<FEElasticFiberMaterial>     m_pFmat;    // pointer to fiber material
+	FEPropertyT<FEFiberDensityDistribution> m_pFDD;     // pointer to fiber density distribution
+	FEPropertyT<FEFiberIntegrationScheme>   m_pFint;    // pointer to fiber integration scheme
 };

@@ -10,7 +10,6 @@
 #define __FEBioMech__FEDamageCDF__
 
 #include "FECore/FEMaterial.h"
-#include "FEDamageMaterial.h"
 
 //-----------------------------------------------------------------------------
 // Virtual base class for damage cumulative distribution functions

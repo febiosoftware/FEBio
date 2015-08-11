@@ -72,6 +72,57 @@ FECoordSysMap* FEMaterial::GetCoordinateSystemMap()
 }
 
 //-----------------------------------------------------------------------------
+int FEMaterial::Properties()
+{
+	int N = MaterialProperties();
+	int n = 0;
+	for (int i=0; i<N; ++i) n += GetMaterialProperty(i)->size();
+	return n;
+}
+
+//-----------------------------------------------------------------------------
+FECoreBase* FEMaterial::GetProperty(int n)
+{
+	int N = MaterialProperties();
+	int m = 0;
+	for (int i=0; i<N; ++i)
+	{
+		FEProperty* pm = GetMaterialProperty(i);
+		int l = pm->size();
+		if (m+l > n) return pm->get(n-m);
+		m += l;
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+int FEMaterial::FindPropertyIndex(const char* sz)
+{
+	int NP = Properties();
+	for (int i=0; i<NP; ++i)
+	{
+		const FEProperty* pm = GetMaterialProperty(i);
+		if (pm && (strcmp(pm->GetName(), sz) == 0)) return pm->GetID();
+	}
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+bool FEMaterial::SetProperty(int nid, FECoreBase* pb)
+{
+	int NP = Properties();
+	for (int i = 0; i<NP; ++i)
+	{
+		FEProperty* pm = GetMaterialProperty(i);
+		if (pm && (pm->GetID() == nid))
+		{
+			if (pm->IsType(pb)) { pm->SetProperty(pb); return true; }
+		}
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 //! This function does nothing here. Derived classes will use this to set the 
 //! local coordinate systems for material points.
 void FEMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
@@ -85,6 +136,21 @@ void FEMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint&
 void FEMaterial::Init()
 {
 	if (m_pmap) m_pmap->Init();
+}
+
+//-----------------------------------------------------------------------------
+FEParam* FEMaterial::GetParameter(const ParamString& s)
+{
+	if (s.count() == 1) return FEMaterial::GetParameter(s);
+
+	int NP = MaterialProperties();
+	for (int i=0; i<NP; ++i)
+	{
+		FEProperty* mp = GetMaterialProperty(i);
+		if (s == mp->GetName()) return mp->GetParameter(s.next());
+	}
+
+	return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -106,21 +172,6 @@ void FEMaterial::Serialize(DumpFile &ar)
 		assert(ntype != -1);
 		ar << ntype;
 		if (m_pmap) m_pmap->Serialize(ar);
-
-		// Save all the material properties
-		int NP = Properties();
-		ar << NP;
-		for (int i=0; i<NP; ++i)
-		{
-			FEMaterial* pmat = dynamic_cast<FEMaterial*>(GetProperty(i));
-			int nflag = (pmat==0 ? 0 : 1);
-			ar << nflag;
-			if (pmat) 
-			{
-				ar << pmat->GetTypeStr();
-				pmat->Serialize(ar);
-			}
-		}
 	}
 	else
 	{
@@ -144,25 +195,13 @@ void FEMaterial::Serialize(DumpFile &ar)
 		case FE_MAP_ANGLES  : m_pmap = new FESphericalAngleMap(pfem); break;
 		}
 		if (m_pmap) m_pmap->Serialize(ar);
+	}
 
-		// read all material properties
-		int NP = 0, nflag;
-		char sz[256] = {0};
-		ar >> NP;
-		for (int i=0; i<NP; ++i)
-		{
-			ar >> nflag;
-			if (nflag)
-			{
-				ar >> sz;
-				FEMaterial* pmat = fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel());
-				pmat->Serialize(ar);
-				SetProperty(i, pmat);
-
-				// TODO: Do I really need to call this here? I find this rather dangerous since
-				//       the model is not completely reconstructed yet.
-				pmat->Init();
-			}
-		}
+	// serialize all the material properties
+	int NP = MaterialProperties();
+	for (int i = 0; i<NP; ++i)
+	{
+		FEProperty* pmat = GetMaterialProperty(i);
+		pmat->Serialize(ar);
 	}
 }

@@ -69,8 +69,8 @@ public:
 class FERemodelingElasticMaterial : public FEElasticMaterial
 {
 public:
-	//! default constructor
-	FERemodelingElasticMaterial(FEModel* pfem) : FEElasticMaterial(pfem) {}
+	//! constructor
+	FERemodelingElasticMaterial(FEModel* pfem);
 	
 	//! strain energy density function
 	double StrainEnergyDensity(FEMaterialPoint& pt);
@@ -101,23 +101,14 @@ public:
 
 public:
 	//! return number of material properties
-	int Properties();
+	int MaterialProperties();
 
 	//! return a material property
-	FECoreBase* GetProperty(int i);
-
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
-	
-	//! data serialization
-	void Serialize(DumpFile& ar);
+	FEProperty* GetMaterialProperty(int i);
 
 public:
-	FEElasticMaterial*	m_pBase;		//!< pointer to elastic solid material
-	FESolidSupply*		m_pSupp;		//!< pointer to solid supply material
+	FEPropertyT<FEElasticMaterial>	m_pBase;		//!< pointer to elastic solid material
+	FEPropertyT<FESolidSupply>		m_pSupp;		//!< pointer to solid supply material
 	double				m_rhormin;		//!< minimum density
 	double				m_rhormax;		//!< maximum density
 	

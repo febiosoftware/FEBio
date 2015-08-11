@@ -22,27 +22,15 @@ public:
 	// set the elastic base material
 	void SetBaseMaterial(FEUncoupledMaterial* pbase) { m_pBase = pbase; }
 
-	//! Find a material parameter
-	FEParam* GetParameter(const ParamString& s);
-
-	//! serialize data to/from dump file
-	void Serialize(DumpFile& ar);
-
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
 	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
 
 public:
 	//! return number of properties
-	int Properties();
+	int MaterialProperties();
 
 	//! return a material property
-	FECoreBase* GetProperty(int i);
-
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
+	FEProperty* GetMaterialProperty(int i);
 
 public:
 	//! data initialization and checking
@@ -66,7 +54,7 @@ public:
 	double	m_g[MAX_TERMS];	//!< visco-elastic coefficients
 	
 private:
-	FEUncoupledMaterial*	m_pBase;	//!< pointer to elastic solid material
+	FEPropertyT<FEUncoupledMaterial>	m_pBase;	//!< pointer to elastic solid material
 	bool					m_binit;	//!< initialization flag
 	
 public:

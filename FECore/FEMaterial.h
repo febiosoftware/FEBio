@@ -14,6 +14,7 @@
 #include "FEMaterialPoint.h"
 #include "FECoordSysMap.h"
 #include "DumpFile.h"
+#include "FECoreKernel.h"
 #include <string.h>
 
 #define INRANGE(x, a, b) ((x)>=(a) && (x)<=(b))
@@ -61,6 +62,156 @@ public:
 	const char*	m_szvar;
 	double	m_vmin, m_vmax;
 	bool	m_bl, m_br;
+};
+
+//-----------------------------------------------------------------------------
+//! First attempt at conceptualizing material properties
+class FEProperty
+{
+public:
+	const char*		m_szname;	//!< name of property
+	int				m_nID;		//!< ID of property
+
+public:
+	FEProperty& SetName(const char* sz) { m_szname = sz; return *this; }
+	FEProperty& SetID(int nid) { m_nID = nid; return *this; }
+	const char* GetName() const { return m_szname; }
+	const int GetID() const { return m_nID; }
+
+	virtual bool IsType(FECoreBase* pc) const = 0;
+	virtual void SetProperty(FECoreBase* pc) = 0;
+
+	virtual void Serialize(DumpFile& ar) = 0;
+
+	virtual int size() = 0;
+	virtual FECoreBase* get(int i) = 0;
+
+	virtual FEParam* GetParameter(const ParamString& s) = 0;
+
+protected:
+	FEProperty(){}
+	virtual ~FEProperty(){}
+};
+
+//-----------------------------------------------------------------------------
+//! Use this class to acutally define material properties in class
+//! Note that the m_pmp member can be zero if the material property is optional
+template<class T> class FEPropertyT : public FEProperty
+{
+private:
+	T*				m_pmp;		//!< pointer to actual material property
+
+public:
+	FEPropertyT() { m_szname = 0; m_nID = -1; m_pmp = 0; }
+	operator T*() { return m_pmp; }
+	T* operator->() { return m_pmp; }
+	void operator = (T* p) { m_pmp = p; }
+
+	virtual bool IsType(FECoreBase* pc) const { return (dynamic_cast<T*>(pc) != 0); }
+	virtual void SetProperty(FECoreBase* pc) { m_pmp = dynamic_cast<T*>(pc); }
+	virtual int size() { return (m_pmp == 0 ? 0 : 1); }
+	virtual FECoreBase* get(int i) { return m_pmp; }
+
+	FEParam* GetParameter(const ParamString& s)
+	{
+		return (m_pmp ? m_pmp->GetParameter(s) : 0); 
+	}
+
+	void Serialize(DumpFile& ar)
+	{
+		if (ar.IsSaving())
+		{
+			int nflag = (m_pmp == 0 ? 0 : 1);
+			ar << nflag;
+			if (nflag)
+			{
+				ar << m_pmp->GetTypeStr();
+				m_pmp->Serialize(ar);
+			}
+		}
+		else
+		{
+			int nflag = 0;
+			ar >> nflag;
+			if (nflag)
+			{
+				char sz[256];
+				ar >> sz;
+				m_pmp = dynamic_cast<T*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+				m_pmp->Serialize(ar);
+
+				m_pmp->Init();
+			}
+		}
+	}
+};
+
+//-----------------------------------------------------------------------------
+//! Use this class to define array material properties
+template<class T> class FEVecPropertyT : public FEProperty
+{
+private:
+	std::vector<T*>	m_pmp;		//!< pointer to actual material property
+
+public:
+	FEVecPropertyT() { m_szname = 0; m_nID = -1; }
+	T* operator [] (int i) { return m_pmp[i]; }
+
+	virtual bool IsType(FECoreBase* pc) const { return (dynamic_cast<T*>(pc) != 0); }
+	virtual void SetProperty(FECoreBase* pc) { m_pmp.push_back(dynamic_cast<T*>(pc)); }
+	virtual int size() { return (int)m_pmp.size(); }
+	virtual FECoreBase* get(int i) { return m_pmp[i]; }
+
+	FEParam* GetParameter(const ParamString& s)
+	{
+		ParamString s2 = s.next();
+
+		int N = (int)m_pmp.size();
+		for (int i = 0; i<N; ++i)
+		{
+			T* pi = m_pmp[i];
+			if (s2 == pi->GetName()) return pi->GetParameter(s2.next());
+		}
+		return 0;
+	}
+
+	void Serialize(DumpFile& ar)
+	{
+		if (ar.IsSaving())
+		{
+			int n = size();
+			ar << n;
+			for (int i=0; i<n; ++i)
+			{
+				T* pm = m_pmp[i];
+				int nflag = (pm == 0 ? 0 : 1);
+				ar << nflag;
+				if (nflag) 
+				{
+					ar << pm->GetTypeStr();
+					pm->Serialize(ar);
+				}
+			}
+		}
+		else
+		{
+			int n = 0;
+			ar >> n;
+			m_pmp.assign(n, nullptr);
+			for (int i=0; i<n; ++i)
+			{
+				int nflag = 0;
+				ar >> nflag;
+				if (nflag)
+				{
+					char sz[256];
+					ar >> sz;
+					m_pmp[i] = dynamic_cast<T*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+					m_pmp[i]->Serialize(ar);
+				}
+			}
+		}
+	}
 };
 
 //-----------------------------------------------------------------------------
@@ -132,6 +283,31 @@ public:
 
 	//! Set the parent of this material
 	void SetParent(FEMaterial* pmat) { m_pParent = pmat; }
+
+public:
+	// NOTE: This is the new interface that materials have to implement
+
+	//! return the number of material property classes
+	virtual int MaterialProperties() { return 0; }
+
+	//! This function must be overloaded (for now) by derived materials that define material properties
+	virtual FEProperty* GetMaterialProperty(int nid) { return nullptr; }
+
+public:
+	//! Find the index of a material property
+	int FindPropertyIndex(const char* sz);
+
+	//! Set a material property
+	bool SetProperty(int nid, FECoreBase* pm);
+
+	//! return actual number of properties
+	int Properties();
+
+	//! return a material property
+	FECoreBase* GetProperty(int i);
+
+	//! return a material parameter
+	FEParam* GetParameter(const ParamString& s);
 
 private:
 	char	m_szname[128];	//!< name of material

@@ -74,6 +74,13 @@ BEGIN_PARAMETER_LIST(FERemodelingElasticMaterial, FEElasticMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
+FERemodelingElasticMaterial::FERemodelingElasticMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
+{
+	m_pBase.SetName("solid").SetID(0);
+	m_pSupp.SetName("supply").SetID(1);
+}
+
+//-----------------------------------------------------------------------------
 //! Initialization
 void FERemodelingElasticMaterial::Init()
 {
@@ -84,93 +91,28 @@ void FERemodelingElasticMaterial::Init()
 
 //-----------------------------------------------------------------------------
 //! This material has two properties
-int FERemodelingElasticMaterial::Properties()
+int FERemodelingElasticMaterial::MaterialProperties()
 {
 	return 2;
 }
 
 //-----------------------------------------------------------------------------
-FECoreBase* FERemodelingElasticMaterial::GetProperty(int i)
+FEProperty* FERemodelingElasticMaterial::GetMaterialProperty(int i)
 {
 	switch (i)
 	{
-	case 0: return m_pBase;
-	case 1: return m_pSupp;
+	case 0: return &m_pBase;
+	case 1: return &m_pSupp;
 	}
 	assert(false);
 	return 0;
 }
 
 //-----------------------------------------------------------------------------
-//! Find the index of a material property
-int FERemodelingElasticMaterial::FindPropertyIndex(const char* szname)
-{
-	if (strcmp(szname, "solid" ) == 0) return 0;
-	if (strcmp(szname, "supply") == 0) return 1;
-	return -1;
-}
-
-//-----------------------------------------------------------------------------
-//! Set a material property
-bool FERemodelingElasticMaterial::SetProperty(int n, FECoreBase* pm)
-{
-	switch(n)
-	{
-	case 0:
-		{
-			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-			if (pme) { m_pBase = pme; return true; }
-		}
-		break;
-	case 1: 
-		{
-			FESolidSupply* pms = dynamic_cast<FESolidSupply*>(pm);
-			if (pms) { m_pSupp = pms; return true; }
-		}
-		break;
-	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-//! Serialization
-void FERemodelingElasticMaterial::Serialize(DumpFile &ar)
-{
-	// serialize material parameters
-	FEElasticMaterial::Serialize(ar);
-
-	// serialize sub-materials
-	if (ar.IsSaving())
-	{
-		ar << m_pBase->GetTypeStr();
-		m_pBase->Serialize(ar);
-
-		ar << m_pSupp->GetTypeStr();
-		m_pSupp->Serialize(ar);
-	}
-	else
-	{
-		char sz[256] = {0};
-
-		ar >> sz;
-		m_pBase = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pBase);
-		m_pBase->Serialize(ar);
-		m_pBase->Init();
-
-		ar >> sz;
-		m_pSupp = dynamic_cast<FESolidSupply*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert (m_pSupp);
-		m_pSupp->Serialize(ar);
-		m_pSupp->Init();
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! Strain energy density function
 double FERemodelingElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 {
-	return (dynamic_cast<FERemodelingInterface*>(m_pBase))->StrainEnergy(mp);
+	return (dynamic_cast<FERemodelingInterface*>((FEElasticMaterial*)m_pBase))->StrainEnergy(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -206,12 +148,12 @@ tens4ds FERemodelingElasticMaterial::Tangent(FEMaterialPoint& mp)
 //! Tangent of strain energy density with mass density
 double FERemodelingElasticMaterial::Tangent_SE_Density(FEMaterialPoint& pt)
 {
-    return (dynamic_cast<FERemodelingInterface*>(m_pBase))->Tangent_SE_Density(pt);
+	return (dynamic_cast<FERemodelingInterface*>((FEElasticMaterial*)m_pBase))->Tangent_SE_Density(pt);
 }
 
 //-----------------------------------------------------------------------------
 //! Tangent of stress with mass density
 mat3ds FERemodelingElasticMaterial::Tangent_Stress_Density(FEMaterialPoint& pt)
 {
-    return (dynamic_cast<FERemodelingInterface*>(m_pBase))->Tangent_Stress_Density(pt);
+	return (dynamic_cast<FERemodelingInterface*>((FEElasticMaterial*)m_pBase))->Tangent_Stress_Density(pt);
 }

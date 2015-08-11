@@ -57,16 +57,10 @@ public:
 
 public:
 	//! return number of properties
-	int Properties();
+	int MaterialProperties();
 
 	//! return a material property
-	FECoreBase* GetProperty(int i);
-
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
+	FEProperty* GetMaterialProperty(int i);
 
 	void SetParameter(FEParam& p);
 
@@ -142,8 +136,8 @@ public:
 	int				m_vRtmp;	//!< helper variable for reading in stoichiometric coefficients for reactants
 	int				m_vPtmp;	//!< helper variable for reading in stoichiometric coefficients for products
 
-	FEReactionRate*	m_pFwd;		//!< pointer to forward reaction rate
-	FEReactionRate*	m_pRev;		//!< pointer to reverse reaction rate
+	FEPropertyT<FEReactionRate>	m_pFwd;		//!< pointer to forward reaction rate
+	FEPropertyT<FEReactionRate>	m_pRev;		//!< pointer to reverse reaction rate
 
 public:
 	FEMultiphasic*	m_pMP;		//!< pointer to multiphasic material where reaction occurs

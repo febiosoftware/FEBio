@@ -11,6 +11,12 @@
 //////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
+FEUncoupledElasticMixture::FEUncoupledElasticMixture(FEModel* pfem) : FEUncoupledMaterial(pfem)
+{
+	m_pMat.SetName("solid").SetID(0);
+}
+
+//-----------------------------------------------------------------------------
 FEMaterialPoint* FEUncoupledElasticMixture::CreateMaterialPointData() 
 { 
 	FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint();
@@ -52,26 +58,7 @@ void FEUncoupledElasticMixture::Init()
 //-----------------------------------------------------------------------------
 void FEUncoupledElasticMixture::AddMaterial(FEUncoupledMaterial* pm) 
 { 
-	m_pMat.push_back(pm); 
-}
-
-//-----------------------------------------------------------------------------
-//! Find the index of a material property
-int FEUncoupledElasticMixture::FindPropertyIndex(const char* szname)
-{
-	if (strcmp(szname, "solid") == 0) return (int) m_pMat.size();
-	return -1;
-}
-
-//-----------------------------------------------------------------------------
-//! Set a material property
-bool FEUncoupledElasticMixture::SetProperty(int n, FECoreBase* pm)
-{
-	assert(n <= (int) m_pMat.size());
-	FEUncoupledMaterial* pme = dynamic_cast<FEUncoupledMaterial*>(pm);
-	if (pme == 0) return false;
-	AddMaterial(pme);
-	return true;
+	m_pMat.SetProperty(pm); 
 }
 
 //-----------------------------------------------------------------------------
@@ -156,60 +143,4 @@ double FEUncoupledElasticMixture::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	}
     
 	return sed;
-}
-
-//-----------------------------------------------------------------------------
-//! For elastic mixtures, the parameter name is defined as follows:
-//!		material.param
-//! where material refers to the name of one of the mixture components and
-//! param is the parameter name.
-//!
-FEParam* FEUncoupledElasticMixture::GetParameter(const ParamString& s)
-{
-	if (s.count() == 1) return FEUncoupledMaterial::GetParameter(s);
-
-	int NMAT = Materials();
-	for (int i=0; i<NMAT; ++i) 
-	{
-		FEUncoupledMaterial* pmi = GetMaterial(i);
-		if (s == pmi->GetName()) return pmi->GetParameter(s.next());
-	}
-
-	// no match found
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! serialization
-void FEUncoupledElasticMixture::Serialize(DumpFile &ar)
-{
-	// serialize material parameters
-	FEUncoupledMaterial::Serialize(ar);
-
-	int nmat = 0;
-	// serialize sub-materials
-	if (ar.IsSaving())
-	{
-		nmat = m_pMat.size();
-		ar << nmat;
-		for (int i=0; i<nmat; ++i)
-		{
-			ar << m_pMat[i]->GetTypeStr();
-			m_pMat[i]->Serialize(ar);
-		}
-	}
-	else
-	{
-		char sz[256] = {0};
-		ar >> nmat;
-		m_pMat.resize(nmat);
-		for (int i=0; i<nmat; ++i)
-		{
-			ar >> sz;
-			m_pMat[i] = dynamic_cast<FEUncoupledMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-			assert(m_pMat[i]);
-			m_pMat[i]->Serialize(ar);
-			m_pMat[i]->Init();
-		}
-	}
 }

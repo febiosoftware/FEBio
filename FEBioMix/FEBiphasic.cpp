@@ -78,10 +78,11 @@ FEBiphasic::FEBiphasic(FEModel* pfem) : FEMaterial(pfem)
 	m_rhoTw = 0; 
 	m_phi0 = 0;
 
-	m_pSolid = 0;
-	m_pPerm = 0;
-	m_pSupp = 0;
-    m_pAmom = 0;
+	// set material properties
+	m_pSolid.SetName("solid"         ).SetID(0);
+	m_pPerm.SetName ("permeability"  ).SetID(1);
+	m_pSupp.SetName ("solvent_supply").SetID(2);
+    m_pAmom.SetName ("active_supply" ).SetID(3);
 }
 
 //-----------------------------------------------------------------------------
@@ -108,70 +109,24 @@ void FEBiphasic::Init()
 
 //-----------------------------------------------------------------------------
 //! A biphasic material has three properties
-int FEBiphasic::Properties()
+int FEBiphasic::MaterialProperties()
 {
-    int np = 4;
-	return np;
+	return 4;
 }
 
 //-----------------------------------------------------------------------------
 //! return a pointer to a biphasic material property
-FECoreBase* FEBiphasic::GetProperty(int i)
+FEProperty* FEBiphasic::GetMaterialProperty(int i)
 {
 	switch (i)
 	{
-	case 0: return m_pSolid;
-	case 1: return m_pPerm;
-	case 2: return m_pSupp;
-    case 3: return m_pAmom;
+	case 0: return &m_pSolid;
+	case 1: return &m_pPerm;
+	case 2: return &m_pSupp;
+    case 3: return &m_pAmom;
 	}
 	assert(false);
 	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Find the index of a material property
-int FEBiphasic::FindPropertyIndex(const char* szname)
-{
-	if (strcmp(szname, "solid"         ) == 0) return 0;
-	if (strcmp(szname, "permeability"  ) == 0) return 1;
-	if (strcmp(szname, "solvent_supply") == 0) return 2;
-    if (strcmp(szname, "active_supply" ) == 0) return 3;
-	return -1;
-}
-
-//-----------------------------------------------------------------------------
-//! Set a material property
-bool FEBiphasic::SetProperty(int n, FECoreBase* pm)
-{
-	switch(n)
-	{
-	case 0:
-		{
-			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-			if (pme) { m_pSolid = pme; return true; }
-		}
-		break;
-	case 1: 
-		{
-			FEHydraulicPermeability* pmp = dynamic_cast<FEHydraulicPermeability*>(pm);
-			if (pmp) { m_pPerm = pmp; return true; }
-		}
-		break;
-	case 2:
-		{
-			FESolventSupply* pms = dynamic_cast<FESolventSupply*>(pm);
-			if (pms) { m_pSupp = pms; return true; }
-		}
-		break;
-    case 3:
-        {
-            FEActiveMomentumSupply* pas = dynamic_cast<FEActiveMomentumSupply*>(pm);
-            if (pas) { m_pAmom = pas; return true; }
-        }
-        break;
-	}
-	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -280,18 +235,4 @@ void FEBiphasic::Permeability(double k[3][3], FEMaterialPoint& pt)
 mat3ds FEBiphasic::Permeability(FEMaterialPoint& mp)
 {
 	return m_pPerm->Permeability(mp);
-}
-
-//-----------------------------------------------------------------------------
-FEParam* FEBiphasic::GetParameter(const ParamString& s)
-{
-	// see if this is a composite parameter
-	if (s.count() == 1) return FEMaterial::GetParameter(s);
-
-	// else find the component's parameter
-	if      (s == "solid"         ) return m_pSolid->GetParameter(s.next());
-	else if (s == "permeability"  ) return m_pPerm ->GetParameter(s.next());
-    else if (s == "solvent_supply") return m_pSupp ->GetParameter(s.next());
-    else if (s == "active_supply" ) return m_pAmom ->GetParameter(s.next());
-	else return 0;
 }

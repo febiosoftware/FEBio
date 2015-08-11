@@ -17,9 +17,6 @@ public:
 	// Get the elastic component (overridden from FEMaterial)
 	FEElasticMaterial* GetElasticMaterial() { return m_pElastic->GetElasticMaterial(); }
 
-	// find a material parameter
-	FEParam* GetParameter(const ParamString& s);
-	
 public:
 	void Init();
 	
@@ -38,23 +35,14 @@ public:
 	//! calculate the conductivity gradient
 	tens4ds ConductivityGradient(FEMaterialPoint& pt);
 
-	//! Serialization
-	void Serialize(DumpFile& ar);
-
 public:
 	//! return number of material properties
-	int Properties();
+	int MaterialProperties();
 
 	//! return a material property
-	FECoreBase* GetProperty(int n);
-
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
+	FEProperty* GetMaterialProperty(int n);
 
 private: // material properties
-	FEThermalElastic*			m_pElastic;	//!< elastic material property
-	FEThermalConductivity*		m_pCond;	//!< thermal conductivity property
+	FEPropertyT<FEThermalElastic>			m_pElastic;	//!< elastic material property
+	FEPropertyT<FEThermalConductivity>		m_pCond;	//!< thermal conductivity property
 };

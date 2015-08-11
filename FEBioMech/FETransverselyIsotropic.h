@@ -39,6 +39,9 @@ public:
 	//! set a material property (returns false on error)
 	bool SetProperty(int i, FECoreBase* pm);
 
+	//! set a material property (returns false on error)
+	bool SetProperty(FECoreBase* pm);
+
 public:
 	FEFiberMaterial	m_fib;
 

@@ -22,10 +22,7 @@ class FEUncoupledReactiveViscoelasticMaterial :	public FEUncoupledMaterial
 public:
     //! default constructor
     FEUncoupledReactiveViscoelasticMaterial(FEModel* pfem);
-    
-    //! Get a parameter
-    FEParam* GetParameter(const ParamString& s);
-    
+        
     //! get the elastic base material
     FEElasticMaterial* GetBaseMaterial() { return m_pBase; }
     
@@ -40,22 +37,13 @@ public:
     
     //! Set the local coordinate system for a material point (overridden from FEMaterial)
     void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
-    
-    //! serialize data to/from dump file
-    void Serialize(DumpFile& ar);
-    
+        
 public:
     //! return number of properties
-    int Properties();
+    int MaterialProperties();
     
     //! return a material property
-    FECoreBase* GetProperty(int i);
-    
-    //! find a material property index ( returns <0 for error)
-    virtual int FindPropertyIndex(const char* szname);
-    
-    //! set a material property (returns false on error)
-    virtual bool SetProperty(int i, FECoreBase* pm);
+    FEProperty* GetMaterialProperty(int i);
     
 public:
     //! data initialization
@@ -86,9 +74,9 @@ public:
     FEMaterialPoint* CreateMaterialPointData();
     
 private:
-    FEUncoupledMaterial*	m_pBase;	//!< pointer to elastic solid material for polymer base
-    FEUncoupledMaterial*	m_pBond;	//!< pointer to elastic solid material for reactive bonds
-    FEBondRelaxation*   m_pRelx;    //!< pointer to bond relaxation material for reactive bonds
+    FEPropertyT<FEUncoupledMaterial>	m_pBase;	//!< pointer to elastic solid material for polymer base
+	FEPropertyT<FEUncoupledMaterial>	m_pBond;	//!< pointer to elastic solid material for reactive bonds
+	FEPropertyT<FEBondRelaxation>		m_pRelx;    //!< pointer to bond relaxation material for reactive bonds
     
 public:
     double	m_wmin;		//!< minimum value of relaxation

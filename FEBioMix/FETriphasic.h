@@ -20,9 +20,6 @@ public:
 	// Get the elastic component (overridden from FEMaterial)
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
 
-	//! find a material parameter
-	FEParam* GetParameter(const ParamString& s);
-
 public:
 
 	//! calculate stress at material point
@@ -67,25 +64,16 @@ public:
 	//! solute charge number
 	int SoluteChargeNumber(const int ion) { return m_pSolute[ion]->ChargeNumber(); }
 	
-	//! Serialization
-	void Serialize(DumpFile& ar);
-
 	//! Add a solute component
 	void AddSolute(FESolute* ps);
 
 public:
 	//! return number of material properties
-	int Properties();
+	int MaterialProperties();
 
 	//! return a material property
-	FECoreBase* GetProperty(int i);
+	FEProperty* GetMaterialProperty(int i);
 
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
-	
 public: // material parameters
 	double						m_phi0;			//!< solid volume fraction in reference configuration
 	double						m_rhoTw;		//!< true fluid density
@@ -96,10 +84,10 @@ public: // material parameters
 	double						m_penalty;		//!< penalty for enforcing electroneutrality
 
 public: // material properties
-	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
-	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
-	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
-	vector<FESolute*>			m_pSolute;		//!< pointer to solute materials
+	FEPropertyT<FEElasticMaterial>			m_pSolid;		//!< pointer to elastic solid material
+	FEPropertyT<FEHydraulicPermeability>	m_pPerm;		//!< pointer to permeability material
+	FEPropertyT<FEOsmoticCoefficient>		m_pOsmC;		//!< pointer to osmotic coefficient material
+	FEVecPropertyT<FESolute>				m_pSolute;		//!< pointer to solute materials
 
 	DECLARE_PARAMETER_LIST();
 };

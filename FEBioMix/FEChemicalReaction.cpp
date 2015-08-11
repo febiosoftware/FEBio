@@ -19,8 +19,10 @@ FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEMaterial(pfem)
 {
 	m_Vovr = false; 
 	m_pMP = 0; 
-	m_pFwd = 0;
-	m_pRev = 0;
+
+	// set material properties
+	m_pFwd.SetName("forward_rate").SetID(0);
+	m_pRev.SetName("reverse_rate").SetID(1);
 }
 
 //-----------------------------------------------------------------------------
@@ -84,43 +86,17 @@ bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, co
 }
 
 //-----------------------------------------------------------------------------
-int FEChemicalReaction::Properties()
+int FEChemicalReaction::MaterialProperties()
 {
 	return 2;
 }
 
 //-----------------------------------------------------------------------------
-FECoreBase* FEChemicalReaction::GetProperty(int i)
+FEProperty* FEChemicalReaction::GetMaterialProperty(int i)
 {
-	if (i==0) return m_pFwd;
-	if (i==1) return m_pRev;
+	if (i==0) return &m_pFwd;
+	if (i==1) return &m_pRev;
 	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! find a material property index ( returns <0 for error)
-int FEChemicalReaction::FindPropertyIndex(const char* szname)
-{ 
-	if (strcmp(szname, "forward_rate") == 0) return 0;
-	if (strcmp(szname, "reverse_rate") == 0) return 1;
-	return -1; 
-}
-
-//-----------------------------------------------------------------------------
-//! set a material property (returns false on error)
-bool FEChemicalReaction::SetProperty(int i, FECoreBase* pm)
-{ 
-	if (i==0)
-	{
-		FEReactionRate* pmr = dynamic_cast<FEReactionRate*>(pm);
-		if (pmr) { SetForwardReactionRate(pmr); return true; }
-	}
-	if (i==1)
-	{
-		FEReactionRate* pmr = dynamic_cast<FEReactionRate*>(pm);
-		if (pmr) { SetReverseReactionRate(pmr); return true; }
-	}
-	return false; 
 }
 
 //-----------------------------------------------------------------------------
@@ -140,7 +116,7 @@ void FEChemicalReaction::Serialize(DumpFile& ar)
 	if (ar.IsSaving())
 	{
 		itrmap p;
-		ar << m_nsol << m_vR << m_vP << m_v << m_Vbar << m_Vovr << m_vRtmp << m_vPtmp;
+		ar << m_nsol << m_vR << m_vP << m_v << m_Vovr;
 		ar << (int) m_solR.size();
 		for (p = m_solR.begin(); p!=m_solR.end(); ++p) {ar << p->first; ar << p->second;}
 		ar << (int) m_solP.size();
@@ -149,24 +125,10 @@ void FEChemicalReaction::Serialize(DumpFile& ar)
 		for (p = m_sbmR.begin(); p!=m_sbmR.end(); ++p) {ar << p->first; ar << p->second;}
 		ar << (int) m_sbmP.size();
 		for (p = m_sbmP.begin(); p!=m_sbmP.end(); ++p) {ar << p->first; ar << p->second;}
-
-		if (m_pFwd)
-		{
-			ar << 1;
-			ar << m_pFwd->GetTypeStr(); m_pFwd->Serialize(ar);
-		}
-		else ar << 0;
-		if (m_pRev)
-		{
-			ar << 1;
-			ar << m_pRev->GetTypeStr(); m_pRev->Serialize(ar);
-		}
-		else ar << 0;
-
 	}
 	else
 	{
-		ar >> m_nsol >> m_vR >> m_vP >> m_v >> m_Vbar >> m_Vovr >> m_vRtmp >> m_vPtmp;
+		ar >> m_nsol >> m_vR >> m_vP >> m_v >> m_Vovr;
 		int size, id, vR;
 		ar >> size;
 		for (int i=0; i<size; ++i)
@@ -192,25 +154,5 @@ void FEChemicalReaction::Serialize(DumpFile& ar)
 			ar >> id; ar >> vR;
 			SetSolidProductsCoefficients(id, vR);
 		}
-		int rr;
-		char sz[256] = {0};
-		ar >> rr;
-		if (rr)
-		{
-			ar >> sz;
-			m_pFwd = dynamic_cast<FEReactionRate*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-			assert(m_pFwd); m_pFwd->Serialize(ar);
-			m_pFwd->Init();
-		}
-		ar >> rr;
-		if (rr)
-		{
-			ar >> sz;
-			m_pRev = dynamic_cast<FEReactionRate*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-			assert(m_pRev); m_pRev->Serialize(ar);
-			m_pRev->Init();
-		}
-
 	}
-
 }

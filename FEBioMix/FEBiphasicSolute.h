@@ -30,22 +30,13 @@ public:
 	//! Get the solute
 	FESolute* GetSolute() { return m_pSolute; }
 
-	// find a material parameter
-	FEParam* GetParameter(const ParamString& s);
-
 public:
 	//! return number of material properties
-	int Properties();
+	int MaterialProperties();
 
 	//! return a material property
-	FECoreBase* GetProperty(int i);
+	FEProperty* GetMaterialProperty(int nid);
 
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
-	
 public:
 	void Init();
 	
@@ -85,10 +76,10 @@ public: // material parameters
 	double						m_Tabs;			//!< absolute temperature
 
 private: // material properties
-	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
-	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
-	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
-	FESolute*					m_pSolute;		//!< pointer to solute material
+	FEPropertyT<FEElasticMaterial>			m_pSolid;		//!< pointer to elastic solid material
+	FEPropertyT<FEHydraulicPermeability>	m_pPerm;		//!< pointer to permeability material
+	FEPropertyT<FEOsmoticCoefficient>		m_pOsmC;		//!< pointer to osmotic coefficient material
+	FEPropertyT<FESolute>					m_pSolute;		//!< pointer to solute material
 
 	DECLARE_PARAMETER_LIST();
 };

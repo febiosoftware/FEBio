@@ -27,13 +27,14 @@ END_PARAMETER_LIST();
 //! constructor
 FEReactiveViscoelasticMaterial::FEReactiveViscoelasticMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	m_pBase = 0;
-    m_pBond = 0;
-    m_pRelx = 0;
-    
     m_wmin = 0;
     m_btype = 0;
     m_ttype = 0;
+
+	// set material properties
+	m_pBase.SetName("elastic"   ).SetID(0);
+	m_pBond.SetName("bond"      ).SetID(1);
+	m_pRelx.SetName("relaxation").SetID(2);
 }
 
 //-----------------------------------------------------------------------------
@@ -65,57 +66,19 @@ void FEReactiveViscoelasticMaterial::Init()
 
 //-----------------------------------------------------------------------------
 //! This material only has one property
-int FEReactiveViscoelasticMaterial::Properties()
+int FEReactiveViscoelasticMaterial::MaterialProperties()
 {
 	return 3;
 }
 
 //-----------------------------------------------------------------------------
-FECoreBase* FEReactiveViscoelasticMaterial::GetProperty(int i)
+FEProperty* FEReactiveViscoelasticMaterial::GetMaterialProperty(int i)
 {
-	if (i == 0) return m_pBase;
-	else if (i == 1) return m_pBond;
-	else if (i == 2) return m_pRelx;
+	if      (i == 0) return &m_pBase;
+	else if (i == 1) return &m_pBond;
+	else if (i == 2) return &m_pRelx;
 	assert(false);
 	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! find a material property index ( returns <0 for error)
-int FEReactiveViscoelasticMaterial::FindPropertyIndex(const char* szname)
-{
-	if (strcmp(szname, "elastic") == 0) return 0;
-    else if (strcmp(szname, "bond") == 0) return 1;
-    else if (strcmp(szname, "relaxation") == 0) return 2;
-    else return -1;
-}
-
-//-----------------------------------------------------------------------------
-//! set a material property (returns false on error)
-bool FEReactiveViscoelasticMaterial::SetProperty(int i, FECoreBase* pm)
-{
-	switch(i)
-	{
-        case 0:
-		{
-			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-			if (pme) { m_pBase = pme; return true; }
-		}
-            break;
-        case 1:
-		{
-			FEElasticMaterial* pmb = dynamic_cast<FEElasticMaterial*>(pm);
-			if (pmb) { m_pBond = pmb; return true; }
-		}
-            break;
-        case 2:
-		{
-			FEBondRelaxation* pmr = dynamic_cast<FEBondRelaxation*>(pm);
-			if (pmr) { m_pRelx = pmr; return true; }
-		}
-            break;
-	}
-	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -458,62 +421,4 @@ void FEReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& mp)
     }
     
     return;
-}
-
-//-----------------------------------------------------------------------------
-//! Get a material parameter
-FEParam* FEReactiveViscoelasticMaterial::GetParameter(const ParamString& s)
-{
-	// see if this is a composite parameter
-	if (s.count() == 1) return FEMaterial::GetParameter(s);
-    
-	// else find the component's parameter
-	if      (s == "elastic"       ) return m_pBase->GetParameter(s.next());
-	else if (s == "bond"          ) return m_pBond->GetParameter(s.next());
-	else if (s == "relaxation"    ) return m_pRelx->GetParameter(s.next());
-	else return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Save data to dump file
-
-void FEReactiveViscoelasticMaterial::Serialize(DumpFile& ar)
-{
-	// serialize material parameters
-	FEMaterial::Serialize(ar);
-    
-	// serialize sub-materials
-	if (ar.IsSaving())
-	{
-		ar << m_pBase->GetTypeStr();
-		m_pBase->Serialize(ar);
-        
-		ar << m_pBond->GetTypeStr();
-		m_pBond->Serialize(ar);
-        
-		ar << m_pRelx->GetTypeStr();
-		m_pRelx->Serialize(ar);
-	}
-	else
-	{
-		char sz[256] = {0};
-        
-		ar >> sz;
-		m_pBase = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pBase);
-		m_pBase->Serialize(ar);
-		m_pBase->Init();
-        
-		ar >> sz;
-		m_pBond = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pBond);
-		m_pBond->Serialize(ar);
-		m_pBond->Init();
-        
-		ar >> sz;
-		m_pRelx = dynamic_cast<FEBondRelaxation*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pRelx);
-		m_pRelx->Serialize(ar);
-		m_pRelx->Init();
-	}
 }

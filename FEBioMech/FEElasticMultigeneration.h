@@ -6,7 +6,7 @@
 class FEGenerationMaterial : public FEElasticMaterial
 {
 public:
-	FEGenerationMaterial(FEModel* pfem) : FEElasticMaterial(pfem){}
+	FEGenerationMaterial(FEModel* pfem);
 
 	//! initialization
 	void Init();
@@ -27,27 +27,18 @@ public:
     
 public:
 	// get the number of properties
-	int Properties() { return 1; }
+	int MaterialProperties() { return 1; }
 
 	//! return a material property
-	FECoreBase* GetProperty(int i) { return m_pMat; }
-
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
+	FEProperty* GetMaterialProperty(int i) { return &m_pMat; }
 
     //! Get the elastic component
     FEElasticMaterial* GetElasticMaterial() { return m_pMat; }
     
-	//! data serialization
-	void Serialize(DumpFile& ar);
-
 public:
 	double	btime;	//!< generation birth time
 
-	FEElasticMaterial*	m_pMat;	//!< pointer to elastic material
+	FEPropertyT<FEElasticMaterial>	m_pMat;	//!< pointer to elastic material
 
 	DECLARE_PARAMETER_LIST();
 };
@@ -96,13 +87,13 @@ public:
 class FEElasticMultigeneration : public FEElasticMaterial
 {
 public:
-	FEElasticMultigeneration(FEModel* pfem) : FEElasticMaterial(pfem) {}
+	FEElasticMultigeneration(FEModel* pfem);
 		
 	// returns a pointer to a new material point object
     FEMaterialPoint* CreateMaterialPointData();
 
     // return number of materials
-    int Materials() const { return (int)m_MG.size(); }
+    int Materials() { return (int)m_MG.size(); }
     
     // return a generation material component
     FEGenerationMaterial* GetMaterial(int i) { return m_MG[i]; }
@@ -111,16 +102,10 @@ public:
 	
 public:
 	//! return material properties
-	int Properties() { return (int) m_MG.size(); }
+	int MaterialProperties() { return 1; }
 
 	//! return a material property
-	FECoreBase* GetProperty(int i) { return m_MG[i]; }
-
-	//! find a material property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a material property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
+	FEProperty* GetMaterialProperty(int i) { return &m_MG; }
 
     //! Set the local coordinate system for a material point (overridden from FEMaterial)
     void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
@@ -138,12 +123,10 @@ public:
 	//! data initialization and checking
 	void Init();
 		
-	void Serialize(DumpFile& ar);
-
 	int CheckGeneration(const double t);
 
 public:
-	vector<FEGenerationMaterial*>	m_MG;		//!< multigeneration data
+	FEVecPropertyT<FEGenerationMaterial>	m_MG;		//!< multigeneration data
 
 	// declare the parameter list
 //	DECLARE_PARAMETER_LIST();
