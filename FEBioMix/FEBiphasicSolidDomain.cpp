@@ -1246,7 +1246,8 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 		ppt.m_gradp = gradient(el, pn, n);
 			
 		// for biphasic materials also update the fluid flux
-		ppt.m_w = m_pMat->Flux(mp);
+//		ppt.m_w = m_pMat->Flux(mp);
+		ppt.m_w = FluidFlux(mp);
 		ppt.m_pa = m_pMat->Pressure(mp);
 			
 		// calculate the stress at this material point
@@ -1481,4 +1482,47 @@ void FEBiphasicSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEl
                 ke[ndof*i+3][ndof*j+2] += kpu.z;
             }
     }	
+}
+
+//-----------------------------------------------------------------------------
+vec3d FEBiphasicSolidDomain::FluidFlux(FEMaterialPoint& mp)
+{
+	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
+	
+	// pressure gradient
+	vec3d gradp = ppt.m_gradp;
+	
+	// fluid flux w = -k*grad(p)
+	mat3ds kt = m_pMat->Permeability(mp);
+    
+    vec3d w = -(kt*gradp);
+
+	// get true fluid density
+	double rhoTw = m_pMat->FluidDensity();
+    
+    // body force contribution
+	FEModel& fem = *m_pMat->GetFEModel();
+    int nbf = fem.BodyLoads();
+    if (nbf) {
+        vec3d b(0,0,0);
+        for (int i=0; i<nbf; ++i)
+		{
+			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(i));
+			if (pbf->IsActive())
+			{
+				// negate b because body forces are defined with a negative sign in FEBio
+				b -= pbf->force(mp);
+			}
+		}
+		w += (kt*b)*(rhoTw);
+    }
+    
+    // active momentum supply contribution
+	FEActiveMomentumSupply* pAmom = m_pMat->GetActiveMomentumSupply();
+    if (pAmom) {
+        vec3d pw = pAmom->ActiveSupply(mp);
+        w += kt*pw;
+    }
+    
+    return w;
 }

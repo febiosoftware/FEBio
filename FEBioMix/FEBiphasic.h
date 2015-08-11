@@ -77,9 +77,6 @@ public:
 	//! return the permeability property
 	FEHydraulicPermeability* GetPermeability() { return m_pPerm; }
 	
-	//! calculate fluid flux
-	vec3d Flux(FEMaterialPoint& pt);
-	
 	//! calculate actual fluid pressure
 	double Pressure(FEMaterialPoint& pt);
 
@@ -98,8 +95,8 @@ public:
 	//! get the solvent supply property
 	FESolventSupply* GetSolventSupply() { return m_pSupp; }
 
-	//! Serialization
-	void Serialize(DumpFile& ar);
+	//! Get the active momentum supply
+	FEActiveMomentumSupply* GetActiveMomentumSupply() { return m_pAmom; }
 
 public:
 	//! return number of material properties

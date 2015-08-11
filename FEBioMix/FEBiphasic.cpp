@@ -250,41 +250,6 @@ tens4ds FEBiphasic::Tangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! Calculate fluid flux from the hydraulic permeability and the fluid pressure
-//! gradient
-
-vec3d FEBiphasic::Flux(FEMaterialPoint& pt)
-{
-	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-	
-	// pressure gradient
-	vec3d gradp = ppt.m_gradp;
-	
-	// fluid flux w = -k*grad(p)
-	mat3ds kt = m_pPerm->Permeability(pt);
-    
-    vec3d w = -(kt*gradp);
-    
-    // body force contribution
-    int nbf = (int)m_bf.size();
-    if (nbf) {
-        vec3d b(0,0,0);
-        for (int i=0; i<nbf; ++i)
-            // negate b because body forces are defined with a negative sign in FEBio
-            b -= m_bf[i]->force(pt);
-        w += (kt*b)*m_rhoTw;
-    }
-    
-    // active momentum supply contribution
-    if (m_pAmom) {
-        vec3d pw = m_pAmom->ActiveSupply(pt);
-        w += kt*pw;
-    }
-    
-    return w;
-}
-
-//-----------------------------------------------------------------------------
 //! actual fluid pressure (same as effective pressure here)
 
 double FEBiphasic::Pressure(FEMaterialPoint& pt)
@@ -315,80 +280,6 @@ void FEBiphasic::Permeability(double k[3][3], FEMaterialPoint& pt)
 mat3ds FEBiphasic::Permeability(FEMaterialPoint& mp)
 {
 	return m_pPerm->Permeability(mp);
-}
-
-//-----------------------------------------------------------------------------
-//! serialization
-void FEBiphasic::Serialize(DumpFile &ar)
-{
-	// serialize material parameters
-	FEMaterial::Serialize(ar);
-
-	// serialize sub-materials
-	int nSupp = 0;
-    int nAmom = 0;
-	if (ar.IsSaving())
-	{
-		ar << m_pSolid->GetTypeStr();
-		m_pSolid->Serialize(ar);
-
-		ar << m_pPerm->GetTypeStr();
-		m_pPerm->Serialize(ar);
-
-		if (m_pSupp == 0) ar << nSupp;
-		else
-		{
-			nSupp = 1;
-			ar << nSupp;
-			ar << m_pSupp->GetTypeStr();
-			m_pSupp->Serialize(ar);
-		}
-        
-        if (m_pAmom == 0) ar << nAmom;
-        else
-        {
-            nAmom = 1;
-            ar << nAmom;
-            ar << m_pAmom->GetTypeStr();
-            m_pAmom->Serialize(ar);
-        }
-	}
-	else
-	{
-		char sz[256] = {0};
-
-		ar >> sz;
-		m_pSolid = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pSolid);
-		m_pSolid->Serialize(ar);
-		m_pSolid->Init();
-
-		ar >> sz;
-		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pPerm);
-		m_pPerm->Serialize(ar);
-		m_pPerm->Init();
-
-		ar >> nSupp;
-		if (nSupp)
-		{
-			ar >> sz;
-			m_pSupp = dynamic_cast<FESolventSupply*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-			assert(m_pSupp);
-			m_pSupp->Serialize(ar);
-			m_pSupp->Init();
-		}
-        
-        ar >> nAmom;
-        if (nAmom)
-        {
-            ar >> sz;
-            m_pAmom = dynamic_cast<FEActiveMomentumSupply*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-            assert(m_pAmom);
-            m_pAmom->Serialize(ar);
-            m_pAmom->Init();
-        }
-	}
 }
 
 //-----------------------------------------------------------------------------

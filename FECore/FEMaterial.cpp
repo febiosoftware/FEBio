@@ -7,6 +7,7 @@
 #include <math.h>
 #include <stdarg.h>
 #include "FEModel.h"
+#include "FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 MaterialError::MaterialError(const char* szfmt, ...)
@@ -90,6 +91,7 @@ void FEMaterial::Init()
 //! Store the material data to the archive
 void FEMaterial::Serialize(DumpFile &ar)
 {
+	// Save the material's parameters
 	FEParamContainer::Serialize(ar);
 
 	if (ar.IsSaving())
@@ -97,6 +99,7 @@ void FEMaterial::Serialize(DumpFile &ar)
 		ar << m_nID;
 		ar << m_nRB;
 
+		// save the local coodinate system generator
 		int ntype = -1;
 		if (m_pmap) ntype = m_pmap->m_ntype;
 		else ntype = FE_MAP_NONE;
@@ -104,12 +107,27 @@ void FEMaterial::Serialize(DumpFile &ar)
 		ar << ntype;
 		if (m_pmap) m_pmap->Serialize(ar);
 
+		// Save all the material properties
+		int NP = Properties();
+		ar << NP;
+		for (int i=0; i<NP; ++i)
+		{
+			FEMaterial* pmat = dynamic_cast<FEMaterial*>(GetProperty(i));
+			int nflag = (pmat==0 ? 0 : 1);
+			ar << nflag;
+			if (pmat) 
+			{
+				ar << pmat->GetTypeStr();
+				pmat->Serialize(ar);
+			}
+		}
 	}
 	else
 	{
 		ar >> m_nID;
 		ar >> m_nRB;
 
+		// read the local cordinate system
 		int ntype;
 		ar >> ntype;
 		if (m_pmap) delete m_pmap;
@@ -126,5 +144,25 @@ void FEMaterial::Serialize(DumpFile &ar)
 		case FE_MAP_ANGLES  : m_pmap = new FESphericalAngleMap(pfem); break;
 		}
 		if (m_pmap) m_pmap->Serialize(ar);
+
+		// read all material properties
+		int NP = 0, nflag;
+		char sz[256] = {0};
+		ar >> NP;
+		for (int i=0; i<NP; ++i)
+		{
+			ar >> nflag;
+			if (nflag)
+			{
+				ar >> sz;
+				FEMaterial* pmat = fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel());
+				pmat->Serialize(ar);
+				SetProperty(i, pmat);
+
+				// TODO: Do I really need to call this here? I find this rather dangerous since
+				//       the model is not completely reconstructed yet.
+				pmat->Init();
+			}
+		}
 	}
 }

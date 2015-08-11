@@ -86,6 +86,17 @@ public: // overridden from FEElasticDomain, but not all implemented in this doma
     void ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke);
 	void MassMatrix(FESolver* psolver, double scale) {}
 
+public: // biphasic domain "properties"
+	// NOTE: I'm thinking about defining properties for domain classes. These would be similar to material
+	// properties (and may require material properties to be evaluated), but are different in that they are
+	// not meant to be customized. For example, the biphasic solver assumes Darcy's law in the evaluation 
+	// of the fluid flux. Although one can see the fluid flux as a material property, since the code makes explicit
+	// use of this constitutive equation (apparent from the fact that the biphasic material needs to define the permeability and its
+	// strain derivate) it is not a true material property: i.e. it is not meant to be changed and is an inherent
+	// assumption in this implementation. Consequently, the fluid flux would be a good example of a domain property.
+	// That is why I've taken this calculation out of the FEBiphasic class and placed it here. 
+	vec3d FluidFlux(FEMaterialPoint& mp);
+
 protected:
 	FEBiphasic*	m_pMat;
 };

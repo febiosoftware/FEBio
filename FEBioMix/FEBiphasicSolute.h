@@ -76,9 +76,6 @@ public:
 	//! fluid density
 	double FluidDensity() { return m_rhoTw; }
 	
-	//! Serialization
-	void Serialize(DumpFile& ar);
-	
 public: // material parameters
 	double						m_rhoTw;		//!< true fluid density
 	double						m_rhoTu;		//!< true solute density
