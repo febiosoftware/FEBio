@@ -22,6 +22,10 @@ void mrqmin(vector<double>& x,
 			vector<double>& a, 
 			matrix& covar, 
 			matrix& alpha, 
+			vector<double>& oneda,
+			vector<double>& atry,
+			vector<double>& beta,
+			vector<double>& da,
 			double& chisq,
 			void funcs(vector<double>& , vector<double>&, vector<double>&, matrix&),
 			double& alamda);
@@ -84,6 +88,9 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	// allocate matrices
 	matrix covar(ma, ma), alpha(ma, ma);
 
+	// allocate vectors for mrqmin
+	vector<double> oneda(ma), atry(ma), beta(ma), da(ma);
+
 	// set the FEM callback function
 	FEModel& fem = opt.GetFEM();
 	fem.AddCallback(fecb, CB_MAJOR_ITERS | CB_INIT, &opt);
@@ -108,7 +115,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 		// do the first call with lamda to intialize the minimization
 		double alamda = -1.0;
 		felog.printf("\n----- Major Iteration: %d -----\n", 0);
-		mrqmin(x, y, sig, a, covar, alpha, fret, objfun, alamda);
+		mrqmin(x, y, sig, a, covar, alpha, oneda, atry, beta, da, fret, objfun, alamda);
 
 		// repeat until converged
 		double fprev = fret, lam1 = alamda;
@@ -116,7 +123,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 		do
 		{
 			felog.printf("\n----- Major Iteration: %d -----\n", niter);
-			mrqmin(x, y, sig, a, covar, alpha, fret, objfun, alamda);
+			mrqmin(x, y, sig, a, covar, alpha, oneda, atry, beta, da, fret, objfun, alamda);
 
 			if (alamda < lam1)
 			{
@@ -138,7 +145,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 
 		// do final call with lamda = 0
 		alamda = 0.0;
-		mrqmin(x, y, sig, a, covar, alpha, fret, objfun, alamda);
+		mrqmin(x, y, sig, a, covar, alpha, oneda, atry, beta, da, fret, objfun, alamda);
 
 	}
 	catch (FEErrorTermination)
@@ -279,6 +286,10 @@ void mrqmin(vector<double>& x,
 			vector<double>& a, 
 			matrix& covar, 
 			matrix& alpha, 
+			vector<double>& oneda,
+			vector<double>& atry,
+			vector<double>& beta,
+			vector<double>& da,
 			double& chisq,
 			void funcs(vector<double>& , vector<double>&, vector<double>&, matrix&),
 			double& alamda)
@@ -287,8 +298,6 @@ void mrqmin(vector<double>& x,
 	int j, k, l;
 
 	int ma = a.size();
-	static vector<double> oneda(ma);
-	static vector<double> atry(ma), beta(ma), da(ma);
 	if (alamda < 0)
 	{
 		alamda = 0.001;
