@@ -65,41 +65,64 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! First attempt at conceptualizing material properties
+//! First attempt at conceptualizing material properties.
+//! A material property is essentially any material that is nested inside
+//! another material definition. To faciliate automation of properties, we
+//! created an explicit interface for such properties.
+//! \todo I'd like to make this available for all FECoreBase classes, not just materials.
 class FEProperty
 {
 public:
-	const char*		m_szname;	//!< name of property
+	//! Name of the property.
+	//! Note that the name is not copied so it must point to a static string.
+	const char*		m_szname;
 
 public:
-	FEProperty& SetName(const char* sz) { m_szname = sz; return *this; }
-	const char* GetName() const { return m_szname; }
+	// Set\Get the name of the property
+	FEProperty& SetName(const char* sz);
+	const char* GetName() const;
 
+public: // these functions have to be implemented by derived classes
+	
+	//! see if the pc parameter is of the correct type for this property
 	virtual bool IsType(FECoreBase* pc) const = 0;
+
+	//! set the property
 	virtual void SetProperty(FECoreBase* pc) = 0;
 
-	virtual void Serialize(DumpFile& ar) = 0;
-
+	//! return the size of the property
 	virtual int size() = 0;
+
+	//! return a specific property
 	virtual FECoreBase* get(int i) = 0;
 
+	//! return a parameter of the property
 	virtual FEParam* GetParameter(const ParamString& s) = 0;
 
+	//! serialize property data
+	virtual void Serialize(DumpFile& ar) = 0;
+
 protected:
-	FEProperty(){}
-	virtual ~FEProperty(){}
+	//! some helper functions for reading, writing properties
+	void Write(DumpFile& ar, FEMaterial* pc);
+	FEMaterial* Read(DumpFile& ar);
+
+protected:
+	// This class should not be created directly
+	FEProperty();
+	virtual ~FEProperty();
 };
 
 //-----------------------------------------------------------------------------
-//! Use this class to acutally define material properties in class
-//! Note that the m_pmp member can be zero if the material property is optional
+//! Use this class to acutally define material properties in material classes.
+//! Note that the m_pmp member can be zero if the material property is optional.
 template<class T> class FEPropertyT : public FEProperty
 {
 private:
 	T*				m_pmp;		//!< pointer to actual material property
 
 public:
-	FEPropertyT() { m_szname = 0; m_pmp = 0; }
+	FEPropertyT() { m_pmp = nullptr; }
 	operator T*() { return m_pmp; }
 	T* operator->() { return m_pmp; }
 	void operator = (T* p) { m_pmp = p; }
@@ -118,27 +141,11 @@ public:
 	{
 		if (ar.IsSaving())
 		{
-			int nflag = (m_pmp == 0 ? 0 : 1);
-			ar << nflag;
-			if (nflag)
-			{
-				ar << m_pmp->GetTypeStr();
-				m_pmp->Serialize(ar);
-			}
+			Write(ar, m_pmp);
 		}
 		else
 		{
-			int nflag = 0;
-			ar >> nflag;
-			if (nflag)
-			{
-				char sz[256];
-				ar >> sz;
-				m_pmp = dynamic_cast<T*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-				m_pmp->Serialize(ar);
-
-				m_pmp->Init();
-			}
+			m_pmp = dynamic_cast<T*>(Read(ar));
 		}
 	}
 };
@@ -151,7 +158,7 @@ private:
 	std::vector<T*>	m_pmp;		//!< pointer to actual material property
 
 public:
-	FEVecPropertyT() { m_szname = 0; }
+	FEVecPropertyT() {}
 	T* operator [] (int i) { return m_pmp[i]; }
 
 	virtual bool IsType(FECoreBase* pc) const { return (dynamic_cast<T*>(pc) != 0); }
@@ -181,13 +188,7 @@ public:
 			for (int i=0; i<n; ++i)
 			{
 				T* pm = m_pmp[i];
-				int nflag = (pm == 0 ? 0 : 1);
-				ar << nflag;
-				if (nflag) 
-				{
-					ar << pm->GetTypeStr();
-					pm->Serialize(ar);
-				}
+				Write(ar, pm);
 			}
 		}
 		else
@@ -197,15 +198,7 @@ public:
 			m_pmp.assign(n, nullptr);
 			for (int i=0; i<n; ++i)
 			{
-				int nflag = 0;
-				ar >> nflag;
-				if (nflag)
-				{
-					char sz[256];
-					ar >> sz;
-					m_pmp[i] = dynamic_cast<T*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-					m_pmp[i]->Serialize(ar);
-				}
+				m_pmp[i] = dynamic_cast<T*>(Read(ar));
 			}
 		}
 	}

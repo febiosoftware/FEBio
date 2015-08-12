@@ -22,6 +22,56 @@ MaterialError::MaterialError(const char* szfmt, ...)
 }
 
 //-----------------------------------------------------------------------------
+FEProperty::FEProperty() : m_szname(nullptr) {}
+
+//-----------------------------------------------------------------------------
+FEProperty::~FEProperty(){}
+
+//-----------------------------------------------------------------------------
+//! Set the name of the property.
+//! Note that the name is not copied so it must point to a static string.
+FEProperty& FEProperty::SetName(const char* sz)
+{ 
+	m_szname = sz; 
+	return *this; 
+}
+
+//-----------------------------------------------------------------------------
+//! Return the name of this property
+const char* FEProperty::GetName() const { return m_szname; }
+
+//-----------------------------------------------------------------------------
+void FEProperty::Write(DumpFile& ar, FEMaterial* pc)
+{
+	int nflag = (pc == 0 ? 0 : 1);
+	ar << nflag;
+	if (nflag)
+	{
+		ar << pc->GetTypeStr();
+		pc->Serialize(ar);
+	}
+}
+
+//-----------------------------------------------------------------------------
+FEMaterial* FEProperty::Read(DumpFile& ar)
+{
+	int nflag = 0;
+	FEMaterial* pm = 0;
+	ar >> nflag;
+	if (nflag)
+	{
+		char sz[256];
+		ar >> sz;
+		pm = fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel());
+		pm->Serialize(ar);
+
+		// TODO: Do I really need to do this here?
+		pm->Init();
+	}
+	return pm;
+}
+
+//-----------------------------------------------------------------------------
 FEMaterial::FEMaterial(FEModel* pfem) : FECoreBase(FEMATERIAL_ID), m_pfem(pfem)
 {
 	static int n = 1;
