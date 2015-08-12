@@ -67,13 +67,6 @@ public:
 	//! Add a solute component
 	void AddSolute(FESolute* ps);
 
-public:
-	//! return number of material properties
-	int MaterialProperties();
-
-	//! return a material property
-	FEProperty* GetMaterialProperty(int i);
-
 public: // material parameters
 	double						m_phi0;			//!< solid volume fraction in reference configuration
 	double						m_rhoTw;		//!< true fluid density

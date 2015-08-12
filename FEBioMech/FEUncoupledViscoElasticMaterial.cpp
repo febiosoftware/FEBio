@@ -32,7 +32,7 @@ FEUncoupledViscoElasticMaterial::FEUncoupledViscoElasticMaterial(FEModel* pfem) 
 	}
 	m_binit = false;
 
-	m_pBase.SetName("elastic").SetID(0);
+	AddProperty(&m_pBase, "elastic");
 }
 
 //-----------------------------------------------------------------------------
@@ -55,21 +55,6 @@ void FEUncoupledViscoElasticMaterial::Init()
 	if (m_binit == false) m_K += m_pBase->m_K;
 
 	m_binit = true;
-}
-
-//-----------------------------------------------------------------------------
-//! This material only has one property
-int FEUncoupledViscoElasticMaterial::MaterialProperties()
-{
-	return 1;
-}
-
-//-----------------------------------------------------------------------------
-FEProperty* FEUncoupledViscoElasticMaterial::GetMaterialProperty(int i)
-{
-	if (i == 0) return &m_pBase;
-	assert(false);
-	return 0;
 }
 
 //-----------------------------------------------------------------------------

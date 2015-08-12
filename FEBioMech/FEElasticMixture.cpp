@@ -78,7 +78,7 @@ void FEElasticMixtureMaterialPoint::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 FEElasticMixture::FEElasticMixture(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	m_pMat.SetName("solid").SetID(0);
+	AddProperty(&m_pMat, "solid");
 }
 
 //-----------------------------------------------------------------------------
@@ -123,18 +123,6 @@ void FEElasticMixture::Init()
 void FEElasticMixture::AddMaterial(FEElasticMaterial* pm) 
 { 
 	m_pMat.SetProperty(pm); 
-}
-
-//-----------------------------------------------------------------------------
-int FEElasticMixture::MaterialProperties()
-{
-	return 1;
-}
-
-//-----------------------------------------------------------------------------
-FEProperty* FEElasticMixture::GetMaterialProperty(int i)
-{
-	return &m_pMat;
 }
 
 //-----------------------------------------------------------------------------

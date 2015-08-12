@@ -178,12 +178,6 @@ public:
 	int GetSoluteLocalID() {return m_LID;}
   
 public:
-	//! return number of material properties
-	int MaterialProperties();
-
-	//! return a material property
-	FEProperty* GetMaterialProperty(int i);
-
 	//! set the material attribute
 	bool SetAttribute(const char* szname, const char* szval);
 

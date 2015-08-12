@@ -27,13 +27,6 @@ public:
     virtual void UpdateSolidBoundMolecules(FEMaterialPoint& mp, const double dt) = 0;
     
 public:
-	//! return material property classes
-	int MaterialProperties();
-
-	//! Get the material property class by ID
-	FEProperty* GetMaterialProperty(int nid);
-
-public:
 	
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);

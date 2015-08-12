@@ -63,13 +63,6 @@ public:
 	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
 
 public:
-	//! return number of properties
-	int MaterialProperties();
-
-	//! get the material property by ID
-	virtual FEProperty* GetMaterialProperty(int nid);
-
-public:
 	//! data initialization
 	void Init();
 

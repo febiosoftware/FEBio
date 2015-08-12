@@ -30,10 +30,11 @@ FETriphasic::FETriphasic(FEModel* pfem) : FEMaterial(pfem)
 	m_rhoTw = 0;
 	m_penalty = 1;
 
-	m_pSolid .SetName("solid"              ).SetID(0);
-	m_pPerm  .SetName("permeability"       ).SetID(1);
-	m_pOsmC  .SetName("osmotic_coefficient").SetID(2);
-	m_pSolute.SetName("solute"             ).SetID(3);
+	// set material properties
+	AddProperty(&m_pSolid , "solid"              );
+	AddProperty(&m_pPerm  , "permeability"       );
+	AddProperty(&m_pOsmC  , "osmotic_coefficient");
+	AddProperty(&m_pSolute, "solute"             );
 }
 
 //-----------------------------------------------------------------------------
@@ -41,28 +42,6 @@ void FETriphasic::AddSolute(FESolute* ps)
 {
 	int n = (int) m_pSolute.size();
 	m_pSolute.SetProperty(ps);
-}
-
-//-----------------------------------------------------------------------------
-//! A triphasic has five properties
-int FETriphasic::MaterialProperties()
-{
-	return 4;
-}
-
-//-----------------------------------------------------------------------------
-//! return a triphasic material property
-FEProperty* FETriphasic::GetMaterialProperty(int i)
-{
-	switch (i)
-	{
-	case 0: return &m_pSolid;
-	case 1: return &m_pPerm;
-	case 2: return &m_pOsmC;
-	case 3: return &m_pSolute;
-	}
-	assert(false);
-	return 0;
 }
 
 //-----------------------------------------------------------------------------

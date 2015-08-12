@@ -21,8 +21,8 @@ FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEMaterial(pfem)
 	m_pMP = 0; 
 
 	// set material properties
-	m_pFwd.SetName("forward_rate").SetID(0);
-	m_pRev.SetName("reverse_rate").SetID(1);
+	AddProperty(&m_pFwd ,"forward_rate");
+	AddProperty(&m_pRev ,"reverse_rate");
 }
 
 //-----------------------------------------------------------------------------
@@ -83,20 +83,6 @@ bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, co
 		}
 	}
 	return false;
-}
-
-//-----------------------------------------------------------------------------
-int FEChemicalReaction::MaterialProperties()
-{
-	return 2;
-}
-
-//-----------------------------------------------------------------------------
-FEProperty* FEChemicalReaction::GetMaterialProperty(int i)
-{
-	if (i==0) return &m_pFwd;
-	if (i==1) return &m_pRev;
-	return 0;
 }
 
 //-----------------------------------------------------------------------------

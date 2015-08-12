@@ -63,13 +63,6 @@ public:
 	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
 
 public:
-	//! return number of properties
-	int MaterialProperties();
-
-	//! return a material property
-	FEProperty* GetMaterialProperty(int i);
-
-public:
 	//! calculate stress at material point
 	virtual mat3ds Stress(FEMaterialPoint& pt);
 		

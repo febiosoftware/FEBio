@@ -70,13 +70,10 @@ class FEProperty
 {
 public:
 	const char*		m_szname;	//!< name of property
-	int				m_nID;		//!< ID of property
 
 public:
 	FEProperty& SetName(const char* sz) { m_szname = sz; return *this; }
-	FEProperty& SetID(int nid) { m_nID = nid; return *this; }
 	const char* GetName() const { return m_szname; }
-	const int GetID() const { return m_nID; }
 
 	virtual bool IsType(FECoreBase* pc) const = 0;
 	virtual void SetProperty(FECoreBase* pc) = 0;
@@ -102,7 +99,7 @@ private:
 	T*				m_pmp;		//!< pointer to actual material property
 
 public:
-	FEPropertyT() { m_szname = 0; m_nID = -1; m_pmp = 0; }
+	FEPropertyT() { m_szname = 0; m_pmp = 0; }
 	operator T*() { return m_pmp; }
 	T* operator->() { return m_pmp; }
 	void operator = (T* p) { m_pmp = p; }
@@ -154,7 +151,7 @@ private:
 	std::vector<T*>	m_pmp;		//!< pointer to actual material property
 
 public:
-	FEVecPropertyT() { m_szname = 0; m_nID = -1; }
+	FEVecPropertyT() { m_szname = 0; }
 	T* operator [] (int i) { return m_pmp[i]; }
 
 	virtual bool IsType(FECoreBase* pc) const { return (dynamic_cast<T*>(pc) != 0); }
@@ -284,14 +281,11 @@ public:
 	//! Set the parent of this material
 	void SetParent(FEMaterial* pmat) { m_pParent = pmat; }
 
-public:
-	// NOTE: This is the new interface that materials have to implement
-
-	//! return the number of material property classes
-	virtual int MaterialProperties() { return 0; }
-
-	//! This function must be overloaded (for now) by derived materials that define material properties
-	virtual FEProperty* GetMaterialProperty(int nid) { return nullptr; }
+protected:
+	//! Add a material property
+	//! Call this in the constructor of derived classes to 
+	//! build the property list
+	void AddProperty(FEProperty* pp, const char* sz);
 
 public:
 	//! Find the index of a material property
@@ -318,6 +312,8 @@ private:
 	FECoordSysMap*	m_pmap;			//!< local material coordinate system
 	FEModel*		m_pfem;			//!< pointer to model this material belongs to
 	FEMaterial*		m_pParent;		//!< pointer to "parent" material (if any)
+
+	vector<FEProperty*>	m_Prop;		//!< list of material properties
 };
 
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)

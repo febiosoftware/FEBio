@@ -25,13 +25,6 @@ public:
         return m_pMat->CreateMaterialPointData();
     }
     
-public:
-	// get the number of properties
-	int MaterialProperties() { return 1; }
-
-	//! return a material property
-	FEProperty* GetMaterialProperty(int i) { return &m_pMat; }
-
     //! Get the elastic component
     FEElasticMaterial* GetElasticMaterial() { return m_pMat; }
     
@@ -101,12 +94,6 @@ public:
 	void AddMaterial(FEElasticMaterial* pmat);
 	
 public:
-	//! return material properties
-	int MaterialProperties() { return 1; }
-
-	//! return a material property
-	FEProperty* GetMaterialProperty(int i) { return &m_MG; }
-
     //! Set the local coordinate system for a material point (overridden from FEMaterial)
     void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
     

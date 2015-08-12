@@ -26,10 +26,10 @@ FEBiphasicSolute::FEBiphasicSolute(FEModel* pfem) : FEMaterial(pfem)
 	m_Tabs = 0; 
 
 	// set material properties
-	m_pSolid .SetName("solid"              ).SetID(0);
-	m_pPerm  .SetName("permeability"       ).SetID(1);
-	m_pOsmC  .SetName("osmotic_coefficient").SetID(2);
-	m_pSolute.SetName("solute"             ).SetID(3);
+	AddProperty(&m_pSolid , "solid"              );
+	AddProperty(&m_pPerm  , "permeability"       );
+	AddProperty(&m_pOsmC  , "osmotic_coefficient");
+	AddProperty(&m_pSolute, "solute"             );
 }
 
 //-----------------------------------------------------------------------------
@@ -281,25 +281,4 @@ double FEBiphasicSolute::ReferentialConcentration(FEMaterialPoint& pt)
 	double cr = J*phiw*Concentration(pt);
 	
 	return cr;
-}
-
-//-----------------------------------------------------------------------------
-//! A biphasic-solute material has four properties
-int FEBiphasicSolute::MaterialProperties()
-{
-	return 4;
-}
-
-//-----------------------------------------------------------------------------
-FEProperty* FEBiphasicSolute::GetMaterialProperty(int i)
-{
-	switch (i)
-	{
-	case 0: return &m_pSolid;
-	case 1: return &m_pPerm;
-	case 2: return &m_pOsmC;
-	case 3: return &m_pSolute;
-	}
-	assert(false);
-	return 0;
 }

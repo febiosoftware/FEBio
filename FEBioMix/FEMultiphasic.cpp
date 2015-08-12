@@ -242,13 +242,13 @@ FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMaterial(pfem)
 	m_penalty = 1;
 
 	// define the material properties
-	m_pSolid .SetName("solid"              ).SetID(0);
-	m_pPerm  .SetName("permeability"       ).SetID(1);
-	m_pOsmC  .SetName("osmotic_coefficient").SetID(2);
-	m_pSupp  .SetName("solvent_supply"     ).SetID(3);
-	m_pSolute.SetName("solute"             ).SetID(4);
-	m_pSBM   .SetName("solid_bound"        ).SetID(5);
-	m_pReact .SetName("reaction"           ).SetID(6);
+	AddProperty(&m_pSolid , "solid"              );
+	AddProperty(&m_pPerm  , "permeability"       );
+	AddProperty(&m_pOsmC  , "osmotic_coefficient");
+	AddProperty(&m_pSupp  , "solvent_supply"     );
+	AddProperty(&m_pSolute, "solute"             );
+	AddProperty(&m_pSBM   , "solid_bound"        );
+	AddProperty(&m_pReact , "reaction"           );
 }
 
 //-----------------------------------------------------------------------------
@@ -1018,23 +1018,4 @@ vec3d FEMultiphasic::CurrentDensity(FEMaterialPoint& pt)
 	Ie *= m_Fc;
 	
 	return Ie;
-}
-
-//-----------------------------------------------------------------------------
-int FEMultiphasic::MaterialProperties()
-{
-	return 7;
-}
-
-//-----------------------------------------------------------------------------
-FEProperty* FEMultiphasic::GetMaterialProperty(int nid)
-{
-	if (nid == 0) return &m_pSolid;
-	if (nid == 1) return &m_pPerm;
-	if (nid == 2) return &m_pOsmC;
-	if (nid == 3) return &m_pSupp;
-	if (nid == 4) return &m_pSolute;
-	if (nid == 5) return &m_pSBM;
-	if (nid == 6) return &m_pReact;
-	return 0;
 }

@@ -72,22 +72,29 @@ FECoordSysMap* FEMaterial::GetCoordinateSystemMap()
 }
 
 //-----------------------------------------------------------------------------
+void FEMaterial::AddProperty(FEProperty* pp, const char* sz)
+{
+	pp->SetName(sz);
+	m_Prop.push_back(pp);
+}
+
+//-----------------------------------------------------------------------------
 int FEMaterial::Properties()
 {
-	int N = MaterialProperties();
+	int N = (int) m_Prop.size();
 	int n = 0;
-	for (int i=0; i<N; ++i) n += GetMaterialProperty(i)->size();
+	for (int i=0; i<N; ++i) n += m_Prop[i]->size();
 	return n;
 }
 
 //-----------------------------------------------------------------------------
 FECoreBase* FEMaterial::GetProperty(int n)
 {
-	int N = MaterialProperties();
+	int N = (int) m_Prop.size();
 	int m = 0;
 	for (int i=0; i<N; ++i)
 	{
-		FEProperty* pm = GetMaterialProperty(i);
+		FEProperty* pm = m_Prop[i];
 		int l = pm->size();
 		if (m+l > n) return pm->get(n-m);
 		m += l;
@@ -98,27 +105,20 @@ FECoreBase* FEMaterial::GetProperty(int n)
 //-----------------------------------------------------------------------------
 int FEMaterial::FindPropertyIndex(const char* sz)
 {
-	int NP = MaterialProperties();
+	int NP = (int) m_Prop.size();
 	for (int i=0; i<NP; ++i)
 	{
-		const FEProperty* pm = GetMaterialProperty(i);
-		if (pm && (strcmp(pm->GetName(), sz) == 0)) return pm->GetID();
+		const FEProperty* pm = m_Prop[i];
+		if (pm && (strcmp(pm->GetName(), sz) == 0)) return i;
 	}
 	return -1;
 }
 
 //-----------------------------------------------------------------------------
-bool FEMaterial::SetProperty(int nid, FECoreBase* pb)
+bool FEMaterial::SetProperty(int i, FECoreBase* pb)
 {
-	int NP = MaterialProperties();
-	for (int i = 0; i<NP; ++i)
-	{
-		FEProperty* pm = GetMaterialProperty(i);
-		if (pm && (pm->GetID() == nid))
-		{
-			if (pm->IsType(pb)) { pm->SetProperty(pb); return true; }
-		}
-	}
+	FEProperty* pm = m_Prop[i];
+	if (pm->IsType(pb)) { pm->SetProperty(pb); return true; }
 	return false;
 }
 
@@ -143,10 +143,10 @@ FEParam* FEMaterial::GetParameter(const ParamString& s)
 {
 	if (s.count() == 1) return FEMaterial::GetParameter(s);
 
-	int NP = MaterialProperties();
+	int NP = (int) m_Prop.size();
 	for (int i=0; i<NP; ++i)
 	{
-		FEProperty* mp = GetMaterialProperty(i);
+		FEProperty* mp = m_Prop[i];
 		if (s == mp->GetName()) return mp->GetParameter(s.next());
 	}
 
@@ -198,10 +198,10 @@ void FEMaterial::Serialize(DumpFile &ar)
 	}
 
 	// serialize all the material properties
-	int NP = MaterialProperties();
+	int NP = m_Prop.size();
 	for (int i = 0; i<NP; ++i)
 	{
-		FEProperty* pmat = GetMaterialProperty(i);
+		FEProperty* pmat = m_Prop[i];
 		pmat->Serialize(ar);
 	}
 }

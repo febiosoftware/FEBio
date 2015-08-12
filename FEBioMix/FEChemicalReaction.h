@@ -56,12 +56,6 @@ public:
 	void InitializeReactionRate(FEReactionRate* m_pRate);
 
 public:
-	//! return number of properties
-	int MaterialProperties();
-
-	//! return a material property
-	FEProperty* GetMaterialProperty(int i);
-
 	void SetParameter(FEParam& p);
 
 	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval);

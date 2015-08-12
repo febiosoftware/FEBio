@@ -76,8 +76,8 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FERemodelingElasticMaterial::FERemodelingElasticMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	m_pBase.SetName("solid").SetID(0);
-	m_pSupp.SetName("supply").SetID(1);
+	AddProperty(&m_pBase, "solid" );
+	AddProperty(&m_pSupp, "supply");
 }
 
 //-----------------------------------------------------------------------------
@@ -87,25 +87,6 @@ void FERemodelingElasticMaterial::Init()
 	FEElasticMaterial::Init();
 	m_pBase->Init();
 	m_pSupp->Init();
-}
-
-//-----------------------------------------------------------------------------
-//! This material has two properties
-int FERemodelingElasticMaterial::MaterialProperties()
-{
-	return 2;
-}
-
-//-----------------------------------------------------------------------------
-FEProperty* FERemodelingElasticMaterial::GetMaterialProperty(int i)
-{
-	switch (i)
-	{
-	case 0: return &m_pBase;
-	case 1: return &m_pSupp;
-	}
-	assert(false);
-	return 0;
 }
 
 //-----------------------------------------------------------------------------

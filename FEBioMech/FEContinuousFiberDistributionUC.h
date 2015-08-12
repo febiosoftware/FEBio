@@ -26,13 +26,6 @@ public:
     
     // Initialization
     void Init();
-     
-public:
-	//! get the number of material properties
-	int MaterialProperties();
-    
-	//! get a specific material property
-	FEProperty* GetMaterialProperty(int i);
     
 public:
 	//! calculate stress at material point

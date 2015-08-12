@@ -13,7 +13,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FEGenerationMaterial::FEGenerationMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	m_pMat.SetName("solid").SetID(0);
+	AddProperty(&m_pMat, "solid");
 }
 
 //-----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ void FEMultigenerationMaterialPoint::Init(bool bflag)
 //-----------------------------------------------------------------------------
 FEElasticMultigeneration::FEElasticMultigeneration(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	m_MG.SetName("generation").SetID(0);
+	AddProperty(&m_MG, "generation");
 }
 
 //-----------------------------------------------------------------------------

@@ -47,12 +47,7 @@ public:
     FEElasticMaterial* GetElasticMaterial() { return m_pBase; }
     
 public:   
-	//! get the number of material properties
-	int MaterialProperties();
-    
-	//! get a specific material property
-	FEProperty* GetMaterialProperty(int i);
-    
+  
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
 	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
     

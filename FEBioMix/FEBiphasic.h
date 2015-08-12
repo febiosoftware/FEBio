@@ -95,13 +95,6 @@ public:
 	//! Get the active momentum supply
 	FEActiveMomentumSupply* GetActiveMomentumSupply() { return m_pAmom; }
 
-public:
-	//! return number of material properties
-	int MaterialProperties();
-
-	//! return a material property
-	FEProperty* GetMaterialProperty(int n);
-
 public: // material parameters
 	double						m_rhoTw;	//!< true fluid density
 	double						m_phi0;		//!< solid volume fraction in reference configuration

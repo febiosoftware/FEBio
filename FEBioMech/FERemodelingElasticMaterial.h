@@ -100,13 +100,6 @@ public:
 	FEElasticMaterial* GetElasticMaterial() { return m_pBase; }
 
 public:
-	//! return number of material properties
-	int MaterialProperties();
-
-	//! return a material property
-	FEProperty* GetMaterialProperty(int i);
-
-public:
 	FEPropertyT<FEElasticMaterial>	m_pBase;		//!< pointer to elastic solid material
 	FEPropertyT<FESolidSupply>		m_pSupp;		//!< pointer to solid supply material
 	double				m_rhormin;		//!< minimum density

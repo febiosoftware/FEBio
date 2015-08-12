@@ -35,13 +35,6 @@ public:
 	//! calculate the conductivity gradient
 	tens4ds ConductivityGradient(FEMaterialPoint& pt);
 
-public:
-	//! return number of material properties
-	int MaterialProperties();
-
-	//! return a material property
-	FEProperty* GetMaterialProperty(int n);
-
 private: // material properties
 	FEPropertyT<FEThermalElastic>			m_pElastic;	//!< elastic material property
 	FEPropertyT<FEThermalConductivity>		m_pCond;	//!< thermal conductivity property

@@ -12,32 +12,13 @@
 FEContinuousFiberDistribution::FEContinuousFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	// set material properties
-	m_pFmat.SetName("fibers"      ).SetID(0);
-	m_pFDD .SetName("distribution").SetID(1);
-	m_pFint.SetName("scheme"      ).SetID(2);
+	AddProperty(&m_pFmat, "fibers"      );
+	AddProperty(&m_pFDD , "distribution");
+	AddProperty(&m_pFint, "scheme"      );
 }
 
 //-----------------------------------------------------------------------------
 FEContinuousFiberDistribution::~FEContinuousFiberDistribution() {}
-
-//-----------------------------------------------------------------------------
-int FEContinuousFiberDistribution::MaterialProperties()
-{
-	return 3;
-}
-
-//-----------------------------------------------------------------------------
-//! get a specific material property
-FEProperty* FEContinuousFiberDistribution::GetMaterialProperty(int i)
-{
-	switch(i)
-	{
-	case 0: return &m_pFmat; break;
-	case 1: return &m_pFDD; break;
-	case 2: return &m_pFint; break;
-	}
-	return 0;
-}
 
 //-----------------------------------------------------------------------------
 void FEContinuousFiberDistribution::Init()

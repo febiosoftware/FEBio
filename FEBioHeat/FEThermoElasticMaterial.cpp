@@ -7,8 +7,8 @@
 FEThermoElasticMaterial::FEThermoElasticMaterial(FEModel* pfem) : FEMaterial(pfem)
 { 
 	// set material properties
-	m_pElastic.SetName("elastic").SetID(0);
-	m_pCond.SetName("conductivity").SetID(1);
+	AddProperty(&m_pElastic, "elastic"     );
+	AddProperty(&m_pCond   , "conductivity");
 }
 
 //-----------------------------------------------------------------------------
@@ -24,25 +24,6 @@ void FEThermoElasticMaterial::Init()
 	FEMaterial::Init();
 	m_pElastic->SetParent(this); m_pElastic->Init();
 	m_pCond->SetParent(this); m_pCond->Init();
-}
-
-//-----------------------------------------------------------------------------
-int FEThermoElasticMaterial::MaterialProperties()
-{
-	return 2;
-}
-
-//-----------------------------------------------------------------------------
-//! return a pointer to a biphasic material property
-FEProperty* FEThermoElasticMaterial::GetMaterialProperty(int i)
-{
-	switch (i)
-	{
-	case 0: return &m_pElastic;
-	case 1: return &m_pCond;
-	}
-	assert(false);
-	return 0;
 }
 
 //-----------------------------------------------------------------------------

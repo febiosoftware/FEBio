@@ -32,9 +32,9 @@ FEReactiveViscoelasticMaterial::FEReactiveViscoelasticMaterial(FEModel* pfem) : 
     m_ttype = 0;
 
 	// set material properties
-	m_pBase.SetName("elastic"   ).SetID(0);
-	m_pBond.SetName("bond"      ).SetID(1);
-	m_pRelx.SetName("relaxation").SetID(2);
+	AddProperty(&m_pBase, "elastic"   );
+	AddProperty(&m_pBond, "bond"      );
+	AddProperty(&m_pRelx, "relaxation");
 }
 
 //-----------------------------------------------------------------------------
@@ -62,23 +62,6 @@ void FEReactiveViscoelasticMaterial::Init()
 	m_pBase->Init();
 	m_pBond->Init();
     m_pRelx->Init();
-}
-
-//-----------------------------------------------------------------------------
-//! This material only has one property
-int FEReactiveViscoelasticMaterial::MaterialProperties()
-{
-	return 3;
-}
-
-//-----------------------------------------------------------------------------
-FEProperty* FEReactiveViscoelasticMaterial::GetMaterialProperty(int i)
-{
-	if      (i == 0) return &m_pBase;
-	else if (i == 1) return &m_pBond;
-	else if (i == 2) return &m_pRelx;
-	assert(false);
-	return 0;
 }
 
 //-----------------------------------------------------------------------------

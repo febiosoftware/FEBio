@@ -13,7 +13,7 @@
 //-----------------------------------------------------------------------------
 FEUncoupledElasticMixture::FEUncoupledElasticMixture(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
-	m_pMat.SetName("solid").SetID(0);
+	AddProperty(&m_pMat, "solid");
 }
 
 //-----------------------------------------------------------------------------

@@ -123,7 +123,7 @@ FEViscoElasticMaterial::FEViscoElasticMaterial(FEModel* pfem) : FEElasticMateria
 	}
 
 	// define the material properties
-	m_Base.SetName("elastic").SetID(0);
+	AddProperty(&m_Base, "elastic");
 }
 
 //-----------------------------------------------------------------------------
@@ -157,21 +157,6 @@ void FEViscoElasticMaterial::Init()
 	if (m_Base == 0) throw MaterialError("This material needs an elastic base.");
 	m_Base->SetParent(GetParent());
 	m_Base->Init();
-}
-
-//-----------------------------------------------------------------------------
-//! This material only has one property
-int FEViscoElasticMaterial::MaterialProperties()
-{
-	return 1;
-}
-
-//-----------------------------------------------------------------------------
-FEProperty* FEViscoElasticMaterial::GetMaterialProperty(int nid)
-{
-	if (nid == 0) return &m_Base;
-	assert(false);
-	return 0;
 }
 
 //-----------------------------------------------------------------------------

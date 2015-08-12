@@ -31,13 +31,6 @@ public:
 	FESolute* GetSolute() { return m_pSolute; }
 
 public:
-	//! return number of material properties
-	int MaterialProperties();
-
-	//! return a material property
-	FEProperty* GetMaterialProperty(int nid);
-
-public:
 	void Init();
 	
 	//! calculate stress at material point

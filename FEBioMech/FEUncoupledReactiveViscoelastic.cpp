@@ -32,9 +32,9 @@ FEUncoupledReactiveViscoelasticMaterial::FEUncoupledReactiveViscoelasticMaterial
     m_ttype = 0;
 
 	// set material properties
-	m_pBase.SetName("elastic"   ).SetID(0);
-	m_pBond.SetName("bond"      ).SetID(1);
-	m_pRelx.SetName("relaxation").SetID(2);
+	AddProperty(&m_pBase, "elastic"   );
+	AddProperty(&m_pBond, "bond"      );
+	AddProperty(&m_pRelx, "relaxation");
 }
 
 //-----------------------------------------------------------------------------
@@ -65,23 +65,6 @@ void FEUncoupledReactiveViscoelasticMaterial::Init()
     
     // set the mixture's bulk modulus based on the base and bond materials
     m_K = m_pBase->m_K + m_pBond->m_K;
-}
-
-//-----------------------------------------------------------------------------
-//! This material only has one property
-int FEUncoupledReactiveViscoelasticMaterial::MaterialProperties()
-{
-    return 3;
-}
-
-//-----------------------------------------------------------------------------
-FEProperty* FEUncoupledReactiveViscoelasticMaterial::GetMaterialProperty(int i)
-{
-    if      (i == 0) return &m_pBase;
-    else if (i == 1) return &m_pBond;
-    else if (i == 2) return &m_pRelx;
-    assert(false);
-    return 0;
 }
 
 //-----------------------------------------------------------------------------

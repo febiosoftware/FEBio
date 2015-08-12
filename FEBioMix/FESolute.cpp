@@ -74,9 +74,9 @@ FESolute::FESolute(FEModel* pfem) : FEMaterial(pfem)
 	m_z = 0;
 
 	// set material properties
-	m_pDiff .SetName("diffusivity").SetID(0);
-	m_pSolub.SetName("solubility" ).SetID(1);
-	m_pSupp .SetName("supply"     ).SetID(2);
+	AddProperty(&m_pDiff , "diffusivity");
+	AddProperty(&m_pSolub, "solubility" );
+	AddProperty(&m_pSupp , "supply"     );
 }
 
 //-----------------------------------------------------------------------------
@@ -128,25 +128,6 @@ void FESolute::Serialize(DumpFile& ar)
 		ar >> solID;
 		SetSoluteID(solID);
 	}
-}
-
-//-----------------------------------------------------------------------------
-int FESolute::MaterialProperties()
-{
-	return 3;
-}
-
-//-----------------------------------------------------------------------------
-FEProperty* FESolute::GetMaterialProperty(int i)
-{
-	switch (i)
-	{
-	case 0: return &m_pDiff;
-	case 1: return &m_pSolub;
-	case 2: return &m_pSupp;
-	}
-	assert(false);
-	return 0;
 }
 
 //-----------------------------------------------------------------------------

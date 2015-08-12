@@ -79,10 +79,10 @@ FEBiphasic::FEBiphasic(FEModel* pfem) : FEMaterial(pfem)
 	m_phi0 = 0;
 
 	// set material properties
-	m_pSolid.SetName("solid"         ).SetID(0);
-	m_pPerm.SetName ("permeability"  ).SetID(1);
-	m_pSupp.SetName ("solvent_supply").SetID(2);
-    m_pAmom.SetName ("active_supply" ).SetID(3);
+	AddProperty(&m_pSolid, "solid"         );
+	AddProperty(&m_pPerm , "permeability"  );
+	AddProperty(&m_pSupp , "solvent_supply");
+    AddProperty(&m_pAmom , "active_supply" );
 }
 
 //-----------------------------------------------------------------------------
@@ -105,28 +105,6 @@ void FEBiphasic::Init()
 	
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
-}
-
-//-----------------------------------------------------------------------------
-//! A biphasic material has three properties
-int FEBiphasic::MaterialProperties()
-{
-	return 4;
-}
-
-//-----------------------------------------------------------------------------
-//! return a pointer to a biphasic material property
-FEProperty* FEBiphasic::GetMaterialProperty(int i)
-{
-	switch (i)
-	{
-	case 0: return &m_pSolid;
-	case 1: return &m_pPerm;
-	case 2: return &m_pSupp;
-    case 3: return &m_pAmom;
-	}
-	assert(false);
-	return 0;
 }
 
 //-----------------------------------------------------------------------------

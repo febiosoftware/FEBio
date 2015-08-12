@@ -17,9 +17,9 @@
 FEDamageMaterial::FEDamageMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	// set material properties
-	m_pBase.SetName("elastic"  ).SetID(0);
-	m_pDamg.SetName("damage"   ).SetID(1);
-	m_pCrit.SetName("criterion").SetID(2);
+	AddProperty(&m_pBase, "elastic"  );
+	AddProperty(&m_pDamg, "damage"   );
+	AddProperty(&m_pCrit, "criterion");
 }
 
 //-----------------------------------------------------------------------------
@@ -99,25 +99,6 @@ double FEDamageMaterial::Damage(FEMaterialPoint& pt)
     pd.m_D = d;
     
     return d;
-}
-
-//-----------------------------------------------------------------------------
-int FEDamageMaterial::MaterialProperties()
-{
-	return 3;
-}
-
-//-----------------------------------------------------------------------------
-//! get a specific material property
-FEProperty* FEDamageMaterial::GetMaterialProperty(int i)
-{
-	switch(i)
-	{
-        case 0: return &m_pBase; break;
-        case 1: return &m_pDamg; break;
-        case 2: return &m_pCrit; break;
-	}
-	return 0;
 }
 
 //-----------------------------------------------------------------------------
