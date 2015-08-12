@@ -98,7 +98,7 @@ FECoreBase* FEMaterial::GetProperty(int n)
 //-----------------------------------------------------------------------------
 int FEMaterial::FindPropertyIndex(const char* sz)
 {
-	int NP = Properties();
+	int NP = MaterialProperties();
 	for (int i=0; i<NP; ++i)
 	{
 		const FEProperty* pm = GetMaterialProperty(i);
@@ -110,7 +110,7 @@ int FEMaterial::FindPropertyIndex(const char* sz)
 //-----------------------------------------------------------------------------
 bool FEMaterial::SetProperty(int nid, FECoreBase* pb)
 {
-	int NP = Properties();
+	int NP = MaterialProperties();
 	for (int i = 0; i<NP; ++i)
 	{
 		FEProperty* pm = GetMaterialProperty(i);

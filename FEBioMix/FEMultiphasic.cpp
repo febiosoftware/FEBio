@@ -1023,7 +1023,7 @@ vec3d FEMultiphasic::CurrentDensity(FEMaterialPoint& pt)
 //-----------------------------------------------------------------------------
 int FEMultiphasic::MaterialProperties()
 {
-	return 6;
+	return 7;
 }
 
 //-----------------------------------------------------------------------------

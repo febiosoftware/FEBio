@@ -30,10 +30,10 @@ FETriphasic::FETriphasic(FEModel* pfem) : FEMaterial(pfem)
 	m_rhoTw = 0;
 	m_penalty = 1;
 
-	m_pSolid.SetName("solid"              ).SetID(0);
-	m_pPerm .SetName("permeability"       ).SetID(1);
-	m_pOsmC .SetName("osmotic_coefficient").SetID(2);
-	m_pSolid.SetName("solute"             ).SetID(3);
+	m_pSolid .SetName("solid"              ).SetID(0);
+	m_pPerm  .SetName("permeability"       ).SetID(1);
+	m_pOsmC  .SetName("osmotic_coefficient").SetID(2);
+	m_pSolute.SetName("solute"             ).SetID(3);
 }
 
 //-----------------------------------------------------------------------------
