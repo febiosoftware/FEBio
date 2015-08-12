@@ -23,6 +23,7 @@ END_PARAMETER_LIST();
 // FEDonnanEquilibrium
 void FEOsmoticVirialExpansion::Init()
 {
+	FEElasticMaterial::Init();
     if (m_phiwr < 0 || m_phiwr > 1) throw MaterialError("phiw0 must be between 0. and 1.");
     if (m_cr < 0) throw MaterialError("cr must be positive.");
 }

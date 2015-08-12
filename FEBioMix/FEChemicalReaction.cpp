@@ -28,8 +28,9 @@ FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEMaterial(pfem)
 //-----------------------------------------------------------------------------
 void FEChemicalReaction::Init() 
 {
-	if (m_pFwd) InitializeReactionRate(m_pFwd);
-	if (m_pRev) InitializeReactionRate(m_pRev);
+	if (m_pFwd) m_pFwd->m_pReact = this;
+	if (m_pRev) m_pRev->m_pReact = this;
+	FEMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -83,14 +84,6 @@ bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, co
 		}
 	}
 	return false;
-}
-
-//-----------------------------------------------------------------------------
-// initialize chemical reaction rate
-void FEChemicalReaction::InitializeReactionRate(FEReactionRate* m_pRate)
-{
-	m_pRate->m_pReact = this;
-    m_pRate->Init();
 }
 
 //-----------------------------------------------------------------------------

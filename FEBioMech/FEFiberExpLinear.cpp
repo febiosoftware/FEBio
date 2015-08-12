@@ -21,13 +21,6 @@ FEFiberExpLinear::FEFiberExpLinear(FEModel* pfem) : FEElasticMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
-//! Initialization
-void FEFiberExpLinear::Init()
-{
-	FEElasticMaterial::Init();
-}
-
-//-----------------------------------------------------------------------------
 //! Calculate the fiber stress
 mat3ds FEFiberExpLinear::Stress(FEMaterialPoint& mp)
 {

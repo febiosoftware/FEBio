@@ -9,7 +9,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FETransverselyIsotropic.h"
+#include "FEUncoupledMaterial.h"
+#include "FEFiberMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Transversely Isotropic Mooney-Rivlin material
@@ -17,10 +18,10 @@
 //! This material has an isotopric Mooney-Rivlin basis and single preferred
 //! fiber direction.
 
-class FETransIsoMooneyRivlin: public FETransverselyIsotropic
+class FETransIsoMooneyRivlin: public FEUncoupledMaterial
 {
 public:
-	FETransIsoMooneyRivlin(FEModel* pfem) : FETransverselyIsotropic (pfem) {}
+	FETransIsoMooneyRivlin(FEModel* pfem);
 
 public:
 	double	c1;	//!< Mooney-Rivlin coefficient C1
@@ -38,6 +39,10 @@ public:
     
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
+
+protected:
+	FEFiberMaterial	m_fib;
+	FEPropertyT<FEActiveFiberContraction>	m_ac;
 };
 
 #endif // !defined(AFX_FETRANSISOMOONEYRIVLIN_H__E918D89B_4CCD_44B9_9731_19CEC4EDF406__INCLUDED_)

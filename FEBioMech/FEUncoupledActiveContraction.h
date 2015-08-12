@@ -10,9 +10,6 @@ public:
 	//! constructor
 	FEUncoupledActiveContraction(FEModel* pfem);
 
-	//! Initialization
-	void Init();
-
 	//! deviatoric stress
 	mat3ds DevStress(FEMaterialPoint& pt);
 

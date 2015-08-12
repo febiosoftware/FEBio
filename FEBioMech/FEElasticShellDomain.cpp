@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEElasticShellDomain.h"
-#include "FETransverselyIsotropic.h"
+#include "FEElasticMaterial.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 #include <math.h>
@@ -34,25 +34,6 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 			{
 				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
 				pt.m_Q = pmap->LocalElementCoord(el, n);
-			}
-		}
-		else
-		{
-			// If we get here, then the element has a user-defined fiber direction
-			// we should check to see if it has indeed been specified.
-			// TODO: This assumes that pt.Q will not get intialized to
-			//		 a valid value. I should find another way for checking since I
-			//		 would like pt.Q always to be initialized to a decent value.
-			if (dynamic_cast<FETransverselyIsotropic*>(m_pMat))
-			{
-				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(0)->ExtractData<FEElasticMaterialPoint>();
-				mat3d& m = pt.m_Q;
-				if (fabs(m.det() - 1) > 1e-7)
-				{
-					// this element did not get specified a user-defined fiber direction
-					felog.printbox("ERROR", "Shell element %d was not assigned a fiber direction.", i+1);
-					bmerr = true;
-				}
 			}
 		}
 	}

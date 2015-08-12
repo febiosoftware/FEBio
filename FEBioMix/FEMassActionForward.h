@@ -17,10 +17,7 @@ class FEMassActionForward : public FEChemicalReaction
 public:
 	//! constructor
 	FEMassActionForward(FEModel* pfem) : FEChemicalReaction(pfem) {}
-	
-	//! data initialization and checking
-	void Init() {FEChemicalReaction::Init(); }
-	
+		
 	//! molar supply at material point
 	double ReactionSupply(FEMaterialPoint& pt);
 	

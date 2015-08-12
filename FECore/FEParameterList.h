@@ -24,6 +24,20 @@ enum FEParamType {
 };
 
 //-----------------------------------------------------------------------------
+// Range for parameters
+enum FEParamRange {
+	FE_DONT_CARE,			// parameter can take on any value
+	FE_GREATER,				// parameter must be greater than val (> val)
+	FE_GREATER_OR_EQUAL,	// parameter must be greater or equal than val ( >= val)
+	FE_LESS,				// parameter must be less than val ( < val)
+	FE_LESS_OR_EQUAL,		// parameter must be less or equal than val ( <= val)
+	FE_OPEN,				// parameter must be inside the open interval (min,max)
+	FE_CLOSED,				// parameter must be inside the closed interval [min, max]
+	FE_LEFT_OPEN,			// parameter must be inside the half-open interval (min, max]
+	FE_RIGHT_OPEN,			// parameter must be inside the right-open interval [min, max)
+};
+
+//-----------------------------------------------------------------------------
 //! This class describes a user-defined parameter
 class FEParam
 {
@@ -36,15 +50,34 @@ public:
 	double		m_scl;		// load curve scale factor
 	vec3d		m_vscl;		// scale factor for vectors
 
+	// range stuff
+	FEParamRange	m_irange;
+	union
+	{
+		// this value is used as the minimum for a range parameter
+		// or for the inf/sup for a half-open or half-closed parameter
+		int		m_imin;
+		double	m_dmin;
+	};
+	union
+	{
+		// this value is used as the maximum for a range parameter
+		int		m_imax;
+		double	m_dmax;
+	};
+
 	FEParam()
 	{
 		m_pv = 0;
 		m_itype = FE_PARAM_DOUBLE;
+		m_irange = FE_DONT_CARE;
 		m_ndim = 1;
 		m_nlc = -1;
 		m_scl = 1.0;
 		m_vscl = vec3d(0,0,0);
 	}
+
+	bool is_inside_range();
 
 public:
 	//! retrieves the value for a non-array item
@@ -79,6 +112,28 @@ template<class T> inline T* FEParam::pvalue(int n)
 }
 
 //-----------------------------------------------------------------------------
+// helper class for defining ranges
+class RANGE
+{
+public:
+	FEParamRange	m_rt;
+	double			m_fmin;
+	double			m_fmax;
+public:
+	RANGE(FEParamRange rt, double fval) { m_rt = rt; m_fmin = fval; m_fmax = 0.0; }
+	RANGE(FEParamRange rt, double fmin, double fmax) { m_rt = rt; m_fmin = fmin; m_fmax = fmax; }
+};
+
+inline RANGE FE_RANGE_GREATER         (double f) { return RANGE(FE_GREATER         , f); }
+inline RANGE FE_RANGE_GREATER_OR_EQUAL(double f) { return RANGE(FE_GREATER_OR_EQUAL, f); }
+inline RANGE FE_RANGE_LESS            (double f) { return RANGE(FE_LESS            , f); }
+inline RANGE FE_RANGE_LESS_OR_EQUAL   (double f) { return RANGE(FE_LESS_OR_EQUAL   , f); }
+inline RANGE FE_RANGE_OPEN      (double fmin, double fmax) {return RANGE(FE_OPEN      , fmin, fmax); }
+inline RANGE FE_RANGE_CLOSED    (double fmin, double fmax) {return RANGE(FE_CLOSED    , fmin, fmax); }
+inline RANGE FE_RANGE_LEFT_OPEN (double fmin, double fmax) {return RANGE(FE_LEFT_OPEN , fmin, fmax); }
+inline RANGE FE_RANGE_RIGHT_OPEN(double fmin, double fmax) {return RANGE(FE_RIGHT_OPEN, fmin, fmax); }
+
+//-----------------------------------------------------------------------------
 // forward declaration of the param container
 class FEParamContainer;
 
@@ -95,6 +150,9 @@ public:
 
 	//! Add a parameter to the list
 	void AddParameter(void* pv, FEParamType itype, int ndim, const char* sz);
+
+	//! Add a parameter to the list
+	void AddParameter(void* pv, FEParamType type, int ndim, FEParamRange rng, double fmin, double fmax, const char* sz);
 
 	//! find a parameter using it's name (the safe way)
 	FEParam* Find(const char* sz);
@@ -189,6 +247,9 @@ protected:
 	//! Add a parameter to the list
 	void AddParameter(void* pv, FEParamType itype, int ndim, const char* sz);
 
+	//! Add a parameter to the list
+	void AddParameter(void* pv, FEParamType type, int ndim, RANGE rng, const char* sz);
+
 private:
 	FEParameterList*	m_pParam;	//!< parameter list
 };
@@ -217,6 +278,10 @@ protected: \
 // that is an array
 #define ADD_PARAMETERV(theParam, theType, theDim, theName) \
 	AddParameter(theParam, theType, theDim, theName);
+
+// the ADD_PARAMETER2 macro adds a parameter with range checking to the parameter list
+#define ADD_PARAMETER2(theParam, theType, theRange, theName) \
+	AddParameter(&theParam, theType, 1, theRange, theName);
 
 // the END_PARAMETER_LIST defines the end of a parameter list
 #define END_PARAMETER_LIST() \

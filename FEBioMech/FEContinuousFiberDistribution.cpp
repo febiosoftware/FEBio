@@ -23,16 +23,11 @@ FEContinuousFiberDistribution::~FEContinuousFiberDistribution() {}
 //-----------------------------------------------------------------------------
 void FEContinuousFiberDistribution::Init()
 {
-    // set parent materials
-    m_pFmat->SetParent(this);
-    m_pFDD->SetParent(this);
-    m_pFint->SetParent(this);
-    
     // propagate pointers to fiber material and density distribution
     // to fiber integration scheme
     m_pFint->m_pFmat = m_pFmat;
     m_pFint->m_pFDD = m_pFDD;
     
-    // initialize fiber integration scheme
-    m_pFint->Init();
+    // initialize base class
+	FEElasticMaterial::Init();
 }

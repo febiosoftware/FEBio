@@ -40,6 +40,7 @@ void FEDonnanEquilibrium::Init()
 	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
 	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");
 	
+	FEElasticMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------

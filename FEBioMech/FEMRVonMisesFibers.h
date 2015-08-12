@@ -10,7 +10,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FETransverselyIsotropic.h"
+#include "FEUncoupledMaterial.h"
+#include "FEFiberMaterial.h"
 
 //-----------------------------------------------------------------------------
 class FEMRVonMisesMaterialPoint : public FEElasticMaterialPoint
@@ -38,10 +39,10 @@ public:
 //! This material has an isotopric Multiple basis and single preferred
 //! fiber direction.
 
-class FEMRVonMisesFibers: public FETransverselyIsotropic
+class FEMRVonMisesFibers: public FEUncoupledMaterial
 {
 public:
-	FEMRVonMisesFibers (FEModel* pfem) : FETransverselyIsotropic(pfem) {}
+	FEMRVonMisesFibers (FEModel* pfem);
 
 public:
 	double	c1;	//!< Mooney-Rivlin coefficient C1
@@ -64,6 +65,9 @@ public:
 
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
+
+protected:
+	FEFiberMaterial	m_fib;
 };
 
 #endif // !defined(AFX_FEVonMisesFibers_H__E918D89B_4CCD_44B9_9731_19CEC4EDF406__INCLUDED_)

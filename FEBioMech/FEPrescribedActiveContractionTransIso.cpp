@@ -26,6 +26,7 @@ FEPrescribedActiveContractionTransIso::FEPrescribedActiveContractionTransIso(FEM
 //-----------------------------------------------------------------------------
 void FEPrescribedActiveContractionTransIso::Init()
 {
+	FEElasticMaterial::Init();
     // convert angles from degrees to radians
     double pi = 4*atan(1.0);
     double the = m_thd*pi/180.;

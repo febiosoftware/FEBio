@@ -19,10 +19,7 @@ class FEConcentrationIndependentReaction : public FEChemicalReaction
 public:
 	//! constructor
 	FEConcentrationIndependentReaction(FEModel* pfem) : FEChemicalReaction(pfem) {}
-	
-	//! data initialization and checking
-	void Init() {FEChemicalReaction::Init(); }
-	
+		
 	//! molar supply at material point
 	double ReactionSupply(FEMaterialPoint& pt);
 	

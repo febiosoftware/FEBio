@@ -9,24 +9,18 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FETransverselyIsotropic.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Muscle Material
 
 //! This material uses the constitutive model developed by Blemker et.al. to model
 //! muscles which undergo active contraction
-//! Note that lam1 and m_K are inherited
 
-class FEMuscleMaterial: public FETransverselyIsotropic
+class FEMuscleMaterial: public FEUncoupledMaterial
 {
 public:
-	FEMuscleMaterial (FEModel* pfem) : FETransverselyIsotropic(pfem)
-	{
-		m_G1 = 0;
-		m_G2 = 0;
-		m_G3 = 0;
-	}
+	FEMuscleMaterial (FEModel* pfem);
 
 public:
 	// transverse constants
@@ -40,6 +34,8 @@ public:
 		
 	double	m_Lofl;  //!< optimal sarcomere length
 	double	m_smax;  //!< maximum isometric stretch
+	double	m_lam1;
+	double	m_alpha;	//!< activation parameter
 
 public:
 	//! calculate deviatoric stress at material point

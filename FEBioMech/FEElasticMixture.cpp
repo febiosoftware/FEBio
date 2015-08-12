@@ -109,17 +109,6 @@ void FEElasticMixture::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterial
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticMixture::Init()
-{
-	FEElasticMaterial::Init();
-	for (int i=0; i < (int)m_pMat.size(); ++i)
-	{
-        m_pMat[i]->SetParent(this);
-		m_pMat[i]->Init();
-	}
-}
-
-//-----------------------------------------------------------------------------
 void FEElasticMixture::AddMaterial(FEElasticMaterial* pm) 
 { 
 	m_pMat.SetProperty(pm); 

@@ -23,19 +23,13 @@ FEContinuousFiberDistributionUC::~FEContinuousFiberDistributionUC() {}
 //-----------------------------------------------------------------------------
 void FEContinuousFiberDistributionUC::Init()
 {
-    FEUncoupledMaterial::Init();
     m_K = m_pFmat->m_K;
     
-    // set parent materials
-    m_pFmat->SetParent(this);
-    m_pFDD->SetParent(this);
-    m_pFint->SetParent(this);
-    
-    // propagate pointers to fiber material and density distribution
+	// propagate pointers to fiber material and density distribution
     // to fiber integration scheme
     m_pFint->m_pFmat = m_pFmat;
     m_pFint->m_pFDD = m_pFDD;
     
     // initialize fiber integration scheme
-    m_pFint->Init();
+    FEUncoupledMaterial::Init();
 }

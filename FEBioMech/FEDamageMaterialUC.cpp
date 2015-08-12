@@ -30,11 +30,6 @@ void FEDamageMaterialUC::Init()
     
     // set bulk modulus to that of base elastic material
     m_K = m_pBase->m_K;
-    
-    // set parent materials
-    m_pBase->SetParent(this);
-    m_pDamg->SetParent(this);
-    m_pCrit->SetParent(this);
 }
 
 //-----------------------------------------------------------------------------

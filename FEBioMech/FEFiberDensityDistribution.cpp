@@ -15,6 +15,7 @@ END_PARAMETER_LIST();
 
 void FEEllipsodialFiberDensityDistribution::Init()
 {
+	FEMaterial::Init();
 	if (m_spa[0] < 0) throw MaterialError("spa1 must be positive.");
 	if (m_spa[1] < 0) throw MaterialError("spa2 must be positive.");
 	if (m_spa[2] < 0) throw MaterialError("spa3 must be positive.");
@@ -34,6 +35,7 @@ END_PARAMETER_LIST();
 
 void FEVonMises3DFiberDensityDistribution::Init()
 {
+	FEMaterial::Init();
 	if (m_b < 0) throw MaterialError("b must be positive.");
 }
 
@@ -54,6 +56,7 @@ END_PARAMETER_LIST();
 
 void FEEllipticalFiberDensityDistribution::Init()
 {
+	FEMaterial::Init();
 	if (m_spa[0] < 0) throw MaterialError("spa1 must be positive.");
 	if (m_spa[1] < 0) throw MaterialError("spa2 must be positive.");
 }
@@ -74,6 +77,7 @@ END_PARAMETER_LIST();
 
 void FEVonMises2DFiberDensityDistribution::Init()
 {
+	FEMaterial::Init();
 	if (m_b < 0) throw MaterialError("b must be positive.");
 }
 

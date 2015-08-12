@@ -26,6 +26,7 @@ FEPrescribedActiveContractionUniaxialUC::FEPrescribedActiveContractionUniaxialUC
 //-----------------------------------------------------------------------------
 void FEPrescribedActiveContractionUniaxialUC::Init()
 {
+	FEUncoupledMaterial::Init();
     // convert angles from degrees to radians
     double pi = 4*atan(1.0);
     double the = m_thd*pi/180.;

@@ -4,6 +4,47 @@
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
+bool FEParam::is_inside_range()
+{
+	if (m_irange == FE_DONT_CARE) return true;
+
+	if (m_itype == FE_PARAM_INT)
+	{
+		int ival = value<int>();
+		switch (m_irange)
+		{
+		case FE_GREATER         : return (ival >  m_imin); break;
+		case FE_GREATER_OR_EQUAL: return (ival >= m_imin); break;
+		case FE_LESS            : return (ival <  m_imin); break;
+		case FE_LESS_OR_EQUAL   : return (ival <= m_imin); break;
+		case FE_OPEN            : return ((ival >  m_imin) && (ival <  m_imax)); break;
+		case FE_CLOSED          : return ((ival >= m_imin) && (ival <= m_imax)); break;
+		case FE_LEFT_OPEN       : return ((ival >  m_imin) && (ival <= m_imax)); break;
+		case FE_RIGHT_OPEN      : return ((ival >= m_imin) && (ival <  m_imax)); break;
+		}
+	}
+	else if (m_itype == FE_PARAM_DOUBLE)
+	{
+		double val = value<double>();
+		switch (m_irange)
+		{
+		case FE_GREATER         : return (val >  m_dmin); break;
+		case FE_GREATER_OR_EQUAL: return (val >= m_dmin); break;
+		case FE_LESS            : return (val <  m_dmin); break;
+		case FE_LESS_OR_EQUAL   : return (val <= m_dmin); break;
+		case FE_OPEN            : return ((val >  m_dmin) && (val <  m_dmax)); break;
+		case FE_CLOSED          : return ((val >= m_dmin) && (val <= m_dmax)); break;
+		case FE_LEFT_OPEN       : return ((val >  m_dmin) && (val <= m_dmax)); break;
+		case FE_RIGHT_OPEN      : return ((val >= m_dmin) && (val <  m_dmax)); break;
+		}
+	}
+
+	// we can get here if the user specified a range type
+	// for a parameter that is not an int or double.
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 //! This function copies the parameter data from the passed parameter list.
 //! This assumes that the two parameter lists are identical.
 void FEParameterList::operator = (FEParameterList& l)
@@ -62,6 +103,50 @@ void FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, const 
 	// make sure that the type is a vector type if the dimension > 1
 	assert((ndim >= 1) && ( (ndim > 1 ? (itype >= 100) : true)));
 	p.m_ndim = ndim;
+
+	// set the name
+	// note that we just copy the pointer, not the actual string
+	// this is okay as long as the name strings are defined
+	// as literal strings
+	assert(sz);
+	p.m_szname = sz;
+
+	// add the parameter to the list
+	m_pl.push_back(p);
+}
+//-----------------------------------------------------------------------------
+// This function adds a parameter to the parameter list
+void FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, FEParamRange rng, double fmin, double fmax, const char *sz)
+{
+	// create a new parameter object
+	FEParam p;
+
+	// set the pointer to the value
+	assert(pv);
+	p.m_pv = pv;
+
+	// set the type
+	p.m_itype = itype;
+
+	// set the dimension
+	// make sure that the type is a vector type if the dimension > 1
+	assert((ndim >= 1) && ( (ndim > 1 ? (itype >= 100) : true)));
+	p.m_ndim = ndim;
+
+	// set the range
+	// (range checking is only supported for int and double params)
+	p.m_irange = rng;
+	if (itype == FE_PARAM_INT)
+	{
+		p.m_imax = (int) fmax;
+		p.m_imin = (int) fmin;
+	}
+	else if (itype == FE_PARAM_DOUBLE)
+	{
+		p.m_dmax = fmax;
+		p.m_dmin = fmin;
+	}
+	else p.m_irange = FE_DONT_CARE;
 
 	// set the name
 	// note that we just copy the pointer, not the actual string
@@ -205,6 +290,14 @@ void FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, const
 {
 	assert(m_pParam);
 	m_pParam->AddParameter(pv, itype, ndim, sz);
+}
+
+//-----------------------------------------------------------------------------
+// Add a parameter to the parameter list
+void FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, RANGE rng, const char* sz)
+{
+	assert(m_pParam);
+	m_pParam->AddParameter(pv, itype, ndim, rng.m_rt, rng.m_fmin, rng.m_fmax, sz);
 }
 
 //-----------------------------------------------------------------------------

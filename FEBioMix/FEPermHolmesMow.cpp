@@ -19,6 +19,8 @@ FEPermHolmesMow::FEPermHolmesMow(FEModel* pfem) : FEHydraulicPermeability(pfem)
 //! Initialization. 
 void FEPermHolmesMow::Init()
 {
+	FEHydraulicPermeability::Init();
+
 	if (m_perm < 0) throw MaterialError("perm must be >= 0");
 	if (m_M < 0) throw MaterialError("M must be >= 0");
 	if (m_alpha < 0) throw MaterialError("alpha must be >= 0");

@@ -28,6 +28,8 @@ FEPermRefOrtho::FEPermRefOrtho(FEModel* pfem) : FEHydraulicPermeability(pfem)
 //! Initialization. 
 void FEPermRefOrtho::Init()
 {
+	FEHydraulicPermeability::Init();
+
 	if (m_perm0 < 0) throw MaterialError("perm0 must be >= 0");
 	if (m_perm1[0] < 0) throw MaterialError("perm1 components must be >= 0");
 	if (m_perm1[1] < 0) throw MaterialError("perm1 components must be >= 0");

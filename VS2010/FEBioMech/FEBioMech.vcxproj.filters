@@ -30,9 +30,6 @@
     <ClCompile Include="..\..\FEBioMech\FEElasticMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FETransverselyIsotropic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEFiberMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -567,9 +564,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEElasticMaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FETransverselyIsotropic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEFiberMaterial.h">

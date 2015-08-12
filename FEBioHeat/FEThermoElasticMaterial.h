@@ -18,8 +18,6 @@ public:
 	FEElasticMaterial* GetElasticMaterial() { return m_pElastic->GetElasticMaterial(); }
 
 public:
-	void Init();
-	
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
 

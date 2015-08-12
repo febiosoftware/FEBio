@@ -22,6 +22,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 void FEEFDUncoupled::Init()
 {
+	FEUncoupledMaterial::Init();
 	if (m_ksi[0] < 0) throw MaterialError("ksi1 must be positive.");
 	if (m_ksi[1] < 0) throw MaterialError("ksi2 must be positive.");
 	if (m_ksi[2] < 0) throw MaterialError("ksi3 must be positive.");

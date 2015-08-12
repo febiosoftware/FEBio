@@ -14,9 +14,13 @@ END_PARAMETER_LIST();
 
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEMRVonMisesFibers, FETransverselyIsotropic)
+BEGIN_PARAMETER_LIST(FEMRVonMisesFibers, FEUncoupledMaterial)
 	ADD_PARAMETER(c1, FE_PARAM_DOUBLE, "c1");
 	ADD_PARAMETER(c2, FE_PARAM_DOUBLE, "c2");
+	ADD_PARAMETER(m_fib.m_c3, FE_PARAM_DOUBLE, "c3");
+	ADD_PARAMETER(m_fib.m_c4, FE_PARAM_DOUBLE, "c4");
+	ADD_PARAMETER(m_fib.m_c5, FE_PARAM_DOUBLE, "c5");
+	ADD_PARAMETER(m_fib.m_lam1, FE_PARAM_DOUBLE, "lam_max");
 	// Fiber Concentration Factor
 	ADD_PARAMETER(kf, FE_PARAM_DOUBLE, "kf");
 	// Preferred fiber orientation IN RADIANS
@@ -151,6 +155,9 @@ double bessi1(double X)
         return (AX*BX);
 	}
 }
+
+//-----------------------------------------------------------------------------
+FEMRVonMisesFibers::FEMRVonMisesFibers(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 //-----------------------------------------------------------------------------
 FEMaterialPoint* FEMRVonMisesFibers::CreateMaterialPointData()

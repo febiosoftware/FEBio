@@ -25,6 +25,8 @@ FEDamageNeoHookean::FEDamageNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem)
 // Initialization routine and parameter checking
 void FEDamageNeoHookean::Init()
 {
+	FEElasticMaterial::Init();
+
 	if (m_E <= 0) throw MaterialError("Invalid value for E");
 	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
 	if (!INRANGE(m_beta, 0.0, 1.0)) throw MaterialError("Invalid value for b: must be in range [0,1]");

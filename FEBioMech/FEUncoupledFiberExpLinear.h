@@ -10,9 +10,6 @@ public:
 	//! Constructor
 	FEUncoupledFiberExpLinear(FEModel* pfem);
 
-	//! Initialization
-	void Init();
-
 	//! calculate deviatoric stress at material point
 	mat3ds DevStress(FEMaterialPoint& pt);
 

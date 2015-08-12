@@ -8,9 +8,6 @@ class FEGenerationMaterial : public FEElasticMaterial
 public:
 	FEGenerationMaterial(FEModel* pfem);
 
-	//! initialization
-	void Init();
-
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
 		
@@ -107,9 +104,6 @@ public:
 	//! calculate strain energy density at material point
 	double StrainEnergyDensity(FEMaterialPoint& pt);
     
-	//! data initialization and checking
-	void Init();
-		
 	int CheckGeneration(const double t);
 
 public:

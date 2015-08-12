@@ -165,10 +165,28 @@ int FEMaterial::FindPropertyIndex(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
+FEProperty* FEMaterial::FindProperty(const char* sz)
+{
+	int NP = (int) m_Prop.size();
+	for (int i=0; i<NP; ++i)
+	{
+		FEProperty* pm = m_Prop[i];
+		if (pm && (strcmp(pm->GetName(), sz) == 0)) return pm;
+	}
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 bool FEMaterial::SetProperty(int i, FECoreBase* pb)
 {
 	FEProperty* pm = m_Prop[i];
-	if (pm->IsType(pb)) { pm->SetProperty(pb); return true; }
+	if (pm->IsType(pb))
+	{ 
+		pm->SetProperty(pb);
+		FEMaterial* pmc = dynamic_cast<FEMaterial*>(pb);
+		if (pmc) pmc->SetParent(this);
+		return true; 
+	}
 	return false;
 }
 
@@ -181,11 +199,71 @@ void FEMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint&
 }
 
 //-----------------------------------------------------------------------------
-//! This function doesn't initialize anything but should be overridden in 
-//! derived classes to initialize and check material parameters
+//! Initial material.
 void FEMaterial::Init()
 {
+	// check the parameter ranges
+	FEParameterList& pl = GetParameterList();
+	const int nparam = pl.Parameters();
+	list<FEParam>::iterator pi = pl.first();
+	for (int i=0; i<nparam; ++i, ++pi)
+	{
+		FEParam& p = *pi;
+		if (p.m_irange != FE_DONT_CARE)
+		{
+			if (p.is_inside_range() == false)
+			{
+				char szerr[256] = {0};
+				const char* szname = p.m_szname;
+				if (p.m_itype == FE_PARAM_INT)
+				{
+					switch (p.m_irange)
+					{
+					case FE_GREATER         : sprintf(szerr, "%s must be greater than %d"            , szname, p.m_imin); break;
+					case FE_GREATER_OR_EQUAL: sprintf(szerr, "%s must be greater than or equal to %d", szname, p.m_imin); break;
+					case FE_LESS            : sprintf(szerr, "%s must be less than %d"               , szname, p.m_imin); break;
+					case FE_LESS_OR_EQUAL   : sprintf(szerr, "%s must be less than or equal to %d"   , szname, p.m_imin); break;
+					case FE_OPEN            : sprintf(szerr, "%s must be in the open interval (%d, %d)"      , szname, p.m_imin, p.m_imax); break;
+					case FE_CLOSED          : sprintf(szerr, "%s must be in the closed interval [%d, %d]"    , szname, p.m_imin, p.m_imax); break;
+					case FE_LEFT_OPEN       : sprintf(szerr, "%s must be in the left-open interval (%d, %d]" , szname, p.m_imin, p.m_imax); break;
+					case FE_RIGHT_OPEN      : sprintf(szerr, "%s must be in the right-open interval [%d, %d)", szname, p.m_imin, p.m_imax); break;
+					default:
+						sprintf(szerr, "%s has an invalid range");
+					}
+				}
+				else if (p.m_itype == FE_PARAM_DOUBLE)
+				{
+					switch (p.m_irange)
+					{
+					case FE_GREATER         : sprintf(szerr, "%s must be greater than %lg"            , szname, p.m_dmin); break;
+					case FE_GREATER_OR_EQUAL: sprintf(szerr, "%s must be greater than or equal to %lg", szname, p.m_dmin); break;
+					case FE_LESS            : sprintf(szerr, "%s must be less than %lg"               , szname, p.m_dmin); break;
+					case FE_LESS_OR_EQUAL   : sprintf(szerr, "%s must be less than or equal to %lg"   , szname, p.m_dmin); break;
+					case FE_OPEN            : sprintf(szerr, "%s must be in the open interval (%lg, %lg)"      , szname, p.m_dmin, p.m_dmax); break;
+					case FE_CLOSED          : sprintf(szerr, "%s must be in the closed interval [%lg, %lg]"    , szname, p.m_dmin, p.m_dmax); break;
+					case FE_LEFT_OPEN       : sprintf(szerr, "%s must be in the left-open interval (%lg, %lg]" , szname, p.m_dmin, p.m_dmax); break;
+					case FE_RIGHT_OPEN      : sprintf(szerr, "%s must be in the right-open interval [%lg, %lg)", szname, p.m_dmin, p.m_dmax); break;
+					default:
+						sprintf(szerr, "%s has an invalid range");
+					}
+				}
+				else sprintf(szerr, "%s has an invalid range");
+
+				// throw the error
+				throw MaterialError(szerr);
+			}
+		}
+	}
+
+	// initialize material axes
 	if (m_pmap) m_pmap->Init();
+
+	// initialize all properties
+	const int nprop = (int) m_Prop.size();
+	for (int i=0; i<nprop; ++i) 
+	{
+		if (m_Prop[i]) m_Prop[i]->Init();
+	}
 }
 
 //-----------------------------------------------------------------------------

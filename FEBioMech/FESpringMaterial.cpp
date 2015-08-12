@@ -23,6 +23,7 @@ double FELinearSpring::stiffness(double dl)
 
 void FELinearSpring::Init()
 {
+	FEDiscreteMaterial::Init();
 	if (m_E < 0) throw MaterialError("Invalid value for E in linear spring material");
 }
 
@@ -47,6 +48,7 @@ double FETensionOnlyLinearSpring::stiffness(double dl)
 
 void FETensionOnlyLinearSpring::Init()
 {
+	FEDiscreteMaterial::Init();
 	if (m_E < 0) throw MaterialError("Invalid value for E in tension only linear spring material");
 }
 
@@ -68,6 +70,7 @@ FENonLinearSpring::FENonLinearSpring(FEModel* pfem) : FESpringMaterial(pfem)
 
 void FENonLinearSpring::Init()
 {
+	FEDiscreteMaterial::Init();
 	if (m_nlc < 0) throw MaterialError("Invalid load curve ID for nonlinear spring");
 	if (m_plc == 0)
 	{

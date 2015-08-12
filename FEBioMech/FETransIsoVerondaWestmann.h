@@ -9,7 +9,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FETransverselyIsotropic.h"
+#include "FEUncoupledMaterial.h"
+#include "FEFiberMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Transversely Isotropic Veronda-Westmann material
@@ -17,10 +18,10 @@
 //! This material has an isotopric Veronda-Westmann basis and single preferred
 //! fiber direction.
 
-class FETransIsoVerondaWestmann : public FETransverselyIsotropic
+class FETransIsoVerondaWestmann : public FEUncoupledMaterial
 {
 public:
-	FETransIsoVerondaWestmann (FEModel* pfem) : FETransverselyIsotropic(pfem) {}
+	FETransIsoVerondaWestmann (FEModel* pfem);
 
 public:
 	double	m_c1;	//!< Veronda-Westmann coefficient C1
@@ -38,6 +39,10 @@ public:
     
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
+
+protected:
+	FEFiberMaterial	m_fib;
+	FEPropertyT<FEActiveFiberContraction>	m_ac;
 };
 
 #endif // !defined(AFX_FETRANSISOVERONDAWESTMANN_H__0FDCFE28_F8ED_4E54_A70E_A8877038CE15__INCLUDED_)

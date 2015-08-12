@@ -21,9 +21,6 @@ public:
     
 	//! damage
 	virtual double Damage(FEMaterialPoint& pt) = 0;
-    
-	virtual void Init() = 0;
-    
 };
 
 //-----------------------------------------------------------------------------

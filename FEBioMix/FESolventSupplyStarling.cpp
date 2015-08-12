@@ -59,12 +59,6 @@ bool FESolventSupplyStarling::SetParameterAttribute(FEParam& p, const char* szat
 }
 
 //-----------------------------------------------------------------------------
-//! Initialization. 
-void FESolventSupplyStarling::Init()
-{
-}
-
-//-----------------------------------------------------------------------------
 //! Solvent supply
 double FESolventSupplyStarling::Supply(FEMaterialPoint& mp)
 {

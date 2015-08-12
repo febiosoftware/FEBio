@@ -16,9 +16,6 @@ public:
 	//! constructor
 	FEReactionRate(FEModel* pfem) : FEMaterial(pfem) {}
 
-	//! Initialization
-	virtual void Init() {}
-	
 	//! reaction rate at material point
 	virtual double ReactionRate(FEMaterialPoint& pt) = 0;
 	
@@ -51,9 +48,6 @@ public:
     
 	//! initialization
 	virtual void Init();	
-
-	// initialize chemical reaction rate
-	void InitializeReactionRate(FEReactionRate* m_pRate);
 
 public:
 	void SetParameter(FEParam& p);

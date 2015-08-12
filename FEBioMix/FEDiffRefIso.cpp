@@ -25,6 +25,8 @@ FEDiffRefIso::FEDiffRefIso(FEModel* pfem) : FESoluteDiffusivity(pfem)
 //! Initialization. 
 void FEDiffRefIso::Init()
 {
+	FESoluteDiffusivity::Init();
+
 	if (m_free_diff < 0) throw MaterialError("free_diff must be >= 0");
 	if (m_diff0 < 0) throw MaterialError("diff0 must be >= 0");
 	if (m_diff1 < 0) throw MaterialError("diff1 must be >= 0");

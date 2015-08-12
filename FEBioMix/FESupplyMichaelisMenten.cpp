@@ -29,6 +29,8 @@ FESupplyMichaelisMenten::FESupplyMichaelisMenten(FEModel* pfem) : FESoluteSupply
 //! Initialization. 
 void FESupplyMichaelisMenten::Init()
 {
+	FESoluteSupply::Init();
+
 	if (m_Vmax < 0) throw MaterialError("Vmax must be >= 0");
 	if (m_Km <= 0) throw MaterialError("Km must be > 0");
 }

@@ -19,7 +19,4 @@ public:
     
 	//! tangent of hydraulic permeability with respect to concentration
 	mat3ds Tangent_Permeability_Concentration(FEMaterialPoint& mp, const int isol);
-    
-	void Init();
 };
-

@@ -4,8 +4,8 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEConstReferenceThermalConductivity, FEThermalConductivity);
-	ADD_PARAMETER(m_k0, FE_PARAM_DOUBLE, "k0");
-	ADD_PARAMETER(m_wt, FE_PARAM_DOUBLE, "wt");
+	ADD_PARAMETER2(m_k0, FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "k0");
+	ADD_PARAMETER2(m_wt, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "wt");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -13,13 +13,6 @@ FEConstReferenceThermalConductivity::FEConstReferenceThermalConductivity(FEModel
 {
 	m_k0 = 0;
 	m_wt = 0;
-}
-
-//-----------------------------------------------------------------------------
-void FEConstReferenceThermalConductivity::Init()
-{
-	if (m_k0 <= 0.0) throw MaterialError("k0 must be positive.");
-	if (m_wt <  0.0) throw MaterialError("wt must be non-negative.");
 }
 
 //-----------------------------------------------------------------------------

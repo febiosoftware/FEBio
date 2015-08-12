@@ -7,7 +7,6 @@ class FEIsotropicFourier : public FEHeatTransferMaterial
 {
 public:
 	FEIsotropicFourier(FEModel* pfem) : FEHeatTransferMaterial(pfem) {}
-	void Init();
 
 public:
 	double	m_k;	//!< heat conductivity

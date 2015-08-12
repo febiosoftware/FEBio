@@ -31,6 +31,7 @@ FEDamageCDFSimo::FEDamageCDFSimo(FEModel* pfem) : FEDamageCDF(pfem)
 //! Initialization.
 void FEDamageCDFSimo::Init()
 {
+	FEDamageCDF::Init();
 	if (m_alpha < 0) throw MaterialError("Invalid value of a: must be a non-negative number");
  	if (!INRANGE(m_beta, 0.0, 1.0)) throw MaterialError("Invalid value for b: must be in range [0,1]");
 }
@@ -84,6 +85,7 @@ FEDamageCDFLogNormal::FEDamageCDFLogNormal(FEModel* pfem) : FEDamageCDF(pfem)
 //! Initialization.
 void FEDamageCDFLogNormal::Init()
 {
+	FEDamageCDF::Init();
 	if (m_mu <= 0) throw MaterialError("mu must be > 0");
 	if (m_sigma <= 0) throw MaterialError("sigma must be > 0");
  	if (!INRANGE(m_Dmax, 0.0, 1.0)) throw MaterialError("Dmax must be in the range [0,1]");
@@ -127,6 +129,7 @@ FEDamageCDFWeibull::FEDamageCDFWeibull(FEModel* pfem) : FEDamageCDF(pfem)
 //! Initialization.
 void FEDamageCDFWeibull::Init()
 {
+	FEDamageCDF::Init();
 	if (m_alpha <= 0) throw MaterialError("alpha must be >= 0");
 	if (m_mu < 0) throw MaterialError("mu must be > 0");
  	if (!INRANGE(m_Dmax, 0.0, 1.0)) throw MaterialError("Dmax must be in the range [0,1]");
@@ -169,6 +172,7 @@ FEDamageCDFStep::FEDamageCDFStep(FEModel* pfem) : FEDamageCDF(pfem)
 //! Initialization.
 void FEDamageCDFStep::Init()
 {
+	FEDamageCDF::Init();
 	if (m_mu < 0) throw MaterialError("mu must be >= 0");
  	if (!INRANGE(m_Dmax, 0.0, 1.0)) throw MaterialError("Dmax must be in the range [0,1]");
 }
@@ -211,6 +215,7 @@ FEDamageCDFPQP::FEDamageCDFPQP(FEModel* pfem) : FEDamageCDF(pfem)
 //! Initialization.
 void FEDamageCDFPQP::Init()
 {
+	FEDamageCDF::Init();
 	if (m_mumin < 0) throw MaterialError("mumin must be >= 0");
 	if (m_mumax <= m_mumin) throw MaterialError("mumax must be > mumin");
  	if (!INRANGE(m_Dmax, 0.0, 1.0)) throw MaterialError("Dmax must be in the range [0,1]");

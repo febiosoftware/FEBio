@@ -350,32 +350,25 @@ void FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
 	
 	// set pointer to this multiphasic material
 	m_pReact->m_pMP = this;
-    m_pReact->SetParent(this); // redundant for now
-	
-	// now run the local initialization
-	m_pReact->Init();
-	
 }
 
 //-----------------------------------------------------------------------------
 void FEMultiphasic::Init()
 {
-	FEMaterial::Init();
-	m_pSolid->SetParent(this);
-	m_pSolid->Init();
-
-	m_pPerm->SetParent(this); m_pPerm->Init();
-	if (m_pSupp) { m_pSupp->SetParent(this); m_pSupp->Init(); }
-	m_pOsmC->SetParent(this); m_pOsmC->Init();
+	// set the solute IDs first, since they are referenced in FESolute::Init()
 	for (int i=0; i<Solutes(); ++i) {
-        m_pSolute[i]->SetParent(this);
         m_pSolute[i]->SetSoluteLocalID(i);
-        m_pSolute[i]->Init();
     }
-	for (int i=0; i<SBMs(); ++i) { m_pSBM[i]->SetParent(this); m_pSBM[i]->Init(); }
+
+	// initialize chemical reactions
 	for (int i=0; i<Reactions(); ++i)
 		InitializeReaction(m_pReact[i]);
-	
+
+	// call the base class.
+	// This also initializes all properties
+	FEMaterial::Init();
+
+	// parameter checking
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
 	if (m_penalty < 0) throw MaterialError("penalty must be positive");

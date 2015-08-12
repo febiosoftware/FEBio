@@ -10,11 +10,12 @@
 #endif
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FETendonMaterial, FETransverselyIsotropic)
-	ADD_PARAMETER(m_G1, FE_PARAM_DOUBLE, "g1");
-	ADD_PARAMETER(m_G2, FE_PARAM_DOUBLE, "g2");
-	ADD_PARAMETER(m_L1, FE_PARAM_DOUBLE, "l1");
-	ADD_PARAMETER(m_L2, FE_PARAM_DOUBLE, "l2");
+BEGIN_PARAMETER_LIST(FETendonMaterial, FEUncoupledMaterial)
+	ADD_PARAMETER(m_G1  , FE_PARAM_DOUBLE, "g1");
+	ADD_PARAMETER(m_G2  , FE_PARAM_DOUBLE, "g2");
+	ADD_PARAMETER(m_L1  , FE_PARAM_DOUBLE, "l1");
+	ADD_PARAMETER(m_L2  , FE_PARAM_DOUBLE, "l2");
+	ADD_PARAMETER(m_lam1, FE_PARAM_DOUBLE, "lam_max");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -29,6 +30,9 @@ inline double acosh(double x)
 //////////////////////////////////////////////////////////////////////
 // FETendonMaterial
 //////////////////////////////////////////////////////////////////////
+
+//-----------------------------------------------------------------------------
+FETendonMaterial::FETendonMaterial(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric stress at a material point.
@@ -118,7 +122,7 @@ mat3ds FETendonMaterial::DevStress(FEMaterialPoint& mp)
 	{
 		Fp = 0;
 	}
-	else if (lat < m_fib.m_lam1)
+	else if (lat < m_lam1)
 	{
 		Fp = m_L1*(exp(m_L2*(lat - 1)) - 1);
 	}
@@ -126,8 +130,8 @@ mat3ds FETendonMaterial::DevStress(FEMaterialPoint& mp)
 	{
 		double L3, L4;
 
-		L3 = m_L1*m_L2*exp(m_L2*(m_fib.m_lam1 - 1));
-		L4 = m_L1*(exp(m_L2*(m_fib.m_lam1 - 1)) - 1) - L3*m_fib.m_lam1;
+		L3 = m_L1*m_L2*exp(m_L2*(m_lam1 - 1));
+		L4 = m_L1*(exp(m_L2*(m_lam1 - 1)) - 1) - L3*m_lam1;
 
 		Fp = L3*lat + L4;
 	}
@@ -254,7 +258,7 @@ tens4ds FETendonMaterial::DevTangent(FEMaterialPoint& mp)
 		Fp = 0;
 		FpDl = 0;
 	}
-	else if (lat < m_fib.m_lam1)
+	else if (lat < m_lam1)
 	{
 		Fp = m_L1*(exp(m_L2*(lat - 1)) - 1);
 		FpDl = m_L1*m_L2*exp(m_L2*(lat - 1));
@@ -263,8 +267,8 @@ tens4ds FETendonMaterial::DevTangent(FEMaterialPoint& mp)
 	{
 		double L3, L4;
 
-		L3 = m_L1*m_L2*exp(m_L2*(m_fib.m_lam1 - 1));
-		L4 = m_L1*(exp(m_L2*(m_fib.m_lam1 - 1)) - 1) - L3*m_fib.m_lam1;
+		L3 = m_L1*m_L2*exp(m_L2*(m_lam1 - 1));
+		L4 = m_L1*(exp(m_L2*(m_lam1 - 1)) - 1) - L3*m_lam1;
 
 		Fp = L3*lat + L4;
 		FpDl = L3;

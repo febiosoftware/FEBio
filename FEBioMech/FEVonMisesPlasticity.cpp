@@ -20,6 +20,7 @@ FEVonMisesPlasticity::FEVonMisesPlasticity(FEModel* pfem) : FEElasticMaterial(pf
 //-----------------------------------------------------------------------------
 void FEVonMisesPlasticity::Init()
 {
+	FEElasticMaterial::Init();
 	if (m_E <= 0) throw MaterialError("E must be postive number");
 	if ((m_v < -1)||(m_v >= 0.5)) throw MaterialError("v must be in the range [-1, 0.5]");
 	if (m_Y <= 0) throw MaterialError("Y must be postitive number");

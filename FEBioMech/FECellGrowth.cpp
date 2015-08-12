@@ -22,6 +22,8 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 void FECellGrowth::Init()
 {
+	FEElasticMaterial::Init();
+
 	if (m_phir < 0) throw MaterialError("phir must be positive.");
 	if (m_cr < 0) throw MaterialError("cr must be positive.");
 	if (m_ce < 0) throw MaterialError("ce must be positive.");

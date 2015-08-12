@@ -102,6 +102,9 @@ public: // these functions have to be implemented by derived classes
 	//! serialize property data
 	virtual void Serialize(DumpFile& ar) = 0;
 
+	//! initializatoin
+	virtual void Init() = 0;
+
 protected:
 	//! some helper functions for reading, writing properties
 	void Write(DumpFile& ar, FEMaterial* pc);
@@ -148,6 +151,8 @@ public:
 			m_pmp = dynamic_cast<T*>(Read(ar));
 		}
 	}
+
+	void Init() { if (m_pmp) m_pmp->Init(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -202,6 +207,8 @@ public:
 			}
 		}
 	}
+
+	void Init() { for (size_t i=0; i<m_pmp.size(); ++i) m_pmp[i]->Init(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -292,6 +299,9 @@ public:
 
 	//! return a material property
 	FECoreBase* GetProperty(int i);
+
+	//! return a property (class)
+	FEProperty* FindProperty(const char* sz);
 
 	//! return a material parameter
 	FEParam* GetParameter(const ParamString& s);

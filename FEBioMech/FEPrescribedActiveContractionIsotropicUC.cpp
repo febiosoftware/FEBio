@@ -20,11 +20,6 @@ FEPrescribedActiveContractionIsotropicUC::FEPrescribedActiveContractionIsotropic
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedActiveContractionIsotropicUC::Init()
-{
-}
-
-//-----------------------------------------------------------------------------
 mat3ds FEPrescribedActiveContractionIsotropicUC::DevStress(FEMaterialPoint &mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

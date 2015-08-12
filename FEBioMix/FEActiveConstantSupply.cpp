@@ -22,13 +22,6 @@ FEActiveConstantSupply::FEActiveConstantSupply(FEModel* pfem) : FEActiveMomentum
 }
 
 //-----------------------------------------------------------------------------
-//! Initialization.
-void FEActiveConstantSupply::Init()
-{
-    FEMaterial::Init();
-}
-
-//-----------------------------------------------------------------------------
 //! Active momentum supply vector.
 //! The momentum supply is oriented along the first material axis
 vec3d FEActiveConstantSupply::ActiveSupply(FEMaterialPoint& mp)

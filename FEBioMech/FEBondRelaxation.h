@@ -23,8 +23,6 @@ public:
     
 	//! relaxation
 	virtual double Relaxation(FEMaterialPoint& pt, const double t) = 0;
-    
-	void Init();
 };
 
 //-----------------------------------------------------------------------------

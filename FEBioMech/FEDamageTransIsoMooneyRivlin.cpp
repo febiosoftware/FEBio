@@ -24,8 +24,8 @@ FEDamageTransIsoMooneyRivlin::FEDamageTransIsoMooneyRivlin(FEModel* pfem) : FEUn
 //-----------------------------------------------------------------------------
 void FEDamageTransIsoMooneyRivlin::Init()
 {
+	FEUncoupledMaterial::Init();
 	if (m_c4 <= 0) throw MaterialError("c4 must be > 0");
-
 }
 
 //-----------------------------------------------------------------------------

@@ -153,10 +153,8 @@ void FEViscoElasticMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMa
 //! \todo why does the base gets this material's parent?
 void FEViscoElasticMaterial::Init()
 {
-	FEElasticMaterial::Init();
 	if (m_Base == 0) throw MaterialError("This material needs an elastic base.");
-	m_Base->SetParent(GetParent());
-	m_Base->Init();
+	FEElasticMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------

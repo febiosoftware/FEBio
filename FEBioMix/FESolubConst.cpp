@@ -17,6 +17,7 @@ FESolubConst::FESolubConst(FEModel* pfem) : FESoluteSolubility(pfem)
 //! Initialization. 
 void FESolubConst::Init()
 {
+	FESoluteSolubility::Init();
 	if (m_solub < 0) throw MaterialError("solub must be >= 0");
 }
 

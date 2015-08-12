@@ -10,9 +10,6 @@ public:
 	//! constructor
 	FEFiberExpLinear(FEModel* pfem);
 	
-	//! Initialization
-	void Init();
-
 	//! Calculate the fiber stress
 	mat3ds Stress(FEMaterialPoint& mp);
 

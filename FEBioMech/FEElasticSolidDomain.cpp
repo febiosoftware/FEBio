@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEElasticSolidDomain.h"
-#include "FETransverselyIsotropic.h"
+#include "FEElasticMaterial.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 

@@ -12,17 +12,10 @@ public:
 	void Init();
 
 	//! calculate the fiber stress
-	double FiberStress(double lamd);
+	mat3ds FiberStress(FEMaterialPoint& mp);
 
 	//! active contraction stiffness contribution
-	double FiberStiffness(double lamd);
-
-public:
-	//! set the property attributes
-	bool SetAttribute(const char* szname, const char* szval);
-
-	//! Get the activation
-	double GetActivation() { return m_ascl; }
+	tens4ds FiberStiffness(FEMaterialPoint& mp);
 
 protected:
 	double	m_ascl;		//!< activation scale factor
@@ -38,14 +31,11 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Base class for fiber materials.
-class FEFiberMaterial : public FEMaterial
+class FEFiberMaterial
 {
 public:
 	//! Constructor
-	FEFiberMaterial(FEModel* pfem);
-
-	//! Initialization
-	void Init();
+	FEFiberMaterial();
 
 	//! Calculate the fiber stress
 	mat3ds Stress(FEMaterialPoint& mp);
@@ -57,26 +47,9 @@ public:
 	double StrainEnergyDensity(FEMaterialPoint& mp);
     
 public:
-	void Serialize(DumpFile& ar);
-
-	//! Set the active contraction property
-	void SetActiveContraction(FEActiveFiberContraction* pma) { m_pafc = pma; }
-
-	//! get the active contraction property
-	FEMaterial* GetActiveContraction() { return m_pafc; }
-
-	//! get activation
-	double GetActivation() { return (m_pafc ? m_pafc->GetActivation() : 0.0); }
-
-public:
 	double	m_c3;		//!< Exponential stress coefficient
 	double	m_c4;		//!< Fiber uncrimping coefficient
 	double	m_c5;		//!< Modulus of straightened fibers
 
 	double	m_lam1;		//!< fiber stretch for straightened fibers
-
-	//--- time varying elastance active contraction data ---
-	FEActiveFiberContraction*	m_pafc;
-
-	DECLARE_PARAMETER_LIST();
 };

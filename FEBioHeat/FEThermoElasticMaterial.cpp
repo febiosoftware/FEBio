@@ -19,14 +19,6 @@ FEMaterialPoint* FEThermoElasticMaterial::CreateMaterialPointData()
 }
 
 //-----------------------------------------------------------------------------
-void FEThermoElasticMaterial::Init()
-{
-	FEMaterial::Init();
-	m_pElastic->SetParent(this); m_pElastic->Init();
-	m_pCond->SetParent(this); m_pCond->Init();
-}
-
-//-----------------------------------------------------------------------------
 mat3ds FEThermoElasticMaterial::Conductivity(FEMaterialPoint& mp)
 {
 	return m_pCond->Conductivity(mp);

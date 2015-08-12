@@ -130,6 +130,11 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 						// parse the material
 						ParseMaterial(tag, pmc);
 					}
+					else
+					{
+						delete pmc;
+						throw XMLReader::InvalidTag(tag);
+					}
 				}
 			}
 		

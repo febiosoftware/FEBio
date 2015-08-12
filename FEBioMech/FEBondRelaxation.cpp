@@ -12,13 +12,6 @@
     #include "gsl/gsl_sf_expint.h"
 #endif
 
-//-----------------------------------------------------------------------------
-// Material parameters for FEBondRelaxation
-void FEBondRelaxation::Init()
-{
-	FEMaterial::Init();
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // FEBondRelaxationExponential

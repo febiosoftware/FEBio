@@ -1,5 +1,5 @@
 #pragma once
-#include "FETransverselyIsotropic.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! 2D transversely isotropic Veronda-Westmann
@@ -9,7 +9,7 @@
 //! material is that in this material the fibers lie in the plane that is perpendicular
 //! to the transverse axis. 
 
-class FE2DTransIsoVerondaWestmann :	public FETransverselyIsotropic
+class FE2DTransIsoVerondaWestmann :	public FEUncoupledMaterial
 {
 	enum { NSTEPS = 12 };	// nr of integration steps
 
@@ -17,6 +17,12 @@ public:
 	// material parameters
 	double	m_c1;	//!< Veronda-Westmann parameter c1
 	double	m_c2;	//!< Veronda-Westmann parameter c2
+
+	// fiber parameters
+	double	m_c3;
+	double	m_c4;
+	double	m_c5;
+	double	m_lam1;
 
 public:
 	//! constructor

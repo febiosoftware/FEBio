@@ -27,29 +27,42 @@ FEActiveFiberContraction::FEActiveFiberContraction(FEModel* pfem) : FEMaterial(p
 }
 
 //-----------------------------------------------------------------------------
-bool FEActiveFiberContraction::SetAttribute(const char* szatt, const char* szval)
-{
-	if (strcmp(szatt, "lc") == 0)
-	{
-		FEParameterList& pl = GetParameterList();
-		FEParam& p = *pl.Find("ascl");
-		p.m_nlc = atoi(szval)-1;
-		p.value<double>() = 1.0;
-	}
-	return true;
-}
-
-//-----------------------------------------------------------------------------
 void FEActiveFiberContraction::Init()
 {
+	FEMaterial::Init();
 	// for backward compatibility we set m_camax to m_ca0 if it is not defined
 	if (m_camax == 0.0) m_camax = m_ca0;
 	assert(m_camax > 0.0);
 }
 
 //-----------------------------------------------------------------------------
-double FEActiveFiberContraction::FiberStress(double lamd)
+mat3ds FEActiveFiberContraction::FiberStress(FEMaterialPoint& mp)
 {
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// get the deformation gradient
+	mat3d F = pt.m_F;
+	double J = pt.m_J;
+	double Jm13 = pow(J, -1.0/3.0);
+
+	// get the initial fiber direction
+	vec3d a0;
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
+
+	// calculate the current material axis lam*a = F*a0;
+	vec3d a = F*a0;
+
+	// normalize material axis and store fiber stretch
+	double lam, lamd;
+	lam = a.unit();
+	lamd = lam*Jm13; // i.e. lambda tilde
+
+	// calculate dyad of a: AxA = (a x a)
+	mat3ds AxA = dyad(a);
+
+	// get the activation
 	double saf = 0.0;
 	if (m_ascl > 0)
 	{
@@ -73,11 +86,11 @@ double FEActiveFiberContraction::FiberStress(double lamd)
 			saf = m_Tmax*(eca50i / ( eca50i + rca*rca ))*ctenslm;
 		}
 	}
-	return saf;
+	return AxA*saf;
 }
 
 //-----------------------------------------------------------------------------
-double FEActiveFiberContraction::FiberStiffness(double lamd)
+tens4ds FEActiveFiberContraction::FiberStiffness(FEMaterialPoint& mp)
 {
 /*	if (lcna >= 0)
 	{
@@ -92,26 +105,14 @@ double FEActiveFiberContraction::FiberStiffness(double lamd)
 		if (dl >= 0) W44 += J*2*beta*refl*exp(-beta*dl);
 	}
 */
-	return 0.0;
+	return tens4ds(0.0);
 }
 
 //=============================================================================
-BEGIN_PARAMETER_LIST(FEFiberMaterial, FEMaterial);
-END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-FEFiberMaterial::FEFiberMaterial(FEModel* pfem) : FEMaterial(pfem)
+FEFiberMaterial::FEFiberMaterial()
 {
 	m_c3 = m_c4 = m_c5 = 0;
 	m_lam1 = 1;
-
-	m_pafc = 0;
-}
-
-//-----------------------------------------------------------------------------
-void FEFiberMaterial::Init()
-{
-	if (m_pafc) m_pafc->Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -177,9 +178,6 @@ mat3ds FEFiberMaterial::Stress(FEMaterialPoint &mp)
 	// calculate stress: 
 	mat3ds s = T.dev()*twoJi;
 
-	// --- active contraction contribution ---
-	if (m_pafc) s += AxA*m_pafc->FiberStress(lamd);
-
 	return s;
 }
 
@@ -236,9 +234,6 @@ tens4ds FEFiberMaterial::Tangent(FEMaterialPoint &mp)
 		W4 = 0;
 		W44 = 0;
 	}
-
-	// --- add active contraction stiffness ---
-	if (m_pafc) W44 += m_pafc->FiberStiffness(lamd);
 
 	// --- calculate tangent ---
 
@@ -309,29 +304,4 @@ double FEFiberMaterial::StrainEnergyDensity(FEMaterialPoint &mp)
 	// --- active contraction contribution to sed is zero ---
     
 	return sed;
-}
-
-//-----------------------------------------------------------------------------
-void FEFiberMaterial::Serialize(DumpFile& ar)
-{
-	FEMaterial::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		if (m_pafc)
-		{
-			ar << 1;
-			m_pafc->Serialize(ar);
-		}
-		else ar << 0;
-	}
-	else
-	{
-		int nafc;
-		ar >> nafc;
-		if (nafc == 1)
-		{
-			m_pafc = new FEActiveFiberContraction(GetFEModel());
-			m_pafc->Serialize(ar);
-		}
-	}
 }

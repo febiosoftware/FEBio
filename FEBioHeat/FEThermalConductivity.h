@@ -25,9 +25,6 @@ class FEConstReferenceThermalConductivity : public FEThermalConductivity
 public:
 	FEConstReferenceThermalConductivity(FEModel* pfem);
 
-	// initialization
-	void Init();
-
 public:
 	// evaluate conductivity
 	mat3ds Conductivity(FEMaterialPoint& mp);

@@ -24,6 +24,8 @@ FEPermRefIso::FEPermRefIso(FEModel* pfem) : FEHydraulicPermeability(pfem)
 //! Initialization. 
 void FEPermRefIso::Init()
 {
+	FEHydraulicPermeability::Init();
+
 	if (m_perm0 < 0) throw MaterialError("perm0 must be >= 0");
 	if (m_perm1 < 0) throw MaterialError("perm1 must be >= 0");
 	if (m_perm2 < 0) throw MaterialError("perm2 must be >= 0");

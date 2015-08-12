@@ -16,6 +16,7 @@ FEPermConstIso::FEPermConstIso(FEModel* pfem) : FEHydraulicPermeability(pfem)
 //! Initialization. 
 void FEPermConstIso::Init()
 {
+	FEHydraulicPermeability::Init();
 	if (m_perm < 0) throw MaterialError("perm must be >= 0");
 }
 

@@ -13,6 +13,8 @@ END_PARAMETER_LIST();
 //! data initialization
 void FECoupledMooneyRivlin::Init()
 {
+	FEElasticMaterial::Init();
+
 	if (m_c1 <= 0.0) throw MaterialError("c1 must be positive");
 	if (m_K  <= 0.0) throw MaterialError("k must be positive" );
 }

@@ -19,12 +19,6 @@ FEUncoupledActiveContraction::FEUncoupledActiveContraction(FEModel* pfem) : FEUn
 }
 
 //-----------------------------------------------------------------------------
-void FEUncoupledActiveContraction::Init()
-{
-
-}
-
-//-----------------------------------------------------------------------------
 mat3ds FEUncoupledActiveContraction::DevStress(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

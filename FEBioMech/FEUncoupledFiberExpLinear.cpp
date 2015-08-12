@@ -17,12 +17,6 @@ FEUncoupledFiberExpLinear::FEUncoupledFiberExpLinear(FEModel* pfem) : FEUncouple
 }
 
 //-----------------------------------------------------------------------------
-void FEUncoupledFiberExpLinear::Init()
-{
-	FEUncoupledMaterial::Init();
-}
-
-//-----------------------------------------------------------------------------
 //! Fiber material stress
 mat3ds FEUncoupledFiberExpLinear::DevStress(FEMaterialPoint &mp)
 {

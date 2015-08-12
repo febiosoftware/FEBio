@@ -103,6 +103,7 @@ FEMaterialPoint* FEMicroMaterial::CreateMaterialPointData()
 //-----------------------------------------------------------------------------
 void FEMicroMaterial::Init()
 {
+	FEElasticMaterial::Init();
 	// try to load the RVE model
 	if (m_brve == false)
 	{

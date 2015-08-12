@@ -32,6 +32,8 @@ FEDiffAlbroIso::FEDiffAlbroIso(FEModel* pfem) : FESoluteDiffusivity(pfem)
 //! Initialization.
 void FEDiffAlbroIso::Init()
 {
+	FESoluteDiffusivity::Init();
+
 	if (m_diff0 < 0) throw MaterialError("free_diff must be >= 0");
 	if (m_cdinv < 0) throw MaterialError("cdinv must be >= 0");
 	if (m_alphad < 0) throw MaterialError("alphad must be >= 0");

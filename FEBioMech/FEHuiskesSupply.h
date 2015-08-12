@@ -10,9 +10,6 @@ public:
 	//! constructor
 	FEHuiskesSupply(FEModel* pfem);
 	
-	//! data initialization and checking
-	void Init();
-	
 	//! solid supply
 	double Supply(FEMaterialPoint& pt);
 	

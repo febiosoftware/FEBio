@@ -17,14 +17,6 @@ FEGenerationMaterial::FEGenerationMaterial(FEModel* pfem) : FEElasticMaterial(pf
 }
 
 //-----------------------------------------------------------------------------
-void FEGenerationMaterial::Init()
-{
-	assert(m_pMat);
-    m_pMat->SetParent(this);
-	m_pMat->Init();
-}
-
-//-----------------------------------------------------------------------------
 //! calculate stress at material point
 mat3ds FEGenerationMaterial::Stress(FEMaterialPoint& pt)
 {
@@ -195,16 +187,6 @@ int FEElasticMultigeneration::CheckGeneration(const double t)
 		if (t < m_MG[igen]->btime) return igen - 1;
 	}
 	return ngen - 1;
-}
-
-//-----------------------------------------------------------------------------
-void FEElasticMultigeneration::Init()
-{
-	FEElasticMaterial::Init();
-    for (int i=0; i<(int)m_MG.size(); i++) {
-        m_MG[i]->SetParent(this);
-        m_MG[i]->Init();
-    }
 }
 
 //-----------------------------------------------------------------------------

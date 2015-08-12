@@ -23,6 +23,8 @@ END_PARAMETER_LIST();
 
 void FEFiberPowLinearUncoupled::Init()
 {
+	FEElasticMaterial::Init();
+
     if (m_E < 0) throw MaterialError("E must be positive.");
     if (m_lam0 <= 1) throw MaterialError("lam0 must be >1.");
     if (m_beta <  2) throw MaterialError("beta must be >= 2.");

@@ -14,6 +14,7 @@ END_PARAMETER_LIST();
 //! data initialization
 void FECoupledVerondaWestmann::Init()
 {
+	FEElasticMaterial::Init();
 	if (m_c1 <= 0.0) throw MaterialError("c1 must be positive");
 	if (m_k  <= 0.0) throw MaterialError("k must be positive" );
 }

@@ -20,9 +20,6 @@ public:
     //! constructor
     FEPrescribedActiveContractionIsotropic(FEModel* pfem);
     
-    //! Initialization
-    void Init();
-    
     //! stress
     mat3ds Stress(FEMaterialPoint& pt);
     

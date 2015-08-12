@@ -2,12 +2,16 @@
 #include "FE2DTransIsoMooneyRivlin.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FE2DTransIsoMooneyRivlin, FETransverselyIsotropic)
+BEGIN_PARAMETER_LIST(FE2DTransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");
 	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
+	ADD_PARAMETERV(m_w, FE_PARAM_DOUBLEV, 2, "w");
+	ADD_PARAMETER(m_c3, FE_PARAM_DOUBLE, "c3");
+	ADD_PARAMETER(m_c4, FE_PARAM_DOUBLE, "c4");
+	ADD_PARAMETER(m_c5, FE_PARAM_DOUBLE, "c5");
+	ADD_PARAMETER(m_lam1, FE_PARAM_DOUBLE, "lam_max");
 	ADD_PARAMETERV(m_a, FE_PARAM_DOUBLEV, 2, "a");
 	ADD_PARAMETER(m_ac, FE_PARAM_DOUBLE, "active_contraction");
-	ADD_PARAMETERV(m_w, FE_PARAM_DOUBLEV, 2, "w");
 END_PARAMETER_LIST();
 
 double FE2DTransIsoMooneyRivlin::m_cth[FE2DTransIsoMooneyRivlin::NSTEPS];
@@ -21,7 +25,7 @@ double FE2DTransIsoMooneyRivlin::m_sth[FE2DTransIsoMooneyRivlin::NSTEPS];
 // FE2DTransIsoMooneyRivlin
 //////////////////////////////////////////////////////////////////////
 
-FE2DTransIsoMooneyRivlin::FE2DTransIsoMooneyRivlin(FEModel* pfem) : FETransverselyIsotropic(pfem)
+FE2DTransIsoMooneyRivlin::FE2DTransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
 	static bool bfirst = true;
 
@@ -118,14 +122,14 @@ mat3ds FE2DTransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 		{
 			double lamdi = 1.0/lamd;
 			double Wl;
-			if (lamd < m_fib.m_lam1)
+			if (lamd < m_lam1)
 			{
-				Wl = lamdi*m_fib.m_c3*(exp(m_fib.m_c4*(lamd - 1)) - 1);
+				Wl = lamdi*m_c3*(exp(m_c4*(lamd - 1)) - 1);
 			}
 			else
 			{
-				double c6 = m_fib.m_c3*(exp(m_fib.m_c4*(m_fib.m_lam1-1))-1) - m_fib.m_c5*m_fib.m_lam1;
-				Wl = lamdi*(m_fib.m_c5*lamd + c6);
+				double c6 = m_c3*(exp(m_c4*(m_lam1-1))-1) - m_c5*m_lam1;
+				Wl = lamdi*(m_c5*lamd + c6);
 			}
 			W4  = 0.5*lamdi*Wl;
 		}
@@ -258,15 +262,15 @@ tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 		{
 			double lamdi = 1.0/lamd;
 			double W4, W44;
-			if (lamd < m_fib.m_lam1)
+			if (lamd < m_lam1)
 			{
-				W4  = lamdi*m_fib.m_c3*(exp(m_fib.m_c4*(lamd - 1)) - 1);
-				W44 = m_fib.m_c3*lamdi*(m_fib.m_c4*exp(m_fib.m_c4*(lamd - 1)) - lamdi*(exp(m_fib.m_c4*(lamd-1))-1));
+				W4  = lamdi*m_c3*(exp(m_c4*(lamd - 1)) - 1);
+				W44 = m_c3*lamdi*(m_c4*exp(m_c4*(lamd - 1)) - lamdi*(exp(m_c4*(lamd-1))-1));
 			}
 			else
 			{
-				double c6 = m_fib.m_c3*(exp(m_fib.m_c4*(m_fib.m_lam1-1))-1) - m_fib.m_c5*m_fib.m_lam1;
-				W4  = lamdi*(m_fib.m_c5*lamd + c6);
+				double c6 = m_c3*(exp(m_c4*(m_lam1-1))-1) - m_c5*m_lam1;
+				W4  = lamdi*(m_c5*lamd + c6);
 				W44 = -c6*lamdi*lamdi;
 			}
 			Wl  = 0.5*lamdi*W4;

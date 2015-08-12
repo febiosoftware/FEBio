@@ -25,10 +25,7 @@ public:
     
     //! Tangent of active momentum supply
     vec3d Tangent_ActiveSupply_Strain(FEMaterialPoint& mp);
-    
-    //! data initialization and checking
-    void Init();
-    
+        
 public:
     double	m_asupp;			//!< active momentum supply
     

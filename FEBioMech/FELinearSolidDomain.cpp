@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FELinearSolidDomain.h"
-#include "FETransverselyIsotropic.h"
+#include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! constructor

@@ -72,9 +72,6 @@ public:
 	//! calculate strain energy density at material point
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
     
-	//! data initialization and checking
-	void Init();
-
 private:
 	FEVecPropertyT<FEElasticMaterial>	m_pMat;	//!< pointers to elastic materials
 };

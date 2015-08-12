@@ -16,12 +16,6 @@ FEHuiskesSupply::FEHuiskesSupply(FEModel* pfem) : FESolidSupply(pfem)
 }
 
 //-----------------------------------------------------------------------------
-//! Initialization. 
-void FEHuiskesSupply::Init()
-{
-}
-
-//-----------------------------------------------------------------------------
 //! Solid supply
 double FEHuiskesSupply::Supply(FEMaterialPoint& mp)
 {

@@ -17,6 +17,7 @@ FEOsmCoefConst::FEOsmCoefConst(FEModel* pfem) : FEOsmoticCoefficient(pfem)
 //! Initialization. 
 void FEOsmCoefConst::Init()
 {
+	FEOsmoticCoefficient::Init();
 	if (m_osmcoef < 0) throw MaterialError("osmcoef must be >= 0");
 }
 

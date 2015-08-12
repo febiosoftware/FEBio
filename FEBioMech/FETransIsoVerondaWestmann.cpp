@@ -6,15 +6,26 @@
 #include "FETransIsoVerondaWestmann.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FETransIsoVerondaWestmann, FETransverselyIsotropic)
-	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");
-	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
+BEGIN_PARAMETER_LIST(FETransIsoVerondaWestmann, FEUncoupledMaterial)
+	ADD_PARAMETER(      m_c1  , FE_PARAM_DOUBLE, "c1");
+	ADD_PARAMETER(      m_c2  , FE_PARAM_DOUBLE, "c2");
+	ADD_PARAMETER(m_fib.m_c3  , FE_PARAM_DOUBLE, "c3");
+	ADD_PARAMETER(m_fib.m_c4  , FE_PARAM_DOUBLE, "c4");
+	ADD_PARAMETER(m_fib.m_c5  , FE_PARAM_DOUBLE, "c5");
+	ADD_PARAMETER(m_fib.m_lam1, FE_PARAM_DOUBLE, "lam_max");
 END_PARAMETER_LIST();
 
 //////////////////////////////////////////////////////////////////////
 // FETransIsoVerondaWestmann
 //////////////////////////////////////////////////////////////////////
 
+//-----------------------------------------------------------------------------
+FETransIsoVerondaWestmann::FETransIsoVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem)
+{
+	AddProperty(&m_ac, "active_contraction");
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FETransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -45,8 +56,11 @@ mat3ds FETransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 	// calculate stress s = pI + 2/J * dev(T) 
 	mat3ds s = T.dev()*(2.0/J);
 
-	// add the fiber stress
+	// add the passive fiber stress
 	s += m_fib.Stress(mp);
+
+	// add the active fiber stress
+	if ((FEActiveFiberContraction*)m_ac) s += m_ac->FiberStress(mp);
 
 	return s;
 }
@@ -105,6 +119,7 @@ tens4ds FETransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 	return c + m_fib.Tangent(mp);
 }
 
+//-----------------------------------------------------------------------------
 double FETransIsoVerondaWestmann::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

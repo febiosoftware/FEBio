@@ -9,17 +9,6 @@
 	#define SQR(x) ((x)*(x))
 #endif
 
-// define the material parameters
-BEGIN_PARAMETER_LIST(FEMuscleMaterial, FETransverselyIsotropic)
-	ADD_PARAMETER(m_G1, FE_PARAM_DOUBLE, "g1");
-	ADD_PARAMETER(m_G2, FE_PARAM_DOUBLE, "g2");
-	ADD_PARAMETER(m_G3, FE_PARAM_DOUBLE, "g3");
-	ADD_PARAMETER(m_P1, FE_PARAM_DOUBLE, "p1");
-	ADD_PARAMETER(m_P2, FE_PARAM_DOUBLE, "p2");
-	ADD_PARAMETER(m_Lofl, FE_PARAM_DOUBLE, "Lofl");
-	ADD_PARAMETER(m_smax, FE_PARAM_DOUBLE, "smax");
-END_PARAMETER_LIST();
-
 //-----------------------------------------------------------------------------
 #ifdef WIN32
 inline double acosh(double x)
@@ -32,6 +21,29 @@ inline double acosh(double x)
 /////////////////////////////////////////////////////////////////////////
 // FEMuscleMaterial
 /////////////////////////////////////////////////////////////////////////
+
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_PARAMETER_LIST(FEMuscleMaterial, FEUncoupledMaterial)
+	ADD_PARAMETER(m_G1, FE_PARAM_DOUBLE, "g1");
+	ADD_PARAMETER(m_G2, FE_PARAM_DOUBLE, "g2");
+	ADD_PARAMETER(m_G3, FE_PARAM_DOUBLE, "g3");
+	ADD_PARAMETER(m_P1, FE_PARAM_DOUBLE, "p1");
+	ADD_PARAMETER(m_P2, FE_PARAM_DOUBLE, "p2");
+	ADD_PARAMETER(m_Lofl, FE_PARAM_DOUBLE, "Lofl");
+	ADD_PARAMETER(m_smax, FE_PARAM_DOUBLE, "smax");
+	ADD_PARAMETER(m_lam1, FE_PARAM_DOUBLE, "lam_max");
+	ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "activation");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+FEMuscleMaterial::FEMuscleMaterial(FEModel* pfem) : FEUncoupledMaterial(pfem)
+{
+	m_G1 = 0;
+	m_G2 = 0;
+	m_G3 = 0;
+	m_alpha = 0.0;
+}
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric stress at a material point.
@@ -122,7 +134,7 @@ mat3ds FEMuscleMaterial::DevStress(FEMaterialPoint& mp)
 		Fp = 0;
 	}
 	else if (lat < lam1)
-*/	if (lat < m_fib.m_lam1)
+*/	if (lat < m_lam1)
 	{
 		Fp = m_P1*(exp(m_P2*(lat/m_Lofl - 1)) - 1);
 	}
@@ -130,8 +142,8 @@ mat3ds FEMuscleMaterial::DevStress(FEMaterialPoint& mp)
 	{
 		double P3, P4;
 
-		P3 = m_P1*m_P2*exp(m_P2*(m_fib.m_lam1/m_Lofl - 1));
-		P4 = m_P1*(exp(m_P2*(m_fib.m_lam1/m_Lofl - 1)) - 1) - P3*m_fib.m_lam1/m_Lofl;
+		P3 = m_P1*m_P2*exp(m_P2*(m_lam1/m_Lofl - 1));
+		P4 = m_P1*(exp(m_P2*(m_lam1/m_Lofl - 1)) - 1) - P3*m_lam1/m_Lofl;
 
 		Fp = P3*lat/m_Lofl + P4;
 	}
@@ -161,11 +173,8 @@ mat3ds FEMuscleMaterial::DevStress(FEMaterialPoint& mp)
 		}
 	}
 
-	// activation level
-	double alpha = m_fib.GetActivation();
-
 	// calculate total fiber force
-	double FfDl = m_smax*(Fp + alpha*Fa)/m_Lofl;
+	double FfDl = m_smax*(Fp + m_alpha*Fa)/m_Lofl;
 	double FfD4  = 0.5*FfDl/lat;
 
 	// add all derivatives
@@ -291,7 +300,7 @@ tens4ds FEMuscleMaterial::DevTangent(FEMaterialPoint& mp)
 		FpDl = 0;
 	}
 	else if (lat < lam1)
-*/	if (lat < m_fib.m_lam1)
+*/	if (lat < m_lam1)
 	{
 		Fp = m_P1*(exp(m_P2*(lat/m_Lofl - 1)) - 1);
 		FpDl = m_P1*m_P2*exp(m_P2*(lat/m_Lofl-1))/m_Lofl;
@@ -300,8 +309,8 @@ tens4ds FEMuscleMaterial::DevTangent(FEMaterialPoint& mp)
 	{
 		double P3, P4;
 
-		P3 = m_P1*m_P2*exp(m_P2*(m_fib.m_lam1/m_Lofl - 1));
-		P4 = m_P1*(exp(m_P2*(m_fib.m_lam1/m_Lofl - 1)) - 1) - P3*m_fib.m_lam1/m_Lofl;
+		P3 = m_P1*m_P2*exp(m_P2*(m_lam1/m_Lofl - 1));
+		P4 = m_P1*(exp(m_P2*(m_lam1/m_Lofl - 1)) - 1) - P3*m_lam1/m_Lofl;
 
 		Fp = P3*lat/m_Lofl + P4;
 		FpDl = P3/m_Lofl;
@@ -336,14 +345,11 @@ tens4ds FEMuscleMaterial::DevTangent(FEMaterialPoint& mp)
 		}
 	}
 
-	// activation level
-	double alpha = m_fib.GetActivation();
-
 	// calculate total fiber force
-	double FfDl = m_smax*(Fp + alpha*Fa)/m_Lofl;
+	double FfDl = m_smax*(Fp + m_alpha*Fa)/m_Lofl;
 	double FfD4  = 0.5*FfDl/lat;
 
-	double FfDll = m_smax*(FpDl + alpha*FaDl)/m_Lofl;
+	double FfDll = m_smax*(FpDl + m_alpha*FaDl)/m_Lofl;
 	double FfD44 = 0.25*(FfDll - FfDl / lat)/I4;
 
 	// add all derivatives

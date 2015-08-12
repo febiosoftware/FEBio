@@ -22,6 +22,7 @@ END_PARAMETER_LIST();
 
 void FEPerfectOsmometer::Init()
 {
+	FEElasticMaterial::Init();
 	if (m_phiwr < 0 || m_phiwr > 1) throw MaterialError("phiw0 must be between 0. and 1.");
 	if (m_iosm < 0) throw MaterialError("iosm must be positive.");
 	if (m_bosm < 0) throw MaterialError("bosm must be positive.");

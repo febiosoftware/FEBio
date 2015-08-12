@@ -4,18 +4,9 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FENeoHookean, FEElasticMaterial)
-	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
-	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
+	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER   (      0.0), "E");
+	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-void FENeoHookean::Init()
-{
-	FEElasticMaterial::Init();
-
-	if (m_E <= 0) throw MaterialError("Invalid value for E");
-	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialRangeError("v", -1.0, 0.5, true, false);
-}
 
 //-----------------------------------------------------------------------------
 mat3ds FENeoHookean::Stress(FEMaterialPoint& mp)

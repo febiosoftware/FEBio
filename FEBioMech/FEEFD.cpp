@@ -68,12 +68,14 @@ const double gw[nint] = {
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEEFD, FEElasticMaterial)
-ADD_PARAMETERV(m_beta, FE_PARAM_DOUBLEV, 3, "beta");
-ADD_PARAMETERV(m_ksi , FE_PARAM_DOUBLEV, 3, "ksi" );
+	ADD_PARAMETERV(m_beta, FE_PARAM_DOUBLEV, 3, "beta");
+	ADD_PARAMETERV(m_ksi , FE_PARAM_DOUBLEV, 3, "ksi" );
 END_PARAMETER_LIST();
 
 void FEEFD::Init()
 {
+	FEElasticMaterial::Init();
+
 	if (m_ksi[0] < 0) throw MaterialError("ksi1 must be positive.");
 	if (m_ksi[1] < 0) throw MaterialError("ksi2 must be positive.");
 	if (m_ksi[2] < 0) throw MaterialError("ksi3 must be positive.");

@@ -34,9 +34,6 @@ public:
 	//! referential solid volume fraction under steady-state conditions
 	double SolidConcentrationSS(FEMaterialPoint& pt);
 
-	//! data initialization and checking
-	void Init();
-	
 public:
 	double	m_supp;			//!< solute supply
 	

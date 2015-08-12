@@ -24,7 +24,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 void FEFiberExponentialPowerUC::Init()
 {
-    FEMaterial::Init();
+    FEElasticFiberMaterialUC::Init();
 	if ((4*m_ksi + 2*m_mu) < 0) throw MaterialError("4*ksi+2*mu must be positive.");
 	if (m_beta < 2) throw MaterialError("beta must be >= 2.");
 	if (m_alpha < 0) throw MaterialError("alpha must be >= 0.");
@@ -202,7 +202,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 void FEFiberNHUC::Init()
 {
-    FEMaterial::Init();
+    FEElasticFiberMaterialUC::Init();
 	if (m_mu < 0) throw MaterialError("mu must be positive.");
 }
 

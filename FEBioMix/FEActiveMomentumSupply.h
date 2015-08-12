@@ -28,8 +28,6 @@ public:
     
     //! tangent of hydraulic permeability with respect to concentration
     vec3d Tangent_ActiveSupply_Concentration(FEMaterialPoint& mp, const int isol);
-    
-    void Init();
 };
 
 

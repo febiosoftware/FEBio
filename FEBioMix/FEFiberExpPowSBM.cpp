@@ -27,6 +27,8 @@ END_PARAMETER_LIST();
 
 void FEFiberExpPowSBM::Init()
 {
+	FEElasticMaterial::Init();
+
     if (m_ksi0 < 0) throw MaterialError("ksi0 must be positive.");
     if (m_beta < 2) throw MaterialError("beta must be >= 2.");
     if (m_alpha < 0) throw MaterialError("alpha must be >= 0.");

@@ -6,15 +6,26 @@
 #include "FETransIsoMooneyRivlin.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FETransIsoMooneyRivlin, FETransverselyIsotropic)
-	ADD_PARAMETER(c1, FE_PARAM_DOUBLE, "c1");
-	ADD_PARAMETER(c2, FE_PARAM_DOUBLE, "c2");
+BEGIN_PARAMETER_LIST(FETransIsoMooneyRivlin, FEUncoupledMaterial)
+	ADD_PARAMETER(c1          , FE_PARAM_DOUBLE, "c1");
+	ADD_PARAMETER(c2          , FE_PARAM_DOUBLE, "c2");
+	ADD_PARAMETER(m_fib.m_c3  , FE_PARAM_DOUBLE, "c3");
+	ADD_PARAMETER(m_fib.m_c4  , FE_PARAM_DOUBLE, "c4");
+	ADD_PARAMETER(m_fib.m_c5  , FE_PARAM_DOUBLE, "c5");
+	ADD_PARAMETER(m_fib.m_lam1, FE_PARAM_DOUBLE, "lam_max");
 END_PARAMETER_LIST();
 
 //////////////////////////////////////////////////////////////////////
 // FETransIsoMooneyRivlin
 //////////////////////////////////////////////////////////////////////
 
+//-----------------------------------------------------------------------------
+FETransIsoMooneyRivlin::FETransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial (pfem)
+{
+	AddProperty(&m_ac, "active_contraction");
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -44,8 +55,12 @@ mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	// calculate stress s = pI + 2/J * dev(T) 
 	mat3ds s = T.dev()*(2.0/J);
 
-	// add the fiber stress
+	// calculate the passive fiber stress
 	mat3ds fs = m_fib.Stress(mp);
+
+	// calculate the active fiber stress
+	if ((FEActiveFiberContraction*)m_ac) fs += m_ac->FiberStress(pt);
+
 	return s + fs;
 }
 
@@ -97,9 +112,10 @@ tens4ds FETransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	tens4ds cw = (BxB - B4)*(W2*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
-	return c + m_fib.Tangent(mp);
+	return c + m_fib.Tangent(mp); // + m_pafc->FiberTangent(mp);
 }
 
+//-----------------------------------------------------------------------------
 double FETransIsoMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

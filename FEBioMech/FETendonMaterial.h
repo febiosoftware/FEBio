@@ -9,19 +9,16 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FETransverselyIsotropic.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Tendon Material
 
-//! This material uses the constitutive model developed by Blemker et.al. to model
-//! tendons
-//! Note that lam1 and m_K are inherited
-
-class FETendonMaterial : public FETransverselyIsotropic
+//! This material uses the constitutive model developed by Blemker et.al. to model tendons
+class FETendonMaterial : public FEUncoupledMaterial
 {
 public:
-	FETendonMaterial(FEModel* pfem) : FETransverselyIsotropic(pfem) {}
+	FETendonMaterial(FEModel* pfem);
 
 public:
 	// transverse constants
@@ -31,6 +28,8 @@ public:
 	// along fiber constants
 	double	m_L1;	//!< tendon fiber constant L1
 	double	m_L2;	//!< tendon fiber constant L2
+
+	double	m_lam1;	//!< max exponential fiber stretch
 	
 public:
 	//! calculate deviatoric stress at material point

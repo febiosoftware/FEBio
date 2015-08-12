@@ -18,12 +18,6 @@ FESupplyConst::FESupplyConst(FEModel* pfem) : FESoluteSupply(pfem)
 }
 
 //-----------------------------------------------------------------------------
-//! Initialization. 
-void FESupplyConst::Init()
-{
-}
-
-//-----------------------------------------------------------------------------
 //! Solute supply
 double FESupplyConst::Supply(FEMaterialPoint& mp)
 {

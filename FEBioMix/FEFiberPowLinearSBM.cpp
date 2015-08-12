@@ -27,6 +27,8 @@ END_PARAMETER_LIST();
 
 void FEFiberPowLinearSBM::Init()
 {
+	FEElasticMaterial::Init();
+
     if (m_E0 < 0) throw MaterialError("E0 must be positive.");
     if (m_lam0 <= 1) throw MaterialError("lam0 must be >1.");
     if (m_beta <  2) throw MaterialError("beta must be >= 2.");

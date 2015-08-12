@@ -27,9 +27,6 @@ public:
 	//! Tangent of supply with respect to concentration
 	double Tangent_Supply_Concentration(FEMaterialPoint& mp, const int isol);
 	
-	//! data initialization and checking
-	void Init();
-	
     //! set parameter attribute for indexed solute parameters
 	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval);
     

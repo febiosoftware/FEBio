@@ -47,16 +47,17 @@ void FETriphasic::AddSolute(FESolute* ps)
 //-----------------------------------------------------------------------------
 void FETriphasic::Init()
 {
-	FEMaterial::Init();
-	m_pSolid->SetParent(this); m_pSolid->Init();
-	m_pPerm->SetParent(this); m_pPerm->Init();
-	m_pOsmC->SetParent(this); m_pOsmC->Init();
-
+	// make sure there are exactly two solutes
 	if (m_pSolute.size() != 2) throw MaterialError("Exactly two solutes must be specified");
 	
-	m_pSolute[0]->SetParent(this); m_pSolute[0]->SetSoluteLocalID(0); m_pSolute[0]->Init();
-    m_pSolute[1]->SetParent(this); m_pSolute[1]->SetSoluteLocalID(1); m_pSolute[1]->Init();
-	
+	// Set the solute IDs since they are referenced in the FESolute::Init() function
+	m_pSolute[0]->SetSoluteLocalID(0);
+    m_pSolute[1]->SetSoluteLocalID(1);
+
+	// Call base class initialization. This will also initialize all properties.
+	FEMaterial::Init();
+
+	// parameter checking
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
 	if (m_penalty < 0) throw MaterialError("penalty must be positive");
@@ -73,8 +74,7 @@ void FETriphasic::Init()
 	
 	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
 	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");
-	if (m_Fc <= 0) throw MaterialError("A positive Faraday constant Fc must be defined in Globals section");
-	
+	if (m_Fc   <= 0) throw MaterialError("A positive Faraday constant Fc must be defined in Globals section");
 }
 
 //-----------------------------------------------------------------------------

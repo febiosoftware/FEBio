@@ -25,6 +25,8 @@ FESupplyBinding::FESupplyBinding(FEModel* pfem) : FESoluteSupply(pfem)
 //! Initialization. 
 void FESupplyBinding::Init()
 {
+	FESoluteSupply::Init();
+
 	if (m_kf <= 0) throw MaterialError("kf must be > 0");
 	if (m_kr < 0) throw MaterialError("kr must be >= 0");
 	if (m_crt < 0) throw MaterialError("Rtot must be >= 0");

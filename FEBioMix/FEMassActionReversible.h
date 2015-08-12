@@ -17,10 +17,7 @@ class FEMassActionReversible : public FEChemicalReaction
 public:
 	//! constructor
 	FEMassActionReversible(FEModel* pfem) : FEChemicalReaction(pfem) {}
-	
-	//! data initialization and checking
-	void Init() {FEChemicalReaction::Init(); }
-	
+		
 	//! molar supply at material point
 	double ReactionSupply(FEMaterialPoint& pt);
 	
