@@ -123,6 +123,10 @@ FEUT4Domain::FEUT4Domain(FEMesh *pm, FEMaterial* pmat) : FEElasticSolidDomain(pm
 
 	m_alpha = 0.05;
 	m_bdev = false;
+
+	m_Be = 0;
+	m_DB = 0;
+	m_Ge = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -174,9 +178,9 @@ void FEUT4Domain::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 FEUT4Domain::~FEUT4Domain()
 {
-	delete [] m_DB;
-	delete [] m_Be;
-	delete [] m_Ge;
+	if (m_DB) delete [] m_DB;
+	if (m_Be) delete [] m_Be;
+	if (m_Ge) delete [] m_Ge;
 }
 
 //-----------------------------------------------------------------------------

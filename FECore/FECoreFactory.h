@@ -23,10 +23,10 @@ public:
 
 public:
 	// return the type string identifier
-	const char* GetTypeStr() { return m_sztype; }
+	const char* GetTypeStr() const { return m_sztype; }
 
 	//! return the super-class ID
-	SUPER_CLASS_ID GetSuperClassID() { return m_scid; }
+	SUPER_CLASS_ID GetSuperClassID() const { return m_scid; }
 
 public:
 	//! derived classes implement this to create an instance of a class

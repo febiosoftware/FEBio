@@ -41,6 +41,12 @@ public:
 	//! List the registered classes with a given super-class id
 	void List(SUPER_CLASS_ID sid);
 
+	//! Get the number of registered factory classes
+	int FactoryClasses();
+
+	//! return a factory class
+	const FECoreFactory* GetFactoryClass(int i);
+
 public:
 	//! Register a new domain class
 	void RegisterDomain(FEDomainFactory* pf);

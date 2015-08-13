@@ -76,6 +76,18 @@ void FECoreKernel::List(SUPER_CLASS_ID sid)
 }
 
 //-----------------------------------------------------------------------------
+int FECoreKernel::FactoryClasses()
+{
+	return (int) m_Fac.size();
+}
+
+//-----------------------------------------------------------------------------
+const FECoreFactory* FECoreKernel::GetFactoryClass(int i)
+{
+	return m_Fac[i];
+}
+
+//-----------------------------------------------------------------------------
 FECoreKernel::FECoreKernel()
 {
 	m_plog = Logfile::GetInstance();
