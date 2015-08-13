@@ -7,8 +7,8 @@
 
 // define the parameter list
 BEGIN_PARAMETER_LIST(FELinearElastic, FEElasticMaterial)
-	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
-	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
+	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
 END_PARAMETER_LIST();
 
 //////////////////////////////////////////////////////////////////////
@@ -20,9 +20,6 @@ void FELinearElastic::Init()
 {
 	// intialize base class
 	FEElasticMaterial::Init();
-
-	if (m_E <= 0) throw MaterialError("Invalid value for E");
-	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
 
     m_lam = m_v*m_E/((1+m_v)*(1-2*m_v));
 	m_mu  = 0.5*m_E/(1+m_v);

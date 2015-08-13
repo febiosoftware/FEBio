@@ -18,9 +18,6 @@ class FESphericalFiberDistribution : public FEElasticMaterial
 public:
 	FESphericalFiberDistribution(FEModel* pfem);
 	
-	//! Initialization
-	void Init();
-	
 	//! Cauchy stress
 	virtual mat3ds Stress(FEMaterialPoint& mp);
 	

@@ -19,15 +19,12 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberIntegrationGauss, FEFiberIntegrationScheme)
-ADD_PARAMETER(m_nph, FE_PARAM_INT, "nph");
-ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
+	ADD_PARAMETER2(m_nph, FE_PARAM_INT, FE_RANGE_GREATER(0), "nph");
+	ADD_PARAMETER2(m_nth, FE_PARAM_INT, FE_RANGE_GREATER(0), "nth");
 END_PARAMETER_LIST();
 
 void FEFiberIntegrationGauss::Init()
 {
-	if (m_nph < 1) throw MaterialError("nph must be strictly greater than zero.");
-	if (m_nth < 1) throw MaterialError("nth must be strictly greater than zero.");
-    
 	m_bfirst = true;
 	
 	if (m_bfirst)

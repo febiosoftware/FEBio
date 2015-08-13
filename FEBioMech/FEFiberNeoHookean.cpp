@@ -3,8 +3,8 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberNeoHookean, FEElasticMaterial)
-	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
-	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
+	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
 	ADD_PARAMETERV(m_a, FE_PARAM_DOUBLEV, 3, "a");
 	ADD_PARAMETER(m_ac, FE_PARAM_DOUBLE, "active_contraction");
 END_PARAMETER_LIST();
@@ -29,9 +29,6 @@ void FEFiberNeoHookean::Init()
 {
 	FEElasticMaterial::Init();
 
-	if (m_E <= 0) throw MaterialError("Invalid value for E");
-	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
-    
     m_bfirst = true;
     
 	if (m_bfirst)

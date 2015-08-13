@@ -21,6 +21,7 @@ bool FEParam::is_inside_range()
 		case FE_CLOSED          : return ((ival >= m_imin) && (ival <= m_imax)); break;
 		case FE_LEFT_OPEN       : return ((ival >  m_imin) && (ival <= m_imax)); break;
 		case FE_RIGHT_OPEN      : return ((ival >= m_imin) && (ival <  m_imax)); break;
+		case FE_NOT_EQUAL       : return (ival != m_imin); break;
 		}
 	}
 	else if (m_itype == FE_PARAM_DOUBLE)
@@ -36,6 +37,7 @@ bool FEParam::is_inside_range()
 		case FE_CLOSED          : return ((val >= m_dmin) && (val <= m_dmax)); break;
 		case FE_LEFT_OPEN       : return ((val >  m_dmin) && (val <= m_dmax)); break;
 		case FE_RIGHT_OPEN      : return ((val >= m_dmin) && (val <  m_dmax)); break;
+		case FE_NOT_EQUAL       : return (val != m_dmin); break;
 		}
 	}
 

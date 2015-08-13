@@ -19,8 +19,8 @@
 // Material parameters for the FEUncoupledReactiveViscoelastic material
 BEGIN_PARAMETER_LIST(FEUncoupledReactiveViscoelasticMaterial, FEUncoupledMaterial)
 	ADD_PARAMETER2(m_wmin , FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "wmin"    );
-	ADD_PARAMETER(m_btype, FE_PARAM_INT   , "kinetics");
-	ADD_PARAMETER(m_ttype, FE_PARAM_INT   , "trigger" );
+	ADD_PARAMETER2(m_btype, FE_PARAM_INT   , FE_RANGE_CLOSED(1, 2), "kinetics");
+	ADD_PARAMETER2(m_ttype, FE_PARAM_INT   , FE_RANGE_CLOSED(0, 2), "trigger" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -56,9 +56,6 @@ void FEUncoupledReactiveViscoelasticMaterial::Init()
     if (m_pBond == 0) throw MaterialError("This material needs an elastic bond.");
     if (m_pRelx == 0) throw MaterialError("This material needs a bond relaxation.");
 
-    if ((m_btype != 1) && (m_btype != 2)) throw MaterialError("kinetics must be 1 or 2");
-    if (!INRANGE(m_ttype, 0, 2)) throw MaterialError("trigger must be 0, 1 or 2");
-    
     // set the mixture's bulk modulus based on the base and bond materials
     m_K = m_pBase->m_K + m_pBond->m_K;
 }

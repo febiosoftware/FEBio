@@ -8,9 +8,6 @@ public:
 public:
 	FEOgdenUnconstrained(FEModel* pfem);
 	
-	//! data initialization and checking
-	void Init();
-	
 	//! calculate the stress
 	mat3ds Stress(FEMaterialPoint& pt);
 	

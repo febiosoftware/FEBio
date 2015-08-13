@@ -8,15 +8,8 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEIncompNeoHookean, FEUncoupledMaterial)
-	ADD_PARAMETER(m_G, FE_PARAM_DOUBLE, "G");
+	ADD_PARAMETER2(m_G, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "G");
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-void FEIncompNeoHookean::Init()
-{
-	FEUncoupledMaterial::Init();
-	if (m_G <= 0) throw MaterialError("G must be positive.");
-}
 
 //-----------------------------------------------------------------------------
 //! Calculate deviatoric stress

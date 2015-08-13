@@ -3,7 +3,7 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FETrussMaterial, FEMaterial)
-	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
+	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -76,9 +76,6 @@ public:
 	//! calculate strain energy (do not overload!)
 	double StrainEnergyDensity(FEMaterialPoint& pt);
     
-	//! material initialization
-	void Init();
-
 public:
 	bool	m_blaugon;	//!< augmented lagrangian flag
 	double	m_atol;		//!< augmented lagrangian tolerance

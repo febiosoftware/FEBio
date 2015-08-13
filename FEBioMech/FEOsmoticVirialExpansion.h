@@ -17,9 +17,6 @@ class FEOsmoticVirialExpansion : public FEElasticMaterial
 public:
     FEOsmoticVirialExpansion(FEModel* pfem) : FEElasticMaterial(pfem) { m_c1 = m_c2 = m_c3 = 0; }
     
-    //! Initialization routine
-    void Init();
-    
     //! Returns the Cauchy stress
     virtual mat3ds Stress(FEMaterialPoint& mp);
     

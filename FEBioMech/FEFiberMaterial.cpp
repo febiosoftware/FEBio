@@ -32,7 +32,7 @@ void FEActiveFiberContraction::Init()
 	FEMaterial::Init();
 	// for backward compatibility we set m_camax to m_ca0 if it is not defined
 	if (m_camax == 0.0) m_camax = m_ca0;
-	assert(m_camax > 0.0);
+	if (m_camax <= 0.0) throw MaterialError("camax must be larger than zero");
 }
 
 //-----------------------------------------------------------------------------

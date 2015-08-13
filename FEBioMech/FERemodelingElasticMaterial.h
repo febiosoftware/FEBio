@@ -87,9 +87,6 @@ public:
 	//! tangent function of stress with solid mass density
 	mat3ds Tangent_Stress_Density(FEMaterialPoint& pt);
 	
-	//! data initialization and checking
-	void Init();
-	
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData()
 	{

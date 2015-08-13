@@ -21,9 +21,6 @@ public:
 	//! calculate strain energy density at material point
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
     
-	//! data initialization
-	void Init();
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

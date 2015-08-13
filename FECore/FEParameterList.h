@@ -35,6 +35,7 @@ enum FEParamRange {
 	FE_CLOSED,				// parameter must be inside the closed interval [min, max]
 	FE_LEFT_OPEN,			// parameter must be inside the half-open interval (min, max]
 	FE_RIGHT_OPEN,			// parameter must be inside the right-open interval [min, max)
+	FE_NOT_EQUAL,			// parameter must not equal val ( != val)
 };
 
 //-----------------------------------------------------------------------------
@@ -132,6 +133,7 @@ inline RANGE FE_RANGE_OPEN      (double fmin, double fmax) {return RANGE(FE_OPEN
 inline RANGE FE_RANGE_CLOSED    (double fmin, double fmax) {return RANGE(FE_CLOSED    , fmin, fmax); }
 inline RANGE FE_RANGE_LEFT_OPEN (double fmin, double fmax) {return RANGE(FE_LEFT_OPEN , fmin, fmax); }
 inline RANGE FE_RANGE_RIGHT_OPEN(double fmin, double fmax) {return RANGE(FE_RIGHT_OPEN, fmin, fmax); }
+inline RANGE FE_RANGE_NOT_EQUAL (double f) { return RANGE(FE_NOT_EQUAL, f); }
 
 //-----------------------------------------------------------------------------
 // forward declaration of the param container

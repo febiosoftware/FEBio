@@ -3,9 +3,9 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberExpPow, FEElasticMaterial)
-	ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
-	ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
-	ADD_PARAMETER(m_ksi , FE_PARAM_DOUBLE, "ksi" );
+	ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
+	ADD_PARAMETER2(m_beta , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
+	ADD_PARAMETER2(m_ksi  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" );
 	ADD_PARAMETER(m_thd, FE_PARAM_DOUBLE, "theta");
 	ADD_PARAMETER(m_phd, FE_PARAM_DOUBLE, "phi");
 END_PARAMETER_LIST();
@@ -17,9 +17,6 @@ END_PARAMETER_LIST();
 void FEFiberExpPow::Init()
 {
 	FEElasticMaterial::Init();
-	if (m_ksi < 0) throw MaterialError("ksi must be positive.");
-	if (m_beta < 2) throw MaterialError("beta must be >= 2.");
-	if (m_alpha < 0) throw MaterialError("alpha must be >= 0.");
 
 	// convert angles from degrees to radians
 	double pi = 4*atan(1.0);

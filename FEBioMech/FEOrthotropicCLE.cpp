@@ -11,19 +11,19 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEOrthotropicCLE, FEElasticMaterial)
-ADD_PARAMETER(lp11, FE_PARAM_DOUBLE, "lp11");
-ADD_PARAMETER(lm11, FE_PARAM_DOUBLE, "lm11");
-ADD_PARAMETER(lp22, FE_PARAM_DOUBLE, "lp22");
-ADD_PARAMETER(lm22, FE_PARAM_DOUBLE, "lm22");
-ADD_PARAMETER(lp33, FE_PARAM_DOUBLE, "lp33");
-ADD_PARAMETER(lp11, FE_PARAM_DOUBLE, "lp11");
-ADD_PARAMETER(lm33, FE_PARAM_DOUBLE, "lm33");
-ADD_PARAMETER(l12, FE_PARAM_DOUBLE, "l12");
-ADD_PARAMETER(l23, FE_PARAM_DOUBLE, "l23");
-ADD_PARAMETER(l31, FE_PARAM_DOUBLE, "l31");
-ADD_PARAMETER(mu1, FE_PARAM_DOUBLE, "mu1");
-ADD_PARAMETER(mu2, FE_PARAM_DOUBLE, "mu2");
-ADD_PARAMETER(mu3, FE_PARAM_DOUBLE, "mu3");
+	ADD_PARAMETER(lp11, FE_PARAM_DOUBLE, "lp11");
+	ADD_PARAMETER(lm11, FE_PARAM_DOUBLE, "lm11");
+	ADD_PARAMETER(lp22, FE_PARAM_DOUBLE, "lp22");
+	ADD_PARAMETER(lm22, FE_PARAM_DOUBLE, "lm22");
+	ADD_PARAMETER(lp33, FE_PARAM_DOUBLE, "lp33");
+	ADD_PARAMETER(lp11, FE_PARAM_DOUBLE, "lp11");
+	ADD_PARAMETER(lm33, FE_PARAM_DOUBLE, "lm33");
+	ADD_PARAMETER(l12, FE_PARAM_DOUBLE, "l12");
+	ADD_PARAMETER(l23, FE_PARAM_DOUBLE, "l23");
+	ADD_PARAMETER(l31, FE_PARAM_DOUBLE, "l31");
+	ADD_PARAMETER2(mu1, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu1");
+	ADD_PARAMETER2(mu2, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu2");
+	ADD_PARAMETER2(mu3, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu3");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -31,10 +31,6 @@ END_PARAMETER_LIST();
 void FEOrthotropicCLE::Init()
 {
     FEElasticMaterial::Init();
-    
-    if (mu1 < 0) throw MaterialError("mu1 should be positive");
-    if (mu2 < 0) throw MaterialError("mu2 should be positive");
-    if (mu3 < 0) throw MaterialError("mu3 should be positive");
     
     // Evaluate Lame coefficients
     double	lam[3][3];

@@ -8,7 +8,7 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FELinearSpring, FEDiscreteMaterial)
-	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
+	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
 END_PARAMETER_LIST();
 
 double FELinearSpring::force(double dl)
@@ -19,12 +19,6 @@ double FELinearSpring::force(double dl)
 double FELinearSpring::stiffness(double dl)
 {
 	return m_E;
-}
-
-void FELinearSpring::Init()
-{
-	FEDiscreteMaterial::Init();
-	if (m_E < 0) throw MaterialError("Invalid value for E in linear spring material");
 }
 
 //-----------------------------------------------------------------------------

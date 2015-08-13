@@ -28,17 +28,14 @@ public:
 
 public:
 	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt);
 
 	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt);
 
 	//! calculate strain energy density at material point
-	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+	double StrainEnergyDensity(FEMaterialPoint& pt);
     
-	//! data initialization
-	void Init();
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

@@ -3,17 +3,17 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFungOrthoCompressible, FEElasticMaterial)
-ADD_PARAMETER(E1, FE_PARAM_DOUBLE, "E1");
-ADD_PARAMETER(E2, FE_PARAM_DOUBLE, "E2");
-ADD_PARAMETER(E3, FE_PARAM_DOUBLE, "E3");
-ADD_PARAMETER(G12, FE_PARAM_DOUBLE, "G12");
-ADD_PARAMETER(G23, FE_PARAM_DOUBLE, "G23");
-ADD_PARAMETER(G31, FE_PARAM_DOUBLE, "G31");
-ADD_PARAMETER(v12, FE_PARAM_DOUBLE, "v12");
-ADD_PARAMETER(v23, FE_PARAM_DOUBLE, "v23");
-ADD_PARAMETER(v31, FE_PARAM_DOUBLE, "v31");
-ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");
-ADD_PARAMETER(m_k, FE_PARAM_DOUBLE, "k");
+	ADD_PARAMETER2(E1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E1");
+	ADD_PARAMETER2(E2, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E2");
+	ADD_PARAMETER2(E3, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E3");
+	ADD_PARAMETER(G12, FE_PARAM_DOUBLE, "G12");
+	ADD_PARAMETER(G23, FE_PARAM_DOUBLE, "G23");
+	ADD_PARAMETER(G31, FE_PARAM_DOUBLE, "G31");
+	ADD_PARAMETER(v12, FE_PARAM_DOUBLE, "v12");
+	ADD_PARAMETER(v23, FE_PARAM_DOUBLE, "v23");
+	ADD_PARAMETER(v31, FE_PARAM_DOUBLE, "v31");
+	ADD_PARAMETER2(m_c, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0),"c");
+	ADD_PARAMETER2(m_k, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "k");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -22,15 +22,9 @@ void FEFungOrthoCompressible::Init()
 {
 	FEElasticMaterial::Init();
 	
-	if (E1 <= 0) throw MaterialError("E1 should be positive");
-	if (E2 <= 0) throw MaterialError("E2 should be positive");
-	if (E3 <= 0) throw MaterialError("E3 should be positive");
-	
 	if (v12 > sqrt(E1/E2)) throw MaterialError("Invalid value for v12. Let v12 > sqrt(E1/E2)");
 	if (v23 > sqrt(E2/E3)) throw MaterialError("Invalid value for v23. Let v23 > sqrt(E2/E3)");
 	if (v31 > sqrt(E3/E1)) throw MaterialError("Invalid value for v31. Let v31 > sqrt(E3/E1)");
-	
-	if (m_c <= 0) throw MaterialError("c should be positive");
 
 	// Evaluate Lame coefficients
 	mu[0] = G12 + G31 - G23;

@@ -11,9 +11,9 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPerfectOsmometer, FEElasticMaterial)
-	ADD_PARAMETER(m_phiwr, FE_PARAM_DOUBLE, "phiw0");
-	ADD_PARAMETER(m_iosm, FE_PARAM_DOUBLE, "iosm");
-	ADD_PARAMETER(m_bosm, FE_PARAM_DOUBLE, "bosm");
+	ADD_PARAMETER2(m_phiwr, FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "phiw0");
+	ADD_PARAMETER2(m_iosm , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "iosm");
+	ADD_PARAMETER2(m_bosm , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "bosm");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -23,16 +23,12 @@ END_PARAMETER_LIST();
 void FEPerfectOsmometer::Init()
 {
 	FEElasticMaterial::Init();
-	if (m_phiwr < 0 || m_phiwr > 1) throw MaterialError("phiw0 must be between 0. and 1.");
-	if (m_iosm < 0) throw MaterialError("iosm must be positive.");
-	if (m_bosm < 0) throw MaterialError("bosm must be positive.");
 	
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 	
 	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
 	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");
-	
 }
 
 //-----------------------------------------------------------------------------

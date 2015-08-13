@@ -81,15 +81,6 @@ FERemodelingElasticMaterial::FERemodelingElasticMaterial(FEModel* pfem) : FEElas
 }
 
 //-----------------------------------------------------------------------------
-//! Initialization
-void FERemodelingElasticMaterial::Init()
-{
-	FEElasticMaterial::Init();
-	m_pBase->Init();
-	m_pSupp->Init();
-}
-
-//-----------------------------------------------------------------------------
 //! Strain energy density function
 double FERemodelingElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 {

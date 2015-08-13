@@ -227,6 +227,7 @@ void FEMaterial::Init()
 					case FE_CLOSED          : sprintf(szerr, "%s must be in the closed interval [%d, %d]"    , szname, p.m_imin, p.m_imax); break;
 					case FE_LEFT_OPEN       : sprintf(szerr, "%s must be in the left-open interval (%d, %d]" , szname, p.m_imin, p.m_imax); break;
 					case FE_RIGHT_OPEN      : sprintf(szerr, "%s must be in the right-open interval [%d, %d)", szname, p.m_imin, p.m_imax); break;
+					case FE_NOT_EQUAL       : sprintf(szerr, "%s must not equal %d", szname, p.m_imin);
 					default:
 						sprintf(szerr, "%s has an invalid range");
 					}
@@ -243,6 +244,7 @@ void FEMaterial::Init()
 					case FE_CLOSED          : sprintf(szerr, "%s must be in the closed interval [%lg, %lg]"    , szname, p.m_dmin, p.m_dmax); break;
 					case FE_LEFT_OPEN       : sprintf(szerr, "%s must be in the left-open interval (%lg, %lg]" , szname, p.m_dmin, p.m_dmax); break;
 					case FE_RIGHT_OPEN      : sprintf(szerr, "%s must be in the right-open interval [%lg, %lg)", szname, p.m_dmin, p.m_dmax); break;
+					case FE_NOT_EQUAL       : sprintf(szerr, "%s must not equal %lg", szname, p.m_dmin);
 					default:
 						sprintf(szerr, "%s has an invalid range");
 					}
@@ -269,7 +271,7 @@ void FEMaterial::Init()
 //-----------------------------------------------------------------------------
 FEParam* FEMaterial::GetParameter(const ParamString& s)
 {
-	if (s.count() == 1) return FEMaterial::GetParameter(s);
+	if (s.count() == 1) return FECoreBase::GetParameter(s);
 
 	int NP = (int) m_Prop.size();
 	for (int i=0; i<NP; ++i)

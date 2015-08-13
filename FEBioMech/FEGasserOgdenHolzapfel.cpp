@@ -3,27 +3,13 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEGasserOgdenHolzapfel, FEElasticMaterial)
-	ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");
-	ADD_PARAMETER(m_k1, FE_PARAM_DOUBLE, "k1");
-	ADD_PARAMETER(m_k2, FE_PARAM_DOUBLE, "k2");
-	ADD_PARAMETER(m_kappa, FE_PARAM_DOUBLE, "kappa");
+	ADD_PARAMETER2(m_c, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "c");
+	ADD_PARAMETER2(m_k1, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "k1");
+	ADD_PARAMETER2(m_k2, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "k2");
+	ADD_PARAMETER2(m_kappa, FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0/3.0), "kappa");
 	ADD_PARAMETER(m_g, FE_PARAM_DOUBLE, "gamma");
-    ADD_PARAMETER(m_k, FE_PARAM_DOUBLE, "k");
+    ADD_PARAMETER2(m_k, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "k");
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-//! Data initialization
-void FEGasserOgdenHolzapfel::Init()
-{
-	FEElasticMaterial::Init();
-
-	if (m_c < 0) throw MaterialError("c should be positive");
-	if (m_k1 < 0) throw MaterialError("k1 should be positive");
-	if (m_k2 < 0) throw MaterialError("k2 should be positive");
-	if (!INRANGE(m_kappa, 0.0, 1./3.)) throw MaterialError("kappa must be in the range 0 <= kappa <= 1/3");
-    if (m_k < 0) throw MaterialError("k should be positive");
-	
-}
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric stress

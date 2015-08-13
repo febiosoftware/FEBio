@@ -5,21 +5,12 @@
 #include "stdafx.h"
 #include "FEMooneyRivlin.h"
 
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMooneyRivlin, FEUncoupledMaterial)
-	ADD_PARAMETER(c1, FE_PARAM_DOUBLE, "c1");
-	ADD_PARAMETER(c2, FE_PARAM_DOUBLE, "c2");
+	ADD_PARAMETER2(c1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c1");
+	ADD_PARAMETER (c2, FE_PARAM_DOUBLE, "c2");
 END_PARAMETER_LIST();
-
-//////////////////////////////////////////////////////////////////////
-// FEMooneyRivlin
-//////////////////////////////////////////////////////////////////////
-
-void FEMooneyRivlin::Init()
-{
-	if (c1 <= 0) throw MaterialError("c1 must be positive");
-	FEUncoupledMaterial::Init();
-}
 
 //-----------------------------------------------------------------------------
 //! Calculate the deviatoric stress

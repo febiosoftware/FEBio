@@ -4,9 +4,9 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEHolmesMow, FEElasticMaterial)
-ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
-ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
-ADD_PARAMETER(m_b, FE_PARAM_DOUBLE, "beta");
+	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
+	ADD_PARAMETER2(m_b, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "beta");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -14,10 +14,6 @@ void FEHolmesMow::Init()
 {
 	FEElasticMaterial::Init();
 	
-	if (m_E <= 0) throw MaterialError("E must be positive");
-	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Valid range for v is -1 <= v < 0.5");
-	if (m_b < 0) throw MaterialError("beta must be positive");
-
 	// Lame coefficients
 	lam = m_v*m_E/((1+m_v)*(1-2*m_v));
 	mu  = 0.5*m_E/(1+m_v);

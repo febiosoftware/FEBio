@@ -10,9 +10,9 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberPowLinear, FEElasticMaterial)
-    ADD_PARAMETER(m_E    , FE_PARAM_DOUBLE, "E"    );
-    ADD_PARAMETER(m_lam0 , FE_PARAM_DOUBLE, "lam0" );
-    ADD_PARAMETER(m_beta , FE_PARAM_DOUBLE, "beta" );
+    ADD_PARAMETER2(m_E    , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E"    );
+    ADD_PARAMETER2(m_lam0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER(1.0), "lam0" );
+    ADD_PARAMETER2(m_beta , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
     ADD_PARAMETER(m_thd  , FE_PARAM_DOUBLE, "theta");
     ADD_PARAMETER(m_phd  , FE_PARAM_DOUBLE, "phi"  );
 END_PARAMETER_LIST();
@@ -25,10 +25,6 @@ void FEFiberPowLinear::Init()
 {
 	FEElasticMaterial::Init();
 
-    if (m_E < 0) throw MaterialError("E must be positive.");
-    if (m_lam0 <= 1) throw MaterialError("lam0 must be >1.");
-    if (m_beta <  2) throw MaterialError("beta must be >= 2.");
-    
     // convert angles from degrees to radians
     double pi = 4*atan(1.0);
     double the = m_thd*pi/180.;

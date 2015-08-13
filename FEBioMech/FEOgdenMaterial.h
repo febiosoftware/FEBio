@@ -9,9 +9,6 @@ public:
 public:
 	FEOgdenMaterial(FEModel* pfem);
 
-	//! data initialization and checking
-	void Init();
-
 	//! calculate the deviatoric stress
 	mat3ds DevStress(FEMaterialPoint& pt);
 

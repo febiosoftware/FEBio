@@ -4,13 +4,13 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEOrthoElastic, FEElasticMaterial)
-	ADD_PARAMETER(E1, FE_PARAM_DOUBLE, "E1");
-	ADD_PARAMETER(E2, FE_PARAM_DOUBLE, "E2");
-	ADD_PARAMETER(E3, FE_PARAM_DOUBLE, "E3");
-	ADD_PARAMETER(G12, FE_PARAM_DOUBLE, "G12");
-	ADD_PARAMETER(G23, FE_PARAM_DOUBLE, "G23");
-	ADD_PARAMETER(G31, FE_PARAM_DOUBLE, "G31");
-	ADD_PARAMETER(v12, FE_PARAM_DOUBLE, "v12");
+	ADD_PARAMETER2(E1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E1");
+	ADD_PARAMETER2(E2, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E2");
+	ADD_PARAMETER2(E3, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E3");
+	ADD_PARAMETER2(G12, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "G12");
+	ADD_PARAMETER2(G23, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "G23");
+	ADD_PARAMETER2(G31, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "G31");
+	ADD_PARAMETER2(v12, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "v12");
 	ADD_PARAMETER(v23, FE_PARAM_DOUBLE, "v23");
 	ADD_PARAMETER(v31, FE_PARAM_DOUBLE, "v31");
 END_PARAMETER_LIST();
@@ -21,14 +21,6 @@ void FEOrthoElastic::Init()
 {
 	FEElasticMaterial::Init();
 
-	if (E1 <= 0) throw MaterialError("E1 should be positive");
-	if (E2 <= 0) throw MaterialError("E2 should be positive");
-	if (E3 <= 0) throw MaterialError("E3 should be positive");
-	
-	if (G12 < 0) throw MaterialError("G12 should be positive");
-	if (G23 < 0) throw MaterialError("G23 should be positive");
-	if (G31 < 0) throw MaterialError("G31 should be positive");
-	
 	if (v12 > sqrt(E1/E2)) throw MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E2)");
 	if (v23 > sqrt(E2/E3)) throw MaterialError("Invalid value for v23. Let v23 <= sqrt(E2/E3)");
 	if (v31 > sqrt(E3/E1)) throw MaterialError("Invalid value for v31. Let v31 <= sqrt(E3/E1)");

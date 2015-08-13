@@ -21,7 +21,6 @@ public:
 	FELinearSpring(FEModel* pfem) : FESpringMaterial(pfem){}
 	double force    (double dl);
 	double stiffness(double dl);
-	void Init();
 
 public:
 	double m_E;	//!< spring constant

@@ -9,12 +9,12 @@ BEGIN_PARAMETER_LIST(FEOgdenUnconstrained, FEElasticMaterial);
 	ADD_PARAMETER(m_c[3], FE_PARAM_DOUBLE, "c4");
 	ADD_PARAMETER(m_c[4], FE_PARAM_DOUBLE, "c5");
 	ADD_PARAMETER(m_c[5], FE_PARAM_DOUBLE, "c6");
-	ADD_PARAMETER(m_m[0], FE_PARAM_DOUBLE, "m1");
-	ADD_PARAMETER(m_m[1], FE_PARAM_DOUBLE, "m2");
-	ADD_PARAMETER(m_m[2], FE_PARAM_DOUBLE, "m3");
-	ADD_PARAMETER(m_m[3], FE_PARAM_DOUBLE, "m4");
-	ADD_PARAMETER(m_m[4], FE_PARAM_DOUBLE, "m5");
-	ADD_PARAMETER(m_m[5], FE_PARAM_DOUBLE, "m6");
+	ADD_PARAMETER2(m_m[0], FE_PARAM_DOUBLE, FE_RANGE_NOT_EQUAL(0.0), "m1");
+	ADD_PARAMETER2(m_m[1], FE_PARAM_DOUBLE, FE_RANGE_NOT_EQUAL(0.0), "m2");
+	ADD_PARAMETER2(m_m[2], FE_PARAM_DOUBLE, FE_RANGE_NOT_EQUAL(0.0), "m3");
+	ADD_PARAMETER2(m_m[3], FE_PARAM_DOUBLE, FE_RANGE_NOT_EQUAL(0.0), "m4");
+	ADD_PARAMETER2(m_m[4], FE_PARAM_DOUBLE, FE_RANGE_NOT_EQUAL(0.0), "m5");
+	ADD_PARAMETER2(m_m[5], FE_PARAM_DOUBLE, FE_RANGE_NOT_EQUAL(0.0), "m6");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -31,16 +31,6 @@ FEOgdenUnconstrained::FEOgdenUnconstrained(FEModel* pfem) : FEElasticMaterial(pf
 }
 
 //-----------------------------------------------------------------------------
-//! data initialization and checking
-void FEOgdenUnconstrained::Init()
-{
-	FEElasticMaterial::Init();
-	for (int i=0; i<MAX_TERMS; ++i) 
-		if (m_m[i] == 0) throw MaterialError("Invalid value for m%d", i+1);
-}
-
-//-----------------------------------------------------------------------------
-
 void FEOgdenUnconstrained::EigenValues(mat3ds& A, double l[3], vec3d r[3], const double eps)
 {
 	A.eigen(l, r);

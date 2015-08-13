@@ -20,9 +20,9 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESphericalFiberDistribution, FEElasticMaterial)
-	ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
-	ADD_PARAMETER(m_beta , FE_PARAM_DOUBLE, "beta" );
-	ADD_PARAMETER(m_ksi  , FE_PARAM_DOUBLE, "ksi"  );
+	ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
+	ADD_PARAMETER2(m_beta , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
+	ADD_PARAMETER2(m_ksi  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -32,16 +32,6 @@ END_PARAMETER_LIST();
 FESphericalFiberDistribution::FESphericalFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	m_alpha = 0.0;
-}
-
-//-----------------------------------------------------------------------------
-void FESphericalFiberDistribution::Init()
-{
-	FEElasticMaterial::Init();
-
-	if (m_ksi < 0) throw MaterialError("ksi must be positive.");
-	if (m_beta < 2) throw MaterialError("beta must be greater than 2.");
-	if (m_alpha < 0) throw MaterialError("alpha must be positive.");
 }
 
 //-----------------------------------------------------------------------------

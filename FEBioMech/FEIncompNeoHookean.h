@@ -29,9 +29,6 @@ public:
 	//! calculate deviatoric tangent stiffness at material point
 	tens4ds DevTangent(FEMaterialPoint& pt);
 
-	//! initialization
-	void Init();
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };
