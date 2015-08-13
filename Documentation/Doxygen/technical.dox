@@ -4,4 +4,5 @@
 This is a collection of articles describing some of the technical aspects of FEBio. Understaing some of this material may be useful for developing with FEBio.
 
 \li \subpage restart
+\li \subpage serialize
 */

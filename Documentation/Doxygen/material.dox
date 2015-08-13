@@ -1,9 +1,9 @@
 /**
 \page material Material Plugins
 
-In this section we will look at the details of setting up a plugin that implemetns a new constitutive
-model. The new material will be integrated seamlessly in FEBio's framework so that the user can take
-immediate advantage of additional functionality such as reading material parameters from the xml-formatted
+In this section we will look at the details of setting up a plugin that implements a new constitutive
+formulation. The new material will be integrated seamlessly in FEBio's framework so that the user can take
+immediate advantage of additional functionality such as reading material parameters from the xml formatted
 FEBio input file, serialization to the restart archive, parameter optimization and more.
 
 The basic procedure for creating a new material for FEBio requires the following steps.
@@ -78,20 +78,15 @@ In order for FEBio to recognize the new material, the material needs to be regis
 In a plugin, this is done by defining a factory class and creating an instance of this class and then passing 
 a pointer to the factory back to FEBio in the PluginGetFactory function.
 
-A material factory class can be defined like this.
+A material factory can be defined like this.
 
 \code
-class MyFactory : public FECoreFactory
-{
-public:
-	MyFactory() : FECoreFactory(FEMATERIAL_ID, "my_material"){}
-	void* Create(FEModel* pfem) { return new MyMaterial(pfem); }
-};
+FERegisterClass_T<FENeoHookean> material_factory(FEMATERIAL_ID, "neo-hookean");
 \endcode
 
-Note that the constructor of the base class FECoreFactory takes two parameters. A super class ID which defines the type
+Note that the constructor of the class two parameters. A super class ID which defines the type
 of class that the factory creates (a material in this case) and a name that uniquely defines the class. This name will 
-later be used to define the material in the user-input file and can also be used for other purposes.
+later be used to define the material in the input file and can also be used for other purposes.
 
 \subsection step3 Defining the material parameters
 
@@ -134,6 +129,35 @@ Finally, the parameter list must be ended with the END_PARAMETER_LIST macro. Not
 advanced options to define material parameters, such as vector parameters and load-curve controlled parameters.
 These will be discussed in the advanced section below.
 
+<b>New in FEBio 2.4</b>
+
+As of FEBio version 2.4, automatic range checking can be added to the parameter list. This is done by using the 
+new macro <c>ADD_PARAMETER2</c>. This macro takes an extra parameter that defines the valid range of the parameter.
+For example,
+
+\code
+ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
+\endcode
+
+This defines a parameter, called "E", mapped to the class variable m_E, that takes a double precision,
+and that has to be greater than 0.0. The range specifier can take on the following values.
+
+\li FE_RANGE_DONT_CARE(): parameter can take on any value
+\li FE_RANGE_GREATER(val): parameter must be greater than val.
+\li FE_RANGE_GREATER_OR_EQUAL(val): parameter must be greater than or equal to val
+\li FE_RANGE_LESS (val): parameter must be less than val
+\li FE_RANGE_LESS_OR_EQUAL(val): parameter must be less than or equal to val
+\li FE_RANGE_OPEN(min,max): parameter must be inside the open interval (min,max)
+\li FE_RANGE_CLOSED(min,max): parameter must be inside the closed interval [min,max]
+\li FE_RANGE_RIGHT_OPEN(min,max): parameter must be inside the right-open interval [min, max)
+\li FE_RANGE_LEFT_OPEN(min,max): parameter must be inside the left-open interval (min, max]
+\li FE_RANGE_NOT_EQUAL(val): parameter cannot equal val.
+
+It is highly recommended to use automatic range checking on all material parameters. This helps catch common
+input errors.
+
+Currently, automatic range checking is only available for <c>FE_PARAM_DOUBLE</c> and <c>FE_PARAM_INT</c> parameters.
+
 \subsection step4 Implementing the initialization function
 
 When implementing a new material class the user has the option to override the base class implementation of the 
@@ -146,7 +170,7 @@ void FENeoHookean::Init()
 		FEElasticMaterial::Init();
 
 		if (m_E <= 0) throw MaterialError("Invalid value for E");
-		if (!INRANGE(m_v, -1, 0.5)) throw MaterialError("Invalid ...
+		if (!INRANGE(m_v, -1, 0.5)) throw MaterialError("Invalid range for v");
 }
 \endcode
 
@@ -161,6 +185,22 @@ to be aborted with a fatal error. The error message will be printed on the scree
 
 Again, it is noted that this function is optional, but it is recommended to implement it so that potential problems
 due to invalid material parameters can be caught quickly.
+
+<b>New in FEBio 2.4</b>
+
+It is recommended to use the automatic range check option available from FEBio 2.4 instead of doing parameter range
+checking in the <c>Init()</c> function. Automatic range checking is done using the <c>ADD_PARAMETER2</c> macro (see previous section).
+
+\code
+BEGIN_PARAMETER_LIST(FENeoHookean, FEElasticMaterial);
+	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
+END_PARAMETER_LIST();
+\endcode
+
+In FEBio 2.4 this is the preferred way of defining the material parameter list. This says that the parameter "E" must be 
+greater than zero, and "v" must lie inside the right-open interval [-1, 0.5). (This means that the parameter can take on
+the value -1, but not 0.5).
 
 \subsection step5 Implementing the stress and tangent functions
 
@@ -450,4 +490,63 @@ The Serialize function is used to store (and read) the material point data to (f
 
 As discussed above, one particularly important material point class is the FEElasticMaterialPoint class which stores the state data for all elastic materials. If your new material is an elastic material, you probably don’t need to redefine a new material point class. See section 2.2 for a detailed discussion of this material point class. However, if any additional data is required that is not stored in the default material point classes, a new material point class must be defined. For elastic materials, it is best to derive a new material point class from the FEElasticMaterialPoint class.
 
+\subsection subsec64 Material Properties (New in FEBio 2.4)
+
+In FEBio materials can be nested inside other materials. For example, the biphasic material requires a "solid" material and a "permeability" material. When a material
+is nested inside another material, we call this material a property of the parent material. Thus, in the previous example, a biphasic material has two properties,
+namely the solid property and the permeability property.
+
+As of FEBio 2.4, a simpler way of defining material properties was implemented. Let's say, for example, we want to make some type of visco-elastic material
+that should work with any of the elastic materials defined in FEBio. We can do this as follows.
+
+\code
+class MyViscoMaterial : public FEElasticMaterial
+{
+public:
+	MyViscoMaterial(FEModel* pfem);
+	
+	mat3ds Stress(FEMaterialPoint& mp);
+	
+	tens4ds Tangent(FEMaterialPoint& mp);
+	
+protected:
+	\\ Define the solid material property
+	FEPropertyT<FEElasticMaterial>	m_Solid;
+};
+\endcode
+
+Aside from the usual stuff (constructor, stress, tangent functions), it defines one material property, namely the solid phase of the visco-elastic material. 
+
+In the constructor of the new material, the property is registered with the framework by calling the AddProperty function.
+
+\code
+MyViscoMaterial::MyViscoMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
+{
+	AddProperty(&m_Solid, "solid");
+}
+\endcode
+
+This function adds a property  with the name "solid" to the property list of the material. The name is used in the input file for defining the solid property. 
+A specific solid material can be created using the <c>type</c> attribute. A definition for this new material will look like this. (Assuming the new material
+was registered under the name "my_visco").
+
+\code
+<material id="1" type="my_visco">
+	<solid type="neo-Hookean">
+		<E>1.0</E>
+		<v>0.3</v>
+	</solid>
+</material>
+\endcode
+
+In the code, the solid is used as if the m_Solid variable is a pointer to an FEElasticMaterial object. For example, 
+
+\code
+mat3ds MyViscoMaterial::Stress(FEMaterialPoint& mp)
+{
+	return m_Solid->Stress(mp);
+}
+\endcode
+
+<i>This page was last updated on August 13, 2015</i>
 */

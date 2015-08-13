@@ -6,14 +6,19 @@ In this section we'll see how to start a plugin for FEBio.
 
 \section plugin_sec1 1. Building a plugin
 
+\subsection plugin_sec1_0 What do you need?
+In order to build a plugin you need to have the FEBio SDK (Software Developemnt Kit). This SDK contains the header files and the pre-built libraries that you
+need to create a plugin. The SDK is usually installed in the same location as FEBio (usually in a subfolder named sdk). Next, you need a C++ compiler since the
+plugin has to be written in C++. We also recommend having a IDE (Integrated Development Environment) as this makes writing code much easier (e.g. VS2010 on Windows, or XCode on Mac). 
+
 \subsection plugin_sec1_1 Creating a plugin project in Visual Studio 2010
 To create a plugin for FEBio in Visual Studio 2010, you need to create a new dll project. To do this, open Visual Studio 2010 and select File->New->Project from the menu. 
 Select the Win32 Project, give it a name and select OK. This will start the Win32 Application Wizard. The first window of the wizard shows the current project settings. 
 Select the Next button to customize the settings. In the Application Settings window select DLL for the Application type. Then press Finish to create the new project.
 
 Next, we'll need to tell Visual Studio where to find the FEBio header and library files. To do this, right-click on the project name in the Solution Explorer and select Properties.
-Locate the VC++ Directories in the Configuration Properties. In the Include Directories, add the path to the root installation of the FEBio code (e.g. "C:\Program Files\FEBio2\"). Then,
-add the path to the FEBio library files to the Library Directories field (e.g. "C:\Program Files\FEBio2\lib\"). When done, press the OK button.
+Locate the VC++ Directories in the Configuration Properties. In the Include Directories, add the path to the include files (e.g. "C:\Program Files\FEBio2\sdk\include"). Then,
+add the path to the FEBio library files to the Library Directories field (e.g. "C:\Program Files\FEBio2\sdk\lib\"). When done, press the OK button.
 
 Now you are ready to write your plugin. You will start by implementing the required functions described below. Before you write these functions, you need to add following include file
 to the top of your source file. (If you are using precompiled header files, make sure the precompiled header file (e.g. stdafx.h) is the first included file.)
@@ -108,6 +113,7 @@ The available SuperClass ID's can be found in "FECore\FE_enum.h". Currently, the
 \li FEBODYLOAD_ID     : Create a body load class
 \li FENLCONSTRAINT_ID : Create a nonlinear constraint class
 \li FEPLOTDATA_ID     : Create a plot data class
+\li FECALLBACK_ID     : Create a callback class
 
 \section plugin_sec4 4. Using the plugin
 In order to use the plugin you have to add it to the FEBio configuration file. This file, usually called "febio.xml", is located in the same place as the executable is.
