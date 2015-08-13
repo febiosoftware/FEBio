@@ -91,6 +91,12 @@ FEBioImport::DuplicateMaterialSection::DuplicateMaterialSection()
 }
 
 //-----------------------------------------------------------------------------
+FEBioImport::MissingMaterialProperty::MissingMaterialProperty(const char* szmat, const char* szprop)
+{
+	SetErrorString("Material \"%s\" needs to have property \"%s\" defined", szmat, szprop);
+}
+
+//-----------------------------------------------------------------------------
 FEModel* FEBioFileSection::GetFEModel() { return m_pim->GetFEModel(); }
 FEAnalysis* FEBioFileSection::GetStep() { return m_pim->GetStep(); }
 

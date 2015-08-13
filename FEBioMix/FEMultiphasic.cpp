@@ -245,10 +245,10 @@ FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMaterial(pfem)
 	AddProperty(&m_pSolid , "solid"              );
 	AddProperty(&m_pPerm  , "permeability"       );
 	AddProperty(&m_pOsmC  , "osmotic_coefficient");
-	AddProperty(&m_pSupp  , "solvent_supply"     );
-	AddProperty(&m_pSolute, "solute"             );
-	AddProperty(&m_pSBM   , "solid_bound"        );
-	AddProperty(&m_pReact , "reaction"           );
+	AddProperty(&m_pSupp  , "solvent_supply"     , false);
+	AddProperty(&m_pSolute, "solute"             , false);
+	AddProperty(&m_pSBM   , "solid_bound"        , false);
+	AddProperty(&m_pReact , "reaction"           , false);
 }
 
 //-----------------------------------------------------------------------------

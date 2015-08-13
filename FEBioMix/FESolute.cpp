@@ -76,7 +76,7 @@ FESolute::FESolute(FEModel* pfem) : FEMaterial(pfem)
 	// set material properties
 	AddProperty(&m_pDiff , "diffusivity");
 	AddProperty(&m_pSolub, "solubility" );
-	AddProperty(&m_pSupp , "supply"     );
+	AddProperty(&m_pSupp , "supply"     , false);
 }
 
 //-----------------------------------------------------------------------------

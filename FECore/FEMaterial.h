@@ -76,6 +76,7 @@ public:
 	//! Name of the property.
 	//! Note that the name is not copied so it must point to a static string.
 	const char*		m_szname;
+	bool			m_brequired;	// true if this flag is required (false if optional). Used in FEMaterial::Init().
 
 public:
 	// Set\Get the name of the property
@@ -103,7 +104,7 @@ public: // these functions have to be implemented by derived classes
 	virtual void Serialize(DumpFile& ar) = 0;
 
 	//! initializatoin
-	virtual void Init() = 0;
+	virtual bool Init() = 0;
 
 protected:
 	//! some helper functions for reading, writing properties
@@ -152,7 +153,10 @@ public:
 		}
 	}
 
-	void Init() { if (m_pmp) m_pmp->Init(); }
+	bool Init() { 
+		if (m_pmp) { m_pmp->Init(); return true;  }
+		return (m_brequired==false); 
+	}
 };
 
 //-----------------------------------------------------------------------------
@@ -208,7 +212,14 @@ public:
 		}
 	}
 
-	void Init() { for (size_t i=0; i<m_pmp.size(); ++i) m_pmp[i]->Init(); }
+	bool Init() {
+		if (m_pmp.empty() && m_brequired) return false;
+		for (size_t i=0; i<m_pmp.size(); ++i)
+		{
+			if (m_pmp[i]) m_pmp[i]->Init(); else return false;
+		}
+		return true;
+	}
 };
 
 //-----------------------------------------------------------------------------
@@ -285,7 +296,7 @@ protected:
 	//! Add a material property
 	//! Call this in the constructor of derived classes to 
 	//! build the property list
-	void AddProperty(FEProperty* pp, const char* sz);
+	void AddProperty(FEProperty* pp, const char* sz, bool brequired = true);
 
 public:
 	//! Find the index of a material property
@@ -305,6 +316,12 @@ public:
 
 	//! return a material parameter
 	FEParam* GetParameter(const ParamString& s);
+
+	//! return the number of material properties defined
+	int MaterialProperties() { return (int) m_Prop.size(); }
+
+	//! return a material property
+	FEProperty* MaterialProperty(int i) { return m_Prop[i]; }
 
 private:
 	char	m_szname[128];	//!< name of material

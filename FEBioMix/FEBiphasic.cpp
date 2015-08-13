@@ -81,8 +81,8 @@ FEBiphasic::FEBiphasic(FEModel* pfem) : FEMaterial(pfem)
 	// set material properties
 	AddProperty(&m_pSolid, "solid"         );
 	AddProperty(&m_pPerm , "permeability"  );
-	AddProperty(&m_pSupp , "solvent_supply");
-    AddProperty(&m_pAmom , "active_supply" );
+	AddProperty(&m_pSupp , "solvent_supply", false);
+    AddProperty(&m_pAmom , "active_supply" , false);
 }
 
 //-----------------------------------------------------------------------------

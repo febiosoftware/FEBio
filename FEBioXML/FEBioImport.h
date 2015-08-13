@@ -104,6 +104,12 @@ public:
 	public: InvalidDomainMaterial();
 	};
 
+	// missing material property
+	class MissingMaterialProperty : public Exception
+	{
+	public: MissingMaterialProperty(const char* szmat, const char* szprop);
+	};
+
 public:
 	//-------------------------------------------------------------------------
 	class PlotVariable

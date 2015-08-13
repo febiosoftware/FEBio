@@ -63,9 +63,6 @@ public:
 	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
 
 public:
-	//! data initialization
-	void Init();
-
 	//! stress function
 	mat3ds Stress(FEMaterialPoint& pt);
 

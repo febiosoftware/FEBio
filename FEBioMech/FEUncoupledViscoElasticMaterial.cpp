@@ -47,11 +47,10 @@ void FEUncoupledViscoElasticMaterial::SetLocalCoordinateSystem(FEElement& el, in
 //! data initialization and checking
 void FEUncoupledViscoElasticMaterial::Init()
 {
-	FEUncoupledMaterial::Init();
-	if (m_pBase == 0) throw MaterialError("This material needs a base material.");
-	
 	// combine bulk modulus from base material and uncoupled viscoelastic material
 	if (m_binit == false) m_K += m_pBase->m_K;
+
+	FEUncoupledMaterial::Init();
 
 	m_binit = true;
 }

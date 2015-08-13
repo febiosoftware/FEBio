@@ -121,10 +121,12 @@ public:
 	double			m_fmin;
 	double			m_fmax;
 public:
+	RANGE(FEParamRange rt) { m_rt = rt; m_fmin = m_fmax = 0.0; }
 	RANGE(FEParamRange rt, double fval) { m_rt = rt; m_fmin = fval; m_fmax = 0.0; }
 	RANGE(FEParamRange rt, double fmin, double fmax) { m_rt = rt; m_fmin = fmin; m_fmax = fmax; }
 };
 
+inline RANGE FE_RANGE_DONT_CARE() { return RANGE(FE_DONT_CARE); }
 inline RANGE FE_RANGE_GREATER         (double f) { return RANGE(FE_GREATER         , f); }
 inline RANGE FE_RANGE_GREATER_OR_EQUAL(double f) { return RANGE(FE_GREATER_OR_EQUAL, f); }
 inline RANGE FE_RANGE_LESS            (double f) { return RANGE(FE_LESS            , f); }

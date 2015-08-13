@@ -52,9 +52,6 @@ void FEUncoupledReactiveViscoelasticMaterial::SetLocalCoordinateSystem(FEElement
 void FEUncoupledReactiveViscoelasticMaterial::Init()
 {
     FEUncoupledMaterial::Init();
-    if (m_pBase == 0) throw MaterialError("This material needs an elastic base.");
-    if (m_pBond == 0) throw MaterialError("This material needs an elastic bond.");
-    if (m_pRelx == 0) throw MaterialError("This material needs a bond relaxation.");
 
     // set the mixture's bulk modulus based on the base and bond materials
     m_K = m_pBase->m_K + m_pBond->m_K;

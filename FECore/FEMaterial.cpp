@@ -22,7 +22,7 @@ MaterialError::MaterialError(const char* szfmt, ...)
 }
 
 //-----------------------------------------------------------------------------
-FEProperty::FEProperty() : m_szname(nullptr) {}
+FEProperty::FEProperty() : m_szname(nullptr), m_brequired(true) {}
 
 //-----------------------------------------------------------------------------
 FEProperty::~FEProperty(){}
@@ -122,9 +122,10 @@ FECoordSysMap* FEMaterial::GetCoordinateSystemMap()
 }
 
 //-----------------------------------------------------------------------------
-void FEMaterial::AddProperty(FEProperty* pp, const char* sz)
+void FEMaterial::AddProperty(FEProperty* pp, const char* sz, bool brequired)
 {
 	pp->SetName(sz);
+	pp->m_brequired = brequired;
 	m_Prop.push_back(pp);
 }
 
@@ -264,7 +265,16 @@ void FEMaterial::Init()
 	const int nprop = (int) m_Prop.size();
 	for (int i=0; i<nprop; ++i) 
 	{
-		if (m_Prop[i]) m_Prop[i]->Init();
+		FEProperty* pi = m_Prop[i];
+		if (pi)
+		{
+			if (pi->Init() == false)
+			{
+				// currently, the property will only return false if a required property was not defined
+				throw MaterialError("This material requires the property %s", pi->GetName());
+			}
+		}
+		else throw MaterialError("A nullptr was set for property i");
 	}
 }
 

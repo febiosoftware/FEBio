@@ -39,6 +39,21 @@ FEMaterial* FEBioMaterialSection::CreateMaterial(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
+// This helper function checks if all the required material properties are defined
+void ValidateMaterial(FEMaterial* pmat)
+{
+	int NP = pmat->MaterialProperties();
+	for (int i=0; i<NP; ++i)
+	{
+		FEProperty* pi = pmat->MaterialProperty(i);
+		if (pi->m_brequired && (pi->size()==0))
+		{
+			throw FEBioImport::MissingMaterialProperty(pmat->GetName(), pi->GetName());
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Parse the Materials section. 
 void FEBioMaterialSection::Parse(XMLTag& tag)
 {
@@ -74,6 +89,9 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 
 			// parse the material parameters
 			ParseMaterial(tag, pmat);
+
+			// validate the material
+			ValidateMaterial(pmat);
 		}
 		else throw XMLReader::InvalidTag(tag);
 

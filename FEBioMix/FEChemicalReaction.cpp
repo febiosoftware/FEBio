@@ -21,8 +21,8 @@ FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEMaterial(pfem)
 	m_pMP = 0; 
 
 	// set material properties
-	AddProperty(&m_pFwd ,"forward_rate");
-	AddProperty(&m_pRev ,"reverse_rate");
+	AddProperty(&m_pFwd ,"forward_rate", false);
+	AddProperty(&m_pRev ,"reverse_rate", false);
 }
 
 //-----------------------------------------------------------------------------

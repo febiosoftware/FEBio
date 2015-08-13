@@ -22,7 +22,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FETransIsoMooneyRivlin::FETransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial (pfem)
 {
-	AddProperty(&m_ac, "active_contraction");
+	AddProperty(&m_ac, "active_contraction", false);
 }
 
 //-----------------------------------------------------------------------------
