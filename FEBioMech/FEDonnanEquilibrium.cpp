@@ -12,11 +12,11 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDonnanEquilibrium, FEElasticMaterial)
-	ADD_PARAMETER(m_phiwr, FE_PARAM_DOUBLE, "phiw0");
+	ADD_PARAMETER2(m_phiwr, FE_PARAM_DOUBLE, FE_RANGE_LEFT_OPEN(0.0, 1.0), "phiw0");
     ADD_PARAMETER(m_phisr, FE_PARAM_DOUBLE, "phis0");
 	ADD_PARAMETER(m_cFr, FE_PARAM_DOUBLE, "cF0");
-	ADD_PARAMETER(m_bosm, FE_PARAM_DOUBLE, "bosm");
-    ADD_PARAMETER(m_Phi, FE_PARAM_DOUBLE, "Phi");
+	ADD_PARAMETER2(m_bosm, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "bosm");
+    ADD_PARAMETER2(m_Phi, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Phi");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -30,9 +30,6 @@ void FEDonnanEquilibrium::Init()
         }
         m_binit = true;
     }
-	if (m_phiwr <= 0 || m_phiwr > 1) throw MaterialError("phiw0 must be between 0. and 1.");
-	if (m_bosm < 0) throw MaterialError("bosm must be positive.");
-    if (m_Phi < 0) throw MaterialError("Phi must be positive.");
 
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");

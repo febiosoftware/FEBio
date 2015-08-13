@@ -14,9 +14,9 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FECellGrowth, FEElasticMaterial)
-ADD_PARAMETER(m_phir, FE_PARAM_DOUBLE, "phir");
-ADD_PARAMETER(m_cr, FE_PARAM_DOUBLE, "cr");
-ADD_PARAMETER(m_ce, FE_PARAM_DOUBLE, "ce");
+	ADD_PARAMETER2(m_phir, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "phir");
+	ADD_PARAMETER2(m_cr  , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "cr");
+	ADD_PARAMETER2(m_ce  , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "ce");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -24,16 +24,11 @@ void FECellGrowth::Init()
 {
 	FEElasticMaterial::Init();
 
-	if (m_phir < 0) throw MaterialError("phir must be positive.");
-	if (m_cr < 0) throw MaterialError("cr must be positive.");
-	if (m_ce < 0) throw MaterialError("ce must be positive.");
-	
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 	
 	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
 	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");
-	
 }
 
 //-----------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEOsmCoefConst, FEOsmoticCoefficient)
-	ADD_PARAMETER(m_osmcoef, FE_PARAM_DOUBLE, "osmcoef");
+	ADD_PARAMETER2(m_osmcoef, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "osmcoef");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -11,14 +11,6 @@ END_PARAMETER_LIST();
 FEOsmCoefConst::FEOsmCoefConst(FEModel* pfem) : FEOsmoticCoefficient(pfem)
 {
 	m_osmcoef = 1;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization. 
-void FEOsmCoefConst::Init()
-{
-	FEOsmoticCoefficient::Init();
-	if (m_osmcoef < 0) throw MaterialError("osmcoef must be >= 0");
 }
 
 //-----------------------------------------------------------------------------

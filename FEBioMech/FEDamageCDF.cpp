@@ -17,23 +17,14 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageCDFSimo, FEDamageCDF)
-    ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "a");
-    ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "b");
+    ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "a");
+    ADD_PARAMETER2(m_beta, FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "b");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FEDamageCDFSimo::FEDamageCDFSimo(FEModel* pfem) : FEDamageCDF(pfem)
 {
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization.
-void FEDamageCDFSimo::Init()
-{
-	FEDamageCDF::Init();
-	if (m_alpha < 0) throw MaterialError("Invalid value of a: must be a non-negative number");
- 	if (!INRANGE(m_beta, 0.0, 1.0)) throw MaterialError("Invalid value for b: must be in range [0,1]");
 }
 
 //-----------------------------------------------------------------------------
@@ -67,9 +58,9 @@ double FEDamageCDFSimo::Damage(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageCDFLogNormal, FEDamageCDF)
-    ADD_PARAMETER(m_mu, FE_PARAM_DOUBLE, "mu");
-    ADD_PARAMETER(m_sigma, FE_PARAM_DOUBLE, "sigma");
-    ADD_PARAMETER(m_Dmax, FE_PARAM_DOUBLE, "Dmax");
+    ADD_PARAMETER2(m_mu   , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "mu");
+    ADD_PARAMETER2(m_sigma, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "sigma");
+    ADD_PARAMETER2(m_Dmax , FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -79,16 +70,6 @@ FEDamageCDFLogNormal::FEDamageCDFLogNormal(FEModel* pfem) : FEDamageCDF(pfem)
     m_mu = 1;
     m_sigma = 1;
     m_Dmax = 1;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization.
-void FEDamageCDFLogNormal::Init()
-{
-	FEDamageCDF::Init();
-	if (m_mu <= 0) throw MaterialError("mu must be > 0");
-	if (m_sigma <= 0) throw MaterialError("sigma must be > 0");
- 	if (!INRANGE(m_Dmax, 0.0, 1.0)) throw MaterialError("Dmax must be in the range [0,1]");
 }
 
 //-----------------------------------------------------------------------------
@@ -113,9 +94,9 @@ double FEDamageCDFLogNormal::Damage(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageCDFWeibull, FEDamageCDF)
-    ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
-    ADD_PARAMETER(m_mu, FE_PARAM_DOUBLE, "mu");
-    ADD_PARAMETER(m_Dmax, FE_PARAM_DOUBLE, "Dmax");
+    ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "alpha");
+    ADD_PARAMETER2(m_mu   , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
+    ADD_PARAMETER2(m_Dmax , FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -123,16 +104,6 @@ END_PARAMETER_LIST();
 FEDamageCDFWeibull::FEDamageCDFWeibull(FEModel* pfem) : FEDamageCDF(pfem)
 {
     m_alpha = m_mu = m_Dmax = 1;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization.
-void FEDamageCDFWeibull::Init()
-{
-	FEDamageCDF::Init();
-	if (m_alpha <= 0) throw MaterialError("alpha must be >= 0");
-	if (m_mu < 0) throw MaterialError("mu must be > 0");
- 	if (!INRANGE(m_Dmax, 0.0, 1.0)) throw MaterialError("Dmax must be in the range [0,1]");
 }
 
 //-----------------------------------------------------------------------------
@@ -157,8 +128,8 @@ double FEDamageCDFWeibull::Damage(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageCDFStep, FEDamageCDF)
-    ADD_PARAMETER(m_mu, FE_PARAM_DOUBLE, "mu");
-    ADD_PARAMETER(m_Dmax, FE_PARAM_DOUBLE, "Dmax");
+    ADD_PARAMETER2(m_mu  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
+    ADD_PARAMETER2(m_Dmax, FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -166,15 +137,6 @@ END_PARAMETER_LIST();
 FEDamageCDFStep::FEDamageCDFStep(FEModel* pfem) : FEDamageCDF(pfem)
 {
     m_mu = m_Dmax = 1;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization.
-void FEDamageCDFStep::Init()
-{
-	FEDamageCDF::Init();
-	if (m_mu < 0) throw MaterialError("mu must be >= 0");
- 	if (!INRANGE(m_Dmax, 0.0, 1.0)) throw MaterialError("Dmax must be in the range [0,1]");
 }
 
 //-----------------------------------------------------------------------------
@@ -197,9 +159,9 @@ double FEDamageCDFStep::Damage(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageCDFPQP, FEDamageCDF)
-    ADD_PARAMETER(m_mumin, FE_PARAM_DOUBLE, "mumin");
-    ADD_PARAMETER(m_mumax, FE_PARAM_DOUBLE, "mumax");
-    ADD_PARAMETER(m_Dmax, FE_PARAM_DOUBLE, "Dmax");
+    ADD_PARAMETER2(m_mumin, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mumin");
+    ADD_PARAMETER(m_mumax , FE_PARAM_DOUBLE, "mumax");
+    ADD_PARAMETER2(m_Dmax , FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -216,9 +178,7 @@ FEDamageCDFPQP::FEDamageCDFPQP(FEModel* pfem) : FEDamageCDF(pfem)
 void FEDamageCDFPQP::Init()
 {
 	FEDamageCDF::Init();
-	if (m_mumin < 0) throw MaterialError("mumin must be >= 0");
 	if (m_mumax <= m_mumin) throw MaterialError("mumax must be > mumin");
- 	if (!INRANGE(m_Dmax, 0.0, 1.0)) throw MaterialError("Dmax must be in the range [0,1]");
 }
 
 //-----------------------------------------------------------------------------

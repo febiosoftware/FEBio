@@ -3,7 +3,7 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESolubConst, FESoluteSolubility)
-	ADD_PARAMETER(m_solub, FE_PARAM_DOUBLE, "solub");
+	ADD_PARAMETER2(m_solub, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "solub");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -11,14 +11,6 @@ END_PARAMETER_LIST();
 FESolubConst::FESolubConst(FEModel* pfem) : FESoluteSolubility(pfem)
 {
 	m_solub = 1;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization. 
-void FESolubConst::Init()
-{
-	FESoluteSolubility::Init();
-	if (m_solub < 0) throw MaterialError("solub must be >= 0");
 }
 
 //-----------------------------------------------------------------------------

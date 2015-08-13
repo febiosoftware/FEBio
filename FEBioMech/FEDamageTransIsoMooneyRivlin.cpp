@@ -3,10 +3,10 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageTransIsoMooneyRivlin, FEUncoupledMaterial)
-	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");
+	ADD_PARAMETER2(m_c1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c1");
 	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
 	ADD_PARAMETER(m_c3, FE_PARAM_DOUBLE, "c3");
-	ADD_PARAMETER(m_c4, FE_PARAM_DOUBLE, "c4");
+	ADD_PARAMETER2(m_c4, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c4");
 	ADD_PARAMETER(m_Mbeta, FE_PARAM_DOUBLE, "Mbeta");
 	ADD_PARAMETER(m_Msmin, FE_PARAM_DOUBLE, "Msmin");
 	ADD_PARAMETER(m_Msmax, FE_PARAM_DOUBLE, "Msmax");
@@ -19,13 +19,6 @@ END_PARAMETER_LIST();
 FEDamageTransIsoMooneyRivlin::FEDamageTransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
 
-}
-
-//-----------------------------------------------------------------------------
-void FEDamageTransIsoMooneyRivlin::Init()
-{
-	FEUncoupledMaterial::Init();
-	if (m_c4 <= 0) throw MaterialError("c4 must be > 0");
 }
 
 //-----------------------------------------------------------------------------

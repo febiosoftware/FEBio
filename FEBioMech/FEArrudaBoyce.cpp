@@ -9,20 +9,9 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEArrudaBoyce, FEUncoupledMaterial)
-	ADD_PARAMETER(m_mu, FE_PARAM_DOUBLE, "mu");
-	ADD_PARAMETER(m_N, FE_PARAM_DOUBLE, "N");
+	ADD_PARAMETER2(m_mu, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "mu");
+	ADD_PARAMETER2(m_N , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "N" );
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-//! Material initialization
-void FEArrudaBoyce::Init()
-{
-	FEUncoupledMaterial::Init();
-
-	// Check the value for N is >0
-	if (m_mu <= 0.0) throw MaterialError("Invalid value for mu");
-	if (m_N <= 0.0) throw MaterialError("Invalid value for N");
-}
 
 //-----------------------------------------------------------------------------
 mat3ds FEArrudaBoyce::DevStress(FEMaterialPoint& mp)

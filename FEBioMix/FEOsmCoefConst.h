@@ -19,9 +19,6 @@ public:
 	//! Tangent of osmotic coefficient with respect to concentration
 	double Tangent_OsmoticCoefficient_Concentration(FEMaterialPoint& mp, const int isol);
 	
-	//! data initialization and checking
-	void Init();
-	
 public:
 	double	m_osmcoef;			//!< osmotic coefficient
 	

@@ -4,20 +4,10 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FECoupledMooneyRivlin, FEElasticMaterial)
-	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");
+	ADD_PARAMETER2(m_c1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c1");
 	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
-	ADD_PARAMETER(m_K , FE_PARAM_DOUBLE, "k" );
+	ADD_PARAMETER2(m_K , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "k" );
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-//! data initialization
-void FECoupledMooneyRivlin::Init()
-{
-	FEElasticMaterial::Init();
-
-	if (m_c1 <= 0.0) throw MaterialError("c1 must be positive");
-	if (m_K  <= 0.0) throw MaterialError("k must be positive" );
-}
 
 //-----------------------------------------------------------------------------
 //! calculate stress at material point

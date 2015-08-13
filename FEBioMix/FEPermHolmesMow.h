@@ -17,9 +17,6 @@ public:
 	//! Tangent of permeability
 	tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp);
 		
-	//! data initialization and checking
-	void Init();
-		
 public:
 	double	m_perm;			//!< permeability
 	double	m_M;			//!< nonlinear exponential coefficient

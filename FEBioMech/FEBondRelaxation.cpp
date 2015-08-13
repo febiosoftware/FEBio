@@ -20,7 +20,7 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEBondRelaxationExponential, FEBondRelaxation)
-    ADD_PARAMETER(m_tau, FE_PARAM_DOUBLE, "tau");
+    ADD_PARAMETER2(m_tau, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "tau");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -28,15 +28,6 @@ END_PARAMETER_LIST();
 FEBondRelaxationExponential::FEBondRelaxationExponential(FEModel* pfem) : FEBondRelaxation(pfem)
 {
     m_tau = 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization.
-void FEBondRelaxationExponential::Init()
-{
-    FEBondRelaxation::Init();
-    
-    if (m_tau <= 0) throw MaterialError("tau must be > 0");
 }
 
 //-----------------------------------------------------------------------------
@@ -57,9 +48,9 @@ double FEBondRelaxationExponential::Relaxation(FEMaterialPoint& mp, const double
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEBondRelaxationExpDistortion, FEBondRelaxation)
-    ADD_PARAMETER(m_tau0, FE_PARAM_DOUBLE, "tau0");
-    ADD_PARAMETER(m_tau1, FE_PARAM_DOUBLE, "tau1");
-    ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
+    ADD_PARAMETER2(m_tau0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "tau0" );
+    ADD_PARAMETER2(m_tau1 , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "tau1" );
+    ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -69,17 +60,6 @@ FEBondRelaxationExpDistortion::FEBondRelaxationExpDistortion(FEModel* pfem) : FE
     m_tau0 = 0;
     m_tau1 = 0;
     m_alpha = 1;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization.
-void FEBondRelaxationExpDistortion::Init()
-{
-    FEBondRelaxation::Init();
-    
-    if (m_tau0 <= 0) throw MaterialError("tau0 must be > 0");
-    if (m_tau1 < 0) throw MaterialError("tau1 must be >= 0");
-    if (m_alpha <= 0) throw MaterialError("alpha must be > 0");
 }
 
 //-----------------------------------------------------------------------------
@@ -115,8 +95,8 @@ double FEBondRelaxationExpDistortion::Relaxation(FEMaterialPoint& mp, const doub
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEBondRelaxationFung, FEBondRelaxation)
-    ADD_PARAMETER(m_tau1, FE_PARAM_DOUBLE, "tau1");
-    ADD_PARAMETER(m_tau2, FE_PARAM_DOUBLE, "tau2");
+    ADD_PARAMETER2(m_tau1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "tau1");
+    ADD_PARAMETER2(m_tau2, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "tau2");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -130,8 +110,6 @@ FEBondRelaxationFung::FEBondRelaxationFung(FEModel* pfem) : FEBondRelaxation(pfe
 void FEBondRelaxationFung::Init()
 {
     FEBondRelaxation::Init();
-    
-    if (m_tau1 <= 0) throw MaterialError("tau1 must be > 0");
     if (m_tau2 <= m_tau1) throw MaterialError("tau2 must be > tau1");
 }
 
@@ -162,24 +140,14 @@ double FEBondRelaxationFung::Relaxation(FEMaterialPoint& mp, const double t)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEBondRelaxationPark, FEBondRelaxation)
-    ADD_PARAMETER(m_tau, FE_PARAM_DOUBLE, "tau");
-    ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
+    ADD_PARAMETER2(m_tau , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "tau");
+    ADD_PARAMETER2(m_beta, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "beta");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FEBondRelaxationPark::FEBondRelaxationPark(FEModel* pfem) : FEBondRelaxation(pfem)
 {
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization.
-void FEBondRelaxationPark::Init()
-{
-    FEBondRelaxation::Init();
-    
-    if (m_tau <= 0) throw MaterialError("tau must be > 0");
-    if (m_beta <= 0) throw MaterialError("beta must be > 0");
 }
 
 //-----------------------------------------------------------------------------
@@ -199,11 +167,11 @@ double FEBondRelaxationPark::Relaxation(FEMaterialPoint& mp, const double t)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEBondRelaxationParkDistortion, FEBondRelaxation)
-    ADD_PARAMETER(m_tau0, FE_PARAM_DOUBLE, "tau0");
-    ADD_PARAMETER(m_tau1, FE_PARAM_DOUBLE, "tau1");
-    ADD_PARAMETER(m_beta0, FE_PARAM_DOUBLE, "beta0");
-    ADD_PARAMETER(m_beta1, FE_PARAM_DOUBLE, "beta1");
-    ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
+    ADD_PARAMETER2(m_tau0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "tau0" );
+    ADD_PARAMETER2(m_tau1 , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "tau1" );
+    ADD_PARAMETER2(m_beta0, FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "beta0");
+    ADD_PARAMETER2(m_beta1, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "beta1");
+    ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -215,19 +183,6 @@ FEBondRelaxationParkDistortion::FEBondRelaxationParkDistortion(FEModel* pfem) : 
     m_tau1 = 0;
     m_beta1 = 0;
     m_alpha = 1;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization.
-void FEBondRelaxationParkDistortion::Init()
-{
-    FEBondRelaxation::Init();
-    
-    if (m_tau0 <= 0) throw MaterialError("tau0 must be > 0");
-    if (m_beta0 <= 0) throw MaterialError("beta0 must be > 0");
-    if (m_tau1 < 0) throw MaterialError("tau1 must be >= 0");
-    if (m_beta1 < 0) throw MaterialError("beta1 must be >= 0");
-    if (m_alpha < 0) throw MaterialError("alpha must be > 0");
 }
 
 //-----------------------------------------------------------------------------
@@ -265,24 +220,14 @@ double FEBondRelaxationParkDistortion::Relaxation(FEMaterialPoint& mp, const dou
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEBondRelaxationPower, FEBondRelaxation)
-    ADD_PARAMETER(m_tau, FE_PARAM_DOUBLE, "tau");
-    ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
+    ADD_PARAMETER2(m_tau , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "tau");
+    ADD_PARAMETER2(m_beta, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "beta");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FEBondRelaxationPower::FEBondRelaxationPower(FEModel* pfem) : FEBondRelaxation(pfem)
 {
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization.
-void FEBondRelaxationPower::Init()
-{
-    FEBondRelaxation::Init();
-    
-    if (m_tau <= 0) throw MaterialError("tau must be > 0");
-    if (m_beta <= 0) throw MaterialError("beta must be > 0");
 }
 
 //-----------------------------------------------------------------------------
@@ -302,11 +247,11 @@ double FEBondRelaxationPower::Relaxation(FEMaterialPoint& mp, const double t)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEBondRelaxationPowerDistortion, FEBondRelaxation)
-    ADD_PARAMETER(m_tau0, FE_PARAM_DOUBLE, "tau0");
-    ADD_PARAMETER(m_tau1, FE_PARAM_DOUBLE, "tau1");
-    ADD_PARAMETER(m_beta0, FE_PARAM_DOUBLE, "beta0");
-    ADD_PARAMETER(m_beta1, FE_PARAM_DOUBLE, "beta1");
-    ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
+    ADD_PARAMETER2(m_tau0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "tau0");
+    ADD_PARAMETER2(m_tau1 , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "tau1");
+    ADD_PARAMETER2(m_beta0, FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "beta0");
+    ADD_PARAMETER2(m_beta1, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "beta1");
+    ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -315,19 +260,6 @@ FEBondRelaxationPowerDistortion::FEBondRelaxationPowerDistortion(FEModel* pfem) 
 {
     m_tau1 = 0;
     m_alpha = 1;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization.
-void FEBondRelaxationPowerDistortion::Init()
-{
-    FEBondRelaxation::Init();
-    
-    if (m_tau0 <= 0) throw MaterialError("tau0 must be > 0");
-    if (m_beta0 <= 0) throw MaterialError("beta0 must be > 0");
-    if (m_tau1 < 0) throw MaterialError("tau1 must be >= 0");
-    if (m_beta1 < 0) throw MaterialError("beta0 must be >= 0");
-    if (m_alpha < 0) throw MaterialError("alpha must be >= 0");
 }
 
 //-----------------------------------------------------------------------------

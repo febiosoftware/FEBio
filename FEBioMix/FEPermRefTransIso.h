@@ -19,9 +19,6 @@ class FEPermRefTransIso :	public FEHydraulicPermeability
 		//! Tangent of permeability
 		tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp);
 		
-		//! data initialization and checking
-		void Init();
-		
 	public:
 		double	m_perm0;		//!< permeability for I term
 		double	m_perm1T;		//!< transverse permeability for b term

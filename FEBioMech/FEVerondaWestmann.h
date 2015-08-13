@@ -33,9 +33,6 @@ public:
 	//! calculate strain energy density at material point
 	double DevStrainEnergyDensity(FEMaterialPoint& pt);
     
-	//! initialize
-	void Init();
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

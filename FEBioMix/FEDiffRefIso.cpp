@@ -2,12 +2,12 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDiffRefIso, FESoluteDiffusivity)
-	ADD_PARAMETER(m_free_diff, FE_PARAM_DOUBLE, "free_diff");
-	ADD_PARAMETER(m_diff0    , FE_PARAM_DOUBLE, "diff0"    );
-	ADD_PARAMETER(m_diff1    , FE_PARAM_DOUBLE, "diff1"    );
-	ADD_PARAMETER(m_diff2    , FE_PARAM_DOUBLE, "diff2"    );
-	ADD_PARAMETER(m_M        , FE_PARAM_DOUBLE, "M"        );
-	ADD_PARAMETER(m_alpha    , FE_PARAM_DOUBLE, "alpha"    );
+	ADD_PARAMETER2(m_free_diff, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "free_diff");
+	ADD_PARAMETER2(m_diff0    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "diff0"    );
+	ADD_PARAMETER2(m_diff1    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "diff1"    );
+	ADD_PARAMETER2(m_diff2    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "diff2"    );
+	ADD_PARAMETER2(m_M        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "M"        );
+	ADD_PARAMETER2(m_alpha    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha"    );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -19,20 +19,6 @@ FEDiffRefIso::FEDiffRefIso(FEModel* pfem) : FESoluteDiffusivity(pfem)
 	m_diff1 = 0;
 	m_diff2 = 0;
 	m_M = m_alpha = 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization. 
-void FEDiffRefIso::Init()
-{
-	FESoluteDiffusivity::Init();
-
-	if (m_free_diff < 0) throw MaterialError("free_diff must be >= 0");
-	if (m_diff0 < 0) throw MaterialError("diff0 must be >= 0");
-	if (m_diff1 < 0) throw MaterialError("diff1 must be >= 0");
-	if (m_diff2 < 0) throw MaterialError("diff2 must be >= 0");
-	if (m_M < 0) throw MaterialError("M must be >= 0");
-	if (m_alpha < 0) throw MaterialError("alpha must be >= 0");
 }
 
 //-----------------------------------------------------------------------------

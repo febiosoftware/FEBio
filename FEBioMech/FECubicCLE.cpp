@@ -10,10 +10,10 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FECubicCLE, FEElasticMaterial)
-ADD_PARAMETER(m_lp1, FE_PARAM_DOUBLE, "lp1");
-ADD_PARAMETER(m_lm1, FE_PARAM_DOUBLE, "lm1");
-ADD_PARAMETER(m_l2, FE_PARAM_DOUBLE, "l2");
-ADD_PARAMETER(m_mu, FE_PARAM_DOUBLE, "mu");
+	ADD_PARAMETER(m_lp1, FE_PARAM_DOUBLE, "lp1");
+	ADD_PARAMETER(m_lm1, FE_PARAM_DOUBLE, "lm1");
+	ADD_PARAMETER(m_l2 , FE_PARAM_DOUBLE, "l2");
+	ADD_PARAMETER2(m_mu , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -21,10 +21,8 @@ END_PARAMETER_LIST();
 void FECubicCLE::Init()
 {
     FEElasticMaterial::Init();
-    
-    if (m_mu < 0) throw MaterialError("mu should be positive");
-    
-    // Evaluate Lame coefficients
+
+	// Evaluate Lame coefficients
     double	lam[3][3];
     double	mu[3];
     mu[0] = m_mu;

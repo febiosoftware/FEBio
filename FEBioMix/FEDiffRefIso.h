@@ -29,9 +29,6 @@ public:
 	//! Tangent of diffusivity with respect to concentration
 	mat3ds Tangent_Diffusivity_Concentration(FEMaterialPoint& mp, const int isol=0);
 	
-	//! data initialization and checking
-	void Init();
-	
 public:
 	double	m_free_diff;	//!< free diffusivity
 	double	m_diff0;		//!< diffusivity for I term

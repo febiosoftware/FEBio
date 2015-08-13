@@ -9,9 +9,9 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESupplyBinding, FESoluteSupply)
-	ADD_PARAMETER(m_kf, FE_PARAM_DOUBLE, "kf");
-	ADD_PARAMETER(m_kr, FE_PARAM_DOUBLE, "kr");
-	ADD_PARAMETER(m_crt, FE_PARAM_DOUBLE, "Rtot");
+	ADD_PARAMETER2(m_kf , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "kf");
+	ADD_PARAMETER2(m_kr , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "kr");
+	ADD_PARAMETER2(m_crt, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Rtot");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -19,17 +19,6 @@ END_PARAMETER_LIST();
 FESupplyBinding::FESupplyBinding(FEModel* pfem) : FESoluteSupply(pfem)
 {
 	m_kf = m_kr = m_crt = 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization. 
-void FESupplyBinding::Init()
-{
-	FESoluteSupply::Init();
-
-	if (m_kf <= 0) throw MaterialError("kf must be > 0");
-	if (m_kr < 0) throw MaterialError("kr must be >= 0");
-	if (m_crt < 0) throw MaterialError("Rtot must be >= 0");
 }
 
 //-----------------------------------------------------------------------------

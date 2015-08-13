@@ -15,9 +15,6 @@ public:
 	//! constructor
 	FEReactionRateHuiskes(FEModel* pfem) : FEReactionRate(pfem) { m_B = m_psi0 = 0; }
 	
-	//! data initialization and checking
-	void Init();
-	
 	//! reaction rate at material point
 	double ReactionRate(FEMaterialPoint& pt);
 	

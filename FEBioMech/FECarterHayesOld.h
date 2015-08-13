@@ -17,9 +17,6 @@ public:
 	double	m_v;	//!< prescribed Poisson's ratio
 
 public:
-	//! data initialization and checking
-	void Init();
-
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
 	

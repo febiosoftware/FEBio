@@ -3,9 +3,9 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPermRefOrtho, FEHydraulicPermeability)
-	ADD_PARAMETER(m_perm0, FE_PARAM_DOUBLE, "perm0");
-	ADD_PARAMETER(m_M0, FE_PARAM_DOUBLE, "M0");
-	ADD_PARAMETER(m_alpha0, FE_PARAM_DOUBLE, "alpha0");
+	ADD_PARAMETER2(m_perm0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm0");
+	ADD_PARAMETER2(m_M0    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "M0");
+	ADD_PARAMETER2(m_alpha0, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha0");
 	ADD_PARAMETERV(m_perm1, FE_PARAM_DOUBLEV, 3, "perm1");
 	ADD_PARAMETERV(m_perm2, FE_PARAM_DOUBLEV, 3, "perm2");
 	ADD_PARAMETERV(m_M, FE_PARAM_DOUBLEV, 3, "M");
@@ -30,18 +30,15 @@ void FEPermRefOrtho::Init()
 {
 	FEHydraulicPermeability::Init();
 
-	if (m_perm0 < 0) throw MaterialError("perm0 must be >= 0");
 	if (m_perm1[0] < 0) throw MaterialError("perm1 components must be >= 0");
 	if (m_perm1[1] < 0) throw MaterialError("perm1 components must be >= 0");
 	if (m_perm1[2] < 0) throw MaterialError("perm1 components must be >= 0");
 	if (m_perm2[0] < 0) throw MaterialError("perm2 components must be >= 0");
 	if (m_perm2[1] < 0) throw MaterialError("perm2 components must be >= 0");
 	if (m_perm2[2] < 0) throw MaterialError("perm2 components must be >= 0");
-	if (m_M0 < 0) throw MaterialError("M0 must be >= 0");
 	if (m_M[0] < 0) throw MaterialError("M components must be >= 0");
 	if (m_M[1] < 0) throw MaterialError("M components must be >= 0");
 	if (m_M[2] < 0) throw MaterialError("M components must be >= 0");
-	if (m_alpha0 < 0) throw MaterialError("alpha0 must be >= 0");
 	if (m_alpha[0] < 0) throw MaterialError("alpha components must be >= 0");
 	if (m_alpha[1] < 0) throw MaterialError("alpha components must be >= 0");
 	if (m_alpha[2] < 0) throw MaterialError("alpha components must be >= 0");

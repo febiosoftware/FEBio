@@ -10,9 +10,6 @@ public:
 	FECoupledVerondaWestmann(FEModel* pfem) : FEElasticMaterial(pfem){}
 
 public:
-	//! data initialization
-	void Init();
-
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
 

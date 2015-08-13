@@ -48,9 +48,6 @@ public:
 	//! constructor
 	FEMultiphasicMultigeneration(FEModel* pfem);
     
-	//! initialization
-	void Init();
-    
     //! returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData();
 	

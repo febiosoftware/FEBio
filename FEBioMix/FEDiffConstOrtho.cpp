@@ -2,8 +2,8 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDiffConstOrtho, FESoluteDiffusivity)
-ADD_PARAMETER(m_free_diff, FE_PARAM_DOUBLE, "free_diff");
-ADD_PARAMETERV(m_diff , FE_PARAM_DOUBLEV, 3, "diff" );
+	ADD_PARAMETER2(m_free_diff, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "free_diff");
+	ADD_PARAMETERV(m_diff , FE_PARAM_DOUBLEV, 3, "diff" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -19,7 +19,6 @@ void FEDiffConstOrtho::Init()
 {
 	FESoluteDiffusivity::Init();
 
-	if (m_free_diff <= 0) throw MaterialError("free_diff must be > 0");
 	if (m_diff[0] < 0) throw MaterialError("diff1 must be >= 0");
 	if (m_diff[1] < 0) throw MaterialError("diff2 must be >= 0");
 	if (m_diff[2] < 0) throw MaterialError("diff3 must be >= 0");

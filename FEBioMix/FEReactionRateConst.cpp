@@ -9,16 +9,7 @@
 
 #include "FEReactionRateConst.h"
 
-// Material parameters for the FEMultiphasic material
+// Material parameters for the FEReactionRateConst material
 BEGIN_PARAMETER_LIST(FEReactionRateConst, FEMaterial)
-	ADD_PARAMETER(m_k, FE_PARAM_DOUBLE, "k");
+	ADD_PARAMETER2(m_k, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-void FEReactionRateConst::Init()
-{
-	FEMaterial::Init();
-
-	if (m_k < 0) throw MaterialError("reaction rate constant must be positive");
-	
-}

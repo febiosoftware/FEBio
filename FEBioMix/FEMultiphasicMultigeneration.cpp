@@ -10,7 +10,7 @@
 
 // Material parameters for the FEMultiphasicMultigeneration material
 BEGIN_PARAMETER_LIST(FEMultiphasicMultigeneration, FEMultiphasic)
-    ADD_PARAMETER(m_gtime   , FE_PARAM_DOUBLE, "gen_time");
+    ADD_PARAMETER2(m_gtime   , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "gen_time");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -18,15 +18,6 @@ END_PARAMETER_LIST();
 FEMultiphasicMultigeneration::FEMultiphasicMultigeneration(FEModel* pfem) : FEMultiphasic(pfem)
 {
     m_gtime = 0;
-}
-
-//-----------------------------------------------------------------------------
-void FEMultiphasicMultigeneration::Init()
-{
-	FEMultiphasic::Init();
-    
-    if (m_gtime <= 0) throw MaterialError("gen_time must be > 0");
-
 }
 
 //-----------------------------------------------------------------------------

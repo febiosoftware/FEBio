@@ -3,10 +3,10 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEVonMisesPlasticity, FEElasticMaterial)
-	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
-	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
-	ADD_PARAMETER(m_Y, FE_PARAM_DOUBLE, "Y");
-	ADD_PARAMETER(m_H, FE_PARAM_DOUBLE, "H");
+	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
+	ADD_PARAMETER2(m_Y, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "Y");
+	ADD_PARAMETER2(m_H, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "H");
 END_PARAMETER_LIST();
 
 
@@ -21,10 +21,6 @@ FEVonMisesPlasticity::FEVonMisesPlasticity(FEModel* pfem) : FEElasticMaterial(pf
 void FEVonMisesPlasticity::Init()
 {
 	FEElasticMaterial::Init();
-	if (m_E <= 0) throw MaterialError("E must be postive number");
-	if ((m_v < -1)||(m_v >= 0.5)) throw MaterialError("v must be in the range [-1, 0.5]");
-	if (m_Y <= 0) throw MaterialError("Y must be postitive number");
-	if (m_H <  0) throw MaterialError("H must be postitive number");
 
 	m_K = m_E/(3.0*(1.0 - 2*m_v));
 	m_G = m_E/(2.0*(1.0 +   m_v));

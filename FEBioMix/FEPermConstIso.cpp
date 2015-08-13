@@ -2,7 +2,7 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPermConstIso, FEHydraulicPermeability)
-	ADD_PARAMETER(m_perm, FE_PARAM_DOUBLE, "perm");
+	ADD_PARAMETER2(m_perm, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -10,14 +10,6 @@ END_PARAMETER_LIST();
 FEPermConstIso::FEPermConstIso(FEModel* pfem) : FEHydraulicPermeability(pfem)
 {
 	m_perm = 1;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization. 
-void FEPermConstIso::Init()
-{
-	FEHydraulicPermeability::Init();
-	if (m_perm < 0) throw MaterialError("perm must be >= 0");
 }
 
 //-----------------------------------------------------------------------------

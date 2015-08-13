@@ -7,9 +7,6 @@ public:
 	//! constructor
 	FEThermoNeoHookean(FEModel* pfem);
 
-	// initialization
-	void Init();
-
 public:
 	//! Cauchy stress
 	mat3ds Stress(FEMaterialPoint& mp);

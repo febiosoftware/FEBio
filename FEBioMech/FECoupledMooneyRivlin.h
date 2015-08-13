@@ -23,8 +23,5 @@ public:
 	//! calculate strain energy density at material point
 	double StrainEnergyDensity(FEMaterialPoint& pt);
     
-	//! data initialization
-	void Init();
-
 	DECLARE_PARAMETER_LIST();
 };

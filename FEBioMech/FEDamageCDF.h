@@ -36,8 +36,6 @@ public:
 	//! damage
 	double Damage(FEMaterialPoint& pt);
     
-	void Init();
-    
 public:
 	double	m_alpha;			//!< parameter alpha
 	double	m_beta;             //!< parameter beta
@@ -57,8 +55,6 @@ public:
     
 	//! damage
 	double Damage(FEMaterialPoint& pt);
-    
-	void Init();
     
 public:
 	double	m_mu;               //!< mean on log scale
@@ -81,8 +77,6 @@ public:
 	//! damage
 	double Damage(FEMaterialPoint& pt);
     
-	void Init();
-    
 public:
 	double	m_alpha;            //!< exponent alpha
 	double	m_mu;               //!< mean mu
@@ -103,8 +97,6 @@ public:
     
 	//! damage
 	double Damage(FEMaterialPoint& pt);
-    
-	void Init();
     
 public:
 	double	m_mu;               //!< threshold mu

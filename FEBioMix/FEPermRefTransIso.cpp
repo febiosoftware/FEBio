@@ -3,17 +3,17 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPermRefTransIso, FEHydraulicPermeability)
-	ADD_PARAMETER(m_perm0, FE_PARAM_DOUBLE, "perm0");
-	ADD_PARAMETER(m_perm1T, FE_PARAM_DOUBLE, "perm1T");
-	ADD_PARAMETER(m_perm1A, FE_PARAM_DOUBLE, "perm1A");
-	ADD_PARAMETER(m_perm2T, FE_PARAM_DOUBLE, "perm2T");
-	ADD_PARAMETER(m_perm2A, FE_PARAM_DOUBLE, "perm2A");
-	ADD_PARAMETER(m_M0, FE_PARAM_DOUBLE, "M0");
-	ADD_PARAMETER(m_MT, FE_PARAM_DOUBLE, "MT");
-	ADD_PARAMETER(m_MA, FE_PARAM_DOUBLE, "MA");
-	ADD_PARAMETER(m_alpha0, FE_PARAM_DOUBLE, "alpha0");
-	ADD_PARAMETER(m_alphaT, FE_PARAM_DOUBLE, "alphaT");
-	ADD_PARAMETER(m_alphaA, FE_PARAM_DOUBLE, "alphaA");
+	ADD_PARAMETER2(m_perm0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm0");
+	ADD_PARAMETER2(m_perm1T, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm1T");
+	ADD_PARAMETER2(m_perm1A, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm1A");
+	ADD_PARAMETER2(m_perm2T, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm2T");
+	ADD_PARAMETER2(m_perm2A, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm2A");
+	ADD_PARAMETER2(m_M0    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "M0");
+	ADD_PARAMETER2(m_MT    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "MT");
+	ADD_PARAMETER2(m_MA    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "MA");
+	ADD_PARAMETER2(m_alpha0, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha0");
+	ADD_PARAMETER2(m_alphaT, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alphaT");
+	ADD_PARAMETER2(m_alphaA, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alphaA");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -25,25 +25,6 @@ FEPermRefTransIso::FEPermRefTransIso(FEModel* pfem) : FEHydraulicPermeability(pf
 	m_perm2T = m_perm2A = 0;
 	m_M0 = m_MT = m_MA = 0;
 	m_alpha0 = m_alphaT = m_alphaA = 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization. 
-void FEPermRefTransIso::Init()
-{
-	FEHydraulicPermeability::Init();
-
-	if (m_perm0 < 0) throw MaterialError("perm0 must be >= 0");
-	if (m_perm1T < 0) throw MaterialError("perm1T must be >= 0");
-	if (m_perm1A < 0) throw MaterialError("perm1A must be >= 0");
-	if (m_perm2T < 0) throw MaterialError("perm2T must be >= 0");
-	if (m_perm2A < 0) throw MaterialError("perm2A must be >= 0");
-	if (m_M0 < 0) throw MaterialError("M0 must be >= 0");
-	if (m_MT < 0) throw MaterialError("MT must be >= 0");
-	if (m_MA < 0) throw MaterialError("MA must be >= 0");
-	if (m_alpha0 < 0) throw MaterialError("alpha0 must be >= 0");
-	if (m_alphaT < 0) throw MaterialError("alphaT must be >= 0");
-	if (m_alphaA < 0) throw MaterialError("alphaA must be >= 0");
 }
 
 //-----------------------------------------------------------------------------

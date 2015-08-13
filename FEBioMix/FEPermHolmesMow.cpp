@@ -2,9 +2,9 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPermHolmesMow, FEHydraulicPermeability)
-	ADD_PARAMETER(m_perm, FE_PARAM_DOUBLE, "perm");
-	ADD_PARAMETER(m_M, FE_PARAM_DOUBLE, "M");
-	ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
+	ADD_PARAMETER2(m_perm , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm" );
+	ADD_PARAMETER2(m_M    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "M"    );
+	ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -13,17 +13,6 @@ FEPermHolmesMow::FEPermHolmesMow(FEModel* pfem) : FEHydraulicPermeability(pfem)
 {
 	m_perm = 1;
 	m_M = m_alpha = 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization. 
-void FEPermHolmesMow::Init()
-{
-	FEHydraulicPermeability::Init();
-
-	if (m_perm < 0) throw MaterialError("perm must be >= 0");
-	if (m_M < 0) throw MaterialError("M must be >= 0");
-	if (m_alpha < 0) throw MaterialError("alpha must be >= 0");
 }
 
 //-----------------------------------------------------------------------------

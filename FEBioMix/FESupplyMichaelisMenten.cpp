@@ -14,8 +14,8 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESupplyMichaelisMenten, FESoluteSupply)
-ADD_PARAMETER(m_Vmax, FE_PARAM_DOUBLE, "Vmax");
-ADD_PARAMETER(m_Km, FE_PARAM_DOUBLE, "Km");
+	ADD_PARAMETER2(m_Vmax, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Vmax");
+	ADD_PARAMETER2(m_Km  , FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "Km"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -23,16 +23,6 @@ END_PARAMETER_LIST();
 FESupplyMichaelisMenten::FESupplyMichaelisMenten(FEModel* pfem) : FESoluteSupply(pfem)
 {
 	m_Vmax = m_Km = 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialization. 
-void FESupplyMichaelisMenten::Init()
-{
-	FESoluteSupply::Init();
-
-	if (m_Vmax < 0) throw MaterialError("Vmax must be >= 0");
-	if (m_Km <= 0) throw MaterialError("Km must be > 0");
 }
 
 //-----------------------------------------------------------------------------

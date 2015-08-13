@@ -3,12 +3,11 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageNeoHookean, FEElasticMaterial)
-	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
-	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
-	ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "a");
-	ADD_PARAMETER(m_beta , FE_PARAM_DOUBLE, "b");
+	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
+	ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "a");
+	ADD_PARAMETER2(m_beta , FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "b");
 END_PARAMETER_LIST();
-
 
 //-----------------------------------------------------------------------------
 // Constructor
@@ -26,11 +25,6 @@ FEDamageNeoHookean::FEDamageNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem)
 void FEDamageNeoHookean::Init()
 {
 	FEElasticMaterial::Init();
-
-	if (m_E <= 0) throw MaterialError("Invalid value for E");
-	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
-	if (!INRANGE(m_beta, 0.0, 1.0)) throw MaterialError("Invalid value for b: must be in range [0,1]");
-	if (m_alpha < 0) throw MaterialError("Invalid value of a: must be a non-negative number");
 
 	// calculate Lame parameters
 	m_lam = m_v*m_E/((1+m_v)*(1-2*m_v));

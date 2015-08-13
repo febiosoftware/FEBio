@@ -9,16 +9,17 @@
 #include "FEFiberPowLinearSBM.h"
 #include "FEMultiphasic.h"
 
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberPowLinearSBM, FEElasticMaterial)
-ADD_PARAMETER(m_E0   , FE_PARAM_DOUBLE, "E0"   );
-ADD_PARAMETER(m_lam0 , FE_PARAM_DOUBLE, "lam0" );
-ADD_PARAMETER(m_beta , FE_PARAM_DOUBLE, "beta" );
-ADD_PARAMETER(m_rho0 , FE_PARAM_DOUBLE, "rho0" );
-ADD_PARAMETER(m_g    , FE_PARAM_DOUBLE, "gamma");
-ADD_PARAMETER(m_sbm  , FE_PARAM_INT   , "sbm"  );
-ADD_PARAMETER(m_thd  , FE_PARAM_DOUBLE, "theta");
-ADD_PARAMETER(m_phd  , FE_PARAM_DOUBLE, "phi"  );
+	ADD_PARAMETER2(m_E0   , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "E0"   );
+	ADD_PARAMETER2(m_lam0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER         (1.0), "lam0" );
+	ADD_PARAMETER2(m_beta , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
+	ADD_PARAMETER2(m_rho0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0" );
+	ADD_PARAMETER2(m_g    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma");
+	ADD_PARAMETER(m_sbm  , FE_PARAM_INT   , "sbm"  );
+	ADD_PARAMETER(m_thd  , FE_PARAM_DOUBLE, "theta");
+	ADD_PARAMETER(m_phd  , FE_PARAM_DOUBLE, "phi"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -29,12 +30,6 @@ void FEFiberPowLinearSBM::Init()
 {
 	FEElasticMaterial::Init();
 
-    if (m_E0 < 0) throw MaterialError("E0 must be positive.");
-    if (m_lam0 <= 1) throw MaterialError("lam0 must be >1.");
-    if (m_beta <  2) throw MaterialError("beta must be >= 2.");
-    if (m_rho0 < 0) throw MaterialError("rho0 must be positive.");
-    if (m_g < 0) throw MaterialError("gamma must be positive.");
-    
     // get the parent material which must be a multiphasic material
     FEMultiphasic* pMP = dynamic_cast<FEMultiphasic*> (GetAncestor());
     if (pMP == 0) throw MaterialError("Parent material must be multiphasic");

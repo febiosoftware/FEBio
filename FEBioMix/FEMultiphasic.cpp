@@ -14,10 +14,10 @@ using namespace std;
 
 // Material parameters for the FEMultiphasic material
 BEGIN_PARAMETER_LIST(FEMultiphasic, FEMaterial)
-	ADD_PARAMETER(m_phi0   , FE_PARAM_DOUBLE, "phi0"                );
-	ADD_PARAMETER(m_rhoTw  , FE_PARAM_DOUBLE, "fluid_density"       );
-	ADD_PARAMETER(m_cFr    , FE_PARAM_DOUBLE, "fixed_charge_density");
-	ADD_PARAMETER(m_penalty, FE_PARAM_DOUBLE, "penalty"             );
+	ADD_PARAMETER2(m_phi0   , FE_PARAM_DOUBLE, FE_RANGE_CLOSED     (0.0, 1.0), "phi0"         );
+	ADD_PARAMETER2(m_rhoTw  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density");
+	ADD_PARAMETER2(m_penalty, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "penalty"      );
+	ADD_PARAMETER(m_cFr     , FE_PARAM_DOUBLE, "fixed_charge_density");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -368,11 +368,6 @@ void FEMultiphasic::Init()
 	// This also initializes all properties
 	FEMaterial::Init();
 
-	// parameter checking
-	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
-	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
-	if (m_penalty < 0) throw MaterialError("penalty must be positive");
-	
 	// Determine how to solve for the electric potential psi
 	int isol;
 	int zmin = 0, zmax = 0, z;

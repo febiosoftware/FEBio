@@ -37,9 +37,6 @@ public:
     //! relaxation
     double Relaxation(FEMaterialPoint& pt, const double t);
     
-    //! data initialization and checking
-    void Init();
-    
 public:
 	double	m_tau;      //!< relaxation time
     
@@ -59,9 +56,6 @@ public:
     
     //! relaxation
     double Relaxation(FEMaterialPoint& pt, const double t);
-    
-    //! data initialization and checking
-    void Init();
     
 public:
     double	m_tau0;     //!< relaxation time
@@ -107,9 +101,6 @@ public:
     //! relaxation
     double Relaxation(FEMaterialPoint& pt, const double t);
     
-    //! data initialization and checking
-    void Init();
-    
 public:
     double	m_tau;      //!< relaxation time
     double  m_beta;     //!< exponent
@@ -130,9 +121,6 @@ public:
     
     //! relaxation
     double Relaxation(FEMaterialPoint& pt, const double t);
-    
-    //! data initialization and checking
-    void Init();
     
 public:
     double	m_tau0;      //!< relaxation time
@@ -157,9 +145,6 @@ public:
     //! relaxation
     double Relaxation(FEMaterialPoint& pt, const double t);
     
-    //! data initialization and checking
-    void Init();
-    
 public:
     double	m_tau;      //!< relaxation time
     double  m_beta;     //!< exponent
@@ -180,9 +165,6 @@ public:
     
     //! relaxation
     double Relaxation(FEMaterialPoint& pt, const double t);
-    
-    //! data initialization and checking
-    void Init();
     
 public:
     double	m_tau0;      //!< relaxation time at zero strain

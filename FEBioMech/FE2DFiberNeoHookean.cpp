@@ -3,8 +3,8 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FE2DFiberNeoHookean, FEElasticMaterial)
-	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
-	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
+	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
 	ADD_PARAMETERV(m_a, FE_PARAM_DOUBLEV, 2, "a");
 	ADD_PARAMETER(m_ac, FE_PARAM_DOUBLE, "active_contraction");
 END_PARAMETER_LIST();
@@ -36,14 +36,6 @@ FE2DFiberNeoHookean::FE2DFiberNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem
 
 	m_ac = 0;
 	m_a[0] = m_a[1] = 0;
-}
-
-void FE2DFiberNeoHookean::Init()
-{
-	FEElasticMaterial::Init();
-
-	if (m_E <= 0) throw MaterialError("Invalid value for E");
-	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
 }
 
 mat3ds FE2DFiberNeoHookean::Stress(FEMaterialPoint& mp)

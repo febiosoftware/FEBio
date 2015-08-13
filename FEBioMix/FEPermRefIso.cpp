@@ -3,11 +3,11 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPermRefIso, FEHydraulicPermeability)
-	ADD_PARAMETER(m_perm0, FE_PARAM_DOUBLE, "perm0");
-	ADD_PARAMETER(m_perm1, FE_PARAM_DOUBLE, "perm1");
-	ADD_PARAMETER(m_perm2, FE_PARAM_DOUBLE, "perm2");
-	ADD_PARAMETER(m_M, FE_PARAM_DOUBLE, "M");
-	ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
+	ADD_PARAMETER2(m_perm0, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm0");
+	ADD_PARAMETER2(m_perm1, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm1");
+	ADD_PARAMETER2(m_perm2, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm2");
+	ADD_PARAMETER2(m_M    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "M"    );
+	ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -25,13 +25,7 @@ FEPermRefIso::FEPermRefIso(FEModel* pfem) : FEHydraulicPermeability(pfem)
 void FEPermRefIso::Init()
 {
 	FEHydraulicPermeability::Init();
-
-	if (m_perm0 < 0) throw MaterialError("perm0 must be >= 0");
-	if (m_perm1 < 0) throw MaterialError("perm1 must be >= 0");
-	if (m_perm2 < 0) throw MaterialError("perm2 must be >= 0");
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 < phi0 <= 1");
-	if (m_M < 0) throw MaterialError("M must be >= 0");
-	if (m_alpha < 0) throw MaterialError("alpha must be >= 0");
 }
 
 //-----------------------------------------------------------------------------

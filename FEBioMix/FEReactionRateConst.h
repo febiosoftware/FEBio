@@ -15,9 +15,6 @@ public:
 	//! constructor
 	FEReactionRateConst(FEModel* pfem) : FEReactionRate(pfem) { m_k = 0; }
 	
-	//! data initialization and checking
-	void Init();
-	
 	//! reaction rate at material point
 	double ReactionRate(FEMaterialPoint& pt) { return m_k; }
 	

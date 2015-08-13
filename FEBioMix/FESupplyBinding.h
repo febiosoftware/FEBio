@@ -43,9 +43,6 @@ public:
 	//! referential solid volume fraction under steady-state conditions
 	double SolidConcentrationSS(FEMaterialPoint& pt);
 	
-	//! data initialization and checking
-	void Init();
-	
 public:
 	double	m_kf;			//!< forward reaction rate constant
 	double	m_kr;			//!< reverse reaction rate constant

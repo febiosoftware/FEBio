@@ -12,11 +12,12 @@
 #include "FEMultiphasic.h"
 #include "stdafx.h"
 
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDiffAlbroIso, FESoluteDiffusivity)
-ADD_PARAMETER(m_diff0, FE_PARAM_DOUBLE, "free_diff");
-ADD_PARAMETER(m_cdinv, FE_PARAM_DOUBLE, "cdinv");
-ADD_PARAMETER(m_alphad, FE_PARAM_DOUBLE, "alphad");
+	ADD_PARAMETER2(m_diff0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "free_diff");
+	ADD_PARAMETER2(m_cdinv , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "cdinv"    );
+	ADD_PARAMETER2(m_alphad, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alphad"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -33,10 +34,6 @@ FEDiffAlbroIso::FEDiffAlbroIso(FEModel* pfem) : FESoluteDiffusivity(pfem)
 void FEDiffAlbroIso::Init()
 {
 	FESoluteDiffusivity::Init();
-
-	if (m_diff0 < 0) throw MaterialError("free_diff must be >= 0");
-	if (m_cdinv < 0) throw MaterialError("cdinv must be >= 0");
-	if (m_alphad < 0) throw MaterialError("alphad must be >= 0");
 
 	// get the grandparent material which must be
     // a biphasic-solute/triphasic/multiphasic material

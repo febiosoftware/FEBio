@@ -3,10 +3,10 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEThermoNeoHookean, FEThermalElastic);
-	ADD_PARAMETER(m_mu   , FE_PARAM_DOUBLE, "G"    );
-	ADD_PARAMETER(m_k    , FE_PARAM_DOUBLE, "K"    );
-	ADD_PARAMETER(m_a0   , FE_PARAM_DOUBLE, "a0"   );
-	ADD_PARAMETER(m_gamma, FE_PARAM_DOUBLE, "gamma");
+	ADD_PARAMETER2(m_mu   , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "G"    );
+	ADD_PARAMETER2(m_k    , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "K"    );
+	ADD_PARAMETER2(m_gamma, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "gamma");
+	ADD_PARAMETER2(m_a0   , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "a0"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -14,15 +14,6 @@ END_PARAMETER_LIST();
 FEThermoNeoHookean::FEThermoNeoHookean(FEModel* pfem) : FEThermalElastic(pfem)
 {
 
-}
-
-//-----------------------------------------------------------------------------
-void FEThermoNeoHookean::Init()
-{
-	if (m_mu <= 0.0) throw MaterialError("G must be positive.");
-	if (m_k  <= 0.0) throw MaterialError("K must be positive.");
-	if (m_a0 <  0.0) throw MaterialError("a0 must be non-negative.");
-	if (m_gamma <= 0.0) throw MaterialError("gamma must be positive.");
 }
 
 //-----------------------------------------------------------------------------

@@ -13,10 +13,10 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FECarterHayes, FEElasticMaterial)
-	ADD_PARAMETER(m_E0, FE_PARAM_DOUBLE, "E0");
-	ADD_PARAMETER(m_rho0, FE_PARAM_DOUBLE, "rho0");
-	ADD_PARAMETER(m_g, FE_PARAM_DOUBLE, "gamma");
-	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
+	ADD_PARAMETER2(m_E0  , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0)         , "E0"   );
+	ADD_PARAMETER2(m_rho0, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0)         , "rho0" );
+	ADD_PARAMETER2(m_g   , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma");
+	ADD_PARAMETER2(m_v   , FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v"    );
 	ADD_PARAMETER(m_sbm, FE_PARAM_INT, "sbm");
 END_PARAMETER_LIST();
 
@@ -25,11 +25,6 @@ void FECarterHayes::Init()
 {
 	FEElasticMaterial::Init();
 	
-	if (m_E0 <= 0) throw MaterialError("E0 must be strictly positive");
-	if (m_rho0 <= 0) throw MaterialError("rho0 must be stricly positive");
-	if (m_g < 0) throw MaterialError("gamma must be positive");
-	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialRangeError("v", -1.0, 0.5, true, false);
-
 	// get the parent material which must be a multiphasic material
 	FEMultiphasic* pMP = dynamic_cast<FEMultiphasic*> (GetParent());
     if (pMP == 0) throw MaterialError("Parent material must be multiphasic");

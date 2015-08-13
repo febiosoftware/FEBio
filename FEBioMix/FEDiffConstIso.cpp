@@ -2,8 +2,8 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDiffConstIso, FESoluteDiffusivity)
-ADD_PARAMETER(m_free_diff, FE_PARAM_DOUBLE, "free_diff");
-ADD_PARAMETER(m_diff, FE_PARAM_DOUBLE, "diff");
+	ADD_PARAMETER2(m_free_diff, FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "free_diff");
+	ADD_PARAMETER2(m_diff     , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "diff"     );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -18,9 +18,6 @@ FEDiffConstIso::FEDiffConstIso(FEModel* pfem) : FESoluteDiffusivity(pfem)
 void FEDiffConstIso::Init()
 {
 	FESoluteDiffusivity::Init();
-
-	if (m_free_diff <= 0) throw MaterialError("free_diff must be > 0");
-	if (m_diff < 0) throw MaterialError("diff must be >= 0");
 	if (m_free_diff < m_diff) throw MaterialError("free_diff must be >= diff");
 }
 

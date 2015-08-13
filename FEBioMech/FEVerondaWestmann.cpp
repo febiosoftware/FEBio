@@ -8,18 +8,9 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEVerondaWestmann, FEUncoupledMaterial)
-	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");
-	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
+	ADD_PARAMETER2(m_c1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c1");
+	ADD_PARAMETER2(m_c2, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c2");
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-void FEVerondaWestmann::Init()
-{
-	FEUncoupledMaterial::Init();
-
-	if (m_c1 <= 0) throw MaterialError("c1 must be positive.");
-	if (m_c2 <= 0) throw MaterialError("c2 must be positive.");
-}
 
 //-----------------------------------------------------------------------------
 //! Calculate deviatoric stress

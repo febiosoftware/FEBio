@@ -30,14 +30,8 @@ double FEEllipsodialFiberDensityDistribution::FiberDensity(const vec3d n0)
 //-----------------------------------------------------------------------------
 // define the 3d von Mises fiber density distribution material parameters
 BEGIN_PARAMETER_LIST(FEVonMises3DFiberDensityDistribution, FEMaterial)
-	ADD_PARAMETER(m_b, FE_PARAM_DOUBLE, "b" );
+	ADD_PARAMETER2(m_b, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
 END_PARAMETER_LIST();
-
-void FEVonMises3DFiberDensityDistribution::Init()
-{
-	FEMaterial::Init();
-	if (m_b < 0) throw MaterialError("b must be positive.");
-}
 
 double FEVonMises3DFiberDensityDistribution::FiberDensity(const vec3d n0)
 {
@@ -50,16 +44,9 @@ double FEVonMises3DFiberDensityDistribution::FiberDensity(const vec3d n0)
 //-----------------------------------------------------------------------------
 // define the ellipsoidal fiber density distributionmaterial parameters
 BEGIN_PARAMETER_LIST(FEEllipticalFiberDensityDistribution, FEMaterial)
-	ADD_PARAMETER(m_spa[0], FE_PARAM_DOUBLE, "spa1" );
-	ADD_PARAMETER(m_spa[1], FE_PARAM_DOUBLE, "spa2" );
+	ADD_PARAMETER2(m_spa[0], FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "spa1" );
+	ADD_PARAMETER2(m_spa[1], FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "spa2" );
 END_PARAMETER_LIST();
-
-void FEEllipticalFiberDensityDistribution::Init()
-{
-	FEMaterial::Init();
-	if (m_spa[0] < 0) throw MaterialError("spa1 must be positive.");
-	if (m_spa[1] < 0) throw MaterialError("spa2 must be positive.");
-}
 
 double FEEllipticalFiberDensityDistribution::FiberDensity(const vec3d n0)
 {
@@ -72,14 +59,8 @@ double FEEllipticalFiberDensityDistribution::FiberDensity(const vec3d n0)
 //-----------------------------------------------------------------------------
 // define the 2d von Mises fiber density distribution material parameters
 BEGIN_PARAMETER_LIST(FEVonMises2DFiberDensityDistribution, FEMaterial)
-	ADD_PARAMETER(m_b, FE_PARAM_DOUBLE, "b" );
+	ADD_PARAMETER2(m_b, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
 END_PARAMETER_LIST();
-
-void FEVonMises2DFiberDensityDistribution::Init()
-{
-	FEMaterial::Init();
-	if (m_b < 0) throw MaterialError("b must be positive.");
-}
 
 double FEVonMises2DFiberDensityDistribution::FiberDensity(const vec3d n0)
 {
@@ -89,4 +70,3 @@ double FEVonMises2DFiberDensityDistribution::FiberDensity(const vec3d n0)
     double R = exp(m_b*(2*SQR(n0.x)-1));
     return R/m_IFD;
 }
-

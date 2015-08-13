@@ -33,9 +33,6 @@ public:
 	//! calculate deviatoric strain energy density
 	virtual double DevStrainEnergyDensity(FEMaterialPoint& mp);
     
-	//! data initialization
-	void Init();
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

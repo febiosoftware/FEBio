@@ -28,9 +28,6 @@ public:
 	//! Second derivative of solubility with respect to concentration
 	double Tangent_Solubility_Concentration_Concentration(FEMaterialPoint& mp, const int isol, const int jsol);
 
-	//! data initialization and checking
-	void Init();
-	
 public:
 	double	m_solub;			//!< solubility
 	

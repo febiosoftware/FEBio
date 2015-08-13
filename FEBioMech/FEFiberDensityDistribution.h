@@ -16,9 +16,6 @@ class FEFiberDensityDistribution : public FEMaterial
 public:
     FEFiberDensityDistribution(FEModel* pfem) : FEMaterial(pfem) { m_IFD = 1; }
     
-    // Initialization function
-    virtual void Init() = 0;
-    
     // Evaluation of fiber density along n0
     virtual double FiberDensity(const vec3d n0) = 0;
     
@@ -33,8 +30,6 @@ class FESphericalFiberDensityDistribution : public FEFiberDensityDistribution
 {
 public:
     FESphericalFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) {}
-    
-    void Init() {}
     
     double FiberDensity(const vec3d n0) { return 1.0/m_IFD; }  
 };
@@ -66,8 +61,6 @@ class FEVonMises3DFiberDensityDistribution : public FEFiberDensityDistribution
 public:
     FEVonMises3DFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) {}
     
-    void Init();
-    
     double FiberDensity(const vec3d n0);
     
 public:
@@ -98,8 +91,6 @@ class FEEllipticalFiberDensityDistribution : public FEFiberDensityDistribution
 public:
     FEEllipticalFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) {}
     
-    void Init();
-    
     double FiberDensity(const vec3d n0);
     
 public:
@@ -116,8 +107,6 @@ class FEVonMises2DFiberDensityDistribution : public FEFiberDensityDistribution
 {
 public:
     FEVonMises2DFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) {}
-    
-    void Init();
     
     double FiberDensity(const vec3d n0);
     

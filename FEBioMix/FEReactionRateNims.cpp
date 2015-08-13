@@ -11,13 +11,13 @@
 
 // Material parameters for the FEMultiphasic material
 BEGIN_PARAMETER_LIST(FEReactionRateNims, FEMaterial)
-ADD_PARAMETER(m_sol, FE_PARAM_INT, "sol");
-ADD_PARAMETER(m_k0, FE_PARAM_DOUBLE, "k0");
-ADD_PARAMETER(m_kc, FE_PARAM_DOUBLE, "kc");
-ADD_PARAMETER(m_kr, FE_PARAM_DOUBLE, "kr");
-ADD_PARAMETER(m_cc, FE_PARAM_DOUBLE, "cc");
-ADD_PARAMETER(m_cr, FE_PARAM_DOUBLE, "cr");
-ADD_PARAMETER(m_trel, FE_PARAM_DOUBLE, "trel");
+	ADD_PARAMETER(m_sol, FE_PARAM_INT, "sol");
+	ADD_PARAMETER(m_k0, FE_PARAM_DOUBLE, "k0");
+	ADD_PARAMETER(m_kc, FE_PARAM_DOUBLE, "kc");
+	ADD_PARAMETER(m_kr, FE_PARAM_DOUBLE, "kr");
+	ADD_PARAMETER2(m_cc  , FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "cc");
+	ADD_PARAMETER2(m_cr  , FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "cr");
+	ADD_PARAMETER2(m_trel, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "trel");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -25,10 +25,6 @@ void FEReactionRateNims::Init()
 {
 	FEMaterial::Init();
 	
-	if (m_cc <= 0) throw MaterialError("cc must be strictly positive");
-	if (m_cr <= 0) throw MaterialError("cr must be strictly positive");
-	if (m_trel < 0) throw MaterialError("trel must be positive");
-
     // do only once
     if (m_lid == -1) {
         // get number of DOFS

@@ -124,9 +124,6 @@ public:
     //! damage
     double Damage(FEMaterialPoint& pt);
     
-	//! data initialization
-	void Init();
-
 protected:
 	mat3ds MatrixStress(FEMaterialPoint& mp);
 	mat3ds FiberStress (FEMaterialPoint& mp);
