@@ -599,6 +599,36 @@ mat2d FESurface::Metric(FESurfaceElement& el, double r, double s)
 }
 
 //-----------------------------------------------------------------------------
+//! Calculates the metric tensor at an integration point
+//! \todo Perhaps I should place this function in the element class.
+
+mat2d FESurface::Metric(FESurfaceElement& el, int n)
+{
+    // nr of element nodes
+    int neln = el.Nodes();
+    
+    // element nodes
+    vec3d rt[FEElement::MAX_NODES];
+    for (int i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+    
+    // get the shape function derivatives at this integration point
+    double* Hr = el.Gr(n);
+    double* Hs = el.Gs(n);
+    
+    // get the tangent vectors
+    vec3d t1(0,0,0);
+    vec3d t2(0,0,0);
+    for (int k=0; k<neln; ++k)
+    {
+        t1 += rt[k]*Hr[k];
+        t2 += rt[k]*Hs[k];
+    }
+    
+    // calculate metric tensor
+    return mat2d(t1*t1, t1*t2, t2*t1, t2*t2);
+}
+
+//-----------------------------------------------------------------------------
 //! Given an element an the natural coordinates of a point in this element, this
 //! function returns the global position vector.
 vec3d FESurface::Local2Global(FESurfaceElement &el, double r, double s)
@@ -798,6 +828,18 @@ void FESurface::CoBaseVectors0(FESurfaceElement &el, double r, double s, vec3d t
 		t[0] += y[i]*H0[i];
 		t[1] += y[i]*H1[i];
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FESurface::ContraBaseVectors(FESurfaceElement& el, int j, vec3d t[2])
+{
+    vec3d e[2];
+    CoBaseVectors(el, j, e);
+    mat2d M = Metric(el, j);
+    mat2d Mi = M.inverse();
+    
+    t[0] = e[0]*Mi[0][0] + e[1]*Mi[0][1];
+    t[1] = e[0]*Mi[1][0] + e[1]*Mi[1][1];
 }
 
 //-----------------------------------------------------------------------------

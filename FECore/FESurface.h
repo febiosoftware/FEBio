@@ -78,9 +78,12 @@ public:
 	//! return the max element size
 	double MaxElementSize();
 
-	//! calculate the metric tensor in the reference configuration
+	//! calculate the metric tensor in the current configuration
 	mat2d Metric(FESurfaceElement& el, double r, double s);
 
+    //! calculate the metric tensor at an integration point
+    mat2d Metric(FESurfaceElement& el, int n);
+    
 	//! calculate the metric tensor in the reference configuration
 	mat2d Metric0(FESurfaceElement& el, double r, double s);
 
@@ -99,12 +102,15 @@ public:
 	//! calculates the covariant base vectors of a surface at an integration point
 	void CoBaseVectors(FESurfaceElement& el, int j, vec3d t[2]);
 
-	//! calculates the covariant base vectors of a surface at an integration point
+	//! calculates the covariant base vectors of a surface
 	void CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
 	//! calculates covariant base vectors of a surface
 	void CoBaseVectors0(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
+    //! calculates contravariant base vectors of a surface  at an integration point
+    void ContraBaseVectors(FESurfaceElement& el, int j, vec3d t[2]);
+    
 	//! calculates contravariant base vectors of a surface
 	void ContraBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
