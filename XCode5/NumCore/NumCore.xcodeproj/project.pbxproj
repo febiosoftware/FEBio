@@ -51,7 +51,6 @@
 		D5E10B281865E1B600B23922 /* LUSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LUSolver.h; sourceTree = "<group>"; };
 		D5E10B291865E1B600B23922 /* NumCore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NumCore.cpp; sourceTree = "<group>"; };
 		D5E10B2A1865E1B600B23922 /* NumCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NumCore.h; sourceTree = "<group>"; };
-		D5E10B2B1865E1B600B23922 /* numcore.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = numcore.mk; sourceTree = "<group>"; };
 		D5E10B2C1865E1B600B23922 /* PardisoSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PardisoSolver.cpp; sourceTree = "<group>"; };
 		D5E10B2D1865E1B600B23922 /* PardisoSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PardisoSolver.h; sourceTree = "<group>"; };
 		D5E10B2E1865E1B600B23922 /* PardisoSolverDL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PardisoSolverDL.cpp; sourceTree = "<group>"; };
@@ -114,7 +113,6 @@
 				D5E10B281865E1B600B23922 /* LUSolver.h */,
 				D5E10B291865E1B600B23922 /* NumCore.cpp */,
 				D5E10B2A1865E1B600B23922 /* NumCore.h */,
-				D5E10B2B1865E1B600B23922 /* numcore.mk */,
 				D5E10B2C1865E1B600B23922 /* PardisoSolver.cpp */,
 				D5E10B2D1865E1B600B23922 /* PardisoSolver.h */,
 				D5E10B2E1865E1B600B23922 /* PardisoSolverDL.cpp */,

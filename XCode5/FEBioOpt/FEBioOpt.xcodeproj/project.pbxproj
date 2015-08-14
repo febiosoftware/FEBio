@@ -29,7 +29,6 @@
 		D5307A1B18B406A2008C8463 /* libFEBioOpt.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioOpt.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5307A2318B406B8008C8463 /* FEBioOpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioOpt.cpp; sourceTree = "<group>"; };
 		D5307A2418B406B8008C8463 /* FEBioOpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioOpt.h; sourceTree = "<group>"; };
-		D5307A2518B406B8008C8463 /* febioopt.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = febioopt.mk; sourceTree = "<group>"; };
 		D5307A2618B406B8008C8463 /* FEConstrainedLMOptimizeMethod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEConstrainedLMOptimizeMethod.cpp; sourceTree = "<group>"; };
 		D5307A2718B406B8008C8463 /* FEConstrainedLMOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEConstrainedLMOptimizeMethod.h; sourceTree = "<group>"; };
 		D5307A2818B406B8008C8463 /* FELMOptimizeMethod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELMOptimizeMethod.cpp; sourceTree = "<group>"; };
@@ -78,7 +77,6 @@
 			children = (
 				D5307A2318B406B8008C8463 /* FEBioOpt.cpp */,
 				D5307A2418B406B8008C8463 /* FEBioOpt.h */,
-				D5307A2518B406B8008C8463 /* febioopt.mk */,
 				D5307A2618B406B8008C8463 /* FEConstrainedLMOptimizeMethod.cpp */,
 				D5307A2718B406B8008C8463 /* FEConstrainedLMOptimizeMethod.h */,
 				D5307A2818B406B8008C8463 /* FELMOptimizeMethod.cpp */,
