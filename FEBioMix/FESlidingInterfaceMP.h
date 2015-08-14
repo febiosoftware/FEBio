@@ -1,6 +1,7 @@
 #pragma once
 #include "FEBioMech/FEContactInterface.h"
 #include "FEBiphasicContactSurface.h"
+#include "FESolute.h"
 #include <map>
 
 //-----------------------------------------------------------------------------
@@ -140,6 +141,9 @@ public:
 	//! set the ambient concentration
 	void SetAmbientConcentration(int id, double ambc) { m_ambcinp.insert(std::pair<int, double>(id, ambc)); }
     
+    //! get solute data
+    FESoluteData* FindSoluteData(int nid);
+    
 protected:
 	void ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfaceMP& ms, bool bupseg);
 	
@@ -184,6 +188,7 @@ public:
 	vector<int> m_sid;				//!< list of solute ids common to both contact surfaces
 	vector<int> m_ssl;				//!< list of slave surface solutes common to both contact surfaces
 	vector<int> m_msl;				//!< list of master surface solutes common to both contact surfaces
+    vector<int> m_sz;               //!< charge number of solutes common to both contact surfaces
 	
 	DECLARE_PARAMETER_LIST();
 };

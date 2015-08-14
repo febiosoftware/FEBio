@@ -570,13 +570,15 @@ bool FESlidingInterfaceMP::Init()
 	if (m_ms.Init() == false) return false;
 	
 	// determine which solutes are common to both contact surfaces
-	m_sid.clear(); m_ssl.clear(); m_msl.clear();
+    m_sid.clear(); m_ssl.clear(); m_msl.clear(); m_sz.clear();
 	for (int is=0; is<m_ss.m_sid.size(); ++is) {
 		for (int im=0; im<m_ms.m_sid.size(); ++im) {
 			if (m_ms.m_sid[im] == m_ss.m_sid[is]) {
 				m_sid.push_back(m_ss.m_sid[is]);
 				m_ssl.push_back(is);
 				m_msl.push_back(im);
+                FESoluteData* sd = FindSoluteData(m_ss.m_sid[is]);
+                m_sz.push_back(sd->m_z);
 			}
 		}
 	}
@@ -1354,6 +1356,7 @@ void FESlidingInterfaceMP::ContactForces(FEGlobalVector& R)
 	double detJ[MN], w[MN], *Hs, Hm[MN];
 	double N[MN*10];
 	int nsol = (int)m_sid.size();
+    double tn[MN], wn[MN], jn[nsol][MN];
 	
 	FEModel& fem = *GetFEModel();
 	
@@ -1396,6 +1399,31 @@ void FESlidingInterfaceMP::ContactForces(FEGlobalVector& R)
 				
 				// integration weights
 				w[j] = se.GaussWeights()[j];
+                
+                FESlidingSurfaceMP::Data& pt = ss.m_Data[i][j];
+
+                // contact traction
+                double eps = m_epsn*pt.m_epsn;      // penalty
+                tn[j] = pt.m_Lmd + eps*pt.m_gap;    // contact traction
+                tn[j] = MBRACKET(tn[j]);
+                
+                // normal fluid flux
+                double epsp = m_epsp*pt.m_epsp;
+                wn[j] = pt.m_Lmp + epsp*pt.m_pg;
+                
+                // normal solute flux
+                double je = 0;      // normal current density (flux units)
+                for (int isol=0; isol<nsol; ++isol)
+                {
+                    int l = sl[isol];
+                    double epsc = m_epsc*pt.m_epsc[l];
+                    jn[isol][j] = pt.m_Lmc[l] + epsc*pt.m_cg[l];
+                    je += m_sz[isol]*jn[isol][j];
+                }
+                
+                // normal effective solute flux
+                for (int isol=0; isol<nsol; ++isol)
+                    jn[isol][j] += je;
 			}
 			
 			// loop over all integration points
@@ -1453,19 +1481,6 @@ void FESlidingInterfaceMP::ContactForces(FEGlobalVector& R)
 					// get normal vector
 					vec3d nu = pt.m_nu;
 					
-					// gap function
-					double g = pt.m_gap;
-					
-					// lagrange multiplier
-					double Lm = pt.m_Lmd;
-					
-					// penalty 
-					double eps = m_epsn*pt.m_epsn;
-					
-					// contact traction
-					double tn = Lm + eps*g;
-					tn = MBRACKET(tn);
-					
 					// calculate the force vector
 					fe.resize(ndof);
 					zero(fe);
@@ -1484,7 +1499,7 @@ void FESlidingInterfaceMP::ContactForces(FEGlobalVector& R)
 						N[3*(k+nseln)+2] = Hm[k]*nu.z;
 					}
 					
-					for (k=0; k<ndof; ++k) fe[k] += tn*N[k]*detJ[j]*w[j];
+					for (k=0; k<ndof; ++k) fe[k] += N[k]*tn[j]*detJ[j]*w[j];
 					
 					// assemble the global residual
 					R.Assemble(en, LM, fe);
@@ -1492,17 +1507,12 @@ void FESlidingInterfaceMP::ContactForces(FEGlobalVector& R)
 					// do the biphasic stuff
 					// only do this when the node is actually in contact
 					// in other words, when tn > 0
-					if (tn > 0)
+					if (tn[j] > 0)
 					{
 						if (sporo && mporo)
 						{
 							// calculate nr of pressure dofs
 							int ndof = nseln + nmeln;
-							
-							// calculate the flow rate
-							double epsp = m_epsp*pt.m_epsp;
-							
-							double wn = pt.m_Lmp + epsp*pt.m_pg;
 							
 							// fill the LM
 							LM.resize(ndof);
@@ -1515,7 +1525,7 @@ void FESlidingInterfaceMP::ContactForces(FEGlobalVector& R)
 							for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
 							for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
 							
-							for (k=0; k<ndof; ++k) fe[k] += dt*wn*N[k]*detJ[j]*w[j];
+							for (k=0; k<ndof; ++k) fe[k] += dt*N[k]*wn[j]*detJ[j]*w[j];
 							
 							// assemble residual
 							R.Assemble(en, LM, fe);
@@ -1523,15 +1533,9 @@ void FESlidingInterfaceMP::ContactForces(FEGlobalVector& R)
 						for (int isol=0; isol<nsol; ++isol)
 						{
 							int sid = m_sid[isol];
-							int l = sl[isol];
 							
 							// calculate nr of concentration dofs
 							int ndof = nseln + nmeln;
-							
-							// calculate the flow rate
-							double epsc = m_epsc*pt.m_epsc[l];
-							
-							double jn = pt.m_Lmc[l] + epsc*pt.m_cg[l];
 							
 							// fill the LM
 							LM.resize(ndof);
@@ -1544,7 +1548,7 @@ void FESlidingInterfaceMP::ContactForces(FEGlobalVector& R)
 							for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
 							for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
 							
-							for (k=0; k<ndof; ++k) fe[k] += dt*jn*N[k]*detJ[j]*w[j];
+							for (k=0; k<ndof; ++k) fe[k] += dt*N[k]*jn[isol][j]*detJ[j]*w[j];
 							
 							// assemble residual
 							R.Assemble(en, LM, fe);
@@ -1563,13 +1567,12 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
 	vector<int> sLM, mLM, LM, en;
 	const int MN = FEElement::MAX_NODES;
 	double detJ[MN], w[MN], *Hs, Hm[MN];
-	double pt[MN], dpr[MN], dps[MN];
 	double N[MN*10];
 	matrix ke;
 	int nsol = (int)m_sid.size();
-	vector< vector<double> > ct(nsol,vector<double>(MN));
-	vector< vector<double> > dcr(nsol,vector<double>(MN));
-	vector< vector<double> > dcs(nsol,vector<double>(MN));
+    double tn[MN], wn[MN], jn[nsol][MN];
+    vec3d pv[MN];
+    vector< vector<vec3d> > qv(nsol,vector<vec3d>(MN));
 	
 	FEModel& fem = *GetFEModel();
  	
@@ -1639,20 +1642,56 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
 				
 				// integration weights
 				w[j] = se.GaussWeights()[j];
+                
+                FESlidingSurfaceMP::Data& pd = ss.m_Data[i][j];
+                
+                // contact traction
+                double eps = m_epsn*pd.m_epsn;      // penalty
+                tn[j] = pd.m_Lmd + eps*pd.m_gap;    // contact traction
+                tn[j] = MBRACKET(tn[j]);
+                
+                // normal fluid flux
+                double epsp = m_epsp*pd.m_epsp;
+                wn[j] = pd.m_Lmp + epsp*pd.m_pg;
+                
+                // normal solute flux
+                double je = 0;      // normal current density (flux units)
+                for (int isol=0; isol<nsol; ++isol)
+                {
+                    int l = sl[isol];
+                    double epsc = m_epsc*pd.m_epsc[l];
+                    jn[isol][j] = pd.m_Lmc[l] + epsc*pd.m_cg[l];
+                    je += m_sz[isol]*jn[isol][j];
+                }
+                
+                // normal effective solute flux
+                for (int isol=0; isol<nsol; ++isol)
+                    jn[isol][j] += je;
 				
-				// pressure
+                // contravariant basis vectors of slave surface
+                vec3d Gs[2];
+                ss.ContraBaseVectors(se, j, Gs);
+                
+				// p vector (gradient of effective fluid pressure on slave surface)
 				if (sporo)
 				{
-					pt[j] = se.eval(pn, j);
-					dpr[j] = se.eval_deriv1(pn, j);
-					dps[j] = se.eval_deriv2(pn, j);
+					double dpr = se.eval_deriv1(pn, j);
+					double dps = se.eval_deriv2(pn, j);
+                    pv[j] = Gs[0]*dpr + Gs[1]*dps;
 				}
-				// concentration
+                
+				// q vectors (gradients of effective solute concentrations on slave surface)
+                vec3d qve(0,0,0);
 				for (int isol=0; isol<nsol; ++isol) {
-					ct[isol][j] = se.eval(&cn[isol][0], j);
-					dcr[isol][j] = se.eval_deriv1(&cn[isol][0], j);
-					dcs[isol][j] = se.eval_deriv2(&cn[isol][0], j);
+					double dcr = se.eval_deriv1(&cn[isol][0], j);
+					double dcs = se.eval_deriv2(&cn[isol][0], j);
+                    qv[isol][j] = Gs[0]*dcr + Gs[1]*dcs;
+                    qve += qv[isol][j]*m_sz[isol];
 				}
+                
+                // effective q vectors
+                for (int isol=0; isol<nsol; ++isol)
+                    qv[isol][j] += qve;
 			}
 			
 			// loop over all integration points
@@ -1778,205 +1817,80 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
 					// get slave normal vector
 					vec3d nu = pt.m_nu;
 					
-					// gap function
-					double g = pt.m_gap;
-					
-					// lagrange multiplier
-					double Lm = pt.m_Lmd;
-					
-					// penalty 
+					// penalty
 					double eps = m_epsn*pt.m_epsn;
 					
-					// contact traction
-					double tn = Lm + eps*g;
-					tn = MBRACKET(tn);
-					
 					//	double dtn = m_eps*HEAVYSIDE(Lm + eps*g);
-					double dtn = (tn > 0.? eps :0.);
+					double dtn = (tn[j] > 0.? eps :0.);
 					
 					// create the stiffness matrix
 					ke.resize(ndof, ndof); ke.zero();
 					
 					// --- S O L I D - S O L I D   C O N T A C T ---
-					
-					// a. NxN-term
-					//------------------------------------
-					
-					// calculate the N-vector
-					for (k=0; k<nseln; ++k)
-					{
-						N[ndpn*k  ] = Hs[k]*nu.x;
-						N[ndpn*k+1] = Hs[k]*nu.y;
-						N[ndpn*k+2] = Hs[k]*nu.z;
-					}
-					
-					for (k=0; k<nmeln; ++k)
-					{
-						N[ndpn*(k+nseln)  ] = -Hm[k]*nu.x;
-						N[ndpn*(k+nseln)+1] = -Hm[k]*nu.y;
-						N[ndpn*(k+nseln)+2] = -Hm[k]*nu.z;
-					}
-					
-					if (ndpn > 3) {
-						for (k=0; k<nseln; ++k)
-						{
-							N[ndpn*k+3] = 0;
-							for (int isol=0; isol<nsol; ++isol)
-								N[ndpn*k+4+isol] = 0;
-						}
-						for (k=0; k<nmeln; ++k)
-						{
-							N[ndpn*(k+nseln)+3] = 0;
-							for (int isol=0; isol<nsol; ++isol)
-								N[ndpn*(k+nseln)+4+isol] = 0;
-						}
-					}
-					
-					for (k=0; k<ndof; ++k)
-						for (l=0; l<ndof; ++l) ke[k][l] += dtn*N[k]*N[l]*detJ[j]*w[j];
-					
-					// b. A-term
-					//-------------------------------------
-					
-					for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
-					for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
-					
-					double* Gr = se.Gr(j);
-					double* Gs = se.Gs(j);
-					vec3d gs[2];
-					ss.CoBaseVectors(se, j, gs);
-					
-					mat3d S1, S2;
-					S1.skew(gs[0]);
-					S2.skew(gs[1]);
-					mat3d As[MN];
-					for (l=0; l<nseln; ++l)
-						As[l] = S2*Gr[l] - S1*Gs[l];
-					
-					if (!m_bsymm)
-					{	// non-symmetric
-						for (l=0; l<nseln; ++l)
-						{
-							for (k=0; k<nseln+nmeln; ++k)
-							{
-								ke[k*ndpn  ][l*ndpn  ] -= knmult*tn*w[j]*N[k]*As[l][0][0];
-								ke[k*ndpn  ][l*ndpn+1] -= knmult*tn*w[j]*N[k]*As[l][0][1];
-								ke[k*ndpn  ][l*ndpn+2] -= knmult*tn*w[j]*N[k]*As[l][0][2];
-								
-								ke[k*ndpn+1][l*ndpn  ] -= knmult*tn*w[j]*N[k]*As[l][1][0];
-								ke[k*ndpn+1][l*ndpn+1] -= knmult*tn*w[j]*N[k]*As[l][1][1];
-								ke[k*ndpn+1][l*ndpn+2] -= knmult*tn*w[j]*N[k]*As[l][1][2];
-								
-								ke[k*ndpn+2][l*ndpn  ] -= knmult*tn*w[j]*N[k]*As[l][2][0];
-								ke[k*ndpn+2][l*ndpn+1] -= knmult*tn*w[j]*N[k]*As[l][2][1];
-								ke[k*ndpn+2][l*ndpn+2] -= knmult*tn*w[j]*N[k]*As[l][2][2];
-							}
-						}
-					} 
-					else 
-					{	// symmetric
-						for (l=0; l<nseln; ++l)
-						{
-							for (k=0; k<nseln+nmeln; ++k)
-							{
-								ke[k*ndpn  ][l*ndpn  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][0];
-								ke[k*ndpn  ][l*ndpn+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][1];
-								ke[k*ndpn  ][l*ndpn+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][2];
-								
-								ke[k*ndpn+1][l*ndpn  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][0];
-								ke[k*ndpn+1][l*ndpn+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][1];
-								ke[k*ndpn+1][l*ndpn+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][2];
-								
-								ke[k*ndpn+2][l*ndpn  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][0];
-								ke[k*ndpn+2][l*ndpn+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][1];
-								ke[k*ndpn+2][l*ndpn+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][2];
-								
-								ke[l*ndpn  ][k*ndpn  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][0];
-								ke[l*ndpn+1][k*ndpn  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][1];
-								ke[l*ndpn+2][k*ndpn  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][2];
-								
-								ke[l*ndpn  ][k*ndpn+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][0];
-								ke[l*ndpn+1][k*ndpn+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][1];
-								ke[l*ndpn+2][k*ndpn+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][2];
-								
-								ke[l*ndpn  ][k*ndpn+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][0];
-								ke[l*ndpn+1][k*ndpn+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][1];
-								ke[l*ndpn+2][k*ndpn+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][2];
-							}
-						}
-					}
-					
-					// c. M-term
-					//---------------------------------------
-					
-					vec3d Gm[2];
-					ms.ContraBaseVectors(me, r, s, Gm);
-					
-					// evaluate master surface normal
-					vec3d mnu = Gm[0] ^ Gm[1];
-					mnu.unit();
-					
-					double Hmr[MN], Hms[MN];
-					me.shape_deriv(Hmr, Hms, r, s);
-					vec3d mm[MN];
-					for (k=0; k<nmeln; ++k) 
-						mm[k] = Gm[0]*Hmr[k] + Gm[1]*Hms[k];
-					
-					if (!m_bsymm)
-					{	// non-symmetric
-						for (k=0; k<nmeln; ++k) 
-						{
-							for (l=0; l<nseln+nmeln; ++l)
-							{
-								ke[(k+nseln)*ndpn  ][l*ndpn  ] += tn*knmult*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
-								ke[(k+nseln)*ndpn  ][l*ndpn+1] += tn*knmult*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
-								ke[(k+nseln)*ndpn  ][l*ndpn+2] += tn*knmult*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
-								
-								ke[(k+nseln)*ndpn+1][l*ndpn  ] += tn*knmult*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
-								ke[(k+nseln)*ndpn+1][l*ndpn+1] += tn*knmult*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
-								ke[(k+nseln)*ndpn+1][l*ndpn+2] += tn*knmult*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
-								
-								ke[(k+nseln)*ndpn+2][l*ndpn  ] += tn*knmult*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
-								ke[(k+nseln)*ndpn+2][l*ndpn+1] += tn*knmult*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
-								ke[(k+nseln)*ndpn+2][l*ndpn+2] += tn*knmult*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
-							}
-						}
-					}
-					else
-					{	// symmetric
-						for (k=0; k<nmeln; ++k) 
-						{
-							for (l=0; l<nseln+nmeln; ++l)
-							{
-								ke[(k+nseln)*ndpn  ][l*ndpn  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
-								ke[(k+nseln)*ndpn  ][l*ndpn+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
-								ke[(k+nseln)*ndpn  ][l*ndpn+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
-								
-								ke[(k+nseln)*ndpn+1][l*ndpn  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
-								ke[(k+nseln)*ndpn+1][l*ndpn+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
-								ke[(k+nseln)*ndpn+1][l*ndpn+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
-								
-								ke[(k+nseln)*ndpn+2][l*ndpn  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
-								ke[(k+nseln)*ndpn+2][l*ndpn+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
-								ke[(k+nseln)*ndpn+2][l*ndpn+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
-								
-								ke[l*ndpn  ][(k+nseln)*ndpn  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
-								ke[l*ndpn+1][(k+nseln)*ndpn  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
-								ke[l*ndpn+2][(k+nseln)*ndpn  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
-								
-								ke[l*ndpn  ][(k+nseln)*ndpn+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
-								ke[l*ndpn+1][(k+nseln)*ndpn+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
-								ke[l*ndpn+2][(k+nseln)*ndpn+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
-								
-								ke[l*ndpn  ][(k+nseln)*ndpn+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
-								ke[l*ndpn+1][(k+nseln)*ndpn+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
-								ke[l*ndpn+2][(k+nseln)*ndpn+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
-							}
-						}
-					}
-					
+
+                    mat3ds Ns = dyad(nu);
+                    
+                    double* Gr = se.Gr(j);
+                    double* Gs = se.Gs(j);
+                    vec3d gs[2];
+                    ss.CoBaseVectors(se, j, gs);
+                    mat3d S1, S2;
+                    S1.skew(gs[0]);
+                    S2.skew(gs[1]);
+                    mat3d As[MN];
+                    for (int c=0; c<nseln; ++c)
+                        As[c] = (S2*Gr[c] - S1*Gs[c])/detJ[j];
+                    
+                    vec3d Gm[2];
+                    ms.ContraBaseVectors(me, r, s, Gm);
+                    vec3d mnu = Gm[0] ^ Gm[1];
+                    mnu.unit();
+                    double Hmr[MN], Hms[MN];
+                    me.shape_deriv(Hmr, Hms, r, s);
+                    vec3d mm[MN];
+                    mat3d Mm[MN];
+                    for (k=0; k<nmeln; ++k) {
+                        mm[k] = Gm[0]*Hmr[k] + Gm[1]*Hms[k];
+                        Mm[k] = mnu & mm[k];
+                    }
+                    
+                    for (int a=0; a<nseln; ++a) {
+                        k = a*ndpn;
+                        for (int c=0; c<nseln; ++c) {
+                            l = c*ndpn;
+                            mat3d Kac = (Ns*(Hs[a]*Hs[c]*dtn)+As[c]*(-Hs[a]*tn[j]))*(detJ[j]*w[j]);
+                            ke[k  ][l  ] += Kac(0,0); ke[k  ][l+1] += Kac(0,1); ke[k  ][l+2] += Kac(0,2);
+                            ke[k+1][l  ] += Kac(1,0); ke[k+1][l+1] += Kac(1,1); ke[k+1][l+2] += Kac(1,2);
+                            ke[k+2][l  ] += Kac(2,0); ke[k+2][l+1] += Kac(2,1); ke[k+2][l+2] += Kac(2,2);
+                        }
+                        for (int d=0; d<nmeln; ++d) {
+                            l = (nseln+d)*ndpn;
+                            mat3d Kad = (Ns*(-Hs[a]*Hm[d]*dtn))*(detJ[j]*w[j]);
+                            ke[k  ][l  ] += Kad(0,0); ke[k  ][l+1] += Kad(0,1); ke[k  ][l+2] += Kad(0,2);
+                            ke[k+1][l  ] += Kad(1,0); ke[k+1][l+1] += Kad(1,1); ke[k+1][l+2] += Kad(1,2);
+                            ke[k+2][l  ] += Kad(2,0); ke[k+2][l+1] += Kad(2,1); ke[k+2][l+2] += Kad(2,2);
+                        }
+                    }
+                    for (int b=0; b<nmeln; ++b) {
+                        k = (nseln+b)*ndpn;
+                        for (int c=0; c<nseln; ++c) {
+                            l = c*ndpn;
+                            mat3d Kbc = (Ns*(-Hm[b]*Hs[c]*dtn)+As[c]*(Hm[b]*tn[j])+Mm[b]*(Hs[c]*tn[j]))*(detJ[j]*w[j]);
+                            ke[k  ][l  ] += Kbc(0,0); ke[k  ][l+1] += Kbc(0,1); ke[k  ][l+2] += Kbc(0,2);
+                            ke[k+1][l  ] += Kbc(1,0); ke[k+1][l+1] += Kbc(1,1); ke[k+1][l+2] += Kbc(1,2);
+                            ke[k+2][l  ] += Kbc(2,0); ke[k+2][l+1] += Kbc(2,1); ke[k+2][l+2] += Kbc(2,2);
+                        }
+                        for (int d=0; d<nmeln; ++d) {
+                            l = (nseln+d)*ndpn;
+                            mat3d Kbd = (Ns*(Hm[b]*Hm[d]*dtn)-Mm[b]*(Hm[d]*tn[j]))*(detJ[j]*w[j]);
+                            ke[k  ][l  ] += Kbd(0,0); ke[k  ][l+1] += Kbd(0,1); ke[k  ][l+2] += Kbd(0,2);
+                            ke[k+1][l  ] += Kbd(1,0); ke[k+1][l+1] += Kbd(1,1); ke[k+1][l+2] += Kbd(1,2);
+                            ke[k+2][l  ] += Kbd(2,0); ke[k+2][l+1] += Kbd(2,1); ke[k+2][l+2] += Kbd(2,2);
+                        }
+                    }
+
 					// --- M U L T I P H A S I C   S T I F F N E S S ---
-					if ((tn > 0) && nsol)
+					if ((tn[j] > 0) && (sporo && mporo))
 					{
 						double dt = fem.GetCurrentStep()->m_dt;
 						
@@ -1984,178 +1898,113 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
 												
 						// --- S O L I D - P R E S S U R E / S O L U T E   C O N T A C T ---
 						
-						if (!m_bsymm)
-						{
-							
-							// a. q-term
-							//-------------------------------------
-							
-							double dpmr, dpms;
-							dpmr = me.eval_deriv1(pm, r, s);
-							dpms = me.eval_deriv2(pm, r, s);
-							
-							for (k=0; k<nseln+nmeln; ++k)
-								for (l=0; l<nseln+nmeln; ++l)
-								{
-									ke[ndpn*k + 3][ndpn*l  ] += dt*w[j]*detJ[j]*epsp*N[k]*N[l]*(dpmr*Gm[0].x + dpms*Gm[1].x);
-									ke[ndpn*k + 3][ndpn*l+1] += dt*w[j]*detJ[j]*epsp*N[k]*N[l]*(dpmr*Gm[0].y + dpms*Gm[1].y);
-									ke[ndpn*k + 3][ndpn*l+2] += dt*w[j]*detJ[j]*epsp*N[k]*N[l]*(dpmr*Gm[0].z + dpms*Gm[1].z);
-									
-									for (int isol=0; isol<nsol; ++isol) {
-										double epsc = m_epsc*pt.m_epsc[sl[isol]];
-										double dcmr = me.eval_deriv1(&cm[isol][0], r, s);
-										double dcms = me.eval_deriv2(&cm[isol][0], r, s);
-										
-										ke[ndpn*k + 4 + isol][ndpn*l  ] += dt*w[j]*detJ[j]*epsc*N[k]*N[l]*(dcmr*Gm[0].x + dcms*Gm[1].x);
-										ke[ndpn*k + 4 + isol][ndpn*l+1] += dt*w[j]*detJ[j]*epsc*N[k]*N[l]*(dcmr*Gm[0].y + dcms*Gm[1].y);
-										ke[ndpn*k + 4 + isol][ndpn*l+2] += dt*w[j]*detJ[j]*epsc*N[k]*N[l]*(dcmr*Gm[0].z + dcms*Gm[1].z);
-									}
-								}
-							
-							double wn = pt.m_Lmp + epsp*pt.m_pg;
-							
-							// b. A-term
-							//-------------------------------------
-							
-							for (l=0; l<nseln; ++l)
-								for (k=0; k<nseln+nmeln; ++k)
-								{
-									ke[ndpn*k + 3][ndpn*l  ] -= dt*w[j]*wn*N[k]*(As[l][0][0]*nu.x + As[l][0][1]*nu.y + As[l][0][2]*nu.z);
-									ke[ndpn*k + 3][ndpn*l+1] -= dt*w[j]*wn*N[k]*(As[l][1][0]*nu.x + As[l][1][1]*nu.y + As[l][1][2]*nu.z);
-									ke[ndpn*k + 3][ndpn*l+2] -= dt*w[j]*wn*N[k]*(As[l][2][0]*nu.x + As[l][2][1]*nu.y + As[l][2][2]*nu.z);
-									
-									for (int isol=0; isol<nsol; ++isol) {
-										double epsc = m_epsc*pt.m_epsc[sl[isol]];
-										double jn = pt.m_Lmc[sl[isol]] + epsc*pt.m_cg[sl[isol]];
-										ke[ndpn*k + 4 + isol][ndpn*l  ] -= dt*w[j]*jn*N[k]*(As[l][0][0]*nu.x + As[l][0][1]*nu.y + As[l][0][2]*nu.z);
-										ke[ndpn*k + 4 + isol][ndpn*l+1] -= dt*w[j]*jn*N[k]*(As[l][1][0]*nu.x + As[l][1][1]*nu.y + As[l][1][2]*nu.z);
-										ke[ndpn*k + 4 + isol][ndpn*l+2] -= dt*w[j]*jn*N[k]*(As[l][2][0]*nu.x + As[l][2][1]*nu.y + As[l][2][2]*nu.z);
-									}
-								}
-							
-							// c. m-term
-							//---------------------------------------
-							
-							for (k=0; k<nmeln; ++k)
-								for (l=0; l<nseln+nmeln; ++l)
-								{
-									ke[ndpn*(k+nseln) + 3][ndpn*l  ] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].x;
-									ke[ndpn*(k+nseln) + 3][ndpn*l+1] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].y;
-									ke[ndpn*(k+nseln) + 3][ndpn*l+2] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].z;
-									
-									for (int isol=0; isol<nsol; ++isol) {
-										double epsc = m_epsc*pt.m_epsc[sl[isol]];
-										double jn = pt.m_Lmc[sl[isol]] + epsc*pt.m_cg[sl[isol]];
-										ke[ndpn*(k+nseln) + 4 + isol][ndpn*l  ] += dt*w[j]*detJ[j]*jn*N[l]*mm[k].x;
-										ke[ndpn*(k+nseln) + 4 + isol][ndpn*l+1] += dt*w[j]*detJ[j]*jn*N[l]*mm[k].y;
-										ke[ndpn*(k+nseln) + 4 + isol][ndpn*l+2] += dt*w[j]*detJ[j]*jn*N[l]*mm[k].z;
-									}
-								}
-						}
-						
-						
-						// --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
-						
-						// calculate the N-vector
-						for (k=0; k<nseln; ++k)
-						{
-							N[ndpn*k+3] = Hs[k];
-							for (int isol=0; isol<nsol; ++isol)
-								N[ndpn*k+4+isol] = Hs[k];
-						}
-						
-						for (k=0; k<nmeln; ++k)
-						{
-							N[ndpn*(k+nseln)+3] = -Hm[k];
-							for (int isol=0; isol<nsol; ++isol)
-								N[ndpn*(k+nseln)+4+isol] = -Hm[k];
-						}
-						
-						for (k=3; k<ndof; k+=ndpn)
-							for (l=3; l<ndof; l+=ndpn) ke[k][l] -= dt*epsp*w[j]*detJ[j]*N[k]*N[l];
-						
-						// --- C O N C E N T R A T I O N - C O N C E N T R A T I O N   C O N T A C T ---
-						
-						for (int isol=0; isol<nsol; ++isol) {
-							double epsc = m_epsc*pt.m_epsc[sl[isol]];
-							for (k=4+isol; k<ndof; k+=ndpn)
-								for (l=4+isol; l<ndof; l+=ndpn) ke[k][l] -= dt*epsc*w[j]*detJ[j]*N[k]*N[l];
-						}
-						
-					}
-					
-					// --- B I P H A S I C   S T I F F N E S S ---
-					else if ((tn > 0) && (sporo && mporo))
-					{
-						// the variable dt is either the timestep or one
-						// depending on whether we are using the symmetric
-						// poro version or not.
-						double dt = fem.GetCurrentStep()->m_dt;
-						
-						double epsp = m_epsp*pt.m_epsp;
-						
-						// --- S O L I D - P R E S S U R E   C O N T A C T ---
-						
-						if (!m_bsymm)
-						{
-							
-							// a. q-term
-							//-------------------------------------
-							
-							double dpmr, dpms;
-							dpmr = me.eval_deriv1(pm, r, s);
-							dpms = me.eval_deriv2(pm, r, s);
-							
-							for (k=0; k<nseln+nmeln; ++k)
-								for (l=0; l<nseln+nmeln; ++l)
-								{
-									ke[ndpn*k + 3][ndpn*l  ] += dt*w[j]*detJ[j]*epsp*N[k]*N[l]*(dpmr*Gm[0].x + dpms*Gm[1].x);
-									ke[ndpn*k + 3][ndpn*l+1] += dt*w[j]*detJ[j]*epsp*N[k]*N[l]*(dpmr*Gm[0].y + dpms*Gm[1].y);
-									ke[ndpn*k + 3][ndpn*l+2] += dt*w[j]*detJ[j]*epsp*N[k]*N[l]*(dpmr*Gm[0].z + dpms*Gm[1].z);
-								}
-							
-							double wn = pt.m_Lmp + epsp*pt.m_pg;
-							
-							// b. A-term
-							//-------------------------------------
-							
-							for (l=0; l<nseln; ++l)
-								for (k=0; k<nseln+nmeln; ++k)
-								{
-									ke[ndpn*k + 3][ndpn*l  ] -= dt*w[j]*wn*N[k]*(As[l][0][0]*nu.x + As[l][0][1]*nu.y + As[l][0][2]*nu.z);
-									ke[ndpn*k + 3][ndpn*l+1] -= dt*w[j]*wn*N[k]*(As[l][1][0]*nu.x + As[l][1][1]*nu.y + As[l][1][2]*nu.z);
-									ke[ndpn*k + 3][ndpn*l+2] -= dt*w[j]*wn*N[k]*(As[l][2][0]*nu.x + As[l][2][1]*nu.y + As[l][2][2]*nu.z);
-								}
-							
-							// c. m-term
-							//---------------------------------------
-							
-							for (k=0; k<nmeln; ++k)
-								for (l=0; l<nseln+nmeln; ++l)
-								{
-									ke[ndpn*(k+nseln) + 3][ndpn*l  ] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].x;
-									ke[ndpn*(k+nseln) + 3][ndpn*l+1] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].y;
-									ke[ndpn*(k+nseln) + 3][ndpn*l+2] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].z;
-								}
-						}
-						
-						
-						// --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
-						
-						// calculate the N-vector
-						for (k=0; k<nseln; ++k)
-						{
-							N[ndpn*k+3] = Hs[k];
-						}
-						
-						for (k=0; k<nmeln; ++k)
-						{
-							N[ndpn*(k+nseln)+3] = -Hm[k];
-						}
-						
-						for (k=3; k<ndof; k+=ndpn)
-							for (l=3; l<ndof; l+=ndpn) ke[k][l] -= dt*epsp*w[j]*detJ[j]*N[k]*N[l];
-						
+                        for (int a=0; a<nseln; ++a) {
+                            k = a*ndpn;
+                            for (int c=0; c<nseln; ++c) {
+                                l = c*ndpn;
+                                vec3d gac = (pv[j]*(Hs[a]*Hs[c]*epsp)-(As[c]*nu)*(Hs[a]*wn[j]))*(dt*detJ[j]*w[j]);
+                                ke[k+3][l  ] += gac.x; ke[k+3][l+1] += gac.y; ke[k+3][l+2] += gac.z;
+                                for (int isol=0; isol<nsol; ++isol) {
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    vec3d hac = (qv[isol][j]*(Hs[a]*Hs[c]*epsc)-(As[c]*nu)*(Hs[a]*jn[isol][j]))*(dt*detJ[j]*w[j]);
+                                    ke[k+4+isol][l  ] += hac.x; ke[k+4+isol][l+1] += hac.y; ke[k+4+isol][l+2] += hac.z;
+                                }
+                            }
+                            for (int d=0; d<nmeln; ++d) {
+                                l = (nseln+d)*ndpn;
+                                vec3d gad = (pv[j]*(-Hs[a]*Hm[d]*epsp))*(dt*detJ[j]*w[j]);
+                                ke[k+3][l  ] += gad.x; ke[k+3][l+1] += gad.y; ke[k+3][l+2] += gad.z;
+                                for (int isol=0; isol<nsol; ++isol) {
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    vec3d had = (qv[isol][j]*(-Hs[a]*Hm[d]*epsc))*(dt*detJ[j]*w[j]);
+                                    ke[k+4+isol][l  ] += had.x; ke[k+4+isol][l+1] += had.y; ke[k+4+isol][l+2] += had.z;
+                                }
+                            }
+                        }
+                        for (int b=0; b<nmeln; ++b) {
+                            k = (nseln+b)*ndpn;
+                            for (int c=0; c<nseln; ++c) {
+                                l = c*ndpn;
+                                vec3d gbc = (pv[j]*(-Hm[b]*Hs[c]*epsp)+(As[c]*nu)*(Hm[b]*wn[j])+mm[b]*(Hs[c]*wn[j]))*(dt*detJ[j]*w[j]);
+                                ke[k+3][l  ] += gbc.x; ke[k+3][l+1] += gbc.y; ke[k+3][l+2] += gbc.z;
+                                for (int isol=0; isol<nsol; ++isol) {
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    vec3d hbc = (qv[isol][j]*(-Hm[b]*Hs[c]*epsc)+(As[c]*nu)*(Hm[b]*jn[isol][j])+mm[b]*(Hs[c]*jn[isol][j]))*(dt*detJ[j]*w[j]);
+                                    ke[k+4+isol][l  ] += hbc.x; ke[k+4+isol][l+1] += hbc.y; ke[k+4+isol][l+2] += hbc.z;
+                                }
+                            }
+                            for (int d=0; d<nmeln; ++d) {
+                                l = (nseln+d)*ndpn;
+                                vec3d gbd = (pv[j]*(Hm[b]*Hm[d]*epsp)-mm[b]*(Hm[d]*wn[j]))*(dt*detJ[j]*w[j]);
+                                ke[k+3][l  ] += gbd.x; ke[k+3][l+1] += gbd.y; ke[k+3][l+2] += gbd.z;
+                                for (int isol=0; isol<nsol; ++isol) {
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    vec3d hbd = (qv[isol][j]*(Hm[b]*Hm[d]*epsc)-mm[b]*(Hm[d]*jn[isol][j]))*(dt*detJ[j]*w[j]);
+                                    ke[k+4+isol][l  ] += hbd.x; ke[k+4+isol][l+1] += hbd.y; ke[k+4+isol][l+2] += hbd.z;
+                                }
+                            }
+                        }
+                        
+                        // --- P R E S S U R E - P R E S S U R E  /  C O N C E N T R A T I O N - C O N C E N T R A T I O N  C O N T A C T ---
+                        
+                        for (int a=0; a<nseln; ++a) {
+                            k = a*ndpn;
+                            for (int c=0; c<nseln; ++c) {
+                                l = c*ndpn;
+                                double gac = (-Hs[a]*Hs[c]*epsp)*(dt*detJ[j]*w[j]);
+                                ke[k+3][l+3] += gac;
+                                for (int isol=0; isol<nsol; ++isol) {
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    double hac = (-Hs[a]*Hs[c]*epsc)*(dt*detJ[j]*w[j]);
+                                    ke[k+4+isol][l+4+isol] += hac;
+                                    for (int jsol=0; jsol<nsol; ++jsol) {
+                                        ke[k+4+isol][l+4+jsol] += hac*m_sz[jsol];
+                                    }
+                                }
+                            }
+                            for (int d=0; d<nmeln; ++d) {
+                                l = (nseln+d)*ndpn;
+                                double gad = (Hs[a]*Hm[d]*epsp)*(dt*detJ[j]*w[j]);
+                                ke[k+3][l+3] += gad;
+                                for (int isol=0; isol<nsol; ++isol) {
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    double had = (Hs[a]*Hm[d]*epsc)*(dt*detJ[j]*w[j]);
+                                    ke[k+4+isol][l+4+isol] += had;
+                                    for (int jsol=0; jsol<nsol; ++jsol) {
+                                        ke[k+4+isol][l+4+jsol] += had*m_sz[jsol];
+                                    }
+                                }
+                            }
+                        }
+                        for (int b=0; b<nmeln; ++b) {
+                            k = (nseln+b)*ndpn;
+                            for (int c=0; c<nseln; ++c) {
+                                l = c*ndpn;
+                                double gbc = (Hm[b]*Hs[c]*epsp)*(dt*detJ[j]*w[j]);
+                                ke[k+3][l+3] += gbc;
+                                for (int isol=0; isol<nsol; ++isol) {
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    double hbc = (Hm[b]*Hs[c]*epsc)*(dt*detJ[j]*w[j]);
+                                    ke[k+4+isol][l+4+isol] += hbc;
+                                    for (int jsol=0; jsol<nsol; ++jsol) {
+                                        ke[k+4+isol][l+4+jsol] += hbc*m_sz[jsol];
+                                    }
+                                }
+                            }
+                            for (int d=0; d<nmeln; ++d) {
+                                l = (nseln+d)*ndpn;
+                                double gbd = (-Hm[b]*Hm[d]*epsp)*(dt*detJ[j]*w[j]);
+                                ke[k+3][l+3] += gbd;
+                                for (int isol=0; isol<nsol; ++isol) {
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    double hbd = (-Hm[b]*Hm[d]*epsc)*(dt*detJ[j]*w[j]);
+                                    ke[k+4+isol][l+4+isol] += hbd;
+                                    for (int jsol=0; jsol<nsol; ++jsol) {
+                                        ke[k+4+isol][l+4+jsol] += hbd*m_sz[jsol];
+                                    }
+                                }
+                            }
+                        }
 					}
 					
 					// assemble the global stiffness
@@ -2500,4 +2349,17 @@ void FESlidingInterfaceMP::SetAmbient()
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+FESoluteData* FESlidingInterfaceMP::FindSoluteData(int nid)
+{
+    FEModel& fem = *GetFEModel();
+    int N = GetFEModel()->GlobalDataItems();
+    for (int i=0; i<N; ++i)
+    {
+        FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
+        if (psd && (psd->m_nID == nid)) return psd;
+    }
+    return 0;
 }
