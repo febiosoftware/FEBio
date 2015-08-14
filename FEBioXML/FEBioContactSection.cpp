@@ -161,7 +161,7 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 
-	FERigidWallInterface* ps = new FERigidWallInterface(&fem);
+	FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, "rigid_wall", GetFEModel()));
 	fem.AddSurfacePairInteraction(ps);
 
 	++tag;
@@ -241,7 +241,7 @@ void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 	if (tag.isleaf()) return;
 
 	// create a new linear constraint manager
-	FELinearConstraintSet* pLCS = new FELinearConstraintSet(&fem);
+	FELinearConstraintSet* pLCS = dynamic_cast<FELinearConstraintSet*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, "linear constraint", GetFEModel()));
 	fem.AddNonlinearConstraint(pLCS);
 
 	// read the linear constraints
