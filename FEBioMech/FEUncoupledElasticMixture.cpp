@@ -49,7 +49,12 @@ void FEUncoupledElasticMixture::Init()
 	m_K = 0.0;
 	for (int i=0; i < (int)m_pMat.size(); ++i) {
 		m_K += m_pMat[i]->m_K;	// Sum up all the values of the bulk moduli
+
+		// Although the bulk-moduli of the solid components
+		// is not used, we cannot leave it as zero
+		if (m_pMat[i]->m_K == 0.0) m_pMat[i]->m_K = 1.0;
 	}
+
 	FEUncoupledMaterial::Init();
 }
 

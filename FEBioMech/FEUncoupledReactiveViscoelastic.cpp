@@ -51,10 +51,10 @@ void FEUncoupledReactiveViscoelasticMaterial::SetLocalCoordinateSystem(FEElement
 //! data initialization
 void FEUncoupledReactiveViscoelasticMaterial::Init()
 {
-    FEUncoupledMaterial::Init();
-
     // set the mixture's bulk modulus based on the base and bond materials
     m_K = m_pBase->m_K + m_pBond->m_K;
+
+    FEUncoupledMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------
