@@ -59,27 +59,11 @@ public:
 
 	//@{ 
 	//! output operators
-	DumpFile& operator << (const char* sz) 
-	{ 
-		int n = strlen(sz); 
-		fwrite(&n, sizeof(int), 1, m_fp);
-		fwrite(sz, sizeof(char), n, m_fp);
-		return (*this);
-	}
+	DumpFile& operator << (const char* sz);
 
-	DumpFile& operator << (char* sz) 
-	{ 
-		int n = strlen(sz); 
-		fwrite(&n, sizeof(int), 1, m_fp);
-		fwrite(sz, sizeof(char), n, m_fp);
-		return (*this);
-	}
+	DumpFile& operator << (char* sz);
 
-	DumpFile& operator << (const double a[3][3])
-	{
-		fwrite(a, sizeof(double), 9, m_fp);
-		return (*this);
-	}
+	DumpFile& operator << (const double a[3][3]);
 
 	template <class T> DumpFile& operator << (const T& o) { fwrite(&o, sizeof(T), 1, m_fp); return (*this); }
 
@@ -91,32 +75,15 @@ public:
 		return (*this);
 	}
 
-	DumpFile& operator << (std::vector<bool>& v)
-	{
-		int n = v.size();
-		fwrite(&n, sizeof(int), 1, m_fp);
-		for (int i=0; i<n; ++i) { int a = (v[i]?1:0); fwrite(&a, sizeof(int), 1, m_fp); }
-		return (*this);
-	}
+	DumpFile& operator << (std::vector<bool>& v);
 	//@}
 
 
 	//@{
 	//! input operators
-	DumpFile& operator >> (char* sz) 
-	{ 
-		int n;
-		fread(&n, sizeof(int), 1, m_fp);
-		fread(sz, sizeof(char), n, m_fp);
-		sz[n] = 0;
-		return (*this);
-	}
+	DumpFile& operator >> (char* sz);
 
-	DumpFile& operator >> (double a[3][3])
-	{
-		fread(a, sizeof(double), 9, m_fp);
-		return (*this);
-	}
+	DumpFile& operator >> (double a[3][3]);
 
 	template <class T> DumpFile& operator >> (T& o) { fread(&o, sizeof(T), 1, m_fp); return (*this); }
 
@@ -133,19 +100,7 @@ public:
 		return (*this);
 	}
 
-	DumpFile& operator >> (std::vector<bool>& v)
-	{
-		int n;
-		fread(&n, sizeof(int), 1, m_fp);
-		if (n > 0) v.resize(n); else v.clear();
-		for (int i=0; i<n; ++i)
-		{
-			int a;
-			fread(&a, sizeof(int), 1, m_fp);
-			v[i] = (a == 1);
-		}
-		return (*this);
-	}
+	DumpFile& operator >> (std::vector<bool>& v);
 	//@}
 
 
