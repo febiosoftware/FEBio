@@ -8,12 +8,16 @@ REGISTER_FECORE_CLASS(FEBioRestart   , FETASK_ID, "restart" );
 REGISTER_FECORE_CLASS(FEBioDiagnostic, FETASK_ID, "diagnose");
 
 //-----------------------------------------------------------------------------
+FEBioStdSolver::FEBioStdSolver(FEModel* pfem) : FECoreTask(pfem)
+{
+
+}
+
+
+//-----------------------------------------------------------------------------
 // This simply calls the FEM::Solve function which will solve the FE problem.
 bool FEBioStdSolver::Run(const char* szfile)
 {
-	// initialize model
-	if (m_pfem->Init() == false) return false;
-
 	// Solve the problem and return error code
 	return m_pfem->Solve();
 }

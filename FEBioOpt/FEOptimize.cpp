@@ -16,9 +16,6 @@ bool FEOptimize::Run(const char* szfile)
 	// TODO: the logfile has not been opened yet, so this will only get printed to the screen
 	felog.printbox("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E", "version 0.1");
 
-	// initialize FE model
-	if (m_pfem->Init() == false) return false;
-
 	// create an optimizer object
 	FEOptimizeData opt(*m_pfem);
 

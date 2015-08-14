@@ -82,6 +82,7 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		do
 		{
 			if		(tag == "Model"      ) ; // No longer used, but included for backwards compatibility
+			else if (tag == "Task"       ) bret = ParseTask       (tag, opt);
 			else if (tag == "Options"    ) bret = ParseOptions    (tag, opt);
 			else if (tag == "Function"   ) bret = ParseObjective  (tag, opt);
 			else if (tag == "Parameters" ) bret = ParseParameters (tag, opt);
@@ -176,6 +177,14 @@ bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 
 	opt.SetSolver(popt);
 
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEOptimizeInput::ParseTask(XMLTag& tag, FEOptimizeData& opt)
+{
+	opt.m_pTask = fecore_new<FECoreTask>(FETASK_ID, tag.szvalue(), &opt.GetFEM());
+	if (opt.m_pTask == 0) return false;
 	return true;
 }
 
@@ -407,6 +416,7 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 FEOptimizeData::FEOptimizeData(FEModel& fem) : m_fem(fem)
 {
 	m_pSolver = 0;
+	m_pTask = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -418,7 +428,11 @@ FEOptimizeData::~FEOptimizeData(void)
 //-----------------------------------------------------------------------------
 bool FEOptimizeData::Init()
 {
+	// allocate default optimization solver if none specified in input file
 	if (m_pSolver == 0) m_pSolver = new FELMOptimizeMethod;
+
+	// allocate default solver if none specified in input file
+	if (m_pTask == 0) m_pTask = fecore_new<FECoreTask>(FETASK_ID, "solve", &m_fem);
 
 	return true;
 }
@@ -426,6 +440,10 @@ bool FEOptimizeData::Init()
 //-----------------------------------------------------------------------------
 bool FEOptimizeData::Solve()
 {
+	// make sure we have a task that will solve the FE model
+	if (m_pTask == 0) return false;
+
+	// go for it!
 	return m_pSolver->Solve(this);
 }
 
@@ -437,4 +455,11 @@ bool FEOptimizeData::Input(const char *szfile)
 	FEOptimizeInput in;
 	if (in.Input(szfile, this) == false) return false;
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEOptimizeData::RunTask()
+{
+	if (m_pTask == 0) return false;
+	return m_pTask->Run(0);
 }

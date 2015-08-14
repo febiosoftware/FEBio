@@ -8,13 +8,10 @@
 class FEBioStdSolver : public FECoreTask
 {
 public:
-	FEBioStdSolver(FEModel* pfem) : FECoreTask(pfem){}
+	FEBioStdSolver(FEModel* pfem);
 
 	//! Run the FE model
 	virtual bool Run(const char* szfile);
-
-private:
-
 };
 
 //-----------------------------------------------------------------------------

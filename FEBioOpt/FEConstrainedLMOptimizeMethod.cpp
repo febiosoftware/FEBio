@@ -278,7 +278,7 @@ bool FEConstrainedLMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a
 	// solve the FE problem
 	felog.SetMode((Logfile::MODE)m_loglevel);
 
-	bool bret = fem.Solve();
+	bool bret = m_pOpt->RunTask();
 
 	felog.SetMode(Logfile::FILE_AND_SCREEN);
 	if (bret)

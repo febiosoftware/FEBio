@@ -3,6 +3,7 @@
 #include "FEBioXML/XMLReader.h"
 #include "FECore/FEModel.h"
 #include "FECore/Logfile.h"
+#include "FECore/FECoreTask.h"
 #include <vector>
 #include <string.h>
 
@@ -35,6 +36,7 @@ public:
 
 protected:
 	bool ParseOptions    (XMLTag& tag, FEOptimizeData& opt);
+	bool ParseTask       (XMLTag& tag, FEOptimizeData& opt);
 	bool ParseObjective  (XMLTag& tag, FEOptimizeData& opt);
 	bool ParseParameters (XMLTag& tag, FEOptimizeData& opt);
 	bool ParseConstraints(XMLTag& tag, FEOptimizeData& opt);
@@ -138,8 +140,12 @@ public:
 
 	void SetSolver(FEOptimizeMethod* po) { m_pSolver = po; }
 
+	bool RunTask();
+
 public:
 	int	m_niter;	// nr of minor iterations (i.e. FE solves)
+
+	FECoreTask* m_pTask;	// the task that will solve the FE model
 
 protected:
 	FEModel&	m_fem;

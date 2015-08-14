@@ -492,6 +492,9 @@ int Run(CMDOPTIONS& ops)
 
 		// read the input file
 		if (fem.Input(ops.szfile) == false) return 1;
+
+		// do the model initialization
+		if (fem.Init() == false) return 1;
 	}
 
 	// find a task

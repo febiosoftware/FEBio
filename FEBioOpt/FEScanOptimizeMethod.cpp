@@ -138,7 +138,7 @@ bool FEScanOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<
 	// solve the FE problem
 	felog.SetMode(Logfile::NEVER);
 
-	bool bret = fem.Solve();
+	bool bret = m_pOpt->RunTask();
 
 	felog.SetMode(Logfile::FILE_AND_SCREEN);
 	if (bret)

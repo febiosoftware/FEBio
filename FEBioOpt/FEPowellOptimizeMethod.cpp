@@ -155,7 +155,7 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 
 	double fobj = 0;
 
-	if (fem.Solve() == false)
+	if (m_pOpt->RunTask() == false)
 	{
 		felog.printf("\n\n\nAAAAAAAAARRRRRRRRRGGGGGGGGHHHHHHHHHHH !!!!!!!!!!!!!\n\n\n\n");
 		return 0;
