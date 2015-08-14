@@ -20,8 +20,7 @@
 #endif
 
 #ifdef LINUX
-	#include <math.h>
-	#define ISNAN(x) isnan(x)
+	#define ISNAN(x) std::isnan(x)
 #endif
 
 #ifdef __APPLE__

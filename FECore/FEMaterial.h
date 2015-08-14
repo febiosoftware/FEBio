@@ -16,6 +16,7 @@
 #include "DumpFile.h"
 #include "FECoreKernel.h"
 #include <string.h>
+#include <stddef.h>
 
 #define INRANGE(x, a, b) ((x)>=(a) && (x)<=(b))
 #define IN_RIGHT_OPEN_RANGE(x, a, b) ((x)>=(a) && (x)<(b))
