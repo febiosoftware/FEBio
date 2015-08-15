@@ -2,6 +2,7 @@
 #include "FECore.h"
 #include "FECoordSysMap.h"
 #include "FECoreKernel.h"
+#include "BC.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -30,4 +31,6 @@ REGISTER_FECORE_CLASS(FESphericalMap     , FECOORDSYSMAP_ID, "spherical"  );
 REGISTER_FECORE_CLASS(FECylindricalMap   , FECOORDSYSMAP_ID, "cylindrical");
 REGISTER_FECORE_CLASS(FEVectorMap        , FECOORDSYSMAP_ID, "vector"     );
 REGISTER_FECORE_CLASS(FESphericalAngleMap, FECOORDSYSMAP_ID, "angles"     );
+
+REGISTER_FECORE_CLASS(FEFixedBC, FEBC_ID, "fix");
 }

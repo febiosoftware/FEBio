@@ -38,9 +38,12 @@ public:
 
 	void Activate();
 
+	void AddNode(int node);
+	void SetDOF(int dof);
+
 public:
-	int		m_node;
-	int		m_dof;
+	vector<int>		m_node;
+	int				m_dof;
 };
 
 //-----------------------------------------------------------------------------

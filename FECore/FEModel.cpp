@@ -72,7 +72,10 @@ void FEModel::Clear()
 //-----------------------------------------------------------------------------
 void FEModel::AddFixedBC(int node, int bc)
 {
-	AddFixedBC(new FEFixedBC(this, node, bc));
+	FEFixedBC* pbc = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "fix", this));
+	pbc->SetDOF(bc);
+	pbc->AddNode(node);
+	AddFixedBC(pbc);
 }
 
 //-----------------------------------------------------------------------------

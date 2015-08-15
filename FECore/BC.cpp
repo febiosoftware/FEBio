@@ -51,15 +51,26 @@ double FENodalLoad::Value()
 //-----------------------------------------------------------------------------
 FEFixedBC::FEFixedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
 { 
-	m_node = -1; 
 	m_dof = -1; 
 }
 
 //-----------------------------------------------------------------------------
 FEFixedBC::FEFixedBC(FEModel* pfem, int node, int dof) : FEBoundaryCondition(FEBC_ID, pfem)
 { 
-	m_node = node; 
+	m_node.push_back(node); 
 	m_dof = dof; 
+}
+
+//-----------------------------------------------------------------------------
+void FEFixedBC::AddNode(int node)
+{
+	m_node.push_back(node);
+}
+
+//-----------------------------------------------------------------------------
+void FEFixedBC::SetDOF(int dof)
+{
+	m_dof = dof;
 }
 
 //-----------------------------------------------------------------------------
@@ -79,8 +90,12 @@ void FEFixedBC::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FEFixedBC::Activate()
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	mesh.Node(m_node).m_ID[m_dof] = -1;
+	if (m_dof >= 0)
+	{
+		FEMesh& mesh = GetFEModel()->GetMesh();
+		int n = (int) m_node.size();
+		for (int i=0; i<n; ++i) mesh.Node(m_node[i]).m_ID[m_dof] = -1;
+	}
 }
 
 //-----------------------------------------------------------------------------

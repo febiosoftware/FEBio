@@ -248,6 +248,16 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 	if (bc.empty()) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 	int nbc = bc.size();
 
+	// create the fixed BC's
+	vector<FEFixedBC*> pbc(nbc);
+	for (int i=0; i<nbc; ++i)
+	{
+		FEFixedBC* pbci = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "fix", &fem));
+		pbci->SetDOF(bc[i]);
+		pbc[i] = pbci;
+		fem.AddFixedBC(pbci);
+	}
+
 	// see if the set attribute is defined
 	const char* szset = tag.AttributeValue("set", true);
 	if (szset)
@@ -265,7 +275,7 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 		{
 			int n = ns[i];
 			if ((n < 0)||(n >= NN)) throw XMLReader::InvalidTag(tag);
-			for (int j=0; j<nbc; ++j) fem.AddFixedBC(n, bc[j]);
+			for (int j=0; j<nbc; ++j) pbc[j]->AddNode(n);
 		}
 	}
 	else
@@ -276,7 +286,7 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 		{
 			int n = atoi(tag.AttributeValue("id"))-1;
 			if ((n<0) || (n >= NN)) throw XMLReader::InvalidAttributeValue(tag, "id");
-			for (int j=0; j<nbc; ++j) fem.AddFixedBC(n, bc[j]);
+			for (int j=0; j<nbc; ++j) pbc[j]->AddNode(n);
 			++tag;
 		}
 		while (!tag.isend());
