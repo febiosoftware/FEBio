@@ -611,7 +611,6 @@ void FESlidingInterfaceMP::BuildMatrixProfile(FEStiffnessMatrix& K)
 	for (int np=0; np<npass; ++np)
 	{
 		FESlidingSurfaceMP& ss = (np == 0? m_ss : m_ms);
-		FESlidingSurfaceMP& ms = (np == 0? m_ms : m_ss);
         
 		int k, l;
 		for (int j=0; j<ss.Elements(); ++j)
@@ -1356,7 +1355,8 @@ void FESlidingInterfaceMP::ContactForces(FEGlobalVector& R)
 	double detJ[MN], w[MN], *Hs, Hm[MN];
 	double N[MN*10];
 	int nsol = (int)m_sid.size();
-    double tn[MN], wn[MN], jn[nsol][MN];
+    double tn[MN], wn[MN];
+    vector< vector<double> > jn(nsol,vector<double>(MN));
 	
 	FEModel& fem = *GetFEModel();
 	
@@ -1567,10 +1567,10 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
 	vector<int> sLM, mLM, LM, en;
 	const int MN = FEElement::MAX_NODES;
 	double detJ[MN], w[MN], *Hs, Hm[MN];
-	double N[MN*10];
 	matrix ke;
 	int nsol = (int)m_sid.size();
-    double tn[MN], wn[MN], jn[nsol][MN];
+    double tn[MN], wn[MN];
+    vector< vector<double> > jn(nsol,vector<double>(MN));
     vec3d pv[MN];
     vector< vector<vec3d> > qv(nsol,vector<vec3d>(MN));
 	
