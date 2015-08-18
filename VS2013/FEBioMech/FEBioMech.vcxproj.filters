@@ -408,9 +408,6 @@
     <ClInclude Include="..\..\FEBioMech\FETransIsoVerondaWestmann.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FETransverselyIsotropic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FETrussMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -942,9 +939,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FETransIsoVerondaWestmann.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FETransverselyIsotropic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FETrussMaterial.cpp">

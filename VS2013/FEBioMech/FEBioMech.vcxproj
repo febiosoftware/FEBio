@@ -454,7 +454,6 @@
     <ClInclude Include="..\..\FEBioMech\FETractionLoad.h" />
     <ClInclude Include="..\..\FEBioMech\FETransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FETransIsoVerondaWestmann.h" />
-    <ClInclude Include="..\..\FEBioMech\FETransverselyIsotropic.h" />
     <ClInclude Include="..\..\FEBioMech\FETrussMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEUDGHexDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEUncoupledActiveContraction.h" />
@@ -634,7 +633,6 @@
     <ClCompile Include="..\..\FEBioMech\FETractionLoad.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETransIsoVerondaWestmann.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FETransverselyIsotropic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETrussMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEUDGHexDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEUncoupledActiveContraction.cpp" />
