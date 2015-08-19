@@ -365,6 +365,8 @@ bool FESolidSolver::CreateStiffness(bool breset)
 		felog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
 		felog.printf("\n");
 	}
+	// let's flush the logfile to make sure the last output will not get lost
+	felog.flush();
 
 	// Do the preprocessing of the solver
 	m_SolverTime.start();

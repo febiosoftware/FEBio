@@ -119,6 +119,7 @@ bool Logfile::append(const char* szfile)
 void Logfile::flush()
 {
 	if (m_fp) m_fp->flush(); 
+	if (m_ps) m_ps->flush();
 }
 
 //-----------------------------------------------------------------------------
