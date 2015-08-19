@@ -338,25 +338,22 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		double s = 1;
 		m_pim->value(tag, s);
 
+		// create the bc
+		FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
+		pdc->SetScale(s).SetDOF(bc).SetLoadCurveIndex(lc);
+
+		// add this boundary condition to the current step
+		fem.AddPrescribedBC(pdc);
+		if (m_pim->m_nsteps > 0)
+		{
+			GetStep()->AddModelComponent(pdc);
+			pdc->Deactivate();
+		}
+
 		// loop over all nodes in the nodeset
 		FENodeSet& ns = *ps;
 		int N = ns.size();
-		for (int i=0; i<N; ++i)
-		{
-			FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
-			pdc->node = ns[i];
-			pdc->bc = bc;
-			pdc->lc = lc;
-			pdc->s = s;
-			fem.AddPrescribedBC(pdc);
-
-			// add this boundary condition to the current step
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(pdc);
-				pdc->Deactivate();
-			}
-		}
+		for (int i = 0; i<N; ++i) pdc->AddNode(ns[i]);
 	}
 	else
 	{
@@ -391,12 +388,12 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			sz = tag.AttributeValue("lc");
 			int lc = atoi(sz)-1;
 
-			FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
-			pdc->node = n;
-			pdc->bc = bc;
-			pdc->lc = lc;
-			tag.value(pdc->s);
-			pdc->br = br;
+			double scale;
+			tag.value(scale);
+
+			FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
+			pdc->SetDOF(bc).SetLoadCurveIndex(lc).SetScale(scale).SetRelativeFlag(br);
+			pdc->AddNode(n);
 			fem.AddPrescribedBC(pdc);
 
 			// add this boundary condition to the current step
@@ -448,6 +445,22 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 	sz = tag.AttributeValue("lc");
 	int lc = atoi(sz) - 1;
 
+	// see if the scale attribute is defined
+	double scale = 1.0;
+	tag.AttributeValue("scale", scale, true);
+
+	// create a prescribed bc
+	FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
+	pdc->SetDOF(bc).SetLoadCurveIndex(lc).SetScale(scale).SetRelativeFlag(br);
+
+	// add this boundary condition to the current step
+	fem.AddPrescribedBC(pdc);
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddModelComponent(pdc);
+		pdc->Deactivate();
+	}
+
 	// see if there is a set defined
 	const char* szset = tag.AttributeValue("set", true);
 	if (szset)
@@ -459,34 +472,10 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 		FENodeSet* pns = mesh.FindNodeSet(szset);
 		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 
-		// see if the scale attribute is defined
-		// TODO: the scale attribute is obsolete. Use the tag's value instead
-		// TODO: instead of defining everything in attributes, perhaps I should
-		//       just make child elements.
-		double scale = 1.0;
-		tag.AttributeValue("scale", scale, true);
-		if (tag.isempty() == false) m_pim->value(tag, scale);
-
+		// add the nodes
 		FENodeSet& ns = *pns;
 		int N = ns.size();
-		for (int i=0; i<N; ++i)
-		{
-			int n = ns[i];
-			FEPrescribedBC* pbc = new FEPrescribedBC(&fem);
-			pbc->node = n;
-			pbc->bc = bc;
-			pbc->lc = lc;
-			pbc->s = scale;
-			pbc->br = br;
-			fem.AddPrescribedBC(pbc);
-
-			// add this boundary condition to the current step
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(pbc);
-				pbc->Deactivate();
-			}
-		}
+		for (int i=0; i<N; ++i) pdc->AddNode(ns[i]);
 	}
 	else
 	{
@@ -496,22 +485,9 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 		{
 			// get the node ID
 			int n = atoi(tag.AttributeValue("id"))-1;
+			m_pim->value(tag, scale);
 
-			// create a new BC
-			FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
-			pdc->node = n;
-			pdc->bc = bc;
-			pdc->lc = lc;
-			pdc->br = br;
-			m_pim->value(tag, pdc->s);
-			fem.AddPrescribedBC(pdc);
-
-			// add this boundary condition to the current step
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(pdc);
-				pdc->Deactivate();
-			}
+			pdc->AddNode(n, scale);
 			++tag;
 		}
 	}

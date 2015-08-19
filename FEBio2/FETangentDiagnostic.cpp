@@ -116,15 +116,10 @@ void FETangentDiagnostic::BuildUniaxial()
 
 	// Add a prescribed BC
 	int nd[4] = {1, 2, 5, 6};
-	for (i=0; i<4; ++i)
-	{
-		FEPrescribedBC* pdc = new FEPrescribedBC(&m_fem);
-		pdc->node = nd[i];
-		pdc->bc = 0;
-		pdc->lc = 0;
-		pdc->s = d;
-		m_fem.AddPrescribedBC(pdc);
-	}
+	FEPrescribedBC* pdc = new FEPrescribedBC(&m_fem);
+	m_fem.AddPrescribedBC(pdc);
+	pdc->SetDOF(DOF_X).SetLoadCurveIndex(0).SetScale(d);
+	for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
 }
 
 //-----------------------------------------------------------------------------
@@ -183,16 +178,11 @@ void FETangentDiagnostic::BuildSimpleShear()
 	m_fem.AddLoadCurve(plc);
 
 	// Add a prescribed BC
-	int nd[4] = {4, 5, 6, 7};
-	for (i=0; i<4; ++i)
-	{
-		FEPrescribedBC* pdc = new FEPrescribedBC(&m_fem);
-		pdc->node = nd[i];
-		pdc->bc = 0;
-		pdc->lc = 0;
-		pdc->s = d;
-		m_fem.AddPrescribedBC(pdc);
-	}
+	FEPrescribedBC* pdc = new FEPrescribedBC(&m_fem);
+	m_fem.AddPrescribedBC(pdc);
+	pdc->SetDOF(DOF_X).SetLoadCurveIndex(0).SetScale(d);
+	int nd[4] = { 4, 5, 6, 7 };
+	for (i=0; i<4; ++i) pdc->AddNode(nd[i]);
 }
 
 //-----------------------------------------------------------------------------

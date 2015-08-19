@@ -319,10 +319,8 @@ bool FEMicroMaterial2O::PrepDisplacementBC()
 			for (int j=0; j<3; ++j, ++NN)
 			{
 				FEPrescribedBC* pdc = new FEPrescribedBC(&m_rve);
-				pdc->bc = j;
-				pdc->lc = NLC;
-				pdc->node = i;
-				pdc->s = 0;
+				pdc->SetDOF(j).SetLoadCurveIndex(NLC).SetScale(0.0);
+				pdc->AddNode(i);
 				m_rve.AddPrescribedBC(pdc);
 			}
 		}
@@ -355,10 +353,8 @@ bool FEMicroMaterial2O::PrepPeriodicBC()
 		for (int j=0; j<3; ++j)
 		{
 			FEPrescribedBC* pdc = new FEPrescribedBC(&m_rve);
-			pdc->bc = j;
-			pdc->lc = NLC;
-			pdc->node = (*pset)[i];
-			pdc->s = 0;
+			pdc->SetDOF(j).SetLoadCurveIndex(NLC).SetScale(0.0);
+			pdc->AddNode((*pset)[i]);
 			m_rve.AddPrescribedBC(pdc);
 		}
 
@@ -380,16 +376,16 @@ void FEMicroMaterial2O::UpdateBC(FEModel& rve, mat3d& F, tens3drs& G)
 		FEPrescribedBC& dy = *rve.PrescribedBC(3*i+1);
 		FEPrescribedBC& dz = *rve.PrescribedBC(3*i+2);
 
-		FENode& node = m.Node(dx.node);
+		FENode& node = m.Node(dx.NodeID(0));
 
 		vec3d r0 = node.m_r0;
 		
 		// LTE - Apply the second order boundary conditions to the RVE problem
 		vec3d r1 = F*r0 + G.contractdyad1(r0)*0.5;
 
-		dx.s = r1.x - r0.x;
-		dy.s = r1.y - r0.y;
-		dz.s = r1.z - r0.z;
+		dx.SetScale(r1.x - r0.x);
+		dy.SetScale(r1.y - r0.y);
+		dz.SetScale(r1.z - r0.z);
 	}
 
 	if (m_bperiodic)
@@ -604,7 +600,7 @@ void FEMicroMaterial2O::AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3
 	for (int i=0; i<nbc/3; ++i)
 	{
 		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
-		FENode& n = m.Node(dc.node);
+		FENode& n = m.Node(dc.NodeID(0));
 		vec3d f;
 		f.x = R[-n.m_ID[DOF_X]-2];
 		f.y = R[-n.m_ID[DOF_Y]-2];
@@ -1124,7 +1120,7 @@ void FEMicroMaterial2O::AveragedStress2OPK1(FEModel& rve, FEMaterialPoint &mp, m
 	for (int i=0; i<nbc/3; ++i)
 	{
 		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
-		FENode& n = m.Node(dc.node);
+		FENode& n = m.Node(dc.NodeID(0));
 		vec3d f;
 		f.x = R[-n.m_ID[DOF_X]-2];
 		f.y = R[-n.m_ID[DOF_Y]-2];
@@ -1221,7 +1217,7 @@ void FEMicroMaterial2O::AveragedStress2OPK2(FEModel& rve, FEMaterialPoint &mp, m
 	for (int i=0; i<nbc/3; ++i)
 	{
 		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
-		FENode& n = m.Node(dc.node);
+		FENode& n = m.Node(dc.NodeID(0));
 		vec3d f;
 		f.x = R[-n.m_ID[DOF_X]-2];
 		f.y = R[-n.m_ID[DOF_Y]-2];

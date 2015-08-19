@@ -291,10 +291,8 @@ bool FEMicroMaterial::PrepDisplacementBC()
 			for (int j=0; j<3; ++j, ++NN)
 			{
 				FEPrescribedBC* pdc = new FEPrescribedBC(&m_rve);
-				pdc->bc = j;
-				pdc->lc = NLC;
-				pdc->node = i;
-				pdc->s = 0;
+				pdc->SetDOF(j).SetLoadCurveIndex(NLC).SetScale(0.0);
+				pdc->AddNode(i);
 				m_rve.AddPrescribedBC(pdc);
 			}
 		}
@@ -327,10 +325,8 @@ bool FEMicroMaterial::PrepPeriodicBC()
 		for (int j=0; j<3; ++j)
 		{
 			FEPrescribedBC* pdc = new FEPrescribedBC(&m_rve);
-			pdc->bc = j;
-			pdc->lc = NLC;
-			pdc->node = (*pset)[i];
-			pdc->s = 0;
+			pdc->SetDOF(j).SetLoadCurveIndex(NLC).SetScale(0.0);
+			pdc->AddNode((*pset)[i]);
 			m_rve.AddPrescribedBC(pdc);
 		}
 
@@ -352,14 +348,14 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 		FEPrescribedBC& dy = *rve.PrescribedBC(3*i+1);
 		FEPrescribedBC& dz = *rve.PrescribedBC(3*i+2);
 
-		FENode& node = m.Node(dx.node);
+		FENode& node = m.Node(dx.NodeID(0));
 
 		vec3d r0 = node.m_r0;
 		vec3d r1 = F*r0;
 
-		dx.s = r1.x - r0.x;
-		dy.s = r1.y - r0.y;
-		dz.s = r1.z - r0.z;
+		dx.SetScale(r1.x - r0.x);
+		dy.SetScale(r1.y - r0.y);
+		dz.SetScale(r1.z - r0.z);
 	}
 
 	if (m_bperiodic)
@@ -495,7 +491,7 @@ mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 	for (int i=0; i<nbc/3; ++i)
 	{
 		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
-		FENode& n = m.Node(dc.node);
+		FENode& n = m.Node(dc.NodeID(0));
 		vec3d f;
 		f.x = R[-n.m_ID[DOF_X]-2];
 		f.y = R[-n.m_ID[DOF_Y]-2];
@@ -797,7 +793,7 @@ mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
 	for (int i=0; i<nbc/3; ++i)
 	{
 		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
-		FENode& n = m.Node(dc.node);
+		FENode& n = m.Node(dc.NodeID(0));
 		vec3d f;
 		f.x = R[-n.m_ID[DOF_X]-2];
 		f.y = R[-n.m_ID[DOF_Y]-2];
@@ -857,7 +853,7 @@ mat3ds FEMicroMaterial::AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp)
 	for (int i=0; i<nbc/3; ++i)
 	{
 		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
-		FENode& n = m.Node(dc.node);
+		FENode& n = m.Node(dc.NodeID(0));
 		vec3d f;
 		f.x = R[-n.m_ID[DOF_X]-2];
 		f.y = R[-n.m_ID[DOF_Y]-2];

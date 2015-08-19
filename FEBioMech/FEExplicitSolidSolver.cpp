@@ -324,40 +324,7 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 	for (i=0; i<ndis; ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
-		if (dc.IsActive())
-		{
-			int n    = dc.node;
-			int lc   = dc.lc;
-			int bc   = dc.bc;
-			double s = dc.s;
-			double r = dc.r;
-
-			FENode& node = mesh.Node(n);
-
-			double g = r + s*m_fem.GetLoadCurve(lc)->Value();
-
-			switch (bc)
-			{
-			case 0:
-				node.m_rt.x = node.m_r0.x + g;
-				break;
-			case 1:
-				node.m_rt.y = node.m_r0.y + g;
-				break;
-			case 2:
-				node.m_rt.z = node.m_r0.z + g;
-				break;
-			case 20:
-				{
-					vec3d dr = node.m_r0;
-					dr.x = 0; dr.unit(); dr *= g;
-
-					node.m_rt.y = node.m_r0.y + dr.y;
-					node.m_rt.z = node.m_r0.z + dr.z;
-				}
-				break;
-			}
-		}
+		if (dc.IsActive()) dc.Apply();
 	}
 
 	// enforce the linear constraints
@@ -630,75 +597,7 @@ void FEExplicitSolidSolver::PrepStep(double time)
 	for (i=0; i<nbc; ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
-		if (dc.IsActive())
-		{
-			int n    = dc.node;
-			int lc   = dc.lc;
-			int bc   = dc.bc;
-			double s = dc.s;
-			double r = dc.r;
-
-			double dq = r + s*m_fem.GetLoadCurve(lc)->Value();
-
-			int I;
-
-			FENode& node = m_fem.GetMesh().Node(n);
-
-			switch (bc)
-			{
-				case DOF_X: 
-					I = -node.m_ID[bc]-2;
-					if (I>=0 && I<neq) 
-						ui[I] = dq - (node.m_rt.x - node.m_r0.x);
-					break;
-				case DOF_Y: 
-					I = -node.m_ID[bc]-2;
-					if (I>=0 && I<neq) 
-						ui[I] = dq - (node.m_rt.y - node.m_r0.y); 
-					break;
-				case DOF_Z: 
-					I = -node.m_ID[bc]-2;
-					if (I>=0 && I<neq) 
-						ui[I] = dq - (node.m_rt.z - node.m_r0.z); 
-					break;
-					// ---> TODO: move to the FEPoroSolidSolver
-				case DOF_P: 
-					I = -node.m_ID[bc]-2;
-					if (I>=0 && I<neq) 
-						ui[I] = dq - node.m_pt; 
-					break;
-/*				case DOF_C: 
-					I = -node.m_ID[bc]-2;
-					if (I>=0 && I<neq) 
-						ui[I] = dq - node.m_ct[0]; 
-					break;
-				case DOF_C+1: 
-					I = -node.m_ID[bc]-2;
-					if (I>=0 && I<neq) 
-						ui[I] = dq - node.m_ct[1]; 
-					break;*/
-					// ---> TODO: change bc=20 to something else
-				case 20:
-				{
-					vec3d dr = node.m_r0;
-					dr.x = 0; dr.unit(); dr *= dq;
-					
-					I = -node.m_ID[1]-2;
-					if (I>=0 && I<neq) 
-						ui[I] = dr.y - (node.m_rt.y - node.m_r0.y); 
-					I = -node.m_ID[2]-2;
-					if (I>=0 && I<neq) 
-						ui[I] = dr.z - (node.m_rt.z - node.m_r0.z); 
-				}
-					break;
-				default:
-					if ((bc >= DOF_C) && (bc < (int)node.m_ID.size())) {
-						I = -node.m_ID[bc]-2;
-						if (I>=0 && I<neq) 
-							ui[I] = dq - node.m_ct[bc - DOF_C]; 
-					}
-			}
-		}
+		if (dc.IsActive()) dc.PrepStep(ui);
 	}
 
 	// initialize rigid bodies

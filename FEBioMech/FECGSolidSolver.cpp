@@ -400,40 +400,7 @@ void FECGSolidSolver::UpdateKinematics(vector<double>& ui)
 	for (i=0; i<ndis; ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
-		if (dc.IsActive())
-		{
-			int n    = dc.node;
-			int lc   = dc.lc;
-			int bc   = dc.bc;
-			double s = dc.s;
-			double r = dc.r;
-
-			FENode& node = mesh.Node(n);
-
-			double g = r + s*m_fem.GetLoadCurve(lc)->Value();
-
-			switch (bc)
-			{
-			case 0:
-				node.m_rt.x = node.m_r0.x + g;
-				break;
-			case 1:
-				node.m_rt.y = node.m_r0.y + g;
-				break;
-			case 2:
-				node.m_rt.z = node.m_r0.z + g;
-				break;
-			case 20:
-				{
-					vec3d dr = node.m_r0;
-					dr.x = 0; dr.unit(); dr *= g;
-
-					node.m_rt.y = node.m_r0.y + dr.y;
-					node.m_rt.z = node.m_r0.z + dr.z;
-				}
-				break;
-			}
-		}
+		if (dc.IsActive()) dc.Apply();
 	}
 
 	// enforce the linear constraints

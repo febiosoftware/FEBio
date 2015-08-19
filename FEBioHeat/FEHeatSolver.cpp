@@ -185,24 +185,7 @@ void FEHeatSolver::PrepStep()
 	for (int i=0; i<nbc; ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
-		if (dc.IsActive())
-		{
-			int n    = dc.node;
-			int lc   = dc.lc;
-			int bc   = dc.bc;
-			double s = dc.s;
-			double r = dc.r;
-
-			double T = r + s*m_fem.GetLoadCurve(lc)->Value();
-
-			FENode& node = m_fem.GetMesh().Node(n);
-
-			if (bc == DOF_T)
-			{
-				int I = -node.m_ID[bc]-2;
-				if (I>=0 && I<m_neq) m_u[I] = T;
-			}
-		}
+		if (dc.IsActive()) dc.PrepStep(m_u, false);
 	}
 }
 

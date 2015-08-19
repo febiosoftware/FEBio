@@ -186,18 +186,18 @@ bool FELinearSolidSolver::SolveStep(double time)
 		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
 		if (dc.IsActive())
 		{
-			int n    = dc.node;
-			int lc   = dc.lc;
-			int bc   = dc.bc;
-			double s = dc.s;
+			int bc = dc.GetDOF();
+			for (size_t j = 0; j<dc.Items(); ++j)
+			{
+				double D = dc.NodeValue(j);
+				int n = dc.NodeID(j);
 
-			double D = s*m_fem.GetLoadCurve(lc)->Value();
+				FENode& node = mesh.Node(n);
 
-			FENode& node = m_fem.GetMesh().Node(n);
-
-			if (bc == DOF_X) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.x - node.m_r0.x); }}
-			if (bc == DOF_Y) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.y - node.m_r0.y); }}
-			if (bc == DOF_Z) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.z - node.m_r0.z); }}
+				if (bc == DOF_X) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.x - node.m_r0.x); }}
+				if (bc == DOF_Y) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.y - node.m_r0.y); }}
+				if (bc == DOF_Z) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.z - node.m_r0.z); }}
+			}
 		}
 	}
 

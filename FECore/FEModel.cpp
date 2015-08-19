@@ -901,15 +901,7 @@ void FEModel::CopyFrom(FEModel& fem)
 	for (int i=0; i<NDC; ++i)
 	{
 		FEPrescribedBC* pbc = fem.PrescribedBC(i);
-		FEPrescribedBC* pnew = new FEPrescribedBC(this);
-
-		// copy data
-		pnew->bc = pbc->bc;
-		pnew->br = pbc->br;
-		pnew->lc = pbc->lc;
-		pnew->node = pbc->node;
-		pnew->r = pbc->r;
-		pnew->s = pbc->s;
+		FEPrescribedBC* pnew = new FEPrescribedBC(this, *pbc);
 
 		// add to model
 		AddPrescribedBC(pnew);

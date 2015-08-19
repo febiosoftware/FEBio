@@ -57,8 +57,12 @@ bool FEThermoElasticAnalysis::Activate()
 		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
 		if (DC.IsActive())
 		{
-			FENode& node = m_fem.GetMesh().Node(DC.node);
-			node.m_ID[DC.bc] = DOF_PRESCRIBED;
+			int dof = DC.GetDOF();
+			for (size_t j=0; j<DC.Items(); ++j)
+			{
+				FENode& node = mesh.Node(DC.NodeID(j));
+				node.m_ID[dof] = DOF_PRESCRIBED;
+			}
 		}
 	}
 
@@ -77,22 +81,7 @@ bool FEThermoElasticAnalysis::Activate()
 	for (int i=0; i<ndis; ++i)
 	{
 		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
-		int nid = DC.node;
-		int bc  = DC.bc;
-		bool br = DC.br;
-
-		FENode& node = m_fem.GetMesh().Node(nid); 
-
-		if (DC.IsActive())
-		{
-			switch (bc)
-			{
-			case DOF_X: DC.r = br ? node.m_rt.x - node.m_r0.x : 0; break;
-			case DOF_Y: DC.r = br ? node.m_rt.y - node.m_r0.y : 0; break;
-			case DOF_Z: DC.r = br ? node.m_rt.z - node.m_r0.z : 0; break;
-			case DOF_T: DC.r = br ? node.m_T    - node.m_T0   : 0; break;
-			}
-		}
+		if (DC.IsActive()) DC.Update();
 	}
 
 	// modify the linear constraints

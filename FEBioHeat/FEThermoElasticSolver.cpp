@@ -616,24 +616,6 @@ void FEThermoElasticSolver::Update(vector<double>& ui)
 	for (int i=0; i<ndis; ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
-		if (dc.IsActive())
-		{
-			int n    = dc.node;
-			int lc   = dc.lc;
-			int bc   = dc.bc;
-			double s = dc.s;
-			double r = dc.r;
-
-			FENode& node = mesh.Node(n);
-
-			double g = r + s*m_fem.GetLoadCurve(lc)->Value();
-
-			switch (bc)
-			{
-			case DOF_T:
-				node.m_T = g;
-				break;
-			}
-		}
+		if (dc.IsActive()) dc.Apply();
 	}
 }

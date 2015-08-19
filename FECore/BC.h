@@ -51,20 +51,50 @@ public:
 
 class FEPrescribedBC : public FEBoundaryCondition
 {
+	struct ITEM
+	{
+		int		nid;	// nodal ID
+		double scale;	// nodal scale factor
+	};
+
 public:
-	FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+	FEPrescribedBC(FEModel* pfem);
+	FEPrescribedBC(FEModel* pfem, const FEPrescribedBC& bc);
+
+	void AddNode(int node, double scale = 1.0);
+	int NodeID(int i) { return m_item[i].nid; }
+
+	size_t Items() const { return m_item.size(); }
 
 	void Serialize(DumpFile& ar);
 
 	bool Init();
 
+	double NodeValue(int n) const;
+
+	void Update();
+
+	void Apply();
+
+	void PrepStep(std::vector<double>& ui, bool brel = true);
+
 public:
-	double	s;		// scale factor
-	int		node;	// node number
-	int		bc;		// dof
-	int		lc;		// load curve
-	double	r;		// initial value
-	bool	br;		// flag for relative bc
+	FEPrescribedBC& SetScale(double s) { m_scale = s; return *this; }
+	FEPrescribedBC& SetDOF(int dof) { m_dof = dof; return *this; }
+	FEPrescribedBC& SetRelativeFlag(bool br) { m_br = br; return *this; }
+	FEPrescribedBC& SetLoadCurveIndex(int lc) { m_lc = lc; return *this; }
+
+	double GetScaleFactor() const { return m_scale; }
+	int GetDOF() const { return m_dof; }
+
+private:
+	double	m_scale;	//!< overall scale factor
+	int		m_dof;		//!< dof
+	int		m_lc;		//!< load curve
+	double	m_r;		//!< initial value
+	bool	m_br;		//!< flag for relative bc
+
+	vector<ITEM>	m_item;		//!< item list
 };
 
 //-----------------------------------------------------------------------------

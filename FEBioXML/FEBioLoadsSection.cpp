@@ -180,7 +180,7 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 			{
 				int n = ns[i];
 				// create new nodal force
-				FENodalLoad* pfc = new FENodalLoad(&fem);
+				FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
 				pfc->m_node = n;
 				pfc->m_bc = bc;
 				pfc->m_lc = lc;
@@ -205,7 +205,7 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 				int n = atoi(tag.AttributeValue("id"))-1;
 
 				// create new nodal force
-				FENodalLoad* pfc = new FENodalLoad(&fem);
+				FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
 				pfc->m_node = n;
 				pfc->m_bc = bc;
 				pfc->m_lc = lc;
@@ -246,7 +246,7 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 			sz = tag.AttributeValue("lc");
 			int lc = atoi(sz) - 1;
 
-			FENodalLoad* pfc = new FENodalLoad(&fem);
+			FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
 			pfc->m_node = n;
 			pfc->m_bc = bc;
 			pfc->m_lc = lc;

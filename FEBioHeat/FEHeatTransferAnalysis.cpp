@@ -41,8 +41,12 @@ bool FEHeatTransferAnalysis::Activate()
 		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
 		if (DC.IsActive())
 		{
-			FENode& node = m_fem.GetMesh().Node(DC.node);
-			if (DC.bc == DOF_T) node.m_ID[DC.bc] = DOF_PRESCRIBED;
+			int dof = DC.GetDOF();
+			for (size_t j=0; j<DC.Items(); ++j)
+			{
+				FENode& node = mesh.Node(DC.NodeID(j));
+				if (dof == DOF_T) node.m_ID[dof] = DOF_PRESCRIBED;
+			}
 		}
 	}
 
@@ -61,19 +65,7 @@ bool FEHeatTransferAnalysis::Activate()
 	for (int i=0; i<ndis; ++i)
 	{
 		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
-		int nid = DC.node;
-		int bc  = DC.bc;
-		bool br = DC.br;
-
-		FENode& node = m_fem.GetMesh().Node(nid); 
-
-		if (DC.IsActive())
-		{
-			if (bc == DOF_T)
-			{
-				DC.r = (br ? node.m_T    - node.m_T0   : 0);
-			}
-		}
+		if (DC.IsActive()) DC.Update();
 	}
 
 	// modify the linear constraints

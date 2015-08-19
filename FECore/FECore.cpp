@@ -32,5 +32,7 @@ REGISTER_FECORE_CLASS(FECylindricalMap   , FECOORDSYSMAP_ID, "cylindrical");
 REGISTER_FECORE_CLASS(FEVectorMap        , FECOORDSYSMAP_ID, "vector"     );
 REGISTER_FECORE_CLASS(FESphericalAngleMap, FECOORDSYSMAP_ID, "angles"     );
 
-REGISTER_FECORE_CLASS(FEFixedBC, FEBC_ID, "fix");
+REGISTER_FECORE_CLASS(FEFixedBC     , FEBC_ID, "fix"      );
+REGISTER_FECORE_CLASS(FEPrescribedBC, FEBC_ID, "prescribe");
+REGISTER_FECORE_CLASS(FENodalLoad   , FEBC_ID, "nodal load");
 }

@@ -903,25 +903,6 @@ void FEMultiphasicSolver::UpdatePoro(vector<double>& ui)
 		// update velocities
 		node.m_vt  = (node.m_rt - node.m_rp) / pstep->m_dt;
 	}
-
-	// make sure the prescribed pressures are fullfilled
-	int ndis = m_fem.PrescribedBCs();
-	for (i=0; i<ndis; ++i)
-	{
-		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
-		if (dc.IsActive())
-		{
-			int n    = dc.node;
-			int lc   = dc.lc;
-			int bc   = dc.bc;
-			double s = dc.s;
-			double r = dc.r;
-
-			FENode& node = mesh.Node(n);
-
-			if (bc == DOF_P) node.m_pt = r + s*m_fem.GetLoadCurve(lc)->Value();
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -963,27 +944,6 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 		
 		// update velocities
 		node.m_vt  = (node.m_rt - node.m_rp) / pstep->m_dt;
-	}
-	
-	// make sure the prescribed concentrations are fullfilled
-	int ndis = m_fem.PrescribedBCs();
-	for (i=0; i<ndis; ++i)
-	{
-		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
-		if (dc.IsActive())
-		{
-			int n    = dc.node;
-			int lc   = dc.lc;
-			int bc   = dc.bc;
-			double s = dc.s;
-			double r = dc.r;
-			
-			FENode& node = mesh.Node(n);
-			
-			for (j=0; j<MAX_CDOFS; ++j) {
-				if (bc == DOF_C+j) node.m_ct[j] = r + s*m_fem.GetLoadCurve(lc)->Value();
-			}
-		}
 	}
 }
 

@@ -4,6 +4,7 @@
 #include "FESolver.h"
 #include "FERigidBody.h"
 #include "log.h"
+#include "DOFS.h"
 
 //-----------------------------------------------------------------------------
 FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
@@ -99,6 +100,34 @@ void FEFixedBC::Activate()
 }
 
 //-----------------------------------------------------------------------------
+FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+{
+	m_lc = -1;
+	m_scale = 0.0;
+	m_r = 0.0;
+	m_dof = -1;
+	m_br = false;
+}
+
+//-----------------------------------------------------------------------------
+FEPrescribedBC::FEPrescribedBC(FEModel* pfem, const FEPrescribedBC& bc) : FEBoundaryCondition(FEBC_ID, pfem)
+{
+	m_lc    = bc.m_lc;
+	m_scale = bc.m_scale;
+	m_r     = bc.m_r;
+	m_dof   = bc.m_dof;
+	m_br    = bc.m_br;
+	m_item  = bc.m_item;
+}
+
+//-----------------------------------------------------------------------------
+void FEPrescribedBC::AddNode(int nid, double s)
+{
+	ITEM item = {nid, s};
+	m_item.push_back(item);
+}
+
+//-----------------------------------------------------------------------------
 bool FEPrescribedBC::Init()
 {
 	// don't forget to call the base class
@@ -107,7 +136,7 @@ bool FEPrescribedBC::Init()
 	// check the load curve ID
 	FEModel& fem = *GetFEModel();
 	int NLC = fem.LoadCurves();
-	if ((lc < 0)||(lc >= NLC))
+	if ((m_lc < 0) || (m_lc >= NLC))
 	{
 		felog.printf("ERROR: Invalid loadcurve in prescribed BC %d\n", GetID());
 		return false;
@@ -115,14 +144,33 @@ bool FEPrescribedBC::Init()
 
 	// make sure this is not a rigid node
 	FEMesh& mesh = fem.GetMesh();
-	if ((node < 0) || (node >= mesh.Nodes())) return false;
-	if (mesh.Node(node).m_rid != -1) 
+	int NN = mesh.Nodes();
+	for (size_t i=0; i<m_item.size(); ++i)
 	{
-		felog.printf("ERROR: Rigid nodes cannot be prescribed.\n");
-		return false;
+		int nid = m_item[i].nid;
+		if ((nid < 0) || (nid >= NN)) return false;
+		if (mesh.Node(nid).m_rid != -1)
+		{
+			felog.printf("ERROR: Rigid nodes cannot be prescribed.\n");
+			return false;
+		}
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+double FEPrescribedBC::NodeValue(int n) const
+{
+	ITEM it = m_item[n];
+	double val = m_scale*it.scale;
+	if (m_lc >= 0) 
+	{
+		FEModel& fem = *GetFEModel();
+		val *= fem.GetLoadCurve(m_lc)->Value();
+	}
+	if (m_br) val += m_r;
+	return val;
 }
 
 //-----------------------------------------------------------------------------
@@ -131,11 +179,95 @@ void FEPrescribedBC::Serialize(DumpFile& ar)
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << bc << lc << node << s << br << r;
+		ar << m_dof << m_lc << m_item << m_scale << m_br << m_r;
 	}
 	else
 	{
-		ar >> bc >> lc >> node >> s >> br >> r;
+		ar >> m_dof >> m_lc >> m_item >> m_scale >> m_br >> m_r;
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! \todo This function is called during PrepStep. I'm not sure yet how to 
+//! integrate this better in the framework. Maybe this can be done in Activate()?
+void FEPrescribedBC::Update()
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	for (size_t i=0; i<m_item.size(); ++i)
+	{
+		FENode& node = mesh.Node(m_item[i].nid);
+		switch(m_dof)
+		{
+		case DOF_X: m_r = (m_br ? node.m_rt.x - node.m_r0.x : 0); break;
+		case DOF_Y: m_r = (m_br ? node.m_rt.y - node.m_r0.y : 0); break;
+		case DOF_Z: m_r = (m_br ? node.m_rt.z - node.m_r0.z : 0); break;
+		case DOF_U: m_r = (m_br ? node.m_Dt.x - node.m_D0.x : 0); break;
+		case DOF_V: m_r = (m_br ? node.m_Dt.y - node.m_D0.y : 0); break;
+		case DOF_W: m_r = (m_br ? node.m_Dt.z - node.m_D0.z : 0); break;
+		case DOF_T: m_r = (m_br ? node.m_T - node.m_T0 : 0); break;
+		case DOF_P: m_r = (m_br ? node.m_pt - node.m_p0 : 0); break;
+		default:	// all prescribed concentrations
+			if ((m_dof >= DOF_C) && (m_dof < (int)node.m_ID.size())) {
+				int sid = m_dof - DOF_C;
+				m_r = (m_br ? node.m_ct[sid] - node.m_c0[sid] : 0);
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! \todo Find a good way to integrate this with the framework.
+//! This is called by the FESolver::UpdateStresses.
+//! Maybe rename this to Update()
+void FEPrescribedBC::Apply()
+{
+	// get the mesh
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	// update the current nodal values
+	for (size_t i = 0; i<m_item.size(); ++i)
+	{
+		FENode& node = mesh.Node(m_item[i].nid);
+		double g = NodeValue(i);
+		switch (m_dof)
+		{
+		case DOF_X: node.m_rt.x = node.m_r0.x + g; break;
+		case DOF_Y: node.m_rt.y = node.m_r0.y + g; break;
+		case DOF_Z: node.m_rt.z = node.m_r0.z + g; break;
+		case DOF_P: node.m_pt = g; break;
+		case DOF_T: node.m_T = g; break;
+		default:
+			if (m_dof >= DOF_C) node.m_ct[m_dof - DOF_C] = g; break;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
+{
+	// get the mesh
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	for (size_t i = 0; i<m_item.size(); ++i)
+	{
+		FENode& node = mesh.Node(m_item[i].nid);
+		double dq = NodeValue(i);
+		int I = -node.m_ID[m_dof] - 2;
+		if (I >= 0)
+		{
+			switch (m_dof)
+			{
+			case DOF_X: ui[I] = dq - (node.m_rt.x - node.m_r0.x); break;
+			case DOF_Y: ui[I] = dq - (node.m_rt.y - node.m_r0.y); break;
+			case DOF_Z: ui[I] = dq - (node.m_rt.z - node.m_r0.z); break;
+			case DOF_P: ui[I] = dq - node.m_pt; break;
+			case DOF_T: ui[I] = (brel ? dq - node.m_T : dq);
+			default:
+				if ((m_dof >= DOF_C) && (m_dof < (int)node.m_ID.size())) {
+					ui[I] = dq - node.m_ct[m_dof - DOF_C];
+				}
+			}
+		}
 	}
 }
 
