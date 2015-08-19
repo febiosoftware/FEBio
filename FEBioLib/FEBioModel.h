@@ -82,6 +82,7 @@ public: // --- I/O functions ---
 	const char* GetInputFileName();
 	const char* GetLogfileName  ();
 	const char* GetPlotFileName ();
+	const char* GetDumpFileName ();
 
 	//! get the file title
 	const char* GetFileTitle();

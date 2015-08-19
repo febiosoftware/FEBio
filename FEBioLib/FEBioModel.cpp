@@ -23,9 +23,9 @@ FEBioModel::FEBioModel()
 	// --- I/O-Data ---
 	m_szfile_title = 0;
 	m_szfile[0] = 0;
-	strcpy(m_szplot, "n3plot");
-	strcpy(m_szlog , "n3log" );
-	strcpy(m_szdump, "n3dump");
+	m_szplot[0] = 0;
+	m_szlog[0] = 0;
+	m_szdump[0] = 0;
 	m_debug = false;
 	m_becho = true;
 	m_plot = 0;
@@ -128,6 +128,13 @@ const char* FEBioModel::GetPlotFileName()
 }
 
 //-----------------------------------------------------------------------------
+//! Return the dump file name.
+const char* FEBioModel::GetDumpFileName()
+{
+	return	m_szdump;
+}
+
+//-----------------------------------------------------------------------------
 //! get the file title (i.e. name of input file without the path)
 //! \todo Do I actually need to store this?
 const char* FEBioModel::GetFileTitle()
@@ -157,6 +164,9 @@ bool FEBioModel::Input(const char* szfile)
 
 		return false;
 	}
+
+	// set the input file name
+	SetInputFilename(szfile);
 
 	// see if user redefined output filenames
 	if (fim.m_szdmp[0]) SetDumpFilename(fim.m_szdmp);
@@ -1091,6 +1101,19 @@ bool FEBioModel::Init()
 	// Open the logfile
 	if (!felog.is_valid()) 
 	{
+		// see if a valid log file name is defined.
+		const char* szlog = GetLogfileName();
+		if (szlog[0] == 0)
+		{
+			// if not, we take the input file name and set the extension to .log
+			char sz[1024] = {0};
+			strcpy(sz, GetInputFileName());
+			char *ch = strrchr(sz, '.');
+			if (ch) *ch = 0;
+			strcat(sz, ".log");
+			SetLogFilename(sz);
+		}
+		
 		if (felog.open(m_szlog) == false)
 		{
 			felog.printbox("FATAL ERROR", "Failed creating log file");
@@ -1128,11 +1151,38 @@ bool FEBioModel::Init()
 			m_plot = new FEBioPlotFile(*this);
 		}
 
+		// see if a valid plot file name is defined.
+		const char* szplt = GetPlotFileName();
+		if (szplt[0] == 0)
+		{
+			// if not, we take the input file name and set the extension to .xplt
+			char sz[1024] = {0};
+			strcpy(sz, GetInputFileName());
+			char *ch = strrchr(sz, '.');
+			if (ch) *ch = 0;
+			strcat(sz, ".xplt");
+			SetPlotFilename(sz);
+		}
+
+		// try to open the plot file
 		if (m_plot->Open(*this, m_szplot) == false)
 		{
 			felog.printf("ERROR : Failed creating PLOT database\n");
 			return false;
 		}
+	}
+
+	// see if a valid dump file name is defined.
+	const char* szdmp = this->GetDumpFileName();
+	if (szdmp[0] == 0)
+	{
+		// if not, we take the input file name and set the extension to .dmp
+		char sz[1024] = {0};
+		strcpy(sz, GetInputFileName());
+		char *ch = strrchr(sz, '.');
+		if (ch) *ch = 0;
+		strcat(sz, ".dmp");
+		SetDumpFilename(sz);
 	}
 
 	// Since it is assumed that for the first timestep

@@ -242,8 +242,12 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	bool bplt = false;
 	bool bdmp = false;
 	bool brun = true;
-	
+
+	// initialize file names
 	ops.szfile[0] = 0;
+	ops.szplt[0] = 0;
+	ops.szlog[0] = 0;
+	ops.szdmp[0] = 0;
 	ops.sztask[0] = 0;
 	ops.szctrl[0] = 0;
 
@@ -487,9 +491,6 @@ int Run(CMDOPTIONS& ops)
 	// read the input file if specified
 	if (ops.szfile[0])
 	{
-		// store the input file name
-		fem.SetInputFilename(ops.szfile);
-
 		// read the input file
 		if (fem.Input(ops.szfile) == false) return 1;
 
