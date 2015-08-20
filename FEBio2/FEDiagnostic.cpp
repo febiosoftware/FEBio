@@ -12,6 +12,7 @@
 #include "FECore/log.h"
 #include "FEBioXML/FEBioControlSection.h"
 #include "FEBioXML/FEBioMaterialSection.h"
+#include "FEBioXML/FEBioGlobalsSection.h"
 #include "FEBioMech/FESolidAnalysis.h"
 #include "FECore/FECoreKernel.h"
 
@@ -55,6 +56,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 	map["Control" ] = new FEBioControlSection (this);
 	map["Material"] = new FEBioMaterialSection(this);
 	map["Scenario"] = new FEBioScenarioSection(this);
+    map["Globals" ] = new FEBioGlobalsSection (this);
 
 	// loop over all child tags
 	try
