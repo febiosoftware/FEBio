@@ -11,6 +11,7 @@
 		D5307A4518B40934008C8463 /* libFEBioOpt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5307A4418B40934008C8463 /* libFEBioOpt.a */; };
 		D5307A4B18B40AB0008C8463 /* liblevmar.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5307A4A18B40AB0008C8463 /* liblevmar.a */; };
 		D5AC350D19B9454B003D048C /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5AC350C19B9454B003D048C /* libgsl.a */; };
+		D5CCDAFC1B86761600B1B3B0 /* FEBiphasicTangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CCDAFA1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.cpp */; };
 		D5E10B921865E24900B23922 /* CommandManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B751865E24900B23922 /* CommandManager.cpp */; };
 		D5E10B931865E24900B23922 /* console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B771865E24900B23922 /* console.cpp */; };
 		D5E10B941865E24900B23922 /* diagnose.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B791865E24900B23922 /* diagnose.cpp */; };
@@ -55,6 +56,8 @@
 		D5307A4A18B40AB0008C8463 /* liblevmar.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblevmar.a; path = ../../../../../../../../../../../usr/local/lib/liblevmar.a; sourceTree = "<group>"; };
 		D53FF8D51865F9F900CE43E4 /* febio.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = febio.xml; path = ../../../FEBio/bin/febio.xml; sourceTree = "<group>"; };
 		D5AC350C19B9454B003D048C /* libgsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgsl.a; path = ../../../../../../../../../../usr/local/lib/libgsl.a; sourceTree = "<group>"; };
+		D5CCDAFA1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicTangentDiagnostic.cpp; sourceTree = "<group>"; };
+		D5CCDAFB1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicTangentDiagnostic.h; sourceTree = "<group>"; };
 		D5E10B671865E23500B23922 /* FEBio2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FEBio2; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E10B741865E24900B23922 /* Command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Command.h; sourceTree = "<group>"; };
 		D5E10B751865E24900B23922 /* CommandManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommandManager.cpp; sourceTree = "<group>"; };
@@ -174,6 +177,8 @@
 				D5E10B8D1865E24900B23922 /* Interrupt.h */,
 				D5E10B901865E24900B23922 /* stdafx.cpp */,
 				D5E10B911865E24900B23922 /* stdafx.h */,
+				D5CCDAFA1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.cpp */,
+				D5CCDAFB1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.h */,
 			);
 			name = FEBio2;
 			path = ../../FEBio2;
@@ -239,6 +244,7 @@
 				D5E10B961865E24900B23922 /* FEBioCommand.cpp in Sources */,
 				D5E10B9B1865E24900B23922 /* FEPrintHBMatrixDiagnostic.cpp in Sources */,
 				D5E10BA01865E24900B23922 /* stdafx.cpp in Sources */,
+				D5CCDAFC1B86761600B1B3B0 /* FEBiphasicTangentDiagnostic.cpp in Sources */,
 				D5E10B9E1865E24900B23922 /* Interrupt.cpp in Sources */,
 				D5E10B971865E24900B23922 /* FEBioStdSolver.cpp in Sources */,
 				D5E10B9D1865E24900B23922 /* FETangentDiagnostic.cpp in Sources */,
