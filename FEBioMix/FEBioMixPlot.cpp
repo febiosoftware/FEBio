@@ -167,51 +167,44 @@ FEPlotActualSoluteConcentration::FEPlotActualSoluteConcentration(FEModel* pfem) 
 }
 
 //-----------------------------------------------------------------------------
+// Resolve solute by name
 bool FEPlotActualSoluteConcentration::SetFilter(const char* sz)
 {
-	if (sz[0] == '\'')
+	// find the solute with that name
+	FEModel& fem = *m_pfem;
+	int N = fem.GlobalDataItems();
+	for (int i=0; i<N; ++i)
 	{
-		// extract the name
-		char szname[512]={0};
-		strcpy(szname, sz);
-		char* sz = szname+1;
-		char* ch = strrchr(sz, '\'');
-		if (ch==0) return false;
-		*ch = 0;
-
-		// find the solute with that name
-		FEModel& fem = *m_pfem;
-		int N = fem.GlobalDataItems();
-		for (int i=0; i<N; ++i)
+		FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
+		if (psd)
 		{
-			FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
-			if (psd)
+			if (strcmp(psd->m_szname, sz) == 0)
 			{
-				if (strcmp(psd->m_szname, sz) == 0)
-				{
-					m_nsol = psd->m_nID;
-					return true;
-				}
+				m_nsol = psd->m_nID;
+				return true;
 			}
 		}
 	}
-	else
-	{
-		int nsol = atoi(sz) - 1;
 
-		// find the solute with that index
-		FEModel& fem = *m_pfem;
-		int N = fem.GlobalDataItems();
-		for (int i=0; i<N; ++i)
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Resolve solute by solute ID
+bool FEPlotActualSoluteConcentration::SetFilter(int nsol)
+{
+	// find the solute with that index
+	FEModel& fem = *m_pfem;
+	int N = fem.GlobalDataItems();
+	for (int i=0; i<N; ++i)
+	{
+		FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
+		if (psd)
 		{
-			FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
-			if (psd)
+			if (psd->m_nID == nsol)
 			{
-				if (psd->m_nID == nsol)
-				{
-					m_nsol = psd->m_nID;
-					return true;
-				}
+				m_nsol = psd->m_nID;
+				return true;
 			}
 		}
 	}

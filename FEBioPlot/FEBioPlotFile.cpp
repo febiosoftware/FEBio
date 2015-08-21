@@ -13,17 +13,44 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 
 	// extract the (optional) title
 	char* ch = strrchr(sz, '=');
-	if (ch) *ch++ = 0;
+	if (ch)
+	{
+		*ch++ = 0;
+		// names must be paranthesized with single quotes.
+		ch = strchr(ch, '\'');
+		if (ch == 0) return false; else *ch++ = 0;
+		// find the end quote
+		char* ch2 = strrchr(ch, '\'');
+		if (ch2==0) return false; else *ch2 = 0;
+	}
 	const char* sztitle = (ch ? ch : szname);
 
 	// extract the filter
 	char* szflt = strchr(sz, '[');
+	int index = 0;
+	int ntype = 0;
 	if (szflt)
 	{
 		*szflt++ = 0;
 		char* ch = strrchr(szflt, ']');
 		if (ch == 0) return false;
 		*ch = 0;
+
+		// see if the filter is a number or a string
+		ch = strchr(szflt, '\'');
+		if (ch)
+		{
+			*szflt++ = 0;
+			// find the end character
+			char* ch2 = strrchr(szflt, '\'');
+			if (ch2 == 0) return false;
+			*ch2 = 0;
+		}
+		else
+		{
+			ntype = 1;
+			index = atoi(szflt);
+		}
 	}
 
 	// create the plot variable
@@ -34,7 +61,14 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 		ps->SetItemList(item);
 		if (szflt) 
 		{
-			if (ps->SetFilter(szflt) == false) return false;
+			if (ntype == 0) 
+			{
+				if (ps->SetFilter(szflt) == false) return false;
+			}
+			else if (ntype == 1)
+			{
+				if (ps->SetFilter(index) == false) return false;
+			}
 		}
 
 		// add the field to the plot file

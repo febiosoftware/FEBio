@@ -36,6 +36,7 @@ public:
 	FEPlotActualSoluteConcentration(FEModel* pfem);
 	bool Save(FEDomain& dom, vector<float>& a);
 	bool SetFilter(const char* sz);
+	bool SetFilter(int nsol);
 protected:
 	int			m_nsol;
 	FEModel*	m_pfem;

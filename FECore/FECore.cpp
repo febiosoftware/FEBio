@@ -3,6 +3,7 @@
 #include "FECoordSysMap.h"
 #include "FECoreKernel.h"
 #include "BC.h"
+#include "FECorePlot.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -35,4 +36,6 @@ REGISTER_FECORE_CLASS(FESphericalAngleMap, FECOORDSYSMAP_ID, "angles"     );
 REGISTER_FECORE_CLASS(FEFixedBC     , FEBC_ID, "fix"      );
 REGISTER_FECORE_CLASS(FEPrescribedBC, FEBC_ID, "prescribe");
 REGISTER_FECORE_CLASS(FENodalLoad   , FEBC_ID, "nodal load");
+
+REGISTER_FECORE_CLASS(FEPlotMaterialParameter, FEPLOTDATA_ID, "parameter");
 }

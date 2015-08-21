@@ -597,6 +597,7 @@
     <ClInclude Include="..\..\FECore\FECoreBase.h" />
     <ClInclude Include="..\..\FECore\FECoreFactory.h" />
     <ClInclude Include="..\..\FECore\FECoreKernel.h" />
+    <ClInclude Include="..\..\FECore\FECorePlot.h" />
     <ClInclude Include="..\..\FECore\FECoreTask.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteMaterial.h" />
@@ -698,6 +699,7 @@
     <ClCompile Include="..\..\FECore\FECoreBase.cpp" />
     <ClCompile Include="..\..\FECore\FECoreFactory.cpp" />
     <ClCompile Include="..\..\FECore\FECoreKernel.cpp" />
+    <ClCompile Include="..\..\FECore\FECorePlot.cpp" />
     <ClCompile Include="..\..\FECore\FECoreTask.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteMaterial.cpp" />

@@ -32,8 +32,14 @@ public:
 
 	// The filter can be used to pass additional information to the plot field.
 	// The interpretation of this filter is up to the derived class, but could
-	// be used e.g. for disambiguation.
-	virtual bool SetFilter(const char* sz) { return true; }
+	// be used e.g. for disambiguation. There are currently two flavors of this
+	// function: one that takes a const char* and one that takes an int. Derived
+	// classes can overload both or just the one that makes sense for that plot field.
+	// Note that these functions return false by default. This implies that trying
+	// to specify a filter on a variable that doesn't support it will automatically cause 
+	// an error.
+	virtual bool SetFilter(const char* sz) { return false; }
+	virtual bool SetFilter(int n) { return false;}
 
 	Var_Type DataType() { return m_ntype; }
 	Storage_Fmt StorageFormat() { return m_sfmt; }
