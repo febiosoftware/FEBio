@@ -161,6 +161,8 @@
 				D5E10B7D1865E24900B23922 /* FEBioCommand.h */,
 				D5E10B7E1865E24900B23922 /* FEBioStdSolver.cpp */,
 				D5E10B7F1865E24900B23922 /* FEBioStdSolver.h */,
+				D5CCDAFA1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.cpp */,
+				D5CCDAFB1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.h */,
 				D5E10B801865E24900B23922 /* FEContactDiagnostic.cpp */,
 				D5E10B811865E24900B23922 /* FEContactDiagnostic.h */,
 				D5E10B821865E24900B23922 /* FEDiagnostic.cpp */,
@@ -177,8 +179,6 @@
 				D5E10B8D1865E24900B23922 /* Interrupt.h */,
 				D5E10B901865E24900B23922 /* stdafx.cpp */,
 				D5E10B911865E24900B23922 /* stdafx.h */,
-				D5CCDAFA1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.cpp */,
-				D5CCDAFB1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.h */,
 			);
 			name = FEBio2;
 			path = ../../FEBio2;
