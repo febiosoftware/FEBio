@@ -329,10 +329,10 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWork(FESolidElement& el, vector<
 	double Ji[3][3], detJ, J0i[3][3];
 	
 	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz, GX, GY, GZ;
+    vec3d GradN;
 	
 	// Bp-matrix
-	vector<double> B1(neln), B2(neln), B3(neln);
+    vector<vec3d> gradN(neln);
 	
 	// gauss-weights
 	double* wg = el.GaussWeights();
@@ -340,7 +340,7 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWork(FESolidElement& el, vector<
 	FEMesh& mesh = *GetMesh();
 	
 	vec3d rp[FEElement::MAX_NODES];
-	for (i=0; i<neln; ++i) 
+	for (i=0; i<neln; ++i)
 	{
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
 	}
@@ -375,22 +375,15 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWork(FESolidElement& el, vector<
 		{
 			// calculate global gradient of shape functions
 			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
+            gradN[i] = vec3d(Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i],
+                             Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i],
+                             Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i]);
 			
-			GX = J0i[0][0]*Gr[i]+J0i[1][0]*Gs[i]+J0i[2][0]*Gt[i];
-			GY = J0i[0][1]*Gr[i]+J0i[1][1]*Gs[i]+J0i[2][1]*Gt[i];
-			GZ = J0i[0][2]*Gr[i]+J0i[1][2]*Gs[i]+J0i[2][2]*Gt[i];
-			
-			Fp[0][0] += rp[i].x*GX; Fp[1][0] += rp[i].y*GX; Fp[2][0] += rp[i].z*GX;
-			Fp[0][1] += rp[i].x*GY; Fp[1][1] += rp[i].y*GY; Fp[2][1] += rp[i].z*GY;
-			Fp[0][2] += rp[i].x*GZ; Fp[1][2] += rp[i].y*GZ; Fp[2][2] += rp[i].z*GZ;
-			
-			// calculate Bp matrix
-			B1[i] = Gx;
-			B2[i] = Gy;
-			B3[i] = Gz;
+            GradN = vec3d(J0i[0][0]*Gr[i]+J0i[1][0]*Gs[i]+J0i[2][0]*Gt[i],
+                          J0i[0][1]*Gr[i]+J0i[1][1]*Gs[i]+J0i[2][1]*Gt[i],
+                          J0i[0][2]*Gr[i]+J0i[1][2]*Gs[i]+J0i[2][2]*Gt[i]);
+            
+            Fp += rp[i] & GradN;
 		}
 		
 		// next we get the determinant
@@ -409,7 +402,7 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWork(FESolidElement& el, vector<
 		// update force vector
 		for (i=0; i<neln; ++i)
 		{
-			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z + (phiwhat - divv)*H[i])*detJ*wg[n];
+			fe[i] -= dt*(w*gradN[i] + (phiwhat - divv)*H[i])*detJ*wg[n];
 		}
 	}
 	
@@ -588,13 +581,11 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 	int neln = el.Nodes();
 	
 	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz, GX, GY, GZ;
 	
 	// jacobian
 	double Ji[3][3], detJ, J0i[3][3];
 	
 	// Bp-matrix
-	vector<double> B1(neln), B2(neln), B3(neln);
 	vector<vec3d> gradN(neln);
 	double tmp;
 	
@@ -640,69 +631,25 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
 
+        // contravariant basis vectors in spatial frame
 		vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
 		vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
 		vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
 		
-		// we need to calculate the divergence of v. To do this we use
-		// the formula div(v) = 1/J*dJdt, where J = det(F)
-		invjac0(el, J0i, n);
-		vec3d G1(J0i[0][0],J0i[0][1],J0i[0][2]);
-		vec3d G2(J0i[1][0],J0i[1][1],J0i[1][2]);
-		vec3d G3(J0i[2][0],J0i[2][1],J0i[2][2]);
-		
-		// next we calculate the deformation gradient and the solid velocity
-		mat3d Fp, gradv;
-		Fp.zero();
-		gradv.zero();
-		vec3d vs(0,0,0);
-		
+        H = el.H(n);
+        
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		Gt = el.Gt(n);
-		
-		H = el.H(n);
-		
+        
 		for (i=0; i<neln; ++i)
 		{
 			// calculate global gradient of shape functions
 			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-			
-			GX = J0i[0][0]*Gr[i]+J0i[1][0]*Gs[i]+J0i[2][0]*Gt[i];
-			GY = J0i[0][1]*Gr[i]+J0i[1][1]*Gs[i]+J0i[2][1]*Gt[i];
-			GZ = J0i[0][2]*Gr[i]+J0i[1][2]*Gs[i]+J0i[2][2]*Gt[i];
-			
-			Fp[0][0] += rp[i].x*GX; Fp[1][0] += rp[i].y*GX; Fp[2][0] += rp[i].z*GX;
-			Fp[0][1] += rp[i].x*GY; Fp[1][1] += rp[i].y*GY; Fp[2][1] += rp[i].z*GY;
-			Fp[0][2] += rp[i].x*GZ; Fp[1][2] += rp[i].y*GZ; Fp[2][2] += rp[i].z*GZ;
-			
-			// calculate solid velocity and its gradient
-			vs += v[i]*H[i];
-			gradv[0][0] += v[i].x*Gx; gradv[1][0] += v[i].y*Gx; gradv[2][0] += v[i].z*Gx;
-			gradv[0][1] += v[i].x*Gy; gradv[1][1] += v[i].y*Gy; gradv[2][1] += v[i].z*Gy;
-			gradv[0][2] += v[i].x*Gz; gradv[1][2] += v[i].y*Gz; gradv[2][2] += v[i].z*Gz;
-			
-			// calculate Bp matrix
-			B1[i] = Gx;
-			B2[i] = Gy;
-			B3[i] = Gz;
-			gradN[i] = vec3d(Gx,Gy,Gz);
-			
+            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
 		}
 		
-		// next we get the determinant
-		double Jp = Fp.det();
-		double J = ept.m_J;
-		
-		// and then finally
-		double dJdt = (J-Jp)/dt;
-		double divv = dJdt/J;
-		
 		// get the fluid flux and pressure gradient
-		vec3d w = pt.m_w;
 		vec3d gradp = pt.m_gradp;
 		
 		// evaluate the permeability and its derivatives
@@ -749,8 +696,8 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 			for (i=0; i<neln; ++i) {
 				for (j=0; j<neln; ++j)
 				{
-					vec3d vt = (-(vdotTdotv(gradN[i], dKdE, gradN[j])*(gradp))
-								-(I*(divv+1./dt) - gradv.transpose() - Phie)*gradN[j]*H[i])*tmp;
+                    vec3d vt = ((vdotTdotv(-gradp, dKdE, gradN[j]).transpose()*(gradN[i]))
+                                +((Phie - I/dt)*gradN[j])*H[i])*tmp;
 					ke[4*i+3][4*j  ] += vt.x;
 					ke[4*i+3][4*j+1] += vt.y;
 					ke[4*i+3][4*j+2] += vt.z;
@@ -789,13 +736,11 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
 	int neln = el.Nodes();
 	
 	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz;
 	
 	// jacobian
 	double Ji[3][3], detJ;
 	
 	// Bp-matrix
-	vector<double> B1(neln), B2(neln), B3(neln);
 	vector<vec3d> gradN(neln);
 	double tmp;
 	
@@ -842,20 +787,10 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
 		{
 			// calculate global gradient of shape functions
 			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-			
-			// calculate Bp matrix
-			B1[i] = Gx;
-			B2[i] = Gy;
-			B3[i] = Gz;
-			gradN[i] = vec3d(Gx,Gy,Gz);
-			
+            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
 		}
 		
 		// get the fluid flux and pressure gradient
-		vec3d w = pt.m_w;
 		vec3d gradp = pt.m_gradp;
 		
 		// evaluate the permeability and its derivatives
@@ -902,8 +837,8 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
 			for (i=0; i<neln; ++i) {
 				for (j=0; j<neln; ++j)
 				{
-					vec3d vt = (-(vdotTdotv(gradN[i], dKdE, gradN[j])*(gradp))
-								+Phie*gradN[j]*H[i])*tmp;
+                    vec3d vt = ((vdotTdotv(-gradp, dKdE, gradN[j]).transpose()*(gradN[i]))
+                                +Phie*gradN[j])*H[i]*tmp;
 					ke[4*i+3][4*j  ] += vt.x;
 					ke[4*i+3][4*j+1] += vt.y;
 					ke[4*i+3][4*j+2] += vt.z;
