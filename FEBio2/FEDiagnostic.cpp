@@ -10,6 +10,7 @@
 #include "FEPrintHBMatrixDiagnostic.h"
 #include "FEMemoryDiagnostic.h"
 #include "FEBiphasicTangentDiagnostic.h"
+#include "FEMultiphasicTangentDiagnostic.h"
 #include "FECore/log.h"
 #include "FEBioXML/FEBioControlSection.h"
 #include "FEBioXML/FEBioMaterialSection.h"
@@ -91,6 +92,15 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
             pnew_solver->m_bsymm = false;
             pstep->m_psolver = pnew_solver;
         }
+        else if (att == "multiphasic tangent test") {
+            m_pdia = new FEMultiphasicTangentDiagnostic(fem);
+            pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "multiphasic", m_pfem);
+            // create a new solver
+            FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "multiphasic", m_pfem);
+            assert(pnew_solver);
+            pnew_solver->m_bsymm = false;
+            pstep->m_psolver = pnew_solver;
+        }
 		else
 		{
 			felog.printf("\nERROR: unknown diagnostic\n\n");
@@ -146,11 +156,13 @@ void FEBioScenarioSection::Parse(XMLTag &tag)
 	FEDiagnosticImport& dim = static_cast<FEDiagnosticImport&>(*m_pim);
 	FETangentDiagnostic& td = static_cast<FETangentDiagnostic&>(*dim.m_pdia);
     FEBiphasicTangentDiagnostic& tbd = static_cast<FEBiphasicTangentDiagnostic&>(*dim.m_pdia);
+    FEMultiphasicTangentDiagnostic& tmd = static_cast<FEMultiphasicTangentDiagnostic&>(*dim.m_pdia);
 
 	XMLAtt& type = tag.Attribute("type");
 	if      (type == "uni-axial"   ) td.m_scn = FETangentDiagnostic::TDS_UNIAXIAL;
 	else if (type == "simple shear") td.m_scn = FETangentDiagnostic::TDS_SIMPLE_SHEAR;
     else if (type == "biphasic uni-axial") tbd.m_scn = FEBiphasicTangentDiagnostic::TDS_BIPHASIC_UNIAXIAL;
+    else if (type == "multiphasic uni-axial") tmd.m_scn = FEMultiphasicTangentDiagnostic::TDS_MULTIPHASIC_UNIAXIAL;
 	else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
 	++tag;
 	do
@@ -159,6 +171,7 @@ void FEBioScenarioSection::Parse(XMLTag &tag)
         else if (tag == "solid_strain") { tag.value(tbd.m_strain); }
         else if (tag == "fluid_pressure") { tag.value(tbd.m_pressure); }
         else if (tag == "time_step") { tag.value(tbd.m_dt); }
+        else if (tag == "solute_concentration") { tag.value(tmd.m_concentration); }
 		++tag;
 	}
 	while (!tag.isend());

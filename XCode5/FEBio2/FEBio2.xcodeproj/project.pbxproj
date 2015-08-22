@@ -12,6 +12,7 @@
 		D5307A4B18B40AB0008C8463 /* liblevmar.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5307A4A18B40AB0008C8463 /* liblevmar.a */; };
 		D5AC350D19B9454B003D048C /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5AC350C19B9454B003D048C /* libgsl.a */; };
 		D5CCDAFC1B86761600B1B3B0 /* FEBiphasicTangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CCDAFA1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.cpp */; };
+		D5CCDB031B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CCDB011B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.cpp */; };
 		D5E10B921865E24900B23922 /* CommandManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B751865E24900B23922 /* CommandManager.cpp */; };
 		D5E10B931865E24900B23922 /* console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B771865E24900B23922 /* console.cpp */; };
 		D5E10B941865E24900B23922 /* diagnose.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B791865E24900B23922 /* diagnose.cpp */; };
@@ -58,6 +59,8 @@
 		D5AC350C19B9454B003D048C /* libgsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgsl.a; path = ../../../../../../../../../../usr/local/lib/libgsl.a; sourceTree = "<group>"; };
 		D5CCDAFA1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicTangentDiagnostic.cpp; sourceTree = "<group>"; };
 		D5CCDAFB1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicTangentDiagnostic.h; sourceTree = "<group>"; };
+		D5CCDB011B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicTangentDiagnostic.cpp; sourceTree = "<group>"; };
+		D5CCDB021B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicTangentDiagnostic.h; sourceTree = "<group>"; };
 		D5E10B671865E23500B23922 /* FEBio2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FEBio2; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E10B741865E24900B23922 /* Command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Command.h; sourceTree = "<group>"; };
 		D5E10B751865E24900B23922 /* CommandManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommandManager.cpp; sourceTree = "<group>"; };
@@ -169,6 +172,8 @@
 				D5E10B831865E24900B23922 /* FEDiagnostic.h */,
 				D5E10B841865E24900B23922 /* FEMemoryDiagnostic.cpp */,
 				D5E10B851865E24900B23922 /* FEMemoryDiagnostic.h */,
+				D5CCDB011B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.cpp */,
+				D5CCDB021B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.h */,
 				D5E10B861865E24900B23922 /* FEPrintHBMatrixDiagnostic.cpp */,
 				D5E10B871865E24900B23922 /* FEPrintHBMatrixDiagnostic.h */,
 				D5E10B881865E24900B23922 /* FEPrintMatrixDiagnostic.cpp */,
@@ -238,6 +243,7 @@
 				D5E10B921865E24900B23922 /* CommandManager.cpp in Sources */,
 				D5E10B9C1865E24900B23922 /* FEPrintMatrixDiagnostic.cpp in Sources */,
 				D5E10B991865E24900B23922 /* FEDiagnostic.cpp in Sources */,
+				D5CCDB031B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.cpp in Sources */,
 				D5E10B941865E24900B23922 /* diagnose.cpp in Sources */,
 				D5E10B931865E24900B23922 /* console.cpp in Sources */,
 				D5E10B981865E24900B23922 /* FEContactDiagnostic.cpp in Sources */,
