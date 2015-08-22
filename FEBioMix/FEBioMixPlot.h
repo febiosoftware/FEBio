@@ -176,8 +176,13 @@ public:
 class FEPlotEffectiveSoluteConcentration : public FEDomainData
 {
 public:
-	FEPlotEffectiveSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
+	FEPlotEffectiveSoluteConcentration(FEModel* pfem);
+	bool SetFilter(const char* sz);
+	bool SetFilter(int nsol);
 	bool Save(FEDomain& m, vector<float>& a);
+protected:
+	int			m_nsol;
+	FEModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------
