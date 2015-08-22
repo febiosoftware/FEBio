@@ -1300,8 +1300,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 							+Ke*(2*kappa[isol]*(gradN[j]*(D[isol]*gradc[isol]))))*(-R*T/D0[isol])
 					+ (Ke*vdotTdotv(gradc[isol], dDdE[isol], gradN[j]))*(-kappa[isol]*R*T/D0[isol]);
 				}
-//				qpu = -gradN[j]*(divv+1.0/dt)-gradv.transpose()*gradN[j];
-				qpu = -gradN[j]*(divv+1.0/dt)+gradv.transpose()*gradN[j];
+				qpu = -gradN[j]*(1.0/dt);
 				vtmp = (wu.transpose()*gradN[i] + (qpu + Phie*gradN[j])*H[i])*(tmp*dt);
 				ke[ndpn*i+3][ndpn*j  ] += vtmp.x;
 				ke[ndpn*i+3][ndpn*j+1] += vtmp.y;
@@ -1404,7 +1403,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 							for (ksol=0; ksol<nsol; ++ksol)
 								sum += c[isol]*dkdcc[isol][jsol][ksol]*dcdt[ksol];
 							
-							qcc[isol][jsol] = -H[j]*((c[isol]*((phiw+J*dpdJ)*dkdc[isol][jsol]+J*phiw*dkdJc[isol][jsol]))*divv
+							qcc[isol][jsol] = -H[j]*((c[isol]*(dkdc[isol][jsol]+J*phiw*dkdJc[isol][jsol]))*divv
 											   +phiw*(c[isol]*dkdc[isol][jsol])/dt
 											   +phiw*sum);
 						}
@@ -1417,8 +1416,8 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 							for (ksol=0; ksol<nsol; ++ksol)
 								sum += (dkdc[isol][ksol]+c[isol]*dkdcc[isol][jsol][ksol])*dcdt[ksol];
 							
-							qcc[isol][jsol] = -H[j]*(((phiw+J*dpdJ)*kappa[isol]+J*phiw*dkdJ[isol]
-													  +c[isol]*((phiw+J*dpdJ)*dkdc[isol][jsol]+J*phiw*dkdJc[isol][jsol]))*divv
+							qcc[isol][jsol] = -H[j]*((kappa[isol]+J*phiw*dkdJ[isol]
+													  +c[isol]*(dkdc[isol][jsol]+J*phiw*dkdJc[isol][jsol]))*divv
 													 +phiw*(kappa[isol] + c[isol]*dkdc[isol][jsol])/dt
 													 +phiw*sum);
 						}

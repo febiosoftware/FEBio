@@ -289,7 +289,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             case 1: node.m_rt.y += dx; break;
             case 2: node.m_rt.z += dx; break;
             case 3: node.m_pt   += dx; break;
-            default: node.m_ct[nj] += dx; break;
+            default: node.m_ct[nj-4] += dx; break;
         }
         
         
@@ -305,7 +305,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             f1[ndpn*k+2] = f1u[3*k+2];
             f1[ndpn*k+3] = f1p[k    ];
             for (isol=0; isol<nsol; ++isol)
-                f0[ndpn*k+4+isol] = f1c[isol][k];
+                f1[ndpn*k+4+isol] = f1c[isol][k];
         }
         
         switch (nj)
@@ -314,7 +314,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             case 1: node.m_rt.y -= dx; break;
             case 2: node.m_rt.z -= dx; break;
             case 3: node.m_pt   -= dx; break;
-            default: node.m_ct[nj] -= dx; break;
+            default: node.m_ct[nj-4] -= dx; break;
         }
         
         solver.UpdateStresses();
