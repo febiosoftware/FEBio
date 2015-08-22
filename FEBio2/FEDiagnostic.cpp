@@ -154,25 +154,51 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 void FEBioScenarioSection::Parse(XMLTag &tag)
 {
 	FEDiagnosticImport& dim = static_cast<FEDiagnosticImport&>(*m_pim);
-	FETangentDiagnostic& td = static_cast<FETangentDiagnostic&>(*dim.m_pdia);
-    FEBiphasicTangentDiagnostic& tbd = static_cast<FEBiphasicTangentDiagnostic&>(*dim.m_pdia);
-    FEMultiphasicTangentDiagnostic& tmd = static_cast<FEMultiphasicTangentDiagnostic&>(*dim.m_pdia);
-
-	XMLAtt& type = tag.Attribute("type");
-	if      (type == "uni-axial"   ) td.m_scn = FETangentDiagnostic::TDS_UNIAXIAL;
-	else if (type == "simple shear") td.m_scn = FETangentDiagnostic::TDS_SIMPLE_SHEAR;
-    else if (type == "biphasic uni-axial") tbd.m_scn = FEBiphasicTangentDiagnostic::TDS_BIPHASIC_UNIAXIAL;
-    else if (type == "multiphasic uni-axial") tmd.m_scn = FEMultiphasicTangentDiagnostic::TDS_MULTIPHASIC_UNIAXIAL;
-	else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
-	++tag;
-	do
-	{
-        if (tag == "strain") { tag.value(td.m_strain); }
-        else if (tag == "solid_strain") { tag.value(tbd.m_strain); }
-        else if (tag == "fluid_pressure") { tag.value(tbd.m_pressure); }
-        else if (tag == "time_step") { tag.value(tbd.m_dt); }
-        else if (tag == "solute_concentration") { tag.value(tmd.m_concentration); }
-		++tag;
-	}
-	while (!tag.isend());
+    FETangentDiagnostic* pdiat = dynamic_cast<FETangentDiagnostic*>(dim.m_pdia);
+    FEBiphasicTangentDiagnostic* pdiab = dynamic_cast<FEBiphasicTangentDiagnostic*>(dim.m_pdia);
+    FEMultiphasicTangentDiagnostic* pdiam = dynamic_cast<FEMultiphasicTangentDiagnostic*>(dim.m_pdia);
+    
+    if (pdiat) {
+        XMLAtt& type = tag.Attribute("type");
+        if      (type == "uni-axial"   ) pdiat->m_scn = FETangentDiagnostic::TDS_UNIAXIAL;
+        else if (type == "simple shear") pdiat->m_scn = FETangentDiagnostic::TDS_SIMPLE_SHEAR;
+        else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
+        ++tag;
+        do
+        {
+            if (tag == "strain") { tag.value(pdiat->m_strain); }
+            ++tag;
+        }
+        while (!tag.isend());
+    }
+    else if (pdiab) {
+        XMLAtt& type = tag.Attribute("type");
+        if (type == "biphasic uni-axial") pdiab->m_scn = FEBiphasicTangentDiagnostic::TDS_BIPHASIC_UNIAXIAL;
+        else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
+        ++tag;
+        do
+        {
+            if (tag == "solid_strain") { tag.value(pdiab->m_strain); }
+            else if (tag == "fluid_pressure") { tag.value(pdiab->m_pressure); }
+            else if (tag == "time_step") { tag.value(pdiab->m_dt); }
+            ++tag;
+        }
+        while (!tag.isend());
+    }
+    else if (pdiam) {
+        XMLAtt& type = tag.Attribute("type");
+        if (type == "multiphasic uni-axial") pdiam->m_scn = FEMultiphasicTangentDiagnostic::TDS_MULTIPHASIC_UNIAXIAL;
+        else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
+        ++tag;
+        do
+        {
+            if (tag == "solid_strain") { tag.value(pdiam->m_strain); }
+            else if (tag == "fluid_pressure") { tag.value(pdiam->m_pressure); }
+            else if (tag == "time_step") { tag.value(pdiam->m_dt); }
+            else if (tag == "solute_concentration") { tag.value(pdiam->m_concentration); }
+            ++tag;
+        }
+        while (!tag.isend());
+        
+    }
 }
