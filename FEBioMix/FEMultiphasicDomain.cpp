@@ -80,6 +80,8 @@ bool FEMultiphasicDomain::Initialize(FEModel &fem)
     const int NE = FEElement::MAX_NODES;
     double p0[NE];
     vector< vector<double> > c0(nsol, vector<double>(NE));
+    vector<int> sid(nsol);
+    for (int j=0; j<nsol; ++j) sid[j] = m_pMat->GetSolute(j)->GetSoluteID();
     FEMesh& m = *GetMesh();
     
     // extract the initial concentrations of the solid-bound molecules
@@ -100,7 +102,7 @@ bool FEMultiphasicDomain::Initialize(FEModel &fem)
         {
             p0[i] = m.Node(el.m_node[i]).m_p0;
             for (int isol=0; isol<nsol; ++isol)
-                c0[isol][i] = m.Node(el.m_node[i]).m_c0[isol];
+                c0[isol][i] = m.Node(el.m_node[i]).m_c0[sid[isol]];
         }
         
         // get the number of integration points
