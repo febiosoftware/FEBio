@@ -3,27 +3,51 @@
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
+//! Adds a variable to the plot file. 
+//! 
+//! The name of the filter can be composed of three parts and in general takes on
+//! the following format.
+//!
+//! szname = "field_name[filter]=alias". 
+//!
+//! field_name = This is the actual filter naeme as it is registered with the framework.
+//! filter     = This is a filter that is used to resolve ambiguities.
+//! alias      = This is an alternative name for the field variable.
+//!
+//! The alias is optional but can be used by post-processing software to present an alternative
+//! (often simpler) name for the field variable than the default field_name + filter combo.
+//! 
+//! Whether a filter is required depends entirely on the field variable. Most field variables don't
+//! require it, but some do in order to resolve an ambiguity. For instance, the "parameter" field
+//! allows users to plot the spatially varying value of a material parameter. The filter is used to
+//! specify the material and parameter name. 
+//!
+//! The filter can be a numerical value or a string. If it's a string then it must be enclosed in
+//! single quotes. 
+//!
+//! szname = "field_name[12]"  \\ example of a numerical filter
+//! szname = "field_name['val'] \\ example of a string filter
+//!
+//! The interpretation of these filters is entirely left up to the field variable. 
+//!
 bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, vector<int>& item)
 {
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 
-	// strip the name from the filter
+	// create a copy so we can strip the alias and the filter from the name
 	char sz[1024] = {0};
 	strcpy(sz, szname);
 
-	// extract the (optional) title
-	char* ch = strrchr(sz, '=');
+	// see if there is an alias defined
+	char* ch = strchr(sz, '=');
 	if (ch)
 	{
+		// replace the equal sign with a null character.
 		*ch++ = 0;
-		// names must be paranthesized with single quotes.
-		ch = strchr(ch, '\'');
-		if (ch == 0) return false; else *ch++ = 0;
-		// find the end quote
-		char* ch2 = strrchr(ch, '\'');
-		if (ch2==0) return false; else *ch2 = 0;
+
+		// make sure there is an alias
+		if (ch==0) return false;
 	}
-	const char* sztitle = (ch ? ch : szname);
 
 	// extract the filter
 	char* szflt = strchr(sz, '[');
@@ -72,9 +96,9 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 		}
 
 		// add the field to the plot file
-		if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, sztitle, item);
-		else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, sztitle, item);
-		else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, sztitle, item);
+		if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname, item);
+		else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname, item);
+		else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, szname, item);
 	}
 	return false;
 }
