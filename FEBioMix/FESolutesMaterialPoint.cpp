@@ -28,6 +28,7 @@ void FESolutesMaterialPoint::Init(bool bflag)
         m_gradc.clear();
         m_j.clear();
         m_ca.clear();
+        m_crp.clear();
         m_sbmr.clear();
         m_sbmrp.clear();
         m_sbmrhat.clear();
@@ -59,7 +60,7 @@ void FESolutesMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 		dmp << m_nsol << m_psi << m_cF << m_Ie << m_nsbm;
 		for (int i=0; i<m_nsol; ++i) {
 			dmp << m_c[i] << m_gradc[i] << m_j[i] << m_ca[i]
-			<< m_k[i] << m_dkdJ[i];
+			<< m_crp[i] << m_k[i] << m_dkdJ[i];
 			for (int j=0; j<m_nsol; ++j)
 				dmp << m_dkdc[i][j];
 		}
@@ -75,7 +76,7 @@ void FESolutesMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 		dmp >> m_nsol >> m_psi >> m_cF >> m_Ie >> m_nsbm;
 		for (int i=0; i<m_nsol; ++i) {
 			dmp >> m_c[i] >> m_gradc[i] >> m_j[i] >> m_ca[i]
-			>> m_k[i] >> m_dkdJ[i];
+			>> m_crp[i] >> m_k[i] >> m_dkdJ[i];
 			for (int j=0; j<m_nsol; ++j)
 				dmp >> m_dkdc[i][j];
 		}
@@ -99,7 +100,7 @@ void FESolutesMaterialPoint::Serialize(DumpFile& ar)
 		ar << m_nsol << m_psi << m_cF << m_Ie << m_nsbm;
 		for (int i=0; i<m_nsol; ++i) {
 			ar << m_c[i] << m_gradc[i] << m_j[i] << m_ca[i]
-			<< m_k[i] << m_dkdJ[i];
+			<< m_crp[i] << m_k[i] << m_dkdJ[i];
 			for (int j=0; j<m_nsol; ++j)
 				ar << m_dkdc[i][j];
 		}
@@ -122,13 +123,14 @@ void FESolutesMaterialPoint::Serialize(DumpFile& ar)
 		m_gradc.resize(m_nsol);
 		m_j.resize(m_nsol);
 		m_ca.resize(m_nsol);
+        m_crp.resize(m_nsol);
 		m_k.resize(m_nsol);
 		m_dkdJ.resize(m_nsol);
 		m_dkdc.resize(m_nsol);
         
 		for (int i=0; i<m_nsol; ++i) {
 			ar >> m_c[i] >> m_gradc[i] >> m_j[i] >> m_ca[i]
-			>> m_k[i] >> m_dkdJ[i];
+			>> m_crp[i] >> m_k[i] >> m_dkdJ[i];
             
 			m_dkdc[i].resize(m_nsol);
 			for (int j=0; j<m_nsol; ++j)

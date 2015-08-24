@@ -29,6 +29,7 @@ public:
 	vector<vec3d>	m_gradc;	//!< spatial gradient of solute concentration
 	vector<vec3d>	m_j;		//!< solute molar flux
 	vector<double>	m_ca;		//!< actual solute concentration
+    vector<double>  m_crp;      //!< referential actual solute concentration at previous time step
 	double			m_psi;		//!< electric potential
 	vec3d			m_Ie;		//!< current density
 	double			m_cF;		//!< fixed charge density in current configuration

@@ -26,11 +26,11 @@ void FEBiphasicMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
 	if (bsave)
 	{
-		dmp << m_p << m_gradp << m_w << m_pa << m_phi0 << m_phi0p << m_phi0hat;
+		dmp << m_p << m_gradp << m_w << m_pa << m_phi0 << m_phi0p << m_phi0hat << m_Jp;
 	}
 	else
 	{
-		dmp >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p >> m_phi0hat;
+		dmp >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p >> m_phi0hat >> m_Jp;
 	}
 
 	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
@@ -41,11 +41,11 @@ void FEBiphasicMaterialPoint::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_p << m_gradp << m_w << m_pa << m_phi0 << m_phi0p << m_phi0hat;
+		ar << m_p << m_gradp << m_w << m_pa << m_phi0 << m_phi0p << m_phi0hat << m_Jp;
 	}
 	else
 	{
-		ar >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p >> m_phi0hat;
+		ar >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p >> m_phi0hat >> m_Jp;
 	}
 
 	if (m_pNext) m_pNext->Serialize(ar);
@@ -61,6 +61,7 @@ void FEBiphasicMaterialPoint::Init(bool bflag)
 		m_w = vec3d(0,0,0);
 		m_phi0 = m_phi0p = 0;
 		m_phi0hat = 0;
+        m_Jp = 1;
 	}
 
 	if (m_pNext) m_pNext->Init(bflag);

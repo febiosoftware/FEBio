@@ -544,9 +544,6 @@ double FEMultiphasic::PartitionCoefficient(FEMaterialPoint& pt, const int sol)
 void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<double>& kappa,
                                                   vector<double>& dkdJ,
                                                   vector< vector<double> >& dkdc,
-                                                  vector<double>& dkdJJ,
-                                                  vector< vector<double> >& dkdJc,
-                                                  vector< vector< vector<double> > >& dkdcc,
                                                   vector< vector<double> >& dkdr,
                                                   vector< vector<double> >& dkdJr,
                                                   vector< vector< vector<double> > >& dkdrc)
@@ -660,25 +657,11 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<do
 	
 	dkdJ.resize(nsol);
 	dkdc.resize(nsol, vector<double>(nsol,0));
-	dkdJJ.resize(nsol);
-	dkdJc.resize(nsol, vector<double>(nsol));
-	dkdcc.resize(nsol, dkdc);	// use dkdc for initialization only
 	
 	for (isol=0; isol<nsol; ++isol) {
 		dkdJ[isol] = zz[isol]*dkhdJ[isol]+z[isol]*kappa[isol]*zidzdJ;
-		dkdJJ[isol] = zz[isol]*dkhdJJ[isol]+2*z[isol]*zz[isol]*dkhdJ[isol]*zidzdJ
-		+z[isol]*kappa[isol]*((z[isol]-1)*SQR(zidzdJ)+zidzdJJ);
 		for (jsol=0; jsol<nsol; ++jsol) {
 			dkdc[isol][jsol] = zz[isol]*dkhdc[isol][jsol]+z[isol]*kappa[isol]*zidzdc[jsol];
-			dkdJc[isol][jsol] = zz[isol]*dkhdJc[isol][jsol]
-			+z[isol]*zz[isol]*(dkhdJ[isol]*zidzdc[jsol]+dkhdc[isol][jsol]*zidzdJ)
-			+z[isol]*kappa[isol]*((z[isol]-1)*zidzdc[jsol]*zidzdJ+zidzdJc[jsol]);
-			for (ksol=0; ksol<nsol; ++ksol) {
-				dkdcc[isol][jsol][ksol] = zz[isol]*(dkhdcc[isol][jsol][ksol]
-													+z[isol]*(dkhdc[isol][jsol]*zidzdc[ksol]
-															  +dkhdc[isol][ksol]*zidzdc[jsol]))
-				+z[isol]*kappa[isol]*((z[isol]-1)*zidzdc[ksol]*zidzdc[jsol]+zidzdcc[jsol][ksol]);
-			}
 		}
 	}
     vector<double> zidzdr(nsbm,0);

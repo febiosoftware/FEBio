@@ -40,6 +40,7 @@ public:
 	double		m_phi0;		//!< referential solid volume fraction at current time
 	double		m_phi0p;	//!< referential solid volume fraction at previous time
 	double		m_phi0hat;	//!< referential solid volume fraction supply at current time
+    double      m_Jp;       //!< determinant of solid deformation gradient at previous time
 };
 
 //-----------------------------------------------------------------------------

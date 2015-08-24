@@ -74,6 +74,90 @@ bool FEMultiphasicDomain::Initialize(FEModel &fem)
 		for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
 	}
 
+    const int nsol = m_pMat->Solutes();
+    const int nsbm = m_pMat->SBMs();
+    
+    const int NE = FEElement::MAX_NODES;
+    double p0[NE];
+    vector< vector<double> > c0(nsol, vector<double>(NE));
+    FEMesh& m = *GetMesh();
+    
+    // extract the initial concentrations of the solid-bound molecules
+    vector<double> sbmr(nsbm,0);
+    for (int i=0; i<nsbm; ++i) {
+        sbmr[i] = m_pMat->GetSBM(i)->m_rho0;
+    }
+    
+    for (int i=0; i<(int) m_Elem.size(); ++i)
+    {
+        // get the solid element
+        FESolidElement& el = m_Elem[i];
+        
+        // get the number of nodes
+        int neln = el.Nodes();
+        // get initial values of fluid pressure and solute concentrations
+        for (int i=0; i<neln; ++i)
+        {
+            p0[i] = m.Node(el.m_node[i]).m_p0;
+            for (int isol=0; isol<nsol; ++isol)
+                c0[isol][i] = m.Node(el.m_node[i]).m_c0[isol];
+        }
+        
+        // get the number of integration points
+        int nint = el.GaussPoints();
+        
+        // loop over the integration points
+        for (int n=0; n<nint; ++n)
+        {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+            FEElasticMaterialPoint& pm = *(mp.ExtractData<FEElasticMaterialPoint>());
+            FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+            FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
+            FEMultigenSBMMaterialPoint& pmg = *(mp.ExtractData<FEMultigenSBMMaterialPoint>());
+            
+            // initialize effective fluid pressure, its gradient, and fluid flux
+            pt.m_p = el.Evaluate(p0, n);
+            pt.m_gradp = gradient(el, p0, n);
+            pt.m_w = m_pMat->FluidFlux(mp);
+            
+            // initialize multiphasic solutes
+            ps.m_nsol = nsol;
+            ps.m_nsbm = nsbm;
+            
+            // initialize effective solute concentrations
+            for (int isol=0; isol<nsol; ++isol) {
+                ps.m_c[isol] = el.Evaluate(c0[isol], n);
+                ps.m_gradc[isol] = gradient(el, c0[isol], n);
+            }
+            
+            ps.m_psi = m_pMat->ElectricPotential(mp);
+            for (int isol=0; isol<nsol; ++isol) {
+                ps.m_ca[isol] = m_pMat->Concentration(mp,isol);
+                ps.m_j[isol] = m_pMat->SoluteFlux(mp,isol);
+                ps.m_crp[isol] = pm.m_J*m_pMat->Porosity(mp)*ps.m_ca[isol];
+            }
+            pt.m_pa = m_pMat->Pressure(mp);
+            
+            ps.m_sbmr = sbmr;
+            ps.m_sbmrp = sbmr;
+            ps.m_sbmrhat.assign(nsbm,0);
+            if (&pmg) {
+                pmg.m_lsbmr = sbmr;
+                pmg.m_gsbmr[0] = sbmr;
+                pmg.m_gsbmrp[0] = sbmr;
+                pmg.m_nsbm = nsbm;
+            }
+            
+            // initialize referential solid volume fraction
+            pt.m_phi0 = m_pMat->SolidReferentialVolumeFraction(mp);
+            
+            // calculate FCD, current and stress
+            ps.m_cF = m_pMat->FixedChargeDensity(mp);
+            ps.m_Ie = m_pMat->CurrentDensity(mp);
+            pm.m_s = m_pMat->Stress(mp);
+        }
+    }
+    
 	return true;
 }
 
@@ -114,6 +198,7 @@ void FEMultiphasicDomain::Reset()
 			ps.m_nsol = nsol;
 			ps.m_c.assign(nsol,0);
 			ps.m_ca.assign(nsol,0);
+            ps.m_crp.assign(nsol, 0);
 			ps.m_gradc.assign(nsol,vec3d(0,0,0));
 			ps.m_k.assign(nsol, 0);
 			ps.m_dkdJ.assign(nsol, 0);
@@ -182,6 +267,7 @@ void FEMultiphasicDomain::InitElements()
 		for (int n=0; n<nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+            FEElasticMaterialPoint& pe = *(mp.ExtractData<FEElasticMaterialPoint>());
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             FEMultigenSBMMaterialPoint& pmg = *(mp.ExtractData<FEMultigenSBMMaterialPoint>());
@@ -189,6 +275,14 @@ void FEMultiphasicDomain::InitElements()
 			// reset referential solid volume fraction at previous time
 			pt.m_phi0p = pt.m_phi0;
 
+            // reset determinant of solid deformation gradient at previous time
+            pt.m_Jp = pe.m_J;
+            
+            // reset referential actual solute concentration at previous time
+            for (int j=0; j<m_pMat->Solutes(); ++j) {
+                ps.m_crp[j] = pe.m_J*m_pMat->Porosity(mp)*ps.m_ca[j];
+            }
+            
 			// reset referential solid-bound molecule concentrations at previous time
 			for (int j=0; j<ps.m_nsbm; ++j) {
 				ps.m_sbmrp[j] = ps.m_sbmr[j];
@@ -212,9 +306,9 @@ void FEMultiphasicDomain::InitElements()
 //-----------------------------------------------------------------------------
 void FEMultiphasicDomain::InternalForces(FEGlobalVector& R)
 {
-	int NE = m_Elem.size();
+	size_t NE = m_Elem.size();
 	#pragma omp parallel for shared (NE)
-	for (int i=0; i<NE; ++i)
+	for (size_t i=0; i<NE; ++i)
 	{
 		// element force vector
 		vector<double> fe;
@@ -360,7 +454,6 @@ bool FEMultiphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector
 	double Ji[3][3], detJ;
 	
 	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz;
 	
 	// gradient of shape functions
 	vector<vec3d> gradN(neln);
@@ -384,6 +477,10 @@ bool FEMultiphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
 		
+        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
+        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+        vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
+        
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		Gt = el.Gt(n);
@@ -392,14 +489,8 @@ bool FEMultiphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector
 		
 		for (i=0; i<neln; ++i)
 		{
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-			
-			// save spatial gradient of shape functions
-			gradN[i] = vec3d(Gx,Gy,Gz);
+            // save spatial gradient of shape functions
+            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
 		}
 		
 		vector<vec3d> j(spt.m_j);
@@ -476,16 +567,15 @@ void FEMultiphasicDomain::InternalSoluteWork(vector<double>& R, double dt)
 //! of nodes
 bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<double>& fe, double dt, const int sol)
 {
-	int i, isol, jsol, n, isbm;
+	int i, isol, n;
 	
 	int nint = el.GaussPoints();
 	int neln = el.Nodes();
 	
 	// jacobian
-	double Ji[3][3], detJ, J0i[3][3];
+	double Ji[3][3], detJ;
 	
 	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz, GX, GY, GZ;
 	
 	// gradient of shape functions
 	vector<vec3d> gradN(neln);
@@ -493,29 +583,9 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 	// gauss-weights
 	double* wg = el.GaussWeights();
 	
-	FEMesh& mesh = *m_pMesh;
-	
 	const int nsol = m_pMat->Solutes();
-    const int nsbm = m_pMat->SBMs();
-
-	vector<int> sid(nsol);
-	for (isol=0; isol<nsol; ++isol)
-		sid[isol] = m_pMat->GetSolute(isol)->GetSoluteID();
 	
 	const int nreact = m_pMat->Reactions();
-	
-	const int NE = FEElement::MAX_NODES;
-	vec3d r0[NE], rt[NE], rp[NE], vt[NE];
-	vector< vector<double> > cp(nsol, vector<double>(8));
-	for (i=0; i<neln; ++i) 
-	{
-		r0[i] = mesh.Node(el.m_node[i]).m_r0;
-		rt[i] = mesh.Node(el.m_node[i]).m_rt;
-		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-		vt[i] = mesh.Node(el.m_node[i]).m_vt;
-		for (isol=0; isol<nsol; ++isol)
-			cp[isol][i] = mesh.Node(el.m_node[i]).m_cp[sid[isol]];
-	}
 	
 	zero(fe);
 	
@@ -533,19 +603,6 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 		vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
 		vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
 		
-		// we need to calculate the divergence of v. To do this we use
-		// the formula div(v) = 1/J*dJdt, where J = det(F)
-		invjac0(el, J0i, n);
-		vec3d G1(J0i[0][0],J0i[0][1],J0i[0][2]);
-		vec3d G2(J0i[1][0],J0i[1][1],J0i[1][2]);
-		vec3d G3(J0i[2][0],J0i[2][1],J0i[2][2]);
-		
-		// next we calculate the deformation gradient and the solid velocity
-		mat3d Fp;
-		Fp.zero();
-		vec3d vs(0,0,0);
-		vector<double> cprev(nsol,0);
-		
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		Gt = el.Gt(n);
@@ -554,62 +611,27 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 		
 		for (i=0; i<neln; ++i)
 		{
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-			
-			GX = J0i[0][0]*Gr[i]+J0i[1][0]*Gs[i]+J0i[2][0]*Gt[i];
-			GY = J0i[0][1]*Gr[i]+J0i[1][1]*Gs[i]+J0i[2][1]*Gt[i];
-			GZ = J0i[0][2]*Gr[i]+J0i[1][2]*Gs[i]+J0i[2][2]*Gt[i];
-			
-			Fp[0][0] += rp[i].x*GX; Fp[1][0] += rp[i].y*GX; Fp[2][0] += rp[i].z*GX;
-			Fp[0][1] += rp[i].x*GY; Fp[1][1] += rp[i].y*GY; Fp[2][1] += rp[i].z*GY;
-			Fp[0][2] += rp[i].x*GZ; Fp[1][2] += rp[i].y*GZ; Fp[2][2] += rp[i].z*GZ;
-			
-			// calculate solid velocity
-			vs += vt[i]*H[i];
-			
 			// save spatial gradient of shape functions
-			gradN[i] = vec3d(Gx,Gy,Gz);
-			
-			// calculate effective concentration at previous time step
-			for (isol=0; isol<nsol; ++isol)
-				cprev[isol] += cp[isol][i]*H[i];
+            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
 		}
 		
 		// next we get the determinant
-		double Jp = Fp.det();
 		double J = ept.m_J;
-		double dJdt = (J-Jp)/dt;
 		
 		vector<vec3d> j(spt.m_j);
 		vector<double> c(spt.m_c);
 		vector<int> z(nsol);
 		vector<double> kappa(spt.m_k);
 		vec3d je(0,0,0);
-		vector<double> dcdt(nsol);
 		
 		for (isol=0; isol<nsol; ++isol) {
-			// get the time derivative of the effective concentration
-			dcdt[isol] = (c[isol] - cprev[isol])/dt;
 			// get the charge number
 			z[isol] = m_pMat->GetSolute(isol)->ChargeNumber();
 			je += j[isol]*z[isol];
 		}
 		
-		double dkdJ = spt.m_dkdJ[sol];
-		vector<double> dkdc(spt.m_dkdc[sol]);
-		vector<double> dkdr(spt.m_dkdr[sol]);
-		
 		// evaluate the porosity, its derivative w.r.t. J, and its gradient
 		double phiw = m_pMat->Porosity(mp);
-		// evaluate time derivatives of solubility and porosity
-		double dkdt = dkdJ*dJdt;
-		for (jsol=0; jsol<nsol; ++jsol)
-			dkdt += dkdc[jsol]*dcdt[jsol];
-        double dphi0dt = 0;
         double chat = 0;
 		
 		// chemical reactions
@@ -617,24 +639,14 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 			FEChemicalReaction* pri = m_pMat->GetReaction(i);
             double zhat = pri->ReactionSupply(mp);
             chat += phiw*zhat*pri->m_v[sol];
-            for (isbm=0; isbm<nsbm; ++isbm) {
-                double M = m_pMat->SBMMolarMass(isbm);
-                double rhoT = m_pMat->SBMDensity(isbm);
-                double v = pri->m_v[nsol+isbm];
-                dkdt += J*phiw*zhat*M*v*dkdr[isbm];
-                dphi0dt += J*phiw*zhat*v*M/rhoT;
-            }
         }
 
 		// update force vector
 		for (i=0; i<neln; ++i)
 		{
-			fe[i] -= dt*(gradN[i]*(j[sol]+je*m_pMat->m_penalty)
-						 + H[i]*(chat - (dJdt-dphi0dt)*kappa[sol]*c[sol]/J
-                                 - phiw*dkdt*c[sol]
-                                 - phiw*kappa[sol]*dcdt[sol]
-                                 )
-						 )*detJ*wg[n];
+            fe[i] -= dt*(gradN[i]*(j[sol]+je*m_pMat->m_penalty)
+                         + H[i]*(chat - (phiw*spt.m_ca[sol] - spt.m_crp[sol]/J)/dt)
+                         )*detJ*wg[n];
 		}
 	}
 	
@@ -686,24 +698,15 @@ bool FEMultiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<do
 	int neln = el.Nodes();
 	
 	// jacobian
-	double Ji[3][3], detJ, J0i[3][3];
+	double Ji[3][3], detJ;
 	
 	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz, GX, GY, GZ;
 	
-	// Bp-matrix
-	vector<double> B1(neln), B2(neln), B3(neln);
-	
+    // gradient of shape functions
+    vector<vec3d> gradN(neln);
+    
 	// gauss-weights
 	double* wg = el.GaussWeights();
-	
-	FEMesh& mesh = *m_pMesh;
-	
-	vec3d rp[FEElement::MAX_NODES];
-	for (i=0; i<neln; ++i) 
-	{
-		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-	}
 	
 	const int nreact = m_pMat->Reactions();
 	
@@ -719,45 +722,23 @@ bool FEMultiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<do
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
 		
-		// we need to calculate the divergence of v. To do this we use
-		// the formula div(v) = 1/J*dJdt, where J = det(F)
-		invjac0(el, J0i, n);
-		
-		// next we calculate the deformation gradient
-		mat3d Fp;
-		Fp.zero();
-		
+        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
+        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+        vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
+        
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		Gt = el.Gt(n);
 		
 		H = el.H(n);
 		
+        // evaluate spatial gradient of shape functions
 		for (i=0; i<neln; ++i)
-		{
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-			
-			GX = J0i[0][0]*Gr[i]+J0i[1][0]*Gs[i]+J0i[2][0]*Gt[i];
-			GY = J0i[0][1]*Gr[i]+J0i[1][1]*Gs[i]+J0i[2][1]*Gt[i];
-			GZ = J0i[0][2]*Gr[i]+J0i[1][2]*Gs[i]+J0i[2][2]*Gt[i];
-			
-			Fp[0][0] += rp[i].x*GX; Fp[1][0] += rp[i].y*GX; Fp[2][0] += rp[i].z*GX;
-			Fp[0][1] += rp[i].x*GY; Fp[1][1] += rp[i].y*GY; Fp[2][1] += rp[i].z*GY;
-			Fp[0][2] += rp[i].x*GZ; Fp[1][2] += rp[i].y*GZ; Fp[2][2] += rp[i].z*GZ;
-			
-			// calculate Bp matrix
-			B1[i] = Gx;
-			B2[i] = Gy;
-			B3[i] = Gz;
-		}
+            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
 		
 		// next we get the determinant
-		double Jp = Fp.det();
 		double J = ept.m_J;
+        double Jp = ppt.m_Jp;
 		
 		// and then finally
 		double divv = ((J-Jp)/dt)/J;
@@ -776,9 +757,7 @@ bool FEMultiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<do
 
 		// update force vector
 		for (i=0; i<neln; ++i)
-		{
-			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z + (phiwhat - divv)*H[i])*detJ*wg[n];
-		}
+			fe[i] -= dt*(gradN[i]*w + (phiwhat - divv)*H[i])*detJ*wg[n];
 	}
 	
 	return true;
@@ -833,11 +812,10 @@ bool FEMultiphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<
 	double Ji[3][3], detJ;
 	
 	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz;
 	
-	// Bp-matrix
-	vector<double> B1(neln), B2(neln), B3(neln);
-	
+    // gradient of shape functions
+    vector<vec3d> gradN(neln);
+    
 	// gauss-weights
 	double* wg = el.GaussWeights();
 	
@@ -854,25 +832,19 @@ bool FEMultiphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
 		
+        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
+        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+        vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
+        
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		Gt = el.Gt(n);
 
 		H = el.H(n);
 		
-		for (i=0; i<neln; ++i)
-		{
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-			
-			// calculate Bp matrix
-			B1[i] = Gx;
-			B2[i] = Gy;
-			B3[i] = Gz;
-		}
+        // evaluate spatial gradient of shape functions
+        for (i=0; i<neln; ++i)
+            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
 		
 		// get the solvent flux
 		vec3d& w = ppt.m_w;
@@ -888,9 +860,7 @@ bool FEMultiphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<
 
 		// update force vector
 		for (i=0; i<neln; ++i)
-		{
-			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z + H[i]*phiwhat)*detJ*wg[n];
-		}
+			fe[i] -= dt*(gradN[i]*w + H[i]*phiwhat)*detJ*wg[n];
 	}
 	
 	return true;
@@ -1010,16 +980,15 @@ void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const
 //!
 bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm, double dt)
 {
-	int i, j, isol, jsol, ksol, n, ireact, isbm;
+	int i, j, isol, jsol, n, ireact, isbm;
 	
 	int nint = el.GaussPoints();
 	int neln = el.Nodes();
 	
 	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz, GX, GY, GZ;
 	
 	// jacobian
-	double Ji[3][3], detJ, J0i[3][3];
+	double Ji[3][3], detJ;
 	
 	// Gradient of shape functions
 	vector<vec3d> gradN(neln);
@@ -1028,28 +997,13 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 	// gauss-weights
 	double* gw = el.GaussWeights();
 	
-	FEMesh& mesh = *m_pMesh;
-	
 	FEMultiphasic* pm = m_pMat;
 	const int nsol = pm->Solutes();
 	int ndpn = 4+nsol;
-	vector<int> sid(nsol);
-	for (isol=0; isol<nsol; ++isol)
-		sid[isol] = pm->GetSolute(isol)->GetSoluteID();
 	
 	const int nsbm   = pm->SBMs();
 	const int nreact = pm->Reactions();
 
-	vec3d rp[FEElement::MAX_NODES], v[FEElement::MAX_NODES];
-	vector< vector<double> > cp(nsol, vector<double>(FEElement::MAX_NODES));
-	for (i=0; i<neln; ++i)
-	{
-		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-		v[i]  = mesh.Node(el.m_node[i]).m_vt;
-		for (isol=0; isol<nsol; ++isol)
-			cp[isol][i] = mesh.Node(el.m_node[i]).m_cp[sid[isol]];
-	}
-	
 	// zero stiffness matrix
 	ke.zero();
 	
@@ -1083,63 +1037,18 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 		vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
 		vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
 		
-		// we need to calculate the divergence of v. To do this we use
-		// the formula div(v) = 1/J*dJdt, where J = det(F)
-		invjac0(el, J0i, n);
-		vec3d G1(J0i[0][0],J0i[0][1],J0i[0][2]);
-		vec3d G2(J0i[1][0],J0i[1][1],J0i[1][2]);
-		vec3d G3(J0i[2][0],J0i[2][1],J0i[2][2]);
-		
-		// next we calculate the deformation gradient and the solid velocity
-		mat3d Fp, gradv;
-		Fp.zero();
-		gradv.zero();
-		vec3d vs(0,0,0);
-		vector<double> cprev(nsol,0);
-		
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		Gt = el.Gt(n);
 		
 		H = el.H(n);
 		
+        // calculate global gradient of shape functions
 		for (i=0; i<neln; ++i)
-		{
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-			
-			GX = J0i[0][0]*Gr[i]+J0i[1][0]*Gs[i]+J0i[2][0]*Gt[i];
-			GY = J0i[0][1]*Gr[i]+J0i[1][1]*Gs[i]+J0i[2][1]*Gt[i];
-			GZ = J0i[0][2]*Gr[i]+J0i[1][2]*Gs[i]+J0i[2][2]*Gt[i];
-			
-			Fp[0][0] += rp[i].x*GX; Fp[1][0] += rp[i].y*GX; Fp[2][0] += rp[i].z*GX;
-			Fp[0][1] += rp[i].x*GY; Fp[1][1] += rp[i].y*GY; Fp[2][1] += rp[i].z*GY;
-			Fp[0][2] += rp[i].x*GZ; Fp[1][2] += rp[i].y*GZ; Fp[2][2] += rp[i].z*GZ;
-			
-			// calculate solid velocity and its gradient
-			vs += v[i]*H[i];
-			gradv[0][0] += v[i].x*Gx; gradv[1][0] += v[i].y*Gx; gradv[2][0] += v[i].z*Gx;
-			gradv[0][1] += v[i].x*Gy; gradv[1][1] += v[i].y*Gy; gradv[2][1] += v[i].z*Gy;
-			gradv[0][2] += v[i].x*Gz; gradv[1][2] += v[i].y*Gz; gradv[2][2] += v[i].z*Gz;
-			
-			// calculate Bp matrix
-			gradN[i] = vec3d(Gx,Gy,Gz);
-			
-			// calculate effective concentration at previous time step
-			for (isol=0; isol<nsol; ++isol)
-				cprev[isol] += cp[isol][i]*H[i];
-		}
+            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
 		
 		// next we get the determinant
-		double Jp = Fp.det();
 		double J = ept.m_J;
-		
-		// and then finally
-		double dJdt = (J-Jp)/dt;
-		double divv = dJdt/J;
 		
 		// get the fluid flux and pressure gradient
 		vec3d w = ppt.m_w;
@@ -1147,24 +1056,16 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 		
 		vector<double> c(spt.m_c);
 		vector<vec3d> gradc(spt.m_gradc);
-		vector<double> dcdt(nsol);
 		vector<int> z(nsol);
 		
-		vector<double> zz(nsol);
 		vector<double> kappa(spt.m_k);
 		
-		for (isol=0; isol<nsol; ++isol) {
-			// get the time derivative of the effective concentration
-			dcdt[isol] = (c[isol] - cprev[isol])/dt;
-			// get the charge number
+        // get the charge number
+		for (isol=0; isol<nsol; ++isol)
 			z[isol] = pm->GetSolute(isol)->ChargeNumber();
-		}
 		
 		vector<double> dkdJ(spt.m_dkdJ);
 		vector< vector<double> > dkdc(spt.m_dkdc);
-		vector<double> dkdJJ(spt.m_dkdJJ);
-		vector< vector<double> > dkdJc(spt.m_dkdJc);
-		vector< vector< vector<double> > > dkdcc(spt.m_dkdcc);
 		vector< vector<double> > dkdr(spt.m_dkdr);
 		vector< vector<double> > dkdJr(spt.m_dkdJr);
 		vector< vector< vector<double> > > dkdrc(spt.m_dkdrc);
@@ -1174,7 +1075,6 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
         double phi0 = ppt.m_phi0;
 		double phis = 1. - phiw;
 		double dpdJ = phis/J;
-		double dpdJJ = -2*phis/(J*J);
 		
 		// evaluate the osmotic coefficient
 		double osmc = pm->GetOsmoticCoefficient()->OsmoticCoefficient(mp);
@@ -1328,13 +1228,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 					+D[isol]*wu*(kappa[isol]*c[isol]/D0[isol]);
 					jue += ju[isol]*z[isol];
 					De += D[isol]*(z[isol]*kappa[isol]*c[isol]/D0[isol]);
-					sum = 0;
-					for (jsol=0; jsol<nsol; ++jsol)
-						sum += dcdt[jsol]*((phiw+J*dpdJ)*dkdc[isol][jsol]+J*phiw*dkdJc[isol][jsol]);
-					qcu[isol] = -gradN[j]*(c[isol]*(dJdt*(2*(dpdJ*kappa[isol]+phiw*dkdJ[isol]+J*dpdJ*dkdJ[isol])
-														  +J*(dpdJJ*kappa[isol]+phiw*dkdJJ[isol])) + sum)
-										   +dcdt[isol]*((phiw+J*dpdJ)*kappa[isol]+J*phiw*dkdJ[isol]))
-					+qpu*(c[isol]*((phiw+J*dpdJ)*kappa[isol]+J*phiw*dkdJ[isol]));
+                    qcu[isol] = qpu*(c[isol]*(kappa[isol]+J*phiw*dkdJ[isol]));
 
                     // chemical reactions
                     for (ireact=0; ireact<nreact; ++ireact) {
@@ -1399,27 +1293,14 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 							((D[isol]*dkdc[isol][jsol]+dDdc[isol][jsol]*kappa[isol])*gc[isol])*H[j]
 							+(D[isol]*(w*(-H[j]*dD0dc[isol][jsol]/D0[isol])+wc[jsol]))*(kappa[isol]*c[isol]/D0[isol]);
 							
-							sum = dkdc[isol][jsol]*dcdt[isol];
-							for (ksol=0; ksol<nsol; ++ksol)
-								sum += c[isol]*dkdcc[isol][jsol][ksol]*dcdt[ksol];
-							
-							qcc[isol][jsol] = -H[j]*((c[isol]*(dkdc[isol][jsol]+J*phiw*dkdJc[isol][jsol]))*divv
-											   +phiw*(c[isol]*dkdc[isol][jsol])/dt
-											   +phiw*sum);
+                            qcc[isol][jsol] = -H[j]*phiw/dt*c[isol]*dkdc[isol][jsol];
 						}
 						else {
 							jc[isol][jsol] = (D[isol]*(gradN[j]*(-phiw)+w*(H[j]/D0[isol])))*kappa[isol]
 							+((D[isol]*dkdc[isol][jsol]+dDdc[isol][jsol]*kappa[isol])*gc[isol])*H[j]
 							+(D[isol]*(w*(-H[j]*dD0dc[isol][jsol]/D0[isol])+wc[jsol]))*(kappa[isol]*c[isol]/D0[isol]);
 							
-							sum = dkdc[isol][jsol]*dcdt[isol];
-							for (ksol=0; ksol<nsol; ++ksol)
-								sum += (dkdc[isol][ksol]+c[isol]*dkdcc[isol][jsol][ksol])*dcdt[ksol];
-							
-							qcc[isol][jsol] = -H[j]*((kappa[isol]+J*phiw*dkdJ[isol]
-													  +c[isol]*(dkdc[isol][jsol]+J*phiw*dkdJc[isol][jsol]))*divv
-													 +phiw*(kappa[isol] + c[isol]*dkdc[isol][jsol])/dt
-													 +phiw*sum);
+                            qcc[isol][jsol] = -H[j]*phiw/dt*(c[isol]*dkdc[isol][jsol] + kappa[isol]);
 						}
 						jce[jsol] += jc[isol][jsol]*z[isol];
 						
@@ -1485,7 +1366,6 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 	int neln = el.Nodes();
 	
 	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz;
 	
 	// jacobian
 	double Ji[3][3], detJ;
@@ -1502,9 +1382,6 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 
 	const int nsol = pm->Solutes();
 	int ndpn = 4+nsol;
-	vector<int> sid(nsol);
-	for (isol=0; isol<nsol; ++isol)
-		sid[isol] = pm->GetSolute(isol)->GetSoluteID();
 	
 	const int nreact = pm->Reactions();
 
@@ -1546,18 +1423,10 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 		
 		H = el.H(n);
 		
-		for (i=0; i<neln; ++i)
-		{
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-			
-			// calculate Bp matrix
-			gradN[i] = vec3d(Gx,Gy,Gz);
-			
-		}
+        // calculate global gradient of shape functions
+        for (i=0; i<neln; ++i)
+            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
+        
 		
 		// next we get the determinant
 		double J = ept.m_J;
@@ -1573,16 +1442,12 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 		vector<double> zz(nsol);
 		vector<double> kappa(spt.m_k);
 		
-		for (isol=0; isol<nsol; ++isol) {
-			// get the charge number
+        // get the charge number
+		for (isol=0; isol<nsol; ++isol)
 			z[isol] = pm->GetSolute(isol)->ChargeNumber();
-		}
 		
 		vector<double> dkdJ(spt.m_dkdJ);
 		vector< vector<double> > dkdc(spt.m_dkdc);
-		vector<double> dkdJJ(spt.m_dkdJJ);
-		vector< vector<double> > dkdJc(spt.m_dkdJc);
-		vector< vector< vector<double> > > dkdcc(spt.m_dkdcc);
 		
 		// evaluate the porosity and its derivative
 		double phiw = pm->Porosity(mp);
@@ -2080,13 +1945,9 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
 	
 	FEMesh& mesh = *m_pMesh;
 
-    // extract the elastic component
-    FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-    
 	// get the multiphasic material
 	FEMultiphasic* pmb = m_pMat;
 	const int nsol = (int)pmb->Solutes();
-	const int nsbm = (int)pmb->SBMs();
 	vector< vector<double> > ct(nsol, vector<double>(FEElement::MAX_NODES));
 	vector<int> sid(nsol);
 	for (j=0; j<nsol; ++j) sid[j] = pmb->GetSolute(j)->GetSoluteID();
@@ -2164,7 +2025,6 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
         spt.m_cF = pmb->FixedChargeDensity(mp);
         spt.m_Ie = pmb->CurrentDensity(mp);
         pmb->PartitionCoefficientFunctions(mp, spt.m_k, spt.m_dkdJ, spt.m_dkdc,
-                                            spt.m_dkdJJ, spt.m_dkdJc, spt.m_dkdcc,
                                             spt.m_dkdr, spt.m_dkdJr, spt.m_dkdrc);
 		// evaluate the stress
 		pt.m_s = pmb->Stress(mp);

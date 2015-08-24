@@ -57,6 +57,9 @@ public:
 	//! porosity
 	double Porosity(FEMaterialPoint& pt);
 	
+    //! partition coefficient derivatives
+    void PartitionCoefficientFunctions(FEMaterialPoint& mp, double& kappa,
+                                       double& dkdJ, double& dkdc);
 	//! fluid density
 	double FluidDensity() { return m_rhoTw; }
 	

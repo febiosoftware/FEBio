@@ -50,9 +50,6 @@ public:
 	void PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<double>& kappa,
 									   vector<double>& dkdJ,
 									   vector< vector<double> >& dkdc,
-									   vector<double>& dkdJJ,
-									   vector< vector<double> >& dkdJc,
-									   vector< vector< vector<double> > >& dkdcc,
                                        vector< vector<double> >& dkdr,
                                        vector< vector<double> >& dkdJr,
                                        vector< vector< vector<double> > >& dkdrc);

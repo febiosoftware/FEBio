@@ -40,7 +40,6 @@ FETriphasic::FETriphasic(FEModel* pfem) : FEMaterial(pfem)
 //-----------------------------------------------------------------------------
 void FETriphasic::AddSolute(FESolute* ps)
 {
-	int n = (int) m_pSolute.size();
 	m_pSolute.SetProperty(ps);
 }
 
@@ -158,21 +157,18 @@ double FETriphasic::ElectricPotential(FEMaterialPoint& pt, const bool eform)
 //! actual concentration
 double FETriphasic::Concentration(FEMaterialPoint& pt, const int ion)
 {
-	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-	
-	// effective concentration
-	double c = spt.m_c[ion];
-	// solubility
-	double khat = m_pSolute[ion]->m_pSolub->Solubility(pt);
-	int z = m_pSolute[ion]->ChargeNumber();
-	double zeta = ElectricPotential(pt, true);
-	double zz = pow(zeta, z);
-	double kappa = zz*khat;
-	
-	// actual concentration
-	double ca = kappa*c;
-	
-	return ca;
+    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    
+    // effective concentration
+    double c = spt.m_c[ion];
+    
+    // partition coefficient
+    double kappa = PartitionCoefficient(pt, ion);
+    
+    // actual concentration
+    double ca = kappa*c;
+    
+    return ca;
 }
 
 //-----------------------------------------------------------------------------
@@ -406,4 +402,144 @@ vec3d FETriphasic::CurrentDensity(FEMaterialPoint& pt)
 	vec3d Ie = (j[0]*z[0] + j[1]*z[1])*m_Fc;
 	
 	return Ie;
+}
+
+//-----------------------------------------------------------------------------
+//! partition coefficient
+double FETriphasic::PartitionCoefficient(FEMaterialPoint& pt, const int sol)
+{
+    
+    // solubility
+    double khat = m_pSolute[sol]->m_pSolub->Solubility(pt);
+    // charge number
+    int z = m_pSolute[sol]->ChargeNumber();
+    // electric potential
+    double zeta = ElectricPotential(pt, true);
+    double zz = pow(zeta, z);
+    // partition coefficient
+    double kappa = zz*khat;
+    
+    return kappa;
+}
+
+//-----------------------------------------------------------------------------
+//! partition coefficients and their derivatives
+void FETriphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<double>& kappa,
+                                                  vector<double>& dkdJ,
+                                                  vector< vector<double> >& dkdc)
+{
+    int isol, jsol, ksol;
+    
+    FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
+    FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+    FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
+    
+    const int nsol = (int)m_pSolute.size();
+    
+    vector<double> c(nsol);
+    vector<int> z(nsol);
+    vector<double> khat(nsol);
+    vector<double> dkhdJ(nsol);
+    vector<double> dkhdJJ(nsol);
+    vector< vector<double> > dkhdc(nsol, vector<double>(nsol));
+    vector< vector<double> > dkhdJc(nsol, vector<double>(nsol));
+    vector< vector< vector<double> > > dkhdcc(nsol, dkhdc);	// use dkhdc to initialize only
+    vector<double> zz(nsol);
+    kappa.resize(nsol);
+    
+    double den = 0;
+    double num = 0;
+    double zeta = ElectricPotential(mp, true);
+    
+    for (isol=0; isol<nsol; ++isol) {
+        // get the effective concentration, its gradient and its time derivative
+        c[isol] = spt.m_c[isol];
+        // get the charge number
+        z[isol] = m_pSolute[isol]->ChargeNumber();
+        // evaluate the solubility and its derivatives w.r.t. J and c
+        khat[isol] = m_pSolute[isol]->m_pSolub->Solubility(mp);
+        dkhdJ[isol] = m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain(mp);
+        dkhdJJ[isol] = m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain_Strain(mp);
+        for (jsol=0; jsol<nsol; ++jsol) {
+            dkhdc[isol][jsol] = m_pSolute[isol]->m_pSolub->Tangent_Solubility_Concentration(mp,jsol);
+            dkhdJc[isol][jsol] = m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,jsol);
+            for (ksol=0; ksol<nsol; ++ksol) {
+                dkhdcc[isol][jsol][ksol] =
+                m_pSolute[isol]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,jsol,ksol);
+            }
+        }
+        zz[isol] = pow(zeta, z[isol]);
+        kappa[isol] = zz[isol]*khat[isol];
+        den += SQR(z[isol])*kappa[isol]*c[isol];
+        num += pow((double)z[isol],3)*kappa[isol]*c[isol];
+    }
+    
+    // get the charge density and its derivatives
+    double J = ept.m_J;
+    double phi0 = ppt.m_phi0;
+    double cF = FixedChargeDensity(mp);
+    double dcFdJ = -cF/(J - phi0);
+    double dcFdJJ = 2*cF/SQR(J-phi0);
+    
+    // evaluate electric potential (nondimensional exponential form) and its derivatives
+    // also evaluate partition coefficients and their derivatives
+    double zidzdJ = 0;
+    double zidzdJJ = 0, zidzdJJ1 = 0, zidzdJJ2 = 0;
+    vector<double> zidzdc(nsol,0);
+    vector<double> zidzdJc(nsol,0), zidzdJc1(nsol,0), zidzdJc2(nsol,0);
+    vector< vector<double> > zidzdcc(nsol, vector<double>(nsol,0));
+    vector< vector<double> > zidzdcc1(nsol, vector<double>(nsol,0));
+    vector<double> zidzdcc2(nsol,0);
+    double zidzdcc3 = 0;
+    
+    if (den > 0) {
+        
+        for (isol=0; isol<nsol; ++isol)
+            zidzdJ += z[isol]*zz[isol]*dkhdJ[isol]*c[isol];
+        zidzdJ = -(dcFdJ+zidzdJ)/den;
+        
+        for (isol=0; isol<nsol; ++isol) {
+            for (jsol=0; jsol<nsol; ++jsol) {
+                zidzdJJ1 += SQR(z[jsol])*c[jsol]*(z[jsol]*zidzdJ*kappa[jsol]+zz[jsol]*dkhdJ[jsol]);
+                zidzdJJ2 += z[jsol]*zz[jsol]*c[jsol]*(zidzdJ*z[jsol]*dkhdJ[jsol]+dkhdJJ[jsol]);
+                zidzdc[isol] += z[jsol]*zz[jsol]*dkhdc[jsol][isol]*c[jsol];
+            }
+            zidzdc[isol] = -(z[isol]*kappa[isol]+zidzdc[isol])/den;
+            zidzdcc3 += pow(double(z[isol]),3)*kappa[isol]*c[isol];
+        }
+        zidzdJJ = zidzdJ*(zidzdJ-zidzdJJ1/den)-(dcFdJJ+zidzdJJ2)/den;
+        
+        for (isol=0; isol<nsol; ++isol) {
+            for (jsol=0; jsol<nsol; ++jsol) {
+                zidzdJc1[isol] += SQR(z[jsol])*c[jsol]*(zidzdc[isol]*z[jsol]*kappa[jsol]+zz[jsol]*dkhdc[jsol][isol]);
+                zidzdJc2[isol] += z[jsol]*zz[jsol]*c[jsol]*(zidzdc[isol]*z[jsol]*dkhdJ[jsol]+dkhdJc[jsol][isol]);
+                zidzdcc2[isol] += SQR(z[jsol])*zz[jsol]*c[jsol]*dkhdc[jsol][isol];
+                for (ksol=0; ksol<nsol; ++ksol)
+                    zidzdcc1[isol][jsol] += z[ksol]*zz[ksol]*c[ksol]*dkhdcc[ksol][isol][jsol];
+            }
+            zidzdJc[isol] = zidzdJ*(zidzdc[isol]-(SQR(z[isol])*kappa[isol] + zidzdJc1[isol])/den)
+            -(z[isol]*zz[isol]*dkhdJ[isol] + zidzdJc2[isol])/den;
+        }
+        
+        for (isol=0; isol<nsol; ++isol) {
+            for (jsol=0; jsol<nsol; ++jsol) {
+                zidzdcc[isol][jsol] = zidzdc[isol]*zidzdc[jsol]*(1 - zidzdcc3/den)
+                - zidzdcc1[isol][jsol]/den
+                - z[isol]*(z[isol]*kappa[isol]*zidzdc[jsol]+zz[isol]*dkhdc[isol][jsol])/den
+                - z[jsol]*(z[jsol]*kappa[jsol]*zidzdc[isol]+zz[jsol]*dkhdc[jsol][isol])/den
+                - zidzdc[jsol]*zidzdcc2[isol]/den
+                - zidzdc[isol]*zidzdcc2[jsol]/den;
+            }
+        }
+    }
+    
+    dkdJ.resize(nsol);
+    dkdc.resize(nsol, vector<double>(nsol,0));
+    
+    for (isol=0; isol<nsol; ++isol) {
+        dkdJ[isol] = zz[isol]*dkhdJ[isol]+z[isol]*kappa[isol]*zidzdJ;
+        for (jsol=0; jsol<nsol; ++jsol) {
+            dkdc[isol][jsol] = zz[isol]*dkhdc[isol][jsol]+z[isol]*kappa[isol]*zidzdc[jsol];
+        }
+    }
 }

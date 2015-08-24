@@ -52,7 +52,14 @@ public:
 	//! current density
 	vec3d CurrentDensity(FEMaterialPoint& pt);
 	
-	//! fluid density
+    //! partition coefficient
+    double PartitionCoefficient(FEMaterialPoint& pt, const int sol);
+    
+    //! partition coefficient derivatives
+    void PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<double>& kappa,
+                                       vector<double>& dkdJ,
+                                       vector< vector<double> >& dkdc);
+    //! fluid density
 	double FluidDensity() { return m_rhoTw; }
 	
 	//! solute density

@@ -279,3 +279,14 @@ double FEBiphasicSolute::ReferentialConcentration(FEMaterialPoint& pt)
 	
 	return cr;
 }
+
+//-----------------------------------------------------------------------------
+//! partition coefficients and their derivatives
+void FEBiphasicSolute::PartitionCoefficientFunctions(FEMaterialPoint& mp, double& kappa,
+                                                double& dkdJ, double& dkdc)
+{
+    // evaluate the solubility and its derivatives w.r.t. J and c
+    kappa = m_pSolute->m_pSolub->Solubility(mp);
+    dkdJ = m_pSolute->m_pSolub->Tangent_Solubility_Strain(mp);
+    dkdc = m_pSolute->m_pSolub->Tangent_Solubility_Concentration(mp,0);
+}

@@ -35,11 +35,14 @@ void FEBiphasicSolidDomain::InitElements()
 
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+            FEBiphasicMaterialPoint& pb = *mp.ExtractData<FEBiphasicMaterialPoint>();
 			pt.m_r0 = r0;
 			pt.m_rt = rt;
 
 			pt.m_J = defgrad(el, pt.m_F, j);
 
+            pb.m_Jp = pt.m_J;
+            
 			mp.Init(false);
 		}
 	}
