@@ -313,6 +313,7 @@ REGISTER_FECORE_CLASS(FEDamageCriterionUCVMS               , FEMATERIAL_ID, "DC 
 REGISTER_FECORE_CLASS(FEDamageCriterionUCMSS               , FEMATERIAL_ID, "DC max shear stress uncoupled"     );
 REGISTER_FECORE_CLASS(FEDamageCriterionUCMNS               , FEMATERIAL_ID, "DC max normal stress uncoupled"    );
 REGISTER_FECORE_CLASS(FEDamageCriterionUCMNLS              , FEMATERIAL_ID, "DC max normal Lagrange strain uncoupled");
+REGISTER_FECORE_CLASS(FEDamageCriterionUCMPSR              , FEMATERIAL_ID, "DC max principal stretch ratio uncoupled");
     
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad

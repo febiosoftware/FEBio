@@ -97,4 +97,16 @@ public:
 	double DamageCriterion(FEMaterialPoint& pt);
 };
 
+//-----------------------------------------------------------------------------
+// max principal stretch ratio as damage criterion
+
+class FEDamageCriterionUCMPSR : public FEDamageCriterionUC
+{
+public:
+    FEDamageCriterionUCMPSR(FEModel* pfem) : FEDamageCriterionUC(pfem) {}
+    
+    //! damage
+    double DamageCriterion(FEMaterialPoint& pt);
+};
+
 #endif /* defined(__FEBioMech__FEDamageCriterionUC__) */
