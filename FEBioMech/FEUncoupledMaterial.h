@@ -77,9 +77,12 @@ public:
 	double StrainEnergyDensity(FEMaterialPoint& pt);
     
 public:
-	bool	m_blaugon;	//!< augmented lagrangian flag
-	double	m_atol;		//!< augmented lagrangian tolerance
 	double	m_K;		//!< bulk modulus
+
+	bool	m_blaugon;		//!< augmented lagrangian flag
+	double	m_augtol;		//!< augmented lagrangian tolerance
+	int		m_naugmin;		//!< minimum number of augmentations
+	int		m_naugmax;		//!< max number of augmentations
 
 	DECLARE_PARAMETER_LIST();
 };

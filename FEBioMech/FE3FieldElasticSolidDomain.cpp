@@ -492,7 +492,7 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel)
 
 //-----------------------------------------------------------------------------
 //! Do augmentation
-bool FE3FieldElasticSolidDomain::Augment()
+bool FE3FieldElasticSolidDomain::Augment(int naug)
 {
 	FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_pMat);
 	assert(pmi);
@@ -527,12 +527,17 @@ bool FE3FieldElasticSolidDomain::Augment()
 
 	felog.printf(" material %d\n", pmi->GetID());
 	felog.printf("                        CURRENT         CHANGE        REQUIRED\n");
-	felog.printf("   pressure norm : %15le%15le%15le\n", normL1, pctn, pmi->m_atol);
+	felog.printf("   pressure norm : %15le%15le%15le\n", normL1, pctn, pmi->m_augtol);
 
+	// check convergence
 	bool bconv = true;
-	if (pctn >= pmi->m_atol)
+	if (pctn >= pmi->m_augtol) bconv = false;
+	if (pmi->m_naugmin > naug) bconv = false;
+	if ((pmi->m_naugmax > 0) && (pmi->m_naugmax <= naug)) bconv = true;
+
+	// do the augmentation only if we have not yet converged
+	if (bconv == false)
 	{
-		bconv = false;
 		for (n=0; n<NE; ++n)
 		{
 			ELEM_DATA& ed = m_Data[n];

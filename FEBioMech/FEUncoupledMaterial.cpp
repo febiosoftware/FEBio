@@ -6,7 +6,9 @@
 BEGIN_PARAMETER_LIST(FEUncoupledMaterial, FEElasticMaterial)
 	ADD_PARAMETER2(m_K, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "k");
 	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon");
-	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "atol"  );
+	ADD_PARAMETER(m_augtol , FE_PARAM_DOUBLE, "atol"  );
+	ADD_PARAMETER(m_naugmin, FE_PARAM_INT   , "minaug");
+	ADD_PARAMETER(m_naugmax, FE_PARAM_INT   , "maxaug");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -14,7 +16,9 @@ END_PARAMETER_LIST();
 FEUncoupledMaterial::FEUncoupledMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	m_blaugon = false;
-	m_atol = 0.01;
+	m_augtol = 0.01;
+	m_naugmin = 0;
+	m_naugmax = 0;
 	m_K = 0;	// invalid value!
 }
 

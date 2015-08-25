@@ -415,7 +415,7 @@ bool FESolidSolver2::Augment()
 	for (int i=0; i<ND; ++i)
 	{
 		FE3FieldElasticSolidDomain* pd = dynamic_cast<FE3FieldElasticSolidDomain*>(&mesh.Domain(i));
-		if (pd) bconv = (pd->Augment() && bconv);
+		if (pd) bconv = (pd->Augment(m_naug) && bconv);
 	}
 
 	return bconv;

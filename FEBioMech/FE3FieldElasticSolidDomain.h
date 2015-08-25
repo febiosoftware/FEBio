@@ -28,7 +28,7 @@ public:
 	void Reset();
 
 	//! augmentation
-	bool Augment();
+	bool Augment(int naug);
 
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
