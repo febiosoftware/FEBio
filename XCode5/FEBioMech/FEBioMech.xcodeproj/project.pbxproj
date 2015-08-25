@@ -115,8 +115,6 @@
 		D5C6D41819CB640D00E48AAF /* FEDamageCDF.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C6D41619CB640D00E48AAF /* FEDamageCDF.h */; };
 		D5C6D41B19CCAAD400E48AAF /* FEDamageMaterialUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C6D41919CCAAD400E48AAF /* FEDamageMaterialUC.cpp */; };
 		D5C6D41C19CCAAD400E48AAF /* FEDamageMaterialUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C6D41A19CCAAD400E48AAF /* FEDamageMaterialUC.h */; };
-		D5C6D41F19CCB16100E48AAF /* FEDamageCriterionUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C6D41D19CCB16100E48AAF /* FEDamageCriterionUC.cpp */; };
-		D5C6D42019CCB16100E48AAF /* FEDamageCriterionUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C6D41E19CCB16100E48AAF /* FEDamageCriterionUC.h */; };
 		D5C8AAB91AE5D73000E36822 /* FERigidPrismaticJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C8AAB71AE5D73000E36822 /* FERigidPrismaticJoint.cpp */; };
 		D5C8AABA1AE5D73000E36822 /* FERigidPrismaticJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C8AAB81AE5D73000E36822 /* FERigidPrismaticJoint.h */; };
 		D5D0E0471AFA8BBF0030A55C /* FEPeriodicBoundary1O.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D0E0431AFA8BBF0030A55C /* FEPeriodicBoundary1O.cpp */; };
@@ -466,8 +464,6 @@
 		D5C6D41619CB640D00E48AAF /* FEDamageCDF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDamageCDF.h; sourceTree = "<group>"; };
 		D5C6D41919CCAAD400E48AAF /* FEDamageMaterialUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDamageMaterialUC.cpp; sourceTree = "<group>"; };
 		D5C6D41A19CCAAD400E48AAF /* FEDamageMaterialUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDamageMaterialUC.h; sourceTree = "<group>"; };
-		D5C6D41D19CCB16100E48AAF /* FEDamageCriterionUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDamageCriterionUC.cpp; sourceTree = "<group>"; };
-		D5C6D41E19CCB16100E48AAF /* FEDamageCriterionUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDamageCriterionUC.h; sourceTree = "<group>"; };
 		D5C8AAB71AE5D73000E36822 /* FERigidPrismaticJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidPrismaticJoint.cpp; sourceTree = "<group>"; };
 		D5C8AAB81AE5D73000E36822 /* FERigidPrismaticJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidPrismaticJoint.h; sourceTree = "<group>"; };
 		D5D0E0431AFA8BBF0030A55C /* FEPeriodicBoundary1O.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPeriodicBoundary1O.cpp; sourceTree = "<group>"; };
@@ -793,8 +789,6 @@
 				D5C6D41619CB640D00E48AAF /* FEDamageCDF.h */,
 				D5C6D41119CB628700E48AAF /* FEDamageCriterion.cpp */,
 				D5C6D41219CB628700E48AAF /* FEDamageCriterion.h */,
-				D5C6D41D19CCB16100E48AAF /* FEDamageCriterionUC.cpp */,
-				D5C6D41E19CCB16100E48AAF /* FEDamageCriterionUC.h */,
 				D5C6D40D19CB4B4400E48AAF /* FEDamageMaterial.cpp */,
 				D5C6D40E19CB4B4400E48AAF /* FEDamageMaterial.h */,
 				D5C6D40919CB4A7900E48AAF /* FEDamageMaterialPoint.cpp */,
@@ -1184,7 +1178,6 @@
 				D594FB3D1AFEE10300F82D29 /* FERigidCylindricalJoint.h in Headers */,
 				D5E1082E1865DFAD00B23922 /* FEStiffnessMatrix.h in Headers */,
 				D5E108401865DFAD00B23922 /* FETransIsoVerondaWestmann.h in Headers */,
-				D5C6D42019CCB16100E48AAF /* FEDamageCriterionUC.h in Headers */,
 				D5E107C01865DFAD00B23922 /* FEFacet2FacetSliding.h in Headers */,
 				D5E1084A1865DFAD00B23922 /* FEUncoupledElasticMixture.h in Headers */,
 				D5E107DC1865DFAD00B23922 /* FEHolmesMow.h in Headers */,
@@ -1464,7 +1457,6 @@
 				D5E108551865DFAD00B23922 /* FEVonMisesPlasticity.cpp in Sources */,
 				CAA03F9018BFA51700EAF395 /* FECGSolidSolver.cpp in Sources */,
 				D5C6D41719CB640D00E48AAF /* FEDamageCDF.cpp in Sources */,
-				D5C6D41F19CCB16100E48AAF /* FEDamageCriterionUC.cpp in Sources */,
 				D52D154A1A00D9A1005A6CB9 /* FERigidRevoluteJoint.cpp in Sources */,
 				D5E107D71865DFAD00B23922 /* FEFungOrthotropic.cpp in Sources */,
 				D54CBF0C1AB34358003CF33F /* FEPrescribedActiveContractionIsotropicUC.cpp in Sources */,

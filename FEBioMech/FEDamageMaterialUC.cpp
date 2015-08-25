@@ -7,7 +7,6 @@
 //
 
 #include "FEDamageMaterialUC.h"
-#include "FEDamageCriterionUC.h"
 #include "FEDamageCDF.h"
 #include "FEUncoupledMaterial.h"
 #include "FECore/FECoreKernel.h"

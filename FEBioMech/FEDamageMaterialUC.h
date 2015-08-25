@@ -11,9 +11,8 @@
 
 #include "FEUncoupledMaterial.h"
 #include "FEDamageMaterialPoint.h"
+#include "FEDamageCriterion.h"
 #include "FEDamageCDF.h"
-
-class FEDamageCriterionUC;
 
 //-----------------------------------------------------------------------------
 // This material models damage in any hyper-elastic materials.
@@ -55,7 +54,7 @@ public:
 public:
     FEPropertyT<FEUncoupledMaterial>    m_pBase;    // base elastic material
 	FEPropertyT<FEDamageCDF>            m_pDamg;    // damage model
-	FEPropertyT<FEDamageCriterionUC>    m_pCrit;    // damage criterion
+	FEPropertyT<FEDamageCriterion>      m_pCrit;    // damage criterion
 };
 
 #endif /* defined(__FEBioMech__FEDamageMaterialUC__) */
