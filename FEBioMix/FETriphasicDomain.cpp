@@ -264,7 +264,7 @@ void FETriphasicDomain::InternalForces(FEGlobalVector& R)
 {
 	size_t NE = m_Elem.size();
 	#pragma omp parallel for shared (NE)
-	for (size_t i=0; i<NE; ++i)
+	for (int i=0; i<NE; ++i)
 	{
 		// element force vector
 		vector<double> fe;
@@ -358,7 +358,7 @@ void FETriphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 {
 	size_t NE = m_Elem.size();
     #pragma omp parallel for shared(NE)
-	for (size_t i=0; i<NE; ++i)
+	for (int i=0; i<NE; ++i)
 	{
 		// get the element
 		FESolidElement& el = m_Elem[i];
@@ -448,7 +448,7 @@ void FETriphasicDomain::InternalFluidWorkSS(vector<double>& R, double dt)
 	size_t NE = m_Elem.size();
     
     #pragma omp parallel for shared(NE)
-	for (size_t i=0; i<NE; ++i)
+	for (int i=0; i<NE; ++i)
 	{
 		// get the element
 		FESolidElement& el = m_Elem[i];
@@ -481,7 +481,7 @@ void FETriphasicDomain::InternalFluidWork(vector<double>& R, double dt)
 	size_t NE = m_Elem.size();
     
     #pragma omp parallel for shared(NE)
-	for (size_t i=0; i<NE; ++i)
+	for (int i=0; i<NE; ++i)
 	{
 		// get the element
 		FESolidElement& el = m_Elem[i];
@@ -799,7 +799,7 @@ void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FET
 	size_t NE = m_Elem.size();
     
 	#pragma omp parallel for shared(NE)
-	for (size_t iel=0; iel<NE; ++iel)
+	for (int iel=0; iel<NE; ++iel)
 	{
 		// element stiffness matrix
 		matrix ke;
@@ -851,7 +851,7 @@ void FETriphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const F
 	size_t NE = m_Elem.size();
     
     #pragma omp parallel for shared(NE)
-	for (size_t iel=0; iel<NE; ++iel)
+	for (int iel=0; iel<NE; ++iel)
 	{
 		// element stiffness matrix
 		matrix ke;

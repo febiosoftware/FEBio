@@ -244,7 +244,7 @@ void FEBiphasicSoluteDomain::InternalForces(FEGlobalVector& R)
 {
 	size_t NE = m_Elem.size();
 	#pragma omp parallel for shared (NE)
-	for (size_t i=0; i<NE; ++i)
+	for (int i=0; i<NE; ++i)
 	{
 		// element force vector
 		vector<double> fe;
