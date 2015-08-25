@@ -122,30 +122,3 @@ double FEDamageCriterionMNLS::DamageCriterion(FEMaterialPoint& mp)
     
     return mnls;
 }
-
-//-----------------------------------------------------------------------------
-// max principal stretch ratio damage criterion
-double FEDamageCriterionMPSR::DamageCriterion(FEMaterialPoint& mp)
-{
-    // evaluate strain tensor
-    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    mat3ds C = pt.RightCauchyGreen();
-    
-    // evaluate principal square stretches
-    double ps[3];
-    C.eigen2(ps);
-    
-    // evaluate max normal Lagrange strain
-    double mpsr = sqrt(max(max(ps[0],ps[1]),ps[2]));
-    
-    return mpsr;
-}
-
-//-----------------------------------------------------------------------------
-// volume ratio damage criterion
-double FEDamageCriterionJ::DamageCriterion(FEMaterialPoint& mp)
-{
-    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    
-    return pt.m_J;
-}
