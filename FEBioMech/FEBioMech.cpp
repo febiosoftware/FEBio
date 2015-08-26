@@ -492,6 +492,7 @@ REGISTER_FECORE_CLASS(FELogElemElasticityYZXZ , FEELEMLOGDATA_ID, "cyzxz");
 REGISTER_FECORE_CLASS(FELogElemElasticityXZXZ , FEELEMLOGDATA_ID, "cxzxz");
 REGISTER_FECORE_CLASS(FELogElemStrainEnergyDensity , FEELEMLOGDATA_ID, "sed");
 REGISTER_FECORE_CLASS(FELogElemDevStrainEnergyDensity , FEELEMLOGDATA_ID, "devsed");
+REGISTER_FECORE_CLASS(FELogElemFiberStretch           , FEELEMLOGDATA_ID, "fiber_stretch");
 
 //-----------------------------------------------------------------------------
 // Derived from FELogObjectData

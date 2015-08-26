@@ -986,6 +986,27 @@ double FELogElemDevStrainEnergyDensity::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogElemFiberStretch::value(FEElement& el)
+{
+	int n = el.GaussPoints();
+	double l = 0.0;
+	for (int j=0; j<n; ++j)
+	{
+		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
+		vec3d ri;
+		ri.x = pt.m_Q[0][0];
+		ri.y = pt.m_Q[1][0];
+		ri.z = pt.m_Q[2][0];
+
+		vec3d r = pt.m_F*ri;
+
+		l += r.norm();
+	}
+	l /= (double) n;
+	return l;
+}
+
+//-----------------------------------------------------------------------------
 double FELogRigidBodyR11::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,0)); }
 double FELogRigidBodyR12::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,1)); }
 double FELogRigidBodyR13::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,2)); }

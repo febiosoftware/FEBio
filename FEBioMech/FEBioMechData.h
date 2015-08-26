@@ -566,6 +566,14 @@ public:
 	double value(FEElement& el);
 };
 
+//-----------------------------------------------------------------------------
+class FELogElemFiberStretch : public FELogElemData
+{
+public:
+	FELogElemFiberStretch(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
 //=============================================================================
 // R I G I D   B O D Y    D A T A
 //=============================================================================
