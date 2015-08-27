@@ -164,7 +164,8 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 		else if (strcmp(szval, "OUTPUT_FINAL"      ) == 0) pstep->SetOutputLevel(FE_OUTPUT_FINAL);
 		else throw XMLReader::InvalidTag(tag);
 	}
-	else if (tag == "use_three_field_hex") tag.value(m_pim->m_b3field);
+	else if (tag == "use_three_field_hex") tag.value(m_pim->m_b3field_hex);
+	else if (tag == "use_three_field_tet") tag.value(m_pim->m_b3field_tet);
 	else if (tag == "integration")
 	{
 		++tag;

@@ -42,15 +42,21 @@ int FESolidDomainFactory::GetDomainType(const FE_Element_Spec& spec, FEMaterial*
 		if (eshape == ET_HEX8)
 		{
 			// three-field implementation for uncoupled materials
-			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field)) return FE_3F_SOLID_DOMAIN;
+			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_hex)) return FE_3F_SOLID_DOMAIN;
 			else
 			{
 				if (etype == FE_HEX8G1) return FE_UDGHEX_DOMAIN;
 				else return FE_ELASTIC_SOLID_DOMAIN;
 			}
 		}
-		else if ((eshape == ET_HEX20) || (eshape == ET_HEX27) || (eshape == ET_TET10) || (eshape == ET_TET15))
+		else if ((eshape == ET_TET10) || (eshape == ET_TET15))
 		{
+			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_tet)) return FE_3F_SOLID_DOMAIN;
+			return FE_ELASTIC_SOLID_DOMAIN;
+		}
+		else if ((eshape == ET_HEX20) || (eshape == ET_HEX27))
+		{
+//			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_hex)) return FE_3F_SOLID_DOMAIN;
 			return FE_ELASTIC_SOLID_DOMAIN;
 		}
 		else if (eshape == ET_TET4)
@@ -61,7 +67,7 @@ int FESolidDomainFactory::GetDomainType(const FE_Element_Spec& spec, FEMaterial*
 		else if (eshape == ET_PENTA6) 
 		{
 			// three-field implementation for uncoupled materials
-			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field)) return FE_3F_SOLID_DOMAIN;
+			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_hex)) return FE_3F_SOLID_DOMAIN;
 			else return FE_ELASTIC_SOLID_DOMAIN;
 		}
 		else if ((eshape == ET_QUAD4) || (eshape == ET_TRI3)) return FE_ELASTIC_SHELL_DOMAIN;

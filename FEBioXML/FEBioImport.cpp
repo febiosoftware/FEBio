@@ -325,8 +325,9 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	m_ntri3  = FE_TRI3G3;
 	m_ntri7  = FE_TRI7G7;
 
-	// 3-field formulation on by default
-	m_b3field = true;
+	// 3-field formulation flags
+	m_b3field_hex = true;
+	m_b3field_tet = false;
 
 	// UT4 formulation off by default
 	m_but4 = false;

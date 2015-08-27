@@ -117,7 +117,8 @@ int FEBioGeometrySection::DomainType(FE_Element_Shape eshape, FEMaterial* pmat)
 	// setup the element specs
 	FE_Element_Spec spec;
 	spec.eshape = eshape;
-	spec.m_bthree_field = m_pim->m_b3field;
+	spec.m_bthree_field_hex = m_pim->m_b3field_hex;
+	spec.m_bthree_field_tet = m_pim->m_b3field_tet;
 	spec.m_but4 = m_pim->m_but4;
 	if      (eshape == ET_HEX8 ) spec.etype = m_pim->m_nhex8;
 	else if (eshape == ET_TET4 ) spec.etype = m_pim->m_ntet4;

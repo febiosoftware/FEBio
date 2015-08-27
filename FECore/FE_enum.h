@@ -94,7 +94,8 @@ struct FE_Element_Spec
 {
 	FE_Element_Shape	eshape;
 	FE_Element_Type		etype;
-	bool				m_bthree_field;
+	bool				m_bthree_field_hex;
+	bool				m_bthree_field_tet;
 	bool				m_but4;
 };
 
