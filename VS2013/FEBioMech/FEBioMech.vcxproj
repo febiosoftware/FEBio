@@ -321,7 +321,6 @@
     <ClInclude Include="..\..\FEBioMech\FECubicCLE.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageCDF.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageCriterion.h" />
-    <ClInclude Include="..\..\FEBioMech\FEDamageCriterionUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageMaterialPoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageMaterialUC.h" />
@@ -501,7 +500,6 @@
     <ClCompile Include="..\..\FEBioMech\FECubicCLE.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageCDF.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageCriterion.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FEDamageCriterionUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageMaterialPoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageMaterialUC.cpp" />

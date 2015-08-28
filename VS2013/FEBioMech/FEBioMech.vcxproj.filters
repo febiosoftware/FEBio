@@ -93,9 +93,6 @@
     <ClInclude Include="..\..\FEBioMech\FEDamageCriterion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEDamageCriterionUC.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEDamageMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -627,9 +624,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEDamageCriterion.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEDamageCriterionUC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEDamageMaterial.cpp">
