@@ -16,6 +16,9 @@
 #include "FEException.h"
 
 //-----------------------------------------------------------------------------
+class FEElementTraits;
+
+//-----------------------------------------------------------------------------
 //! The FEElementState class stores the element state data. The state is defined
 //! by a material point class for each of the integration points.
 class FEElementState
@@ -69,6 +72,9 @@ public:
 
 	//! Set the traits of an element
 	virtual void SetTraits(FEElementTraits* ptraits);
+
+	//! Get the element traits
+	FEElementTraits* GetTraits() { return m_pT; }
 
 	//! return number of nodes
 	int Nodes() const { return m_pT->neln; } 

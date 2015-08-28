@@ -142,6 +142,15 @@ public:
 };
 
 //=============================================================================
+class FESRISolidElementTraits
+{
+public:
+	FESRISolidElementTraits() : m_pTRI(0) {}
+	~FESRISolidElementTraits() { if (m_pTRI) delete m_pTRI; }
+	FESolidElementTraits*	m_pTRI;
+};
+
+//=============================================================================
 //! Base class for 8-node hexahedral elements
 class FEHex8_ : public FESolidElementTraits
 {
@@ -320,6 +329,22 @@ public:
 
 //=============================================================================
 // 10-node tetrahedral element using a 4-node Gaussian integration rule
+class FETet10G1 : public FETet10_
+{
+public:
+	enum { NINT = 1 };
+
+public:
+	FETet10G1();
+
+	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix Ai;
+};
+
+//=============================================================================
+// 10-node tetrahedral element using a 4-node Gaussian integration rule
 class FETet10G4 : public FETet10_
 {
 public:
@@ -352,6 +377,19 @@ private:
 	matrix Ai;
 };
 
+//=============================================================================
+class FETet10G4RI1 : public FETet10G4, public FESRISolidElementTraits
+{
+public:
+	FETet10G4RI1();
+};
+
+//=============================================================================
+class FETet10G8RI4 : public FETet10G8, public FESRISolidElementTraits
+{
+public:
+	FETet10G8RI4();
+};
 
 //=============================================================================
 // 10-node tetrahedral element using a 11-node Gauss-Lobatto integration rule
@@ -390,6 +428,23 @@ public:
 
 	//! values of shape function second derivatives
 	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
+};
+
+//=============================================================================
+// 15-node tetrahedral element using a 8-node Gaussian integration rule
+class FETet15G4 : public FETet15_
+{
+public:
+	enum { NINT = 4 };
+
+public:
+	FETet15G4();
+
+	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix N;
+	matrix Ai;
 };
 
 //=============================================================================
@@ -441,6 +496,13 @@ public:
 private:
 	matrix N;
 	matrix Ai;
+};
+
+//=============================================================================
+class FETet15G15RI4 : public FETet15G15, public FESRISolidElementTraits
+{
+public:
+	FETet15G15RI4();
 };
 
 

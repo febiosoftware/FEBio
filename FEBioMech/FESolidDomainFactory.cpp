@@ -18,6 +18,7 @@
 #include "FECore/FEDiscreteMaterial.h"
 #include "FEMicroMaterial2O.h"
 #include "FEElasticDomain2O.h"
+#include "FESRIElasticSolidDomain.h"
 
 //-----------------------------------------------------------------------------
 int FESolidDomainFactory::GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat)
@@ -51,8 +52,15 @@ int FESolidDomainFactory::GetDomainType(const FE_Element_Spec& spec, FEMaterial*
 		}
 		else if ((eshape == ET_TET10) || (eshape == ET_TET15))
 		{
-			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_tet)) return FE_3F_SOLID_DOMAIN;
-			return FE_ELASTIC_SOLID_DOMAIN;
+			if ((etype == FE_TET10G8RI4)||(etype == FE_TET10G4RI1))
+			{
+				return FE_SRI_ELASTIC_SOLID_DOMAIN;
+			}
+			else
+			{
+				if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_tet)) return FE_3F_SOLID_DOMAIN;
+				return FE_ELASTIC_SOLID_DOMAIN;
+			}
 		}
 		else if ((eshape == ET_HEX20) || (eshape == ET_HEX27))
 		{
@@ -103,5 +111,6 @@ FEDomain* FESolidDomainFactory::CreateDomain(int dtype, FEMesh* pm, FEMaterial* 
 	if (dtype == FE_3F_SOLID_DOMAIN     ) return new FE3FieldElasticSolidDomain(pm, pmat);
 	if (dtype == FE_LINEAR_SOLID_DOMAIN ) return new FELinearSolidDomain       (pm, pmat);
 	if (dtype == FE_DISCRETE_DOMAIN     ) return new FEDiscreteSpringDomain    (pm, pmat);
+	if (dtype == FE_SRI_ELASTIC_SOLID_DOMAIN) return new FESRIElasticSolidDomain(pm, pmat);
 	return 0;
 }

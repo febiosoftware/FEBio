@@ -185,9 +185,12 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 				}
 				else if (elem == "tet10")
 				{
-					if      (strcmp(szv, "GAUSS4"   ) == 0) m_pim->m_ntet10 = FE_TET10G4;
+					if      (strcmp(szv, "GAUSS1"   ) == 0) m_pim->m_ntet10 = FE_TET10G1;
+					else if (strcmp(szv, "GAUSS4"   ) == 0) m_pim->m_ntet10 = FE_TET10G4;
 					else if (strcmp(szv, "GAUSS8"   ) == 0) m_pim->m_ntet10 = FE_TET10G8;
 					else if (strcmp(szv, "LOBATTO11") == 0) m_pim->m_ntet10 = FE_TET10GL11;
+					else if (strcmp(szv, "GAUSS4RI1") == 0) m_pim->m_ntet10 = FE_TET10G4RI1;
+					else if (strcmp(szv, "GAUSS8RI4") == 0) m_pim->m_ntet10 = FE_TET10G8RI4;
 					else throw XMLReader::InvalidValue(tag);
 				}
 				else if (elem == "tet15")
@@ -195,6 +198,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 					if      (strcmp(szv, "GAUSS8" ) == 0) m_pim->m_ntet15 = FE_TET15G8;
 					else if (strcmp(szv, "GAUSS11") == 0) m_pim->m_ntet15 = FE_TET15G11;
 					else if (strcmp(szv, "GAUSS15") == 0) m_pim->m_ntet15 = FE_TET15G15;
+					else if (strcmp(szv, "GAUSS15RI4") == 0) m_pim->m_ntet10 = FE_TET15G15RI4;
 					else throw XMLReader::InvalidValue(tag);
 				}
 				else if (elem == "tri3")
