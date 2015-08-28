@@ -2,5 +2,5 @@
 
 include $(FEBDIR)build/lnx64d.mk
 
-DEF += -DNDEBUG -DFEBIO_LICENSE
+DEF += -DNDEBUG
 
