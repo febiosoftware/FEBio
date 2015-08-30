@@ -112,7 +112,7 @@ FE_Element_Shape FEBioGeometrySection::ElementShape(XMLTag& t)
 
 //-----------------------------------------------------------------------------
 //! find the domain type for the element and material type
-int FEBioGeometrySection::DomainType(FE_Element_Shape eshape, FEMaterial* pmat)
+FEDomain* FEBioGeometrySection::CreateDomain(const FE_Element_Shape& eshape, FEMesh* pm, FEMaterial* pmat)
 {
 	// setup the element specs
 	FE_Element_Spec spec;
@@ -128,19 +128,7 @@ int FEBioGeometrySection::DomainType(FE_Element_Shape eshape, FEMaterial* pmat)
 	
 	// get the domain type
 	FECoreKernel& febio = FECoreKernel::GetInstance();
-	return febio.GetDomainType(spec, pmat);
-}
-
-//-----------------------------------------------------------------------------
-//! Create a particular type of domain
-FEDomain* FEBioGeometrySection::CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat)
-{
-	// create a new domain based on the type
-	FECoreKernel& febio = FECoreKernel::GetInstance();
-	FEDomain* pd = febio.CreateDomain(ntype, pm, pmat);
-
-	// return the domain
-	return pd;
+	return febio.CreateDomain(spec, pm, pmat);
 }
 
 //-----------------------------------------------------------------------------
@@ -212,15 +200,9 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		// get material class
 		FEMaterial* pmat = fem.GetMaterial(d.mat);
 
-		// then, find the domain type depending on the 
-		// element and material types
-		int ntype = DomainType(d.elem, pmat);
-		if (ntype == 0) throw FEBioImport::InvalidDomainType();
-
 		// create the new domain
-		FEDomain* pdom = CreateDomain(ntype, &mesh, pmat);
+		FEDomain* pdom = CreateDomain(d.elem, &mesh, pmat);
 		if (pdom == 0) throw FEBioImport::FailedCreatingDomain();
-
 
 		// add it to the mesh
 		assert(d.nel);
@@ -410,13 +392,8 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	// get the domain's material class
 	FEMaterial* pmat = fem.GetMaterial(nmat);
 
-	// then, find the domain type depending on the 
-	// element and material types
-	int ndomtype = DomainType(etype, pmat);
-	if (ndomtype == 0) throw FEBioImport::InvalidDomainType();
-
 	// create the new domain
-	FEDomain* pdom = CreateDomain(ndomtype, &mesh, pmat);
+	FEDomain* pdom = CreateDomain(etype, &mesh, pmat);
 	if (pdom == 0) throw FEBioImport::FailedCreatingDomain();
 	FEDomain& dom = *pdom;
 	dom.SetName(szname);
@@ -581,13 +558,8 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 	{
 		FEDOMAIN& d = dom[i];
 
-		// then, find the domain type depending on the 
-		// element and material types
-		int ntype = DomainType(d.elem, 0);
-		if (ntype == 0) throw FEBioImport::InvalidDomainType();
-
 		// create the new domain
-		FEDomain* pdom = CreateDomain(ntype, &mesh, 0);
+		FEDomain* pdom = CreateDomain(d.elem, &mesh, 0);
 		if (pdom == 0) throw FEBioImport::FailedCreatingDomain();
 
 

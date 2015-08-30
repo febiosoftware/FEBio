@@ -10,7 +10,7 @@ class FEElasticDomain2O : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	FEElasticDomain2O(FEMesh* pm, FEMaterial* pmat);
+	FEElasticDomain2O(FEModel* pfem);
 	
 	void InitElements();
 	void ElementInternalForce(FESolidElement& el, vector<double>& fe);

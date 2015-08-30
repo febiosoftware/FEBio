@@ -94,7 +94,8 @@ void FETangentDiagnostic::BuildUniaxial()
 	FEMaterial* pmat = m_fem.GetMaterial(0);
 
 	// create a solid domain
-	FEElasticSolidDomain* pd = new FEElasticSolidDomain(&m, pmat);
+	FEElasticSolidDomain* pd = new FEElasticSolidDomain(&m_fem);
+	pd->SetMaterial(pmat);
 	pd->create(1);
 	m.AddDomain(pd);
 	FESolidElement& el = pd->Element(0);
@@ -157,7 +158,8 @@ void FETangentDiagnostic::BuildSimpleShear()
 	FEMaterial* pmat = m_fem.GetMaterial(0);
 
 	// create a solid domain
-	FEElasticSolidDomain* pd = new FEElasticSolidDomain(&m, pmat);
+	FEElasticSolidDomain* pd = new FEElasticSolidDomain(&m_fem);
+	pd->SetMaterial(pmat);
 	pd->create(1);
 	m.AddDomain(pd);
 	FESolidElement& el = pd->Element(0);

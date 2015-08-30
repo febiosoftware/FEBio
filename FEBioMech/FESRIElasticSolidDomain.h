@@ -6,7 +6,7 @@
 class FESRIElasticSolidDomain : public FEElasticSolidDomain
 {
 public:
-	FESRIElasticSolidDomain(FEMesh* pmesh, FEMaterial* pmat);
+	FESRIElasticSolidDomain(FEModel* pfem);
 
 	//! create a copy
 	FEDomain* Copy();

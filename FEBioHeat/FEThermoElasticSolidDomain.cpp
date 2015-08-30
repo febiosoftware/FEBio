@@ -6,7 +6,13 @@
 #include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
-FEThermoElasticSolidDomain::FEThermoElasticSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_THERMOELASTIC_DOMAIN, pm)
+FEThermoElasticSolidDomain::FEThermoElasticSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh())
+{
+	m_pMat = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FEThermoElasticSolidDomain::SetMaterial(FEMaterial* pmat)
 {
 	m_pMat = dynamic_cast<FEThermoElasticMaterial*>(pmat);
 	assert(m_pMat);

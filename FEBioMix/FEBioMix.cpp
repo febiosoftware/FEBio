@@ -55,6 +55,10 @@
 #include "FEBioMixData.h"
 
 #include "FEMixDomainFactory.h"
+#include "FEBiphasicSolidDomain.h"
+#include "FEBiphasicSoluteDomain.h"
+#include "FETriphasicDomain.h"
+#include "FEMultiphasicDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Initialization of the FEBioMix module. This function registers all the classes
@@ -121,6 +125,13 @@ REGISTER_FECORE_CLASS(FEMassActionReversible              ,FEMATERIAL_ID, "mass-
 REGISTER_FECORE_CLASS(FEMichaelisMenten                   ,FEMATERIAL_ID, "Michaelis-Menten"         );
 REGISTER_FECORE_CLASS(FESolidBoundMolecule                ,FEMATERIAL_ID, "solid_bound"              );
 REGISTER_FECORE_CLASS(FEActiveConstantSupply              ,FEMATERIAL_ID, "active-const-supply"      );
+
+//-----------------------------------------------------------------------------
+// Domain classes
+REGISTER_FECORE_CLASS(FEBiphasicSolidDomain , FEDOMAIN_ID, "biphasic-solid"       );
+REGISTER_FECORE_CLASS(FEBiphasicSoluteDomain, FEDOMAIN_ID, "biphasic-solute-solid");
+REGISTER_FECORE_CLASS(FETriphasicDomain     , FEDOMAIN_ID, "triphasic-solid"      );
+REGISTER_FECORE_CLASS(FEMultiphasicDomain   , FEDOMAIN_ID, "multiphasic-solid"    );
 
 //-----------------------------------------------------------------------------
 // Surface loads

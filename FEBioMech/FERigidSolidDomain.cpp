@@ -4,6 +4,9 @@
 #include <FECore/FERigidBody.h>
 
 //-----------------------------------------------------------------------------
+FERigidSolidDomain::FERigidSolidDomain(FEModel* pfem) : FEElasticSolidDomain(pfem) {}
+
+//-----------------------------------------------------------------------------
 // NOTE: Although this function doesn't do anything we need it because we don't
 //       want to call the FEElasticSolidDomain::Initialize function.
 bool FERigidSolidDomain::Initialize(FEModel& fem)

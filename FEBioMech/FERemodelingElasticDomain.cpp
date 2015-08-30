@@ -4,7 +4,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FERemodelingElasticDomain::FERemodelingElasticDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat)
+FERemodelingElasticDomain::FERemodelingElasticDomain(FEModel* pfem) : FEElasticSolidDomain(pfem)
 {
 }
 

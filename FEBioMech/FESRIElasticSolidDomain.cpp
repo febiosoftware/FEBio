@@ -4,7 +4,7 @@
 #include "FECore\FEElementLibrary.h"
 
 //-----------------------------------------------------------------------------
-FESRIElasticSolidDomain::FESRIElasticSolidDomain(FEMesh* pmesh, FEMaterial* pmat) : FEElasticSolidDomain(pmesh, pmat)
+FESRIElasticSolidDomain::FESRIElasticSolidDomain(FEModel* pfem) : FEElasticSolidDomain(pfem)
 {
 }
 
@@ -13,7 +13,7 @@ FESRIElasticSolidDomain::FESRIElasticSolidDomain(FEMesh* pmesh, FEMaterial* pmat
 //! Node that this creates a copy without a material assignment
 FEDomain* FESRIElasticSolidDomain::Copy()
 {
-	FESRIElasticSolidDomain* pd = new FESRIElasticSolidDomain(0, 0);
+	FESRIElasticSolidDomain* pd = new FESRIElasticSolidDomain(m_pMat->GetFEModel());
 	pd->m_Elem = m_Elem;
 	pd->m_Node = m_Node;
 	return pd;

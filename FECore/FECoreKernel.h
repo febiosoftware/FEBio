@@ -51,11 +51,8 @@ public:
 	//! Register a new domain class
 	void RegisterDomain(FEDomainFactory* pf);
 
-	//! Find the domain type given an element spec and material
-	int GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat);
-
 	//! Create a domain of a certain type
-	FEDomain* CreateDomain(int dtype, FEMesh* pm, FEMaterial* pmat);
+	FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat);
 
 private:
 	std::vector<FECoreFactory*>		m_Fac;	// list of registered factory classes

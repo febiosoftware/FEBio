@@ -18,20 +18,17 @@ class FEMaterial;
 //! This class describes a physical domain that will be divided into elements
 //! of a specific type. All elements in the domain have to have the same type
 //! and material. 
-class FEDomain
+class FEDomain : public FECoreBase
 {
 public:
 	enum { MAX_DOMAIN_NAME = 64 };
 
 public:
 	//! constructor
-	FEDomain(int ntype, int nclass, FEMesh* pm);
+	FEDomain(int nclass, FEMesh* pm);
 
 	//! virtual destructor
 	virtual ~FEDomain();
-
-	//! return domain type
-	int Type() { return m_ntype; }
 
 	//! return domain class
 	int Class() { return m_nclass; }
@@ -91,9 +88,6 @@ public: // optional functions to overload
 	//! create a copy of this domain
 	virtual FEDomain* Copy() { return 0; }
 
-	//! serialize domain to archive
-	virtual void Serialize(DumpFile& ar) {}
-
 	//! stream domain data
 	virtual void ShallowCopy(DumpStream& dmp, bool bsave) {}
 
@@ -110,7 +104,6 @@ protected:
 	FEMesh*		m_pMesh;	//!< the mesh that this domain is a part of
 
 protected:
-	int	m_ntype;			//!< type of domain
 	int	m_nclass;			//!< domain class
 
 private:

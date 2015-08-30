@@ -510,8 +510,7 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	FE_Element_Spec spec;
 	spec.eshape = ET_TRUSS2;
 	spec.etype  = FE_DISCRETE;
-	int ndomtype = febio.GetDomainType(spec, pm);
-	FEDiscreteDomain* pd = dynamic_cast<FEDiscreteDomain*>(febio.CreateDomain(ndomtype, &mesh, pm));
+	FEDiscreteDomain* pd = dynamic_cast<FEDiscreteDomain*>(febio.CreateDomain(spec, &mesh, pm));
 	mesh.AddDomain(pd);
 
 	pd->create(1);

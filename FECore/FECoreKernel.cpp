@@ -101,22 +101,11 @@ void FECoreKernel::RegisterDomain(FEDomainFactory* pf)
 }
 
 //-----------------------------------------------------------------------------
-int FECoreKernel::GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat)
+FEDomain* FECoreKernel::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)
 {
 	for (int i=0; i<(int)m_Dom.size(); ++i)
 	{
-		int ndom = m_Dom[i]->GetDomainType(spec, pmat);
-		if (ndom != 0) return ndom;
-	}
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-FEDomain* FECoreKernel::CreateDomain(int dtype, FEMesh* pm, FEMaterial* pmat)
-{
-	for (int i=0; i<(int)m_Dom.size(); ++i)
-	{
-		FEDomain* pdom = m_Dom[i]->CreateDomain(dtype, pm, pmat);
+		FEDomain* pdom = m_Dom[i]->CreateDomain(spec, pm, pmat);
 		if (pdom != 0) return pdom;
 	}
 	return 0;

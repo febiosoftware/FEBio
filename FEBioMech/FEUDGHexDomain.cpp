@@ -3,10 +3,9 @@
 #include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
-FEUDGHexDomain::FEUDGHexDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat)
+FEUDGHexDomain::FEUDGHexDomain(FEModel* pfem) : FEElasticSolidDomain(pfem)
 { 
 	m_hg = 1.0; 
-	m_ntype = FE_UDGHEX_DOMAIN; 
 }
 
 //-----------------------------------------------------------------------------

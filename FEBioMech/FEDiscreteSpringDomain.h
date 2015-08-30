@@ -9,13 +9,16 @@ class FEDiscreteSpringDomain : public FEDiscreteDomain, public FEElasticDomain
 {
 public:
 	//! constructor
-	FEDiscreteSpringDomain(FEMesh* pm, FEMaterial* pmat);
+	FEDiscreteSpringDomain(FEModel* pfem);
 
 	//! Unpack LM data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 	//! get the material (overridden from FEDomain)
 	FEMaterial* GetMaterial() { return m_pMat; }
+
+	//! set the material
+	void SetMaterial(FEMaterial* pmat);
 
 public: // overridden from FEElasticDomain
 

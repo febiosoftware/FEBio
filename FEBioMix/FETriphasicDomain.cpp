@@ -8,7 +8,13 @@
 #endif
 
 //-----------------------------------------------------------------------------
-FETriphasicDomain::FETriphasicDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_TRIPHASIC_DOMAIN, pm)
+FETriphasicDomain::FETriphasicDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh())
+{
+	m_pMat = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FETriphasicDomain::SetMaterial(FEMaterial* pmat)
 {
 	m_pMat = dynamic_cast<FETriphasic*>(pmat);
 	assert(m_pMat);

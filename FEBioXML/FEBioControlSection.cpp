@@ -10,7 +10,7 @@ FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)
 {
 	switch (nmod)
 	{
-	case FE_SOLID         : return fecore_new<FESolver>(FESOLVER_ID, "solid"          , &fem);
+	case FE_SOLID         : return fecore_new<FESolver>(FESOLVER_ID, "solid2"         , &fem);
 	case FE_SOLID2        : return fecore_new<FESolver>(FESOLVER_ID, "solid2"         , &fem);
 	case FE_CG_SOLID      : return fecore_new<FESolver>(FESOLVER_ID, "CG-solid"       , &fem);
 	case FE_EXPLICIT_SOLID: return fecore_new<FESolver>(FESOLVER_ID, "explicit-solid" , &fem);

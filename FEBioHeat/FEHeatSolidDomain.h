@@ -18,13 +18,16 @@ class FEHeatSolidDomain : public FESolidDomain, public FEHeatDomain
 {
 public:
 	//! constructor
-	FEHeatSolidDomain(FEMesh* pm, FEMaterial* pmat);
+	FEHeatSolidDomain(FEModel* pfem);
 
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 	//! get the material (overridden from FEDomain)
 	FEMaterial* GetMaterial() { return m_pMat; }
+
+	//! set the material
+	void SetMaterial(FEMaterial* pmat);
 
 public: // overloaded from FEHeatDomain
 

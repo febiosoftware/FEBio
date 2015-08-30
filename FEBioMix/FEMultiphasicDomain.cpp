@@ -9,8 +9,14 @@
 #endif
 
 //-----------------------------------------------------------------------------
-FEMultiphasicDomain::FEMultiphasicDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_MULTIPHASIC_DOMAIN, pm)
+FEMultiphasicDomain::FEMultiphasicDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh())
 { 
+	m_pMat = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FEMultiphasicDomain::SetMaterial(FEMaterial* pmat)
+{
 	m_pMat = dynamic_cast<FEMultiphasic*>(pmat);
 	assert(m_pMat);
 }

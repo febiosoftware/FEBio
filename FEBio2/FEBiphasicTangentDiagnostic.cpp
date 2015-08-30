@@ -105,7 +105,8 @@ void FEBiphasicTangentDiagnostic::BuildUniaxial()
     FEMaterial* pmat = m_fem.GetMaterial(0);
     
     // create a biphasic domain
-    FEBiphasicSolidDomain* pd = new FEBiphasicSolidDomain(&m, pmat);
+    FEBiphasicSolidDomain* pd = new FEBiphasicSolidDomain(&m_fem);
+	pd->SetMaterial(pmat);
     pd->create(1);
     m.AddDomain(pd);
     FESolidElement& el = pd->Element(0);

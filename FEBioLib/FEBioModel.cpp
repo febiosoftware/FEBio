@@ -610,11 +610,9 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 		for (i=0; i<ND; ++i)
 		{
 			FEDomain& d = m.Domain(i);
-			int ntype = d.Type();
-			int ne = d.Elements();
-			int nmat = (int) d.GetMaterial()->GetID() - 1; 
-			ar << nmat;
-			ar << ntype << ne;
+
+			ar << d.GetMaterial()->GetID();
+			ar << d.GetTypeStr() << d.Elements();
 			d.Serialize(ar);
 		}
 
@@ -664,8 +662,9 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 		}
 
 		// read domain data
-		int ND;
+		int ND, ne;
 		ar >> ND;
+		char sz[256] = {0};
 		for (int i=0; i<ND; ++i)
 		{
 			int nmat;
@@ -673,10 +672,10 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 			FEMaterial* pm = GetMaterial(nmat);
 			assert(pm);
 
-			int ntype, ne;
-			ar >> ntype >> ne;
-			FEDomain* pd = febio.CreateDomain(ntype, &m, pm);
+			ar >> sz >> ne;
+			FEDomain* pd = fecore_new<FEDomain>(FEDOMAIN_ID, sz, this);
 			assert(pd);
+			pd->SetMaterial(pm);
 			pd->create(ne);
 			pd->Serialize(ar);
 

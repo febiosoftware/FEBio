@@ -147,7 +147,8 @@ bool FEContactDiagnostic::Init()
 	m_fem.AddMaterial(pm);
 
 	// get the one-and-only domain
-	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(&mesh, pm);
+	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(&m_fem);
+	pbd->SetMaterial(pm);
 	pbd->create(2);
 	mesh.AddDomain(pbd);
 

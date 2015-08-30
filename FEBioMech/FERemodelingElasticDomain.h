@@ -9,7 +9,7 @@ class FERemodelingElasticDomain : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	FERemodelingElasticDomain(FEMesh* pm, FEMaterial* pmat);
+	FERemodelingElasticDomain(FEModel* pfem);
 
 	//! reset element data
 	void Reset();

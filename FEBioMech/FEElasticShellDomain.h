@@ -8,7 +8,7 @@
 class FEElasticShellDomain : public FEShellDomain, public FEElasticDomain
 {
 public:
-	FEElasticShellDomain(FEMesh* pm, FEMaterial* pmat);
+	FEElasticShellDomain(FEModel* pfem);
 
 	//! \todo do I really need this?
 	FEElasticShellDomain& operator = (FEElasticShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
@@ -21,6 +21,9 @@ public:
 
 	//! get the material (overridden from FEDomain)
 	FEMaterial* GetMaterial() { return m_pMat; }
+
+	//! set the material
+	void SetMaterial(FEMaterial* pmat);
 
 public: // overrides from FEElasticDomain
 

@@ -10,42 +10,35 @@
 #include "FEMultiphasicDomain.h"
 
 //-----------------------------------------------------------------------------
-int FEMixDomainFactory::GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat)
+FEDomain* FEMixDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)
 {
+	FEModel* pfem = pmat->GetFEModel();
 	FE_Element_Shape eshape = spec.eshape;
+	FEDomain* pd = 0;
 	if (dynamic_cast<FEBiphasic*>(pmat))
 	{
 		// biphasic elements
-		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) return FE_BIPHASIC_DOMAIN;
+		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) pd = new FEBiphasicSolidDomain(pfem);
 		else return 0;
 	}
 	if (dynamic_cast<FEBiphasicSolute*>(pmat))
 	{
-		// biphasic elements
-		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) return FE_BIPHASIC_SOLUTE_DOMAIN;
+		// biphasic solute elements
+		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) pd = new FEBiphasicSoluteDomain(pfem);
 		else return 0;
 	}
 	else if (dynamic_cast<FETriphasic*>(pmat))
 	{
 		// triphasic elements
-		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) return FE_TRIPHASIC_DOMAIN;
+		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) pd = new FETriphasicDomain(pfem);
 		else return 0;
 	}
 	if (dynamic_cast<FEMultiphasic*>(pmat))
 	{
 		// multiphasic elements
-		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) return FE_MULTIPHASIC_DOMAIN;
+		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) pd = new FEMultiphasicDomain(pfem);
 		else return 0;
 	}
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-FEDomain* FEMixDomainFactory::CreateDomain(int dtype, FEMesh* pm, FEMaterial* pmat)
-{
-	if (dtype == FE_BIPHASIC_DOMAIN       ) return new FEBiphasicSolidDomain (pm, pmat);
-	if (dtype == FE_BIPHASIC_SOLUTE_DOMAIN) return new FEBiphasicSoluteDomain(pm, pmat);
-	if (dtype == FE_TRIPHASIC_DOMAIN      ) return new FETriphasicDomain     (pm, pmat);
-	if (dtype == FE_MULTIPHASIC_DOMAIN    ) return new FEMultiphasicDomain   (pm, pmat);
-	return 0;
+	if (pd) pd->SetMaterial(pmat);
+	return pd;
 }

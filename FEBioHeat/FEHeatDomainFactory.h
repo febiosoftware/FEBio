@@ -5,6 +5,5 @@
 class FEHeatDomainFactory : public FEDomainFactory
 {
 public:
-	int GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat);
-	FEDomain* CreateDomain(int dtype, FEMesh* pm, FEMaterial* pmat);
+	FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat);
 };

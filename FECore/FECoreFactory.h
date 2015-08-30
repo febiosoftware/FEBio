@@ -52,6 +52,5 @@ public:
 	FEDomainFactory(){}
 	virtual ~FEDomainFactory(){}
 
-	virtual int GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat) = 0;
-	virtual FEDomain* CreateDomain(int dtype, FEMesh* pm, FEMaterial* pmat) = 0;
+	virtual FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat) = 0;
 };

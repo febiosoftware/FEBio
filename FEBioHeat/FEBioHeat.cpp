@@ -15,6 +15,8 @@
 #include "FEThermoElasticMaterial.h"
 #include "FEThermoNeoHookean.h"
 #include "FEThermalConductivity.h"
+#include "FEHeatSolidDomain.h"
+#include "FEThermoElasticSolidDomain.h"
 
 namespace FEBioHeat {
 
@@ -39,6 +41,10 @@ void InitModule()
 	REGISTER_FECORE_CLASS(FEThermoNeoHookean     , FEMATERIAL_ID, "thermo-neo-Hookean");
 	REGISTER_FECORE_CLASS(FEConstReferenceThermalConductivity, FEMATERIAL_ID, "cond-ref-iso");
 	REGISTER_FECORE_CLASS(FEConstThermalConductivity         , FEMATERIAL_ID, "cond-const"  );
+
+	// Domain classes
+	REGISTER_FECORE_CLASS(FEHeatSolidDomain         , FEDOMAIN_ID, "heat-solid"          );
+	REGISTER_FECORE_CLASS(FEThermoElasticSolidDomain, FEDOMAIN_ID, "thermo-elastic-solid");
 
 	// Body loads
 	REGISTER_FECORE_CLASS(FEHeatSource, FEBODYLOAD_ID, "heat_source");

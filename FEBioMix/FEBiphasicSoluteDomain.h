@@ -13,13 +13,16 @@ class FEBiphasicSoluteDomain : public FESolidDomain, public FEElasticDomain
 {
 public:
 	//! constructor
-	FEBiphasicSoluteDomain(FEMesh* pm, FEMaterial* pmat);
+	FEBiphasicSoluteDomain(FEModel* pfem);
 	
 	//! reset domain data
 	void Reset();
 
 	//! get the material (overridden from FEDomain)
 	FEMaterial* GetMaterial() { return m_pMat; }
+
+	//! set the material
+	void SetMaterial(FEMaterial* pmat);
 
 	//! Unpack solid element data (overridden from FEDomain)
 	void UnpackLM(FEElement& el, vector<int>& lm);

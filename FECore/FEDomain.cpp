@@ -4,7 +4,7 @@
 #include <string.h>
 
 //-----------------------------------------------------------------------------
-FEDomain::FEDomain(int ntype, int nclass, FEMesh* pm) : m_pMesh(pm), m_ntype(ntype), m_nclass(nclass)
+FEDomain::FEDomain(int nclass, FEMesh* pm) : FECoreBase(FEDOMAIN_ID), m_pMesh(pm), m_nclass(nclass)
 {
 	m_szname[0] = 0;
 }

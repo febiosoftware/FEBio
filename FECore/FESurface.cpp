@@ -7,7 +7,7 @@
 #include "DOFS.h"
 
 //-----------------------------------------------------------------------------
-FESurface::FESurface(FEMesh* pm) : FEDomain(FE_SURFACE_DOMAIN, FE_DOMAIN_SURFACE, pm) 
+FESurface::FESurface(FEMesh* pm) : FEDomain(FE_DOMAIN_SURFACE, pm) 
 {
 	
 }

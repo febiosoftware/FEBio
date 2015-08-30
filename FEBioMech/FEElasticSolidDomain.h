@@ -11,7 +11,7 @@ class FEElasticSolidDomain : public FESolidDomain, public FEElasticDomain
 {
 public:
 	//! constructor
-	FEElasticSolidDomain(FEMesh* pm, FEMaterial* pmat);
+	FEElasticSolidDomain(FEModel* pfem);
 
 	//! assignment operator
 	FEElasticSolidDomain& operator = (FEElasticSolidDomain& d);

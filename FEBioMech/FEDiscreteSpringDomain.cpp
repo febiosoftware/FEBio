@@ -3,7 +3,13 @@
 #include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
-FEDiscreteSpringDomain::FEDiscreteSpringDomain(FEMesh* pm, FEMaterial* pmat) : FEDiscreteDomain(FE_DISCRETE_DOMAIN, pm)
+FEDiscreteSpringDomain::FEDiscreteSpringDomain(FEModel* pfem) : FEDiscreteDomain(&pfem->GetMesh())
+{
+	m_pMat = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FEDiscreteSpringDomain::SetMaterial(FEMaterial* pmat)
 {
 	m_pMat = dynamic_cast<FESpringMaterial*>(pmat);
 	assert(m_pMat);

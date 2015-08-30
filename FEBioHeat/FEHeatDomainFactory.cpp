@@ -5,27 +5,46 @@
 
 //-----------------------------------------------------------------------------
 //! Use the material and the element type to determine the domain type.
-int FEHeatDomainFactory::GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat)
+FEDomain* FEHeatDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)
 {
+	FEModel& fem = *pmat->GetFEModel();
 	FE_Element_Shape eshape = spec.eshape;
 	if (dynamic_cast<FEHeatTransferMaterial*>(pmat))
 	{
-		if ((eshape == ET_HEX8) || (eshape == ET_HEX20) || (eshape == ET_HEX27) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_TET15)) return FE_HEAT_SOLID_DOMAIN;
-		else return 0;
+		switch (eshape)
+		{
+		case ET_HEX8:
+		case ET_HEX20:
+		case ET_HEX27:
+		case ET_PENTA6:
+		case ET_TET4:
+		case ET_TET10:
+		case ET_TET15:
+			{
+				FEDomain* pd = new FEHeatSolidDomain(&fem);
+				pd->SetMaterial(pmat);
+				return pd;
+			}
+			break;
+		}
 	}
 	if (dynamic_cast<FEThermoElasticMaterial*>(pmat))
 	{
-		if ((eshape == ET_HEX8) || (eshape == ET_HEX20) || (eshape == ET_HEX27) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_TET15)) return FE_THERMOELASTIC_DOMAIN;
-		else return 0;
+		switch (eshape)
+		{
+		case ET_HEX8:
+		case ET_HEX20:
+		case ET_HEX27:
+		case ET_PENTA6:
+		case ET_TET4:
+		case ET_TET10:
+		case ET_TET15:
+			{
+				FEDomain* pd = new FEThermoElasticSolidDomain(&fem);
+				pd->SetMaterial(pmat);
+				return pd;
+			}
+		}
 	}
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Create a domain from the given domain type (dtype)
-FEDomain* FEHeatDomainFactory::CreateDomain(int dtype, FEMesh* pm, FEMaterial* pmat)
-{
-	if (dtype == FE_HEAT_SOLID_DOMAIN   ) return new FEHeatSolidDomain(pm, pmat);
-	if (dtype == FE_THERMOELASTIC_DOMAIN) return new FEThermoElasticSolidDomain(pm, pmat);
 	return 0;
 }

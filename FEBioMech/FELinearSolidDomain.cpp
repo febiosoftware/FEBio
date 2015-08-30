@@ -4,7 +4,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FELinearSolidDomain::FELinearSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_LINEAR_SOLID_DOMAIN, pm)
+FELinearSolidDomain::FELinearSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(pm)
 {
 	m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
 	assert(false);

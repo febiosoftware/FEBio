@@ -6,7 +6,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEElasticDomain2O::FEElasticDomain2O(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat)
+FEElasticDomain2O::FEElasticDomain2O(FEModel* pfem) : FEElasticSolidDomain(pfem)
 {
 }
 

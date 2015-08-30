@@ -7,7 +7,7 @@ class FEUDGHexDomain : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	FEUDGHexDomain(FEMesh* pm, FEMaterial* pmat);
+	FEUDGHexDomain(FEModel* pfem);
 
 	//! initialize class
 	bool Initialize(FEModel& fem);

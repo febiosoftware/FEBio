@@ -9,7 +9,7 @@ class FEThermoElasticSolidDomain : public FESolidDomain, public FEElasticDomain
 {
 public:
 	//! constructor
-	FEThermoElasticSolidDomain(FEMesh* pm, FEMaterial* pmat);
+	FEThermoElasticSolidDomain(FEModel* pfem);
 
 	//! initialize class
 	bool Initialize(FEModel& fem);
@@ -25,6 +25,9 @@ public:
 
 	//! get the material (overridden from FEDomain)
 	FEMaterial* GetMaterial() { return m_pMat; }
+
+	//! set the material
+	void SetMaterial(FEMaterial* pmat);
 
 public:
 	// update stresses (overridden from FEElasticDomain)

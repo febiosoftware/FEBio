@@ -24,7 +24,7 @@ public:
 
 public:
 	//! constructor
-	FEUT4Domain(FEMesh* pm, FEMaterial* pmat);
+	FEUT4Domain(FEModel* pfem);
 
 	//! destructor
 	~FEUT4Domain();

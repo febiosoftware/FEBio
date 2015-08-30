@@ -5,7 +5,13 @@
 #include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
-FEBiphasicSoluteDomain::FEBiphasicSoluteDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_BIPHASIC_SOLUTE_DOMAIN, pm)
+FEBiphasicSoluteDomain::FEBiphasicSoluteDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh())
+{
+	m_pMat = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FEBiphasicSoluteDomain::SetMaterial(FEMaterial* pmat)
 {
 	m_pMat = dynamic_cast<FEBiphasicSolute*>(pmat);
 	assert(m_pMat);

@@ -1,9 +1,15 @@
 #include "FEHeatSolidDomain.h"
-#include "FECore/FEMesh.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEHeatSolidDomain::FEHeatSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_HEAT_SOLID_DOMAIN, pm)
+FEHeatSolidDomain::FEHeatSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh())
+{
+	m_pMat = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FEHeatSolidDomain::SetMaterial(FEMaterial* pmat)
 {
 	m_pMat = dynamic_cast<FEHeatTransferMaterial*>(pmat);
 	assert(m_pMat);

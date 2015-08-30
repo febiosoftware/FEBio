@@ -6,7 +6,7 @@
 class FEDiscreteDomain : public FEDomain
 {
 public:
-	FEDiscreteDomain(int ntype, FEMesh* pm) : FEDomain(ntype, FE_DOMAIN_DISCRETE, pm) {}
+	FEDiscreteDomain(FEMesh* pm) : FEDomain(FE_DOMAIN_DISCRETE, pm) {}
 
 	void create(int n) { m_Elem.resize(n); }
 	int Elements() { return (int) m_Elem.size(); }

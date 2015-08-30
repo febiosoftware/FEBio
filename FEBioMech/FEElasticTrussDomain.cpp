@@ -4,7 +4,13 @@
 
 //-----------------------------------------------------------------------------
 //! Constructor
-FEElasticTrussDomain::FEElasticTrussDomain(FEMesh* pm, FEMaterial* pmat) : FETrussDomain(FE_TRUSS_DOMAIN, pm)
+FEElasticTrussDomain::FEElasticTrussDomain(FEModel* pfem) : FETrussDomain(&pfem->GetMesh())
+{
+	m_pMat = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticTrussDomain::SetMaterial(FEMaterial* pmat)
 {
 	m_pMat = dynamic_cast<FETrussMaterial*>(pmat);
 	assert(m_pMat);

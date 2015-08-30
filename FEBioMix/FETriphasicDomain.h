@@ -13,13 +13,16 @@ class FETriphasicDomain : public FESolidDomain, public FEElasticDomain
 {
 public:
 	//! constructor
-	FETriphasicDomain(FEMesh* pm, FEMaterial* pmat);
+	FETriphasicDomain(FEModel* pfem);
 	
 	//! reset domain data
 	void Reset();
 
 	//! get material (overridden from FEDomain)
 	FEMaterial* GetMaterial() { return m_pMat; }
+
+	//! set the material
+	void SetMaterial(FEMaterial* pmat);
 
 	//! Unpack solid element data (overridden from FEDomain)
 	void UnpackLM(FEElement& el, vector<int>& lm);

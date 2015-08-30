@@ -114,7 +114,8 @@ void FEMultiphasicTangentDiagnostic::BuildUniaxial()
     }
     
     // create a multiphasic domain
-    FEMultiphasicDomain* pd = new FEMultiphasicDomain(&m, pmat);
+    FEMultiphasicDomain* pd = new FEMultiphasicDomain(&m_fem);
+	pd->SetMaterial(pmat);
     pd->create(1);
     m.AddDomain(pd);
     FESolidElement& el = pd->Element(0);

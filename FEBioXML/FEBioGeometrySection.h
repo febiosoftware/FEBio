@@ -33,9 +33,7 @@ protected:
 	void ReadTrussElement(XMLTag& tag, FETrussElement& el, int ntype, int nid, int nmat);
 
 	FE_Element_Shape ElementShape(XMLTag& tag);
-	int DomainType(FE_Element_Shape eshape, FEMaterial* pmat);
-	FEDomain* CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat);
-
+	FEDomain* CreateDomain(const FE_Element_Shape& eshape, FEMesh* pm, FEMaterial* pmat);
 
 protected:
 	vector<FEDOMAIN>	m_dom;

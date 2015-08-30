@@ -16,7 +16,7 @@ protected:
 
 public:
 	//! constructor
-	FE3FieldElasticSolidDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_3F_SOLID_DOMAIN; }
+	FE3FieldElasticSolidDomain(FEModel* pfem) : FEElasticSolidDomain(pfem) {}
 
 	//! \todo Do I really use this?
 	FE3FieldElasticSolidDomain& operator = (FE3FieldElasticSolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }

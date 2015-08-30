@@ -146,6 +146,19 @@
 #include "FEBioMechData.h"
 
 #include "FESolidDomainFactory.h"
+#include "FEElasticSolidDomain.h"
+#include "FEElasticShellDomain.h"
+#include "FEElasticTrussDomain.h"
+#include "FERigidSolidDomain.h"
+#include "FERigidShellDomain.h"
+#include "FERemodelingElasticDomain.h"
+#include "FEUDGHexDomain.h"
+#include "FEUT4Domain.h"
+#include "FEElasticDomain2O.h"
+#include "FESRIElasticSolidDomain.h"
+#include "FE3FieldElasticSolidDomain.h"
+#include "FEDiscreteSpringDomain.h"
+
 
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
@@ -298,13 +311,28 @@ REGISTER_FECORE_CLASS(FEDamageCDFWeibull                   , FEMATERIAL_ID, "CDF
 REGISTER_FECORE_CLASS(FEDamageCDFStep                      , FEMATERIAL_ID, "CDF step"             );
 REGISTER_FECORE_CLASS(FEDamageCDFPQP                       , FEMATERIAL_ID, "CDF quintic"          );
 REGISTER_FECORE_CLASS(FEDamageCriterionSimo                , FEMATERIAL_ID, "DC Simo"              );
-REGISTER_FECORE_CLASS(FEDamageCriterionSED                 , FEMATERIAL_ID, "DC strain energy density"          );
-REGISTER_FECORE_CLASS(FEDamageCriterionSSE                 , FEMATERIAL_ID, "DC specific strain energy"         );
-REGISTER_FECORE_CLASS(FEDamageCriterionVMS                 , FEMATERIAL_ID, "DC von Mises stress"               );
-REGISTER_FECORE_CLASS(FEDamageCriterionMSS                 , FEMATERIAL_ID, "DC max shear stress"               );
-REGISTER_FECORE_CLASS(FEDamageCriterionMNS                 , FEMATERIAL_ID, "DC max normal stress"              );
-REGISTER_FECORE_CLASS(FEDamageCriterionMNLS                , FEMATERIAL_ID, "DC max normal Lagrange strain"     );
-    
+REGISTER_FECORE_CLASS(FEDamageCriterionSED                 , FEMATERIAL_ID, "DC strain energy density"     );
+REGISTER_FECORE_CLASS(FEDamageCriterionSSE                 , FEMATERIAL_ID, "DC specific strain energy"    );
+REGISTER_FECORE_CLASS(FEDamageCriterionVMS                 , FEMATERIAL_ID, "DC von Mises stress"          );
+REGISTER_FECORE_CLASS(FEDamageCriterionMSS                 , FEMATERIAL_ID, "DC max shear stress"          );
+REGISTER_FECORE_CLASS(FEDamageCriterionMNS                 , FEMATERIAL_ID, "DC max normal stress"         );
+REGISTER_FECORE_CLASS(FEDamageCriterionMNLS                , FEMATERIAL_ID, "DC max normal Lagrange strain");
+
+//-----------------------------------------------------------------------------
+// domain classes
+REGISTER_FECORE_CLASS(FERigidSolidDomain        , FEDOMAIN_ID, "rigid-solid"      );
+REGISTER_FECORE_CLASS(FERigidShellDomain        , FEDOMAIN_ID, "rigid-shell"      );
+REGISTER_FECORE_CLASS(FERemodelingElasticDomain , FEDOMAIN_ID, "remodeling-solid" );
+REGISTER_FECORE_CLASS(FEElasticDomain2O         , FEDOMAIN_ID, "elastic-20-solid" );
+REGISTER_FECORE_CLASS(FE3FieldElasticSolidDomain, FEDOMAIN_ID, "three-field-solid");
+REGISTER_FECORE_CLASS(FEUDGHexDomain            , FEDOMAIN_ID, "udg-hex"          );
+REGISTER_FECORE_CLASS(FESRIElasticSolidDomain   , FEDOMAIN_ID, "sri-solid"        );
+REGISTER_FECORE_CLASS(FEUT4Domain               , FEDOMAIN_ID, "ut4-solid"        );
+REGISTER_FECORE_CLASS(FEElasticSolidDomain      , FEDOMAIN_ID, "elastic-solid"    );
+REGISTER_FECORE_CLASS(FEElasticShellDomain      , FEDOMAIN_ID, "elastic-shell"    );
+REGISTER_FECORE_CLASS(FEElasticTrussDomain      , FEDOMAIN_ID, "elastic-truss"    );
+REGISTER_FECORE_CLASS(FEDiscreteSpringDomain    , FEDOMAIN_ID, "discrete-spring"  );
+
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad
 REGISTER_FECORE_CLASS(FEPressureLoad, FESURFACELOAD_ID, "pressure");

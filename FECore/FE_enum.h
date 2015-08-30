@@ -127,6 +127,7 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FERIGIDOBJECT_ID			0x0010	// derived from FECoreBase (TODO: work in progress)
 #define FENLCLOGDATA_ID             0x0011	// derived from FELogNLConstraintData
 #define FECALLBACK_ID				0x0012	// derived from FECallBack
+#define FEDOMAIN_ID					0x0013	// derived from FEDomain (TODO: work in progress)
 
 /////////////////////////////////////////////////////////////////////////////
 // ENUM: Linear solvers
@@ -223,28 +224,5 @@ enum FE_Output_Level {
 #define	FE_DOMAIN_SURFACE	4
 #define	FE_DOMAIN_TRUSS		5
 #define	FE_DOMAIN_DISCRETE	6
-
-//-----------------------------------------------------------------------------
-//! Domain Types
-//! The domain type defines the specific type of domain
-//! \todo I'll probably want to get rid of this eventually
-#define FE_ELASTIC_SOLID_DOMAIN		1
-#define FE_ELASTIC_SHELL_DOMAIN		2
-#define FE_SURFACE_DOMAIN			3
-#define FE_TRUSS_DOMAIN				4
-#define FE_RIGID_SOLID_DOMAIN		5
-#define FE_RIGID_SHELL_DOMAIN		6
-#define FE_UDGHEX_DOMAIN			7
-#define FE_UT4_DOMAIN				8
-#define FE_HEAT_SOLID_DOMAIN		9
-#define FE_DISCRETE_DOMAIN			10
-#define FE_3F_SOLID_DOMAIN			11
-#define FE_BIPHASIC_DOMAIN			12
-#define FE_BIPHASIC_SOLUTE_DOMAIN	13
-#define FE_LINEAR_SOLID_DOMAIN		14
-#define FE_TRIPHASIC_DOMAIN			15
-#define FE_MULTIPHASIC_DOMAIN		16
-#define FE_THERMOELASTIC_DOMAIN		17
-#define FE_SRI_ELASTIC_SOLID_DOMAIN	18
 
 #endif // _FE_ENUM_H_05132007_

@@ -116,11 +116,8 @@ tens4ds material_to_spatial(tens4ds& C, mat3d& F)
 
 //-----------------------------------------------------------------------------
 //! Constructor for the UT4Domain
-FEUT4Domain::FEUT4Domain(FEMesh *pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat)
+FEUT4Domain::FEUT4Domain(FEModel* pfem) : FEElasticSolidDomain(pfem)
 {
-	// overwrite the domain type
-	m_ntype = FE_UT4_DOMAIN; 
-
 	m_alpha = 0.05;
 	m_bdev = false;
 

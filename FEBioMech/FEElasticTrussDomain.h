@@ -9,7 +9,7 @@ class FEElasticTrussDomain : public FETrussDomain, public FEElasticDomain
 {
 public:
 	//! Constructor
-	FEElasticTrussDomain(FEMesh* pm, FEMaterial* pmat);
+	FEElasticTrussDomain(FEModel* pfem);
 
 	//! copy operator
 	FEElasticTrussDomain& operator = (FEElasticTrussDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
@@ -25,6 +25,9 @@ public:
 
 	//! get the material (overridden from FEDomain)
 	FEMaterial* GetMaterial() { return m_pMat; }
+
+	//! set the material
+	void SetMaterial(FEMaterial* pmat);
 
 public: // overloads from FEElasticDomain
 

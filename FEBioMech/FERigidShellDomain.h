@@ -8,7 +8,7 @@ class FERigidShellDomain : public FEElasticShellDomain
 {
 public:
 	//! constructor
-	FERigidShellDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticShellDomain(pm, pmat) { m_ntype = FE_RIGID_SHELL_DOMAIN; }
+	FERigidShellDomain(FEModel* pfem);
 
 	//! Initialize
 	bool Initialize(FEModel& fem);
