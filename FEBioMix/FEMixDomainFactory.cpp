@@ -14,31 +14,37 @@ FEDomain* FEMixDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* 
 {
 	FEModel* pfem = pmat->GetFEModel();
 	FE_Element_Shape eshape = spec.eshape;
-	FEDomain* pd = 0;
+	const char* sztype = 0;
 	if (dynamic_cast<FEBiphasic*>(pmat))
 	{
 		// biphasic elements
-		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) pd = new FEBiphasicSolidDomain(pfem);
+		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) sztype = "biphasic-solid";
 		else return 0;
 	}
 	if (dynamic_cast<FEBiphasicSolute*>(pmat))
 	{
 		// biphasic solute elements
-		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) pd = new FEBiphasicSoluteDomain(pfem);
+		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) sztype = "biphasic-solute-solid";
 		else return 0;
 	}
 	else if (dynamic_cast<FETriphasic*>(pmat))
 	{
 		// triphasic elements
-		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) pd = new FETriphasicDomain(pfem);
+		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) sztype = "triphasic-solid";
 		else return 0;
 	}
 	if (dynamic_cast<FEMultiphasic*>(pmat))
 	{
 		// multiphasic elements
-		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) pd = new FEMultiphasicDomain(pfem);
+		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) sztype = "multiphasic-solid";
 		else return 0;
 	}
-	if (pd) pd->SetMaterial(pmat);
-	return pd;
+
+	if (sztype)
+	{
+		FEDomain* pd = fecore_new<FEDomain>(FEDOMAIN_ID, sztype, pfem);
+		if (pd) pd->SetMaterial(pmat);
+		return pd;
+	}
+	else return 0;
 }

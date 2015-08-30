@@ -9,6 +9,7 @@ FEDomain* FEHeatDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh*
 {
 	FEModel& fem = *pmat->GetFEModel();
 	FE_Element_Shape eshape = spec.eshape;
+	const char* sztype = 0;
 	if (dynamic_cast<FEHeatTransferMaterial*>(pmat))
 	{
 		switch (eshape)
@@ -20,11 +21,7 @@ FEDomain* FEHeatDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh*
 		case ET_TET4:
 		case ET_TET10:
 		case ET_TET15:
-			{
-				FEDomain* pd = new FEHeatSolidDomain(&fem);
-				pd->SetMaterial(pmat);
-				return pd;
-			}
+			sztype = "heat-solid";
 			break;
 		}
 	}
@@ -39,12 +36,16 @@ FEDomain* FEHeatDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh*
 		case ET_TET4:
 		case ET_TET10:
 		case ET_TET15:
-			{
-				FEDomain* pd = new FEThermoElasticSolidDomain(&fem);
-				pd->SetMaterial(pmat);
-				return pd;
-			}
+			sztype = "thermo-elastic-solid";
+			break;
 		}
 	}
-	return 0;
+
+	if (sztype)
+	{
+		FEDomain* pd = fecore_new<FEDomain>(FEDOMAIN_ID, sztype, &fem);
+		if (pd) pd->SetMaterial(pmat);
+		return pd;
+	}
+	else return 0;
 }
