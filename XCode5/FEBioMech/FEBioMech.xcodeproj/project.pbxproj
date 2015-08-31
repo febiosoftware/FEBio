@@ -1553,6 +1553,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
+				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DHAVE_GSL";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = "Release-Dave";
@@ -1649,6 +1650,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
+				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DHAVE_GSL";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1657,6 +1659,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
+				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DHAVE_GSL";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
