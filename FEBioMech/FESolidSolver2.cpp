@@ -43,6 +43,8 @@ BEGIN_PARAMETER_LIST(FESolidSolver2, FESolver)
 	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
 	ADD_PARAMETER(m_gamma        , FE_PARAM_DOUBLE, "gamma"       );
     ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
+	ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
+	ADD_PARAMETER(m_bdoreforms   , FE_PARAM_BOOL  , "do_reforms"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -63,6 +65,8 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FESolver(pfem)
 	m_neq = 0;
 	m_plinsolve = 0;
 
+	m_bdivreform = true;
+	m_bdoreforms = true;
 
 	// default Newmark parameters for trapezoidal time integration
     m_alpha = 1.0;
@@ -357,6 +361,8 @@ bool FESolidSolver2::CreateStiffness(bool breset)
 		felog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
 		felog.printf("\n");
 	}
+	// let's flush the logfile to make sure the last output will not get lost
+	felog.flush();
 
 	// Do the preprocessing of the solver
 	m_SolverTime.start();
@@ -1094,8 +1100,7 @@ bool FESolidSolver2::Quasin(double time)
 	felog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
 
 	// set the initial step length estimates to 1.0
-	double s, olds, oldolds;  // line search step lengths from the current iteration and the two previous ones
-	s=1; olds=1; oldolds=1;
+	double s = 1.0;
 
 	// loop until converged or when max nr of reformations reached
 	do
@@ -1115,13 +1120,6 @@ bool FESolidSolver2::Quasin(double time)
 			m_bfgs.SolveEquations(m_bfgs.m_ui, m_bfgs.m_R0);
 		}
 		m_SolverTime.stop();
-
-		// check for nans
-		if (m_fem.GetDebugFlag())
-		{
-			double du = m_bfgs.m_ui*m_bfgs.m_ui;
-			if (ISNAN(du)) throw NANDetected();
-		}
 
 		// set initial convergence norms
 		if (m_niter == 0)
@@ -1209,7 +1207,7 @@ bool FESolidSolver2::Quasin(double time)
 				felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
 				breform = true;
 			}
-			else if (normE1 > normEm)
+			else if ((normE1 > normEm) && m_bdivreform)
 			{
 				// check for diverging
 				felog.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
@@ -1256,7 +1254,7 @@ bool FESolidSolver2::Quasin(double time)
 			zero(m_bfgs.m_ui);
 
 			// reform stiffness matrices if necessary
-			if (breform)
+			if (breform && m_bdoreforms)
 			{
 				felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 
@@ -1273,8 +1271,17 @@ bool FESolidSolver2::Quasin(double time)
 		else if (m_baugment)
 		{
 			// we have converged, so let's see if the augmentations have converged as well
-
 			felog.printf("\n........................ augmentation # %d\n", m_naug+1);
+
+			// plot states before augmentations.
+			if (pstep->GetPlotLevel() == FE_PLOT_AUGMENTATIONS)
+			{
+				// The reason we store the state prior to the augmentations
+				// is because the augmentations are going to change things such that
+				// the system no longer in equilibrium. Since the model has to be converged
+				// before we do augmentations, storing the model now will store an actual converged state.
+				pstep->GetFEModel().Write();
+			}
 
 			// do the augmentations
 			bconv = Augment();
@@ -1319,14 +1326,15 @@ bool FESolidSolver2::Quasin(double time)
 	// print a convergence summary to the felog file
 	if (bconv)
 	{
-		Logfile::MODE mode = felog.SetMode(Logfile::FILE_ONLY);
+		Logfile::MODE mode = felog.GetMode();
 		if (mode != Logfile::NEVER)
 		{
+			felog.SetMode(Logfile::FILE_ONLY);
 			felog.printf("\nconvergence summary\n");
 			felog.printf("    number of iterations   : %d\n", m_niter);
 			felog.printf("    number of reformations : %d\n", m_nref);
+			felog.SetMode(mode);
 		}
-		felog.SetMode(mode);
 	}
 
 	// if converged we update the total displacements
@@ -1465,9 +1473,12 @@ bool FESolidSolver2::StiffnessMatrix(const FETimePoint& tp)
 	for (i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-
-		// respect the pressure stiffness flag
-		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
+		if (psl->IsActive())
+		{
+			// respect the pressure stiffness flag
+			// TODO: Find a different solution for this. Maybe I can pass the flag to the pressure load?
+			if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
+		}
 	}
 
 	// calculate nonlinear constraint stiffness
@@ -1475,8 +1486,8 @@ bool FESolidSolver2::StiffnessMatrix(const FETimePoint& tp)
 	// constrainst enforced with augmented lagrangian
 	NonLinearConstraintStiffness(tp);
 
-	// point constraints
-//	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->StiffnessMatrix(this);
+	// calculate the stiffness contributions for the rigid forces
+	for (i=0; i<m_fem.ModelLoads(); ++i) m_fem.ModelLoad(i)->StiffnessMatrix(this, tp);
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.

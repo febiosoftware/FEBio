@@ -143,6 +143,10 @@ public:
 	double	m_Etol;			//!< energy tolerance
 	double	m_Rmin;			//!< min residual value
 
+	// strategy parameters
+	bool	m_bdivreform;	//!< reform when diverging
+	bool	m_bdoreforms;	//!< do reformations
+
 	// equation numbers
 	int		m_nreq;			//!< start of rigid body equations
 

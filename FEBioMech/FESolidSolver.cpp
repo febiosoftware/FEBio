@@ -347,8 +347,6 @@ bool FESolidSolver::CreateStiffness(bool breset)
 	// clean up the stiffness matrix
 	m_pK->Clear();
 
-	int nmode = felog.GetMode();
-
 	// create the stiffness matrix
 	felog.printf("===== reforming stiffness matrix:\n");
 	if (m_pK->Create(&GetFEModel(), m_neq, breset) == false) 
