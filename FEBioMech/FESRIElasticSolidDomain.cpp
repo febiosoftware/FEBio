@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FESRIElasticSolidDomain.h"
 #include "FEElasticMaterial.h"
-#include "FECore\FEElementLibrary.h"
+#include "FECore/FEElementLibrary.h"
 
 //-----------------------------------------------------------------------------
 FESRIElasticSolidDomain::FESRIElasticSolidDomain(FEModel* pfem) : FEElasticSolidDomain(pfem)
