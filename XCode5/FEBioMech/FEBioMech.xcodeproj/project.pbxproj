@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B465DA891B94A3A500EF4843 /* FESRIElasticSolidDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B465DA871B94A3A500EF4843 /* FESRIElasticSolidDomain.cpp */; };
+		B465DA8A1B94A3A500EF4843 /* FESRIElasticSolidDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = B465DA881B94A3A500EF4843 /* FESRIElasticSolidDomain.h */; };
 		CAA03F9018BFA51700EAF395 /* FECGSolidSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA03F8E18BFA51700EAF395 /* FECGSolidSolver.cpp */; };
 		CAA03F9118BFA51700EAF395 /* FECGSolidSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = CAA03F8F18BFA51700EAF395 /* FECGSolidSolver.h */; };
 		D50824A61AFAFC860094BC4C /* FEFiberPowLinearUncoupled.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50824A41AFAFC860094BC4C /* FEFiberPowLinearUncoupled.cpp */; };
@@ -356,6 +358,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B465DA871B94A3A500EF4843 /* FESRIElasticSolidDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESRIElasticSolidDomain.cpp; sourceTree = "<group>"; };
+		B465DA881B94A3A500EF4843 /* FESRIElasticSolidDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESRIElasticSolidDomain.h; sourceTree = "<group>"; };
 		CAA03F8E18BFA51700EAF395 /* FECGSolidSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECGSolidSolver.cpp; sourceTree = "<group>"; };
 		CAA03F8F18BFA51700EAF395 /* FECGSolidSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECGSolidSolver.h; sourceTree = "<group>"; };
 		D50824A41AFAFC860094BC4C /* FEFiberPowLinearUncoupled.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFiberPowLinearUncoupled.cpp; sourceTree = "<group>"; };
@@ -735,6 +739,8 @@
 		D5E1068C1865DFAC00B23922 /* FEBioMech */ = {
 			isa = PBXGroup;
 			children = (
+				B465DA871B94A3A500EF4843 /* FESRIElasticSolidDomain.cpp */,
+				B465DA881B94A3A500EF4843 /* FESRIElasticSolidDomain.h */,
 				D5E1068D1865DFAC00B23922 /* FE2DFiberNeoHookean.cpp */,
 				D5E1068E1865DFAC00B23922 /* FE2DFiberNeoHookean.h */,
 				D5E1068F1865DFAC00B23922 /* FE2DTransIsoMooneyRivlin.cpp */,
@@ -1115,6 +1121,7 @@
 				D57549781AC3A0D6002934C7 /* FEOrthotropicCLE.h in Headers */,
 				D5E107DA1865DFAD00B23922 /* FEGasserOgdenHolzapfel.h in Headers */,
 				D5E107971865DFAD00B23922 /* FEDamageMooneyRivlin.h in Headers */,
+				B465DA8A1B94A3A500EF4843 /* FESRIElasticSolidDomain.h in Headers */,
 				D56DC22019532A83006C137D /* FERigidSphericalJoint.h in Headers */,
 				D5E1081E1865DFAD00B23922 /* FESlidingInterface.h in Headers */,
 				D5E107B21865DFAD00B23922 /* FEElasticMixture.h in Headers */,
@@ -1395,6 +1402,7 @@
 				D5E1081B1865DFAD00B23922 /* FERigidWallInterface.cpp in Sources */,
 				D5E107961865DFAD00B23922 /* FEDamageMooneyRivlin.cpp in Sources */,
 				D5E1082F1865DFAD00B23922 /* FEStVenantKirchhoff.cpp in Sources */,
+				B465DA891B94A3A500EF4843 /* FESRIElasticSolidDomain.cpp in Sources */,
 				D5E107BB1865DFAD00B23922 /* FEEllipsoidalFiberDistribution.cpp in Sources */,
 				D57C1D0919ABB99F0091EAE4 /* FEBondRelaxation.cpp in Sources */,
 				D5E107DB1865DFAD00B23922 /* FEHolmesMow.cpp in Sources */,
@@ -1519,7 +1527,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.intel.compilers.icc.14_0_0;
+				GCC_VERSION = com.intel.compilers.icc.latest;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;

@@ -306,6 +306,7 @@
 		B489C44A1B18D06D00E5AD7F /* Release-Dave */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_VERSION = com.intel.compilers.icc.latest;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
