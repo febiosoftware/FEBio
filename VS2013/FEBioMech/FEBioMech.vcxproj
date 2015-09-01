@@ -442,6 +442,7 @@
     <ClInclude Include="..\..\FEBioMech\FESphericalFiberDistribution.h" />
     <ClInclude Include="..\..\FEBioMech\FESpringMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FESPRProjection.h" />
+    <ClInclude Include="..\..\FEBioMech\FESRIElasticSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEStickyInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FEStiffnessMatrix.h" />
     <ClInclude Include="..\..\FEBioMech\FEStVenantKirchhoff.h" />
@@ -620,6 +621,7 @@
     <ClCompile Include="..\..\FEBioMech\FESphericalFiberDistribution.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESpringMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESPRProjection.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESRIElasticSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStickyInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStiffnessMatrix.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStVenantKirchhoff.cpp" />

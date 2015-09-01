@@ -549,6 +549,9 @@
     <ClInclude Include="..\..\FEBioMech\FERigidForce.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FESRIElasticSolidDomain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1062,6 +1065,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FERigidForce.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FESRIElasticSolidDomain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
