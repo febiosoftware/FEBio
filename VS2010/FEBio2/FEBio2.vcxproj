@@ -229,7 +229,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(LMDir)\lib;$(MKLDir)\em64t\lib;$(ZLibDir)\lib64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(LMDir)\lib;$(MKLDir)\em64t\lib;$(ZLibDir)\lib64;$(KEYGENDir)\lib;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)x64mt</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -439,7 +439,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>numcore.lib;fecore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioxml.lib;febioplot.lib;febioopt.lib;febiolib.lib;levmar64.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;mkl_intel_lp64.lib;zlib.lib</AdditionalDependencies>
+      <AdditionalDependencies>numcore.lib;fecore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioxml.lib;febioplot.lib;febioopt.lib;febiolib.lib;levmar64.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;mkl_intel_lp64.lib;zlib.lib;keygen64.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
