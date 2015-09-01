@@ -129,16 +129,6 @@ public:
 
 	// local second derivatives of shape functions at gauss points
 	matrix Grr, Gsr, Gtr, Grs, Gss, Gts, Grt, Gst, Gtt;
-	
-	// data used when unpacking
-	// TODO: Are we still using this?
-	vector<mat3d>	m_Jt;		// jacobian
-	vector<mat3d>	m_Jti;		// inverse jacobian
-	vector<double>	m_detJt;	// jacobian determinant
-
-	vector<mat3d>	m_J0;		// jacobian
-	vector<mat3d>	m_J0i;		// inverse jacobian
-	vector<double>	m_detJ0;	// jacobian determinant
 };
 
 //=============================================================================
@@ -1124,27 +1114,7 @@ private:
 class FEShellElementTraits : public FEElementTraits
 {
 public:
-	FEShellElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_SHELL) 
-	{
-		gr.resize(ni);
-		gs.resize(ni);
-		gt.resize(ni);
-		gw.resize(ni);
-
-		Hr.resize(ni, ne);
-		Hs.resize(ni, ne);
-
-		D0.resize(ne);
-		Dt.resize(ne);
-
-		m_Jt.resize(ni);
-		m_Jti.resize(ni);
-		m_detJt.resize(ni);
-
-		m_J0.resize(ni);
-		m_J0i.resize(ni);
-		m_detJ0.resize(ni);
-	}
+	FEShellElementTraits(int ni, int ne, FE_Element_Type et);
 
 public:
 	// gauss-point coordinates and weights
@@ -1159,15 +1129,6 @@ public:
 
 	// local derivatives of shape functions at gauss points
 	matrix Hr, Hs;
-
-	// data used when unpacking
-	vector<mat3d>	m_Jt;		// jacobian
-	vector<mat3d>	m_Jti;		// inverse jacobian
-	vector<double>	m_detJt;	// jacobian determinant
-
-	vector<mat3d>	m_J0;		// jacobian
-	vector<mat3d>	m_J0i;		// inverse jacobian
-	vector<double>	m_detJ0;	// jacobian determinant
 };
 
 //=============================================================================

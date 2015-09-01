@@ -29,14 +29,6 @@ FESolidElementTraits::FESolidElementTraits(int ni, int ne, FE_Element_Type et) :
 	Grt.resize(ni, ne);
 	Gst.resize(ni, ne);
 	Gtt.resize(ni, ne);
-		
-	m_Jt.resize(ni);
-	m_Jti.resize(ni);
-	m_detJt.resize(ni);
-
-	m_J0.resize(ni);
-	m_J0i.resize(ni);
-	m_detJ0.resize(ni);
 }
 
 //-----------------------------------------------------------------------------
@@ -2624,6 +2616,21 @@ void FEQuad9G9::project_to_nodes(double* ai, double* ao)
 //                      S H E L L   E L E M E N T S
 //
 //=============================================================================
+
+FEShellElementTraits::FEShellElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_SHELL)
+{
+	gr.resize(ni);
+	gs.resize(ni);
+	gt.resize(ni);
+	gw.resize(ni);
+
+	Hr.resize(ni, ne);
+	Hs.resize(ni, ne);
+
+	D0.resize(ne);
+	Dt.resize(ne);
+}
+
 
 //=============================================================================
 //                          F E S H E L L Q U A D E L E M E N T
