@@ -742,6 +742,11 @@ void FEBioImport::ReadList(XMLTag& tag, vector<int>& l)
 }
 
 //-----------------------------------------------------------------------------
+void FEBioImport::SetDumpfileName(const char* sz) { sprintf(m_szdmp, sz); }
+void FEBioImport::SetLogfileName (const char* sz) { sprintf(m_szlog, sz); }
+void FEBioImport::SetPlotfileName(const char* sz) { sprintf(m_szplt, sz); }
+
+//-----------------------------------------------------------------------------
 void FEBioImport::AddPlotVariable(const char* szvar, vector<int>& item)
 {
 	PlotVariable var(szvar, item);

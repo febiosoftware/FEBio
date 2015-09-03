@@ -2,8 +2,8 @@
 // 
 //////////////////////////////////////////////////////////////////////////
 #include "stdafx.h"
-#include "FEDiagnostic.h"
-#include "FETangentDiagnostic.h"
+#include "FEBioTest/FEDiagnostic.h"
+#include "FEBioTest/FETangentDiagnostic.h"
 #include "FEBioLib/FEBox.h"
 #include "FECore/log.h"
 

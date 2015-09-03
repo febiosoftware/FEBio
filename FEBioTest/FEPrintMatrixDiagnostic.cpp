@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "FEPrintMatrixDiagnostic.h"
 #include "FEBioMech/FESolidSolver.h"
 #include <stdio.h>

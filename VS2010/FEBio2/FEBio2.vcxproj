@@ -245,7 +245,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fecored.lib;numcored.lib;febiolibd.lib;febiomechd.lib;febioheatd.lib;febiomixd.lib;febiooptd.lib;febioplotd.lib;febioxmld.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;levmard.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecored.lib;numcored.lib;febiolibd.lib;febiomechd.lib;febioheatd.lib;febiomixd.lib;febiooptd.lib;febioplotd.lib;febioxmld.lib;febiotestd.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;levmard.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -379,7 +379,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febiolib.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioplot.lib;febioxml.lib;febioopt.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;levmar.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;febiolib.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioplot.lib;febioxml.lib;febioopt.lib;febiotest.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;levmar.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenMP|Win32'">
@@ -439,7 +439,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>numcore.lib;fecore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioxml.lib;febioplot.lib;febioopt.lib;febiolib.lib;levmar64.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;mkl_intel_lp64.lib;zlib.lib;keygen64.lib</AdditionalDependencies>
+      <AdditionalDependencies>numcore.lib;fecore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioxml.lib;febioplot.lib;febioopt.lib;febiolib.lib;febiotest.lib;levmar64.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;mkl_intel_lp64.lib;zlib.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -448,14 +448,6 @@
     <ClInclude Include="..\..\FEBio2\console.h" />
     <ClInclude Include="..\..\FEBio2\FEBioCommand.h" />
     <ClInclude Include="..\..\FEBio2\FEBioStdSolver.h" />
-    <ClInclude Include="..\..\FEBio2\FEBiphasicTangentDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\FEContactDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\FEDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\FEMemoryDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\FEMultiphasicTangentDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\FEPrintMatrixDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\FETangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\Interrupt.h" />
     <ClInclude Include="..\..\FEBio2\stdafx.h" />
     <ClInclude Include="resource.h" />
@@ -467,14 +459,6 @@
     <ClCompile Include="..\..\FEBio2\FEBio.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBioCommand.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBioStdSolver.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEBiphasicTangentDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEContactDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEMemoryDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEMultiphasicTangentDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEPrintMatrixDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\Interrupt.cpp" />
     <ClCompile Include="..\..\FEBio2\stdafx.cpp" />
   </ItemGroup>

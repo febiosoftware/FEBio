@@ -2,7 +2,6 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
 #include "FEDiagnostic.h"
 #include "FETangentDiagnostic.h"
 #include "FEContactDiagnostic.h"

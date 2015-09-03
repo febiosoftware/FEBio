@@ -1,7 +1,5 @@
-#include "stdafx.h"
 #include "FEMemoryDiagnostic.h"
 #include "FECore/log.h"
-#include "console.h"
 
 FEMemoryDiagnostic::FEMemoryDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
@@ -42,9 +40,6 @@ bool FEMemoryDiagnostic::Run()
 	// the RVE problem.
 	Logfile::MODE nmode = felog.GetMode();
 	felog.SetMode(Logfile::NEVER);
-
-	// turn the console off
-	Console::GetHandle()->Deactivate();
 
 	// run the problem
 	for (int i=0; i<m_iters; ++i)

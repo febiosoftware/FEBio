@@ -1,17 +1,16 @@
 //
-//  FEMultiphasicTangentDiagnostic.cpp
+//  FEBiphasicTangentDiagnostic.cpp
 //  FEBio2
 //
-//  Created by Gerard Ateshian on 8/21/15.
+//  Created by Gerard Ateshian on 8/20/15.
 //  Copyright (c) 2015 febio.org. All rights reserved.
 //
 
-#include "FEMultiphasicTangentDiagnostic.h"
-#include "stdafx.h"
+#include "FEBiphasicTangentDiagnostic.h"
 #include "FETangentDiagnostic.h"
 #include "FEBioLib/FEBox.h"
-#include "FEBioMix/FEMultiphasicSolver.h"
-#include "FEBioMix/FEMultiphasicDomain.h"
+#include "FEBioMix/FEBiphasicSolver.h"
+#include "FEBioMix/FEBiphasicSolidDomain.h"
 #include "FECore/log.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -20,22 +19,21 @@
 
 //-----------------------------------------------------------------------------
 // Constructor
-FEMultiphasicTangentDiagnostic::FEMultiphasicTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEBiphasicTangentDiagnostic::FEBiphasicTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
     m_strain = 0;
     m_pressure = 0;
-    m_concentration = 0;
     m_dt = 1;
 }
 
 //-----------------------------------------------------------------------------
 // Initialize the diagnostic. In this function we build the FE model depending
 // on the scenario.
-bool FEMultiphasicTangentDiagnostic::Init()
+bool FEBiphasicTangentDiagnostic::Init()
 {
     switch (m_scn)
     {
-        case TDS_MULTIPHASIC_UNIAXIAL: BuildUniaxial(); break;
+        case TDS_BIPHASIC_UNIAXIAL: BuildUniaxial(); break;
         default:
             return false;
     }
@@ -44,7 +42,7 @@ bool FEMultiphasicTangentDiagnostic::Init()
 
 //-----------------------------------------------------------------------------
 // Helper function to print a matrix
-void FEMultiphasicTangentDiagnostic::print_matrix(matrix& m)
+void FEBiphasicTangentDiagnostic::print_matrix(matrix& m)
 {
     int i, j;
     int N = m.rows();
@@ -69,29 +67,20 @@ void FEMultiphasicTangentDiagnostic::print_matrix(matrix& m)
 
 //-----------------------------------------------------------------------------
 // Build the uniaxial loading scenario
-// Cube with face displaced along x, with prescribed fluid pressure
-// and solute concentrations on displaced face
+// Cube with face displaced along x, with zero fluid pressure on displaced face
 // and impermeable fixed face.
-void FEMultiphasicTangentDiagnostic::BuildUniaxial()
+void FEBiphasicTangentDiagnostic::BuildUniaxial()
 {
-    int i, isol;
+    int i;
     vec3d r[8] = {
         vec3d(0,0,0), vec3d(1,0,0), vec3d(1,1,0), vec3d(0,1,0),
         vec3d(0,0,1), vec3d(1,0,1), vec3d(1,1,1), vec3d(0,1,1)
     };
     
-    int BC[8][3] = {
-        {-1,-1,-1},{ 0,-1,-1},{ 0, 0,-1}, {-1, 0,-1},
-        {-1,-1, 0},{ 0,-1, 0},{ 0, 0, 0}, {-1, 0, 0}
+    int BC[8][4] = {
+        {-1,-1,-1, 0},{ 0,-1,-1,-1},{ 0, 0,-1,-1}, {-1, 0,-1, 0},
+        {-1,-1, 0, 0},{ 0,-1, 0,-1},{ 0, 0, 0,-1}, {-1, 0, 0, 0}
     };
-    
-    // get the material
-    FEMaterial* pmat = m_fem.GetMaterial(0);
-    FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*>(pmat);
-    assert(pmp);
-    int nsol = pmp->Solutes();
-    double osm = nsol*m_concentration;
-    double pe = -pmp->m_Rgas*pmp->m_Tabs*osm;
     
     // --- create the FE problem ---
     // create the mesh
@@ -100,21 +89,22 @@ void FEMultiphasicTangentDiagnostic::BuildUniaxial()
     for (i=0; i<8; ++i)
     {
         FENode& n = m.Node(i);
-        n.m_rt = n.m_rp = n.m_r0 = r[i];
-        n.m_pt = n.m_p0 = pe;
-        for (isol=0; isol<nsol; ++isol) {
-            n.m_ct[isol] = n.m_cp[isol] = n.m_c0[isol] = m_concentration;
-        }
+        n.m_rt = n.m_r0 = r[i];
+        n.m_pt = n.m_p0 = 0;
         n.m_rid = -1;
         
         // set displacement BC's
         if (BC[i][0] == -1) m_fem.AddFixedBC(i, DOF_X);
         if (BC[i][1] == -1) m_fem.AddFixedBC(i, DOF_Y);
         if (BC[i][2] == -1) m_fem.AddFixedBC(i, DOF_Z);
+        if (BC[i][3] == -1) m_fem.AddFixedBC(i, DOF_P);
     }
     
-    // create a multiphasic domain
-    FEMultiphasicDomain* pd = new FEMultiphasicDomain(&m_fem);
+    // get the material
+    FEMaterial* pmat = m_fem.GetMaterial(0);
+    
+    // create a biphasic domain
+    FEBiphasicSolidDomain* pd = new FEBiphasicSolidDomain(&m_fem);
 	pd->SetMaterial(pmat);
     pd->create(1);
     m.AddDomain(pd);
@@ -135,33 +125,19 @@ void FEMultiphasicTangentDiagnostic::BuildUniaxial()
     plc->Add(1, 1);
     m_fem.AddLoadCurve(plc);
     
-    // Add a prescribed displacement BC along X
+    // Add a prescribed BC
     int nd[4] = {1, 2, 5, 6};
     FEPrescribedBC* pdc = new FEPrescribedBC(&m_fem);
     m_fem.AddPrescribedBC(pdc);
     pdc->SetDOF(DOF_X).SetLoadCurveIndex(0).SetScale(d);
     for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
-    
-    // Add a prescribed fluid pressure BC
-    FEPrescribedBC* ppc = new FEPrescribedBC(&m_fem);
-    m_fem.AddPrescribedBC(ppc);
-    ppc->SetDOF(DOF_P).SetLoadCurveIndex(0).SetScale(pe);
-    for (i = 0; i<4; ++i) ppc->AddNode(nd[i]);
-    
-    // Add prescribed solute concentration BC
-    for (i=0; i<nsol; ++i) {
-        FEPrescribedBC* psc = new FEPrescribedBC(&m_fem);
-        m_fem.AddPrescribedBC(psc);
-        psc->SetDOF(DOF_C+i).SetLoadCurveIndex(0).SetScale(m_concentration);
-        for (i = 0; i<4; ++i) psc->AddNode(nd[i]);
-    }
 }
 
 //-----------------------------------------------------------------------------
 // Run the tangent diagnostic. After we run the FE model, we calculate
 // the element stiffness matrix and compare that to a finite difference
 // of the element residual.
-bool FEMultiphasicTangentDiagnostic::Run()
+bool FEBiphasicTangentDiagnostic::Run()
 {
     Logfile::MODE oldmode = felog.SetMode(Logfile::FILE_ONLY);
     
@@ -170,24 +146,17 @@ bool FEMultiphasicTangentDiagnostic::Run()
     m_fem.Solve();
     felog.SetMode(Logfile::FILE_ONLY);
     
-    // get the material
-    FEMaterial* pmat = m_fem.GetMaterial(0);
-    FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*>(pmat);
-    assert(pmp);
-    int nsol = pmp->Solutes();
-    int ndpn = 4+nsol;
-    
     FEMesh& mesh = m_fem.GetMesh();
-    FEMultiphasicDomain& md = static_cast<FEMultiphasicDomain&>(mesh.Domain(0));
+    FEBiphasicSolidDomain& bd = static_cast<FEBiphasicSolidDomain&>(mesh.Domain(0));
     
     // get the one and only element
-    FESolidElement& el = md.Element(0);
+    FESolidElement& el = bd.Element(0);
     int N = mesh.Nodes();
     
     // set up the element stiffness matrix
-    matrix k0(ndpn*N, ndpn*N);
+    matrix k0(4*N, 4*N);
     k0.zero();
-    md.ElementMultiphasicStiffness(el, k0, false, m_dt);
+    bd.ElementBiphasicStiffness(el, k0, false, m_dt);
     
     // print the element stiffness matrix
     felog.printf("\nActual stiffness matrix:\n");
@@ -203,11 +172,11 @@ bool FEMultiphasicTangentDiagnostic::Run()
     
     // finally calculate the difference matrix
     felog.printf("\n");
-    matrix kd(ndpn*N, ndpn*N);
+    matrix kd(4*N, 4*N);
     double kmax = 0, kij;
     int i0 = -1, j0 = -1, i, j;
-    for (i=0; i<ndpn*N; ++i)
-        for (j=0; j<ndpn*N; ++j)
+    for (i=0; i<4*N; ++i)
+        for (j=0; j<4*N; ++j)
         {
             kd[i][j] = k0[i][j] - k1[i][j];
             kij = 100.0*fabs(kd[i][j] / k0[0][0]);
@@ -233,56 +202,44 @@ bool FEMultiphasicTangentDiagnostic::Run()
 //-----------------------------------------------------------------------------
 // Calculate a finite difference approximation of the derivative of the
 // element residual.
-void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
+void FEBiphasicTangentDiagnostic::deriv_residual(matrix& ke)
 {
-    int i, j, k, nj, isol;
+    int i, j, k, nj;
     
     // get the solver
     FEAnalysis* pstep = m_fem.GetCurrentStep();
-    FEMultiphasicSolver& solver = static_cast<FEMultiphasicSolver&>(*pstep->m_psolver);
-    
-    // get the material
-    FEMaterial* pmat = m_fem.GetMaterial(0);
-    FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*>(pmat);
-    assert(pmp);
-    int nsol = pmp->Solutes();
-    int ndpn = 4+nsol;
+    FEBiphasicSolver& solver = static_cast<FEBiphasicSolver&>(*pstep->m_psolver);
     
     // get the mesh
     FEMesh& mesh = m_fem.GetMesh();
     
-    FEMultiphasicDomain& md = static_cast<FEMultiphasicDomain&>(mesh.Domain(0));
+    FEBiphasicSolidDomain& bd = static_cast<FEBiphasicSolidDomain&>(mesh.Domain(0));
     
     // get the one and only element
-    FESolidElement& el = md.Element(0);
+    FESolidElement& el = bd.Element(0);
     int N = mesh.Nodes();
     
     // first calculate the initial residual
-    vector<double> f0(ndpn*N), f0u(3*N), f0p(N);
-    vector< vector<double> > f0c(nsol,vector<double>(N));
-    zero(f0u); zero(f0p); for (isol=0; isol<nsol; ++isol) zero(f0c[isol]);
-    md.ElementInternalForce(el, f0u);
-    md.ElementInternalFluidWork(el, f0p, m_dt);
-    for (isol=0; isol<nsol; ++isol) md.ElementInternalSoluteWork(el, f0c[isol], m_dt, isol);
+    vector<double> f0(4*N), f0u(3*N), f0p(N);
+    zero(f0u); zero(f0p);
+    bd.ElementInternalForce(el, f0u);
+    bd.ElementInternalFluidWork(el, f0p, m_dt);
     for (i=0; i<N; ++i) {
-        f0[ndpn*i  ] = f0u[3*i  ];
-        f0[ndpn*i+1] = f0u[3*i+1];
-        f0[ndpn*i+2] = f0u[3*i+2];
-        f0[ndpn*i+3] = f0p[i    ];
-        for (isol=0; isol<nsol; ++isol)
-            f0[ndpn*i+4+isol] = f0c[isol][i];
+        f0[4*i  ] = f0u[3*i  ];
+        f0[4*i+1] = f0u[3*i+1];
+        f0[4*i+2] = f0u[3*i+2];
+        f0[4*i+3] = f0p[i    ];
     }
     
     // now calculate the perturbed residuals
-    ke.resize(ndpn*N, ndpn*N);
+    ke.resize(4*N, 4*N);
     ke.zero();
     double dx = 1e-8;
-    vector<double> f1(ndpn*N), f1u(3*N), f1p(N);
-    vector< vector<double> > f1c(nsol,vector<double>(N));
-    for (j=0; j<ndpn*N; ++j)
+    vector<double> f1(4*N), f1u(3*N), f1p(N);
+    for (j=0; j<4*N; ++j)
     {
-        FENode& node = mesh.Node(el.m_node[j/ndpn]);
-        nj = j%ndpn;
+        FENode& node = mesh.Node(el.m_node[j/4]);
+        nj = j%4;
         
         switch (nj)
         {
@@ -290,23 +247,19 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             case 1: node.m_rt.y += dx; break;
             case 2: node.m_rt.z += dx; break;
             case 3: node.m_pt   += dx; break;
-            default: node.m_ct[nj-4] += dx; break;
         }
         
         
         solver.UpdateStresses();
         
-        zero(f1u); zero(f1p); for (isol=0; isol<nsol; ++isol) zero(f1c[isol]);
-        md.ElementInternalForce(el, f1u);
-        md.ElementInternalFluidWork(el, f1p, m_dt);
-        for (isol=0; isol<nsol; ++isol) md.ElementInternalSoluteWork(el, f1c[isol], m_dt, isol);
+        zero(f1u); zero(f1p);
+        bd.ElementInternalForce(el, f1u);
+        bd.ElementInternalFluidWork(el, f1p, m_dt);
         for (k=0; k<N; ++k) {
-            f1[ndpn*k  ] = f1u[3*k  ];
-            f1[ndpn*k+1] = f1u[3*k+1];
-            f1[ndpn*k+2] = f1u[3*k+2];
-            f1[ndpn*k+3] = f1p[k    ];
-            for (isol=0; isol<nsol; ++isol)
-                f1[ndpn*k+4+isol] = f1c[isol][k];
+            f1[4*k  ] = f1u[3*k  ];
+            f1[4*k+1] = f1u[3*k+1];
+            f1[4*k+2] = f1u[3*k+2];
+            f1[4*k+3] = f1p[k    ];
         }
         
         switch (nj)
@@ -315,11 +268,10 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             case 1: node.m_rt.y -= dx; break;
             case 2: node.m_rt.z -= dx; break;
             case 3: node.m_pt   -= dx; break;
-            default: node.m_ct[nj-4] -= dx; break;
         }
         
         solver.UpdateStresses();
         
-        for (i=0; i<ndpn*N; ++i) ke[i][j] = -(f1[i] - f0[i])/dx;
+        for (i=0; i<4*N; ++i) ke[i][j] = -(f1[i] - f0[i])/dx;
     }
 }

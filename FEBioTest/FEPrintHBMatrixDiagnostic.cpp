@@ -1,6 +1,5 @@
 // Implementation of the Harwell-Boeing Matrix Print Diagnostic
 
-#include "stdafx.h"
 #include "FEPrintHBMatrixDiagnostic.h"
 #include "FEBioMech/FESolidSolver.h"
 #include "NumCore/CompactMatrix.h"

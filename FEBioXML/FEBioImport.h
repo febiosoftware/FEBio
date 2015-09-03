@@ -160,9 +160,9 @@ public:
 	FECore::FEAnalysis* CreateNewStep();
 
 public:
-	void SetDumpfileName(const char* sz) { sprintf(m_szdmp, sz); }
-	void SetLogfileName (const char* sz) { sprintf(m_szlog, sz); }
-	void SetPlotfileName(const char* sz) { sprintf(m_szplt, sz); }
+	void SetDumpfileName(const char* sz);
+	void SetLogfileName (const char* sz);
+	void SetPlotfileName(const char* sz);
 
 	void AddPlotVariable(const char* szvar, vector<int>& item);
 
