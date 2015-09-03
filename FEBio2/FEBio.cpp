@@ -493,9 +493,6 @@ int Run(CMDOPTIONS& ops)
 	{
 		// read the input file
 		if (fem.Input(ops.szfile) == false) return 1;
-
-		// do the model initialization
-		if (fem.Init() == false) return 1;
 	}
 
 	// find a task
@@ -506,8 +503,15 @@ int Run(CMDOPTIONS& ops)
 		return 1;
 	}
 
-	// run the FEBio task (and pass the optional control file)
-	bool bret = ptask->Run(ops.szctrl);
+	// initialize the task
+	if (ptask->Init(ops.szctrl) == false)
+	{
+		fprintf(stderr, "Failed initializing the task: %s", ops.sztask);
+		return 1;
+	}
+
+	// run the task
+	bool bret = ptask->Run();
 
 	return (bret?0:1);
 }

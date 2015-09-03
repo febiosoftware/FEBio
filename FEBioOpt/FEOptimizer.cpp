@@ -434,7 +434,8 @@ bool FEOptimizeData::Init()
 	// allocate default solver if none specified in input file
 	if (m_pTask == 0) m_pTask = fecore_new<FECoreTask>(FETASK_ID, "solve", &m_fem);
 
-	return true;
+	// do the initialization of the task
+	return m_pTask->Init(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -461,5 +462,5 @@ bool FEOptimizeData::Input(const char *szfile)
 bool FEOptimizeData::RunTask()
 {
 	if (m_pTask == 0) return false;
-	return m_pTask->Run(0);
+	return m_pTask->Run();
 }

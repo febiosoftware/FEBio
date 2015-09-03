@@ -13,8 +13,15 @@ public:
 	FECoreTask(FEModel* pfem);
 	virtual ~FECoreTask(void);
 
+	//! initialize the task
+	//! make sure to call FEModel::Init at some point
+	virtual bool Init(const char* szfile) = 0;
+
 	//! Run the task.
-	virtual bool Run (const char* szfile) = 0;
+	virtual bool Run() = 0;
+
+	//! return the FEModel
+	FEModel* GetFEModel() { return m_pfem; }
 
 protected:
 	FEModel*	m_pfem;

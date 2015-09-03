@@ -10,17 +10,11 @@ class FEBioStdSolver : public FECoreTask
 public:
 	FEBioStdSolver(FEModel* pfem);
 
-	//! Run the FE model
-	virtual bool Run(const char* szfile);
-};
+	//! initialization
+	bool Init(const char* szfile);
 
-//-----------------------------------------------------------------------------
-class FEBioDiagnostic : public FECoreTask
-{
-public:
-	FEBioDiagnostic(FEModel* pfem) : FECoreTask(pfem){}
 	//! Run the FE model
-	virtual bool Run(const char* szfile);
+	bool Run();
 };
 
 //-----------------------------------------------------------------------------
@@ -28,6 +22,28 @@ class FEBioRestart : public FECoreTask
 {
 public:
 	FEBioRestart(FEModel* pfem) : FECoreTask(pfem){}
+
+	//! initialization
+	bool Init(const char* szfile);
+
 	//! Run the FE model
-	virtual bool Run(const char* szfile);
+	virtual bool Run();
+};
+
+//-----------------------------------------------------------------------------
+class FEDiagnostic;
+
+class FEBioDiagnostic : public FECoreTask
+{
+public:
+	FEBioDiagnostic(FEModel* pfem) : FECoreTask(pfem){ m_pdia = 0; }
+
+	//! initialization
+	bool Init(const char* szfile);
+
+	//! Run the FE model
+	virtual bool Run();
+
+private:
+	FEDiagnostic*	m_pdia;
 };
