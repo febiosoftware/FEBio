@@ -256,6 +256,13 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 		pbci->SetDOF(bc[i]);
 		pbc[i] = pbci;
 		fem.AddFixedBC(pbci);
+
+		// add this boundary condition to the current step
+		if (m_pim->m_nsteps > 0)
+		{
+			GetStep()->AddModelComponent(pbci);
+			pbci->Deactivate();
+		}
 	}
 
 	// see if the set attribute is defined

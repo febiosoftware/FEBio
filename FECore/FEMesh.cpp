@@ -35,6 +35,7 @@ FENode::FENode()
 
 	// initialize dof stuff
     m_ID.assign(MAX_NDOFS, DOF_FIXED);
+	m_BC.assign(MAX_NDOFS, DOF_OPEN );
 
 	// exclude flag (true if the node should not be part of the analysis.
 	// For instance, if it is isolated).
@@ -74,6 +75,7 @@ FENode::FENode(const FENode& n)
 	m_bexclude = n.m_bexclude;
 
 	m_ID = n.m_ID;
+	m_BC = n.m_BC;
 }
 
 //-----------------------------------------------------------------------------
@@ -103,6 +105,7 @@ FENode& FENode::operator = (const FENode& n)
 	m_bexclude = n.m_bexclude;
 
 	m_ID = n.m_ID;
+	m_BC = n.m_BC;
 
 	return (*this);
 }
@@ -515,7 +518,11 @@ void FEMesh::Reset()
 
 		// reset ID arrays
 		int ndof = node.m_ID.size();
-		for (int i=0; i<ndof; ++i) node.m_ID[i] = DOF_FIXED;
+		for (int i=0; i<ndof; ++i) 
+		{
+			node.m_ID[i] = DOF_FIXED;
+			node.m_BC[i] = DOF_OPEN;
+		}
 	}
 
 	// update the mesh

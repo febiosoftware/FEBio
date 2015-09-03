@@ -24,30 +24,7 @@ bool FEHeatTransferAnalysis::Activate()
 		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = DOF_FIXED;
 
 		// open the temperature dof
-		node.m_ID[DOF_T] = DOF_OPEN;
-	}
-
-	// apply fixed dofs
-	for (int i=0; i<m_fem.FixedBCs(); ++i)
-	{
-		FEFixedBC& bc = *m_fem.FixedBC(i);
-		bc.Activate();
-	}
-
-	// apply prescribed dofs
-	int ndis = m_fem.PrescribedBCs();
-	for (int i=0; i<ndis; ++i)
-	{
-		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
-		if (DC.IsActive())
-		{
-			int dof = DC.GetDOF();
-			for (size_t j=0; j<DC.Items(); ++j)
-			{
-				FENode& node = mesh.Node(DC.NodeID(j));
-				if (dof == DOF_T) node.m_ID[dof] = DOF_PRESCRIBED;
-			}
-		}
+		node.m_ID[DOF_T] = node.m_BC[DOF_T];
 	}
 
 	// initialize equations
@@ -58,15 +35,6 @@ bool FEHeatTransferAnalysis::Activate()
 	// Must be done after equations are initialized
 	if (InitLinearConstraints() == false) return false;
 	// ----->
-
-	// Now we adjust the equation numbers of prescribed dofs according to the above rule
-	// Make sure that a prescribed dof has not been fixed
-	// TODO: maybe this can be moved to the FESolver::InitEquations function
-	for (int i=0; i<ndis; ++i)
-	{
-		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
-		if (DC.IsActive()) DC.Update();
-	}
 
 	// modify the linear constraints
 	if (m_fem.m_LinC.size())

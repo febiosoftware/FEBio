@@ -616,6 +616,6 @@ void FEThermoElasticSolver::Update(vector<double>& ui)
 	for (int i=0; i<ndis; ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
-		if (dc.IsActive()) dc.Apply();
+		if (dc.IsActive()) dc.Update();
 	}
 }

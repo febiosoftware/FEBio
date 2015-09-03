@@ -91,11 +91,33 @@ void FEFixedBC::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FEFixedBC::Activate()
 {
+	FEBoundaryCondition::Activate();
 	if (m_dof >= 0)
 	{
 		FEMesh& mesh = GetFEModel()->GetMesh();
 		int n = (int) m_node.size();
-		for (int i=0; i<n; ++i) mesh.Node(m_node[i]).m_ID[m_dof] = -1;
+		for (int i=0; i<n; ++i)
+		{
+			// make sure we only activate open dof's
+			vector<int>& BC = mesh.Node(m_node[i]).m_BC;
+			if (BC[m_dof] == DOF_OPEN) BC[m_dof] = DOF_FIXED;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEFixedBC::Deactivate()
+{
+	FEBoundaryCondition::Deactivate();
+	if (m_dof >= 0)
+	{
+		FEMesh& mesh = GetFEModel()->GetMesh();
+		int n = (int) m_node.size();
+		for (int i=0; i<n; ++i)
+		{
+			vector<int>& BC = mesh.Node(m_node[i]).m_BC;
+			BC[m_dof] = DOF_OPEN;
+		}
 	}
 }
 
@@ -160,6 +182,57 @@ bool FEPrescribedBC::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEPrescribedBC::Activate()
+{
+	FEBoundaryCondition::Activate();
+
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	for (size_t j = 0; j<m_item.size(); ++j)
+	{
+		// get the node
+		FENode& node = mesh.Node(m_item[j].nid);
+
+		// set the dof to prescribed
+		node.m_BC[m_dof] = DOF_PRESCRIBED;
+
+		// evaluate the relative offset
+		switch(m_dof)
+		{
+		case DOF_X: m_r = (m_br ? node.m_rt.x - node.m_r0.x : 0); break;
+		case DOF_Y: m_r = (m_br ? node.m_rt.y - node.m_r0.y : 0); break;
+		case DOF_Z: m_r = (m_br ? node.m_rt.z - node.m_r0.z : 0); break;
+		case DOF_U: m_r = (m_br ? node.m_Dt.x - node.m_D0.x : 0); break;
+		case DOF_V: m_r = (m_br ? node.m_Dt.y - node.m_D0.y : 0); break;
+		case DOF_W: m_r = (m_br ? node.m_Dt.z - node.m_D0.z : 0); break;
+		case DOF_T: m_r = (m_br ? node.m_T - node.m_T0 : 0); break;
+		case DOF_P: m_r = (m_br ? node.m_pt - node.m_p0 : 0); break;
+		default:	// all prescribed concentrations
+			if ((m_dof >= DOF_C) && (m_dof < (int)node.m_ID.size())) {
+				int sid = m_dof - DOF_C;
+				m_r = (m_br ? node.m_ct[sid] - node.m_c0[sid] : 0);
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEPrescribedBC::Deactivate()
+{
+	FEBoundaryCondition::Deactivate();
+
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	for (size_t j = 0; j<m_item.size(); ++j)
+	{
+		FENode& node = mesh.Node(m_item[j].nid);
+		node.m_BC[m_dof] = DOF_OPEN;
+	}
+}
+
+//-----------------------------------------------------------------------------
 double FEPrescribedBC::NodeValue(int n) const
 {
 	ITEM it = m_item[n];
@@ -188,38 +261,12 @@ void FEPrescribedBC::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-//! \todo This function is called during PrepStep. I'm not sure yet how to 
-//! integrate this better in the framework. Maybe this can be done in Activate()?
+//! This is called by the FESolver::UpdateStresses to make sure that the prescribed.
+//! dofs are satisfied.
+//! \todo Find a good way to integrate this with the framework. Maybe I don't even
+//! need this since if I need this, then the prescribed dofs are not enforced correctly.
+//! In other words, either this is completely unnecassery or there is a bug
 void FEPrescribedBC::Update()
-{
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	for (size_t i=0; i<m_item.size(); ++i)
-	{
-		FENode& node = mesh.Node(m_item[i].nid);
-		switch(m_dof)
-		{
-		case DOF_X: m_r = (m_br ? node.m_rt.x - node.m_r0.x : 0); break;
-		case DOF_Y: m_r = (m_br ? node.m_rt.y - node.m_r0.y : 0); break;
-		case DOF_Z: m_r = (m_br ? node.m_rt.z - node.m_r0.z : 0); break;
-		case DOF_U: m_r = (m_br ? node.m_Dt.x - node.m_D0.x : 0); break;
-		case DOF_V: m_r = (m_br ? node.m_Dt.y - node.m_D0.y : 0); break;
-		case DOF_W: m_r = (m_br ? node.m_Dt.z - node.m_D0.z : 0); break;
-		case DOF_T: m_r = (m_br ? node.m_T - node.m_T0 : 0); break;
-		case DOF_P: m_r = (m_br ? node.m_pt - node.m_p0 : 0); break;
-		default:	// all prescribed concentrations
-			if ((m_dof >= DOF_C) && (m_dof < (int)node.m_ID.size())) {
-				int sid = m_dof - DOF_C;
-				m_r = (m_br ? node.m_ct[sid] - node.m_c0[sid] : 0);
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! \todo Find a good way to integrate this with the framework.
-//! This is called by the FESolver::UpdateStresses.
-//! Maybe rename this to Update()
-void FEPrescribedBC::Apply()
 {
 	// get the mesh
 	FEMesh& mesh = GetFEModel()->GetMesh();

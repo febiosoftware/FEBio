@@ -347,6 +347,20 @@ bool FEModel::Solve()
 // so we do it here. This function is called in Init() and Reset()
 void FEModel::Activate()
 {
+	// fixed dofs
+	for (int i=0; i<(int) m_BC.size(); ++i)
+	{
+		FEFixedBC& bc = *m_BC[i];
+		if (bc.IsActive()) bc.Activate();
+	}
+
+	// prescribed dofs
+	for (int i=0; i<(int) m_DC.size(); ++i)
+	{
+		FEPrescribedBC& dc = *m_DC[i];
+		if (dc.IsActive()) dc.Activate();
+	}
+
 	// model loads
 	for (int i=0; i<(int) m_ML.size(); ++i)
 	{

@@ -400,7 +400,7 @@ void FECGSolidSolver::UpdateKinematics(vector<double>& ui)
 	for (i=0; i<ndis; ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
-		if (dc.IsActive()) dc.Apply();
+		if (dc.IsActive()) dc.Update();
 	}
 
 	// enforce the linear constraints

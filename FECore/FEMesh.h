@@ -127,6 +127,7 @@ public:
 	bool	m_bexclude;	//!< exclude this node from the analysis
 
 public:
+	vector<int>		m_BC;	//!< boundary condition array
 	vector<int>		m_ID;	//!< nodal equation numbers
 };
 

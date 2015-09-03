@@ -21,47 +21,24 @@ bool FEThermoElasticAnalysis::Activate()
 		FENode& node = mesh.Node(i);
 
 		// fix all degrees of freedom
-		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = -1;
+		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = DOF_FIXED;
 
 		// open the dofs for non-fixed nodes
 		if (node.m_bexclude == false)
 		{
 			if (node.m_rid < 0)
 			{
-				node.m_ID[DOF_X] = 0;
-				node.m_ID[DOF_Y] = 0;
-				node.m_ID[DOF_Z] = 0;
-				node.m_ID[DOF_T] = 0;
+				node.m_ID[DOF_X] = node.m_BC[DOF_X];
+				node.m_ID[DOF_Y] = node.m_BC[DOF_Y];
+				node.m_ID[DOF_Z] = node.m_BC[DOF_Z];
+				node.m_ID[DOF_T] = node.m_BC[DOF_T];
 			}
 
 			if (node.m_bshell)
 			{
-				node.m_ID[DOF_U] = 0;
-				node.m_ID[DOF_V] = 0;
-				node.m_ID[DOF_W] = 0;
-			}
-		}
-	}
-
-	// apply fixed dofs
-	for (int i=0; i<m_fem.FixedBCs(); ++i)
-	{
-		FEFixedBC& bc = *m_fem.FixedBC(i);
-		bc.Activate();
-	}
-
-	// apply prescribed dofs
-	int ndis = m_fem.PrescribedBCs();
-	for (int i=0; i<ndis; ++i)
-	{
-		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
-		if (DC.IsActive())
-		{
-			int dof = DC.GetDOF();
-			for (size_t j=0; j<DC.Items(); ++j)
-			{
-				FENode& node = mesh.Node(DC.NodeID(j));
-				node.m_ID[dof] = DOF_PRESCRIBED;
+				node.m_ID[DOF_U] = node.m_BC[DOF_U];
+				node.m_ID[DOF_V] = node.m_BC[DOF_V];
+				node.m_ID[DOF_W] = node.m_BC[DOF_W];
 			}
 		}
 	}
@@ -74,15 +51,6 @@ bool FEThermoElasticAnalysis::Activate()
 	// Must be done after equations are initialized
 	if (InitLinearConstraints() == false) return false;
 	// ----->
-
-	// Now we adjust the equation numbers of prescribed dofs according to the above rule
-	// Make sure that a prescribed dof has not been fixed
-	// TODO: maybe this can be moved to the FESolver::InitEquations function
-	for (int i=0; i<ndis; ++i)
-	{
-		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
-		if (DC.IsActive()) DC.Update();
-	}
 
 	// modify the linear constraints
 	if (m_fem.m_LinC.size())

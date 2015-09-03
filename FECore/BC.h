@@ -28,22 +28,35 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! This class represents a fixed degree of freedom
+//! This boundary conditions sets the BC attribute of the nodes in the nodeset
+//! to DOF_FIXED when activated.
 class FEFixedBC : public FEBoundaryCondition
 {
 public:
+	//! constructors
 	FEFixedBC(FEModel* pfem);
 	FEFixedBC(FEModel* pfem, int node, int dof);
 
-	void Serialize(DumpFile& ar);
-
-	void Activate();
-
+	//! add a node to the node set
 	void AddNode(int node);
+
+	//! set the degree of freedom that will be fixed
 	void SetDOF(int dof);
 
 public:
-	vector<int>		m_node;
-	int				m_dof;
+	//! serialization
+	void Serialize(DumpFile& ar);
+
+	//! activation
+	void Activate();
+
+	//! deactivations
+	void Deactivate();
+
+public:
+	vector<int>		m_node;		//!< node set
+	int				m_dof;		//!< fixed degree of freedom
 };
 
 //-----------------------------------------------------------------------------
@@ -68,13 +81,15 @@ public:
 
 	void Serialize(DumpFile& ar);
 
+	void Activate();
+
+	void Deactivate();
+
 	bool Init();
 
 	double NodeValue(int n) const;
 
 	void Update();
-
-	void Apply();
 
 	void PrepStep(std::vector<double>& ui, bool brel = true);
 
