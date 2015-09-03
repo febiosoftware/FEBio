@@ -46,9 +46,6 @@ public: // --- I/O functions ---
 
 public: //! --- serialization for restarts ---
 	
-	//! Restart from restart point
-	bool Restart(const char* szfile);
-
 	//! Write or read data from archive
 	bool Serialize(DumpFile& ar);
 

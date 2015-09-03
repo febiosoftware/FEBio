@@ -455,7 +455,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\FEBio2\CommandManager.cpp" />
     <ClCompile Include="..\..\FEBio2\console.cpp" />
-    <ClCompile Include="..\..\FEBio2\diagnose.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBio.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBioCommand.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBioStdSolver.cpp" />

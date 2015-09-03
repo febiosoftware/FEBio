@@ -47,9 +47,6 @@
     <ClCompile Include="..\..\FEBio2\console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\diagnose.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEBio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

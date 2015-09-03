@@ -5,6 +5,7 @@
 #include "FEBioTest/FETangentDiagnostic.h"
 #include "FEBioLib/FEBox.h"
 #include "FECore/log.h"
+#include "FEBioXML/FERestartImport.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FEBioStdSolver , FETASK_ID, "solve"   );
@@ -34,8 +35,59 @@ bool FEBioRestart::Init(const char *szfile)
 {
 	FEBioModel& fem = static_cast<FEBioModel&>(*GetFEModel());
 
-	// load restart data
-	return fem.Restart(szfile);
+	// check the extension of the file
+	// if the extension is .dmp or not given it is assumed the file
+	// is a bindary archive (dump file). Otherwise it is assumed the
+	// file is a restart input file.
+	const char* ch = strrchr(szfile, '.');
+	if ((ch == 0) || (strcmp(ch, ".dmp") == 0) || (strcmp(ch, ".DMP") == 0))
+	{
+		// the file is binary so just read the dump file and return
+
+		// open the archive
+		DumpFile ar(&fem);
+		if (ar.Open(szfile) == false) { fprintf(stderr, "FATAL ERROR: failed opening restart archive\n"); return false; }
+
+		// read the archive
+		try
+		{
+			if (fem.Serialize(ar) == false) { fprintf(stderr, "FATAL ERROR: failed reading restart data from archive %s\n", szfile); return false; }
+		}
+		catch (...)
+		{
+			fprintf(stderr, "FATAL ERROR: failed reading restart data from archive %s\n", szfile); 
+			return false;
+		}
+	}
+	else
+	{
+		// the file is assumed to be a xml-text input file
+		FERestartImport file;
+		if (file.Load(fem, szfile) == false)
+		{
+			char szerr[256];
+			file.GetErrorMessage(szerr);
+			fprintf(stderr, "%s", szerr);
+			return false;
+		}
+
+		// see if user redefined restart file name
+		if (file.m_szdmp[0]) fem.SetDumpFilename(file.m_szdmp);
+	}
+
+	// Open the log file for appending
+	const char* szlog = fem.GetLogfileName();
+	if (felog.append(szlog) == false)
+	{
+		printf("WARNING: Could not reopen log file. A new log file is created\n");
+		felog.open(szlog);
+		return false;
+	}
+
+	// inform the user from where the problem is restarted
+	felog.printbox(" - R E S T A R T -", "Restarting from time %lg.\n", fem.m_ftime);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
