@@ -7,10 +7,5 @@ using namespace FECore;
 class FEBiphasicAnalysis : public FEAnalysis
 {
 public:
-	FEBiphasicAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_BIPHASIC) {}
-
-	bool Activate();
-
-protected:
-	void InitNodes();
+	FEBiphasicAnalysis(FEModel* pfem);
 };

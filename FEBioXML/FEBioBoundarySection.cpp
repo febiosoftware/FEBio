@@ -211,9 +211,6 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 	FEMesh& mesh = fem.GetMesh();
 	int NN = mesh.Nodes();
 
-	// make sure this section does not appear in a step section
-	if (m_pim->m_nsteps != 0) throw XMLReader::InvalidTag(tag);
-
 	// get the required bc attribute
 	char szbc[8];
 	strcpy(szbc, tag.AttributeValue("bc"));

@@ -100,6 +100,26 @@ bool FEThermoElasticSolidDomain::Initialize(FEModel &fem)
 }
 
 //-----------------------------------------------------------------------------
+void FEThermoElasticSolidDomain::Activate()
+{
+	for (int i=0; i<Nodes(); ++i)
+	{
+		FENode& node = Node(i);
+		if (node.m_bexclude == false)
+		{
+			if (node.m_rid < 0)
+			{
+				node.m_ID[DOF_X] = DOF_ACTIVE;
+				node.m_ID[DOF_Y] = DOF_ACTIVE;
+				node.m_ID[DOF_Z] = DOF_ACTIVE;
+			}
+
+			node.m_ID[DOF_T] = DOF_ACTIVE;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Unpack the element LM data. 
 void FEThermoElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {

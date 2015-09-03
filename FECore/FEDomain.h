@@ -100,6 +100,9 @@ public: // optional functions to overload
 	//! Initialize material point data for the elements
 	void InitMaterialPointData();
 
+	//! Activate the domain
+	virtual void Activate() {}
+
 protected:
 	FEMesh*		m_pMesh;	//!< the mesh that this domain is a part of
 

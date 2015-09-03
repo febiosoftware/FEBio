@@ -36,6 +36,19 @@ void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
+void FEHeatSolidDomain::Activate()
+{
+	for (int i=0; i<Nodes(); ++i)
+	{
+		FENode& node = Node(i);
+		if (node.m_bexclude == false)
+		{
+			node.m_ID[DOF_T] = DOF_ACTIVE;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Calculate the heat conduction matrix
 void FEHeatSolidDomain::ConductionMatrix(FESolver* psolver)
 {

@@ -30,6 +30,9 @@ public:
 	//! initialize class
 	bool Initialize(FEModel& fem);
 
+	//! Activate
+	void Activate();
+
 	//! initialize elements for this domain
 	void InitElements();
 

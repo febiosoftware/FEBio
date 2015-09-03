@@ -23,53 +23,9 @@ bool FESolidAnalysis::Activate()
 	// initialize base class data
 	FEAnalysis::Activate();
 
-	// reset nodal ID's
-	FEMesh& mesh = m_fem.GetMesh();
-	for (int i=0; i<mesh.Nodes(); ++i)
-	{
-		// fix all degrees of freedom
-		FENode& node = mesh.Node(i);
-		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = DOF_FIXED;
-
-		// open degrees of freedom
-		if (node.m_bexclude == false)
-		{
-			// turn on displacement dofs (for non-rigid nodes)
-			if (node.m_rid < 0)
-			{
-				node.m_ID[DOF_X] = node.m_BC[DOF_X];
-				node.m_ID[DOF_Y] = node.m_BC[DOF_Y];
-				node.m_ID[DOF_Z] = node.m_BC[DOF_Z];
-			}
-
-			// turn on rotation dofs for non-rigid shell nodes
-			if (node.m_bshell)
-			{
-				node.m_ID[DOF_U] = node.m_BC[DOF_U];
-				node.m_ID[DOF_V] = node.m_BC[DOF_V];
-				node.m_ID[DOF_W] = node.m_BC[DOF_W];
-			}
-		}
-	}
-
-	// initialize equations
-	// ----->
-	if (m_psolver->InitEquations() == false) return false;
-
-	// initialize linear constraints
-	// Must be done after equations are initialized
-	if (InitLinearConstraints() == false) return false;
-	// ----->
-
-	// activate the linear constraints
-	if (m_fem.m_LinC.size())
-	{
-		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
-		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il) il->Activate();
-	}
-
 	if (m_nanalysis == FE_DYNAMIC)
 	{
+		FEMesh& mesh = m_fem.GetMesh();
 		FERigidSystem& rigid = *m_fem.GetRigidSystem();
 
 		// set the initial velocities of all rigid nodes
@@ -90,13 +46,6 @@ bool FESolidAnalysis::Activate()
 				n.m_ap = n.m_at = a;
 			}
 		}
-	}
-
-	// do one time initialization of solver data
-	if (m_psolver->Init() == false)
-	{
-		felog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");
-		return false;
 	}
 
 	return true;
@@ -124,57 +73,7 @@ void FESolidAnalysis::Deactivate()
 bool FEExplicitSolidAnalysis::Activate()
 {
 	// initialize base class data
-	FEAnalysis::Activate();
-
-	// reset nodal ID's
-	FEMesh& mesh = m_fem.GetMesh();
-	for (int i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = DOF_FIXED;
-
-		if (node.m_bexclude == false)
-		{
-			if (node.m_rid < 0)
-			{
-				node.m_ID[DOF_X] = node.m_BC[DOF_X];
-				node.m_ID[DOF_Y] = node.m_BC[DOF_Y];
-				node.m_ID[DOF_Z] = node.m_BC[DOF_Z];
-			}
-
-			if (node.m_bshell)
-			{
-				node.m_ID[DOF_U] = node.m_BC[DOF_U];
-				node.m_ID[DOF_V] = node.m_BC[DOF_V];
-				node.m_ID[DOF_W] = node.m_BC[DOF_W];
-			}
-		}
-	}
-
-	// initialize equations
-	// ----->
-	if (m_psolver->InitEquations() == false) return false;
-
-	// initialize linear constraints
-	// Must be done after equations are initialized
-	if (InitLinearConstraints() == false) return false;
-	// ----->
-
-	// activate the linear constraints
-	if (m_fem.m_LinC.size())
-	{
-		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
-		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il) il->Activate();
-	}
-
-	// do one time initialization of solver data
-	if (m_psolver->Init() == false)
-	{
-		felog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");
-		return false;
-	}
-
-	return true;
+	return FEAnalysis::Activate();
 }
 
 //-----------------------------------------------------------------------------
@@ -184,55 +83,5 @@ bool FEExplicitSolidAnalysis::Activate()
 bool FELinearSolidAnalysis::Activate()
 {
 	// initialize base class data
-	FEAnalysis::Activate();
-
-	// reset nodal ID's
-	FEMesh& mesh = m_fem.GetMesh();
-	for (int i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = DOF_FIXED;
-
-		if (node.m_bexclude == false)
-		{
-			if (node.m_rid < 0)
-			{
-				node.m_ID[DOF_X] = node.m_BC[DOF_X];
-				node.m_ID[DOF_Y] = node.m_BC[DOF_Y];
-				node.m_ID[DOF_Z] = node.m_BC[DOF_Z];
-			}
-
-			if (node.m_bshell)
-			{
-				node.m_ID[DOF_U] = node.m_BC[DOF_U];
-				node.m_ID[DOF_V] = node.m_BC[DOF_V];
-				node.m_ID[DOF_W] = node.m_BC[DOF_W];
-			}
-		}
-	}
-
-	// initialize equations
-	// ----->
-	if (m_psolver->InitEquations() == false) return false;
-
-	// initialize linear constraints
-	// Must be done after equations are initialized
-	if (InitLinearConstraints() == false) return false;
-	// ----->
-
-	// activate the linear constraints
-	if (m_fem.m_LinC.size())
-	{
-		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
-		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il) il->Activate();
-	}
-
-	// do one time initialization of solver data
-	if (m_psolver->Init() == false)
-	{
-		felog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");
-		return false;
-	}
-
-	return true;
+	return FEAnalysis::Activate();
 }

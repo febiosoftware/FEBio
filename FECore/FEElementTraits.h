@@ -22,6 +22,11 @@
 #define DOF_PRESCRIBED	 2		// the dof is prescribed. It will be given a negative equation number (equation = - index - 2)
 
 //-----------------------------------------------------------------------------
+// status of a dof
+#define DOF_INACTIVE	-1		// the dof is inactive and should not be assigned an equation (regardless of its type)
+#define DOF_ACTIVE		 0		// the dof is active and an equation can be assigned (depending on its type)
+
+//-----------------------------------------------------------------------------
 // Max nr of nodal degrees of freedom
 
 // At this point the nodal dofs are used as follows:

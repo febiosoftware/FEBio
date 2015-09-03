@@ -20,6 +20,9 @@ public:
 	//! constructor
 	FEHeatSolidDomain(FEModel* pfem);
 
+	//! activate
+	void Activate();
+
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 

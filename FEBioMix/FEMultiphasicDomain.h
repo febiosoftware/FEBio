@@ -38,6 +38,9 @@ public:
 	
 	//! initialize class
 	bool Initialize(FEModel& fem);
+
+	//! activate
+	void Activate();
 	
 	// update stresses (overridden from FEElasticDomain)
 	void UpdateStresses(FEModel& fem);

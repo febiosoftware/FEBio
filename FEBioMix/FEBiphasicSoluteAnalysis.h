@@ -7,10 +7,5 @@ using namespace FECore;
 class FEBiphasicSoluteAnalysis : public FEAnalysis
 {
 public:
-	FEBiphasicSoluteAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_POROSOLUTE) {}
-
-	bool Activate();
-
-protected:
-	void InitNodes();
+	FEBiphasicSoluteAnalysis(FEModel* pfem);
 };

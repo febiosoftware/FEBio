@@ -120,8 +120,57 @@ bool FEAnalysis::Activate()
 	ClearDomains();
 	for (int i=0; i<ndom; ++i) AddDomain(i);
 
-	// activate the model components
+	// activate the model components assigned to this step
 	for (int i=0; i<(int) m_MC.size(); ++i) m_MC[i]->Activate();
+
+	// Next, we need to determine which degrees of freedom are active. 
+	// We start by resetting all nodal degrees of freedom.
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = DOF_INACTIVE;
+	}
+
+	// Then, we activate the domains.
+	// This will activate the relevant degrees of freedom
+	for (int i=0; i<mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		dom.Activate();
+	}
+
+	// Now we apply the BC's to the active dofs
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		int nbc = node.m_ID.size();
+		for (int j=0; j<nbc; ++j)
+		{
+			if (node.m_ID[j] == DOF_ACTIVE) node.m_ID[j] = node.m_BC[j];
+			else node.m_ID[j] = DOF_FIXED;
+		}
+	}
+
+	// initialize equations
+	if (m_psolver->InitEquations() == false) return false;
+
+	// do one time initialization of solver data
+	if (m_psolver->Init() == false)
+	{
+		felog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");
+		return false;
+	}
+
+	// initialize linear constraints
+	// Must be done after equations are initialized
+	if (InitLinearConstraints() == false) return false;
+
+	// activate the linear constraints
+	if (m_fem.m_LinC.size())
+	{
+		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
+		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il) il->Activate();
+	}
 	
 	return true;
 }

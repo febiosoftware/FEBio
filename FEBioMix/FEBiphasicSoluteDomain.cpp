@@ -86,6 +86,28 @@ bool FEBiphasicSoluteDomain::Initialize(FEModel &fem)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+void FEBiphasicSoluteDomain::Activate()
+{
+	int dofc = DOF_C + m_pMat->GetSolute()->GetSoluteID();
+
+	for (int i=0; i<Nodes(); ++i)
+	{
+		FENode& node = Node(i);
+		if (node.m_bexclude == false)
+		{
+			if (node.m_rid < 0)
+			{
+				node.m_ID[DOF_X] = DOF_ACTIVE;
+				node.m_ID[DOF_Y] = DOF_ACTIVE;
+				node.m_ID[DOF_Z] = DOF_ACTIVE;
+			}
+
+			node.m_ID[DOF_P] = DOF_ACTIVE;
+			node.m_ID[dofc ] = DOF_ACTIVE;
+		}
+	}
+}
 
 //-----------------------------------------------------------------------------
 //! Unpack the element LM data. 

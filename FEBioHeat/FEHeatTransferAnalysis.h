@@ -9,7 +9,4 @@ class FEHeatTransferAnalysis : public FEAnalysis
 public:
 	//! constructor
 	FEHeatTransferAnalysis(FEModel* pfem);
-
-	//! Initialization
-	bool Activate();
 };

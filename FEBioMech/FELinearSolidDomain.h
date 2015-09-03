@@ -28,6 +28,9 @@ public:
 	//! Initialization
 	bool Initialize(FEModel& fem);
 
+	//! activate
+	void Activate();
+
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 

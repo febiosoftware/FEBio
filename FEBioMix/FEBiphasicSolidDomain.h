@@ -17,6 +17,9 @@ public:
 	//! initialize class
 	bool Initialize(FEModel& fem);
 
+	//! activate
+	void Activate();
+
 	//! reset domain data
 	void Reset();
 

@@ -155,6 +155,31 @@ bool FETriphasicDomain::Initialize(FEModel &fem)
 }
 
 //-----------------------------------------------------------------------------
+void FETriphasicDomain::Activate()
+{
+	int dofc0 = DOF_C + m_pMat->m_pSolute[0]->GetSoluteID();
+	int dofc1 = DOF_C + m_pMat->m_pSolute[1]->GetSoluteID();
+
+	for (int i=0; i<Nodes(); ++i)
+	{
+		FENode& node = Node(i);
+		if (node.m_bexclude == false)
+		{
+			if (node.m_rid < 0)
+			{
+				node.m_ID[DOF_X] = DOF_ACTIVE;
+				node.m_ID[DOF_Y] = DOF_ACTIVE;
+				node.m_ID[DOF_Z] = DOF_ACTIVE;
+			}
+
+			node.m_ID[DOF_P] = DOF_ACTIVE;
+			node.m_ID[dofc0] = DOF_ACTIVE;
+			node.m_ID[dofc1] = DOF_ACTIVE;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FETriphasicDomain::Reset()
 {
 	// reset base class

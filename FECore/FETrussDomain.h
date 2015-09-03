@@ -17,6 +17,8 @@ public:
 
 	bool Initialize(FEModel& fem);
 
+	void Activate();
+
 	int Nodes() { return (int) m_Node.size(); }
 	FENode& Node(int i);
 

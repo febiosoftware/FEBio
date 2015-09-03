@@ -8,7 +8,4 @@ class FEThermoElasticAnalysis : public FEAnalysis
 public:
 	//! constructor
 	FEThermoElasticAnalysis(FEModel* pfem);
-
-	//! Initialization
-	bool Activate();
 };

@@ -16,6 +16,9 @@ public:
 	//! Initialize domain
 	bool Initialize(FEModel& fem);
 
+	//! Activate the domain
+	void Activate();
+
 	//! Unpack shell element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 

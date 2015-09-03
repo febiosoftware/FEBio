@@ -19,6 +19,9 @@ public:
 	//! initialize class
 	bool Initialize(FEModel& fem);
 
+	//! activate
+	void Activate();
+
 	//! initialize elements
 	virtual void InitElements();
 
