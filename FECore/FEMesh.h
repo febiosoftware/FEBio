@@ -92,9 +92,8 @@ public:
 public:
 	// geometry data
 	vec3d	m_r0;	//!< initial position
-	vec3d	m_v0;	//!< initial velocity
-
 	vec3d	m_rt;	//!< current position
+
 	vec3d	m_vt;	//!< nodal velocity
 	vec3d	m_at;	//!< nodal acceleration
 

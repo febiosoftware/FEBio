@@ -52,6 +52,7 @@ void FEModel::Clear()
 	for (i=0; i<m_BL.size  (); ++i) delete m_BL [i] ; m_BL.clear  ();
 	for (i=0; i<m_BC.size  (); ++i) delete m_BC [i] ; m_BC.clear  ();
 	for (i=0; i<m_DC.size  (); ++i) delete m_DC [i] ; m_DC.clear  ();
+	for (i=0; i<m_IC.size  (); ++i) delete m_IC [i] ; m_IC.clear  ();
 	for (i=0; i<m_FC.size  (); ++i) delete m_FC [i] ; m_FC.clear  ();
 	for (i=0; i<m_SL.size  (); ++i) delete m_SL [i] ; m_SL.clear  ();
 	for (i=0; i<m_ML.size  (); ++i) delete m_ML [i] ; m_ML.clear  ();
@@ -352,6 +353,15 @@ void FEModel::Activate()
 	{
 		FEFixedBC& bc = *m_BC[i];
 		if (bc.IsActive()) bc.Activate();
+	}
+
+	// initial conditions
+	// Must be activated before prescribed BC's
+	// since relative prescribed BC's use the initial values
+	for (int i=0; i<(int) m_IC.size(); ++i)
+	{
+		FEInitialCondition& ic = *m_IC[i];
+		if (ic.IsActive()) ic.Activate();
 	}
 
 	// prescribed dofs
@@ -766,6 +776,7 @@ FEModelComponent* FEModel::FindModelComponent(int nid)
 	int i;
 	for (i=0; i<(int) m_BC.size (); ++i) if (m_BC [i]->GetClassID() == nid) return m_BC [i];
 	for (i=0; i<(int) m_DC.size (); ++i) if (m_DC [i]->GetClassID() == nid) return m_DC [i];
+	for (i=0; i<(int) m_IC.size (); ++i) if (m_IC [i]->GetClassID() == nid) return m_IC [i];
 	for (i=0; i<(int) m_FC.size (); ++i) if (m_FC [i]->GetClassID() == nid) return m_FC [i];
 	for (i=0; i<(int) m_SL.size (); ++i) if (m_SL [i]->GetClassID() == nid) return m_SL [i];
 	for (i=0; i<(int) m_ML.size (); ++i) if (m_ML [i]->GetClassID() == nid) return m_ML [i];

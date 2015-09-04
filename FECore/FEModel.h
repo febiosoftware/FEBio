@@ -130,6 +130,11 @@ public: // --- Boundary Conditions functions ---
 	void AddPrescribedBC(FEPrescribedBC* pbc) { m_DC.push_back(pbc); }
 	void ClearBCs();
 
+	// initial conditions
+	int InitialConditions() { return (int) m_IC.size(); }
+	FEInitialCondition* InitialCondition(int i) { return m_IC[i]; }
+	void AddInitialCondition(FEInitialCondition* pbc) { m_IC.push_back(pbc); }
+
 	// nodal loads
 	int NodalLoads() { return (int) m_FC.size(); }
 	FENodalLoad* NodalLoad(int i) { return m_FC[i]; }
@@ -307,6 +312,7 @@ protected:
 	std::vector<FEMaterial*>				m_MAT;	//!< array of materials
 	std::vector<FEFixedBC*>					m_BC;	//!< fixed constraints
 	std::vector<FEPrescribedBC*>			m_DC;	//!< prescribed constraints
+	std::vector<FEInitialCondition*>		m_IC;	//!< initial conditions
 	std::vector<FENodalLoad*>				m_FC;	//!< concentrated nodal loads
 	std::vector<FESurfaceLoad*>				m_SL;	//!< surface loads
 	std::vector<FESurfacePairInteraction*>	m_CI;	//!< contact interface array

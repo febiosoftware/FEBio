@@ -40,7 +40,7 @@ bool FESolidAnalysis::Activate()
 				vec3d r = n.m_rt - rb.m_rt;
 
 				vec3d v = V + (W ^ r); 
-				n.m_v0 = n.m_vp = n.m_vt = v;
+				n.m_vp = n.m_vt = v;
 
 				vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
 				n.m_ap = n.m_at = a;

@@ -599,7 +599,6 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 			ar << node.m_rp;
 			ar << node.m_rt;
 			ar << node.m_T;
-			ar << node.m_v0;
 			ar << node.m_vp;
 			ar << node.m_vt;
 		}
@@ -656,7 +655,6 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 			ar >> node.m_rp;
 			ar >> node.m_rt;
 			ar >> node.m_T;
-			ar >> node.m_v0;
 			ar >> node.m_vp;
 			ar >> node.m_vt;
 		}
@@ -759,6 +757,14 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		{
 			FEPrescribedBC& dc = *m_DC[i];
 			dc.Serialize(ar);
+		}
+
+		// initial conditions
+		ar << (int) m_IC.size();
+		for (int i=0; i<(int) m_IC.size(); ++i) 
+		{
+			FEInitialCondition& ic = *m_IC[i];
+			ic.Serialize(ar);
 		}
 
 		// nodal loads
@@ -869,7 +875,18 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
 			m_DC.push_back(pdc);
 		}
-		
+
+		// initial conditions
+		ar >> n;
+		m_IC.clear();
+		for (int i=0; i<n; ++i) 
+		{
+			FEInitialCondition* pic = new FEInitialCondition(this);
+			pic->Serialize(ar);
+			if (pic->IsActive()) pic->Activate(); else pic->Deactivate();
+			m_IC.push_back(pic);
+		}
+
 		// nodal loads
 		ar >> n;
 		m_FC.clear();

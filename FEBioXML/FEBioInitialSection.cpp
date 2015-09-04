@@ -20,14 +20,22 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 	// make sure we've read the nodes section
 	if (mesh.Nodes() == 0) throw XMLReader::InvalidTag(tag);
 
-	for (int i=0; i<mesh.Nodes(); ++i) mesh.Node(i).m_v0 = vec3d(0,0,0);
-
 	// read nodal data
 	++tag;
 	do
 	{
 		if (tag == "velocity")
 		{
+			FEInitialVelocity* pic = new FEInitialVelocity(&fem);
+			fem.AddInitialCondition(pic);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddModelComponent(pic);
+				pic->Deactivate();
+			}
+
 			++tag;
 			do
 			{
@@ -36,7 +44,8 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 					int nid = atoi(tag.AttributeValue("id"))-1;
 					vec3d v;
 					m_pim->value(tag, v);
-					mesh.Node(nid).m_v0 += v;
+
+					pic->Add(nid, v);
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
@@ -45,6 +54,16 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 		}
 		else if (tag == "fluid_pressure")
 		{
+			FEInitialPressure* pic = new FEInitialPressure(&fem);
+			fem.AddInitialCondition(pic);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddModelComponent(pic);
+				pic->Deactivate();
+			}
+
 			++tag;
 			do
 			{
@@ -53,7 +72,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 					int nid = atoi(tag.AttributeValue("id"))-1;
 					double p;
 					m_pim->value(tag, p);
-					mesh.Node(nid).m_p0 += p;
+					pic->Add(nid, p);
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
@@ -84,6 +103,16 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 		}
 		else if (tag == "temperature")
 		{
+			FEInitialTemperature* pic = new FEInitialTemperature(&fem);
+			fem.AddInitialCondition(pic);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddModelComponent(pic);
+				pic->Deactivate();
+			}
+
 			++tag;
 			do
 			{
@@ -92,7 +121,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 					int nid = atoi(tag.AttributeValue("id"))-1;
 					double T;
 					m_pim->value(tag, T);
-					mesh.Node(nid).m_T0 = T;
+					pic->Add(nid, T);
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
