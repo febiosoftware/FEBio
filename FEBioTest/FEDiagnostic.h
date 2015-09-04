@@ -12,6 +12,22 @@
 #include "FECore/FEModel.h"
 #include "FEBioXML/FEBioImport.h"
 
+class FEDiagnostic;
+
+//-----------------------------------------------------------------------------
+class FEDiagnosticScenario : public FEParamContainer
+{
+public:
+	FEDiagnosticScenario(FEDiagnostic* pdia) : m_pdia(pdia) {};
+
+	FEDiagnostic* GetDiagnostic() { return m_pdia; }
+
+	virtual bool Init() { return true; }
+
+private:
+	FEDiagnostic* m_pdia;
+};
+
 //-----------------------------------------------------------------------------
 //! The FEDiagnostic class is a base class that can be used to create
 //! diagnostic classes to test FEBio's performance.
@@ -34,7 +50,12 @@ public:
 	//! load data from file
 	virtual bool ParseSection(XMLTag& tag) { return false; }
 
-public:
+	//! create a scenario class
+	virtual FEDiagnosticScenario* CreateScenario(const std::string& sname) { return 0; }
+
+	FEModel& GetFEModel() { return m_fem; }
+
+private:
 	FEModel&	m_fem;	//!< the FEModel object the diagnostic is performed on
 };
 

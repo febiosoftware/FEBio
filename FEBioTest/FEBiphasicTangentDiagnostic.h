@@ -12,6 +12,31 @@
 #include "FEDiagnostic.h"
 
 //-----------------------------------------------------------------------------
+class FEBiphasicScenario : public FEDiagnosticScenario
+{
+public:
+	FEBiphasicScenario(FEDiagnostic* pdia) : FEDiagnosticScenario(pdia) { m_dt = 1.0; }
+
+public:
+	double	m_dt;
+};
+
+//-----------------------------------------------------------------------------
+class FEBiphasicTangentUniaxial : public FEBiphasicScenario
+{
+public:
+	FEBiphasicTangentUniaxial(FEDiagnostic* pdia);
+
+	bool Init();
+
+private:
+    double		m_strain;
+    double      m_pressure;
+
+	DECLARE_PARAMETER_LIST();
+};
+
+//-----------------------------------------------------------------------------
 //! The FEBiphasicTangentDiagnostic class tests the stiffness matrix implementation
 //! by comparing it to a numerical approximating of the derivative of the
 //! residual.
@@ -19,30 +44,22 @@
 class FEBiphasicTangentDiagnostic : public FEDiagnostic
 {
 public:
-    enum TD_Scenario {
-        TDS_BIPHASIC_UNIAXIAL
-    };
-    
-public:
     FEBiphasicTangentDiagnostic(FEModel& fem);
     virtual ~FEBiphasicTangentDiagnostic(){}
     
     bool Init();
     
     bool Run();
+
+	FEDiagnosticScenario* CreateScenario(const std::string& sname);
     
 protected:
-    void BuildUniaxial();
-    
     void deriv_residual(matrix& ke);
     
     void print_matrix(matrix& m);
     
 public:
-    TD_Scenario	m_scn;
-    double		m_strain;
-    double      m_pressure;
-    double      m_dt;
+    FEBiphasicScenario*	m_pscn;
 };
 
 #endif /* defined(__FEBio2__FEBiphasicTangentDiagnostic__) */

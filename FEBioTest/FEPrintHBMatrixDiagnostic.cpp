@@ -20,6 +20,10 @@ void write_hb(CompactMatrix& m, FILE* fp)
 //-----------------------------------------------------------------------------
 FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
+	FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", &fem);
+    fem.AddStep(pstep);
+    fem.m_nStep = 0;
+    fem.SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------
@@ -30,7 +34,7 @@ FEPrintHBMatrixDiagnostic::~FEPrintHBMatrixDiagnostic(void)
 //-----------------------------------------------------------------------------
 bool FEPrintHBMatrixDiagnostic::ParseSection(XMLTag &tag)
 {
-	FEModel& fem = m_fem;
+	FEModel& fem = GetFEModel();
 	if (tag == "input")
 	{
 		// get the input file name
@@ -57,7 +61,8 @@ bool FEPrintHBMatrixDiagnostic::ParseSection(XMLTag &tag)
 bool FEPrintHBMatrixDiagnostic::Run()
 {
 	// Get the current step
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	FEModel& fem = GetFEModel();
+	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	// initialize the step
 	pstep->Init();
@@ -69,7 +74,7 @@ bool FEPrintHBMatrixDiagnostic::Run()
 
 	// build the stiffness matrix
 	// recalculate the shape of the stiffness matrix if necessary
-	if (m_fem.SurfacePairInteractions()) solver.UpdateContact();
+	if (fem.SurfacePairInteractions()) solver.UpdateContact();
 
 	// reshape the stiffness matrix
 	if (!solver.CreateStiffness(true)) return false;

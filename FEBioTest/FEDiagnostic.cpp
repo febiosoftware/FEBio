@@ -62,44 +62,13 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 		if (xml.FindTag("febio_diagnostic", tag) == false) return 0;
 
 		XMLAtt& att = tag.m_att[0];
-        if      (att == "tangent test"  ) {
-            m_pdia = new FETangentDiagnostic(fem);
-            pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", m_pfem);
-        }
-        else if (att == "contact test"  ) {
-            m_pdia = new FEContactDiagnostic(fem);
-            pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", m_pfem);
-        }
-        else if (att == "print matrix"  ) {
-            m_pdia = new FEPrintMatrixDiagnostic(fem);
-            pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", m_pfem);
-        }
-        else if (att == "print hbmatrix") {
-            m_pdia = new FEPrintHBMatrixDiagnostic(fem);
-            pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", m_pfem);
-        }
-        else if (att == "memory test"   ) {
-            m_pdia = new FEMemoryDiagnostic(fem);
-            pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", m_pfem);
-        }
-        else if (att == "biphasic tangent test") {
-            m_pdia = new FEBiphasicTangentDiagnostic(fem);
-            pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "biphasic", m_pfem);
-            // create a new solver
-            FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "biphasic", m_pfem);
-            assert(pnew_solver);
-            pnew_solver->m_bsymm = false;
-            pstep->m_psolver = pnew_solver;
-        }
-        else if (att == "multiphasic tangent test") {
-            m_pdia = new FEMultiphasicTangentDiagnostic(fem);
-            pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "multiphasic", m_pfem);
-            // create a new solver
-            FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "multiphasic", m_pfem);
-            assert(pnew_solver);
-            pnew_solver->m_bsymm = false;
-            pstep->m_psolver = pnew_solver;
-        }
+        if      (att == "tangent test"            ) m_pdia = new FETangentDiagnostic           (fem);
+        else if (att == "contact test"            ) m_pdia = new FEContactDiagnostic           (fem);
+        else if (att == "print matrix"            ) m_pdia = new FEPrintMatrixDiagnostic       (fem);
+        else if (att == "print hbmatrix"          ) m_pdia = new FEPrintHBMatrixDiagnostic     (fem);
+        else if (att == "memory test"             ) m_pdia = new FEMemoryDiagnostic            (fem);
+        else if (att == "biphasic tangent test"   ) m_pdia = new FEBiphasicTangentDiagnostic   (fem);
+        else if (att == "multiphasic tangent test") m_pdia = new FEMultiphasicTangentDiagnostic(fem);
 		else
 		{
 			felog.printf("\nERROR: unknown diagnostic\n\n");
@@ -107,10 +76,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 		}
 
         // keep a pointer to the fem object
-        fem.AddStep(pstep);
-        fem.m_nStep = 0;
-        fem.SetCurrentStep(pstep);
-        m_pStep = pstep;
+        m_pStep = fem.GetCurrentStep();
         
 		++tag;
 		do
@@ -153,51 +119,23 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 void FEBioScenarioSection::Parse(XMLTag &tag)
 {
 	FEDiagnosticImport& dim = static_cast<FEDiagnosticImport&>(*m_pim);
-    FETangentDiagnostic* pdiat = dynamic_cast<FETangentDiagnostic*>(dim.m_pdia);
-    FEBiphasicTangentDiagnostic* pdiab = dynamic_cast<FEBiphasicTangentDiagnostic*>(dim.m_pdia);
-    FEMultiphasicTangentDiagnostic* pdiam = dynamic_cast<FEMultiphasicTangentDiagnostic*>(dim.m_pdia);
-    
-    if (pdiat) {
-        XMLAtt& type = tag.Attribute("type");
-        if      (type == "uni-axial"   ) pdiat->m_scn = FETangentDiagnostic::TDS_UNIAXIAL;
-        else if (type == "simple shear") pdiat->m_scn = FETangentDiagnostic::TDS_SIMPLE_SHEAR;
-        else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
-        ++tag;
-        do
-        {
-            if (tag == "strain") { tag.value(pdiat->m_strain); }
-            ++tag;
-        }
-        while (!tag.isend());
-    }
-    else if (pdiab) {
-        XMLAtt& type = tag.Attribute("type");
-        if (type == "biphasic uni-axial") pdiab->m_scn = FEBiphasicTangentDiagnostic::TDS_BIPHASIC_UNIAXIAL;
-        else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
-        ++tag;
-        do
-        {
-            if (tag == "solid_strain") { tag.value(pdiab->m_strain); }
-            else if (tag == "fluid_pressure") { tag.value(pdiab->m_pressure); }
-            else if (tag == "time_step") { tag.value(pdiab->m_dt); }
-            ++tag;
-        }
-        while (!tag.isend());
-    }
-    else if (pdiam) {
-        XMLAtt& type = tag.Attribute("type");
-        if (type == "multiphasic uni-axial") pdiam->m_scn = FEMultiphasicTangentDiagnostic::TDS_MULTIPHASIC_UNIAXIAL;
-        else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
-        ++tag;
-        do
-        {
-            if (tag == "solid_strain") { tag.value(pdiam->m_strain); }
-            else if (tag == "fluid_pressure") { tag.value(pdiam->m_pressure); }
-            else if (tag == "time_step") { tag.value(pdiam->m_dt); }
-            else if (tag == "solute_concentration") { tag.value(pdiam->m_concentration); }
-            ++tag;
-        }
-        while (!tag.isend());
-        
-    }
+
+	// get the diagnostic
+	FEDiagnostic* pdia = dim.m_pdia;
+
+	// find the type attribute
+	XMLAtt& type = tag.Attribute("type");
+
+	// create the scenario
+	FEDiagnosticScenario* pscn = pdia->CreateScenario(type.cvalue());
+
+	// parse the parameter list
+	FEParameterList& pl = pscn->GetParameterList();
+	++tag;
+	do
+	{
+		if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
 }

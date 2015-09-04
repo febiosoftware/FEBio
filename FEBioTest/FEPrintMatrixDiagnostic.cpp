@@ -26,6 +26,11 @@ FEPrintMatrixDiagnostic::FEPrintMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fe
 	m_szout[0] = 0;
 	m_rng[0] = m_rng[1] = 0;
 	m_rng[2] = m_rng[3] = -1;
+
+	FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", &fem);
+    fem.AddStep(pstep);
+    fem.m_nStep = 0;
+    fem.SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------
@@ -43,7 +48,8 @@ bool FEPrintMatrixDiagnostic::ParseSection(XMLTag &tag)
 
 		// try to read the file
 		FEBioImport im;
-		if (im.Load(m_fem, szfile) == false)
+		FEModel& fem = GetFEModel();
+		if (im.Load(fem, szfile) == false)
 		{
 			char szerr[256];
 			im.GetErrorMessage(szerr);
@@ -72,7 +78,8 @@ bool FEPrintMatrixDiagnostic::ParseSection(XMLTag &tag)
 bool FEPrintMatrixDiagnostic::Run()
 {
 	// get and initialize the first step
-	FEAnalysis* pstep = m_fem.GetStep(0);
+	FEModel& fem = GetFEModel();
+	FEAnalysis* pstep = fem.GetStep(0);
 	pstep->Init();
 	pstep->Activate();
 
@@ -82,7 +89,7 @@ bool FEPrintMatrixDiagnostic::Run()
 
 	// build the stiffness matrix
 	// recalculate the shape of the stiffness matrix if necessary
-	if (m_fem.SurfacePairInteractions() > 0) solver.UpdateContact();
+	if (fem.SurfacePairInteractions() > 0) solver.UpdateContact();
 
 	// reshape the stiffness matrix
 	if (!solver.CreateStiffness(true)) return false;

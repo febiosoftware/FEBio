@@ -37,31 +37,15 @@ void print_matrix(matrix& m)
 //////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-// Constructor
-FETangentDiagnostic::FETangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
-{
-	m_strain = 0;
-}
+BEGIN_PARAMETER_LIST(FETangentUniaxial, FEDiagnosticScenario)
+	ADD_PARAMETER(m_strain, FE_PARAM_DOUBLE, "strain");
+END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-// Initialize the diagnostic. In this function we build the FE model depending
-// on the scenario.
-bool FETangentDiagnostic::Init()
+bool FETangentUniaxial::Init()
 {
-	switch (m_scn)
-	{
-	case TDS_UNIAXIAL: BuildUniaxial(); break;
-	case TDS_SIMPLE_SHEAR: BuildSimpleShear(); break;
-	default:
-		return false;
-	}
-	return FEDiagnostic::Init();
-}
+	FEModel& fem = GetDiagnostic()->GetFEModel();
 
-//-----------------------------------------------------------------------------
-// Build the uni-axial scenario
-void FETangentDiagnostic::BuildUniaxial()
-{
 	int i;
 	vec3d r[8] = {
 		vec3d(0,0,0), vec3d(1,0,0), vec3d(1,1,0), vec3d(0,1,0),
@@ -75,7 +59,7 @@ void FETangentDiagnostic::BuildUniaxial()
 
 	// --- create the FE problem ---
 	// create the mesh
-	FEMesh& m = m_fem.GetMesh();
+	FEMesh& m = fem.GetMesh();
 	m.CreateNodes(8);
 	for (i=0; i<8; ++i)
 	{
@@ -84,16 +68,16 @@ void FETangentDiagnostic::BuildUniaxial()
 		n.m_rid = -1;
 
 		// set displacement BC's
-		if (BC[i][0] == -1) m_fem.AddFixedBC(i, DOF_X);
-		if (BC[i][1] == -1) m_fem.AddFixedBC(i, DOF_Y);
-		if (BC[i][2] == -1) m_fem.AddFixedBC(i, DOF_Z);
+		if (BC[i][0] == -1) fem.AddFixedBC(i, DOF_X);
+		if (BC[i][1] == -1) fem.AddFixedBC(i, DOF_Y);
+		if (BC[i][2] == -1) fem.AddFixedBC(i, DOF_Z);
 	}
 
 	// get the material
-	FEMaterial* pmat = m_fem.GetMaterial(0);
+	FEMaterial* pmat = fem.GetMaterial(0);
 
 	// create a solid domain
-	FEElasticSolidDomain* pd = new FEElasticSolidDomain(&m_fem);
+	FEElasticSolidDomain* pd = new FEElasticSolidDomain(&fem);
 	pd->SetMaterial(pmat);
 	pd->create(1);
 	m.AddDomain(pd);
@@ -112,20 +96,28 @@ void FETangentDiagnostic::BuildUniaxial()
 	FELoadCurve* plc = new FELoadCurve;
 	plc->Add(0, 0);
 	plc->Add(1, 1);
-	m_fem.AddLoadCurve(plc);
+	fem.AddLoadCurve(plc);
 
 	// Add a prescribed BC
 	int nd[4] = {1, 2, 5, 6};
-	FEPrescribedBC* pdc = new FEPrescribedBC(&m_fem);
-	m_fem.AddPrescribedBC(pdc);
+	FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
+	fem.AddPrescribedBC(pdc);
 	pdc->SetDOF(DOF_X).SetLoadCurveIndex(0).SetScale(d);
 	for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
-// Build the simple shear scenario
-void FETangentDiagnostic::BuildSimpleShear()
+BEGIN_PARAMETER_LIST(FETangentSimpleShear, FEDiagnosticScenario)
+	ADD_PARAMETER(m_strain, FE_PARAM_DOUBLE, "strain");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+bool FETangentSimpleShear::Init()
 {
+	FEModel& fem = GetDiagnostic()->GetFEModel();
+
 	int i;
 	vec3d r[8] = {
 		vec3d(0,0,0), vec3d(1,0,0), vec3d(1,1,0), vec3d(0,1,0),
@@ -139,7 +131,7 @@ void FETangentDiagnostic::BuildSimpleShear()
 
 	// --- create the FE problem ---
 	// create the mesh
-	FEMesh& m = m_fem.GetMesh();
+	FEMesh& m = fem.GetMesh();
 	m.CreateNodes(8);
 	for (i=0; i<8; ++i)
 	{
@@ -148,16 +140,16 @@ void FETangentDiagnostic::BuildSimpleShear()
 		n.m_rid = -1;
 
 		// set displacement BC's
-		if (BC[i][0] == -1) m_fem.AddFixedBC(i, DOF_X);
-		if (BC[i][1] == -1) m_fem.AddFixedBC(i, DOF_Y);
-		if (BC[i][2] == -1) m_fem.AddFixedBC(i, DOF_Z);
+		if (BC[i][0] == -1) fem.AddFixedBC(i, DOF_X);
+		if (BC[i][1] == -1) fem.AddFixedBC(i, DOF_Y);
+		if (BC[i][2] == -1) fem.AddFixedBC(i, DOF_Z);
 	}
 
 	// get the material
-	FEMaterial* pmat = m_fem.GetMaterial(0);
+	FEMaterial* pmat = fem.GetMaterial(0);
 
 	// create a solid domain
-	FEElasticSolidDomain* pd = new FEElasticSolidDomain(&m_fem);
+	FEElasticSolidDomain* pd = new FEElasticSolidDomain(&fem);
 	pd->SetMaterial(pmat);
 	pd->create(1);
 	m.AddDomain(pd);
@@ -176,14 +168,53 @@ void FETangentDiagnostic::BuildSimpleShear()
 	FELoadCurve* plc = new FELoadCurve;
 	plc->Add(0, 0);
 	plc->Add(1, 1);
-	m_fem.AddLoadCurve(plc);
+	fem.AddLoadCurve(plc);
 
 	// Add a prescribed BC
-	FEPrescribedBC* pdc = new FEPrescribedBC(&m_fem);
-	m_fem.AddPrescribedBC(pdc);
+	FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
+	fem.AddPrescribedBC(pdc);
 	pdc->SetDOF(DOF_X).SetLoadCurveIndex(0).SetScale(d);
 	int nd[4] = { 4, 5, 6, 7 };
 	for (i=0; i<4; ++i) pdc->AddNode(nd[i]);
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Constructor
+FETangentDiagnostic::FETangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+{
+	m_pscn = 0;
+
+	// create an analysis step
+	FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", &fem);
+
+	// keep a pointer to the fem object
+    fem.AddStep(pstep);
+    fem.m_nStep = 0;
+    fem.SetCurrentStep(pstep);
+}
+
+//-----------------------------------------------------------------------------
+FEDiagnosticScenario* FETangentDiagnostic::CreateScenario(const std::string& sname)
+{
+	if (sname == "uni-axial"   ) return (m_pscn = new FETangentUniaxial   (this));
+	if (sname == "simple shear") return (m_pscn = new FETangentSimpleShear(this));
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+// Initialize the diagnostic. In this function we build the FE model depending
+// on the scenario.
+bool FETangentDiagnostic::Init()
+{
+	// make sure we have a scenario
+	if (m_pscn == 0) return false;
+
+	// initialize the scenario
+	if (m_pscn->Init() == false) return false;
+
+	return FEDiagnostic::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -195,11 +226,12 @@ bool FETangentDiagnostic::Run()
 	Logfile::MODE oldmode = felog.SetMode(Logfile::FILE_ONLY);
 
 	// solve the problem
+	FEModel& fem = GetFEModel();
 	felog.SetMode(Logfile::NEVER);
-	m_fem.Solve();
+	fem.Solve();
 	felog.SetMode(Logfile::FILE_ONLY);
 
-	FEMesh& mesh = m_fem.GetMesh();
+	FEMesh& mesh = fem.GetMesh();
 	FEElasticSolidDomain& bd = static_cast<FEElasticSolidDomain&>(mesh.Domain(0));
 
 	// get the one and only element
@@ -208,7 +240,7 @@ bool FETangentDiagnostic::Run()
 	// set up the element stiffness matrix
 	matrix k0(24, 24);
 	k0.zero();
-	bd.ElementStiffness(m_fem, 0, k0);
+	bd.ElementStiffness(fem, 0, k0);
 
 	// print the element stiffness matrix
 	felog.printf("\nActual stiffness matrix:\n");
@@ -257,11 +289,12 @@ bool FETangentDiagnostic::Run()
 void FETangentDiagnostic::deriv_residual(matrix& ke)
 {
 	// get the solver
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	FEModel& fem = GetFEModel();
+	FEAnalysis* pstep = fem.GetCurrentStep();
 	FESolidSolver& solver = static_cast<FESolidSolver&>(*pstep->m_psolver);
 
 	// get the mesh
-	FEMesh& mesh = m_fem.GetMesh();
+	FEMesh& mesh = fem.GetMesh();
 
 	FEElasticSolidDomain& bd = static_cast<FEElasticSolidDomain&>(mesh.Domain(0));
 

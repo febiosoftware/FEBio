@@ -5,6 +5,11 @@ FEMemoryDiagnostic::FEMemoryDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
 	m_szfile[0] = 0;
 	m_iters = 1;
+
+	FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", &fem);
+	fem.AddStep(pstep);
+	fem.m_nStep = 0;
+	fem.SetCurrentStep(pstep);
 }
 
 FEMemoryDiagnostic::~FEMemoryDiagnostic(void)
@@ -14,7 +19,7 @@ FEMemoryDiagnostic::~FEMemoryDiagnostic(void)
 
 bool FEMemoryDiagnostic::Init()
 {
-	FEModel& fem = m_fem;
+	FEModel& fem = GetFEModel();
 
 	// try to open the file
 	FEBioImport im;
@@ -27,8 +32,8 @@ bool FEMemoryDiagnostic::Init()
 	if (m_iters <= 0) return false;
 
 	// turn off all output
-	m_fem.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
-	m_fem.GetCurrentStep()->SetPrintLevel(FE_PRINT_NEVER);
+	fem.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
+	fem.GetCurrentStep()->SetPrintLevel(FE_PRINT_NEVER);
 
 	return true;
 }
@@ -42,11 +47,12 @@ bool FEMemoryDiagnostic::Run()
 	felog.SetMode(Logfile::NEVER);
 
 	// run the problem
+	FEModel& fem = GetFEModel();
 	for (int i=0; i<m_iters; ++i)
 	{
 		fprintf(stderr, "%d/%d: ...", i+1, m_iters);
-		m_fem.Reset();
-		bool b = m_fem.Solve();
+		fem.Reset();
+		bool b = fem.Solve();
 //		system("ps -C febio.test -o rss,vsize h");
 		fprintf(stderr, "%s\n", (b?"NT" : "ET"));
 	}

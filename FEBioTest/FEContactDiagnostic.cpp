@@ -39,7 +39,10 @@ void print_matrix(Logfile& log, DenseMatrix& m)
 
 FEContactDiagnostic::FEContactDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
-
+	FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", &fem);
+    fem.AddStep(pstep);
+    fem.m_nStep = 0;
+    fem.SetCurrentStep(pstep);
 }
 
 FEContactDiagnostic::~FEContactDiagnostic()
@@ -50,7 +53,8 @@ FEContactDiagnostic::~FEContactDiagnostic()
 bool FEContactDiagnostic::Run()
 {
 	// get the solver
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	FEModel& fem = GetFEModel();
+	FEAnalysis* pstep = fem.GetCurrentStep();
 	FESolidSolver& solver = static_cast<FESolidSolver&>(*pstep->m_psolver);
 	solver.Init();
 
@@ -108,7 +112,8 @@ bool FEContactDiagnostic::Run()
 //-----------------------------------------------------------------------------
 bool FEContactDiagnostic::Init()
 {
-	FEMesh& mesh = m_fem.GetMesh();
+	FEModel& fem = GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	// --- create the geometry ---
 
@@ -140,13 +145,13 @@ bool FEContactDiagnostic::Init()
 	}
 
 	// --- create a material ---
-	FENeoHookean* pm = new FENeoHookean(&m_fem);
+	FENeoHookean* pm = new FENeoHookean(&fem);
 	pm->m_E = 1;
 	pm->m_v = 0.45;
-	m_fem.AddMaterial(pm);
+	fem.AddMaterial(pm);
 
 	// get the one-and-only domain
-	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(&m_fem);
+	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(&fem);
 	pbd->SetMaterial(pm);
 	pbd->create(2);
 	mesh.AddDomain(pbd);
@@ -179,7 +184,7 @@ bool FEContactDiagnostic::Init()
 	el1.m_node[7] = 15;
 
 	// --- create the sliding interface ---
-	FESlidingInterface* ps = new FESlidingInterface(&m_fem);
+	FESlidingInterface* ps = new FESlidingInterface(&fem);
 	ps->m_atol = 0.1;
 	ps->m_eps = 1;
 	ps->m_btwo_pass = false;
@@ -198,10 +203,10 @@ bool FEContactDiagnostic::Init()
 	ss.Element(0).m_node[1] = 10;
 	ss.Element(0).m_node[2] = 9;
 	ss.Element(0).m_node[3] = 8;
-	m_fem.AddSurfacePairInteraction(ps);
+	fem.AddSurfacePairInteraction(ps);
 
 	// --- set fem data ---
-	m_fem.m_nsolver = LU_SOLVER;	// make sure we have the LU solver
+	fem.m_nsolver = LU_SOLVER;	// make sure we have the LU solver
 
 	return FEDiagnostic::Init();
 }
@@ -210,18 +215,19 @@ bool FEContactDiagnostic::Init()
 void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 {
 	// get the solver
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	FEModel& fem = GetFEModel();
+	FEAnalysis* pstep = fem.GetCurrentStep();
 	FESolidSolver& solver = static_cast<FESolidSolver&>(*pstep->m_psolver);
 
 	// get the mesh
-	FEMesh& mesh = m_fem.GetMesh();
+	FEMesh& mesh = fem.GetMesh();
 
 	solver.UpdateContact();
 
 	// first calculate the initial residual
 	vector<double> R0; R0.assign(48, 0);
 	vector<double> dummy(R0);
-	FEResidualVector RHS0(m_fem, R0, dummy);
+	FEResidualVector RHS0(fem, R0, dummy);
 	solver.ContactForces(RHS0);
 //	solver.Residual(RHS);
 
@@ -247,7 +253,7 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 		solver.UpdateContact();
 
 		zero(R1);
-		FEResidualVector RHS1(m_fem, R1, dummy);
+		FEResidualVector RHS1(fem, R1, dummy);
 		solver.ContactForces(RHS1);
 //		solver.Residual(R1);
 
