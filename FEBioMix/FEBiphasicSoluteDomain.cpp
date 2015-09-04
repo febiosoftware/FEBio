@@ -30,58 +30,6 @@ bool FEBiphasicSoluteDomain::Initialize(FEModel &fem)
 		FESolidElement& el = m_Elem[i];
 		for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
 	}
-	
-    const int NE = FEElement::MAX_NODES;
-    double p0[NE], c0[NE];
-    FEMesh& m = *GetMesh();
-    
-    int id0 = m_pMat->GetSolute()->GetSoluteID();
-    
-    for (int i=0; i<(int) m_Elem.size(); ++i)
-    {
-        // get the solid element
-        FESolidElement& el = m_Elem[i];
-        
-        // get the number of nodes
-        int neln = el.Nodes();
-        // get initial values of fluid pressure and solute concentrations
-        for (int i=0; i<neln; ++i)
-        {
-            p0[i] = m.Node(el.m_node[i]).m_p0;
-            c0[i] = m.Node(el.m_node[i]).m_c0[id0];
-        }
-        
-        // get the number of integration points
-        int nint = el.GaussPoints();
-        
-        // loop over the integration points
-        for (int n=0; n<nint; ++n)
-        {
-            FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-            FEElasticMaterialPoint& pm = *(mp.ExtractData<FEElasticMaterialPoint>());
-            FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-            FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
-            
-            // initialize effective fluid pressure, its gradient, and fluid flux
-            pt.m_p = el.Evaluate(p0, n);
-            pt.m_gradp = gradient(el, p0, n);
-            pt.m_w = m_pMat->FluidFlux(mp);
-            
-            // initialize effective solute concentrations
-            ps.m_c[0] = el.Evaluate(c0, n);
-            ps.m_gradc[0] = gradient(el, c0, n);
-            ps.m_ca[0] = m_pMat->Concentration(mp);
-            ps.m_j[0] = m_pMat->SoluteFlux(mp);
-            ps.m_crp[0] = pm.m_J*m_pMat->Porosity(mp)*ps.m_ca[0];
-            pt.m_pa = m_pMat->Pressure(mp);
-            
-            // initialize referential solid volume fraction
-            pt.m_phi0 = m_pMat->m_phi0;
-            
-            // calculate stress
-            pm.m_s = m_pMat->Stress(mp);
-        }
-    }
     
 	return true;
 }
@@ -105,6 +53,59 @@ void FEBiphasicSoluteDomain::Activate()
 
 			node.m_ID[DOF_P] = DOF_ACTIVE;
 			node.m_ID[dofc ] = DOF_ACTIVE;
+		}
+	}
+
+	const int NE = FEElement::MAX_NODES;
+	double p0[NE], c0[NE];
+	FEMesh& m = *GetMesh();
+
+	int id0 = m_pMat->GetSolute()->GetSoluteID();
+
+	for (int i = 0; i<(int)m_Elem.size(); ++i)
+	{
+		// get the solid element
+		FESolidElement& el = m_Elem[i];
+
+		// get the number of nodes
+		int neln = el.Nodes();
+		// get initial values of fluid pressure and solute concentrations
+		for (int i = 0; i<neln; ++i)
+		{
+			p0[i] = m.Node(el.m_node[i]).m_p0;
+			//			c0[i] = m.Node(el.m_node[i]).m_c0[id0];
+			c0[i] = m.Node(el.m_node[i]).m_ct[id0];
+		}
+
+		// get the number of integration points
+		int nint = el.GaussPoints();
+
+		// loop over the integration points
+		for (int n = 0; n<nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FEElasticMaterialPoint& pm = *(mp.ExtractData<FEElasticMaterialPoint>());
+			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+			FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
+
+			// initialize effective fluid pressure, its gradient, and fluid flux
+			pt.m_p = el.Evaluate(p0, n);
+			pt.m_gradp = gradient(el, p0, n);
+			pt.m_w = m_pMat->FluidFlux(mp);
+
+			// initialize effective solute concentrations
+			ps.m_c[0] = el.Evaluate(c0, n);
+			ps.m_gradc[0] = gradient(el, c0, n);
+			ps.m_ca[0] = m_pMat->Concentration(mp);
+			ps.m_j[0] = m_pMat->SoluteFlux(mp);
+			ps.m_crp[0] = pm.m_J*m_pMat->Porosity(mp)*ps.m_ca[0];
+			pt.m_pa = m_pMat->Pressure(mp);
+
+			// initialize referential solid volume fraction
+			pt.m_phi0 = m_pMat->m_phi0;
+
+			// calculate stress
+			pm.m_s = m_pMat->Stress(mp);
 		}
 	}
 }

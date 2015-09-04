@@ -121,6 +121,9 @@ bool FEAnalysis::Activate()
 	for (int i=0; i<ndom; ++i) AddDomain(i);
 
 	// activate the model components assigned to this step
+	// NOTE: This currently does not ensure that initial conditions are
+	// applied first. This is important since relative prescribed displacements must 
+	// be applied after initial conditions.
 	for (int i=0; i<(int) m_MC.size(); ++i) m_MC[i]->Activate();
 
 	// Next, we need to determine which degrees of freedom are active. 
@@ -133,6 +136,8 @@ bool FEAnalysis::Activate()
 
 	// Then, we activate the domains.
 	// This will activate the relevant degrees of freedom
+	// NOTE: this must be done after the model components are activated.
+	// This is to make sure that all initial and prescribed values are applied.
 	for (int i=0; i<mesh.Domains(); ++i)
 	{
 		FEDomain& dom = mesh.Domain(i);

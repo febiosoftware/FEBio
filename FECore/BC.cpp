@@ -203,15 +203,15 @@ void FEPrescribedBC::Activate()
 		case DOF_X: m_r = (m_br ? node.m_rt.x - node.m_r0.x : 0); break;
 		case DOF_Y: m_r = (m_br ? node.m_rt.y - node.m_r0.y : 0); break;
 		case DOF_Z: m_r = (m_br ? node.m_rt.z - node.m_r0.z : 0); break;
-		case DOF_U: m_r = (m_br ? node.m_Dt.x - node.m_D0.x : 0); break;
-		case DOF_V: m_r = (m_br ? node.m_Dt.y - node.m_D0.y : 0); break;
-		case DOF_W: m_r = (m_br ? node.m_Dt.z - node.m_D0.z : 0); break;
-		case DOF_T: m_r = (m_br ? node.m_T - node.m_T0 : 0); break;
-		case DOF_P: m_r = (m_br ? node.m_pt - node.m_p0 : 0); break;
+		case DOF_U: m_r = (m_br ? node.m_Dt.x: 0); break;
+		case DOF_V: m_r = (m_br ? node.m_Dt.y: 0); break;
+		case DOF_W: m_r = (m_br ? node.m_Dt.z: 0); break;
+		case DOF_T: m_r = (m_br ? node.m_T   : 0); break;
+		case DOF_P: m_r = (m_br ? node.m_pt  : 0); break;
 		default:	// all prescribed concentrations
 			if ((m_dof >= DOF_C) && (m_dof < (int)node.m_ID.size())) {
 				int sid = m_dof - DOF_C;
-				m_r = (m_br ? node.m_ct[sid] - node.m_c0[sid] : 0);
+				m_r = (m_br ? node.m_ct[sid] : 0);
 			}
 		}
 	}
@@ -440,7 +440,7 @@ void FEInitialConcentration::Activate()
 	for (size_t i=0; i<m_item.size(); ++i)
 	{
 		FENode& node = mesh.Node(m_item[i].nid);
-		node.m_ct[m_nsol] = node.m_c0[m_nsol] = m_item[i].c0;
+		node.m_ct[m_nsol] = m_item[i].c0;
 	}
 }
 

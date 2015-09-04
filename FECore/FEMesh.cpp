@@ -29,7 +29,6 @@ FENode::FENode()
     int MAX_NDOFS = fedofs.GetNDOFS();
     int MAX_CDOFS = fedofs.GetCDOFS();
     
-    m_c0.assign(MAX_CDOFS, 0);
     m_ct.assign(MAX_CDOFS, 0);
     m_cp.assign(MAX_CDOFS, 0);
 
@@ -65,7 +64,6 @@ FENode::FENode(const FENode& n)
 	m_pt = n.m_pt;
 	m_T  = n.m_T;
 	m_T0 = n.m_T0;
-	m_c0 = n.m_c0;
 	m_ct = n.m_ct;
 	m_cp = n.m_cp;
 
@@ -94,7 +92,6 @@ FENode& FENode::operator = (const FENode& n)
 	m_pt = n.m_pt;
 	m_T  = n.m_T;
 	m_T0 = n.m_T0;
-	m_c0 = n.m_c0;
 	m_ct = n.m_ct;
 	m_cp = n.m_cp;
 
@@ -221,7 +218,6 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 			dmp << nd.m_D0 << nd.m_Dt;
 			dmp << nd.m_p0 << nd.m_pt;
 			dmp << nd.m_T;
-			dmp << nd.m_c0;
 			dmp << nd.m_ct;
 			dmp << nd.m_cp;
 		}
@@ -239,7 +235,6 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 			dmp >> nd.m_D0 >> nd.m_Dt;
 			dmp >> nd.m_p0 >> nd.m_pt;
 			dmp >> nd.m_T;
-			dmp >> nd.m_c0;
 			dmp >> nd.m_ct;
 			dmp >> nd.m_cp;
 		}
@@ -507,7 +502,7 @@ void FEMesh::Reset()
 		
 		int cdofs = (int) node.m_ct.size();
 		for (int k=0; k<cdofs; ++k)
-			node.m_ct[k] = node.m_cp[k] = node.m_c0[k];
+			node.m_ct[k] = node.m_cp[k] = 0.0;
 		
 		node.m_T = node.m_T0;
 

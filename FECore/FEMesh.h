@@ -116,7 +116,6 @@ public:
 	double	m_T0;	//!< initial temperature
 
 	// solute-data
-	vector<double>	m_c0;	//!< initial effective concentration
 	vector<double>	m_ct;	//!< current effective concentration
 	vector<double>	m_cp;	//!< effective concentration at previous time step
 	

@@ -81,11 +81,24 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 		}
 		else if (tag == "concentration")
 		{
+			FEInitialConcentration* pic = new FEInitialConcentration(&fem);
+			fem.AddInitialCondition(pic);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddModelComponent(pic);
+				pic->Deactivate();
+			}
+
 			int isol = 0;
 			const char* sz = tag.AttributeValue("sol", true);
 			if (sz) isol = atoi(sz) - 1;
 			if ((isol < 0) || (isol >= MAX_CDOFS))
 				throw XMLReader::InvalidAttributeValue(tag, "sol", sz);
+
+			pic->SetSoluteID(isol);
+
 			++tag;
 			do
 			{
@@ -94,7 +107,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 					int nid = atoi(tag.AttributeValue("id"))-1;
 					double c;
 					m_pim->value(tag, c);
-					mesh.Node(nid).m_c0[isol] += c;
+					pic->Add(nid, c);
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;

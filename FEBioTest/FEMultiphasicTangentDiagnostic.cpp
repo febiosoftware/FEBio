@@ -67,7 +67,7 @@ bool FEMultiphasicTangentUniaxial::Init()
         n.m_rt = n.m_rp = n.m_r0 = r[i];
         n.m_pt = n.m_p0 = pe;
         for (isol=0; isol<nsol; ++isol) {
-            n.m_ct[isol] = n.m_cp[isol] = n.m_c0[isol] = m_concentration;
+            n.m_ct[isol] = n.m_cp[isol] = m_concentration;
         }
         n.m_rid = -1;
         
