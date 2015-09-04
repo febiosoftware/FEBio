@@ -30,34 +30,10 @@
     <ClInclude Include="..\FEBio2\FEBioStdSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\FEBio2\FEContactDiagnostic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\FEBio2\FEDiagnostic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\FEBio2\FEMemoryDiagnostic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\FEBio2\FEPrintHBMatrixDiagnostic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\FEBio2\FEPrintMatrixDiagnostic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\FEBio2\FETangentDiagnostic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\FEBio2\Interrupt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\FEBio2\stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\FEBio2\FEBiphasicTangentDiagnostic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\FEBio2\FEMultiphasicTangentDiagnostic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -66,9 +42,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\FEBio2\console.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\FEBio2\diagnose.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\FEBio2\FEBio.cpp">
@@ -80,34 +53,10 @@
     <ClCompile Include="..\FEBio2\FEBioStdSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\FEBio2\FEContactDiagnostic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\FEBio2\FEDiagnostic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\FEBio2\FEMemoryDiagnostic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\FEBio2\FEPrintHBMatrixDiagnostic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\FEBio2\FEPrintMatrixDiagnostic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\FEBio2\FETangentDiagnostic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\FEBio2\Interrupt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\FEBio2\stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\FEBio2\FEBiphasicTangentDiagnostic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\FEBio2\FEMultiphasicTangentDiagnostic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

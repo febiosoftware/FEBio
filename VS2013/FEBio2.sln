@@ -34,6 +34,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FEBioXML", "FEBioXML\FEBioX
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FEBioLib", "FEBioLib\FEBioLib.vcxproj", "{C321376E-732A-42C1-9893-3685EF281D20}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FEBioTest", "FEBioTest\FEBioTest.vcxproj", "{C12C2407-0C93-47A6-8C8C-3D78BCE713C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug OMP|Win32 = Debug OMP|Win32
@@ -164,6 +166,15 @@ Global
 		{C321376E-732A-42C1-9893-3685EF281D20}.Release|Win32.Build.0 = Release|Win32
 		{C321376E-732A-42C1-9893-3685EF281D20}.Release|x64.ActiveCfg = Release|x64
 		{C321376E-732A-42C1-9893-3685EF281D20}.Release|x64.Build.0 = Release|x64
+		{C12C2407-0C93-47A6-8C8C-3D78BCE713C0}.Debug OMP|Win32.ActiveCfg = Debug|Win32
+		{C12C2407-0C93-47A6-8C8C-3D78BCE713C0}.Debug OMP|Win32.Build.0 = Debug|Win32
+		{C12C2407-0C93-47A6-8C8C-3D78BCE713C0}.Debug OMP|x64.ActiveCfg = Debug|Win32
+		{C12C2407-0C93-47A6-8C8C-3D78BCE713C0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C12C2407-0C93-47A6-8C8C-3D78BCE713C0}.Debug|Win32.Build.0 = Debug|Win32
+		{C12C2407-0C93-47A6-8C8C-3D78BCE713C0}.Debug|x64.ActiveCfg = Debug|Win32
+		{C12C2407-0C93-47A6-8C8C-3D78BCE713C0}.Release|Win32.ActiveCfg = Release|Win32
+		{C12C2407-0C93-47A6-8C8C-3D78BCE713C0}.Release|Win32.Build.0 = Release|Win32
+		{C12C2407-0C93-47A6-8C8C-3D78BCE713C0}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
