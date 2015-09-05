@@ -19,7 +19,6 @@
 FENode::FENode()
 {
 	// initialize nodal data
-	m_p0 = 0;
 	m_pt = 0;
 	m_T = 0;
 	m_T0 = 0;
@@ -60,7 +59,6 @@ FENode::FENode(const FENode& n)
 	m_Fr = n.m_Fr;
 	m_D0 = n.m_D0;
 	m_Dt = n.m_Dt;
-	m_p0 = n.m_p0;
 	m_pt = n.m_pt;
 	m_T  = n.m_T;
 	m_T0 = n.m_T0;
@@ -88,7 +86,6 @@ FENode& FENode::operator = (const FENode& n)
 	m_Fr = n.m_Fr;
 	m_D0 = n.m_D0;
 	m_Dt = n.m_Dt;
-	m_p0 = n.m_p0;
 	m_pt = n.m_pt;
 	m_T  = n.m_T;
 	m_T0 = n.m_T0;
@@ -216,7 +213,7 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 			dmp << nd.m_rp << nd.m_vp << nd.m_ap;
 			dmp << nd.m_Fr;
 			dmp << nd.m_D0 << nd.m_Dt;
-			dmp << nd.m_p0 << nd.m_pt;
+			dmp << nd.m_pt;
 			dmp << nd.m_T;
 			dmp << nd.m_ct;
 			dmp << nd.m_cp;
@@ -233,7 +230,7 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 			dmp >> nd.m_rp >> nd.m_vp >> nd.m_ap;
 			dmp >> nd.m_Fr;
 			dmp >> nd.m_D0 >> nd.m_Dt;
-			dmp >> nd.m_p0 >> nd.m_pt;
+			dmp >> nd.m_pt;
 			dmp >> nd.m_T;
 			dmp >> nd.m_ct;
 			dmp >> nd.m_cp;
@@ -498,7 +495,7 @@ void FEMesh::Reset()
 		node.m_vp = node.m_vt = vec3d(0,0,0);
 		node.m_ap = node.m_at = vec3d(0,0,0);
 
-		node.m_pt = node.m_p0;
+		node.m_pt = 0;
 		
 		int cdofs = (int) node.m_ct.size();
 		for (int k=0; k<cdofs; ++k)

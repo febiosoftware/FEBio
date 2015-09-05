@@ -376,7 +376,7 @@ void FEInitialPressure::Activate()
 	for (size_t i=0; i<m_item.size(); ++i)
 	{
 		FENode& node = mesh.Node(m_item[i].nid);
-		node.m_pt = node.m_p0 = m_item[i].p0;
+		node.m_pt = m_item[i].p0;
 	}
 }
 

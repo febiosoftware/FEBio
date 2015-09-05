@@ -72,8 +72,9 @@ void FEBiphasicSoluteDomain::Activate()
 		// get initial values of fluid pressure and solute concentrations
 		for (int i = 0; i<neln; ++i)
 		{
-			p0[i] = m.Node(el.m_node[i]).m_p0;
-			//			c0[i] = m.Node(el.m_node[i]).m_c0[id0];
+			// p0[i] = m.Node(el.m_node[i]).m_p0;
+			// c0[i] = m.Node(el.m_node[i]).m_c0[id0];
+			p0[i] = m.Node(el.m_node[i]).m_pt;
 			c0[i] = m.Node(el.m_node[i]).m_ct[id0];
 		}
 

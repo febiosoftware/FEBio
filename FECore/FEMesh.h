@@ -108,7 +108,6 @@ public:
 	vec3d	m_Dt;	//!< current director
 
 	// poroelasticity-data
-	double	m_p0;	//!< initial pressure
 	double	m_pt;	//!< current pressure
 
 	// heat-conduction data

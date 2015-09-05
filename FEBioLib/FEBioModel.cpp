@@ -591,7 +591,6 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 			ar << node.m_Dt;
 			ar << node.m_Fr;
 			ar << node.m_ID;
-			ar << node.m_p0;
 			ar << node.m_pt;
 			ar << node.m_r0;
 			ar << node.m_rid;
@@ -646,7 +645,6 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 			ar >> node.m_Dt;
 			ar >> node.m_Fr;
 			ar >> node.m_ID;
-			ar >> node.m_p0;
 			ar >> node.m_pt;
 			ar >> node.m_r0;
 			ar >> node.m_rid;

@@ -53,7 +53,7 @@ bool FEBiphasicTangentUniaxial::Init()
     {
         FENode& n = m.Node(i);
         n.m_rt = n.m_r0 = r[i];
-        n.m_pt = n.m_p0 = 0;
+        n.m_pt = 0;
         n.m_rid = -1;
         
         // set displacement BC's
