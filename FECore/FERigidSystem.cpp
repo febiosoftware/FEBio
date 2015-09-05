@@ -212,7 +212,10 @@ bool FERigidSystem::CreateObjects()
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		if (node.m_rid >= 0) node.m_rid = mrb[ node.m_rid ];
+		if (node.m_rid >= 0) 
+		{
+			node.m_rid = mrb[ node.m_rid ];
+		}
 	}
 
 	// Ok, we now know how many rigid bodies there are

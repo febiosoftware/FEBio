@@ -207,10 +207,6 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 			tag.AttributeValue("lc", obj.m_nlc);
 			obj.m_nlc--;
 
-			// find the variable
-			obj.m_pd = fem.FindParameter(obj.m_szname);
-			if (obj.m_pd == 0) throw InvalidVariableName(obj.m_szname);
-
 			opt.SetObjective(obj);
 		}
 		else throw XMLReader::InvalidTag(tag);
@@ -435,7 +431,14 @@ bool FEOptimizeData::Init()
 	if (m_pTask == 0) m_pTask = fecore_new<FECoreTask>(FETASK_ID, "solve", &m_fem);
 
 	// do the initialization of the task
-	return m_pTask->Init(0);
+	if (m_pTask->Init(0) == false) return false;
+
+	// find the variable
+	OPT_OBJECTIVE& obj = GetObjective();
+	obj.m_pd = m_fem.FindParameter(obj.m_szname);
+	if (obj.m_pd == 0) return false;
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
