@@ -10,21 +10,13 @@
 		B489C45A1B18E1F500E5AD7F /* febio.xml in Copy Files */ = {isa = PBXBuildFile; fileRef = B489C4591B18E1F500E5AD7F /* febio.xml */; };
 		D5307A4518B40934008C8463 /* libFEBioOpt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5307A4418B40934008C8463 /* libFEBioOpt.a */; };
 		D5307A4B18B40AB0008C8463 /* liblevmar.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5307A4A18B40AB0008C8463 /* liblevmar.a */; };
+		D53D74FB1B9BCAF100A770B5 /* libFEBioTest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D53D74FA1B9BCAF100A770B5 /* libFEBioTest.a */; };
 		D5AC350D19B9454B003D048C /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5AC350C19B9454B003D048C /* libgsl.a */; };
-		D5CCDAFC1B86761600B1B3B0 /* FEBiphasicTangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CCDAFA1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.cpp */; };
-		D5CCDB031B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CCDB011B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.cpp */; };
 		D5E10B921865E24900B23922 /* CommandManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B751865E24900B23922 /* CommandManager.cpp */; };
 		D5E10B931865E24900B23922 /* console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B771865E24900B23922 /* console.cpp */; };
-		D5E10B941865E24900B23922 /* diagnose.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B791865E24900B23922 /* diagnose.cpp */; };
 		D5E10B951865E24900B23922 /* FEBio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B7A1865E24900B23922 /* FEBio.cpp */; };
 		D5E10B961865E24900B23922 /* FEBioCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B7C1865E24900B23922 /* FEBioCommand.cpp */; };
 		D5E10B971865E24900B23922 /* FEBioStdSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B7E1865E24900B23922 /* FEBioStdSolver.cpp */; };
-		D5E10B981865E24900B23922 /* FEContactDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B801865E24900B23922 /* FEContactDiagnostic.cpp */; };
-		D5E10B991865E24900B23922 /* FEDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B821865E24900B23922 /* FEDiagnostic.cpp */; };
-		D5E10B9A1865E24900B23922 /* FEMemoryDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B841865E24900B23922 /* FEMemoryDiagnostic.cpp */; };
-		D5E10B9B1865E24900B23922 /* FEPrintHBMatrixDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B861865E24900B23922 /* FEPrintHBMatrixDiagnostic.cpp */; };
-		D5E10B9C1865E24900B23922 /* FEPrintMatrixDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B881865E24900B23922 /* FEPrintMatrixDiagnostic.cpp */; };
-		D5E10B9D1865E24900B23922 /* FETangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B8A1865E24900B23922 /* FETangentDiagnostic.cpp */; };
 		D5E10B9E1865E24900B23922 /* Interrupt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B8C1865E24900B23922 /* Interrupt.cpp */; };
 		D5E10BA01865E24900B23922 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B901865E24900B23922 /* stdafx.cpp */; };
 		D5FB050918A5B053004E688A /* libFEBioPlot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB050818A5B053004E688A /* libFEBioPlot.a */; };
@@ -55,36 +47,20 @@
 		B489C4591B18E1F500E5AD7F /* febio.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = febio.xml; path = ../../build/bin/febio.xml; sourceTree = "<group>"; };
 		D5307A4418B40934008C8463 /* libFEBioOpt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFEBioOpt.a; path = ../FEBioOpt/build/Debug/libFEBioOpt.a; sourceTree = "<group>"; };
 		D5307A4A18B40AB0008C8463 /* liblevmar.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblevmar.a; path = ../../../../../../../../../../../usr/local/lib/liblevmar.a; sourceTree = "<group>"; };
+		D53D74FA1B9BCAF100A770B5 /* libFEBioTest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFEBioTest.a; path = ../FEBioTest/build/Debug/libFEBioTest.a; sourceTree = "<group>"; };
 		D53FF8D51865F9F900CE43E4 /* febio.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = febio.xml; path = ../../../FEBio/bin/febio.xml; sourceTree = "<group>"; };
 		D5AC350C19B9454B003D048C /* libgsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgsl.a; path = ../../../../../../../../../../usr/local/lib/libgsl.a; sourceTree = "<group>"; };
-		D5CCDAFA1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicTangentDiagnostic.cpp; sourceTree = "<group>"; };
-		D5CCDAFB1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicTangentDiagnostic.h; sourceTree = "<group>"; };
-		D5CCDB011B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicTangentDiagnostic.cpp; sourceTree = "<group>"; };
-		D5CCDB021B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicTangentDiagnostic.h; sourceTree = "<group>"; };
 		D5E10B671865E23500B23922 /* FEBio2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FEBio2; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E10B741865E24900B23922 /* Command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Command.h; sourceTree = "<group>"; };
 		D5E10B751865E24900B23922 /* CommandManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommandManager.cpp; sourceTree = "<group>"; };
 		D5E10B761865E24900B23922 /* CommandManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandManager.h; sourceTree = "<group>"; };
 		D5E10B771865E24900B23922 /* console.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = console.cpp; sourceTree = "<group>"; };
 		D5E10B781865E24900B23922 /* console.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = console.h; sourceTree = "<group>"; };
-		D5E10B791865E24900B23922 /* diagnose.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = diagnose.cpp; sourceTree = "<group>"; };
 		D5E10B7A1865E24900B23922 /* FEBio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBio.cpp; sourceTree = "<group>"; };
 		D5E10B7C1865E24900B23922 /* FEBioCommand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioCommand.cpp; sourceTree = "<group>"; };
 		D5E10B7D1865E24900B23922 /* FEBioCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioCommand.h; sourceTree = "<group>"; };
 		D5E10B7E1865E24900B23922 /* FEBioStdSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioStdSolver.cpp; sourceTree = "<group>"; };
 		D5E10B7F1865E24900B23922 /* FEBioStdSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioStdSolver.h; sourceTree = "<group>"; };
-		D5E10B801865E24900B23922 /* FEContactDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactDiagnostic.cpp; sourceTree = "<group>"; };
-		D5E10B811865E24900B23922 /* FEContactDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEContactDiagnostic.h; sourceTree = "<group>"; };
-		D5E10B821865E24900B23922 /* FEDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDiagnostic.cpp; sourceTree = "<group>"; };
-		D5E10B831865E24900B23922 /* FEDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDiagnostic.h; sourceTree = "<group>"; };
-		D5E10B841865E24900B23922 /* FEMemoryDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMemoryDiagnostic.cpp; sourceTree = "<group>"; };
-		D5E10B851865E24900B23922 /* FEMemoryDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMemoryDiagnostic.h; sourceTree = "<group>"; };
-		D5E10B861865E24900B23922 /* FEPrintHBMatrixDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPrintHBMatrixDiagnostic.cpp; sourceTree = "<group>"; };
-		D5E10B871865E24900B23922 /* FEPrintHBMatrixDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPrintHBMatrixDiagnostic.h; sourceTree = "<group>"; };
-		D5E10B881865E24900B23922 /* FEPrintMatrixDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPrintMatrixDiagnostic.cpp; sourceTree = "<group>"; };
-		D5E10B891865E24900B23922 /* FEPrintMatrixDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPrintMatrixDiagnostic.h; sourceTree = "<group>"; };
-		D5E10B8A1865E24900B23922 /* FETangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETangentDiagnostic.cpp; sourceTree = "<group>"; };
-		D5E10B8B1865E24900B23922 /* FETangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETangentDiagnostic.h; sourceTree = "<group>"; };
 		D5E10B8C1865E24900B23922 /* Interrupt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Interrupt.cpp; sourceTree = "<group>"; };
 		D5E10B8D1865E24900B23922 /* Interrupt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Interrupt.h; sourceTree = "<group>"; };
 		D5E10B901865E24900B23922 /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stdafx.cpp; sourceTree = "<group>"; };
@@ -115,6 +91,7 @@
 				D5FB051A18A5B1EB004E688A /* libFECore.a in Frameworks */,
 				D5FB051B18A5B1EB004E688A /* libNumCore.a in Frameworks */,
 				D5FB050918A5B053004E688A /* libFEBioPlot.a in Frameworks */,
+				D53D74FB1B9BCAF100A770B5 /* libFEBioTest.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -124,6 +101,7 @@
 		D5E10B5E1865E23500B23922 = {
 			isa = PBXGroup;
 			children = (
+				D53D74FA1B9BCAF100A770B5 /* libFEBioTest.a */,
 				B489C4591B18E1F500E5AD7F /* febio.xml */,
 				D5AC350C19B9454B003D048C /* libgsl.a */,
 				D5307A4A18B40AB0008C8463 /* liblevmar.a */,
@@ -158,28 +136,11 @@
 				D5E10B761865E24900B23922 /* CommandManager.h */,
 				D5E10B771865E24900B23922 /* console.cpp */,
 				D5E10B781865E24900B23922 /* console.h */,
-				D5E10B791865E24900B23922 /* diagnose.cpp */,
 				D5E10B7A1865E24900B23922 /* FEBio.cpp */,
 				D5E10B7C1865E24900B23922 /* FEBioCommand.cpp */,
 				D5E10B7D1865E24900B23922 /* FEBioCommand.h */,
 				D5E10B7E1865E24900B23922 /* FEBioStdSolver.cpp */,
 				D5E10B7F1865E24900B23922 /* FEBioStdSolver.h */,
-				D5CCDAFA1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.cpp */,
-				D5CCDAFB1B86761500B1B3B0 /* FEBiphasicTangentDiagnostic.h */,
-				D5E10B801865E24900B23922 /* FEContactDiagnostic.cpp */,
-				D5E10B811865E24900B23922 /* FEContactDiagnostic.h */,
-				D5E10B821865E24900B23922 /* FEDiagnostic.cpp */,
-				D5E10B831865E24900B23922 /* FEDiagnostic.h */,
-				D5E10B841865E24900B23922 /* FEMemoryDiagnostic.cpp */,
-				D5E10B851865E24900B23922 /* FEMemoryDiagnostic.h */,
-				D5CCDB011B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.cpp */,
-				D5CCDB021B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.h */,
-				D5E10B861865E24900B23922 /* FEPrintHBMatrixDiagnostic.cpp */,
-				D5E10B871865E24900B23922 /* FEPrintHBMatrixDiagnostic.h */,
-				D5E10B881865E24900B23922 /* FEPrintMatrixDiagnostic.cpp */,
-				D5E10B891865E24900B23922 /* FEPrintMatrixDiagnostic.h */,
-				D5E10B8A1865E24900B23922 /* FETangentDiagnostic.cpp */,
-				D5E10B8B1865E24900B23922 /* FETangentDiagnostic.h */,
 				D5E10B8C1865E24900B23922 /* Interrupt.cpp */,
 				D5E10B8D1865E24900B23922 /* Interrupt.h */,
 				D5E10B901865E24900B23922 /* stdafx.cpp */,
@@ -241,20 +202,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				D5E10B921865E24900B23922 /* CommandManager.cpp in Sources */,
-				D5E10B9C1865E24900B23922 /* FEPrintMatrixDiagnostic.cpp in Sources */,
-				D5E10B991865E24900B23922 /* FEDiagnostic.cpp in Sources */,
-				D5CCDB031B87EA6800B1B3B0 /* FEMultiphasicTangentDiagnostic.cpp in Sources */,
-				D5E10B941865E24900B23922 /* diagnose.cpp in Sources */,
 				D5E10B931865E24900B23922 /* console.cpp in Sources */,
-				D5E10B981865E24900B23922 /* FEContactDiagnostic.cpp in Sources */,
 				D5E10B961865E24900B23922 /* FEBioCommand.cpp in Sources */,
-				D5E10B9B1865E24900B23922 /* FEPrintHBMatrixDiagnostic.cpp in Sources */,
 				D5E10BA01865E24900B23922 /* stdafx.cpp in Sources */,
-				D5CCDAFC1B86761600B1B3B0 /* FEBiphasicTangentDiagnostic.cpp in Sources */,
 				D5E10B9E1865E24900B23922 /* Interrupt.cpp in Sources */,
 				D5E10B971865E24900B23922 /* FEBioStdSolver.cpp in Sources */,
-				D5E10B9D1865E24900B23922 /* FETangentDiagnostic.cpp in Sources */,
-				D5E10B9A1865E24900B23922 /* FEMemoryDiagnostic.cpp in Sources */,
 				D5E10B951865E24900B23922 /* FEBio.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -308,7 +260,10 @@
 			buildSettings = {
 				GCC_VERSION = com.intel.compilers.icc.latest;
 				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/gerard/Documents/Programs/fem/FEBio/MRLProjects/FEBio2/XCode5/FEBioTest/build/Debug,
+				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					/opt/intel/lib/libiomp5.a,
@@ -416,7 +371,10 @@
 		D5E10B711865E23500B23922 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/gerard/Documents/Programs/fem/FEBio/MRLProjects/FEBio2/XCode5/FEBioTest/build/Debug,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -425,7 +383,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/gerard/Documents/Programs/fem/FEBio/MRLProjects/FEBio2/XCode5/FEBioTest/build/Debug,
+				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					/opt/intel/lib/libiomp5.a,
