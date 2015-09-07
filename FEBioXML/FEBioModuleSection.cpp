@@ -10,7 +10,8 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 	// get the type attribute
 	const char* szt = tag.AttributeValue("type");
 
-	if      (strcmp(szt, "solid"         ) == 0) m_pim->m_nstep_type = FE_SOLID;
+	if      (strcmp(szt, "solid_old"     ) == 0) m_pim->m_nstep_type = FE_SOLID;
+	else if (strcmp(szt, "solid"         ) == 0) m_pim->m_nstep_type = FE_SOLID2;
 	else if (strcmp(szt, "solid2"        ) == 0) m_pim->m_nstep_type = FE_SOLID2;
 	else if (strcmp(szt, "CG-solid"      ) == 0) m_pim->m_nstep_type = FE_CG_SOLID;
 	else if (strcmp(szt, "explicit-solid") == 0) m_pim->m_nstep_type = FE_EXPLICIT_SOLID;
