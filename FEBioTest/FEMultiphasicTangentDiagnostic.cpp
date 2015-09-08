@@ -61,14 +61,24 @@ bool FEMultiphasicTangentUniaxial::Init()
     // create the mesh
     FEMesh& m = fem.GetMesh();
     m.CreateNodes(8);
+
+	// add initial conditions
+	for (isol = 0; isol<nsol; ++isol) {
+		FEInitialConcentration* pic = new FEInitialConcentration(&fem);
+		pic->SetSoluteID(isol);
+		for (i=0; i<8; ++i) pic->Add(i, m_concentration);
+		fem.AddInitialCondition(pic);
+	}
+
+	FEInitialPressure* pip = new FEInitialPressure(&fem);
+	for (i=0; i<8; ++i) pip->Add(i, pe);
+	fem.AddInitialCondition(pip);
+
+	// add boundary conditions
     for (i=0; i<8; ++i)
     {
         FENode& n = m.Node(i);
         n.m_rt = n.m_rp = n.m_r0 = r[i];
-        n.m_pt = pe;
-        for (isol=0; isol<nsol; ++isol) {
-            n.m_ct[isol] = n.m_cp[isol] = m_concentration;
-        }
         n.m_rid = -1;
         
         // set displacement BC's
@@ -199,7 +209,11 @@ bool FEMultiphasicTangentDiagnostic::Run()
     // solve the problem
     felog.SetMode(Logfile::NEVER);
 	FEModel& fem = GetFEModel();
-    fem.Solve();
+    if (fem.Solve() == false)
+	{
+		felog.SetMode(oldmode);
+		return false;
+	}
     felog.SetMode(Logfile::FILE_ONLY);
     
     // get the material
