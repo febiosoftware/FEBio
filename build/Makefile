@@ -51,6 +51,7 @@ endif
 	( cd $(PLAT)/FEBioMix;	$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FEBioMech;	$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FEBioOpt;	$(MAKE) -f ../../Makelibs.mk )
+	( cd $(PLAT)/FEBioTest;	$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FEBio2;	$(MAKE) -f ../../febio2.mk )
 
 lnx64clean lnx32clean osxclean lnx64dclean lnx64gclean gccclean gcc64clean gcc64gclean osxdclean skyclean:
@@ -63,6 +64,7 @@ lnx64clean lnx32clean osxclean lnx64dclean lnx64gclean gccclean gcc64clean gcc64
 	( cd $(PLAT)/FEBioMix;	$(MAKE) -f ../../Makelibs.mk clean )
 	( cd $(PLAT)/FEBioMech;	$(MAKE) -f ../../Makelibs.mk clean )
 	( cd $(PLAT)/FEBioOpt;	$(MAKE) -f ../../Makelibs.mk clean )
+	( cd $(PLAT)/FEBioTest;	$(MAKE) -f ../../Makelibs.mk clean )
 	( cd $(PLAT)/FEBio2;	$(MAKE) -f ../../febio2.mk clean )
 
 

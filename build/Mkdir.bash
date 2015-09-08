@@ -14,6 +14,7 @@ mkdir FEBioMech
 mkdir FEBioMix
 mkdir FEBioOpt
 mkdir FEBioPlot
+mkdir FEBioTest
 mkdir FEBioXML
 mkdir FECore
 mkdir NumCore

@@ -27,8 +27,8 @@ public: // overridden from FEElasticDomain
 	void MassMatrix(FESolver* psolver, double scale) {}
 	void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf) {}
 
-	//! Calculates inertial forces for dynamic problems
-	void InertialForces(FEGlobalVector& R, vector<double>& F) { assert(false); }
+	//! Calculates inertial forces for dynamic problems | todo implement (removed assert DSR)
+	void InertialForces(FEGlobalVector& R, vector<double>& F) { }
 
 	//! update stresses (not used for discrete springs)
 	void UpdateStresses(FEModel& fem){}	

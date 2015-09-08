@@ -36,8 +36,8 @@ public: // overrides from FEElasticDomain
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);
 
-	//! Calculates inertial forces for dynamic problems
-	void InertialForces(FEGlobalVector& R, vector<double>& F) { assert(false); }
+	//! Calculates inertial forces for dynamic problems | todo implement this (removed assert DSR)
+	void InertialForces(FEGlobalVector& R, vector<double>& F) { }
 
 	//! calculate body force
 	void BodyForce(FEGlobalVector& R, FEBodyForce& bf);
