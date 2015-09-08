@@ -637,7 +637,7 @@ void FEMicroMaterial2O::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp, ten
 
 	// get the solver
 	FEAnalysis* pstep = rve.GetCurrentStep();
-	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->m_psolver);
 
 	// the element's stiffness matrix
 	matrix ke;
@@ -1112,7 +1112,7 @@ void FEMicroMaterial2O::AveragedStress2OPK1(FEModel& rve, FEMaterialPoint &mp, m
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero). 
 	FEAnalysis* pstep = rve.GetCurrentStep();
-	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->m_psolver);
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 	int nbc = rve.PrescribedBCs();
@@ -1209,7 +1209,7 @@ void FEMicroMaterial2O::AveragedStress2OPK2(FEModel& rve, FEMaterialPoint &mp, m
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero). 
 	FEAnalysis* pstep = rve.GetCurrentStep();
-	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->m_psolver);
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 	int nbc = rve.PrescribedBCs();
