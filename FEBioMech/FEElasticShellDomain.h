@@ -48,8 +48,8 @@ public: // overrides from FEElasticDomain
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolver* psolver);
 
-	// inertial stiffness \todo implement this
-	void MassMatrix(FESolver* psolver, double scale) { assert(false); }
+	// inertial stiffness \todo implement this (removed assert DSR)
+	void MassMatrix(FESolver* psolver, double scale) { }
 
 	// body force stiffness \todo implement this
 	void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf) { assert(false); }
