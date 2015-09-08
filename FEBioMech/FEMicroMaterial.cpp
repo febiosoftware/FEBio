@@ -2,7 +2,7 @@
 #include "FEMicroMaterial.h"
 #include "FECore/FEElemElemList.h"
 #include "FECore/log.h"
-#include "FESolidSolver.h"
+#include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
 #include "FEBioXML/FEBioImport.h"
@@ -484,7 +484,7 @@ mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero). 
 	FEAnalysis* pstep = rve.GetCurrentStep();
-	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->m_psolver);
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 	int nbc = rve.PrescribedBCs();
@@ -513,7 +513,7 @@ tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
 
 	// get the solver
 	FEAnalysis* pstep = rve.GetCurrentStep();
-	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->m_psolver);
 
 	// the element's stiffness matrix
 	matrix ke;
@@ -786,7 +786,7 @@ mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero). 
 	FEAnalysis* pstep = rve.GetCurrentStep();
-	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->m_psolver);
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 	int nbc = rve.PrescribedBCs();
@@ -846,7 +846,7 @@ mat3ds FEMicroMaterial::AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp)
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero). 
 	FEAnalysis* pstep = rve.GetCurrentStep();
-	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->m_psolver);
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 	int nbc = rve.PrescribedBCs();

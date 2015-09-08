@@ -2,7 +2,7 @@
 #include "FEMicroMaterial2O.h"
 #include "FECore/FEElemElemList.h"
 #include "FECore/log.h"
-#include "FESolidSolver.h"
+#include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
 #include "FEBioXML/FEBioImport.h"
@@ -592,7 +592,7 @@ void FEMicroMaterial2O::AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero). 
 	FEAnalysis* pstep = rve.GetCurrentStep();
-	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->m_psolver);
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 	int nbc = rve.PrescribedBCs();
