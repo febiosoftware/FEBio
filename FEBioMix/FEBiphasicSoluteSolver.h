@@ -2,7 +2,7 @@
 #include "FEBiphasicSolver.h"
 
 //-----------------------------------------------------------------------------
-// This class adds additional functionality to the FESolidSolver to solve
+// This class adds additional functionality to the FEBiphasicSolver to solve
 // solute problems. 
 class FEBiphasicSoluteSolver : public FEBiphasicSolver
 {
@@ -30,7 +30,7 @@ public:
 	//! Calculates residual (overridden from FEBiphasicSolver)
 	virtual bool Residual(vector<double>& R);
 
-	//! calculates the global stiffness matrix (overridden from FESolidSolver)
+	//! calculates the global stiffness matrix (overridden from FESolidSolver2)
 	virtual bool StiffnessMatrix(const FETimePoint& tp);
 
 	//! update kinematics

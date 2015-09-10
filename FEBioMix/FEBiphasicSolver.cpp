@@ -25,13 +25,13 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FEBiphasicSolver, FESolidSolver)
+BEGIN_PARAMETER_LIST(FEBiphasicSolver, FESolidSolver2)
 	ADD_PARAMETER(m_Ptol         , FE_PARAM_DOUBLE, "ptol"        );
 	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_biphasic");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver(pfem)
+FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 {
 	m_Ptol = 0.01;
 	m_ndeq = 0;
@@ -44,7 +44,7 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver(pfem)
 bool FEBiphasicSolver::Init()
 {
 	// initialize base class
-	if (FESolidSolver::Init() == false) return false;
+	if (FESolidSolver2::Init() == false) return false;
 
 	// allocate poro-vectors
 	assert(m_ndeq > 0);
@@ -78,7 +78,7 @@ bool FEBiphasicSolver::Init()
 bool FEBiphasicSolver::InitEquations()
 {
 	// base class does most of the work
-	FESolidSolver::InitEquations();
+	FESolidSolver2::InitEquations();
 
 	int i;
 
@@ -110,7 +110,7 @@ void FEBiphasicSolver::PrepStep(double time)
 	zero(m_Pi);
 	zero(m_Di);
 
-	FESolidSolver::PrepStep(time);
+	FESolidSolver2::PrepStep(time);
 }
 
 //-----------------------------------------------------------------------------
@@ -688,12 +688,12 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 }
 
 //-----------------------------------------------------------------------------
-//! Update the model's kinematic data. This is overriden from FESolidSolver so
+//! Update the model's kinematic data. This is overriden from FESolidSolver2 so
 //! that biphasic data is updated
 void FEBiphasicSolver::UpdateKinematics(vector<double>& ui)
 {
 	// first update all solid-mechanics kinematics
-	FESolidSolver::UpdateKinematics(ui);
+	FESolidSolver2::UpdateKinematics(ui);
 
 	// update poroelastic data
 	UpdatePoro(ui);
@@ -752,7 +752,7 @@ void FEBiphasicSolver::UpdateContact()
 	}
 
 	// Update all contact interfaces
-	FESolidSolver::UpdateContact();
+	FESolidSolver2::UpdateContact();
 
 	if (bporo)
 	{
@@ -824,7 +824,7 @@ void FEBiphasicSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 
 void FEBiphasicSolver::Serialize(DumpFile& ar)
 {
-	FESolidSolver::Serialize(ar);
+	FESolidSolver2::Serialize(ar);
 
 	if (ar.IsSaving())
 	{

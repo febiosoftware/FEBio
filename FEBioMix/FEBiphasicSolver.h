@@ -1,11 +1,11 @@
 #pragma once
-#include "FEBioMech/FESolidSolver.h"
+#include "FEBioMech/FESolidSolver2.h"
 #include "FECore/FEElementTraits.h"
 
 //-----------------------------------------------------------------------------
 // This class adds additional functionality to the FESolidSolver to solve
 // biphasic problems. 
-class FEBiphasicSolver : public FESolidSolver
+class FEBiphasicSolver : public FESolidSolver2
 {
 public:
 	//! constructor
@@ -38,10 +38,10 @@ public:
 	void UpdatePoro(vector<double>& ui);
 
 public:
-	//! Calculates residual (overridden from FESolidSolver)
+	//! Calculates residual (overridden from FESolidSolver2)
 	virtual bool Residual(vector<double>& R);
 
-	//! calculates the global stiffness matrix (overridden from FESolidSolver)
+	//! calculates the global stiffness matrix (overridden from FESolidSolver2)
 	virtual bool StiffnessMatrix(const FETimePoint& tp);
 
 protected:

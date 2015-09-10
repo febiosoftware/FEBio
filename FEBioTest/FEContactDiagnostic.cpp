@@ -4,7 +4,7 @@
 
 #include "FEContactDiagnostic.h"
 #include "FEBioMech/FENeoHookean.h"
-#include "FEBioMech/FESolidSolver.h"
+#include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FESlidingInterface.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include "FEBioMech/FEResidualVector.h"
@@ -55,7 +55,7 @@ bool FEContactDiagnostic::Run()
 	// get the solver
 	FEModel& fem = GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	FESolidSolver& solver = static_cast<FESolidSolver&>(*pstep->m_psolver);
+	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->m_psolver);
 	solver.Init();
 
 	// make sure contact data is up to data
@@ -217,7 +217,7 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 	// get the solver
 	FEModel& fem = GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	FESolidSolver& solver = static_cast<FESolidSolver&>(*pstep->m_psolver);
+	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->m_psolver);
 
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();

@@ -4,6 +4,8 @@
 #include "FEBioXML/FileImport.h"
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioMech/FERigidJoint.h"
+#include "FEBioMech/FESolidSolver.h"
+#include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FERigidSphericalJoint.h"
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSoluteSolver.h"
@@ -173,6 +175,18 @@ void echo_input(FEBioModel& fem)
 		felog.printf("\tResidual convergence tolerance ................. : %lg\n", ps->m_Rtol);
 		felog.printf("\tMinimal residual value ......................... : %lg\n", ps->m_Rmin);
 	}
+	FESolidSolver2* ps2 = dynamic_cast<FESolidSolver2*>(step.m_psolver);
+	if (ps2)
+	{
+		felog.printf("\tMax nr of stiffness reformations ............... : %d\n", ps2->m_bfgs.m_maxref);
+		felog.printf("\tper time steps\n");
+		felog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", ps2->m_bfgs.m_maxups);
+		felog.printf("\tbetween stiffness matrix reformations\n");
+		felog.printf("\tDisplacement convergence tolerance ............. : %lg\n", ps2->m_Dtol);
+		felog.printf("\tEnergy convergence tolerance ................... : %lg\n", ps2->m_Etol);
+		felog.printf("\tResidual convergence tolerance ................. : %lg\n", ps2->m_Rtol);
+		felog.printf("\tMinimal residual value ......................... : %lg\n", ps2->m_Rmin);
+	}
 
 	FEBiphasicSolver* pps = dynamic_cast<FEBiphasicSolver*>(step.m_psolver);
 	if (pps) felog.printf("\tFluid pressure convergence tolerance ........... : %lg\n", pps->m_Ptol);
@@ -190,6 +204,14 @@ void echo_input(FEBioModel& fem)
 		felog.printf("\tMaximum number of line search iterations ....... : %d\n" , ps->m_bfgs.m_LSiter);
 		felog.printf("\tMax condition number ........................... : %lg\n", ps->m_bfgs.m_cmax  );
 	}
+	if (ps2)
+	{
+		felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", ps2->m_bfgs.m_LStol );
+		felog.printf("\tMinimum line search size ....................... : %lg\n", ps2->m_bfgs.m_LSmin );
+		felog.printf("\tMaximum number of line search iterations ....... : %d\n" , ps2->m_bfgs.m_LSiter);
+		felog.printf("\tMax condition number ........................... : %lg\n", ps2->m_bfgs.m_cmax  );
+	}
+
 	felog.printf("\n\n");
 
 

@@ -4,7 +4,7 @@
 
 #include "FETangentDiagnostic.h"
 #include "FEBioLib/FEBox.h"
-#include "FEBioMech/FESolidSolver.h"
+#include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include "FECore/log.h"
 
@@ -291,7 +291,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 	// get the solver
 	FEModel& fem = GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	FESolidSolver& solver = static_cast<FESolidSolver&>(*pstep->m_psolver);
+	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->m_psolver);
 
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();

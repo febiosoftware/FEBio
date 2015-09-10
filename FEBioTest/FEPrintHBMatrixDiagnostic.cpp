@@ -1,7 +1,7 @@
 // Implementation of the Harwell-Boeing Matrix Print Diagnostic
 
 #include "FEPrintHBMatrixDiagnostic.h"
-#include "FEBioMech/FESolidSolver.h"
+#include "FEBioMech/FESolidSolver2.h"
 #include "NumCore/CompactMatrix.h"
 
 //-----------------------------------------------------------------------------
@@ -69,7 +69,7 @@ bool FEPrintHBMatrixDiagnostic::Run()
 	pstep->Activate();
 
 	// get and initialize the FE solver
-	FESolidSolver& solver = static_cast<FESolidSolver&>(*pstep->m_psolver);
+	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->m_psolver);
 	solver.Init();
 
 	// build the stiffness matrix

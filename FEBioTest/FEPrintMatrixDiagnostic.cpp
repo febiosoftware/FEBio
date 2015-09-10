@@ -1,5 +1,5 @@
 #include "FEPrintMatrixDiagnostic.h"
-#include "FEBioMech/FESolidSolver.h"
+#include "FEBioMech/FESolidSolver2.h"
 #include <stdio.h>
 
 //-----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ bool FEPrintMatrixDiagnostic::Run()
 	pstep->Activate();
 
 	// get and initialize the solver
-	FESolidSolver& solver = static_cast<FESolidSolver&>(*pstep->m_psolver);
+	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->m_psolver);
 	solver.Init();
 
 	// build the stiffness matrix

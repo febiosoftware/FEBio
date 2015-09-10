@@ -30,14 +30,14 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FEMultiphasicSolver, FESolidSolver)
+BEGIN_PARAMETER_LIST(FEMultiphasicSolver, FESolidSolver2)
 	ADD_PARAMETER(m_Ptol         , FE_PARAM_DOUBLE, "ptol"        );
 	ADD_PARAMETER(m_Ctol         , FE_PARAM_DOUBLE, "ctol"        );
 	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_biphasic");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver(pfem)
+FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 {
 	m_Ctol = 0.01;
     
@@ -50,7 +50,7 @@ FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver(pfem)
 bool FEMultiphasicSolver::Init()
 {
 	// initialize base class
-	if (FESolidSolver::Init() == false) return false;
+	if (FESolidSolver2::Init() == false) return false;
 
 	// allocate poro-vectors
 	assert(m_ndeq > 0);
@@ -110,7 +110,7 @@ bool FEMultiphasicSolver::Init()
 bool FEMultiphasicSolver::InitEquations()
 {
 	// base class does most of the work
-	FESolidSolver::InitEquations();
+	FESolidSolver2::InitEquations();
 
 	// determined the nr of pressure and concentration equations
 	FEMesh& mesh = m_fem.GetMesh();
@@ -151,7 +151,7 @@ void FEMultiphasicSolver::PrepStep(double time)
 	zero(m_Pi);
 	zero(m_Di);
 
-	FESolidSolver::PrepStep(time);
+	FESolidSolver2::PrepStep(time);
 }
 
 //-----------------------------------------------------------------------------
@@ -867,7 +867,7 @@ void FEMultiphasicSolver::GetConcentrationData(vector<double> &ci, vector<double
 void FEMultiphasicSolver::UpdateKinematics(vector<double>& ui)
 {
 	// first update all solid-mechanics kinematics
-	FESolidSolver::UpdateKinematics(ui);
+	FESolidSolver2::UpdateKinematics(ui);
 
 	// update poroelastic data
 	UpdatePoro(ui);
@@ -966,7 +966,7 @@ void FEMultiphasicSolver::UpdateContact()
 	}
 
 	// Update all contact interfaces
-	FESolidSolver::UpdateContact();
+	FESolidSolver2::UpdateContact();
 
 	// set free-draining boundary conditions
 	for (int i=0; i<m_fem.SurfacePairInteractions(); ++i) 
@@ -987,7 +987,7 @@ void FEMultiphasicSolver::UpdateContact()
 
 void FEMultiphasicSolver::Serialize(DumpFile& ar)
 {
-	FESolidSolver::Serialize(ar);
+	FESolidSolver2::Serialize(ar);
 
 	if (ar.IsSaving())
 	{

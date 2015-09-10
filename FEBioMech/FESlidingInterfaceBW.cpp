@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "FESlidingInterfaceBW.h"
-#include "FESolidSolver.h"
 #include "FECore/FENormalProjection.h"
+#include "FECore/FEModel.h"
+#include "FEBioMech/FEStiffnessMatrix.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

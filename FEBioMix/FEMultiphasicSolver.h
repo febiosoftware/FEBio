@@ -2,9 +2,9 @@
 #include "FEBiphasicSolver.h"
 
 //-----------------------------------------------------------------------------
-// This class adds additional functionality to the FESolidSolver to solve
+// This class adds additional functionality to the FESolidSolver2 to solve
 // solute problems. 
-class FEMultiphasicSolver : public FESolidSolver
+class FEMultiphasicSolver : public FESolidSolver2
 {
 public:
 	//! con/descructor
@@ -40,10 +40,10 @@ public:
 	void UpdateSolute(vector<double>& ui);
 
 public:
-	//! Calculates residual (overridden from FESolidSolver)
+	//! Calculates residual (overridden from FESolidSolver2)
 	virtual bool Residual(vector<double>& R);
 
-	//! calculates the global stiffness matrix (overridden from FESolidSolver)
+	//! calculates the global stiffness matrix (overridden from FESolidSolver2)
 	virtual bool StiffnessMatrix(const FETimePoint& tp);
 
 protected:
