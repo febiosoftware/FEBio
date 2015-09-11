@@ -198,7 +198,11 @@ int FEBioCmd_Restart::run(int nargs, char **argv)
 
 int FEBioCmd_Version::run(int nargs, char **argv)
 {
+#ifdef _WIN64
+	printf("\nFEBio version %d.%d.%d (x64)\n", VERSION, SUBVERSION, SUBSUBVERSION);
+#else
 	printf("\nFEBio version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
+#endif
 	printf("\nSVN revision: %d\n", SVNREVISION);
 	printf("compiled on " __DATE__ "\n");
 	printf("using FECore version %s\n\n", FECore::get_version_string());

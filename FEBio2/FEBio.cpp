@@ -563,7 +563,11 @@ int prompt(CMDOPTIONS& ops)
 			}
 			else if (strcmp(argv[0], "version") == 0)
 			{
+#ifdef _WIN64
+				fprintf(stderr, "\nFEBio version %d.%d.%d (x64)\n", VERSION, SUBVERSION, SUBSUBVERSION);
+#else
 				fprintf(stderr, "\nFEBio version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
+#endif
 				fprintf(stderr, "SVN revision: %d\n", SVNREVISION);
 				fprintf(stderr, "compiled on " __DATE__ "\n");
 				fprintf(stderr, "using FECore version %s\n\n", FECore::get_version_string());
