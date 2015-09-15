@@ -128,6 +128,7 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FENLCLOGDATA_ID             0x0011	// derived from FELogNLConstraintData
 #define FECALLBACK_ID				0x0012	// derived from FECallBack
 #define FEDOMAIN_ID					0x0013	// derived from FEDomain (TODO: work in progress)
+#define FEIC_ID						0x0014	// derived from initial condition
 
 /////////////////////////////////////////////////////////////////////////////
 // ENUM: Linear solvers

@@ -141,6 +141,30 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			}
 			while (!tag.isend());
 		}
+		else if (tag == "ic")
+		{
+			// get the type attribute
+			const char* sztype = tag.AttributeValue("type");
+
+			// allocate a new initial condition of this type
+			FEInitialCondition* pic = fecore_new<FEInitialCondition>(FEIC_ID, sztype, &fem);
+			if (pic == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+			// add the initial condition
+			fem.AddInitialCondition(pic);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddModelComponent(pic);
+				pic->Deactivate();
+			}
+
+			if (!tag.isempty())
+			{
+				// TODO: read the parameter list
+			}
+		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}

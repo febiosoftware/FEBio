@@ -4,6 +4,7 @@
 #include "FEMesh.h"
 #include "LoadCurve.h"
 #include "BC.h"
+#include "FEInitialCondition.h"
 #include "FEModelLoad.h"
 #include "FEBodyLoad.h"
 #include "FESurfacePairInteraction.h"
