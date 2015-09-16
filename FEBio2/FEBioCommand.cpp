@@ -99,8 +99,6 @@ int FEBioCmd_Debug::run(int nargs, char** argv)
 		else { fprintf(stderr, "%s is not a valid option for debug.\n", argv[1]); return 0; }
 	}
 	m_pfem->SetDebugFlag(bdebug);
-	if (bdebug) pstep->SetPlotLevel(FE_PLOT_MINOR_ITRS); 
-	else pstep->SetPlotLevel(FE_PLOT_MAJOR_ITRS);
 
 	printf("Debug mode is %s\n", (bdebug?"on":"off"));
 	return 0;

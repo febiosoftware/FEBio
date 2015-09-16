@@ -303,13 +303,6 @@ public: // Global data
 	void SetGlobalConstant(const string& s, double v);
 	double GetGlobalConstant(const string& s);
 
-public:
-	//! set the debug level
-	void SetDebugFlag(bool b) { m_debug = b; }
-
-	//! get the debug level
-	bool GetDebugFlag() { return m_debug; }
-
 public: // TODO: Find a better place for these parameters
 	int		m_nsolver;			//!< type of solver selected
 	int		m_bwopt;			//!< bandwidth optimization flag
@@ -317,7 +310,6 @@ public: // TODO: Find a better place for these parameters
 	double	m_ftime;			//!< current time value
 	double	m_ftime0;			//!< start time of current step
 	int		m_nplane_strain;	//!< run analysis in plain strain mode \todo Move to the analysis class?
-	bool	m_debug;			//!< debug flag
 	double	m_ut4_alpha;		//!< UT4 integration alpha value
 	bool	m_ut4_bdev;			//!< UT4 integration deviatoric formulation flag
 	double	m_udghex_hg;		//!< hourglass parameter for UDGhex integration

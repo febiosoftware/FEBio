@@ -90,11 +90,19 @@ public: // --- I/O functions ---
 	//! Return the total timer
 	Timer& GetTotalTimer();
 
+public:
+	//! set the debug level
+	void SetDebugFlag(bool b) { m_debug = b; }
+
+	//! get the debug level
+	bool GetDebugFlag() { return m_debug; }
+
 private:
 	Timer		m_TotalTime;	//!< Create timer to track total running time
 	DataStore	m_Data;			//!< the data store used for data logging
 	PlotFile*	m_plot;			//!< the plot file
 	bool		m_becho;		//!< echo input to logfile \todo Make this a command line option
+	bool		m_debug;		//!< debug flag
 
 protected: // file names
 	char*	m_szfile_title;			//!< master input file title 

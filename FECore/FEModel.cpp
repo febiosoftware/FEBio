@@ -808,7 +808,6 @@ void FEModel::CopyFrom(FEModel& fem)
 	m_ftime   = fem.m_ftime;
 	m_ftime0  = fem.m_ftime0;
 	m_nplane_strain = fem.m_nplane_strain;
-	m_debug   = fem.m_debug;
 	m_ut4_alpha = fem.m_ut4_alpha;
 	m_ut4_bdev  = fem.m_ut4_bdev;
 	m_udghex_hg = fem.m_udghex_hg;
