@@ -148,6 +148,9 @@ bool FEModel::Init()
 	// do the callback
 	DoCallback(CB_INIT);
 
+	// write the initial state
+	Write(FE_INITIALIZED);
+
 	return true;
 }
 

@@ -284,10 +284,9 @@ void FEExplicitSolidSolver::Update(vector<double>& ui)
 		if (pbf) pbf->Update();
 	}
 
-	// dump all states to the plot file when requested
-	if (m_fem.GetCurrentStep()->GetPlotLevel() == FE_PLOT_MINOR_ITRS) m_fem.Write();
+	// write the new state
+	m_fem.Write(FE_UNCONVERGED);
 }
-
 
 //-----------------------------------------------------------------------------
 //! Update the kinematics of the model, such as nodal positions, velocities,
@@ -508,7 +507,6 @@ bool FEExplicitSolidSolver::SolveStep(double time)
 	{
 		// A negative jacobian was detected
 		felog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
-		if (m_fem.GetDebugFlag()) m_fem.Write();
 		return false;
 	}
 	catch (MaxStiffnessReformations) // shouldn't happen for an explicit analysis!

@@ -243,11 +243,8 @@ bool FEMultiphasicSolver::Quasin(double time)
 		m_SolverTime.stop();
 
 		// check for nans
-		if (m_fem.GetDebugFlag())
-		{
-			double du = m_bfgs.m_ui*m_bfgs.m_ui;
-			if (ISNAN(du)) throw NANDetected();
-		}
+		double du = m_bfgs.m_ui*m_bfgs.m_ui;
+		if (ISNAN(du)) throw NANDetected();
 
 		// extract the pressure increments
 		GetDisplacementData(m_di, m_bfgs.m_ui);
@@ -776,17 +773,10 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 	}
 
 	// let's check the stiffness matrix for zero diagonal elements
-	if (m_fem.GetDebugFlag())
+	int neq = K.Size();
+	for (i=0; i<neq; ++i)
 	{
-		vector<int> zd;
-		int neq = K.Size();
-		for (i=0; i<neq; ++i)
-		{
-			if (K.diag(i) == 0) zd.push_back(i);
-		}
-
-//		if (zd.empty() == false) throw ZeroDiagonal(zd, m_fem);
-		if (zd.empty() == false) throw ZeroDiagonal(-1, -1);
+		if (K.diag(i) == 0) throw ZeroDiagonal(-1, -1);
 	}
 
 	return true;

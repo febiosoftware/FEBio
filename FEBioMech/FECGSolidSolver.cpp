@@ -192,11 +192,8 @@ bool FECGSolidSolver::Quasin(double time)
 		u0=m_bfgs.m_ui;		// store direction for use on the next iteration
 
 		// check for nans
-		if (m_fem.GetDebugFlag())
-		{
-			double du = m_bfgs.m_ui*m_bfgs.m_ui;
-			if (ISNAN(du)) throw NANDetected();
-		}
+		double du = m_bfgs.m_ui*m_bfgs.m_ui;
+		if (ISNAN(du)) throw NANDetected();
 
 		// set initial convergence norms
 		if (m_niter == 0)

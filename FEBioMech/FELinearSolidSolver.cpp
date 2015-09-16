@@ -272,9 +272,8 @@ void FELinearSolidSolver::Update(vector<double>& u)
 		d.UpdateStresses(m_fem);
 	}
 
-	// dump all states to the plot file
-	// when requested
-	if (m_fem.GetCurrentStep()->GetPlotLevel() == FE_PLOT_MINOR_ITRS) m_fem.Write();
+	// output modified state data
+	m_fem.Write(FE_UNCONVERGED);
 }
 
 //-----------------------------------------------------------------------------

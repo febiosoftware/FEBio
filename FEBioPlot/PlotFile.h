@@ -37,6 +37,9 @@ public:
 	//! Write current FE state to plot database
 	virtual bool Write(FEModel& fem) = 0;
 
+	//! see if the plot file is valid
+	virtual bool IsValid() const = 0;
+
 protected:
 	FEModel*	m_pfem;		//!< pointer to FE model
 };

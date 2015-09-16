@@ -310,6 +310,8 @@ public:
 
 	void SetCompression(int n);
 
+	bool IsValid() const { return (m_fp != 0); }
+
 protected:
 	FileStream*	m_fp;		// pointer to file stream
 	bool		m_bSaving;	// read or write mode?

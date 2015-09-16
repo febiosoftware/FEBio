@@ -164,7 +164,7 @@ protected:
 	std::vector<int>				m_Dom;	//!< list of active domains for this analysis
 	std::vector<FEModelComponent*>	m_MC;	//!< array of model components active during this step
 
-protected:
+public:
 	int		m_nmust;		//!< current must-point
 	int		m_ntype;		//!< step type
 };

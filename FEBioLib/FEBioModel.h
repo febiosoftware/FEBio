@@ -36,7 +36,7 @@ public: // --- I/O functions ---
 	bool Input(const char* szfile);
 
 	//! write to plot file
-	void Write();
+	void Write(FE_OUTPUT_HINT hint);
 
 	//! write data to log file
 	void WriteData();

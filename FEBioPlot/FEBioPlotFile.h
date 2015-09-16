@@ -183,6 +183,9 @@ public:
 	//! Set the compression level
 	void SetCompression(int n);
 
+	//! see if the plot file is valid
+	virtual bool IsValid() const;
+
 public:
 	const Dictionary& GetDictionary() const { return m_dic; }
 

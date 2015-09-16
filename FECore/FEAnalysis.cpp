@@ -176,6 +176,9 @@ bool FEAnalysis::Activate()
 		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
 		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il) il->Activate();
 	}
+
+	// write the initial state
+	m_fem.Write(FE_STEP_INITIALIZED);
 	
 	return true;
 }
@@ -292,7 +295,6 @@ bool FEAnalysis::Solve()
 
 	// Flags used to note whether the last converged time step was stored.
 	// This is used by to make sure that the final time step is stored to the plot file and data files.
-	bool bplot = false;
 	bool boutput = false;
 
 	// repeat for all timesteps
@@ -388,18 +390,7 @@ bool FEAnalysis::Solve()
 			m_ntimesteps++;
 
 			// output results to plot database
-			bplot = false;
-			if ((m_nplot != FE_PLOT_NEVER) && (m_nplot != FE_PLOT_FINAL))
-			{
-				if (m_nplot == FE_PLOT_MUST_POINTS)
-				{
-					if (m_nmust >= 0) { m_fem.Write(); bplot = true; }
-				}
-				else
-				{
-					if (m_ntimesteps % m_nplot_stride == 0) { m_fem.Write(); bplot = true; }
-				}
-			}
+			m_fem.Write(FE_CONVERGED);
 
 			// Dump converged state to the archive
 			if (m_bDump) m_fem.DumpData();
@@ -433,7 +424,7 @@ bool FEAnalysis::Solve()
 			felog.printf("\n\n------- failed to converge at time : %lg\n\n", m_fem.m_ftime);
 
 			// plot the state when the debug flag is on
-			if (m_fem.GetDebugFlag()) m_fem.Write();
+			m_fem.Write(FE_UNCONVERGED);
 
 			// If we have auto time stepping, decrease time step and let's retry
 			if (m_bautostep && (m_nretries < m_maxretries))
@@ -468,10 +459,9 @@ bool FEAnalysis::Solve()
 	}
 
 	// write the final time step, if it hasn't been written yet.
-	if (m_nplot != FE_PLOT_NEVER)
-	{
-		if (bconv && (bplot == false)) m_fem.Write();
-	}
+	if (bconv) m_fem.Write(FE_STEP_SOLVED);
+
+	// output the final time step, if it hasn't been written yet.
 	if (m_noutput != FE_OUTPUT_NEVER)
 	{
 		if (bconv && (boutput == false)) m_fem.WriteData();

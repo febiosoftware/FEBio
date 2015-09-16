@@ -211,6 +211,12 @@ void FEBioPlotFile::SetCompression(int n)
 }
 
 //-----------------------------------------------------------------------------
+bool FEBioPlotFile::IsValid() const
+{
+	return m_ar.IsValid();
+}
+
+//-----------------------------------------------------------------------------
 void FEBioPlotFile::Close()
 {
 	m_ar.Close();

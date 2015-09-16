@@ -42,6 +42,20 @@ struct FECORE_CALLBACK {
 };
 
 //-----------------------------------------------------------------------------
+//! These output flags are used when calling FEModel::Write to report the state
+//! of the solution. This can be used to decide whether to output the state data or not.
+enum FE_OUTPUT_HINT {
+	FE_UNKNOWN,				// the model is in an unknown state
+	FE_INITIALIZED,			// the model has been initialized (i.e. FEModel::Init() was called)
+	FE_UNCONVERGED,			// the model is in a non-converged state
+	FE_CONVERGED,			// the time step has converged
+	FE_AUGMENT,				// the model is entering an augmented (called before Augment())
+	FE_SOLVED,				// the entire model is solved
+	FE_STEP_INITIALIZED,	// the current step is initialized (i.e. FEAnalysis::Init() was called)
+	FE_STEP_SOLVED,			// the step was solved
+};
+
+//-----------------------------------------------------------------------------
 //! The FEModel class stores all the data for the finite element model, including
 //! geometry, analysis steps, boundary and loading conditions, contact interfaces
 //! and so on.
@@ -266,7 +280,7 @@ public:	// --- Miscellaneous routines ---
 public: // --- I/O functions
 
 	//! write to plot file
-	virtual void Write() {}
+	virtual void Write(FE_OUTPUT_HINT hint) {}
 
 	//! write data to log file
 	virtual void WriteData() {}

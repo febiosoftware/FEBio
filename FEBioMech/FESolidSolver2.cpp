@@ -611,8 +611,8 @@ void FESolidSolver2::Update(vector<double>& ui)
 		if (pbf) pbf->Update();
 	}
 
-	// dump all states to the plot file when requested
-	if (m_fem.GetCurrentStep()->GetPlotLevel() == FE_PLOT_MINOR_ITRS) m_fem.Write();
+	// write the new state
+	m_fem.Write(FE_UNCONVERGED);
 }
 
 //-----------------------------------------------------------------------------
@@ -1274,14 +1274,11 @@ bool FESolidSolver2::Quasin(double time)
 			felog.printf("\n........................ augmentation # %d\n", m_naug+1);
 
 			// plot states before augmentations.
-			if (pstep->GetPlotLevel() == FE_PLOT_AUGMENTATIONS)
-			{
-				// The reason we store the state prior to the augmentations
-				// is because the augmentations are going to change things such that
-				// the system no longer in equilibrium. Since the model has to be converged
-				// before we do augmentations, storing the model now will store an actual converged state.
-				pstep->GetFEModel().Write();
-			}
+			// The reason we store the state prior to the augmentations
+			// is because the augmentations are going to change things such that
+			// the system no longer in equilibrium. Since the model has to be converged
+			// before we do augmentations, storing the model now will store an actual converged state.
+			pstep->GetFEModel().Write(FE_AUGMENT);
 
 			// do the augmentations
 			bconv = Augment();
@@ -1504,18 +1501,10 @@ bool FESolidSolver2::StiffnessMatrix(const FETimePoint& tp)
 	}
 
 	// let's check the stiffness matrix for zero diagonal elements
-	if (m_fem.GetDebugFlag())
+	int neq = K.Size();
+	for (i=0; i<neq; ++i)
 	{
-		vector<int> zd;
-		int neq = K.Size();
-		for (i=0; i<neq; ++i)
-		{
-//			if (K.diag(i) == 0) zd.push_back(i);
-			if (fabs(K.diag(i)) < 1e-15) zd.push_back(i);
-		}
-
-//		if (zd.empty() == false) throw ZeroDiagonal(zd, m_fem);
-		if (zd.empty() == false) throw ZeroDiagonal(-1, -1);
+		if (fabs(K.diag(i)) < 1e-15) throw ZeroDiagonal(-1, -1);
 	}
 
 	return true;
