@@ -141,13 +141,13 @@ void FEElasticDomain2O::ElementInternalForce(FESolidElement& el, vector<double>&
 			// the '-' sign is so that the internal forces get subtracted
 			// from the global residual vector
 			fe[3*i  ] -=  (Gx*s.xx() + Gy*s.xy() + Gz*s.xz())*detJt +
-						   (tau.d[0]*GXX + tau.d[1]*(GXY + GYX) + tau.d[2]*(GXZ + GZX) + tau.d[3]*GYY + tau.d[4]*(GYZ + GZY) + tau.d[5]*GZZ)*detJt;
+						   (tau.d[0]*GXX + tau.d[1]*(GXY + GYX) + tau.d[2]*(GXZ + GZX) + tau.d[3]*GYY + tau.d[4]*(GYZ + GZY) + tau.d[5]*GZZ)*detJt*detJt;
 
 			fe[3*i+1] -=  (Gx*s.xy() + Gy*s.yy() + Gz*s.yz())*detJt +
-		   				   (tau.d[1]*GXX + tau.d[3]*(GXY + GYX) + tau.d[4]*(GXZ + GZX) + tau.d[6]*GYY + tau.d[7]*(GYZ + GZY) + tau.d[8]*GZZ)*detJt;
+		   				   (tau.d[1]*GXX + tau.d[3]*(GXY + GYX) + tau.d[4]*(GXZ + GZX) + tau.d[6]*GYY + tau.d[7]*(GYZ + GZY) + tau.d[8]*GZZ)*detJt*detJt;
 
 			fe[3*i+2] -=  (Gx*s.xz() + Gy*s.yz() + Gz*s.zz())*detJt +
-		   				   (tau.d[2]*GXX + tau.d[4]*(GXY + GYX) + tau.d[5]*(GXZ + GZX) + tau.d[7]*GYY + tau.d[8]*(GYZ + GZY) + tau.d[9]*GZZ)*detJt;
+		   				   (tau.d[2]*GXX + tau.d[4]*(GXY + GYX) + tau.d[5]*(GXZ + GZX) + tau.d[7]*GYY + tau.d[8]*(GYZ + GZY) + tau.d[9]*GZZ)*detJt*detJt;
 		}
 	}
 }
@@ -323,9 +323,9 @@ void FEElasticDomain2O::ElementGeometricalStiffness(FESolidElement &el, matrix &
 				double GZY = Ji[0][2]*Grrj*Ji[0][1] + Ji[0][2]*Grsj*Ji[1][1] + Ji[0][2]*Grtj*Ji[2][1] + Ji[1][2]*Gsrj*Ji[0][1] + Ji[1][2]*Gssj*Ji[1][1] + Ji[1][2]*Gstj*Ji[2][1] + Ji[2][2]*Gtrj*Ji[0][1] + Ji[2][2]*Gtsj*Ji[1][1] + Ji[2][2]*Gttj*Ji[2][1];
 				double GZZ = Ji[0][2]*Grrj*Ji[0][2] + Ji[0][2]*Grsj*Ji[1][2] + Ji[0][2]*Grtj*Ji[2][2] + Ji[1][2]*Gsrj*Ji[0][2] + Ji[1][2]*Gssj*Ji[1][2] + Ji[1][2]*Gstj*Ji[2][2] + Ji[2][2]*Gtrj*Ji[0][2] + Ji[2][2]*Gtsj*Ji[1][2] + Ji[2][2]*Gttj*Ji[2][2];
 						
-				kab = ((Gx[i]*(s.xx()*Gx[j] + s.xy()*Gy[j] + s.xz()*Gz[j])*detJt + (tau.d[0]*GXX + tau.d[1]*(GXY + GYX) + tau.d[2]*(GXZ + GZX) + tau.d[3]*GYY + tau.d[4]*(GYZ + GZY) + tau.d[5]*GZZ))*detJt +
-					   (Gy[i]*(s.xy()*Gx[j] + s.yy()*Gy[j] + s.yz()*Gz[j])*detJt + (tau.d[1]*GXX + tau.d[3]*(GXY + GYX) + tau.d[4]*(GXZ + GZX) + tau.d[6]*GYY + tau.d[7]*(GYZ + GZY) + tau.d[8]*GZZ))*detJt + 
-					   (Gz[i]*(s.xz()*Gx[j] + s.yz()*Gy[j] + s.zz()*Gz[j])*detJt + (tau.d[2]*GXX + tau.d[4]*(GXY + GYX) + tau.d[5]*(GXZ + GZX) + tau.d[7]*GYY + tau.d[8]*(GYZ + GZY) + tau.d[9]*GZZ))*detJt);
+				kab = ((Gx[i]*(s.xx()*Gx[j] + s.xy()*Gy[j] + s.xz()*Gz[j])*detJt + (tau.d[0]*GXX + tau.d[1]*(GXY + GYX) + tau.d[2]*(GXZ + GZX) + tau.d[3]*GYY + tau.d[4]*(GYZ + GZY) + tau.d[5]*GZZ))*detJt*detJt +
+					   (Gy[i]*(s.xy()*Gx[j] + s.yy()*Gy[j] + s.yz()*Gz[j])*detJt + (tau.d[1]*GXX + tau.d[3]*(GXY + GYX) + tau.d[4]*(GXZ + GZX) + tau.d[6]*GYY + tau.d[7]*(GYZ + GZY) + tau.d[8]*GZZ))*detJt*detJt + 
+					   (Gz[i]*(s.xz()*Gx[j] + s.yz()*Gy[j] + s.zz()*Gz[j])*detJt + (tau.d[2]*GXX + tau.d[4]*(GXY + GYX) + tau.d[5]*(GXZ + GZX) + tau.d[7]*GYY + tau.d[8]*(GYZ + GZY) + tau.d[9]*GZZ))*detJt*detJt);
 
 				ke[3*i  ][3*j  ] += kab;
 				ke[3*i+1][3*j+1] += kab;
@@ -533,76 +533,76 @@ void FEElasticDomain2O::ElementMaterialStiffness(FESolidElement &el, matrix &ke)
 				// Second-order components with D*d + D*k
 				ke[i3  ][j3  ] += (Gxi*(d.d[0]*GXXj + d.d[1]*(GXYj + GYXj) + d.d[2]*(GXZj + GZXj) + d.d[3]*GYYj + d.d[4]*(GYZj + GZYj) + d.d[5]*GZZj)
 					             + Gyi*(d.d[1]*GXXj + d.d[3]*(GXYj + GYXj) + d.d[4]*(GXZj + GZXj) + d.d[10]*GYYj + d.d[11]*(GYZj + GZYj) + d.d[12]*GZZj)
-								 + Gzi*(d.d[2]*GXXj + d.d[4]*(GXYj + GYXj) + d.d[5]*(GXZj + GZXj) + d.d[11]*GYYj + d.d[12]*(GYZj + GZYj) + d.d[17]*GZZj))*detJt;
+								 + Gzi*(d.d[2]*GXXj + d.d[4]*(GXYj + GYXj) + d.d[5]*(GXZj + GZXj) + d.d[11]*GYYj + d.d[12]*(GYZj + GZYj) + d.d[17]*GZZj))*detJt*detJt;
 				
 				ke[i3  ][j3+1] += (Gxi*(d.d[1]*GXXj + d.d[3]*(GXYj + GYXj) + d.d[4]*(GXZj + GZXj) + d.d[6]*GYYj + d.d[7]*(GYZj + GZYj) + d.d[8]*GZZj)
 					             + Gyi*(d.d[3]*GXXj + d.d[10]*(GXYj + GYXj) + d.d[11]*(GXZj + GZXj) + d.d[13]*GYYj + d.d[14]*(GYZj + GZYj) + d.d[15]*GZZj)
-								 + Gzi*(d.d[4]*GXXj + d.d[11]*(GXYj + GYXj) + d.d[12]*(GXZj + GZXj) + d.d[18]*GYYj + d.d[19]*(GYZj + GZYj) + d.d[20]*GZZj))*detJt;
+								 + Gzi*(d.d[4]*GXXj + d.d[11]*(GXYj + GYXj) + d.d[12]*(GXZj + GZXj) + d.d[18]*GYYj + d.d[19]*(GYZj + GZYj) + d.d[20]*GZZj))*detJt*detJt;
 
 				ke[i3  ][j3+2] += (Gxi*(d.d[2]*GXXj + d.d[4]*(GXYj + GYXj) + d.d[5]*(GXZj + GZXj) + d.d[7]*GYYj + d.d[8]*(GYZj + GZYj) + d.d[9]*GZZj)
 					             + Gyi*(d.d[4]*GXXj + d.d[11]*(GXYj + GYXj) + d.d[12]*(GXZj + GZXj) + d.d[14]*GYYj + d.d[15]*(GYZj + GZYj) + d.d[16]*GZZj)
-								 + Gzi*(d.d[5]*GXXj + d.d[12]*(GXYj + GYXj) + d.d[17]*(GXZj + GZXj) + d.d[19]*GYYj + d.d[20]*(GYZj + GZYj) + d.d[21]*GZZj))*detJt;
+								 + Gzi*(d.d[5]*GXXj + d.d[12]*(GXYj + GYXj) + d.d[17]*(GXZj + GZXj) + d.d[19]*GYYj + d.d[20]*(GYZj + GZYj) + d.d[21]*GZZj))*detJt*detJt;
 
 				ke[i3+1][j3  ] += (Gxi*(d.d[1]*GXXj + d.d[3]*(GXYj + GYXj) + d.d[4]*(GXZj + GZXj) + d.d[10]*GYYj + d.d[11]*(GYZj + GZYj) + d.d[12]*GZZj)
 					             + Gyi*(d.d[3]*GXXj + d.d[10]*(GXYj + GYXj) + d.d[11]*(GXZj + GZXj) + d.d[13]*GYYj + d.d[14]*(GYZj + GZYj) + d.d[19]*GZZj)
-								 + Gzi*(d.d[4]*GXXj + d.d[11]*(GXYj + GYXj) + d.d[12]*(GXZj + GZXj) + d.d[14]*GYYj + d.d[15]*(GYZj + GZYj) + d.d[20]*GZZj))*detJt;
+								 + Gzi*(d.d[4]*GXXj + d.d[11]*(GXYj + GYXj) + d.d[12]*(GXZj + GZXj) + d.d[14]*GYYj + d.d[15]*(GYZj + GZYj) + d.d[20]*GZZj))*detJt*detJt;
 				
 				ke[i3+1][j3+1] += (Gxi*(d.d[3]*GXXj + d.d[10]*(GXYj + GYXj) + d.d[11]*(GXZj + GZXj) + d.d[13]*GYYj + d.d[14]*(GYZj + GZYj) + d.d[15]*GZZj)
 					             + Gyi*(d.d[10]*GXXj + d.d[13]*(GXYj + GYXj) + d.d[14]*(GXZj + GZXj) + d.d[22]*GYYj + d.d[23]*(GYZj + GZYj) + d.d[24]*GZZj)
-								 + Gzi*(d.d[11]*GXXj + d.d[14]*(GXYj + GYXj) + d.d[15]*(GXZj + GZXj) + d.d[23]*GYYj + d.d[24]*(GYZj + GZYj) + d.d[26]*GZZj))*detJt;
+								 + Gzi*(d.d[11]*GXXj + d.d[14]*(GXYj + GYXj) + d.d[15]*(GXZj + GZXj) + d.d[23]*GYYj + d.d[24]*(GYZj + GZYj) + d.d[26]*GZZj))*detJt*detJt;
 
 				ke[i3+1][j3+2] += (Gxi*(d.d[4]*GXXj + d.d[11]*(GXYj + GYXj) + d.d[12]*(GXZj + GZXj) + d.d[14]*GYYj + d.d[15]*(GYZj + GZYj) + d.d[16]*GZZj)
 					             + Gyi*(d.d[11]*GXXj + d.d[14]*(GXYj + GYXj) + d.d[19]*(GXZj + GZXj) + d.d[23]*GYYj + d.d[24]*(GYZj + GZYj) + d.d[25]*GZZj)
-								 + Gzi*(d.d[12]*GXXj + d.d[15]*(GXYj + GYXj) + d.d[20]*(GXZj + GZXj) + d.d[24]*GYYj + d.d[26]*(GYZj + GZYj) + d.d[27]*GZZj))*detJt;
+								 + Gzi*(d.d[12]*GXXj + d.d[15]*(GXYj + GYXj) + d.d[20]*(GXZj + GZXj) + d.d[24]*GYYj + d.d[26]*(GYZj + GZYj) + d.d[27]*GZZj))*detJt*detJt;
 
 				ke[i3+2][j3  ] += (Gxi*(d.d[2]*GXXj + d.d[4]*(GXYj + GYXj) + d.d[5]*(GXZj + GZXj) + d.d[11]*GYYj + d.d[12]*(GYZj + GZYj) + d.d[17]*GZZj)
 					             + Gyi*(d.d[4]*GXXj + d.d[11]*(GXYj + GYXj) + d.d[12]*(GXZj + GZXj) + d.d[14]*GYYj + d.d[15]*(GYZj + GZYj) + d.d[20]*GZZj)
-								 + Gzi*(d.d[5]*GXXj + d.d[12]*(GXYj + GYXj) + d.d[17]*(GXZj + GZXj) + d.d[19]*GYYj + d.d[20]*(GYZj + GZYj) + d.d[21]*GZZj))*detJt;
+								 + Gzi*(d.d[5]*GXXj + d.d[12]*(GXYj + GYXj) + d.d[17]*(GXZj + GZXj) + d.d[19]*GYYj + d.d[20]*(GYZj + GZYj) + d.d[21]*GZZj))*detJt*detJt;
 
 				ke[i3+2][j3+1] += (Gxi*(d.d[4]*GXXj + d.d[11]*(GXYj + GYXj) + d.d[12]*(GXZj + GZXj) + d.d[14]*GYYj + d.d[15]*(GYZj + GZYj) + d.d[20]*GZZj)
 					             + Gyi*(d.d[11]*GXXj + d.d[14]*(GXYj + GYXj) + d.d[15]*(GXZj + GZXj) + d.d[23]*GYYj + d.d[24]*(GYZj + GZYj) + d.d[26]*GZZj)
-								 + Gzi*(d.d[12]*GXXj + d.d[19]*(GXYj + GYXj) + d.d[20]*(GXZj + GZXj) + d.d[24]*GYYj + d.d[26]*(GYZj + GZYj) + d.d[27]*GZZj))*detJt;
+								 + Gzi*(d.d[12]*GXXj + d.d[19]*(GXYj + GYXj) + d.d[20]*(GXZj + GZXj) + d.d[24]*GYYj + d.d[26]*(GYZj + GZYj) + d.d[27]*GZZj))*detJt*detJt;
 
 				ke[i3+2][j3+2] += (Gxi*(d.d[5]*GXXj + d.d[12]*(GXYj + GYXj) + d.d[17]*(GXZj + GZXj) + d.d[15]*GYYj + d.d[20]*(GYZj + GZYj) + d.d[21]*GZZj)
 					             + Gyi*(d.d[12]*GXXj + d.d[15]*(GXYj + GYXj) + d.d[20]*(GXZj + GZXj) + d.d[24]*GYYj + d.d[26]*(GYZj + GZYj) + d.d[27]*GZZj)
-								 + Gzi*(d.d[17]*GXXj + d.d[20]*(GXYj + GYXj) + d.d[21]*(GXZj + GZXj) + d.d[26]*GYYj + d.d[27]*(GYZj + GZYj) + d.d[28]*GZZj))*detJt;
+								 + Gzi*(d.d[17]*GXXj + d.d[20]*(GXYj + GYXj) + d.d[21]*(GXZj + GZXj) + d.d[26]*GYYj + d.d[27]*(GYZj + GZYj) + d.d[28]*GZZj))*detJt*detJt;
 
 				
 				ke[i3  ][j3  ] += (Gxj*(d.d[0]*GXXi + d.d[1]*(GXYi + GYXi) + d.d[2]*(GXZi + GZXi) + d.d[3]*GYYi + d.d[4]*(GYZi + GZYi) + d.d[5]*GZZi)
 					             + Gyj*(d.d[1]*GXXi + d.d[3]*(GXYi + GYXi) + d.d[4]*(GXZi + GZXi) + d.d[10]*GYYi + d.d[11]*(GYZi + GZYi) + d.d[12]*GZZi)
-								 + Gzj*(d.d[2]*GXXi + d.d[4]*(GXYi + GYXi) + d.d[5]*(GXZi + GZXi) + d.d[11]*GYYi + d.d[12]*(GYZi + GZYi) + d.d[17]*GZZi))*detJt;
+								 + Gzj*(d.d[2]*GXXi + d.d[4]*(GXYi + GYXi) + d.d[5]*(GXZi + GZXi) + d.d[11]*GYYi + d.d[12]*(GYZi + GZYi) + d.d[17]*GZZi))*detJt*detJt;
 		
 				ke[i3  ][j3+1] += (Gxj*(d.d[1]*GXXi + d.d[3]*(GXYi + GYXi) + d.d[4]*(GXZi + GZXi) + d.d[6]*GYYi + d.d[7]*(GYZi + GZYi) + d.d[8]*GZZi)
 					             + Gyj*(d.d[3]*GXXi + d.d[10]*(GXYi + GYXi) + d.d[11]*(GXZi + GZXi) + d.d[13]*GYYi + d.d[14]*(GYZi + GZYi) + d.d[15]*GZZi)
-								 + Gzj*(d.d[4]*GXXi + d.d[11]*(GXYi + GYXi) + d.d[12]*(GXZi + GZXi) + d.d[18]*GYYi + d.d[19]*(GYZi + GZYi) + d.d[20]*GZZi))*detJt;
+								 + Gzj*(d.d[4]*GXXi + d.d[11]*(GXYi + GYXi) + d.d[12]*(GXZi + GZXi) + d.d[18]*GYYi + d.d[19]*(GYZi + GZYi) + d.d[20]*GZZi))*detJt*detJt;
 
 				ke[i3  ][j3+2] += (Gxj*(d.d[2]*GXXi + d.d[4]*(GXYi + GYXi) + d.d[5]*(GXZi + GZXi) + d.d[7]*GYYi + d.d[8]*(GYZi + GZYi) + d.d[9]*GZZi)
 					             + Gyj*(d.d[4]*GXXi + d.d[11]*(GXYi + GYXi) + d.d[12]*(GXZi + GZXi) + d.d[14]*GYYi + d.d[15]*(GYZi + GZYi) + d.d[16]*GZZi)
-								 + Gzj*(d.d[5]*GXXi + d.d[12]*(GXYi + GYXi) + d.d[17]*(GXZi + GZXi) + d.d[19]*GYYi + d.d[20]*(GYZi + GZYi) + d.d[21]*GZZi))*detJt;
+								 + Gzj*(d.d[5]*GXXi + d.d[12]*(GXYi + GYXi) + d.d[17]*(GXZi + GZXi) + d.d[19]*GYYi + d.d[20]*(GYZi + GZYi) + d.d[21]*GZZi))*detJt*detJt;
 
 				ke[i3+1][j3  ] += (Gxj*(d.d[1]*GXXi + d.d[3]*(GXYi + GYXi) + d.d[4]*(GXZi + GZXi) + d.d[10]*GYYi + d.d[11]*(GYZi + GZYi) + d.d[12]*GZZi)
 					             + Gyj*(d.d[3]*GXXi + d.d[10]*(GXYi + GYXi) + d.d[11]*(GXZi + GZXi) + d.d[13]*GYYi + d.d[14]*(GYZi + GZYi) + d.d[19]*GZZi)
-								 + Gzj*(d.d[4]*GXXi + d.d[11]*(GXYi + GYXi) + d.d[12]*(GXZi + GZXi) + d.d[14]*GYYi + d.d[15]*(GYZi + GZYi) + d.d[20]*GZZi))*detJt;
+								 + Gzj*(d.d[4]*GXXi + d.d[11]*(GXYi + GYXi) + d.d[12]*(GXZi + GZXi) + d.d[14]*GYYi + d.d[15]*(GYZi + GZYi) + d.d[20]*GZZi))*detJt*detJt;
 				
 				ke[i3+1][j3+1] += (Gxj*(d.d[3]*GXXi + d.d[10]*(GXYi + GYXi) + d.d[11]*(GXZi + GZXi) + d.d[13]*GYYi + d.d[14]*(GYZi + GZYi) + d.d[15]*GZZi)
 					             + Gyj*(d.d[10]*GXXi + d.d[13]*(GXYi + GYXi) + d.d[14]*(GXZi + GZXi) + d.d[22]*GYYi + d.d[23]*(GYZi + GZYi) + d.d[24]*GZZi)
-								 + Gzj*(d.d[11]*GXXi + d.d[14]*(GXYi + GYXi) + d.d[15]*(GXZi + GZXi) + d.d[23]*GYYi + d.d[24]*(GYZi + GZYi) + d.d[26]*GZZi))*detJt;
+								 + Gzj*(d.d[11]*GXXi + d.d[14]*(GXYi + GYXi) + d.d[15]*(GXZi + GZXi) + d.d[23]*GYYi + d.d[24]*(GYZi + GZYi) + d.d[26]*GZZi))*detJt*detJt;
 
 				ke[i3+1][j3+2] += (Gxj*(d.d[4]*GXXi + d.d[11]*(GXYi + GYXi) + d.d[12]*(GXZi + GZXi) + d.d[14]*GYYi + d.d[15]*(GYZi + GZYi) + d.d[16]*GZZi)
 					             + Gyj*(d.d[11]*GXXi + d.d[14]*(GXYi + GYXi) + d.d[19]*(GXZi + GZXi) + d.d[23]*GYYi + d.d[24]*(GYZi + GZYi) + d.d[25]*GZZi)
-								 + Gzj*(d.d[12]*GXXi + d.d[15]*(GXYi + GYXi) + d.d[20]*(GXZi + GZXi) + d.d[24]*GYYi + d.d[26]*(GYZi + GZYi) + d.d[27]*GZZi))*detJt;
+								 + Gzj*(d.d[12]*GXXi + d.d[15]*(GXYi + GYXi) + d.d[20]*(GXZi + GZXi) + d.d[24]*GYYi + d.d[26]*(GYZi + GZYi) + d.d[27]*GZZi))*detJt*detJt;
 
 				ke[i3+2][j3  ] += (Gxj*(d.d[2]*GXXi + d.d[4]*(GXYi + GYXi) + d.d[5]*(GXZi + GZXi) + d.d[11]*GYYi + d.d[12]*(GYZi + GZYi) + d.d[17]*GZZi)
 					             + Gyj*(d.d[4]*GXXi + d.d[11]*(GXYi + GYXi) + d.d[12]*(GXZi + GZXi) + d.d[14]*GYYi + d.d[15]*(GYZi + GZYi) + d.d[20]*GZZi)
-								 + Gzj*(d.d[5]*GXXi + d.d[12]*(GXYi + GYXi) + d.d[17]*(GXZi + GZXi) + d.d[19]*GYYi + d.d[20]*(GYZi + GZYi) + d.d[21]*GZZi))*detJt;
+								 + Gzj*(d.d[5]*GXXi + d.d[12]*(GXYi + GYXi) + d.d[17]*(GXZi + GZXi) + d.d[19]*GYYi + d.d[20]*(GYZi + GZYi) + d.d[21]*GZZi))*detJt*detJt;
 
 				ke[i3+2][j3+1] += (Gxj*(d.d[4]*GXXi + d.d[11]*(GXYi + GYXi) + d.d[12]*(GXZi + GZXi) + d.d[14]*GYYi + d.d[15]*(GYZi + GZYi) + d.d[20]*GZZi)
 					             + Gyj*(d.d[11]*GXXi + d.d[14]*(GXYi + GYXi) + d.d[15]*(GXZi + GZXi) + d.d[23]*GYYi + d.d[24]*(GYZi + GZYi) + d.d[26]*GZZi)
-								 + Gzj*(d.d[12]*GXXi + d.d[19]*(GXYi + GYXi) + d.d[20]*(GXZi + GZXi) + d.d[24]*GYYi + d.d[26]*(GYZi + GZYi) + d.d[27]*GZZi))*detJt;
+								 + Gzj*(d.d[12]*GXXi + d.d[19]*(GXYi + GYXi) + d.d[20]*(GXZi + GZXi) + d.d[24]*GYYi + d.d[26]*(GYZi + GZYi) + d.d[27]*GZZi))*detJt*detJt;
 
 				ke[i3+2][j3+2] += (Gxj*(d.d[5]*GXXi + d.d[12]*(GXYi + GYXi) + d.d[17]*(GXZi + GZXi) + d.d[15]*GYYi + d.d[20]*(GYZi + GZYi) + d.d[21]*GZZi)
 					             + Gyj*(d.d[12]*GXXi + d.d[15]*(GXYi + GYXi) + d.d[20]*(GXZi + GZXi) + d.d[24]*GYYi + d.d[26]*(GYZi + GZYi) + d.d[27]*GZZi)
-								 + Gzj*(d.d[17]*GXXi + d.d[20]*(GXYi + GYXi) + d.d[21]*(GXZi + GZXi) + d.d[26]*GYYi + d.d[27]*(GYZi + GZYi) + d.d[28]*GZZi))*detJt;
+								 + Gzj*(d.d[17]*GXXi + d.d[20]*(GXYi + GYXi) + d.d[21]*(GXZi + GZXi) + d.d[26]*GYYi + d.d[27]*(GYZi + GZYi) + d.d[28]*GZZi))*detJt*detJt;
 
 				// Second-order component E*k
 				ke[i3  ][j3  ] += (GXXi*(e.d[0]*GXXj + e.d[1]*(GXYj + GYXj) + e.d[2]*(GXZj + GZXj) + e.d[3]*GYYj + e.d[4]*(GYZj + GZYj) + e.d[5]*GZZj)
@@ -610,63 +610,63 @@ void FEElasticDomain2O::ElementMaterialStiffness(FESolidElement &el, matrix &ke)
 								+ (GXZi + GZXi)*(e.d[2]*GXXj + e.d[4]*(GXYj + GYXj) + e.d[5]*(GXZj + GZXj) + e.d[17]*GYYj + e.d[18]*(GYZj + GZYj) + e.d[19]*GZZj)
 								 + GYYi*(e.d[3]*GXXj + e.d[10]*(GXYj + GYXj) + e.d[11]*(GXZj + GZXj) + e.d[13]*GYYj + e.d[14]*(GYZj + GZYj) + e.d[24]*GZZj)
 								+ (GYZi + GZYi)*(e.d[4]*GXXj + e.d[11]*(GXYj + GYXj) + e.d[18]*(GXZj + GZXj) + e.d[14]*GYYj + e.d[24]*(GYZj + GZYj) + e.d[29]*GZZj)
-								 + GZZi*(e.d[5]*GXXj + e.d[18]*(GXYj + GYXj) + e.d[19]*(GXZj + GZXj) + e.d[24]*GYYj + e.d[22]*(GYZj + GZYj) + e.d[23]*GZZj))*detJt;
+								 + GZZi*(e.d[5]*GXXj + e.d[18]*(GXYj + GYXj) + e.d[19]*(GXZj + GZXj) + e.d[24]*GYYj + e.d[22]*(GYZj + GZYj) + e.d[23]*GZZj))*detJt*detJt;
 
 				ke[i3  ][j3+1] += (GXXi*(e.d[1]*GXXj + e.d[3]*(GXYj + GYXj) + e.d[4]*(GXZj + GZXj) + e.d[6]*GYYj + e.d[7]*(GYZj + GZYj) + e.d[8]*GZZj)
 					            + (GXYi + GYXi)*(e.d[3]*GXXj + e.d[10]*(GXYj + GYXj) + e.d[11]*(GXZj + GZXj) + e.d[13]*GYYj + e.d[14]*(GYZj + GZYj) + e.d[15]*GZZj)
 								+ (GXZi + GZXi)*(e.d[4]*GXXj + e.d[17]*(GXYj + GYXj) + e.d[18]*(GXZj + GZXj) + e.d[20]*GYYj + e.d[21]*(GYZj + GZYj) + e.d[22]*GZZj)
 								 + GYYi*(e.d[10]*GXXj + e.d[13]*(GXYj + GYXj) + e.d[14]*(GXZj + GZXj) + e.d[25]*GYYj + e.d[26]*(GYZj + GZYj) + e.d[27]*GZZj)
 								+ (GYZi + GZYi)*(e.d[11]*GXXj + e.d[14]*(GXYj + GYXj) + e.d[24]*(GXZj + GZXj) + e.d[30]*GYYj + e.d[31]*(GYZj + GZYj) + e.d[32]*GZZj)
-								 + GZZi*(e.d[18]*GXXj + e.d[24]*(GXYj + GYXj) + e.d[22]*(GXZj + GZXj) + e.d[34]*GYYj + e.d[35]*(GYZj + GZYj) + e.d[36]*GZZj))*detJt;
+								 + GZZi*(e.d[18]*GXXj + e.d[24]*(GXYj + GYXj) + e.d[22]*(GXZj + GZXj) + e.d[34]*GYYj + e.d[35]*(GYZj + GZYj) + e.d[36]*GZZj))*detJt*detJt;
 
 				ke[i3  ][j3+2] += (GXXi*(e.d[2]*GXXj + e.d[4]*(GXYj + GYXj) + e.d[5]*(GXZj + GZXj) + e.d[7]*GYYj + e.d[8]*(GYZj + GZYj) + e.d[9]*GZZj)
 					            + (GXYi + GYXi)*(e.d[4]*GXXj + e.d[11]*(GXYj + GYXj) + e.d[12]*(GXZj + GZXj) + e.d[14]*GYYj + e.d[15]*(GYZj + GZYj) + e.d[16]*GZZj)
 								+ (GXZi + GZXi)*(e.d[5]*GXXj + e.d[18]*(GXYj + GYXj) + e.d[19]*(GXZj + GZXj) + e.d[21]*GYYj + e.d[22]*(GYZj + GZYj) + e.d[23]*GZZj)
 								 + GYYi*(e.d[11]*GXXj + e.d[14]*(GXYj + GYXj) + e.d[24]*(GXZj + GZXj) + e.d[26]*GYYj + e.d[27]*(GYZj + GZYj) + e.d[28]*GZZj)
 								+ (GYZi + GZYi)*(e.d[18]*GXXj + e.d[24]*(GXYj + GYXj) + e.d[29]*(GXZj + GZXj) + e.d[31]*GYYj + e.d[32]*(GYZj + GZYj) + e.d[33]*GZZj)
-								 + GZZi*(e.d[19]*GXXj + e.d[22]*(GXYj + GYXj) + e.d[23]*(GXZj + GZXj) + e.d[35]*GYYj + e.d[36]*(GYZj + GZYj) + e.d[37]*GZZj))*detJt;
+								 + GZZi*(e.d[19]*GXXj + e.d[22]*(GXYj + GYXj) + e.d[23]*(GXZj + GZXj) + e.d[35]*GYYj + e.d[36]*(GYZj + GZYj) + e.d[37]*GZZj))*detJt*detJt;
 
 				ke[i3+1][j3  ] += (GXXi*(e.d[1]*GXXj + e.d[3]*(GXYj + GYXj) + e.d[4]*(GXZj + GZXj) + e.d[10]*GYYj + e.d[11]*(GYZj + GZYj) + e.d[18]*GZZj)
 					            + (GXYi + GYXi)*(e.d[3]*GXXj + e.d[10]*(GXYj + GYXj) + e.d[11]*(GXZj + GZXj) + e.d[13]*GYYj + e.d[14]*(GYZj + GZYj) + e.d[21]*GZZj)
 								+ (GXZi + GZXi)*(e.d[4]*GXXj + e.d[11]*(GXYj + GYXj) + e.d[18]*(GXZj + GZXj) + e.d[14]*GYYj + e.d[21]*(GYZj + GZYj) + e.d[22]*GZZj)
 								 + GYYi*(e.d[10]*GXXj + e.d[13]*(GXYj + GYXj) + e.d[14]*(GXZj + GZXj) + e.d[25]*GYYj + e.d[26]*(GYZj + GZYj) + e.d[31]*GZZj)
 								+ (GYZi + GZYi)*(e.d[17]*GXXj + e.d[14]*(GXYj + GYXj) + e.d[24]*(GXZj + GZXj) + e.d[26]*GYYj + e.d[31]*(GYZj + GZYj) + e.d[35]*GZZj)
-								 + GZZi*(e.d[18]*GXXj + e.d[21]*(GXYj + GYXj) + e.d[22]*(GXZj + GZXj) + e.d[31]*GYYj + e.d[35]*(GYZj + GZYj) + e.d[36]*GZZj))*detJt;
+								 + GZZi*(e.d[18]*GXXj + e.d[21]*(GXYj + GYXj) + e.d[22]*(GXZj + GZXj) + e.d[31]*GYYj + e.d[35]*(GYZj + GZYj) + e.d[36]*GZZj))*detJt*detJt;
 
 				ke[i3+1][j3+1] += (GXXi*(e.d[3]*GXXj + e.d[10]*(GXYj + GYXj) + e.d[11]*(GXZj + GZXj) + e.d[13]*GYYj + e.d[14]*(GYZj + GZYj) + e.d[15]*GZZj)
 					            + (GXYi + GYXi)*(e.d[10]*GXXj + e.d[13]*(GXYj + GYXj) + e.d[14]*(GXZj + GZXj) + e.d[25]*GYYj + e.d[26]*(GYZj + GZYj) + e.d[27]*GZZj)
 								+ (GXZi + GZXi)*(e.d[11]*GXXj + e.d[14]*(GXYj + GYXj) + e.d[21]*(GXZj + GZXj) + e.d[30]*GYYj + e.d[31]*(GYZj + GZYj) + e.d[32]*GZZj)
 								 + GYYi*(e.d[13]*GXXj + e.d[25]*(GXYj + GYXj) + e.d[26]*(GXZj + GZXj) + e.d[38]*GYYj + e.d[39]*(GYZj + GZYj) + e.d[40]*GZZj)
 								+ (GYZi + GZYi)*(e.d[14]*GXXj + e.d[26]*(GXYj + GYXj) + e.d[31]*(GXZj + GZXj) + e.d[39]*GYYj + e.d[40]*(GYZj + GZYj) + e.d[42]*GZZj)
-								 + GZZi*(e.d[21]*GXXj + e.d[31]*(GXYj + GYXj) + e.d[35]*(GXZj + GZXj) + e.d[40]*GYYj + e.d[42]*(GYZj + GZYj) + e.d[43]*GZZj))*detJt;
+								 + GZZi*(e.d[21]*GXXj + e.d[31]*(GXYj + GYXj) + e.d[35]*(GXZj + GZXj) + e.d[40]*GYYj + e.d[42]*(GYZj + GZYj) + e.d[43]*GZZj))*detJt*detJt;
 
 				ke[i3+1][j3+2] += (GXXi*(e.d[4]*GXXj + e.d[11]*(GXYj + GYXj) + e.d[18]*(GXZj + GZXj) + e.d[14]*GYYj + e.d[15]*(GYZj + GZYj) + e.d[16]*GZZj)
 					            + (GXYi + GYXi)*(e.d[11]*GXXj + e.d[14]*(GXYj + GYXj) + e.d[21]*(GXZj + GZXj) + e.d[26]*GYYj + e.d[27]*(GYZj + GZYj) + e.d[28]*GZZj)
 								+ (GXZi + GZXi)*(e.d[18]*GXXj + e.d[21]*(GXYj + GYXj) + e.d[22]*(GXZj + GZXj) + e.d[31]*GYYj + e.d[32]*(GYZj + GZYj) + e.d[33]*GZZj)
 								 + GYYi*(e.d[14]*GXXj + e.d[26]*(GXYj + GYXj) + e.d[31]*(GXZj + GZXj) + e.d[39]*GYYj + e.d[40]*(GYZj + GZYj) + e.d[41]*GZZj)
 								+ (GYZi + GZYi)*(e.d[24]*GXXj + e.d[31]*(GXYj + GYXj) + e.d[35]*(GXZj + GZXj) + e.d[40]*GYYj + e.d[42]*(GYZj + GZYj) + e.d[43]*GZZj)
-								 + GZZi*(e.d[22]*GXXj + e.d[35]*(GXYj + GYXj) + e.d[36]*(GXZj + GZXj) + e.d[42]*GYYj + e.d[43]*(GYZj + GZYj) + e.d[44]*GZZj))*detJt;
+								 + GZZi*(e.d[22]*GXXj + e.d[35]*(GXYj + GYXj) + e.d[36]*(GXZj + GZXj) + e.d[42]*GYYj + e.d[43]*(GYZj + GZYj) + e.d[44]*GZZj))*detJt*detJt;
 
 				ke[i3+2][j3  ] += (GXXi*(e.d[2]*GXXj + e.d[4]*(GXYj + GYXj) + e.d[5]*(GXZj + GZXj) + e.d[17]*GYYj + e.d[18]*(GYZj + GZYj) + e.d[19]*GZZj)
 					            + (GXYi + GYXi)*(e.d[4]*GXXj + e.d[11]*(GXYj + GYXj) + e.d[18]*(GXZj + GZXj) + e.d[14]*GYYj + e.d[21]*(GYZj + GZYj) + e.d[22]*GZZj)
 								+ (GXZi + GZXi)*(e.d[5]*GXXj + e.d[18]*(GXYj + GYXj) + e.d[19]*(GXZj + GZXj) + e.d[24]*GYYj + e.d[22]*(GYZj + GZYj) + e.d[23]*GZZj)
 								 + GYYi*(e.d[17]*GXXj + e.d[14]*(GXYj + GYXj) + e.d[24]*(GXZj + GZXj) + e.d[26]*GYYj + e.d[31]*(GYZj + GZYj) + e.d[35]*GZZj)
 								+ (GYZi + GZYi)*(e.d[18]*GXXj + e.d[21]*(GXYj + GYXj) + e.d[22]*(GXZj + GZXj) + e.d[31]*GYYj + e.d[35]*(GYZj + GZYj) + e.d[36]*GZZj)
-								 + GZZi*(e.d[19]*GXXj + e.d[22]*(GXYj + GYXj) + e.d[23]*(GXZj + GZXj) + e.d[35]*GYYj + e.d[36]*(GYZj + GZYj) + e.d[37]*GZZj))*detJt;
+								 + GZZi*(e.d[19]*GXXj + e.d[22]*(GXYj + GYXj) + e.d[23]*(GXZj + GZXj) + e.d[35]*GYYj + e.d[36]*(GYZj + GZYj) + e.d[37]*GZZj))*detJt*detJt;
 
 				ke[i3+2][j3+1] += (GXXi*(e.d[4]*GXXj + e.d[17]*(GXYj + GYXj) + e.d[18]*(GXZj + GZXj) + e.d[14]*GYYj + e.d[21]*(GYZj + GZYj) + e.d[22]*GZZj)
 					            + (GXYi + GYXi)*(e.d[11]*GXXj + e.d[14]*(GXYj + GYXj) + e.d[21]*(GXZj + GZXj) + e.d[26]*GYYj + e.d[31]*(GYZj + GZYj) + e.d[35]*GZZj)
 								+ (GXZi + GZXi)*(e.d[18]*GXXj + e.d[24]*(GXYj + GYXj) + e.d[22]*(GXZj + GZXj) + e.d[31]*GYYj + e.d[35]*(GYZj + GZYj) + e.d[36]*GZZj)
 								 + GYYi*(e.d[14]*GXXj + e.d[26]*(GXYj + GYXj) + e.d[31]*(GXZj + GZXj) + e.d[39]*GYYj + e.d[40]*(GYZj + GZYj) + e.d[42]*GZZj)
 								+ (GYZi + GZYi)*(e.d[21]*GXXj + e.d[31]*(GXYj + GYXj) + e.d[35]*(GXZj + GZXj) + e.d[40]*GYYj + e.d[42]*(GYZj + GZYj) + e.d[43]*GZZj)
-								 + GZZi*(e.d[22]*GXXj + e.d[35]*(GXYj + GYXj) + e.d[36]*(GXZj + GZXj) + e.d[42]*GYYj + e.d[43]*(GYZj + GZYj) + e.d[44]*GZZj))*detJt;
+								 + GZZi*(e.d[22]*GXXj + e.d[35]*(GXYj + GYXj) + e.d[36]*(GXZj + GZXj) + e.d[42]*GYYj + e.d[43]*(GYZj + GZYj) + e.d[44]*GZZj))*detJt*detJt;
 
 				ke[i3+2][j3+2] += (GXXi*(e.d[5]*GXXj + e.d[18]*(GXYj + GYXj) + e.d[19]*(GXZj + GZXj) + e.d[21]*GYYj + e.d[22]*(GYZj + GZYj) + e.d[23]*GZZj)
 					            + (GXYi + GYXi)*(e.d[18]*GXXj + e.d[21]*(GXYj + GYXj) + e.d[22]*(GXZj + GZXj) + e.d[31]*GYYj + e.d[35]*(GYZj + GZYj) + e.d[33]*GZZj)
 								+ (GXZi + GZXi)*(e.d[19]*GXXj + e.d[22]*(GXYj + GYXj) + e.d[23]*(GXZj + GZXj) + e.d[35]*GYYj + e.d[36]*(GYZj + GZYj) + e.d[37]*GZZj)
 								 + GYYi*(e.d[24]*GXXj + e.d[31]*(GXYj + GYXj) + e.d[35]*(GXZj + GZXj) + e.d[40]*GYYj + e.d[42]*(GYZj + GZYj) + e.d[43]*GZZj)
 								+ (GYZi + GZYi)*(e.d[22]*GXXj + e.d[35]*(GXYj + GYXj) + e.d[36]*(GXZj + GZXj) + e.d[42]*GYYj + e.d[43]*(GYZj + GZYj) + e.d[44]*GZZj)
-								 + GZZi*(e.d[23]*GXXj + e.d[36]*(GXYj + GYXj) + e.d[37]*(GXZj + GZXj) + e.d[43]*GYYj + e.d[44]*(GYZj + GZYj) + e.d[45]*GZZj))*detJt;
+								 + GZZi*(e.d[23]*GXXj + e.d[36]*(GXYj + GYXj) + e.d[37]*(GXZj + GZXj) + e.d[43]*GYYj + e.d[44]*(GYZj + GZYj) + e.d[45]*GZZj))*detJt*detJt;
 
 			}
 		}

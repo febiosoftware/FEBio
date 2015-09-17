@@ -404,10 +404,10 @@ void FEMicroMaterial2O::UpdateBC(FEModel& rve, mat3d& F, tens3drs& G)
 			pc->m_Fmacro = F;
 			pc->m_Gmacro = G;
 
-			FE2OMicroConstraint* pmc = dynamic_cast<FE2OMicroConstraint*>(rve.NonlinearConstraint(i));
-			assert(pmc);
-			pmc->m_s.m_Fm = F;
-			pmc->m_s.m_Gm = G;
+			//FE2OMicroConstraint* pmc = dynamic_cast<FE2OMicroConstraint*>(rve.NonlinearConstraint(i));
+			//assert(pmc);
+			//pmc->m_s.m_Fm = F;
+			//pmc->m_s.m_Gm = G;
 		}
 	}
 }
@@ -485,6 +485,30 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 
 	// initialize
 	if (rve.Init() == false) throw FEMultiScaleException();
+	
+	FEBioPlotFile* pplt = 0;
+
+	if (plot_on)
+	{
+		pplt = new FEBioPlotFile(rve);
+		vector<int> item;
+		pplt->AddVariable("displacement", item);
+		pplt->AddVariable("stress", item);
+
+		if (m_bperiodic)
+		{
+			pplt->AddVariable("contact gap", item);
+			pplt->AddVariable("contact traction", item);
+			pplt->AddVariable("contact pressure", item);
+		}
+
+		stringstream ss;
+		ss << "rve_elem_" << plot_on << "_ipt_" << int_pt << ".xplt";
+		string plot_name = ss.str();
+		
+		pplt->Open(rve, plot_name.c_str());
+		pplt->Write(rve);
+	}
 
 	// apply the BC's
 	UpdateBC(rve, F, G);
@@ -514,7 +538,7 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 
 	// set the plot file
 	if (plot_on)
-	{
+	{/*
 		FEBioPlotFile* pplt = new FEBioPlotFile(rve);
 		vector<int> item;
 		pplt->AddVariable("displacement", item);
@@ -530,7 +554,8 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 		stringstream ss;
 		ss << "rve_elem_" << plot_on << "_ipt_" << int_pt << ".xplt";
 		string plot_name = ss.str();
-		pplt->Open(rve, plot_name.c_str());
+		
+		pplt->Open(rve, plot_name.c_str());*/
 		pplt->Write(rve);
 		pplt->Close();
 	}

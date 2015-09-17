@@ -483,6 +483,7 @@ bool FEPlotElementtaunorm::Save(FEDomain& dom, vector<float>& a)
 		// we output the average stress values of the gauss points
 		for (int j=0; j<nint; ++j)
 		{
+			FEElasticMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
 			FEMicroMaterialPoint2O* ppt2O = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
 			
 			if (ppt2O)
@@ -490,6 +491,9 @@ bool FEPlotElementtaunorm::Save(FEDomain& dom, vector<float>& a)
 				FEMicroMaterialPoint2O& pt2O = *ppt2O;
 				tau_avg += (pt2O.m_tau)*f;
 				
+				FEElasticMaterialPoint& pt = *ppt;
+				double norm = pt2O.m_G.tripledot3rs(pt2O.m_G);
+
 				pt2O.m_G_prev = pt2O.m_G;
 
 				pt2O.m_macro_energy += pt2O.m_macro_energy_inc;

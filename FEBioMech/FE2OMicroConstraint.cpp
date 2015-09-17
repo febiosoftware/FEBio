@@ -360,5 +360,5 @@ void FE2OMicroConstraint::Update(const FETimePoint& tp)
 	m_s.m_c = m_s.SurfMicrofluc();
 	
 	// update pressure variable
-	m_s.m_pv = m_s.m_Lm + m_s.m_c*m_eps;
+	m_s.m_pv = m_s.m_Lm - m_s.m_c*m_eps;
 }

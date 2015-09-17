@@ -393,6 +393,21 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	// initialize
 	if (rve.Init() == false) throw FEMultiScaleException();
 
+	FEBioPlotFile* pplt = new FEBioPlotFile(rve);
+	vector<int> item;
+	pplt->AddVariable("displacement", item);
+	pplt->AddVariable("stress", item);
+
+	if (m_bperiodic)
+	{
+		pplt->AddVariable("contact gap", item);
+		pplt->AddVariable("contact traction", item);
+		pplt->AddVariable("contact pressure", item);
+	}
+
+	pplt->Open(rve, "rve.xplt");
+	pplt->Write(rve);
+	
 	// apply the BC's
 	UpdateBC(rve, F);
 
@@ -415,7 +430,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	calc_energy_diff(rve, mp);	
 	
 	// set the plot file
-	FEBioPlotFile* pplt = new FEBioPlotFile(rve);
+	/*FEBioPlotFile* pplt = new FEBioPlotFile(rve);
 	vector<int> item;
 	pplt->AddVariable("displacement", item);
 	pplt->AddVariable("stress", item);
@@ -427,7 +442,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 		pplt->AddVariable("contact pressure", item);
 	}
 
-	pplt->Open(rve, "rve.xplt");
+	pplt->Open(rve, "rve.xplt");*/
 	pplt->Write(rve);
 	pplt->Close();
 
@@ -732,7 +747,7 @@ void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 				V0 += J0*w[n];
 				rve_energy_avg += rve_S.dotdot(rve_E - rve_E_prev)*J0*w[n];*/
 				
-				//// calculate microscopic strain energy according to Cauchy stress
+				// calculate microscopic strain energy according to Cauchy stress
 				/*rve_e = ((mat3dd(1) - rve_F.transinv()*rve_F.inverse())*0.5).sym();
 				rve_e_prev = ((mat3dd(1) - rve_F_prev.transinv()*rve_F_prev.inverse())*0.5).sym();
 				J = dom.detJt(el, n);		
