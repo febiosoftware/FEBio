@@ -14,17 +14,11 @@
 #include "FELinearConstraint.h"
 #include "FEObject.h"
 #include "DumpStream.h"
-#include "DataStore.h"
 #include "FEGlobalData.h"
 #include "FETypes.h"
 #include <string>
 #include <vector>
 #include <map>
-
-//-----------------------------------------------------------------------------
-// Forward declaration of the FEModel class.
-class FEModel;
-class DataRecord;
 
 //-----------------------------------------------------------------------------
 // callback structure
