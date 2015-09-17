@@ -292,10 +292,6 @@ bool FEAnalysis::Solve()
 	// dump stream for running restarts
 	DumpStream dmp;
 
-	// Flags used to note whether the last converged time step was stored.
-	// This is used by to make sure that the final time step is stored to the plot file and data files.
-	bool boutput = false;
-
 	// repeat for all timesteps
 	m_nretries = 0;
 	while (endtime - m_fem.m_ftime > eps)
@@ -391,23 +387,6 @@ bool FEAnalysis::Solve()
 			// output results to plot database
 			m_fem.Write(FE_CONVERGED);
 
-			// Dump converged state to the archive
-			if (m_bDump) m_fem.DumpData();
-
-			// store additional data to the logfile
-			boutput = false;
-			if ((m_noutput != FE_OUTPUT_NEVER) && (m_noutput != FE_OUTPUT_FINAL))
-			{
-				if (m_noutput == FE_OUTPUT_MUST_POINTS)
-				{
-					if (m_nmust >= 0) { m_fem.WriteData(); boutput = true; }
-				}
-				else
-				{
-					m_fem.WriteData(); boutput = true;
-				}
-			}
-
 			// update time step
 			if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(m_psolver->m_niter);
 
@@ -459,12 +438,6 @@ bool FEAnalysis::Solve()
 
 	// write the final time step, if it hasn't been written yet.
 	if (bconv) m_fem.Write(FE_STEP_SOLVED);
-
-	// output the final time step, if it hasn't been written yet.
-	if (m_noutput != FE_OUTPUT_NEVER)
-	{
-		if (bconv && (boutput == false)) m_fem.WriteData();
-	}
 
 	m_fem.m_ftime0 = m_fem.m_ftime;
 

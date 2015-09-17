@@ -82,7 +82,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			}
 			else prec->DataRecord::SetItemList(tag.szvalue());
 
-			fem.AddDataRecord(prec);
+			m_pim->AddDataRecord(prec);
 		}
 		else if (tag == "element_data")
 		{
@@ -131,7 +131,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			}
 			else prec->DataRecord::SetItemList(tag.szvalue());
 
-			fem.AddDataRecord(prec);
+			m_pim->AddDataRecord(prec);
 		}
 		else if (tag == "rigid_body_data")
 		{
@@ -173,7 +173,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 			prec->SetItemList(tag.szvalue());
 
-			fem.AddDataRecord(prec);
+			m_pim->AddDataRecord(prec);
 		}
         else if (tag == "rigid_connector_data")
         {
@@ -215,7 +215,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
             
             prec->SetItemList(tag.szvalue());
             
-            fem.AddDataRecord(prec);
+            m_pim->AddDataRecord(prec);
         }
 		else throw XMLReader::InvalidTag(tag);
 

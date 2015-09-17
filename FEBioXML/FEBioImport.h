@@ -3,6 +3,7 @@
 #include "XMLReader.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FESolver.h"
+#include "FECore/DataStore.h"
 #include <map>
 #include <string>
 using namespace std;
@@ -168,6 +169,8 @@ public:
 
 	void SetPlotCompression(int n);
 
+	void AddDataRecord(DataRecord* pd);
+
 public:
 	void ClearParams();
 
@@ -205,6 +208,8 @@ public:
 	char					m_szplot_type[256];
 	vector<PlotVariable>	m_plot;
 	int						m_nplot_compression;
+
+	vector<DataRecord*>		m_data;
 
 	vector<XMLParam>	m_Param;	// parameter list
 

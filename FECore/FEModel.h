@@ -282,17 +282,8 @@ public: // --- I/O functions
 	//! write to plot file
 	virtual void Write(FE_OUTPUT_HINT hint) {}
 
-	//! write data to log file
-	virtual void WriteData() {}
-
-	//! write data to dump file
-	virtual void DumpData() {}
-
 	//! serialize data
 	virtual bool Serialize(DumpFile& ar) { return true; }
-
-	//! Add data record
-	virtual void AddDataRecord(DataRecord* pd) {}
 
 public: // Global data
 	void AddGlobalData(FEGlobalData* psd);

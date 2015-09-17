@@ -316,6 +316,8 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	m_plot.clear();
 	m_nplot_compression = 0;
 
+	m_data.clear();
+
 	// default element type
 	m_ntet4  = FE_TET4G1;
 	m_nhex8  = FE_HEX8G8;
@@ -745,6 +747,12 @@ void FEBioImport::ReadList(XMLTag& tag, vector<int>& l)
 void FEBioImport::SetDumpfileName(const char* sz) { sprintf(m_szdmp, sz); }
 void FEBioImport::SetLogfileName (const char* sz) { sprintf(m_szlog, sz); }
 void FEBioImport::SetPlotfileName(const char* sz) { sprintf(m_szplt, sz); }
+
+//-----------------------------------------------------------------------------
+void FEBioImport::AddDataRecord(DataRecord* pd)
+{
+	m_data.push_back(pd);
+}
 
 //-----------------------------------------------------------------------------
 void FEBioImport::AddPlotVariable(const char* szvar, vector<int>& item)

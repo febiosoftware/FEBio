@@ -206,6 +206,10 @@ bool FEBioModel::Input(const char* szfile)
 		}
 	}
 
+	// add the data records
+	int ND = fim.m_data.size();
+	for (int i=0; i<ND; ++i) AddDataRecord(fim.m_data[i]);
+
 	// we're done reading
 	return true;
 }
@@ -218,67 +222,93 @@ bool FEBioModel::Input(const char* szfile)
 //! Export state to plot file.
 void FEBioModel::Write(FE_OUTPUT_HINT hint)
 {
+	// get the current step
+	FEAnalysis* pstep = GetCurrentStep();
+
 	if (m_plot)
 	{
-		// get the step and its plot level
-		FEAnalysis* pstep = GetCurrentStep();
+		// get the plot level
 		int nplt = pstep->GetPlotLevel();
 
 		// if we don't want to plot anything we return
-		if (nplt == FE_PLOT_NEVER) return;
-
-		// try to open the plot file
-		if (hint == FE_STEP_INITIALIZED)
+		if (nplt != FE_PLOT_NEVER)
 		{
-			if (m_plot->IsValid() == false)
+			// try to open the plot file
+			if (hint == FE_STEP_INITIALIZED)
 			{
-				if (m_plot->Open(*this, m_szplot) == false)
+				if (m_plot->IsValid() == false)
 				{
-					felog.printf("ERROR : Failed creating PLOT database\n");
-					delete m_plot;
-					m_plot = 0;
+					if (m_plot->Open(*this, m_szplot) == false)
+					{
+						felog.printf("ERROR : Failed creating PLOT database\n");
+						delete m_plot;
+						m_plot = 0;
+					}
+
+					// Since it is assumed that for the first timestep
+					// there are no loads or initial displacements, the case n=0 is skipped.
+					// Therefor we can output those results here.
+					// TODO: Offcourse we should actually check if this is indeed
+					//       the case, otherwise we should also solve for t=0
+					m_plot->Write(*this);
 				}
-
-				// Since it is assumed that for the first timestep
-				// there are no loads or initial displacements, the case n=0 is skipped.
-				// Therefor we can output those results here.
-				// TODO: Offcourse we should actually check if this is indeed
-				//       the case, otherwise we should also solve for t=0
-				m_plot->Write(*this);
 			}
-		}
-		else
-		{
-			// assume we won't be writing anything
-			bool bout = false;
-
-			// see if we need to output something
-			bool bdebug = GetDebugFlag();
-
-			// when debugging we always output
-			// (this coule mean we may end up writing the same state multiple times)
-			if (bdebug) bout = true;
 			else
 			{
-				switch (hint)
+				// assume we won't be writing anything
+				bool bout = false;
+
+				// see if we need to output something
+				bool bdebug = GetDebugFlag();
+
+				// when debugging we always output
+				// (this coule mean we may end up writing the same state multiple times)
+				if (bdebug) bout = true;
+				else
 				{
-				case FE_UNKNOWN    : bout = true; break;
-				case FE_UNCONVERGED: if (nplt == FE_PLOT_MINOR_ITRS   ) bout = true; break;
-				case FE_CONVERGED  : 
-					if ((nplt == FE_PLOT_MAJOR_ITRS ) && (pstep->m_ntimesteps % pstep->m_nplot_stride == 0)) bout = true; 
-					if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_nmust >= 0)) bout = true;
-					break;
-				case FE_AUGMENT    : if (nplt == FE_PLOT_AUGMENTATIONS) bout = true; break;
-				case FE_STEP_SOLVED: if (nplt == FE_PLOT_FINAL) bout = true;
+					switch (hint)
+					{
+					case FE_UNKNOWN    : bout = true; break;
+					case FE_UNCONVERGED: if (nplt == FE_PLOT_MINOR_ITRS   ) bout = true; break;
+					case FE_CONVERGED  : 
+						if ((nplt == FE_PLOT_MAJOR_ITRS ) && (pstep->m_ntimesteps % pstep->m_nplot_stride == 0)) bout = true; 
+						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_nmust >= 0)) bout = true;
+						break;
+					case FE_AUGMENT    : if (nplt == FE_PLOT_AUGMENTATIONS) bout = true; break;
+					case FE_STEP_SOLVED: if (nplt == FE_PLOT_FINAL) bout = true;
+					}
+				}
+
+				// output the state if requested
+				if (bout) 
+				{
+					m_plot->Write(*this);
 				}
 			}
-
-			// output the state if requested
-			if (bout) 
-			{
-				m_plot->Write(*this);
-			}
 		}
+	}
+
+	// Dump converged state to the archive
+	if (pstep->m_bDump) DumpData();
+
+	// write the output data
+	int nout = pstep->GetOutputLevel();
+	if (nout != FE_OUTPUT_NEVER)
+	{
+		bool bout = false;
+		switch (hint)
+		{
+		case FE_UNCONVERGED: if (nout == FE_OUTPUT_MINOR_ITRS) bout = true; break;
+		case FE_CONVERGED:
+			if (nout == FE_OUTPUT_MAJOR_ITRS) bout = true;
+			if ((nout == FE_OUTPUT_MUST_POINTS) && (pstep->m_nmust >= 0)) bout = true;
+			break;
+		case FE_STEP_SOLVED:
+			if (nout == FE_OUTPUT_FINAL) bout = true;
+			break;
+		}
+
+		if (bout) WriteData();
 	}
 }
 
