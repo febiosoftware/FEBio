@@ -40,6 +40,9 @@ public:
 	double	   m_macro_energy_inc;
 	double	   m_micro_energy_inc;
 
+	FEModel m_rve;		
+	FEModel m_rve_prev;
+
 	tens4ds	m_Ka;	//!< averaged material stiffness
 };
 
@@ -60,7 +63,7 @@ public:
 	bool	m_bperiodic;	//!< periodic bc flag
 
 protected:
-	FEModel	m_rve;			//!< the master RVE (Representive Volume Element)
+	FEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
 	bool	m_brve;			//!< flag indicating whether RVE was read in
 	double	m_V0;			//!< initial volume of RVE
 	vector<int> m_BN;		//!< boundary node flags
@@ -95,7 +98,7 @@ protected:
 	mat3d AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp);
 	mat3ds AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp);
 
-	void calc_energy_diff(FEModel& rve, FEMaterialPoint& pt);
+	void calc_energy_diff(FEMaterialPoint& pt);
 
 public:
 	// declare the parameter list

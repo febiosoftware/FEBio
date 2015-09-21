@@ -57,6 +57,9 @@ public:
 	double	   m_macro_energy_inc;	// LTE - Macroscopic strain energy increment
 	double	   m_micro_energy_inc;	// LTE - Microscopic strain energy increment
 
+	FEModel m_rve;		
+	FEModel m_rve_prev;
+
 	tens4ds	   m_Ca;			//!< averaged material stiffness
 	tens5ds    m_Da;
 	tens6ds    m_Ea;
@@ -79,7 +82,7 @@ public:
 	bool	m_bperiodic;	//!< periodic bc flag
 
 protected:
-	FEModel	m_rve;			//!< the master RVE (Representive Volume Element)
+	FEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
 	bool	m_brve;			//!< flag indicating whether RVE was read in
 	double	m_V0;			//!< initial volume of RVE
 	vector<int> m_BN;		//!< boundary node flags

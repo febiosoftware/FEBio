@@ -401,6 +401,7 @@ bool FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
 				if (mmppt)
 				{
 					FEMicroMaterialPoint& mmpt = *mmppt;
+					mmpt.m_rve_prev.CopyFrom(mmpt.m_rve);
 					mmpt.m_macro_energy += mmpt.m_macro_energy_inc;
 					mmpt.m_micro_energy += mmpt.m_micro_energy_inc;
 					mmpt.m_energy_diff = fabs(mmpt.m_macro_energy - mmpt.m_micro_energy); 
@@ -496,6 +497,7 @@ bool FEPlotElementtaunorm::Save(FEDomain& dom, vector<float>& a)
 
 				pt2O.m_G_prev = pt2O.m_G;
 
+				pt2O.m_rve_prev.CopyFrom(pt2O.m_rve);
 				pt2O.m_macro_energy += pt2O.m_macro_energy_inc;
 				pt2O.m_micro_energy += pt2O.m_micro_energy_inc;
 				pt2O.m_energy_diff = fabs(pt2O.m_macro_energy - pt2O.m_micro_energy); 

@@ -137,16 +137,16 @@ void FEMicroMaterial2O::Init()
 	{
 		// load the RVE model
 		FEBioImport fim;
-		if (fim.Load(m_rve, m_szrve) == false)
+		if (fim.Load(m_mrve, m_szrve) == false)
 		{
 			throw MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
 		}
 
 		// set the pardiso solver as default
-		m_rve.m_nsolver = PARDISO_SOLVER;
+		m_mrve.m_nsolver = PARDISO_SOLVER;
 
 		// make sure the RVE problem doesn't output anything to a plot file
-		m_rve.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
+		m_mrve.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
 
 		// create the BC's for this RVE
 		if (PrepRVE() == false) throw MaterialError("An error occurred preparing RVE model");
@@ -180,14 +180,14 @@ bool FEMicroMaterial2O::PrepRVE()
 	felog.SetMode(Logfile::NEVER);
 
 	// initialize RVE
-	if (m_rve.Init() == false) return false;
+	if (m_mrve.Init() == false) return false;
 
 	// calculate intial RVE volume
 	m_V0 = 0;
 	double ve;
 	int nint;
 	double* w, J;
-	FEMesh& m = m_rve.GetMesh();
+	FEMesh& m = m_mrve.GetMesh();
 	for (int k=0; k<m.Domains(); ++k)
 	{
 		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
@@ -218,7 +218,7 @@ bool FEMicroMaterial2O::PrepRVE()
 void FEMicroMaterial2O::FindBoundaryNodes()
 {
 	// first we need to find all the boundary nodes
-	FEMesh& m = m_rve.GetMesh();
+	FEMesh& m = m_mrve.GetMesh();
 	int N = m.Nodes();
 	m_BN.assign(N, 0);
 
@@ -292,7 +292,7 @@ void FEMicroMaterial2O::FindBoundaryNodes()
 //-----------------------------------------------------------------------------
 bool FEMicroMaterial2O::PrepDisplacementBC()
 {
-	FEMesh& m = m_rve.GetMesh();
+	FEMesh& m = m_mrve.GetMesh();
 	int N = m.Nodes();
 
 	// count the nr of exterior nodes
@@ -307,21 +307,21 @@ bool FEMicroMaterial2O::PrepDisplacementBC()
 	plc->SetInterpolation(FELoadCurve::LINEAR);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	m_rve.AddLoadCurve(plc);
-	int NLC = m_rve.LoadCurves() - 1;
+	m_mrve.AddLoadCurve(plc);
+	int NLC = m_mrve.LoadCurves() - 1;
 
 	// create the DC's
 	NN = 0;
-	m_rve.ClearBCs();
+	m_mrve.ClearBCs();
 	for (i=0; i<N; ++i)
 		if (m_BN[i] == 1)
 		{
 			for (int j=0; j<3; ++j, ++NN)
 			{
-				FEPrescribedBC* pdc = new FEPrescribedBC(&m_rve);
+				FEPrescribedBC* pdc = new FEPrescribedBC(&m_mrve);
 				pdc->SetDOF(j).SetLoadCurveIndex(NLC).SetScale(0.0);
 				pdc->AddNode(i);
-				m_rve.AddPrescribedBC(pdc);
+				m_mrve.AddPrescribedBC(pdc);
 			}
 		}
 
@@ -332,30 +332,30 @@ bool FEMicroMaterial2O::PrepDisplacementBC()
 bool FEMicroMaterial2O::PrepPeriodicBC()
 {
 	// get the RVE mesh
-	FEMesh& m = m_rve.GetMesh();
+	FEMesh& m = m_mrve.GetMesh();
 
 	// create a load curve
 	FELoadCurve* plc = new FELoadCurve;
 	plc->SetInterpolation(FELoadCurve::LINEAR);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	m_rve.AddLoadCurve(plc);
-	int NLC = m_rve.LoadCurves() - 1;
+	m_mrve.AddLoadCurve(plc);
+	int NLC = m_mrve.LoadCurves() - 1;
 
 	// find the node set that defines the corner nodes
 	FENodeSet* pset = m.FindNodeSet(m_szbc);
 	if (pset == 0) return false;
 
 	// create the DC's
-	m_rve.ClearBCs();
+	m_mrve.ClearBCs();
 	int N = pset->size();
 	for (int i=0; i<N; ++i)
 		for (int j=0; j<3; ++j)
 		{
-			FEPrescribedBC* pdc = new FEPrescribedBC(&m_rve);
+			FEPrescribedBC* pdc = new FEPrescribedBC(&m_mrve);
 			pdc->SetDOF(j).SetLoadCurveIndex(NLC).SetScale(0.0);
 			pdc->AddNode((*pset)[i]);
-			m_rve.AddPrescribedBC(pdc);
+			m_mrve.AddPrescribedBC(pdc);
 		}
 
 	return true;
@@ -480,7 +480,7 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 	
 	// Create a local copy of the rve
 	FEModel rve;
-	rve.CopyFrom(m_rve);
+	rve.CopyFrom(m_mrve);
 	rve.GetStep(0)->SetPrintLevel(FE_PRINT_NEVER);
 
 	// initialize
@@ -518,6 +518,8 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException();
+
+	mmpt2O.m_rve.CopyFrom(rve);
 
 	// calculate the averaged Cauchy stress
 	mat3ds sa; sa.zero();
@@ -991,7 +993,7 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 
 	// calculate the macroscopic strain energy increment according to PK1 stress
 	mmpt2O.m_macro_energy_inc = mmpt2O.m_PK1.dotdot(pt.m_F - pt.m_F_prev) + mmpt2O.m_QK1.tripledot3rs(mmpt2O.m_G - mmpt2O.m_G_prev);
-	
+
 	// calculate the macroscopic strain energy increment according to PK2 stress
 	/*mat3ds E_prev = ((F_prev.transpose()*F_prev - mat3dd(1))*0.5).sym();
 	tens3ds H_prev = ((G_prev.transpose().multiply2right(F).LStoUnsym() + G_prev.multiply2left(Ftrans).RStoUnsym())*0.5).symm();
@@ -1027,22 +1029,32 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	double J = 0.;
 	double v = 0.;
 
-	FEMesh& m = rve.GetMesh();
+	FEMesh& m = mmpt2O.m_rve.GetMesh();
+	FEMesh& m_prev = mmpt2O.m_rve_prev.GetMesh();
+
+	if (m_prev.Domains() == 0)
+		m_prev.CopyFrom(m);
+
 	for (int k=0; k<m.Domains(); ++k)
 	{
 		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
+		FESolidDomain& dom_prev = static_cast<FESolidDomain&>(m_prev.Domain(k));
+
 		for (int i=0; i<dom.Elements(); ++i)
 		{
 			FESolidElement& el = dom.Element(i);
+			FESolidElement& el_prev = dom_prev.Element(i);
+			
 			nint = el.GaussPoints();
 			w = el.GaussWeights();
 			
 			for (int n=0; n<nint; ++n)
 			{
 				FEElasticMaterialPoint& rve_pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
-				
+				FEElasticMaterialPoint& rve_pt_prev = *el_prev.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
+
 				rve_F = rve_pt.m_F;
-				rve_F_prev = rve_pt.m_F_prev;
+				rve_F_prev = rve_pt_prev.m_F;
 				rve_s = rve_pt.m_s;
 
 				// calculate microscopic strain energy according to PK1 stress

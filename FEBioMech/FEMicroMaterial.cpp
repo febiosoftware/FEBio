@@ -109,16 +109,16 @@ void FEMicroMaterial::Init()
 	{
 		// load the RVE model
 		FEBioImport fim;
-		if (fim.Load(m_rve, m_szrve) == false)
+		if (fim.Load(m_mrve, m_szrve) == false)
 		{
 			throw MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
 		}
 
 		// set the pardiso solver as default
-		m_rve.m_nsolver = PARDISO_SOLVER;
+		m_mrve.m_nsolver = PARDISO_SOLVER;
 
 		// make sure the RVE problem doesn't output anything to a plot file
-		m_rve.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
+		m_mrve.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
 
 		// create the BC's for this RVE
 		if (PrepRVE() == false) throw MaterialError("An error occurred preparing RVE model");
@@ -152,14 +152,14 @@ bool FEMicroMaterial::PrepRVE()
 	felog.SetMode(Logfile::NEVER);
 
 	// initialize RVE
-	if (m_rve.Init() == false) return false;
+	if (m_mrve.Init() == false) return false;
 
 	// calculate intial RVE volume
 	m_V0 = 0;
 	double ve;
 	int nint;
 	double* w, J;
-	FEMesh& m = m_rve.GetMesh();
+	FEMesh& m = m_mrve.GetMesh();
 	for (int k=0; k<m.Domains(); ++k)
 	{
 		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
@@ -190,7 +190,7 @@ bool FEMicroMaterial::PrepRVE()
 void FEMicroMaterial::FindBoundaryNodes()
 {
 	// first we need to find all the boundary nodes
-	FEMesh& m = m_rve.GetMesh();
+	FEMesh& m = m_mrve.GetMesh();
 	int N = m.Nodes();
 	m_BN.assign(N, 0);
 
@@ -264,7 +264,7 @@ void FEMicroMaterial::FindBoundaryNodes()
 //-----------------------------------------------------------------------------
 bool FEMicroMaterial::PrepDisplacementBC()
 {
-	FEMesh& m = m_rve.GetMesh();
+	FEMesh& m = m_mrve.GetMesh();
 	int N = m.Nodes();
 
 	// count the nr of exterior nodes
@@ -279,21 +279,21 @@ bool FEMicroMaterial::PrepDisplacementBC()
 	plc->SetInterpolation(FELoadCurve::LINEAR);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	m_rve.AddLoadCurve(plc);
-	int NLC = m_rve.LoadCurves() - 1;
+	m_mrve.AddLoadCurve(plc);
+	int NLC = m_mrve.LoadCurves() - 1;
 
 	// create the DC's
 	NN = 0;
-	m_rve.ClearBCs();
+	m_mrve.ClearBCs();
 	for (i=0; i<N; ++i)
 		if (m_BN[i] == 1)
 		{
 			for (int j=0; j<3; ++j, ++NN)
 			{
-				FEPrescribedBC* pdc = new FEPrescribedBC(&m_rve);
+				FEPrescribedBC* pdc = new FEPrescribedBC(&m_mrve);
 				pdc->SetDOF(j).SetLoadCurveIndex(NLC).SetScale(0.0);
 				pdc->AddNode(i);
-				m_rve.AddPrescribedBC(pdc);
+				m_mrve.AddPrescribedBC(pdc);
 			}
 		}
 
@@ -304,30 +304,30 @@ bool FEMicroMaterial::PrepDisplacementBC()
 bool FEMicroMaterial::PrepPeriodicBC()
 {
 	// get the RVE mesh
-	FEMesh& m = m_rve.GetMesh();
+	FEMesh& m = m_mrve.GetMesh();
 
 	// create a load curve
 	FELoadCurve* plc = new FELoadCurve;
 	plc->SetInterpolation(FELoadCurve::LINEAR);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	m_rve.AddLoadCurve(plc);
-	int NLC = m_rve.LoadCurves() - 1;
+	m_mrve.AddLoadCurve(plc);
+	int NLC = m_mrve.LoadCurves() - 1;
 
 	// find the node set that defines the corner nodes
 	FENodeSet* pset = m.FindNodeSet(m_szbc);
 	if (pset == 0) return false;
 
 	// create the DC's
-	m_rve.ClearBCs();
+	m_mrve.ClearBCs();
 	int N = pset->size();
 	for (int i=0; i<N; ++i)
 		for (int j=0; j<3; ++j)
 		{
-			FEPrescribedBC* pdc = new FEPrescribedBC(&m_rve);
+			FEPrescribedBC* pdc = new FEPrescribedBC(&m_mrve);
 			pdc->SetDOF(j).SetLoadCurveIndex(NLC).SetScale(0.0);
 			pdc->AddNode((*pset)[i]);
-			m_rve.AddPrescribedBC(pdc);
+			m_mrve.AddPrescribedBC(pdc);
 		}
 
 	return true;
@@ -387,7 +387,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	
 	// Create a local copy of the rve
 	FEModel rve;
-	rve.CopyFrom(m_rve);
+	rve.CopyFrom(m_mrve);
 	rve.GetStep(0)->SetPrintLevel(FE_PRINT_NEVER);
 
 	// initialize
@@ -417,6 +417,8 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException();
 
+	mmpt.m_rve.CopyFrom(rve);
+
 	// calculate the averaged stress
 	mat3ds sa = AveragedStress(rve, mp);
 	
@@ -427,7 +429,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	// calculate the averaged stiffness
 	mmpt.m_Ka = AveragedStiffness(rve, mp);
 
-	calc_energy_diff(rve, mp);	
+	calc_energy_diff(mp);	
 	
 	// set the plot file
 	/*FEBioPlotFile* pplt = new FEBioPlotFile(rve);
@@ -656,7 +658,7 @@ tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the energy difference between the RVE problem and the macro material point
-void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
+void FEMicroMaterial::calc_energy_diff(FEMaterialPoint& mp)
 {
 	double energy_diff = 0.;
 	
@@ -714,30 +716,40 @@ void FEMicroMaterial::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	double J = 0.;
 	double v = 0.;
 
-	FEMesh& m = rve.GetMesh();
+	FEMesh& m = mmpt.m_rve.GetMesh();
+	FEMesh& m_prev = mmpt.m_rve_prev.GetMesh();
+
+	if (m_prev.Domains() == 0)
+		m_prev.CopyFrom(m);
+
 	for (int k=0; k<m.Domains(); ++k)
 	{
 		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
+		FESolidDomain& dom_prev = static_cast<FESolidDomain&>(m_prev.Domain(k));
+		
 		for (int i=0; i<dom.Elements(); ++i)
 		{
 			FESolidElement& el = dom.Element(i);
+			FESolidElement& el_prev = dom_prev.Element(i);
+
 			nint = el.GaussPoints();
 			w = el.GaussWeights();
 			
 			for (int n=0; n<nint; ++n)
 			{
 				FEElasticMaterialPoint& rve_pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
-				
+				FEElasticMaterialPoint& rve_pt_prev = *el_prev.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
+
 				rve_F = rve_pt.m_F;
-				rve_F_prev = rve_pt.m_F_prev;
+				rve_F_prev = rve_pt_prev.m_F;
 				rve_s = rve_pt.m_s;
 
 				// calculate microscopic strain energy according to PK1 stress
-				rve_PK1 = rve_F.det()*rve_s*rve_F.transinv();
-				J0 = dom.detJ0(el, n);		
-				V0 += J0*w[n];
-				rve_energy_avg += rve_PK1.dotdot(rve_F - rve_F_prev)*J0*w[n];
-								
+				//rve_PK1 = rve_F.det()*rve_s*rve_F.transinv();
+				//J0 = dom.detJ0(el, n);		
+				//V0 += J0*w[n];
+				//rve_energy_avg += rve_PK1.dotdot(rve_F - rve_F_prev)*J0*w[n];
+
 				// calculate microscopic strain energy according to PK2 stress
 				/*rve_E = ((rve_F.transpose()*rve_F - mat3dd(1))*0.5).sym();
 				rve_E_prev = ((rve_F_prev.transpose()*rve_F_prev - mat3dd(1))*0.5).sym();
