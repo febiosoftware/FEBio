@@ -6,11 +6,11 @@
 //! This class implements a domain used in an elastic remodeling problem.
 //! It differs from the FEElasticSolidDomain in that it adds a stiffness matrix
 //! due to the deformation dependent density.
-class FEElasticDomain2O : public FEElasticSolidDomain
+class FEElasticMultiscaleDomain2O : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	FEElasticDomain2O(FEModel* pfem);
+	FEElasticMultiscaleDomain2O(FEModel* pfem);
 	
 	void InitElements();
 	void ElementInternalForce(FESolidElement& el, vector<double>& fe);

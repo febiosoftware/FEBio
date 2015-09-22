@@ -75,6 +75,8 @@ public:
 	//! calculate stress at material point
 	virtual mat3ds Stress(FEMaterialPoint& pt);
 
+	virtual mat3ds Stress1O(FEMaterialPoint& pt, int plot_on, int int_pt);
+
 	//! calculate tangent stiffness at material point
 	virtual tens4ds Tangent(FEMaterialPoint& pt);
 

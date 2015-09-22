@@ -154,7 +154,8 @@
 #include "FERemodelingElasticDomain.h"
 #include "FEUDGHexDomain.h"
 #include "FEUT4Domain.h"
-#include "FEElasticDomain2O.h"
+#include "FEElasticMultiscaleDomain1O.h"
+#include "FEElasticMultiscaleDomain2O.h"
 #include "FESRIElasticSolidDomain.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FEDiscreteSpringDomain.h"
@@ -323,7 +324,8 @@ REGISTER_FECORE_CLASS(FEDamageCriterionMNLS                , FEMATERIAL_ID, "DC 
 REGISTER_FECORE_CLASS(FERigidSolidDomain        , FEDOMAIN_ID, "rigid-solid"      );
 REGISTER_FECORE_CLASS(FERigidShellDomain        , FEDOMAIN_ID, "rigid-shell"      );
 REGISTER_FECORE_CLASS(FERemodelingElasticDomain , FEDOMAIN_ID, "remodeling-solid" );
-REGISTER_FECORE_CLASS(FEElasticDomain2O         , FEDOMAIN_ID, "elastic-20-solid" );
+REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain1O, FEDOMAIN_ID, "elastic-10-solid" );
+REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain2O, FEDOMAIN_ID, "elastic-20-solid" );
 REGISTER_FECORE_CLASS(FE3FieldElasticSolidDomain, FEDOMAIN_ID, "three-field-solid");
 REGISTER_FECORE_CLASS(FEUDGHexDomain            , FEDOMAIN_ID, "udg-hex"          );
 REGISTER_FECORE_CLASS(FESRIElasticSolidDomain   , FEDOMAIN_ID, "sri-solid"        );

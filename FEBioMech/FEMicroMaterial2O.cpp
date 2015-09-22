@@ -540,24 +540,7 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 
 	// set the plot file
 	if (plot_on)
-	{/*
-		FEBioPlotFile* pplt = new FEBioPlotFile(rve);
-		vector<int> item;
-		pplt->AddVariable("displacement", item);
-		pplt->AddVariable("stress", item);
-
-		if (m_bperiodic)
-		{
-			pplt->AddVariable("contact gap", item);
-			pplt->AddVariable("contact traction", item);
-			pplt->AddVariable("contact pressure", item);
-		}
-
-		stringstream ss;
-		ss << "rve_elem_" << plot_on << "_ipt_" << int_pt << ".xplt";
-		string plot_name = ss.str();
-		
-		pplt->Open(rve, plot_name.c_str());*/
+	{
 		pplt->Write(rve);
 		pplt->Close();
 	}

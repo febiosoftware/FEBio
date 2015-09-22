@@ -1,18 +1,18 @@
 #include "stdafx.h"
-#include "FEElasticDomain2O.h"
+#include "FEElasticMultiscaleDomain2O.h"
 #include "FEMicroMaterial2O.h"
 #include "FECore/mat3d.h"
 #include "FECore/tens6d.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEElasticDomain2O::FEElasticDomain2O(FEModel* pfem) : FEElasticSolidDomain(pfem)
+FEElasticMultiscaleDomain2O::FEElasticMultiscaleDomain2O(FEModel* pfem) : FEElasticSolidDomain(pfem)
 {
 }
 
 //-----------------------------------------------------------------------------
 //! Initialize element data
-void FEElasticDomain2O::InitElements()
+void FEElasticMultiscaleDomain2O::InitElements()
 {
 	const int NE = FEElement::MAX_NODES;
 	vec3d x0[NE], xt[NE], r0, rt;
@@ -48,7 +48,7 @@ void FEElasticDomain2O::InitElements()
 
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
-void FEElasticDomain2O::ElementInternalForce(FESolidElement& el, vector<double>& fe)
+void FEElasticMultiscaleDomain2O::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
 
@@ -155,7 +155,7 @@ void FEElasticDomain2O::ElementInternalForce(FESolidElement& el, vector<double>&
 //-----------------------------------------------------------------------------
 //! Update element state data (mostly stresses, but some other stuff as well)
 //! \todo Remove the remodeling solid stuff
-void FEElasticDomain2O::UpdateElementStress(int iel, double dt)
+void FEElasticMultiscaleDomain2O::UpdateElementStress(int iel, double dt)
 {
 	// get the solid element
 	FESolidElement& el = m_Elem[iel];
@@ -203,9 +203,13 @@ void FEElasticDomain2O::UpdateElementStress(int iel, double dt)
 		int plot_on = 0;
 		int num_elem = Elements();
 
-		// If it is a multi-element problem, plot for the last integration point in the first and last element
-		if ((el.m_nID == 1 || el.m_nID == num_elem) && (n == nint-1)){
+		// If it is a multi-element problem, plot for the first integration point in the first and last element
+		if ((el.m_nID == 1 || el.m_nID == num_elem) && (n == 0)){
 			plot_on = el.m_nID;}
+		
+		// If it is a multi-element problem, plot for the last integration point in the first and last element
+		//if ((el.m_nID == 1 || el.m_nID == num_elem) && (n == nint-1)){
+		//	plot_on = el.m_nID;}
 		
 		// If it is a single-element problem, plot for each intergration point of the element
 		if (num_elem == 1){
@@ -218,7 +222,7 @@ void FEElasticDomain2O::UpdateElementStress(int iel, double dt)
 
 //-----------------------------------------------------------------------------
 //! calculates element's geometrical stiffness component for integration point n
-void FEElasticDomain2O::ElementGeometricalStiffness(FESolidElement &el, matrix &ke)
+void FEElasticMultiscaleDomain2O::ElementGeometricalStiffness(FESolidElement &el, matrix &ke)
 {
 	int n, i, j;
 
@@ -336,7 +340,7 @@ void FEElasticDomain2O::ElementGeometricalStiffness(FESolidElement &el, matrix &
 
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
-void FEElasticDomain2O::ElementMaterialStiffness(FESolidElement &el, matrix &ke)
+void FEElasticMultiscaleDomain2O::ElementMaterialStiffness(FESolidElement &el, matrix &ke)
 {
 	int i, i3, j, j3, n;
 
@@ -677,7 +681,7 @@ void FEElasticDomain2O::ElementMaterialStiffness(FESolidElement &el, matrix &ke)
 //! Calculate the deformation gradient of element el at integration point n.
 //! The deformation gradient is returned in F and its determinant is the return
 //! value of the function
-void FEElasticDomain2O::defhess(FESolidElement &el, tens3drs &G, int n)
+void FEElasticMultiscaleDomain2O::defhess(FESolidElement &el, tens3drs &G, int n)
 {
 	int i;
 

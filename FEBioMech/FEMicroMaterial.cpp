@@ -7,6 +7,7 @@
 #include "FECore/FEAnalysis.h"
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioPlot/FEBioPlotFile.h"
+#include <sstream>
 
 //-----------------------------------------------------------------------------
 FEMicroMaterialPoint::FEMicroMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoint(mp)
@@ -378,7 +379,16 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 }
 
 //-----------------------------------------------------------------------------
+// LTE - Note that this function is not used in the first-order implemenetation
 mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
+{
+	mat3ds sa; sa.zero();
+	
+	return sa;
+}
+
+//-----------------------------------------------------------------------------
+mat3ds FEMicroMaterial::Stress1O(FEMaterialPoint &mp, int plot_on, int int_pt)
 {
 	// get the deformation gradient
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -394,19 +404,28 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	if (rve.Init() == false) throw FEMultiScaleException();
 
 	FEBioPlotFile* pplt = new FEBioPlotFile(rve);
-	vector<int> item;
-	pplt->AddVariable("displacement", item);
-	pplt->AddVariable("stress", item);
-
-	if (m_bperiodic)
+	
+	if (plot_on)
 	{
-		pplt->AddVariable("contact gap", item);
-		pplt->AddVariable("contact traction", item);
-		pplt->AddVariable("contact pressure", item);
-	}
+		pplt = new FEBioPlotFile(rve);
+		vector<int> item;
+		pplt->AddVariable("displacement", item);
+		pplt->AddVariable("stress", item);
 
-	pplt->Open(rve, "rve.xplt");
-	pplt->Write(rve);
+		if (m_bperiodic)
+		{
+			pplt->AddVariable("contact gap", item);
+			pplt->AddVariable("contact traction", item);
+			pplt->AddVariable("contact pressure", item);
+		}
+
+		stringstream ss;
+		ss << "rve_elem_" << plot_on << "_ipt_" << int_pt << ".xplt";
+		string plot_name = ss.str();
+		
+		pplt->Open(rve, plot_name.c_str());
+		pplt->Write(rve);
+	}
 	
 	// apply the BC's
 	UpdateBC(rve, F);
@@ -432,21 +451,11 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	calc_energy_diff(mp);	
 	
 	// set the plot file
-	/*FEBioPlotFile* pplt = new FEBioPlotFile(rve);
-	vector<int> item;
-	pplt->AddVariable("displacement", item);
-	pplt->AddVariable("stress", item);
-
-	if (m_bperiodic)
+	if (plot_on)
 	{
-		pplt->AddVariable("contact gap", item);
-		pplt->AddVariable("contact traction", item);
-		pplt->AddVariable("contact pressure", item);
+		pplt->Write(rve);
+		pplt->Close();
 	}
-
-	pplt->Open(rve, "rve.xplt");*/
-	pplt->Write(rve);
-	pplt->Close();
 
 	return sa;
 }
@@ -745,10 +754,10 @@ void FEMicroMaterial::calc_energy_diff(FEMaterialPoint& mp)
 				rve_s = rve_pt.m_s;
 
 				// calculate microscopic strain energy according to PK1 stress
-				//rve_PK1 = rve_F.det()*rve_s*rve_F.transinv();
-				//J0 = dom.detJ0(el, n);		
-				//V0 += J0*w[n];
-				//rve_energy_avg += rve_PK1.dotdot(rve_F - rve_F_prev)*J0*w[n];
+				rve_PK1 = rve_F.det()*rve_s*rve_F.transinv();
+				J0 = dom.detJ0(el, n);		
+				V0 += J0*w[n];
+				rve_energy_avg += rve_PK1.dotdot(rve_F - rve_F_prev)*J0*w[n];
 
 				// calculate microscopic strain energy according to PK2 stress
 				/*rve_E = ((rve_F.transpose()*rve_F - mat3dd(1))*0.5).sym();

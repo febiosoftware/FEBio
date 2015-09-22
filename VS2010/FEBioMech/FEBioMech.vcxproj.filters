@@ -462,9 +462,6 @@
     <ClCompile Include="..\..\FEBioMech\FEElasticDomain2O.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEElasticDomain2O.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEMicroMaterial2O.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -547,6 +544,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FESRIElasticSolidDomain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEElasticMultiscaleDomain1O.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEElasticMultiscaleDomain2O.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1013,9 +1016,6 @@
     <ClInclude Include="..\..\FEBioMech\FEElasticDomain2O.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEElasticDomain2O.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEMicroMaterial2O.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1098,6 +1098,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FESRIElasticSolidDomain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEElasticMultiscaleDomain1O.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEElasticMultiscaleDomain2O.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
