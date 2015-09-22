@@ -309,6 +309,7 @@
     <ClInclude Include="..\..\FECore\FEGlobalData.h" />
     <ClInclude Include="..\..\FECore\FEGlobalMatrix.h" />
     <ClInclude Include="..\..\FECore\FEGlobalVector.h" />
+    <ClInclude Include="..\..\FECore\FEInitialCondition.h" />
     <ClInclude Include="..\..\FECore\FELevelStructure.h" />
     <ClInclude Include="..\..\FECore\FELinearConstraint.h" />
     <ClInclude Include="..\..\FECore\FEMaterial.h" />
@@ -407,6 +408,7 @@
     <ClCompile Include="..\..\FECore\FEGlobalData.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalMatrix.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalVector.cpp" />
+    <ClCompile Include="..\..\FECore\FEInitialCondition.cpp" />
     <ClCompile Include="..\..\FECore\FELevelStructure.cpp" />
     <ClCompile Include="..\..\FECore\FELinearConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterial.cpp" />

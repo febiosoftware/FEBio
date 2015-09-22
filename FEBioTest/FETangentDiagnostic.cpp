@@ -189,6 +189,12 @@ FETangentDiagnostic::FETangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 	// create an analysis step
 	FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", &fem);
 
+	// create a new solver
+	FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "solid", &fem);
+	assert(pnew_solver);
+	pstep->m_psolver = pnew_solver;
+
+
 	// keep a pointer to the fem object
     fem.AddStep(pstep);
     fem.m_nStep = 0;
