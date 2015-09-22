@@ -57,12 +57,31 @@ still available by setting the Module tag to solid_old in the FEBio input file.
 
 2. FEATURE: rigid connectors
 -----------------------------
+Nonlinear constraints have been implemented to connect rigid bodies
+with joints (rigid joints) or springs and dampers (rigid connectors).
+Rigid joints include revolute (hinge), prismatic (slider),
+cylindrical, planar and spherical joints. The degrees of freedom of
+rigid joints may be optionally prescribed using load curves.  Reaction forces and moments
+at these rigid connectors may be saved to the logfile using a new
+rigid_connector_data class. 
 
 3. FEATURE: Damage materials and damage criteria
----------------------------------------
+----------------------------------------
+A new elastic damage model has been implemented to describe damage in
+any of the elastic materials defined in FEBio, using a reactive
+framework where the damage variable D represents the fraction of bonds
+in that material that have broken.  This damage material requires the specification of
+an elastic material, a damage criterion (a function of state) that governs damage
+initiation and progression, and a cumulative density function that describes the
+probability of damage at a particular value of the damage criterion.
+This damage model may be used within a solid mixture to describe heterogeneous and
+anisotropic damage responses.
 
 4. FEATURE: Biphasic and multiphasic tangents diagnostics
----------------------------------------
+-----------------------------------------------
+Tangent diagnostics have been introduced for the biphasic and
+multiphasic solvers. These can be used to validate the analytical
+expressions for the tangents against numerical approximations.
 
 5. FEATURE: Plot field filters and alias
 -------------------------------
@@ -95,7 +114,7 @@ callback functions.
 
 7. FEATURE: Initial condition plugins
 -------------------------------------
-New intial conditions can now also be defined in plugins. These initial conditions
+New initial conditions can now also be defined in plugins. These initial conditions
 can be used inside multi-step analysis. Special initial conditions can be defined
 to transfer data between steps in a multi-step analysis or initialize variables that
 are not used in previous analysis steps (e.g. when combining static and dynamic
@@ -119,9 +138,20 @@ is the preferred way for validating the value range. Second, material classes th
 properties no longer need to define the special functions for defining the material properties.
 Instead a template class FEPropertyT can now be used to define material properties. 
 
-10. BUG FIX: stiffness matrix for (bi/tri/multi)-phasic problems
+10. FEATURE: Fiber with toe-linear response
 ---------------------------------------------------------------
+A new fiber constitutive model has been introduced to describe a toe
+region with a power law, followed by a linear region.  This model is
+available as a stand-alone fiber model, or as part of a continuous
+fiber distribution.
 
+ 11. BUG FIX: stiffness matrix for (bi/tri/multi)-phasic problems
+---------------------------------------------------------------
+The linearization of the solid matrix velocity in biphasic,
+biphasic-solute, triphasic and multiphasic domains has been modified
+to correctly reflect the time-discretization used for evaluating the
+solid velocity from the solid displacement.  These changes should
+slightly improve the convergence characteristics of the corresponding solvers.
 
 ===========================================================================
 
