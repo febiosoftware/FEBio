@@ -69,7 +69,7 @@ bool FEPrintHBMatrixDiagnostic::Run()
 	pstep->Activate();
 
 	// get and initialize the FE solver
-	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->m_psolver);
+	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->GetFESolver());
 	solver.Init();
 
 	// build the stiffness matrix

@@ -192,8 +192,7 @@ FETangentDiagnostic::FETangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 	// create a new solver
 	FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "solid", &fem);
 	assert(pnew_solver);
-	pstep->m_psolver = pnew_solver;
-
+	pstep->SetFESolver(pnew_solver);
 
 	// keep a pointer to the fem object
     fem.AddStep(pstep);
@@ -297,7 +296,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 	// get the solver
 	FEModel& fem = GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->m_psolver);
+	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->GetFESolver());
 
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();

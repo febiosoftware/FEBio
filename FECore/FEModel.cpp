@@ -850,13 +850,13 @@ void FEModel::CopyFrom(FEModel& fem)
 		pnew->m_naggr		= ps->m_naggr;
 
 		// copy the solver
-		FESolver* psolver = ps->m_psolver;
+		FESolver* psolver = ps->GetFESolver();
 		sztype = psolver->GetTypeStr();
 
 		// create a new solver
 		FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, sztype, this);
 		assert(pnew_solver);
-		pnew->m_psolver = pnew_solver;
+		pnew->SetFESolver(pnew_solver);
 
 		// add the step
 		AddStep(pnew);

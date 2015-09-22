@@ -108,7 +108,7 @@ double FENodeZAcc::value(int nnode)
 double FENodeForceX::value(int nnode) 
 {
 	FEMesh& mesh = m_pfem->GetMesh();
-	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(m_pfem->GetCurrentStep()->m_psolver);
+	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(m_pfem->GetCurrentStep()->GetFESolver());
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
@@ -122,7 +122,7 @@ double FENodeForceX::value(int nnode)
 double FENodeForceY::value(int nnode) 
 {
 	FEMesh& mesh = m_pfem->GetMesh();
-	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(m_pfem->GetCurrentStep()->m_psolver);
+	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(m_pfem->GetCurrentStep()->GetFESolver());
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
@@ -136,7 +136,7 @@ double FENodeForceY::value(int nnode)
 double FENodeForceZ::value(int nnode) 
 {
 	FEMesh& mesh = m_pfem->GetMesh();
-	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(m_pfem->GetCurrentStep()->m_psolver);
+	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(m_pfem->GetCurrentStep()->GetFESolver());
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;

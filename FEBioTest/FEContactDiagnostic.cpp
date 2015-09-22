@@ -55,7 +55,7 @@ bool FEContactDiagnostic::Run()
 	// get the solver
 	FEModel& fem = GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->m_psolver);
+	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->GetFESolver());
 	solver.Init();
 
 	// make sure contact data is up to data
@@ -217,7 +217,7 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 	// get the solver
 	FEModel& fem = GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->m_psolver);
+	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->GetFESolver());
 
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();

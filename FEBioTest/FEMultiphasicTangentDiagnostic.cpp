@@ -148,7 +148,7 @@ FEMultiphasicTangentDiagnostic::FEMultiphasicTangentDiagnostic(FEModel& fem) : F
 	FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "multiphasic", &fem);
 	assert(pnew_solver);
 	pnew_solver->m_bsymm = false;
-	pstep->m_psolver = pnew_solver;
+	pstep->SetFESolver(pnew_solver);
 
 	fem.AddStep(pstep);
 	fem.m_nStep = 0;
@@ -287,7 +287,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
     // get the solver
 	FEModel& fem = GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
-    FEMultiphasicSolver& solver = static_cast<FEMultiphasicSolver&>(*pstep->m_psolver);
+	FEMultiphasicSolver& solver = static_cast<FEMultiphasicSolver&>(*pstep->GetFESolver());
     
     // get the material
     FEMaterial* pmat = fem.GetMaterial(0);

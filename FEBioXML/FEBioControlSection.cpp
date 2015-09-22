@@ -33,8 +33,12 @@ void FEBioControlSection::Parse(XMLTag& tag)
 	FEAnalysis* pstep = GetStep();
 
 	// make sure we have a solver defined
-	if (pstep->m_psolver == 0) pstep->m_psolver = BuildSolver(m_pim->m_nstep_type, fem);
-	FESolver* psolver = pstep->m_psolver;
+	FESolver* psolver = pstep->GetFESolver();
+	if (psolver == 0)
+	{
+		psolver = BuildSolver(m_pim->m_nstep_type, fem);
+		pstep->SetFESolver(psolver);
+	}
 
 	++tag;
 	do

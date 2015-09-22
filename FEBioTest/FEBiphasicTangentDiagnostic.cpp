@@ -110,7 +110,7 @@ FEBiphasicTangentDiagnostic::FEBiphasicTangentDiagnostic(FEModel& fem) : FEDiagn
 	FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "biphasic", &fem);
 	assert(pnew_solver);
 	pnew_solver->m_bsymm = false;
-	pstep->m_psolver = pnew_solver;
+	pstep->SetFESolver(pnew_solver);
 
 	fem.AddStep(pstep);
 	fem.m_nStep = 0;
@@ -238,7 +238,7 @@ void FEBiphasicTangentDiagnostic::deriv_residual(matrix& ke)
     // get the solver
 	FEModel& fem = GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
-    FEBiphasicSolver& solver = static_cast<FEBiphasicSolver&>(*pstep->m_psolver);
+	FEBiphasicSolver& solver = static_cast<FEBiphasicSolver&>(*pstep->GetFESolver());
     
     // get the mesh
     FEMesh& mesh = fem.GetMesh();

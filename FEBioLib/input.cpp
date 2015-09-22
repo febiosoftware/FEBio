@@ -163,7 +163,10 @@ void echo_input(FEBioModel& fem)
 //	felog.printf("\tNumber of constant traction boundary cards ..... : %d\n", (fem.m_ptrac ? fem.m_ptrac->Surface().Elements() : 0));
 //	felog.printf("\tNumber of fluid flux boundary cards .............: %d\n", (fem.m_fsurf ? fem.m_fsurf->Surface().Elements() : 0));
 	felog.printf("\tNumber of concentrated nodal forces ............ : %d\n", fem.NodalLoads());
-	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(step.m_psolver);
+
+	// output solver data
+	FESolver* psolver = step.GetFESolver();
+	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(psolver);
 	if (ps)
 	{
 		felog.printf("\tMax nr of stiffness reformations ............... : %d\n", ps->m_bfgs.m_maxref);
@@ -175,7 +178,7 @@ void echo_input(FEBioModel& fem)
 		felog.printf("\tResidual convergence tolerance ................. : %lg\n", ps->m_Rtol);
 		felog.printf("\tMinimal residual value ......................... : %lg\n", ps->m_Rmin);
 	}
-	FESolidSolver2* ps2 = dynamic_cast<FESolidSolver2*>(step.m_psolver);
+	FESolidSolver2* ps2 = dynamic_cast<FESolidSolver2*>(psolver);
 	if (ps2)
 	{
 		felog.printf("\tMax nr of stiffness reformations ............... : %d\n", ps2->m_bfgs.m_maxref);
@@ -188,13 +191,13 @@ void echo_input(FEBioModel& fem)
 		felog.printf("\tMinimal residual value ......................... : %lg\n", ps2->m_Rmin);
 	}
 
-	FEBiphasicSolver* pps = dynamic_cast<FEBiphasicSolver*>(step.m_psolver);
+	FEBiphasicSolver* pps = dynamic_cast<FEBiphasicSolver*>(psolver);
 	if (pps) felog.printf("\tFluid pressure convergence tolerance ........... : %lg\n", pps->m_Ptol);
 
-	FEBiphasicSoluteSolver* pss = dynamic_cast<FEBiphasicSoluteSolver*>(step.m_psolver);
+	FEBiphasicSoluteSolver* pss = dynamic_cast<FEBiphasicSoluteSolver*>(psolver);
 	if (pss) felog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", pss->m_Ctol);
 
-	FEMultiphasicSolver* pmps = dynamic_cast<FEMultiphasicSolver*>(step.m_psolver);
+	FEMultiphasicSolver* pmps = dynamic_cast<FEMultiphasicSolver*>(psolver);
 	if (pmps) felog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", pmps->m_Ctol);
 
 	if (ps)

@@ -680,7 +680,7 @@ void FESlidingInterfaceMP::Activate()
 	if (!m_bsymm) 
 	{
 		// request a non-symmetric stiffness matrix
-		FESolver* psolver = GetFEModel()->GetCurrentStep()->m_psolver;
+		FESolver* psolver = GetFEModel()->GetCurrentStep()->GetFESolver();
 		psolver->m_bsymm = false;
 	}
 	
@@ -1183,14 +1183,15 @@ void FESlidingInterfaceMP::Update(int niter)
 	// we need this number to see if we can do segment updates or not
 	// also reset number of iterations after each augmentation
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	if (pstep->m_psolver->m_niter == 0) {
+	FESolver* psolver = pstep->GetFESolver();
+	if (psolver->m_niter == 0) {
 		biter = 0;
-		naug = pstep->m_psolver->m_naug;
-	} else if (pstep->m_psolver->m_naug > naug) {
-		biter = pstep->m_psolver->m_niter;
-		naug = pstep->m_psolver->m_naug;
+		naug = psolver->m_naug;
+	} else if (psolver->m_naug > naug) {
+		biter = psolver->m_niter;
+		naug = psolver->m_naug;
 	}
-	niter = pstep->m_psolver->m_niter - biter;
+	niter = psolver->m_niter - biter;
 	bool bupseg = ((m_nsegup == 0)? true : (niter <= m_nsegup));
 	// get the logfile
 	//	Logfile& log = GetLogfile();

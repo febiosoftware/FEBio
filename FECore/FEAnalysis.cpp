@@ -85,6 +85,13 @@ void FEAnalysis::Reset()
 }
 
 //-----------------------------------------------------------------------------
+void FEAnalysis::SetFESolver(FESolver* psolver)
+{
+	if (m_psolver) delete m_psolver;
+	m_psolver = psolver;
+}
+
+//-----------------------------------------------------------------------------
 //! Data initialization and data chekcing.
 bool FEAnalysis::Init()
 {
@@ -156,10 +163,11 @@ bool FEAnalysis::Activate()
 	}
 
 	// initialize equations
-	if (m_psolver->InitEquations() == false) return false;
+	FESolver* psolver = GetFESolver();
+	if (psolver->InitEquations() == false) return false;
 
 	// do one time initialization of solver data
-	if (m_psolver->Init() == false)
+	if (psolver->Init() == false)
 	{
 		felog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");
 		return false;
@@ -192,7 +200,7 @@ void FEAnalysis::Deactivate()
 	for (size_t i=0; i<(int) m_MC.size(); ++i) m_MC[i]->Deactivate();
 
 	// clean up solver data (i.e. destroy linear solver)
-	m_psolver->Clean();
+	GetFESolver()->Clean();
 }
 
 //-----------------------------------------------------------------------------
@@ -281,7 +289,7 @@ bool FEAnalysis::Solve()
 	if (m_ntimesteps != 0)
 	{
 		// update time step
-		if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(m_psolver->m_niter);
+		if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(GetFESolver()->m_niter);
 	}
 	else
 	{
@@ -306,7 +314,7 @@ bool FEAnalysis::Solve()
 		// initialize the solver step
 		// (This basically evaluates all the parameter lists, but let's the solver
 		//  customize this process to the specific needs of the solver)
-		if (m_psolver->InitStep(m_fem.m_ftime) == false)
+		if (GetFESolver()->InitStep(m_fem.m_ftime) == false)
 		{
 			bconv = false;
 			break;
@@ -315,7 +323,7 @@ bool FEAnalysis::Solve()
 		// solve this timestep,
 		try
 		{
-			bconv = m_psolver->SolveStep(m_fem.m_ftime);
+			bconv = GetFESolver()->SolveStep(m_fem.m_ftime);
 		}
 		catch (ExitRequest)
 		{
@@ -370,9 +378,10 @@ bool FEAnalysis::Solve()
 		}
 #endif
 		// update counters
-		m_ntotref  += m_psolver->m_ntotref;
-		m_ntotiter += m_psolver->m_niter;
-		m_ntotrhs  += m_psolver->m_nrhs;
+		FESolver* psolver = GetFESolver();
+		m_ntotref  += psolver->m_ntotref;
+		m_ntotiter += psolver->m_niter;
+		m_ntotrhs  += psolver->m_nrhs;
 
 		// see if we have converged
 		if (bconv)
@@ -388,7 +397,7 @@ bool FEAnalysis::Solve()
 			m_fem.Write(FE_CONVERGED);
 
 			// update time step
-			if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(m_psolver->m_niter);
+			if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(psolver->m_niter);
 
 			// reset retry counter
 			m_nretries = 0;
@@ -459,7 +468,7 @@ bool FEAnalysis::Solve()
 		// get and print elapsed time
 		char sztime[64];
 
-		m_psolver->m_SolverTime.time_str(sztime);
+		GetFESolver()->m_SolverTime.time_str(sztime);
 		felog.printf("\tTime in solver: %s\n\n", sztime);
 	}
 
@@ -636,8 +645,9 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		for (int i=0; i< (int) m_MC.size(); ++i) ar << m_MC[i]->GetClassID();
 
 		// Seriaize solver data
-		ar << m_psolver->GetTypeStr();
-		m_psolver->Serialize(ar);
+		FESolver* psolver = GetFESolver();
+		ar << psolver->GetTypeStr();
+		psolver->Serialize(ar);
 	}
 	else
 	{

@@ -334,7 +334,7 @@ void FETiedBiphasicInterface::Activate()
 	if (!m_bsymm) 
 	{
 		// request a non-symmetric stiffness matrix
-		FESolver* psolver = GetFEModel()->GetCurrentStep()->m_psolver;
+		FESolver* psolver = GetFEModel()->GetCurrentStep()->GetFESolver();
 		psolver->m_bsymm = false;
 	}
 	

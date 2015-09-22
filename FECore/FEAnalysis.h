@@ -51,6 +51,8 @@ public:
 public:
 	FEModel& GetFEModel() { return m_fem; }
 
+	void SetFESolver(FESolver* psolver);
+
 	FESolver* GetFESolver() { return m_psolver; }
 
 public:
@@ -118,6 +120,7 @@ public:
 	//{
 		int		m_nanalysis;	//!< analysis type
 		int		m_istiffpr;		//!< calculate pressure stiffness \todo remove
+		int		m_ntype;		//!< step type
 	//}
 
 	// --- Time Step Data ---
@@ -135,13 +138,11 @@ public:
 		double	m_ddt;			//!< used by auto-time stepper
 		int		m_nmplc;		//!< must point load curve number
 		int		m_naggr;		//!< aggressivness parameter
-	//}
+		int		m_nmust;		//!< current must-point
+		//}
 
 	// --- Quasi-Newton Solver Variables ---
 	//{
-		// the FE solver
-		FESolver*	m_psolver;	//!< pointer to solver class that will solve this step.
-
 		int		m_nretries;		//!< nr of retries tried so far
 		int		m_maxretries;	//!< max nr of retries allowed per time step
 
@@ -160,13 +161,15 @@ public:
 		bool	m_bDump;		//!< create a restart file or not
 	//}
 
+private:
+	// the FE solver
+	FESolver*	m_psolver;	//!< pointer to solver class that will solve this step.
+
 protected:
 	std::vector<int>				m_Dom;	//!< list of active domains for this analysis
 	std::vector<FEModelComponent*>	m_MC;	//!< array of model components active during this step
 
 public:
-	int		m_nmust;		//!< current must-point
-	int		m_ntype;		//!< step type
 };
 
 } // namespace FECore
