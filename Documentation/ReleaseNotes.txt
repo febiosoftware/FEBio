@@ -41,6 +41,90 @@ at http://mrlforums.sci.utah.edu/forums/.
 
 ===========================================================================
 
+ R E L E A S E   2.4  9/25/2015
+
+===========================================================================
+
+1. FEATURE: new rigid body solver
+---------------------------------
+A new rigid body update algorithm was implemented that fixes some issues with the 
+previous implementation. The new solver is now used automatically so users don't need
+to do anything special. If for some reason the old solver is still needed, it is
+still available by setting the Module tag to solid_old in the FEBio input file.
+
+<Module type="solid_old"/>
+
+
+2. FEATURE: rigid connectors
+-----------------------------
+
+3. FEATURE: Damage materials and damage criteria
+---------------------------------------
+
+4. FEATURE: Biphasic and multiphasic tangents diagnostics
+---------------------------------------
+
+5. FEATURE: Plot field filters and alias
+-------------------------------
+Some plot fields support filters that can be used for disambiguation. For example,
+the solute concentration can now be stored using the following tag.
+
+<var type="solute concentration['sol1']"/>
+
+The filter is entered between square brackets. For this plot variable, the 
+filter denotes the name of the solute (defined in the Globals section). If the
+filter is a string (like in this example), it is entered between quote marks. 
+
+An alias can be defined for a plot file variable by appending the type definition
+with an equal sign an the alias name. For instance,
+
+<var type="solute concentration['sol1']=sol1 concentration"/>
+
+Post processors (such as PostView) can use the alias as an alternative for
+displaying the field variable name.
+
+6. FEATURE: Callback plugins
+-------------------
+A new plugin type is supported termed callback plugins. Callbacks are special
+functions that are called by FEBio at specific points during the initialzation
+and solution phase and are a convenient mechanism for interacting with FEBio.
+FEBio uses callbacks for updating the window title and to show progress. Other
+applications of callbacks can be the extraction of information during the 
+nonlinear solution iterations. Via callback plugins, a plugin can now also define
+callback functions.
+
+7. FEATURE: Initial condition plugins
+-------------------------------------
+New intial conditions can now also be defined in plugins. These initial conditions
+can be used inside multi-step analysis. Special initial conditions can be defined
+to transfer data between steps in a multi-step analysis or initialize variables that
+are not used in previous analysis steps (e.g. when combining static and dynamic
+analyses in a multi-step analysis).
+
+
+8. FEATURE: Fixed BC's in multi-step analyses
+------------------------------------
+Previously, fixed boundary conditions can only be defined at the model level and thus
+persisted throughout the entire simulation. Now, they can be defined inside the Boundary
+sections of Steps in a multi-step analysis (as prescribed boundary conditions).
+
+9. FEATURE: Simplifications for material plugins
+---------------------------------------
+There are two new constructions supported for material plugins that can make creating
+material plugins easier. First, there is automatic parameter checking which may eliminate
+the need for defining the FEMaterial::Init() function. This solves the problem that 
+errors can only be reported from the Init() function by throwing exceptions. However, it is not
+always safe to throw exceptions from within a plugin so automatic parameter checking
+is the preferred way for validating the value range. Second, material classes that define
+properties no longer need to define the special functions for defining the material properties.
+Instead a template class FEPropertyT can now be used to define material properties. 
+
+10. BUG FIX: stiffness matrix for (bi/tri/multi)-phasic problems
+---------------------------------------------------------------
+
+
+===========================================================================
+
  R E L E A S E   2.3  5/28/2015
 
 ===========================================================================
