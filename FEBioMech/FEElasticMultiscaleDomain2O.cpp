@@ -17,6 +17,15 @@ void FEElasticMultiscaleDomain2O::InitElements()
 	const int NE = FEElement::MAX_NODES;
 	vec3d x0[NE], xt[NE], r0, rt;
 	FEMesh& m = *GetMesh();
+		
+	FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(m_pMat);
+	FEModel rve;
+	rve.CopyFrom(pmat->m_mrve);
+	rve.GetStep(0)->SetPrintLevel(FE_PRINT_NEVER);
+			
+	// initialize
+	if (rve.Init() == false) throw FEMultiScaleException();
+
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
@@ -35,13 +44,18 @@ void FEElasticMultiscaleDomain2O::InitElements()
 
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			FEMicroMaterialPoint2O& pt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
+			FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
 			pt.m_r0 = r0;
 			pt.m_rt = rt;
 
 			pt.m_J = defgrad(el, pt.m_F, j);
-			defhess(el, pt2O.m_G, j);
+			defhess(el, mmpt2O.m_G, j);
 			mp.Init(false);
+
+			if (mmpt2O.m_rve_init == false){
+				mmpt2O.m_rve.CopyFrom(rve);
+				mmpt2O.m_rve_prev.CopyFrom(mmpt2O.m_rve);
+				mmpt2O.m_rve_init = true;}
 		}
 	}
 }
@@ -72,7 +86,7 @@ void FEElasticMultiscaleDomain2O::ElementInternalForce(FESolidElement& el, vecto
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEMicroMaterialPoint2O& pt2O = *(mp.ExtractData<FEMicroMaterialPoint2O>());
+		FEMicroMaterialPoint2O& mmpt2O = *(mp.ExtractData<FEMicroMaterialPoint2O>());
 
 		// calculate the jacobian
 		detJt = invjact(el, Ji, n);
@@ -81,7 +95,7 @@ void FEElasticMultiscaleDomain2O::ElementInternalForce(FESolidElement& el, vecto
 
 		// get the stress vector for this integration point
 		s = pt.m_s;
-		tau = pt2O.m_tau;
+		tau = mmpt2O.m_tau;
 
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
@@ -184,7 +198,7 @@ void FEElasticMultiscaleDomain2O::UpdateElementStress(int iel, double dt)
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEMicroMaterialPoint2O& pt2O = *(mp.ExtractData<FEMicroMaterialPoint2O>());
+		FEMicroMaterialPoint2O& mmpt2O = *(mp.ExtractData<FEMicroMaterialPoint2O>());
 		
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
@@ -194,7 +208,7 @@ void FEElasticMultiscaleDomain2O::UpdateElementStress(int iel, double dt)
 
 		// get the deformation gradient and determinant
 		pt.m_J = defgrad(el, pt.m_F, n);
-		defhess(el, pt2O.m_G, n);
+		defhess(el, mmpt2O.m_G, n);
 
 		// calculate the stress at this material point
 		FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(m_pMat);
@@ -287,12 +301,12 @@ void FEElasticMultiscaleDomain2O::ElementGeometricalStiffness(FESolidElement &el
 		// get the material point data
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEMicroMaterialPoint2O& pt2O = *(mp.ExtractData<FEMicroMaterialPoint2O>());
+		FEMicroMaterialPoint2O& mmpt2O = *(mp.ExtractData<FEMicroMaterialPoint2O>());
 		
 		// element's Cauchy-stress tensor at gauss point n
 		// s is the voight vector
 		mat3ds s = pt.m_s;
-		tens3ds tau = pt2O.m_tau;
+		tens3ds tau = mmpt2O.m_tau;
 
 		double Grrj, Grsj, Grtj, Gsrj, Gssj, Gstj, Gtrj, Gtsj, Gttj;
 
@@ -399,7 +413,7 @@ void FEElasticMultiscaleDomain2O::ElementMaterialStiffness(FESolidElement &el, m
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEMicroMaterialPoint2O& pt2O = *(mp.ExtractData<FEMicroMaterialPoint2O>());
+		FEMicroMaterialPoint2O& mmpt2O = *(mp.ExtractData<FEMicroMaterialPoint2O>());
 
 		// get the 'D' matrix
 		tens4ds c; c.zero();

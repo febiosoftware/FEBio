@@ -12,6 +12,8 @@ public:
 	//! constructor
 	FEElasticMultiscaleDomain1O(FEModel* pfem);
 	
+	void InitElements();
+
 	void UpdateElementStress(int iel, double dt);
 
 };

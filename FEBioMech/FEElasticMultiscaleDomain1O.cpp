@@ -11,6 +11,55 @@ FEElasticMultiscaleDomain1O::FEElasticMultiscaleDomain1O(FEModel* pfem) : FEElas
 }
 
 //-----------------------------------------------------------------------------
+//! Initialize element data
+void FEElasticMultiscaleDomain1O::InitElements()
+{
+	const int NE = FEElement::MAX_NODES;
+	vec3d x0[NE], xt[NE], r0, rt;
+	FEMesh& m = *GetMesh();
+	
+	FEMicroMaterial* pmat = dynamic_cast<FEMicroMaterial*>(m_pMat);
+	FEModel rve;
+	rve.CopyFrom(pmat->m_mrve);
+	rve.GetStep(0)->SetPrintLevel(FE_PRINT_NEVER);
+
+	// initialize
+	if (rve.Init() == false) throw FEMultiScaleException();
+
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		FESolidElement& el = m_Elem[i];
+		int neln = el.Nodes();
+		for (int i=0; i<neln; ++i)
+		{
+			x0[i] = m.Node(el.m_node[i]).m_r0;
+			xt[i] = m.Node(el.m_node[i]).m_rt;
+		}
+
+		int n = el.GaussPoints();
+		for (int j=0; j<n; ++j) 
+		{
+			r0 = el.Evaluate(x0, j);
+			rt = el.Evaluate(xt, j);
+
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
+			pt.m_r0 = r0;
+			pt.m_rt = rt;
+
+			pt.m_J = defgrad(el, pt.m_F, j);
+			mp.Init(false);
+
+			if (mmpt.m_rve_init == false){
+				mmpt.m_rve.CopyFrom(rve);
+				mmpt.m_rve_prev.CopyFrom(mmpt.m_rve);
+				mmpt.m_rve_init = true;}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Update element state data (mostly stresses, but some other stuff as well)
 //! \todo Remove the remodeling solid stuff
 void FEElasticMultiscaleDomain1O::UpdateElementStress(int iel, double dt)

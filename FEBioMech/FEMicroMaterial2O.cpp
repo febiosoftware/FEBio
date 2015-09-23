@@ -34,6 +34,8 @@ FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterial
 	m_Ea.zero();
 	
 	m_G_prev.zero();
+
+	m_rve_init = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -47,13 +49,13 @@ void FEMicroMaterialPoint2O::Init(bool bflag)
 //! create a shallow copy
 FEMaterialPoint* FEMicroMaterialPoint2O::Copy()
 {
-	FEMicroMaterialPoint2O* pt = new FEMicroMaterialPoint2O(m_pNext?m_pNext->Copy():0);
-	pt->m_tau = m_tau;
-	pt->m_G = m_G;
-	pt->m_Ca = m_Ca;
-	pt->m_Da = m_Da;
-	pt->m_Ea = m_Ea;
-	return pt;
+	FEMicroMaterialPoint2O* mmpt2O = new FEMicroMaterialPoint2O(m_pNext?m_pNext->Copy():0);
+	mmpt2O->m_tau = m_tau;
+	mmpt2O->m_G = m_G;
+	mmpt2O->m_Ca = m_Ca;
+	mmpt2O->m_Da = m_Da;
+	mmpt2O->m_Ea = m_Ea;
+	return mmpt2O;
 }
 
 //-----------------------------------------------------------------------------
@@ -419,8 +421,8 @@ void FEMicroMaterial2O::UpdateBC(FEModel& rve, mat3d& F, tens3drs& G)
 // LTE - Note that this function is not used in the second-order implemenetation
 tens4ds FEMicroMaterial2O::Tangent(FEMaterialPoint &mp)
 {
-	FEMicroMaterialPoint2O& mmpt = *mp.ExtractData<FEMicroMaterialPoint2O>();
-	return mmpt.m_Ca;
+	FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
+	return mmpt2O.m_Ca;
 }
 
 //-----------------------------------------------------------------------------
@@ -463,29 +465,16 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 	mat3d F = pt.m_F;
 	tens3drs G = mmpt2O.m_G;
 
-	// If running the verification problem from Nguygen et al...
-	bool verification = false;
-	if (verification){
-		mat3d U_grad = F - mat3dd(1);
-		mat3d s;
-		tens3ds tau;
-		double mu = 10;
-		double kappa = 0.01*mu;
-
-		pt.m_s.zero(); pt.m_s(0,1) = mu*U_grad[0][1];
-		mmpt2O.m_tau.zero(); mmpt2O.m_tau.d[3] = kappa*G.d[3];
-
-		return;
-	}
-	
-	// Create a local copy of the rve
+	// create the local copy of the rve at the previous time step
 	FEModel rve;
-	rve.CopyFrom(m_mrve);
-	rve.GetStep(0)->SetPrintLevel(FE_PRINT_NEVER);
-
-	// initialize
-	if (rve.Init() == false) throw FEMultiScaleException();
+	rve.CopyFrom(mmpt2O.m_rve_prev);
 	
+	// create a copy of the rve in the reference configuration for plotting
+	FEModel rve_init;
+	rve_init.CopyFrom(rve);
+	rve_init.Reset();
+
+	// if plotting is turned on, create the plot file and plot the reference configuration
 	FEBioPlotFile* pplt = 0;
 
 	if (plot_on)
@@ -507,7 +496,7 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 		string plot_name = ss.str();
 		
 		pplt->Open(rve, plot_name.c_str());
-		pplt->Write(rve);
+		pplt->Write(rve_init);
 	}
 
 	// apply the BC's
@@ -519,11 +508,7 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException();
 
-	mmpt2O.m_rve.CopyFrom(rve);
-
 	// calculate the averaged Cauchy stress
-	mat3ds sa; sa.zero();
-	tens3ds taua; taua.zero();
 	AveragedStress2O(rve, mp, pt.m_s, mmpt2O.m_tau);
 	
 	// calculate the averaged PK1 stress
@@ -538,7 +523,10 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 	// calculate the difference between the macro and micro energy for Hill-Mandel condition
 	calc_energy_diff(rve, mp);	
 
-	// set the plot file
+	// save the new configuration of the rve
+	mmpt2O.m_rve.CopyFrom(rve);
+
+	// plot the rve
 	if (plot_on)
 	{
 		pplt->Write(rve);
@@ -1014,9 +1002,6 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 
 	FEMesh& m = mmpt2O.m_rve.GetMesh();
 	FEMesh& m_prev = mmpt2O.m_rve_prev.GetMesh();
-
-	if (m_prev.Domains() == 0)
-		m_prev.CopyFrom(m);
 
 	for (int k=0; k<m.Domains(); ++k)
 	{

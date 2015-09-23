@@ -57,12 +57,13 @@ public:
 	double	   m_macro_energy_inc;	// LTE - Macroscopic strain energy increment
 	double	   m_micro_energy_inc;	// LTE - Microscopic strain energy increment
 
-	FEModel m_rve;		
-	FEModel m_rve_prev;
+	bool m_rve_init;			// LTE - Flag indicating that the rve has been initialized
+	FEModel m_rve;				// LTE - Current copy of the rve		
+	FEModel m_rve_prev;			// LTE - Previous configured state of the rve
 
-	tens4ds	   m_Ca;			//!< averaged material stiffness
-	tens5ds    m_Da;
-	tens6ds    m_Ea;
+	tens4ds	   m_Ca;			// LTE - Averaged rank 4 material stiffness
+	tens5ds    m_Da;			// LTE - Averaged rank 5 material stiffness
+	tens6ds    m_Ea;			// LTE - Averaged rank 6 material stiffness
 };
 
 //-----------------------------------------------------------------------------
@@ -80,9 +81,9 @@ public:
 	char	m_szrve[256];	//!< filename for RVE file
 	char	m_szbc[256];	//!< name of nodeset defining boundary
 	bool	m_bperiodic;	//!< periodic bc flag
+	FEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
 
 protected:
-	FEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
 	bool	m_brve;			//!< flag indicating whether RVE was read in
 	double	m_V0;			//!< initial volume of RVE
 	vector<int> m_BN;		//!< boundary node flags

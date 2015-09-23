@@ -20,6 +20,8 @@ FEMicroMaterialPoint::FEMicroMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoin
 	m_micro_energy_inc = 0.;
 
 	m_Ka.zero();
+	
+	m_rve_init = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -395,14 +397,16 @@ mat3ds FEMicroMaterial::Stress1O(FEMaterialPoint &mp, int plot_on, int int_pt)
 	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
 	mat3d F = pt.m_F;
 	
-	// Create a local copy of the rve
+	// create the local copy of the rve at the previous time step
 	FEModel rve;
-	rve.CopyFrom(m_mrve);
-	rve.GetStep(0)->SetPrintLevel(FE_PRINT_NEVER);
-
-	// initialize
-	if (rve.Init() == false) throw FEMultiScaleException();
-
+	rve.CopyFrom(mmpt.m_rve_prev);
+	
+	// create a copy of the rve in the reference configuration for plotting
+	FEModel rve_init;
+	rve_init.CopyFrom(rve);
+	rve_init.Reset();
+	
+	// if plotting is turned on, create the plot file and plot the reference configuration
 	FEBioPlotFile* pplt = new FEBioPlotFile(rve);
 	
 	if (plot_on)
@@ -424,10 +428,10 @@ mat3ds FEMicroMaterial::Stress1O(FEMaterialPoint &mp, int plot_on, int int_pt)
 		string plot_name = ss.str();
 		
 		pplt->Open(rve, plot_name.c_str());
-		pplt->Write(rve);
+		pplt->Write(rve_init);
 	}
 	
-	// apply the BC's
+	// update the BC's
 	UpdateBC(rve, F);
 
 	// solve the RVE
@@ -436,21 +440,25 @@ mat3ds FEMicroMaterial::Stress1O(FEMaterialPoint &mp, int plot_on, int int_pt)
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException();
 
-	mmpt.m_rve.CopyFrom(rve);
-
-	// calculate the averaged stress
+	// calculate the averaged Cauchy stress
 	mat3ds sa = AveragedStress(rve, mp);
 	
-	mmpt.m_PK1_prev = mmpt.m_PK1;
+	// calculate the averaged PK1 stress
 	mmpt.m_PK1 = AveragedStressPK1(rve, mp);
+	
+	// calculate the averaged PK2 stress
 	mmpt.m_S = AveragedStressPK2(rve, mp);
 
 	// calculate the averaged stiffness
 	mmpt.m_Ka = AveragedStiffness(rve, mp);
 
+	// calculate the difference between the macro and micro energy for Hill-Mandel condition
 	calc_energy_diff(mp);	
 	
-	// set the plot file
+	// save the new configuration of the rve
+	mmpt.m_rve.CopyFrom(rve);
+
+	// plot the rve
 	if (plot_on)
 	{
 		pplt->Write(rve);
@@ -727,9 +735,6 @@ void FEMicroMaterial::calc_energy_diff(FEMaterialPoint& mp)
 
 	FEMesh& m = mmpt.m_rve.GetMesh();
 	FEMesh& m_prev = mmpt.m_rve_prev.GetMesh();
-
-	if (m_prev.Domains() == 0)
-		m_prev.CopyFrom(m);
 
 	for (int k=0; k<m.Domains(); ++k)
 	{
