@@ -22,8 +22,6 @@ void FEElasticMultiscaleDomain1O::InitElements()
 	FEModel rve;
 	rve.CopyFrom(pmat->m_mrve);
 	rve.GetStep(0)->SetPrintLevel(FE_PRINT_NEVER);
-
-	// initialize
 	if (rve.Init() == false) throw FEMultiScaleException();
 
 	for (size_t i=0; i<m_Elem.size(); ++i)
@@ -53,7 +51,11 @@ void FEElasticMultiscaleDomain1O::InitElements()
 
 			if (mmpt.m_rve_init == false){
 				mmpt.m_rve.CopyFrom(rve);
-				mmpt.m_rve_prev.CopyFrom(mmpt.m_rve);
+				mmpt.m_rve.Init();
+				
+				mmpt.m_rve_prev.CopyFrom(rve);
+				mmpt.m_rve_prev.Init();
+				
 				mmpt.m_rve_init = true;}
 		}
 	}

@@ -42,7 +42,7 @@ public:
 
 	bool    m_rve_init;			// LTE - Flag indicating that the rve has been initialized
 	FEModel m_rve;				// LTE - Current copy of the rve		
-	FEModel m_rve_prev;			// LTE - Previous configured state of the rve
+	FEModel m_rve_prev;			// LTE - Previous converged state of the rve
 
 	tens4ds	m_Ka;				// LTE - Averaged rank 4 material stiffness
 };
