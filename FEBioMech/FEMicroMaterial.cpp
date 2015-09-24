@@ -397,21 +397,17 @@ mat3ds FEMicroMaterial::Stress1O(FEMaterialPoint &mp, int plot_on, int int_pt)
 	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
 	mat3d F = pt.m_F;
 	
-	// create the local copy of the rve at the previous time step
-	FEModel rve;
-	rve.CopyFrom(mmpt.m_rve_prev);
-	
 	// create a copy of the rve in the reference configuration for plotting
 	FEModel rve_init;
-	rve_init.CopyFrom(rve);
+	rve_init.CopyFrom(mmpt.m_rve);
 	rve_init.Reset();
 	
 	// if plotting is turned on, create the plot file and plot the reference configuration
-	FEBioPlotFile* pplt = new FEBioPlotFile(rve);
+	FEBioPlotFile* pplt = new FEBioPlotFile(mmpt.m_rve);
 	
 	if (plot_on)
 	{
-		pplt = new FEBioPlotFile(rve);
+		pplt = new FEBioPlotFile(mmpt.m_rve);
 		vector<int> item;
 		pplt->AddVariable("displacement", item);
 		pplt->AddVariable("stress", item);
@@ -427,41 +423,38 @@ mat3ds FEMicroMaterial::Stress1O(FEMaterialPoint &mp, int plot_on, int int_pt)
 		ss << "rve_elem_" << plot_on << "_ipt_" << int_pt << ".xplt";
 		string plot_name = ss.str();
 		
-		pplt->Open(rve, plot_name.c_str());
+		pplt->Open(mmpt.m_rve, plot_name.c_str());
 		pplt->Write(rve_init);
 	}
 	
 	// update the BC's
-	UpdateBC(rve, F);
+	UpdateBC(mmpt.m_rve, F);
 
 	// solve the RVE
-	bool bret = rve.Solve();
+	bool bret = mmpt.m_rve.Solve();
 
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException();
 
 	// calculate the averaged Cauchy stress
-	mat3ds sa = AveragedStress(rve, mp);
+	mat3ds sa = AveragedStress(mmpt.m_rve, mp);
 	
 	// calculate the averaged PK1 stress
-	mmpt.m_PK1 = AveragedStressPK1(rve, mp);
+	mmpt.m_PK1 = AveragedStressPK1(mmpt.m_rve, mp);
 	
 	// calculate the averaged PK2 stress
-	mmpt.m_S = AveragedStressPK2(rve, mp);
+	mmpt.m_S = AveragedStressPK2(mmpt.m_rve, mp);
 
 	// calculate the averaged stiffness
-	mmpt.m_Ka = AveragedStiffness(rve, mp);
+	mmpt.m_Ka = AveragedStiffness(mmpt.m_rve, mp);
 
 	// calculate the difference between the macro and micro energy for Hill-Mandel condition
 	calc_energy_diff(mp);	
 	
-	// save the new configuration of the rve
-	mmpt.m_rve.CopyFrom(rve);
-
 	// plot the rve
 	if (plot_on)
 	{
-		pplt->Write(rve);
+		pplt->Write(mmpt.m_rve);
 		pplt->Close();
 	}
 

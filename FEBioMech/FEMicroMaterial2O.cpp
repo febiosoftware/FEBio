@@ -465,13 +465,9 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 	mat3d F = pt.m_F;
 	tens3drs G = mmpt2O.m_G;
 
-	// create the local copy of the rve at the previous time step
-	FEModel rve;
-	rve.CopyFrom(mmpt2O.m_rve_prev);
-	
 	// create a copy of the rve in the reference configuration for plotting
 	FEModel rve_init;
-	rve_init.CopyFrom(rve);
+	rve_init.CopyFrom(mmpt2O.m_rve);
 	rve_init.Reset();
 
 	// if plotting is turned on, create the plot file and plot the reference configuration
@@ -479,7 +475,7 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 
 	if (plot_on)
 	{
-		pplt = new FEBioPlotFile(rve);
+		pplt = new FEBioPlotFile(mmpt2O.m_rve);
 		vector<int> item;
 		pplt->AddVariable("displacement", item);
 		pplt->AddVariable("stress", item);
@@ -495,41 +491,38 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 		ss << "rve_elem_" << plot_on << "_ipt_" << int_pt << ".xplt";
 		string plot_name = ss.str();
 		
-		pplt->Open(rve, plot_name.c_str());
+		pplt->Open(mmpt2O.m_rve, plot_name.c_str());
 		pplt->Write(rve_init);
 	}
 
 	// apply the BC's
-	UpdateBC(rve, F, G);
+	UpdateBC(mmpt2O.m_rve, F, G);
 
 	// solve the RVE
-	bool bret = rve.Solve();
+	bool bret = mmpt2O.m_rve.Solve();
 
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException();
 
 	// calculate the averaged Cauchy stress
-	AveragedStress2O(rve, mp, pt.m_s, mmpt2O.m_tau);
+	AveragedStress2O(mmpt2O.m_rve, mp, pt.m_s, mmpt2O.m_tau);
 	
 	// calculate the averaged PK1 stress
-	AveragedStress2OPK1(rve, mp, mmpt2O.m_PK1, mmpt2O.m_QK1);
+	AveragedStress2OPK1(mmpt2O.m_rve, mp, mmpt2O.m_PK1, mmpt2O.m_QK1);
 	
 	// calculate the averaged PK2 stress
-	AveragedStress2OPK2(rve, mp, mmpt2O.m_S, mmpt2O.m_T);
+	AveragedStress2OPK2(mmpt2O.m_rve, mp, mmpt2O.m_S, mmpt2O.m_T);
 
 	// calculate the averaged stiffness
-	AveragedStiffness(rve, mp, mmpt2O.m_Ca, mmpt2O.m_Da, mmpt2O.m_Ea);
+	AveragedStiffness(mmpt2O.m_rve, mp, mmpt2O.m_Ca, mmpt2O.m_Da, mmpt2O.m_Ea);
 
 	// calculate the difference between the macro and micro energy for Hill-Mandel condition
-	calc_energy_diff(rve, mp);	
-
-	// save the new configuration of the rve
-	mmpt2O.m_rve.CopyFrom(rve);
+	calc_energy_diff(mmpt2O.m_rve, mp);	
 
 	// plot the rve
 	if (plot_on)
 	{
-		pplt->Write(rve);
+		pplt->Write(mmpt2O.m_rve);
 		pplt->Close();
 	}
 
