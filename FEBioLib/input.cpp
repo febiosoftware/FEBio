@@ -203,16 +203,16 @@ void echo_input(FEBioModel& fem)
 
 	if (ps)
 	{
-		felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", ps->m_bfgs.m_LStol );
-		felog.printf("\tMinimum line search size ....................... : %lg\n", ps->m_bfgs.m_LSmin );
-		felog.printf("\tMaximum number of line search iterations ....... : %d\n" , ps->m_bfgs.m_LSiter);
-		felog.printf("\tMax condition number ........................... : %lg\n", ps->m_bfgs.m_cmax  );
+		felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", ps->m_LStol );
+		felog.printf("\tMinimum line search size ....................... : %lg\n", ps->m_LSmin );
+		felog.printf("\tMaximum number of line search iterations ....... : %d\n" , ps->m_LSiter);
+		felog.printf("\tMax condition number ........................... : %lg\n", ps->m_bfgs.m_cmax);
 	}
 	if (ps2)
 	{
-		felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", ps2->m_bfgs.m_LStol );
-		felog.printf("\tMinimum line search size ....................... : %lg\n", ps2->m_bfgs.m_LSmin );
-		felog.printf("\tMaximum number of line search iterations ....... : %d\n" , ps2->m_bfgs.m_LSiter);
+		felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", ps2->m_LStol );
+		felog.printf("\tMinimum line search size ....................... : %lg\n", ps2->m_LSmin );
+		felog.printf("\tMaximum number of line search iterations ....... : %d\n" , ps2->m_LSiter);
 		felog.printf("\tMax condition number ........................... : %lg\n", ps2->m_bfgs.m_cmax  );
 	}
 
@@ -229,9 +229,9 @@ void echo_input(FEBioModel& fem)
         felog.printf("\tVelocity convergence tolerance ................. : %lg\n", pfs->m_Vtol);
         felog.printf("\tResidual convergence tolerance ................. : %lg\n", pfs->m_Rtol);
         felog.printf("\tMinimal residual value ......................... : %lg\n", pfs->m_Rmin);
-        felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", pfs->m_bfgs.m_LStol );
-        felog.printf("\tMinimum line search size ....................... : %lg\n", pfs->m_bfgs.m_LSmin );
-        felog.printf("\tMaximum number of line search iterations ....... : %d\n" , pfs->m_bfgs.m_LSiter);
+        felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", pfs->m_LStol );
+        felog.printf("\tMinimum line search size ....................... : %lg\n", pfs->m_LSmin );
+        felog.printf("\tMaximum number of line search iterations ....... : %d\n" , pfs->m_LSiter);
         felog.printf("\tMax condition number ........................... : %lg\n", pfs->m_bfgs.m_cmax  );
     }
     

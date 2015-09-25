@@ -32,9 +32,9 @@ bool FECGSolidSolver::Init()
 	if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }
 	if (m_Rtol <  0.0) { felog.printf("Error: rtol must be nonnegative.\n"); return false; }
 	if (m_Rmin <  0.0) { felog.printf("Error: min_residual must be nonnegative.\n"  ); return false; }
-	if (m_bfgs.m_LStol  < 0.0) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
-	if (m_bfgs.m_LSmin  < 0.0) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
-	if (m_bfgs.m_LSiter < 0) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
+	if (m_LStol  < 0.0) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
+	if (m_LSmin  < 0.0) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
+	if (m_LSiter < 0) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
 	if (m_bfgs.m_maxref < 0) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
 	if (m_bfgs.m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
 	if (m_bfgs.m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
@@ -208,7 +208,7 @@ bool FECGSolidSolver::Quasin(double time)
 		// the geometry is also updated in the line search
 		// use the step length from two steps previously as the initial guess
 		// note that it has its own linesearch, different from the BFGS one
-		s = m_bfgs.LineSearchCG(oldolds);
+		s = LineSearchCG(oldolds);
 		// update the old step lengths for use as an initial guess in two iterations' time
 		if (m_niter<1) oldolds=s;	// if this is the first iteration, use current step length
 		else oldolds=olds;	// otherwise use the previous one
@@ -234,7 +234,7 @@ bool FECGSolidSolver::Quasin(double time)
 		if ((m_Etol > 0) && (normE1 > m_Etol*normEi)) bconv = false;
 
 		// check linestep size
-		if ((m_bfgs.m_LStol > 0) && (s < m_bfgs.m_LSmin)) bconv = false;
+		if ((m_LStol > 0) && (s < m_LSmin)) bconv = false;
 
 		// check energy divergence
 		if (normE1 > normEm) bconv = false;
@@ -248,7 +248,7 @@ bool FECGSolidSolver::Quasin(double time)
 		felog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
-		if (m_bfgs.m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
+		if (m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
 		felog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
 		felog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
 		felog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
@@ -269,7 +269,7 @@ bool FECGSolidSolver::Quasin(double time)
 		// If not, calculate the BFGS update vectors
 		if (bconv == false)
 		{
-			if (s < m_bfgs.m_LSmin)
+			if (s < m_LSmin)
 			{
 				// check for zero linestep size
 				felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
@@ -435,4 +435,167 @@ void FECGSolidSolver::UpdateKinematics(vector<double>& ui)
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+double FECGSolidSolver::LineSearchCG(double s)
+{
+	//  s is now passed from the solver routine instead of defaulting to 1.0
+	double smin = s;
+
+	double FA, FB, FC, AA, AB, r, r0;
+	bool failed = false;
+
+	// max nr of line search iterations
+	int nmax = m_LSiter;
+	int n = 0;
+
+	// initial energy
+	FA = m_bfgs.m_ui*m_bfgs.m_R0;
+	AA = 0.0;
+	r0 = FA;
+
+	double rmin = fabs(FA);
+
+	vector<double> ul(m_bfgs.m_ui.size());
+
+	// so we can set AA = 0 and FA= r0
+	// AB=s and we need to evaluate FB (called r1)
+	// n is a count of the number of linesearch attempts
+
+	// calculate residual at this point, reducing s if necessary
+	do
+	{
+		// Update geometry using the initial guess s
+		vcopys(ul, m_bfgs.m_ui, s);
+		failed = false;
+		try
+		{
+			Update(ul);
+			Evaluate(m_bfgs.m_R1);
+		}
+		catch (...)
+		{
+			//					printf("reducing s at initial evaluation");
+			failed = true;
+			s = 0.1*s;
+		}
+	} while (failed == true);
+
+	// calculate energies
+	FB = m_bfgs.m_ui*m_bfgs.m_R1;
+	AB = s;
+
+	if (FB<rmin){
+		rmin = FB;
+		smin = s;
+	}
+
+	do
+	{
+		// make sure that r1 does not happen to be really close to zero,
+		// since in that case we won't find any better solution.
+		if (fabs(FB) < 1.e-20) r = 0;  // we've hit the converged solution and don't need to do any more
+		else r = fabs(FB / r0);
+
+		if (r > m_LStol)	// we need to search and find a better value of s
+		{
+			if (FB == FA) s = (AA + AB) * 1000;
+			else {
+				s = (AA*FB - AB*FA) / (FB - FA);
+				s = min(s, 100 * max(AA, AB));
+			}
+			// calculate residual at this point, reducing s if necessary
+			do
+			{
+				// Update geometry using the initial guess s
+				vcopys(ul, m_bfgs.m_ui, s);
+				failed = false;
+				try
+				{
+					Update(ul);
+					Evaluate(m_bfgs.m_R1);
+				}
+				catch (...)
+				{
+					//					printf("reducing s at FC");
+					failed = true;
+					s = 0.1*s;
+				}
+			} while ((failed == true) && (s>m_LSmin));
+
+			// calculate energies
+			FC = m_bfgs.m_ui*m_bfgs.m_R1;
+			r = fabs(FC / r0);
+
+			if (fabs(FC)>100 * min(fabs(FA), fabs(FB)))  //  it was a bad guess and we need to go back a bit
+			{
+				s = 0.1*s;
+
+				// calculate residual at this point, reducing s if necessary
+				do
+				{
+					// Update geometry using the initial guess s
+					vcopys(ul, m_bfgs.m_ui, s);
+					failed = false;
+					try
+					{
+						Update(ul);
+						Evaluate(m_bfgs.m_R1);
+					}
+					catch (...)
+					{
+						//					printf("reducing s after bad guess");
+						failed = true;
+						s = 0.1*s;
+					}
+				} while (failed == true);
+
+				// calculate energies
+				FC = m_bfgs.m_ui*m_bfgs.m_R1;
+				r = fabs(FC / r0);
+			}
+
+			if (fabs(FA)<fabs(FB)) // use the new value and the closest of the previous ones
+			{
+				FB = FC;
+				AB = s;
+			}
+			else
+			{
+				FA = FC;
+				AA = s;
+			}
+
+			++n;
+		}
+	} while ((r > m_LStol) && (n < nmax));
+
+
+	if (n >= nmax)
+	{
+		// max nr of iterations reached.
+		// we choose the line step that reached the smallest energy
+		s = smin;
+		// calculate residual at this point, reducing s if necessary
+		do
+		{
+			// Update geometry using the initial guess s
+			vcopys(ul, m_bfgs.m_ui, s);
+			failed = false;
+			try
+			{
+				Update(ul);
+				Evaluate(m_bfgs.m_R1);
+			}
+			catch (...)
+			{
+				//					printf("reducing s after failed line search");
+				failed = true;
+				s = 0.1*s;
+			}
+		} while (failed == true);
+	}
+
+	return s;
 }

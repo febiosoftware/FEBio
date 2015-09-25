@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FECore/FESolver.h"
+#include "FECore/FENewtonSolver.h"
 #include "FEBioMech/FEStiffnessMatrix.h"
 #include "FECore/FETypes.h"
 
@@ -8,7 +8,7 @@
 //! The FEFluidSolver class solves fluid mechanics problems
 //! It can deal with quasi-static and dynamic problems
 //!
-class FEFluidSolver : public FESolver
+class FEFluidSolver : public FENewtonSolver
 {
 public:
     //! constructor
@@ -113,8 +113,6 @@ public:
     // global stiffness matrix
     FEStiffnessMatrix*	m_pK;		//!< global stiffness matrix
     int					m_neq;		//!< number of equations
-    
-    BFGSSolver	m_bfgs;			//!< BFGS solver parameters
     
     // declare the parameter list
     DECLARE_PARAMETER_LIST();

@@ -34,9 +34,9 @@ BEGIN_PARAMETER_LIST(FESolidSolver, FESolver)
 	ADD_PARAMETER(m_Etol         , FE_PARAM_DOUBLE, "etol"        );
 	ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );
 	ADD_PARAMETER(m_Rmin         , FE_PARAM_DOUBLE, "min_residual");
-	ADD_PARAMETER(m_bfgs.m_LStol , FE_PARAM_DOUBLE, "lstol"       );
-	ADD_PARAMETER(m_bfgs.m_LSmin , FE_PARAM_DOUBLE, "lsmin"       );
-	ADD_PARAMETER(m_bfgs.m_LSiter, FE_PARAM_INT   , "lsiter"      );
+	ADD_PARAMETER(m_LStol , FE_PARAM_DOUBLE, "lstol"       );
+	ADD_PARAMETER(m_LSmin , FE_PARAM_DOUBLE, "lsmin"       );
+	ADD_PARAMETER(m_LSiter, FE_PARAM_INT   , "lsiter"      );
 	ADD_PARAMETER(m_bfgs.m_maxref, FE_PARAM_INT   , "max_refs"    );
 	ADD_PARAMETER(m_bfgs.m_maxups, FE_PARAM_INT   , "max_ups"     );
 	ADD_PARAMETER(m_bfgs.m_cmax  , FE_PARAM_DOUBLE, "cmax"        );
@@ -51,7 +51,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 //! FESolidSolver Construction
 //
-FESolidSolver::FESolidSolver(FEModel* pfem) : FESolver(pfem)
+FESolidSolver::FESolidSolver(FEModel* pfem) : FENewtonSolver(pfem)
 {
 	// default values
 	m_Rtol = 0;	// deactivate residual convergence 
@@ -103,9 +103,9 @@ bool FESolidSolver::Init()
 	if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }
 	if (m_Rtol <  0.0) { felog.printf("Error: rtol must be nonnegative.\n"); return false; }
 	if (m_Rmin <  0.0) { felog.printf("Error: min_residual must be nonnegative.\n"  ); return false; }
-	if (m_bfgs.m_LStol  < 0.0) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
-	if (m_bfgs.m_LSmin  < 0.0) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
-	if (m_bfgs.m_LSiter < 0) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
+	if (m_LStol  < 0.0) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
+	if (m_LSmin  < 0.0) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
+	if (m_LSiter < 0) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
 	if (m_bfgs.m_maxref < 0) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
 	if (m_bfgs.m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
 	if (m_bfgs.m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
@@ -204,7 +204,7 @@ void FESolidSolver::Serialize(DumpFile& ar)
 		ar << m_naug;
 		ar << m_neq << m_nreq;
 
-		ar << m_bfgs.m_LStol << m_bfgs.m_LSiter << m_bfgs.m_LSmin;
+		ar << m_LStol << m_LSiter << m_LSmin;
 		ar << m_bfgs.m_maxups;
 		ar << m_bfgs.m_maxref;
 		ar << m_bfgs.m_cmax;
@@ -220,7 +220,7 @@ void FESolidSolver::Serialize(DumpFile& ar)
 		ar >> m_naug;
 		ar >> m_neq >> m_nreq;
 
-		ar >> m_bfgs.m_LStol >> m_bfgs.m_LSiter >> m_bfgs.m_LSmin;
+		ar >> m_LStol >> m_LSiter >> m_LSmin;
 		ar >> m_bfgs.m_maxups;
 		ar >> m_bfgs.m_maxref;
 		ar >> m_bfgs.m_cmax;
@@ -1128,7 +1128,7 @@ bool FESolidSolver::Quasin(double time)
 
 		// perform a linesearch
 		// the geometry is also updated in the line search
-		if (m_bfgs.m_LStol > 0) s = m_bfgs.LineSearch(1.0);
+		if (m_LStol > 0) s = LineSearch(1.0);
 		else
 		{
 			s = 1;
@@ -1163,7 +1163,7 @@ bool FESolidSolver::Quasin(double time)
 		if ((m_Etol > 0) && (normE1 > m_Etol*normEi)) bconv = false;
 
 		// check linestep size
-		if ((m_bfgs.m_LStol > 0) && (s < m_bfgs.m_LSmin)) bconv = false;
+		if ((m_LStol > 0) && (s < m_LSmin)) bconv = false;
 
 		// check energy divergence
 		if (normE1 > normEm) bconv = false;
@@ -1177,7 +1177,7 @@ bool FESolidSolver::Quasin(double time)
 		felog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
-		if (m_bfgs.m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
+		if (m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
 		felog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
 		felog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
 		felog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
@@ -1198,7 +1198,7 @@ bool FESolidSolver::Quasin(double time)
 		// If not, calculate the BFGS update vectors
 		if (bconv == false)
 		{
-			if (s < m_bfgs.m_LSmin)
+			if (s < m_LSmin)
 			{
 				// check for zero linestep size
 				felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");

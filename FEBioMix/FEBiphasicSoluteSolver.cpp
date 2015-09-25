@@ -220,7 +220,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 
 		// perform a linesearch
 		// the geometry is also updated in the line search
-		if (m_bfgs.m_LStol > 0) s = m_bfgs.LineSearch(1.0);
+		if (m_LStol > 0) s = LineSearch(1.0);
 		else
 		{
 			s = 1;
@@ -254,7 +254,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 		if ((m_Etol > 0) && (normE1 > m_Etol*normEi)) bconv = false;
 
 		// check linestep size
-		if ((m_bfgs.m_LStol > 0) && (s < m_bfgs.m_LSmin)) bconv = false;
+		if ((m_LStol > 0) && (s < m_LSmin)) bconv = false;
 
 		// check energy divergence
 		if (normE1 > normEm) bconv = false;
@@ -315,7 +315,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 		felog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
-		if (m_bfgs.m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
+		if (m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
 		felog.printf("\tconvergence norms :        INITIAL         CURRENT         REQUIRED\n");
 		felog.printf("\t residual               %15le %15le %15le\n", normRi, normR1, m_Rtol*normRi);
 		felog.printf("\t energy                 %15le %15le %15le\n", normEi, normE1, m_Etol*normEi);
@@ -339,7 +339,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 				felog.printbox("WARNING", "No force acting on the system.");
 				bconv = true;
 			}
-			else if (s < m_bfgs.m_LSmin)
+			else if (s < m_LSmin)
 			{
 				// check for zero linestep size
 				felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");

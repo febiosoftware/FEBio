@@ -18,4 +18,9 @@ public:
 
 	//! update nodal positions, velocities, accelerations, etc.
 	void UpdateKinematics(vector<double>& ui);
+
+private:
+	//! modified linesearch for Hager-Zhang solver
+	double LineSearchCG(double s);
+
 };

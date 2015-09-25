@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FECore/FESolver.h"
+#include "FECore/FENewtonSolver.h"
 #include "FEStiffnessMatrix.h"
 #include "FECore/FETypes.h"
 
@@ -8,7 +8,7 @@
 //! The FESolidSolver class solves large deformation solid mechanics problems
 //! It can deal with quasi-static and dynamic problems
 //! 
-class FESolidSolver : public FESolver
+class FESolidSolver : public FENewtonSolver
 {
 public:
 	//! constructor
@@ -158,7 +158,6 @@ public:
 	FEStiffnessMatrix*	m_pK;		//!< global stiffness matrix
 	int					m_neq;		//!< number of equations
 
-	BFGSSolver	m_bfgs;			//!< BFGS solver parameters
 	bool		m_baugment;		//!< augmentation flag
 
 	bool	m_bnew_update;	//!< use new rigid body update algorithm

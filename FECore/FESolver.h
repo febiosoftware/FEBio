@@ -1,8 +1,9 @@
 #pragma once
-#include "BFGSSolver.h"
 #include "FECoreBase.h"
 #include "DumpFile.h"
 #include "Timer.h"
+#include "matrix.h"
+#include "vector.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;

@@ -25,21 +25,10 @@ public:
 	//! solve the equations
 	void SolveEquations(vector<double>& x, vector<double>& b);
 
-	//! Performs a linesearch
-	double LineSearch(double s);
-
-	//! modified linesearch for Hager-Zhang solver
-	double LineSearchCG(double s);
-
 public:
 	int		m_maxups;		//!< max nr of QN iters permitted between stiffness reformations
 	int		m_maxref;		//!< max nr of reformations per time step
 	double	m_cmax;			//!< maximum value for the condition number
-
-	// line search options
-	double	m_LSmin;		//!< minimum line search step
-	double	m_LStol;		//!< line search tolerance
-	int		m_LSiter;		//!< max nr of line search iterations
 
 public:
 	// keep a pointer to the linear solver
