@@ -1,0 +1,380 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D53C4F901B9C837800718FBC /* FEBioFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4F801B9C837800718FBC /* FEBioFluid.cpp */; };
+		D53C4F911B9C837800718FBC /* FEBioFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4F811B9C837800718FBC /* FEBioFluid.h */; };
+		D53C4F921B9C837800718FBC /* FEBioFluidData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4F821B9C837800718FBC /* FEBioFluidData.cpp */; };
+		D53C4F931B9C837800718FBC /* FEBioFluidData.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4F831B9C837800718FBC /* FEBioFluidData.h */; };
+		D53C4F941B9C837800718FBC /* FEBioFluidPlot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4F841B9C837800718FBC /* FEBioFluidPlot.cpp */; };
+		D53C4F951B9C837800718FBC /* FEBioFluidPlot.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4F851B9C837800718FBC /* FEBioFluidPlot.h */; };
+		D53C4F961B9C837800718FBC /* FEFluidDomainFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4F861B9C837800718FBC /* FEFluidDomainFactory.cpp */; };
+		D53C4F971B9C837800718FBC /* FEFluidDomainFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4F871B9C837800718FBC /* FEFluidDomainFactory.h */; };
+		D53C4F981B9C837800718FBC /* FEFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4F881B9C837800718FBC /* FEFluid.cpp */; };
+		D53C4F991B9C837800718FBC /* FEFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4F891B9C837800718FBC /* FEFluid.h */; };
+		D53C4F9A1B9C837800718FBC /* FEFluidAnalysis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4F8A1B9C837800718FBC /* FEFluidAnalysis.cpp */; };
+		D53C4F9B1B9C837800718FBC /* FEFluidAnalysis.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4F8B1B9C837800718FBC /* FEFluidAnalysis.h */; };
+		D53C4F9C1B9C837800718FBC /* FEFluidDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4F8C1B9C837800718FBC /* FEFluidDomain.cpp */; };
+		D53C4F9D1B9C837800718FBC /* FEFluidDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4F8D1B9C837800718FBC /* FEFluidDomain.h */; };
+		D53C4F9E1B9C837800718FBC /* FEFluidSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4F8E1B9C837800718FBC /* FEFluidSolver.cpp */; };
+		D53C4F9F1B9C837800718FBC /* FEFluidSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4F8F1B9C837800718FBC /* FEFluidSolver.h */; };
+		D53C4FA11B9C85DD00718FBC /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4FA01B9C85DD00718FBC /* stdafx.h */; };
+		D53C4FA41B9C8FD500718FBC /* FEElasticFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4FA21B9C8FD500718FBC /* FEElasticFluid.cpp */; };
+		D53C4FA51B9C8FD500718FBC /* FEElasticFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4FA31B9C8FD500718FBC /* FEElasticFluid.h */; };
+		D53C4FA81B9C92D900718FBC /* FEIdealGas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4FA61B9C92D900718FBC /* FEIdealGas.cpp */; };
+		D53C4FA91B9C92D900718FBC /* FEIdealGas.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4FA71B9C92D900718FBC /* FEIdealGas.h */; };
+		D53C4FAC1B9C9F6D00718FBC /* FENeoHookeanFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4FAA1B9C9F6D00718FBC /* FENeoHookeanFluid.cpp */; };
+		D53C4FAD1B9C9F6D00718FBC /* FENeoHookeanFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4FAB1B9C9F6D00718FBC /* FENeoHookeanFluid.h */; };
+		D53C4FB01B9CA58400718FBC /* FEViscousFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4FAE1B9CA58400718FBC /* FEViscousFluid.cpp */; };
+		D53C4FB11B9CA58400718FBC /* FEViscousFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4FAF1B9CA58400718FBC /* FEViscousFluid.h */; };
+		D53C4FB41B9CB6B200718FBC /* FENewtonianFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4FB21B9CB6B200718FBC /* FENewtonianFluid.cpp */; };
+		D53C4FB51B9CB6B200718FBC /* FENewtonianFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4FB31B9CB6B200718FBC /* FENewtonianFluid.h */; };
+		D53C4FB81B9D242600718FBC /* FEFluidResidualVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4FB61B9D242600718FBC /* FEFluidResidualVector.cpp */; };
+		D53C4FB91B9D242600718FBC /* FEFluidResidualVector.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4FB71B9D242600718FBC /* FEFluidResidualVector.h */; };
+		D53C4FC21B9E306800718FBC /* FEFluidTractionLoad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4FC01B9E306800718FBC /* FEFluidTractionLoad.cpp */; };
+		D53C4FC31B9E306800718FBC /* FEFluidTractionLoad.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4FC11B9E306800718FBC /* FEFluidTractionLoad.h */; };
+		D5691CC51BAA2F3B0066FAC1 /* FEIdealFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5691CC31BAA2F3B0066FAC1 /* FEIdealFluid.cpp */; };
+		D5691CC61BAA2F3B0066FAC1 /* FEIdealFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D5691CC41BAA2F3B0066FAC1 /* FEIdealFluid.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D53C4F781B9C836800718FBC /* libFEBioFluid.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioFluid.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D53C4F801B9C837800718FBC /* FEBioFluid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioFluid.cpp; sourceTree = "<group>"; };
+		D53C4F811B9C837800718FBC /* FEBioFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioFluid.h; sourceTree = "<group>"; };
+		D53C4F821B9C837800718FBC /* FEBioFluidData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioFluidData.cpp; sourceTree = "<group>"; };
+		D53C4F831B9C837800718FBC /* FEBioFluidData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioFluidData.h; sourceTree = "<group>"; };
+		D53C4F841B9C837800718FBC /* FEBioFluidPlot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioFluidPlot.cpp; sourceTree = "<group>"; };
+		D53C4F851B9C837800718FBC /* FEBioFluidPlot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioFluidPlot.h; sourceTree = "<group>"; };
+		D53C4F861B9C837800718FBC /* FEFluidDomainFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidDomainFactory.cpp; sourceTree = "<group>"; };
+		D53C4F871B9C837800718FBC /* FEFluidDomainFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidDomainFactory.h; sourceTree = "<group>"; };
+		D53C4F881B9C837800718FBC /* FEFluid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluid.cpp; sourceTree = "<group>"; };
+		D53C4F891B9C837800718FBC /* FEFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluid.h; sourceTree = "<group>"; };
+		D53C4F8A1B9C837800718FBC /* FEFluidAnalysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidAnalysis.cpp; sourceTree = "<group>"; };
+		D53C4F8B1B9C837800718FBC /* FEFluidAnalysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidAnalysis.h; sourceTree = "<group>"; };
+		D53C4F8C1B9C837800718FBC /* FEFluidDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidDomain.cpp; sourceTree = "<group>"; };
+		D53C4F8D1B9C837800718FBC /* FEFluidDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidDomain.h; sourceTree = "<group>"; };
+		D53C4F8E1B9C837800718FBC /* FEFluidSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidSolver.cpp; sourceTree = "<group>"; };
+		D53C4F8F1B9C837800718FBC /* FEFluidSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidSolver.h; sourceTree = "<group>"; };
+		D53C4FA01B9C85DD00718FBC /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
+		D53C4FA21B9C8FD500718FBC /* FEElasticFluid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElasticFluid.cpp; sourceTree = "<group>"; };
+		D53C4FA31B9C8FD500718FBC /* FEElasticFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElasticFluid.h; sourceTree = "<group>"; };
+		D53C4FA61B9C92D900718FBC /* FEIdealGas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEIdealGas.cpp; sourceTree = "<group>"; };
+		D53C4FA71B9C92D900718FBC /* FEIdealGas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEIdealGas.h; sourceTree = "<group>"; };
+		D53C4FAA1B9C9F6D00718FBC /* FENeoHookeanFluid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENeoHookeanFluid.cpp; sourceTree = "<group>"; };
+		D53C4FAB1B9C9F6D00718FBC /* FENeoHookeanFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENeoHookeanFluid.h; sourceTree = "<group>"; };
+		D53C4FAE1B9CA58400718FBC /* FEViscousFluid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEViscousFluid.cpp; sourceTree = "<group>"; };
+		D53C4FAF1B9CA58400718FBC /* FEViscousFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEViscousFluid.h; sourceTree = "<group>"; };
+		D53C4FB21B9CB6B200718FBC /* FENewtonianFluid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENewtonianFluid.cpp; sourceTree = "<group>"; };
+		D53C4FB31B9CB6B200718FBC /* FENewtonianFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENewtonianFluid.h; sourceTree = "<group>"; };
+		D53C4FB61B9D242600718FBC /* FEFluidResidualVector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidResidualVector.cpp; sourceTree = "<group>"; };
+		D53C4FB71B9D242600718FBC /* FEFluidResidualVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidResidualVector.h; sourceTree = "<group>"; };
+		D53C4FC01B9E306800718FBC /* FEFluidTractionLoad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidTractionLoad.cpp; sourceTree = "<group>"; };
+		D53C4FC11B9E306800718FBC /* FEFluidTractionLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidTractionLoad.h; sourceTree = "<group>"; };
+		D5691CC31BAA2F3B0066FAC1 /* FEIdealFluid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEIdealFluid.cpp; sourceTree = "<group>"; };
+		D5691CC41BAA2F3B0066FAC1 /* FEIdealFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEIdealFluid.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D53C4F751B9C836800718FBC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D53C4F6F1B9C836800718FBC = {
+			isa = PBXGroup;
+			children = (
+				D53C4F7F1B9C837800718FBC /* FEBioFluid */,
+				D53C4F791B9C836800718FBC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D53C4F791B9C836800718FBC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D53C4F781B9C836800718FBC /* libFEBioFluid.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D53C4F7F1B9C837800718FBC /* FEBioFluid */ = {
+			isa = PBXGroup;
+			children = (
+				D53C4F801B9C837800718FBC /* FEBioFluid.cpp */,
+				D53C4F811B9C837800718FBC /* FEBioFluid.h */,
+				D53C4F821B9C837800718FBC /* FEBioFluidData.cpp */,
+				D53C4F831B9C837800718FBC /* FEBioFluidData.h */,
+				D53C4F841B9C837800718FBC /* FEBioFluidPlot.cpp */,
+				D53C4F851B9C837800718FBC /* FEBioFluidPlot.h */,
+				D53C4FA21B9C8FD500718FBC /* FEElasticFluid.cpp */,
+				D53C4FA31B9C8FD500718FBC /* FEElasticFluid.h */,
+				D53C4F881B9C837800718FBC /* FEFluid.cpp */,
+				D53C4F891B9C837800718FBC /* FEFluid.h */,
+				D53C4F8A1B9C837800718FBC /* FEFluidAnalysis.cpp */,
+				D53C4F8B1B9C837800718FBC /* FEFluidAnalysis.h */,
+				D53C4F8C1B9C837800718FBC /* FEFluidDomain.cpp */,
+				D53C4F8D1B9C837800718FBC /* FEFluidDomain.h */,
+				D53C4F861B9C837800718FBC /* FEFluidDomainFactory.cpp */,
+				D53C4F871B9C837800718FBC /* FEFluidDomainFactory.h */,
+				D53C4FB61B9D242600718FBC /* FEFluidResidualVector.cpp */,
+				D53C4FB71B9D242600718FBC /* FEFluidResidualVector.h */,
+				D53C4F8E1B9C837800718FBC /* FEFluidSolver.cpp */,
+				D53C4F8F1B9C837800718FBC /* FEFluidSolver.h */,
+				D53C4FC01B9E306800718FBC /* FEFluidTractionLoad.cpp */,
+				D53C4FC11B9E306800718FBC /* FEFluidTractionLoad.h */,
+				D5691CC31BAA2F3B0066FAC1 /* FEIdealFluid.cpp */,
+				D5691CC41BAA2F3B0066FAC1 /* FEIdealFluid.h */,
+				D53C4FA61B9C92D900718FBC /* FEIdealGas.cpp */,
+				D53C4FA71B9C92D900718FBC /* FEIdealGas.h */,
+				D53C4FAA1B9C9F6D00718FBC /* FENeoHookeanFluid.cpp */,
+				D53C4FAB1B9C9F6D00718FBC /* FENeoHookeanFluid.h */,
+				D53C4FB21B9CB6B200718FBC /* FENewtonianFluid.cpp */,
+				D53C4FB31B9CB6B200718FBC /* FENewtonianFluid.h */,
+				D53C4FAE1B9CA58400718FBC /* FEViscousFluid.cpp */,
+				D53C4FAF1B9CA58400718FBC /* FEViscousFluid.h */,
+				D53C4FA01B9C85DD00718FBC /* stdafx.h */,
+			);
+			name = FEBioFluid;
+			path = ../../FEBioFluid;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D53C4F761B9C836800718FBC /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D53C4FA11B9C85DD00718FBC /* stdafx.h in Headers */,
+				D53C4FB11B9CA58400718FBC /* FEViscousFluid.h in Headers */,
+				D53C4FB91B9D242600718FBC /* FEFluidResidualVector.h in Headers */,
+				D53C4FB51B9CB6B200718FBC /* FENewtonianFluid.h in Headers */,
+				D53C4F911B9C837800718FBC /* FEBioFluid.h in Headers */,
+				D53C4F9D1B9C837800718FBC /* FEFluidDomain.h in Headers */,
+				D53C4F9F1B9C837800718FBC /* FEFluidSolver.h in Headers */,
+				D53C4F951B9C837800718FBC /* FEBioFluidPlot.h in Headers */,
+				D53C4F991B9C837800718FBC /* FEFluid.h in Headers */,
+				D53C4FA51B9C8FD500718FBC /* FEElasticFluid.h in Headers */,
+				D53C4F931B9C837800718FBC /* FEBioFluidData.h in Headers */,
+				D5691CC61BAA2F3B0066FAC1 /* FEIdealFluid.h in Headers */,
+				D53C4F971B9C837800718FBC /* FEFluidDomainFactory.h in Headers */,
+				D53C4FA91B9C92D900718FBC /* FEIdealGas.h in Headers */,
+				D53C4F9B1B9C837800718FBC /* FEFluidAnalysis.h in Headers */,
+				D53C4FC31B9E306800718FBC /* FEFluidTractionLoad.h in Headers */,
+				D53C4FAD1B9C9F6D00718FBC /* FENeoHookeanFluid.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D53C4F771B9C836800718FBC /* FEBioFluid */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D53C4F7C1B9C836800718FBC /* Build configuration list for PBXNativeTarget "FEBioFluid" */;
+			buildPhases = (
+				D53C4F741B9C836800718FBC /* Sources */,
+				D53C4F751B9C836800718FBC /* Frameworks */,
+				D53C4F761B9C836800718FBC /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FEBioFluid;
+			productName = FEBioFluid;
+			productReference = D53C4F781B9C836800718FBC /* libFEBioFluid.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D53C4F701B9C836800718FBC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0640;
+				ORGANIZATIONNAME = febio.org;
+				TargetAttributes = {
+					D53C4F771B9C836800718FBC = {
+						CreatedOnToolsVersion = 6.4;
+					};
+				};
+			};
+			buildConfigurationList = D53C4F731B9C836800718FBC /* Build configuration list for PBXProject "FEBioFluid" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D53C4F6F1B9C836800718FBC;
+			productRefGroup = D53C4F791B9C836800718FBC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D53C4F771B9C836800718FBC /* FEBioFluid */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D53C4F741B9C836800718FBC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D53C4F9A1B9C837800718FBC /* FEFluidAnalysis.cpp in Sources */,
+				D53C4F961B9C837800718FBC /* FEFluidDomainFactory.cpp in Sources */,
+				D53C4FB01B9CA58400718FBC /* FEViscousFluid.cpp in Sources */,
+				D53C4F941B9C837800718FBC /* FEBioFluidPlot.cpp in Sources */,
+				D53C4F981B9C837800718FBC /* FEFluid.cpp in Sources */,
+				D53C4FA81B9C92D900718FBC /* FEIdealGas.cpp in Sources */,
+				D53C4FC21B9E306800718FBC /* FEFluidTractionLoad.cpp in Sources */,
+				D53C4FB81B9D242600718FBC /* FEFluidResidualVector.cpp in Sources */,
+				D53C4FA41B9C8FD500718FBC /* FEElasticFluid.cpp in Sources */,
+				D53C4F921B9C837800718FBC /* FEBioFluidData.cpp in Sources */,
+				D53C4F901B9C837800718FBC /* FEBioFluid.cpp in Sources */,
+				D53C4FAC1B9C9F6D00718FBC /* FENeoHookeanFluid.cpp in Sources */,
+				D53C4F9C1B9C837800718FBC /* FEFluidDomain.cpp in Sources */,
+				D53C4FB41B9CB6B200718FBC /* FENewtonianFluid.cpp in Sources */,
+				D53C4F9E1B9C837800718FBC /* FEFluidSolver.cpp in Sources */,
+				D5691CC51BAA2F3B0066FAC1 /* FEIdealFluid.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D53C4F7A1B9C836800718FBC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		D53C4F7B1B9C836800718FBC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		D53C4F7D1B9C836800718FBC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LIBRARY = "libstdc++";
+				EXECUTABLE_PREFIX = lib;
+				ICC_LANG_OPENMP = parallel;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+			};
+			name = Debug;
+		};
+		D53C4F7E1B9C836800718FBC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_VERSION = com.intel.compilers.icc.15_0_0;
+				ICC_LANG_OPENMP = parallel;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D53C4F731B9C836800718FBC /* Build configuration list for PBXProject "FEBioFluid" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D53C4F7A1B9C836800718FBC /* Debug */,
+				D53C4F7B1B9C836800718FBC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D53C4F7C1B9C836800718FBC /* Build configuration list for PBXNativeTarget "FEBioFluid" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D53C4F7D1B9C836800718FBC /* Debug */,
+				D53C4F7E1B9C836800718FBC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D53C4F701B9C836800718FBC /* Project object */;
+}
