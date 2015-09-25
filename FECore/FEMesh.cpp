@@ -22,6 +22,7 @@ FENode::FENode()
 	m_pt = 0;
 	m_T = 0;
 	m_T0 = 0;
+    m_et = 0;
     
     // get DOFS
     DOFS& fedofs = *DOFS::GetInstance();
@@ -62,6 +63,7 @@ FENode::FENode(const FENode& n)
 	m_pt = n.m_pt;
 	m_T  = n.m_T;
 	m_T0 = n.m_T0;
+    m_et = n.m_et;
 	m_ct = n.m_ct;
 	m_cp = n.m_cp;
 
@@ -89,6 +91,7 @@ FENode& FENode::operator = (const FENode& n)
 	m_pt = n.m_pt;
 	m_T  = n.m_T;
 	m_T0 = n.m_T0;
+    m_et = n.m_et;
 	m_ct = n.m_ct;
 	m_cp = n.m_cp;
 
@@ -215,6 +218,7 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 			dmp << nd.m_D0 << nd.m_Dt;
 			dmp << nd.m_pt;
 			dmp << nd.m_T;
+            dmp << nd.m_et;
 			dmp << nd.m_ct;
 			dmp << nd.m_cp;
 		}
@@ -232,6 +236,7 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 			dmp >> nd.m_D0 >> nd.m_Dt;
 			dmp >> nd.m_pt;
 			dmp >> nd.m_T;
+            dmp >> nd.m_et;
 			dmp >> nd.m_ct;
 			dmp >> nd.m_cp;
 		}
@@ -503,7 +508,9 @@ void FEMesh::Reset()
 		
 		node.m_T = node.m_T0;
 
-		node.m_Fr = vec3d(0,0,0);
+        node.m_et = 0;
+
+        node.m_Fr = vec3d(0,0,0);
 		node.m_Dt = node.m_D0;
 
 		// reset ID arrays

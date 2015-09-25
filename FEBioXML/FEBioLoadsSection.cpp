@@ -150,6 +150,10 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 		else if (strcmp(sz, "z") == 0) bc = DOF_Z;
 		else if (strcmp(sz, "p") == 0) bc = DOF_P;
 		else if (strcmp(sz, "t") == 0) bc = DOF_T;
+        else if (strcmp(sz, "vx") == 0) bc = DOF_VX;
+        else if (strcmp(sz, "vy") == 0) bc = DOF_VY;
+        else if (strcmp(sz, "vz") == 0) bc = DOF_VZ;
+        else if (strcmp(sz, "e") == 0) bc = DOF_E;
 		else if (strcmp(sz, "c") == 0) bc = DOF_C;
 		else if (strcmp(sz, "c1") == 0) bc = DOF_C;
 		else if (strcmp(sz, "c2") == 0) bc = DOF_C+1;

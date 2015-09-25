@@ -14,7 +14,8 @@ enum FE_Element_Class {
 	FE_ELEM_BEAM,
 	FE_ELEM_SURFACE,
 	FE_ELEM_TRUSS,
-	FE_ELEM_DISCRETE
+	FE_ELEM_DISCRETE,
+    FE_ELEM_FERGUSON_SHELL
 };
 
 //-----------------------------------------------------------------------------
@@ -85,6 +86,7 @@ enum FE_Element_Type {
 	// shell elements
 	FE_SHELL_QUAD,
 	FE_SHELL_TRI,
+    FE_FERGUSON_SHELL_QUAD,
 
 	// truss elements
 	FE_TRUSS,
@@ -162,7 +164,8 @@ enum FE_Step_Type {
 	FE_HEAT_SOLID,
 	FE_EXPLICIT_SOLID,
 	FE_CG_SOLID,
-	FE_THERMO_ELASTIC
+	FE_THERMO_ELASTIC,
+    FE_FLUID
 };
 
 ///////////////////////////////////////////////////////////////////////////////

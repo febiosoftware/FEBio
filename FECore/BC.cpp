@@ -208,6 +208,10 @@ void FEPrescribedBC::Activate()
 		case DOF_W: m_r = (m_br ? node.m_Dt.z: 0); break;
 		case DOF_T: m_r = (m_br ? node.m_T   : 0); break;
 		case DOF_P: m_r = (m_br ? node.m_pt  : 0); break;
+        case DOF_VX: m_r = (m_br ? node.m_vt.x : 0); break;
+        case DOF_VY: m_r = (m_br ? node.m_vt.y : 0); break;
+        case DOF_VZ: m_r = (m_br ? node.m_vt.z : 0); break;
+        case DOF_E: m_r = (m_br ? node.m_et  : 0); break;
 		default:	// all prescribed concentrations
 			if ((m_dof >= DOF_C) && (m_dof < (int)node.m_ID.size())) {
 				int sid = m_dof - DOF_C;
@@ -283,6 +287,10 @@ void FEPrescribedBC::Update()
 		case DOF_Z: node.m_rt.z = node.m_r0.z + g; break;
 		case DOF_P: node.m_pt = g; break;
 		case DOF_T: node.m_T = g; break;
+        case DOF_VX: node.m_vt.x = g; break;
+        case DOF_VY: node.m_vt.y = g; break;
+        case DOF_VZ: node.m_vt.z = g; break;
+        case DOF_E: node.m_et = g; break;
 		default:
 			if (m_dof >= DOF_C) node.m_ct[m_dof - DOF_C] = g; break;
 		}
@@ -309,6 +317,10 @@ void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 			case DOF_Z: ui[I] = dq - (node.m_rt.z - node.m_r0.z); break;
 			case DOF_P: ui[I] = dq - node.m_pt; break;
 			case DOF_T: ui[I] = (brel ? dq - node.m_T : dq);
+            case DOF_VX: ui[I] = dq - node.m_vt.x; break;
+            case DOF_VY: ui[I] = dq - node.m_vt.y; break;
+            case DOF_VZ: ui[I] = dq - node.m_vt.z; break;
+            case DOF_E: ui[I] = dq - node.m_et; break;
 			default:
 				if ((m_dof >= DOF_C) && (m_dof < (int)node.m_ID.size())) {
 					ui[I] = dq - node.m_ct[m_dof - DOF_C];

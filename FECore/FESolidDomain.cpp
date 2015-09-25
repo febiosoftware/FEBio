@@ -583,6 +583,54 @@ vec3d FESolidDomain::gradient(FESolidElement& el, vector<double>& fn, int n)
 }
 
 //-----------------------------------------------------------------------------
+//! calculate spatial gradient of function at integration points
+mat3d FESolidDomain::gradient(FESolidElement& el, vec3d* fn, int n)
+{
+    double Ji[3][3];
+    invjact(el, Ji, n);
+				
+    vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
+    vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+    vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
+    
+    double* Gr = el.Gr(n);
+    double* Gs = el.Gs(n);
+    double* Gt = el.Gt(n);
+    
+    mat3d gradf;
+    gradf.zero();
+    int N = el.Nodes();
+    for (int i=0; i<N; ++i)
+        gradf += fn[i] & (g1*Gr[i] + g2*Gs[i] + g3*Gt[i]);
+    
+    return gradf;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate material gradient of function at integration points
+mat3d FESolidDomain::Gradient(FESolidElement& el, vec3d* fn, int n)
+{
+    double Ji[3][3];
+    invjac0(el, Ji, n);
+				
+    vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
+    vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+    vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
+    
+    double* Gr = el.Gr(n);
+    double* Gs = el.Gs(n);
+    double* Gt = el.Gt(n);
+    
+    mat3d Gradf;
+    Gradf.zero();
+    int N = el.Nodes();
+    for (int i=0; i<N; ++i)
+        Gradf += fn[i] & (g1*Gr[i] + g2*Gs[i] + g3*Gt[i]);
+    
+    return Gradf;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate jacobian with respect to current frame
 double FESolidDomain::detJt(FESolidElement &el, int n)
 {

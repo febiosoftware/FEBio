@@ -4,6 +4,7 @@
 #include "FEBioMix/FEBioMix.h"
 #include "FEBioHeat/FEBioHeat.h"
 #include "FEBioOpt/FEBioOpt.h"
+#include "FEBioFluid/FEBioFluid.h"
 
 void InitFEBioLibrary()
 {
@@ -14,4 +15,5 @@ FEBioMech::InitModule();
 FEBioMix::InitModule();
 FEBioHeat::InitModule();
 FEBioOpt::InitModule();
+FEBioFluid::InitModule();
 }

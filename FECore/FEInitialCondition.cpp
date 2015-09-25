@@ -132,3 +132,34 @@ void FEInitialConcentration::Activate()
 		node.m_ct[m_nsol] = m_item[i].c0;
 	}
 }
+
+//-----------------------------------------------------------------------------
+void FEInitialDilatation::Serialize(DumpFile& ar)
+{
+    if (ar.IsSaving())
+    {
+        for (size_t i=0; i<m_item.size(); ++i)
+        {
+            ar << m_item[i].nid << m_item[i].e0;
+        }
+    }
+    else
+    {
+        for (size_t i=0; i<m_item.size(); ++i)
+        {
+            ar >> m_item[i].nid >> m_item[i].e0;
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void FEInitialDilatation::Activate()
+{
+    FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
+    for (size_t i=0; i<m_item.size(); ++i)
+    {
+        FENode& node = mesh.Node(m_item[i].nid);
+        node.m_et = m_item[i].e0;
+    }
+}

@@ -22,5 +22,6 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 	else if (strcmp(szt, "heat"          ) == 0) m_pim->m_nstep_type = FE_HEAT;
 //	else if (strcmp(szt, "heat-solid"    ) == 0) m_pim->m_nstep_type = FE_HEAT_SOLID;
 	else if (strcmp(szt, "thermo-elastic") == 0) m_pim->m_nstep_type = FE_THERMO_ELASTIC;
+    else if (strcmp(szt, "fluid"         ) == 0) m_pim->m_nstep_type = FE_FLUID;
 	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 }

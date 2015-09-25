@@ -166,6 +166,13 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 			else if (strcmp(sz, "uw" ) == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_W); }
 			else if (strcmp(sz, "uvw") == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_V); fem.AddFixedBC(n, DOF_W); }
 			else if (strcmp(sz, "t"  ) == 0) { fem.AddFixedBC(n, DOF_T); }
+            else if (strcmp(sz, "vx"  ) == 0) { fem.AddFixedBC(n, DOF_VX); }
+            else if (strcmp(sz, "vy"  ) == 0) { fem.AddFixedBC(n, DOF_VY); }
+            else if (strcmp(sz, "vz"  ) == 0) { fem.AddFixedBC(n, DOF_VZ); }
+            else if (strcmp(sz, "vxy" ) == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VY); }
+            else if (strcmp(sz, "vyz" ) == 0) { fem.AddFixedBC(n, DOF_VY); fem.AddFixedBC(n, DOF_VZ); }
+            else if (strcmp(sz, "vxz" ) == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VZ); }
+            else if (strcmp(sz, "vxyz") == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VY); fem.AddFixedBC(n, DOF_VZ); }
 			else if (strcmp(sz, "c"  ) == 0) { fem.AddFixedBC(n, DOF_C); }
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 		}
@@ -194,6 +201,14 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 			else if (strcmp(sz, "uw" ) == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_W); }
 			else if (strcmp(sz, "uvw") == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_V); fem.AddFixedBC(n, DOF_W); }
 			else if (strcmp(sz, "t"  ) == 0) { fem.AddFixedBC(n, DOF_T); }
+            else if (strcmp(sz, "vx" ) == 0) { fem.AddFixedBC(n, DOF_VX); }
+            else if (strcmp(sz, "vy" ) == 0) { fem.AddFixedBC(n, DOF_VY); }
+            else if (strcmp(sz, "vz" ) == 0) { fem.AddFixedBC(n, DOF_VZ); }
+            else if (strcmp(sz, "vxy" ) == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VY); }
+            else if (strcmp(sz, "vyz" ) == 0) { fem.AddFixedBC(n, DOF_VY); fem.AddFixedBC(n, DOF_VZ); }
+            else if (strcmp(sz, "vxz" ) == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VZ); }
+            else if (strcmp(sz, "vxyz") == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VY); fem.AddFixedBC(n, DOF_VZ); }
+            else if (strcmp(sz, "e"  ) == 0) { fem.AddFixedBC(n, DOF_E); }
 			else if (strcmp(sz, "c"  ) == 0) { fem.AddFixedBC(n, DOF_C); }
 			else if (strncmp(sz, "c", 1) == 0) { fem.AddFixedBC(n, DOF_C + atoi(&sz[1]) - 1); }
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
@@ -228,6 +243,10 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 		else if (*ch == 'w') bc.push_back(DOF_W);
 		else if (*ch == 'p') bc.push_back(DOF_P);
 		else if (*ch == 't') bc.push_back(DOF_T);
+        else if (*ch == 'X') bc.push_back(DOF_VX);
+        else if (*ch == 'Y') bc.push_back(DOF_VY);
+        else if (*ch == 'Z') bc.push_back(DOF_VZ);
+        else if (*ch == 'e') bc.push_back(DOF_E);
 		else if (*ch == 'c')
 		{
 			char ci = ch[1];
@@ -327,6 +346,10 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		else if (strcmp(sz, "w") == 0) bc = DOF_W;
 		else if (strcmp(sz, "p") == 0) bc = DOF_P;
 		else if (strcmp(sz, "t") == 0) bc = DOF_T; 
+        else if (strcmp(sz, "vx") == 0) bc = DOF_VX;
+        else if (strcmp(sz, "vy") == 0) bc = DOF_VY;
+        else if (strcmp(sz, "vz") == 0) bc = DOF_VZ;
+        else if (strcmp(sz, "e") == 0) bc = DOF_E;
 		else if (strcmp(sz, "c") == 0) bc = DOF_C;
 		else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
 		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
@@ -384,6 +407,10 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			else if (strcmp(sz, "w") == 0) bc = DOF_W;
 			else if (strcmp(sz, "p") == 0) bc = DOF_P;
 			else if (strcmp(sz, "t") == 0) bc = DOF_T; 
+            else if (strcmp(sz, "vx") == 0) bc = DOF_VX;
+            else if (strcmp(sz, "vy") == 0) bc = DOF_VY;
+            else if (strcmp(sz, "vz") == 0) bc = DOF_VZ;
+            else if (strcmp(sz, "e") == 0) bc = DOF_E;
 			else if (strcmp(sz, "c") == 0) bc = DOF_C;
 			else if (strcmp(sz, "c1") == 0) bc = DOF_C;
 			else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
@@ -441,6 +468,10 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 	else if (strcmp(sz, "w") == 0) bc = DOF_W;
 	else if (strcmp(sz, "p") == 0) bc = DOF_P;
 	else if (strcmp(sz, "t") == 0) bc = DOF_T; 
+    else if (strcmp(sz, "vx") == 0) bc = DOF_VX;
+    else if (strcmp(sz, "vy") == 0) bc = DOF_VY;
+    else if (strcmp(sz, "vz") == 0) bc = DOF_VZ;
+    else if (strcmp(sz, "e") == 0) bc = DOF_E;
 	else if (strcmp(sz, "c") == 0) bc = DOF_C;
 	else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
 	else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);

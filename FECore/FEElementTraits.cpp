@@ -6,6 +6,11 @@
 #include "FEElementTraits.h"
 #include "FEElement.h"
 #include "FEException.h"
+
+#ifndef SQR
+#define SQR(x) ((x)*(x))
+#endif
+
 //=============================================================================
 FESolidElementTraits::FESolidElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_SOLID) 
 {
@@ -2727,6 +2732,118 @@ void FEShellTriElementTraits::init()
 		Hs[n][1] =  0;
 		Hs[n][2] =  1;
 	}
+}
+
+//=============================================================================
+//               F E F E R G U S O N S H E L L E L E M E N T T R A I T S
+//=============================================================================
+void FEFergusonShellElementTraits::shape(double *H, double r)
+{
+    H[0] = SQR(r-1)*(2+r)/4;
+    H[1] = SQR(r+1)*(2-r)/4;
+    H[2] = SQR(r-1)*(r+1)/4;
+    H[3] = SQR(r+1)*(r-1)/4;
+}
+
+void FEFergusonShellElementTraits::shape_deriv(double* Gr, double r)
+{
+    Gr[0] = (SQR(r)-1)*0.75;
+    Gr[1] = -(SQR(r)-1)*0.75;
+    Gr[2] = (r-1)*(3*r+1)/4;
+    Gr[3] = (r+1)*(3*r-1)/4;
+}
+
+void FEFergusonShellElementTraits::shape_deriv2(double* Grr, double r)
+{
+    Grr[0] = 1.5*r;
+    Grr[1] = -1.5*r;
+    Grr[2] = (3*r-1)/2;
+    Grr[3] = (3*r+1)/2;
+}
+
+//=============================================================================
+//               F E F E R G U S O N S H E L L Q U A D E L E M E N T
+//=============================================================================
+
+void FEFergusonShellQuadElementTraits::init()
+{
+    int n;
+    
+    const double a = 1.0 / sqrt(3.0);
+    const double b = sqrt(3.0/5.0);
+    const double w = 5.0 / 9.0;
+    double Fr[4], Fs[4];
+    double Gr[4], Gs[4];
+    
+    gr[ 0] = -a; gs[ 0] = -a; gt[ 0] = -b; gw[ 0] = w;
+    gr[ 1] =  a; gs[ 1] = -a; gt[ 1] = -b; gw[ 1] = w;
+    gr[ 2] =  a; gs[ 2] =  a; gt[ 2] = -b; gw[ 2] = w;
+    gr[ 3] = -a; gs[ 3] =  a; gt[ 3] = -b; gw[ 3] = w;
+    
+    gr[ 4] = -a; gs[ 4] = -a; gt[ 4] =  0; gw[ 4] = 8.0/9.0;
+    gr[ 5] =  a; gs[ 5] = -a; gt[ 5] =  0; gw[ 5] = 8.0/9.0;
+    gr[ 6] =  a; gs[ 6] =  a; gt[ 6] =  0; gw[ 6] = 8.0/9.0;
+    gr[ 7] = -a; gs[ 7] =  a; gt[ 7] =  0; gw[ 7] = 8.0/9.0;
+    
+    gr[ 8] = -a; gs[ 8] = -a; gt[ 8] =  b; gw[ 8] = w;
+    gr[ 9] =  a; gs[ 9] = -a; gt[ 9] =  b; gw[ 9] = w;
+    gr[10] =  a; gs[10] =  a; gt[10] =  b; gw[10] = w;
+    gr[11] = -a; gs[11] =  a; gt[11] =  b; gw[11] = w;
+    
+    
+    for (n=0; n<NINT; ++n)
+    {
+        shape(Fr, gr[n]);
+        shape(Fs, gs[n]);
+
+        H[n][0] = Fr[0]*Fs[0];
+        H[n][1] = Fr[1]*Fs[0];
+        H[n][2] = Fr[1]*Fs[1];
+        H[n][3] = Fr[0]*Fs[1];
+
+        P[0][n][0] = Fr[2]*Fs[0];
+        P[0][n][1] = Fr[3]*Fs[0];
+        P[0][n][2] = Fr[3]*Fs[1];
+        P[0][n][3] = Fr[2]*Fs[1];
+        
+        P[1][n][0] = Fr[0]*Fs[2];
+        P[1][n][1] = Fr[1]*Fs[2];
+        P[1][n][2] = Fr[1]*Fs[3];
+        P[1][n][3] = Fr[0]*Fs[3];
+        
+        shape_deriv(Gr, gr[n]);
+        shape_deriv(Gs, gs[n]);
+        
+        Hr[n][0] = Gr[0]*Fs[0];
+        Hr[n][1] = Gr[1]*Fs[0];
+        Hr[n][2] = Gr[1]*Fs[1];
+        Hr[n][3] = Gr[0]*Fs[1];
+        
+        Hs[n][0] = Fr[0]*Gs[0];
+        Hs[n][1] = Fr[1]*Gs[0];
+        Hs[n][2] = Fr[1]*Gs[1];
+        Hs[n][3] = Fr[0]*Gs[1];
+        
+        Pr[0][n][0] = Gr[2]*Fs[0];
+        Pr[0][n][1] = Gr[3]*Fs[0];
+        Pr[0][n][2] = Gr[3]*Fs[1];
+        Pr[0][n][3] = Gr[2]*Fs[1];
+        
+        Ps[0][n][0] = Fr[2]*Gs[0];
+        Ps[0][n][1] = Fr[3]*Gs[0];
+        Ps[0][n][2] = Fr[3]*Gs[1];
+        Ps[0][n][3] = Fr[2]*Gs[1];
+        
+        Pr[1][n][0] = Gr[0]*Fs[2];
+        Pr[1][n][1] = Gr[1]*Fs[2];
+        Pr[1][n][2] = Gr[1]*Fs[3];
+        Pr[1][n][3] = Gr[0]*Fs[3];
+        
+        Ps[1][n][0] = Fr[0]*Gs[2];
+        Ps[1][n][1] = Fr[1]*Gs[2];
+        Ps[1][n][2] = Fr[1]*Gs[3];
+        Ps[1][n][3] = Fr[0]*Gs[3];
+    }
 }
 
 //=============================================================================

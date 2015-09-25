@@ -10,6 +10,7 @@
 		B489C45A1B18E1F500E5AD7F /* febio.xml in Copy Files */ = {isa = PBXBuildFile; fileRef = B489C4591B18E1F500E5AD7F /* febio.xml */; };
 		D5307A4518B40934008C8463 /* libFEBioOpt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5307A4418B40934008C8463 /* libFEBioOpt.a */; };
 		D5307A4B18B40AB0008C8463 /* liblevmar.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5307A4A18B40AB0008C8463 /* liblevmar.a */; };
+		D53C4FBF1B9DE8BC00718FBC /* libFEBioFluid.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D53C4FBE1B9DE8BC00718FBC /* libFEBioFluid.a */; };
 		D53D74FB1B9BCAF100A770B5 /* libFEBioTest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D53D74FA1B9BCAF100A770B5 /* libFEBioTest.a */; };
 		D5AC350D19B9454B003D048C /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5AC350C19B9454B003D048C /* libgsl.a */; };
 		D5E10B921865E24900B23922 /* CommandManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B751865E24900B23922 /* CommandManager.cpp */; };
@@ -47,6 +48,7 @@
 		B489C4591B18E1F500E5AD7F /* febio.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = febio.xml; path = ../../build/bin/febio.xml; sourceTree = "<group>"; };
 		D5307A4418B40934008C8463 /* libFEBioOpt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFEBioOpt.a; path = ../FEBioOpt/build/Debug/libFEBioOpt.a; sourceTree = "<group>"; };
 		D5307A4A18B40AB0008C8463 /* liblevmar.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblevmar.a; path = ../../../../../../../../../../../usr/local/lib/liblevmar.a; sourceTree = "<group>"; };
+		D53C4FBE1B9DE8BC00718FBC /* libFEBioFluid.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFEBioFluid.a; path = ../FEBioFluid/build/Debug/libFEBioFluid.a; sourceTree = "<group>"; };
 		D53D74FA1B9BCAF100A770B5 /* libFEBioTest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFEBioTest.a; path = ../FEBioTest/build/Debug/libFEBioTest.a; sourceTree = "<group>"; };
 		D53FF8D51865F9F900CE43E4 /* febio.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = febio.xml; path = ../../../FEBio/bin/febio.xml; sourceTree = "<group>"; };
 		D5AC350C19B9454B003D048C /* libgsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgsl.a; path = ../../../../../../../../../../usr/local/lib/libgsl.a; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 				D5FB051B18A5B1EB004E688A /* libNumCore.a in Frameworks */,
 				D5FB050918A5B053004E688A /* libFEBioPlot.a in Frameworks */,
 				D53D74FB1B9BCAF100A770B5 /* libFEBioTest.a in Frameworks */,
+				D53C4FBF1B9DE8BC00718FBC /* libFEBioFluid.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,6 +104,7 @@
 		D5E10B5E1865E23500B23922 = {
 			isa = PBXGroup;
 			children = (
+				D53C4FBE1B9DE8BC00718FBC /* libFEBioFluid.a */,
 				D53D74FA1B9BCAF100A770B5 /* libFEBioTest.a */,
 				B489C4591B18E1F500E5AD7F /* febio.xml */,
 				D5AC350C19B9454B003D048C /* libgsl.a */,
@@ -263,6 +267,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/gerard/Documents/Programs/fem/FEBio/MRLProjects/FEBio2/XCode5/FEBioTest/build/Debug,
+					/Users/gerard/Documents/Programs/fem/FEBio/MRLProjects/FEBio2/XCode5/FEBioFluid/build/Debug,
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
@@ -374,6 +379,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/gerard/Documents/Programs/fem/FEBio/MRLProjects/FEBio2/XCode5/FEBioTest/build/Debug,
+					/Users/gerard/Documents/Programs/fem/FEBio/MRLProjects/FEBio2/XCode5/FEBioFluid/build/Debug,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -386,6 +392,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/gerard/Documents/Programs/fem/FEBio/MRLProjects/FEBio2/XCode5/FEBioTest/build/Debug,
+					/Users/gerard/Documents/Programs/fem/FEBio/MRLProjects/FEBio2/XCode5/FEBioFluid/build/Debug,
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (

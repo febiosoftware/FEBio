@@ -20,6 +20,7 @@ FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)
 	case FE_MULTIPHASIC   : return fecore_new<FESolver>(FESOLVER_ID, "multiphasic"    , &fem);
 	case FE_HEAT          : return fecore_new<FESolver>(FESOLVER_ID, "heat transfer"  , &fem);
 	case FE_THERMO_ELASTIC: return fecore_new<FESolver>(FESOLVER_ID, "thermo-elastic" , &fem);
+    case FE_FLUID         : return fecore_new<FESolver>(FESOLVER_ID, "fluid"          , &fem);
 	default:
 		assert(false);
 		return 0;

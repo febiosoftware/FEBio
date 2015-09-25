@@ -114,6 +114,9 @@ public:
 	double	m_T;	//!< temperature
 	double	m_T0;	//!< initial temperature
 
+    // fluid data
+    double	m_et;	//!< current fluid dilatation
+    
 	// solute-data
 	vector<double>	m_ct;	//!< current effective concentration
 	vector<double>	m_cp;	//!< effective concentration at previous time step

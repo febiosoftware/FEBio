@@ -42,7 +42,11 @@
 #define DOF_RV			8		// rigid y-rotation
 #define DOF_RW			9		// rigid z-rotation
 #define DOF_T			10		// temperature
-#define DOF_C			11		// solute concentration
+#define DOF_VX			11		// x-fluid velocity
+#define DOF_VY			12		// y-fluid velocity
+#define DOF_VZ			13		// z-fluid velocity
+#define DOF_E           14      // fluid dilatation
+#define DOF_C			15		// solute concentration
 //
 // The rotational degrees of freedom are only used for rigid nodes and shells.
 // The fluid pressure is only used for poroelastic problems.
@@ -1164,6 +1168,98 @@ public:
 	FEShellTriElementTraits() : FEShellElementTraits(NINT, NELN, FE_SHELL_TRI) { init(); }
 
 	void init();
+};
+
+//=============================================================================
+// This is the base class for Ferguson shell element traits
+//
+class FEFergusonShellElementTraits : public FEElementTraits
+{
+public:
+    FEFergusonShellElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_FERGUSON_SHELL)
+    {
+        gr.resize(ni);
+        gs.resize(ni);
+        gt.resize(ni);
+        gw.resize(ni);
+        
+        Hr.resize(ni, ne);
+        Hs.resize(ni, ne);
+        
+        D0.resize(ne);
+        Dt.resize(ne);
+        
+        m_Jt.resize(ni);
+        m_Jti.resize(ni);
+        m_detJt.resize(ni);
+        
+        m_J0.resize(ni);
+        m_J0i.resize(ni);
+        m_detJ0.resize(ni);
+        
+        P[0].resize(ni, ne);
+        P[1].resize(ni, ne);
+        Pr[0].resize(ni, ne);
+        Pr[1].resize(ni, ne);
+        Ps[0].resize(ni, ne);
+        Ps[1].resize(ni, ne);
+    }
+    
+public:
+    // gauss-point coordinates and weights
+    vector<double> gr;
+    vector<double> gs;
+    vector<double> gt;
+    vector<double> gw;
+    
+    // directors
+    vector<vec3d>	D0;	//!< initial directors
+    vector<vec3d>	Dt;	//!< current directors
+    
+    // local derivatives of shape functions at gauss points
+    matrix Hr, Hs;
+    
+    // data used when unpacking
+    vector<mat3d>	m_Jt;		// jacobian
+    vector<mat3d>	m_Jti;		// inverse jacobian
+    vector<double>	m_detJt;	// jacobian determinant
+    
+    vector<mat3d>	m_J0;		// jacobian
+    vector<mat3d>	m_J0i;		// inverse jacobian
+    vector<double>	m_detJ0;	// jacobian determinant
+
+public:
+    matrix P[2];	//!< tangent shape function values at gausspoints.
+    
+                    //!< The first index refers to the gauss-point,
+                    //!< the second index to the shape function
+    
+    // local derivatives of shape functions at gauss points
+    matrix Pr[2], Ps[2];
+    
+    // shape function at r
+    void shape(double* H, double r);
+    
+    // shape function derivatives at r
+    void shape_deriv(double* Gr, double r);
+    
+    // shape function derivatives at r
+    void shape_deriv2(double* Grr, double r);
+};
+
+//=============================================================================
+// 4-node quadrilateral elements with 4*3-point gaussian quadrature
+//
+class FEFergusonShellQuadElementTraits : public FEFergusonShellElementTraits
+{
+public:
+    enum { NINT = 12 };
+    enum { NELN = 4 };
+    
+public:
+    FEFergusonShellQuadElementTraits() : FEFergusonShellElementTraits(NINT, NELN, FE_FERGUSON_SHELL_QUAD) { init(); }
+    
+    void init();
 };
 
 //=============================================================================

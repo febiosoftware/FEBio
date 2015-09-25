@@ -119,28 +119,36 @@ void FEBiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[0];
-		lm[3*i+1] = id[1];
-		lm[3*i+2] = id[2];
+		lm[3*i  ] = id[DOF_X];
+		lm[3*i+1] = id[DOF_Y];
+		lm[3*i+2] = id[DOF_Z];
 
 		// now the pressure dofs
-		lm[3*N+i] = id[6];
+		lm[3*N+i] = id[DOF_P];
 
 		// rigid rotational dofs
-		lm[4*N + 3*i  ] = id[7];
-		lm[4*N + 3*i+1] = id[8];
-		lm[4*N + 3*i+2] = id[9];
+		lm[4*N + 3*i  ] = id[DOF_RU];
+		lm[4*N + 3*i+1] = id[DOF_RV];
+		lm[4*N + 3*i+2] = id[DOF_RW];
 
 		// fill the rest with -1
 		lm[7*N + 3*i  ] = -1;
 		lm[7*N + 3*i+1] = -1;
 		lm[7*N + 3*i+2] = -1;
 
-		lm[10*N + i] = id[10];
+		lm[10*N + i] = id[DOF_T];
 		
+        // velocity dofs
+        lm[11*N + 3*i  ] = id[DOF_VX];
+        lm[11*N + 3*i+1] = id[DOF_VY];
+        lm[11*N + 3*i+2] = id[DOF_VZ];
+        
+        // fluid dilatation dofs
+        lm[14*N+i] = id[DOF_E];
+        
 		// concentration dofs
 		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(11+k)*N + i] = id[11+k];
+			lm[(15+k)*N + i] = id[DOF_C+k];
 	}
 }
 

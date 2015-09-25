@@ -100,3 +100,25 @@ public:
 public:
 	vector<ITEM>	m_item;
 };
+
+//-----------------------------------------------------------------------------
+class FEInitialDilatation : public FEInitialCondition
+{
+    struct ITEM
+    {
+        int		nid;	//!< node ID
+        double	e0;		//!< initial dilatation
+    };
+    
+public:
+    FEInitialDilatation(FEModel* pfem) : FEInitialCondition(pfem){}
+    
+    void Serialize(DumpFile& ar);
+    
+    void Activate();
+    
+    void Add(int nid, double e) { ITEM it = {nid, e}; m_item.push_back(it); }
+    
+public:
+    vector<ITEM>	m_item;
+};

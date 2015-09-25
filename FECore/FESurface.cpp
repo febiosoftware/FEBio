@@ -152,9 +152,17 @@ void FESurface::UnpackLM(FEElement& el, vector<int>& lm)
 
 		lm[10*N + i] = id[DOF_T];
 		
+        // fluid velocity dofs
+        lm[11*N + 3*i  ] = id[DOF_VX];
+        lm[11*N + 3*i+1] = id[DOF_VY];
+        lm[11*N + 3*i+2] = id[DOF_VZ];
+        
+        // fluid dilatation dof
+        lm[14*N + i] = id[DOF_E];
+        
 		// concentration dofs
 		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(11+k)*N + i] = id[DOF_C+k];
+			lm[(15+k)*N + i] = id[DOF_C+k];
 	}
 }
 

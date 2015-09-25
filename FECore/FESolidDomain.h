@@ -57,6 +57,12 @@ public:
 	//! calculate gradient of function at integration points
 	vec3d gradient(FESolidElement& el, vector<double>& fn, int n);
 
+    //! calculate spatial gradient of vector function at integration points
+    mat3d gradient(FESolidElement& el, vec3d* fn, int n);
+    
+    //! calculate material gradient of vector function at integration points
+    mat3d Gradient(FESolidElement& el, vec3d* fn, int n);
+    
 	//! calculate jacobian in reference frame
 	double detJ0(FESolidElement& el, int n);
 

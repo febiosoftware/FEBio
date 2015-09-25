@@ -10,6 +10,7 @@
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSoluteSolver.h"
 #include "FEBioMix/FEMultiphasicSolver.h"
+#include "FEBioFluid/FEFluidSolver.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
@@ -218,6 +219,22 @@ void echo_input(FEBioModel& fem)
 	felog.printf("\n\n");
 
 
+    FEFluidSolver* pfs = dynamic_cast<FEFluidSolver*>(psolver);
+    if (pfs)
+    {
+        felog.printf("\tMax nr of stiffness reformations ............... : %d\n", pfs->m_bfgs.m_maxref);
+        felog.printf("\tper time steps\n");
+        felog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", pfs->m_bfgs.m_maxups);
+        felog.printf("\tbetween stiffness matrix reformations\n");
+        felog.printf("\tVelocity convergence tolerance ................. : %lg\n", pfs->m_Vtol);
+        felog.printf("\tResidual convergence tolerance ................. : %lg\n", pfs->m_Rtol);
+        felog.printf("\tMinimal residual value ......................... : %lg\n", pfs->m_Rmin);
+        felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", pfs->m_bfgs.m_LStol );
+        felog.printf("\tMinimum line search size ....................... : %lg\n", pfs->m_bfgs.m_LSmin );
+        felog.printf("\tMaximum number of line search iterations ....... : %d\n" , pfs->m_bfgs.m_LSiter);
+        felog.printf("\tMax condition number ........................... : %lg\n", pfs->m_bfgs.m_cmax  );
+    }
+    
 	// print output data
 	felog.printf(" OUTPUT DATA\n");
 	felog.printf("===========================================================================\n");
