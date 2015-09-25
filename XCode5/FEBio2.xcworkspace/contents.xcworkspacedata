@@ -34,4 +34,7 @@
    <FileRef
       location = "group:FEBioTest/FEBioTest.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:FEBioFluid/FEBioFluid.xcodeproj">
+   </FileRef>
 </Workspace>
