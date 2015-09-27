@@ -324,7 +324,7 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 				lm[4*i  ] = elm[3*i];
 				lm[4*i+1] = elm[3*i+1];
 				lm[4*i+2] = elm[3*i+2];
-				lm[4*i+3] = elm[(11+m_isol-1)*neln+i];  // m_isol is 1-based
+				lm[4*i+3] = elm[(15+m_isol-1)*neln+i];  // m_isol is 1-based
 			}
 					
 			// assemble element matrix in global stiffness matrix
@@ -365,15 +365,11 @@ void FESoluteFlux::Residual(FEGlobalVector& R)
 
 		// get the element's LM vector
 		m_psurf->UnpackLM(el, elm);
-			
-		// TODO: the problem here is that the LM array that is returned by the UnpackElement
-		// function does not give the equation numbers in the right order. For this reason we
-		// have to create a new lm array and place the equation numbers in the right order.
-		// What we really ought to do is fix the UnpackElement function so that it returns
-		// the LM vector in the right order for solute-solid elements.
+
+		// We only need the solute concentration dofs, so just extract these.
 		vector<int> lm(ndof);
 		for (int i=0; i<neln; ++i)
-			lm[i] = elm[(11+m_isol-1)*neln+i];  // m_isol is 1-based
+			lm[i] = elm[(15+m_isol-1)*neln+i];  // m_isol is 1-based
 			
 		// add element force vector to global force vector
 		R.Assemble(el.m_node, lm, fe);
