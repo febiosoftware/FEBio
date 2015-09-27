@@ -65,8 +65,8 @@ bool FEContactDiagnostic::Run()
 	solver.CreateStiffness(true);
 
 	// get the stiffness matrix
-	FEStiffnessMatrix& K = *solver.m_pK;
-	SparseMatrix *pA = (SparseMatrix*)K;
+	FEGlobalMatrix& K = solver.GetStiffnessMatrix();
+	SparseMatrix *pA = (SparseMatrix*)(&K);
 	DenseMatrix& K0 = static_cast<DenseMatrix&>(*pA);
 
 	// build the stiffness matrix

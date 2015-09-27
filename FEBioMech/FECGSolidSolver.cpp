@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "FECGSolidSolver.h"
+#include "FECore/FEModel.h"
+#include "FECore/FEMesh.h"
 #include "FECore/log.h"
 
 #ifdef WIN32
@@ -32,10 +34,10 @@ bool FECGSolidSolver::Init()
 	if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }
 	if (m_Rtol <  0.0) { felog.printf("Error: rtol must be nonnegative.\n"); return false; }
 	if (m_Rmin <  0.0) { felog.printf("Error: min_residual must be nonnegative.\n"  ); return false; }
-	if (m_LStol  < 0.0) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
-	if (m_LSmin  < 0.0) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
-	if (m_LSiter < 0) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
-	if (m_bfgs.m_maxref < 0) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
+	if (m_LStol  < 0.) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
+	if (m_LSmin  < 0.) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
+	if (m_LSiter < 0 ) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
+	if (m_maxref < 0 ) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
 	if (m_bfgs.m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
 	if (m_bfgs.m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
 
@@ -114,9 +116,9 @@ bool FECGSolidSolver::Quasin(double time)
 	m_fem.DoCallback(CB_MINOR_ITERS);
 
 	// calculate initial residual
-	if (Residual(m_bfgs.m_R0) == false) return false;
+	if (Residual(m_R0) == false) return false;
 
-	m_bfgs.m_R0 += m_Fd;
+	m_R0 += m_Fd;
 
 	// TODO: I can check here if the residual is zero.
 	// If it is than there is probably no force acting on the system
@@ -149,7 +151,7 @@ bool FECGSolidSolver::Quasin(double time)
 
 			// calculate yk
 			vector<double> RR(m_neq);
-			RR=m_bfgs.m_R1-Rold;
+			RR=m_R1-Rold;
 
 			// calculate dk.yk
 			double bdiv=u0*RR;
@@ -163,11 +165,11 @@ bool FECGSolidSolver::Quasin(double time)
 				double RR2=RR*RR;	// yk^2
                		// use m_ui as a temporary vector
 				for (i=0; i<m_neq; ++i) {
-					m_bfgs.m_ui[i] = RR[i]-2.0*u0[i]*RR2/bdiv;	// yk-2*dk*yk^2/(dk.yk)
+					m_ui[i] = RR[i]-2.0*u0[i]*RR2/bdiv;	// yk-2*dk*yk^2/(dk.yk)
 					}
-				betapcg=m_bfgs.m_ui*m_bfgs.m_R1;	// m_ui*gk+1
+				betapcg=m_ui*m_R1;	// m_ui*gk+1
 				betapcg=-betapcg/bdiv;   
-          		double modR=sqrt(m_bfgs.m_R0*m_bfgs.m_R0);
+          		double modR=sqrt(m_R0*m_R0);
           		double etak=-1.0/(moddU*min(0.01,modR));
           		betapcg=max(etak,betapcg);
 				// try Fletcher - Reeves instead
@@ -178,29 +180,29 @@ bool FECGSolidSolver::Quasin(double time)
 
 			for (i=0; i<m_neq; ++i) 
 			{
-            	m_bfgs.m_ui[i]=m_bfgs.m_R1[i]+betapcg*u0[i];
+            	m_ui[i]=m_R1[i]+betapcg*u0[i];
 			}
 		}
 		else 
 		{
 			// use steepest descent for first iteration or when a restart is needed
-            m_bfgs.m_ui=m_bfgs.m_R0;
+            m_ui=m_R0;
 			breform=false;
 			sdflag=true;
         	}
-		Rold=m_bfgs.m_R1;		// store residual for use next time
-		u0=m_bfgs.m_ui;		// store direction for use on the next iteration
+		Rold=m_R1;		// store residual for use next time
+		u0=m_ui;		// store direction for use on the next iteration
 
 		// check for nans
-		double du = m_bfgs.m_ui*m_bfgs.m_ui;
+		double du = m_ui*m_ui;
 		if (ISNAN(du)) throw NANDetected();
 
 		// set initial convergence norms
 		if (m_niter == 0)
 		{
-			normRi = fabs(m_bfgs.m_R0*m_bfgs.m_R0);
-			normEi = fabs(m_bfgs.m_ui*m_bfgs.m_R0);
-			normUi = fabs(m_bfgs.m_ui*m_bfgs.m_ui);
+			normRi = fabs(m_R0*m_R0);
+			normEi = fabs(m_ui*m_R0);
+			normUi = fabs(m_ui*m_ui);
 			normEm = normEi;
 		}
 
@@ -216,13 +218,13 @@ bool FECGSolidSolver::Quasin(double time)
 
 		// update total displacements
 		int neq = m_Ui.size();
-		for (i=0; i<neq; ++i) m_Ui[i] += s*m_bfgs.m_ui[i];
+		for (i=0; i<neq; ++i) m_Ui[i] += s*m_ui[i];
 
 		// calculate norms
-		normR1 = m_bfgs.m_R1*m_bfgs.m_R1;
-		normu  = (m_bfgs.m_ui*m_bfgs.m_ui)*(s*s);
+		normR1 = m_R1*m_R1;
+		normu  = (m_ui*m_ui)*(s*s);
 		normU  = m_Ui*m_Ui;
-		normE1 = s*fabs(m_bfgs.m_ui*m_bfgs.m_R1);
+		normE1 = s*fabs(m_ui*m_R1);
 
 		// check residual norm
 		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	
@@ -288,10 +290,10 @@ bool FECGSolidSolver::Quasin(double time)
 			// we must set this to zero before the reformation
 			// because we assume that the prescribed displacements are stored 
 			// in the m_ui vector.
-			zero(m_bfgs.m_ui);
+			zero(m_ui);
 
 			// copy last calculated residual
-			m_bfgs.m_R0 = m_bfgs.m_R1;
+			m_R0 = m_R1;
 		}
 		else if (m_baugment)
 		{
@@ -316,7 +318,7 @@ bool FECGSolidSolver::Quasin(double time)
 				// we also recalculate the stresses in case we are doing augmentations
 				// for incompressible materials
 				UpdateStresses();
-				Residual(m_bfgs.m_R0);
+				Residual(m_R0);
 /*
 				// reform the matrix if we are using full-Newton
 				if (m_bfgs.m_maxups == 0)
@@ -451,13 +453,13 @@ double FECGSolidSolver::LineSearchCG(double s)
 	int n = 0;
 
 	// initial energy
-	FA = m_bfgs.m_ui*m_bfgs.m_R0;
+	FA = m_ui*m_R0;
 	AA = 0.0;
 	r0 = FA;
 
 	double rmin = fabs(FA);
 
-	vector<double> ul(m_bfgs.m_ui.size());
+	vector<double> ul(m_ui.size());
 
 	// so we can set AA = 0 and FA= r0
 	// AB=s and we need to evaluate FB (called r1)
@@ -467,12 +469,12 @@ double FECGSolidSolver::LineSearchCG(double s)
 	do
 	{
 		// Update geometry using the initial guess s
-		vcopys(ul, m_bfgs.m_ui, s);
+		vcopys(ul, m_ui, s);
 		failed = false;
 		try
 		{
 			Update(ul);
-			Evaluate(m_bfgs.m_R1);
+			Evaluate(m_R1);
 		}
 		catch (...)
 		{
@@ -483,7 +485,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 	} while (failed == true);
 
 	// calculate energies
-	FB = m_bfgs.m_ui*m_bfgs.m_R1;
+	FB = m_ui*m_R1;
 	AB = s;
 
 	if (FB<rmin){
@@ -509,12 +511,12 @@ double FECGSolidSolver::LineSearchCG(double s)
 			do
 			{
 				// Update geometry using the initial guess s
-				vcopys(ul, m_bfgs.m_ui, s);
+				vcopys(ul, m_ui, s);
 				failed = false;
 				try
 				{
 					Update(ul);
-					Evaluate(m_bfgs.m_R1);
+					Evaluate(m_R1);
 				}
 				catch (...)
 				{
@@ -525,7 +527,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 			} while ((failed == true) && (s>m_LSmin));
 
 			// calculate energies
-			FC = m_bfgs.m_ui*m_bfgs.m_R1;
+			FC = m_ui*m_R1;
 			r = fabs(FC / r0);
 
 			if (fabs(FC)>100 * min(fabs(FA), fabs(FB)))  //  it was a bad guess and we need to go back a bit
@@ -536,12 +538,12 @@ double FECGSolidSolver::LineSearchCG(double s)
 				do
 				{
 					// Update geometry using the initial guess s
-					vcopys(ul, m_bfgs.m_ui, s);
+					vcopys(ul, m_ui, s);
 					failed = false;
 					try
 					{
 						Update(ul);
-						Evaluate(m_bfgs.m_R1);
+						Evaluate(m_R1);
 					}
 					catch (...)
 					{
@@ -552,7 +554,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 				} while (failed == true);
 
 				// calculate energies
-				FC = m_bfgs.m_ui*m_bfgs.m_R1;
+				FC = m_ui*m_R1;
 				r = fabs(FC / r0);
 			}
 
@@ -581,12 +583,12 @@ double FECGSolidSolver::LineSearchCG(double s)
 		do
 		{
 			// Update geometry using the initial guess s
-			vcopys(ul, m_bfgs.m_ui, s);
+			vcopys(ul, m_ui, s);
 			failed = false;
 			try
 			{
 				Update(ul);
-				Evaluate(m_bfgs.m_R1);
+				Evaluate(m_R1);
 			}
 			catch (...)
 			{

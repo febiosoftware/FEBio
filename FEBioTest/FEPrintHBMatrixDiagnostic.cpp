@@ -3,6 +3,7 @@
 #include "FEPrintHBMatrixDiagnostic.h"
 #include "FEBioMech/FESolidSolver2.h"
 #include "NumCore/CompactMatrix.h"
+#include "FECore/FEGlobalMatrix.h"
 
 //-----------------------------------------------------------------------------
 void write_hb(CompactMatrix& m, FILE* fp)
@@ -86,7 +87,7 @@ bool FEPrintHBMatrixDiagnostic::Run()
 	solver.StiffnessMatrix(tp);
 
 	// get the matrix
-	SparseMatrix* psm = solver.GetStiffnessMatrix()->GetSparseMatrixPtr();
+	SparseMatrix* psm = solver.GetStiffnessMatrix().GetSparseMatrixPtr();
 	CompactSymmMatrix* pcm = dynamic_cast<CompactSymmMatrix*>(psm);
 	if (pcm == 0) return false;
 

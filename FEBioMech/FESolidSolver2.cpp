@@ -11,6 +11,7 @@
 #include "FECore/DOFS.h"
 #include "FEUncoupledMaterial.h"
 #include "NumCore/NumCore.h"
+#include "FEBioMech/FEStiffnessMatrix.h"
 
 #ifdef WIN32
 	#include <float.h>
@@ -55,8 +56,6 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem)
 	m_niter = 0;
 	m_nreq = 0;
 
-	m_pK = 0;
-
 	m_bdivreform = true;
 	m_bdoreforms = true;
 
@@ -71,7 +70,7 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem)
 //-----------------------------------------------------------------------------
 FESolidSolver2::~FESolidSolver2()
 {
-	delete m_pK;		// clean up stiffnes matrix data
+
 }
 
 //-----------------------------------------------------------------------------
@@ -139,9 +138,6 @@ bool FESolidSolver2::Init()
 		n = node.m_ID[DOF_V]; if (n >= 0) m_Ut[n] = node.m_Dt.y - node.m_D0.y;
 		n = node.m_ID[DOF_W]; if (n >= 0) m_Ut[n] = node.m_Dt.z - node.m_D0.z;
 	}
-
-	// set the create stiffness matrix flag
-	m_breshape = true;
 
 	return true;
 }
@@ -224,47 +220,6 @@ bool FESolidSolver2::InitEquations()
 	}
 
 	// All initialization is done
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//!  Creates the global stiffness matrix
-//! \todo Can we move this to the FEStiffnessMatrix::Create function?
-bool FESolidSolver2::CreateStiffness(bool breset)
-{
-	// clean up the solver
-	if (m_pK->NonZeroes()) m_plinsolve->Destroy();
-
-	// clean up the stiffness matrix
-	m_pK->Clear();
-
-	// create the stiffness matrix
-	felog.printf("===== reforming stiffness matrix:\n");
-	if (m_pK->Create(&GetFEModel(), m_neq, breset) == false) 
-	{
-		felog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
-		return false;
-	}
-	else
-	{
-		// output some information about the direct linear solver
-		int neq = m_pK->Rows();
-		int nnz = m_pK->NonZeroes();
-		felog.printf("\tNr of equations ........................... : %d\n", neq);
-		felog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
-		felog.printf("\n");
-	}
-	// let's flush the logfile to make sure the last output will not get lost
-	felog.flush();
-
-	// Do the preprocessing of the solver
-	m_SolverTime.start();
-	{
-		if (!m_plinsolve->PreProcess()) throw FatalError();
-	}
-	m_SolverTime.stop();
-
-	// done!
 	return true;
 }
 
@@ -712,7 +667,7 @@ void FESolidSolver2::PrepStep(double time)
 
 	// apply prescribed displacements
 	// we save the prescribed displacements increments in the ui vector
-	vector<double>& ui = m_bfgs.m_ui;
+	vector<double>& ui = m_ui;
 	zero(ui);
 	int neq = m_neq;
 	int nbc = m_fem.PrescribedBCs();
@@ -912,13 +867,19 @@ bool FESolidSolver2::Quasin(double time)
 	// do minor iterations callbacks
 	m_fem.DoCallback(CB_MINOR_ITERS);
 
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
+	tp.alpha = m_alpha;
+	tp.beta  = m_beta;
+	tp.gamma = m_gamma;
+
 	// calculate initial stiffness matrix
-	if (ReformStiffness() == false) return false;
+	if (ReformStiffness(tp) == false) return false;
 
 	// calculate initial residual
-	if (Residual(m_bfgs.m_R0) == false) return false;
+	if (Residual(m_R0) == false) return false;
 
-	m_bfgs.m_R0 += m_Fd;
+	m_R0 += m_Fd;
 
 	// TODO: I can check here if the residual is zero.
 	// If it is than there is probably no force acting on the system
@@ -946,16 +907,16 @@ bool FESolidSolver2::Quasin(double time)
 		// solve the equations
 		m_SolverTime.start();
 		{
-			m_bfgs.SolveEquations(m_bfgs.m_ui, m_bfgs.m_R0);
+			m_bfgs.SolveEquations(m_ui, m_R0);
 		}
 		m_SolverTime.stop();
 
 		// set initial convergence norms
 		if (m_niter == 0)
 		{
-			normRi = fabs(m_bfgs.m_R0*m_bfgs.m_R0);
-			normEi = fabs(m_bfgs.m_ui*m_bfgs.m_R0);
-			normUi = fabs(m_bfgs.m_ui*m_bfgs.m_ui);
+			normRi = fabs(m_R0*m_R0);
+			normEi = fabs(m_ui*m_R0);
+			normUi = fabs(m_ui*m_ui);
 			normEm = normEi;
 		}
 
@@ -967,23 +928,23 @@ bool FESolidSolver2::Quasin(double time)
 			s = 1;
 
 			// Update geometry
-			Update(m_bfgs.m_ui);
+			Update(m_ui);
 
 			// calculate residual at this point
-			Residual(m_bfgs.m_R1);
+			Residual(m_R1);
 		}
 
 		// update total displacements
 		int neq = (int)m_Ui.size();
-        vector<double> ui(m_bfgs.m_ui);
+        vector<double> ui(m_ui);
         for (i=0; i<neq; ++i) ui[i] *= s;
         UpdateIncrements(m_Ui, ui, false);
 
 		// calculate norms
-		normR1 = m_bfgs.m_R1*m_bfgs.m_R1;
-		normu  = (m_bfgs.m_ui*m_bfgs.m_ui)*(s*s);
+		normR1 = m_R1*m_R1;
+		normu  = (m_ui*m_ui)*(s*s);
 		normU  = m_Ui*m_Ui;
-		normE1 = s*fabs(m_bfgs.m_ui*m_bfgs.m_R1);
+		normE1 = s*fabs(m_ui*m_R1);
 
 		// check residual norm
 		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	
@@ -1053,7 +1014,7 @@ bool FESolidSolver2::Quasin(double time)
 				{
 					if (m_bfgs.m_nups < m_bfgs.m_maxups-1)
 					{
-						if (m_bfgs.Update(s, m_bfgs.m_ui, m_bfgs.m_R0, m_bfgs.m_R1) == false)
+						if (m_bfgs.Update(s, m_ui, m_R0, m_R1) == false)
 						{
 							// Stiffness update has failed.
 							// this might be due a too large condition number
@@ -1080,7 +1041,7 @@ bool FESolidSolver2::Quasin(double time)
 			// we must set this to zero before the reformation
 			// because we assume that the prescribed displacements are stored 
 			// in the m_ui vector.
-			zero(m_bfgs.m_ui);
+			zero(m_ui);
 
 			// reform stiffness matrices if necessary
 			if (breform && m_bdoreforms)
@@ -1088,14 +1049,14 @@ bool FESolidSolver2::Quasin(double time)
 				felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 
 				// reform the matrix
-				if (ReformStiffness() == false) break;
+				if (ReformStiffness(tp) == false) break;
 	
 				// reset reformation flag
 				breform = false;
 			}
 
 			// copy last calculated residual
-			m_bfgs.m_R0 = m_bfgs.m_R1;
+			m_R0 = m_R1;
 		}
 		else if (m_baugment)
 		{
@@ -1126,13 +1087,13 @@ bool FESolidSolver2::Quasin(double time)
 				// we also recalculate the stresses in case we are doing augmentations
 				// for incompressible materials
 				UpdateStresses();
-				Residual(m_bfgs.m_R0);
+				Residual(m_R0);
 
 				// reform the matrix if we are using full-Newton
 				if (m_bfgs.m_maxups == 0)
 				{
 					felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
-					if (ReformStiffness() == false) break;
+					if (ReformStiffness(tp) == false) break;
 				}
 			}
 		}
@@ -1170,55 +1131,6 @@ bool FESolidSolver2::Quasin(double time)
 	}
 
 	return bconv;
-}
-
-//-----------------------------------------------------------------------------
-//! Reforms a stiffness matrix and factorizes it
-bool FESolidSolver2::ReformStiffness()
-{
-	// first, let's make sure we have not reached the max nr of reformations allowed
-	if (m_nref >= m_bfgs.m_maxref) throw MaxStiffnessReformations();
-
-	// recalculate the shape of the stiffness matrix if necessary
-	if (m_breshape)
-	{
-		// TODO: I don't think I need to update here
-//		if (m_fem.m_bcontact) UpdateContact();
-
-		// reshape the stiffness matrix
-		if (!CreateStiffness(m_niter == 0)) return false;
-
-		// reset reshape flag, except for contact
-		m_breshape = (m_fem.SurfacePairInteractions() > 0? true : false);
-	}
-
-	// get the time information
-	FETimePoint tp = m_fem.GetTime();
-	tp.alpha = m_alpha;
-	tp.beta  = m_beta;
-	tp.gamma = m_gamma;
-
-	// calculate the global stiffness matrix
-	bool bret = StiffnessMatrix(tp);
-
-	if (bret)
-	{
-		m_SolverTime.start();
-		{
-			// factorize the stiffness matrix
-			m_plinsolve->Factor();
-		}
-		m_SolverTime.stop();
-
-		// increase total nr of reformations
-		m_nref++;
-		m_ntotref++;
-
-		// reset bfgs update counter
-		m_bfgs.m_nups = 0;
-	}
-
-	return bret;
 }
 
 //-----------------------------------------------------------------------------
@@ -1447,7 +1359,7 @@ void FESolidSolver2::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& k
     
 	int ndof = ke.columns() / n;
     
-	vector<double>& ui = m_bfgs.m_ui;
+	vector<double>& ui = m_ui;
 	FEMesh& mesh = m_fem.GetMesh();
 	FERigidSystem& rigid = *m_fem.GetRigidSystem();
     
@@ -1764,7 +1676,7 @@ void FESolidSolver2::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix
 	// assemble into global stiffness matrix
 	m_pK->Assemble(ke, elm);
 
-	vector<double>& ui = m_bfgs.m_ui;
+	vector<double>& ui = m_ui;
 
 	// adjust for linear constraints
 	if (m_fem.m_LinC.size() > 0)

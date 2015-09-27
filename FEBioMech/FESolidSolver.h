@@ -1,8 +1,8 @@
 #pragma once
 
 #include "FECore/FENewtonSolver.h"
-#include "FEStiffnessMatrix.h"
 #include "FECore/FETypes.h"
+#include "FECore/FEGlobalVector.h"
 
 //-----------------------------------------------------------------------------
 //! The FESolidSolver class solves large deformation solid mechanics problems
@@ -77,20 +77,12 @@ public:
 	//}
 
 	//{ --- Stiffness matrix routines ---
-		//! return pointer to stiffness matrix
-		FEStiffnessMatrix* GetStiffnessMatrix() { return m_pK; }
-
-		//! recalculates the shape of the stiffness matrix
-		bool CreateStiffness(bool breset);
 
 		//! calculates the global stiffness matrix
 		virtual bool StiffnessMatrix(const FETimePoint& tp);
 
 		//! contact stiffness
 		void ContactStiffness();
-
-		//! reform the stiffness matrix
-		bool ReformStiffness();
 
 		//! calculate the rigid stiffnes matrices
 		void RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
@@ -142,13 +134,7 @@ public:
 	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
 	vector<double> m_Fd;	//!< residual correction due to prescribed displacements
 
-	// matrix reshape flag
-	bool	m_breshape;		//!< Matrix reshape flag
-
 public:
-	// global stiffness matrix
-	FEStiffnessMatrix*	m_pK;		//!< global stiffness matrix
-
 	bool		m_baugment;		//!< augmentation flag
 
 	bool	m_bnew_update;	//!< use new rigid body update algorithm

@@ -47,10 +47,10 @@ public:
 	//! return the number of rows
 	int Rows() { return m_pA->Size(); }
 
-	//! converts a FEStiffnessMatrix to a SparseMatrix
+	//! converts a FEGlobalMatrix to a SparseMatrix
 	operator SparseMatrix* () { return m_pA; }
 
-	//! converts a FEStiffnessMatrix to a SparseMatrix
+	//! converts a FEGlobalMatrix to a SparseMatrix
 	operator SparseMatrix& () { return *m_pA;}
 
 	//! return a pointer to the sparse matrix

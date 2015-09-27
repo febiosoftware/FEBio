@@ -6,6 +6,7 @@
 #include "FECore/DOFS.h"
 #include "NumCore/NumCore.h"
 #include <assert.h>
+#include "FEBioMech/FEStiffnessMatrix.h"
 
 #ifdef WIN32
 #include <float.h>
@@ -44,8 +45,6 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
     
     m_niter = 0;
     
-    m_pK = 0;
-    
     m_bsymm = false;
     m_bdivreform = true;
     m_bdoreforms = true;
@@ -55,7 +54,7 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
 //-----------------------------------------------------------------------------
 FEFluidSolver::~FEFluidSolver()
 {
-    delete m_pK;		// clean up stiffnes matrix data
+
 }
 
 //-----------------------------------------------------------------------------
@@ -121,9 +120,6 @@ bool FEFluidSolver::Init()
         n = node.m_ID[DOF_E]; if (n >= 0) m_Vt[n] = node.m_et;
     }
     
-    // set the create stiffness matrix flag
-    m_breshape = true;
-    
     return true;
 }
 
@@ -153,47 +149,6 @@ void FEFluidSolver::Serialize(DumpFile& ar)
         ar >> m_nref >> m_ntotref;
         ar >> m_naug;
     }
-}
-
-//-----------------------------------------------------------------------------
-//!  Creates the global stiffness matrix
-//! \todo Can we move this to the FEStiffnessMatrix::Create function?
-bool FEFluidSolver::CreateStiffness(bool breset)
-{
-    // clean up the solver
-    if (m_pK->NonZeroes()) m_plinsolve->Destroy();
-    
-    // clean up the stiffness matrix
-    m_pK->Clear();
-    
-    // create the stiffness matrix
-    felog.printf("===== reforming stiffness matrix:\n");
-    if (m_pK->Create(&GetFEModel(), m_neq, breset) == false)
-    {
-        felog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
-        return false;
-    }
-    else
-    {
-        // output some information about the direct linear solver
-        int neq = m_pK->Rows();
-        int nnz = m_pK->NonZeroes();
-        felog.printf("\tNr of equations ........................... : %d\n", neq);
-        felog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
-        felog.printf("\n");
-    }
-    // let's flush the logfile to make sure the last output will not get lost
-    felog.flush();
-    
-    // Do the preprocessing of the solver
-    m_SolverTime.start();
-    {
-        if (!m_plinsolve->PreProcess()) throw FatalError();
-    }
-    m_SolverTime.stop();
-    
-    // done!
-    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -334,7 +289,7 @@ void FEFluidSolver::PrepStep(double time)
     
     // apply prescribed velocities
     // we save the prescribed velocity increments in the ui vector
-    vector<double>& ui = m_bfgs.m_ui;
+    vector<double>& ui = m_ui;
     zero(ui);
     int nbc = m_fem.PrescribedBCs();
     for (int i=0; i<nbc; ++i)
@@ -386,14 +341,18 @@ bool FEFluidSolver::Quasin(double time)
     
     // do minor iterations callbacks
     m_fem.DoCallback(CB_MINOR_ITERS);
-    
+
     // calculate initial stiffness matrix
-    if (ReformStiffness() == false) return false;
+	FETimePoint tp = m_fem.GetTime();
+    if (ReformStiffness(tp) == false) return false;
     
     // calculate initial residual
-    if (Residual(m_bfgs.m_R0) == false) return false;
+    if (Residual(m_R0) == false) return false;
     
-    m_bfgs.m_R0 += m_Fd;
+	// Add the "reaction forces" from prescribed dofs.
+	// This vector is created by bringing the stiffness contributions
+	// from the prescribed dofs to the RHS. 
+    m_R0 += m_Fd;
     
     // TODO: I can check here if the residual is zero.
     // If it is than there is probably no force acting on the system
@@ -421,15 +380,15 @@ bool FEFluidSolver::Quasin(double time)
         // solve the equations
         m_SolverTime.start();
         {
-            m_bfgs.SolveEquations(m_bfgs.m_ui, m_bfgs.m_R0);
+            m_bfgs.SolveEquations(m_ui, m_R0);
         }
         m_SolverTime.stop();
         
         // set initial convergence norms
         if (m_niter == 0)
         {
-            normRi = fabs(m_bfgs.m_R0*m_bfgs.m_R0);
-            normUi = fabs(m_bfgs.m_ui*m_bfgs.m_ui);
+            normRi = fabs(m_R0*m_R0);
+            normUi = fabs(m_ui*m_ui);
         }
         
         // perform a linesearch
@@ -440,22 +399,22 @@ bool FEFluidSolver::Quasin(double time)
             s = 1;
             
             // Update geometry
-            Update(m_bfgs.m_ui);
+            Update(m_ui);
             
             // calculate residual at this point
-            Residual(m_bfgs.m_R1);
+            Residual(m_R1);
         }
         
         // calculate norms
-        normR1 = m_bfgs.m_R1*m_bfgs.m_R1;
-        normu  = (m_bfgs.m_ui*m_bfgs.m_ui)*(s*s);
+        normR1 = m_R1*m_R1;
+        normu  = (m_ui*m_ui)*(s*s);
         
         // check for nans
         if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
         
         // update total velocities
         int neq = (int)m_Vi.size();
-        for (i=0; i<neq; ++i) m_Vi[i] += s*m_bfgs.m_ui[i];
+        for (i=0; i<neq; ++i) m_Vi[i] += s*m_ui[i];
         normU  = m_Vi*m_Vi;
         
         // check residual norm
@@ -510,7 +469,7 @@ bool FEFluidSolver::Quasin(double time)
                 {
                     if (m_bfgs.m_nups < m_bfgs.m_maxups-1)
                     {
-                        if (m_bfgs.Update(s, m_bfgs.m_ui, m_bfgs.m_R0, m_bfgs.m_R1) == false)
+                        if (m_bfgs.Update(s, m_ui, m_R0, m_R1) == false)
                         {
                             // Stiffness update has failed.
                             // this might be due a too large condition number
@@ -537,7 +496,7 @@ bool FEFluidSolver::Quasin(double time)
             // we must set this to zero before the reformation
             // because we assume that the prescribed velocities are stored
             // in the m_ui vector.
-            zero(m_bfgs.m_ui);
+            zero(m_ui);
             
             // reform stiffness matrices if necessary
             if (breform && m_bdoreforms)
@@ -545,14 +504,14 @@ bool FEFluidSolver::Quasin(double time)
                 felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
                 
                 // reform the matrix
-                if (ReformStiffness() == false) break;
+                if (ReformStiffness(tp) == false) break;
                 
                 // reset reformation flag
                 breform = false;
             }
             
             // copy last calculated residual
-            m_bfgs.m_R0 = m_bfgs.m_R1;
+            m_R0 = m_R1;
         }
         
         // increase iteration number
@@ -588,50 +547,6 @@ bool FEFluidSolver::Quasin(double time)
     }
     
     return bconv;
-}
-
-//-----------------------------------------------------------------------------
-//! Reforms a stiffness matrix and factorizes it
-bool FEFluidSolver::ReformStiffness()
-{
-    // first, let's make sure we have not reached the max nr of reformations allowed
-    if (m_nref >= m_bfgs.m_maxref) throw MaxStiffnessReformations();
-    
-    // recalculate the shape of the stiffness matrix if necessary
-    if (m_breshape)
-    {
-        // TODO: I don't think I need to update here
-        //		if (m_fem.m_bcontact) UpdateContact();
-        
-        // reshape the stiffness matrix
-        if (!CreateStiffness(m_niter == 0)) return false;
-        
-        // reset reshape flag, except for contact
-        m_breshape = (m_fem.SurfacePairInteractions() > 0? true : false);
-    }
-    
-    // calculate the global stiffness matrix
-    FETimePoint tp = m_fem.GetTime();
-    bool bret = StiffnessMatrix(tp);
-    
-    if (bret)
-    {
-        m_SolverTime.start();
-        {
-            // factorize the stiffness matrix
-            m_plinsolve->Factor();
-        }
-        m_SolverTime.stop();
-        
-        // increase total nr of reformations
-        m_nref++;
-        m_ntotref++;
-        
-        // reset bfgs update counter
-        m_bfgs.m_nups = 0;
-    }
-    
-    return bret;
 }
 
 //-----------------------------------------------------------------------------
@@ -732,7 +647,7 @@ void FEFluidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
     // assemble into global stiffness matrix
     m_pK->Assemble(ke, elm);
     
-    vector<double>& ui = m_bfgs.m_ui;
+    vector<double>& ui = m_ui;
     
     // adjust for linear constraints
     if (m_fem.m_LinC.size() > 0)

@@ -1,10 +1,12 @@
 #pragma once
 #include "FESolver.h"
 #include "BFGSSolver.h"
+#include "FETypes.h"
 
 //-----------------------------------------------------------------------------
 // forward declarations
 class FEModel;
+class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
 //! This class defines the base class for Newton-type solvers. 
@@ -37,6 +39,16 @@ public: // overloaded from FESolver
 	//! Solve an analysis step
 	bool SolveStep(double time);
 
+public:
+	//! return the stiffness matrix
+	FEGlobalMatrix& GetStiffnessMatrix();
+
+	//! reform the stiffness matrix
+    bool ReformStiffness(const FETimePoint& tp);
+
+    //! recalculates the shape of the stiffness matrix
+    bool CreateStiffness(bool breset);
+    
 protected:
 	//! Performs a linesearch
 	double LineSearch(double s);
@@ -45,8 +57,8 @@ protected:
 	//! This is called from SolveStep and must be implemented by derived classes.
 	virtual bool Quasin(double time) = 0;
 
-public:	
-	BFGSSolver	m_bfgs;			//!< BFGS solver parameters
+    //! calculates the global stiffness matrix (needs to be overwritten by derived classes)
+    virtual bool StiffnessMatrix(const FETimePoint& tp) = 0;
 
 public:
 	// line search options
@@ -54,9 +66,20 @@ public:
 	double	m_LStol;		//!< line search tolerance
 	int		m_LSiter;		//!< max nr of line search iterations
 
+	// solver parameters
+	int			m_maxref;		//!< max nr of reformations per time step
+	BFGSSolver	m_bfgs;			//!< BFGS solver parameters
+
 	// linear solver data
 	LinearSolver*		m_plinsolve;	//!< the linear solver
+	FEGlobalMatrix*		m_pK;			//!< global stiffness matrix
 	int					m_neq;			//!< number of equations
+    bool				m_breshape;		//!< Matrix reshape flag
+
+	// data used by Quasin
+	vector<double> m_R0;	//!< residual at iteration i-1
+	vector<double> m_R1;	//!< residual at iteration i
+	vector<double> m_ui;	//!< displacement increment vector
 
 	DECLARE_PARAMETER_LIST();
 };

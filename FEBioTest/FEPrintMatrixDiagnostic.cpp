@@ -1,5 +1,6 @@
 #include "FEPrintMatrixDiagnostic.h"
 #include "FEBioMech/FESolidSolver2.h"
+#include "FECore/FEGlobalMatrix.h"
 #include <stdio.h>
 
 //-----------------------------------------------------------------------------
@@ -104,7 +105,7 @@ bool FEPrintMatrixDiagnostic::Run()
 	FILE* fp = fopen(m_szout, "wt");
 	if (fp == 0) { fprintf(stderr, "Failed creating output file."); return false; }
 	int* n = m_rng;
-	print(*solver.GetStiffnessMatrix()->GetSparseMatrixPtr(), fp, n[0], n[1], n[2], n[3]);
+	print(*solver.GetStiffnessMatrix().GetSparseMatrixPtr(), fp, n[0], n[1], n[2], n[3]);
 	fclose(fp);
 
 	return true;

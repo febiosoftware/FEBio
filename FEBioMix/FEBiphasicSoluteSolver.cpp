@@ -6,6 +6,7 @@
 #include "FETriphasicDomain.h"
 #include "FEBioMech/FEPressureLoad.h"
 #include "FEBioMech/FEResidualVector.h"
+#include "FECore/FEGlobalMatrix.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
@@ -165,12 +166,13 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 	m_fem.DoCallback(CB_MINOR_ITERS);
 
 	// calculate initial stiffness matrix
-	if (ReformStiffness() == false) return false;
+	FETimePoint tp = m_fem.GetTime();
+	if (ReformStiffness(tp) == false) return false;
 
 	// calculate initial residual
-	if (Residual(m_bfgs.m_R0) == false) return false;
+	if (Residual(m_R0) == false) return false;
 
-	m_bfgs.m_R0 += m_Fd;
+	m_R0 += m_Fd;
 
 	// TODO: I can check here if the residual is zero.
 	// If it is than there is probably no force acting on the system
@@ -198,22 +200,22 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 		// solve the equations
 		m_SolverTime.start();
 		{
-			m_bfgs.SolveEquations(m_bfgs.m_ui, m_bfgs.m_R0);
+			m_bfgs.SolveEquations(m_ui, m_R0);
 		}
 		m_SolverTime.stop();
 
 		// check for nans
-		double du = m_bfgs.m_ui*m_bfgs.m_ui;
+		double du = m_ui*m_ui;
 		if (ISNAN(du)) throw NANDetected();
 
 		// extract the pressure increments
-		GetDisplacementData(m_di, m_bfgs.m_ui);
+		GetDisplacementData(m_di, m_ui);
 
 		// set initial convergence norms
 		if (m_niter == 0)
 		{
-			normRi = fabs(m_bfgs.m_R0*m_bfgs.m_R0);
-			normEi = fabs(m_bfgs.m_ui*m_bfgs.m_R0);
+			normRi = fabs(m_R0*m_R0);
+			normEi = fabs(m_ui*m_R0);
 			normDi = fabs(m_di*m_di);
 			normEm = normEi;
 		}
@@ -226,23 +228,23 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 			s = 1;
 
 			// Update geometry
-			Update(m_bfgs.m_ui);
+			Update(m_ui);
 
 			// calculate residual at this point
-			Residual(m_bfgs.m_R1);
+			Residual(m_R1);
 		}
 
 		// update all degrees of freedom
-		for (i=0; i<m_neq; ++i) m_Ui[i] += s*m_bfgs.m_ui[i];
+		for (i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
 
 		// update displacements
 		for (i=0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
 
 		// calculate norms
-		normR1 = m_bfgs.m_R1*m_bfgs.m_R1;
+		normR1 = m_R1*m_R1;
 		normd  = (m_di*m_di)*(s*s);
 		normD  = m_Di*m_Di;
-		normE1 = s*fabs(m_bfgs.m_ui*m_bfgs.m_R1);
+		normE1 = s*fabs(m_ui*m_R1);
 
 		// check residual norm
 		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	
@@ -262,7 +264,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 		// check poroelastic convergence
 		{
 			// extract the pressure increments
-			GetPressureData(m_pi, m_bfgs.m_ui);
+			GetPressureData(m_pi, m_ui);
 
 			// set initial norm
 			if (m_niter == 0) normPi = fabs(m_pi*m_pi);
@@ -283,7 +285,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 			// extract the concentration increments
 			for (j=0; j<(int)m_nceq.size(); ++j) {
 				if (m_nceq[j]) {
-					GetConcentrationData(m_ci[j], m_bfgs.m_ui,j);
+					GetConcentrationData(m_ci[j], m_ui,j);
 					
 					// set initial norm
 					if (m_niter == 0)
@@ -366,7 +368,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 				{
 					if (m_bfgs.m_nups < m_bfgs.m_maxups-1)
 					{
-						if (m_bfgs.Update(s, m_bfgs.m_ui, m_bfgs.m_R0, m_bfgs.m_R1) == false)
+						if (m_bfgs.Update(s, m_ui, m_R0, m_R1) == false)
 						{
 							// Stiffness update has failed.
 							// this might be due a too large condition number
@@ -393,7 +395,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 			// we must set this to zero before the reformation
 			// because we assume that the prescribed displacements are stored 
 			// in the m_ui vector.
-			zero(m_bfgs.m_ui);
+			zero(m_ui);
 
 			// reform stiffness matrices if necessary
 			if (breform)
@@ -401,14 +403,14 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 				felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 
 				// reform the matrix
-				if (ReformStiffness() == false) break;
+				if (ReformStiffness(tp) == false) break;
 	
 				// reset reformation flag
 				breform = false;
 			}
 
 			// copy last calculated residual
-			m_bfgs.m_R0 = m_bfgs.m_R1;
+			m_R0 = m_R1;
 		}
 		else if (m_baugment)
 		{
@@ -433,13 +435,13 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 				// we also recalculate the stresses in case we are doing augmentations
 				// for incompressible materials
 				UpdateStresses();
-				Residual(m_bfgs.m_R0);
+				Residual(m_R0);
 
 				// reform the matrix if we are using full-Newton
 				if (m_bfgs.m_maxups == 0)
 				{
 					felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
-					if (ReformStiffness() == false) break;
+					if (ReformStiffness(tp) == false) break;
 				}
 			}
 		}

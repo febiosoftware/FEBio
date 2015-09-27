@@ -27,7 +27,6 @@ public:
 
 public:
 	int		m_maxups;		//!< max nr of QN iters permitted between stiffness reformations
-	int		m_maxref;		//!< max nr of reformations per time step
 	double	m_cmax;			//!< maximum value for the condition number
 
 public:
@@ -40,12 +39,6 @@ public:
 
 	// counters
 	int		m_nups;			//!< nr of stiffness updates
-
-	vector<double> m_ui;	//!< displacement increment vector
-
-	// residuals
-	vector<double> m_R0;	//!< residual at iteration i-1
-	vector<double> m_R1;	//!< residual at iteration i
 
 	// BFGS update vectors
 	matrix			m_V;		//!< BFGS update vector

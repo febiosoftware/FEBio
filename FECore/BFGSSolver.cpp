@@ -9,7 +9,6 @@
 BFGSSolver::BFGSSolver()
 {
 	m_maxups = 10;
-	m_maxref = 15;
 	m_cmax   = 1e5;
 
 	// pointer to linear solver
@@ -30,10 +29,6 @@ void BFGSSolver::Init(int neq, FESolver* pNLS, LinearSolver* pls)
 	m_D.resize(neq);
 	m_G.resize(neq);
 	m_H.resize(neq);
-
-	m_ui.assign(neq, 0);
-	m_R0.assign(neq, 0);
-	m_R1.assign(neq, 0);
 
 	m_neq = neq;
 	m_nups = 0;

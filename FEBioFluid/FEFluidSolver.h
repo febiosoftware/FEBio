@@ -1,7 +1,6 @@
 #pragma once
 
 #include "FECore/FENewtonSolver.h"
-#include "FEBioMech/FEStiffnessMatrix.h"
 #include "FECore/FETypes.h"
 
 //-----------------------------------------------------------------------------
@@ -58,17 +57,9 @@ public:
     void UpdateStresses();
     
     //{ --- Stiffness matrix routines ---
-    //! return pointer to stiffness matrix
-    FEStiffnessMatrix* GetStiffnessMatrix() { return m_pK; }
-    
-    //! recalculates the shape of the stiffness matrix
-    bool CreateStiffness(bool breset);
     
     //! calculates the global stiffness matrix
     bool StiffnessMatrix(const FETimePoint& tp);
-    
-    //! reform the stiffness matrix
-    bool ReformStiffness();
     
     //{ --- Residual routines ---
     
@@ -94,13 +85,6 @@ public:
     vector<double> m_Vi;	//!< Total velocity vector for iteration
     vector<double> m_Vt;	//!< Total velocity vector at time t (incl all previous timesteps)
     vector<double> m_Fd;	//!< residual correction due to prescribed velocities
-    
-    // matrix reshape flag
-    bool	m_breshape;		//!< Matrix reshape flag
-    
-public:
-   // global stiffness matrix
-    FEStiffnessMatrix*	m_pK;		//!< global stiffness matrix
     
     // declare the parameter list
     DECLARE_PARAMETER_LIST();

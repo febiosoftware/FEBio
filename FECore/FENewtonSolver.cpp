@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "FENewtonSolver.h"
 #include "NumCore/NumCore.h"
-#include "FECore/FENodeReorder.h"
+#include "FENodeReorder.h"
 #include "FEModel.h"
+#include "FEGlobalMatrix.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
@@ -11,7 +12,7 @@ BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_LStol        , FE_PARAM_DOUBLE, "lstol"   );
 	ADD_PARAMETER(m_LSmin        , FE_PARAM_DOUBLE, "lsmin"   );
 	ADD_PARAMETER(m_LSiter       , FE_PARAM_INT   , "lsiter"  );
-	ADD_PARAMETER(m_bfgs.m_maxref, FE_PARAM_INT   , "max_refs");
+	ADD_PARAMETER(m_maxref       , FE_PARAM_INT   , "max_refs");
 	ADD_PARAMETER(m_bfgs.m_maxups, FE_PARAM_INT   , "max_ups" );
 	ADD_PARAMETER(m_bfgs.m_cmax  , FE_PARAM_DOUBLE, "cmax"    );
 END_PARAMETER_LIST();
@@ -19,19 +20,112 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 {
-	// default line search parameters
+	// default parameters
 	m_LSmin = 0.01;
 	m_LStol = 0.9;
 	m_LSiter = 5;
+	m_maxref = 15;
 
     m_neq = 0;
     m_plinsolve = 0;
+	m_pK = 0;
 }
 
 //-----------------------------------------------------------------------------
 FENewtonSolver::~FENewtonSolver()
 {
 	delete m_plinsolve;	// clean up linear solver data
+	delete m_pK;		// clean up stiffnes matrix data
+}
+
+//-----------------------------------------------------------------------------
+FEGlobalMatrix& FENewtonSolver::GetStiffnessMatrix()
+{
+	return *m_pK;
+}
+
+//-----------------------------------------------------------------------------
+//! Reforms a stiffness matrix and factorizes it
+bool FENewtonSolver::ReformStiffness(const FETimePoint& tp)
+{
+    // first, let's make sure we have not reached the max nr of reformations allowed
+    if (m_nref >= m_maxref) throw MaxStiffnessReformations();
+    
+    // recalculate the shape of the stiffness matrix if necessary
+    if (m_breshape)
+    {
+        // TODO: I don't think I need to update here
+        //		if (m_fem.m_bcontact) UpdateContact();
+        
+        // reshape the stiffness matrix
+        if (!CreateStiffness(m_niter == 0)) return false;
+        
+        // reset reshape flag, except for contact
+        m_breshape = (m_fem.SurfacePairInteractions() > 0? true : false);
+    }
+    
+    // calculate the global stiffness matrix
+    bool bret = StiffnessMatrix(tp);
+    
+    if (bret)
+    {
+        m_SolverTime.start();
+        {
+            // factorize the stiffness matrix
+            m_plinsolve->Factor();
+        }
+        m_SolverTime.stop();
+        
+        // increase total nr of reformations
+        m_nref++;
+        m_ntotref++;
+        
+        // reset bfgs update counter
+        m_bfgs.m_nups = 0;
+    }
+    
+    return bret;
+}
+
+//-----------------------------------------------------------------------------
+//!  Creates the global stiffness matrix
+//! \todo Can we move this to the FEStiffnessMatrix::Create function?
+bool FENewtonSolver::CreateStiffness(bool breset)
+{
+	// clean up the solver
+	if (m_pK->NonZeroes()) m_plinsolve->Destroy();
+
+	// clean up the stiffness matrix
+	m_pK->Clear();
+
+	// create the stiffness matrix
+	felog.printf("===== reforming stiffness matrix:\n");
+	if (m_pK->Create(&GetFEModel(), m_neq, breset) == false) 
+	{
+		felog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
+		return false;
+	}
+	else
+	{
+		// output some information about the direct linear solver
+		int neq = m_pK->Rows();
+		int nnz = m_pK->NonZeroes();
+		felog.printf("\tNr of equations ........................... : %d\n", neq);
+		felog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
+		felog.printf("\n");
+	}
+	// let's flush the logfile to make sure the last output will not get lost
+	felog.flush();
+
+	// Do the preprocessing of the solver
+	m_SolverTime.start();
+	{
+		if (!m_plinsolve->PreProcess()) throw FatalError();
+	}
+	m_SolverTime.stop();
+
+	// done!
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -41,7 +135,7 @@ bool FENewtonSolver::Init()
 	if (m_LStol  < 0.0) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
 	if (m_LSmin  < 0.0) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
 	if (m_LSiter < 0  ) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
-	if (m_bfgs.m_maxref < 0) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
+	if (m_maxref < 0  ) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
 	if (m_bfgs.m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
 	if (m_bfgs.m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
 
@@ -60,9 +154,17 @@ bool FENewtonSolver::Init()
         }
     }
 
+	// allocate data vectors
+	m_R0.assign(m_neq, 0);
+	m_R1.assign(m_neq, 0);
+	m_ui.assign(m_neq, 0);
+
 	// initialize BFGS data
 	// Must be done after initialization of linear solver
 	m_bfgs.Init(m_neq, this, m_plinsolve);
+
+    // set the create stiffness matrix flag
+    m_breshape = true;
 
 	return true;
 }
@@ -151,8 +253,8 @@ void FENewtonSolver::Serialize(DumpFile& ar)
 	{
 		ar << m_neq;
 		ar << m_LStol << m_LSiter << m_LSmin;
+		ar << m_maxref;
 		ar << m_bfgs.m_maxups;
-		ar << m_bfgs.m_maxref;
 		ar << m_bfgs.m_cmax;
 		ar << m_bfgs.m_nups;
 	}
@@ -160,8 +262,8 @@ void FENewtonSolver::Serialize(DumpFile& ar)
 	{
 		ar >> m_neq;
 		ar >> m_LStol >> m_LSiter >> m_LSmin;
+		ar >> m_maxref;
 		ar >> m_bfgs.m_maxups;
-		ar >> m_bfgs.m_maxref;
 		ar >> m_bfgs.m_cmax;
 		ar >> m_bfgs.m_nups;
 	}
@@ -252,20 +354,20 @@ double FENewtonSolver::LineSearch(double s)
 	int n = 0;
 
 	// initial energy
-	r0 = m_bfgs.m_ui*m_bfgs.m_R0;
+	r0 = m_ui*m_R0;
 
 	double rmin = fabs(r0);
 
 	// ul = ls*ui
-	vector<double> ul(m_bfgs.m_ui.size());
+	vector<double> ul(m_ui.size());
 	do
 	{
 		// Update geometry
-		vcopys(ul, m_bfgs.m_ui, s);
+		vcopys(ul, m_ui, s);
 		Update(ul);
 
 		// calculate residual at this point
-		Evaluate(m_bfgs.m_R1);
+		Evaluate(m_R1);
 
 		// make sure we are still in a valid range
 		if (s < m_LSmin)
@@ -277,18 +379,18 @@ double FENewtonSolver::LineSearch(double s)
 			s = 0.5;
 
 			// reupdate  
-			vcopys(ul, m_bfgs.m_ui, s);
+			vcopys(ul, m_ui, s);
 			Update(ul);
 
 			// recalculate residual at this point
-			Evaluate(m_bfgs.m_R1);
+			Evaluate(m_R1);
 
 			// return and hope for the best
 			break;
 		}
 
 		// calculate energies
-		r1 = m_bfgs.m_ui*m_bfgs.m_R1;
+		r1 = m_ui*m_R1;
 
 		if ((n == 0) || (fabs(r1) < rmin))
 		{
@@ -331,9 +433,9 @@ double FENewtonSolver::LineSearch(double s)
 		// max nr of iterations reached.
 		// we choose the line step that reached the smallest energy
 		s = smin;
-		vcopys(ul, m_bfgs.m_ui, s);
+		vcopys(ul, m_ui, s);
 		Update(ul);
-		Evaluate(m_bfgs.m_R1);
+		Evaluate(m_R1);
 	}
 	return s;
 }

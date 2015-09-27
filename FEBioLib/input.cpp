@@ -170,7 +170,7 @@ void echo_input(FEBioModel& fem)
 	FENewtonSolver* pns = dynamic_cast<FENewtonSolver*>(psolver);
 	if (pns)
 	{
-		felog.printf("\tMax nr of stiffness reformations ............... : %d\n", pns->m_bfgs.m_maxref);
+		felog.printf("\tMax nr of stiffness reformations ............... : %d\n", pns->m_maxref);
 		felog.printf("\tper time steps\n");
 		felog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", pns->m_bfgs.m_maxups);
 		felog.printf("\tbetween stiffness matrix reformations\n");
