@@ -17,20 +17,11 @@ public:
     //! destructor
     ~FEFluidSolver();
     
-    //! Clean up
-    void Clean();
-    
     //! serialize data to/from dump file
     void Serialize(DumpFile& ar);
     
     //! Initializes data structures
     bool Init();
-    
-    //! solves a single time step
-    bool SolveStep(double time);
-    
-    //! Initialize linear equation system
-    bool InitEquations();
     
 public:
     //! assemble the element residual into the global residual
@@ -108,11 +99,8 @@ public:
     bool	m_breshape;		//!< Matrix reshape flag
     
 public:
-    LinearSolver*		m_plinsolve;	//!< the linear solver
-    
-    // global stiffness matrix
+   // global stiffness matrix
     FEStiffnessMatrix*	m_pK;		//!< global stiffness matrix
-    int					m_neq;		//!< number of equations
     
     // declare the parameter list
     DECLARE_PARAMETER_LIST();

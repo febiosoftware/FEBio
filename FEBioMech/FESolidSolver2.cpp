@@ -28,17 +28,11 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FESolidSolver2, FESolver)
+BEGIN_PARAMETER_LIST(FESolidSolver2, FENewtonSolver)
 	ADD_PARAMETER(m_Dtol         , FE_PARAM_DOUBLE, "dtol"        );
 	ADD_PARAMETER(m_Etol         , FE_PARAM_DOUBLE, "etol"        );
 	ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );
 	ADD_PARAMETER(m_Rmin         , FE_PARAM_DOUBLE, "min_residual");
-	ADD_PARAMETER(m_LStol , FE_PARAM_DOUBLE, "lstol"       );
-	ADD_PARAMETER(m_LSmin , FE_PARAM_DOUBLE, "lsmin"       );
-	ADD_PARAMETER(m_LSiter, FE_PARAM_INT   , "lsiter"      );
-	ADD_PARAMETER(m_bfgs.m_maxref, FE_PARAM_INT   , "max_refs"    );
-	ADD_PARAMETER(m_bfgs.m_maxups, FE_PARAM_INT   , "max_ups"     );
-	ADD_PARAMETER(m_bfgs.m_cmax  , FE_PARAM_DOUBLE, "cmax"        );
     ADD_PARAMETER(m_alpha        , FE_PARAM_DOUBLE, "alpha"       );
 	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
 	ADD_PARAMETER(m_gamma        , FE_PARAM_DOUBLE, "gamma"       );
@@ -62,8 +56,6 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem)
 	m_nreq = 0;
 
 	m_pK = 0;
-	m_neq = 0;
-	m_plinsolve = 0;
 
 	m_bdivreform = true;
 	m_bdoreforms = true;
@@ -79,16 +71,7 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem)
 //-----------------------------------------------------------------------------
 FESolidSolver2::~FESolidSolver2()
 {
-	delete m_plinsolve;	// clean up linear solver data
 	delete m_pK;		// clean up stiffnes matrix data
-}
-
-//-----------------------------------------------------------------------------
-//! Clean
-//! \todo Why can this not be done in destructor?
-void FESolidSolver2::Clean()
-{
-	if (m_plinsolve) m_plinsolve->Destroy();
 }
 
 //-----------------------------------------------------------------------------
@@ -96,32 +79,14 @@ void FESolidSolver2::Clean()
 //
 bool FESolidSolver2::Init()
 {
+	// initialize base class
+	if (FENewtonSolver::Init() == false) return false;
+
 	// check parameters
 	if (m_Dtol <  0.0) { felog.printf("Error: dtol must be nonnegative.\n"   ); return false; }
 	if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }
 	if (m_Rtol <  0.0) { felog.printf("Error: rtol must be nonnegative.\n"); return false; }
 	if (m_Rmin <  0.0) { felog.printf("Error: min_residual must be nonnegative.\n"  ); return false; }
-	if (m_LStol  < 0.0) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
-	if (m_LSmin  < 0.0) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
-	if (m_LSiter < 0) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
-	if (m_bfgs.m_maxref < 0) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
-	if (m_bfgs.m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
-	if (m_bfgs.m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
-
-	// Now that we have determined the equation numbers we can continue
-	// with creating the stiffness matrix. First we select the linear solver
-	// The stiffness matrix is created in CreateStiffness
-	// Note that if a particular solver was requested in the input file
-	// then the solver might already be allocated. That's way we need to check it.
-	if (m_plinsolve == 0)
-	{
-		m_plinsolve = NumCore::CreateLinearSolver(m_fem.m_nsolver);
-		if (m_plinsolve == 0)
-		{
-			felog.printbox("FATAL ERROR","Unknown solver type selected\n");
-			return false;
-		}
-	}
 
 	// allocate storage for the sparse matrix that will hold the stiffness matrix data
 	// we let the solver allocate the correct type of matrix format
@@ -175,9 +140,6 @@ bool FESolidSolver2::Init()
 		n = node.m_ID[DOF_W]; if (n >= 0) m_Ut[n] = node.m_Dt.z - node.m_D0.z;
 	}
 
-	// initialize BFGS data
-	m_bfgs.Init(neq, this, m_plinsolve);
-
 	// set the create stiffness matrix flag
 	m_breshape = true;
 
@@ -190,7 +152,7 @@ bool FESolidSolver2::Init()
 void FESolidSolver2::Serialize(DumpFile& ar)
 {
 	// Serialize parameters
-	FESolver::Serialize(ar);
+	FENewtonSolver::Serialize(ar);
 	
 	if (ar.IsSaving())
 	{
@@ -200,13 +162,7 @@ void FESolidSolver2::Serialize(DumpFile& ar)
 		ar << m_niter;
 		ar << m_nref << m_ntotref;
 		ar << m_naug;
-		ar << m_neq << m_nreq;
-
-		ar << m_LStol << m_LSiter << m_LSmin;
-		ar << m_bfgs.m_maxups;
-		ar << m_bfgs.m_maxref;
-		ar << m_bfgs.m_cmax;
-		ar << m_bfgs.m_nups;
+		ar << m_nreq;
 	}
 	else
 	{
@@ -216,90 +172,26 @@ void FESolidSolver2::Serialize(DumpFile& ar)
 		ar >> m_niter;
 		ar >> m_nref >> m_ntotref;
 		ar >> m_naug;
-		ar >> m_neq >> m_nreq;
-
-		ar >> m_LStol >> m_LSiter >> m_LSmin;
-		ar >> m_bfgs.m_maxups;
-		ar >> m_bfgs.m_maxref;
-		ar >> m_bfgs.m_cmax;
-		ar >> m_bfgs.m_nups;
+		ar >> m_nreq;
 	}
 }
 
 //-----------------------------------------------------------------------------
-//! Determine the number of linear equations and assign equation numbers
-//!
-
-//-----------------------------------------------------------------------------
-//!	This function initializes the equation system.
-//! It is assumed that all free dofs up until now have been given an ID >= 0
-//! and the fixed or rigid dofs an ID < 0.
-//! After this operation the nodal ID array will contain the equation
-//! number assigned to the corresponding degree of freedom. To distinguish
-//! between free or unconstrained dofs and constrained ones the following rules
-//! apply to the ID array:
-//!
-//!           /
-//!          |  >=  0 --> dof j of node i is a free dof
-//! ID[i][j] <  == -1 --> dof j of node i is a fixed (no equation assigned too)
-//!          |  <  -1 --> dof j of node i is constrained and has equation nr = -ID[i][j]-2
-//!           \
-//!
 bool FESolidSolver2::InitEquations()
 {
-	int i, j;
-
-	// get the mesh
-	FEMesh& mesh = m_fem.GetMesh();
-
-	// initialize nr of equations
-	int neq = 0;
-
-	// see if we need to optimize the bandwidth
-	if (m_fem.m_bwopt)
-	{
-		// reorder the node numbers
-		vector<int> P(mesh.Nodes());
-		FENodeReorder mod;
-		mod.Apply(mesh, P);
-
-		// set the equation numbers
-		for (i=0; i<mesh.Nodes(); ++i)
-		{
-			FENode& node = mesh.Node(P[i]);
-			for (j=0; j<(int)node.m_ID.size(); ++j)
-			{
-				if      (node.m_ID[j] == DOF_FIXED     ) { node.m_ID[j] = -1; }
-				else if (node.m_ID[j] == DOF_OPEN      ) { node.m_ID[j] =  neq++; }
-				else if (node.m_ID[j] == DOF_PRESCRIBED) { node.m_ID[j] = -neq-2; neq++; }
-				else { assert(false); return false; }
-			}
-		}
-	}
-	else
-	{
-		// give all free dofs an equation number
-		for (i=0; i<mesh.Nodes(); ++i)
-		{
-			FENode& node = mesh.Node(i);
-			for (j=0; j<(int)node.m_ID.size(); ++j)
-			{
-				if      (node.m_ID[j] == DOF_FIXED     ) { node.m_ID[j] = -1; }
-				else if (node.m_ID[j] == DOF_OPEN      ) { node.m_ID[j] =  neq++; }
-				else if (node.m_ID[j] == DOF_PRESCRIBED) { node.m_ID[j] = -neq-2; neq++; }
-				else { assert(false); return false; }
-			}
-		}
-	}
+	// First call the base class.
+	// This will initialize all equation numbers, except the rigid body equation numbers
+	if (FENewtonSolver::InitEquations() == false) return false;
 
 	// Next, we assign equation numbers to the rigid body degrees of freedom
+	int neq = m_neq;
 	m_nreq = neq;
 	FERigidSystem& rigid = *m_fem.GetRigidSystem();
 	int nrb = rigid.Objects();
-	for (i=0; i<nrb; ++i)
+	for (int i=0; i<nrb; ++i)
 	{
 		FERigidBody& RB = *rigid.Object(i);
-		for (j=0; j<6; ++j)
+		for (int j=0; j<6; ++j)
 		{
 			int bcj = RB.m_BC[j];
 			int lmj = RB.m_LM[j];
@@ -315,7 +207,8 @@ bool FESolidSolver2::InitEquations()
 
 	// we assign the rigid body equation number to
 	// Also make sure that the nodes are NOT constrained!
-	for (i=0; i<mesh.Nodes(); ++i)
+	FEMesh& mesh = m_fem.GetMesh();
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 		if (node.m_rid >= 0)
@@ -780,70 +673,6 @@ bool FESolidSolver2::InitStep(double time)
 	double ta = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
 
 	return FESolver::InitStep(ta);
-}
-
-//-----------------------------------------------------------------------------
-//!  This function mainly calls the Quasin routine 
-//!  and deals with exceptions that require the immediate termination of
-//!	quasi-Newton iterations.
-bool FESolidSolver2::SolveStep(double time)
-{
-	bool bret;
-
-	try
-	{
-		// let's try to call Quasin
-		bret = Quasin(time);
-	}
-	catch (NegativeJacobian e)
-	{
-		// A negative jacobian was detected
-		felog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
-		return false;
-	}
-	catch (MaxStiffnessReformations)
-	{
-		// max nr of reformations is reached
-		felog.printbox("ERROR", "Max nr of reformations reached.");
-		return false;
-	}
-	catch (ForceConversion)
-	{
-		// user forced conversion of problem
-		felog.printbox("WARNING", "User forced conversion.\nSolution might not be stable.");
-		return true;
-	}
-	catch (IterationFailure)
-	{
-		// user caused a forced iteration failure
-		felog.printbox("WARNING", "User forced iteration failure.");
-		return false;
-	}
-	catch (ZeroLinestepSize)
-	{
-		// a zero line step size was detected
-		felog.printbox("ERROR", "Zero line step size.");
-		return false;
-	}
-	catch (EnergyDiverging)
-	{
-		// problem was diverging after stiffness reformation
-		felog.printbox("ERROR", "Problem diverging uncontrollably.");
-		return false;
-	}
-	catch (FEMultiScaleException)
-	{
-		// the RVE problem didn't solve
-		felog.printbox("ERROR", "The RVE problem has failed. Aborting macro run.");
-		return false;
-	}
-	catch (DoRunningRestart)
-	{
-		// a request to fail the iteration and restart the time step
-		return false;
-	}
-
-	return bret;
 }
 
 //-----------------------------------------------------------------------------

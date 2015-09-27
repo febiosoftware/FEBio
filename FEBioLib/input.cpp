@@ -167,13 +167,22 @@ void echo_input(FEBioModel& fem)
 
 	// output solver data
 	FESolver* psolver = step.GetFESolver();
+	FENewtonSolver* pns = dynamic_cast<FENewtonSolver*>(psolver);
+	if (pns)
+	{
+		felog.printf("\tMax nr of stiffness reformations ............... : %d\n", pns->m_bfgs.m_maxref);
+		felog.printf("\tper time steps\n");
+		felog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", pns->m_bfgs.m_maxups);
+		felog.printf("\tbetween stiffness matrix reformations\n");
+		felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", pns->m_LStol );
+		felog.printf("\tMinimum line search size ....................... : %lg\n", pns->m_LSmin );
+		felog.printf("\tMaximum number of line search iterations ....... : %d\n" , pns->m_LSiter);
+		felog.printf("\tMax condition number ........................... : %lg\n", pns->m_bfgs.m_cmax);
+	}
+
 	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(psolver);
 	if (ps)
 	{
-		felog.printf("\tMax nr of stiffness reformations ............... : %d\n", ps->m_bfgs.m_maxref);
-		felog.printf("\tper time steps\n");
-		felog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", ps->m_bfgs.m_maxups);
-		felog.printf("\tbetween stiffness matrix reformations\n");
 		felog.printf("\tDisplacement convergence tolerance ............. : %lg\n", ps->m_Dtol);
 		felog.printf("\tEnergy convergence tolerance ................... : %lg\n", ps->m_Etol);
 		felog.printf("\tResidual convergence tolerance ................. : %lg\n", ps->m_Rtol);
@@ -182,10 +191,6 @@ void echo_input(FEBioModel& fem)
 	FESolidSolver2* ps2 = dynamic_cast<FESolidSolver2*>(psolver);
 	if (ps2)
 	{
-		felog.printf("\tMax nr of stiffness reformations ............... : %d\n", ps2->m_bfgs.m_maxref);
-		felog.printf("\tper time steps\n");
-		felog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", ps2->m_bfgs.m_maxups);
-		felog.printf("\tbetween stiffness matrix reformations\n");
 		felog.printf("\tDisplacement convergence tolerance ............. : %lg\n", ps2->m_Dtol);
 		felog.printf("\tEnergy convergence tolerance ................... : %lg\n", ps2->m_Etol);
 		felog.printf("\tResidual convergence tolerance ................. : %lg\n", ps2->m_Rtol);
@@ -201,40 +206,16 @@ void echo_input(FEBioModel& fem)
 	FEMultiphasicSolver* pmps = dynamic_cast<FEMultiphasicSolver*>(psolver);
 	if (pmps) felog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", pmps->m_Ctol);
 
-	if (ps)
-	{
-		felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", ps->m_LStol );
-		felog.printf("\tMinimum line search size ....................... : %lg\n", ps->m_LSmin );
-		felog.printf("\tMaximum number of line search iterations ....... : %d\n" , ps->m_LSiter);
-		felog.printf("\tMax condition number ........................... : %lg\n", ps->m_bfgs.m_cmax);
-	}
-	if (ps2)
-	{
-		felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", ps2->m_LStol );
-		felog.printf("\tMinimum line search size ....................... : %lg\n", ps2->m_LSmin );
-		felog.printf("\tMaximum number of line search iterations ....... : %d\n" , ps2->m_LSiter);
-		felog.printf("\tMax condition number ........................... : %lg\n", ps2->m_bfgs.m_cmax  );
-	}
-
-	felog.printf("\n\n");
-
-
     FEFluidSolver* pfs = dynamic_cast<FEFluidSolver*>(psolver);
     if (pfs)
     {
-        felog.printf("\tMax nr of stiffness reformations ............... : %d\n", pfs->m_bfgs.m_maxref);
-        felog.printf("\tper time steps\n");
-        felog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", pfs->m_bfgs.m_maxups);
-        felog.printf("\tbetween stiffness matrix reformations\n");
         felog.printf("\tVelocity convergence tolerance ................. : %lg\n", pfs->m_Vtol);
         felog.printf("\tResidual convergence tolerance ................. : %lg\n", pfs->m_Rtol);
         felog.printf("\tMinimal residual value ......................... : %lg\n", pfs->m_Rmin);
-        felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", pfs->m_LStol );
-        felog.printf("\tMinimum line search size ....................... : %lg\n", pfs->m_LSmin );
-        felog.printf("\tMaximum number of line search iterations ....... : %d\n" , pfs->m_LSiter);
-        felog.printf("\tMax condition number ........................... : %lg\n", pfs->m_bfgs.m_cmax  );
     }
-    
+
+	felog.printf("\n\n");
+
 	// print output data
 	felog.printf(" OUTPUT DATA\n");
 	felog.printf("===========================================================================\n");

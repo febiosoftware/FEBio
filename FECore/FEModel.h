@@ -289,7 +289,11 @@ public: // Global data
 	double GetGlobalConstant(const string& s);
 
 public: // TODO: Find a better place for these parameters
-	int		m_nsolver;			//!< type of solver selected
+	// I want to make this parameter part of the FEAnalysis, since 
+	// it could be different analysis steps (in multi-step problems) may
+	// require different solvers.
+	int		m_nsolver;			//!< type of (linear) solver selected
+
 	int		m_bwopt;			//!< bandwidth optimization flag
 	int		m_nStep;			//!< current analysis step
 	double	m_ftime;			//!< current time value

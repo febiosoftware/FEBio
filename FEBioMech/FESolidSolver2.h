@@ -18,9 +18,6 @@ public:
 	//! destructor
 	virtual ~FESolidSolver2();
 
-	//! Clean up
-	virtual void Clean();
-
 	//! serialize data to/from dump file
 	void Serialize(DumpFile& ar);
 
@@ -29,9 +26,6 @@ public:
 
 	//! initialize the step
 	bool InitStep(double time);
-
-	//! solves a single time step
-	bool SolveStep(double time);
 
 	//! Initialize linear equation system
 	bool InitEquations();
@@ -166,11 +160,8 @@ public:
 	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
     
 public:
-	LinearSolver*		m_plinsolve;	//!< the linear solver
-
 	// global stiffness matrix
 	FEStiffnessMatrix*	m_pK;		//!< global stiffness matrix
-	int					m_neq;		//!< number of equations
 
 	bool		m_baugment;		//!< augmentation flag
 
