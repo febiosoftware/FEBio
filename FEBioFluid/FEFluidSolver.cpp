@@ -872,11 +872,11 @@ bool FEFluidSolver::StiffnessMatrix(const FETimePoint& tp)
     }
     
     // let's check the stiffness matrix for zero diagonal elements
-    int neq = K.Size();
+/*    int neq = K.Size();
     for (i=0; i<neq; ++i)
     {
         if (fabs(K.diag(i)) < 1e-15) throw ZeroDiagonal(-1, -1);
-    }
+    }*/
     
     return true;
 }
