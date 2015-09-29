@@ -4,6 +4,7 @@
 #include "FEIdealFluid.h"
 #include "FENeoHookeanFluid.h"
 #include "FENewtonianFluid.h"
+#include "FECarreauFluid.h"
 
 #include "FEFluidAnalysis.h"
 #include "FEFluidSolver.h"
@@ -41,6 +42,7 @@ REGISTER_FECORE_CLASS(FEIdealGas                    ,FEMATERIAL_ID, "ideal gas" 
 REGISTER_FECORE_CLASS(FEIdealFluid                  ,FEMATERIAL_ID, "ideal fluid"       );
 REGISTER_FECORE_CLASS(FENeoHookeanFluid             ,FEMATERIAL_ID, "neo-Hookean fluid" );
 REGISTER_FECORE_CLASS(FENewtonianFluid              ,FEMATERIAL_ID, "Newtonian fluid"   );
+REGISTER_FECORE_CLASS(FECarreauFluid                ,FEMATERIAL_ID, "Carreau fluid"     );
 
 //-----------------------------------------------------------------------------
 // Domain classes
