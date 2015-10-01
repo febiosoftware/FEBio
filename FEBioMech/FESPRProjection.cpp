@@ -8,6 +8,13 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 FESPRProjection::FESPRProjection()
 {
+	m_p = -1;
+}
+
+//-------------------------------------------------------------------------------------------------
+void FESPRProjection::SetInterpolationOrder(int p)
+{
+	m_p = p;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -33,9 +40,14 @@ void FESPRProjection::Project(FESolidDomain& dom, const vector< vector<double> >
 	case FE_TET10G4  : { NDOF =  4; NCN = 4; } break;
 	case FE_TET10G8  : { NDOF =  4; NCN = 4; } break;
 	case FE_TET10GL11: { NDOF =  4; NCN = 4; } break;
-	case FE_TET15G8  : { NDOF = 10; NCN = 4; } break;
-	case FE_TET15G11 : { NDOF = 10; NCN = 4; } break;
-	case FE_TET15G15 : { NDOF = 10; NCN = 4; } break;
+	case FE_TET15G8  : // fall-trough
+	case FE_TET15G11 : // fall-trough
+	case FE_TET15G15 : 
+		{
+			NDOF = (m_p == 1 ? 4 : 10); 
+			NCN = 4; 
+		}
+		break;
 	case FE_HEX8G8   : { NDOF =  7; NCN = 8; } break;
 	default:
 		return;

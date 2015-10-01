@@ -409,6 +409,16 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! class the projects stresses from integration points to nodes using
+//! SPR (superconvergergent patch recovery)
+class FEPlotSPRLinearStresses : public FEDomainData
+{
+public:
+	FEPlotSPRLinearStresses(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_NODE){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
 //! class that projects the principal stresses from integration points to nodes
 //! using the SPR projection method
 class FEPlotSPRPrincStresses : public FEDomainData

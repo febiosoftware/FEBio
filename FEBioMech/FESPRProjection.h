@@ -13,4 +13,8 @@ public:
 
 	void Project(FESolidDomain& dom, const std::vector< std::vector<double> >& d, std::vector<double>& o);
 
+	void SetInterpolationOrder(int p);
+
+protected:
+	int		m_p;	//!< interpolation order (set to -1 for default rules)
 };
