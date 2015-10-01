@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // Material parameters for FEUncoupledMaterial
 BEGIN_PARAMETER_LIST(FEUncoupledMaterial, FEElasticMaterial)
-	ADD_PARAMETER2(m_K, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "k");
+	ADD_PARAMETER2(m_K, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
 	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon");
 	ADD_PARAMETER(m_augtol , FE_PARAM_DOUBLE, "atol"  );
 	ADD_PARAMETER(m_naugmin, FE_PARAM_INT   , "minaug");
