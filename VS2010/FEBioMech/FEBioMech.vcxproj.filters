@@ -459,9 +459,6 @@
     <ClCompile Include="..\..\FEBioMech\FEMicroMaterial2O.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEElasticDomain2O.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEMicroMaterial2O.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1011,9 +1008,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEMicroMaterial2O.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEElasticDomain2O.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEMicroMaterial2O.h">
