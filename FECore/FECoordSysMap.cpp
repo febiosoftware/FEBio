@@ -238,6 +238,107 @@ void FECylindricalMap::Serialize(DumpFile& ar)
 }
 
 //=============================================================================
+// FEPolarMap
+//-----------------------------------------------------------------------------
+
+BEGIN_PARAMETER_LIST(FEPolarMap, FECoordSysMap)
+	ADD_PARAMETER(m_c, FE_PARAM_VEC3D, "center");
+	ADD_PARAMETER(m_a, FE_PARAM_VEC3D, "axis"  );
+	ADD_PARAMETER(m_d0, FE_PARAM_VEC3D, "vector1");
+	ADD_PARAMETER(m_d1, FE_PARAM_VEC3D, "vector2");
+	ADD_PARAMETER(m_R0, FE_PARAM_DOUBLE, "radius1");
+	ADD_PARAMETER(m_R1, FE_PARAM_DOUBLE, "radius2");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+FEPolarMap::FEPolarMap(FEModel* pfem) : FECoordSysMap(FE_MAP_POLAR), m_mesh(pfem->GetMesh())
+{
+	m_c = vec3d(0,0,0);
+	m_a = vec3d(0,0,1);
+	m_d0 = m_d1 = vec3d(1,0,0);
+	m_R0 = 0; 
+	m_R1 = 1;
+}
+
+//-----------------------------------------------------------------------------
+void FEPolarMap::Init()
+{
+	m_a.unit();
+	m_d0.unit();
+	m_d1.unit();
+}
+
+//-----------------------------------------------------------------------------
+mat3d FEPolarMap::LocalElementCoord(FEElement& el, int n)
+{
+	// get the element nodes
+	vec3d r0[FEElement::MAX_NODES];
+	for (int i=0; i<el.Nodes(); ++i) r0[i] = m_mesh.Node(el.m_node[i]).m_r0;
+
+	// find the nodal position of the integration point n
+	vec3d p = el.Evaluate(r0, n);
+
+	// find the vector to the axis and its lenght
+	vec3d b = (p - m_c) - m_a*(m_a*(p - m_c)); 
+	double R = b.unit();
+
+	// get the relative radius
+	double R0 = m_R0;
+	double R1 = m_R1;
+	if (R1 == R0) R1 += 1;
+	double w = (R - R0)/(R1 - R0);
+
+	// get the fiber vectors
+	vec3d v0 = m_d0;
+	vec3d v1 = m_d1;
+	quatd Q0(0,vec3d(0,0,1)), Q1(v0,v1);
+	quatd Qw = quatd::slerp(Q0, Q1, w);
+	vec3d v = v0; Qw.RotateVector(v);
+
+	// setup the rotation vector
+	vec3d x_unit(vec3d(1,0,0));
+	quatd q(x_unit, b);
+
+	// rotate the reference vector
+	q.RotateVector(v);
+
+	// setup a local coordinate system with r as the x-axis
+	vec3d d(vec3d(0,1,0));
+	q.RotateVector(d);
+	if (fabs(d*v) > 0.99)
+	{
+		d = vec3d(0,0,1);
+		q.RotateVector(d);
+	}
+
+	// find basis vectors
+	vec3d e1 = v;
+	vec3d e3 = (e1 ^ d); e3.unit();
+	vec3d e2 = e3 ^ e1;
+
+	// setup rotation matrix
+	mat3d Q;
+	Q[0][0] = e1.x; Q[0][1] = e2.x; Q[0][2] = e3.x;
+	Q[1][0] = e1.y; Q[1][1] = e2.y; Q[1][2] = e3.y;
+	Q[2][0] = e1.z; Q[2][1] = e2.z; Q[2][2] = e3.z;
+
+	return Q;
+}
+
+//-----------------------------------------------------------------------------
+void FEPolarMap::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_c << m_a << m_d0 << m_d1 << m_R0 << m_R1;
+	}
+	else
+	{
+		ar >> m_c >> m_a >> m_d0 >> m_d1 >> m_R0 >> m_R1;
+	}
+}
+
+//=============================================================================
 // FEVectorMap
 //-----------------------------------------------------------------------------
 

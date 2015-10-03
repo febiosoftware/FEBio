@@ -23,6 +23,7 @@ class FEMesh;
 #define FE_MAP_VECTOR	3
 #define FE_MAP_CYLINDER	4
 #define FE_MAP_ANGLES	5
+#define FE_MAP_POLAR	6
 
 //-----------------------------------------------------------------------------
 //! The FECoordSysMap class is used to create local coordinate systems.
@@ -124,6 +125,42 @@ protected:
 
 	DECLARE_PARAMETER_LIST();
 };
+
+//-----------------------------------------------------------------------------
+
+class FEPolarMap : public FECoordSysMap
+{
+public:
+	FEPolarMap(FEModel* pfem);
+
+	void Init();
+
+	void SetCenter(vec3d c) { m_c = c; }
+
+	void SetAxis(vec3d a) { m_a = a; m_a.unit(); }
+
+	void SetVector0(vec3d r) { m_d0 = r; m_d0.unit(); }
+	void SetVector1(vec3d r) { m_d1 = r; m_d1.unit(); }
+
+	void SetRadius0(double r) { m_R0 = r; }
+	void SetRadius1(double r) { m_R1 = r; }
+
+	mat3d LocalElementCoord(FEElement& el, int n);
+
+	virtual void Serialize(DumpFile& ar);
+
+public:
+	vec3d		m_c;		// center of map
+	vec3d		m_a;		// axis
+	vec3d		m_d0, m_d1;	// reference direction
+	double		m_R0, m_R1;
+
+protected:
+	FEMesh&		m_mesh;
+
+	DECLARE_PARAMETER_LIST();
+};
+
 
 //-----------------------------------------------------------------------------
 

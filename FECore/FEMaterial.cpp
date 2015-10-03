@@ -333,6 +333,7 @@ void FEMaterial::Serialize(DumpFile &ar)
 		case FE_MAP_CYLINDER: m_pmap = new FECylindricalMap   (pfem); break;
 		case FE_MAP_VECTOR  : m_pmap = new FEVectorMap        (pfem); break;
 		case FE_MAP_ANGLES  : m_pmap = new FESphericalAngleMap(pfem); break;
+		case FE_MAP_POLAR   : m_pmap = new FEPolarMap         (pfem); break;
 		}
 		if (m_pmap) m_pmap->Serialize(ar);
 	}
