@@ -61,13 +61,14 @@ public:
 
 //-----------------------------------------------------------------------------
 //! prescribed boundary condition data
-
+//! \todo Should I make a derived class for the relative prescribed BC's?
 class FEPrescribedBC : public FEBoundaryCondition
 {
 	struct ITEM
 	{
 		int		nid;	// nodal ID
-		double scale;	// nodal scale factor
+		double	scale;	// nodal scale factor
+		double	ref;	// reference value (for relative BC's)
 	};
 
 public:
@@ -106,7 +107,6 @@ private:
 	double	m_scale;	//!< overall scale factor
 	int		m_dof;		//!< dof
 	int		m_lc;		//!< load curve
-	double	m_r;		//!< initial value
 	bool	m_br;		//!< flag for relative bc
 
 	vector<ITEM>	m_item;		//!< item list

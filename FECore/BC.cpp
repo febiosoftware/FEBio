@@ -126,7 +126,6 @@ FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfe
 {
 	m_lc = -1;
 	m_scale = 0.0;
-	m_r = 0.0;
 	m_dof = -1;
 	m_br = false;
 }
@@ -136,7 +135,6 @@ FEPrescribedBC::FEPrescribedBC(FEModel* pfem, const FEPrescribedBC& bc) : FEBoun
 {
 	m_lc    = bc.m_lc;
 	m_scale = bc.m_scale;
-	m_r     = bc.m_r;
 	m_dof   = bc.m_dof;
 	m_br    = bc.m_br;
 	m_item  = bc.m_item;
@@ -145,7 +143,7 @@ FEPrescribedBC::FEPrescribedBC(FEModel* pfem, const FEPrescribedBC& bc) : FEBoun
 //-----------------------------------------------------------------------------
 void FEPrescribedBC::AddNode(int nid, double s)
 {
-	ITEM item = {nid, s};
+	ITEM item = {nid, s, 0.0};
 	m_item.push_back(item);
 }
 
@@ -198,25 +196,30 @@ void FEPrescribedBC::Activate()
 		node.m_BC[m_dof] = DOF_PRESCRIBED;
 
 		// evaluate the relative offset
-		switch(m_dof)
+		if (m_br)
 		{
-		case DOF_X: m_r = (m_br ? node.m_rt.x - node.m_r0.x : 0); break;
-		case DOF_Y: m_r = (m_br ? node.m_rt.y - node.m_r0.y : 0); break;
-		case DOF_Z: m_r = (m_br ? node.m_rt.z - node.m_r0.z : 0); break;
-		case DOF_U: m_r = (m_br ? node.m_Dt.x: 0); break;
-		case DOF_V: m_r = (m_br ? node.m_Dt.y: 0); break;
-		case DOF_W: m_r = (m_br ? node.m_Dt.z: 0); break;
-		case DOF_T: m_r = (m_br ? node.m_T   : 0); break;
-		case DOF_P: m_r = (m_br ? node.m_pt  : 0); break;
-        case DOF_VX: m_r = (m_br ? node.m_vt.x : 0); break;
-        case DOF_VY: m_r = (m_br ? node.m_vt.y : 0); break;
-        case DOF_VZ: m_r = (m_br ? node.m_vt.z : 0); break;
-        case DOF_E: m_r = (m_br ? node.m_et  : 0); break;
-		default:	// all prescribed concentrations
-			if ((m_dof >= DOF_C) && (m_dof < (int)node.m_ID.size())) {
-				int sid = m_dof - DOF_C;
-				m_r = (m_br ? node.m_ct[sid] : 0);
+			double r = 0.0;
+			switch(m_dof)
+			{
+			case DOF_X : r = node.m_rt.x - node.m_r0.x; break;
+			case DOF_Y : r = node.m_rt.y - node.m_r0.y; break;
+			case DOF_Z : r = node.m_rt.z - node.m_r0.z; break;
+			case DOF_U : r = node.m_Dt.x; break;
+			case DOF_V : r = node.m_Dt.y; break;
+			case DOF_W : r = node.m_Dt.z; break;
+			case DOF_T : r = node.m_T; break;
+			case DOF_P : r = node.m_pt; break;
+			case DOF_VX: r = node.m_vt.x; break;
+			case DOF_VY: r = node.m_vt.y; break;
+			case DOF_VZ: r = node.m_vt.z; break;
+			case DOF_E : r = node.m_et; break;
+			default:	// all prescribed concentrations
+				if ((m_dof >= DOF_C) && (m_dof < (int)node.m_ID.size())) {
+					int sid = m_dof - DOF_C;
+					r = node.m_ct[sid];
+				}
 			}
+			m_item[j].ref = r;
 		}
 	}
 }
@@ -246,7 +249,7 @@ double FEPrescribedBC::NodeValue(int n) const
 		FEModel& fem = *GetFEModel();
 		val *= fem.GetLoadCurve(m_lc)->Value();
 	}
-	if (m_br) val += m_r;
+	if (m_br) val += it.ref;
 	return val;
 }
 
@@ -256,11 +259,11 @@ void FEPrescribedBC::Serialize(DumpFile& ar)
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << m_dof << m_lc << m_item << m_scale << m_br << m_r;
+		ar << m_dof << m_lc << m_item << m_scale << m_br;
 	}
 	else
 	{
-		ar >> m_dof >> m_lc >> m_item >> m_scale >> m_br >> m_r;
+		ar >> m_dof >> m_lc >> m_item >> m_scale >> m_br;
 	}
 }
 
