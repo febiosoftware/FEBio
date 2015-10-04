@@ -10,20 +10,14 @@
 #endif // _MSC_VER > 1000
 
 #include "mat3d.h"
-#include "FEElement.h"
-#include "DumpFile.h"
 #include "FECoreBase.h"
 
+//-----------------------------------------------------------------------------
+// Forward declarations
 class FEModel;
 class FEMesh;
-
-#define FE_MAP_NONE		0
-#define FE_MAP_LOCAL	1
-#define FE_MAP_SPHERE	2
-#define FE_MAP_VECTOR	3
-#define FE_MAP_CYLINDER	4
-#define FE_MAP_ANGLES	5
-#define FE_MAP_POLAR	6
+class FEElement;
+class DumpFile;
 
 //-----------------------------------------------------------------------------
 //! The FECoordSysMap class is used to create local coordinate systems.
@@ -31,11 +25,11 @@ class FEMesh;
 class FECoordSysMap : public FECoreBase
 {
 public:
-	FECoordSysMap(int ntype) : FECoreBase(FECOORDSYSMAP_ID) { m_ntype = ntype; }
-	virtual ~FECoordSysMap() {}
+	FECoordSysMap(FEModel* pfem);
+	virtual ~FECoordSysMap();
 
 	//! initialization
-	virtual void Init() {}
+	virtual void Init();
 
 	//! return the local coordinate system at an element's gauss point
 	virtual mat3d LocalElementCoord(FEElement& el, int n) = 0;
@@ -44,11 +38,14 @@ public:
 	virtual void Serialize(DumpFile& ar) = 0;
 
 public:
-	int	m_ntype;
+	FEModel* GetFEModel() { return m_pfem; }
+
+private:
+	FEModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------
-
+//! This class generates a material axes based on the local element node numbering.
 class FELocalMap : public FECoordSysMap
 {
 public:
@@ -66,13 +63,11 @@ public:
 	int			m_n[3];	// local element nodes
 
 protected:
-	FEMesh&		m_mesh;
-
 	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
-
+//! This class generates material axes based on a spherical map. 
 class FESphericalMap : public FECoordSysMap
 {
 public:
@@ -90,8 +85,6 @@ public:
 	vec3d		m_c;	// center of map
 
 protected:
-	FEMesh&		m_mesh;
-
 	DECLARE_PARAMETER_LIST();
 };
 
@@ -121,8 +114,6 @@ public:
 	vec3d		m_r;	// reference direction
 
 protected:
-	FEMesh&		m_mesh;
-
 	DECLARE_PARAMETER_LIST();
 };
 
@@ -156,22 +147,19 @@ public:
 	double		m_R0, m_R1;
 
 protected:
-	FEMesh&		m_mesh;
-
 	DECLARE_PARAMETER_LIST();
 };
-
 
 //-----------------------------------------------------------------------------
 
 class FEVectorMap : public FECoordSysMap
 {
 public:
-	FEVectorMap(FEModel* pfem) : FECoordSysMap(FE_MAP_VECTOR) {}
+	FEVectorMap(FEModel* pfem);
 
 	void Init();
 
-	void SetVectors(vec3d a, vec3d d) { m_a = a; m_d = d; }
+	void SetVectors(vec3d a, vec3d d);
 
 	mat3d LocalElementCoord(FEElement& el, int n);
 
@@ -187,11 +175,11 @@ public:
 class FESphericalAngleMap : public FECoordSysMap
 {
 public:
-	FESphericalAngleMap(FEModel* pfem) : FECoordSysMap(FE_MAP_ANGLES){}
+	FESphericalAngleMap(FEModel* pfem);
 
 	void Init();
 
-	void SetAngles(double theta, double phi) { m_theta = theta; m_phi = phi; }
+	void SetAngles(double theta, double phi);
 
 	mat3d LocalElementCoord(FEElement& el, int n);
 

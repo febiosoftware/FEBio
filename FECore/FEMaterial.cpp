@@ -306,12 +306,13 @@ void FEMaterial::Serialize(DumpFile &ar)
 		ar << m_nRB;
 
 		// save the local coodinate system generator
-		int ntype = -1;
-		if (m_pmap) ntype = m_pmap->m_ntype;
-		else ntype = FE_MAP_NONE;
-		assert(ntype != -1);
-		ar << ntype;
-		if (m_pmap) m_pmap->Serialize(ar);
+		int nmap = (m_pmap ? 1 : 0);
+		ar << nmap;
+		if (m_pmap)
+		{
+			ar << m_pmap->GetTypeStr();
+			m_pmap->Serialize(ar);
+		}
 	}
 	else
 	{
@@ -319,23 +320,20 @@ void FEMaterial::Serialize(DumpFile &ar)
 		ar >> m_nRB;
 
 		// read the local cordinate system
-		int ntype;
-		ar >> ntype;
+		int nmap;
+		ar >> nmap;
 		if (m_pmap) delete m_pmap;
 		m_pmap = 0;
-		assert(ntype != -1);
-		FEModel* pfem = ar.GetFEModel();
-		switch (ntype)
+
+		if (nmap)
 		{
-		case FE_MAP_NONE    : m_pmap = 0; break;
-		case FE_MAP_LOCAL   : m_pmap = new FELocalMap         (pfem); break;
-		case FE_MAP_SPHERE  : m_pmap = new FESphericalMap     (pfem); break;
-		case FE_MAP_CYLINDER: m_pmap = new FECylindricalMap   (pfem); break;
-		case FE_MAP_VECTOR  : m_pmap = new FEVectorMap        (pfem); break;
-		case FE_MAP_ANGLES  : m_pmap = new FESphericalAngleMap(pfem); break;
-		case FE_MAP_POLAR   : m_pmap = new FEPolarMap         (pfem); break;
+			FEModel* pfem = ar.GetFEModel();
+
+			char sztype[64]={0};
+			ar >> sztype;
+			m_pmap = fecore_new<FECoordSysMap>(FECOORDSYSMAP_ID, sztype, pfem);
+			m_pmap->Serialize(ar);
 		}
-		if (m_pmap) m_pmap->Serialize(ar);
 	}
 
 	// serialize all the material properties

@@ -6,6 +6,22 @@
 #include "FECoordSysMap.h"
 #include "FEMesh.h"
 #include "FEModel.h"
+#include "DumpFile.h"
+#include "FEElement.h"
+
+//-----------------------------------------------------------------------------
+FECoordSysMap::FECoordSysMap(FEModel* pfem) : FECoreBase(FECOORDSYSMAP_ID) 
+{ 
+	m_pfem = pfem; 
+}
+
+//-----------------------------------------------------------------------------
+FECoordSysMap::~FECoordSysMap() {}
+
+//-----------------------------------------------------------------------------
+//! initialization
+void FECoordSysMap::Init() {}
+
 
 //=============================================================================
 // FELocalMap
@@ -16,7 +32,7 @@ BEGIN_PARAMETER_LIST(FELocalMap, FECoordSysMap)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FELocalMap::FELocalMap(FEModel* pfem) : FECoordSysMap(FE_MAP_LOCAL), m_mesh(pfem->GetMesh())
+FELocalMap::FELocalMap(FEModel* pfem) : FECoordSysMap(pfem)
 {
 	m_n[0] = -1;
 	m_n[1] = -1;
@@ -41,8 +57,9 @@ void FELocalMap::SetLocalNodes(int n1, int n2, int n3)
 //-----------------------------------------------------------------------------
 mat3d FELocalMap::LocalElementCoord(FEElement& el, int n)
 {
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	vec3d r0[FEElement::MAX_NODES];
-	for (int i=0; i<el.Nodes(); ++i) r0[i] = m_mesh.Node(el.m_node[i]).m_r0;
+	for (int i=0; i<el.Nodes(); ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
 
 	vec3d a, b, c, d;
 	mat3d Q;
@@ -95,7 +112,7 @@ BEGIN_PARAMETER_LIST(FESphericalMap, FECoordSysMap)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FESphericalMap::FESphericalMap(FEModel* pfem): FECoordSysMap(FE_MAP_SPHERE), m_mesh(pfem->GetMesh())
+FESphericalMap::FESphericalMap(FEModel* pfem): FECoordSysMap(pfem)
 {
 
 }
@@ -109,8 +126,9 @@ void FESphericalMap::Init()
 //-----------------------------------------------------------------------------
 mat3d FESphericalMap::LocalElementCoord(FEElement& el, int n)
 {
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	vec3d r0[FEElement::MAX_NODES];
-	for (int i=0; i<el.Nodes(); ++i) r0[i] = m_mesh.Node(el.m_node[i]).m_r0;
+	for (int i=0; i<el.Nodes(); ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
 
 	double* H = el.H(n);
 	vec3d a;
@@ -166,7 +184,7 @@ BEGIN_PARAMETER_LIST(FECylindricalMap, FECoordSysMap)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FECylindricalMap::FECylindricalMap(FEModel* pfem) : FECoordSysMap(FE_MAP_CYLINDER), m_mesh(pfem->GetMesh())
+FECylindricalMap::FECylindricalMap(FEModel* pfem) : FECoordSysMap(pfem)
 {
 	m_c = vec3d(0,0,0);
 	m_a = vec3d(0,0,1);
@@ -183,9 +201,10 @@ void FECylindricalMap::Init()
 //-----------------------------------------------------------------------------
 mat3d FECylindricalMap::LocalElementCoord(FEElement& el, int n)
 {
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	// get the element nodes
 	vec3d r0[FEElement::MAX_NODES];
-	for (int i=0; i<el.Nodes(); ++i) r0[i] = m_mesh.Node(el.m_node[i]).m_r0;
+	for (int i=0; i<el.Nodes(); ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
 
 	// find the nodal position of the integration point n
 	vec3d p = el.Evaluate(r0, n);
@@ -251,7 +270,7 @@ BEGIN_PARAMETER_LIST(FEPolarMap, FECoordSysMap)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEPolarMap::FEPolarMap(FEModel* pfem) : FECoordSysMap(FE_MAP_POLAR), m_mesh(pfem->GetMesh())
+FEPolarMap::FEPolarMap(FEModel* pfem) : FECoordSysMap(pfem)
 {
 	m_c = vec3d(0,0,0);
 	m_a = vec3d(0,0,1);
@@ -271,9 +290,11 @@ void FEPolarMap::Init()
 //-----------------------------------------------------------------------------
 mat3d FEPolarMap::LocalElementCoord(FEElement& el, int n)
 {
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
 	// get the element nodes
 	vec3d r0[FEElement::MAX_NODES];
-	for (int i=0; i<el.Nodes(); ++i) r0[i] = m_mesh.Node(el.m_node[i]).m_r0;
+	for (int i=0; i<el.Nodes(); ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
 
 	// find the nodal position of the integration point n
 	vec3d p = el.Evaluate(r0, n);
@@ -347,11 +368,23 @@ BEGIN_PARAMETER_LIST(FEVectorMap, FECoordSysMap)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
+FEVectorMap::FEVectorMap(FEModel* pfem) : FECoordSysMap(pfem) 
+{
+}
+
+//-----------------------------------------------------------------------------
 void FEVectorMap::Init()
 {
 	m_a.unit();
 	m_d = vec3d(1,0,0);
 	if (m_a*m_d > .999) m_d = vec3d(0,1,0);
+}
+
+//-----------------------------------------------------------------------------
+void FEVectorMap::SetVectors(vec3d a, vec3d d)
+{ 
+	m_a = a; 
+	m_d = d; 
 }
 
 //-----------------------------------------------------------------------------
@@ -398,10 +431,23 @@ BEGIN_PARAMETER_LIST(FESphericalAngleMap, FECoordSysMap)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
+FESphericalAngleMap::FESphericalAngleMap(FEModel* pfem) : FECoordSysMap(pfem)
+{
+
+}
+
+//-----------------------------------------------------------------------------
 void FESphericalAngleMap::Init()
 {
 	m_theta = 0.0;
 	m_phi   = 90.0;
+}
+
+//-----------------------------------------------------------------------------
+void FESphericalAngleMap::SetAngles(double theta, double phi)
+{ 
+	m_theta = theta; 
+	m_phi = phi; 
 }
 
 //-----------------------------------------------------------------------------
