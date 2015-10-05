@@ -10,31 +10,36 @@
 	<string>FEBio2</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>b505bdfe-9d5c-0410-8600-697d5fc8e487</key>
-		<string>https://gforge.sci.utah.edu/svn/MRLProjects</string>
+		<key>b505bdfe-9d5c-0410-8600-697d5fc8e487++1133</key>
+		<string>https://gforge.sci.utah.edu/svn/MRLProjects/FEBio2</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>FEBio2/XCode5/FEBio2.xcworkspace</string>
+	<string>XCode5/FEBio2.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>b505bdfe-9d5c-0410-8600-697d5fc8e487</key>
-		<string>../../..</string>
+		<key>b505bdfe-9d5c-0410-8600-697d5fc8e487++1133</key>
+		<string>../..</string>
 	</dict>
+	<key>IDESourceControlProjectRepositoryRootDictionary</key>
+	<dict>
+		<key>b505bdfe-9d5c-0410-8600-697d5fc8e487++1133</key>
+		<string>https://gforge.sci.utah.edu/svn/MRLProjects</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://gforge.sci.utah.edu/svn/MRLProjects/FEBio2/XCode5/FEBio2.xcworkspace</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>b505bdfe-9d5c-0410-8600-697d5fc8e487</string>
+	<string>b505bdfe-9d5c-0410-8600-697d5fc8e487++1133</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
-			<key>IDESourceControlRepositoryBranchesRelativeLocationKey</key>
-			<string>branches</string>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.subversion</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>b505bdfe-9d5c-0410-8600-697d5fc8e487</string>
+			<string>b505bdfe-9d5c-0410-8600-697d5fc8e487++1133</string>
 			<key>IDESourceControlWCCName</key>
-			<string>MRLProjects</string>
+			<string>FEBio2</string>
 		</dict>
 	</array>
 </dict>

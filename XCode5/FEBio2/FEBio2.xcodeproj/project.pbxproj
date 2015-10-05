@@ -262,6 +262,7 @@
 		B489C44A1B18D06D00E5AD7F /* Release-Dave */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_VERSION = com.intel.compilers.icc.latest;
 				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG";
 				LIBRARY_SEARCH_PATHS = (
@@ -417,7 +418,7 @@
 				B489C4491B18D06D00E5AD7F /* Release-Dave */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release-Dave";
 		};
 		D5E10B701865E23500B23922 /* Build configuration list for PBXNativeTarget "FEBio2" */ = {
 			isa = XCConfigurationList;
@@ -427,7 +428,7 @@
 				B489C44A1B18D06D00E5AD7F /* Release-Dave */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release-Dave";
 		};
 /* End XCConfigurationList section */
 	};

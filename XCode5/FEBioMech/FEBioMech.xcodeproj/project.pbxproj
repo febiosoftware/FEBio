@@ -1560,6 +1560,7 @@
 		B489C4521B18DD8D00E5AD7F /* Release-Dave */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				EXECUTABLE_PREFIX = lib;
 				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DHAVE_GSL";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1683,7 +1684,7 @@
 				B489C4511B18DD8D00E5AD7F /* Release-Dave */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release-Dave";
 		};
 		D5E106891865DF9F00B23922 /* Build configuration list for PBXNativeTarget "FEBioMech" */ = {
 			isa = XCConfigurationList;
@@ -1693,7 +1694,7 @@
 				B489C4521B18DD8D00E5AD7F /* Release-Dave */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release-Dave";
 		};
 /* End XCConfigurationList section */
 	};

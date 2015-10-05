@@ -224,6 +224,7 @@
 		B489C44C1B18D0A800E5AD7F /* Release-Dave */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -344,7 +345,7 @@
 				B489C44B1B18D0A800E5AD7F /* Release-Dave */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release-Dave";
 		};
 		D5E1065B1865DF6000B23922 /* Build configuration list for PBXNativeTarget "FEBioLib" */ = {
 			isa = XCConfigurationList;
@@ -354,7 +355,7 @@
 				B489C44C1B18D0A800E5AD7F /* Release-Dave */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release-Dave";
 		};
 /* End XCConfigurationList section */
 	};

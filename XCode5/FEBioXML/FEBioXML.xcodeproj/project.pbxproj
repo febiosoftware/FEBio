@@ -291,6 +291,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -440,7 +441,7 @@
 				B489C4571B18DE0A00E5AD7F /* Release-Dave */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release-Dave";
 		};
 		D5E1098F1865E10A00B23922 /* Build configuration list for PBXNativeTarget "FEBioXML" */ = {
 			isa = XCConfigurationList;
@@ -450,7 +451,7 @@
 				B489C4581B18DE0A00E5AD7F /* Release-Dave */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release-Dave";
 		};
 /* End XCConfigurationList section */
 	};
