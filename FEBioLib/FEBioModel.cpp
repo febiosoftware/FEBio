@@ -289,7 +289,14 @@ void FEBioModel::Write(FE_OUTPUT_HINT hint)
 	}
 
 	// Dump converged state to the archive
-	if (pstep->m_bDump) DumpData();
+	int ndump = pstep->GetDumpLevel();
+	if (ndump != FE_DUMP_NEVER)
+	{
+		bool bdump = false;
+		if ((hint == FE_STEP_SOLVED) && (ndump == FE_DUMP_STEP      )) bdump = true;
+		if ((hint == FE_CONVERGED  ) && (ndump == FE_DUMP_MAJOR_ITRS)) bdump = true;
+		if (bdump) DumpData();
+	}
 
 	// write the output data
 	int nout = pstep->GetOutputLevel();
@@ -622,22 +629,18 @@ void FEBioModel::SerializeGeometry(DumpFile &ar)
 	// serialize the other geometry data
 	if (ar.IsSaving())
 	{
-		int i;
-
 		// FE objects
 		int nrb = rigid.Objects();
 		ar << nrb;
-		for (i=0; i<nrb; ++i) rigid.Object(i)->Serialize(ar);
+		for (int i=0; i<nrb; ++i) rigid.Object(i)->Serialize(ar);
 	}
 	else
 	{
-		int i;
-
 		// rigid bodies
-		int nrb;
+		int nrb = 0;
 		ar >> nrb;
 		rigid.Clear();
-		for (i=0; i<nrb; ++i)
+		for (int i=0; i<nrb; ++i)
 		{
 			FERigidBody* prb = new FERigidBody(this);
 			prb->Serialize(ar);
@@ -704,11 +707,6 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 			ar << d.GetTypeStr() << d.Elements();
 			d.Serialize(ar);
 		}
-
-		// write node element list
-		FENodeElemList nel = m.NodeElementList();
-		nel.Serialize(ar);
-
 	}
 	else
 	{
@@ -756,7 +754,7 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 		{
 			int nmat;
 			ar >> nmat;
-			FEMaterial* pm = GetMaterial(nmat);
+			FEMaterial* pm = FindMaterial(nmat);
 			assert(pm);
 
 			ar >> sz >> ne;
@@ -768,10 +766,6 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 
 			m.AddDomain(pd);
 		}
-
-		// read node element list
-		FENodeElemList nel = m.NodeElementList();
-		nel.Serialize(ar);
 
 		m.UpdateBox();
 	}

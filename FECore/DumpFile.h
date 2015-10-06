@@ -65,13 +65,13 @@ public:
 
 	DumpFile& operator << (const double a[3][3]);
 
-	template <class T> DumpFile& operator << (const T& o) { fwrite(&o, sizeof(T), 1, m_fp); return (*this); }
+	template <class T> DumpFile& operator << (const T& o) { write(&o, sizeof(T), 1); return (*this); }
 
 	template <class T> DumpFile& operator << (std::vector<T>& v)
 	{
 		int n = v.size();
-		fwrite(&n, sizeof(int), 1, m_fp);
-		if (n>0) fwrite((T*) &v[0], sizeof(T), v.size(), m_fp);
+		write(&n, sizeof(int), 1);
+		if (n>0) write((T*) &v[0], sizeof(T), v.size());
 		return (*this);
 	}
 
@@ -85,16 +85,16 @@ public:
 
 	DumpFile& operator >> (double a[3][3]);
 
-	template <class T> DumpFile& operator >> (T& o) { fread(&o, sizeof(T), 1, m_fp); return (*this); }
+	template <class T> DumpFile& operator >> (T& o) { read(&o, sizeof(T), 1); return (*this); }
 
 	template <class T> DumpFile& operator >> (std::vector<T>& v)
 	{
 		int n;
-		fread(&n, sizeof(int), 1, m_fp);
+		read(&n, sizeof(int), 1);
 		if (n>0)
 		{
 			v.resize(n);
-			fread((T*) &v[0], sizeof(T), n, m_fp);
+			read((T*) &v[0], sizeof(T), n);
 		}
 		else v.clear();
 		return (*this);
@@ -105,24 +105,22 @@ public:
 
 
 	//! write buffer to archive
-	size_t write(const void* pd, size_t size, size_t count)
-	{
-		return fwrite(pd, size, count, m_fp);
-	}
+	size_t write(const void* pd, size_t size, size_t count);
 
 	//! read buffer from archive
-	size_t read(void* pd, size_t size, size_t count)
-	{
-		return fread(pd, size, count, m_fp);
-	}
+	size_t read(void* pd, size_t size, size_t count);
 
 	//! get FEM model
 	FEModel* GetFEModel() { return m_pfem; }
+
+	//! get the current index
+	int GetDataIndex() const { return m_nindex; }
 
 protected:
 	FILE*		m_fp;		//!< The actual file pointer
 	FEModel*	m_pfem;		//!< FEM data that will be serialized
 	bool		m_bsave;	//!< Save flag
+	int			m_nindex;	//!< file index (gives amount of bytes written or read in so far)
 };
 
 #endif // !defined(AFX_ARCHIVE_H__B95A81B1_BBFB_46E5_B9B3_7675ED8A6029__INCLUDED_)

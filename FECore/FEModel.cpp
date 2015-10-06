@@ -212,6 +212,17 @@ bool FEModel::InitMesh()
 }
 
 //-----------------------------------------------------------------------------
+FEMaterial* FEModel::FindMaterial(int nid)
+{
+	for (int i=0; i<(int)m_MAT.size(); ++i)
+	{
+		FEMaterial* pm = m_MAT[i];
+		if (pm->GetID() == nid) return pm;
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Initialize material data
 bool FEModel::InitMaterials()
 {

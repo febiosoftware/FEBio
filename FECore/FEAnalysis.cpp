@@ -43,7 +43,7 @@ FEAnalysis::FEAnalysis(FEModel* pfem, int ntype) : FECoreBase(FEANALYSIS_ID), m_
 	m_ntotrhs    = 0;		// total nr of right hand side evaluations
 
 	// --- I/O Data ---
-	m_bDump = false;
+	m_ndump   = FE_DUMP_NEVER;
 	m_nplot   = FE_PLOT_MAJOR_ITRS;
 	m_nprint  = FE_PRINT_MINOR_ITRS;
 	m_noutput = FE_OUTPUT_MAJOR_ITRS;
@@ -638,7 +638,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		ar << m_nplot;
 		ar << m_nprint;
 		ar << m_noutput;
-		ar << m_bDump;
+		ar << m_ndump;
 		ar << m_nplot_stride;
 
 		// store the class IDs for the active model components
@@ -682,11 +682,11 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		ar >> m_nplot;
 		ar >> m_nprint;
 		ar >> m_noutput;
-		ar >> m_bDump;
+		ar >> m_ndump;
 		ar >> m_nplot_stride;
 
 #ifdef _DEBUG
-		m_bDump = false;
+		m_ndump = FE_DUMP_NEVER;
 #endif
 
 		// read the active model components

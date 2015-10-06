@@ -172,13 +172,13 @@ int FEBioCmd_Restart::run(int nargs, char **argv)
 {
 	assert(m_pfem);
 	FEAnalysis* pstep = m_pfem->GetCurrentStep();
-	bool bdump = pstep->m_bDump;
+	int ndump = pstep->GetDumpLevel();
 
-	if (nargs == 1) bdump = !bdump;
+	if (nargs == 1) ndump = (ndump == FE_DUMP_NEVER ? FE_DUMP_MAJOR_ITRS : FE_DUMP_NEVER);
 	else
 	{
-		if (strcmp(argv[1], "on") == 0) bdump = true;
-		else if (strcmp(argv[2], "off") == 0) bdump = false;
+		if      (strcmp(argv[1], "on" ) == 0) ndump = FE_DUMP_NEVER;
+		else if (strcmp(argv[2], "off") == 0) ndump = FE_DUMP_MAJOR_ITRS;
 		else 
 		{
 			fprintf(stderr, "%s is not a valid option for restart.\n", argv[1]);
@@ -186,8 +186,7 @@ int FEBioCmd_Restart::run(int nargs, char **argv)
 		}
 	}
 
-	pstep->m_bDump = bdump;
-	printf("Restart flag is %s\n", (bdump?"on":"off"));
+	pstep->SetDumpLevel(ndump);
 
 	return 0;
 }

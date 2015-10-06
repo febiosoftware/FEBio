@@ -243,7 +243,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				const char* szlc = tag.AttributeValue("lc");
 				int lc = atoi(szlc) - 1;
 
-				FERigidBodyForce* pFC = new FERigidBodyForce(&fem);
+				FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem));
 				pFC->id = nmat;
 				pFC->bc = bc;
 				pFC->lc = lc;
@@ -259,7 +259,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 			}
 			else if (strcmp(szt, "fixed") == 0)
 			{
-				FERigidBodyFixedBC* pBC = new FERigidBodyFixedBC(&fem);
+				FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "rigid_fixed",  &fem));
 				pBC->id = nmat;
 				pBC->bc = bc;
 				fem.m_RBC.push_back(pBC);
@@ -307,7 +307,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				const char* szlc = tag.AttributeValue("lc");
 				int lc = atoi(szlc) - 1;
 
-				FERigidBodyForce* pFC = new FERigidBodyForce(&fem);
+				FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem));
 				pFC->id = nmat;
 				pFC->bc = bc;
 				pFC->lc = lc;
@@ -323,7 +323,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 			}
 			else if (strcmp(szt, "fixed") == 0)
 			{
-				FERigidBodyFixedBC* pBC = new FERigidBodyFixedBC(&fem);
+				FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "rigid_fixed",  &fem));
 				pBC->id = nmat;
 				pBC->bc = bc;
 				fem.m_RBC.push_back(pBC);
@@ -441,7 +441,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			if ((ntype == 0)&&(lc==-1)) throw XMLReader::MissingAttribute(tag, "lc");
 
 			// create the rigid body force
-			FERigidBodyForce* pFC = new FERigidBodyForce(&fem);
+			FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem));
 			pFC->m_ntype = ntype;
 			pFC->id = nmat;
 			pFC->bc = bc;
@@ -471,7 +471,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
 			// create the fixed dof
-			FERigidBodyFixedBC* pBC = new FERigidBodyFixedBC(&fem);
+			FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "rigid_fixed",  &fem));
 			pBC->id = nmat;
 			pBC->bc = bc;
 			fem.m_RBC.push_back(pBC);

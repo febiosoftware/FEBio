@@ -102,7 +102,15 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	{
 		const char* szf = tag.AttributeValue("file", true);
 		if (szf) m_pim->SetDumpfileName(szf);
-		tag.value(pstep->m_bDump);
+		char szval[256];
+		tag.value(szval);
+		if		(strcmp(szval, "DUMP_DEFAULT"    ) == 0) {} // don't change the restart level
+		else if (strcmp(szval, "DUMP_NEVER"      ) == 0) pstep->SetDumpLevel(FE_DUMP_NEVER);
+		else if (strcmp(szval, "DUMP_MAJOR_ITRS" ) == 0) pstep->SetDumpLevel(FE_DUMP_MAJOR_ITRS);
+		else if (strcmp(szval, "DUMP_STEP"       ) == 0) pstep->SetDumpLevel(FE_DUMP_STEP);
+		else if (strcmp(szval, "0" ) == 0) pstep->SetDumpLevel(FE_DUMP_NEVER);		// for backward compatibility only
+		else if (strcmp(szval, "1" ) == 0) pstep->SetDumpLevel(FE_DUMP_MAJOR_ITRS); // for backward compatibility only
+		else throw XMLReader::InvalidValue(tag);
 	}
 	else if (tag == "time_stepper")
 	{

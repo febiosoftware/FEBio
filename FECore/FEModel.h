@@ -123,6 +123,9 @@ public: // --- Material functions ---
 	//! return a pointer to a material
 	FEMaterial* GetMaterial(int i) { return m_MAT[i]; }
 
+	//! find a material based on its index
+	FEMaterial* FindMaterial(int nid);
+
 	//! material initialization
 	bool InitMaterials();
 

@@ -97,6 +97,12 @@ public:
 	//! Get the output level
 	int GetOutputLevel() { return m_noutput; }
 
+	//! Set the dump level (for cold restarts)
+	void SetDumpLevel(int n) { m_ndump = n; }
+
+	//! get the dump level
+	int GetDumpLevel() { return m_ndump; }
+
 protected:
 	//! initialize constraint data
 	bool InitLinearConstraints();
@@ -158,7 +164,7 @@ public:
 		int		m_nplot;		//!< plot level
 		int		m_noutput;		//!< data output level
 		int		m_nplot_stride;	//!< stride for plotting
-		bool	m_bDump;		//!< create a restart file or not
+		int		m_ndump;		//!< create a restart file or not
 	//}
 
 private:

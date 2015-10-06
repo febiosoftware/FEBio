@@ -382,7 +382,9 @@ REGISTER_FECORE_CLASS(FEFacet2FacetTied      , FESURFACEPAIRINTERACTION_ID, "fac
 //-----------------------------------------------------------------------------
 // classes derived directly from FEModelLoad
 // TODO: define another SUPER_CLASS_ID for this
-REGISTER_FECORE_CLASS(FERigidAxialForce, FEBC_ID, "rigid_axial_force");
+REGISTER_FECORE_CLASS(FERigidAxialForce , FEBC_ID, "rigid_axial_force");
+REGISTER_FECORE_CLASS(FERigidBodyForce  , FEBC_ID, "rigid_force"      );
+REGISTER_FECORE_CLASS(FERigidBodyFixedBC, FEBC_ID, "rigid_fixed"      );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
