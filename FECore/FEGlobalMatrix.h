@@ -30,7 +30,7 @@ public:
 	virtual ~FEGlobalMatrix();
 
 	//! construct the stiffness matrix from a FEM object
-	virtual bool Create(FEModel* psolver, int neq, bool breset) = 0;
+	virtual bool Create(FEModel* psolver, int neq, bool breset);
 
 	//! clears the sparse matrix that stores the stiffness matrix
 	void Clear();
@@ -70,6 +70,7 @@ protected:
 
 	// The following data structures are used to incrementally
 	// build the profile of the sparse matrix
+
 	SparseMatrixProfile*	m_pMP;		//!< profile of sparse matrix
 	vector< vector<int> >			m_LM;		//!< used for building the stiffness matrix
 	int	m_nlm;									//!< nr of elements in m_LM array

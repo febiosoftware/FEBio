@@ -52,7 +52,8 @@ bool FELinearSolidSolver::Init()
 	// then the solver might already be allocated. That's way we need to check it.
 	if (m_plinsolve == 0)
 	{
-		m_plinsolve = NumCore::CreateLinearSolver(m_fem.m_nsolver);
+		FECoreKernel& fecore = FECoreKernel::GetInstance();
+		m_plinsolve = fecore.CreateLinearSolver(m_fem.m_nsolver);
 		if (m_plinsolve == 0)
 		{
 			felog.printbox("FATAL ERROR","Unknown solver type selected\n");

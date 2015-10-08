@@ -10,22 +10,34 @@
 #include "WSMPSolver.h"
 #include "RCICGSolver.h"
 #include "FECore/FE_enum.h"
+#include "FECore/FECoreFactory.h"
+#include "FECore/FECoreKernel.h"
 
-LinearSolver* NumCore::CreateLinearSolver(int ntype)
+namespace NumCore {
+
+template <class T, int nid> class LinearSolverFactory_T : public FELinearSolverFactory
 {
-	LinearSolver* pls = 0;
-	switch (ntype)
+public:
+	LinearSolverFactory_T() : FELinearSolverFactory(nid)
 	{
-	case SKYLINE_SOLVER      : pls = new SkylineSolver(); break;
-	case PSLDLT_SOLVER       : pls = new PSLDLTSolver (); break;
-	case SUPERLU_SOLVER      : pls = new SuperLUSolver(); break;
-	case SUPERLU_MT_SOLVER   : pls = new SuperLU_MT_Solver(); break;
-	case PARDISO_SOLVER      : pls = new PardisoSolver(); break;
-	case LU_SOLVER           : pls = new LUSolver(); break;
-	case WSMP_SOLVER         : pls = new WSMPSolver(); break;
-	case CG_ITERATIVE_SOLVER : pls = new ConjGradIterSolver(); break;
-	case RCICG_SOLVER        : pls = new RCICGSolver(); break;
+		FECoreKernel& fecore = FECoreKernel::GetInstance();
+		fecore.RegisterLinearSolver(this);
 	}
+	LinearSolver* Create() { return new T(); }
+};
 
-	return pls;
+#define REGISTER_LINEAR_SOLVER(theSolver, theID) static LinearSolverFactory_T<theSolver, theID> _##theSolver;
+}
+
+void NumCore::InitModule()
+{
+REGISTER_LINEAR_SOLVER(SkylineSolver     , SKYLINE_SOLVER     );
+REGISTER_LINEAR_SOLVER(PSLDLTSolver      , PSLDLT_SOLVER      );
+REGISTER_LINEAR_SOLVER(SuperLUSolver     , SUPERLU_SOLVER     );
+REGISTER_LINEAR_SOLVER(SuperLU_MT_Solver , SUPERLU_MT_SOLVER  );
+REGISTER_LINEAR_SOLVER(PardisoSolver     , PARDISO_SOLVER     );
+REGISTER_LINEAR_SOLVER(LUSolver          , LU_SOLVER          );
+REGISTER_LINEAR_SOLVER(WSMPSolver        , WSMP_SOLVER        );
+REGISTER_LINEAR_SOLVER(ConjGradIterSolver, CG_ITERATIVE_SOLVER);
+REGISTER_LINEAR_SOLVER(RCICGSolver       , RCICG_SOLVER       );
 }

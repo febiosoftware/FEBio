@@ -466,7 +466,6 @@
     <ClInclude Include="..\..\FEBioHeat\FEHeatSolidDomain.h" />
     <ClInclude Include="..\..\FEBioHeat\FEHeatSolver.h" />
     <ClInclude Include="..\..\FEBioHeat\FEHeatSource.h" />
-    <ClInclude Include="..\..\FEBioHeat\FEHeatStiffnessMatrix.h" />
     <ClInclude Include="..\..\FEBioHeat\FEHeatTransferAnalysis.h" />
     <ClInclude Include="..\..\FEBioHeat\FEHeatTransferMaterial.h" />
     <ClInclude Include="..\..\FEBioHeat\FEIsotropicFourier.h" />
@@ -490,7 +489,6 @@
     <ClCompile Include="..\..\FEBioHeat\FEHeatSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEHeatSolver.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEHeatSource.cpp" />
-    <ClCompile Include="..\..\FEBioHeat\FEHeatStiffnessMatrix.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEHeatTransferAnalysis.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEIsotropicFourier.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEPlotHeatFlux.cpp" />

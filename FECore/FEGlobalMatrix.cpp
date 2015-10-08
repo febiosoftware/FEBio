@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEGlobalMatrix.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! Takes a SparseMatrix structure that defines the structure of the global matrix.
@@ -77,4 +78,41 @@ void FEGlobalMatrix::build_end()
 {
 	if (m_nlm > 0) build_flush();
 	m_pA->Create(*m_pMP);
+}
+
+//-----------------------------------------------------------------------------
+bool FEGlobalMatrix::Create(FEModel* pfem, int neq, bool breset)
+{
+	// keep a pointer to the FEM object
+	FEModel& fem = *pfem;
+	FEAnalysis* pstep = fem.GetCurrentStep();
+
+	// begin building the profile
+	if (breset)
+	{
+		build_begin(neq);
+		{
+			SparseMatrixProfile& MP = *m_pMP;
+
+			vector<int> elm;
+
+			// Add all elements to the profile
+			// Loop over all active domains
+			for (int nd=0; nd<pstep->Domains(); ++nd)
+			{
+				FEDomain& d = *pstep->Domain(nd);
+				for (int j=0; j<d.Elements(); ++j)
+				{
+					FEElement& el = d.ElementRef(j);
+					d.UnpackLM(el, elm);
+					build_add(elm);
+				}
+			}
+		}
+	}
+	// All done! We can now finish building the profile and create 
+	// the actual sparse matrix. This is done in the following function
+	build_end();
+
+	return true;
 }

@@ -54,3 +54,21 @@ public:
 
 	virtual FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat) = 0;
 };
+
+//-----------------------------------------------------------------------------
+// factory class for linear solvers.
+class LinearSolver;
+
+class FELinearSolverFactory
+{
+public:
+	FELinearSolverFactory(int nid) : m_nsolver_id(nid) {}
+	virtual ~FELinearSolverFactory(){}
+
+	virtual LinearSolver* Create() = 0;
+
+	int GetID() { return m_nsolver_id; }
+
+private:
+	int	m_nsolver_id;
+};

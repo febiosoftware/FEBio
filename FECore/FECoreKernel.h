@@ -54,9 +54,17 @@ public:
 	//! Create a domain of a certain type
 	FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat);
 
+public:
+	//! Register a linear solver factory
+	void RegisterLinearSolver(FELinearSolverFactory* pf);
+
+	//! create a linear solver factory
+	LinearSolver* CreateLinearSolver(int nsolver);
+
 private:
-	std::vector<FECoreFactory*>		m_Fac;	// list of registered factory classes
-	std::vector<FEDomainFactory*>	m_Dom;	// list of domain factory classes
+	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
+	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
+	std::vector<FELinearSolverFactory*> m_LS;	// list of linear solver factories
 
 	Logfile*	m_plog;	// keep a pointer to the logfile (used by plugins)
 

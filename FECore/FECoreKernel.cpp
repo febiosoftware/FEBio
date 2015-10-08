@@ -110,3 +110,20 @@ FEDomain* FECoreKernel::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FE
 	}
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+void FECoreKernel::RegisterLinearSolver(FELinearSolverFactory* pf)
+{
+	m_LS.push_back(pf); 
+}
+
+//-----------------------------------------------------------------------------
+LinearSolver* FECoreKernel::CreateLinearSolver(int nsolver)
+{
+	for (int i=0; i<(int)m_LS.size(); ++i)
+	{
+		FELinearSolverFactory* pls = m_LS[i];
+		if (pls->GetID() == nsolver) return pls->Create();
+	}
+	return 0;
+}

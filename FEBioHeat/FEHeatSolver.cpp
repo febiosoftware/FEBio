@@ -3,11 +3,12 @@
 #include "FEConvectiveHeatFlux.h"
 #include "FEHeatTransferMaterial.h"
 #include "FEHeatSource.h"
-#include "FEHeatStiffnessMatrix.h"
 #include "FECore/FENodeReorder.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
 #include "NumCore/NumCore.h"
+#include "FECore/LinearSolver.h"
+#include "FECore/FEGlobalMatrix.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -54,7 +55,8 @@ bool FEHeatSolver::Init()
 	// then the solver might already be allocated. That's way we need to check it.
 	if (m_plinsolve == 0)
 	{
-		m_plinsolve = NumCore::CreateLinearSolver(m_fem.m_nsolver);
+		FECoreKernel& fecore = FECoreKernel::GetInstance();
+		m_plinsolve = fecore.CreateLinearSolver(m_fem.m_nsolver);
 		if (m_plinsolve == 0)
 		{
 			felog.printbox("FATAL ERROR","Unknown solver type selected\n");
@@ -77,7 +79,7 @@ bool FEHeatSolver::Init()
 	// Create the stiffness matrix.
 	// Note that this does not construct the stiffness matrix. This
 	// is done later in the StiffnessMatrix routine.
-	m_pK = new FEHeatStiffnessMatrix(pS);
+	m_pK = new FEGlobalMatrix(pS);
 	if (m_pK == 0)
 	{
 		felog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "FECore/FESolver.h"
-#include "FECore/LinearSolver.h"
 #include "FEHeatSolidDomain.h"
 
 //-----------------------------------------------------------------------------
-class FEHeatStiffnessMatrix;
+class FEGlobalMatrix;
+class LinearSolver;
 
 //-----------------------------------------------------------------------------
 //! The FEHeatSolver solves heat-conduction problems
@@ -85,8 +85,8 @@ protected:
 
 	LinearSolver*	m_plinsolve;
 
-	FEHeatStiffnessMatrix*	m_pK;
-	int						m_neq;		//!< number of equations
+	FEGlobalMatrix*		m_pK;
+	int					m_neq;		//!< number of equations
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

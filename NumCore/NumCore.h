@@ -4,6 +4,6 @@
 
 namespace NumCore {
 
-LinearSolver* CreateLinearSolver(int ntype);
+void InitModule();
 
 } // namespace NumCore
