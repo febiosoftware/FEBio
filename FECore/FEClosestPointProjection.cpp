@@ -88,6 +88,31 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 	//
 	if (m_bspecial)
 	{
+		// First, let's redo the search but with a larger search radius
+		// NOTE: This is highly inefficient since multiple nodes and faces are visited multiple times
+		for (int i=0; i<nval; ++i)
+		{
+			// get the master element
+			FESurfaceElement& el = static_cast<FESurfaceElement&> (*pe[i]);
+			int N = el.Nodes();
+			for (int j=0; j<N; ++j)
+			{
+				int mj = el.m_lnode[j];
+				int nj = m_NEL.Valence(mj);
+				FEElement** pej = m_NEL.ElementList(mj);
+				for (int k=0; k<nj; ++k)
+				{
+					FESurfaceElement& ek = static_cast<FESurfaceElement&> (*pej[k]);
+
+					// project the node on the element
+					r[0] = 0;
+					r[1] = 0;
+					q = m_surf.ProjectToSurface(ek, x, r[0], r[1]);
+					if (m_surf.IsInsideElement(ek, r[0], r[1], m_tol)) return &ek;
+				}
+			}
+		}
+
 		// This tries to handle some of the special cases. 
 		// For now, we only consider triangular facets. 
 		// First we try to find an edge this point projects on
