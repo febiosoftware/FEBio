@@ -97,6 +97,12 @@ FEBioImport::MissingMaterialProperty::MissingMaterialProperty(const char* szmat,
 }
 
 //-----------------------------------------------------------------------------
+FEBioImport::FailedAllocatingSolver::FailedAllocatingSolver(const char* sztype)
+{
+	SetErrorString("Failed allocating solver \"%s\"", sztype);
+}
+
+//-----------------------------------------------------------------------------
 FEModel* FEBioFileSection::GetFEModel() { return m_pim->GetFEModel(); }
 FEAnalysis* FEBioFileSection::GetStep() { return m_pim->GetStep(); }
 
@@ -305,7 +311,7 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	// intialize some variables
 	m_pStep = 0;	// zero step pointer
 	m_nsteps = 0;	// reset step section counter
-	m_nstep_type = FE_SOLID;	// default step type in case Module section is not defined
+	sprintf(m_szmod, "solid");
 	m_nversion = -1;
 	m_szdmp[0] = 0;
 	m_szlog[0] = 0;
@@ -477,24 +483,7 @@ FEAnalysis* FEBioImport::GetStep()
 //-----------------------------------------------------------------------------
 FEAnalysis* FEBioImport::CreateNewStep()
 {
-	FEAnalysis* pstep = 0;
-	
-	switch (m_nstep_type)
-	{
-	case FE_SOLID         : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid"          , m_pfem); break;
-	case FE_SOLID2        : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid"          , m_pfem); break;
-	case FE_CG_SOLID      : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid"          , m_pfem); break;
-	case FE_EXPLICIT_SOLID: pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "explicit-solid" , m_pfem); break;
-	case FE_LINEAR_SOLID  : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "linear-solid"   , m_pfem); break;
-	case FE_BIPHASIC      : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "biphasic"       , m_pfem); break;
-	case FE_POROSOLUTE    : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "biphasic-solute", m_pfem); break;
-	case FE_MULTIPHASIC   : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "multiphasic"    , m_pfem); break;
-	case FE_HEAT          : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "heat transfer"  , m_pfem); break;
-	case FE_THERMO_ELASTIC: pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "thermo-elastic" , m_pfem); break;
-    case FE_FLUID         : pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "fluid"          , m_pfem); break;
-	default:
-		assert(false);
-	}
+	FEAnalysis* pstep = new FEAnalysis(m_pfem);
 	return pstep;
 }
 

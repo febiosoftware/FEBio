@@ -6,25 +6,10 @@
 using namespace FECore;
 
 //-----------------------------------------------------------------------------
-FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)
+FESolver* FEBioControlSection::BuildSolver(const char* sztype, FEModel& fem)
 {
-	switch (nmod)
-	{
-	case FE_SOLID         : return fecore_new<FESolver>(FESOLVER_ID, "solid"          , &fem);
-	case FE_SOLID2        : return fecore_new<FESolver>(FESOLVER_ID, "solid2"         , &fem);
-	case FE_CG_SOLID      : return fecore_new<FESolver>(FESOLVER_ID, "CG-solid"       , &fem);
-	case FE_EXPLICIT_SOLID: return fecore_new<FESolver>(FESOLVER_ID, "explicit-solid" , &fem);
-	case FE_LINEAR_SOLID  : return fecore_new<FESolver>(FESOLVER_ID, "linear-solid"   , &fem);
-	case FE_BIPHASIC      : return fecore_new<FESolver>(FESOLVER_ID, "biphasic"       , &fem);
-	case FE_POROSOLUTE    : return fecore_new<FESolver>(FESOLVER_ID, "biphasic-solute", &fem);
-	case FE_MULTIPHASIC   : return fecore_new<FESolver>(FESOLVER_ID, "multiphasic"    , &fem);
-	case FE_HEAT          : return fecore_new<FESolver>(FESOLVER_ID, "heat transfer"  , &fem);
-	case FE_THERMO_ELASTIC: return fecore_new<FESolver>(FESOLVER_ID, "thermo-elastic" , &fem);
-    case FE_FLUID         : return fecore_new<FESolver>(FESOLVER_ID, "fluid"          , &fem);
-	default:
-		assert(false);
-		return 0;
-	}
+	FESolver* ps = fecore_new<FESolver>(FESOLVER_ID, sztype, &fem);
+	return ps;
 }
 
 //-----------------------------------------------------------------------------
@@ -37,7 +22,8 @@ void FEBioControlSection::Parse(XMLTag& tag)
 	FESolver* psolver = pstep->GetFESolver();
 	if (psolver == 0)
 	{
-		psolver = BuildSolver(m_pim->m_nstep_type, fem);
+		psolver = BuildSolver(m_pim->m_szmod, fem);
+		if (psolver == 0) throw FEBioImport::FailedAllocatingSolver(m_pim->m_szmod);
 		pstep->SetFESolver(psolver);
 	}
 

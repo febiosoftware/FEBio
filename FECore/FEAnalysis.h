@@ -1,6 +1,5 @@
 #pragma once
 #include "DumpFile.h"
-#include "FECoreBase.h"
 #include "FEBoundaryCondition.h"
 #include "FESurfacePairInteraction.h"
 #include "FENLConstraint.h"
@@ -15,11 +14,11 @@ namespace FECore {
 
 //-----------------------------------------------------------------------------
 //! Base class for finite element analysis
-class FEAnalysis : public FECoreBase
+class FEAnalysis
 {
 public:
 	//! constructor
-	FEAnalysis(FEModel* pfem, int ntype);
+	FEAnalysis(FEModel* pfem);
 
 	//! destructor
 	virtual ~FEAnalysis();
@@ -41,12 +40,6 @@ public:
 
 	//! Serialize data from and to a binary archive
 	virtual void Serialize(DumpFile& ar);
-
-	//! get the step type
-	int GetType () { return m_ntype; }
-
-	//! set the step type
-	void SetType(int ntype) { m_ntype = ntype; }
 
 public:
 	FEModel& GetFEModel() { return m_fem; }
@@ -126,7 +119,6 @@ public:
 	//{
 		int		m_nanalysis;	//!< analysis type
 		int		m_istiffpr;		//!< calculate pressure stiffness \todo remove
-		int		m_ntype;		//!< step type
 	//}
 
 	// --- Time Step Data ---

@@ -794,6 +794,40 @@ void FESolidSolver2::PrepStep(double time)
 		}
 	}
 
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	if (pstep->m_nanalysis == FE_DYNAMIC)
+	{
+		FEMesh& mesh = m_fem.GetMesh();
+		FERigidSystem& rigid = *m_fem.GetRigidSystem();
+
+		// set the initial velocities of all rigid nodes
+		for (int i=0; i<mesh.Nodes(); ++i)
+		{
+			FENode& n = mesh.Node(i);
+			if (n.m_rid >= 0)
+			{
+				FERigidBody& rb = *rigid.Object(n.m_rid);
+				vec3d V = rb.m_vt;
+				vec3d W = rb.m_wt;
+				vec3d r = n.m_rt - rb.m_rt;
+
+				vec3d v = V + (W ^ r); 
+				n.m_vp = n.m_vt = v;
+
+				vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
+				n.m_ap = n.m_at = a;
+			}
+		}
+	}
+
+	// store the current rigid body reaction forces
+	for (int i=0; i<rigid.Objects(); ++i)
+	{
+		FERigidBody& RB = *rigid.Object(i);
+		RB.m_Fp = RB.m_Fr;
+		RB.m_Mp = RB.m_Mr;
+	}
+
 	// initialize contact
 	if (m_fem.SurfacePairInteractions() > 0) UpdateContact();
 

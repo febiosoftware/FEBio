@@ -119,7 +119,7 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FENLCONSTRAINT_ID           0x0006	// derived from FENLConstraint
 #define FECOORDSYSMAP_ID            0x0007	// derived from FECoordSysMap
 #define FEPLOTDATA_ID               0x0008	// derived from FEPlotData
-#define FEANALYSIS_ID               0x0009	// derived from FEAnalysis
+//#define FEANALYSIS_ID               0x0009	// derived from FEAnalysis (Obsolete from 2.5)
 #define FESURFACEPAIRINTERACTION_ID 0x000A	// derived from FESurfacePairInteraction
 #define FENODELOGDATA_ID            0x000B	// derived from FENodeLogData
 #define FEELEMLOGDATA_ID            0x000C	// derived from FElemLogData
@@ -151,27 +151,9 @@ enum FE_Linear_Solver_Type {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// ENUM: Step types
-//
-enum FE_Step_Type {
-	FE_SOLID,
-	FE_SOLID2,
-	FE_BIPHASIC,
-	FE_HEAT,
-	FE_POROSOLUTE,
-	FE_MULTIPHASIC,
-	FE_LINEAR_SOLID,
-	FE_HEAT_SOLID,
-	FE_EXPLICIT_SOLID,
-	FE_CG_SOLID,
-	FE_THERMO_ELASTIC,
-    FE_FLUID
-};
-
-///////////////////////////////////////////////////////////////////////////////
 // ENUM: Analysis types
 //  Types of analysis that can be performed
-//
+// TODO: Make this a FESolver attribute
 enum FE_Analysis_Type {
 	FE_STATIC		= 0,
 	FE_DYNAMIC		= 1,

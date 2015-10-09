@@ -6,7 +6,6 @@
 #include "FENewtonianFluid.h"
 #include "FECarreauFluid.h"
 
-#include "FEFluidAnalysis.h"
 #include "FEFluidSolver.h"
 #include "FEFluidDomain.h"
 
@@ -26,10 +25,6 @@ void FEBioFluid::InitModule()
 // Domain factory
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 	febio.RegisterDomain(new FEFluidDomainFactory);
-
-//-----------------------------------------------------------------------------
-// Analysis classes
-REGISTER_FECORE_CLASS(FEFluidAnalysis      , FEANALYSIS_ID, "fluid"       );
 
 //-----------------------------------------------------------------------------
 // solver classes

@@ -104,7 +104,7 @@ FEBiphasicTangentDiagnostic::FEBiphasicTangentDiagnostic(FEModel& fem) : FEDiagn
 {
 	m_pscn = 0;
 
-	FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "biphasic", &fem);
+	FEAnalysis* pstep = new FEAnalysis(&fem);
 
 	// create a new solver
 	FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "biphasic", &fem);

@@ -44,9 +44,6 @@
 #include "FESlidingInterfaceMP.h"
 #include "FETiedBiphasicInterface.h"
 
-#include "FEBiphasicAnalysis.h"
-#include "FEBiphasicSoluteAnalysis.h"
-#include "FEMultiphasicAnalysis.h"
 #include "FEBiphasicSolver.h"
 #include "FEBiphasicSoluteSolver.h"
 #include "FEMultiphasicSolver.h"
@@ -76,16 +73,10 @@ REGISTER_FECORE_CLASS(FESoluteData, FEGLOBALDATA_ID, "solute"     );
 REGISTER_FECORE_CLASS(FESBMData   , FEGLOBALDATA_ID, "solid_bound");
 
 //-----------------------------------------------------------------------------
-// Analysis classes
-REGISTER_FECORE_CLASS(FEBiphasicAnalysis      , FEANALYSIS_ID, "biphasic"       );
-REGISTER_FECORE_CLASS(FEBiphasicSoluteAnalysis, FEANALYSIS_ID, "biphasic-solute");
-REGISTER_FECORE_CLASS(FEMultiphasicAnalysis   , FEANALYSIS_ID, "multiphasic"    );
-
-//-----------------------------------------------------------------------------
 // solver classes
-REGISTER_FECORE_CLASS(FEBiphasicSolver      , FESOLVER_ID, "biphasic"       );
-REGISTER_FECORE_CLASS(FEBiphasicSoluteSolver, FESOLVER_ID, "biphasic-solute");
-REGISTER_FECORE_CLASS(FEMultiphasicSolver   , FESOLVER_ID, "multiphasic"    );
+REGISTER_FECORE_CLASS(FEBiphasicSolver      , FESOLVER_ID, "biphasic"   );
+REGISTER_FECORE_CLASS(FEBiphasicSoluteSolver, FESOLVER_ID, "solute"     );
+REGISTER_FECORE_CLASS(FEMultiphasicSolver   , FESOLVER_ID, "multiphasic");
 
 //-----------------------------------------------------------------------------
 // Materials

@@ -145,9 +145,6 @@ bool FEThermoElasticSolver::Quasin(double time)
 	// get the current step
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
-	// make-sure this is a thermo-elastic problem
-	assert(pstep->GetType() == FE_THERMO_ELASTIC);
-
 	// prepare for the first iteration
 	PrepStep(time);
 

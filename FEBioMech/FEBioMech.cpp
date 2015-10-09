@@ -135,7 +135,6 @@
 #include "FERigidContractileForce.h"
 #include "FERigidForce.h"
 
-#include "FESolidAnalysis.h"
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
 #include "FELinearSolidSolver.h"
@@ -171,15 +170,9 @@ void FEBioMech::InitModule()
 	febio.RegisterDomain(new FESolidDomainFactory);
 
 //-----------------------------------------------------------------------------
-// Analysis classes
-REGISTER_FECORE_CLASS(FESolidAnalysis        , FEANALYSIS_ID, "solid"         );
-REGISTER_FECORE_CLASS(FEExplicitSolidAnalysis, FEANALYSIS_ID, "explicit-solid");
-REGISTER_FECORE_CLASS(FELinearSolidAnalysis  , FEANALYSIS_ID, "linear-solid"  );
-
-//-----------------------------------------------------------------------------
 // Solver classes
-REGISTER_FECORE_CLASS(FESolidSolver        , FESOLVER_ID, "solid"         );
-REGISTER_FECORE_CLASS(FESolidSolver2       , FESOLVER_ID, "solid2"        );
+REGISTER_FECORE_CLASS(FESolidSolver        , FESOLVER_ID, "solid_old"     );
+REGISTER_FECORE_CLASS(FESolidSolver2       , FESOLVER_ID, "solid"         );
 REGISTER_FECORE_CLASS(FEExplicitSolidSolver, FESOLVER_ID, "explicit-solid");
 REGISTER_FECORE_CLASS(FELinearSolidSolver  , FESOLVER_ID, "linear-solid"  );
 REGISTER_FECORE_CLASS(FECGSolidSolver      , FESOLVER_ID, "CG-solid"      );

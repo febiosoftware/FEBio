@@ -141,9 +141,6 @@
     <ClCompile Include="..\..\FEBioMix\FESFDSBM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMix\FEBiphasicAnalysis.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMix\FEBioMixPlot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -156,13 +153,7 @@
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMix\FEMultiphasicAnalysis.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMix\FEMixDomainFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMix\FEBiphasicSoluteAnalysis.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMix\FEDiffAlbroIso.cpp">
@@ -338,9 +329,6 @@
     <ClInclude Include="..\..\FEBioMix\FESFDSBM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMix\FEBiphasicAnalysis.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMix\FEBioMixPlot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -353,13 +341,7 @@
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMix\FEMultiphasicAnalysis.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMix\FEMixDomainFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioMix\FEBiphasicSoluteAnalysis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMix\FEDiffAlbroIso.h">

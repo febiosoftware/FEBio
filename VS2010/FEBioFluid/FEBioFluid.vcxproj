@@ -270,7 +270,6 @@
     <ClCompile Include="..\..\FEBioFluid\FECarreauFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEElasticFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluid.cpp" />
-    <ClCompile Include="..\..\FEBioFluid\FEFluidAnalysis.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidDomain.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidResidualVector.cpp" />
@@ -289,7 +288,6 @@
     <ClInclude Include="..\..\FEBioFluid\FECarreauFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEElasticFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluid.h" />
-    <ClInclude Include="..\..\FEBioFluid\FEFluidAnalysis.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidDomain.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidDomainFactory.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidResidualVector.h" />

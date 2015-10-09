@@ -111,6 +111,12 @@ public:
 	public: MissingMaterialProperty(const char* szmat, const char* szprop);
 	};
 
+	//! Failed allocating solver
+	class FailedAllocatingSolver : public Exception
+	{
+	public: FailedAllocatingSolver(const char* sztype);
+	};
+
 public:
 	//-------------------------------------------------------------------------
 	class PlotVariable
@@ -214,9 +220,9 @@ public:
 	vector<XMLParam>	m_Param;	// parameter list
 
 public:
-	int m_nsteps;		//!< nr of step sections read
-	int	m_nstep_type;	//!< step type
-	int	m_maxid;		//!< max element ID
+	char	m_szmod[256];	//!< module type string
+	int		m_nsteps;		//!< nr of step sections read
+	int		m_maxid;		//!< max element ID
 
 	bool	m_b3field_hex;	//!< three-field element flag for hex (and wedge elements)
 	bool	m_b3field_tet;	//!< three-field element flag for quadratic tets

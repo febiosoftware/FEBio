@@ -187,7 +187,7 @@ FETangentDiagnostic::FETangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 	m_pscn = 0;
 
 	// create an analysis step
-	FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", &fem);
+	FEAnalysis* pstep = new FEAnalysis(&fem);
 
 	// create a new solver
 	FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "solid", &fem);

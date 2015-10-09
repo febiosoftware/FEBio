@@ -833,14 +833,9 @@ void FEModel::CopyFrom(FEModel& fem)
 	{
 		// get the type string
 		FEAnalysis* ps = fem.GetStep(i);
-		const char* sztype = ps->GetTypeStr();
 
 		// create a new step
-		FEAnalysis* pnew = fecore_new<FEAnalysis>(FEANALYSIS_ID, sztype, this);
-		assert(pnew);
-
-		// copy parameter data
-		pnew->GetParameterList() = ps->GetParameterList();
+		FEAnalysis* pnew = new FEAnalysis(this);
 
 		// copy additional info
 		pnew->m_nanalysis = ps->m_nanalysis;
@@ -862,7 +857,7 @@ void FEModel::CopyFrom(FEModel& fem)
 
 		// copy the solver
 		FESolver* psolver = ps->GetFESolver();
-		sztype = psolver->GetTypeStr();
+		const char* sztype = psolver->GetTypeStr();
 
 		// create a new solver
 		FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, sztype, this);

@@ -21,7 +21,7 @@ void write_hb(CompactMatrix& m, FILE* fp)
 //-----------------------------------------------------------------------------
 FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
-	FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", &fem);
+	FEAnalysis* pstep = new FEAnalysis(&fem);
     fem.AddStep(pstep);
     fem.m_nStep = 0;
     fem.SetCurrentStep(pstep);

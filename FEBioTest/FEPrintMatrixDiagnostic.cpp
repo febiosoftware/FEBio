@@ -28,7 +28,7 @@ FEPrintMatrixDiagnostic::FEPrintMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fe
 	m_rng[0] = m_rng[1] = 0;
 	m_rng[2] = m_rng[3] = -1;
 
-	FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", &fem);
+	FEAnalysis* pstep = new FEAnalysis(&fem);
     fem.AddStep(pstep);
     fem.m_nStep = 0;
     fem.SetCurrentStep(pstep);

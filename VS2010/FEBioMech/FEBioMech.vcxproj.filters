@@ -294,9 +294,6 @@
     <ClCompile Include="..\..\FEBioMech\FEEFD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FESolidAnalysis.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEBioMechPlot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -834,9 +831,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEEFD.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FESolidAnalysis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEBioMechPlot.h">

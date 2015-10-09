@@ -48,9 +48,6 @@
     <ClInclude Include="..\..\FEBioHeat\FEPlotHeatFlux.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioHeat\FEHeatTransferAnalysis.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioHeat\FEHeatDomainFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -70,9 +67,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioHeat\FEThermalConductivity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioHeat\FEThermoElasticAnalysis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioHeat\FEThermoNeoHookean.h">
@@ -110,9 +104,6 @@
     <ClCompile Include="..\..\FEBioHeat\FEPlotHeatFlux.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioHeat\FEHeatTransferAnalysis.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioHeat\FEHeatDomainFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -132,9 +123,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioHeat\FEThermalConductivity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioHeat\FEThermoElasticAnalysis.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioHeat\FEThermoNeoHookean.cpp">

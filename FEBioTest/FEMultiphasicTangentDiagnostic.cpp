@@ -143,7 +143,8 @@ FEMultiphasicTangentDiagnostic::FEMultiphasicTangentDiagnostic(FEModel& fem) : F
 {
     m_pscn = 0;
 
-	FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "multiphasic", &fem);
+	FEAnalysis* pstep = new FEAnalysis(&fem);
+
 	// create a new solver
 	FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "multiphasic", &fem);
 	assert(pnew_solver);

@@ -196,9 +196,6 @@ bool FEMultiphasicSolver::Quasin(double time)
 	// get the current step
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
-	// make sure this is poro-solute problem
-	assert(pstep->GetType() == FE_MULTIPHASIC);
-
 	// prepare for the first iteration
 	PrepStep(time);
 

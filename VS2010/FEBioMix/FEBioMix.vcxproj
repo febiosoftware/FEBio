@@ -459,9 +459,7 @@
     <ClCompile Include="..\..\FEBioMix\FEBioMixData.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBioMixPlot.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasic.cpp" />
-    <ClCompile Include="..\..\FEBioMix\FEBiphasicAnalysis.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicContactSurface.cpp" />
-    <ClCompile Include="..\..\FEBioMix\FEBiphasicSoluteAnalysis.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEDiffAlbroIso.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEFiberExpPowSBM.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEFiberPowLinearSBM.cpp" />
@@ -483,7 +481,6 @@
     <ClCompile Include="..\..\FEBioMix\FEMassActionReversible.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMichaelisMenten.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasic.cpp" />
-    <ClCompile Include="..\..\FEBioMix\FEMultiphasicAnalysis.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicMultigeneration.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicSolver.cpp" />
@@ -525,9 +522,7 @@
     <ClInclude Include="..\..\FEBioMix\FEBioMixData.h" />
     <ClInclude Include="..\..\FEBioMix\FEBioMixPlot.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasic.h" />
-    <ClInclude Include="..\..\FEBioMix\FEBiphasicAnalysis.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicContactSurface.h" />
-    <ClInclude Include="..\..\FEBioMix\FEBiphasicSoluteAnalysis.h" />
     <ClInclude Include="..\..\FEBioMix\FEDiffAlbroIso.h" />
     <ClInclude Include="..\..\FEBioMix\FEFiberExpPowSBM.h" />
     <ClInclude Include="..\..\FEBioMix\FEFiberPowLinearSBM.h" />
@@ -549,7 +544,6 @@
     <ClInclude Include="..\..\FEBioMix\FEMassActionReversible.h" />
     <ClInclude Include="..\..\FEBioMix\FEMichaelisMenten.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasic.h" />
-    <ClInclude Include="..\..\FEBioMix\FEMultiphasicAnalysis.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicMultigeneration.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicSolver.h" />

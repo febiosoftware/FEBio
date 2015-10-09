@@ -490,7 +490,6 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		ar << (int) m_Step.size();
 		for (int i=0; i<(int) m_Step.size(); ++i) 
 		{
-			ar << m_Step[i]->GetTypeStr();
 			m_Step[i]->Serialize(ar);
 		}
 
@@ -523,8 +522,7 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		ar >> nsteps;
 		for (int i=0; i<nsteps; ++i)
 		{
-			ar >> sztype;
-			FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, sztype, this); assert(pstep);
+			FEAnalysis* pstep = new FEAnalysis(this); assert(pstep);
 			pstep->Serialize(ar);
 			m_Step.push_back(pstep);
 		}

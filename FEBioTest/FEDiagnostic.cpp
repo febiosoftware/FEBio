@@ -14,7 +14,6 @@
 #include "FEBioXML/FEBioControlSection.h"
 #include "FEBioXML/FEBioMaterialSection.h"
 #include "FEBioXML/FEBioGlobalsSection.h"
-#include "FEBioMech/FESolidAnalysis.h"
 #include "FECore/FECoreKernel.h"
 #include "FECore/FESolver.h"
 

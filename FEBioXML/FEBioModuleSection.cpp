@@ -4,24 +4,10 @@
 //-----------------------------------------------------------------------------
 //! This function parses the Module section.
 //! The Module defines the type of problem the user wants to solve (solid, heat, ...)
-//!
+//! It is currently only used to allocate the FESolver.
 void FEBioModuleSection::Parse(XMLTag &tag)
 {
 	// get the type attribute
 	const char* szt = tag.AttributeValue("type");
-
-	if      (strcmp(szt, "solid_old"     ) == 0) m_pim->m_nstep_type = FE_SOLID;
-	else if (strcmp(szt, "solid"         ) == 0) m_pim->m_nstep_type = FE_SOLID2;
-	else if (strcmp(szt, "solid2"        ) == 0) m_pim->m_nstep_type = FE_SOLID2;
-	else if (strcmp(szt, "CG-solid"      ) == 0) m_pim->m_nstep_type = FE_CG_SOLID;
-	else if (strcmp(szt, "explicit-solid") == 0) m_pim->m_nstep_type = FE_EXPLICIT_SOLID;
-	else if (strcmp(szt, "linear solid"  ) == 0) m_pim->m_nstep_type = FE_LINEAR_SOLID; 
-	else if (strcmp(szt, "biphasic"      ) == 0) m_pim->m_nstep_type = FE_BIPHASIC;
-	else if (strcmp(szt, "solute"        ) == 0) m_pim->m_nstep_type = FE_POROSOLUTE;	// obsolete in 2.0
-	else if (strcmp(szt, "multiphasic"   ) == 0) m_pim->m_nstep_type = FE_MULTIPHASIC;
-	else if (strcmp(szt, "heat"          ) == 0) m_pim->m_nstep_type = FE_HEAT;
-//	else if (strcmp(szt, "heat-solid"    ) == 0) m_pim->m_nstep_type = FE_HEAT_SOLID;
-	else if (strcmp(szt, "thermo-elastic") == 0) m_pim->m_nstep_type = FE_THERMO_ELASTIC;
-    else if (strcmp(szt, "fluid"         ) == 0) m_pim->m_nstep_type = FE_FLUID;
-	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+	strcpy(m_pim->m_szmod, szt);
 }

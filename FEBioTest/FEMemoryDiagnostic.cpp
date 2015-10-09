@@ -6,7 +6,7 @@ FEMemoryDiagnostic::FEMemoryDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 	m_szfile[0] = 0;
 	m_iters = 1;
 
-	FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, "solid", &fem);
+	FEAnalysis* pstep = new FEAnalysis(&fem);
 	fem.AddStep(pstep);
 	fem.m_nStep = 0;
 	fem.SetCurrentStep(pstep);

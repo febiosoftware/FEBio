@@ -128,7 +128,7 @@ void echo_input(FEBioModel& fem)
 	// print control info
 	felog.printf(" CONTROL DATA\n");
 	felog.printf("===========================================================================\n");
-	const char* szmod = step.GetTypeStr();
+	const char* szmod = step.GetFESolver()->GetTypeStr();
 	if (szmod == 0) { szmod = "unknown"; assert(false); }
 	felog.printf("\tModule type .................................... : %s\n", szmod);
 

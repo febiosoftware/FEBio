@@ -10,7 +10,7 @@
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
 
 //-----------------------------------------------------------------------------
-FEAnalysis::FEAnalysis(FEModel* pfem, int ntype) : FECoreBase(FEANALYSIS_ID), m_fem(*pfem), m_ntype(ntype) 
+FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem)
 {
 	m_psolver = 0;
 	m_tend = 0.0;
@@ -609,7 +609,6 @@ void FEAnalysis::Serialize(DumpFile& ar)
 	if (ar.IsSaving())
 	{
 		// --- analysis data ---
-		ar << m_ntype;
 		ar << m_nanalysis;
 		ar << m_istiffpr;
 
@@ -653,7 +652,6 @@ void FEAnalysis::Serialize(DumpFile& ar)
 	else
 	{
 		// --- analysis data ---
-		ar >> m_ntype;
 		ar >> m_nanalysis;
 		ar >> m_istiffpr;
 

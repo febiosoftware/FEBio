@@ -1052,9 +1052,6 @@ void FEUT4Domain::ElementGeometricalStiffness(FESolidElement &el, matrix &ke)
 
 void FEUT4Domain::ElementMaterialStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
 {
-	// make sure this is the struct mech module
-	assert(fem.GetCurrentStep()->GetType() == FE_SOLID);
-
 	int i, i3, j, j3, n;
 
 	// Get the current element's data

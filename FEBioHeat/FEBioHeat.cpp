@@ -2,7 +2,6 @@
 #include "FEIsotropicFourier.h"
 #include "FEPlotNodeTemperature.h"
 #include "FEPlotHeatFlux.h"
-#include "FEHeatTransferAnalysis.h"
 #include "FEHeatFlux.h"
 #include "FEConvectiveHeatFlux.h"
 #include "FEHeatSolver.h"
@@ -10,7 +9,6 @@
 #include "FEHeatDomainFactory.h"
 #include "FEHeatSource.h"
 #include "FEBioHeatData.h"
-#include "FEThermoElasticAnalysis.h"
 #include "FEThermoElasticSolver.h"
 #include "FEThermoElasticMaterial.h"
 #include "FEThermoNeoHookean.h"
@@ -26,10 +24,6 @@ void InitModule()
 	// Domain factory
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 	febio.RegisterDomain(new FEHeatDomainFactory);
-
-	// Analysis
-	REGISTER_FECORE_CLASS(FEHeatTransferAnalysis, FEANALYSIS_ID, "heat transfer");
-	REGISTER_FECORE_CLASS(FEThermoElasticAnalysis, FEANALYSIS_ID, "thermo-elastic");
 
 	// Solvers
 	REGISTER_FECORE_CLASS(FEHeatSolver         , FESOLVER_ID, "heat transfer" );
