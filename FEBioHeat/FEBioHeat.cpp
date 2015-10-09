@@ -26,7 +26,7 @@ void InitModule()
 	febio.RegisterDomain(new FEHeatDomainFactory);
 
 	// Solvers
-	REGISTER_FECORE_CLASS(FEHeatSolver         , FESOLVER_ID, "heat transfer" );
+	REGISTER_FECORE_CLASS(FEHeatSolver         , FESOLVER_ID, "heat" );
 	REGISTER_FECORE_CLASS(FEThermoElasticSolver, FESOLVER_ID, "thermo-elastic");
 
 	// Materials
