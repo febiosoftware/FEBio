@@ -539,7 +539,6 @@
     <ClInclude Include="..\..\FEBioMech\FERigidWallInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FESlidingInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FESlidingInterfaceBW.h" />
-    <ClInclude Include="..\..\FEBioMech\FESolidAnalysis.h" />
     <ClInclude Include="..\..\FEBioMech\FESolidDomainFactory.h" />
     <ClInclude Include="..\..\FEBioMech\FESolidMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FESolidSolver.h" />
@@ -719,7 +718,6 @@
     <ClCompile Include="..\..\FEBioMech\FERigidWallInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESlidingInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESlidingInterfaceBW.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FESolidAnalysis.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESolidDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESolidMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESolidSolver.cpp" />
