@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "version.h"
-#include "validate.h"
+//#include "validate.h" // For KeyGen
+#ifdef NALPLIB
+	#include "FEBioNSL.h"
+#endif
 #include "FECore/log.h"
 #include <stdio.h>
 
@@ -71,7 +74,7 @@ void print_banner() {}
 */
 void Hello()
 {
-	int nlic = GetLicenseKeyStatus();
+	//int nlic = GetLicenseKeyStatus(); // For KeyGen
 
 	felog.printf("===========================================================================\n");
 	felog.printf("         ________    _________   _________     __     _________            \n");
@@ -101,6 +104,16 @@ void Hello()
 	felog.printf("                                                                           \n");
 	felog.printf("  FEBio is a registered trademark.                                         \n");
 	felog.printf("  copyright (c) 2006-2015 - All rights reserved                            \n");
+
+#ifdef NALPLIB
+#else
+	felog.printf("                                                                                \n");
+	felog.printf(" This is the NON-COMMERCIAL version of FEBio. This version may only be          \n");
+	felog.printf(" used for non-commercial purposes as described in the license agreement.        \n");
+	felog.printf(" To obtain a valid commercial license file, please contact the developers.      \n");
+#endif
+
+	/* Used with KeyGen
 	if(nlic == 0)
 	{
 		felog.printf("                                                                              \n");
@@ -128,6 +141,7 @@ void Hello()
 		felog.printf(" the functionality may be limited. If you wish to obtain a valid license   \n");
 		felog.printf(" file or if you think your license is valid, please contact the developers.\n");
 	}
+	*/
 
 	felog.printf("                                                                           \n");
 	felog.printf("===========================================================================\n");

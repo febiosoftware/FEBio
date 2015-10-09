@@ -45,7 +45,7 @@
 #include "FEBioLib/version.h"
 #include "FEBioCommand.h"
 #include "FECore/FECore.h"
-#include "FEBioLib/validate.h"
+//#include "FEBioLib/validate.h" // For the KeyGen library
 #include "console.h"
 #include "FECore/log.h"
 #include "FEBioStdSolver.h"
@@ -197,8 +197,8 @@ int main(int argc, char* argv[])
 	CMDOPTIONS ops;
 	if (ParseCmdLine(argc, argv, ops) == false) return 0;
 
-	// load the license file
-	LoadLicenseFile();
+	// load the license file (for KeyGen)
+	//LoadLicenseFile();
 
 	// print welcome message
 	if (ops.bsplash && (!ops.bsilent)) Hello();
