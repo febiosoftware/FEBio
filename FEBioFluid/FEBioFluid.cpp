@@ -59,15 +59,25 @@ REGISTER_FECORE_CLASS(FEPlotFluidAcceleration       , FEPLOTDATA_ID, "fluid acce
 REGISTER_FECORE_CLASS(FEPlotFluidVorticity          , FEPLOTDATA_ID, "fluid vorticity"          );
 REGISTER_FECORE_CLASS(FEPlotElementFluidStress      , FEPLOTDATA_ID, "fluid stress"             );
 REGISTER_FECORE_CLASS(FEPlotElementFluidRateOfDef   , FEPLOTDATA_ID, "fluid rate of deformation");
+REGISTER_FECORE_CLASS(FEPlotFluidStressPower        , FEPLOTDATA_ID, "fluid stress power"       );
 
 //-----------------------------------------------------------------------------
+REGISTER_FECORE_CLASS(FELogElemFluidPosX,        FEELEMLOGDATA_ID, "fx");
+REGISTER_FECORE_CLASS(FELogElemFluidPosY,        FEELEMLOGDATA_ID, "fy");
+REGISTER_FECORE_CLASS(FELogElemFluidPosZ,        FEELEMLOGDATA_ID, "fz");
 REGISTER_FECORE_CLASS(FELogElasticFluidPressure, FEELEMLOGDATA_ID, "fp");
 REGISTER_FECORE_CLASS(FELogFluidVolumeRatio,     FEELEMLOGDATA_ID, "fJ");
+REGISTER_FECORE_CLASS(FELogFluidDensity,         FEELEMLOGDATA_ID, "fd");
+REGISTER_FECORE_CLASS(FELogFluidStressPower,     FEELEMLOGDATA_ID, "fsp");
+REGISTER_FECORE_CLASS(FELogFluidVelocityX,       FEELEMLOGDATA_ID, "fvx");
+REGISTER_FECORE_CLASS(FELogFluidVelocityY,       FEELEMLOGDATA_ID, "fvy");
+REGISTER_FECORE_CLASS(FELogFluidVelocityZ,       FEELEMLOGDATA_ID, "fvz");
 REGISTER_FECORE_CLASS(FELogFluidAccelerationX,   FEELEMLOGDATA_ID, "fax");
 REGISTER_FECORE_CLASS(FELogFluidAccelerationY,   FEELEMLOGDATA_ID, "fay");
 REGISTER_FECORE_CLASS(FELogFluidAccelerationZ,   FEELEMLOGDATA_ID, "faz");
 REGISTER_FECORE_CLASS(FELogFluidVorticityX,      FEELEMLOGDATA_ID, "fwx");
 REGISTER_FECORE_CLASS(FELogFluidVorticityY,      FEELEMLOGDATA_ID, "fwy");
+REGISTER_FECORE_CLASS(FELogFluidVorticityZ,      FEELEMLOGDATA_ID, "fwz");
 REGISTER_FECORE_CLASS(FELogFluidStressXX,        FEELEMLOGDATA_ID, "fsxx");
 REGISTER_FECORE_CLASS(FELogFluidStressYY,        FEELEMLOGDATA_ID, "fsyy");
 REGISTER_FECORE_CLASS(FELogFluidStressZZ,        FEELEMLOGDATA_ID, "fszz");

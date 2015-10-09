@@ -4,6 +4,45 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+double FELogElemFluidPosX::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEFluidMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
+        val += pt.m_r0.x;
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemFluidPosY::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEFluidMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
+        val += pt.m_r0.y;
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemFluidPosZ::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEFluidMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
+        val += pt.m_r0.z;
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
 double FELogElasticFluidPressure::value(FEElement& el)
 {
 	double val = 0.0;
@@ -25,6 +64,77 @@ double FELogFluidVolumeRatio::value(FEElement& el)
     {
         FEFluidMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
         if (ppt) val += ppt->m_J;
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidDensity::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    FEMaterial* pmat = m_pfem->GetMaterial(el.GetMatID());
+    FEFluid* pfmat = dynamic_cast<FEFluid*>(pmat);
+    if (pfmat) {
+        for (int i=0; i<nint; ++i)
+        {
+            FEMaterialPoint* pt = el.GetMaterialPoint(i);
+            val += pfmat->Density(*pt);
+        }
+        return val / (double) nint;
+    }
+    else
+        return 0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidStressPower::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEFluidMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
+        if (ppt) val += (ppt->m_s*ppt->m_L).trace();
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidVelocityX::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEFluidMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
+        if (ppt) val += ppt->m_vt.x;
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidVelocityY::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEFluidMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
+        if (ppt) val += ppt->m_vt.y;
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidVelocityZ::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEFluidMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
+        if (ppt) val += ppt->m_vt.z;
     }
     return val / (double) nint;
 }

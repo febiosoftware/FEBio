@@ -90,3 +90,12 @@ public:
     bool Save(FEDomain& dom, vector<float>& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Element fluid stress power
+class FEPlotFluidStressPower : public FEDomainData
+{
+public:
+    FEPlotFluidStressPower(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, vector<float>& a);
+};
+

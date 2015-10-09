@@ -313,3 +313,32 @@ bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, vector<float>& a)
     return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotFluidStressPower::Save(FEDomain &dom, vector<float>& a)
+{
+    if (dom.Class() != FE_DOMAIN_SOLID) return false;
+    FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+    if (dynamic_cast<FEFluidDomain* >(&bd))
+    {
+        for (int i=0; i<bd.Elements(); ++i)
+        {
+            FESolidElement& el = bd.Element(i);
+            
+            // calculate average pressure
+            double ew = 0;
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
+                
+                if (pt) ew += (pt->m_s*pt->m_L).trace();
+            }
+            ew /= el.GaussPoints();
+            
+            a.push_back((float) ew);
+        }
+        return true;
+    }
+    return false;
+}
+

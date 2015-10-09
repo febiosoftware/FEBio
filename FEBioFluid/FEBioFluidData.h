@@ -12,6 +12,30 @@
 //=============================================================================
 
 //-----------------------------------------------------------------------------
+class FELogElemFluidPosX : public FELogElemData
+{
+public:
+    FELogElemFluidPosX(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemFluidPosY : public FELogElemData
+{
+public:
+    FELogElemFluidPosY(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemFluidPosZ : public FELogElemData
+{
+public:
+    FELogElemFluidPosZ(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
 class FELogElasticFluidPressure : public FELogElemData
 {
 public:
@@ -25,6 +49,46 @@ class FELogFluidVolumeRatio : public FELogElemData
 public:
 	FELogFluidVolumeRatio(FEModel* pfem) : FELogElemData(pfem){}
 	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidDensity : public FELogElemData
+{
+public:
+    FELogFluidDensity(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidStressPower : public FELogElemData
+{
+public:
+    FELogFluidStressPower(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidVelocityX : public FELogElemData
+{
+public:
+    FELogFluidVelocityX(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidVelocityY : public FELogElemData
+{
+public:
+    FELogFluidVelocityY(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidVelocityZ : public FELogElemData
+{
+public:
+    FELogFluidVelocityZ(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
 };
 
 //-----------------------------------------------------------------------------
