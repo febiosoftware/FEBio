@@ -294,8 +294,6 @@
 		D5E1081E1865DFAD00B23922 /* FESlidingInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E107381865DFAD00B23922 /* FESlidingInterface.h */; };
 		D5E1081F1865DFAD00B23922 /* FESlidingInterfaceBW.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E107391865DFAD00B23922 /* FESlidingInterfaceBW.cpp */; };
 		D5E108201865DFAD00B23922 /* FESlidingInterfaceBW.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1073A1865DFAD00B23922 /* FESlidingInterfaceBW.h */; };
-		D5E108211865DFAD00B23922 /* FESolidAnalysis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1073B1865DFAD00B23922 /* FESolidAnalysis.cpp */; };
-		D5E108221865DFAD00B23922 /* FESolidAnalysis.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1073C1865DFAD00B23922 /* FESolidAnalysis.h */; };
 		D5E108231865DFAD00B23922 /* FESolidDomainFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1073D1865DFAD00B23922 /* FESolidDomainFactory.cpp */; };
 		D5E108241865DFAD00B23922 /* FESolidDomainFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1073E1865DFAD00B23922 /* FESolidDomainFactory.h */; };
 		D5E108251865DFAD00B23922 /* FESolidMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1073F1865DFAD00B23922 /* FESolidMaterial.cpp */; };
@@ -648,8 +646,6 @@
 		D5E107381865DFAD00B23922 /* FESlidingInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESlidingInterface.h; sourceTree = "<group>"; };
 		D5E107391865DFAD00B23922 /* FESlidingInterfaceBW.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESlidingInterfaceBW.cpp; sourceTree = "<group>"; };
 		D5E1073A1865DFAD00B23922 /* FESlidingInterfaceBW.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESlidingInterfaceBW.h; sourceTree = "<group>"; };
-		D5E1073B1865DFAD00B23922 /* FESolidAnalysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolidAnalysis.cpp; sourceTree = "<group>"; };
-		D5E1073C1865DFAD00B23922 /* FESolidAnalysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolidAnalysis.h; sourceTree = "<group>"; };
 		D5E1073D1865DFAD00B23922 /* FESolidDomainFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolidDomainFactory.cpp; sourceTree = "<group>"; };
 		D5E1073E1865DFAD00B23922 /* FESolidDomainFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolidDomainFactory.h; sourceTree = "<group>"; };
 		D5E1073F1865DFAD00B23922 /* FESolidMaterial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolidMaterial.cpp; sourceTree = "<group>"; };
@@ -1022,8 +1018,6 @@
 				D5E107381865DFAD00B23922 /* FESlidingInterface.h */,
 				D5E107391865DFAD00B23922 /* FESlidingInterfaceBW.cpp */,
 				D5E1073A1865DFAD00B23922 /* FESlidingInterfaceBW.h */,
-				D5E1073B1865DFAD00B23922 /* FESolidAnalysis.cpp */,
-				D5E1073C1865DFAD00B23922 /* FESolidAnalysis.h */,
 				D5E1073D1865DFAD00B23922 /* FESolidDomainFactory.cpp */,
 				D5E1073E1865DFAD00B23922 /* FESolidDomainFactory.h */,
 				D5E1073F1865DFAD00B23922 /* FESolidMaterial.cpp */,
@@ -1106,7 +1100,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D5E107B01865DFAD00B23922 /* FEElasticMaterial.h in Headers */,
-				D5E108221865DFAD00B23922 /* FESolidAnalysis.h in Headers */,
 				D5E107D81865DFAD00B23922 /* FEFungOrthotropic.h in Headers */,
 				D5C69F951A41EA9000EB52B2 /* FEUncoupledFiberExpLinear.h in Headers */,
 				D5E107E41865DFAD00B23922 /* FEIsotropicElastic.h in Headers */,
@@ -1449,7 +1442,6 @@
 				D5E107D91865DFAD00B23922 /* FEGasserOgdenHolzapfel.cpp in Sources */,
 				D5E107F71865DFAD00B23922 /* FENeoHookean.cpp in Sources */,
 				D5E1083B1865DFAD00B23922 /* FETractionLoad.cpp in Sources */,
-				D5E108211865DFAD00B23922 /* FESolidAnalysis.cpp in Sources */,
 				D59D17D5192BD83B007C880C /* FECoupledMooneyRivlin.cpp in Sources */,
 				D5E1082B1865DFAD00B23922 /* FESpringMaterial.cpp in Sources */,
 				D51BB3FD1991238100638A8B /* FEFiberMaterialPoint.cpp in Sources */,

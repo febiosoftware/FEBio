@@ -12,8 +12,6 @@
 		D51892821B448051006A50AE /* FEThermalConductivity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D51892751B448051006A50AE /* FEThermalConductivity.cpp */; };
 		D51892831B448051006A50AE /* FEThermalConductivity.h in Headers */ = {isa = PBXBuildFile; fileRef = D51892761B448051006A50AE /* FEThermalConductivity.h */; };
 		D51892841B448051006A50AE /* FEThermalElastic.h in Headers */ = {isa = PBXBuildFile; fileRef = D51892771B448051006A50AE /* FEThermalElastic.h */; };
-		D51892851B448051006A50AE /* FEThermoElasticAnalysis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D51892781B448051006A50AE /* FEThermoElasticAnalysis.cpp */; };
-		D51892861B448051006A50AE /* FEThermoElasticAnalysis.h in Headers */ = {isa = PBXBuildFile; fileRef = D51892791B448051006A50AE /* FEThermoElasticAnalysis.h */; };
 		D51892871B448051006A50AE /* FEThermoElasticMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D518927A1B448051006A50AE /* FEThermoElasticMaterial.cpp */; };
 		D51892881B448051006A50AE /* FEThermoElasticMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D518927B1B448051006A50AE /* FEThermoElasticMaterial.h */; };
 		D51892891B448051006A50AE /* FEThermoElasticSolidDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D518927C1B448051006A50AE /* FEThermoElasticSolidDomain.cpp */; };
@@ -38,10 +36,6 @@
 		D5E106401865DF1900B23922 /* FEHeatSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E106251865DF1900B23922 /* FEHeatSolver.h */; };
 		D5E106411865DF1900B23922 /* FEHeatSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E106261865DF1900B23922 /* FEHeatSource.cpp */; };
 		D5E106421865DF1900B23922 /* FEHeatSource.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E106271865DF1900B23922 /* FEHeatSource.h */; };
-		D5E106431865DF1900B23922 /* FEHeatStiffnessMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E106281865DF1900B23922 /* FEHeatStiffnessMatrix.cpp */; };
-		D5E106441865DF1900B23922 /* FEHeatStiffnessMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E106291865DF1900B23922 /* FEHeatStiffnessMatrix.h */; };
-		D5E106451865DF1900B23922 /* FEHeatTransferAnalysis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1062A1865DF1900B23922 /* FEHeatTransferAnalysis.cpp */; };
-		D5E106461865DF1900B23922 /* FEHeatTransferAnalysis.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1062B1865DF1900B23922 /* FEHeatTransferAnalysis.h */; };
 		D5E106471865DF1900B23922 /* FEHeatTransferMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1062C1865DF1900B23922 /* FEHeatTransferMaterial.h */; };
 		D5E106481865DF1900B23922 /* FEIsotropicFourier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1062D1865DF1900B23922 /* FEIsotropicFourier.cpp */; };
 		D5E106491865DF1900B23922 /* FEIsotropicFourier.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1062E1865DF1900B23922 /* FEIsotropicFourier.h */; };
@@ -57,8 +51,6 @@
 		D51892751B448051006A50AE /* FEThermalConductivity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEThermalConductivity.cpp; sourceTree = "<group>"; };
 		D51892761B448051006A50AE /* FEThermalConductivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEThermalConductivity.h; sourceTree = "<group>"; };
 		D51892771B448051006A50AE /* FEThermalElastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEThermalElastic.h; sourceTree = "<group>"; };
-		D51892781B448051006A50AE /* FEThermoElasticAnalysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEThermoElasticAnalysis.cpp; sourceTree = "<group>"; };
-		D51892791B448051006A50AE /* FEThermoElasticAnalysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEThermoElasticAnalysis.h; sourceTree = "<group>"; };
 		D518927A1B448051006A50AE /* FEThermoElasticMaterial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEThermoElasticMaterial.cpp; sourceTree = "<group>"; };
 		D518927B1B448051006A50AE /* FEThermoElasticMaterial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEThermoElasticMaterial.h; sourceTree = "<group>"; };
 		D518927C1B448051006A50AE /* FEThermoElasticSolidDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEThermoElasticSolidDomain.cpp; sourceTree = "<group>"; };
@@ -84,10 +76,6 @@
 		D5E106251865DF1900B23922 /* FEHeatSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEHeatSolver.h; sourceTree = "<group>"; };
 		D5E106261865DF1900B23922 /* FEHeatSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEHeatSource.cpp; sourceTree = "<group>"; };
 		D5E106271865DF1900B23922 /* FEHeatSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEHeatSource.h; sourceTree = "<group>"; };
-		D5E106281865DF1900B23922 /* FEHeatStiffnessMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEHeatStiffnessMatrix.cpp; sourceTree = "<group>"; };
-		D5E106291865DF1900B23922 /* FEHeatStiffnessMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEHeatStiffnessMatrix.h; sourceTree = "<group>"; };
-		D5E1062A1865DF1900B23922 /* FEHeatTransferAnalysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEHeatTransferAnalysis.cpp; sourceTree = "<group>"; };
-		D5E1062B1865DF1900B23922 /* FEHeatTransferAnalysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEHeatTransferAnalysis.h; sourceTree = "<group>"; };
 		D5E1062C1865DF1900B23922 /* FEHeatTransferMaterial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEHeatTransferMaterial.h; sourceTree = "<group>"; };
 		D5E1062D1865DF1900B23922 /* FEIsotropicFourier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEIsotropicFourier.cpp; sourceTree = "<group>"; };
 		D5E1062E1865DF1900B23922 /* FEIsotropicFourier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEIsotropicFourier.h; sourceTree = "<group>"; };
@@ -145,10 +133,6 @@
 				D5E106251865DF1900B23922 /* FEHeatSolver.h */,
 				D5E106261865DF1900B23922 /* FEHeatSource.cpp */,
 				D5E106271865DF1900B23922 /* FEHeatSource.h */,
-				D5E106281865DF1900B23922 /* FEHeatStiffnessMatrix.cpp */,
-				D5E106291865DF1900B23922 /* FEHeatStiffnessMatrix.h */,
-				D5E1062A1865DF1900B23922 /* FEHeatTransferAnalysis.cpp */,
-				D5E1062B1865DF1900B23922 /* FEHeatTransferAnalysis.h */,
 				D5E1062C1865DF1900B23922 /* FEHeatTransferMaterial.h */,
 				D5E1062D1865DF1900B23922 /* FEIsotropicFourier.cpp */,
 				D5E1062E1865DF1900B23922 /* FEIsotropicFourier.h */,
@@ -159,8 +143,6 @@
 				D51892751B448051006A50AE /* FEThermalConductivity.cpp */,
 				D51892761B448051006A50AE /* FEThermalConductivity.h */,
 				D51892771B448051006A50AE /* FEThermalElastic.h */,
-				D51892781B448051006A50AE /* FEThermoElasticAnalysis.cpp */,
-				D51892791B448051006A50AE /* FEThermoElasticAnalysis.h */,
 				D518927A1B448051006A50AE /* FEThermoElasticMaterial.cpp */,
 				D518927B1B448051006A50AE /* FEThermoElasticMaterial.h */,
 				D518927C1B448051006A50AE /* FEThermoElasticSolidDomain.cpp */,
@@ -182,7 +164,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D518928A1B448051006A50AE /* FEThermoElasticSolidDomain.h in Headers */,
-				D51892861B448051006A50AE /* FEThermoElasticAnalysis.h in Headers */,
 				D5E1063A1865DF1900B23922 /* FEHeatDomainFactory.h in Headers */,
 				D5E106491865DF1900B23922 /* FEIsotropicFourier.h in Headers */,
 				D5E1063E1865DF1900B23922 /* FEHeatSolidDomain.h in Headers */,
@@ -191,7 +172,6 @@
 				D518928C1B448051006A50AE /* FEThermoElasticSolver.h in Headers */,
 				D5E1063C1865DF1900B23922 /* FEHeatFlux.h in Headers */,
 				D51892841B448051006A50AE /* FEThermalElastic.h in Headers */,
-				D5E106461865DF1900B23922 /* FEHeatTransferAnalysis.h in Headers */,
 				D5E106361865DF1900B23922 /* FEConvectiveHeatFlux.h in Headers */,
 				D5E1064D1865DF1900B23922 /* FEPlotNodeTemperature.h in Headers */,
 				D5E106381865DF1900B23922 /* FECoupledHeatSolidSolver.h in Headers */,
@@ -200,7 +180,6 @@
 				D513A2F71952467E00060C20 /* FEBioHeatData.h in Headers */,
 				D51892881B448051006A50AE /* FEThermoElasticMaterial.h in Headers */,
 				D5E106401865DF1900B23922 /* FEHeatSolver.h in Headers */,
-				D5E106441865DF1900B23922 /* FEHeatStiffnessMatrix.h in Headers */,
 				D5E106341865DF1900B23922 /* FEBioHeat.h in Headers */,
 				D5E106471865DF1900B23922 /* FEHeatTransferMaterial.h in Headers */,
 			);
@@ -262,7 +241,6 @@
 				D5E106331865DF1900B23922 /* FEBioHeat.cpp in Sources */,
 				D51892821B448051006A50AE /* FEThermalConductivity.cpp in Sources */,
 				D5E1063D1865DF1900B23922 /* FEHeatSolidDomain.cpp in Sources */,
-				D5E106451865DF1900B23922 /* FEHeatTransferAnalysis.cpp in Sources */,
 				D5E106391865DF1900B23922 /* FEHeatDomainFactory.cpp in Sources */,
 				D5E106351865DF1900B23922 /* FEConvectiveHeatFlux.cpp in Sources */,
 				D513A2F61952467E00060C20 /* FEBioHeatData.cpp in Sources */,
@@ -270,12 +248,10 @@
 				D5E1063F1865DF1900B23922 /* FEHeatSolver.cpp in Sources */,
 				D51892891B448051006A50AE /* FEThermoElasticSolidDomain.cpp in Sources */,
 				D5E106371865DF1900B23922 /* FECoupledHeatSolidSolver.cpp in Sources */,
-				D5E106431865DF1900B23922 /* FEHeatStiffnessMatrix.cpp in Sources */,
 				D518928B1B448051006A50AE /* FEThermoElasticSolver.cpp in Sources */,
 				D5E106481865DF1900B23922 /* FEIsotropicFourier.cpp in Sources */,
 				D518928D1B448051006A50AE /* FEThermoNeoHookean.cpp in Sources */,
 				D5E106411865DF1900B23922 /* FEHeatSource.cpp in Sources */,
-				D51892851B448051006A50AE /* FEThermoElasticAnalysis.cpp in Sources */,
 				D51892871B448051006A50AE /* FEThermoElasticMaterial.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
