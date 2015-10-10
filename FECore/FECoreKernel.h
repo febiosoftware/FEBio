@@ -25,6 +25,9 @@ public:
 	// instance. Instead, use the FECoreKernel object that is passed in the PluginInitialize method
 	static FECoreKernel& GetInstance();
 
+	// set the instance of the kernel
+	static void SetInstance(FECoreKernel* pkernel);
+
 	// Get the logfile
 	Logfile& GetLogfile();
 

@@ -341,7 +341,8 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	m_but4 = false;
 
 	// Reset degrees of freedom (TODO: Can I do this elsewhere?)
-    DOFS& fedofs = *DOFS::GetInstance();
+	// Perhaps the solver should be responsible for determining the dofs.
+    DOFS& fedofs = fem.GetDOFS();
 	fedofs.Reset();
 
 	// extract the path

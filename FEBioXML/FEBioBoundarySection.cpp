@@ -477,8 +477,9 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 	else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 	// get the load curve number
-	sz = tag.AttributeValue("lc");
-	int lc = atoi(sz) - 1;
+	int lc = -1;
+	sz = tag.AttributeValue("lc", true);
+	if (sz) { lc = atoi(sz) - 1; }
 
 	// see if the scale attribute is defined
 	double scale = 1.0;

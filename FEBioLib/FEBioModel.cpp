@@ -657,7 +657,7 @@ void FEBioModel::SerializeGeometry(DumpFile &ar)
 
 void FEBioModel::SerializeMesh(DumpFile& ar)
 {
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = GetDOFS();
 	FEMesh& m = m_mesh;
 
 	if (ar.IsSaving())

@@ -14,6 +14,12 @@ FECoreKernel& FECoreKernel::GetInstance()
 }
 
 //-----------------------------------------------------------------------------
+void FECoreKernel::SetInstance(FECoreKernel* pkernel)
+{
+	m_pKernel = pkernel;
+}
+
+//-----------------------------------------------------------------------------
 Logfile& FECoreKernel::GetLogfile()
 {
 	return *m_plog;

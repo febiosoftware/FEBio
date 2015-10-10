@@ -27,8 +27,10 @@ public:
 	FEModel& GetFEModel();
 
 public:
+	//! Initialize solver data
 	virtual bool Init() = 0;
 
+	//! Can this be removed?
 	virtual void Clean() = 0;
 
 public:
@@ -39,6 +41,7 @@ public:
 	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) = 0;
 
 	// Initialize linear equation system (TODO: Is this the right place to do this?)
+	// \todo Can I make this part of the Init function?
 	virtual bool InitEquations() = 0;
 
 	//! initialize the step

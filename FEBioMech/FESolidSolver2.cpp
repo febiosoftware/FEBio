@@ -1375,7 +1375,7 @@ void FESolidSolver2::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& k
 	int i, j, k, l, n = en.size();
     
     // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = m_fem.GetDOFS();
     int MAX_NDOFS = fedofs.GetNDOFS();
     
 	double Ri[3][3] = {0}, Rj[3][3] = {0};
@@ -1704,7 +1704,7 @@ void FESolidSolver2::AssembleStiffness(std::vector<int>& lm, matrix& ke)
 void FESolidSolver2::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 {
     // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = m_fem.GetDOFS();
     int MAX_NDOFS = fedofs.GetNDOFS();
 
 	// assemble into global stiffness matrix

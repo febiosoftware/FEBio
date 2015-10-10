@@ -322,6 +322,9 @@
     <ClInclude Include="..\..\FECore\FENewtonSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FECore\FELinearSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\DumpFile.cpp">
@@ -574,6 +577,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FENewtonSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FECore\FELinearSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -186,7 +186,7 @@ bool FEExplicitSolidSolver::InitEquations()
 	int i, j;
 
     // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = m_fem.GetDOFS();
     int MAX_NDOFS = fedofs.GetNDOFS();
 
 	// get the mesh

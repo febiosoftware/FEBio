@@ -641,7 +641,7 @@ void FEFluidSolver::AssembleStiffness(std::vector<int>& lm, matrix& ke)
 void FEFluidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 {
     // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = m_fem.GetDOFS();
     int MAX_NDOFS = fedofs.GetNDOFS();
     
     // assemble into global stiffness matrix

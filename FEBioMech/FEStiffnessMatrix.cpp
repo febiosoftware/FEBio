@@ -48,7 +48,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 	int i, j, k, l, m, n;
 
     // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = pfem->GetDOFS();
     int MAX_NDOFS = fedofs.GetNDOFS();
 
 	// keep a pointer to the FEM object

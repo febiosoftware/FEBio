@@ -76,7 +76,7 @@ bool FEMultiphasicSolver::Init()
 	}
 
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = m_fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetCDOFS();
     
 	// allocate concentration-vectors
@@ -127,7 +127,7 @@ bool FEMultiphasicSolver::InitEquations()
 	}
 	
 	// determine the nr of concentration equations
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = m_fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetCDOFS();
     m_nceq.assign(MAX_CDOFS, 0);
 	
@@ -181,7 +181,7 @@ bool FEMultiphasicSolver::Quasin(double time)
 	double	normp;		// incremement pressure norm
 
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = m_fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetCDOFS();
     
 	// solute convergence data
@@ -907,7 +907,7 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = m_fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetCDOFS();
     
 	// update solute data

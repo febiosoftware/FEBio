@@ -713,6 +713,15 @@ bool FEModel::EvaluateParameterList(FECoreBase* pc)
 }
 
 //-----------------------------------------------------------------------------
+//! I'd like to place the list of DOFS inside the model.
+//! As a first step, all classes that have access to the model
+//! should get the DOFS from this function.
+DOFS& FEModel::GetDOFS()
+{
+	return *(DOFS::GetInstance());
+}
+
+//-----------------------------------------------------------------------------
 // This function adds a callback routine
 //
 void FEModel::AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void *pd)

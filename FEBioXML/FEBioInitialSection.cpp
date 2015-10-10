@@ -14,7 +14,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 	FEMesh& mesh = fem.GetMesh();
 
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetCDOFS();
     
 	// make sure we've read the nodes section

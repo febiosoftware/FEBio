@@ -156,7 +156,7 @@ bool FEPrescribedBC::Init()
 	// check the load curve ID
 	FEModel& fem = *GetFEModel();
 	int NLC = fem.LoadCurves();
-	if ((m_lc < 0) || (m_lc >= NLC))
+	if ((m_lc < -1) || (m_lc >= NLC))
 	{
 		felog.printf("ERROR: Invalid loadcurve in prescribed BC %d\n", GetID());
 		return false;

@@ -1,4 +1,5 @@
 #pragma once
+#include "DOFS.h"
 #include "FERigidSystem.h"
 #include "FEMaterial.h"
 #include "FEMesh.h"
@@ -273,6 +274,11 @@ public:	// --- Miscellaneous routines ---
 
 	//! call the callback function
 	void DoCallback(unsigned int nevent);
+
+	//! I'd like to place the list of DOFS inside the model.
+	//! As a first step, all classes that have access to the model
+	//! should get the DOFS from this function
+	DOFS& GetDOFS();
 
 public: // --- I/O functions
 

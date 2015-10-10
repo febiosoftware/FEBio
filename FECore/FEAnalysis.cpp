@@ -238,7 +238,7 @@ bool FEAnalysis::InitLinearConstraints()
 	}
 
 	// create the linear constraint table
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = m_fem.GetDOFS();
     int MAX_NDOFS = fedofs.GetNDOFS();
 	m_fem.m_LCT.assign(mesh.Nodes()*MAX_NDOFS, -1);
 
