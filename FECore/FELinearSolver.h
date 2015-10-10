@@ -16,6 +16,14 @@ public:
 	//! constructor
 	FELinearSolver(FEModel* pfem);
 
+	//! Set the degrees of freedom
+	void SetDOF(vector<int>& dof);
+
+	//! Get the number of equations
+	int NumberOfEquations() const;
+
+public: // from FESolver
+
 	//! solve the step
 	bool SolveStep(double time);
 
@@ -31,9 +39,8 @@ public:
 	//! assemble global stiffness matrix
 	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
 
-public:
-	//! Set the degrees of freedom
-	void SetDOF(vector<int>& dof);
+	//! Serialization
+	void Serialize(DumpFile& ar);
 
 public: // these functions need to be implemented by the derived class
 
@@ -54,15 +61,14 @@ protected: // some helper functions
 	//! Create and evaluate the stiffness matrix
 	bool CreateStiffness();
 
+protected:
+	vector<double>		m_R;	//!< RHS vector
+	vector<double>		m_u;	//!< vector containing prescribed values
+
 private:
 	LinearSolver*		m_pls;		//!< The linear equation solver
 	FEGlobalMatrix*		m_pK;		//!< The global stiffness matrix
 	int					m_neq;		//!< The number of equations (TODO: Get this from linear solver)
-	
-	vector<double>		m_R;	//!< RHS vector
-	vector<double>		m_u;	//!< vector containing prescribed values
-
 	vector<int>		m_dof;	//!< list of active degrees of freedom
-
 	bool	m_breform;	//!< matrix reformation flag
 };

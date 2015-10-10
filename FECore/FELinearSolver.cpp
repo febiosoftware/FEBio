@@ -29,6 +29,12 @@ void FELinearSolver::SetDOF(vector<int>& dof)
 }
 
 //-----------------------------------------------------------------------------
+int FELinearSolver::NumberOfEquations() const 
+{
+	return m_neq;
+}
+
+//-----------------------------------------------------------------------------
 bool FELinearSolver::Init()
 {
 	// Now that we have determined the equation numbers we can continue
@@ -174,6 +180,9 @@ bool FELinearSolver::SolveStep(double time)
 	FEGlobalVector rhs(fem, m_R, F);
 	RHSVector(rhs);
 
+	// increase RHS counter
+	m_nrhs++;
+
 	// build the stiffness matrix
 	ReformStiffness();
 
@@ -306,4 +315,19 @@ bool FELinearSolver::CreateStiffness()
 
 	// done!
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FELinearSolver::Serialize(DumpFile& ar)
+{
+	FESolver::Serialize(ar);
+
+	if (ar.IsSaving())
+	{
+		ar << m_breform;
+	}
+	else
+	{
+		ar >> m_breform;
+	}
 }
