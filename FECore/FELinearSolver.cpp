@@ -13,6 +13,7 @@ FELinearSolver::FELinearSolver(FEModel* pfem) : FESolver(pfem)
 	m_pls = 0;
 	m_pK = 0;
 	m_neq = 0;
+	m_breform = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -67,6 +68,9 @@ bool FELinearSolver::Init()
 		felog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
 		return false;
 	}
+
+	// Set the matrix formation flag
+	m_breform = true;
 
 	// get number of equations
 	int neq = m_neq;
@@ -237,7 +241,14 @@ void FELinearSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix
 bool FELinearSolver::ReformStiffness()
 {
 	// recalculate the shape of the stiffness matrix if necessary
-	if (!CreateStiffness()) return false;
+	if (m_breform)
+	{
+		if (!CreateStiffness()) return false;
+		
+		// since it's not likely that the matrix form changes
+		// in a linear analysis, we don't recalculate the form
+		m_breform = false;
+	}
 
 	// Make sure it is all set to zero
 	m_pK->Zero();

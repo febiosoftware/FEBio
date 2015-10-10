@@ -14,6 +14,8 @@ FECoreKernel& FECoreKernel::GetInstance()
 }
 
 //-----------------------------------------------------------------------------
+// This function is used by plugins to make sure that the plugin and the executable
+// are using the same kernel
 void FECoreKernel::SetInstance(FECoreKernel* pkernel)
 {
 	m_pKernel = pkernel;
@@ -22,7 +24,13 @@ void FECoreKernel::SetInstance(FECoreKernel* pkernel)
 //-----------------------------------------------------------------------------
 Logfile& FECoreKernel::GetLogfile()
 {
-	return *m_plog;
+	return *m_pKernel->m_plog;
+}
+
+//-----------------------------------------------------------------------------
+FECoreKernel::FECoreKernel()
+{
+	m_plog = Logfile::GetInstance();
 }
 
 //-----------------------------------------------------------------------------
@@ -91,12 +99,6 @@ int FECoreKernel::FactoryClasses()
 const FECoreFactory* FECoreKernel::GetFactoryClass(int i)
 {
 	return m_Fac[i];
-}
-
-//-----------------------------------------------------------------------------
-FECoreKernel::FECoreKernel()
-{
-	m_plog = Logfile::GetInstance();
 }
 
 //-----------------------------------------------------------------------------

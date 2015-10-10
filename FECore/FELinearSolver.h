@@ -63,4 +63,6 @@ private:
 	vector<double>		m_u;	//!< vector containing prescribed values
 
 	vector<int>		m_dof;	//!< list of active degrees of freedom
+
+	bool	m_breform;	//!< matrix reformation flag
 };

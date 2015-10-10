@@ -29,7 +29,7 @@ public:
 	static void SetInstance(FECoreKernel* pkernel);
 
 	// Get the logfile
-	Logfile& GetLogfile();
+	static Logfile& GetLogfile();
 
 public:
 	//! Register a class with the framework
