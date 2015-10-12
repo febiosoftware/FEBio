@@ -21,7 +21,7 @@ RCICGSolver::RCICGSolver() : m_pA(0)
 SparseMatrix* RCICGSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 #ifdef MKL_ISS
-	if (ntype != SPARSE_SYMMETRIC) return 0;
+	if (ntype != REAL_SYMMETRIC) return 0;
 	m_pA = new CompactSymmMatrix(1);
 	return m_pA;
 #else

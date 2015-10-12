@@ -34,7 +34,7 @@ public:
 	void resize(int nr, int nc);
 
 	//! destructor
-	~matrix();
+	~matrix() { clear(); }
 
 	//! access operator
 	double * operator [] (int l) { return m_pr[l]; }
@@ -42,8 +42,8 @@ public:
 	double operator () (int i, int j) const { return m_pr[i][j]; }
 	operator double** () { return m_pr; }
 
-	int rows   () { return m_nr; }
-	int columns() { return m_nc; }
+	int rows   () const { return m_nr; }
+	int columns() const { return m_nc; }
 
 	void zero() { memset(m_pd, 0, sizeof(double)*m_nsize); }
 
@@ -72,6 +72,10 @@ public:
 
 	// infinity-norm
 	double inf_norm();
+
+private:
+	void alloc(int nr, int nc);
+	void clear();
 
 protected:
 	double**	m_pr;	// pointer to rows

@@ -473,6 +473,8 @@
     <ClInclude Include="..\..\FECore\Archive.h" />
     <ClInclude Include="..\..\FECore\BC.h" />
     <ClInclude Include="..\..\FECore\BFGSSolver.h" />
+    <ClInclude Include="..\..\FECore\cmatrix.h" />
+    <ClInclude Include="..\..\FECore\ComplexSparseMatrix.h" />
     <ClInclude Include="..\..\FECore\DataStore.h" />
     <ClInclude Include="..\..\FECore\DOFS.h" />
     <ClInclude Include="..\..\FECore\DumpFile.h" />
@@ -577,7 +579,9 @@
     <ClCompile Include="..\..\FECore\Archive.cpp" />
     <ClCompile Include="..\..\FECore\BC.cpp" />
     <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
+    <ClCompile Include="..\..\FECore\cmatrix.cpp" />
     <ClCompile Include="..\..\FECore\colsol.cpp" />
+    <ClCompile Include="..\..\FECore\ComplexSparseMatrix.cpp" />
     <ClCompile Include="..\..\FECore\DataStore.cpp" />
     <ClCompile Include="..\..\FECore\DOFS.cpp" />
     <ClCompile Include="..\..\FECore\DumpFile.cpp" />

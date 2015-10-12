@@ -29,7 +29,7 @@ SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype)
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	return nullptr;
 #else
-	m_bsymm = (ntype == SPARSE_SYMMETRIC);
+	m_bsymm = (ntype == REAL_SYMMETRIC);
 	if (m_bsymm) m_pA = new CompactSymmMatrix(1);
 	else m_pA = new CompactUnSymmMatrix(1, true);
 

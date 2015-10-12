@@ -29,6 +29,9 @@ public:
 	//! Activation
 	virtual bool Activate();
 
+	//! See if this step is active
+	bool IsActive();
+
 	//! Reset analysis data
 	virtual void Reset();
 
@@ -162,6 +165,7 @@ public:
 private:
 	// the FE solver
 	FESolver*	m_psolver;	//!< pointer to solver class that will solve this step.
+	bool		m_bactive;	//!< activation flag
 
 protected:
 	std::vector<int>				m_Dom;	//!< list of active domains for this analysis

@@ -393,11 +393,11 @@ void FERigidBodyFixedBC::Serialize(DumpFile& ar)
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << bc << id;
+		ar << bc << id << m_binit;
 	}
 	else
 	{
-		ar >> bc >> id;
+		ar >> bc >> id >> m_binit;
 	}
 }
 
@@ -480,11 +480,11 @@ void FERigidBodyDisplacement::Serialize(DumpFile& ar)
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << bc << id << lc << sf;
+		ar << bc << id << lc << sf << m_binit;
 	}
 	else
 	{
-		ar >> bc >> id >> lc >> sf;
+		ar >> bc >> id >> lc >> sf >> m_binit;
 	}
 }
 

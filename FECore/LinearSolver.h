@@ -8,8 +8,10 @@
 //! from a linear solver. 
 //! \sa LinearSolver::CreateSparseMatrix.
 enum Matrix_Type {
-	SPARSE_SYMMETRIC,
-	SPARSE_UNSYMMETRIC
+	REAL_SYMMETRIC,
+	REAL_UNSYMMETRIC,
+	COMPLEX_SYMMETRIC,
+	COMPLEX_UNSYMMETRIC
 };
 
 //-----------------------------------------------------------------------------

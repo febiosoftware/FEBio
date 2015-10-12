@@ -16,7 +16,7 @@ ConjGradIterSolver::ConjGradIterSolver() : m_pA(0)
 //! Create a sparse matrix for this linear solver
 SparseMatrix* ConjGradIterSolver::CreateSparseMatrix(Matrix_Type ntype)
 { 
-	return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix() : 0)); 
+	return (m_pA = (ntype == REAL_SYMMETRIC? new CompactSymmMatrix() : 0)); 
 }
 
 //-----------------------------------------------------------------------------

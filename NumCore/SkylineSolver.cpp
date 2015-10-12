@@ -14,7 +14,7 @@ SkylineSolver::SkylineSolver() : m_pA(0)
 //! Create a sparse matrix
 SparseMatrix* SkylineSolver::CreateSparseMatrix(Matrix_Type ntype)
 { 
-	return (m_pA = (ntype == SPARSE_SYMMETRIC? new SkylineMatrix() : 0)); 
+	return (m_pA = (ntype == REAL_SYMMETRIC? new SkylineMatrix() : 0)); 
 }
 
 //-----------------------------------------------------------------------------

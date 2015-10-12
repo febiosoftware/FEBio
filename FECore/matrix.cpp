@@ -53,8 +53,7 @@ vector<double> operator * (matrix& m, vector<double>& b)
 }
 
 //-----------------------------------------------------------------------------
-//! Constructor for matrix class. 
-matrix::matrix(int nr, int nc)
+void matrix::alloc(int nr, int nc)
 {
 	m_nr = nr;
 	m_nc = nc;
@@ -62,54 +61,44 @@ matrix::matrix(int nr, int nc)
 
 	m_pd = new double [m_nsize];
 	m_pr = new double*[nr];
-
 	for (int i=0; i<nr; i++) m_pr[i] = m_pd + i*nc;
 }
 
 //-----------------------------------------------------------------------------
-//! matrix destructor
-matrix::~matrix()
+//! Constructor for matrix class. 
+matrix::matrix(int nr, int nc)
 {
-	delete [] m_pd;
-	delete [] m_pr;
+	alloc(nr, nc);
+}
+
+//-----------------------------------------------------------------------------
+//! matrix destructor
+void matrix::clear()
+{
+	if (m_pr) delete [] m_pr;
+	if (m_pd) delete [] m_pd;
+	m_pd = 0;
+	m_pr = 0;
+	m_nr = m_nc = 0;
 }
 
 //-----------------------------------------------------------------------------
 //! Copy constructor for matrix class. 
 matrix::matrix(const matrix& m)
 {
-	m_nr = m.m_nr;
-	m_nc = m.m_nc;
-	m_nsize = m_nr*m_nc;
-
-	m_pd = new double[m_nsize];
-	m_pr = new double*[m_nr];
-
-	int i;
-	for (i=0; i<m_nr; ++i) m_pr[i] = m_pd + i*m_nc;
-	for (i=0; i<m_nsize; ++i) m_pd[i] = m.m_pd[i];
+	alloc(m.m_nr, m.m_nc);
+	for (int i=0; i<m_nsize; ++i) m_pd[i] = m.m_pd[i];
 }
 
 //-----------------------------------------------------------------------------
 matrix& matrix::operator = (const matrix& m)
 {
-	int i;
 	if ((m.m_nr != m_nr) || (m.m_nc != m_nc))
 	{
-		delete [] m_pd;
-		delete [] m_pr;
-
-		m_nr = m.m_nr;
-		m_nc = m.m_nc;
-		m_nsize = m_nr*m_nc;
-
-		m_pd = new double[m_nsize];
-		m_pr = new double*[m_nr];
-
-		for (i=0; i<m_nr; ++i) m_pr[i] = m_pd + i*m_nc;
+		clear();
+		alloc(m.m_nr, m.m_nc);
 	}
-
-	for (i=0; i<m_nsize; ++i) m_pd[i] = m.m_pd[i];
+	for (int i=0; i<m_nsize; ++i) m_pd[i] = m.m_pd[i];
 
 	return (*this);
 }
@@ -119,17 +108,8 @@ void matrix::resize(int nr, int nc)
 {
 	if ((nr != m_nr) || (nc != m_nc))
 	{
-		m_nr = nr;
-		m_nc = nc;
-		m_nsize = nr*nc;
-
-		if (m_pd) delete [] m_pd;
-		if (m_pr) delete [] m_pr;
-
-		m_pd = new double [m_nsize];
-		m_pr = new double*[nr];
-
-		for (int i=0; i<nr; i++) m_pr[i] = m_pd + i*nc;
+		clear();
+		alloc(nr, nc);
 	}
 }
 

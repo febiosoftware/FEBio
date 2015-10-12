@@ -48,6 +48,8 @@ FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem)
 	m_nprint  = FE_PRINT_MINOR_ITRS;
 	m_noutput = FE_OUTPUT_MAJOR_ITRS;
 	m_nplot_stride = 1;
+
+	m_bactive = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -108,9 +110,23 @@ bool FEAnalysis::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! See if this step is active
+bool FEAnalysis::IsActive()
+{
+	return m_bactive;
+}
+
+//-----------------------------------------------------------------------------
 //! This function gets called right before the step needs to be solved.
 bool FEAnalysis::Activate()
 {
+	// Make sure we are not activated yet
+	// This can happen after a restart during FEModel::Solve
+	if (m_bactive) return true;
+
+	// activate the time step
+	m_bactive = true;
+
 	// set first time step
 	// We can't do this since it will mess up the value from a restart
 //	m_dt = m_dt0;
@@ -202,6 +218,9 @@ void FEAnalysis::Deactivate()
 
 	// clean up solver data (i.e. destroy linear solver)
 	GetFESolver()->Clean();
+
+	// deactivate the time step
+	m_bactive = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -611,6 +630,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		// --- analysis data ---
 		ar << m_nanalysis;
 		ar << m_istiffpr;
+		ar << m_bactive;
 
 		// --- Time Step Data ---
 		ar << m_ntime;
@@ -654,6 +674,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		// --- analysis data ---
 		ar >> m_nanalysis;
 		ar >> m_istiffpr;
+		ar >> m_bactive;
 
 		// --- Time Step Data ---
 		ar >> m_ntime;

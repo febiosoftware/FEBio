@@ -11,7 +11,7 @@ WSMPSolver::WSMPSolver() : m_pA(0)
 //-----------------------------------------------------------------------------
 SparseMatrix* WSMPSolver::CreateSparseMatrix(Matrix_Type ntype)
 { 
-	return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix(1) : 0)); 
+	return (m_pA = (ntype == REAL_SYMMETRIC? new CompactSymmMatrix(1) : 0)); 
 }
 
 //-----------------------------------------------------------------------------

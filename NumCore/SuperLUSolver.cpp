@@ -15,7 +15,7 @@ SuperLUSolver::SuperLUSolver() : m_pA(0)
 //-----------------------------------------------------------------------------
 SparseMatrix* SuperLUSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
-	m_bsymm = (ntype == SPARSE_SYMMETRIC);
+	m_bsymm = (ntype == REAL_SYMMETRIC);
 	return (m_pA = new CompactUnSymmMatrix()); 
 }
 

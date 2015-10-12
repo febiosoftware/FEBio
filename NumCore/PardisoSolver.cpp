@@ -25,7 +25,7 @@ PardisoSolver::PardisoSolver() : m_pA(0)
 //-----------------------------------------------------------------------------
 SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
-	m_bsymm = (ntype == SPARSE_SYMMETRIC);
+	m_bsymm = (ntype == REAL_SYMMETRIC);
 	if (m_bsymm) m_pA = new CompactSymmMatrix(1);
 	else m_pA = new CompactUnSymmMatrix(1, true);
 
