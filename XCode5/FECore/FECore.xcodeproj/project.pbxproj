@@ -14,6 +14,8 @@
 		D52A5B0F19A6815C009E3A47 /* tens4ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D52A5B0D19A6815C009E3A47 /* tens4ds.hpp */; };
 		D5307A4818B40A6B008C8463 /* FENormalProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5307A4618B40A6B008C8463 /* FENormalProjection.cpp */; };
 		D5307A4918B40A6B008C8463 /* FENormalProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A4718B40A6B008C8463 /* FENormalProjection.h */; };
+		D5377EAE1BCC715100685CB5 /* FELinearSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5377EAC1BCC715100685CB5 /* FELinearSolver.cpp */; settings = {ASSET_TAGS = (); }; };
+		D5377EAF1BCC715100685CB5 /* FELinearSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5377EAD1BCC715100685CB5 /* FELinearSolver.h */; settings = {ASSET_TAGS = (); }; };
 		D571F82B1B78C49C002FAACE /* FERigidSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D571F8291B78C49C002FAACE /* FERigidSystem.cpp */; };
 		D571F82C1B78C49C002FAACE /* FERigidSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = D571F82A1B78C49C002FAACE /* FERigidSystem.h */; };
 		D58D4D141B5D7E76002BB72A /* FECallback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58D4D111B5D7E76002BB72A /* FECallback.cpp */; };
@@ -205,6 +207,8 @@
 		D52A5B0D19A6815C009E3A47 /* tens4ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens4ds.hpp; sourceTree = "<group>"; };
 		D5307A4618B40A6B008C8463 /* FENormalProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENormalProjection.cpp; sourceTree = "<group>"; };
 		D5307A4718B40A6B008C8463 /* FENormalProjection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENormalProjection.h; sourceTree = "<group>"; };
+		D5377EAC1BCC715100685CB5 /* FELinearSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELinearSolver.cpp; sourceTree = "<group>"; };
+		D5377EAD1BCC715100685CB5 /* FELinearSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELinearSolver.h; sourceTree = "<group>"; };
 		D53B72D51BA9000A000F572F /* FEInitialCondition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEInitialCondition.cpp; sourceTree = "<group>"; };
 		D53B72D61BA9000A000F572F /* FEInitialCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEInitialCondition.h; sourceTree = "<group>"; };
 		D571F8291B78C49C002FAACE /* FERigidSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidSystem.cpp; sourceTree = "<group>"; };
@@ -490,12 +494,13 @@
 				D5E10A261865E15900B23922 /* FEGlobalVector.cpp */,
 				D5E10A271865E15900B23922 /* FEGlobalVector.h */,
 				D5FAB1501BAC5A760057818F /* FEInitialCondition.cpp */,
-				D53B72D51BA9000A000F572F /* FEInitialCondition.cpp */,
 				D53B72D61BA9000A000F572F /* FEInitialCondition.h */,
 				D5E10A281865E15900B23922 /* FELevelStructure.cpp */,
 				D5E10A291865E15900B23922 /* FELevelStructure.h */,
 				D5E10A2A1865E15900B23922 /* FELinearConstraint.cpp */,
 				D5E10A2B1865E15900B23922 /* FELinearConstraint.h */,
+				D5377EAC1BCC715100685CB5 /* FELinearSolver.cpp */,
+				D5377EAD1BCC715100685CB5 /* FELinearSolver.h */,
 				D5E10A2C1865E15900B23922 /* FEMaterial.cpp */,
 				D5E10A2D1865E15900B23922 /* FEMaterial.h */,
 				D5E10A2E1865E15900B23922 /* FEMaterialPoint.cpp */,
@@ -608,7 +613,7 @@
 				D5E10A7E1865E15900B23922 /* vector.cpp */,
 				D5E10A7F1865E15900B23922 /* vector.h */,
 				D5BE04D519A5806400AD08F8 /* version.h */,
-				D53B72D61BA9000A000F572F /* FEInitialCondition.h */,
+				D53B72D51BA9000A000F572F /* FEInitialCondition.cpp */,
 			);
 			name = FECore;
 			path = ../../FECore;
@@ -665,6 +670,7 @@
 				D5E10AEF1865E15900B23922 /* log.h in Headers */,
 				D5E10ACF1865E15900B23922 /* FENodeReorder.h in Headers */,
 				D5F0E92719D05B9F0073F72C /* erf.h in Headers */,
+				D5377EAF1BCC715100685CB5 /* FELinearSolver.h in Headers */,
 				D5E10AE61865E15900B23922 /* FETrussDomain.h in Headers */,
 				D5E10AD21865E15900B23922 /* FEOctree.h in Headers */,
 				D5E10A8D1865E15900B23922 /* ElementDataRecord.h in Headers */,
@@ -840,6 +846,7 @@
 				D5B572DD186CC76500D12E45 /* FEGlobalData.cpp in Sources */,
 				D5E10A801865E15900B23922 /* Archive.cpp in Sources */,
 				D5960230195B65E6000A675D /* quatd.cpp in Sources */,
+				D5377EAE1BCC715100685CB5 /* FELinearSolver.cpp in Sources */,
 				D5E10AC41865E15900B23922 /* FEModelComponent.cpp in Sources */,
 				D5E10AB41865E15900B23922 /* FEGlobalMatrix.cpp in Sources */,
 				D571F82B1B78C49C002FAACE /* FERigidSystem.cpp in Sources */,
