@@ -33,6 +33,8 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
     m_plinsolve = 0;
 	m_pK = 0;
 
+	m_cmax   = 1e5;
+	m_maxups = 10;
 	m_nqnsolver = QN_BFGS;
 	m_pbfgs = 0;
 }
@@ -156,8 +158,8 @@ bool FENewtonSolver::Init()
 	// choose a solution strategy
 	switch (m_nqnsolver)
 	{
-	case QN_BFGS : SetSolutionStrategy(new BFGSSolver );
-	case QN_BFGS2: SetSolutionStrategy(new BFGSSolver2);
+	case QN_BFGS : SetSolutionStrategy(new BFGSSolver ); break;
+	case QN_BFGS2: SetSolutionStrategy(new BFGSSolver2); break;
 	default:
 		return false;
 	}
@@ -282,18 +284,39 @@ void FENewtonSolver::Serialize(DumpFile& ar)
 		ar << m_neq;
 		ar << m_LStol << m_LSiter << m_LSmin;
 		ar << m_maxref;
-		ar << m_pbfgs->m_maxups;
-		ar << m_pbfgs->m_cmax;
-		ar << m_pbfgs->m_nups;
+
+		if (m_pbfgs == 0) ar << 0; else ar << 1;
+		if (m_pbfgs)
+		{
+			ar << m_nqnsolver;
+			ar << m_pbfgs->m_maxups;
+			ar << m_pbfgs->m_cmax;
+			ar << m_pbfgs->m_nups;
+		}
 	}
 	else
 	{
 		ar >> m_neq;
 		ar >> m_LStol >> m_LSiter >> m_LSmin;
 		ar >> m_maxref;
-		ar >> m_pbfgs->m_maxups;
-		ar >> m_pbfgs->m_cmax;
-		ar >> m_pbfgs->m_nups;
+
+		int n = -1;
+		ar >> n;
+		if (n)
+		{
+			ar >> m_nqnsolver;
+			switch (m_nqnsolver)
+			{
+			case QN_BFGS: SetSolutionStrategy(new BFGSSolver); break;
+			case QN_BFGS2: SetSolutionStrategy(new BFGSSolver2); break;
+			default:
+				return;
+			}
+
+			ar >> m_pbfgs->m_maxups;
+			ar >> m_pbfgs->m_cmax;
+			ar >> m_pbfgs->m_nups;
+		}
 	}
 }
 
