@@ -11,6 +11,7 @@
 #include "FECore/DOFS.h"
 #include "FEUncoupledMaterial.h"
 #include "FEBioMech/FEStiffnessMatrix.h"
+#include "FECore/LinearSolver.h"
 #include <assert.h>
 
 #ifdef WIN32

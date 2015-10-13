@@ -4,6 +4,7 @@
 #include "FENodeReorder.h"
 #include "FEModel.h"
 #include "FEGlobalMatrix.h"
+#include "BFGSSolver.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
