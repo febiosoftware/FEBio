@@ -639,7 +639,7 @@ void FESolidSolver2::PrepStep(double time)
 	m_nrhs  = 0;	// nr of RHS evaluations
 	m_nref  = 0;	// nr of stiffness reformations
 	m_ntotref = 0;
-	m_bfgs.m_nups	= 0;	// nr of stiffness updates between reformations
+	m_pbfgs->m_nups	= 0;	// nr of stiffness updates between reformations
 	m_naug  = 0;	// nr of augmentations
 
 	// zero total displacements
@@ -941,7 +941,7 @@ bool FESolidSolver2::Quasin(double time)
 		// solve the equations
 		m_SolverTime.start();
 		{
-			m_bfgs.SolveEquations(m_ui, m_R0);
+			m_pbfgs->SolveEquations(m_ui, m_R0);
 		}
 		m_SolverTime.stop();
 
@@ -1001,7 +1001,7 @@ bool FESolidSolver2::Quasin(double time)
 			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);
 
 		felog.printf(" Nonlinear solution status: time= %lg\n", time); 
-		felog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
+		felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
@@ -1046,9 +1046,9 @@ bool FESolidSolver2::Quasin(double time)
 				// do an update
 				if (!breform)
 				{
-					if (m_bfgs.m_nups < m_bfgs.m_maxups-1)
+					if (m_pbfgs->m_nups < m_pbfgs->m_maxups-1)
 					{
-						if (m_bfgs.Update(s, m_ui, m_R0, m_R1) == false)
+						if (m_pbfgs->Update(s, m_ui, m_R0, m_R1) == false)
 						{
 							// Stiffness update has failed.
 							// this might be due a too large condition number
@@ -1064,7 +1064,7 @@ bool FESolidSolver2::Quasin(double time)
 						breform = true;
 
 						// print a warning only if the user did not intent full-Newton
-						if (m_bfgs.m_maxups > 0)
+						if (m_pbfgs->m_maxups > 0)
 							felog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
 
 					}
@@ -1124,7 +1124,7 @@ bool FESolidSolver2::Quasin(double time)
 				Residual(m_R0);
 
 				// reform the matrix if we are using full-Newton
-				if (m_bfgs.m_maxups == 0)
+				if (m_pbfgs->m_maxups == 0)
 				{
 					felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 					if (ReformStiffness(tp) == false) break;

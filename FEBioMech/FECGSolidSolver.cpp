@@ -38,8 +38,8 @@ bool FECGSolidSolver::Init()
 	if (m_LSmin  < 0.) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
 	if (m_LSiter < 0 ) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
 	if (m_maxref < 0 ) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
-	if (m_bfgs.m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
-	if (m_bfgs.m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
+	if (m_pbfgs->m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
+	if (m_pbfgs->m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
 
 	// get nr of equations
 	int neq = m_neq;
@@ -72,7 +72,7 @@ bool FECGSolidSolver::Init()
 	}
 
 	// initialize BFGS data
-	m_bfgs.Init(neq, this, m_plinsolve);
+	m_pbfgs->Init(neq, this, m_plinsolve);
 
 	// set the create stiffness matrix flag
 	m_breshape = true;
@@ -247,7 +247,7 @@ bool FECGSolidSolver::Quasin(double time)
 			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);
 
 		felog.printf(" Nonlinear solution status: time= %lg\n", time); 
-		felog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
+		felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
@@ -321,7 +321,7 @@ bool FECGSolidSolver::Quasin(double time)
 				Residual(m_R0);
 /*
 				// reform the matrix if we are using full-Newton
-				if (m_bfgs.m_maxups == 0)
+				if (m_pbfgs->m_maxups == 0)
 				{
 					felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 					if (ReformStiffness() == false) break;

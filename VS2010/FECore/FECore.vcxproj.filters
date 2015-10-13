@@ -319,16 +319,16 @@
     <ClInclude Include="..\..\FECore\FEInitialCondition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FENewtonSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\FELinearSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FECore\BFGSSolver2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FENewtonSolver2.h">
+    <ClInclude Include="..\..\FECore\FENewtonStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FECore\FENewtonSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -591,7 +591,7 @@
     <ClCompile Include="..\..\FECore\BFGSSolver2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\FENewton2Solver.cpp">
+    <ClCompile Include="..\..\FECore\FENewtonStrategy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

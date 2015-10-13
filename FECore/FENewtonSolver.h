@@ -22,6 +22,9 @@ public:
 	//! destrcutor
 	~FENewtonSolver();
 
+	//! Set the solution strategy
+	void SetSolutionStrategy(FENewtonStrategy* pstrategy);
+
 public: // overloaded from FESolver
 
 	//! Initialization
@@ -67,8 +70,8 @@ public:
 	int		m_LSiter;		//!< max nr of line search iterations
 
 	// solver parameters
-	int			m_maxref;		//!< max nr of reformations per time step
-	BFGSSolver	m_bfgs;			//!< BFGS solver parameters
+	int					m_maxref;		//!< max nr of reformations per time step
+	FENewtonStrategy*	m_pbfgs;		//!< BFGS solver parameters
 
 	// linear solver data
 	LinearSolver*		m_plinsolve;	//!< the linear solver

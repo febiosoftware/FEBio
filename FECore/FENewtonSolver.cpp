@@ -13,8 +13,8 @@ BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_LSmin        , FE_PARAM_DOUBLE, "lsmin"   );
 	ADD_PARAMETER(m_LSiter       , FE_PARAM_INT   , "lsiter"  );
 	ADD_PARAMETER(m_maxref       , FE_PARAM_INT   , "max_refs");
-	ADD_PARAMETER(m_bfgs.m_maxups, FE_PARAM_INT   , "max_ups" );
-	ADD_PARAMETER(m_bfgs.m_cmax  , FE_PARAM_DOUBLE, "cmax"    );
+	ADD_PARAMETER(m_pbfgs->m_maxups, FE_PARAM_INT   , "max_ups" );
+	ADD_PARAMETER(m_pbfgs->m_cmax  , FE_PARAM_DOUBLE, "cmax"    );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -29,6 +29,16 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
     m_neq = 0;
     m_plinsolve = 0;
 	m_pK = 0;
+
+	// By default, we'll use the BFGS solver
+	m_pbfgs = new BFGSSolver;
+}
+
+//-----------------------------------------------------------------------------
+void FENewtonSolver::SetSolutionStrategy(FENewtonStrategy* pstrategy)
+{
+	if (m_pbfgs) delete m_pbfgs;
+	m_pbfgs = pstrategy;
 }
 
 //-----------------------------------------------------------------------------
@@ -36,6 +46,7 @@ FENewtonSolver::~FENewtonSolver()
 {
 	delete m_plinsolve;	// clean up linear solver data
 	delete m_pK;		// clean up stiffnes matrix data
+	if (m_pbfgs) delete m_pbfgs;
 }
 
 //-----------------------------------------------------------------------------
@@ -81,7 +92,7 @@ bool FENewtonSolver::ReformStiffness(const FETimePoint& tp)
         m_ntotref++;
         
         // reset bfgs update counter
-        m_bfgs.m_nups = 0;
+        m_pbfgs->m_nups = 0;
     }
     
     return bret;
@@ -136,8 +147,8 @@ bool FENewtonSolver::Init()
 	if (m_LSmin  < 0.0) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
 	if (m_LSiter < 0  ) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
 	if (m_maxref < 0  ) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
-	if (m_bfgs.m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
-	if (m_bfgs.m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
+	if (m_pbfgs->m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
+	if (m_pbfgs->m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
 
     // Now that we have determined the equation numbers we can continue
     // with creating the stiffness matrix. First we select the linear solver
@@ -162,7 +173,7 @@ bool FENewtonSolver::Init()
 
 	// initialize BFGS data
 	// Must be done after initialization of linear solver
-	m_bfgs.Init(m_neq, this, m_plinsolve);
+	m_pbfgs->Init(m_neq, this, m_plinsolve);
 
     // set the create stiffness matrix flag
     m_breshape = true;
@@ -255,18 +266,18 @@ void FENewtonSolver::Serialize(DumpFile& ar)
 		ar << m_neq;
 		ar << m_LStol << m_LSiter << m_LSmin;
 		ar << m_maxref;
-		ar << m_bfgs.m_maxups;
-		ar << m_bfgs.m_cmax;
-		ar << m_bfgs.m_nups;
+		ar << m_pbfgs->m_maxups;
+		ar << m_pbfgs->m_cmax;
+		ar << m_pbfgs->m_nups;
 	}
 	else
 	{
 		ar >> m_neq;
 		ar >> m_LStol >> m_LSiter >> m_LSmin;
 		ar >> m_maxref;
-		ar >> m_bfgs.m_maxups;
-		ar >> m_bfgs.m_cmax;
-		ar >> m_bfgs.m_nups;
+		ar >> m_pbfgs->m_maxups;
+		ar >> m_pbfgs->m_cmax;
+		ar >> m_pbfgs->m_nups;
 	}
 }
 

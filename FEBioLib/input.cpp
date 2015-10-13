@@ -172,12 +172,12 @@ void echo_input(FEBioModel& fem)
 	{
 		felog.printf("\tMax nr of stiffness reformations ............... : %d\n", pns->m_maxref);
 		felog.printf("\tper time steps\n");
-		felog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", pns->m_bfgs.m_maxups);
+		felog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", pns->m_pbfgs->m_maxups);
 		felog.printf("\tbetween stiffness matrix reformations\n");
 		felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", pns->m_LStol );
 		felog.printf("\tMinimum line search size ....................... : %lg\n", pns->m_LSmin );
 		felog.printf("\tMaximum number of line search iterations ....... : %d\n" , pns->m_LSiter);
-		felog.printf("\tMax condition number ........................... : %lg\n", pns->m_bfgs.m_cmax);
+		felog.printf("\tMax condition number ........................... : %lg\n", pns->m_pbfgs->m_cmax);
 	}
 
 	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(psolver);

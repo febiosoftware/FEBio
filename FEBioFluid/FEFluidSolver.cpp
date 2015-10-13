@@ -7,6 +7,7 @@
 #include "NumCore/NumCore.h"
 #include <assert.h>
 #include "FEBioMech/FEStiffnessMatrix.h"
+#include "FECore/BFGSSolver2.h"
 
 #ifdef WIN32
 #include <float.h>
@@ -24,7 +25,7 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FEFluidSolver, FENewtonSolver2)
+BEGIN_PARAMETER_LIST(FEFluidSolver, FENewtonSolver)
 	ADD_PARAMETER(m_Vtol         , FE_PARAM_DOUBLE, "vtol"        );
 	ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );
 	ADD_PARAMETER(m_Rmin         , FE_PARAM_DOUBLE, "min_residual");
@@ -36,7 +37,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 //! FEFluidSolver Construction
 //
-FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver2(pfem)
+FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
 {
     // default values
     m_Rtol = 0;	// deactivate residual convergence
@@ -48,7 +49,9 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver2(pfem)
     m_bsymm = false;
     m_bdivreform = true;
     m_bdoreforms = true;
-    
+
+	// a different solution strategy is used here
+	SetSolutionStrategy(new BFGSSolver2);
 }
 
 //-----------------------------------------------------------------------------
@@ -63,7 +66,7 @@ FEFluidSolver::~FEFluidSolver()
 bool FEFluidSolver::Init()
 {
 	// initialize base class
-	if (FENewtonSolver2::Init() == false) return false;
+	if (FENewtonSolver::Init() == false) return false;
 
     // check parameters
     if (m_Vtol <  0.0) { felog.printf("Error: vtol must be nonnegative.\n"   ); return false; }
@@ -129,7 +132,7 @@ bool FEFluidSolver::Init()
 void FEFluidSolver::Serialize(DumpFile& ar)
 {
     // Serialize parameters
-    FENewtonSolver2::Serialize(ar);
+    FENewtonSolver::Serialize(ar);
     
     if (ar.IsSaving())
     {
@@ -262,7 +265,7 @@ void FEFluidSolver::PrepStep(double time)
     m_nrhs  = 0;	// nr of RHS evaluations
     m_nref  = 0;	// nr of stiffness reformations
     m_ntotref = 0;
-    m_bfgs.m_nups	= 0;	// nr of stiffness updates between reformations
+    m_pbfgs->m_nups	= 0;	// nr of stiffness updates between reformations
     m_naug  = 0;	// nr of augmentations
     
     // zero total velocities
@@ -378,7 +381,7 @@ bool FEFluidSolver::Quasin(double time)
         // solve the equations
         m_SolverTime.start();
         {
-            m_bfgs.SolveEquations(m_ui, m_R0);
+            m_pbfgs->SolveEquations(m_ui, m_R0);
         }
         m_SolverTime.stop();
         
@@ -430,7 +433,7 @@ bool FEFluidSolver::Quasin(double time)
             (pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);
         
         felog.printf(" Nonlinear solution status: time= %lg\n", time);
-        felog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
+        felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
         felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
         felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
         if (m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
@@ -465,16 +468,16 @@ bool FEFluidSolver::Quasin(double time)
                 // do an update
                 if (!breform)
                 {
-                    if (m_bfgs.m_nups < m_bfgs.m_maxups-1)
+                    if (m_pbfgs->m_nups < m_pbfgs->m_maxups-1)
                     {
-                        if (m_bfgs.Update(s, m_ui, m_R0, m_R1) == false)
+                        if (m_pbfgs->Update(s, m_ui, m_R0, m_R1) == false)
                         {
                             // Stiffness update has failed.
                             // this might be due a too large condition number
                             // or the update was no longer positive definite.
                             felog.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
                             breform = true;
-                            m_bfgs.m_nups = 0;  // reset and use as flag
+                            m_pbfgs->m_nups = 0;  // reset and use as flag
                         }
                     }
                     else
@@ -484,9 +487,9 @@ bool FEFluidSolver::Quasin(double time)
                         breform = true;
                         
                         // print a warning only if the user did not intent full-Newton
-                        if (m_bfgs.m_maxups > 0) {
+                        if (m_pbfgs->m_maxups > 0) {
                             felog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
-                            m_bfgs.m_nups = 0;  // reset and use as flag
+                            m_pbfgs->m_nups = 0;  // reset and use as flag
                         }
                         
                     }

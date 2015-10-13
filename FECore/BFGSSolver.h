@@ -3,14 +3,13 @@
 #include "matrix.h"
 #include "vector.h"
 #include "LinearSolver.h"
-
-class FESolver;
+#include "FENewtonStrategy.h"
 
 //-----------------------------------------------------------------------------
 //! The BFGSSolver solves a nonlinear system of equations using the BFGS method.
 //! It depends on the NonLinearSystem to evaluate the function and its jacobian.
 
-class BFGSSolver
+class BFGSSolver : public FENewtonStrategy
 {
 public:
 	//! constructor
@@ -26,19 +25,12 @@ public:
 	void SolveEquations(vector<double>& x, vector<double>& b);
 
 public:
-	int		m_maxups;		//!< max nr of QN iters permitted between stiffness reformations
-	double	m_cmax;			//!< maximum value for the condition number
-
-public:
 	// keep a pointer to the linear solver
 	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
 
 	// the non-linear system to solve
 	FESolver*		m_pNLS;		//!< pointer to nonlinear system to solve
 	int				m_neq;		//!< number of equations
-
-	// counters
-	int		m_nups;			//!< nr of stiffness updates
 
 	// BFGS update vectors
 	matrix			m_V;		//!< BFGS update vector
