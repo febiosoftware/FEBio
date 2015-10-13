@@ -5,17 +5,19 @@
 #include "FEModel.h"
 #include "FEGlobalMatrix.h"
 #include "BFGSSolver.h"
+#include "BFGSSolver2.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
-	ADD_PARAMETER(m_LStol        , FE_PARAM_DOUBLE, "lstol"   );
-	ADD_PARAMETER(m_LSmin        , FE_PARAM_DOUBLE, "lsmin"   );
-	ADD_PARAMETER(m_LSiter       , FE_PARAM_INT   , "lsiter"  );
-	ADD_PARAMETER(m_maxref       , FE_PARAM_INT   , "max_refs");
-	ADD_PARAMETER(m_pbfgs->m_maxups, FE_PARAM_INT   , "max_ups" );
-	ADD_PARAMETER(m_pbfgs->m_cmax  , FE_PARAM_DOUBLE, "cmax"    );
+	ADD_PARAMETER(m_LStol    , FE_PARAM_DOUBLE, "lstol"   );
+	ADD_PARAMETER(m_LSmin    , FE_PARAM_DOUBLE, "lsmin"   );
+	ADD_PARAMETER(m_LSiter   , FE_PARAM_INT   , "lsiter"  );
+	ADD_PARAMETER(m_maxref   , FE_PARAM_INT   , "max_refs");
+	ADD_PARAMETER(m_maxups   , FE_PARAM_INT   , "max_ups" );
+	ADD_PARAMETER(m_cmax     , FE_PARAM_DOUBLE, "cmax"    );
+	ADD_PARAMETER(m_nqnsolver, FE_PARAM_INT   , "qnmethod");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -31,8 +33,8 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
     m_plinsolve = 0;
 	m_pK = 0;
 
-	// By default, we'll use the BFGS solver
-	m_pbfgs = new BFGSSolver;
+	m_nqnsolver = QN_BFGS;
+	m_pbfgs = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -148,8 +150,21 @@ bool FENewtonSolver::Init()
 	if (m_LSmin  < 0.0) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
 	if (m_LSiter < 0  ) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
 	if (m_maxref < 0  ) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
-	if (m_pbfgs->m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
-	if (m_pbfgs->m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
+	if (m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
+	if (m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
+
+	// choose a solution strategy
+	switch (m_nqnsolver)
+	{
+	case QN_BFGS : SetSolutionStrategy(new BFGSSolver );
+	case QN_BFGS2: SetSolutionStrategy(new BFGSSolver2);
+	default:
+		return false;
+	}
+
+	// set the solution parameters
+	m_pbfgs->m_maxups = m_maxups;
+	m_pbfgs->m_cmax   = m_cmax;
 
     // Now that we have determined the equation numbers we can continue
     // with creating the stiffness matrix. First we select the linear solver

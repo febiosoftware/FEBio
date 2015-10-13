@@ -51,7 +51,7 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
     m_bdoreforms = true;
 
 	// a different solution strategy is used here
-	SetSolutionStrategy(new BFGSSolver2);
+	m_nqnsolver = QN_BFGS2;
 }
 
 //-----------------------------------------------------------------------------
