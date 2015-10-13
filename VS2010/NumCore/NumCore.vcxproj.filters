@@ -69,9 +69,6 @@
     <ClCompile Include="..\..\NumCore\BlockSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\NumCore\ComplexCompactMatrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\NumCore\stdafx.h">
@@ -123,9 +120,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\NumCore\BlockSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\NumCore\ComplexCompactMatrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -469,7 +469,6 @@
     <ClCompile Include="..\..\NumCore\BlockMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\BlockSolver.cpp" />
     <ClCompile Include="..\..\NumCore\CompactMatrix.cpp" />
-    <ClCompile Include="..\..\NumCore\ComplexCompactMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\ConjGradIterSolver.cpp" />
     <ClCompile Include="..\..\NumCore\DenseMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\LUSolver.cpp" />
@@ -489,7 +488,6 @@
     <ClInclude Include="..\..\NumCore\BlockMatrix.h" />
     <ClInclude Include="..\..\NumCore\BlockSolver.h" />
     <ClInclude Include="..\..\NumCore\CompactMatrix.h" />
-    <ClInclude Include="..\..\NumCore\ComplexCompactMatrix.h" />
     <ClInclude Include="..\..\NumCore\ConjGradIterSolver.h" />
     <ClInclude Include="..\..\NumCore\DenseMatrix.h" />
     <ClInclude Include="..\..\NumCore\LUSolver.h" />

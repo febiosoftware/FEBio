@@ -325,10 +325,10 @@
     <ClInclude Include="..\..\FECore\FELinearSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\cmatrix.h">
+    <ClInclude Include="..\..\FECore\BFGSSolver2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\ComplexSparseMatrix.h">
+    <ClInclude Include="..\..\FECore\FENewtonSolver2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -588,10 +588,10 @@
     <ClCompile Include="..\..\FECore\FELinearSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\cmatrix.cpp">
+    <ClCompile Include="..\..\FECore\BFGSSolver2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\ComplexSparseMatrix.cpp">
+    <ClCompile Include="..\..\FECore\FENewton2Solver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
