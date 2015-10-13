@@ -8,8 +8,9 @@ class FEGlobalMatrix;
 class LinearSolver;
 
 //-----------------------------------------------------------------------------
-//! Abstract Base class for finite element solution algorithms that only require the solution
-//! of a linear system of equations.
+//! Abstract Base class for finite element solution algorithms that require the solution
+//! of linear system of equations. This can be simple linear solution algorithm, but
+//! also nonlinear algorithms that require solving a linear system of equations (e.g. Newton solvers)
 class FELinearSolver : public FESolver
 {
 public:
@@ -69,6 +70,7 @@ private:
 	LinearSolver*		m_pls;		//!< The linear equation solver
 	FEGlobalMatrix*		m_pK;		//!< The global stiffness matrix
 	int					m_neq;		//!< The number of equations (TODO: Get this from linear solver)
+
 	vector<int>		m_dof;	//!< list of active degrees of freedom
-	bool	m_breform;	//!< matrix reformation flag
+	bool			m_breform;	//!< matrix reformation flag
 };

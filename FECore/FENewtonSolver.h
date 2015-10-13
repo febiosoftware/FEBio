@@ -1,6 +1,6 @@
 #pragma once
 #include "FESolver.h"
-#include "BFGSSolver.h"
+#include "FENewtonStrategy.h"
 #include "FETypes.h"
 
 //-----------------------------------------------------------------------------
@@ -10,9 +10,13 @@ class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
 //! This class defines the base class for Newton-type solvers. 
-//! \todo This is a work in progress. I'd like to call this the BFGSSolver,
-//!       but this name is already in use. This class should handle the common
-//!       tasks in all solver classes that use the BFGSSolver.
+//! The class implements the basic logic behind a newton-solver but defers some
+//! of the logic, especially relating to the update of the stiffness matrix to
+//! the FENewtonStrategy class. 
+//! \todo there is some common functionality with the FELinearSolver. Perhaps
+//! I can make the FELinearSolver a base class?
+//! \todo Perhaps I can introduce a base class for linear search algorithms
+//! so that the line search strategy can be customized as well.
 class FENewtonSolver : public FESolver
 {
 public:
@@ -71,7 +75,7 @@ public:
 
 	// solver parameters
 	int					m_maxref;		//!< max nr of reformations per time step
-	FENewtonStrategy*	m_pbfgs;		//!< BFGS solver parameters
+	FENewtonStrategy*	m_pbfgs;		//!< class handling the specific stiffness update logic
 
 	// linear solver data
 	LinearSolver*		m_plinsolve;	//!< the linear solver
