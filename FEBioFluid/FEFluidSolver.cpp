@@ -24,7 +24,7 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FEFluidSolver, FENewtonSolver)
+BEGIN_PARAMETER_LIST(FEFluidSolver, FENewtonSolver2)
 	ADD_PARAMETER(m_Vtol         , FE_PARAM_DOUBLE, "vtol"        );
 	ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );
 	ADD_PARAMETER(m_Rmin         , FE_PARAM_DOUBLE, "min_residual");
@@ -36,7 +36,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 //! FEFluidSolver Construction
 //
-FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
+FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver2(pfem)
 {
     // default values
     m_Rtol = 0;	// deactivate residual convergence
@@ -63,7 +63,7 @@ FEFluidSolver::~FEFluidSolver()
 bool FEFluidSolver::Init()
 {
 	// initialize base class
-	if (FENewtonSolver::Init() == false) return false;
+	if (FENewtonSolver2::Init() == false) return false;
 
     // check parameters
     if (m_Vtol <  0.0) { felog.printf("Error: vtol must be nonnegative.\n"   ); return false; }
@@ -129,7 +129,7 @@ bool FEFluidSolver::Init()
 void FEFluidSolver::Serialize(DumpFile& ar)
 {
     // Serialize parameters
-    FENewtonSolver::Serialize(ar);
+    FENewtonSolver2::Serialize(ar);
     
     if (ar.IsSaving())
     {
@@ -312,9 +312,7 @@ void FEFluidSolver::PrepStep(double time)
 }
 
 //-----------------------------------------------------------------------------
-//! Implements the BFGS algorithm to solve the nonlinear FE equations.
-//! The details of this implementation of the BFGS method can be found in:
-//!   "Finite Element Procedures", K.J. Bathe, p759 and following
+//! Implements the BFGS2 algorithm to solve the nonlinear FE equations.
 bool FEFluidSolver::Quasin(double time)
 {
     int i;
@@ -476,6 +474,7 @@ bool FEFluidSolver::Quasin(double time)
                             // or the update was no longer positive definite.
                             felog.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
                             breform = true;
+                            m_bfgs.m_nups = 0;  // reset and use as flag
                         }
                     }
                     else
@@ -485,8 +484,10 @@ bool FEFluidSolver::Quasin(double time)
                         breform = true;
                         
                         // print a warning only if the user did not intent full-Newton
-                        if (m_bfgs.m_maxups > 0)
+                        if (m_bfgs.m_maxups > 0) {
                             felog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
+                            m_bfgs.m_nups = 0;  // reset and use as flag
+                        }
                         
                     }
                 }
