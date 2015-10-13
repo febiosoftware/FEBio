@@ -3,6 +3,13 @@
 #include "FECore/FEModel.h"
 #include "FECore/FEMesh.h"
 #include "FECore/log.h"
+#include "FEContactInterface.h"
+#include "FEUncoupledMaterial.h"
+#include "FEResidualVector.h"
+#include "FEElasticDomain.h"
+#include "FEPointBodyForce.h"
+#include "FE3FieldElasticSolidDomain.h"
+
 
 #ifdef WIN32
 	#include <float.h>
@@ -19,10 +26,41 @@
 #endif
 
 //-----------------------------------------------------------------------------
-FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolidSolver(pfem)
-{
-}
+// define the parameter list
+BEGIN_PARAMETER_LIST(FECGSolidSolver, FESolver)
+	ADD_PARAMETER(m_Dtol  , FE_PARAM_DOUBLE, "dtol");
+	ADD_PARAMETER(m_Etol  , FE_PARAM_DOUBLE, "etol");
+	ADD_PARAMETER(m_Rtol  , FE_PARAM_DOUBLE, "rtol");
+	ADD_PARAMETER(m_Rmin  , FE_PARAM_DOUBLE, "min_residual");
+	ADD_PARAMETER(m_beta  , FE_PARAM_DOUBLE, "beta");
+	ADD_PARAMETER(m_gamma , FE_PARAM_DOUBLE, "gamma");
+	ADD_PARAMETER(m_LStol , FE_PARAM_DOUBLE, "lstol");
+	ADD_PARAMETER(m_LSmin , FE_PARAM_DOUBLE, "lsmin");
+	ADD_PARAMETER(m_LSiter, FE_PARAM_INT   , "lsiter");
+END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
+FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem)
+{
+	// default values
+	m_Rtol = 0;	// deactivate residual convergence 
+	m_Dtol = 0.001;
+	m_Etol = 0.01;
+	m_Rmin = 1.0e-20;
+
+	m_LStol = 0;
+	m_LSmin = 0;
+	m_LSiter = 10;
+
+	m_niter = 0;
+	m_nreq = 0;
+
+	m_baugment = false;
+
+	// default Newmark parameters for unconditionally stable time integration
+	m_beta = 0.25;
+	m_gamma = 0.5;
+}
 
 //-----------------------------------------------------------------------------
 //! Allocates and initializes the data structures used by the FESolidSolver
@@ -37,9 +75,6 @@ bool FECGSolidSolver::Init()
 	if (m_LStol  < 0.) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
 	if (m_LSmin  < 0.) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
 	if (m_LSiter < 0 ) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
-	if (m_maxref < 0 ) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
-	if (m_pbfgs->m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
-	if (m_pbfgs->m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
 
 	// get nr of equations
 	int neq = m_neq;
@@ -71,17 +106,315 @@ bool FECGSolidSolver::Init()
 		n = node.m_ID[DOF_W]; if (n >= 0) m_Ut[n] = node.m_Dt.z - node.m_D0.z;
 	}
 
-	// initialize BFGS data
-	m_pbfgs->Init(neq, this, m_plinsolve);
-
-	// set the create stiffness matrix flag
-	m_breshape = true;
-
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FECGSolidSolver::Quasin(double time)
+//!	This function initializes the equation system.
+//! It is assumed that all free dofs up until now have been given an ID >= 0
+//! and the fixed or rigid dofs an ID < 0.
+//! After this operation the nodal ID array will contain the equation
+//! number assigned to the corresponding degree of freedom. To distinguish
+//! between free or unconstrained dofs and constrained ones the following rules
+//! apply to the ID array:
+//!
+//!           /
+//!          |  >=  0 --> dof j of node i is a free dof
+//! ID[i][j] <  == -1 --> dof j of node i is a fixed (no equation assigned too)
+//!          |  <  -1 --> dof j of node i is constrained and has equation nr = -ID[i][j]-2
+//!           \
+//!
+bool FECGSolidSolver::InitEquations()
+{
+	// get the mesh
+	FEMesh& mesh = m_fem.GetMesh();
+
+	// initialize nr of equations
+	int neq = 0;
+
+	// give all free dofs an equation number
+	for (int i = 0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		for (int j = 0; j<(int)node.m_ID.size(); ++j)
+		{
+			if (node.m_ID[j] == DOF_FIXED) { node.m_ID[j] = -1; }
+			else if (node.m_ID[j] == DOF_OPEN) { node.m_ID[j] = neq++; }
+			else if (node.m_ID[j] == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; }
+			else { assert(false); return false; }
+		}
+	}
+
+	// Next, we assign equation numbers to the rigid body degrees of freedom
+	m_nreq = neq;
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	int nrb = rigid.Objects();
+	for (int i = 0; i<nrb; ++i)
+	{
+		FERigidBody& RB = *rigid.Object(i);
+		for (int j = 0; j<6; ++j)
+		{
+			int bcj = RB.m_BC[j];
+			int lmj = RB.m_LM[j];
+			if (bcj == DOF_OPEN) { RB.m_LM[j] = neq; neq++; }
+			else if (bcj == DOF_PRESCRIBED) { RB.m_LM[j] = -neq - 2; neq++; }
+			else if (bcj == DOF_FIXED) { RB.m_LM[j] = -1; }
+			else { assert(false); return false; }
+		}
+	}
+
+	// store the number of equations
+	m_neq = neq;
+
+	// we assign the rigid body equation number to
+	// Also make sure that the nodes are NOT constrained!
+	for (int i = 0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		if (node.m_rid >= 0)
+		{
+			FERigidBody& RB = *rigid.Object(node.m_rid);
+			node.m_ID[DOF_X] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0] - 2 : RB.m_LM[0]);
+			node.m_ID[DOF_Y] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1] - 2 : RB.m_LM[1]);
+			node.m_ID[DOF_Z] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2] - 2 : RB.m_LM[2]);
+			node.m_ID[DOF_RU] = (RB.m_LM[3] >= 0 ? -RB.m_LM[3] - 2 : RB.m_LM[3]);
+			node.m_ID[DOF_RV] = (RB.m_LM[4] >= 0 ? -RB.m_LM[4] - 2 : RB.m_LM[4]);
+			node.m_ID[DOF_RW] = (RB.m_LM[5] >= 0 ? -RB.m_LM[5] - 2 : RB.m_LM[5]);
+		}
+	}
+
+	// All initialization is done
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Prepares the data for the first BFGS-iteration. 
+void FECGSolidSolver::PrepStep(double time)
+{
+	// initialize counters
+	m_niter = 0;	// nr of iterations
+	m_nrhs = 0;	// nr of RHS evaluations
+	m_nref = 0;	// nr of stiffness reformations
+	m_ntotref = 0;
+	m_naug = 0;	// nr of augmentations
+
+	// zero total displacements
+	zero(m_Ui);
+
+	// store previous mesh state
+	// we need them for velocity and acceleration calculations
+	FEMesh& mesh = m_fem.GetMesh();
+	for (int i = 0; i<mesh.Nodes(); ++i)
+	{
+		FENode& ni = mesh.Node(i);
+		ni.m_rp = ni.m_rt;
+		ni.m_vp = ni.m_vt;
+		ni.m_ap = ni.m_at;
+		// ---> TODO: move to the FEPoroSoluteSolver
+		for (int k = 0; k<(int)ni.m_cp.size(); ++k) ni.m_cp[k] = ni.m_ct[k];
+	}
+
+	// TODO: Pass this parameter to this function instead of time
+	FETimePoint tp = m_fem.GetTime();
+
+	// apply concentrated nodal forces
+	// since these forces do not depend on the geometry
+	// we can do this once outside the NR loop.
+	NodalForces(m_Fn, tp);
+
+	// apply prescribed displacements
+	// we save the prescribed displacements increments in the ui vector
+	vector<double>& ui = m_ui;
+	zero(ui);
+	int neq = m_neq;
+	int nbc = m_fem.PrescribedBCs();
+	for (int i = 0; i<nbc; ++i)
+	{
+		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
+		if (dc.IsActive()) dc.PrepStep(ui);
+	}
+
+	// initialize rigid bodies
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	int NO = rigid.Objects();
+	for (int i = 0; i<NO; ++i) rigid.Object(i)->Init();
+
+	// calculate local rigid displacements
+	for (int i = 0; i<(int)m_fem.m_RDC.size(); ++i)
+	{
+		FERigidBodyDisplacement& DC = *m_fem.m_RDC[i];
+		FERigidBody& RB = *rigid.Object(DC.id);
+		if (DC.IsActive())
+		{
+			int I = DC.bc;
+			int lc = DC.lc;
+			if (lc >= 0)
+			{
+				RB.m_dul[I] = DC.Value() - RB.m_Ut[DC.bc];
+			}
+		}
+	}
+
+	// calculate global rigid displacements
+	for (int i = 0; i<NO; ++i)
+	{
+		FERigidBody* prb = rigid.Object(i);
+		if (prb)
+		{
+			FERigidBody& RB = *prb;
+			if (RB.m_prb == 0)
+			{
+				for (int j = 0; j<6; ++j) RB.m_du[j] = RB.m_dul[j];
+			}
+			else
+			{
+				double* dul = RB.m_dul;
+				vec3d dr = vec3d(dul[0], dul[1], dul[2]);
+
+				vec3d v = vec3d(dul[3], dul[4], dul[5]);
+				double w = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+				quatd dq = quatd(w, v);
+
+				FERigidBody* pprb = RB.m_prb;
+
+				vec3d r0 = RB.m_rt;
+				quatd Q0 = RB.m_qt;
+
+				dr = Q0*dr;
+				dq = Q0*dq*Q0.Inverse();
+
+				while (pprb)
+				{
+					vec3d r1 = pprb->m_rt;
+					dul = pprb->m_dul;
+
+					quatd Q1 = pprb->m_qt;
+
+					dr = r0 + dr - r1;
+
+					// grab the parent's local displacements
+					vec3d dR = vec3d(dul[0], dul[1], dul[2]);
+					v = vec3d(dul[3], dul[4], dul[5]);
+					w = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+					quatd dQ = quatd(w, v);
+
+					dQ = Q1*dQ*Q1.Inverse();
+
+					// update global displacements
+					quatd Qi = Q1.Inverse();
+					dr = dR + r1 + dQ*dr - r0;
+					dq = dQ*dq;
+
+					// move up in the chain
+					pprb = pprb->m_prb;
+					Q0 = Q1;
+				}
+
+				// set global displacements
+				double* du = RB.m_du;
+
+				du[0] = dr.x;
+				du[1] = dr.y;
+				du[2] = dr.z;
+
+				v = dq.GetVector();
+				w = dq.GetAngle();
+				du[3] = w*v.x;
+				du[4] = w*v.y;
+				du[5] = w*v.z;
+			}
+		}
+	}
+
+	// store rigid displacements in Ui vector
+	for (int i = 0; i<NO; ++i)
+	{
+		FERigidBody& RB = *rigid.Object(i);
+		for (int j = 0; j<6; ++j)
+		{
+			int I = -RB.m_LM[j] - 2;
+			if (I >= 0) ui[I] = RB.m_du[j];
+		}
+	}
+
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	if (pstep->m_nanalysis == FE_DYNAMIC)
+	{
+		FEMesh& mesh = m_fem.GetMesh();
+		FERigidSystem& rigid = *m_fem.GetRigidSystem();
+
+		// set the initial velocities of all rigid nodes
+		for (int i = 0; i<mesh.Nodes(); ++i)
+		{
+			FENode& n = mesh.Node(i);
+			if (n.m_rid >= 0)
+			{
+				FERigidBody& rb = *rigid.Object(n.m_rid);
+				vec3d V = rb.m_vt;
+				vec3d W = rb.m_wt;
+				vec3d r = n.m_rt - rb.m_rt;
+
+				vec3d v = V + (W ^ r);
+				n.m_vp = n.m_vt = v;
+
+				vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
+				n.m_ap = n.m_at = a;
+			}
+		}
+	}
+
+	// store the current rigid body reaction forces
+	for (int i = 0; i<rigid.Objects(); ++i)
+	{
+		FERigidBody& RB = *rigid.Object(i);
+		RB.m_Fp = RB.m_Fr;
+		RB.m_Mp = RB.m_Mr;
+	}
+
+	// initialize contact
+	if (m_fem.SurfacePairInteractions() > 0) UpdateContact();
+
+	// initialize nonlinear constraints
+	if (m_fem.NonlinearConstraints() > 0) UpdateConstraints();
+
+	// intialize material point data
+	// NOTE: do this before the stresses are updated
+	// TODO: does it matter if the stresses are updated before
+	//       the material point data is initialized
+	FEMaterialPoint::dt = m_fem.GetCurrentStep()->m_dt;
+	FEMaterialPoint::time = m_fem.m_ftime;
+
+	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
+
+	// update stresses
+	UpdateStresses();
+
+	// see if we need to do contact augmentations
+	m_baugment = false;
+	for (int i = 0; i<m_fem.SurfacePairInteractions(); ++i)
+	{
+		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*m_fem.SurfacePairInteraction(i));
+		if (ci.IsActive() && ci.m_blaugon) m_baugment = true;
+	}
+
+	// see if we need to do incompressible augmentations
+	int nmat = m_fem.Materials();
+	for (int i = 0; i<nmat; ++i)
+	{
+		FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_fem.GetMaterial(i));
+		if (pmi && pmi->m_blaugon) m_baugment = true;
+	}
+
+	// see if we have to do nonlinear constraint augmentations
+	for (int i = 0; i<m_fem.NonlinearConstraints(); ++i)
+	{
+		FENLConstraint& ci = *m_fem.NonlinearConstraint(i);
+		if (ci.IsActive()) m_baugment = true;
+	}
+}
+
+//-----------------------------------------------------------------------------
+bool FECGSolidSolver::SolveStep(double time)
 {
 	int i;
 
@@ -247,7 +580,6 @@ bool FECGSolidSolver::Quasin(double time)
 			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);
 
 		felog.printf(" Nonlinear solution status: time= %lg\n", time); 
-		felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
@@ -319,14 +651,6 @@ bool FECGSolidSolver::Quasin(double time)
 				// for incompressible materials
 				UpdateStresses();
 				Residual(m_R0);
-/*
-				// reform the matrix if we are using full-Newton
-				if (m_pbfgs->m_maxups == 0)
-				{
-					felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
-					if (ReformStiffness() == false) break;
-				}
-*/
 			}
 		}
 	
@@ -600,4 +924,441 @@ double FECGSolidSolver::LineSearchCG(double s)
 	}
 
 	return s;
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the residual vector
+//! Note that the concentrated nodal forces are not calculated here.
+//! This is because they do not depend on the geometry 
+//! so we only calculate them once (in Quasin) and then add them here.
+
+bool FECGSolidSolver::Residual(vector<double>& R)
+{
+	// initialize residual with concentrated nodal loads
+	R = m_Fn;
+
+	// zero nodal reaction forces
+	zero(m_Fr);
+
+	// setup the global vector
+	FEResidualVector RHS(GetFEModel(), R, m_Fr);
+
+	// zero rigid body reaction forces
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	int NRB = rigid.Objects();
+	for (int i = 0; i<NRB; ++i)
+	{
+		FERigidBody& RB = *rigid.Object(i);
+		RB.m_Fr = RB.m_Mr = vec3d(0, 0, 0);
+	}
+
+	// get the mesh
+	FEMesh& mesh = m_fem.GetMesh();
+
+	// calculate the internal (stress) forces
+	for (int i = 0; i<mesh.Domains(); ++i)
+	{
+		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+		dom.InternalForces(RHS);
+	}
+
+	// update body forces
+	for (int i = 0; i<m_fem.BodyLoads(); ++i)
+	{
+		// TODO: I don't like this but for now I'll hard-code the modification of the
+		//       force center position
+		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_fem.GetBodyLoad(i));
+		if (pbf)
+		{
+			if (pbf->m_rlc[0] >= 0) pbf->m_rc.x = m_fem.GetLoadCurve(pbf->m_rlc[0])->Value();
+			if (pbf->m_rlc[1] >= 0) pbf->m_rc.y = m_fem.GetLoadCurve(pbf->m_rlc[1])->Value();
+			if (pbf->m_rlc[2] >= 0) pbf->m_rc.z = m_fem.GetLoadCurve(pbf->m_rlc[2])->Value();
+		}
+	}
+
+	// calculate the body forces
+	for (int i = 0; i<mesh.Domains(); ++i)
+	{
+		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+		for (int j = 0; j<m_fem.BodyLoads(); ++j)
+		{
+			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+			dom.BodyForce(RHS, *pbf);
+		}
+	}
+
+	// calculate inertial forces for dynamic problems
+	if (m_fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) InertialForces(RHS);
+
+	// calculate forces due to surface loads
+	int nsl = m_fem.SurfaceLoads();
+	for (int i = 0; i<nsl; ++i)
+	{
+		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
+		if (psl->IsActive()) psl->Residual(RHS);
+	}
+
+	// calculate contact forces
+	if (m_fem.SurfacePairInteractions() > 0)
+	{
+		ContactForces(RHS);
+	}
+
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
+
+	// calculate nonlinear constraint forces
+	// note that these are the linear constraints
+	// enforced using the augmented lagrangian
+	NonLinearConstraintForces(RHS, tp);
+
+	// forces due to point constraints
+	//	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
+
+	// add model loads
+	int NML = m_fem.ModelLoads();
+	for (int i = 0; i<NML; ++i)
+	{
+		FEModelLoad& mli = *m_fem.ModelLoad(i);
+		if (mli.IsActive())
+		{
+			mli.Residual(RHS, tp);
+		}
+	}
+
+	// set the nodal reaction forces
+	// TODO: Is this a good place to do this?
+	for (int i = 0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		node.m_Fr = vec3d(0, 0, 0);
+
+		int n;
+		if ((n = -node.m_ID[DOF_X] - 2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[DOF_Y] - 2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[DOF_Z] - 2) >= 0) node.m_Fr.z = -m_Fr[n];
+	}
+
+	// increase RHS counter
+	m_nrhs++;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//!  Updates the element stresses
+void FECGSolidSolver::UpdateStresses()
+{
+	FEMesh& mesh = m_fem.GetMesh();
+
+	// update the stresses on all domains
+	for (int i = 0; i<mesh.Domains(); ++i)
+	{
+		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+		dom.UpdateStresses(m_fem);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Update contact interfaces.
+void FECGSolidSolver::UpdateContact()
+{
+	// Update all contact interfaces
+	for (int i = 0; i<m_fem.SurfacePairInteractions(); ++i)
+	{
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
+		if (pci->IsActive()) pci->Update(m_niter);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Update nonlinear constraints
+void FECGSolidSolver::UpdateConstraints()
+{
+	FETimePoint tp = m_fem.GetTime();
+
+	// Update all nonlinear constraints
+	for (int i = 0; i<m_fem.NonlinearConstraints(); ++i)
+	{
+		FENLConstraint* pci = m_fem.NonlinearConstraint(i);
+		if (pci->IsActive()) pci->Update(tp);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//!  This functions performs the Lagrange augmentations
+//!  It returns true if all the augmentation have converged, 
+//!	otherwise it returns false
+//
+//! \todo There is an inherent problem with this approach. Since
+//!	      Lagrangian multipliers are inherited from previous timesteps
+//!       they might not be zero in case a node-surface contact breaks. 
+//!       The node's gap value needs to become negative to a certain value
+//!       before the Lagr. multipliers dissapears. 
+//
+bool FECGSolidSolver::Augment()
+{
+	FETimePoint tp = m_fem.GetTime();
+
+	// Assume we will pass (can't hurt to be optimistic)
+	bool bconv = true;
+
+	// Do contact augmentations
+	if (m_fem.SurfacePairInteractions() > 0)
+	{
+		// loop over all contact interfaces
+		for (int i = 0; i<m_fem.SurfacePairInteractions(); ++i)
+		{
+			FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
+			if (pci->IsActive()) bconv = (pci->Augment(m_naug) && bconv);
+		}
+	}
+
+	// do nonlinear constraint augmentations
+	int n = m_fem.NonlinearConstraints();
+	for (int i = 0; i<n; ++i)
+	{
+		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
+		if (plc->IsActive()) bconv = plc->Augment(m_naug, tp) && bconv;
+	}
+
+	// do incompressibility multipliers for 3Field domains
+	FEMesh& mesh = m_fem.GetMesh();
+	int ND = mesh.Domains();
+	for (int i = 0; i<ND; ++i)
+	{
+		FE3FieldElasticSolidDomain* pd = dynamic_cast<FE3FieldElasticSolidDomain*>(&mesh.Domain(i));
+		if (pd) bconv = (pd->Augment(m_naug) && bconv);
+	}
+
+	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the contact forces
+void FECGSolidSolver::ContactForces(FEGlobalVector& R)
+{
+	for (int i = 0; i<m_fem.SurfacePairInteractions(); ++i)
+	{
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
+		if (pci->IsActive()) pci->ContactForces(R);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! calculate the nonlinear constraint forces 
+void FECGSolidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp)
+{
+	int N = m_fem.NonlinearConstraints();
+	for (int i = 0; i<N; ++i)
+	{
+		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
+		if (plc->IsActive()) plc->Residual(R, tp);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the concentrated nodal forces
+
+void FECGSolidSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
+{
+	// zero nodal force vector
+	zero(F);
+
+	// loop over nodal loads
+	int NNL = m_fem.NodalLoads();
+	for (int i = 0; i<NNL; ++i)
+	{
+		FENodalLoad& fc = *m_fem.NodalLoad(i);
+		if (fc.IsActive())
+		{
+			int nid = fc.m_node;	// node ID
+			int dof = fc.m_bc;		// degree of freedom
+
+			// get the nodal load value
+			double f = fc.Value();
+
+			// For pressure and concentration loads, multiply by dt
+			// for consistency with evaluation of residual and stiffness matrix
+			if ((dof == DOF_P) || (dof >= DOF_C)) f *= tp.dt;
+
+			// assemble into residual
+			AssembleResidual(nid, dof, f, F);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the inertial forces for dynamic problems
+
+void FECGSolidSolver::InertialForces(FEGlobalVector& R)
+{
+	// get the mesh
+	FEMesh& mesh = m_fem.GetMesh();
+
+	// allocate F
+	vector<double> F(3 * mesh.Nodes());
+	zero(F);
+
+	// calculate F
+	double dt = m_fem.GetCurrentStep()->m_dt;
+	double a = 1.0 / (m_beta*dt);
+	double b = a / dt;
+	double c = 1.0 - 0.5 / m_beta;
+	for (int i = 0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		vec3d& rt = node.m_rt;
+		vec3d& rp = node.m_rp;
+		vec3d& vp = node.m_vp;
+		vec3d& ap = node.m_ap;
+
+		F[3 * i] = b*(rt.x - rp.x) - a*vp.x + c * ap.x;
+		F[3 * i + 1] = b*(rt.y - rp.y) - a*vp.y + c * ap.y;
+		F[3 * i + 2] = b*(rt.z - rp.z) - a*vp.z + c * ap.z;
+	}
+
+	// now multiply F with the mass matrix
+	for (int nd = 0; nd < mesh.Domains(); ++nd)
+	{
+		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(nd));
+		dom.InertialForces(R, F);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// \todo I'd like to do something different with this. Right now, if a nodal load
+//       it applied to a rigid body, the load has to be translated to a force and 
+//       torque applied to the rigid body. Perhaps we should really define two types
+//       of nodal loads, one for the deformable body and for the rigid body. This can
+//       be done in a pre-processor phase. That way, standard assembly routines can be
+//       used to assemble to loads into the global vector.
+void FECGSolidSolver::AssembleResidual(int node_id, int dof, double f, vector<double>& R)
+{
+	// get the mesh
+	FEMesh& mesh = m_fem.GetMesh();
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+
+	// get the equation number
+	FENode& node = mesh.Node(node_id);
+	int n = node.m_ID[dof];
+
+	// assemble into global vector
+	if (n >= 0) R[n] += f;
+	else if (node.m_rid >= 0)
+	{
+		// this is a rigid body node
+		FERigidBody& RB = *rigid.Object(node.m_rid);
+
+		// get the relative position
+		vec3d a = node.m_rt - RB.m_rt;
+
+		int* lm = RB.m_LM;
+		switch (dof)
+		{
+		case DOF_X:
+			if (lm[0] >= 0) R[lm[0]] += f;
+			if (lm[4] >= 0) R[lm[4]] += a.z*f;
+			if (lm[5] >= 0) R[lm[5]] += -a.y*f;
+			break;
+		case DOF_Y:
+			if (lm[1] >= 0) R[lm[1]] += f;
+			if (lm[3] >= 0) R[lm[3]] += -a.z*f;
+			if (lm[5] >= 0) R[lm[5]] += a.x*f;
+			break;
+		case DOF_Z:
+			if (lm[2] >= 0) R[lm[2]] += f;
+			if (lm[3] >= 0) R[lm[3]] += a.y*f;
+			if (lm[4] >= 0) R[lm[4]] += -a.x*f;
+			break;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Updates the rigid body data
+void FECGSolidSolver::UpdateRigidBodies(vector<double>& ui)
+{
+	// get the number of rigid bodies
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	const int NRB = rigid.Objects();
+
+	// first calculate the rigid body displacement increments
+	for (int i = 0; i<NRB; ++i)
+	{
+		// get the rigid body
+		FERigidBody& RB = *rigid.Object(i);
+		int *lm = RB.m_LM;
+		double* du = RB.m_du;
+
+		if (RB.m_prb == 0)
+		{
+			for (int j = 0; j<6; ++j)
+			{
+				du[j] = (lm[j] >= 0 ? m_Ui[lm[j]] + ui[lm[j]] : 0);
+			}
+		}
+	}
+
+	// for prescribed displacements, the displacement increments are evaluated differently
+	// TODO: Is this really necessary? Why can't the ui vector contain the correct values?
+	const int NRD = (const int)m_fem.m_RDC.size();
+	for (int i = 0; i<NRD; ++i)
+	{
+		FERigidBodyDisplacement& dc = *m_fem.m_RDC[i];
+		if (dc.IsActive())
+		{
+			FERigidBody& RB = *rigid.Object(dc.id);
+			if (RB.m_prb == 0)
+			{
+				RB.m_du[dc.bc] = (dc.lc < 0 ? 0 : dc.Value() - RB.m_Up[dc.bc]);
+			}
+		}
+	}
+
+	// update the rigid bodies
+	for (int i = 0; i<NRB; ++i)
+	{
+		// get the rigid body
+		FERigidBody& RB = *rigid.Object(i);
+		double* du = RB.m_du;
+
+		// This is the "new" update algorithm which addressesses a couple issues
+		// with the old method, namely that prescribed rotational dofs aren't update correctly.
+		// Unfortunately, it seems to produce worse convergence in some cases, especially with line search
+		// and it doesn't work when rigid bodies are used in a hierarchy
+		if (RB.m_prb) du = RB.m_dul;
+		RB.m_Ut[0] = RB.m_Up[0] + du[0];
+		RB.m_Ut[1] = RB.m_Up[1] + du[1];
+		RB.m_Ut[2] = RB.m_Up[2] + du[2];
+		RB.m_Ut[3] = RB.m_Up[3] + du[3];
+		RB.m_Ut[4] = RB.m_Up[4] + du[4];
+		RB.m_Ut[5] = RB.m_Up[5] + du[5];
+
+		RB.m_rt = RB.m_r0 + vec3d(RB.m_Ut[0], RB.m_Ut[1], RB.m_Ut[2]);
+
+		vec3d Rt(RB.m_Ut[3], RB.m_Ut[4], RB.m_Ut[5]);
+		RB.m_qt = quatd(Rt);
+	}
+
+	// we need to update the position of rigid nodes
+	FEMesh& mesh = m_fem.GetMesh();
+	for (int i = 0; i<NRB; ++i)
+	{
+		// get the rigid body
+		FERigidBody& RB = *rigid.Object(i);
+
+		// update the mesh' nodes
+		int N = mesh.Nodes();
+		for (int j = 0; j<N; ++j)
+		{
+			FENode& node = mesh.Node(j);
+			if (node.m_rid == RB.m_nID)
+			{
+				vec3d a0 = node.m_r0 - RB.m_r0;
+				vec3d at = RB.m_qt*a0;
+				node.m_rt = RB.m_rt + at;
+			}
+		}
+	}
 }

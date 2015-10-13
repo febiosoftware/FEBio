@@ -401,6 +401,7 @@
     <ClInclude Include="..\..\FECore\Archive.h" />
     <ClInclude Include="..\..\FECore\BC.h" />
     <ClInclude Include="..\..\FECore\BFGSSolver.h" />
+    <ClInclude Include="..\..\FECore\BFGSSolver2.h" />
     <ClInclude Include="..\..\FECore\DataStore.h" />
     <ClInclude Include="..\..\FECore\DOFS.h" />
     <ClInclude Include="..\..\FECore\DumpFile.h" />
@@ -434,12 +435,14 @@
     <ClInclude Include="..\..\FECore\FEInitialCondition.h" />
     <ClInclude Include="..\..\FECore\FELevelStructure.h" />
     <ClInclude Include="..\..\FECore\FELinearConstraint.h" />
+    <ClInclude Include="..\..\FECore\FELinearSolver.h" />
     <ClInclude Include="..\..\FECore\FEMaterial.h" />
     <ClInclude Include="..\..\FECore\FEMaterialPoint.h" />
     <ClInclude Include="..\..\FECore\FEMesh.h" />
     <ClInclude Include="..\..\FECore\FEModel.h" />
     <ClInclude Include="..\..\FECore\FEModelComponent.h" />
     <ClInclude Include="..\..\FECore\FENewtonSolver.h" />
+    <ClInclude Include="..\..\FECore\FENewtonStrategy.h" />
     <ClInclude Include="..\..\FECore\FENLConstraint.h" />
     <ClInclude Include="..\..\FECore\FENNQuery.h" />
     <ClInclude Include="..\..\FECore\FENodeElemList.h" />
@@ -501,6 +504,7 @@
     <ClCompile Include="..\..\FECore\Archive.cpp" />
     <ClCompile Include="..\..\FECore\BC.cpp" />
     <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
+    <ClCompile Include="..\..\FECore\BFGSSolver2.cpp" />
     <ClCompile Include="..\..\FECore\colsol.cpp" />
     <ClCompile Include="..\..\FECore\DataStore.cpp" />
     <ClCompile Include="..\..\FECore\DOFS.cpp" />
@@ -534,12 +538,14 @@
     <ClCompile Include="..\..\FECore\FEInitialCondition.cpp" />
     <ClCompile Include="..\..\FECore\FELevelStructure.cpp" />
     <ClCompile Include="..\..\FECore\FELinearConstraint.cpp" />
+    <ClCompile Include="..\..\FECore\FELinearSolver.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterialPoint.cpp" />
     <ClCompile Include="..\..\FECore\FEMesh.cpp" />
     <ClCompile Include="..\..\FECore\FEModel.cpp" />
     <ClCompile Include="..\..\FECore\FEModelComponent.cpp" />
     <ClCompile Include="..\..\FECore\FENewtonSolver.cpp" />
+    <ClCompile Include="..\..\FECore\FENewtonStrategy.cpp" />
     <ClCompile Include="..\..\FECore\FENLConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FENNQuery.cpp" />
     <ClCompile Include="..\..\FECore\FENodeElemList.cpp" />
