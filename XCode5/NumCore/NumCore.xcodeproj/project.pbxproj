@@ -282,6 +282,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
+				HEADER_SEARCH_PATHS = /opt/intel/mkl/include;
+				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO -DMKL_ISS";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DPARDISO",
+					"-DMKL_ISS",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = "Release-Dave";
@@ -378,6 +385,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
+				HEADER_SEARCH_PATHS = /opt/intel/mkl/include;
+				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO -DMKL_ISS";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DPARDISO",
+					"-DMKL_ISS",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -386,6 +400,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
+				HEADER_SEARCH_PATHS = /opt/intel/mkl/include;
+				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO -DMKL_ISS";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DPARDISO",
+					"-DMKL_ISS",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

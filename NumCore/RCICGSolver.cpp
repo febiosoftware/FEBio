@@ -119,7 +119,7 @@ bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
 	dcg_get(&n, px, pb, &rci_request, ipar, dpar, ptmp, &niter);
 
 	// release internal MKL buffers
-	MKL_FreeBuffers();
+	MKL_Free_Buffers();
 
 	return bsuccess;
 #else
