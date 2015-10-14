@@ -9,6 +9,7 @@
 #include "PardisoSolver.h"
 #include "WSMPSolver.h"
 #include "RCICGSolver.h"
+#include "FGMRESSolver.h"
 #include "FECore/FE_enum.h"
 #include "FECore/FECoreFactory.h"
 #include "FECore/FECoreKernel.h"
@@ -40,4 +41,5 @@ REGISTER_LINEAR_SOLVER(LUSolver          , LU_SOLVER          );
 REGISTER_LINEAR_SOLVER(WSMPSolver        , WSMP_SOLVER        );
 REGISTER_LINEAR_SOLVER(ConjGradIterSolver, CG_ITERATIVE_SOLVER);
 REGISTER_LINEAR_SOLVER(RCICGSolver       , RCICG_SOLVER       );
+REGISTER_LINEAR_SOLVER(FGMRESSolver      , FGMRES_SOLVER      );
 }

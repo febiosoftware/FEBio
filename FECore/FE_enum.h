@@ -147,7 +147,8 @@ enum FE_Linear_Solver_Type {
 	LU_SOLVER,
 	WSMP_SOLVER,		// use only where available
 	CG_ITERATIVE_SOLVER,
-	RCICG_SOLVER		// use only where available
+	RCICG_SOLVER,		// use only where available
+	FGMRES_SOLVER		// use only where available
 };
 
 ///////////////////////////////////////////////////////////////////////////////

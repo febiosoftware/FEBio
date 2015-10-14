@@ -318,7 +318,11 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 			// no output to screen
 			ops.bsilent = true;
 		}
-		else if (strcmp(sz, "-cnf") == 0)
+		else if (strcmp(sz, "-cnf") == 0)	// obsolete: use -config instead
+		{
+			strcpy(ops.szcnf, argv[++i]);
+		}
+		else if (strcmp(sz, "-config") == 0)
 		{
 			strcpy(ops.szcnf, argv[++i]);
 		}
@@ -619,6 +623,7 @@ bool Configure(const char *szfile)
 						else if (strcmp(szt, "superlu_mt"        ) == 0) FEModel::SetDefaultSolver(SUPERLU_MT_SOLVER);
 						else if (strcmp(szt, "pardiso"           ) == 0) FEModel::SetDefaultSolver(PARDISO_SOLVER   );
 						else if (strcmp(szt, "rcicg"             ) == 0) FEModel::SetDefaultSolver(RCICG_SOLVER     );
+						else if (strcmp(szt, "fgmres"            ) == 0) FEModel::SetDefaultSolver(FGMRES_SOLVER    );
 						else if (strcmp(szt, "wsmp"              ) == 0) FEModel::SetDefaultSolver(WSMP_SOLVER      );
 					}
 					else if (tag == "import")
