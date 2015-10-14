@@ -569,54 +569,32 @@ double CompactUnSymmMatrix::diag(int i)
 //-----------------------------------------------------------------------------
 void CompactUnSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r)
 {
-	int j, i, n;
-	int N = Size();
-
-	double* pv, rj;
-	int* pi;
+	// get the matrix size
+	const int N = Size();
 
 	// loop over all columns
-	for (j=0; j<N; ++j)
+	if (m_brow_based)
 	{
-		pv = m_pd  + m_ppointers[j] - m_offset;
-		pi = m_pindices + m_ppointers[j]  - m_offset;
-		n = m_ppointers[j+1] - m_ppointers[j];
-
-		// add off-diagonal elements
-		for (i=1; i<n-7; i+=8)
+		// loop over all rows
+		for (int i=0; i<N; ++i)
 		{
-			// add lower triangular element
-			r[pi[i  ] - m_offset] += pv[i  ]*x[j];
-			r[pi[i+1] - m_offset] += pv[i+1]*x[j];
-			r[pi[i+2] - m_offset] += pv[i+2]*x[j];
-			r[pi[i+3] - m_offset] += pv[i+3]*x[j];
-			r[pi[i+4] - m_offset] += pv[i+4]*x[j];
-			r[pi[i+5] - m_offset] += pv[i+5]*x[j];
-			r[pi[i+6] - m_offset] += pv[i+6]*x[j];
-			r[pi[i+7] - m_offset] += pv[i+7]*x[j];
+			double ri = 0.0;
+			double* pv = m_pd + m_ppointers[i] - m_offset;
+			int* pi = m_pindices + m_ppointers[i] - m_offset;
+			int n = m_ppointers[i+1] - m_ppointers[i];
+			for (int j=0; j<n; ++j) ri += pv[j]*x[pi[j]-m_offset];
+			r[i] = ri;
 		}
-		for (i=0; i<(n-1)%8; ++i)
-			r[pi[n-1-i] - m_offset] += pv[n-1-i]*x[j];
-
-		// add diagonal element
-		rj = pv[0]*x[j]; 
-
-		// add upper-triangular elements
-		for (i=1; i<n-7; i+=8)
+	}
+	else
+	{
+		// loop over all columns
+		for (int i=0; i<N; ++i)
 		{
-			// add upper triangular element
-			rj += pv[i  ]*x[pi[i  ] - m_offset];
-			rj += pv[i+1]*x[pi[i+1] - m_offset];
-			rj += pv[i+2]*x[pi[i+2] - m_offset];
-			rj += pv[i+3]*x[pi[i+3] - m_offset];
-			rj += pv[i+4]*x[pi[i+4] - m_offset];
-			rj += pv[i+5]*x[pi[i+5] - m_offset];
-			rj += pv[i+6]*x[pi[i+6] - m_offset];
-			rj += pv[i+7]*x[pi[i+7] - m_offset];
+			double* pv = m_pd  + m_ppointers[i] - m_offset;
+			int* pi = m_pindices + m_ppointers[i]  - m_offset;
+			int n = m_ppointers[i+1] - m_ppointers[i];
+			for (int j=1; j<n; j++)  r[pi[j] - m_offset] += pv[j]*x[i];
 		}
-		for (i=0; i<(n-1)%8; ++i)
-			rj += pv[n-1-i]*x[pi[n-1-i] - m_offset];
-
-		r[j] += rj;
 	}
 }

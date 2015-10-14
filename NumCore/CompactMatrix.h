@@ -38,7 +38,7 @@ public:
 	//! return the index offset (is 0 or 1)
 	int     Offset  () { return m_offset; }
 
-protected:
+public:
 	//! Create the matrix
 	void alloc(int N, int nz, double* pv, int *pi, int* pp);
 

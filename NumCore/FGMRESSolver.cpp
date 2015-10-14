@@ -22,7 +22,7 @@ SparseMatrix* FGMRESSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 #ifdef MKL_ISS
 	if (ntype != REAL_UNSYMMETRIC) return 0;
-	m_pA = new CompactUnSymmMatrix(1);
+	m_pA = new CompactUnSymmMatrix(1, true);
 	return m_pA;
 #else
 	return 0;
