@@ -102,12 +102,9 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 		}
 	}
 
-	// if converged get the solution. 
-	if (bconverged)
-	{
-		MKL_INT itercount;
-		dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp, &itercount);
-	}
+	// get the solution. 
+	MKL_INT itercount;
+	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp, &itercount);
 
 	MKL_Free_Buffers();
 	return bconverged;
