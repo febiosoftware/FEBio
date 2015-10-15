@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D5CE283E1BCEC89C006D8A97 /* BlockMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CE28381BCEC89C006D8A97 /* BlockMatrix.cpp */; settings = {ASSET_TAGS = (); }; };
+		D5CE283F1BCEC89C006D8A97 /* BlockMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CE28391BCEC89C006D8A97 /* BlockMatrix.h */; settings = {ASSET_TAGS = (); }; };
+		D5CE28401BCEC89C006D8A97 /* BlockSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CE283A1BCEC89C006D8A97 /* BlockSolver.cpp */; settings = {ASSET_TAGS = (); }; };
+		D5CE28411BCEC89C006D8A97 /* BlockSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CE283B1BCEC89C006D8A97 /* BlockSolver.h */; settings = {ASSET_TAGS = (); }; };
+		D5CE28421BCEC89C006D8A97 /* FGMRESSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CE283C1BCEC89C006D8A97 /* FGMRESSolver.cpp */; settings = {ASSET_TAGS = (); }; };
+		D5CE28431BCEC89C006D8A97 /* FGMRESSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CE283D1BCEC89C006D8A97 /* FGMRESSolver.h */; settings = {ASSET_TAGS = (); }; };
 		D5E10B401865E1B600B23922 /* CompactMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B211865E1B600B23922 /* CompactMatrix.cpp */; };
 		D5E10B411865E1B600B23922 /* CompactMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10B221865E1B600B23922 /* CompactMatrix.h */; };
 		D5E10B421865E1B600B23922 /* ConjGradIterSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B231865E1B600B23922 /* ConjGradIterSolver.cpp */; };
@@ -40,6 +46,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D5CE28381BCEC89C006D8A97 /* BlockMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockMatrix.cpp; sourceTree = "<group>"; };
+		D5CE28391BCEC89C006D8A97 /* BlockMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockMatrix.h; sourceTree = "<group>"; };
+		D5CE283A1BCEC89C006D8A97 /* BlockSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockSolver.cpp; sourceTree = "<group>"; };
+		D5CE283B1BCEC89C006D8A97 /* BlockSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockSolver.h; sourceTree = "<group>"; };
+		D5CE283C1BCEC89C006D8A97 /* FGMRESSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FGMRESSolver.cpp; sourceTree = "<group>"; };
+		D5CE283D1BCEC89C006D8A97 /* FGMRESSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FGMRESSolver.h; sourceTree = "<group>"; };
 		D5E10B191865E1AA00B23922 /* libNumCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libNumCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E10B211865E1B600B23922 /* CompactMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompactMatrix.cpp; sourceTree = "<group>"; };
 		D5E10B221865E1B600B23922 /* CompactMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompactMatrix.h; sourceTree = "<group>"; };
@@ -103,12 +115,18 @@
 		D5E10B201865E1B600B23922 /* NumCore */ = {
 			isa = PBXGroup;
 			children = (
+				D5CE28381BCEC89C006D8A97 /* BlockMatrix.cpp */,
+				D5CE28391BCEC89C006D8A97 /* BlockMatrix.h */,
+				D5CE283A1BCEC89C006D8A97 /* BlockSolver.cpp */,
+				D5CE283B1BCEC89C006D8A97 /* BlockSolver.h */,
 				D5E10B211865E1B600B23922 /* CompactMatrix.cpp */,
 				D5E10B221865E1B600B23922 /* CompactMatrix.h */,
 				D5E10B231865E1B600B23922 /* ConjGradIterSolver.cpp */,
 				D5E10B241865E1B600B23922 /* ConjGradIterSolver.h */,
 				D5E10B251865E1B600B23922 /* DenseMatrix.cpp */,
 				D5E10B261865E1B600B23922 /* DenseMatrix.h */,
+				D5CE283C1BCEC89C006D8A97 /* FGMRESSolver.cpp */,
+				D5CE283D1BCEC89C006D8A97 /* FGMRESSolver.h */,
 				D5E10B271865E1B600B23922 /* LUSolver.cpp */,
 				D5E10B281865E1B600B23922 /* LUSolver.h */,
 				D5E10B291865E1B600B23922 /* NumCore.cpp */,
@@ -147,7 +165,10 @@
 			files = (
 				D5E10B471865E1B600B23922 /* LUSolver.h in Headers */,
 				D5E10B411865E1B600B23922 /* CompactMatrix.h in Headers */,
+				D5CE28411BCEC89C006D8A97 /* BlockSolver.h in Headers */,
 				D5E10B521865E1B600B23922 /* SkylineMatrix.h in Headers */,
+				D5CE283F1BCEC89C006D8A97 /* BlockMatrix.h in Headers */,
+				D5CE28431BCEC89C006D8A97 /* FGMRESSolver.h in Headers */,
 				D5E10B5D1865E1B600B23922 /* WSMPSolver.h in Headers */,
 				D5E10B4B1865E1B600B23922 /* PardisoSolver.h in Headers */,
 				D5E10B5A1865E1B600B23922 /* SuperLUSolver.h in Headers */,
@@ -214,6 +235,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5CE283E1BCEC89C006D8A97 /* BlockMatrix.cpp in Sources */,
 				D5E10B421865E1B600B23922 /* ConjGradIterSolver.cpp in Sources */,
 				D5E10B461865E1B600B23922 /* LUSolver.cpp in Sources */,
 				D5E10B481865E1B600B23922 /* NumCore.cpp in Sources */,
@@ -221,8 +243,10 @@
 				D5E10B4C1865E1B600B23922 /* PardisoSolverDL.cpp in Sources */,
 				D5E10B401865E1B600B23922 /* CompactMatrix.cpp in Sources */,
 				D5E10B441865E1B600B23922 /* DenseMatrix.cpp in Sources */,
+				D5CE28421BCEC89C006D8A97 /* FGMRESSolver.cpp in Sources */,
 				D5E10B571865E1B600B23922 /* SuperLU_MT_Solver.cpp in Sources */,
 				D5E10B4D1865E1B600B23922 /* PSLDLTSolver.cpp in Sources */,
+				D5CE28401BCEC89C006D8A97 /* BlockSolver.cpp in Sources */,
 				D5E10B511865E1B600B23922 /* SkylineMatrix.cpp in Sources */,
 				D5E10B5C1865E1B600B23922 /* WSMPSolver.cpp in Sources */,
 				D5E10B551865E1B600B23922 /* stdafx.cpp in Sources */,
@@ -263,14 +287,16 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /opt/intel/mkl/include;
 				ICC_CXX_LIBRARY = "libc++";
 				ICC_OPTLEVEL = speedHLO;
-				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO";
+				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO -DMKL_ISS";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DPARDISO",
+					"-DMKL_ISS",
 				);
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -325,14 +351,16 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /opt/intel/mkl/include;
 				ICC_CXX_LIBRARY = "libc++";
 				ICC_OPTLEVEL = none;
-				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO";
+				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO -DMKL_ISS";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DPARDISO",
+					"-DMKL_ISS",
 				);
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -367,13 +395,15 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /opt/intel/mkl/include;
 				ICC_CXX_LIBRARY = "libc++";
 				ICC_OPTLEVEL = speedHLO;
-				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO";
+				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO -DMKL_ISS";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DPARDISO",
+					"-DMKL_ISS",
 				);
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
