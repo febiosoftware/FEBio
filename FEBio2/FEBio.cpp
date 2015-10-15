@@ -624,7 +624,8 @@ bool Configure(const char *szfile)
 						else if (strcmp(szt, "pardiso"           ) == 0) FEModel::SetDefaultSolver(PARDISO_SOLVER   );
 						else if (strcmp(szt, "rcicg"             ) == 0) FEModel::SetDefaultSolver(RCICG_SOLVER     );
 						else if (strcmp(szt, "fgmres"            ) == 0) FEModel::SetDefaultSolver(FGMRES_SOLVER    );
-						else if (strcmp(szt, "fgmres_ilut"       ) == 0) FEModel::SetDefaultSolver(FGMRES_LUT_SOLVER);
+						else if (strcmp(szt, "fgmres_ilut"       ) == 0) FEModel::SetDefaultSolver(FGMRES_ILUT_SOLVER);
+						else if (strcmp(szt, "fgmres_ilu0"       ) == 0) FEModel::SetDefaultSolver(FGMRES_ILU0_SOLVER);
 						else if (strcmp(szt, "wsmp"              ) == 0) FEModel::SetDefaultSolver(WSMP_SOLVER      );
 					}
 					else if (tag == "import")
