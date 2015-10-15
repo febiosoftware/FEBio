@@ -421,6 +421,7 @@ void echo_input(FEBioModel& fem)
 	case CG_ITERATIVE_SOLVER: felog.printf("Conjugate gradient\n"); break;
 	case RCICG_SOLVER       : felog.printf("RCICG\n"             ); break;
 	case FGMRES_SOLVER      : felog.printf("FGMRES\n"            ); break;
+	case FGMRES_LUT_SOLVER  : felog.printf("FGMRES_ILUT\n"       ); break;
 	default:
 		assert(false);
 		felog.printf("Unknown solver\n");
