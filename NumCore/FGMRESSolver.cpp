@@ -43,7 +43,8 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 	MKL_INT ipar[128];
 	double dpar[128];
 	MKL_INT RCI_request;
-	vector<double> tmp(N*(2*N+1)+(N*(N+9))/2+1);
+	int M = (N < 150 ? N : 150); // this is the default value of par[15] (i.e. par[14] in C)
+	vector<double> tmp(N*(2*M+1)+(M*(M+9))/2+1);
 	double* ptmp = &tmp[0];
 	MKL_INT ivar = N;
 
@@ -136,7 +137,8 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	MKL_INT ipar[128];
 	double dpar[128];
 	MKL_INT RCI_request;
-	vector<double> tmp(N*(2*N+1)+(N*(N+9))/2+1);
+	int M = (N < 150 ? N : 150); // this is the default value of par[15] (i.e. par[14] in C)
+	vector<double> tmp(N*(2*M+1)+(M*(M+9))/2+1);
 	vector<double> trvec(N);
 	double* ptmp = &tmp[0];
 	MKL_INT ivar = N;
@@ -256,7 +258,8 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	MKL_INT ipar[128];
 	double dpar[128];
 	MKL_INT RCI_request;
-	vector<double> tmp(N*(2*N+1)+(N*(N+9))/2+1);
+	int M = (N < 150 ? N : 150); // this is the default value of par[15] (i.e. par[14] in C)
+	vector<double> tmp(N*(2*M+1)+(M*(M+9))/2+1);
 	vector<double> trvec(N);
 	double* ptmp = &tmp[0];
 	MKL_INT ivar = N;
