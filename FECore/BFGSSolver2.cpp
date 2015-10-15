@@ -42,22 +42,6 @@ void BFGSSolver2::Init(int neq, FESolver* pNLS, LinearSolver* pls)
     assert(pNLS);
     m_pNLS = pNLS;
 }
-/*{
-    // allocate storage for BFGS update vectors
-    m_r.resize(m_maxups, neq);
-    m_delta.resize(m_maxups, neq);
-    m_q.resize(m_maxups, neq);
-    
-    m_rho.resize(neq);
-    
-    m_neq = neq;
-    m_nups = 0;
-    
-    m_plinsolve = pls;
-    
-    assert(pNLS);
-    m_pNLS = pNLS;
-}*/
 
 //-----------------------------------------------------------------------------
 //! This function performs a BFGS stiffness update.
@@ -92,33 +76,6 @@ bool BFGSSolver2::Update(double s, vector<double>& ui, vector<double>& R0, vecto
     
     return true;
 }
-/*{
-    int i, j;
-    
-    int neq = (int)ui.size();
-    
-    for (j=0; j<m_nups; ++j)
-    {
-        double dq = 0;
-        for (i=0; i<neq; ++i) dq += m_delta[j][i]*m_q[j][i];
-        for (i=0; i<neq; ++i)
-            m_q[j+i][i] = m_q[j][i] + m_rho[j]*dq*(m_delta[j][i]-m_r[j][i]);
-    }
-    
-    m_rho[m_nups] = 0;
-    for (i=0; i<neq; ++i)
-    {
-        m_r[m_nups][i] = m_q[m_nups][i] + ui[i];
-        m_delta[m_nups][i] = s*ui[i];
-        m_rho[m_nups] += m_r[m_nups][i]*m_delta[m_nups][i];
-    }
-    m_rho[m_nups] = 1./m_rho[m_nups];
-    
-    // increment update counter
-    ++m_nups;
-    
-    return true;
-}*/
 
 //-----------------------------------------------------------------------------
 // This function solves a system of equations using the BFGS update vectors
@@ -158,30 +115,3 @@ void BFGSSolver2::SolveEquations(vector<double>& x, vector<double>& b)
         }
     }
 }
-/*{
-    int i;
-    
-    // get the nr of equations
-    int neq = (int)x.size();
-    
-    // make sure we need to do work
-    if (neq==0) return;
-    
-    if (m_nups == 0)
-    {
-        // create temporary storage
-        static vector<double> tmp;
-        tmp = b;
-        
-        // perform a backsubstitution
-        m_plinsolve->BackSolve(x, tmp);
-    }
-    else
-    {
-        double dq = 0;
-        for (i=0; i<neq; ++i) dq += m_delta[m_nups][i]*m_q[m_nups][i];
-        
-        for (i=0; i<neq; ++i)
-            x[i] = -m_q[m_nups][i] - m_rho[m_nups]*dq*(m_delta[m_nups][i]-m_r[m_nups][i]);
-    }
-}*/

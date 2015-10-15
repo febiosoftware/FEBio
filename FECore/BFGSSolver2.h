@@ -44,9 +44,6 @@ public:
     FESolver*		m_pNLS;		//!< pointer to nonlinear system to solve
     int				m_neq;		//!< number of equations
     
-    // counters
-    int		m_nups;			//!< nr of stiffness updates
-    
     // BFGS update vectors
     vector<double>	m_dx;       //!< temp vectors for calculating BFGS update vectors
     vector<double>	m_f;        //!< temp vectors for calculating BFGS update vectors
