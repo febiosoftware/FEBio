@@ -24,9 +24,6 @@ LEV_LIB = -llevmar_$(PLAT)
 # GSL library
 GSL_LIB = -lgsl_$(PLAT)
 
-# KeyGen library
-KEYGEN_LIB = -lkeygen_$(PLAT)
-
 # SuperLU library
 SUPERLU_INC = /home/sci/rawlins/Projects/SuperLU/4.3/SRC/
 SUPERLU_LIB =	-lsuperlu_4.3
@@ -35,6 +32,6 @@ SUPERLU_LIB =	-lsuperlu_4.3
 SUPERLUMT_INC = /home/sci/rawlins/Projects/SuperLU_MT_2.2/SRC/
 SUPERLUMT_LIB =	-lsuperlu_mt_OPENMP
 
-LIBS = -L$(FEBDIR)/build/lib $(LEV_LIB) $(MKL_LIB) $(GSL_LIB) $(KEYGEN_LIB)
+LIBS = -L$(FEBDIR)/build/lib $(LEV_LIB) $(MKL_LIB) $(GSL_LIB)
 
 INC = -I$(INTEL_INC) -I$(FEBDIR) -I$(FEBDIR)build/include
