@@ -292,6 +292,7 @@ FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FEModelLoad(FEBC_ID, pfem)
 {
 	m_bfollow = false;
 	m_ntype = RAMP;
+	m_trg = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -306,16 +307,38 @@ bool FERigidBodyForce::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FERigidBodyForce::Activate()
+{
+	FEModelLoad::Activate();
+
+	FEModel& fem = *GetFEModel();
+	FERigidSystem& rigid = *fem.GetRigidSystem();
+	FERigidBody& rb = *rigid.Object(id);
+	if (m_ntype == TARGET)
+	{
+		switch (bc)
+		{
+		case 0: m_trg = rb.m_Fr.x; break;
+		case 1: m_trg = rb.m_Fr.y; break;
+		case 2: m_trg= rb.m_Fr.z; break;
+		case 3: m_trg = rb.m_Mr.x; break;
+		case 4: m_trg = rb.m_Mr.y; break;
+		case 5: m_trg= rb.m_Mr.z; break;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FERigidBodyForce::Serialize(DumpFile& ar)
 {
 	FEModelLoad::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << m_ntype << bc << id << lc << sf;
+		ar << m_ntype << bc << id << lc << sf << m_trg;
 	}
 	else
 	{
-		ar >> m_ntype >> bc >> id >> lc >> sf;
+		ar >> m_ntype >> bc >> id >> lc >> sf >> m_trg;
 	}
 }
 
@@ -357,16 +380,7 @@ void FERigidBodyForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
 			double t1 = pstep->m_tend;
 			double w = (tp.t - t0)/(t1 - t0);
 			assert((w>=-0.0000001)&&(w<=1.0000001));
-			double f0 = 0.0, f1 = sf;
-			switch (bc)
-			{
-			case 0: f0 = rb.m_Fp.x; break;
-			case 1: f0 = rb.m_Fp.y; break;
-			case 2: f0 = rb.m_Fp.z; break;
-			case 3: f0 = rb.m_Mp.x; break;
-			case 4: f0 = rb.m_Mp.y; break;
-			case 5: f0 = rb.m_Mp.z; break;
-			}
+			double f0 = m_trg, f1 = sf;
 
 			double f = f0*(1.0 - w) + f1*w;
 			R[I] += f;

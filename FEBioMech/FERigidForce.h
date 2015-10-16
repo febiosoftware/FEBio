@@ -45,6 +45,9 @@ public:
 public:
 	FERigidBodyForce(FEModel* pfem);
 
+	//! Activation
+	void Activate();
+
 	//! initialization
 	bool Init();
 
@@ -66,5 +69,6 @@ public:
 	int		bc;		// force direction
 	int		lc;		// load curve number
 	double	sf;		// scale factor
+	double	m_trg;	// target force for target case
 	bool	m_bfollow;	//!< follower force if true
 };

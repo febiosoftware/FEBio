@@ -105,7 +105,8 @@ bool FENewtonSolver::ReformStiffness(const FETimePoint& tp)
 		int neq = K.Size();
 		for (int i=0; i<neq; ++i)
 		{
-			if (K.diag(i) < m_zero_tol) zd.push_back(i);
+			double di = fabs(K.diag(i));
+			if (di < m_zero_tol) zd.push_back(i);
 		}
 
 		if (zd.empty() == false) throw ZeroDiagonal(-1, -1);
