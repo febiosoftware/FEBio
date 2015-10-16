@@ -52,6 +52,9 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
 
 	// a different solution strategy is used here
 	m_nqnsolver = QN_BFGS2;
+
+	// turn off checking for a zero diagonal
+	CheckZeroDiagonal(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -599,13 +602,6 @@ bool FEFluidSolver::StiffnessMatrix(const FETimePoint& tp)
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
         dom.MassMatrix(this);
     }
-    
-    // let's check the stiffness matrix for zero diagonal elements
-/*    int neq = K.Size();
-    for (i=0; i<neq; ++i)
-    {
-        if (fabs(K.diag(i)) < 1e-15) throw ZeroDiagonal(-1, -1);
-    }*/
     
     return true;
 }

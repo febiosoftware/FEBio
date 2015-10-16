@@ -56,6 +56,7 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 	ipar[8]=1;		// do residual stopping test
 	ipar[9]=0;		// do not request for the user defined stopping test
 	ipar[11]=1;		// do the check of the norm of the next generated vector automatically
+	ipar[4]=150;
 //	dpar[0]=1.0E-3;	// set the relative tolerance to 1.0D-3 instead of default value 1.0D-6
 
 	// Check the correctness and consistency of the newly set parameters
@@ -83,6 +84,8 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 				int* ia = m_pA->Pointers();
 				int* ja = m_pA->Indices();
 				mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, &tmp[ipar[21]-1], &tmp[ipar[22]-1]);
+
+//				fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
 			}
 			break;
 		default:	// something went wrong
@@ -247,6 +250,9 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	// make sure we have a matrix
 	if (m_pA == 0) return false;
 
+	// max number of iterations
+	const int MAXITER = 150;
+
 	// number of equations
 	MKL_INT N = m_pA->Size();
 	MKL_INT NNZ = m_pA->NonZeroes();
@@ -258,7 +264,7 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	MKL_INT ipar[128];
 	double dpar[128];
 	MKL_INT RCI_request;
-	int M = (N < 150 ? N : 150); // this is the default value of par[15] (i.e. par[14] in C)
+	int M = (N < MAXITER ? N : MAXITER); // this is the default value of par[15] (i.e. par[14] in C)
 	vector<double> tmp(N*(2*M+1)+(M*(M+9))/2+1);
 	vector<double> trvec(N);
 	double* ptmp = &tmp[0];
@@ -284,6 +290,7 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	ipar[9]=0;		// do not request for the user defined stopping test
 	ipar[10]=1;		// do the pre-conditioned version of the FGMRES iterative solver
 	ipar[11]=1;		// do the check of the norm of the next generated vector automatically
+	ipar[4]=MAXITER;
 //	dpar[0]=1.0E-3;	// set the relative tolerance to 1.0D-3 instead of default value 1.0D-6
 
 	// Check the correctness and consistency of the newly set parameters
@@ -308,6 +315,7 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 			{
 				char cvar = 'N'; // multiply with unmodified A
 				mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, &tmp[ipar[21]-1], &tmp[ipar[22]-1]);
+//				fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
 			}
 			break;
 		case 3:	// do the pre-conditioning step

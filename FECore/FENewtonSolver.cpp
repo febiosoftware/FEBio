@@ -18,6 +18,8 @@ BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_maxups   , FE_PARAM_INT   , "max_ups" );
 	ADD_PARAMETER(m_cmax     , FE_PARAM_DOUBLE, "cmax"    );
 	ADD_PARAMETER(m_nqnsolver, FE_PARAM_INT   , "qnmethod");
+	ADD_PARAMETER(m_bzero_diagonal, FE_PARAM_BOOL  , "check_zero_diagonal");
+	ADD_PARAMETER(m_zero_tol      , FE_PARAM_DOUBLE, "zero_diagonal_tol"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -37,6 +39,9 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_maxups = 10;
 	m_nqnsolver = QN_BFGS;
 	m_pbfgs = 0;
+
+	m_bzero_diagonal = true;
+	m_zero_tol = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -61,6 +66,14 @@ FEGlobalMatrix& FENewtonSolver::GetStiffnessMatrix()
 }
 
 //-----------------------------------------------------------------------------
+//! Check the zero diagonal
+void FENewtonSolver::CheckZeroDiagonal(bool bcheck, double ztol)
+{
+	m_bzero_diagonal = bcheck;
+	m_zero_tol = fabs(ztol);
+}
+
+//-----------------------------------------------------------------------------
 //! Reforms a stiffness matrix and factorizes it
 bool FENewtonSolver::ReformStiffness(const FETimePoint& tp)
 {
@@ -82,7 +95,24 @@ bool FENewtonSolver::ReformStiffness(const FETimePoint& tp)
     
     // calculate the global stiffness matrix
     bool bret = StiffnessMatrix(tp);
-    
+
+	// check for zero diagonals
+	if (m_bzero_diagonal)
+	{
+		// get the stiffness matrix
+		SparseMatrix& K = *m_pK;
+		vector<int> zd;
+		int neq = K.Size();
+		for (int i=0; i<neq; ++i)
+		{
+			if (K.diag(i) < m_zero_tol) zd.push_back(i);
+		}
+
+		if (zd.empty() == false) throw ZeroDiagonal(-1, -1);
+	}
+
+	// if the stiffness matrix was evaluated successfully,
+	// we factor it.
     if (bret)
     {
         m_SolverTime.start();

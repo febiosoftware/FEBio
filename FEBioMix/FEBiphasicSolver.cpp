@@ -669,19 +669,6 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 			}
 	}
 
-	// let's check the stiffness matrix for zero diagonal elements
-	{
-		vector<int> zd;
-		int neq = K.Size();
-		for (i=0; i<neq; ++i)
-		{
-			if (K.diag(i) == 0) zd.push_back(i);
-		}
-
-//		if (zd.empty() == false) throw ZeroDiagonal(zd, m_fem);
-		if (zd.empty() == false) throw ZeroDiagonal(-1, -1);
-	}
-
 	return true;
 }
 

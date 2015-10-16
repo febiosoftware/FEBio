@@ -774,13 +774,6 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 			}
 	}
 
-	// let's check the stiffness matrix for zero diagonal elements
-	int neq = K.Size();
-	for (i=0; i<neq; ++i)
-	{
-		if (K.diag(i) == 0) throw ZeroDiagonal(-1, -1);
-	}
-
 	return true;
 }
 

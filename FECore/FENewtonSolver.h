@@ -29,6 +29,9 @@ public:
 	//! Set the solution strategy
 	void SetSolutionStrategy(FENewtonStrategy* pstrategy);
 
+	//! Check the zero diagonal
+	void CheckZeroDiagonal(bool bcheck, double ztol = 0.0);
+
 public: // overloaded from FESolver
 
 	//! Initialization
@@ -79,6 +82,10 @@ public:
 	int					m_cmax;			//!< max condition numbers
 	int					m_maxref;		//!< max nr of reformations per time step
 	FENewtonStrategy*	m_pbfgs;		//!< class handling the specific stiffness update logic
+
+	// Error handling
+	bool	m_bzero_diagonal;	//!< check for zero diagonals
+	double	m_zero_tol;			//!< tolerance for zero diagonal
 
 	// linear solver data
 	LinearSolver*		m_plinsolve;	//!< the linear solver
