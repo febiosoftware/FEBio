@@ -111,7 +111,7 @@ void BFGSSolver2::SolveEquations(vector<double>& x, vector<double>& b)
         double r = (m_dx*b)/(m_dx*df);
         
         for (i=0; i<neq; ++i) {
-            x[i] = -r*m_dx[i];
+            x[i] = r*m_dx[i];
         }
     }
 }

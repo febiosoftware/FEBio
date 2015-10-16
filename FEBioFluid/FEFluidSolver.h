@@ -73,6 +73,7 @@ public:
     // convergence tolerances
     double	m_Rtol;			//!< residual tolerance
     double	m_Vtol;			//!< velocity tolerance
+    double	m_Etol;			//!< energy tolerance
     double	m_Rmin;			//!< min residual value
     
     // strategy parameters

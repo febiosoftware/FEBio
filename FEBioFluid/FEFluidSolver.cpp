@@ -27,6 +27,7 @@
 // define the parameter list
 BEGIN_PARAMETER_LIST(FEFluidSolver, FENewtonSolver)
 	ADD_PARAMETER(m_Vtol         , FE_PARAM_DOUBLE, "vtol"        );
+    ADD_PARAMETER(m_Etol         , FE_PARAM_DOUBLE, "etol"        );
 	ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );
 	ADD_PARAMETER(m_Rmin         , FE_PARAM_DOUBLE, "min_residual");
 	ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
@@ -72,7 +73,8 @@ bool FEFluidSolver::Init()
 	if (FENewtonSolver::Init() == false) return false;
 
     // check parameters
-    if (m_Vtol <  0.0) { felog.printf("Error: vtol must be nonnegative.\n"   ); return false; }
+    if (m_Vtol <  0.0) { felog.printf("Error: vtol must be nonnegative.\n"); return false; }
+    if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }
     if (m_Rtol <  0.0) { felog.printf("Error: rtol must be nonnegative.\n"); return false; }
     if (m_Rmin <  0.0) { felog.printf("Error: min_residual must be nonnegative.\n"  ); return false; }
     
@@ -139,7 +141,7 @@ void FEFluidSolver::Serialize(DumpFile& ar)
     
     if (ar.IsSaving())
     {
-        ar << m_Vtol << m_Rtol << m_Rmin;
+        ar << m_Vtol << m_Etol << m_Rtol << m_Rmin;
         ar << m_bsymm;
         ar << m_nrhs;
         ar << m_niter;
@@ -148,7 +150,7 @@ void FEFluidSolver::Serialize(DumpFile& ar)
     }
     else
     {
-        ar >> m_Vtol >> m_Rtol >> m_Rmin;
+        ar >> m_Vtol >> m_Etol >> m_Rtol >> m_Rmin;
         ar >> m_bsymm;
         ar >> m_nrhs;
         ar >> m_niter;
@@ -328,10 +330,13 @@ bool FEFluidSolver::Quasin(double time)
     
     // convergence norms
     double	normR1;		// residual norm
+    double	normE1;		// energy norm
     double	normU;		// velocity norm
     double	normu;		// velocity increment norm
     double	normRi = 0;		// initial residual norm
     double	normUi = 0;		// initial velocity norm
+    double	normEi;		// initial energy norm
+    double	normEm;		// max energy norm
     
     // initialize flags
     bool bconv = false;		// convergence flag
@@ -392,7 +397,9 @@ bool FEFluidSolver::Quasin(double time)
         if (m_niter == 0)
         {
             normRi = fabs(m_R0*m_R0);
+            normEi = fabs(m_ui*m_R0);
             normUi = fabs(m_ui*m_ui);
+            normEm = normEi;
         }
         
         // perform a linesearch
@@ -412,6 +419,7 @@ bool FEFluidSolver::Quasin(double time)
         // calculate norms
         normR1 = m_R1*m_R1;
         normu  = (m_ui*m_ui)*(s*s);
+        normE1 = s*fabs(m_ui*m_R1);
         
         // check for nans
         if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
@@ -427,8 +435,14 @@ bool FEFluidSolver::Quasin(double time)
         // check velocity norm
         if ((m_Vtol > 0) && (normu  > (m_Vtol*m_Vtol)*normU )) bconv = false;
         
+        // check energy norm
+        if ((m_Etol > 0) && (normE1 > m_Etol*normEi)) bconv = false;
+        
         // check linestep size
         if ((m_LStol > 0) && (s < m_LSmin)) bconv = false;
+        
+        // check energy divergence
+        if (normE1 > normEm) bconv = false;
         
         // print convergence summary
         oldmode = felog.GetMode();
@@ -442,6 +456,7 @@ bool FEFluidSolver::Quasin(double time)
         if (m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
         felog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
         felog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
+        felog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
         felog.printf("\t   velocity         %15le %15le %15le \n", normUi, normu ,(m_Vtol*m_Vtol)*normU );
         
         felog.SetMode(oldmode);
@@ -465,6 +480,15 @@ bool FEFluidSolver::Quasin(double time)
                 felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
                 breform = true;
             }
+            else if ((normE1 > normEm) && m_bdivreform)
+            {
+                // check for diverging
+                felog.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
+                normEm = normE1;
+                normEi = normE1;
+                normRi = normR1;
+                breform = true;
+            }
             else
             {
                 // If we havn't reached max nr of BFGS updates
@@ -480,7 +504,6 @@ bool FEFluidSolver::Quasin(double time)
                             // or the update was no longer positive definite.
                             felog.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
                             breform = true;
-                            m_pbfgs->m_nups = 0;  // reset and use as flag
                         }
                     }
                     else
@@ -490,10 +513,8 @@ bool FEFluidSolver::Quasin(double time)
                         breform = true;
                         
                         // print a warning only if the user did not intent full-Newton
-                        if (m_pbfgs->m_maxups > 0) {
+                        if (m_pbfgs->m_maxups > 0)
                             felog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
-                            m_pbfgs->m_nups = 0;  // reset and use as flag
-                        }
                         
                     }
                 }
