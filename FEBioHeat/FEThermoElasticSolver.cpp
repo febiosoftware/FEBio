@@ -11,7 +11,11 @@
 #endif
 
 #ifdef LINUX
-	#define ISNAN(x) std::isnan(x)
+	#ifdef CENTOS
+		#define ISNAN(x) isnan(x)
+	#else
+		#define ISNAN(x) std::isnan(x)
+	#endif
 #endif
 
 #ifdef __APPLE__
