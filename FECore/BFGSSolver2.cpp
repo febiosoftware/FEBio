@@ -21,14 +21,11 @@ BFGSSolver2::BFGSSolver2()
     
     // pointer to linear solver
     m_plinsolve = 0;
-    
-    // pointer to non-linear system
-    m_pNLS = 0;
 }
 
 //-----------------------------------------------------------------------------
 // Initialization method
-void BFGSSolver2::Init(int neq, FESolver* pNLS, LinearSolver* pls)
+void BFGSSolver2::Init(int neq, LinearSolver* pls)
 {
     // allocate storage for BFGS update vectors
     m_dx.resize(neq);
@@ -38,9 +35,6 @@ void BFGSSolver2::Init(int neq, FESolver* pNLS, LinearSolver* pls)
     m_nups = 0;
     
     m_plinsolve = pls;
-    
-    assert(pNLS);
-    m_pNLS = pNLS;
 }
 
 //-----------------------------------------------------------------------------

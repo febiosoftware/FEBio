@@ -309,7 +309,7 @@ bool FEBiphasicSolver::Quasin(double time)
 				felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
 				breform = true;
 			}
-			else if (normE1 > normEm)
+			else if ((normE1 > normEm) && m_bdivreform)
 			{
 				// check for diverging
 				felog.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");

@@ -484,6 +484,7 @@
     <ClInclude Include="..\..\FECore\FEAnalysis.h" />
     <ClInclude Include="..\..\FECore\FEBodyLoad.h" />
     <ClInclude Include="..\..\FECore\FEBoundaryCondition.h" />
+    <ClInclude Include="..\..\FECore\FEBroydenStrategy.h" />
     <ClInclude Include="..\..\FECore\FECallBack.h" />
     <ClInclude Include="..\..\FECore\FEClosestPointProjection.h" />
     <ClInclude Include="..\..\FECore\FECoordSysMap.h" />
@@ -591,6 +592,7 @@
     <ClCompile Include="..\..\FECore\FEAnalysis.cpp" />
     <ClCompile Include="..\..\FECore\FEBodyLoad.cpp" />
     <ClCompile Include="..\..\FECore\FEBoundaryCondition.cpp" />
+    <ClCompile Include="..\..\FECore\FEBroydenStrategy.cpp" />
     <ClCompile Include="..\..\FECore\FECallback.cpp" />
     <ClCompile Include="..\..\FECore\FEClosestPointProjection.cpp" />
     <ClCompile Include="..\..\FECore\FECoordSysMap.cpp" />

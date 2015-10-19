@@ -5,9 +5,9 @@ using namespace std;
 //-----------------------------------------------------------------------------
 #define QN_BFGS		0
 #define QN_BFGS2	1
+#define QN_BROYDEN	2
 
 //-----------------------------------------------------------------------------
-class FESolver;
 class LinearSolver;
 
 //-----------------------------------------------------------------------------
@@ -19,7 +19,8 @@ public:
 	virtual ~FENewtonStrategy();
 
 public:
-	virtual void Init(int neq, FESolver* pNLS, LinearSolver* pls) = 0;
+	//! Data allocation and initialization
+	virtual void Init(int neq, LinearSolver* pls) = 0;
 
 	//! perform a Newton udpate
 	virtual bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1) = 0;

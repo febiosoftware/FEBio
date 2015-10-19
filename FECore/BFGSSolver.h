@@ -16,7 +16,7 @@ public:
 	BFGSSolver();
 
 	//! New initialization method
-	void Init(int neq, FESolver* pNLS, LinearSolver* pls);
+	void Init(int neq, LinearSolver* pls);
 
 	//! perform a BFGS udpate
 	bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1);
@@ -27,9 +27,6 @@ public:
 public:
 	// keep a pointer to the linear solver
 	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
-
-	// the non-linear system to solve
-	FESolver*		m_pNLS;		//!< pointer to nonlinear system to solve
 	int				m_neq;		//!< number of equations
 
 	// BFGS update vectors

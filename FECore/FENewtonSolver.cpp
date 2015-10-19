@@ -6,6 +6,7 @@
 #include "FEGlobalMatrix.h"
 #include "BFGSSolver.h"
 #include "BFGSSolver2.h"
+#include "FEBroydenStrategy.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
@@ -189,8 +190,9 @@ bool FENewtonSolver::Init()
 	// choose a solution strategy
 	switch (m_nqnsolver)
 	{
-	case QN_BFGS : SetSolutionStrategy(new BFGSSolver ); break;
-	case QN_BFGS2: SetSolutionStrategy(new BFGSSolver2); break;
+	case QN_BFGS   : SetSolutionStrategy(new BFGSSolver ); break;
+	case QN_BFGS2  : SetSolutionStrategy(new BFGSSolver2); break;
+	case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy); break;
 	default:
 		return false;
 	}
@@ -222,7 +224,7 @@ bool FENewtonSolver::Init()
 
 	// initialize BFGS data
 	// Must be done after initialization of linear solver
-	m_pbfgs->Init(m_neq, this, m_plinsolve);
+	m_pbfgs->Init(m_neq, m_plinsolve);
 
     // set the create stiffness matrix flag
     m_breshape = true;
@@ -340,6 +342,7 @@ void FENewtonSolver::Serialize(DumpFile& ar)
 			{
 			case QN_BFGS: SetSolutionStrategy(new BFGSSolver); break;
 			case QN_BFGS2: SetSolutionStrategy(new BFGSSolver2); break;
+			case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy); break;
 			default:
 				return;
 			}
