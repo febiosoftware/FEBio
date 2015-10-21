@@ -22,6 +22,9 @@ public:
 	//! constructor
 	Timer();
 
+	//! constructor
+	~Timer();
+
 	//! Start the timer
 	void start();
 
