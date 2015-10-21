@@ -95,6 +95,7 @@ bool FENewtonSolver::ReformStiffness(const FETimePoint& tp)
     }
     
     // calculate the global stiffness matrix
+	m_ReformTime.start();
     bool bret = StiffnessMatrix(tp);
 
 	// check for zero diagonals
@@ -112,6 +113,7 @@ bool FENewtonSolver::ReformStiffness(const FETimePoint& tp)
 
 		if (zd.empty() == false) throw ZeroDiagonal(-1, -1);
 	}
+	m_ReformTime.stop();
 
 	// if the stiffness matrix was evaluated successfully,
 	// we factor it.
@@ -140,35 +142,45 @@ bool FENewtonSolver::ReformStiffness(const FETimePoint& tp)
 //! \todo Can we move this to the FEStiffnessMatrix::Create function?
 bool FENewtonSolver::CreateStiffness(bool breset)
 {
-	// clean up the solver
-	if (m_pK->NonZeroes()) m_plinsolve->Destroy();
-
-	// clean up the stiffness matrix
-	m_pK->Clear();
-
-	// create the stiffness matrix
-	felog.printf("===== reforming stiffness matrix:\n");
-	if (m_pK->Create(&GetFEModel(), m_neq, breset) == false) 
+	m_ReformTime.start();
 	{
-		felog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
-		return false;
+		// clean up the solver
+		if (m_pK->NonZeroes()) m_plinsolve->Destroy();
+
+		// clean up the stiffness matrix
+		m_pK->Clear();
+
+		// create the stiffness matrix
+		felog.printf("===== reforming stiffness matrix:\n");
+		if (m_pK->Create(&GetFEModel(), m_neq, breset) == false) 
+		{
+			felog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
+			m_ReformTime.stop();
+			return false;
+		}
+		else
+		{
+			// output some information about the direct linear solver
+			int neq = m_pK->Rows();
+			int nnz = m_pK->NonZeroes();
+			felog.printf("\tNr of equations ........................... : %d\n", neq);
+			felog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
+			felog.printf("\n");
+		}
+		// let's flush the logfile to make sure the last output will not get lost
+		felog.flush();
 	}
-	else
-	{
-		// output some information about the direct linear solver
-		int neq = m_pK->Rows();
-		int nnz = m_pK->NonZeroes();
-		felog.printf("\tNr of equations ........................... : %d\n", neq);
-		felog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
-		felog.printf("\n");
-	}
-	// let's flush the logfile to make sure the last output will not get lost
-	felog.flush();
+	m_ReformTime.stop();
 
 	// Do the preprocessing of the solver
 	m_SolverTime.start();
 	{
-		if (!m_plinsolve->PreProcess()) throw FatalError();
+		if (!m_plinsolve->PreProcess()) 
+		{
+			// TODO: get rid of throwing this exception. We should just return false.
+			m_SolverTime.stop();
+			throw FatalError();
+		}
 	}
 	m_SolverTime.stop();
 

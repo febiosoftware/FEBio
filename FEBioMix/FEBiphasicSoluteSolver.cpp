@@ -489,6 +489,8 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 
 bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 {
+	TimerTracker t(m_RHSTime);
+
 	int i;
 	double dt = m_fem.GetCurrentStep()->m_dt;
 

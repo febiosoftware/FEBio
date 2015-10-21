@@ -87,8 +87,10 @@ public: // --- I/O functions ---
 	//! return the data store
 	DataStore& GetDataStore();
 
+public: // Timers
+
 	//! Return the total timer
-	Timer& GetTotalTimer();
+	Timer& GetSolveTimer();
 
 public:
 	//! set the debug level
@@ -98,7 +100,11 @@ public:
 	bool GetDebugFlag() { return m_debug; }
 
 private:
-	Timer		m_TotalTime;	//!< Create timer to track total running time
+	Timer		m_SolveTime;	//!< timer to track total time to solve problem
+	Timer		m_InputTime;	//!< timer to track time to read model
+	Timer		m_InitTime;		//!< timer to track model initialization
+	Timer		m_IOTimer;		//!< timer to track output (include plot, dump, and data)
+
 	DataStore	m_Data;			//!< the data store used for data logging
 	PlotFile*	m_plot;			//!< the plot file
 	bool		m_becho;		//!< echo input to logfile \todo Make this a command line option

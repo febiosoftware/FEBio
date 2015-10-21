@@ -489,7 +489,7 @@ bool FEAnalysis::Solve()
 		char sztime[64];
 
 		GetFESolver()->m_SolverTime.time_str(sztime);
-		felog.printf("\tTime in solver: %s\n\n", sztime);
+		felog.printf("\tTime in linear solver: %s\n\n", sztime);
 	}
 
 	return bconv;

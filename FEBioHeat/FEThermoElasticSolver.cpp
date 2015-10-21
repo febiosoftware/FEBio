@@ -491,6 +491,8 @@ void FEThermoElasticSolver::GetTemperatureData(vector<double> &ti, const vector<
 
 bool FEThermoElasticSolver::Residual(vector<double>& R)
 {
+	TimerTracker t(m_RHSTime);
+
 	int i;
 	double dt = m_fem.GetCurrentStep()->m_dt;
 

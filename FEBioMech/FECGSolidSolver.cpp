@@ -195,6 +195,8 @@ bool FECGSolidSolver::InitEquations()
 //! Prepares the data for the first BFGS-iteration. 
 void FECGSolidSolver::PrepStep(double time)
 {
+	TimerTracker t(m_UpdateTime);
+
 	// initialize counters
 	m_niter = 0;	// nr of iterations
 	m_nrhs = 0;	// nr of RHS evaluations
@@ -938,6 +940,8 @@ double FECGSolidSolver::LineSearchCG(double s)
 
 bool FECGSolidSolver::Residual(vector<double>& R)
 {
+	TimerTracker t(m_RHSTime);
+
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
 

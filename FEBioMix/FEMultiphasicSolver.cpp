@@ -532,6 +532,8 @@ bool FEMultiphasicSolver::Quasin(double time)
 
 bool FEMultiphasicSolver::Residual(vector<double>& R)
 {
+	TimerTracker t(m_RHSTime);
+
 	int i;
 	double dt = m_fem.GetCurrentStep()->m_dt;
 

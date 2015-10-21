@@ -253,6 +253,8 @@ bool FEExplicitSolidSolver::InitEquations()
 //! Updates the current state of the model
 void FEExplicitSolidSolver::Update(vector<double>& ui)
 {
+	TimerTracker t(m_UpdateTime);
+
 	FETimePoint tp = m_fem.GetTime();
 
 	// update kinematics
@@ -554,6 +556,8 @@ bool FEExplicitSolidSolver::SolveStep(double time)
 //! Prepares the data for the time step. 
 void FEExplicitSolidSolver::PrepStep(double time)
 {
+	TimerTracker t(m_UpdateTime);
+
 	int i, j;
 
 	// initialize counters
@@ -936,6 +940,8 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 
 bool FEExplicitSolidSolver::Residual(vector<double>& R)
 {
+	TimerTracker t(m_RHSTime);
+
 	int i;
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;

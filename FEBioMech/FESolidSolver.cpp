@@ -478,6 +478,8 @@ void FESolidSolver::UpdateRigidKinematics()
 //! Updates the current state of the model
 void FESolidSolver::Update(vector<double>& ui)
 {
+	TimerTracker t(m_UpdateTime);
+
 	// update kinematics
 	UpdateKinematics(ui);
 
@@ -660,6 +662,8 @@ void FESolidSolver::UpdateConstraints()
 //! Prepares the data for the first BFGS-iteration. 
 void FESolidSolver::PrepStep(double time)
 {
+	TimerTracker t(m_UpdateTime);
+
 	// initialize counters
 	m_niter = 0;	// nr of iterations
 	m_nrhs  = 0;	// nr of RHS evaluations
@@ -1809,6 +1813,8 @@ void FESolidSolver::ContactForces(FEGlobalVector& R)
 
 bool FESolidSolver::Residual(vector<double>& R)
 {
+	TimerTracker t(m_RHSTime);
+
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
 
