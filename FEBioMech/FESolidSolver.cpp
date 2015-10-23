@@ -179,9 +179,6 @@ void FESolidSolver::Serialize(DumpFile& ar)
 
 //-----------------------------------------------------------------------------
 //! Determine the number of linear equations and assign equation numbers
-//!
-
-//-----------------------------------------------------------------------------
 //!	This function initializes the equation system.
 //! It is assumed that all free dofs up until now have been given an ID >= 0
 //! and the fixed or rigid dofs an ID < 0.
@@ -936,8 +933,6 @@ bool FESolidSolver::Quasin(double time)
 	// if (m_R0*m_R0 < eps) bconv = true;
 
 //	double r0 = m_R0*m_R0;
-
-	felog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
 
 	// set the initial step length estimates to 1.0
 	double s = 1.0;

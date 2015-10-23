@@ -805,9 +805,6 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 	// do minor iterations callbacks
 	m_fem.DoCallback(CB_MINOR_ITERS);
 
-	// print starting message
-	felog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
-
 	Logfile::MODE oldmode = felog.GetMode();
 	if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
 		(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);

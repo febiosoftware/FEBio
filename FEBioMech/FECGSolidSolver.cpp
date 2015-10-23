@@ -465,8 +465,6 @@ bool FECGSolidSolver::SolveStep(double time)
 
 //	double r0 = m_R0*m_R0;
 
-	felog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
-
 	// set the initial step length estimates to 1.0
 	double s, olds, oldolds;  // line search step lengths from the current iteration and the two previous ones
 	s=1; olds=1; oldolds=1;

@@ -330,6 +330,7 @@ bool FEAnalysis::Solve()
 
 		// update time
 		m_fem.m_ftime += m_dt;
+		felog.printf("\n===== beginning time step %d : %lg =====\n", m_ntimesteps + 1, m_fem.m_ftime);
 
 		// initialize the solver step
 		// (This basically evaluates all the parameter lists, but let's the solver

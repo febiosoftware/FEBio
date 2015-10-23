@@ -167,8 +167,6 @@ bool FEThermoElasticSolver::Quasin(double time)
 
 	Logfile::MODE oldmode;
 
-	felog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
-
 	// loop until converged or when max nr of reformations reached
 	do
 	{
