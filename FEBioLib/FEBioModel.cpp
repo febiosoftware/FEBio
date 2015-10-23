@@ -1373,12 +1373,18 @@ bool FEBioModel::Solve()
 	felog.SetMode(Logfile::FILE_ONLY);
 
 	// sum up all the times spend in the linear solvers
-	int NS = Steps();
+	double total_time = 0.0;
+	double input_time   = m_InputTime.GetTime(); total_time += input_time;
+	double init_time    = m_InitTime.GetTime (); total_time += init_time;
+	double solve_time   = m_SolveTime.GetTime(); total_time += solve_time;
+	double io_time      = m_IOTimer.GetTime  ();
 	double total_linsol = 0.0;
 	double total_reform = 0.0;
+	double total_stiff  = 0.0;
 	double total_rhs    = 0.0;
 	double total_update = 0.0;
-	for (int i=0; i<NS; ++i)
+	int NS = Steps();
+	for (int i = 0; i<NS; ++i)
 	{
 		FEAnalysis* pstep = GetStep(i);
 		FESolver* psolve = pstep->GetFESolver();
@@ -1386,6 +1392,7 @@ bool FEBioModel::Solve()
 		{
 			total_linsol += psolve->m_SolverTime.GetTime();
 			total_reform += psolve->m_ReformTime.GetTime();
+			total_stiff  += psolve->m_StiffnessTime.GetTime();
 			total_rhs    += psolve->m_RHSTime.GetTime();
 			total_update += psolve->m_UpdateTime.GetTime();
 		}
@@ -1393,14 +1400,17 @@ bool FEBioModel::Solve()
 
 
 	felog.printf(" T I M I N G   I N F O R M A T I O N\n\n");
-	m_InputTime.time_str         (sztime); felog.printf("\tInput time ...................... : %s (%lg sec)\n\n", sztime, m_InputTime.GetTime());
-	m_InitTime.time_str          (sztime); felog.printf("\tInitialization time ............. : %s (%lg sec)\n\n", sztime, m_InitTime .GetTime());
-	m_SolveTime.time_str         (sztime); felog.printf("\tElapsed time .................... : %s (%lg sec)\n\n", sztime, m_SolveTime.GetTime());
-	m_IOTimer.time_str           (sztime); felog.printf("\t   IO-time (plot, dmp, data) .... : %s (%lg sec)\n\n", sztime, m_IOTimer  .GetTime());
-	Timer::time_str(total_linsol, sztime); felog.printf("\t   time in linear solver ........ : %s (%lg sec)\n\n", sztime, total_linsol);
+	Timer::time_str(input_time  , sztime); felog.printf("\tInput time ...................... : %s (%lg sec)\n\n", sztime, input_time  );
+	Timer::time_str(init_time   , sztime); felog.printf("\tInitialization time ............. : %s (%lg sec)\n\n", sztime, init_time   );
+	Timer::time_str(solve_time  , sztime); felog.printf("\tSolve time ...................... : %s (%lg sec)\n\n", sztime, solve_time  );
+	Timer::time_str(io_time     , sztime); felog.printf("\t   IO-time (plot, dmp, data) .... : %s (%lg sec)\n\n", sztime, io_time     );
 	Timer::time_str(total_reform, sztime); felog.printf("\t   reforming stiffness .......... : %s (%lg sec)\n\n", sztime, total_reform);
-	Timer::time_str(total_rhs   , sztime); felog.printf("\t   evaluating residual .......... : %s (%lg sec)\n\n", sztime, total_rhs);
+	Timer::time_str(total_stiff , sztime); felog.printf("\t   evaluating stiffness ......... : %s (%lg sec)\n\n", sztime, total_stiff );
+	Timer::time_str(total_rhs   , sztime); felog.printf("\t   evaluating residual .......... : %s (%lg sec)\n\n", sztime, total_rhs   );
 	Timer::time_str(total_update, sztime); felog.printf("\t   model update ................. : %s (%lg sec)\n\n", sztime, total_update);
+	Timer::time_str(total_linsol, sztime); felog.printf("\t   time in linear solver ........ : %s (%lg sec)\n\n", sztime, total_linsol);
+	Timer::time_str(total_time  , sztime); felog.printf("\tTotal elapsed time .............. : %s (%lg sec)\n\n", sztime, total_time  );
+
 
 	felog.SetMode(old_mode);
 

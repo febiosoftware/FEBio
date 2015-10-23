@@ -95,7 +95,7 @@ bool FENewtonSolver::ReformStiffness(const FETimePoint& tp)
     }
     
     // calculate the global stiffness matrix
-	m_ReformTime.start();
+	m_StiffnessTime.start();
     bool bret = StiffnessMatrix(tp);
 
 	// check for zero diagonals
@@ -113,7 +113,7 @@ bool FENewtonSolver::ReformStiffness(const FETimePoint& tp)
 
 		if (zd.empty() == false) throw ZeroDiagonal(-1, -1);
 	}
-	m_ReformTime.stop();
+	m_StiffnessTime.stop();
 
 	// if the stiffness matrix was evaluated successfully,
 	// we factor it.
