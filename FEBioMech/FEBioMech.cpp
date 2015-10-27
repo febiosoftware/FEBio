@@ -121,6 +121,7 @@
 #include "FEVolumeConstraint.h"
 #include "FEDistanceConstraint.h"
 #include "FE2OMicroConstraint.h"
+#include "FEMortarSlidingContact.h"
 
 #include "FEAugLagLinearConstraint.h"
 #include "FERigidJoint.h"
@@ -371,6 +372,7 @@ REGISTER_FECORE_CLASS(FESurfaceConstraint    , FESURFACEPAIRINTERACTION_ID, "sur
 REGISTER_FECORE_CLASS(FETiedInterface        , FESURFACEPAIRINTERACTION_ID, "tied"                       );
 REGISTER_FECORE_CLASS(FEStickyInterface      , FESURFACEPAIRINTERACTION_ID, "sticky"                     );
 REGISTER_FECORE_CLASS(FEFacet2FacetTied      , FESURFACEPAIRINTERACTION_ID, "facet-to-facet tied"        );
+REGISTER_FECORE_CLASS(FEMortarSlidingContact , FESURFACEPAIRINTERACTION_ID, "mortar-sliding"             );
 
 //-----------------------------------------------------------------------------
 // classes derived directly from FEModelLoad

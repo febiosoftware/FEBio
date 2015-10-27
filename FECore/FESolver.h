@@ -37,6 +37,9 @@ public:
 	//! assemble global stiffness matrix (TODO: this is only used by rigid joints)
 	virtual void AssembleStiffness(vector<int>& elm, matrix& ke) { assert(false); }
 
+	//! assemble global stiffness matrix (TODO: this is only used by mortar contact)
+	virtual void AssembleStiffness2(vector<int>& lmi, vector<int>& lmj, matrix& ke) { assert(false); }
+
 	//! assemble global stiffness matrix
 	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) = 0;
 

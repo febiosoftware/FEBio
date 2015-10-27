@@ -40,6 +40,10 @@ public:
 	//! assemble global stiffness matrix \todo this is only used by rigid joints
 	void AssembleStiffness(vector<int>& elm, matrix& ke);
 
+	//! adjust the residual matrix for prescribed displacements
+	void AssembleStiffness2(vector<int>& lmi, vector<int>& lmj, matrix& ke);
+
+
 public:
 	//{ --- evaluation and update ---
 		//! Perform an update

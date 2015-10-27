@@ -546,6 +546,9 @@
     <ClCompile Include="..\..\FEBioMech\FEElasticMultiscaleDomain2O.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEMortarSlidingContact.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h">
@@ -1092,6 +1095,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEElasticMultiscaleDomain2O.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEMortarSlidingContact.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

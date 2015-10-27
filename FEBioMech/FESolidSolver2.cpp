@@ -1687,6 +1687,12 @@ void FESolidSolver2::AssembleStiffness(std::vector<int>& lm, matrix& ke)
 }
 
 //-----------------------------------------------------------------------------
+void FESolidSolver2::AssembleStiffness2(vector<int>& lmi, vector<int>& lmj, matrix& ke)
+{
+	m_pK->Assemble(ke, lmi, lmj);
+}
+
+//-----------------------------------------------------------------------------
 //!  Assembles the element stiffness matrix into the global stiffness matrix.
 //!  Also adjusts the global stiffness matrix and residual to take the 
 //!  prescribed displacements into account.
