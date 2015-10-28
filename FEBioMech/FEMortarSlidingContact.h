@@ -13,12 +13,14 @@ public:
 	bool Init();
 
 	//! update the normals
-	void UpdateNormals();
+	void UpdateNormals(bool binit);
 
 public:
-	vector<double>	m_p;	//!< nodal contact pressures
-	vector<vec3d>	m_nu;	//!< nodal normals
-	vector<vec3d>	m_gap;	//!< nodal gap function
+	vector<double>	m_p;		//!< nodal contact pressures
+	vector<double>	m_L;		//!< Lagrange multipliers
+	vector<vec3d>	m_nu;		//!< nodal normals
+	vector<double>	m_norm0;	//!< initial (inverse) normal lenghts
+	vector<vec3d>	m_gap;		//!< nodal gap function
 };
 
 //-----------------------------------------------------------------------------
@@ -121,8 +123,11 @@ protected:
 	//! Update integration factors
 	void UpdateMortarWeights();
 
+	// contact stiffness contributions
+	void ContactGapStiffness(FESolver* psolver);
+	void ContactNormalStiffness(FESolver* psolver);
+
 private:
-	bool	m_blaugon;	//!< augmented Lagrangian flag
 	double	m_atol;		//!< augmented Lagrangian tolerance
 	double	m_eps;		//!< penalty factor
 	int		m_naugmin;	//!< minimum number of augmentations

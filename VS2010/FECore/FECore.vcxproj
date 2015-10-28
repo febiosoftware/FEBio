@@ -549,6 +549,7 @@
     <ClInclude Include="..\..\FECore\MathParser.h" />
     <ClInclude Include="..\..\FECore\matrix.h" />
     <ClInclude Include="..\..\FECore\MatrixProfile.h" />
+    <ClInclude Include="..\..\FECore\mortar.h" />
     <ClInclude Include="..\..\FECore\NLConstraintDataRecord.h" />
     <ClInclude Include="..\..\FECore\NodeDataRecord.h" />
     <ClInclude Include="..\..\FECore\ObjectDataRecord.h" />
@@ -651,6 +652,7 @@
     <ClCompile Include="..\..\FECore\MathParser.cpp" />
     <ClCompile Include="..\..\FECore\matrix.cpp" />
     <ClCompile Include="..\..\FECore\MatrixProfile.cpp" />
+    <ClCompile Include="..\..\FECore\mortar.cpp" />
     <ClCompile Include="..\..\FECore\NLConstraintDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\NodeDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\ObjectDataRecord.cpp" />

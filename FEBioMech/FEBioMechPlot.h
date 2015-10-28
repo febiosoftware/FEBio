@@ -142,6 +142,33 @@ public:
 	bool Save(FESurface& S, vector<float>& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Mortar gap
+class FEPlotMortarContactGap : public FESurfaceData
+{
+public:
+	FEPlotMortarContactGap(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_NODE){}
+	bool Save(FESurface& S, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Mortar gap
+class FEPlotMortarContactGapVector : public FESurfaceData
+{
+public:
+	FEPlotMortarContactGapVector(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_NODE){}
+	bool Save(FESurface& S, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Mortar gap
+class FEPlotMortarContactNormal : public FESurfaceData
+{
+public:
+	FEPlotMortarContactNormal(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_NODE){}
+	bool Save(FESurface& S, vector<float>& a);
+};
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

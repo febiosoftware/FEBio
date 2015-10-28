@@ -18,6 +18,7 @@
 #include "FEMicroMaterial.h"
 #include "FEMicroMaterial2O.h"
 #include "FEFacet2FacetSliding.h"
+#include "FEMortarSlidingContact.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -315,6 +316,65 @@ bool FEPlotVolumePressure::Save(FESurface& S, vector<float>& a)
 
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+bool FEPlotMortarContactGap::Save(FESurface& S, vector<float>& a)
+{
+	FEMortarSurface* ps = dynamic_cast<FEMortarSurface*>(&S);
+	if (ps)
+	{
+		int N = ps->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			vec3d vA = ps->m_nu[i];
+			vec3d gA = ps->m_gap[i];
+			double gap = gA*vA;
+			a.push_back((float) gap);
+		}
+		return true;
+	}
+	else return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotMortarContactGapVector::Save(FESurface& S, vector<float>& a)
+{
+	FEMortarSurface* ps = dynamic_cast<FEMortarSurface*>(&S);
+	if (ps)
+	{
+		int N = ps->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			vec3d gA = ps->m_gap[i];
+			a.push_back((float) gA.x);
+			a.push_back((float) gA.y);
+			a.push_back((float) gA.z);
+		}
+		return true;
+	}
+	else return false;
+}
+
+
+//-----------------------------------------------------------------------------
+bool FEPlotMortarContactNormal::Save(FESurface& S, vector<float>& a)
+{
+	FEMortarSurface* ps = dynamic_cast<FEMortarSurface*>(&S);
+	if (ps)
+	{
+		int N = ps->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			vec3d vA = ps->m_nu[i];
+			a.push_back((float) vA.x);
+			a.push_back((float) vA.y);
+			a.push_back((float) vA.z);
+		}
+		return true;
+	}
+	else return false;
+}
+
 
 //=============================================================================
 //							D O M A I N   D A T A

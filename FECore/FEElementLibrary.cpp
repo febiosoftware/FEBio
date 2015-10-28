@@ -43,6 +43,7 @@ FEElementLibrary* FEElementLibrary::GetInstance()
 		n = m_pThis->RegisterTraits(new FEQuad4NI   ); assert(n==FE_QUAD4NI  );
 		n = m_pThis->RegisterTraits(new FETri3G1    ); assert(n==FE_TRI3G1   );
 		n = m_pThis->RegisterTraits(new FETri3G3    ); assert(n==FE_TRI3G3   );
+		n = m_pThis->RegisterTraits(new FETri3G7    ); assert(n==FE_TRI3G7   );
 		n = m_pThis->RegisterTraits(new FETri3NI    ); assert(n==FE_TRI3NI   );
 		n = m_pThis->RegisterTraits(new FETri6G3    ); assert(n==FE_TRI6G3   );
 		n = m_pThis->RegisterTraits(new FETri6G4    ); assert(n==FE_TRI6G4   );

@@ -747,6 +747,24 @@ protected:
 };
 
 //=============================================================================
+//!  3-node triangular element with 7-point gaussian quadrature
+class FETri3G7 : public FETri3_
+{
+public:
+	enum { NINT = 7 };
+
+public:
+	//! constructor
+	FETri3G7();
+
+	//! project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
+
+protected:
+	matrix	Ai;
+};
+
+//=============================================================================
 //  3-node triangular element with nodal quadrature
 class FETri3NI : public FETri3_
 {

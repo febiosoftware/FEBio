@@ -412,6 +412,9 @@ REGISTER_FECORE_CLASS(FEPlotSPRTestQuadratic	 , FEPLOTDATA_ID, "SPR test quadrat
 REGISTER_FECORE_CLASS(FEPlotNodalStresses		 , FEPLOTDATA_ID, "nodal stress"		  );
 REGISTER_FECORE_CLASS(FEPlotVolumePressure       , FEPLOTDATA_ID, "volume pressure"       );
 REGISTER_FECORE_CLASS(FEPlotLagrangeStrain       , FEPLOTDATA_ID, "Lagrange strain"       );
+REGISTER_FECORE_CLASS(FEPlotMortarContactGap     , FEPLOTDATA_ID, "mortar-gap"            );
+REGISTER_FECORE_CLASS(FEPlotMortarContactGapVector, FEPLOTDATA_ID, "mortar-gap vector"     );
+REGISTER_FECORE_CLASS(FEPlotMortarContactNormal  , FEPLOTDATA_ID, "mortar-normal"         );
 
 // LTE - 2O continuum fields
 REGISTER_FECORE_CLASS(FEPlotElementGnorm         , FEPLOTDATA_ID, "G norm"                );              
