@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEMortarSlidingContact.h"
 #include "FEStiffnessMatrix.h"
-#include <FECore\FEModel.h>
+#include <FECore/FEModel.h>
 
 //=============================================================================
 // FEMortarSurface
