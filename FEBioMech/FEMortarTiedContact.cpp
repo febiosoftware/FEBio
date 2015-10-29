@@ -1,19 +1,19 @@
 #include "stdafx.h"
-#include "FEMortarSlidingContact.h"
+#include "FEMortarTiedContact.h"
 #include "FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
 #include "FECore/mortar.h"
 #include "FECore/log.h"
 
 //=============================================================================
-// FEMortarSlidingSurface
+// FEMortarTiedSurface
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-FEMortarSlidingSurface::FEMortarSlidingSurface(FEMesh* pm) : FEContactSurface(pm) {}
+FEMortarTiedSurface::FEMortarTiedSurface(FEMesh* pm) : FEContactSurface(pm) {}
 
 //-----------------------------------------------------------------------------
-bool FEMortarSlidingSurface::Init()
+bool FEMortarTiedSurface::Init()
 {
 	// always intialize base class first!
 	if (FEContactSurface::Init() == false) return false;
@@ -22,62 +22,19 @@ bool FEMortarSlidingSurface::Init()
 	int NN = Nodes();
 
 	// allocate data structures
-	m_p.resize(NN, 0.0);
-	m_L.resize(NN, 0.0);
-	m_nu.resize(NN, vec3d(0,0,0));
-	m_norm0.resize(NN, 0.0);
+	m_L.resize(NN, vec3d(0,0,0));
 	m_gap.resize(NN, vec3d(0,0,0));
 
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-void FEMortarSlidingSurface::UpdateNormals(bool binit)
-{
-	const int NN = Nodes();
-
-	// reset normals
-	m_nu.assign(NN, vec3d(0,0,0));
-
-	// recalculate normals
-	const int NF = Elements();
-	for (int i=0; i<NF; ++i)
-	{
-		FESurfaceElement& el = Element(i);
-		int neln = el.Nodes();
-		for (int j=0; j<neln; ++j)
-		{
-			vec3d r0 = Node(el.m_lnode[j]).m_rt;
-			vec3d r1 = Node(el.m_lnode[(j+1)%neln]).m_rt;
-			vec3d r2 = Node(el.m_lnode[(j+neln-1)%neln]).m_rt;
-
-			vec3d n = (r1 - r0)^(r2 - r0);
-			m_nu[el.m_lnode[j]] += n;
-		}
-	}
-
-	// normalize
-	if (binit)
-	{
-		for (int i=0; i<NN; ++i) 
-		{
-			double d = m_nu[i].unit();
-			m_norm0[i] = 1.0/d;
-		}
-	}
-	else
-	{
-		for (int i=0; i<NN; ++i) m_nu[i] *= m_norm0[i];
-	}
-}
-
 //=============================================================================
-// FEMortarSlidingContact
+// FEMortarTiedContact
 //=============================================================================
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FEMortarSlidingContact, FEContactInterface)
+BEGIN_PARAMETER_LIST(FEMortarTiedContact, FEContactInterface)
 	ADD_PARAMETER(m_blaugon      , FE_PARAM_BOOL  , "laugon"       ); 
 	ADD_PARAMETER(m_atol         , FE_PARAM_DOUBLE, "tolerance"    );
 	ADD_PARAMETER(m_eps          , FE_PARAM_DOUBLE, "penalty"      );
@@ -86,17 +43,12 @@ BEGIN_PARAMETER_LIST(FEMortarSlidingContact, FEContactInterface)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEMortarSlidingContact::FEMortarSlidingContact(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
+FEMortarTiedContact::FEMortarTiedContact(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
 }
 
 //-----------------------------------------------------------------------------
-FEMortarSlidingContact::~FEMortarSlidingContact()
-{
-}
-
-//-----------------------------------------------------------------------------
-bool FEMortarSlidingContact::Init()
+bool FEMortarTiedContact::Init()
 {
 	// initialize surfaces
 	if (m_ms.Init() == false) return false;
@@ -115,15 +67,13 @@ bool FEMortarSlidingContact::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEMortarSlidingContact::Activate()
+void FEMortarTiedContact::Activate()
 {
 	//! don't forget the base class
 	FEContactInterface::Activate();
 
-	// update the normals on the slave surface
-	m_ss.UpdateNormals(true);
-
 	// update the mortar weights
+	// For tied interfaces, this is only done once, during activation
 	UpdateMortarWeights();
 
 	// update the nodal gaps
@@ -133,7 +83,7 @@ void FEMortarSlidingContact::Activate()
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
-void FEMortarSlidingContact::BuildMatrixProfile(FEStiffnessMatrix& K)
+void FEMortarTiedContact::BuildMatrixProfile(FEStiffnessMatrix& K)
 {
 	// For now we'll assume that each node on the slave side is connected to the master side
 	// This is obviously too much, but we'll worry about improving this later
@@ -159,7 +109,7 @@ void FEMortarSlidingContact::BuildMatrixProfile(FEStiffnessMatrix& K)
 
 //-----------------------------------------------------------------------------
 //! Update the mortar weights
-void FEMortarSlidingContact::UpdateMortarWeights()
+void FEMortarTiedContact::UpdateMortarWeights()
 {
 	// clear weights
 	m_n1.zero();
@@ -282,7 +232,7 @@ void FEMortarSlidingContact::UpdateMortarWeights()
 
 //-----------------------------------------------------------------------------
 //! calculate contact forces
-void FEMortarSlidingContact::ContactForces(FEGlobalVector& R)
+void FEMortarTiedContact::ContactForces(FEGlobalVector& R)
 {
 	int NS = m_ss.Nodes();
 	int NM = m_ms.Nodes();
@@ -290,13 +240,8 @@ void FEMortarSlidingContact::ContactForces(FEGlobalVector& R)
 	// loop over all slave nodes
 	for (int A=0; A<NS; ++A)
 	{
-		vec3d nuA = m_ss.m_nu[A];
 		vec3d gA = m_ss.m_gap[A];
-		double gap = gA*nuA;
-		double pA = m_ss.m_L[A] + m_eps*gap;
-//		if (gap < 0.0) pA = 0.0;
-		
-		vec3d tA = nuA*(pA);
+		vec3d tA = m_ss.m_L[A] + gA*m_eps;
 
 		// loop over all slave nodes
 		vector<int> en(1);
@@ -345,7 +290,7 @@ void FEMortarSlidingContact::ContactForces(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! Calculate the intersection between two facets
-bool FEMortarSlidingContact::CalculateIntersection(int k, int l, Patch& patch)
+bool FEMortarTiedContact::CalculateIntersection(int k, int l, Patch& patch)
 {
 	// clear the patch
 	patch.Clear();
@@ -421,7 +366,7 @@ bool FEMortarSlidingContact::CalculateIntersection(int k, int l, Patch& patch)
 
 //-----------------------------------------------------------------------------
 //! Update the nodal gaps
-void FEMortarSlidingContact::UpdateNodalGaps()
+void FEMortarTiedContact::UpdateNodalGaps()
 {
 	// reset nodal gaps
 	vector<vec3d>& gap = m_ss.m_gap;
@@ -455,26 +400,16 @@ void FEMortarSlidingContact::UpdateNodalGaps()
 
 //-----------------------------------------------------------------------------
 //! calculate contact stiffness
-void FEMortarSlidingContact::ContactStiffness(FESolver* psolver)
-{
-	ContactGapStiffness(psolver);
-	ContactNormalStiffness(psolver);
-}
-
-//-----------------------------------------------------------------------------
-//! calculate contact stiffness
-void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
+void FEMortarTiedContact::ContactStiffness(FESolver* psolver)
 {
 	int NS = m_ss.Nodes();
 	int NM = m_ms.Nodes();
 
 	// A. Linearization of the gap function
 	vector<int> lmi(3), lmj(3);
-	matrix kA(3,3), kG(3,3), ke(3,3);
+	matrix ke(3,3);
 	for (int A=0; A<NS; ++A)
 	{
-		vec3d nuA = m_ss.m_nu[A];
-
 		// loop over all slave nodes
 		for (int B=0; B<NS; ++B)
 		{
@@ -483,13 +418,9 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 			lmi[1] = nodeB.m_ID[1];
 			lmi[2] = nodeB.m_ID[2];
 
-			double nAB = m_n1[A][B];
+			double nAB = m_n1[A][B]*m_eps;
 			if (nAB != 0.0)
 			{
-				kA[0][0] = m_eps*nAB*(nuA.x*nuA.x); kA[0][1] = m_eps*nAB*(nuA.x*nuA.y); kA[0][2] = m_eps*nAB*(nuA.x*nuA.z);
-				kA[1][0] = m_eps*nAB*(nuA.y*nuA.x); kA[1][1] = m_eps*nAB*(nuA.y*nuA.y); kA[1][2] = m_eps*nAB*(nuA.y*nuA.z);
-				kA[2][0] = m_eps*nAB*(nuA.z*nuA.x); kA[2][1] = m_eps*nAB*(nuA.z*nuA.y); kA[2][2] = m_eps*nAB*(nuA.z*nuA.z);
-
 				// loop over slave nodes
 				for (int C=0; C<NS; ++C)
 				{
@@ -498,14 +429,12 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 					lmj[1] = nodeC.m_ID[1];
 					lmj[2] = nodeC.m_ID[2];
 
-					double nAC = m_n1[A][C];
+					double nAC = m_n1[A][C]*nAB;
 					if (nAC != 0.0)
 					{
-						kG[0][0] = nAC; kG[0][1] = 0.0; kG[0][2] = 0.0;
-						kG[1][0] = 0.0; kG[1][1] = nAC; kG[1][2] = 0.0;
-						kG[2][0] = 0.0; kG[2][1] = 0.0; kG[2][2] = nAC;
-
-						ke = kA*kG;
+						ke[0][0] = nAC; ke[0][1] = 0.0; ke[0][2] = 0.0;
+						ke[1][0] = 0.0; ke[1][1] = nAC; ke[1][2] = 0.0;
+						ke[2][0] = 0.0; ke[2][1] = 0.0; ke[2][2] = nAC;
 
 						psolver->AssembleStiffness2(lmi, lmj, ke);
 					}
@@ -519,14 +448,12 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 					lmj[1] = nodeC.m_ID[1];
 					lmj[2] = nodeC.m_ID[2];
 
-					double nAC = -m_n2[A][C];
+					double nAC = -m_n2[A][C]*nAB;
 					if (nAC != 0.0)
 					{
-						kG[0][0] = nAC; kG[0][1] = 0.0; kG[0][2] = 0.0;
-						kG[1][0] = 0.0; kG[1][1] = nAC; kG[1][2] = 0.0;
-						kG[2][0] = 0.0; kG[2][1] = 0.0; kG[2][2] = nAC;
-
-						ke = kA*kG;
+						ke[0][0] = nAC; ke[0][1] = 0.0; ke[0][2] = 0.0;
+						ke[1][0] = 0.0; ke[1][1] = nAC; ke[1][2] = 0.0;
+						ke[2][0] = 0.0; ke[2][1] = 0.0; ke[2][2] = nAC;
 
 						psolver->AssembleStiffness2(lmi, lmj, ke);
 					}
@@ -542,13 +469,9 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 			lmi[1] = nodeB.m_ID[1];
 			lmi[2] = nodeB.m_ID[2];
 
-			double nAB = -m_n2[A][B];
+			double nAB = -m_n2[A][B]*m_eps;
 			if (nAB != 0.0)
 			{
-				kA[0][0] = m_eps*nAB*(nuA.x*nuA.x); kA[0][1] = m_eps*nAB*(nuA.x*nuA.y); kA[0][2] = m_eps*nAB*(nuA.x*nuA.z);
-				kA[1][0] = m_eps*nAB*(nuA.y*nuA.x); kA[1][1] = m_eps*nAB*(nuA.y*nuA.y); kA[1][2] = m_eps*nAB*(nuA.y*nuA.z);
-				kA[2][0] = m_eps*nAB*(nuA.z*nuA.x); kA[2][1] = m_eps*nAB*(nuA.z*nuA.y); kA[2][2] = m_eps*nAB*(nuA.z*nuA.z);
-
 				// loop over slave nodes
 				for (int C=0; C<NS; ++C)
 				{
@@ -557,14 +480,12 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 					lmj[1] = nodeC.m_ID[1];
 					lmj[2] = nodeC.m_ID[2];
 
-					double nAC = m_n1[A][C];
+					double nAC = m_n1[A][C]*nAB;
 					if (nAC != 0.0)
 					{
-						kG[0][0] = nAC; kG[0][1] = 0.0; kG[0][2] = 0.0;
-						kG[1][0] = 0.0; kG[1][1] = nAC; kG[1][2] = 0.0;
-						kG[2][0] = 0.0; kG[2][1] = 0.0; kG[2][2] = nAC;
-
-						ke = kA*kG;
+						ke[0][0] = nAC; ke[0][1] = 0.0; ke[0][2] = 0.0;
+						ke[1][0] = 0.0; ke[1][1] = nAC; ke[1][2] = 0.0;
+						ke[2][0] = 0.0; ke[2][1] = 0.0; ke[2][2] = nAC;
 
 						psolver->AssembleStiffness2(lmi, lmj, ke);
 					}
@@ -578,14 +499,12 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 					lmj[1] = nodeC.m_ID[1];
 					lmj[2] = nodeC.m_ID[2];
 
-					double nAC = -m_n2[A][C];
+					double nAC = -m_n2[A][C]*nAB;
 					if (nAC != 0.0)
 					{
-						kG[0][0] = nAC; kG[0][1] = 0.0; kG[0][2] = 0.0;
-						kG[1][0] = 0.0; kG[1][1] = nAC; kG[1][2] = 0.0;
-						kG[2][0] = 0.0; kG[2][1] = 0.0; kG[2][2] = nAC;
-
-						ke = kA*kG;
+						ke[0][0] = nAC; ke[0][1] = 0.0; ke[0][2] = 0.0;
+						ke[1][0] = 0.0; ke[1][1] = nAC; ke[1][2] = 0.0;
+						ke[2][0] = 0.0; ke[2][1] = 0.0; ke[2][2] = nAC;
 
 						psolver->AssembleStiffness2(lmi, lmj, ke);
 					}
@@ -596,111 +515,8 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-//! calculate contact stiffness
-void FEMortarSlidingContact::ContactNormalStiffness(FESolver* psolver)
-{
-	int NS = m_ss.Nodes();
-	int NM = m_ms.Nodes();
-
-	vector<int> lm1(3);
-	vector<int> lm2(3);
-	matrix ke(3,3);
-	int NF = m_ss.Elements();
-	for (int i=0; i<NF; ++i)
-	{
-		FESurfaceElement& f = m_ss.Element(i);
-		int nn = f.Nodes();
-		for (int j=0; j<nn; ++j)
-		{
-			int jp1 = (j+1)%nn;
-			int jm1 = (j+nn-1)%nn;
-			int A = f.m_lnode[j];
-
-			vec3d vA = m_ss.m_nu[A];
-			vec3d gA = m_ss.m_gap[A];
-			double pA = m_ss.m_L[A] + m_eps*(gA*vA);
-			double normA = m_ss.m_norm0[A];
-
-			mat3d kA = ((vA&gA)*m_eps + mat3dd(pA));
-
-			FENode& nodej1 = m_ss.Node(f.m_lnode[jp1]);
-			vec3d& x1 = nodej1.m_rt;
-			mat3da k1(x1);
-			lm1[0] = nodej1.m_ID[0];
-			lm1[1] = nodej1.m_ID[1];
-			lm1[2] = nodej1.m_ID[2];
-
-			FENode& nodej2 = m_ss.Node(f.m_lnode[jm1]);
-			vec3d& x2 = nodej2.m_rt;
-			mat3da k2(x2);
-			lm2[0] = nodej2.m_ID[0];
-			lm2[1] = nodej2.m_ID[1];
-			lm2[2] = nodej2.m_ID[2];
-
-			// loop over slave nodes
-			for (int B=0; B<NS; ++B)
-			{
-				FENode& nodeB = m_ss.Node(B);
-				
-				double nAB = m_n1[A][B];
-				if (nAB != 0.0)
-				{
-					vector<int> lmi(3);
-					lmi[0] = nodeB.m_ID[0];
-					lmi[1] = nodeB.m_ID[1];
-					lmi[2] = nodeB.m_ID[2];
-
-					mat3d kab = (kA*k1)*(nAB*normA);
-					ke[0][0] = kab(0,0); ke[0][1] = kab(0,1); ke[0][2] = kab(0,2);
-					ke[1][0] = kab(1,0); ke[1][1] = kab(1,1); ke[1][2] = kab(1,2);
-					ke[2][0] = kab(2,0); ke[2][1] = kab(2,1); ke[2][2] = kab(2,2);
-
-					psolver->AssembleStiffness2(lmi, lm2, ke);
-
-					kab = (kA*k2)*(-nAB*normA);
-					ke[0][0] = kab(0,0); ke[0][1] = kab(0,1); ke[0][2] = kab(0,2);
-					ke[1][0] = kab(1,0); ke[1][1] = kab(1,1); ke[1][2] = kab(1,2);
-					ke[2][0] = kab(2,0); ke[2][1] = kab(2,1); ke[2][2] = kab(2,2);
-
-					psolver->AssembleStiffness2(lmi, lm1, ke);
-				}
-			}
-
-			// loop over master nodes
-			for (int B=0; B<NM; ++B)
-			{
-				FENode& nodeB = m_ms.Node(B);
-				
-				double nAB = m_n2[A][B];
-				if (nAB != 0.0)
-				{
-					vector<int> lmi(3);
-					lmi[0] = nodeB.m_ID[0];
-					lmi[1] = nodeB.m_ID[1];
-					lmi[2] = nodeB.m_ID[2];
-
-					mat3d kab = (kA*k1)*(nAB*normA);
-					ke[0][0] = kab(0,0); ke[0][1] = kab(0,1); ke[0][2] = kab(0,2);
-					ke[1][0] = kab(1,0); ke[1][1] = kab(1,1); ke[1][2] = kab(1,2);
-					ke[2][0] = kab(2,0); ke[2][1] = kab(2,1); ke[2][2] = kab(2,2);
-
-					psolver->AssembleStiffness2(lmi, lm2, ke);
-
-					kab = (kA*k2)*(-nAB*normA);
-					ke[0][0] = kab(0,0); ke[0][1] = kab(0,1); ke[0][2] = kab(0,2);
-					ke[1][0] = kab(1,0); ke[1][1] = kab(1,1); ke[1][2] = kab(1,2);
-					ke[2][0] = kab(2,0); ke[2][1] = kab(2,1); ke[2][2] = kab(2,2);
-
-					psolver->AssembleStiffness2(lmi, lm1, ke);
-				}
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! calculate Lagrangian augmentations
-bool FEMortarSlidingContact::Augment(int naug)
+bool FEMortarTiedContact::Augment(int naug)
 {
 	if (m_blaugon == false) return true;
 
@@ -709,14 +525,14 @@ bool FEMortarSlidingContact::Augment(int naug)
 	// loop over all slave nodes
 	for (int A=0; A<NS; ++A)
 	{
-		vec3d vA = m_ss.m_nu[A];
 		vec3d gA = m_ss.m_gap[A];
-		double gap = gA*vA;
-		
-		double Lold = m_ss.m_L[A];
-		double Lnew = Lold + m_eps*gap;
+		vec3d Lold = m_ss.m_L[A];
+		vec3d Lnew = Lold + gA*m_eps;
 
-		double err = fabs((Lold - Lnew)/(Lold + Lnew));
+		double uold = Lold.norm();
+		double unew = Lnew.norm();
+
+		double err = fabs((uold - unew)/(uold + unew));
 		if (err > max_err) max_err = err;
 	}
 
@@ -730,18 +546,14 @@ bool FEMortarSlidingContact::Augment(int naug)
 	felog.printf("    normal force : %15le", max_err);
 	if (m_atol > 0) felog.printf("%15le\n", m_atol); else felog.printf("       ***\n");
 
-
 	if (bconv == false)
 	{
 		// loop over all slave nodes
 		for (int A=0; A<NS; ++A)
 		{
-			vec3d vA = m_ss.m_nu[A];
 			vec3d gA = m_ss.m_gap[A];
-			double gap = gA*vA;
-		
-			double Lold = m_ss.m_L[A];
-			double Lnew = Lold + m_eps*gap;
+			vec3d Lold = m_ss.m_L[A];
+			vec3d Lnew = Lold + gA*m_eps;
 			m_ss.m_L[A] = Lnew;
 		}
 	}
@@ -751,21 +563,19 @@ bool FEMortarSlidingContact::Augment(int naug)
 
 //-----------------------------------------------------------------------------
 //! update interface data
-void FEMortarSlidingContact::Update(int niter)
+void FEMortarTiedContact::Update(int niter)
 {
-	m_ss.UpdateNormals(false);
-	UpdateMortarWeights();
 	UpdateNodalGaps();
 }
 
 //-----------------------------------------------------------------------------
 //! serialize data to archive
-void FEMortarSlidingContact::Serialize(DumpFile& ar)
+void FEMortarTiedContact::Serialize(DumpFile& ar)
 {
 }
 
 //-----------------------------------------------------------------------------
 //! shallow copy
-void FEMortarSlidingContact::ShallowCopy(DumpStream& dmp, bool bsave)
+void FEMortarTiedContact::ShallowCopy(DumpStream& dmp, bool bsave)
 {
 }

@@ -5,35 +5,26 @@
 
 //-----------------------------------------------------------------------------
 //! This class represents a surface used by the mortar contact interface.
-class FEMortarSlidingSurface : public FEContactSurface
+class FEMortarTiedSurface : public FEContactSurface
 {
 public:
-	FEMortarSlidingSurface(FEMesh* pm = 0);
+	FEMortarTiedSurface(FEMesh* pm = 0);
 
 	//! Initializes data structures
 	bool Init();
 
-	//! update the normals
-	void UpdateNormals(bool binit);
-
 public:
-	vector<double>	m_p;		//!< nodal contact pressures
-	vector<double>	m_L;		//!< Lagrange multipliers
-	vector<vec3d>	m_nu;		//!< nodal normals
-	vector<double>	m_norm0;	//!< initial (inverse) normal lenghts
+	vector<vec3d>	m_L;		//!< Lagrange multipliers
 	vector<vec3d>	m_gap;		//!< nodal gap function
 };
 
 //-----------------------------------------------------------------------------
-//! This class implements a mortar contact formulation for frictionless, sliding contact
-class FEMortarSlidingContact : public FEContactInterface
+//! This class implements a mortar based tied interface.
+class FEMortarTiedContact : public FEContactInterface
 {
 public:
 	//! constructor
-	FEMortarSlidingContact(FEModel* pfem);
-
-	//! destructor
-	~FEMortarSlidingContact();
+	FEMortarTiedContact(FEModel* pfem);
 
 	//! return the master and slave surface
 	FESurface* GetMasterSurface() { return &m_ms; }
@@ -80,10 +71,6 @@ protected:
 	//! Update integration factors
 	void UpdateMortarWeights();
 
-	// contact stiffness contributions
-	void ContactGapStiffness(FESolver* psolver);
-	void ContactNormalStiffness(FESolver* psolver);
-
 private:
 	double	m_atol;		//!< augmented Lagrangian tolerance
 	double	m_eps;		//!< penalty factor
@@ -91,8 +78,8 @@ private:
 	int		m_naugmax;	//!< maximum number of augmentations
 
 private:
-	FEMortarSlidingSurface	m_ms;	//!< mortar surface
-	FEMortarSlidingSurface	m_ss;	//!< non-mortar surface
+	FEMortarTiedSurface	m_ms;	//!< mortar surface
+	FEMortarTiedSurface	m_ss;	//!< non-mortar surface
 
 	matrix	m_n1;	//!< integration weights n1_AB
 	matrix	m_n2;	//!< integration weights n2_AB

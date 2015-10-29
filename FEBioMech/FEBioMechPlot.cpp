@@ -320,7 +320,7 @@ bool FEPlotVolumePressure::Save(FESurface& S, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotMortarContactGap::Save(FESurface& S, vector<float>& a)
 {
-	FEMortarSurface* ps = dynamic_cast<FEMortarSurface*>(&S);
+	FEMortarSlidingSurface* ps = dynamic_cast<FEMortarSlidingSurface*>(&S);
 	if (ps)
 	{
 		int N = ps->Nodes();
@@ -339,7 +339,7 @@ bool FEPlotMortarContactGap::Save(FESurface& S, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotMortarContactGapVector::Save(FESurface& S, vector<float>& a)
 {
-	FEMortarSurface* ps = dynamic_cast<FEMortarSurface*>(&S);
+	FEMortarSlidingSurface* ps = dynamic_cast<FEMortarSlidingSurface*>(&S);
 	if (ps)
 	{
 		int N = ps->Nodes();
@@ -359,7 +359,7 @@ bool FEPlotMortarContactGapVector::Save(FESurface& S, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotMortarContactNormal::Save(FESurface& S, vector<float>& a)
 {
-	FEMortarSurface* ps = dynamic_cast<FEMortarSurface*>(&S);
+	FEMortarSlidingSurface* ps = dynamic_cast<FEMortarSlidingSurface*>(&S);
 	if (ps)
 	{
 		int N = ps->Nodes();
