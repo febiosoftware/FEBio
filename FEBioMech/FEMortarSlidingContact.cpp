@@ -195,7 +195,7 @@ void FEMortarSlidingContact::UpdateMortarWeights()
 
 			// calculate the patch of triangles, representing the intersection
 			// of the non-mortar facet with the mortar facet
-			if (CalculateIntersection(i, j, patch))
+			if (CalculateMortarIntersection(m_ss, m_ms, i, j, patch))
 			{
 				// loop over all patches
 				int np = patch.Size();
@@ -341,82 +341,6 @@ void FEMortarSlidingContact::ContactForces(FEGlobalVector& R)
 			}
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-//! Calculate the intersection between two facets
-bool FEMortarSlidingContact::CalculateIntersection(int k, int l, Patch& patch)
-{
-	// clear the patch
-	patch.Clear();
-
-	// get the surface elements
-	FESurfaceElement& es = m_ss.Element(k);
-	FESurfaceElement& em = m_ms.Element(l);
-
-	// get the slave nodal coordinates
-	const int M = FEElement::MAX_NODES;
-	vec3d rs[M], rm[M];
-	int ns = es.Nodes(), nm = em.Nodes();
-	for (int i=0; i<ns; ++i) rs[i] = m_ss.Node(es.m_lnode[i]).m_rt;
-	for (int i=0; i<nm; ++i) rm[i] = m_ms.Node(em.m_lnode[i]).m_rt;
-
-	// setup an orthonormal coordinate system
-	vec3d c = rs[0];
-	vec3d e1 = rs[   1] - rs[0]; e1.unit();
-	vec3d e2 = rs[ns-1] - rs[0]; e2.unit();
-	vec3d e3 = e1^e2;
-	e2 = e3^e1;
-
-	// project all points onto this plane
-	POINT2D P[M], Q[M], R[M];
-	for (int i=0; i<ns; ++i)
-	{
-		vec3d& r = rs[i] - c;
-		vec3d q = r - e3*(r*e3);
-		P[i].x = q*e1;
-		P[i].y = q*e2;
-	}
-
-	// now we do the master nodes
-	for (int i=0; i<nm; ++i)
-	{
-		vec3d& r = rm[nm-i-1] - c;
-		vec3d q = r - e3*(r*e3);
-		Q[i].x = q*e1;
-		Q[i].y = q*e2;
-	}
-
-	// now we calculate the intersection
-	int nr = ConvexIntersect(P, ns, Q, nm, R);
-	if (nr >= 3)
-	{
-		// evaluate the center of the patch
-		POINT2D d;
-		d.x = d.y = 0;
-		for (int k=0; k<nr; ++k)
-		{
-			d.x += R[k].x;
-			d.y += R[k].y;
-		}
-		d.x /= nr; d.y /= nr;
-
-		// the center point is always the same
-		vec3d r[3];
-		r[0] = e1*d.x + e2*d.y + c;
-
-		// calculate the other patch points
-		for (int k=0; k<nr; ++k)
-		{
-			int k1 = (k+1)%nr;
-			r[1] = e1*R[k ].x + e2*R[k ].y + c;
-			r[2] = e1*R[k1].x + e2*R[k1].y + c;
-			patch.Add(r);
-		}
-	}
-
-	// return
-	return (patch.Empty() == false);
 }
 
 //-----------------------------------------------------------------------------

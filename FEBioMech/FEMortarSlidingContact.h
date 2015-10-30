@@ -71,9 +71,6 @@ public:
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 protected:
-	//! Calculate intersection of two patches
-	bool CalculateIntersection(int k, int l, Patch& patch);
-
 	//! Update the gap values
 	void UpdateNodalGaps();
 

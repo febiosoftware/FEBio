@@ -4,6 +4,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/mortar.h"
 #include "FECore/log.h"
+#include "FECore/fecore_debug.h"
 
 //=============================================================================
 // FEMortarTiedSurface
@@ -145,7 +146,7 @@ void FEMortarTiedContact::UpdateMortarWeights()
 
 			// calculate the patch of triangles, representing the intersection
 			// of the non-mortar facet with the mortar facet
-			if (CalculateIntersection(i, j, patch))
+			if (CalculateMortarIntersection(m_ss, m_ms, i, j, patch))
 			{
 				// loop over all patches
 				int np = patch.Size();
@@ -158,57 +159,62 @@ void FEMortarTiedContact::UpdateMortarWeights()
 					// (We multiply by two because the sum of the integration weights in FEBio sum up to the area
 					// of the triangle in natural coordinates (=0.5)).
 					double Area = fk.Area()*2.0;
-
-					// loop over integration points
-					for (int n=0; n<nint; ++n)
+					if (Area > 0.0)
 					{
-						// evaluate the spatial position of the integration point on the patch
-						vec3d xp = fk.Position(gr[n], gs[n]);
-
-						// evaluate the integration points on the slave and master surfaces
-						// i.e. determine rs, rm
-						double r1 = 0, s1 = 0, r2 = 0, s2 = 0;
-						vec3d xs = m_ss.ProjectToSurface(se, xp, r1, s1);
-						vec3d xm = m_ms.ProjectToSurface(me, xp, r2, s2);
-
-						// evaluate shape functions
-						se.shape_fnc(Ns[n], r1, s1);
-						me.shape_fnc(Nm[n], r2, s2);
-					}
-
-					// Evaluate the contributions to the integrals
-					int ns = se.Nodes();
-					int nm = me.Nodes();
-					for (int A=0; A<ns; ++A)
-					{
-						int a = se.m_lnode[A];
-
-						// loop over all the nodes on the slave facet
-						for (int B=0; B<ns; ++B)
+						// loop over integration points
+						for (int n=0; n<nint; ++n)
 						{
-							double n1 = 0;
-							for (int n=0; n<nint; ++n)
-							{
-								n1 += gw[n]*Ns[n][A]*Ns[n][B];
-							}
-							n1 *= Area;
+							// evaluate the spatial position of the integration point on the patch
+							vec3d xp = fk.Position(gr[n], gs[n]);
 
-							int b = se.m_lnode[B];
-							m_n1[a][b] += n1;
+							// evaluate the integration points on the slave and master surfaces
+							// i.e. determine rs, rm
+							double r1 = 0, s1 = 0, r2 = 0, s2 = 0;
+							vec3d xs = m_ss.ProjectToSurface(se, xp, r1, s1);
+							vec3d xm = m_ms.ProjectToSurface(me, xp, r2, s2);
+
+							assert((r1>=0.0)&&(s1>=0)&&(r1+s1<1.0));
+							assert((r2>=0.0)&&(s2>=0)&&(r2+s2<1.0));
+
+							// evaluate shape functions
+							se.shape_fnc(Ns[n], r1, s1);
+							me.shape_fnc(Nm[n], r2, s2);
 						}
 
-						// loop over all the nodes on the master facet
-						for (int C = 0; C<nm; ++C)
+						// Evaluate the contributions to the integrals
+						int ns = se.Nodes();
+						int nm = me.Nodes();
+						for (int A=0; A<ns; ++A)
 						{
-							double n2 = 0;
-							for (int n=0; n<nint; ++n)
-							{
-								n2 += gw[n]*Ns[n][A]*Nm[n][C];
-							}
-							n2 *= Area;
+							int a = se.m_lnode[A];
 
-							int c = me.m_lnode[C];
-							m_n2[a][c] += n2;
+							// loop over all the nodes on the slave facet
+							for (int B=0; B<ns; ++B)
+							{
+								double n1 = 0;
+								for (int n=0; n<nint; ++n)
+								{
+									n1 += gw[n]*Ns[n][A]*Ns[n][B];
+								}
+								n1 *= Area;
+
+								int b = se.m_lnode[B];
+								m_n1[a][b] += n1;
+							}
+
+							// loop over all the nodes on the master facet
+							for (int C = 0; C<nm; ++C)
+							{
+								double n2 = 0;
+								for (int n=0; n<nint; ++n)
+								{
+									n2 += gw[n]*Ns[n][A]*Nm[n][C];
+								}
+								n2 *= Area;
+
+								int c = me.m_lnode[C];
+								m_n2[a][c] += n2;
+							}
 						}
 					}
 				}
@@ -227,7 +233,6 @@ void FEMortarTiedContact::UpdateMortarWeights()
 	double sum2 = 0.0;
 	for (int A=0; A<NS; ++A)
 		for (int C=0; C<NM; ++C) sum2 += m_n2[A][C];
-
 }
 
 //-----------------------------------------------------------------------------
@@ -286,82 +291,6 @@ void FEMortarTiedContact::ContactForces(FEGlobalVector& R)
 			}
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-//! Calculate the intersection between two facets
-bool FEMortarTiedContact::CalculateIntersection(int k, int l, Patch& patch)
-{
-	// clear the patch
-	patch.Clear();
-
-	// get the surface elements
-	FESurfaceElement& es = m_ss.Element(k);
-	FESurfaceElement& em = m_ms.Element(l);
-
-	// get the slave nodal coordinates
-	const int M = FEElement::MAX_NODES;
-	vec3d rs[M], rm[M];
-	int ns = es.Nodes(), nm = em.Nodes();
-	for (int i=0; i<ns; ++i) rs[i] = m_ss.Node(es.m_lnode[i]).m_rt;
-	for (int i=0; i<nm; ++i) rm[i] = m_ms.Node(em.m_lnode[i]).m_rt;
-
-	// setup an orthonormal coordinate system
-	vec3d c = rs[0];
-	vec3d e1 = rs[   1] - rs[0]; e1.unit();
-	vec3d e2 = rs[ns-1] - rs[0]; e2.unit();
-	vec3d e3 = e1^e2;
-	e2 = e3^e1;
-
-	// project all points onto this plane
-	POINT2D P[M], Q[M], R[M];
-	for (int i=0; i<ns; ++i)
-	{
-		vec3d& r = rs[i] - c;
-		vec3d q = r - e3*(r*e3);
-		P[i].x = q*e1;
-		P[i].y = q*e2;
-	}
-
-	// now we do the master nodes
-	for (int i=0; i<nm; ++i)
-	{
-		vec3d& r = rm[nm-i-1] - c;
-		vec3d q = r - e3*(r*e3);
-		Q[i].x = q*e1;
-		Q[i].y = q*e2;
-	}
-
-	// now we calculate the intersection
-	int nr = ConvexIntersect(P, ns, Q, nm, R);
-	if (nr >= 3)
-	{
-		// evaluate the center of the patch
-		POINT2D d;
-		d.x = d.y = 0;
-		for (int k=0; k<nr; ++k)
-		{
-			d.x += R[k].x;
-			d.y += R[k].y;
-		}
-		d.x /= nr; d.y /= nr;
-
-		// the center point is always the same
-		vec3d r[3];
-		r[0] = e1*d.x + e2*d.y + c;
-
-		// calculate the other patch points
-		for (int k=0; k<nr; ++k)
-		{
-			int k1 = (k+1)%nr;
-			r[1] = e1*R[k ].x + e2*R[k ].y + c;
-			r[2] = e1*R[k1].x + e2*R[k1].y + c;
-			patch.Add(r);
-		}
-	}
-
-	// return
-	return (patch.Empty() == false);
 }
 
 //-----------------------------------------------------------------------------
