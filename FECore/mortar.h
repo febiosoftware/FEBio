@@ -106,3 +106,7 @@ bool CalculateMortarIntersection(FESurface& ss, FESurface& ms, int k, int l, Pat
 //-----------------------------------------------------------------------------
 // Calculates the mortar intersection between two surfaces
 void CalculateMortarSurface(FESurface& ss, FESurface& ms, MortarSurface& s);
+
+//-----------------------------------------------------------------------------
+// Stores the mortar surface in STL format
+bool ExportMortar(MortarSurface& mortar, const char* szfile);

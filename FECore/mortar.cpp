@@ -277,6 +277,11 @@ int ConvexIntersect(POINT2D* P, int n, POINT2D* Q, int m, POINT2D* R)
 	return nr;
 }
 
+double tri_area(vec3d r[3])
+{
+	return ((r[1]-r[0])^(r[2]-r[0])).norm()*0.5;
+}
+
 bool CalculateMortarIntersection(FESurface& ss, FESurface& ms, int k, int l, Patch& patch)
 {
 	// clear the patch
@@ -297,7 +302,7 @@ bool CalculateMortarIntersection(FESurface& ss, FESurface& ms, int k, int l, Pat
 	vec3d c = rs[0];
 	vec3d e1 = rs[   1] - rs[0]; e1.unit();
 	vec3d e2 = rs[ns-1] - rs[0]; e2.unit();
-	vec3d e3 = e1^e2;
+	vec3d e3 = e1^e2; e3.unit();
 	e2 = e3^e1;
 
 	// project all points onto this plane
@@ -345,6 +350,7 @@ bool CalculateMortarIntersection(FESurface& ss, FESurface& ms, int k, int l, Pat
 			int k1 = (k+1)%nr;
 			r[1] = e1*R[k ].x + e2*R[k ].y + c;
 			r[2] = e1*R[k1].x + e2*R[k1].y + c;
+
 			patch.Add(r);
 		}
 	}
@@ -376,4 +382,41 @@ void CalculateMortarSurface(FESurface& ss, FESurface& ms, MortarSurface& mortar)
 			mortar.AddPatch(patch);
 		}
 	}
+}
+
+bool ExportMortar(MortarSurface& mortar, const char* szfile)
+{
+	FILE* fp = fopen(szfile, "wt");
+	if (fp == 0) return false;
+
+	fprintf(fp, "solid %s\n", "mortar");
+	int NP = mortar.Patches();
+	for (int i=0; i<NP; ++i)
+	{
+		Patch& patch = mortar.GetPatch(i);
+		int np = patch.Size();
+		for (int j=0; j<np; j++)
+		{
+			Patch::FACET& tri = patch.Facet(j);
+
+			vec3d e1 = tri.r[1] - tri.r[0];
+			vec3d e2 = tri.r[2] - tri.r[0];
+			vec3d n = e1^e2; n.unit();
+
+			fprintf(fp, "facet normal %g %g %g\n", n.x, n.y, n.z);
+			fprintf(fp, "outer loop\n");
+			for (int k=0; k<3; ++k)
+			{
+				vec3d& r = tri.r[k];
+				fprintf(fp, "vertex %g %g %g\n", r.x, r.y, r.z);
+			}
+			fprintf(fp, "endloop\n");
+			fprintf(fp, "endfacet\n");
+		}
+	}
+	fprintf(fp, "endsolid\n");
+
+	fclose(fp);
+
+	return true;
 }

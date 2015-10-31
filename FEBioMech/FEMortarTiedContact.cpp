@@ -127,6 +127,8 @@ void FEMortarTiedContact::UpdateMortarWeights()
 	MortarSurface mortar;
 	CalculateMortarSurface(m_ss, m_ms, mortar);
 
+	ExportMortar(mortar, "mortar.stl");
+
 	// These arrays will store the shape function values of the projection points 
 	// on the slave and master side when evaluating the integral over a pallet
 	double Ns[MAX_INT][4], Nm[MAX_INT][4];
@@ -158,7 +160,7 @@ void FEMortarTiedContact::UpdateMortarWeights()
 			// (We multiply by two because the sum of the integration weights in FEBio sum up to the area
 			// of the triangle in natural coordinates (=0.5)).
 			double Area = fj.Area()*2.0;
-			if (Area > 0.0)
+			if (Area > 1e-15)
 			{
 				// loop over integration points
 				for (int n=0; n<nint; ++n)
@@ -172,8 +174,8 @@ void FEMortarTiedContact::UpdateMortarWeights()
 					vec3d xs = m_ss.ProjectToSurface(se, xp, r1, s1);
 					vec3d xm = m_ms.ProjectToSurface(me, xp, r2, s2);
 
-//					assert((r1>=0.0)&&(s1>=0)&&(r1+s1<1.0));
-//					assert((r2>=0.0)&&(s2>=0)&&(r2+s2<1.0));
+					assert((r1>=0.0)&&(s1>=0)&&(r1+s1<1.0));
+					assert((r2>=0.0)&&(s2>=0)&&(r2+s2<1.0));
 
 					// evaluate shape functions
 					se.shape_fnc(Ns[n], r1, s1);
@@ -230,6 +232,10 @@ void FEMortarTiedContact::UpdateMortarWeights()
 	double sum2 = 0.0;
 	for (int A=0; A<NS; ++A)
 		for (int C=0; C<NM; ++C) sum2 += m_n2[A][C];
+
+	fecore_watch(sum1);
+	fecore_watch(sum2);
+	fecore_break();
 }
 
 //-----------------------------------------------------------------------------
