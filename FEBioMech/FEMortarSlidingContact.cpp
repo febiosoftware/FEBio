@@ -165,9 +165,6 @@ void FEMortarSlidingContact::UpdateMortarWeights()
 	m_n1.zero();
 	m_n2.zero();
 
-	// We'll use a patch to store the intersection between two facets
-	Patch patch;
-
 	// number of integration points
 	const int MAX_INT = 11;
 	const int nint = m_pT->nint;
@@ -195,6 +192,7 @@ void FEMortarSlidingContact::UpdateMortarWeights()
 
 			// calculate the patch of triangles, representing the intersection
 			// of the non-mortar facet with the mortar facet
+			Patch patch(i,j);
 			if (CalculateMortarIntersection(m_ss, m_ms, i, j, patch))
 			{
 				// loop over all patches

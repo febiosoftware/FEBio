@@ -116,9 +116,6 @@ void FEMortarTiedContact::UpdateMortarWeights()
 	m_n1.zero();
 	m_n2.zero();
 
-	// We'll use a patch to store the intersection between two facets
-	Patch patch;
-
 	// number of integration points
 	const int MAX_INT = 11;
 	const int nint = m_pT->nint;
@@ -126,96 +123,96 @@ void FEMortarTiedContact::UpdateMortarWeights()
 	vector<double>& gr = m_pT->gr;
 	vector<double>& gs = m_pT->gs;
 
+	// calculate the mortar surface
+	MortarSurface mortar;
+	CalculateMortarSurface(m_ss, m_ms, mortar);
+
 	// These arrays will store the shape function values of the projection points 
 	// on the slave and master side when evaluating the integral over a pallet
 	double Ns[MAX_INT][4], Nm[MAX_INT][4];
 
-	// loop over all non-mortar facets
-	int NSF = m_ss.Elements();
-	int NMF = m_ms.Elements();
-	for (int i=0; i<NSF; ++i)
+	// loop over the mortar patches
+	int NP = mortar.Patches();
+	for (int i=0; i<NP; ++i)
 	{
+		// get the next patch
+		Patch& pi = mortar.GetPatch(i);
+
+		// get the facet ID's that generated this patch
+		int k = pi.GetSlaveFacetID();
+		int l = pi.GetMasterFacetID();
+
 		// get the non-mortar surface element
-		FESurfaceElement& se = m_ss.Element(i);
+		FESurfaceElement& se = m_ss.Element(k);
+		// get the mortar surface element
+		FESurfaceElement& me = m_ms.Element(l);
 
-		// loop over all the mortar surface elements
-		for (int j=0; j<NMF; ++j)
+		// loop over all patch triangles
+		int np = pi.Size();
+		for (int j=0; j<np; ++j)
 		{
-			// get the next surface element
-			FESurfaceElement& me = m_ms.Element(j);
+			// get the next facet
+			Patch::FACET& fj = pi.Facet(j);
 
-			// calculate the patch of triangles, representing the intersection
-			// of the non-mortar facet with the mortar facet
-			if (CalculateMortarIntersection(m_ss, m_ms, i, j, patch))
+			// calculate the patch area
+			// (We multiply by two because the sum of the integration weights in FEBio sum up to the area
+			// of the triangle in natural coordinates (=0.5)).
+			double Area = fj.Area()*2.0;
+			if (Area > 0.0)
 			{
-				// loop over all patches
-				int np = patch.Size();
-				for (int k=0; k<np; ++k)
+				// loop over integration points
+				for (int n=0; n<nint; ++n)
 				{
-					// get the next facet
-					Patch::FACET& fk = patch.Facet(k);
+					// evaluate the spatial position of the integration point on the patch
+					vec3d xp = fj.Position(gr[n], gs[n]);
 
-					// calculate the patch area
-					// (We multiply by two because the sum of the integration weights in FEBio sum up to the area
-					// of the triangle in natural coordinates (=0.5)).
-					double Area = fk.Area()*2.0;
-					if (Area > 0.0)
+					// evaluate the integration points on the slave and master surfaces
+					// i.e. determine rs, rm
+					double r1 = 0, s1 = 0, r2 = 0, s2 = 0;
+					vec3d xs = m_ss.ProjectToSurface(se, xp, r1, s1);
+					vec3d xm = m_ms.ProjectToSurface(me, xp, r2, s2);
+
+//					assert((r1>=0.0)&&(s1>=0)&&(r1+s1<1.0));
+//					assert((r2>=0.0)&&(s2>=0)&&(r2+s2<1.0));
+
+					// evaluate shape functions
+					se.shape_fnc(Ns[n], r1, s1);
+					me.shape_fnc(Nm[n], r2, s2);
+				}
+
+				// Evaluate the contributions to the integrals
+				int ns = se.Nodes();
+				int nm = me.Nodes();
+				for (int A=0; A<ns; ++A)
+				{
+					int a = se.m_lnode[A];
+
+					// loop over all the nodes on the slave facet
+					for (int B=0; B<ns; ++B)
 					{
-						// loop over integration points
+						double n1 = 0;
 						for (int n=0; n<nint; ++n)
 						{
-							// evaluate the spatial position of the integration point on the patch
-							vec3d xp = fk.Position(gr[n], gs[n]);
-
-							// evaluate the integration points on the slave and master surfaces
-							// i.e. determine rs, rm
-							double r1 = 0, s1 = 0, r2 = 0, s2 = 0;
-							vec3d xs = m_ss.ProjectToSurface(se, xp, r1, s1);
-							vec3d xm = m_ms.ProjectToSurface(me, xp, r2, s2);
-
-							assert((r1>=0.0)&&(s1>=0)&&(r1+s1<1.0));
-							assert((r2>=0.0)&&(s2>=0)&&(r2+s2<1.0));
-
-							// evaluate shape functions
-							se.shape_fnc(Ns[n], r1, s1);
-							me.shape_fnc(Nm[n], r2, s2);
+							n1 += gw[n]*Ns[n][A]*Ns[n][B];
 						}
+						n1 *= Area;
 
-						// Evaluate the contributions to the integrals
-						int ns = se.Nodes();
-						int nm = me.Nodes();
-						for (int A=0; A<ns; ++A)
+						int b = se.m_lnode[B];
+						m_n1[a][b] += n1;
+					}
+
+					// loop over all the nodes on the master facet
+					for (int C = 0; C<nm; ++C)
+					{
+						double n2 = 0;
+						for (int n=0; n<nint; ++n)
 						{
-							int a = se.m_lnode[A];
-
-							// loop over all the nodes on the slave facet
-							for (int B=0; B<ns; ++B)
-							{
-								double n1 = 0;
-								for (int n=0; n<nint; ++n)
-								{
-									n1 += gw[n]*Ns[n][A]*Ns[n][B];
-								}
-								n1 *= Area;
-
-								int b = se.m_lnode[B];
-								m_n1[a][b] += n1;
-							}
-
-							// loop over all the nodes on the master facet
-							for (int C = 0; C<nm; ++C)
-							{
-								double n2 = 0;
-								for (int n=0; n<nint; ++n)
-								{
-									n2 += gw[n]*Ns[n][A]*Nm[n][C];
-								}
-								n2 *= Area;
-
-								int c = me.m_lnode[C];
-								m_n2[a][c] += n2;
-							}
+							n2 += gw[n]*Ns[n][A]*Nm[n][C];
 						}
+						n2 *= Area;
+
+						int c = me.m_lnode[C];
+						m_n2[a][c] += n2;
 					}
 				}
 			}		

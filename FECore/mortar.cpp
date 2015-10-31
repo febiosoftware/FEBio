@@ -352,3 +352,28 @@ bool CalculateMortarIntersection(FESurface& ss, FESurface& ms, int k, int l, Pat
 	// return
 	return (patch.Empty() == false);
 }
+
+void CalculateMortarSurface(FESurface& ss, FESurface& ms, MortarSurface& mortar)
+{
+	// loop over all non-mortar facets
+	int NSF = ss.Elements();
+	int NMF = ms.Elements();
+	for (int i=0; i<NSF; ++i)
+	{
+		// get the non-mortar surface element
+		FESurfaceElement& se = ss.Element(i);
+
+		// loop over all the mortar surface elements
+		for (int j=0; j<NMF; ++j)
+		{
+			// get the next surface element
+			FESurfaceElement& me = ms.Element(j);
+
+			// calculate the patch of triangles, representing the intersection
+			// of the non-mortar facet with the mortar facet
+			Patch patch(i,j);
+			CalculateMortarIntersection(ss, ms, i, j, patch);
+			mortar.AddPatch(patch);
+		}
+	}
+}

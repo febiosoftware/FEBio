@@ -40,6 +40,25 @@ public:
 	};
 
 public:
+	Patch(int k, int l) : m_nslave_facet_id(k), m_nmaster_facet_id(l) {}
+
+	Patch(const Patch& p) { 
+		m_tri = p.m_tri; 
+		m_nslave_facet_id = p.m_nslave_facet_id; 
+		m_nmaster_facet_id = p.m_nmaster_facet_id; 
+	}
+
+	Patch& operator = (const Patch& p) { 
+		m_tri = p.m_tri; 
+		m_nslave_facet_id = p.m_nslave_facet_id; 
+		m_nmaster_facet_id = p.m_nmaster_facet_id; 
+		return *this; 
+	}
+
+	int GetSlaveFacetID() const { return m_nslave_facet_id; }
+	int GetMasterFacetID() const { return m_nmaster_facet_id; }
+
+public:
 	//! Clear the patch
 	void Clear() { m_tri.clear(); }
 
@@ -56,7 +75,34 @@ public:
 	bool Empty() { return m_tri.empty(); }
 
 private:
+	int		m_nslave_facet_id;		//!< index of slave facet
+	int		m_nmaster_facet_id;		//!< index of master facet
+
 	vector<FACET>	m_tri;	//!< triangular patches
 };
 
+//-----------------------------------------------------------------------------
+class MortarSurface
+{
+public:
+	MortarSurface(){}
+
+	int Patches() { return (int) m_patch.size(); }
+
+	Patch& GetPatch(int i) { return m_patch[i]; }
+
+	void AddPatch(const Patch& p) { m_patch.push_back(p); }
+
+	void Clear() { m_patch.clear(); }
+
+private:
+	vector<Patch>	m_patch;	
+};
+
+//-----------------------------------------------------------------------------
+// Calculates the intersection between two segments and adds it to the patch
 bool CalculateMortarIntersection(FESurface& ss, FESurface& ms, int k, int l, Patch& patch);
+
+//-----------------------------------------------------------------------------
+// Calculates the mortar intersection between two surfaces
+void CalculateMortarSurface(FESurface& ss, FESurface& ms, MortarSurface& s);
