@@ -1,7 +1,7 @@
 #pragma once
 #include "FEContactInterface.h"
 #include "FEContactSurface.h"
-#include "FECore\mortar.h"
+#include "FECore/mortar.h"
 
 //-----------------------------------------------------------------------------
 //! This class represents a surface used by the mortar contact interface.

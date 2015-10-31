@@ -72,7 +72,7 @@ public:
 		if (pvar) FECoreDebugger::Add(pvar);
 	}
 
-	FECoreWatchVariable::~FECoreWatchVariable()
+	~FECoreWatchVariable()
 	{
 		if (m_pvar) FECoreDebugger::Remove(m_pvar);
 	}

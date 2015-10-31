@@ -355,6 +355,10 @@
 		D5F65D9B1B1BD25F004C648D /* FERigidAngularDamper.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F65D991B1BD25F004C648D /* FERigidAngularDamper.h */; };
 		D5FA1BDE1B74CD9000EA5913 /* FERigidForce.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FA1BDC1B74CD9000EA5913 /* FERigidForce.cpp */; };
 		D5FA1BDF1B74CD9000EA5913 /* FERigidForce.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FA1BDD1B74CD9000EA5913 /* FERigidForce.h */; };
+		D5FF08F61BE4528E0064FF98 /* FEMortarSlidingContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FF08F21BE4528E0064FF98 /* FEMortarSlidingContact.cpp */; };
+		D5FF08F71BE4528E0064FF98 /* FEMortarSlidingContact.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FF08F31BE4528E0064FF98 /* FEMortarSlidingContact.h */; };
+		D5FF08F81BE4528E0064FF98 /* FEMortarTiedContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FF08F41BE4528E0064FF98 /* FEMortarTiedContact.cpp */; };
+		D5FF08F91BE4528E0064FF98 /* FEMortarTiedContact.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FF08F51BE4528E0064FF98 /* FEMortarTiedContact.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -707,6 +711,10 @@
 		D5F65D991B1BD25F004C648D /* FERigidAngularDamper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidAngularDamper.h; sourceTree = "<group>"; };
 		D5FA1BDC1B74CD9000EA5913 /* FERigidForce.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidForce.cpp; sourceTree = "<group>"; };
 		D5FA1BDD1B74CD9000EA5913 /* FERigidForce.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidForce.h; sourceTree = "<group>"; };
+		D5FF08F21BE4528E0064FF98 /* FEMortarSlidingContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMortarSlidingContact.cpp; sourceTree = "<group>"; };
+		D5FF08F31BE4528E0064FF98 /* FEMortarSlidingContact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMortarSlidingContact.h; sourceTree = "<group>"; };
+		D5FF08F41BE4528E0064FF98 /* FEMortarTiedContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMortarTiedContact.cpp; sourceTree = "<group>"; };
+		D5FF08F51BE4528E0064FF98 /* FEMortarTiedContact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMortarTiedContact.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -924,6 +932,10 @@
 				D59BBB9D1AD771B800E2991F /* FEMicroMaterial2O.h */,
 				D5E1070B1865DFAD00B23922 /* FEMooneyRivlin.cpp */,
 				D5E1070C1865DFAD00B23922 /* FEMooneyRivlin.h */,
+				D5FF08F21BE4528E0064FF98 /* FEMortarSlidingContact.cpp */,
+				D5FF08F31BE4528E0064FF98 /* FEMortarSlidingContact.h */,
+				D5FF08F41BE4528E0064FF98 /* FEMortarTiedContact.cpp */,
+				D5FF08F51BE4528E0064FF98 /* FEMortarTiedContact.h */,
 				D5E1070D1865DFAD00B23922 /* FEMRVonMisesFibers.cpp */,
 				D5E1070E1865DFAD00B23922 /* FEMRVonMisesFibers.h */,
 				D5E1070F1865DFAD00B23922 /* FEMuscleMaterial.cpp */,
@@ -1121,6 +1133,7 @@
 				D5E107DA1865DFAD00B23922 /* FEGasserOgdenHolzapfel.h in Headers */,
 				D5E107971865DFAD00B23922 /* FEDamageMooneyRivlin.h in Headers */,
 				B465DA8A1B94A3A500EF4843 /* FESRIElasticSolidDomain.h in Headers */,
+				D5FF08F91BE4528E0064FF98 /* FEMortarTiedContact.h in Headers */,
 				D56DC22019532A83006C137D /* FERigidSphericalJoint.h in Headers */,
 				D5E1081E1865DFAD00B23922 /* FESlidingInterface.h in Headers */,
 				D5E107B21865DFAD00B23922 /* FEElasticMixture.h in Headers */,
@@ -1217,6 +1230,7 @@
 				D5F407CC197D7DDE0059F0B1 /* FESolidSolver2.h in Headers */,
 				D5B6ED801B02306600126821 /* FERigidDamper.h in Headers */,
 				D5E1077F1865DFAD00B23922 /* FEAugLagLinearConstraint.h in Headers */,
+				D5FF08F71BE4528E0064FF98 /* FEMortarSlidingContact.h in Headers */,
 				D54CBF091AB34286003CF33F /* FEPrescribedActiveContractionIsotropic.h in Headers */,
 				D51BB3FE1991238100638A8B /* FEFiberMaterialPoint.h in Headers */,
 				D5E107D01865DFAD00B23922 /* FEFiberIntegrationTrapezoidal.h in Headers */,
@@ -1338,6 +1352,7 @@
 				D5E107981865DFAD00B23922 /* FEDamageNeoHookean.cpp in Sources */,
 				D509A2441A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.cpp in Sources */,
 				D5E1079C1865DFAD00B23922 /* FEDiscreteSpringDomain.cpp in Sources */,
+				D5FF08F81BE4528E0064FF98 /* FEMortarTiedContact.cpp in Sources */,
 				D5E1080D1865DFAD00B23922 /* FERemodelingElasticMaterial.cpp in Sources */,
 				D59D17D7192BD83B007C880C /* FECoupledVerondaWestmann.cpp in Sources */,
 				D5E107761865DFAD00B23922 /* FE2DTransIsoMooneyRivlin.cpp in Sources */,
@@ -1435,6 +1450,7 @@
 				D5E107FD1865DFAD00B23922 /* FEOgdenUnconstrained.cpp in Sources */,
 				D54CBEF81AB31FD3003CF33F /* FEPrescribedActiveContractionUniaxial.cpp in Sources */,
 				D5E107B31865DFAD00B23922 /* FEElasticMultigeneration.cpp in Sources */,
+				D5FF08F61BE4528E0064FF98 /* FEMortarSlidingContact.cpp in Sources */,
 				D5E108251865DFAD00B23922 /* FESolidMaterial.cpp in Sources */,
 				D5E1082D1865DFAD00B23922 /* FEStiffnessMatrix.cpp in Sources */,
 				D5E107AA1865DFAD00B23922 /* FEEFDVerondaWestmann.cpp in Sources */,
