@@ -346,7 +346,8 @@ Global
 		{1E68B5C9-3ECC-4958-BA10-53F66AB6F687}.Release OpenMP|x64.Build.0 = Release OpenMP|x64
 		{1E68B5C9-3ECC-4958-BA10-53F66AB6F687}.Release|Win32.ActiveCfg = Release|Win32
 		{1E68B5C9-3ECC-4958-BA10-53F66AB6F687}.Release|Win32.Build.0 = Release|Win32
-		{1E68B5C9-3ECC-4958-BA10-53F66AB6F687}.Release|x64.ActiveCfg = Release|Win32
+		{1E68B5C9-3ECC-4958-BA10-53F66AB6F687}.Release|x64.ActiveCfg = Release|x64
+		{1E68B5C9-3ECC-4958-BA10-53F66AB6F687}.Release|x64.Build.0 = Release|x64
 		{800F57F9-2B50-489C-B5E6-F13C9309F53D}.Debug - MTd|Win32.ActiveCfg = Debug|Win32
 		{800F57F9-2B50-489C-B5E6-F13C9309F53D}.Debug - MTd|Win32.Build.0 = Debug|Win32
 		{800F57F9-2B50-489C-B5E6-F13C9309F53D}.Debug - MTd|x64.ActiveCfg = Debug|Win32
@@ -368,7 +369,8 @@ Global
 		{800F57F9-2B50-489C-B5E6-F13C9309F53D}.Release OpenMP|x64.Build.0 = Release OpenMP|x64
 		{800F57F9-2B50-489C-B5E6-F13C9309F53D}.Release|Win32.ActiveCfg = Release|Win32
 		{800F57F9-2B50-489C-B5E6-F13C9309F53D}.Release|Win32.Build.0 = Release|Win32
-		{800F57F9-2B50-489C-B5E6-F13C9309F53D}.Release|x64.ActiveCfg = Release|Win32
+		{800F57F9-2B50-489C-B5E6-F13C9309F53D}.Release|x64.ActiveCfg = Release|x64
+		{800F57F9-2B50-489C-B5E6-F13C9309F53D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
