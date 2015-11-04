@@ -4,7 +4,6 @@
 #include "FECore/FEModel.h"
 #include "FECore/mortar.h"
 #include "FECore/log.h"
-#include "FECore/fecore_debug.h"
 
 //=============================================================================
 // FEMortarTiedSurface
@@ -27,6 +26,26 @@ bool FEMortarTiedSurface::Init()
 	m_gap.resize(NN, vec3d(0,0,0));
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEMortarTiedSurface::UpdateNodalAreas()
+{
+	int NN = Nodes();
+	int NF = Elements();
+	m_A.resize(NN, 0.0);
+
+	for (int i=0; i<NF; ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		double a = FaceArea(el);
+
+		int nn = el.Nodes();
+		double fa = a / (double) nn;
+		for (int j=0; j<nn; ++j) m_A[el.m_lnode[j]] += fa;
+	}
+
+	for (int i=0; i<NN; ++i) m_A[i] = 1.0/m_A[i];
 }
 
 //=============================================================================
@@ -72,6 +91,8 @@ void FEMortarTiedContact::Activate()
 {
 	//! don't forget the base class
 	FEContactInterface::Activate();
+
+	m_ss.UpdateNodalAreas();
 
 	// update the mortar weights
 	// For tied interfaces, this is only done once, during activation
@@ -232,10 +253,6 @@ void FEMortarTiedContact::UpdateMortarWeights()
 	double sum2 = 0.0;
 	for (int A=0; A<NS; ++A)
 		for (int C=0; C<NM; ++C) sum2 += m_n2[A][C];
-
-	fecore_watch(sum1);
-	fecore_watch(sum2);
-	fecore_break();
 }
 
 //-----------------------------------------------------------------------------
@@ -248,8 +265,9 @@ void FEMortarTiedContact::ContactForces(FEGlobalVector& R)
 	// loop over all slave nodes
 	for (int A=0; A<NS; ++A)
 	{
+		double eps = m_eps*m_ss.m_A[A];
 		vec3d gA = m_ss.m_gap[A];
-		vec3d tA = m_ss.m_L[A] + gA*m_eps;
+		vec3d tA = m_ss.m_L[A] + gA*eps;
 
 		// loop over all slave nodes
 		vector<int> en(1);
@@ -342,6 +360,8 @@ void FEMortarTiedContact::ContactStiffness(FESolver* psolver)
 	matrix ke(3,3);
 	for (int A=0; A<NS; ++A)
 	{
+		double eps = m_eps*m_ss.m_A[A];
+
 		// loop over all slave nodes
 		for (int B=0; B<NS; ++B)
 		{
@@ -350,7 +370,7 @@ void FEMortarTiedContact::ContactStiffness(FESolver* psolver)
 			lmi[1] = nodeB.m_ID[1];
 			lmi[2] = nodeB.m_ID[2];
 
-			double nAB = m_n1[A][B]*m_eps;
+			double nAB = m_n1[A][B]*eps;
 			if (nAB != 0.0)
 			{
 				// loop over slave nodes
@@ -401,7 +421,7 @@ void FEMortarTiedContact::ContactStiffness(FESolver* psolver)
 			lmi[1] = nodeB.m_ID[1];
 			lmi[2] = nodeB.m_ID[2];
 
-			double nAB = -m_n2[A][B]*m_eps;
+			double nAB = -m_n2[A][B]*eps;
 			if (nAB != 0.0)
 			{
 				// loop over slave nodes
@@ -457,9 +477,10 @@ bool FEMortarTiedContact::Augment(int naug)
 	// loop over all slave nodes
 	for (int A=0; A<NS; ++A)
 	{
+		double eps = m_eps*m_ss.m_A[A];
 		vec3d gA = m_ss.m_gap[A];
 		vec3d Lold = m_ss.m_L[A];
-		vec3d Lnew = Lold + gA*m_eps;
+		vec3d Lnew = Lold + gA*eps;
 
 		double uold = Lold.norm();
 		double unew = Lnew.norm();
@@ -483,9 +504,10 @@ bool FEMortarTiedContact::Augment(int naug)
 		// loop over all slave nodes
 		for (int A=0; A<NS; ++A)
 		{
+			double eps = m_eps*m_ss.m_A[A];
 			vec3d gA = m_ss.m_gap[A];
 			vec3d Lold = m_ss.m_L[A];
-			vec3d Lnew = Lold + gA*m_eps;
+			vec3d Lnew = Lold + gA*eps;
 			m_ss.m_L[A] = Lnew;
 		}
 	}

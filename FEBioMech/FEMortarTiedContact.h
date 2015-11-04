@@ -13,9 +13,13 @@ public:
 	//! Initializes data structures
 	bool Init();
 
+	//! update nodal areas
+	void UpdateNodalAreas();
+
 public:
 	vector<vec3d>	m_L;		//!< Lagrange multipliers
 	vector<vec3d>	m_gap;		//!< nodal gap function
+	vector<double>	m_A;		//!< nodal areas
 };
 
 //-----------------------------------------------------------------------------
