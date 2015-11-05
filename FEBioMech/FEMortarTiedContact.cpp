@@ -10,42 +10,21 @@
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-FEMortarTiedSurface::FEMortarTiedSurface(FEMesh* pm) : FEContactSurface(pm) {}
+FEMortarTiedSurface::FEMortarTiedSurface(FEMesh* pm) : FEMortarContactSurface(pm) {}
 
 //-----------------------------------------------------------------------------
 bool FEMortarTiedSurface::Init()
 {
 	// always intialize base class first!
-	if (FEContactSurface::Init() == false) return false;
+	if (FEMortarContactSurface::Init() == false) return false;
 
 	// get the number of nodes
 	int NN = Nodes();
 
 	// allocate data structures
 	m_L.resize(NN, vec3d(0,0,0));
-	m_gap.resize(NN, vec3d(0,0,0));
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEMortarTiedSurface::UpdateNodalAreas()
-{
-	int NN = Nodes();
-	int NF = Elements();
-	m_A.resize(NN, 0.0);
-
-	for (int i=0; i<NF; ++i)
-	{
-		FESurfaceElement& el = Element(i);
-		double a = FaceArea(el);
-
-		int nn = el.Nodes();
-		double fa = a / (double) nn;
-		for (int j=0; j<nn; ++j) m_A[el.m_lnode[j]] += fa;
-	}
-
-	for (int i=0; i<NN; ++i) m_A[i] = 1.0/m_A[i];
 }
 
 //=============================================================================
@@ -54,7 +33,7 @@ void FEMortarTiedSurface::UpdateNodalAreas()
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FEMortarTiedContact, FEContactInterface)
+BEGIN_PARAMETER_LIST(FEMortarTiedContact, FEMortarInterface)
 	ADD_PARAMETER(m_blaugon      , FE_PARAM_BOOL  , "laugon"       ); 
 	ADD_PARAMETER(m_atol         , FE_PARAM_DOUBLE, "tolerance"    );
 	ADD_PARAMETER(m_eps          , FE_PARAM_DOUBLE, "penalty"      );
@@ -63,7 +42,7 @@ BEGIN_PARAMETER_LIST(FEMortarTiedContact, FEContactInterface)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEMortarTiedContact::FEMortarTiedContact(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
+FEMortarTiedContact::FEMortarTiedContact(FEModel* pfem) : FEMortarInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
 }
 
@@ -73,15 +52,6 @@ bool FEMortarTiedContact::Init()
 	// initialize surfaces
 	if (m_ms.Init() == false) return false;
 	if (m_ss.Init() == false) return false;
-
-	// set the integration rule
-	m_pT = dynamic_cast<FESurfaceElementTraits*>(FEElementLibrary::GetElementTraits(FE_TRI3G7));
-
-	// allocate sturcture for the integration weights
-	int NS = m_ss.Nodes();
-	int NM = m_ms.Nodes();
-	m_n1.resize(NS,NS);
-	m_n2.resize(NS,NM);
 
 	return true;
 }
@@ -96,11 +66,11 @@ void FEMortarTiedContact::Activate()
 
 	// update the mortar weights
 	// For tied interfaces, this is only done once, during activation
-	UpdateMortarWeights();
+	UpdateMortarWeights(m_ss, m_ms);
 
 	// update the nodal gaps
 	// (must be done after mortar eights are updated)
-	UpdateNodalGaps();
+	UpdateNodalGaps(m_ss, m_ms);
 }
 
 //-----------------------------------------------------------------------------
@@ -127,132 +97,6 @@ void FEMortarTiedContact::BuildMatrixProfile(FEStiffnessMatrix& K)
 		LM[3*NS + 3*i+2] = ni.m_ID[2];
 	}
 	K.build_add(LM);
-}
-
-//-----------------------------------------------------------------------------
-//! Update the mortar weights
-void FEMortarTiedContact::UpdateMortarWeights()
-{
-	// clear weights
-	m_n1.zero();
-	m_n2.zero();
-
-	// number of integration points
-	const int MAX_INT = 11;
-	const int nint = m_pT->nint;
-	vector<double>& gw = m_pT->gw;
-	vector<double>& gr = m_pT->gr;
-	vector<double>& gs = m_pT->gs;
-
-	// calculate the mortar surface
-	MortarSurface mortar;
-	CalculateMortarSurface(m_ss, m_ms, mortar);
-
-	ExportMortar(mortar, "mortar.stl");
-
-	// These arrays will store the shape function values of the projection points 
-	// on the slave and master side when evaluating the integral over a pallet
-	double Ns[MAX_INT][4], Nm[MAX_INT][4];
-
-	// loop over the mortar patches
-	int NP = mortar.Patches();
-	for (int i=0; i<NP; ++i)
-	{
-		// get the next patch
-		Patch& pi = mortar.GetPatch(i);
-
-		// get the facet ID's that generated this patch
-		int k = pi.GetSlaveFacetID();
-		int l = pi.GetMasterFacetID();
-
-		// get the non-mortar surface element
-		FESurfaceElement& se = m_ss.Element(k);
-		// get the mortar surface element
-		FESurfaceElement& me = m_ms.Element(l);
-
-		// loop over all patch triangles
-		int np = pi.Size();
-		for (int j=0; j<np; ++j)
-		{
-			// get the next facet
-			Patch::FACET& fj = pi.Facet(j);
-
-			// calculate the patch area
-			// (We multiply by two because the sum of the integration weights in FEBio sum up to the area
-			// of the triangle in natural coordinates (=0.5)).
-			double Area = fj.Area()*2.0;
-			if (Area > 1e-15)
-			{
-				// loop over integration points
-				for (int n=0; n<nint; ++n)
-				{
-					// evaluate the spatial position of the integration point on the patch
-					vec3d xp = fj.Position(gr[n], gs[n]);
-
-					// evaluate the integration points on the slave and master surfaces
-					// i.e. determine rs, rm
-					double r1 = 0, s1 = 0, r2 = 0, s2 = 0;
-					vec3d xs = m_ss.ProjectToSurface(se, xp, r1, s1);
-					vec3d xm = m_ms.ProjectToSurface(me, xp, r2, s2);
-
-					assert((r1>=0.0)&&(s1>=0)&&(r1+s1<1.0));
-					assert((r2>=0.0)&&(s2>=0)&&(r2+s2<1.0));
-
-					// evaluate shape functions
-					se.shape_fnc(Ns[n], r1, s1);
-					me.shape_fnc(Nm[n], r2, s2);
-				}
-
-				// Evaluate the contributions to the integrals
-				int ns = se.Nodes();
-				int nm = me.Nodes();
-				for (int A=0; A<ns; ++A)
-				{
-					int a = se.m_lnode[A];
-
-					// loop over all the nodes on the slave facet
-					for (int B=0; B<ns; ++B)
-					{
-						double n1 = 0;
-						for (int n=0; n<nint; ++n)
-						{
-							n1 += gw[n]*Ns[n][A]*Ns[n][B];
-						}
-						n1 *= Area;
-
-						int b = se.m_lnode[B];
-						m_n1[a][b] += n1;
-					}
-
-					// loop over all the nodes on the master facet
-					for (int C = 0; C<nm; ++C)
-					{
-						double n2 = 0;
-						for (int n=0; n<nint; ++n)
-						{
-							n2 += gw[n]*Ns[n][A]*Nm[n][C];
-						}
-						n2 *= Area;
-
-						int c = me.m_lnode[C];
-						m_n2[a][c] += n2;
-					}
-				}
-			}		
-		}
-	}
-
-	// Sanity check: sum should add up to contact area
-	int NS = m_ss.Nodes();
-	int NM = m_ms.Nodes();
-
-	double sum1 = 0.0;
-	for (int A=0; A<NS; ++A)
-		for (int B=0; B<NS; ++B) sum1 += m_n1[A][B];
-
-	double sum2 = 0.0;
-	for (int A=0; A<NS; ++A)
-		for (int C=0; C<NM; ++C) sum2 += m_n2[A][C];
 }
 
 //-----------------------------------------------------------------------------
@@ -310,40 +154,6 @@ void FEMortarTiedContact::ContactForces(FEGlobalVector& R)
 
 				R.Assemble(en, lm, fe);
 			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Update the nodal gaps
-void FEMortarTiedContact::UpdateNodalGaps()
-{
-	// reset nodal gaps
-	vector<vec3d>& gap = m_ss.m_gap;
-	zero(m_ss.m_gap);
-
-	int NS = m_ss.Nodes();
-	int NM = m_ms.Nodes();
-
-	// loop over all slave nodes
-	for (int A=0; A<NS; ++A)
-	{
-		// loop over all slave nodes
-		for (int B=0; B<NS; ++B)
-		{
-			FENode& nodeB = m_ss.Node(B);
-			vec3d& xB = nodeB.m_rt;
-			double nAB = m_n1[A][B];
-			gap[A] += xB*nAB;
-		}
-
-		// loop over master side
-		for (int C=0; C<NM; ++C)
-		{
-			FENode& nodeC = m_ms.Node(C);
-			vec3d& xC = nodeC.m_rt;
-			double nAC = m_n2[A][C];
-			gap[A] -= xC*nAC;
 		}
 	}
 }
@@ -519,7 +329,7 @@ bool FEMortarTiedContact::Augment(int naug)
 //! update interface data
 void FEMortarTiedContact::Update(int niter)
 {
-	UpdateNodalGaps();
+	UpdateNodalGaps(m_ss, m_ms);
 }
 
 //-----------------------------------------------------------------------------

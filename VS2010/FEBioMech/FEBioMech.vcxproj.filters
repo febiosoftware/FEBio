@@ -552,6 +552,12 @@
     <ClCompile Include="..\..\FEBioMech\FEMortarTiedContact.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEMortarContactSurface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEMortarInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h">
@@ -1104,6 +1110,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEMortarTiedContact.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEMortarContactSurface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEMortarInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

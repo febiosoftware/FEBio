@@ -546,6 +546,8 @@
     <ClCompile Include="..\..\FEBioMech\FEMicroMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMicroMaterial2O.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMortarContactSurface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMortarInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMortarSlidingContact.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMortarTiedContact.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMRVonMisesFibers.cpp" />
@@ -724,6 +726,8 @@
     <ClInclude Include="..\..\FEBioMech\FEMicroMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEMicroMaterial2O.h" />
     <ClInclude Include="..\..\FEBioMech\FEMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMortarContactSurface.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMortarInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FEMortarSlidingContact.h" />
     <ClInclude Include="..\..\FEBioMech\FEMortarTiedContact.h" />
     <ClInclude Include="..\..\FEBioMech\FEMRVonMisesFibers.h" />

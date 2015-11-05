@@ -1,11 +1,10 @@
 #pragma once
-#include "FEContactInterface.h"
-#include "FEContactSurface.h"
-#include "FECore/mortar.h"
+#include "FEMortarInterface.h"
+#include "FEMortarContactSurface.h"
 
 //-----------------------------------------------------------------------------
 //! This class represents a surface used by the mortar contact interface.
-class FEMortarSlidingSurface : public FEContactSurface
+class FEMortarSlidingSurface : public FEMortarContactSurface
 {
 public:
 	FEMortarSlidingSurface(FEMesh* pm = 0);
@@ -16,21 +15,16 @@ public:
 	//! update the normals
 	void UpdateNormals(bool binit);
 
-	//! update nodal areas
-	void UpdateNodalAreas();
-
 public:
 	vector<double>	m_p;		//!< nodal contact pressures
 	vector<double>	m_L;		//!< Lagrange multipliers
 	vector<vec3d>	m_nu;		//!< nodal normals
 	vector<double>	m_norm0;	//!< initial (inverse) normal lenghts
-	vector<vec3d>	m_gap;		//!< nodal gap function
-	vector<double>	m_A;		//!< nodal areas
 };
 
 //-----------------------------------------------------------------------------
 //! This class implements a mortar contact formulation for frictionless, sliding contact
-class FEMortarSlidingContact : public FEContactInterface
+class FEMortarSlidingContact : public FEMortarInterface
 {
 public:
 	//! constructor
@@ -75,12 +69,6 @@ public:
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 protected:
-	//! Update the gap values
-	void UpdateNodalGaps();
-
-	//! Update integration factors
-	void UpdateMortarWeights();
-
 	// contact stiffness contributions
 	void ContactGapStiffness(FESolver* psolver);
 	void ContactNormalStiffness(FESolver* psolver);
@@ -94,12 +82,6 @@ private:
 private:
 	FEMortarSlidingSurface	m_ms;	//!< mortar surface
 	FEMortarSlidingSurface	m_ss;	//!< non-mortar surface
-
-	matrix	m_n1;	//!< integration weights n1_AB
-	matrix	m_n2;	//!< integration weights n2_AB
-
-	// integration rule
-	FESurfaceElementTraits*	m_pT;
 
 	DECLARE_PARAMETER_LIST();
 };

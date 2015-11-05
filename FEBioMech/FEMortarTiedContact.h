@@ -1,11 +1,10 @@
 #pragma once
-#include "FEContactInterface.h"
-#include "FEContactSurface.h"
-#include "FECore/mortar.h"
+#include "FEMortarInterface.h"
+#include "FEMortarContactSurface.h"
 
 //-----------------------------------------------------------------------------
 //! This class represents a surface used by the mortar contact interface.
-class FEMortarTiedSurface : public FEContactSurface
+class FEMortarTiedSurface : public FEMortarContactSurface
 {
 public:
 	FEMortarTiedSurface(FEMesh* pm = 0);
@@ -13,18 +12,13 @@ public:
 	//! Initializes data structures
 	bool Init();
 
-	//! update nodal areas
-	void UpdateNodalAreas();
-
 public:
 	vector<vec3d>	m_L;		//!< Lagrange multipliers
-	vector<vec3d>	m_gap;		//!< nodal gap function
-	vector<double>	m_A;		//!< nodal areas
 };
 
 //-----------------------------------------------------------------------------
 //! This class implements a mortar based tied interface.
-class FEMortarTiedContact : public FEContactInterface
+class FEMortarTiedContact : public FEMortarInterface
 {
 public:
 	//! constructor
@@ -65,13 +59,6 @@ public:
 	//! shallow copy
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
-protected:
-	//! Update the gap values
-	void UpdateNodalGaps();
-
-	//! Update integration factors
-	void UpdateMortarWeights();
-
 private:
 	double	m_atol;		//!< augmented Lagrangian tolerance
 	double	m_eps;		//!< penalty factor
@@ -81,12 +68,6 @@ private:
 private:
 	FEMortarTiedSurface	m_ms;	//!< mortar surface
 	FEMortarTiedSurface	m_ss;	//!< non-mortar surface
-
-	matrix	m_n1;	//!< integration weights n1_AB
-	matrix	m_n2;	//!< integration weights n2_AB
-
-	// integration rule
-	FESurfaceElementTraits*	m_pT;
 
 	DECLARE_PARAMETER_LIST();
 };
