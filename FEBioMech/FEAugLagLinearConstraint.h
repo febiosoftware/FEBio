@@ -77,8 +77,10 @@ public:
 public:
 	double	m_tol;	//!< augmentation tolerance
 	double	m_eps;	//!< penalty factor
-
-	int	m_naugmax;	//!< max nr of augmenations
+	int		m_naugmax;	//!< max nr of augmentations
+	int		m_naugmin;	//!< min nf of augmentations
 
 	int	m_nID;		//!< ID of manager
+
+	DECLARE_PARAMETER_LIST();
 };

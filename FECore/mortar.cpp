@@ -455,7 +455,7 @@ bool CalculateMortarIntersection(FESurface& ss, FESurface& ms, int k, int l, Pat
 
 	// now we calculate the intersection
 	int nr = ConvexIntersectSH(P, ns, Q, nm, R);
-	if (nr > 0)
+/*	if (nr > 0)
 	{
 		for (int i=0; i<nr; ++i)
 		{
@@ -464,7 +464,7 @@ bool CalculateMortarIntersection(FESurface& ss, FESurface& ms, int k, int l, Pat
 
 			double qr, qs;
 			vec3d ps = ss.ProjectToSurface(es, x, qr, qs);
-			const double eps = 1e-7;
+			const double eps = 1e-4;
 			if ((qr < -eps) || (qs < -eps) || (qr+qs > 1+eps))
 			{
 				// error
@@ -480,7 +480,7 @@ bool CalculateMortarIntersection(FESurface& ss, FESurface& ms, int k, int l, Pat
 
 		}
 	}
-
+*/
 	if (nr >= 3)
 	{
 		// evaluate the center of the patch

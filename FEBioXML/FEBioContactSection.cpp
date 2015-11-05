@@ -279,10 +279,10 @@ void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 			// add the linear constraint to the system
 			pLCS->add(pLC);
 		}
-		else if (tag == "tol"    ) m_pim->value(tag, pLCS->m_tol);
-		else if (tag == "penalty") m_pim->value(tag, pLCS->m_eps);
-		else if (tag == "maxaug" ) m_pim->value(tag, pLCS->m_naugmax);
-		else throw XMLReader::InvalidTag(tag);
+		else if (m_pim->ReadParameter(tag, pLCS) == false)
+		{
+			throw XMLReader::InvalidTag(tag);
+		}
 		++tag;
 	}
 	while (!tag.isend());

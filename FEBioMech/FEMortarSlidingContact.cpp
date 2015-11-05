@@ -71,6 +71,26 @@ void FEMortarSlidingSurface::UpdateNormals(bool binit)
 	}
 }
 
+//-----------------------------------------------------------------------------
+void FEMortarSlidingSurface::UpdateNodalAreas()
+{
+	int NN = Nodes();
+	int NF = Elements();
+	m_A.resize(NN, 0.0);
+
+	for (int i=0; i<NF; ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		double a = FaceArea(el);
+
+		int nn = el.Nodes();
+		double fa = a / (double) nn;
+		for (int j=0; j<nn; ++j) m_A[el.m_lnode[j]] += fa;
+	}
+
+	for (int i=0; i<NN; ++i) m_A[i] = 1.0/m_A[i];
+}
+
 //=============================================================================
 // FEMortarSlidingContact
 //=============================================================================
@@ -123,6 +143,9 @@ void FEMortarSlidingContact::Activate()
 	// update the normals on the slave surface
 	m_ss.UpdateNormals(true);
 
+	// update nodal areas
+	m_ss.UpdateNodalAreas();
+
 	// update the mortar weights
 	UpdateMortarWeights();
 
@@ -172,99 +195,105 @@ void FEMortarSlidingContact::UpdateMortarWeights()
 	vector<double>& gr = m_pT->gr;
 	vector<double>& gs = m_pT->gs;
 
+	// calculate the mortar surface
+	MortarSurface mortar;
+	CalculateMortarSurface(m_ss, m_ms, mortar);
+
 	// These arrays will store the shape function values of the projection points 
 	// on the slave and master side when evaluating the integral over a pallet
 	double Ns[MAX_INT][4], Nm[MAX_INT][4];
 
-	// loop over all non-mortar facets
-	int NSF = m_ss.Elements();
-	int NMF = m_ms.Elements();
-	for (int i=0; i<NSF; ++i)
+	// loop over the mortar patches
+	int NP = mortar.Patches();
+	for (int i=0; i<NP; ++i)
 	{
+		// get the next patch
+		Patch& pi = mortar.GetPatch(i);
+
+		// get the facet ID's that generated this patch
+		int k = pi.GetSlaveFacetID();
+		int l = pi.GetMasterFacetID();
+
 		// get the non-mortar surface element
-		FESurfaceElement& se = m_ss.Element(i);
+		FESurfaceElement& se = m_ss.Element(k);
+		// get the mortar surface element
+		FESurfaceElement& me = m_ms.Element(l);
 
-		// loop over all the mortar surface elements
-		for (int j=0; j<NMF; ++j)
+		// loop over all patch triangles
+		int np = pi.Size();
+		for (int j=0; j<np; ++j)
 		{
-			// get the next surface element
-			FESurfaceElement& me = m_ms.Element(j);
+			// get the next facet
+			Patch::FACET& fj = pi.Facet(j);
 
-			// calculate the patch of triangles, representing the intersection
-			// of the non-mortar facet with the mortar facet
-			Patch patch(i,j);
-			if (CalculateMortarIntersection(m_ss, m_ms, i, j, patch))
+			// calculate the patch area
+			// (We multiply by two because the sum of the integration weights in FEBio sum up to the area
+			// of the triangle in natural coordinates (=0.5)).
+			double Area = fj.Area()*2.0;
+			if (Area > 1e-15)
 			{
-				// loop over all patches
-				int np = patch.Size();
-				for (int k=0; k<np; ++k)
+				// loop over integration points
+				for (int n=0; n<nint; ++n)
 				{
-					// get the next facet
-					Patch::FACET& fk = patch.Facet(k);
+					// evaluate the spatial position of the integration point on the patch
+					vec3d xp = fj.Position(gr[n], gs[n]);
 
-					// calculate the patch area
-					// (We multiply by two because the sum of the integration weights in FEBio sum up to the area
-					// of the triangle in natural coordinates (=0.5)).
-					double Area = fk.Area()*2.0;
+					// evaluate the integration points on the slave and master surfaces
+					// i.e. determine rs, rm
+					double r1 = 0, s1 = 0, r2 = 0, s2 = 0;
+					vec3d xs = m_ss.ProjectToSurface(se, xp, r1, s1);
+					vec3d xm = m_ms.ProjectToSurface(me, xp, r2, s2);
 
-					// loop over integration points
-					for (int n=0; n<nint; ++n)
+//					assert((r1>=0.0)&&(s1>=0)&&(r1+s1<1.0));
+//					assert((r2>=0.0)&&(s2>=0)&&(r2+s2<1.0));
+
+					// evaluate shape functions
+					se.shape_fnc(Ns[n], r1, s1);
+					me.shape_fnc(Nm[n], r2, s2);
+				}
+
+				// Evaluate the contributions to the integrals
+				int ns = se.Nodes();
+				int nm = me.Nodes();
+				for (int A=0; A<ns; ++A)
+				{
+					int a = se.m_lnode[A];
+
+					// loop over all the nodes on the slave facet
+					for (int B=0; B<ns; ++B)
 					{
-						// evaluate the spatial position of the integration point on the patch
-						vec3d xp = fk.Position(gr[n], gs[n]);
+						double n1 = 0;
+						for (int n=0; n<nint; ++n)
+						{
+							n1 += gw[n]*Ns[n][A]*Ns[n][B];
+						}
+						n1 *= Area;
 
-						// evaluate the integration points on the slave and master surfaces
-						// i.e. determine rs, rm
-						double r1 = 0, s1 = 0, r2 = 0, s2 = 0;
-						vec3d xs = m_ss.ProjectToSurface(se, xp, r1, s1);
-						vec3d xm = m_ms.ProjectToSurface(me, xp, r2, s2);
-
-						// evaluate shape functions
-						se.shape_fnc(Ns[n], r1, s1);
-						me.shape_fnc(Nm[n], r2, s2);
+						int b = se.m_lnode[B];
+						m_n1[a][b] += n1;
 					}
 
-					// Evaluate the contributions to the integrals
-					int ns = se.Nodes();
-					int nm = me.Nodes();
-					for (int A=0; A<ns; ++A)
+					// loop over all the nodes on the master facet
+					for (int C = 0; C<nm; ++C)
 					{
-						int a = se.m_lnode[A];
-
-						// loop over all the nodes on the slave facet
-						for (int B=0; B<ns; ++B)
+						double n2 = 0;
+						for (int n=0; n<nint; ++n)
 						{
-							double n1 = 0;
-							for (int n=0; n<nint; ++n)
-							{
-								n1 += gw[n]*Ns[n][A]*Ns[n][B];
-							}
-							n1 *= Area;
-
-							int b = se.m_lnode[B];
-							m_n1[a][b] += n1;
+							n2 += gw[n]*Ns[n][A]*Nm[n][C];
 						}
+						n2 *= Area;
 
-						// loop over all the nodes on the master facet
-						for (int C = 0; C<nm; ++C)
-						{
-							double n2 = 0;
-							for (int n=0; n<nint; ++n)
-							{
-								n2 += gw[n]*Ns[n][A]*Nm[n][C];
-							}
-							n2 *= Area;
-
-							int c = me.m_lnode[C];
-							m_n2[a][c] += n2;
-						}
+						int c = me.m_lnode[C];
+						m_n2[a][c] += n2;
 					}
 				}
 			}		
 		}
 	}
 
+#ifdef _DEBUG
 	// Sanity check: sum should add up to contact area
+	// This is for a hardcoded problem. Remove or generalize this!
 	int NS = m_ss.Nodes();
 	int NM = m_ms.Nodes();
 
@@ -275,6 +304,10 @@ void FEMortarSlidingContact::UpdateMortarWeights()
 	double sum2 = 0.0;
 	for (int A=0; A<NS; ++A)
 		for (int C=0; C<NM; ++C) sum2 += m_n2[A][C];
+
+	if (fabs(sum1 - 1.0) > 1e-5) felog.printf("WARNING: Mortar weights are not correct (%lg).\n", sum1);
+	if (fabs(sum2 - 1.0) > 1e-5) felog.printf("WARNING: Mortar weights are not correct (%lg).\n", sum2);
+#endif
 
 }
 
@@ -290,8 +323,9 @@ void FEMortarSlidingContact::ContactForces(FEGlobalVector& R)
 	{
 		vec3d nuA = m_ss.m_nu[A];
 		vec3d gA = m_ss.m_gap[A];
+		double eps = m_eps*m_ss.m_A[A];
 		double gap = gA*nuA;
-		double pA = m_ss.m_L[A] + m_eps*gap;
+		double pA = m_ss.m_L[A] + eps*gap;
 //		if (gap < 0.0) pA = 0.0;
 		
 		vec3d tA = nuA*(pA);
@@ -396,6 +430,7 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 	for (int A=0; A<NS; ++A)
 	{
 		vec3d nuA = m_ss.m_nu[A];
+		double eps = m_eps*m_ss.m_A[A];
 
 		// loop over all slave nodes
 		for (int B=0; B<NS; ++B)
@@ -408,9 +443,9 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 			double nAB = m_n1[A][B];
 			if (nAB != 0.0)
 			{
-				kA[0][0] = m_eps*nAB*(nuA.x*nuA.x); kA[0][1] = m_eps*nAB*(nuA.x*nuA.y); kA[0][2] = m_eps*nAB*(nuA.x*nuA.z);
-				kA[1][0] = m_eps*nAB*(nuA.y*nuA.x); kA[1][1] = m_eps*nAB*(nuA.y*nuA.y); kA[1][2] = m_eps*nAB*(nuA.y*nuA.z);
-				kA[2][0] = m_eps*nAB*(nuA.z*nuA.x); kA[2][1] = m_eps*nAB*(nuA.z*nuA.y); kA[2][2] = m_eps*nAB*(nuA.z*nuA.z);
+				kA[0][0] = eps*nAB*(nuA.x*nuA.x); kA[0][1] = eps*nAB*(nuA.x*nuA.y); kA[0][2] = eps*nAB*(nuA.x*nuA.z);
+				kA[1][0] = eps*nAB*(nuA.y*nuA.x); kA[1][1] = eps*nAB*(nuA.y*nuA.y); kA[1][2] = eps*nAB*(nuA.y*nuA.z);
+				kA[2][0] = eps*nAB*(nuA.z*nuA.x); kA[2][1] = eps*nAB*(nuA.z*nuA.y); kA[2][2] = eps*nAB*(nuA.z*nuA.z);
 
 				// loop over slave nodes
 				for (int C=0; C<NS; ++C)
@@ -467,9 +502,9 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 			double nAB = -m_n2[A][B];
 			if (nAB != 0.0)
 			{
-				kA[0][0] = m_eps*nAB*(nuA.x*nuA.x); kA[0][1] = m_eps*nAB*(nuA.x*nuA.y); kA[0][2] = m_eps*nAB*(nuA.x*nuA.z);
-				kA[1][0] = m_eps*nAB*(nuA.y*nuA.x); kA[1][1] = m_eps*nAB*(nuA.y*nuA.y); kA[1][2] = m_eps*nAB*(nuA.y*nuA.z);
-				kA[2][0] = m_eps*nAB*(nuA.z*nuA.x); kA[2][1] = m_eps*nAB*(nuA.z*nuA.y); kA[2][2] = m_eps*nAB*(nuA.z*nuA.z);
+				kA[0][0] = eps*nAB*(nuA.x*nuA.x); kA[0][1] = eps*nAB*(nuA.x*nuA.y); kA[0][2] = eps*nAB*(nuA.x*nuA.z);
+				kA[1][0] = eps*nAB*(nuA.y*nuA.x); kA[1][1] = eps*nAB*(nuA.y*nuA.y); kA[1][2] = eps*nAB*(nuA.y*nuA.z);
+				kA[2][0] = eps*nAB*(nuA.z*nuA.x); kA[2][1] = eps*nAB*(nuA.z*nuA.y); kA[2][2] = eps*nAB*(nuA.z*nuA.z);
 
 				// loop over slave nodes
 				for (int C=0; C<NS; ++C)
@@ -540,10 +575,11 @@ void FEMortarSlidingContact::ContactNormalStiffness(FESolver* psolver)
 
 			vec3d vA = m_ss.m_nu[A];
 			vec3d gA = m_ss.m_gap[A];
-			double pA = m_ss.m_L[A] + m_eps*(gA*vA);
+			double eps = m_eps*m_ss.m_A[A];
+			double pA = m_ss.m_L[A] + eps*(gA*vA);
 			double normA = m_ss.m_norm0[A];
 
-			mat3d kA = ((vA&gA)*m_eps + mat3dd(pA));
+			mat3d kA = ((vA&gA)*eps + mat3dd(pA));
 
 			FENode& nodej1 = m_ss.Node(f.m_lnode[jp1]);
 			vec3d& x1 = nodej1.m_rt;
@@ -634,9 +670,10 @@ bool FEMortarSlidingContact::Augment(int naug)
 		vec3d vA = m_ss.m_nu[A];
 		vec3d gA = m_ss.m_gap[A];
 		double gap = gA*vA;
+		double eps = m_eps*m_ss.m_A[A];
 		
 		double Lold = m_ss.m_L[A];
-		double Lnew = Lold + m_eps*gap;
+		double Lnew = Lold + eps*gap;
 
 		double err = fabs((Lold - Lnew)/(Lold + Lnew));
 		if (err > max_err) max_err = err;
@@ -661,9 +698,10 @@ bool FEMortarSlidingContact::Augment(int naug)
 			vec3d vA = m_ss.m_nu[A];
 			vec3d gA = m_ss.m_gap[A];
 			double gap = gA*vA;
+			double eps = m_eps*m_ss.m_A[A];
 		
 			double Lold = m_ss.m_L[A];
-			double Lnew = Lold + m_eps*gap;
+			double Lnew = Lold + eps*gap;
 			m_ss.m_L[A] = Lnew;
 		}
 	}

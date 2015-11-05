@@ -31,6 +31,14 @@ void FEAugLagLinearConstraint::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FELinearConstraintSet, FENLConstraint)
+	ADD_PARAMETER(m_tol, FE_PARAM_DOUBLE, "tol");
+	ADD_PARAMETER(m_eps, FE_PARAM_DOUBLE, "penalty");
+	ADD_PARAMETER(m_naugmin, FE_PARAM_INT, "minaug");
+	ADD_PARAMETER(m_naugmax, FE_PARAM_INT, "maxaug");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FENLConstraint(pfem)
 {
 	static int nc = 1;
@@ -39,6 +47,7 @@ FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FENLConstraint(pfe
 	m_eps = 1;
 	m_tol = 0.1;
 	m_naugmax = 50;
+	m_naugmin = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -99,14 +108,12 @@ bool FELinearConstraintSet::Augment(int naug, const FETimePoint& tp)
 
 	felog.printf("linear constraint set %d: %15.7lg %15.7lg %15.7lg", m_nID, L0, fabs(L1 - L0), fabs(m_tol*L1));
 
-	if ((m_naugmax >= 0) && (naug >= m_naugmax)) return true;
+	bool bconv = false;
+	if (p <= m_tol) bconv = true;
+	if ((m_naugmax >= 0) && (naug >= m_naugmax)) bconv = true;
+	if (naug < m_naugmin) bconv = false;
 
-	if (p<= m_tol) 
-	{
-//		log.printf("(conv)\n");
-		return true;
-	}
-	else 
+	if (bconv == false)
 	{
 		im = m_LC.begin();
 		for (i=0; i<M; ++i, ++im)
@@ -115,11 +122,9 @@ bool FELinearConstraintSet::Augment(int naug, const FETimePoint& tp)
 			double c = constraint(LC);
 			LC.m_lam += m_eps*c;
 		}
-//		log.printf("\n");
-		return false;
 	}
 
-	return true;
+	return bconv;
 }
 
 //-----------------------------------------------------------------------------

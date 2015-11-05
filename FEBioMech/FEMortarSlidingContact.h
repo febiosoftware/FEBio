@@ -16,12 +16,16 @@ public:
 	//! update the normals
 	void UpdateNormals(bool binit);
 
+	//! update nodal areas
+	void UpdateNodalAreas();
+
 public:
 	vector<double>	m_p;		//!< nodal contact pressures
 	vector<double>	m_L;		//!< Lagrange multipliers
 	vector<vec3d>	m_nu;		//!< nodal normals
 	vector<double>	m_norm0;	//!< initial (inverse) normal lenghts
 	vector<vec3d>	m_gap;		//!< nodal gap function
+	vector<double>	m_A;		//!< nodal areas
 };
 
 //-----------------------------------------------------------------------------
