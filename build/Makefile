@@ -39,9 +39,6 @@ export PLAT
 export FEBDIR
 
 lnx64 lnx64d lnx64g lnx32 gcc gcc64 gcc64g osx osxd sky:
-ifeq ($(findstring lnx64,$(PLAT)),lnx64)
-	python svnrev.py
-endif
 	( cd $(PLAT)/FEBioLib;		$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FEBioPlot;		$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FEBioHeat;		$(MAKE) -f ../../Makelibs.mk )

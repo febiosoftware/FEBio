@@ -17,3 +17,5 @@ f_svnrev.write("//  This file is created by svnrev.py which uses svnversion in L
 f_svnrev.write("//  to determine the svn revision number\n\n")
 f_svnrev.write("#define SVNREVISION  " + revision + "\n")
 f_svnrev.close()
+
+os.chdir("build")
