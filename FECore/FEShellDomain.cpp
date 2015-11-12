@@ -325,6 +325,8 @@ void FEShellDomain::Serialize(DumpFile &ar)
 {
 	if (ar.IsSaving())
 	{
+		ar << m_Node;
+		
 		for (size_t i=0; i<m_Elem.size(); ++i)
 		{
 			FEShellElement& el = m_Elem[i];
@@ -342,6 +344,9 @@ void FEShellDomain::Serialize(DumpFile &ar)
 	else
 	{
 		int n, mat;
+
+		ar >> m_Node;
+
 		FEModel& fem = *ar.GetFEModel();
 
 		for (size_t i=0; i<m_Elem.size(); ++i)
