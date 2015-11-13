@@ -315,6 +315,7 @@ void FEPoroNormalTraction::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
+		ar << m_traction;
 		ar << m_blinear << m_beffective;
 		ar << (int) m_PC.size();
 		for (int i=0; i<(int) m_PC.size(); ++i)
@@ -328,6 +329,7 @@ void FEPoroNormalTraction::Serialize(DumpFile& ar)
 	else
 	{
 		int n;
+		ar >> m_traction;
 		ar >> m_blinear >> m_beffective;
 		ar >> n;
 		m_PC.resize(n);
