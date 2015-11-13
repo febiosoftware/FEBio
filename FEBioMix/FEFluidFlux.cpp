@@ -487,6 +487,7 @@ void FEFluidFlux::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
+		ar << m_flux;
 		ar << m_blinear << m_bmixture;
 		ar << (int) m_PC.size();
 		for (int i=0; i<(int) m_PC.size(); ++i)
@@ -500,6 +501,7 @@ void FEFluidFlux::Serialize(DumpFile& ar)
 	else
 	{
 		int n;
+		ar >> m_flux;
 		ar >> m_blinear >> m_bmixture;
 		ar >> n;
 		m_PC.resize(n);
