@@ -982,6 +982,9 @@ bool FESolidSolver2::Quasin(double time)
 		normU  = m_Ui*m_Ui;
 		normE1 = s*fabs(m_ui*m_R1);
 
+		// check for nans
+		if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
+
 		// check residual norm
 		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	
 
