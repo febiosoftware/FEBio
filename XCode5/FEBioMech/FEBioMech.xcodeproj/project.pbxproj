@@ -127,6 +127,10 @@
 		D5D0E04A1AFA8BBF0030A55C /* FEPeriodicBoundary2O.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D0E0461AFA8BBF0030A55C /* FEPeriodicBoundary2O.h */; };
 		D5D2E4021B16382D00E7089B /* FERigidConnector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D2E4001B16382D00E7089B /* FERigidConnector.cpp */; };
 		D5D2E4031B16382D00E7089B /* FERigidConnector.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D2E4011B16382D00E7089B /* FERigidConnector.h */; };
+		D5D4CC1E1BF7D6CD00A2BD96 /* FEMortarContactSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D4CC1A1BF7D6CD00A2BD96 /* FEMortarContactSurface.cpp */; };
+		D5D4CC1F1BF7D6CD00A2BD96 /* FEMortarContactSurface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D4CC1B1BF7D6CD00A2BD96 /* FEMortarContactSurface.h */; };
+		D5D4CC201BF7D6CD00A2BD96 /* FEMortarInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D4CC1C1BF7D6CD00A2BD96 /* FEMortarInterface.cpp */; };
+		D5D4CC211BF7D6CD00A2BD96 /* FEMortarInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D4CC1D1BF7D6CD00A2BD96 /* FEMortarInterface.h */; };
 		D5E107741865DFAD00B23922 /* FE2DFiberNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1068D1865DFAC00B23922 /* FE2DFiberNeoHookean.cpp */; };
 		D5E107751865DFAD00B23922 /* FE2DFiberNeoHookean.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1068E1865DFAC00B23922 /* FE2DFiberNeoHookean.h */; };
 		D5E107761865DFAD00B23922 /* FE2DTransIsoMooneyRivlin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1068F1865DFAC00B23922 /* FE2DTransIsoMooneyRivlin.cpp */; };
@@ -482,6 +486,10 @@
 		D5D0E0461AFA8BBF0030A55C /* FEPeriodicBoundary2O.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPeriodicBoundary2O.h; sourceTree = "<group>"; };
 		D5D2E4001B16382D00E7089B /* FERigidConnector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidConnector.cpp; sourceTree = "<group>"; };
 		D5D2E4011B16382D00E7089B /* FERigidConnector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidConnector.h; sourceTree = "<group>"; };
+		D5D4CC1A1BF7D6CD00A2BD96 /* FEMortarContactSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMortarContactSurface.cpp; sourceTree = "<group>"; };
+		D5D4CC1B1BF7D6CD00A2BD96 /* FEMortarContactSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMortarContactSurface.h; sourceTree = "<group>"; };
+		D5D4CC1C1BF7D6CD00A2BD96 /* FEMortarInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMortarInterface.cpp; sourceTree = "<group>"; };
+		D5D4CC1D1BF7D6CD00A2BD96 /* FEMortarInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMortarInterface.h; sourceTree = "<group>"; };
 		D5E106851865DF9F00B23922 /* libFEBioMech.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioMech.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E1068D1865DFAC00B23922 /* FE2DFiberNeoHookean.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FE2DFiberNeoHookean.cpp; sourceTree = "<group>"; };
 		D5E1068E1865DFAC00B23922 /* FE2DFiberNeoHookean.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FE2DFiberNeoHookean.h; sourceTree = "<group>"; };
@@ -932,6 +940,10 @@
 				D59BBB9D1AD771B800E2991F /* FEMicroMaterial2O.h */,
 				D5E1070B1865DFAD00B23922 /* FEMooneyRivlin.cpp */,
 				D5E1070C1865DFAD00B23922 /* FEMooneyRivlin.h */,
+				D5D4CC1A1BF7D6CD00A2BD96 /* FEMortarContactSurface.cpp */,
+				D5D4CC1B1BF7D6CD00A2BD96 /* FEMortarContactSurface.h */,
+				D5D4CC1C1BF7D6CD00A2BD96 /* FEMortarInterface.cpp */,
+				D5D4CC1D1BF7D6CD00A2BD96 /* FEMortarInterface.h */,
 				D5FF08F21BE4528E0064FF98 /* FEMortarSlidingContact.cpp */,
 				D5FF08F31BE4528E0064FF98 /* FEMortarSlidingContact.h */,
 				D5FF08F41BE4528E0064FF98 /* FEMortarTiedContact.cpp */,
@@ -1122,6 +1134,7 @@
 				D5E1082A1865DFAD00B23922 /* FESphericalFiberDistribution.h in Headers */,
 				D5E1079F1865DFAD00B23922 /* FEDonnanEquilibrium.h in Headers */,
 				D5E107DE1865DFAD00B23922 /* FEHuiskesSupply.h in Headers */,
+				D5D4CC1F1BF7D6CD00A2BD96 /* FEMortarContactSurface.h in Headers */,
 				D5E107F01865DFAD00B23922 /* FEMicroMaterial.h in Headers */,
 				D5E108541865DFAD00B23922 /* FEViscoElasticMaterial.h in Headers */,
 				D5E1077B1865DFAD00B23922 /* FE3FieldElasticSolidDomain.h in Headers */,
@@ -1219,6 +1232,7 @@
 				D5E107871865DFAD00B23922 /* FEBodyForce.h in Headers */,
 				D5C8AABA1AE5D73000E36822 /* FERigidPrismaticJoint.h in Headers */,
 				D5E1080A1865DFAD00B23922 /* FEPressureLoad.h in Headers */,
+				D5D4CC211BF7D6CD00A2BD96 /* FEMortarInterface.h in Headers */,
 				D54A4E4B1A2B65F50032E843 /* FEReactiveVEMaterialPoint.h in Headers */,
 				D5E108101865DFAD00B23922 /* FEResidualVector.h in Headers */,
 				D50824A71AFAFC860094BC4C /* FEFiberPowLinearUncoupled.h in Headers */,
@@ -1488,10 +1502,12 @@
 				D5E108431865DFAD00B23922 /* FETrussMaterial.cpp in Sources */,
 				D56DC21F19532A83006C137D /* FERigidSphericalJoint.cpp in Sources */,
 				D5E108091865DFAD00B23922 /* FEPressureLoad.cpp in Sources */,
+				D5D4CC1E1BF7D6CD00A2BD96 /* FEMortarContactSurface.cpp in Sources */,
 				D5E1083F1865DFAD00B23922 /* FETransIsoVerondaWestmann.cpp in Sources */,
 				D57C1D0519AB8AC20091EAE4 /* FEReactiveViscoelastic.cpp in Sources */,
 				D54A4E4A1A2B65F50032E843 /* FEReactiveVEMaterialPoint.cpp in Sources */,
 				D5E108311865DFAD00B23922 /* FESurfaceConstraint.cpp in Sources */,
+				D5D4CC201BF7D6CD00A2BD96 /* FEMortarInterface.cpp in Sources */,
 				D5E1084D1865DFAD00B23922 /* FEUncoupledViscoElasticMaterial.cpp in Sources */,
 				D561928D1B0188200034DD51 /* FERigidSpring.cpp in Sources */,
 				D5E108471865DFAD00B23922 /* FEUncoupledActiveContraction.cpp in Sources */,
