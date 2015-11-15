@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D50876FC1BBB6C18007D55F1 /* FECarreauFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50876FA1BBB6C18007D55F1 /* FECarreauFluid.cpp */; settings = {ASSET_TAGS = (); }; };
-		D50876FD1BBB6C18007D55F1 /* FECarreauFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D50876FB1BBB6C18007D55F1 /* FECarreauFluid.h */; settings = {ASSET_TAGS = (); }; };
+		D50876FC1BBB6C18007D55F1 /* FECarreauFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50876FA1BBB6C18007D55F1 /* FECarreauFluid.cpp */; };
+		D50876FD1BBB6C18007D55F1 /* FECarreauFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D50876FB1BBB6C18007D55F1 /* FECarreauFluid.h */; };
 		D53C4F901B9C837800718FBC /* FEBioFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4F801B9C837800718FBC /* FEBioFluid.cpp */; };
 		D53C4F911B9C837800718FBC /* FEBioFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4F811B9C837800718FBC /* FEBioFluid.h */; };
 		D53C4F921B9C837800718FBC /* FEBioFluidData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4F821B9C837800718FBC /* FEBioFluidData.cpp */; };

@@ -37,6 +37,7 @@ BEGIN_PARAMETER_LIST(FEFluidSolver, FENewtonSolver)
 	ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
 	ADD_PARAMETER(m_bdoreforms   , FE_PARAM_BOOL  , "do_reforms"  );
 	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
+    ADD_PARAMETER(m_boldform     , FE_PARAM_BOOL  , "old_form"    );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -54,6 +55,7 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
     m_bsymm = false;
     m_bdivreform = true;
     m_bdoreforms = true;
+    m_boldform = true;
 
 	// a different solution strategy is used here
 	m_nqnsolver = QN_BFGS2;
@@ -845,6 +847,7 @@ bool FEFluidSolver::Residual(vector<double>& R)
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
+        dom.Setform(m_boldform);
         if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
             dom.SetSteadyStateAnalysis();
         else

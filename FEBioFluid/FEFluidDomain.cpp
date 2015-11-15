@@ -239,7 +239,12 @@ void FEFluidDomain::ElementInternalForce(FESolidElement& el, vector<double>& fe)
         for (i=0; i<neln; ++i)
         {
             vec3d fs = s*gradN[i];
-            double fJ = (((pt.m_J - pt.m_Jp)/mp.dt)*m_btrans + pt.m_gradJ*pt.m_vt - pt.m_J*pt.m_L.trace())*H[i];
+            double fJ;
+            if (m_boldform) {
+                fJ = (((pt.m_J - pt.m_Jp)/mp.dt)*m_btrans + pt.m_gradJ*pt.m_vt - pt.m_J*pt.m_L.trace())*H[i];
+            } else {
+                fJ = (((pt.m_J - pt.m_Jp)/mp.dt)*m_btrans + pt.m_gradJ*pt.m_vt)*H[i]/pt.m_J + pt.m_vt*gradN[i];
+            }
             
             // calculate internal force
             // the '-' sign is so that the internal forces get subtracted
@@ -433,9 +438,17 @@ void FEFluidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &ke)
             for (j=0, j4 = 0; j<neln; ++j, j4 += 4)
             {
                 mat3d Kv = vdotTdotv(gradN[i], cv, gradN[j])*detJ;
-                vec3d kv = (pt.m_gradJ*H[j] - gradN[j]*pt.m_J)*(H[i]*detJ);
+                vec3d kv;
+                double k;
+                if (m_boldform) {
+                    kv = (pt.m_gradJ*H[j] - gradN[j]*pt.m_J)*(H[i]*detJ);
+                    k = (H[j]*((1.0*m_btrans)/mp.dt - pt.m_L.trace()) + gradN[j]*pt.m_vt)*(H[i]*detJ);
+                }
+                else {
+                    kv = (pt.m_gradJ*(H[i]/pt.m_J) + gradN[i])*(H[j]*detJ);
+                    k = (H[j]/pt.m_J*((pt.m_Jp*m_btrans)/mp.dt - pt.m_gradJ*pt.m_vt) + gradN[j]*pt.m_vt)*(H[i]/pt.m_J*detJ);
+                }
                 vec3d kJ = (mat3dd(-dpdJ) + svJ)*gradN[i]*(H[j]*detJ);
-                double k = (H[j]*((1.0*m_btrans)/mp.dt - pt.m_L.trace()) + gradN[j]*pt.m_vt)*(H[i]*detJ);
                 
                 ke[i4  ][j4  ] += Kv(0,0);
                 ke[i4  ][j4+1] += Kv(0,1);
