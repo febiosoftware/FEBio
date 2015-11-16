@@ -79,7 +79,6 @@ public:
     // strategy parameters
     bool	m_bdivreform;	//!< reform when diverging
     bool	m_bdoreforms;	//!< do reformations
-    bool    m_boldform;     //!< use old form of virtual work integral
     
 public:
     vector<double> m_Fn;	//!< concentrated nodal force vector

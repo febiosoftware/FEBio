@@ -92,12 +92,10 @@ public:
     
     void SetTransientAnalysis() { m_btrans = true; }
     void SetSteadyStateAnalysis() { m_btrans = false; }
-    void Setform(bool form) { m_boldform = form; }
     
     // ---
     
 protected:
     FEFluid*	m_pMat;
     bool        m_btrans;   // flag for transient (true) or steady-state (false) analysis
-    bool        m_boldform; // flag for using old form of virtual work integral
 };
