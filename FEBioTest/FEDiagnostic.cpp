@@ -10,6 +10,7 @@
 #include "FEMemoryDiagnostic.h"
 #include "FEBiphasicTangentDiagnostic.h"
 #include "FEMultiphasicTangentDiagnostic.h"
+#include "FEFluidTangentDiagnostic.h"
 #include "FECore/log.h"
 #include "FEBioXML/FEBioControlSection.h"
 #include "FEBioXML/FEBioMaterialSection.h"
@@ -49,7 +50,6 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 	map["Scenario"] = new FEBioScenarioSection(this);
     map["Globals" ] = new FEBioGlobalsSection (this);
 
-    FEAnalysis* pstep = 0;
     m_pfem = &fem;
     m_pdia = 0;
     
@@ -68,6 +68,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
         else if (att == "memory test"             ) m_pdia = new FEMemoryDiagnostic            (fem);
         else if (att == "biphasic tangent test"   ) m_pdia = new FEBiphasicTangentDiagnostic   (fem);
         else if (att == "multiphasic tangent test") m_pdia = new FEMultiphasicTangentDiagnostic(fem);
+        else if (att == "fluid tangent test"      ) m_pdia = new FEFluidTangentDiagnostic      (fem);
 		else
 		{
 			felog.printf("\nERROR: unknown diagnostic\n\n");
