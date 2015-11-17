@@ -246,6 +246,8 @@ bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vect
 //!
 void FESoluteFlux::Serialize(DumpFile& ar)
 {
+	FESurfaceLoad::Serialize(ar);
+
 	if (ar.IsSaving())
 	{
 		// solute fluxes

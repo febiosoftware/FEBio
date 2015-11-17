@@ -313,6 +313,8 @@ bool FEPoroNormalTraction::LinearTractionForce(FESurfaceElement& el, vector<doub
 
 void FEPoroNormalTraction::Serialize(DumpFile& ar)
 {
+	FESurfaceLoad::Serialize(ar);
+
 	if (ar.IsSaving())
 	{
 		ar << m_traction;

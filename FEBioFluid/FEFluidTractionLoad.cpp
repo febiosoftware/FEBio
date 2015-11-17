@@ -128,6 +128,8 @@ void FEFluidTractionLoad::Residual(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 void FEFluidTractionLoad::Serialize(DumpFile& ar)
 {
+	FESurfaceLoad::Serialize(ar);
+
 	if (ar.IsSaving())
 	{
 		ar << (int) m_TC.size();
