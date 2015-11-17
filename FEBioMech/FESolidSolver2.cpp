@@ -175,7 +175,9 @@ void FESolidSolver2::Serialize(DumpFile& ar)
 		ar >> m_nreq;
 
 		// initialize data structures
-		Init();
+		// (only when number of equations is non-zero.
+		// This can be zero in a multi-step analysis for steps that have not yet been initialized.)
+		if (m_neq > 0) Init();
 	}
 }
 
