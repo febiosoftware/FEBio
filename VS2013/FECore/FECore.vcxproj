@@ -422,6 +422,8 @@
     <ClInclude Include="..\..\FECore\FECoreKernel.h" />
     <ClInclude Include="..\..\FECore\FECorePlot.h" />
     <ClInclude Include="..\..\FECore\FECoreTask.h" />
+    <ClInclude Include="..\..\FECore\fecore_debug.h" />
+    <ClInclude Include="..\..\FECore\fecore_debug_t.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteMaterial.h" />
     <ClInclude Include="..\..\FECore\FEDomain.h" />
@@ -476,6 +478,7 @@
     <ClInclude Include="..\..\FECore\MathParser.h" />
     <ClInclude Include="..\..\FECore\matrix.h" />
     <ClInclude Include="..\..\FECore\MatrixProfile.h" />
+    <ClInclude Include="..\..\FECore\mortar.h" />
     <ClInclude Include="..\..\FECore\NLConstraintDataRecord.h" />
     <ClInclude Include="..\..\FECore\NodeDataRecord.h" />
     <ClInclude Include="..\..\FECore\ObjectDataRecord.h" />
@@ -526,6 +529,7 @@
     <ClCompile Include="..\..\FECore\FECoreKernel.cpp" />
     <ClCompile Include="..\..\FECore\FECorePlot.cpp" />
     <ClCompile Include="..\..\FECore\FECoreTask.cpp" />
+    <ClCompile Include="..\..\FECore\fecore_debug.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain.cpp" />
@@ -574,6 +578,7 @@
     <ClCompile Include="..\..\FECore\MathParser.cpp" />
     <ClCompile Include="..\..\FECore\matrix.cpp" />
     <ClCompile Include="..\..\FECore\MatrixProfile.cpp" />
+    <ClCompile Include="..\..\FECore\mortar.cpp" />
     <ClCompile Include="..\..\FECore\NLConstraintDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\NodeDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\ObjectDataRecord.cpp" />
