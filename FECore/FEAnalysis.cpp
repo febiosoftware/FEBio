@@ -727,5 +727,11 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		assert(m_psolver == 0);
 		m_psolver = fecore_new<FESolver>(FESOLVER_ID, szsolver, &m_fem); assert(m_psolver);
 		m_psolver->Serialize(ar);
+
+		// For now, add all domains to the analysis step
+		FEMesh& mesh = m_fem.GetMesh();
+		int ndom = mesh.Domains();
+		ClearDomains();
+		for (int i = 0; i<ndom; ++i) AddDomain(i);
 	}
 }

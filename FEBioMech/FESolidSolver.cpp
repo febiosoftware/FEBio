@@ -174,6 +174,9 @@ void FESolidSolver::Serialize(DumpFile& ar)
 		ar >> m_nref >> m_ntotref;
 		ar >> m_naug;
 		ar >> m_nreq;
+
+		// re-initialize data
+		Init();
 	}
 }
 

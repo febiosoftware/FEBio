@@ -363,6 +363,11 @@ void FENewtonSolver::Serialize(DumpFile& ar)
 			ar >> m_pbfgs->m_cmax;
 			ar >> m_pbfgs->m_nups;
 		}
+
+		// realloc data
+		m_R0.assign(m_neq, 0);
+		m_R1.assign(m_neq, 0);
+		m_ui.assign(m_neq, 0);
 	}
 }
 
