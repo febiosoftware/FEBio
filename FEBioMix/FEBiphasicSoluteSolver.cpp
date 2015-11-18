@@ -784,7 +784,6 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 
 void FEBiphasicSoluteSolver::Serialize(DumpFile& ar)
 {
-	FEBiphasicSolver::Serialize(ar);
     
 	if (ar.IsSaving())
 	{
@@ -796,4 +795,6 @@ void FEBiphasicSoluteSolver::Serialize(DumpFile& ar)
 		ar >> m_Ctol;
 		ar >> m_nceq;
 	}
+
+	FEBiphasicSolver::Serialize(ar);
 }
