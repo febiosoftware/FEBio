@@ -815,7 +815,7 @@ void FEBioModel::SerializeContactData(DumpFile &ar)
 
 			// add surfaces to mesh
 			FEMesh& m = m_mesh;
-			m.AddSurface(pci->GetMasterSurface());
+			if (pci->GetMasterSurface()) m.AddSurface(pci->GetMasterSurface());
 			m.AddSurface(pci->GetSlaveSurface());
 		}	
 	}
