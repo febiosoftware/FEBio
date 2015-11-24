@@ -976,7 +976,6 @@ void FEMultiphasicSolver::UpdateContact()
 
 void FEMultiphasicSolver::Serialize(DumpFile& ar)
 {
-	FESolidSolver2::Serialize(ar);
 
 	if (ar.IsSaving())
 	{
@@ -999,4 +998,6 @@ void FEMultiphasicSolver::Serialize(DumpFile& ar)
 		ar >> m_Ctol;
 		ar >> m_nceq;
 	}
+
+	FESolidSolver2::Serialize(ar);
 }
