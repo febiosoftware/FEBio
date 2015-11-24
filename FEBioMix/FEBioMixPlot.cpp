@@ -1220,6 +1220,22 @@ bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
+// Resolve sbm by name
+bool FEPlotSBMRefAppDensity::SetFilter(const char* sz)
+{
+	m_nsbm = GetSBMID(*m_pfem, sz);
+	return (m_nsbm != -1);
+}
+
+//-----------------------------------------------------------------------------
+// Resolve sbm by solute ID
+bool FEPlotSBMRefAppDensity::SetFilter(int nsol)
+{
+	m_nsbm = GetSBMID(*m_pfem, nsol);
+	return (m_nsbm != -1);
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotSBMRefAppDensity::Save(FEDomain &dom, vector<float>& a)
 {
 	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
