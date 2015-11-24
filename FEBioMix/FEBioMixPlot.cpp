@@ -177,6 +177,23 @@ int GetSoluteID(FEModel& fem, int nsol)
 }
 
 //-----------------------------------------------------------------------------
+// Finds the id of a sbm with given ID nsbm.
+// This currently returns either nsbm if a solute was found or -1 if not
+int GetSBMID(FEModel& fem, int nsol)
+{
+	int N = fem.GlobalDataItems();
+	for (int i=0; i<N; ++i)
+	{
+		FESBMData* psd = dynamic_cast<FESBMData*>(fem.GetGlobalData(i));
+		if (psd)
+		{
+			if (psd->m_nID == nsol) return psd->m_nID;
+		}
+	}
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
 // Finds the solute ID given the name of the solute
 int GetSoluteID(FEModel& fem, const char* sz)
 {
@@ -185,6 +202,23 @@ int GetSoluteID(FEModel& fem, const char* sz)
 	for (int i=0; i<N; ++i)
 	{
 		FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
+		if (psd)
+		{
+			if (strcmp(psd->m_szname, sz) == 0) return psd->m_nID;
+		}
+	}
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+// Finds the sbm ID given the name of the sbm
+int GetSBMID(FEModel& fem, const char* sz)
+{
+	// find the solute with that name
+	int N = fem.GlobalDataItems();
+	for (int i=0; i<N; ++i)
+	{
+		FESBMData* psd = dynamic_cast<FESBMData*>(fem.GetGlobalData(i));
 		if (psd)
 		{
 			if (strcmp(psd->m_szname, sz) == 0) return psd->m_nID;
@@ -223,6 +257,23 @@ int GetLocalSoluteID(FEMaterial* pm, int nsol)
 		// Check if this solute is present in this specific multiphasic mixture
 		for (int i=0; i<pmm->Solutes(); ++i)
 			if (pmm->GetSolute(i)->GetSoluteID() == nsol) {nsid = i; break;}
+	}
+	return nsid;
+}
+
+//-----------------------------------------------------------------------------
+// find the local SBM ID, given a global ID. If the material is not a 
+// multiphasic material, this returns -1.
+int GetLocalSBMID(FEMaterial* pm, int nsbm)
+{
+	// figure out the SBM ID to export. This depends on the material type.
+	int nsid = -1;
+	FEMultiphasic* pmm = dynamic_cast<FEMultiphasic*> (pm);
+	if (pmm)
+	{
+		// Check if this solute is present in this specific multiphasic mixture
+		for (int i=0; i<pmm->SBMs(); ++i)
+			if (pmm->GetSBM(i)->GetSBMID() == nsbm) {nsid = i; break;}
 	}
 	return nsid;
 }
@@ -378,41 +429,63 @@ bool FEPlotActualSolConcentration_::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
+FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM)
+{
+	m_nsol = 0;
+	m_pfem = 0;
+}
+
+//-----------------------------------------------------------------------------
+// Resolve sbm by name
+bool FEPlotSoluteFlux::SetFilter(const char* sz)
+{
+	m_nsol = GetSoluteID(*m_pfem, sz);
+	return (m_nsol != -1);
+}
+
+//-----------------------------------------------------------------------------
+// Resolve sbm by solute ID
+bool FEPlotSoluteFlux::SetFilter(int nsol)
+{
+	m_nsol = GetSoluteID(*m_pfem, nsol);
+	return (m_nsol != -1);
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotSoluteFlux::Save(FEDomain &dom, vector<float>& a)
 {
-	int i, j;
+	// figure out the solute ID to export. This depends on the material type.
+	int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
+
+	// make sure we have a valid index
+	if (nsid == -1) return false;
+
 	float af[3];
-	vec3d ew;
-	FEBiphasicSoluteDomain* pbd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
-	if (pbd)
+	for (int i=0; i<dom.Elements(); ++i)
 	{
-		for (i=0; i<pbd->Elements(); ++i)
+		FEElement& el = dom.ElementRef(i);
+			
+		// calculate average flux
+		vec3d ew = vec3d(0,0,0);
+		for (int j=0; j<el.GaussPoints(); ++j)
 		{
-			FESolidElement& el = pbd->Element(i);
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 			
-			// calculate average flux
-			ew = vec3d(0,0,0);
-			for (j=0; j<el.GaussPoints(); ++j)
-			{
-				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
-				
-				if (pt) ew += pt->m_j[0];
-			}
-			
-			ew /= el.GaussPoints();
-			
-			af[0] = (float) ew.x;
-			af[1] = (float) ew.y;
-			af[2] = (float) ew.z;
-			
-			a.push_back(af[0]);
-			a.push_back(af[1]);
-			a.push_back(af[2]);
+			if (pt) ew += pt->m_j[nsid];
 		}
-		return true;
+			
+		ew /= el.GaussPoints();
+			
+		af[0] = (float) ew.x;
+		af[1] = (float) ew.y;
+		af[2] = (float) ew.z;
+			
+		a.push_back(af[0]);
+		a.push_back(af[1]);
+		a.push_back(af[2]);
 	}
-	return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -609,6 +682,63 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, vector<float>& a)
 		return true;
 	}
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+FEPlotSBMConcentration::FEPlotSBMConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
+{
+	m_pfem = pfem;
+	m_nsbm = 0;
+}
+
+//-----------------------------------------------------------------------------
+// Resolve sbm by name
+bool FEPlotSBMConcentration::SetFilter(const char* sz)
+{
+	m_nsbm = GetSBMID(*m_pfem, sz);
+	return (m_nsbm != -1);
+}
+
+//-----------------------------------------------------------------------------
+// Resolve sbm by solute ID
+bool FEPlotSBMConcentration::SetFilter(int nsol)
+{
+	m_nsbm = GetSBMID(*m_pfem, nsol);
+	return (m_nsbm != -1);
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSBMConcentration::Save(FEDomain &dom, vector<float>& a)
+{
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+	if (pm == 0) return false;
+
+	// figure out the sbm ID to export. This depends on the material type.
+	int nsid = GetLocalSBMID(dom.GetMaterial(), m_nsbm);
+
+	// make sure we have a valid index
+	if (nsid == -1) return false;
+
+	int N = dom.Elements();
+	for (int i=0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+			
+		// calculate average concentration
+		double ew = 0;
+		for (int j=0; j<el.GaussPoints(); ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+				
+			if (pt) ew += pm->SBMConcentration(mp, nsid);
+		}
+			
+		ew /= el.GaussPoints();
+			
+		a.push_back((float) ew);
+	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1087,6 +1217,36 @@ bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, vector<float>& a)
 		return true;
 	}
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSBMRefAppDensity::Save(FEDomain &dom, vector<float>& a)
+{
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+	if (pm == 0) return false;
+
+	// figure out the sbm ID to export. This depends on the material type.
+	int nsid = GetLocalSBMID(dom.GetMaterial(), m_nsbm);
+	if (nsid == -1) return false;
+
+	for (int i=0; i<dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+			
+		// calculate average concentration
+		double ew = 0;
+		for (int j=0; j<el.GaussPoints(); ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
+			
+			if (st) ew += st->m_sbmr[nsid];
+		}
+		ew /= el.GaussPoints();
+			
+		a.push_back((float) ew);
+	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------

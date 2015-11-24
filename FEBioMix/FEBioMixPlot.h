@@ -66,8 +66,13 @@ public:
 class FEPlotSoluteFlux : public FEDomainData
 {
 public:
-	FEPlotSoluteFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+	FEPlotSoluteFlux(FEModel* pfem);
 	bool Save(FEDomain& dom, vector<float>& a);
+	bool SetFilter(const char* sz);
+	bool SetFilter(int nsol);
+protected:
+	int			m_nsol;
+	FEModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------
@@ -96,6 +101,19 @@ class FEPlotOsmolarity : public FEDomainData
 public:
     FEPlotOsmolarity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+class FEPlotSBMConcentration : public FEDomainData
+{
+public:
+	FEPlotSBMConcentration(FEModel* pfem);
+	bool Save(FEDomain& dom, vector<float>& a);
+	bool SetFilter(const char* sz);
+	bool SetFilter(int nsol);
+protected:
+	int			m_nsbm;
+	FEModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------
@@ -211,6 +229,20 @@ class FEPlotReceptorLigandConcentration : public FEDomainData
 public:
 	FEPlotReceptorLigandConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Base class for solid-bound molecule referential apparent density
+class FEPlotSBMRefAppDensity : public FEDomainData
+{
+public:
+	FEPlotSBMRefAppDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM), m_nsbm(0) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+	bool SetFilter(const char* sz);
+	bool SetFilter(int nsol);
+protected:
+	int			m_nsbm;
+	FEModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------

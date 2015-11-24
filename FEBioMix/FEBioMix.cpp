@@ -147,6 +147,7 @@ REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentration , FEPLOTDATA_ID, "effec
 REGISTER_FECORE_CLASS(FEPlotActualSoluteConcentration    , FEPLOTDATA_ID, "solute concentration"            );
 REGISTER_FECORE_CLASS(FEPlotSoluteFlux                   , FEPLOTDATA_ID, "solute flux"                     );
 REGISTER_FECORE_CLASS(FEPlotReceptorLigandConcentration  , FEPLOTDATA_ID, "receptor-ligand concentration"   );
+REGISTER_FECORE_CLASS(FEPlotSBMConcentration             , FEPLOTDATA_ID, "sbm concentration"			    );
 REGISTER_FECORE_CLASS_T(FEPlotEffectiveSolConcentrationT , FEPLOTDATA_ID, 0, "effective solute 1 concentration");
 REGISTER_FECORE_CLASS_T(FEPlotActualSolConcentrationT    , FEPLOTDATA_ID, 0, "solute 1 concentration"          );
 REGISTER_FECORE_CLASS_T(FEPlotSolFluxT                   , FEPLOTDATA_ID, 0, "solute 1 flux"                   );
@@ -180,6 +181,7 @@ REGISTER_FECORE_CLASS(FEPlotNodalFluidFlux               , FEPLOTDATA_ID, "nodal
 REGISTER_FECORE_CLASS(FEPlotOsmolarity                   , FEPLOTDATA_ID,  "osmolarity"         );
 REGISTER_FECORE_CLASS(FEPlotPressureGap					 , FEPLOTDATA_ID, "pressure gap"        );
 REGISTER_FECORE_CLASS(FEPlotFluidForce                   , FEPLOTDATA_ID, "fluid force"         );
+REGISTER_FECORE_CLASS(FEPlotSBMRefAppDensity             , FEPLOTDATA_ID, "sbm referential apparent density");
 REGISTER_FECORE_CLASS_T(FEPlotSBMRefAppDensityT          , FEPLOTDATA_ID, 0, "sbm 1 referential apparent density");
 REGISTER_FECORE_CLASS_T(FEPlotSBMRefAppDensityT          , FEPLOTDATA_ID, 1, "sbm 2 referential apparent density");
 REGISTER_FECORE_CLASS_T(FEPlotSBMRefAppDensityT          , FEPLOTDATA_ID, 2, "sbm 3 referential apparent density");
