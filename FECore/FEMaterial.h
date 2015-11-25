@@ -107,6 +107,12 @@ public: // these functions have to be implemented by derived classes
 	//! initializatoin
 	virtual bool Init() = 0;
 
+	//! Get the parent of this material (zero if none)
+	FEMaterial* GetParent() { return m_pParent; }
+    
+	//! Set the parent of this material
+	void SetParent(FEMaterial* pmat) { m_pParent = pmat; }
+
 protected:
 	//! some helper functions for reading, writing properties
 	void Write(DumpFile& ar, FEMaterial* pc);
@@ -116,6 +122,9 @@ protected:
 	// This class should not be created directly
 	FEProperty();
 	virtual ~FEProperty();
+
+private:
+	FEMaterial* m_pParent; //!< pointer to the "parent" material
 };
 
 //-----------------------------------------------------------------------------

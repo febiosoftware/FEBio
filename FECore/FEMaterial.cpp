@@ -63,10 +63,11 @@ FEMaterial* FEProperty::Read(DumpFile& ar)
 		char sz[256];
 		ar >> sz;
 		pm = fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel());
+		pm->SetParent(GetParent());
 		pm->Serialize(ar);
 
 		// TODO: Do I really need to do this here?
-		pm->Init();
+		//pm->Init();
 	}
 	return pm;
 }
@@ -341,6 +342,7 @@ void FEMaterial::Serialize(DumpFile &ar)
 	for (int i = 0; i<NP; ++i)
 	{
 		FEProperty* pmat = m_Prop[i];
+		pmat->SetParent(this);
 		pmat->Serialize(ar);
 	}
 }
