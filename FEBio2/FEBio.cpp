@@ -86,7 +86,7 @@ struct CMDOPTIONS
 // forward declarations
 //
 bool ParseCmdLine(int argc, char* argv[], CMDOPTIONS& ops);
-void Hello();
+int Hello();
 int Run(CMDOPTIONS& ops);
 int prompt(CMDOPTIONS& ops);
 int get_app_path (char *pname, size_t pathsize);
@@ -201,8 +201,11 @@ int main(int argc, char* argv[])
 	//LoadLicenseFile();
 
 	// print welcome message
+#ifdef NALPLIB
+	if (Hello()) return 1;
+#else
 	if (ops.bsplash && (!ops.bsilent)) Hello();
-
+#endif
 	// Initialize FEBio library
 	InitFEBioLibrary();
 

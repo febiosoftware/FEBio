@@ -1191,7 +1191,7 @@ void FEBioModel::SerializeDataStore(DumpFile& ar)
 
 //-----------------------------------------------------------------------------
 // Forward declarations
-void Hello();
+int Hello();
 
 //-----------------------------------------------------------------------------
 //! This function performs one-time-initialization stuff. All the different 
