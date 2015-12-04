@@ -12,4 +12,7 @@ public:
 protected:
 	void ParseLogfile (XMLTag& tag);
 	void ParsePlotfile(XMLTag& tag);
+    
+protected:
+    bool BuildSurface(FESurface& s, FEFacetSet& fs);
 };

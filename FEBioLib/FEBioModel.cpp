@@ -202,7 +202,7 @@ bool FEBioModel::Input(const char* szfile)
 		}
 
 		// add the plot output variable
-		if (pplt->AddVariable(var.m_szvar, item) == false) 
+		if (pplt->AddVariable(var.m_szvar, item, var.m_szdom) == false)
 		{
 			felog.printf("FATAL ERROR: Output variable \"%s\" is not defined\n", var.m_szvar);
 			return false;

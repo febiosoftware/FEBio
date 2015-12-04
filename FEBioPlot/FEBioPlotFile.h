@@ -127,7 +127,7 @@ public:
 	class Dictionary
 	{
 	public:
-		bool AddVariable(FEModel* pfem, const char* szname, vector<int>& item);
+		bool AddVariable(FEModel* pfem, const char* szname, vector<int>& item, const char* szdom = "");
 
 		int NodalVariables  () { return m_Node.size(); }
 		int DomainVarialbes () { return m_Elem.size(); }
@@ -178,7 +178,7 @@ public:
 	bool Write(FEModel& fem);
 
 	//! Add a variable to the dictionary
-	bool AddVariable(const char* sz, vector<int>& item) { return m_dic.AddVariable(&m_fem, sz, item); }
+	bool AddVariable(const char* sz, vector<int>& item, const char* szdom = "") { return m_dic.AddVariable(&m_fem, sz, item, szdom); }
 
 	//! Set the compression level
 	void SetCompression(int n);

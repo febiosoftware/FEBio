@@ -21,6 +21,94 @@ bool FEPlotFluidDilatation::Save(FEDomain &dom, vector<float>& a)
     return false;
 }
 
+//=============================================================================
+//                       S U R F A C E    D A T A
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidSurfaceForce::Save(FESurface &surf, std::vector<float> &a)
+{
+    FESurface* pcs = &surf;
+    if (pcs == 0) return false;
+    
+    // Evaluate this field only for a specific domain, by checking domain name
+    if (strcmp(pcs->GetName(), "") == 0) return false;
+    if (strcmp(pcs->GetName(), m_szdom) != 0) return false;
+    
+    int NF = pcs->Elements();
+    const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+    a.assign(3*MFN*NF, 0.f);
+    vec3d fn(0,0,0);    // initialize
+    
+    FEMesh* m_pMesh = pcs->GetMesh();
+    
+    // initialize on the first pass to calculate the vectorial area of each surface element and to identify solid element associated with this surface element
+    if (m_binit) {
+        m_area.resize(NF);
+        m_elem.resize(NF);
+        for (int j=0; j<NF; ++j)
+        {
+            FESurfaceElement& el = pcs->Element(j);
+            m_area[j] = pcs->SurfaceNormal(el,0,0)*pcs->FaceArea(el);
+            m_elem[j] = pcs->FindElement(el);
+        }
+        m_binit = false;
+    }
+    
+    // calculate net fluid force
+    for (int j=0; j<NF; ++j)
+    {
+        // get the element this surface element belongs to
+        FEElement* pe = m_pMesh->FindElementFromID(m_elem[j]);
+        if (pe)
+        {
+            // get the material
+            FEMaterial* pm = m_pfem->GetMaterial(pe->GetMatID());
+            
+            // see if this is a fluid element
+            FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
+            if (fluid) {
+                // evaluate the average stress in this element
+                int nint = pe->GaussPoints();
+                mat3ds s(mat3dd(0));
+                for (int n=0; n<nint; ++n)
+                {
+                    FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+                    FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+                    s += pt.m_s;
+                }
+                s /= nint;
+                
+                // Evaluate contribution to net force on surface.
+                // Negate the fluid traction since we want the traction on the surface,
+                // which is the opposite of the traction on the fluid.
+                fn -= s*m_area[j];
+            }
+        }
+    }
+    
+    // save results
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        
+        // store in archive
+        int ne = el.Nodes();
+        for (int k=0; k<ne; ++k)
+        {
+            a[3*MFN*j +3*k   ] = (float) fn.x;
+            a[3*MFN*j +3*k +1] = (float) fn.y;
+            a[3*MFN*j +3*k +2] = (float) fn.z;
+        }
+    }
+    
+    return true;
+}
+
+//=============================================================================
+//							D O M A I N   D A T A
+//=============================================================================
+
 //-----------------------------------------------------------------------------
 bool FEPlotElasticFluidPressure::Save(FEDomain &dom, vector<float>& a)
 {

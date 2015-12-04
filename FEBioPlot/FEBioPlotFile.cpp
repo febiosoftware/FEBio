@@ -30,7 +30,7 @@
 //!
 //! The interpretation of these filters is entirely left up to the field variable. 
 //!
-bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, vector<int>& item)
+bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, vector<int>& item, const char* szdom)
 {
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 
@@ -96,9 +96,10 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 		}
 
 		// add the field to the plot file
-		if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname, item);
-		else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname, item);
-		else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, szname, item);
+        ps->SetDomainName(szdom);
+        if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname, item);
+        else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname, item);
+        else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, szname, item);
 	}
 	return false;
 }

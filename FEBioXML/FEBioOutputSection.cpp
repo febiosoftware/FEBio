@@ -257,8 +257,44 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 				vector<int> item;
 				if (tag.isempty() == false) tag.value(item);
 
-				// Add the plot variable
-				m_pim->AddPlotVariable(szt, item);
+                // see if a surface is referenced
+                const char* szset = tag.AttributeValue("surface", true);
+                if (szset)
+                {
+                    // make sure this tag does not have any children
+                    if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
+                    
+                    // see if we can find the facet set
+                    FEMesh& m = GetFEModel()->GetMesh();
+                    FEFacetSet* ps = 0;
+                    for (int i=0; i<m.FacetSets(); ++i)
+                    {
+                        FEFacetSet& fi = m.FacetSet(i);
+                        if (strcmp(fi.GetName(), szset) == 0)
+                        {
+                            ps = &fi;
+                            break;
+                        }
+                    }
+                    
+                    // create a surface from the facet set
+                    if (ps)
+                    {
+                        // create a new surface
+                        FESurface* psurf = new FESurface(&fem.GetMesh());
+                        fem.GetMesh().AddSurface(psurf);
+                        if (BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag);
+                        // Add the plot variable
+                        const char* szd = psurf->GetName();
+                        m_pim->AddPlotVariable(szt, item, szd);
+                    }
+                    else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
+                }
+                else
+                {
+                    // Add the plot variable
+                    m_pim->AddPlotVariable(szt, item);
+                }
 			}
 			else if (tag=="compression")
 			{
@@ -270,4 +306,42 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 		}
 		while (!tag.isend());
 	}
+}
+
+
+//-----------------------------------------------------------------------------
+bool FEBioOutputSection::BuildSurface(FESurface& s, FEFacetSet& fs)
+{
+    FEModel& fem = *GetFEModel();
+    FEMesh& m = fem.GetMesh();
+    int NN = m.Nodes();
+    
+    // count nr of faces
+    int faces = fs.Faces();
+    
+    // allocate storage for faces
+    s.create(faces);
+    
+    // read faces
+    for (int i=0; i<faces; ++i)
+    {
+        FESurfaceElement& el = s.Element(i);
+        FEFacetSet::FACET& fi = fs.Face(i);
+        
+        if      (fi.ntype == 4) el.SetType(FE_QUAD4G4);
+        else if (fi.ntype == 3) el.SetType(m_pim->m_ntri3);
+        else if (fi.ntype == 6) el.SetType(m_pim->m_ntri6);
+        else if (fi.ntype == 7) el.SetType(m_pim->m_ntri7);
+        else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
+        else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
+        else return false;
+        
+        int N = el.Nodes(); assert(N == fi.ntype);
+        for (int j=0; j<N; ++j) el.m_node[j] = fi.node[j];
+    }
+    
+    // copy the name
+    s.SetName(fs.GetName());
+    
+    return true;
 }

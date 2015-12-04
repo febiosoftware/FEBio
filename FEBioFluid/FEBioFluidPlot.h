@@ -15,6 +15,26 @@ public:
 };
 
 //=============================================================================
+//                         S U R F A C E   D A T A
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+//! Fluid surface force
+//!
+class FEPlotFluidSurfaceForce : public FESurfaceData
+{
+private:
+    FEModel*        m_pfem;
+    bool            m_binit;
+    vector<int>     m_elem;
+    vector<vec3d>   m_area;
+    
+public:
+    FEPlotFluidSurfaceForce(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){ m_pfem = pfem; m_binit = true; }
+    bool Save(FESurface& surf, vector<float>& a);
+};
+
+//=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================
 

@@ -128,15 +128,16 @@ void FEBioFileSectionMap::Clear()
 FEBioImport::PlotVariable::PlotVariable(const FEBioImport::PlotVariable& pv)
 {
 	strcpy(m_szvar, pv.m_szvar);
+    strcpy(m_szdom, pv.m_szdom);
 	m_item = pv.m_item;
 }
 
-FEBioImport::PlotVariable::PlotVariable(const char* szvar, vector<int>& item)
+FEBioImport::PlotVariable::PlotVariable(const char* szvar, vector<int>& item, const char* szdom)
 {
-	strcpy(m_szvar, szvar);
-	m_item = item;
+    strcpy(m_szvar, szvar);
+    m_item = item;
+    strcpy(m_szdom, szdom);
 }
-
 
 //-----------------------------------------------------------------------------
 void FEBioImport::ClearParams()
@@ -746,10 +747,10 @@ void FEBioImport::AddDataRecord(DataRecord* pd)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioImport::AddPlotVariable(const char* szvar, vector<int>& item)
+void FEBioImport::AddPlotVariable(const char* szvar, vector<int>& item, const char* szdom)
 {
-	PlotVariable var(szvar, item);
-	m_plot.push_back(var);
+    PlotVariable var(szvar, item, szdom);
+    m_plot.push_back(var);
 }
 
 //-----------------------------------------------------------------------------

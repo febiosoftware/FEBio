@@ -122,11 +122,12 @@ public:
 	class PlotVariable
 	{
 	public:
-		PlotVariable(const char* szvar, vector<int>& item);
 		PlotVariable(const PlotVariable& pv);
-
+        PlotVariable(const char* szvar, vector<int>& item, const char* szdom = "");
+        
 	public:
 		char		m_szvar[64];	//!< name of output variable
+        char        m_szdom[64];    //!< (optional) name of domain
 		vector<int>	m_item;			//!< (optional) list of items
 	};
 
@@ -171,10 +172,10 @@ public:
 	void SetLogfileName (const char* sz);
 	void SetPlotfileName(const char* sz);
 
-	void AddPlotVariable(const char* szvar, vector<int>& item);
+    void AddPlotVariable(const char* szvar, vector<int>& item, const char* szdom = "");
 
 	void SetPlotCompression(int n);
-
+    
 	void AddDataRecord(DataRecord* pd);
 
 public:
