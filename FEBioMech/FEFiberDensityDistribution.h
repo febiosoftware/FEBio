@@ -40,7 +40,7 @@ public:
 class FEEllipsodialFiberDensityDistribution : public FEFiberDensityDistribution
 {
 public:
-    FEEllipsodialFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) {}
+    FEEllipsodialFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_spa[0] = m_spa[1] = m_spa[2] = 1; }
     
     void Init();
     
@@ -59,7 +59,7 @@ public:
 class FEVonMises3DFiberDensityDistribution : public FEFiberDensityDistribution
 {
 public:
-    FEVonMises3DFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) {}
+    FEVonMises3DFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_b = 0; }
     
     double FiberDensity(const vec3d n0);
     
@@ -68,6 +68,24 @@ public:
     
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
+};
+
+//---------------------------------------------------------------------------
+// 3D 2-fiber families axisymmetric von Mises fiber density distribution
+//
+class FEVonMises3DTwoFDDAxisymmetric : public FEFiberDensityDistribution
+{
+public:
+    FEVonMises3DTwoFDDAxisymmetric(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_b = 0; m_c = 1; }
+    
+    double FiberDensity(const vec3d n0);
+    
+public:
+    double m_b;         // concentration parameter
+    double m_c;         // cosine of ±angle offset of fiber families
+    
+    // declare the parameter list
+    DECLARE_PARAMETER_LIST();
 };
 
 //---------------------------------------------------------------------------
@@ -89,7 +107,7 @@ public:
 class FEEllipticalFiberDensityDistribution : public FEFiberDensityDistribution
 {
 public:
-    FEEllipticalFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) {}
+    FEEllipticalFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_spa[0] = m_spa[1] = 1; }
     
     double FiberDensity(const vec3d n0);
     
@@ -106,7 +124,7 @@ public:
 class FEVonMises2DFiberDensityDistribution : public FEFiberDensityDistribution
 {
 public:
-    FEVonMises2DFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) {}
+    FEVonMises2DFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_b = 0; }
     
     double FiberDensity(const vec3d n0);
     

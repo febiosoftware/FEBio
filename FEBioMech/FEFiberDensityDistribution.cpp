@@ -42,6 +42,25 @@ double FEVonMises3DFiberDensityDistribution::FiberDensity(const vec3d n0)
 }
 
 //-----------------------------------------------------------------------------
+// define the 3d 2-fiber family axisymmetric von Mises fiber density distribution material parameters
+BEGIN_PARAMETER_LIST(FEVonMises3DTwoFDDAxisymmetric, FEMaterial)
+ADD_PARAMETER2(m_b, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
+ADD_PARAMETER2(m_c, FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0, 1), "cosg" );
+END_PARAMETER_LIST();
+
+double FEVonMises3DTwoFDDAxisymmetric::FiberDensity(const vec3d n0)
+{
+    // The local x-direction is the principal fiber bundle direction
+    // The x-component of n0 is cos(phi)
+    double cphi = n0.x; double sphi = sqrt(1-cphi*cphi);
+    double sing = sqrt(1-m_c*m_c);
+    double cp = cphi*m_c - sphi*sing;
+    double cm = cphi*m_c + sphi*sing;
+    double R = exp(m_b*(2*SQR(cp)-1)) + exp(m_b*(2*SQR(cm)-1));
+    return R/m_IFD;
+}
+
+//-----------------------------------------------------------------------------
 // define the ellipsoidal fiber density distributionmaterial parameters
 BEGIN_PARAMETER_LIST(FEEllipticalFiberDensityDistribution, FEMaterial)
 	ADD_PARAMETER2(m_spa[0], FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "spa1" );
