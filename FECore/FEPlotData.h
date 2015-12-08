@@ -4,19 +4,11 @@
 #include "FESurface.h"
 #include "FECoreBase.h"
 #include "Archive.h"
+#include "FE_enum.h"
 
 //-----------------------------------------------------------------------------
 // forward declaration of model class
 class FEModel;
-
-// --- data types ---
-enum Var_Type { PLT_FLOAT, PLT_VEC3F, PLT_MAT3FS, PLT_MAT3FD, PLT_TENS4FS, PLT_MAT3F };
-
-// --- storage format ---
-// FMT_NODE : one value stored for each node of a region
-// FMT_ITEM : one value stored for each item (e.g. element) of a region
-// FMT_MULT : one value for each node of each item of a region
-enum Storage_Fmt { FMT_NODE, FMT_ITEM, FMT_MULT };
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all classes that wish to store data to the 

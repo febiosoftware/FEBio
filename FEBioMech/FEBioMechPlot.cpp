@@ -103,52 +103,46 @@ bool FEPlotNodeReactionForces::Save(FEMesh& m, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotRigidReactionForce::Save(FEMesh& m, vector<float>& a)
+bool FEPlotRigidReactionForce::Save(FEDomain& dom, vector<float>& a)
 {
-    int N = m.Nodes();
+	// get the material
+	FEMaterial* pmat = dom.GetMaterial();
+	if ((pmat==0) || (pmat->IsRigid() == false)) return false;
+
+	// get the rigid body ID
+	int nrid = pmat->GetRigidBodyID();
+	if (nrid < 0) return false;
+
+	// get the rigid body
 	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
-    for (int i=0; i<N; ++i)
-    {
-        FENode& node = m.Node(i);
-        if (node.m_rid >= 0)
-        {
-            FERigidBody& rb = *rigid.Object(node.m_rid);
-            a.push_back((float)rb.m_Fr.x);
-            a.push_back((float)rb.m_Fr.y);
-            a.push_back((float)rb.m_Fr.z);
-        }
-        else
-        {
-            a.push_back(0.f);
-            a.push_back(0.f);
-            a.push_back(0.f);
-        }
-    }
-    return true;
+    FERigidBody& rb = *rigid.Object(nrid);
+
+	a.push_back((float)rb.m_Fr.x);
+    a.push_back((float)rb.m_Fr.y);
+    a.push_back((float)rb.m_Fr.z);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotRigidReactionTorque::Save(FEMesh& m, vector<float>& a)
+bool FEPlotRigidReactionTorque::Save(FEDomain& dom, vector<float>& a)
 {
+	// get the material
+	FEMaterial* pmat = dom.GetMaterial();
+	if ((pmat==0) || (pmat->IsRigid() == false)) return false;
+
+	// get the rigid body ID
+	int nrid = pmat->GetRigidBodyID();
+	if (nrid < 0) return false;
+
+	// get the rigid body
 	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
-	int N = m.Nodes();
-	for (int i=0; i<N; ++i)
-	{
-		FENode& node = m.Node(i);
-		if (node.m_rid >= 0)
-		{
-			FERigidBody& rb = *rigid.Object(node.m_rid);
-			a.push_back((float)rb.m_Mr.x);
-			a.push_back((float)rb.m_Mr.y);
-			a.push_back((float)rb.m_Mr.z);
-		}
-		else
-		{
-			a.push_back(0.f);
-			a.push_back(0.f);
-			a.push_back(0.f);
-		}
-	}
+    FERigidBody& rb = *rigid.Object(nrid);
+
+	a.push_back((float)rb.m_Mr.x);
+    a.push_back((float)rb.m_Mr.y);
+    a.push_back((float)rb.m_Mr.z);
+
 	return true;
 }
 
@@ -233,23 +227,11 @@ bool FEPlotContactForce::Save(FESurface &surf, std::vector<float> &a)
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
     
-	int NF = pcs->Elements();
-	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
-	a.assign(3*MFN*NF, 0.f);
 	vec3d fn = pcs->GetContactForce();
-	for (int j=0; j<NF; ++j)
-	{
-		FESurfaceElement& el = pcs->Element(j);
-        
-		// store in archive
-		int ne = el.Nodes();
-		for (int k=0; k<ne; ++k)
-		{
-			a[3*MFN*j +3*k   ] = (float) fn.x;
-			a[3*MFN*j +3*k +1] = (float) fn.y;
-			a[3*MFN*j +3*k +2] = (float) fn.z;
-		}
-	}
+
+	a.push_back((float) fn.x);
+	a.push_back((float) fn.y);
+	a.push_back((float) fn.z);
     
 	return true;
 }

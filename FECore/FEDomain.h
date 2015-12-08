@@ -8,6 +8,29 @@
 #include "FEGlobalVector.h"
 
 //-----------------------------------------------------------------------------
+class FEDataExport
+{
+public:
+	FEDataExport(Var_Type itype, Storage_Fmt ifmt, void* pd, const char* szname)
+	{
+		m_pd = pd;
+		m_type = itype;
+		m_fmt = ifmt;
+		m_szname = szname;
+	}
+
+	virtual ~FEDataExport(){}
+
+	virtual void Serialize(vector<float>& d);
+
+public:
+	Var_Type	m_type;
+	Storage_Fmt	m_fmt;
+	void*		m_pd;		//!< pointer to data field
+	const char*	m_szname;
+};
+
+//-----------------------------------------------------------------------------
 // forward declaration of classes
 class FEModel;
 class FENode;
@@ -103,6 +126,15 @@ public: // optional functions to overload
 	//! Activate the domain
 	virtual void Activate() {}
 
+public:
+	// This is an experimental feature.
+	// The idea is to let the class define what data it wants to export
+	// The hope is to eliminate the need for special plot and log classes
+	// and to automate the I/O completely.
+	void AddDataExport(FEDataExport* pd);
+	int DataExports() const { return (int) m_Data.size(); }
+	FEDataExport* GetDataExport(int i) { return m_Data[i]; }
+
 protected:
 	FEMesh*		m_pMesh;	//!< the mesh that this domain is a part of
 
@@ -111,4 +143,7 @@ protected:
 
 private:
 	char	m_szname[MAX_DOMAIN_NAME];	//!< domain name
+
+private:
+	vector<FEDataExport*>	m_Data;	//!< list of data export classes
 };

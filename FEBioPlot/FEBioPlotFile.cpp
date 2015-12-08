@@ -2,6 +2,39 @@
 #include "FEBioPlotFile.h"
 #include "FECore/FECoreKernel.h"
 
+class FEPlotDataExport : public FEPlotData
+{
+public:
+	FEPlotDataExport(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(itype, fmt) { m_szname = szname; }
+	void Save(FEModel& fem, Archive& ar)
+	{
+		FEMesh& mesh = fem.GetMesh();
+		int NS = mesh.Surfaces();
+		for (int i=0; i<NS; ++i)
+		{
+			FESurface& s = mesh.Surface(i);
+			int ND = s.DataExports();
+			if (ND > 0)
+			{
+				for (int j=0; j<ND; ++j)
+				{
+					FEDataExport* pd = s.GetDataExport(j);
+					if (strcmp(pd->m_szname, m_szname) == 0)
+					{
+						vector<float> d;
+						pd->Serialize(d);
+						ar.WriteData(i+1, d);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+private:
+	const char*		m_szname;
+};
+
 //-----------------------------------------------------------------------------
 //! Adds a variable to the plot file. 
 //! 
@@ -101,6 +134,27 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
         else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname, item);
         else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, szname, item);
 	}
+	else
+	{
+		// If we get here then this variable is not a plot field.
+		// But let's see if it is an export variable from a domain
+		FEMesh& mesh = pfem->GetMesh();
+		for (int i=0; i<mesh.Surfaces(); ++i)
+		{
+			FESurface& s = mesh.Surface(i);
+			int ND = s.DataExports();
+			for (int j=0; j<ND; ++j)
+			{
+				FEDataExport* pd = s.GetDataExport(j);
+				if (strcmp(pd->m_szname, szname) == 0)
+				{
+					// We have a match. Create a plot field for this export
+					ps = new FEPlotDataExport(pd->m_szname, pd->m_type, pd->m_fmt);
+					return AddSurfaceVariable(ps, szname, item);
+				}
+			}
+		}
+	}
 	return false;
 }
 
@@ -151,7 +205,7 @@ bool FEBioPlotFile::Dictionary::AddDomainVariable(FEPlotData* ps, const char* sz
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* szname, vector<int>& item)
 {
-	if (dynamic_cast<FESurfaceData*>(ps))
+//	if (dynamic_cast<FESurfaceData*>(ps))
 	{
 		DICTIONARY_ITEM it;
 		it.m_ntype = ps->DataType();

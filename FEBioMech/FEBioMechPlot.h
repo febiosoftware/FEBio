@@ -47,28 +47,6 @@ public:
 	bool Save(FEMesh& m, vector<float>& a);
 };
 
-//-----------------------------------------------------------------------------
-//! Rigid body reaction force
-class FEPlotRigidReactionForce : public FENodeData
-{
-public:
-	FEPlotRigidReactionForce(FEModel* pfem) : FENodeData(PLT_VEC3F, FMT_NODE),  m_pfem(pfem) {}
-	bool Save(FEMesh& m, vector<float>& a);
-private:
-	FEModel* m_pfem;
-};
-
-//-----------------------------------------------------------------------------
-//! Rigid body reaction torque
-class FEPlotRigidReactionTorque : public FENodeData
-{
-public:
-    FEPlotRigidReactionTorque(FEModel* pfem) : FENodeData(PLT_VEC3F, FMT_NODE),  m_pfem(pfem) {}
-    bool Save(FEMesh& m, vector<float>& a);
-private:
-    FEModel* m_pfem;
-};
-
 //=============================================================================
 //                         S U R F A C E   D A T A
 //=============================================================================
@@ -109,7 +87,7 @@ public:
 class FEPlotContactForce : public FESurfaceData
 {
 public:
-	FEPlotContactForce(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+	FEPlotContactForce(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_REGION){}
 	bool Save(FESurface& surf, vector<float>& a);
 };
 
@@ -591,4 +569,26 @@ class FEPlotLagrangeStrain : public FEDomainData
 public:
 	FEPlotLagrangeStrain(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Rigid body reaction force
+class FEPlotRigidReactionForce : public FEDomainData
+{
+public:
+	FEPlotRigidReactionForce(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+private:
+	FEModel* m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! Rigid body reaction torque
+class FEPlotRigidReactionTorque : public FEDomainData
+{
+public:
+    FEPlotRigidReactionTorque(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION), m_pfem(pfem) {}
+    bool Save(FEDomain& dom, vector<float>& a);
+private:
+	FEModel* m_pfem;
 };

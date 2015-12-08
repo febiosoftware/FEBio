@@ -223,4 +223,14 @@ enum FE_Dump_Level {
 #define	FE_DOMAIN_TRUSS		5
 #define	FE_DOMAIN_DISCRETE	6
 
+// --- data types ---
+enum Var_Type { PLT_FLOAT, PLT_VEC3F, PLT_MAT3FS, PLT_MAT3FD, PLT_TENS4FS, PLT_MAT3F };
+
+// --- storage format ---
+// FMT_NODE : one value stored for each node of a region
+// FMT_ITEM : one value stored for each item (e.g. element) of a region
+// FMT_MULT : one value for each node of each item of a region
+// FMT_REGION: one value per region (surface, domain)
+enum Storage_Fmt { FMT_NODE, FMT_ITEM, FMT_MULT, FMT_REGION };
+
 #endif // _FE_ENUM_H_05132007_
