@@ -16,6 +16,8 @@ public:
 
 	bool Initialize(FEModel& fem);
 
+	void Activate();
+
 	int Nodes() { return (int) m_Node.size(); }
 	FENode& Node(int i);
 
@@ -24,6 +26,9 @@ public:
 
 	//! Serialize data to archive
 	void Serialize(DumpFile& ar);
+
+public:
+	void AddElement(int eid, int n[2]);
 
 protected:
 	vector<int>					m_Node;

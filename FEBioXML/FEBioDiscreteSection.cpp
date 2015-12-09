@@ -35,6 +35,9 @@ void FEBioDiscreteSection::ParseSpringSection(XMLTag &tag)
 	FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, szt, &fem));
 	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
+	fem.AddMaterial(pm);
+	pm->SetID(fem.Materials());
+
 	// create a new spring "domain"
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 	FE_Element_Spec spec;
@@ -42,16 +45,6 @@ void FEBioDiscreteSection::ParseSpringSection(XMLTag &tag)
 	spec.etype  = FE_DISCRETE;
 	FEDiscreteDomain* pd = dynamic_cast<FEDiscreteDomain*>(febio.CreateDomain(spec, &mesh, pm));
 	mesh.AddDomain(pd);
-
-	pd->create(1);
-	FEDiscreteElement& de = pd->Element(0);
-	de.SetType(FE_DISCRETE);
-	de.m_nID = ++m_pim->m_maxid;
-	
-	// add a new material for each spring
-	fem.AddMaterial(pm);
-	pm->SetID(fem.Materials());
-	de.SetMatID(fem.Materials()-1);
 
 	// read spring discrete elements
 	++tag;
@@ -62,16 +55,22 @@ void FEBioDiscreteSection::ParseSpringSection(XMLTag &tag)
 		{
 			int n[2];
 			tag.value(n, 2);
-			de.m_node[0] = n[0]-1;
-			de.m_node[1] = n[1]-1;
+			n[0] -= 1;
+			n[1] -= 1;
+			pd->AddElement(++m_pim->m_maxid, n);
 		}
 		else
 		{
-			// read the actual spring material parameters
-			FEParameterList& pl = pm->GetParameterList();
+			// first read the domain paramters
+			FEParameterList& pl = pd->GetParameterList();
 			if (m_pim->ReadParameter(tag, pl) == 0)
 			{
-				throw XMLReader::InvalidTag(tag);
+				// read the actual spring material parameters
+				FEParameterList& pl = pm->GetParameterList();
+				if (m_pim->ReadParameter(tag, pl) == 0)
+				{
+					throw XMLReader::InvalidTag(tag);
+				}
 			}
 		}
 		++tag;

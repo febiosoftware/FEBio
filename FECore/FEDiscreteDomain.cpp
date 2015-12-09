@@ -23,10 +23,52 @@ bool FEDiscreteDomain::Initialize(FEModel &fem)
 			if (tag[nj] == -1) tag[nj] = n++;
 		}
 	}
-	m_Node.reserve(n);
-	for (i=0; i<N; ++i) if (tag[i] >= 0) m_Node.push_back(i);
-	assert(m_Node.size() == n);
+	m_Node.resize(n);
+	n = 0;
+	for (i=0; i<NE; ++i)
+	{
+		FEDiscreteElement& e = m_Elem[i];
+		int ne = e.Nodes();
+		for (j=0; j<ne; ++j)
+		{
+			int nj = e.m_node[j];
+			if (tag[nj] != -1)
+			{
+				m_Node[n++] = nj;
+				tag[nj] = -1;
+			}
+		}
+	}
+
+	FEMaterial* pmat = GetMaterial();
+	if (pmat)
+	{
+		int mid = pmat->GetID();
+		for (int i=0; i<NE; ++i)
+		{
+			Element(i).SetMatID(mid);
+		}
+	}
+
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEDiscreteDomain::Activate()
+{
+	for (int i=0; i<Nodes(); ++i)
+	{
+		FENode& node = Node(i);
+		if (node.m_bexclude == false)
+		{
+			if (node.m_rid < 0)
+			{
+				node.m_ID[DOF_X] = DOF_ACTIVE;
+				node.m_ID[DOF_Y] = DOF_ACTIVE;
+				node.m_ID[DOF_Z] = DOF_ACTIVE;
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -45,6 +87,17 @@ void FEDiscreteDomain::ShallowCopy(DumpStream& dmp, bool bsave)
 		int nint = el.GaussPoints();
 		for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->ShallowCopy(dmp, bsave);
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEDiscreteDomain::AddElement(int eid, int n[2])
+{
+	FEDiscreteElement el;
+	el.SetType(FE_DISCRETE);
+	el.m_node[0] = n[0];
+	el.m_node[1] = n[1];
+	el.m_nID = eid;
+	m_Elem.push_back(el);
 }
 
 //-----------------------------------------------------------------------------

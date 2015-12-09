@@ -2,10 +2,15 @@
 #include "FEDiscreteSpringDomain.h"
 #include "FECore/DOFS.h"
 
+BEGIN_PARAMETER_LIST(FEDiscreteSpringDomain, FEDiscreteDomain)
+	ADD_PARAMETER(m_keps, FE_PARAM_DOUBLE, "k_eps");
+END_PARAMETER_LIST();
+
 //-----------------------------------------------------------------------------
 FEDiscreteSpringDomain::FEDiscreteSpringDomain(FEModel* pfem) : FEDiscreteDomain(&pfem->GetMesh())
 {
 	m_pMat = 0;
+	m_keps = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -92,6 +97,38 @@ void FEDiscreteSpringDomain::InternalForces(FEGlobalVector& R)
 		// assemble element
 		R.Assemble(en, lm, fe);
 	}
+
+	if (m_keps > 0)
+	{
+		double eps = m_keps;
+		lm.resize(3);
+		en.resize(1);
+		fe.resize(3);
+		int NN = Nodes();
+		for (int i=1; i<NN-1; ++i)
+		{
+			int i0 = i - 1;
+			int i1 = i + 1;
+
+			vec3d xi = Node(i).m_rt;
+			vec3d x0 = Node(i0).m_rt;
+			vec3d x1 = Node(i1).m_rt;
+
+			vec3d r = xi - x0;
+			vec3d s = x1 - x0; s.unit();
+			vec3d d = r - s*(r*s);
+
+			fe[0] = -eps*d.x;
+			fe[1] = -eps*d.y;
+			fe[2] = -eps*d.z;
+
+			en[0] = m_Node[i];
+			lm[0] = Node(i).m_ID[DOF_X];
+			lm[1] = Node(i).m_ID[DOF_Y];
+			lm[2] = Node(i).m_ID[DOF_Z];
+			R.Assemble(en, lm, fe);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -140,9 +177,9 @@ void FEDiscreteSpringDomain::StiffnessMatrix(FESolver* psolver)
 		if (Lt == 0) { F = 0; Lt = 1; e = vec3d(1,1,1); }
 
 		double A[3][3] = {0};
-		A[0][0] = (E - F/Lt)*e.x*e.x + F/Lt;
-		A[1][1] = (E - F/Lt)*e.y*e.y + F/Lt;
-		A[2][2] = (E - F/Lt)*e.z*e.z + F/Lt;
+		A[0][0] = ((E - F/Lt)*e.x*e.x + F/Lt);
+		A[1][1] = ((E - F/Lt)*e.y*e.y + F/Lt);
+		A[2][2] = ((E - F/Lt)*e.z*e.z + F/Lt);
 
 		A[0][1] = A[1][0] = (E - F/Lt)*e.x*e.y;
 		A[1][2] = A[2][1] = (E - F/Lt)*e.y*e.z;
@@ -173,5 +210,57 @@ void FEDiscreteSpringDomain::StiffnessMatrix(FESolver* psolver)
 
 		// assemble the element into the global system
 		psolver->AssembleStiffness(en, lm, ke);
+	}
+
+	// Add Bending stiffness
+	if (m_keps > 0)
+	{
+		double eps = m_keps;
+		vector<int> lmi(3);
+		vector<int>	lmj(9);
+		en.resize(3);
+		int NN = Nodes();
+		for (int i=1; i<NN-1; ++i)
+		{
+			int i0 = i - 1;
+			int i1 = i + 1;
+
+			vec3d xi = Node(i).m_rt;
+			vec3d x0 = Node(i0).m_rt;
+			vec3d x1 = Node(i1).m_rt;
+
+			vec3d r = xi - x0*0.5 - x1*0.5;
+			vec3d s = x1 - x0; 
+			double L = s.unit();
+			double c = (r*s)*(-eps/L);
+
+			mat3ds SxS = dyad(s);
+			mat3ds K = (mat3dd(1.0) - SxS)*(eps);
+
+			ke.resize(3, 9);
+			ke.zero();
+			ke[0][0] = eps; ke[0][3] = -0.5*eps; ke[0][6] = -0.5*eps;
+			ke[1][1] = eps; ke[1][4] = -0.5*eps; ke[1][7] = -0.5*eps;
+			ke[2][2] = eps; ke[2][5] = -0.5*eps; ke[2][8] = -0.5*eps;
+
+			vector<int>& IDi = Node(i ).m_ID;
+			vector<int>& ID0 = Node(i0).m_ID;
+			vector<int>& ID1 = Node(i1).m_ID;
+
+			lmi[0] = IDi[DOF_X];
+			lmi[1] = IDi[DOF_Y];
+			lmi[2] = IDi[DOF_Z];
+
+			lmj[0] = IDi[DOF_X];
+			lmj[1] = IDi[DOF_Y];
+			lmj[2] = IDi[DOF_Z];
+			lmj[3] = ID0[DOF_X];
+			lmj[4] = ID0[DOF_Y];
+			lmj[5] = ID0[DOF_Z];
+			lmj[6] = ID1[DOF_X];
+			lmj[7] = ID1[DOF_Y];
+			lmj[8] = ID1[DOF_Z];
+			psolver->AssembleStiffness2(lmi, lmj, ke);
+		}
 	}
 }

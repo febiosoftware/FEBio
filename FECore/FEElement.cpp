@@ -10,14 +10,20 @@
 FEElementState::FEElementState(const FEElementState& s)
 {
 	m_data.resize( s.m_data.size() );
-	for (size_t i=0; i<m_data.size(); ++i) m_data[i] = s.m_data[i]->Copy();
+	for (size_t i=0; i<m_data.size(); ++i) 
+	{
+		if (s.m_data[i]) m_data[i] = s.m_data[i]->Copy(); else m_data[i] = 0;
+	}
 }
 
 FEElementState& FEElementState::operator = (const FEElementState& s)
 {
 	Clear();
 	m_data.resize( s.m_data.size() );
-	for (size_t i=0; i<m_data.size(); ++i) m_data[i] = s.m_data[i]->Copy();
+	for (size_t i=0; i<m_data.size(); ++i) 
+	{
+		if (s.m_data[i]) m_data[i] = s.m_data[i]->Copy(); else m_data[i] = 0;
+	}
 	return (*this);
 }
 

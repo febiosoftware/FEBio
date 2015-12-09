@@ -41,4 +41,7 @@ public: // overridden from FEElasticDomain
 
 protected:
 	FESpringMaterial*	m_pMat;
+	double				m_keps;
+
+	DECLARE_PARAMETER_LIST();
 };
