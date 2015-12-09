@@ -119,24 +119,6 @@ public:
 	bool Save(FESurface& S, FEDataStream& a);
 };
 
-//-----------------------------------------------------------------------------
-//! Mortar gap
-class FEPlotMortarContactGapVector : public FESurfaceData
-{
-public:
-	FEPlotMortarContactGapVector(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_NODE){}
-	bool Save(FESurface& S, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Mortar gap
-class FEPlotMortarContactNormal : public FESurfaceData
-{
-public:
-	FEPlotMortarContactNormal(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_NODE){}
-	bool Save(FESurface& S, FEDataStream& a);
-};
-
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

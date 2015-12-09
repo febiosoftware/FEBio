@@ -4,13 +4,19 @@
 #include "FECore/FEModel.h"
 #include "FECore/mortar.h"
 #include "FECore/log.h"
+#include <FECore/FEDataExport.h>
 
 //=============================================================================
 // FEMortarSlidingSurface
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-FEMortarSlidingSurface::FEMortarSlidingSurface(FEMesh* pm) : FEMortarContactSurface(pm) {}
+FEMortarSlidingSurface::FEMortarSlidingSurface(FEMesh* pm) : FEMortarContactSurface(pm) 
+{
+	// class exports
+	EXPORT_DATA(PLT_VEC3F, FMT_NODE, &m_gap, "mortar-gap vector");
+	EXPORT_DATA(PLT_VEC3F, FMT_NODE, &m_nu , "mortar-normal"    );
+}
 
 //-----------------------------------------------------------------------------
 bool FEMortarSlidingSurface::Init()

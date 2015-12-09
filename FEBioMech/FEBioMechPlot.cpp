@@ -231,34 +231,6 @@ bool FEPlotMortarContactGap::Save(FESurface& S, FEDataStream& a)
 	else return false;
 }
 
-//-----------------------------------------------------------------------------
-bool FEPlotMortarContactGapVector::Save(FESurface& S, FEDataStream& a)
-{
-	FEMortarSlidingSurface* ps = dynamic_cast<FEMortarSlidingSurface*>(&S);
-	if (ps)
-	{
-		int N = ps->Nodes();
-		for (int i=0; i<N; ++i) a << ps->m_gap[i];
-		return true;
-	}
-	else return false;
-}
-
-
-//-----------------------------------------------------------------------------
-bool FEPlotMortarContactNormal::Save(FESurface& S, FEDataStream& a)
-{
-	FEMortarSlidingSurface* ps = dynamic_cast<FEMortarSlidingSurface*>(&S);
-	if (ps)
-	{
-		int N = ps->Nodes();
-		for (int i=0; i<N; ++i) a << ps->m_nu[i];
-		return true;
-	}
-	else return false;
-}
-
-
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

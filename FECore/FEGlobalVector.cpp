@@ -24,9 +24,15 @@ void FEGlobalVector::Assemble(vector<int>& en, vector<int>& elm, vector<double>&
 	for (int i=0; i<ndof; ++i)
 	{
 		int I = elm[i];
-		if ( I >= 0) R[I] += fe[i];
+		if ( I >= 0) {
+#pragma omp atomic
+			R[I] += fe[i];
+		}
 // TODO: Find another way to store reaction forces
-		else if (-I-2 >= 0) m_Fr[-I-2] -= fe[i];
+		else if (-I-2 >= 0) {
+#pragma omp atomic
+			m_Fr[-I-2] -= fe[i];
+		}
 	}
 }
 
@@ -39,6 +45,9 @@ void FEGlobalVector::Assemble(int* lm, double* fe, int n)
 	for (int i=0; i<n; ++i)
 	{
 		int nid = lm[i];
-		if (nid >= 0) R[nid] += fe[i];
+		if (nid >= 0) {
+#pragma omp atomic
+			R[nid] += fe[i];
+		}
 	}
 }
