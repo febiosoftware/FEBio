@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------
 //! Store the nodal displacements
-bool FEPlotNodeTemperature::Save(FEMesh& m, FEPlotStream& a)
+bool FEPlotNodeTemperature::Save(FEMesh& m, FEDataStream& a)
 {
 	for (int i=0; i<m.Nodes(); ++i)
 	{

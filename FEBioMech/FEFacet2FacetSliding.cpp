@@ -45,7 +45,8 @@ FEFacetSlidingSurface::Data::Data()
 
 FEFacetSlidingSurface::FEFacetSlidingSurface(FEMesh* pm) : FEContactSurface(pm)
 {
-	AddDataExport(new FEDataExport(PLT_VEC3F, FMT_NODE, &m_Fn, "contact nodal forces"));
+	// define class exports
+	EXPORT_DATA(PLT_VEC3F, FMT_NODE, &m_Fn, "contact nodal forces");
 }
 
 //-----------------------------------------------------------------------------

@@ -35,7 +35,7 @@ void FENodeData::Save(FEModel &fem, Archive& ar)
 	int ndata = VarSize(DataType());
 
 	int N = fem.GetMesh().Nodes();
-	FEPlotStream a; a.reserve(ndata*N);
+	FEDataStream a; a.reserve(ndata*N);
 	if (Save(fem.GetMesh(), a))
 	{
 		assert(a.size() == N*ndata);
@@ -87,7 +87,7 @@ void FEDomainData::Save(FEModel &fem, Archive& ar)
 		assert(nsize > 0);
 
 		// fill data vector and save
-		FEPlotStream a; 
+		FEDataStream a; 
 		a.reserve(nsize);
 		if (Save(D, a))
 		{
@@ -131,7 +131,7 @@ void FESurfaceData::Save(FEModel &fem, Archive& ar)
 		}
 
 		// save data
-		FEPlotStream a; a.reserve(nsize);
+		FEDataStream a; a.reserve(nsize);
 		if (Save(S, a))
 		{
 			assert(a.size() == nsize);

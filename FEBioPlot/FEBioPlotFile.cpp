@@ -22,9 +22,9 @@ public:
 					FEDataExport* pd = s.GetDataExport(j);
 					if (strcmp(pd->m_szname, m_szname) == 0)
 					{
-						vector<float> d;
+						FEDataStream d;
 						pd->Serialize(d);
-						ar.WriteData(i+1, d);
+						ar.WriteData(i+1, d.data());
 						break;
 					}
 				}

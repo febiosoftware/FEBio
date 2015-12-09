@@ -5,7 +5,7 @@
 #include "FEBioPlot/FEBioPlotFile.h"
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidDilatation::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotFluidDilatation::Save(FEDomain &dom, FEDataStream& a)
 {
     FEFluidDomain* pd = dynamic_cast<FEFluidDomain*>(&dom);
     if (pd)
@@ -26,7 +26,7 @@ bool FEPlotFluidDilatation::Save(FEDomain &dom, FEPlotStream& a)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEPlotStream &a)
+bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
 {
     FESurface* pcs = &surf;
     if (pcs == 0) return false;
@@ -96,7 +96,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEPlotStream &a)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-bool FEPlotElasticFluidPressure::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotElasticFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 {
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -125,7 +125,7 @@ bool FEPlotElasticFluidPressure::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, FEDataStream& a)
 {
     if (dom.Class() != FE_DOMAIN_SOLID) return false;
     FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -154,7 +154,7 @@ bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidDensity::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotFluidDensity::Save(FEDomain &dom, FEDataStream& a)
 {
     if (dom.Class() != FE_DOMAIN_SOLID) return false;
     FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -184,7 +184,7 @@ bool FEPlotFluidDensity::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidVelocity::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
     if (pme == 0) return false;
@@ -213,7 +213,7 @@ bool FEPlotFluidVelocity::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidAcceleration::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotFluidAcceleration::Save(FEDomain &dom, FEDataStream& a)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
     if (pme == 0) return false;
@@ -243,7 +243,7 @@ bool FEPlotFluidAcceleration::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidVorticity::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotFluidVorticity::Save(FEDomain &dom, FEDataStream& a)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
     if (pme == 0) return false;
@@ -274,7 +274,7 @@ bool FEPlotFluidVorticity::Save(FEDomain &dom, FEPlotStream& a)
 
 //-----------------------------------------------------------------------------
 //! Store the average stresses for each element.
-bool FEPlotElementFluidStress::Save(FEDomain& dom, FEPlotStream& a)
+bool FEPlotElementFluidStress::Save(FEDomain& dom, FEDataStream& a)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
     if (pme == 0) return false;
@@ -311,7 +311,7 @@ bool FEPlotElementFluidStress::Save(FEDomain& dom, FEPlotStream& a)
 
 //-----------------------------------------------------------------------------
 //! Store the average stresses for each element.
-bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, FEPlotStream& a)
+bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, FEDataStream& a)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
     if (pme == 0) return false;
@@ -348,7 +348,7 @@ bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidStressPower::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotFluidStressPower::Save(FEDomain &dom, FEDataStream& a)
 {
     if (dom.Class() != FE_DOMAIN_SOLID) return false;
     FESolidDomain& bd = static_cast<FESolidDomain&>(dom);

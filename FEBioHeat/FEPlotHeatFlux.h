@@ -6,5 +6,5 @@ class FEPlotHeatFlux : public FEDomainData
 {
 public:
 	FEPlotHeatFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEPlotStream& a);
+	bool Save(FEDomain& dom, FEDataStream& a);
 };

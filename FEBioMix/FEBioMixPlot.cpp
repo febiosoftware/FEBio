@@ -12,7 +12,7 @@
 #include "FEBioPlot/FEBioPlotFile.h"
 
 //-----------------------------------------------------------------------------
-bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 {
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -44,7 +44,7 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidFlux::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 {
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -77,7 +77,7 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotNodalFluidFlux::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotNodalFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 {
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -124,7 +124,7 @@ bool FEPlotNodalFluidFlux::Save(FEDomain &dom, FEPlotStream& a)
 
 /*
 //-----------------------------------------------------------------------------
-bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEBiphasicSoluteDomain* pbd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	if (pbd)
@@ -295,7 +295,7 @@ bool FEPlotActualSoluteConcentration::SetFilter(int nsol)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
 	// figure out the solute ID to export. This depends on the material type.
 	int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
@@ -326,7 +326,7 @@ bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotActualSolConcentration_::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotActualSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEBiphasicSolute* psm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
 	if (psm)
@@ -445,7 +445,7 @@ bool FEPlotSoluteFlux::SetFilter(int nsol)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSoluteFlux::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotSoluteFlux::Save(FEDomain &dom, FEDataStream& a)
 {
 	// figure out the solute ID to export. This depends on the material type.
 	int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
@@ -475,7 +475,7 @@ bool FEPlotSoluteFlux::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSolFlux_::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotSolFlux_::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEBiphasicSolute* psm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
 	if (psm)
@@ -571,7 +571,7 @@ bool FEPlotSolFlux_::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotOsmolarity::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotOsmolarity::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
@@ -673,7 +673,7 @@ bool FEPlotSBMConcentration::SetFilter(int nsol)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSBMConcentration::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotSBMConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
 	if (pm == 0) return false;
@@ -707,7 +707,7 @@ bool FEPlotSBMConcentration::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSBMConcentration_::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotSBMConcentration_::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
@@ -745,7 +745,7 @@ bool FEPlotSBMConcentration_::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotElectricPotential::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotElectricPotential::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
@@ -799,7 +799,7 @@ bool FEPlotElectricPotential::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotCurrentDensity::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotCurrentDensity::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	vec3d ew;
@@ -853,7 +853,7 @@ bool FEPlotCurrentDensity::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotReferentialSolidVolumeFraction::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotReferentialSolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
@@ -884,7 +884,7 @@ bool FEPlotReferentialSolidVolumeFraction::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFixedChargeDensity::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
@@ -938,7 +938,7 @@ bool FEPlotFixedChargeDensity::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
@@ -996,7 +996,7 @@ bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEBiphasicSolidDomain*  pd  = dynamic_cast<FEBiphasicSolidDomain* >(&dom);
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
@@ -1039,7 +1039,7 @@ bool FEPlotEffectiveSoluteConcentration::SetFilter(int nsol)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
 	int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
 
@@ -1056,7 +1056,7 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEBiphasicSolute* pbm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
 	if (pbm)
@@ -1111,7 +1111,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
@@ -1158,7 +1158,7 @@ bool FEPlotSBMRefAppDensity::SetFilter(int nsol)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSBMRefAppDensity::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotSBMRefAppDensity::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
 	if (pm == 0) return false;
@@ -1188,7 +1188,7 @@ bool FEPlotSBMRefAppDensity::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSBMRefAppDensity_::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotSBMRefAppDensity_::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
@@ -1226,7 +1226,7 @@ bool FEPlotSBMRefAppDensity_::Save(FEDomain &dom, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotEffectiveElasticity::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotEffectiveElasticity::Save(FEDomain &dom, FEDataStream& a)
 {
     tens4ds c;
     
@@ -1276,7 +1276,7 @@ bool FEPlotEffectiveElasticity::Save(FEDomain &dom, FEPlotStream& a)
 
 //-----------------------------------------------------------------------------
 // Plot contact gap
-bool FEPlotPressureGap::Save(FESurface& surf, FEPlotStream& a)
+bool FEPlotPressureGap::Save(FESurface& surf, FEDataStream& a)
 {
 	FEBiphasicContactSurface* pcs = dynamic_cast<FEBiphasicContactSurface*>(&surf);
 	if (pcs == 0) return false;
@@ -1296,7 +1296,7 @@ bool FEPlotPressureGap::Save(FESurface& surf, FEPlotStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidForce::Save(FESurface &surf, FEPlotStream &a)
+bool FEPlotFluidForce::Save(FESurface &surf, FEDataStream &a)
 {
 	FEBiphasicContactSurface* pcs = dynamic_cast<FEBiphasicContactSurface*>(&surf);
 	if (pcs == 0) return false;

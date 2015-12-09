@@ -2,6 +2,7 @@
 #include "FEVolumeConstraint.h"
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
+#include <FECore/FEDataExport.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -11,6 +12,9 @@ FEVolumeSurface::FEVolumeSurface(FEMesh* pm) : FESurface(pm)
 	m_p  = 0.0;
 	m_V0 = 0.0;
 	m_Vt = 0.0;
+
+	// define class exports
+	EXPORT_DATA(PLT_FLOAT, FMT_REGION, &m_p, "volume pressure");
 }
 
 //-----------------------------------------------------------------------------

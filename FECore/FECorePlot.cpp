@@ -23,7 +23,7 @@ bool FEPlotMaterialParameter::SetFilter(const char* sz)
 
 //-----------------------------------------------------------------------------
 // The Save function stores the material parameter data to the plot file.
-bool FEPlotMaterialParameter::Save(FEDomain& dom, FEPlotStream& a)
+bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
 {
 	// First, get the domain material
 	FEMaterial* pmat = dom.GetMaterial();

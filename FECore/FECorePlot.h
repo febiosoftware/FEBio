@@ -7,7 +7,7 @@ class FEPlotMaterialParameter : public FEDomainData
 {
 public:
 	FEPlotMaterialParameter(FEModel* pfem);
-	bool Save(FEDomain& dom, FEPlotStream& a);
+	bool Save(FEDomain& dom, FEDataStream& a);
 
 	virtual bool SetFilter(const char* sz);
 

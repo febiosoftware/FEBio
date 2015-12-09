@@ -3,7 +3,7 @@
 #include "FEHeatTransferMaterial.h"
 
 //-----------------------------------------------------------------------------
-bool FEPlotHeatFlux::Save(FEDomain &dom, FEPlotStream& a)
+bool FEPlotHeatFlux::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEHeatSolidDomain* pbd = dynamic_cast<FEHeatSolidDomain*>(&dom);
 	if (pbd)
