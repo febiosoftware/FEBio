@@ -26,7 +26,7 @@ public:
 
 public:
 	//! constructor
-	FEFacetSlidingSurface(FEMesh* pm) : FEContactSurface(pm) {}
+	FEFacetSlidingSurface(FEMesh* pm);
 
 	//! initialization
 	bool Init();
@@ -50,6 +50,7 @@ public:
 
 public:
 	vector< vector<Data> >		m_Data;	//!< integration point data
+	vector<vec3d>				m_Fn;	//!< equivalent nodal forces
 };
 
 //-----------------------------------------------------------------------------

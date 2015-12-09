@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEBioPlotFile.h"
 #include "FECore/FECoreKernel.h"
+#include "FECore/FEDataExport.h"
 
 class FEPlotDataExport : public FEPlotData
 {

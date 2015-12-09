@@ -4,6 +4,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/FEClosestPointProjection.h"
 #include "FECore/log.h"
+#include "FECore/FEDataExport.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -42,10 +43,19 @@ FEFacetSlidingSurface::Data::Data()
 // FEFacetSlidingSurface
 //-----------------------------------------------------------------------------
 
+FEFacetSlidingSurface::FEFacetSlidingSurface(FEMesh* pm) : FEContactSurface(pm)
+{
+	AddDataExport(new FEDataExport(PLT_VEC3F, FMT_NODE, &m_Fn, "contact nodal forces"));
+}
+
+//-----------------------------------------------------------------------------
 bool FEFacetSlidingSurface::Init()
 {
 	// initialize surface data first
 	if (FEContactSurface::Init() == false) return false;
+
+	int nn = Nodes();
+	m_Fn.assign(nn, vec3d(0,0,0));
 
 	// allocate data structures
 	const int NE = Elements();
@@ -625,6 +635,9 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 	double detJ[MELN], w[MELN], *Hs, Hm[MELN];
 	vec3d r0[MELN];
 
+	m_ss.m_Fn.assign(m_ss.Nodes(), vec3d(0,0,0));
+	m_ms.m_Fn.assign(m_ms.Nodes(), vec3d(0,0,0));
+
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
 	{
@@ -752,6 +765,9 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 					}
 
 					for (int k=0; k<ndof; ++k) fe[k] *= tn*detJ[j]*w[j];
+
+					for (int k=0; k<nseln; ++k) ss.m_Fn[se.m_lnode[k]] += vec3d(fe[3*k], fe[3*k+1], fe[3*k+2]);
+					for (int k=0; k<nmeln; ++k) ms.m_Fn[me.m_lnode[k]] += vec3d(fe[3*nseln+3*k], fe[3*nseln+3*k+1], fe[3*nseln+3*k+2]);
 
 					// assemble the global residual
 					R.Assemble(en, LM, fe);
