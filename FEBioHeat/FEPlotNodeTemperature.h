@@ -7,5 +7,5 @@ class FEPlotNodeTemperature : public FENodeData
 {
 public:
 	FEPlotNodeTemperature(FEModel* pfem) : FENodeData(PLT_FLOAT, FMT_NODE){}
-	bool Save(FEMesh& m, vector<float>& a);
+	bool Save(FEMesh& m, FEPlotStream& a);
 };

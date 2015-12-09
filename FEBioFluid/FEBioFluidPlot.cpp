@@ -5,7 +5,7 @@
 #include "FEBioPlot/FEBioPlotFile.h"
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidDilatation::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotFluidDilatation::Save(FEDomain &dom, FEPlotStream& a)
 {
     FEFluidDomain* pd = dynamic_cast<FEFluidDomain*>(&dom);
     if (pd)
@@ -14,7 +14,7 @@ bool FEPlotFluidDilatation::Save(FEDomain &dom, vector<float>& a)
         for (int i=0; i<N; ++i)
         {
             FENode& node = pd->Node(i);
-            a.push_back((float) node.m_et);
+            a << node.m_et;
         }
         return true;
     }
@@ -26,7 +26,7 @@ bool FEPlotFluidDilatation::Save(FEDomain &dom, vector<float>& a)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidSurfaceForce::Save(FESurface &surf, std::vector<float> &a)
+bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEPlotStream &a)
 {
     FESurface* pcs = &surf;
     if (pcs == 0) return false;
@@ -86,9 +86,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, std::vector<float> &a)
     }
     
     // save results
-    a.push_back((float) fn.x);
-    a.push_back((float) fn.y);
-    a.push_back((float) fn.z);
+	a << fn;
     
     return true;
 }
@@ -98,7 +96,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, std::vector<float> &a)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-bool FEPlotElasticFluidPressure::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotElasticFluidPressure::Save(FEDomain &dom, FEPlotStream& a)
 {
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -119,7 +117,7 @@ bool FEPlotElasticFluidPressure::Save(FEDomain &dom, vector<float>& a)
 			}
 			ew /= el.GaussPoints();
 			
-			a.push_back((float) ew);
+			a << ew;
 		}
 		return true;
 	}
@@ -127,7 +125,7 @@ bool FEPlotElasticFluidPressure::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, FEPlotStream& a)
 {
     if (dom.Class() != FE_DOMAIN_SOLID) return false;
     FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -148,7 +146,7 @@ bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, vector<float>& a)
             }
             ew /= el.GaussPoints();
             
-            a.push_back((float) ew);
+            a << ew;
         }
         return true;
     }
@@ -156,7 +154,7 @@ bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidDensity::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotFluidDensity::Save(FEDomain &dom, FEPlotStream& a)
 {
     if (dom.Class() != FE_DOMAIN_SOLID) return false;
     FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -178,7 +176,7 @@ bool FEPlotFluidDensity::Save(FEDomain &dom, vector<float>& a)
             }
             ew /= el.GaussPoints();
             
-            a.push_back((float) ew);
+            a << ew;
         }
         return true;
     }
@@ -186,7 +184,7 @@ bool FEPlotFluidDensity::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidVelocity::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotFluidVelocity::Save(FEDomain &dom, FEPlotStream& a)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
     if (pme == 0) return false;
@@ -205,17 +203,9 @@ bool FEPlotFluidVelocity::Save(FEDomain &dom, vector<float>& a)
                 FEFluidMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEFluidMaterialPoint>();
                 r += pt.m_vt;
             }
-            
             r /= n;
             
-            float f[3];
-            f[0] = (float) r.x;
-            f[1] = (float) r.y;
-            f[2] = (float) r.z;
-            
-            a.push_back(f[0]);
-            a.push_back(f[1]);
-            a.push_back(f[2]);
+			a << r;
         }
         return true;
     }
@@ -223,7 +213,7 @@ bool FEPlotFluidVelocity::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidAcceleration::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotFluidAcceleration::Save(FEDomain &dom, FEPlotStream& a)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
     if (pme == 0) return false;
@@ -245,14 +235,7 @@ bool FEPlotFluidAcceleration::Save(FEDomain &dom, vector<float>& a)
             
             r /= n;
             
-            float f[3];
-            f[0] = (float) r.x;
-            f[1] = (float) r.y;
-            f[2] = (float) r.z;
-            
-            a.push_back(f[0]);
-            a.push_back(f[1]);
-            a.push_back(f[2]);
+			a << r;
         }
         return true;
     }
@@ -260,7 +243,7 @@ bool FEPlotFluidAcceleration::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidVorticity::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotFluidVorticity::Save(FEDomain &dom, FEPlotStream& a)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
     if (pme == 0) return false;
@@ -281,15 +264,8 @@ bool FEPlotFluidVorticity::Save(FEDomain &dom, vector<float>& a)
             }
             
             r /= n;
-            
-            float f[3];
-            f[0] = (float) r.x;
-            f[1] = (float) r.y;
-            f[2] = (float) r.z;
-            
-            a.push_back(f[0]);
-            a.push_back(f[1]);
-            a.push_back(f[2]);
+
+			a << r;
         }
         return true;
     }
@@ -298,7 +274,7 @@ bool FEPlotFluidVorticity::Save(FEDomain &dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the average stresses for each element.
-bool FEPlotElementFluidStress::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementFluidStress::Save(FEDomain& dom, FEPlotStream& a)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
     if (pme == 0) return false;
@@ -309,34 +285,25 @@ bool FEPlotElementFluidStress::Save(FEDomain& dom, vector<float>& a)
     {
         FEElement& el = dom.ElementRef(i);
         
-        float s[6] = {0};
         int nint = el.GaussPoints();
         double f = 1.0 / (double) nint;
         
         // since the PLOT file requires floats we need to convert
         // the doubles to single precision
         // we output the average stress values of the gauss points
+		mat3ds s(0.0);
         for (int j=0; j<nint; ++j)
         {
             FEFluidMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEFluidMaterialPoint>());
             if (ppt)
             {
                 FEFluidMaterialPoint& pt = *ppt;
-                s[0] += (float) (f*pt.m_s.xx());
-                s[1] += (float) (f*pt.m_s.yy());
-                s[2] += (float) (f*pt.m_s.zz());
-                s[3] += (float) (f*pt.m_s.xy());
-                s[4] += (float) (f*pt.m_s.yz());
-                s[5] += (float) (f*pt.m_s.xz());
+				s += pt.m_s;
             }
         }
+		s *= f;
         
-        a.push_back(s[0]);
-        a.push_back(s[1]);
-        a.push_back(s[2]);
-        a.push_back(s[3]);
-        a.push_back(s[4]);
-        a.push_back(s[5]);
+		a << s;
     }
     
     return true;
@@ -344,7 +311,7 @@ bool FEPlotElementFluidStress::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the average stresses for each element.
-bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, FEPlotStream& a)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
     if (pme == 0) return false;
@@ -355,13 +322,13 @@ bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, vector<float>& a)
     {
         FEElement& el = dom.ElementRef(i);
         
-        float s[6] = {0};
         int nint = el.GaussPoints();
         double f = 1.0 / (double) nint;
         
         // since the PLOT file requires floats we need to convert
         // the doubles to single precision
         // we output the average stress values of the gauss points
+		mat3ds s(0.0);
         for (int j=0; j<nint; ++j)
         {
             FEFluidMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEFluidMaterialPoint>());
@@ -369,28 +336,19 @@ bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, vector<float>& a)
             {
                 FEFluidMaterialPoint& pt = *ppt;
                 mat3ds D = pt.RateOfDeformation();
-                s[0] += (float) (f*D.xx());
-                s[1] += (float) (f*D.yy());
-                s[2] += (float) (f*D.zz());
-                s[3] += (float) (f*D.xy());
-                s[4] += (float) (f*D.yz());
-                s[5] += (float) (f*D.xz());
+				s += D;
             }
         }
+		s *= f;
         
-        a.push_back(s[0]);
-        a.push_back(s[1]);
-        a.push_back(s[2]);
-        a.push_back(s[3]);
-        a.push_back(s[4]);
-        a.push_back(s[5]);
+		a << s;
     }
     
     return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidStressPower::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotFluidStressPower::Save(FEDomain &dom, FEPlotStream& a)
 {
     if (dom.Class() != FE_DOMAIN_SOLID) return false;
     FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -411,10 +369,9 @@ bool FEPlotFluidStressPower::Save(FEDomain &dom, vector<float>& a)
             }
             ew /= el.GaussPoints();
             
-            a.push_back((float) ew);
+            a << ew;
         }
         return true;
     }
     return false;
 }
-

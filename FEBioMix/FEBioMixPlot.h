@@ -7,7 +7,7 @@ class FEPlotActualFluidPressure : public FEDomainData
 {
 public:
 	FEPlotActualFluidPressure(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -16,7 +16,7 @@ class FEPlotFluidFlux : public FEDomainData
 {
 public:
 	FEPlotFluidFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -25,7 +25,7 @@ class FEPlotNodalFluidFlux : public FEDomainData
 {
 public:
 	FEPlotNodalFluidFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_MULT){}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -34,7 +34,7 @@ class FEPlotActualSoluteConcentration : public FEDomainData
 {
 public:
 	FEPlotActualSoluteConcentration(FEModel* pfem);
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 	bool SetFilter(const char* sz);
 	bool SetFilter(int nsol);
 protected:
@@ -48,7 +48,7 @@ class FEPlotActualSolConcentration_ : public FEDomainData
 {
 public:
 	FEPlotActualSolConcentration_(FEModel* pfem, int nsol) : FEDomainData(PLT_FLOAT, FMT_ITEM), m_nsol(nsol) {}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 private:
 	int	m_nsol;
 };
@@ -67,7 +67,7 @@ class FEPlotSoluteFlux : public FEDomainData
 {
 public:
 	FEPlotSoluteFlux(FEModel* pfem);
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 	bool SetFilter(const char* sz);
 	bool SetFilter(int nsol);
 protected:
@@ -81,7 +81,7 @@ class FEPlotSolFlux_ : public FEDomainData
 {
 public:
 	FEPlotSolFlux_(FEModel* pfem, int nsol) : FEDomainData(PLT_VEC3F, FMT_ITEM), m_nsol(nsol) {}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 private:
 	int	m_nsol;
 };
@@ -100,7 +100,7 @@ class FEPlotOsmolarity : public FEDomainData
 {
 public:
     FEPlotOsmolarity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& dom, vector<float>& a);
+    bool Save(FEDomain& dom, FEPlotStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -108,7 +108,7 @@ class FEPlotSBMConcentration : public FEDomainData
 {
 public:
 	FEPlotSBMConcentration(FEModel* pfem);
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 	bool SetFilter(const char* sz);
 	bool SetFilter(int nsol);
 protected:
@@ -122,7 +122,7 @@ class FEPlotSBMConcentration_ : public FEDomainData
 {
 public:
 	FEPlotSBMConcentration_(int nsbm) : FEDomainData(PLT_FLOAT, FMT_ITEM), m_nsbm(nsbm) {}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 private:
 	int m_nsbm;
 };
@@ -141,7 +141,7 @@ class FEPlotElectricPotential : public FEDomainData
 {
 public:
 	FEPlotElectricPotential(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -150,7 +150,7 @@ class FEPlotCurrentDensity : public FEDomainData
 {
 public:
 	FEPlotCurrentDensity(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -159,7 +159,7 @@ class FEPlotReferentialSolidVolumeFraction : public FEDomainData
 {
 public:
     FEPlotReferentialSolidVolumeFraction(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
-    bool Save(FEDomain& dom, vector<float>& a);
+    bool Save(FEDomain& dom, FEPlotStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -168,7 +168,7 @@ class FEPlotFixedChargeDensity : public FEDomainData
 {
 public:
 	FEPlotFixedChargeDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -177,7 +177,7 @@ class FEPlotReferentialFixedChargeDensity : public FEDomainData
 {
 public:
 	FEPlotReferentialFixedChargeDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -186,7 +186,7 @@ class FEPlotEffectiveFluidPressure : public FEDomainData
 {
 public:
 	FEPlotEffectiveFluidPressure(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
-	bool Save(FEDomain& m, vector<float>& a);
+	bool Save(FEDomain& m, FEPlotStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -197,7 +197,7 @@ public:
 	FEPlotEffectiveSoluteConcentration(FEModel* pfem);
 	bool SetFilter(const char* sz);
 	bool SetFilter(int nsol);
-	bool Save(FEDomain& m, vector<float>& a);
+	bool Save(FEDomain& m, FEPlotStream& a);
 protected:
 	int			m_nsol;
 	FEModel*	m_pfem;
@@ -209,7 +209,7 @@ class FEPlotEffectiveSolConcentration_ : public FEDomainData
 {
 public:
 	FEPlotEffectiveSolConcentration_(FEModel* pfem, int nsol) : FEDomainData(PLT_FLOAT, FMT_NODE), m_nsol(nsol) {}
-	bool Save(FEDomain& m, vector<float>& a);
+	bool Save(FEDomain& m, FEPlotStream& a);
 private:
 	int m_nsol;
 };
@@ -228,7 +228,7 @@ class FEPlotReceptorLigandConcentration : public FEDomainData
 {
 public:
 	FEPlotReceptorLigandConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -237,7 +237,7 @@ class FEPlotSBMRefAppDensity : public FEDomainData
 {
 public:
 	FEPlotSBMRefAppDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM), m_nsbm(0) {}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 	bool SetFilter(const char* sz);
 	bool SetFilter(int nsol);
 protected:
@@ -251,7 +251,7 @@ class FEPlotSBMRefAppDensity_ : public FEDomainData
 {
 public:
 	FEPlotSBMRefAppDensity_(int nsbm) : FEDomainData(PLT_FLOAT, FMT_ITEM), m_nsbm(nsbm) {}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 private:
 	int m_nsbm;
 };
@@ -270,7 +270,7 @@ class FEPlotEffectiveElasticity : public FEDomainData
 {
 public:
 	FEPlotEffectiveElasticity(FEModel* pfem) : FEDomainData(PLT_TENS4FS, FMT_ITEM){}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEPlotStream& a);
 };
 
 //=============================================================================
@@ -283,8 +283,8 @@ public:
 class FEPlotFluidForce : public FESurfaceData
 {
 public:
-	FEPlotFluidForce(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
-	bool Save(FESurface& surf, vector<float>& a);
+	FEPlotFluidForce(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_REGION){}
+	bool Save(FESurface& surf, FEPlotStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -294,5 +294,5 @@ class FEPlotPressureGap : public FESurfaceData
 {
 public:
 	FEPlotPressureGap(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_MULT){}
-	bool Save(FESurface& surf, vector<float>& a);
+	bool Save(FESurface& surf, FEPlotStream& a);
 };

@@ -5,6 +5,7 @@
 #include "FECoreBase.h"
 #include "Archive.h"
 #include "FE_enum.h"
+#include "tens4d.h"
 
 //-----------------------------------------------------------------------------
 // forward declaration of model class
@@ -40,13 +41,58 @@ public:
 
 	void SetItemList(vector<int>& item) { m_item = item; }
     
-    void SetDomainName(const char* szdom) { strcpy(m_szdom, szdom); }
+    void SetDomainName(const char* szdom);
 
 protected:
 	Var_Type		m_ntype;	//!< data type
 	Storage_Fmt		m_sfmt;		//!< data storage format
 	vector<int>		m_item;		//!< Data will only be stored for the item's in this list
     char			m_szdom[64];//!< Data will only be stored for the domain with this name
+};
+
+//-----------------------------------------------------------------------------
+class FEPlotStream
+{
+public:
+	FEPlotStream(){}
+
+	void clear() { m_a.clear(); }
+
+	FEPlotStream& operator << (const double& f) { m_a.push_back((float) f); return *this; }
+	FEPlotStream& operator << (const vec3d& v) 
+	{
+		m_a.push_back((float) v.x);
+		m_a.push_back((float) v.y);
+		m_a.push_back((float) v.z);
+		return *this;
+	}
+	FEPlotStream& operator << (const mat3ds& m) 
+	{
+		m_a.push_back((float) m.xx());
+		m_a.push_back((float) m.yy());
+		m_a.push_back((float) m.zz());
+		m_a.push_back((float) m.xy());
+		m_a.push_back((float) m.yz());
+		m_a.push_back((float) m.xz());
+		return *this;
+	}
+	FEPlotStream& operator << (const tens4ds& a)
+	{
+        for (int k=0; k<21; ++k) m_a.push_back((float) a.d[k]);
+		return *this;
+	}
+
+	void assign(size_t count, float f) { m_a.assign(count, f); }
+	void reserve(size_t count) { m_a.reserve(count); }
+	void push_back(const float& f) { m_a.push_back(f); }
+	size_t size() const { return m_a.size(); }
+
+	float& operator [] (int i) { return m_a[i]; }
+
+	vector<float>& data() { return m_a; }
+
+private:
+	vector<float>	m_a;
 };
 
 //-----------------------------------------------------------------------------
@@ -57,7 +103,7 @@ class FENodeData : public FEPlotData
 public:
 	FENodeData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
 	void Save(FEModel& fem, Archive& ar);
-	virtual bool Save(FEMesh& m, vector<float>& a) = 0;
+	virtual bool Save(FEMesh& m, FEPlotStream& a) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -68,7 +114,7 @@ class FEDomainData : public FEPlotData
 public:
 	FEDomainData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
 	void Save(FEModel& fem, Archive& ar);
-	virtual bool Save(FEDomain& D, vector<float>& a) = 0;
+	virtual bool Save(FEDomain& D, FEPlotStream& a) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -79,5 +125,5 @@ class FESurfaceData : public FEPlotData
 public:
 	FESurfaceData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
 	void Save(FEModel& fem, Archive& ar);
-	virtual bool Save(FESurface& S, vector<float>& a) = 0;
+	virtual bool Save(FESurface& S, FEPlotStream& a) = 0;
 };

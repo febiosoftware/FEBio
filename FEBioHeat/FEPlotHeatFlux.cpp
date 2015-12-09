@@ -3,7 +3,7 @@
 #include "FEHeatTransferMaterial.h"
 
 //-----------------------------------------------------------------------------
-bool FEPlotHeatFlux::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotHeatFlux::Save(FEDomain &dom, FEPlotStream& a)
 {
 	FEHeatSolidDomain* pbd = dynamic_cast<FEHeatSolidDomain*>(&dom);
 	if (pbd)
@@ -25,9 +25,7 @@ bool FEPlotHeatFlux::Save(FEDomain &dom, vector<float>& a)
 			ew /= el.GaussPoints();
 
 			// store to buffer
-			a.push_back((float) ew.x);
-			a.push_back((float) ew.y);
-			a.push_back((float) ew.z);
+			a << ew;
 		}
 		return true;
 	}

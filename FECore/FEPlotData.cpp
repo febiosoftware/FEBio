@@ -21,6 +21,12 @@ int FEPlotData::VarSize(Var_Type t)
 }
 
 //-----------------------------------------------------------------------------
+void FEPlotData::SetDomainName(const char* szdom)
+{
+	strcpy(m_szdom, szdom); 
+}
+
+//-----------------------------------------------------------------------------
 void FENodeData::Save(FEModel &fem, Archive& ar)
 {
 	// loop over all node sets
@@ -29,11 +35,11 @@ void FENodeData::Save(FEModel &fem, Archive& ar)
 	int ndata = VarSize(DataType());
 
 	int N = fem.GetMesh().Nodes();
-	vector<float> a; a.reserve(ndata*N);
+	FEPlotStream a; a.reserve(ndata*N);
 	if (Save(fem.GetMesh(), a))
 	{
 		assert(a.size() == N*ndata);
-		ar.WriteData(0, a);
+		ar.WriteData(0, a.data());
 	}
 }
 
@@ -81,12 +87,12 @@ void FEDomainData::Save(FEModel &fem, Archive& ar)
 		assert(nsize > 0);
 
 		// fill data vector and save
-		vector<float> a; 
+		FEPlotStream a; 
 		a.reserve(nsize);
 		if (Save(D, a))
 		{
 			assert(a.size() == nsize);
-			ar.WriteData(m_item[i]+1, a);
+			ar.WriteData(m_item[i]+1, a.data());
 		}
 	}
 }
@@ -125,11 +131,11 @@ void FESurfaceData::Save(FEModel &fem, Archive& ar)
 		}
 
 		// save data
-		vector<float> a; a.reserve(nsize);
+		FEPlotStream a; a.reserve(nsize);
 		if (Save(S, a))
 		{
 			assert(a.size() == nsize);
-			ar.WriteData(i+1, a);
+			ar.WriteData(i+1, a.data());
 		}
 	}
 }

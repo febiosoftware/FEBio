@@ -25,124 +25,55 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 //! Store the nodal displacements
-bool FEPlotNodeDisplacement::Save(FEMesh& m, vector<float>& a)
+bool FEPlotNodeDisplacement::Save(FEMesh& m, FEPlotStream& a)
 {
-	float xf[3];
+	// loop over all nodes
 	for (int i=0; i<m.Nodes(); ++i)
 	{
+		// get the next node
 		FENode& node = m.Node(i);
 
-		// since the PLOT file requires floats we need to convert
-		// the doubles to single precision
-		xf[0] = (float) (node.m_rt.x - node.m_r0.x);
-		xf[1] = (float) (node.m_rt.y - node.m_r0.y);
-		xf[2] = (float) (node.m_rt.z - node.m_r0.z);
+		// calculate displacement
+		vec3d u = node.m_rt - node.m_r0;
 
-		a.push_back(xf[0]);
-		a.push_back(xf[1]);
-		a.push_back(xf[2]);
+		// stream displacement
+		a << u;
 	}
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotNodeVelocity::Save(FEMesh& m, vector<float>& a)
+bool FEPlotNodeVelocity::Save(FEMesh& m, FEPlotStream& a)
 {
-	float xf[3];
 	for (int i=0; i<m.Nodes(); ++i)
 	{
 		FENode& node = m.Node(i);
-
-		// since the PLOT file requires floats we need to convert
-		// the doubles to single precision
-		xf[0] = (float) node.m_vt.x;
-		xf[1] = (float) node.m_vt.y;
-		xf[2] = (float) node.m_vt.z;
-
-		a.push_back(xf[0]);
-		a.push_back(xf[1]);
-		a.push_back(xf[2]);
+		a << node.m_vt;
 	}
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotNodeAcceleration::Save(FEMesh& m, vector<float>& a)
+bool FEPlotNodeAcceleration::Save(FEMesh& m, FEPlotStream& a)
 {
-	float xf[3];
 	for (int i=0; i<m.Nodes(); ++i)
 	{
 		FENode& node = m.Node(i);
-
-		// since the PLOT file requires floats we need to convert
-		// the doubles to single precision
-		xf[0] = (float) node.m_at.x;
-		xf[1] = (float) node.m_at.y;
-		xf[2] = (float) node.m_at.z;
-
-		a.push_back(xf[0]);
-		a.push_back(xf[1]);
-		a.push_back(xf[2]);
+		a << node.m_at;
 	}
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! Store nodal reaction forces
-bool FEPlotNodeReactionForces::Save(FEMesh& m, vector<float>& a)
+bool FEPlotNodeReactionForces::Save(FEMesh& m, FEPlotStream& a)
 {
 	int N = m.Nodes();
 	for (int i=0; i<N; ++i)
 	{
 		FENode& node = m.Node(i);
-		a.push_back((float) node.m_Fr.x);
-		a.push_back((float) node.m_Fr.y);
-		a.push_back((float) node.m_Fr.z);
+		a << node.m_Fr;
 	}
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotRigidReactionForce::Save(FEDomain& dom, vector<float>& a)
-{
-	// get the material
-	FEMaterial* pmat = dom.GetMaterial();
-	if ((pmat==0) || (pmat->IsRigid() == false)) return false;
-
-	// get the rigid body ID
-	int nrid = pmat->GetRigidBodyID();
-	if (nrid < 0) return false;
-
-	// get the rigid body
-	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
-    FERigidBody& rb = *rigid.Object(nrid);
-
-	a.push_back((float)rb.m_Fr.x);
-    a.push_back((float)rb.m_Fr.y);
-    a.push_back((float)rb.m_Fr.z);
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotRigidReactionTorque::Save(FEDomain& dom, vector<float>& a)
-{
-	// get the material
-	FEMaterial* pmat = dom.GetMaterial();
-	if ((pmat==0) || (pmat->IsRigid() == false)) return false;
-
-	// get the rigid body ID
-	int nrid = pmat->GetRigidBodyID();
-	if (nrid < 0) return false;
-
-	// get the rigid body
-	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
-    FERigidBody& rb = *rigid.Object(nrid);
-
-	a.push_back((float)rb.m_Mr.x);
-    a.push_back((float)rb.m_Mr.y);
-    a.push_back((float)rb.m_Mr.z);
-
 	return true;
 }
 
@@ -152,7 +83,7 @@ bool FEPlotRigidReactionTorque::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 // Plot contact gap
-bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
+bool FEPlotContactGap::Save(FESurface& surf, FEPlotStream& a)
 {
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
@@ -173,7 +104,7 @@ bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 // Plot contact pressure
-bool FEPlotContactPressure::Save(FESurface &surf, vector<float>& a)
+bool FEPlotContactPressure::Save(FESurface &surf, FEPlotStream& a)
 {
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
@@ -194,7 +125,7 @@ bool FEPlotContactPressure::Save(FESurface &surf, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 // Plot contact traction
-bool FEPlotContactTraction::Save(FESurface &surf, std::vector<float> &a)
+bool FEPlotContactTraction::Save(FESurface &surf, FEPlotStream& a)
 {
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
@@ -222,23 +153,20 @@ bool FEPlotContactTraction::Save(FESurface &surf, std::vector<float> &a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotContactForce::Save(FESurface &surf, std::vector<float> &a)
+bool FEPlotContactForce::Save(FESurface &surf, FEPlotStream &a)
 {
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
     
 	vec3d fn = pcs->GetContactForce();
-
-	a.push_back((float) fn.x);
-	a.push_back((float) fn.y);
-	a.push_back((float) fn.z);
+	a << fn;
     
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 // Plot contact area
-bool FEPlotContactArea::Save(FESurface &surf, vector<float>& a)
+bool FEPlotContactArea::Save(FESurface &surf, FEPlotStream& a)
 {
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
@@ -259,7 +187,7 @@ bool FEPlotContactArea::Save(FESurface &surf, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 // Plot contact penalty parameter
-bool FEPlotContactPenalty::Save(FESurface& surf, vector<float>& a)
+bool FEPlotContactPenalty::Save(FESurface& surf, FEPlotStream& a)
 {
 	FEFacetSlidingSurface* ps = dynamic_cast<FEFacetSlidingSurface*>(&surf);
 	if (ps)
@@ -285,7 +213,7 @@ bool FEPlotContactPenalty::Save(FESurface& surf, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotVolumePressure::Save(FESurface& S, vector<float>& a)
+bool FEPlotVolumePressure::Save(FESurface& S, FEPlotStream& a)
 {
 	FEVolumeSurface* pvs = dynamic_cast<FEVolumeSurface*>(&S);
 	if (pvs == 0) return false;
@@ -300,7 +228,7 @@ bool FEPlotVolumePressure::Save(FESurface& S, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotMortarContactGap::Save(FESurface& S, vector<float>& a)
+bool FEPlotMortarContactGap::Save(FESurface& S, FEPlotStream& a)
 {
 	FEMortarSlidingSurface* ps = dynamic_cast<FEMortarSlidingSurface*>(&S);
 	if (ps)
@@ -311,7 +239,7 @@ bool FEPlotMortarContactGap::Save(FESurface& S, vector<float>& a)
 			vec3d vA = ps->m_nu[i];
 			vec3d gA = ps->m_gap[i];
 			double gap = gA*vA;
-			a.push_back((float) gap);
+			a << gap;
 		}
 		return true;
 	}
@@ -319,19 +247,13 @@ bool FEPlotMortarContactGap::Save(FESurface& S, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotMortarContactGapVector::Save(FESurface& S, vector<float>& a)
+bool FEPlotMortarContactGapVector::Save(FESurface& S, FEPlotStream& a)
 {
 	FEMortarSlidingSurface* ps = dynamic_cast<FEMortarSlidingSurface*>(&S);
 	if (ps)
 	{
 		int N = ps->Nodes();
-		for (int i=0; i<N; ++i)
-		{
-			vec3d gA = ps->m_gap[i];
-			a.push_back((float) gA.x);
-			a.push_back((float) gA.y);
-			a.push_back((float) gA.z);
-		}
+		for (int i=0; i<N; ++i) a << ps->m_gap[i];
 		return true;
 	}
 	else return false;
@@ -339,19 +261,13 @@ bool FEPlotMortarContactGapVector::Save(FESurface& S, vector<float>& a)
 
 
 //-----------------------------------------------------------------------------
-bool FEPlotMortarContactNormal::Save(FESurface& S, vector<float>& a)
+bool FEPlotMortarContactNormal::Save(FESurface& S, FEPlotStream& a)
 {
 	FEMortarSlidingSurface* ps = dynamic_cast<FEMortarSlidingSurface*>(&S);
 	if (ps)
 	{
 		int N = ps->Nodes();
-		for (int i=0; i<N; ++i)
-		{
-			vec3d vA = ps->m_nu[i];
-			a.push_back((float) vA.x);
-			a.push_back((float) vA.y);
-			a.push_back((float) vA.z);
-		}
+		for (int i=0; i<N; ++i) a << ps->m_nu[i];
 		return true;
 	}
 	else return false;
@@ -363,7 +279,7 @@ bool FEPlotMortarContactNormal::Save(FESurface& S, vector<float>& a)
 //=============================================================================
 //-----------------------------------------------------------------------------
 //! Store the average deformation Hessian (G) for each element. 
-bool FEPlotElementGnorm::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementGnorm::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -405,7 +321,7 @@ bool FEPlotElementGnorm::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the average stresses for each element. 
-bool FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementStress::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -416,7 +332,7 @@ bool FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
 	{
 		FEElement& el = dom.ElementRef(i);
 
-		float s[6] = {0};
+		mat3ds s(0.0);
 		int nint = el.GaussPoints();
 		double f = 1.0 / (double) nint;
 
@@ -429,13 +345,11 @@ bool FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
 			if (ppt)
 			{
 				FEElasticMaterialPoint& pt = *ppt;
-				s[0] += (float) (f*pt.m_s.xx());
-				s[1] += (float) (f*pt.m_s.yy());
-				s[2] += (float) (f*pt.m_s.zz());
-				s[3] += (float) (f*pt.m_s.xy());
-				s[4] += (float) (f*pt.m_s.yz());
-				s[5] += (float) (f*pt.m_s.xz());
+				s += pt.m_s;
 
+				//------>
+				// TODO: Delete all this stuff. I don't know what it does, but whatever it is, there has
+				//       to be a better way.
 				pt.m_F_prev = pt.m_F;
 
 				FEMicroMaterialPoint* mmppt = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint>());
@@ -448,15 +362,12 @@ bool FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
 					mmpt.m_micro_energy += mmpt.m_micro_energy_inc;
 					mmpt.m_energy_diff = fabs(mmpt.m_macro_energy - mmpt.m_micro_energy); 
 				}
+				//------>
 			}
 		}
+		s *= f;
 
-		a.push_back(s[0]);
-		a.push_back(s[1]);
-		a.push_back(s[2]);
-		a.push_back(s[3]);
-		a.push_back(s[4]);
-		a.push_back(s[5]);
+		a << s;
 	}
 
 	return true;
@@ -464,7 +375,7 @@ bool FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the norm of the average Cauchy stress for each element. 
-bool FEPlotElementsnorm::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementsnorm::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -504,7 +415,7 @@ bool FEPlotElementsnorm::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the norm of the average Cauchy stress moment for each element. 
-bool FEPlotElementtaunorm::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementtaunorm::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -556,7 +467,7 @@ bool FEPlotElementtaunorm::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the norm of the average PK1 stress for each element.
-bool FEPlotElementPK1norm::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementPK1norm::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -606,7 +517,7 @@ bool FEPlotElementPK1norm::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the norm of the average PK1 stress moment for each element. 
-bool FEPlotElementQK1norm::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementQK1norm::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -648,7 +559,7 @@ bool FEPlotElementQK1norm::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the norm of the average PK2 stress for each element.
-bool FEPlotElementSnorm::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementSnorm::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -698,7 +609,7 @@ bool FEPlotElementSnorm::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the norm of the average PK2 stress moment for each element. 
-bool FEPlotElementTnorm::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementTnorm::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -740,7 +651,7 @@ bool FEPlotElementTnorm::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the average infinitesimal strain gradient for each element. 
-bool FEPlotElementinfstrnorm::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementinfstrnorm::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -782,7 +693,7 @@ bool FEPlotElementinfstrnorm::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the average Green-Lagrange strain gradient for each element. 
-bool FEPlotElementGLstrnorm::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementGLstrnorm::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -824,7 +735,7 @@ bool FEPlotElementGLstrnorm::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the average Euler-Almansi strain gradient for each element. 
-bool FEPlotElementEAstrnorm::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementEAstrnorm::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -866,7 +777,7 @@ bool FEPlotElementEAstrnorm::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Element macro-micro energy difference
-bool FEPlotElementenergydiff::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementenergydiff::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -912,7 +823,7 @@ bool FEPlotElementenergydiff::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Element macro energy
-bool FEPlotElementMacroEnergy::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementMacroEnergy::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -958,7 +869,7 @@ bool FEPlotElementMacroEnergy::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Element macro energy
-bool FEPlotElementMicroEnergy::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementMicroEnergy::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -1004,12 +915,10 @@ bool FEPlotElementMicroEnergy::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the average elasticity for each element.
-bool FEPlotElementElasticity::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementElasticity::Save(FEDomain& dom, FEPlotStream& a)
 {
     FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
     if ((pme == 0) || pme->IsRigid()) return false;
-    
-    tens4ds c;
     
 	// write solid element data
 	int N = dom.Elements();
@@ -1017,29 +926,27 @@ bool FEPlotElementElasticity::Save(FEDomain& dom, vector<float>& a)
 	{
 		FEElement& el = dom.ElementRef(i);
         
-		float s[21] = {0};
+		tens4ds s(0.0);
 		int nint = el.GaussPoints();
 		double f = 1.0 / (double) nint;
         
-		// since the PLOT file requires floats we need to convert
-		// the doubles to single precision
-		// we output the average stress values of the gauss points
+		// we output the average tangent values of the gauss points
 		for (int j=0; j<nint; ++j)
 		{
 			FEMaterialPoint& pt = *el.GetMaterialPoint(j);
-            c = pme->Tangent(pt);
-            
-            for (int k=0; k<21; ++k) s[k] += (float) (f*c.d[k]);
+            tens4ds c = pme->Tangent(pt);
+            s  += c;
 		}
+		s *= f;
         
-        for (int k=0; k<21; ++k) a.push_back(s[k]);
+		a << s;
 	}
     
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, FEPlotStream& a)
 {
     FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
     if ((pme == 0) || pme->IsRigid()) return false;
@@ -1069,7 +976,7 @@ bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotDevStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotDevStrainEnergyDensity::Save(FEDomain &dom, FEPlotStream& a)
 {
     FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
     FEUncoupledMaterial* pmu = dynamic_cast<FEUncoupledMaterial*>(pme);
@@ -1100,7 +1007,7 @@ bool FEPlotDevStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, FEPlotStream& a)
 {
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
@@ -1128,7 +1035,7 @@ bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotDensity::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotDensity::Save(FEDomain &dom, FEPlotStream& a)
 {
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
@@ -1157,7 +1064,7 @@ bool FEPlotDensity::Save(FEDomain &dom, vector<float>& a)
 
 
 //-----------------------------------------------------------------------------
-bool FEPlotRelativeVolume::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotRelativeVolume::Save(FEDomain &dom, FEPlotStream& a)
 {
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
@@ -1186,7 +1093,7 @@ bool FEPlotRelativeVolume::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotFiberVector::Save(FEDomain &dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if (pme == 0) return false;
@@ -1213,14 +1120,7 @@ bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 //			r /= (double) n;
 			r.unit();
 
-			float f[3];
-			f[0] = (float) r.x;
-			f[1] = (float) r.y;
-			f[2] = (float) r.z;
-
-			a.push_back(f[0]);
-			a.push_back(f[1]);
-			a.push_back(f[2]);
+			a << r;
 		}
 		return true;
 	}
@@ -1228,7 +1128,7 @@ bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFiberStretch::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotFiberStretch::Save(FEDomain &dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if (pme == 0) return false;
@@ -1263,7 +1163,7 @@ bool FEPlotFiberStretch::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotDevFiberStretch::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotDevFiberStretch::Save(FEDomain &dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if (pme == 0) return false;
@@ -1309,7 +1209,7 @@ bool FEPlotDevFiberStretch::Save(FEDomain &dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store shell thicknesses
-bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
+bool FEPlotShellThickness::Save(FEDomain &dom, FEPlotStream &a)
 {
 	if (dom.Class() == FE_DOMAIN_SHELL)
 	{
@@ -1332,7 +1232,7 @@ bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotDamage::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotDamage::Save(FEDomain &dom, FEPlotStream& a)
 {
 	int N = dom.Elements();
 	FEElasticMaterial* pmat = dom.GetMaterial()->GetElasticMaterial();
@@ -1413,7 +1313,7 @@ bool FEPlotDamage::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotMixtureVolumeFraction::Save(FEDomain &m, std::vector<float> &a)
+bool FEPlotMixtureVolumeFraction::Save(FEDomain &m, FEPlotStream &a)
 {
 	// extract the mixture material
 	FEMaterial* pmat = m.GetMaterial();
@@ -1441,7 +1341,7 @@ bool FEPlotMixtureVolumeFraction::Save(FEDomain &m, std::vector<float> &a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotUT4NodalStresses::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotUT4NodalStresses::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEUT4Domain* pd = dynamic_cast<FEUT4Domain*>(&dom);
 	if (pd == 0) return false;
@@ -1450,20 +1350,14 @@ bool FEPlotUT4NodalStresses::Save(FEDomain& dom, vector<float>& a)
 	for (int i=0; i<N; ++i)
 	{
 		FEUT4Domain::UT4NODE& n = pd->UT4Node(i);
-		mat3ds& s = n.si;
-		a.push_back((float) s.xx());
-		a.push_back((float) s.yy());
-		a.push_back((float) s.zz());
-		a.push_back((float) s.xy());
-		a.push_back((float) s.yz());
-		a.push_back((float) s.xz());
+		a << n.si;
 	}
 	return true;
 }
 
 
 //-----------------------------------------------------------------------------
-bool FEPlotShellStrain::Save(FEDomain &dom, std::vector<float> &a)
+bool FEPlotShellStrain::Save(FEDomain &dom, FEPlotStream &a)
 {
 	if (dom.Class() != FE_DOMAIN_SHELL) return false;
 
@@ -1486,18 +1380,13 @@ bool FEPlotShellStrain::Save(FEDomain &dom, std::vector<float> &a)
 		}
 		E /= (3.0*ni);
 
-		a.push_back((float) E.xx());
-		a.push_back((float) E.yy());
-		a.push_back((float) E.zz());
-		a.push_back((float) E.xy());
-		a.push_back((float) E.yz());
-		a.push_back((float) E.xz());
+		a << E;
 	}
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSPRStresses::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotSPRStresses::Save(FEDomain& dom, FEPlotStream& a)
 {
 	const int LUT[6][2] = {{0,0},{1,1},{2,2},{0,1},{1,2},{0,2}};
 
@@ -1558,7 +1447,7 @@ bool FEPlotSPRStresses::Save(FEDomain& dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSPRLinearStresses::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotSPRLinearStresses::Save(FEDomain& dom, FEPlotStream& a)
 {
 	const int LUT[6][2] = {{0,0},{1,1},{2,2},{0,1},{1,2},{0,2}};
 
@@ -1620,7 +1509,7 @@ bool FEPlotSPRLinearStresses::Save(FEDomain& dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSPRPrincStresses::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotSPRPrincStresses::Save(FEDomain& dom, FEPlotStream& a)
 {
 	// For now, this is only available for solid domains
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
@@ -1678,7 +1567,7 @@ bool FEPlotSPRPrincStresses::Save(FEDomain& dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSPRTestLinear::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotSPRTestLinear::Save(FEDomain& dom, FEPlotStream& a)
 {
 	// For now, this is only available for solid domains
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
@@ -1735,7 +1624,7 @@ bool FEPlotSPRTestLinear::Save(FEDomain& dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSPRTestQuadratic::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotSPRTestQuadratic::Save(FEDomain& dom, FEPlotStream& a)
 {
 	// For now, this is only available for solid domains
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
@@ -1795,7 +1684,26 @@ bool FEPlotSPRTestQuadratic::Save(FEDomain& dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotRigidDisplacement::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotRigidDisplacement::Save(FEDomain& dom, FEPlotStream& a)
+{
+	// get the rigid material
+	FEMaterial* pm = dom.GetMaterial();
+	if (pm->IsRigid() == false) return false;
+	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
+    
+	// get the rigid body
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+
+	// store the rigid body position
+	// TODO: why do we not store displacement?
+	a << rb.m_rt;
+    
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotRigidVelocity::Save(FEDomain& dom, FEPlotStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
@@ -1806,20 +1714,14 @@ bool FEPlotRigidDisplacement::Save(FEDomain& dom, vector<float>& a)
 	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
 	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
     
-	// copy results to archive
-	int NN = dom.Nodes();
-	for (int i=0; i<NN; ++i)
-	{
-		a.push_back((float) rb.m_rt.x);
-		a.push_back((float) rb.m_rt.y);
-		a.push_back((float) rb.m_rt.z);
-	}
+	// store the rigid velocity
+	a << rb.m_vt;
     
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotRigidVelocity::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotRigidAcceleration::Save(FEDomain& dom, FEPlotStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
@@ -1830,44 +1732,14 @@ bool FEPlotRigidVelocity::Save(FEDomain& dom, vector<float>& a)
 	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
 	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
     
-	// copy results to archive
-	int NN = dom.Nodes();
-	for (int i=0; i<NN; ++i)
-	{
-		a.push_back((float) rb.m_vt.x);
-		a.push_back((float) rb.m_vt.y);
-		a.push_back((float) rb.m_vt.z);
-	}
+	// store rigid body acceleration
+	a << rb.m_at;
     
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotRigidAcceleration::Save(FEDomain& dom, vector<float>& a)
-{
-	// get the rigid material
-	FEMaterial* pm = dom.GetMaterial();
-	if (pm->IsRigid() == false) return false;
-	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
-    
-	// get the rigid body
-	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
-	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
-    
-	// copy results to archive
-	int NN = dom.Nodes();
-	for (int i=0; i<NN; ++i)
-	{
-		a.push_back((float) rb.m_at.x);
-		a.push_back((float) rb.m_at.y);
-		a.push_back((float) rb.m_at.z);
-	}
-    
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotRigidRotation::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotRigidRotation::Save(FEDomain& dom, FEPlotStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
@@ -1879,20 +1751,14 @@ bool FEPlotRigidRotation::Save(FEDomain& dom, vector<float>& a)
 	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
     vec3d q = rb.m_qt.GetVector()*rb.m_qt.GetAngle();
     
-	// copy results to archive
-	int NN = dom.Nodes();
-	for (int i=0; i<NN; ++i)
-	{
-		a.push_back((float) q.x);
-		a.push_back((float) q.y);
-		a.push_back((float) q.z);
-	}
+	// store rotation vector
+	a << q;
     
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotRigidAngularVelocity::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotRigidAngularVelocity::Save(FEDomain& dom, FEPlotStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
@@ -1903,20 +1769,14 @@ bool FEPlotRigidAngularVelocity::Save(FEDomain& dom, vector<float>& a)
 	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
 	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
     
-	// copy results to archive
-	int NN = dom.Nodes();
-	for (int i=0; i<NN; ++i)
-	{
-		a.push_back((float) rb.m_wt.x);
-		a.push_back((float) rb.m_wt.y);
-		a.push_back((float) rb.m_wt.z);
-	}
+	// store rigid angular velocity
+	a << rb.m_wt;
     
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotRigidAngularAcceleration::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotRigidAngularAcceleration::Save(FEDomain& dom, FEPlotStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
@@ -1927,20 +1787,14 @@ bool FEPlotRigidAngularAcceleration::Save(FEDomain& dom, vector<float>& a)
 	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
 	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
     
-	// copy results to archive
-	int NN = dom.Nodes();
-	for (int i=0; i<NN; ++i)
-	{
-		a.push_back((float) rb.m_alt.x);
-		a.push_back((float) rb.m_alt.y);
-		a.push_back((float) rb.m_alt.z);
-	}
+	// store angular acceleration
+	a << rb.m_alt;
     
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotRigidKineticEnergy::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotRigidKineticEnergy::Save(FEDomain& dom, FEPlotStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
@@ -1957,15 +1811,14 @@ bool FEPlotRigidKineticEnergy::Save(FEDomain& dom, vector<float>& a)
     mat3ds Jt = (Rt*rb.m_moi*Rt.transpose()).sym();
     double ke = ((v*v)*m + w*(Jt*w))/2;
     
-	// copy results to archive
-	int NN = dom.Nodes();
-	for (int i=0; i<NN; ++i) a.push_back((float) ke);
+	// store kinetic energy
+	a << ke;
     
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotRigidEuler::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotRigidEuler::Save(FEDomain& dom, FEPlotStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
@@ -1980,7 +1833,8 @@ bool FEPlotRigidEuler::Save(FEDomain& dom, vector<float>& a)
 	double E[3];
 	quat2euler(rb.m_qt, E);
     
-	// copy results to archive
+	// store Euler
+	a << E[0];
 	int NN = dom.Nodes();
 	for (int i=0; i<NN; ++i)
 	{
@@ -1993,7 +1847,8 @@ bool FEPlotRigidEuler::Save(FEDomain& dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotRigidRotationVector::Save(FEDomain& dom, vector<float>& a)
+// TODO: I think this already gets stored somewhere
+bool FEPlotRigidRotationVector::Save(FEDomain& dom, FEPlotStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
@@ -2008,20 +1863,14 @@ bool FEPlotRigidRotationVector::Save(FEDomain& dom, vector<float>& a)
 	double w = rb.m_qt.GetAngle();
 	vec3d r = rb.m_qt.GetVector()*w;
     
-	// copy results to archive
-	int NN = dom.Nodes();
-	for (int i=0; i<NN; ++i)
-	{
-		a.push_back((float) r.x);
-		a.push_back((float) r.y);
-		a.push_back((float) r.z);
-	}
+	// store rotation vector
+	a << r;
     
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotNodalStresses::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotNodalStresses::Save(FEDomain& dom, FEPlotStream& a)
 {
 	// make sure this is a solid-domain class
 	FESolidDomain* pd = dynamic_cast<FESolidDomain*>(&dom);
@@ -2079,7 +1928,7 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, vector<float>& a)
 
 //-----------------------------------------------------------------------------
 //! Store the average Euler-lagrange strain
-bool FEPlotLagrangeStrain::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotLagrangeStrain::Save(FEDomain& dom, FEPlotStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
@@ -2090,7 +1939,6 @@ bool FEPlotLagrangeStrain::Save(FEDomain& dom, vector<float>& a)
 	{
 		FEElement& el = dom.ElementRef(i);
 
-		float s[6] = { 0 };
 		int nint = el.GaussPoints();
 		double f = 1.0 / (double)nint;
 		mat3dd I(1.0); // identity tensor
@@ -2098,6 +1946,7 @@ bool FEPlotLagrangeStrain::Save(FEDomain& dom, vector<float>& a)
 		// since the PLOT file requires floats we need to convert
 		// the doubles to single precision
 		// we output the average stress values of the gauss points
+		mat3ds s(0.0);
 		for (int j = 0; j<nint; ++j)
 		{
 			FEElasticMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
@@ -2105,22 +1954,54 @@ bool FEPlotLagrangeStrain::Save(FEDomain& dom, vector<float>& a)
 			{
 				mat3d C = ppt->RightCauchyGreen();
 				mat3ds E = ((C - I)*0.5).sym();
-				s[0] += (float)(f*E.xx());
-				s[1] += (float)(f*E.yy());
-				s[2] += (float)(f*E.zz());
-				s[3] += (float)(f*E.xy());
-				s[4] += (float)(f*E.yz());
-				s[5] += (float)(f*E.xz());
+				s += E;
 			}
 		}
+		s *= f;
 
-		a.push_back(s[0]);
-		a.push_back(s[1]);
-		a.push_back(s[2]);
-		a.push_back(s[3]);
-		a.push_back(s[4]);
-		a.push_back(s[5]);
+		// write average strain
+		a << s;
 	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotRigidReactionForce::Save(FEDomain& dom, FEPlotStream& a)
+{
+	// get the material
+	FEMaterial* pmat = dom.GetMaterial();
+	if ((pmat==0) || (pmat->IsRigid() == false)) return false;
+
+	// get the rigid body ID
+	int nrid = pmat->GetRigidBodyID();
+	if (nrid < 0) return false;
+
+	// get the rigid body
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+    FERigidBody& rb = *rigid.Object(nrid);
+
+	a << rb.m_Fr;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotRigidReactionTorque::Save(FEDomain& dom, FEPlotStream& a)
+{
+	// get the material
+	FEMaterial* pmat = dom.GetMaterial();
+	if ((pmat==0) || (pmat->IsRigid() == false)) return false;
+
+	// get the rigid body ID
+	int nrid = pmat->GetRigidBodyID();
+	if (nrid < 0) return false;
+
+	// get the rigid body
+	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+    FERigidBody& rb = *rigid.Object(nrid);
+
+	a << rb.m_Mr;
 
 	return true;
 }
