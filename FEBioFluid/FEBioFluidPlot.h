@@ -30,7 +30,7 @@ private:
     vector<vec3d>   m_area;
     
 public:
-    FEPlotFluidSurfaceForce(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){ m_pfem = pfem; m_binit = true; }
+    FEPlotFluidSurfaceForce(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_REGION){ m_pfem = pfem; m_binit = true; }
     bool Save(FESurface& surf, vector<float>& a);
 };
 

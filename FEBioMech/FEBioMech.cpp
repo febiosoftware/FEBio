@@ -255,6 +255,7 @@ REGISTER_FECORE_CLASS(FEFiberPowerLinear             ,FEMATERIAL_ID, "fiber-powe
 REGISTER_FECORE_CLASS(FESphericalFiberDensityDistribution  , FEMATERIAL_ID, "spherical"   );
 REGISTER_FECORE_CLASS(FEEllipsodialFiberDensityDistribution, FEMATERIAL_ID, "ellipsoidal" );
 REGISTER_FECORE_CLASS(FEVonMises3DFiberDensityDistribution , FEMATERIAL_ID, "von-Mises-3d");
+REGISTER_FECORE_CLASS(FEVonMises3DTwoFDDAxisymmetric       , FEMATERIAL_ID, "von-Mises-3d-two-axisym");
 REGISTER_FECORE_CLASS(FECircularFiberDensityDistribution   , FEMATERIAL_ID, "circular"    );
 REGISTER_FECORE_CLASS(FEEllipticalFiberDensityDistribution , FEMATERIAL_ID, "elliptical"  );
 REGISTER_FECORE_CLASS(FEVonMises2DFiberDensityDistribution , FEMATERIAL_ID, "von-Mises-2d");

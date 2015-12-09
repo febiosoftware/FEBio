@@ -45,7 +45,8 @@ END_PARAMETER_LIST();
 FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
 {
     // default values
-    m_Rtol = 0;	// deactivate residual convergence
+    m_Rtol = 0.001;
+    m_Etol = 0.01;
     m_Vtol = 0.001;
     m_Rmin = 1.0e-20;
     

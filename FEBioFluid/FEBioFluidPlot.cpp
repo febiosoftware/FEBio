@@ -36,8 +36,6 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, std::vector<float> &a)
     if (strcmp(pcs->GetName(), m_szdom) != 0) return false;
     
     int NF = pcs->Elements();
-    const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
-    a.assign(3*MFN*NF, 0.f);
     vec3d fn(0,0,0);    // initialize
     
     FEMesh* m_pMesh = pcs->GetMesh();
@@ -88,19 +86,9 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, std::vector<float> &a)
     }
     
     // save results
-    for (int j=0; j<NF; ++j)
-    {
-        FESurfaceElement& el = pcs->Element(j);
-        
-        // store in archive
-        int ne = el.Nodes();
-        for (int k=0; k<ne; ++k)
-        {
-            a[3*MFN*j +3*k   ] = (float) fn.x;
-            a[3*MFN*j +3*k +1] = (float) fn.y;
-            a[3*MFN*j +3*k +2] = (float) fn.z;
-        }
-    }
+    a.push_back((float) fn.x);
+    a.push_back((float) fn.y);
+    a.push_back((float) fn.z);
     
     return true;
 }
