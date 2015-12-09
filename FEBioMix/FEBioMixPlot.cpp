@@ -1007,7 +1007,7 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEPlotStream& a)
 		int N = dom.Nodes();
 		for (int i=0; i<N; ++i)
 		{
-			FENode& node = pd->Node(i);
+			FENode& node = dom.Node(i);
 			a << node.m_pt;
 		}
 		return true;
