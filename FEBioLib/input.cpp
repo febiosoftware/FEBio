@@ -272,6 +272,7 @@ void echo_input(FEBioModel& fem)
 					case FMT_NODE: szf = "NODE"; break;
 					case FMT_ITEM: szf = "ITEM"; break;
 					case FMT_MULT: szf = "COMP"; break;
+					case FMT_REGION: szf = "REGION"; break;
 					}
 
 					felog.printf("\t\t\t%-20s (type = %5s, format = %4s)\n", it->m_szname, szt, szf);
