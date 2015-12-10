@@ -287,8 +287,21 @@ FEParam* FEMaterial::GetParameter(const ParamString& s)
 	int NP = (int) m_Prop.size();
 	for (int i=0; i<NP; ++i)
 	{
+		// get the property
 		FEProperty* mp = m_Prop[i];
-		if (s == mp->GetName()) return mp->GetParameter(s.next());
+
+		// get the number of items in this property
+		int nsize = mp->size();
+
+		// If there is only one, we first compare the property title
+		if ((nsize == 1) && (s == mp->GetName())) return mp->GetParameter(s.next());
+
+		// for vector properties we try to match the "name" attribute
+		for (int j=0; j<nsize; ++j)
+		{
+			FEMaterial* pm = dynamic_cast<FEMaterial*>(mp->get(j));
+			if (pm && (s == pm->GetName())) return pm->GetParameter(s.next());
+		}
 	}
 
 	return 0;
