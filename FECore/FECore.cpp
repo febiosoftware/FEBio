@@ -3,6 +3,7 @@
 #include "FECoordSysMap.h"
 #include "FECoreKernel.h"
 #include "BC.h"
+#include "FEInitialCondition.h"
 #include "FECorePlot.h"
 
 #define FECORE_VERSION		0
@@ -37,6 +38,12 @@ REGISTER_FECORE_CLASS(FEPolarMap         , FECOORDSYSMAP_ID, "polar"      );
 REGISTER_FECORE_CLASS(FEFixedBC     , FEBC_ID, "fix"      );
 REGISTER_FECORE_CLASS(FEPrescribedBC, FEBC_ID, "prescribe");
 REGISTER_FECORE_CLASS(FENodalLoad   , FEBC_ID, "nodal load");
+
+REGISTER_FECORE_CLASS(FEInitialVelocity     , FEIC_ID, "velocity"      );
+REGISTER_FECORE_CLASS(FEInitialPressure     , FEIC_ID, "fluid_pressure");
+REGISTER_FECORE_CLASS(FEInitialConcentration, FEIC_ID, "concentration" );
+REGISTER_FECORE_CLASS(FEInitialTemperature  , FEIC_ID, "temperature"   );
+REGISTER_FECORE_CLASS(FEInitialDilatation   , FEIC_ID, "dilatation"    );
 
 REGISTER_FECORE_CLASS(FEPlotMaterialParameter, FEPLOTDATA_ID, "parameter");
 }

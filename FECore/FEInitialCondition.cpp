@@ -10,16 +10,22 @@ FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEModelComponent(FEIC_ID
 //-----------------------------------------------------------------------------
 void FEInitialVelocity::Serialize(DumpFile& ar)
 {
+	FEInitialCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		for (size_t i=0; i<m_item.size(); ++i)
+		int nsize = m_item.size();
+		ar << nsize;
+		for (size_t i=0; i<nsize; ++i)
 		{
 			ar << m_item[i].nid << m_item[i].v0;
 		}
 	}
 	else
 	{
-		for (size_t i=0; i<m_item.size(); ++i)
+		int nsize = 0;
+		ar >> nsize;
+		m_item.resize(nsize);
+		for (size_t i=0; i<nsize; ++i)
 		{
 			ar >> m_item[i].nid >> m_item[i].v0;
 		}
@@ -41,16 +47,22 @@ void FEInitialVelocity::Activate()
 //-----------------------------------------------------------------------------
 void FEInitialPressure::Serialize(DumpFile& ar)
 {
+	FEInitialCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		for (size_t i=0; i<m_item.size(); ++i)
+		int nsize = m_item.size();
+		ar << nsize;
+		for (size_t i=0; i<nsize; ++i)
 		{
 			ar << m_item[i].nid << m_item[i].p0;
 		}
 	}
 	else
 	{
-		for (size_t i=0; i<m_item.size(); ++i)
+		int nsize = 0;
+		ar >> nsize;
+		m_item.resize(nsize);
+		for (size_t i=0; i<nsize; ++i)
 		{
 			ar >> m_item[i].nid >> m_item[i].p0;
 		}
@@ -72,16 +84,22 @@ void FEInitialPressure::Activate()
 //-----------------------------------------------------------------------------
 void FEInitialTemperature::Serialize(DumpFile& ar)
 {
+	FEInitialCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		for (size_t i=0; i<m_item.size(); ++i)
+		int nsize = m_item.size();
+		ar << nsize;
+		for (size_t i=0; i<nsize; ++i)
 		{
 			ar << m_item[i].nid << m_item[i].T0;
 		}
 	}
 	else
 	{
-		for (size_t i=0; i<m_item.size(); ++i)
+		int nsize = 0;
+		ar >> nsize;
+		m_item.resize(nsize);
+		for (size_t i=0; i<nsize; ++i)
 		{
 			ar >> m_item[i].nid >> m_item[i].T0;
 		}
@@ -103,18 +121,24 @@ void FEInitialTemperature::Activate()
 //-----------------------------------------------------------------------------
 void FEInitialConcentration::Serialize(DumpFile& ar)
 {
+	FEInitialCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
+		int nsize = m_item.size();
 		ar << m_nsol;
-		for (size_t i=0; i<m_item.size(); ++i)
+		ar << nsize;
+		for (size_t i=0; i<nsize; ++i)
 		{
 			ar << m_item[i].nid << m_item[i].c0;
 		}
 	}
 	else
 	{
+		int nsize = 0;
 		ar >> m_nsol;
-		for (size_t i=0; i<m_item.size(); ++i)
+		ar >> nsize;
+		m_item.resize(nsize);
+		for (size_t i=0; i<nsize; ++i)
 		{
 			ar >> m_item[i].nid >> m_item[i].c0;
 		}
@@ -136,16 +160,22 @@ void FEInitialConcentration::Activate()
 //-----------------------------------------------------------------------------
 void FEInitialDilatation::Serialize(DumpFile& ar)
 {
+	FEInitialCondition::Serialize(ar);
     if (ar.IsSaving())
     {
-        for (size_t i=0; i<m_item.size(); ++i)
+		int nsize = m_item.size();
+		ar << nsize;
+        for (size_t i=0; i<nsize; ++i)
         {
             ar << m_item[i].nid << m_item[i].e0;
         }
     }
     else
     {
-        for (size_t i=0; i<m_item.size(); ++i)
+		int nsize = 0;
+		ar >> nsize;
+		m_item.resize(nsize);
+        for (size_t i=0; i<nsize; ++i)
         {
             ar >> m_item[i].nid >> m_item[i].e0;
         }

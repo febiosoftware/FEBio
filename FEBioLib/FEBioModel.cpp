@@ -850,6 +850,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		for (int i=0; i<(int) m_IC.size(); ++i) 
 		{
 			FEInitialCondition& ic = *m_IC[i];
+			ar << ic.GetTypeStr();
 			ic.Serialize(ar);
 		}
 
@@ -938,6 +939,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 	else
 	{
 		int n;
+		char sz[256] = {0};
 
 		// fixed bc's
 		// NOTE: I think this may create a memory leak if m_BC is not empty
@@ -967,7 +969,9 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		m_IC.clear();
 		for (int i=0; i<n; ++i) 
 		{
-			FEInitialCondition* pic = new FEInitialCondition(this);
+			ar >> sz;
+			FEInitialCondition* pic = fecore_new<FEInitialCondition>(FEIC_ID, sz, this);
+			assert(pic);
 			pic->Serialize(ar);
 			if (pic->IsActive()) pic->Activate(); else pic->Deactivate();
 			m_IC.push_back(pic);

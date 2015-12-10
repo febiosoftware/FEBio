@@ -26,7 +26,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 	{
 		if (tag == "velocity")
 		{
-			FEInitialVelocity* pic = new FEInitialVelocity(&fem);
+			FEInitialVelocity* pic = dynamic_cast<FEInitialVelocity*>(fecore_new<FEInitialCondition>(FEIC_ID, "velocity", &fem));
 			fem.AddInitialCondition(pic);
 
 			// add this boundary condition to the current step
@@ -54,7 +54,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 		}
 		else if (tag == "fluid_pressure")
 		{
-			FEInitialPressure* pic = new FEInitialPressure(&fem);
+			FEInitialPressure* pic = dynamic_cast<FEInitialPressure*>(fecore_new<FEInitialCondition>(FEIC_ID, "fluid_pressure", &fem));
 			fem.AddInitialCondition(pic);
 
 			// add this boundary condition to the current step
@@ -81,7 +81,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 		}
 		else if (tag == "concentration")
 		{
-			FEInitialConcentration* pic = new FEInitialConcentration(&fem);
+			FEInitialConcentration* pic = dynamic_cast<FEInitialConcentration*>(fecore_new<FEInitialCondition>(FEIC_ID, "concentration", &fem));
 			fem.AddInitialCondition(pic);
 
 			// add this boundary condition to the current step
@@ -116,7 +116,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 		}
 		else if (tag == "temperature")
 		{
-			FEInitialTemperature* pic = new FEInitialTemperature(&fem);
+			FEInitialTemperature* pic = dynamic_cast<FEInitialTemperature*>(fecore_new<FEInitialCondition>(FEIC_ID, "temperature", &fem));
 			fem.AddInitialCondition(pic);
 
 			// add this boundary condition to the current step
