@@ -88,14 +88,13 @@ bool FEExplicitSolidSolver::Init()
 			// and set a pointer in domain_mass to the new element array
 			domain_mass[nd] = elmasses;
 
+			FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(pbd->GetMaterial());
+			double d = pme->Density();
+
 			for (iel=0; iel<pbd->Elements(); ++iel)
 			{
 				FESolidElement& el = pbd->Element(iel);
 				pbd->UnpackLM(el, lm);
-
-				FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
-
-				double d = pme->Density();
 
 				nint = el.GaussPoints();
 				neln = el.Nodes();

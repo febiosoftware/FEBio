@@ -176,7 +176,7 @@ bool FEBioMaterialSection::ParseMatAxisTag(XMLTag &tag, FEMaterial *pm)
 	XMLAtt& type = tag.Attribute("type");
 	if (type == "local")
 	{
-		FELocalMap* pmap = new FELocalMap(&fem);
+		FELocalMap* pmap = dynamic_cast<FELocalMap*>(fecore_new<FECoordSysMap>(FECOORDSYSMAP_ID, "local", &fem));
 		pm->SetCoordinateSystemMap(pmap);
 
 		int n[3] = {0};
@@ -187,7 +187,7 @@ bool FEBioMaterialSection::ParseMatAxisTag(XMLTag &tag, FEMaterial *pm)
 	}
 	else if (type == "vector")
 	{
-		FEVectorMap* pmap = new FEVectorMap(&fem);
+		FEVectorMap* pmap = dynamic_cast<FEVectorMap*>(fecore_new<FECoordSysMap>(FECOORDSYSMAP_ID, "vector", &fem));
 		pm->SetCoordinateSystemMap(pmap);
 
 		vec3d a(1,0,0), d(0,1,0);
@@ -205,7 +205,7 @@ bool FEBioMaterialSection::ParseMatAxisTag(XMLTag &tag, FEMaterial *pm)
 	}
 	else if (type == "angles")
 	{
-		FESphericalAngleMap* pmap = new FESphericalAngleMap(&fem);
+		FESphericalAngleMap* pmap = dynamic_cast<FESphericalAngleMap*>(fecore_new<FECoordSysMap>(FECOORDSYSMAP_ID, "angles", &fem));
 		pm->SetCoordinateSystemMap(pmap);
 
 		double theta = 0.0, phi = 90.0;
@@ -246,7 +246,8 @@ bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
 	}
 	else if (type == "local")
 	{
-		FELocalMap* pmap = new FELocalMap(&fem);
+		FELocalMap* pmap = dynamic_cast<FELocalMap*>(fecore_new<FECoordSysMap>(FECOORDSYSMAP_ID, "local", &fem));
+		assert(pmap);
 		pm->SetCoordinateSystemMap(pmap);
 
 		int n[3] = {0};
@@ -257,7 +258,7 @@ bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
 	}
 	else if (type == "vector")
 	{
-		FEVectorMap* pmap = new FEVectorMap(&fem);
+		FEVectorMap* pmap = dynamic_cast<FEVectorMap*>(fecore_new<FECoordSysMap>(FECOORDSYSMAP_ID, "vector", &fem));
 		pm->SetCoordinateSystemMap(pmap);
 
 		vec3d a;
@@ -266,7 +267,7 @@ bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
 	}
 	else if (type == "angles")
 	{
-		FESphericalAngleMap* pmap = new FESphericalAngleMap(&fem);
+		FESphericalAngleMap* pmap = dynamic_cast<FESphericalAngleMap*>(fecore_new<FECoordSysMap>(FECOORDSYSMAP_ID, "angles", &fem));
 		pm->SetCoordinateSystemMap(pmap);
 
 		double theta = 0.0, phi = 90.0;

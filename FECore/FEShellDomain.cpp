@@ -348,6 +348,8 @@ void FEShellDomain::Serialize(DumpFile &ar)
 		ar >> m_Node;
 
 		FEModel& fem = *ar.GetFEModel();
+		FEMaterial* pmat = GetMaterial();
+		assert(pmat);
 
 		for (size_t i=0; i<m_Elem.size(); ++i)
 		{
@@ -364,7 +366,7 @@ void FEShellDomain::Serialize(DumpFile &ar)
 
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
-				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
+				el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
 				el.GetMaterialPoint(j)->Serialize(ar);
 			}
 		}

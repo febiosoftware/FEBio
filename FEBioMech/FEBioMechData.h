@@ -383,171 +383,21 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemElasticityXXXX : public FELogElemData
+// Base class for elasticity tensor output
+class FELogElemElasticity_ : public FELogElemData
 {
-public:
-	FELogElemElasticityXXXX(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
+protected:
+	FELogElemElasticity_(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el, int n);
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemElasticityXXYY : public FELogElemData
+// template class for generating the different tensor components
+template <int n> class FELogElemElasticity : public FELogElemElasticity_
 {
 public:
-	FELogElemElasticityXXYY(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityYYYY : public FELogElemData
-{
-public:
-	FELogElemElasticityYYYY(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityXXZZ : public FELogElemData
-{
-public:
-	FELogElemElasticityXXZZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityYYZZ : public FELogElemData
-{
-public:
-	FELogElemElasticityYYZZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityZZZZ : public FELogElemData
-{
-public:
-	FELogElemElasticityZZZZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityXXXY : public FELogElemData
-{
-public:
-	FELogElemElasticityXXXY(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityYYXY : public FELogElemData
-{
-public:
-	FELogElemElasticityYYXY(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityZZXY : public FELogElemData
-{
-public:
-	FELogElemElasticityZZXY(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityXYXY : public FELogElemData
-{
-public:
-	FELogElemElasticityXYXY(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityXXYZ : public FELogElemData
-{
-public:
-	FELogElemElasticityXXYZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityYYYZ : public FELogElemData
-{
-public:
-	FELogElemElasticityYYYZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityZZYZ : public FELogElemData
-{
-public:
-	FELogElemElasticityZZYZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityXYYZ : public FELogElemData
-{
-public:
-	FELogElemElasticityXYYZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityYZYZ : public FELogElemData
-{
-public:
-	FELogElemElasticityYZYZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityXXXZ : public FELogElemData
-{
-public:
-	FELogElemElasticityXXXZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityYYXZ : public FELogElemData
-{
-public:
-	FELogElemElasticityYYXZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityZZXZ : public FELogElemData
-{
-public:
-	FELogElemElasticityZZXZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityXYXZ : public FELogElemData
-{
-public:
-	FELogElemElasticityXYXZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityYZXZ : public FELogElemData
-{
-public:
-	FELogElemElasticityYZXZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemElasticityXZXZ : public FELogElemData
-{
-public:
-	FELogElemElasticityXZXZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
+	FELogElemElasticity(FEModel* pfem) : FELogElemElasticity_(pfem){}
+	double value(FEElement& el) { return FELogElemElasticity_::value(el, n); }
 };
 
 //-----------------------------------------------------------------------------

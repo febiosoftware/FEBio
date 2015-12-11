@@ -122,6 +122,9 @@ void FEDiscreteDomain::Serialize(DumpFile& ar)
 	}
 	else
 	{
+		FEMaterial* pmat = GetMaterial();
+		assert(pmat);
+
 		FEModel& fem = *ar.GetFEModel();
 		ar >> m_Node;
 		int n, mat;
@@ -138,7 +141,7 @@ void FEDiscreteDomain::Serialize(DumpFile& ar)
 
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
-				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
+				el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
 				el.GetMaterialPoint(j)->Serialize(ar);
 			}
 		}
