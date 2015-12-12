@@ -288,3 +288,34 @@ double* FERigidSystem::FindParameter(int nmat, ParamString& sz, int index)
 
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+//! Call this function after the rigid body kinematics are updated to ensure
+//! that the mesh (or at least the part of the mesh corresponding to the rigid
+//! bodies) is updated.
+void FERigidSystem::UpdateMesh()
+{
+	FEMesh& mesh = m_fem.GetMesh();
+	int NRB = Objects();
+	for (int i=0; i<NRB; ++i)
+	{
+		// get the rigid body
+		FERigidBody& RB = *Object(i);
+
+		// update the mesh' nodes
+		int N = mesh.Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = mesh.Node(i);
+			if (node.m_rid == RB.m_nID)
+			{
+				vec3d a0 = node.m_r0 - RB.m_r0;
+				vec3d at = RB.m_qt*a0;
+				node.m_rt = RB.m_rt + at;
+
+				vec3d ut = node.m_rt - node.m_r0;
+				node.set_vec3d(DOF_X, DOF_Y, DOF_Z, ut);
+			}
+		}
+	}
+}

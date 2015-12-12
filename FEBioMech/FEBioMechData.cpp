@@ -38,7 +38,7 @@ double FENodeXDisp::value(int nnode)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.m_rt.x - node.m_r0.x; 
+	return node.get(DOF_X); 
 }
 
 //-----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ double FENodeYDisp::value(int nnode)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.m_rt.y - node.m_r0.y; 
+	return node.get(DOF_Y); 
 }
 
 //-----------------------------------------------------------------------------
@@ -54,7 +54,7 @@ double FENodeZDisp::value(int nnode)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.m_rt.z - node.m_r0.z; 
+	return node.get(DOF_Z); 
 }
 
 //-----------------------------------------------------------------------------

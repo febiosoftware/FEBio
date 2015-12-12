@@ -201,9 +201,9 @@ void FEPrescribedBC::Activate()
 			double r = 0.0;
 			switch(m_dof)
 			{
-			case DOF_X : r = node.m_rt.x - node.m_r0.x; break;
-			case DOF_Y : r = node.m_rt.y - node.m_r0.y; break;
-			case DOF_Z : r = node.m_rt.z - node.m_r0.z; break;
+			case DOF_X : r = node.get(DOF_X); break;
+			case DOF_Y : r = node.get(DOF_Y); break;
+			case DOF_Z : r = node.get(DOF_Z); break;
 			case DOF_U : r = node.get(DOF_U); break;
 			case DOF_V : r = node.get(DOF_V); break;
 			case DOF_W : r = node.get(DOF_W); break;
@@ -284,9 +284,9 @@ void FEPrescribedBC::Update()
 		double g = NodeValue(i);
 		switch (m_dof)
 		{
-		case DOF_X: node.m_rt.x = node.m_r0.x + g; break;
-		case DOF_Y: node.m_rt.y = node.m_r0.y + g; break;
-		case DOF_Z: node.m_rt.z = node.m_r0.z + g; break;
+		case DOF_X: node.set(DOF_X, g); node.m_rt.x = node.m_r0.x + g; break;
+		case DOF_Y: node.set(DOF_Y, g); node.m_rt.y = node.m_r0.y + g; break;
+		case DOF_Z: node.set(DOF_Z, g); node.m_rt.z = node.m_r0.z + g; break;
 		case DOF_P: node.set(DOF_P, g); break;
 		case DOF_T: node.set(DOF_T, g); break;
         case DOF_VX: node.set(DOF_VX, g); break;
@@ -314,9 +314,9 @@ void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 		{
 			switch (m_dof)
 			{
-			case DOF_X: ui[I] = dq - (node.m_rt.x - node.m_r0.x); break;
-			case DOF_Y: ui[I] = dq - (node.m_rt.y - node.m_r0.y); break;
-			case DOF_Z: ui[I] = dq - (node.m_rt.z - node.m_r0.z); break;
+			case DOF_X: ui[I] = dq - node.get(DOF_X); break;
+			case DOF_Y: ui[I] = dq - node.get(DOF_Y); break;
+			case DOF_Z: ui[I] = dq - node.get(DOF_Z); break;
 			case DOF_P: ui[I] = dq - node.get(DOF_P); break;
 			case DOF_T: ui[I] = (brel ? dq - node.get(DOF_T) : dq);
             case DOF_VX: ui[I] = dq - node.get(DOF_VX); break;

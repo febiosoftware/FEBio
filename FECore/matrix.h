@@ -11,6 +11,7 @@
 
 #include <memory.h>
 #include <vector>
+#include "mat3d.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -63,6 +64,12 @@ public:
 
 	matrix& operator -= (const matrix& m);
 
+	matrix& operator *=(double g)
+	{
+		for (int i=0; i<m_nsize; ++i) m_pd[i] *= g;
+		return *this;
+	}
+
 	// calculate the LU decomposition
 	// note that this modifies the matrix
 	void lufactor(vector<int>& indx);
@@ -72,6 +79,59 @@ public:
 
 	// infinity-norm
 	double inf_norm();
+
+public:
+	void set(int i, int j, const mat3d& a)
+	{
+		m_pr[i][j] = a(0,0); m_pr[i][j+1] = a(0,1); m_pr[i][j+2] = a(0,2); i++;
+		m_pr[i][j] = a(1,0); m_pr[i][j+1] = a(1,1); m_pr[i][j+2] = a(1,2); i++;
+		m_pr[i][j] = a(2,0); m_pr[i][j+1] = a(2,1); m_pr[i][j+2] = a(2,2);
+	}
+
+	void add(int i, int j, const mat3d& a)
+	{
+		m_pr[i][j] += a(0,0); m_pr[i][j+1] += a(0,1); m_pr[i][j+2] += a(0,2); i++;
+		m_pr[i][j] += a(1,0); m_pr[i][j+1] += a(1,1); m_pr[i][j+2] += a(1,2); i++;
+		m_pr[i][j] += a(2,0); m_pr[i][j+1] += a(2,1); m_pr[i][j+2] += a(2,2);
+	}
+
+	void sub(int i, int j, const mat3d& a)
+	{
+		m_pr[i][j] -= a(0,0); m_pr[i][j+1] -= a(0,1); m_pr[i][j+2] -= a(0,2); i++;
+		m_pr[i][j] -= a(1,0); m_pr[i][j+1] -= a(1,1); m_pr[i][j+2] -= a(1,2); i++;
+		m_pr[i][j] -= a(2,0); m_pr[i][j+1] -= a(2,1); m_pr[i][j+2] -= a(2,2);
+	}
+
+	// copy-lower-triangular
+	// make the matrix symmetric by copying the lower triangular part
+	void copy_lt()
+	{
+		assert(m_nr==m_nc);
+		if (m_nr != m_nc) return;
+		for (int i=0; i<m_nr; ++i)
+		{
+			for (int j=i+1; j<m_nr; ++j)
+			{
+				m_pr[i][j] = m_pr[j][i];
+			}
+		}
+	}
+
+	// copy-upper-triangular
+	// make the matrix symmetric by copying the upper triangular part
+	void copy_ut()
+	{
+		assert(m_nr==m_nc);
+		if (m_nr != m_nc) return;
+		for (int i=0; i<m_nr; ++i)
+		{
+			for (int j=i+1; j<m_nr; ++j)
+			{
+				m_pr[j][i] = m_pr[i][j];
+			}
+		}
+	}
+
 
 private:
 	void alloc(int nr, int nc);

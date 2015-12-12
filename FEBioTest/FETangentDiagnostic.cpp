@@ -325,9 +325,9 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 
 		switch (nj)
 		{
-		case 0: node.m_rt.x += dx; break;
-		case 1: node.m_rt.y += dx; break;
-		case 2: node.m_rt.z += dx; break;
+		case 0: node.inc(DOF_X, dx); node.m_rt.x += dx; break;
+		case 1: node.inc(DOF_Y, dx); node.m_rt.y += dx; break;
+		case 2: node.inc(DOF_Z, dx); node.m_rt.z += dx; break;
 		}
 
 
@@ -338,9 +338,9 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 
 		switch (nj)
 		{
-		case 0: node.m_rt.x -= dx; break;
-		case 1: node.m_rt.y -= dx; break;
-		case 2: node.m_rt.z -= dx; break;
+		case 0: node.dec(DOF_X, dx); node.m_rt.x -= dx; break;
+		case 1: node.dec(DOF_Y, dx); node.m_rt.y -= dx; break;
+		case 2: node.dec(DOF_Z, dx); node.m_rt.z -= dx; break;
 		}
 
 		solver.UpdateStresses();

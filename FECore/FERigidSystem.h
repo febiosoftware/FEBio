@@ -39,6 +39,9 @@ public:
 	// Find a parameter (from a rigid material index)
 	double* FindParameter(int nmat, ParamString& sz, int index);
 
+	// update the mesh geometry
+	void UpdateMesh();
+
 protected:
 	bool CreateObjects();
 

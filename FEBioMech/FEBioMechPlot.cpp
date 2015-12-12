@@ -34,7 +34,7 @@ bool FEPlotNodeDisplacement::Save(FEMesh& m, FEDataStream& a)
 		FENode& node = m.Node(i);
 
 		// calculate displacement
-		vec3d u = node.m_rt - node.m_r0;
+		vec3d u = node.get_vec3d(DOF_X, DOF_Y, DOF_Z);
 
 		// stream displacement
 		a << u;

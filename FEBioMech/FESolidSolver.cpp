@@ -316,9 +316,9 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 
 		// displacement dofs
 		// current position = initial + total at prev conv step + total increment so far + current increment  
-		if ((n = node.m_ID[DOF_X]) >= 0) node.m_rt.x = node.m_r0.x + m_Ut[n] + m_Ui[n] + ui[n];
-		if ((n = node.m_ID[DOF_Y]) >= 0) node.m_rt.y = node.m_r0.y + m_Ut[n] + m_Ui[n] + ui[n];
-		if ((n = node.m_ID[DOF_Z]) >= 0) node.m_rt.z = node.m_r0.z + m_Ut[n] + m_Ui[n] + ui[n];
+		if ((n = node.m_ID[DOF_X]) >= 0) { node.set(DOF_X, m_Ut[n] + m_Ui[n] + ui[n]); node.m_rt.x = node.m_r0.x + node.get(DOF_X); }
+		if ((n = node.m_ID[DOF_Y]) >= 0) { node.set(DOF_Y, m_Ut[n] + m_Ui[n] + ui[n]); node.m_rt.y = node.m_r0.y + node.get(DOF_Y); }
+		if ((n = node.m_ID[DOF_Z]) >= 0) { node.set(DOF_Z, m_Ut[n] + m_Ui[n] + ui[n]); node.m_rt.z = node.m_r0.z + node.get(DOF_Z); }
 
 		// rotational dofs
 		if ((n = node.m_ID[DOF_U]) >= 0) node.set(DOF_U, node.m_D0.x + m_Ut[n] + m_Ui[n] + ui[n]);
@@ -598,25 +598,7 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 	}
 
 	// we need to update the position of rigid nodes
-	FEMesh& mesh = m_fem.GetMesh();
-	for (int i=0; i<NRB; ++i)
-	{
-		// get the rigid body
-		FERigidBody& RB = *rigid.Object(i);
-
-		// update the mesh' nodes
-		int N = mesh.Nodes();
-		for (int j=0; j<N; ++j)
-		{
-			FENode& node = mesh.Node(j);
-			if (node.m_rid == RB.m_nID)
-			{
-				vec3d a0 = node.m_r0 - RB.m_r0;
-				vec3d at = RB.m_qt*a0;
-				node.m_rt = RB.m_rt + at;
-			}
-		}
-	}
+	rigid.UpdateMesh();
 }
 
 //-----------------------------------------------------------------------------

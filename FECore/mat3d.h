@@ -219,10 +219,14 @@ public:
 	mat3da(double xy, double yz, double xz);
 
 	// calculates the antisymmetric matrix from a vector
+	// A.b = a x b where A = mat3da(a).
 	mat3da(const vec3d& a);
 
 	// access operator
 	double operator () (int i, int j);
+
+	// matrix multiplication
+	mat3d operator * (const mat3d& a);
 
 protected:
 	double	d[3];	// stores xy, yz, xz
