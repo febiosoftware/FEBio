@@ -73,7 +73,7 @@ bool FEThermoElasticSolver::Init()
 			FENode& node = mesh.Node(i);
 
 			// temperature dofs
-			int n = node.m_ID[DOF_T]; if (n >= 0) m_Ut[n] = node.m_T;
+			int n = node.m_ID[DOF_T]; if (n >= 0) m_Ut[n] = node.get(DOF_T);
 		}
 	}
 
@@ -607,7 +607,7 @@ void FEThermoElasticSolver::Update(vector<double>& ui)
 
 		// current temperature = initial + total at prev conv step + total increment so far + current increment
 		int n = node.m_ID[DOF_T];
-		if (n >= 0) node.m_T = m_Ut[n] + m_Ui[n] + ui[n];
+		if (n >= 0) node.set(DOF_T, m_Ut[n] + m_Ui[n] + ui[n]);
 	}
 
 	// make sure the prescribed displacements are fullfilled

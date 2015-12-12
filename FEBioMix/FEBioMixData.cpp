@@ -10,7 +10,7 @@ double FENodePressure::value(int nnode)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.m_pt; 
+	return node.get(DOF_P); 
 }
 
 //-----------------------------------------------------------------------------
@@ -18,7 +18,7 @@ double FENodeConcentration::value(int nnode)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.m_ct[0]; 
+	return node.get(DOF_C); 
 }
 
 //-----------------------------------------------------------------------------
@@ -26,7 +26,7 @@ double FENodeConcentration_::value(int nnode)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.m_ct[m_nsol]; 
+	return node.get(DOF_C + m_nsol); 
 }
 
 //-----------------------------------------------------------------------------

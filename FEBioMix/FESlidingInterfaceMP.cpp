@@ -331,7 +331,7 @@ vec3d FESlidingSurfaceMP::GetFluidForce()
 		int nseln = el.Nodes();
 		
 		// nodal pressures
-		for (i=0; i<nseln; ++i) pn[i] = GetMesh()->Node(el.m_node[i]).m_pt;
+		for (i=0; i<nseln; ++i) pn[i] = GetMesh()->Node(el.m_node[i]).get(DOF_P);
 		
 		int nint = el.GaussPoints();
 		
@@ -1042,12 +1042,12 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
 		// get the nodal pressures
 		if (sporo)
 		{
-			for (int j=0; j<ne; ++j) ps[j] = mesh.Node(el.m_node[j]).m_pt;
+			for (int j=0; j<ne; ++j) ps[j] = mesh.Node(el.m_node[j]).get(DOF_P);
 		}
 		
 		// get the nodal concentrations
 		for (int isol=0; isol<nsol; ++isol) {
-			for (int j=0; j<ne; ++j) cs[isol][j] = mesh.Node(el.m_node[j]).m_ct[m_sid[isol]];
+			for (int j=0; j<ne; ++j) cs[isol][j] = mesh.Node(el.m_node[j]).get(DOF_C + m_sid[isol]);
 		}
 		
 		for (int j=0; j<nint; ++j)
@@ -1115,14 +1115,14 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
 					bool mporo = ms.m_bporo;
 					if (sporo && mporo) {
 						double pm[MN];
-						for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).m_pt;
+						for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).get(DOF_P);
 						double p2 = pme->eval(pm, rs[0], rs[1]);
 						pt.m_pg = p1 - p2;
 					}
 					for (int isol=0; isol<nsol; ++isol) {
 						int sid = m_sid[isol];
 						double cm[MN];
-						for (int k=0; k<pme->Nodes(); ++k) cm[k] = mesh.Node(pme->m_node[k]).m_ct[sid];
+						for (int k=0; k<pme->Nodes(); ++k) cm[k] = mesh.Node(pme->m_node[k]).get(DOF_C + sid);
 						double c2 = pme->eval(cm, rs[0], rs[1]);
 						pt.m_cg[m_ssl[isol]] = c1[isol] - c2;
 					}
@@ -1621,9 +1621,9 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
 			vector< vector<double> >cn(nsol,vector<double>(MN));
 			for (j=0; j<nseln; ++j)
 			{
-				pn[j] = ss.GetMesh()->Node(se.m_node[j]).m_pt;
+				pn[j] = ss.GetMesh()->Node(se.m_node[j]).get(DOF_P);
 				for (int isol=0; isol<nsol; ++isol) {
-					cn[isol][j] = ss.GetMesh()->Node(se.m_node[j]).m_ct[m_sid[isol]];
+					cn[isol][j] = ss.GetMesh()->Node(se.m_node[j]).get(DOF_C + m_sid[isol]);
 				}
 			}
 			
@@ -1715,9 +1715,9 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
 					vector< vector<double> > cm(nsol,vector<double>(MN));
 					for (k=0; k<nmeln; ++k) 
 					{
-						pm[k] = ms.GetMesh()->Node(me.m_node[k]).m_pt;
+						pm[k] = ms.GetMesh()->Node(me.m_node[k]).get(DOF_P);
 						for (int isol=0; isol<nsol; ++isol) {
-							cm[isol][k] = ms.GetMesh()->Node(me.m_node[k]).m_ct[m_sid[isol]];
+							cm[isol][k] = ms.GetMesh()->Node(me.m_node[k]).get(DOF_C + m_sid[isol]);
 						}
 					}
 					
@@ -2331,7 +2331,7 @@ void FESlidingInterfaceMP::SetAmbient()
 				{
 					FENode& node = s.Node(i);
 					// set the fluid pressure to ambient condition
-					node.m_pt = m_ambp;
+					node.set(DOF_P, m_ambp);
 				}
 			}
 		}
@@ -2344,7 +2344,7 @@ void FESlidingInterfaceMP::SetAmbient()
 					{
 						FENode& node = s.Node(i);
 						// set the fluid pressure to ambient condition
-						node.m_ct[j] = m_ambc[j];
+						node.set(DOF_C + j, m_ambc[j]);
 					}
 				}
 			}

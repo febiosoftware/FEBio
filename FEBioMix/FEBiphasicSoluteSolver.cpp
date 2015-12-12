@@ -76,7 +76,7 @@ bool FEBiphasicSoluteSolver::Init()
 		for (j=0; j<MAX_CDOFS; ++j) {
 			if (m_nceq[j]) {
 				n = node.m_ID[DOF_C+j];
-				if (n >= 0) m_Ut[n] = node.m_ct[j];
+				if (n >= 0) m_Ut[n] = node.get(DOF_C + j);
 			}
 		}
 	}
@@ -761,10 +761,9 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 //			if (n >= 0) node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 			// Force the concentrations to remain positive
 			if (n >= 0) {
-				node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
-				if (node.m_ct[j] < 0) {
-					node.m_ct[j] = 0;
-				}
+				double ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+				if (ct < 0) ct = 0.0;
+				node.set(DOF_C + j, ct);
 			}
 		}
 	}

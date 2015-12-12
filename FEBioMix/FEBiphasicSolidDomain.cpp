@@ -965,7 +965,7 @@ void FEBiphasicSolidDomain::ElementBiphasicMaterialStiffness(FESolidElement &el,
 	
 	// nodal pressures
 	double pn[FEElement::MAX_NODES];
-	for (i=0; i<neln; ++i) pn[i] = m_pMesh->Node(el.m_node[i]).m_pt;
+	for (i=0; i<neln; ++i) pn[i] = m_pMesh->Node(el.m_node[i]).get(DOF_P);
 	
 	// calculate element stiffness matrix
 	for (n=0; n<nint; ++n)
@@ -1189,7 +1189,7 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 	{
 		r0[j] = mesh.Node(el.m_node[j]).m_r0;
 		rt[j] = mesh.Node(el.m_node[j]).m_rt;
-		pn[j] = mesh.Node(el.m_node[j]).m_pt;
+		pn[j] = mesh.Node(el.m_node[j]).get(DOF_P);
 	}
 
 	// loop over the integration points and calculate

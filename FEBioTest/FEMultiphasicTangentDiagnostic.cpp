@@ -339,8 +339,8 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             case 0: node.m_rt.x += dx; break;
             case 1: node.m_rt.y += dx; break;
             case 2: node.m_rt.z += dx; break;
-            case 3: node.m_pt   += dx; break;
-            default: node.m_ct[nj-4] += dx; break;
+            case 3: node.inc(DOF_P, dx); break;
+            default: node.inc(DOF_C + nj-4, dx); break;
         }
         
         
@@ -364,8 +364,8 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             case 0: node.m_rt.x -= dx; break;
             case 1: node.m_rt.y -= dx; break;
             case 2: node.m_rt.z -= dx; break;
-            case 3: node.m_pt   -= dx; break;
-            default: node.m_ct[nj-4] -= dx; break;
+            case 3: node.dec(DOF_P, dx); break;
+            default: node.dec(DOF_C + nj-4, dx); break;
         }
         
         solver.UpdateStresses();

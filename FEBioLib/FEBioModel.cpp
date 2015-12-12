@@ -682,21 +682,16 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 			ar << node.m_at;
 			ar << node.m_bshell;
 			ar << node.m_bexclude;
-			ar << node.m_cp;
-			ar << node.m_ct;
 			ar << node.m_D0;
-			ar << node.m_Dt;
 			ar << node.m_Fr;
 			ar << node.m_ID;
-			ar << node.m_pt;
 			ar << node.m_r0;
 			ar << node.m_rid;
 			ar << node.m_rp;
 			ar << node.m_rt;
-			ar << node.m_T;
-            ar << node.m_et;
 			ar << node.m_vp;
 			ar << node.m_vt;
+			ar << node.m_val;
 		}
 
 		// write domain data
@@ -732,21 +727,16 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 			ar >> node.m_at;
 			ar >> node.m_bshell;
 			ar >> node.m_bexclude;
-			ar >> node.m_cp;
-			ar >> node.m_ct;
 			ar >> node.m_D0;
-			ar >> node.m_Dt;
 			ar >> node.m_Fr;
 			ar >> node.m_ID;
-			ar >> node.m_pt;
 			ar >> node.m_r0;
 			ar >> node.m_rid;
 			ar >> node.m_rp;
 			ar >> node.m_rt;
-			ar >> node.m_T;
-            ar >> node.m_et;
 			ar >> node.m_vp;
 			ar >> node.m_vt;
+			ar >> node.m_val;
 		}
 
 		// read domain data

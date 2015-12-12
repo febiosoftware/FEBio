@@ -14,7 +14,7 @@ bool FEPlotFluidDilatation::Save(FEDomain &dom, FEDataStream& a)
         for (int i=0; i<N; ++i)
         {
             FENode& node = pd->Node(i);
-            a << node.m_et;
+            a << node.get(DOF_E);
         }
         return true;
     }

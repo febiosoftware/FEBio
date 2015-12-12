@@ -130,7 +130,7 @@ bool FEFluidSolver::Init()
         n = node.m_ID[DOF_VZ]; if (n >= 0) m_Vt[n] = node.m_vt.z;
         
         // dilatation dofs
-        n = node.m_ID[DOF_E]; if (n >= 0) m_Vt[n] = node.m_et;
+        n = node.m_ID[DOF_E]; if (n >= 0) m_Vt[n] = node.get(DOF_E);
     }
     
     return true;
@@ -187,7 +187,7 @@ void FEFluidSolver::UpdateKinematics(vector<double>& vi)
         
         // dilatation dofs
         // current dilatation = total at prev conv step + total increment so far + current increment
-        if ((n = node.m_ID[DOF_E]) >= 0) node.m_et = m_Vt[n] + m_Vi[n] + vi[n];
+        if ((n = node.m_ID[DOF_E]) >= 0) node.set(DOF_E, m_Vt[n] + m_Vi[n] + vi[n]);
     }
     
     // make sure the prescribed velocities are fullfilled
@@ -222,7 +222,7 @@ void FEFluidSolver::UpdateKinematics(vector<double>& vi)
                     case 0: d += si->val*node.m_vt.x; break;
                     case 1: d += si->val*node.m_vt.y; break;
                     case 2: d += si->val*node.m_vt.z; break;
-                    case 3: d += si->val*node.m_et;   break;
+                    case 3: d += si->val*node.get(DOF_E); break;
                 }
             }
             
@@ -231,7 +231,7 @@ void FEFluidSolver::UpdateKinematics(vector<double>& vi)
                 case 0: node.m_vt.x = d; break;
                 case 1: node.m_vt.y = d; break;
                 case 2: node.m_vt.z = d; break;
-                case 3: node.m_et   = d; break;
+                case 3: node.set(DOF_E, d); break;
             }
         }
     }

@@ -75,7 +75,7 @@ bool FEMultiphasicSolver::Init()
 			FENode& node = mesh.Node(i);
 
 			// pressure dofs
-			int n = node.m_ID[DOF_P]; if (n >= 0) m_Ut[n] = node.m_pt;
+			int n = node.m_ID[DOF_P]; if (n >= 0) m_Ut[n] = node.get(DOF_P);
 		}
 	}
 
@@ -102,7 +102,7 @@ bool FEMultiphasicSolver::Init()
 		for (int j=0; j<(int)m_nceq.size(); ++j) {
 			if (m_nceq[j]) {
 				int n = node.m_ID[DOF_C+j];
-				if (n >= 0) m_Ut[n] = node.m_ct[j];
+				if (n >= 0) m_Ut[n] = node.get(DOF_C + j);
 			}
 		}
 	}
@@ -881,7 +881,7 @@ void FEMultiphasicSolver::UpdatePoro(vector<double>& ui)
 
 		// update nodal pressures
 		n = node.m_ID[DOF_P];
-		if (n >= 0) node.m_pt = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+		if (n >= 0) node.set(DOF_P, 0 + m_Ut[n] + m_Ui[n] + ui[n]);
 	}
 
 	// update poro-elasticity data
@@ -918,10 +918,9 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 //			if (n >= 0) node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 			// Force the concentrations to remain positive
 			if (n >= 0) {
-				node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
-				if (node.m_ct[j] < 0) {
-					node.m_ct[j] = 0;
-				}
+				double ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+				if (ct < 0.0) ct = 0.0;
+				node.set(DOF_C + j, ct);
 			}
 		}
 	}

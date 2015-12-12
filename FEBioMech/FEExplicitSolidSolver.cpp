@@ -57,9 +57,9 @@ bool FEExplicitSolidSolver::Init()
 		n = node.m_ID[DOF_Z]; if (n >= 0) m_Ut[n] = node.m_rt.z - node.m_r0.z;
 
 		// rotational dofs
-		n = node.m_ID[DOF_U]; if (n >= 0) m_Ut[n] = node.m_Dt.x - node.m_D0.x;
-		n = node.m_ID[DOF_V]; if (n >= 0) m_Ut[n] = node.m_Dt.y - node.m_D0.y;
-		n = node.m_ID[DOF_W]; if (n >= 0) m_Ut[n] = node.m_Dt.z - node.m_D0.z;
+		n = node.m_ID[DOF_U]; if (n >= 0) m_Ut[n] = node.get(DOF_U) - node.m_D0.x;
+		n = node.m_ID[DOF_V]; if (n >= 0) m_Ut[n] = node.get(DOF_V) - node.m_D0.y;
+		n = node.m_ID[DOF_W]; if (n >= 0) m_Ut[n] = node.get(DOF_W) - node.m_D0.z;
 	}
 
 	// calculate the inverse mass vector for the explicit analysis
@@ -314,9 +314,9 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 		if ((n = node.m_ID[DOF_Z]) >= 0) node.m_rt.z = node.m_r0.z + m_Ut[n] + m_Ui[n] + ui[n];
 
 		// rotational dofs
-		if ((n = node.m_ID[DOF_U]) >= 0) node.m_Dt.x = node.m_D0.x + m_Ut[n] + m_Ui[n] + ui[n];
-		if ((n = node.m_ID[DOF_V]) >= 0) node.m_Dt.y = node.m_D0.y + m_Ut[n] + m_Ui[n] + ui[n];
-		if ((n = node.m_ID[DOF_W]) >= 0) node.m_Dt.z = node.m_D0.z + m_Ut[n] + m_Ui[n] + ui[n];
+		if ((n = node.m_ID[DOF_U]) >= 0) node.set(DOF_U, node.m_D0.x + m_Ut[n] + m_Ui[n] + ui[n]);
+		if ((n = node.m_ID[DOF_V]) >= 0) node.set(DOF_V, node.m_D0.y + m_Ut[n] + m_Ui[n] + ui[n]);
+		if ((n = node.m_ID[DOF_W]) >= 0) node.set(DOF_W, node.m_D0.z + m_Ut[n] + m_Ui[n] + ui[n]);
 	}
 
 	// make sure the prescribed displacements are fullfilled
@@ -578,8 +578,6 @@ void FEExplicitSolidSolver::PrepStep(double time)
 		ni.m_rp = ni.m_rt;
 		ni.m_vp = ni.m_vt;
 		ni.m_ap = ni.m_at;
-		// ---> TODO: move to the FEPoroSoluteSolver
-		for (int k=0; k<(int)ni.m_cp.size(); ++k) ni.m_cp[k] = ni.m_ct[k];
 	}
 
 	FETimePoint tp = m_fem.GetTime();

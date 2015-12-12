@@ -1008,7 +1008,7 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = dom.Node(i);
-			a << node.m_pt;
+			a << node.get(DOF_P);
 		}
 		return true;
 	}
@@ -1050,7 +1050,7 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 	for (int i=0; i<N; ++i)
 	{
 		FENode& node = dom.Node(i);
-		a << node.m_ct[nsid];
+		a << node.get(DOF_C + nsid);
 	}
 	return true;
 }
@@ -1069,7 +1069,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = dom.Node(i);
-			a << node.m_ct[m_nsol];
+			a << node.get(DOF_C + m_nsol);
 		}
 		return true;
 	}
@@ -1085,7 +1085,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = dom.Node(i);
-			a << node.m_ct[m_nsol];
+			a << node.get(DOF_C + m_nsol);
 		}
 		return true;
 	}
@@ -1103,7 +1103,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = dom.Node(i);
-			a << node.m_ct[m_nsol];
+			a << node.get(DOF_C + m_nsol);
 		}
 		return true;
 	}

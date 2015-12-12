@@ -364,7 +364,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 
 		// fluid pressure
 		double pt[FEElement::MAX_NODES];
-		for (int i=0; i<neln; ++i) pt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_pt;
+		for (int i=0; i<neln; ++i) pt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).get(DOF_P);
 			
 		// calculate nodal normal tractions
 		vector<double> tn(neln);
@@ -414,7 +414,7 @@ void FEPoroNormalTraction::Residual(FEGlobalVector& R)
 
 		// fluid pressure
 		double pt[FEElement::MAX_NODES];
-		for (int j=0; j<neln; ++j) pt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_pt;
+		for (int j=0; j<neln; ++j) pt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).get(DOF_P);
 
 		// calculate nodal normal tractions
 		vector<double> tn(neln);

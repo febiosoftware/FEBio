@@ -18,23 +18,14 @@
 //-----------------------------------------------------------------------------
 FENode::FENode()
 {
-	// initialize nodal data
-	m_pt = 0;
-	m_T = 0;
-	m_T0 = 0;
-    m_et = 0;
-    
     // get DOFS
     DOFS& fedofs = *DOFS::GetInstance();
     int MAX_NDOFS = fedofs.GetNDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
     
-    m_ct.assign(MAX_CDOFS, 0);
-    m_cp.assign(MAX_CDOFS, 0);
-
 	// initialize dof stuff
     m_ID.assign(MAX_NDOFS, DOF_FIXED);
 	m_BC.assign(MAX_NDOFS, DOF_OPEN );
+	m_val.assign(MAX_NDOFS, 0.0);
 
 	// exclude flag (true if the node should not be part of the analysis.
 	// For instance, if it is isolated).
@@ -59,13 +50,6 @@ FENode::FENode(const FENode& n)
 	m_ap = n.m_ap;
 	m_Fr = n.m_Fr;
 	m_D0 = n.m_D0;
-	m_Dt = n.m_Dt;
-	m_pt = n.m_pt;
-	m_T  = n.m_T;
-	m_T0 = n.m_T0;
-    m_et = n.m_et;
-	m_ct = n.m_ct;
-	m_cp = n.m_cp;
 
 	m_rid = n.m_rid;
 	m_bshell = n.m_bshell;
@@ -73,6 +57,7 @@ FENode::FENode(const FENode& n)
 
 	m_ID = n.m_ID;
 	m_BC = n.m_BC;
+	m_val = n.m_val;
 }
 
 //-----------------------------------------------------------------------------
@@ -87,13 +72,6 @@ FENode& FENode::operator = (const FENode& n)
 	m_ap = n.m_ap;
 	m_Fr = n.m_Fr;
 	m_D0 = n.m_D0;
-	m_Dt = n.m_Dt;
-	m_pt = n.m_pt;
-	m_T  = n.m_T;
-	m_T0 = n.m_T0;
-    m_et = n.m_et;
-	m_ct = n.m_ct;
-	m_cp = n.m_cp;
 
 	m_rid = n.m_rid;
 	m_bshell = n.m_bshell;
@@ -101,6 +79,7 @@ FENode& FENode::operator = (const FENode& n)
 
 	m_ID = n.m_ID;
 	m_BC = n.m_BC;
+	m_val = n.m_val;
 
 	return (*this);
 }
@@ -215,12 +194,8 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 			dmp << nd.m_rt << nd.m_vt << nd.m_at;
 			dmp << nd.m_rp << nd.m_vp << nd.m_ap;
 			dmp << nd.m_Fr;
-			dmp << nd.m_D0 << nd.m_Dt;
-			dmp << nd.m_pt;
-			dmp << nd.m_T;
-            dmp << nd.m_et;
-			dmp << nd.m_ct;
-			dmp << nd.m_cp;
+			dmp << nd.m_D0;
+			dmp << nd.m_val;
 		}
 	}
 	else
@@ -233,12 +208,8 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 			dmp >> nd.m_rt >> nd.m_vt >> nd.m_at;
 			dmp >> nd.m_rp >> nd.m_vp >> nd.m_ap;
 			dmp >> nd.m_Fr;
-			dmp >> nd.m_D0 >> nd.m_Dt;
-			dmp >> nd.m_pt;
-			dmp >> nd.m_T;
-            dmp >> nd.m_et;
-			dmp >> nd.m_ct;
-			dmp >> nd.m_cp;
+			dmp >> nd.m_D0;
+			dmp >> nd.m_val;
 		}
 	}
 
@@ -452,7 +423,9 @@ void FEMesh::InitShellNormals()
 	{
 		FENode& node = Node(i);
 		node.m_D0.unit();
-		node.m_Dt = node.m_D0;
+		node.set(DOF_U, node.m_D0.x);
+		node.set(DOF_V, node.m_D0.y);
+		node.set(DOF_W, node.m_D0.z);
 	}
 }
 
@@ -500,18 +473,7 @@ void FEMesh::Reset()
 		node.m_vp = node.m_vt = vec3d(0,0,0);
 		node.m_ap = node.m_at = vec3d(0,0,0);
 
-		node.m_pt = 0;
-		
-		int cdofs = (int) node.m_ct.size();
-		for (int k=0; k<cdofs; ++k)
-			node.m_ct[k] = node.m_cp[k] = 0.0;
-		
-		node.m_T = node.m_T0;
-
-        node.m_et = 0;
-
         node.m_Fr = vec3d(0,0,0);
-		node.m_Dt = node.m_D0;
 
 		// reset ID arrays
 		int ndof = node.m_ID.size();
@@ -519,7 +481,13 @@ void FEMesh::Reset()
 		{
 			node.m_ID[i] = DOF_FIXED;
 			node.m_BC[i] = DOF_OPEN;
+			node.set(i, 0.0);
 		}
+
+		// shell directors need to be reset
+		node.set(DOF_U, node.m_D0.x);
+		node.set(DOF_V, node.m_D0.y);
+		node.set(DOF_W, node.m_D0.z);
 	}
 
 	// update the mesh

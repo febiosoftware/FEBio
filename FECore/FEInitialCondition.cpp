@@ -77,7 +77,7 @@ void FEInitialPressure::Activate()
 	for (size_t i=0; i<m_item.size(); ++i)
 	{
 		FENode& node = mesh.Node(m_item[i].nid);
-		node.m_pt = m_item[i].p0;
+		node.set(DOF_P, m_item[i].p0);
 	}
 }
 
@@ -114,7 +114,7 @@ void FEInitialTemperature::Activate()
 	for (size_t i=0; i<m_item.size(); ++i)
 	{
 		FENode& node = mesh.Node(m_item[i].nid);
-		node.m_T = node.m_T0 = m_item[i].T0;
+		node.set(DOF_T, m_item[i].T0);
 	}
 }
 
@@ -153,7 +153,7 @@ void FEInitialConcentration::Activate()
 	for (size_t i=0; i<m_item.size(); ++i)
 	{
 		FENode& node = mesh.Node(m_item[i].nid);
-		node.m_ct[m_nsol] = m_item[i].c0;
+		node.set(DOF_C + m_nsol, m_item[i].c0);
 	}
 }
 
@@ -190,6 +190,6 @@ void FEInitialDilatation::Activate()
     for (size_t i=0; i<m_item.size(); ++i)
     {
         FENode& node = mesh.Node(m_item[i].nid);
-        node.m_et = m_item[i].e0;
+        node.set(DOF_E, m_item[i].e0);
     }
 }

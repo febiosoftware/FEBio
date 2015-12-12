@@ -714,7 +714,7 @@ void FEFluidDomain::UpdateElementStress(int iel, double dt)
     double et[FEElement::MAX_NODES];
     for (int j=0; j<neln; ++j) {
         vt[j] = m_pMesh->Node(el.m_node[j]).m_vt;
-        et[j] = m_pMesh->Node(el.m_node[j]).m_et;
+        et[j] = m_pMesh->Node(el.m_node[j]).get(DOF_E);
     }
     
     // loop over the integration points and update

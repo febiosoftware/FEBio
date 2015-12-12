@@ -557,7 +557,7 @@ void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBi
 		// get the nodal pressures
 		if (sporo)
 		{
-			for (int j=0; j<ne; ++j) ps[j] = mesh.Node(el.m_node[j]).m_pt;
+			for (int j=0; j<ne; ++j) ps[j] = mesh.Node(el.m_node[j]).get(DOF_P);
 		}
 		
 		for (int j=0; j<nint; ++j, ++n)
@@ -586,7 +586,7 @@ void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBi
 				bool mporo = ms.m_poro[pme->m_lid];
 				if (sporo && mporo) {
 					double pm[FEElement::MAX_NODES];
-					for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).m_pt;
+					for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).get(DOF_P);
 					double p2 = pme->eval(pm, ss.m_rs[n][0], ss.m_rs[n][1]);
 					ss.m_pg[n] = p1 - p2;
 				}
@@ -863,7 +863,7 @@ void FETiedBiphasicInterface::ContactStiffness(FESolver* psolver)
 			
 			// nodal pressures
 			double pn[FEElement::MAX_NODES];
-			for (j=0; j<nseln; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).m_pt;
+			for (j=0; j<nseln; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).get(DOF_P);
 			
 			// copy the LM vector
 			ss.UnpackLM(se, sLM);
@@ -907,7 +907,7 @@ void FETiedBiphasicInterface::ContactStiffness(FESolver* psolver)
 					
 					// nodal pressure
 					double pm[FEElement::MAX_NODES];
-					if (mporo) for (k=0; k<nmeln; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).m_pt;
+					if (mporo) for (k=0; k<nmeln; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).get(DOF_P);
 					
 					// copy the LM vector
 					ms.UnpackLM(me, mLM);

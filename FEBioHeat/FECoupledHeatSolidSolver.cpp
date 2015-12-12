@@ -92,7 +92,7 @@ void FECoupledHeatSolidSolver::CalculateInitialStresses()
 		int neln = el.Nodes();
 
 		// get the nodal temperatures
-		for (int j=0; j<neln; ++j) tn[j] = mesh.Node(el.m_node[j]).m_T;
+		for (int j=0; j<neln; ++j) tn[j] = mesh.Node(el.m_node[j]).get(DOF_T);
 
 		// loop over integration points
 		for (int j=0; j<nint; ++j)

@@ -47,7 +47,7 @@ bool FEHeatSolver::Init()
 	{
 		FENode& node = mesh.Node(i);
 		int nid = node.m_ID[DOF_T];
-		if (nid >= 0) m_Tp[nid] = node.m_T;
+		if (nid >= 0) m_Tp[nid] = node.get(DOF_T);
 	}
 
 	// Identify the heat-transfer domains
@@ -76,8 +76,8 @@ void FEHeatSolver::Update(vector<double>& u)
 	{
 		FENode& node = mesh.Node(i);
 		int n = node.m_ID[DOF_T];
-		if (n >= 0) node.m_T = u[n];
-		else if (-n-2 >= 0) node.m_T = u[-n-2];
+		if (n >= 0) node.set(DOF_T, u[n]);
+		else if (-n-2 >= 0) node.set(DOF_T, u[-n-2]);
 	}
 
 	// update heat fluxes
@@ -98,7 +98,7 @@ void FEHeatSolver::Update(vector<double>& u)
 
 				// get the nodal temperatures
 				double T[FEElement::MAX_NODES];
-				for (int n=0; n<ne; ++n) T[n] = mesh.Node(el.m_node[n]).m_T;
+				for (int n=0; n<ne; ++n) T[n] = mesh.Node(el.m_node[n]).get(DOF_T);
 
 				// calculate heat flux for each integration point
 				for (int n=0; n<ni; ++n)

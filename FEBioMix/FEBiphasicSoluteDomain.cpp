@@ -74,8 +74,8 @@ void FEBiphasicSoluteDomain::Activate()
 		{
 			// p0[i] = m.Node(el.m_node[i]).m_p0;
 			// c0[i] = m.Node(el.m_node[i]).m_c0[id0];
-			p0[i] = m.Node(el.m_node[i]).m_pt;
-			c0[i] = m.Node(el.m_node[i]).m_ct[id0];
+			p0[i] = m.Node(el.m_node[i]).get(DOF_P);
+			c0[i] = m.Node(el.m_node[i]).get(DOF_C + id0);
 		}
 
 		// get the number of integration points
@@ -1355,7 +1355,7 @@ void FEBiphasicSoluteDomain::ElementBiphasicSoluteMaterialStiffness(FESolidEleme
 
 	// nodal concentrations
 	double ct[FEElement::MAX_NODES];
-	for (i=0; i<neln; ++i) ct[i] = m_pMesh->Node(el.m_node[i]).m_ct[id0];
+	for (i=0; i<neln; ++i) ct[i] = m_pMesh->Node(el.m_node[i]).get(DOF_C + id0);
 
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
@@ -1581,8 +1581,8 @@ void FEBiphasicSoluteDomain::UpdateElementStress(int iel, double dt, bool sstate
 	{
 		r0[j] = mesh.Node(el.m_node[j]).m_r0;
 		rt[j] = mesh.Node(el.m_node[j]).m_rt;
-		pn[j] = mesh.Node(el.m_node[j]).m_pt;
-		ct[j] = mesh.Node(el.m_node[j]).m_ct[id0];
+		pn[j] = mesh.Node(el.m_node[j]).get(DOF_P);
+		ct[j] = mesh.Node(el.m_node[j]).get(DOF_C + id0);
 	}
 		
 	// loop over the integration points and calculate

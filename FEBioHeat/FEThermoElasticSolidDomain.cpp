@@ -80,7 +80,7 @@ bool FEThermoElasticSolidDomain::Initialize(FEModel &fem)
         int neln = el.Nodes();
         // get initial values of temperature
 		for (int i=0; i<neln; ++i)
-			T0[i] = m.Node(el.m_node[i]).m_T;
+			T0[i] = m.Node(el.m_node[i]).get(DOF_T);
         
 		// get the number of integration points
 		int nint = el.GaussPoints();
@@ -793,7 +793,7 @@ void FEThermoElasticSolidDomain::ElementGradientStiffness(FESolidElement &el, ma
 	FEMesh& mesh = *GetMesh();
 	double T[EN];
 	const int ne = el.Nodes();
-	for (int i=0; i<ne; ++i) T[i] = mesh.Node(el.m_node[i]).m_T;
+	for (int i=0; i<ne; ++i) T[i] = mesh.Node(el.m_node[i]).get(DOF_T);
 
 	// loop over all integration points
 	const int ni = el.GaussPoints();
@@ -891,8 +891,11 @@ void FEThermoElasticSolidDomain::UpdateElementStress(int iel)
 	{
 		r0[j] = mesh.Node(el.m_node[j]).m_r0;
 		rt[j] = mesh.Node(el.m_node[j]).m_rt;
-		u0[j] = mesh.Node(el.m_node[j]).m_T0;
-		ut[j] = mesh.Node(el.m_node[j]).m_T;
+
+		// TODO: After I make the transition to domain specific data I need to fix this
+//		u0[j] = mesh.Node(el.m_node[j]).m_T0;
+//		ut[j] = mesh.Node(el.m_node[j]).get(DOF_T);
+		assert(false);
 	}
 
 	// loop over the integration points and calculate

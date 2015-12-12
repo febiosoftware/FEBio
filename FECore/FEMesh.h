@@ -105,30 +105,23 @@ public:
 
 	// shell data
 	vec3d	m_D0;	//!< initial director
-	vec3d	m_Dt;	//!< current director
 
-	// poroelasticity-data
-	double	m_pt;	//!< current pressure
-
-	// heat-conduction data
-	double	m_T;	//!< temperature
-	double	m_T0;	//!< initial temperature
-
-    // fluid data
-    double	m_et;	//!< current fluid dilatation
-    
-	// solute-data
-	vector<double>	m_ct;	//!< current effective concentration
-	vector<double>	m_cp;	//!< effective concentration at previous time step
-	
 	// rigid body data
 	int		m_rid;		//!< rigid body number
 	bool	m_bshell;	//!< does this node belong to a non-rigid shell element?
 	bool	m_bexclude;	//!< exclude this node from the analysis
 
 public:
+	double get(int n) const { return m_val[n]; }
+	void set(int n, double v) { m_val[n] = v; }
+	void inc(int n, double v) { m_val[n] += v; }
+	void dec(int n, double v) { m_val[n] -= v; }
+	vec3d get_vec3d(int i, int j, int k) const { return vec3d(m_val[i], m_val[j], m_val[k]); }
+
+public:
 	vector<int>		m_BC;	//!< boundary condition array
 	vector<int>		m_ID;	//!< nodal equation numbers
+	vector<double>	m_val;	//!< nodal DOF values
 };
 
 //-----------------------------------------------------------------------------

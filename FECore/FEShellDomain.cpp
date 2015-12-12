@@ -69,8 +69,9 @@ double FEShellDomain::defgrad(FEShellElement& el, mat3d& F, int n)
 	vec3d r[FEElement::MAX_NODES], D[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i)
 	{
-		r[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-		D[i] = m_pMesh->Node(el.m_node[i]).m_Dt;
+		FENode& ni = m_pMesh->Node(el.m_node[i]);
+		r[i] = ni.m_rt;
+		D[i] = ni.get_vec3d(DOF_U, DOF_V, DOF_W);
 	}
 
 	double g = el.gt(n);
@@ -204,8 +205,9 @@ double FEShellDomain::invjact(FEShellElement& el, double Ji[3][3], int n)
 	vec3d rt[FEElement::MAX_NODES], Dt[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i)
 	{
-		rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-		Dt[i] = m_pMesh->Node(el.m_node[i]).m_Dt;
+		FENode& ni = m_pMesh->Node(el.m_node[i]);
+		rt[i] = ni.m_rt;
+		Dt[i] = ni.get_vec3d(DOF_U, DOF_V, DOF_W);
 	}
 
 	// calculate jacobian

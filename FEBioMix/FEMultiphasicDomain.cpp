@@ -147,10 +147,10 @@ void FEMultiphasicDomain::Activate()
 		for (int i = 0; i<neln; ++i)
 		{
 //			p0[i] = m.Node(el.m_node[i]).m_p0;
-			p0[i] = m.Node(el.m_node[i]).m_pt;
+			p0[i] = m.Node(el.m_node[i]).get(DOF_P);
 			for (int isol = 0; isol<nsol; ++isol)
 				//				c0[isol][i] = m.Node(el.m_node[i]).m_c0[sid[isol]];
-				c0[isol][i] = m.Node(el.m_node[i]).m_ct[sid[isol]];
+				c0[isol][i] = m.Node(el.m_node[i]).get(DOF_C + sid[isol]);
 		}
 
 		// get the number of integration points
@@ -2017,9 +2017,9 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
 	{
 		r0[j] = mesh.Node(el.m_node[j]).m_r0;
 		rt[j] = mesh.Node(el.m_node[j]).m_rt;
-		pn[j] = mesh.Node(el.m_node[j]).m_pt;
+		pn[j] = mesh.Node(el.m_node[j]).get(DOF_P);
 		for (k=0; k<nsol; ++k)
-			ct[k][j] = mesh.Node(el.m_node[j]).m_ct[sid[k]];
+			ct[k][j] = mesh.Node(el.m_node[j]).get(DOF_C + sid[k]);
 	}
 		
 	// loop over the integration points and calculate

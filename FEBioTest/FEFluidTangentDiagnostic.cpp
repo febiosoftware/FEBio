@@ -52,7 +52,7 @@ bool FEFluidTangentUniaxial::Init()
     {
         FENode& n = m.Node(i);
         n.m_rt = n.m_r0 = r[i];
-        n.m_pt = 0;
+        n.set(DOF_P, 0.0);
         n.m_rid = -1;
         
         // set displacement BC's
@@ -266,7 +266,7 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
             case 0: node.m_vt.x += dx; break;
             case 1: node.m_vt.y += dx; break;
             case 2: node.m_vt.z += dx; break;
-            case 3: node.m_et   += dx; break;
+            case 3: node.inc(DOF_E, dx); break;
         }
         
         
@@ -281,7 +281,7 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
             case 0: node.m_vt.x -= dx; break;
             case 1: node.m_vt.y -= dx; break;
             case 2: node.m_vt.z -= dx; break;
-            case 3: node.m_et   -= dx; break;
+            case 3: node.dec(DOF_E, dx); break;
         }
         
         solver.UpdateStresses();
