@@ -638,7 +638,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
 		rt[i] = mesh.Node(el.m_node[i]).m_rt;
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-		v[i]  = mesh.Node(el.m_node[i]).m_vt;
+		v[i]  = mesh.Node(el.m_node[i]).get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
 	}
 	
 	// zero stiffness matrix

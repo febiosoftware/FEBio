@@ -125,9 +125,9 @@ bool FEFluidSolver::Init()
         FENode& node = mesh.Node(i);
         
         // velocity dofs
-        n = node.m_ID[DOF_VX]; if (n >= 0) m_Vt[n] = node.m_vt.x;
-        n = node.m_ID[DOF_VY]; if (n >= 0) m_Vt[n] = node.m_vt.y;
-        n = node.m_ID[DOF_VZ]; if (n >= 0) m_Vt[n] = node.m_vt.z;
+        n = node.m_ID[DOF_VX]; if (n >= 0) m_Vt[n] = node.get(DOF_VX);
+        n = node.m_ID[DOF_VY]; if (n >= 0) m_Vt[n] = node.get(DOF_VY);
+        n = node.m_ID[DOF_VZ]; if (n >= 0) m_Vt[n] = node.get(DOF_VZ);
         
         // dilatation dofs
         n = node.m_ID[DOF_E]; if (n >= 0) m_Vt[n] = node.get(DOF_E);
@@ -181,9 +181,9 @@ void FEFluidSolver::UpdateKinematics(vector<double>& vi)
         
         // velocity dofs
         // current velocity = total at prev conv step + total increment so far + current increment
-        if ((n = node.m_ID[DOF_VX]) >= 0) node.m_vt.x = m_Vt[n] + m_Vi[n] + vi[n];
-        if ((n = node.m_ID[DOF_VY]) >= 0) node.m_vt.y = m_Vt[n] + m_Vi[n] + vi[n];
-        if ((n = node.m_ID[DOF_VZ]) >= 0) node.m_vt.z = m_Vt[n] + m_Vi[n] + vi[n];
+        if ((n = node.m_ID[DOF_VX]) >= 0) node.set(DOF_VX, m_Vt[n] + m_Vi[n] + vi[n]);
+        if ((n = node.m_ID[DOF_VY]) >= 0) node.set(DOF_VY, m_Vt[n] + m_Vi[n] + vi[n]);
+        if ((n = node.m_ID[DOF_VZ]) >= 0) node.set(DOF_VZ, m_Vt[n] + m_Vi[n] + vi[n]);
         
         // dilatation dofs
         // current dilatation = total at prev conv step + total increment so far + current increment
@@ -219,18 +219,18 @@ void FEFluidSolver::UpdateKinematics(vector<double>& vi)
                 FENode& node = mesh.Node(si->node);
                 switch (si->bc)
                 {
-                    case 0: d += si->val*node.m_vt.x; break;
-                    case 1: d += si->val*node.m_vt.y; break;
-                    case 2: d += si->val*node.m_vt.z; break;
+                    case 0: d += si->val*node.get(DOF_VX); break;
+                    case 1: d += si->val*node.get(DOF_VY); break;
+                    case 2: d += si->val*node.get(DOF_VZ); break;
                     case 3: d += si->val*node.get(DOF_E); break;
                 }
             }
             
             switch (lc.master.bc)
             {
-                case 0: node.m_vt.x = d; break;
-                case 1: node.m_vt.y = d; break;
-                case 2: node.m_vt.z = d; break;
+                case 0: node.set(DOF_VX, d); break;
+                case 1: node.set(DOF_VY, d); break;
+                case 2: node.set(DOF_VZ, d); break;
                 case 3: node.set(DOF_E, d); break;
             }
         }
@@ -292,7 +292,7 @@ void FEFluidSolver::PrepStep(double time)
     {
         FENode& ni = mesh.Node(i);
         ni.m_rp = ni.m_rt = ni.m_r0;
-        ni.m_vp = ni.m_vt;
+        ni.m_vp = ni.get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
         ni.m_ap = ni.m_at;
     }
     

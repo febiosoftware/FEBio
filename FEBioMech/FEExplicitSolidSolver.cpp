@@ -576,7 +576,7 @@ void FEExplicitSolidSolver::PrepStep(double time)
 	{
 		FENode& ni = mesh.Node(i);
 		ni.m_rp = ni.m_rt;
-		ni.m_vp = ni.m_vt;
+		ni.m_vp = ni.get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
 		ni.m_ap = ni.m_at;
 	}
 
@@ -882,11 +882,12 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 		if ((n = node.m_ID[DOF_Z]) >= 0) node.m_at.z = (node.m_at.z+m_R1[n])*m_inv_mass[n];
 		// and update the velocities using the accelerations
 		// which are added to the previously calculated velocity changes from damping
-		node.m_vt = node.m_vp + node.m_at*dt;	//  update velocity using acceleration m_at
+		vec3d vt = node.m_vp + node.m_at*dt;
+		node.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, vt);	//  update velocity using acceleration m_at
 		//	calculate incremental displacement using the velocity
-		if ((n = node.m_ID[DOF_X]) >= 0) m_ui[n] = node.m_vt.x*dt;
-		if ((n = node.m_ID[DOF_Y]) >= 0) m_ui[n] = node.m_vt.y*dt;
-		if ((n = node.m_ID[DOF_Z]) >= 0) m_ui[n] = node.m_vt.z*dt;
+		if ((n = node.m_ID[DOF_X]) >= 0) m_ui[n] = vt.x*dt;
+		if ((n = node.m_ID[DOF_Y]) >= 0) m_ui[n] = vt.y*dt;
+		if ((n = node.m_ID[DOF_Z]) >= 0) m_ui[n] = vt.z*dt;
 	}
 
 	// need to update everything for the explicit solver

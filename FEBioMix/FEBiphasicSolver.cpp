@@ -713,7 +713,8 @@ void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 
 		// update velocities
-		node.m_vt  = (node.m_rt - node.m_rp) / pstep->m_dt;
+		vec3d vt = (node.m_rt - node.m_rp) / pstep->m_dt;
+		node.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, vt); 
 	}
 }
 

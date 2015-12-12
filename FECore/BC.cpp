@@ -209,9 +209,9 @@ void FEPrescribedBC::Activate()
 			case DOF_W : r = node.get(DOF_W); break;
 			case DOF_T : r = node.get(DOF_T); break;
 			case DOF_P : r = node.get(DOF_P); break;
-			case DOF_VX: r = node.m_vt.x; break;
-			case DOF_VY: r = node.m_vt.y; break;
-			case DOF_VZ: r = node.m_vt.z; break;
+			case DOF_VX: r = node.get(DOF_VX); break;
+			case DOF_VY: r = node.get(DOF_VY); break;
+			case DOF_VZ: r = node.get(DOF_VZ); break;
 			case DOF_E : r = node.get(DOF_E); break;
 			default:	// all prescribed concentrations
 				if ((m_dof >= DOF_C) && (m_dof < (int)node.m_ID.size())) {
@@ -289,9 +289,9 @@ void FEPrescribedBC::Update()
 		case DOF_Z: node.m_rt.z = node.m_r0.z + g; break;
 		case DOF_P: node.set(DOF_P, g); break;
 		case DOF_T: node.set(DOF_T, g); break;
-        case DOF_VX: node.m_vt.x = g; break;
-        case DOF_VY: node.m_vt.y = g; break;
-        case DOF_VZ: node.m_vt.z = g; break;
+        case DOF_VX: node.set(DOF_VX, g); break;
+        case DOF_VY: node.set(DOF_VY, g); break;
+        case DOF_VZ: node.set(DOF_VZ, g); break;
         case DOF_E: node.set(DOF_E, g); break;
 		default:
 			if (m_dof >= DOF_C) node.set(m_dof, g); break;
@@ -319,9 +319,9 @@ void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 			case DOF_Z: ui[I] = dq - (node.m_rt.z - node.m_r0.z); break;
 			case DOF_P: ui[I] = dq - node.get(DOF_P); break;
 			case DOF_T: ui[I] = (brel ? dq - node.get(DOF_T) : dq);
-            case DOF_VX: ui[I] = dq - node.m_vt.x; break;
-            case DOF_VY: ui[I] = dq - node.m_vt.y; break;
-            case DOF_VZ: ui[I] = dq - node.m_vt.z; break;
+            case DOF_VX: ui[I] = dq - node.get(DOF_VX); break;
+            case DOF_VY: ui[I] = dq - node.get(DOF_VY); break;
+            case DOF_VZ: ui[I] = dq - node.get(DOF_VZ); break;
             case DOF_E: ui[I] = dq - node.get(DOF_E); break;
 			default:
 				if ((m_dof >= DOF_C) && (m_dof < (int)node.m_ID.size())) {

@@ -95,7 +95,7 @@ void FEFluidFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>
 	for (i=0; i<neln; ++i)
 	{
 		rt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_rt;
-		vt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_vt;
+		vt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
 	}
 	
 	vec3d kab, t1, t2;
@@ -226,7 +226,7 @@ bool FEFluidFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<doub
 	for (i=0; i<neln; ++i)
 	{
 		rt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_rt;
-		vt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_vt;
+		vt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
 	}
 	
 	double* Gr, *Gs;
@@ -358,7 +358,7 @@ bool FEFluidFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vecto
 	{
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
 		rt[i] = mesh.Node(el.m_node[i]).m_rt;
-		vt[i] = mesh.Node(el.m_node[i]).m_vt;
+		vt[i] = mesh.Node(el.m_node[i]).get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
 	}
 
 	double* Gr, *Gs;

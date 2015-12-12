@@ -94,7 +94,6 @@ public:
 	vec3d	m_r0;	//!< initial position
 	vec3d	m_rt;	//!< current position
 
-	vec3d	m_vt;	//!< nodal velocity
 	vec3d	m_at;	//!< nodal acceleration
 
 	vec3d	m_rp;	//!< position of node at previous time step
@@ -117,6 +116,7 @@ public:
 	void inc(int n, double v) { m_val[n] += v; }
 	void dec(int n, double v) { m_val[n] -= v; }
 	vec3d get_vec3d(int i, int j, int k) const { return vec3d(m_val[i], m_val[j], m_val[k]); }
+	void set_vec3d(int i, int j, int k, const vec3d& v) { m_val[i] = v.x; m_val[j] = v.y, m_val[k] = v.z; }
 
 public:
 	vector<int>		m_BC;	//!< boundary condition array

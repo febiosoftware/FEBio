@@ -214,7 +214,7 @@ void FECGSolidSolver::PrepStep(double time)
 	{
 		FENode& ni = mesh.Node(i);
 		ni.m_rp = ni.m_rt;
-		ni.m_vp = ni.m_vt;
+		ni.m_vp = ni.get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
 		ni.m_ap = ni.m_at;
 	}
 
@@ -359,7 +359,8 @@ void FECGSolidSolver::PrepStep(double time)
 				vec3d r = n.m_rt - rb.m_rt;
 
 				vec3d v = V + (W ^ r);
-				n.m_vp = n.m_vt = v;
+				n.m_vp = v;
+				n.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, v);
 
 				vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
 				n.m_ap = n.m_at = a;

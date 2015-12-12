@@ -263,9 +263,9 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.m_vt.x += dx; break;
-            case 1: node.m_vt.y += dx; break;
-            case 2: node.m_vt.z += dx; break;
+            case 0: node.inc(DOF_VX, dx); break;
+            case 1: node.inc(DOF_VY, dx); break;
+            case 2: node.inc(DOF_VZ, dx); break;
             case 3: node.inc(DOF_E, dx); break;
         }
         
@@ -278,9 +278,9 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.m_vt.x -= dx; break;
-            case 1: node.m_vt.y -= dx; break;
-            case 2: node.m_vt.z -= dx; break;
+            case 0: node.dec(DOF_VX, dx); break;
+            case 1: node.dec(DOF_VY, dx); break;
+            case 2: node.dec(DOF_VZ, dx); break;
             case 3: node.dec(DOF_E, dx); break;
         }
         

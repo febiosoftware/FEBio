@@ -48,7 +48,7 @@ bool FEPlotNodeVelocity::Save(FEMesh& m, FEDataStream& a)
 	for (int i=0; i<m.Nodes(); ++i)
 	{
 		FENode& node = m.Node(i);
-		a << node.m_vt;
+		a << node.get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
 	}
 	return true;
 }

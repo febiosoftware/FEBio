@@ -373,7 +373,8 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 		{
 			FENode& n = mesh.Node(i);
 			n.m_at = (n.m_rt - n.m_rp)*b - n.m_vp*a + n.m_ap*c;
-			n.m_vt = n.m_vp + (n.m_ap*(1.0 - m_gamma) + n.m_at*m_gamma)*dt;
+			vec3d vt = n.m_vp + (n.m_ap*(1.0 - m_gamma) + n.m_at*m_gamma)*dt;
+			n.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, vt);
 		}
 	}
 }
@@ -665,7 +666,7 @@ void FESolidSolver2::PrepStep(double time)
 	{
 		FENode& ni = mesh.Node(i);
 		ni.m_rp = ni.m_rt;
-		ni.m_vp = ni.m_vt;
+		ni.m_vp = ni.get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
 		ni.m_ap = ni.m_at;
 	}
 
@@ -823,7 +824,8 @@ void FESolidSolver2::PrepStep(double time)
 				vec3d r = n.m_rt - rb.m_rt;
 
 				vec3d v = V + (W ^ r); 
-				n.m_vp = n.m_vt = v;
+				n.m_vp = v;
+				n.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, v);
 
 				vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
 				n.m_ap = n.m_at = a;
@@ -2073,7 +2075,8 @@ void FESolidSolver2::InertialForces(FEGlobalVector& R)
 	{
 		FENode& node = mesh.Node(i);
         node.m_at = (node.m_rt - node.m_rp)*b - node.m_vp*a + node.m_ap*c;
-        node.m_vt = node.m_vp + (node.m_ap*(1.0 - m_gamma) + node.m_at*m_gamma)*dt;
+        vec3d vt = node.m_vp + (node.m_ap*(1.0 - m_gamma) + node.m_at*m_gamma)*dt;
+		node.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, vt);
         
         F[3*i  ] = node.m_at.x;
         F[3*i+1] = node.m_at.y;

@@ -40,7 +40,7 @@ void FEInitialVelocity::Activate()
 	for (size_t i=0; i<m_item.size(); ++i)
 	{
 		FENode& node = mesh.Node(m_item[i].nid);
-		node.m_vt = m_item[i].v0;
+		node.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, m_item[i].v0);
 	}
 }
 

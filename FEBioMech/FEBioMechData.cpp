@@ -62,7 +62,7 @@ double FENodeXVel::value(int nnode)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.m_vt.x; 
+	return node.get(DOF_VX);
 }
 
 //-----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ double FENodeYVel::value(int nnode)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.m_vt.y; 
+	return node.get(DOF_VY); 
 }
 
 //-----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ double FENodeZVel::value(int nnode)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.m_vt.z; 
+	return node.get(DOF_VZ);
 }
 
 //-----------------------------------------------------------------------------

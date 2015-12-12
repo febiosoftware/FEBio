@@ -713,7 +713,7 @@ void FEFluidDomain::UpdateElementStress(int iel, double dt)
     vec3d vt[FEElement::MAX_NODES];
     double et[FEElement::MAX_NODES];
     for (int j=0; j<neln; ++j) {
-        vt[j] = m_pMesh->Node(el.m_node[j]).m_vt;
+        vt[j] = m_pMesh->Node(el.m_node[j]).get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
         et[j] = m_pMesh->Node(el.m_node[j]).get(DOF_E);
     }
     

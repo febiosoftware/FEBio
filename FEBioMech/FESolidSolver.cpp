@@ -385,7 +385,8 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 		{
 			FENode& n = mesh.Node(i);
 			n.m_at = (n.m_rt - n.m_rp)*b - n.m_vp*a + n.m_ap*c;
-			n.m_vt = n.m_vp + (n.m_ap*(1.0 - m_gamma) + n.m_at*m_gamma)*dt;
+			vec3d vt = n.m_vp + (n.m_ap*(1.0 - m_gamma) + n.m_at*m_gamma)*dt;
+			n.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, vt);
 		}
 
 		// update the rigid body kinematics
@@ -431,7 +432,7 @@ void FESolidSolver::UpdateRigidKinematics()
 					for (int i=0; i<NN; ++i, ncnt++)
 					{
 						vec3d ri = dom.Node(i).m_rt - rb.m_rt;
-						vec3d vi = dom.Node(i).m_vt;
+						vec3d vi = dom.Node(i).get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
 
 						vec3d wi = ri ^ vi;
 
@@ -682,7 +683,7 @@ void FESolidSolver::PrepStep(double time)
 	{
 		FENode& ni = mesh.Node(i);
 		ni.m_rp = ni.m_rt;
-		ni.m_vp = ni.m_vt;
+		ni.m_vp = ni.get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
 		ni.m_ap = ni.m_at;
 	}
 
@@ -827,7 +828,8 @@ void FESolidSolver::PrepStep(double time)
 				vec3d r = n.m_rt - rb.m_rt;
 
 				vec3d v = V + (W ^ r); 
-				n.m_vp = n.m_vt = v;
+				n.m_vp = v;
+				n.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, v);
 
 				vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
 				n.m_ap = n.m_at = a;

@@ -43,7 +43,6 @@ FENode::FENode(const FENode& n)
 {
 	m_r0 = n.m_r0;
 	m_rt = n.m_rt;
-	m_vt = n.m_vt;
 	m_at = n.m_at;
 	m_rp = n.m_rp;
 	m_vp = n.m_vp;
@@ -65,7 +64,6 @@ FENode& FENode::operator = (const FENode& n)
 {
 	m_r0 = n.m_r0;
 	m_rt = n.m_rt;
-	m_vt = n.m_vt;
 	m_at = n.m_at;
 	m_rp = n.m_rp;
 	m_vp = n.m_vp;
@@ -191,7 +189,7 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 		{
 			FENode& nd = m_Node[i];
 			dmp << nd.m_r0;
-			dmp << nd.m_rt << nd.m_vt << nd.m_at;
+			dmp << nd.m_rt << nd.m_at;
 			dmp << nd.m_rp << nd.m_vp << nd.m_ap;
 			dmp << nd.m_Fr;
 			dmp << nd.m_D0;
@@ -205,7 +203,7 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 		{
 			FENode& nd = m_Node[i];
 			dmp >> nd.m_r0;
-			dmp >> nd.m_rt >> nd.m_vt >> nd.m_at;
+			dmp >> nd.m_rt >> nd.m_at;
 			dmp >> nd.m_rp >> nd.m_vp >> nd.m_ap;
 			dmp >> nd.m_Fr;
 			dmp >> nd.m_D0;
@@ -470,7 +468,7 @@ void FEMesh::Reset()
 		FENode& node = Node(i);
 
 		node.m_rp = node.m_rt = node.m_r0;
-		node.m_vp = node.m_vt = vec3d(0,0,0);
+		node.m_vp = vec3d(0,0,0);
 		node.m_ap = node.m_at = vec3d(0,0,0);
 
         node.m_Fr = vec3d(0,0,0);
