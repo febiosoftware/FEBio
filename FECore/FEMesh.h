@@ -102,9 +102,6 @@ public:
 
 	vec3d	m_Fr;	//!< nodal reaction forces
 
-	// shell data
-	vec3d	m_D0;	//!< initial director
-
 	// rigid body data
 	int		m_rid;		//!< rigid body number
 	bool	m_bshell;	//!< does this node belong to a non-rigid shell element?

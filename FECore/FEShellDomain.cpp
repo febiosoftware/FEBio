@@ -39,7 +39,7 @@ double FEShellDomain::defgrad(FEShellElement& el, mat3d& F, int n)
 	{
 		FENode& ni = m_pMesh->Node(el.m_node[i]);
 		r[i] = ni.m_rt;
-		D[i] = ni.m_D0 + ni.get_vec3d(DOF_U, DOF_V, DOF_W);
+		D[i] = el.m_D0[i] + ni.get_vec3d(DOF_U, DOF_V, DOF_W);
 	}
 
 	double g = el.gt(n);
@@ -104,7 +104,7 @@ double FEShellDomain::invjac0(FEShellElement& el, double Ji[3][3], int n)
 	for (i=0; i<neln; ++i)
 	{
 		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
-		D0[i] = m_pMesh->Node(el.m_node[i]).m_D0;
+		D0[i] = el.m_D0[i];
 	}
 
 	// calculate jacobian
@@ -175,7 +175,7 @@ double FEShellDomain::invjact(FEShellElement& el, double Ji[3][3], int n)
 	{
 		FENode& ni = m_pMesh->Node(el.m_node[i]);
 		rt[i] = ni.m_rt;
-		Dt[i] = ni.m_D0 + ni.get_vec3d(DOF_U, DOF_V, DOF_W);
+		Dt[i] = el.m_D0[i] + ni.get_vec3d(DOF_U, DOF_V, DOF_W);
 	}
 
 	// calculate jacobian
@@ -242,7 +242,7 @@ double FEShellDomain::detJ0(FEShellElement &el, int n)
 	for (i=0; i<neln; ++i)
 	{
 		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
-		D0[i] = m_pMesh->Node(el.m_node[i]).m_D0;
+		D0[i] = el.m_D0[i];
 	}
 
 	// jacobian matrix
@@ -307,6 +307,7 @@ void FEShellDomain::Serialize(DumpFile &ar)
 			ar << el.m_node;
 
 			ar << el.m_h0;
+			ar << el.m_D0;
 
 			for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
 		}
@@ -333,6 +334,7 @@ void FEShellDomain::Serialize(DumpFile &ar)
 			ar >> el.m_node;
 
 			ar >> el.m_h0;
+			ar >> el.m_D0;
 
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{

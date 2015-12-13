@@ -48,7 +48,6 @@ FENode::FENode(const FENode& n)
 	m_vp = n.m_vp;
 	m_ap = n.m_ap;
 	m_Fr = n.m_Fr;
-	m_D0 = n.m_D0;
 
 	m_rid = n.m_rid;
 	m_bshell = n.m_bshell;
@@ -69,7 +68,6 @@ FENode& FENode::operator = (const FENode& n)
 	m_vp = n.m_vp;
 	m_ap = n.m_ap;
 	m_Fr = n.m_Fr;
-	m_D0 = n.m_D0;
 
 	m_rid = n.m_rid;
 	m_bshell = n.m_bshell;
@@ -192,7 +190,6 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 			dmp << nd.m_rt << nd.m_at;
 			dmp << nd.m_rp << nd.m_vp << nd.m_ap;
 			dmp << nd.m_Fr;
-			dmp << nd.m_D0;
 			dmp << nd.m_val;
 		}
 	}
@@ -206,7 +203,6 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 			dmp >> nd.m_rt >> nd.m_at;
 			dmp >> nd.m_rp >> nd.m_vp >> nd.m_ap;
 			dmp >> nd.m_Fr;
-			dmp >> nd.m_D0;
 			dmp >> nd.m_val;
 		}
 	}
@@ -380,7 +376,8 @@ int FEMesh::RemoveIsolatedVertices()
 void FEMesh::InitShellNormals()
 {
 	// zero initial directors for shell nodes
-	for (int i=0; i<Nodes(); ++i) Node(i).m_D0 = vec3d(0,0,0);
+	int NN = Nodes();
+	vector<vec3d> D(NN, vec3d(0,0,0));
 
 	// loop over all domains
 	for (int nd = 0; nd < Domains(); ++nd)
@@ -410,20 +407,31 @@ void FEMesh::InitShellNormals()
 					vec3d b = r0[m1];
 					vec3d c = r0[m2];
 
-					Node(en[m0]).m_D0 += (b-a)^(c-a);
+					D[en[m0]] += (b-a)^(c-a);
 				}
 			}
 		}
 	}
 
 	// make sure we start with unit directors
-	for (int i=0; i<Nodes(); ++i)
+	for (int i=0; i<NN; ++i) D[i].unit();
+
+	// assign directors to shells 
+	for (int nd = 0; nd < Domains(); ++nd)
 	{
-		FENode& node = Node(i);
-		node.m_D0.unit();
+		// Calculate the shell directors as the local node normals
+		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
+		{
+			FEShellDomain& sd = static_cast<FEShellDomain&>(Domain(nd));
+			for (int i=0; i<sd.Elements(); ++i)
+			{
+				FEShellElement& el = sd.Element(i);
+				int ne = el.Nodes();
+				for (int j=0; j<ne; ++j) el.m_D0[j] = D[el.m_node[j]];
+			}
+		}
 	}
 }
-
 
 //-----------------------------------------------------------------------------
 //! Does one-time initialization of the Mesh data. Call FEMesh::Reset for resetting 
@@ -561,7 +569,7 @@ double FEMesh::ShellElementVolume(FEShellElement& el)
 	for (i=0; i<neln; ++i)
 	{
 		r0[i] = Node(el.m_node[i]).m_r0;
-		D0[i] = Node(el.m_node[i]).m_D0;
+		D0[i] = el.m_D0[i];
 	}
 
 	int nint = el.GaussPoints();

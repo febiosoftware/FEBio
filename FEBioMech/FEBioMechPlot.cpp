@@ -1180,7 +1180,7 @@ bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
 			for (int j=0; j<n; ++j)
 			{
 				FENode& nj = mesh.Node(e.m_node[j]);
-				vec3d D = nj.m_D0 + nj.get_vec3d(DOF_U, DOF_V, DOF_W);
+				vec3d D = e.m_D0[j] + nj.get_vec3d(DOF_U, DOF_V, DOF_W);
 				double h = e.m_h0[j] * D.norm();
 				a.push_back((float) h);
 			}

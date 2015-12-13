@@ -332,11 +332,7 @@ public:
 	//! assignment operator
 	FEShellElement& operator = (const FEShellElement& el);
 
-	virtual void SetTraits(FEElementTraits* ptraits)
-	{
-		FEElement::SetTraits(ptraits);
-		m_h0.resize(Nodes());
-	}
+	virtual void SetTraits(FEElementTraits* ptraits);
 
 	double* GaussWeights() { return &((FEShellElementTraits*)(m_pT))->gw[0]; }	// weights of integration points
 
@@ -355,6 +351,7 @@ public:
 
 public:
 	vector<double>	m_h0;	//!< initial shell thicknesses
+	vector<vec3d>	m_D0;	//!< initial shell directors
 };
 
 //-----------------------------------------------------------------------------
