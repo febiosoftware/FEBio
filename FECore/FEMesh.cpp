@@ -421,9 +421,6 @@ void FEMesh::InitShellNormals()
 	{
 		FENode& node = Node(i);
 		node.m_D0.unit();
-		node.set(DOF_U, node.m_D0.x);
-		node.set(DOF_V, node.m_D0.y);
-		node.set(DOF_W, node.m_D0.z);
 	}
 }
 
@@ -481,11 +478,6 @@ void FEMesh::Reset()
 			node.m_BC[i] = DOF_OPEN;
 			node.set(i, 0.0);
 		}
-
-		// shell directors need to be reset
-		node.set(DOF_U, node.m_D0.x);
-		node.set(DOF_V, node.m_D0.y);
-		node.set(DOF_W, node.m_D0.z);
 	}
 
 	// update the mesh

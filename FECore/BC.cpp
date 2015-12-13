@@ -198,26 +198,8 @@ void FEPrescribedBC::Activate()
 		// evaluate the relative offset
 		if (m_br)
 		{
-			double r = 0.0;
-			switch(m_dof)
-			{
-			case DOF_X : r = node.get(DOF_X); break;
-			case DOF_Y : r = node.get(DOF_Y); break;
-			case DOF_Z : r = node.get(DOF_Z); break;
-			case DOF_U : r = node.get(DOF_U); break;
-			case DOF_V : r = node.get(DOF_V); break;
-			case DOF_W : r = node.get(DOF_W); break;
-			case DOF_T : r = node.get(DOF_T); break;
-			case DOF_P : r = node.get(DOF_P); break;
-			case DOF_VX: r = node.get(DOF_VX); break;
-			case DOF_VY: r = node.get(DOF_VY); break;
-			case DOF_VZ: r = node.get(DOF_VZ); break;
-			case DOF_E : r = node.get(DOF_E); break;
-			default:	// all prescribed concentrations
-				if ((m_dof >= DOF_C) && (m_dof < (int)node.m_ID.size())) {
-					r = node.get(m_dof);
-				}
-			}
+			assert(m_dof < node.m_val.size());
+			double r = node.get(m_dof);
 			m_item[j].ref = r;
 		}
 	}

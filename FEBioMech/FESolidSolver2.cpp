@@ -138,9 +138,9 @@ bool FESolidSolver2::Init()
 		n = node.m_ID[DOF_Z]; if (n >= 0) m_Ut[n] = node.m_rt.z - node.m_r0.z;
 
 		// rotational dofs
-		n = node.m_ID[DOF_U]; if (n >= 0) m_Ut[n] = node.get(DOF_U) - node.m_D0.x;
-		n = node.m_ID[DOF_V]; if (n >= 0) m_Ut[n] = node.get(DOF_V) - node.m_D0.y;
-		n = node.m_ID[DOF_W]; if (n >= 0) m_Ut[n] = node.get(DOF_W) - node.m_D0.z;
+		n = node.m_ID[DOF_U]; if (n >= 0) m_Ut[n] = node.get(DOF_U);
+		n = node.m_ID[DOF_V]; if (n >= 0) m_Ut[n] = node.get(DOF_V);
+		n = node.m_ID[DOF_W]; if (n >= 0) m_Ut[n] = node.get(DOF_W);
 	}
 
 	return true;
@@ -309,9 +309,9 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 		if ((n = node.m_ID[DOF_Z]) >= 0) { node.set(DOF_Z, ui[n] + m_Ui[n] + m_Ut[n]); node.m_rt.z = node.m_r0.z + node.get(DOF_Z); }
 
 		// rotational dofs
-        if ((n = node.m_ID[DOF_U]) >= 0) node.set(DOF_U, node.m_D0.x + m_Ut[n] + m_Ui[n] + ui[n]);
-        if ((n = node.m_ID[DOF_V]) >= 0) node.set(DOF_V, node.m_D0.y + m_Ut[n] + m_Ui[n] + ui[n]);
-        if ((n = node.m_ID[DOF_W]) >= 0) node.set(DOF_W, node.m_D0.z + m_Ut[n] + m_Ui[n] + ui[n]);
+        if ((n = node.m_ID[DOF_U]) >= 0) node.set(DOF_U, m_Ut[n] + m_Ui[n] + ui[n]);
+        if ((n = node.m_ID[DOF_V]) >= 0) node.set(DOF_V, m_Ut[n] + m_Ui[n] + ui[n]);
+        if ((n = node.m_ID[DOF_W]) >= 0) node.set(DOF_W, m_Ut[n] + m_Ui[n] + ui[n]);
 	}
 
 	// make sure the prescribed displacements are fullfilled
@@ -441,8 +441,7 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
         if ((n = node.m_ID[DOF_U]) >= 0) Ui[n] += ui[n];
         if ((n = node.m_ID[DOF_V]) >= 0) Ui[n] += ui[n];
         if ((n = node.m_ID[DOF_W]) >= 0) Ui[n] += ui[n];
-	}
-    
+	}    
 }
 
 //-----------------------------------------------------------------------------
