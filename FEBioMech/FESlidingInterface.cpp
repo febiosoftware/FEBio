@@ -153,7 +153,7 @@ bool FESlidingSurface::Init()
 			}
 		}
 	}
-	for (i=0; i<nn; ++i) m_off[i] = tag[m_node[i]];
+	for (i=0; i<nn; ++i) m_off[i] = tag[NodeIndex(i)];
 
 	return true;
 }
@@ -529,7 +529,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 		vec3d x = node.m_rt;
 
 		// get the global node number
-		int m = ss.m_node[i];
+		int m = ss.NodeIndex(i);
 
 		// get the previous master element (if any)
 		FESurfaceElement* pme = ss.m_pme[i];

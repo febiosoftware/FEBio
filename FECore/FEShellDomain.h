@@ -24,13 +24,8 @@ public:
 	//! Initialize elements
 	void InitElements();
 
-	bool Initialize(FEModel& fem);
-
 	//! Reset element data
 	void Reset();
-
-	int Nodes() { return (int) m_Node.size(); }
-	FENode& Node(int i);
 
 	// calculate deformation gradient
 	double defgrad(FEShellElement& el, mat3d& F, int n);
@@ -52,6 +47,5 @@ public:
 	void Serialize(DumpFile& ar);
 
 protected:
-	vector<int>				m_Node;	//!< node list
 	vector<FEShellElement>	m_Elem;	//!< array of elements
 };

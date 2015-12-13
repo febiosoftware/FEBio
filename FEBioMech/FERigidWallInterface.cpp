@@ -68,7 +68,7 @@ bool FERigidWallSurface::Init()
 			}
 		}
 	}
-	for (i=0; i<nn; ++i) m_off[i] = tag[m_node[i]];
+	for (i=0; i<nn; ++i) m_off[i] = tag[NodeIndex(i)];
 
 	return true;
 }

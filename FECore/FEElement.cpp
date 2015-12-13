@@ -67,6 +67,7 @@ void FEElement::SetTraits(FEElementTraits* ptraits)
 {
 	m_pT = ptraits;
 	m_node.resize(Nodes());
+	m_lnode.resize(Nodes());
 	m_State.Create(GaussPoints());
 }
 
@@ -78,8 +79,9 @@ FESolidElement::FESolidElement(const FESolidElement& el)
 
 	// copy base class data
 	m_mat = el.m_mat;
-	m_node = el.m_node;
 	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
 }
 
 FESolidElement& FESolidElement::operator = (const FESolidElement& el)
@@ -89,8 +91,9 @@ FESolidElement& FESolidElement::operator = (const FESolidElement& el)
 
 	// copy base class data
 	m_mat = el.m_mat;
-	m_node = el.m_node;
 	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
 
 	return (*this);
 }
@@ -103,8 +106,9 @@ FEShellElement::FEShellElement(const FEShellElement& el)
 
 	// copy base class data
 	m_mat = el.m_mat;
-	m_node = el.m_node;
 	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
 
 	// copy shell data
 	m_h0 = el.m_h0;
@@ -118,13 +122,63 @@ FEShellElement& FEShellElement::operator = (const FEShellElement& el)
 
 	// copy base class data
 	m_mat = el.m_mat;
-	m_node = el.m_node;
 	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
 
 	// copy shell data
 	m_h0 = el.m_h0;
 
 	return (*this);
+}
+
+//-----------------------------------------------------------------------------
+FESurfaceElement::FESurfaceElement() 
+{ 
+	m_nelem = -1; m_lid = -1; 
+}
+
+FESurfaceElement::FESurfaceElement(const FESurfaceElement& el)
+{
+	// set the traits of the element
+	if (el.m_pT) SetTraits(el.m_pT);
+
+	// copy base class data
+	m_mat = el.m_mat;
+	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
+
+	// copy surface element data
+	m_lid = el.m_lid;
+	m_nelem = el.m_nelem;
+}
+
+FESurfaceElement& FESurfaceElement::operator = (const FESurfaceElement& el)
+{
+	// make sure the element type is the same
+	if (m_pT == 0) SetTraits(el.m_pT);
+	else assert(m_pT == el.m_pT);
+
+	// copy base class data
+	m_mat = el.m_mat;
+	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
+
+	// copy surface element data
+	m_lid = el.m_lid;
+	m_nelem = el.m_nelem;
+
+	return (*this); 
+}
+
+void FESurfaceElement::SetTraits(FEElementTraits* pt)
+{
+	// we don't allocate state data for surface elements
+	m_pT = pt;
+	m_node.resize(Nodes());
+	m_lnode.resize(Nodes());
 }
 
 //-----------------------------------------------------------------------------
@@ -135,8 +189,9 @@ FETrussElement::FETrussElement(const FETrussElement& el)
 
 	// copy base class data
 	m_mat = el.m_mat;
-	m_node = el.m_node;
 	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
 
 	// truss data
 	m_a0 = el.m_a0;
@@ -149,8 +204,9 @@ FETrussElement& FETrussElement::operator = (const FETrussElement& el)
 
 	// copy base class data
 	m_mat = el.m_mat;
-	m_node = el.m_node;
 	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
 
 	// copy truss data
 	m_a0 = el.m_a0;
@@ -166,8 +222,9 @@ FEDiscreteElement::FEDiscreteElement(const FEDiscreteElement& el)
 
 	// copy base class data
 	m_mat = el.m_mat;
-	m_node = el.m_node;
 	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
 }
 
 FEDiscreteElement& FEDiscreteElement::operator =(const FEDiscreteElement& el)
@@ -177,8 +234,9 @@ FEDiscreteElement& FEDiscreteElement::operator =(const FEDiscreteElement& el)
 
 	// copy base class data
 	m_mat = el.m_mat;
-	m_node = el.m_node;
 	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
 
 	return (*this);
 }

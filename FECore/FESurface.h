@@ -54,12 +54,6 @@ public:
 	//! find the index of a surface element
 	int FindElement(FESurfaceElement& el);
 
-	//! number of nodes on this surface
-	int Nodes() { return m_node.size(); }
-
-	//! return the FENode object for local node n
-	FENode& Node(int n) { return m_pMesh->Node( m_node[n] ); }
-
 public:
 
 	//! Project a node onto a surface element
@@ -122,9 +116,6 @@ public:
 
 protected:
 	vector<FESurfaceElement>	m_el;	//!< surface elements
-
-public:
-	vector<int>	m_node;	//!< array of node indices
 };
 
 #endif // !defined(AFX_FESURFACE_H__6437C4B1_5BB7_4DDA_8354_CADFF3291D3E__INCLUDED_)

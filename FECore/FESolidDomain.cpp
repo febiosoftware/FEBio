@@ -4,48 +4,10 @@
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
-//! Domain initialization
-
-bool FESolidDomain::Initialize(FEModel &fem)
-{
-	int i, j;
-	FEMesh& m = *m_pMesh;
-	int N = m.Nodes();
-	vector<int> tag; tag.assign(N, -1);
-
-	int NE = Elements();
-	int n = 0;
-	m_Node.clear();
-	m_Node.reserve(N);
-	for (i=0; i<NE; ++i)
-	{
-		FESolidElement& e = Element(i);
-		int ne = e.Nodes();
-		for (j=0; j<ne; ++j)
-		{
-			int nj = e.m_node[j];
-			if (tag[nj] == -1) 
-			{
-				tag[nj] = n++;
-				m_Node.push_back(nj);
-			}
-		}
-	}
-	assert(m_Node.size() == n);
-	return true;
-}
-
-//-----------------------------------------------------------------------------
 // Reset data
 void FESolidDomain::Reset()
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
-}
-
-//-----------------------------------------------------------------------------
-FENode& FESolidDomain::Node(int i) 
-{
-	return m_pMesh->Node(m_Node[i]); 
 }
 
 //-----------------------------------------------------------------------------

@@ -61,16 +61,19 @@ public:
 	//! set the material ID of all elements
 	void SetMatID(int mid);
 
+	//! return number of nodes
+	int Nodes() { return (int) m_Node.size(); }
+
+	//! return a specific node
+	FENode& Node(int i);
+
+	//! return the global node index from a local index
+	int NodeIndex(int i) { return m_Node[i]; }
+
 public: // interface for derived classes
 	
 	//! create a domain of n elements
 	virtual void create(int n) = 0;
-
-	//! return number of nodes
-	virtual int Nodes() = 0;
-
-	//! return a specific node
-	virtual FENode& Node(int i) = 0;
 
 	//! return number of elements
 	virtual int Elements() = 0;
@@ -93,7 +96,7 @@ public: // optional functions to overload
 	virtual void ShallowCopy(DumpStream& dmp, bool bsave) {}
 
 	//! initialize domain
-	virtual bool Initialize(FEModel& fem) { return true; }
+	virtual bool Initialize(FEModel& fem);
 
 	//! Initialize elements of domain
 	virtual void InitElements() {}
@@ -115,6 +118,7 @@ public:
 
 protected:
 	FEMesh*		m_pMesh;	//!< the mesh that this domain is a part of
+	vector<int>	m_Node;		//!< list of nodes in this domain
 
 protected:
 	int	m_nclass;			//!< domain class

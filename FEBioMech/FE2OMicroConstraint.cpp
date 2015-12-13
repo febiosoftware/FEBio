@@ -24,6 +24,24 @@ bool FEMicroFlucSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEMicroFlucSurface::CopyFrom(FEMicroFlucSurface& s)
+{
+	m_Node = s.m_Node;
+
+	// create elements
+	int NE = s.Elements();
+	create(NE);
+	for (int i=0; i<NE; ++i) Element(i) = s.Element(i);
+
+	// copy surface data
+	m_Lm = s.m_Lm;
+	m_pv = s.m_pv;
+	m_c  = s.m_c;
+	m_Fm = s.m_Fm;
+	m_Gm = s.m_Gm;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the initial volume
 vec3d FEMicroFlucSurface::SurfMicrofluc()
 {
@@ -96,19 +114,7 @@ void FE2OMicroConstraint::CopyFrom(FENLConstraint* plc)
 	GetParameterList() = mc.GetParameterList();
 
 	// copy nodes
-	m_s.m_node = mc.m_s.m_node;
-
-	// create elements
-	int NE = mc.m_s.Elements();
-	m_s.create(NE);
-	for (int i=0; i<NE; ++i) m_s.Element(i) = mc.m_s.Element(i);
-
-	// copy surface data
-	m_s.m_Lm = mc.m_s.m_Lm;
-	m_s.m_pv  = mc.m_s.m_pv;
-	m_s.m_c = mc.m_s.m_c;
-	m_s.m_Fm = mc.m_s.m_Fm;
-	m_s.m_Gm = mc.m_s.m_Gm;
+	m_s.CopyFrom(mc.m_s);
 }
 
 //-----------------------------------------------------------------------------

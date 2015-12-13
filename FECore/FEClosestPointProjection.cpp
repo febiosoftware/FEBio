@@ -56,7 +56,7 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 	int mn = m_SNQ.Find(x);
 
 	// mn is a local index, so get the global node number too
-	int m = m_surf.m_node[mn];
+	int m = m_surf.NodeIndex(mn);
 
 	// get the nodal position
 	vec3d rm = mesh.Node(m).m_rt;
@@ -260,7 +260,7 @@ FESurfaceElement* FEClosestPointProjection::Project(int n, vec3d& q, vec2d& r)
 	int N = m_surf.Nodes();
 	for (int i=0; i<N; ++i)
 	{
-		if (m_surf.m_node[i] != n)
+		if (m_surf.NodeIndex(i) != n)
 		{
 			vec3d r = m_surf.Node(i).m_rt;
 			double d = (r - x)*(r - x);
@@ -273,7 +273,7 @@ FESurfaceElement* FEClosestPointProjection::Project(int n, vec3d& q, vec2d& r)
 	}
 	
 	// mn is a local index, so get the global node number too
-	int m = m_surf.m_node[mn];
+	int m = m_surf.NodeIndex(mn);
 	
 	// get the nodal position
 	vec3d r0 = mesh.Node(m).m_rt;

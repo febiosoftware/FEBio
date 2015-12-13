@@ -18,9 +18,6 @@ public:
 
 	void Activate();
 
-	int Nodes() { return (int) m_Node.size(); }
-	FENode& Node(int i);
-
 	//! create a shallow copy
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
@@ -31,6 +28,5 @@ public:
 	void AddElement(int eid, int n[2]);
 
 protected:
-	vector<int>					m_Node;
 	vector<FEDiscreteElement>	m_Elem;
 };

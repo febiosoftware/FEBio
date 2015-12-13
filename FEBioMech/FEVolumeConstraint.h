@@ -12,6 +12,9 @@ public:
 	//! Initialization
 	bool Init();
 
+	//! copy data
+	void CopyFrom(FEVolumeSurface& s);
+
 public:
 	double Volume();
 

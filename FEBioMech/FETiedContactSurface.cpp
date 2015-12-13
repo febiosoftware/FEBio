@@ -51,7 +51,7 @@ bool FETiedContactSurface::Init()
 				}
 			}
 		}
-		for (int i = 0; i<nn; ++i) m_off[i] = tag[m_node[i]];
+		for (int i = 0; i<nn; ++i) m_off[i] = tag[NodeIndex(i)];
 	}
 
 	return true;

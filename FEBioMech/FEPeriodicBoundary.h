@@ -13,6 +13,9 @@ public:
 	//! initializes data
 	bool Init();
 
+	//! copy data
+	void CopyFrom(FEPeriodicSurface& s);
+
 	//! shallow copy
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 

@@ -119,6 +119,10 @@ public:
 	int				m_nID;		//!< element ID
 	vector<int>		m_node;		//!< connectivity
 
+	// This array stores the local node numbers, that is the node numbers
+	// into the node list of a domain.
+	vector<int>		m_lnode;	//!< local connectivity
+
 protected:
 	FEElementState		m_State;	//!< element state data
 	FEElementTraits*	m_pT;		//!< pointer to element traits
@@ -183,50 +187,13 @@ public:
 class FESurfaceElement : public FEElement
 {
 public:
-	FESurfaceElement() { m_nelem = -1; m_lid = -1; }
+	FESurfaceElement();
 
-	FESurfaceElement(const FESurfaceElement& el)
-	{
-		// set the traits of the element
-		if (el.m_pT) SetTraits(el.m_pT);
+	FESurfaceElement(const FESurfaceElement& el);
 
-		// copy base class data
-		m_mat = el.m_mat;
-		m_node = el.m_node;
-		m_nID = el.m_nID;
-		m_lid = el.m_lid;
+	FESurfaceElement& operator = (const FESurfaceElement& el);
 
-		// copy surface element data
-		m_nelem = el.m_nelem;
-		m_lnode = el.m_lnode;
-	}
-
-	FESurfaceElement& operator = (const FESurfaceElement& el)
-	{
-		// make sure the element type is the same
-		if (m_pT == 0) SetTraits(el.m_pT);
-		else assert(m_pT == el.m_pT);
-
-		// copy base class data
-		m_mat = el.m_mat;
-		m_node = el.m_node;
-		m_nID = el.m_nID;
-		m_lid = el.m_lid;
-
-		// copy surface element data
-		m_nelem = el.m_nelem;
-		m_lnode = el.m_lnode;
-
-		return (*this); 
-	}
-
-	virtual void SetTraits(FEElementTraits* pt)
-	{
-		// we don't allocate state data for surface elements
-		m_pT = pt;
-		m_node.resize(Nodes());
-		m_lnode.resize(Nodes());
-	}
+	virtual void SetTraits(FEElementTraits* pt);
 
 	double* GaussWeights() { return &((FESurfaceElementTraits*)(m_pT))->gw[0]; }			// weights of integration points
 	double gr(int n) { return ((FESurfaceElementTraits*)(m_pT))->gr[n]; }	// integration point coordinate r
@@ -343,7 +310,9 @@ public:
 public:
 	int		m_lid;			//!< local ID
 	int		m_nelem;		//!< index of solid or shell element this surface element is a face of
-	vector<int>	m_lnode;	//!< local node numbering (compared to m_node which is a global numbering)
+
+	// This array is now defined the FEElement base class
+//	vector<int>	m_lnode;	//!< local node numbering (compared to m_node which is a global numbering)
 };
 
 //-----------------------------------------------------------------------------

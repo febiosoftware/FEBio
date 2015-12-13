@@ -6,44 +6,13 @@
 //-----------------------------------------------------------------------------
 bool FEDiscreteDomain::Initialize(FEModel &fem)
 {
-	int i, j;
-	FEMesh& m = *m_pMesh;
-	int N = m.Nodes();
-	vector<int> tag; tag.assign(N, -1);
-
-	int NE = Elements();
-	int n = 0;
-	for (i=0; i<NE; ++i)
-	{
-		FEDiscreteElement& e = m_Elem[i];
-		int ne = e.Nodes();
-		for (j=0; j<ne; ++j)
-		{
-			int nj = e.m_node[j];
-			if (tag[nj] == -1) tag[nj] = n++;
-		}
-	}
-	m_Node.resize(n);
-	n = 0;
-	for (i=0; i<NE; ++i)
-	{
-		FEDiscreteElement& e = m_Elem[i];
-		int ne = e.Nodes();
-		for (j=0; j<ne; ++j)
-		{
-			int nj = e.m_node[j];
-			if (tag[nj] != -1)
-			{
-				m_Node[n++] = nj;
-				tag[nj] = -1;
-			}
-		}
-	}
+	if (FEDomain::Initialize(fem) == false) return false;
 
 	FEMaterial* pmat = GetMaterial();
 	if (pmat)
 	{
 		int mid = pmat->GetID();
+		int NE = Elements();
 		for (int i=0; i<NE; ++i)
 		{
 			Element(i).SetMatID(mid);
@@ -69,12 +38,6 @@ void FEDiscreteDomain::Activate()
 			}
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-FENode& FEDiscreteDomain::Node(int i) 
-{
-	return m_pMesh->Node(m_Node[i]); 
 }
 
 //-----------------------------------------------------------------------------

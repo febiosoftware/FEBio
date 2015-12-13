@@ -71,18 +71,8 @@ void FEPeriodicBoundary1O::CopyFrom(FESurfacePairInteraction* pci)
 	GetParameterList() = pb.GetParameterList();
 
 	// copy nodes
-	m_ss.m_node = pb.m_ss.m_node;
-	m_ms.m_node = pb.m_ms.m_node;
-
-	// create slave elements
-	int NE = pb.m_ss.Elements();
-	m_ss.create(NE);
-	for (int i=0; i<NE; ++i) m_ss.Element(i) = pb.m_ss.Element(i);
-
-	// create master element
-	NE = pb.m_ms.Elements();
-	m_ms.create(NE);
-	for (int i=0; i<NE; ++i) m_ms.Element(i) = pb.m_ms.Element(i);
+	m_ss.CopyFrom(pb.m_ss);
+	m_ms.CopyFrom(pb.m_ms);
 }
 
 //-----------------------------------------------------------------------------

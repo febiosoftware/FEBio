@@ -2,6 +2,7 @@
 #include "FEDomain.h"
 #include "FEMaterial.h"
 #include "FEDataExport.h"
+#include "FEMesh.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------
@@ -72,4 +73,67 @@ void FEDomain::InitMaterialPointData()
 void FEDomain::SetMatID(int mid)
 {
 	for (int i=0; i<Elements(); ++i) ElementRef(i).SetMatID(mid);
+}
+
+//-----------------------------------------------------------------------------
+//! return a specific node
+FENode& FEDomain::Node(int i)
+{ 
+	return m_pMesh->Node(m_Node[i]); 
+}
+
+//-----------------------------------------------------------------------------
+bool FEDomain::Initialize(FEModel& fem)
+{
+	// make sure that there are elements in this domain
+	if (Elements() == 0) return false;
+
+	// get the mesh to which this domain belongs
+	FEMesh& mesh = *GetMesh();
+
+	// This array is used to keep tags on each node
+	int NN = mesh.Nodes();
+	vector<int> tag; tag.assign(NN, -1);
+
+	// let's find all nodes the domain needs
+	int nn = 0;
+	int NE = Elements();
+	for (int i=0; i<NE; ++i)
+	{
+		FEElement& el = ElementRef(i);
+		int ne = el.Nodes();
+		for (int j=0; j<ne; ++j)
+		{
+			// get the global node number
+			int m = el.m_node[j];
+		
+			// create a local node number
+			if (tag[m] == -1) tag[m] = nn++;
+
+			// set the local node number
+			el.m_lnode[j] = tag[m];
+		}
+	}
+
+	// allocate node index table
+	m_Node.assign(nn, -1);
+
+	// fill the node index table
+	for (int i=0; i<NN; ++i)
+	{
+		if (tag[i] >= 0)
+		{
+			m_Node[tag[i]] = i;
+		}
+	}
+
+#ifdef _DEBUG
+	// make sure all nodes are assigned a local index
+	for (int i=0; i<nn; ++i)
+	{
+		assert(m_Node[i] >= 0);
+	}
+#endif
+
+	return true;
 }

@@ -15,17 +15,11 @@ public:
 
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
-	bool Initialize(FEModel& fem);
-
 	void Activate();
-
-	int Nodes() { return (int) m_Node.size(); }
-	FENode& Node(int i);
 
 	//! Calculate the truss normal
 	vec3d TrussNormal(FETrussElement& el);
 
 protected:
-	vector<int>				m_Node;
 	vector<FETrussElement>	m_Elem;
 };

@@ -120,7 +120,7 @@ void FEMortarTiedContact::ContactForces(FEGlobalVector& R)
 		for (int B=0; B<NS; ++B)
 		{
 			FENode& nodeB = m_ss.Node(B);
-			en[0] = m_ss.m_node[B];
+			en[0] = m_ss.NodeIndex(B);
 			lm[0] = nodeB.m_ID[DOF_X];
 			lm[1] = nodeB.m_ID[DOF_Y];
 			lm[2] = nodeB.m_ID[DOF_Z];
@@ -140,7 +140,7 @@ void FEMortarTiedContact::ContactForces(FEGlobalVector& R)
 		for (int C=0; C<NM; ++C)
 		{
 			FENode& nodeC = m_ms.Node(C);
-			en[0] = m_ms.m_node[C];
+			en[0] = m_ms.NodeIndex(C);
 			lm[0] = nodeC.m_ID[DOF_X];
 			lm[1] = nodeC.m_ID[DOF_Y];
 			lm[2] = nodeC.m_ID[DOF_Z];

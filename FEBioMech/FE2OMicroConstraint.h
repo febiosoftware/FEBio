@@ -14,6 +14,9 @@ public:
 	//! Initialization
 	bool Init();
 
+	//! copy data
+	void CopyFrom(FEMicroFlucSurface& s);
+
 public:
 	vec3d SurfMicrofluc();
 

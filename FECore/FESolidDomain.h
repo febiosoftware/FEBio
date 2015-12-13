@@ -24,12 +24,6 @@ public:
 
 	int GetElementType() { return m_Elem[0].Type(); }
 
-	bool Initialize(FEModel& fem);
-
-	int Nodes() { return (int) m_Node.size(); }
-	FENode& Node(int i);
-	int NodeIndex(int i) { return m_Node[i]; }
-
 	//! find the element in which point y lies
 	FESolidElement* FindElement(vec3d y, double r[3]);
 
@@ -77,6 +71,5 @@ public:
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 protected:
-	vector<int>				m_Node;		//!< node list
 	vector<FESolidElement>	m_Elem;		//!< array of elements
 };

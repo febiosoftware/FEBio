@@ -50,14 +50,14 @@ bool FESurface::Init()
 	}
 
 	// allocate node index table
-	m_node.resize(nn);
+	m_Node.resize(nn);
 
 	// fill the node index table
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		if (tag[i] >= 0)
 		{
-			m_node[tag[i]] = i;
+			m_Node[tag[i]] = i;
 		}
 	}
 

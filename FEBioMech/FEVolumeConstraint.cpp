@@ -28,6 +28,23 @@ bool FEVolumeSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEVolumeSurface::CopyFrom(FEVolumeSurface& s)
+{
+	m_Node = s.m_Node;
+
+	// create elements
+	int NE = s.Elements();
+	create(NE);
+	for (int i=0; i<NE; ++i) Element(i) = s.Element(i);
+
+	// copy surface data
+	m_Lp = s.m_Lp;
+	m_p  = s.m_p;
+	m_V0 = s.m_V0;
+	m_Vt = s.m_Vt;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the initial volume
 double FEVolumeSurface::Volume()
 {
@@ -99,18 +116,7 @@ void FEVolumeConstraint::CopyFrom(FENLConstraint* plc)
 	GetParameterList() = vc.GetParameterList();
 
 	// copy nodes
-	m_s.m_node = vc.m_s.m_node;
-
-	// create elements
-	int NE = vc.m_s.Elements();
-	m_s.create(NE);
-	for (int i=0; i<NE; ++i) m_s.Element(i) = vc.m_s.Element(i);
-
-	// copy surface data
-	m_s.m_Lp = vc.m_s.m_Lp;
-	m_s.m_p  = vc.m_s.m_p;
-	m_s.m_V0 = vc.m_s.m_V0;
-	m_s.m_Vt = vc.m_s.m_Vt;
+	m_s.CopyFrom(vc.m_s);
 }
 
 //-----------------------------------------------------------------------------
