@@ -100,9 +100,9 @@ bool FECGSolidSolver::Init()
 		FENode& node = mesh.Node(i);
 
 		// displacement dofs
-		n = node.m_ID[DOF_X]; if (n >= 0) m_Ut[n] = node.m_rt.x - node.m_r0.x;
-		n = node.m_ID[DOF_Y]; if (n >= 0) m_Ut[n] = node.m_rt.y - node.m_r0.y;
-		n = node.m_ID[DOF_Z]; if (n >= 0) m_Ut[n] = node.m_rt.z - node.m_r0.z;
+		n = node.m_ID[DOF_X]; if (n >= 0) m_Ut[n] = node.get(DOF_X);
+		n = node.m_ID[DOF_Y]; if (n >= 0) m_Ut[n] = node.get(DOF_Y);
+		n = node.m_ID[DOF_Z]; if (n >= 0) m_Ut[n] = node.get(DOF_Z);
 
 		// rotational dofs
 		n = node.m_ID[DOF_U]; if (n >= 0) m_Ut[n] = node.get(DOF_U);
