@@ -249,11 +249,8 @@ void FEPrescribedBC::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-//! This is called by the FESolver::UpdateStresses to make sure that the prescribed.
-//! dofs are satisfied.
-//! \todo Find a good way to integrate this with the framework. Maybe I don't even
-//! need this since if I need this, then the prescribed dofs are not enforced correctly.
-//! In other words, either this is completely unnecassery or there is a bug
+//! Update the values of the prescribed degrees of freedom.
+//! This is called during model update (FESolver::Update)
 void FEPrescribedBC::Update()
 {
 	// get the mesh
@@ -264,20 +261,7 @@ void FEPrescribedBC::Update()
 	{
 		FENode& node = mesh.Node(m_item[i].nid);
 		double g = NodeValue(i);
-		switch (m_dof)
-		{
-		case DOF_X: node.set(DOF_X, g); node.m_rt.x = node.m_r0.x + g; break;
-		case DOF_Y: node.set(DOF_Y, g); node.m_rt.y = node.m_r0.y + g; break;
-		case DOF_Z: node.set(DOF_Z, g); node.m_rt.z = node.m_r0.z + g; break;
-		case DOF_P: node.set(DOF_P, g); break;
-		case DOF_T: node.set(DOF_T, g); break;
-        case DOF_VX: node.set(DOF_VX, g); break;
-        case DOF_VY: node.set(DOF_VY, g); break;
-        case DOF_VZ: node.set(DOF_VZ, g); break;
-        case DOF_E: node.set(DOF_E, g); break;
-		default:
-			if (m_dof >= DOF_C) node.set(m_dof, g); break;
-		}
+		node.set(m_dof, g);
 	}
 }
 
@@ -292,25 +276,7 @@ void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 		FENode& node = mesh.Node(m_item[i].nid);
 		double dq = NodeValue(i);
 		int I = -node.m_ID[m_dof] - 2;
-		if (I >= 0)
-		{
-			switch (m_dof)
-			{
-			case DOF_X: ui[I] = dq - node.get(DOF_X); break;
-			case DOF_Y: ui[I] = dq - node.get(DOF_Y); break;
-			case DOF_Z: ui[I] = dq - node.get(DOF_Z); break;
-			case DOF_P: ui[I] = dq - node.get(DOF_P); break;
-			case DOF_T: ui[I] = (brel ? dq - node.get(DOF_T) : dq);
-            case DOF_VX: ui[I] = dq - node.get(DOF_VX); break;
-            case DOF_VY: ui[I] = dq - node.get(DOF_VY); break;
-            case DOF_VZ: ui[I] = dq - node.get(DOF_VZ); break;
-            case DOF_E: ui[I] = dq - node.get(DOF_E); break;
-			default:
-				if ((m_dof >= DOF_C) && (m_dof < (int)node.m_ID.size())) {
-					ui[I] = dq - node.get(m_dof);
-				}
-			}
-		}
+		if (I >= 0) ui[I] = dq - node.get(m_dof);
 	}
 }
 

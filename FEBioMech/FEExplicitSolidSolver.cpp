@@ -309,9 +309,9 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 
 		// displacement dofs
 		// current position = initial + total at prev conv step + total increment so far + current increment  
-		if ((n = node.m_ID[DOF_X]) >= 0) { node.set(DOF_X, m_Ut[n] + m_Ui[n] + ui[n]); node.m_rt.x = node.m_r0.x + node.get(DOF_X); }
-		if ((n = node.m_ID[DOF_Y]) >= 0) { node.set(DOF_Y, m_Ut[n] + m_Ui[n] + ui[n]); node.m_rt.y = node.m_r0.y + node.get(DOF_Y); }
-		if ((n = node.m_ID[DOF_Z]) >= 0) { node.set(DOF_Z, m_Ut[n] + m_Ui[n] + ui[n]); node.m_rt.z = node.m_r0.z + node.get(DOF_Z); }
+		if ((n = node.m_ID[DOF_X]) >= 0) node.set(DOF_X, m_Ut[n] + m_Ui[n] + ui[n]);
+		if ((n = node.m_ID[DOF_Y]) >= 0) node.set(DOF_Y, m_Ut[n] + m_Ui[n] + ui[n]);
+		if ((n = node.m_ID[DOF_Z]) >= 0) node.set(DOF_Z, m_Ut[n] + m_Ui[n] + ui[n]);
 
 		// rotational dofs
 		if ((n = node.m_ID[DOF_U]) >= 0) node.set(DOF_U, m_Ut[n] + m_Ui[n] + ui[n]);
@@ -325,6 +325,15 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 	{
 		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
 		if (dc.IsActive()) dc.Update();
+	}
+
+	// Update the spatial nodal positions
+	// Don't update rigid nodes since they are already updated
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		if (node.m_rid == -1)
+			node.m_rt = node.m_r0 + node.get_vec3d(DOF_X, DOF_Y, DOF_Z);
 	}
 
 	// enforce the linear constraints
