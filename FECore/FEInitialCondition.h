@@ -11,6 +11,32 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+// Base class designed to replace the specialized initial condition classes.
+class FEInitialBC : public FEInitialCondition
+{
+	struct ITEM
+	{
+		int		nid;	//!< node ID
+		double	v;		//!< initial value
+	};
+
+public:
+	FEInitialBC(FEModel* pfem);
+
+	void SetDOF(int ndof) { m_dof = ndof; }
+
+	void Serialize(DumpFile& ar);
+
+	void Activate();
+
+	void Add(int nid, double v) { ITEM it = {nid, v}; m_item.push_back(it); }
+
+public:
+	vector<ITEM>	m_item;		//!< node value pairs
+	int				m_dof;		//!< degree of freedom
+};
+
+//-----------------------------------------------------------------------------
 class FEInitialVelocity : public FEInitialCondition
 {
 	struct ITEM

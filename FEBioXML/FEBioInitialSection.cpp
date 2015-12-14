@@ -165,6 +165,32 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 				// TODO: read the parameter list
 			}
 		}
+		else if (tag == "init")
+		{
+			// TODO: This will be become the preferred way of defining initial conditions on the DOFs.
+
+			// get the bc attribute
+			const char* szbc = tag.AttributeValue("bc");
+
+			// allocate a new initial condition of this type
+			FEInitialBC* pic = fecore_new<FEInitialBC>(FEIC_ID, "init_bc", &fem);
+			if (pic == 0) throw XMLReader::InvalidAttributeValue(tag, "type", "init_bc");
+
+			// add the initial condition
+			fem.AddInitialCondition(pic);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddModelComponent(pic);
+				pic->Deactivate();
+			}
+
+			if (!tag.isempty())
+			{
+				// TODO: read the parameter list
+			}
+		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}

@@ -8,6 +8,51 @@ FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEModelComponent(FEIC_ID
 }
 
 //-----------------------------------------------------------------------------
+FEInitialBC::FEInitialBC(FEModel* pfem) : FEInitialCondition(pfem)
+{
+	m_dof = -1;
+}
+
+//-----------------------------------------------------------------------------
+void FEInitialBC::Serialize(DumpFile& ar)
+{
+	FEInitialCondition::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << m_dof;
+		int nsize = m_item.size();
+		ar << nsize;
+		for (size_t i=0; i<nsize; ++i)
+		{
+			ar << m_item[i].nid << m_item[i].v;
+		}
+	}
+	else
+	{
+		ar >> m_dof;
+		int nsize = 0;
+		ar >> nsize;
+		m_item.resize(nsize);
+		for (size_t i=0; i<nsize; ++i)
+		{
+			ar >> m_item[i].nid >> m_item[i].v;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEInitialBC::Activate()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	for (size_t i=0; i<m_item.size(); ++i)
+	{
+		FENode& node = mesh.Node(m_item[i].nid);
+		node.set(m_dof, m_item[i].v);
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEInitialVelocity::Serialize(DumpFile& ar)
 {
 	FEInitialCondition::Serialize(ar);
