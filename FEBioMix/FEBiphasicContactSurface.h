@@ -12,6 +12,8 @@ public:
 	//! destructor
 	~FEBiphasicContactSurface();
 
+	void UnpackLM(FEElement& el, vector<int>& lm);
+
 public:
 	//! Get the fluid pressure gap
 	virtual void GetNodalPressureGap(int nface, double* pg);

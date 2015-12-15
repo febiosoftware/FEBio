@@ -34,6 +34,9 @@ public:
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
 
+	//! Unpack surface element data
+	void UnpackLM(FEElement& el, vector<int>& lm);
+
 public:
 	//! set an attribute of a surface facet
 	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);

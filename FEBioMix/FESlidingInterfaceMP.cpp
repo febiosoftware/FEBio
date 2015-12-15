@@ -1540,8 +1540,8 @@ void FESlidingInterfaceMP::ContactForces(FEGlobalVector& R)
 							
 							// fill the LM
 							LM.resize(ndof);
-							for (k=0; k<nseln; ++k) LM[k        ] = sLM[(DOF_C+sid)*nseln+k];
-							for (k=0; k<nmeln; ++k) LM[k + nseln] = mLM[(DOF_C+sid)*nmeln+k];
+							for (k=0; k<nseln; ++k) LM[k        ] = sLM[(4+sid)*nseln+k];
+							for (k=0; k<nmeln; ++k) LM[k + nseln] = mLM[(4+sid)*nmeln+k];
 							
 							// fill the force array
 							fe.resize(ndof);
@@ -1742,7 +1742,7 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
 							LM[ndpn*k+2] = sLM[3*k+2];			// z-dof
 							LM[ndpn*k+3] = sLM[3*nseln+k];		// p-dof
 							for (int isol=0; isol<nsol; ++isol)
-								LM[ndpn*k+4+isol] = sLM[(DOF_C+m_sid[isol])*nseln+k];		// c-dof
+								LM[ndpn*k+4+isol] = sLM[(4+m_sid[isol])*nseln+k];		// c-dof
 						}
 						for (k=0; k<nmeln; ++k)
 						{
@@ -1751,7 +1751,7 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
 							LM[ndpn*(k+nseln)+2] = mLM[3*k+2];			// z-dof
 							LM[ndpn*(k+nseln)+3] = mLM[3*nmeln+k];		// p-dof
 							for (int isol=0; isol<nsol; ++isol)
-								LM[ndpn*(k+nseln)+4+isol] = mLM[(DOF_C+m_sid[isol])*nmeln+k];		// c-dof
+								LM[ndpn*(k+nseln)+4+isol] = mLM[(4+m_sid[isol])*nmeln+k];		// c-dof
 						}
 					}
 					

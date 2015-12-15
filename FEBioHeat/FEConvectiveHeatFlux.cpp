@@ -37,7 +37,7 @@ void FEConvectiveHeatFlux::Create(int n)
 void FEConvectiveHeatFlux::Residual(FEGlobalVector& R)
 {
 	FEModel& fem = R.GetFEModel();
-	vector<int> elm;
+	FEMesh& mesh = fem.GetMesh();
 
 	int nfc = m_psurf->Elements();
 	for (int i=0; i<nfc; ++i)
@@ -60,7 +60,7 @@ void FEConvectiveHeatFlux::Residual(FEGlobalVector& R)
 
 		// nodal coordinates
 		vec3d rt[FEElement::MAX_NODES];
-		for (int j=0; j<ne; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
+		for (int j=0; j<ne; ++j) rt[j] = mesh.Node(el.m_node[j]).m_rt;
 
 		double* Gr, *Gs;
 		double* N;
@@ -72,10 +72,8 @@ void FEConvectiveHeatFlux::Residual(FEGlobalVector& R)
 		vec3d dxr, dxs;
 
 		// get the element's LM vector
-		m_psurf->UnpackLM(el, elm);
-
 		vector<int> lm(ne);
-		for (int j=0; j<ne; ++j) lm[j] = elm[ne*10 + j];
+		for (int j=0; j<ne; ++j) lm[j] = mesh.Node(el.m_node[j]).m_ID[DOF_T];
 
 		// force vector
 		// repeat over integration points
@@ -118,9 +116,9 @@ void FEConvectiveHeatFlux::Residual(FEGlobalVector& R)
 void FEConvectiveHeatFlux::StiffnessMatrix(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	matrix ke;
-	vector<int> elm;
 
 	int npr = m_FC.size();
 	for (int m=0; m<npr; ++m)
@@ -139,10 +137,8 @@ void FEConvectiveHeatFlux::StiffnessMatrix(FESolver* psolver)
 		ElementStiffness(el, ke, fc.hc);
 
 		// get the element's LM vector
-		m_psurf->UnpackLM(el, elm);
-
 		vector<int> lm(neln);
-		for (int j=0; j<neln; ++j) lm[j] = elm[neln*10 + j];
+		for (int j=0; j<neln; ++j) lm[j] = mesh.Node(el.m_node[j]).m_ID[DOF_T];
 
 		// assemble element matrix in global stiffness matrix
 		psolver->AssembleStiffness(el.m_node, lm, ke);

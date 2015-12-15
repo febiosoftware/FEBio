@@ -40,6 +40,9 @@ public:
 	//! Check if this is a linear force or not
 	bool IsLinear() { return m_blinear; }
 
+	//! Unpack surface element data
+	void UnpackLM(FEElement& el, vector<int>& lm);
+
 public:
 	//! set an attribute of the surface load
 	bool SetAttribute(const char* szatt, const char* szval);

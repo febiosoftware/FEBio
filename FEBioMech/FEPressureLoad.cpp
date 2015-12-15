@@ -361,6 +361,24 @@ void FEPressureLoad::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+void FEPressureLoad::UnpackLM(FEElement& el, vector<int>& lm)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	int N = el.Nodes();
+	lm.resize(N*3);
+	for (int i=0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+		FENode& node = mesh.Node(n);
+		vector<int>& id = node.m_ID;
+
+		lm[3*i  ] = id[DOF_X];
+		lm[3*i+1] = id[DOF_Y];
+		lm[3*i+2] = id[DOF_Z];
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
@@ -397,7 +415,7 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 			PressureStiffness(el, ke, tn);
 
 			// get the element's LM vector
-			m_psurf->UnpackLM(el, lm);
+			UnpackLM(el, lm);
 
 			// assemble element matrix in global stiffness matrix
 			psolver->AssembleStiffness(el.m_node, lm, ke);
@@ -437,7 +455,7 @@ void FEPressureLoad::Residual(FEGlobalVector& R)
 		if (m_blinear) LinearPressureForce(el, fe, tn); else PressureForce(el, fe, tn);
 
 		// get the element's LM vector
-		m_psurf->UnpackLM(el, lm);
+		UnpackLM(el, lm);
 
 		// add element force vector to global force vector
 		R.Assemble(el.m_node, lm, fe);

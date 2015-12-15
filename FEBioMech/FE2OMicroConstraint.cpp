@@ -24,6 +24,23 @@ bool FEMicroFlucSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEMicroFlucSurface::UnpackLM(FEElement& el, vector<int>& lm)
+{
+	int N = el.Nodes();
+	lm.resize(N*3);
+	for (int i=0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+		FENode& node = m_pMesh->Node(n);
+		vector<int>& id = node.m_ID;
+
+		lm[3*i  ] = id[DOF_X];
+		lm[3*i+1] = id[DOF_Y];
+		lm[3*i+2] = id[DOF_Z];
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEMicroFlucSurface::CopyFrom(FEMicroFlucSurface& s)
 {
 	m_Node = s.m_Node;
@@ -196,7 +213,14 @@ void FE2OMicroConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 		}
 
 		// get the element's LM vector
-		m_s.UnpackLM(el, lm);
+		lm.resize(3*neln);
+		for (int j=0; j<neln; ++j)
+		{
+			vector<int>& id = mesh.Node(el.m_node[j]).m_ID;
+			lm[3*j  ] = id[DOF_X];
+			lm[3*j+1] = id[DOF_Y];
+			lm[3*j+2] = id[DOF_Z];
+		}
 
 		// add element force vector to global force vector
 		R.Assemble(el.m_node, lm, fe);
@@ -287,7 +311,14 @@ void FE2OMicroConstraint::StiffnessMatrix(FESolver* psolver, const FETimePoint& 
 
 
 		// get the element's LM vector
-		m_s.UnpackLM(el, lm);
+		lm.resize(3*neln);
+		for (int j=0; j<neln; ++j)
+		{
+			vector<int>& id = mesh.Node(el.m_node[j]).m_ID;
+			lm[3*j  ] = id[DOF_X];
+			lm[3*j+1] = id[DOF_Y];
+			lm[3*j+2] = id[DOF_Z];
+		}
 
 		// assemble element matrix in global stiffness matrix
 		psolver->AssembleStiffness(el.m_node, lm, ke);

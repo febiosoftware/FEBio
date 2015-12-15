@@ -38,6 +38,7 @@ public:
 	void Serialize(DumpFile& ar);
 
 	//! Unpack surface element data
+	//! TODO: This is obsolete. Remove this.
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 public:

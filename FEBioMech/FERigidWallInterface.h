@@ -40,6 +40,9 @@ public:
 
 	void Serialize(DumpFile& ar);
 
+	//! Unpack surface element data
+	void UnpackLM(FEElement& el, vector<int>& lm);
+
 public:
 	vector<double>				m_gap;	//!< gap function at nodes
 	vector<vec3d>				m_nu;	//!< master normal at slave node

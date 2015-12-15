@@ -21,6 +21,9 @@ public:
 	//! Set the sibling of this contact surface
 	void SetSibling(FEContactSurface* ps);
 
+	//! Unpack surface element data
+	void UnpackLM(FEElement& el, vector<int>& lm);
+
 public:
 	virtual void GetNodalContactGap     (int nface, double* pg);
 	virtual void GetNodalContactPressure(int nface, double* pg);

@@ -17,6 +17,9 @@ public:
 	//! copy data
 	void CopyFrom(FEMicroFlucSurface& s);
 
+	//! Unpack surface element data
+	void UnpackLM(FEElement& el, vector<int>& lm);
+
 public:
 	vec3d SurfMicrofluc();
 

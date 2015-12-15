@@ -126,7 +126,6 @@ void FEThermoElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
     // get nodal DOFS
     DOFS& fedofs = *DOFS::GetInstance();
     int MAX_NDOFS = fedofs.GetNDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
     
 	int N = el.Nodes();
 	lm.assign(N*MAX_NDOFS, -1);

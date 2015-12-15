@@ -38,6 +38,8 @@ public:
 	//! serialize data
 	void Serialize(DumpFile& ar);
 
+	void UnpackLM(FEElement& el, vector<int>& lm);
+
 public:
 	//! set an attribute of the surface load
 	bool SetAttribute(const char* szatt, const char* szval);

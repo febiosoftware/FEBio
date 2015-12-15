@@ -15,6 +15,9 @@ public:
 	//! copy data
 	void CopyFrom(FEVolumeSurface& s);
 
+	//! Unpack surface element data
+	void UnpackLM(FEElement& el, vector<int>& lm);
+
 public:
 	double Volume();
 

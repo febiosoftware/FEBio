@@ -13,10 +13,6 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-    // get number of DOFS
-    DOFS& fedofs = fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
-    
 	// make sure we've read the nodes section
 	if (mesh.Nodes() == 0) throw XMLReader::InvalidTag(tag);
 
@@ -91,12 +87,10 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 				pic->Deactivate();
 			}
 
+			// TODO: Add a check to make sure that a solute with this ID exists
 			int isol = 0;
 			const char* sz = tag.AttributeValue("sol", true);
 			if (sz) isol = atoi(sz) - 1;
-			if ((isol < 0) || (isol >= MAX_CDOFS))
-				throw XMLReader::InvalidAttributeValue(tag, "sol", sz);
-
 			pic->SetSoluteID(isol);
 
 			++tag;

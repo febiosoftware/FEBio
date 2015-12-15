@@ -70,6 +70,28 @@ bool FEFluidFlux::SetFacetAttribute(int nface, const char* szatt, const char* sz
 }
 
 //-----------------------------------------------------------------------------
+void FEFluidFlux::UnpackLM(FEElement& el, vector<int>& lm)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	int N = el.Nodes();
+	lm.resize(N*4);
+	for (int i=0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+		FENode& node = mesh.Node(n);
+		vector<int>& id = node.m_ID;
+
+		// first the displacement dofs
+		lm[3*i  ] = id[DOF_X];
+		lm[3*i+1] = id[DOF_Y];
+		lm[3*i+2] = id[DOF_Z];
+
+		// now the pressure dofs
+		lm[3*N+i] = id[DOF_P];
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to fluid flux
 
 void FEFluidFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& wn, double dt, bool mixture)
@@ -537,7 +559,7 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 
 			// get the surface element
 			FESurfaceElement& el = m_psurf->Element(m);
-			m_psurf->UnpackLM(el, elm);
+			UnpackLM(el, elm);
 				
 			// calculate nodal normal fluid flux
 			int neln = el.Nodes();
@@ -570,7 +592,7 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 
 			// get the surface element
 			FESurfaceElement& el = m_psurf->Element(m);
-			m_psurf->UnpackLM(el, elm);
+			UnpackLM(el, elm);
 					
 			// calculate nodal normal fluid flux
 			int neln = el.Nodes();
@@ -616,7 +638,7 @@ void FEFluidFlux::Residual(FEGlobalVector& R)
 			LOAD& fc = m_PC[i];
 
 			FESurfaceElement& el = m_psurf->Element(i);
-			m_psurf->UnpackLM(el, elm);
+			UnpackLM(el, elm);
 				
 			// calculate nodal normal fluid flux
 			int neln = el.Nodes();
@@ -645,7 +667,7 @@ void FEFluidFlux::Residual(FEGlobalVector& R)
 			LOAD& fc = m_PC[i];
 
 			FESurfaceElement& el = m_psurf->Element(i);
-			m_psurf->UnpackLM(el, elm);
+			UnpackLM(el, elm);
 				
 			// calculate nodal normal fluid flux
 			int neln = el.Nodes();

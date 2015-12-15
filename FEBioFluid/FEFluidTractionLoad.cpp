@@ -37,6 +37,25 @@ void FEFluidTractionLoad::Create(int n)
 }
 
 //-----------------------------------------------------------------------------
+void FEFluidTractionLoad::UnpackLM(FEElement& el, vector<int>& lm)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	int N = el.Nodes();
+	lm.resize(N*3);
+	for (int i=0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+		FENode& node = mesh.Node(n);
+		vector<int>& id = node.m_ID;
+
+		// first the displacement dofs
+		lm[3*i  ] = id[DOF_VX];
+		lm[3*i+1] = id[DOF_VY];
+		lm[3*i+2] = id[DOF_VZ];
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the residual for the traction load
 void FEFluidTractionLoad::Residual(FEGlobalVector& R)
 {
@@ -110,18 +129,10 @@ void FEFluidTractionLoad::Residual(FEGlobalVector& R)
 		}
 
 		// get the element's LM vector and adjust it
-		m_psurf->UnpackLM(el, elm);
-
-        vector<int> lm(ndof);
-        for (int i=0; i<neln; ++i)
-        {
-            lm[3*i  ] = elm[11*neln + 3*i];
-            lm[3*i+1] = elm[11*neln + 3*i+1];
-            lm[3*i+2] = elm[11*neln + 3*i+2];
-        }
+		UnpackLM(el, elm);
         
 		// add element force vector to global force vector
-		R.Assemble(el.m_node, lm, fe);
+		R.Assemble(el.m_node, elm, fe);
 	}
 }
 

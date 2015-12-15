@@ -90,6 +90,23 @@ double FEVolumeSurface::Volume()
 }
 
 //-----------------------------------------------------------------------------
+void FEVolumeSurface::UnpackLM(FEElement& el, vector<int>& lm)
+{
+	int N = el.Nodes();
+	lm.resize(N*3);
+	for (int i=0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+		FENode& node = m_pMesh->Node(n);
+		vector<int>& id = node.m_ID;
+
+		lm[3*i  ] = id[DOF_X];
+		lm[3*i+1] = id[DOF_Y];
+		lm[3*i+2] = id[DOF_Z];
+	}
+}
+
+//-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEVolumeConstraint, FENLConstraint);
 	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon" ); 
 	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "augtol" );

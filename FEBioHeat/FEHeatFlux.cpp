@@ -32,6 +32,7 @@ void FEHeatFlux::Residual(FEGlobalVector& R)
 {
 	int i, j, n;
 	FEModel& fem = R.GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 	vector<int> elm;
 
 	int nfc = m_psurf->Elements();
@@ -66,10 +67,8 @@ void FEHeatFlux::Residual(FEGlobalVector& R)
 		vec3d dxr, dxs;
 
 		// get the element's LM vector
-		m_psurf->UnpackLM(el, elm);
-
 		vector<int> lm(ne);
-		for (j=0; j<ne; ++j) lm[j] = elm[ne*10 + j];
+		for (j=0; j<ne; ++j) lm[j] = mesh.Node(el.m_node[j]).m_ID[DOF_T];
 
 		// force vector
 		// repeat over integration points

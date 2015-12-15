@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "FESurface.h"
-#include "DOFS.h"
 
 //-----------------------------------------------------------------------------
 FESurface::FESurface(FEMesh* pm) : FEDomain(FE_DOMAIN_SURFACE, pm) 
@@ -117,53 +116,8 @@ int FESurface::FindElement(FESurfaceElement& el)
 //-----------------------------------------------------------------------------
 void FESurface::UnpackLM(FEElement& el, vector<int>& lm)
 {
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
-    
-	int N = el.Nodes();
-	lm.resize(N*MAX_NDOFS);
-
-	for (int i=0; i<N; ++i)
-	{
-		int n = el.m_node[i];
-
-		FENode& node = m_pMesh->Node(n);
-		vector<int>& id = node.m_ID;
-
-		// first the displacement dofs
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
-
-		// now the pressure dofs
-		lm[3*N+i] = id[DOF_P];
-
-		// rigid rotational dofs
-		lm[4*N + 3*i  ] = id[DOF_RU];
-		lm[4*N + 3*i+1] = id[DOF_RV];
-		lm[4*N + 3*i+2] = id[DOF_RW];
-
-		// fill the rest with -1
-		lm[7*N + 3*i  ] = -1;
-		lm[7*N + 3*i+1] = -1;
-		lm[7*N + 3*i+2] = -1;
-
-		lm[10*N + i] = id[DOF_T];
-		
-        // fluid velocity dofs
-        lm[11*N + 3*i  ] = id[DOF_VX];
-        lm[11*N + 3*i+1] = id[DOF_VY];
-        lm[11*N + 3*i+2] = id[DOF_VZ];
-        
-        // fluid dilatation dof
-        lm[14*N + i] = id[DOF_E];
-        
-		// concentration dofs
-		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(15+k)*N + i] = id[DOF_C+k];
-	}
+	// TODO: This is obsolete. No class should come here ever again.
+	assert(false);
 }
 
 //-----------------------------------------------------------------------------

@@ -110,7 +110,7 @@ void FETractionLoad::Residual(FEGlobalVector& R)
 		}
 
 		// get the element's LM vector
-		m_psurf->UnpackLM(el, lm);
+		UnpackLM(el, lm);
 
 		// add element force vector to global force vector
 		R.Assemble(el.m_node, lm, fe);
@@ -179,4 +179,22 @@ bool FETractionLoad::SetFacetAttribute(int nface, const char* szatt, const char*
 	else return false;
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FETractionLoad::UnpackLM(FEElement& el, vector<int>& lm)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	int N = el.Nodes();
+	lm.resize(N*3);
+	for (int i=0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+		FENode& node = mesh.Node(n);
+		vector<int>& id = node.m_ID;
+
+		lm[3*i  ] = id[DOF_X];
+		lm[3*i+1] = id[DOF_Y];
+		lm[3*i+2] = id[DOF_Z];
+	}
 }

@@ -72,6 +72,28 @@ bool FEPoroNormalTraction::SetFacetAttribute(int nface, const char* szatt, const
 }
 
 //-----------------------------------------------------------------------------
+void FEPoroNormalTraction::UnpackLM(FEElement& el, vector<int>& lm)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	int N = el.Nodes();
+	lm.resize(N*4);
+	for (int i=0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+		FENode& node = mesh.Node(n);
+		vector<int>& id = node.m_ID;
+
+		// first the displacement dofs
+		lm[3*i  ] = id[DOF_X];
+		lm[3*i+1] = id[DOF_Y];
+		lm[3*i+2] = id[DOF_Z];
+
+		// now the pressure dofs
+		lm[3*N+i] = id[DOF_P];
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to normal traction
 void FEPoroNormalTraction::TractionStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn, bool effective, bool bsymm)
 {
@@ -388,7 +410,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 			TractionStiffness(el, ke, tn, m_beffective, psolver->m_bsymm);
 
 			// get the element's LM vector
-			m_psurf->UnpackLM(el, lm);
+			UnpackLM(el, lm);
 
 			// assemble element matrix in global stiffness matrix
 			psolver->AssembleStiffness(el.m_node, lm, ke);
@@ -434,7 +456,7 @@ void FEPoroNormalTraction::Residual(FEGlobalVector& R)
 		if (m_blinear) LinearTractionForce(el, fe, tn); else TractionForce(el, fe, tn);
 
 		// get the element's LM vector
-		m_psurf->UnpackLM(el, lm);
+		UnpackLM(el, lm);
 
 		// add element force vector to global force vector
 		R.Assemble(el.m_node, lm, fe);

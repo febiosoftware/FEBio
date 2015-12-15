@@ -64,6 +64,37 @@ bool FESoluteFlux::SetFacetAttribute(int nface, const char* szatt, const char* s
 }
 
 //-----------------------------------------------------------------------------
+void FESoluteFlux::UnpackLM(FEElement& el, vector<int>& lm)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+    // get nodal DOFS
+    DOFS& fedofs = *DOFS::GetInstance();
+    int MAX_NDOFS = fedofs.GetNDOFS();
+    int MAX_CDOFS = fedofs.GetCDOFS();
+    
+	int N = el.Nodes();
+	lm.resize(N*(3+MAX_CDOFS));
+
+	for (int i=0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+
+		FENode& node = mesh.Node(n);
+		vector<int>& id = node.m_ID;
+
+		// first the displacement dofs
+		lm[3*i  ] = id[DOF_X];
+		lm[3*i+1] = id[DOF_Y];
+		lm[3*i+2] = id[DOF_Z];
+
+		// concentration dofs
+		for (int k=0; k<MAX_CDOFS; ++k)
+			lm[(3+k)*N + i] = id[DOF_C+k];
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to solute flux
 //!
 void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& wn, double dt)
@@ -313,7 +344,7 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 			FluxStiffness(el, ke, wn, dt);
 
 			// get the element's LM vector
-			m_psurf->UnpackLM(el, elm);
+			UnpackLM(el, elm);
 					
 			// TODO: the problem here is that the LM array that is returned by the UnpackElement
 			// function does not give the equation numbers in the right order. For this reason we
@@ -326,7 +357,7 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 				lm[4*i  ] = elm[3*i];
 				lm[4*i+1] = elm[3*i+1];
 				lm[4*i+2] = elm[3*i+2];
-				lm[4*i+3] = elm[(15+m_isol-1)*neln+i];  // m_isol is 1-based
+				lm[4*i+3] = elm[(3+m_isol-1)*neln+i];  // m_isol is 1-based
 			}
 					
 			// assemble element matrix in global stiffness matrix
@@ -366,12 +397,12 @@ void FESoluteFlux::Residual(FEGlobalVector& R)
 		if (m_blinear) LinearFlowRate(el, fe, wn, dt); else FlowRate(el, fe, wn, dt);
 
 		// get the element's LM vector
-		m_psurf->UnpackLM(el, elm);
+		UnpackLM(el, elm);
 
 		// We only need the solute concentration dofs, so just extract these.
 		vector<int> lm(ndof);
 		for (int i=0; i<neln; ++i)
-			lm[i] = elm[(15+m_isol-1)*neln+i];  // m_isol is 1-based
+			lm[i] = elm[(3+m_isol-1)*neln+i];  // m_isol is 1-based
 			
 		// add element force vector to global force vector
 		R.Assemble(el.m_node, lm, fe);
