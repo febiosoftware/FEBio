@@ -20,6 +20,8 @@ public:
 	//! set the material
 	void SetMaterial(FEMaterial* pmat);
 
+	void Activate();
+
 public: // overridden from FEElasticDomain
 
 	//! calculate stiffness matrix

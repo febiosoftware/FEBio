@@ -43,6 +43,24 @@ void FEDiscreteSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
+void FEDiscreteSpringDomain::Activate()
+{
+	for (int i=0; i<Nodes(); ++i)
+	{
+		FENode& node = Node(i);
+		if (node.m_bexclude == false)
+		{
+			if (node.m_rid < 0)
+			{
+				node.m_ID[DOF_X] = DOF_ACTIVE;
+				node.m_ID[DOF_Y] = DOF_ACTIVE;
+				node.m_ID[DOF_Z] = DOF_ACTIVE;
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Calculates the forces due to discrete elements (i.e. springs)
 
 void FEDiscreteSpringDomain::InternalForces(FEGlobalVector& R)

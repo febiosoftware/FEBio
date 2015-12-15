@@ -37,6 +37,24 @@ void FEElasticTrussDomain::UnpackLM(FEElement &el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
+void FEElasticTrussDomain::Activate()
+{
+	for (int i=0; i<Nodes(); ++i)
+	{
+		FENode& node = Node(i);
+		if (node.m_bexclude == false)
+		{
+			if (node.m_rid < 0)
+			{
+				node.m_ID[DOF_X] = DOF_ACTIVE;
+				node.m_ID[DOF_Y] = DOF_ACTIVE;
+				node.m_ID[DOF_Z] = DOF_ACTIVE;
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEElasticTrussDomain::InitElements()
 {
 	for (size_t i=0; i<m_Elem.size(); ++i)

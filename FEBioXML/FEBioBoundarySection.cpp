@@ -321,6 +321,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
+	DOFS& dofs = fem.GetDOFS();
 
 	int nversion = m_pim->Version();
 
@@ -337,22 +338,9 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		// get the bc attribute
 		const char* sz = tag.AttributeValue("bc");
 
-		int bc;
-		if      (strcmp(sz, "x") == 0) bc = DOF_X;
-		else if (strcmp(sz, "y") == 0) bc = DOF_Y;
-		else if (strcmp(sz, "z") == 0) bc = DOF_Z;
-		else if (strcmp(sz, "u") == 0) bc = DOF_U;
-		else if (strcmp(sz, "v") == 0) bc = DOF_V;
-		else if (strcmp(sz, "w") == 0) bc = DOF_W;
-		else if (strcmp(sz, "p") == 0) bc = DOF_P;
-		else if (strcmp(sz, "t") == 0) bc = DOF_T; 
-        else if (strcmp(sz, "vx") == 0) bc = DOF_VX;
-        else if (strcmp(sz, "vy") == 0) bc = DOF_VY;
-        else if (strcmp(sz, "vz") == 0) bc = DOF_VZ;
-        else if (strcmp(sz, "e") == 0) bc = DOF_E;
-		else if (strcmp(sz, "c") == 0) bc = DOF_C;
-		else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
-		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+		// find the dof index from its symbol
+		int bc = dofs.GetDOF(sz);
+		if (bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 		// get the lc attribute
 		sz = tag.AttributeValue("lc");
@@ -396,25 +384,12 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		++tag;
 		for (int i=0; i<ndis; ++i)
 		{
-			int n = atoi(tag.AttributeValue("id"))-1, bc;
+			int n = atoi(tag.AttributeValue("id"))-1;
 			const char* sz = tag.AttributeValue("bc");
 
-			if      (strcmp(sz, "x") == 0) bc = DOF_X;
-			else if (strcmp(sz, "y") == 0) bc = DOF_Y;
-			else if (strcmp(sz, "z") == 0) bc = DOF_Z;
-			else if (strcmp(sz, "u") == 0) bc = DOF_U;
-			else if (strcmp(sz, "v") == 0) bc = DOF_V;
-			else if (strcmp(sz, "w") == 0) bc = DOF_W;
-			else if (strcmp(sz, "p") == 0) bc = DOF_P;
-			else if (strcmp(sz, "t") == 0) bc = DOF_T; 
-            else if (strcmp(sz, "vx") == 0) bc = DOF_VX;
-            else if (strcmp(sz, "vy") == 0) bc = DOF_VY;
-            else if (strcmp(sz, "vz") == 0) bc = DOF_VZ;
-            else if (strcmp(sz, "e") == 0) bc = DOF_E;
-			else if (strcmp(sz, "c") == 0) bc = DOF_C;
-			else if (strcmp(sz, "c1") == 0) bc = DOF_C;
-			else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
-			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+			// get the dof index from its symbol
+			int bc = dofs.GetDOF(sz);
+			if (bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 			sz = tag.AttributeValue("lc");
 			int lc = atoi(sz)-1;
@@ -443,6 +418,7 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
+	DOFS& dofs = fem.GetDOFS();
 	int NN = mesh.Nodes();
 
 	int nversion = m_pim->Version();
@@ -458,23 +434,9 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 	if (sztype && strcmp(sztype, "relative") == 0) br = true;
 
 	// get the BC
-	int bc = -1;
 	const char* sz = tag.AttributeValue("bc");
-	if      (strcmp(sz, "x") == 0) bc = DOF_X;
-	else if (strcmp(sz, "y") == 0) bc = DOF_Y;
-	else if (strcmp(sz, "z") == 0) bc = DOF_Z;
-	else if (strcmp(sz, "u") == 0) bc = DOF_U;
-	else if (strcmp(sz, "v") == 0) bc = DOF_V;
-	else if (strcmp(sz, "w") == 0) bc = DOF_W;
-	else if (strcmp(sz, "p") == 0) bc = DOF_P;
-	else if (strcmp(sz, "t") == 0) bc = DOF_T; 
-    else if (strcmp(sz, "vx") == 0) bc = DOF_VX;
-    else if (strcmp(sz, "vy") == 0) bc = DOF_VY;
-    else if (strcmp(sz, "vz") == 0) bc = DOF_VZ;
-    else if (strcmp(sz, "e") == 0) bc = DOF_E;
-	else if (strcmp(sz, "c") == 0) bc = DOF_C;
-	else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
-	else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+	int bc = dofs.GetDOF(sz);
+	if(bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 	// get the load curve number
 	int lc = -1;

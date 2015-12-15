@@ -27,11 +27,10 @@ void FEMultiphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
     // get nodal DOFS
     DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
     int MAX_CDOFS = fedofs.GetCDOFS();
     
 	int N = el.Nodes();
-	lm.resize(N*MAX_NDOFS);
+	lm.resize(N*(7+MAX_CDOFS));
 	
 	for (int i=0; i<N; ++i)
 	{
@@ -49,28 +48,14 @@ void FEMultiphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		lm[3*N+i] = id[DOF_P];
 
 		// rigid rotational dofs
+		// TODO: Do we really need this?
 		lm[4*N + 3*i  ] = id[DOF_RU];
 		lm[4*N + 3*i+1] = id[DOF_RV];
 		lm[4*N + 3*i+2] = id[DOF_RW];
 
-		// fill the rest with -1
-		lm[7*N + 3*i  ] = -1;
-		lm[7*N + 3*i+1] = -1;
-		lm[7*N + 3*i+2] = -1;
-
-		lm[10*N + i] = id[DOF_T];
-		
-        // fluid velocity dofs
-        lm[11*N + 3*i  ] = id[DOF_VX];
-        lm[11*N + 3*i+1] = id[DOF_VY];
-        lm[11*N + 3*i+2] = id[DOF_VZ];
-        
-        // fluid dilatation dofs
-        lm[14*N+i] = id[DOF_E];
-        
 		// concentration dofs
 		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(15+k)*N + i] = id[DOF_C+k];
+			lm[(7+k)*N + i] = id[DOF_C+k];
 	}
 }
 
@@ -479,10 +464,10 @@ void FEMultiphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
             // add solute work to global residual
             #pragma omp critical
             {
-                int dofc = DOF_C + m_pMat->GetSolute(isol)->GetSoluteID();
+                int dofc = neln*(7 + m_pMat->GetSolute(isol)->GetSoluteID());
                 for (int j=0; j<neln; ++j)
                 {
-                    int J = elm[dofc*neln+j];
+                    int J = elm[dofc+j];
                     if (J >= 0) R[J] += fe[j];
                 }
             }
@@ -598,10 +583,10 @@ void FEMultiphasicDomain::InternalSoluteWork(vector<double>& R, double dt)
 			// add solute work to global residual
             #pragma omp critical
             {
-                int dofc = DOF_C + m_pMat->GetSolute(isol)->GetSoluteID();
+                int dofc = neln*(7 + m_pMat->GetSolute(isol)->GetSoluteID());
                 for (int j=0; j<neln; ++j)
                 {
-                    int J = elm[dofc*neln+j];
+                    int J = elm[dofc + j];
                     if (J >= 0) R[J] += fe[j];
                 }
             }
@@ -952,7 +937,7 @@ void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const F
             int isol;
             vector<int> dofc(nsol);
             for (isol=0; isol<nsol; ++isol)
-                dofc[isol] = DOF_C + m_pMat->GetSolute(isol)->GetSoluteID();
+                dofc[isol] = neln*(7 + m_pMat->GetSolute(isol)->GetSoluteID());
             for (int i=0; i<neln; ++i)
             {
                 lm[ndpn*i  ] = elm[3*i];
@@ -960,7 +945,7 @@ void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const F
                 lm[ndpn*i+2] = elm[3*i+2];
                 lm[ndpn*i+3] = elm[3*neln+i];
                 for (isol=0; isol<nsol; ++isol)
-                    lm[ndpn*i+4+isol] = elm[dofc[isol]*neln+i];
+                    lm[ndpn*i+4+isol] = elm[dofc[isol]+i];
             }
 			
             // assemble element matrix in global stiffness matrix
@@ -1006,7 +991,7 @@ void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const
             int isol;
             vector<int> dofc(nsol);
             for (isol=0; isol<nsol; ++isol)
-                dofc[isol] = DOF_C + m_pMat->GetSolute(isol)->GetSoluteID();
+                dofc[isol] = neln*(7 + m_pMat->GetSolute(isol)->GetSoluteID());
             for (int i=0; i<neln; ++i)
             {
                 lm[ndpn*i  ] = elm[3*i];
@@ -1014,7 +999,7 @@ void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const
                 lm[ndpn*i+2] = elm[3*i+2];
                 lm[ndpn*i+3] = elm[3*neln+i];
                 for (isol=0; isol<nsol; ++isol)
-                    lm[ndpn*i+4+isol] = elm[dofc[isol]*neln+i];
+                    lm[ndpn*i+4+isol] = elm[dofc[isol]+i];
             }
 			
             // assemble element matrix in global stiffness matrix

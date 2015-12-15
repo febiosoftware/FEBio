@@ -29,6 +29,9 @@ public:
 	//! set the material
 	void SetMaterial(FEMaterial* pmat);
 
+	//! Activate domain
+	void Activate();
+
 public: // overloads from FEElasticDomain
 
 	//! update the truss stresses

@@ -24,14 +24,11 @@ void FETriphasicDomain::SetMaterial(FEMaterial* pmat)
 //! Unpack the element LM data. 
 void FETriphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
-    
+	int dofc0 = DOF_C + m_pMat->m_pSolute[0]->GetSoluteID();
+	int dofc1 = DOF_C + m_pMat->m_pSolute[1]->GetSoluteID();
+
 	int N = el.Nodes();
-	lm.resize(N*MAX_NDOFS);
-	
+	lm.resize(N*9);
 	for (int i=0; i<N; ++i)
 	{
 		int n = el.m_node[i];
@@ -48,28 +45,14 @@ void FETriphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		lm[3*N+i] = id[DOF_P];
 
 		// rigid rotational dofs
+		// TODO: Do I really need these?
 		lm[4*N + 3*i  ] = id[DOF_RU];
 		lm[4*N + 3*i+1] = id[DOF_RV];
 		lm[4*N + 3*i+2] = id[DOF_RW];
 
-		// fill the rest with -1
-		lm[7*N + 3*i  ] = -1;
-		lm[7*N + 3*i+1] = -1;
-		lm[7*N + 3*i+2] = -1;
-
-		lm[10*N + i] = id[DOF_T];
-		
-        // fluid velocity dofs
-        lm[11*N + 3*i  ] = id[DOF_VX];
-        lm[11*N + 3*i+1] = id[DOF_VY];
-        lm[11*N + 3*i+2] = id[DOF_VZ];
-        
-        // fluid dilatation dofs
-        lm[14*N+i] = id[DOF_E];
-        
 		// concentration dofs
-		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(15+k)*N + i] = id[DOF_C+k];
+		lm[7*N + i] = id[dofc0];
+		lm[8*N + i] = id[dofc1];
 	}
 }
 
@@ -418,10 +401,9 @@ void FETriphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 		// add solute work to global residual
         #pragma omp critical
         {
-			int dofc = DOF_C + m_pMat->m_pSolute[0]->GetSoluteID();
 			for (int j=0; j<neln; ++j)
 			{
-				int J = elm[dofc*neln+j];
+				int J = elm[7*neln+j];
 				if (J >= 0) R[J] += fe[j];
 			}
 		}
@@ -432,10 +414,9 @@ void FETriphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 		// add solute work to global residual
         #pragma omp critical
         {
-            int dofc = DOF_C + m_pMat->m_pSolute[1]->GetSoluteID();
             for (int j=0; j<neln; ++j)
             {
-                int J = elm[dofc*neln+j];
+                int J = elm[8*neln+j];
                 if (J >= 0) R[J] += fe[j];
             }
         }
@@ -463,10 +444,9 @@ void FETriphasicDomain::InternalSoluteWork(vector<double>& R, double dt)
 		ElementInternalSoluteWork(el, fe, dt, 0);
 			
 		// add solute work to global residual
-		int dofc = DOF_C + m_pMat->m_pSolute[0]->GetSoluteID();
 		for (int j=0; j<neln; ++j)
 		{
-			int J = elm[dofc*neln+j];
+			int J = elm[7*neln+j];
 			if (J >= 0) R[J] += fe[j];
 		}
 
@@ -474,10 +454,9 @@ void FETriphasicDomain::InternalSoluteWork(vector<double>& R, double dt)
 		ElementInternalSoluteWork(el, fe, dt, 1);
 			
 		// add solute work to global residual
-		dofc = DOF_C + m_pMat->m_pSolute[1]->GetSoluteID();
 		for (int j=0; j<neln; ++j)
 		{
-			int J = elm[dofc*neln+j];
+			int J = elm[8*neln+j];
 			if (J >= 0) R[J] += fe[j];
 		}
 	}
@@ -833,9 +812,7 @@ bool FETriphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector<d
 void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp)
 {
 	FETriphasic* pm = m_pMat;
-	int dofc0 = DOF_C + pm->m_pSolute[0]->GetSoluteID();
-	int dofc1 = DOF_C + pm->m_pSolute[1]->GetSoluteID();
-	
+
 	// repeat over all solid elements
 	size_t NE = m_Elem.size();
     
@@ -870,8 +847,8 @@ void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FET
 			lm[ndpn*i+1] = elm[3*i+1];
 			lm[ndpn*i+2] = elm[3*i+2];
 			lm[ndpn*i+3] = elm[3*neln+i];
-			lm[ndpn*i+4] = elm[dofc0*neln+i];
-			lm[ndpn*i+5] = elm[dofc1*neln+i];
+			lm[ndpn*i+4] = elm[7*neln+i];
+			lm[ndpn*i+5] = elm[8*neln+i];
 		}
 		
 		// assemble element matrix in global stiffness matrix
@@ -885,8 +862,6 @@ void FETriphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const F
 {
 	// get the elements material
 	FETriphasic* pm = m_pMat;
-	int dofc0 = DOF_C + pm->m_pSolute[0]->GetSoluteID();
-	int dofc1 = DOF_C + pm->m_pSolute[1]->GetSoluteID();
 	
 	// repeat over all solid elements
 	size_t NE = m_Elem.size();
@@ -922,8 +897,8 @@ void FETriphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const F
 			lm[ndpn*i+1] = elm[3*i+1];
 			lm[ndpn*i+2] = elm[3*i+2];
 			lm[ndpn*i+3] = elm[3*neln+i];
-			lm[ndpn*i+4] = elm[dofc0*neln+i];
-			lm[ndpn*i+5] = elm[dofc1*neln+i];
+			lm[ndpn*i+4] = elm[7*neln+i];
+			lm[ndpn*i+5] = elm[8*neln+i];
 		}
 		
 		// assemble element matrix in global stiffness matrix

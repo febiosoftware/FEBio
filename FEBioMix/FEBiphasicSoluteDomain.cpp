@@ -115,14 +115,9 @@ void FEBiphasicSoluteDomain::Activate()
 //! Unpack the element LM data. 
 void FEBiphasicSoluteDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
-    
+	int dofc = DOF_C + m_pMat->GetSolute()->GetSoluteID();
 	int N = el.Nodes();
-	lm.resize(N*MAX_NDOFS);
-	
+	lm.resize(N*8);
 	for (int i=0; i<N; ++i)
 	{
 		int n = el.m_node[i];
@@ -139,28 +134,13 @@ void FEBiphasicSoluteDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		lm[3*N+i] = id[DOF_P];
 
 		// rigid rotational dofs
+		// TODO: Do I really need this
 		lm[4*N + 3*i  ] = id[DOF_RU];
 		lm[4*N + 3*i+1] = id[DOF_RV];
 		lm[4*N + 3*i+2] = id[DOF_RW];
 
-		// fill the rest with -1
-		lm[7*N + 3*i  ] = -1;
-		lm[7*N + 3*i+1] = -1;
-		lm[7*N + 3*i+2] = -1;
-
-		lm[10*N + i] = id[DOF_T];
-		
-        // velocity dofs
-        lm[11*N + 3*i  ] = id[DOF_VX];
-        lm[11*N + 3*i+1] = id[DOF_VY];
-        lm[11*N + 3*i+2] = id[DOF_VZ];
-        
-        // fluid dilatation dofs
-        lm[14*N+i] = id[DOF_E];
-        
 		// concentration dofs
-		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(15+k)*N + i] = id[DOF_C+k];
+		lm[7*N + i] = id[dofc];
 	}
 }
 
@@ -461,10 +441,9 @@ void FEBiphasicSoluteDomain::InternalSoluteWork(vector<double>& R, double dt)
 		#pragma omp critical
 		{
 			int neln = el.Nodes();
-			int dofc = DOF_C + m_pMat->GetSolute()->GetSoluteID();
 			for (int j=0; j<neln; ++j)
 			{
-				int J = elm[dofc*neln+j];
+				int J = elm[7*neln+j];
 				if (J >= 0) R[J] += fe[j];
 			}
 		}
@@ -494,10 +473,9 @@ void FEBiphasicSoluteDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
 		#pragma omp critical
 		{
 			int neln = el.Nodes();
-			int dofc = DOF_C + m_pMat->GetSolute()->GetSoluteID();
 			for (int j=0; j<neln; ++j)
 			{
-				int J = elm[dofc*neln+j];
+				int J = elm[7*neln+j];
 				if (J >= 0) R[J] += fe[j];
 			}
 		}
@@ -810,14 +788,13 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, cons
 		#pragma omp critical
 		{
 			vector<int> lm(ndof);
-			int dofc = DOF_C + m_pMat->GetSolute()->GetSoluteID();
 			for (int i=0; i<neln; ++i)
 			{
 				lm[5*i  ] = elm[3*i];
 				lm[5*i+1] = elm[3*i+1];
 				lm[5*i+2] = elm[3*i+2];
 				lm[5*i+3] = elm[3*neln+i];
-				lm[5*i+4] = elm[dofc*neln+i];
+				lm[5*i+4] = elm[7*neln+i];
 			}
 		
 			// assemble element matrix in global stiffness matrix
@@ -860,14 +837,13 @@ void FEBiphasicSoluteDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, co
 		#pragma omp critical
 		{
 			vector<int> lm(ndof);
-			int dofc = DOF_C + m_pMat->GetSolute()->GetSoluteID();
 			for (int i=0; i<neln; ++i)
 			{
 				lm[5*i  ] = elm[3*i];
 				lm[5*i+1] = elm[3*i+1];
 				lm[5*i+2] = elm[3*i+2];
 				lm[5*i+3] = elm[3*neln+i];
-				lm[5*i+4] = elm[dofc*neln+i];
+				lm[5*i+4] = elm[7*neln+i];
 			}
 		
 			// assemble element matrix in global stiffness matrix

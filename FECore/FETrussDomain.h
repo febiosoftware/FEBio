@@ -15,8 +15,6 @@ public:
 
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
-	void Activate();
-
 	//! Calculate the truss normal
 	vec3d TrussNormal(FETrussElement& el);
 

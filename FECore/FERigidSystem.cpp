@@ -312,9 +312,6 @@ void FERigidSystem::UpdateMesh()
 				vec3d a0 = node.m_r0 - RB.m_r0;
 				vec3d at = RB.m_qt*a0;
 				node.m_rt = RB.m_rt + at;
-
-				vec3d ut = node.m_rt - node.m_r0;
-				node.set_vec3d(DOF_X, DOF_Y, DOF_Z, ut);
 			}
 		}
 	}

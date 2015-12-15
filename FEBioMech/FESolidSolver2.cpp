@@ -580,6 +580,19 @@ void FESolidSolver2::UpdateRigidBodies(vector<double>& ui)
 
 	// update the mesh' nodes
 	rigid.UpdateMesh();
+
+	// Since the rigid nodes are repositioned we need to update the displacement DOFS
+	FEMesh& mesh = m_fem.GetMesh();
+	int N = mesh.Nodes();
+	for (int i=0; i<N; ++i)
+	{
+		FENode& node = mesh.Node(i);
+		if (node.m_rid >= 0)
+		{
+			vec3d ut = node.m_rt - node.m_r0;
+			node.set_vec3d(DOF_X, DOF_Y, DOF_Z, ut);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

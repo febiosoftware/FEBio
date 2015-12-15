@@ -3,6 +3,7 @@
 #include "FEMesh.h"
 #include "FEModel.h"
 
+
 //-----------------------------------------------------------------------------
 bool FEDiscreteDomain::Initialize(FEModel &fem)
 {
@@ -20,24 +21,6 @@ bool FEDiscreteDomain::Initialize(FEModel &fem)
 	}
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEDiscreteDomain::Activate()
-{
-	for (int i=0; i<Nodes(); ++i)
-	{
-		FENode& node = Node(i);
-		if (node.m_bexclude == false)
-		{
-			if (node.m_rid < 0)
-			{
-				node.m_ID[DOF_X] = DOF_ACTIVE;
-				node.m_ID[DOF_Y] = DOF_ACTIVE;
-				node.m_ID[DOF_Z] = DOF_ACTIVE;
-			}
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------

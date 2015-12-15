@@ -16,8 +16,6 @@ public:
 
 	bool Initialize(FEModel& fem);
 
-	void Activate();
-
 	//! create a shallow copy
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 

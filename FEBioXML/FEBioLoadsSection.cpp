@@ -134,6 +134,7 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
+	DOFS& dofs = fem.GetDOFS();
 
 	int nversion = m_pim->Version();
 	if (nversion >= 0x0200)
@@ -142,22 +143,9 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 		int ncnf = tag.children();
 
 		// get the bc
-		int bc = -1;
 		const char* sz = tag.AttributeValue("bc");
-
-		if      (strcmp(sz, "x") == 0) bc = DOF_X;
-		else if (strcmp(sz, "y") == 0) bc = DOF_Y;
-		else if (strcmp(sz, "z") == 0) bc = DOF_Z;
-		else if (strcmp(sz, "p") == 0) bc = DOF_P;
-		else if (strcmp(sz, "t") == 0) bc = DOF_T;
-        else if (strcmp(sz, "vx") == 0) bc = DOF_VX;
-        else if (strcmp(sz, "vy") == 0) bc = DOF_VY;
-        else if (strcmp(sz, "vz") == 0) bc = DOF_VZ;
-        else if (strcmp(sz, "e") == 0) bc = DOF_E;
-		else if (strcmp(sz, "c") == 0) bc = DOF_C;
-		else if (strcmp(sz, "c1") == 0) bc = DOF_C;
-		else if (strcmp(sz, "c2") == 0) bc = DOF_C+1;
-		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+		int bc = dofs.GetDOF(sz);
+		if (bc==-1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 		// get the load curve
 		sz = tag.AttributeValue("lc");
