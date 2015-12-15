@@ -439,6 +439,36 @@ bool FEBiphasicSolver::Quasin(double time)
 }
 
 //-----------------------------------------------------------------------------
+//! calculates the concentrated nodal forces
+void FEBiphasicSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
+{
+	// zero nodal force vector
+	zero(F);
+
+	// loop over nodal loads
+	int NNL = m_fem.NodalLoads();
+	for (int i=0; i<NNL; ++i)
+	{
+		FENodalLoad& fc = *m_fem.NodalLoad(i);
+		if (fc.IsActive())
+		{
+			int nid	= fc.m_node;	// node ID
+			int dof = fc.m_bc;		// degree of freedom
+
+			// get the nodal load value
+			double f = fc.Value();
+			
+			// For pressure and concentration loads, multiply by dt
+			// for consistency with evaluation of residual and stiffness matrix
+			if ((dof == DOF_P) || (dof >= DOF_C)) f *= tp.dt;
+
+			// assemble into residual
+			AssembleResidual(nid, dof, f, F);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! calculates the residual vector
 //! Note that the concentrated nodal forces are not calculated here.
 //! This is because they do not depend on the geometry 

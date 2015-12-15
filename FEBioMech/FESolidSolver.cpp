@@ -1961,10 +1961,6 @@ void FESolidSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
 			// get the nodal load value
 			double f = fc.Value();
 			
-			// For pressure and concentration loads, multiply by dt
-			// for consistency with evaluation of residual and stiffness matrix
-			if ((dof == DOF_P) || (dof >= DOF_C)) f *= tp.dt;
-
 			// assemble into residual
 			AssembleResidual(nid, dof, f, F);
 		}

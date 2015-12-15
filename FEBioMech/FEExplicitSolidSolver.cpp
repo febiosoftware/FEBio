@@ -751,10 +751,6 @@ void FEExplicitSolidSolver::NodalForces(vector<double>& F, const FETimePoint& tp
 		
 			double f = fc.Value();
 			
-			// For pressure and concentration loads, multiply by dt
-			// for consistency with evaluation of residual and stiffness matrix
-			if ((bc == DOF_P) || (bc >= DOF_C)) f *= tp.dt;
-
 			if (n >= 0) F[n] = f;
 			else if (node.m_rid >=0)
 			{

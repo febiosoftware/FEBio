@@ -40,6 +40,10 @@ public:
 	void UpdateSolute(vector<double>& ui);
 
 public:
+	//! Calculates concentrated nodal forces (overridden from FESolidSolver2)
+	//! (This function is called from FESolidSolver2::PrepStep)
+	virtual void NodalForces(vector<double>& F, const FETimePoint& tp);
+
 	//! Calculates residual (overridden from FESolidSolver2)
 	virtual bool Residual(vector<double>& R);
 
