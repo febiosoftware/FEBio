@@ -8,7 +8,7 @@
 #endif
 
 //-----------------------------------------------------------------------------
-FETriphasicDomain::FETriphasicDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh())
+FETriphasicDomain::FETriphasicDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
 }

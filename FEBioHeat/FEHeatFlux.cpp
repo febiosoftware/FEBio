@@ -33,8 +33,10 @@ void FEHeatFlux::Residual(FEGlobalVector& R)
 	int i, j, n;
 	FEModel& fem = R.GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
+	const int dof_T = fem.GetDOFS().GetDOF("t");
+	if (dof_T == -1) { assert(false); return; }
+	
 	vector<int> elm;
-
 	int nfc = m_psurf->Elements();
 	for (i=0; i<nfc; ++i)
 	{
@@ -68,7 +70,7 @@ void FEHeatFlux::Residual(FEGlobalVector& R)
 
 		// get the element's LM vector
 		vector<int> lm(ne);
-		for (j=0; j<ne; ++j) lm[j] = mesh.Node(el.m_node[j]).m_ID[DOF_T];
+		for (j=0; j<ne; ++j) lm[j] = mesh.Node(el.m_node[j]).m_ID[dof_T];
 
 		// force vector
 		// repeat over integration points

@@ -17,7 +17,7 @@ extern "C" int omp_get_thread_num(void);
 //! constructor
 //! Some derived classes will pass 0 to the pmat, since the pmat variable will be
 //! to initialize another material. These derived classes will set the m_pMat variable as well.
-FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh())
+FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
 }

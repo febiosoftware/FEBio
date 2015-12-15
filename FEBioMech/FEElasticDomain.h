@@ -5,6 +5,8 @@
 #include <vector>
 using namespace std;
 
+class FEModel;
+
 //-----------------------------------------------------------------------------
 //! Abstract interface class for elastic domains.
 
@@ -16,6 +18,7 @@ using namespace std;
 class FEElasticDomain
 {
 public:
+	FEElasticDomain(FEModel* pfem) : m_pfem(pfem) {}
 	virtual ~FEElasticDomain(){}
 
 	//! Updates the element stresses
@@ -46,4 +49,10 @@ public:
 
 	//! calculate the mass matrix (for dynamic problems)
 	virtual void MassMatrix(FESolver* psolver, double scale) = 0;
+
+public:
+	FEModel* GetFEModel() { return m_pfem; }
+
+protected:
+	FEModel*	m_pfem;
 };

@@ -43,6 +43,9 @@ void FEInitialBC::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FEInitialBC::Activate()
 {
+	FEInitialCondition::Activate();
+	assert(m_dof >= 0);
+	if (m_dof == -1) return;
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	for (size_t i=0; i<m_item.size(); ++i)
@@ -53,11 +56,12 @@ void FEInitialBC::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FEInitialVelocity::Serialize(DumpFile& ar)
+void FEInitialBCVec3D::Serialize(DumpFile& ar)
 {
 	FEInitialCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
+		ar << m_dof[0] << m_dof[1] << m_dof[2];
 		int nsize = m_item.size();
 		ar << nsize;
 		for (size_t i=0; i<nsize; ++i)
@@ -67,6 +71,7 @@ void FEInitialVelocity::Serialize(DumpFile& ar)
 	}
 	else
 	{
+		ar >> m_dof[0] >> m_dof[1] >> m_dof[2];
 		int nsize = 0;
 		ar >> nsize;
 		m_item.resize(nsize);
@@ -78,163 +83,15 @@ void FEInitialVelocity::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEInitialVelocity::Activate()
+void FEInitialBCVec3D::Activate()
 {
+	assert((m_dof[0]>=0)&&(m_dof[1]>=0)&&(m_dof[2]>=0));
+	FEInitialCondition::Activate();
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	for (size_t i=0; i<m_item.size(); ++i)
 	{
 		FENode& node = mesh.Node(m_item[i].nid);
-		node.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, m_item[i].v0);
+		node.set_vec3d(m_dof[0], m_dof[1], m_dof[2], m_item[i].v0);
 	}
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialPressure::Serialize(DumpFile& ar)
-{
-	FEInitialCondition::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		int nsize = m_item.size();
-		ar << nsize;
-		for (size_t i=0; i<nsize; ++i)
-		{
-			ar << m_item[i].nid << m_item[i].p0;
-		}
-	}
-	else
-	{
-		int nsize = 0;
-		ar >> nsize;
-		m_item.resize(nsize);
-		for (size_t i=0; i<nsize; ++i)
-		{
-			ar >> m_item[i].nid >> m_item[i].p0;
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialPressure::Activate()
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-	for (size_t i=0; i<m_item.size(); ++i)
-	{
-		FENode& node = mesh.Node(m_item[i].nid);
-		node.set(DOF_P, m_item[i].p0);
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialTemperature::Serialize(DumpFile& ar)
-{
-	FEInitialCondition::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		int nsize = m_item.size();
-		ar << nsize;
-		for (size_t i=0; i<nsize; ++i)
-		{
-			ar << m_item[i].nid << m_item[i].T0;
-		}
-	}
-	else
-	{
-		int nsize = 0;
-		ar >> nsize;
-		m_item.resize(nsize);
-		for (size_t i=0; i<nsize; ++i)
-		{
-			ar >> m_item[i].nid >> m_item[i].T0;
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialTemperature::Activate()
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-	for (size_t i=0; i<m_item.size(); ++i)
-	{
-		FENode& node = mesh.Node(m_item[i].nid);
-		node.set(DOF_T, m_item[i].T0);
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialConcentration::Serialize(DumpFile& ar)
-{
-	FEInitialCondition::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		int nsize = m_item.size();
-		ar << m_nsol;
-		ar << nsize;
-		for (size_t i=0; i<nsize; ++i)
-		{
-			ar << m_item[i].nid << m_item[i].c0;
-		}
-	}
-	else
-	{
-		int nsize = 0;
-		ar >> m_nsol;
-		ar >> nsize;
-		m_item.resize(nsize);
-		for (size_t i=0; i<nsize; ++i)
-		{
-			ar >> m_item[i].nid >> m_item[i].c0;
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialConcentration::Activate()
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-	for (size_t i=0; i<m_item.size(); ++i)
-	{
-		FENode& node = mesh.Node(m_item[i].nid);
-		node.set(DOF_C + m_nsol, m_item[i].c0);
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialDilatation::Serialize(DumpFile& ar)
-{
-	FEInitialCondition::Serialize(ar);
-    if (ar.IsSaving())
-    {
-		int nsize = m_item.size();
-		ar << nsize;
-        for (size_t i=0; i<nsize; ++i)
-        {
-            ar << m_item[i].nid << m_item[i].e0;
-        }
-    }
-    else
-    {
-		int nsize = 0;
-		ar >> nsize;
-		m_item.resize(nsize);
-        for (size_t i=0; i<nsize; ++i)
-        {
-            ar >> m_item[i].nid >> m_item[i].e0;
-        }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialDilatation::Activate()
-{
-    FEModel& fem = *GetFEModel();
-    FEMesh& mesh = fem.GetMesh();
-    for (size_t i=0; i<m_item.size(); ++i)
-    {
-        FENode& node = mesh.Node(m_item[i].nid);
-        node.set(DOF_E, m_item[i].e0);
-    }
 }

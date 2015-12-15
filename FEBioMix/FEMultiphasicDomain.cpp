@@ -9,7 +9,7 @@
 #endif
 
 //-----------------------------------------------------------------------------
-FEMultiphasicDomain::FEMultiphasicDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh())
+FEMultiphasicDomain::FEMultiphasicDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
 { 
 	m_pMat = 0;
 }

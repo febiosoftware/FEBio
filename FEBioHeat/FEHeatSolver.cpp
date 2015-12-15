@@ -20,8 +20,9 @@ FEHeatSolver::FEHeatSolver(FEModel* pfem) : FELinearSolver(pfem)
 	m_nrhs = 0;
 
 	// set the active degrees of freedom for this solver
+	const int dof_T = pfem->GetDOFS().GetDOF("t");
 	vector<int> dof;
-	dof.push_back(DOF_T);
+	dof.push_back(dof_T);
 	SetDOF(dof);
 }
 
@@ -37,6 +38,9 @@ bool FEHeatSolver::Init()
 	// Call base class first
 	if (FELinearSolver::Init() == false) return false;
 
+	const int dof_T = m_fem.GetDOFS().GetDOF("t");
+	if (dof_T == -1) { assert(false); return false; }
+
 	// allocate data structures
 	int neq = NumberOfEquations();
 	m_Tp.assign(neq, 0);
@@ -46,8 +50,8 @@ bool FEHeatSolver::Init()
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		int nid = node.m_ID[DOF_T];
-		if (nid >= 0) m_Tp[nid] = node.get(DOF_T);
+		int nid = node.m_ID[dof_T];
+		if (nid >= 0) m_Tp[nid] = node.get(dof_T);
 	}
 
 	// Identify the heat-transfer domains
@@ -70,14 +74,16 @@ bool FEHeatSolver::Init()
 void FEHeatSolver::Update(vector<double>& u)
 {
 	FEMesh& mesh = m_fem.GetMesh();
+	const int dof_T = m_fem.GetDOFS().GetDOF("t");
+	if (dof_T == -1) { assert(false); return; }
 
 	// update temperatures
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		int n = node.m_ID[DOF_T];
-		if (n >= 0) node.set(DOF_T, u[n]);
-		else if (-n-2 >= 0) node.set(DOF_T, u[-n-2]);
+		int n = node.m_ID[dof_T];
+		if (n >= 0) node.set(dof_T, u[n]);
+		else if (-n-2 >= 0) node.set(dof_T, u[-n-2]);
 	}
 
 	// update heat fluxes
@@ -98,7 +104,7 @@ void FEHeatSolver::Update(vector<double>& u)
 
 				// get the nodal temperatures
 				double T[FEElement::MAX_NODES];
-				for (int n=0; n<ne; ++n) T[n] = mesh.Node(el.m_node[n]).get(DOF_T);
+				for (int n=0; n<ne; ++n) T[n] = mesh.Node(el.m_node[n]).get(dof_T);
 
 				// calculate heat flux for each integration point
 				for (int n=0; n<ni; ++n)
@@ -139,6 +145,8 @@ void FEHeatSolver::NodalFluxes(FEGlobalVector& R)
 {
 	// get the FE mesh
 	FEMesh& mesh = m_fem.GetMesh();
+	const int dof_T = m_fem.GetDOFS().GetDOF("t");
+	if (dof_T == -1) { assert(false); return; }
 
 	// loop over nodal loads
 	int ncnf = m_fem.NodalLoads();
@@ -153,7 +161,7 @@ void FEHeatSolver::NodalFluxes(FEGlobalVector& R)
 			FENode& node = mesh.Node(id);
 
 			int n = node.m_ID[bc];
-			if ((n >= 0) && (bc == DOF_T)) 
+			if ((n >= 0) && (bc == dof_T)) 
 			{
 				R[n] = fc.Value();
 			}

@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEHeatSolidDomain::FEHeatSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh())
+FEHeatSolidDomain::FEHeatSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEHeatDomain(pfem)
 {
 	m_pMat = 0;
 }
@@ -20,6 +20,9 @@ void FEHeatSolidDomain::SetMaterial(FEMaterial* pmat)
 
 void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	const int dof_T = dofs.GetDOF("t");
+
 	int N = el.Nodes();
 	lm.resize(N);
 
@@ -31,19 +34,22 @@ void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// get temperature equation number
-		lm[i] = id[DOF_T];
+		lm[i] = id[dof_T];
 	}
 }
 
 //-----------------------------------------------------------------------------
 void FEHeatSolidDomain::Activate()
 {
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	const int dof_T = dofs.GetDOF("t");
+
 	for (int i=0; i<Nodes(); ++i)
 	{
 		FENode& node = Node(i);
 		if (node.m_bexclude == false)
 		{
-			node.m_ID[DOF_T] = DOF_ACTIVE;
+			node.m_ID[dof_T] = DOF_ACTIVE;
 		}
 	}
 }

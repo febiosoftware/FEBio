@@ -36,6 +36,8 @@ FEThermoElasticSolver::FEThermoElasticSolver(FEModel* pfem) : FESolidSolver(pfem
 
 	m_ndeq = 0;
 	m_nteq = 0;
+
+	m_dofT = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -51,6 +53,10 @@ bool FEThermoElasticSolver::Init()
 {
 	// we need a non-symmetric stiffness matrix
 	m_bsymm = false;
+
+	// get the temperature degree of freedom index
+	m_dofT = m_fem.GetDOFS().GetDOF("t");
+	if (m_dofT == -1) { assert(false); return false; }
 
 	// call the base class version first
 	if (FESolidSolver::Init() == false) return false;
@@ -73,7 +79,7 @@ bool FEThermoElasticSolver::Init()
 			FENode& node = mesh.Node(i);
 
 			// temperature dofs
-			int n = node.m_ID[DOF_T]; if (n >= 0) m_Ut[n] = node.get(DOF_T);
+			int n = node.m_ID[m_dofT]; if (n >= 0) m_Ut[n] = node.get(m_dofT);
 		}
 	}
 
@@ -99,7 +105,7 @@ bool FEThermoElasticSolver::InitEquations()
 		if (n.m_ID[DOF_X] != -1) m_ndeq++;
 		if (n.m_ID[DOF_Y] != -1) m_ndeq++;
 		if (n.m_ID[DOF_Z] != -1) m_ndeq++;
-		if (n.m_ID[DOF_T] != -1) m_nteq++;
+		if (n.m_ID[m_dofT] != -1) m_nteq++;
 	}
 
 	return true;
@@ -471,7 +477,7 @@ void FEThermoElasticSolver::GetTemperatureData(vector<double> &ti, const vector<
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = m_fem.GetMesh().Node(i);
-		nid = n.m_ID[DOF_T];
+		nid = n.m_ID[m_dofT];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
@@ -606,8 +612,8 @@ void FEThermoElasticSolver::Update(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 
 		// current temperature = initial + total at prev conv step + total increment so far + current increment
-		int n = node.m_ID[DOF_T];
-		if (n >= 0) node.set(DOF_T, m_Ut[n] + m_Ui[n] + ui[n]);
+		int n = node.m_ID[m_dofT];
+		if (n >= 0) node.set(m_dofT, m_Ut[n] + m_Ui[n] + ui[n]);
 	}
 
 	// make sure the prescribed displacements are fullfilled

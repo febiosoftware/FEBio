@@ -12,6 +12,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
+	DOFS& dofs = fem.GetDOFS();
 
 	// make sure we've read the nodes section
 	if (mesh.Nodes() == 0) throw XMLReader::InvalidTag(tag);
@@ -22,7 +23,8 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 	{
 		if (tag == "velocity")
 		{
-			FEInitialVelocity* pic = dynamic_cast<FEInitialVelocity*>(fecore_new<FEInitialCondition>(FEIC_ID, "velocity", &fem));
+			FEInitialBCVec3D* pic = dynamic_cast<FEInitialBCVec3D*>(fecore_new<FEInitialCondition>(FEIC_ID, "init_bc_vec3d", &fem));
+			pic->SetDOF(DOF_VX, DOF_VY, DOF_VZ);
 			fem.AddInitialCondition(pic);
 
 			// add this boundary condition to the current step
@@ -48,18 +50,43 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			}
 			while (!tag.isend());
 		}
-		else if (tag == "fluid_pressure")
+		else
 		{
-			FEInitialPressure* pic = dynamic_cast<FEInitialPressure*>(fecore_new<FEInitialCondition>(FEIC_ID, "fluid_pressure", &fem));
-			fem.AddInitialCondition(pic);
+			// Get the degree of freedom
+			int ndof = -1;
+			if      (tag == "temperature"   ) ndof = dofs.GetDOF("t");
+			else if (tag == "fluid_pressure") ndof = dofs.GetDOF("p");
+			else if (tag == "concentration" )
+			{
+				// TODO: Add a check to make sure that a solute with this ID exists
+				int isol = 0;
+				const char* sz = tag.AttributeValue("sol", true);
+				if (sz) isol = atoi(sz) - 1;
+				ndof = DOF_C + isol;
+			}
+			else if (tag == "init")
+			{
+				// TODO: In the future I want to make this the preferred way of defining initial conditions
+				// get the bc attribute
+				const char* szbc = tag.AttributeValue("bc");
+				ndof = dofs.GetDOF(szbc);
+			}
+			else throw XMLReader::InvalidTag(tag);
+			if (ndof == -1) throw XMLReader::InvalidTag(tag);
+
+			// allocate initial condition
+			FEInitialBC* pic = dynamic_cast<FEInitialBC*>(fecore_new<FEInitialCondition>(FEIC_ID, "init_bc", &fem));
+			pic->SetDOF(ndof);
 
 			// add this boundary condition to the current step
+			fem.AddInitialCondition(pic);
 			if (m_pim->m_nsteps > 0)
 			{
 				GetStep()->AddModelComponent(pic);
 				pic->Deactivate();
 			}
 
+			// read the node list and values
 			++tag;
 			do
 			{
@@ -75,117 +102,6 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			}
 			while (!tag.isend());
 		}
-		else if (tag == "concentration")
-		{
-			FEInitialConcentration* pic = dynamic_cast<FEInitialConcentration*>(fecore_new<FEInitialCondition>(FEIC_ID, "concentration", &fem));
-			fem.AddInitialCondition(pic);
-
-			// add this boundary condition to the current step
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(pic);
-				pic->Deactivate();
-			}
-
-			// TODO: Add a check to make sure that a solute with this ID exists
-			int isol = 0;
-			const char* sz = tag.AttributeValue("sol", true);
-			if (sz) isol = atoi(sz) - 1;
-			pic->SetSoluteID(isol);
-
-			++tag;
-			do
-			{
-				if (tag == "node")
-				{
-					int nid = atoi(tag.AttributeValue("id"))-1;
-					double c;
-					m_pim->value(tag, c);
-					pic->Add(nid, c);
-				}
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
-			}
-			while (!tag.isend());
-		}
-		else if (tag == "temperature")
-		{
-			FEInitialTemperature* pic = dynamic_cast<FEInitialTemperature*>(fecore_new<FEInitialCondition>(FEIC_ID, "temperature", &fem));
-			fem.AddInitialCondition(pic);
-
-			// add this boundary condition to the current step
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(pic);
-				pic->Deactivate();
-			}
-
-			++tag;
-			do
-			{
-				if (tag == "node")
-				{
-					int nid = atoi(tag.AttributeValue("id"))-1;
-					double T;
-					m_pim->value(tag, T);
-					pic->Add(nid, T);
-				}
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
-			}
-			while (!tag.isend());
-		}
-		else if (tag == "ic")
-		{
-			// get the type attribute
-			const char* sztype = tag.AttributeValue("type");
-
-			// allocate a new initial condition of this type
-			FEInitialCondition* pic = fecore_new<FEInitialCondition>(FEIC_ID, sztype, &fem);
-			if (pic == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-
-			// add the initial condition
-			fem.AddInitialCondition(pic);
-
-			// add this boundary condition to the current step
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(pic);
-				pic->Deactivate();
-			}
-
-			if (!tag.isempty())
-			{
-				// TODO: read the parameter list
-			}
-		}
-		else if (tag == "init")
-		{
-			// TODO: This will be become the preferred way of defining initial conditions on the DOFs.
-
-			// get the bc attribute
-			const char* szbc = tag.AttributeValue("bc");
-
-			// allocate a new initial condition of this type
-			FEInitialBC* pic = fecore_new<FEInitialBC>(FEIC_ID, "init_bc", &fem);
-			if (pic == 0) throw XMLReader::InvalidAttributeValue(tag, "type", "init_bc");
-
-			// add the initial condition
-			fem.AddInitialCondition(pic);
-
-			// add this boundary condition to the current step
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(pic);
-				pic->Deactivate();
-			}
-
-			if (!tag.isempty())
-			{
-				// TODO: read the parameter list
-			}
-		}
-		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());

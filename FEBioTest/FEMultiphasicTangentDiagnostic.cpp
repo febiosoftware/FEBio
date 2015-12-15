@@ -64,13 +64,14 @@ bool FEMultiphasicTangentUniaxial::Init()
 
 	// add initial conditions
 	for (isol = 0; isol<nsol; ++isol) {
-		FEInitialConcentration* pic = new FEInitialConcentration(&fem);
-		pic->SetSoluteID(isol);
+		FEInitialBC* pic = new FEInitialBC(&fem);
+		pic->SetDOF(DOF_C + isol);
 		for (i=0; i<8; ++i) pic->Add(i, m_concentration);
 		fem.AddInitialCondition(pic);
 	}
 
-	FEInitialPressure* pip = new FEInitialPressure(&fem);
+	FEInitialBC* pip = new FEInitialBC(&fem);
+	pip->SetDOF(DOF_P);
 	for (i=0; i<8; ++i) pip->Add(i, pe);
 	fem.AddInitialCondition(pip);
 

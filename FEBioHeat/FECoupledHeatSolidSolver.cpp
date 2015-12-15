@@ -71,6 +71,9 @@ bool FECoupledHeatSolidSolver::SolveStep(double time)
 //! \todo This won't work anymore since the domains are stored on the FEAnalysis
 void FECoupledHeatSolidSolver::CalculateInitialStresses()
 {
+	const int dof_T = m_fem.GetDOFS().GetDOF("t");
+	if (dof_T == -1) { assert(false); return; }
+
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	FEHeatSolidDomain&   dh = dynamic_cast<FEHeatSolidDomain  &>(*pstep->Domain(0));
@@ -92,7 +95,7 @@ void FECoupledHeatSolidSolver::CalculateInitialStresses()
 		int neln = el.Nodes();
 
 		// get the nodal temperatures
-		for (int j=0; j<neln; ++j) tn[j] = mesh.Node(el.m_node[j]).get(DOF_T);
+		for (int j=0; j<neln; ++j) tn[j] = mesh.Node(el.m_node[j]).get(dof_T);
 
 		// loop over integration points
 		for (int j=0; j<nint; ++j)

@@ -4,7 +4,7 @@
 #include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
-FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh())
+FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
 }

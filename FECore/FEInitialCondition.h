@@ -11,7 +11,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// Base class designed to replace the specialized initial condition classes.
+// Class representing an initial condition on a degree of freedom
 class FEInitialBC : public FEInitialCondition
 {
 	struct ITEM
@@ -37,16 +37,19 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FEInitialVelocity : public FEInitialCondition
+// Class for initializing degrees of freedom using a vec3d (useful for e.g. velocity)
+class FEInitialBCVec3D : public FEInitialCondition
 {
 	struct ITEM
 	{
 		int		nid;	//!< node ID
-		vec3d	v0;		//!< initial velocity
+		vec3d	v0;		//!< initial value
 	};
 
 public:
-	FEInitialVelocity(FEModel* pfem) : FEInitialCondition(pfem){}
+	FEInitialBCVec3D(FEModel* pfem) : FEInitialCondition(pfem) { m_dof[0] = m_dof[1] = m_dof[2] = -1; }
+
+	void SetDOF(int d0, int d1, int d2) { m_dof[0] = d0; m_dof[1] = d1; m_dof[2] = d2; }
 
 	void Serialize(DumpFile& ar);
 
@@ -56,95 +59,5 @@ public:
 
 public:
 	vector<ITEM>	m_item;
-};
-
-//-----------------------------------------------------------------------------
-class FEInitialPressure : public FEInitialCondition
-{
-	struct ITEM
-	{
-		int		nid;	//!< node ID
-		double	p0;		//!< initial pressure
-	};
-
-public:
-	FEInitialPressure(FEModel* pfem) : FEInitialCondition(pfem){}
-
-	void Serialize(DumpFile& ar);
-
-	void Activate();
-
-	void Add(int nid, double p) { ITEM it = {nid, p}; m_item.push_back(it); }
-
-public:
-	vector<ITEM>	m_item;
-};
-
-//-----------------------------------------------------------------------------
-class FEInitialConcentration : public FEInitialCondition
-{
-	struct ITEM
-	{
-		int		nid;	//!< node ID
-		double	c0;		//!< initial concentration
-	};
-
-public:
-	FEInitialConcentration(FEModel* pfem) : FEInitialCondition(pfem){}
-
-	void Serialize(DumpFile& ar);
-
-	void Activate();
-
-	void Add(int nid, double c) { ITEM it = {nid, c}; m_item.push_back(it); }
-
-	void SetSoluteID(int nsol) { m_nsol = nsol; }
-
-public:
-	vector<ITEM>	m_item;
-	int				m_nsol;
-};
-
-//-----------------------------------------------------------------------------
-class FEInitialTemperature : public FEInitialCondition
-{
-	struct ITEM
-	{
-		int		nid;	//!< node ID
-		double	T0;		//!< initial temperature
-	};
-
-public:
-	FEInitialTemperature(FEModel* pfem) : FEInitialCondition(pfem){}
-
-	void Serialize(DumpFile& ar);
-
-	void Activate();
-
-	void Add(int nid, double u) { ITEM it = {nid, u}; m_item.push_back(it); }
-
-public:
-	vector<ITEM>	m_item;
-};
-
-//-----------------------------------------------------------------------------
-class FEInitialDilatation : public FEInitialCondition
-{
-    struct ITEM
-    {
-        int		nid;	//!< node ID
-        double	e0;		//!< initial dilatation
-    };
-    
-public:
-    FEInitialDilatation(FEModel* pfem) : FEInitialCondition(pfem){}
-    
-    void Serialize(DumpFile& ar);
-    
-    void Activate();
-    
-    void Add(int nid, double e) { ITEM it = {nid, e}; m_item.push_back(it); }
-    
-public:
-    vector<ITEM>	m_item;
+	int				m_dof[3];
 };

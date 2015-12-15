@@ -6,7 +6,7 @@
 #include "FECore/DOFS.h"
 
 //-----------------------------------------------------------------------------
-FEThermoElasticSolidDomain::FEThermoElasticSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh())
+FEThermoElasticSolidDomain::FEThermoElasticSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
 }
@@ -58,6 +58,8 @@ bool FEThermoElasticSolidDomain::Initialize(FEModel &fem)
 {
 	// initialize base class
 	FESolidDomain::Initialize(fem);
+	const int dof_T = fem.GetDOFS().GetDOF("t");
+	if (dof_T == -1) { assert(false); return false; }
     
 	// initialize local coordinate systems (can I do this elsewhere?)
 	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
@@ -80,7 +82,7 @@ bool FEThermoElasticSolidDomain::Initialize(FEModel &fem)
         int neln = el.Nodes();
         // get initial values of temperature
 		for (int i=0; i<neln; ++i)
-			T0[i] = m.Node(el.m_node[i]).get(DOF_T);
+			T0[i] = m.Node(el.m_node[i]).get(dof_T);
         
 		// get the number of integration points
 		int nint = el.GaussPoints();
@@ -102,6 +104,8 @@ bool FEThermoElasticSolidDomain::Initialize(FEModel &fem)
 //-----------------------------------------------------------------------------
 void FEThermoElasticSolidDomain::Activate()
 {
+	const int dof_T = GetFEModel()->GetDOFS().GetDOF("t");
+
 	for (int i=0; i<Nodes(); ++i)
 	{
 		FENode& node = Node(i);
@@ -114,7 +118,7 @@ void FEThermoElasticSolidDomain::Activate()
 				node.m_ID[DOF_Z] = DOF_ACTIVE;
 			}
 
-			node.m_ID[DOF_T] = DOF_ACTIVE;
+			node.m_ID[dof_T] = DOF_ACTIVE;
 		}
 	}
 }
@@ -124,8 +128,9 @@ void FEThermoElasticSolidDomain::Activate()
 void FEThermoElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
     // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
+    DOFS& dofs = GetFEModel()->GetDOFS();
+    int MAX_NDOFS = dofs.GetNDOFS();
+	const int dof_T = dofs.GetDOF("t");
     
 	int N = el.Nodes();
 	lm.assign(N*MAX_NDOFS, -1);
@@ -143,12 +148,7 @@ void FEThermoElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		lm[3*i+2] = id[DOF_Z];
 
 		// now the temperature dofs
-		lm[3*N+i] = id[DOF_T];
-
-		// rigid rotational dofs
-		lm[4*N + 3*i  ] = id[DOF_RU];
-		lm[4*N + 3*i+1] = id[DOF_RV];
-		lm[4*N + 3*i+2] = id[DOF_RW];
+		lm[3*N+i] = id[dof_T];
 	}
 }
 
@@ -777,6 +777,8 @@ vec3d weird_product(double Ga[3], double Gb[3], double GT[3], const tens4ds& t)
 //! Conductivity gradient stiffness (i.e. derivative of conductivity wrt strain
 void FEThermoElasticSolidDomain::ElementGradientStiffness(FESolidElement &el, matrix& ke)
 {
+	const int dof_T = GetFEModel()->GetDOFS().GetDOF("t");
+
 	// global derivatives of shape functions
 	// Gx = dH/dx
 	const int EN = FEElement::MAX_NODES;
@@ -792,7 +794,7 @@ void FEThermoElasticSolidDomain::ElementGradientStiffness(FESolidElement &el, ma
 	FEMesh& mesh = *GetMesh();
 	double T[EN];
 	const int ne = el.Nodes();
-	for (int i=0; i<ne; ++i) T[i] = mesh.Node(el.m_node[i]).get(DOF_T);
+	for (int i=0; i<ne; ++i) T[i] = mesh.Node(el.m_node[i]).get(dof_T);
 
 	// loop over all integration points
 	const int ni = el.GaussPoints();
@@ -876,6 +878,8 @@ void FEThermoElasticSolidDomain::UpdateStresses(FEModel &fem)
 // It evaluates the Cauchy stress tensor, as well as the spatial heat flux vector.
 void FEThermoElasticSolidDomain::UpdateElementStress(int iel)
 {
+	const int dof_T = GetFEModel()->GetDOFS().GetDOF("t");
+
 	// get the solid element
 	FESolidElement& el = m_Elem[iel];
 		
@@ -893,7 +897,7 @@ void FEThermoElasticSolidDomain::UpdateElementStress(int iel)
 
 		// TODO: After I make the transition to domain specific data I need to fix this
 //		u0[j] = mesh.Node(el.m_node[j]).m_T0;
-//		ut[j] = mesh.Node(el.m_node[j]).get(DOF_T);
+//		ut[j] = mesh.Node(el.m_node[j]).get(dof_T);
 		assert(false);
 	}
 

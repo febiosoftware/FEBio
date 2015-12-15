@@ -7,7 +7,7 @@ BEGIN_PARAMETER_LIST(FEDiscreteSpringDomain, FEDiscreteDomain)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEDiscreteSpringDomain::FEDiscreteSpringDomain(FEModel* pfem) : FEDiscreteDomain(&pfem->GetMesh())
+FEDiscreteSpringDomain::FEDiscreteSpringDomain(FEModel* pfem) : FEDiscreteDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
 	m_keps = 0.0;

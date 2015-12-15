@@ -39,6 +39,8 @@ protected:
 	int		m_ndeq;	//!< number of displacement equations
 	int		m_nteq;	//!< number of temperature equations
 
+	int		m_dofT;	//!< degree of freedom index for temperature
+
 	// thermo data
 	vector<double>	m_di;	//!< displacement increment vector
 	vector<double>	m_Di;	//!< total displacement vector for iteration

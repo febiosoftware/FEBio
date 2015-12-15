@@ -38,6 +38,8 @@ void FEConvectiveHeatFlux::Residual(FEGlobalVector& R)
 {
 	FEModel& fem = R.GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
+	const int dof_T = fem.GetDOFS().GetDOF("t");
+	if (dof_T == -1) { assert(false); return; }
 
 	int nfc = m_psurf->Elements();
 	for (int i=0; i<nfc; ++i)
@@ -73,7 +75,7 @@ void FEConvectiveHeatFlux::Residual(FEGlobalVector& R)
 
 		// get the element's LM vector
 		vector<int> lm(ne);
-		for (int j=0; j<ne; ++j) lm[j] = mesh.Node(el.m_node[j]).m_ID[DOF_T];
+		for (int j=0; j<ne; ++j) lm[j] = mesh.Node(el.m_node[j]).m_ID[dof_T];
 
 		// force vector
 		// repeat over integration points
@@ -117,6 +119,8 @@ void FEConvectiveHeatFlux::StiffnessMatrix(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
+	const int dof_T = fem.GetDOFS().GetDOF("t");
+	if (dof_T == -1) { assert(false); return; }
 
 	matrix ke;
 
@@ -138,7 +142,7 @@ void FEConvectiveHeatFlux::StiffnessMatrix(FESolver* psolver)
 
 		// get the element's LM vector
 		vector<int> lm(neln);
-		for (int j=0; j<neln; ++j) lm[j] = mesh.Node(el.m_node[j]).m_ID[DOF_T];
+		for (int j=0; j<neln; ++j) lm[j] = mesh.Node(el.m_node[j]).m_ID[dof_T];
 
 		// assemble element matrix in global stiffness matrix
 		psolver->AssembleStiffness(el.m_node, lm, ke);

@@ -3,13 +3,21 @@
 #include "FECore/FESolver.h"
 #include "FEHeatTransferMaterial.h"
 
+class FEModel;
+
 //-----------------------------------------------------------------------------
 class FEHeatDomain
 {
 public:
+	FEHeatDomain(FEModel* pfem) : m_pfem(pfem) {}
 	virtual ~FEHeatDomain(){}
 	virtual void ConductionMatrix (FESolver* pnls) = 0;
 	virtual void CapacitanceMatrix(FESolver* pnls, double dt) = 0;
+
+	FEModel* GetFEModel() { return m_pfem; }
+
+protected:
+	FEModel* m_pfem;
 };
 
 //-----------------------------------------------------------------------------

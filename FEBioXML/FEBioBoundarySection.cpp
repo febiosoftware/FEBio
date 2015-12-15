@@ -125,6 +125,7 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
+	DOFS& dofs = fem.GetDOFS();
 
 	// make sure this section does not appear in a step section
 	if (m_pim->m_nsteps != 0) throw XMLReader::InvalidTag(tag);
@@ -150,31 +151,27 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 		for (int i=0; i<N; ++i)
 		{
 			int n = s[i];
-			if      (strcmp(sz, "x"  ) == 0) { fem.AddFixedBC(n, DOF_X); }
-			else if (strcmp(sz, "y"  ) == 0) { fem.AddFixedBC(n, DOF_Y); }
-			else if (strcmp(sz, "z"  ) == 0) { fem.AddFixedBC(n, DOF_Z); }
-			else if (strcmp(sz, "xy" ) == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Y); }
-			else if (strcmp(sz, "yz" ) == 0) { fem.AddFixedBC(n, DOF_Y); fem.AddFixedBC(n, DOF_Z); }
-			else if (strcmp(sz, "xz" ) == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Z); }
-			else if (strcmp(sz, "xyz") == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Y); fem.AddFixedBC(n, DOF_Z); }
-			else if (strcmp(sz, "p"  ) == 0) { fem.AddFixedBC(n, DOF_P); }
-			else if (strcmp(sz, "u"  ) == 0) { fem.AddFixedBC(n, DOF_U); }
-			else if (strcmp(sz, "v"  ) == 0) { fem.AddFixedBC(n, DOF_V); }
-			else if (strcmp(sz, "w"  ) == 0) { fem.AddFixedBC(n, DOF_W); }
-			else if (strcmp(sz, "uv" ) == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_V); }
-			else if (strcmp(sz, "vw" ) == 0) { fem.AddFixedBC(n, DOF_V); fem.AddFixedBC(n, DOF_W); }
-			else if (strcmp(sz, "uw" ) == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_W); }
-			else if (strcmp(sz, "uvw") == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_V); fem.AddFixedBC(n, DOF_W); }
-			else if (strcmp(sz, "t"  ) == 0) { fem.AddFixedBC(n, DOF_T); }
-            else if (strcmp(sz, "vx"  ) == 0) { fem.AddFixedBC(n, DOF_VX); }
-            else if (strcmp(sz, "vy"  ) == 0) { fem.AddFixedBC(n, DOF_VY); }
-            else if (strcmp(sz, "vz"  ) == 0) { fem.AddFixedBC(n, DOF_VZ); }
-            else if (strcmp(sz, "vxy" ) == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VY); }
-            else if (strcmp(sz, "vyz" ) == 0) { fem.AddFixedBC(n, DOF_VY); fem.AddFixedBC(n, DOF_VZ); }
-            else if (strcmp(sz, "vxz" ) == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VZ); }
-            else if (strcmp(sz, "vxyz") == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VY); fem.AddFixedBC(n, DOF_VZ); }
-			else if (strcmp(sz, "c"  ) == 0) { fem.AddFixedBC(n, DOF_C); }
-			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+
+			int ndof = dofs.GetDOF(sz);
+			if (ndof >= 0) fem.AddFixedBC(n, ndof);
+			else
+			{
+				// The supported fixed BC strings don't quite follow the dof naming convention.
+				// For now, we'll check these BC explicitly, but I want to get rid of this in the future.
+				if      (strcmp(sz, "xy" ) == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Y); }
+				else if (strcmp(sz, "yz" ) == 0) { fem.AddFixedBC(n, DOF_Y); fem.AddFixedBC(n, DOF_Z); }
+				else if (strcmp(sz, "xz" ) == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Z); }
+				else if (strcmp(sz, "xyz") == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Y); fem.AddFixedBC(n, DOF_Z); }
+				else if (strcmp(sz, "uv" ) == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_V); }
+				else if (strcmp(sz, "vw" ) == 0) { fem.AddFixedBC(n, DOF_V); fem.AddFixedBC(n, DOF_W); }
+				else if (strcmp(sz, "uw" ) == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_W); }
+				else if (strcmp(sz, "uvw") == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_V); fem.AddFixedBC(n, DOF_W); }
+	            else if (strcmp(sz, "vxy" ) == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VY); }
+		        else if (strcmp(sz, "vyz" ) == 0) { fem.AddFixedBC(n, DOF_VY); fem.AddFixedBC(n, DOF_VZ); }
+			    else if (strcmp(sz, "vxz" ) == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VZ); }
+				else if (strcmp(sz, "vxyz") == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VY); fem.AddFixedBC(n, DOF_VZ); }
+				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+			}
 		}
 	}
 	else
@@ -185,33 +182,27 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 		{
 			int n = atoi(tag.AttributeValue("id"))-1;
 			const char* sz = tag.AttributeValue("bc");
-			if      (strcmp(sz, "x"  ) == 0) { fem.AddFixedBC(n, DOF_X); }
-			else if (strcmp(sz, "y"  ) == 0) { fem.AddFixedBC(n, DOF_Y); }
-			else if (strcmp(sz, "z"  ) == 0) { fem.AddFixedBC(n, DOF_Z); }
-			else if (strcmp(sz, "xy" ) == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Y); }
-			else if (strcmp(sz, "yz" ) == 0) { fem.AddFixedBC(n, DOF_Y); fem.AddFixedBC(n, DOF_Z); }
-			else if (strcmp(sz, "xz" ) == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Z); }
-			else if (strcmp(sz, "xyz") == 0) { fem.AddFixedBC(n, DOF_X); fem.AddFixedBC(n, DOF_Y); fem.AddFixedBC(n, DOF_Z); }
-			else if (strcmp(sz, "p"  ) == 0) { fem.AddFixedBC(n, DOF_P); }
-			else if (strcmp(sz, "u"  ) == 0) { fem.AddFixedBC(n, DOF_U); }
-			else if (strcmp(sz, "v"  ) == 0) { fem.AddFixedBC(n, DOF_V); }
-			else if (strcmp(sz, "w"  ) == 0) { fem.AddFixedBC(n, DOF_W); }
-			else if (strcmp(sz, "uv" ) == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_V); }
-			else if (strcmp(sz, "vw" ) == 0) { fem.AddFixedBC(n, DOF_V); fem.AddFixedBC(n, DOF_W); }
-			else if (strcmp(sz, "uw" ) == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_W); }
-			else if (strcmp(sz, "uvw") == 0) { fem.AddFixedBC(n, DOF_U); fem.AddFixedBC(n, DOF_V); fem.AddFixedBC(n, DOF_W); }
-			else if (strcmp(sz, "t"  ) == 0) { fem.AddFixedBC(n, DOF_T); }
-            else if (strcmp(sz, "vx" ) == 0) { fem.AddFixedBC(n, DOF_VX); }
-            else if (strcmp(sz, "vy" ) == 0) { fem.AddFixedBC(n, DOF_VY); }
-            else if (strcmp(sz, "vz" ) == 0) { fem.AddFixedBC(n, DOF_VZ); }
-            else if (strcmp(sz, "vxy" ) == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VY); }
-            else if (strcmp(sz, "vyz" ) == 0) { fem.AddFixedBC(n, DOF_VY); fem.AddFixedBC(n, DOF_VZ); }
-            else if (strcmp(sz, "vxz" ) == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VZ); }
-            else if (strcmp(sz, "vxyz") == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VY); fem.AddFixedBC(n, DOF_VZ); }
-            else if (strcmp(sz, "e"  ) == 0) { fem.AddFixedBC(n, DOF_E); }
-			else if (strcmp(sz, "c"  ) == 0) { fem.AddFixedBC(n, DOF_C); }
-			else if (strncmp(sz, "c", 1) == 0) { fem.AddFixedBC(n, DOF_C + atoi(&sz[1]) - 1); }
-			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+
+			int ndof = dofs.GetDOF(sz);
+			if (ndof >= 0) fem.AddFixedBC(n, ndof);
+			else
+			{
+				// The supported fixed BC strings don't quite follow the dof naming convention.
+				// For now, we'll check these BC explicitly, but I want to get rid of this in the future.
+				if      (strcmp(sz, "xy"  ) == 0) { fem.AddFixedBC(n, DOF_X ); fem.AddFixedBC(n, DOF_Y ); }
+				else if (strcmp(sz, "yz"  ) == 0) { fem.AddFixedBC(n, DOF_Y ); fem.AddFixedBC(n, DOF_Z ); }
+				else if (strcmp(sz, "xz"  ) == 0) { fem.AddFixedBC(n, DOF_X ); fem.AddFixedBC(n, DOF_Z ); }
+				else if (strcmp(sz, "xyz" ) == 0) { fem.AddFixedBC(n, DOF_X ); fem.AddFixedBC(n, DOF_Y ); fem.AddFixedBC(n, DOF_Z); }
+				else if (strcmp(sz, "uv"  ) == 0) { fem.AddFixedBC(n, DOF_U ); fem.AddFixedBC(n, DOF_V ); }
+				else if (strcmp(sz, "vw"  ) == 0) { fem.AddFixedBC(n, DOF_V ); fem.AddFixedBC(n, DOF_W ); }
+				else if (strcmp(sz, "uw"  ) == 0) { fem.AddFixedBC(n, DOF_U ); fem.AddFixedBC(n, DOF_W ); }
+				else if (strcmp(sz, "uvw" ) == 0) { fem.AddFixedBC(n, DOF_U ); fem.AddFixedBC(n, DOF_V ); fem.AddFixedBC(n, DOF_W); }
+	            else if (strcmp(sz, "vxy" ) == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VY); }
+		        else if (strcmp(sz, "vyz" ) == 0) { fem.AddFixedBC(n, DOF_VY); fem.AddFixedBC(n, DOF_VZ); }
+				else if (strcmp(sz, "vxz" ) == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VZ); }
+				else if (strcmp(sz, "vxyz") == 0) { fem.AddFixedBC(n, DOF_VX); fem.AddFixedBC(n, DOF_VY); fem.AddFixedBC(n, DOF_VZ); }
+				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+			}
 			++tag;
 		}
 		while (!tag.isend());
