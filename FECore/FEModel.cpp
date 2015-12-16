@@ -722,6 +722,12 @@ DOFS& FEModel::GetDOFS()
 }
 
 //-----------------------------------------------------------------------------
+int FEModel::GetDOFIndex(const char* sz)
+{
+	return GetDOFS().GetDOF(sz);
+}
+
+//-----------------------------------------------------------------------------
 // This function adds a callback routine
 //
 void FEModel::AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void *pd)

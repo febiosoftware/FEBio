@@ -28,12 +28,12 @@ void FEElasticTrussDomain::UnpackLM(FEElement &el, vector<int>& lm)
 	lm.resize(6);
 	FENode& n1 = m_pMesh->Node(el.m_node[0]);
 	FENode& n2 = m_pMesh->Node(el.m_node[1]);
-	lm[0] = n1.m_ID[DOF_X];
-	lm[1] = n1.m_ID[DOF_Y];
-	lm[2] = n1.m_ID[DOF_Z];
-	lm[3] = n2.m_ID[DOF_X];
-	lm[4] = n2.m_ID[DOF_Y];
-	lm[5] = n2.m_ID[DOF_Z];
+	lm[0] = n1.m_ID[m_dofX];
+	lm[1] = n1.m_ID[m_dofY];
+	lm[2] = n1.m_ID[m_dofZ];
+	lm[3] = n2.m_ID[m_dofX];
+	lm[4] = n2.m_ID[m_dofY];
+	lm[5] = n2.m_ID[m_dofZ];
 }
 
 //-----------------------------------------------------------------------------
@@ -46,9 +46,9 @@ void FEElasticTrussDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.m_ID[DOF_X] = DOF_ACTIVE;
-				node.m_ID[DOF_Y] = DOF_ACTIVE;
-				node.m_ID[DOF_Z] = DOF_ACTIVE;
+				node.m_ID[m_dofX] = DOF_ACTIVE;
+				node.m_ID[m_dofY] = DOF_ACTIVE;
+				node.m_ID[m_dofZ] = DOF_ACTIVE;
 			}
 		}
 	}

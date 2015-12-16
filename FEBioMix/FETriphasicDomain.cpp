@@ -11,6 +11,7 @@
 FETriphasicDomain::FETriphasicDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
+	m_dofP = pfem->GetDOFIndex("p");
 }
 
 //-----------------------------------------------------------------------------
@@ -37,12 +38,12 @@ void FETriphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
 
 		// now the pressure dofs
-		lm[3*N+i] = id[DOF_P];
+		lm[3*N+i] = id[m_dofP];
 
 		// rigid rotational dofs
 		// TODO: Do I really need these?
@@ -86,12 +87,12 @@ void FETriphasicDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.m_ID[DOF_X] = DOF_ACTIVE;
-				node.m_ID[DOF_Y] = DOF_ACTIVE;
-				node.m_ID[DOF_Z] = DOF_ACTIVE;
+				node.m_ID[m_dofX] = DOF_ACTIVE;
+				node.m_ID[m_dofY] = DOF_ACTIVE;
+				node.m_ID[m_dofZ] = DOF_ACTIVE;
 			}
 
-			node.m_ID[DOF_P] = DOF_ACTIVE;
+			node.m_ID[m_dofP] = DOF_ACTIVE;
 			node.m_ID[dofc0] = DOF_ACTIVE;
 			node.m_ID[dofc1] = DOF_ACTIVE;
 		}
@@ -120,7 +121,7 @@ void FETriphasicDomain::Activate()
 		for (int i = 0; i<neln; ++i)
 		{
 //			p0[i] = m.Node(el.m_node[i]).m_p0;
-			p0[i] = m.Node(el.m_node[i]).get(DOF_P);
+			p0[i] = m.Node(el.m_node[i]).get(m_dofP);
 			for (int isol = 0; isol<nsol; ++isol)
 				//				c0[isol][i] = m.Node(el.m_node[i]).m_c0[id[isol]];
 				c0[isol][i] = m.Node(el.m_node[i]).get(DOF_C + id[isol]);
@@ -1803,7 +1804,7 @@ void FETriphasicDomain::UpdateElementStress(int iel)
 	{
 		r0[j] = mesh.Node(el.m_node[j]).m_r0;
 		rt[j] = mesh.Node(el.m_node[j]).m_rt;
-		pn[j] = mesh.Node(el.m_node[j]).get(DOF_P);
+		pn[j] = mesh.Node(el.m_node[j]).get(m_dofP);
 		ct[0][j] = mesh.Node(el.m_node[j]).get(DOF_C + id0);
 		ct[1][j] = mesh.Node(el.m_node[j]).get(DOF_C + id1);
 	}

@@ -29,6 +29,9 @@ void FEPlotData::SetDomainName(const char* szdom)
 //-----------------------------------------------------------------------------
 void FENodeData::Save(FEModel &fem, Archive& ar)
 {
+	// store pointer to model
+	m_pfem = &fem;
+
 	// loop over all node sets
 	// write now there is only one, namely the master node set
 	// so we just pass the mesh
@@ -46,6 +49,9 @@ void FENodeData::Save(FEModel &fem, Archive& ar)
 //-----------------------------------------------------------------------------
 void FEDomainData::Save(FEModel &fem, Archive& ar)
 {
+	// store pointer to model
+	m_pfem = &fem;
+
 	FEMesh& m = fem.GetMesh();
 	int ND = m.Domains();
 
@@ -103,6 +109,9 @@ void FEDomainData::Save(FEModel &fem, Archive& ar)
 //! make sure that the FEBioPlot assumes as many values.
 void FESurfaceData::Save(FEModel &fem, Archive& ar)
 {
+	// store pointer to model
+	m_pfem = &fem;
+
 	// loop over all surfaces
 	FEMesh& m = fem.GetMesh();
 	int NS = m.Surfaces();

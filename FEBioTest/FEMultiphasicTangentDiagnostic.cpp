@@ -62,6 +62,10 @@ bool FEMultiphasicTangentUniaxial::Init()
     FEMesh& m = fem.GetMesh();
     m.CreateNodes(8);
 
+	// get the degrees of freedom
+	int dof_p = fem.GetDOFIndex("p");
+	if (dof_p == -1) return false;
+
 	// add initial conditions
 	for (isol = 0; isol<nsol; ++isol) {
 		FEInitialBC* pic = new FEInitialBC(&fem);
@@ -71,7 +75,7 @@ bool FEMultiphasicTangentUniaxial::Init()
 	}
 
 	FEInitialBC* pip = new FEInitialBC(&fem);
-	pip->SetDOF(DOF_P);
+	pip->SetDOF(dof_p);
 	for (i=0; i<8; ++i) pip->Add(i, pe);
 	fem.AddInitialCondition(pip);
 
@@ -120,7 +124,7 @@ bool FEMultiphasicTangentUniaxial::Init()
     // Add a prescribed fluid pressure BC
     FEPrescribedBC* ppc = new FEPrescribedBC(&fem);
     fem.AddPrescribedBC(ppc);
-    ppc->SetDOF(DOF_P).SetLoadCurveIndex(0).SetScale(pe);
+    ppc->SetDOF(dof_p).SetLoadCurveIndex(0).SetScale(pe);
     for (i = 0; i<4; ++i) ppc->AddNode(nd[i]);
     
     // Add prescribed solute concentration BC
@@ -300,6 +304,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
     
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
+	const int dof_p = fem.GetDOFIndex("p");
     
     FEMultiphasicDomain& md = static_cast<FEMultiphasicDomain&>(mesh.Domain(0));
     
@@ -340,7 +345,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             case 0: node.m_rt.x += dx; break;
             case 1: node.m_rt.y += dx; break;
             case 2: node.m_rt.z += dx; break;
-            case 3: node.inc(DOF_P, dx); break;
+            case 3: node.inc(dof_p, dx); break;
             default: node.inc(DOF_C + nj-4, dx); break;
         }
         
@@ -365,7 +370,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             case 0: node.m_rt.x -= dx; break;
             case 1: node.m_rt.y -= dx; break;
             case 2: node.m_rt.z -= dx; break;
-            case 3: node.dec(DOF_P, dx); break;
+            case 3: node.dec(dof_p, dx); break;
             default: node.dec(DOF_C + nj-4, dx); break;
         }
         

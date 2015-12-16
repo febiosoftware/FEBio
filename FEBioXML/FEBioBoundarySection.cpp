@@ -214,6 +214,7 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
+	DOFS& dofs = fem.GetDOFS();
 	FEMesh& mesh = fem.GetMesh();
 	int NN = mesh.Nodes();
 
@@ -223,35 +224,28 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 
 	// process the bc string
 	vector<int> bc;
-	char* ch = szbc;
-	while (*ch)
+
+	int ndof = dofs.GetDOF(szbc);
+	if (ndof >= 0) bc.push_back(ndof);
+	else
 	{
-		if      (*ch == 'x') bc.push_back(DOF_X);
-		else if (*ch == 'y') bc.push_back(DOF_Y);
-		else if (*ch == 'z') bc.push_back(DOF_Z);
-		else if (*ch == 'u') bc.push_back(DOF_U);
-		else if (*ch == 'v') bc.push_back(DOF_V);
-		else if (*ch == 'w') bc.push_back(DOF_W);
-		else if (*ch == 'p') bc.push_back(DOF_P);
-		else if (*ch == 't') bc.push_back(DOF_T);
-        else if (*ch == 'X') bc.push_back(DOF_VX);
-        else if (*ch == 'Y') bc.push_back(DOF_VY);
-        else if (*ch == 'Z') bc.push_back(DOF_VZ);
-        else if (*ch == 'e') bc.push_back(DOF_E);
-		else if (*ch == 'c')
-		{
-			char ci = ch[1];
-			if (isdigit(ci))
-			{
-				int i = (ci - '0');
-				bc.push_back(DOF_C + i - 1);
-				++ch;
-			}
-			else bc.push_back(DOF_C);
-		}
+		// The supported fixed BC strings don't quite follow the dof naming convention.
+		// For now, we'll check these BC explicitly, but I want to get rid of this in the future.
+		if      (strcmp(szbc, "xy"  ) == 0) { bc.push_back(DOF_X ); bc.push_back(DOF_Y); }
+		else if (strcmp(szbc, "yz"  ) == 0) { bc.push_back(DOF_Y ); bc.push_back(DOF_Z); }
+		else if (strcmp(szbc, "xz"  ) == 0) { bc.push_back(DOF_X ); bc.push_back(DOF_Z); }
+		else if (strcmp(szbc, "xyz" ) == 0) { bc.push_back(DOF_X ); bc.push_back(DOF_Y); bc.push_back(DOF_Z); }
+		else if (strcmp(szbc, "uv"  ) == 0) { bc.push_back(DOF_U ); bc.push_back(DOF_V); }
+		else if (strcmp(szbc, "vw"  ) == 0) { bc.push_back(DOF_V ); bc.push_back(DOF_W); }
+		else if (strcmp(szbc, "uw"  ) == 0) { bc.push_back(DOF_U ); bc.push_back(DOF_W); }
+		else if (strcmp(szbc, "uvw" ) == 0) { bc.push_back(DOF_U ); bc.push_back(DOF_V); bc.push_back(DOF_W); }
+	    else if (strcmp(szbc, "vxy" ) == 0) { bc.push_back(DOF_VX); bc.push_back(DOF_VY); }
+		else if (strcmp(szbc, "vyz" ) == 0) { bc.push_back(DOF_VY); bc.push_back(DOF_VZ); }
+		else if (strcmp(szbc, "vxz" ) == 0) { bc.push_back(DOF_VX); bc.push_back(DOF_VZ); }
+		else if (strcmp(szbc, "vxyz") == 0) { bc.push_back(DOF_VX); bc.push_back(DOF_VY); bc.push_back(DOF_VZ); }
 		else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
-		if (*ch) ++ch;
 	}
+
 	if (bc.empty()) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 	int nbc = bc.size();
 

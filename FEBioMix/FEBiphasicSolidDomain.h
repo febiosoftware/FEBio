@@ -105,4 +105,5 @@ public: // biphasic domain "properties"
 
 protected:
 	FEBiphasic*	m_pMat;
+	int			m_dofP;		//!< pressure dof index
 };

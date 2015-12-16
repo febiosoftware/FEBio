@@ -26,13 +26,20 @@ vec3d FEBiphasicContactSurface::GetFluidForce()
 void FEBiphasicContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 {
     // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
+    DOFS& dofs = *DOFS::GetInstance();
+    int MAX_NDOFS = dofs.GetNDOFS();
+    int MAX_CDOFS = dofs.GetCDOFS();
     
 	int N = el.Nodes();
 	lm.resize(N*(4+MAX_CDOFS));
 
+	// get the DOF indices
+	const int dof_x = dofs.GetDOF("x");
+	const int dof_y = dofs.GetDOF("y");
+	const int dof_z = dofs.GetDOF("z");
+	const int dof_p = dofs.GetDOF("p");
+
+	// pack the equation numbers
 	for (int i=0; i<N; ++i)
 	{
 		int n = el.m_node[i];
@@ -41,12 +48,12 @@ void FEBiphasicContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
+		lm[3*i  ] = id[dof_x];
+		lm[3*i+1] = id[dof_y];
+		lm[3*i+2] = id[dof_z];
 
 		// now the pressure dofs
-		lm[3*N+i] = id[DOF_P];
+		lm[3*N+i] = id[dof_p];
 
 		// concentration dofs
 		for (int k=0; k<MAX_CDOFS; ++k)

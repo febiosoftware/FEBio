@@ -83,9 +83,9 @@ void FEElasticShellDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.m_ID[DOF_X] = DOF_ACTIVE;
-				node.m_ID[DOF_Y] = DOF_ACTIVE;
-				node.m_ID[DOF_Z] = DOF_ACTIVE;
+				node.m_ID[m_dofX] = DOF_ACTIVE;
+				node.m_ID[m_dofY] = DOF_ACTIVE;
+				node.m_ID[m_dofZ] = DOF_ACTIVE;
 			}
 
 			if (node.m_bshell)
@@ -730,9 +730,9 @@ void FEElasticShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[6*i  ] = id[DOF_X];
-		lm[6*i+1] = id[DOF_Y];
-		lm[6*i+2] = id[DOF_Z];
+		lm[6*i  ] = id[m_dofX];
+		lm[6*i+1] = id[m_dofY];
+		lm[6*i+2] = id[m_dofZ];
 
 		// next the rotational dofs
 		lm[6*i+3] = id[DOF_U];

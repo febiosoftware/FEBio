@@ -1004,11 +1004,15 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 	FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
 	if (pd || psd || ptd || pmd)
 	{
+		// get the pressure dof index
+		int dof_p = GetFEModel()->GetDOFIndex("p");
+		if (dof_p == -1) return false;
+
 		int N = dom.Nodes();
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = dom.Node(i);
-			a << node.get(DOF_P);
+			a << node.get(dof_p);
 		}
 		return true;
 	}

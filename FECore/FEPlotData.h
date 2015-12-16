@@ -20,7 +20,7 @@ class FEModel;
 class FEPlotData : public FECoreBase
 {
 public:
-	FEPlotData(Var_Type t, Storage_Fmt s) : FECoreBase(FEPLOTDATA_ID) { m_ntype = t; m_sfmt = s; }
+	FEPlotData(Var_Type t, Storage_Fmt s) : FECoreBase(FEPLOTDATA_ID) { m_ntype = t; m_sfmt = s; m_pfem = 0; }
 	virtual void Save(FEModel& fem, Archive& ar) = 0;
 
 	// The filter can be used to pass additional information to the plot field.
@@ -43,11 +43,14 @@ public:
     
     void SetDomainName(const char* szdom);
 
+	FEModel* GetFEModel() { return m_pfem; }
+
 protected:
 	Var_Type		m_ntype;	//!< data type
 	Storage_Fmt		m_sfmt;		//!< data storage format
 	vector<int>		m_item;		//!< Data will only be stored for the item's in this list
     char			m_szdom[64];//!< Data will only be stored for the domain with this name
+	FEModel*		m_pfem;
 };
 
 //-----------------------------------------------------------------------------

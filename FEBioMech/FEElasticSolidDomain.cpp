@@ -113,9 +113,9 @@ void FEElasticSolidDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.m_ID[DOF_X] = DOF_ACTIVE;
-				node.m_ID[DOF_Y] = DOF_ACTIVE;
-				node.m_ID[DOF_Z] = DOF_ACTIVE;
+				node.m_ID[m_dofX] = DOF_ACTIVE;
+				node.m_ID[m_dofY] = DOF_ACTIVE;
+				node.m_ID[m_dofZ] = DOF_ACTIVE;
 			}
 		}
 	}
@@ -850,9 +850,9 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
 
 		// rigid rotational dofs
 		lm[3*N + 3*i  ] = id[DOF_RU];

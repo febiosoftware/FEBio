@@ -105,4 +105,5 @@ protected: // overridden from FEElasticDomain, but not implemented in this domai
 
 protected:
 	FEMultiphasic*	m_pMat;
+	int				m_dofP;		//!< pressure dof index
 };

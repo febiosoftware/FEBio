@@ -18,7 +18,7 @@ class FEModel;
 class FEElasticDomain
 {
 public:
-	FEElasticDomain(FEModel* pfem) : m_pfem(pfem) {}
+	FEElasticDomain(FEModel* pfem);
 	virtual ~FEElasticDomain(){}
 
 	//! Updates the element stresses
@@ -55,4 +55,7 @@ public:
 
 protected:
 	FEModel*	m_pfem;
+	int					m_dofX;		//!< X-dof index
+	int					m_dofY;		//!< Y-dof index
+	int					m_dofZ;		//!< Z-dof index
 };

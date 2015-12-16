@@ -9,6 +9,7 @@
 FEThermoElasticSolidDomain::FEThermoElasticSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
+	m_dofT = pfem->GetDOFIndex("t");
 }
 
 //-----------------------------------------------------------------------------
@@ -104,8 +105,6 @@ bool FEThermoElasticSolidDomain::Initialize(FEModel &fem)
 //-----------------------------------------------------------------------------
 void FEThermoElasticSolidDomain::Activate()
 {
-	const int dof_T = GetFEModel()->GetDOFS().GetDOF("t");
-
 	for (int i=0; i<Nodes(); ++i)
 	{
 		FENode& node = Node(i);
@@ -113,12 +112,12 @@ void FEThermoElasticSolidDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.m_ID[DOF_X] = DOF_ACTIVE;
-				node.m_ID[DOF_Y] = DOF_ACTIVE;
-				node.m_ID[DOF_Z] = DOF_ACTIVE;
+				node.m_ID[m_dofX] = DOF_ACTIVE;
+				node.m_ID[m_dofY] = DOF_ACTIVE;
+				node.m_ID[m_dofZ] = DOF_ACTIVE;
 			}
 
-			node.m_ID[dof_T] = DOF_ACTIVE;
+			node.m_ID[m_dofT] = DOF_ACTIVE;
 		}
 	}
 }
@@ -127,13 +126,8 @@ void FEThermoElasticSolidDomain::Activate()
 //! Unpack the element LM data. 
 void FEThermoElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
-    // get nodal DOFS
-    DOFS& dofs = GetFEModel()->GetDOFS();
-    int MAX_NDOFS = dofs.GetNDOFS();
-	const int dof_T = dofs.GetDOF("t");
-    
 	int N = el.Nodes();
-	lm.assign(N*MAX_NDOFS, -1);
+	lm.assign(N*4, -1);
 	
 	for (int i=0; i<N; ++i)
 	{
@@ -143,12 +137,12 @@ void FEThermoElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
 
 		// now the temperature dofs
-		lm[3*N+i] = id[dof_T];
+		lm[3*N+i] = id[m_dofT];
 	}
 }
 

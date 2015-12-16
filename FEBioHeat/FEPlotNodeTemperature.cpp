@@ -6,8 +6,7 @@
 bool FEPlotNodeTemperature::Save(FEMesh& m, FEDataStream& a)
 {
 	// get the temperature dof index
-	DOFS& dofs = m_pfem->GetDOFS();
-	int dof_t = dofs.GetDOF("t");
+	int dof_t = GetFEModel()->GetDOFIndex("t");
 	if (dof_t == -1) return false;
 
 	// store the temperatures

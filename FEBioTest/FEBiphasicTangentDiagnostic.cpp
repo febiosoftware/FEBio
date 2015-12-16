@@ -43,24 +43,28 @@ bool FEBiphasicTangentUniaxial::Init()
         {-1,-1,-1, 0},{ 0,-1,-1,-1},{ 0, 0,-1,-1}, {-1, 0,-1, 0},
         {-1,-1, 0, 0},{ 0,-1, 0,-1},{ 0, 0, 0,-1}, {-1, 0, 0, 0}
     };
-    
+  
+	FEModel& fem = GetDiagnostic()->GetFEModel();
+	const int dof_x = fem.GetDOFIndex("x");
+	const int dof_y = fem.GetDOFIndex("y");
+	const int dof_z = fem.GetDOFIndex("z");
+	const int dof_p = fem.GetDOFIndex("p");
+
     // --- create the FE problem ---
     // create the mesh
-	FEModel& fem = GetDiagnostic()->GetFEModel();
     FEMesh& m = fem.GetMesh();
     m.CreateNodes(8);
     for (i=0; i<8; ++i)
     {
         FENode& n = m.Node(i);
         n.m_rt = n.m_r0 = r[i];
-        n.set(DOF_P, 0);
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddFixedBC(i, DOF_X);
-        if (BC[i][1] == -1) fem.AddFixedBC(i, DOF_Y);
-        if (BC[i][2] == -1) fem.AddFixedBC(i, DOF_Z);
-        if (BC[i][3] == -1) fem.AddFixedBC(i, DOF_P);
+        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_x);
+        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_y);
+        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_z);
+        if (BC[i][3] == -1) fem.AddFixedBC(i, dof_p);
     }
     
     // get the material
@@ -239,6 +243,12 @@ void FEBiphasicTangentDiagnostic::deriv_residual(matrix& ke)
 	FEModel& fem = GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
 	FEBiphasicSolver& solver = static_cast<FEBiphasicSolver&>(*pstep->GetFESolver());
+
+	// get the DOFs
+	const int dof_x = fem.GetDOFIndex("x");
+	const int dof_y = fem.GetDOFIndex("y");
+	const int dof_z = fem.GetDOFIndex("z");
+	const int dof_p = fem.GetDOFIndex("p");
     
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
@@ -274,12 +284,11 @@ void FEBiphasicTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.m_rt.x += dx; break;
-            case 1: node.m_rt.y += dx; break;
-            case 2: node.m_rt.z += dx; break;
-            case 3: node.inc(DOF_P, dx); break;
+            case 0: node.inc(dof_x, dx); node.m_rt.x += dx; break;
+            case 1: node.inc(dof_y, dx); node.m_rt.y += dx; break;
+            case 2: node.inc(dof_z, dx); node.m_rt.z += dx; break;
+            case 3: node.inc(dof_p, dx); break;
         }
-        
         
         solver.UpdateStresses();
         
@@ -295,10 +304,10 @@ void FEBiphasicTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.m_rt.x -= dx; break;
-            case 1: node.m_rt.y -= dx; break;
-            case 2: node.m_rt.z -= dx; break;
-            case 3: node.dec(DOF_P, dx); break;
+            case 0: node.dec(dof_x, dx); node.m_rt.x -= dx; break;
+            case 1: node.dec(dof_y, dx); node.m_rt.y -= dx; break;
+            case 2: node.dec(dof_z, dx); node.m_rt.z -= dx; break;
+            case 3: node.dec(dof_p, dx); break;
         }
         
         solver.UpdateStresses();

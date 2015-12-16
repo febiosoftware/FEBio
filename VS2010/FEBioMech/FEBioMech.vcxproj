@@ -625,6 +625,7 @@
     <ClCompile Include="..\..\FEBioMech\FEEFDNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEFDUncoupled.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEFDVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticFiberMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticFiberMaterialUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticMaterial.cpp" />

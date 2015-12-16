@@ -31,9 +31,9 @@ void FEDiscreteSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
 
 		// rigid rotational dofs
 		lm[3*N + 3*i  ] = id[DOF_RU];
@@ -52,9 +52,9 @@ void FEDiscreteSpringDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.m_ID[DOF_X] = DOF_ACTIVE;
-				node.m_ID[DOF_Y] = DOF_ACTIVE;
-				node.m_ID[DOF_Z] = DOF_ACTIVE;
+				node.m_ID[m_dofX] = DOF_ACTIVE;
+				node.m_ID[m_dofY] = DOF_ACTIVE;
+				node.m_ID[m_dofZ] = DOF_ACTIVE;
 			}
 		}
 	}
@@ -141,9 +141,9 @@ void FEDiscreteSpringDomain::InternalForces(FEGlobalVector& R)
 			fe[2] = -eps*d.z;
 
 			en[0] = m_Node[i];
-			lm[0] = Node(i).m_ID[DOF_X];
-			lm[1] = Node(i).m_ID[DOF_Y];
-			lm[2] = Node(i).m_ID[DOF_Z];
+			lm[0] = Node(i).m_ID[m_dofX];
+			lm[1] = Node(i).m_ID[m_dofY];
+			lm[2] = Node(i).m_ID[m_dofZ];
 			R.Assemble(en, lm, fe);
 		}
 	}
@@ -265,19 +265,19 @@ void FEDiscreteSpringDomain::StiffnessMatrix(FESolver* psolver)
 			vector<int>& ID0 = Node(i0).m_ID;
 			vector<int>& ID1 = Node(i1).m_ID;
 
-			lmi[0] = IDi[DOF_X];
-			lmi[1] = IDi[DOF_Y];
-			lmi[2] = IDi[DOF_Z];
+			lmi[0] = IDi[m_dofX];
+			lmi[1] = IDi[m_dofY];
+			lmi[2] = IDi[m_dofZ];
 
-			lmj[0] = IDi[DOF_X];
-			lmj[1] = IDi[DOF_Y];
-			lmj[2] = IDi[DOF_Z];
-			lmj[3] = ID0[DOF_X];
-			lmj[4] = ID0[DOF_Y];
-			lmj[5] = ID0[DOF_Z];
-			lmj[6] = ID1[DOF_X];
-			lmj[7] = ID1[DOF_Y];
-			lmj[8] = ID1[DOF_Z];
+			lmj[0] = IDi[m_dofX];
+			lmj[1] = IDi[m_dofY];
+			lmj[2] = IDi[m_dofZ];
+			lmj[3] = ID0[m_dofX];
+			lmj[4] = ID0[m_dofY];
+			lmj[5] = ID0[m_dofZ];
+			lmj[6] = ID1[m_dofX];
+			lmj[7] = ID1[m_dofY];
+			lmj[8] = ID1[m_dofZ];
 			psolver->AssembleStiffness2(lmi, lmj, ke);
 		}
 	}

@@ -7,6 +7,7 @@
 FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
+	m_dofP = pfem->GetDOFIndex("p");
 }
 
 //-----------------------------------------------------------------------------
@@ -89,12 +90,12 @@ void FEBiphasicSolidDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.m_ID[DOF_X] = DOF_ACTIVE;
-				node.m_ID[DOF_Y] = DOF_ACTIVE;
-				node.m_ID[DOF_Z] = DOF_ACTIVE;
+				node.m_ID[m_dofX] = DOF_ACTIVE;
+				node.m_ID[m_dofY] = DOF_ACTIVE;
+				node.m_ID[m_dofZ] = DOF_ACTIVE;
 			}
 
-			node.m_ID[DOF_P] = DOF_ACTIVE;
+			node.m_ID[m_dofP] = DOF_ACTIVE;
 		}
 	}
 }
@@ -112,12 +113,12 @@ void FEBiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
 
 		// now the pressure dofs
-		lm[3*N+i] = id[DOF_P];
+		lm[3*N+i] = id[m_dofP];
 
 		// rigid rotational dofs
 		// TODO: Do I really need this?
@@ -940,7 +941,7 @@ void FEBiphasicSolidDomain::ElementBiphasicMaterialStiffness(FESolidElement &el,
 	
 	// nodal pressures
 	double pn[FEElement::MAX_NODES];
-	for (i=0; i<neln; ++i) pn[i] = m_pMesh->Node(el.m_node[i]).get(DOF_P);
+	for (i=0; i<neln; ++i) pn[i] = m_pMesh->Node(el.m_node[i]).get(m_dofP);
 	
 	// calculate element stiffness matrix
 	for (n=0; n<nint; ++n)
@@ -1164,7 +1165,7 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 	{
 		r0[j] = mesh.Node(el.m_node[j]).m_r0;
 		rt[j] = mesh.Node(el.m_node[j]).m_rt;
-		pn[j] = mesh.Node(el.m_node[j]).get(DOF_P);
+		pn[j] = mesh.Node(el.m_node[j]).get(m_dofP);
 	}
 
 	// loop over the integration points and calculate

@@ -280,6 +280,9 @@ public:	// --- Miscellaneous routines ---
 	//! should get the DOFS from this function
 	DOFS& GetDOFS();
 
+	//! Get the index of a DOF
+	int GetDOFIndex(const char* sz);
+
 public: // --- I/O functions
 
 	//! write to plot file

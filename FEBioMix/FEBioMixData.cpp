@@ -10,7 +10,8 @@ double FENodePressure::value(int nnode)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.get(DOF_P); 
+	const int dof_p = m_pfem->GetDOFIndex("p");
+	return node.get(dof_p); 
 }
 
 //-----------------------------------------------------------------------------

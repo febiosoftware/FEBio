@@ -52,7 +52,6 @@ bool FEFluidTangentUniaxial::Init()
     {
         FENode& n = m.Node(i);
         n.m_rt = n.m_r0 = r[i];
-        n.set(DOF_P, 0.0);
         n.m_rid = -1;
         
         // set displacement BC's

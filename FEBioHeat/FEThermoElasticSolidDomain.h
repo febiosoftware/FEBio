@@ -85,4 +85,5 @@ public: // overridden from FEElasticDomain, but not all implemented in this doma
 
 protected:
 	FEThermoElasticMaterial*	m_pMat;
+	int							m_dofT; //!< temperature dof index
 };
