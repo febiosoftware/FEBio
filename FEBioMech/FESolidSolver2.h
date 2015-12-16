@@ -157,6 +157,11 @@ public:
 public:
 	bool		m_baugment;		//!< augmentation flag
 
+protected:
+	int		m_dofX;
+	int		m_dofY;
+	int		m_dofZ;
+
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

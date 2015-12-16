@@ -63,8 +63,10 @@ bool FEMultiphasicTangentUniaxial::Init()
     m.CreateNodes(8);
 
 	// get the degrees of freedom
-	int dof_p = fem.GetDOFIndex("p");
-	if (dof_p == -1) return false;
+	const int dof_x = fem.GetDOFIndex("x");
+	const int dof_y = fem.GetDOFIndex("y");
+	const int dof_z = fem.GetDOFIndex("z");
+	const int dof_p = fem.GetDOFIndex("p");
 
 	// add initial conditions
 	for (isol = 0; isol<nsol; ++isol) {
@@ -87,9 +89,9 @@ bool FEMultiphasicTangentUniaxial::Init()
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddFixedBC(i, DOF_X);
-        if (BC[i][1] == -1) fem.AddFixedBC(i, DOF_Y);
-        if (BC[i][2] == -1) fem.AddFixedBC(i, DOF_Z);
+        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_x);
+        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_y);
+        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_z);
     }
     
     // create a multiphasic domain
@@ -118,7 +120,7 @@ bool FEMultiphasicTangentUniaxial::Init()
     int nd[4] = {1, 2, 5, 6};
     FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
     fem.AddPrescribedBC(pdc);
-    pdc->SetDOF(DOF_X).SetLoadCurveIndex(0).SetScale(d);
+    pdc->SetDOF(dof_x).SetLoadCurveIndex(0).SetScale(d);
     for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
     
     // Add a prescribed fluid pressure BC

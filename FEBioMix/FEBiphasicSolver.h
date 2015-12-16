@@ -68,6 +68,9 @@ public:
 	vector<double>	m_pi;	//!< pressure increment vector
 	vector<double>	m_Pi;	//!< Total pressure vector for iteration
 
+protected:
+	int	m_dofP;	//!< pressure dof index
+
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

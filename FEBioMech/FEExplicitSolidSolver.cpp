@@ -20,6 +20,11 @@ FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : FESolver(pfem)
 	m_dyn_damping = 0.99;
 	m_niter = 0;
 	m_nreq = 0;
+
+	// get the DOF indices
+	m_dofX = pfem->GetDOFIndex("x");
+	m_dofY = pfem->GetDOFIndex("y");
+	m_dofZ = pfem->GetDOFIndex("z");
 }
 
 //-----------------------------------------------------------------------------
@@ -52,9 +57,9 @@ bool FEExplicitSolidSolver::Init()
 		FENode& node = mesh.Node(i);
 
 		// displacement dofs
-		n = node.m_ID[DOF_X]; if (n >= 0) m_Ut[n] = node.get(DOF_X);
-		n = node.m_ID[DOF_Y]; if (n >= 0) m_Ut[n] = node.get(DOF_Y);
-		n = node.m_ID[DOF_Z]; if (n >= 0) m_Ut[n] = node.get(DOF_Z);
+		n = node.m_ID[m_dofX]; if (n >= 0) m_Ut[n] = node.get(m_dofX);
+		n = node.m_ID[m_dofY]; if (n >= 0) m_Ut[n] = node.get(m_dofY);
+		n = node.m_ID[m_dofZ]; if (n >= 0) m_Ut[n] = node.get(m_dofZ);
 
 		// rotational dofs
 		n = node.m_ID[DOF_U]; if (n >= 0) m_Ut[n] = node.get(DOF_U);
@@ -235,9 +240,9 @@ bool FEExplicitSolidSolver::InitEquations()
 		if (node.m_rid >= 0)
 		{
 			FERigidBody& RB = *rigid.Object(node.m_rid);
-			node.m_ID[DOF_X ] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0]-2 : RB.m_LM[0]);
-			node.m_ID[DOF_Y ] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1]-2 : RB.m_LM[1]);
-			node.m_ID[DOF_Z ] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2]-2 : RB.m_LM[2]);
+			node.m_ID[m_dofX] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0]-2 : RB.m_LM[0]);
+			node.m_ID[m_dofY] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1]-2 : RB.m_LM[1]);
+			node.m_ID[m_dofZ] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2]-2 : RB.m_LM[2]);
 			node.m_ID[DOF_RU] = (RB.m_LM[3] >= 0 ? -RB.m_LM[3]-2 : RB.m_LM[3]);
 			node.m_ID[DOF_RV] = (RB.m_LM[4] >= 0 ? -RB.m_LM[4]-2 : RB.m_LM[4]);
 			node.m_ID[DOF_RW] = (RB.m_LM[5] >= 0 ? -RB.m_LM[5]-2 : RB.m_LM[5]);
@@ -309,9 +314,9 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 
 		// displacement dofs
 		// current position = initial + total at prev conv step + total increment so far + current increment  
-		if ((n = node.m_ID[DOF_X]) >= 0) node.set(DOF_X, m_Ut[n] + m_Ui[n] + ui[n]);
-		if ((n = node.m_ID[DOF_Y]) >= 0) node.set(DOF_Y, m_Ut[n] + m_Ui[n] + ui[n]);
-		if ((n = node.m_ID[DOF_Z]) >= 0) node.set(DOF_Z, m_Ut[n] + m_Ui[n] + ui[n]);
+		if ((n = node.m_ID[m_dofX]) >= 0) node.set(m_dofX, m_Ut[n] + m_Ui[n] + ui[n]);
+		if ((n = node.m_ID[m_dofY]) >= 0) node.set(m_dofY, m_Ut[n] + m_Ui[n] + ui[n]);
+		if ((n = node.m_ID[m_dofZ]) >= 0) node.set(m_dofZ, m_Ut[n] + m_Ui[n] + ui[n]);
 
 		// rotational dofs
 		if ((n = node.m_ID[DOF_U]) >= 0) node.set(DOF_U, m_Ut[n] + m_Ui[n] + ui[n]);
@@ -333,7 +338,7 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 	{
 		FENode& node = mesh.Node(i);
 		if (node.m_rid == -1)
-			node.m_rt = node.m_r0 + node.get_vec3d(DOF_X, DOF_Y, DOF_Z);
+			node.m_rt = node.m_r0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ);
 	}
 
 	// enforce the linear constraints
@@ -452,7 +457,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 		if (node.m_rid >= 0)
 		{
 			vec3d ut = node.m_rt - node.m_r0;
-			node.set_vec3d(DOF_X, DOF_Y, DOF_Z, ut);
+			node.set_vec3d(m_dofX, m_dofY, m_dofZ, ut);
 		}
 	}
 }
@@ -876,17 +881,17 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 		FENode& node = mesh.Node(i);
 		//  calculate acceleration using F=ma and update - note m_inv_mass is 1/m so multiply not divide
 		n=m_R1[0];
-		if ((n = node.m_ID[DOF_X]) >= 0) node.m_at.x = (node.m_at.x+m_R1[n])*m_inv_mass[n];
-		if ((n = node.m_ID[DOF_Y]) >= 0) node.m_at.y = (node.m_at.y+m_R1[n])*m_inv_mass[n];
-		if ((n = node.m_ID[DOF_Z]) >= 0) node.m_at.z = (node.m_at.z+m_R1[n])*m_inv_mass[n];
+		if ((n = node.m_ID[m_dofX]) >= 0) node.m_at.x = (node.m_at.x+m_R1[n])*m_inv_mass[n];
+		if ((n = node.m_ID[m_dofY]) >= 0) node.m_at.y = (node.m_at.y+m_R1[n])*m_inv_mass[n];
+		if ((n = node.m_ID[m_dofZ]) >= 0) node.m_at.z = (node.m_at.z+m_R1[n])*m_inv_mass[n];
 		// and update the velocities using the accelerations
 		// which are added to the previously calculated velocity changes from damping
 		vec3d vt = node.m_vp + node.m_at*dt;
 		node.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, vt);	//  update velocity using acceleration m_at
 		//	calculate incremental displacement using the velocity
-		if ((n = node.m_ID[DOF_X]) >= 0) m_ui[n] = vt.x*dt;
-		if ((n = node.m_ID[DOF_Y]) >= 0) m_ui[n] = vt.y*dt;
-		if ((n = node.m_ID[DOF_Z]) >= 0) m_ui[n] = vt.z*dt;
+		if ((n = node.m_ID[m_dofX]) >= 0) m_ui[n] = vt.x*dt;
+		if ((n = node.m_ID[m_dofY]) >= 0) m_ui[n] = vt.y*dt;
+		if ((n = node.m_ID[m_dofZ]) >= 0) m_ui[n] = vt.z*dt;
 	}
 
 	// need to update everything for the explicit solver
@@ -1026,9 +1031,9 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 		node.m_Fr = vec3d(0,0,0);
 
 		int n;
-		if ((n = -node.m_ID[DOF_X]-2) >= 0) node.m_Fr.x = -m_Fr[n];
-		if ((n = -node.m_ID[DOF_Y]-2) >= 0) node.m_Fr.y = -m_Fr[n];
-		if ((n = -node.m_ID[DOF_Z]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofX]-2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofY]-2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofZ]-2) >= 0) node.m_Fr.z = -m_Fr[n];
 	}
 
 	// increase RHS counter

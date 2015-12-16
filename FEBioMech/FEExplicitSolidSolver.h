@@ -89,6 +89,11 @@ public:
 	vector<double> m_R1;	//!< residual at iteration i
 	double *** domain_mass;	//! Pointer to data structure for nodal masses, dynamically allocated during initiation
 
+protected:
+	int		m_dofX;
+	int		m_dofY;
+	int		m_dofZ;
+
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

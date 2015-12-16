@@ -41,6 +41,9 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 	m_Ptol = 0.01;
 	m_ndeq = 0;
 	m_npeq = 0;
+
+	// get pressure dof
+	m_dofP = pfem->GetDOFIndex("p");
 }
 
 //-----------------------------------------------------------------------------
@@ -70,7 +73,7 @@ bool FEBiphasicSolver::Init()
 			FENode& node = mesh.Node(i);
 
 			// pressure dofs
-			n = node.m_ID[DOF_P]; if (n >= 0) m_Ut[n] = node.get(DOF_P);
+			n = node.m_ID[m_dofP]; if (n >= 0) m_Ut[n] = node.get(m_dofP);
 		}
 	}
 
@@ -94,10 +97,10 @@ bool FEBiphasicSolver::InitEquations()
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& n = mesh.Node(i);
-		if (n.m_ID[DOF_X] != -1) m_ndeq++;
-		if (n.m_ID[DOF_Y] != -1) m_ndeq++;
-		if (n.m_ID[DOF_Z] != -1) m_ndeq++;
-		if (n.m_ID[DOF_P] != -1) m_npeq++;
+		if (n.m_ID[m_dofX] != -1) m_ndeq++;
+		if (n.m_ID[m_dofY] != -1) m_ndeq++;
+		if (n.m_ID[m_dofZ] != -1) m_ndeq++;
+		if (n.m_ID[m_dofP] != -1) m_npeq++;
 	}
 
 	return true;
@@ -460,7 +463,7 @@ void FEBiphasicSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
 			
 			// For pressure and concentration loads, multiply by dt
 			// for consistency with evaluation of residual and stiffness matrix
-			if ((dof == DOF_P) || (dof >= DOF_C)) f *= tp.dt;
+			if ((dof == m_dofP) || (dof >= DOF_C)) f *= tp.dt;
 
 			// assemble into residual
 			AssembleResidual(nid, dof, f, F);
@@ -583,9 +586,9 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 		node.m_Fr = vec3d(0,0,0);
 
 		int n;
-		if ((n = -node.m_ID[DOF_X]-2) >= 0) node.m_Fr.x = -m_Fr[n];
-		if ((n = -node.m_ID[DOF_Y]-2) >= 0) node.m_Fr.y = -m_Fr[n];
-		if ((n = -node.m_ID[DOF_Z]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofX]-2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofY]-2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofZ]-2) >= 0) node.m_Fr.z = -m_Fr[n];
 	}
 
 	// increase RHS counter
@@ -733,8 +736,8 @@ void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 
 		// update nodal pressures
-		n = node.m_ID[DOF_P];
-		if (n >= 0) node.set(DOF_P, 0 + m_Ut[n] + m_Ui[n] + ui[n]);
+		n = node.m_ID[m_dofP];
+		if (n >= 0) node.set(m_dofP, 0 + m_Ut[n] + m_Ui[n] + ui[n]);
 	}
 
 	// update poro-elasticity data
@@ -787,21 +790,21 @@ void FEBiphasicSolver::GetDisplacementData(vector<double> &di, vector<double> &u
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = m_fem.GetMesh().Node(i);
-		nid = n.m_ID[DOF_X];
+		nid = n.m_ID[m_dofX];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
 			di[m++] = ui[nid];
 			assert(m <= (int) di.size());
 		}
-		nid = n.m_ID[DOF_Y];
+		nid = n.m_ID[m_dofY];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
 			di[m++] = ui[nid];
 			assert(m <= (int) di.size());
 		}
-		nid = n.m_ID[DOF_Z];
+		nid = n.m_ID[m_dofZ];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
@@ -819,7 +822,7 @@ void FEBiphasicSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = m_fem.GetMesh().Node(i);
-		nid = n.m_ID[DOF_P];
+		nid = n.m_ID[m_dofP];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);

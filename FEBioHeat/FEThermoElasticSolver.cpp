@@ -37,7 +37,9 @@ FEThermoElasticSolver::FEThermoElasticSolver(FEModel* pfem) : FESolidSolver(pfem
 	m_ndeq = 0;
 	m_nteq = 0;
 
-	m_dofT = -1;
+	// get the temperature degree of freedom index
+	// (X,Y,Z) dofs are allocated in base class
+	m_dofT = m_fem.GetDOFS().GetDOF("t");
 }
 
 //-----------------------------------------------------------------------------
@@ -53,10 +55,6 @@ bool FEThermoElasticSolver::Init()
 {
 	// we need a non-symmetric stiffness matrix
 	m_bsymm = false;
-
-	// get the temperature degree of freedom index
-	m_dofT = m_fem.GetDOFS().GetDOF("t");
-	if (m_dofT == -1) { assert(false); return false; }
 
 	// call the base class version first
 	if (FESolidSolver::Init() == false) return false;
@@ -102,9 +100,9 @@ bool FEThermoElasticSolver::InitEquations()
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& n = mesh.Node(i);
-		if (n.m_ID[DOF_X] != -1) m_ndeq++;
-		if (n.m_ID[DOF_Y] != -1) m_ndeq++;
-		if (n.m_ID[DOF_Z] != -1) m_ndeq++;
+		if (n.m_ID[m_dofX] != -1) m_ndeq++;
+		if (n.m_ID[m_dofY] != -1) m_ndeq++;
+		if (n.m_ID[m_dofZ] != -1) m_ndeq++;
 		if (n.m_ID[m_dofT] != -1) m_nteq++;
 	}
 
@@ -444,21 +442,21 @@ void FEThermoElasticSolver::GetDisplacementData(vector<double> &di, const vector
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = m_fem.GetMesh().Node(i);
-		nid = n.m_ID[DOF_X];
+		nid = n.m_ID[m_dofX];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
 			di[m++] = ui[nid];
 			assert(m <= (int) di.size());
 		}
-		nid = n.m_ID[DOF_Y];
+		nid = n.m_ID[m_dofY];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
 			di[m++] = ui[nid];
 			assert(m <= (int) di.size());
 		}
-		nid = n.m_ID[DOF_Z];
+		nid = n.m_ID[m_dofZ];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
@@ -587,9 +585,9 @@ bool FEThermoElasticSolver::Residual(vector<double>& R)
 		node.m_Fr = vec3d(0,0,0);
 
 		int n;
-		if ((n = -node.m_ID[DOF_X]-2) >= 0) node.m_Fr.x = -m_Fr[n];
-		if ((n = -node.m_ID[DOF_Y]-2) >= 0) node.m_Fr.y = -m_Fr[n];
-		if ((n = -node.m_ID[DOF_Z]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofX]-2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofY]-2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofZ]-2) >= 0) node.m_Fr.z = -m_Fr[n];
 	}
 
 	// increase RHS counter

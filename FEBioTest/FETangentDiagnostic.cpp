@@ -57,6 +57,11 @@ bool FETangentUniaxial::Init()
 		{-1,-1, 0},{ 0,-1, 0},{ 0, 0, 0}, {-1, 0, 0}
 	};
 
+	// get the degrees of freedom
+	const int dof_X = fem.GetDOFIndex("x");
+	const int dof_Y = fem.GetDOFIndex("y");
+	const int dof_Z = fem.GetDOFIndex("z");
+
 	// --- create the FE problem ---
 	// create the mesh
 	FEMesh& m = fem.GetMesh();
@@ -68,9 +73,9 @@ bool FETangentUniaxial::Init()
 		n.m_rid = -1;
 
 		// set displacement BC's
-		if (BC[i][0] == -1) fem.AddFixedBC(i, DOF_X);
-		if (BC[i][1] == -1) fem.AddFixedBC(i, DOF_Y);
-		if (BC[i][2] == -1) fem.AddFixedBC(i, DOF_Z);
+		if (BC[i][0] == -1) fem.AddFixedBC(i, dof_X);
+		if (BC[i][1] == -1) fem.AddFixedBC(i, dof_Y);
+		if (BC[i][2] == -1) fem.AddFixedBC(i, dof_Z);
 	}
 
 	// get the material
@@ -102,7 +107,7 @@ bool FETangentUniaxial::Init()
 	int nd[4] = {1, 2, 5, 6};
 	FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
 	fem.AddPrescribedBC(pdc);
-	pdc->SetDOF(DOF_X).SetLoadCurveIndex(0).SetScale(d);
+	pdc->SetDOF(dof_X).SetLoadCurveIndex(0).SetScale(d);
 	for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
 
 	return true;
@@ -129,6 +134,11 @@ bool FETangentSimpleShear::Init()
 		{ 0,-1,-1},{ 0,-1,-1},{ 0, 0,-1}, { 0, 0,-1}
 	};
 
+	// get the degrees of freedom
+	const int dof_X = fem.GetDOFIndex("x");
+	const int dof_Y = fem.GetDOFIndex("y");
+	const int dof_Z = fem.GetDOFIndex("z");
+
 	// --- create the FE problem ---
 	// create the mesh
 	FEMesh& m = fem.GetMesh();
@@ -140,9 +150,9 @@ bool FETangentSimpleShear::Init()
 		n.m_rid = -1;
 
 		// set displacement BC's
-		if (BC[i][0] == -1) fem.AddFixedBC(i, DOF_X);
-		if (BC[i][1] == -1) fem.AddFixedBC(i, DOF_Y);
-		if (BC[i][2] == -1) fem.AddFixedBC(i, DOF_Z);
+		if (BC[i][0] == -1) fem.AddFixedBC(i, dof_X);
+		if (BC[i][1] == -1) fem.AddFixedBC(i, dof_Y);
+		if (BC[i][2] == -1) fem.AddFixedBC(i, dof_Z);
 	}
 
 	// get the material
@@ -173,7 +183,7 @@ bool FETangentSimpleShear::Init()
 	// Add a prescribed BC
 	FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
 	fem.AddPrescribedBC(pdc);
-	pdc->SetDOF(DOF_X).SetLoadCurveIndex(0).SetScale(d);
+	pdc->SetDOF(dof_X).SetLoadCurveIndex(0).SetScale(d);
 	int nd[4] = { 4, 5, 6, 7 };
 	for (i=0; i<4; ++i) pdc->AddNode(nd[i]);
 
@@ -298,6 +308,11 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->GetFESolver());
 
+	// get the degrees of freedom
+	const int dof_X = fem.GetDOFIndex("x");
+	const int dof_Y = fem.GetDOFIndex("y");
+	const int dof_Z = fem.GetDOFIndex("z");
+
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();
 
@@ -325,9 +340,9 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 
 		switch (nj)
 		{
-		case 0: node.inc(DOF_X, dx); node.m_rt.x += dx; break;
-		case 1: node.inc(DOF_Y, dx); node.m_rt.y += dx; break;
-		case 2: node.inc(DOF_Z, dx); node.m_rt.z += dx; break;
+		case 0: node.inc(dof_X, dx); node.m_rt.x += dx; break;
+		case 1: node.inc(dof_Y, dx); node.m_rt.y += dx; break;
+		case 2: node.inc(dof_Z, dx); node.m_rt.z += dx; break;
 		}
 
 
@@ -338,9 +353,9 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 
 		switch (nj)
 		{
-		case 0: node.dec(DOF_X, dx); node.m_rt.x -= dx; break;
-		case 1: node.dec(DOF_Y, dx); node.m_rt.y -= dx; break;
-		case 2: node.dec(DOF_Z, dx); node.m_rt.z -= dx; break;
+		case 0: node.dec(dof_X, dx); node.m_rt.x -= dx; break;
+		case 1: node.dec(dof_Y, dx); node.m_rt.y -= dx; break;
+		case 2: node.dec(dof_Z, dx); node.m_rt.z -= dx; break;
 		}
 
 		solver.UpdateStresses();

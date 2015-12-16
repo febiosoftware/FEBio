@@ -99,5 +99,10 @@ private:
 	int				m_nreq;
 	bool		m_baugment;
 
+protected:
+	int		m_dofX;
+	int		m_dofY;
+	int		m_dofZ;
+
 	DECLARE_PARAMETER_LIST();
 };
