@@ -74,6 +74,32 @@ bool FEMultiphasicDomain::Initialize(FEModel &fem)
 		for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
 	}
 
+    // extract the initial concentrations of the solid-bound molecules
+    const int nsbm = m_pMat->SBMs();
+    vector<double> sbmr(nsbm, 0);
+    for (int i = 0; i<nsbm; ++i) {
+        sbmr[i] = m_pMat->GetSBM(i)->m_rho0;
+    }
+    
+    for (int i = 0; i<(int)m_Elem.size(); ++i)
+    {
+        // get the solid element
+        FESolidElement& el = m_Elem[i];
+        
+        // get the number of integration points
+        int nint = el.GaussPoints();
+        
+        // loop over the integration points
+        for (int n = 0; n<nint; ++n)
+        {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+            FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
+            
+            ps.m_sbmr = sbmr;
+            ps.m_sbmrp = sbmr;
+            ps.m_sbmrhat.assign(nsbm, 0);
+        }
+    }
 	return true;
 }
 
@@ -116,12 +142,6 @@ void FEMultiphasicDomain::Activate()
 	for (int j = 0; j<nsol; ++j) sid[j] = m_pMat->GetSolute(j)->GetSoluteID();
 	FEMesh& m = *GetMesh();
 
-	// extract the initial concentrations of the solid-bound molecules
-	vector<double> sbmr(nsbm, 0);
-	for (int i = 0; i<nsbm; ++i) {
-		sbmr[i] = m_pMat->GetSBM(i)->m_rho0;
-	}
-
 	for (int i = 0; i<(int)m_Elem.size(); ++i)
 	{
 		// get the solid element
@@ -132,10 +152,8 @@ void FEMultiphasicDomain::Activate()
 		// get initial values of fluid pressure and solute concentrations
 		for (int i = 0; i<neln; ++i)
 		{
-//			p0[i] = m.Node(el.m_node[i]).m_p0;
 			p0[i] = m.Node(el.m_node[i]).get(m_dofP);
 			for (int isol = 0; isol<nsol; ++isol)
-				//				c0[isol][i] = m.Node(el.m_node[i]).m_c0[sid[isol]];
 				c0[isol][i] = m.Node(el.m_node[i]).get(DOF_C + sid[isol]);
 		}
 
@@ -149,7 +167,6 @@ void FEMultiphasicDomain::Activate()
 			FEElasticMaterialPoint& pm = *(mp.ExtractData<FEElasticMaterialPoint>());
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
-			FEMultigenSBMMaterialPoint& pmg = *(mp.ExtractData<FEMultigenSBMMaterialPoint>());
 
 			// initialize effective fluid pressure, its gradient, and fluid flux
 			pt.m_p = el.Evaluate(p0, n);
@@ -173,16 +190,6 @@ void FEMultiphasicDomain::Activate()
 				ps.m_crp[isol] = pm.m_J*m_pMat->Porosity(mp)*ps.m_ca[isol];
 			}
 			pt.m_pa = m_pMat->Pressure(mp);
-
-			ps.m_sbmr = sbmr;
-			ps.m_sbmrp = sbmr;
-			ps.m_sbmrhat.assign(nsbm, 0);
-			if (&pmg) {
-				pmg.m_lsbmr = sbmr;
-				pmg.m_gsbmr[0] = sbmr;
-				pmg.m_gsbmrp[0] = sbmr;
-				pmg.m_nsbm = nsbm;
-			}
 
 			// initialize referential solid volume fraction
 			pt.m_phi0 = m_pMat->SolidReferentialVolumeFraction(mp);

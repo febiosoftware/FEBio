@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEContactSurface.h"
-#include "FECore\DOFS.h"
+#include "FECore/DOFS.h"
 #include <assert.h>
 
 //-----------------------------------------------------------------------------

@@ -95,6 +95,7 @@
 		D59D17D8192BD83B007C880C /* FECoupledVerondaWestmann.h in Headers */ = {isa = PBXBuildFile; fileRef = D59D17D4192BD83B007C880C /* FECoupledVerondaWestmann.h */; };
 		D5A12B1A1875B02C008BF405 /* FEContactSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A12B181875B02C008BF405 /* FEContactSurface.cpp */; };
 		D5A12B1B1875B02C008BF405 /* FEContactSurface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A12B191875B02C008BF405 /* FEContactSurface.h */; };
+		D5A32E101C20F9F100162B01 /* FEElasticDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A32E0F1C20F9F100162B01 /* FEElasticDomain.cpp */; };
 		D5B572E1186CD45900D12E45 /* FERemodelingElasticDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B572DF186CD45900D12E45 /* FERemodelingElasticDomain.cpp */; };
 		D5B572E2186CD45900D12E45 /* FERemodelingElasticDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B572E0186CD45900D12E45 /* FERemodelingElasticDomain.h */; };
 		D5B57D0518A40AFC005C9598 /* FEStickyInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B57D0318A40AFC005C9598 /* FEStickyInterface.cpp */; };
@@ -454,6 +455,7 @@
 		D59D17D4192BD83B007C880C /* FECoupledVerondaWestmann.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECoupledVerondaWestmann.h; sourceTree = "<group>"; };
 		D5A12B181875B02C008BF405 /* FEContactSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactSurface.cpp; sourceTree = "<group>"; };
 		D5A12B191875B02C008BF405 /* FEContactSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEContactSurface.h; sourceTree = "<group>"; };
+		D5A32E0F1C20F9F100162B01 /* FEElasticDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElasticDomain.cpp; sourceTree = "<group>"; };
 		D5B572DF186CD45900D12E45 /* FERemodelingElasticDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERemodelingElasticDomain.cpp; sourceTree = "<group>"; };
 		D5B572E0186CD45900D12E45 /* FERemodelingElasticDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERemodelingElasticDomain.h; sourceTree = "<group>"; };
 		D5B57D0318A40AFC005C9598 /* FEStickyInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEStickyInterface.cpp; sourceTree = "<group>"; };
@@ -837,6 +839,7 @@
 				D5E106C31865DFAC00B23922 /* FEEFDUncoupled.h */,
 				D5E106C41865DFAC00B23922 /* FEEFDVerondaWestmann.cpp */,
 				D5E106C51865DFAC00B23922 /* FEEFDVerondaWestmann.h */,
+				D5A32E0F1C20F9F100162B01 /* FEElasticDomain.cpp */,
 				D5E106C61865DFAC00B23922 /* FEElasticDomain.h */,
 				D5E106C71865DFAC00B23922 /* FEElasticFiberMaterial.cpp */,
 				D5E106C81865DFAC00B23922 /* FEElasticFiberMaterial.h */,
@@ -1498,6 +1501,7 @@
 				D52D154A1A00D9A1005A6CB9 /* FERigidRevoluteJoint.cpp in Sources */,
 				D5E107D71865DFAD00B23922 /* FEFungOrthotropic.cpp in Sources */,
 				D54CBF0C1AB34358003CF33F /* FEPrescribedActiveContractionIsotropicUC.cpp in Sources */,
+				D5A32E101C20F9F100162B01 /* FEElasticDomain.cpp in Sources */,
 				D5E108371865DFAD00B23922 /* FETiedContactSurface.cpp in Sources */,
 				D5E108431865DFAD00B23922 /* FETrussMaterial.cpp in Sources */,
 				D56DC21F19532A83006C137D /* FERigidSphericalJoint.cpp in Sources */,

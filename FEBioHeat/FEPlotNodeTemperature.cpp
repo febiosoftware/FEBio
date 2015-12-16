@@ -1,5 +1,5 @@
 #include "FEPlotNodeTemperature.h"
-#include "FECore\FEModel.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! Store the nodal temperatures
