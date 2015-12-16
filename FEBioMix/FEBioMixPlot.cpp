@@ -1047,6 +1047,8 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
 	int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
 
+	const int dof_C = GetFEModel()->GetDOFIndex("c");
+
 	// make sure we have a valid index
 	if (nsid == -1) return false;
 		
@@ -1054,7 +1056,7 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 	for (int i=0; i<N; ++i)
 	{
 		FENode& node = dom.Node(i);
-		a << node.get(DOF_C + nsid);
+		a << node.get(dof_C + nsid);
 	}
 	return true;
 }
@@ -1062,6 +1064,7 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 {
+	const int dof_C = GetFEModel()->GetDOFIndex("c");
 	FEBiphasicSolute* pbm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
 	if (pbm)
 	{
@@ -1073,7 +1076,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = dom.Node(i);
-			a << node.get(DOF_C + m_nsol);
+			a << node.get(dof_C + m_nsol);
 		}
 		return true;
 	}
@@ -1089,7 +1092,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = dom.Node(i);
-			a << node.get(DOF_C + m_nsol);
+			a << node.get(dof_C + m_nsol);
 		}
 		return true;
 	}
@@ -1107,7 +1110,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = dom.Node(i);
-			a << node.get(DOF_C + m_nsol);
+			a << node.get(dof_C + m_nsol);
 		}
 		return true;
 	}

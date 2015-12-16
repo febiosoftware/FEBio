@@ -93,6 +93,15 @@ protected:
 	int		m_dofX;
 	int		m_dofY;
 	int		m_dofZ;
+	int		m_dofVX;
+	int		m_dofVY;
+	int		m_dofVZ;
+	int		m_dofU;
+	int		m_dofV;
+	int		m_dofW;
+	int		m_dofRU;
+	int		m_dofRV;
+	int		m_dofRW;
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

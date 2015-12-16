@@ -10,11 +10,12 @@ bool FEPlotFluidDilatation::Save(FEDomain &dom, FEDataStream& a)
     FEFluidDomain* pd = dynamic_cast<FEFluidDomain*>(&dom);
     if (pd)
     {
+		const int dof_E = GetFEModel()->GetDOFIndex("e");
         int N = pd->Nodes();
         for (int i=0; i<N; ++i)
         {
             FENode& node = pd->Node(i);
-            a << node.get(DOF_E);
+            a << node.get(dof_E);
         }
         return true;
     }

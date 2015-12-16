@@ -36,49 +36,55 @@ double FENodeZPos::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeXDisp::value(int nnode) 
 {
+	const int dof_X = m_pfem->GetDOFIndex("x");
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.get(DOF_X); 
+	return node.get(dof_X); 
 }
 
 //-----------------------------------------------------------------------------
 double FENodeYDisp::value(int nnode) 
 {
+	const int dof_Y = m_pfem->GetDOFIndex("y");
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.get(DOF_Y); 
+	return node.get(dof_Y); 
 }
 
 //-----------------------------------------------------------------------------
 double FENodeZDisp::value(int nnode) 
 {
+	const int dof_Z = m_pfem->GetDOFIndex("z");
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.get(DOF_Z); 
+	return node.get(dof_Z); 
 }
 
 //-----------------------------------------------------------------------------
 double FENodeXVel::value(int nnode) 
 {
+	const int dof_VX = m_pfem->GetDOFIndex("vx");
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.get(DOF_VX);
+	return node.get(dof_VX);
 }
 
 //-----------------------------------------------------------------------------
 double FENodeYVel::value(int nnode) 
 {
+	const int dof_VY = m_pfem->GetDOFIndex("vy");
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.get(DOF_VY); 
+	return node.get(dof_VY); 
 }
 
 //-----------------------------------------------------------------------------
 double FENodeZVel::value(int nnode) 
 {
+	const int dof_VZ = m_pfem->GetDOFIndex("vz");
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.get(DOF_VZ);
+	return node.get(dof_VZ);
 }
 
 //-----------------------------------------------------------------------------

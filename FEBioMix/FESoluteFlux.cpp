@@ -22,6 +22,11 @@ FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem)
 	m_flux = 1.0;
 	m_blinear = false; 
 	m_isol = 0; 
+
+	m_dofX = pfem->GetDOFIndex("x");
+	m_dofY = pfem->GetDOFIndex("y");
+	m_dofZ = pfem->GetDOFIndex("z");
+	m_dofC = pfem->GetDOFIndex("c");
 }
 	
 //-----------------------------------------------------------------------------
@@ -84,13 +89,13 @@ void FESoluteFlux::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
 
 		// concentration dofs
 		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(3+k)*N + i] = id[DOF_C+k];
+			lm[(3+k)*N + i] = id[m_dofC+k];
 	}
 }
 

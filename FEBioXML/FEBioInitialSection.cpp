@@ -23,8 +23,11 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 	{
 		if (tag == "velocity")
 		{
+			const int dof_VX = dofs.GetDOF("vx");
+			const int dof_VY = dofs.GetDOF("vy");
+			const int dof_VZ = dofs.GetDOF("vz");
 			FEInitialBCVec3D* pic = dynamic_cast<FEInitialBCVec3D*>(fecore_new<FEInitialCondition>(FEIC_ID, "init_bc_vec3d", &fem));
-			pic->SetDOF(DOF_VX, DOF_VY, DOF_VZ);
+			pic->SetDOF(dof_VX, dof_VY, dof_VZ);
 			fem.AddInitialCondition(pic);
 
 			// add this boundary condition to the current step
@@ -62,7 +65,9 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 				int isol = 0;
 				const char* sz = tag.AttributeValue("sol", true);
 				if (sz) isol = atoi(sz) - 1;
-				ndof = DOF_C + isol;
+
+				int cdof = dofs.GetDOF("c");
+				ndof = cdof + isol;
 			}
 			else if (tag == "init")
 			{

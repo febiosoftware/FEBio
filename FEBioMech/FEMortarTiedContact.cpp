@@ -44,6 +44,9 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FEMortarTiedContact::FEMortarTiedContact(FEModel* pfem) : FEMortarInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
+	m_dofX = pfem->GetDOFIndex("x");
+	m_dofY = pfem->GetDOFIndex("y");
+	m_dofZ = pfem->GetDOFIndex("z");
 }
 
 //-----------------------------------------------------------------------------
@@ -121,9 +124,9 @@ void FEMortarTiedContact::ContactForces(FEGlobalVector& R)
 		{
 			FENode& nodeB = m_ss.Node(B);
 			en[0] = m_ss.NodeIndex(B);
-			lm[0] = nodeB.m_ID[DOF_X];
-			lm[1] = nodeB.m_ID[DOF_Y];
-			lm[2] = nodeB.m_ID[DOF_Z];
+			lm[0] = nodeB.m_ID[m_dofX];
+			lm[1] = nodeB.m_ID[m_dofY];
+			lm[2] = nodeB.m_ID[m_dofZ];
 
 			double nAB = -m_n1[A][B];
 			if (nAB != 0.0)
@@ -141,9 +144,9 @@ void FEMortarTiedContact::ContactForces(FEGlobalVector& R)
 		{
 			FENode& nodeC = m_ms.Node(C);
 			en[0] = m_ms.NodeIndex(C);
-			lm[0] = nodeC.m_ID[DOF_X];
-			lm[1] = nodeC.m_ID[DOF_Y];
-			lm[2] = nodeC.m_ID[DOF_Z];
+			lm[0] = nodeC.m_ID[m_dofX];
+			lm[1] = nodeC.m_ID[m_dofY];
+			lm[2] = nodeC.m_ID[m_dofZ];
 
 			double nAC = m_n2[A][C];
 			if (nAC != 0.0)

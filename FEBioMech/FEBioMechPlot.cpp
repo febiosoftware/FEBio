@@ -27,6 +27,11 @@
 //! Store the nodal displacements
 bool FEPlotNodeDisplacement::Save(FEMesh& m, FEDataStream& a)
 {
+	FEModel& fem = *GetFEModel();
+	const int dof_X = fem.GetDOFIndex("x");
+	const int dof_Y = fem.GetDOFIndex("y");
+	const int dof_Z = fem.GetDOFIndex("z");
+
 	// loop over all nodes
 	for (int i=0; i<m.Nodes(); ++i)
 	{
@@ -34,7 +39,7 @@ bool FEPlotNodeDisplacement::Save(FEMesh& m, FEDataStream& a)
 		FENode& node = m.Node(i);
 
 		// calculate displacement
-		vec3d u = node.get_vec3d(DOF_X, DOF_Y, DOF_Z);
+		vec3d u = node.get_vec3d(dof_X, dof_Y, dof_Z);
 
 		// stream displacement
 		a << u;
@@ -45,10 +50,13 @@ bool FEPlotNodeDisplacement::Save(FEMesh& m, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotNodeVelocity::Save(FEMesh& m, FEDataStream& a)
 {
+	const int dof_VX = GetFEModel()->GetDOFIndex("vx");
+	const int dof_VY = GetFEModel()->GetDOFIndex("vy");
+	const int dof_VZ = GetFEModel()->GetDOFIndex("vz");
 	for (int i=0; i<m.Nodes(); ++i)
 	{
 		FENode& node = m.Node(i);
-		a << node.get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
+		a << node.get_vec3d(dof_VX, dof_VY, dof_VZ);
 	}
 	return true;
 }
@@ -1168,6 +1176,9 @@ bool FEPlotDevFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 //! Store shell thicknesses
 bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
 {
+	const int dof_U = GetFEModel()->GetDOFIndex("u");
+	const int dof_V = GetFEModel()->GetDOFIndex("v");
+	const int dof_W = GetFEModel()->GetDOFIndex("w");
 	if (dom.Class() == FE_DOMAIN_SHELL)
 	{
 		FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
@@ -1180,7 +1191,7 @@ bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
 			for (int j=0; j<n; ++j)
 			{
 				FENode& nj = mesh.Node(e.m_node[j]);
-				vec3d D = e.m_D0[j] + nj.get_vec3d(DOF_U, DOF_V, DOF_W);
+				vec3d D = e.m_D0[j] + nj.get_vec3d(dof_U, dof_V, dof_W);
 				double h = e.m_h0[j] * D.norm();
 				a.push_back((float) h);
 			}

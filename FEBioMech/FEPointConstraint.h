@@ -40,6 +40,10 @@ public:
 	FESolidElement*		m_pel;		//!< element in which the node is located.
 	double				m_rs[3];	//!< natural coordinates in element m_pel
 
+	int	m_dofX;
+	int	m_dofY;
+	int	m_dofZ;
+
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

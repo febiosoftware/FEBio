@@ -74,5 +74,16 @@ protected:
 	// Fluid flux boundary data
 	vector<LOAD>	m_PC;		//!< fluid flux boundary cards
 
+	// degrees of freedom
+	// (TODO: find a better way of defining this. 
+	//        I don't want to have to do this in each class)
+	int	m_dofX;
+	int	m_dofY;
+	int	m_dofZ;
+	int	m_dofP;
+	int	m_dofVX;
+	int	m_dofVY;
+	int	m_dofVZ;
+
 	DECLARE_PARAMETER_LIST();
 };

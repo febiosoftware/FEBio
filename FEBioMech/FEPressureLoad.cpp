@@ -24,6 +24,11 @@ FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 	m_blinear = false;
 	m_pressure = 1.0;
 	m_bsymm = true;
+
+	// get the degrees of freedom
+	m_dofX = pfem->GetDOFIndex("x");
+	m_dofY = pfem->GetDOFIndex("y");
+	m_dofZ = pfem->GetDOFIndex("z");
 }
 
 //-----------------------------------------------------------------------------
@@ -372,9 +377,9 @@ void FEPressureLoad::UnpackLM(FEElement& el, vector<int>& lm)
 		FENode& node = mesh.Node(n);
 		vector<int>& id = node.m_ID;
 
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
 	}
 }
 

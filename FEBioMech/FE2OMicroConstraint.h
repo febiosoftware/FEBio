@@ -17,9 +17,6 @@ public:
 	//! copy data
 	void CopyFrom(FEMicroFlucSurface& s);
 
-	//! Unpack surface element data
-	void UnpackLM(FEElement& el, vector<int>& lm);
-
 public:
 	vec3d SurfMicrofluc();
 
@@ -55,6 +52,9 @@ public:
 
 	FESurface* GetSurface(const char* sz);
 
+	//! Unpack surface element data
+	void UnpackLM(FEElement& el, vector<int>& lm);
+
 public:
 	FEMicroFlucSurface m_s;	//!< the bounding surface
 
@@ -65,6 +65,10 @@ public:
 
 private:
 	bool	m_binit;	//!< flag indicating whether the constraint is initialized
+
+	int		m_dofX;
+	int		m_dofY;
+	int		m_dofZ;
 
 	DECLARE_PARAMETER_LIST();
 };

@@ -61,6 +61,11 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
 
 	// turn off checking for a zero diagonal
 	CheckZeroDiagonal(false);
+
+	m_dofVX = pfem->GetDOFIndex("vx");
+	m_dofVY = pfem->GetDOFIndex("vy");
+	m_dofVZ = pfem->GetDOFIndex("vz");
+	m_dofE  = pfem->GetDOFIndex("e");
 }
 
 //-----------------------------------------------------------------------------
@@ -125,12 +130,12 @@ bool FEFluidSolver::Init()
         FENode& node = mesh.Node(i);
         
         // velocity dofs
-        n = node.m_ID[DOF_VX]; if (n >= 0) m_Vt[n] = node.get(DOF_VX);
-        n = node.m_ID[DOF_VY]; if (n >= 0) m_Vt[n] = node.get(DOF_VY);
-        n = node.m_ID[DOF_VZ]; if (n >= 0) m_Vt[n] = node.get(DOF_VZ);
+        n = node.m_ID[m_dofVX]; if (n >= 0) m_Vt[n] = node.get(m_dofVX);
+        n = node.m_ID[m_dofVY]; if (n >= 0) m_Vt[n] = node.get(m_dofVY);
+        n = node.m_ID[m_dofVZ]; if (n >= 0) m_Vt[n] = node.get(m_dofVZ);
         
         // dilatation dofs
-        n = node.m_ID[DOF_E]; if (n >= 0) m_Vt[n] = node.get(DOF_E);
+        n = node.m_ID[m_dofE]; if (n >= 0) m_Vt[n] = node.get(m_dofE);
     }
     
     return true;
@@ -181,13 +186,13 @@ void FEFluidSolver::UpdateKinematics(vector<double>& vi)
         
         // velocity dofs
         // current velocity = total at prev conv step + total increment so far + current increment
-        if ((n = node.m_ID[DOF_VX]) >= 0) node.set(DOF_VX, m_Vt[n] + m_Vi[n] + vi[n]);
-        if ((n = node.m_ID[DOF_VY]) >= 0) node.set(DOF_VY, m_Vt[n] + m_Vi[n] + vi[n]);
-        if ((n = node.m_ID[DOF_VZ]) >= 0) node.set(DOF_VZ, m_Vt[n] + m_Vi[n] + vi[n]);
+        if ((n = node.m_ID[m_dofVX]) >= 0) node.set(m_dofVX, m_Vt[n] + m_Vi[n] + vi[n]);
+        if ((n = node.m_ID[m_dofVY]) >= 0) node.set(m_dofVY, m_Vt[n] + m_Vi[n] + vi[n]);
+        if ((n = node.m_ID[m_dofVZ]) >= 0) node.set(m_dofVZ, m_Vt[n] + m_Vi[n] + vi[n]);
         
         // dilatation dofs
         // current dilatation = total at prev conv step + total increment so far + current increment
-        if ((n = node.m_ID[DOF_E]) >= 0) node.set(DOF_E, m_Vt[n] + m_Vi[n] + vi[n]);
+        if ((n = node.m_ID[m_dofE]) >= 0) node.set(m_dofE, m_Vt[n] + m_Vi[n] + vi[n]);
     }
     
     // make sure the prescribed velocities are fullfilled
@@ -219,19 +224,19 @@ void FEFluidSolver::UpdateKinematics(vector<double>& vi)
                 FENode& node = mesh.Node(si->node);
                 switch (si->bc)
                 {
-                    case 0: d += si->val*node.get(DOF_VX); break;
-                    case 1: d += si->val*node.get(DOF_VY); break;
-                    case 2: d += si->val*node.get(DOF_VZ); break;
-                    case 3: d += si->val*node.get(DOF_E); break;
+                    case 0: d += si->val*node.get(m_dofVX); break;
+                    case 1: d += si->val*node.get(m_dofVY); break;
+                    case 2: d += si->val*node.get(m_dofVZ); break;
+                    case 3: d += si->val*node.get(m_dofE); break;
                 }
             }
             
             switch (lc.master.bc)
             {
-                case 0: node.set(DOF_VX, d); break;
-                case 1: node.set(DOF_VY, d); break;
-                case 2: node.set(DOF_VZ, d); break;
-                case 3: node.set(DOF_E, d); break;
+                case 0: node.set(m_dofVX, d); break;
+                case 1: node.set(m_dofVY, d); break;
+                case 2: node.set(m_dofVZ, d); break;
+                case 3: node.set(m_dofE, d); break;
             }
         }
     }
@@ -292,7 +297,7 @@ void FEFluidSolver::PrepStep(double time)
     {
         FENode& ni = mesh.Node(i);
         ni.m_rp = ni.m_rt = ni.m_r0;
-        ni.m_vp = ni.get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
+        ni.m_vp = ni.get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
         ni.m_ap = ni.m_at;
     }
     
@@ -907,9 +912,9 @@ bool FEFluidSolver::Residual(vector<double>& R)
         node.m_Fr = vec3d(0,0,0);
         
         int n;
-        if ((n = -node.m_ID[DOF_VX]-2) >= 0) node.m_Fr.x = -m_Fr[n];
-        if ((n = -node.m_ID[DOF_VY]-2) >= 0) node.m_Fr.y = -m_Fr[n];
-        if ((n = -node.m_ID[DOF_VZ]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+        if ((n = -node.m_ID[m_dofVX]-2) >= 0) node.m_Fr.x = -m_Fr[n];
+        if ((n = -node.m_ID[m_dofVY]-2) >= 0) node.m_Fr.y = -m_Fr[n];
+        if ((n = -node.m_ID[m_dofVZ]-2) >= 0) node.m_Fr.z = -m_Fr[n];
     }
     
     // increase RHS counter

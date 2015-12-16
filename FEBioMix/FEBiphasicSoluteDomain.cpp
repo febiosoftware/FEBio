@@ -9,6 +9,7 @@ FEBiphasicSoluteDomain::FEBiphasicSoluteDomain(FEModel* pfem) : FESolidDomain(&p
 {
 	m_pMat = 0;
 	m_dofP = pfem->GetDOFIndex("p");
+	m_dofC = pfem->GetDOFIndex("c");
 }
 
 //-----------------------------------------------------------------------------
@@ -38,7 +39,7 @@ bool FEBiphasicSoluteDomain::Initialize(FEModel &fem)
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteDomain::Activate()
 {
-	int dofc = DOF_C + m_pMat->GetSolute()->GetSoluteID();
+	int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteID();
 
 	for (int i=0; i<Nodes(); ++i)
 	{
@@ -76,7 +77,7 @@ void FEBiphasicSoluteDomain::Activate()
 			// p0[i] = m.Node(el.m_node[i]).m_p0;
 			// c0[i] = m.Node(el.m_node[i]).m_c0[id0];
 			p0[i] = m.Node(el.m_node[i]).get(m_dofP);
-			c0[i] = m.Node(el.m_node[i]).get(DOF_C + id0);
+			c0[i] = m.Node(el.m_node[i]).get(m_dofC + id0);
 		}
 
 		// get the number of integration points
@@ -116,7 +117,7 @@ void FEBiphasicSoluteDomain::Activate()
 //! Unpack the element LM data. 
 void FEBiphasicSoluteDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
-	int dofc = DOF_C + m_pMat->GetSolute()->GetSoluteID();
+	int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteID();
 	int N = el.Nodes();
 	lm.resize(N*8);
 	for (int i=0; i<N; ++i)
@@ -136,9 +137,9 @@ void FEBiphasicSoluteDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 		// rigid rotational dofs
 		// TODO: Do I really need this
-		lm[4*N + 3*i  ] = id[DOF_RU];
-		lm[4*N + 3*i+1] = id[DOF_RV];
-		lm[4*N + 3*i+2] = id[DOF_RW];
+		lm[4*N + 3*i  ] = id[m_dofRU];
+		lm[4*N + 3*i+1] = id[m_dofRV];
+		lm[4*N + 3*i+2] = id[m_dofRW];
 
 		// concentration dofs
 		lm[7*N + i] = id[dofc];
@@ -1332,7 +1333,7 @@ void FEBiphasicSoluteDomain::ElementBiphasicSoluteMaterialStiffness(FESolidEleme
 
 	// nodal concentrations
 	double ct[FEElement::MAX_NODES];
-	for (i=0; i<neln; ++i) ct[i] = m_pMesh->Node(el.m_node[i]).get(DOF_C + id0);
+	for (i=0; i<neln; ++i) ct[i] = m_pMesh->Node(el.m_node[i]).get(m_dofC + id0);
 
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
@@ -1559,7 +1560,7 @@ void FEBiphasicSoluteDomain::UpdateElementStress(int iel, double dt, bool sstate
 		r0[j] = mesh.Node(el.m_node[j]).m_r0;
 		rt[j] = mesh.Node(el.m_node[j]).m_rt;
 		pn[j] = mesh.Node(el.m_node[j]).get(m_dofP);
-		ct[j] = mesh.Node(el.m_node[j]).get(DOF_C + id0);
+		ct[j] = mesh.Node(el.m_node[j]).get(m_dofC + id0);
 	}
 		
 	// loop over the integration points and calculate

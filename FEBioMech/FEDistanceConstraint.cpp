@@ -26,6 +26,10 @@ FEDistanceConstraint::FEDistanceConstraint(FEModel* pfem) : FENLConstraint(pfem)
 	m_Lm = 0.0;
 	m_nminaug = 0;
 	m_nmaxaug = 10;
+
+	m_dofX = pfem->GetDOFIndex("x");
+	m_dofY = pfem->GetDOFIndex("y");
+	m_dofZ = pfem->GetDOFIndex("z");
 }
 
 //-----------------------------------------------------------------------------
@@ -92,12 +96,12 @@ void FEDistanceConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 
 	// setup the LM vector
 	vector<int> lm(6);
-	lm[0] = nodea.m_ID[DOF_X];
-	lm[1] = nodea.m_ID[DOF_Y];
-	lm[2] = nodea.m_ID[DOF_Z];
-	lm[3] = nodeb.m_ID[DOF_X];
-	lm[4] = nodeb.m_ID[DOF_Y];
-	lm[5] = nodeb.m_ID[DOF_Z];
+	lm[0] = nodea.m_ID[m_dofX];
+	lm[1] = nodea.m_ID[m_dofY];
+	lm[2] = nodea.m_ID[m_dofZ];
+	lm[3] = nodeb.m_ID[m_dofX];
+	lm[4] = nodeb.m_ID[m_dofY];
+	lm[5] = nodeb.m_ID[m_dofZ];
 
 	// setup element vector
 	vector<int> en(2);
@@ -151,12 +155,12 @@ void FEDistanceConstraint::StiffnessMatrix(FESolver* psolver, const FETimePoint&
 
 	// setup the LM vector
 	vector<int> lm(6);
-	lm[0] = nodea.m_ID[DOF_X];
-	lm[1] = nodea.m_ID[DOF_Y];
-	lm[2] = nodea.m_ID[DOF_Z];
-	lm[3] = nodeb.m_ID[DOF_X];
-	lm[4] = nodeb.m_ID[DOF_Y];
-	lm[5] = nodeb.m_ID[DOF_Z];
+	lm[0] = nodea.m_ID[m_dofX];
+	lm[1] = nodea.m_ID[m_dofY];
+	lm[2] = nodea.m_ID[m_dofZ];
+	lm[3] = nodeb.m_ID[m_dofX];
+	lm[4] = nodeb.m_ID[m_dofY];
+	lm[5] = nodeb.m_ID[m_dofZ];
 
 	// setup element vector
 	vector<int> en(2);

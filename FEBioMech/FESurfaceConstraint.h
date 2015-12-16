@@ -91,5 +91,9 @@ public:
 	double	m_srad;			//!< search radius (%)
 	bool	m_btwo_pass;	//!< nr of passes
 
+	int	m_dofX;
+	int m_dofY;
+	int	m_dofZ;
+
 	DECLARE_PARAMETER_LIST();
 };

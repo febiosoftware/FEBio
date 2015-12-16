@@ -34,4 +34,8 @@ public:
 
 protected:
 	FEContactSurface* m_pSibling;
+
+	int	m_dofX;
+	int	m_dofY;
+	int	m_dofZ;
 };

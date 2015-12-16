@@ -10,9 +10,33 @@
 #include <string.h>
 #include <stdlib.h>
 
-//=============================================================================
-// The one-and-only DOFS
-//DOFS& fedofs = *DOFS::GetInstance();
+//-----------------------------------------------------------------------------
+// Max nr of nodal degrees of freedom
+
+// At this point the nodal dofs are used as follows:
+//
+#define DOF_X			0		// x-displacement
+#define DOF_Y			1		// y-displacement
+#define DOF_Z			2		// z-displacement
+#define DOF_U			3		// x-rotation
+#define DOF_V			4		// y-rotation
+#define DOF_W			5		// z-rotation
+#define DOF_P			6		// fluid pressure
+#define DOF_RU			7		// rigid x-rotation
+#define DOF_RV			8		// rigid y-rotation
+#define DOF_RW			9		// rigid z-rotation
+#define DOF_T			10		// temperature
+#define DOF_VX			11		// x-fluid velocity
+#define DOF_VY			12		// y-fluid velocity
+#define DOF_VZ			13		// z-fluid velocity
+#define DOF_E           14      // fluid dilatation
+#define DOF_C			15		// solute concentration
+//
+// The rotational degrees of freedom are only used for rigid nodes and shells.
+// The fluid pressure is only used for poroelastic problems.
+// The rigid rotational degrees of freedom are only used for rigid nodes and only during the creation of the stiffenss matrix
+// The temperature is only used during heat-conduction problems
+// The solute concentration is only used in solute transport problems.
 
 //-----------------------------------------------------------------------------
 DOFS* DOFS::m_pdofs = 0;
@@ -89,13 +113,15 @@ int DOFS::GetDOF(const char* sz)
 	else if (strcmp(sz, "v" ) == 0) bc = DOF_V;
 	else if (strcmp(sz, "w" ) == 0) bc = DOF_W;
 	else if (strcmp(sz, "p" ) == 0) bc = DOF_P;
+	else if (strcmp(sz, "Ru") == 0) bc = DOF_RU;
+	else if (strcmp(sz, "Rv") == 0) bc = DOF_RV;
+	else if (strcmp(sz, "Rw") == 0) bc = DOF_RW;
 	else if (strcmp(sz, "t" ) == 0) bc = DOF_T; 
     else if (strcmp(sz, "vx") == 0) bc = DOF_VX;
     else if (strcmp(sz, "vy") == 0) bc = DOF_VY;
     else if (strcmp(sz, "vz") == 0) bc = DOF_VZ;
     else if (strcmp(sz, "e" ) == 0) bc = DOF_E;
 	else if (strcmp(sz, "c" ) == 0) bc = DOF_C;
-	else if (strcmp(sz, "c1") == 0) bc = DOF_C;
-	else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
+	else if (sz[0] == 'c') bc = DOF_C + atoi(&sz[1]) - 1;
 	return bc;
 }

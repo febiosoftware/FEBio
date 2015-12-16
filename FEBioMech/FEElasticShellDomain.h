@@ -55,6 +55,13 @@ public: // overrides from FEElasticDomain
 	void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf) { }
 
 public:
+	// calculate deformation gradient
+	double defgrad(FEShellElement& el, mat3d& F, int n);
+
+	// inverse jacobian with respect to current frame
+	double invjact(FEShellElement& el, double J[3][3], int n);
+ 
+public:
 
 	// --- S T I F F N E S S --- 
 
@@ -74,4 +81,7 @@ public:
 
 protected:
 	FESolidMaterial*	m_pMat;
+	int					m_dofU;
+	int					m_dofV;
+	int					m_dofW;
 };

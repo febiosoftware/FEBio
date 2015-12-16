@@ -21,6 +21,11 @@ FEFluidDomain::FEFluidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh())
 {
     m_pMat = 0;
     m_btrans = true;
+
+	m_dofVX = pfem->GetDOFIndex("vx");
+	m_dofVY = pfem->GetDOFIndex("vy");
+	m_dofVZ = pfem->GetDOFIndex("vz");
+	m_dofE = pfem->GetDOFIndex("e");
 }
 
 //-----------------------------------------------------------------------------
@@ -114,10 +119,10 @@ void FEFluidDomain::Activate()
         {
             if (node.m_rid < 0)
             {
-                node.m_ID[DOF_VX] = DOF_ACTIVE;
-                node.m_ID[DOF_VY] = DOF_ACTIVE;
-                node.m_ID[DOF_VZ] = DOF_ACTIVE;
-                node.m_ID[DOF_E]  = DOF_ACTIVE;
+                node.m_ID[m_dofVX] = DOF_ACTIVE;
+                node.m_ID[m_dofVY] = DOF_ACTIVE;
+                node.m_ID[m_dofVZ] = DOF_ACTIVE;
+                node.m_ID[m_dofE]  = DOF_ACTIVE;
             }
         }
     }
@@ -713,8 +718,8 @@ void FEFluidDomain::UpdateElementStress(int iel, double dt)
     vec3d vt[FEElement::MAX_NODES];
     double et[FEElement::MAX_NODES];
     for (int j=0; j<neln; ++j) {
-        vt[j] = m_pMesh->Node(el.m_node[j]).get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
-        et[j] = m_pMesh->Node(el.m_node[j]).get(DOF_E);
+        vt[j] = m_pMesh->Node(el.m_node[j]).get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
+        et[j] = m_pMesh->Node(el.m_node[j]).get(m_dofE);
     }
     
     // loop over the integration points and update
@@ -752,11 +757,10 @@ void FEFluidDomain::UnpackLM(FEElement& el, vector<int>& lm)
         vector<int>& id = node.m_ID;
         
         // first the velocity dofs
-        lm[4*i  ] = id[DOF_VX];
-        lm[4*i+1] = id[DOF_VY];
-        lm[4*i+2] = id[DOF_VZ];
-        lm[4*i+3] = id[DOF_E];
-        
+        lm[4*i  ] = id[m_dofVX];
+        lm[4*i+1] = id[m_dofVY];
+        lm[4*i+2] = id[m_dofVZ];
+        lm[4*i+3] = id[m_dofE];
     }
 }
 

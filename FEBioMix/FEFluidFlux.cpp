@@ -22,6 +22,15 @@ FEFluidFlux::FEFluidFlux(FEModel* pfem) : FESurfaceLoad(pfem)
 	m_blinear = false; 
 	m_bmixture = false; 
 	m_flux = 1.0;
+
+	// get the degrees of freedom
+	m_dofX = pfem->GetDOFIndex("x");
+	m_dofY = pfem->GetDOFIndex("y");
+	m_dofZ = pfem->GetDOFIndex("z");
+	m_dofP = pfem->GetDOFIndex("p");
+	m_dofVX = pfem->GetDOFIndex("vx");
+	m_dofVY = pfem->GetDOFIndex("vy");
+	m_dofVZ = pfem->GetDOFIndex("vz");
 }
 
 //-----------------------------------------------------------------------------
@@ -82,12 +91,12 @@ void FEFluidFlux::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
 
 		// now the pressure dofs
-		lm[3*N+i] = id[DOF_P];
+		lm[3*N+i] = id[m_dofP];
 	}
 }
 
@@ -117,7 +126,7 @@ void FEFluidFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>
 	for (i=0; i<neln; ++i)
 	{
 		rt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_rt;
-		vt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
+		vt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
 	}
 	
 	vec3d kab, t1, t2;
@@ -248,7 +257,7 @@ bool FEFluidFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<doub
 	for (i=0; i<neln; ++i)
 	{
 		rt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_rt;
-		vt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
+		vt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
 	}
 	
 	double* Gr, *Gs;
@@ -380,7 +389,7 @@ bool FEFluidFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vecto
 	{
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
 		rt[i] = mesh.Node(el.m_node[i]).m_rt;
-		vt[i] = mesh.Node(el.m_node[i]).get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
+		vt[i] = mesh.Node(el.m_node[i]).get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
 	}
 
 	double* Gr, *Gs;

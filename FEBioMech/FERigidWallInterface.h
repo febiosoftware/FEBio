@@ -22,7 +22,7 @@ class FERigidWallSurface : public FESurface
 {
 public:
 	//! constructor
-	FERigidWallSurface(FEMesh* pm=0) : FESurface(pm) { m_NQ.Attach(this); }
+	FERigidWallSurface(FEMesh* pm=0);
 
 	//! Initializes data structures
 	bool Init();
@@ -54,6 +54,10 @@ public:
 	vector<vec2d>				m_Lt;	//!< Lagrange multipliers for friction
 	vector<double>				m_off;	//!< gap offset (= shell thickness)
 	vector<double>				m_eps;	//!< normal penalty factors
+
+	int	m_dofX;
+	int	m_dofY;
+	int	m_dofZ;
 
 	FENNQuery		m_NQ;		//!< this structure is used in finding the master element that corresponds to a slave node
 };

@@ -150,7 +150,16 @@ bool FEStickyInterface::Init()
 //! build the matrix profile for use in the stiffness matrix
 void FEStickyInterface::BuildMatrixProfile(FEStiffnessMatrix& K)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// get the DOFS
+	const int dof_X = fem.GetDOFIndex("x");
+	const int dof_Y = fem.GetDOFIndex("y");
+	const int dof_Z = fem.GetDOFIndex("z");
+	const int dof_RU = fem.GetDOFIndex("Ru");
+	const int dof_RV = fem.GetDOFIndex("Rv");
+	const int dof_RW = fem.GetDOFIndex("Rw");
 
 	const int LMSIZE = 6*(FEElement::MAX_NODES+1);
 	vector<int> lm(LMSIZE);
@@ -167,22 +176,22 @@ void FEStickyInterface::BuildMatrixProfile(FEStiffnessMatrix& K)
 			int n = me.Nodes();
 			lm.assign(LMSIZE, -1);
 
-			lm[0] = ss.Node(j).m_ID[DOF_X];
-			lm[1] = ss.Node(j).m_ID[DOF_Y];
-			lm[2] = ss.Node(j).m_ID[DOF_Z];
-			lm[3] = ss.Node(j).m_ID[DOF_RU];
-			lm[4] = ss.Node(j).m_ID[DOF_RV];
-			lm[5] = ss.Node(j).m_ID[DOF_RW];
+			lm[0] = ss.Node(j).m_ID[dof_X];
+			lm[1] = ss.Node(j).m_ID[dof_Y];
+			lm[2] = ss.Node(j).m_ID[dof_Z];
+			lm[3] = ss.Node(j).m_ID[dof_RU];
+			lm[4] = ss.Node(j).m_ID[dof_RV];
+			lm[5] = ss.Node(j).m_ID[dof_RW];
 
 			for (int k=0; k<n; ++k)
 			{
 				vector<int>& id = mesh.Node(en[k]).m_ID;
-				lm[6*(k+1)  ] = id[DOF_X];
-				lm[6*(k+1)+1] = id[DOF_Y];
-				lm[6*(k+1)+2] = id[DOF_Z];
-				lm[6*(k+1)+3] = id[DOF_RU];
-				lm[6*(k+1)+4] = id[DOF_RV];
-				lm[6*(k+1)+5] = id[DOF_RW];
+				lm[6*(k+1)  ] = id[dof_X];
+				lm[6*(k+1)+1] = id[dof_Y];
+				lm[6*(k+1)+2] = id[dof_Z];
+				lm[6*(k+1)+3] = id[dof_RU];
+				lm[6*(k+1)+4] = id[dof_RV];
+				lm[6*(k+1)+5] = id[dof_RW];
 			}
 
 			K.build_add(lm);

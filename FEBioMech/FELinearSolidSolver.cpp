@@ -23,6 +23,10 @@ FELinearSolidSolver::FELinearSolidSolver(FEModel* pfem) : FENewtonSolver(pfem)
 	m_pK = 0;
 	m_neq = 0;
 	m_plinsolve = 0;
+
+	m_dofX = pfem->GetDOFIndex("x");
+	m_dofY = pfem->GetDOFIndex("y");
+	m_dofZ = pfem->GetDOFIndex("z");
 }
 
 //-----------------------------------------------------------------------------
@@ -59,9 +63,9 @@ bool FELinearSolidSolver::Quasin(double time)
 
 				FENode& node = mesh.Node(n);
 
-				if (bc == DOF_X) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.x - node.m_r0.x); }}
-				if (bc == DOF_Y) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.y - node.m_r0.y); }}
-				if (bc == DOF_Z) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.z - node.m_r0.z); }}
+				if (bc == m_dofX) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - node.get(m_dofX); }}
+				if (bc == m_dofY) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - node.get(m_dofY); }}
+				if (bc == m_dofZ) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - node.get(m_dofZ); }}
 			}
 		}
 	}
@@ -127,9 +131,9 @@ void FELinearSolidSolver::Update(vector<double>& u)
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		n = node.m_ID[DOF_X]; if (n >= 0) node.m_rt.x = node.m_r0.x + u[n]; else if (-n-2 >= 0) node.m_rt.x = node.m_r0.x + m_d[-n-2];
-		n = node.m_ID[DOF_Y]; if (n >= 0) node.m_rt.y = node.m_r0.y + u[n]; else if (-n-2 >= 0) node.m_rt.y = node.m_r0.y + m_d[-n-2];
-		n = node.m_ID[DOF_Z]; if (n >= 0) node.m_rt.z = node.m_r0.z + u[n]; else if (-n-2 >= 0) node.m_rt.z = node.m_r0.z + m_d[-n-2];
+		n = node.m_ID[m_dofX]; if (n >= 0) node.m_rt.x = node.m_r0.x + u[n]; else if (-n-2 >= 0) node.m_rt.x = node.m_r0.x + m_d[-n-2];
+		n = node.m_ID[m_dofY]; if (n >= 0) node.m_rt.y = node.m_r0.y + u[n]; else if (-n-2 >= 0) node.m_rt.y = node.m_r0.y + m_d[-n-2];
+		n = node.m_ID[m_dofZ]; if (n >= 0) node.m_rt.z = node.m_r0.z + u[n]; else if (-n-2 >= 0) node.m_rt.z = node.m_r0.z + m_d[-n-2];
 	}
 
 	// update the stresses on all domains

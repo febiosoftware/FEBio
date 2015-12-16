@@ -3,8 +3,16 @@
 #include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
+FELinearElasticDomain::FELinearElasticDomain(FEModel* pfem)
+{
+	m_dofX = pfem->GetDOFIndex("x");
+	m_dofY = pfem->GetDOFIndex("y");
+	m_dofZ = pfem->GetDOFIndex("z");
+}
+
+//-----------------------------------------------------------------------------
 //! constructor
-FELinearSolidDomain::FELinearSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(pm)
+FELinearSolidDomain::FELinearSolidDomain(FEModel* pfem, FEMaterial* pmat) : FESolidDomain(&pfem->GetMesh()), FELinearElasticDomain(pfem)
 {
 	m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
 	assert(false);
@@ -50,9 +58,9 @@ void FELinearSolidDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.m_ID[DOF_X] = DOF_ACTIVE;
-				node.m_ID[DOF_Y] = DOF_ACTIVE;
-				node.m_ID[DOF_Z] = DOF_ACTIVE;
+				node.m_ID[m_dofX] = DOF_ACTIVE;
+				node.m_ID[m_dofY] = DOF_ACTIVE;
+				node.m_ID[m_dofZ] = DOF_ACTIVE;
 			}
 		}
 	}
@@ -109,9 +117,9 @@ void FELinearSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// get displacement DOFs
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
 	}
 }
 

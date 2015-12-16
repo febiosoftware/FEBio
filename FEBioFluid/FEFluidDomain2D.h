@@ -106,4 +106,8 @@ public:
 protected:
     FEFluid*	m_pMat;
     bool        m_btrans;   // flag for transient (true) or steady-state (false) analysis
+
+protected:
+	int	m_dofVX, m_dofVY;
+	int	m_dofE;
 };

@@ -19,7 +19,8 @@ double FENodeConcentration::value(int nnode)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.get(DOF_C); 
+	const int dof_C = m_pfem->GetDOFIndex("c");	
+	return node.get(dof_C); 
 }
 
 //-----------------------------------------------------------------------------
@@ -27,7 +28,8 @@ double FENodeConcentration_::value(int nnode)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	return node.get(DOF_C + m_nsol); 
+	const int dof_C = m_pfem->GetDOFIndex("c");
+	return node.get(dof_C + m_nsol); 
 }
 
 //-----------------------------------------------------------------------------

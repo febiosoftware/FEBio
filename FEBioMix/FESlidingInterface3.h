@@ -171,5 +171,9 @@ public:
 	double	m_ambp;		//!< ambient pressure
 	double	m_ambc;		//!< ambient concentration
 
+protected:
+	int	m_dofP;
+	int	m_dofC;
+
 	DECLARE_PARAMETER_LIST();
 };

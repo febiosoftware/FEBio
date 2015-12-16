@@ -9,6 +9,9 @@
 FEElasticShellDomain::FEElasticShellDomain(FEModel* pfem) : FEShellDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
+	m_dofU = pfem->GetDOFIndex("u");
+	m_dofV = pfem->GetDOFIndex("v");
+	m_dofW = pfem->GetDOFIndex("w");
 }
 
 //-----------------------------------------------------------------------------
@@ -90,12 +93,150 @@ void FEElasticShellDomain::Activate()
 
 			if (node.m_bshell)
 			{
-				node.m_ID[DOF_U] = DOF_ACTIVE;
-				node.m_ID[DOF_V] = DOF_ACTIVE;
-				node.m_ID[DOF_W] = DOF_ACTIVE;
+				node.m_ID[m_dofU] = DOF_ACTIVE;
+				node.m_ID[m_dofV] = DOF_ACTIVE;
+				node.m_ID[m_dofW] = DOF_ACTIVE;
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+double FEElasticShellDomain::defgrad(FEShellElement& el, mat3d& F, int n)
+{
+	int i;
+
+	int neln = el.Nodes();
+
+	double* Hrn = el.Hr(n);
+	double* Hsn = el.Hs(n);
+	double* Hn  = el.H(n);
+	double NX, NY, NZ, MX, MY, MZ;
+	double za;
+
+	// current nodal coordinates and directors
+	vec3d r[FEElement::MAX_NODES], D[FEElement::MAX_NODES];
+	for (i=0; i<neln; ++i)
+	{
+		FENode& ni = m_pMesh->Node(el.m_node[i]);
+		r[i] = ni.m_rt;
+		D[i] = el.m_D0[i] + ni.get_vec3d(m_dofU, m_dofV, m_dofW);
+	}
+
+	double g = el.gt(n);
+
+	double Ji[3][3];
+	invjac0(el, Ji, n);
+
+	F[0][0] = F[0][1] = F[0][2] = 0;
+	F[1][0] = F[1][1] = F[1][2] = 0;
+	F[2][0] = F[2][1] = F[2][2] = 0;
+	for (i=0; i<neln; ++i)
+	{
+		const double& Hri = Hrn[i];
+		const double& Hsi = Hsn[i];
+		const double& Hi  = Hn[i];
+
+		const double& x = r[i].x;
+		const double& y = r[i].y;
+		const double& z = r[i].z;
+
+		const double& dx = D[i].x;
+		const double& dy = D[i].y;
+		const double& dz = D[i].z;
+
+		za = 0.5*g*el.m_h0[i];
+
+		// calculate global gradient of shape functions
+		// note that we need the transposed of Ji, not Ji itself !
+		NX = Ji[0][0]*Hri+Ji[1][0]*Hsi;
+		NY = Ji[0][1]*Hri+Ji[1][1]*Hsi;
+		NZ = Ji[0][2]*Hri+Ji[1][2]*Hsi;
+
+		MX = za*Ji[0][0]*Hri + za*Ji[1][0]*Hsi + Ji[2][0]*0.5*el.m_h0[i]*Hi;
+		MY = za*Ji[0][1]*Hri + za*Ji[1][1]*Hsi + Ji[2][1]*0.5*el.m_h0[i]*Hi;
+		MZ = za*Ji[0][2]*Hri + za*Ji[1][2]*Hsi + Ji[2][2]*0.5*el.m_h0[i]*Hi;
+
+		// calculate deformation gradient F
+		F[0][0] += NX*x + MX*dx; F[0][1] += NY*x + MY*dx; F[0][2] += NZ*x + MZ*dx;
+		F[1][0] += NX*y + MX*dy; F[1][1] += NY*y + MY*dy; F[1][2] += NZ*y + MZ*dy;
+		F[2][0] += NX*z + MX*dz; F[2][1] += NY*z + MY*dz; F[2][2] += NZ*z + MZ*dz;
+	}
+
+	double V = F.det();
+	if (V <= 0) throw NegativeJacobian(el.m_nID, n, V, &el);
+
+	return V;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the inverse jacobian with respect to the current frame at 
+//! integration point n. The inverse jacobian is return in Ji. The return value
+//! is the determinant of the jacobian (not the inverse!)
+double FEElasticShellDomain::invjact(FEShellElement& el, double Ji[3][3], int n)
+{
+	int i;
+
+	// number of nodes
+	int neln = el.Nodes();
+
+	// initial nodal coordinates and directors
+	vec3d rt[FEElement::MAX_NODES], Dt[FEElement::MAX_NODES];
+	for (i=0; i<neln; ++i)
+	{
+		FENode& ni = m_pMesh->Node(el.m_node[i]);
+		rt[i] = ni.m_rt;
+		Dt[i] = el.m_D0[i] + ni.get_vec3d(m_dofU, m_dofV, m_dofW);
+	}
+
+	// calculate jacobian
+	double* h0 = &el.m_h0[0];
+	double J[3][3] = {0};
+	for (i=0; i<neln; ++i)
+	{
+		const double& Hri = el.Hr(n)[i];
+		const double& Hsi = el.Hs(n)[i];
+		const double& Hi = el.H(n)[i];
+		
+		const double& x = rt[i].x;
+		const double& y = rt[i].y;
+		const double& z = rt[i].z;
+		
+		const double& dx = Dt[i].x;
+		const double& dy = Dt[i].y;
+		const double& dz = Dt[i].z;
+			
+		double za = 0.5*el.gt(n)*h0[i];
+			
+		J[0][0] += Hri*x + Hri*za*dx; J[0][1] += Hsi*x + Hsi*za*dx; J[0][2] += 0.5*h0[i]*Hi*dx;
+		J[1][0] += Hri*y + Hri*za*dy; J[1][1] += Hsi*y + Hsi*za*dy; J[1][2] += 0.5*h0[i]*Hi*dy;
+		J[2][0] += Hri*z + Hri*za*dz; J[2][1] += Hsi*z + Hsi*za*dz; J[2][2] += 0.5*h0[i]*Hi*dz;
+	}
+		
+	// calculate the determinant
+	double det =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1]) 
+				+ J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0]) 
+				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+
+	// make sure the determinant is positive
+	if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
+		
+	// calculate the inverse of the jacobian
+	double deti = 1.0 / det;
+			
+	Ji[0][0] =  deti*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
+	Ji[1][0] =  deti*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
+	Ji[2][0] =  deti*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+	
+	Ji[0][1] =  deti*(J[0][2]*J[2][1] - J[0][1]*J[2][2]);
+	Ji[1][1] =  deti*(J[0][0]*J[2][2] - J[0][2]*J[2][0]);
+	Ji[2][1] =  deti*(J[0][1]*J[2][0] - J[0][0]*J[2][1]);
+	
+	Ji[0][2] =  deti*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
+	Ji[1][2] =  deti*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
+	Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
+
+	return det;
 }
 
 //-----------------------------------------------------------------------------
@@ -735,13 +876,13 @@ void FEElasticShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		lm[6*i+2] = id[m_dofZ];
 
 		// next the rotational dofs
-		lm[6*i+3] = id[DOF_U];
-		lm[6*i+4] = id[DOF_V];
-		lm[6*i+5] = id[DOF_W];
+		lm[6*i+3] = id[m_dofU];
+		lm[6*i+4] = id[m_dofV];
+		lm[6*i+5] = id[m_dofW];
 
 		// rigid rotational dofs
-		lm[6*N + 3*i  ] = id[DOF_RU];
-		lm[6*N + 3*i+1] = id[DOF_RV];
-		lm[6*N + 3*i+2] = id[DOF_RW];
+		lm[6*N + 3*i  ] = id[m_dofRU];
+		lm[6*N + 3*i+1] = id[m_dofRV];
+		lm[6*N + 3*i+2] = id[m_dofRW];
 	}
 }

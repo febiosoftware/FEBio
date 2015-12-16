@@ -69,5 +69,12 @@ protected:
 	bool			m_bsymm;	//!< use symmetric formulation
 	vector<LOAD>	m_PC;		//!< pressure load cards
 
+	// degrees of freedom
+	// (TODO: find a better way of defining this. 
+	//        I don't want to have to do this in each class)
+	int	m_dofX;
+	int	m_dofY;
+	int	m_dofZ;
+
 	DECLARE_PARAMETER_LIST();
 };

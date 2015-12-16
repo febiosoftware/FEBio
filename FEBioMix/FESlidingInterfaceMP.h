@@ -189,6 +189,10 @@ public:
 	vector<int> m_ssl;				//!< list of slave surface solutes common to both contact surfaces
 	vector<int> m_msl;				//!< list of master surface solutes common to both contact surfaces
     vector<int> m_sz;               //!< charge number of solutes common to both contact surfaces
+
+protected:
+	int	m_dofP;
+	int	m_dofC;
 	
 	DECLARE_PARAMETER_LIST();
 };

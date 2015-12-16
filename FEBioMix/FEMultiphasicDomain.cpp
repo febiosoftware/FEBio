@@ -13,6 +13,7 @@ FEMultiphasicDomain::FEMultiphasicDomain(FEModel* pfem) : FESolidDomain(&pfem->G
 { 
 	m_pMat = 0;
 	m_dofP = pfem->GetDOFIndex("p");
+	m_dofC = pfem->GetDOFIndex("c");
 }
 
 //-----------------------------------------------------------------------------
@@ -50,13 +51,13 @@ void FEMultiphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 		// rigid rotational dofs
 		// TODO: Do we really need this?
-		lm[4*N + 3*i  ] = id[DOF_RU];
-		lm[4*N + 3*i+1] = id[DOF_RV];
-		lm[4*N + 3*i+2] = id[DOF_RW];
+		lm[4*N + 3*i  ] = id[m_dofRU];
+		lm[4*N + 3*i+1] = id[m_dofRV];
+		lm[4*N + 3*i+2] = id[m_dofRW];
 
 		// concentration dofs
 		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(7+k)*N + i] = id[DOF_C+k];
+			lm[(7+k)*N + i] = id[m_dofC+k];
 	}
 }
 
@@ -125,7 +126,7 @@ void FEMultiphasicDomain::Activate()
 	const int nsol = m_pMat->Solutes();
 	for (int l=0; l<nsol; ++l)
 	{
-		int dofc = DOF_C + m_pMat->GetSolute(l)->GetSoluteID();
+		int dofc = m_dofC + m_pMat->GetSolute(l)->GetSoluteID();
 		for (int i=0; i<Nodes(); ++i)
 		{
 			FENode& node = Node(i);
@@ -154,7 +155,7 @@ void FEMultiphasicDomain::Activate()
 		{
 			p0[i] = m.Node(el.m_node[i]).get(m_dofP);
 			for (int isol = 0; isol<nsol; ++isol)
-				c0[isol][i] = m.Node(el.m_node[i]).get(DOF_C + sid[isol]);
+				c0[isol][i] = m.Node(el.m_node[i]).get(m_dofC + sid[isol]);
 		}
 
 		// get the number of integration points
@@ -2012,7 +2013,7 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
 		rt[j] = mesh.Node(el.m_node[j]).m_rt;
 		pn[j] = mesh.Node(el.m_node[j]).get(m_dofP);
 		for (k=0; k<nsol; ++k)
-			ct[k][j] = mesh.Node(el.m_node[j]).get(DOF_C + sid[k]);
+			ct[k][j] = mesh.Node(el.m_node[j]).get(m_dofC + sid[k]);
 	}
 		
 	// loop over the integration points and calculate

@@ -102,6 +102,10 @@ FESurfaceConstraint::FESurfaceConstraint(FEModel* pfem) : FEContactInterface(pfe
 	m_eps = 0;
 	m_btwo_pass = false;
 
+	m_dofX = pfem->GetDOFIndex("x");
+	m_dofY = pfem->GetDOFIndex("y");
+	m_dofZ = pfem->GetDOFIndex("z");
+
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
 }
@@ -120,7 +124,16 @@ bool FESurfaceConstraint::Init()
 //! build the matrix profile for use in the stiffness matrix
 void FESurfaceConstraint::BuildMatrixProfile(FEStiffnessMatrix& K)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// get the DOFS
+	const int dof_X = fem.GetDOFIndex("x");
+	const int dof_Y = fem.GetDOFIndex("y");
+	const int dof_Z = fem.GetDOFIndex("z");
+	const int dof_RU = fem.GetDOFIndex("Ru");
+	const int dof_RV = fem.GetDOFIndex("Rv");
+	const int dof_RW = fem.GetDOFIndex("Rw");
 
 	vector<int> lm(6*5);
 
@@ -133,22 +146,22 @@ void FESurfaceConstraint::BuildMatrixProfile(FEStiffnessMatrix& K)
 
 	assign(lm, -1);
 
-	lm[0] = m_ss.Node(nref).m_ID[DOF_X];
-	lm[1] = m_ss.Node(nref).m_ID[DOF_Y];
-	lm[2] = m_ss.Node(nref).m_ID[DOF_Z];
-	lm[3] = m_ss.Node(nref).m_ID[DOF_RU];
-	lm[4] = m_ss.Node(nref).m_ID[DOF_RV];
-	lm[5] = m_ss.Node(nref).m_ID[DOF_RW];
+	lm[0] = m_ss.Node(nref).m_ID[dof_X];
+	lm[1] = m_ss.Node(nref).m_ID[dof_Y];
+	lm[2] = m_ss.Node(nref).m_ID[dof_Z];
+	lm[3] = m_ss.Node(nref).m_ID[dof_RU];
+	lm[4] = m_ss.Node(nref).m_ID[dof_RV];
+	lm[5] = m_ss.Node(nref).m_ID[dof_RW];
 
 	for (int k=0; k<n0; ++k)
 	{
 		vector<int>& id = mesh.Node(nr0[k]).m_ID;
-		lm[6*(k+1)  ] = id[DOF_X];
-		lm[6*(k+1)+1] = id[DOF_Y];
-		lm[6*(k+1)+2] = id[DOF_Z];
-		lm[6*(k+1)+3] = id[DOF_RU];
-		lm[6*(k+1)+4] = id[DOF_RV];
-		lm[6*(k+1)+5] = id[DOF_RW];
+		lm[6*(k+1)  ] = id[dof_X];
+		lm[6*(k+1)+1] = id[dof_Y];
+		lm[6*(k+1)+2] = id[dof_Z];
+		lm[6*(k+1)+3] = id[dof_RU];
+		lm[6*(k+1)+4] = id[dof_RV];
+		lm[6*(k+1)+5] = id[dof_RW];
 	}
 
 	for (int j=0; j<m_ss.Nodes(); ++j)
@@ -160,22 +173,22 @@ void FESurfaceConstraint::BuildMatrixProfile(FEStiffnessMatrix& K)
 
 		int n = me.Nodes();
 
-		lm[0] = m_ss.Node(j).m_ID[DOF_X];
-		lm[1] = m_ss.Node(j).m_ID[DOF_Y];
-		lm[2] = m_ss.Node(j).m_ID[DOF_Z];
-		lm[3] = m_ss.Node(j).m_ID[DOF_RU];
-		lm[4] = m_ss.Node(j).m_ID[DOF_RV];
-		lm[5] = m_ss.Node(j).m_ID[DOF_RW];
+		lm[0] = m_ss.Node(j).m_ID[dof_X];
+		lm[1] = m_ss.Node(j).m_ID[dof_Y];
+		lm[2] = m_ss.Node(j).m_ID[dof_Z];
+		lm[3] = m_ss.Node(j).m_ID[dof_RU];
+		lm[4] = m_ss.Node(j).m_ID[dof_RV];
+		lm[5] = m_ss.Node(j).m_ID[dof_RW];
 
 		for (int k=0; k<n; ++k)
 		{
 			vector<int>& id = mesh.Node(en[k]).m_ID;
-			lm[6*(k+1)  ] = id[DOF_X];
-			lm[6*(k+1)+1] = id[DOF_Y];
-			lm[6*(k+1)+2] = id[DOF_Z];
-			lm[6*(k+1)+3] = id[DOF_RU];
-			lm[6*(k+1)+4] = id[DOF_RV];
-			lm[6*(k+1)+5] = id[DOF_RW];
+			lm[6*(k+1)  ] = id[dof_X];
+			lm[6*(k+1)+1] = id[dof_Y];
+			lm[6*(k+1)+2] = id[dof_Z];
+			lm[6*(k+1)+3] = id[dof_RU];
+			lm[6*(k+1)+4] = id[dof_RV];
+			lm[6*(k+1)+5] = id[dof_RW];
 		}
 
 		K.build_add(lm);
@@ -559,9 +572,9 @@ void FESurfaceConstraint::ContactStiffness(FESolver* psolver)
 
 		// fill the lm array
 		lm.resize(3*(ne0+1));
-		lm[0] = ss.Node(nref).m_ID[DOF_X];
-		lm[1] = ss.Node(nref).m_ID[DOF_Y];
-		lm[2] = ss.Node(nref).m_ID[DOF_Z];
+		lm[0] = ss.Node(nref).m_ID[m_dofX];
+		lm[1] = ss.Node(nref).m_ID[m_dofY];
+		lm[2] = ss.Node(nref).m_ID[m_dofZ];
 		for (l=0; l<ne0; ++l)
 		{
 			lm[3*(l+1)  ] = LM0[l*3  ];

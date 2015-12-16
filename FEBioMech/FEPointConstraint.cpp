@@ -18,6 +18,10 @@ FEPointConstraint::FEPointConstraint(FEModel* pfem) : FENLConstraint(pfem)
 
 	m_node = -1;
 	m_pel = 0;
+
+	m_dofX = pfem->GetDOFIndex("x");
+	m_dofY = pfem->GetDOFIndex("y");
+	m_dofZ = pfem->GetDOFIndex("z");
 }
 
 //-----------------------------------------------------------------------------
@@ -70,16 +74,16 @@ void FEPointConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 	// setup the LM matrix
 	vector<int> LM(3*9), en(9);
 	en[0] = m_node;
-	LM[0] = m.Node(m_node).m_ID[DOF_X];
-	LM[1] = m.Node(m_node).m_ID[DOF_Y];
-	LM[2] = m.Node(m_node).m_ID[DOF_Z];
+	LM[0] = m.Node(m_node).m_ID[m_dofX];
+	LM[1] = m.Node(m_node).m_ID[m_dofY];
+	LM[2] = m.Node(m_node).m_ID[m_dofZ];
 	for (i=0; i<8; ++i)
 	{
 		en[i+1] = m_pel->m_node[i];
 		FENode& node = m.Node(en[i+1]);
-		LM[(i+1)*3  ] = node.m_ID[DOF_X];
-		LM[(i+1)*3+1] = node.m_ID[DOF_Y];
-		LM[(i+1)*3+2] = node.m_ID[DOF_Z];
+		LM[(i+1)*3  ] = node.m_ID[m_dofX];
+		LM[(i+1)*3+1] = node.m_ID[m_dofY];
+		LM[(i+1)*3+2] = node.m_ID[m_dofZ];
 	}
 
 	// set up nodal force vector
@@ -117,16 +121,16 @@ void FEPointConstraint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp
 	// setup the LM matrix
 	vector<int> LM(3*9), en(9);
 	en[0] = m_node;
-	LM[0] = m.Node(m_node).m_ID[DOF_X];
-	LM[1] = m.Node(m_node).m_ID[DOF_Y];
-	LM[2] = m.Node(m_node).m_ID[DOF_Z];
+	LM[0] = m.Node(m_node).m_ID[m_dofX];
+	LM[1] = m.Node(m_node).m_ID[m_dofY];
+	LM[2] = m.Node(m_node).m_ID[m_dofZ];
 	for (i=0; i<8; ++i)
 	{
 		en[i+1] = m_pel->m_node[i];
 		FENode& node = m.Node(en[i+1]);
-		LM[(i+1)*3  ] = node.m_ID[DOF_X];
-		LM[(i+1)*3+1] = node.m_ID[DOF_Y];
-		LM[(i+1)*3+2] = node.m_ID[DOF_Z];
+		LM[(i+1)*3  ] = node.m_ID[m_dofX];
+		LM[(i+1)*3+1] = node.m_ID[m_dofY];
+		LM[(i+1)*3+2] = node.m_ID[m_dofZ];
 	}
 
 	// setup stiffness matrix

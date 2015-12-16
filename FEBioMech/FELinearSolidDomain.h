@@ -8,10 +8,15 @@
 class FELinearElasticDomain
 {
 public:
+	FELinearElasticDomain(FEModel* pfem);
 	virtual ~FELinearElasticDomain(){}
 	virtual void StiffnessMatrix(FESolver* psolver) = 0;
 	virtual void RHS(FEGlobalVector& R) = 0;
 	virtual void UpdateStresses(FEModel& fem) = 0;
+protected:
+	int	m_dofX;
+	int	m_dofY;
+	int	m_dofZ;
 };
 
 //-----------------------------------------------------------------------------
@@ -20,7 +25,7 @@ class FELinearSolidDomain : public FESolidDomain, public FELinearElasticDomain
 {
 public:
 	//! constructor
-	FELinearSolidDomain(FEMesh* pm, FEMaterial* pmat);
+	FELinearSolidDomain(FEModel* pfem, FEMaterial* pmat);
 
 	//! get the material (overridden from FEDomain)
 	FEMaterial* GetMaterial() { return m_pMat; }

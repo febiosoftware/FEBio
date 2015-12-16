@@ -5,6 +5,10 @@
 //-----------------------------------------------------------------------------
 FEBiphasicContactSurface::FEBiphasicContactSurface(FEMesh* pm) : FEContactSurface(pm)
 {
+	// I want to use the FEModel class for this, but don't know how
+	DOFS& dofs = *DOFS::GetInstance();
+	m_dofP = dofs.GetDOF("p");
+	m_dofC = dofs.GetDOF("c");
 }
 
 //-----------------------------------------------------------------------------
@@ -27,17 +31,10 @@ void FEBiphasicContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 {
     // get nodal DOFS
     DOFS& dofs = *DOFS::GetInstance();
-    int MAX_NDOFS = dofs.GetNDOFS();
     int MAX_CDOFS = dofs.GetCDOFS();
     
 	int N = el.Nodes();
 	lm.resize(N*(4+MAX_CDOFS));
-
-	// get the DOF indices
-	const int dof_x = dofs.GetDOF("x");
-	const int dof_y = dofs.GetDOF("y");
-	const int dof_z = dofs.GetDOF("z");
-	const int dof_p = dofs.GetDOF("p");
 
 	// pack the equation numbers
 	for (int i=0; i<N; ++i)
@@ -48,15 +45,15 @@ void FEBiphasicContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[dof_x];
-		lm[3*i+1] = id[dof_y];
-		lm[3*i+2] = id[dof_z];
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
 
 		// now the pressure dofs
-		lm[3*N+i] = id[dof_p];
+		lm[3*N+i] = id[m_dofP];
 
 		// concentration dofs
 		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(4 + k)*N + i] = id[DOF_C+k];
+			lm[(4 + k)*N + i] = id[m_dofC+k];
 	}
 }

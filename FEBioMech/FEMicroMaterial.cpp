@@ -510,6 +510,9 @@ mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 	// get the reaction force vector from the solid solver
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero). 
+	const int dof_X = rve.GetDOFIndex("x");
+	const int dof_Y = rve.GetDOFIndex("y");
+	const int dof_Z = rve.GetDOFIndex("z");
 	FEAnalysis* pstep = rve.GetCurrentStep();
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
@@ -520,9 +523,9 @@ mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
 		FENode& n = m.Node(dc.NodeID(0));
 		vec3d f;
-		f.x = R[-n.m_ID[DOF_X]-2];
-		f.y = R[-n.m_ID[DOF_Y]-2];
-		f.z = R[-n.m_ID[DOF_Z]-2];
+		f.x = R[-n.m_ID[dof_X]-2];
+		f.y = R[-n.m_ID[dof_Y]-2];
+		f.z = R[-n.m_ID[dof_Z]-2];
 		T += f & n.m_rt;
 	}
 
@@ -819,6 +822,9 @@ mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
 	// get the reaction force vector from the solid solver
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero). 
+	const int dof_X = rve.GetDOFIndex("x");
+	const int dof_Y = rve.GetDOFIndex("y");
+	const int dof_Z = rve.GetDOFIndex("z");
 	FEAnalysis* pstep = rve.GetCurrentStep();
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
@@ -829,9 +835,9 @@ mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
 		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
 		FENode& n = m.Node(dc.NodeID(0));
 		vec3d f;
-		f.x = R[-n.m_ID[DOF_X]-2];
-		f.y = R[-n.m_ID[DOF_Y]-2];
-		f.z = R[-n.m_ID[DOF_Z]-2];
+		f.x = R[-n.m_ID[dof_X]-2];
+		f.y = R[-n.m_ID[dof_Y]-2];
+		f.z = R[-n.m_ID[dof_Z]-2];
 		PK1 += f & n.m_r0;
 	}
 
@@ -879,6 +885,9 @@ mat3ds FEMicroMaterial::AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp)
 	// get the reaction force vector from the solid solver
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero). 
+	const int dof_X = rve.GetDOFIndex("x");
+	const int dof_Y = rve.GetDOFIndex("y");
+	const int dof_Z = rve.GetDOFIndex("z");
 	FEAnalysis* pstep = rve.GetCurrentStep();
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
@@ -889,9 +898,9 @@ mat3ds FEMicroMaterial::AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp)
 		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
 		FENode& n = m.Node(dc.NodeID(0));
 		vec3d f;
-		f.x = R[-n.m_ID[DOF_X]-2];
-		f.y = R[-n.m_ID[DOF_Y]-2];
-		f.z = R[-n.m_ID[DOF_Z]-2];
+		f.x = R[-n.m_ID[dof_X]-2];
+		f.y = R[-n.m_ID[dof_Y]-2];
+		f.z = R[-n.m_ID[dof_Z]-2];
 		vec3d f0 = Finv*f;
 		S += f0 & n.m_r0;
 	}

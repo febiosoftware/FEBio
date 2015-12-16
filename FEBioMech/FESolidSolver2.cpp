@@ -74,6 +74,15 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem)
 	m_dofX = pfem->GetDOFIndex("x");
 	m_dofY = pfem->GetDOFIndex("y");
 	m_dofZ = pfem->GetDOFIndex("z");
+	m_dofVX = pfem->GetDOFIndex("vx");
+	m_dofVY = pfem->GetDOFIndex("vy");
+	m_dofVZ = pfem->GetDOFIndex("vz");
+	m_dofU = pfem->GetDOFIndex("u");
+	m_dofV = pfem->GetDOFIndex("v");
+	m_dofW = pfem->GetDOFIndex("w");
+	m_dofRU = pfem->GetDOFIndex("Ru");
+	m_dofRV = pfem->GetDOFIndex("Rv");
+	m_dofRW = pfem->GetDOFIndex("Rw");
 }
 
 //-----------------------------------------------------------------------------
@@ -143,9 +152,9 @@ bool FESolidSolver2::Init()
 		n = node.m_ID[m_dofZ]; if (n >= 0) m_Ut[n] = node.get(m_dofZ);
 
 		// rotational dofs
-		n = node.m_ID[DOF_U]; if (n >= 0) m_Ut[n] = node.get(DOF_U);
-		n = node.m_ID[DOF_V]; if (n >= 0) m_Ut[n] = node.get(DOF_V);
-		n = node.m_ID[DOF_W]; if (n >= 0) m_Ut[n] = node.get(DOF_W);
+		n = node.m_ID[m_dofU]; if (n >= 0) m_Ut[n] = node.get(m_dofU);
+		n = node.m_ID[m_dofV]; if (n >= 0) m_Ut[n] = node.get(m_dofV);
+		n = node.m_ID[m_dofW]; if (n >= 0) m_Ut[n] = node.get(m_dofW);
 	}
 
 	return true;
@@ -224,12 +233,12 @@ bool FESolidSolver2::InitEquations()
 		if (node.m_rid >= 0)
 		{
 			FERigidBody& RB = *rigid.Object(node.m_rid);
-			node.m_ID[m_dofX] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0]-2 : RB.m_LM[0]);
-			node.m_ID[m_dofY] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1]-2 : RB.m_LM[1]);
-			node.m_ID[m_dofZ] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2]-2 : RB.m_LM[2]);
-			node.m_ID[DOF_RU] = (RB.m_LM[3] >= 0 ? -RB.m_LM[3]-2 : RB.m_LM[3]);
-			node.m_ID[DOF_RV] = (RB.m_LM[4] >= 0 ? -RB.m_LM[4]-2 : RB.m_LM[4]);
-			node.m_ID[DOF_RW] = (RB.m_LM[5] >= 0 ? -RB.m_LM[5]-2 : RB.m_LM[5]);
+			node.m_ID[m_dofX ] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0]-2 : RB.m_LM[0]);
+			node.m_ID[m_dofY ] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1]-2 : RB.m_LM[1]);
+			node.m_ID[m_dofZ ] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2]-2 : RB.m_LM[2]);
+			node.m_ID[m_dofRU] = (RB.m_LM[3] >= 0 ? -RB.m_LM[3]-2 : RB.m_LM[3]);
+			node.m_ID[m_dofRV] = (RB.m_LM[4] >= 0 ? -RB.m_LM[4]-2 : RB.m_LM[4]);
+			node.m_ID[m_dofRW] = (RB.m_LM[5] >= 0 ? -RB.m_LM[5]-2 : RB.m_LM[5]);
 		}
 	}
 
@@ -314,9 +323,9 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 		if ((n = node.m_ID[m_dofZ]) >= 0) node.set(m_dofZ, ui[n] + m_Ui[n] + m_Ut[n]);
 
 		// rotational dofs
-        if ((n = node.m_ID[DOF_U]) >= 0) node.set(DOF_U, m_Ut[n] + m_Ui[n] + ui[n]);
-        if ((n = node.m_ID[DOF_V]) >= 0) node.set(DOF_V, m_Ut[n] + m_Ui[n] + ui[n]);
-        if ((n = node.m_ID[DOF_W]) >= 0) node.set(DOF_W, m_Ut[n] + m_Ui[n] + ui[n]);
+        if ((n = node.m_ID[m_dofU]) >= 0) node.set(m_dofU, m_Ut[n] + m_Ui[n] + ui[n]);
+        if ((n = node.m_ID[m_dofV]) >= 0) node.set(m_dofV, m_Ut[n] + m_Ui[n] + ui[n]);
+        if ((n = node.m_ID[m_dofW]) >= 0) node.set(m_dofW, m_Ut[n] + m_Ui[n] + ui[n]);
 	}
 
 	// make sure the prescribed displacements are fullfilled
@@ -388,7 +397,7 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 			FENode& n = mesh.Node(i);
 			n.m_at = (n.m_rt - n.m_rp)*b - n.m_vp*a + n.m_ap*c;
 			vec3d vt = n.m_vp + (n.m_ap*(1.0 - m_gamma) + n.m_at*m_gamma)*dt;
-			n.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, vt);
+			n.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
 		}
 	}
 }
@@ -452,9 +461,9 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
 		if ((n = node.m_ID[m_dofZ]) >= 0) Ui[n] += ui[n];
         
         // rotational dofs
-        if ((n = node.m_ID[DOF_U]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[DOF_V]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[DOF_W]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofU]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofV]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofW]) >= 0) Ui[n] += ui[n];
 	}    
 }
 
@@ -680,7 +689,7 @@ void FESolidSolver2::PrepStep(double time)
 	{
 		FENode& ni = mesh.Node(i);
 		ni.m_rp = ni.m_rt;
-		ni.m_vp = ni.get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
+		ni.m_vp = ni.get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
 		ni.m_ap = ni.m_at;
 	}
 
@@ -839,7 +848,7 @@ void FESolidSolver2::PrepStep(double time)
 
 				vec3d v = V + (W ^ r); 
 				n.m_vp = v;
-				n.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, v);
+				n.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, v);
 
 				vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
 				n.m_ap = n.m_at = a;
@@ -2085,7 +2094,7 @@ void FESolidSolver2::InertialForces(FEGlobalVector& R)
 		FENode& node = mesh.Node(i);
         node.m_at = (node.m_rt - node.m_rp)*b - node.m_vp*a + node.m_ap*c;
         vec3d vt = node.m_vp + (node.m_ap*(1.0 - m_gamma) + node.m_at*m_gamma)*dt;
-		node.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, vt);
+		node.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
         
         F[3*i  ] = node.m_at.x;
         F[3*i+1] = node.m_at.y;

@@ -221,7 +221,7 @@ vec3d FESlidingSurface2::GetFluidForce()
 		int nseln = el.Nodes();
         
 		// nodal pressures
-		for (i=0; i<nseln; ++i) pn[i] = GetMesh()->Node(el.m_node[i]).get(DOF_P);
+		for (i=0; i<nseln; ++i) pn[i] = GetMesh()->Node(el.m_node[i]).get(m_dofP);
 		
 		int nint = el.GaussPoints();
 		
@@ -467,6 +467,8 @@ FESlidingInterface2::FESlidingInterface2(FEModel* pfem) : FEContactInterface(pfe
 	m_naugmin = 0;
 	m_naugmax = 10;
 
+	m_dofP = pfem->GetDOFIndex("p");
+
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
 }
@@ -499,7 +501,17 @@ bool FESlidingInterface2::Init()
 //-----------------------------------------------------------------------------
 void FESlidingInterface2::BuildMatrixProfile(FEStiffnessMatrix& K)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// get the DOFS
+	const int dof_X = fem.GetDOFIndex("x");
+	const int dof_Y = fem.GetDOFIndex("y");
+	const int dof_Z = fem.GetDOFIndex("z");
+	const int dof_P = fem.GetDOFIndex("p");
+	const int dof_RU = fem.GetDOFIndex("Ru");
+	const int dof_RV = fem.GetDOFIndex("Rv");
+	const int dof_RW = fem.GetDOFIndex("Rw");
 
 	vector<int> lm(7*FEElement::MAX_NODES*2);
 
@@ -532,25 +544,25 @@ void FESlidingInterface2::BuildMatrixProfile(FEStiffnessMatrix& K)
 					for (l=0; l<nseln; ++l)
 					{
 						vector<int>& id = mesh.Node(sn[l]).m_ID;
-						lm[7*l  ] = id[DOF_X];
-						lm[7*l+1] = id[DOF_Y];
-						lm[7*l+2] = id[DOF_Z];
-						lm[7*l+3] = id[DOF_P];
-						lm[7*l+4] = id[DOF_RU];
-						lm[7*l+5] = id[DOF_RV];
-						lm[7*l+6] = id[DOF_RW];
+						lm[7*l  ] = id[dof_X];
+						lm[7*l+1] = id[dof_Y];
+						lm[7*l+2] = id[dof_Z];
+						lm[7*l+3] = id[dof_P];
+						lm[7*l+4] = id[dof_RU];
+						lm[7*l+5] = id[dof_RV];
+						lm[7*l+6] = id[dof_RW];
 					}
 
 					for (l=0; l<nmeln; ++l)
 					{
 						vector<int>& id = mesh.Node(mn[l]).m_ID;
-						lm[7*(l+nseln)  ] = id[DOF_X];
-						lm[7*(l+nseln)+1] = id[DOF_Y];
-						lm[7*(l+nseln)+2] = id[DOF_Z];
-						lm[7*(l+nseln)+3] = id[DOF_P];
-						lm[7*(l+nseln)+4] = id[DOF_RU];
-						lm[7*(l+nseln)+5] = id[DOF_RV];
-						lm[7*(l+nseln)+6] = id[DOF_RW];
+						lm[7*(l+nseln)  ] = id[dof_X];
+						lm[7*(l+nseln)+1] = id[dof_Y];
+						lm[7*(l+nseln)+2] = id[dof_Z];
+						lm[7*(l+nseln)+3] = id[dof_P];
+						lm[7*(l+nseln)+4] = id[dof_RU];
+						lm[7*(l+nseln)+5] = id[dof_RV];
+						lm[7*(l+nseln)+6] = id[dof_RW];
 					}
 
 					K.build_add(lm);
@@ -791,7 +803,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 		// get the nodal pressures
 		if (sporo)
 		{
-			for (int j=0; j<ne; ++j) ps[j] = mesh.Node(el.m_node[j]).get(DOF_P);
+			for (int j=0; j<ne; ++j) ps[j] = mesh.Node(el.m_node[j]).get(m_dofP);
 		}
 
 		for (int j=0; j<nint; ++j)
@@ -857,7 +869,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 					bool mporo = ms.m_poro[pme->m_lid];
 					if (sporo && mporo) {
 						double pm[FEElement::MAX_NODES];
-						for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).get(DOF_P);
+						for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).get(m_dofP);
 						double p2 = pme->eval(pm, rs[0], rs[1]);
 						pt.m_pg = p1 - p2;
 					}
@@ -979,11 +991,11 @@ void FESlidingInterface2::Update(int niter)
 			for (i=0; i<neln; ++i)
 			{
 				FENode& node = ss.Node(el.m_lnode[i]);
-				id = node.m_ID[DOF_P];
+				id = node.m_ID[m_dofP];
 				if ((id < -1) && (tn[i] > 0))
 				{
 					// mark node as non-free-draining (= pos ID)
-					node.m_ID[DOF_P] = -id-2;
+					node.m_ID[m_dofP] = -id-2;
 				}
 			}
 		}
@@ -1036,11 +1048,11 @@ void FESlidingInterface2::Update(int niter)
 						double tp = pse->eval(tn, rs[0], rs[1]);
 						
 						// if tp > 0, mark node as non-free-draining. (= pos ID)
-						id = node.m_ID[DOF_P];
+						id = node.m_ID[m_dofP];
 						if ((id < -1) && (tp > 0))
 						{
 							// mark as non free-draining
-							node.m_ID[DOF_P] = -id-2;
+							node.m_ID[m_dofP] = -id-2;
 						}
 					}
 				}
@@ -1297,7 +1309,7 @@ void FESlidingInterface2::ContactStiffness(FESolver* psolver)
 
 			// nodal pressures
 			double pn[MN];
-			for (j=0; j<nseln; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).get(DOF_P);
+			for (j=0; j<nseln; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).get(m_dofP);
 
 			// copy the LM vector
 			ss.UnpackLM(se, sLM);
@@ -1344,7 +1356,7 @@ void FESlidingInterface2::ContactStiffness(FESolver* psolver)
 
 					// nodal pressure
 					double pm[MN];
-					for (k=0; k<nmeln; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).get(DOF_P);
+					for (k=0; k<nmeln; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).get(m_dofP);
 
 					// copy the LM vector
 					ms.UnpackLM(me, mLM);
@@ -1908,12 +1920,12 @@ void FESlidingInterface2::MarkFreeDraining()
 			// to a negative number
 			for (i=0; i<s.Nodes(); ++i) 
 			{
-				id = s.Node(i).m_ID[DOF_P];
+				id = s.Node(i).m_ID[m_dofP];
 				if (id >= 0) 
 				{
 					FENode& node = s.Node(i);
 					// mark node as free-draining
-					node.m_ID[DOF_P] = -id-2;
+					node.m_ID[m_dofP] = -id-2;
 				}
 			}
 		}
@@ -1934,11 +1946,11 @@ void FESlidingInterface2::SetFreeDraining()
 			// loop over all nodes
 			for (i=0; i<s.Nodes(); ++i) 
 			{
-				if (s.Node(i).m_ID[DOF_P] < -1)
+				if (s.Node(i).m_ID[m_dofP] < -1)
 				{
 					FENode& node = s.Node(i);
 					// set the fluid pressure to zero
-					node.set(DOF_P, 0);
+					node.set(m_dofP, 0);
 				}
 			}
 		}

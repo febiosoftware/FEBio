@@ -36,5 +36,9 @@ public:
 	double	m_l0;		//!< reference length
 	double	m_Lm;		//!< Lagrange multiplier
 
+	int	m_dofX;
+	int	m_dofY;
+	int	m_dofZ;
+
 	DECLARE_PARAMETER_LIST();
 };

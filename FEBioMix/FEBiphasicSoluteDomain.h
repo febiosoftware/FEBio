@@ -106,4 +106,5 @@ protected: // overridden from FEElasticDomain, but not implemented in this domai
 protected:
 	FEBiphasicSolute*	m_pMat;
 	int			m_dofP;		//!< pressure dof index
+	int			m_dofC;		//!< concentration dof index
 };

@@ -66,6 +66,9 @@
     <ClCompile Include="..\..\FEBioFluid\FECarreauFluid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEFluidDomain2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioFluid\FEBioFluid.h">
@@ -117,6 +120,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioFluid\FECarreauFluid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEFluidDomain2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

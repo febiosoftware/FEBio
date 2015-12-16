@@ -48,5 +48,9 @@ private:
 protected:
 	vector<LOAD>	m_TC;		//!< traction boundary cards
 
+	int		m_dofVX;
+	int		m_dofVY;
+	int		m_dofVZ;
+
 	DECLARE_PARAMETER_LIST();
 };

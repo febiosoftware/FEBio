@@ -4,7 +4,16 @@
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
-FEContactSurface::FEContactSurface(FEMesh* pm) : FESurface(pm) { m_pSibling = 0; }
+FEContactSurface::FEContactSurface(FEMesh* pm) : FESurface(pm) 
+{
+	m_pSibling = 0; 
+
+	// I want to use the FEModel class for this, but don't know how
+	DOFS& dofs = *DOFS::GetInstance();
+	m_dofX = dofs.GetDOF("x");
+	m_dofY = dofs.GetDOF("y");
+	m_dofZ = dofs.GetDOF("z");
+}
 
 //-----------------------------------------------------------------------------
 FEContactSurface::~FEContactSurface() { m_pSibling = 0; }
@@ -38,8 +47,8 @@ void FEContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 		FENode& node = m_pMesh->Node(n);
 		vector<int>& id = node.m_ID;
 
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
 	}
 }

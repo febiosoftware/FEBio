@@ -8,6 +8,9 @@ FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(&pfe
 {
 	m_pMat = 0;
 	m_dofP = pfem->GetDOFIndex("p");
+	m_dofVX = pfem->GetDOFIndex("vx");
+	m_dofVY = pfem->GetDOFIndex("vy");
+	m_dofVZ = pfem->GetDOFIndex("vz");
 }
 
 //-----------------------------------------------------------------------------
@@ -122,9 +125,9 @@ void FEBiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 		// rigid rotational dofs
 		// TODO: Do I really need this?
-		lm[4*N + 3*i  ] = id[DOF_RU];
-		lm[4*N + 3*i+1] = id[DOF_RV];
-		lm[4*N + 3*i+2] = id[DOF_RW];
+		lm[4*N + 3*i  ] = id[m_dofRU];
+		lm[4*N + 3*i+1] = id[m_dofRV];
+		lm[4*N + 3*i+2] = id[m_dofRW];
 	}
 }
 
@@ -614,7 +617,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
 		rt[i] = mesh.Node(el.m_node[i]).m_rt;
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-		v[i]  = mesh.Node(el.m_node[i]).get_vec3d(DOF_VX, DOF_VY, DOF_VZ);
+		v[i]  = mesh.Node(el.m_node[i]).get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
 	}
 	
 	// zero stiffness matrix

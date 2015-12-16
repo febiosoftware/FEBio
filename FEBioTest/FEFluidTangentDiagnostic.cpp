@@ -43,9 +43,14 @@ bool FEFluidTangentUniaxial::Init()
         { 0,-1,-1, 0},{ 0,-1,-1,-1},{ 0,-1,-1,-1}, { 0,-1,-1, 0}
     };
     
+    FEModel& fem = GetDiagnostic()->GetFEModel();
+	const int dof_VX = fem.GetDOFIndex("vx");
+	const int dof_VY = fem.GetDOFIndex("vy");
+	const int dof_VZ = fem.GetDOFIndex("vz");
+	const int dof_E  = fem.GetDOFIndex("e");
+
     // --- create the FE problem ---
     // create the mesh
-    FEModel& fem = GetDiagnostic()->GetFEModel();
     FEMesh& m = fem.GetMesh();
     m.CreateNodes(8);
     for (i=0; i<8; ++i)
@@ -55,10 +60,10 @@ bool FEFluidTangentUniaxial::Init()
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddFixedBC(i, DOF_VX);
-        if (BC[i][1] == -1) fem.AddFixedBC(i, DOF_VY);
-        if (BC[i][2] == -1) fem.AddFixedBC(i, DOF_VZ);
-        if (BC[i][3] == -1) fem.AddFixedBC(i, DOF_E);
+        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_VX);
+        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_VY);
+        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_VZ);
+        if (BC[i][3] == -1) fem.AddFixedBC(i, dof_E);
     }
     
     // get the material
@@ -87,7 +92,7 @@ bool FEFluidTangentUniaxial::Init()
     int nd[4] = {0, 3, 4, 7};
     FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
     fem.AddPrescribedBC(pdc);
-    pdc->SetDOF(DOF_VX).SetLoadCurveIndex(0).SetScale(m_velocity);
+    pdc->SetDOF(dof_VX).SetLoadCurveIndex(0).SetScale(m_velocity);
     for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
     
     return true;
@@ -234,6 +239,12 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
     FEModel& fem = GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
     FEFluidSolver& solver = static_cast<FEFluidSolver&>(*pstep->GetFESolver());
+
+	// get the dof indices
+	const int dof_VX = fem.GetDOFIndex("vx");
+	const int dof_VY = fem.GetDOFIndex("vy");
+	const int dof_VZ = fem.GetDOFIndex("vz");
+	const int dof_E  = fem.GetDOFIndex("e");
     
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
@@ -262,10 +273,10 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.inc(DOF_VX, dx); break;
-            case 1: node.inc(DOF_VY, dx); break;
-            case 2: node.inc(DOF_VZ, dx); break;
-            case 3: node.inc(DOF_E, dx); break;
+            case 0: node.inc(dof_VX, dx); break;
+            case 1: node.inc(dof_VY, dx); break;
+            case 2: node.inc(dof_VZ, dx); break;
+            case 3: node.inc(dof_E, dx); break;
         }
         
         
@@ -277,10 +288,10 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.dec(DOF_VX, dx); break;
-            case 1: node.dec(DOF_VY, dx); break;
-            case 2: node.dec(DOF_VZ, dx); break;
-            case 3: node.dec(DOF_E, dx); break;
+            case 0: node.dec(dof_VX, dx); break;
+            case 1: node.dec(dof_VY, dx); break;
+            case 2: node.dec(dof_VZ, dx); break;
+            case 3: node.dec(dof_E, dx); break;
         }
         
         solver.UpdateStresses();

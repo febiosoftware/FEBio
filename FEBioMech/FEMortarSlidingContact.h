@@ -83,5 +83,9 @@ private:
 	FEMortarSlidingSurface	m_ms;	//!< mortar surface
 	FEMortarSlidingSurface	m_ss;	//!< non-mortar surface
 
+	int		m_dofX;
+	int		m_dofY;
+	int		m_dofZ;
+
 	DECLARE_PARAMETER_LIST();
 };

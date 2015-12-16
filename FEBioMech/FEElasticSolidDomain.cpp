@@ -855,9 +855,9 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		lm[3*i+2] = id[m_dofZ];
 
 		// rigid rotational dofs
-		lm[3*N + 3*i  ] = id[DOF_RU];
-		lm[3*N + 3*i+1] = id[DOF_RV];
-		lm[3*N + 3*i+2] = id[DOF_RW];
+		lm[3*N + 3*i  ] = id[m_dofRU];
+		lm[3*N + 3*i+1] = id[m_dofRV];
+		lm[3*N + 3*i+2] = id[m_dofRW];
 	}
 }
 

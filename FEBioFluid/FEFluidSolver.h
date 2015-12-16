@@ -86,6 +86,12 @@ public:
     vector<double> m_Vi;	//!< Total velocity vector for iteration
     vector<double> m_Vt;	//!< Total velocity vector at time t (incl all previous timesteps)
     vector<double> m_Fd;	//!< residual correction due to prescribed velocities
+
+protected:
+	int		m_dofVX;
+	int		m_dofVY;
+	int		m_dofVZ;
+	int		m_dofE;
     
     // declare the parameter list
     DECLARE_PARAMETER_LIST();

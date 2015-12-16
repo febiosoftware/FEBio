@@ -147,7 +147,16 @@ FEFacet2FacetTied::FEFacet2FacetTied(FEModel* pfem) : FEContactInterface(pfem), 
 //! build the matrix profile for use in the stiffness matrix
 void FEFacet2FacetTied::BuildMatrixProfile(FEStiffnessMatrix& K)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// get the DOFS
+	const int dof_X = fem.GetDOFIndex("x");
+	const int dof_Y = fem.GetDOFIndex("y");
+	const int dof_Z = fem.GetDOFIndex("z");
+	const int dof_RU = fem.GetDOFIndex("Ru");
+	const int dof_RV = fem.GetDOFIndex("Rv");
+	const int dof_RW = fem.GetDOFIndex("Rw");
 
 	vector<int> lm(6*FEElement::MAX_NODES*2);
 
@@ -175,23 +184,23 @@ void FEFacet2FacetTied::BuildMatrixProfile(FEStiffnessMatrix& K)
 				for (int l=0; l<nseln; ++l)
 				{
 					vector<int>& id = mesh.Node(sn[l]).m_ID;
-					lm[6*l  ] = id[DOF_X];
-					lm[6*l+1] = id[DOF_Y];
-					lm[6*l+2] = id[DOF_Z];
-					lm[6*l+3] = id[DOF_RU];
-					lm[6*l+4] = id[DOF_RV];
-					lm[6*l+5] = id[DOF_RW];
+					lm[6*l  ] = id[dof_X];
+					lm[6*l+1] = id[dof_Y];
+					lm[6*l+2] = id[dof_Z];
+					lm[6*l+3] = id[dof_RU];
+					lm[6*l+4] = id[dof_RV];
+					lm[6*l+5] = id[dof_RW];
 				}
 
 				for (int l=0; l<nmeln; ++l)
 				{
 					vector<int>& id = mesh.Node(mn[l]).m_ID;
-					lm[6*(l+nseln)  ] = id[DOF_X];
-					lm[6*(l+nseln)+1] = id[DOF_Y];
-					lm[6*(l+nseln)+2] = id[DOF_Z];
-					lm[6*(l+nseln)+3] = id[DOF_RU];
-					lm[6*(l+nseln)+4] = id[DOF_RV];
-					lm[6*(l+nseln)+5] = id[DOF_RW];
+					lm[6*(l+nseln)  ] = id[dof_X];
+					lm[6*(l+nseln)+1] = id[dof_Y];
+					lm[6*(l+nseln)+2] = id[dof_Z];
+					lm[6*(l+nseln)+3] = id[dof_RU];
+					lm[6*(l+nseln)+4] = id[dof_RV];
+					lm[6*(l+nseln)+5] = id[dof_RW];
 				}
 
 				K.build_add(lm);

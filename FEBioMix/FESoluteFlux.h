@@ -62,6 +62,11 @@ protected:
 	bool	m_blinear;	//!< linear or not (true is non-follower, false is follower)
 	int		m_isol;		//!< solute index
 
+	int	m_dofX;
+	int	m_dofY;
+	int	m_dofZ;
+	int	m_dofC;
+
 	// solute flux boundary data
 	vector<LOAD>	m_PC;		//!< solute flux boundary cards
 

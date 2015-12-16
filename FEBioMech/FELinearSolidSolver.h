@@ -45,6 +45,10 @@ protected:
 	vector<double>	m_R;	//!< right hand side
 	vector<double>	m_d;	//!< prescribed displacements
 
+	int	m_dofX;
+	int	m_dofY;
+	int	m_dofZ;
+
 public:
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

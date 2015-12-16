@@ -24,23 +24,6 @@ bool FEMicroFlucSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEMicroFlucSurface::UnpackLM(FEElement& el, vector<int>& lm)
-{
-	int N = el.Nodes();
-	lm.resize(N*3);
-	for (int i=0; i<N; ++i)
-	{
-		int n = el.m_node[i];
-		FENode& node = m_pMesh->Node(n);
-		vector<int>& id = node.m_ID;
-
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
-	}
-}
-
-//-----------------------------------------------------------------------------
 void FEMicroFlucSurface::CopyFrom(FEMicroFlucSurface& s)
 {
 	m_Node = s.m_Node;
@@ -119,6 +102,10 @@ FE2OMicroConstraint::FE2OMicroConstraint(FEModel* pfem) : FENLConstraint(pfem), 
 	m_atol = 0.0;
 	m_blaugon = false;
 	m_binit = false;	// will be set to true during activation
+
+	m_dofX = pfem->GetDOFIndex("x");
+	m_dofY = pfem->GetDOFIndex("y");
+	m_dofZ = pfem->GetDOFIndex("z");
 }
 
 //-----------------------------------------------------------------------------
@@ -153,6 +140,24 @@ void FE2OMicroConstraint::Activate()
 
 	// set flag that initial volume is calculated
 	m_binit = true;
+}
+
+//-----------------------------------------------------------------------------
+void FE2OMicroConstraint::UnpackLM(FEElement& el, vector<int>& lm)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	int N = el.Nodes();
+	lm.resize(N*3);
+	for (int i=0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+		FENode& node = mesh.Node(n);
+		vector<int>& id = node.m_ID;
+
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -217,9 +222,9 @@ void FE2OMicroConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 		for (int j=0; j<neln; ++j)
 		{
 			vector<int>& id = mesh.Node(el.m_node[j]).m_ID;
-			lm[3*j  ] = id[DOF_X];
-			lm[3*j+1] = id[DOF_Y];
-			lm[3*j+2] = id[DOF_Z];
+			lm[3*j  ] = id[m_dofX];
+			lm[3*j+1] = id[m_dofY];
+			lm[3*j+2] = id[m_dofZ];
 		}
 
 		// add element force vector to global force vector
@@ -315,9 +320,9 @@ void FE2OMicroConstraint::StiffnessMatrix(FESolver* psolver, const FETimePoint& 
 		for (int j=0; j<neln; ++j)
 		{
 			vector<int>& id = mesh.Node(el.m_node[j]).m_ID;
-			lm[3*j  ] = id[DOF_X];
-			lm[3*j+1] = id[DOF_Y];
-			lm[3*j+2] = id[DOF_Z];
+			lm[3*j  ] = id[m_dofX];
+			lm[3*j+1] = id[m_dofY];
+			lm[3*j+2] = id[m_dofZ];
 		}
 
 		// assemble element matrix in global stiffness matrix

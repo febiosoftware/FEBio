@@ -21,6 +21,18 @@ END_PARAMETER_LIST();
 // FERigidWallSurface
 ///////////////////////////////////////////////////////////////////////////////
 
+
+FERigidWallSurface::FERigidWallSurface(FEMesh* pm) : FESurface(pm) 
+{ 
+	m_NQ.Attach(this); 
+
+	// I want to use the FEModel class for this, but don't know how
+	DOFS& dofs = *DOFS::GetInstance();
+	m_dofX = dofs.GetDOF("x");
+	m_dofY = dofs.GetDOF("y");
+	m_dofZ = dofs.GetDOF("z");
+}
+
 //-----------------------------------------------------------------------------
 //! Creates a surface for use with a sliding interface. All surface data
 //! structures are allocated.
@@ -186,9 +198,9 @@ void FERigidWallSurface::UnpackLM(FEElement& el, vector<int>& lm)
 		FENode& node = m_pMesh->Node(n);
 		vector<int>& id = node.m_ID;
 
-		lm[3*i  ] = id[DOF_X];
-		lm[3*i+1] = id[DOF_Y];
-		lm[3*i+2] = id[DOF_Z];
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
 	}
 }
 
@@ -268,17 +280,27 @@ bool FERigidWallInterface::SetProperty(int i, FECoreBase* pm)
 //! build the matrix profile for use in the stiffness matrix
 void FERigidWallInterface::BuildMatrixProfile(FEStiffnessMatrix& K)
 {
+	FEModel& fem = *GetFEModel();
+
+	// get the DOFS
+	const int dof_X = fem.GetDOFIndex("x");
+	const int dof_Y = fem.GetDOFIndex("y");
+	const int dof_Z = fem.GetDOFIndex("z");
+	const int dof_RU = fem.GetDOFIndex("Ru");
+	const int dof_RV = fem.GetDOFIndex("Rv");
+	const int dof_RW = fem.GetDOFIndex("Rw");
+
 	vector<int> lm(6);
 	for (int j=0; j<m_ss.Nodes(); ++j)
 	{
 		if (m_ss.m_gap[j] >= 0)
 		{
-			lm[0] = m_ss.Node(j).m_ID[DOF_X];
-			lm[1] = m_ss.Node(j).m_ID[DOF_Y];
-			lm[2] = m_ss.Node(j).m_ID[DOF_Z];
-			lm[3] = m_ss.Node(j).m_ID[DOF_RU];
-			lm[4] = m_ss.Node(j).m_ID[DOF_RV];
-			lm[5] = m_ss.Node(j).m_ID[DOF_RW];
+			lm[0] = m_ss.Node(j).m_ID[dof_X];
+			lm[1] = m_ss.Node(j).m_ID[dof_Y];
+			lm[2] = m_ss.Node(j).m_ID[dof_Z];
+			lm[3] = m_ss.Node(j).m_ID[dof_RU];
+			lm[4] = m_ss.Node(j).m_ID[dof_RV];
+			lm[5] = m_ss.Node(j).m_ID[dof_RW];
 
 			K.build_add(lm);
 		}

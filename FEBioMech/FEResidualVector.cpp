@@ -141,7 +141,7 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
                         /*
                          // if the rotational degrees of freedom are constrained for a rigid node
                          // then we need to add an additional component to the residual
-                         if (node.m_ID[DOF_RU] == lm[3])
+                         if (node.m_ID[m_dofRU] == lm[3])
                          {
                          d = node.m_Dt;
                          n = lm[3]; if (n >= 0) R[n] += d.y*F.z-d.z*F.y; RB.m_Mr.x -= d.y*F.z-d.z*F.y;

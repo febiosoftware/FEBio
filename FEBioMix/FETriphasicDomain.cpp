@@ -12,6 +12,7 @@ FETriphasicDomain::FETriphasicDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMe
 {
 	m_pMat = 0;
 	m_dofP = pfem->GetDOFIndex("p");
+	m_dofC = pfem->GetDOFIndex("c");
 }
 
 //-----------------------------------------------------------------------------
@@ -25,8 +26,8 @@ void FETriphasicDomain::SetMaterial(FEMaterial* pmat)
 //! Unpack the element LM data. 
 void FETriphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
-	int dofc0 = DOF_C + m_pMat->m_pSolute[0]->GetSoluteID();
-	int dofc1 = DOF_C + m_pMat->m_pSolute[1]->GetSoluteID();
+	int dofc0 = m_dofC + m_pMat->m_pSolute[0]->GetSoluteID();
+	int dofc1 = m_dofC + m_pMat->m_pSolute[1]->GetSoluteID();
 
 	int N = el.Nodes();
 	lm.resize(N*9);
@@ -47,9 +48,9 @@ void FETriphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 		// rigid rotational dofs
 		// TODO: Do I really need these?
-		lm[4*N + 3*i  ] = id[DOF_RU];
-		lm[4*N + 3*i+1] = id[DOF_RV];
-		lm[4*N + 3*i+2] = id[DOF_RW];
+		lm[4*N + 3*i  ] = id[m_dofRU];
+		lm[4*N + 3*i+1] = id[m_dofRV];
+		lm[4*N + 3*i+2] = id[m_dofRW];
 
 		// concentration dofs
 		lm[7*N + i] = id[dofc0];
@@ -77,8 +78,8 @@ bool FETriphasicDomain::Initialize(FEModel &fem)
 //-----------------------------------------------------------------------------
 void FETriphasicDomain::Activate()
 {
-	int dofc0 = DOF_C + m_pMat->m_pSolute[0]->GetSoluteID();
-	int dofc1 = DOF_C + m_pMat->m_pSolute[1]->GetSoluteID();
+	int dofc0 = m_dofC + m_pMat->m_pSolute[0]->GetSoluteID();
+	int dofc1 = m_dofC + m_pMat->m_pSolute[1]->GetSoluteID();
 
 	for (int i=0; i<Nodes(); ++i)
 	{
@@ -124,7 +125,7 @@ void FETriphasicDomain::Activate()
 			p0[i] = m.Node(el.m_node[i]).get(m_dofP);
 			for (int isol = 0; isol<nsol; ++isol)
 				//				c0[isol][i] = m.Node(el.m_node[i]).m_c0[id[isol]];
-				c0[isol][i] = m.Node(el.m_node[i]).get(DOF_C + id[isol]);
+				c0[isol][i] = m.Node(el.m_node[i]).get(m_dofC + id[isol]);
 		}
 
 		// get the number of integration points
@@ -1576,8 +1577,8 @@ void FETriphasicDomain::ElementTriphasicMaterialStiffness(FESolidElement &el, ma
 	// nodal concentrations
 	double ct[2][FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) {
-		ct[0][i] = m_pMesh->Node(el.m_node[i]).get(DOF_C + id0);
-		ct[1][i] = m_pMesh->Node(el.m_node[i]).get(DOF_C + id1);
+		ct[0][i] = m_pMesh->Node(el.m_node[i]).get(m_dofC + id0);
+		ct[1][i] = m_pMesh->Node(el.m_node[i]).get(m_dofC + id1);
 	}
 	
 	// weights at gauss points
@@ -1805,8 +1806,8 @@ void FETriphasicDomain::UpdateElementStress(int iel)
 		r0[j] = mesh.Node(el.m_node[j]).m_r0;
 		rt[j] = mesh.Node(el.m_node[j]).m_rt;
 		pn[j] = mesh.Node(el.m_node[j]).get(m_dofP);
-		ct[0][j] = mesh.Node(el.m_node[j]).get(DOF_C + id0);
-		ct[1][j] = mesh.Node(el.m_node[j]).get(DOF_C + id1);
+		ct[0][j] = mesh.Node(el.m_node[j]).get(m_dofC + id0);
+		ct[1][j] = mesh.Node(el.m_node[j]).get(m_dofC + id1);
 	}
 		
 	// loop over the integration points and calculate

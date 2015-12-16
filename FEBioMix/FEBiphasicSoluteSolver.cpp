@@ -75,8 +75,8 @@ bool FEBiphasicSoluteSolver::Init()
 		// concentration dofs
 		for (j=0; j<MAX_CDOFS; ++j) {
 			if (m_nceq[j]) {
-				n = node.m_ID[DOF_C+j];
-				if (n >= 0) m_Ut[n] = node.get(DOF_C + j);
+				n = node.m_ID[m_dofC+j];
+				if (n >= 0) m_Ut[n] = node.get(m_dofC + j);
 			}
 		}
 	}
@@ -104,7 +104,7 @@ bool FEBiphasicSoluteSolver::InitEquations()
 	{
 		FENode& n = mesh.Node(i);
 		for (int j=0; j<MAX_CDOFS; ++j)
-			if (n.m_ID[DOF_C+j] != -1) m_nceq[j]++;
+			if (n.m_ID[m_dofC+j] != -1) m_nceq[j]++;
 	}
 	
 	return true;
@@ -714,7 +714,7 @@ void FEBiphasicSoluteSolver::GetConcentrationData(vector<double> &ci, vector<dou
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = m_fem.GetMesh().Node(i);
-		nid = n.m_ID[DOF_C+sol];
+		nid = n.m_ID[m_dofC+sol];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
@@ -757,13 +757,13 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 		
 		// update nodal concentration
 		for (j=0; j<MAX_CDOFS; ++j) {
-			n = node.m_ID[DOF_C+j];
+			n = node.m_ID[m_dofC+j];
 //			if (n >= 0) node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 			// Force the concentrations to remain positive
 			if (n >= 0) {
 				double ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 				if (ct < 0) ct = 0.0;
-				node.set(DOF_C + j, ct);
+				node.set(m_dofC + j, ct);
 			}
 		}
 	}
@@ -775,7 +775,7 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 		
 		// update velocities
 		vec3d vt = (node.m_rt - node.m_rp) / pstep->m_dt;
-		node.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, vt);
+		node.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
 	}
 }
 

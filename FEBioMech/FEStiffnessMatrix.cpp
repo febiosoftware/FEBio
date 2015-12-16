@@ -48,12 +48,17 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 	int i, j, k, l, m, n;
 
     // get nodal DOFS
-    DOFS& fedofs = pfem->GetDOFS();
+	FEModel& fem = *pfem;
+    DOFS& fedofs = fem.GetDOFS();
     int MAX_NDOFS = fedofs.GetNDOFS();
+
+	// get the DOFS
+	const int dof_X = fem.GetDOFIndex("x");
+	const int dof_Y = fem.GetDOFIndex("y");
+	const int dof_Z = fem.GetDOFIndex("z");
 
 	// keep a pointer to the FEM object
 	m_pfem = pfem;
-	FEModel& fem = *m_pfem;
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	FEMesh& mesh = fem.GetMesh();
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -224,15 +229,15 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 					FEPointConstraint& pc = dynamic_cast<FEPointConstraint&>(*pnlc);
 					vector<int> lm(3*9);
 					FENode& n0 = mesh.Node(pc.m_node);
-					lm[0] = n0.m_ID[DOF_X];
-					lm[1] = n0.m_ID[DOF_Y];
-					lm[2] = n0.m_ID[DOF_Z];
+					lm[0] = n0.m_ID[dof_X];
+					lm[1] = n0.m_ID[dof_Y];
+					lm[2] = n0.m_ID[dof_Z];
 					for (j=0; i<8; ++i)
 					{
 						FENode& nj = mesh.Node(pc.m_pel->m_node[j]);
-						lm[3*(j+1)  ] = nj.m_ID[DOF_X];
-						lm[3*(j+1)+1] = nj.m_ID[DOF_Y];
-						lm[3*(j+1)+2] = nj.m_ID[DOF_Z];
+						lm[3*(j+1)  ] = nj.m_ID[dof_X];
+						lm[3*(j+1)+1] = nj.m_ID[dof_Y];
+						lm[3*(j+1)+2] = nj.m_ID[dof_Z];
 					}
 					build_add(lm);
 				}
@@ -282,13 +287,13 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 					FEDistanceConstraint* pdc = dynamic_cast<FEDistanceConstraint*>(pnlc);
 					vector<int> lm(6);
 					FENode& n0 = mesh.Node(pdc->m_node[0] - 1);
-					lm[0] = n0.m_ID[DOF_X];
-					lm[1] = n0.m_ID[DOF_Y];
-					lm[2] = n0.m_ID[DOF_Z];
+					lm[0] = n0.m_ID[dof_X];
+					lm[1] = n0.m_ID[dof_Y];
+					lm[2] = n0.m_ID[dof_Z];
 					FENode& n1 = mesh.Node(pdc->m_node[1] - 1);
-					lm[3] = n1.m_ID[DOF_X];
-					lm[4] = n1.m_ID[DOF_Y];
-					lm[5] = n1.m_ID[DOF_Z];
+					lm[3] = n1.m_ID[dof_X];
+					lm[4] = n1.m_ID[dof_Y];
+					lm[5] = n1.m_ID[dof_Z];
                     build_add(lm);
 				}
 			}

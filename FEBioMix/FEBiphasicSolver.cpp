@@ -44,6 +44,10 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 
 	// get pressure dof
 	m_dofP = pfem->GetDOFIndex("p");
+	m_dofC = pfem->GetDOFIndex("c");
+	m_dofVX = pfem->GetDOFIndex("vx");
+	m_dofVY = pfem->GetDOFIndex("vy");
+	m_dofVZ = pfem->GetDOFIndex("vz");
 }
 
 //-----------------------------------------------------------------------------
@@ -463,7 +467,7 @@ void FEBiphasicSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
 			
 			// For pressure and concentration loads, multiply by dt
 			// for consistency with evaluation of residual and stiffness matrix
-			if ((dof == m_dofP) || (dof >= DOF_C)) f *= tp.dt;
+			if ((dof == m_dofP) || (dof >= m_dofC)) f *= tp.dt;
 
 			// assemble into residual
 			AssembleResidual(nid, dof, f, F);
@@ -747,7 +751,7 @@ void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 
 		// update velocities
 		vec3d vt = (node.m_rt - node.m_rp) / pstep->m_dt;
-		node.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, vt); 
+		node.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt); 
 	}
 }
 

@@ -15,9 +15,6 @@ public:
 	//! copy data
 	void CopyFrom(FEVolumeSurface& s);
 
-	//! Unpack surface element data
-	void UnpackLM(FEElement& el, vector<int>& lm);
-
 public:
 	double Volume();
 
@@ -49,6 +46,9 @@ public:
 	void Reset();
 	void Update(const FETimePoint& tp);
 
+	//! Unpack surface element data
+	void UnpackLM(FEElement& el, vector<int>& lm);
+
 	FESurface* GetSurface(const char* sz);
 
 public:
@@ -61,6 +61,13 @@ public:
 
 private:
 	bool	m_binit;	//!< flag indicating whether the constraint is initialized
+
+	// degrees of freedom
+	// (TODO: find a better way of defining this. 
+	//        I don't want to have to do this in each class)
+	int	m_dofX;
+	int	m_dofY;
+	int	m_dofZ;
 
 	DECLARE_PARAMETER_LIST();
 };

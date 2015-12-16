@@ -48,8 +48,12 @@ FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
     
 	m_bsymm = false; // assume non-symmetric stiffness matrix by default
 
-	// get pressure dof
+	// get dofs
 	m_dofP = pfem->GetDOFIndex("p");
+	m_dofC = pfem->GetDOFIndex("c");
+	m_dofVX = pfem->GetDOFIndex("vx");
+	m_dofVY = pfem->GetDOFIndex("vy");
+	m_dofVZ = pfem->GetDOFIndex("vz");
 }
 
 //-----------------------------------------------------------------------------
@@ -104,8 +108,8 @@ bool FEMultiphasicSolver::Init()
 		// concentration dofs
 		for (int j=0; j<(int)m_nceq.size(); ++j) {
 			if (m_nceq[j]) {
-				int n = node.m_ID[DOF_C+j];
-				if (n >= 0) m_Ut[n] = node.get(DOF_C + j);
+				int n = node.m_ID[m_dofC+j];
+				if (n >= 0) m_Ut[n] = node.get(m_dofC + j);
 			}
 		}
 	}
@@ -143,7 +147,7 @@ bool FEMultiphasicSolver::InitEquations()
 	{
 		FENode& n = mesh.Node(i);
 		for (int j=0; j<(int)m_nceq.size(); ++j)
-			if (n.m_ID[DOF_C+j] != -1) m_nceq[j]++;
+			if (n.m_ID[m_dofC+j] != -1) m_nceq[j]++;
 	}
 	
 	return true;
@@ -547,7 +551,7 @@ void FEMultiphasicSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
 			
 			// For pressure and concentration loads, multiply by dt
 			// for consistency with evaluation of residual and stiffness matrix
-			if ((dof == m_dofP) || (dof >= DOF_C)) f *= tp.dt;
+			if ((dof == m_dofP) || (dof >= m_dofC)) f *= tp.dt;
 
 			// assemble into residual
 			AssembleResidual(nid, dof, f, F);
@@ -872,7 +876,7 @@ void FEMultiphasicSolver::GetConcentrationData(vector<double> &ci, vector<double
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = m_fem.GetMesh().Node(i);
-		nid = n.m_ID[DOF_C+sol];
+		nid = n.m_ID[m_dofC+sol];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
@@ -924,7 +928,7 @@ void FEMultiphasicSolver::UpdatePoro(vector<double>& ui)
 
 		// update velocities
 		vec3d vt = (node.m_rt - node.m_rp) / pstep->m_dt;
-		node.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, vt);
+		node.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
 	}
 }
 
@@ -948,13 +952,13 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 		
 		// update nodal concentration
 		for (j=0; j<MAX_CDOFS; ++j) {
-			n = node.m_ID[DOF_C+j];
+			n = node.m_ID[m_dofC+j];
 //			if (n >= 0) node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 			// Force the concentrations to remain positive
 			if (n >= 0) {
 				double ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 				if (ct < 0.0) ct = 0.0;
-				node.set(DOF_C + j, ct);
+				node.set(m_dofC + j, ct);
 			}
 		}
 	}
@@ -966,7 +970,7 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 		
 		// update velocities
 		vec3d vt = (node.m_rt - node.m_rp) / pstep->m_dt;
-		node.set_vec3d(DOF_VX, DOF_VY, DOF_VZ, vt);
+		node.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
 	}
 }
 

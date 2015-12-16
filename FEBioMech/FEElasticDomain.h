@@ -58,4 +58,7 @@ protected:
 	int					m_dofX;		//!< X-dof index
 	int					m_dofY;		//!< Y-dof index
 	int					m_dofZ;		//!< Z-dof index
+	int					m_dofRU;
+	int					m_dofRV;	
+	int					m_dofRW;
 };

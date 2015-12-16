@@ -122,6 +122,9 @@ public:
 	
 	// biphasic contact parameters
 	double			m_epsp;		//!< flow rate penalty
+
+protected:
+	int	m_dofP;
 	
 	DECLARE_PARAMETER_LIST();
 };

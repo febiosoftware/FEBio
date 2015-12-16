@@ -67,11 +67,12 @@ bool FEMultiphasicTangentUniaxial::Init()
 	const int dof_y = fem.GetDOFIndex("y");
 	const int dof_z = fem.GetDOFIndex("z");
 	const int dof_p = fem.GetDOFIndex("p");
+	const int dof_c = fem.GetDOFIndex("c");
 
 	// add initial conditions
 	for (isol = 0; isol<nsol; ++isol) {
 		FEInitialBC* pic = new FEInitialBC(&fem);
-		pic->SetDOF(DOF_C + isol);
+		pic->SetDOF(dof_c + isol);
 		for (i=0; i<8; ++i) pic->Add(i, m_concentration);
 		fem.AddInitialCondition(pic);
 	}
@@ -133,7 +134,7 @@ bool FEMultiphasicTangentUniaxial::Init()
     for (i=0; i<nsol; ++i) {
         FEPrescribedBC* psc = new FEPrescribedBC(&fem);
         fem.AddPrescribedBC(psc);
-        psc->SetDOF(DOF_C+i).SetLoadCurveIndex(0).SetScale(m_concentration);
+        psc->SetDOF(dof_c+i).SetLoadCurveIndex(0).SetScale(m_concentration);
         for (i = 0; i<4; ++i) psc->AddNode(nd[i]);
     }
 
@@ -307,6 +308,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
 	const int dof_p = fem.GetDOFIndex("p");
+	const int dof_c = fem.GetDOFIndex("c");
     
     FEMultiphasicDomain& md = static_cast<FEMultiphasicDomain&>(mesh.Domain(0));
     
@@ -348,7 +350,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             case 1: node.m_rt.y += dx; break;
             case 2: node.m_rt.z += dx; break;
             case 3: node.inc(dof_p, dx); break;
-            default: node.inc(DOF_C + nj-4, dx); break;
+            default: node.inc(dof_c + nj-4, dx); break;
         }
         
         
@@ -373,7 +375,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             case 1: node.m_rt.y -= dx; break;
             case 2: node.m_rt.z -= dx; break;
             case 3: node.dec(dof_p, dx); break;
-            default: node.dec(DOF_C + nj-4, dx); break;
+            default: node.dec(dof_c + nj-4, dx); break;
         }
         
         solver.UpdateStresses();
