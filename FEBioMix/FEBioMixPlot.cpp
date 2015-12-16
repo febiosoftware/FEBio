@@ -1045,18 +1045,18 @@ bool FEPlotEffectiveSoluteConcentration::SetFilter(int nsol)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
-	int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
-
-	const int dof_C = GetFEModel()->GetDOFIndex("c");
-
 	// make sure we have a valid index
+	int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
 	if (nsid == -1) return false;
-		
+
+	// get the dof
+	const int dof_C = GetFEModel()->GetDOFIndex("c", nsid);
+
 	int N = dom.Nodes();
 	for (int i=0; i<N; ++i)
 	{
 		FENode& node = dom.Node(i);
-		a << node.get(dof_C + nsid);
+		a << node.get(dof_C);
 	}
 	return true;
 }
@@ -1064,19 +1064,21 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 {
-	const int dof_C = GetFEModel()->GetDOFIndex("c");
 	FEBiphasicSolute* pbm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
 	if (pbm)
 	{
 		// Check if this solute is present in this specific biphasic-solute mixture
 		bool present = (pbm->GetSolute()->GetSoluteID() == m_nsol);
 		if (!present) return false;
-		
+
+		// get the dof
+		const int dof_C = GetFEModel()->GetDOFIndex("c", m_nsol);
+
 		int N = dom.Nodes();
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = dom.Node(i);
-			a << node.get(dof_C + m_nsol);
+			a << node.get(dof_C);
 		}
 		return true;
 	}
@@ -1087,7 +1089,10 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		// Check if this solute is present in this specific triphasic mixture
 		bool present = (ptm->m_pSolute[0]->GetSoluteID() == m_nsol) || (ptm->m_pSolute[1]->GetSoluteID() == m_nsol);
 		if (!present) return false;
-		
+
+		// get the dof
+		const int dof_C = GetFEModel()->GetDOFIndex("c", m_nsol);
+
 		int N = dom.Nodes();
 		for (int i=0; i<N; ++i)
 		{
@@ -1105,7 +1110,10 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		for (int i=0; i<pmm->Solutes(); ++i)
 			if (pmm->GetSolute(i)->GetSoluteID() == m_nsol) {present = true; break;}
 		if (!present) return false;
-		
+
+		// get the dof
+		const int dof_C = GetFEModel()->GetDOFIndex("c", m_nsol);
+
 		int N = dom.Nodes();
 		for (int i=0; i<N; ++i)
 		{

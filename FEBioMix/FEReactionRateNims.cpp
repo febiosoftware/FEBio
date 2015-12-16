@@ -29,7 +29,7 @@ void FEReactionRateNims::Init()
     if (m_lid == -1) {
         // get number of DOFS
         DOFS& fedofs = *DOFS::GetInstance();
-        int MAX_CDOFS = fedofs.GetCDOFS();
+        int MAX_CDOFS = fedofs.GetDOFSize("c");
         // check validity of sol
         if (m_sol < 1 || m_sol > MAX_CDOFS)
             throw MaterialError("sol value outside of valid range for solutes");

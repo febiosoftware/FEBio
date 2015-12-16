@@ -145,7 +145,16 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 		// get the bc
 		const char* sz = tag.AttributeValue("bc");
 		int bc = dofs.GetDOF(sz);
-		if (bc==-1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+		if (bc==-1) 
+		{
+			// TODO: For now concentrations have to be handeld differently.
+			if (sz[0]=='c')
+			{
+				int c = atoi(sz+1) - 1;
+				bc = fem.GetDOFIndex("c", c);
+			}
+		}
+		if (bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 		// get the load curve
 		sz = tag.AttributeValue("lc");

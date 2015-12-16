@@ -88,7 +88,7 @@ bool FEMultiphasicSolver::Init()
 
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
+    int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	// allocate concentration-vectors
 	m_ci.assign(MAX_CDOFS,vector<double>(0,0));
@@ -139,7 +139,7 @@ bool FEMultiphasicSolver::InitEquations()
 	
 	// determine the nr of concentration equations
     DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
+    int MAX_CDOFS = fedofs.GetDOFSize("c");
     m_nceq.assign(MAX_CDOFS, 0);
 	
     // get number of DOFS
@@ -193,7 +193,7 @@ bool FEMultiphasicSolver::Quasin(double time)
 
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
+    int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	// solute convergence data
 	vector<double>	normCi(MAX_CDOFS);	// initial concentration norm
@@ -943,7 +943,7 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 	
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
+    int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	// update solute data
 	for (i=0; i<mesh.Nodes(); ++i)

@@ -181,6 +181,14 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 		        else if (strcmp(sz, "vyz" ) == 0) { fem.AddFixedBC(n, dof_VY); fem.AddFixedBC(n, dof_VZ); }
 			    else if (strcmp(sz, "vxz" ) == 0) { fem.AddFixedBC(n, dof_VX); fem.AddFixedBC(n, dof_VZ); }
 				else if (strcmp(sz, "vxyz") == 0) { fem.AddFixedBC(n, dof_VX); fem.AddFixedBC(n, dof_VY); fem.AddFixedBC(n, dof_VZ); }
+				else if (sz[0]=='c')
+				{
+					// TODO: For now concentrations have to be handled differently. I need to fix this.
+					int c = atoi(sz+1) - 1;
+					int dof_C = fem.GetDOFIndex("c", c);
+					if (dof_C == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+					fem.AddFixedBC(n, dof_C);
+				}
 				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 			}
 		}
@@ -212,6 +220,14 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 		        else if (strcmp(sz, "vyz" ) == 0) { fem.AddFixedBC(n, dof_VY); fem.AddFixedBC(n, dof_VZ); }
 				else if (strcmp(sz, "vxz" ) == 0) { fem.AddFixedBC(n, dof_VX); fem.AddFixedBC(n, dof_VZ); }
 				else if (strcmp(sz, "vxyz") == 0) { fem.AddFixedBC(n, dof_VX); fem.AddFixedBC(n, dof_VY); fem.AddFixedBC(n, dof_VZ); }
+				else if (sz[0]=='c')
+				{
+					// TODO: For now concentrations have to be handled differently. I need to fix this.
+					int c = atoi(sz+1) - 1;
+					int dof_C = fem.GetDOFIndex("c", c);
+					if (dof_C == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+					fem.AddFixedBC(n, dof_C);
+				}
 				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 			}
 			++tag;
@@ -265,6 +281,14 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 		else if (strcmp(szbc, "vyz" ) == 0) { bc.push_back(dof_VY); bc.push_back(dof_VZ); }
 		else if (strcmp(szbc, "vxz" ) == 0) { bc.push_back(dof_VX); bc.push_back(dof_VZ); }
 		else if (strcmp(szbc, "vxyz") == 0) { bc.push_back(dof_VX); bc.push_back(dof_VY); bc.push_back(dof_VZ); }
+		else if (szbc[0]=='c')
+		{
+			// TODO: For now concentrations have to be handled differently. I need to fix this.
+			int c = atoi(szbc+1) - 1;
+			int dof_C = fem.GetDOFIndex("c", c);
+			if (dof_C == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+			bc.push_back(dof_C);
+		}
 		else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 	}
 
@@ -347,6 +371,15 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 
 		// find the dof index from its symbol
 		int bc = dofs.GetDOF(sz);
+		if (bc == -1) 
+		{
+			// TODO: For now concentrations have to be handled differently. I need to fix this.
+			if (sz[0]=='c')
+			{
+				int c = atoi(sz+1) - 1;
+				bc = fem.GetDOFIndex("c", c);
+			}
+		}
 		if (bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 		// get the lc attribute
@@ -396,6 +429,15 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 
 			// get the dof index from its symbol
 			int bc = dofs.GetDOF(sz);
+			if (bc == -1)
+			{
+				// TODO: For now concentrations have to be handled differently. I need to fix this.
+				if (sz[0]=='c')
+				{
+					int c = atoi(sz+1) - 1;
+					bc = fem.GetDOFIndex("c", c);
+				}
+			}
 			if (bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 			sz = tag.AttributeValue("lc");
@@ -443,7 +485,16 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 	// get the BC
 	const char* sz = tag.AttributeValue("bc");
 	int bc = dofs.GetDOF(sz);
-	if(bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+	if(bc == -1)
+	{
+		// TODO: For now concentrations have to be handled differently. I need to fix this.
+		if (sz[0]=='c')
+		{
+			int c = atoi(sz+1) - 1;
+			bc = fem.GetDOFIndex("c", c);
+		}
+	}
+	if (bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 	// get the load curve number
 	int lc = -1;

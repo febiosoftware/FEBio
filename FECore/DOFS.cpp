@@ -9,34 +9,8 @@
 #include "DOFS.h"
 #include <string.h>
 #include <stdlib.h>
-
-//-----------------------------------------------------------------------------
-// Max nr of nodal degrees of freedom
-
-// At this point the nodal dofs are used as follows:
-//
-#define DOF_X			0		// x-displacement
-#define DOF_Y			1		// y-displacement
-#define DOF_Z			2		// z-displacement
-#define DOF_U			3		// x-rotation
-#define DOF_V			4		// y-rotation
-#define DOF_W			5		// z-rotation
-#define DOF_P			6		// fluid pressure
-#define DOF_RU			7		// rigid x-rotation
-#define DOF_RV			8		// rigid y-rotation
-#define DOF_RW			9		// rigid z-rotation
-#define DOF_T			10		// temperature
-#define DOF_VX			11		// x-fluid velocity
-#define DOF_VY			12		// y-fluid velocity
-#define DOF_VZ			13		// z-fluid velocity
-#define DOF_E           14      // fluid dilatation
-#define DOF_C			15		// solute concentration
-//
-// The rotational degrees of freedom are only used for rigid nodes and shells.
-// The fluid pressure is only used for poroelastic problems.
-// The rigid rotational degrees of freedom are only used for rigid nodes and only during the creation of the stiffenss matrix
-// The temperature is only used during heat-conduction problems
-// The solute concentration is only used in solute transport problems.
+#include <assert.h>
+using namespace std;
 
 //-----------------------------------------------------------------------------
 DOFS* DOFS::m_pdofs = 0;
@@ -58,8 +32,26 @@ DOFS::DOFS()
 //-----------------------------------------------------------------------------
 void DOFS::Reset()
 {
-    MAX_NDOFS = 15;
-    MAX_CDOFS = 0;
+	// clear the DOFS
+	if (m_dof.empty() == false) m_dof.clear();
+
+	// Add the default DOFS
+	AddDOF("x");
+	AddDOF("y");
+	AddDOF("z");
+	AddDOF("u");
+	AddDOF("v");
+	AddDOF("w");
+	AddDOF("p");
+	AddDOF("Ru");
+	AddDOF("Rv");
+	AddDOF("Rw");
+	AddDOF("t");
+	AddDOF("vx");
+	AddDOF("vy");
+	AddDOF("vz");
+	AddDOF("e");
+	AddDOF("c", 0);	// we start with 0 concentration dofs
 }
 
 //-----------------------------------------------------------------------------
@@ -71,57 +63,106 @@ DOFS::~DOFS()
 }
 
 //-----------------------------------------------------------------------------
-// set total number of DOFS
-//
-void DOFS::SetNDOFS(int ndofs)
+//! Add a degree of freedom.
+//! Returns -1 if the degree of freedom exists or if the symbol is invalid
+//! \sa DOFS::GetDOF
+int DOFS::AddDOF(const char* sz, int nsize)
 {
-    MAX_NDOFS = ndofs;
+	// Make sure sz is a valid symbol
+	if (sz    == 0) return -1;	// cannot be null
+	if (sz[0] == 0) return -1;	// must have non-zero length
+
+	// See if the dof is already defined
+	int ndof = -1;
+	for (int i=0; i<(int)m_dof.size(); ++i)
+	{
+		if (strcmp(sz, m_dof[i].sz) == 0)
+		{
+			// it's already defined so return -1
+			return -1;
+		}
+	}
+	
+	// If we get here, the variable does not exist yet
+	DOF_ITEM it = {sz, nsize, 0};
+	m_dof.push_back(it);
+
+	// update all dofs
+	Update();
+
+	// return a nonnegative number
+	return (int) (m_dof.size() - 1);
 }
 
 //-----------------------------------------------------------------------------
-// return total number of DOFS
-//
-int DOFS::GetNDOFS()
+//! Return the DOF index.
+//! This index is used in the FENode::get(), FENode::set() functions to set 
+//! the values of nodal values. This index is also used in the FENode::m_ID and FENode::m_BC arrays.
+int DOFS::GetDOF(const char* sz, int n)
 {
-    return MAX_NDOFS;
+	const int NDOF = (int)m_dof.size();
+	for (int i=0; i<NDOF; ++i)
+	{
+		DOF_ITEM& it = m_dof[i];
+		if (strcmp(it.sz, sz) == 0) 
+		{
+			assert((n>=0)&&(n<it.nsize));
+			return it.ndof + n;
+		}
+	}
+	return -1;
 }
 
 //-----------------------------------------------------------------------------
-// set number of solute DOFS
-//
-void DOFS::SetCDOFS(int cdofs)
+//! Return the symbol assigned to a variable.
+//! Returns 0 if the dof is undefined.
+const char* DOFS::GetDOFSymbol(int nvar)
 {
-    MAX_CDOFS = cdofs;
+	if ((nvar >= 0) && (nvar < (int) m_dof.size())) return m_dof[nvar].sz;
+	else return 0;
 }
 
 //-----------------------------------------------------------------------------
-// return number of solute DOFS
-//
-int DOFS::GetCDOFS()
+//! Change the size of the dof array of a variable
+bool DOFS::ChangeDOFSize(const char* sz, int nsize)
 {
-    return MAX_CDOFS;
+	int n = (int) m_dof.size();
+	for (int i=0; i<n; ++i)
+	{
+		if (strcmp(sz, m_dof[i].sz) == 0)
+		{
+			m_dof[i].nsize = nsize;
+			Update();
+			return true;
+		}
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
-int DOFS::GetDOF(const char* sz)
+//! Change the size of the dof array of a variable
+int DOFS::GetDOFSize(const char* sz)
 {
-	int bc = -1;
-	if      (strcmp(sz, "x" ) == 0) bc = DOF_X;
-	else if (strcmp(sz, "y" ) == 0) bc = DOF_Y;
-	else if (strcmp(sz, "z" ) == 0) bc = DOF_Z;
-	else if (strcmp(sz, "u" ) == 0) bc = DOF_U;
-	else if (strcmp(sz, "v" ) == 0) bc = DOF_V;
-	else if (strcmp(sz, "w" ) == 0) bc = DOF_W;
-	else if (strcmp(sz, "p" ) == 0) bc = DOF_P;
-	else if (strcmp(sz, "Ru") == 0) bc = DOF_RU;
-	else if (strcmp(sz, "Rv") == 0) bc = DOF_RV;
-	else if (strcmp(sz, "Rw") == 0) bc = DOF_RW;
-	else if (strcmp(sz, "t" ) == 0) bc = DOF_T; 
-    else if (strcmp(sz, "vx") == 0) bc = DOF_VX;
-    else if (strcmp(sz, "vy") == 0) bc = DOF_VY;
-    else if (strcmp(sz, "vz") == 0) bc = DOF_VZ;
-    else if (strcmp(sz, "e" ) == 0) bc = DOF_E;
-	else if (strcmp(sz, "c" ) == 0) bc = DOF_C;
-	else if (sz[0] == 'c') bc = DOF_C + atoi(&sz[1]) - 1;
-	return bc;
+	int n = (int) m_dof.size();
+	for (int i=0; i<n; ++i)
+	{
+		if (strcmp(sz, m_dof[i].sz) == 0)
+		{
+			return m_dof[i].nsize;
+		}
+	}
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+void DOFS::Update()
+{
+	m_maxdofs = 0;
+	int n = (int) m_dof.size();
+	for (int i=0; i<n; ++i)
+	{
+		DOF_ITEM& it = m_dof[i];
+		it.ndof = m_maxdofs;
+		m_maxdofs += it.nsize;
+	}
 }

@@ -722,9 +722,9 @@ DOFS& FEModel::GetDOFS()
 }
 
 //-----------------------------------------------------------------------------
-int FEModel::GetDOFIndex(const char* sz)
+int FEModel::GetDOFIndex(const char* sz, int n)
 {
-	return GetDOFS().GetDOF(sz);
+	return GetDOFS().GetDOF(sz, n);
 }
 
 //-----------------------------------------------------------------------------

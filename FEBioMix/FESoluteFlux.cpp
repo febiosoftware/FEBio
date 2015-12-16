@@ -75,8 +75,7 @@ void FESoluteFlux::UnpackLM(FEElement& el, vector<int>& lm)
 
     // get nodal DOFS
     DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-    int MAX_CDOFS = fedofs.GetCDOFS();
+    int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	int N = el.Nodes();
 	lm.resize(N*(3+MAX_CDOFS));

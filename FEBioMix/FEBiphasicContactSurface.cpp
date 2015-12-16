@@ -31,7 +31,7 @@ void FEBiphasicContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 {
     // get nodal DOFS
     DOFS& dofs = *DOFS::GetInstance();
-    int MAX_CDOFS = dofs.GetCDOFS();
+    int MAX_CDOFS = dofs.GetDOFSize("c");
     
 	int N = el.Nodes();
 	lm.resize(N*(4+MAX_CDOFS));

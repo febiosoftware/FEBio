@@ -29,7 +29,7 @@ void FEMultiphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
     // get nodal DOFS
     DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_CDOFS = fedofs.GetCDOFS();
+    int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	int N = el.Nodes();
 	lm.resize(N*(7+MAX_CDOFS));

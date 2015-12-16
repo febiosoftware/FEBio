@@ -1066,7 +1066,7 @@ void FESlidingInterface3::Update(int niter)
 
     // get number of DOFS
     DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_CDOFS = fedofs.GetCDOFS();
+    int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	double R = m_srad*fem.GetMesh().GetBoundingBox().radius();
 	
@@ -2270,7 +2270,7 @@ void FESlidingInterface3::MarkAmbient()
 
     // get number of DOFS
     DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_CDOFS = fedofs.GetCDOFS();
+    int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	for (int np=0; np<2; ++np)
 	{
@@ -2317,7 +2317,7 @@ void FESlidingInterface3::SetAmbient()
 {	
     // get number of DOFS
     DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_CDOFS = fedofs.GetCDOFS();
+    int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	// Set the pressure to zero for the free-draining nodes
 	for (int np=0; np<2; ++np)

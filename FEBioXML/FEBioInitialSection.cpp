@@ -66,8 +66,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 				const char* sz = tag.AttributeValue("sol", true);
 				if (sz) isol = atoi(sz) - 1;
 
-				int cdof = dofs.GetDOF("c");
-				ndof = cdof + isol;
+				ndof = dofs.GetDOF("c", isol);
 			}
 			else if (tag == "init")
 			{
@@ -75,6 +74,15 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 				// get the bc attribute
 				const char* szbc = tag.AttributeValue("bc");
 				ndof = dofs.GetDOF(szbc);
+				if (ndof == -1)
+				{
+					// TODO: For now concentrations have to be handled differently. I need to fix this.
+					if (szbc[0]=='c')
+					{
+						int c = atoi(szbc+1) - 1;
+						ndof = fem.GetDOFIndex("c", c);
+					}
+				}
 			}
 			else throw XMLReader::InvalidTag(tag);
 			if (ndof == -1) throw XMLReader::InvalidTag(tag);

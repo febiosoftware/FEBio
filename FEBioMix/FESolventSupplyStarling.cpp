@@ -22,7 +22,7 @@ FESolventSupplyStarling::FESolventSupplyStarling(FEModel* pfem) : FESolventSuppl
 
     // get number of DOFS
     DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_CDOFS = fedofs.GetCDOFS();
+    int MAX_CDOFS = fedofs.GetDOFSize("c");
     
     m_qc.assign(MAX_CDOFS,0);
     m_cv.assign(MAX_CDOFS,0);
@@ -33,7 +33,7 @@ bool FESolventSupplyStarling::SetParameterAttribute(FEParam& p, const char* szat
 {
     // get number of DOFS
     DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_CDOFS = fedofs.GetCDOFS();
+    int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	if (strcmp(p.m_szname, "qc") == 0)
 	{

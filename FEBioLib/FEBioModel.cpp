@@ -669,9 +669,6 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 	{
 		int i;
 
-		// write DOFS
-		ar << fedofs.GetNDOFS() << fedofs.GetCDOFS();
-		
 		// write nodal data
 		int nn = m.Nodes();
 		ar << nn;
@@ -708,12 +705,6 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 	{
 		FECoreKernel& febio = FECoreKernel::GetInstance();
 
-		// read DOFS
-		int MAX_NDOFS, MAX_CDOFS;
-		ar >> MAX_NDOFS >> MAX_CDOFS;
-		fedofs.SetNDOFS(MAX_NDOFS);
-		fedofs.SetCDOFS(MAX_CDOFS);
-		
 		// read nodal data
 		int nn;
 		ar >> nn;
