@@ -276,7 +276,7 @@ void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 		FENode& node = mesh.Node(m_item[i].nid);
 		double dq = NodeValue(i);
 		int I = -node.m_ID[m_dof] - 2;
-		if (I >= 0) ui[I] = dq - node.get(m_dof);
+		if (I >= 0) ui[I] = (brel ? dq - node.get(m_dof) : dq);
 	}
 }
 
