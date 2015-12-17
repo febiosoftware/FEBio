@@ -2,6 +2,7 @@
 
 #include "FECore/FENewtonSolver.h"
 #include "FECore/FETypes.h"
+#include "FECore/FEGlobalVector.h"
 
 //-----------------------------------------------------------------------------
 //! The FEFluidSolver class solves fluid mechanics problems
@@ -56,10 +57,16 @@ public:
     //! Update Stresses
     void UpdateStresses();
     
+    //! Lagrangian augmentation
+    bool Augment();
+    
     //{ --- Stiffness matrix routines ---
     
     //! calculates the global stiffness matrix
     bool StiffnessMatrix(const FETimePoint& tp);
+    
+    //! calculates stiffness contributon of nonlinear constraints
+    void NonLinearConstraintStiffness(const FETimePoint& tp);
     
     //{ --- Residual routines ---
     
@@ -68,6 +75,9 @@ public:
     
     //! Calculates residual
     bool Residual(vector<double>& R);
+    
+    //! Calculate nonlinear constraint forces
+    void NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp);
     
 public:
     // convergence tolerances
@@ -87,6 +97,9 @@ public:
     vector<double> m_Vt;	//!< Total velocity vector at time t (incl all previous timesteps)
     vector<double> m_Fd;	//!< residual correction due to prescribed velocities
 
+public:
+    bool		m_baugment;		//!< augmentation flag
+    
 protected:
 	int		m_dofVX;
 	int		m_dofVY;

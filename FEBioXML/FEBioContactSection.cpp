@@ -235,6 +235,7 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
+    DOFS& dofs = fem.GetDOFS();
 	FEMesh& m = fem.GetMesh();
 
 	// make sure there is a constraint defined
@@ -264,9 +265,8 @@ void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 					dof.node = node - 1;
 
 					const char* szbc = tag.AttributeValue("bc");
-					if      (strcmp(szbc, "x") == 0) dof.bc = 0;
-					else if (strcmp(szbc, "y") == 0) dof.bc = 1;
-					else if (strcmp(szbc, "z") == 0) dof.bc = 2;
+                    int ndof = dofs.GetDOF(szbc);
+                    if (ndof >= 0) dof.bc = ndof;
 					else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
 					pLC->m_dof.push_back(dof);

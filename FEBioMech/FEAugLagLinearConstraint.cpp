@@ -69,7 +69,7 @@ double FELinearConstraintSet::constraint(FEAugLagLinearConstraint& LC)
 		case 1: u = node.m_rt.y - node.m_r0.y; break;
 		case 2: u = node.m_rt.z - node.m_r0.z; break;
 		default:
-			assert(false);
+                u = node.get(it->bc);
 		}
 		c += it->val*u;
 	}

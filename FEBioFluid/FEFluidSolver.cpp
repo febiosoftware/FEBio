@@ -56,6 +56,8 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
     m_bdivreform = true;
     m_bdoreforms = true;
 
+    m_baugment = false;
+    
 	// a different solution strategy is used here
 	m_nqnsolver = QN_BFGS2;
 
@@ -282,6 +284,35 @@ void FEFluidSolver::UpdateStresses()
 }
 
 //-----------------------------------------------------------------------------
+//!  This functions performs the Lagrange augmentations
+//!  It returns true if all the augmentation have converged,
+//!	otherwise it returns false
+//
+//! \todo There is an inherent problem with this approach. Since
+//!	      Lagrangian multipliers are inherited from previous timesteps
+//!       they might not be zero in case a node-surface contact breaks.
+//!       The node's gap value needs to become negative to a certain value
+//!       before the Lagr. multipliers dissapears.
+//
+bool FEFluidSolver::Augment()
+{
+    FETimePoint tp = m_fem.GetTime();
+    
+    // Assume we will pass (can't hurt to be optimistic)
+    bool bconv = true;
+    
+    // do nonlinear constraint augmentations
+    int n = m_fem.NonlinearConstraints();
+    for (int i=0; i<n; ++i)
+    {
+        FENLConstraint* plc = m_fem.NonlinearConstraint(i);
+        if (plc->IsActive()) bconv = plc->Augment(m_naug, tp) && bconv;
+    }
+    
+    return bconv;
+}
+
+//-----------------------------------------------------------------------------
 //! Prepares the data for the first BFGS-iteration.
 void FEFluidSolver::PrepStep(double time)
 {
@@ -339,6 +370,9 @@ void FEFluidSolver::PrepStep(double time)
     
     // update stresses
     UpdateStresses();
+    
+    // see if we have to do nonlinear constraint augmentations
+    if (m_fem.NonlinearConstraints() != 0) m_baugment = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -561,6 +595,45 @@ bool FEFluidSolver::Quasin(double time)
             // copy last calculated residual
             m_R0 = m_R1;
         }
+        else if (m_baugment)
+        {
+            // we have converged, so let's see if the augmentations have converged as well
+            felog.printf("\n........................ augmentation # %d\n", m_naug+1);
+            
+            // plot states before augmentations.
+            // The reason we store the state prior to the augmentations
+            // is because the augmentations are going to change things such that
+            // the system no longer in equilibrium. Since the model has to be converged
+            // before we do augmentations, storing the model now will store an actual converged state.
+            pstep->GetFEModel().Write(FE_AUGMENT);
+            
+            // do the augmentations
+            bconv = Augment();
+            
+            // update counter
+            ++m_naug;
+            
+            // we reset the reformations counter
+            m_nref = 0;
+            
+            // If we havn't converged we prepare for the next iteration
+            if (!bconv)
+            {
+                // Since the Lagrange multipliers have changed, we can't just copy
+                // the last residual but have to recalculate the residual
+                // we also recalculate the stresses in case we are doing augmentations
+                // for incompressible materials
+                UpdateStresses();
+                Residual(m_R0);
+                
+                // reform the matrix if we are using full-Newton
+                if (m_pbfgs->m_maxups == 0)
+                {
+                    felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
+                    if (ReformStiffness(tp) == false) break;
+                }
+            }
+        }
         
         // increase iteration number
         m_niter++;
@@ -644,7 +717,24 @@ bool FEFluidSolver::StiffnessMatrix(const FETimePoint& tp)
         dom.MassMatrix(this);
     }
     
+    // calculate nonlinear constraint stiffness
+    // note that this is the contribution of the
+    // constrainst enforced with augmented lagrangian
+    NonLinearConstraintStiffness(tp);
+    
     return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the stiffness contribution due to nonlinear constraints
+void FEFluidSolver::NonLinearConstraintStiffness(const FETimePoint& tp)
+{
+    int N = m_fem.NonlinearConstraints();
+    for (int i=0; i<N; ++i)
+    {
+        FENLConstraint* plc = m_fem.NonlinearConstraint(i);
+        if (plc->IsActive()) plc->StiffnessMatrix(this, tp);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -901,6 +991,11 @@ bool FEFluidSolver::Residual(vector<double>& R)
     // get the time information
     FETimePoint tp = m_fem.GetTime();
     
+    // calculate nonlinear constraint forces
+    // note that these are the linear constraints
+    // enforced using the augmented lagrangian
+    NonLinearConstraintForces(RHS, tp);
+    
     // add model loads
     int NML = m_fem.ModelLoads();
     for (int i=0; i<NML; ++i)
@@ -929,6 +1024,18 @@ bool FEFluidSolver::Residual(vector<double>& R)
     m_nrhs++;
     
     return true;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate the nonlinear constraint forces
+void FEFluidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp)
+{
+    int N = m_fem.NonlinearConstraints();
+    for (int i=0; i<N; ++i)
+    {
+        FENLConstraint* plc = m_fem.NonlinearConstraint(i);
+        if (plc->IsActive()) plc->Residual(R, tp);
+    }
 }
 
 //-----------------------------------------------------------------------------
