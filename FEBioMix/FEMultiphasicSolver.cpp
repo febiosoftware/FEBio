@@ -52,10 +52,6 @@ FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 	DOFS& dofs = pfem->GetDOFS();
 	dofs.AddDOF("p");
 	dofs.AddDOF("c", 0);	// we start with zero concentrations
-
-	// get dofs
-	m_dofP = pfem->GetDOFIndex("p");
-	m_dofC = pfem->GetDOFIndex("c");
 }
 
 //-----------------------------------------------------------------------------
@@ -144,6 +140,10 @@ bool FEMultiphasicSolver::InitEquations()
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     m_nceq.assign(MAX_CDOFS, 0);
 	
+	// get dofs
+	m_dofP = m_fem.GetDOFIndex("p");
+	m_dofC = m_fem.GetDOFIndex("c");
+
     // get number of DOFS
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{

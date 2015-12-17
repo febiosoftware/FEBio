@@ -45,11 +45,9 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
 	dofs.AddDOF("p");
-	dofs.AddDOF("c", 0);	// we start with zero concentrations
 
 	// get pressure dof
 	m_dofP = pfem->GetDOFIndex("p");
-	m_dofC = pfem->GetDOFIndex("c");
 }
 
 //-----------------------------------------------------------------------------
@@ -469,7 +467,7 @@ void FEBiphasicSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
 			
 			// For pressure and concentration loads, multiply by dt
 			// for consistency with evaluation of residual and stiffness matrix
-			if ((dof == m_dofP) || (dof >= m_dofC)) f *= tp.dt;
+			if (dof == m_dofP) f *= tp.dt;
 
 			// assemble into residual
 			AssembleResidual(nid, dof, f, F);

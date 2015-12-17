@@ -27,6 +27,10 @@ public:
 	void Serialize(DumpFile& ar);
 
 public:
+	//! Calculates concentrated nodal forces (overridden from FESolidSolver2)
+	//! (This function is called from FESolidSolver2::PrepStep)
+	virtual void NodalForces(vector<double>& F, const FETimePoint& tp);
+
 	//! Calculates residual (overridden from FEBiphasicSolver)
 	virtual bool Residual(vector<double>& R);
 
@@ -49,6 +53,8 @@ public:
 	// solute data
 	vector< vector<double> >	m_ci;	//!< concentration increment vector
 	vector< vector<double> >	m_Ci;	//!< Total concentration vector for iteration
+
+	int	m_dofC;	//!< concentration dof
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
