@@ -859,7 +859,7 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag)
 		if (szname == 0) szname = "_unnamed";
 
 		// create a new node set
-		FENodeSet* pns = new FENodeSet(&mesh);
+		pns = new FENodeSet(&mesh);
 		pns->SetName(szname);
 
 		// read the nodes
@@ -872,6 +872,12 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag)
 				int nid = -1;
 				tag.AttributeValue("id", nid);
 				l.push_back(nid);
+			}
+			else if (tag == "node_list")
+			{
+				vector<int> nl;
+				ReadList(tag, nl);
+				l.insert(l.end(), nl.begin(), nl.end());
 			}
 			else throw XMLReader::InvalidTag(tag);
 			++tag;

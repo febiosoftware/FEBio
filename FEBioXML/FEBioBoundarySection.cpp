@@ -47,7 +47,7 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 		else if (nversion >= 0x0205)
 		{
 			if      (tag == "fix"              ) ParseBCFix20      (tag);
-			else if (tag == "prescribe"        ) ParseBCPrescribe20(tag);
+			else if (tag == "prescribe"        ) ParseBCPrescribe25(tag);
 			else if (tag == "linear_constraint") ParseConstraints  (tag);
 			else throw XMLReader::InvalidTag(tag);
 		}
@@ -634,6 +634,7 @@ void FEBioBoundarySection::ParseBCPrescribe25(XMLTag& tag)
 			int N = ns.size();
 			for (int i=0; i<N; ++i) pdc->AddNode(ns[i]);
 		}
+		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());
