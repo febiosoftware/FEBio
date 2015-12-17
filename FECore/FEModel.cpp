@@ -15,6 +15,25 @@ FEModel::FEModel(void)
 {
 	m_sztitle[0] = 0;
 
+	// Add the default degrees of freedom
+	DOFS& dofs = GetDOFS();
+	dofs.AddDOF("x");
+	dofs.AddDOF("y");
+	dofs.AddDOF("z");
+	dofs.AddDOF("u");
+	dofs.AddDOF("v");
+	dofs.AddDOF("w");
+	dofs.AddDOF("p");
+	dofs.AddDOF("Ru");
+	dofs.AddDOF("Rv");
+	dofs.AddDOF("Rw");
+	dofs.AddDOF("t");
+	dofs.AddDOF("vx");
+	dofs.AddDOF("vy");
+	dofs.AddDOF("vz");
+	dofs.AddDOF("e");
+	dofs.AddDOF("c", 0);	// we start with 0 concentration dofs
+
 	// --- Analysis Data ---
 	m_pStep = 0;
 	m_nStep = -1;

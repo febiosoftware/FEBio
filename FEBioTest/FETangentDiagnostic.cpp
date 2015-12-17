@@ -58,6 +58,7 @@ bool FETangentUniaxial::Init()
 	};
 
 	// get the degrees of freedom
+	int MAX_DOFS = fem.GetDOFS().GetNDOFS();
 	const int dof_X = fem.GetDOFIndex("x");
 	const int dof_Y = fem.GetDOFIndex("y");
 	const int dof_Z = fem.GetDOFIndex("z");
@@ -66,6 +67,7 @@ bool FETangentUniaxial::Init()
 	// create the mesh
 	FEMesh& m = fem.GetMesh();
 	m.CreateNodes(8);
+	m.SetDOFS(MAX_DOFS);
 	for (i=0; i<8; ++i)
 	{
 		FENode& n = m.Node(i);
@@ -135,6 +137,7 @@ bool FETangentSimpleShear::Init()
 	};
 
 	// get the degrees of freedom
+	int MAX_DOFS = fem.GetDOFS().GetNDOFS();
 	const int dof_X = fem.GetDOFIndex("x");
 	const int dof_Y = fem.GetDOFIndex("y");
 	const int dof_Z = fem.GetDOFIndex("z");
@@ -143,6 +146,7 @@ bool FETangentSimpleShear::Init()
 	// create the mesh
 	FEMesh& m = fem.GetMesh();
 	m.CreateNodes(8);
+	m.SetDOFS(MAX_DOFS);
 	for (i=0; i<8; ++i)
 	{
 		FENode& n = m.Node(i);

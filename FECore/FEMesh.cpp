@@ -18,15 +18,6 @@
 //-----------------------------------------------------------------------------
 FENode::FENode()
 {
-    // get DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
-    
-	// initialize dof stuff
-    m_ID.assign(MAX_NDOFS, DOF_FIXED);
-	m_BC.assign(MAX_NDOFS, DOF_OPEN );
-	m_val.assign(MAX_NDOFS, 0.0);
-
 	// exclude flag (true if the node should not be part of the analysis.
 	// For instance, if it is isolated).
 	m_bexclude = false;
@@ -36,6 +27,15 @@ FENode::FENode()
 
 	// rigid body data
 	m_rid = -1;
+}
+
+//-----------------------------------------------------------------------------
+void FENode::SetDOFS(int n)
+{
+	// initialize dof stuff
+    m_ID.assign(n, DOF_FIXED);
+	m_BC.assign(n, DOF_OPEN );
+	m_val.assign(n, 0.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -232,6 +232,13 @@ void FEMesh::AddNodes(int nodes)
 	assert(nodes);
 	int N0 = (int) m_Node.size();
 	m_Node.resize(N0 + nodes);
+}
+
+//-----------------------------------------------------------------------------
+void FEMesh::SetDOFS(int n)
+{
+	int NN = Nodes();
+	for (int i=0; i<NN; ++i) m_Node[i].SetDOFS(n);
 }
 
 //-----------------------------------------------------------------------------

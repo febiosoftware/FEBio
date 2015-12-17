@@ -34,24 +34,6 @@ void DOFS::Reset()
 {
 	// clear the DOFS
 	if (m_dof.empty() == false) m_dof.clear();
-
-	// Add the default DOFS
-	AddDOF("x");
-	AddDOF("y");
-	AddDOF("z");
-	AddDOF("u");
-	AddDOF("v");
-	AddDOF("w");
-	AddDOF("p");
-	AddDOF("Ru");
-	AddDOF("Rv");
-	AddDOF("Rw");
-	AddDOF("t");
-	AddDOF("vx");
-	AddDOF("vy");
-	AddDOF("vz");
-	AddDOF("e");
-	AddDOF("c", 0);	// we start with 0 concentration dofs
 }
 
 //-----------------------------------------------------------------------------

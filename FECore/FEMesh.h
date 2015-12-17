@@ -88,6 +88,9 @@ public:
 
 	//! assignment operator
 	FENode& operator = (const FENode& n);
+
+	//! Set the number of DOFS
+	void SetDOFS(int n);
 	
 public:
 	// geometry data
@@ -252,6 +255,9 @@ public:
 
 	//! return reference to a node
 	FENode& Node(int i) { return m_Node[i]; }
+
+	//! Set the number of degrees of freedom on this mesh
+	void SetDOFS(int n);
 
 	//! update bounding box
 	void UpdateBox();

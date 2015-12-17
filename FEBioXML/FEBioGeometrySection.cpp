@@ -43,6 +43,15 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 		}
 		while (!tag.isend());
 	}
+
+	// At this point the mesh is completely read in.
+	// Now we can allocate the degrees of freedom.
+	// NOTE: We do this here since the mesh no longer automatically allocates the dofs.
+	//       At some point I want to be able to read the mesh before deciding any physics.
+	//       When that happens I'll have to move this elsewhere.
+	FEModel& fem = *GetFEModel();
+	int MAX_DOFS = fem.GetDOFS().GetNDOFS();
+	fem.GetMesh().SetDOFS(MAX_DOFS);
 }
 
 //-----------------------------------------------------------------------------

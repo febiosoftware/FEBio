@@ -44,6 +44,7 @@ bool FEFluidTangentUniaxial::Init()
     };
     
     FEModel& fem = GetDiagnostic()->GetFEModel();
+	int MAX_DOFS = fem.GetDOFS().GetNDOFS();
 	const int dof_VX = fem.GetDOFIndex("vx");
 	const int dof_VY = fem.GetDOFIndex("vy");
 	const int dof_VZ = fem.GetDOFIndex("vz");
@@ -53,6 +54,7 @@ bool FEFluidTangentUniaxial::Init()
     // create the mesh
     FEMesh& m = fem.GetMesh();
     m.CreateNodes(8);
+	m.SetDOFS(MAX_DOFS);
     for (i=0; i<8; ++i)
     {
         FENode& n = m.Node(i);

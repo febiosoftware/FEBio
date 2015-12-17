@@ -116,11 +116,13 @@ bool FEContactDiagnostic::Init()
 	FEMesh& mesh = fem.GetMesh();
 
 	// --- create the geometry ---
+	int MAX_DOFS = fem.GetDOFS().GetNDOFS();
 
 	// currently we simply assume a two-element contact problem
 	// so we create two elements
 	const double eps = 0.5;
 	mesh.CreateNodes(16);
+	mesh.SetDOFS(MAX_DOFS);
 	mesh.Node( 0).m_r0 = vec3d(0,0,0);
 	mesh.Node( 1).m_r0 = vec3d(1,0,0);
 	mesh.Node( 2).m_r0 = vec3d(1,1,0);

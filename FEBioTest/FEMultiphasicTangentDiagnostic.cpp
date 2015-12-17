@@ -58,16 +58,18 @@ bool FEMultiphasicTangentUniaxial::Init()
     double pe = -pmp->m_Rgas*pmp->m_Tabs*osm;
     
     // --- create the FE problem ---
-    // create the mesh
-    FEMesh& m = fem.GetMesh();
-    m.CreateNodes(8);
-
 	// get the degrees of freedom
+	int MAX_DOFS = fem.GetDOFS().GetNDOFS();
 	const int dof_x = fem.GetDOFIndex("x");
 	const int dof_y = fem.GetDOFIndex("y");
 	const int dof_z = fem.GetDOFIndex("z");
 	const int dof_p = fem.GetDOFIndex("p");
 	const int dof_c = fem.GetDOFIndex("c");
+
+    // create the mesh
+    FEMesh& m = fem.GetMesh();
+    m.CreateNodes(8);
+	m.SetDOFS(MAX_DOFS);
 
 	// add initial conditions
 	for (isol = 0; isol<nsol; ++isol) {
