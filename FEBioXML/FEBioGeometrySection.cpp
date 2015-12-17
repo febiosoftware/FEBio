@@ -876,57 +876,9 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 
 void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 {
-	FEMesh& mesh = *m_pim->GetFEMesh();
-
-	// get the name attribute
-	const char* szname = tag.AttributeValue("name");
-
-	// create a new node set
-	FENodeSet* pns = new FENodeSet(&mesh);
-	pns->SetName(szname);
-
-	// NOTE: The initial specs of the 2.0 format defined the nodes as a value list.
-	// This was later revised to promote more consistency between the node set definitions
-	// and other features (e.g. fixed BC's) that define node sets. However, for now
-	// we still support the old format, although this is to be considered obsolete.
-	vector<int> l;
-	if (tag.isleaf())
-	{
-		// NOTE: This is the old way of specifying node sets. Consider obsolete!
-		// read the list of indices
-		m_pim->ReadList(tag, l);
-		assert(!l.empty());
-	}
-	else
-	{
-		// This is new and preferred way of defining node sets
-		++tag;
-		do
-		{
-			if (tag == "node")
-			{
-				int nid = -1;
-				tag.AttributeValue("id", nid);
-				l.push_back(nid);
-			}
-			else throw XMLReader::InvalidTag(tag);
-			++tag;
-		}
-		while (!tag.isend());
-	}
-
-	// only add non-empty node sets
-	if (l.empty() == false)
-	{
-		// assign indices to node set
-		int N = l.size();
-		pns->create(N);
-		for (int i=0; i<N; ++i) (*pns)[i] = l[i] - 1;
-
-		// add the nodeset to the mesh
-		mesh.AddNodeSet(pns);
-	}
-	else delete pns;
+	// read the node set
+	FENodeSet* pns = m_pim->ParseNodeSet(tag);
+	if (pns == 0) throw XMLReader::InvalidTag(tag);
 }
 
 //-----------------------------------------------------------------------------

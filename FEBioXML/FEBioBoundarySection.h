@@ -13,6 +13,7 @@ public:
 protected:
 	void ParseBCFix               (XMLTag& tag);
 	void ParseBCFix20             (XMLTag& tag);
+	void ParseBCFix25             (XMLTag& tag);
 	void ParseBCPrescribe         (XMLTag& tag);
 	void ParseBCPrescribe20       (XMLTag& tag);
 	void ParseBCPrescribe25       (XMLTag& tag);

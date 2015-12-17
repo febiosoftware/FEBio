@@ -46,7 +46,7 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 		}
 		else if (nversion >= 0x0205)
 		{
-			if      (tag == "fix"              ) ParseBCFix20      (tag);
+			if      (tag == "fix"              ) ParseBCFix25      (tag);
 			else if (tag == "prescribe"        ) ParseBCPrescribe25(tag);
 			else if (tag == "linear_constraint") ParseConstraints  (tag);
 			else throw XMLReader::InvalidTag(tag);
@@ -354,6 +354,58 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 		}
 		while (!tag.isend());
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioBoundarySection::ParseBCFix25(XMLTag &tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// get the required bc attribute
+	const char* szbc = tag.AttributeValue("bc");
+	int ndof = fem.GetDOFIndex(szbc);
+	if (ndof == -1)
+	{
+		// TODO: For now concentrations have to be handled differently. I need to fix this.
+		if (szbc[0]=='c')
+		{
+			int c = atoi(szbc+1) - 1;
+			ndof = fem.GetDOFIndex("c", c);
+		}
+		else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+	}
+	if (ndof == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+
+	// create the fixed BC's
+	FEFixedBC* pbc = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "fix", &fem));
+	pbc->SetDOF(ndof);
+
+	// add this boundary condition to the current step
+	fem.AddFixedBC(pbc);
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddModelComponent(pbc);
+		pbc->Deactivate();
+	}
+
+	// read the node sets
+	++tag;
+	do
+	{
+		if (tag == "node_set")
+		{
+			FENodeSet* pns = m_pim->ParseNodeSet(tag);
+			if (pns == 0) throw XMLReader::InvalidTag(tag);
+
+			FENodeSet& ns = *pns;
+			int N = ns.size();
+			for (int i=0; i<N; ++i) pbc->AddNode(ns[i]);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------
