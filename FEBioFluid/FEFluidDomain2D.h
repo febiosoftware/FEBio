@@ -9,16 +9,18 @@
 #pragma once
 #include "FECore/FEShellDomain.h"
 #include "FECore/FEModel.h"
+#include "FEFluidDomain.h"
 #include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
 //! domain described by 3D volumetric elements
 //!
-class FEFluidDomain2D : public FEShellDomain
+class FEFluidDomain2D : public FEShellDomain, public FEFluidDomain
 {
 public:
     //! constructor
     FEFluidDomain2D(FEModel* pfem);
+    ~FEFluidDomain2D() {}
     
     //! assignment operator
     FEFluidDomain2D& operator = (FEFluidDomain2D& d);
@@ -98,14 +100,10 @@ public:
     //! Calculates the inertial force vector for solid elements
     void ElementInertialForce(FEShellElement& el, vector<double>& fe);
     
-    void SetTransientAnalysis() { m_btrans = true; }
-    void SetSteadyStateAnalysis() { m_btrans = false; }
-    
     // ---
     
 protected:
     FEFluid*	m_pMat;
-    bool        m_btrans;   // flag for transient (true) or steady-state (false) analysis
 
 protected:
 	int	m_dofVX, m_dofVY;

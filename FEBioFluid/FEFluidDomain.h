@@ -1,106 +1,67 @@
+//
+//  FEFluidDomain.hpp
+//  FEBioFluid
+//
+//  Created by Gerard Ateshian on 12/16/15.
+//  Copyright © 2015 febio.org. All rights reserved.
+//
 #pragma once
-#include "FECore/FESolidDomain.h"
+#include "FEBioMech/FEBodyForce.h"
+#include "FECore/FESolver.h"
 #include "FECore/FEModel.h"
-#include "FEFluid.h"
+#include <vector>
+using namespace std;
+
+class FEModel;
 
 //-----------------------------------------------------------------------------
-//! domain described by 3D volumetric elements
-//!
-class FEFluidDomain : public FESolidDomain
+//! Abstract interface class for fluid domains.
+
+//! An fluid domain is used by the fluid mechanics solver.
+//! This interface defines the functions that have to be implemented by a
+//! fluid domain. There are basically two categories: residual functions
+//! that contribute to the global residual vector. And stiffness matrix
+//! function that calculate contributions to the global stiffness matrix.
+class FEFluidDomain
 {
 public:
-    //! constructor
     FEFluidDomain(FEModel* pfem);
+    virtual ~FEFluidDomain(){}
     
-    //! assignment operator
-    FEFluidDomain& operator = (FEFluidDomain& d);
-    
-    //! initialize class
-    bool Initialize(FEModel& fem);
-    
-    //! activate
-    void Activate();
-    
-    //! initialize elements
-    virtual void InitElements();
-    
-    //! Unpack solid element data
-    void UnpackLM(FEElement& el, vector<int>& lm);
-    
-public: // overrides from FEDomain
-    
-    //! get the material
-    FEMaterial* GetMaterial() { return m_pMat; }
-    
-    //! set the material
-    void SetMaterial(FEMaterial* pm);
-    
-    //! create a copy
-    FEDomain* Copy();
-    
-public: // overrides from FEElasticDomain
-    
-    // update stresses
-    void UpdateStresses(FEModel& fem);
-    
-    // update the element stress
-    void UpdateElementStress(int iel, double dt);
-    
-    //! internal stress forces
-    void InternalForces(FEGlobalVector& R);
-    
-    //! body forces
-    void BodyForce(FEGlobalVector& R, FEBodyForce& BF);
-    
-    //! intertial forces for dynamic problems
-    void InertialForces(FEGlobalVector& R);
-    
-    //! calculates the global stiffness matrix for this domain
-    void StiffnessMatrix(FESolver* psolver);
-    
-    //! calculates inertial stiffness
-    void MassMatrix(FESolver* psolver);
-    
-    //! body force stiffness
-    void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf);
-    
-public:
-    // --- S T I F F N E S S ---
-    
-    //! calculates the solid element stiffness matrix
-    void ElementStiffness(FEModel& fem, int iel, matrix& ke);
-    
-    //! material stiffness component
-    void ElementMaterialStiffness(FESolidElement& el, matrix& ke);
-    
-    //! calculates the solid element mass matrix
-    void ElementMassMatrix(FESolidElement& el, matrix& ke);
-    
-    //! calculates the stiffness matrix due to body forces
-    void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke);
+    //! Updates the element stresses
+    virtual void UpdateStresses(FEModel& fem) = 0;
     
     // --- R E S I D U A L ---
     
-    //! Calculates the internal stress vector for solid elements
-    void ElementInternalForce(FESolidElement& el, vector<double>& fe);
+    //! calculate the internal forces
+    virtual void InternalForces(FEGlobalVector& R) = 0;
     
-    //! Calculatess external body forces for solid elements
-    void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe);
+    //! Calculate the body force vector
+    virtual void BodyForce(FEGlobalVector& R, FEBodyForce& bf) = 0;
     
-    //! Calculates the inertial force vector for solid elements
-    void ElementInertialForce(FESolidElement& el, vector<double>& fe);
+    //! calculate the interial forces (for dynamic problems)
+    virtual void InertialForces(FEGlobalVector& R) = 0;
     
+    // --- S T I F F N E S S   M A T R I X ---
+    
+    //! Calculate global stiffness matrix (only contribution from internal force derivative)
+    //! \todo maybe I should rename this the InternalStiffness matrix?
+    virtual void StiffnessMatrix   (FESolver* psolver) = 0;
+    
+    //! Calculate stiffness contribution of body forces
+    virtual void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) = 0;
+    
+    //! calculate the mass matrix (for dynamic problems)
+    virtual void MassMatrix(FESolver* psolver) = 0;
+    
+    //! transient analysis
     void SetTransientAnalysis() { m_btrans = true; }
     void SetSteadyStateAnalysis() { m_btrans = false; }
     
-    // ---
+public:
+    FEModel* GetFEModel() { return m_pfem; }
     
 protected:
-    FEFluid*	m_pMat;
+    FEModel*	m_pfem;
     bool        m_btrans;   // flag for transient (true) or steady-state (false) analysis
-
-	int	m_dofVX;
-	int	m_dofVY;
-	int	m_dofVZ;
-	int	m_dofE;
 };

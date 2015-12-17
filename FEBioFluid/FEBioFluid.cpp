@@ -7,7 +7,8 @@
 #include "FECarreauFluid.h"
 
 #include "FEFluidSolver.h"
-#include "FEFluidDomain.h"
+#include "FEFluidDomain3D.h"
+#include "FEFluidDomain2D.h"
 
 #include "FEFluidTractionLoad.h"
 
@@ -41,7 +42,8 @@ REGISTER_FECORE_CLASS(FECarreauFluid                ,FEMATERIAL_ID, "Carreau flu
 
 //-----------------------------------------------------------------------------
 // Domain classes
-REGISTER_FECORE_CLASS(FEFluidDomain                 , FEDOMAIN_ID, "fluid"              );
+REGISTER_FECORE_CLASS(FEFluidDomain3D               , FEDOMAIN_ID, "fluid"              );
+REGISTER_FECORE_CLASS(FEFluidDomain2D               , FEDOMAIN_ID, "fluid2D"              );
 
 //-----------------------------------------------------------------------------
 // Surface loads

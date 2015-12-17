@@ -25,13 +25,13 @@ extern "C" int omp_get_thread_num(void);
 //! constructor
 //! Some derived classes will pass 0 to the pmat, since the pmat variable will be
 //! to initialize another material. These derived classes will set the m_pMat variable as well.
-FEFluidDomain2D::FEFluidDomain2D(FEModel* pfem) : FEShellDomain(&pfem->GetMesh())
+FEFluidDomain2D::FEFluidDomain2D(FEModel* pfem) : FEShellDomain(&pfem->GetMesh()), FEFluidDomain(pfem)
 {
     m_pMat = 0;
     m_btrans = true;
 
 	m_dofVX = pfem->GetDOFIndex("vx");
-	m_dofVY = pfem->GetDOFIndex("vx");
+	m_dofVY = pfem->GetDOFIndex("vy");
 	m_dofE  = pfem->GetDOFIndex("e");
 }
 
@@ -93,7 +93,7 @@ bool FEFluidDomain2D::Initialize(FEModel &fem)
         int nint = el.GaussPoints();
         for (int n=0; n<nint; ++n)
         {
-            double J0 = detJ0(el, n);
+            double J0 = detJ02D(el, n);
             if (J0 <= 0)
             {
                 felog.printf("**************************** E R R O R ****************************\n");
@@ -230,7 +230,7 @@ void FEFluidDomain2D::ElementInternalForce(FEShellElement& el, vector<double>& f
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         
         // calculate the jacobian
-        detJ = invjac0(el, Ji, n)*gw[n];
+        detJ = invjac02D(el, Ji, n)*gw[n];
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -318,7 +318,7 @@ void FEFluidDomain2D::ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vect
         
         pt.m_r0 = el.Evaluate(r0, n);
         
-        detJ = detJ0(el, n)*gw[n];
+        detJ = detJ02D(el, n)*gw[n];
         
         // get the force
         f = BF.force(mp);
@@ -357,7 +357,7 @@ void FEFluidDomain2D::ElementBodyForceStiffness(FEBodyForce& BF, FEShellElement 
         FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
         
         // calculate the jacobian
-        detJ = detJ0(el, n)*gw[n];
+        detJ = detJ02D(el, n)*gw[n];
         
         H = el.H(n);
         
@@ -409,7 +409,7 @@ void FEFluidDomain2D::ElementMaterialStiffness(FEShellElement &el, matrix &ke)
     for (n=0; n<nint; ++n)
     {
         // calculate jacobian
-        detJ = invjac0(el, Ji, n)*gw[n];
+        detJ = invjac02D(el, Ji, n)*gw[n];
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -595,7 +595,7 @@ void FEFluidDomain2D::ElementMassMatrix(FEShellElement& el, matrix& ke)
     for (n=0; n<nint; ++n)
     {
         // calculate jacobian
-        detJ = invjac0(el, Ji, n)*gw[n];
+        detJ = invjac02D(el, Ji, n)*gw[n];
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -803,7 +803,7 @@ void FEFluidDomain2D::ElementInertialForce(FEShellElement& el, vector<double>& f
         double dens = m_pMat->Density(mp);
         
         // calculate the jacobian
-        detJ = detJ0(el, n)*gw[n];
+        detJ = detJ02D(el, n)*gw[n];
         
         H = el.H(n);
         

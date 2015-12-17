@@ -137,11 +137,146 @@ double FEShellDomain::detJ0(FEShellElement &el, int n)
 }
 
 //-----------------------------------------------------------------------------
+//! Calculate the inverse jacobian with respect to the reference frame at
+//! integration point n. The inverse jacobian is return in Ji. The return value
+//! is the determinant of the jacobian (not the inverse!)
+//! A 2D element is assumed to have no variation through the thickness.
+double FEShellDomain::invjac02D(FEShellElement& el, double Ji[3][3], int n)
+{
+    int i;
+    
+    // number of nodes
+    int neln = el.Nodes();
+    
+    // initial nodal coordinates
+    vec3d r0[FEElement::MAX_NODES];
+    for (i=0; i<neln; ++i)
+    {
+        r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+    }
+    
+    // evaluate covariant basis vectors
+    vec3d g1, g2, g3;
+    g1 = g2 = vec3d(0,0,0);
+    double J[3][3];
+    for (i=0; i<neln; ++i)
+    {
+        const double& Hri = el.Hr(n)[i];
+        const double& Hsi = el.Hs(n)[i];
+
+        // in-plane covariant basis vectors
+        g1 += r0[i]*Hri;
+        g2 += r0[i]*Hsi;
+    }
+        // normal vector
+    g3 = g1 ^ g2; g3.unit();
+    
+    // calculate jacobian
+    J[0][0] = g1.x; J[0][1] = g2.x; J[0][2] = g3.x;
+    J[1][0] = g1.y; J[1][1] = g2.y; J[1][2] = g3.y;
+    J[2][0] = g1.z; J[2][1] = g2.z; J[2][2] = g3.z;
+    
+    // calculate the determinant
+    double det =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1])
+				+ J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0])
+				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+    
+    // make sure the determinant is positive
+    if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
+    
+    // calculate the inverse of the jacobian
+    double deti = 1.0 / det;
+    
+    Ji[0][0] =  deti*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
+    Ji[1][0] =  deti*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
+    Ji[2][0] =  deti*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+    
+    Ji[0][1] =  deti*(J[0][2]*J[2][1] - J[0][1]*J[2][2]);
+    Ji[1][1] =  deti*(J[0][0]*J[2][2] - J[0][2]*J[2][0]);
+    Ji[2][1] =  deti*(J[0][1]*J[2][0] - J[0][0]*J[2][1]);
+    
+    Ji[0][2] =  deti*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
+    Ji[1][2] =  deti*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
+    Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
+    
+    return det;
+}
+
+
+//-----------------------------------------------------------------------------
+//! Calculate the inverse jacobian with respect to the reference frame at
+//! integration point n. The inverse jacobian is return in Ji. The return value
+//! is the determinant of the jacobian (not the inverse!)
+//! A 2D element is assumed to have no variation through the thickness.
+double FEShellDomain::invjact2D(FEShellElement& el, double Ji[3][3], int n)
+{
+    int i;
+    
+    // number of nodes
+    int neln = el.Nodes();
+    
+    // initial nodal coordinates
+    vec3d r0[FEElement::MAX_NODES];
+    for (i=0; i<neln; ++i)
+    {
+        r0[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+    }
+    
+    // evaluate covariant basis vectors
+    vec3d g1, g2, g3;
+    g1 = g2 = vec3d(0,0,0);
+    double J[3][3];
+    for (i=0; i<neln; ++i)
+    {
+        const double& Hri = el.Hr(n)[i];
+        const double& Hsi = el.Hs(n)[i];
+        
+        // in-plane covariant basis vectors
+        g1 += r0[i]*Hri;
+        g2 += r0[i]*Hsi;
+    }
+    // normal vector
+    g3 = g1 ^ g2; g3.unit();
+    
+    // calculate jacobian
+    J[0][0] = g1.x; J[0][1] = g2.x; J[0][2] = g3.x;
+    J[1][0] = g1.y; J[1][1] = g2.y; J[1][2] = g3.y;
+    J[2][0] = g1.z; J[2][1] = g2.z; J[2][2] = g3.z;
+    
+    // calculate the determinant
+    double det =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1])
+				+ J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0])
+				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+    
+    // make sure the determinant is positive
+    if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
+    
+    // calculate the inverse of the jacobian
+    double deti = 1.0 / det;
+    
+    Ji[0][0] =  deti*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
+    Ji[1][0] =  deti*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
+    Ji[2][0] =  deti*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+    
+    Ji[0][1] =  deti*(J[0][2]*J[2][1] - J[0][1]*J[2][2]);
+    Ji[1][1] =  deti*(J[0][0]*J[2][2] - J[0][2]*J[2][0]);
+    Ji[2][1] =  deti*(J[0][1]*J[2][0] - J[0][0]*J[2][1]);
+    
+    Ji[0][2] =  deti*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
+    Ji[1][2] =  deti*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
+    Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
+    
+    return det;
+}
+
+
+//-----------------------------------------------------------------------------
 //! calculate gradient of function at integration points
+//! A 2D element is assumed to have no variation through the thickness.
 vec3d FEShellDomain::gradient2D(FEShellElement& el, double* fn, int n)
 {
     double Ji[3][3];
-    invjac0(el, Ji, n);
+    invjact2D(el, Ji, n);
 				
     double* Grn = el.Hr(n);
     double* Gsn = el.Hs(n);
@@ -169,10 +304,11 @@ vec3d FEShellDomain::gradient2D(FEShellElement& el, double* fn, int n)
 
 //-----------------------------------------------------------------------------
 //! calculate gradient of function at integration points
+//! A 2D element is assumed to have no variation through the thickness.
 vec3d FEShellDomain::gradient2D(FEShellElement& el, vector<double>& fn, int n)
 {
     double Ji[3][3];
-    invjac0(el, Ji, n);
+    invjact2D(el, Ji, n);
 				
     double* Grn = el.Hr(n);
     double* Gsn = el.Hs(n);
@@ -200,10 +336,11 @@ vec3d FEShellDomain::gradient2D(FEShellElement& el, vector<double>& fn, int n)
 
 //-----------------------------------------------------------------------------
 //! calculate spatial gradient of function at integration points
+//! A 2D element is assumed to have no variation through the thickness.
 mat3d FEShellDomain::gradient2D(FEShellElement& el, vec3d* fn, int n)
 {
     double Ji[3][3];
-    invjac0(el, Ji, n);
+    invjact2D(el, Ji, n);
 				
     vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
     vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -219,6 +356,51 @@ mat3d FEShellDomain::gradient2D(FEShellElement& el, vec3d* fn, int n)
         gradf += fn[i] & (g1*Gr[i] + g2*Gs[i]);
     
     return gradf;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate jacobian with respect to reference frame
+double FEShellDomain::detJ02D(FEShellElement &el, int n)
+{
+    int i;
+    
+    // number of nodes
+    int neln = el.Nodes();
+    
+    // initial nodal coordinates
+    vec3d r0[FEElement::MAX_NODES];
+    for (i=0; i<neln; ++i)
+    {
+        r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+    }
+    
+    // evaluate covariant basis vectors
+    vec3d g1, g2, g3;
+    g1 = g2 = vec3d(0,0,0);
+    double J[3][3];
+    for (i=0; i<neln; ++i)
+    {
+        const double& Hri = el.Hr(n)[i];
+        const double& Hsi = el.Hs(n)[i];
+        
+        // in-plane covariant basis vectors
+        g1 += r0[i]*Hri;
+        g2 += r0[i]*Hsi;
+    }
+    // normal vector
+    g3 = g1 ^ g2; g3.unit();
+    
+    // calculate jacobian
+    J[0][0] = g1.x; J[0][1] = g2.x; J[0][2] = g3.x;
+    J[1][0] = g1.y; J[1][1] = g2.y; J[1][2] = g3.y;
+    J[2][0] = g1.z; J[2][1] = g2.z; J[2][2] = g3.z;
+    
+    // calculate the determinant
+    double det =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1])
+				+ J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0])
+				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+    
+	return det;
 }
 
 //-----------------------------------------------------------------------------

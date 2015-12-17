@@ -36,6 +36,20 @@ private:
 };
 
 //-----------------------------------------------------------------------------
+class FEFluidTangentUniaxialSS : public FEFluidScenario
+{
+public:
+    FEFluidTangentUniaxialSS(FEDiagnostic* pdia);
+    
+    bool Init();
+    
+private:
+    double		m_velocity;
+    
+    DECLARE_PARAMETER_LIST();
+};
+
+//-----------------------------------------------------------------------------
 //! The FEBiphasicTangentDiagnostic class tests the stiffness matrix implementation
 //! by comparing it to a numerical approximating of the derivative of the
 //! residual.

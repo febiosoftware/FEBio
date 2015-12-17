@@ -7,11 +7,11 @@
 
 //-----------------------------------------------------------------------------
 //! Nodal effective fluid pressures
-class FEPlotFluidDilatation : public FEDomainData
+class FEPlotFluidDilatation : public FENodeData
 {
 public:
-    FEPlotFluidDilatation(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
-    bool Save(FEDomain& m, FEDataStream& a);
+    FEPlotFluidDilatation(FEModel* pfem) : FENodeData(PLT_FLOAT, FMT_NODE){}
+    bool Save(FEMesh& m, FEDataStream& a);
 };
 
 //=============================================================================

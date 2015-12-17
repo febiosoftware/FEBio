@@ -13,6 +13,7 @@ FEDomain* FEFluidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 	{
 		// fluid elements
 		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) sztype = "fluid";
+        else if ((eshape == ET_QUAD4) || (eshape == ET_TRI3)) sztype = "fluid2D";
 		else return 0;
 	}
 

@@ -33,6 +33,12 @@ public:
 	// jacobian with respect to reference frame
 	double detJ0(FEShellElement& el, int n);
 
+    // inverse jacobian with respect to reference frame
+    double invjac02D(FEShellElement& el, double J[3][3], int n);
+    
+    // inverse jacobian with respect to current frame
+    double invjact2D(FEShellElement& el, double J[3][3], int n);
+    
     //! calculate in-plane gradient of function at integration points
     vec3d gradient2D(FEShellElement& el, double* fn, int n);
     
@@ -41,6 +47,9 @@ public:
     
     //! calculate in-plane gradient of vector function at integration points
     mat3d gradient2D(FEShellElement& el, vec3d* fn, int n);
+    
+	// jacobian with respect to reference frame
+	double detJ02D(FEShellElement& el, int n);
 
 public:
 	//! shallow copy
