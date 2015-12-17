@@ -21,6 +21,21 @@ FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : FESolver(pfem)
 	m_niter = 0;
 	m_nreq = 0;
 
+	// Allocate degrees of freedom
+	DOFS& dofs = pfem->GetDOFS();
+	dofs.AddDOF("x");
+	dofs.AddDOF("y");
+	dofs.AddDOF("z");
+	dofs.AddDOF("u");
+	dofs.AddDOF("v");
+	dofs.AddDOF("w");
+	dofs.AddDOF("Ru");
+	dofs.AddDOF("Rv");
+	dofs.AddDOF("Rw");
+	dofs.AddDOF("vx");
+	dofs.AddDOF("vy");
+	dofs.AddDOF("vz");
+
 	// get the DOF indices
 	m_dofX = pfem->GetDOFIndex("x");
 	m_dofY = pfem->GetDOFIndex("y");

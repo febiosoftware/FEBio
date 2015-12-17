@@ -48,12 +48,14 @@ FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
     
 	m_bsymm = false; // assume non-symmetric stiffness matrix by default
 
+	// Allocate degrees of freedom
+	DOFS& dofs = pfem->GetDOFS();
+	dofs.AddDOF("p");
+	dofs.AddDOF("c", 0);	// we start with zero concentrations
+
 	// get dofs
 	m_dofP = pfem->GetDOFIndex("p");
 	m_dofC = pfem->GetDOFIndex("c");
-	m_dofVX = pfem->GetDOFIndex("vx");
-	m_dofVY = pfem->GetDOFIndex("vy");
-	m_dofVZ = pfem->GetDOFIndex("vz");
 }
 
 //-----------------------------------------------------------------------------

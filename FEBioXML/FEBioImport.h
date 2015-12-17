@@ -151,7 +151,7 @@ public:
 	bool Load(FEModel& fem, const char* szfile);
 
 	//! read the contents of a file
-	bool ReadFile(const char* szfile);
+	bool ReadFile(const char* szfile, bool broot = true);
 
 public:
 	FEModel* GetFEModel() { return m_pfem; }
@@ -165,6 +165,7 @@ public:
 
 	void ReadList(XMLTag& tag, vector<int>& l);
 
+	FESolver* BuildSolver(const char* sztype, FEModel& fem);
 	FECore::FEAnalysis* CreateNewStep();
 
 public:
@@ -177,6 +178,10 @@ public:
 	void SetPlotCompression(int n);
     
 	void AddDataRecord(DataRecord* pd);
+
+public:
+	// Helper functions for reading node sets, surfaces, etc.
+	FENodeSet* ParseNodeSet(XMLTag& tag);
 
 public:
 	void ClearParams();

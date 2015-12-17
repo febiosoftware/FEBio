@@ -62,6 +62,14 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
 	// turn off checking for a zero diagonal
 	CheckZeroDiagonal(false);
 
+	// Allocate degrees of freedom
+	DOFS& dofs = pfem->GetDOFS();
+	dofs.AddDOF("vx");
+	dofs.AddDOF("vy");
+	dofs.AddDOF("vz");
+	dofs.AddDOF("e");
+
+	// get the dof indices
 	m_dofVX = pfem->GetDOFIndex("vx");
 	m_dofVY = pfem->GetDOFIndex("vy");
 	m_dofVZ = pfem->GetDOFIndex("vz");

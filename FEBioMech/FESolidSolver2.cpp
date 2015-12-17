@@ -70,16 +70,31 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem)
 
 	m_baugment = false;
 
+	// Allocate degrees of freedom
+	DOFS& dofs = pfem->GetDOFS();
+	dofs.AddDOF("x");
+	dofs.AddDOF("y");
+	dofs.AddDOF("z");
+	dofs.AddDOF("u");
+	dofs.AddDOF("v");
+	dofs.AddDOF("w");
+	dofs.AddDOF("Ru");
+	dofs.AddDOF("Rv");
+	dofs.AddDOF("Rw");
+	dofs.AddDOF("vx");
+	dofs.AddDOF("vy");
+	dofs.AddDOF("vz");
+
 	// get the DOF indices
-	m_dofX = pfem->GetDOFIndex("x");
-	m_dofY = pfem->GetDOFIndex("y");
-	m_dofZ = pfem->GetDOFIndex("z");
+	m_dofX  = pfem->GetDOFIndex("x");
+	m_dofY  = pfem->GetDOFIndex("y");
+	m_dofZ  = pfem->GetDOFIndex("z");
 	m_dofVX = pfem->GetDOFIndex("vx");
 	m_dofVY = pfem->GetDOFIndex("vy");
 	m_dofVZ = pfem->GetDOFIndex("vz");
-	m_dofU = pfem->GetDOFIndex("u");
-	m_dofV = pfem->GetDOFIndex("v");
-	m_dofW = pfem->GetDOFIndex("w");
+	m_dofU  = pfem->GetDOFIndex("u");
+	m_dofV  = pfem->GetDOFIndex("v");
+	m_dofW  = pfem->GetDOFIndex("w");
 	m_dofRU = pfem->GetDOFIndex("Ru");
 	m_dofRV = pfem->GetDOFIndex("Rv");
 	m_dofRW = pfem->GetDOFIndex("Rw");

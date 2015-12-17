@@ -6,26 +6,14 @@
 using namespace FECore;
 
 //-----------------------------------------------------------------------------
-FESolver* FEBioControlSection::BuildSolver(const char* sztype, FEModel& fem)
-{
-	FESolver* ps = fecore_new<FESolver>(FESOLVER_ID, sztype, &fem);
-	return ps;
-}
-
-//-----------------------------------------------------------------------------
 void FEBioControlSection::Parse(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEAnalysis* pstep = GetStep();
 
-	// make sure we have a solver defined
+	// Get the solver
 	FESolver* psolver = pstep->GetFESolver();
-	if (psolver == 0)
-	{
-		psolver = BuildSolver(m_pim->m_szmod, fem);
-		if (psolver == 0) throw FEBioImport::FailedAllocatingSolver(m_pim->m_szmod);
-		pstep->SetFESolver(psolver);
-	}
+	if (psolver == 0) throw FEBioImport::FailedAllocatingSolver(m_pim->m_szmod);
 
 	++tag;
 	do

@@ -71,7 +71,6 @@ public:
 protected:
 	int	m_dofP;	//!< pressure dof index
 	int	m_dofC;	//!< concentration (TODO: Move this since this solver doesn't handle concentration dofs)
-	int	m_dofVX, m_dofVY, m_dofVZ;
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

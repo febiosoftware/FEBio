@@ -42,12 +42,14 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 	m_ndeq = 0;
 	m_npeq = 0;
 
+	// Allocate degrees of freedom
+	DOFS& dofs = pfem->GetDOFS();
+	dofs.AddDOF("p");
+	dofs.AddDOF("c", 0);	// we start with zero concentrations
+
 	// get pressure dof
 	m_dofP = pfem->GetDOFIndex("p");
 	m_dofC = pfem->GetDOFIndex("c");
-	m_dofVX = pfem->GetDOFIndex("vx");
-	m_dofVY = pfem->GetDOFIndex("vy");
-	m_dofVZ = pfem->GetDOFIndex("vz");
 }
 
 //-----------------------------------------------------------------------------

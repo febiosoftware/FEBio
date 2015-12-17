@@ -23,10 +23,12 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 {
 	if (tag.isleaf()) return;
 
+	int nversion = m_pim->Version();
+
 	++tag;
 	do
 	{
-		if (m_pim->Version() < 0x0200)
+		if (nversion < 0x0200)
 		{
 			if      (tag == "fix"              ) ParseBCFix         (tag);
 			else if (tag == "prescribe"        ) ParseBCPrescribe   (tag);
@@ -35,7 +37,14 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 			else if (tag == "spring"           ) ParseSpringSection (tag);
 			else throw XMLReader::InvalidTag(tag);
 		}
-		else
+		else if (nversion == 0x0200)
+		{
+			if      (tag == "fix"              ) ParseBCFix20      (tag);
+			else if (tag == "prescribe"        ) ParseBCPrescribe20(tag);
+			else if (tag == "linear_constraint") ParseConstraints  (tag);
+			else throw XMLReader::InvalidTag(tag);
+		}
+		else if (nversion >= 0x0205)
 		{
 			if      (tag == "fix"              ) ParseBCFix20      (tag);
 			else if (tag == "prescribe"        ) ParseBCPrescribe20(tag);
@@ -547,6 +556,87 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 			++tag;
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! In version 2.5 all prescribed boundary conditions use a node set to define
+//! the list of nodes to which the bc is applied.
+void FEBioBoundarySection::ParseBCPrescribe25(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	DOFS& dofs = fem.GetDOFS();
+	int NN = mesh.Nodes();
+
+	// double-check the version
+	int nversion = m_pim->Version();
+	if (nversion < 0x0205) throw XMLReader::InvalidTag(tag);
+
+	// get the BC
+	const char* sz = tag.AttributeValue("bc");
+	int bc = dofs.GetDOF(sz);
+	if(bc == -1)
+	{
+		// TODO: For now concentrations have to be handled differently. I need to fix this.
+		if (sz[0]=='c')
+		{
+			int c = atoi(sz+1) - 1;
+			bc = fem.GetDOFIndex("c", c);
+		}
+	}
+	if (bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+
+	// create a prescribed bc
+	FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
+	pdc->SetDOF(bc);
+
+	// add this boundary condition to the current step
+	fem.AddPrescribedBC(pdc);
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddModelComponent(pdc);
+		pdc->Deactivate();
+	}
+
+	// Read the parameter list
+	++tag;
+	do
+	{
+		if (tag == "scale")
+		{
+			// get the value
+			double scale = 1.0;
+			tag.value(scale);
+
+			// get the load curve number
+			int lc = -1;
+			sz = tag.AttributeValue("lc", true);
+			if (sz) { lc = atoi(sz) - 1; }
+
+			pdc->SetScale(scale);
+			pdc->SetLoadCurveIndex(lc);
+		}
+		else if (tag == "relative")
+		{
+			// determine whether prescribed BC is relative or absolute
+			bool br = false;
+			tag.value(br);
+			pdc->SetRelativeFlag(br);
+		}
+		else if (tag == "node_set")
+		{
+			// find the node set
+			FENodeSet* pns = m_pim->ParseNodeSet(tag);
+			if (pns == 0) throw XMLReader::InvalidTag(tag);
+
+			// add the nodes
+			FENodeSet& ns = *pns;
+			int N = ns.size();
+			for (int i=0; i<N; ++i) pdc->AddNode(ns[i]);
+		}
+		++tag;
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------

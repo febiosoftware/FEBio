@@ -312,7 +312,7 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	// intialize some variables
 	m_pStep = 0;	// zero step pointer
 	m_nsteps = 0;	// reset step section counter
-	sprintf(m_szmod, "solid");
+	m_szmod[0] = 0;
 	m_nversion = -1;
 	m_szdmp[0] = 0;
 	m_szlog[0] = 0;
@@ -341,12 +341,6 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	// UT4 formulation off by default
 	m_but4 = false;
 
-	// Reset degrees of freedom (TODO: Can I do this elsewhere?)
-	// Perhaps the solver should be responsible for determining the dofs.
-	// NOTE: I commented this out for now since the DOFS are currently initialized in FEModel's c'tor.
-//	DOFS& dofs = fem.GetDOFS();
-//	dofs.Reset();
-
 	// extract the path
 	strcpy(m_szpath, szfile);
 	char* ch = strrchr(m_szpath, '\\');
@@ -361,7 +355,9 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioImport::ReadFile(const char* szfile)
+// This function parses the XML input file. The broot parameter is used to indicate
+// if this is the master file or an included file. 
+bool FEBioImport::ReadFile(const char* szfile, bool broot)
 {
 	// Open the XML file
 	XMLReader xml;
@@ -385,12 +381,74 @@ bool FEBioImport::ReadFile(const char* szfile)
 		// get the version number
 		ParseVersion(tag);
 
-		// FEBio2 only supports file version 1.2 and 2.0
+		// FEBio2 only supports file version 1.2, 2.0, and 2.5
 		if ((m_nversion != 0x0102) && 
-			(m_nversion != 0x0200)) throw InvalidVersion();
+			(m_nversion != 0x0200) && 
+			(m_nversion != 0x0205)) throw InvalidVersion();
+
+		// For versions before 2.5 we need to allocate all the degrees of freedom beforehand. 
+		// This is necessary because the Module section doesn't have to defined until a Control section appears.
+		// That means that model components that depend on DOFs can be defined before the Module tag (e.g. in multi-step analyses) and this leads to problems.
+		// In 2.5 this is solved by requiring that the Module tag is defined at the top of the file. 
+		if (broot && (m_nversion < 0x0205))
+		{
+			// We need to define a default Module type since before 2.5 this tag is optional for structural mechanics model definitions.
+			sprintf(m_szmod, "solid");
+
+			// Reset degrees of
+			FEModel& fem = *GetFEModel();
+			DOFS& dofs = fem.GetDOFS();
+			dofs.Reset();
+
+			// Add the default degrees of freedom
+			dofs.AddDOF("x");
+			dofs.AddDOF("y");
+			dofs.AddDOF("z");
+			dofs.AddDOF("u");
+			dofs.AddDOF("v");
+			dofs.AddDOF("w");
+			dofs.AddDOF("p");
+			dofs.AddDOF("Ru");
+			dofs.AddDOF("Rv");
+			dofs.AddDOF("Rw");
+			dofs.AddDOF("t");
+			dofs.AddDOF("vx");
+			dofs.AddDOF("vy");
+			dofs.AddDOF("vz");
+			dofs.AddDOF("e");
+			dofs.AddDOF("c", 0);	// we start with 0 concentration dofs. Concentrations dofs are added by the Solute tags. 
+		}
 
 		// parse the file
 		++tag;
+
+		// From version 2.5 and up the first tag of the master file has to be the Module tag.
+		if (broot && (m_nversion >= 0x0205))
+		{
+			if (tag != "Module")
+			{
+				return errf("First tag must be the Module section.\n\n");
+			}
+
+			// try to find a section parser
+			FEBioFileSectionMap::iterator is = m_map.find(tag.Name());
+
+			// make sure we found a section reader
+			if (is == m_map.end()) throw XMLReader::InvalidTag(tag);
+
+			// parse the module tag
+			is->second->Parse(tag);
+
+			// Now that the Module tag is read in, we'll want to create an analysis step.
+			// Creating an analysis step will allocate a solver class (based on the module) 
+			// and this in turn will allocate the degrees of freedom.
+			// TODO: This is kind of a round-about way and I really want to find a better solution.
+			GetStep();
+
+			// let's get the next tag
+			++tag;
+		}
+
 		do
 		{
 			// try to find a section parser
@@ -484,9 +542,25 @@ FEAnalysis* FEBioImport::GetStep()
 }
 
 //-----------------------------------------------------------------------------
+FESolver* FEBioImport::BuildSolver(const char* sztype, FEModel& fem)
+{
+	FESolver* ps = fecore_new<FESolver>(FESOLVER_ID, sztype, &fem);
+	return ps;
+}
+
+//-----------------------------------------------------------------------------
 FEAnalysis* FEBioImport::CreateNewStep()
 {
 	FEAnalysis* pstep = new FEAnalysis(m_pfem);
+
+	// make sure we have a solver defined
+	FESolver* psolver = pstep->GetFESolver();
+	if (psolver == 0)
+	{
+		psolver = BuildSolver(m_szmod, *GetFEModel());
+		if (psolver == 0) throw FEBioImport::FailedAllocatingSolver(m_szmod);
+		pstep->SetFESolver(psolver);
+	}
 	return pstep;
 }
 
@@ -758,4 +832,65 @@ void FEBioImport::AddPlotVariable(const char* szvar, vector<int>& item, const ch
 void FEBioImport::SetPlotCompression(int n)
 {
 	m_nplot_compression = n;
+}
+
+//-----------------------------------------------------------------------------
+// This tag parses a node set.
+FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	FENodeSet* pns = 0;
+
+	// If this is a leaf then the node set must already exist
+	if (tag.isleaf())
+	{
+		// get the set name
+		const char* szset = tag.AttributeValue("set");
+
+		// find the node set
+		pns = mesh.FindNodeSet(szset);
+		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
+	}
+	else
+	{
+		// This defines a node set, so we need a name tag
+		// (For now this name is optional)
+		const char* szname = tag.AttributeValue("name", true);
+		if (szname == 0) szname = "_unnamed";
+
+		// create a new node set
+		FENodeSet* pns = new FENodeSet(&mesh);
+		pns->SetName(szname);
+
+		// read the nodes
+		vector<int> l;
+		++tag;
+		do
+		{
+			if (tag == "node")
+			{
+				int nid = -1;
+				tag.AttributeValue("id", nid);
+				l.push_back(nid);
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+
+		// only add non-empty node sets
+		if (l.empty() == false)
+		{
+			// assign indices to node set
+			int N = l.size();
+			pns->create(N);
+			for (int i=0; i<N; ++i) (*pns)[i] = l[i] - 1;
+
+			// add the nodeset to the mesh
+			mesh.AddNodeSet(pns);
+		}
+		else { delete pns; pns = 0; }
+	}
+
+	return pns;
 }

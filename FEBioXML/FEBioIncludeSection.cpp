@@ -22,6 +22,6 @@ void FEBioIncludeSection::Parse(XMLTag& tag)
 	}
 
 	// read the file
-	if (m_pim->ReadFile(szin) == false)
+	if (m_pim->ReadFile(szin, false) == false)
 		throw XMLReader::InvalidValue(tag);
 }

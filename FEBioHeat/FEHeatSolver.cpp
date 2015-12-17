@@ -19,8 +19,12 @@ FEHeatSolver::FEHeatSolver(FEModel* pfem) : FELinearSolver(pfem)
 	m_niter = 0;
 	m_nrhs = 0;
 
+	// Allocate degrees of freedom
+	DOFS& dofs = pfem->GetDOFS();
+	dofs.AddDOF("t");
+
 	// set the active degrees of freedom for this solver
-	const int dof_T = pfem->GetDOFS().GetDOF("t");
+	const int dof_T = dofs.GetDOF("t");
 	vector<int> dof;
 	dof.push_back(dof_T);
 	SetDOF(dof);

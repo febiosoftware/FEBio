@@ -65,6 +65,21 @@ FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem)
 	m_beta = 0.25;
 	m_gamma = 0.5;
 
+	// Allocate degrees of freedom
+	DOFS& dofs = pfem->GetDOFS();
+	dofs.AddDOF("x");
+	dofs.AddDOF("y");
+	dofs.AddDOF("z");
+	dofs.AddDOF("u");
+	dofs.AddDOF("v");
+	dofs.AddDOF("w");
+	dofs.AddDOF("Ru");
+	dofs.AddDOF("Rv");
+	dofs.AddDOF("Rw");
+	dofs.AddDOF("vx");
+	dofs.AddDOF("vy");
+	dofs.AddDOF("vz");
+
 	// get the DOF indices
 	m_dofX = pfem->GetDOFIndex("x");
 	m_dofY = pfem->GetDOFIndex("y");

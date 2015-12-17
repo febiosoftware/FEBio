@@ -37,8 +37,12 @@ FEThermoElasticSolver::FEThermoElasticSolver(FEModel* pfem) : FESolidSolver(pfem
 	m_ndeq = 0;
 	m_nteq = 0;
 
-	// get the temperature degree of freedom index
+	// Allocate degrees of freedom
 	// (X,Y,Z) dofs are allocated in base class
+	DOFS& dofs = pfem->GetDOFS();
+	dofs.AddDOF("t");
+
+	// get the temperature degree of freedom index
 	m_dofT = m_fem.GetDOFS().GetDOF("t");
 }
 

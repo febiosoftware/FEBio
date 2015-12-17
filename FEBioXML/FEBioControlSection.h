@@ -10,6 +10,5 @@ public:
 	void Parse(XMLTag& tag);
 
 protected:
-	FESolver* BuildSolver(const char* sztype, FEModel& fem);
 	bool ParseCommonParams(XMLTag& tag);
 };
