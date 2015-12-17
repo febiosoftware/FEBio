@@ -5,6 +5,7 @@
 #include "FECore/FEShellDomain.h"
 #include "FECore/FETrussDomain.h"
 #include "FECore/FEDiscreteDomain.h"
+#include "FECore/FEDomain2D.h"
 #include <list>
 using namespace std;
 
@@ -207,6 +208,7 @@ protected:
 	void WriteShellDomain   (FEShellDomain&    dom);
 	void WriteTrussDomain   (FETrussDomain&    dom);
 	void WriteDiscreteDomain(FEDiscreteDomain& dom);
+    void WriteDomain2D      (FEDomain2D&       dom);
 
 	void WriteGlobalData  (FEModel& fem);
 	void WriteMaterialData(FEModel& fem);

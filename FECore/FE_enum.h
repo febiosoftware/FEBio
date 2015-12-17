@@ -222,6 +222,7 @@ enum FE_Dump_Level {
 #define	FE_DOMAIN_SURFACE	4
 #define	FE_DOMAIN_TRUSS		5
 #define	FE_DOMAIN_DISCRETE	6
+#define	FE_DOMAIN_2D		7
 
 // --- data types ---
 enum Var_Type { PLT_FLOAT, PLT_VEC3F, PLT_MAT3FS, PLT_MAT3FD, PLT_TENS4FS, PLT_MAT3F };

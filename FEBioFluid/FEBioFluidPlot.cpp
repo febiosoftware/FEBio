@@ -101,57 +101,33 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
 //-----------------------------------------------------------------------------
 bool FEPlotElasticFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 {
-	if (dom.Class() == FE_DOMAIN_SOLID)
+    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
+    if (pme == 0) return false;
+    
+    // write solid element data
+    int N = dom.Elements();
+    for (int i=0; i<N; ++i)
     {
-        FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-        if (dynamic_cast<FEFluidDomain3D* >(&bd))
+        FEElement& el = dom.ElementRef(i);
+        
+        int nint = el.GaussPoints();
+        double f = 1.0 / (double) nint;
+        
+        // since the PLOT file requires floats we need to convert
+        // the doubles to single precision
+        // we output the average elastic pressure values of the gauss points
+        double r = 0;
+        for (int j=0; j<nint; ++j)
         {
-            for (int i=0; i<bd.Elements(); ++i)
-            {
-                FESolidElement& el = bd.Element(i);
-                
-                // calculate average pressure
-                double ew = 0;
-                for (int j=0; j<el.GaussPoints(); ++j)
-                {
-                    FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-                    FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
-                    
-                    if (pt) ew += pt->m_p;
-                }
-                ew /= el.GaussPoints();
-                
-                a << ew;
-            }
-            return true;
+            FEFluidMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEFluidMaterialPoint>());
+            if (ppt) r += ppt->m_p;
         }
+        r *= f;
+        
+        a << r;
     }
-    else if (dom.Class() == FE_DOMAIN_SHELL)
-    {
-        FEShellDomain& bd = static_cast<FEShellDomain&>(dom);
-        if (dynamic_cast<FEFluidDomain2D*>(&bd))
-        {
-            for (int i=0; i<bd.Elements(); ++i)
-            {
-                FEShellElement& el = bd.Element(i);
-                
-                // calculate average pressure
-                double ew = 0;
-                for (int j=0; j<el.GaussPoints(); ++j)
-                {
-                    FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-                    FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
-                    
-                    if (pt) ew += pt->m_p;
-                }
-                ew /= el.GaussPoints();
-                
-                a << ew;
-            }
-            return true;
-        }
-    }
-	return false;
+    
+    return true;
 }
 
 //-----------------------------------------------------------------------------

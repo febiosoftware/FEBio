@@ -9,6 +9,7 @@
 #include "FETrussDomain.h"
 #include "FEShellDomain.h"
 #include "FESolidDomain.h"
+#include "FEDomain2D.h"
 #include "FEMaterial.h"
 #include "log.h"
 #include "DOFS.h"
@@ -281,6 +282,11 @@ int FEMesh::ShellElements()
 			FEShellDomain& sd = static_cast<FEShellDomain&>(*m_Domain[i]);
 			N += sd.Elements();
 		}
+        else if (m_Domain[i]->Class() == FE_DOMAIN_2D)
+        {
+            FEDomain2D& sd = static_cast<FEDomain2D&>(*m_Domain[i]);
+            N += sd.Elements();
+        }
 	}
 	return N;
 }

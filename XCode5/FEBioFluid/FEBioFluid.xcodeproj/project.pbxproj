@@ -42,6 +42,8 @@
 		D5691CC61BAA2F3B0066FAC1 /* FEIdealFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D5691CC41BAA2F3B0066FAC1 /* FEIdealFluid.h */; };
 		D5A32E0D1C20982A00162B01 /* FEFluidDomain2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A32E0B1C20982A00162B01 /* FEFluidDomain2D.cpp */; };
 		D5A32E0E1C20982A00162B01 /* FEFluidDomain2D.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A32E0C1C20982A00162B01 /* FEFluidDomain2D.h */; };
+		D5A32E131C230CDC00162B01 /* FEFluidDomain3D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A32E111C230CDC00162B01 /* FEFluidDomain3D.cpp */; };
+		D5A32E141C230CDC00162B01 /* FEFluidDomain3D.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A32E121C230CDC00162B01 /* FEFluidDomain3D.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -81,6 +83,8 @@
 		D5691CC41BAA2F3B0066FAC1 /* FEIdealFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEIdealFluid.h; sourceTree = "<group>"; };
 		D5A32E0B1C20982A00162B01 /* FEFluidDomain2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidDomain2D.cpp; sourceTree = "<group>"; };
 		D5A32E0C1C20982A00162B01 /* FEFluidDomain2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidDomain2D.h; sourceTree = "<group>"; };
+		D5A32E111C230CDC00162B01 /* FEFluidDomain3D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidDomain3D.cpp; sourceTree = "<group>"; };
+		D5A32E121C230CDC00162B01 /* FEFluidDomain3D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidDomain3D.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +133,8 @@
 				D53C4F8D1B9C837800718FBC /* FEFluidDomain.h */,
 				D5A32E0B1C20982A00162B01 /* FEFluidDomain2D.cpp */,
 				D5A32E0C1C20982A00162B01 /* FEFluidDomain2D.h */,
+				D5A32E111C230CDC00162B01 /* FEFluidDomain3D.cpp */,
+				D5A32E121C230CDC00162B01 /* FEFluidDomain3D.h */,
 				D53C4F861B9C837800718FBC /* FEFluidDomainFactory.cpp */,
 				D53C4F871B9C837800718FBC /* FEFluidDomainFactory.h */,
 				D53C4FB61B9D242600718FBC /* FEFluidResidualVector.cpp */,
@@ -160,6 +166,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5A32E141C230CDC00162B01 /* FEFluidDomain3D.h in Headers */,
 				D53C4FA11B9C85DD00718FBC /* stdafx.h in Headers */,
 				D53C4FB11B9CA58400718FBC /* FEViscousFluid.h in Headers */,
 				D50876FD1BBB6C18007D55F1 /* FECarreauFluid.h in Headers */,
@@ -241,6 +248,7 @@
 				D53C4FB01B9CA58400718FBC /* FEViscousFluid.cpp in Sources */,
 				D53C4F941B9C837800718FBC /* FEBioFluidPlot.cpp in Sources */,
 				D53C4F981B9C837800718FBC /* FEFluid.cpp in Sources */,
+				D5A32E131C230CDC00162B01 /* FEFluidDomain3D.cpp in Sources */,
 				D50876FC1BBB6C18007D55F1 /* FECarreauFluid.cpp in Sources */,
 				D53C4FA81B9C92D900718FBC /* FEIdealGas.cpp in Sources */,
 				D53C4FC21B9E306800718FBC /* FEFluidTractionLoad.cpp in Sources */,

@@ -7,15 +7,15 @@
 //
 
 #pragma once
-#include "FECore/FEShellDomain.h"
+#include "FECore/FEDomain2D.h"
 #include "FECore/FEModel.h"
 #include "FEFluidDomain.h"
 #include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
-//! domain described by 3D volumetric elements
+//! domain described by 2D elements
 //!
-class FEFluidDomain2D : public FEShellDomain, public FEFluidDomain
+class FEFluidDomain2D : public FEDomain2D, public FEFluidDomain
 {
 public:
     //! constructor
