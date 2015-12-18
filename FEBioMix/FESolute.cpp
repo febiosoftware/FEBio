@@ -128,7 +128,7 @@ void FESolute::Serialize(DumpFile& ar)
 bool FESolute::SetAttribute(const char* szname, const char* szval)
 {
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	if (strcmp(szname, "sol") == 0)

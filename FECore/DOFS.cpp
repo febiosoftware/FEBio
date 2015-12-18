@@ -13,16 +13,6 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------
-DOFS* DOFS::m_pdofs = 0;
-
-//-----------------------------------------------------------------------------
-DOFS* DOFS::GetInstance()
-{
-	if (m_pdofs == 0) m_pdofs = new DOFS();
-	return m_pdofs;
-}
-
-//-----------------------------------------------------------------------------
 // constructor for the DOFS class
 DOFS::DOFS()
 {
@@ -30,10 +20,18 @@ DOFS::DOFS()
 }
 
 //-----------------------------------------------------------------------------
-void DOFS::Reset()
+DOFS::DOFS(const DOFS& dofs)
 {
-	// clear the DOFS
-	if (m_dof.empty() == false) m_dof.clear();
+	m_dof = dofs.m_dof;
+	m_maxdofs = dofs.m_maxdofs;
+}
+
+//-----------------------------------------------------------------------------
+DOFS& DOFS::operator = (const DOFS& dofs)
+{
+	m_dof = dofs.m_dof;
+	m_maxdofs = dofs.m_maxdofs;
+	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -41,7 +39,13 @@ void DOFS::Reset()
 //
 DOFS::~DOFS()
 {
-	m_pdofs = 0;
+}
+
+//-----------------------------------------------------------------------------
+void DOFS::Reset()
+{
+	// clear the DOFS
+	if (m_dof.empty() == false) m_dof.clear();
 }
 
 //-----------------------------------------------------------------------------

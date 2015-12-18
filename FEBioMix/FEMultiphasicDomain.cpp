@@ -28,7 +28,7 @@ void FEMultiphasicDomain::SetMaterial(FEMaterial* pmat)
 void FEMultiphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
     // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	int N = el.Nodes();

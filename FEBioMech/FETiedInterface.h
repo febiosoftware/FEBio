@@ -61,10 +61,6 @@ public:
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEStiffnessMatrix& K);
 
-private:
-	//! copy constructor hidden
-	FETiedInterface(FETiedInterface& si){}
-
 public:
 	FETiedContactSurface	ss;	//!< slave surface
 	FETiedContactSurface	ms;	//!< master surface

@@ -19,7 +19,7 @@ class FESlidingSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FESlidingSurface(FEMesh* pm=0) : FEContactSurface(pm) {}
+	FESlidingSurface(FEModel* pfem) : FEContactSurface(pfem) {}
 
 	//! Initializes data structures
 	bool Init();
@@ -129,10 +129,6 @@ protected:
 
 	//! map the frictional data from the old element to the new element
 	void MapFrictionData(int inode, FESlidingSurface& ss, FESlidingSurface& ms, FESurfaceElement& sn, FESurfaceElement& so, vec3d& q);
-
-private:
-	//! copy constructor hidden
-	FESlidingInterface(FESlidingInterface& si){}
 
 public:
 	FESlidingSurface	m_ss;	//!< slave surface

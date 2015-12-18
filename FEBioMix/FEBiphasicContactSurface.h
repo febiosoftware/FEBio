@@ -7,7 +7,7 @@ class FEBiphasicContactSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FEBiphasicContactSurface(FEMesh* pm = 0);
+	FEBiphasicContactSurface(FEModel* pfem);
 
 	//! destructor
 	~FEBiphasicContactSurface();

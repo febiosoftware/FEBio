@@ -22,12 +22,12 @@ END_PARAMETER_LIST();
 ///////////////////////////////////////////////////////////////////////////////
 
 
-FERigidWallSurface::FERigidWallSurface(FEMesh* pm) : FESurface(pm) 
+FERigidWallSurface::FERigidWallSurface(FEModel* pfem) : FESurface(&pfem->GetMesh()) 
 { 
 	m_NQ.Attach(this); 
 
 	// I want to use the FEModel class for this, but don't know how
-	DOFS& dofs = *DOFS::GetInstance();
+	DOFS& dofs = pfem->GetDOFS();
 	m_dofX = dofs.GetDOF("x");
 	m_dofY = dofs.GetDOF("y");
 	m_dofZ = dofs.GetDOF("z");
@@ -210,7 +210,7 @@ void FERigidWallSurface::UnpackLM(FEElement& el, vector<int>& lm)
 
 //-----------------------------------------------------------------------------
 //! constructor
-FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh())
+FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem)
 {
 	static int count = 1;
 	SetID(count++);

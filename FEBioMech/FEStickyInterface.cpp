@@ -113,7 +113,7 @@ void FEStickySurface::GetNodalContactTraction(int nface, vec3d* tn)
 
 //-----------------------------------------------------------------------------
 //! Constructor. Initialize default values.
-FEStickyInterface::FEStickyInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&pfem->GetMesh()), ms(&pfem->GetMesh())
+FEStickyInterface::FEStickyInterface(FEModel* pfem) : FEContactInterface(pfem), ss(pfem), ms(pfem)
 {
 	static int count = 1;
 	SetID(count++);

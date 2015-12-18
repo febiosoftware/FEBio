@@ -386,7 +386,7 @@ void FESlidingSurface::GetNodalContactTraction(int nface, vec3d* tn)
 
 //-----------------------------------------------------------------------------
 //! constructor
-FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
+FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
 	static int count = 1;
 	SetID(count++);

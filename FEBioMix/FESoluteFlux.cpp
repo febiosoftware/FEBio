@@ -71,10 +71,11 @@ bool FESoluteFlux::SetFacetAttribute(int nface, const char* szatt, const char* s
 //-----------------------------------------------------------------------------
 void FESoluteFlux::UnpackLM(FEElement& el, vector<int>& lm)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
     // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	int N = el.Nodes();

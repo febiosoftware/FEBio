@@ -22,7 +22,7 @@ class FERigidWallSurface : public FESurface
 {
 public:
 	//! constructor
-	FERigidWallSurface(FEMesh* pm=0);
+	FERigidWallSurface(FEModel* pfem);
 
 	//! Initializes data structures
 	bool Init();
@@ -130,10 +130,6 @@ public: // inherited from FECoreBase
 
 	//! set a property (returns false on error)
 	bool SetProperty(int i, FECoreBase* pm);
-
-private:
-	//! copy constructor hidden
-	FERigidWallInterface(FERigidWallInterface& ri){}
 
 public:
 	FERigidWallSurface	m_ss;		//!< slave surface

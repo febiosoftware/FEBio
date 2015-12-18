@@ -12,7 +12,7 @@ class FETiedContactSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FETiedContactSurface(FEMesh* pm=0) : FEContactSurface(pm) { m_boffset = false; }
+	FETiedContactSurface(FEModel* pfem) : FEContactSurface(pfem) { m_boffset = false; }
 
 	//! Initializes data structures
 	bool Init();

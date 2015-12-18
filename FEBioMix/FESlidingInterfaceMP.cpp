@@ -53,7 +53,7 @@ FESlidingSurfaceMP::Data::Data()
 // FESlidingSurfaceMP
 //-----------------------------------------------------------------------------
 
-FESlidingSurfaceMP::FESlidingSurfaceMP(FEModel* pfem) : FEBiphasicContactSurface(&pfem->GetMesh())
+FESlidingSurfaceMP::FESlidingSurfaceMP(FEModel* pfem) : FEBiphasicContactSurface(pfem)
 { 
 	m_bporo = m_bsolu = false;
 	m_pfem = pfem; 
@@ -70,7 +70,7 @@ FESlidingSurfaceMP::~FESlidingSurfaceMP()
 void FESlidingSurfaceMP::UnpackLM(FEElement& el, vector<int>& lm)
 {
     // get nodal DOFS
-    DOFS& dofs = *DOFS::GetInstance();
+    DOFS& dofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = dofs.GetDOFSize("c");
     
 	int N = el.Nodes();
@@ -105,7 +105,7 @@ bool FESlidingSurfaceMP::Init()
 	if (FEBiphasicContactSurface::Init() == false) return false;
 
 	// store concentration index
-	DOFS& dofs = *DOFS::GetInstance();
+	DOFS& dofs = GetFEModel()->GetDOFS();
 	m_dofC = dofs.GetDOF("c");
 	
 	m_nn.assign(Nodes(), vec3d(0,0,0));
@@ -542,7 +542,7 @@ FESlidingInterfaceMP::FESlidingInterfaceMP(FEModel* pfem) : FEContactInterface(p
 	SetID(count++);
 	
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = pfem->GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	// initial values
@@ -583,7 +583,7 @@ FESlidingInterfaceMP::~FESlidingInterfaceMP()
 bool FESlidingInterfaceMP::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
 {
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	if (strcmp(p.m_szname, "ambient_concentration") == 0)
@@ -624,7 +624,7 @@ bool FESlidingInterfaceMP::Init()
 	}
 
     // cycle through all the solutes and determine ambient concentrations
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = GetFEModel()->GetDOFS();
     int nsol = fedofs.GetDOFSize("c");
     
 	itridmap it;
@@ -1223,7 +1223,7 @@ void FESlidingInterfaceMP::Update(int niter)
 	FEModel& fem = *GetFEModel();
 	
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	double R = m_srad*GetFEModel()->GetMesh().GetBoundingBox().radius();
@@ -2312,7 +2312,7 @@ void FESlidingInterfaceMP::MarkAmbient()
 	int i, j, id, np;
 	
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	// Mark all nodes as free-draining.  This needs to be done for ALL
@@ -2367,7 +2367,7 @@ void FESlidingInterfaceMP::SetAmbient()
 	int i, j, np;
 	
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	// Set the pressure to zero for the free-draining nodes

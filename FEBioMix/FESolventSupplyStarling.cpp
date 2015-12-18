@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include "FESolventSupplyStarling.h"
 #include "FESolutesMaterialPoint.h"
-#include "FECore/DOFS.h"
+#include "FECore/FEModel.h"
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESolventSupplyStarling, FESolventSupply)
@@ -21,7 +21,7 @@ FESolventSupplyStarling::FESolventSupplyStarling(FEModel* pfem) : FESolventSuppl
 	m_pv = 0;
 
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+	DOFS& fedofs = pfem->GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
     m_qc.assign(MAX_CDOFS,0);
@@ -32,7 +32,7 @@ FESolventSupplyStarling::FESolventSupplyStarling(FEModel* pfem) : FESolventSuppl
 bool FESolventSupplyStarling::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
 {
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	if (strcmp(p.m_szname, "qc") == 0)

@@ -10,7 +10,7 @@
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-FEMortarTiedSurface::FEMortarTiedSurface(FEMesh* pm) : FEMortarContactSurface(pm) {}
+FEMortarTiedSurface::FEMortarTiedSurface(FEModel* pfem) : FEMortarContactSurface(pfem) {}
 
 //-----------------------------------------------------------------------------
 bool FEMortarTiedSurface::Init()
@@ -42,7 +42,7 @@ BEGIN_PARAMETER_LIST(FEMortarTiedContact, FEMortarInterface)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEMortarTiedContact::FEMortarTiedContact(FEModel* pfem) : FEMortarInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
+FEMortarTiedContact::FEMortarTiedContact(FEModel* pfem) : FEMortarInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
 	m_dofX = pfem->GetDOFIndex("x");
 	m_dofY = pfem->GetDOFIndex("y");

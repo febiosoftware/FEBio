@@ -7,7 +7,7 @@
 //
 
 #include "FEReactionRateNims.h"
-#include "FECore/DOFS.h"
+#include "FECore/FEModel.h"
 
 // Material parameters for the FEMultiphasic material
 BEGIN_PARAMETER_LIST(FEReactionRateNims, FEMaterial)
@@ -28,7 +28,7 @@ void FEReactionRateNims::Init()
     // do only once
     if (m_lid == -1) {
         // get number of DOFS
-        DOFS& fedofs = *DOFS::GetInstance();
+        DOFS& fedofs = GetFEModel()->GetDOFS();
         int MAX_CDOFS = fedofs.GetDOFSize("c");
         // check validity of sol
         if (m_sol < 1 || m_sol > MAX_CDOFS)

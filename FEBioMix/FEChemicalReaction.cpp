@@ -46,7 +46,7 @@ void FEChemicalReaction::SetParameter(FEParam& p)
 bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
 {
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	if (strcmp(p.m_szname, "vR") == 0)

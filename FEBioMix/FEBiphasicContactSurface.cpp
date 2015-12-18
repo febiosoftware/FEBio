@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "FEBiphasicContactSurface.h"
-#include "FECore/DOFS.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-FEBiphasicContactSurface::FEBiphasicContactSurface(FEMesh* pm) : FEContactSurface(pm)
+FEBiphasicContactSurface::FEBiphasicContactSurface(FEModel* pfem) : FEContactSurface(pfem)
 {
 	m_dofP = -1;
 }
@@ -17,7 +17,7 @@ FEBiphasicContactSurface::~FEBiphasicContactSurface()
 bool FEBiphasicContactSurface::Init()
 {
 	// I want to use the FEModel class for this, but don't know how
-	DOFS& dofs = *DOFS::GetInstance();
+	DOFS& dofs = GetFEModel()->GetDOFS();
 	m_dofP = dofs.GetDOF("p");
 	return FEContactSurface::Init();
 }

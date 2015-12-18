@@ -22,7 +22,7 @@ public:
 
 public:
 	//! constructor
-	FEFacetTiedSurface(FEMesh* pm);
+	FEFacetTiedSurface(FEModel* pfem);
 
 	//! Initialization
 	bool Init();

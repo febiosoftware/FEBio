@@ -138,7 +138,7 @@ void FEPeriodicSurface::GetNodalContactTraction(int nface, vec3d* tn)
 // FEPeriodicBoundary
 //-----------------------------------------------------------------------------
 
-FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
+FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
 	static int count = 1;
 	SetID(count++);

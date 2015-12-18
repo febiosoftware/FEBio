@@ -91,7 +91,7 @@ void FESurfaceConstraintSurface::Serialize(DumpFile& ar)
 // FESurfaceConstraint
 //-----------------------------------------------------------------------------
 
-FESurfaceConstraint::FESurfaceConstraint(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
+FESurfaceConstraint::FESurfaceConstraint(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
 	static int count = 1;
 	SetID(count++);

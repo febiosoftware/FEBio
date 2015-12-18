@@ -2,7 +2,7 @@
 #include "FEMortarContactSurface.h"
 
 //-----------------------------------------------------------------------------
-FEMortarContactSurface::FEMortarContactSurface(FEMesh* pm) : FEContactSurface(pm)
+FEMortarContactSurface::FEMortarContactSurface(FEModel* pfem) : FEContactSurface(pfem)
 {
 }
 

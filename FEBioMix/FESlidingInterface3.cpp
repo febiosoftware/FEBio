@@ -54,7 +54,7 @@ FESlidingSurface3::Data::Data()
 // FESlidingSurface3
 //-----------------------------------------------------------------------------
 
-FESlidingSurface3::FESlidingSurface3(FEModel* pfem) : FEBiphasicContactSurface(&pfem->GetMesh())
+FESlidingSurface3::FESlidingSurface3(FEModel* pfem) : FEBiphasicContactSurface(pfem)
 { 
 	m_bporo = m_bsolu = false;
 	m_pfem = pfem; 
@@ -71,7 +71,7 @@ FESlidingSurface3::~FESlidingSurface3()
 void FESlidingSurface3::UnpackLM(FEElement& el, vector<int>& lm)
 {
     // get nodal DOFS
-    DOFS& dofs = *DOFS::GetInstance();
+    DOFS& dofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = dofs.GetDOFSize("c");
     
 	int N = el.Nodes();
@@ -106,7 +106,7 @@ bool FESlidingSurface3::Init()
 	if (FEBiphasicContactSurface::Init() == false) return false;
 	
 	// store concentration index
-	DOFS& dofs = *DOFS::GetInstance();
+	DOFS& dofs = GetFEModel()->GetDOFS();
 	m_dofC = dofs.GetDOF("c");
 
 	// allocate data structures
@@ -1102,7 +1102,7 @@ void FESlidingInterface3::Update(int niter)
 	FEModel& fem = *GetFEModel();
 
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	double R = m_srad*fem.GetMesh().GetBoundingBox().radius();
@@ -2306,7 +2306,7 @@ void FESlidingInterface3::MarkAmbient()
 	// free-draining.
 
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	for (int np=0; np<2; ++np)
@@ -2353,7 +2353,7 @@ void FESlidingInterface3::MarkAmbient()
 void FESlidingInterface3::SetAmbient()
 {	
     // get number of DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
+    DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     
 	// Set the pressure to zero for the free-draining nodes

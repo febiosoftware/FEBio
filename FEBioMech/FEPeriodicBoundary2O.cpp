@@ -21,7 +21,7 @@ END_PARAMETER_LIST();
 // FEPeriodicBoundary
 //-----------------------------------------------------------------------------
 
-FEPeriodicBoundary2O::FEPeriodicBoundary2O(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
+FEPeriodicBoundary2O::FEPeriodicBoundary2O(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
 	static int count = 1;
 	SetID(count++);

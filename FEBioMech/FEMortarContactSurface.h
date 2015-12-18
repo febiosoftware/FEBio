@@ -6,7 +6,7 @@
 class FEMortarContactSurface : public FEContactSurface
 {
 public:
-	FEMortarContactSurface(FEMesh* pm = 0);
+	FEMortarContactSurface(FEModel* pfem);
 
 	//! Initializes data structures
 	bool Init();

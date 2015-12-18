@@ -15,7 +15,6 @@
 
 //-----------------------------------------------------------------------------
 //! Class that is used for setting number of nodal degrees of freedom
-
 //! Note that this class is implemented as a singleton, in other words, only one
 //! instance can be created.
 
@@ -29,8 +28,10 @@ class DOFS
 	};
 
 public:
-	//! obtain a pointer to the DOFS
-	static DOFS* GetInstance();
+	// constructors
+	DOFS();
+	DOFS(const DOFS& dofs);
+	DOFS& operator = (const DOFS& dofs);
     
 	//! destructor
 	~DOFS();
@@ -61,13 +62,7 @@ public:
 	int GetDOFSize(const char* sz);
 
 private:
-	//! constructor is private so that you cannot create it directly
-	DOFS();
-	DOFS(const DOFS& dofs) {}
 	void Update();
-    
-protected:
-	static DOFS* m_pdofs;	//!< the one and only DOFS
     
 private:
 	std::vector<DOF_ITEM>		m_dof;		//!< array of dof symbols

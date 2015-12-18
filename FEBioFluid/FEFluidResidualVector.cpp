@@ -24,10 +24,6 @@ void FEFluidResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<d
     
     vec3d a, d;
     
-    
-    // get nodal DOFS
-    DOFS& fedofs = *DOFS::GetInstance();
-    int MAX_NDOFS = fedofs.GetNDOFS();
     //#pragma omp critical
     {
         // assemble the element residual into the global residual
@@ -57,6 +53,10 @@ void FEFluidResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<d
         
         if (m_fem.m_LinC.size() > 0)
         {
+		    // get nodal DOFS
+			DOFS& fedofs = m_fem.GetDOFS();
+			int MAX_NDOFS = fedofs.GetNDOFS();
+
             // loop over all degrees of freedom of this element
             for (i=0; i<ndof; ++i)
             {

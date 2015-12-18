@@ -8,7 +8,7 @@ class FEPeriodicSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FEPeriodicSurface(FEMesh* pm = 0) : FEContactSurface(pm) {}
+	FEPeriodicSurface(FEModel* pfem) : FEContactSurface(pfem) {}
 
 	//! initializes data
 	bool Init();

@@ -43,7 +43,7 @@ FEFacetSlidingSurface::Data::Data()
 // FEFacetSlidingSurface
 //-----------------------------------------------------------------------------
 
-FEFacetSlidingSurface::FEFacetSlidingSurface(FEMesh* pm) : FEContactSurface(pm)
+FEFacetSlidingSurface::FEFacetSlidingSurface(FEModel* pfem) : FEContactSurface(pfem)
 {
 	// define class exports
 	EXPORT_DATA(PLT_VEC3F, FMT_NODE, &m_Fn, "contact nodal forces");
@@ -301,7 +301,7 @@ void FEFacetSlidingSurface::GetNodalContactTraction(int nface, vec3d* tn)
 // FEFacet2FacetSliding
 //-----------------------------------------------------------------------------
 
-FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
+FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
 	static int ncount = 1;
 	SetID(ncount++);

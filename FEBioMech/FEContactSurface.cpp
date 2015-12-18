@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "FEContactSurface.h"
-#include "FECore/DOFS.h"
+#include "FECore/FEModel.h"
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
-FEContactSurface::FEContactSurface(FEMesh* pm) : FESurface(pm) 
+FEContactSurface::FEContactSurface(FEModel* pfem) : FESurface(&pfem->GetMesh()), m_pfem(pfem)
 {
 	m_pSibling = 0; 
 	m_dofX = -1;
@@ -19,7 +19,7 @@ FEContactSurface::~FEContactSurface() { m_pSibling = 0; }
 bool FEContactSurface::Init()
 {
 	// I want to use the FEModel class for this, but don't know how
-	DOFS& dofs = *DOFS::GetInstance();
+	DOFS& dofs = GetFEModel()->GetDOFS();
 	m_dofX = dofs.GetDOF("x");
 	m_dofY = dofs.GetDOF("y");
 	m_dofZ = dofs.GetDOF("z");

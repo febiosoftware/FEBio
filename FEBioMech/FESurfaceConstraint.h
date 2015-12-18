@@ -8,7 +8,7 @@ class FESurfaceConstraintSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FESurfaceConstraintSurface(FEMesh* pm = 0) : FEContactSurface(pm) { m_nref = -1; }
+	FESurfaceConstraintSurface(FEModel* pfem) : FEContactSurface(pfem) { m_nref = -1; }
 
 	//! initializes data
 	bool Init();

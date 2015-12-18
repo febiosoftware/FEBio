@@ -27,7 +27,7 @@ public:
 
 public:
 	//! constructor
-	FEStickySurface(FEMesh* pm=0) : FEContactSurface(pm) {}
+	FEStickySurface(FEModel* pfem) : FEContactSurface(pfem) {}
 
 	//! Initializes data structures
 	bool Init();
@@ -97,10 +97,6 @@ public:
 
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEStiffnessMatrix& K);
-
-private:
-	//! copy constructor hidden
-	FEStickyInterface(FEStickyInterface& si){}
 
 public:
 	FEStickySurface	ss;	//!< slave surface

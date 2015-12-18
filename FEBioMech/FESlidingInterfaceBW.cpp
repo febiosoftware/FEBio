@@ -41,7 +41,7 @@ FESlidingSurfaceBW::Data::Data()
 // FESlidingSurfaceBW
 //-----------------------------------------------------------------------------
 
-FESlidingSurfaceBW::FESlidingSurfaceBW(FEModel* pfem) : FEContactSurface(&pfem->GetMesh())
+FESlidingSurfaceBW::FESlidingSurfaceBW(FEModel* pfem) : FEContactSurface(pfem)
 { 
 	m_pfem = pfem; 
 }

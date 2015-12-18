@@ -333,6 +333,9 @@ protected:
 	FEAnalysis*					m_pStep;	//!< pointer to current analysis step
 
 protected:
+	// DOFS data
+	DOFS	m_dofs;				//!< list of degree of freedoms in this model
+
 	// Geometry data
 	FEMesh		m_mesh;			//!< the one and only FE mesh
 

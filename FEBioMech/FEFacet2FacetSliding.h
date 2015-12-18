@@ -26,7 +26,7 @@ public:
 
 public:
 	//! constructor
-	FEFacetSlidingSurface(FEMesh* pm);
+	FEFacetSlidingSurface(FEModel* pfem);
 
 	//! initialization
 	bool Init();

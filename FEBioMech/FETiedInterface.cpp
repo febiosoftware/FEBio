@@ -26,7 +26,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. Initialize default values.
-FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&pfem->GetMesh()), ms(&pfem->GetMesh())
+FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(pfem), ms(pfem)
 {
 	static int count = 1;
 	SetID(count++);

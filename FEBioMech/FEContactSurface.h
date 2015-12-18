@@ -13,7 +13,7 @@ class FEContactSurface : public FESurface
 {
 public:
 	//! constructor
-	FEContactSurface(FEMesh* pm=0);
+	FEContactSurface(FEModel* pfem);
 
 	//! destructor
 	~FEContactSurface();
@@ -35,8 +35,11 @@ public:
 	virtual vec3d GetContactForce();
     virtual double GetContactArea();
 
+	FEModel* GetFEModel() { return m_pfem; }
+
 protected:
 	FEContactSurface* m_pSibling;
+	FEModel*	m_pfem;
 
 	int	m_dofX;
 	int	m_dofY;

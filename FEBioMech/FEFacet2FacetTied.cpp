@@ -26,7 +26,7 @@ FEFacetTiedSurface::Data::Data()
 }
 
 //-----------------------------------------------------------------------------
-FEFacetTiedSurface::FEFacetTiedSurface(FEMesh* pm) : FEContactSurface(pm)
+FEFacetTiedSurface::FEFacetTiedSurface(FEModel* pfem) : FEContactSurface(pfem)
 {
 
 }
@@ -124,7 +124,7 @@ void FEFacetTiedSurface::Serialize(DumpFile &ar)
 }
 
 //=============================================================================
-FEFacet2FacetTied::FEFacet2FacetTied(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
+FEFacet2FacetTied::FEFacet2FacetTied(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
 	// give this interface an ID
 	static int count = 1;
