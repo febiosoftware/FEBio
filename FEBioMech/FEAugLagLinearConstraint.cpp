@@ -34,6 +34,7 @@ void FEAugLagLinearConstraint::Serialize(DumpFile& ar)
 BEGIN_PARAMETER_LIST(FELinearConstraintSet, FENLConstraint)
 	ADD_PARAMETER(m_tol, FE_PARAM_DOUBLE, "tol");
 	ADD_PARAMETER(m_eps, FE_PARAM_DOUBLE, "penalty");
+    ADD_PARAMETER(m_rhs, FE_PARAM_DOUBLE, "rhs");
 	ADD_PARAMETER(m_naugmin, FE_PARAM_INT, "minaug");
 	ADD_PARAMETER(m_naugmax, FE_PARAM_INT, "maxaug");
 END_PARAMETER_LIST();
@@ -46,6 +47,7 @@ FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FENLConstraint(pfe
 
 	m_eps = 1;
 	m_tol = 0.1;
+    m_rhs = 0;
 	m_naugmax = 50;
 	m_naugmin = 0;
 }
@@ -91,7 +93,7 @@ bool FELinearConstraintSet::Augment(int naug, const FETimePoint& tp)
 	for (i=0; i<M; ++i, ++im)
 	{
 		FEAugLagLinearConstraint& LC = *(*im);
-		double c = constraint(LC);
+		double c = constraint(LC) - m_rhs;
 		double lam = LC.m_lam + m_eps*c;
 
 		L0 += LC.m_lam*LC.m_lam;
@@ -119,7 +121,7 @@ bool FELinearConstraintSet::Augment(int naug, const FETimePoint& tp)
 		for (i=0; i<M; ++i, ++im)
 		{
 			FEAugLagLinearConstraint& LC = *(*im);
-			double c = constraint(LC);
+			double c = constraint(LC) - m_rhs;
 			LC.m_lam += m_eps*c;
 		}
 	}

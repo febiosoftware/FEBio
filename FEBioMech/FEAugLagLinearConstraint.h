@@ -77,6 +77,7 @@ public:
 public:
 	double	m_tol;	//!< augmentation tolerance
 	double	m_eps;	//!< penalty factor
+    double  m_rhs;  //!< right-hand-side of linear constraint equation
 	int		m_naugmax;	//!< max nr of augmentations
 	int		m_naugmin;	//!< min nf of augmentations
 
