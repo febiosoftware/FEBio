@@ -7,16 +7,25 @@
 FEContactSurface::FEContactSurface(FEMesh* pm) : FESurface(pm) 
 {
 	m_pSibling = 0; 
+	m_dofX = -1;
+	m_dofY = -1;
+	m_dofZ = -1;
+}
 
+//-----------------------------------------------------------------------------
+FEContactSurface::~FEContactSurface() { m_pSibling = 0; }
+
+//-----------------------------------------------------------------------------
+bool FEContactSurface::Init()
+{
 	// I want to use the FEModel class for this, but don't know how
 	DOFS& dofs = *DOFS::GetInstance();
 	m_dofX = dofs.GetDOF("x");
 	m_dofY = dofs.GetDOF("y");
 	m_dofZ = dofs.GetDOF("z");
-}
 
-//-----------------------------------------------------------------------------
-FEContactSurface::~FEContactSurface() { m_pSibling = 0; }
+	return FESurface::Init();
+}
 
 //-----------------------------------------------------------------------------
 void FEContactSurface::SetSibling(FEContactSurface* ps) { m_pSibling = ps; }

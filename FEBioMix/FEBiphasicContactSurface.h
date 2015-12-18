@@ -12,6 +12,9 @@ public:
 	//! destructor
 	~FEBiphasicContactSurface();
 
+	//! initialization
+	bool Init();
+
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 public:
@@ -23,5 +26,4 @@ public:
 
 protected:
 	int	m_dofP;
-	int	m_dofC;
 };

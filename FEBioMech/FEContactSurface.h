@@ -18,6 +18,9 @@ public:
 	//! destructor
 	~FEContactSurface();
 
+	// initialization
+	bool Init();
+
 	//! Set the sibling of this contact surface
 	void SetSibling(FEContactSurface* ps);
 

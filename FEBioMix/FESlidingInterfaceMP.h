@@ -58,6 +58,8 @@ public:
 	void Serialize(DumpFile& ar);
 	
 	void SetPoroMode(bool bporo) { m_bporo = bporo; }
+
+	void UnpackLM(FEElement& el, vector<int>& lm);
 	
 public:
 	void GetNodalContactGap     (int nface, double* pg);
@@ -77,6 +79,9 @@ public:
 	vector<vec3d>				m_nn;	//!< node normals
 	
 	vector<int>					m_sid;	//!< list of solute id's for this surface
+
+protected:
+	int	m_dofC;
 };
 
 typedef std::map<int,double> idmap;     //!< map integer id with double value

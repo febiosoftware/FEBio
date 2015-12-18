@@ -55,7 +55,7 @@ FESlidingSurface2::FESlidingSurface2(FEModel* pfem) : FEBiphasicContactSurface(&
 bool FESlidingSurface2::Init()
 {
 	// initialize surface data first
-	if (FEContactSurface::Init() == false) return false;
+	if (FEBiphasicContactSurface::Init() == false) return false;
 
 	// allocate data structures
 	int NE = Elements();

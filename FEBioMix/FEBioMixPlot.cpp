@@ -1097,7 +1097,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = dom.Node(i);
-			a << node.get(dof_C + m_nsol);
+			a << node.get(dof_C);
 		}
 		return true;
 	}
@@ -1118,7 +1118,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = dom.Node(i);
-			a << node.get(dof_C + m_nsol);
+			a << node.get(dof_C);
 		}
 		return true;
 	}

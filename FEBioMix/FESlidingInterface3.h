@@ -57,6 +57,8 @@ public:
 	
 	void SetPoroMode(bool bporo) { m_bporo = bporo; }
 
+	void UnpackLM(FEElement& el, vector<int>& lm);
+
 public:
 	void GetNodalContactGap     (int nface, double* pg);
 	void GetNodalContactPressure(int nface, double* pg);
@@ -75,7 +77,10 @@ public:
 
 	vector< vector<Data> >		m_Data; //!< integration point data
 	
-	vector<vec3d>		m_nn;	//!< node normals	
+	vector<vec3d>		m_nn;	//!< node normals
+
+protected:
+	int	m_dofC;
 };
 
 //-----------------------------------------------------------------------------

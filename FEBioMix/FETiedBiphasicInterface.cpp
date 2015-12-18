@@ -38,7 +38,7 @@ FETiedBiphasicSurface::FETiedBiphasicSurface(FEModel* pfem) : FEBiphasicContactS
 bool FETiedBiphasicSurface::Init()
 {
 	// initialize surface data first
-	if (FEContactSurface::Init() == false) return false;
+	if (FEBiphasicContactSurface::Init() == false) return false;
 	
 	// count how many integration points we have
 	int nint = 0, i;

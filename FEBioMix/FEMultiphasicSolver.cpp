@@ -122,6 +122,10 @@ bool FEMultiphasicSolver::InitEquations()
 	// base class does most of the work
 	FESolidSolver2::InitEquations();
 
+	// get dofs
+	m_dofP = m_fem.GetDOFIndex("p");
+	m_dofC = m_fem.GetDOFIndex("c");
+
 	// determined the nr of pressure and concentration equations
 	FEMesh& mesh = m_fem.GetMesh();
 	m_ndeq = m_npeq = 0;
@@ -140,10 +144,6 @@ bool FEMultiphasicSolver::InitEquations()
     int MAX_CDOFS = fedofs.GetDOFSize("c");
     m_nceq.assign(MAX_CDOFS, 0);
 	
-	// get dofs
-	m_dofP = m_fem.GetDOFIndex("p");
-	m_dofC = m_fem.GetDOFIndex("c");
-
     // get number of DOFS
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{

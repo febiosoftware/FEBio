@@ -58,6 +58,7 @@ FESlidingSurface3::FESlidingSurface3(FEModel* pfem) : FEBiphasicContactSurface(&
 { 
 	m_bporo = m_bsolu = false;
 	m_pfem = pfem; 
+	m_dofC = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -67,11 +68,47 @@ FESlidingSurface3::~FESlidingSurface3()
 }
 
 //-----------------------------------------------------------------------------
+void FESlidingSurface3::UnpackLM(FEElement& el, vector<int>& lm)
+{
+    // get nodal DOFS
+    DOFS& dofs = *DOFS::GetInstance();
+    int MAX_CDOFS = dofs.GetDOFSize("c");
+    
+	int N = el.Nodes();
+	lm.resize(N*(4+MAX_CDOFS));
+
+	// pack the equation numbers
+	for (int i=0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+
+		FENode& node = m_pMesh->Node(n);
+		vector<int>& id = node.m_ID;
+
+		// first the displacement dofs
+		lm[3*i  ] = id[m_dofX];
+		lm[3*i+1] = id[m_dofY];
+		lm[3*i+2] = id[m_dofZ];
+
+		// now the pressure dofs
+		lm[3*N+i] = id[m_dofP];
+
+		// concentration dofs
+		for (int k=0; k<MAX_CDOFS; ++k)
+			lm[(4 + k)*N + i] = id[m_dofC+k];
+	}
+}
+
+//-----------------------------------------------------------------------------
 bool FESlidingSurface3::Init()
 {
 	// initialize surface data first
-	if (FEContactSurface::Init() == false) return false;
+	if (FEBiphasicContactSurface::Init() == false) return false;
 	
+	// store concentration index
+	DOFS& dofs = *DOFS::GetInstance();
+	m_dofC = dofs.GetDOF("c");
+
 	// allocate data structures
 	int NE = Elements();
 	m_Data.resize(NE);
