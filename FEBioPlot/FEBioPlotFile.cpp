@@ -36,6 +36,43 @@ private:
 	const char*		m_szname;
 };
 
+class FEPlotVariable : public FENodeData
+{
+public:
+	FEPlotVariable(const char* szname, Var_Type itype, Storage_Fmt fmt) : FENodeData(itype, fmt) { strcpy(m_szname, szname); }
+	bool Save(FEMesh& mesh, FEDataStream& str)
+	{
+		// get the DOFS
+		FEModel& fem = *GetFEModel();
+		DOFS& dofs = fem.GetDOFS();
+
+		// see if this variable exists
+		int nvar = dofs.GetVariableIndex(m_szname);
+		if (nvar < 0) return false;
+
+		// get the size of the variable
+		int n = dofs.GetVariableSize(nvar);
+		if (n == 0) return false;
+
+		// get the start index of the DOFS
+		int ndof = dofs.GetDOF(nvar, 0);
+		if (ndof < 0) return false;
+
+		// store the nodal data
+		int NN = mesh.Nodes();
+		for (int i=0; i<NN; ++i)
+		{
+			FENode& node = mesh.Node(i);
+			for (int j=0; j<n; ++j) str << node.get(ndof + j);
+		}
+
+		return true;
+	}
+
+private:
+	char	m_szname[256];
+};
+
 //-----------------------------------------------------------------------------
 //! Adds a variable to the plot file. 
 //! 
@@ -153,6 +190,19 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 					ps = new FEPlotDataExport(pd->m_szname, pd->m_type, pd->m_fmt);
 					return AddSurfaceVariable(ps, szname, item);
 				}
+			}
+		}
+
+		// If we still didn't find it, maybe it's a model variable.
+		DOFS& dofs = pfem->GetDOFS();
+		int nvar = dofs.GetVariableIndex(szname);
+		if (nvar >= 0)
+		{
+			int ndofs = dofs.GetVariableSize(nvar);
+			if (ndofs == 1)
+			{
+				ps = new FEPlotVariable(szname, PLT_FLOAT, FMT_NODE);
+				return AddNodalVariable(ps, szname, item);
 			}
 		}
 	}
