@@ -48,6 +48,17 @@ void FEReactiveViscoelasticMaterial::SetLocalCoordinateSystem(FEElement& el, int
 }
 
 //-----------------------------------------------------------------------------
+//! data initialization
+void FEReactiveViscoelasticMaterial::Init()
+{
+    m_pBase->Init();
+    m_pBond->Init();
+    m_pRelx->Init();
+    
+    FEElasticMaterial::Init();
+}
+
+//-----------------------------------------------------------------------------
 //! Create material point data for this material
 FEMaterialPoint* FEReactiveViscoelasticMaterial::CreateMaterialPointData()
 {
