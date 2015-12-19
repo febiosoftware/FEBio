@@ -719,9 +719,15 @@ DOFS& FEModel::GetDOFS()
 }
 
 //-----------------------------------------------------------------------------
-int FEModel::GetDOFIndex(const char* sz, int n)
+int FEModel::GetDOFIndex(const char* sz)
 {
-	return m_dofs.GetDOF(sz, n);
+	return m_dofs.GetDOF(sz);
+}
+
+//-----------------------------------------------------------------------------
+int FEModel::GetDOFIndex(const char* szvar, int n)
+{
+	return m_dofs.GetDOF(szvar, n);
 }
 
 //-----------------------------------------------------------------------------

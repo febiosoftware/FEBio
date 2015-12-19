@@ -9,7 +9,7 @@ FEBiphasicSoluteDomain::FEBiphasicSoluteDomain(FEModel* pfem) : FESolidDomain(&p
 {
 	m_pMat = 0;
 	m_dofP = pfem->GetDOFIndex("p");
-	m_dofC = pfem->GetDOFIndex("c");
+	m_dofC = pfem->GetDOFIndex("concentration", 0);
 }
 
 //-----------------------------------------------------------------------------

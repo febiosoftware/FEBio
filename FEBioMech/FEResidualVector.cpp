@@ -57,7 +57,7 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
         if (m_fem.m_LinC.size() > 0)
         {
 		    DOFS& fedofs = m_fem.GetDOFS();
-			int MAX_NDOFS = fedofs.GetNDOFS();
+			int MAX_NDOFS = fedofs.GetTotalDOFS();
 
             // loop over all degrees of freedom of this element
             for (i=0; i<ndof; ++i)

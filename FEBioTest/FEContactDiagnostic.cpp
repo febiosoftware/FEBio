@@ -116,7 +116,7 @@ bool FEContactDiagnostic::Init()
 	FEMesh& mesh = fem.GetMesh();
 
 	// --- create the geometry ---
-	int MAX_DOFS = fem.GetDOFS().GetNDOFS();
+	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 
 	// currently we simply assume a two-element contact problem
 	// so we create two elements

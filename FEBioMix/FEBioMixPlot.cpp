@@ -1050,7 +1050,7 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 	if (nsid == -1) return false;
 
 	// get the dof
-	const int dof_C = GetFEModel()->GetDOFIndex("c", nsid);
+	const int dof_C = GetFEModel()->GetDOFIndex("concentration", nsid);
 
 	int N = dom.Nodes();
 	for (int i=0; i<N; ++i)
@@ -1072,7 +1072,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		if (!present) return false;
 
 		// get the dof
-		const int dof_C = GetFEModel()->GetDOFIndex("c", m_nsol);
+		const int dof_C = GetFEModel()->GetDOFIndex("concentration", m_nsol);
 
 		int N = dom.Nodes();
 		for (int i=0; i<N; ++i)
@@ -1091,7 +1091,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		if (!present) return false;
 
 		// get the dof
-		const int dof_C = GetFEModel()->GetDOFIndex("c", m_nsol);
+		const int dof_C = GetFEModel()->GetDOFIndex("concentration", m_nsol);
 
 		int N = dom.Nodes();
 		for (int i=0; i<N; ++i)
@@ -1112,7 +1112,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		if (!present) return false;
 
 		// get the dof
-		const int dof_C = GetFEModel()->GetDOFIndex("c", m_nsol);
+		const int dof_C = GetFEModel()->GetDOFIndex("concentration", m_nsol);
 
 		int N = dom.Nodes();
 		for (int i=0; i<N; ++i)

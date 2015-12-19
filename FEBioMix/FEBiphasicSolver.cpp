@@ -44,7 +44,8 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
-	dofs.AddDOF("p");
+	int varP = dofs.AddVariable("fluid pressure");
+	dofs.AddDOF(varP, "p");
 
 	// get pressure dof
 	m_dofP = pfem->GetDOFIndex("p");

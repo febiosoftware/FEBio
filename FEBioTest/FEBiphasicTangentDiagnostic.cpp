@@ -45,7 +45,7 @@ bool FEBiphasicTangentUniaxial::Init()
     };
   
 	FEModel& fem = GetDiagnostic()->GetFEModel();
-	int MAX_DOFS = fem.GetDOFS().GetNDOFS();
+	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 	const int dof_x = fem.GetDOFIndex("x");
 	const int dof_y = fem.GetDOFIndex("y");
 	const int dof_z = fem.GetDOFIndex("z");

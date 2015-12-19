@@ -50,7 +50,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
     // get nodal DOFS
 	FEModel& fem = *pfem;
     DOFS& fedofs = fem.GetDOFS();
-    int MAX_NDOFS = fedofs.GetNDOFS();
+    int MAX_NDOFS = fedofs.GetTotalDOFS();
 
 	// get the DOFS
 	const int dof_X = fem.GetDOFIndex("x");

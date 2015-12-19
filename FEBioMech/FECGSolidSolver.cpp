@@ -67,18 +67,23 @@ FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem)
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
-	dofs.AddDOF("x");
-	dofs.AddDOF("y");
-	dofs.AddDOF("z");
-	dofs.AddDOF("u");
-	dofs.AddDOF("v");
-	dofs.AddDOF("w");
-	dofs.AddDOF("Ru");
-	dofs.AddDOF("Rv");
-	dofs.AddDOF("Rw");
-	dofs.AddDOF("vx");
-	dofs.AddDOF("vy");
-	dofs.AddDOF("vz");
+	int varD = dofs.AddVariable("displacement");
+	dofs.AddDOF(varD, "x");
+	dofs.AddDOF(varD, "y");
+	dofs.AddDOF(varD, "z");
+	int varQ = dofs.AddVariable("rotation");
+	dofs.AddDOF(varQ, "u");
+	dofs.AddDOF(varQ, "v");
+	dofs.AddDOF(varQ, "w");
+	int varQR = dofs.AddVariable("rigid rotation");
+	dofs.AddDOF(varQR, "Ru");
+	dofs.AddDOF(varQR, "Rv");
+	dofs.AddDOF(varQR, "Rw");
+	int varV = dofs.AddVariable("velocity");
+	dofs.AddDOF(varV, "vx");
+	dofs.AddDOF(varV, "vy");
+	dofs.AddDOF(varV, "vz");
+
 
 	// get the DOF indices
 	m_dofX = pfem->GetDOFIndex("x");

@@ -66,10 +66,12 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
-	dofs.AddDOF("vx");
-	dofs.AddDOF("vy");
-	dofs.AddDOF("vz");
-	dofs.AddDOF("e");
+	int nV = dofs.AddVariable("fluid velocity");
+	int nE = dofs.AddVariable("fluid dilation");
+	dofs.AddDOF(nV, "vx");
+	dofs.AddDOF(nV, "vy");
+	dofs.AddDOF(nV, "vz");
+	dofs.AddDOF(nE, "e");
 
 	// get the dof indices
 	m_dofVX = pfem->GetDOFIndex("vx");
@@ -773,7 +775,7 @@ void FEFluidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 {
     // get nodal DOFS
     DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_NDOFS = fedofs.GetNDOFS();
+    int MAX_NDOFS = fedofs.GetTotalDOFS();
     
     // assemble into global stiffness matrix
     m_pK->Assemble(ke, elm);

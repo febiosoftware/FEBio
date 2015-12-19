@@ -281,7 +281,8 @@ public:	// --- Miscellaneous routines ---
 	DOFS& GetDOFS();
 
 	//! Get the index of a DOF
-	int GetDOFIndex(const char* sz, int n = 0);
+	int GetDOFIndex(const char* sz);
+	int GetDOFIndex(const char* szvar, int n);
 
 public: // --- I/O functions
 

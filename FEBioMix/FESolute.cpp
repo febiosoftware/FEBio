@@ -24,10 +24,13 @@ FESoluteData::FESoluteData(FEModel* pfem)
 	m_z = 0; 
 	m_szname[0] = 0; 
 
-	// for each solute we have to increase the number of concentration dofs
+	// for each solute we have to add a concentration degree of freedom
     DOFS& fedofs = pfem->GetDOFS();
-	int cdofs = fedofs.GetDOFSize("c");
-	fedofs.ChangeDOFSize("c", cdofs+1);
+	int varC = fedofs.GetVariableIndex("concentration");
+	int cdofs = fedofs.GetVariableSize(varC);
+	char sz[8] = {0};
+	sprintf(sz, "c%d", cdofs+1);
+	fedofs.AddDOF(varC, sz);
 }
 
 //-----------------------------------------------------------------------------
@@ -129,7 +132,7 @@ bool FESolute::SetAttribute(const char* szname, const char* szval)
 {
     // get number of DOFS
     DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	if (strcmp(szname, "sol") == 0)
 	{

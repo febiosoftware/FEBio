@@ -72,7 +72,7 @@ void FESlidingSurface3::UnpackLM(FEElement& el, vector<int>& lm)
 {
     // get nodal DOFS
     DOFS& dofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = dofs.GetDOFSize("c");
+    int MAX_CDOFS = dofs.GetVariableSize("concentration");
     
 	int N = el.Nodes();
 	lm.resize(N*(4+MAX_CDOFS));
@@ -107,7 +107,7 @@ bool FESlidingSurface3::Init()
 	
 	// store concentration index
 	DOFS& dofs = GetFEModel()->GetDOFS();
-	m_dofC = dofs.GetDOF("c");
+	m_dofC = dofs.GetDOF("concentration", 0);
 
 	// allocate data structures
 	int NE = Elements();
@@ -556,7 +556,7 @@ FESlidingInterface3::FESlidingInterface3(FEModel* pfem) : FEContactInterface(pfe
 	m_naugmax = 10;
 
 	m_dofP = pfem->GetDOFIndex("p");
-	m_dofC = pfem->GetDOFIndex("c");
+	m_dofC = pfem->GetDOFIndex("concentration", 0);
 	
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
@@ -596,7 +596,7 @@ void FESlidingInterface3::BuildMatrixProfile(FEStiffnessMatrix& K)
 	const int dof_RU = fem.GetDOFIndex("Ru");
 	const int dof_RV = fem.GetDOFIndex("Rv");
 	const int dof_RW = fem.GetDOFIndex("Rw");
-	const int dof_C = fem.GetDOFIndex("c");
+	const int dof_C = fem.GetDOFIndex("concentration", 0);
 
 	vector<int> lm(8*FEElement::MAX_NODES*2);
 					
@@ -1103,7 +1103,7 @@ void FESlidingInterface3::Update(int niter)
 
     // get number of DOFS
     DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	double R = m_srad*fem.GetMesh().GetBoundingBox().radius();
 	
@@ -2307,7 +2307,7 @@ void FESlidingInterface3::MarkAmbient()
 
     // get number of DOFS
     DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	for (int np=0; np<2; ++np)
 	{
@@ -2354,7 +2354,7 @@ void FESlidingInterface3::SetAmbient()
 {	
     // get number of DOFS
     DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	// Set the pressure to zero for the free-draining nodes
 	for (int np=0; np<2; ++np)

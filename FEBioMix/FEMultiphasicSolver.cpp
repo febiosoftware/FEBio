@@ -50,8 +50,9 @@ FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
-	dofs.AddDOF("p");
-	dofs.AddDOF("c", 0);	// we start with zero concentrations
+	int varP = dofs.AddVariable("fluid pressure");
+	dofs.AddDOF(varP, "p");
+	dofs.AddVariable("concentration");	// we start with zero concentrations
 }
 
 //-----------------------------------------------------------------------------
@@ -86,7 +87,7 @@ bool FEMultiphasicSolver::Init()
 
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	// allocate concentration-vectors
 	m_ci.assign(MAX_CDOFS,vector<double>(0,0));
@@ -124,7 +125,7 @@ bool FEMultiphasicSolver::InitEquations()
 
 	// get dofs
 	m_dofP = m_fem.GetDOFIndex("p");
-	m_dofC = m_fem.GetDOFIndex("c");
+	m_dofC = m_fem.GetDOFIndex("concentration", 0);
 
 	// determined the nr of pressure and concentration equations
 	FEMesh& mesh = m_fem.GetMesh();
@@ -141,7 +142,7 @@ bool FEMultiphasicSolver::InitEquations()
 	
 	// determine the nr of concentration equations
     DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     m_nceq.assign(MAX_CDOFS, 0);
 	
     // get number of DOFS
@@ -195,7 +196,7 @@ bool FEMultiphasicSolver::Quasin(double time)
 
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	// solute convergence data
 	vector<double>	normCi(MAX_CDOFS);	// initial concentration norm
@@ -945,7 +946,7 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 	
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	// update solute data
 	for (i=0; i<mesh.Nodes(); ++i)

@@ -34,7 +34,7 @@ void FEBox::Create(FEModel* pfem, int nx, int ny, int nz, vec3d r0, vec3d r1, in
 	// allocate data
 	FEMesh::CreateNodes(nodes);
 
-	int MAX_DOFS = pfem->GetDOFS().GetNDOFS();
+	int MAX_DOFS = pfem->GetDOFS().GetTotalDOFS();
 	FEMesh::SetDOFS(MAX_DOFS);
 
 	// create the nodes

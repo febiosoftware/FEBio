@@ -26,7 +26,7 @@ FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem)
 	m_dofX = pfem->GetDOFIndex("x");
 	m_dofY = pfem->GetDOFIndex("y");
 	m_dofZ = pfem->GetDOFIndex("z");
-	m_dofC = pfem->GetDOFIndex("c");
+	m_dofC = pfem->GetDOFIndex("concentration", 0);
 }
 	
 //-----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ void FESoluteFlux::UnpackLM(FEElement& el, vector<int>& lm)
 
     // get nodal DOFS
     DOFS& fedofs = fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	int N = el.Nodes();
 	lm.resize(N*(3+MAX_CDOFS));

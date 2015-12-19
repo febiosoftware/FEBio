@@ -59,12 +59,12 @@ bool FEMultiphasicTangentUniaxial::Init()
     
     // --- create the FE problem ---
 	// get the degrees of freedom
-	int MAX_DOFS = fem.GetDOFS().GetNDOFS();
+	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 	const int dof_x = fem.GetDOFIndex("x");
 	const int dof_y = fem.GetDOFIndex("y");
 	const int dof_z = fem.GetDOFIndex("z");
 	const int dof_p = fem.GetDOFIndex("p");
-	const int dof_c = fem.GetDOFIndex("c");
+	const int dof_c = fem.GetDOFIndex("concentration", 0);
 
     // create the mesh
     FEMesh& m = fem.GetMesh();
@@ -310,7 +310,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
 	const int dof_p = fem.GetDOFIndex("p");
-	const int dof_c = fem.GetDOFIndex("c");
+	const int dof_c = fem.GetDOFIndex("concentration", 0);
     
     FEMultiphasicDomain& md = static_cast<FEMultiphasicDomain&>(mesh.Domain(0));
     

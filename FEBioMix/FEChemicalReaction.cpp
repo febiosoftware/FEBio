@@ -47,7 +47,7 @@ bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, co
 {
     // get number of DOFS
     DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	if (strcmp(p.m_szname, "vR") == 0)
 	{

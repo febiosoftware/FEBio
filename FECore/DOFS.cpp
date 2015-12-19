@@ -13,23 +13,63 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------
+DOFS::DOF_ITEM::DOF_ITEM()
+{
+	sz[0] = 0;
+	ndof = -1;
+}
+
+//-----------------------------------------------------------------------------
+DOFS::DOF_ITEM::DOF_ITEM(const char* sz)
+{
+	SetName(sz);
+	ndof = -1;
+}
+
+//-----------------------------------------------------------------------------
+DOFS::DOF_ITEM::DOF_ITEM(const DOFS::DOF_ITEM& d)
+{
+	SetName(d.sz);
+	ndof = d.ndof;
+}
+
+//-----------------------------------------------------------------------------
+void DOFS::DOF_ITEM::operator = (const DOFS::DOF_ITEM& d)
+{
+	SetName(d.sz);
+	ndof = d.ndof;
+}
+
+//-----------------------------------------------------------------------------
+DOFS::~DOFS()
+{
+	
+}
+
+//-----------------------------------------------------------------------------
+void DOFS::DOF_ITEM::SetName(const char* szdof)
+{
+	strcpy(sz, szdof);
+}
+
+//-----------------------------------------------------------------------------
 // constructor for the DOFS class
 DOFS::DOFS()
 {
-	Reset();
+	m_maxdofs = 0;
 }
 
 //-----------------------------------------------------------------------------
 DOFS::DOFS(const DOFS& dofs)
 {
-	m_dof = dofs.m_dof;
+	m_var = dofs.m_var;
 	m_maxdofs = dofs.m_maxdofs;
 }
 
 //-----------------------------------------------------------------------------
 DOFS& DOFS::operator = (const DOFS& dofs)
 {
-	m_dof = dofs.m_dof;
+	m_var = dofs.m_var;
 	m_maxdofs = dofs.m_maxdofs;
 	return *this;
 }
@@ -37,7 +77,7 @@ DOFS& DOFS::operator = (const DOFS& dofs)
 //-----------------------------------------------------------------------------
 // destructor for the DOFS class
 //
-DOFS::~DOFS()
+DOFS::DOF_ITEM::~DOF_ITEM()
 {
 }
 
@@ -45,110 +85,227 @@ DOFS::~DOFS()
 void DOFS::Reset()
 {
 	// clear the DOFS
-	if (m_dof.empty() == false) m_dof.clear();
+	if (m_var.empty() == false) m_var.clear();
+	m_maxdofs = 0;
 }
 
 //-----------------------------------------------------------------------------
-//! Add a degree of freedom.
+//! Define a variable.
+//! This creates an empty variable. Add DOFs to this variable using one of the 
+//! DOFS::AddDOF functions.
+int DOFS::AddVariable(const char* szvar)
+{
+	// Make sure szvar is a valid symbol
+	if (szvar    == 0) return -1;	// cannot be null
+	if (szvar[0] == 0) return -1;	// must have non-zero length
+
+	// Make sure the variable does not exist yet
+	int nvar = GetVariableIndex(szvar);
+	if (nvar >= 0) return -1;
+
+	// Okay, add the variable
+	Var var;
+	var.szname = szvar;
+	m_var.push_back(var);
+
+	// return the index to this variable
+	return (int) m_var.size() - 1;
+}
+
+//-----------------------------------------------------------------------------
+DOFS::Var* DOFS::GetVariable(const char* szvar)
+{
+	if (m_var.empty()) return 0;
+	int NVAR = (int) m_var.size();
+	for (int i=0; i<NVAR; ++i)
+	{
+		Var& var = m_var[i];
+		if (strcmp(szvar, var.szname) == 0) return &var;
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+int DOFS::GetVariableIndex(const char* szvar)
+{
+	if (m_var.empty()) return -1;
+	int NVAR = (int) m_var.size();
+	for (int i=0; i<NVAR; ++i)
+	{
+		Var& var = m_var[i];
+		if (strcmp(szvar, var.szname) == 0) return i;
+	}
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! Add a degree of freedom to a variable.
 //! Returns -1 if the degree of freedom exists or if the symbol is invalid
 //! \sa DOFS::GetDOF
-int DOFS::AddDOF(const char* sz, int nsize)
+int DOFS::AddDOF(const char* szvar, const char* sz)
 {
 	// Make sure sz is a valid symbol
 	if (sz    == 0) return -1;	// cannot be null
 	if (sz[0] == 0) return -1;	// must have non-zero length
 
-	// See if the dof is already defined
-	int ndof = -1;
-	for (int i=0; i<(int)m_dof.size(); ++i)
+	// Make sure the symbol does not exist yet
+	int ndof = GetDOF(sz);
+	if (ndof >= 0) return -1;
+
+	// Make sure the variable is valid
+	Var* pvar = GetVariable(szvar);
+	if (pvar)
 	{
-		if (strcmp(sz, m_dof[i].sz) == 0)
-		{
-			// it's already defined so return -1
-			return -1;
-		}
+		Var& var = *pvar;
+
+		DOF_ITEM it(sz);
+		var.m_dof.push_back(it);
+
+		// update all dofs
+		Update();
+
+		// return a nonnegative number
+		return 0;
 	}
-	
-	// If we get here, the variable does not exist yet
-	DOF_ITEM it = {sz, nsize, 0};
-	m_dof.push_back(it);
+
+	// if we get here, the variable does not exist
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! Add a degree of freedom to a variable.
+//! Returns -1 if the degree of freedom exists or if the symbol is invalid
+//! \sa DOFS::GetDOF
+int DOFS::AddDOF(int nvar, const char* sz)
+{
+	// Make sure sz is a valid symbol
+	if (sz    == 0) return -1;	// cannot be null
+	if (sz[0] == 0) return -1;	// must have non-zero length
+
+	// Make sure the symbol is not defined yet
+	int ndof = GetDOF(sz);
+	if (ndof >= 0) return -1;
+
+	// Make sure the variable index is valid
+	if (nvar < 0) return -1;
+	if (nvar >= (int) m_var.size()) return -1; 
+
+	// Add the DOF
+	DOF_ITEM it(sz);
+	m_var[nvar].m_dof.push_back(it);
 
 	// update all dofs
 	Update();
 
 	// return a nonnegative number
-	return (int) (m_dof.size() - 1);
+	return 0;
 }
 
 //-----------------------------------------------------------------------------
-//! Return the DOF index.
+//! Return the DOF index from a variable and an index into the variable's dof array.
 //! This index is used in the FENode::get(), FENode::set() functions to set 
 //! the values of nodal values. This index is also used in the FENode::m_ID and FENode::m_BC arrays.
-int DOFS::GetDOF(const char* sz, int n)
+int DOFS::GetDOF(const char* szvar, int n)
 {
-	const int NDOF = (int)m_dof.size();
-	for (int i=0; i<NDOF; ++i)
+	Var* pvar = GetVariable(szvar);
+	if (pvar)
 	{
-		DOF_ITEM& it = m_dof[i];
-		if (strcmp(it.sz, sz) == 0) 
+		assert((n>=0)&&(n<(int)pvar->m_dof.size()));
+		DOF_ITEM& it = pvar->m_dof[n];
+		return it.ndof;
+	}
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! Return the DOF index from a variable and an index into the variable's dof array.
+//! This index is used in the FENode::get(), FENode::set() functions to set 
+//! the values of nodal values. This index is also used in the FENode::m_ID and FENode::m_BC arrays.
+int DOFS::GetDOF(int nvar, int n)
+{
+	assert((nvar>=0)&&(nvar<(int)m_var.size()));
+	Var& var = m_var[nvar];
+	assert((n>=0)&&(n<(int)var.m_dof.size()));
+	DOF_ITEM& it = var.m_dof[n];
+	return it.ndof;
+}
+
+//-----------------------------------------------------------------------------
+//! Return the DOF index from a dof symbol.
+//! This index is used in the FENode::get(), FENode::set() functions to set 
+//! the values of nodal values. This index is also used in the FENode::m_ID and FENode::m_BC arrays.
+int DOFS::GetDOF(const char* szdof)
+{
+	const int NVAR = (int)m_var.size();
+	for (int i=0; i<NVAR; ++i)
+	{
+		Var& var = m_var[i];
+		int ndof = (int)var.m_dof.size();
+		for (int j=0; j<ndof; ++j)
 		{
-			assert((n>=0)&&(n<it.nsize));
-			return it.ndof + n;
+			DOF_ITEM& it = var.m_dof[j];
+			if (strcmp(it.sz, szdof) == 0) return it.ndof;
 		}
 	}
 	return -1;
 }
 
 //-----------------------------------------------------------------------------
-//! Return the symbol assigned to a variable.
-//! Returns 0 if the dof is undefined.
-const char* DOFS::GetDOFSymbol(int nvar)
+//! get the size of the dof array of a variable
+int DOFS::GetVariableSize(const char* szvar)
 {
-	if ((nvar >= 0) && (nvar < (int) m_dof.size())) return m_dof[nvar].sz;
-	else return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Change the size of the dof array of a variable
-bool DOFS::ChangeDOFSize(const char* sz, int nsize)
-{
-	int n = (int) m_dof.size();
-	for (int i=0; i<n; ++i)
-	{
-		if (strcmp(sz, m_dof[i].sz) == 0)
-		{
-			m_dof[i].nsize = nsize;
-			Update();
-			return true;
-		}
-	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-//! Change the size of the dof array of a variable
-int DOFS::GetDOFSize(const char* sz)
-{
-	int n = (int) m_dof.size();
-	for (int i=0; i<n; ++i)
-	{
-		if (strcmp(sz, m_dof[i].sz) == 0)
-		{
-			return m_dof[i].nsize;
-		}
-	}
+	Var* pvar = GetVariable(szvar);
+	if (pvar) return pvar->m_dof.size();
 	return -1;
 }
 
 //-----------------------------------------------------------------------------
+//! get the size of the dof array of a variable
+int DOFS::GetVariableSize(int nvar)
+{
+	if ((nvar < 0) || (nvar >= (int) m_var.size())) return -1;
+	return m_var[nvar].m_dof.size();
+}
+
+//-----------------------------------------------------------------------------
+// Updates the DOF indices. 
+// This is called after a dof is added. 
 void DOFS::Update()
 {
 	m_maxdofs = 0;
-	int n = (int) m_dof.size();
-	for (int i=0; i<n; ++i)
+	int NVAR = (int) m_var.size();
+	for (int i=0; i<NVAR; ++i)
 	{
-		DOF_ITEM& it = m_dof[i];
-		it.ndof = m_maxdofs;
-		m_maxdofs += it.nsize;
+		Var& var = m_var[i];
+		int NDOF = (int) var.m_dof.size();
+		for (int j=0; j<NDOF; ++j)
+		{
+			DOF_ITEM& it = var.m_dof[j];
+			it.ndof = m_maxdofs++;
+		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+DOFS::DOF_ITEM* DOFS::GetDOFPtr(const char* szdof)
+{
+	const int NVAR = (int)m_var.size();
+	for (int i=0; i<NVAR; ++i)
+	{
+		Var& var = m_var[i];
+		int ndof = (int)var.m_dof.size();
+		for (int j=0; j<ndof; ++j)
+		{
+			DOF_ITEM& it = var.m_dof[j];
+			if (strcmp(it.sz, szdof) == 0) return &it;
+		}
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+void DOFS::ChangeDOFName(const char* szdof, const char* szname)
+{
+	DOF_ITEM* pdof = GetDOFPtr(szdof);
+	if (pdof) pdof->SetName(szname);
 }

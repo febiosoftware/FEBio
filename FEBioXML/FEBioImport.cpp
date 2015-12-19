@@ -401,22 +401,29 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			dofs.Reset();
 
 			// Add the default degrees of freedom
-			dofs.AddDOF("x");
-			dofs.AddDOF("y");
-			dofs.AddDOF("z");
-			dofs.AddDOF("u");
-			dofs.AddDOF("v");
-			dofs.AddDOF("w");
-			dofs.AddDOF("p");
-			dofs.AddDOF("Ru");
-			dofs.AddDOF("Rv");
-			dofs.AddDOF("Rw");
-			dofs.AddDOF("t");
-			dofs.AddDOF("vx");
-			dofs.AddDOF("vy");
-			dofs.AddDOF("vz");
-			dofs.AddDOF("e");
-			dofs.AddDOF("c", 0);	// we start with 0 concentration dofs. Concentrations dofs are added by the Solute tags. 
+			int varD = dofs.AddVariable("displacement");
+			dofs.AddDOF(varD, "x");
+			dofs.AddDOF(varD, "y");
+			dofs.AddDOF(varD, "z");
+			int varQ = dofs.AddVariable("rotation");
+			dofs.AddDOF(varQ, "u");
+			dofs.AddDOF(varQ, "v");
+			dofs.AddDOF(varQ, "w");
+			int varP = dofs.AddVariable("fluid pressure");
+			dofs.AddDOF(varP, "p");
+			int varQR = dofs.AddVariable("rigid rotation");
+			dofs.AddDOF(varQR, "Ru");
+			dofs.AddDOF(varQR, "Rv");
+			dofs.AddDOF(varQR, "Rw");
+			int varT = dofs.AddVariable("temperature");
+			dofs.AddDOF(varT, "t");
+			int varV = dofs.AddVariable("velocity");
+			dofs.AddDOF(varV, "vx");
+			dofs.AddDOF(varV, "vy");
+			dofs.AddDOF(varV, "vz");
+			int varE = dofs.AddVariable("fluid dilation");
+			dofs.AddDOF(varE, "e");
+			int varC = dofs.AddVariable("concentration"); // we start with zero concentrations
 		}
 
 		// parse the file

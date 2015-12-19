@@ -49,7 +49,7 @@ bool FEFluidTangentUniaxial::Init()
     };
     
     FEModel& fem = GetDiagnostic()->GetFEModel();
-	int MAX_DOFS = fem.GetDOFS().GetNDOFS();
+	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 	const int dof_VX = fem.GetDOFIndex("vx");
 	const int dof_VY = fem.GetDOFIndex("vy");
 	const int dof_VZ = fem.GetDOFIndex("vz");

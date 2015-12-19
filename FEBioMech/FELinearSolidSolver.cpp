@@ -26,9 +26,10 @@ FELinearSolidSolver::FELinearSolidSolver(FEModel* pfem) : FENewtonSolver(pfem)
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
-	dofs.AddDOF("x");
-	dofs.AddDOF("y");
-	dofs.AddDOF("z");
+	int varD = dofs.AddVariable("displacement");
+	dofs.AddDOF(varD, "x");
+	dofs.AddDOF(varD, "y");
+	dofs.AddDOF(varD, "z");
 
 	// get DOF indices
 	m_dofX = pfem->GetDOFIndex("x");

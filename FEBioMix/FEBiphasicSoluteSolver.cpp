@@ -44,7 +44,8 @@ FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel* pfem) : FEBiphasicSolver
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
-	dofs.AddDOF("c", 0);	// we start with zero concentrations
+	int varC = dofs.AddVariable("concentration");
+	dofs.AddDOF(varC, 0);	// we start with zero concentrations
 
 	m_dofC = -1;
 }
@@ -61,7 +62,7 @@ bool FEBiphasicSoluteSolver::Init()
     
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	// allocate concentration-vectors
 	m_ci.assign(MAX_CDOFS,vector<double>(0,0));
@@ -103,8 +104,8 @@ bool FEBiphasicSoluteSolver::InitEquations()
 
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
-	m_dofC = m_fem.GetDOFIndex("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
+	m_dofC = m_fem.GetDOFIndex("concentration", 0);
 
     m_nceq.assign(MAX_CDOFS, 0);
 	for (int i=0; i<mesh.Nodes(); ++i)
@@ -183,7 +184,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	// solute convergence data
 	vector<double>	normCi(MAX_CDOFS);	// initial concentration norm
@@ -785,7 +786,7 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 	
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	// update solute data
 	for (i=0; i<mesh.Nodes(); ++i)

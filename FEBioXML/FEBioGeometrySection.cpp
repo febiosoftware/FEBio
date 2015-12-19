@@ -50,7 +50,7 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 	//       At some point I want to be able to read the mesh before deciding any physics.
 	//       When that happens I'll have to move this elsewhere.
 	FEModel& fem = *GetFEModel();
-	int MAX_DOFS = fem.GetDOFS().GetNDOFS();
+	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 	fem.GetMesh().SetDOFS(MAX_DOFS);
 }
 

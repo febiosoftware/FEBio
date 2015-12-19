@@ -13,7 +13,7 @@ FEMultiphasicDomain::FEMultiphasicDomain(FEModel* pfem) : FESolidDomain(&pfem->G
 { 
 	m_pMat = 0;
 	m_dofP = pfem->GetDOFIndex("p");
-	m_dofC = pfem->GetDOFIndex("c");
+	m_dofC = pfem->GetDOFIndex("concentration", 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -29,7 +29,7 @@ void FEMultiphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
     // get nodal DOFS
     DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetDOFSize("c");
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	int N = el.Nodes();
 	lm.resize(N*(7+MAX_CDOFS));
