@@ -33,7 +33,7 @@ void FEHeatFlux::Residual(FEGlobalVector& R)
 	int i, j, n;
 	FEModel& fem = R.GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	const int dof_T = fem.GetDOFS().GetDOF("t");
+	const int dof_T = fem.GetDOFS().GetDOF("T");
 	if (dof_T == -1) { assert(false); return; }
 	
 	vector<int> elm;

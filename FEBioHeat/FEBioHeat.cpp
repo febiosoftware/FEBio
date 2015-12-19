@@ -7,7 +7,6 @@
 #include "FEHeatSolidDomain.h"
 #include "FEHeatDomainFactory.h"
 #include "FEHeatSource.h"
-#include "FEBioHeatData.h"
 #include "FEThermoElasticSolver.h"
 #include "FEThermoElasticMaterial.h"
 #include "FEThermoNeoHookean.h"
@@ -48,9 +47,6 @@ void InitModule()
 
 	// Plot data fields
 	REGISTER_FECORE_CLASS(FEPlotHeatFlux		, FEPLOTDATA_ID, "heat flux"	);
-
-	// log data fields
-	REGISTER_FECORE_CLASS(FENodeTemp, FENODELOGDATA_ID, "T");
 }
 
 }

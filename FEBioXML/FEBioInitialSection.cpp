@@ -57,7 +57,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 		{
 			// Get the degree of freedom
 			int ndof = -1;
-			if      (tag == "temperature"   ) ndof = dofs.GetDOF("t");
+			if      (tag == "temperature"   ) ndof = dofs.GetDOF("T");
 			else if (tag == "fluid_pressure") ndof = dofs.GetDOF("p");
 			else if (tag == "concentration" )
 			{

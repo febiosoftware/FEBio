@@ -6,29 +6,11 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-double FENodePressure::value(int nnode) 
-{
-	FEMesh& mesh = m_pfem->GetMesh();
-	FENode& node = mesh.Node(nnode);
-	const int dof_p = m_pfem->GetDOFIndex("p");
-	return node.get(dof_p); 
-}
-
-//-----------------------------------------------------------------------------
 double FENodeConcentration::value(int nnode) 
 {
 	FEMesh& mesh = m_pfem->GetMesh();
 	FENode& node = mesh.Node(nnode);
 	const int dof_C = m_pfem->GetDOFIndex("concentration", 0);	
-	return node.get(dof_C); 
-}
-
-//-----------------------------------------------------------------------------
-double FENodeConcentration_::value(int nnode) 
-{
-	FEMesh& mesh = m_pfem->GetMesh();
-	FENode& node = mesh.Node(nnode);
-	const int dof_C = m_pfem->GetDOFIndex("concentration", m_nsol);
 	return node.get(dof_C); 
 }
 

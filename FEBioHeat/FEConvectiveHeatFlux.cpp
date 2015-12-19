@@ -38,7 +38,7 @@ void FEConvectiveHeatFlux::Residual(FEGlobalVector& R)
 {
 	FEModel& fem = R.GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	const int dof_T = fem.GetDOFS().GetDOF("t");
+	const int dof_T = fem.GetDOFS().GetDOF("T");
 	if (dof_T == -1) { assert(false); return; }
 
 	int nfc = m_psurf->Elements();
@@ -119,7 +119,7 @@ void FEConvectiveHeatFlux::StiffnessMatrix(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	const int dof_T = fem.GetDOFS().GetDOF("t");
+	const int dof_T = fem.GetDOFS().GetDOF("T");
 	if (dof_T == -1) { assert(false); return; }
 
 	matrix ke;

@@ -8,37 +8,12 @@
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-class FENodePressure : public FENodeLogData
-{ 
-public: 
-	FENodePressure(FEModel* pfem) : FENodeLogData(pfem){} 
-	double value(int node); 
-};
-
-//-----------------------------------------------------------------------------
+// This class uses the deprecated "c" variable to denote concentrations.
 class FENodeConcentration : public FENodeLogData
 { 
 public: 
 	FENodeConcentration(FEModel* pfem) : FENodeLogData(pfem){} 
 	double value(int node); 
-};
-
-//-----------------------------------------------------------------------------
-class FENodeConcentration_ : public FENodeLogData
-{ 
-protected: 
-	FENodeConcentration_(FEModel* pfem, int nsol) : FENodeLogData(pfem), m_nsol(nsol) {} 
-	double value(int node); 
-private:
-	int	m_nsol;
-};
-
-//-----------------------------------------------------------------------------
-template <int N> class FENodeConcentration_T : public FENodeConcentration_
-{ 
-public: 
-	FENodeConcentration_T(FEModel* pfem) : FENodeConcentration_(pfem, N) {} 
-	double value(int node) { return FENodeConcentration_::value(node); }
 };
 
 //=============================================================================

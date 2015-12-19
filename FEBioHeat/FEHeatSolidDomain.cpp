@@ -21,7 +21,7 @@ void FEHeatSolidDomain::SetMaterial(FEMaterial* pmat)
 void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	DOFS& dofs = GetFEModel()->GetDOFS();
-	const int dof_T = dofs.GetDOF("t");
+	const int dof_T = dofs.GetDOF("T");
 
 	int N = el.Nodes();
 	lm.resize(N);
@@ -42,7 +42,7 @@ void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 void FEHeatSolidDomain::Activate()
 {
 	DOFS& dofs = GetFEModel()->GetDOFS();
-	const int dof_T = dofs.GetDOF("t");
+	const int dof_T = dofs.GetDOF("T");
 
 	for (int i=0; i<Nodes(); ++i)
 	{

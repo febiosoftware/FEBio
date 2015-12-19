@@ -22,10 +22,10 @@ FEHeatSolver::FEHeatSolver(FEModel* pfem) : FELinearSolver(pfem)
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
 	int varT = dofs.AddVariable("temperature");
-	dofs.AddDOF(varT, "t");
+	dofs.AddDOF(varT, "T");
 
 	// set the active degrees of freedom for this solver
-	const int dof_T = dofs.GetDOF("t");
+	const int dof_T = dofs.GetDOF("T");
 	vector<int> dof;
 	dof.push_back(dof_T);
 	SetDOF(dof);
@@ -43,7 +43,7 @@ bool FEHeatSolver::Init()
 	// Call base class first
 	if (FELinearSolver::Init() == false) return false;
 
-	const int dof_T = m_fem.GetDOFS().GetDOF("t");
+	const int dof_T = m_fem.GetDOFS().GetDOF("T");
 	if (dof_T == -1) { assert(false); return false; }
 
 	// allocate data structures
@@ -79,7 +79,7 @@ bool FEHeatSolver::Init()
 void FEHeatSolver::Update(vector<double>& u)
 {
 	FEMesh& mesh = m_fem.GetMesh();
-	const int dof_T = m_fem.GetDOFS().GetDOF("t");
+	const int dof_T = m_fem.GetDOFS().GetDOF("T");
 	if (dof_T == -1) { assert(false); return; }
 
 	// update temperatures
@@ -150,7 +150,7 @@ void FEHeatSolver::NodalFluxes(FEGlobalVector& R)
 {
 	// get the FE mesh
 	FEMesh& mesh = m_fem.GetMesh();
-	const int dof_T = m_fem.GetDOFS().GetDOF("t");
+	const int dof_T = m_fem.GetDOFS().GetDOF("T");
 	if (dof_T == -1) { assert(false); return; }
 
 	// loop over nodal loads

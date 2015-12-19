@@ -18,7 +18,18 @@ void NodeDataRecord::Parse(const char* szexpr)
 		if (ch) *ch++ = 0;
 		FENodeLogData* pdata = fecore_new<FENodeLogData>(FENODELOGDATA_ID, sz, m_pfem);
 		if (pdata) m_Data.push_back(pdata);
-		else throw UnknownDataField(sz);
+		else 
+		{
+			// see if this refers to a DOF of the model
+			int ndof = m_pfem->GetDOFIndex(sz);
+			if (ndof >= 0)
+			{
+				// Add an output for a nodal variable
+				pdata = new FENodeVarData(m_pfem, ndof);
+				m_Data.push_back(pdata);
+			}
+			else throw UnknownDataField(sz);
+		}
 		sz = ch;
 	}
 	while (ch);
@@ -52,4 +63,12 @@ void NodeDataRecord::SetItemList(FENodeSet* pns)
 	assert(n);
 	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = (*pns)[i] + 1;
+}
+
+//-----------------------------------------------------------------------------
+double FENodeVarData::value(int node)
+{
+	FEModel& fem = *m_pfem;
+	FEMesh& mesh = fem.GetMesh();
+	return mesh.Node(node).get(m_ndof);
 }

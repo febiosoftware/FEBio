@@ -31,3 +31,14 @@ public:
 private:
 	vector<FENodeLogData*>	m_Data;
 };
+
+//-----------------------------------------------------------------------------
+// Special class for outputting nodal variables
+class FENodeVarData : public FENodeLogData
+{
+public:
+	FENodeVarData(FEModel* pfem, int ndof) : FENodeLogData(pfem), m_ndof(ndof) {}
+	double value(int node);
+private:
+	int	m_ndof;
+};

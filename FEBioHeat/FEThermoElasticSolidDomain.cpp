@@ -9,7 +9,7 @@
 FEThermoElasticSolidDomain::FEThermoElasticSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
-	m_dofT = pfem->GetDOFIndex("t");
+	m_dofT = pfem->GetDOFIndex("T");
 }
 
 //-----------------------------------------------------------------------------
@@ -59,7 +59,7 @@ bool FEThermoElasticSolidDomain::Initialize(FEModel &fem)
 {
 	// initialize base class
 	FESolidDomain::Initialize(fem);
-	const int dof_T = fem.GetDOFS().GetDOF("t");
+	const int dof_T = fem.GetDOFS().GetDOF("T");
 	if (dof_T == -1) { assert(false); return false; }
     
 	// initialize local coordinate systems (can I do this elsewhere?)
@@ -771,7 +771,7 @@ vec3d weird_product(double Ga[3], double Gb[3], double GT[3], const tens4ds& t)
 //! Conductivity gradient stiffness (i.e. derivative of conductivity wrt strain
 void FEThermoElasticSolidDomain::ElementGradientStiffness(FESolidElement &el, matrix& ke)
 {
-	const int dof_T = GetFEModel()->GetDOFS().GetDOF("t");
+	const int dof_T = GetFEModel()->GetDOFS().GetDOF("T");
 
 	// global derivatives of shape functions
 	// Gx = dH/dx
@@ -872,7 +872,7 @@ void FEThermoElasticSolidDomain::UpdateStresses(FEModel &fem)
 // It evaluates the Cauchy stress tensor, as well as the spatial heat flux vector.
 void FEThermoElasticSolidDomain::UpdateElementStress(int iel)
 {
-	const int dof_T = GetFEModel()->GetDOFS().GetDOF("t");
+	const int dof_T = GetFEModel()->GetDOFS().GetDOF("T");
 
 	// get the solid element
 	FESolidElement& el = m_Elem[iel];
