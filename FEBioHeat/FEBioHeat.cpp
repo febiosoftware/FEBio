@@ -1,6 +1,5 @@
 #include "FEBioHeat.h"
 #include "FEIsotropicFourier.h"
-#include "FEPlotNodeTemperature.h"
 #include "FEPlotHeatFlux.h"
 #include "FEHeatFlux.h"
 #include "FEConvectiveHeatFlux.h"
@@ -48,7 +47,6 @@ void InitModule()
 	REGISTER_FECORE_CLASS(FEConvectiveHeatFlux, FESURFACELOAD_ID, "convective_heatflux");
 
 	// Plot data fields
-	REGISTER_FECORE_CLASS(FEPlotNodeTemperature	, FEPLOTDATA_ID, "temperature"	);
 	REGISTER_FECORE_CLASS(FEPlotHeatFlux		, FEPLOTDATA_ID, "heat flux"	);
 
 	// log data fields
