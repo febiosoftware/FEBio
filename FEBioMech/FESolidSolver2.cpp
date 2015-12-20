@@ -72,22 +72,22 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem)
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
-	int varD = dofs.AddVariable("displacement");
-	dofs.AddDOF(varD, "x");
-	dofs.AddDOF(varD, "y");
-	dofs.AddDOF(varD, "z");
-	int varQ = dofs.AddVariable("rotation");
-	dofs.AddDOF(varQ, "u");
-	dofs.AddDOF(varQ, "v");
-	dofs.AddDOF(varQ, "w");
-	int varQR = dofs.AddVariable("rigid rotation");
-	dofs.AddDOF(varQR, "Ru");
-	dofs.AddDOF(varQR, "Rv");
-	dofs.AddDOF(varQR, "Rw");
-	int varV = dofs.AddVariable("velocity");
-	dofs.AddDOF(varV, "vx");
-	dofs.AddDOF(varV, "vy");
-	dofs.AddDOF(varV, "vz");
+	int varD = dofs.AddVariable("displacement", VAR_VEC3);
+	dofs.SetDOFName(varD, 0, "x");
+	dofs.SetDOFName(varD, 1, "y");
+	dofs.SetDOFName(varD, 2, "z");
+	int varQ = dofs.AddVariable("rotation", VAR_VEC3);
+	dofs.SetDOFName(varQ, 0, "u");
+	dofs.SetDOFName(varQ, 1, "v");
+	dofs.SetDOFName(varQ, 2, "w");
+	int varQR = dofs.AddVariable("rigid rotation", VAR_VEC3);
+	dofs.SetDOFName(varQR, 0, "Ru");
+	dofs.SetDOFName(varQR, 1, "Rv");
+	dofs.SetDOFName(varQR, 2, "Rw");
+	int varV = dofs.AddVariable("velocity", VAR_VEC3);
+	dofs.SetDOFName(varV, 0, "vx");
+	dofs.SetDOFName(varV, 1, "vy");
+	dofs.SetDOFName(varV, 2, "vz");
 
 	// get the DOF indices
 	m_dofX  = pfem->GetDOFIndex("x");

@@ -51,8 +51,8 @@ FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
 	int varP = dofs.AddVariable("fluid pressure");
-	dofs.AddDOF(varP, "p");
-	dofs.AddVariable("concentration");	// we start with zero concentrations
+	dofs.SetDOFName(varP, 0, "p");
+	dofs.AddVariable("concentration", VAR_ARRAY);	// we start with zero concentrations
 }
 
 //-----------------------------------------------------------------------------

@@ -433,7 +433,6 @@ REGISTER_FECORE_CLASS(FEPlotElementMicroEnergy   , FEPLOTDATA_ID, "m energy"			 
 REGISTER_FECORE_CLASS(FEPlotElementenergydiff    , FEPLOTDATA_ID, "M-m energy diff"       );
 
 //-----------------------------------------------------------------------------
-REGISTER_FECORE_CLASS(FEPlotNodeDisplacement   , FEPLOTDATA_ID, "displacement"   );
 REGISTER_FECORE_CLASS(FEPlotNodeVelocity       , FEPLOTDATA_ID, "velocity"       );
 REGISTER_FECORE_CLASS(FEPlotNodeAcceleration   , FEPLOTDATA_ID, "acceleration"   );
 REGISTER_FECORE_CLASS(FEPlotNodeReactionForces , FEPLOTDATA_ID, "reaction forces");

@@ -43,9 +43,9 @@ FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel* pfem) : FEBiphasicSolver
 	m_bsymm = false; // assume non-symmetric stiffness matrix by default
 
 	// Allocate degrees of freedom
+	// (We start with zero concentration degrees of freedom)
 	DOFS& dofs = pfem->GetDOFS();
-	int varC = dofs.AddVariable("concentration");
-	dofs.AddDOF(varC, 0);	// we start with zero concentrations
+	int varC = dofs.AddVariable("concentration", VAR_ARRAY);
 
 	m_dofC = -1;
 }

@@ -93,7 +93,7 @@ void DOFS::Reset()
 //! Define a variable.
 //! This creates an empty variable. Add DOFs to this variable using one of the 
 //! DOFS::AddDOF functions.
-int DOFS::AddVariable(const char* szvar)
+int DOFS::AddVariable(const char* szvar, int ntype)
 {
 	// Make sure szvar is a valid symbol
 	if (szvar    == 0) return -1;	// cannot be null
@@ -106,6 +106,21 @@ int DOFS::AddVariable(const char* szvar)
 	// Okay, add the variable
 	Var var;
 	var.szname = szvar;
+	var.ntype = ntype;
+
+	// allocate degrees of freedom
+	int ndof = 0;
+	if (ntype == VAR_SCALAR) ndof = 1;
+	else if (ntype == VAR_VEC2  ) ndof = 2;
+	else if (ntype == VAR_VEC3  ) ndof = 3;
+	else if (ntype == VAR_ARRAY) ndof = 0;		// for array we start with no dofs predefined (use AddDOF to a dofs to an array variable)
+	else { assert(false); return -1; }
+	if (ndof > 0) 
+	{
+		var.m_dof.resize(ndof);
+		Update();
+	}
+	
 	m_var.push_back(var);
 
 	// return the index to this variable
@@ -140,6 +155,7 @@ int DOFS::GetVariableIndex(const char* szvar)
 
 //-----------------------------------------------------------------------------
 //! Add a degree of freedom to a variable.
+// This only works on array variables
 //! Returns -1 if the degree of freedom exists or if the symbol is invalid
 //! \sa DOFS::GetDOF
 int DOFS::AddDOF(const char* szvar, const char* sz)
@@ -154,7 +170,7 @@ int DOFS::AddDOF(const char* szvar, const char* sz)
 
 	// Make sure the variable is valid
 	Var* pvar = GetVariable(szvar);
-	if (pvar)
+	if (pvar && (pvar->ntype == VAR_ARRAY))
 	{
 		Var& var = *pvar;
 
@@ -190,15 +206,21 @@ int DOFS::AddDOF(int nvar, const char* sz)
 	if (nvar < 0) return -1;
 	if (nvar >= (int) m_var.size()) return -1; 
 
-	// Add the DOF
-	DOF_ITEM it(sz);
-	m_var[nvar].m_dof.push_back(it);
+	Var& var = m_var[nvar];
+	if (var.ntype == VAR_ARRAY)
+	{
+		// Add the DOF
+		DOF_ITEM it(sz);
+		m_var[nvar].m_dof.push_back(it);
 
-	// update all dofs
-	Update();
+		// update all dofs
+		Update();
 
-	// return a nonnegative number
-	return 0;
+		// return a nonnegative number
+		return 0;
+	}
+
+	return -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -268,6 +290,14 @@ int DOFS::GetVariableSize(int nvar)
 }
 
 //-----------------------------------------------------------------------------
+//! get the size of the dof array of a variable
+int DOFS::GetVariableType(int nvar)
+{
+	if ((nvar < 0) || (nvar >= (int) m_var.size())) return -1;
+	return m_var[nvar].ntype;
+}
+
+//-----------------------------------------------------------------------------
 // Updates the DOF indices. 
 // This is called after a dof is added. 
 void DOFS::Update()
@@ -304,8 +334,31 @@ DOFS::DOF_ITEM* DOFS::GetDOFPtr(const char* szdof)
 }
 
 //-----------------------------------------------------------------------------
-void DOFS::ChangeDOFName(const char* szdof, const char* szname)
+void DOFS::SetDOFName(const char* szvar, int n, const char* szname)
 {
-	DOF_ITEM* pdof = GetDOFPtr(szdof);
-	if (pdof) pdof->SetName(szname);
+	Var* pvar = GetVariable(szvar);
+	if (pvar)
+	{
+		int nsize = (int) pvar->m_dof.size();
+		if ((n>=0)&&(n<nsize))
+		{
+			DOF_ITEM& it = pvar->m_dof[n];
+			it.SetName(szname);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void DOFS::SetDOFName(int nvar, int n, const char* szname)
+{
+	if ((nvar>=0)&&(nvar<(int)m_var.size()))
+	{
+		Var& var = m_var[nvar];
+		int nsize = (int) var.m_dof.size();
+		if ((n>=0)&&(n<nsize))
+		{
+			DOF_ITEM& it = var.m_dof[n];
+			it.SetName(szname);
+		}
+	}
 }

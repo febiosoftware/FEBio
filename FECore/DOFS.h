@@ -14,6 +14,13 @@
 #define DOF_ACTIVE		 0		// the dof is active and an equation can be assigned (depending on its type)
 
 //-----------------------------------------------------------------------------
+// Types of variables
+#define VAR_SCALAR	0		// scalar variable
+#define VAR_VEC2	1		// 2D vector
+#define VAR_VEC3	2		// 3D vector
+#define VAR_ARRAY	3		// a variable array of scalars
+
+//-----------------------------------------------------------------------------
 //! Class that manages the variables and degrees of freedoms.
 class DOFS
 {
@@ -43,10 +50,11 @@ class DOFS
 	{
 	public:
 		Var() : szname(0) {}
-		Var(const Var& v) { szname = v.szname; m_dof = v.m_dof; }
-		void operator = (const Var& v) { szname = v.szname; m_dof = v.m_dof; }
+		Var(const Var& v) { szname = v.szname; m_dof = v.m_dof; ntype = v.ntype; }
+		void operator = (const Var& v) { szname = v.szname; m_dof = v.m_dof; ntype = v.ntype; }
 
 	public:
+		int			ntype;				// type of variable
 		const char* szname;				// variable name
 		std::vector<DOF_ITEM>	m_dof;	// list of dofs for this variable
 	};
@@ -66,16 +74,18 @@ public:
 public:
 	//! Add a (empty) variable
 	//! returns the new variable's index (or -1 if the variable already exists)
-	int AddVariable(const char* szname);
+	int AddVariable(const char* szname, int ntype = VAR_SCALAR);
 
 	//! Get the index of a variable (returns -1 if the variable does not exist)
 	int GetVariableIndex(const char* szname);
 
 	// Add a degree of freedom
+	// Can only be used on array variables.
 	// returns >= 0 on success and -1 on failure (e.g. if the dof is already defined)
 	int AddDOF(const char* szvar, const char* sz);
 
 	// Add a degree of freedom
+	// Can only be used on array variables.
 	// returns >= 0 on success and -1 on failure (e.g. if the dof is already defined)
 	int AddDOF(int nvar, const char* sz);
 
@@ -99,11 +109,15 @@ public:
 	//! (returns -1 if the variable is not defined)
 	int GetVariableSize(int nvar);
 
+	//! return the type of a variable
+	int GetVariableType(int nvar);
+
 	//! return the total number of degrees of freedom
 	int GetTotalDOFS() const { return m_maxdofs; }
 
-	//! change the name of a DOF
-	void ChangeDOFName(const char* szdof, const char* szname);
+	//! Set the name of a DOF
+	void SetDOFName(const char* szvar, int n, const char* szname);
+	void SetDOFName(int nvar, int n, const char* szname);
 
 private:
 	void Update();

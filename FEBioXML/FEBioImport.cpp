@@ -400,30 +400,30 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			DOFS& dofs = fem.GetDOFS();
 			dofs.Reset();
 
-			// Add the default degrees of freedom
-			int varD = dofs.AddVariable("displacement");
-			dofs.AddDOF(varD, "x");
-			dofs.AddDOF(varD, "y");
-			dofs.AddDOF(varD, "z");
-			int varQ = dofs.AddVariable("rotation");
-			dofs.AddDOF(varQ, "u");
-			dofs.AddDOF(varQ, "v");
-			dofs.AddDOF(varQ, "w");
+			// Add the default variables and degrees of freedom
+			int varD = dofs.AddVariable("displacement", VAR_VEC3);
+			dofs.SetDOFName(varD, 0, "x");
+			dofs.SetDOFName(varD, 1, "y");
+			dofs.SetDOFName(varD, 2, "z");
+			int varQ = dofs.AddVariable("rotation", VAR_VEC3);
+			dofs.SetDOFName(varQ, 0, "u");
+			dofs.SetDOFName(varQ, 1, "v");
+			dofs.SetDOFName(varQ, 2, "w");
 			int varP = dofs.AddVariable("fluid pressure");
-			dofs.AddDOF(varP, "p");
-			int varQR = dofs.AddVariable("rigid rotation");
-			dofs.AddDOF(varQR, "Ru");
-			dofs.AddDOF(varQR, "Rv");
-			dofs.AddDOF(varQR, "Rw");
+			dofs.SetDOFName(varP, 0, "p");
+			int varQR = dofs.AddVariable("rigid rotation", VAR_VEC3);
+			dofs.SetDOFName(varQR, 0, "Ru");
+			dofs.SetDOFName(varQR, 1, "Rv");
+			dofs.SetDOFName(varQR, 2, "Rw");
 			int varT = dofs.AddVariable("temperature");
-			dofs.AddDOF(varT, "T");
-			int varV = dofs.AddVariable("velocity");
-			dofs.AddDOF(varV, "vx");
-			dofs.AddDOF(varV, "vy");
-			dofs.AddDOF(varV, "vz");
+			dofs.SetDOFName(varT, 0, "T");
+			int varV = dofs.AddVariable("velocity", VAR_VEC3);
+			dofs.SetDOFName(varV, 0, "vx");
+			dofs.SetDOFName(varV, 1, "vy");
+			dofs.SetDOFName(varV, 2, "vz");
 			int varE = dofs.AddVariable("fluid dilation");
-			dofs.AddDOF(varE, "e");
-			int varC = dofs.AddVariable("concentration"); // we start with zero concentrations
+			dofs.SetDOFName(varE, 0, "e");
+			int varC = dofs.AddVariable("concentration", VAR_ARRAY); // we start with zero concentrations
 		}
 
 		// parse the file

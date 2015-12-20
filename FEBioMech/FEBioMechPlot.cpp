@@ -23,29 +23,6 @@
 //=============================================================================
 //                            N O D E   D A T A
 //=============================================================================
-//-----------------------------------------------------------------------------
-//! Store the nodal displacements
-bool FEPlotNodeDisplacement::Save(FEMesh& m, FEDataStream& a)
-{
-	FEModel& fem = *GetFEModel();
-	const int dof_X = fem.GetDOFIndex("x");
-	const int dof_Y = fem.GetDOFIndex("y");
-	const int dof_Z = fem.GetDOFIndex("z");
-
-	// loop over all nodes
-	for (int i=0; i<m.Nodes(); ++i)
-	{
-		// get the next node
-		FENode& node = m.Node(i);
-
-		// calculate displacement
-		vec3d u = node.get_vec3d(dof_X, dof_Y, dof_Z);
-
-		// stream displacement
-		a << u;
-	}
-	return true;
-}
 
 //-----------------------------------------------------------------------------
 bool FEPlotNodeVelocity::Save(FEMesh& m, FEDataStream& a)

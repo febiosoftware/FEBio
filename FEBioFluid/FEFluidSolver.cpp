@@ -66,12 +66,12 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
-	int nV = dofs.AddVariable("fluid velocity");
-	int nE = dofs.AddVariable("fluid dilation");
-	dofs.AddDOF(nV, "vx");
-	dofs.AddDOF(nV, "vy");
-	dofs.AddDOF(nV, "vz");
-	dofs.AddDOF(nE, "e");
+	int nV = dofs.AddVariable("fluid velocity", VAR_VEC3);
+	int nE = dofs.AddVariable("fluid dilation", VAR_SCALAR);
+	dofs.SetDOFName(nV, 0, "vx");
+	dofs.SetDOFName(nV, 1, "vy");
+	dofs.SetDOFName(nV, 2, "vz");
+	dofs.SetDOFName(nE, 0, "e");
 
 	// get the dof indices
 	m_dofVX = pfem->GetDOFIndex("vx");

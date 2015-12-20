@@ -198,10 +198,15 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 		int nvar = dofs.GetVariableIndex(szname);
 		if (nvar >= 0)
 		{
-			int ndofs = dofs.GetVariableSize(nvar);
-			if (ndofs == 1)
+			int ntype = dofs.GetVariableType(nvar);
+			if (ntype == VAR_SCALAR)
 			{
 				ps = new FEPlotVariable(szname, PLT_FLOAT, FMT_NODE);
+				return AddNodalVariable(ps, szname, item);
+			}
+			else if (ntype == VAR_VEC3)
+			{
+				ps = new FEPlotVariable(szname, PLT_VEC3F, FMT_NODE);
 				return AddNodalVariable(ps, szname, item);
 			}
 		}
