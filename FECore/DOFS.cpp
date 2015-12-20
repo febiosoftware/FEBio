@@ -115,13 +115,11 @@ int DOFS::AddVariable(const char* szvar, int ntype)
 	else if (ntype == VAR_VEC3  ) ndof = 3;
 	else if (ntype == VAR_ARRAY) ndof = 0;		// for array we start with no dofs predefined (use AddDOF to a dofs to an array variable)
 	else { assert(false); return -1; }
-	if (ndof > 0) 
-	{
-		var.m_dof.resize(ndof);
-		Update();
-	}
-	
+
+	if (ndof > 0) var.m_dof.resize(ndof);
 	m_var.push_back(var);
+
+	Update();
 
 	// return the index to this variable
 	return (int) m_var.size() - 1;
