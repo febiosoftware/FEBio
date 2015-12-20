@@ -638,8 +638,9 @@ void FEFluidDomain2D::ElementMassMatrix(FEShellElement& el, matrix& ke)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidDomain2D::UpdateStresses(FEModel &fem)
+void FEFluidDomain2D::Update()
 {
+	FEModel& fem = *GetFEModel();
     double dt = fem.GetCurrentStep()->m_dt;
     
     // TODO: This is temporary hack for running micro-materials in parallel.

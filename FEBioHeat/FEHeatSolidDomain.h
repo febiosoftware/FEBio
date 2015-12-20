@@ -40,6 +40,9 @@ public:
 	//! set the material
 	void SetMaterial(FEMaterial* pmat);
 
+	//! Update state data
+	void Update();
+
 public: // overloaded from FEHeatDomain
 
 	//! Calculate the conduction stiffness 

@@ -655,8 +655,9 @@ void FEFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidDomain3D::UpdateStresses(FEModel &fem)
+void FEFluidDomain3D::Update()
 {
+	FEModel& fem = *GetFEModel();
     double dt = fem.GetCurrentStep()->m_dt;
     
     // TODO: This is temporary hack for running micro-materials in parallel.

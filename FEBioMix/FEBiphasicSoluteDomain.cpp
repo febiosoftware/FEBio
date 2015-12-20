@@ -1503,8 +1503,9 @@ void FEBiphasicSoluteDomain::ElementGeometricalStiffness(FESolidElement &el, mat
 
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
+void FEBiphasicSoluteDomain::Update()
 {
+	FEModel& fem = *GetFEModel();
 	double dt = fem.GetCurrentStep()->m_dt;
 	bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
 	bool berr = false;

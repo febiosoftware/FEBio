@@ -107,6 +107,10 @@ public: // optional functions to overload
 	//! Activate the domain
 	virtual void Activate() {}
 
+	//! Update domain data.
+	//! (Called when the model state needs to be updated).
+	virtual void Update() {}
+
 public:
 	// This is an experimental feature.
 	// The idea is to let the class define what data it wants to export

@@ -35,7 +35,7 @@ public:
 public: // overloads from FEElasticDomain
 
 	//! update the truss stresses
-	void UpdateStresses(FEModel& fem);
+	void Update();
 
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);

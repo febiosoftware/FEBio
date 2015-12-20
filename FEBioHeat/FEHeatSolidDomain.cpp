@@ -217,3 +217,36 @@ void FEHeatSolidDomain::ElementCapacitance(FESolidElement &el, matrix &ke, doubl
 		}
 	}
 }
+
+//-----------------------------------------------------------------------------
+// This function updates the domain state data. 
+// This function is called during FESolver::Update after the nodal variables are udpated.
+void FEHeatSolidDomain::Update()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int NE = Elements();
+	const int dof_T = fem.GetDOFIndex("T");
+	for (int j=0; j<NE; ++j)
+	{
+		FESolidElement& el = Element(j);
+		int ni = el.GaussPoints();
+		int ne = el.Nodes();
+
+		// get the nodal temperatures
+		double T[FEElement::MAX_NODES];
+		for (int n=0; n<ne; ++n) T[n] = mesh.Node(el.m_node[n]).get(dof_T);
+
+		// calculate heat flux for each integration point
+		for (int n=0; n<ni; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FEHeatMaterialPoint* pt = (mp.ExtractData<FEHeatMaterialPoint>());
+			assert(pt);
+
+			vec3d gradT = gradient(el, T, n);
+			mat3ds D = m_pMat->Conductivity(mp);
+			pt->m_q = -(D*gradT);
+		}
+	}
+}

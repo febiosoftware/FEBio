@@ -192,7 +192,7 @@ void FEElasticTrussDomain::ElementInternalForces(FETrussElement& el, vector<doub
 
 //-----------------------------------------------------------------------------
 //! Update the truss' stresses
-void FEElasticTrussDomain::UpdateStresses(FEModel &fem)
+void FEElasticTrussDomain::Update()
 {
 	// loop over all elements
 	vec3d r0[2], rt[2];

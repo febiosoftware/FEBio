@@ -618,12 +618,4 @@ void FEThermoElasticSolver::Update(vector<double>& ui)
 		int n = node.m_ID[m_dofT];
 		if (n >= 0) node.set(m_dofT, m_Ut[n] + m_Ui[n] + ui[n]);
 	}
-
-	// make sure the prescribed displacements are fullfilled
-	int ndis = m_fem.PrescribedBCs();
-	for (int i=0; i<ndis; ++i)
-	{
-		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
-		if (dc.IsActive()) dc.Update();
-	}
 }

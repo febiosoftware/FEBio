@@ -1113,7 +1113,7 @@ void FEBiphasicSolidDomain::ElementGeometricalStiffness(FESolidElement &el, matr
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSolidDomain::UpdateStresses(FEModel &fem)
+void FEBiphasicSolidDomain::Update()
 {
 	bool berr = false;
 	int NE = (int) m_Elem.size();

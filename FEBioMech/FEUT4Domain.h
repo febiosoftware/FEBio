@@ -44,8 +44,8 @@ public:
 
 public: // overrides from FEElasticDomain
 
-	//! Update stresses
-	void UpdateStresses(FEModel& fem);
+	//! Update domain data
+	void Update();
 
 	//! calculates the internal force vector
 	void InternalForces(FEGlobalVector& R);

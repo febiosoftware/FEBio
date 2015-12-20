@@ -32,8 +32,8 @@ public: // overridden from FEElasticDomain
 	//! Calculates inertial forces for dynamic problems | todo implement (removed assert DSR)
 	void InertialForces(FEGlobalVector& R, vector<double>& F) { }
 
-	//! update stresses (not used for discrete springs)
-	void UpdateStresses(FEModel& fem){}	
+	//! update domain data
+	void Update(){}	
 
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);

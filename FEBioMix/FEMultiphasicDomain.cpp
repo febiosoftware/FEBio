@@ -1945,8 +1945,9 @@ void FEMultiphasicDomain::ElementGeometricalStiffness(FESolidElement &el, matrix
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::UpdateStresses(FEModel &fem)
+void FEMultiphasicDomain::Update()
 {
+	FEModel& fem = *GetFEModel();
 	bool berr = false;
 	int NE = (int) m_Elem.size();
 	double dt = fem.GetCurrentStep()->m_dt;

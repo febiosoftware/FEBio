@@ -839,7 +839,7 @@ void FEThermoElasticSolidDomain::ElementGradientStiffness(FESolidElement &el, ma
 }
 
 //-----------------------------------------------------------------------------
-void FEThermoElasticSolidDomain::UpdateStresses(FEModel &fem)
+void FEThermoElasticSolidDomain::Update()
 {
 	bool berr = false;
 	int NE = (int) m_Elem.size();

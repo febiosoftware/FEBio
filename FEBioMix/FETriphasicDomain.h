@@ -36,8 +36,8 @@ public:
 	//! initialize elements for this domain
 	void InitElements();
 	
-	// update stresses (overridden from FEElasticDomain)
-	void UpdateStresses(FEModel& fem);
+	// update domain data
+	void Update();
 
 	//! update element state data
 	void UpdateElementStress(int iel);

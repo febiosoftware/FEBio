@@ -52,7 +52,7 @@ public: // these functions need to be implemented by the derived class
 	virtual bool StiffnessMatrix() = 0;
 
 	//! Update the model state
-	virtual void Update(vector<double>& u) = 0;
+	virtual void Update(vector<double>& u);
 
 protected: // some helper functions
 

@@ -12,7 +12,6 @@ public:
 	virtual ~FELinearElasticDomain(){}
 	virtual void StiffnessMatrix(FESolver* psolver) = 0;
 	virtual void RHS(FEGlobalVector& R) = 0;
-	virtual void UpdateStresses(FEModel& fem) = 0;
 protected:
 	int	m_dofX;
 	int	m_dofY;
@@ -53,8 +52,8 @@ public: // overrides from FELinearElasticDomain
 	// Calculate the RHS vector
 	void RHS(FEGlobalVector& R);
 
-	//! Update the element stresses
-	void UpdateStresses(FEModel& fem);
+	//! Update domain data
+	void Update();
 
 protected:
 	void InitialStress(FESolidElement& el, vector<double>& fe);

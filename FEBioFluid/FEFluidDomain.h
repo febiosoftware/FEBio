@@ -28,9 +28,6 @@ public:
     FEFluidDomain(FEModel* pfem);
     virtual ~FEFluidDomain(){}
     
-    //! Updates the element stresses
-    virtual void UpdateStresses(FEModel& fem) = 0;
-    
     // --- R E S I D U A L ---
     
     //! calculate the internal forces

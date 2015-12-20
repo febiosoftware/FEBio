@@ -249,11 +249,11 @@ bool FEUT4Domain::Initialize(FEModel& mdl)
 
 //-----------------------------------------------------------------------------
 //! Update the nodal and element stresses
-void FEUT4Domain::UpdateStresses(FEModel &fem)
+void FEUT4Domain::Update()
 {
 	// updating the element stresses is easy, since we only
 	// need to call the base class
-	FEElasticSolidDomain::UpdateStresses(fem);
+	FEElasticSolidDomain::Update();
 
 	// next we update the nodal data
 	int i, j, NE = Elements();

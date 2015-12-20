@@ -331,3 +331,33 @@ void FELinearSolver::Serialize(DumpFile& ar)
 		ar >> m_breform;
 	}
 }
+
+//-----------------------------------------------------------------------------
+// This function copies the solution back to the nodal variables
+// and class the FEDomain::Update to give domains a chance to update
+// their local data.
+// TODO: Instead of calling Update on all domains, perhaps I should introduce
+//       a mechanism for solvers only update the domains that are relevant.
+void FELinearSolver::Update(vector<double>& u)
+{
+	FEMesh& mesh = m_fem.GetMesh();
+
+	// update nodal variables
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		for (int j=0; j<m_dof.size(); ++j)
+		{
+			int n = node.m_ID[m_dof[j]];
+			if (n >= 0) node.set(m_dof[j], u[n]);
+			else if (-n-2 >= 0) node.set(m_dof[j], u[-n-2]);
+		}
+	}
+
+	// update the domains
+	for (int i=0; i<mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		dom.Update();
+	}
+}

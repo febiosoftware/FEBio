@@ -278,11 +278,7 @@ void FEFluidSolver::UpdateStresses()
     FEMesh& mesh = m_fem.GetMesh();
     
     // update the stresses on all domains
-    for (int i=0; i<mesh.Domains(); ++i)
-    {
-        FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        dom.UpdateStresses(m_fem);
-    }
+    for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update();
 }
 
 //-----------------------------------------------------------------------------

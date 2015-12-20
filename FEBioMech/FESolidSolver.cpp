@@ -663,11 +663,7 @@ void FESolidSolver::UpdateStresses()
 	FEMesh& mesh = m_fem.GetMesh();
 
 	// update the stresses on all domains
-	for (int i=0; i<mesh.Domains(); ++i)
-	{
-		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		dom.UpdateStresses(m_fem);
-	}
+	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update();
 }
 
 //-----------------------------------------------------------------------------

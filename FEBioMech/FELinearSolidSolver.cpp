@@ -145,11 +145,7 @@ void FELinearSolidSolver::Update(vector<double>& u)
 	}
 
 	// update the stresses on all domains
-	for (int i=0; i<pstep->Domains(); ++i)
-	{
-		FELinearElasticDomain& d = dynamic_cast<FELinearElasticDomain&>(*pstep->Domain(i));
-		d.UpdateStresses(m_fem);
-	}
+	for (int i=0; i<pstep->Domains(); ++i) pstep->Domain(i)->Update();
 
 	// output modified state data
 	m_fem.Write(FE_UNCONVERGED);

@@ -805,7 +805,7 @@ void FEElasticShellDomain::ElementBodyForce(FEModel& fem, FEShellElement& el, ve
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticShellDomain::UpdateStresses(FEModel &fem)
+void FEElasticShellDomain::Update()
 {
 	FEMesh& mesh = *GetMesh();
 	vec3d r0[9], rt[9];

@@ -440,7 +440,7 @@ void FELinearSolidDomain::InternalForce(FESolidElement& el, vector<double>& fe)
 }
 
 //-----------------------------------------------------------------------------
-void FELinearSolidDomain::UpdateStresses(FEModel &fem)
+void FELinearSolidDomain::Update()
 {
 	int i, n;
 	int nint, neln;

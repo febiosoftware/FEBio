@@ -19,8 +19,8 @@ public:
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolver* psolver);
 
-	// update stresses
-	void UpdateStresses(FEModel& fem);
+	// update domain data
+	void Update();
 
 protected: // element residual contributions
 	//! Calculates the internal stress vector for enhanced strain hex elements

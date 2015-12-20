@@ -42,7 +42,7 @@ public: // overrides from FEDomain
 public: // overrides from FEElasticDomain
 
 	// update stresses
-	void UpdateStresses(FEModel& fem);
+	void Update();
 
 	// update the element stress
 	virtual void UpdateElementStress(int iel, double dt);

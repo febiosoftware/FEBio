@@ -745,8 +745,9 @@ void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, dou
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
+void FEElasticSolidDomain::Update()
 {
+	FEModel& fem = *GetFEModel();
 	double dt = fem.GetCurrentStep()->m_dt;
 
 	// TODO: This is temporary hack for running micro-materials in parallel. 

@@ -24,6 +24,6 @@ public:
 	//! calculates the residual (nothing to do)
 	void InternalForces(FESolver* psolver, vector<double>& R);
 
-	// update stresses (nothing to do)
-	void UpdateStresses(FEModel& fem);
+	// update domain data
+	void Update();
 };

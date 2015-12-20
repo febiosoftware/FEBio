@@ -36,8 +36,8 @@ public:
 	void SetMaterial(FEMaterial* pmat);
 
 public:
-	// update stresses (overridden from FEElasticDomain)
-	void UpdateStresses(FEModel& fem);
+	// update domain data
+	void Update();
 
 	// update element stress
 	void UpdateElementStress(int iel);

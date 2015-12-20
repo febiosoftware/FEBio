@@ -78,53 +78,9 @@ bool FEHeatSolver::Init()
 //! update solution
 void FEHeatSolver::Update(vector<double>& u)
 {
-	FEMesh& mesh = m_fem.GetMesh();
-	const int dof_T = m_fem.GetDOFS().GetDOF("T");
-	if (dof_T == -1) { assert(false); return; }
-
-	// update temperatures
-	for (int i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		int n = node.m_ID[dof_T];
-		if (n >= 0) node.set(dof_T, u[n]);
-		else if (-n-2 >= 0) node.set(dof_T, u[-n-2]);
-	}
-
-	// update heat fluxes
-	for (int i=0; i<mesh.Domains(); ++i)
-	{
-		FEHeatSolidDomain* pbd = dynamic_cast<FEHeatSolidDomain*>(&mesh.Domain(i));
-		if (pbd)
-		{
-			FEHeatTransferMaterial* pmat = dynamic_cast<FEHeatTransferMaterial*>(pbd->GetMaterial());
-			assert(pmat);
-
-			int NE = pbd->Elements();
-			for (int j=0; j<NE; ++j)
-			{
-				FESolidElement& el = pbd->Element(j);
-				int ni = el.GaussPoints();
-				int ne = el.Nodes();
-
-				// get the nodal temperatures
-				double T[FEElement::MAX_NODES];
-				for (int n=0; n<ne; ++n) T[n] = mesh.Node(el.m_node[n]).get(dof_T);
-
-				// calculate heat flux for each integration point
-				for (int n=0; n<ni; ++n)
-				{
-					FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-					FEHeatMaterialPoint* pt = (mp.ExtractData<FEHeatMaterialPoint>());
-					assert(pt);
-
-					vec3d gradT = pbd->gradient(el, T, n);
-					mat3ds D = pmat->Conductivity(mp);
-					pt->m_q = -(D*gradT);
-				}
-			}
-		}
-	}
+	// call base class. 
+	// This updates nodal variables and calls FEDomain::Update
+	FELinearSolver::Update(u);
 
 	// copy new temperatures to old temperature
 	m_Tp = u;

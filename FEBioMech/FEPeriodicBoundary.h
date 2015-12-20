@@ -19,9 +19,6 @@ public:
 	//! shallow copy
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
-	//! update surface data
-	void Update();
-
 	//! calculates the center of mass of the surface
 	vec3d CenterOfMass();
 

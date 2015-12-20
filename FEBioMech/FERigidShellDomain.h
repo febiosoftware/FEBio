@@ -23,6 +23,6 @@ public:
 	//! calculates the internal forces (nothing to do)
 	void InternalForces(FEGlobalVector& R);
 
-	// update stresses
-	void UpdateStresses(FEModel& fem);
+	// update domain data
+	void Update();
 };
