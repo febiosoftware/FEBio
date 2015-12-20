@@ -5,9 +5,6 @@
 //-----------------------------------------------------------------------------
 FELinearElasticDomain::FELinearElasticDomain(FEModel* pfem)
 {
-	m_dofX = pfem->GetDOFIndex("x");
-	m_dofY = pfem->GetDOFIndex("y");
-	m_dofZ = pfem->GetDOFIndex("z");
 }
 
 //-----------------------------------------------------------------------------
@@ -16,6 +13,13 @@ FELinearSolidDomain::FELinearSolidDomain(FEModel* pfem, FEMaterial* pmat) : FESo
 {
 	m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
 	assert(false);
+
+	// list the degrees of freedom
+	vector<int> dof;
+	dof.push_back(pfem->GetDOFIndex("x"));
+	dof.push_back(pfem->GetDOFIndex("y"));
+	dof.push_back(pfem->GetDOFIndex("z"));
+	SetDOF(dof);
 }
 
 //-----------------------------------------------------------------------------
@@ -46,24 +50,6 @@ bool FELinearSolidDomain::Initialize(FEModel &mdl)
 		}
 	}
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FELinearSolidDomain::Activate()
-{
-	for (int i=0; i<Nodes(); ++i)
-	{
-		FENode& node = Node(i);
-		if (node.m_bexclude == false)
-		{
-			if (node.m_rid < 0)
-			{
-				node.m_ID[m_dofX] = DOF_ACTIVE;
-				node.m_ID[m_dofY] = DOF_ACTIVE;
-				node.m_ID[m_dofZ] = DOF_ACTIVE;
-			}
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -98,28 +84,6 @@ void FELinearSolidDomain::InitElements()
 
 			mp.Init(false);
 		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Unpack the element. That is, copy element data in traits structure
-//!
-void FELinearSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
-{
-	int N = el.Nodes();
-	lm.resize(3*N);
-
-	for (int i=0; i<N; ++i)
-	{
-		int n = el.m_node[i];
-		FENode& node = m_pMesh->Node(n);
-
-		vector<int>& id = node.m_ID;
-
-		// get displacement DOFs
-		lm[3*i  ] = id[m_dofX];
-		lm[3*i+1] = id[m_dofY];
-		lm[3*i+2] = id[m_dofZ];
 	}
 }
 
@@ -442,22 +406,18 @@ void FELinearSolidDomain::InternalForce(FESolidElement& el, vector<double>& fe)
 //-----------------------------------------------------------------------------
 void FELinearSolidDomain::Update()
 {
-	int i, n;
-	int nint, neln;
-	double* gw;
-
-	for (i=0; i<(int) m_Elem.size(); ++i)
+	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
 
 		// get the number of integration points
-		nint = el.GaussPoints();
+		const int nint = el.GaussPoints();
 
 		// number of nodes
-		neln = el.Nodes();
+		const int neln = el.Nodes();
 
-		// nodall coordinates
+		// nodal coordinates
 		vec3d r0[FEElement::MAX_NODES];
 		vec3d rt[FEElement::MAX_NODES];
 		for (int j=0; j<neln; ++j)
@@ -467,11 +427,11 @@ void FELinearSolidDomain::Update()
 		}
 
 		// get the integration weights
-		gw = el.GaussWeights();
+		double* gw = el.GaussWeights();
 
 		// loop over the integration points and calculate
 		// the stress at the integration point
-		for (n=0; n<nint; ++n)
+		for (int n=0; n<nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());

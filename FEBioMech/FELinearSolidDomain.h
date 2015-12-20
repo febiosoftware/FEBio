@@ -12,10 +12,6 @@ public:
 	virtual ~FELinearElasticDomain(){}
 	virtual void StiffnessMatrix(FESolver* psolver) = 0;
 	virtual void RHS(FEGlobalVector& R) = 0;
-protected:
-	int	m_dofX;
-	int	m_dofY;
-	int	m_dofZ;
 };
 
 //-----------------------------------------------------------------------------
@@ -31,12 +27,6 @@ public:
 
 	//! Initialization
 	bool Initialize(FEModel& fem);
-
-	//! activate
-	void Activate();
-
-	//! Unpack solid element data
-	void UnpackLM(FEElement& el, vector<int>& lm);
 
 	//! reset element data
 	void Reset();
