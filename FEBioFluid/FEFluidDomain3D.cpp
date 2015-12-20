@@ -26,6 +26,15 @@ FEFluidDomain3D::FEFluidDomain3D(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()
     m_dofVY = pfem->GetDOFIndex("vy");
     m_dofVZ = pfem->GetDOFIndex("vz");
     m_dofE  = pfem->GetDOFIndex("e");
+
+	// list the degrees of freedom
+	// (This allows the FEBomain base class to handle several tasks such as UnpackLM)
+	vector<int> dof;
+	dof.push_back(m_dofVX);
+	dof.push_back(m_dofVY);
+	dof.push_back(m_dofVZ);
+	dof.push_back(m_dofE);
+	SetDOF(dof);
 }
 
 //-----------------------------------------------------------------------------
@@ -106,26 +115,6 @@ bool FEFluidDomain3D::Initialize(FEModel &fem)
     }
     
     return (ninverted == 0);
-}
-
-
-//-----------------------------------------------------------------------------
-void FEFluidDomain3D::Activate()
-{
-    for (int i=0; i<Nodes(); ++i)
-    {
-        FENode& node = Node(i);
-        if (node.m_bexclude == false)
-        {
-            if (node.m_rid < 0)
-            {
-                node.m_ID[m_dofVX] = DOF_ACTIVE;
-                node.m_ID[m_dofVY] = DOF_ACTIVE;
-                node.m_ID[m_dofVZ] = DOF_ACTIVE;
-                node.m_ID[m_dofE]  = DOF_ACTIVE;
-            }
-        }
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -746,97 +735,10 @@ void FEFluidDomain3D::UpdateElementStress(int iel, double dt)
     }
 }
 
-//-----------------------------------------------------------------------------
-//! Unpack the element LM data. 
-void FEFluidDomain3D::UnpackLM(FEElement& el, vector<int>& lm)
-{
-    int N = el.Nodes();
-    lm.resize(N*4);
-    for (int i=0; i<N; ++i)
-    {
-        FENode& node = m_pMesh->Node(el.m_node[i]);
-        vector<int>& id = node.m_ID;
-        
-        // first the velocity dofs
-        lm[4*i  ] = id[m_dofVX];
-        lm[4*i+1] = id[m_dofVY];
-        lm[4*i+2] = id[m_dofVZ];
-        lm[4*i+3] = id[m_dofE ];
-        
-    }
-}
-
-//-----------------------------------------------------------------------------
 void FEFluidDomain3D::InertialForces(FEGlobalVector& R)
 {
-    int NE = (int)m_Elem.size();
-#pragma omp parallel for shared (NE)
-    for (int i=0; i<NE; ++i)
-    {
-        // element force vector
-        vector<double> fe;
-        vector<int> lm;
-        
-        // get the element
-        FESolidElement& el = m_Elem[i];
-        
-        // get the element force vector and initialize it to zero
-        int ndof = 4*el.Nodes();
-        fe.assign(ndof, 0);
-        
-        // calculate internal force vector
-        ElementInertialForce(el, fe);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble element 'fe'-vector into global R vector
-        //#pragma omp critical
-        R.Assemble(el.m_node, lm, fe);
-    }
 }
-
-//-----------------------------------------------------------------------------
-//! calculates the internal equivalent nodal forces for solid elements
 
 void FEFluidDomain3D::ElementInertialForce(FESolidElement& el, vector<double>& fe)
 {
-    int i, n;
-    
-    // jacobian determinant
-    double detJ;
-    
-    mat3ds s;
-    
-    const double* H;
-    
-    int nint = el.GaussPoints();
-    int neln = el.Nodes();
-    
-    double*	gw = el.GaussWeights();
-    
-    // repeat for all integration points
-    for (n=0; n<nint; ++n)
-    {
-        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-        FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
-        double dens = m_pMat->Density(mp);
-        
-        // calculate the jacobian
-        detJ = detJ0(el, n)*gw[n];
-        
-        H = el.H(n);
-        
-        for (i=0; i<neln; ++i)
-        {
-            vec3d f = pt.m_at*(dens*H[i]);
-            
-            // calculate internal force
-            // the '-' sign is so that the internal forces get subtracted
-            // from the global residual vector
-            fe[4*i  ] -= f.x*detJ;
-            fe[4*i+1] -= f.y*detJ;
-            fe[4*i+2] -= f.z*detJ;
-        }
-    }
 }

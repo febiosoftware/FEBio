@@ -20,14 +20,8 @@ public:
     //! initialize class
     bool Initialize(FEModel& fem);
     
-    //! activate
-    void Activate();
-    
     //! initialize elements
     void InitElements();
-    
-    //! Unpack solid element data
-    void UnpackLM(FEElement& el, vector<int>& lm);
     
 public: // overrides from FEDomain
     
