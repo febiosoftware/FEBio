@@ -6,6 +6,11 @@
 FEHeatSolidDomain::FEHeatSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEHeatDomain(pfem)
 {
 	m_pMat = 0;
+
+	// list the degrees of freedom
+	vector<int> dof;
+	dof.push_back(pfem->GetDOFIndex("T"));
+	SetDOF(dof);
 }
 
 //-----------------------------------------------------------------------------
@@ -13,45 +18,6 @@ void FEHeatSolidDomain::SetMaterial(FEMaterial* pmat)
 {
 	m_pMat = dynamic_cast<FEHeatTransferMaterial*>(pmat);
 	assert(m_pMat);
-}
-
-//-----------------------------------------------------------------------------
-//! Unpack the element. That is, copy element data in traits structure
-
-void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
-{
-	DOFS& dofs = GetFEModel()->GetDOFS();
-	const int dof_T = dofs.GetDOF("T");
-
-	int N = el.Nodes();
-	lm.resize(N);
-
-	for (int i=0; i<N; ++i)
-	{
-		int n = el.m_node[i];
-		FENode& node = m_pMesh->Node(n);
-
-		vector<int>& id = node.m_ID;
-
-		// get temperature equation number
-		lm[i] = id[dof_T];
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEHeatSolidDomain::Activate()
-{
-	DOFS& dofs = GetFEModel()->GetDOFS();
-	const int dof_T = dofs.GetDOF("T");
-
-	for (int i=0; i<Nodes(); ++i)
-	{
-		FENode& node = Node(i);
-		if (node.m_bexclude == false)
-		{
-			node.m_ID[dof_T] = DOF_ACTIVE;
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -223,10 +189,9 @@ void FEHeatSolidDomain::ElementCapacitance(FESolidElement &el, matrix &ke, doubl
 // This function is called during FESolver::Update after the nodal variables are udpated.
 void FEHeatSolidDomain::Update()
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = *GetMesh();
 	int NE = Elements();
-	const int dof_T = fem.GetDOFIndex("T");
+	const int dof_T = m_dof[DOF_T];
 	for (int j=0; j<NE; ++j)
 	{
 		FESolidElement& el = Element(j);

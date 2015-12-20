@@ -82,7 +82,7 @@ public: // interface for derived classes
 	virtual FEElement& ElementRef(int i) = 0;
 
 	//! Unpack the LM data for an element of this domain
-	virtual void UnpackLM(FEElement& el, vector<int>& lm) = 0;
+	virtual void UnpackLM(FEElement& el, vector<int>& lm);
 
 public: // optional functions to overload
 
@@ -105,11 +105,14 @@ public: // optional functions to overload
 	void InitMaterialPointData();
 
 	//! Activate the domain
-	virtual void Activate() {}
+	virtual void Activate();
 
 	//! Update domain data.
 	//! (Called when the model state needs to be updated).
 	virtual void Update() {}
+
+public:
+	void SetDOF(vector<int>& dof);
 
 public:
 	// This is an experimental feature.
@@ -123,6 +126,7 @@ public:
 protected:
 	FEMesh*		m_pMesh;	//!< the mesh that this domain is a part of
 	vector<int>	m_Node;		//!< list of nodes in this domain
+	vector<int>	m_dof;		//!< list of active degrees of freedom for this domain
 
 protected:
 	int	m_nclass;			//!< domain class

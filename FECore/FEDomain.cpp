@@ -3,6 +3,7 @@
 #include "FEMaterial.h"
 #include "FEDataExport.h"
 #include "FEMesh.h"
+#include "DOFS.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------
@@ -73,6 +74,47 @@ void FEDomain::InitMaterialPointData()
 void FEDomain::SetMatID(int mid)
 {
 	for (int i=0; i<Elements(); ++i) ElementRef(i).SetMatID(mid);
+}
+
+//-----------------------------------------------------------------------------
+void FEDomain::SetDOF(vector<int>& dof)
+{
+	m_dof = dof;
+}
+
+//-----------------------------------------------------------------------------
+// This is the default packing method. 
+// It stores all the degrees of freedom for the first node in the order defined
+// by the DOF array, then for the second node, and so on. 
+void FEDomain::UnpackLM(FEElement& el, vector<int>& lm)
+{
+	int N = el.Nodes();
+	int ndofs = m_dof.size();
+	lm.resize(N*ndofs);
+	for (int i=0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+		FENode& node = m_pMesh->Node(n);
+		vector<int>& id = node.m_ID;
+		for (int j=0; j<ndofs; ++j) lm[i*ndofs + j] = id[m_dof[j]];
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEDomain::Activate()
+{
+	// get the number of degrees of freedom for this domain.
+	const int ndofs = (int)m_dof.size();
+
+	// activate all the degrees of freedom of this domain
+	for (int i=0; i<Nodes(); ++i)
+	{
+		FENode& node = Node(i);
+		if (node.m_bexclude == false)
+		{
+			for (int j=0; j<ndofs; ++j) node.m_ID[m_dof[j]] = DOF_ACTIVE;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

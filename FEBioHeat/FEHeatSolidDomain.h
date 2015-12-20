@@ -24,15 +24,11 @@ protected:
 //! domain class for 3D heat elements
 class FEHeatSolidDomain : public FESolidDomain, public FEHeatDomain
 {
+	enum { DOF_T = 0 };
+
 public:
 	//! constructor
 	FEHeatSolidDomain(FEModel* pfem);
-
-	//! activate
-	void Activate();
-
-	//! Unpack solid element data
-	void UnpackLM(FEElement& el, vector<int>& lm);
 
 	//! get the material (overridden from FEDomain)
 	FEMaterial* GetMaterial() { return m_pMat; }
