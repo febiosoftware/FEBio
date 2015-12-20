@@ -1,5 +1,5 @@
 #pragma once
-
+#include "vec2d.h"
 #include "vec3d.h"
 #include <assert.h>
 #include <list>
@@ -14,6 +14,7 @@ enum FEParamType {
 	FE_PARAM_INT,
 	FE_PARAM_BOOL,
 	FE_PARAM_DOUBLE,
+	FE_PARAM_VEC2D,
 	FE_PARAM_VEC3D,
 	FE_PARAM_MAT3D,
 	FE_PARAM_MAT3DS,
@@ -94,6 +95,7 @@ public:
 	void operator = (double g) { assert(m_itype == FE_PARAM_DOUBLE); value<double>() = g; }
 	void operator = (int    n) { assert(m_itype == FE_PARAM_INT   ); value<int   >() = n; }
 	void operator = (bool   b) { assert(m_itype == FE_PARAM_BOOL  ); value<bool  >() = b; }
+	void operator = (vec2d  v) { assert(m_itype == FE_PARAM_VEC2D ); value<vec2d >() = v; }
 	void operator = (vec3d  v) { assert(m_itype == FE_PARAM_VEC3D ); value<vec3d >() = v; }
 	void operator = (mat3d  m) { assert(m_itype == FE_PARAM_MAT3D ); value<mat3d >() = m; }
 	void operator = (mat3ds m) { assert(m_itype == FE_PARAM_MAT3DS); value<mat3ds>() = m; }
