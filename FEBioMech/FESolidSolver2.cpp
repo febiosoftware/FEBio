@@ -2162,7 +2162,8 @@ void FESolidSolver2::InertialForces(FEGlobalVector& R)
 void FESolidSolver2::RigidInertialForces(FERigidBody& RB, FEGlobalVector& R)
 {
     // 6 dofs per rigid body
-    double fe[6];
+    vector<double> fe(6);
+	vector<int>	LM(6);
         
     // rate of change of linear momentum = mass*acceleration
     vec3d F = RB.m_at*RB.m_mass;
@@ -2185,8 +2186,15 @@ void FESolidSolver2::RigidInertialForces(FERigidBody& RB, FEGlobalVector& R)
     fe[3] = -M.x;
     fe[4] = -M.y;
     fe[5] = -M.z;
-        
-    R.Assemble(RB.m_LM, fe, 6);
+
+	// pack the equation numbers
+	LM[0] = RB.m_LM[0];
+	LM[1] = RB.m_LM[1];
+	LM[2] = RB.m_LM[2];
+	LM[3] = RB.m_LM[3];
+	LM[4] = RB.m_LM[4];
+	LM[5] = RB.m_LM[5];
+    R.Assemble(LM, fe);
         
     // add to rigid body force
     RB.m_Fr += F;

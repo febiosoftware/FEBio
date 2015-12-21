@@ -19,8 +19,8 @@ public:
 	//! Assemble the element vector into this global vector
 	virtual void Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe);
 
-	//! Assemble into this global vector (\todo replace pointers with vectors?).
-	virtual void Assemble(int* lm, double* fe, int n);
+	//! Assemble into this global vector
+	virtual void Assemble(vector<int>& lm, vector<double>& fe);
     
 	//! access operator
 	double& operator [] (int i) { return m_R[i]; }

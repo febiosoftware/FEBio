@@ -38,10 +38,10 @@ void FEGlobalVector::Assemble(vector<int>& en, vector<int>& elm, vector<double>&
 
 //-----------------------------------------------------------------------------
 //! \todo This function does not add to m_Fr. Is this a problem?
-void FEGlobalVector::Assemble(int* lm, double* fe, int n)
+void FEGlobalVector::Assemble(vector<int>& lm, vector<double>& fe)
 {
 	vector<double>& R = m_R;
-
+	const int n = (int) lm.size();
 	for (int i=0; i<n; ++i)
 	{
 		int nid = lm[i];
