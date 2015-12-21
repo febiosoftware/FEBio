@@ -737,8 +737,71 @@ void FEFluidDomain3D::UpdateElementStress(int iel, double dt)
 
 void FEFluidDomain3D::InertialForces(FEGlobalVector& R)
 {
+    int NE = (int)m_Elem.size();
+#pragma omp parallel for shared (NE)
+    for (int i=0; i<NE; ++i)
+    {
+        // element force vector
+        vector<double> fe;
+        vector<int> lm;
+        
+        // get the element
+        FESolidElement& el = m_Elem[i];
+        
+        // get the element force vector and initialize it to zero
+        int ndof = 4*el.Nodes();
+        fe.assign(ndof, 0);
+        
+        // calculate internal force vector
+        ElementInertialForce(el, fe);
+        
+        // get the element's LM vector
+        UnpackLM(el, lm);
+        
+        // assemble element 'fe'-vector into global R vector
+        //#pragma omp critical
+        R.Assemble(el.m_node, lm, fe);
+    }
 }
 
 void FEFluidDomain3D::ElementInertialForce(FESolidElement& el, vector<double>& fe)
 {
+    int i, n;
+    
+    // jacobian determinant
+    double detJ;
+    
+    mat3ds s;
+    
+    const double* H;
+    
+    int nint = el.GaussPoints();
+    int neln = el.Nodes();
+    
+    double*	gw = el.GaussWeights();
+    
+    // repeat for all integration points
+    for (n=0; n<nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+        double dens = m_pMat->Density(mp);
+        
+        // calculate the jacobian
+        detJ = detJ0(el, n)*gw[n];
+        
+        H = el.H(n);
+        
+        for (i=0; i<neln; ++i)
+        {
+            vec3d f = pt.m_at*(dens*H[i]);
+            
+            // calculate internal force
+            // the '-' sign is so that the internal forces get subtracted
+            // from the global residual vector
+            fe[4*i  ] -= f.x*detJ;
+            fe[4*i+1] -= f.y*detJ;
+            fe[4*i+2] -= f.z*detJ;
+        }
+    }
 }
