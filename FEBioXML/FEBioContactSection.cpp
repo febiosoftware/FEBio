@@ -196,6 +196,7 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 
 	int NMAT = fem.Materials();
 
@@ -218,7 +219,7 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 
 		prn->nid = id;
 		prn->rid = rb;
-		fem.AddRigidNode(prn);
+		rigid.AddRigidNode(prn);
 
 		if (m_pim->m_nsteps > 0)
 		{

@@ -733,9 +733,9 @@ void FESolidSolver2::PrepStep(double time)
 	for (int i=0; i<NO; ++i) rigid.Object(i)->Init();
 
 	// calculate local rigid displacements
-	for (int i=0; i<(int) m_fem.m_RDC.size(); ++i)
+	for (int i=0; i<(int) rigid.m_RDC.size(); ++i)
 	{
-		FERigidBodyDisplacement& DC = *m_fem.m_RDC[i];
+		FERigidBodyDisplacement& DC = *rigid.m_RDC[i];
 		FERigidBody& RB = *rigid.Object(DC.id);
 		if (DC.IsActive())
 		{

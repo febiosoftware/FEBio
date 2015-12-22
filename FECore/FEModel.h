@@ -158,11 +158,6 @@ public: // --- Boundary Conditions functions ---
 	FESurfaceLoad* SurfaceLoad(int i) { return m_SL[i]; }
 	void AddSurfaceLoad(FESurfaceLoad* psl) { m_SL.push_back(psl); }
 
-	// rigid nodes
-	int RigidNodes() { return (int) m_RN.size(); }
-	FERigidNode* RigidNode(int i) { return m_RN[i]; }
-	void AddRigidNode(FERigidNode* prn) { m_RN.push_back(prn); }
-
 public: // --- Body load functions --- 
 
 	//! Add a body load to the model
@@ -344,14 +339,6 @@ protected:
 	FERigidSystem*		m_prs;	//!< the rigid body system manages rigid bodies
 
 public:
-	// Boundary/Initial conditions for rigid bodies
-	// TODO: I'd like to do something different with this. Perhaps place them in the BC or in some constraint section.
-	vector<FERigidNode*>				m_RN;	//!< rigid nodes
-	vector<FERigidBodyFixedBC*>			m_RBC;	//!< rigid body fixed
-	vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
-	vector<FERigidBodyVelocity*>		m_RBV;	//!< rigid body initial velocities
-	vector<FERigidBodyAngularVelocity*>	m_RBW;	//!< rigid body initial angular velocities
-
 	// linear constraint data
 	list<FELinearConstraint>	m_LinC;		//!< linear constraints data
 	vector<int>					m_LCT;		//!< linear constraint table

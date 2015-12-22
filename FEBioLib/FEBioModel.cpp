@@ -854,22 +854,6 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			psl->Serialize(ar);
 		}
 
-		// fixed rigid body dofs
-		ar << (int) m_RBC.size();
-		for (int i=0; i<(int) m_RBC.size(); ++i)
-		{
-			FERigidBodyFixedBC& bc = *m_RBC[i];
-			bc.Serialize(ar);
-		}
-
-		// rigid body displacements
-		ar << (int) m_RDC.size();
-		for (int i=0; i<(int) m_RDC.size(); ++i)
-		{
-			FERigidBodyDisplacement& dc = *m_RDC[i];
-			dc.Serialize(ar);
-		}
-
 		// model loads
 		ar << (int) m_ML.size();
 		for (int i=0; i<(int) m_ML.size(); ++i)
@@ -877,14 +861,6 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			FEModelLoad& ml = *m_ML[i];
 			ar << ml.GetTypeStr();
 			ml.Serialize(ar);
-		}
-
-		// rigid nodes
-		ar << (int) m_RN.size();
-		for (int i=0; i<(int) m_RN.size(); ++i)
-		{
-			FERigidNode& rn = *m_RN[i];
-			rn.Serialize(ar);
 		}
 
 		// linear constraints
@@ -988,28 +964,6 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			m_mesh.AddSurface(psurf);
 		}
 
-		// fixed rigid body dofs
-		ar >> n;
-		m_RBC.clear();
-		for (int i=0; i<n; ++i)
-		{
-			FERigidBodyFixedBC* pbc = new FERigidBodyFixedBC(this);
-			pbc->Serialize(ar);
-			if (pbc->IsActive()) pbc->Activate(); else pbc->Deactivate();
-			m_RBC.push_back(pbc);
-		}
-
-		// rigid body displacements
-		ar >> n;
-		m_RDC.clear();
-		for (int i=0; i<n; ++i)
-		{
-			FERigidBodyDisplacement* pdc = new FERigidBodyDisplacement(this);
-			pdc->Serialize(ar);
-			if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
-			m_RDC.push_back(pdc);
-		}
-
 		// model loads
 		ar >> n;
 		m_ML.clear();
@@ -1024,17 +978,6 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			pml->Serialize(ar);
 			if (pml->IsActive()) pml->Activate(); else pml->Deactivate();
 			m_ML.push_back(pml);
-		}
-
-		// rigid nodes
-		ar >> n;
-		m_RN.clear();
-		for (int i=0; i<n; ++i)
-		{
-			FERigidNode* prn = new FERigidNode(this);
-			prn->Serialize(ar);
-			if (prn->IsActive()) prn->Activate(); else prn->Deactivate();
-			m_RN.push_back(prn);
 		}
 
 		// linear constraints
@@ -1074,6 +1017,9 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			m_NLC.push_back(plc);
 */		}
 	}
+
+	// serialize rigid stuff
+	if (m_prs) m_prs->Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

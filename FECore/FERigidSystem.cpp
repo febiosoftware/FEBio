@@ -32,8 +32,128 @@ FERigidBody* FERigidSystem::Object(int i)
 //! delete all rigid bodies
 void FERigidSystem::Clear()
 {
-	for (int i=0; i<(int) m_RB.size(); ++i) delete m_RB[i]; 
-	m_RB.clear();
+	int i;
+	for (i=0; i<m_RDC.size(); ++i) delete m_RDC[i]; m_RDC.clear();
+	for (i=0; i<m_RBV.size(); ++i) delete m_RBV[i]; m_RBV.clear();
+	for (i=0; i<m_RBW.size(); ++i) delete m_RBW[i]; m_RBW.clear();
+	for (i=0; i<m_RN.size (); ++i) delete m_RN [i]; m_RN.clear ();
+}
+
+//-----------------------------------------------------------------------------
+void FERigidSystem::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		// rigid nodes
+		ar << (int) m_RN.size();
+		for (int i=0; i<(int) m_RN.size(); ++i)
+		{
+			FERigidNode& rn = *m_RN[i];
+			rn.Serialize(ar);
+		}
+
+		// fixed rigid body dofs
+		ar << (int) m_RBC.size();
+		for (int i=0; i<(int) m_RBC.size(); ++i)
+		{
+			FERigidBodyFixedBC& bc = *m_RBC[i];
+			bc.Serialize(ar);
+		}
+
+		// rigid body displacements
+		ar << (int) m_RDC.size();
+		for (int i=0; i<(int) m_RDC.size(); ++i)
+		{
+			FERigidBodyDisplacement& dc = *m_RDC[i];
+			dc.Serialize(ar);
+		}
+	}
+	else
+	{
+		// rigid nodes
+		int n = 0;
+		ar >> n;
+		m_RN.clear();
+		for (int i=0; i<n; ++i)
+		{
+			FERigidNode* prn = new FERigidNode(&m_fem);
+			prn->Serialize(ar);
+			if (prn->IsActive()) prn->Activate(); else prn->Deactivate();
+			m_RN.push_back(prn);
+		}
+
+		// fixed rigid body dofs
+		ar >> n;
+		m_RBC.clear();
+		for (int i=0; i<n; ++i)
+		{
+			FERigidBodyFixedBC* pbc = new FERigidBodyFixedBC(&m_fem);
+			pbc->Serialize(ar);
+			if (pbc->IsActive()) pbc->Activate(); else pbc->Deactivate();
+			m_RBC.push_back(pbc);
+		}
+
+		// rigid body displacements
+		ar >> n;
+		m_RDC.clear();
+		for (int i=0; i<n; ++i)
+		{
+			FERigidBodyDisplacement* pdc = new FERigidBodyDisplacement(&m_fem);
+			pdc->Serialize(ar);
+			if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
+			m_RDC.push_back(pdc);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Find a BC based on its ID. This is needed for restarts.
+FEModelComponent* FERigidSystem::FindModelComponent(int nid)
+{
+	int i;
+	for (i=0; i<(int) m_RBC.size(); ++i) if (m_RBC[i]->GetClassID() == nid) return m_RBC[i];
+	for (i=0; i<(int) m_RDC.size(); ++i) if (m_RDC[i]->GetClassID() == nid) return m_RDC[i];
+	for (i=0; i<(int) m_RN.size (); ++i) if (m_RN [i]->GetClassID() == nid) return m_RN [i];
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidSystem::Activate()
+{
+	// rigid nodes
+	for (int i=0; i<(int) m_RN.size(); ++i)
+	{
+		FERigidNode& rn = *m_RN[i];
+		if (rn.IsActive()) rn.Activate();
+	}
+
+	// rigid body displacements
+	for (int i=0; i<(int) m_RDC.size(); ++i)
+	{
+		FERigidBodyDisplacement& rc = *m_RDC[i];
+		if (rc.IsActive()) rc.Activate();
+	}
+
+	// fixed rigid body dofs
+	for (int i=0; i<(int) m_RBC.size(); ++i)
+	{
+		FERigidBodyFixedBC& rc = *m_RBC[i];
+		if (rc.IsActive()) rc.Activate();
+	}
+
+	// initial rigid velocity
+	for (int i=0; i<(int) m_RBV.size(); ++i)
+	{
+		FERigidBodyVelocity& RV = *m_RBV[i];
+		if (RV.IsActive()) RV.Activate();
+	}
+
+	// initial rigid angular velocity
+	for (int i=0; i<(int) m_RBW.size(); ++i)
+	{
+		FERigidBodyAngularVelocity& RW = *m_RBW[i];
+		if (RW.IsActive()) RW.Activate();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -46,24 +166,24 @@ bool FERigidSystem::Init()
 	// so we now associate them with the rigid bodies
 	// NOTE: This is now done in the Init() member function for each class
 	FEModel& fem = m_fem;
-	for (int i=0; i<(int) fem.m_RBC.size(); ++i)
+	for (int i=0; i<(int) m_RBC.size(); ++i)
 	{
-		FERigidBodyFixedBC& BC = *fem.m_RBC[i];
+		FERigidBodyFixedBC& BC = *m_RBC[i];
 		if (BC.Init() == false) return false;
 	}
-	for (int i=0; i<(int) fem.m_RDC.size(); ++i)
+	for (int i=0; i<(int) m_RDC.size(); ++i)
 	{
-		FERigidBodyDisplacement& DC = *fem.m_RDC[i];
+		FERigidBodyDisplacement& DC = *m_RDC[i];
 		if (DC.Init() == false) return false;
 	}
-	for (int i=0; i<(int) fem.m_RBV.size(); ++i)
+	for (int i=0; i<(int) m_RBV.size(); ++i)
 	{
-		FERigidBodyVelocity& RV = *fem.m_RBV[i];
+		FERigidBodyVelocity& RV = *m_RBV[i];
 		if (RV.Init() == false) return false;
 	}
-	for (int i=0; i<(int) fem.m_RBW.size(); ++i)
+	for (int i=0; i<(int) m_RBW.size(); ++i)
 	{
-		FERigidBodyAngularVelocity& RW = *fem.m_RBW[i];
+		FERigidBodyAngularVelocity& RW = *m_RBW[i];
 		if (RW.Init() == false) return false;
 	}
 	return true;
@@ -218,9 +338,15 @@ bool FERigidSystem::CreateObjects()
 		}
 	}
 
+	// let's clear all rigid bodies
+	if (m_RB.empty() == false)
+	{
+		for (int i=0; i<(int) m_RB.size(); ++i) delete m_RB[i]; 
+		m_RB.clear();
+	}
+
 	// Ok, we now know how many rigid bodies there are
 	// so let's create them
-	Clear();
 	for (int i=0; i<nrb; ++i)
 	{
 		// create a new rigid body
@@ -245,9 +371,9 @@ bool FERigidSystem::CreateObjects()
 	}
 
 	// assign correct rigid body ID's to rigid nodes
-	for (int i=0; i<(int) fem.m_RN.size(); ++i)
+	for (int i=0; i<(int) m_RN.size(); ++i)
 	{
-		FERigidNode& rn = *fem.m_RN[i];
+		FERigidNode& rn = *m_RN[i];
 		rn.rid = mrb[rn.rid];
 	}
 

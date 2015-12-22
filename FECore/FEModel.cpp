@@ -56,10 +56,6 @@ void FEModel::Clear()
 	for (i=0; i<m_FC.size  (); ++i) delete m_FC [i] ; m_FC.clear  ();
 	for (i=0; i<m_SL.size  (); ++i) delete m_SL [i] ; m_SL.clear  ();
 	for (i=0; i<m_ML.size  (); ++i) delete m_ML [i] ; m_ML.clear  ();
-	for (i=0; i<m_RDC.size (); ++i) delete m_RDC[i] ; m_RDC.clear ();
-	for (i=0; i<m_RBV.size (); ++i) delete m_RBV[i] ; m_RBV.clear ();
-	for (i=0; i<m_RBW.size (); ++i) delete m_RBW[i] ; m_RBW.clear ();
-	for (i=0; i<m_RN.size  (); ++i) delete m_RN [i] ; m_RN.clear  ();
 	for (i=0; i<m_NLC.size (); ++i) delete m_NLC[i] ; m_NLC.clear ();
 
 	// global data
@@ -406,40 +402,8 @@ void FEModel::Activate()
 		if (ci.IsActive()) ci.Activate();
 	}
 
-	// rigid nodes
-	for (int i=0; i<(int) m_RN.size(); ++i)
-	{
-		FERigidNode& rn = *m_RN[i];
-		if (rn.IsActive()) rn.Activate();
-	}
-
-	// rigid body displacements
-	for (int i=0; i<(int)m_RDC.size(); ++i)
-	{
-		FERigidBodyDisplacement& rc = *m_RDC[i];
-		if (rc.IsActive()) rc.Activate();
-	}
-
-	// fixed rigid body dofs
-	for (int i=0; i<(int)m_RBC.size(); ++i)
-	{
-		FERigidBodyFixedBC& rc = *m_RBC[i];
-		if (rc.IsActive()) rc.Activate();
-	}
-
-	// initial rigid velocity
-	for (int i=0; i<(int) m_RBV.size(); ++i)
-	{
-		FERigidBodyVelocity& RV = *m_RBV[i];
-		if (RV.IsActive()) RV.Activate();
-	}
-
-	// initial rigid angular velocity
-	for (int i=0; i<(int) m_RBW.size(); ++i)
-	{
-		FERigidBodyAngularVelocity& RW = *m_RBW[i];
-		if (RW.IsActive()) RW.Activate();
-	}
+	// activate rigid components
+	if (m_prs) m_prs->Activate();
 }
 
 //-----------------------------------------------------------------------------
@@ -812,12 +776,9 @@ FEModelComponent* FEModel::FindModelComponent(int nid)
 	for (i=0; i<(int) m_FC.size (); ++i) if (m_FC [i]->GetClassID() == nid) return m_FC [i];
 	for (i=0; i<(int) m_SL.size (); ++i) if (m_SL [i]->GetClassID() == nid) return m_SL [i];
 	for (i=0; i<(int) m_ML.size (); ++i) if (m_ML [i]->GetClassID() == nid) return m_ML [i];
-	for (i=0; i<(int) m_RBC.size(); ++i) if (m_RBC[i]->GetClassID() == nid) return m_RBC[i];
-	for (i=0; i<(int) m_RDC.size(); ++i) if (m_RDC[i]->GetClassID() == nid) return m_RDC[i];
-	for (i=0; i<(int) m_RN.size (); ++i) if (m_RN [i]->GetClassID() == nid) return m_RN [i];
 	for (i=0; i<(int) m_CI.size (); ++i) if (m_CI [i]->GetClassID() == nid) return m_CI [i];
 	for (i=0; i<(int) m_NLC.size(); ++i) if (m_NLC[i]->GetClassID() == nid) return m_NLC[i];
-	return 0;
+	return (m_prs? m_prs->FindModelComponent(nid) : 0);
 }
 
 //-----------------------------------------------------------------------------

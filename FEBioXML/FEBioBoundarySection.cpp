@@ -787,6 +787,7 @@ void FEBioBoundarySection::ParseContactInterface(XMLTag& tag, FESurfacePairInter
 void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 	FEMesh& m = fem.GetMesh();
 
 	// make sure that the version is 1.x
@@ -866,7 +867,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 			prn->nid = id;
 			prn->rid = rb;
-			fem.AddRigidNode(prn);
+			rigid.AddRigidNode(prn);
 
 			if (m_pim->m_nsteps > 0)
 			{

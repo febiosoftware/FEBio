@@ -24,6 +24,12 @@ public:
 	//! get a rigid body
 	FERigidBody* Object(int i);
 
+	//! Activate
+	void Activate();
+
+	//! Serialize
+	void Serialize(DumpFile& ar);
+
 	//! Clear
 	void Clear();
 
@@ -32,6 +38,9 @@ public:
 
 	//! Reset data
 	bool Reset();
+
+	// find a model component from its ID
+	FEModelComponent* FindModelComponent(int nid);
 
 	//! place data on stream for running restarts
 	void ShallowCopy(DumpStream& dmp, bool bsave);
@@ -42,8 +51,23 @@ public:
 	// update the mesh geometry
 	void UpdateMesh();
 
+public:
+	// rigid nodes
+	int RigidNodes() { return (int) m_RN.size(); }
+	FERigidNode* RigidNode(int i) { return m_RN[i]; }
+	void AddRigidNode(FERigidNode* prn) { m_RN.push_back(prn); }
+
 protected:
 	bool CreateObjects();
+
+public:
+	// Boundary/Initial conditions for rigid bodies
+	// TODO: I'd like to do something different with this. Perhaps place them in the BC or in some constraint section.
+	vector<FERigidNode*>				m_RN;	//!< rigid nodes
+	vector<FERigidBodyFixedBC*>			m_RBC;	//!< rigid body fixed
+	vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
+	vector<FERigidBodyVelocity*>		m_RBV;	//!< rigid body initial velocities
+	vector<FERigidBodyAngularVelocity*>	m_RBW;	//!< rigid body initial angular velocities
 
 private:
 	FEModel&					m_fem;	//!< the FE model this system is attached to
