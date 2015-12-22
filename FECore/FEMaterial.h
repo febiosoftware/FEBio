@@ -333,6 +333,10 @@ public:
 	//! return a material property
 	FEProperty* MaterialProperty(int i) { return m_Prop[i]; }
 
+	//! Find a material component by type
+	//! This returns the first occurrence of this type
+	FEMaterial* FindComponentByType(const char* sztype);
+
 private:
 	char	m_szname[128];	//!< name of material
 	int		m_nID;			//!< material ID

@@ -359,3 +359,35 @@ void FEMaterial::Serialize(DumpFile &ar)
 		pmat->Serialize(ar);
 	}
 }
+
+//-----------------------------------------------------------------------------
+FEMaterial* FEMaterial::FindComponentByType(const char* sztype)
+{
+	// look at the properties first
+	int NP = m_Prop.size();
+	for (int i=0; i<NP; ++i)
+	{
+		// get the next property array
+		FEProperty* pi = m_Prop[i];
+
+		// loop over the properties in the array
+		int n = pi->size();
+		for (int j=0; j<n; ++j)
+		{
+			// get the next material
+			FEMaterial* pmj = dynamic_cast<FEMaterial*>(pi->get(j));
+			if (pmj)
+			{
+				// check the type string and return if match
+				const char* sz = pmj->GetTypeStr();
+				if (strcmp(sz, sztype)==0) return pmj;
+
+				// If not matched, try recursively.
+				FEMaterial* pmc = pmj->FindComponentByType(sztype);
+				if (pmc) return pmc;
+			}
+		}
+	}
+
+	return 0;
+}
