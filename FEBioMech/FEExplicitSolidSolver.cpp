@@ -433,10 +433,10 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 
 	// for prescribed displacements, the displacement increments are evaluated differently
 	// TODO: Is this really necessary? Why can't the ui vector contain the correct values?
-	const int NRD = (const int) rigid.m_RDC.size();
+	const int NRD = rigid.PrescribedBCs();
 	for (int i=0; i<NRD; ++i)
 	{
-		FERigidBodyDisplacement& dc = *rigid.m_RDC[i];
+		FERigidBodyDisplacement& dc = *rigid.PrescribedBC(i);
 		if (dc.IsActive() && (dc.lc >= 0))
 		{
 			FERigidBody& RB = *rigid.Object(dc.id);
@@ -637,9 +637,9 @@ void FEExplicitSolidSolver::PrepStep(double time)
 	for (i=0; i<NO; ++i) rigid.Object(i)->Init();
 
 	// calculate local rigid displacements
-	for (i=0; i<(int) rigid.m_RDC.size(); ++i)
+	for (i=0; i<(int) rigid.PrescribedBCs(); ++i)
 	{
-		FERigidBodyDisplacement& DC = *rigid.m_RDC[i];
+		FERigidBodyDisplacement& DC = *rigid.PrescribedBC(i);
 		FERigidBody& RB = *rigid.Object(DC.id);
 		if (DC.IsActive())
 		{

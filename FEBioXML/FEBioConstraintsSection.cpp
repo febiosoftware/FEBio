@@ -230,7 +230,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				pDC->lc = lc;
 				pDC->brel = brel;
 				tag.value(pDC->sf);
-				rigid.m_RDC.push_back(pDC);
+				rigid.AddPrescribedBC(pDC);
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -263,7 +263,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "rigid_fixed",  &fem));
 				pBC->id = nmat;
 				pBC->bc = bc;
-				rigid.m_RBC.push_back(pBC);
+				rigid.AddFixedBC(pBC);
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -294,7 +294,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				pDC->bc = bc;
 				pDC->lc = lc;
 				tag.value(pDC->sf);
-				rigid.m_RDC.push_back(pDC);
+				rigid.AddPrescribedBC(pDC);
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -327,7 +327,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "rigid_fixed",  &fem));
 				pBC->id = nmat;
 				pBC->bc = bc;
-				rigid.m_RBC.push_back(pBC);
+				rigid.AddFixedBC(pBC);
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -399,13 +399,11 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			pDC->lc = lc;
 			pDC->brel = brel;
 			m_pim->value(tag, pDC->sf);
-			rigid.m_RDC.push_back(pDC);
+			rigid.AddPrescribedBC(pDC);
 
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)
 			{
-				int n = rigid.m_RDC.size()-1;
-				FERigidBodyDisplacement* pDC = rigid.m_RDC[n];
 				pStep->AddModelComponent(pDC);
 				pDC->Deactivate();
 			}
@@ -476,7 +474,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "rigid_fixed",  &fem));
 			pBC->id = nmat;
 			pBC->bc = bc;
-			rigid.m_RBC.push_back(pBC);
+			rigid.AddFixedBC(pBC);
 
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)
@@ -495,7 +493,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			FERigidBodyVelocity* pic = new FERigidBodyVelocity(&fem);
 			pic->m_rid = nmat;
 			pic->m_vel = v;
-			rigid.m_RBV.push_back(pic);
+			rigid.AddInitialVelocity(pic);
 
 			// add this initial condition to the current step
 			if (m_pim->m_nsteps > 0)
@@ -514,7 +512,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			FERigidBodyAngularVelocity* pic = new FERigidBodyAngularVelocity(&fem);
 			pic->m_rid = nmat;
 			pic->m_w = w;
-			rigid.m_RBW.push_back(pic);
+			rigid.AddInitialAngularVelocity(pic);
 
 			// add this initial condition to the current step
 			if (m_pim->m_nsteps > 0)

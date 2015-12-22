@@ -57,10 +57,26 @@ public:
 	FERigidNode* RigidNode(int i) { return m_RN[i]; }
 	void AddRigidNode(FERigidNode* prn) { m_RN.push_back(prn); }
 
+	int FixedBCs() { return (int) m_RBC.size(); }
+	FERigidBodyFixedBC* FixedBC(int i) { return m_RBC[i]; }
+	void AddFixedBC(FERigidBodyFixedBC* pbc) { m_RBC.push_back(pbc); }
+
+	int PrescribedBCs() { return (int) m_RDC.size(); }
+	FERigidBodyDisplacement* PrescribedBC(int i) { return m_RDC[i]; }
+	void AddPrescribedBC(FERigidBodyDisplacement* pdc) { m_RDC.push_back(pdc); }
+
+	int InitialVelocities() { return (int) m_RBV.size(); }
+	FERigidBodyVelocity* InitialVelocity(int i) { return m_RBV[i]; }
+	void AddInitialVelocity(FERigidBodyVelocity* pbv) { m_RBV.push_back(pbv); }
+
+	int InitialAngularVelocities() { return (int) m_RBW.size(); }
+	FERigidBodyAngularVelocity* InitialAngularVelocity(int i) { return m_RBW[i]; }
+	void AddInitialAngularVelocity(FERigidBodyAngularVelocity* pbw) { m_RBW.push_back(pbw); }
+
 protected:
 	bool CreateObjects();
 
-public:
+protected:
 	// Boundary/Initial conditions for rigid bodies
 	// TODO: I'd like to do something different with this. Perhaps place them in the BC or in some constraint section.
 	vector<FERigidNode*>				m_RN;	//!< rigid nodes
