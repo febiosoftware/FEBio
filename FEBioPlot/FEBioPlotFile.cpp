@@ -519,7 +519,14 @@ bool FEBioPlotFile::WriteMaterials(FEModel& fem)
 		{
 			unsigned int nid = (unsigned int) pm->GetID();
 			char szname[STR_SIZE] = {0};
-			strcpy(szname, pm->GetName());
+
+			// Make sure that the material name fits in the buffer
+			const char* sz = pm->GetName();
+			int l = strlen(sz);
+			if (l >= STR_SIZE) l = STR_SIZE - 1;
+			strncpy(szname, sz, l);
+
+			// write the material data
 			m_ar.WriteChunk(PLT_MAT_ID, nid);
 			m_ar.WriteChunk(PLT_MAT_NAME, szname, STR_SIZE);
 		}
