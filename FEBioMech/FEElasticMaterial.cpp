@@ -350,7 +350,7 @@ void FEElasticMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMateria
 	
 		// compound the local map with the global material axes
 		mat3d Qlocal = pmap->LocalElementCoord(el, n);
-		pt.m_Q = Qlocal*pt.m_Q;
+		pt.m_Q = pt.m_Q*Qlocal;
 	}
 }
 
