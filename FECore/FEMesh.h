@@ -241,17 +241,8 @@ public:
 	//! return total nr of elements
 	int Elements();
 
-	//! return the total nr of solid elements
-	int SolidElements();
-
-	//! return the total nr of shell elements
-	int ShellElements();
-
-	//! return the total nr of truss elements
-	int TrussElements();
-
-	//! return the total nr of discrete elements
-	int DiscreteElements();
+	//! return the nr of elements of a specific domain type
+	int Elements(int ndom_type);
 
 	//! return reference to a node
 	FENode& Node(int i) { return m_Node[i]; }

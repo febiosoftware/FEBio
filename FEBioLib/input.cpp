@@ -120,9 +120,10 @@ void echo_input(FEBioModel& fem)
 	felog.printf("\tNumber of materials ............................ : %d\n", fem.Materials());
 	felog.printf("\tNumber of domains .............................. : %d\n", mesh.Domains());
 	felog.printf("\tNumber of nodes ................................ : %d\n", mesh.Nodes());
-	felog.printf("\tNumber of solid elements ....................... : %d\n", mesh.SolidElements());
-	felog.printf("\tNumber of shell elements ....................... : %d\n", mesh.ShellElements());
-	felog.printf("\tNumber of truss elements ....................... : %d\n", mesh.TrussElements());
+	int nsolid = mesh.Elements(FE_DOMAIN_SOLID); if (nsolid > 0) felog.printf("\tNumber of solid elements ....................... : %d\n", nsolid);
+	int nshell = mesh.Elements(FE_DOMAIN_SHELL); if (nshell > 0) felog.printf("\tNumber of shell elements ....................... : %d\n", nshell);
+	int ntruss = mesh.Elements(FE_DOMAIN_TRUSS); if (ntruss > 0) felog.printf("\tNumber of truss elements ....................... : %d\n", ntruss);
+	int nelm2d = mesh.Elements(FE_DOMAIN_2D   ); if (nelm2d > 0) felog.printf("\tNumber of 2D elements .......................... : %d\n", nelm2d);
 	felog.printf("\n\n");
 
 	// print control info
