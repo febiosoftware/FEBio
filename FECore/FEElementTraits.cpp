@@ -2895,3 +2895,488 @@ void FETrussElementTraits::init()
 {
 
 }
+
+//=============================================================================
+//
+//                  2 D   E L E M E N T S
+//
+//=============================================================================
+
+FE2DElementTraits::FE2DElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_2D)
+{
+	m_ntype = et;
+
+	gr.resize(ni);
+	gs.resize(ni);
+	gw.resize(ni);
+
+	Gr.resize(ni, ne);
+	Gs.resize(ni, ne);
+}
+
+//-----------------------------------------------------------------------------
+//! Initialize the 2D element traits data variables.
+//
+void FE2DElementTraits::init()
+{
+	assert(nint > 0);
+	assert(neln > 0);
+
+	// evaluate shape functions
+	const int NE = FEElement::MAX_NODES;
+	double N[NE];
+	for (int n=0; n<nint; ++n)
+	{
+		shape(N, gr[n], gs[n]);
+		for (int i=0; i<neln; ++i) H[n][i] = N[i]; 
+	}
+	
+	// evaluate shape function derivatives
+	double Nr[NE], Ns[NE];
+	for (int n=0; n<nint; ++n)
+	{
+		shape_deriv(Nr, Ns, gr[n], gs[n]);
+		for (int i=0; i<neln; ++i)
+		{
+			Gr[n][i] = Nr[i];
+			Gs[n][i] = Ns[i];
+		}
+	}
+}
+
+//=============================================================================
+//                          F E 2 D T R I 
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+void FE2DTri3_::shape(double* H, double r, double s)
+{
+	H[0] = 1.0 - r - s;
+	H[1] = r;
+	H[2] = s;
+}
+
+//-----------------------------------------------------------------------------
+void FE2DTri3_::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	Hr[0] = -1; Hs[0] = -1;
+	Hr[1] =  1; Hs[1] =  0;
+	Hr[2] =  0; Hs[2] =  1;
+}
+
+//-----------------------------------------------------------------------------
+void FE2DTri3_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+{
+	Hrr[0] = 0; Hrs[0] = 0; Hss[0] = 0;
+	Hrr[1] = 0; Hrs[1] = 0; Hss[1] = 0;
+	Hrr[2] = 0; Hrs[2] = 0; Hss[2] = 0;
+}
+
+//=============================================================================
+//                          F E 2 D T R I G 1 
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+FE2DTri3G1::FE2DTri3G1() : FE2DTri3_(NINT, FE2D_TRI3G1)
+{
+	const double a = 1.0/3.0;
+	gr[0] = a; gs[0] = a; gw[0] = 0.5;
+	init(); 
+}
+
+//-----------------------------------------------------------------------------
+void FE2DTri3G1::project_to_nodes(double* ai, double* ao)
+{
+	ao[0] = ai[0];
+	ao[1] = ai[0];
+	ao[2] = ai[0];
+}
+
+//============================================================================
+//                             F E 2 D T R I 6
+//============================================================================
+
+//-----------------------------------------------------------------------------
+void FE2DTri6_::shape(double* H, double r, double s)
+{
+	double r1 = 1.0 - r - s;
+	double r2 = r;
+	double r3 = s;
+
+	H[0] = r1*(2.0*r1 - 1.0);
+	H[1] = r2*(2.0*r2 - 1.0);
+	H[2] = r3*(2.0*r3 - 1.0);
+	H[3] = 4.0*r1*r2;
+	H[4] = 4.0*r2*r3;
+	H[5] = 4.0*r3*r1;
+}
+
+//-----------------------------------------------------------------------------
+void FE2DTri6_::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	Hr[0] = -3.0 + 4.0*r + 4.0*s;
+	Hr[1] =  4.0*r - 1.0;
+	Hr[2] =  0.0;
+	Hr[3] =  4.0 - 8.0*r - 4.0*s;
+	Hr[4] =  4.0*s;
+	Hr[5] = -4.0*s;
+
+	Hs[0] = -3.0 + 4.0*s + 4.0*r;
+	Hs[1] =  0.0;
+	Hs[2] =  4.0*s - 1.0;
+	Hs[3] = -4.0*r;
+	Hs[4] =  4.0*r;
+	Hs[5] =  4.0 - 8.0*s - 4.0*r;
+}
+
+//-----------------------------------------------------------------------------
+void FE2DTri6_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+{
+	Hrr[0] =  4.0; Hrs[0] =  4.0; Hss[0] =  4.0;
+	Hrr[1] =  4.0; Hrs[1] =  0.0; Hss[1] =  0.0;
+	Hrr[2] =  0.0; Hrs[2] =  0.0; Hss[2] =  4.0;
+	Hrr[3] = -8.0; Hrs[3] = -4.0; Hss[3] =  0.0;
+	Hrr[4] =  0.0; Hrs[4] =  4.0; Hss[4] =  0.0;
+	Hrr[5] =  0.0; Hrs[5] = -4.0; Hss[5] = -8.0;
+}
+
+//=============================================================================
+//                          F E 2 D T R I 6 G 3
+//=============================================================================
+
+FE2DTri6G3::FE2DTri6G3() : FE2DTri6_(NINT, FE_TRI6G3) 
+{ 
+	const double a = 1.0 / 6.0;
+	const double b = 2.0 / 3.0;
+	gr[0] = a; gs[0] = a; gw[0] = a;
+	gr[1] = b; gs[1] = a; gw[1] = a;
+	gr[2] = a; gs[2] = b; gw[2] = a;
+	init(); 
+}
+
+//-----------------------------------------------------------------------------
+void FE2DTri6G3::project_to_nodes(double* ai, double* ao)
+{
+	matrix H(3, 3);
+	for (int n=0; n<3; ++n)
+	{
+		H[n][0] = 1.0 - gr[n] - gs[n];
+		H[n][1] = gr[n];
+		H[n][2] = gs[n];
+	}
+	H.inverse();
+
+	for (int i=0; i<3; ++i)
+	{
+		ao[i] = 0;
+		for (int j=0; j<3; ++j) ao[i] += H[i][j]*ai[j];
+	}
+
+	ao[3] = 0.5*(ao[0] + ao[1]);
+	ao[4] = 0.5*(ao[1] + ao[2]);
+	ao[5] = 0.5*(ao[2] + ao[0]);
+}
+
+//=============================================================================
+//                          F E 2 D Q U A D 4
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+void FE2DQuad4_::shape(double* H, double r, double s)
+{
+	H[0] = 0.25*(1-r)*(1-s);
+	H[1] = 0.25*(1+r)*(1-s);
+	H[2] = 0.25*(1+r)*(1+s);
+	H[3] = 0.25*(1-r)*(1+s);
+}
+
+//-----------------------------------------------------------------------------
+void FE2DQuad4_::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
+	Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
+	Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
+	Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
+}
+
+//-----------------------------------------------------------------------------
+void FE2DQuad4_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+{
+	Hrr[0] = 0; Hrs[0] =  0.25; Hss[0] = 0;
+	Hrr[1] = 0; Hrs[1] = -0.25; Hss[1] = 0;
+	Hrr[2] = 0; Hrs[2] =  0.25; Hss[2] = 0;
+	Hrr[3] = 0; Hrs[3] = -0.25; Hss[3] = 0;
+}
+
+//=============================================================================
+//                          F E 2 D Q U A D G 4 
+//=============================================================================
+
+FE2DQuad4G4::FE2DQuad4G4() : FE2DQuad4_(NINT, FE2D_QUAD4G4) 
+{
+	const double a = 1.0 / sqrt(3.0);
+	gr[0] = -a; gs[0] = -a; gw[0] = 1;
+	gr[1] =  a; gs[1] = -a; gw[1] = 1;
+	gr[2] =  a; gs[2] =  a; gw[2] = 1;
+	gr[3] = -a; gs[3] =  a; gw[3] = 1;
+	init(); 
+	Hi = H.inverse();
+}
+
+//-----------------------------------------------------------------------------
+void FE2DQuad4G4::project_to_nodes(double* ai, double* ao)
+{
+	int ni = NINT;
+	int ne = NELN;
+	assert(ni == ne);
+	for (int i=0; i<ne; ++i)
+	{
+		ao[i] = 0;
+		for (int j=0; j<ni; ++j) ao[i] += Hi[i][j]*ai[j];
+	}
+}
+
+//=============================================================================
+//          F E 2 D Q U A D 8 
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+// shape function at (r,s)
+void FE2DQuad8_::shape(double* H, double r, double s)
+{
+	H[4] = 0.5*(1 - r*r)*(1 - s);
+	H[5] = 0.5*(1 - s*s)*(1 + r);
+	H[6] = 0.5*(1 - r*r)*(1 + s);
+	H[7] = 0.5*(1 - s*s)*(1 - r);
+
+	H[0] = 0.25*(1 - r)*(1 - s) - 0.5*(H[4] + H[7]);
+	H[1] = 0.25*(1 + r)*(1 - s) - 0.5*(H[4] + H[5]);
+	H[2] = 0.25*(1 + r)*(1 + s) - 0.5*(H[5] + H[6]);
+	H[3] = 0.25*(1 - r)*(1 + s) - 0.5*(H[6] + H[7]);
+}
+
+//-----------------------------------------------------------------------------
+// shape function derivatives at (r,s)
+void FE2DQuad8_::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	Hr[4] = -r*(1 - s);
+	Hr[5] = 0.5*(1 - s*s);
+	Hr[6] = -r*(1 + s);
+	Hr[7] = -0.5*(1 - s*s);
+
+	Hr[0] = -0.25*(1 - s) - 0.5*(Hr[4] + Hr[7]);
+	Hr[1] =  0.25*(1 - s) - 0.5*(Hr[4] + Hr[5]);
+	Hr[2] =  0.25*(1 + s) - 0.5*(Hr[5] + Hr[6]);
+	Hr[3] = -0.25*(1 + s) - 0.5*(Hr[6] + Hr[7]);
+
+	Hs[4] = -0.5*(1 - r*r);
+	Hs[5] = -s*(1 + r);
+	Hs[6] = 0.5*(1 - r*r);
+	Hs[7] = -s*(1 - r);
+
+	Hs[0] = -0.25*(1 - r) - 0.5*(Hs[4] + Hs[7]);
+	Hs[1] = -0.25*(1 + r) - 0.5*(Hs[4] + Hs[5]);
+	Hs[2] =  0.25*(1 + r) - 0.5*(Hs[5] + Hs[6]);
+	Hs[3] =  0.25*(1 - r) - 0.5*(Hs[6] + Hs[7]);
+}
+
+//-----------------------------------------------------------------------------
+//! shape function derivatives at (r,s)
+void FE2DQuad8_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+{
+	Hrr[4] = -(1 - s);
+	Hrr[5] = 0.0;
+	Hrr[6] = -(1 + s);
+	Hrr[7] = 0.0;
+
+	Hrs[4] = r;
+	Hrs[5] = -s;
+	Hrs[6] = -r;
+	Hrs[7] = s;
+
+	Hss[4] = 0.0;
+	Hss[5] = -(1 + r);
+	Hss[6] = 0.0;
+	Hss[7] = -(1 - r);
+
+	Hrr[0] = - 0.5*(Hrr[4] + Hrr[7]);
+	Hrr[1] = - 0.5*(Hrr[4] + Hrr[5]);
+	Hrr[2] = - 0.5*(Hrr[5] + Hrr[6]);
+	Hrr[3] = - 0.5*(Hrr[6] + Hrr[7]);
+
+	Hrs[0] =  0.25 - 0.5*(Hrs[4] + Hrs[7]);
+	Hrs[1] = -0.25 - 0.5*(Hrs[4] + Hrs[5]);
+	Hrs[2] =  0.25 - 0.5*(Hrs[5] + Hrs[6]);
+	Hrs[3] = -0.25 - 0.5*(Hrs[6] + Hrs[7]);
+
+	Hss[0] = - 0.5*(Hss[4] + Hss[7]);
+	Hss[1] = - 0.5*(Hss[4] + Hss[5]);
+	Hss[2] = - 0.5*(Hss[5] + Hss[6]);
+	Hss[3] = - 0.5*(Hss[6] + Hss[7]);
+}
+
+//=============================================================================
+//       F E 2 D Q U A D 8 G 9
+//=============================================================================
+
+FE2DQuad8G9::FE2DQuad8G9() : FE2DQuad8_(NINT, FE2D_QUAD8G9)
+{
+	// integration point coordinates
+	const double a = sqrt(0.6);
+	const double w1 = 25.0/81.0;
+	const double w2 = 40.0/81.0;
+	const double w3 = 64.0/81.0;
+	gr[ 0] = -a; gs[ 0] = -a;  gw[ 0] = w1;
+	gr[ 1] =  0; gs[ 1] = -a;  gw[ 1] = w2;
+	gr[ 2] =  a; gs[ 2] = -a;  gw[ 2] = w1;
+	gr[ 3] = -a; gs[ 3] =  0;  gw[ 3] = w2;
+	gr[ 4] =  0; gs[ 4] =  0;  gw[ 4] = w3;
+	gr[ 5] =  a; gs[ 5] =  0;  gw[ 5] = w2;
+	gr[ 6] = -a; gs[ 6] =  a;  gw[ 6] = w1;
+	gr[ 7] =  0; gs[ 7] =  a;  gw[ 7] = w2;
+	gr[ 8] =  a; gs[ 8] =  a;  gw[ 8] = w1;
+	init();
+
+	// we need Ai to project integration point data to the nodes
+	matrix A(NELN,NELN);
+	Ai.resize(NELN,NELN);
+	A = H.transpose()*H;
+	Ai = A.inverse();
+}
+
+//-----------------------------------------------------------------------------
+void FE2DQuad8G9::project_to_nodes(double* ai, double* ao)
+{
+	vector<double> b(NELN);
+	for (int i=0; i<NELN; ++i) 
+	{
+		b[i] = 0;
+		for (int j=0; j<NINT; ++j) b[i] += H[j][i]*ai[j];
+	}
+
+	for (int i=0; i<NELN; ++i) 
+	{
+		ao[i] = 0;
+		for (int j=0; j<NELN; ++j) ao[i] += Ai[i][j]*b[j];
+	}
+}
+
+//=============================================================================
+//          F E 2 D Q U A D 9 
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+// shape function at (r,s)
+void FE2DQuad9_::shape(double* H, double r, double s)
+{
+	double R[3] = {0.5*r*(r-1.0), 0.5*r*(r+1.0), 1.0 - r*r};
+	double S[3] = {0.5*s*(s-1.0), 0.5*s*(s+1.0), 1.0 - s*s};
+
+	H[0] = R[0]*S[0];
+	H[1] = R[1]*S[0];
+	H[2] = R[1]*S[1];
+	H[3] = R[0]*S[1];
+	H[4] = R[2]*S[0];
+	H[5] = R[1]*S[2];
+	H[6] = R[2]*S[1];
+	H[7] = R[0]*S[2];
+	H[8] = R[2]*S[2];
+}
+
+//-----------------------------------------------------------------------------
+// shape function derivatives at (r,s)
+void FE2DQuad9_::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	double R[3] = {0.5*r*(r-1.0), 0.5*r*(r+1.0), 1.0 - r*r};
+	double S[3] = {0.5*s*(s-1.0), 0.5*s*(s+1.0), 1.0 - s*s};
+	double DR[3] = {r-0.5, r+0.5, -2.0*r};
+	double DS[3] = {s-0.5, s+0.5, -2.0*s};
+
+	Hr[0] = DR[0]*S[0];
+	Hr[1] = DR[1]*S[0];
+	Hr[2] = DR[1]*S[1];
+	Hr[3] = DR[0]*S[1];
+	Hr[4] = DR[2]*S[0];
+	Hr[5] = DR[1]*S[2];
+	Hr[6] = DR[2]*S[1];
+	Hr[7] = DR[0]*S[2];
+	Hr[8] = DR[2]*S[2];
+
+	Hs[0] = R[0]*DS[0];
+	Hs[1] = R[1]*DS[0];
+	Hs[2] = R[1]*DS[1];
+	Hs[3] = R[0]*DS[1];
+	Hs[4] = R[2]*DS[0];
+	Hs[5] = R[1]*DS[2];
+	Hs[6] = R[2]*DS[1];
+	Hs[7] = R[0]*DS[2];
+	Hs[8] = R[2]*DS[2];
+}
+
+//-----------------------------------------------------------------------------
+//! shape function derivatives at (r,s)
+void FE2DQuad9_::shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s)
+{
+	double R[3] = {0.5*r*(r-1.0), 0.5*r*(r+1.0), 1.0 - r*r};
+	double S[3] = {0.5*s*(s-1.0), 0.5*s*(s+1.0), 1.0 - s*s};
+	double DR[3] = {r-0.5, r+0.5, -2.0*r};
+	double DS[3] = {s-0.5, s+0.5, -2.0*s};
+	double DDR[3] = {1.0, 1.0, -2.0};
+	double DDS[3] = {1.0, 1.0, -2.0};
+
+	Grr[0] = DDR[0]*S[0]; Grs[0] = DR[0]*DS[0]; Gss[0] = R[0]*DDS[0];
+	Grr[1] = DDR[1]*S[0]; Grs[1] = DR[1]*DS[0]; Gss[1] = R[1]*DDS[0];
+	Grr[2] = DDR[1]*S[1]; Grs[2] = DR[1]*DS[1]; Gss[2] = R[1]*DDS[1];
+	Grr[3] = DDR[0]*S[1]; Grs[3] = DR[0]*DS[1]; Gss[3] = R[0]*DDS[1];
+	Grr[4] = DDR[2]*S[0]; Grs[4] = DR[2]*DS[0]; Gss[4] = R[2]*DDS[0];
+	Grr[5] = DDR[1]*S[2]; Grs[5] = DR[1]*DS[2]; Gss[5] = R[1]*DDS[2];
+	Grr[6] = DDR[2]*S[1]; Grs[6] = DR[2]*DS[1]; Gss[6] = R[2]*DDS[1];
+	Grr[7] = DDR[0]*S[2]; Grs[7] = DR[0]*DS[2]; Gss[7] = R[0]*DDS[2];
+	Grr[8] = DDR[2]*S[2]; Grs[8] = DR[2]*DS[2]; Gss[8] = R[2]*DDS[2];		
+}
+
+//=============================================================================
+//       F E 2 D Q U A D 9 G 9
+//=============================================================================
+
+FE2DQuad9G9::FE2DQuad9G9() : FE2DQuad9_(NINT, FE2D_QUAD9G9)
+{
+	// integration point coordinates
+	const double a = sqrt(0.6);
+	const double w1 = 25.0/81.0;
+	const double w2 = 40.0/81.0;
+	const double w3 = 64.0/81.0;
+	gr[ 0] = -a; gs[ 0] = -a;  gw[ 0] = w1;
+	gr[ 1] =  0; gs[ 1] = -a;  gw[ 1] = w2;
+	gr[ 2] =  a; gs[ 2] = -a;  gw[ 2] = w1;
+	gr[ 3] = -a; gs[ 3] =  0;  gw[ 3] = w2;
+	gr[ 4] =  0; gs[ 4] =  0;  gw[ 4] = w3;
+	gr[ 5] =  a; gs[ 5] =  0;  gw[ 5] = w2;
+	gr[ 6] = -a; gs[ 6] =  a;  gw[ 6] = w1;
+	gr[ 7] =  0; gs[ 7] =  a;  gw[ 7] = w2;
+	gr[ 8] =  a; gs[ 8] =  a;  gw[ 8] = w1;
+	init();
+
+	// we need Ai to project integration point data to the nodes
+	matrix A(NELN,NELN);
+	Ai.resize(NELN,NELN);
+	A = H.transpose()*H;
+	Ai = A.inverse();
+}
+
+//-----------------------------------------------------------------------------
+void FE2DQuad9G9::project_to_nodes(double* ai, double* ao)
+{
+	vector<double> b(NELN);
+	for (int i=0; i<NELN; ++i) 
+	{
+		b[i] = 0;
+		for (int j=0; j<NINT; ++j) b[i] += H[j][i]*ai[j];
+	}
+
+	for (int i=0; i<NELN; ++i) 
+	{
+		ao[i] = 0;
+		for (int j=0; j<NELN; ++j) ao[i] += Ai[i][j]*b[j];
+	}
+}

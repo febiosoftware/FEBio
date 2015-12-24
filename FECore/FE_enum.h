@@ -15,7 +15,8 @@ enum FE_Element_Class {
 	FE_ELEM_SURFACE,
 	FE_ELEM_TRUSS,
 	FE_ELEM_DISCRETE,
-    FE_ELEM_FERGUSON_SHELL
+    FE_ELEM_FERGUSON_SHELL,	/// --> TODO: why is this here? This is just another shell so there is no need to define this.
+	FE_ELEM_2D
 };
 
 //-----------------------------------------------------------------------------
@@ -94,6 +95,13 @@ enum FE_Element_Type {
 
 	// discrete elements
 	FE_DISCRETE,
+
+	// 2D elements
+	FE2D_TRI3G1,
+	FE2D_TRI6G3,
+	FE2D_QUAD4G4,
+	FE2D_QUAD8G9,
+	FE2D_QUAD9G9
 };
 
 //-----------------------------------------------------------------------------
