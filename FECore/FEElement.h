@@ -386,4 +386,41 @@ public:
 	FEDiscreteElement& operator = (const FEDiscreteElement& e);
 };
 
+//-----------------------------------------------------------------------------
+//!  This class defines a 2D element
+class FEElement2D : public FEElement
+{
+public:
+	//! default constructor
+	FEElement2D(){}
+
+	//! copy constructor
+	FEElement2D(const FEElement2D& el);
+
+	//! assignment operator
+	FEElement2D& operator = (const FEElement2D& el);
+
+	double* GaussWeights() { return &((FE2DElementTraits*)(m_pT))->gw[0]; }			// weights of integration points
+
+	double* Hr(int n) { return ((FE2DElementTraits*)(m_pT))->Gr[n]; }	// shape function derivative to r
+	double* Hs(int n) { return ((FE2DElementTraits*)(m_pT))->Gs[n]; }	// shape function derivative to s
+
+	//! intialize element data
+	void Init(bool bflag)
+	{
+		int nint = GaussPoints();
+		for (int i=0; i<nint; ++i) m_State[i]->Init(bflag);
+	}
+
+	//! values of shape functions
+	void shape_fnc(double* H, double r, double s) { ((FE2DElementTraits*)(m_pT))->shape(H, r, s); }
+
+	//! values of shape function derivatives
+	void shape_deriv(double* Hr, double* Hs, double r, double s) { ((FE2DElementTraits*)(m_pT))->shape_deriv(Hr, Hs, r, s); }
+
+	//! this function projects data from the gauss-points to the nodal points
+	void project_to_nodes(double* ai, double* ao) { ((FE2DElementTraits*)m_pT)->project_to_nodes(ai, ao); }
+};
+
+
 #endif // !defined(AFX_FEELEMENT_H__2EE38101_58E2_4FEB_B214_BB71B6FB15FB__INCLUDED_)

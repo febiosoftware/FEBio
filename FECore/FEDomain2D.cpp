@@ -16,7 +16,7 @@ void FEDomain2D::InitElements()
 {
     for (size_t i=0; i<m_Elem.size(); ++i)
     {
-        FEShellElement& el = m_Elem[i];
+        FEElement2D& el = m_Elem[i];
         int n = el.GaussPoints();
         for (int j=0; j<n; ++j) el.GetMaterialPoint(j)->Init(false);
     }
@@ -33,16 +33,14 @@ void FEDomain2D::Reset()
 //! integration point n. The inverse jacobian is return in Ji. The return value
 //! is the determinant of the jacobian (not the inverse!)
 //! A 2D element is assumed to have no variation through the thickness.
-double FEDomain2D::invjac0(FEShellElement& el, double Ji[3][3], int n)
+double FEDomain2D::invjac0(FEElement2D& el, double Ji[3][3], int n)
 {
-    int i;
-    
     // number of nodes
     int neln = el.Nodes();
     
     // initial nodal coordinates
     vec3d r0[FEElement::MAX_NODES];
-    for (i=0; i<neln; ++i)
+    for (int i=0; i<neln; ++i)
     {
         r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
     }
@@ -51,7 +49,7 @@ double FEDomain2D::invjac0(FEShellElement& el, double Ji[3][3], int n)
     vec3d g1, g2, g3;
     g1 = g2 = vec3d(0,0,0);
     double J[3][3];
-    for (i=0; i<neln; ++i)
+    for (int i=0; i<neln; ++i)
     {
         const double& Hri = el.Hr(n)[i];
         const double& Hsi = el.Hs(n)[i];
@@ -100,7 +98,7 @@ double FEDomain2D::invjac0(FEShellElement& el, double Ji[3][3], int n)
 //! integration point n. The inverse jacobian is return in Ji. The return value
 //! is the determinant of the jacobian (not the inverse!)
 //! A 2D element is assumed to have no variation through the thickness.
-double FEDomain2D::invjact(FEShellElement& el, double Ji[3][3], int n)
+double FEDomain2D::invjact(FEElement2D& el, double Ji[3][3], int n)
 {
     int i;
     
@@ -165,7 +163,7 @@ double FEDomain2D::invjact(FEShellElement& el, double Ji[3][3], int n)
 //-----------------------------------------------------------------------------
 //! calculate gradient of function at integration points
 //! A 2D element is assumed to have no variation through the thickness.
-vec3d FEDomain2D::gradient(FEShellElement& el, double* fn, int n)
+vec3d FEDomain2D::gradient(FEElement2D& el, double* fn, int n)
 {
     double Ji[3][3];
     invjact(el, Ji, n);
@@ -197,7 +195,7 @@ vec3d FEDomain2D::gradient(FEShellElement& el, double* fn, int n)
 //-----------------------------------------------------------------------------
 //! calculate gradient of function at integration points
 //! A 2D element is assumed to have no variation through the thickness.
-vec3d FEDomain2D::gradient(FEShellElement& el, vector<double>& fn, int n)
+vec3d FEDomain2D::gradient(FEElement2D& el, vector<double>& fn, int n)
 {
     double Ji[3][3];
     invjact(el, Ji, n);
@@ -229,7 +227,7 @@ vec3d FEDomain2D::gradient(FEShellElement& el, vector<double>& fn, int n)
 //-----------------------------------------------------------------------------
 //! calculate spatial gradient of function at integration points
 //! A 2D element is assumed to have no variation through the thickness.
-mat3d FEDomain2D::gradient(FEShellElement& el, vec3d* fn, int n)
+mat3d FEDomain2D::gradient(FEElement2D& el, vec3d* fn, int n)
 {
     double Ji[3][3];
     invjact(el, Ji, n);
@@ -252,7 +250,7 @@ mat3d FEDomain2D::gradient(FEShellElement& el, vec3d* fn, int n)
 
 //-----------------------------------------------------------------------------
 //! Calculate jacobian with respect to reference frame
-double FEDomain2D::detJ0(FEShellElement &el, int n)
+double FEDomain2D::detJ0(FEElement2D &el, int n)
 {
     int i;
     
@@ -301,7 +299,7 @@ void FEDomain2D::ShallowCopy(DumpStream& dmp, bool bsave)
     int NEL = (int) m_Elem.size();
     for (int i=0; i<NEL; ++i)
     {
-        FEShellElement& el = m_Elem[i];
+        FEElement2D& el = m_Elem[i];
         int nint = el.GaussPoints();
         for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->ShallowCopy(dmp, bsave);
     }
@@ -316,14 +314,13 @@ void FEDomain2D::Serialize(DumpFile &ar)
         
         for (size_t i=0; i<m_Elem.size(); ++i)
         {
-            FEShellElement& el = m_Elem[i];
+            FEElement2D& el = m_Elem[i];
             ar << el.Type();
             
             ar << el.GetMatID();
             ar << el.m_nID;
             ar << el.m_node;
-            
-            ar << el.m_h0;
+			ar << el.m_lnode;
             
             for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
         }
@@ -340,7 +337,7 @@ void FEDomain2D::Serialize(DumpFile &ar)
         
         for (size_t i=0; i<m_Elem.size(); ++i)
         {
-            FEShellElement& el = m_Elem[i];
+            FEElement2D& el = m_Elem[i];
             ar >> n;
             
             el.SetType(n);
@@ -348,8 +345,7 @@ void FEDomain2D::Serialize(DumpFile &ar)
             ar >> mat; el.SetMatID(mat);
             ar >> el.m_nID;
             ar >> el.m_node;
-            
-            ar >> el.m_h0;
+			ar >> el.m_lnode;
             
             for (int j=0; j<el.GaussPoints(); ++j)
             {

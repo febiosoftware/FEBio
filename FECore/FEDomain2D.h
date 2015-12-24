@@ -24,7 +24,7 @@ public:
     int Elements() { return m_Elem.size(); }
     
     //! element access
-    FEShellElement& Element(int n) { return m_Elem[n]; }
+    FEElement2D& Element(int n) { return m_Elem[n]; }
     FEElement& ElementRef(int n) { return m_Elem[n]; }
     
     int GetElementType() { return m_Elem[0].Type(); }
@@ -36,22 +36,22 @@ public:
     void Reset();
     
     // inverse jacobian with respect to reference frame
-    double invjac0(FEShellElement& el, double J[3][3], int n);
+    double invjac0(FEElement2D& el, double J[3][3], int n);
     
     // inverse jacobian with respect to current frame
-    double invjact(FEShellElement& el, double J[3][3], int n);
+    double invjact(FEElement2D& el, double J[3][3], int n);
     
     //! calculate in-plane gradient of function at integration points
-    vec3d gradient(FEShellElement& el, double* fn, int n);
+    vec3d gradient(FEElement2D& el, double* fn, int n);
     
     //! calculate in-plane gradient of function at integration points
-    vec3d gradient(FEShellElement& el, vector<double>& fn, int n);
+    vec3d gradient(FEElement2D& el, vector<double>& fn, int n);
     
     //! calculate in-plane gradient of vector function at integration points
-    mat3d gradient(FEShellElement& el, vec3d* fn, int n);
+    mat3d gradient(FEElement2D& el, vec3d* fn, int n);
     
     // jacobian with respect to reference frame
-    double detJ0(FEShellElement& el, int n);
+    double detJ0(FEElement2D& el, int n);
     
 public:
     //! shallow copy
@@ -61,5 +61,5 @@ public:
     void Serialize(DumpFile& ar);
     
 protected:
-    vector<FEShellElement>	m_Elem;	//!< array of elements
+    vector<FEElement2D>	m_Elem;	//!< array of elements
 };

@@ -807,8 +807,10 @@ void FEBioPlotFile::WriteDomain2D(FEDomain2D& dom)
     int dtype = 0;
     switch (etype)
     {
-        case FE_SHELL_QUAD: ne = 4; dtype = PLT_ELEM_QUAD; break;
-        case FE_SHELL_TRI : ne = 3; dtype = PLT_ELEM_TRI; break;
+        case FE2D_TRI3G1 : ne = 3; dtype = PLT_ELEM_TRI; break;
+        case FE2D_QUAD4G4: ne = 4; dtype = PLT_ELEM_QUAD; break;
+		default:
+			assert(false);
     }
     
     // write the header
@@ -826,7 +828,7 @@ void FEBioPlotFile::WriteDomain2D(FEDomain2D& dom)
     {
         for (i=0; i<NE; ++i)
         {
-            FEShellElement& el = dom.Element(i);
+            FEElement2D& el = dom.Element(i);
             n[0] = el.m_nID;
             for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
             m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);

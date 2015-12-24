@@ -249,3 +249,30 @@ FEDiscreteElement& FEDiscreteElement::operator =(const FEDiscreteElement& el)
 
 	return (*this);
 }
+
+//-----------------------------------------------------------------------------
+FEElement2D::FEElement2D(const FEElement2D& el)
+{
+	// set the traits of the element
+	if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
+
+	// copy base class data
+	m_mat = el.m_mat;
+	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
+}
+
+FEElement2D& FEElement2D::operator = (const FEElement2D& el)
+{
+	// set the traits of the element
+	if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
+
+	// copy base class data
+	m_mat = el.m_mat;
+	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
+
+	return (*this);
+}

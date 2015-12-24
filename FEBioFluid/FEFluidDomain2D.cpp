@@ -88,7 +88,7 @@ bool FEFluidDomain2D::Initialize(FEModel &fem)
     // assign local coordinate system to each integration point
     for (size_t i=0; i<m_Elem.size(); ++i)
     {
-        FEShellElement& el = m_Elem[i];
+        FEElement2D& el = m_Elem[i];
         for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
     }
     
@@ -96,7 +96,7 @@ bool FEFluidDomain2D::Initialize(FEModel &fem)
     int ninverted = 0;
     for (int i=0; i<Elements(); ++i)
     {
-        FEShellElement& el = Element(i);
+        FEElement2D& el = Element(i);
         
         int nint = el.GaussPoints();
         for (int n=0; n<nint; ++n)
@@ -132,7 +132,7 @@ void FEFluidDomain2D::InitElements()
     FEMesh& m = *GetMesh();
     for (size_t i=0; i<m_Elem.size(); ++i)
     {
-        FEShellElement& el = m_Elem[i];
+        FEElement2D& el = m_Elem[i];
         int neln = el.Nodes();
         for (int i=0; i<neln; ++i)
         {
@@ -172,7 +172,7 @@ void FEFluidDomain2D::InternalForces(FEGlobalVector& R)
         vector<int> lm;
         
         // get the element
-        FEShellElement& el = m_Elem[i];
+        FEElement2D& el = m_Elem[i];
         
         // get the element force vector and initialize it to zero
         int ndof = 3*el.Nodes();
@@ -193,7 +193,7 @@ void FEFluidDomain2D::InternalForces(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 
-void FEFluidDomain2D::ElementInternalForce(FEShellElement& el, vector<double>& fe)
+void FEFluidDomain2D::ElementInternalForce(FEElement2D& el, vector<double>& fe)
 {
     int i, n;
     
@@ -261,7 +261,7 @@ void FEFluidDomain2D::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
         vector<int> lm;
         
         // get the element
-        FEShellElement& el = m_Elem[i];
+        FEElement2D& el = m_Elem[i];
         
         // get the element force vector and initialize it to zero
         int ndof = 3*el.Nodes();
@@ -281,7 +281,7 @@ void FEFluidDomain2D::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 //-----------------------------------------------------------------------------
 //! calculates the body forces
 
-void FEFluidDomain2D::ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe)
+void FEFluidDomain2D::ElementBodyForce(FEBodyForce& BF, FEElement2D& el, vector<double>& fe)
 {
     // jacobian
     double detJ;
@@ -324,7 +324,7 @@ void FEFluidDomain2D::ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vect
 
 //-----------------------------------------------------------------------------
 //! This function calculates the stiffness due to body forces
-void FEFluidDomain2D::ElementBodyForceStiffness(FEBodyForce& BF, FEShellElement &el, matrix &ke)
+void FEFluidDomain2D::ElementBodyForceStiffness(FEBodyForce& BF, FEElement2D &el, matrix &ke)
 {
     int neln = el.Nodes();
     int ndof = ke.columns()/neln;
@@ -371,7 +371,7 @@ void FEFluidDomain2D::ElementBodyForceStiffness(FEBodyForce& BF, FEShellElement 
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEFluidDomain2D::ElementMaterialStiffness(FEShellElement &el, matrix &ke)
+void FEFluidDomain2D::ElementMaterialStiffness(FEElement2D &el, matrix &ke)
 {
     int i, i3, j, j3, n;
     
@@ -460,7 +460,7 @@ void FEFluidDomain2D::StiffnessMatrix(FESolver* psolver)
         matrix ke;
         vector<int> lm;
         
-        FEShellElement& el = m_Elem[iel];
+        FEElement2D& el = m_Elem[iel];
         
         // create the element's stiffness matrix
         int ndof = 3*el.Nodes();
@@ -492,7 +492,7 @@ void FEFluidDomain2D::MassMatrix(FESolver* psolver)
         matrix ke;
         vector<int> lm;
         
-        FEShellElement& el = m_Elem[iel];
+        FEElement2D& el = m_Elem[iel];
         
         // create the element's stiffness matrix
         int ndof = 3*el.Nodes();
@@ -526,7 +526,7 @@ void FEFluidDomain2D::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf)
         matrix ke;
         vector<int> lm;
         
-        FEShellElement& el = m_Elem[iel];
+        FEElement2D& el = m_Elem[iel];
         
         // create the element's stiffness matrix
         int ndof = 3*el.Nodes();
@@ -551,7 +551,7 @@ void FEFluidDomain2D::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf)
 
 void FEFluidDomain2D::ElementStiffness(FEModel& fem, int iel, matrix& ke)
 {
-    FEShellElement& el = Element(iel);
+    FEElement2D& el = Element(iel);
     
     // calculate material stiffness (i.e. constitutive component)
     ElementMaterialStiffness(el, ke);
@@ -560,7 +560,7 @@ void FEFluidDomain2D::ElementStiffness(FEModel& fem, int iel, matrix& ke)
 
 //-----------------------------------------------------------------------------
 //! calculates element inertial stiffness matrix
-void FEFluidDomain2D::ElementMassMatrix(FEShellElement& el, matrix& ke)
+void FEFluidDomain2D::ElementMassMatrix(FEElement2D& el, matrix& ke)
 {
     int i, i3, j, j3, n;
     
@@ -679,7 +679,7 @@ void FEFluidDomain2D::Update()
 void FEFluidDomain2D::UpdateElementStress(int iel, double dt)
 {
     // get the solid element
-    FEShellElement& el = m_Elem[iel];
+    FEElement2D& el = m_Elem[iel];
     
     // get the number of integration points
     int nint = el.GaussPoints();
@@ -730,7 +730,7 @@ void FEFluidDomain2D::InertialForces(FEGlobalVector& R)
         vector<int> lm;
         
         // get the element
-        FEShellElement& el = m_Elem[i];
+        FEElement2D& el = m_Elem[i];
         
         // get the element force vector and initialize it to zero
         int ndof = 3*el.Nodes();
@@ -751,7 +751,7 @@ void FEFluidDomain2D::InertialForces(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 
-void FEFluidDomain2D::ElementInertialForce(FEShellElement& el, vector<double>& fe)
+void FEFluidDomain2D::ElementInertialForce(FEElement2D& el, vector<double>& fe)
 {
     int i, n;
     
