@@ -42,10 +42,10 @@ public:
     double invjact(FEElement2D& el, double J[2][2], int n);
     
     //! calculate in-plane gradient of function at integration points
-    vec3d gradient(FEElement2D& el, double* fn, int n);
+    vec2d gradient(FEElement2D& el, double* fn, int n);
     
     //! calculate in-plane gradient of function at integration points
-    vec3d gradient(FEElement2D& el, vector<double>& fn, int n);
+    vec2d gradient(FEElement2D& el, vector<double>& fn, int n);
     
     //! calculate in-plane gradient of vector function at integration points
     mat3d gradient(FEElement2D& el, vec3d* fn, int n);

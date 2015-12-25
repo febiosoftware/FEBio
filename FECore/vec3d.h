@@ -2,6 +2,7 @@
 #define _VEC3D_H_10222006_
 
 #include <math.h>
+#include "vec2d.h"
 
 class vec3d
 {
@@ -9,6 +10,7 @@ public:
 	// constructors
 	vec3d() : x(0), y(0), z(0) {}
 	vec3d(double X, double Y, double Z) : x(X), y(Y), z(Z) {}
+	vec3d(const vec2d& v) { x = v.r[0]; y = v.r[1]; z = 0.0; }
 
 	// operators
 	vec3d operator + (const vec3d& r) const { return vec3d(x+r.x, y+r.y, z+r.z); }

@@ -120,7 +120,7 @@ double FEDomain2D::invjact(FEElement2D& el, double Ji[2][2], int n)
 //-----------------------------------------------------------------------------
 //! calculate gradient of function at integration points
 //! A 2D element is assumed to have no variation through the thickness.
-vec3d FEDomain2D::gradient(FEElement2D& el, double* fn, int n)
+vec2d FEDomain2D::gradient(FEElement2D& el, double* fn, int n)
 {
     double Ji[2][2];
     invjact(el, Ji, n);
@@ -130,7 +130,7 @@ vec3d FEDomain2D::gradient(FEElement2D& el, double* fn, int n)
     
     double Gx, Gy;
     
-    vec3d gradf(0,0,0);
+    vec2d gradf(0,0);
     int N = el.Nodes();
     for (int i=0; i<N; ++i)
     {
@@ -140,8 +140,8 @@ vec3d FEDomain2D::gradient(FEElement2D& el, double* fn, int n)
         Gy = Ji[0][1]*Grn[i]+Ji[1][1]*Gsn[i];
         
         // calculate gradient
-        gradf.x += Gx*fn[i];
-        gradf.y += Gy*fn[i];
+        gradf.x() += Gx*fn[i];
+        gradf.y() += Gy*fn[i];
     }
     
     return gradf;
@@ -150,7 +150,7 @@ vec3d FEDomain2D::gradient(FEElement2D& el, double* fn, int n)
 //-----------------------------------------------------------------------------
 //! calculate gradient of function at integration points
 //! A 2D element is assumed to have no variation through the thickness.
-vec3d FEDomain2D::gradient(FEElement2D& el, vector<double>& fn, int n)
+vec2d FEDomain2D::gradient(FEElement2D& el, vector<double>& fn, int n)
 {
     double Ji[2][2];
     invjact(el, Ji, n);
@@ -158,7 +158,7 @@ vec3d FEDomain2D::gradient(FEElement2D& el, vector<double>& fn, int n)
     double* Grn = el.Hr(n);
     double* Gsn = el.Hs(n);
     
-    vec3d gradf(0,0,0);
+    vec2d gradf(0,0);
     int N = el.Nodes();
     for (int i=0; i<N; ++i)
     {
@@ -168,8 +168,8 @@ vec3d FEDomain2D::gradient(FEElement2D& el, vector<double>& fn, int n)
         double Gy = Ji[0][1]*Grn[i]+Ji[1][1]*Gsn[i];
         
         // calculate pressure gradient
-        gradf.x += Gx*fn[i];
-        gradf.y += Gy*fn[i];
+        gradf.x() += Gx*fn[i];
+        gradf.y() += Gy*fn[i];
     }
     
     return gradf;
