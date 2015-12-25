@@ -36,10 +36,10 @@ public:
     void Reset();
     
     // inverse jacobian with respect to reference frame
-    double invjac0(FEElement2D& el, double J[3][3], int n);
+    double invjac0(FEElement2D& el, double J[2][2], int n);
     
     // inverse jacobian with respect to current frame
-    double invjact(FEElement2D& el, double J[3][3], int n);
+    double invjact(FEElement2D& el, double J[2][2], int n);
     
     //! calculate in-plane gradient of function at integration points
     vec3d gradient(FEElement2D& el, double* fn, int n);

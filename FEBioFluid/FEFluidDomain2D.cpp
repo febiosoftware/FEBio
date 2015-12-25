@@ -198,7 +198,7 @@ void FEFluidDomain2D::ElementInternalForce(FEElement2D& el, vector<double>& fe)
     int i, n;
     
     // jacobian matrix, inverse jacobian matrix and determinants
-    double Ji[3][3], detJ;
+    double Ji[2][2], detJ;
     
     mat3ds s;
     
@@ -221,8 +221,8 @@ void FEFluidDomain2D::ElementInternalForce(FEElement2D& el, vector<double>& fe)
         // calculate the jacobian
         detJ = invjac0(el, Ji, n)*gw[n];
         
-        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
-        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+        vec3d g1(Ji[0][0],Ji[0][1],0.0);
+        vec3d g2(Ji[1][0],Ji[1][1],0.0);
         
         // get the stress tensor for this integration point
         s = pt.m_s;
@@ -385,7 +385,7 @@ void FEFluidDomain2D::ElementMaterialStiffness(FEElement2D &el, matrix &ke)
     double *H, *Gr, *Gs;
     
     // jacobian
-    double Ji[3][3], detJ;
+    double Ji[2][2], detJ;
     
     // weights at gauss points
     const double *gw = el.GaussWeights();
@@ -400,8 +400,8 @@ void FEFluidDomain2D::ElementMaterialStiffness(FEElement2D &el, matrix &ke)
         // calculate jacobian
         detJ = invjac0(el, Ji, n)*gw[n];
         
-        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
-        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+        vec3d g1(Ji[0][0],Ji[0][1],0.0);
+        vec3d g2(Ji[1][0],Ji[1][1],0.0);
         
         H = el.H(n);
         Gr = el.Hr(n);
@@ -575,7 +575,7 @@ void FEFluidDomain2D::ElementMassMatrix(FEElement2D& el, matrix& ke)
     double *Gr, *Gs;
     
     // jacobian
-    double Ji[3][3], detJ;
+    double Ji[2][2], detJ;
     
     // weights at gauss points
     const double *gw = el.GaussWeights();
@@ -586,8 +586,8 @@ void FEFluidDomain2D::ElementMassMatrix(FEElement2D& el, matrix& ke)
         // calculate jacobian
         detJ = invjac0(el, Ji, n)*gw[n];
         
-        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
-        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+        vec3d g1(Ji[0][0],Ji[0][1],0.0);
+        vec3d g2(Ji[1][0],Ji[1][1],0.0);
         
         H = el.H(n);
         
