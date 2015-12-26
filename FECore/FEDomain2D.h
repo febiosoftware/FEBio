@@ -46,6 +46,9 @@ public:
     
     //! calculate in-plane gradient of function at integration points
     vec2d gradient(FEElement2D& el, vector<double>& fn, int n);
+
+    //! calculate in-plane gradient of vector function at integration points
+    mat2d gradient(FEElement2D& el, vec2d* fn, int n);
     
     //! calculate in-plane gradient of vector function at integration points
     mat3d gradient(FEElement2D& el, vec3d* fn, int n);

@@ -177,6 +177,28 @@ vec2d FEDomain2D::gradient(FEElement2D& el, vector<double>& fn, int n)
 
 //-----------------------------------------------------------------------------
 //! calculate spatial gradient of function at integration points
+mat2d FEDomain2D::gradient(FEElement2D& el, vec2d* fn, int n)
+{
+    double Ji[2][2];
+    invjact(el, Ji, n);
+				
+    vec2d g1(Ji[0][0],Ji[0][1]);
+    vec2d g2(Ji[1][0],Ji[1][1]);
+    
+    double* Gr = el.Hr(n);
+    double* Gs = el.Hs(n);
+    
+    mat2d gradf;
+    gradf.zero();
+    int N = el.Nodes();
+    for (int i=0; i<N; ++i)
+        gradf += dyad(fn[i], g1*Gr[i] + g2*Gs[i]);
+    
+    return gradf;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate spatial gradient of function at integration points
 //! A 2D element is assumed to have no variation through the thickness.
 mat3d FEDomain2D::gradient(FEElement2D& el, vec3d* fn, int n)
 {

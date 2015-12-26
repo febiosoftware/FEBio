@@ -46,6 +46,15 @@ double FEElement::Evaluate(vector<double>& fn, int n)
 	return f;
 }
 
+vec2d FEElement::Evaluate(vec2d* vn, int n)
+{
+	double* Hn = H(n);
+	vec2d v(0,0);
+	const int N = Nodes();
+	for (int i=0; i<N; ++i) v += vn[i]*Hn[i];
+	return v;
+}
+
 vec3d FEElement::Evaluate(vec3d* vn, int n)
 {
 	double* Hn = H(n);

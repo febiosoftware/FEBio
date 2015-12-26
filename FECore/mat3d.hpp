@@ -479,6 +479,14 @@ inline mat3d::mat3d(const mat3da& m)
 	d[0][2] = m.d[2]; d[2][0] = -m.d[2];
 }
 
+inline mat3d::mat3d(const mat2d& m)
+{
+	d[0][0] = m(0,0); d[0][1] = m(0,1); d[0][2] = 0.0;
+	d[1][0] = m(1,0); d[1][1] = m(1,1); d[1][2] = 0.0;
+	d[2][0] = d[2][1] = 0.0;
+	d[2][2] = 0.0;	// Should I set this to 1.0 instead? that way det(), inverse() etc. remain valid for the mat3d
+}
+
 // assignment operators
 inline mat3d& mat3d::operator = (const mat3dd& m)
 {

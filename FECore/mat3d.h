@@ -12,6 +12,7 @@
 // we'll need the vector class
 #include <assert.h>
 #include "vec3d.h"
+#include "mat2d.h"
 
 //-----------------------------------------------------------------------------
 // The following classes are defined in this file
@@ -255,6 +256,8 @@ public:
 	mat3d(const mat3dd& m);
 	mat3d(const mat3ds& m);
 	mat3d(const mat3da& m);
+
+	mat3d(const mat2d& m);
 
 	// assignment operators
 	mat3d& operator = (const mat3dd& m);

@@ -688,10 +688,10 @@ void FEFluidDomain2D::UpdateElementStress(int iel, double dt)
     int neln = el.Nodes();
     
     // nodal coordinates
-    vec3d vt[FEElement::MAX_NODES];
+    vec2d vt[FEElement::MAX_NODES];
     double et[FEElement::MAX_NODES];
     for (int j=0; j<neln; ++j) {
-        vt[j] = vec3d(m_pMesh->Node(el.m_node[j]).get(m_dofVX), m_pMesh->Node(el.m_node[j]).get(m_dofVY), 0.0);
+        vt[j] = vec2d(m_pMesh->Node(el.m_node[j]).get(m_dofVX), m_pMesh->Node(el.m_node[j]).get(m_dofVY));
         et[j] = m_pMesh->Node(el.m_node[j]).get(m_dofE);
     }
     

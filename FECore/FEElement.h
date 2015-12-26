@@ -110,6 +110,9 @@ public:
 	double Evaluate(vector<double>& fn, int n);
 
 	//! evaluate vector field at integration point
+	vec2d Evaluate(vec2d* vn, int n);
+
+	//! evaluate vector field at integration point
 	vec3d Evaluate(vec3d* vn, int n);
 
 protected:
