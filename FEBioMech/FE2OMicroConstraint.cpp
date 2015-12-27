@@ -143,6 +143,13 @@ void FE2OMicroConstraint::Activate()
 }
 
 //-----------------------------------------------------------------------------
+void FE2OMicroConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+	// We don't do anything here since the connectivity of a surface
+	// is implied by the domain to which it is attached.
+}
+
+//-----------------------------------------------------------------------------
 void FE2OMicroConstraint::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();

@@ -42,6 +42,9 @@ public:
 	//! initialization function
 	bool Initialize(FEModel& fem);
 
+	//! build the matrix profile
+	void BuildMatrixProfile(FEGlobalMatrix& M);
+
 public: // overrides from FEElasticDomain
 
 	//! Update domain data

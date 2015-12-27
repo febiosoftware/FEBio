@@ -146,6 +146,13 @@ void FEVolumeConstraint::Activate()
 }
 
 //-----------------------------------------------------------------------------
+void FEVolumeConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+	// We don't do anything here since the connectivity of a surface
+	// is implied by the domain to which it is attached.
+}
+
+//-----------------------------------------------------------------------------
 void FEVolumeConstraint::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();

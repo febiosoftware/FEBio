@@ -115,7 +115,7 @@ public:
 	bool UseNodalIntegration() { return true; }
 
 	//! build the matrix profile for use in the stiffness matrix
-	void BuildMatrixProfile(FEStiffnessMatrix& K);
+	void BuildMatrixProfile(FEGlobalMatrix& K);
 
 protected:
 	//! calculate auto penalty factor

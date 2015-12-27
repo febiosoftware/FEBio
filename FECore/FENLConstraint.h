@@ -3,6 +3,7 @@
 #include "DumpFile.h"
 #include "FEModelComponent.h"
 #include "FEGlobalVector.h"
+#include "FEGlobalMatrix.h"
 #include "FESurface.h"
 #include "FETypes.h"
 #include <vector>
@@ -31,6 +32,7 @@ public:
 	virtual void Serialize(DumpFile& ar) = 0;
 	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
 	virtual void CopyFrom(FENLConstraint* plc) {}
+	virtual void BuildMatrixProfile(FEGlobalMatrix& M) = 0;
 
 	// update state
 	virtual void Reset() {}

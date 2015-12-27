@@ -17,6 +17,8 @@ public:
 	void Serialize(DumpFile& ar);
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
+	//! build connectivity for matrix profile
+	void BuildMatrixProfile(FEGlobalMatrix& M);
 
 	// update state
 	void Reset();

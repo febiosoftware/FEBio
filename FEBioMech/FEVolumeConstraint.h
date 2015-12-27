@@ -49,6 +49,9 @@ public:
 	//! Unpack surface element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
+	//! build connectivity for matrix profile
+	void BuildMatrixProfile(FEGlobalMatrix& M);
+
 	FESurface* GetSurface(const char* sz);
 
 public:

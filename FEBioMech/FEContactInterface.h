@@ -49,7 +49,7 @@ public:
 	virtual void Serialize(DumpFile& ar);
 
 	//! build the matrix profile for use in the stiffness matrix
-	virtual void BuildMatrixProfile(FEStiffnessMatrix& K) = 0;
+	virtual void BuildMatrixProfile(FEGlobalMatrix& K) = 0;
 
 protected:
 	//! don't call the default constructor

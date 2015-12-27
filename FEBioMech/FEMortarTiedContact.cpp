@@ -78,7 +78,7 @@ void FEMortarTiedContact::Activate()
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
-void FEMortarTiedContact::BuildMatrixProfile(FEStiffnessMatrix& K)
+void FEMortarTiedContact::BuildMatrixProfile(FEGlobalMatrix& K)
 {
 	// For now we'll assume that each node on the slave side is connected to the master side
 	// This is obviously too much, but we'll worry about improving this later

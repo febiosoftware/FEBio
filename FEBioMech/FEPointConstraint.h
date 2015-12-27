@@ -31,6 +31,9 @@ public:
 	//! augmentations \todo implement this
 	bool Augment(int naug, const FETimePoint& tp) { return true; }
 
+	//! build connectivity for matrix profile
+	void BuildMatrixProfile(FEGlobalMatrix& M);
+
 public:
 	double		m_eps;		//!< penalty parameter
 	int			m_node_id;	//!< id of master node

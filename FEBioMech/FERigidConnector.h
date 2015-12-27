@@ -26,6 +26,9 @@ public:
     virtual ~FERigidConnector();
     
     int     GetConnectorID() { return m_nID; }
+
+	//! build connectivity for matrix profile
+	void BuildMatrixProfile(FEGlobalMatrix& M);
     
 public:
     int	m_nRBa;		//!< rigid body A that the connector connects

@@ -181,6 +181,36 @@ FEUT4Domain::~FEUT4Domain()
 }
 
 //-----------------------------------------------------------------------------
+void FEUT4Domain::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+    DOFS& fedofs = fem.GetDOFS();
+    int MAX_NDOFS = fedofs.GetTotalDOFS();
+
+	// we'll need the node-element list
+	FENodeElemList& NEL = GetNodeElemList();
+	assert(NEL.Size() > 0);
+
+	vector<int> LM, elm;
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		int NE = NEL.Valence(i);
+		if (NE > 0)
+		{
+			LM.assign(NE*4*MAX_NDOFS, -1);
+			FEElement** ppe = NEL.ElementList(i);
+			for (int n=0; n<NE; ++n)
+			{
+				UnpackLM(*ppe[n], elm);
+				for (int j=0; j<(int)elm.size(); ++j) LM[n*4*MAX_NDOFS + j] = elm[j];
+			}
+			M.build_add(LM);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Initialization for the UT4Domain.
 //! Note that we first initialize the base class before initializing the domain.
 bool FEUT4Domain::Initialize(FEModel& mdl)

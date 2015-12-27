@@ -4,6 +4,7 @@
 #include "FEDataExport.h"
 #include "FEMesh.h"
 #include "DOFS.h"
+#include "FEGlobalMatrix.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------
@@ -97,6 +98,19 @@ void FEDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		FENode& node = m_pMesh->Node(n);
 		vector<int>& id = node.m_ID;
 		for (int j=0; j<ndofs; ++j) lm[i*ndofs + j] = id[m_dof[j]];
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEDomain::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+	vector<int> elm;
+	const int NE = Elements();
+	for (int j=0; j<NE; ++j)
+	{
+		FEElement& el = ElementRef(j);
+		UnpackLM(el, elm);
+		M.build_add(elm);
 	}
 }
 

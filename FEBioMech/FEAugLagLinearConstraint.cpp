@@ -53,6 +53,24 @@ FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FENLConstraint(pfe
 }
 
 //-----------------------------------------------------------------------------
+void FELinearConstraintSet::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	list<FEAugLagLinearConstraint*>& LC = m_LC;
+	vector<int> lm;
+	int N = (int)LC.size();
+	list<FEAugLagLinearConstraint*>::iterator it = LC.begin();
+	for (int i=0; i<N; ++i, ++it)
+	{
+		int n = (int)(*it)->m_dof.size();
+		lm.resize(n);
+		FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
+		for (int j = 0; j<n; ++j, ++is) lm[j] = mesh.Node(is->node).m_ID[is->bc];;
+		M.build_add(lm);
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! This function calculates the current value of the constraint.
 
 double FELinearConstraintSet::constraint(FEAugLagLinearConstraint& LC)

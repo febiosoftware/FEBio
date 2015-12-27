@@ -78,7 +78,7 @@ void FEPeriodicBoundary1O::CopyFrom(FESurfacePairInteraction* pci)
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
 // TODO: what if two_pass ??
-void FEPeriodicBoundary1O::BuildMatrixProfile(FEStiffnessMatrix& K)
+void FEPeriodicBoundary1O::BuildMatrixProfile(FEGlobalMatrix& K)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();

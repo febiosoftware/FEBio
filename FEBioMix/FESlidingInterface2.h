@@ -119,7 +119,7 @@ public:
 	bool UseNodalIntegration() { return false; }
 
 	//! build the matrix profile for use in the stiffness matrix
-	void BuildMatrixProfile(FEStiffnessMatrix& K);
+	void BuildMatrixProfile(FEGlobalMatrix& K);
 
 protected:
 	void ProjectSurface(FESlidingSurface2& ss, FESlidingSurface2& ms, bool bupseg, bool bmove = false);

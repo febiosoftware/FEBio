@@ -14,6 +14,7 @@ class FENode;
 class FEMesh;
 class FEMaterial;
 class FEDataExport;
+class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
 //! This class describes a physical domain that will be divided into elements
@@ -110,6 +111,9 @@ public: // optional functions to overload
 	//! Update domain data.
 	//! (Called when the model state needs to be updated).
 	virtual void Update() {}
+
+	//! build the matrix profile
+	virtual void BuildMatrixProfile(FEGlobalMatrix& M);
 
 public:
 	void SetDOF(vector<int>& dof);

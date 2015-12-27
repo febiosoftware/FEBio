@@ -34,7 +34,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
-void FESlidingInterface::BuildMatrixProfile(FEStiffnessMatrix& K)
+void FESlidingInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 {
 	// TODO: this is currently for max 6 nodes (hence 7=6+1)
 	vector<int> lm(6*7);

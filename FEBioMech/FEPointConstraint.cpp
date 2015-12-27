@@ -42,6 +42,25 @@ bool FEPointConstraint::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEPointConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	vector<int> lm(3*9);
+	FENode& n0 = mesh.Node(m_node);
+	lm[0] = n0.m_ID[m_dofX];
+	lm[1] = n0.m_ID[m_dofY];
+	lm[2] = n0.m_ID[m_dofZ];
+	for (int i=0; i<8; ++i)
+	{
+		FENode& ni = mesh.Node(m_pel->m_node[i]);
+		lm[3*(i+1)  ] = ni.m_ID[m_dofX];
+		lm[3*(i+1)+1] = ni.m_ID[m_dofY];
+		lm[3*(i+1)+2] = ni.m_ID[m_dofZ];
+	}
+	M.build_add(lm);
+}
+
+//-----------------------------------------------------------------------------
 void FEPointConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {
 	int i;

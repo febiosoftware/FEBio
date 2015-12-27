@@ -50,6 +50,9 @@ public:
 	//! Reset data
 	void Reset();
 
+	//! build connectivity for matrix profile
+	void BuildMatrixProfile(FEGlobalMatrix& M);
+
 public:
 	int	m_nRBa;		//!< rigid body A that the joint connects
 	int	m_nRBb;		//!< rigid body B that the joint connects

@@ -96,7 +96,7 @@ public:
 	bool UseNodalIntegration() { return true; }
 
 	//! build the matrix profile for use in the stiffness matrix
-	void BuildMatrixProfile(FEStiffnessMatrix& K);
+	void BuildMatrixProfile(FEGlobalMatrix& K);
 
 public:
 	FEStickySurface	ss;	//!< slave surface

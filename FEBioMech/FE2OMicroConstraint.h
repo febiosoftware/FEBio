@@ -55,6 +55,9 @@ public:
 	//! Unpack surface element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
+	//! build connectivity for matrix profile
+	void BuildMatrixProfile(FEGlobalMatrix& M);
+
 public:
 	FEMicroFlucSurface m_s;	//!< the bounding surface
 

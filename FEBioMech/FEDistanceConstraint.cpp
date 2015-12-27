@@ -217,6 +217,22 @@ bool FEDistanceConstraint::Augment(int naug, const FETimePoint& tp)
 }
 
 //-----------------------------------------------------------------------------
+void FEDistanceConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	vector<int> lm(6);
+	FENode& n0 = mesh.Node(m_node[0] - 1);
+	lm[0] = n0.m_ID[m_dofX];
+	lm[1] = n0.m_ID[m_dofY];
+	lm[2] = n0.m_ID[m_dofZ];
+	FENode& n1 = mesh.Node(m_node[1] - 1);
+	lm[3] = n1.m_ID[m_dofX];
+	lm[4] = n1.m_ID[m_dofY];
+	lm[5] = n1.m_ID[m_dofZ];
+    M.build_add(lm);
+}
+
+//-----------------------------------------------------------------------------
 void FEDistanceConstraint::Serialize(DumpFile& ar)
 {
 }

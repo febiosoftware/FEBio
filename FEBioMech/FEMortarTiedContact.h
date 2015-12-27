@@ -51,7 +51,7 @@ public:
 	void Serialize(DumpFile& ar);
 
 	//! build the matrix profile for use in the stiffness matrix
-	void BuildMatrixProfile(FEStiffnessMatrix& K);
+	void BuildMatrixProfile(FEGlobalMatrix& K);
 
 	//! update interface data
 	void Update(int niter);

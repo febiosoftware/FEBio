@@ -499,7 +499,7 @@ bool FESlidingInterface2::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface2::BuildMatrixProfile(FEStiffnessMatrix& K)
+void FESlidingInterface2::BuildMatrixProfile(FEGlobalMatrix& K)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();

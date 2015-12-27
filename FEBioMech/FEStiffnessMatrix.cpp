@@ -92,42 +92,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 			for (int nd=0; nd<pstep->Domains(); ++nd)
 			{
 				FEDomain& d = *pstep->Domain(nd);
-
-				if (dynamic_cast<FEUT4Domain*>(&d) == 0)
-				{
-					for (int j=0; j<d.Elements(); ++j)
-					{
-						FEElement& el = d.ElementRef(j);
-						d.UnpackLM(el, elm);
-						build_add(elm);
-					}
-				}
-				else
-				{
-					// The UT4 Domain requires a slightly different form
-					FEUT4Domain& ut4 = dynamic_cast<FEUT4Domain&>(d);
-
-					// we'll need the node-element list
-					FENodeElemList& NEL = ut4.GetNodeElemList();
-					assert(NEL.Size() > 0);
-
-					vector<int> LM;
-					for (int i=0; i<mesh.Nodes(); ++i)
-					{
-						int NE = NEL.Valence(i);
-						if (NE > 0)
-						{
-							LM.assign(NE*4*MAX_NDOFS, -1);
-							FEElement** ppe = NEL.ElementList(i);
-							for (int n=0; n<NE; ++n)
-							{
-								ut4.UnpackLM(*ppe[n], elm);
-								for (int j=0; j<(int)elm.size(); ++j) LM[n*4*MAX_NDOFS + j] = elm[j];
-							}
-							build_add(LM);
-						}
-					}
-				}
+				d.BuildMatrixProfile(*this);
 			}
 
 			// Add rigid bodies to the profile
@@ -224,78 +189,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 			for (int m=0; m<M; ++m)
 			{
 				FENLConstraint* pnlc = fem.NonlinearConstraint(m);
-				if (dynamic_cast<FEPointConstraint*>(pnlc))
-				{
-					FEPointConstraint& pc = dynamic_cast<FEPointConstraint&>(*pnlc);
-					vector<int> lm(3*9);
-					FENode& n0 = mesh.Node(pc.m_node);
-					lm[0] = n0.m_ID[dof_X];
-					lm[1] = n0.m_ID[dof_Y];
-					lm[2] = n0.m_ID[dof_Z];
-					for (j=0; i<8; ++i)
-					{
-						FENode& nj = mesh.Node(pc.m_pel->m_node[j]);
-						lm[3*(j+1)  ] = nj.m_ID[dof_X];
-						lm[3*(j+1)+1] = nj.m_ID[dof_Y];
-						lm[3*(j+1)+2] = nj.m_ID[dof_Z];
-					}
-					build_add(lm);
-				}
-				else if (dynamic_cast<FELinearConstraintSet*>(pnlc))
-				{
-					FELinearConstraintSet& lcs = dynamic_cast<FELinearConstraintSet&>(*pnlc);
-					list<FEAugLagLinearConstraint*>& LC = lcs.m_LC;
-					vector<int> lm;
-					int N = (int)LC.size();
-					list<FEAugLagLinearConstraint*>::iterator it = LC.begin();
-					for (i=0; i<N; ++i, ++it)
-					{
-						int n = (int)(*it)->m_dof.size();
-						lm.resize(n);
-						FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
-						for (j = 0; j<n; ++j, ++is) lm[j] = mesh.Node(is->node).m_ID[is->bc];;
-		
-						build_add(lm);
-					}
-				}
-				else if (dynamic_cast<FERigidJoint*>(pnlc))
-				{
-					FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*pnlc);
-					vector<int> lm(12);
-			
-					int* lm1 = rigid.Object(rj.m_nRBa)->m_LM;
-					int* lm2 = rigid.Object(rj.m_nRBb)->m_LM;
-
-					for (j=0; j<6; ++j) lm[j  ] = lm1[j];
-					for (j=0; j<6; ++j) lm[j+6] = lm2[j];
-					build_add(lm);
-				}
-                else if (dynamic_cast<FERigidConnector*>(pnlc))
-                {
-                    FERigidConnector& rj = dynamic_cast<FERigidConnector&>(*pnlc);
-                    vector<int> lm(12);
-                    
-                    int* lm1 = rigid.Object(rj.m_nRBa)->m_LM;
-                    int* lm2 = rigid.Object(rj.m_nRBb)->m_LM;
-                    
-                    for (j=0; j<6; ++j) lm[j  ] = lm1[j];
-                    for (j=0; j<6; ++j) lm[j+6] = lm2[j];
-                    build_add(lm);
-                }
-				else if (dynamic_cast<FEDistanceConstraint*>(pnlc))
-				{
-					FEDistanceConstraint* pdc = dynamic_cast<FEDistanceConstraint*>(pnlc);
-					vector<int> lm(6);
-					FENode& n0 = mesh.Node(pdc->m_node[0] - 1);
-					lm[0] = n0.m_ID[dof_X];
-					lm[1] = n0.m_ID[dof_Y];
-					lm[2] = n0.m_ID[dof_Z];
-					FENode& n1 = mesh.Node(pdc->m_node[1] - 1);
-					lm[3] = n1.m_ID[dof_X];
-					lm[4] = n1.m_ID[dof_Y];
-					lm[5] = n1.m_ID[dof_Z];
-                    build_add(lm);
-				}
+				if (pnlc->IsActive()) pnlc->BuildMatrixProfile(*this);
 			}
 
 			// copy the static profile to the MP object

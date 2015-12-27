@@ -66,7 +66,7 @@ bool FETiedInterface::Init()
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
-void FETiedInterface::BuildMatrixProfile(FEStiffnessMatrix& K)
+void FETiedInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();

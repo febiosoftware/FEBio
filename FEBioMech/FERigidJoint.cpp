@@ -85,6 +85,20 @@ void FERigidJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 }
 
 //-----------------------------------------------------------------------------
+void FERigidJoint::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+	vector<int> lm(12);
+			
+	int* lm1 = rigid.Object(m_nRBa)->m_LM;
+	int* lm2 = rigid.Object(m_nRBb)->m_LM;
+
+	for (int j=0; j<6; ++j) lm[j  ] = lm1[j];
+	for (int j=0; j<6; ++j) lm[j+6] = lm2[j];
+	M.build_add(lm);
+}
+
+//-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {

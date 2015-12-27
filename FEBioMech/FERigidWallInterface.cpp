@@ -278,7 +278,7 @@ bool FERigidWallInterface::SetProperty(int i, FECoreBase* pm)
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
-void FERigidWallInterface::BuildMatrixProfile(FEStiffnessMatrix& K)
+void FERigidWallInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 {
 	FEModel& fem = *GetFEModel();
 

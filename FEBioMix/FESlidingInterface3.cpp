@@ -583,7 +583,7 @@ bool FESlidingInterface3::Init()
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
-void FESlidingInterface3::BuildMatrixProfile(FEStiffnessMatrix& K)
+void FESlidingInterface3::BuildMatrixProfile(FEGlobalMatrix& K)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();

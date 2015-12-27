@@ -67,6 +67,9 @@ public:
 	//! do the augmentation
 	bool Augment(int naug, const FETimePoint& tp);
 
+	//! build connectivity for matrix profile
+	void BuildMatrixProfile(FEGlobalMatrix& M);
+
 protected:
 	//! calculate the constraint value
 	double constraint(FEAugLagLinearConstraint& LC);

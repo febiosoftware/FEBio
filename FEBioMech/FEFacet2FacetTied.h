@@ -65,7 +65,7 @@ public:
 	bool UseNodalIntegration() { return false; }
 
 	//! build the matrix profile for use in the stiffness matrix
-	void BuildMatrixProfile(FEStiffnessMatrix& K);
+	void BuildMatrixProfile(FEGlobalMatrix& K);
 
 public:
 	//! calculate contact forces

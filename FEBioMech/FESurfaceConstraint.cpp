@@ -122,7 +122,7 @@ bool FESurfaceConstraint::Init()
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
-void FESurfaceConstraint::BuildMatrixProfile(FEStiffnessMatrix& K)
+void FESurfaceConstraint::BuildMatrixProfile(FEGlobalMatrix& K)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();

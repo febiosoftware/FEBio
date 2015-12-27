@@ -357,7 +357,7 @@ void FESlidingInterfaceBW::Activate()
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
-void FESlidingInterfaceBW::BuildMatrixProfile(FEStiffnessMatrix& K)
+void FESlidingInterfaceBW::BuildMatrixProfile(FEGlobalMatrix& K)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
