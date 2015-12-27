@@ -12,7 +12,7 @@
 #include "FE_enum.h"
 #include "vec3d.h"
 #include "quatd.h"
-#include "BC.h"
+#include "RigidBC.h"
 #include "DumpFile.h"
 #include "FEObject.h"
 

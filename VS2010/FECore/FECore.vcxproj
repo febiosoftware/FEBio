@@ -693,6 +693,7 @@
     <ClInclude Include="..\..\FECore\NodeDataRecord.h" />
     <ClInclude Include="..\..\FECore\ObjectDataRecord.h" />
     <ClInclude Include="..\..\FECore\quatd.h" />
+    <ClInclude Include="..\..\FECore\RigidBC.h" />
     <ClInclude Include="..\..\FECore\SparseMatrix.h" />
     <ClInclude Include="..\..\FECore\stdafx.h" />
     <ClInclude Include="..\..\FECore\targetver.h" />
@@ -800,6 +801,7 @@
     <ClCompile Include="..\..\FECore\ObjectDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\qsort.cpp" />
     <ClCompile Include="..\..\FECore\quatd.cpp" />
+    <ClCompile Include="..\..\FECore\RigidBC.cpp" />
     <ClCompile Include="..\..\FECore\SparseMatrix.cpp" />
     <ClCompile Include="..\..\FECore\stdafx.cpp" />
     <ClCompile Include="..\..\FECore\svd.cpp" />
