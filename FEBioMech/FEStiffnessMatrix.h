@@ -10,8 +10,10 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/FEGlobalMatrix.h"
-#include "FECore/FEModel.h"
-#include "FEContactInterface.h"
+
+//-----------------------------------------------------------------------------
+class FEModel;
+class FEMesh;
 
 //-----------------------------------------------------------------------------
 //! The FEStiffnessmatrix class stores the global stiffness matrix of the FE

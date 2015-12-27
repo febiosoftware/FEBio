@@ -4,22 +4,10 @@
 
 #include "stdafx.h"
 #include "FEStiffnessMatrix.h"
-#include "FEUT4Domain.h"
-#include "FEPointConstraint.h"
-#include "FEAugLagLinearConstraint.h"
 #include "FECore/FERigidBody.h"
-#include "FECore/DOFS.h"
-#include "FERigidJoint.h"
-#include "FERigidSphericalJoint.h"
-#include "FERigidRevoluteJoint.h"
-#include "FERigidPrismaticJoint.h"
-#include "FERigidCylindricalJoint.h"
-#include "FERigidPlanarJoint.h"
-#include "FERigidSpring.h"
-#include "FERigidDamper.h"
-#include "FERigidAngularDamper.h"
-#include "FERigidContractileForce.h"
-#include "FEDistanceConstraint.h"
+#include "FECore/FEModel.h"
+#include "FECore/FEMesh.h"
+#include "FEContactInterface.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -45,17 +33,10 @@ FEStiffnessMatrix::~FEStiffnessMatrix()
 
 bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 {
-	int i, j, k, l, m, n;
-
     // get nodal DOFS
 	FEModel& fem = *pfem;
     DOFS& fedofs = fem.GetDOFS();
     int MAX_NDOFS = fedofs.GetTotalDOFS();
-
-	// get the DOFS
-	const int dof_X = fem.GetDOFIndex("x");
-	const int dof_Y = fem.GetDOFIndex("y");
-	const int dof_Z = fem.GetDOFIndex("z");
 
 	// keep a pointer to the FEM object
 	m_pfem = pfem;
@@ -69,7 +50,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 	// for instance contact elements which can change connectivity in between
 	// calls to the Create() function. Storing the static profile instead of
 	// reconstructing it every time we come here saves us a lot of time. The 
-	// static profile is stored in the variable m_MP.
+	// static profile is stored in the variable m_MPs.
 
 	// begin building the profile
 	build_begin(neq);
@@ -123,42 +104,37 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 				// loop over all solid elements
 				for (int nd=0; nd<pstep->Domains(); ++nd)
 				{
-					FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(pstep->Domain(nd));
-					if (pbd && (pbd->GetMaterial()->IsRigid() == false))
+					FEDomain& dom = *pstep->Domain(nd);
+					for (int i=0; i<dom.Elements(); ++i)
 					{
-						for (i=0; i<pbd->Elements(); ++i)
+						FEElement& el = dom.ElementRef(i);
+						dom.UnpackLM(el, elm);
+						int ne = (int)elm.size();
+
+						// see if this element connects to the 
+						// master node of a linear constraint ...
+						int m = el.Nodes();
+						for (int j=0; j<m; ++j)
 						{
-							FESolidElement& el = pbd->Element(i);
-							pbd->UnpackLM(el, elm);
-							int ne = (int)elm.size();
-
-							// see if this element connects to the 
-							// master node of a linear constraint ...
-							m = el.Nodes();
-							for (j=0; j<m; ++j)
+							for (int k=0; k<MAX_NDOFS; ++k)
 							{
-								for (k=0; k<MAX_NDOFS; ++k)
+								int n = fem.m_LCT[el.m_node[j]*MAX_NDOFS + k];
+								if (n >= 0)
 								{
-									n = fem.m_LCT[el.m_node[j]*MAX_NDOFS + k];
+									// ... it does so we need to connect the 
+									// element to the linear constraint
+									FELinearConstraint* plc = fem.m_LCA[n];
 
-									if (n >= 0)
-									{
-										// ... it does so we need to connect the 
-										// element to the linear constraint
-										FELinearConstraint* plc = fem.m_LCA[n];
+									int ns = (int)plc->slave.size();
 
-										int ns = (int)plc->slave.size();
+									lm.resize(ne + ns);
+									for (int l=0; l<ne; ++l) lm[l] = elm[l];
+									
+									list<FELinearConstraint::SlaveDOF>::iterator is = plc->slave.begin();
+									for (int l=ne; l<ne+ns; ++l, ++is) lm[l] = is->neq;
 
-										lm.resize(ne + ns);
-										for (l=0; l<ne; ++l) lm[l] = elm[l];
-
-										list<FELinearConstraint::SlaveDOF>::iterator is = plc->slave.begin();
-										for (l=ne; l<ne+ns; ++l, ++is) lm[l] = is->neq;
-
-										build_add(lm);
-		
-										break;
-									}
+									build_add(lm);
+									break;
 								}
 							}
 						}
@@ -170,16 +146,16 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 				// do the constraint term
 				int ni;
 				list<FELinearConstraint>::iterator ic = fem.m_LinC.begin();
-				n = 0;
-				for (i=0; i<nlin; ++i, ++ic) n += ic->slave.size();
+				int n = 0;
+				for (int i=0; i<nlin; ++i, ++ic) n += ic->slave.size();
 				lm.resize(n);
 				ic = fem.m_LinC.begin();
 				n = 0;
-				for (i=0; i<nlin; ++i, ++ic)
+				for (int i=0; i<nlin; ++i, ++ic)
 				{
 					ni = (int)ic->slave.size();
 					list<FELinearConstraint::SlaveDOF>::iterator is = ic->slave.begin();
-					for (j=0; j<ni; ++j, ++is) lm[n++] = is->neq;
+					for (int j=0; j<ni; ++j, ++is) lm[n++] = is->neq;
 				}
 				build_add(lm);
 			}
@@ -197,7 +173,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 			build_flush();
 			m_MPs = *m_pMP;
 		}
-		else
+		else // --> if (breset)
 		{
 			// copy the old static profile
 			*m_pMP = m_MPs;
@@ -209,7 +185,7 @@ bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 		if (fem.SurfacePairInteractions() > 0)
 		{
 			// Add all contact interface elements
-			for (i=0; i<fem.SurfacePairInteractions(); ++i)
+			for (int i=0; i<fem.SurfacePairInteractions(); ++i)
 			{
 				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairInteraction(i));
 				if (pci->IsActive()) pci->BuildMatrixProfile(*this);
@@ -232,16 +208,10 @@ bool FEStiffnessMatrix::Create(FEMesh& mesh, int neq)
 	{
 		// Add all elements to the profile
 		// Loop over all active domains
-		vector<int> elm;
 		for (int nd=0; nd<mesh.Domains(); ++nd)
 		{
 			FEDomain& d = mesh.Domain(nd);
-			for (int j=0; j<d.Elements(); ++j)
-			{
-				FEElement& el = d.ElementRef(j);
-				d.UnpackLM(el, elm);
-				build_add(elm);
-			}
+			d.BuildMatrixProfile(*this);
 		}
 	}
 	// All done! We can now finish building the profile and create 

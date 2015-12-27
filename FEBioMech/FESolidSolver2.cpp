@@ -12,6 +12,7 @@
 #include "FEUncoupledMaterial.h"
 #include "NumCore/NumCore.h"
 #include "FEBioMech/FEStiffnessMatrix.h"
+#include "FEContactInterface.h"
 
 #ifdef WIN32
 	#include <float.h>
