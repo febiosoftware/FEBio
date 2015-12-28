@@ -37,6 +37,8 @@ int FELinearSolver::NumberOfEquations() const
 //-----------------------------------------------------------------------------
 bool FELinearSolver::Init()
 {
+	if (FESolver::Init() == false) return false;
+
 	// Now that we have determined the equation numbers we can continue
 	// with creating the stiffness matrix. First we select the linear solver
 	// The stiffness matrix is created in CreateStiffness

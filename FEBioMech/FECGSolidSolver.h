@@ -16,7 +16,7 @@ public:
 	bool Init();
 
 	//! clean up
-	void Clean() {}
+	void Clean();
 
 	//! Performs a CG step
 	bool SolveStep(double time);

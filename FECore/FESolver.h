@@ -28,7 +28,7 @@ public:
 
 public:
 	//! Initialize solver data
-	virtual bool Init() = 0;
+	virtual bool Init();
 
 	//! Can this be removed?
 	virtual void Clean() = 0;

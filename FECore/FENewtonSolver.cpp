@@ -191,6 +191,8 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 //-----------------------------------------------------------------------------
 bool FENewtonSolver::Init()
 {
+	if (FESolver::Init() == false) return false;
+
 	// check parameters
 	if (m_LStol  < 0.0) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
 	if (m_LSmin  < 0.0) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
@@ -240,6 +242,28 @@ bool FENewtonSolver::Init()
 
     // set the create stiffness matrix flag
     m_breshape = true;
+
+	// allocate storage for the sparse matrix that will hold the stiffness matrix data
+	// we let the linear solver allocate the correct type of matrix format
+	SparseMatrix* pS = m_plinsolve->CreateSparseMatrix(m_bsymm? REAL_SYMMETRIC : REAL_UNSYMMETRIC);
+	if (pS == 0)
+	{
+		felog.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
+		return false;
+	}
+
+	// clean up the stiffness matrix if we have one
+	if (m_pK) delete m_pK; m_pK = 0;
+
+	// Create the stiffness matrix.
+	// Note that this does not construct the stiffness matrix. This
+	// is done later in the CreateStiffness routine.
+	m_pK = new FEGlobalMatrix(pS);
+	if (m_pK == 0)
+	{
+		felog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
+		return false;
+	}
 
 	return true;
 }

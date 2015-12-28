@@ -63,6 +63,8 @@ void FEExplicitSolidSolver::Clean()
 //-----------------------------------------------------------------------------
 bool FEExplicitSolidSolver::Init()
 {
+	if (FESolver::Init() == false) return false;
+
 	// get nr of equations
 	int neq = m_neq;
 

@@ -19,12 +19,7 @@ void FECoupledHeatSolidSolver::Clean()
 //! Initialization
 bool FECoupledHeatSolidSolver::Init()
 {
-	// NOTE: Don't call base class since it will try to allocate
-	//       a global stiffness matrix. We don't need one for this
-	//       type of coupled problem. Instead, we'll need to sub-
-	//		 matrices which will be stored in the m_Heat and m_Solid
-	//		 classes.
-//	FESolver::Init();
+	if (FESolver::Init() == false) return false;
 
 	// Initialize heat solver
 	if (m_Heat.Init() == false) return false;

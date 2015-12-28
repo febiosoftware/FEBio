@@ -13,25 +13,8 @@
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/LinearSolver.h"
 #include "FEContactInterface.h"
+#include <FECore/sys.h>
 #include <assert.h>
-
-#ifdef WIN32
-	#include <float.h>
-	#define ISNAN(x) _isnan(x)
-#endif
-
-#ifdef LINUX
-	#ifdef CENTOS
-		#define ISNAN(x) isnan(x)
-	#else
-		#define ISNAN(x) std::isnan(x)
-	#endif
-#endif
-
-#ifdef __APPLE__
-#include <math.h>
-#define ISNAN(x) isnan(x)
-#endif
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -126,44 +109,19 @@ bool FESolidSolver::Init()
 	if (m_Rtol <  0.0) { felog.printf("Error: rtol must be nonnegative.\n"); return false; }
 	if (m_Rmin <  0.0) { felog.printf("Error: min_residual must be nonnegative.\n"  ); return false; }
 
-	// allocate storage for the sparse matrix that will hold the stiffness matrix data
-	// we let the solver allocate the correct type of matrix format
-	SparseMatrix* pS = m_plinsolve->CreateSparseMatrix(m_bsymm? REAL_SYMMETRIC : REAL_UNSYMMETRIC);
-	if (pS == 0)
-	{
-		felog.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
-		return false;
-	}
-
-	// clean up the stiffness matrix if we have one
-	if (m_pK) delete m_pK; m_pK = 0;
-
-	// Create the stiffness matrix.
-	// Note that this does not construct the stiffness matrix. This
-	// is done later in the StiffnessMatrix routine.
-	m_pK = new FEGlobalMatrix(pS);
-	if (m_pK == 0)
-	{
-		felog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
-		return false;
-	}
-
-	// get nr of equations
-	int neq = m_neq;
-
 	// allocate vectors
+	int neq = m_neq;
 	m_Fn.assign(neq, 0);
 	m_Fd.assign(neq, 0);
 	m_Fr.assign(neq, 0);
 	m_Ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);
 
-	int i, n;
-
 	// we need to fill the total displacement vector m_Ut
 	// TODO: I need to find an easier way to do this
+	int n;
 	FEMesh& mesh = m_fem.GetMesh();
-	for (i=0; i<mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 

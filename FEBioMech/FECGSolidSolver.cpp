@@ -9,25 +9,7 @@
 #include "FEElasticDomain.h"
 #include "FEPointBodyForce.h"
 #include "FE3FieldElasticSolidDomain.h"
-
-
-#ifdef WIN32
-	#include <float.h>
-	#define ISNAN(x) _isnan(x)
-#endif
-
-#ifdef LINUX
-	#ifdef CENTOS
-		#define ISNAN(x) isnan(x)
-	#else
-		#define ISNAN(x) std::isnan(x)
-	#endif
-#endif
-
-#ifdef __APPLE__
-#include <math.h>
-#define ISNAN(x) isnan(x)
-#endif
+#include "FECore/sys.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -100,10 +82,18 @@ FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem)
 }
 
 //-----------------------------------------------------------------------------
+void FECGSolidSolver::Clean()
+{
+
+}
+
+//-----------------------------------------------------------------------------
 //! Allocates and initializes the data structures used by the FESolidSolver
 //
 bool FECGSolidSolver::Init()
 {
+	if (FESolver::Init() == false) return false;
+
 	// check parameters
 	if (m_Dtol <  0.0) { felog.printf("Error: dtol must be nonnegative.\n"   ); return false; }
 	if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }

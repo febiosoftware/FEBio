@@ -42,3 +42,9 @@ bool FESolver::InitStep(double time)
 
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+bool FESolver::Init()
+{
+	return true;
+}
