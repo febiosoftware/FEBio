@@ -5,7 +5,7 @@
 #include "FEPressureLoad.h"
 #include "FERigidMaterial.h"
 #include "FECore/log.h"
-#include "FEStiffnessMatrix.h"
+#include "FECore/FEGlobalMatrix.h"
 #include "NumCore/NumCore.h"
 
 //-----------------------------------------------------------------------------

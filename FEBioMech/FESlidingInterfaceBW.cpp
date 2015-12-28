@@ -2,7 +2,6 @@
 #include "FESlidingInterfaceBW.h"
 #include "FECore/FENormalProjection.h"
 #include "FECore/FEModel.h"
-#include "FEBioMech/FEStiffnessMatrix.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

@@ -1,7 +1,6 @@
 #include "FESlidingInterface3.h"
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
-#include "FEBioMech/FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"

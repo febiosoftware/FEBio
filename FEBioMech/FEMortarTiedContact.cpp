@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEMortarTiedContact.h"
-#include "FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
 #include "FECore/mortar.h"
 #include "FECore/log.h"

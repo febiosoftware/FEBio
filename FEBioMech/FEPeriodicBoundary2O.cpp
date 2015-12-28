@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEPeriodicBoundary2O.h"
-#include "FEStiffnessMatrix.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEModel.h"
 #include "FECore/FENormalProjection.h"

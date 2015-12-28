@@ -15,7 +15,7 @@
 
 class FEModel;
 class FESolver;
-class FEStiffnessMatrix;
+class FEGlobalMatrix;
 
 // Macauley bracket
 #define MBRACKET(x) ((x)>=0? (x): 0)
@@ -47,9 +47,6 @@ public:
 
 	//! serialize data to archive
 	virtual void Serialize(DumpFile& ar);
-
-	//! build the matrix profile for use in the stiffness matrix
-	virtual void BuildMatrixProfile(FEGlobalMatrix& K) = 0;
 
 protected:
 	//! don't call the default constructor

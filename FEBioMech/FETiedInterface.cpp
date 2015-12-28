@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "FETiedInterface.h"
-#include "FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEClosestPointProjection.h"
 #include "FECore/log.h"

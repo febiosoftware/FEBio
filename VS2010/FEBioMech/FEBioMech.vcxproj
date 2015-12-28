@@ -737,7 +737,6 @@
     <ClCompile Include="..\..\FEBioMech\FESPRProjection.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESRIElasticSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStickyInterface.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FEStiffnessMatrix.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStVenantKirchhoff.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESurfaceConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETCNonlinearOrthotropic.cpp" />
@@ -917,7 +916,6 @@
     <ClInclude Include="..\..\FEBioMech\FESPRProjection.h" />
     <ClInclude Include="..\..\FEBioMech\FESRIElasticSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEStickyInterface.h" />
-    <ClInclude Include="..\..\FEBioMech\FEStiffnessMatrix.h" />
     <ClInclude Include="..\..\FEBioMech\FEStVenantKirchhoff.h" />
     <ClInclude Include="..\..\FEBioMech\FESurfaceConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FETCNonlinearOrthotropic.h" />

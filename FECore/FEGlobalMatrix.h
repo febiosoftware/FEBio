@@ -5,6 +5,10 @@
 #include <vector>
 
 //-----------------------------------------------------------------------------
+class FEModel;
+class FEMesh;
+
+//-----------------------------------------------------------------------------
 //! This class implements a global system matrix.
 
 //! The global system matrix is usually created by the discretization of the FE 
@@ -30,7 +34,10 @@ public:
 	virtual ~FEGlobalMatrix();
 
 	//! construct the stiffness matrix from a FEM object
-	virtual bool Create(FEModel* psolver, int neq, bool breset);
+	bool Create(FEModel* pfem, int neq, bool breset);
+
+	//! construct the stiffness matrix from a mesh
+	bool Create(FEMesh& mesh, int neq);
 
 	//! clears the sparse matrix that stores the stiffness matrix
 	void Clear();
@@ -72,6 +79,7 @@ protected:
 	// build the profile of the sparse matrix
 
 	SparseMatrixProfile*	m_pMP;		//!< profile of sparse matrix
-	vector< vector<int> >			m_LM;		//!< used for building the stiffness matrix
-	int	m_nlm;									//!< nr of elements in m_LM array
+	SparseMatrixProfile		m_MPs;		//!< the "static" part of the matrix profile
+	vector< vector<int> >	m_LM;		//!< used for building the stiffness matrix
+	int	m_nlm;				//!< nr of elements in m_LM array
 };

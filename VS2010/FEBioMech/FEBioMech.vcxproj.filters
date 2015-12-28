@@ -267,9 +267,6 @@
     <ClCompile Include="..\..\FEBioMech\FESurfaceConstraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEStiffnessMatrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEPressureLoad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -819,9 +816,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FESurfaceConstraint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEStiffnessMatrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEPressureLoad.h">

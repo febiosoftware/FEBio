@@ -139,7 +139,7 @@ bool FENewtonSolver::ReformStiffness(const FETimePoint& tp)
 
 //-----------------------------------------------------------------------------
 //!  Creates the global stiffness matrix
-//! \todo Can we move this to the FEStiffnessMatrix::Create function?
+//! \todo Can we move this to the FEGlobalMatrix::Create function?
 bool FENewtonSolver::CreateStiffness(bool breset)
 {
 	m_ReformTime.start();

@@ -1,6 +1,5 @@
 #include "FETiedBiphasicInterface.h"
 #include "FEBiphasic.h"
-#include "FEBioMech/FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
 #include "FECore/FENormalProjection.h"
 #include "FECore/log.h"

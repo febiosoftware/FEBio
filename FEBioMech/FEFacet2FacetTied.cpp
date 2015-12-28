@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEFacet2FacetTied.h"
-#include "FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEClosestPointProjection.h"
 #include "FECore/log.h"

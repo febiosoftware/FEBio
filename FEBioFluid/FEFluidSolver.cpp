@@ -6,7 +6,7 @@
 #include "FECore/DOFS.h"
 #include "NumCore/NumCore.h"
 #include <assert.h>
-#include "FEBioMech/FEStiffnessMatrix.h"
+#include "FECore/FEGlobalMatrix.h"
 #include "FECore/BFGSSolver2.h"
 
 #ifdef WIN32
@@ -115,7 +115,7 @@ bool FEFluidSolver::Init()
     // Create the stiffness matrix.
     // Note that this does not construct the stiffness matrix. This
     // is done later in the StiffnessMatrix routine.
-    m_pK = new FEStiffnessMatrix(pS);
+    m_pK = new FEGlobalMatrix(pS);
     if (m_pK == 0)
     {
         felog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");

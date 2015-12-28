@@ -13,7 +13,6 @@
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
-#include "FECore/FEGlobalMatrix.h"
 
 #ifdef WIN32
 	#include <float.h>

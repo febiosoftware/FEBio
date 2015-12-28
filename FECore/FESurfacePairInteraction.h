@@ -4,6 +4,7 @@
 
 //-----------------------------------------------------------------------------
 class FEModel;
+class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
 //! This class describes a general purpose interaction between two surfaces.
@@ -37,4 +38,7 @@ public:
 
 	//! create a copy of this interface
 	virtual void CopyFrom(FESurfacePairInteraction* pci) {}
+
+	//! build the matrix profile for use in the stiffness matrix
+	virtual void BuildMatrixProfile(FEGlobalMatrix& K) = 0;
 };

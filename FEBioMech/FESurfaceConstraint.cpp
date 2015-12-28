@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FESurfaceConstraint.h"
-#include "FEStiffnessMatrix.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEModel.h"
 #include "FECore/FENormalProjection.h"

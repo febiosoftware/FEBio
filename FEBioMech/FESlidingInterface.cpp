@@ -3,7 +3,6 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "FEStiffnessMatrix.h"
 #include "FESlidingInterface.h"
 #include "FEElasticShellDomain.h"
 #include "FECore/FEClosestPointProjection.h"

@@ -6,7 +6,6 @@
 #include "FEBioMech/FEElasticDomain.h"
 #include "FEBioMech/FEPressureLoad.h"
 #include "FEBioMech/FEResidualVector.h"
-#include "FECore/FEGlobalMatrix.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 

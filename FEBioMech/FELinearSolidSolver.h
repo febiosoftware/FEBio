@@ -2,7 +2,7 @@
 #include "FECore/FENewtonSolver.h"
 #include "FECore/LinearSolver.h"
 
-class FEStiffnessMatrix;
+class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
 //! The FELinearSolidSolver class solves linear (quasi-static) elasticity 
