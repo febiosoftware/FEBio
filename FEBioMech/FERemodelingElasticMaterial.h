@@ -13,9 +13,6 @@ public:
 	//! constructor
 	FESolidSupply(FEModel* pfem) : FEMaterial(pfem) {}
 
-	//! Initialization
-	virtual void Init() {}
-	
 	//! solid supply
 	virtual double Supply(FEMaterialPoint& pt) = 0;
 	

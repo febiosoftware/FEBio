@@ -21,7 +21,7 @@ public:
     FEPrescribedActiveContractionTransIso(FEModel* pfem);
     
     //! Initialization
-    void Init();
+    bool Init();
     
     //! stress
     mat3ds Stress(FEMaterialPoint& pt);

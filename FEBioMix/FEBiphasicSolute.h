@@ -31,7 +31,7 @@ public:
 	FESolute* GetSolute() { return m_pSolute; }
 
 public:
-	void Init();
+	bool Init();
 	
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);

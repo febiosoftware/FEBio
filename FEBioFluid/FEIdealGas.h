@@ -17,7 +17,7 @@ class FEIdealGas :	public FEElasticFluid
         double Tangent_Pressure_Strain(FEMaterialPoint& mp);
 		
         //! Initialization routine
-        void Init();
+        bool Init();
         
 	public:
 		double	m_M;		//!< molar mass

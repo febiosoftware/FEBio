@@ -11,7 +11,7 @@ public:
 	FEFiberExpPow(FEModel* pfem) : FEElasticMaterial(pfem) { m_thd = 0; m_phd = 90; }
 	
 	//! Initialization
-	void Init();
+	bool Init();
 
 	//! Cauchy stress
 	virtual mat3ds Stress(FEMaterialPoint& mp);

@@ -44,7 +44,7 @@ void FEUncoupledElasticMixture::SetLocalCoordinateSystem(FEElement& el, int n, F
 }
 
 //-----------------------------------------------------------------------------
-void FEUncoupledElasticMixture::Init()
+bool FEUncoupledElasticMixture::Init()
 {
 	m_K = 0.0;
 	for (int i=0; i < (int)m_pMat.size(); ++i) {
@@ -52,7 +52,7 @@ void FEUncoupledElasticMixture::Init()
 		m_K += m_pMat[i]->m_K;	// Sum up all the values of the bulk moduli
 	}
 
-	FEUncoupledMaterial::Init();
+	return FEUncoupledMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------

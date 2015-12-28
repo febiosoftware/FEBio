@@ -21,7 +21,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 // FEDonnanEquilibrium
-void FEDonnanEquilibrium::Init()
+bool FEDonnanEquilibrium::Init()
 {
     if (!m_binit) {
         if (m_phisr >= 0) {
@@ -34,10 +34,10 @@ void FEDonnanEquilibrium::Init()
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 	
-	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
-	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");
+	if (m_Rgas <= 0) return MaterialError("A positive universal gas constant R must be defined in Globals section");
+	if (m_Tabs <= 0) return MaterialError("A positive absolute temperature T must be defined in Globals section");
 	
-	FEElasticMaterial::Init();
+	return FEElasticMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------

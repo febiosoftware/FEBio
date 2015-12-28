@@ -19,9 +19,6 @@ public:
     //! tangent of stress with respect to rate of deformation tensor D
     tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp);
     
-    //! Initialization routine
-    void Init();
-    
 public:
     double	m_kappa;	//!< bulk viscosity
     double	m_mu;		//!< shear viscosity

@@ -24,9 +24,10 @@ FEPrescribedActiveContractionUniaxial::FEPrescribedActiveContractionUniaxial(FEM
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedActiveContractionUniaxial::Init()
+bool FEPrescribedActiveContractionUniaxial::Init()
 {
-	FEElasticMaterial::Init();
+	if (FEElasticMaterial::Init() == false) return false;
+
     // convert angles from degrees to radians
     double pi = 4*atan(1.0);
     double the = m_thd*pi/180.;
@@ -35,6 +36,8 @@ void FEPrescribedActiveContractionUniaxial::Init()
     m_n0.x = cos(the)*sin(phi);
     m_n0.y = sin(the)*sin(phi);
     m_n0.z = cos(phi);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

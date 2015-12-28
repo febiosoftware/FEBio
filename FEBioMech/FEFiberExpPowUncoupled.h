@@ -10,7 +10,7 @@ public:
 	FEFiberExpPowUncoupled(FEModel* pfem) : FEUncoupledMaterial(pfem) { m_thd = 0; m_phd = 90; }
 	
 	//! Initialization
-	void Init();
+	bool Init();
 
 	//! Cauchy stress
 	virtual mat3ds DevStress(FEMaterialPoint& mp);

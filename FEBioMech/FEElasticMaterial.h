@@ -67,7 +67,7 @@ public:
 	~FEElasticMaterial();
 
 	//! Initialization
-	void Init();
+	bool Init();
 
 	//! create material point data for this material
 	virtual FEMaterialPoint* CreateMaterialPointData() { return new FEElasticMaterialPoint; }

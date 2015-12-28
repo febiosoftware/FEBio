@@ -17,17 +17,19 @@ END_PARAMETER_LIST();
 // FETCNonlinearOrthotropic
 //////////////////////////////////////////////////////////////////////
 
-void FETCNonlinearOrthotropic::Init()
+bool FETCNonlinearOrthotropic::Init()
 {
-	FEUncoupledMaterial::Init();
+	if (FEUncoupledMaterial::Init() == false) return false;
 
-	if (m_ksi[0] < 0) throw MaterialError("Invalid value for ksi1");
-	if (m_ksi[1] < 0) throw MaterialError("Invalid value for ksi2");
-	if (m_ksi[2] < 0) throw MaterialError("Invalid value for ksi3");
+	if (m_ksi[0] < 0) return MaterialError("Invalid value for ksi1");
+	if (m_ksi[1] < 0) return MaterialError("Invalid value for ksi2");
+	if (m_ksi[2] < 0) return MaterialError("Invalid value for ksi3");
 
-	if (m_beta[0] < 2) throw MaterialError("Invalid value for beta1");
-	if (m_beta[1] < 2) throw MaterialError("Invalid value for beta2");
-	if (m_beta[2] < 2) throw MaterialError("Invalid value for beta3");
+	if (m_beta[0] < 2) return MaterialError("Invalid value for beta1");
+	if (m_beta[1] < 2) return MaterialError("Invalid value for beta2");
+	if (m_beta[2] < 2) return MaterialError("Invalid value for beta3");
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

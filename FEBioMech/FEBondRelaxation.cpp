@@ -107,10 +107,11 @@ FEBondRelaxationFung::FEBondRelaxationFung(FEModel* pfem) : FEBondRelaxation(pfe
 
 //-----------------------------------------------------------------------------
 //! Initialization.
-void FEBondRelaxationFung::Init()
+bool FEBondRelaxationFung::Init()
 {
-    FEBondRelaxation::Init();
-    if (m_tau2 <= m_tau1) throw MaterialError("tau2 must be > tau1");
+    if (FEBondRelaxation::Init() == false) return false;
+    if (m_tau2 <= m_tau1) return MaterialError("tau2 must be > tau1");
+	return true;
 }
 
 //-----------------------------------------------------------------------------

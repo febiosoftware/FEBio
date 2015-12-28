@@ -9,7 +9,7 @@ public:
 	FEActiveFiberContraction(FEModel* pfem);
 
 	//! initialization
-	void Init();
+	bool Init();
 
 	//! calculate the fiber stress
 	mat3ds FiberStress(FEMaterialPoint& mp);

@@ -28,12 +28,6 @@ FECarreauFluid::FECarreauFluid(FEModel* pfem) : FEViscousFluid(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FECarreauFluid::Init()
-{
-    FEViscousFluid::Init();
-}
-
-//-----------------------------------------------------------------------------
 //! viscous stress
 mat3ds FECarreauFluid::Stress(FEMaterialPoint& pt)
 {

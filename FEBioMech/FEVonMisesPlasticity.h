@@ -101,7 +101,7 @@ public:
 	virtual tens4ds Tangent(FEMaterialPoint& pt);
 
 	//! data initialization and checking
-	void Init();
+	bool Init();
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

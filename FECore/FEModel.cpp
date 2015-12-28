@@ -229,29 +229,12 @@ bool FEModel::InitMaterials()
 		FEMaterial* pmat = GetMaterial(i);
 
 		// initialize material data
-		try
+		if (pmat->Init() == false)
 		{
-			pmat->Init();
-		}
-		catch (MaterialError e)
-		{
+			const char* szerr = fecore_get_error_string();
+			if (szerr == 0) szerr = "unknown error";
 			felog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
-			felog.printf("ERROR: %s\n\n", e.Error());
-			return false;
-		}
-		catch (MaterialRangeError e)
-		{
-			felog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
-			felog.printf("ERROR: parameter \"%s\" out of range ", e.m_szvar);
-			if (e.m_bl) felog.printf("["); else felog.printf("(");
-			felog.printf("%lg, %lg", e.m_vmin, e.m_vmax);
-			if (e.m_br) felog.printf("]"); else felog.printf(")");
-			felog.printf("\n\n");
-			return false;
-		}
-		catch (...)
-		{
-			felog.printf("A fatal error occured during material intialization\n\n");
+			felog.printf("ERROR: %s\n\n", szerr);
 			return false;
 		}
 	}

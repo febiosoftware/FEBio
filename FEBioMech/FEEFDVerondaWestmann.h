@@ -13,7 +13,7 @@ public:
 	FEEFDVerondaWestmann(FEModel* pfem);
 
 	//! material initialization
-	void Init();
+	bool Init();
 
 	//! deviatoric stress
 	mat3ds DevStress(FEMaterialPoint& pt);

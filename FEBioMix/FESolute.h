@@ -89,9 +89,6 @@ public:
 	//! constructor
 	FESoluteSupply(FEModel* pfem) : FEMaterial(pfem) {}
 
-	//! Initialization
-	virtual void Init() {}
-	
 	//! solute supply
 	virtual double Supply(FEMaterialPoint& pt) = 0;
 	
@@ -151,7 +148,7 @@ public:
 	FESolute(FEModel* pfem);
 
 public:
-	void Init();
+	bool Init();
 	
 	//! solute density
 	double Density() { return m_rhoT; }
@@ -231,7 +228,7 @@ public:
 	FESolidBoundMolecule(FEModel* pfem);
 	
 public:
-	void Init();
+	bool Init();
 	
 	//! solute density
 	double Density() { return m_rhoT; }

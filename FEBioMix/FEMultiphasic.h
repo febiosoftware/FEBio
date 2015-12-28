@@ -15,7 +15,7 @@ public:
 	FEMultiphasic(FEModel* pfem);
 
 	//! initialization
-	void Init();
+	bool Init();
 
 	// returns a pointer to a new material point object
 	virtual FEMaterialPoint* CreateMaterialPointData() = 0;
@@ -114,7 +114,7 @@ public:
 	int FindLocalSBMID(int nid);
 	
 	// initialize chemical reaction
-	void InitializeReaction(FEChemicalReaction* m_pReact);
+	bool InitializeReaction(FEChemicalReaction* m_pReact);
 
 	//! Add a solute
 	void AddSolute(FESolute* psol);

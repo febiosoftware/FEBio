@@ -36,7 +36,7 @@ public:
     mat3ds Tangent_Diffusivity_Concentration(FEMaterialPoint& mp, const int isol=0);
     
     //! data initialization and checking
-    void Init();
+    bool Init();
     
 public:
     double	m_diff0;        //!< free diffusivity

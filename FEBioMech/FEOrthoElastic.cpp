@@ -17,13 +17,13 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Material initialization.
-void FEOrthoElastic::Init()
+bool FEOrthoElastic::Init()
 {
-	FEElasticMaterial::Init();
+	if (FEElasticMaterial::Init() == false) return false;
 
-	if (v12 > sqrt(E1/E2)) throw MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E2)");
-	if (v23 > sqrt(E2/E3)) throw MaterialError("Invalid value for v23. Let v23 <= sqrt(E2/E3)");
-	if (v31 > sqrt(E3/E1)) throw MaterialError("Invalid value for v31. Let v31 <= sqrt(E3/E1)");
+	if (v12 > sqrt(E1/E2)) return MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E2)");
+	if (v23 > sqrt(E2/E3)) return MaterialError("Invalid value for v23. Let v23 <= sqrt(E2/E3)");
+	if (v31 > sqrt(E3/E1)) return MaterialError("Invalid value for v31. Let v31 <= sqrt(E3/E1)");
 
 	// Evaluate Lame coefficients
 	mu[0] = G12 + G31 - G23;
@@ -39,7 +39,7 @@ void FEOrthoElastic::Init()
 	c.exact_eigen(l);
 
 	if ((l[0]<0) || (l[1]<0) || (l[2]<0))
-		throw MaterialError("Stiffness matrix is not positive definite.");
+		return MaterialError("Stiffness matrix is not positive definite.");
 
 	// evaluate stiffness matrix and extract Lame constants
 	c = c.inverse();
@@ -49,6 +49,8 @@ void FEOrthoElastic::Init()
 	lam[1][2] = c(1,2); lam[2][1] = c(2,1);
 	lam[2][0] = c(2,0); lam[0][2] = c(0,2);
 	lam[0][1] = c(0,1); lam[1][0] = c(1,0);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

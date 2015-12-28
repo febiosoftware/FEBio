@@ -19,7 +19,7 @@ public:
 	FEPerfectOsmometer(FEModel* pfem) : FEElasticMaterial(pfem) { m_Rgas = 0; m_Tabs = 0; }
 	
 	//! Initialization routine
-	void Init();
+	bool Init();
 
 	//! Returns the Cauchy stress
 	virtual mat3ds Stress(FEMaterialPoint& mp);

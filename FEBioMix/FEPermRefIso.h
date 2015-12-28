@@ -8,28 +8,28 @@
 // of Ateshian and Weiss (JBME 2010)
 
 class FEPermRefIso :	public FEHydraulicPermeability
-	{
-	public:
-		//! constructor
-		FEPermRefIso(FEModel* pfem);
+{
+public:
+	//! constructor
+	FEPermRefIso(FEModel* pfem);
 		
-		//! permeability
-		mat3ds Permeability(FEMaterialPoint& pt);
+	//! permeability
+	mat3ds Permeability(FEMaterialPoint& pt);
 		
-		//! Tangent of permeability
-		tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp);
+	//! Tangent of permeability
+	tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp);
 		
-		//! data initialization and checking
-		void Init();
+	//! data initialization and checking
+	bool Init();
 		
-	public:
-		double	m_perm0;		//!< permeability for I term
-		double	m_perm1;		//!< permeability for b term
-		double	m_perm2;		//!< permeability for b^2 term
-		double	m_phi0;			//!< solid volume fraction in reference state
-		double	m_M;			//!< nonlinear exponential coefficient
-		double	m_alpha;		//!< nonlinear power exponent
+public:
+	double	m_perm0;		//!< permeability for I term
+	double	m_perm1;		//!< permeability for b term
+	double	m_perm2;		//!< permeability for b^2 term
+	double	m_phi0;			//!< solid volume fraction in reference state
+	double	m_M;			//!< nonlinear exponential coefficient
+	double	m_alpha;		//!< nonlinear power exponent
 		
-		// declare parameter list
-		DECLARE_PARAMETER_LIST();
-	};
+	// declare parameter list
+	DECLARE_PARAMETER_LIST();
+};

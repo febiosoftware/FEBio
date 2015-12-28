@@ -40,7 +40,7 @@ public:
         
 public:
     //! data initialization
-    void Init();
+    bool Init();
     
     //! stress function
     mat3ds DevStress(FEMaterialPoint& pt);

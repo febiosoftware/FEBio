@@ -23,12 +23,12 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationTrapezoidalUC, FEFiberIntegrationSchemeUC
     ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
 END_PARAMETER_LIST();
 
-void FEFiberIntegrationTrapezoidalUC::Init()
+bool FEFiberIntegrationTrapezoidalUC::Init()
 {
-	if (m_nth < 1) throw MaterialError("nth must be strictly greater than zero.");
+	if (m_nth < 1) return MaterialError("nth must be strictly greater than zero.");
     
     // also initialize the parent class
-    FEFiberIntegrationSchemeUC::Init();
+    return FEFiberIntegrationSchemeUC::Init();
 }
 
 //-----------------------------------------------------------------------------

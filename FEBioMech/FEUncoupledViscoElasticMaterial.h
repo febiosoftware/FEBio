@@ -27,7 +27,7 @@ public:
 
 public:
 	//! data initialization and checking
-	void Init();
+	bool Init();
 	
 	//! deviatoric stress function
 	mat3ds DevStress(FEMaterialPoint& pt);

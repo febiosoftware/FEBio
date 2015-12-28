@@ -21,7 +21,7 @@ FEContinuousFiberDistribution::FEContinuousFiberDistribution(FEModel* pfem) : FE
 FEContinuousFiberDistribution::~FEContinuousFiberDistribution() {}
 
 //-----------------------------------------------------------------------------
-void FEContinuousFiberDistribution::Init()
+bool FEContinuousFiberDistribution::Init()
 {
     // propagate pointers to fiber material and density distribution
     // to fiber integration scheme
@@ -29,5 +29,5 @@ void FEContinuousFiberDistribution::Init()
     m_pFint->m_pFDD = m_pFDD;
     
     // initialize base class
-	FEElasticMaterial::Init();
+	return FEElasticMaterial::Init();
 }

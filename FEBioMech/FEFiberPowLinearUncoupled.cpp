@@ -21,9 +21,9 @@ END_PARAMETER_LIST();
 // FEFiberPowLinearUncoupled.h
 //-----------------------------------------------------------------------------
 
-void FEFiberPowLinearUncoupled::Init()
+bool FEFiberPowLinearUncoupled::Init()
 {
-	FEElasticMaterial::Init();
+	if (FEElasticMaterial::Init() == false) return false;
 
     // convert angles from degrees to radians
     double pi = 4*atan(1.0);
@@ -38,6 +38,8 @@ void FEFiberPowLinearUncoupled::Init()
     m_I0 = m_lam0*m_lam0;
     m_ksi = m_E/(4*m_I0*m_I0)/(m_beta-1)*pow(m_I0-1, 2-m_beta);
     m_b = m_ksi*pow(m_I0-1, m_beta-1) + m_E/4/m_I0;
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

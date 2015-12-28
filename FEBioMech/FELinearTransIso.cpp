@@ -14,11 +14,11 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 //! Check material parameters.
 //! \todo check material parameters
-void FELinearTransIso::Init()
+bool FELinearTransIso::Init()
 {
-	FEElasticMaterial::Init();
+	if (FEElasticMaterial::Init() == false) return false;
     
-	if (v12 > sqrt(E1/E3)) throw MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E3)");
+	if (v12 > sqrt(E1/E3)) return MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E3)");
     
 	// Evaluate shear moduli
 	muT = E3/2/(1+v23);
@@ -30,13 +30,15 @@ void FELinearTransIso::Init()
 	c.exact_eigen(l);
     
 	if ((l[0]<0) || (l[1]<0) || (l[2]<0))
-		throw MaterialError("Stiffness matrix is not positive definite.");
+		return MaterialError("Stiffness matrix is not positive definite.");
     
 	// evaluate stiffness matrix and extract Lame constants
 	c = c.inverse();
     lam = c(0,0) - 2*mu;
     lamL = 0.5*(c(0,1)+c(0,2)); // c(0,1) = c(0,2)
     lamT = c(1,2);              // c(1,2) = c(1,1) - 2*muT = c(2,2) - 2*muT
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

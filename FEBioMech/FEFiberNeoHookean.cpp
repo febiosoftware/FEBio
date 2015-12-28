@@ -25,9 +25,9 @@ FEFiberNeoHookean::FEFiberNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem)
 	m_ac = 0;
 }
 
-void FEFiberNeoHookean::Init()
+bool FEFiberNeoHookean::Init()
 {
-	FEElasticMaterial::Init();
+	if (FEElasticMaterial::Init() == false) return false;
 
     m_bfirst = true;
     
@@ -50,6 +50,8 @@ void FEFiberNeoHookean::Init()
         
 		m_bfirst = false;
 	}
+
+	return true;
 }
 
 mat3ds FEFiberNeoHookean::Stress(FEMaterialPoint& mp)

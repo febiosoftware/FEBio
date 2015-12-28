@@ -21,18 +21,18 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! data initialization and checking
-void FEMichaelisMenten::Init()
+bool FEMichaelisMenten::Init()
 {
     // Initialize base class
-    FEChemicalReaction::Init();
+    if (FEChemicalReaction::Init() == false) return false;
     
 	// there is only one reactant and one product in a Michaelis-Menten reaction
 	if (m_solR.size() + m_sbmR.size() > 1)
-		throw MaterialError("Provide only one vR for this reaction");
+		return MaterialError("Provide only one vR for this reaction");
 	if (m_solP.size() + m_sbmP.size() > 1)
-		throw MaterialError("Provide only one vP for this reaction");
+		return MaterialError("Provide only one vP for this reaction");
 
-	if (m_c0 < 0) throw MaterialError("c0 must be positive");
+	if (m_c0 < 0) return MaterialError("c0 must be positive");
 	
 	const int ntot = (int)m_v.size();
 	for (int itot=0; itot<ntot; itot++) {
@@ -40,11 +40,12 @@ void FEMichaelisMenten::Init()
 		if (m_vP[itot] > 0) m_Pid = itot;
 	}
 	
-	if (m_Rid == -1) throw MaterialError("Provide vR for the reactant");
+	if (m_Rid == -1) return MaterialError("Provide vR for the reactant");
 	
 	// check if reactant is a solute or a solid-bound molecule
 	if (m_Rid >= m_nsol) m_Rtype = true;
 	
+	return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -25,7 +25,7 @@ public:
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
     
 	//! data initialization and checking
-	void Init();
+	bool Init();
 
 public:
 
@@ -61,7 +61,7 @@ public:
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
     
 	//! data initialization and checking
-	void Init();
+	bool Init();
 
 public:
 

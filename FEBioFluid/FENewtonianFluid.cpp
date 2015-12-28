@@ -24,12 +24,6 @@ FENewtonianFluid::FENewtonianFluid(FEModel* pfem) : FEViscousFluid(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FENewtonianFluid::Init()
-{
-    FEViscousFluid::Init();
-}
-
-//-----------------------------------------------------------------------------
 //! viscous stress
 mat3ds FENewtonianFluid::Stress(FEMaterialPoint& pt)
 {

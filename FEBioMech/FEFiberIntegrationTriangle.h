@@ -17,7 +17,7 @@ public:
     ~FEFiberIntegrationTriangle() {}
 	
 	//! Initialization
-	void Init();
+	bool Init();
     
 	//! Cauchy stress
 	mat3ds Stress(FEMaterialPoint& mp);

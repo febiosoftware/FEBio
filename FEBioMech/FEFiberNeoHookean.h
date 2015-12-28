@@ -21,7 +21,7 @@ public:
 	virtual double StrainEnergyDensity(FEMaterialPoint& mp);
     
 	//! material parameter intialization and checking
-	void Init();
+	bool Init();
 
 public:
 	double	m_E;	//<! Young's modulus

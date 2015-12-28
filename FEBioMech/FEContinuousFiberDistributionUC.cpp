@@ -21,7 +21,7 @@ FEContinuousFiberDistributionUC::FEContinuousFiberDistributionUC(FEModel* pfem) 
 FEContinuousFiberDistributionUC::~FEContinuousFiberDistributionUC() {}
 
 //-----------------------------------------------------------------------------
-void FEContinuousFiberDistributionUC::Init()
+bool FEContinuousFiberDistributionUC::Init()
 {
     m_K = m_pFmat->m_K;
     
@@ -31,5 +31,5 @@ void FEContinuousFiberDistributionUC::Init()
     m_pFint->m_pFDD = m_pFDD;
     
     // initialize fiber integration scheme
-    FEUncoupledMaterial::Init();
+    return FEUncoupledMaterial::Init();
 }

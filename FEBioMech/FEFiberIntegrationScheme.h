@@ -17,7 +17,7 @@ class FEFiberIntegrationScheme : public FEElasticMaterial
 public:
     FEFiberIntegrationScheme(FEModel* pfem) : FEElasticMaterial(pfem) {}
     
-    void Init();
+    bool Init();
     virtual void IntegratedFiberDensity(double& IFD) = 0;
 
 public:

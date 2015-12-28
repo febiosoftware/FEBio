@@ -355,10 +355,11 @@ void FEElasticMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMateria
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticMaterial::Init()
+bool FEElasticMaterial::Init()
 {
-	FESolidMaterial::Init();
-	if (m_density <= 0) throw MaterialError("Invalid material density");
+	if (FESolidMaterial::Init() == false) return false;
+	if (m_density <= 0) return MaterialError("Invalid material density");
+	return true;
 }
 
 //-----------------------------------------------------------------------------

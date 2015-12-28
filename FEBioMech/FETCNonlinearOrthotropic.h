@@ -34,7 +34,7 @@ public:
 	double DevStrainEnergyDensity(FEMaterialPoint& mp);
     
 	//! data initialization and checking
-	void Init();
+	bool Init();
 
 public:
 	double	m_beta[3];

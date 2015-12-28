@@ -26,11 +26,11 @@ FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEChemicalReaction::Init() 
+bool FEChemicalReaction::Init() 
 {
 	if (m_pFwd) m_pFwd->m_pReact = this;
 	if (m_pRev) m_pRev->m_pReact = this;
-	FEMaterial::Init();
+	return FEMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------

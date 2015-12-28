@@ -79,7 +79,7 @@ public:
     double Relaxation(FEMaterialPoint& pt, const double t);
     
     //! data initialization and checking
-    void Init();
+    bool Init();
     
 public:
     double	m_tau1;     //!< lower relaxation time

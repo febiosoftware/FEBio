@@ -37,7 +37,7 @@ public:
 	FETensionOnlyLinearSpring(FEModel* pfem) : FESpringMaterial(pfem){}
 	double force    (double dl);
 	double stiffness(double dl);
-	void Init();
+	bool Init();
 
 public:
 	double m_E;	//!< spring constant
@@ -55,7 +55,7 @@ public:
 
 	double force    (double dl);
 	double stiffness(double dl);
-	void Init();
+	bool Init();
 
 	void Serialize(DumpFile& ar);
 

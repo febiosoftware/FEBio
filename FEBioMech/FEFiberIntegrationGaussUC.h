@@ -21,7 +21,7 @@ public:
     ~FEFiberIntegrationGaussUC() {}
 	
 	//! Initialization
-	void Init();
+	bool Init();
     
 	//! Cauchy stress
 	mat3ds DevStress(FEMaterialPoint& mp);

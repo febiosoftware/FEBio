@@ -26,22 +26,24 @@ FEPermRefOrtho::FEPermRefOrtho(FEModel* pfem) : FEHydraulicPermeability(pfem)
 
 //-----------------------------------------------------------------------------
 //! Initialization. 
-void FEPermRefOrtho::Init()
+bool FEPermRefOrtho::Init()
 {
-	FEHydraulicPermeability::Init();
+	if (FEHydraulicPermeability::Init() == false) return false;
 
-	if (m_perm1[0] < 0) throw MaterialError("perm1 components must be >= 0");
-	if (m_perm1[1] < 0) throw MaterialError("perm1 components must be >= 0");
-	if (m_perm1[2] < 0) throw MaterialError("perm1 components must be >= 0");
-	if (m_perm2[0] < 0) throw MaterialError("perm2 components must be >= 0");
-	if (m_perm2[1] < 0) throw MaterialError("perm2 components must be >= 0");
-	if (m_perm2[2] < 0) throw MaterialError("perm2 components must be >= 0");
-	if (m_M[0] < 0) throw MaterialError("M components must be >= 0");
-	if (m_M[1] < 0) throw MaterialError("M components must be >= 0");
-	if (m_M[2] < 0) throw MaterialError("M components must be >= 0");
-	if (m_alpha[0] < 0) throw MaterialError("alpha components must be >= 0");
-	if (m_alpha[1] < 0) throw MaterialError("alpha components must be >= 0");
-	if (m_alpha[2] < 0) throw MaterialError("alpha components must be >= 0");
+	if (m_perm1[0] < 0) return MaterialError("perm1 components must be >= 0");
+	if (m_perm1[1] < 0) return MaterialError("perm1 components must be >= 0");
+	if (m_perm1[2] < 0) return MaterialError("perm1 components must be >= 0");
+	if (m_perm2[0] < 0) return MaterialError("perm2 components must be >= 0");
+	if (m_perm2[1] < 0) return MaterialError("perm2 components must be >= 0");
+	if (m_perm2[2] < 0) return MaterialError("perm2 components must be >= 0");
+	if (m_M[0] < 0) return MaterialError("M components must be >= 0");
+	if (m_M[1] < 0) return MaterialError("M components must be >= 0");
+	if (m_M[2] < 0) return MaterialError("M components must be >= 0");
+	if (m_alpha[0] < 0) return MaterialError("alpha components must be >= 0");
+	if (m_alpha[1] < 0) return MaterialError("alpha components must be >= 0");
+	if (m_alpha[2] < 0) return MaterialError("alpha components must be >= 0");
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -16,10 +16,11 @@ BEGIN_PARAMETER_LIST(FEReactionRateExpSED, FEMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-void FEReactionRateExpSED::Init()
+bool FEReactionRateExpSED::Init()
 {
-    FEMaterial::Init();
-    if (m_Psi0 == 0) throw MaterialError("Psi0 must be non-zero");
+    if (FEMaterial::Init() == false) return false;
+    if (m_Psi0 == 0) return MaterialError("Psi0 must be non-zero");
+	return true;
 }
 
 //-----------------------------------------------------------------------------

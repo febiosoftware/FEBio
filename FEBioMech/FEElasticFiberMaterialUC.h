@@ -32,7 +32,7 @@ public:
         m_alpha = 0; m_beta = 2; m_ksi = 0; m_mu = 0; }
 	
 	//! Initialization
-	void Init();
+	bool Init();
 	
 	//! Cauchy stress
 	mat3ds DevStress(FEMaterialPoint& mp);
@@ -62,7 +62,7 @@ public:
 	FEFiberNHUC(FEModel* pfem) : FEElasticFiberMaterialUC(pfem) { m_mu = 0; }
 	
 	//! Initialization
-	void Init();
+	bool Init();
 	
 	//! Cauchy stress
 	mat3ds DevStress(FEMaterialPoint& mp);

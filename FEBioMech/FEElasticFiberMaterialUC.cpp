@@ -22,10 +22,10 @@ BEGIN_PARAMETER_LIST(FEFiberExponentialPowerUC, FEElasticFiberMaterialUC)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-void FEFiberExponentialPowerUC::Init()
+bool FEFiberExponentialPowerUC::Init()
 {
-    FEElasticFiberMaterialUC::Init();
-	if ((4*m_ksi + 2*m_mu) < 0) throw MaterialError("4*ksi+2*mu must be positive.");
+	if ((4*m_ksi + 2*m_mu) < 0) return MaterialError("4*ksi+2*mu must be positive.");
+    return FEElasticFiberMaterialUC::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -197,10 +197,10 @@ BEGIN_PARAMETER_LIST(FEFiberNHUC, FEElasticFiberMaterialUC)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-void FEFiberNHUC::Init()
+bool FEFiberNHUC::Init()
 {
-    FEElasticFiberMaterialUC::Init();
-	if (m_mu < 0) throw MaterialError("mu must be positive.");
+	if (m_mu < 0) return MaterialError("mu must be positive.");
+    return FEElasticFiberMaterialUC::Init();
 }
 
 //-----------------------------------------------------------------------------

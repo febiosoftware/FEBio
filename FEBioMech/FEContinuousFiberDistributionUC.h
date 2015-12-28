@@ -25,7 +25,7 @@ public:
     ~FEContinuousFiberDistributionUC();
     
     // Initialization
-    void Init();
+    bool Init();
     
 public:
 	//! calculate stress at material point

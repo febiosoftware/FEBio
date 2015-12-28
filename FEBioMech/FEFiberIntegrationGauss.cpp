@@ -23,7 +23,7 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationGauss, FEFiberIntegrationScheme)
 	ADD_PARAMETER2(m_nth, FE_PARAM_INT, FE_RANGE_GREATER(0), "nth");
 END_PARAMETER_LIST();
 
-void FEFiberIntegrationGauss::Init()
+bool FEFiberIntegrationGauss::Init()
 {
 	m_bfirst = true;
 	
@@ -71,14 +71,14 @@ void FEFiberIntegrationGauss::Init()
                 m_gw.assign(gw10, gw10+nint10);
                 break;
             default:
-                throw MaterialError("nint must not exceed 10.");
+                return MaterialError("nint must not exceed 10.");
                 break;
         }
 		m_bfirst = false;
     }
     
     // also initialize the parent class
-    FEFiberIntegrationScheme::Init();
+    return FEFiberIntegrationScheme::Init();
 }
 
 //-----------------------------------------------------------------------------

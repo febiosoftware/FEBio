@@ -24,7 +24,7 @@ public:
 	double DevStrainEnergyDensity(FEMaterialPoint& pt);
     
 	//! data initialization
-	void Init();
+	bool Init();
 
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();

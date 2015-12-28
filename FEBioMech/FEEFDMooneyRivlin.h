@@ -13,7 +13,7 @@ public:
 	FEEFDMooneyRivlin(FEModel* pfem);
 	
 	//! Data initialization
-	void Init();
+	bool Init();
 
 public:
 	//! Calculate the deviatoric stress

@@ -31,7 +31,7 @@ public:
 	double DevStrainEnergyDensity(FEMaterialPoint& mp);
     
 	//! data initialization
-	void Init();
+	bool Init();
 
 	// calculate damage reduction factor
 	double Damage(FEMaterialPoint& pt);

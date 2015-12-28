@@ -21,10 +21,10 @@ FEDamageMooneyRivlin::FEDamageMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(
 }
 
 //-----------------------------------------------------------------------------
-void FEDamageMooneyRivlin::Init()
+bool FEDamageMooneyRivlin::Init()
 {
-	if (c1 + c2 <= 0) throw MaterialError("c1 + c2 must be a positive number.");
-	FEUncoupledMaterial::Init();
+	if (c1 + c2 <= 0) return MaterialError("c1 + c2 must be a positive number.");
+	return FEUncoupledMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------

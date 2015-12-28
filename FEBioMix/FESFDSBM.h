@@ -21,7 +21,7 @@ public:
 	FESFDSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_alpha = 0;}
 	
 	//! Initialization
-	void Init();
+	bool Init();
 	
 	//! Cauchy stress
 	virtual mat3ds Stress(FEMaterialPoint& mp);

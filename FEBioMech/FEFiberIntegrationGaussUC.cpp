@@ -23,10 +23,10 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationGaussUC, FEFiberIntegrationSchemeUC)
     ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
 END_PARAMETER_LIST();
 
-void FEFiberIntegrationGaussUC::Init()
+bool FEFiberIntegrationGaussUC::Init()
 {
-	if (m_nph < 1) throw MaterialError("nph must be strictly greater than zero.");
-	if (m_nth < 1) throw MaterialError("nth must be strictly greater than zero.");
+	if (m_nph < 1) return MaterialError("nph must be strictly greater than zero.");
+	if (m_nth < 1) return MaterialError("nth must be strictly greater than zero.");
     
 	m_bfirst = true;
 	
@@ -74,14 +74,14 @@ void FEFiberIntegrationGaussUC::Init()
                 m_gw.assign(gw10, gw10+nint10);
                 break;
             default:
-                throw MaterialError("nint must not exceed 10.");
+                return MaterialError("nint must not exceed 10.");
                 break;
         }
 		m_bfirst = false;
     }
     
     // also initialize the parent class
-    FEFiberIntegrationSchemeUC::Init();
+    return FEFiberIntegrationSchemeUC::Init();
 }
 
 //-----------------------------------------------------------------------------

@@ -28,7 +28,7 @@ public:
     { m_trel = 0; m_lid = m_cmax = -1; }
 	
 	//! data initialization and checking
-	void Init();
+	bool Init();
 	
 	//! reaction rate at material point
 	double ReactionRate(FEMaterialPoint& pt);

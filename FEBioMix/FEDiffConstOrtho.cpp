@@ -15,16 +15,18 @@ FEDiffConstOrtho::FEDiffConstOrtho(FEModel* pfem) : FESoluteDiffusivity(pfem)
 
 //-----------------------------------------------------------------------------
 //! Initialization. 
-void FEDiffConstOrtho::Init()
+bool FEDiffConstOrtho::Init()
 {
-	FESoluteDiffusivity::Init();
+	if (FESoluteDiffusivity::Init() == false) return false;
 
-	if (m_diff[0] < 0) throw MaterialError("diff1 must be >= 0");
-	if (m_diff[1] < 0) throw MaterialError("diff2 must be >= 0");
-	if (m_diff[2] < 0) throw MaterialError("diff3 must be >= 0");
-	if (m_free_diff < m_diff[0]) throw MaterialError("free_diff must be >= diff1");
-	if (m_free_diff < m_diff[1]) throw MaterialError("free_diff must be >= diff2");
-	if (m_free_diff < m_diff[2]) throw MaterialError("free_diff must be >= diff3");
+	if (m_diff[0] < 0) return MaterialError("diff1 must be >= 0");
+	if (m_diff[1] < 0) return MaterialError("diff2 must be >= 0");
+	if (m_diff[2] < 0) return MaterialError("diff3 must be >= 0");
+	if (m_free_diff < m_diff[0]) return MaterialError("free_diff must be >= diff1");
+	if (m_free_diff < m_diff[1]) return MaterialError("free_diff must be >= diff2");
+	if (m_free_diff < m_diff[2]) return MaterialError("free_diff must be >= diff3");
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

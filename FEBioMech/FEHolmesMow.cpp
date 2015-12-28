@@ -10,14 +10,16 @@ BEGIN_PARAMETER_LIST(FEHolmesMow, FEElasticMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-void FEHolmesMow::Init()
+bool FEHolmesMow::Init()
 {
-	FEElasticMaterial::Init();
+	if (FEElasticMaterial::Init() == false) return false;
 	
 	// Lame coefficients
 	lam = m_v*m_E/((1+m_v)*(1-2*m_v));
 	mu  = 0.5*m_E/(1+m_v);
 	Ha = lam + 2*mu;	
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

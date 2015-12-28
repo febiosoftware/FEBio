@@ -51,7 +51,7 @@ public:
 	virtual tens4ds Tangent(FEMaterialPoint& pt) { return tens4ds(); }
 
 	//! data initialization
-	void Init();
+	bool Init();
 
 	//! serialization
 	void Serialize(DumpFile& ar);

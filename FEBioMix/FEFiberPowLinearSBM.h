@@ -22,7 +22,7 @@ public:
     FEFiberPowLinearSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_thd = 0; m_phd = 90; m_sbm = 0; }
     
     //! Initialization
-    void Init();
+    bool Init();
     
     //! Cauchy stress
     mat3ds Stress(FEMaterialPoint& mp);

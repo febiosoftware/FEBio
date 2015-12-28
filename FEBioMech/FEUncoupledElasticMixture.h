@@ -42,7 +42,7 @@ public:
 	double DevStrainEnergyDensity(FEMaterialPoint& pt);
     
 	//! data initialization and checking
-	void Init();
+	bool Init();
 
 private:
 	FEVecPropertyT<FEUncoupledMaterial>	m_pMat;	//!< pointers to elastic materials

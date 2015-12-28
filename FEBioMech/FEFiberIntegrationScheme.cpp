@@ -8,11 +8,13 @@
 
 #include "FEFiberIntegrationScheme.h"
 
-void FEFiberIntegrationScheme::Init()
+bool FEFiberIntegrationScheme::Init()
 {
-    m_pFmat->Init();
-    m_pFDD->Init();
+    if (m_pFmat->Init() == false) return false;
+    if (m_pFDD->Init() == false) return false;
     
     // evaluate the integrated fiber density distribution
     IntegratedFiberDensity(m_pFDD->m_IFD);
+
+	return true;
 }

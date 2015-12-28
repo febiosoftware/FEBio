@@ -15,12 +15,6 @@ FEMultiphasicStandard::FEMultiphasicStandard(FEModel* pfem) : FEMultiphasic(pfem
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicStandard::Init()
-{
-	FEMultiphasic::Init();
-}
-
-//-----------------------------------------------------------------------------
 FEMaterialPoint* FEMultiphasicStandard::CreateMaterialPointData()
 {
 	return new FESolutesMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));

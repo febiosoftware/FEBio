@@ -22,13 +22,15 @@ FEDamageNeoHookean::FEDamageNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem)
 
 //-----------------------------------------------------------------------------
 // Initialization routine and parameter checking
-void FEDamageNeoHookean::Init()
+bool FEDamageNeoHookean::Init()
 {
-	FEElasticMaterial::Init();
+	if (FEElasticMaterial::Init() == false) return false;
 
 	// calculate Lame parameters
 	m_lam = m_v*m_E/((1+m_v)*(1-2*m_v));
 	m_mu  = 0.5*m_E/(1+m_v);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

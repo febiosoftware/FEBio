@@ -57,6 +57,14 @@ public:
 	//! Create a domain of a certain type
 	FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat);
 
+public: // error reporting mechanism
+
+	// Set the error string
+	void SetErrorString(const char* sz);
+
+	// returns error string (can be null if no error reported)
+	const char* GetErrorString();
+
 public:
 	//! Register a linear solver factory
 	void RegisterLinearSolver(FELinearSolverFactory* pf);
@@ -71,6 +79,8 @@ private:
 
 	Logfile*	m_plog;	// keep a pointer to the logfile (used by plugins)
 
+	char*	m_szerr;	//!< error string
+
 private: // make singleton
 	FECoreKernel();
 	FECoreKernel(const FECoreKernel&){}
@@ -79,6 +89,11 @@ private: // make singleton
 private:
 	static FECoreKernel* m_pKernel;	// the one-and-only kernel object
 };
+
+//-----------------------------------------------------------------------------
+// helper function for reporting errors
+bool fecore_error(const char* szerr, ...);
+const char* fecore_get_error_string();
 
 //-----------------------------------------------------------------------------
 //! This class helps with the registration of a class with the framework

@@ -49,21 +49,21 @@ void FEReactiveViscoelasticMaterial::SetLocalCoordinateSystem(FEElement& el, int
 
 //-----------------------------------------------------------------------------
 //! data initialization
-void FEReactiveViscoelasticMaterial::Init()
+bool FEReactiveViscoelasticMaterial::Init()
 {
     FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>((FEElasticMaterial*)m_pBase);
     if (m_pMat != nullptr)
-        throw MaterialError("Elastic material should not be of type uncoupled");
+        return MaterialError("Elastic material should not be of type uncoupled");
     
     m_pMat = dynamic_cast<FEUncoupledMaterial*>((FEElasticMaterial*)m_pBond);
     if (m_pMat != nullptr)
-        throw MaterialError("Bond material should not be of type uncoupled");
+        return MaterialError("Bond material should not be of type uncoupled");
     
-    m_pBase->Init();
-    m_pBond->Init();
-    m_pRelx->Init();
+    if (m_pBase->Init() == false) return false;
+    if (m_pBond->Init() == false) return false;
+    if (m_pRelx->Init() == false) return false;
     
-    FEElasticMaterial::Init();
+    return FEElasticMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------

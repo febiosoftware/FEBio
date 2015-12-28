@@ -19,13 +19,13 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberIntegrationGaussKronrod, FEFiberIntegrationScheme)
-ADD_PARAMETER(m_nph, FE_PARAM_INT, "nph");
-ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
+	ADD_PARAMETER(m_nph, FE_PARAM_INT, "nph");
+	ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
 END_PARAMETER_LIST();
 
-void FEFiberIntegrationGaussKronrod::Init()
+bool FEFiberIntegrationGaussKronrod::Init()
 {
-    if (m_nth < 1) throw MaterialError("nth must be strictly greater than zero.");
+    if (m_nth < 1) return MaterialError("nth must be strictly greater than zero.");
     
     m_bfirst = true;
     
@@ -57,14 +57,14 @@ void FEFiberIntegrationGaussKronrod::Init()
                 m_gw.assign(gw27, gw27+nint27);
                 break;
             default:
-                throw MaterialError("nph must be 7, 11, 15, 19, 23, or 27.");
+                return MaterialError("nph must be 7, 11, 15, 19, 23, or 27.");
                 break;
         }
         m_bfirst = false;
     }
     
     // also initialize the parent class
-    FEFiberIntegrationScheme::Init();
+    return FEFiberIntegrationScheme::Init();
 }
 
 //-----------------------------------------------------------------------------

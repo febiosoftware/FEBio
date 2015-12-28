@@ -22,13 +22,6 @@ FEIdealFluid::FEIdealFluid(FEModel* pfem) : FEElasticFluid(pfem)
 }
 
 //-----------------------------------------------------------------------------
-// FEIdealFluid
-void FEIdealFluid::Init()
-{
-    FEElasticFluid::Init();
-}
-
-//-----------------------------------------------------------------------------
 //! fluid pressure (relative to reference pressure when J=1)
 double FEIdealFluid::Pressure(FEMaterialPoint& mp)
 {

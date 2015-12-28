@@ -16,15 +16,15 @@ BEGIN_PARAMETER_LIST(FEEllipsoidalFiberDistribution, FEElasticMaterial)
 	ADD_PARAMETERV(m_ksi , FE_PARAM_DOUBLEV, 3, "ksi" );
 END_PARAMETER_LIST();
 
-void FEEllipsoidalFiberDistribution::Init()
+bool FEEllipsoidalFiberDistribution::Init()
 {
-	FEElasticMaterial::Init();
-	if (m_ksi[0] < 0) throw MaterialError("ksi1 must be positive.");
-	if (m_ksi[1] < 0) throw MaterialError("ksi2 must be positive.");
-	if (m_ksi[2] < 0) throw MaterialError("ksi3 must be positive.");
-	if (m_beta[0] < 2) throw MaterialError("beta1 must be greater than 2.");
-	if (m_beta[1] < 2) throw MaterialError("beta1 must be greater than 2.");
-	if (m_beta[2] < 2) throw MaterialError("beta1 must be greater than 2.");
+	if (m_ksi[0] < 0) return MaterialError("ksi1 must be positive.");
+	if (m_ksi[1] < 0) return MaterialError("ksi2 must be positive.");
+	if (m_ksi[2] < 0) return MaterialError("ksi3 must be positive.");
+	if (m_beta[0] < 2) return MaterialError("beta1 must be greater than 2.");
+	if (m_beta[1] < 2) return MaterialError("beta1 must be greater than 2.");
+	if (m_beta[2] < 2) return MaterialError("beta1 must be greater than 2.");
+	return FEElasticMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -426,16 +426,16 @@ END_PARAMETER_LIST();
 // FEEllipsoidalFiberDistributionOld
 //-----------------------------------------------------------------------------
 
-void FEEllipsoidalFiberDistributionOld::Init()
+bool FEEllipsoidalFiberDistributionOld::Init()
 {
-	FEElasticMaterial::Init();
+	if (FEElasticMaterial::Init() == false) return false;
 
-	if (m_ksi[0] < 0) throw MaterialError("ksi1 must be positive.");
-	if (m_ksi[1] < 0) throw MaterialError("ksi2 must be positive.");
-	if (m_ksi[2] < 0) throw MaterialError("ksi3 must be positive.");
-	if (m_beta[0] < 2) throw MaterialError("beta1 must be greater than 2.");
-	if (m_beta[1] < 2) throw MaterialError("beta1 must be greater than 2.");
-	if (m_beta[2] < 2) throw MaterialError("beta1 must be greater than 2.");
+	if (m_ksi[0] < 0) return MaterialError("ksi1 must be positive.");
+	if (m_ksi[1] < 0) return MaterialError("ksi2 must be positive.");
+	if (m_ksi[2] < 0) return MaterialError("ksi3 must be positive.");
+	if (m_beta[0] < 2) return MaterialError("beta1 must be greater than 2.");
+	if (m_beta[1] < 2) return MaterialError("beta1 must be greater than 2.");
+	if (m_beta[2] < 2) return MaterialError("beta1 must be greater than 2.");
 
 	m_bfirst = true;
 	
@@ -458,6 +458,8 @@ void FEEllipsoidalFiberDistributionOld::Init()
 		
 		m_bfirst = false;
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

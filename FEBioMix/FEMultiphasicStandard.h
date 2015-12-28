@@ -10,9 +10,6 @@ public:
 	//! constructor
 	FEMultiphasicStandard(FEModel* pfem);
     
-	//! initialization
-	void Init();
-
     //! returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData();
 	

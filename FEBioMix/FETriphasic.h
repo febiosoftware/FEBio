@@ -9,7 +9,7 @@ class FETriphasic : public FEMaterial
 public:
 	FETriphasic(FEModel* pfem);
 
-	void Init();
+	bool Init();
 	
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() 

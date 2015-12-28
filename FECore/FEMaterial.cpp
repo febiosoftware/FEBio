@@ -10,15 +10,18 @@
 #include "FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
-MaterialError::MaterialError(const char* szfmt, ...)
+bool MaterialError(const char* szfmt, ...)
 {
 	// get a pointer to the argument list
 	va_list	args;
 
-	// print to file
+	// create the message
+	char szerr[512] = {0};
 	va_start(args, szfmt);
-	vsprintf(m_szerr, szfmt, args);
+	vsprintf(szerr, szfmt, args);
 	va_end(args);
+
+	return fecore_error(szerr);
 }
 
 //-----------------------------------------------------------------------------
@@ -202,7 +205,7 @@ void FEMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint&
 
 //-----------------------------------------------------------------------------
 //! Initial material.
-void FEMaterial::Init()
+bool FEMaterial::Init()
 {
 	// check the parameter ranges
 	FEParameterList& pl = GetParameterList();
@@ -254,7 +257,7 @@ void FEMaterial::Init()
 				else sprintf(szerr, "%s has an invalid range");
 
 				// throw the error
-				throw MaterialError(szerr);
+				return MaterialError(szerr);
 			}
 		}
 	}
@@ -272,11 +275,13 @@ void FEMaterial::Init()
 			if (pi->Init() == false)
 			{
 				// currently, the property will only return false if a required property was not defined
-				throw MaterialError("This material requires the property %s", pi->GetName());
+				return MaterialError("This material requires the property %s", pi->GetName());
 			}
 		}
-		else throw MaterialError("A nullptr was set for property i");
+		else return MaterialError("A nullptr was set for property i");
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

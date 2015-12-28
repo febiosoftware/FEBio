@@ -19,11 +19,12 @@ FEEFDMooneyRivlin::FEEFDMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem),
 }
 
 //-----------------------------------------------------------------------------
-void FEEFDMooneyRivlin::Init()
+bool FEEFDMooneyRivlin::Init()
 {
-	FEUncoupledMaterial::Init();
-	m_MR.Init();
-	m_EFD.Init();
+	if (FEUncoupledMaterial::Init() == false) return false;
+	if (m_MR.Init() == false) return false;
+	if (m_EFD.Init() == false) return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------

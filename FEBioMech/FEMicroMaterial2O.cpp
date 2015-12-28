@@ -130,9 +130,9 @@ FEMaterialPoint* FEMicroMaterial2O::CreateMaterialPointData()
 }
 
 //-----------------------------------------------------------------------------
-void FEMicroMaterial2O::Init()
+bool FEMicroMaterial2O::Init()
 {
-	FEElasticMaterial::Init();
+	if (FEElasticMaterial::Init() == false) return false;
 
 	// try to load the RVE model
 	if (m_brve == false)
@@ -141,7 +141,7 @@ void FEMicroMaterial2O::Init()
 		FEBioImport fim;
 		if (fim.Load(m_mrve, m_szrve) == false)
 		{
-			throw MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
+			return MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
 		}
 
 		// set the pardiso solver as default
@@ -151,11 +151,13 @@ void FEMicroMaterial2O::Init()
 		m_mrve.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
 
 		// create the BC's for this RVE
-		if (PrepRVE() == false) throw MaterialError("An error occurred preparing RVE model");
+		if (PrepRVE() == false) return MaterialError("An error occurred preparing RVE model");
 
 		// mark that we read and processed the RVE successfully
 		m_brve = true;
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

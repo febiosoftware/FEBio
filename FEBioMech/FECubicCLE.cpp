@@ -18,9 +18,9 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Check material parameters.
-void FECubicCLE::Init()
+bool FECubicCLE::Init()
 {
-    FEElasticMaterial::Init();
+    if (FEElasticMaterial::Init() == false) return false;
 
 	// Evaluate Lame coefficients
     double	lam[3][3];
@@ -38,7 +38,7 @@ void FECubicCLE::Init()
     c.exact_eigen(l);
     
     if ((l[0]<0) || (l[1]<0) || (l[2]<0))
-        throw MaterialError("Stiffness matrix is not positive definite.");
+        return MaterialError("Stiffness matrix is not positive definite.");
     
     // repeat check with all tensile diagonal first lamé constants
     lam[0][0] = m_lp1; lam[1][1] = m_lp1; lam[2][2] = m_lp1;
@@ -47,8 +47,9 @@ void FECubicCLE::Init()
     c.exact_eigen(l);
     
     if ((l[0]<0) || (l[1]<0) || (l[2]<0))
-        throw MaterialError("Stiffness matrix is not positive definite.");
+        return MaterialError("Stiffness matrix is not positive definite.");
     
+	return true;
 }
 
 //-----------------------------------------------------------------------------

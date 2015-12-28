@@ -64,7 +64,7 @@ public:
 
 public:
     //! data initialization and checking
-    void Init();
+    bool Init();
     
 	//! calculate stress at material point
 	virtual mat3ds Stress(FEMaterialPoint& pt);

@@ -26,7 +26,7 @@ public:
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
     
 	//! material parameter intialization and checking
-	void Init();
+	bool Init();
 
 	//! serialization
 	void Serialize(DumpFile& ar);

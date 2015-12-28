@@ -17,9 +17,6 @@ public:
     //! tangent of fluid pressure with respect to strain J
     double Tangent_Pressure_Strain(FEMaterialPoint& mp);
     
-    //! Initialization routine
-    void Init();
-    
 public:
     double	m_k;		//!< bulk modulus
     

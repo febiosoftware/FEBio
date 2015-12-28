@@ -47,7 +47,7 @@ public:
     FEChemicalReaction(FEModel* pfem);
     
 	//! initialization
-	virtual void Init();	
+	bool Init();	
 
 public:
 	void SetParameter(FEParam& p);

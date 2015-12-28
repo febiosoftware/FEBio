@@ -21,7 +21,7 @@ class FEFiberIntegrationSchemeUC : public FEUncoupledMaterial
 public:
     FEFiberIntegrationSchemeUC(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
     
-    void Init();
+    bool Init();
     virtual void IntegratedFiberDensity(double& IFD) = 0;
     
 public:

@@ -23,7 +23,7 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationTriangle, FEFiberIntegrationScheme)
 ADD_PARAMETER(m_nres, FE_PARAM_INT, "resolution");
 END_PARAMETER_LIST();
 
-void FEFiberIntegrationTriangle::Init()
+bool FEFiberIntegrationTriangle::Init()
 {
     m_bfirst = true;
     
@@ -270,7 +270,7 @@ void FEFiberIntegrationTriangle::Init()
                 break;
                 
                 //            default:
-                //                throw MaterialError("resolutio must 1-9");
+                //                return MaterialError("resolutio must 1-9");
                 //                break;
         }
         
@@ -278,7 +278,7 @@ void FEFiberIntegrationTriangle::Init()
     }
     
     // also initialize the parent class
-    FEFiberIntegrationScheme::Init();
+    return FEFiberIntegrationScheme::Init();
 }
 
 //-----------------------------------------------------------------------------

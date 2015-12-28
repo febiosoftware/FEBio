@@ -21,9 +21,9 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationGeodesicUC, FEFiberIntegrationSchemeUC)
     ADD_PARAMETER(m_nres, FE_PARAM_INT, "resolution");
 END_PARAMETER_LIST();
 
-void FEFiberIntegrationGeodesicUC::Init()
+bool FEFiberIntegrationGeodesicUC::Init()
 {
-	if ((m_nres != 0) && (m_nres != 1)) throw MaterialError("resolution must be 0 (low) or 1 (high).");
+	if ((m_nres != 0) && (m_nres != 1)) return MaterialError("resolution must be 0 (low) or 1 (high).");
     
 	m_bfirst = true;
 	
@@ -48,7 +48,7 @@ void FEFiberIntegrationGeodesicUC::Init()
 	}
     
     // also initialize the parent class
-    FEFiberIntegrationSchemeUC::Init();
+    return FEFiberIntegrationSchemeUC::Init();
 }
 
 //-----------------------------------------------------------------------------

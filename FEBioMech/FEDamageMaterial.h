@@ -35,7 +35,7 @@ public:
     double Damage(FEMaterialPoint& pt);
     
 	//! data initialization and checking
-	void Init();
+	bool Init();
     
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData()

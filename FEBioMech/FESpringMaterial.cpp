@@ -40,10 +40,10 @@ double FETensionOnlyLinearSpring::stiffness(double dl)
 	return (dl >= 0 ? m_E : 0);
 }
 
-void FETensionOnlyLinearSpring::Init()
+bool FETensionOnlyLinearSpring::Init()
 {
-	FEDiscreteMaterial::Init();
-	if (m_E < 0) throw MaterialError("Invalid value for E in tension only linear spring material");
+	if (m_E < 0) return MaterialError("Invalid value for E in tension only linear spring material");
+	return FEDiscreteMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -62,15 +62,15 @@ FENonLinearSpring::FENonLinearSpring(FEModel* pfem) : FESpringMaterial(pfem)
 	m_F = 1; 
 }
 
-void FENonLinearSpring::Init()
+bool FENonLinearSpring::Init()
 {
-	FEDiscreteMaterial::Init();
-	if (m_nlc < 0) throw MaterialError("Invalid load curve ID for nonlinear spring");
+	if (m_nlc < 0) return MaterialError("Invalid load curve ID for nonlinear spring");
 	if (m_plc == 0)
 	{
 		m_plc = GetFEModel()->GetLoadCurve(m_nlc);
-		assert(m_plc);
+		if (m_plc == 0) return false;
 	}
+	return FEDiscreteMaterial::Init();
 }
 
 double FENonLinearSpring::force(double dl)

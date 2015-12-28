@@ -31,16 +31,18 @@ FEDiffAlbroIso::FEDiffAlbroIso(FEModel* pfem) : FESoluteDiffusivity(pfem)
 
 //-----------------------------------------------------------------------------
 //! Initialization.
-void FEDiffAlbroIso::Init()
+bool FEDiffAlbroIso::Init()
 {
-	FESoluteDiffusivity::Init();
+	if (FESoluteDiffusivity::Init() == false) return false;
 
 	// get the grandparent material which must be
     // a biphasic-solute/triphasic/multiphasic material
     FESolute* pSol = dynamic_cast<FESolute*> (GetParent());
     m_lsol = pSol->GetSoluteLocalID();
     
-	if (m_lsol == -1) throw MaterialError("Invalid value for sol");
+	if (m_lsol == -1) return MaterialError("Invalid value for sol");
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

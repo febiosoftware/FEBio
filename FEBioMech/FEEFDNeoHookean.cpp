@@ -13,12 +13,12 @@ END_PARAMETER_LIST();
 // FEEFDNeoHookean
 //////////////////////////////////////////////////////////////////////
 
-void FEEFDNeoHookean::Init()
+bool FEEFDNeoHookean::Init()
 {
-	FEElasticMaterial::Init();
-
-	m_NH.Init();
-	m_EFD.Init();
+	if (FEElasticMaterial::Init() == false) return false;
+	if (m_NH.Init()  == false) return false;
+	if (m_EFD.Init() == false) return false;
+	return true;
 }
 
 mat3ds FEEFDNeoHookean::Stress(FEMaterialPoint& mp)
@@ -73,12 +73,13 @@ BEGIN_PARAMETER_LIST(FEEFDNeoHookeanOld, FEElasticMaterial)
 	ADD_PARAMETERV(m_EFD.m_ksi , FE_PARAM_DOUBLEV, 3, "ksi" );
 END_PARAMETER_LIST();
 
-void FEEFDNeoHookeanOld::Init()
+bool FEEFDNeoHookeanOld::Init()
 {
-	FEElasticMaterial::Init();
+	if (FEElasticMaterial::Init() == false) return false;
 
-	m_NH.Init();
-	m_EFD.Init();
+	if (m_NH.Init() == false) return false;
+	if (m_EFD.Init() == false) return false;
+	return true;
 }
 
 mat3ds FEEFDNeoHookeanOld::Stress(FEMaterialPoint& mp)

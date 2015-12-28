@@ -39,12 +39,12 @@ void FERigidMaterial::SetParameter(FEParam& p)
 
 //-----------------------------------------------------------------------------
 // Initialize rigid material data
-void FERigidMaterial::Init()
+bool FERigidMaterial::Init()
 {
-	FESolidMaterial::Init();
+	if (FESolidMaterial::Init() == false) return false;
 
-	if (m_E <= 0) throw MaterialError("Invalid value for E");
-	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
+	if (m_E <= 0) return MaterialError("Invalid value for E");
+	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) return MaterialError("Invalid value for v");
 
 	if (m_binit == false)
 	{
@@ -68,7 +68,7 @@ void FERigidMaterial::Init()
 		if (m_pmid  > -1)
 		{
 			FERigidMaterial* ppm = dynamic_cast<FERigidMaterial*>(GetFEModel()->GetMaterial(m_pmid-1));
-			if (ppm == 0) throw MaterialError("parent of rigid material %s is not a rigid material\n", GetName());
+			if (ppm == 0) return MaterialError("parent of rigid material %s is not a rigid material\n", GetName());
 
 			FERigidBody& prb = *rigid.Object(ppm->GetRigidBodyID());
 			rb.m_prb = &prb;
@@ -84,6 +84,8 @@ void FERigidMaterial::Init()
 
 		m_binit = true;
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

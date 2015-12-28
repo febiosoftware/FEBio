@@ -14,9 +14,9 @@ END_PARAMETER_LIST();
 // FEFiberExpPow
 //-----------------------------------------------------------------------------
 
-void FEFiberExpPow::Init()
+bool FEFiberExpPow::Init()
 {
-	FEElasticMaterial::Init();
+	if (FEElasticMaterial::Init() == false) return false;
 
 	// convert angles from degrees to radians
 	double pi = 4*atan(1.0);
@@ -26,6 +26,8 @@ void FEFiberExpPow::Init()
 	m_n0.x = cos(the)*sin(phi);
 	m_n0.y = sin(the)*sin(phi);
 	m_n0.z = cos(phi);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -20,15 +20,15 @@ BEGIN_PARAMETER_LIST(FEEFDUncoupled, FEUncoupledMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-void FEEFDUncoupled::Init()
+bool FEEFDUncoupled::Init()
 {
-	FEUncoupledMaterial::Init();
-	if (m_ksi[0] < 0) throw MaterialError("ksi1 must be positive.");
-	if (m_ksi[1] < 0) throw MaterialError("ksi2 must be positive.");
-	if (m_ksi[2] < 0) throw MaterialError("ksi3 must be positive.");
-	if (m_beta[0] < 2) throw MaterialError("beta1 must be greater than 2.");
-	if (m_beta[1] < 2) throw MaterialError("beta1 must be greater than 2.");
-	if (m_beta[2] < 2) throw MaterialError("beta1 must be greater than 2.");
+	if (m_ksi[0] < 0) return MaterialError("ksi1 must be positive.");
+	if (m_ksi[1] < 0) return MaterialError("ksi2 must be positive.");
+	if (m_ksi[2] < 0) return MaterialError("ksi3 must be positive.");
+	if (m_beta[0] < 2) return MaterialError("beta1 must be greater than 2.");
+	if (m_beta[1] < 2) return MaterialError("beta1 must be greater than 2.");
+	if (m_beta[2] < 2) return MaterialError("beta1 must be greater than 2.");
+	return FEUncoupledMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------

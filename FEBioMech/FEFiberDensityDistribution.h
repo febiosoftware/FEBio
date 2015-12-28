@@ -42,7 +42,7 @@ class FEEllipsodialFiberDensityDistribution : public FEFiberDensityDistribution
 public:
     FEEllipsodialFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_spa[0] = m_spa[1] = m_spa[2] = 1; }
     
-    void Init();
+    bool Init();
     
     double FiberDensity(const vec3d n0);
     
@@ -95,8 +95,6 @@ class FECircularFiberDensityDistribution : public FEFiberDensityDistribution
 {
 public:
     FECircularFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) {}
-    
-    void Init() {}
     
     double FiberDensity(const vec3d n0) { return 1.0/m_IFD; }
 };

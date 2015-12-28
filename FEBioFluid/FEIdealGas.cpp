@@ -16,12 +16,12 @@ FEIdealGas::FEIdealGas(FEModel* pfem) : FEElasticFluid(pfem)
 
 //-----------------------------------------------------------------------------
 // FEIdealGas
-void FEIdealGas::Init()
+bool FEIdealGas::Init()
 {
     m_Rgas = GetFEModel()->GetGlobalConstant("R");
     m_Tabs = GetFEModel()->GetGlobalConstant("T");
     
-    FEElasticFluid::Init();
+    return FEElasticFluid::Init();
 }
 
 //-----------------------------------------------------------------------------

@@ -27,18 +27,9 @@ class FEModel;
 class FEElement;
 
 //-----------------------------------------------------------------------------
-//! exception to throw during the material initialization phase
+//! helper functions for reporting material errors
 
-class MaterialError
-{
-public:
-	MaterialError(const char* sz, ...);
-
-	const char* Error() { return m_szerr; }
-
-protected:
-	char	m_szerr[512];
-};
+bool MaterialError(const char* sz, ...);
 
 //-----------------------------------------------------------------------------
 // Forward declaration of the FEElasticMaterial class. 
@@ -46,24 +37,6 @@ protected:
 // However, this is only a temporary construct so make sure to delete this forward declaration
 // when no longer needed.
 class FEElasticMaterial;
-
-//-----------------------------------------------------------------------------
-//! exception to throw during material initialization phase
-class MaterialRangeError
-{
-public:
-	// szvar = name of variable
-	// vmin  = inf value
-	// vmax  = sup value
-	// bl    = inf is allowed
-	// br    = sup is allowed
-	MaterialRangeError(const char* szvar, double vmin, double vmax, bool bl, bool br) : m_szvar(szvar), m_vmin(vmin), m_vmax(vmax), m_bl(bl), m_br(br) {}
-
-public:
-	const char*	m_szvar;
-	double	m_vmin, m_vmax;
-	bool	m_bl, m_br;
-};
 
 //-----------------------------------------------------------------------------
 //! First attempt at conceptualizing material properties.
@@ -253,7 +226,7 @@ public:
 	virtual FEMaterialPoint* CreateMaterialPointData() { return 0; };
 
 	//! performs initialization and parameter checking
-	virtual void Init();
+	virtual bool Init();
 
 	int GetID() { return m_nID; }
 	void SetID(int nid) { m_nID = nid; }

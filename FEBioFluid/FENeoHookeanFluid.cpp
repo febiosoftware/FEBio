@@ -15,13 +15,6 @@ FENeoHookeanFluid::FENeoHookeanFluid(FEModel* pfem) : FEElasticFluid(pfem)
 }
 
 //-----------------------------------------------------------------------------
-// FEIdealGas
-void FENeoHookeanFluid::Init()
-{
-    FEElasticFluid::Init();
-}
-
-//-----------------------------------------------------------------------------
 //! fluid pressure (relative to reference pressure when J=1)
 double FENeoHookeanFluid::Pressure(FEMaterialPoint& mp)
 {

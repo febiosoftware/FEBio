@@ -287,7 +287,7 @@ int FEMultiphasic::FindLocalSBMID(int nid)
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
+bool FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
 {
 	int isol, isbm, itot;
 	
@@ -346,14 +346,16 @@ void FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
 		znet += m_pReact->m_v[isol]*m_pSolute[isol]->ChargeNumber();
 	for (isbm=0; isbm<nsbm; ++isbm)
 		znet += m_pReact->m_v[nsol+isbm]*m_pSBM[isbm]->ChargeNumber();
-	if (znet != 0) throw MaterialError("chemical reaction must satisfy electroneutrality");
+	if (znet != 0) return MaterialError("chemical reaction must satisfy electroneutrality");
 	
 	// set pointer to this multiphasic material
 	m_pReact->m_pMP = this;
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasic::Init()
+bool FEMultiphasic::Init()
 {
 	// set the solute IDs first, since they are referenced in FESolute::Init()
 	for (int i=0; i<Solutes(); ++i) {
@@ -362,11 +364,13 @@ void FEMultiphasic::Init()
 
 	// initialize chemical reactions
 	for (int i=0; i<Reactions(); ++i)
-		InitializeReaction(m_pReact[i]);
+	{
+		if (InitializeReaction(m_pReact[i]) == false) return false;
+	}
 
 	// call the base class.
 	// This also initializes all properties
-	FEMaterial::Init();
+	if (FEMaterial::Init() == false) return false;
 
 	// Determine how to solve for the electric potential psi
 	int isol;
@@ -383,9 +387,11 @@ void FEMultiphasic::Init()
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 	m_Fc   = GetFEModel()->GetGlobalConstant("Fc");
 	
-	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
-	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");
-	if ((zmin || zmax) && (m_Fc <= 0)) throw MaterialError("A positive Faraday constant Fc must be defined in Globals section");
+	if (m_Rgas <= 0) return MaterialError("A positive universal gas constant R must be defined in Globals section");
+	if (m_Tabs <= 0) return MaterialError("A positive absolute temperature T must be defined in Globals section");
+	if ((zmin || zmax) && (m_Fc <= 0)) return MaterialError("A positive Faraday constant Fc must be defined in Globals section");
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

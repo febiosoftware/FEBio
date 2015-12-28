@@ -9,16 +9,16 @@
 
 //-----------------------------------------------------------------------------
 // define the ellipsoidal fiber density distributionmaterial parameters
-BEGIN_PARAMETER_LIST(FEEllipsodialFiberDensityDistribution, FEMaterial)
+BEGIN_PARAMETER_LIST(FEEllipsodialFiberDensityDistribution, FEFiberDensityDistribution)
 	ADD_PARAMETERV(m_spa , FE_PARAM_DOUBLEV, 3, "spa" );
 END_PARAMETER_LIST();
 
-void FEEllipsodialFiberDensityDistribution::Init()
+bool FEEllipsodialFiberDensityDistribution::Init()
 {
-	FEMaterial::Init();
-	if (m_spa[0] < 0) throw MaterialError("spa1 must be positive.");
-	if (m_spa[1] < 0) throw MaterialError("spa2 must be positive.");
-	if (m_spa[2] < 0) throw MaterialError("spa3 must be positive.");
+	if (m_spa[0] < 0) return MaterialError("spa1 must be positive.");
+	if (m_spa[1] < 0) return MaterialError("spa2 must be positive.");
+	if (m_spa[2] < 0) return MaterialError("spa3 must be positive.");
+	return FEFiberDensityDistribution::Init();
 }
 
 double FEEllipsodialFiberDensityDistribution::FiberDensity(const vec3d n0)

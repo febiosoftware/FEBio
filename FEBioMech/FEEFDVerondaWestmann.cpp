@@ -20,11 +20,12 @@ FEEFDVerondaWestmann::FEEFDVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(
 }
 
 //-----------------------------------------------------------------------------
-void FEEFDVerondaWestmann::Init()
+bool FEEFDVerondaWestmann::Init()
 {
-	FEUncoupledMaterial::Init();
-	m_VW.Init();
-	m_EFD.Init();
+	if (FEUncoupledMaterial::Init() == false) return false;
+	if (m_VW.Init() == false) return false;
+	if (m_EFD.Init() == false) return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------

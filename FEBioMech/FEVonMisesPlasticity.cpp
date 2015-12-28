@@ -18,12 +18,14 @@ FEVonMisesPlasticity::FEVonMisesPlasticity(FEModel* pfem) : FEElasticMaterial(pf
 }
 
 //-----------------------------------------------------------------------------
-void FEVonMisesPlasticity::Init()
+bool FEVonMisesPlasticity::Init()
 {
-	FEElasticMaterial::Init();
+	if (FEElasticMaterial::Init() == false) return false;
 
 	m_K = m_E/(3.0*(1.0 - 2*m_v));
 	m_G = m_E/(2.0*(1.0 +   m_v));
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

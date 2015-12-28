@@ -115,11 +115,14 @@ void FEElasticMixture::AddMaterial(FEElasticMaterial* pm)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticMixture::Init()
+bool FEElasticMixture::Init()
 {
-    for (int i=0; i < (int)m_pMat.size(); ++i) m_pMat[i]->Init();
+    for (int i=0; i < (int)m_pMat.size(); ++i)
+	{
+		if (m_pMat[i]->Init() == false) return false;
+	}
     
-    FEElasticMaterial::Init();
+    return FEElasticMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------

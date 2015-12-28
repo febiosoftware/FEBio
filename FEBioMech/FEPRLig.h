@@ -24,9 +24,6 @@ public:
 	//! calculate tangent stiffness at material point
 	virtual tens4ds Tangent(FEMaterialPoint& pt);
 
-	//! data initialization and checking
-	void Init();
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

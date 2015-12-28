@@ -18,7 +18,7 @@ public:
     FEReactionRateExpSED(FEModel* pfem) : FEReactionRate(pfem) { m_B = m_Psi0 = 0; }
     
     //! data initialization and checking
-    void Init();
+    bool Init();
     
     //! reaction rate at material point
     double ReactionRate(FEMaterialPoint& pt);

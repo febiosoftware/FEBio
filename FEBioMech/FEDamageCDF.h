@@ -118,7 +118,7 @@ public:
 	//! damage
 	double Damage(FEMaterialPoint& pt);
     
-	void Init();
+	bool Init();
     
 public:
 	double	m_mumin;            //!< mu threshold

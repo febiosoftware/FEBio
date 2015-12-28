@@ -1,7 +1,35 @@
 #include "stdafx.h"
 #include "FECoreKernel.h"
 #include "Logfile.h"
+#include <stdarg.h>
 using namespace std;
+
+//-----------------------------------------------------------------------------
+//! Helper function for reporting errors
+bool fecore_error(const char* sz, ...)
+{
+	// get a pointer to the argument list
+	va_list	args;
+
+	// make the message
+	char szerr[512] = {0};
+	va_start(args, sz);
+	vsprintf(szerr, sz, args);
+	va_end(args);
+
+	// TODO: Perhaps I should report it to the logfile?
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	fecore.SetErrorString(sz);
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+const char* fecore_get_error_string()
+{
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	return fecore.GetErrorString();
+}
 
 //-----------------------------------------------------------------------------
 FECoreKernel* FECoreKernel::m_pKernel = 0;
@@ -31,6 +59,28 @@ Logfile& FECoreKernel::GetLogfile()
 FECoreKernel::FECoreKernel()
 {
 	m_plog = Logfile::GetInstance();
+	m_szerr = 0;
+}
+
+//-----------------------------------------------------------------------------
+// Sets the error string.
+// Calling SetErrorString(null) can be used to clear the error string.
+void FECoreKernel::SetErrorString(const char* sz)
+{
+	// always clear the current error first
+	if (m_szerr) delete [] m_szerr; m_szerr = 0;
+
+	// make sure there is a new error string
+	if (sz == 0) return;
+	int l = strlen(sz);
+	m_szerr = new char[l+1];
+	strncpy(m_szerr, sz, l);
+}
+
+//-----------------------------------------------------------------------------
+const char* FECoreKernel::GetErrorString()
+{
+	return m_szerr;
 }
 
 //-----------------------------------------------------------------------------

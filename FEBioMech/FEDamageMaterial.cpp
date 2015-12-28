@@ -24,17 +24,17 @@ FEDamageMaterial::FEDamageMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 
 //-----------------------------------------------------------------------------
 //! Initialization.
-void FEDamageMaterial::Init()
+bool FEDamageMaterial::Init()
 {
     FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>((FEElasticMaterial*)m_pBase);
     if (m_pMat != nullptr)
-        throw MaterialError("Elastic material should not be of type uncoupled");
+        return MaterialError("Elastic material should not be of type uncoupled");
     
-    m_pBase->Init();
-    m_pDamg->Init();
-    m_pCrit->Init();
+    if (m_pBase->Init() == false) return false;
+    if (m_pDamg->Init() == false) return false;
+    if (m_pCrit->Init() == false) return false;
     
-	FEElasticMaterial::Init();
+	return FEElasticMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------

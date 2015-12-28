@@ -26,17 +26,17 @@ END_PARAMETER_LIST();
 // FEFiberPowLinear
 //-----------------------------------------------------------------------------
 
-void FEFiberPowLinearSBM::Init()
+bool FEFiberPowLinearSBM::Init()
 {
-	FEElasticMaterial::Init();
+	if (FEElasticMaterial::Init() == false) return false;
 
     // get the parent material which must be a multiphasic material
     FEMultiphasic* pMP = dynamic_cast<FEMultiphasic*> (GetAncestor());
-    if (pMP == 0) throw MaterialError("Parent material must be multiphasic");
+    if (pMP == 0) return MaterialError("Parent material must be multiphasic");
     
     // extract the local id of the SBM whose density controls Young's modulus from the global id
     m_lsbm = pMP->FindLocalSBMID(m_sbm);
-    if (m_lsbm == -1) throw MaterialError("Invalid value for sbm");
+    if (m_lsbm == -1) return MaterialError("Invalid value for sbm");
     
     // convert angles from degrees to radians
     double pi = 4*atan(1.0);
@@ -46,6 +46,8 @@ void FEFiberPowLinearSBM::Init()
     m_n0.x = cos(the)*sin(phi);
     m_n0.y = sin(the)*sin(phi);
     m_n0.z = cos(phi);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

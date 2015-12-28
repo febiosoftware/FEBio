@@ -82,7 +82,7 @@ public:
 	virtual tens4ds Tangent(FEMaterialPoint& pt);
 
 	//! data initialization
-	void Init();
+	bool Init();
 
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPointData();

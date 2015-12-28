@@ -16,11 +16,12 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-void FEEFDDonnanEquilibrium::Init()
+bool FEEFDDonnanEquilibrium::Init()
 {
-	FEElasticMaterial::Init();
-	m_DEQ.Init();
-	m_Fib.Init();
+	if (FEElasticMaterial::Init() == false) return false;
+	if (m_DEQ.Init() == false) return false;
+	if (m_Fib.Init() == false) return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------

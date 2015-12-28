@@ -101,7 +101,7 @@ public:
 	void Tangent2O(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e);
 	
 	//! data initialization
-	void Init();
+	bool Init();
 
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPointData();

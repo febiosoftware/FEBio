@@ -24,9 +24,10 @@ FEPrescribedActiveContractionTransIsoUC::FEPrescribedActiveContractionTransIsoUC
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedActiveContractionTransIsoUC::Init()
+bool FEPrescribedActiveContractionTransIsoUC::Init()
 {
-	FEUncoupledMaterial::Init();
+	if (FEUncoupledMaterial::Init() == false) return false;
+
     // convert angles from degrees to radians
     double pi = 4*atan(1.0);
     double the = m_thd*pi/180.;
@@ -35,6 +36,8 @@ void FEPrescribedActiveContractionTransIsoUC::Init()
     m_n0.x = cos(the)*sin(phi);
     m_n0.y = sin(the)*sin(phi);
     m_n0.z = cos(phi);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

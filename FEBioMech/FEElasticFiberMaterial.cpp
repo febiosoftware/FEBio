@@ -14,10 +14,10 @@ BEGIN_PARAMETER_LIST(FEFiberExponentialPower, FEElasticFiberMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-void FEFiberExponentialPower::Init()
+bool FEFiberExponentialPower::Init()
 {
-    FEElasticFiberMaterial::Init();
-	if ((4*m_ksi + 2*m_mu) < 0) throw MaterialError("4*ksi+2*mu must be positive.");
+	if ((4*m_ksi + 2*m_mu) < 0) return MaterialError("4*ksi+2*mu must be positive.");
+    return FEElasticFiberMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -176,10 +176,10 @@ BEGIN_PARAMETER_LIST(FEFiberNH, FEElasticFiberMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-void FEFiberNH::Init()
+bool FEFiberNH::Init()
 {
-    FEElasticFiberMaterial::Init();
-	if (m_mu < 0) throw MaterialError("mu must be positive.");
+	if (m_mu < 0) return MaterialError("mu must be positive.");
+    return FEElasticFiberMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -309,17 +309,19 @@ BEGIN_PARAMETER_LIST(FEFiberPowerLinear, FEElasticFiberMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-void FEFiberPowerLinear::Init()
+bool FEFiberPowerLinear::Init()
 {
-    FEElasticFiberMaterial::Init();
-    if (m_E < 0) throw MaterialError("E must be positive.");
-    if (m_beta < 2) throw MaterialError("beta must be >= 2.");
-    if (m_lam0 <= 1) throw MaterialError("lam0 must be >1.");
+    if (FEElasticFiberMaterial::Init() == false) return false;
+    if (m_E < 0) return MaterialError("E must be positive.");
+    if (m_beta < 2) return MaterialError("beta must be >= 2.");
+    if (m_lam0 <= 1) return MaterialError("lam0 must be >1.");
     
     // initialize material constants
     m_I0 = m_lam0*m_lam0;
     m_ksi = m_E/4/(m_beta-1)*pow(m_I0, -3./2.)*pow(m_I0-1, 2-m_beta);
     m_b = m_ksi*pow(m_I0-1, m_beta-1) + m_E/2/sqrt(m_I0);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -21,7 +21,7 @@ public:
         m_bnew = false; m_binit = false; m_Phi = 1;}
 	
 	//! Initialization routine
-	void Init();
+	bool Init();
 
 	//! Returns the Cauchy stress
 	virtual mat3ds Stress(FEMaterialPoint& mp);

@@ -21,11 +21,6 @@ FEPRLig::FEPRLig(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 }
 
-void FEPRLig::Init()
-{
-	FEElasticMaterial::Init();
-	// Throw errors specific to our material parameters here;  None currently programmed. 
-}
 							///////////////////////////
 //////////////////////////////Cauchy Stress Calculation ////////////////////////////////////////////////
 							////////////////////////////

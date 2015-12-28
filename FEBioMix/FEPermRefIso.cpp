@@ -22,10 +22,11 @@ FEPermRefIso::FEPermRefIso(FEModel* pfem) : FEHydraulicPermeability(pfem)
 
 //-----------------------------------------------------------------------------
 //! Initialization. 
-void FEPermRefIso::Init()
+bool FEPermRefIso::Init()
 {
-	FEHydraulicPermeability::Init();
-	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 < phi0 <= 1");
+	if (FEHydraulicPermeability::Init() == false) return false;
+	if (!INRANGE(m_phi0, 0.0, 1.0)) return MaterialError("phi0 must be in the range 0 < phi0 <= 1");
+	return true;
 }
 
 //-----------------------------------------------------------------------------
