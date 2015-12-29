@@ -6,6 +6,7 @@
 #include "FECore/FEModel.h"
 #include "FEBioMech/FEElasticMaterial.h"
 #include "FECore/FECoreKernel.h"
+#include "FEBioMech/FEElasticMixture.h"
 
 //-----------------------------------------------------------------------------
 //!  Parses the geometry section from the xml file
@@ -854,11 +855,28 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 					{
 						FEParameterList& pl = pt->GetParameterList();
 						if (m_pim->ReadParameter(tag, pl)) break;
-						else
+
+						FEElasticMixtureMaterialPoint* mPt = dynamic_cast<FEElasticMixtureMaterialPoint*>(pt);
+
+						bool tagFound=false;
+						if(mPt)
 						{
-							pt = pt->Next();
-							if (pt == 0) throw XMLReader::InvalidTag(tag);
+							vector<FEMaterialPoint*> mPtV = mPt->m_mp;
+							for (int i=0; i<(int)mPtV.size(); ++i)
+							{
+								FEParameterList& pl = mPtV[i]->GetParameterList();
+								if (m_pim->ReadParameter(tag, pl))
+								{
+									tagFound=true;
+									break;
+								}
+							}
 						}
+
+						if(tagFound)
+							break;
+						pt = pt->Next();
+						if (pt == 0) throw XMLReader::InvalidTag(tag);
 					}
 				}
 			}
