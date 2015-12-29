@@ -139,6 +139,14 @@ FENode& FEDomain::Node(int i)
 }
 
 //-----------------------------------------------------------------------------
+void FEDomain::CopyFrom(FEDomain* pd)
+{
+	m_Node = pd->m_Node;
+	m_dof = pd->m_dof;
+	SetName(pd->GetName());
+}
+
+//-----------------------------------------------------------------------------
 bool FEDomain::Initialize(FEModel& fem)
 {
 	// make sure that there are elements in this domain

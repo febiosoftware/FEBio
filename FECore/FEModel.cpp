@@ -860,12 +860,18 @@ void FEModel::CopyFrom(FEModel& fem)
 
 	// copy the mesh data
 	// NOTE: This will not assign materials to the new domains
-	m_mesh.CopyFrom(fem.m_mesh);
-	assert(m_mesh.Domains()==fem.m_mesh.Domains());
+	// A. copy nodes
+	FEMesh& mesh = fem.GetMesh();
+	int N = mesh.Nodes();
+	m_mesh.CreateNodes(N);
+	for (int i=0; i<N; ++i)
+	{
+		m_mesh.Node(i) = mesh.Node(i);
+	}
 
-	// next, we need to assign the new materials to the new domains
+	// B. domains
 	// let's first create a table of material indices for the old domains
-	int NDOM = fem.m_mesh.Domains();
+	int NDOM = mesh.Domains();
 	vector<int> LUT(NDOM);
 	for (int i=0; i<NDOM; ++i)
 	{
@@ -880,14 +886,22 @@ void FEModel::CopyFrom(FEModel& fem)
 		}
 	}
 
-	// since both the domains and the materials are created in the same order
-	// we can use the lookup table to assign materials to domains
-	int ND = m_mesh.Domains();
-	for (int i=0; i<ND; ++i)
+	// now allocate domains
+	for (int i=0; i<NDOM; ++i)
 	{
-		FEDomain& dom = m_mesh.Domain(i);
-		dom.SetMaterial(m_MAT[LUT[i]]);
-		assert(dom.GetMaterial());
+		FEDomain& dom = mesh.Domain(i);
+		const char* sz = dom.GetTypeStr();
+
+		// create a new domain
+		FEDomain* pd = fecore_new<FEDomain>(FEDOMAIN_ID, sz, this);
+		assert(pd);
+		pd->SetMaterial(m_MAT[LUT[i]]);
+
+		// copy domain data
+		pd->CopyFrom(&dom);
+
+		// add it to the mesh
+		m_mesh.AddDomain(pd);
 	}
 
 	// --- boundary conditions ---

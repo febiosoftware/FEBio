@@ -99,6 +99,8 @@ public:
 	FEPrescribedBC& SetDOF(int dof) { m_dof = dof; return *this; }
 	FEPrescribedBC& SetRelativeFlag(bool br) { m_br = br; return *this; }
 	FEPrescribedBC& SetLoadCurveIndex(int lc) { m_lc = lc; return *this; }
+	
+	void SetNodeScale(int n, double s) { m_item[n].scale = s; }
 
 	double GetScaleFactor() const { return m_scale; }
 	int GetDOF() const { return m_dof; }

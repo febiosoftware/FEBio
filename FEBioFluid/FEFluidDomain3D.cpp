@@ -59,17 +59,6 @@ void FEFluidDomain3D::SetMaterial(FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-//! create a copy (overridden from FEDomain).
-//! Node that this creates a copy without a material assignment
-FEDomain* FEFluidDomain3D::Copy()
-{
-    FEFluidDomain3D* pd = new FEFluidDomain3D(0);
-    pd->m_Elem = m_Elem;
-    pd->m_Node = m_Node;
-    return pd;
-}
-
-//-----------------------------------------------------------------------------
 //! \todo The material point initialization needs to move to the base class.
 bool FEFluidDomain3D::Initialize(FEModel &fem)
 {

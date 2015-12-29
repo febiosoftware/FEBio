@@ -91,7 +91,7 @@ public: // optional functions to overload
 	virtual void Reset() {}
 
 	//! create a copy of this domain
-	virtual FEDomain* Copy() { return 0; }
+	virtual void CopyFrom(FEDomain* pd);
 
 	//! stream domain data
 	virtual void ShallowCopy(DumpStream& dmp, bool bsave) {}

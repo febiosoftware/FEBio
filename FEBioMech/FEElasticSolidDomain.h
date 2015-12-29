@@ -36,9 +36,6 @@ public: // overrides from FEDomain
 	//! set the material
 	void SetMaterial(FEMaterial* pm);
 
-	//! create a copy
-	FEDomain* Copy();
-
 public: // overrides from FEElasticDomain
 
 	// update stresses

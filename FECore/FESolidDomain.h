@@ -18,6 +18,9 @@ public:
 	//! reset data (overridden from FEDomain)
 	void Reset();
 
+	//! copy data from another domain (overridden from FEDomain)
+	void CopyFrom(FEDomain* pd);
+
 	//! element access
 	FESolidElement& Element(int n) { return m_Elem[n]; }
 	FEElement& ElementRef(int n) { return m_Elem[n]; }

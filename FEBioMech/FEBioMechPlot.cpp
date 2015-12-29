@@ -294,7 +294,7 @@ bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 				//       to be a better way.
 				pt.m_F_prev = pt.m_F;
 
-				FEMicroMaterialPoint* mmppt = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint>());
+/*				FEMicroMaterialPoint* mmppt = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint>());
 
 				if (mmppt)
 				{
@@ -305,6 +305,7 @@ bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 					mmpt.m_energy_diff = fabs(mmpt.m_macro_energy - mmpt.m_micro_energy); 
 				}
 				//------>
+*/
 			}
 		}
 		s *= f;

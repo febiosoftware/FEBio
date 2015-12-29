@@ -44,17 +44,6 @@ void FEElasticSolidDomain::SetMaterial(FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-//! create a copy (overridden from FEDomain).
-//! Node that this creates a copy without a material assignment
-FEDomain* FEElasticSolidDomain::Copy()
-{
-	FEElasticSolidDomain* pd = new FEElasticSolidDomain(0);
-	pd->m_Elem = m_Elem;
-	pd->m_Node = m_Node;
-	return pd;
-}
-
-//-----------------------------------------------------------------------------
 //! \todo The material point initialization needs to move to the base class.
 bool FEElasticSolidDomain::Initialize(FEModel &fem)
 {

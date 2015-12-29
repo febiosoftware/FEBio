@@ -86,7 +86,7 @@ FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 	// initialize parameters
 	m_szrve[0] = 0;
 	m_szbc[0] = 0;
-	m_bperiodic = false;
+	m_bperiodic = false;	// use displacement BCs by default
 
 	m_bb_x = 0.; m_bb_y = 0.; m_bb_z = 0.;
 	m_num_ext_node = 0;
@@ -135,9 +135,37 @@ bool FEMicroMaterial::Init()
 }
 
 //-----------------------------------------------------------------------------
+double FEMicroMaterial::InitVolume()
+{
+	double V0 = 0.0;
+	FEMesh& m = m_mrve.GetMesh();
+	for (int k=0; k<m.Domains(); ++k)
+	{
+		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
+		for (int i=0; i<dom.Elements(); ++i)
+		{
+			FESolidElement& el = dom.Element(i);
+			int nint = el.GaussPoints();
+			double* w = el.GaussWeights();
+			double ve = 0;
+			for (int n=0; n<nint; ++n)
+			{
+				double J = dom.detJt(el, n);
+				ve += J*w[n];
+			}
+			V0 += ve;
+		}
+	}
+
+	return V0;
+}
+
+//-----------------------------------------------------------------------------
+// This function prepares the RVE model. It find the boundaries (assuming the RVE is a box),
+// initializes the model and calculates the initial volume.
 bool FEMicroMaterial::PrepRVE()
 {
-	// find all boundar nodes
+	// find all boundary nodes
 	FindBoundaryNodes();
 
 	if (m_bperiodic == false)
@@ -161,30 +189,7 @@ bool FEMicroMaterial::PrepRVE()
 	if (m_mrve.Init() == false) return false;
 
 	// calculate intial RVE volume
-	m_V0 = 0;
-	double ve;
-	int nint;
-	double* w, J;
-	FEMesh& m = m_mrve.GetMesh();
-	for (int k=0; k<m.Domains(); ++k)
-	{
-		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
-		for (int i=0; i<dom.Elements(); ++i)
-		{
-			FESolidElement& el = dom.Element(i);
-			nint = el.GaussPoints();
-			w = el.GaussWeights();
-			ve = 0;
-			for (int n=0; n<nint; ++n)
-			{
-				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
-				J = dom.detJt(el, n);
-
-				ve += J*w[n];
-			}
-			m_V0 += ve;
-		}
-	}
+	m_V0 = InitVolume();
 
 	// reset the logfile mode
 	felog.SetMode(nmode);
@@ -268,8 +273,15 @@ void FEMicroMaterial::FindBoundaryNodes()
 }
 
 //-----------------------------------------------------------------------------
+// This function adds pre-scribed displacements to the RVE model that will be
+// used to apply the displacement boundary conditions.
 bool FEMicroMaterial::PrepDisplacementBC()
 {
+	// clear any existing BCs
+	// (there shouldn't be any, but just to make sure)
+	m_mrve.ClearBCs();
+
+	// get the mesh
 	FEMesh& m = m_mrve.GetMesh();
 	int N = m.Nodes();
 
@@ -278,7 +290,8 @@ bool FEMicroMaterial::PrepDisplacementBC()
 	for (i=0; i<N; ++i) if (m_BN[i] == 1) ++NN;
 	m_num_ext_node = NN;
 
-	assert(NN > 0);
+	// Make sure we have boundary nodes
+	if (NN == 0) return false;
 
 	// create a load curve
 	FELoadCurve* plc = new FELoadCurve;
@@ -288,19 +301,28 @@ bool FEMicroMaterial::PrepDisplacementBC()
 	m_mrve.AddLoadCurve(plc);
 	int NLC = m_mrve.LoadCurves() - 1;
 
-	// create the DC's
-	NN = 0;
-	m_mrve.ClearBCs();
+	// get the dofs.
+	int dofX = m_mrve.GetDOFIndex("x");
+	int dofY = m_mrve.GetDOFIndex("y");
+	int dofZ = m_mrve.GetDOFIndex("z");
+
+	// create three BCs (one for x, y, and z)
+	FEPrescribedBC* pdx = new FEPrescribedBC(&m_mrve); pdx->SetDOF(dofX).SetLoadCurveIndex(NLC).SetScale(1.0);
+	FEPrescribedBC* pdy = new FEPrescribedBC(&m_mrve); pdy->SetDOF(dofY).SetLoadCurveIndex(NLC).SetScale(1.0);
+	FEPrescribedBC* pdz = new FEPrescribedBC(&m_mrve); pdz->SetDOF(dofZ).SetLoadCurveIndex(NLC).SetScale(1.0);
+
+	// Add them to the model
+	m_mrve.AddPrescribedBC(pdx);
+	m_mrve.AddPrescribedBC(pdy);
+	m_mrve.AddPrescribedBC(pdz);
+
+	// add the boundary nodes
 	for (i=0; i<N; ++i)
 		if (m_BN[i] == 1)
 		{
-			for (int j=0; j<3; ++j, ++NN)
-			{
-				FEPrescribedBC* pdc = new FEPrescribedBC(&m_mrve);
-				pdc->SetDOF(j).SetLoadCurveIndex(NLC).SetScale(0.0);
-				pdc->AddNode(i);
-				m_mrve.AddPrescribedBC(pdc);
-			}
+			pdx->AddNode(i);
+			pdy->AddNode(i);
+			pdz->AddNode(i);
 		}
 
 	return true;
@@ -347,21 +369,22 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 	FEMesh& m = rve.GetMesh();
 
 	// assign new DC's for the boundary nodes
-	int N = rve.PrescribedBCs()/3, i;
-	for (i=0; i<N; ++i)
+	for (int i=0; i<3; ++i)
 	{
-		FEPrescribedBC& dx = *rve.PrescribedBC(3*i  );
-		FEPrescribedBC& dy = *rve.PrescribedBC(3*i+1);
-		FEPrescribedBC& dz = *rve.PrescribedBC(3*i+2);
+		FEPrescribedBC& dc = *rve.PrescribedBC(i);
 
-		FENode& node = m.Node(dx.NodeID(0));
+		int n = dc.Items();
+		for (int j=0; j<n; ++j)
+		{
+			FENode& node = m.Node(dc.NodeID(j));
 
-		vec3d r0 = node.m_r0;
-		vec3d r1 = F*r0;
+			vec3d& r0 = node.m_r0;
+			vec3d r1 = F*r0;
 
-		dx.SetScale(r1.x - r0.x);
-		dy.SetScale(r1.y - r0.y);
-		dz.SetScale(r1.z - r0.z);
+			if      (i==0) dc.SetScale(r1.x - r0.x);
+			else if (i==1) dc.SetScale(r1.y - r0.y);
+			else if (i==2) dc.SetScale(r1.z - r0.z);
+		}
 	}
 
 	if (m_bperiodic)
@@ -434,7 +457,9 @@ mat3ds FEMicroMaterial::Stress1O(FEMaterialPoint &mp, int plot_on, int int_pt)
 	UpdateBC(mmpt.m_rve, F);
 
 	// solve the RVE
+	Logfile::MODE nmode = felog.GetMode(); felog.SetMode(Logfile::NEVER);
 	bool bret = mmpt.m_rve.Solve();
+	felog.SetMode(nmode);
 
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException();

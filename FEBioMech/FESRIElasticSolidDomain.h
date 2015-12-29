@@ -8,9 +8,6 @@ class FESRIElasticSolidDomain : public FEElasticSolidDomain
 public:
 	FESRIElasticSolidDomain(FEModel* pfem);
 
-	//! create a copy
-	FEDomain* Copy();
-
 public:
 	//! internal stress forces
 	virtual void ElementInternalForce(FESolidElement& el, vector<double>& fe);

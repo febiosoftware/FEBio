@@ -93,6 +93,8 @@ protected:
 	bool PrepPeriodicBC();
 	void FindBoundaryNodes();
 
+	double InitVolume();
+
 	void UpdateBC(FEModel& rve, mat3d& F);
 	
 	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint& pt);

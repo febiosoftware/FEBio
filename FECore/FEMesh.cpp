@@ -789,28 +789,3 @@ void FEMesh::DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom)
 		}
 	}
 }
-
-//-----------------------------------------------------------------------------
-//! Copy the mesh data from the passed mesh object
-void FEMesh::CopyFrom(FEMesh& mesh)
-{
-	// copy nodes
-	m_Node = mesh.m_Node;
-
-	// copy domains
-	// NOTE: This creates domains that don't have materials assigned to them
-	ClearDomains();
-	int ND = mesh.Domains();
-	for (int i=0; i<ND; ++i)
-	{
-		// copy this domain
-		FEDomain* pd = mesh.Domain(i).Copy();
-		assert(pd);
-
-		// assign the domain to this mesh
-		pd->SetMesh(this);
-
-		// add the domain
-		m_Domain.push_back(pd);
-	}	
-}

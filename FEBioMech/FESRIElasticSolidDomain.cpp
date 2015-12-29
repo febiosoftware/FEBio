@@ -9,17 +9,6 @@ FESRIElasticSolidDomain::FESRIElasticSolidDomain(FEModel* pfem) : FEElasticSolid
 }
 
 //-----------------------------------------------------------------------------
-//! create a copy (overridden from FEDomain).
-//! Node that this creates a copy without a material assignment
-FEDomain* FESRIElasticSolidDomain::Copy()
-{
-	FESRIElasticSolidDomain* pd = new FESRIElasticSolidDomain(m_pMat->GetFEModel());
-	pd->m_Elem = m_Elem;
-	pd->m_Node = m_Node;
-	return pd;
-}
-
-//-----------------------------------------------------------------------------
 void FESRIElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
 	// jacobian matrix, inverse jacobian matrix and determinants

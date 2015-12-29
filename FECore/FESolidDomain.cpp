@@ -4,6 +4,13 @@
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
+void FESolidDomain::CopyFrom(FEDomain* pd)
+{
+	FESolidDomain* psd = dynamic_cast<FESolidDomain*>(pd);
+	m_Elem = psd->m_Elem;
+}
+
+//-----------------------------------------------------------------------------
 // Reset data
 void FESolidDomain::Reset()
 {

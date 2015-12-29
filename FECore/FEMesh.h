@@ -228,9 +228,6 @@ public:
 	//! initialize mesh
 	bool Init();
 
-	//! copy the mesh
-	void CopyFrom(FEMesh& mesh);
-
 	//! allocate storage for mesh data
 	void CreateNodes(int nodes);
 	void AddNodes(int nodes);
