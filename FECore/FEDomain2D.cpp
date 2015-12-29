@@ -192,7 +192,10 @@ mat2d FEDomain2D::gradient(FEElement2D& el, vec2d* fn, int n)
     gradf.zero();
     int N = el.Nodes();
     for (int i=0; i<N; ++i)
-        gradf += dyad(fn[i], g1*Gr[i] + g2*Gs[i]);
+    {
+        vec2d tmp = g1*Gr[i] + g2*Gs[i];
+        gradf += dyad(fn[i], tmp);
+    }
     
     return gradf;
 }
