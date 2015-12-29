@@ -400,7 +400,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioHeat\FEBioHeat.h" />
-    <ClInclude Include="..\..\FEBioHeat\FEBioHeatData.h" />
     <ClInclude Include="..\..\FEBioHeat\FEConvectiveHeatFlux.h" />
     <ClInclude Include="..\..\FEBioHeat\FECoupledHeatSolidSolver.h" />
     <ClInclude Include="..\..\FEBioHeat\FEHeatDomainFactory.h" />
@@ -411,7 +410,6 @@
     <ClInclude Include="..\..\FEBioHeat\FEHeatTransferMaterial.h" />
     <ClInclude Include="..\..\FEBioHeat\FEIsotropicFourier.h" />
     <ClInclude Include="..\..\FEBioHeat\FEPlotHeatFlux.h" />
-    <ClInclude Include="..\..\FEBioHeat\FEPlotNodeTemperature.h" />
     <ClInclude Include="..\..\FEBioHeat\FEThermalConductivity.h" />
     <ClInclude Include="..\..\FEBioHeat\FEThermalElastic.h" />
     <ClInclude Include="..\..\FEBioHeat\FEThermoElasticMaterial.h" />
@@ -421,7 +419,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioHeat\FEBioHeat.cpp" />
-    <ClCompile Include="..\..\FEBioHeat\FEBioHeatData.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEConvectiveHeatFlux.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FECoupledHeatSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEHeatDomainFactory.cpp" />
@@ -431,7 +428,6 @@
     <ClCompile Include="..\..\FEBioHeat\FEHeatSource.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEIsotropicFourier.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEPlotHeatFlux.cpp" />
-    <ClCompile Include="..\..\FEBioHeat\FEPlotNodeTemperature.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEThermalConductivity.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEThermoElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEThermoElasticSolidDomain.cpp" />

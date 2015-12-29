@@ -372,9 +372,6 @@
     <ClInclude Include="..\..\FEBioMech\FEStickyInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEStiffnessMatrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEStVenantKirchhoff.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -917,9 +914,6 @@
     <ClCompile Include="..\..\FEBioMech\FEStickyInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEStiffnessMatrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEStVenantKirchhoff.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1092,6 +1086,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEMortarTiedContact.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEElasticDomain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
