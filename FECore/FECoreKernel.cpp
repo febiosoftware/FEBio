@@ -102,7 +102,7 @@ void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 			if (strcmp(pfac->GetTypeStr(), sztype) == 0) return pfac->CreateInstance(pfem);
 		}
 	}
-
+/*
 #ifdef _DEBUG
 	fprintf(stderr, "Unable to create class\n. These are the possible values:\n");
 	for (pf=m_Fac.begin(); pf!=m_Fac.end(); ++pf)
@@ -111,7 +111,7 @@ void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 	    if (pfac->GetSuperClassID() == id) fprintf(stderr, "%s\n", pfac->GetTypeStr());
 	  }
 #endif
-
+*/
 	return 0;
 }
 

@@ -376,14 +376,15 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 		int n = dc.Items();
 		for (int j=0; j<n; ++j)
 		{
-			FENode& node = m.Node(dc.NodeID(j));
+			int nid = dc.NodeID(j);
+			FENode& node = m.Node(nid);
 
 			vec3d& r0 = node.m_r0;
 			vec3d r1 = F*r0;
 
-			if      (i==0) dc.SetScale(r1.x - r0.x);
-			else if (i==1) dc.SetScale(r1.y - r0.y);
-			else if (i==2) dc.SetScale(r1.z - r0.z);
+			if      (i==0) dc.SetNodeScale(nid, r1.x - r0.x);
+			else if (i==1) dc.SetNodeScale(nid, r1.y - r0.y);
+			else if (i==2) dc.SetNodeScale(nid, r1.z - r0.z);
 		}
 	}
 
@@ -545,11 +546,13 @@ mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	int nbc = rve.PrescribedBCs();
-	for (int i=0; i<nbc/3; ++i)
+
+	// TODO: Don't use the BC for this. We should keep a list of all the boundary nodes
+	FEPrescribedBC& dc = *rve.PrescribedBC(0);
+	int n = dc.Items();
+	for (int j=0; j<n; ++j)
 	{
-		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
-		FENode& n = m.Node(dc.NodeID(0));
+		FENode& n = m.Node(dc.NodeID(j));
 		vec3d f;
 		f.x = R[-n.m_ID[dof_X]-2];
 		f.y = R[-n.m_ID[dof_Y]-2];
@@ -857,11 +860,11 @@ mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	int nbc = rve.PrescribedBCs();
-	for (int i=0; i<nbc/3; ++i)
+	FEPrescribedBC& dc = *rve.PrescribedBC(0);
+	int nitems = dc.Items();
+	for (int i=0; i<nitems; ++i)
 	{
-		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
-		FENode& n = m.Node(dc.NodeID(0));
+		FENode& n = m.Node(dc.NodeID(i));
 		vec3d f;
 		f.x = R[-n.m_ID[dof_X]-2];
 		f.y = R[-n.m_ID[dof_Y]-2];
@@ -920,11 +923,11 @@ mat3ds FEMicroMaterial::AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp)
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	int nbc = rve.PrescribedBCs();
-	for (int i=0; i<nbc/3; ++i)
+	FEPrescribedBC& dc = *rve.PrescribedBC(0);
+	int nitems = dc.Items();
+	for (int i=0; i<nitems; ++i)
 	{
-		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
-		FENode& n = m.Node(dc.NodeID(0));
+		FENode& n = m.Node(dc.NodeID(i));
 		vec3d f;
 		f.x = R[-n.m_ID[dof_X]-2];
 		f.y = R[-n.m_ID[dof_Y]-2];
