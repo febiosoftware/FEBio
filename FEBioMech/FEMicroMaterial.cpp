@@ -547,17 +547,20 @@ mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 
-	// TODO: Don't use the BC for this. We should keep a list of all the boundary nodes
-	FEPrescribedBC& dc = *rve.PrescribedBC(0);
-	int n = dc.Items();
-	for (int j=0; j<n; ++j)
+	// calculate the averaged stress
+	// TODO: This might be more efficient if we keep a list of boundary nodes
+	int NN = m.Nodes();
+	for (int j=0; j<NN; ++j)
 	{
-		FENode& n = m.Node(dc.NodeID(j));
-		vec3d f;
-		f.x = R[-n.m_ID[dof_X]-2];
-		f.y = R[-n.m_ID[dof_Y]-2];
-		f.z = R[-n.m_ID[dof_Z]-2];
-		T += f & n.m_rt;
+		if (m_BN[j]==1)
+		{
+			FENode& n = m.Node(j);
+			vec3d f;
+			f.x = R[-n.m_ID[dof_X]-2];
+			f.y = R[-n.m_ID[dof_Y]-2];
+			f.z = R[-n.m_ID[dof_Z]-2];
+			T += f & n.m_rt;
+		}
 	}
 
 	return T.sym() / (J*m_V0);
