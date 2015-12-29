@@ -382,9 +382,9 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 			vec3d& r0 = node.m_r0;
 			vec3d r1 = F*r0;
 
-			if      (i==0) dc.SetNodeScale(nid, r1.x - r0.x);
-			else if (i==1) dc.SetNodeScale(nid, r1.y - r0.y);
-			else if (i==2) dc.SetNodeScale(nid, r1.z - r0.z);
+			if      (i==0) dc.SetNodeScale(j, r1.x - r0.x);
+			else if (i==1) dc.SetNodeScale(j, r1.y - r0.y);
+			else if (i==2) dc.SetNodeScale(j, r1.z - r0.z);
 		}
 	}
 
