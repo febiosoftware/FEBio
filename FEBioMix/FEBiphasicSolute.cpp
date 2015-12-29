@@ -48,7 +48,7 @@ bool FEBiphasicSolute::Init()
 	m_pSolute->SetSoluteLocalID(0);
 
 	// Call base class which calls the Init member of all properties
-	FEMaterial::Init();
+	if (FEMaterial::Init() == false) return false;
 	
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");

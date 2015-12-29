@@ -137,7 +137,7 @@ public:
 	}
 
 	bool Init() { 
-		if (m_pmp) { m_pmp->Init(); return true;  }
+		if (m_pmp) { return m_pmp->Init(); }
 		return (m_brequired==false); 
 	}
 };
@@ -199,7 +199,11 @@ public:
 		if (m_pmp.empty() && m_brequired) return false;
 		for (size_t i=0; i<m_pmp.size(); ++i)
 		{
-			if (m_pmp[i]) m_pmp[i]->Init(); else return false;
+			if (m_pmp[i]) 
+			{
+				if (m_pmp[i]->Init() == false) return false;
+			}
+			else return false;
 		}
 		return true;
 	}

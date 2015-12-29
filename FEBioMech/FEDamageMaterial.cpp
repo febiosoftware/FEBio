@@ -30,10 +30,6 @@ bool FEDamageMaterial::Init()
     if (m_pMat != nullptr)
         return MaterialError("Elastic material should not be of type uncoupled");
     
-    if (m_pBase->Init() == false) return false;
-    if (m_pDamg->Init() == false) return false;
-    if (m_pCrit->Init() == false) return false;
-    
 	return FEElasticMaterial::Init();
 }
 

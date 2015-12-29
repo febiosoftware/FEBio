@@ -59,10 +59,6 @@ bool FEReactiveViscoelasticMaterial::Init()
     if (m_pMat != nullptr)
         return MaterialError("Bond material should not be of type uncoupled");
     
-    if (m_pBase->Init() == false) return false;
-    if (m_pBond->Init() == false) return false;
-    if (m_pRelx->Init() == false) return false;
-    
     return FEElasticMaterial::Init();
 }
 
