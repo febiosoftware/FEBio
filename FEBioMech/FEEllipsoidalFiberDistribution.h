@@ -14,9 +14,6 @@ class FEEllipsoidalFiberDistribution : public FEElasticMaterial
 public:
 	FEEllipsoidalFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem) {}
 	
-	//! Initialization
-	bool Init();
-
 	//! Cauchy stress
 	virtual mat3ds Stress(FEMaterialPoint& mp);
 

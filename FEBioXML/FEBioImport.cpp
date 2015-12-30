@@ -593,50 +593,59 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* sz
 	FEParam* pp = pl.Find((szparam == 0 ? tag.Name() : szparam));
 	if (pp)
 	{
-		switch (pp->m_itype)
+		if (pp->m_ndim == 1)
 		{
-		case FE_PARAM_DOUBLE : value(tag, pp->value<double>()); break;
-		case FE_PARAM_INT    : value(tag, pp->value<int   >()); break;
-		case FE_PARAM_BOOL   : value(tag, pp->value<bool  >()); break;
-		case FE_PARAM_VEC3D  : value(tag, pp->value<vec3d >()); break;
-		case FE_PARAM_MAT3D  : value(tag, pp->value<mat3d >()); break;
-		case FE_PARAM_MAT3DS : value(tag, pp->value<mat3ds>()); break;
-		case FE_PARAM_STRING : value(tag, pp->cvalue()); break;
-		case FE_PARAM_INTV   : value(tag, pp->pvalue<int   >(), pp->m_ndim); break;
-		case FE_PARAM_DOUBLEV: value(tag, pp->pvalue<double>(), pp->m_ndim); break;
-		case FE_PARAM_IMAGE_3D:
+			switch (pp->m_itype)
 			{
-				const char* szfile = tag.AttributeValue("file");
-				++tag;
-				int n[3] = {0};
-				do
+			case FE_PARAM_DOUBLE : value(tag, pp->value<double>()); break;
+			case FE_PARAM_INT    : value(tag, pp->value<int   >()); break;
+			case FE_PARAM_BOOL   : value(tag, pp->value<bool  >()); break;
+			case FE_PARAM_VEC3D  : value(tag, pp->value<vec3d >()); break;
+			case FE_PARAM_MAT3D  : value(tag, pp->value<mat3d >()); break;
+			case FE_PARAM_MAT3DS : value(tag, pp->value<mat3ds>()); break;
+			case FE_PARAM_STRING : value(tag, pp->cvalue()); break;
+			case FE_PARAM_IMAGE_3D:
 				{
-					if (tag == "size") tag.value(n, 3);
-					else throw XMLReader::InvalidTag(tag);
+					const char* szfile = tag.AttributeValue("file");
 					++tag;
-				}
-				while (!tag.isend());
-				Image& im = pp->value<Image>();
-				im.Create(n[0], n[1], n[2]);
+					int n[3] = {0};
+					do
+					{
+						if (tag == "size") tag.value(n, 3);
+						else throw XMLReader::InvalidTag(tag);
+						++tag;
+					}
+					while (!tag.isend());
+					Image& im = pp->value<Image>();
+					im.Create(n[0], n[1], n[2]);
 
-				// see if we need to pre-pend a path
-				char szin[512];
-				strcpy(szin, szfile);
-				char* ch = strrchr(szin, '\\');
-				if (ch==0) ch = strrchr(szin, '/');
-				if (ch==0)
-				{
-					// pre-pend the name with the input path
-					sprintf(szin, "%s%s", m_szpath, szfile);
-				}
+					// see if we need to pre-pend a path
+					char szin[512];
+					strcpy(szin, szfile);
+					char* ch = strrchr(szin, '\\');
+					if (ch==0) ch = strrchr(szin, '/');
+					if (ch==0)
+					{
+						// pre-pend the name with the input path
+						sprintf(szin, "%s%s", m_szpath, szfile);
+					}
 
-				// Try to load the image file
-				if (im.Load(szin) == false) throw XMLReader::InvalidValue(tag);
+					// Try to load the image file
+					if (im.Load(szin) == false) throw XMLReader::InvalidValue(tag);
+				}
+				break;
+			default:
+				assert(false);
+				return false;
 			}
-			break;
-		default:
-			assert(false);
-			return false;
+		}
+		else
+		{
+			switch (pp->m_itype)
+			{
+			case FE_PARAM_INT   : value(tag, pp->pvalue<int   >(), pp->m_ndim); break;
+			case FE_PARAM_DOUBLE: value(tag, pp->pvalue<double>(), pp->m_ndim); break;
+			}
 		}
 
 		int nattr = tag.m_natt;
@@ -685,35 +694,47 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam
 	FEParam* pp = pl.Find((szparam == 0 ? tag.Name() : szparam));
 	if (pp)
 	{
-		switch (pp->m_itype)
+		if (pp->m_ndim == 1)
 		{
-		case FE_PARAM_DOUBLE : value(tag, pp->value<double>() ); break;
-		case FE_PARAM_INT    : value(tag, pp->value<int   >() ); break;
-		case FE_PARAM_BOOL   : value(tag, pp->value<bool  >() ); break;
-		case FE_PARAM_VEC3D  : value(tag, pp->value<vec3d >() ); break;
-		case FE_PARAM_STRING : value(tag, pp->cvalue() ); break;
-		case FE_PARAM_INTV   : value(tag, pp->pvalue<int   >(), pp->m_ndim); break;
-		case FE_PARAM_DOUBLEV: value(tag, pp->pvalue<double>(), pp->m_ndim); break;
-		case FE_PARAM_IMAGE_3D:
+			switch (pp->m_itype)
 			{
-				const char* szfile = tag.AttributeValue("file");
-				++tag;
-				int n[3] = {0};
-				do
+			case FE_PARAM_DOUBLE : value(tag, pp->value<double>() ); break;
+			case FE_PARAM_INT    : value(tag, pp->value<int   >() ); break;
+			case FE_PARAM_BOOL   : value(tag, pp->value<bool  >() ); break;
+			case FE_PARAM_VEC3D  : value(tag, pp->value<vec3d >() ); break;
+			case FE_PARAM_STRING : value(tag, pp->cvalue() ); break;
+			case FE_PARAM_IMAGE_3D:
 				{
-					if (tag == "size") tag.value(n, 3);
-					else throw XMLReader::InvalidTag(tag);
+					const char* szfile = tag.AttributeValue("file");
 					++tag;
+					int n[3] = {0};
+					do
+					{
+						if (tag == "size") tag.value(n, 3);
+						else throw XMLReader::InvalidTag(tag);
+						++tag;
+					}
+					while (!tag.isend());
+					Image& im = pp->value<Image>();
+					im.Create(n[0], n[1], n[2]);
+					if (im.Load(szfile) == false) throw XMLReader::InvalidValue(tag);
 				}
-				while (!tag.isend());
-				Image& im = pp->value<Image>();
-				im.Create(n[0], n[1], n[2]);
-				if (im.Load(szfile) == false) throw XMLReader::InvalidValue(tag);
+				break;
+			default:
+				assert(false);
+				return false;
 			}
-			break;
-		default:
-			assert(false);
-			return false;
+		}
+		else
+		{
+			switch (pp->m_itype)
+			{
+			case FE_PARAM_INT   : value(tag, pp->pvalue<int   >(), pp->m_ndim); break;
+			case FE_PARAM_DOUBLE: value(tag, pp->pvalue<double>(), pp->m_ndim); break;
+			default:
+				assert(false);
+				return false;
+			}
 		}
 
 		int nattr = tag.m_natt;

@@ -28,7 +28,7 @@ void FECoordSysMap::Init() {}
 //-----------------------------------------------------------------------------
 
 BEGIN_PARAMETER_LIST(FELocalMap, FECoordSysMap)
-	ADD_PARAMETERV(m_n, FE_PARAM_INTV, 3, "local");
+	ADD_PARAMETERV(m_n, FE_PARAM_INT, 3, "local");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -8,7 +8,7 @@ BEGIN_PARAMETER_LIST(FEDistanceConstraint, FENLConstraint);
 	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon" ); 
 	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "augtol" );
 	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty");
-	ADD_PARAMETERV(m_node  , FE_PARAM_INTV  , 2, "node");
+	ADD_PARAMETERV(m_node  , FE_PARAM_INT   , 2, "node");
 	ADD_PARAMETER(m_nminaug, FE_PARAM_DOUBLE, "minaug");
 	ADD_PARAMETER(m_nmaxaug, FE_PARAM_DOUBLE, "maxaug");
 END_PARAMETER_LIST();

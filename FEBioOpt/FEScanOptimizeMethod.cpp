@@ -4,7 +4,7 @@
 #include "FECore/log.h"
 
 BEGIN_PARAMETER_LIST(FEScanOptimizeMethod, FEOptimizeMethod)
-	ADD_PARAMETERV(m_inc, FE_PARAM_DOUBLEV, 32, "inc");
+	ADD_PARAMETERV(m_inc, FE_PARAM_DOUBLE, 32, "inc");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

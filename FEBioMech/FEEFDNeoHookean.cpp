@@ -5,8 +5,8 @@
 BEGIN_PARAMETER_LIST(FEEFDNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_NH.m_E, FE_PARAM_DOUBLE, "E");
 	ADD_PARAMETER(m_NH.m_v, FE_PARAM_DOUBLE, "v");
-	ADD_PARAMETERV(m_EFD.m_beta, FE_PARAM_DOUBLEV, 3, "beta");
-	ADD_PARAMETERV(m_EFD.m_ksi , FE_PARAM_DOUBLEV, 3, "ksi" );
+	ADD_PARAMETERV(m_EFD.m_beta, FE_PARAM_DOUBLE, 3, "beta");
+	ADD_PARAMETERV(m_EFD.m_ksi , FE_PARAM_DOUBLE, 3, "ksi" );
 END_PARAMETER_LIST();
 
 //////////////////////////////////////////////////////////////////////
@@ -69,8 +69,8 @@ double FEEFDNeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
 BEGIN_PARAMETER_LIST(FEEFDNeoHookeanOld, FEElasticMaterial)
 	ADD_PARAMETER(m_NH.m_E, FE_PARAM_DOUBLE, "E");
 	ADD_PARAMETER(m_NH.m_v, FE_PARAM_DOUBLE, "v");
-	ADD_PARAMETERV(m_EFD.m_beta, FE_PARAM_DOUBLEV, 3, "beta");
-	ADD_PARAMETERV(m_EFD.m_ksi , FE_PARAM_DOUBLEV, 3, "ksi" );
+	ADD_PARAMETERV(m_EFD.m_beta, FE_PARAM_DOUBLE, 3, "beta");
+	ADD_PARAMETERV(m_EFD.m_ksi , FE_PARAM_DOUBLE, 3, "ksi" );
 END_PARAMETER_LIST();
 
 bool FEEFDNeoHookeanOld::Init()

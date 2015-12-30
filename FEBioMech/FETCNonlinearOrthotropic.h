@@ -33,9 +33,6 @@ public:
 	//! Strain energy density
 	double DevStrainEnergyDensity(FEMaterialPoint& mp);
     
-	//! data initialization and checking
-	bool Init();
-
 public:
 	double	m_beta[3];
 	double	m_ksi[3];

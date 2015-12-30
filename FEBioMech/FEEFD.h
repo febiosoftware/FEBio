@@ -20,9 +20,6 @@ class FEEFD : public FEElasticMaterial
 public:
 	FEEFD(FEModel* pfem) : FEElasticMaterial(pfem) {}
 	
-	//! Initialization
-	bool Init();
-    
 	//! Cauchy stress
 	mat3ds Stress(FEMaterialPoint& mp);
     

@@ -42,8 +42,6 @@ class FEEllipsodialFiberDensityDistribution : public FEFiberDensityDistribution
 public:
     FEEllipsodialFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_spa[0] = m_spa[1] = m_spa[2] = 1; }
     
-    bool Init();
-    
     double FiberDensity(const vec3d n0);
     
 public:

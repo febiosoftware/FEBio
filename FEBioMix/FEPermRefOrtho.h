@@ -19,9 +19,6 @@ public:
 	//! Tangent of permeability
 	tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp);
 		
-	//! data initialization and checking
-	bool Init();
-		
 public:
 	double	m_perm0;		//!< permeability for I term
 	double	m_perm1[3];		//!< permeability for b term

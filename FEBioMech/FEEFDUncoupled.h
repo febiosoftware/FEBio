@@ -8,9 +8,6 @@ class FEEFDUncoupled : public FEUncoupledMaterial
 public:
 	FEEFDUncoupled(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
-	//! Initialization
-	bool Init();
-
 	//! deviatoric Cauchy stress
 	mat3ds DevStress(FEMaterialPoint& pt);
 

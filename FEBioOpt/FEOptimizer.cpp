@@ -19,17 +19,29 @@ bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 	FEParam* pp = pl.Find(tag.Name());
 	if (pp == 0) return false;
 
-	switch (pp->m_itype)
+	if (pp->m_ndim == 1)
 	{
-	case FE_PARAM_DOUBLE : tag.value(pp->value<double>() ); break;
-	case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
-	case FE_PARAM_BOOL   : tag.value(pp->value<bool  >() ); break;
-	case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
-	case FE_PARAM_INTV   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
-	case FE_PARAM_DOUBLEV: tag.value(pp->pvalue<double>(), pp->m_ndim); break;
-	default:
-		assert(false);
-		return false;
+		switch (pp->m_itype)
+		{
+		case FE_PARAM_DOUBLE : tag.value(pp->value<double>() ); break;
+		case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
+		case FE_PARAM_BOOL   : tag.value(pp->value<bool  >() ); break;
+		case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
+		default:
+			assert(false);
+			return false;
+		}
+	}
+	else
+	{
+		switch (pp->m_itype)
+		{
+		case FE_PARAM_INT   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
+		case FE_PARAM_DOUBLE: tag.value(pp->pvalue<double>(), pp->m_ndim); break;
+		default:
+			assert(false);
+			return false;
+		}
 	}
 
 	int nattr = tag.m_natt;

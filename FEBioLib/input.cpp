@@ -23,48 +23,59 @@ void print_parameter(FEParam& p)
 	char sz[512] = {0};
 	int l = strlen(p.m_szname);
 	sprintf(sz, "\t%-*s %.*s", l, p.m_szname, 50-l, "..................................................");
-	switch (p.m_itype)
+	if (p.m_ndim == 1)
 	{
-	case FE_PARAM_DOUBLE : felog.printf("%s : %lg\n", sz, p.value<double>()); break;
-	case FE_PARAM_INT    : felog.printf("%s : %d\n" , sz, p.value<int   >()); break;
-	case FE_PARAM_BOOL   : felog.printf("%s : %d\n" , sz, (int) p.value<bool  >()); break;
-	case FE_PARAM_STRING : felog.printf("%s : %s\n" , sz, p.cvalue()); break;
-	case FE_PARAM_VEC3D  :
+		switch (p.m_itype)
 		{
-			vec3d v = p.value<vec3d>();
-			felog.printf("%s : %lg,%lg,%lg\n", sz, v.x, v.y, v.z);
-		}
-		break;
-	case FE_PARAM_MAT3DS :
-		{
-			mat3ds m = p.value<mat3ds>();
-			felog.printf("%s : %lg,%lg,%lg,%lg,%lg,%lg\n", sz, m.xx(), m.yy(), m.zz(), m.xy(), m.yz(), m.xz());
-		}
-		break;
-	case FE_PARAM_MAT3D:
-		{
-			mat3d m = p.value<mat3d>();
-			felog.printf("%s : %lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg\n", sz, m(0,0), m(0,1), m(0,2), m(1,0), m(1,1), m(1,2), m(2,0), m(2,1), m(2,2));
-		}
-		break;
-	case FE_PARAM_INTV   :
-	case FE_PARAM_DOUBLEV:
-		{
-			int n = p.m_ndim;
-			felog.printf("%s : ", sz);
-			for (int k=0; k<n; ++k)
+		case FE_PARAM_DOUBLE : felog.printf("%s : %lg\n", sz, p.value<double>()); break;
+		case FE_PARAM_INT    : felog.printf("%s : %d\n" , sz, p.value<int   >()); break;
+		case FE_PARAM_BOOL   : felog.printf("%s : %d\n" , sz, (int) p.value<bool  >()); break;
+		case FE_PARAM_STRING : felog.printf("%s : %s\n" , sz, p.cvalue()); break;
+		case FE_PARAM_VEC3D  :
 			{
-				switch (p.m_itype)
-				{
-				case FE_PARAM_INTV   : felog.printf("%d", p.pvalue<int   >()[k]); break;
-				case FE_PARAM_DOUBLEV: felog.printf("%lg", p.pvalue<double>()[k]); break;
-				}
-				if (k!=n-1) felog.printf(","); else felog.printf("\n");
+				vec3d v = p.value<vec3d>();
+				felog.printf("%s : %lg,%lg,%lg\n", sz, v.x, v.y, v.z);
 			}
+			break;
+		case FE_PARAM_MAT3DS :
+			{
+				mat3ds m = p.value<mat3ds>();
+				felog.printf("%s : %lg,%lg,%lg,%lg,%lg,%lg\n", sz, m.xx(), m.yy(), m.zz(), m.xy(), m.yz(), m.xz());
+			}
+			break;
+		case FE_PARAM_MAT3D:
+			{
+				mat3d m = p.value<mat3d>();
+				felog.printf("%s : %lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg\n", sz, m(0,0), m(0,1), m(0,2), m(1,0), m(1,1), m(1,2), m(2,0), m(2,1), m(2,2));
+			}
+			break;
+		default:
+			assert(false);
 		}
-		break;
-	default:
-		assert(false);
+	}
+	else
+	{
+		switch (p.m_itype)
+		{
+		case FE_PARAM_INT:
+		case FE_PARAM_DOUBLE:
+			{
+				int n = p.m_ndim;
+				felog.printf("%s : ", sz);
+				for (int k=0; k<n; ++k)
+				{
+					switch (p.m_itype)
+					{
+					case FE_PARAM_INT   : felog.printf("%d" , p.pvalue<int   >()[k]); break;
+					case FE_PARAM_DOUBLE: felog.printf("%lg", p.pvalue<double>()[k]); break;
+					}
+					if (k!=n-1) felog.printf(","); else felog.printf("\n");
+				}
+			}
+			break;
+		default:
+			assert(false);
+		}
 	}
 }
 

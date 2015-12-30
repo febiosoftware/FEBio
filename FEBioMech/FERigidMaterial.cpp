@@ -9,9 +9,9 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FERigidMaterial, FESolidMaterial)
-	ADD_PARAMETER(m_density, FE_PARAM_DOUBLE, "density"       );
-	ADD_PARAMETER(m_E      , FE_PARAM_DOUBLE, "E"             );
-	ADD_PARAMETER(m_v      , FE_PARAM_DOUBLE, "v"             );
+	ADD_PARAMETER2(m_density, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "density"       );
+	ADD_PARAMETER2(m_E      , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E"             );
+	ADD_PARAMETER2(m_v      , FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v"             );
 	ADD_PARAMETER(m_pmid   , FE_PARAM_INT   , "parent_id"     );
 	ADD_PARAMETER(m_rc     , FE_PARAM_VEC3D , "center_of_mass");
 END_PARAMETER_LIST();
@@ -42,9 +42,6 @@ void FERigidMaterial::SetParameter(FEParam& p)
 bool FERigidMaterial::Init()
 {
 	if (FESolidMaterial::Init() == false) return false;
-
-	if (m_E <= 0) return MaterialError("Invalid value for E");
-	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) return MaterialError("Invalid value for v");
 
 	if (m_binit == false)
 	{

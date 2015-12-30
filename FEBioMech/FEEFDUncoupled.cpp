@@ -15,21 +15,9 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEEFDUncoupled, FEUncoupledMaterial)
-	ADD_PARAMETERV(m_beta, FE_PARAM_DOUBLEV, 3, "beta");
-	ADD_PARAMETERV(m_ksi , FE_PARAM_DOUBLEV, 3, "ksi" );
+	ADD_PARAMETERV2(m_beta, FE_PARAM_DOUBLE, 3, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
+	ADD_PARAMETERV2(m_ksi , FE_PARAM_DOUBLE, 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" );
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-bool FEEFDUncoupled::Init()
-{
-	if (m_ksi[0] < 0) return MaterialError("ksi1 must be positive.");
-	if (m_ksi[1] < 0) return MaterialError("ksi2 must be positive.");
-	if (m_ksi[2] < 0) return MaterialError("ksi3 must be positive.");
-	if (m_beta[0] < 2) return MaterialError("beta1 must be greater than 2.");
-	if (m_beta[1] < 2) return MaterialError("beta1 must be greater than 2.");
-	if (m_beta[2] < 2) return MaterialError("beta1 must be greater than 2.");
-	return FEUncoupledMaterial::Init();
-}
 
 //-----------------------------------------------------------------------------
 mat3ds FEEFDUncoupled::DevStress(FEMaterialPoint& mp)

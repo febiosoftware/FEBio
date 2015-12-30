@@ -4,40 +4,80 @@
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
+bool is_inside_range_int(int ival, FEParamRange rng, int imin, int imax)
+{
+	switch (rng)
+	{
+	case FE_GREATER         : return (ival >  imin); break;
+	case FE_GREATER_OR_EQUAL: return (ival >= imin); break;
+	case FE_LESS            : return (ival <  imin); break;
+	case FE_LESS_OR_EQUAL   : return (ival <= imin); break;
+	case FE_OPEN            : return ((ival >  imin) && (ival <  imax)); break;
+	case FE_CLOSED          : return ((ival >= imin) && (ival <= imax)); break;
+	case FE_LEFT_OPEN       : return ((ival >  imin) && (ival <= imax)); break;
+	case FE_RIGHT_OPEN      : return ((ival >= imin) && (ival <  imax)); break;
+	case FE_NOT_EQUAL       : return (ival != imin); break;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool is_inside_range_double(double val, FEParamRange rng, double dmin, double dmax)
+{
+	switch (rng)
+	{
+	case FE_GREATER         : return (val >  dmin); break;
+	case FE_GREATER_OR_EQUAL: return (val >= dmin); break;
+	case FE_LESS            : return (val <  dmin); break;
+	case FE_LESS_OR_EQUAL   : return (val <= dmin); break;
+	case FE_OPEN            : return ((val >  dmin) && (val <  dmax)); break;
+	case FE_CLOSED          : return ((val >= dmin) && (val <= dmax)); break;
+	case FE_LEFT_OPEN       : return ((val >  dmin) && (val <= dmax)); break;
+	case FE_RIGHT_OPEN      : return ((val >= dmin) && (val <  dmax)); break;
+	case FE_NOT_EQUAL       : return (val != dmin); break;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 bool FEParam::is_inside_range()
 {
 	if (m_irange == FE_DONT_CARE) return true;
 
-	if (m_itype == FE_PARAM_INT)
+	if (m_ndim == 1)
 	{
-		int ival = value<int>();
-		switch (m_irange)
+		if (m_itype == FE_PARAM_INT)
 		{
-		case FE_GREATER         : return (ival >  m_imin); break;
-		case FE_GREATER_OR_EQUAL: return (ival >= m_imin); break;
-		case FE_LESS            : return (ival <  m_imin); break;
-		case FE_LESS_OR_EQUAL   : return (ival <= m_imin); break;
-		case FE_OPEN            : return ((ival >  m_imin) && (ival <  m_imax)); break;
-		case FE_CLOSED          : return ((ival >= m_imin) && (ival <= m_imax)); break;
-		case FE_LEFT_OPEN       : return ((ival >  m_imin) && (ival <= m_imax)); break;
-		case FE_RIGHT_OPEN      : return ((ival >= m_imin) && (ival <  m_imax)); break;
-		case FE_NOT_EQUAL       : return (ival != m_imin); break;
+			int ival = value<int>();
+			return is_inside_range_int(ival, m_irange, m_imin, m_imax);
+		}
+		else if (m_itype == FE_PARAM_DOUBLE)
+		{
+			double val = value<double>();
+			return is_inside_range_double(val, m_irange, m_dmin, m_dmax);
 		}
 	}
-	else if (m_itype == FE_PARAM_DOUBLE)
+	else
 	{
-		double val = value<double>();
-		switch (m_irange)
+		if (m_itype == FE_PARAM_INT)
 		{
-		case FE_GREATER         : return (val >  m_dmin); break;
-		case FE_GREATER_OR_EQUAL: return (val >= m_dmin); break;
-		case FE_LESS            : return (val <  m_dmin); break;
-		case FE_LESS_OR_EQUAL   : return (val <= m_dmin); break;
-		case FE_OPEN            : return ((val >  m_dmin) && (val <  m_dmax)); break;
-		case FE_CLOSED          : return ((val >= m_dmin) && (val <= m_dmax)); break;
-		case FE_LEFT_OPEN       : return ((val >  m_dmin) && (val <= m_dmax)); break;
-		case FE_RIGHT_OPEN      : return ((val >= m_dmin) && (val <  m_dmax)); break;
-		case FE_NOT_EQUAL       : return (val != m_dmin); break;
+			for (int i=0; i<m_ndim; ++i)
+			{
+				int val = *(pvalue<int>(i));
+				bool b = is_inside_range_int(val, m_irange, m_imin, m_imax);
+				if (b == false) return false;
+			}
+			return true;
+		}
+		else if (m_itype == FE_PARAM_DOUBLE)
+		{
+			for (int i=0; i<m_ndim; ++i)
+			{
+				double val = *(pvalue<double>(i));
+				bool b = is_inside_range_double(val, m_irange, m_dmin, m_dmax);;
+				if (b == false) return false;
+			}
+			return true;
 		}
 	}
 
@@ -63,26 +103,37 @@ void FEParameterList::operator = (FEParameterList& l)
 
 		if (s.m_itype != d.m_itype) { assert(false); return; }
 		if (s.m_ndim != d.m_ndim) { assert(false); return; }
-		switch (s.m_itype)
+		if (s.m_ndim == 1)
 		{
-		case FE_PARAM_INT   : d.value<int   >() = s.value<int   >(); break;
-		case FE_PARAM_BOOL  : d.value<bool  >() = s.value<bool  >(); break;
-		case FE_PARAM_DOUBLE: d.value<double>() = s.value<double>(); break;
-		case FE_PARAM_VEC3D : d.value<vec3d >() = s.value<vec3d >(); break;
-		case FE_PARAM_MAT3D : d.value<mat3d >() = s.value<mat3d >(); break;
-		case FE_PARAM_MAT3DS: d.value<mat3ds>() = s.value<mat3ds>(); break;
-		case FE_PARAM_INTV  :
+			switch (s.m_itype)
 			{
-				for (int i=0; i<s.m_ndim; ++i) d.pvalue<int>()[i] = s.pvalue<int>()[i];
+			case FE_PARAM_INT   : d.value<int   >() = s.value<int   >(); break;
+			case FE_PARAM_BOOL  : d.value<bool  >() = s.value<bool  >(); break;
+			case FE_PARAM_DOUBLE: d.value<double>() = s.value<double>(); break;
+			case FE_PARAM_VEC3D : d.value<vec3d >() = s.value<vec3d >(); break;
+			case FE_PARAM_MAT3D : d.value<mat3d >() = s.value<mat3d >(); break;
+			case FE_PARAM_MAT3DS: d.value<mat3ds>() = s.value<mat3ds>(); break;
+			default:
+				assert(false);
 			}
-			break;
-		case FE_PARAM_DOUBLEV:
+		}
+		else
+		{
+			switch (s.m_itype)
 			{
-				for (int i=0; i<s.m_ndim; ++i) d.pvalue<double>()[i] = s.pvalue<double>()[i];
+			case FE_PARAM_INT:
+				{
+					for (int i=0; i<s.m_ndim; ++i) d.pvalue<int>()[i] = s.pvalue<int>()[i];
+				}
+				break;
+			case FE_PARAM_DOUBLE:
+				{
+					for (int i=0; i<s.m_ndim; ++i) d.pvalue<double>()[i] = s.pvalue<double>()[i];
+				}
+				break;
+			default:
+				assert(false);
 			}
-			break;
-		default:
-			assert(false);
 		}
 	}
 }
@@ -323,31 +374,41 @@ void FEParamContainer::Serialize(DumpFile& ar)
 			ar << p.m_scl;
 			ar << p.m_vscl;
 			ar << (int) p.m_itype;
-			switch (p.m_itype)
+			ar << p.m_ndim;
+			if (p.m_ndim == 1)
 			{
-			case FE_PARAM_INT   : ar << p.value<int   >(); break;
-			case FE_PARAM_BOOL  : ar << p.value<bool  >(); break;
-			case FE_PARAM_DOUBLE: ar << p.value<double>(); break;
-			case FE_PARAM_VEC3D : ar << p.value<vec3d >(); break;
-			case FE_PARAM_MAT3D : ar << p.value<mat3d >(); break;
-			case FE_PARAM_MAT3DS: ar << p.value<mat3ds>(); break;
-			case FE_PARAM_STRING: ar << (const char*) p.m_pv; break;
-			case FE_PARAM_INTV:
+				switch (p.m_itype)
 				{
-					int* pi = (int*) p.m_pv;
-					ar << p.m_ndim;
-					for (int i=0; i<p.m_ndim; ++i) ar << pi[i];
+				case FE_PARAM_INT   : ar << p.value<int   >(); break;
+				case FE_PARAM_BOOL  : ar << p.value<bool  >(); break;
+				case FE_PARAM_DOUBLE: ar << p.value<double>(); break;
+				case FE_PARAM_VEC3D : ar << p.value<vec3d >(); break;
+				case FE_PARAM_MAT3D : ar << p.value<mat3d >(); break;
+				case FE_PARAM_MAT3DS: ar << p.value<mat3ds>(); break;
+				case FE_PARAM_STRING: ar << (const char*) p.m_pv; break;
+				default:
+					assert(false);
 				}
-				break;
-			case FE_PARAM_DOUBLEV:
+			}
+			else
+			{
+				switch (p.m_itype)
 				{
-					double* pv = (double*) p.m_pv;
-					ar << p.m_ndim;
-					for (int i=0; i<p.m_ndim; ++i) ar << pv[i];
+				case FE_PARAM_INT:
+					{
+						int* pi = (int*) p.m_pv;
+						for (int i=0; i<p.m_ndim; ++i) ar << pi[i];
+					}
+					break;
+				case FE_PARAM_DOUBLE:
+					{
+						double* pv = (double*) p.m_pv;
+						for (int i=0; i<p.m_ndim; ++i) ar << pv[i];
+					}
+					break;
+				default:
+					assert(false);
 				}
-				break;
-			default:
-				assert(false);
 			}
 		}
 	}
@@ -366,38 +427,45 @@ void FEParamContainer::Serialize(DumpFile& ar)
 				ar >> p.m_nlc;
 				ar >> p.m_scl;
 				ar >> p.m_vscl;
-				int ntype;
+				int ntype, ndim;
 				ar >> ntype;
+				ar >> ndim;
+				if (ndim != p.m_ndim) throw DumpFile::ReadError();
 				if (ntype != p.m_itype) throw DumpFile::ReadError();
-				switch (p.m_itype)
+				if (p.m_ndim == 1)
 				{
-				case FE_PARAM_INT   : ar >> p.value<int   >(); break;
-				case FE_PARAM_BOOL  : ar >> p.value<bool  >(); break;
-				case FE_PARAM_DOUBLE: ar >> p.value<double>(); break;
-				case FE_PARAM_VEC3D : ar >> p.value<vec3d >(); break;
-				case FE_PARAM_MAT3D : ar >> p.value<mat3d >(); break;
-				case FE_PARAM_MAT3DS: ar >> p.value<mat3ds>(); break;
-				case FE_PARAM_STRING: ar >> (char*) p.m_pv; break;
-				case FE_PARAM_INTV:
+					switch (p.m_itype)
 					{
-						int* pi = (int*) p.m_pv;
-						int ndim;
-						ar >> ndim;
-						if (ndim != p.m_ndim) throw DumpFile::ReadError();
-						for (int i=0; i<p.m_ndim; ++i) ar >> pi[i];
+					case FE_PARAM_INT   : ar >> p.value<int   >(); break;
+					case FE_PARAM_BOOL  : ar >> p.value<bool  >(); break;
+					case FE_PARAM_DOUBLE: ar >> p.value<double>(); break;
+					case FE_PARAM_VEC3D : ar >> p.value<vec3d >(); break;
+					case FE_PARAM_MAT3D : ar >> p.value<mat3d >(); break;
+					case FE_PARAM_MAT3DS: ar >> p.value<mat3ds>(); break;
+					case FE_PARAM_STRING: ar >> (char*) p.m_pv; break;
+					default:
+						assert(false);
 					}
-					break;
-				case FE_PARAM_DOUBLEV:
+				}
+				else
+				{
+					switch (p.m_itype)
 					{
-						double* pv = (double*) p.m_pv;
-						int ndim;
-						ar >> ndim;
-						if (ndim != p.m_ndim) throw DumpFile::ReadError();
-						for (int i=0; i<p.m_ndim; ++i) ar >> pv[i];
+					case FE_PARAM_INT:
+						{
+							int* pi = (int*) p.m_pv;
+							for (int i=0; i<p.m_ndim; ++i) ar >> pi[i];
+						}
+						break;
+					case FE_PARAM_DOUBLE:
+						{
+							double* pv = (double*) p.m_pv;
+							for (int i=0; i<p.m_ndim; ++i) ar >> pv[i];
+						}
+						break;
+					default:
+						assert(false);
 					}
-					break;
-				default:
-					assert(false);
 				}
 			}
 		}

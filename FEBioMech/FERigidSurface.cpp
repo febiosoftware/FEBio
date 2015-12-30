@@ -7,7 +7,7 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEPlane, FERigidSurface)
-	ADD_PARAMETERV(a, FE_PARAM_DOUBLEV, 4, "plane");
+	ADD_PARAMETERV(a, FE_PARAM_DOUBLE, 4, "plane");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

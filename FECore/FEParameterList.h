@@ -20,8 +20,6 @@ enum FEParamType {
 	FE_PARAM_MAT3DS,
 	FE_PARAM_IMAGE_3D,
 	FE_PARAM_STRING,
-	FE_PARAM_INTV = 100,
-	FE_PARAM_DOUBLEV,
 };
 
 //-----------------------------------------------------------------------------
@@ -106,12 +104,10 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Retrieves a pointer to element in array
-//! \todo only works with doubles for now
 template<class T> inline T* FEParam::pvalue(int n)
 {
-	assert((m_itype==FE_PARAM_DOUBLE)||(m_itype==FE_PARAM_DOUBLEV));
 	assert((n >= 0) && (n < m_ndim));
-	return &(pvalue<double>()[n]);
+	return &(pvalue<T>()[n]);
 }
 
 //-----------------------------------------------------------------------------
@@ -288,6 +284,12 @@ protected: \
 // the ADD_PARAMETER2 macro adds a parameter with range checking to the parameter list
 #define ADD_PARAMETER2(theParam, theType, theRange, theName) \
 	AddParameter(&theParam, theType, 1, theRange, theName);
+
+// the ADD_PARAMETERV macro adds a parameter to the paramter list
+// that is an array
+#define ADD_PARAMETERV2(theParam, theType, theDim, theRange, theName) \
+	AddParameter(theParam, theType, theDim, theRange, theName);
+
 
 // the END_PARAMETER_LIST defines the end of a parameter list
 #define END_PARAMETER_LIST() \

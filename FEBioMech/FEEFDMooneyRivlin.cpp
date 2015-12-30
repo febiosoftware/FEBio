@@ -5,8 +5,8 @@
 BEGIN_PARAMETER_LIST(FEEFDMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_MR.c1, FE_PARAM_DOUBLE, "c1");
 	ADD_PARAMETER(m_MR.c2, FE_PARAM_DOUBLE, "c2");
-	ADD_PARAMETERV(m_EFD.m_beta, FE_PARAM_DOUBLEV, 3, "beta");
-	ADD_PARAMETERV(m_EFD.m_ksi , FE_PARAM_DOUBLEV, 3, "ksi" );
+	ADD_PARAMETERV(m_EFD.m_beta, FE_PARAM_DOUBLE, 3, "beta");
+	ADD_PARAMETERV(m_EFD.m_ksi , FE_PARAM_DOUBLE, 3, "ksi" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
