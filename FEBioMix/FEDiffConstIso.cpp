@@ -14,10 +14,10 @@ FEDiffConstIso::FEDiffConstIso(FEModel* pfem) : FESoluteDiffusivity(pfem)
 }
 
 //-----------------------------------------------------------------------------
-//! Initialization. 
-bool FEDiffConstIso::Init()
+//! Validation
+bool FEDiffConstIso::Validate()
 {
-	if (FESoluteDiffusivity::Init() == false) return false;
+	if (FESoluteDiffusivity::Validate() == false) return false;
 	if (m_free_diff < m_diff) return MaterialError("free_diff must be >= diff");
 	return true;
 }

@@ -357,6 +357,10 @@ bool FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
 //-----------------------------------------------------------------------------
 bool FEMultiphasic::Init()
 {
+	// call the base class.
+	// This also initializes all properties
+	if (FEMaterial::Init() == false) return false;
+
 	// set the solute IDs first, since they are referenced in FESolute::Init()
 	for (int i=0; i<Solutes(); ++i) {
         m_pSolute[i]->SetSoluteLocalID(i);
@@ -367,10 +371,6 @@ bool FEMultiphasic::Init()
 	{
 		if (InitializeReaction(m_pReact[i]) == false) return false;
 	}
-
-	// call the base class.
-	// This also initializes all properties
-	if (FEMaterial::Init() == false) return false;
 
 	// Determine how to solve for the electric potential psi
 	int isol;

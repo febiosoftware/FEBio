@@ -34,11 +34,10 @@ bool FESolver::InitStep(double time)
 	// evaluate the parameter lists
 	fem.EvaluateAllParameterLists();
 
-	// re-initialize materials
-	// TODO: I need to do this since the material parameters can have changed and thus a new initialization
-	//       needs to be done to see if the material parameters are still valid. I would like to add value checking
-	//       directly in the parameter evaluation above so this can be removed.
-	if (fem.InitMaterials() == false) return false;
+	// re-validate materials
+	// This is necessary since the material parameters can have changed (e.g. via load curves) and thus 
+	// a new validation needs to be done to see if the material parameters are still valid. 
+	if (fem.ValidateMaterials() == false) return false;
 
 	return true;
 }

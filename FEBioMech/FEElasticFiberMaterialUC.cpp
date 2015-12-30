@@ -22,10 +22,10 @@ BEGIN_PARAMETER_LIST(FEFiberExponentialPowerUC, FEElasticFiberMaterialUC)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-bool FEFiberExponentialPowerUC::Init()
+bool FEFiberExponentialPowerUC::Validate()
 {
 	if ((4*m_ksi + 2*m_mu) < 0) return MaterialError("4*ksi+2*mu must be positive.");
-    return FEElasticFiberMaterialUC::Init();
+    return FEElasticFiberMaterialUC::Validate();
 }
 
 //-----------------------------------------------------------------------------
@@ -193,15 +193,8 @@ double FEFiberExponentialPowerUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberNHUC, FEElasticFiberMaterialUC)
-    ADD_PARAMETER(m_mu, FE_PARAM_DOUBLE, "mu");
+    ADD_PARAMETER2(m_mu, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-bool FEFiberNHUC::Init()
-{
-	if (m_mu < 0) return MaterialError("mu must be positive.");
-    return FEElasticFiberMaterialUC::Init();
-}
 
 //-----------------------------------------------------------------------------
 mat3ds FEFiberNHUC::DevStress(FEMaterialPoint& mp)

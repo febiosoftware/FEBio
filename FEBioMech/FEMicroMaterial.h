@@ -65,7 +65,6 @@ public:
 	FEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
 
 protected:
-	bool	m_brve;			//!< flag indicating whether RVE was read in
 	double	m_V0;			//!< initial volume of RVE
 	vector<int> m_BN;		//!< boundary node flags
 

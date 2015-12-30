@@ -28,9 +28,9 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Check material parameters.
-bool FEOrthotropicCLE::Init()
+bool FEOrthotropicCLE::Validate()
 {
-    if (FEElasticMaterial::Init() == false) return false;
+    if (FEElasticMaterial::Validate() == false) return false;
     
     // Evaluate Lame coefficients
     double	lam[3][3];

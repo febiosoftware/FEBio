@@ -18,9 +18,9 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Check material parameters.
-bool FECubicCLE::Init()
+bool FECubicCLE::Validate()
 {
-    if (FEElasticMaterial::Init() == false) return false;
+    if (FEElasticMaterial::Validate() == false) return false;
 
 	// Evaluate Lame coefficients
     double	lam[3][3];

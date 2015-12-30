@@ -42,7 +42,6 @@ public:
 	double          m_cph[NSTH];
 	double          m_sph[NSTH];
 	double          m_w[NSTH];
-    bool            m_bfirst;
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

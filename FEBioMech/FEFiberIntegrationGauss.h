@@ -36,7 +36,6 @@ public:
     int             m_nth;  // number of trapezoidal integration points along theta
     vector<double>  m_gp;   // gauss points
     vector<double>  m_gw;   // gauss weights
-    bool            m_bfirst;   // flag for loading gauss data
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

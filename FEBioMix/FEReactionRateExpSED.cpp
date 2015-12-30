@@ -12,16 +12,8 @@
 // Material parameters for the FEMultiphasic material
 BEGIN_PARAMETER_LIST(FEReactionRateExpSED, FEMaterial)
 	ADD_PARAMETER(m_B   , FE_PARAM_DOUBLE, "B");
-	ADD_PARAMETER(m_Psi0, FE_PARAM_DOUBLE, "Psi0");
+	ADD_PARAMETER2(m_Psi0, FE_PARAM_DOUBLE, FE_RANGE_NOT_EQUAL(0.0), "Psi0");
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-bool FEReactionRateExpSED::Init()
-{
-    if (FEMaterial::Init() == false) return false;
-    if (m_Psi0 == 0) return MaterialError("Psi0 must be non-zero");
-	return true;
-}
 
 //-----------------------------------------------------------------------------
 //! reaction rate at material point

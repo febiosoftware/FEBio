@@ -75,6 +75,7 @@ void FECoreKernel::SetErrorString(const char* sz)
 	int l = strlen(sz);
 	m_szerr = new char[l+1];
 	strncpy(m_szerr, sz, l);
+	m_szerr[l] = 0;
 }
 
 //-----------------------------------------------------------------------------

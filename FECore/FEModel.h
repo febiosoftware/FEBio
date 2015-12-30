@@ -130,6 +130,9 @@ public: // --- Material functions ---
 	//! material initialization
 	bool InitMaterials();
 
+	//! material validation
+	bool ValidateMaterials();
+
 public: // --- Boundary Conditions functions ---
 	// fixed BC
 	int FixedBCs() { return (int) m_BC.size(); }

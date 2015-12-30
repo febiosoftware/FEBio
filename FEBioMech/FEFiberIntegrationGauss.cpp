@@ -25,56 +25,50 @@ END_PARAMETER_LIST();
 
 bool FEFiberIntegrationGauss::Init()
 {
-	m_bfirst = true;
-	
-	if (m_bfirst)
-	{
-        switch (m_nph) {
-            case 1:
-                m_gp.assign(gp1, gp1+nint1);
-                m_gw.assign(gw1, gw1+nint1);
-                break;
-            case 2:
-                m_gp.assign(gp2, gp2+nint2);
-                m_gw.assign(gw2, gw2+nint2);
-                break;
-            case 3:
-                m_gp.assign(gp3, gp3+nint3);
-                m_gw.assign(gw3, gw3+nint3);
-                break;
-            case 4:
-                m_gp.assign(gp4, gp4+nint4);
-                m_gw.assign(gw4, gw4+nint4);
-                break;
-            case 5:
-                m_gp.assign(gp5, gp5+nint5);
-                m_gw.assign(gw5, gw5+nint5);
-                break;
-            case 6:
-                m_gp.assign(gp6, gp6+nint6);
-                m_gw.assign(gw6, gw6+nint6);
-                break;
-            case 7:
-                m_gp.assign(gp7, gp7+nint7);
-                m_gw.assign(gw7, gw7+nint7);
-                break;
-            case 8:
-                m_gp.assign(gp8, gp8+nint8);
-                m_gw.assign(gw8, gw8+nint8);
-                break;
-            case 9:
-                m_gp.assign(gp9, gp9+nint9);
-                m_gw.assign(gw9, gw9+nint9);
-                break;
-            case 10:
-                m_gp.assign(gp10, gp10+nint10);
-                m_gw.assign(gw10, gw10+nint10);
-                break;
-            default:
-                return MaterialError("nint must not exceed 10.");
-                break;
-        }
-		m_bfirst = false;
+    switch (m_nph) {
+        case 1:
+            m_gp.assign(gp1, gp1+nint1);
+            m_gw.assign(gw1, gw1+nint1);
+            break;
+        case 2:
+            m_gp.assign(gp2, gp2+nint2);
+            m_gw.assign(gw2, gw2+nint2);
+            break;
+        case 3:
+            m_gp.assign(gp3, gp3+nint3);
+            m_gw.assign(gw3, gw3+nint3);
+            break;
+        case 4:
+            m_gp.assign(gp4, gp4+nint4);
+            m_gw.assign(gw4, gw4+nint4);
+            break;
+        case 5:
+            m_gp.assign(gp5, gp5+nint5);
+            m_gw.assign(gw5, gw5+nint5);
+            break;
+        case 6:
+            m_gp.assign(gp6, gp6+nint6);
+            m_gw.assign(gw6, gw6+nint6);
+            break;
+        case 7:
+            m_gp.assign(gp7, gp7+nint7);
+            m_gw.assign(gw7, gw7+nint7);
+            break;
+        case 8:
+            m_gp.assign(gp8, gp8+nint8);
+            m_gw.assign(gw8, gw8+nint8);
+            break;
+        case 9:
+            m_gp.assign(gp9, gp9+nint9);
+            m_gw.assign(gw9, gw9+nint9);
+            break;
+        case 10:
+            m_gp.assign(gp10, gp10+nint10);
+            m_gw.assign(gw10, gw10+nint10);
+            break;
+        default:
+            return MaterialError("nint must not exceed 10.");
+            break;
     }
     
     // also initialize the parent class

@@ -27,40 +27,34 @@ bool FEFiberIntegrationGaussKronrodUC::Init()
 {
     if (m_nth < 1) return MaterialError("nth must be strictly greater than zero.");
     
-    m_bfirst = true;
-    
-    if (m_bfirst)
-    {
-        switch (m_nph) {
-            case 7:
-                m_gp.assign(gp7, gp7+nint7);
-                m_gw.assign(gw7, gw7+nint7);
-                break;
-            case 11:
-                m_gp.assign(gp11, gp11+nint11);
-                m_gw.assign(gw11, gw11+nint11);
-                break;
-            case 15:
-                m_gp.assign(gp15, gp15+nint15);
-                m_gw.assign(gw15, gw15+nint15);
-                break;
-            case 19:
-                m_gp.assign(gp19, gp19+nint19);
-                m_gw.assign(gw19, gw19+nint19);
-                break;
-            case 23:
-                m_gp.assign(gp23, gp23+nint23);
-                m_gw.assign(gw23, gw23+nint23);
-                break;
-            case 27:
-                m_gp.assign(gp27, gp27+nint27);
-                m_gw.assign(gw27, gw27+nint27);
-                break;
-            default:
-                return MaterialError("nph must be 7, 11, 15, 19, 23, or 27.");
-                break;
-        }
-        m_bfirst = false;
+    switch (m_nph) {
+        case 7:
+            m_gp.assign(gp7, gp7+nint7);
+            m_gw.assign(gw7, gw7+nint7);
+            break;
+        case 11:
+            m_gp.assign(gp11, gp11+nint11);
+            m_gw.assign(gw11, gw11+nint11);
+            break;
+        case 15:
+            m_gp.assign(gp15, gp15+nint15);
+            m_gw.assign(gw15, gw15+nint15);
+            break;
+        case 19:
+            m_gp.assign(gp19, gp19+nint19);
+            m_gw.assign(gw19, gw19+nint19);
+            break;
+        case 23:
+            m_gp.assign(gp23, gp23+nint23);
+            m_gw.assign(gw23, gw23+nint23);
+            break;
+        case 27:
+            m_gp.assign(gp27, gp27+nint27);
+            m_gw.assign(gw27, gw27+nint27);
+            break;
+        default:
+            return MaterialError("nph must be 7, 11, 15, 19, 23, or 27.");
+            break;
     }
     
     // also initialize the parent class

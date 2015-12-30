@@ -18,9 +18,6 @@ public:
     FEFiberIntegrationTrapezoidal(FEModel* pfem) : FEFiberIntegrationScheme(pfem) { m_nth = 12; }
     ~FEFiberIntegrationTrapezoidal() {}
 	
-	//! Initialization
-	bool Init();
-    
 	//! Cauchy stress
 	mat3ds Stress(FEMaterialPoint& mp);
     

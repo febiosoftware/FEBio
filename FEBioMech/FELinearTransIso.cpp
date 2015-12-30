@@ -13,10 +13,9 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Check material parameters.
-//! \todo check material parameters
-bool FELinearTransIso::Init()
+bool FELinearTransIso::Validate()
 {
-	if (FEElasticMaterial::Init() == false) return false;
+	if (FEElasticMaterial::Validate() == false) return false;
     
 	if (v12 > sqrt(E1/E3)) return MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E3)");
     

@@ -17,9 +17,9 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Data initialization
-bool FEFungOrthotropic::Init()
+bool FEFungOrthotropic::Validate()
 {
-	if (FEUncoupledMaterial::Init() == false) return false;
+	if (FEUncoupledMaterial::Validate() == false) return false;
 
 	if (v12 > sqrt(E1/E2)) return MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E2)");
 	if (v23 > sqrt(E2/E3)) return MaterialError("Invalid value for v23. Let v23 <= sqrt(E2/E3)");

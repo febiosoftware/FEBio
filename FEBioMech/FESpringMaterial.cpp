@@ -27,7 +27,7 @@ double FELinearSpring::stiffness(double dl)
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FETensionOnlyLinearSpring, FEDiscreteMaterial)
-	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
+	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
 END_PARAMETER_LIST();
 
 double FETensionOnlyLinearSpring::force(double dl)
@@ -38,12 +38,6 @@ double FETensionOnlyLinearSpring::force(double dl)
 double FETensionOnlyLinearSpring::stiffness(double dl)
 {
 	return (dl >= 0 ? m_E : 0);
-}
-
-bool FETensionOnlyLinearSpring::Init()
-{
-	if (m_E < 0) return MaterialError("Invalid value for E in tension only linear spring material");
-	return FEDiscreteMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------

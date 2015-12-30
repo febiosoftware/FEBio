@@ -20,7 +20,7 @@ public:
 	tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp);
 		
 	//! data initialization and checking
-	bool Init();
+	bool Validate();
 		
 public:
 	double	m_perm0;		//!< permeability for I term

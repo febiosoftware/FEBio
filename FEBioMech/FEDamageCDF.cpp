@@ -175,10 +175,10 @@ FEDamageCDFPQP::FEDamageCDFPQP(FEModel* pfem) : FEDamageCDF(pfem)
 
 //-----------------------------------------------------------------------------
 //! Initialization.
-bool FEDamageCDFPQP::Init()
+bool FEDamageCDFPQP::Validate()
 {
 	if (m_mumax <= m_mumin) return MaterialError("mumax must be > mumin");
-	return FEDamageCDF::Init();
+	return FEDamageCDF::Validate();
 }
 
 //-----------------------------------------------------------------------------

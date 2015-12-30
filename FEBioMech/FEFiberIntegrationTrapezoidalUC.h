@@ -20,9 +20,6 @@ public:
     FEFiberIntegrationTrapezoidalUC(FEModel* pfem) : FEFiberIntegrationSchemeUC(pfem) { m_nth = 12; }
     ~FEFiberIntegrationTrapezoidalUC() {}
 	
-	//! Initialization
-	bool Init();
-    
 	//! Cauchy stress
 	mat3ds DevStress(FEMaterialPoint& mp);
     

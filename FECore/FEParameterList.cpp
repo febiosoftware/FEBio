@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEParameterList.h"
+#include "FECoreKernel.h"
 #include <cstring>
 #include <assert.h>
 
@@ -470,4 +471,66 @@ void FEParamContainer::Serialize(DumpFile& ar)
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! This function validates all parameters. 
+//! It fails on the first parameter that is outside its allowed range.
+//! Use fecore_get_error_string() to find out which parameter failed validation.
+bool FEParamContainer::Validate()
+{
+	FEParameterList& pl = GetParameterList();
+	int N = pl.Parameters();
+	list<FEParam>::iterator pi = pl.first();
+	for (int i=0; i<N; ++i, pi++)
+	{
+		FEParam& p = *pi;
+		if (p.is_inside_range() == false)
+		{
+			char szerr[256] = {0};
+			const char* szname = p.m_szname;
+			if (p.m_itype == FE_PARAM_INT)
+			{
+				int val = p.value<int>();
+				switch (p.m_irange)
+				{
+				case FE_GREATER         : sprintf(szerr, "%s (=%d) must be greater than %d"            , szname, val, p.m_imin); break;
+				case FE_GREATER_OR_EQUAL: sprintf(szerr, "%s (=%d) must be greater than or equal to %d", szname, val, p.m_imin); break;
+				case FE_LESS            : sprintf(szerr, "%s (=%d) must be less than %d"               , szname, val, p.m_imin); break;
+				case FE_LESS_OR_EQUAL   : sprintf(szerr, "%s (=%d) must be less than or equal to %d"   , szname, val, p.m_imin); break;
+				case FE_OPEN            : sprintf(szerr, "%s (=%d) must be in the open interval (%d, %d)"      , szname, val, p.m_imin, p.m_imax); break;
+				case FE_CLOSED          : sprintf(szerr, "%s (=%d) must be in the closed interval [%d, %d]"    , szname, val, p.m_imin, p.m_imax); break;
+				case FE_LEFT_OPEN       : sprintf(szerr, "%s (=%d) must be in the left-open interval (%d, %d]" , szname, val, p.m_imin, p.m_imax); break;
+				case FE_RIGHT_OPEN      : sprintf(szerr, "%s (=%d) must be in the right-open interval [%d, %d)", szname, val, p.m_imin, p.m_imax); break;
+				case FE_NOT_EQUAL       : sprintf(szerr, "%s (=%d) must not equal %d", szname, p.m_imin);
+				default:
+					sprintf(szerr, "%s has an invalid range");
+				}
+			}
+			else if (p.m_itype == FE_PARAM_DOUBLE)
+			{
+				double val = p.value<double>();
+				switch (p.m_irange)
+				{
+				case FE_GREATER         : sprintf(szerr, "%s (=%lg) must be greater than %lg"            , szname, val, p.m_dmin); break;
+				case FE_GREATER_OR_EQUAL: sprintf(szerr, "%s (=%lg) must be greater than or equal to %lg", szname, val, p.m_dmin); break;
+				case FE_LESS            : sprintf(szerr, "%s (=%lg) must be less than %lg"               , szname, val, p.m_dmin); break;
+				case FE_LESS_OR_EQUAL   : sprintf(szerr, "%s (=%lg) must be less than or equal to %lg"   , szname, val, p.m_dmin); break;
+				case FE_OPEN            : sprintf(szerr, "%s (=%lg) must be in the open interval (%lg, %lg)"      , szname, val, p.m_dmin, p.m_dmax); break;
+				case FE_CLOSED          : sprintf(szerr, "%s (=%lg) must be in the closed interval [%lg, %lg]"    , szname, val, p.m_dmin, p.m_dmax); break;
+				case FE_LEFT_OPEN       : sprintf(szerr, "%s (=%lg) must be in the left-open interval (%lg, %lg]" , szname, val, p.m_dmin, p.m_dmax); break;
+				case FE_RIGHT_OPEN      : sprintf(szerr, "%s (=%lg) must be in the right-open interval [%lg, %lg)", szname, val, p.m_dmin, p.m_dmax); break;
+				case FE_NOT_EQUAL       : sprintf(szerr, "%s (=%lg) must not equal %lg", szname, p.m_dmin);
+				default:
+					sprintf(szerr, "%s has an invalid range");
+				}
+			}
+			else sprintf(szerr, "%s has an invalid range");
+
+			// report the error
+			return fecore_error(szerr);
+		}
+	}
+
+	return true;
 }

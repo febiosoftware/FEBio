@@ -31,8 +31,8 @@ public:
 	FEFiberExponentialPowerUC(FEModel* pfem) : FEElasticFiberMaterialUC(pfem) {
         m_alpha = 0; m_beta = 2; m_ksi = 0; m_mu = 0; }
 	
-	//! Initialization
-	bool Init();
+	//! Validation
+	bool Validate();
 	
 	//! Cauchy stress
 	mat3ds DevStress(FEMaterialPoint& mp);
@@ -60,9 +60,6 @@ class FEFiberNHUC : public FEElasticFiberMaterialUC
 {
 public:
 	FEFiberNHUC(FEModel* pfem) : FEElasticFiberMaterialUC(pfem) { m_mu = 0; }
-	
-	//! Initialization
-	bool Init();
 	
 	//! Cauchy stress
 	mat3ds DevStress(FEMaterialPoint& mp);

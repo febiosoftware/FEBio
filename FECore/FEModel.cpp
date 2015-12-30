@@ -219,7 +219,7 @@ FEMaterial* FEModel::FindMaterial(int nid)
 }
 
 //-----------------------------------------------------------------------------
-//! Initialize material data
+//! Initialize material data (This also does an initial validation).
 bool FEModel::InitMaterials()
 {
 	// initialize material data
@@ -234,6 +234,30 @@ bool FEModel::InitMaterials()
 			const char* szerr = fecore_get_error_string();
 			if (szerr == 0) szerr = "unknown error";
 			felog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
+			felog.printf("ERROR: %s\n\n", szerr);
+			return false;
+		}
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! validate material data
+bool FEModel::ValidateMaterials()
+{
+	// initialize material data
+	for (int i=0; i<Materials(); ++i)
+	{
+		// get the material
+		FEMaterial* pmat = GetMaterial(i);
+
+		// initialize material data
+		if (pmat->Validate() == false)
+		{
+			const char* szerr = fecore_get_error_string();
+			if (szerr == 0) szerr = "unknown error";
+			felog.printf("Failed validating material %d (name=\"%s\"):\n", i+1, pmat->GetName());
 			felog.printf("ERROR: %s\n\n", szerr);
 			return false;
 		}

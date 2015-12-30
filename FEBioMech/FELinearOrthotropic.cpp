@@ -17,9 +17,9 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Check material parameters.
-bool FELinearOrthotropic::Init()
+bool FELinearOrthotropic::Validate()
 {
-	if (FEElasticMaterial::Init() == false) return false;
+	if (FEElasticMaterial::Validate() == false) return false;
 
 	if (v12 > sqrt(E1/E2)) return MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E2)");
 	if (v23 > sqrt(E2/E3)) return MaterialError("Invalid value for v23. Let v23 <= sqrt(E2/E3)");

@@ -80,6 +80,9 @@ public: // these functions have to be implemented by derived classes
 	//! initializatoin
 	virtual bool Init() = 0;
 
+	//! validation
+	virtual bool Validate() = 0;
+
 	//! Get the parent of this material (zero if none)
 	FEMaterial* GetParent() { return m_pParent; }
     
@@ -139,6 +142,11 @@ public:
 	bool Init() { 
 		if (m_pmp) { return m_pmp->Init(); }
 		return (m_brequired==false); 
+	}
+
+	bool Validate() {
+		if (m_pmp) return m_pmp->Validate();
+		return true;
 	}
 };
 
@@ -207,6 +215,19 @@ public:
 		}
 		return true;
 	}
+
+	bool Validate() {
+		if (m_pmp.empty()) return true;
+		for (size_t i=0; i<m_pmp.size(); ++i)
+		{
+			if (m_pmp[i]) 
+			{
+				if (m_pmp[i]->Validate() == false) return false;
+			}
+		}
+		return true;
+	}
+
 };
 
 //-----------------------------------------------------------------------------
@@ -229,8 +250,11 @@ public:
 	//! returns a pointer to a new material point object
 	virtual FEMaterialPoint* CreateMaterialPointData() { return 0; };
 
-	//! performs initialization and parameter checking
+	//! performs initialization
 	virtual bool Init();
+
+	//! validates all material parameters
+	bool Validate();
 
 	int GetID() { return m_nID; }
 	void SetID(int nid) { m_nID = nid; }

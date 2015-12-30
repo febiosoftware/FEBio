@@ -29,7 +29,7 @@ public:
         m_alpha = 0; m_beta = 2; m_ksi = 0; m_mu = 0; }
 	
 	//! Initialization
-	bool Init();
+	bool Validate();
 	
 	//! Cauchy stress
 	mat3ds Stress(FEMaterialPoint& mp);
@@ -58,9 +58,6 @@ class FEFiberNH : public FEElasticFiberMaterial
 public:
 	FEFiberNH(FEModel* pfem) : FEElasticFiberMaterial(pfem) { m_mu = 0; }
 	
-	//! Initialization
-	bool Init();
-	
 	//! Cauchy stress
 	mat3ds Stress(FEMaterialPoint& mp);
 	
@@ -87,7 +84,7 @@ public:
         m_E = 0; m_lam0 = 1; m_beta = 3; }
     
     //! Initialization
-    bool Init();
+    bool Validate();
     
     //! Cauchy stress
     mat3ds Stress(FEMaterialPoint& mp);

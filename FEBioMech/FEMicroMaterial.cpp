@@ -81,8 +81,6 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	m_brve = false;
-
 	// initialize parameters
 	m_szrve[0] = 0;
 	m_szbc[0] = 0;
@@ -108,28 +106,21 @@ bool FEMicroMaterial::Init()
 {
 	if (FEElasticMaterial::Init() == false) return false;
 
-	// try to load the RVE model
-	if (m_brve == false)
+	// load the RVE model
+	FEBioImport fim;
+	if (fim.Load(m_mrve, m_szrve) == false)
 	{
-		// load the RVE model
-		FEBioImport fim;
-		if (fim.Load(m_mrve, m_szrve) == false)
-		{
-			return MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
-		}
-
-		// set the pardiso solver as default
-		m_mrve.m_nsolver = PARDISO_SOLVER;
-
-		// make sure the RVE problem doesn't output anything to a plot file
-		m_mrve.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
-
-		// create the BC's for this RVE
-		if (PrepRVE() == false) return MaterialError("An error occurred preparing RVE model");
-
-		// mark that we read and processed the RVE successfully
-		m_brve = true;
+		return MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
 	}
+
+	// set the pardiso solver as default
+	m_mrve.m_nsolver = PARDISO_SOLVER;
+
+	// make sure the RVE problem doesn't output anything to a plot file
+	m_mrve.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
+
+	// create the BC's for this RVE
+	if (PrepRVE() == false) return MaterialError("An error occurred preparing RVE model");
 
 	return true;
 }

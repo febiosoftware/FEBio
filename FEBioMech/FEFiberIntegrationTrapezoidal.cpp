@@ -20,16 +20,8 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberIntegrationTrapezoidal, FEFiberIntegrationScheme)
-	ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
+	ADD_PARAMETER2(m_nth, FE_PARAM_INT, FE_RANGE_GREATER(0), "nth");
 END_PARAMETER_LIST();
-
-bool FEFiberIntegrationTrapezoidal::Init()
-{
-	if (m_nth < 1) return MaterialError("nth must be strictly greater than zero.");
-    
-    // also initialize the parent class
-    return FEFiberIntegrationScheme::Init();
-}
 
 //-----------------------------------------------------------------------------
 mat3ds FEFiberIntegrationTrapezoidal::Stress(FEMaterialPoint& mp)

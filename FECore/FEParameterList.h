@@ -234,6 +234,13 @@ public:
 	//! serialize parameter data
 	virtual void Serialize(DumpFile& ar);
 
+	//! validate material parameters.
+	//! This function returns false on the first parameter encountered
+	//! that is not valid (i.e. is outside its defined range). 
+	//! Overload this function to do additional validation. Make sure to always call the base class.
+	//! Use fecore_get_error_string() to find out which parameter failed validation.
+	virtual bool Validate();
+
 public:
 	//! This function is called after the parameter was read in from the input file.
 	//! It can be used to do additional processing when a parameter is read in.

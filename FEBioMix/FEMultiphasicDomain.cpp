@@ -795,7 +795,10 @@ bool FEMultiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<do
 		// chemical reactions
         double phiw = m_pMat->Porosity(mp);
 		for (i=0; i<nreact; ++i)
-			phiwhat += phiw*m_pMat->GetReaction(i)->m_Vbar*m_pMat->GetReaction(i)->ReactionSupply(mp);
+		{
+			FEChemicalReaction* pr = m_pMat->GetReaction(i);
+			phiwhat += phiw*pr->m_Vbar*pr->ReactionSupply(mp);
+		}
 
 		// update force vector
 		for (i=0; i<neln; ++i)

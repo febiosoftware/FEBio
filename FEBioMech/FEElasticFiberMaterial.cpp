@@ -14,10 +14,10 @@ BEGIN_PARAMETER_LIST(FEFiberExponentialPower, FEElasticFiberMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-bool FEFiberExponentialPower::Init()
+bool FEFiberExponentialPower::Validate()
 {
 	if ((4*m_ksi + 2*m_mu) < 0) return MaterialError("4*ksi+2*mu must be positive.");
-    return FEElasticFiberMaterial::Init();
+    return FEElasticFiberMaterial::Validate();
 }
 
 //-----------------------------------------------------------------------------
@@ -172,15 +172,8 @@ double FEFiberExponentialPower::StrainEnergyDensity(FEMaterialPoint& mp)
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberNH, FEElasticFiberMaterial)
-	ADD_PARAMETER(m_mu, FE_PARAM_DOUBLE, "mu");
+	ADD_PARAMETER2(m_mu, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-bool FEFiberNH::Init()
-{
-	if (m_mu < 0) return MaterialError("mu must be positive.");
-    return FEElasticFiberMaterial::Init();
-}
 
 //-----------------------------------------------------------------------------
 mat3ds FEFiberNH::Stress(FEMaterialPoint& mp)
@@ -303,18 +296,15 @@ double FEFiberNH::StrainEnergyDensity(FEMaterialPoint& mp)
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberPowerLinear, FEElasticFiberMaterial)
-    ADD_PARAMETER(m_E    , FE_PARAM_DOUBLE, "E"    );
-    ADD_PARAMETER(m_beta , FE_PARAM_DOUBLE, "beta" );
-    ADD_PARAMETER(m_lam0 , FE_PARAM_DOUBLE, "lam0" );
+    ADD_PARAMETER2(m_E    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "E"    );
+    ADD_PARAMETER2(m_beta , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
+    ADD_PARAMETER2(m_lam0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER(1.0), "lam0" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-bool FEFiberPowerLinear::Init()
+bool FEFiberPowerLinear::Validate()
 {
-    if (FEElasticFiberMaterial::Init() == false) return false;
-    if (m_E < 0) return MaterialError("E must be positive.");
-    if (m_beta < 2) return MaterialError("beta must be >= 2.");
-    if (m_lam0 <= 1) return MaterialError("lam0 must be >1.");
+    if (FEElasticFiberMaterial::Validate() == false) return false;
     
     // initialize material constants
     m_I0 = m_lam0*m_lam0;
