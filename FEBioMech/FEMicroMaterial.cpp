@@ -69,6 +69,21 @@ void FEMicroMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 }
 
 //=============================================================================
+BEGIN_PARAMETER_LIST(FEMicroProbe, FEMaterial)
+	ADD_PARAMETER(m_neid  , FE_PARAM_INT   , "element_id");
+	ADD_PARAMETER(m_ngp   , FE_PARAM_INT   , "gausspt"   );
+	ADD_PARAMETER(m_szfile, FE_PARAM_STRING, "file"      );
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+FEMicroProbe::FEMicroProbe(FEModel* pfem) : FEMaterial(pfem)
+{
+	m_neid = -1;	// invalid element - this must be defined by user
+	m_ngp = 1;		// by default, first gauss point (note is one-based!)
+	sprintf(m_szfile, "rve.xplt");
+}
+
+//=============================================================================
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -88,6 +103,8 @@ FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 
 	m_bb_x = 0.; m_bb_y = 0.; m_bb_z = 0.;
 	m_num_ext_node = 0;
+
+	AddProperty(&m_probe, "probe", false);
 }
 
 //-----------------------------------------------------------------------------

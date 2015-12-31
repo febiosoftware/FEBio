@@ -19,7 +19,7 @@ bool fecore_error(const char* sz, ...)
 
 	// TODO: Perhaps I should report it to the logfile?
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
-	fecore.SetErrorString(sz);
+	fecore.SetErrorString(szerr);
 
 	return false;
 }

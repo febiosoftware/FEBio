@@ -1192,7 +1192,9 @@ bool FEBioModel::Init()
 	// initialize model data
 	if (FEModel::Init() == false) 
 	{
-		felog.printf("FATAL ERROR: Model initialization failed\n\n");
+		felog.printf("\nFATAL ERROR: Model initialization failed\n");
+		const char* szerr = fecore_get_error_string();
+		if (szerr) felog.printf("REASON: %s\n\n", szerr);
 		return false;
 	}
 

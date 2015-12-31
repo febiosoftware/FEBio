@@ -11,42 +11,32 @@
 class FERVEProbe : public FECallBack
 {
 public:
-	FERVEProbe(FEElasticMultiscaleDomain1O* pdom) : FECallBack(pdom->GetFEModel(), CB_MAJOR_ITERS | CB_INIT | CB_SOLVED), m_pdom(pdom) 
+	// The first FEModel (fem) is the macro-problem, i.e. the model that will generate the callbacks
+	// The second FEModel (rve) is the micro-problem that needs to be tracked.
+	FERVEProbe(FEModel& fem, FEModel& rve, const char* szfile) : FECallBack(&fem, CB_MAJOR_ITERS | CB_INIT | CB_SOLVED), m_rve(rve), m_file(szfile) 
 	{
 		m_xplt = 0;
-		m_eid = 0;
-		m_ngp = 0;
 	}
 
 	void Execute(FEModel& fem, int nwhen)
 	{
-		// get the element
-		FESolidElement& el = m_pdom->Element(m_eid);
-
-		// get the material point
-		FEMaterialPoint& mp = *el.GetMaterialPoint(m_ngp);
-		FEMicroMaterialPoint& mmp = *mp.ExtractData<FEMicroMaterialPoint>();
-
-		// get the rve model
-		FEModel& rve = mmp.m_rve;
-
 		if (nwhen == CB_INIT)	// initialize the plot file
 		{
 			// create a plot file
-			m_xplt = new FEBioPlotFile(rve);
-			if (m_xplt->Open(rve, "rve.xplt") == false)
+			m_xplt = new FEBioPlotFile(m_rve);
+			if (m_xplt->Open(m_rve, m_file.c_str()) == false)
 			{
 				felog.printf("Failed creating probe.\n\n");
 				delete m_xplt; m_xplt = 0;
 			}
 
 			// write the initial state
-			m_xplt->Write(rve);
+			m_xplt->Write(m_rve);
 		}
 		else if (nwhen == CB_MAJOR_ITERS)	// store the current state
 		{
 			// write the deformed state
-			if (m_xplt) m_xplt->Write(rve);
+			if (m_xplt) m_xplt->Write(m_rve);
 		}
 		else if (nwhen == CB_SOLVED)	// clean up
 		{
@@ -56,10 +46,9 @@ public:
 	}
 
 private:
-	FEElasticMultiscaleDomain1O* m_pdom;		//!< domain
-	int		m_eid;								//!< element ID (local in domain)
-	int		m_ngp;								//!< which gauss-point
-	FEBioPlotFile*		m_xplt;					//!< the actual plot file
+	FEModel&			m_rve;		//!< The RVE model to keep track of
+	FEBioPlotFile*		m_xplt;		//!< the actual plot file
+	std::string			m_file;		//!< file name
 };
 
 //-----------------------------------------------------------------------------
@@ -104,8 +93,26 @@ bool FEElasticMultiscaleDomain1O::Initialize(FEModel& fem)
 		}
 	}
 
-	// create a probe
-	FERVEProbe* prve = new FERVEProbe(this);
+	// create the probes
+	int NP = pmat->Probes();
+	for (int i=0; i<NP; ++i)
+	{
+		FEMicroProbe& p = pmat->Probe(i);
+		FEElement* pel = FindElementFromID(p.m_neid);
+		if (pel)
+		{
+			int nint = pel->GaussPoints();
+			int ngp = p.m_ngp - 1;
+			if ((ngp>=0)&&(ngp<nint))
+			{
+				FEMaterialPoint& mp = *pel->GetMaterialPoint(ngp);
+				FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
+				FERVEProbe* prve = new FERVEProbe(fem, mmpt.m_rve, p.m_szfile);
+			}
+			else return fecore_error("Invalid gausspt number for micro-probe %d in material %d (%s)", i+1, m_pMat->GetID(), m_pMat->GetName());
+		}
+		else return fecore_error("Invalid Element ID for micro probe %d in material %d (%s)", i+1, m_pMat->GetID(), m_pMat->GetName());
+	}
 
 	return true;
 }

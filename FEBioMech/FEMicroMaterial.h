@@ -48,6 +48,24 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+// The FEMicroProbe class is not really a material, but we abuse the framework
+// here in order to read in the probe information. 
+class FEMicroProbe : public FEMaterial
+{
+	enum { MAX_FILE = 128 };
+
+public:
+	FEMicroProbe(FEModel* pfem);
+
+public:
+	int		m_neid;					//!< element Id
+	int		m_ngp;					//!< Gauss-point (one-based!)
+	char	m_szfile[MAX_FILE];		//!< file name
+
+	DECLARE_PARAMETER_LIST();
+};
+
+//-----------------------------------------------------------------------------
 //! The micro-material implements material homogenization. The stress and tangents
 //! are calculated by solving a micro-structural RVE problem and return the
 //! averaged stress and condensed tangents.
@@ -101,6 +119,13 @@ protected:
 	mat3ds AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp);
 
 	void calc_energy_diff(FEMaterialPoint& pt);
+
+public:
+	int Probes() { return (int) m_probe.size(); }
+	FEMicroProbe& Probe(int i) { return *m_probe[i]; }
+
+protected:
+	FEVecPropertyT<FEMicroProbe>	m_probe;
 
 public:
 	// declare the parameter list
