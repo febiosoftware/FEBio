@@ -356,6 +356,9 @@ bool FEModel::Solve()
 		m_pStep->Deactivate();
 	}
 
+	// do the callbacks
+	DoCallback(CB_SOLVED);
+
 	return bconv;
 }
 

@@ -11,9 +11,7 @@ class FEElasticMultiscaleDomain1O : public FEElasticSolidDomain
 public:
 	//! constructor
 	FEElasticMultiscaleDomain1O(FEModel* pfem);
-	
-	void InitElements();
 
-	void UpdateElementStress(int iel, double dt);
-
+	//! initialize class
+	bool Initialize(FEModel& fem);
 };

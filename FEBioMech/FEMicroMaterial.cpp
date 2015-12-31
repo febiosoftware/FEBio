@@ -402,48 +402,10 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 // LTE - Note that this function is not used in the first-order implemenetation
 mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 {
-	mat3ds sa; sa.zero();
-	
-	return sa;
-}
-
-//-----------------------------------------------------------------------------
-mat3ds FEMicroMaterial::Stress1O(FEMaterialPoint &mp, int plot_on, int int_pt)
-{
 	// get the deformation gradient
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
 	mat3d F = pt.m_F;
-	
-	// create a copy of the rve in the reference configuration for plotting
-	FEModel rve_init;
-	rve_init.CopyFrom(mmpt.m_rve);
-	rve_init.Reset();
-	
-	// if plotting is turned on, create the plot file and plot the reference configuration
-	FEBioPlotFile* pplt = new FEBioPlotFile(mmpt.m_rve);
-	
-	if (plot_on)
-	{
-		pplt = new FEBioPlotFile(mmpt.m_rve);
-		vector<int> item;
-		pplt->AddVariable("displacement", item);
-		pplt->AddVariable("stress", item);
-
-		if (m_bperiodic)
-		{
-			pplt->AddVariable("contact gap", item);
-			pplt->AddVariable("contact traction", item);
-			pplt->AddVariable("contact pressure", item);
-		}
-
-		stringstream ss;
-		ss << "rve_elem_" << plot_on << "_ipt_" << int_pt << ".xplt";
-		string plot_name = ss.str();
-		
-		pplt->Open(mmpt.m_rve, plot_name.c_str());
-		pplt->Write(rve_init);
-	}
 	
 	// update the BC's
 	UpdateBC(mmpt.m_rve, F);
@@ -471,13 +433,6 @@ mat3ds FEMicroMaterial::Stress1O(FEMaterialPoint &mp, int plot_on, int int_pt)
 	// calculate the difference between the macro and micro energy for Hill-Mandel condition
 	calc_energy_diff(mp);	
 	
-	// plot the rve
-	if (plot_on)
-	{
-		pplt->Write(mmpt.m_rve);
-		pplt->Close();
-	}
-
 	return sa;
 }
 
