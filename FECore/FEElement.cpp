@@ -146,7 +146,7 @@ FEShellElement& FEShellElement::operator = (const FEShellElement& el)
 void FEShellElement::SetTraits(FEElementTraits* ptraits)
 {
 	FEElement::SetTraits(ptraits);
-	m_h0.resize(Nodes());
+	m_h0.assign(Nodes(), 0.0);
 	m_D0.resize(Nodes());
 }
 
@@ -200,6 +200,11 @@ void FESurfaceElement::SetTraits(FEElementTraits* pt)
 }
 
 //-----------------------------------------------------------------------------
+FETrussElement::FETrussElement()
+{
+	m_a0 = 0.0;
+}
+
 FETrussElement::FETrussElement(const FETrussElement& el)
 {
 	// set the traits of the element

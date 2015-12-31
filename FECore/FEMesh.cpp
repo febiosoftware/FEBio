@@ -28,6 +28,9 @@ FENode::FENode()
 
 	// rigid body data
 	m_rid = -1;
+
+	// default ID
+	m_nID = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -223,7 +226,10 @@ void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
 void FEMesh::CreateNodes(int nodes)
 {
 	assert(nodes);
-	m_Node.resize (nodes);
+	m_Node.resize(nodes);
+
+	// set the default node IDs
+	for (int i=0; i<nodes; ++i) Node(i).SetID(i+1);
 }
 
 //-----------------------------------------------------------------------------
@@ -232,7 +238,15 @@ void FEMesh::AddNodes(int nodes)
 {
 	assert(nodes);
 	int N0 = (int) m_Node.size();
+
+	// get the ID of the last node
+	// (It is assumed that nodes are sorted according their ID
+	//  so the last node should have the highest ID)
+	int n0 = 1;
+	if (N0 > 0) n0 = m_Node[N0-1].GetID() + 1;
+
 	m_Node.resize(N0 + nodes);
+	for (int i=0; i<nodes; ++i) m_Node[i+N0].SetID(n0+i);
 }
 
 //-----------------------------------------------------------------------------

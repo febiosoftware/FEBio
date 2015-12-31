@@ -117,6 +117,12 @@ public:
 	public: FailedAllocatingSolver(const char* sztype);
 	};
 
+	//! Invalid node ID
+	class InvalidNodeID : public Exception
+	{
+	public: InvalidNodeID();
+	};
+
 public:
 	//-------------------------------------------------------------------------
 	class PlotVariable
@@ -240,6 +246,24 @@ public:
 	FE_Element_Type		m_ntri6;	//!< tri6 integration rule
 	FE_Element_Type		m_ntri7;	//!< tri7 integration rule
 	FE_Element_Type		m_ntri3;	//!< tri3 integration rule
+
+public:
+	// Build the node ID table
+	void BuildNodeList();
+
+	// find a node index from its ID
+	int FindNodeFromID(int nid);
+
+	// convert an array of nodal ID to nodal indices
+	void GlobalToLocalID(int* l, int n, vector<int>& m);
+
+	//! read a nodal ID
+	//! This assumes the node ID is defined via the "id" attribute
+	int ReadNodeID(XMLTag& tag);
+
+protected:
+	int			m_node_off;		//!< node offset (i.e. lowest node ID)
+	vector<int>	m_node_list;	//!< map node ID's to their nodes.
 
 protected:
 	FEBioFileSectionMap	m_map;

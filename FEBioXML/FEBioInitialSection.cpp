@@ -42,7 +42,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			{
 				if (tag == "node")
 				{
-					int nid = atoi(tag.AttributeValue("id"))-1;
+					int nid = m_pim->ReadNodeID(tag);
 					vec3d v;
 					m_pim->value(tag, v);
 
@@ -96,7 +96,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			{
 				if (tag == "node")
 				{
-					int nid = atoi(tag.AttributeValue("id"))-1;
+					int nid = m_pim->ReadNodeID(tag);
 					double p;
 					m_pim->value(tag, p);
 					pic->Add(nid, p);

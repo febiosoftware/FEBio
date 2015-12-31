@@ -261,9 +261,7 @@ void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 				if (tag == "node")
 				{
 					tag.value(dof.val);
-					int node;
-					tag.AttributeValue("id", node);
-					dof.node = node - 1;
+					dof.node = m_pim->ReadNodeID(tag);
 
 					const char* szbc = tag.AttributeValue("bc");
                     int ndof = dofs.GetDOF(szbc);

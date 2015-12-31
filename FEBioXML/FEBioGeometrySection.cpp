@@ -62,11 +62,14 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	FEMesh& mesh = *m_pim->GetFEMesh();
 	int N0 = mesh.Nodes();
 
+	// get the largest nodal ID
+	// (It is assumed that nodes are sorted by ID so the last node should have the largest ID)
+	int max_id = 0;
+	if (N0 > 0) max_id = mesh.Node(N0-1).GetID();
+
 	// first we need to figure out how many nodes there are
 	XMLTag t(tag);
-	int nodes = 0;
-	++t;
-	while (!t.isend()) { nodes++; ++t; }
+	int nodes = tag.children();
 
 	// see if this list defines a set
 	const char* szl = tag.AttributeValue("set", true);
@@ -89,6 +92,19 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 		FENode& node = mesh.Node(N0 + i);
 		m_pim->value(tag, node.m_r0);
 		node.m_rt = node.m_r0;
+
+		// get the nodal ID
+		int nid = -1;
+		tag.AttributeValue("id", nid);
+
+		// Make sure it is valid
+		if (nid <= max_id) throw XMLReader::InvalidAttributeValue(tag, "id");
+
+		// set the ID
+		node.SetID(nid);
+		max_id = nid;
+
+		// go on to the next node
 		++tag;
 	}
 
@@ -97,6 +113,9 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	{
 		for (int i=0; i<nodes; ++i) (*ps)[i] = N0+i;
 	}
+
+	// tell the file reader to rebuild the node ID table
+	m_pim->BuildNodeList();
 }
 
 //-----------------------------------------------------------------------------
@@ -258,66 +277,16 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 
 		switch (etype)
 		{
-		case ET_HEX8:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nhex8, nid, nmat);
-			}
-			break;
-		case ET_HEX20:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_HEX20G27, nid, nmat);
-			}
-			break;
-		case ET_HEX27:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_HEX27G27, nid, nmat);
-			}
-			break;
-		case ET_PENTA6:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_PENTA6G6, nid, nmat);
-			}
-			break;
-		case ET_TET4:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), m_pim->m_ntet4, nid, nmat);
-			}
-			break;
-		case ET_TET10:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), m_pim->m_ntet10, nid, nmat);
-			}
-			break;
-		case ET_TET15:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), m_pim->m_ntet15, nid, nmat);
-			}
-			break;
-		case ET_QUAD4:
-			{
-				FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
-				ReadShellElement(tag, sd.Element(ne), FE_SHELL_QUAD, nid, nmat);
-			}
-			break;
-		case ET_TRI3:
-			{
-				FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
-				ReadShellElement(tag, sd.Element(ne), FE_SHELL_TRI, nid, nmat);
-			}
-			break;
-		case ET_TRUSS2:
-			{
-				FETrussDomain& td = static_cast<FETrussDomain&>(dom);
-				ReadTrussElement(tag, td.Element(ne), FE_TRUSS, nid, nmat);
-			}
-			break;
+		case ET_HEX8  : ReadElement(tag, dom.ElementRef(ne), m_pim->m_nhex8, nid, nmat); break;
+		case ET_HEX20 : ReadElement(tag, dom.ElementRef(ne), FE_HEX20G27, nid, nmat); break;
+		case ET_HEX27 : ReadElement(tag, dom.ElementRef(ne), FE_HEX27G27, nid, nmat); break;
+		case ET_PENTA6: ReadElement(tag, dom.ElementRef(ne), FE_PENTA6G6, nid, nmat); break;
+		case ET_TET4  : ReadElement(tag, dom.ElementRef(ne), m_pim->m_ntet4, nid, nmat); break;
+		case ET_TET10 : ReadElement(tag, dom.ElementRef(ne), m_pim->m_ntet10, nid, nmat); break;
+		case ET_TET15 : ReadElement(tag, dom.ElementRef(ne), m_pim->m_ntet15, nid, nmat); break;
+		case ET_QUAD4 : ReadElement(tag, dom.ElementRef(ne), FE_SHELL_QUAD, nid, nmat); break;
+		case ET_TRI3  : ReadElement(tag, dom.ElementRef(ne), FE_SHELL_TRI, nid, nmat); break;
+		case ET_TRUSS2: ReadElement(tag, dom.ElementRef(ne), FE_TRUSS, nid, nmat); break;
 		default:
 			throw FEBioImport::InvalidElementType();
 		}
@@ -443,66 +412,16 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 		// read the element data
 		switch (etype)
 		{
-		case ET_HEX8:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(i), m_pim->m_nhex8, nid, nmat);
-			}
-			break;
-		case ET_PENTA6:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(i), FE_PENTA6G6, nid, nmat);
-			}
-			break;
-		case ET_TET4:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(i), m_pim->m_ntet4, nid, nmat);
-			}
-			break;
-		case ET_TET10:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(i), m_pim->m_ntet10, nid, nmat);
-			}
-			break;
-		case ET_TET15:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(i), m_pim->m_ntet15, nid, nmat);
-			}
-			break;
-		case ET_HEX20:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(i), FE_HEX20G27, nid, nmat);
-			}
-			break;
-		case ET_HEX27:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(i), FE_HEX27G27, nid, nmat);
-			}
-			break;
-		case ET_QUAD4:
-			{
-				FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
-				ReadShellElement(tag, sd.Element(i), FE_SHELL_QUAD, nid, nmat);
-			}
-			break;
-		case ET_TRI3:
-			{
-				FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
-				ReadShellElement(tag, sd.Element(i), FE_SHELL_TRI, nid, nmat);
-			}
-			break;
-		case ET_TRUSS2:
-			{
-				FETrussDomain& td = static_cast<FETrussDomain&>(dom);
-				ReadTrussElement(tag, td.Element(i), FE_TRUSS, nid, nmat);
-			}
-			break;
+		case ET_HEX8  : ReadElement(tag, dom.ElementRef(i), m_pim->m_nhex8, nid, nmat); break;
+		case ET_PENTA6: ReadElement(tag, dom.ElementRef(i), FE_PENTA6G6, nid, nmat); break;
+		case ET_TET4  : ReadElement(tag, dom.ElementRef(i), m_pim->m_ntet4, nid, nmat); break;
+		case ET_TET10 : ReadElement(tag, dom.ElementRef(i), m_pim->m_ntet10, nid, nmat); break;
+		case ET_TET15 : ReadElement(tag, dom.ElementRef(i), m_pim->m_ntet15, nid, nmat); break;
+		case ET_HEX20 : ReadElement(tag, dom.ElementRef(i), FE_HEX20G27, nid, nmat); break;
+		case ET_HEX27 : ReadElement(tag, dom.ElementRef(i), FE_HEX27G27, nid, nmat); break;
+		case ET_QUAD4 : ReadElement(tag, dom.ElementRef(i), FE_SHELL_QUAD, nid, nmat); break;
+		case ET_TRI3  : ReadElement(tag, dom.ElementRef(i), FE_SHELL_TRI, nid, nmat); break;
+		case ET_TRUSS2: ReadElement(tag, dom.ElementRef(i), FE_TRUSS, nid, nmat); break;
 		default:
 			throw FEBioImport::InvalidElementType();
 		}
@@ -610,66 +529,16 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 
 		switch (etype)
 		{
-		case ET_HEX8:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nhex8, nid, 0);
-			}
-			break;
-		case ET_HEX20:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_HEX20G27, nid, 0);
-			}
-			break;
-		case ET_HEX27:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_HEX27G27, nid, 0);
-			}
-			break;
-		case ET_PENTA6:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_PENTA6G6, nid, 0);
-			}
-			break;
-		case ET_TET4:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), m_pim->m_ntet4, nid, 0);
-			}
-			break;
-		case ET_TET10:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET10G4, nid, 0);
-			}
-			break;
-		case ET_TET15:
-			{
-				FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET15G8, nid, 0);
-			}
-			break;
-		case ET_QUAD4:
-			{
-				FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
-				ReadShellElement(tag, sd.Element(ne), FE_SHELL_QUAD, nid, 0);
-			}
-			break;
-		case ET_TRI3:
-			{
-				FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
-				ReadShellElement(tag, sd.Element(ne), FE_SHELL_TRI, nid, 0);
-			}
-			break;
-		case ET_TRUSS2:
-			{
-				FETrussDomain& td = static_cast<FETrussDomain&>(dom);
-				ReadTrussElement(tag, td.Element(ne), FE_TRUSS, nid, 0);
-			}
-			break;
+		case ET_HEX8  : ReadElement(tag, dom.ElementRef(ne), m_pim->m_nhex8, nid, 0); break;
+		case ET_HEX20 : ReadElement(tag, dom.ElementRef(ne), FE_HEX20G27, nid, 0); break;
+		case ET_HEX27 : ReadElement(tag, dom.ElementRef(ne), FE_HEX27G27, nid, 0); break;
+		case ET_PENTA6: ReadElement(tag, dom.ElementRef(ne), FE_PENTA6G6, nid, 0); break;
+		case ET_TET4  : ReadElement(tag, dom.ElementRef(ne), m_pim->m_ntet4, nid, 0); break;
+		case ET_TET10 : ReadElement(tag, dom.ElementRef(ne), FE_TET10G4, nid, 0); break;
+		case ET_TET15 : ReadElement(tag, dom.ElementRef(ne), FE_TET15G8, nid, 0); break;
+		case ET_QUAD4 : ReadElement(tag, dom.ElementRef(ne), FE_SHELL_QUAD, nid, 0); break;
+		case ET_TRI3  : ReadElement(tag, dom.ElementRef(ne), FE_SHELL_TRI, nid, 0); break;
+		case ET_TRUSS2: ReadElement(tag, dom.ElementRef(ne), FE_TRUSS, nid, 0); break;
 		default:
 			throw FEBioImport::InvalidElementType();
 		}
@@ -680,41 +549,15 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioGeometrySection::ReadSolidElement(XMLTag &tag, FESolidElement& el, int ntype, int nid, int nmat)
+void FEBioGeometrySection::ReadElement(XMLTag &tag, FEElement& el, int ntype, int nid, int nmat)
 {
 	el.SetType(ntype);
 	el.m_nID = nid;
 	int n[FEElement::MAX_NODES];
 	tag.value(n,el.Nodes());
-	for (int j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
+	m_pim->GlobalToLocalID(n, el.Nodes(), el.m_node);
 	el.SetMatID(nmat);
 }
-
-//-----------------------------------------------------------------------------
-void FEBioGeometrySection::ReadShellElement(XMLTag &tag, FEShellElement& el, int ntype, int nid, int nmat)
-{
-	el.SetType(ntype);
-	el.m_nID = nid;
-	int n[9];
-	tag.value(n,el.Nodes());
-	for (int j=0; j<el.Nodes(); ++j) { el.m_node[j] = n[j]-1; el.m_h0[j] = 0.0; }
-	el.SetMatID(nmat);
-}
-
-//-----------------------------------------------------------------------------
-void FEBioGeometrySection::ReadTrussElement(XMLTag &tag, FETrussElement& el, int ntype, int nid, int nmat)
-{
-	el.SetType(ntype);
-	el.m_nID = nid;
-	int n[8];
-	tag.value(n, el.Nodes());
-	for (int j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-	el.SetMatID(nmat);
-
-	// area is read in the ElementData section
-	el.m_a0 = 0;
-}
-
 
 //-----------------------------------------------------------------------------
 //! Reads the ElementData section from the FEBio input file

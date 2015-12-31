@@ -362,7 +362,7 @@ public:
 class FETrussElement : public FEElement
 {
 public:
-	FETrussElement(){}
+	FETrussElement();
 
 	FETrussElement(const FETrussElement& el);
 

@@ -200,7 +200,7 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 		++tag;
 		do
 		{
-			int n = atoi(tag.AttributeValue("id"))-1;
+			int n = m_pim->ReadNodeID(tag);
 			const char* sz = tag.AttributeValue("bc");
 
 			int ndof = dofs.GetDOF(sz);
@@ -323,7 +323,7 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 		++tag;
 		do
 		{
-			int n = atoi(tag.AttributeValue("id"))-1;
+			int n = m_pim->ReadNodeID(tag);
 			if ((n<0) || (n >= NN)) throw XMLReader::InvalidAttributeValue(tag, "id");
 			for (int j=0; j<nbc; ++j) pbc[j]->AddNode(n);
 			++tag;
@@ -442,7 +442,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		++tag;
 		for (int i=0; i<ndis; ++i)
 		{
-			int n = atoi(tag.AttributeValue("id"))-1;
+			int n = m_pim->ReadNodeID(tag);
 			const char* sz = tag.AttributeValue("bc");
 
 			// get the dof index from its symbol
@@ -540,7 +540,7 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 		for (int i=0; i<ndis; ++i)
 		{
 			// get the node ID
-			int n = atoi(tag.AttributeValue("id"))-1;
+			int n = m_pim->ReadNodeID(tag);
 			m_pim->value(tag, scale);
 
 			pdc->AddNode(n, scale);
@@ -695,7 +695,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 	FELinearConstraint LC(&fem);
 	int node;
 	tag.AttributeValue("node", node);
-	LC.master.node = node-1;
+	LC.master.node = m_pim->FindNodeFromID(node);
 
 	const char* szbc = tag.AttributeValue("bc");
 	if      (strcmp(szbc, "x") == 0) LC.master.bc = 0;
@@ -715,8 +715,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 		if (tag == "node")
 		{
 			tag.value(dof.val);
-			tag.AttributeValue("id", node);
-			dof.node = node - 1;
+			dof.node = m_pim->ReadNodeID(tag);
 
 			const char* szbc = tag.AttributeValue("bc");
 			if      (strcmp(szbc, "x") == 0) dof.bc = 0;
@@ -1054,9 +1053,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					if (tag == "node")
 					{
 						tag.value(dof.val);
-						int node;
-						tag.AttributeValue("id", node);
-						dof.node = node - 1;
+						dof.node = m_pim->ReadNodeID(tag);
 
 						const char* szbc = tag.AttributeValue("bc");
 						if      (strcmp(szbc, "x") == 0) dof.bc = 0;

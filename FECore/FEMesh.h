@@ -91,9 +91,17 @@ public:
 
 	//! Set the number of DOFS
 	void SetDOFS(int n);
+
+	//! Get the nodal ID
+	int GetID() const { return m_nID; }
+
+	//! Set the node ID
+	void SetID(int n) { m_nID = n; }
+
+protected:
+	int		m_nID;	//!< nodal ID
 	
-public:
-	// geometry data
+public: // geometry data
 	vec3d	m_r0;	//!< initial position
 	vec3d	m_rt;	//!< current position
 
@@ -105,7 +113,7 @@ public:
 
 	vec3d	m_Fr;	//!< nodal reaction forces
 
-	// rigid body data
+public:	// rigid body data
 	int		m_rid;		//!< rigid body number
 	bool	m_bshell;	//!< does this node belong to a non-rigid shell element?
 	bool	m_bexclude;	//!< exclude this node from the analysis

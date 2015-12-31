@@ -103,6 +103,12 @@ FEBioImport::FailedAllocatingSolver::FailedAllocatingSolver(const char* sztype)
 }
 
 //-----------------------------------------------------------------------------
+FEBioImport::InvalidNodeID::InvalidNodeID()
+{
+	SetErrorString("Invalid node ID");
+}
+
+//-----------------------------------------------------------------------------
 FEModel* FEBioFileSection::GetFEModel() { return m_pim->GetFEModel(); }
 FEAnalysis* FEBioFileSection::GetStep() { return m_pim->GetStep(); }
 
@@ -928,7 +934,7 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag)
 			// assign indices to node set
 			int N = l.size();
 			pns->create(N);
-			for (int i=0; i<N; ++i) (*pns)[i] = l[i] - 1;
+			for (int i=0; i<N; ++i) (*pns)[i] = FindNodeFromID(l[i]);
 
 			// add the nodeset to the mesh
 			mesh.AddNodeSet(pns);
@@ -937,4 +943,60 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag)
 	}
 
 	return pns;
+}
+
+//-----------------------------------------------------------------------------
+void FEBioImport::BuildNodeList()
+{
+	// find the min, max ID
+	// (We assume that they are given by the first and last node)
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	int NN = mesh.Nodes();
+	int nmin = mesh.Node(0   ).GetID();
+	int nmax = mesh.Node(NN-1).GetID();
+	assert(nmax >= nmin);
+
+	// get the range
+	int nn = nmax - nmin+1;
+
+	// allocate list
+	m_node_off = nmin;
+	m_node_list.assign(nn, -1);
+
+	// build the list
+	for (int i=0; i<NN; ++i)
+	{
+		int nid = mesh.Node(i).GetID();
+		m_node_list[nid - m_node_off] = i;
+	}
+}
+
+//-----------------------------------------------------------------------------
+int FEBioImport::FindNodeFromID(int nid)
+{
+	int N = (int) m_node_list.size();
+	if (N > 0)
+	{
+		int n = nid - m_node_off;
+		if ((n>=0)&&(n<N)) return m_node_list[n];
+	}
+	throw FEBioImport::InvalidNodeID();
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+void FEBioImport::GlobalToLocalID(int* l, int n, vector<int>& m)
+{
+	assert((int) m.size()==n);
+	for (int i=0; i<n; ++i)
+	{
+		m[i] = FindNodeFromID(l[i]);
+	}
+}
+
+//-----------------------------------------------------------------------------
+int FEBioImport::ReadNodeID(XMLTag& tag)
+{
+	int n = atoi(tag.AttributeValue("id"));
+	return FindNodeFromID(n);
 }

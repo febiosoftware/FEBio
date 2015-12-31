@@ -28,9 +28,7 @@ protected:
 
 	void ParseMesh(XMLTag& tag);
 
-	void ReadSolidElement(XMLTag& tag, FESolidElement& el, int ntype, int nid, int nmat);
-	void ReadShellElement(XMLTag& tag, FEShellElement& el, int ntype, int nid, int nmat);
-	void ReadTrussElement(XMLTag& tag, FETrussElement& el, int ntype, int nid, int nmat);
+	void ReadElement(XMLTag& tag, FEElement& el, int ntype, int nid, int nmat);
 
 	FE_Element_Shape ElementShape(XMLTag& tag);
 	FEDomain* CreateDomain(const FE_Element_Shape& eshape, FEMesh* pm, FEMaterial* pmat);
