@@ -382,6 +382,9 @@ bool FEBioModel::Serialize(DumpFile &ar)
 	// --- Global Data ---
 	SerializeGlobals(ar);
 
+	// --- Analysis data ---
+	SerializeAnalysisData(ar);
+
 	// --- Material Data ---
 	SerializeMaterials(ar);
 
@@ -393,9 +396,6 @@ bool FEBioModel::Serialize(DumpFile &ar)
 
 	// --- Boundary Condition Data ---
 	SerializeBoundaryData(ar);
-
-	// --- Analysis data ---
-	SerializeAnalysisData(ar);
 
 	// --- Save IO Data
 	SerializeIOData(ar);
@@ -505,15 +505,6 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		// direct solver data
 		ar << m_nsolver;
 		ar << m_bwopt;
-
-		// body loads
-		ar << (int) m_BL.size();
-		for (int i=0; i<(int) m_BL.size(); ++i)
-		{
-			FEBodyLoad* pbl = m_BL[i];
-			ar << pbl->GetTypeStr();
-			pbl->Serialize(ar);
-		}
 	}
 	else
 	{
@@ -538,21 +529,6 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		// direct solver data
 		ar >> m_nsolver;
 		ar >> m_bwopt;
-
-		// body loads
-		int nbl;
-		ar >> nbl;
-		m_BL.clear();
-		char szbl[256] = {0};
-		for (int i=0; i<nbl; ++i)
-		{
-			ar >> szbl;
-			FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, szbl, this);
-			assert(pbl);
-
-			pbl->Serialize(ar);
-			m_BL.push_back(pbl);
-		}
 
 		// set the correct step
 		m_pStep = m_Step[m_nStep];
@@ -856,6 +832,15 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			psl->Serialize(ar);
 		}
 
+		// body loads
+		ar << (int) m_BL.size();
+		for (int i=0; i<(int) m_BL.size(); ++i)
+		{
+			FEBodyLoad* pbl = m_BL[i];
+			ar << pbl->GetTypeStr();
+			pbl->Serialize(ar);
+		}
+
 		// model loads
 		ar << (int) m_ML.size();
 		for (int i=0; i<(int) m_ML.size(); ++i)
@@ -964,6 +949,21 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 
 			m_SL.push_back(ps);
 			m_mesh.AddSurface(psurf);
+		}
+
+		// body loads
+		int nbl;
+		ar >> nbl;
+		m_BL.clear();
+		char szbl[256] = {0};
+		for (int i=0; i<nbl; ++i)
+		{
+			ar >> szbl;
+			FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, szbl, this);
+			assert(pbl);
+
+			pbl->Serialize(ar);
+			m_BL.push_back(pbl);
 		}
 
 		// model loads
