@@ -3,6 +3,7 @@
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEShellDomain.h"
 #include "FECore/FETrussDomain.h"
+#include "FECore/FEDomain2D.h"
 #include "FECore/FEModel.h"
 #include "FEBioMech/FEElasticMaterial.h"
 #include "FECore/FECoreKernel.h"
@@ -396,6 +397,28 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 		mesh.AddElementSet(pg);
 	}
 
+	// get the dimensionality
+	int NDIM = 3;
+	if (dynamic_cast<FEDomain2D*>(pdom)) NDIM = 2;
+
+	// get the element type
+	int el_type = -1;
+	switch (etype)
+	{
+	case ET_HEX8  : el_type = m_pim->m_nhex8 ; break;
+	case ET_PENTA6: el_type = FE_PENTA6G6    ; break;
+	case ET_TET4  : el_type = m_pim->m_ntet4 ; break;
+	case ET_TET10 : el_type = m_pim->m_ntet10; break;
+	case ET_TET15 : el_type = m_pim->m_ntet15; break;
+	case ET_HEX20 : el_type = FE_HEX20G27    ; break;
+	case ET_HEX27 : el_type = FE_HEX27G27    ; break;
+	case ET_QUAD4 : el_type = (NDIM == 3 ? FE_SHELL_QUAD : FE2D_QUAD4G4) ; break;
+	case ET_TRI3  : el_type = (NDIM == 3 ? FE_SHELL_TRI  : FE2D_TRI3G1 ) ; break;
+	case ET_TRUSS2: el_type = FE_TRUSS       ; break;
+	default:
+		throw FEBioImport::InvalidElementType();
+	}
+
 	// read element data
 	++tag;
 	for (int i=0; i<elems; ++i)
@@ -417,21 +440,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 		if (pg) (*pg)[i] = nid;
 
 		// read the element data
-		switch (etype)
-		{
-		case ET_HEX8  : ReadElement(tag, dom.ElementRef(i), m_pim->m_nhex8 , nid, nmat); break;
-		case ET_PENTA6: ReadElement(tag, dom.ElementRef(i), FE_PENTA6G6    , nid, nmat); break;
-		case ET_TET4  : ReadElement(tag, dom.ElementRef(i), m_pim->m_ntet4 , nid, nmat); break;
-		case ET_TET10 : ReadElement(tag, dom.ElementRef(i), m_pim->m_ntet10, nid, nmat); break;
-		case ET_TET15 : ReadElement(tag, dom.ElementRef(i), m_pim->m_ntet15, nid, nmat); break;
-		case ET_HEX20 : ReadElement(tag, dom.ElementRef(i), FE_HEX20G27    , nid, nmat); break;
-		case ET_HEX27 : ReadElement(tag, dom.ElementRef(i), FE_HEX27G27    , nid, nmat); break;
-		case ET_QUAD4 : ReadElement(tag, dom.ElementRef(i), FE_SHELL_QUAD  , nid, nmat); break;
-		case ET_TRI3  : ReadElement(tag, dom.ElementRef(i), FE_SHELL_TRI   , nid, nmat); break;
-		case ET_TRUSS2: ReadElement(tag, dom.ElementRef(i), FE_TRUSS       , nid, nmat); break;
-		default:
-			throw FEBioImport::InvalidElementType();
-		}
+		ReadElement(tag, dom.ElementRef(i), el_type , nid, nmat);
 
 		// go to next tag
 		++tag;
