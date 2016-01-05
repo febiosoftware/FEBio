@@ -203,6 +203,9 @@
 		D5F0E92719D05B9F0073F72C /* erf.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F0E92519D05B9F0073F72C /* erf.h */; };
 		D5F76A4F1BC9FD8400DFA30A /* FELinearSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F76A4D1BC9FD8400DFA30A /* FELinearSolver.cpp */; };
 		D5F76A501BC9FD8400DFA30A /* FELinearSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F76A4E1BC9FD8400DFA30A /* FELinearSolver.h */; };
+		D5F9A96E1C3C4B8400D53C19 /* RigidBC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F9A96B1C3C4B8400D53C19 /* RigidBC.cpp */; };
+		D5F9A96F1C3C4B8400D53C19 /* RigidBC.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F9A96C1C3C4B8400D53C19 /* RigidBC.h */; };
+		D5F9A9701C3C4B8400D53C19 /* sys.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F9A96D1C3C4B8400D53C19 /* sys.h */; };
 		D5FA1BE21B74CDCB00EA5913 /* FEModelLoad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FA1BE01B74CDCB00EA5913 /* FEModelLoad.cpp */; };
 		D5FA1BE31B74CDCB00EA5913 /* FEModelLoad.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FA1BE11B74CDCB00EA5913 /* FEModelLoad.h */; };
 		D5FAB1521BAC5A760057818F /* FEInitialCondition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FAB1501BAC5A760057818F /* FEInitialCondition.cpp */; };
@@ -414,6 +417,9 @@
 		D5F0E92519D05B9F0073F72C /* erf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = erf.h; sourceTree = "<group>"; };
 		D5F76A4D1BC9FD8400DFA30A /* FELinearSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELinearSolver.cpp; sourceTree = "<group>"; };
 		D5F76A4E1BC9FD8400DFA30A /* FELinearSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELinearSolver.h; sourceTree = "<group>"; };
+		D5F9A96B1C3C4B8400D53C19 /* RigidBC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RigidBC.cpp; sourceTree = "<group>"; };
+		D5F9A96C1C3C4B8400D53C19 /* RigidBC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RigidBC.h; sourceTree = "<group>"; };
+		D5F9A96D1C3C4B8400D53C19 /* sys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sys.h; sourceTree = "<group>"; };
 		D5FA1BE01B74CDCB00EA5913 /* FEModelLoad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEModelLoad.cpp; sourceTree = "<group>"; };
 		D5FA1BE11B74CDCB00EA5913 /* FEModelLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEModelLoad.h; sourceTree = "<group>"; };
 		D5FAB1501BAC5A760057818F /* FEInitialCondition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEInitialCondition.cpp; sourceTree = "<group>"; };
@@ -626,11 +632,14 @@
 				D5E10A701865E15900B23922 /* qsort.cpp */,
 				D596022F195B65E6000A675D /* quatd.cpp */,
 				D5E10A711865E15900B23922 /* quatd.h */,
+				D5F9A96B1C3C4B8400D53C19 /* RigidBC.cpp */,
+				D5F9A96C1C3C4B8400D53C19 /* RigidBC.h */,
 				D5E10A721865E15900B23922 /* SparseMatrix.cpp */,
 				D5E10A731865E15900B23922 /* SparseMatrix.h */,
 				D5E10A741865E15900B23922 /* stdafx.cpp */,
 				D5E10A751865E15900B23922 /* stdafx.h */,
 				D595BB411899C7B40028A7F3 /* svd.cpp */,
+				D5F9A96D1C3C4B8400D53C19 /* sys.h */,
 				D5E10A761865E15900B23922 /* targetver.h */,
 				D59BBBA21AD771DD00E2991F /* tens3d.cpp */,
 				D59BBBA31AD771DD00E2991F /* tens3d.h */,
@@ -724,6 +733,7 @@
 				D5E10A8D1865E15900B23922 /* ElementDataRecord.h in Headers */,
 				D5E10AC31865E15900B23922 /* FEModel.h in Headers */,
 				D59BBBBA1AD771DD00E2991F /* tens6d.hpp in Headers */,
+				D5F9A96F1C3C4B8400D53C19 /* RigidBC.h in Headers */,
 				D5B572DC186CC76500D12E45 /* FECoreTask.h in Headers */,
 				D5E10AF21865E15900B23922 /* mat2d.h in Headers */,
 				D5B572DE186CC76500D12E45 /* FEGlobalData.h in Headers */,
@@ -737,6 +747,7 @@
 				D59BBBB71AD771DD00E2991F /* tens5ds.hpp in Headers */,
 				D59BBBB21AD771DD00E2991F /* tens3drs.hpp in Headers */,
 				D5E10AE71865E15900B23922 /* FETypes.h in Headers */,
+				D5F9A9701C3C4B8400D53C19 /* sys.h in Headers */,
 				D5E10AFB1865E15900B23922 /* MatrixProfile.h in Headers */,
 				D58D4D151B5D7E76002BB72A /* FECallBack.h in Headers */,
 				D5C111361BCDE4D8005219CD /* FENewtonStrategy.h in Headers */,
@@ -889,6 +900,7 @@
 				D5E10AC01865E15900B23922 /* FEMesh.cpp in Sources */,
 				D5E10A981865E15900B23922 /* FEBoundaryCondition.cpp in Sources */,
 				D5E10AE81865E15900B23922 /* Image.cpp in Sources */,
+				D5F9A96E1C3C4B8400D53C19 /* RigidBC.cpp in Sources */,
 				D5FA1BE21B74CDCB00EA5913 /* FEModelLoad.cpp in Sources */,
 				D50CB99B1B177CCC006E43E6 /* BC.cpp in Sources */,
 				D5E10AD71865E15900B23922 /* FERigidBody.cpp in Sources */,

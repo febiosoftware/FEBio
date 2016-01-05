@@ -309,8 +309,6 @@
 		D5E1082A1865DFAD00B23922 /* FESphericalFiberDistribution.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E107441865DFAD00B23922 /* FESphericalFiberDistribution.h */; };
 		D5E1082B1865DFAD00B23922 /* FESpringMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E107451865DFAD00B23922 /* FESpringMaterial.cpp */; };
 		D5E1082C1865DFAD00B23922 /* FESpringMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E107461865DFAD00B23922 /* FESpringMaterial.h */; };
-		D5E1082D1865DFAD00B23922 /* FEStiffnessMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E107471865DFAD00B23922 /* FEStiffnessMatrix.cpp */; };
-		D5E1082E1865DFAD00B23922 /* FEStiffnessMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E107481865DFAD00B23922 /* FEStiffnessMatrix.h */; };
 		D5E1082F1865DFAD00B23922 /* FEStVenantKirchhoff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E107491865DFAD00B23922 /* FEStVenantKirchhoff.cpp */; };
 		D5E108301865DFAD00B23922 /* FEStVenantKirchhoff.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1074A1865DFAD00B23922 /* FEStVenantKirchhoff.h */; };
 		D5E108311865DFAD00B23922 /* FESurfaceConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1074B1865DFAD00B23922 /* FESurfaceConstraint.cpp */; };
@@ -670,8 +668,6 @@
 		D5E107441865DFAD00B23922 /* FESphericalFiberDistribution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESphericalFiberDistribution.h; sourceTree = "<group>"; };
 		D5E107451865DFAD00B23922 /* FESpringMaterial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESpringMaterial.cpp; sourceTree = "<group>"; };
 		D5E107461865DFAD00B23922 /* FESpringMaterial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESpringMaterial.h; sourceTree = "<group>"; };
-		D5E107471865DFAD00B23922 /* FEStiffnessMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEStiffnessMatrix.cpp; sourceTree = "<group>"; };
-		D5E107481865DFAD00B23922 /* FEStiffnessMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEStiffnessMatrix.h; sourceTree = "<group>"; };
 		D5E107491865DFAD00B23922 /* FEStVenantKirchhoff.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEStVenantKirchhoff.cpp; sourceTree = "<group>"; };
 		D5E1074A1865DFAD00B23922 /* FEStVenantKirchhoff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEStVenantKirchhoff.h; sourceTree = "<group>"; };
 		D5E1074B1865DFAD00B23922 /* FESurfaceConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESurfaceConstraint.cpp; sourceTree = "<group>"; };
@@ -1063,8 +1059,6 @@
 				B465DA881B94A3A500EF4843 /* FESRIElasticSolidDomain.h */,
 				D5B57D0318A40AFC005C9598 /* FEStickyInterface.cpp */,
 				D5B57D0418A40AFC005C9598 /* FEStickyInterface.h */,
-				D5E107471865DFAD00B23922 /* FEStiffnessMatrix.cpp */,
-				D5E107481865DFAD00B23922 /* FEStiffnessMatrix.h */,
 				D5E107491865DFAD00B23922 /* FEStVenantKirchhoff.cpp */,
 				D5E1074A1865DFAD00B23922 /* FEStVenantKirchhoff.h */,
 				D5E1074B1865DFAD00B23922 /* FESurfaceConstraint.cpp */,
@@ -1210,7 +1204,6 @@
 				D5E108381865DFAD00B23922 /* FETiedContactSurface.h in Headers */,
 				D5E108261865DFAD00B23922 /* FESolidMaterial.h in Headers */,
 				D594FB3D1AFEE10300F82D29 /* FERigidCylindricalJoint.h in Headers */,
-				D5E1082E1865DFAD00B23922 /* FEStiffnessMatrix.h in Headers */,
 				D5E108401865DFAD00B23922 /* FETransIsoVerondaWestmann.h in Headers */,
 				D5E107C01865DFAD00B23922 /* FEFacet2FacetSliding.h in Headers */,
 				D5E1084A1865DFAD00B23922 /* FEUncoupledElasticMixture.h in Headers */,
@@ -1469,7 +1462,6 @@
 				D5E107B31865DFAD00B23922 /* FEElasticMultigeneration.cpp in Sources */,
 				D5FF08F61BE4528E0064FF98 /* FEMortarSlidingContact.cpp in Sources */,
 				D5E108251865DFAD00B23922 /* FESolidMaterial.cpp in Sources */,
-				D5E1082D1865DFAD00B23922 /* FEStiffnessMatrix.cpp in Sources */,
 				D5E107AA1865DFAD00B23922 /* FEEFDVerondaWestmann.cpp in Sources */,
 				D5E107781865DFAD00B23922 /* FE2DTransIsoVerondaWestmann.cpp in Sources */,
 				D5E107D91865DFAD00B23922 /* FEGasserOgdenHolzapfel.cpp in Sources */,
