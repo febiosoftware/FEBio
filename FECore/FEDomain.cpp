@@ -53,7 +53,7 @@ FEElement* FEDomain::FindElementFromID(int nid)
 	for (int i=0; i<Elements(); ++i)
 	{
 		FEElement& el = ElementRef(i);
-		if (el.m_nID == nid) return &el;
+		if (el.GetID() == nid) return &el;
 	}
 
 	return 0;

@@ -190,7 +190,7 @@ double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, int n)
 	}
 
 	double D = F.det();
-	if (D <= 0) throw NegativeJacobian(el.m_nID, n, D, &el);
+	if (D <= 0) throw NegativeJacobian(el.GetID(), n, D, &el);
 
 	return D;
 }
@@ -242,7 +242,7 @@ double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, double r, double s, 
 	}
 
 	double D = F.det();
-	if (D <= 0) throw NegativeJacobian(el.m_nID, -1, D, &el);
+	if (D <= 0) throw NegativeJacobian(el.GetID(), -1, D, &el);
 
 	return D;
 }
@@ -285,7 +285,7 @@ double FESolidDomain::invjac0(FESolidElement& el, double Ji[3][3], int n)
 				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
 		
 	// make sure the determinant is positive
-	if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
+	if (det <= 0) throw NegativeJacobian(el.GetID(), n+1, det);
 
 	// calculate the inverse jacobian
 	double deti = 1.0 / det;
@@ -348,7 +348,7 @@ double FESolidDomain::invjac0(FESolidElement& el, double Ji[3][3], double r, dou
 				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
 		
 	// make sure the determinant is positive
-	if (det <= 0) throw NegativeJacobian(el.m_nID, -1, det);
+	if (det <= 0) throw NegativeJacobian(el.GetID(), -1, det);
 
 	// calculate the inverse jacobian
 	double deti = 1.0 / det;
@@ -406,7 +406,7 @@ double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], int n)
 				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
 
 	// make sure the determinant is positive
-	if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
+	if (det <= 0) throw NegativeJacobian(el.GetID(), n+1, det);
 
 	// calculate inverse jacobian
 	double deti = 1.0 / det;
@@ -467,7 +467,7 @@ double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], double r, dou
 				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
 		
 	// make sure the determinant is positive
-	if (det <= 0) throw NegativeJacobian(el.m_nID, -1, det);
+	if (det <= 0) throw NegativeJacobian(el.GetID(), -1, det);
 
 	// calculate the inverse jacobian
 	double deti = 1.0 / det;
@@ -711,7 +711,7 @@ void FESolidDomain::Serialize(DumpFile &ar)
 			ar << el.Type();
 			
 			ar << nmat;
-			ar << el.m_nID;
+			ar << el.GetID();
 			ar << el.m_node;
 
 			for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
@@ -725,7 +725,7 @@ void FESolidDomain::Serialize(DumpFile &ar)
 		ar >> m_Node;
 
 		FEModel& fem = *ar.GetFEModel();
-		int n, mat;
+		int n, mat, nid;
 		for (size_t i=0; i<m_Elem.size(); ++i)
 		{
 			FESolidElement& el = m_Elem[i];
@@ -734,7 +734,7 @@ void FESolidDomain::Serialize(DumpFile &ar)
 			el.SetType(n);
 
 			ar >> mat; el.SetMatID(mat);
-			ar >> el.m_nID;
+			ar >> nid; el.SetID(nid);
 			ar >> el.m_node;
 
 			for (int j=0; j<el.GaussPoints(); ++j)

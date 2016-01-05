@@ -94,7 +94,7 @@ bool FEFluidDomain2D::Initialize(FEModel &fem)
             if (J0 <= 0)
             {
                 felog.printf("**************************** E R R O R ****************************\n");
-                felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
+                felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
                 felog.printf("Jacobian = %lg\n", J0);
                 felog.printf("Did you use the right node numbering?\n");
                 felog.printf("Nodes:");

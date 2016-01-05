@@ -221,7 +221,7 @@ void FEElasticMultiscaleDomain2O::UpdateElementStress(int iel, double dt)
 
 		// If it is a multi-element problem, plot for the middle integration point of each element 
 		if (n == 13){
-			plot_on = el.m_nID;}
+			plot_on = el.GetID();}
 		
 		// If it is a multi-element problem, plot for the last integration point in the first and last element
 		//if ((el.m_nID == 1 || el.m_nID == num_elem) && (n == nint-1)){

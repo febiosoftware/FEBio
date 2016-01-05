@@ -61,8 +61,8 @@ void ElementDataRecord::BuildELT()
 		for (j=0; j<ne; ++j)
 		{
 			FEElement& el = d.ElementRef(j);
-			m_ELT[el.m_nID-1].ndom = i;
-			m_ELT[el.m_nID-1].nid  = j;
+			m_ELT[el.GetID()-1].ndom = i;
+			m_ELT[el.GetID()-1].nid  = j;
 		}
 	}
 }

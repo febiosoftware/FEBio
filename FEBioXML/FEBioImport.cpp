@@ -109,6 +109,18 @@ FEBioImport::InvalidNodeID::InvalidNodeID()
 }
 
 //-----------------------------------------------------------------------------
+FEBioImport::MissingSlaveSurface::MissingSlaveSurface()
+{
+	SetErrorString("Missing contact slave surface");
+}
+
+//-----------------------------------------------------------------------------
+FEBioImport::MissingMasterSurface::MissingMasterSurface()
+{
+	SetErrorString("Missing contact master surface");
+}
+
+//-----------------------------------------------------------------------------
 FEModel* FEBioFileSection::GetFEModel() { return m_pim->GetFEModel(); }
 FEAnalysis* FEBioFileSection::GetStep() { return m_pim->GetStep(); }
 

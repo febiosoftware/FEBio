@@ -58,7 +58,7 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 			if (J0 <= 0)
 			{
 				felog.printf("**************************** E R R O R ****************************\n");
-				felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
+				felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
 				felog.printf("Jacobian = %lg\n", J0);
 				felog.printf("Did you use the right node numbering?\n");
 				felog.printf("Nodes:");
@@ -164,7 +164,7 @@ double FEElasticShellDomain::defgrad(FEShellElement& el, mat3d& F, int n)
 	}
 
 	double V = F.det();
-	if (V <= 0) throw NegativeJacobian(el.m_nID, n, V, &el);
+	if (V <= 0) throw NegativeJacobian(el.GetID(), n, V, &el);
 
 	return V;
 }
@@ -219,7 +219,7 @@ double FEElasticShellDomain::invjact(FEShellElement& el, double Ji[3][3], int n)
 				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
 
 	// make sure the determinant is positive
-	if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
+	if (det <= 0) throw NegativeJacobian(el.GetID(), n+1, det);
 		
 	// calculate the inverse of the jacobian
 	double deti = 1.0 / det;

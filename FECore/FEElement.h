@@ -76,6 +76,12 @@ public:
 	//! Get the element traits
 	FEElementTraits* GetTraits() { return m_pT; }
 
+	//! get the element ID
+	int GetID() const { return m_nID; }
+
+	//! set the element ID
+	void SetID(int n) { m_nID = n; }
+
 	//! return number of nodes
 	int Nodes() const { return m_pT->neln; } 
 
@@ -116,10 +122,10 @@ public:
 	vec3d Evaluate(vec3d* vn, int n);
 
 protected:
+	int		m_nID;		//!< element ID
 	int		m_mat;		//!< material index
 
 public:
-	int				m_nID;		//!< element ID
 	vector<int>		m_node;		//!< connectivity
 
 	// This array stores the local node numbers, that is the node numbers

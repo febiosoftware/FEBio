@@ -667,7 +667,7 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 		for (i=0; i<NE; ++i)
 		{
 			FESolidElement& el = dom.Element(i);
-			n[0] = el.m_nID;
+			n[0] = el.GetID();
 			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
 			m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
 		}
@@ -710,7 +710,7 @@ void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 		for (i=0; i<NE; ++i)
 		{
 			FEShellElement& el = dom.Element(i);
-			n[0] = el.m_nID;
+			n[0] = el.GetID();
 			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
 			m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
 		}
@@ -747,7 +747,7 @@ void FEBioPlotFile::WriteTrussDomain(FETrussDomain& dom)
 		for (i=0; i<NE; ++i)
 		{
 			FEElement& el = dom.ElementRef(i);
-			n[0] = el.m_nID;
+			n[0] = el.GetID();
 			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
 			m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
 		}
@@ -784,7 +784,7 @@ void FEBioPlotFile::WriteDiscreteDomain(FEDiscreteDomain& dom)
 		for (i=0; i<NE; ++i)
 		{
 			FEElement& el = dom.ElementRef(i);
-			n[0] = el.m_nID;
+			n[0] = el.GetID();
 			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
 			m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
 		}
@@ -829,7 +829,7 @@ void FEBioPlotFile::WriteDomain2D(FEDomain2D& dom)
         for (i=0; i<NE; ++i)
         {
             FEElement2D& el = dom.Element(i);
-            n[0] = el.m_nID;
+            n[0] = el.GetID();
             for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
             m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
         }

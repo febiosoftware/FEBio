@@ -97,12 +97,12 @@ int FESurface::FindElement(FESurfaceElement& el)
 			{
 				switch (nn)
 				{
-				case 3: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.m_nID; break;
-				case 4: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.m_nID; break;
-				case 6: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.m_nID; break;
-				case 7: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.m_nID; break;
-				case 8: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.m_nID; break;
-				case 9: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.m_nID; break;
+				case 3: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
+				case 4: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.GetID(); break;
+				case 6: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
+				case 7: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
+				case 8: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.GetID(); break;
+				case 9: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.GetID(); break;
 				default:
 					assert(false);
 				}
@@ -1477,7 +1477,7 @@ void FESurface::Serialize(DumpFile &ar)
 		{
 			FESurfaceElement& el = Element(k);
 			ar << el.Type();
-			ar << el.GetMatID() << el.m_nID;
+			ar << el.GetMatID() << el.GetID();
 			ar << el.m_node;
 			ar << el.m_lnode;
 			ar << el.m_nelem;
@@ -1493,15 +1493,16 @@ void FESurface::Serialize(DumpFile &ar)
 		{
 			FESurfaceElement& el = Element(k);
 
-			int n, mat;
+			int n, mat, nid;
 			ar >> n;
 			el.SetType(n);
 
-			ar >> mat >> el.m_nID;
+			ar >> mat >> nid;
 			ar >> el.m_node;
 			ar >> el.m_lnode;
 			ar >> el.m_nelem;
 			el.SetMatID(mat);
+			el.SetID(nid);
 		}
 
 		// initialize surface

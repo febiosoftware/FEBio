@@ -83,7 +83,7 @@ bool FEFluidTangentUniaxial::Init()
     m.AddDomain(pd);
     FESolidElement& el = pd->Element(0);
     el.SetType(FE_HEX8G8);
-    el.m_nID = 1;
+    el.SetID(1);
     el.SetMatID(0);
     for (i=0; i<8; ++i) el.m_node[i] = i;
     
@@ -162,7 +162,7 @@ bool FEFluidTangentUniaxialSS::Init()
     m.AddDomain(pd);
     FESolidElement& el = pd->Element(0);
     el.SetType(FE_HEX8G8);
-    el.m_nID = 1;
+    el.SetID(1);
     el.SetMatID(0);
     for (i=0; i<8; ++i) el.m_node[i] = i;
     

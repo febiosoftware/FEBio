@@ -60,7 +60,7 @@ double FEDomain2D::invjac0(FEElement2D& el, double Ji[2][2], int n)
 	double det =  J[0][0]*J[1][1] - J[0][1]*J[1][0];
 		
 	// make sure the determinant is positive
-	if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
+	if (det <= 0) throw NegativeJacobian(el.GetID(), n+1, det);
 
 	// calculate the inverse jacobian
 	double deti = 1.0 / det;
@@ -106,7 +106,7 @@ double FEDomain2D::invjact(FEElement2D& el, double Ji[2][2], int n)
 	double det =  J[0][0]*J[1][1] - J[0][1]*J[1][0];
 		
 	// make sure the determinant is positive
-	if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
+	if (det <= 0) throw NegativeJacobian(el.GetID(), n+1, det);
 
 	// calculate the inverse jacobian
 	double deti = 1.0 / det;
@@ -279,7 +279,7 @@ void FEDomain2D::Serialize(DumpFile &ar)
             ar << el.Type();
             
             ar << el.GetMatID();
-            ar << el.m_nID;
+            ar << el.GetID();
             ar << el.m_node;
 			ar << el.m_lnode;
             
@@ -288,7 +288,7 @@ void FEDomain2D::Serialize(DumpFile &ar)
     }
     else
     {
-        int n, mat;
+        int n, mat, nid;
         
         ar >> m_Node;
         
@@ -304,7 +304,7 @@ void FEDomain2D::Serialize(DumpFile &ar)
             el.SetType(n);
             
             ar >> mat; el.SetMatID(mat);
-            ar >> el.m_nID;
+            ar >> nid; el.SetID(nid);
             ar >> el.m_node;
 			ar >> el.m_lnode;
             

@@ -123,6 +123,20 @@ public:
 	public: InvalidNodeID();
 	};
 
+	//! missing slave surface
+	class MissingSlaveSurface : public Exception
+	{
+	public:
+		MissingSlaveSurface();
+	};
+
+	//! missing master surface
+	class MissingMasterSurface : public Exception
+	{
+	public:
+		MissingMasterSurface();
+	};
+
 public:
 	//-------------------------------------------------------------------------
 	class PlotVariable

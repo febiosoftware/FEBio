@@ -42,7 +42,7 @@ void FEDiscreteDomain::AddElement(int eid, int n[2])
 	el.SetType(FE_DISCRETE);
 	el.m_node[0] = n[0];
 	el.m_node[1] = n[1];
-	el.m_nID = eid;
+	el.SetID(eid);
 	m_Elem.push_back(el);
 }
 
@@ -60,7 +60,7 @@ void FEDiscreteDomain::Serialize(DumpFile& ar)
 			ar << (int) el.Type();
 			
 			ar << nmat;
-			ar << el.m_nID;
+			ar << el.GetID();
 			ar << el.m_node;
 
 			for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
@@ -73,7 +73,7 @@ void FEDiscreteDomain::Serialize(DumpFile& ar)
 
 		FEModel& fem = *ar.GetFEModel();
 		ar >> m_Node;
-		int n, mat;
+		int n, mat, nid;
 		for (size_t i=0; i<m_Elem.size(); ++i)
 		{
 			FEDiscreteElement& el = m_Elem[i];
@@ -82,7 +82,7 @@ void FEDiscreteDomain::Serialize(DumpFile& ar)
 			el.SetType(n);
 
 			ar >> mat; el.SetMatID(mat);
-			ar >> el.m_nID;
+			ar >> nid; el.SetID(nid);
 			ar >> el.m_node;
 
 			for (int j=0; j<el.GaussPoints(); ++j)

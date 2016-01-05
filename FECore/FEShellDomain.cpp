@@ -66,7 +66,7 @@ double FEShellDomain::invjac0(FEShellElement& el, double Ji[3][3], int n)
 				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
 
 	// make sure the determinant is positive
-	if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
+	if (det <= 0) throw NegativeJacobian(el.GetID(), n+1, det);
 		
 	// calculate the inverse of the jacobian
 	double deti = 1.0 / det;
@@ -161,7 +161,7 @@ void FEShellDomain::Serialize(DumpFile &ar)
 			ar << el.Type();
 
 			ar << el.GetMatID();
-			ar << el.m_nID;
+			ar << el.GetID();
 			ar << el.m_node;
 
 			ar << el.m_h0;
@@ -172,7 +172,7 @@ void FEShellDomain::Serialize(DumpFile &ar)
 	}
 	else
 	{
-		int n, mat;
+		int n, mat, nid;
 
 		ar >> m_Node;
 
@@ -188,7 +188,7 @@ void FEShellDomain::Serialize(DumpFile &ar)
 			el.SetType(n);
 
 			ar >> mat; el.SetMatID(mat);
-			ar >> el.m_nID;
+			ar >> nid; el.SetID(nid);
 			ar >> el.m_node;
 
 			ar >> el.m_h0;

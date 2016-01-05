@@ -153,6 +153,10 @@ void FEBioContactSection::ParseContactInterface(XMLTag& tag, FESurfacePairIntera
 		++tag;
 	}
 	while (!tag.isend());
+
+	// Make sure we have a master and a slave interface
+	FESurface* pss = pci->GetSlaveSurface (); if ((pss == 0) || (pss->Elements()==0)) throw FEBioImport::MissingSlaveSurface ();
+	FESurface* pms = pci->GetMasterSurface(); if ((pms == 0) || (pms->Elements()==0)) throw FEBioImport::MissingMasterSurface();
 }
 
 //-----------------------------------------------------------------------------
