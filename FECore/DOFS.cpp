@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "DumpFile.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -82,6 +83,28 @@ DOFS::DOF_ITEM::~DOF_ITEM()
 }
 
 //-----------------------------------------------------------------------------
+DOFS::Var::Var()
+{
+	szname[0] = 0;
+}
+
+//-----------------------------------------------------------------------------
+DOFS::Var::Var(const DOFS::Var& v) 
+{ 
+	strcpy(szname, v.szname); 
+	m_dof = v.m_dof; 
+	ntype = v.ntype; 
+}
+
+//-----------------------------------------------------------------------------
+void DOFS::Var::operator = (const DOFS::Var& v)
+{ 
+	strcpy(szname, v.szname); 
+	m_dof = v.m_dof; 
+	ntype = v.ntype; 
+}
+
+//-----------------------------------------------------------------------------
 void DOFS::Reset()
 {
 	// clear the DOFS
@@ -105,7 +128,7 @@ int DOFS::AddVariable(const char* szvar, int ntype)
 
 	// Okay, add the variable
 	Var var;
-	var.szname = szvar;
+	strcpy(var.szname, szvar);
 	var.ntype = ntype;
 
 	// allocate degrees of freedom
@@ -357,6 +380,58 @@ void DOFS::SetDOFName(int nvar, int n, const char* szname)
 		{
 			DOF_ITEM& it = var.m_dof[n];
 			it.SetName(szname);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void DOFS::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_maxdofs;
+		int nvar = m_var.size();
+		ar << nvar;
+		for (int i=0; i<nvar; ++i)
+		{
+			Var& v = m_var[i];
+			ar << v.ntype;
+			ar << v.szname;
+
+			int ndof = (int) v.m_dof.size();
+			ar << ndof;
+			for (int j=0; j<ndof; ++j)
+			{
+				DOF_ITEM& d = v.m_dof[j];
+				ar << d.ndof;
+				ar << d.sz;
+			}
+		}
+	}
+	else
+	{
+		m_var.clear();
+		ar >> m_maxdofs;
+		int nvar;
+		ar >> nvar;
+		for (int i=0; i<nvar; ++i)
+		{
+			Var v;
+			ar >> v.ntype;
+			ar >> v.szname;
+
+			int ndof;
+			ar >> ndof;
+			for (int j=0; j<ndof; ++j)
+			{
+				DOF_ITEM d;
+				ar >> d.ndof;
+				ar >> d.sz;
+
+				v.m_dof.push_back(d);
+			}
+
+			m_var.push_back(v);
 		}
 	}
 }

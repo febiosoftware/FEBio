@@ -376,6 +376,9 @@ bool FEBioModel::Serialize(DumpFile &ar)
 		if (nversion != RSTRTVERSION) return false;
 	}
 
+	// --- DOF data ---
+	m_dofs.Serialize(ar);
+
 	// --- Load Data ---
 	SerializeLoadData(ar);
 

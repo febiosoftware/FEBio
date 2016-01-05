@@ -120,9 +120,9 @@ bool FEGlobalMatrix::Create(FEModel* pfem, int neq, bool breset)
 
 			// Add all elements to the profile
 			// Loop over all active domains
-			for (int nd=0; nd<pstep->Domains(); ++nd)
+			for (int nd=0; nd<mesh.Domains(); ++nd)
 			{
-				FEDomain& d = *pstep->Domain(nd);
+				FEDomain& d = mesh.Domain(nd);
 				d.BuildMatrixProfile(*this);
 			}
 

@@ -2,6 +2,8 @@
 #define __FECore__DOFS__
 #include <vector>
 
+class DumpFile;
+
 //-----------------------------------------------------------------------------
 // Degree of freedom types
 #define DOF_OPEN		 0		// the dof is open and will be given an equation number
@@ -48,14 +50,15 @@ class DOFS
 	// (e.g. a displacement variable in 3D has 3 dofs.)
 	class Var
 	{
+		enum { MAX_VAR_NAME = 64 };
 	public:
-		Var() : szname(0) {}
-		Var(const Var& v) { szname = v.szname; m_dof = v.m_dof; ntype = v.ntype; }
-		void operator = (const Var& v) { szname = v.szname; m_dof = v.m_dof; ntype = v.ntype; }
+		Var();
+		Var(const Var& v);
+		void operator = (const Var& v);
 
 	public:
-		int			ntype;				// type of variable
-		const char* szname;				// variable name
+		int		ntype;					// type of variable
+		char	szname[MAX_VAR_NAME];	// variable name
 		std::vector<DOF_ITEM>	m_dof;	// list of dofs for this variable
 	};
 
@@ -118,6 +121,9 @@ public:
 	//! Set the name of a DOF
 	void SetDOFName(const char* szvar, int n, const char* szname);
 	void SetDOFName(int nvar, int n, const char* szname);
+
+	//! serialization
+	void Serialize(DumpFile& ar);
 
 private:
 	void Update();
