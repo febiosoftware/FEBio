@@ -1,19 +1,36 @@
 /**
 \page plugin_log Accessing the FEBio Log file
 By default FEBio writes all output to a log file. More precisely, it uses the Logfile class which writes to both the standard output as well as to a file. FEBio also
-defines a felog variable, an instance of Logfile, that developers can use to write to the log file. Although plugins also define an felog variable (by including FECore\log.h) it is important to realize that this is not the same log file that is being used by FEBio. Instead, it is a variable that is only local to the plugin. Although a plugin could use this variable to output information, that information will not be stored in the log file.
+defines a felog variable, an instance of Logfile, that developers can use to write to the log file. Although plugins also define an felog variable (by including FECore\log.h)
+it is important to realize that this is not the same log file that is being used by FEBio. Instead, it is a variable that is only local to the plugin. 
+Although a plugin could use this variable to output information, that information will not be stored to the FEBio log file.
 
-In order to access the FEBio log file, you must call the FECoreKernel::GetLogfile during the PluginInitialize function. The pointer returned by this function
-can then be stored and used to write to the actual FEBio log file. 
+In order to access the FEBio log file, you must call the FECoreKernel::SetInstance during the PluginInitialize function. 
 
 \code
-Logfile* plog = 0;
 FECORE_EXPORT void PluginInitialize(FECoreKernel& febio)
 {
-	plog = febio.GetLogfile();
+	FECoreKernel::SetInstance(&febio);
 }
 \endcode
 
-This page was edited last on Mon Jun 20 2015.
+This ensures that the plugin and FEBio use the same kernel and consequently the same resources (e.g. the logfile). 
+
+Writing to the logfile can be done by including the file <FECore\log.h> and using the felog variable. This variable has two member function for writing data to the log file.
+
+The <c>printf</c> function works just like the c printf function and can be used to write formatted text to the screen and the log file. 
+
+\code
+felog.printf("A negative Jacobian was detected at integration point %d of element %d", 1, 123);
+\endcode
+
+The <c>printbox</c> function is similar, but prints the message in a box. It takes at least two arguments: The first argument is a string that is the title of the 
+message box, the second is a formatted text string. 
+
+\code
+felog.printbox("FATAL ERROR", "Your library book %s is overdue (fine = $%d)", "FEBio for beginners", 5.0);
+\endcode
+
+<i>This page was edited last on Tue Jan 5 2016.</i>
 
 */

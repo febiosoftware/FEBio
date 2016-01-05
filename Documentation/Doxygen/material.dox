@@ -11,7 +11,7 @@ The basic procedure for creating a new material for FEBio requires the following
 1.	Defining a new material class by deriving it from an available base class.
 2.	Registering the material with FEBio's framework.
 3.	Defining the material parameters.
-4.	Implementing the initialization function (optional)
+4.	Implementing the Init() and Validate() functions (optional)
 5.	Defining a MaterialPoint structure (optional)
 6.	Implementing the stress and tangent functions.
 
@@ -50,7 +50,10 @@ class FENeoHookean : public FEElasticMaterial
  
  		// class initialization (optional)
  		virtual void Init();
- 
+
+ 		// class validation (optional)
+ 		virtual void Validate();
+
  		// declare as having a parameter list
  		DECLARE_PARAMETER_LIST();
 };
@@ -107,15 +110,15 @@ example, this list is found at the top of the FENeoHookean.cpp file.
 
 \code
 BEGIN_PARAMETER_LIST(FENeoHookean, FEElasticMaterial);
-	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
-	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
+	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1, 0.5), "v");
 END_PARAMETER_LIST();
 \endcode
 
 The parameter list definition begins with the BEGIN_PARAMETER_LIST macro, which takes two parameters: the 
-name of the class, and the name of the base class. Next, for each parameter, the ADD_PARAMETER macro can
-be used to define it. This macro takes three parameters: the variable that will store the parameter's value,
-a type identifier and a string name for the variable. The type of the type identifier can be any of the 
+name of the class, and the name of the base class. Next, for each parameter, the ADD_PARAMETER2 macro can
+be used to define it. This macro takes four parameters: the variable that will store the parameter's value,
+a type identifier, a range identifer, and a string name for the variable. The type of the type identifier can be any of the 
 following values.
 
 \li FE_PARAM_INT: defines a parameter of type int. 
@@ -125,22 +128,7 @@ following values.
 Note that the type identifier must match the type of the actual variable. For example, a double variable must
 be defined with the FE_PARAM_DOUBLE type identifier. If the types do not match, the resulting behavior is undefined.
 
-Finally, the parameter list must be ended with the END_PARAMETER_LIST macro. Note that there a couple of more 
-advanced options to define material parameters, such as vector parameters and load-curve controlled parameters.
-These will be discussed in the advanced section below.
-
-<b>New in FEBio 2.4</b>
-
-As of FEBio version 2.4, automatic range checking can be added to the parameter list. This is done by using the 
-new macro <c>ADD_PARAMETER2</c>. This macro takes an extra parameter that defines the valid range of the parameter.
-For example,
-
-\code
-ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
-\endcode
-
-This defines a parameter, called "E", mapped to the class variable m_E, that takes a double precision,
-and that has to be greater than 0.0. The range specifier can take on the following values.
+The range identifier can be one of the following values.
 
 \li FE_RANGE_DONT_CARE(): parameter can take on any value
 \li FE_RANGE_GREATER(val): parameter must be greater than val.
@@ -153,54 +141,54 @@ and that has to be greater than 0.0. The range specifier can take on the followi
 \li FE_RANGE_LEFT_OPEN(min,max): parameter must be inside the left-open interval (min, max]
 \li FE_RANGE_NOT_EQUAL(val): parameter cannot equal val.
 
-It is highly recommended to use automatic range checking on all material parameters. This helps catch common
-input errors.
+Defining the valid range of a variable helps FEBio to ensure that the value of the variable remains within this range
+throughout the analysis. FEBio will check the range every time a parameter is changed (e.g. if the parameter defines 
+a loadcurve then the value will be checked at the start of each time step).
 
 Currently, automatic range checking is only available for <c>FE_PARAM_DOUBLE</c> and <c>FE_PARAM_INT</c> parameters.
+It is ignored for all other parameters.
 
-\subsection step4 Implementing the initialization function
+Finally, the parameter list must be ended with the END_PARAMETER_LIST macro. Note that there a couple of more 
+advanced options to define material parameters, such as vector parameters and load-curve controlled parameters.
+These will be discussed in the advanced section below.
+
+\subsection step4 Implementing the Init function
 
 When implementing a new material class the user has the option to override the base class implementation of the 
-Init function. This function is called after the material parameters have been read from the input file and can
-be used to check the values of these parameters.  In our example, this function is declared as follows.
+Init function. This function is called during model initialization and can be used to allocate any data the class may require. 
+In our example, this function is not necessary but is provided simply as an example. It is important to always 
+call the base class version as well.
 
 \code
-void FENeoHookean::Init()
+bool FENeoHookean::Init()
 {
-		FEElasticMaterial::Init();
-
-		if (m_E <= 0) throw MaterialError("Invalid value for E");
-		if (!INRANGE(m_v, -1, 0.5)) throw MaterialError("Invalid range for v");
+	if (FEElasticMaterial::Init() == false) return false;
+	
+	// Do additional initialization here
+	
+	return true;
 }
 \endcode
 
-First note line 3 where the base class version of this function is called. It is good practice to always call
-this function so that the base class has a chance to check itself. Even though the base class implementation may
-do nothing, it is best not to assume this and always call the base class version.
-
-The next two lines check the values of the parameters as they have been read from the user input file. If an invalid
-parameter value is encountered the user can report a problem by throwing the MaterialError exception. This exception
-accepts a variable-argument list, similarly to the printf class of functions. Throwing this error will cause the run
-to be aborted with a fatal error. The error message will be printed on the screen as well as to the log file. 
-
-Again, it is noted that this function is optional, but it is recommended to implement it so that potential problems
-due to invalid material parameters can be caught quickly.
-
-<b>New in FEBio 2.4</b>
-
-It is recommended to use the automatic range check option available from FEBio 2.4 instead of doing parameter range
-checking in the <c>Init()</c> function. Automatic range checking is done using the <c>ADD_PARAMETER2</c> macro (see previous section).
+\subsection step4b Implementing the Validate function
+The Validate function is called whenever the values of the material parameters have changed. By default, FEBio will use
+the ranges defined in the material parameter definitions to validate materials so for most material implementation this 
+function doest not have to be defined. However, if the material requires additional
+validation then the user should override the Validate member. Again, make sure to always call the base class version. 
 
 \code
-BEGIN_PARAMETER_LIST(FENeoHookean, FEElasticMaterial);
-	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
-	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
-END_PARAMETER_LIST();
+bool FENeoHookean::Validate()
+{
+	if (FEElasticMaterial::Validate() == false) return false;
+	
+	// Do additional parameter validation here
+	
+	return true;
+}
 \endcode
 
-In FEBio 2.4 this is the preferred way of defining the material parameter list. This says that the parameter "E" must be 
-greater than zero, and "v" must lie inside the right-open interval [-1, 0.5). (This means that the parameter can take on
-the value -1, but not 0.5).
+The Validate function should also be implemented when class members depend on material parameters. Since material parameters
+can change during an analysis (e.g. via a load curve), then all dependent parameters must be updated as well. 
 
 \subsection step5 Implementing the stress and tangent functions
 
@@ -548,5 +536,5 @@ mat3ds MyViscoMaterial::Stress(FEMaterialPoint& mp)
 }
 \endcode
 
-<i>This page was last updated on August 13, 2015</i>
+<i>This page was edited last on Tue Jan 5 2016.</i>
 */

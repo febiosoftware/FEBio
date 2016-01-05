@@ -54,13 +54,21 @@ FECORE_EXPORT unsigned int GetSDKVersion()
 FEBio will not load the plugin if this function is omitted or if the returned version number is incompatible with the version of FEBio that is trying to load the plugin.
 
 \subsection PluginInitialize
-This function will be the first function called by FEBio and can be used to allocated and initialize plugin data.
+This function will be the first function called by FEBio and can be used to allocated and initialize plugin data. It is also recommended to call the SetInstance function
+as in the example below.
 
 \code
-FECORE_EXPORT void PluginInitialize(FECoreKernel&);
+FECORE_EXPORT void PluginInitialize(FECoreKernel& febio)
+{
+	FECoreKernel::SetInstance(&febio);
+}
 \endcode
 
-It takes one parameter, a reference to the kernel object. This object is used for accessing the resources managed by this class, such as the \ref plugin_log "log file". This is also a good place to allocate any resources that the plugin may need. 
+It takes one parameter, a reference to the kernel object. This object is used for accessing the resources managed by this class, such as the \ref plugin_log "log file". 
+This is also a good place to allocate any resources that the plugin may need. The call to SetInstance ensures
+that the plugin uses the same kernel object as the FEBio executable. Since a plugin links statically to the FECore library, it actually has its own FECoreKernel object
+(and related resources such as the logfile). However, this is usally not desirable and calling the SetInstance function ensure that both the plugin and the FEBio 
+executable use the same kernel.
 
 \subsection PluginNumClasses
 This functions returns the number of classes that the plugin defines. 
@@ -125,6 +133,6 @@ Add the following line to this configuration file.
 
 That is, enclose the full path and filename of the plugin between "import" tags. When FEBio starts it will read all plugins listed in the configuration file. A message will be printed on the screen at the start of an FEBio analysis indicating if FEBio was successful in loading the plugin.
 
-This page was edited last on Mon Jun 20 2015.
+<i>This page was edited last on Tue Jan 5 2016.</i>
 
 */
