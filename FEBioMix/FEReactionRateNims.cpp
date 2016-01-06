@@ -36,13 +36,7 @@ bool FEReactionRateNims::Init()
         
         // convert global sol value to local id
         FEMultiphasic* pmp = m_pReact->m_pMP;
-        int gid = m_sol - 1;
-        m_lid = -1;
-        for (int isol=0; isol<pmp->Solutes(); ++isol)
-            if (pmp->GetSolute(isol)->GetSoluteID() == gid) {
-                m_lid = isol;
-                break;
-            }
+		m_lid = pmp->FindLocalSoluteID(m_sol - 1);
         
         // check validity of local id
         if (m_lid == -1)

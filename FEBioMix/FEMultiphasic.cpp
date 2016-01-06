@@ -287,6 +287,19 @@ int FEMultiphasic::FindLocalSBMID(int nid)
 }
 
 //-----------------------------------------------------------------------------
+//! Returns the local solute index given the global ID
+int FEMultiphasic::FindLocalSoluteID(int nid)
+{
+	int lsid = -1;
+	for (int isol=0; isol<Solutes(); ++isol)
+		if (GetSolute(isol)->GetSoluteID() == nid) {
+                lsid = isol;
+                break;
+		}
+	return lsid;
+}
+
+//-----------------------------------------------------------------------------
 bool FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
 {
 	int isol, isbm, itot;
@@ -357,6 +370,13 @@ bool FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
 //-----------------------------------------------------------------------------
 bool FEMultiphasic::Init()
 {
+	// we first have to set the parent material
+	// TODO: This seems redundant since each material already has a pointer to its parent
+	for (int i=0; i<Reactions(); ++i)
+	{
+		m_pReact[i]->m_pMP = this;
+	}
+
 	// call the base class.
 	// This also initializes all properties
 	if (FEMaterial::Init() == false) return false;
