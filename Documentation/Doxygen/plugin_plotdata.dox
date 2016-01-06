@@ -31,21 +31,21 @@ class MyNodeData : public FENodeData
 {
 public:
 	MyNodeData(FEModel* pfem) : FENodeData(PLT_FLOAT, FMT_NODE){}
-	bool Save(FEMesh& m, vector<float>& a);
+	bool Save(FEMesh& m, FEDataStream& a);
 };
 \endcode
 
-The \c Save function takes the \c FEMesh as a parameter and a vector of floats. This vector is initially empty and needs to be filled by the \c Save function. 
+The \c Save function takes the \c FEMesh as a parameter and FEDataStream reference.
 
 \code
-bool MyNodeData::Save(FEMesh& m, vector<float>& a)
+bool MyNodeData::Save(FEMesh& m, FEDataStream& a)
 {
 	int N = m.Nodes();
 	for (int i=0; i<N; ++i)
 	{
-		float f;
+		double f;
 		\\ calculate something for f
-		a.push_back(f);
+		a << f;
 	}
 	return true;
 }
@@ -59,24 +59,24 @@ class MyElementData : public FEDomainData
 {
 public:
 	MyElementData(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, vector<float>& a);
+	bool Save(FEDomain& dom, FEDataStream& a);
 };
 \endcode
 
-The \c Save member function takes the FEDomain class and a vector of float as parameters. The domain references the current domain for which data is being stored. 
+The \c Save member function takes the FEDomain class and a FEDataStream as parameters. The domain references the current domain for which data is being stored. 
 A cast may be necessary to convert the FEDomain base class to the correct domain class. 
 
 \code
-class MyElementData::Save(FEDomain& dom, vector<float>& a)
+class MyElementData::Save(FEDomain& dom, FEDataStream& a)
 {
 	int NE = dom.Elements();
 	for (int i=0; i<NE; ++i)
 	{
 		FEElement& el = dom.ElementRef(i);
 		
-		float f;
+		double f;
 		\\ calculate something for f
-		a.push_back(f);
+		a << f;
 	}
 	
 	return true;
@@ -91,29 +91,29 @@ class MySurfaceData : public FESurfaceData
 {
 public:
 	MySurfaceData(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FESurface& s, vector<float>& a);
+	bool Save(FESurface& s, FEDataStream& a);
 };
 \endcode
 
-The \c Save member function takes the FESurface class and a vector of float as parameters. The FESurface references the current surface for which data is being stored. 
+The \c Save member function takes the FESurface class and a FEDataStream as parameters. The FESurface references the current surface for which data is being stored. 
 
 \code
-class MySurfaceData::Save(FESurface& s, vector<float>& a)
+class MySurfaceData::Save(FESurface& s, FEDataStream& a)
 {
 	int NE = s.Elements();
 	for (int i=0; i<NE; ++i)
 	{
 		FESurfaceElement& el = s.Element(i);
 		
-		float f;
+		double f;
 		\\ calculate something for f
-		a.push_back(f);
+		a << f;
 	}
 	
 	return true;
 }
 \endcode 
 
-This page was last edited on Mon Jun 20 2015.
+<i>This page was last edited on Tue Jan 5 2016.</i>
 
 */

@@ -10,9 +10,10 @@ and a parameter that defines when the callback should be called. The possible va
 \li <b>CB_INIT</b>: Calls the callback after initialization, but before the solve phase.
 \li <b>CB_MAJOR_ITERS</b>: Calls the callback after each converged time step.
 \li <b>CB_MINOR_ITERS</b>: Calls the callback after each quasi-Newton iteration.
-\li <b>CB_ALWAYS</b>: Calls the callback during all events defined above.
+\li <b>CB_SOLVED</b>: Calls the callback at the end of the solve phase.
 
-These parameters can be cominbed using a binary or operator (e.g. CB_INIT | CB_MAJOR_ITERS).
+These parameters can be cominbed using a binary or operator (e.g. CB_INIT | CB_MAJOR_ITERS). If you wish that the callback is called for all events you can use
+the convenience macro CB_ALWAYS. 
 
 The base class defines an abstract member, FECallback::Execute, which needs to be overridden by the derived class. This is the function that will be called by FEBio.
 
@@ -33,6 +34,22 @@ The constructor of the derived class calls the base class constructor with the p
 
 The Execute member is then called when the events occur for which the callback was registered. Inside this function, a developer can implement any additional functionality. 
 
-This page was edited last on Mon Jun 20 2015.
+If the callback was requested for multiple events the nreason parameter can be used to identify the event.
+
+\code
+void MyCallback::Execute(FEModel& fem, unsigned int nreason)
+{
+	if (nreason==CB_INIT)
+	{
+		// Model was initialized
+	}
+	else if (nreason == CB_SOLVED)
+	{
+		// Model is solved
+	}
+}
+\endcode
+
+<i>This page was edited last on Tue Jan 5 2016.</i>
 
 */
