@@ -16,4 +16,10 @@ public:
     
 	//! tangent of fluid pressure with respect to strain J
     virtual double Tangent_Pressure_Strain(FEMaterialPoint& mp) = 0;
+    
+    //! 2nd derivative of fluid pressure with respect to strain J
+    virtual double Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp) = 0;
+    
+    //! bulk modulus
+    double BulkModulus(FEMaterialPoint& mp);
 };

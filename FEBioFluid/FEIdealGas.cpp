@@ -45,3 +45,14 @@ double FEIdealGas::Tangent_Pressure_Strain(FEMaterialPoint &mp)
     double rho = m_pMat->Density(mp);
     return -m_Rgas*m_Tabs*rho/m_M/vt.m_J;
 }
+
+//-----------------------------------------------------------------------------
+//! 2nd derivative of fluid pressure with respect to strain J
+double FEIdealGas::Tangent_Pressure_Strain_Strain(FEMaterialPoint &mp)
+{
+    FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
+    FEFluid* m_pMat = dynamic_cast<FEFluid*>(GetParent());
+    assert(m_pMat);
+    double rho = m_pMat->Density(mp);
+    return 2*m_Rgas*m_Tabs*rho/m_M/(vt.m_J*vt.m_J);
+}

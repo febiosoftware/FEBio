@@ -30,6 +30,16 @@ double FENeoHookeanFluid::Tangent_Pressure_Strain(FEMaterialPoint &mp)
 {
     FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
     double J = vt.m_J;
-    double dpdJ = -m_k*(1 - log(J))/(J*J);
+    double dpdJ = m_k*(log(J) - 1)/(J*J);
     return dpdJ;
+}
+
+//-----------------------------------------------------------------------------
+//! 2nd derivative of fluid pressure with respect to strain J
+double FENeoHookeanFluid::Tangent_Pressure_Strain_Strain(FEMaterialPoint &mp)
+{
+    FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
+    double J = vt.m_J;
+    double d2pdJ2 = m_k*(3 - 2*log(J))/pow(J, 3);
+    return d2pdJ2;
 }

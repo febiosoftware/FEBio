@@ -35,3 +35,10 @@ double FEIdealFluid::Tangent_Pressure_Strain(FEMaterialPoint &mp)
 {
     return -m_k;
 }
+
+//-----------------------------------------------------------------------------
+//! 2nd derivative of fluid pressure with respect to strain J
+double FEIdealFluid::Tangent_Pressure_Strain_Strain(FEMaterialPoint &mp)
+{
+    return 0;
+}

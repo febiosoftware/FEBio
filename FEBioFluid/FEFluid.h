@@ -59,6 +59,12 @@ public:
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
 	
+    //! tangent of stress with respect to strain J
+    mat3ds Tangent_Strain(FEMaterialPoint& mp);
+    
+    //! tangent of stress with respect to rate of deformation tensor D
+    tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp)  { return m_pViscous->Tangent_RateOfDeformation(mp); }
+    
 	//! referential fluid density
 	double ReferentialDensity() { return m_rhor; }
 
@@ -71,6 +77,12 @@ public:
     //! return viscous part
     FEViscousFluid* GetViscous() { return m_pViscous; }
     
+    //! kinematic viscosity
+    double KinematicViscosity(FEMaterialPoint& mp);
+    
+    //! acoustic speed
+    double AcousticSpeed(FEMaterialPoint& mp);
+    
 public: // material parameters
     vector<FEBodyForce*>        m_bf;       //!< body forces acting on this viscous fluid material
 
@@ -80,6 +92,7 @@ private: // material properties
 	
 public:
     double						m_rhor;     //!< referential fluid density
+    bool                        m_bsupg;    //!< flag for SUPG stabilization
     
     // declare parameter list
     DECLARE_PARAMETER_LIST();

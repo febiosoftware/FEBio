@@ -50,3 +50,10 @@ tens4ds FENewtonianFluid::Tangent_RateOfDeformation(FEMaterialPoint& mp)
     tens4ds c = dyad1s(I)*(m_kappa - 2.*m_mu/3.) + dyad4s(I)*(2*m_mu);
     return c;
 }
+
+//-----------------------------------------------------------------------------
+//! kinematic viscosity
+double FENewtonianFluid::DynamicViscosity(FEMaterialPoint& mp)
+{
+    return m_mu;
+}

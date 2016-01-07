@@ -20,4 +20,7 @@ public:
     //! tangent of stress with respect to rate of deformation tensor D
     virtual tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp) = 0;
     
+    //! dynamic viscosity
+    virtual double DynamicViscosity(FEMaterialPoint& mp) = 0;
+    
 };

@@ -4,6 +4,7 @@
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFluid, FEMaterial)
     ADD_PARAMETER2(m_rhor, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "density");
+    ADD_PARAMETER(m_bsupg, FE_PARAM_BOOL, "supg");
 END_PARAMETER_LIST();
 
 //============================================================================
@@ -16,8 +17,9 @@ FEFluidMaterialPoint::FEFluidMaterialPoint()
     m_L.zero();
     m_J = 1;
     m_Jp = 1;
-    m_vt = m_vp = m_at = vec3d(0,0,0);
+    m_vt = m_vp = m_at = m_gradJ = vec3d(0,0,0);
     m_s.zero();
+    m_L.zero();
 }
 
 //-----------------------------------------------------------------------------
@@ -87,6 +89,7 @@ void FEFluidMaterialPoint::Init(bool bflag)
 FEFluid::FEFluid(FEModel* pfem) : FEMaterial(pfem)
 { 
 	m_rhor = 1;
+    m_bsupg = false;
 
 	// set material properties
 	AddProperty(&m_pElastic, "elastic"  );
@@ -126,4 +129,39 @@ mat3ds FEFluid::Stress(FEMaterialPoint& mp)
 	s.zz() -= p;
 	
 	return s;
+}
+
+//-----------------------------------------------------------------------------
+//! The tangent of stress with respect to strain J of a fluid material is the
+//! sum of the tangent of the fluid pressure and that of the viscous stress.
+
+mat3ds FEFluid::Tangent_Strain(FEMaterialPoint& mp)
+{
+    // get tangent of viscous stress
+    mat3ds sJ = m_pViscous->Tangent_Strain(mp);
+    
+    double dpdJ = m_pElastic->Tangent_Pressure_Strain(mp);
+    
+    // add tangent of fluid pressure
+    sJ.xx() -= dpdJ;
+    sJ.yy() -= dpdJ;
+    sJ.zz() -= dpdJ;
+    
+    return sJ;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate current fluid kinematic viscosity
+double FEFluid::KinematicViscosity(FEMaterialPoint& mp)
+{
+    return m_pViscous->DynamicViscosity(mp)/Density(mp);
+}
+
+//-----------------------------------------------------------------------------
+//! calculate current acoustic speed
+double FEFluid::AcousticSpeed(FEMaterialPoint& mp)
+{
+    double c = sqrt(m_pElastic->BulkModulus(mp)/Density(mp));
+    
+    return c;
 }

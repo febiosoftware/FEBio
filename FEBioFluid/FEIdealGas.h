@@ -16,6 +16,9 @@ class FEIdealGas :	public FEElasticFluid
         //! tangent of fluid pressure with respect to strain J
         double Tangent_Pressure_Strain(FEMaterialPoint& mp);
 		
+        //! 2nd derivative of fluid pressure with respect to strain J
+        double Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp);
+        
         //! Initialization routine
         bool Init();
         

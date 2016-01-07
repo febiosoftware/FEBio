@@ -27,6 +27,9 @@ public:
     //! tangent of stress with respect to rate of deformation tensor D
     tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp);
     
+    //! dynamic viscosity
+    double DynamicViscosity(FEMaterialPoint& mp);
+    
 public:
     double	m_mu0;		//!< shear viscosity at zero shear rate
     double	m_mui;		//!< shear viscosity at infinite shear rate
