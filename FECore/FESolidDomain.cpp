@@ -698,6 +698,138 @@ void FESolidDomain::ShallowCopy(DumpStream& dmp, bool bsave)
 }
 
 //-----------------------------------------------------------------------------
+//! This function calculates the covariant basis vectors of a solid element
+//! at an integration point
+
+void FESolidDomain::CoBaseVectors(FESolidElement& el, int j, vec3d g[3])
+{
+    FEMesh& m = *m_pMesh;
+    
+    // get the nr of nodes
+    int n = el.Nodes();
+    
+    // get the shape function derivatives
+    double* Hr = el.Gr(j);
+    double* Hs = el.Gs(j);
+    double* Ht = el.Gt(j);
+    
+    g[0] = g[1] = g[2] = vec3d(0,0,0);
+    for (int i=0; i<n; ++i)
+    {
+        vec3d rt = m.Node(el.m_node[i]).m_rt;
+        g[0] += rt*Hr[i];
+        g[1] += rt*Hs[i];
+        g[2] += rt*Ht[i];
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the contravariant basis vectors of a solid element
+//! at an integration point
+
+void FESolidDomain::ContraBaseVectors(FESolidElement& el, int j, vec3d gcnt[3])
+{
+    vec3d gcov[3];
+    CoBaseVectors(el, j, gcov);
+    
+    mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
+                    gcov[0].y, gcov[1].y, gcov[2].y,
+                    gcov[0].z, gcov[1].z, gcov[2].z);
+    mat3d Ji = J.inverse();
+    
+    gcnt[0] = vec3d(Ji(0,0),Ji(0,1),Ji(0,2));
+    gcnt[1] = vec3d(Ji(1,0),Ji(1,1),Ji(1,2));
+    gcnt[2] = vec3d(Ji(2,0),Ji(2,1),Ji(2,2));
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the parametric derivatives of covariant basis
+//! vectors of a solid element at an integration point
+
+void FESolidDomain::CoBaseVectorDerivatives(FESolidElement& el, int j, vec3d dg[3][3])
+{
+    FEMesh& m = *m_pMesh;
+    
+    // get the nr of nodes
+    int n = el.Nodes();
+    
+    // get the shape function derivatives
+    double* Hrr = el.Grr(j); double* Hrs = el.Grs(j); double* Hrt = el.Grt(j);
+    double* Hsr = el.Gsr(j); double* Hss = el.Gss(j); double* Hst = el.Gst(j);
+    double* Htr = el.Gtr(j); double* Hts = el.Gts(j); double* Htt = el.Gtt(j);
+    
+    dg[0][0] = dg[0][1] = dg[0][2] = vec3d(0,0,0);  // derivatives of g[0]
+    dg[1][0] = dg[1][1] = dg[1][2] = vec3d(0,0,0);  // derivatives of g[1]
+    dg[2][0] = dg[2][1] = dg[2][2] = vec3d(0,0,0);  // derivatives of g[2]
+    
+    for (int i=0; i<n; ++i)
+    {
+        vec3d rt = m.Node(el.m_node[i]).m_rt;
+        dg[0][0] += rt*Hrr[i]; dg[0][1] += rt*Hsr[i]; dg[0][2] += rt*Htr[i];
+        dg[1][0] += rt*Hrs[i]; dg[1][1] += rt*Hss[i]; dg[1][2] += rt*Hts[i];
+        dg[2][0] += rt*Hrt[i]; dg[2][1] += rt*Hst[i]; dg[2][2] += rt*Htt[i];
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the parametric derivatives of contravariant basis
+//! vectors of a solid element at an integration point
+
+void FESolidDomain::ContraBaseVectorDerivatives(FESolidElement& el, int j, vec3d dgcnt[3][3])
+{
+    vec3d gcnt[3];
+    vec3d dgcov[3][3];
+    ContraBaseVectors(el, j, gcnt);
+    CoBaseVectorDerivatives(el, j, dgcov);
+    
+    // derivatives of gcnt[0]
+    dgcnt[0][0] = -gcnt[0]*(gcnt[0]*dgcov[0][0])-gcnt[1]*(gcnt[0]*dgcov[1][0])-gcnt[2]*(gcnt[0]*dgcov[2][0]);
+    dgcnt[0][1] = -gcnt[0]*(gcnt[0]*dgcov[0][1])-gcnt[1]*(gcnt[0]*dgcov[1][1])-gcnt[2]*(gcnt[0]*dgcov[2][1]);
+    dgcnt[0][2] = -gcnt[0]*(gcnt[0]*dgcov[0][2])-gcnt[1]*(gcnt[0]*dgcov[1][2])-gcnt[2]*(gcnt[0]*dgcov[2][2]);
+
+    // derivatives of gcnt[1]
+    dgcnt[1][0] = -gcnt[0]*(gcnt[1]*dgcov[0][0])-gcnt[1]*(gcnt[1]*dgcov[1][0])-gcnt[2]*(gcnt[1]*dgcov[2][0]);
+    dgcnt[1][1] = -gcnt[0]*(gcnt[1]*dgcov[0][1])-gcnt[1]*(gcnt[1]*dgcov[1][1])-gcnt[2]*(gcnt[1]*dgcov[2][1]);
+    dgcnt[1][2] = -gcnt[0]*(gcnt[1]*dgcov[0][2])-gcnt[1]*(gcnt[1]*dgcov[1][2])-gcnt[2]*(gcnt[1]*dgcov[2][2]);
+
+    // derivatives of gcnt[2]
+    dgcnt[2][0] = -gcnt[0]*(gcnt[2]*dgcov[0][0])-gcnt[1]*(gcnt[2]*dgcov[1][0])-gcnt[2]*(gcnt[2]*dgcov[2][0]);
+    dgcnt[2][1] = -gcnt[0]*(gcnt[2]*dgcov[0][1])-gcnt[1]*(gcnt[2]*dgcov[1][1])-gcnt[2]*(gcnt[2]*dgcov[2][1]);
+    dgcnt[2][2] = -gcnt[0]*(gcnt[2]*dgcov[0][2])-gcnt[1]*(gcnt[2]*dgcov[1][2])-gcnt[2]*(gcnt[2]*dgcov[2][2]);
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the transpose of the spatial gradient of the shape
+//! function spatial gradients, gradT(grad H), at an integration point
+
+void FESolidDomain::gradTgradShape(FESolidElement& el, int j, vector<mat3d>& mn)
+{
+    int N = el.Nodes();
+    vec3d g[3], dg[3][3];
+    ContraBaseVectors(el, j, g);
+    ContraBaseVectorDerivatives(el, j, dg);
+
+    // get the shape functions
+    double* Hr = el.Gr(j);
+    double* Hs = el.Gs(j);
+    double* Ht = el.Gt(j);
+    
+    // get the shape function derivatives
+    double* Hrr = el.Grr(j); double* Hrs = el.Grs(j); double* Hrt = el.Grt(j);
+    double* Hsr = el.Gsr(j); double* Hss = el.Gss(j); double* Hst = el.Gst(j);
+    double* Htr = el.Gtr(j); double* Hts = el.Gts(j); double* Htt = el.Gtt(j);
+    
+    for (int i=0; i<N; ++i) {
+        mn[i] = ((g[0] & dg[0][0]) + (g[1] & dg[0][1]) + (g[2] & dg[0][2]))*Hr[i]
+        + ((g[0] & dg[1][0]) + (g[1] & dg[1][1]) + (g[2] & dg[1][2]))*Hs[i]
+        + ((g[0] & dg[2][0]) + (g[1] & dg[2][1]) + (g[2] & dg[2][2]))*Ht[i]
+        + (g[0] & g[0])*Hrr[i] + (g[1] & g[0])*Hsr[i] + (g[2] & g[0])*Htr[i]
+        + (g[0] & g[1])*Hrs[i] + (g[1] & g[1])*Hss[i] + (g[2] & g[1])*Hts[i]
+        + (g[0] & g[2])*Hrt[i] + (g[1] & g[2])*Hst[i] + (g[2] & g[2])*Htt[i];
+    }
+}
+
+//-----------------------------------------------------------------------------
 void FESolidDomain::Serialize(DumpFile &ar)
 {
 	if (ar.IsSaving())

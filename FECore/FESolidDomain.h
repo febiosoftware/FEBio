@@ -65,7 +65,22 @@ public:
 
 	//! calculate jacobian in current frame
 	double detJt(FESolidElement& el, int n);
+    
+    //! calculates covariant basis vectors at an integration point
+    void CoBaseVectors(FESolidElement& el, int j, vec3d g[3]);
 
+    //! calculates contravariant basis vectors at an integration point
+    void ContraBaseVectors(FESolidElement& el, int j, vec3d g[3]);
+    
+    //! calculates parametric derivatives of covariant basis vectors at an integration point
+    void CoBaseVectorDerivatives(FESolidElement& el, int j, vec3d dg[3][3]);
+    
+    //! calculates parametric derivatives of contravariant basis vectors at an integration point
+    void ContraBaseVectorDerivatives(FESolidElement& el, int j, vec3d dg[3][3]);
+    
+    //! calculate the transpose of the gradient of the shape function gradients at an integration point
+    void gradTgradShape(FESolidElement& el, int j, vector<mat3d>& mn);
+    
 public:
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);

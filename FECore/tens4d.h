@@ -86,8 +86,11 @@ public:
 	// unary operators
 	tens4ds operator - () const;
 	
-	// double dot product with tensor
+	// double dot product with 2nd order tensor
 	mat3ds dot(const mat3ds& m) const;
+    mat3ds dot(const mat3dd& m) const { return dot(mat3ds(m)); }
+    mat3ds dot(const mat3d& m) const;
+    mat3ds dot2(const mat3d& m) const;
 
 	// trace
 	double tr() const;

@@ -572,7 +572,8 @@ inline tens4ds ddots(const tens4ds& a, const tens4ds& b)
 }
 
 //-----------------------------------------------------------------------------
-// double contraction with a symmetric 2nd-order tensor
+// double contraction of symmetric 4th-order tensor with a symmetric 2nd-order tensor
+// Aij = Dijkl Mkl
 inline mat3ds tens4ds::dot(const mat3ds &m) const
 {
 	mat3ds a;
@@ -583,6 +584,36 @@ inline mat3ds tens4ds::dot(const mat3ds &m) const
 	a.yz() = d[10]*m.xx() + d[11]*m.yy() + d[12]*m.zz() + 2*d[13]*m.xy() + 2*d[14]*m.yz() + 2*d[19]*m.xz();
 	a.xz() = d[15]*m.xx() + d[16]*m.yy() + d[17]*m.zz() + 2*d[18]*m.xy() + 2*d[19]*m.yz() + 2*d[20]*m.xz();
 	return a;
+}
+
+//-----------------------------------------------------------------------------
+// double contraction of symmetric 4th-order tensor with a general 2nd-order tensor
+// Aij = Dijkl Mkl
+inline mat3ds tens4ds::dot(const mat3d &m) const
+{
+    mat3ds a;
+    a.xx() = d[ 0]*m(0,0) + d[ 1]*m(1,1) + d[ 3]*m(2,2) + d[ 6]*(m(0,1)+m(1,0)) + d[10]*(m(1,2)+m(2,1)) + d[15]*(m(0,2)+m(2,0));
+    a.yy() = d[ 1]*m(0,0) + d[ 2]*m(1,1) + d[ 4]*m(2,2) + d[ 7]*(m(0,1)+m(1,0)) + d[11]*(m(1,2)+m(2,1)) + d[16]*(m(0,2)+m(2,0));
+    a.zz() = d[ 3]*m(0,0) + d[ 4]*m(1,1) + d[ 5]*m(2,2) + d[ 8]*(m(0,1)+m(1,0)) + d[12]*(m(1,2)+m(2,1)) + d[17]*(m(0,2)+m(2,0));
+    a.xy() = d[ 6]*m(0,0) + d[ 7]*m(1,1) + d[ 8]*m(2,2) + d[ 9]*(m(0,1)+m(1,0)) + d[13]*(m(1,2)+m(2,1)) + d[18]*(m(0,2)+m(2,0));
+    a.yz() = d[10]*m(0,0) + d[11]*m(1,1) + d[12]*m(2,2) + d[13]*(m(0,1)+m(1,0)) + d[14]*(m(1,2)+m(2,1)) + d[19]*(m(0,2)+m(2,0));
+    a.xz() = d[15]*m(0,0) + d[16]*m(1,1) + d[17]*m(2,2) + d[18]*(m(0,1)+m(1,0)) + d[19]*(m(1,2)+m(2,1)) + d[20]*(m(0,2)+m(2,0));
+    return a;
+}
+
+//-----------------------------------------------------------------------------
+// double contraction of symmetric 4th-order tensor with a general 2nd-order tensor (2nd kind)
+// Aij = Dikjl Mkl
+inline mat3ds tens4ds::dot2(const mat3d &m) const
+{
+    mat3ds a;
+    a.xx() = d[ 0]*m(0,0) + d[ 9]*m(1,1) + d[20]*m(2,2) + d[ 6]*(m(0,1)+m(1,0)) + d[18]*(m(1,2)+m(2,1)) + d[15]*(m(0,2)+m(2,0));
+    a.yy() = d[ 9]*m(0,0) + d[ 2]*m(1,1) + d[14]*m(2,2) + d[ 7]*(m(0,1)+m(1,0)) + d[11]*(m(1,2)+m(2,1)) + d[13]*(m(0,2)+m(2,0));
+    a.zz() = d[20]*m(0,0) + d[14]*m(1,1) + d[ 5]*m(2,2) + d[19]*(m(0,1)+m(1,0)) + d[12]*(m(1,2)+m(2,1)) + d[17]*(m(0,2)+m(2,0));
+    a.xy() = d[ 6]*m(0,0) + d[ 7]*m(1,1) + d[19]*m(2,2) + d[ 1]*(m(0,1)+m(1,0)) + d[13]*(m(1,2)+m(2,1)) + d[10]*(m(0,2)+m(2,0));
+    a.yz() = d[18]*m(0,0) + d[11]*m(1,1) + d[12]*m(2,2) + d[13]*(m(0,1)+m(1,0)) + d[ 4]*(m(1,2)+m(2,1)) + d[ 8]*(m(0,2)+m(2,0));
+    a.xz() = d[15]*m(0,0) + d[13]*m(1,1) + d[17]*m(2,2) + d[10]*(m(0,1)+m(1,0)) + d[ 8]*(m(1,2)+m(2,1)) + d[ 3]*(m(0,2)+m(2,0));
+    return a;
 }
 
 //-----------------------------------------------------------------------------
