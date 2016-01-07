@@ -154,8 +154,6 @@ void FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, const 
 	p.m_itype = itype;
 
 	// set the dimension
-	// make sure that the type is a vector type if the dimension > 1
-	assert((ndim >= 1) && ( (ndim > 1 ? (itype >= 100) : true)));
 	p.m_ndim = ndim;
 
 	// set the name
@@ -183,8 +181,6 @@ void FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, FEPara
 	p.m_itype = itype;
 
 	// set the dimension
-	// make sure that the type is a vector type if the dimension > 1
-	assert((ndim >= 1) && ( (ndim > 1 ? (itype >= 100) : true)));
 	p.m_ndim = ndim;
 
 	// set the range
