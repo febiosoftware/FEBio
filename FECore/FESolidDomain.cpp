@@ -799,6 +799,75 @@ void FESolidDomain::ContraBaseVectorDerivatives(FESolidElement& el, int j, vec3d
 }
 
 //-----------------------------------------------------------------------------
+//! calculate the laplacian of a vector function at an integration point
+vec3d FESolidDomain::lapvec(FESolidElement& el, vec3d* fn, int n)
+{
+    vec3d gcnt[3];
+    vec3d dgcnt[3][3];
+    ContraBaseVectors(el, n, gcnt);
+    ContraBaseVectorDerivatives(el, n, dgcnt);
+				
+    double* Gr = el.Gr(n);
+    double* Gs = el.Gs(n);
+    double* Gt = el.Gt(n);
+    
+    // get the shape function derivatives
+    double* Hrr = el.Grr(n); double* Hrs = el.Grs(n); double* Hrt = el.Grt(n);
+    double* Hsr = el.Gsr(n); double* Hss = el.Gss(n); double* Hst = el.Gst(n);
+    double* Htr = el.Gtr(n); double* Hts = el.Gts(n); double* Htt = el.Gtt(n);
+    
+    vec3d lapv(0,0,0);
+    int N = el.Nodes();
+    for (int i=0; i<N; ++i)
+        lapv += fn[i]*((gcnt[0]*Hrr[i]+dgcnt[0][0]*Gr[i])*gcnt[0]+
+                       (gcnt[0]*Hrs[i]+dgcnt[0][1]*Gr[i])*gcnt[1]+
+                       (gcnt[0]*Hrt[i]+dgcnt[0][2]*Gr[i])*gcnt[2]+
+                       (gcnt[1]*Hsr[i]+dgcnt[1][0]*Gs[i])*gcnt[0]+
+                       (gcnt[1]*Hss[i]+dgcnt[1][1]*Gs[i])*gcnt[1]+
+                       (gcnt[1]*Hst[i]+dgcnt[1][2]*Gs[i])*gcnt[2]+
+                       (gcnt[2]*Htr[i]+dgcnt[2][0]*Gt[i])*gcnt[0]+
+                       (gcnt[2]*Hts[i]+dgcnt[2][1]*Gt[i])*gcnt[1]+
+                       (gcnt[2]*Htt[i]+dgcnt[2][2]*Gt[i])*gcnt[2]);
+    
+    return lapv;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate the gradient of the divergence of a vector function at an integration point
+vec3d FESolidDomain::gradivec(FESolidElement& el, vec3d* fn, int n)
+{
+    vec3d gcnt[3];
+    vec3d dgcnt[3][3];
+    ContraBaseVectors(el, n, gcnt);
+    ContraBaseVectorDerivatives(el, n, dgcnt);
+				
+    double* Gr = el.Gr(n);
+    double* Gs = el.Gs(n);
+    double* Gt = el.Gt(n);
+    
+    // get the shape function derivatives
+    double* Hrr = el.Grr(n); double* Hrs = el.Grs(n); double* Hrt = el.Grt(n);
+    double* Hsr = el.Gsr(n); double* Hss = el.Gss(n); double* Hst = el.Gst(n);
+    double* Htr = el.Gtr(n); double* Hts = el.Gts(n); double* Htt = el.Gtt(n);
+    
+    vec3d gdv(0,0,0);
+    int N = el.Nodes();
+    for (int i=0; i<N; ++i)
+        gdv +=
+        gcnt[0]*((gcnt[0]*Hrr[i]+dgcnt[0][0]*Gr[i])*fn[i])+
+        gcnt[1]*((gcnt[0]*Hrs[i]+dgcnt[0][1]*Gr[i])*fn[i])+
+        gcnt[2]*((gcnt[0]*Hrt[i]+dgcnt[0][2]*Gr[i])*fn[i])+
+        gcnt[0]*((gcnt[1]*Hsr[i]+dgcnt[1][0]*Gs[i])*fn[i])+
+        gcnt[1]*((gcnt[1]*Hss[i]+dgcnt[1][1]*Gs[i])*fn[i])+
+        gcnt[2]*((gcnt[1]*Hst[i]+dgcnt[1][2]*Gs[i])*fn[i])+
+        gcnt[0]*((gcnt[2]*Htr[i]+dgcnt[2][0]*Gt[i])*fn[i])+
+        gcnt[1]*((gcnt[2]*Hts[i]+dgcnt[2][1]*Gt[i])*fn[i])+
+        gcnt[2]*((gcnt[2]*Htt[i]+dgcnt[2][2]*Gt[i])*fn[i]);
+    
+    return gdv;
+}
+
+//-----------------------------------------------------------------------------
 //! This function calculates the transpose of the spatial gradient of the shape
 //! function spatial gradients, gradT(grad H), at an integration point
 

@@ -78,6 +78,12 @@ public:
     //! calculates parametric derivatives of contravariant basis vectors at an integration point
     void ContraBaseVectorDerivatives(FESolidElement& el, int j, vec3d dg[3][3]);
     
+    //! calculate the laplacian of a vector function at an integration point
+    vec3d lapvec(FESolidElement& el, vec3d* fn, int n);
+
+    //! calculate the gradient of the divergence of a vector function at an integration point
+    vec3d gradivec(FESolidElement& el, vec3d* fn, int n);
+    
     //! calculate the transpose of the gradient of the shape function gradients at an integration point
     void gradTgradShape(FESolidElement& el, int j, vector<mat3d>& mn);
     

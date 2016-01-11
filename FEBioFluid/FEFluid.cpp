@@ -20,6 +20,7 @@ FEFluidMaterialPoint::FEFluidMaterialPoint()
     m_vt = m_vp = m_at = m_gradJ = vec3d(0,0,0);
     m_s.zero();
     m_L.zero();
+    m_lapv = m_gdiv = vec3d(0,0,0);
 }
 
 //-----------------------------------------------------------------------------
@@ -35,11 +36,11 @@ void FEFluidMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
 	if (bsave)
 	{
-		dmp << m_p << m_L << m_J << m_Jp << m_gradJ << m_vt << m_vp << m_at << m_s;
+		dmp << m_p << m_L << m_J << m_Jp << m_gradJ << m_vt << m_vp << m_at << m_s << m_lapv << m_gdiv;
 	}
 	else
 	{
-		dmp >> m_p >> m_L >> m_J >> m_Jp >> m_gradJ >> m_vt >> m_vp >> m_at >> m_s;
+		dmp >> m_p >> m_L >> m_J >> m_Jp >> m_gradJ >> m_vt >> m_vp >> m_at >> m_s >> m_lapv >> m_gdiv;
 	}
 
 	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
@@ -50,11 +51,11 @@ void FEFluidMaterialPoint::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_p << m_L << m_J << m_Jp << m_gradJ << m_vt << m_vp << m_at << m_s;
+		ar << m_p << m_L << m_J << m_Jp << m_gradJ << m_vt << m_vp << m_at << m_s << m_lapv << m_gdiv;
 	}
 	else
 	{
-		ar >> m_p >> m_L >> m_J >> m_Jp >> m_gradJ >> m_vt >> m_vp >> m_at >> m_s;
+		ar >> m_p >> m_L >> m_J >> m_Jp >> m_gradJ >> m_vt >> m_vp >> m_at >> m_s >> m_lapv >> m_gdiv;
 	}
 
 	if (m_pNext) m_pNext->Serialize(ar);
@@ -71,6 +72,7 @@ void FEFluidMaterialPoint::Init(bool bflag)
         m_Jp = 1;
         m_vt = m_vp = m_at = m_gradJ = vec3d(0,0,0);
         m_s.zero();
+        m_lapv = m_gdiv = vec3d(0,0,0);
 	}
 
 	if (m_pNext) m_pNext->Init(bflag);
