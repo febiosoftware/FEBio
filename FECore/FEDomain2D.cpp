@@ -289,7 +289,7 @@ double FEDomain2D::detJt(FEElement2D &el, int n)
 //! This function calculates the covariant basis vectors of a 2D element
 //! at an integration point
 
-void FEDomain2D::CoBaseVectors(FEElement2D& el, int j, vec3d g[2])
+void FEDomain2D::CoBaseVectors(FEElement2D& el, int j, vec2d g[2])
 {
     FEMesh& m = *m_pMesh;
     
@@ -300,10 +300,10 @@ void FEDomain2D::CoBaseVectors(FEElement2D& el, int j, vec3d g[2])
     double* Hr = el.Hr(j);
     double* Hs = el.Hs(j);
     
-    g[0] = g[1] = vec3d(0,0,0);
+    g[0] = g[1] = vec2d(0,0);
     for (int i=0; i<n; ++i)
     {
-        vec3d rt = m.Node(el.m_node[i]).m_rt;
+        vec2d rt = vec2d(m.Node(el.m_node[i]).m_rt.x,m.Node(el.m_node[i]).m_rt.y);
         g[0] += rt*Hr[i];
         g[1] += rt*Hs[i];
     }
@@ -313,24 +313,24 @@ void FEDomain2D::CoBaseVectors(FEElement2D& el, int j, vec3d g[2])
 //! This function calculates the contravariant basis vectors of a 2D element
 //! at an integration point
 
-void FEDomain2D::ContraBaseVectors(FEElement2D& el, int j, vec3d gcnt[2])
+void FEDomain2D::ContraBaseVectors(FEElement2D& el, int j, vec2d gcnt[2])
 {
-    vec3d gcov[2];
+    vec2d gcov[2];
     CoBaseVectors(el, j, gcov);
     
-    mat2d J = mat2d(gcov[0].x, gcov[1].x,
-                    gcov[0].y, gcov[1].y);
+    mat2d J = mat2d(gcov[0].x(), gcov[1].x(),
+                    gcov[0].y(), gcov[1].y());
     mat3d Ji = J.inverse();
     
-    gcnt[0] = vec3d(Ji(0,0),Ji(0,1),0);
-    gcnt[1] = vec3d(Ji(1,0),Ji(1,1),0);
+    gcnt[0] = vec2d(Ji(0,0),Ji(0,1));
+    gcnt[1] = vec2d(Ji(1,0),Ji(1,1));
 }
 
 //-----------------------------------------------------------------------------
 //! This function calculates the parametric derivatives of covariant basis
 //! vectors of a 2D element at an integration point
 
-void FEDomain2D::CoBaseVectorDerivatives(FEElement2D& el, int j, vec3d dg[2][2])
+void FEDomain2D::CoBaseVectorDerivatives(FEElement2D& el, int j, vec2d dg[2][2])
 {
     FEMesh& m = *m_pMesh;
     
@@ -341,12 +341,12 @@ void FEDomain2D::CoBaseVectorDerivatives(FEElement2D& el, int j, vec3d dg[2][2])
     double* Hrr = el.Hrr(j); double* Hrs = el.Hrs(j);
     double* Hsr = el.Hsr(j); double* Hss = el.Hss(j);
     
-    dg[0][0] = dg[0][1] = vec3d(0,0,0);  // derivatives of g[0]
-    dg[1][0] = dg[1][1] = vec3d(0,0,0);  // derivatives of g[1]
+    dg[0][0] = dg[0][1] = vec2d(0,0);  // derivatives of g[0]
+    dg[1][0] = dg[1][1] = vec2d(0,0);  // derivatives of g[1]
     
     for (int i=0; i<n; ++i)
     {
-        vec3d rt = m.Node(el.m_node[i]).m_rt;
+        vec2d rt = vec2d(m.Node(el.m_node[i]).m_rt.x,m.Node(el.m_node[i]).m_rt.y);
         dg[0][0] += rt*Hrr[i]; dg[0][1] += rt*Hsr[i];
         dg[1][0] += rt*Hrs[i]; dg[1][1] += rt*Hss[i];
     }
@@ -356,28 +356,28 @@ void FEDomain2D::CoBaseVectorDerivatives(FEElement2D& el, int j, vec3d dg[2][2])
 //! This function calculates the parametric derivatives of contravariant basis
 //! vectors of a solid element at an integration point
 
-void FEDomain2D::ContraBaseVectorDerivatives(FEElement2D& el, int j, vec3d dgcnt[2][2])
+void FEDomain2D::ContraBaseVectorDerivatives(FEElement2D& el, int j, vec2d dgcnt[2][2])
 {
-    vec3d gcnt[2];
-    vec3d dgcov[2][2];
+    vec2d gcnt[2];
+    vec2d dgcov[2][2];
     ContraBaseVectors(el, j, gcnt);
     CoBaseVectorDerivatives(el, j, dgcov);
     
     // derivatives of gcnt[0]
-    dgcnt[0][0] = -gcnt[0]*(gcnt[0]*dgcov[0][0])-gcnt[1]*(gcnt[0]*dgcov[1][0])-gcnt[2]*(gcnt[0]*dgcov[2][0]);
-    dgcnt[0][1] = -gcnt[0]*(gcnt[0]*dgcov[0][1])-gcnt[1]*(gcnt[0]*dgcov[1][1])-gcnt[2]*(gcnt[0]*dgcov[2][1]);
+    dgcnt[0][0] = -gcnt[0]*(gcnt[0]*dgcov[0][0])-gcnt[1]*(gcnt[0]*dgcov[1][0]);
+    dgcnt[0][1] = -gcnt[0]*(gcnt[0]*dgcov[0][1])-gcnt[1]*(gcnt[0]*dgcov[1][1]);
     
     // derivatives of gcnt[1]
-    dgcnt[1][0] = -gcnt[0]*(gcnt[1]*dgcov[0][0])-gcnt[1]*(gcnt[1]*dgcov[1][0])-gcnt[2]*(gcnt[1]*dgcov[2][0]);
-    dgcnt[1][1] = -gcnt[0]*(gcnt[1]*dgcov[0][1])-gcnt[1]*(gcnt[1]*dgcov[1][1])-gcnt[2]*(gcnt[1]*dgcov[2][1]);
+    dgcnt[1][0] = -gcnt[0]*(gcnt[1]*dgcov[0][0])-gcnt[1]*(gcnt[1]*dgcov[1][0]);
+    dgcnt[1][1] = -gcnt[0]*(gcnt[1]*dgcov[0][1])-gcnt[1]*(gcnt[1]*dgcov[1][1]);
 }
 
 //-----------------------------------------------------------------------------
 //! calculate the laplacian of a vector function at an integration point
-vec3d FEDomain2D::lapvec(FEElement2D& el, vec3d* fn, int n)
+vec2d FEDomain2D::lapvec(FEElement2D& el, vec2d* fn, int n)
 {
-    vec3d gcnt[2];
-    vec3d dgcnt[2][2];
+    vec2d gcnt[2];
+    vec2d dgcnt[2][2];
     ContraBaseVectors(el, n, gcnt);
     ContraBaseVectorDerivatives(el, n, dgcnt);
 				
@@ -388,7 +388,7 @@ vec3d FEDomain2D::lapvec(FEElement2D& el, vec3d* fn, int n)
     double* Hrr = el.Hrr(n); double* Hrs = el.Hrs(n);
     double* Hsr = el.Hsr(n); double* Hss = el.Hss(n);
     
-    vec3d lapv(0,0,0);
+    vec2d lapv(0,0);
     int N = el.Nodes();
     for (int i=0; i<N; ++i)
         lapv += fn[i]*((gcnt[0]*Hrr[i]+dgcnt[0][0]*Gr[i])*gcnt[0]+
@@ -401,10 +401,10 @@ vec3d FEDomain2D::lapvec(FEElement2D& el, vec3d* fn, int n)
 
 //-----------------------------------------------------------------------------
 //! calculate the gradient of the divergence of a vector function at an integration point
-vec3d FEDomain2D::gradivec(FEElement2D& el, vec3d* fn, int n)
+vec2d FEDomain2D::gradivec(FEElement2D& el, vec2d* fn, int n)
 {
-    vec3d gcnt[2];
-    vec3d dgcnt[2][2];
+    vec2d gcnt[2];
+    vec2d dgcnt[2][2];
     ContraBaseVectors(el, n, gcnt);
     ContraBaseVectorDerivatives(el, n, dgcnt);
 				
@@ -415,7 +415,7 @@ vec3d FEDomain2D::gradivec(FEElement2D& el, vec3d* fn, int n)
     double* Hrr = el.Hrr(n); double* Hrs = el.Hrs(n);
     double* Hsr = el.Hsr(n); double* Hss = el.Hss(n);
     
-    vec3d gdv(0,0,0);
+    vec2d gdv(0,0);
     int N = el.Nodes();
     for (int i=0; i<N; ++i)
         gdv +=

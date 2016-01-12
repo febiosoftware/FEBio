@@ -2912,6 +2912,12 @@ FE2DElementTraits::FE2DElementTraits(int ni, int ne, FE_Element_Type et) : FEEle
 
 	Gr.resize(ni, ne);
 	Gs.resize(ni, ne);
+    
+    Grr.resize(ni, ne);
+    Gsr.resize(ni, ne);
+    
+    Grs.resize(ni, ne);
+    Gss.resize(ni, ne);
 }
 
 //-----------------------------------------------------------------------------

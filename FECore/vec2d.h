@@ -26,6 +26,8 @@ public: // arithmetic operators
 	vec2d& operator *= (double g) { r[0] *= g; r[1] *= g; return *this; }
 	vec2d& operator /= (double g) { r[0] /= g; r[1] /= g; return *this; }
 
+    vec2d operator - () { return vec2d(-r[0], -r[1]); }
+    
 	// dot product
 	double operator * (const vec2d& v) const { return r[0]*v[0] + r[1]*v[1]; }
 
