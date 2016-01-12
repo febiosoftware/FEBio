@@ -56,6 +56,27 @@ public:
     // jacobian with respect to reference frame
     double detJ0(FEElement2D& el, int n);
     
+    //! calculate jacobian in current frame
+    double detJt(FEElement2D& el, int n);
+    
+    //! calculates covariant basis vectors at an integration point
+    void CoBaseVectors(FEElement2D& el, int j, vec3d g[2]);
+    
+    //! calculates contravariant basis vectors at an integration point
+    void ContraBaseVectors(FEElement2D& el, int j, vec3d g[2]);
+    
+    //! calculates parametric derivatives of covariant basis vectors at an integration point
+    void CoBaseVectorDerivatives(FEElement2D& el, int j, vec3d dg[2][2]);
+    
+    //! calculates parametric derivatives of contravariant basis vectors at an integration point
+    void ContraBaseVectorDerivatives(FEElement2D& el, int j, vec3d dg[2][2]);
+    
+    //! calculate the laplacian of a vector function at an integration point
+    vec3d lapvec(FEElement2D& el, vec3d* fn, int n);
+    
+    //! calculate the gradient of the divergence of a vector function at an integration point
+    vec3d gradivec(FEElement2D& el, vec3d* fn, int n);
+    
 public:
     //! shallow copy
     void ShallowCopy(DumpStream& dmp, bool bsave);

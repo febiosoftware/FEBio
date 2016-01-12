@@ -414,6 +414,12 @@ public:
 	double* Hr(int n) { return ((FE2DElementTraits*)(m_pT))->Gr[n]; }	// shape function derivative to r
 	double* Hs(int n) { return ((FE2DElementTraits*)(m_pT))->Gs[n]; }	// shape function derivative to s
 
+    double* Hrr(int n) { return ((FE2DElementTraits*)(m_pT))->Grr[n]; }	// shape function 2nd derivative to rr
+    double* Hsr(int n) { return ((FE2DElementTraits*)(m_pT))->Gsr[n]; }	// shape function 2nd derivative to sr
+    
+    double* Hrs(int n) { return ((FE2DElementTraits*)(m_pT))->Grs[n]; }	// shape function 2nd derivative to rs
+    double* Hss(int n) { return ((FE2DElementTraits*)(m_pT))->Gss[n]; }	// shape function 2nd derivative to ss
+    
 	//! intialize element data
 	void Init(bool bflag)
 	{

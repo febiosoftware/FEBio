@@ -1317,6 +1317,9 @@ public:
 
 	// local derivatives of shape functions at gauss points
 	matrix Gr, Gs;
+    
+    // local second derivatives of shape functions at gauss points
+    matrix Grr, Gsr, Grs, Gss;
 };
 
 //=============================================================================
