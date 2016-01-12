@@ -32,6 +32,9 @@ public:
 	//! copy material point data (for running restarts) \todo Is this still used?
 	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
 
+	//! get the number of material point components
+	virtual int Components() { return 1; }
+
 	//! Get the material point data
 	virtual FEMaterialPoint* GetPointData(int i) { return this; }
 

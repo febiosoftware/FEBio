@@ -25,6 +25,9 @@ public:
 	//! stream material point data
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
+	//! get the number of material point components
+	virtual int Components() { return (int) m_mp.size(); }
+
 	//! retrieve point data
 	FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }
 
