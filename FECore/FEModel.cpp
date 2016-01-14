@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEModel.h"
-#include "FEShellDomain.h"
 #include "FERigidBody.h"
 #include <string>
 #include "log.h"

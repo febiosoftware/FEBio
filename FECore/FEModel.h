@@ -23,11 +23,12 @@
 
 //-----------------------------------------------------------------------------
 // callback structure
-#define CB_ALWAYS		0x00001111		//!< Call for all reasons
+#define CB_ALWAYS		0x00011111		//!< Call for all reasons
 #define CB_INIT			0x00000001		//!< Call after model initialization (i.e. FEModel::Init())
 #define CB_MAJOR_ITERS	0x00000010		//!< Call at the end of each major converged iteration
 #define CB_MINOR_ITERS	0x00000100		//!< Call for each minor iteration
 #define CB_SOLVED		0x00001000		//!< Call at the end of FEModel::Solve
+#define CB_UPDATE_TIME	0x00010000		//!< Call when time is updated and right before time step is solved (in FEAnalysis::Solve)
 
 typedef unsigned int FECORE_CB_WHEN;
 typedef void (*FECORE_CB_FNC)(FEModel*,unsigned int,void*);

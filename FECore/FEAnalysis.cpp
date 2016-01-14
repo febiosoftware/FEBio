@@ -341,6 +341,9 @@ bool FEAnalysis::Solve()
 			break;
 		}
 
+		// do the callback
+		m_fem.DoCallback(CB_UPDATE_TIME);
+
 		// solve this timestep,
 		try
 		{
