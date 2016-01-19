@@ -385,9 +385,6 @@ bool FEBioModel::Serialize(DumpFile &ar)
 	// --- Global Data ---
 	SerializeGlobals(ar);
 
-	// --- Analysis data ---
-	SerializeAnalysisData(ar);
-
 	// --- Material Data ---
 	SerializeMaterials(ar);
 
@@ -399,6 +396,9 @@ bool FEBioModel::Serialize(DumpFile &ar)
 
 	// --- Boundary Condition Data ---
 	SerializeBoundaryData(ar);
+
+	// --- Analysis data ---
+	SerializeAnalysisData(ar);
 
 	// --- Save IO Data
 	SerializeIOData(ar);
