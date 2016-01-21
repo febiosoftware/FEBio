@@ -392,12 +392,12 @@ bool FEPlotElementtaunorm::Save(FEDomain& dom, FEDataStream& a)
 				double norm = pt2O.m_G.tripledot3rs(pt2O.m_G);
 
 				pt2O.m_G_prev = pt2O.m_G;
-
+/*
 				pt2O.m_rve_prev.CopyFrom(pt2O.m_rve);
 				pt2O.m_macro_energy += pt2O.m_macro_energy_inc;
 				pt2O.m_micro_energy += pt2O.m_micro_energy_inc;
 				pt2O.m_energy_diff = fabs(pt2O.m_macro_energy - pt2O.m_micro_energy); 
-			}
+*/			}
 		}
 
 		L2_norm = (float) sqrt(tau_avg.tripledot3s(tau_avg));

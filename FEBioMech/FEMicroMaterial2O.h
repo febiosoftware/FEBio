@@ -7,7 +7,8 @@
 #include "FECore/tens4d.h"
 #include "FECore/tens5d.h"
 #include "FECore/tens6d.h"
-#include "FEBioMech/FE2OMicroConstraint.h"
+#include "FE2OMicroConstraint.h"
+#include "FEMicroMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Material point class for the micro-material
@@ -93,7 +94,7 @@ protected:
 public:
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
-	void Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt);
+	void Stress2O(FEMaterialPoint &mp);
 
 	//! calculate tangent stiffness at material point
 	tens4ds Tangent(FEMaterialPoint& pt);
@@ -127,6 +128,13 @@ protected:
 
 	void AveragedStress2OPK1(FEModel& rve, FEMaterialPoint &mp, mat3d &PK1a, tens3drs &QK1a);
 	void AveragedStress2OPK2(FEModel& rve, FEMaterialPoint &mp, mat3ds &Sa, tens3ds &Ta);
+
+public:
+	int Probes() { return (int) m_probe.size(); }
+	FEMicroProbe& Probe(int i) { return *m_probe[i]; }
+
+protected:
+	FEVecPropertyT<FEMicroProbe>	m_probe;
 
 public:
 	// declare the parameter list

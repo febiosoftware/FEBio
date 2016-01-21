@@ -114,6 +114,8 @@ FEMicroMaterial2O::FEMicroMaterial2O(FEModel* pfem) : FEElasticMaterial(pfem)
 
 	m_bb_x = 0.; m_bb_y = 0.; m_bb_z = 0.;
 	m_num_ext_node = 0;
+
+	AddProperty(&m_probe, "probe", false);
 }
 
 //-----------------------------------------------------------------------------
@@ -450,43 +452,13 @@ void  FEMicroMaterial2O::Tangent2O(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, 
 }
 
 //-----------------------------------------------------------------------------
-void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
+void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp)
 {
 	// get the deformation gradient
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
 	mat3d F = pt.m_F;
 	tens3drs G = mmpt2O.m_G;
-
-	// create a copy of the rve in the reference configuration for plotting
-	FEModel rve_init;
-	rve_init.CopyFrom(mmpt2O.m_rve);
-	rve_init.Reset();
-
-	// if plotting is turned on, create the plot file and plot the reference configuration
-	FEBioPlotFile* pplt = 0;
-
-	if (plot_on)
-	{
-		pplt = new FEBioPlotFile(mmpt2O.m_rve);
-		vector<int> item;
-		pplt->AddVariable("displacement", item);
-		pplt->AddVariable("stress", item);
-
-		if (m_bperiodic)
-		{
-			pplt->AddVariable("contact gap", item);
-			pplt->AddVariable("contact traction", item);
-			pplt->AddVariable("contact pressure", item);
-		}
-
-		stringstream ss;
-		ss << "rve_elem_" << plot_on << "_ipt_" << int_pt << ".xplt";
-		string plot_name = ss.str();
-		
-		pplt->Open(mmpt2O.m_rve, plot_name.c_str());
-		pplt->Write(rve_init);
-	}
 
 	// apply the BC's
 	UpdateBC(mmpt2O.m_rve, F, G);
@@ -511,13 +483,6 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp, int plot_on, int int_pt)
 
 	// calculate the difference between the macro and micro energy for Hill-Mandel condition
 	calc_energy_diff(mmpt2O.m_rve, mp);	
-
-	// plot the rve
-	if (plot_on)
-	{
-		pplt->Write(mmpt2O.m_rve);
-		pplt->Close();
-	}
 
 	return;
 }

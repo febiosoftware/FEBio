@@ -12,7 +12,9 @@ public:
 	//! constructor
 	FEElasticMultiscaleDomain2O(FEModel* pfem);
 	
-	void InitElements();
+	//! initialize class
+	bool Initialize(FEModel& fem);
+
 	void ElementInternalForce(FESolidElement& el, vector<double>& fe);
 	void UpdateElementStress(int iel, double dt);
 

@@ -2,7 +2,27 @@
 #include "FEElasticMaterial.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
-#include "FEBioMech/FEPeriodicBoundary1O.h"
+#include "FEPeriodicBoundary1O.h"
+#include "FECore/FECallBack.h"
+
+//-----------------------------------------------------------------------------
+class FEBioPlotFile;
+
+//-----------------------------------------------------------------------------
+class FERVEProbe : public FECallBack
+{
+public:
+	// The first FEModel (fem) is the macro-problem, i.e. the model that will generate the callbacks
+	// The second FEModel (rve) is the micro-problem that needs to be tracked.
+	FERVEProbe(FEModel& fem, FEModel& rve, const char* szfile);
+
+	void Execute(FEModel& fem, int nwhen);
+
+private:
+	FEModel&			m_rve;		//!< The RVE model to keep track of
+	FEBioPlotFile*		m_xplt;		//!< the actual plot file
+	std::string			m_file;		//!< file name
+};
 
 //-----------------------------------------------------------------------------
 //! Material point class for the micro-material

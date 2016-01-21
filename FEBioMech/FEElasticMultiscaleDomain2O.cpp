@@ -12,20 +12,17 @@ FEElasticMultiscaleDomain2O::FEElasticMultiscaleDomain2O(FEModel* pfem) : FEElas
 
 //-----------------------------------------------------------------------------
 //! Initialize element data
-void FEElasticMultiscaleDomain2O::InitElements()
+bool FEElasticMultiscaleDomain2O::Initialize(FEModel& fem)
 {
+	if (FEElasticSolidDomain::Initialize(fem) == false) return false;
+
 	const int NE = FEElement::MAX_NODES;
 	vec3d x0[NE], xt[NE], r0, rt;
 	FEMesh& m = *GetMesh();
 		
 	FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(m_pMat);
-	FEModel rve;
-	rve.CopyFrom(pmat->m_mrve);
-	rve.GetStep(0)->SetPrintLevel(FE_PRINT_NEVER);
+	FEModel& rve = pmat->m_mrve;
 			
-	// initialize
-	if (rve.Init() == false) throw FEMultiScaleException();
-
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
@@ -50,16 +47,40 @@ void FEElasticMultiscaleDomain2O::InitElements()
 
 			pt.m_J = defgrad(el, pt.m_F, j);
 			defhess(el, mmpt2O.m_G, j);
-			mp.Init(false);
 
-			if (mmpt2O.m_rve_init == false){
+			if (mmpt2O.m_rve_init == false)
+			{
 				mmpt2O.m_rve.CopyFrom(rve);
 				mmpt2O.m_rve.Init();
 				mmpt2O.m_rve_prev.CopyFrom(rve);
 				mmpt2O.m_rve_prev.Init();
-				mmpt2O.m_rve_init = true;}
+				mmpt2O.m_rve_init = true;
+			}
 		}
 	}
+
+	// create the probes
+	int NP = pmat->Probes();
+	for (int i=0; i<NP; ++i)
+	{
+		FEMicroProbe& p = pmat->Probe(i);
+		FEElement* pel = FindElementFromID(p.m_neid);
+		if (pel)
+		{
+			int nint = pel->GaussPoints();
+			int ngp = p.m_ngp - 1;
+			if ((ngp>=0)&&(ngp<nint))
+			{
+				FEMaterialPoint& mp = *pel->GetMaterialPoint(ngp);
+				FEMicroMaterialPoint2O& mmpt = *mp.ExtractData<FEMicroMaterialPoint2O>();
+				FERVEProbe* prve = new FERVEProbe(fem, mmpt.m_rve, p.m_szfile);
+			}
+			else return fecore_error("Invalid gausspt number for micro-probe %d in material %d (%s)", i+1, m_pMat->GetID(), m_pMat->GetName());
+		}
+		else return fecore_error("Invalid Element ID for micro probe %d in material %d (%s)", i+1, m_pMat->GetID(), m_pMat->GetName());
+	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -215,24 +236,7 @@ void FEElasticMultiscaleDomain2O::UpdateElementStress(int iel, double dt)
 		// calculate the stress at this material point
 		FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(m_pMat);
 		
-		// calculate the stress at this material point
-		int plot_on = 0;
-		int num_elem = Elements();
-
-		// If it is a multi-element problem, plot for the middle integration point of each element 
-		if (n == 13){
-			plot_on = el.GetID();}
-		
-		// If it is a multi-element problem, plot for the last integration point in the first and last element
-		//if ((el.m_nID == 1 || el.m_nID == num_elem) && (n == nint-1)){
-		//	plot_on = el.m_nID;}
-		
-		// If it is a single-element problem, plot for each intergration point of the element
-		if (num_elem == 1){
-			plot_on = num_elem;}
-
-		pmat->Stress2O(mp, plot_on, n+1);
-
+		pmat->Stress2O(mp);
 	}
 }
 

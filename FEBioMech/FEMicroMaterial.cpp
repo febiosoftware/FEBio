@@ -9,7 +9,40 @@
 #include "FEBioPlot/FEBioPlotFile.h"
 #include <sstream>
 
-//-----------------------------------------------------------------------------
+//=============================================================================
+FERVEProbe::FERVEProbe(FEModel& fem, FEModel& rve, const char* szfile) : FECallBack(&fem, CB_MAJOR_ITERS | CB_INIT | CB_SOLVED), m_rve(rve), m_file(szfile) 
+{
+
+}
+
+void FERVEProbe::Execute(FEModel& fem, int nwhen)
+{
+	if (nwhen == CB_INIT)	// initialize the plot file
+	{
+		// create a plot file
+		m_xplt = new FEBioPlotFile(m_rve);
+		if (m_xplt->Open(m_rve, m_file.c_str()) == false)
+		{
+			felog.printf("Failed creating probe.\n\n");
+			delete m_xplt; m_xplt = 0;
+		}
+
+		// write the initial state
+		m_xplt->Write(m_rve);
+	}
+	else if (nwhen == CB_MAJOR_ITERS)	// store the current state
+	{
+		// write the deformed state
+		if (m_xplt) m_xplt->Write(m_rve);
+	}
+	else if (nwhen == CB_SOLVED)	// clean up
+	{
+		if (m_xplt) delete m_xplt;
+		m_xplt = 0;
+	}
+}
+
+//=============================================================================
 FEMicroMaterialPoint::FEMicroMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoint(mp)
 {
 	m_macro_energy = 0.;

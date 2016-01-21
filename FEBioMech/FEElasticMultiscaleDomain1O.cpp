@@ -3,53 +3,7 @@
 #include "FEMicroMaterial.h"
 #include "FECore/mat3d.h"
 #include "FECore/tens6d.h"
-#include <FECore/FECallBack.h>
-#include <FEBioPlot/FEBioPlotFile.h>
 #include <FECore/log.h>
-
-//-----------------------------------------------------------------------------
-class FERVEProbe : public FECallBack
-{
-public:
-	// The first FEModel (fem) is the macro-problem, i.e. the model that will generate the callbacks
-	// The second FEModel (rve) is the micro-problem that needs to be tracked.
-	FERVEProbe(FEModel& fem, FEModel& rve, const char* szfile) : FECallBack(&fem, CB_MAJOR_ITERS | CB_INIT | CB_SOLVED), m_rve(rve), m_file(szfile) 
-	{
-		m_xplt = 0;
-	}
-
-	void Execute(FEModel& fem, int nwhen)
-	{
-		if (nwhen == CB_INIT)	// initialize the plot file
-		{
-			// create a plot file
-			m_xplt = new FEBioPlotFile(m_rve);
-			if (m_xplt->Open(m_rve, m_file.c_str()) == false)
-			{
-				felog.printf("Failed creating probe.\n\n");
-				delete m_xplt; m_xplt = 0;
-			}
-
-			// write the initial state
-			m_xplt->Write(m_rve);
-		}
-		else if (nwhen == CB_MAJOR_ITERS)	// store the current state
-		{
-			// write the deformed state
-			if (m_xplt) m_xplt->Write(m_rve);
-		}
-		else if (nwhen == CB_SOLVED)	// clean up
-		{
-			if (m_xplt) delete m_xplt;
-			m_xplt = 0;
-		}
-	}
-
-private:
-	FEModel&			m_rve;		//!< The RVE model to keep track of
-	FEBioPlotFile*		m_xplt;		//!< the actual plot file
-	std::string			m_file;		//!< file name
-};
 
 //-----------------------------------------------------------------------------
 //! constructor
