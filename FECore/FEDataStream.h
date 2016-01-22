@@ -32,6 +32,19 @@ public:
 		m_a.push_back((float) m.xz());
 		return *this;
 	}
+	FEDataStream& operator << (const mat3d& m)
+	{
+		m_a.push_back((float)m(0, 0));
+		m_a.push_back((float)m(0, 1));
+		m_a.push_back((float)m(0, 2));
+		m_a.push_back((float)m(1, 0));
+		m_a.push_back((float)m(1, 1));
+		m_a.push_back((float)m(1, 2));
+		m_a.push_back((float)m(2, 0));
+		m_a.push_back((float)m(2, 1));
+		m_a.push_back((float)m(2, 2));
+		return *this;
+	}
 	FEDataStream& operator << (const tens4ds& a)
 	{
         for (int k=0; k<21; ++k) m_a.push_back((float) a.d[k]);
