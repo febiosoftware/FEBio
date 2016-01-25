@@ -131,7 +131,10 @@ FE_Element_Shape FEBioGeometrySection::ElementShape(XMLTag& t)
 	else if (t=="tet10" ) return ET_TET10;
 	else if (t=="tet15" ) return ET_TET15;
 	else if (t=="quad4" ) return ET_QUAD4;
+    else if (t=="quad8" ) return ET_QUAD8;
+    else if (t=="quad9" ) return ET_QUAD9;
 	else if (t=="tri3"  ) return ET_TRI3;
+    else if (t=="tri6"  ) return ET_TRI6;
 	else if (t=="truss2") return ET_TRUSS2;
 	else 
 	{
@@ -155,6 +158,10 @@ FEDomain* FEBioGeometrySection::CreateDomain(const FE_Element_Shape& eshape, FEM
 	else if (eshape == ET_TET10) spec.etype = m_pim->m_ntet10;
 	else if (eshape == ET_TET15) spec.etype = m_pim->m_ntet15;
 	else if (eshape == ET_TRI3 ) spec.etype = m_pim->m_ntri3;
+    else if (eshape == ET_TRI6 ) spec.etype = m_pim->m_ntri6;
+    else if (eshape == ET_QUAD4) spec.etype = m_pim->m_nquad4;
+    else if (eshape == ET_QUAD8) spec.etype = m_pim->m_nquad8;
+    else if (eshape == ET_QUAD9) spec.etype = m_pim->m_nquad9;
 	
 	// get the domain type
 	FECoreKernel& febio = FECoreKernel::GetInstance();
@@ -336,7 +343,10 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	else if (strcmp(sztype, "tet10" ) == 0) etype = ET_TET10;
 	else if (strcmp(sztype, "tet15" ) == 0) etype = ET_TET15;
 	else if (strcmp(sztype, "quad4" ) == 0) etype = ET_QUAD4;
+    else if (strcmp(sztype, "quad8" ) == 0) etype = ET_QUAD8;
+    else if (strcmp(sztype, "quad9" ) == 0) etype = ET_QUAD9;
 	else if (strcmp(sztype, "tri3"  ) == 0) etype = ET_TRI3;
+    else if (strcmp(sztype, "tri6"  ) == 0) etype = ET_TRI6;
 	else if (strcmp(sztype, "truss2") == 0) etype = ET_TRUSS2;
 	else 
 	{
@@ -414,6 +424,9 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	case ET_HEX27 : el_type = FE_HEX27G27    ; break;
 	case ET_QUAD4 : el_type = (NDIM == 3 ? FE_SHELL_QUAD : FE2D_QUAD4G4) ; break;
 	case ET_TRI3  : el_type = (NDIM == 3 ? FE_SHELL_TRI  : FE2D_TRI3G1 ) ; break;
+    case ET_TRI6  : el_type = FE2D_TRI6G3    ; break;
+    case ET_QUAD8 : el_type = FE2D_QUAD8G9   ; break;
+    case ET_QUAD9 : el_type = FE2D_QUAD9G9   ; break;
 	case ET_TRUSS2: el_type = FE_TRUSS       ; break;
 	default:
 		throw FEBioImport::InvalidElementType();

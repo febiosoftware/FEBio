@@ -260,6 +260,9 @@ public:
 	FE_Element_Type		m_ntri6;	//!< tri6 integration rule
 	FE_Element_Type		m_ntri7;	//!< tri7 integration rule
 	FE_Element_Type		m_ntri3;	//!< tri3 integration rule
+    FE_Element_Type		m_nquad4;	//!< quad4 integration rule
+    FE_Element_Type		m_nquad8;	//!< quad8 integration rule
+    FE_Element_Type		m_nquad9;	//!< quad9 integration rule
 
 public:
 	// Build the node ID table

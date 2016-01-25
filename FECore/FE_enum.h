@@ -32,7 +32,10 @@ enum FE_Element_Shape {
 	ET_TET10,
 	ET_TET15,
 	ET_QUAD4,
+    ET_QUAD8,
+    ET_QUAD9,
 	ET_TRI3,
+    ET_TRI6,
 	ET_TRUSS2
 };
 

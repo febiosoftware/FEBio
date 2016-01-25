@@ -3050,7 +3050,7 @@ void FE2DTri6_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, do
 //                          F E 2 D T R I 6 G 3
 //=============================================================================
 
-FE2DTri6G3::FE2DTri6G3() : FE2DTri6_(NINT, FE_TRI6G3) 
+FE2DTri6G3::FE2DTri6G3() : FE2DTri6_(NINT, FE2D_TRI6G3)
 { 
 	const double a = 1.0 / 6.0;
 	const double b = 2.0 / 3.0;

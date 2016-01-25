@@ -808,7 +808,10 @@ void FEBioPlotFile::WriteDomain2D(FEDomain2D& dom)
     switch (etype)
     {
         case FE2D_TRI3G1 : ne = 3; dtype = PLT_ELEM_TRI; break;
+        case FE2D_TRI6G3 : ne = 6; dtype = PLT_ELEM_TRI6; break;
         case FE2D_QUAD4G4: ne = 4; dtype = PLT_ELEM_QUAD; break;
+        case FE2D_QUAD8G9: ne = 8; dtype = PLT_ELEM_QUAD8; break;
+        case FE2D_QUAD9G9: ne = 9; dtype = PLT_ELEM_QUAD9; break;
 		default:
 			assert(false);
     }
@@ -823,7 +826,7 @@ void FEBioPlotFile::WriteDomain2D(FEDomain2D& dom)
     m_ar.EndChunk();
     
     // write the element list
-    int n[5];
+    int n[10];
     m_ar.BeginChunk(PLT_DOM_ELEM_LIST);
     {
         for (i=0; i<NE; ++i)
