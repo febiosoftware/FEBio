@@ -400,10 +400,6 @@ void FEFluidDomain3D::ElementMaterialStiffness(FESolidElement &el, matrix &ke)
     const int nint = el.GaussPoints();
     const int neln = el.Nodes();
     
-    bool bsupg = m_pMat->m_bsupg;
-    
-    double tau, tau1, tau2, tau3;
-    
     // gradient of shape functions
     vector<vec3d> gradN(neln);
     
@@ -438,83 +434,41 @@ void FEFluidDomain3D::ElementMaterialStiffness(FESolidElement &el, matrix &ke)
         // get the tangents
         mat3ds sJ = m_pMat->Tangent_Strain(mp);
         tens4ds cv = m_pMat->Tangent_RateOfDeformation(mp);
+        double divv = pt.m_L.trace();
         
         // evaluate spatial gradient of shape functions
-        vec3d g(0,0,0);
-        tau = tau1 = tau2 = tau3 = 0;
-        double c = m_pMat->AcousticSpeed(mp);
-        double nu = m_pMat->KinematicViscosity(mp);
         for (i=0; i<neln; ++i)
-        {
             gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
-            vec3d j = pt.m_gradJ; j.unit();
-            vec3d vu = pt.m_vt; vu.unit();
-            vec3d r = pt.m_L.transpose()*vu; r.unit();
-            tau1 += c*fabs(j*gradN[i]) + fabs(pt.m_vt*gradN[i]);
-            tau3 += fabs(r*gradN[i]);
-            double d = pt.m_vt*gradN[i];
-            if (d > 0) g += gradN[i];
-            else if (d < 0) g -= gradN[i];
-        }
-        g /= neln;
-        tau2 = 2./mp.dt;
-        tau3 = nu*tau3*tau3;
-        tau = tau1*tau1 + m_btrans*tau2*tau2 + tau3*tau3;
-        if (tau > 0) tau = pow(tau,-0.5);
-        
-        // this is the governing equation for v
-        double dpdJ = m_pMat->GetElastic()->Tangent_Pressure_Strain(mp);
-        double mu = m_pMat->GetViscous()->DynamicViscosity(mp);
-        double rho = m_pMat->Density(mp);
-        mat3ds TpJ = m_pMat->Tangent_Strain(mp);
-        // TODO: add bulk viscosity term
-        vec3d divT = pt.m_gradJ*(-dpdJ) + pt.m_gdiv*(mu/3) + pt.m_lapv*mu;
-        vec3d fv = divT - pt.m_at*rho;
-        
-        // this is the governing equation for J
-        double divv = pt.m_L.trace();
-        double f = ((pt.m_J - pt.m_Jp)/mp.dt)*m_btrans + pt.m_gradJ*pt.m_vt - pt.m_J*divv;
         
         // evaluate stiffness matrix
         for (i=0, i4=0; i<neln; ++i, i4 += 4)
         {
             for (j=0, j4 = 0; j<neln; ++j, j4 += 4)
             {
-                mat3d Kvv = vdotTdotv(gradN[i], cv, gradN[j])*detJ;
-                vec3d kJv = (pt.m_gradJ*H[j] - gradN[j]*pt.m_J)*(H[i]*detJ);
-                vec3d kvJ = (sJ*gradN[i])*(H[j]*detJ);
-                double kJJ = (H[j]*((1.0*m_btrans)/mp.dt - divv) + gradN[j]*pt.m_vt)*(H[i]*detJ);
+                mat3d Kvv = vdotTdotv(gradN[i], cv, gradN[j]);
+                vec3d kJv = (pt.m_gradJ*H[j] - gradN[j]*pt.m_J)*H[i];
+                vec3d kvJ = (sJ*gradN[i])*H[j];
+                double kJJ = (H[j]*((1.0*m_btrans)/mp.dt - divv) + gradN[j]*pt.m_vt)*H[i];
                 
-                if (bsupg) {
-                    Kvv += (fv & g)*(gradN[i]*pt.m_vt)*(-tau*tau*H[j]*detJ)
-                    + (fv & gradN[i])*(H[j]*tau*detJ)
-                    - (mat3dd(H[j]/mp.dt*m_btrans+gradN[j]*pt.m_vt)+pt.m_L*H[j])*(pt.m_vt*gradN[i])*(rho*tau*detJ);
-                    kvJ += (TpJ*gradN[j] + pt.m_at*(H[j]*rho/pt.m_J))*(gradN[i]*pt.m_vt)*(tau*detJ);
-                    kJv += g*(-(gradN[i]*pt.m_vt)*tau*tau*f*H[j]*detJ)
-                    + gradN[i]*(tau*f*H[j]*detJ)
-                    + (pt.m_gradJ*H[j]-gradN[j]*pt.m_J)*(gradN[i]*pt.m_vt)*(tau*detJ);
-                    kJJ += tau*(gradN[i]*pt.m_vt)*((1/mp.dt*m_btrans-divv)*H[j]+gradN[j]*pt.m_vt)*detJ;
-                }
+                ke[i4  ][j4  ] += Kvv(0,0)*detJ;
+                ke[i4  ][j4+1] += Kvv(0,1)*detJ;
+                ke[i4  ][j4+2] += Kvv(0,2)*detJ;
+                ke[i4  ][j4+3] += kvJ.x*detJ;
                 
-                ke[i4  ][j4  ] += Kvv(0,0);
-                ke[i4  ][j4+1] += Kvv(0,1);
-                ke[i4  ][j4+2] += Kvv(0,2);
-                ke[i4  ][j4+3] += kvJ.x;
+                ke[i4+1][j4  ] += Kvv(1,0)*detJ;
+                ke[i4+1][j4+1] += Kvv(1,1)*detJ;
+                ke[i4+1][j4+2] += Kvv(1,2)*detJ;
+                ke[i4+1][j4+3] += kvJ.y*detJ;
                 
-                ke[i4+1][j4  ] += Kvv(1,0);
-                ke[i4+1][j4+1] += Kvv(1,1);
-                ke[i4+1][j4+2] += Kvv(1,2);
-                ke[i4+1][j4+3] += kvJ.y;
+                ke[i4+2][j4  ] += Kvv(2,0)*detJ;
+                ke[i4+2][j4+1] += Kvv(2,1)*detJ;
+                ke[i4+2][j4+2] += Kvv(2,2)*detJ;
+                ke[i4+2][j4+3] += kvJ.z*detJ;
                 
-                ke[i4+2][j4  ] += Kvv(2,0);
-                ke[i4+2][j4+1] += Kvv(2,1);
-                ke[i4+2][j4+2] += Kvv(2,2);
-                ke[i4+2][j4+3] += kvJ.z;
-                
-                ke[i4+3][j4  ] += kJv.x;
-                ke[i4+3][j4+1] += kJv.y;
-                ke[i4+3][j4+2] += kJv.z;
-                ke[i4+3][j4+3] += kJJ;
+                ke[i4+3][j4  ] += kJv.x*detJ;
+                ke[i4+3][j4+1] += kJv.y*detJ;
+                ke[i4+3][j4+2] += kJv.z*detJ;
+                ke[i4+3][j4+3] += kJJ*detJ;
             }
         }
     }
