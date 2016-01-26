@@ -15,6 +15,9 @@ public:
 	//! copy data
 	void CopyFrom(FEVolumeSurface& s);
 
+	//! serialization
+	void Serialize(DumpFile& ar);
+
 public:
 	double Volume();
 

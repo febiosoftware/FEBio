@@ -45,6 +45,20 @@ void FEVolumeSurface::CopyFrom(FEVolumeSurface& s)
 }
 
 //-----------------------------------------------------------------------------
+void FEVolumeSurface::Serialize(DumpFile& ar)
+{
+	FESurface::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << m_Lp << m_p << m_V0 << m_Vt;
+	}
+	else
+	{
+		ar >> m_Lp >> m_p >> m_V0 >> m_Vt;
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the initial volume
 double FEVolumeSurface::Volume()
 {
@@ -366,6 +380,16 @@ bool FEVolumeConstraint::Augment(int naug, const FETimePoint& tp)
 //-----------------------------------------------------------------------------
 void FEVolumeConstraint::Serialize(DumpFile& ar)
 {
+	FENLConstraint::Serialize(ar);
+	m_s.Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << m_binit;
+	}
+	else
+	{
+		ar >> m_binit;
+	}
 }
 
 //-----------------------------------------------------------------------------

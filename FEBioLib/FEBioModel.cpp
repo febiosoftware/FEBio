@@ -862,14 +862,16 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			for (i=0; i<n; ++i) m_LCSet[i]->Serialize(ar);
 		}
 */
+		// nonlinear constraints
 		int n = m_NLC.size();
 		ar << n;
 		if (n) 
 		{
 			for (int i=0; i<n; ++i) 
 			{
-//				ar << m_NLC[i]->Type();
-//				m_NLC[i]->Serialize(ar);
+				FENLConstraint& ci = *m_NLC[i];
+				ar << ci.GetTypeStr();
+				ci.Serialize(ar);
 			}
 		}
 	}
@@ -996,25 +998,19 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		list<FELinearConstraint>::iterator ic = m_LinC.begin();
 		for (int i=0; i<nlin; ++i, ++ic) m_LCA[i] = &(*ic);
 
-		// aug lag linear constraints
+		// non-linear constraints
 		ar >> n;
-//		int ntype;
 		m_NLC.clear();
 		for (int i=0; i<n; ++i)
 		{
-/*			ar >> ntype;
-			FENLConstraint* plc = 0;
-			switch (ntype)
-			{
-			case FE_POINT_CONSTRAINT : plc = new FEPointConstraint    (this); break;
-			case FE_LINEAR_CONSTRAINT: plc = new FELinearConstraintSet(this); break;
-			default:
-				assert(false);
-			}
-			assert(plc);
-			plc->Serialize(ar);
-			m_NLC.push_back(plc);
-*/		}
+			char sztype[256] = { 0 };
+			ar >> sztype;
+			FENLConstraint* pc = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, this);
+			assert(pc);
+
+			pc->Serialize(ar);
+			m_NLC.push_back(pc);
+		}
 	}
 
 	// serialize rigid stuff
