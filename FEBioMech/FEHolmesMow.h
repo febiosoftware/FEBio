@@ -26,7 +26,7 @@ public:
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
     
 	//! data initialization and checking
-	bool Init();
+	bool Validate();
 		
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
