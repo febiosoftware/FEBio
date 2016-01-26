@@ -914,6 +914,7 @@ void FESolidDomain::Serialize(DumpFile &ar)
 			ar << nmat;
 			ar << el.GetID();
 			ar << el.m_node;
+			ar << el.m_lnode;
 
 			for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
 		}
@@ -937,6 +938,7 @@ void FESolidDomain::Serialize(DumpFile &ar)
 			ar >> mat; el.SetMatID(mat);
 			ar >> nid; el.SetID(nid);
 			ar >> el.m_node;
+			ar >> el.m_lnode;
 
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
