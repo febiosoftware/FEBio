@@ -81,6 +81,7 @@ double FENonLinearSpring::stiffness(double dl)
 
 void FENonLinearSpring::Serialize(DumpFile& ar)
 {
+	FESpringMaterial::Serialize(ar);
 	if (ar.IsSaving())
 	{
 		ar << m_F << m_nlc;
