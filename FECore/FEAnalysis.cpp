@@ -427,7 +427,12 @@ bool FEAnalysis::Solve()
 			m_nretries = 0;
 
 			// call callback function
-			m_fem.DoCallback(CB_MAJOR_ITERS);
+			if (m_fem.DoCallback(CB_MAJOR_ITERS) == false)
+			{
+				bconv = false;
+				felog.printbox("WARNING", "Early termination on user's request");
+				break;
+			}
 		}
 		else 
 		{

@@ -273,7 +273,8 @@ public:	// --- Miscellaneous routines ---
 	void AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void* pd);
 
 	//! call the callback function
-	void DoCallback(unsigned int nevent);
+	//! This function returns fals if the run is to be aborted
+	bool DoCallback(unsigned int nevent);
 
 	//! I'd like to place the list of DOFS inside the model.
 	//! As a first step, all classes that have access to the model

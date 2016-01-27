@@ -719,14 +719,23 @@ void FEModel::AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void *pd)
 //-----------------------------------------------------------------------------
 // Call the callback function if there is one defined
 //
-void FEModel::DoCallback(unsigned int nevent)
+bool FEModel::DoCallback(unsigned int nevent)
 {
-	list<FECORE_CALLBACK>::iterator it = m_pcb.begin();
-	for (int i=0; i<(int) m_pcb.size(); ++i, ++it)
+	try
 	{
-		// call the callback function
-		if (it->m_nwhen & nevent) (it->m_pcb)(this, nevent, it->m_pd);
+		list<FECORE_CALLBACK>::iterator it = m_pcb.begin();
+		for (int i=0; i<(int) m_pcb.size(); ++i, ++it)
+		{
+			// call the callback function
+			if (it->m_nwhen & nevent) (it->m_pcb)(this, nevent, it->m_pd);
+		}
 	}
+	catch (...)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -326,11 +326,18 @@ void FELinearSolver::Serialize(DumpFile& ar)
 
 	if (ar.IsSaving())
 	{
-		ar << m_breform;
+		ar << m_breform << m_neq;
 	}
 	else
 	{
-		ar >> m_breform;
+		ar >> m_breform >> m_neq;
+
+		// We need to rebuild the stiffness matrix at some point.
+		// Currently this is done during Activation, but we don't
+		// call FEAnalysis::Activate after restart so for now,
+		// I'll just do it here.
+		// TODO: Find a better way.
+		FELinearSolver::Init();
 	}
 }
 

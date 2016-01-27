@@ -158,6 +158,28 @@ void add_break_point(double t)
 }
 
 //-----------------------------------------------------------------------------
+// break points cb
+void break_point_cb(FEModel* pfem, unsigned int nwhen, void* pd)
+{
+	const double eps = 1e-12;
+
+	// see if a break-point has been reached
+	double t = pfem->GetTime().t;
+
+	Interruption itr;
+	int nbp = break_points.size();
+	for (int i=0; i<nbp; ++i)
+	{
+		pair<double, int>& bpi = break_points[i];
+		if (bpi.second && (bpi.first <= t + eps))
+		{
+			itr.interrupt();
+			bpi.second = 0;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 // callback for ctrl+c interruptions
 void interrupt_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 {
@@ -166,22 +188,6 @@ void interrupt_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	{
 		itr.m_bsig = false;
 		itr.interrupt();
-	}
-	else
-	{
-		// see if a break-point has been reached
-		double t = pfem->GetTime().t;
-
-		int nbp = break_points.size();
-		for (int i=0; i<nbp; ++i)
-		{
-			pair<double, int>& bpi = break_points[i];
-			if (bpi.second && (bpi.first < t))
-			{
-				itr.interrupt();
-				bpi.second = 0;
-			}
-		}
 	}
 }
 
@@ -483,6 +489,7 @@ int Run(CMDOPTIONS& ops)
 	// register callbacks
 	fem.AddCallback(update_console_cb, CB_MAJOR_ITERS | CB_INIT, 0);
 	fem.AddCallback(interrupt_cb     , CB_MINOR_ITERS, 0);
+	fem.AddCallback(break_point_cb   , CB_MAJOR_ITERS, 0);
 
 	// intialize the framework
 	FEBioCommand::SetFEM(&fem);
