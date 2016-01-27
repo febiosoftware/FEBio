@@ -14,9 +14,9 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidDamper, FERigidConnector);
-ADD_PARAMETER(m_c   , FE_PARAM_DOUBLE, "c"          );
-ADD_PARAMETER(m_a0  , FE_PARAM_VEC3D , "insertion_a");
-ADD_PARAMETER(m_b0  , FE_PARAM_VEC3D , "insertion_b");
+	ADD_PARAMETER(m_c   , FE_PARAM_DOUBLE, "c"          );
+	ADD_PARAMETER(m_a0  , FE_PARAM_VEC3D , "insertion_a");
+	ADD_PARAMETER(m_b0  , FE_PARAM_VEC3D , "insertion_b");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -83,6 +83,22 @@ void FERigidDamper::ShallowCopy(DumpStream& dmp, bool bsave)
     {
         dmp >> m_qa0 >> m_qb0;
         dmp >> m_F;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void FERigidDamper::Serialize(DumpFile& ar)
+{
+	FERigidConnector::Serialize(ar);
+    if (ar.IsSaving())
+    {
+		ar << m_binit;
+        ar << m_qa0 << m_qb0;
+    }
+    else
+    {
+		ar >> m_binit;
+        ar >> m_qa0 >> m_qb0;
     }
 }
 
@@ -306,25 +322,6 @@ void FERigidDamper::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
 bool FERigidDamper::Augment(int naug, const FETimePoint& tp)
 {
     return true;
-}
-
-//-----------------------------------------------------------------------------
-void FERigidDamper::Serialize(DumpFile& ar)
-{
-    if (ar.IsSaving())
-    {
-        ar << m_nID;
-        ar << m_nRBa << m_nRBb;
-        ar << m_qa0 << m_qb0;
-        ar << m_F << m_c;
-    }
-    else
-    {
-        ar >> m_nID;
-        ar >> m_nRBa >> m_nRBb;
-        ar >> m_qa0 >> m_qb0;
-        ar >> m_F >> m_c;
-    }
 }
 
 //-----------------------------------------------------------------------------

@@ -48,7 +48,7 @@ public:
     //! Reset data
     void Reset();
     
-public:
+public: // parameters
     double	m_c;        //! damping constant
     
 protected:

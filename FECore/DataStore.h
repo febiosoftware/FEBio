@@ -23,6 +23,7 @@ class FEModel;
 #define FE_DATA_NODE	1
 #define FE_DATA_ELEM	2
 #define FE_DATA_RB		3
+#define FE_DATA_NLC		4
 
 //-----------------------------------------------------------------------------
 // Exception thrown when parsing fails

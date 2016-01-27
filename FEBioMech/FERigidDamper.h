@@ -50,13 +50,14 @@ public:
     //! Reset data
     void Reset();
     
-public:
+public: // parameters
+    double	m_c;        //! damping constant
     vec3d	m_a0;       //! initial absolute position vector of spring on body A
     vec3d	m_b0;       //! initial absolute position vector of spring on body B
+
+protected:
     vec3d	m_qa0;      //! initial relative position vector of spring on body A
     vec3d	m_qb0;      //! initial relative position vector of spring on body B
-    
-    double	m_c;        //! damping constant
     
 protected:
     bool	m_binit;

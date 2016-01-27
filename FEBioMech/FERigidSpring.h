@@ -50,17 +50,16 @@ public:
     //! Reset data
     void Reset();
     
-public:
+public: // parameters
     vec3d	m_a0;       //! initial absolute position vector of spring on body A
     vec3d	m_b0;       //! initial absolute position vector of spring on body B
-    vec3d	m_qa0;      //! initial relative position vector of spring on body A
-    vec3d	m_qb0;      //! initial relative position vector of spring on body B
-    
     double	m_k;        //! spring constant
-    double  m_L0;       //! spring resting length
-    
+
 protected:
-    bool	m_binit;
+    bool	m_binit;	//! is spring initialized?
+    double  m_L0;       //! spring resting length
+	vec3d	m_qa0;      //! initial relative position vector of spring on body A
+    vec3d	m_qb0;      //! initial relative position vector of spring on body B
     
     DECLARE_PARAMETER_LIST();
 };

@@ -50,13 +50,14 @@ public:
     //! Reset data
     void Reset();
     
-public:
+public: // parameters
+    double	m_f0;       //! contractile force
     vec3d	m_a0;       //! initial absolute position vector of insertion on body A
     vec3d	m_b0;       //! initial absolute position vector of insertion on body B
+
+protected:
     vec3d	m_qa0;      //! initial relative position vector of insertion on body A
     vec3d	m_qb0;      //! initial relative position vector of insertion on body B
-    
-    double	m_f0;       //! contractile force
     
 protected:
     bool	m_binit;

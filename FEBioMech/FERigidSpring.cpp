@@ -90,6 +90,24 @@ void FERigidSpring::ShallowCopy(DumpStream& dmp, bool bsave)
 }
 
 //-----------------------------------------------------------------------------
+void FERigidSpring::Serialize(DumpFile& ar)
+{
+	FERigidConnector::Serialize(ar);
+    if (ar.IsSaving())
+    {
+		ar << m_binit;
+        ar << m_qa0 << m_qb0;
+        ar << m_L0 << m_k;
+    }
+    else
+    {
+		ar >> m_binit;
+        ar >> m_qa0 >> m_qb0;
+        ar >> m_L0 >> m_k;
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidSpring::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {
@@ -291,25 +309,6 @@ void FERigidSpring::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
 bool FERigidSpring::Augment(int naug, const FETimePoint& tp)
 {
     return true;
-}
-
-//-----------------------------------------------------------------------------
-void FERigidSpring::Serialize(DumpFile& ar)
-{
-    if (ar.IsSaving())
-    {
-        ar << m_nID;
-        ar << m_nRBa << m_nRBb;
-        ar << m_qa0 << m_qb0;
-        ar << m_F << m_L0 << m_k;
-    }
-    else
-    {
-        ar >> m_nID;
-        ar >> m_nRBa >> m_nRBb;
-        ar >> m_qa0 >> m_qb0;
-        ar >> m_F >> m_L0 >> m_k;
-    }
 }
 
 //-----------------------------------------------------------------------------

@@ -38,3 +38,21 @@ void FERigidConnector::BuildMatrixProfile(FEGlobalMatrix& M)
     for (int j=0; j<6; ++j) lm[j+6] = lm2[j];
     M.build_add(lm);
 }
+
+//-----------------------------------------------------------------------------
+void FERigidConnector::Serialize(DumpFile& ar)
+{
+	FENLConstraint::Serialize(ar);
+	if (ar.IsSaving())
+	{
+        ar << m_nID;
+        ar << m_nRBa << m_nRBb;
+        ar << m_F << m_M;
+	}
+	else
+	{
+        ar >> m_nID;
+        ar >> m_nRBa >> m_nRBb;
+        ar >> m_F >> m_M;
+	}
+}

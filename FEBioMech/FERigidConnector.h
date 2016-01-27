@@ -29,6 +29,9 @@ public:
 
 	//! build connectivity for matrix profile
 	void BuildMatrixProfile(FEGlobalMatrix& M);
+
+	//! serialization
+	void Serialize(DumpFile& ar);
     
 public:
     int	m_nRBa;		//!< rigid body A that the connector connects

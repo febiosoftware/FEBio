@@ -123,6 +123,31 @@ void FERigidPlanarJoint::ShallowCopy(DumpStream& dmp, bool bsave)
     }
 }
 
+
+//-----------------------------------------------------------------------------
+void FERigidPlanarJoint::Serialize(DumpFile& ar)
+{
+	FERigidConnector::Serialize(ar);
+    if (ar.IsSaving())
+    {
+		ar << m_binit;
+        ar << m_qa0 << m_qb0;
+        ar << m_L << m_U;
+        ar << m_e0[0] << m_e0[1] << m_e0[2];
+        ar << m_ea0[0] << m_ea0[1] << m_ea0[2];
+        ar << m_eb0[0] << m_eb0[1] << m_eb0[2];
+    }
+    else
+    {
+		ar >> m_binit;
+        ar >> m_qa0 >> m_qb0;
+        ar >> m_L >> m_U;
+        ar >> m_e0[0] >> m_e0[1] >> m_e0[2];
+        ar >> m_ea0[0] >> m_ea0[1] >> m_ea0[2];
+        ar >> m_eb0[0] >> m_eb0[1] >> m_eb0[2];
+    }
+}
+
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidPlanarJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
@@ -573,31 +598,6 @@ bool FERigidPlanarJoint::Augment(int naug, const FETimePoint& tp)
     }
     
     return bconv;
-}
-
-//-----------------------------------------------------------------------------
-void FERigidPlanarJoint::Serialize(DumpFile& ar)
-{
-    if (ar.IsSaving())
-    {
-        ar << m_nID;
-        ar << m_nRBa << m_nRBb;
-        ar << m_q0 << m_qa0 << m_qb0;
-        ar << m_F << m_L << m_eps << m_atol;
-        ar << m_ea0[0] << m_ea0[1] << m_ea0[2];
-        ar << m_eb0[0] << m_eb0[1] << m_eb0[2];
-        ar << m_M << m_U << m_ups;
-    }
-    else
-    {
-        ar >> m_nID;
-        ar >> m_nRBa >> m_nRBb;
-        ar >> m_q0 >> m_qa0 >> m_qb0;
-        ar >> m_F >> m_L >> m_eps >> m_atol;
-        ar >> m_ea0[0] >> m_ea0[1] >> m_ea0[2];
-        ar >> m_eb0[0] >> m_eb0[1] >> m_eb0[2];
-        ar >> m_M >> m_U >> m_ups;
-    }
 }
 
 //-----------------------------------------------------------------------------

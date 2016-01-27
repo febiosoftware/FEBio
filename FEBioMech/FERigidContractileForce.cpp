@@ -87,6 +87,22 @@ void FERigidContractileForce::ShallowCopy(DumpStream& dmp, bool bsave)
 }
 
 //-----------------------------------------------------------------------------
+void FERigidContractileForce::Serialize(DumpFile& ar)
+{
+	FERigidConnector::Serialize(ar);
+    if (ar.IsSaving())
+    {
+		ar << m_binit;
+        ar << m_qa0 << m_qb0;
+    }
+    else
+    {
+		ar >> m_binit;
+        ar >> m_qa0 >> m_qb0;
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidContractileForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {
@@ -288,25 +304,6 @@ void FERigidContractileForce::StiffnessMatrix(FESolver* psolver, const FETimePoi
 bool FERigidContractileForce::Augment(int naug, const FETimePoint& tp)
 {
     return true;
-}
-
-//-----------------------------------------------------------------------------
-void FERigidContractileForce::Serialize(DumpFile& ar)
-{
-    if (ar.IsSaving())
-    {
-        ar << m_nID;
-        ar << m_nRBa << m_nRBb;
-        ar << m_qa0 << m_qb0;
-        ar << m_F << m_f0;
-    }
-    else
-    {
-        ar >> m_nID;
-        ar >> m_nRBa >> m_nRBb;
-        ar >> m_qa0 >> m_qb0;
-        ar >> m_F >> m_f0;
-    }
 }
 
 //-----------------------------------------------------------------------------

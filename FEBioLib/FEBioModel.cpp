@@ -6,6 +6,7 @@
 #include "FECore/NodeDataRecord.h"
 #include "FECore/ElementDataRecord.h"
 #include "FECore/ObjectDataRecord.h"
+#include "FECore/NLConstraintDataRecord.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FECoreKernel.h"
@@ -1075,9 +1076,10 @@ void FEBioModel::SerializeDataStore(DumpFile& ar)
 			DataRecord* pd = m_Data.GetDataRecord(i);
 
 			int ntype = -1;
-			if (dynamic_cast<NodeDataRecord*>(pd)) ntype = FE_DATA_NODE;
-			if (dynamic_cast<ElementDataRecord*>(pd)) ntype = FE_DATA_ELEM;
-			if (dynamic_cast<ObjectDataRecord*>(pd)) ntype = FE_DATA_RB;
+			if (dynamic_cast<NodeDataRecord*       >(pd)) ntype = FE_DATA_NODE;
+			if (dynamic_cast<ElementDataRecord*    >(pd)) ntype = FE_DATA_ELEM;
+			if (dynamic_cast<ObjectDataRecord*     >(pd)) ntype = FE_DATA_RB;
+			if (dynamic_cast<NLConstraintDataRecord*>(pd)) ntype = FE_DATA_NLC;
 			assert(ntype != -1);
 			ar << ntype;
 			pd->Serialize(ar);
@@ -1096,9 +1098,10 @@ void FEBioModel::SerializeDataStore(DumpFile& ar)
 			DataRecord* pd = 0;
 			switch(ntype)
 			{
-			case FE_DATA_NODE: pd = new NodeDataRecord(this, 0); break;
-			case FE_DATA_ELEM: pd = new ElementDataRecord(this, 0); break;
-			case FE_DATA_RB  : pd = new ObjectDataRecord(this, 0); break;
+			case FE_DATA_NODE: pd = new NodeDataRecord        (this, 0); break;
+			case FE_DATA_ELEM: pd = new ElementDataRecord     (this, 0); break;
+			case FE_DATA_RB  : pd = new ObjectDataRecord      (this, 0); break;
+			case FE_DATA_NLC : pd = new NLConstraintDataRecord(this, 0); break;
 			}
 			assert(pd);
 			pd->Serialize(ar);

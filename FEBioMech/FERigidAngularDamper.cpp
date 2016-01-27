@@ -74,6 +74,22 @@ void FERigidAngularDamper::ShallowCopy(DumpStream& dmp, bool bsave)
 }
 
 //-----------------------------------------------------------------------------
+void FERigidAngularDamper::Serialize(DumpFile& ar)
+{
+	FERigidConnector::Serialize(ar);
+    if (ar.IsSaving())
+    {
+		ar << m_binit;
+        ar << m_c;
+    }
+    else
+    {
+		ar >> m_binit;
+        ar >> m_c;
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidAngularDamper::Residual(FEGlobalVector& R, const FETimePoint& tp)
 {
@@ -196,23 +212,6 @@ void FERigidAngularDamper::StiffnessMatrix(FESolver* psolver, const FETimePoint&
 bool FERigidAngularDamper::Augment(int naug, const FETimePoint& tp)
 {
     return true;
-}
-
-//-----------------------------------------------------------------------------
-void FERigidAngularDamper::Serialize(DumpFile& ar)
-{
-    if (ar.IsSaving())
-    {
-        ar << m_nID;
-        ar << m_nRBa << m_nRBb;
-        ar << m_M << m_c;
-    }
-    else
-    {
-        ar >> m_nID;
-        ar >> m_nRBa >> m_nRBb;
-        ar >> m_M >> m_c;
-    }
 }
 
 //-----------------------------------------------------------------------------
