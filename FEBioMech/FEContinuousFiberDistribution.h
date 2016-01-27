@@ -23,6 +23,9 @@ public:
     // Initialization
     bool Init();
 
+	// serialization
+	void Serialize(DumpFile& ar);
+
 public:
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt) { return m_pFint->Stress(pt); }

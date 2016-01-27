@@ -31,3 +31,14 @@ bool FEContinuousFiberDistribution::Init()
     // initialize base class
 	return FEElasticMaterial::Init();
 }
+
+//-----------------------------------------------------------------------------
+void FEContinuousFiberDistribution::Serialize(DumpFile& ar)
+{
+	FEElasticMaterial::Serialize(ar);
+	if (ar.IsSaving() == false)
+	{
+		m_pFint->m_pFmat = m_pFmat;
+		m_pFint->m_pFDD = m_pFDD;
+	}
+}

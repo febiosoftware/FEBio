@@ -30,16 +30,23 @@ public:
     
     // Fiber density
     void IntegratedFiberDensity(double& IFD);
+
+	// serialization
+	void Serialize(DumpFile& ar);
+
+protected:
+	void InitIntegrationRule();
     
-public:
+public: // parameters
 	int             m_nres;	// resolution
+
+protected:
     int             m_nint; // number of integration points
 	double          m_cth[2000];
 	double          m_sth[2000];
 	double          m_cph[2000];
 	double          m_sph[2000];
 	double          m_w[2000];
-    bool            m_bfirst;
     
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

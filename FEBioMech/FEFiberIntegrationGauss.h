@@ -30,10 +30,15 @@ public:
     
     // Fiber density
     void IntegratedFiberDensity(double& IFD);
+
+	//! Serialization
+	void Serialize(DumpFile& ar);
     
-public:
+public:	// parameters
 	int             m_nph;	// number of gauss integration points along phi
     int             m_nth;  // number of trapezoidal integration points along theta
+
+protected:
     vector<double>  m_gp;   // gauss points
     vector<double>  m_gw;   // gauss weights
 

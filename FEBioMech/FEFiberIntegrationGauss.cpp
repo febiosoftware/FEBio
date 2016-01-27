@@ -23,6 +23,21 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationGauss, FEFiberIntegrationScheme)
 	ADD_PARAMETER2(m_nth, FE_PARAM_INT, FE_RANGE_GREATER(0), "nth");
 END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
+void FEFiberIntegrationGauss::Serialize(DumpFile& ar)
+{
+	FEFiberIntegrationScheme::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << m_gp << m_gw;
+	}
+	else
+	{
+		ar >> m_gp >> m_gw;
+	}
+}
+
+//-----------------------------------------------------------------------------
 bool FEFiberIntegrationGauss::Init()
 {
     switch (m_nph) {

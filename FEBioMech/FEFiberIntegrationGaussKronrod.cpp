@@ -23,6 +23,19 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationGaussKronrod, FEFiberIntegrationScheme)
 	ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
 END_PARAMETER_LIST();
 
+void FEFiberIntegrationGaussKronrod::Serialize(DumpFile& ar)
+{
+	FEFiberIntegrationScheme::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << m_gp << m_gw;
+	}
+	else
+	{
+		ar >> m_gp >> m_gw;
+	}
+}
+
 bool FEFiberIntegrationGaussKronrod::Init()
 {
     if (m_nth < 1) return MaterialError("nth must be strictly greater than zero.");

@@ -16,15 +16,37 @@
 // FEFiberIntegrationGeodesic
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberIntegrationGeodesic, FEFiberIntegrationScheme)
 	ADD_PARAMETER(m_nres, FE_PARAM_INT, "resolution");
 END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
+void FEFiberIntegrationGeodesic::Serialize(DumpFile& ar)
+{
+	FEFiberIntegrationScheme::Serialize(ar);
+	if (ar.IsSaving() == false)
+	{
+		InitIntegrationRule();
+	}
+}
+
+//-----------------------------------------------------------------------------
 bool FEFiberIntegrationGeodesic::Init()
 {
 	if ((m_nres != 0) && (m_nres != 1)) return MaterialError("resolution must be 0 (low) or 1 (high).");
     
+	// initialize integration rule data
+	InitIntegrationRule();
+		
+    // also initialize the parent class
+    return FEFiberIntegrationScheme::Init();
+}
+
+//-----------------------------------------------------------------------------
+void FEFiberIntegrationGeodesic::InitIntegrationRule()
+{
 	// select the integration rule
 	m_nint = (m_nres == 0? NSTL  : NSTH  );
 	const double* phi = (m_nres == 0? PHIL  : PHIH  );
@@ -39,9 +61,6 @@ bool FEFiberIntegrationGeodesic::Init()
 		m_sph[n] = sin(phi[n]);
 		m_w[n] = w[n];
 	}
-		
-    // also initialize the parent class
-    return FEFiberIntegrationScheme::Init();
 }
 
 //-----------------------------------------------------------------------------
