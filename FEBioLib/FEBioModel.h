@@ -10,8 +10,6 @@
 //!
 //! In addition it adds support for all I/O capabilities. 
 //!
-//! \todo Maybe all the serialization functions can be handled by a new class?
-//!
 class FEBioModel : public FEModel
 {
 public:
@@ -36,7 +34,7 @@ public: // --- I/O functions ---
 	bool Input(const char* szfile);
 
 	//! write to plot file
-	void Write(FE_OUTPUT_HINT hint);
+	void Write(unsigned int nwhen);
 
 	//! write data to log file
 	void WriteData();
@@ -51,15 +49,7 @@ public: //! --- serialization for restarts ---
 
 protected:
 	// helper functions for serialization
-	void SerializeMaterials   (DumpFile& ar);
-	void SerializeAnalysisData(DumpFile& ar);
-	void SerializeGeometry    (DumpFile& ar);
-	void SerializeMesh        (DumpFile& ar);
-	void SerializeContactData (DumpFile& ar);
-	void SerializeBoundaryData(DumpFile& ar);
 	void SerializeIOData      (DumpFile& ar);
-	void SerializeLoadData    (DumpFile& ar);
-	void SerializeGlobals     (DumpFile& ar);
 	void SerializeDataStore   (DumpFile& ar);
 
 public: // --- I/O functions ---

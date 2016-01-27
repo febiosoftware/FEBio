@@ -319,9 +319,6 @@ void FEExplicitSolidSolver::Update(vector<double>& ui)
 		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(i));
 		if (pbf) pbf->Update();
 	}
-
-	// write the new state
-	m_fem.Write(FE_UNCONVERGED);
 }
 
 //-----------------------------------------------------------------------------
@@ -828,9 +825,6 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 
 	// prepare for the first iteration
 	PrepStep(time);
-
-	// do minor iterations callbacks
-	m_fem.DoCallback(CB_MINOR_ITERS);
 
 	Logfile::MODE oldmode = felog.GetMode();
 	if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&

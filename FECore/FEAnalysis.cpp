@@ -201,9 +201,6 @@ bool FEAnalysis::Activate()
 		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il) il->Activate();
 	}
 
-	// write the initial state
-	m_fem.Write(FE_STEP_INITIALIZED);
-	
 	return true;
 }
 
@@ -417,15 +414,6 @@ bool FEAnalysis::Solve()
 			// update nr of completed timesteps
 			m_ntimesteps++;
 
-			// output results to plot database
-			m_fem.Write(FE_CONVERGED);
-
-			// update time step
-			if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(psolver->m_niter);
-
-			// reset retry counter
-			m_nretries = 0;
-
 			// call callback function
 			if (m_fem.DoCallback(CB_MAJOR_ITERS) == false)
 			{
@@ -433,14 +421,17 @@ bool FEAnalysis::Solve()
 				felog.printbox("WARNING", "Early termination on user's request");
 				break;
 			}
+
+			// reset retry counter
+			m_nretries = 0;
+
+			// update time step
+			if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(psolver->m_niter);
 		}
 		else 
 		{
 			// Report the sad news to the user.
 			felog.printf("\n\n------- failed to converge at time : %lg\n\n", m_fem.m_ftime);
-
-			// plot the state when the debug flag is on
-			m_fem.Write(FE_UNCONVERGED);
 
 			// If we have auto time stepping, decrease time step and let's retry
 			if (m_bautostep && (m_nretries < m_maxretries))
@@ -474,9 +465,7 @@ bool FEAnalysis::Solve()
 		felog.flush();
 	}
 
-	// write the final time step, if it hasn't been written yet.
-	if (bconv) m_fem.Write(FE_STEP_SOLVED);
-
+	// TODO: Why is this here?
 	m_fem.m_ftime0 = m_fem.m_ftime;
 
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)

@@ -501,9 +501,6 @@ void FESolidSolver::Update(vector<double>& ui)
 		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_fem.GetBodyLoad(i));
 		if (pbf) pbf->Update();
 	}
-
-	// dump all states to the plot file when requested
-	m_fem.Write(FE_UNCONVERGED);
 }
 
 //-----------------------------------------------------------------------------
@@ -911,9 +908,6 @@ bool FESolidSolver::Quasin(double time)
 	// prepare for the first iteration
 	PrepStep(time);
 
-	// do minor iterations callbacks
-	m_fem.DoCallback(CB_MINOR_ITERS);
-
 	// calculate initial stiffness matrix
 	FETimePoint tp = m_fem.GetTime();
 	if (ReformStiffness(tp) == false) return false;
@@ -1109,7 +1103,7 @@ bool FESolidSolver::Quasin(double time)
 			// is because the augmentations are going to change things such that
 			// the system no longer in equilibrium. Since the model has to be converged
 			// before we do augmentations, storing the model now will store an actual converged state.
-			pstep->GetFEModel().Write(FE_AUGMENT);
+			pstep->GetFEModel().DoCallback(CB_AUGMENT);
 
 			// do the augmentations
 			bconv = Augment();

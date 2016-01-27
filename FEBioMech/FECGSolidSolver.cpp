@@ -473,9 +473,6 @@ bool FECGSolidSolver::SolveStep(double time)
 	// update stresses
 	UpdateStresses();
 
-	// do minor iterations callbacks
-	m_fem.DoCallback(CB_MINOR_ITERS);
-
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;
 

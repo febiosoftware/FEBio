@@ -23,12 +23,13 @@
 
 //-----------------------------------------------------------------------------
 // callback structure
-#define CB_ALWAYS		0x00011111		//!< Call for all reasons
+#define CB_ALWAYS		0xFFFFFFFF		//!< Call for all reasons
 #define CB_INIT			0x00000001		//!< Call after model initialization (i.e. FEModel::Init())
-#define CB_MAJOR_ITERS	0x00000010		//!< Call at the end of each major converged iteration
-#define CB_MINOR_ITERS	0x00000100		//!< Call for each minor iteration
-#define CB_SOLVED		0x00001000		//!< Call at the end of FEModel::Solve
-#define CB_UPDATE_TIME	0x00010000		//!< Call when time is updated and right before time step is solved (in FEAnalysis::Solve)
+#define CB_MAJOR_ITERS	0x00000002		//!< Call at the end of each major converged iteration
+#define CB_MINOR_ITERS	0x00000004		//!< Call for each minor iteration
+#define CB_SOLVED		0x00000008		//!< Call at the end of FEModel::Solve
+#define CB_UPDATE_TIME	0x00000010		//!< Call when time is updated and right before time step is solved (in FEAnalysis::Solve)
+#define CB_AUGMENT		0x00000020		//!< The model is entering augmentations (called before Augment)
 
 typedef unsigned int FECORE_CB_WHEN;
 typedef void (*FECORE_CB_FNC)(FEModel*,unsigned int,void*);
@@ -36,20 +37,6 @@ struct FECORE_CALLBACK {
 	FECORE_CB_FNC	m_pcb;		// pointer to callback function
 	void*			m_pd;		// pointer to user data
 	FECORE_CB_WHEN	m_nwhen;	// when to call function
-};
-
-//-----------------------------------------------------------------------------
-//! These output flags are used when calling FEModel::Write to report the state
-//! of the solution. This can be used to decide whether to output the state data or not.
-enum FE_OUTPUT_HINT {
-	FE_UNKNOWN,				// the model is in an unknown state
-	FE_INITIALIZED,			// the model has been initialized (i.e. FEModel::Init() was called)
-	FE_UNCONVERGED,			// the model is in a non-converged state
-	FE_CONVERGED,			// the time step has converged
-	FE_AUGMENT,				// the model is entering an augmented (called before Augment())
-	FE_SOLVED,				// the entire model is solved
-	FE_STEP_INITIALIZED,	// the current step is initialized (i.e. FEAnalysis::Init() was called)
-	FE_STEP_SOLVED,			// the step was solved
 };
 
 //-----------------------------------------------------------------------------
@@ -285,13 +272,20 @@ public:	// --- Miscellaneous routines ---
 	int GetDOFIndex(const char* sz);
 	int GetDOFIndex(const char* szvar, int n);
 
-public: // --- I/O functions
-
-	//! write to plot file
-	virtual void Write(FE_OUTPUT_HINT hint) {}
-
+public:
 	//! serialize data
-	virtual bool Serialize(DumpFile& ar) { return true; }
+	virtual bool Serialize(DumpFile& ar);
+
+protected:
+	// helper functions for serialization
+	void SerializeLoadData    (DumpFile& ar);
+	void SerializeGlobals     (DumpFile& ar);
+	void SerializeMaterials   (DumpFile& ar);
+	void SerializeGeometry    (DumpFile& ar);
+	void SerializeMesh        (DumpFile& ar);
+	void SerializeContactData (DumpFile& ar);
+	void SerializeBoundaryData(DumpFile& ar);
+	void SerializeAnalysisData(DumpFile& ar);
 
 public: // Global data
 	void AddGlobalData(FEGlobalData* psd);

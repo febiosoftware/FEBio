@@ -130,7 +130,7 @@ int FEBioCmd_Fail::run(int nargs, char **argv)
 int FEBioCmd_Plot::run(int nargs, char **argv)
 {
 	assert(m_pfem);
-	m_pfem->Write(FE_UNKNOWN);
+	assert(false);
 	return 1;
 }
 

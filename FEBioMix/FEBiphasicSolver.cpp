@@ -143,9 +143,6 @@ bool FEBiphasicSolver::Quasin(double time)
 	// prepare for the first iteration
 	PrepStep(time);
 
-	// do minor iterations callbacks
-	m_fem.DoCallback(CB_MINOR_ITERS);
-
 	// calculate initial stiffness matrix
 	FETimePoint tp = m_fem.GetTime();
 	if (ReformStiffness(tp) == false) return false;
