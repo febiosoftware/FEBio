@@ -4,9 +4,10 @@
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
-FERestartDiagnostic::FERestartDiagnostic(FEModel*pfem) : FECoreTask(pfem)
+FERestartDiagnostic::FERestartDiagnostic(FEModel*pfem) : FECoreTask(pfem), m_dmp(*pfem)
 {
 	m_bok = false;
+	m_bfile = false;
 	strcpy(m_szdmp, "out.dmp");
 }
 
@@ -16,18 +17,26 @@ bool restart_test_cb(FEModel* pfem, unsigned int nwen, void* pd)
 	FERestartDiagnostic* ptask = (FERestartDiagnostic*) pd;
 
 	// try to create archive
-	DumpFile ar(*pfem);
-	if (ar.Create(ptask->m_szdmp) == false)
+	if (ptask->m_bfile)
 	{
-		felog.printf("FAILED CREATING RESTART DUMP FILE.\n");
-		return false;
-	}
+		DumpFile ar(*pfem);
+		if (ar.Create(ptask->m_szdmp) == false)
+		{
+			felog.printf("FAILED CREATING RESTART DUMP FILE.\n");
+			return false;
+		}
 		
-	// serialize the data
-	pfem->Serialize(ar);
+		// serialize the data
+		pfem->Serialize(ar);
 
-	// close the dump file.
-	ar.Close();
+		// close the dump file.
+		ar.Close();
+	}
+	else
+	{
+		ptask->m_dmp.Open(true, false);
+		pfem->Serialize(ptask->m_dmp);
+	}
 
 	// set the ok flag to tell the diagnostic that the restart 
 	// file was created successfully.
@@ -75,20 +84,27 @@ bool FERestartDiagnostic::Run()
 	{
 		if (m_bok)
 		{
-			// reopen the dump file for readin
-			DumpFile ar(fem);
-			if (ar.Open(m_szdmp) == false)
+			if (m_bfile)
 			{
-				felog.printf("FAILED OPENING RESTART DUMP FILE.\n");
-				return false;
+				// reopen the dump file for readin
+				DumpFile ar(fem);
+				if (ar.Open(m_szdmp) == false)
+				{
+					felog.printf("FAILED OPENING RESTART DUMP FILE.\n");
+					return false;
+				}
+
+				fem.Serialize(ar);
 			}
+			else
+			{
+				m_dmp.Open(false, false);
+				fem.Serialize(m_dmp);
+			}
+			m_bok = false;
 
 			// reset output mode
 			felog.SetMode(Logfile::FILE_AND_SCREEN);
-	
-			// read the model data
-			fem.Serialize(ar);
-			m_bok = false;
 		}
 		else return false;
 	}
