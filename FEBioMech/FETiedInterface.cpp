@@ -502,4 +502,30 @@ void FETiedInterface::Serialize(DumpStream &ar)
 	// store contact surface data
 	ms.Serialize(ar);
 	ss.Serialize(ar);
+
+	// serialize pointers
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			int NE = ss.m_pme.size();
+			ar << NE;
+			for (int i=0; i<NE; ++i)
+			{
+				FESurfaceElement* pe = ss.m_pme[i];
+				if (pe) ar << pe->m_lid; else ar << -1;
+			}
+		}
+		else
+		{
+			int NE, lid;
+			ar >> NE;
+			ss.m_pme.resize(NE);
+			for (int i=0; i<NE; ++i)
+			{
+				ar >> lid;
+				if (lid < 0) ss.m_pme[i] = 0; else ss.m_pme[i] = &ms.Element(lid);
+			}
+		}
+	}
 }

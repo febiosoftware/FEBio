@@ -39,7 +39,7 @@ void mrqcof(vector<double>& x,
 			double& chisq,
 			void funcs(vector<double>& , vector<double>&, vector<double>&, matrix&));
 
-extern void fecb(FEModel* pfem, unsigned int nwhen, void* pd);
+extern bool fecb(FEModel* pfem, unsigned int nwhen, void* pd);
 
 //-----------------------------------------------------------------------------
 FELMOptimizeMethod::FELMOptimizeMethod()

@@ -104,7 +104,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // callback to update window title
-void update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
+bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 {
 	FEBioModel& fem = static_cast<FEBioModel&>(*pfem);
 
@@ -139,6 +139,8 @@ void update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s %s", fem.m_nStep+1, nsteps, f, szfile, szvers, (bdebug?"(debug mode)": ""));
 	else
 		pShell->SetTitle("(%.f%%) %s - %s %s", f, szfile, szvers, (bdebug?"(debug mode)": ""));
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -159,7 +161,7 @@ void add_break_point(double t)
 
 //-----------------------------------------------------------------------------
 // break points cb
-void break_point_cb(FEModel* pfem, unsigned int nwhen, void* pd)
+bool break_point_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 {
 	const double eps = 1e-12;
 
@@ -177,11 +179,12 @@ void break_point_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 			bpi.second = 0;
 		}
 	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------
 // callback for ctrl+c interruptions
-void interrupt_cb(FEModel* pfem, unsigned int nwhen, void* pd)
+bool interrupt_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 {
 	Interruption itr;
 	if (itr.m_bsig)
@@ -189,6 +192,7 @@ void interrupt_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 		itr.m_bsig = false;
 		itr.interrupt();
 	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------

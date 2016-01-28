@@ -3,15 +3,17 @@
 #include "FEBioLib/FEBioModel.h"
 #include "FEBioTest/FEDiagnostic.h"
 #include "FEBioTest/FETangentDiagnostic.h"
+#include "FEBioTest/FERestartDiagnostics.h"
 #include "FEBioLib/FEBox.h"
 #include "FECore/log.h"
 #include "FEBioXML/FERestartImport.h"
 #include "FECore/DumpFile.h"
 
 //-----------------------------------------------------------------------------
-REGISTER_FECORE_CLASS(FEBioStdSolver , FETASK_ID, "solve"   );
-REGISTER_FECORE_CLASS(FEBioRestart   , FETASK_ID, "restart" );
-REGISTER_FECORE_CLASS(FEBioDiagnostic, FETASK_ID, "diagnose");
+REGISTER_FECORE_CLASS(FEBioStdSolver     , FETASK_ID, "solve"       );
+REGISTER_FECORE_CLASS(FEBioRestart       , FETASK_ID, "restart"     );
+REGISTER_FECORE_CLASS(FEBioDiagnostic    , FETASK_ID, "diagnose"    );
+REGISTER_FECORE_CLASS(FERestartDiagnostic, FETASK_ID, "restart_test");
 
 //-----------------------------------------------------------------------------
 FEBioStdSolver::FEBioStdSolver(FEModel* pfem) : FECoreTask(pfem) {}

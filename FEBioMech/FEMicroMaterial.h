@@ -16,7 +16,7 @@ public:
 	// The second FEModel (rve) is the micro-problem that needs to be tracked.
 	FERVEProbe(FEModel& fem, FEModel& rve, const char* szfile);
 
-	void Execute(FEModel& fem, int nwhen);
+	bool Execute(FEModel& fem, int nwhen);
 
 private:
 	FEModel&			m_rve;		//!< The RVE model to keep track of

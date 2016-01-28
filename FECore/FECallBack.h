@@ -14,5 +14,5 @@ public:
 	virtual ~FECallBack();
 
 	// Override this function in the derived class.
-	virtual void Execute(FEModel& fem, int nwhen) = 0;
+	virtual bool Execute(FEModel& fem, int nwhen) = 0;
 };

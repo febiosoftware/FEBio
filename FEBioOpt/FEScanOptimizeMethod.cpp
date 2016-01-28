@@ -11,7 +11,7 @@ END_PARAMETER_LIST();
 // FEScanOptimizeMethod
 //-----------------------------------------------------------------------------
 
-void fecb(FEModel* pfem, unsigned int nwhen, void* pd);
+bool fecb(FEModel* pfem, unsigned int nwhen, void* pd);
 
 bool FEScanOptimizeMethod::Solve(FEOptimizeData* pOpt)
 {

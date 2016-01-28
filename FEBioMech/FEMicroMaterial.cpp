@@ -15,7 +15,7 @@ FERVEProbe::FERVEProbe(FEModel& fem, FEModel& rve, const char* szfile) : FECallB
 
 }
 
-void FERVEProbe::Execute(FEModel& fem, int nwhen)
+bool FERVEProbe::Execute(FEModel& fem, int nwhen)
 {
 	if (nwhen == CB_INIT)	// initialize the plot file
 	{
@@ -40,6 +40,8 @@ void FERVEProbe::Execute(FEModel& fem, int nwhen)
 		if (m_xplt) delete m_xplt;
 		m_xplt = 0;
 	}
+
+	return true;
 }
 
 //=============================================================================

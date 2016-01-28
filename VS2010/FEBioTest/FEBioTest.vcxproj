@@ -396,6 +396,7 @@
     <ClCompile Include="..\..\FEBioTest\FEMultiphasicTangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEPrintHBMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEPrintMatrixDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBioTest\FERestartDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FETangentDiagnostic.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -407,6 +408,7 @@
     <ClInclude Include="..\..\FEBioTest\FEMultiphasicTangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEPrintHBMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEPrintMatrixDiagnostic.h" />
+    <ClInclude Include="..\..\FEBioTest\FERestartDiagnostics.h" />
     <ClInclude Include="..\..\FEBioTest\FETangentDiagnostic.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

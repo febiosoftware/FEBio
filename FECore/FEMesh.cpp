@@ -11,6 +11,7 @@
 #include "FESolidDomain.h"
 #include "FEDomain2D.h"
 #include "FEMaterial.h"
+#include "FEModel.h"
 #include "log.h"
 #include "DOFS.h"
 
@@ -162,22 +163,7 @@ FEMesh::FEMesh()
 //-----------------------------------------------------------------------------
 FEMesh::~FEMesh()
 {
-	for (size_t i=0; i<m_NodeSet.size(); ++i) delete m_NodeSet[i];
-	for (size_t i=0; i<m_FaceSet.size(); ++i) delete m_FaceSet[i];
-	for (size_t i=0; i<m_ElSet.size()  ; ++i) delete m_ElSet[i];
-	m_NodeSet.clear();
-	m_FaceSet.clear();
-	m_ElSet.clear();
-
-	ClearDomains();
-}
-
-//-----------------------------------------------------------------------------
-void FEMesh::ClearDomains()
-{
-	// clear solid domains
-	for (size_t i=0; i<m_Domain.size(); ++i) delete m_Domain[i];
-	m_Domain.clear();
+	Clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -219,6 +205,93 @@ void FEMesh::Serialize(DumpStream& ar)
 		{
 			FEDomain& dom = Domain(i);
 			dom.Serialize(ar);
+		}
+	}
+	else
+	{
+		if (ar.IsSaving())
+		{
+			// write nodal data
+			int nn = Nodes();
+			ar << nn;
+			for (int i=0; i<nn; ++i)
+			{
+				FENode& node = Node(i);
+				ar << node.m_ap;
+				ar << node.m_at;
+				ar << node.m_bshell;
+				ar << node.m_bexclude;
+				ar << node.m_Fr;
+				ar << node.m_ID;
+				ar << node.m_BC;
+				ar << node.m_r0;
+				ar << node.m_rid;
+				ar << node.m_rp;
+				ar << node.m_rt;
+				ar << node.m_vp;
+				ar << node.m_val;
+			}
+
+			// write domain data
+			int ND = Domains();
+			ar << ND;
+			for (int i=0; i<ND; ++i)
+			{
+				FEDomain& d = Domain(i);
+				ar << d.GetMaterial()->GetID();
+				ar << d.GetTypeStr() << d.Elements();
+				d.Serialize(ar);
+			}
+		}
+		else
+		{
+			FEModel& fem = ar.GetFEModel();
+			FECoreKernel& febio = FECoreKernel::GetInstance();
+
+			// read nodal data
+			int nn;
+			ar >> nn;
+			CreateNodes(nn);
+			for (int i=0; i<nn; ++i)
+			{
+				FENode& node = Node(i);
+				ar >> node.m_ap;
+				ar >> node.m_at;
+				ar >> node.m_bshell;
+				ar >> node.m_bexclude;
+				ar >> node.m_Fr;
+				ar >> node.m_ID;
+				ar >> node.m_BC;
+				ar >> node.m_r0;
+				ar >> node.m_rid;
+				ar >> node.m_rp;
+				ar >> node.m_rt;
+				ar >> node.m_vp;
+				ar >> node.m_val;
+			}
+
+			// read domain data
+			int ND, ne;
+			ar >> ND;
+			char sz[256] = {0};
+			for (int i=0; i<ND; ++i)
+			{
+				int nmat;
+				ar >> nmat;
+				FEMaterial* pm = fem.FindMaterial(nmat);
+				assert(pm);
+
+				ar >> sz >> ne;
+				FEDomain* pd = fecore_new<FEDomain>(FEDOMAIN_ID, sz, &fem);
+				assert(pd);
+				pd->SetMaterial(pm);
+				pd->create(ne);
+				pd->Serialize(ar);
+
+				AddDomain(pd);
+			}
+
+			UpdateBox();
 		}
 	}
 }
@@ -433,6 +506,25 @@ bool FEMesh::Init()
 
 	// All done
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEMesh::Clear()
+{
+	m_Node.clear();
+	for (size_t i=0; i<m_Domain.size (); ++i) delete m_Domain [i];
+
+	// TODO: Surfaces are currently managed by the classes that use them so don't delete them
+//	for (size_t i=0; i<m_Surf.size   (); ++i) delete m_Surf   [i];
+
+	for (size_t i=0; i<m_NodeSet.size(); ++i) delete m_NodeSet[i];
+	for (size_t i=0; i<m_FaceSet.size(); ++i) delete m_FaceSet[i];
+	for (size_t i=0; i<m_ElSet.size  (); ++i) delete m_ElSet  [i];
+	m_Domain.clear();
+	m_Surf.clear();
+	m_NodeSet.clear();
+	m_FaceSet.clear();
+	m_ElSet.clear();
 }
 
 //-----------------------------------------------------------------------------

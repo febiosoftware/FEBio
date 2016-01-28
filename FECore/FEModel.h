@@ -32,7 +32,7 @@
 #define CB_AUGMENT		0x00000020		//!< The model is entering augmentations (called before Augment)
 
 typedef unsigned int FECORE_CB_WHEN;
-typedef void (*FECORE_CB_FNC)(FEModel*,unsigned int,void*);
+typedef bool (*FECORE_CB_FNC)(FEModel*,unsigned int,void*);
 struct FECORE_CALLBACK {
 	FECORE_CB_FNC	m_pcb;		// pointer to callback function
 	void*			m_pd;		// pointer to user data
@@ -278,7 +278,6 @@ protected:
 	void SerializeGlobals     (DumpStream& ar);
 	void SerializeMaterials   (DumpStream& ar);
 	void SerializeGeometry    (DumpStream& ar);
-	void SerializeMesh        (DumpStream& ar);
 	void SerializeContactData (DumpStream& ar);
 	void SerializeBoundaryData(DumpStream& ar);
 	void SerializeAnalysisData(DumpStream& ar);

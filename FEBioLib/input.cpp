@@ -95,6 +95,9 @@ void print_parameter_list(FEParameterList& pl)
 //! This function outputs the input data to the felog file.
 void echo_input(FEBioModel& fem)
 {
+	// don't output when no output is requested
+	if (felog.GetMode() == Logfile::NEVER) return;
+
 	// echo input
 	int i, j;
 

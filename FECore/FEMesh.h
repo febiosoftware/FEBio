@@ -235,6 +235,9 @@ public:
 	//! initialize mesh
 	bool Init();
 
+	//! clear the mesh
+	void Clear();
+
 	//! allocate storage for mesh data
 	void CreateNodes(int nodes);
 	void AddNodes(int nodes);
@@ -336,9 +339,6 @@ protected:
 
 	//! Initialize shell normals
 	void InitShellNormals();
-
-protected:
-	void ClearDomains();
 
 protected:
 	vector<FENode>		m_Node;		//!< nodes

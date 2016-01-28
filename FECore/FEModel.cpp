@@ -43,6 +43,10 @@ FEModel::~FEModel(void)
 //-----------------------------------------------------------------------------
 void FEModel::Clear()
 {
+	// clear dofs
+	m_dofs.Reset();
+
+	// clear model components
 	size_t i;
 	for (i=0; i<m_Step.size(); ++i) delete m_Step[i]; m_Step.clear();
 	for (i=0; i<m_CI.size  (); ++i) delete m_CI [i] ; m_CI.clear  ();
@@ -63,6 +67,9 @@ void FEModel::Clear()
 
 	// clear the rigid system (if there is one)
 	if (m_prs) m_prs->Clear();
+
+	// clear the mesh
+	m_mesh.Clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -704,7 +711,11 @@ bool FEModel::DoCallback(unsigned int nevent)
 		for (int i=0; i<(int) m_pcb.size(); ++i, ++it)
 		{
 			// call the callback function
-			if (it->m_nwhen & nevent) (it->m_pcb)(this, nevent, it->m_pd);
+			if (it->m_nwhen & nevent)
+			{
+				bool bret = (it->m_pcb)(this, nevent, it->m_pd);
+				if (bret == false) return false;
+			}
 		}
 	}
 	catch (...)
@@ -1021,6 +1032,7 @@ bool FEModel::Serialize(DumpStream& ar)
 	}
 	else
 	{
+		if (ar.IsSaving() == false) Clear();
 		m_dofs.Serialize(ar);
 		SerializeLoadData(ar);
 		SerializeGlobals(ar);
@@ -1176,7 +1188,7 @@ void FEModel::SerializeMaterials(DumpStream& ar)
 void FEModel::SerializeGeometry(DumpStream &ar)
 {
 	// serialize the mesh first 
-	SerializeMesh(ar);
+	m_mesh.Serialize(ar);
 	FERigidSystem& rigid = *GetRigidSystem();
 
 	// serialize the other geometry data
@@ -1199,105 +1211,6 @@ void FEModel::SerializeGeometry(DumpStream &ar)
 			prb->Serialize(ar);
 			rigid.AddRigidBody(prb);
 		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! This function is used by the restart feature and reads or writes
-//! the mesh data to or from the binary archive
-//! \param[in] ar the archive to which the data is serialized
-//! \todo serialize nodesets
-
-void FEModel::SerializeMesh(DumpStream& ar)
-{
-    DOFS& fedofs = GetDOFS();
-	FEMesh& m = m_mesh;
-
-	if (ar.IsSaving())
-	{
-		int i;
-
-		// write nodal data
-		int nn = m.Nodes();
-		ar << nn;
-		for (i=0; i<nn; ++i)
-		{
-			FENode& node = m.Node(i);
-			ar << node.m_ap;
-			ar << node.m_at;
-			ar << node.m_bshell;
-			ar << node.m_bexclude;
-			ar << node.m_Fr;
-			ar << node.m_ID;
-			ar << node.m_BC;
-			ar << node.m_r0;
-			ar << node.m_rid;
-			ar << node.m_rp;
-			ar << node.m_rt;
-			ar << node.m_vp;
-			ar << node.m_val;
-		}
-
-		// write domain data
-		int ND = m.Domains();
-		ar << ND;
-		for (i=0; i<ND; ++i)
-		{
-			FEDomain& d = m.Domain(i);
-
-			ar << d.GetMaterial()->GetID();
-			ar << d.GetTypeStr() << d.Elements();
-			d.Serialize(ar);
-		}
-	}
-	else
-	{
-		FECoreKernel& febio = FECoreKernel::GetInstance();
-
-		// read nodal data
-		int nn;
-		ar >> nn;
-		m.CreateNodes(nn);
-		for (int i=0; i<nn; ++i)
-		{
-			FENode& node = m.Node(i);
-			ar >> node.m_ap;
-			ar >> node.m_at;
-			ar >> node.m_bshell;
-			ar >> node.m_bexclude;
-			ar >> node.m_Fr;
-			ar >> node.m_ID;
-			ar >> node.m_BC;
-			ar >> node.m_r0;
-			ar >> node.m_rid;
-			ar >> node.m_rp;
-			ar >> node.m_rt;
-			ar >> node.m_vp;
-			ar >> node.m_val;
-		}
-
-		// read domain data
-		int ND, ne;
-		ar >> ND;
-		char sz[256] = {0};
-		for (int i=0; i<ND; ++i)
-		{
-			int nmat;
-			ar >> nmat;
-			FEMaterial* pm = FindMaterial(nmat);
-			assert(pm);
-
-			ar >> sz >> ne;
-			FEDomain* pd = fecore_new<FEDomain>(FEDOMAIN_ID, sz, this);
-			assert(pd);
-			pd->SetMaterial(pm);
-			pd->create(ne);
-			pd->Serialize(ar);
-
-			m.AddDomain(pd);
-		}
-
-		m.UpdateBox();
 	}
 }
 
