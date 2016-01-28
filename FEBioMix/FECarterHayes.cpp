@@ -37,6 +37,23 @@ bool FECarterHayes::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FECarterHayes::Serialize(DumpStream& ar)
+{
+	FEElasticMaterial::Serialize(ar);
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_lsbm;
+		}
+		else
+		{
+			ar >> m_lsbm;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Create material point data
 FEMaterialPoint* FECarterHayes::CreateMaterialPointData()
 {

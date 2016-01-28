@@ -20,17 +20,22 @@ class FECarterHayes : public FEElasticMaterial, public FERemodelingInterface
 public:
 	FECarterHayes(FEModel* pfem) : FEElasticMaterial(pfem) { m_E0 = 0; m_rho0 = 1; m_sbm = -1; m_lsbm = -1; m_g = 0; }
 	
-public:
+public: // parameters
 	double	m_E0;	//!< Young's modulus at reference sbm density
 	double	m_g;	//!< gamma exponent for calculation of Young's modulus
 	double	m_v;	//!< prescribed Poisson's ratio
     double  m_rho0; //!< reference sbm density
 	int		m_sbm;	//!< global id of solid-bound molecule
+
+protected:
 	int		m_lsbm;	//!< local id of solid-bound molecule
 
 public:
 	//! data initialization and checking
 	bool Init();
+
+	//! serialization
+	void Serialize(DumpStream& ar);
 
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);

@@ -91,47 +91,54 @@ bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, co
 void FEChemicalReaction::Serialize(DumpStream& ar)
 {
 	FEMaterial::Serialize(ar);
-	
-	if (ar.IsSaving())
+
+	if (ar.IsShallow() == false)
 	{
-		itrmap p;
-		ar << m_nsol << m_vR << m_vP << m_v << m_Vovr;
-		ar << (int) m_solR.size();
-		for (p = m_solR.begin(); p!=m_solR.end(); ++p) {ar << p->first; ar << p->second;}
-		ar << (int) m_solP.size();
-		for (p = m_solP.begin(); p!=m_solP.end(); ++p) {ar << p->first; ar << p->second;}
-		ar << (int) m_sbmR.size();
-		for (p = m_sbmR.begin(); p!=m_sbmR.end(); ++p) {ar << p->first; ar << p->second;}
-		ar << (int) m_sbmP.size();
-		for (p = m_sbmP.begin(); p!=m_sbmP.end(); ++p) {ar << p->first; ar << p->second;}
-	}
-	else
-	{
-		ar >> m_nsol >> m_vR >> m_vP >> m_v >> m_Vovr;
-		int size, id, vR;
-		ar >> size;
-		for (int i=0; i<size; ++i)
+		if (ar.IsSaving())
 		{
-			ar >> id; ar >> vR;
-			SetSoluteReactantsCoefficients(id, vR);
+			itrmap p;
+			ar << m_nsol << m_vR << m_vP << m_v << m_Vovr;
+			ar << (int) m_solR.size();
+			for (p = m_solR.begin(); p!=m_solR.end(); ++p) {ar << p->first; ar << p->second;}
+			ar << (int) m_solP.size();
+			for (p = m_solP.begin(); p!=m_solP.end(); ++p) {ar << p->first; ar << p->second;}
+			ar << (int) m_sbmR.size();
+			for (p = m_sbmR.begin(); p!=m_sbmR.end(); ++p) {ar << p->first; ar << p->second;}
+			ar << (int) m_sbmP.size();
+			for (p = m_sbmP.begin(); p!=m_sbmP.end(); ++p) {ar << p->first; ar << p->second;}
 		}
-		ar >> size;
-		for (int i=0; i<size; ++i)
+		else
 		{
-			ar >> id; ar >> vR;
-			SetSoluteProductsCoefficients(id, vR);
-		}
-		ar >> size;
-		for (int i=0; i<size; ++i)
-		{
-			ar >> id; ar >> vR;
-			SetSolidReactantsCoefficients(id, vR);
-		}
-		ar >> size;
-		for (int i=0; i<size; ++i)
-		{
-			ar >> id; ar >> vR;
-			SetSolidProductsCoefficients(id, vR);
+			// restore pointers
+			if (m_pFwd) m_pFwd->m_pReact = this;
+			if (m_pRev) m_pRev->m_pReact = this;
+
+			ar >> m_nsol >> m_vR >> m_vP >> m_v >> m_Vovr;
+			int size, id, vR;
+			ar >> size;
+			for (int i=0; i<size; ++i)
+			{
+				ar >> id; ar >> vR;
+				SetSoluteReactantsCoefficients(id, vR);
+			}
+			ar >> size;
+			for (int i=0; i<size; ++i)
+			{
+				ar >> id; ar >> vR;
+				SetSoluteProductsCoefficients(id, vR);
+			}
+			ar >> size;
+			for (int i=0; i<size; ++i)
+			{
+				ar >> id; ar >> vR;
+				SetSolidReactantsCoefficients(id, vR);
+			}
+			ar >> size;
+			for (int i=0; i<size; ++i)
+			{
+				ar >> id; ar >> vR;
+				SetSolidProductsCoefficients(id, vR);
+			}
 		}
 	}
 }
