@@ -25,9 +25,6 @@ public:
 	//! update
 	void Update(int niter);
 
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! calculate contact forces
 	void ContactForces(FEGlobalVector& R);
 
@@ -38,7 +35,7 @@ public:
 	bool Augment(int naug);
 
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! return the master and slave surface
 	FESurface* GetMasterSurface() { return &m_ms; }

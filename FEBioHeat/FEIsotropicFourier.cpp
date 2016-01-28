@@ -13,9 +13,3 @@ mat3ds FEIsotropicFourier::Conductivity(FEMaterialPoint& mp)
 {
 	return mat3dd(m_k);
 }
-
-//-----------------------------------------------------------------------------
-void FEIsotropicFourier::Serialize(DumpFile& ar)
-{
-	FEHeatTransferMaterial::Serialize(ar);
-}

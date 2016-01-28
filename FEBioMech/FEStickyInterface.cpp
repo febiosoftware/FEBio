@@ -38,44 +38,45 @@ bool FEStickySurface::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEStickySurface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		for (int i=0; i<(int)m_Node.size(); ++i)
-		{
-			NODE& n = m_Node[i];
-			dmp << n.gap << n.rs << n.Lm;
-		}
-	}
-	else
-	{
-		for (int i=0; i<(int)m_Node.size(); ++i)
-		{
-			NODE& n = m_Node[i];
-			dmp >> n.gap >> n.rs >> n.Lm;
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEStickySurface::Serialize(DumpFile &ar)
+void FEStickySurface::Serialize(DumpStream &ar)
 {
 	FEContactSurface::Serialize(ar);
-	if (ar.IsSaving())
+	if (ar.IsShallow())
 	{
-		for (int i=0; i<(int)m_Node.size(); ++i)
+		if (ar.IsSaving())
 		{
-			NODE& n = m_Node[i];
-			ar << n.gap << n.rs << n.Lm;
+			for (int i=0; i<(int)m_Node.size(); ++i)
+			{
+				NODE& n = m_Node[i];
+				ar << n.gap << n.rs << n.Lm;
+			}
+		}
+		else
+		{
+			for (int i=0; i<(int)m_Node.size(); ++i)
+			{
+				NODE& n = m_Node[i];
+				ar >> n.gap >> n.rs >> n.Lm;
+			}
 		}
 	}
 	else
 	{
-		for (int i=0; i<(int)m_Node.size(); ++i)
+		if (ar.IsSaving())
 		{
-			NODE& n = m_Node[i];
-			ar >> n.gap >> n.rs >> n.Lm;
+			for (int i=0; i<(int)m_Node.size(); ++i)
+			{
+				NODE& n = m_Node[i];
+				ar << n.gap << n.rs << n.Lm;
+			}
+		}
+		else
+		{
+			for (int i=0; i<(int)m_Node.size(); ++i)
+			{
+				NODE& n = m_Node[i];
+				ar >> n.gap >> n.rs >> n.Lm;
+			}
 		}
 	}
 }
@@ -207,13 +208,6 @@ void FEStickyInterface::Activate()
 
 	// project slave surface onto master surface
 	ProjectSurface(ss, ms, false);
-}
-
-//-----------------------------------------------------------------------------
-void FEStickyInterface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	ss.ShallowCopy(dmp, bsave);
-	ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------
@@ -658,7 +652,7 @@ bool FEStickyInterface::Augment(int naug)
 
 //-----------------------------------------------------------------------------
 //! Serialize the data to the archive.
-void FEStickyInterface::Serialize(DumpFile &ar)
+void FEStickyInterface::Serialize(DumpStream &ar)
 {
 	// store contact data
 	FEContactInterface::Serialize(ar);

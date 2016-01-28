@@ -27,9 +27,6 @@ public:
 	//! Activate
 	void Activate();
 
-	//! Serialize
-	void Serialize(DumpFile& ar);
-
 	//! Clear
 	void Clear();
 
@@ -42,8 +39,8 @@ public:
 	// find a model component from its ID
 	FEModelComponent* FindModelComponent(int nid);
 
-	//! place data on stream for running restarts
-	void ShallowCopy(DumpStream& dmp, bool bsave);
+	//! place data on stream for restarts
+	void Serialize(DumpStream& dmp);
 
 	// Find a parameter (from a rigid material index)
 	double* FindParameter(int nmat, ParamString& sz, int index);

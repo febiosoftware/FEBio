@@ -60,7 +60,7 @@ bool FERigidAxialForce::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FERigidAxialForce::Serialize(DumpFile& ar)
+void FERigidAxialForce::Serialize(DumpStream& ar)
 {
 	FEModelLoad::Serialize(ar);
 	if (ar.IsSaving())
@@ -249,7 +249,7 @@ void FERigidBodyForce::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FERigidBodyForce::Serialize(DumpFile& ar)
+void FERigidBodyForce::Serialize(DumpStream& ar)
 {
 	FEModelLoad::Serialize(ar);
 	if (ar.IsSaving())

@@ -42,6 +42,12 @@ bool FEPointConstraint::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEPointConstraint::Serialize(DumpStream& ar)
+{
+
+}
+
+//-----------------------------------------------------------------------------
 void FEPointConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();

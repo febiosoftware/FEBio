@@ -43,31 +43,19 @@ public:
 		if (m_pNext) m_pNext->Init(bflag);
 	}
 
-	void ShallowCopy(DumpStream& dmp, bool bsave)
-	{
-		if (bsave)
-		{
-			dmp << m_MEtrial << m_MEmax << m_Dm;
-			dmp << m_FEtrial << m_FEmax << m_Df;
-		}
-		else
-		{
-			dmp >> m_MEtrial >> m_MEmax >> m_Dm;
-			dmp >> m_FEtrial >> m_FEmax >> m_Df;
-		}
-		if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
-	}
-
-	void Serialize(DumpFile& ar)
+	void Serialize(DumpStream& ar)
 	{
 		if (ar.IsSaving())
 		{
-			ar << m_MEmax << m_FEmax;
+			ar << m_MEtrial << m_MEmax << m_Dm;
+			ar << m_FEtrial << m_FEmax << m_Df;
 		}
 		else
 		{
-			ar >> m_MEmax >> m_FEmax;
+			ar >> m_MEtrial >> m_MEmax >> m_Dm;
+			ar >> m_FEtrial >> m_FEmax >> m_Df;
 		}
+		FEMaterialPoint::Serialize(ar);
 	}
 
 public:

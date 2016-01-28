@@ -181,42 +181,45 @@ void FEMesh::ClearDomains()
 }
 
 //-----------------------------------------------------------------------------
-void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
+void FEMesh::Serialize(DumpStream& ar)
 {
- 	// stream nodal data
-	if (bsave)
+	if (ar.IsShallow())
 	{
-		int NN = (int) m_Node.size();
-		for (int i=0; i<NN; ++i)
+ 		// stream nodal data
+		if (ar.IsSaving())
 		{
-			FENode& nd = m_Node[i];
-			dmp << nd.m_r0;
-			dmp << nd.m_rt << nd.m_at;
-			dmp << nd.m_rp << nd.m_vp << nd.m_ap;
-			dmp << nd.m_Fr;
-			dmp << nd.m_val;
+			int NN = (int) m_Node.size();
+			for (int i=0; i<NN; ++i)
+			{
+				FENode& nd = m_Node[i];
+				ar << nd.m_r0;
+				ar << nd.m_rt << nd.m_at;
+				ar << nd.m_rp << nd.m_vp << nd.m_ap;
+				ar << nd.m_Fr;
+				ar << nd.m_val;
+			}
 		}
-	}
-	else
-	{
-		int NN = (int) m_Node.size();
-		for (int i=0; i<NN; ++i)
+		else
 		{
-			FENode& nd = m_Node[i];
-			dmp >> nd.m_r0;
-			dmp >> nd.m_rt >> nd.m_at;
-			dmp >> nd.m_rp >> nd.m_vp >> nd.m_ap;
-			dmp >> nd.m_Fr;
-			dmp >> nd.m_val;
+			int NN = (int) m_Node.size();
+			for (int i=0; i<NN; ++i)
+			{
+				FENode& nd = m_Node[i];
+				ar >> nd.m_r0;
+				ar >> nd.m_rt >> nd.m_at;
+				ar >> nd.m_rp >> nd.m_vp >> nd.m_ap;
+				ar >> nd.m_Fr;
+				ar >> nd.m_val;
+			}
 		}
-	}
 
-	// stream domain data
-	int ND = Domains();
-	for (int i=0; i<ND; ++i)
-	{
-		FEDomain& dom = Domain(i);
-		dom.ShallowCopy(dmp, bsave);
+		// stream domain data
+		int ND = Domains();
+		for (int i=0; i<ND; ++i)
+		{
+			FEDomain& dom = Domain(i);
+			dom.Serialize(ar);
+		}
 	}
 }
 

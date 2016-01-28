@@ -12,9 +12,6 @@ public:
 	//! constructor
 	FEBodyForce(FEModel* pfem);
 
-	//! serialize data to archive
-	virtual void Serialize(DumpFile& ar);
-
 	//! update
 	virtual void Update(){}
 

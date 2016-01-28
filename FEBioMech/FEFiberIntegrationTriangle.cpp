@@ -31,7 +31,7 @@ bool FEFiberIntegrationTriangle::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEFiberIntegrationTriangle::Serialize(DumpFile& ar)
+void FEFiberIntegrationTriangle::Serialize(DumpStream& ar)
 {
 	FEFiberIntegrationScheme::Serialize(ar);
 	if (ar.IsSaving() == false)

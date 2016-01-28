@@ -88,7 +88,7 @@ bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, co
 
 //-----------------------------------------------------------------------------
 //! Data serialization
-void FEChemicalReaction::Serialize(DumpFile& ar)
+void FEChemicalReaction::Serialize(DumpStream& ar)
 {
 	FEMaterial::Serialize(ar);
 	

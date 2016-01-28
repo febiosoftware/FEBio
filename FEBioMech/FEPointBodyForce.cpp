@@ -62,7 +62,7 @@ mat3ds FEPointBodyForce::stiffness(FEMaterialPoint &mp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPointBodyForce::Serialize(DumpFile &ar)
+void FEPointBodyForce::Serialize(DumpStream &ar)
 {
 	if (ar.IsSaving())
 	{

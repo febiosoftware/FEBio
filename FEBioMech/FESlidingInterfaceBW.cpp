@@ -64,89 +64,88 @@ bool FESlidingSurfaceBW::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! \todo Originally, we only copied Lmd, gap, Ln and reset pme to zero.
-//!       Need to check if this achieves the same
-void FESlidingSurfaceBW::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	// And finally, we serialize the surface data
-	if (bsave)
-	{
-		for (int i=0; i<(int) m_Data.size(); ++i)
-		{
-			vector<Data>& di = m_Data[i];
-			int nint = (int) di.size();
-			for (int j=0; j<nint; ++j)
-			{
-				Data& d = di[j];
-				dmp << d.m_gap;
-				dmp << d.m_nu;
-				dmp << d.m_rs;
-				dmp << d.m_Lmd;
-				dmp << d.m_epsn;
-				dmp << d.m_Ln;
-			}
-		}
-	}
-	else
-	{
-		for (int i=0; i<(int) m_Data.size(); ++i)
-		{
-			vector<Data>& di = m_Data[i];
-			int nint = (int) di.size();
-			for (int j=0; j<nint; ++j)
-			{
-				Data& d = di[j];
-				dmp >> d.m_gap;
-				dmp >> d.m_nu;
-				dmp >> d.m_rs;
-				dmp >> d.m_Lmd;
-				dmp >> d.m_epsn;
-				dmp >> d.m_Ln;
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FESlidingSurfaceBW::Serialize(DumpFile& ar)
+void FESlidingSurfaceBW::Serialize(DumpStream& ar)
 {
 	// We can serialize the base-class data
 	FEContactSurface::Serialize(ar);
-	
-	// And finally, we serialize the surface data
-	if (ar.IsSaving())
+
+	if (ar.IsShallow())
 	{
-		for (int i=0; i<(int) m_Data.size(); ++i)
+		// And finally, we serialize the surface data
+		if (ar.IsSaving())
 		{
-			vector<Data>& di = m_Data[i];
-			int nint = (int) di.size();
-			for (int j=0; j<nint; ++j)
+			for (int i=0; i<(int) m_Data.size(); ++i)
 			{
-				Data& d = di[j];
-				ar << d.m_gap;
-				ar << d.m_nu;
-				ar << d.m_rs;
-				ar << d.m_Lmd;
-				ar << d.m_epsn;
-				ar << d.m_Ln;
+				vector<Data>& di = m_Data[i];
+				int nint = (int) di.size();
+				for (int j=0; j<nint; ++j)
+				{
+					Data& d = di[j];
+					ar << d.m_gap;
+					ar << d.m_nu;
+					ar << d.m_rs;
+					ar << d.m_Lmd;
+					ar << d.m_epsn;
+					ar << d.m_Ln;
+				}
+			}
+		}
+		else
+		{
+			for (int i=0; i<(int) m_Data.size(); ++i)
+			{
+				vector<Data>& di = m_Data[i];
+				int nint = (int) di.size();
+				for (int j=0; j<nint; ++j)
+				{
+					Data& d = di[j];
+					ar >> d.m_gap;
+					ar >> d.m_nu;
+					ar >> d.m_rs;
+					ar >> d.m_Lmd;
+					ar >> d.m_epsn;
+					ar >> d.m_Ln;
+				}
 			}
 		}
 	}
 	else
 	{
-		for (int i=0; i<(int) m_Data.size(); ++i)
+		// And finally, we serialize the surface data
+		if (ar.IsSaving())
 		{
-			vector<Data>& di = m_Data[i];
-			int nint = (int) di.size();
-			for (int j=0; j<nint; ++j)
+			for (int i=0; i<(int) m_Data.size(); ++i)
 			{
-				Data& d = di[j];
-				ar >> d.m_gap;
-				ar >> d.m_nu;
-				ar >> d.m_rs;
-				ar >> d.m_Lmd;
-				ar >> d.m_epsn;
-				ar >> d.m_Ln;
+				vector<Data>& di = m_Data[i];
+				int nint = (int) di.size();
+				for (int j=0; j<nint; ++j)
+				{
+					Data& d = di[j];
+					ar << d.m_gap;
+					ar << d.m_nu;
+					ar << d.m_rs;
+					ar << d.m_Lmd;
+					ar << d.m_epsn;
+					ar << d.m_Ln;
+				}
+			}
+		}
+		else
+		{
+			for (int i=0; i<(int) m_Data.size(); ++i)
+			{
+				vector<Data>& di = m_Data[i];
+				int nint = (int) di.size();
+				for (int j=0; j<nint; ++j)
+				{
+					Data& d = di[j];
+					ar >> d.m_gap;
+					ar >> d.m_nu;
+					ar >> d.m_rs;
+					ar >> d.m_Lmd;
+					ar >> d.m_epsn;
+					ar >> d.m_Ln;
+				}
 			}
 		}
 	}
@@ -645,13 +644,6 @@ void FESlidingInterfaceBW::Update(int nsolve_iter)
 	UpdateContactPressures();
 
 	return;
-}
-
-//-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	m_ss.ShallowCopy(dmp, bsave);
-	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------
@@ -1289,7 +1281,7 @@ bool FESlidingInterfaceBW::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::Serialize(DumpFile &ar)
+void FESlidingInterfaceBW::Serialize(DumpStream &ar)
 {
 	// serialize contact data
 	FEContactInterface::Serialize(ar);

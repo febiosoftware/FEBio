@@ -10,7 +10,6 @@
 #endif // _MSC_VER > 1000
 
 #include "FEDomain.h"
-#include "DumpFile.h"
 #include "FENodeElemList.h"
 #include "DumpStream.h"
 
@@ -231,7 +230,7 @@ public:
 	virtual ~FEMesh();
 
 	//! stream mesh data
-	void ShallowCopy(DumpStream& dmp, bool bsave);
+	void Serialize(DumpStream& dmp);
 
 	//! initialize mesh
 	bool Init();

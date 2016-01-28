@@ -10,18 +10,6 @@ FEMaterialPoint* FEDiscreteMaterialPoint::Copy()
 }
 
 //-----------------------------------------------------------------------------
-void FEDiscreteMaterialPoint::Serialize(DumpFile& ar)
-{
-	if (m_pNext) m_pNext->Serialize(ar);
-}
-
-//-----------------------------------------------------------------------------
-void FEDiscreteMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
-}
-
-//-----------------------------------------------------------------------------
 void FEDiscreteMaterialPoint::Init(bool bflag)
 {
 	if (m_pNext) m_pNext->Init(bflag);

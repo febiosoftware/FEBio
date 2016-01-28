@@ -26,10 +26,7 @@ public:
 	void Init(bool bflag);
     
 	//! Serialize data to archive
-	void Serialize(DumpFile& ar);
-    
-	//! data streaming
-	void ShallowCopy(DumpStream& dmp, bool bsave);
+	void Serialize(DumpStream& ar);
     
 public:
     vec3d   m_n0;    //!< fiber direction, reference configuration, global CS

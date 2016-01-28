@@ -10,7 +10,6 @@
 #define __FEBioMech__FERigidRevoluteJoint__
 
 #include "FECore/vec3d.h"
-#include "FECore/DumpFile.h"
 #include "FECore/LoadCurve.h"
 #include "FERigidConnector.h"
 
@@ -41,10 +40,7 @@ public:
     bool Augment(int naug, const FETimePoint& tp);
     
     //! serialize data to archive
-    void Serialize(DumpFile& ar);
-    
-    //! create a shallow copy
-    void ShallowCopy(DumpStream& dmp, bool bsave);
+    void Serialize(DumpStream& ar);
     
     //! update state
     void Update(const FETimePoint& tp);

@@ -104,29 +104,6 @@ bool FETiedBiphasicSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FETiedBiphasicSurface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		dmp << m_bporo;
-		dmp << m_Lmd << m_Gap << m_dg;
-		if (m_bporo)
-		{
-			dmp << m_pg << m_Lmp;
-		}
-	}
-	else
-	{
-		dmp >> m_bporo;
-		dmp >> m_Lmd >> m_Gap >> m_dg;
-		if (m_bporo)
-		{
-			dmp >> m_pg >> m_Lmp;
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! This function calculates the node normal. Due to the piecewise continuity
 //! of the surface elements this normal is not uniquely defined so in order to
 //! obtain a unique normal the normal is averaged for each node over all the 
@@ -164,52 +141,76 @@ void FETiedBiphasicSurface::UpdateNodeNormals()
 }
 
 //-----------------------------------------------------------------------------
-void FETiedBiphasicSurface::Serialize(DumpFile& ar)
+void FETiedBiphasicSurface::Serialize(DumpStream& ar)
 {
-	// We need to store the m_bporo flag first 
-	// since we need it before we initialize the surface data
-	if (ar.IsSaving())
+	if (ar.IsShallow())
 	{
-		ar << m_bporo;
+		if (ar.IsSaving())
+		{
+			ar << m_bporo;
+			ar << m_Lmd << m_Gap << m_dg;
+			if (m_bporo)
+			{
+				ar << m_pg << m_Lmp;
+			}
+		}
+		else
+		{
+			ar >> m_bporo;
+			ar >> m_Lmd >> m_Gap >> m_dg;
+			if (m_bporo)
+			{
+				ar >> m_pg >> m_Lmp;
+			}
+		}
 	}
 	else
 	{
-		ar >> m_bporo;
-	}
+		// We need to store the m_bporo flag first 
+		// since we need it before we initialize the surface data
+		if (ar.IsSaving())
+		{
+			ar << m_bporo;
+		}
+		else
+		{
+			ar >> m_bporo;
+		}
 	
-	// Next, we can serialize the base-class data
-	FEContactSurface::Serialize(ar);
+		// Next, we can serialize the base-class data
+		FEContactSurface::Serialize(ar);
 	
-	// And finally, we serialize the surface data
-	if (ar.IsSaving())
-	{
-		ar << m_Gap;
-		ar << m_dg;
-		ar << m_nu;
-		ar << m_rs;
-		ar << m_Lmd;
-		ar << m_Lmp;
-		ar << m_nei;
-		ar << m_epsn;
-		ar << m_epsp;
-		ar << m_nn;
-		ar << m_pg;
-		ar << m_poro;
-	}
-	else
-	{
-		ar >> m_Gap;
-		ar >> m_dg;
-		ar >> m_nu;
-		ar >> m_rs;
-		ar >> m_Lmd;
-		ar >> m_Lmp;
-		ar >> m_nei;
-		ar >> m_epsn;
-		ar >> m_epsp;
-		ar >> m_nn;
-		ar >> m_pg;
-		ar >> m_poro;
+		// And finally, we serialize the surface data
+		if (ar.IsSaving())
+		{
+			ar << m_Gap;
+			ar << m_dg;
+			ar << m_nu;
+			ar << m_rs;
+			ar << m_Lmd;
+			ar << m_Lmp;
+			ar << m_nei;
+			ar << m_epsn;
+			ar << m_epsp;
+			ar << m_nn;
+			ar << m_pg;
+			ar << m_poro;
+		}
+		else
+		{
+			ar >> m_Gap;
+			ar >> m_dg;
+			ar >> m_nu;
+			ar >> m_rs;
+			ar >> m_Lmd;
+			ar >> m_Lmp;
+			ar >> m_nei;
+			ar >> m_epsn;
+			ar >> m_epsp;
+			ar >> m_nn;
+			ar >> m_pg;
+			ar >> m_poro;
+		}
 	}
 }
 
@@ -616,19 +617,11 @@ void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBi
 
 void FETiedBiphasicInterface::Update(int niter)
 {	
-
 	// project the surfaces onto each other
 	// this will update the gap functions as well
 	ProjectSurface(m_ss, m_ms);
 	if (m_btwo_pass) ProjectSurface(m_ms, m_ss);
 	
-}
-
-//-----------------------------------------------------------------------------
-void FETiedBiphasicInterface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	m_ss.ShallowCopy(dmp, bsave);
-	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------
@@ -1343,7 +1336,7 @@ bool FETiedBiphasicInterface::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedBiphasicInterface::Serialize(DumpFile &ar)
+void FETiedBiphasicInterface::Serialize(DumpStream &ar)
 {
 	// store contact data
 	FEContactInterface::Serialize(ar);

@@ -33,12 +33,8 @@ public:
 	// jacobian with respect to reference frame
 	double detJ0(FEShellElement& el, int n);
 
-public:
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! Serialize domain data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 protected:
 	vector<FEShellElement>	m_Elem;	//!< array of elements

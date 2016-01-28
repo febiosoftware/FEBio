@@ -74,23 +74,7 @@ bool FERigidSpring::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! create a shallow copy
-void FERigidSpring::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-    if (bsave)
-    {
-        dmp << m_qa0 << m_qb0;
-        dmp << m_F << m_L0;
-    }
-    else
-    {
-        dmp >> m_qa0 >> m_qb0;
-        dmp >> m_F >> m_L0;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void FERigidSpring::Serialize(DumpFile& ar)
+void FERigidSpring::Serialize(DumpStream& ar)
 {
 	FERigidConnector::Serialize(ar);
     if (ar.IsSaving())

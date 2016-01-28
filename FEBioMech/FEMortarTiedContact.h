@@ -48,16 +48,13 @@ public:
 	bool Augment(int naug);
 
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEGlobalMatrix& K);
 
 	//! update interface data
 	void Update(int niter);
-
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 private:
 	double	m_atol;		//!< augmented Lagrangian tolerance

@@ -39,10 +39,7 @@ public:
 	FEMaterialPoint* Copy();
 
 	//! serialize material point data
-	void Serialize(DumpFile& ar);
-
-	//! stream material point data
-	void ShallowCopy(DumpStream& dmp, bool bsave);
+	void Serialize(DumpStream& ar);
 
 public:
 	mat3d      m_PK1;			// LTE - 1st Piola-Kirchhoff stress

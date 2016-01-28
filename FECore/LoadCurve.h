@@ -9,8 +9,10 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "DumpFile.h"
 #include <vector>
+
+//-----------------------------------------------------------------------------
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 //! This class implements the concept of a loadcurve.
@@ -96,7 +98,7 @@ public:
 	bool HasPoint(double t) const;
 
 	//! Serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 protected:
 	double ExtendValue(double t) const;

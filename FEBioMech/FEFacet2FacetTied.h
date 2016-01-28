@@ -27,11 +27,8 @@ public:
 	//! Initialization
 	bool Init();
 
-	//! create a shallow copy for running restarts
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! serialization for cold restarts
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public:
 	vector< vector<Data> >	m_Data;	//!< integration point data
@@ -51,11 +48,8 @@ public:
 	//! interface activation
 	void Activate();
 
-	//! Create a shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! return the master and slave surface
 	FESurface* GetMasterSurface() { return &m_ms; }

@@ -6,6 +6,7 @@
 #include "FEBioLib/FEBox.h"
 #include "FECore/log.h"
 #include "FEBioXML/FERestartImport.h"
+#include "FECore/DumpFile.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FEBioStdSolver , FETASK_ID, "solve"   );
@@ -45,7 +46,7 @@ bool FEBioRestart::Init(const char *szfile)
 		// the file is binary so just read the dump file and return
 
 		// open the archive
-		DumpFile ar(&fem);
+		DumpFile ar(fem);
 		if (ar.Open(szfile) == false) { fprintf(stderr, "FATAL ERROR: failed opening restart archive\n"); return false; }
 
 		// read the archive

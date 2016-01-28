@@ -270,7 +270,7 @@ void FELinearSolidSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, ma
 //-----------------------------------------------------------------------------
 //! Store data to restart file
 //! \todo Implement serialization
-void FELinearSolidSolver::Serialize(DumpFile &ar)
+void FELinearSolidSolver::Serialize(DumpStream &ar)
 {
 	
 }

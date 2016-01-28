@@ -19,15 +19,17 @@ public:
 		return pt;
 	}
 
-	void ShallowCopy(DumpStream& dmp, bool bsave)
+	void Serialize(DumpStream& ar)
 	{
-		if (bsave) { dmp << m_q; } else { dmp >> m_q; }
-		if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
-	}
-
-	void Serialize(DumpFile& ar)
-	{
-		if (m_pNext) m_pNext->Serialize(ar);
+		if (ar.IsSaving())
+		{
+			ar << m_q << m_T << m_T0;
+		}
+		else
+		{
+			ar >> m_q >> m_T >> m_T0;
+		}
+		FEMaterialPoint::Serialize(ar);
 	}
 
 	void Init(bool bflag)

@@ -2,7 +2,7 @@
 #define __FECore__DOFS__
 #include <vector>
 
-class DumpFile;
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 // Degree of freedom types
@@ -123,7 +123,7 @@ public:
 	void SetDOFName(int nvar, int n, const char* szname);
 
 	//! serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 private:
 	void Update();

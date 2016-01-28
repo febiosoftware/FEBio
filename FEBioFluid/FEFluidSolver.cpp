@@ -115,7 +115,7 @@ bool FEFluidSolver::Init()
 //-----------------------------------------------------------------------------
 //! Save data to dump file
 
-void FEFluidSolver::Serialize(DumpFile& ar)
+void FEFluidSolver::Serialize(DumpStream& ar)
 {
     // Serialize parameters
     FENewtonSolver::Serialize(ar);

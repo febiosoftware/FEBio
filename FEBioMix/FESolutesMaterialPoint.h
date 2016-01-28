@@ -14,11 +14,8 @@ public:
 	FEMaterialPoint* Copy();
 	
 	//! serialize data
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
     
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-	
 	//! Initialize material point data
 	void Init(bool bflag);
 	

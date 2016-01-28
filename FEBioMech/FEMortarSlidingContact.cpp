@@ -533,12 +533,6 @@ void FEMortarSlidingContact::Update(int niter)
 
 //-----------------------------------------------------------------------------
 //! serialize data to archive
-void FEMortarSlidingContact::Serialize(DumpFile& ar)
-{
-}
-
-//-----------------------------------------------------------------------------
-//! shallow copy
-void FEMortarSlidingContact::ShallowCopy(DumpStream& dmp, bool bsave)
+void FEMortarSlidingContact::Serialize(DumpStream& ar)
 {
 }

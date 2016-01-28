@@ -63,48 +63,44 @@ FEMaterialPoint* FEMultigenerationMaterialPoint::Copy()
 }
 
 //-----------------------------------------------------------------------------
-void FEMultigenerationMaterialPoint::Serialize(DumpFile& ar)
+void FEMultigenerationMaterialPoint::Serialize(DumpStream& ar)
 {
-	if (m_pNext) m_pNext->Serialize(ar);
-			
-	if (ar.IsSaving())
+	if (ar.IsShallow())
 	{
-        ar << m_tgen << m_ngen;
-		ar << (int)m_mp.size();
+		if (ar.IsSaving())
+		{
+			ar << m_tgen << m_ngen;
+		}
+		else
+		{
+			ar >> m_tgen >> m_ngen;
+		}
 		for (int i=0; i < (int)m_mp.size(); i++) m_mp[i]->Serialize(ar);
+    
+		// TODO: shallow copy m_pmat
 	}
 	else
 	{
-        ar >> m_tgen >> m_ngen;
-		int mp_size;
-		ar >> mp_size;
-		m_mp.resize(mp_size);
-		for (int i=0; i < mp_size; i++)
+		if (ar.IsSaving())
 		{
-			m_mp[i] = new FEElasticMaterialPoint;
-			m_mp[i]->Serialize(ar);
-			m_mp[i]->Init(true);
+			ar << m_tgen << m_ngen;
+			ar << (int)m_mp.size();
+			for (int i=0; i < (int)m_mp.size(); i++) m_mp[i]->Serialize(ar);
+		}
+		else
+		{
+			ar >> m_tgen >> m_ngen;
+			int mp_size;
+			ar >> mp_size;
+			m_mp.resize(mp_size);
+			for (int i=0; i < mp_size; i++)
+			{
+				m_mp[i] = new FEElasticMaterialPoint;
+				m_mp[i]->Serialize(ar);
+			}
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-void FEMultigenerationMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
-			
-	if (bsave)
-	{
-        dmp << m_tgen << m_ngen;
-	}
-	else
-	{
-        dmp >> m_tgen >> m_ngen;
-	}
-    for (int i=0; i < (int)m_mp.size(); i++) m_mp[i]->ShallowCopy(dmp,bsave);
-    
-    // TODO: shallow copy m_pmat
-    
+	FEMaterialPoint::Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

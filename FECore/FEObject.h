@@ -1,5 +1,4 @@
 #pragma once
-#include "DumpFile.h"
 #include "FEParameterList.h"
 #include "DumpStream.h"
 #include <vector>
@@ -25,10 +24,7 @@ public:
 	virtual ~FEObject(){}
 
 	// object serialization
-	virtual void Serialize(DumpFile& ar) = 0;
-
-	//! shallow copy
-	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
+	virtual void Serialize(DumpStream& ar) = 0;
 
 	//! initialize object
 	virtual void Init() = 0;

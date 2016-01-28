@@ -71,23 +71,7 @@ bool FERigidContractileForce::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! create a shallow copy
-void FERigidContractileForce::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-    if (bsave)
-    {
-        dmp << m_qa0 << m_qb0;
-        dmp << m_F;
-    }
-    else
-    {
-        dmp >> m_qa0 >> m_qb0;
-        dmp >> m_F;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void FERigidContractileForce::Serialize(DumpFile& ar)
+void FERigidContractileForce::Serialize(DumpStream& ar)
 {
 	FERigidConnector::Serialize(ar);
     if (ar.IsSaving())

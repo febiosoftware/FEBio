@@ -12,13 +12,10 @@ public:
 	//! initialization
 	bool Init();
 	
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-	
 	//! calculate the nodal normals
 	void UpdateNodeNormals();
 	
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 	
 	void SetPoroMode(bool bporo) { m_bporo = bporo; }
 	
@@ -67,9 +64,6 @@ public:
 	//! update
 	void Update(int n);
 	
-	//! Create a shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-	
 	//! calculate contact forces
 	void ContactForces(FEGlobalVector& R);
 	
@@ -80,7 +74,7 @@ public:
 	bool Augment(int naug);
 	
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! return the master and slave surface
 	FESurface* GetMasterSurface() { return &m_ms; }

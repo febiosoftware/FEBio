@@ -371,28 +371,23 @@ bool FE2OMicroConstraint::Augment(int naug, const FETimePoint& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FE2OMicroConstraint::Serialize(DumpFile& ar)
+void FE2OMicroConstraint::Serialize(DumpStream& ar)
 {
-}
-
-//-----------------------------------------------------------------------------
-void FE2OMicroConstraint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
+	if (ar.IsSaving())
 	{
-		dmp << m_s.m_Lm;
-		dmp << m_s.m_pv;
-		dmp << m_s.m_c;
-		dmp << m_s.m_Fm;
-		dmp << m_s.m_Gm;
+		ar << m_s.m_Lm;
+		ar << m_s.m_pv;
+		ar << m_s.m_c;
+		ar << m_s.m_Fm;
+		ar << m_s.m_Gm;
 	}
 	else
 	{
-		dmp >> m_s.m_Lm;
-		dmp >> m_s.m_pv;
-		dmp >> m_s.m_c;
-		dmp >> m_s.m_Fm;
-		dmp >> m_s.m_Gm;
+		ar >> m_s.m_Lm;
+		ar >> m_s.m_pv;
+		ar >> m_s.m_c;
+		ar >> m_s.m_Fm;
+		ar >> m_s.m_Gm;
 	}
 }
 

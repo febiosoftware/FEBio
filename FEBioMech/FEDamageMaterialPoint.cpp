@@ -7,6 +7,7 @@
 //
 
 #include "FEDamageMaterialPoint.h"
+#include <FECore/DumpStream.h>
 
 FEMaterialPoint* FEDamageMaterialPoint::Copy()
 {
@@ -33,27 +34,15 @@ void FEDamageMaterialPoint::Init(bool bflag)
     if (m_pNext) m_pNext->Init(bflag);
 }
 
-void FEDamageMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-    if (bsave)
-    {
-        dmp << m_Etrial << m_Emax << m_D;
-    }
-    else
-    {
-        dmp >> m_Etrial >> m_Emax >> m_D;
-    }
-    if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
-}
-
-void FEDamageMaterialPoint::Serialize(DumpFile& ar)
+void FEDamageMaterialPoint::Serialize(DumpStream& ar)
 {
     if (ar.IsSaving())
     {
-        ar << m_Emax;
+        ar << m_Etrial << m_Emax >> m_D;
     }
     else
     {
-        ar >> m_Emax;
+        ar >> m_Etrial >> m_Emax >> m_D;
     }
+	FEMaterialPoint::Serialize(ar);
 }

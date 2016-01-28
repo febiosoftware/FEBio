@@ -16,8 +16,10 @@ FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FENodalLoad::Serialize(DumpFile& ar)
+void FENodalLoad::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow()) return;
+
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
@@ -75,8 +77,10 @@ void FEFixedBC::SetDOF(int dof)
 }
 
 //-----------------------------------------------------------------------------
-void FEFixedBC::Serialize(DumpFile& ar)
+void FEFixedBC::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow()) return;
+
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
@@ -235,8 +239,10 @@ double FEPrescribedBC::NodeValue(int n) const
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedBC::Serialize(DumpFile& ar)
+void FEPrescribedBC::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow()) return;
+
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{

@@ -67,29 +67,9 @@ void FEReactiveVEMaterialPoint::Init(bool bflag)
 
 //-----------------------------------------------------------------------------
 //! Serialize data to the archive
-void FEReactiveVEMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+void FEReactiveVEMaterialPoint::Serialize(DumpStream& ar)
 {
-    if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
-    
-    if (bsave)
-    {
-        int n = (int)m_Fi.size();
-        dmp << n;
-        for (int i=0; i<n; ++i) dmp << m_Fi[i] << m_Ji[i] << m_v[i] << m_w[i];
-    }
-    else
-    {
-        int n;
-        dmp >> n;
-        for (int i=0; i<n; ++i) dmp >> m_Fi[i] >> m_Ji[i] >> m_v[i] >> m_w[i];
-    }
-}
-
-//-----------------------------------------------------------------------------
-//! Serialize data to the archive
-void FEReactiveVEMaterialPoint::Serialize(DumpFile& ar)
-{
-    if (m_pNext) m_pNext->Serialize(ar);
+    FEMaterialPoint::Serialize(ar);
     
     if (ar.IsSaving())
     {

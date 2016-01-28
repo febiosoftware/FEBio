@@ -40,9 +40,6 @@ public:
 	//! initialization
 	bool Init();
 	
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-	
 	//! evaluate net contact force
 	vec3d GetContactForce();
 	
@@ -55,7 +52,7 @@ public:
 	//! calculate the nodal normals
 	void UpdateNodeNormals();
 	
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 	
 	void SetPoroMode(bool bporo) { m_bporo = bporo; }
 
@@ -106,9 +103,6 @@ public:
 	//! update
 	void Update(int niter);
 	
-	//! Create a shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-	
 	//! calculate contact forces
 	void ContactForces(FEGlobalVector& R);
 	
@@ -122,7 +116,7 @@ public:
 	bool Augment(int naug);
 	
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 	
 	//! mark ambient condition 
 	void MarkAmbient();

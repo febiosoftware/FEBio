@@ -18,7 +18,7 @@ public:
 	virtual ~FESolidSolver();
 
 	//! serialize data to/from dump file
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! Initializes data structures
 	bool Init();

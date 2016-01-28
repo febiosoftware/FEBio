@@ -31,9 +31,6 @@ public:
 	//! initialization
 	bool Init();
 
-	//! create a shallow copy for running restarts
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! evaluate net contact force
 	vec3d GetContactForce();
 
@@ -41,7 +38,7 @@ public:
 	double GetContactArea();
     
 	//! serialize data for (cold) restart
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public:
 	void GetNodalContactGap     (int nface, double* gn);
@@ -75,9 +72,6 @@ public:
 	//! update 
 	void Update(int niter);
 
-	//! Create a shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! calculate contact forces
 	void ContactForces(FEGlobalVector& R);
 
@@ -91,7 +85,7 @@ public:
 	bool Augment(int naug);
 
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! return the master and slave surface
 	FESurface* GetMasterSurface() { return &m_ms; }

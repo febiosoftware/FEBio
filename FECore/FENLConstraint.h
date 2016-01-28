@@ -1,6 +1,5 @@
 #pragma once
 #include "FESolver.h"
-#include "DumpFile.h"
 #include "FEModelComponent.h"
 #include "FEGlobalVector.h"
 #include "FEGlobalMatrix.h"
@@ -29,7 +28,6 @@ public:
 	virtual void Residual(FEGlobalVector& R, const FETimePoint& tp) = 0;
 	virtual void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp) = 0;
 	virtual bool Augment(int naug, const FETimePoint& tp) = 0;
-	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
 	virtual void CopyFrom(FENLConstraint* plc) {}
 	virtual void BuildMatrixProfile(FEGlobalMatrix& M) = 0;
 

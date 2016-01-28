@@ -32,25 +32,9 @@ void FEFiberMaterialPoint::Init(bool bflag)
 
 //-----------------------------------------------------------------------------
 //! Serialize data to the archive
-void FEFiberMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+void FEFiberMaterialPoint::Serialize(DumpStream& ar)
 {
-	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
-    
-	if (bsave)
-	{
-		dmp << m_n0;
-	}
-	else
-	{
-		dmp >> m_n0;
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Serialize data to the archive
-void FEFiberMaterialPoint::Serialize(DumpFile& ar)
-{
-	if (m_pNext) m_pNext->Serialize(ar);
+	FEMaterialPoint::Serialize(ar);
     
 	if (ar.IsSaving())
 	{

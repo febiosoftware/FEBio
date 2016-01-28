@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEPeriodicBoundary2O.h"
-#include "FECore/DumpFile.h"
 #include "FECore/FEModel.h"
 #include "FECore/FENormalProjection.h"
 #include "FECore/log.h"
@@ -224,13 +223,6 @@ void FEPeriodicBoundary2O::Update(int niter)
 			ss.m_gap[i] = ws - wm;
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-void FEPeriodicBoundary2O::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	m_ss.ShallowCopy(dmp, bsave);
-	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------
@@ -648,7 +640,7 @@ bool FEPeriodicBoundary2O::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary2O::Serialize(DumpFile &ar)
+void FEPeriodicBoundary2O::Serialize(DumpStream &ar)
 {
 	// store contact data
 	FEContactInterface::Serialize(ar);

@@ -819,7 +819,7 @@ void FEBiphasicSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 //-----------------------------------------------------------------------------
 //! Save data to dump file
 
-void FEBiphasicSolver::Serialize(DumpFile& ar)
+void FEBiphasicSolver::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{

@@ -199,7 +199,7 @@ void FENodeElemList::Create(FEDomain& dom)
 //-----------------------------------------------------------------------------
 //! Save data to dump file
 
-void FENodeElemList::Serialize(DumpFile& ar)
+void FENodeElemList::Serialize(DumpStream& ar)
 {
 
 	if (ar.IsSaving())

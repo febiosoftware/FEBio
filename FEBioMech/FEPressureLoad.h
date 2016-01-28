@@ -32,7 +32,7 @@ public:
 	void Residual(FEGlobalVector& R);
 
 	//! serialize data
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! set the linear flag
 	void SetLinear(bool blinear) { m_blinear = blinear; }

@@ -470,37 +470,6 @@ FETimePoint FEModel::GetTime()
 	return pt;
 }
 
-//-----------------------------------------------------------------------------
-//! This function is used when pushing the FEM state data. Since we don't need
-//! to copy all the data, this function only copies the data that needs to be 
-//! restored for a running restart.
-//!
-//! \todo Shallow copy nonlinear constraints
-void FEModel::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	// stream model data
-	if (bsave)
-	{
-		dmp << m_ftime;
-	}
-	else
-	{
-		dmp >> m_ftime;
-	}
-
-	// stream mesh
-	m_mesh.ShallowCopy(dmp, bsave);
-
-	// stream rigid body data
-	if (m_prs) m_prs->ShallowCopy(dmp, bsave);
-
-	// stream contact data
-	for (int i=0; i<SurfacePairInteractions(); ++i) m_CI[i]->ShallowCopy(dmp, bsave);
-
-	// stream nonlinear constraints
-	for (int i=0; i<NonlinearConstraints(); ++i) m_NLC[i]->ShallowCopy(dmp, bsave);
-}
-
 //=============================================================================
 //    P A R A M E T E R   F U N C T I O N S
 //=============================================================================
@@ -1006,38 +975,57 @@ void FEModel::CopyFrom(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
-bool FEModel::Serialize(DumpFile& ar)
+// This function serializes data to a stream.
+// This is used for running and cold restarts.
+bool FEModel::Serialize(DumpStream& ar)
 {
-	// --- DOF data ---
-	m_dofs.Serialize(ar);
+	if (ar.IsShallow())
+	{
+		// stream model data
+		if (ar.IsSaving())
+		{
+			ar << m_ftime;
+		}
+		else
+		{
+			ar >> m_ftime;
+		}
+		ar.check();
 
-	// --- Load Data ---
-	SerializeLoadData(ar);
+		// stream mesh
+		m_mesh.Serialize(ar);
+		ar.check();
 
-	// --- Global Data ---
-	SerializeGlobals(ar);
+		// stream rigid body data
+		if (m_prs) m_prs->Serialize(ar);
+		ar.check();
 
-	// --- Material Data ---
-	SerializeMaterials(ar);
+		// stream contact data
+		for (int i=0; i<SurfacePairInteractions(); ++i) m_CI[i]->Serialize(ar);
+		ar.check();
 
-	// --- Geometry Data ---
-	SerializeGeometry(ar);
-
-	// --- Contact Data ---
-	SerializeContactData(ar);
-
-	// --- Boundary Condition Data ---
-	SerializeBoundaryData(ar);
-
-	// --- Analysis data ---
-	SerializeAnalysisData(ar);	
+		// stream nonlinear constraints
+		for (int i=0; i<NonlinearConstraints(); ++i) m_NLC[i]->Serialize(ar);
+		ar.check();
+	}
+	else
+	{
+		m_dofs.Serialize(ar);
+		SerializeLoadData(ar);
+		SerializeGlobals(ar);
+		SerializeMaterials(ar);
+		SerializeGeometry(ar);
+		SerializeContactData(ar);
+		SerializeBoundaryData(ar);
+		SerializeAnalysisData(ar);	
+	}
 
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! Serialize load curves
-void FEModel::SerializeLoadData(DumpFile& ar)
+void FEModel::SerializeLoadData(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -1062,7 +1050,7 @@ void FEModel::SerializeLoadData(DumpFile& ar)
 
 //-----------------------------------------------------------------------------
 //! Serialize global data
-void FEModel::SerializeGlobals(DumpFile& ar)
+void FEModel::SerializeGlobals(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -1118,7 +1106,7 @@ void FEModel::SerializeGlobals(DumpFile& ar)
 
 //-----------------------------------------------------------------------------
 //! serialize material data
-void FEModel::SerializeMaterials(DumpFile& ar)
+void FEModel::SerializeMaterials(DumpStream& ar)
 {
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 
@@ -1174,7 +1162,7 @@ void FEModel::SerializeMaterials(DumpFile& ar)
 
 //-----------------------------------------------------------------------------
 //! \todo Serialize nonlinear constraints
-void FEModel::SerializeGeometry(DumpFile &ar)
+void FEModel::SerializeGeometry(DumpStream &ar)
 {
 	// serialize the mesh first 
 	SerializeMesh(ar);
@@ -1207,10 +1195,9 @@ void FEModel::SerializeGeometry(DumpFile &ar)
 //! This function is used by the restart feature and reads or writes
 //! the mesh data to or from the binary archive
 //! \param[in] ar the archive to which the data is serialized
-//! \sa DumpFile
 //! \todo serialize nodesets
 
-void FEModel::SerializeMesh(DumpFile& ar)
+void FEModel::SerializeMesh(DumpStream& ar)
 {
     DOFS& fedofs = GetDOFS();
 	FEMesh& m = m_mesh;
@@ -1305,7 +1292,7 @@ void FEModel::SerializeMesh(DumpFile& ar)
 
 //-----------------------------------------------------------------------------
 //! serialize contact data
-void FEModel::SerializeContactData(DumpFile &ar)
+void FEModel::SerializeContactData(DumpStream &ar)
 {
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 
@@ -1352,7 +1339,7 @@ void FEModel::SerializeContactData(DumpFile &ar)
 
 //-----------------------------------------------------------------------------
 //! \todo Do we need to store the m_bActive flag of the boundary conditions?
-void FEModel::SerializeBoundaryData(DumpFile& ar)
+void FEModel::SerializeBoundaryData(DumpStream& ar)
 {
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 
@@ -1596,7 +1583,7 @@ void FEModel::SerializeBoundaryData(DumpFile& ar)
 
 //-----------------------------------------------------------------------------
 //! Serialize analysis data
-void FEModel::SerializeAnalysisData(DumpFile &ar)
+void FEModel::SerializeAnalysisData(DumpStream &ar)
 {
 	if (ar.IsSaving())
 	{
@@ -1618,7 +1605,6 @@ void FEModel::SerializeAnalysisData(DumpFile &ar)
 	else
 	{
 		m_Step.clear();
-		FEModel* pfem = ar.GetFEModel();
 
 		char sztype[256] = {0};
 

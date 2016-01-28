@@ -127,13 +127,6 @@ void FETiedInterface::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FETiedInterface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	ss.ShallowCopy(dmp, bsave);
-	ms.ShallowCopy(dmp, bsave);
-}
-
-//-----------------------------------------------------------------------------
 //! Update tied interface data. This function re-evaluates the gaps between
 //! the slave node and their projections onto the master surface.
 //!
@@ -501,7 +494,7 @@ bool FETiedInterface::Augment(int naug)
 
 //-----------------------------------------------------------------------------
 //! Serialize the data to the archive.
-void FETiedInterface::Serialize(DumpFile &ar)
+void FETiedInterface::Serialize(DumpStream &ar)
 {
 	// store contact data
 	FEContactInterface::Serialize(ar);

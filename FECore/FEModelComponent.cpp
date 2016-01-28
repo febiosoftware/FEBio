@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEModelComponent.h"
 #include <string.h>
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 //! The constructor takes two arguments: the SUPER_CLASS_ID which defines the 
@@ -100,8 +101,10 @@ void FEModelComponent::Deactivate()
 }
 
 //-----------------------------------------------------------------------------
-void FEModelComponent::Serialize(DumpFile& ar)
+void FEModelComponent::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow()) return;
+
 	FECoreBase::Serialize(ar);
 	if (ar.IsSaving())
 	{

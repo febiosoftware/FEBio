@@ -10,7 +10,6 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/FEMesh.h"
-#include "FECore/DumpFile.h"
 #include "FECore/FESurfacePairInteraction.h"
 
 class FEModel;
@@ -46,7 +45,7 @@ public:
 	virtual bool Augment(int naug) = 0;
 
 	//! serialize data to archive
-	virtual void Serialize(DumpFile& ar);
+	virtual void Serialize(DumpStream& ar);
 
 protected:
 	//! don't call the default constructor

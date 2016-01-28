@@ -32,7 +32,7 @@ public:
 	void Residual(FEGlobalVector& R);
 
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! Unpack surface element data
 	void UnpackLM(FEElement& el, vector<int>& lm);

@@ -300,8 +300,10 @@ void DataRecord::SetItemList(const char* szlist)
 
 //-----------------------------------------------------------------------------
 
-void DataRecord::Serialize(DumpFile &ar)
+void DataRecord::Serialize(DumpStream &ar)
 {
+	if (ar.IsShallow()) return;
+
 	if (ar.IsSaving())
 	{
 		ar << m_nid;

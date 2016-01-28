@@ -54,7 +54,7 @@ public:
 	bool Init();
 
 	//! serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	// declare a parameter list
 	DECLARE_PARAMETER_LIST();

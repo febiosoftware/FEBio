@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEPeriodicBoundary.h"
-#include "FECore/DumpFile.h"
 #include "FECore/FEModel.h"
 #include "FECore/FENormalProjection.h"
 #include "FECore/log.h"
@@ -69,33 +68,34 @@ vec3d FEPeriodicSurface::CenterOfMass()
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicSurface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		dmp << m_Lm << m_gap;
-	}
-	else
-	{
-		dmp >> m_Lm >> m_gap;
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEPeriodicSurface::Serialize(DumpFile& ar)
+void FEPeriodicSurface::Serialize(DumpStream& ar)
 {
 	FEContactSurface::Serialize(ar);
-	if (ar.IsSaving())
+	if (ar.IsShallow())
 	{
-		ar << m_gap;
-		ar << m_rs;
-		ar << m_Lm;
+		if (ar.IsSaving())
+		{
+			ar << m_Lm << m_gap;
+		}
+		else
+		{
+			ar >> m_Lm >> m_gap;
+		}
 	}
 	else
 	{
-		ar >> m_gap;
-		ar >> m_rs;
-		ar >> m_Lm;
+		if (ar.IsSaving())
+		{
+			ar << m_gap;
+			ar << m_rs;
+			ar << m_Lm;
+		}
+		else
+		{
+			ar >> m_gap;
+			ar >> m_rs;
+			ar >> m_Lm;
+		}
 	}
 }
 
@@ -333,13 +333,6 @@ void FEPeriodicBoundary::Update(int niter)
 			ss.m_gap[i] = us - um + m_off*s;
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-void FEPeriodicBoundary::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	m_ss.ShallowCopy(dmp, bsave);
-	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------
@@ -757,7 +750,7 @@ bool FEPeriodicBoundary::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::Serialize(DumpFile &ar)
+void FEPeriodicBoundary::Serialize(DumpStream &ar)
 {
 	// store contact data
 	FEContactInterface::Serialize(ar);

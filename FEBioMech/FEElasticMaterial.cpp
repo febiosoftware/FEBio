@@ -44,22 +44,7 @@ void FEElasticMaterialPoint::Init(bool bflag)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		dmp << m_F << m_J << m_Q << m_s << m_s0;
-	}
-	else
-	{
-		dmp >> m_F >> m_J >> m_Q >> m_s >> m_s0;
-	}
-
-	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
-}
-
-//-----------------------------------------------------------------------------
-void FEElasticMaterialPoint::Serialize(DumpFile& ar)
+void FEElasticMaterialPoint::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -70,7 +55,7 @@ void FEElasticMaterialPoint::Serialize(DumpFile& ar)
 		ar >> m_F >> m_J >> m_Q >> m_s >> m_s0;
 	}
 
-	if (m_pNext) m_pNext->Serialize(ar);
+	FEMaterialPoint::Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

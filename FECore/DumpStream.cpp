@@ -1,70 +1,63 @@
 #include "stdafx.h"
 #include "DumpStream.h"
-#include <assert.h>
-#include <memory.h>
 
 //-----------------------------------------------------------------------------
-DumpStream::DumpStream()
+DumpStream::DumpStream(FEModel& fem) : m_fem(fem)
 {
-	m_pb = 0;
-	m_pd = 0;
-	m_nsize = 0;
-	m_nreserved = 0;
-}
-
-//-----------------------------------------------------------------------------
-void DumpStream::clear()
-{
-	delete [] m_pb;
-	m_pb = 0;
-	m_pd = 0;
-	m_nsize = 0;
-	m_nreserved = 0;
+	m_bsave = false;
+	m_bshallow = false;
 }
 
 //-----------------------------------------------------------------------------
 DumpStream::~DumpStream()
 {
-	clear();
 }
 
 //-----------------------------------------------------------------------------
-void DumpStream::set_position(int l)
+void DumpStream::Open(bool bsave, bool bshallow)
 {
-	assert((l >= 0) && (l < m_nreserved));
-	m_pd = m_pb + l;
-	m_nsize = l;
+	m_bsave = bsave;
+	m_bshallow = bshallow;
 }
 
 //-----------------------------------------------------------------------------
-void DumpStream::grow_buffer(int l)
-{
-	if (l <= 0) return;
-
-	char* pnew = new char[m_nreserved + l];
-	if (m_pb)
-	{
-		memcpy(pnew, m_pb, m_nreserved);
-		delete [] m_pb;
-	}
-	m_pb = pnew;
-	m_pd = m_pb + m_nsize;
-	m_nreserved += l;
+DumpStream& DumpStream::operator << (const char* sz) 
+{ 
+	int n = (sz ? strlen(sz) : 0); 
+	write(&n, sizeof(int), 1);
+	if (sz) write(sz, sizeof(char), n);
+	return (*this);
 }
 
 //-----------------------------------------------------------------------------
-void DumpStream::write(void* pd, int nsize)
-{
-	if (m_nsize + nsize > m_nreserved) grow_buffer(nsize + m_nreserved/10);
-	memcpy(m_pd, pd, nsize);
-	m_pd += nsize;
-	m_nsize += nsize;
+DumpStream& DumpStream::operator << (char* sz) 
+{ 
+	int n = (sz ? strlen(sz) : 0); 
+	write(&n, sizeof(int), 1);
+	if (sz) write(sz, sizeof(char), n);
+	return (*this);
 }
 
 //-----------------------------------------------------------------------------
-void DumpStream::read(void* pd, int nsize)
+DumpStream& DumpStream::operator << (const double a[3][3])
 {
-	memcpy(pd, m_pd, nsize);
-	m_pd += nsize;
-	m_nsize += nsize;
+	write(a, sizeof(double), 9);
+	return (*this);
+}
+
+//-----------------------------------------------------------------------------
+DumpStream& DumpStream::operator >> (char* sz) 
+{ 
+	int n;
+	read(&n, sizeof(int), 1);
+	if (n>0) read(sz, sizeof(char), n);
+	sz[n] = 0;
+	return (*this);
+}
+
+//-----------------------------------------------------------------------------
+DumpStream& DumpStream::operator >> (double a[3][3])
+{
+	read(a, sizeof(double), 9);
+	return (*this);
 }

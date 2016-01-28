@@ -164,85 +164,6 @@ bool FESlidingSurfaceMP::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurfaceMP::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	// We need to store the m_bporo and m_bsolu flags first
-	// since we need them before we initialize the surface data
-	if (bsave)
-	{
-		dmp << m_bporo;
-		dmp << m_bsolu;
-	}
-	else
-	{
-		dmp >> m_bporo;
-		dmp >> m_bsolu;
-	}
-	
-	// And finally, we serialize the surface data
-	if (bsave)
-	{
-		int N = (int) m_Data.size();
-		for (int i=0; i<N; ++i)
-		{
-			vector<Data>& di = m_Data[i];
-			for (int j=0; j<(int) di.size(); ++j)
-			{
-				Data& d = di[j];
-				dmp << d.m_gap;
-				dmp << d.m_nu;
-				dmp << d.m_rs;
-				dmp << d.m_Lmd;
-				dmp << d.m_Lmp;
-				dmp << d.m_Lmc;
-				dmp << d.m_epsn;
-				dmp << d.m_epsp;
-				dmp << d.m_epsc;
-				dmp << d.m_pg;
-				dmp << d.m_cg;
-				dmp << d.m_Ln;
-			}
-		}
-		dmp << m_nn;
-        dmp << m_sid;
-	}
-	else
-	{
-		int N = (int) m_Data.size();
-		for (int i=0; i<N; ++i)
-		{
-			vector<Data>& di = m_Data[i];
-			for (int j=0; j<(int) di.size(); ++j)
-			{
-				Data& d = di[j];
-				dmp >> d.m_gap;
-				dmp >> d.m_nu;
-				dmp >> d.m_rs;
-				dmp >> d.m_Lmd;
-				dmp >> d.m_Lmp;
-				dmp >> d.m_Lmc;
-				dmp >> d.m_epsn;
-				dmp >> d.m_epsp;
-				dmp >> d.m_epsc;
-				dmp >> d.m_pg;
-				dmp >> d.m_cg;
-				dmp >> d.m_Ln;
-			}
-		}
-		dmp >> m_nn;
-        dmp >> m_sid;
-        
-		// reset element pointers
-		for (int i=0; i<Elements(); ++i)
-		{
-			vector<Data>& di = m_Data[i];
-			int n = (int) di.size();
-			for (int j=0; j<n; ++j) di[j].m_pme = 0;
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! This function calculates the node normal. Due to the piecewise continuity
 //! of the surface elements this normal is not uniquely defined so in order to
 //! obtain a unique normal the normal is averaged for each node over all the 
@@ -392,76 +313,156 @@ vec3d FESlidingSurfaceMP::GetFluidForce()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurfaceMP::Serialize(DumpFile& ar)
+void FESlidingSurfaceMP::Serialize(DumpStream& ar)
 {
-	// We need to store the m_bporo and m_bsolu flags first
-	// since we need them before we initialize the surface data
-	if (ar.IsSaving())
+	if (ar.IsShallow())
 	{
-		ar << m_bporo;
-		ar << m_bsolu;
+		// We need to store the m_bporo and m_bsolu flags first
+		// since we need them before we initialize the surface data
+		if (ar.IsSaving())
+		{
+			ar << m_bporo;
+			ar << m_bsolu;
+		}
+		else
+		{
+			ar >> m_bporo;
+			ar >> m_bsolu;
+		}
+	
+		// And finally, we serialize the surface data
+		if (ar.IsSaving())
+		{
+			int N = (int) m_Data.size();
+			for (int i=0; i<N; ++i)
+			{
+				vector<Data>& di = m_Data[i];
+				for (int j=0; j<(int) di.size(); ++j)
+				{
+					Data& d = di[j];
+					ar << d.m_gap;
+					ar << d.m_nu;
+					ar << d.m_rs;
+					ar << d.m_Lmd;
+					ar << d.m_Lmp;
+					ar << d.m_Lmc;
+					ar << d.m_epsn;
+					ar << d.m_epsp;
+					ar << d.m_epsc;
+					ar << d.m_pg;
+					ar << d.m_cg;
+					ar << d.m_Ln;
+				}
+			}
+			ar << m_nn;
+			ar << m_sid;
+		}
+		else
+		{
+			int N = (int) m_Data.size();
+			for (int i=0; i<N; ++i)
+			{
+				vector<Data>& di = m_Data[i];
+				for (int j=0; j<(int) di.size(); ++j)
+				{
+					Data& d = di[j];
+					ar >> d.m_gap;
+					ar >> d.m_nu;
+					ar >> d.m_rs;
+					ar >> d.m_Lmd;
+					ar >> d.m_Lmp;
+					ar >> d.m_Lmc;
+					ar >> d.m_epsn;
+					ar >> d.m_epsp;
+					ar >> d.m_epsc;
+					ar >> d.m_pg;
+					ar >> d.m_cg;
+					ar >> d.m_Ln;
+				}
+			}
+			ar >> m_nn;
+			ar >> m_sid;
+        
+			// reset element pointers
+			for (int i=0; i<Elements(); ++i)
+			{
+				vector<Data>& di = m_Data[i];
+				int n = (int) di.size();
+				for (int j=0; j<n; ++j) di[j].m_pme = 0;
+			}
+		}
 	}
 	else
 	{
-		ar >> m_bporo;
-		ar >> m_bsolu;
-	}
-	
-	// Next, we can serialize the base-class data
-	FEContactSurface::Serialize(ar);
-	
-	// And finally, we serialize the surface data
-	if (ar.IsSaving())
-	{
-		int N = (int) m_Data.size();
-		for (int i=0; i<N; ++i)
+		// We need to store the m_bporo and m_bsolu flags first
+		// since we need them before we initialize the surface data
+		if (ar.IsSaving())
 		{
-			vector<Data>& di = m_Data[i];
-			for (int j=0; j<(int) di.size(); ++j)
-			{
-				Data& d = di[j];
-				ar << d.m_gap;
-				ar << d.m_nu;
-				ar << d.m_rs;
-				ar << d.m_Lmd;
-				ar << d.m_Lmp;
-				ar << d.m_Lmc;
-				ar << d.m_epsn;
-				ar << d.m_epsp;
-				ar << d.m_epsc;
-				ar << d.m_pg;
-				ar << d.m_cg;
-				ar << d.m_Ln;
-			}
+			ar << m_bporo;
+			ar << m_bsolu;
 		}
-		ar << m_nn;
-        ar << m_sid;
-	}
-	else
-	{
-		int N = (int) m_Data.size();
-		for (int i=0; i<N; ++i)
+		else
 		{
-			vector<Data>& di = m_Data[i];
-			for (int j=0; j<(int) di.size(); ++j)
-			{
-				Data& d = di[j];
-				ar >> d.m_gap;
-				ar >> d.m_nu;
-				ar >> d.m_rs;
-				ar >> d.m_Lmd;
-				ar >> d.m_Lmp;
-				ar >> d.m_Lmc;
-				ar >> d.m_epsn;
-				ar >> d.m_epsp;
-				ar >> d.m_epsc;
-				ar >> d.m_pg;
-				ar >> d.m_cg;
-				ar >> d.m_Ln;
-			}
+			ar >> m_bporo;
+			ar >> m_bsolu;
 		}
-		ar >> m_nn;
-        ar >> m_sid;
+	
+		// Next, we can serialize the base-class data
+		FEContactSurface::Serialize(ar);
+	
+		// And finally, we serialize the surface data
+		if (ar.IsSaving())
+		{
+			int N = (int) m_Data.size();
+			for (int i=0; i<N; ++i)
+			{
+				vector<Data>& di = m_Data[i];
+				for (int j=0; j<(int) di.size(); ++j)
+				{
+					Data& d = di[j];
+					ar << d.m_gap;
+					ar << d.m_nu;
+					ar << d.m_rs;
+					ar << d.m_Lmd;
+					ar << d.m_Lmp;
+					ar << d.m_Lmc;
+					ar << d.m_epsn;
+					ar << d.m_epsp;
+					ar << d.m_epsc;
+					ar << d.m_pg;
+					ar << d.m_cg;
+					ar << d.m_Ln;
+				}
+			}
+			ar << m_nn;
+			ar << m_sid;
+		}
+		else
+		{
+			int N = (int) m_Data.size();
+			for (int i=0; i<N; ++i)
+			{
+				vector<Data>& di = m_Data[i];
+				for (int j=0; j<(int) di.size(); ++j)
+				{
+					Data& d = di[j];
+					ar >> d.m_gap;
+					ar >> d.m_nu;
+					ar >> d.m_rs;
+					ar >> d.m_Lmd;
+					ar >> d.m_Lmp;
+					ar >> d.m_Lmc;
+					ar >> d.m_epsn;
+					ar >> d.m_epsp;
+					ar >> d.m_epsc;
+					ar >> d.m_pg;
+					ar >> d.m_cg;
+					ar >> d.m_Ln;
+				}
+			}
+			ar >> m_nn;
+			ar >> m_sid;
+		}
 	}
 }
 
@@ -1391,13 +1392,6 @@ void FESlidingInterfaceMP::Update(int niter)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceMP::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	m_ss.ShallowCopy(dmp, bsave);
-	m_ms.ShallowCopy(dmp, bsave);
-}
-
-//-----------------------------------------------------------------------------
 void FESlidingInterfaceMP::ContactForces(FEGlobalVector& R)
 {
 	int i, j, k;
@@ -2294,7 +2288,7 @@ bool FESlidingInterfaceMP::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceMP::Serialize(DumpFile &ar)
+void FESlidingInterfaceMP::Serialize(DumpStream &ar)
 {
 	// serialize contact data
 	FEContactInterface::Serialize(ar);

@@ -344,7 +344,7 @@ void FENewtonSolver::Clean()
 }
 
 //-----------------------------------------------------------------------------
-void FENewtonSolver::Serialize(DumpFile& ar)
+void FENewtonSolver::Serialize(DumpStream& ar)
 {
 	FESolver::Serialize(ar);
 

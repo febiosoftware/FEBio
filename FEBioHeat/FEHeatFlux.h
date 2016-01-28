@@ -31,7 +31,7 @@ public:
 	void Residual(FEGlobalVector& R);
 
 	//! serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public:
 	//! set an attribute of a surface facet

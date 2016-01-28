@@ -315,7 +315,7 @@ bool FEAnalysis::Solve()
 	}
 
 	// dump stream for running restarts
-	DumpStream dmp;
+	DumpMemStream dmp(m_fem);
 
 	// repeat for all timesteps
 	m_nretries = 0;
@@ -323,7 +323,7 @@ bool FEAnalysis::Solve()
 	{
 		// keep a copy of the current state, in case
 		// we need to retry this time step
-		if (m_bautostep) { dmp.clear(); m_fem.ShallowCopy(dmp, true); }
+		if (m_bautostep) { dmp.clear(); dmp.Open(true, true); m_fem.Serialize(dmp); }
 
 		// update time
 		m_fem.m_ftime += m_dt;
@@ -437,8 +437,8 @@ bool FEAnalysis::Solve()
 			if (m_bautostep && (m_nretries < m_maxretries))
 			{
 				// restore the previous state
-				dmp.set_position(0);
-				m_fem.ShallowCopy(dmp, false);
+				dmp.Open(false, true);
+				m_fem.Serialize(dmp);
 				
 				// let's try again
 				Retry();
@@ -621,8 +621,11 @@ double FEAnalysis::CheckMustPoints(double t, double dt)
 }
 
 //-----------------------------------------------------------------------------
-void FEAnalysis::Serialize(DumpFile& ar)
+void FEAnalysis::Serialize(DumpStream& ar)
 {
+	// don't serialize for shallow copies
+	if (ar.IsShallow()) return;
+
 	if (ar.IsSaving())
 	{
 		// --- analysis data ---

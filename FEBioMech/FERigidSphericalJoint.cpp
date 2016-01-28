@@ -95,27 +95,7 @@ bool FERigidSphericalJoint::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! create a shallow copy
-void FERigidSphericalJoint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-    if (bsave)
-    {
-        dmp << m_q0 << m_qa0 << m_qb0;
-        dmp << m_F << m_L;
-        dmp << m_M << m_U;
-        dmp << m_qpx << m_qpy << m_qpz << m_Mpx << m_Mpy << m_Mpz;
-    }
-    else
-    {
-        dmp >> m_q0 >> m_qa0 >> m_qb0;
-        dmp >> m_F >> m_L;
-        dmp >> m_M >> m_U;
-        dmp >> m_qpx >> m_qpy >> m_qpz >> m_Mpx >> m_Mpy >> m_Mpz;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void FERigidSphericalJoint::Serialize(DumpFile& ar)
+void FERigidSphericalJoint::Serialize(DumpStream& ar)
 {
 	FERigidConnector::Serialize(ar);
     if (ar.IsSaving())

@@ -52,7 +52,7 @@ bool FESoluteData::SetAttribute(const char* szname, const char* szval)
 
 //-----------------------------------------------------------------------------
 //! Store the solute data to the archive
-void FESoluteData::Serialize(DumpFile &ar)
+void FESoluteData::Serialize(DumpStream &ar)
 {
 	if (ar.IsSaving()) ar << m_nID;
 	else ar >> m_nID;
@@ -113,7 +113,7 @@ bool FESolute::Init()
 
 //-----------------------------------------------------------------------------
 //! Data serialization
-void FESolute::Serialize(DumpFile& ar)
+void FESolute::Serialize(DumpStream& ar)
 {
 	FEMaterial::Serialize(ar);
 	
@@ -186,7 +186,7 @@ bool FESBMData::SetAttribute(const char* szname, const char* szval)
 
 //-----------------------------------------------------------------------------
 //! Store the solute data to the archive
-void FESBMData::Serialize(DumpFile &ar)
+void FESBMData::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving()) ar << m_nID;
 	else ar >> m_nID;
@@ -264,7 +264,7 @@ bool FESolidBoundMolecule::SetAttribute(const char* szname, const char* szval)
 
 //-----------------------------------------------------------------------------
 //! Data serialization
-void FESolidBoundMolecule::Serialize(DumpFile& ar)
+void FESolidBoundMolecule::Serialize(DumpStream& ar)
 {
 	FEMaterial::Serialize(ar);
 	FECoreKernel& febio = FECoreKernel::GetInstance();

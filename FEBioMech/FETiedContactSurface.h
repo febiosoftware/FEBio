@@ -17,11 +17,8 @@ public:
 	//! Initializes data structures
 	bool Init();
 
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! data serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! offset shell surfaces (must be called before Init())
 	void SetShellOffset(bool b) { m_boffset = b; }

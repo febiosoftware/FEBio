@@ -994,7 +994,7 @@ void FEMultiphasicSolver::UpdateContact()
 //-----------------------------------------------------------------------------
 //! Save data to dump file
 
-void FEMultiphasicSolver::Serialize(DumpFile& ar)
+void FEMultiphasicSolver::Serialize(DumpStream& ar)
 {
 
 	if (ar.IsSaving())

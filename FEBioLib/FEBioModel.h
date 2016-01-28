@@ -45,12 +45,12 @@ public: // --- I/O functions ---
 public: //! --- serialization for restarts ---
 	
 	//! Write or read data from archive
-	bool Serialize(DumpFile& ar);
+	bool Serialize(DumpStream& ar);
 
 protected:
 	// helper functions for serialization
-	void SerializeIOData      (DumpFile& ar);
-	void SerializeDataStore   (DumpFile& ar);
+	void SerializeIOData   (DumpStream& ar);
+	void SerializeDataStore(DumpStream& ar);
 
 public: // --- I/O functions ---
 	//! Add data record

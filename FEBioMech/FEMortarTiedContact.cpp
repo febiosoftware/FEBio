@@ -336,12 +336,6 @@ void FEMortarTiedContact::Update(int niter)
 
 //-----------------------------------------------------------------------------
 //! serialize data to archive
-void FEMortarTiedContact::Serialize(DumpFile& ar)
-{
-}
-
-//-----------------------------------------------------------------------------
-//! shallow copy
-void FEMortarTiedContact::ShallowCopy(DumpStream& dmp, bool bsave)
+void FEMortarTiedContact::Serialize(DumpStream& ar)
 {
 }

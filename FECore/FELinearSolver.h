@@ -41,7 +41,7 @@ public: // from FESolver
 	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
 
 	//! Serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public: // these functions need to be implemented by the derived class
 

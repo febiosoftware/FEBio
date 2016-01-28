@@ -21,12 +21,6 @@ public:
 	//! update 
 	virtual void Update(int niter) = 0;
 
-	//! Create a shallow copy
-	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
-
-	//! serialize data to archive
-	virtual void Serialize(DumpFile& ar) = 0;
-
 	//! return the master surface
 	virtual FESurface* GetMasterSurface() = 0;
 

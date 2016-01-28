@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "DumpFile.h"
+#include "DumpStream.h"
 #include <vector>
 
 class FESurface;
@@ -40,7 +40,7 @@ public:
 	void Create(FEDomain& dom);
 
 	//! serialize data to/from dump file
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	int MaxValence();
 	int Valence(int n) { return m_nval[n]; }

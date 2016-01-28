@@ -89,10 +89,7 @@ public:
     
 public:
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
-
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
+	void Serialize(DumpStream& ar);
 
 protected:
 	vector<FESolidElement>	m_Elem;		//!< array of elements

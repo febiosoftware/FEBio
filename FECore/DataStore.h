@@ -9,7 +9,6 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "DumpFile.h"
 #include "FEMesh.h"
 #include <stdio.h>
 #include <vector>
@@ -18,6 +17,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 // forward declaration
 class FEModel;
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 #define FE_DATA_NODE	1
@@ -56,7 +56,7 @@ public:
 public:
 	virtual double Evaluate(int item, int ndata) = 0;
 	virtual void SelectAllItems() = 0;
-	virtual void Serialize(DumpFile& ar);
+	virtual void Serialize(DumpStream& ar);
 	virtual void Parse(const char* sz) = 0;
 	virtual int Size() = 0;
 

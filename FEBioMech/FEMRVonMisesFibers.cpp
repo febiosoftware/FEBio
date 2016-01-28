@@ -60,7 +60,7 @@ void FEMRVonMisesMaterialPoint::Init(bool bflag)
 }
 
 //-----------------------------------------------------------------------------
-void FEMRVonMisesMaterialPoint::Serialize(DumpFile& ar)
+void FEMRVonMisesMaterialPoint::Serialize(DumpStream& ar)
 {
 	if (m_pNext) m_pNext->Serialize(ar);
 

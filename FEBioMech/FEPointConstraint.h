@@ -16,11 +16,8 @@ public:
 	//! initialize data
 	bool Init();
 
-	//! serialize \todo Implement this
-	void Serialize(DumpFile& ar) {}
-
-	//! stream constraint data
-	void ShallowCopy(DumpStream& dmp, bool bsave) {}
+	//! serialize
+	void Serialize(DumpStream& ar);
 
 	//! Calculate the constraint force
 	void Residual(FEGlobalVector& R, const FETimePoint& tp);

@@ -1,5 +1,4 @@
 #pragma once
-#include "DumpFile.h"
 #include "FEModelComponent.h"
 #include <list>
 using namespace std;
@@ -34,7 +33,7 @@ public:
 
 	double FindDOF(int n);
 
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	void Activate();
 

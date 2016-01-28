@@ -56,7 +56,7 @@ public:
 	double stiffness(double dl);
 	bool Init();
 
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval);
 

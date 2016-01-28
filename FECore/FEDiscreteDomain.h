@@ -16,11 +16,8 @@ public:
 
 	bool Initialize(FEModel& fem);
 
-	//! create a shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! Serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public:
 	void AddElement(int eid, int n[2]);

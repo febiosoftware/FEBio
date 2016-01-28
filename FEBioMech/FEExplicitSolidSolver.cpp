@@ -502,7 +502,7 @@ void FEExplicitSolidSolver::UpdateStresses()
 //-----------------------------------------------------------------------------
 //! Save data to dump file
 
-void FEExplicitSolidSolver::Serialize(DumpFile& ar)
+void FEExplicitSolidSolver::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{

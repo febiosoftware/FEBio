@@ -123,7 +123,7 @@ void FETractionLoad::Residual(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FETractionLoad::Serialize(DumpFile& ar)
+void FETractionLoad::Serialize(DumpStream& ar)
 {
 	FESurfaceLoad::Serialize(ar);
 

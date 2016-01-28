@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "LoadCurve.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 // copy constructor
@@ -324,8 +325,10 @@ bool FELoadCurve::HasPoint(double t) const
 
 //-----------------------------------------------------------------------------
 
-void FELoadCurve::Serialize(DumpFile &ar)
+void FELoadCurve::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow()) return;
+
 	int j, n;
 	if (ar.IsSaving())
 	{

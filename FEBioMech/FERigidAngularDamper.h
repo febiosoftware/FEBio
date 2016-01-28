@@ -37,10 +37,7 @@ public:
     bool Augment(int naug, const FETimePoint& tp);
     
     //! serialize data to archive
-    void Serialize(DumpFile& ar);
-    
-    //! create a shallow copy
-    void ShallowCopy(DumpStream& dmp, bool bsave);
+    void Serialize(DumpStream& ar);
     
     //! update state
     void Update(const FETimePoint& tp);

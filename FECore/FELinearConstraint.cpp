@@ -2,6 +2,7 @@
 #include "FELinearConstraint.h"
 #include "FEMesh.h"
 #include "FEModel.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC) : FEModelComponent(FEBC_ID, LC.GetFEModel())
@@ -35,8 +36,10 @@ void FELinearConstraint::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FELinearConstraint::Serialize(DumpFile& ar)
+void FELinearConstraint::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow()) return;
+
 	if (ar.IsSaving())
 	{
 		ar.write(&master, sizeof(DOF), 1);

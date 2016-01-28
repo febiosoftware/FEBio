@@ -242,76 +242,76 @@ vec3d FERigidBody::CayleyIncrementalCompoundRotation()
 }
 
 //-----------------------------------------------------------------------------
-void FERigidBody::ShallowCopy(DumpStream& dmp, bool bsave)
+void FERigidBody::Serialize(DumpStream& ar)
 {
-	if (bsave)
+	if (ar.IsShallow())
 	{
-		dmp << m_mass;
-        dmp << m_moi;
-		dmp << m_Fr << m_Mr;
-		dmp << m_rp << m_rt;
-		dmp << m_vp << m_vt;
-        dmp << m_ap << m_at;
-		dmp << m_qp << m_qt;
-		dmp << m_wp << m_wt;
-		dmp << m_alp << m_alt;
-		for (int i=0; i<6; ++i)
+		if (ar.IsSaving())
 		{
-			dmp << m_Up[i];
-			dmp << m_Ut[i];
-			dmp << m_du[i];
-			dmp << m_dul[i];
+			ar << m_mass;
+			ar << m_moi;
+			ar << m_Fr << m_Mr;
+			ar << m_rp << m_rt;
+			ar << m_vp << m_vt;
+			ar << m_ap << m_at;
+			ar << m_qp << m_qt;
+			ar << m_wp << m_wt;
+			ar << m_alp << m_alt;
+			for (int i=0; i<6; ++i)
+			{
+				ar << m_Up[i];
+				ar << m_Ut[i];
+				ar << m_du[i];
+				ar << m_dul[i];
+			}
+		}
+		else
+		{
+			ar >> m_mass;
+			ar >> m_moi;
+			ar >> m_Fr >> m_Mr;
+			ar >> m_rp >> m_rt;
+			ar >> m_vp >> m_vt;
+			ar >> m_ap >> m_at;
+			ar >> m_qp >> m_qt;
+			ar >> m_wp >> m_wt;
+			ar >> m_alp >> m_alt;
+			for (int i=0; i<6; ++i)
+			{
+				ar >> m_Up[i];
+				ar >> m_Ut[i];
+				ar >> m_du[i];
+				ar >> m_dul[i];
+			}
 		}
 	}
 	else
 	{
-		dmp >> m_mass;
-        dmp >> m_moi;
-		dmp >> m_Fr >> m_Mr;
-		dmp >> m_rp >> m_rt;
-		dmp >> m_vp >> m_vt;
-        dmp >> m_ap >> m_at;
-		dmp >> m_qp >> m_qt;
-		dmp >> m_wp >> m_wt;
-		dmp >> m_alp >> m_alt;
-		for (int i=0; i<6; ++i)
+		if (ar.IsSaving())
 		{
-			dmp >> m_Up[i];
-			dmp >> m_Ut[i];
-			dmp >> m_du[i];
-			dmp >> m_dul[i];
+			ar << m_nID << m_mat << m_mass << m_moi << m_Fr << m_Mr;
+			ar << m_r0 << m_rt << m_rp << m_vt << m_vp << m_at << m_ap;
+			ar << m_qt << m_qp << m_wt << m_wp << m_alt << m_alp;
+			ar << m_bpofr;
+			ar.write(m_BC , sizeof(int), 6);
+			ar.write(m_LM , sizeof(int), 6);
+			ar.write(m_Up , sizeof(double), 6);
+			ar.write(m_Ut , sizeof(double), 6);
+			ar.write(m_du , sizeof(double), 6);
+			ar.write(m_dul, sizeof(double), 6);
 		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-
-void FERigidBody::Serialize(DumpFile& ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << m_nID << m_mat << m_mass << m_moi << m_Fr << m_Mr;
-		ar << m_r0 << m_rt << m_rp << m_vt << m_vp << m_at << m_ap;
-        ar << m_qt << m_qp << m_wt << m_wp << m_alt << m_alp;
-		ar << m_bpofr;
-		ar.write(m_BC , sizeof(int), 6);
-		ar.write(m_LM , sizeof(int), 6);
-		ar.write(m_Up , sizeof(double), 6);
-		ar.write(m_Ut , sizeof(double), 6);
-		ar.write(m_du , sizeof(double), 6);
-		ar.write(m_dul, sizeof(double), 6);
-	}
-	else
-	{
-		ar >> m_nID >> m_mat >> m_mass >> m_moi >> m_Fr >> m_Mr;
-		ar >> m_r0 >> m_rt >> m_rp >> m_vt >> m_vp >> m_at >> m_ap;
-        ar >> m_qt >> m_qp >> m_wt >> m_wp >> m_alt >> m_alp;
-		ar >> m_bpofr;
-		ar.read(m_BC , sizeof(int), 6);
-		ar.read(m_LM , sizeof(int   ), 6);
-		ar.read(m_Up , sizeof(double), 6);
-		ar.read(m_Ut , sizeof(double), 6);
-		ar.read(m_du , sizeof(double), 6);
-		ar.read(m_dul, sizeof(double), 6);
+		else
+		{
+			ar >> m_nID >> m_mat >> m_mass >> m_moi >> m_Fr >> m_Mr;
+			ar >> m_r0 >> m_rt >> m_rp >> m_vt >> m_vp >> m_at >> m_ap;
+			ar >> m_qt >> m_qp >> m_wt >> m_wp >> m_alt >> m_alp;
+			ar >> m_bpofr;
+			ar.read(m_BC , sizeof(int), 6);
+			ar.read(m_LM , sizeof(int   ), 6);
+			ar.read(m_Up , sizeof(double), 6);
+			ar.read(m_Ut , sizeof(double), 6);
+			ar.read(m_du , sizeof(double), 6);
+			ar.read(m_dul, sizeof(double), 6);
+		}
 	}
 }

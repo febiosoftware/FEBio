@@ -14,7 +14,7 @@
 #include "FENLConstraint.h"
 #include "FELinearConstraint.h"
 #include "FEObject.h"
-#include "DumpStream.h"
+#include "DumpMemStream.h"
 #include "FEGlobalData.h"
 #include "FETypes.h"
 #include <string>
@@ -250,9 +250,6 @@ public: // --- parameter functions ---
 
 public:	// --- Miscellaneous routines ---
 
-	//! read/write the model state to a dump stream (used for running restarts)
-	virtual void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! find a model componnet from its class ID
 	FEModelComponent* FindModelComponent(int nid);
 
@@ -272,20 +269,19 @@ public:	// --- Miscellaneous routines ---
 	int GetDOFIndex(const char* sz);
 	int GetDOFIndex(const char* szvar, int n);
 
-public:
-	//! serialize data
-	virtual bool Serialize(DumpFile& ar);
+	//! serialize data for restarts
+	virtual bool Serialize(DumpStream& ar);
 
 protected:
 	// helper functions for serialization
-	void SerializeLoadData    (DumpFile& ar);
-	void SerializeGlobals     (DumpFile& ar);
-	void SerializeMaterials   (DumpFile& ar);
-	void SerializeGeometry    (DumpFile& ar);
-	void SerializeMesh        (DumpFile& ar);
-	void SerializeContactData (DumpFile& ar);
-	void SerializeBoundaryData(DumpFile& ar);
-	void SerializeAnalysisData(DumpFile& ar);
+	void SerializeLoadData    (DumpStream& ar);
+	void SerializeGlobals     (DumpStream& ar);
+	void SerializeMaterials   (DumpStream& ar);
+	void SerializeGeometry    (DumpStream& ar);
+	void SerializeMesh        (DumpStream& ar);
+	void SerializeContactData (DumpStream& ar);
+	void SerializeBoundaryData(DumpStream& ar);
+	void SerializeAnalysisData(DumpStream& ar);
 
 public: // Global data
 	void AddGlobalData(FEGlobalData* psd);

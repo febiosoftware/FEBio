@@ -26,9 +26,7 @@ public:
     
     void Init(bool bflag);
     
-    void ShallowCopy(DumpStream& dmp, bool bsave);
-    
-    void Serialize(DumpFile& ar);
+    void Serialize(DumpStream& ar);
     
 public:
 	double	m_Etrial;		//!< trial damage criterion at time t

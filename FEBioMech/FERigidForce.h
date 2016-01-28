@@ -13,7 +13,7 @@ public:
 	bool Init();
 
 	//! Serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! Residual
 	void Residual(FEGlobalVector& R, const FETimePoint& tp);
@@ -55,7 +55,7 @@ public:
 	double Value();
 
 	//! Serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! Residual
 	void Residual(FEGlobalVector& R, const FETimePoint& tp);

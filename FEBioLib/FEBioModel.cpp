@@ -10,6 +10,7 @@
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FECoreKernel.h"
+#include "FECore/DumpFile.h"
 #include "FECore/DOFS.h"
 #include "version.h"
 
@@ -346,7 +347,7 @@ void FEBioModel::WriteData()
 //! Dump state to archive for restarts
 void FEBioModel::DumpData()
 {
-	DumpFile ar(this);
+	DumpFile ar(*this);
 	if (ar.Create(m_szdump) == false)
 	{
 		felog.printf("WARNING: Failed creating restart file (%s).\n", m_szdump);
@@ -370,35 +371,47 @@ void FEBioModel::DumpData()
 //!  format is used for reading and writing.
 //! \param[in] ar the archive to which the data is serialized
 //! \sa DumpFile
-bool FEBioModel::Serialize(DumpFile &ar)
+bool FEBioModel::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
+	// don't need to do anything for running restarts
+	if (ar.IsShallow())
 	{
-		// --- version number ---
-		ar << (int) RSTRTVERSION;
+		// serialize model data
+		FEModel::Serialize(ar);
 	}
 	else
 	{
-		// --- version ---
-		int nversion;
-		ar >> nversion;
+		if (ar.IsSaving())
+		{
+			// --- version number ---
+			ar << (int) RSTRTVERSION;
+		}
+		else
+		{
+			// --- version ---
+			int nversion;
+			ar >> nversion;
 
-		// make sure it is the right version
-		if (nversion != RSTRTVERSION) return false;
+			// make sure it is the right version
+			if (nversion != RSTRTVERSION) return false;
+		}
+
+		// serialize model data
+		FEModel::Serialize(ar);
+
+		// serialize data store
+		SerializeDataStore(ar);
+
+		// --- Save IO Data
+		SerializeIOData(ar);
 	}
-
-	// serialize model data
-	FEModel::Serialize(ar);
-
-	// --- Save IO Data
-	SerializeIOData(ar);
 
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! Serialization of FEBioModel data
-void FEBioModel::SerializeIOData(DumpFile &ar)
+void FEBioModel::SerializeIOData(DumpStream &ar)
 {
 	if (ar.IsSaving())
 	{
@@ -443,7 +456,7 @@ void FEBioModel::SerializeIOData(DumpFile &ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioModel::SerializeDataStore(DumpFile& ar)
+void FEBioModel::SerializeDataStore(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{

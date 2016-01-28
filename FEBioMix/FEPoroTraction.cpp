@@ -339,7 +339,7 @@ bool FEPoroNormalTraction::LinearTractionForce(FESurfaceElement& el, vector<doub
 
 //-----------------------------------------------------------------------------
 
-void FEPoroNormalTraction::Serialize(DumpFile& ar)
+void FEPoroNormalTraction::Serialize(DumpStream& ar)
 {
 	FESurfaceLoad::Serialize(ar);
 

@@ -30,7 +30,7 @@ public:
 	~FEUT4Domain();
 
 	//! data serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! get nodal data
 	int UT4Nodes() { return (int) m_NODE.size(); }

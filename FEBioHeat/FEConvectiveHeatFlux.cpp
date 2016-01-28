@@ -220,7 +220,7 @@ bool FEConvectiveHeatFlux::SetFacetAttribute(int nface, const char* szatt, const
 }
 
 //-----------------------------------------------------------------------------
-void FEConvectiveHeatFlux::Serialize(DumpFile& ar)
+void FEConvectiveHeatFlux::Serialize(DumpStream& ar)
 {
 	FESurfaceLoad::Serialize(ar);
 	

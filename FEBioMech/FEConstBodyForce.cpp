@@ -28,12 +28,6 @@ FENonConstBodyForce::FENonConstBodyForce(FEModel* pfem) : FEBodyForce(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEConstBodyForce::Serialize(DumpFile &ar)
-{
-	FEBodyForce::Serialize(ar);
-}
-
-//-----------------------------------------------------------------------------
 vec3d FENonConstBodyForce::force(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -65,7 +59,7 @@ mat3ds FENonConstBodyForce::stiffness(FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
-void FENonConstBodyForce::Serialize(DumpFile &ar)
+void FENonConstBodyForce::Serialize(DumpStream &ar)
 {
 	FEBodyForce::Serialize(ar);
 	if (ar.IsSaving())
@@ -88,7 +82,7 @@ BEGIN_PARAMETER_LIST(FECentrifugalBodyForce, FEBodyForce);
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-void FECentrifugalBodyForce::Serialize(DumpFile &ar)
+void FECentrifugalBodyForce::Serialize(DumpStream &ar)
 {
 	FEBodyForce::Serialize(ar);
 	if (ar.IsSaving())

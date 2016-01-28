@@ -127,7 +127,7 @@ FEUT4Domain::FEUT4Domain(FEModel* pfem) : FEElasticSolidDomain(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEUT4Domain::Serialize(DumpFile& ar)
+void FEUT4Domain::Serialize(DumpStream& ar)
 {
 	FEElasticSolidDomain::Serialize(ar);
 	if (ar.IsSaving())

@@ -28,7 +28,7 @@ public:
 	void Update(vector<double>& u);
 
 	//! data serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! Initialize equations
 	bool InitEquations();

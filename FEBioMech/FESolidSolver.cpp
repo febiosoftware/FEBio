@@ -142,7 +142,7 @@ bool FESolidSolver::Init()
 //-----------------------------------------------------------------------------
 //! Save data to dump file
 
-void FESolidSolver::Serialize(DumpFile& ar)
+void FESolidSolver::Serialize(DumpStream& ar)
 {
 	// Serialize parameters
 	FENewtonSolver::Serialize(ar);

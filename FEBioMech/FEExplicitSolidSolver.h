@@ -29,7 +29,7 @@ public:
 	void Update(vector<double>& ui);
 
 	//! Serialize data
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public:
 	//! assemble the element residual into the global residual

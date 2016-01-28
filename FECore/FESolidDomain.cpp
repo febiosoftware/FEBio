@@ -686,18 +686,6 @@ double FESolidDomain::detJ0(FESolidElement &el, int n)
 }
 
 //-----------------------------------------------------------------------------
-void FESolidDomain::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	int NEL = (int) m_Elem.size();
-	for (int i=0; i<NEL; ++i)
-	{
-		FESolidElement& el = m_Elem[i];
-		int nint = el.GaussPoints();
-		for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->ShallowCopy(dmp, bsave);
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! This function calculates the covariant basis vectors of a solid element
 //! at an integration point
 
@@ -899,51 +887,64 @@ void FESolidDomain::gradTgradShape(FESolidElement& el, int j, vector<mat3d>& mn)
 }
 
 //-----------------------------------------------------------------------------
-void FESolidDomain::Serialize(DumpFile &ar)
+void FESolidDomain::Serialize(DumpStream &ar)
 {
-	if (ar.IsSaving())
+	if (ar.IsShallow())
 	{
-		ar << m_Node;
-
-		for (size_t i=0; i<m_Elem.size(); ++i)
+		int NEL = (int) m_Elem.size();
+		for (int i=0; i<NEL; ++i)
 		{
 			FESolidElement& el = m_Elem[i];
-			int nmat = el.GetMatID();
-			ar << el.Type();
-			
-			ar << nmat;
-			ar << el.GetID();
-			ar << el.m_node;
-			ar << el.m_lnode;
-
-			for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
+			int nint = el.GaussPoints();
+			for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->Serialize(ar);
 		}
 	}
 	else
 	{
-		FEMaterial* pmat = GetMaterial();
-		assert(pmat);
-
-		ar >> m_Node;
-
-		FEModel& fem = *ar.GetFEModel();
-		int n, mat, nid;
-		for (size_t i=0; i<m_Elem.size(); ++i)
+		if (ar.IsSaving())
 		{
-			FESolidElement& el = m_Elem[i];
-			ar >> n;
+			ar << m_Node;
 
-			el.SetType(n);
-
-			ar >> mat; el.SetMatID(mat);
-			ar >> nid; el.SetID(nid);
-			ar >> el.m_node;
-			ar >> el.m_lnode;
-
-			for (int j=0; j<el.GaussPoints(); ++j)
+			for (size_t i=0; i<m_Elem.size(); ++i)
 			{
-				el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
-				el.GetMaterialPoint(j)->Serialize(ar);
+				FESolidElement& el = m_Elem[i];
+				int nmat = el.GetMatID();
+				ar << el.Type();
+			
+				ar << nmat;
+				ar << el.GetID();
+				ar << el.m_node;
+				ar << el.m_lnode;
+
+				for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
+			}
+		}
+		else
+		{
+			FEMaterial* pmat = GetMaterial();
+			assert(pmat);
+
+			ar >> m_Node;
+
+			FEModel& fem = ar.GetFEModel();
+			int n, mat, nid;
+			for (size_t i=0; i<m_Elem.size(); ++i)
+			{
+				FESolidElement& el = m_Elem[i];
+				ar >> n;
+
+				el.SetType(n);
+
+				ar >> mat; el.SetMatID(mat);
+				ar >> nid; el.SetID(nid);
+				ar >> el.m_node;
+				ar >> el.m_lnode;
+
+				for (int j=0; j<el.GaussPoints(); ++j)
+				{
+					el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+					el.GetMaterialPoint(j)->Serialize(ar);
+				}
 			}
 		}
 	}

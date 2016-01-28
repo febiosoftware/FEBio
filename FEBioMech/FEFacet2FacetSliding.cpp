@@ -142,85 +142,85 @@ double FEFacetSlidingSurface::GetContactArea()
 }
 
 //-----------------------------------------------------------------------------
-//! \todo Originally, we only copied Lmd, gap, Ln and reset pme to zero.
-//!       Need to check if this achieves the same
-void FEFacetSlidingSurface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		for (int i=0; i<(int) m_Data.size(); ++i)
-		{
-			vector<Data>& di = m_Data[i];
-			int nint = (int) di.size();
-			for (int j=0; j<nint; ++j)
-			{
-				Data& d = di[j];
-				dmp << d.m_gap;
-				dmp << d.m_nu;
-				dmp << d.m_rs;
-				dmp << d.m_Lm;
-				dmp << d.m_eps;
-				dmp << d.m_Ln;
-			}
-		}
-	}
-	else
-	{
-		for (int i=0; i<(int) m_Data.size(); ++i)
-		{
-			vector<Data>& di = m_Data[i];
-			int nint = (int) di.size();
-			for (int j=0; j<nint; ++j)
-			{
-				Data& d = di[j];
-				dmp >> d.m_gap;
-				dmp >> d.m_nu;
-				dmp >> d.m_rs;
-				dmp >> d.m_Lm;
-				dmp >> d.m_eps;
-				dmp >> d.m_Ln;
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEFacetSlidingSurface::Serialize(DumpFile& ar)
+void FEFacetSlidingSurface::Serialize(DumpStream& ar)
 {
 	FEContactSurface::Serialize(ar);
-	if (ar.IsSaving())
+
+	if (ar.IsShallow())
 	{
-		for (int i=0; i<(int) m_Data.size(); ++i)
+		if (ar.IsSaving())
 		{
-			vector<Data>& di = m_Data[i];
-			int nint = (int) di.size();
-			for (int j=0; j<nint; ++j)
+			for (int i=0; i<(int) m_Data.size(); ++i)
 			{
-				Data& d = di[j];
-				ar << d.m_gap;
-				ar << d.m_nu;
-				ar << d.m_rs;
-				ar << d.m_Lm;
-				ar << d.m_eps;
-				ar << d.m_Ln;
+				vector<Data>& di = m_Data[i];
+				int nint = (int) di.size();
+				for (int j=0; j<nint; ++j)
+				{
+					Data& d = di[j];
+					ar << d.m_gap;
+					ar << d.m_nu;
+					ar << d.m_rs;
+					ar << d.m_Lm;
+					ar << d.m_eps;
+					ar << d.m_Ln;
+				}
 			}
 		}
+		else
+		{
+			for (int i=0; i<(int) m_Data.size(); ++i)
+			{
+				vector<Data>& di = m_Data[i];
+				int nint = (int) di.size();
+				for (int j=0; j<nint; ++j)
+				{
+					Data& d = di[j];
+					ar >> d.m_gap;
+					ar >> d.m_nu;
+					ar >> d.m_rs;
+					ar >> d.m_Lm;
+					ar >> d.m_eps;
+					ar >> d.m_Ln;
+				}
+			}
+		}	
 	}
 	else
 	{
-		for (int i=0; i<(int) m_Data.size(); ++i)
+		if (ar.IsSaving())
 		{
-			vector<Data>& di = m_Data[i];
-			int nint = (int) di.size();
-			for (int j=0; j<nint; ++j)
+			for (int i=0; i<(int) m_Data.size(); ++i)
 			{
-				Data& d = di[j];
-				ar >> d.m_gap;
-				ar >> d.m_nu;
-				ar >> d.m_rs;
-				ar >> d.m_Lm;
-				ar >> d.m_eps;
-				ar >> d.m_Ln;
+				vector<Data>& di = m_Data[i];
+				int nint = (int) di.size();
+				for (int j=0; j<nint; ++j)
+				{
+					Data& d = di[j];
+					ar << d.m_gap;
+					ar << d.m_nu;
+					ar << d.m_rs;
+					ar << d.m_Lm;
+					ar << d.m_eps;
+					ar << d.m_Ln;
+				}
+			}
+		}
+		else
+		{
+			for (int i=0; i<(int) m_Data.size(); ++i)
+			{
+				vector<Data>& di = m_Data[i];
+				int nint = (int) di.size();
+				for (int j=0; j<nint; ++j)
+				{
+					Data& d = di[j];
+					ar >> d.m_gap;
+					ar >> d.m_nu;
+					ar >> d.m_rs;
+					ar >> d.m_Lm;
+					ar >> d.m_eps;
+					ar >> d.m_Ln;
+				}
 			}
 		}
 	}
@@ -625,13 +625,6 @@ void FEFacet2FacetSliding::Update(int niter)
 	UpdateContactPressures();
 
 	m_bfirst = false;
-}
-
-//-----------------------------------------------------------------------------
-void FEFacet2FacetSliding::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	m_ss.ShallowCopy(dmp, bsave);
-	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------
@@ -1297,7 +1290,7 @@ bool FEFacet2FacetSliding::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FEFacet2FacetSliding::Serialize(DumpFile &ar)
+void FEFacet2FacetSliding::Serialize(DumpStream &ar)
 {
 	// store contact data
 	FEContactInterface::Serialize(ar);

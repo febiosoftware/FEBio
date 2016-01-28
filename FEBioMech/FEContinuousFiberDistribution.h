@@ -24,7 +24,7 @@ public:
     bool Init();
 
 	// serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public:
 	//! calculate stress at material point

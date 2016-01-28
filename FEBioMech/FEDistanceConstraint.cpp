@@ -233,20 +233,16 @@ void FEDistanceConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 }
 
 //-----------------------------------------------------------------------------
-void FEDistanceConstraint::Serialize(DumpFile& ar)
+void FEDistanceConstraint::Serialize(DumpStream& ar)
 {
-}
-
-//-----------------------------------------------------------------------------
-void FEDistanceConstraint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
+	FENLConstraint::Serialize(ar);
+	if (ar.IsSaving())
 	{
-		dmp << m_Lm; 
+		ar << m_Lm; 
 	}
 	else
 	{
-		dmp >> m_Lm;
+		ar >> m_Lm;
 	}
 }
 

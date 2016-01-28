@@ -320,7 +320,7 @@ bool FELinearSolver::CreateStiffness()
 }
 
 //-----------------------------------------------------------------------------
-void FELinearSolver::Serialize(DumpFile& ar)
+void FELinearSolver::Serialize(DumpStream& ar)
 {
 	FESolver::Serialize(ar);
 

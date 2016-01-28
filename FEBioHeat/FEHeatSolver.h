@@ -20,7 +20,7 @@ public:
 	bool Init();
 
 	//! serialize data
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 protected: // from FELinearSolver
 

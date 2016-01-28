@@ -25,7 +25,7 @@ bool FEEFDDonnanEquilibrium::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEEFDDonnanEquilibrium::Serialize(DumpFile& ar)
+void FEEFDDonnanEquilibrium::Serialize(DumpStream& ar)
 {
 	FEElasticMaterial::Serialize(ar);
 	m_Fib.Serialize(ar);

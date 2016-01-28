@@ -13,7 +13,7 @@
 #include "FECoreBase.h"
 #include "FEMaterialPoint.h"
 #include "FECoordSysMap.h"
-#include "DumpFile.h"
+#include "DumpStream.h"
 #include "FECoreKernel.h"
 #include <string.h>
 #include <stddef.h>
@@ -75,7 +75,7 @@ public: // these functions have to be implemented by derived classes
 	virtual FEParam* GetParameter(const ParamString& s) = 0;
 
 	//! serialize property data
-	virtual void Serialize(DumpFile& ar) = 0;
+	virtual void Serialize(DumpStream& ar) = 0;
 
 	//! initializatoin
 	virtual bool Init() = 0;
@@ -91,8 +91,8 @@ public: // these functions have to be implemented by derived classes
 
 protected:
 	//! some helper functions for reading, writing properties
-	void Write(DumpFile& ar, FEMaterial* pc);
-	FEMaterial* Read(DumpFile& ar);
+	void Write(DumpStream& ar, FEMaterial* pc);
+	FEMaterial* Read(DumpStream& ar);
 
 protected:
 	// This class should not be created directly
@@ -127,7 +127,7 @@ public:
 		return (m_pmp ? m_pmp->GetParameter(s) : 0); 
 	}
 
-	void Serialize(DumpFile& ar)
+	void Serialize(DumpStream& ar)
 	{
 		if (ar.IsSaving())
 		{
@@ -179,7 +179,7 @@ public:
 		return 0;
 	}
 
-	void Serialize(DumpFile& ar)
+	void Serialize(DumpStream& ar)
 	{
 		if (ar.IsSaving())
 		{
@@ -260,7 +260,7 @@ public:
 	void SetID(int nid) { m_nID = nid; }
 
 	//! Serialize material data to archive
-	virtual void Serialize(DumpFile& ar);
+	virtual void Serialize(DumpStream& ar);
 
 	//! Return elastic material \todo I need to move this function up the hierarchy once I redesign the material library
 	virtual FEElasticMaterial* GetElasticMaterial() { return 0; }

@@ -1,5 +1,4 @@
 #pragma once
-#include "DumpFile.h"
 #include "FEBoundaryCondition.h"
 #include "FESurfacePairInteraction.h"
 #include "FENLConstraint.h"
@@ -9,6 +8,7 @@
 class FEModel;
 class FESolver;
 class FEDomain;
+class DumpStream;
 
 namespace FECore {
 
@@ -42,7 +42,7 @@ public:
 	virtual void Deactivate();
 
 	//! Serialize data from and to a binary archive
-	virtual void Serialize(DumpFile& ar);
+	virtual void Serialize(DumpStream& ar);
 
 public:
 	FEModel& GetFEModel() { return m_fem; }

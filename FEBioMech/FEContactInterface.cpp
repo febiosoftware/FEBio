@@ -71,10 +71,10 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 }
 
 //-----------------------------------------------------------------------------
-void FEContactInterface::Serialize(DumpFile& ar)
+void FEContactInterface::Serialize(DumpStream& ar)
 {
 	// store base class
-	FEModelComponent::Serialize(ar);
+	FESurfacePairInteraction::Serialize(ar);
 
 	// save parameters
 	if (ar.IsSaving())

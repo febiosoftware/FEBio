@@ -24,7 +24,7 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationGauss, FEFiberIntegrationScheme)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-void FEFiberIntegrationGauss::Serialize(DumpFile& ar)
+void FEFiberIntegrationGauss::Serialize(DumpStream& ar)
 {
 	FEFiberIntegrationScheme::Serialize(ar);
 	if (ar.IsSaving())

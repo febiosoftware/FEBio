@@ -167,26 +167,6 @@ bool FESlidingSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		dmp << m_Lm;
-		dmp << m_gap;
-		dmp << m_Lt;
-		dmp << m_Ln;
-	}
-	else
-	{
-		zero(m_pme);
-		dmp >> m_Lm;
-		dmp >> m_gap;
-		dmp >> m_Lt;
-		dmp >> m_Ln;
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! 
 vec3d FESlidingSurface::traction(int inode)
 {
@@ -311,40 +291,61 @@ double FESlidingSurface::GetContactArea()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurface::Serialize(DumpFile& ar)
+void FESlidingSurface::Serialize(DumpStream& ar)
 {
 	FEContactSurface::Serialize(ar);
-	if (ar.IsSaving())
+	if (ar.IsShallow())
 	{
-		ar << m_gap;
-		ar << m_nu;
-		ar << m_rs;
-		ar << m_rsp;
-		ar << m_Lm;
-		ar << m_M;
-		ar << m_Lt;
-		ar << m_off;
-		ar << m_eps;
-		ar << m_Ln;
+		if (ar.IsSaving())
+		{
+			ar << m_Lm;
+			ar << m_gap;
+			ar << m_Lt;
+			ar << m_Ln;
+		}
+		else
+		{
+			zero(m_pme);
+			ar >> m_Lm;
+			ar >> m_gap;
+			ar >> m_Lt;
+			ar >> m_Ln;
+		}
 	}
 	else
 	{
-		// read the contact data
-		// Note that we do this after Init() (called in FESurface::Serialize) since this data gets 
-		// initialized to zero there
-		ar >> m_gap;
-		ar >> m_nu;
-		ar >> m_rs;
-		ar >> m_rsp;
-		ar >> m_Lm;
-		ar >> m_M;
-		ar >> m_Lt;
-		ar >> m_off;
-		ar >> m_eps;
-		ar >> m_Ln;
+		if (ar.IsSaving())
+		{
+			ar << m_gap;
+			ar << m_nu;
+			ar << m_rs;
+			ar << m_rsp;
+			ar << m_Lm;
+			ar << m_M;
+			ar << m_Lt;
+			ar << m_off;
+			ar << m_eps;
+			ar << m_Ln;
+		}
+		else
+		{
+			// read the contact data
+			// Note that we do this after Init() (called in FESurface::Serialize) since this data gets 
+			// initialized to zero there
+			ar >> m_gap;
+			ar >> m_nu;
+			ar >> m_rs;
+			ar >> m_rsp;
+			ar >> m_Lm;
+			ar >> m_M;
+			ar >> m_Lt;
+			ar >> m_off;
+			ar >> m_eps;
+			ar >> m_Ln;
 
-		// add surface to mesh
-		GetMesh()->AddSurface(this);
+			// add surface to mesh
+			GetMesh()->AddSurface(this);
+		}
 	}
 }
 
@@ -1875,14 +1876,7 @@ void FESlidingInterface::UpdateContactPressures()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	m_ss.ShallowCopy(dmp, bsave);
-	m_ms.ShallowCopy(dmp, bsave);
-}
-
-//-----------------------------------------------------------------------------
-void FESlidingInterface::Serialize(DumpFile& ar)
+void FESlidingInterface::Serialize(DumpStream& ar)
 {
 	// store contact data
 	FEContactInterface::Serialize(ar);
@@ -1890,5 +1884,4 @@ void FESlidingInterface::Serialize(DumpFile& ar)
 	// store contact surface data
 	m_ms.Serialize(ar);
 	m_ss.Serialize(ar);
-
 }

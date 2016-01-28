@@ -14,8 +14,7 @@ public:
 	void Residual(FEGlobalVector& R, const FETimePoint& tp);
 	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
 	bool Augment(int naug, const FETimePoint& tp);
-	void Serialize(DumpFile& ar);
-	void ShallowCopy(DumpStream& dmp, bool bsave);
+	void Serialize(DumpStream& ar);
 
 	//! build connectivity for matrix profile
 	void BuildMatrixProfile(FEGlobalMatrix& M);

@@ -23,9 +23,6 @@ public:
 	//! get the material's density
 	double Density() { return m_rho; }
 
-	//! serialization
-	void Serialize(DumpFile& ar);
-
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

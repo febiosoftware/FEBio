@@ -2,7 +2,6 @@
 
 #include "FECore/vector.h"
 #include "FECore/matrix.h"
-#include "FECore/DumpFile.h"
 #include "FECore/FENLConstraint.h"
 #include <list>
 using namespace std;
@@ -32,7 +31,7 @@ public:
 	FEAugLagLinearConstraint() { m_lam = 0; }
 
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public:
 	list<DOF>	m_dof;	//!< list of participating dofs
@@ -53,10 +52,7 @@ public:
 
 public:
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
-
-	//! stream constraint data
-	void ShallowCopy(DumpStream& dmp, bool bsave);
+	void Serialize(DumpStream& ar);
 
 	//! add the linear constraint contributions to the residual
 	void Residual(FEGlobalVector& R, const FETimePoint& tp);

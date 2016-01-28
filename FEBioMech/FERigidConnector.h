@@ -31,7 +31,7 @@ public:
 	void BuildMatrixProfile(FEGlobalMatrix& M);
 
 	//! serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
     
 public:
     int	m_nRBa;		//!< rigid body A that the connector connects

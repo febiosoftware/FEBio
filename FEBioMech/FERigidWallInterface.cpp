@@ -143,21 +143,7 @@ void FERigidWallSurface::UpdateNormals()
 }
 
 //-----------------------------------------------------------------------------
-void FERigidWallSurface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		dmp << m_Lm << m_gap << m_Lt;
-	}
-	else
-	{
-		dmp >> m_Lm >> m_gap >> m_Lt;
-		zero(m_pme);
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FERigidWallSurface::Serialize(DumpFile &ar)
+void FERigidWallSurface::Serialize(DumpStream &ar)
 {
 	FESurface::Serialize(ar);
 	if (ar.IsSaving())
@@ -183,6 +169,7 @@ void FERigidWallSurface::Serialize(DumpFile &ar)
 		ar >> m_Lt;
 		ar >> m_off;
 		ar >> m_eps;
+		zero(m_pme);
 	}
 }
 
@@ -219,12 +206,6 @@ FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(p
 	m_eps = 0;
 	m_atol = 0;
 };
-
-//-----------------------------------------------------------------------------
-void FERigidWallInterface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	m_ss.ShallowCopy(dmp, bsave);
-}
 
 //-----------------------------------------------------------------------------
 //! Initializes the rigid wall interface data
@@ -654,66 +635,60 @@ bool FERigidWallInterface::Augment(int naug)
 
 //-----------------------------------------------------------------------------
 
-void FERigidWallInterface::Serialize(DumpFile &ar)
+void FERigidWallInterface::Serialize(DumpStream &ar)
 {
 	FEContactInterface::Serialize(ar);
+	m_ss.Serialize(ar);
 
-	if (ar.IsSaving())
+	if (ar.IsShallow() == false)
 	{
-		ar << m_eps;
-		ar << m_atol;
-
-		m_ss.Serialize(ar);
-		
-		// plane data
-		if (dynamic_cast<FEPlane*>(m_mp))
+		if (ar.IsSaving())
 		{
-			FEPlane* pp = dynamic_cast<FEPlane*>(m_mp);
-			ar << FE_RIGID_PLANE;
-			ar << pp->m_nplc;
-			double* a = pp->GetEquation();
-			ar << a[0] << a[1] << a[2] << a[3];
-		}
-		else if (dynamic_cast<FERigidSphere*>(m_mp))
-		{
-			FERigidSphere* ps = dynamic_cast<FERigidSphere*>(m_mp);
-			ar << FE_RIGID_SPHERE;
-			ar << ps->m_rc;
-			ar << ps->m_R;
-		}
-	}
-	else
-	{
-		ar >> m_eps;
-		ar >> m_atol;
-
-		m_ss.Serialize(ar);
-
-		// plane data
-		int ntype;
-		ar >> ntype;
-		switch (ntype)
-		{
-		case FE_RIGID_PLANE:
+			// plane data
+			if (dynamic_cast<FEPlane*>(m_mp))
 			{
-				SetMasterSurface(new FEPlane(GetFEModel()));
-				FEPlane& pl = dynamic_cast<FEPlane&>(*m_mp);
-				ar >> pl.m_nplc;
-				if (pl.m_nplc >= 0) pl.m_pplc = GetFEModel()->GetLoadCurve(pl.m_nplc);
-				double* a = pl.GetEquation();
-				ar >> a[0] >> a[1] >> a[2] >> a[3];
+				FEPlane* pp = dynamic_cast<FEPlane*>(m_mp);
+				ar << FE_RIGID_PLANE;
+				ar << pp->m_nplc;
+				double* a = pp->GetEquation();
+				ar << a[0] << a[1] << a[2] << a[3];
 			}
-			break;
-		case FE_RIGID_SPHERE:
+			else if (dynamic_cast<FERigidSphere*>(m_mp))
 			{
-				SetMasterSurface(new FERigidSphere(GetFEModel()));
-				FERigidSphere& s = dynamic_cast<FERigidSphere&>(*m_mp);
-				ar >> s.m_rc;
-				ar >> s.m_R;
+				FERigidSphere* ps = dynamic_cast<FERigidSphere*>(m_mp);
+				ar << FE_RIGID_SPHERE;
+				ar << ps->m_rc;
+				ar << ps->m_R;
 			}
-			break;
-		default:
-			assert(false);
+		}
+		else
+		{
+			// plane data
+			int ntype;
+			ar >> ntype;
+			switch (ntype)
+			{
+			case FE_RIGID_PLANE:
+				{
+					SetMasterSurface(new FEPlane(GetFEModel()));
+					FEPlane& pl = dynamic_cast<FEPlane&>(*m_mp);
+					ar >> pl.m_nplc;
+					if (pl.m_nplc >= 0) pl.m_pplc = GetFEModel()->GetLoadCurve(pl.m_nplc);
+					double* a = pl.GetEquation();
+					ar >> a[0] >> a[1] >> a[2] >> a[3];
+				}
+				break;
+			case FE_RIGID_SPHERE:
+				{
+					SetMasterSurface(new FERigidSphere(GetFEModel()));
+					FERigidSphere& s = dynamic_cast<FERigidSphere&>(*m_mp);
+					ar >> s.m_rc;
+					ar >> s.m_R;
+				}
+				break;
+			default:
+				assert(false);
+			}
 		}
 	}
 }

@@ -123,7 +123,7 @@ void FECoupledHeatSolidSolver::Update(std::vector<double> &u)
 }
 
 //-----------------------------------------------------------------------------
-void FECoupledHeatSolidSolver::Serialize(DumpFile &ar)
+void FECoupledHeatSolidSolver::Serialize(DumpStream &ar)
 {
 	FESolver::Serialize(ar);
 	m_Heat.Serialize(ar);

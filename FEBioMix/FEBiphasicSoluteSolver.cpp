@@ -799,7 +799,7 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 //-----------------------------------------------------------------------------
 //! Save data to dump file
 
-void FEBiphasicSoluteSolver::Serialize(DumpFile& ar)
+void FEBiphasicSoluteSolver::Serialize(DumpStream& ar)
 {
     
 	if (ar.IsSaving())

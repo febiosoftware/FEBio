@@ -16,7 +16,7 @@ public:
 
 	bool Init();
 
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	double Value();
 
@@ -46,7 +46,7 @@ public:
 
 public:
 	//! serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! activation
 	void Activate();
@@ -80,7 +80,7 @@ public:
 
 	size_t Items() const { return m_item.size(); }
 
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	void Activate();
 

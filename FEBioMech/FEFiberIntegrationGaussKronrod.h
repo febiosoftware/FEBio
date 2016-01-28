@@ -31,7 +31,7 @@ public:
     void IntegratedFiberDensity(double& IFD);
 
 	// Serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
     
 public: // parameters
 	int             m_nph;	// number of gauss integration points along phi

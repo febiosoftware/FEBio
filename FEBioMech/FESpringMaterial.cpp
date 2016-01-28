@@ -79,7 +79,7 @@ double FENonLinearSpring::stiffness(double dl)
 	return m_F*m_plc->Deriv(dl);
 }
 
-void FENonLinearSpring::Serialize(DumpFile& ar)
+void FENonLinearSpring::Serialize(DumpStream& ar)
 {
 	FESpringMaterial::Serialize(ar);
 	if (ar.IsSaving())
@@ -89,7 +89,7 @@ void FENonLinearSpring::Serialize(DumpFile& ar)
 	else
 	{
 		ar >> m_F >> m_nlc;
-		m_plc = ar.GetFEModel()->GetLoadCurve(m_nlc);
+		m_plc = ar.GetFEModel().GetLoadCurve(m_nlc);
 	}
 }
 

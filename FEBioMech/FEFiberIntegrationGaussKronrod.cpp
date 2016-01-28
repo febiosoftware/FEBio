@@ -23,7 +23,7 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationGaussKronrod, FEFiberIntegrationScheme)
 	ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
 END_PARAMETER_LIST();
 
-void FEFiberIntegrationGaussKronrod::Serialize(DumpFile& ar)
+void FEFiberIntegrationGaussKronrod::Serialize(DumpStream& ar)
 {
 	FEFiberIntegrationScheme::Serialize(ar);
 	if (ar.IsSaving())

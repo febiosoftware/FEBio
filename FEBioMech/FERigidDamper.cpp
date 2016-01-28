@@ -71,23 +71,7 @@ bool FERigidDamper::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! create a shallow copy
-void FERigidDamper::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-    if (bsave)
-    {
-        dmp << m_qa0 << m_qb0;
-        dmp << m_F;
-    }
-    else
-    {
-        dmp >> m_qa0 >> m_qb0;
-        dmp >> m_F;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void FERigidDamper::Serialize(DumpFile& ar)
+void FERigidDamper::Serialize(DumpStream& ar)
 {
 	FERigidConnector::Serialize(ar);
     if (ar.IsSaving())

@@ -16,13 +16,10 @@ public:
 	//! copy data
 	void CopyFrom(FEPeriodicSurface& s);
 
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! calculates the center of mass of the surface
 	vec3d CenterOfMass();
 
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public:
 	void GetNodalContactGap     (int nface, double* pg);
@@ -58,9 +55,6 @@ public:
 	//! update
 	void Update(int niter);
 
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! calculate contact forces
 	void ContactForces(FEGlobalVector& R);
 
@@ -71,7 +65,7 @@ public:
 	bool Augment(int naug);
 
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! return the master and slave surface
 	FESurface* GetMasterSurface() { return &m_ms; }

@@ -127,7 +127,7 @@ bool FEHeatFlux::SetFacetAttribute(int nface, const char* szatt, const char* szv
 }
 
 //-----------------------------------------------------------------------------
-void FEHeatFlux::Serialize(DumpFile &ar)
+void FEHeatFlux::Serialize(DumpStream &ar)
 {
 	FESurfaceLoad::Serialize(ar);
 	

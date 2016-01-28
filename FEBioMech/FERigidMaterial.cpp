@@ -87,7 +87,7 @@ bool FERigidMaterial::Init()
 
 //-----------------------------------------------------------------------------
 //! Serialize data to or from the dump file
-void FERigidMaterial::Serialize(DumpFile &ar)
+void FERigidMaterial::Serialize(DumpStream &ar)
 {
 	// serialize base class parameters
 	FESolidMaterial::Serialize(ar);

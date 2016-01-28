@@ -6,7 +6,7 @@
 #include "FECoordSysMap.h"
 #include "FEMesh.h"
 #include "FEModel.h"
-#include "DumpFile.h"
+#include "DumpStream.h"
 #include "FEElement.h"
 
 //-----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ mat3d FELocalMap::LocalElementCoord(FEElement& el, int n)
 }
 
 //-----------------------------------------------------------------------------
-void FELocalMap::Serialize(DumpFile& ar)
+void FELocalMap::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -160,7 +160,7 @@ mat3d FESphericalMap::LocalElementCoord(FEElement& el, int n)
 }
 
 //-----------------------------------------------------------------------------
-void FESphericalMap::Serialize(DumpFile& ar)
+void FESphericalMap::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -244,7 +244,7 @@ mat3d FECylindricalMap::LocalElementCoord(FEElement& el, int n)
 }
 
 //-----------------------------------------------------------------------------
-void FECylindricalMap::Serialize(DumpFile& ar)
+void FECylindricalMap::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -347,7 +347,7 @@ mat3d FEPolarMap::LocalElementCoord(FEElement& el, int n)
 }
 
 //-----------------------------------------------------------------------------
-void FEPolarMap::Serialize(DumpFile& ar)
+void FEPolarMap::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -409,7 +409,7 @@ mat3d FEVectorMap::LocalElementCoord(FEElement& el, int n)
 }
 
 //-----------------------------------------------------------------------------
-void FEVectorMap::Serialize(DumpFile &ar)
+void FEVectorMap::Serialize(DumpStream &ar)
 {
 	if (ar.IsSaving())
 	{
@@ -486,7 +486,7 @@ mat3d FESphericalAngleMap::LocalElementCoord(FEElement& el, int n)
 }
 
 //-----------------------------------------------------------------------------
-void FESphericalAngleMap::Serialize(DumpFile &ar)
+void FESphericalAngleMap::Serialize(DumpStream &ar)
 {
 	if (ar.IsSaving())
 	{

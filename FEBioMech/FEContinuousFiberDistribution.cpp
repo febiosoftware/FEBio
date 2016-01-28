@@ -33,8 +33,10 @@ bool FEContinuousFiberDistribution::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEContinuousFiberDistribution::Serialize(DumpFile& ar)
+void FEContinuousFiberDistribution::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow()) return;
+
 	FEElasticMaterial::Serialize(ar);
 	if (ar.IsSaving() == false)
 	{

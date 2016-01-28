@@ -23,7 +23,7 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationGeodesic, FEFiberIntegrationScheme)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-void FEFiberIntegrationGeodesic::Serialize(DumpFile& ar)
+void FEFiberIntegrationGeodesic::Serialize(DumpStream& ar)
 {
 	FEFiberIntegrationScheme::Serialize(ar);
 	if (ar.IsSaving() == false)

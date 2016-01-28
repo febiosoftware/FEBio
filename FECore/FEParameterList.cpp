@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEParameterList.h"
 #include "FECoreKernel.h"
+#include "DumpStream.h"
 #include <cstring>
 #include <assert.h>
 
@@ -352,8 +353,10 @@ void FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, RANGE
 
 //-----------------------------------------------------------------------------
 // Serialize parameters to archive
-void FEParamContainer::Serialize(DumpFile& ar)
+void FEParamContainer::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow()) return;
+
 	if (ar.IsSaving())
 	{
 		int NP = 0;
@@ -416,7 +419,7 @@ void FEParamContainer::Serialize(DumpFile& ar)
 		if (NP)
 		{
 			FEParameterList& pl = GetParameterList();
-			if (NP != pl.Parameters()) throw DumpFile::ReadError();
+			if (NP != pl.Parameters()) throw DumpStream::ReadError();
 			list<FEParam>::iterator it = pl.first();
 			for (int i=0; i<NP; ++i)
 			{
@@ -427,8 +430,8 @@ void FEParamContainer::Serialize(DumpFile& ar)
 				int ntype, ndim;
 				ar >> ntype;
 				ar >> ndim;
-				if (ndim != p.m_ndim) throw DumpFile::ReadError();
-				if (ntype != p.m_itype) throw DumpFile::ReadError();
+				if (ndim != p.m_ndim) throw DumpStream::ReadError();
+				if (ntype != p.m_itype) throw DumpStream::ReadError();
 				if (p.m_ndim == 1)
 				{
 					switch (p.m_itype)

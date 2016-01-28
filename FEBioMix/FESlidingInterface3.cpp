@@ -301,160 +301,160 @@ vec3d FESlidingSurface3::GetFluidForce()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurface3::ShallowCopy(DumpStream& dmp, bool bsave)
+void FESlidingSurface3::Serialize(DumpStream& ar)
 {
-	// We need to store the m_bporo and m_bsolu flags first 
-	// since we need them before we initialize the surface data
-	if (bsave)
+	if (ar.IsShallow())
 	{
-		dmp << m_bporo;
-		dmp << m_bsolu;
-	}
-	else
-	{
-		dmp >> m_bporo;
-		dmp >> m_bsolu;
-	}
+		// We need to store the m_bporo and m_bsolu flags first 
+		// since we need them before we initialize the surface data
+		if (ar.IsSaving())
+		{
+			ar << m_bporo;
+			ar << m_bsolu;
+		}
+		else
+		{
+			ar >> m_bporo;
+			ar >> m_bsolu;
+		}
 	
-	// And finally, we serialize the surface data
-	if (bsave)
-	{
-		int N = (int) m_Data.size();
-		for (int i=0; i<N; ++i)
+		// And finally, we serialize the surface data
+		if (ar.IsSaving())
 		{
-			vector<Data>& di = m_Data[i];
-			for (int j=0; j<(int) di.size(); ++j)
+			int N = (int) m_Data.size();
+			for (int i=0; i<N; ++i)
 			{
-				Data& d = di[j];
-				dmp << d.m_gap;
-				dmp << d.m_nu;
-				dmp << d.m_rs;
-				dmp << d.m_Lmd;
-				dmp << d.m_Lmp;
-				dmp << d.m_Lmc;
-				dmp << d.m_epsn;
-				dmp << d.m_epsp;
-				dmp << d.m_epsc;
-				dmp << d.m_pg;
-				dmp << d.m_cg;
-				dmp << d.m_Ln;
+				vector<Data>& di = m_Data[i];
+				for (int j=0; j<(int) di.size(); ++j)
+				{
+					Data& d = di[j];
+					ar << d.m_gap;
+					ar << d.m_nu;
+					ar << d.m_rs;
+					ar << d.m_Lmd;
+					ar << d.m_Lmp;
+					ar << d.m_Lmc;
+					ar << d.m_epsn;
+					ar << d.m_epsp;
+					ar << d.m_epsc;
+					ar << d.m_pg;
+					ar << d.m_cg;
+					ar << d.m_Ln;
+				}
+			}
+			ar << m_nn;
+			ar << m_poro;
+			ar << m_solu;
+		}
+		else
+		{
+			int N = (int) m_Data.size();
+			for (int i=0; i<N; ++i)
+			{
+				vector<Data>& di = m_Data[i];
+				for (int j=0; j<(int) di.size(); ++j)
+				{
+					Data& d = di[j];
+					ar >> d.m_gap;
+					ar >> d.m_nu;
+					ar >> d.m_rs;
+					ar >> d.m_Lmd;
+					ar >> d.m_Lmp;
+					ar >> d.m_Lmc;
+					ar >> d.m_epsn;
+					ar >> d.m_epsp;
+					ar >> d.m_epsc;
+					ar >> d.m_pg;
+					ar >> d.m_cg;
+					ar >> d.m_Ln;
+				}
+			}
+			ar >> m_nn;
+			ar >> m_poro;
+			ar >> m_solu;
+
+			// reset element pointers
+			for (int i=0; i<Elements(); ++i)
+			{
+				vector<Data>& di = m_Data[i];
+				int n = (int) di.size();
+				for (int j=0; j<n; ++j) di[j].m_pme = 0;
 			}
 		}
-		dmp << m_nn;
-		dmp << m_poro;
-		dmp << m_solu;
 	}
 	else
 	{
-		int N = (int) m_Data.size();
-		for (int i=0; i<N; ++i)
+		// We need to store the m_bporo and m_bsolu flags first 
+		// since we need them before we initialize the surface data
+		if (ar.IsSaving())
 		{
-			vector<Data>& di = m_Data[i];
-			for (int j=0; j<(int) di.size(); ++j)
-			{
-				Data& d = di[j];
-				dmp >> d.m_gap;
-				dmp >> d.m_nu;
-				dmp >> d.m_rs;
-				dmp >> d.m_Lmd;
-				dmp >> d.m_Lmp;
-				dmp >> d.m_Lmc;
-				dmp >> d.m_epsn;
-				dmp >> d.m_epsp;
-				dmp >> d.m_epsc;
-				dmp >> d.m_pg;
-				dmp >> d.m_cg;
-				dmp >> d.m_Ln;
-			}
+			ar << m_bporo;
+			ar << m_bsolu;
 		}
-		dmp >> m_nn;
-		dmp >> m_poro;
-		dmp >> m_solu;
-
-		// reset element pointers
-		for (int i=0; i<Elements(); ++i)
+		else
 		{
-			vector<Data>& di = m_Data[i];
-			int n = (int) di.size();
-			for (int j=0; j<n; ++j) di[j].m_pme = 0;
+			ar >> m_bporo;
+			ar >> m_bsolu;
 		}
-	}
-}
-
-
-//-----------------------------------------------------------------------------
-void FESlidingSurface3::Serialize(DumpFile& ar)
-{
-	// We need to store the m_bporo and m_bsolu flags first 
-	// since we need them before we initialize the surface data
-	if (ar.IsSaving())
-	{
-		ar << m_bporo;
-		ar << m_bsolu;
-	}
-	else
-	{
-		ar >> m_bporo;
-		ar >> m_bsolu;
-	}
 	
-	// Next, we can serialize the base-class data
-	FEContactSurface::Serialize(ar);
+		// Next, we can serialize the base-class data
+		FEContactSurface::Serialize(ar);
 	
-	// And finally, we serialize the surface data
-	if (ar.IsSaving())
-	{
-		int N = (int) m_Data.size();
-		for (int i=0; i<N; ++i)
+		// And finally, we serialize the surface data
+		if (ar.IsSaving())
 		{
-			vector<Data>& di = m_Data[i];
-			for (int j=0; j<(int) di.size(); ++j)
+			int N = (int) m_Data.size();
+			for (int i=0; i<N; ++i)
 			{
-				Data& d = di[j];
-				ar << d.m_gap;
-				ar << d.m_nu;
-				ar << d.m_rs;
-				ar << d.m_Lmd;
-				ar << d.m_Lmp;
-				ar << d.m_Lmc;
-				ar << d.m_epsn;
-				ar << d.m_epsp;
-				ar << d.m_epsc;
-				ar << d.m_pg;
-				ar << d.m_cg;
-				ar << d.m_Ln;
+				vector<Data>& di = m_Data[i];
+				for (int j=0; j<(int) di.size(); ++j)
+				{
+					Data& d = di[j];
+					ar << d.m_gap;
+					ar << d.m_nu;
+					ar << d.m_rs;
+					ar << d.m_Lmd;
+					ar << d.m_Lmp;
+					ar << d.m_Lmc;
+					ar << d.m_epsn;
+					ar << d.m_epsp;
+					ar << d.m_epsc;
+					ar << d.m_pg;
+					ar << d.m_cg;
+					ar << d.m_Ln;
+				}
 			}
+			ar << m_nn;
+			ar << m_poro;
+			ar << m_solu;
 		}
-		ar << m_nn;
-		ar << m_poro;
-		ar << m_solu;
-	}
-	else
-	{
-		int N = (int) m_Data.size();
-		for (int i=0; i<N; ++i)
+		else
 		{
-			vector<Data>& di = m_Data[i];
-			for (int j=0; j<(int) di.size(); ++j)
+			int N = (int) m_Data.size();
+			for (int i=0; i<N; ++i)
 			{
-				Data& d = di[j];
-				ar >> d.m_gap;
-				ar >> d.m_nu;
-				ar >> d.m_rs;
-				ar >> d.m_Lmd;
-				ar >> d.m_Lmp;
-				ar >> d.m_Lmc;
-				ar >> d.m_epsn;
-				ar >> d.m_epsp;
-				ar >> d.m_epsc;
-				ar >> d.m_pg;
-				ar >> d.m_cg;
-				ar >> d.m_Ln;
+				vector<Data>& di = m_Data[i];
+				for (int j=0; j<(int) di.size(); ++j)
+				{
+					Data& d = di[j];
+					ar >> d.m_gap;
+					ar >> d.m_nu;
+					ar >> d.m_rs;
+					ar >> d.m_Lmd;
+					ar >> d.m_Lmp;
+					ar >> d.m_Lmc;
+					ar >> d.m_epsn;
+					ar >> d.m_epsp;
+					ar >> d.m_epsc;
+					ar >> d.m_pg;
+					ar >> d.m_cg;
+					ar >> d.m_Ln;
+				}
 			}
+			ar >> m_nn;
+			ar >> m_poro;
+			ar >> m_solu;
 		}
-		ar >> m_nn;
-		ar >> m_poro;
-		ar >> m_solu;
 	}
 }
 
@@ -1267,13 +1267,6 @@ void FESlidingInterface3::Update(int niter)
 			}
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-void FESlidingInterface3::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	m_ss.ShallowCopy(dmp, bsave);
-	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------
@@ -2283,7 +2276,7 @@ bool FESlidingInterface3::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface3::Serialize(DumpFile &ar)
+void FESlidingInterface3::Serialize(DumpStream &ar)
 {
 	// store contact data
 	FEContactInterface::Serialize(ar);

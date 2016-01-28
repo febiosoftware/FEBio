@@ -44,7 +44,7 @@ FEProperty& FEProperty::SetName(const char* sz)
 const char* FEProperty::GetName() const { return m_szname; }
 
 //-----------------------------------------------------------------------------
-void FEProperty::Write(DumpFile& ar, FEMaterial* pc)
+void FEProperty::Write(DumpStream& ar, FEMaterial* pc)
 {
 	int nflag = (pc == 0 ? 0 : 1);
 	ar << nflag;
@@ -56,7 +56,7 @@ void FEProperty::Write(DumpFile& ar, FEMaterial* pc)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial* FEProperty::Read(DumpFile& ar)
+FEMaterial* FEProperty::Read(DumpStream& ar)
 {
 	int nflag = 0;
 	FEMaterial* pm = 0;
@@ -65,7 +65,7 @@ FEMaterial* FEProperty::Read(DumpFile& ar)
 	{
 		char sz[256];
 		ar >> sz;
-		pm = fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel());
+		pm = fecore_new<FEMaterial>(FEMATERIAL_ID, sz, &ar.GetFEModel());
 		pm->SetParent(GetParent());
 		pm->Serialize(ar);
 
@@ -279,8 +279,11 @@ FEParam* FEMaterial::GetParameter(const ParamString& s)
 
 //-----------------------------------------------------------------------------
 //! Store the material data to the archive
-void FEMaterial::Serialize(DumpFile &ar)
+void FEMaterial::Serialize(DumpStream &ar)
 {
+	// We don't need to serialize material data for shallow copies.
+	if (ar.IsShallow()) return;
+
 	// Save the material's parameters
 	FEParamContainer::Serialize(ar);
 
@@ -311,11 +314,11 @@ void FEMaterial::Serialize(DumpFile &ar)
 
 		if (nmap)
 		{
-			FEModel* pfem = ar.GetFEModel();
+			FEModel& pfem = ar.GetFEModel();
 
 			char sztype[64]={0};
 			ar >> sztype;
-			m_pmap = fecore_new<FECoordSysMap>(FECOORDSYSMAP_ID, sztype, pfem);
+			m_pmap = fecore_new<FECoordSysMap>(FECOORDSYSMAP_ID, sztype, &pfem);
 			m_pmap->Serialize(ar);
 		}
 	}

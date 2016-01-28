@@ -1,5 +1,7 @@
 #pragma once
 #include "FEModelComponent.h"
+#include <vector>
+using namespace std;
 
 //-----------------------------------------------------------------------------
 //! Base class for defining initial conditions.
@@ -25,7 +27,7 @@ public:
 
 	void SetDOF(int ndof) { m_dof = ndof; }
 
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	void Activate();
 
@@ -51,7 +53,7 @@ public:
 
 	void SetDOF(int d0, int d1, int d2) { m_dof[0] = d0; m_dof[1] = d1; m_dof[2] = d2; }
 
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	void Activate();
 

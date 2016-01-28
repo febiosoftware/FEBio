@@ -17,7 +17,6 @@
 class FEModel;
 class FEMesh;
 class FEElement;
-class DumpFile;
 
 //-----------------------------------------------------------------------------
 //! The FECoordSysMap class is used to create local coordinate systems.
@@ -35,7 +34,7 @@ public:
 	virtual mat3d LocalElementCoord(FEElement& el, int n) = 0;
 
 	//! serialization
-	virtual void Serialize(DumpFile& ar) = 0;
+	virtual void Serialize(DumpStream& ar) = 0;
 
 public:
 	FEModel* GetFEModel() { return m_pfem; }
@@ -57,7 +56,7 @@ public:
 
 	mat3d LocalElementCoord(FEElement& el, int n);
 
-	virtual void Serialize(DumpFile& ar);
+	virtual void Serialize(DumpStream& ar);
 
 public:
 	int			m_n[3];	// local element nodes
@@ -79,7 +78,7 @@ public:
 
 	mat3d LocalElementCoord(FEElement& el, int n);
 
-	virtual void Serialize(DumpFile& ar);
+	virtual void Serialize(DumpStream& ar);
 
 public:
 	vec3d		m_c;	// center of map
@@ -106,7 +105,7 @@ public:
 
 	mat3d LocalElementCoord(FEElement& el, int n);
 
-	virtual void Serialize(DumpFile& ar);
+	virtual void Serialize(DumpStream& ar);
 
 public:
 	vec3d		m_c;	// center of map
@@ -138,7 +137,7 @@ public:
 
 	mat3d LocalElementCoord(FEElement& el, int n);
 
-	virtual void Serialize(DumpFile& ar);
+	virtual void Serialize(DumpStream& ar);
 
 public:
 	vec3d		m_c;		// center of map
@@ -163,7 +162,7 @@ public:
 
 	mat3d LocalElementCoord(FEElement& el, int n);
 
-	virtual void Serialize(DumpFile& ar);
+	virtual void Serialize(DumpStream& ar);
 
 public:
 	vec3d	m_a, m_d;
@@ -183,7 +182,7 @@ public:
 
 	mat3d LocalElementCoord(FEElement& el, int n);
 
-	virtual void Serialize(DumpFile& ar);
+	virtual void Serialize(DumpStream& ar);
 
 public:
 	double	m_theta;

@@ -32,76 +32,82 @@ FERigidBody* FERigidSystem::Object(int i)
 //! delete all rigid bodies
 void FERigidSystem::Clear()
 {
-	int i;
-	for (i=0; i<m_RDC.size(); ++i) delete m_RDC[i]; m_RDC.clear();
-	for (i=0; i<m_RBV.size(); ++i) delete m_RBV[i]; m_RBV.clear();
-	for (i=0; i<m_RBW.size(); ++i) delete m_RBW[i]; m_RBW.clear();
-	for (i=0; i<m_RN.size (); ++i) delete m_RN [i]; m_RN.clear ();
+	for (int i=0; i<(int)m_RDC.size(); ++i) delete m_RDC[i]; m_RDC.clear();
+	for (int i=0; i<(int)m_RBV.size(); ++i) delete m_RBV[i]; m_RBV.clear();
+	for (int i=0; i<(int)m_RBW.size(); ++i) delete m_RBW[i]; m_RBW.clear();
+	for (int i=0; i<(int)m_RN.size (); ++i) delete m_RN [i]; m_RN.clear ();
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSystem::Serialize(DumpFile& ar)
+void FERigidSystem::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
+	if (ar.IsShallow())
 	{
-		// rigid nodes
-		ar << (int) m_RN.size();
-		for (int i=0; i<(int) m_RN.size(); ++i)
-		{
-			FERigidNode& rn = *m_RN[i];
-			rn.Serialize(ar);
-		}
-
-		// fixed rigid body dofs
-		ar << (int) m_RBC.size();
-		for (int i=0; i<(int) m_RBC.size(); ++i)
-		{
-			FERigidBodyFixedBC& bc = *m_RBC[i];
-			bc.Serialize(ar);
-		}
-
-		// rigid body displacements
-		ar << (int) m_RDC.size();
-		for (int i=0; i<(int) m_RDC.size(); ++i)
-		{
-			FERigidBodyDisplacement& dc = *m_RDC[i];
-			dc.Serialize(ar);
-		}
+		for (int i=0; i<(int) m_RB.size(); ++i) m_RB[i]->Serialize(ar);
 	}
 	else
 	{
-		// rigid nodes
-		int n = 0;
-		ar >> n;
-		m_RN.clear();
-		for (int i=0; i<n; ++i)
+		if (ar.IsSaving())
 		{
-			FERigidNode* prn = new FERigidNode(&m_fem);
-			prn->Serialize(ar);
-			if (prn->IsActive()) prn->Activate(); else prn->Deactivate();
-			m_RN.push_back(prn);
-		}
+			// rigid nodes
+			ar << (int) m_RN.size();
+			for (int i=0; i<(int) m_RN.size(); ++i)
+			{
+				FERigidNode& rn = *m_RN[i];
+				rn.Serialize(ar);
+			}
 
-		// fixed rigid body dofs
-		ar >> n;
-		m_RBC.clear();
-		for (int i=0; i<n; ++i)
-		{
-			FERigidBodyFixedBC* pbc = new FERigidBodyFixedBC(&m_fem);
-			pbc->Serialize(ar);
-			if (pbc->IsActive()) pbc->Activate(); else pbc->Deactivate();
-			m_RBC.push_back(pbc);
-		}
+			// fixed rigid body dofs
+			ar << (int) m_RBC.size();
+			for (int i=0; i<(int) m_RBC.size(); ++i)
+			{
+				FERigidBodyFixedBC& bc = *m_RBC[i];
+				bc.Serialize(ar);
+			}
 
-		// rigid body displacements
-		ar >> n;
-		m_RDC.clear();
-		for (int i=0; i<n; ++i)
+			// rigid body displacements
+			ar << (int) m_RDC.size();
+			for (int i=0; i<(int) m_RDC.size(); ++i)
+			{
+				FERigidBodyDisplacement& dc = *m_RDC[i];
+				dc.Serialize(ar);
+			}
+		}
+		else
 		{
-			FERigidBodyDisplacement* pdc = new FERigidBodyDisplacement(&m_fem);
-			pdc->Serialize(ar);
-			if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
-			m_RDC.push_back(pdc);
+			// rigid nodes
+			int n = 0;
+			ar >> n;
+			m_RN.clear();
+			for (int i=0; i<n; ++i)
+			{
+				FERigidNode* prn = new FERigidNode(&m_fem);
+				prn->Serialize(ar);
+				if (prn->IsActive()) prn->Activate(); else prn->Deactivate();
+				m_RN.push_back(prn);
+			}
+
+			// fixed rigid body dofs
+			ar >> n;
+			m_RBC.clear();
+			for (int i=0; i<n; ++i)
+			{
+				FERigidBodyFixedBC* pbc = new FERigidBodyFixedBC(&m_fem);
+				pbc->Serialize(ar);
+				if (pbc->IsActive()) pbc->Activate(); else pbc->Deactivate();
+				m_RBC.push_back(pbc);
+			}
+
+			// rigid body displacements
+			ar >> n;
+			m_RDC.clear();
+			for (int i=0; i<n; ++i)
+			{
+				FERigidBodyDisplacement* pdc = new FERigidBodyDisplacement(&m_fem);
+				pdc->Serialize(ar);
+				if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
+				m_RDC.push_back(pdc);
+			}
 		}
 	}
 }
@@ -387,13 +393,6 @@ bool FERigidSystem::Reset()
 	int nrb = m_RB.size();
 	for (int i=0; i<nrb; ++i) m_RB[i]->Reset();
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Copy some data to the dump stream for running restarts
-void FERigidSystem::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	for (int i=0; i<(int) m_RB.size(); ++i) m_RB[i]->ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------

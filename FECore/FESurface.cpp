@@ -1466,8 +1466,10 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 }
 
 //-----------------------------------------------------------------------------
-void FESurface::Serialize(DumpFile &ar)
+void FESurface::Serialize(DumpStream &ar)
 {
+	if (ar.IsShallow()) return;
+
 	if (ar.IsSaving())
 	{
 		int ne = Elements();

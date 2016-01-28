@@ -37,29 +37,19 @@ public:
 		if (m_pNext) m_pNext->Init(bflag);
 	}
 
-	void ShallowCopy(DumpStream& dmp, bool bsave)
-	{
-		if (bsave)
-		{
-			dmp << e0 << e1 << sn;
-			dmp << Y0 << Y1 << b;
-		}
-		else
-		{
-			dmp >> e0 >> e1 >> sn;
-			dmp >> Y0 >> Y1 >> b;
-		}
-		if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
-	}
-
-	void Serialize(DumpFile& ar)
+	void Serialize(DumpStream& ar)
 	{
 		if (ar.IsSaving())
 		{
+			ar << e0 << e1 << sn;
+			ar << Y0 << Y1 << b;
 		}
 		else
 		{
+			ar >> e0 >> e1 >> sn;
+			ar >> Y0 >> Y1 >> b;
 		}
+		FEMaterialPoint::Serialize(ar);
 	}
 
 public:

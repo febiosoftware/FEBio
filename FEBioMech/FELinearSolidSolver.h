@@ -21,7 +21,7 @@ public:
 	bool Quasin(double time);
 
 	//! Data serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 protected:
 	//! calculate the residual

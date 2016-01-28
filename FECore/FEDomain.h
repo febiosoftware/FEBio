@@ -1,8 +1,6 @@
 #pragma once
 
 #include "FEElement.h"
-#include "DumpFile.h"
-#include "DumpStream.h"
 #include "FE_enum.h"
 #include "FESolver.h"
 #include "FEGlobalVector.h"
@@ -92,9 +90,6 @@ public: // optional functions to overload
 
 	//! create a copy of this domain
 	virtual void CopyFrom(FEDomain* pd);
-
-	//! stream domain data
-	virtual void ShallowCopy(DumpStream& dmp, bool bsave) {}
 
 	//! initialize domain
 	virtual bool Initialize(FEModel& fem);

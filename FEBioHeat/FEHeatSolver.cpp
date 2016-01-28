@@ -234,7 +234,7 @@ void FEHeatSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& k
 //! Serializes data to the archive.
 //! Still need to implement this.
 //!
-void FEHeatSolver::Serialize(DumpFile &ar)
+void FEHeatSolver::Serialize(DumpStream &ar)
 {
 	FELinearSolver::Serialize(ar);
 

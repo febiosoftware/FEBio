@@ -55,10 +55,8 @@ public:
 	void AddMaterialPoint(FEMaterialPoint* pt);
 		
 	//! data serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-		
 	void Init(bool bflag);
 		
     FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }

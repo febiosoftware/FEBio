@@ -24,9 +24,6 @@ public:
 	//! Initializes data structures
 	bool Init();
 
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! Calculate the total traction at a node
 	vec3d traction(int inode);
 
@@ -37,7 +34,7 @@ public:
 	double GetContactArea();
     
 	//! Serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public:
 	void GetNodalContactGap     (int nface, double* pg);
@@ -86,9 +83,6 @@ public:
 	//! projects slave nodes onto master nodes
 	void ProjectSurface(FESlidingSurface& ss, FESlidingSurface& ms, bool bupseg, bool bmove = false);
 
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! calculate penalty value
 	double Penalty() { return m_eps; }
 
@@ -102,7 +96,7 @@ public:
 	virtual bool Augment(int naug);
 
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! calculate contact pressures for file output
 	void UpdateContactPressures();

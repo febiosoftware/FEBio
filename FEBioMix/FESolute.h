@@ -124,7 +124,7 @@ public:
 	FESoluteData(FEModel* pfem);
 
 	//! Serialize solute data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! Set the attribute
 	bool SetAttribute(const char* szname, const char* szval);
@@ -160,7 +160,7 @@ public:
 	int ChargeNumber() { return m_z; }
 	
 	//! Serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! set solute ID
 	void SetSoluteID(const int ID) {m_ID = ID;}
@@ -204,7 +204,7 @@ public:
 	FESBMData(FEModel* pfem);
 
 	//! Serialize solute data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! Set the attribute
 	bool SetAttribute(const char* szname, const char* szval);
@@ -240,7 +240,7 @@ public:
 	int ChargeNumber() { return m_z; }
 	
 	//! Serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 	
 	//! set solute ID
 	void SetSBMID(const int ID) {m_ID = ID;}

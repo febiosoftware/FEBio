@@ -23,7 +23,7 @@ public:
 
 	void Init(bool bflag);
 
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public:
 	double	m_kf;

@@ -35,7 +35,7 @@ public:
     void IntegratedFiberDensity(double& IFD);
 
 	// serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 protected:
 	void InitIntegrationRule();  

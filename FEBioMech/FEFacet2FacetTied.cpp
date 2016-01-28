@@ -50,73 +50,72 @@ bool FEFacetTiedSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! \todo Originally, we only copied Lmd, gap, Ln and reset pme to zero.
-//!       Need to check if this achieves the same
-void FEFacetTiedSurface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		for (int i=0; i<(int) m_Data.size(); ++i)
-		{
-			vector<Data>& di = m_Data[i];
-			int nint = (int) di.size();
-			for (int j=0; j<nint; ++j)
-			{
-				Data& d = di[j];
-				dmp << d.m_gap;
-				dmp << d.m_rs;
-				dmp << d.m_Lm;
-			}
-		}
-	}
-	else
-	{
-		for (int i=0; i<(int) m_Data.size(); ++i)
-		{
-			vector<Data>& di = m_Data[i];
-			int nint = (int) di.size();
-			for (int j=0; j<nint; ++j)
-			{
-				Data& d = di[j];
-				dmp >> d.m_gap;
-				dmp >> d.m_rs;
-				dmp >> d.m_Lm;
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEFacetTiedSurface::Serialize(DumpFile &ar)
+void FEFacetTiedSurface::Serialize(DumpStream &ar)
 {
 	FEContactSurface::Serialize(ar);
-	if (ar.IsSaving())
+	if (ar.IsShallow())
 	{
-		for (int i=0; i<(int) m_Data.size(); ++i)
+		if (ar.IsSaving())
 		{
-			vector<Data>& di = m_Data[i];
-			int nint = (int) di.size();
-			for (int j=0; j<nint; ++j)
+			for (int i=0; i<(int) m_Data.size(); ++i)
 			{
-				Data& d = di[j];
-				ar << d.m_gap;
-				ar << d.m_rs;
-				ar << d.m_Lm;
+				vector<Data>& di = m_Data[i];
+				int nint = (int) di.size();
+				for (int j=0; j<nint; ++j)
+				{
+					Data& d = di[j];
+					ar << d.m_gap;
+					ar << d.m_rs;
+					ar << d.m_Lm;
+				}
+			}
+		}
+		else
+		{
+			for (int i=0; i<(int) m_Data.size(); ++i)
+			{
+				vector<Data>& di = m_Data[i];
+				int nint = (int) di.size();
+				for (int j=0; j<nint; ++j)
+				{
+					Data& d = di[j];
+					ar >> d.m_gap;
+					ar >> d.m_rs;
+					ar >> d.m_Lm;
+				}
 			}
 		}
 	}
 	else
 	{
-		for (int i=0; i<(int) m_Data.size(); ++i)
+		if (ar.IsSaving())
 		{
-			vector<Data>& di = m_Data[i];
-			int nint = (int) di.size();
-			for (int j=0; j<nint; ++j)
+			for (int i=0; i<(int) m_Data.size(); ++i)
 			{
-				Data& d = di[j];
-				ar >> d.m_gap;
-				ar >> d.m_rs;
-				ar >> d.m_Lm;
+				vector<Data>& di = m_Data[i];
+				int nint = (int) di.size();
+				for (int j=0; j<nint; ++j)
+				{
+					Data& d = di[j];
+					ar << d.m_gap;
+					ar << d.m_rs;
+					ar << d.m_Lm;
+				}
+			}
+		}
+		else
+		{
+			for (int i=0; i<(int) m_Data.size(); ++i)
+			{
+				vector<Data>& di = m_Data[i];
+				int nint = (int) di.size();
+				for (int j=0; j<nint; ++j)
+				{
+					Data& d = di[j];
+					ar >> d.m_gap;
+					ar >> d.m_rs;
+					ar >> d.m_Lm;
+				}
 			}
 		}
 	}
@@ -217,13 +216,6 @@ bool FEFacet2FacetTied::Init()
 	if (m_ms.Init() == false) return false;
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEFacet2FacetTied::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	m_ss.ShallowCopy(dmp, bsave);
-	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------
@@ -650,7 +642,7 @@ bool FEFacet2FacetTied::Augment(int naug)
 
 //-----------------------------------------------------------------------------
 //! Serialize the data to the archive.
-void FEFacet2FacetTied::Serialize(DumpFile &ar)
+void FEFacet2FacetTied::Serialize(DumpStream &ar)
 {
 	// store contact data
 	FEContactInterface::Serialize(ar);

@@ -36,9 +36,6 @@ public:
 	//! projects slave nodes onto master nodes
 	void ProjectSurface(FETiedContactSurface& ss, FETiedContactSurface& ms, bool bmove = false);
 
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! calculate contact forces
 	virtual void ContactForces(FEGlobalVector& R);
 
@@ -49,7 +46,7 @@ public:
 	virtual bool Augment(int naug);
 
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! return the master and slave surface
 	FESurface* GetMasterSurface() { return &ms; }

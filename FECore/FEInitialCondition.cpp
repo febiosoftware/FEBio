@@ -14,7 +14,7 @@ FEInitialBC::FEInitialBC(FEModel* pfem) : FEInitialCondition(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEInitialBC::Serialize(DumpFile& ar)
+void FEInitialBC::Serialize(DumpStream& ar)
 {
 	FEInitialCondition::Serialize(ar);
 	if (ar.IsSaving())
@@ -56,7 +56,7 @@ void FEInitialBC::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FEInitialBCVec3D::Serialize(DumpFile& ar)
+void FEInitialBCVec3D::Serialize(DumpStream& ar)
 {
 	FEInitialCondition::Serialize(ar);
 	if (ar.IsSaving())

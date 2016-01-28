@@ -11,7 +11,7 @@ public:
 	vec3d force(FEMaterialPoint& mp);
 	mat3ds stiffness(FEMaterialPoint& mp);
 
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	bool Init();
 	void Update();

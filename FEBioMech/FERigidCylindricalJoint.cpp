@@ -113,33 +113,7 @@ bool FERigidCylindricalJoint::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! create a shallow copy
-void FERigidCylindricalJoint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-    if (bsave)
-    {
-        dmp << m_q0 << m_qa0 << m_qb0;
-        dmp << m_F << m_L;
-        dmp << m_ea0[0] << m_ea0[1] << m_ea0[2];
-        dmp << m_eb0[0] << m_eb0[1] << m_eb0[2];
-        dmp << m_M << m_U;
-        dmp << m_dp << m_Fp;
-        dmp << m_qp << m_Mp;
-    }
-    else
-    {
-        dmp >> m_q0 >> m_qa0 >> m_qb0;
-        dmp >> m_F >> m_L;
-        dmp >> m_ea0[0] >> m_ea0[1] >> m_ea0[2];
-        dmp >> m_eb0[0] >> m_eb0[1] >> m_eb0[2];
-        dmp >> m_M >> m_U;
-        dmp >> m_dp >> m_Fp;
-        dmp >> m_qp >> m_Mp;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void FERigidCylindricalJoint::Serialize(DumpFile& ar)
+void FERigidCylindricalJoint::Serialize(DumpStream& ar)
 {
 	FERigidConnector::Serialize(ar);
     if (ar.IsSaving())

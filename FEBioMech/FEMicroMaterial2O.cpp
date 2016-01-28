@@ -60,8 +60,9 @@ FEMaterialPoint* FEMicroMaterialPoint2O::Copy()
 
 //-----------------------------------------------------------------------------
 //! serialize material point data
-void FEMicroMaterialPoint2O::Serialize(DumpFile& ar)
+void FEMicroMaterialPoint2O::Serialize(DumpStream& ar)
 {
+	FEMaterialPoint::Serialize(ar);
 	if (ar.IsSaving())
 	{
 		ar << m_Ca;
@@ -73,24 +74,6 @@ void FEMicroMaterialPoint2O::Serialize(DumpFile& ar)
 		ar >> m_Ca;
 		ar >> m_Da;
 		ar >> m_Ea;
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! stream material point data
-void FEMicroMaterialPoint2O::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		dmp << m_Ca;
-		dmp << m_Da;
-		dmp << m_Ea;
-	}
-	else
-	{
-		dmp >> m_Ca;
-		dmp >> m_Da;
-		dmp >> m_Ea;
 	}
 }
 

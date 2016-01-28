@@ -34,10 +34,8 @@ public:
     
 	void Init(bool bflag);
     
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-    
 public:
 	double		m_sed;		//!< strain energy density
 	double		m_dsed;		//!< derivative of strain energy density with mass density

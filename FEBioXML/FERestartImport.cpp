@@ -7,6 +7,7 @@
 #include "FECore/FESolver.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
+#include "FECore/DumpFile.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -51,7 +52,7 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 		tag.value(szar);
 
 		// open the archive
-		DumpFile ar(&fem);
+		DumpFile ar(fem);
 		if (ar.Open(szar) == false) return errf("FATAL ERROR: failed opening restart archive\n");
 
 		// read the archive

@@ -44,7 +44,7 @@ public: // overloaded from FESolver
 	void Clean();
 
 	//! serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! Solve an analysis step
 	bool SolveStep(double time);

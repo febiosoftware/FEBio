@@ -74,7 +74,7 @@ public:
 	void SetSoluteProductsCoefficients(int id, int vR) { m_solP.insert(std::pair<int, int>(id, vR)); }
 
 	//! Serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public:
     //! reset, initialize and update optional chemical reaction data in the FESolutesMaterialPoint

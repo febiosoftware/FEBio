@@ -69,22 +69,6 @@ bool FERigidJoint::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! create a shallow copy
-void FERigidJoint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		dmp << m_q0 << m_qa0 << m_qb0;
-		dmp << m_F << m_L;
-	}
-	else
-	{
-		dmp >> m_q0 >> m_qa0 >> m_qb0;
-		dmp >> m_F >> m_L;
-	}
-}
-
-//-----------------------------------------------------------------------------
 void FERigidJoint::BuildMatrixProfile(FEGlobalMatrix& M)
 {
 	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
@@ -314,7 +298,7 @@ bool FERigidJoint::Augment(int naug, const FETimePoint& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidJoint::Serialize(DumpFile& ar)
+void FERigidJoint::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{

@@ -36,7 +36,7 @@ public:
 	void Residual(FEGlobalVector& R);
 	
 	//! serialize data
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	void UnpackLM(FEElement& el, vector<int>& lm);
 

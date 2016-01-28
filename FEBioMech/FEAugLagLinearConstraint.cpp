@@ -4,7 +4,7 @@
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
-void FEAugLagLinearConstraint::Serialize(DumpFile& ar)
+void FEAugLagLinearConstraint::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -216,41 +216,42 @@ void FELinearConstraintSet::StiffnessMatrix(FESolver* psolver, const FETimePoint
 }
 
 //-----------------------------------------------------------------------------
-void FELinearConstraintSet::Serialize(DumpFile& ar)
+void FELinearConstraintSet::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
+	if (ar.IsShallow())
 	{
-		ar << m_tol << m_eps << m_naugmax << m_nID;
-		ar << (int) m_LC.size();
-		list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
-		for (int i=0; i<(int) m_LC.size(); ++i, ++it) (*it)->Serialize(ar);
-	}
-	else
-	{
-		ar >> m_tol >> m_eps >> m_naugmax >> m_nID;
-		int n;
-		ar >> n;
-		m_LC.clear();
-		for (int i=0; i<n; ++i)
+		if (ar.IsSaving())
 		{
-			FEAugLagLinearConstraint* plc = new FEAugLagLinearConstraint;
-			plc->Serialize(ar);
-			m_LC.push_back(plc);
+			list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
+			for (int i=0; i<(int) m_LC.size(); ++i, ++it) ar << (*it)->m_lam;
+		}
+		else
+		{
+			list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
+			for (int i=0; i<(int) m_LC.size(); ++i, ++it) ar >> (*it)->m_lam;
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-void FELinearConstraintSet::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
-		for (int i=0; i<(int) m_LC.size(); ++i, ++it) dmp << (*it)->m_lam;
-	}
 	else
 	{
-		list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
-		for (int i=0; i<(int) m_LC.size(); ++i, ++it) dmp >> (*it)->m_lam;
+		if (ar.IsSaving())
+		{
+			ar << m_tol << m_eps << m_naugmax << m_nID;
+			ar << (int) m_LC.size();
+			list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
+			for (int i=0; i<(int) m_LC.size(); ++i, ++it) (*it)->Serialize(ar);
+		}
+		else
+		{
+			ar >> m_tol >> m_eps >> m_naugmax >> m_nID;
+			int n;
+			ar >> n;
+			m_LC.clear();
+			for (int i=0; i<n; ++i)
+			{
+				FEAugLagLinearConstraint* plc = new FEAugLagLinearConstraint;
+				plc->Serialize(ar);
+				m_LC.push_back(plc);
+			}
+		}
 	}
 }

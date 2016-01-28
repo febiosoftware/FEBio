@@ -45,7 +45,7 @@ void FEVolumeSurface::CopyFrom(FEVolumeSurface& s)
 }
 
 //-----------------------------------------------------------------------------
-void FEVolumeSurface::Serialize(DumpFile& ar)
+void FEVolumeSurface::Serialize(DumpStream& ar)
 {
 	FESurface::Serialize(ar);
 	if (ar.IsSaving())
@@ -378,7 +378,7 @@ bool FEVolumeConstraint::Augment(int naug, const FETimePoint& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEVolumeConstraint::Serialize(DumpFile& ar)
+void FEVolumeConstraint::Serialize(DumpStream& ar)
 {
 	FENLConstraint::Serialize(ar);
 	m_s.Serialize(ar);
@@ -389,23 +389,6 @@ void FEVolumeConstraint::Serialize(DumpFile& ar)
 	else
 	{
 		ar >> m_binit;
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEVolumeConstraint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		dmp << m_s.m_Lp;
-		dmp << m_s.m_p;
-		dmp << m_s.m_Vt;
-	}
-	else
-	{
-		dmp >> m_s.m_Lp;
-		dmp >> m_s.m_p;
-		dmp >> m_s.m_Vt;
 	}
 }
 

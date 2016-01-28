@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "DumpFile.h"
+#include "DumpStream.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -385,8 +385,10 @@ void DOFS::SetDOFName(int nvar, int n, const char* szname)
 }
 
 //-----------------------------------------------------------------------------
-void DOFS::Serialize(DumpFile& ar)
+void DOFS::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow()) return;
+
 	if (ar.IsSaving())
 	{
 		ar << m_maxdofs;

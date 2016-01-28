@@ -8,7 +8,7 @@ class FERigidNode : public FEBoundaryCondition
 public:
 	FERigidNode(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
 
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	void Activate();
 	void Deactivate();
@@ -27,7 +27,7 @@ public:
 
 	bool Init();
 
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	void Activate();
 
@@ -53,7 +53,7 @@ public:
 
 	double Value();
 
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	void Activate();
 

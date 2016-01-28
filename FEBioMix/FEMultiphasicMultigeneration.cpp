@@ -160,10 +160,8 @@ FEMaterialPoint* FEMultigenSBMMaterialPoint::Copy()
 }
 
 //-----------------------------------------------------------------------------
-void FEMultigenSBMMaterialPoint::Serialize(DumpFile& ar)
+void FEMultigenSBMMaterialPoint::Serialize(DumpStream& ar)
 {
-	if (m_pNext) m_pNext->Serialize(ar);
-    
 	if (ar.IsSaving())
 	{
         ar << m_ngen << m_nsbm << m_tgen;
@@ -196,45 +194,7 @@ void FEMultigenSBMMaterialPoint::Serialize(DumpFile& ar)
             ar >> m_lsbmr[j];
 	}
     
-	if (m_pNext) m_pNext->Serialize(ar);
-}
-
-//-----------------------------------------------------------------------------
-void FEMultigenSBMMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (m_pNext) m_pNext->ShallowCopy(dmp, bsave);
-    
-	if (bsave)
-	{
-        dmp << m_ngen << m_nsbm << m_tgen;
-		for (int i=0; i < m_ngen; ++i)
-			dmp << m_Fi[i];
-		for (int i=0; i < m_ngen; ++i)
-			dmp << m_Ji[i];
-		for (int i=0; i < m_ngen; ++i)
-            for (int j=0; j< m_nsbm; ++j)
-                dmp << m_gsbmr[i][j] << m_gsbmrp[i][j];
-        for (int j=0; j<m_nsbm; ++j)
-            dmp << m_lsbmr[j];
-	}
-	else
-	{
-        dmp >> m_ngen >> m_nsbm >> m_tgen;
-        m_Fi.resize(m_ngen);
-        m_Ji.resize(m_ngen);
-        m_gsbmr.resize(m_ngen, vector<double>(m_nsbm));
-        m_gsbmrp.resize(m_ngen, vector<double>(m_nsbm));
-        m_lsbmr.resize(m_nsbm);
-		for (int i=0; i < m_ngen; ++i)
-			dmp >> m_Fi[i];
-		for (int i=0; i < m_ngen; ++i)
-			dmp >> m_Ji[i];
-		for (int i=0; i < m_ngen; ++i)
-            for (int j=0; j< m_nsbm; ++j)
-                dmp >> m_gsbmr[i][j] >> m_gsbmrp[i][j];
-        for (int j=0; j<m_nsbm; ++j)
-            dmp >> m_lsbmr[j];
-	}
+	FEMaterialPoint::Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

@@ -20,10 +20,7 @@ public:
 	void Init(bool bflag);
 
 	//! data serialization
-	void Serialize(DumpFile& ar);
-
-	//! stream material point data
-	void ShallowCopy(DumpStream& dmp, bool bsave);
+	void Serialize(DumpStream& ar);
 
 	//! get the number of material point components
 	virtual int Components() { return (int) m_mp.size(); }

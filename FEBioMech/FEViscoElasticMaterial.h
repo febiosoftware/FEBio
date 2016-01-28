@@ -19,10 +19,7 @@ public:
 	void Init(bool bflag);
 
 	//! Serialize data to archive
-	void Serialize(DumpFile& ar);
-
-	//! data streaming
-	void ShallowCopy(DumpStream& dmp, bool bsave);
+	void Serialize(DumpStream& ar);
 
 public:
 	mat3ds	m_se;	//!< elastic Cauchy stress

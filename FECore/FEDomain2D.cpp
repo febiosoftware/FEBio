@@ -428,64 +428,64 @@ vec2d FEDomain2D::gradivec(FEElement2D& el, vec2d* fn, int n)
 }
 
 //-----------------------------------------------------------------------------
-void FEDomain2D::ShallowCopy(DumpStream& dmp, bool bsave)
+void FEDomain2D::Serialize(DumpStream &ar)
 {
-    int NEL = (int) m_Elem.size();
-    for (int i=0; i<NEL; ++i)
-    {
-        FEElement2D& el = m_Elem[i];
-        int nint = el.GaussPoints();
-        for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->ShallowCopy(dmp, bsave);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void FEDomain2D::Serialize(DumpFile &ar)
-{
-    if (ar.IsSaving())
-    {
-        ar << m_Node;
+	if (ar.IsShallow())
+	{
+		int NEL = (int) m_Elem.size();
+		for (int i=0; i<NEL; ++i)
+		{
+			FEElement2D& el = m_Elem[i];
+			int nint = el.GaussPoints();
+			for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->Serialize(ar);
+		}
+	}
+	else
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_Node;
         
-        for (size_t i=0; i<m_Elem.size(); ++i)
-        {
-            FEElement2D& el = m_Elem[i];
-            ar << el.Type();
+			for (size_t i=0; i<m_Elem.size(); ++i)
+			{
+				FEElement2D& el = m_Elem[i];
+				ar << el.Type();
             
-            ar << el.GetMatID();
-            ar << el.GetID();
-            ar << el.m_node;
-			ar << el.m_lnode;
+				ar << el.GetMatID();
+				ar << el.GetID();
+				ar << el.m_node;
+				ar << el.m_lnode;
             
-            for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
-        }
-    }
-    else
-    {
-        int n, mat, nid;
+				for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
+			}
+		}
+		else
+		{
+			int n, mat, nid;
         
-        ar >> m_Node;
+			ar >> m_Node;
         
-        FEModel& fem = *ar.GetFEModel();
-        FEMaterial* pmat = GetMaterial();
-        assert(pmat);
+			FEMaterial* pmat = GetMaterial();
+			assert(pmat);
         
-        for (size_t i=0; i<m_Elem.size(); ++i)
-        {
-            FEElement2D& el = m_Elem[i];
-            ar >> n;
+			for (size_t i=0; i<m_Elem.size(); ++i)
+			{
+				FEElement2D& el = m_Elem[i];
+				ar >> n;
             
-            el.SetType(n);
+				el.SetType(n);
             
-            ar >> mat; el.SetMatID(mat);
-            ar >> nid; el.SetID(nid);
-            ar >> el.m_node;
-			ar >> el.m_lnode;
+				ar >> mat; el.SetMatID(mat);
+				ar >> nid; el.SetID(nid);
+				ar >> el.m_node;
+				ar >> el.m_lnode;
             
-            for (int j=0; j<el.GaussPoints(); ++j)
-            {
-                el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
-                el.GetMaterialPoint(j)->Serialize(ar);
-            }
-        }
-    }
+				for (int j=0; j<el.GaussPoints(); ++j)
+				{
+					el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+					el.GetMaterialPoint(j)->Serialize(ar);
+				}
+			}
+		}
+	}
 }

@@ -35,7 +35,7 @@ public:
 	void create(int n) { m_el.resize(n); }
 
 	//! serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! Unpack surface element data
 	//! TODO: This is obsolete. Remove this.

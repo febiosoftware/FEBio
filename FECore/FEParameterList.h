@@ -1,12 +1,14 @@
 #pragma once
 #include "vec2d.h"
 #include "vec3d.h"
+#include "mat3d.h"
 #include <assert.h>
 #include <list>
 #include <memory>
-#include "DumpFile.h"
 using namespace std;
 
+//-----------------------------------------------------------------------------
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 // Different supported parameter types
@@ -232,7 +234,7 @@ public:
 	virtual FEParam* GetParameter(const ParamString& s);
 
 	//! serialize parameter data
-	virtual void Serialize(DumpFile& ar);
+	virtual void Serialize(DumpStream& ar);
 
 	//! validate material parameters.
 	//! This function returns false on the first parameter encountered

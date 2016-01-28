@@ -70,7 +70,7 @@ public:
 
 public:
 	//! serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 protected:
 	//! used by derived class to set the ID

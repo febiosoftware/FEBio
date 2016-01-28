@@ -58,37 +58,38 @@ bool FETiedContactSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FETiedContactSurface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		dmp << m_Lm << m_gap << m_Tc;
-	}
-	else
-	{
-		dmp >> m_Lm >> m_gap >> m_Tc;
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FETiedContactSurface::Serialize(DumpFile &ar)
+void FETiedContactSurface::Serialize(DumpStream &ar)
 {
 	FEContactSurface::Serialize(ar);
-	if (ar.IsSaving())
+	if (ar.IsShallow())
 	{
-		ar << m_gap;
-		ar << m_rs;
-		ar << m_Lm;
-		ar << m_off;
-		ar << m_Tc;
+		if (ar.IsSaving())
+		{
+			ar << m_Lm << m_gap << m_Tc;
+		}
+		else
+		{
+			ar >> m_Lm >> m_gap >> m_Tc;
+		}
 	}
 	else
 	{
-		ar >> m_gap;
-		ar >> m_rs;
-		ar >> m_Lm;
-		ar >> m_off;
-		ar >> m_Tc;
+		if (ar.IsSaving())
+		{
+			ar << m_gap;
+			ar << m_rs;
+			ar << m_Lm;
+			ar << m_off;
+			ar << m_Tc;
+		}
+		else
+		{
+			ar >> m_gap;
+			ar >> m_rs;
+			ar >> m_Lm;
+			ar >> m_off;
+			ar >> m_Tc;
+		}
 	}
 }
 

@@ -21,8 +21,10 @@ void FERigidNode::Deactivate()
 }
 
 //-----------------------------------------------------------------------------
-void FERigidNode::Serialize(DumpFile& ar)
+void FERigidNode::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow()) return;
+
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
@@ -89,8 +91,10 @@ void FERigidBodyFixedBC::Deactivate()
 }
 
 //-----------------------------------------------------------------------------
-void FERigidBodyFixedBC::Serialize(DumpFile& ar)
+void FERigidBodyFixedBC::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow()) return;
+
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
@@ -176,8 +180,10 @@ void FERigidBodyDisplacement::Deactivate()
 }
 
 //-----------------------------------------------------------------------------
-void FERigidBodyDisplacement::Serialize(DumpFile& ar)
+void FERigidBodyDisplacement::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow()) return;
+
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{

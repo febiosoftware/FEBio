@@ -1,81 +1,114 @@
 #pragma once
 #include <vector>
+#include <string.h>
+#include "vec3d.h"
+#include "mat3d.h"
+#include "quatd.h"
 
 //-----------------------------------------------------------------------------
-//! The dump stream allows a class to record its internal state to a memory object
-//! so that it can be restored later.
-//! This can be used for storing the FEModel state during running restarts
+class FEModel;
+
+//-----------------------------------------------------------------------------
+//! A dump stream is used to serialize data to and from a data stream.
+//! This is used in FEBio for running and cold restarts. 
+//! This is just an abstract base class. Classes must be derived from this
+//! to implement the actual storage mechanism.
 class DumpStream
 {
 public:
-	DumpStream();
-	~DumpStream();
+	// This class is thrown when an error occurs reading the dumpfile
+	class ReadError{};
 
-	void clear();
+public:
+	//! constructor
+	DumpStream(FEModel& fem);
 
-	void set_position(int l);
+	//! destructor
+	virtual ~DumpStream();
 
-	void write(void* pd, int nsize);
-	void read (void* pd, int nsize);
+	//! See if the stream is used for input or output
+	bool IsSaving() const { return m_bsave; }
 
-	template <typename T> DumpStream& operator << (T& o);
-	template <typename T> DumpStream& operator >> (T& o);
+	//! See if shallow flag is set
+	bool IsShallow() const { return m_bshallow; }
 
+	// open the stream
+	virtual void Open(bool bsave, bool bshallow);
+
+	// get the FE model
+	FEModel& GetFEModel() { return m_fem; }
+
+public:
+	// These functions must be overloaded by derived classes
+	virtual size_t write(const void* pd, size_t size, size_t count) = 0;
+	virtual size_t read(void* pd, size_t size, size_t count) = 0;
+	virtual void clear() = 0;
+	virtual void check(){}
+
+public: // output operators
+	DumpStream& operator << (const char* sz);
+	DumpStream& operator << (char* sz);
+	DumpStream& operator << (const double a[3][3]);
+	template <typename T> DumpStream& operator << (const T& o);
 	template <typename T> DumpStream& operator << (std::vector<T>& o);
+
+public: // input operators
+	DumpStream& operator >> (char* sz);
+	DumpStream& operator >> (double a[3][3]);
+	template <typename T> DumpStream& operator >> (T& o);
 	template <typename T> DumpStream& operator >> (std::vector<T>& o);
 
-protected:
-	void grow_buffer(int l);
-
 private:
-	char*	m_pb;			//!< pointer to buffer
-	char*	m_pd;			//!< position to insert a new value
-	int		m_nsize;		//!< size of stream
-	int		m_nreserved;	//!< size of reserved buffer
+	bool		m_bsave;	//!< true if output stream, false for input stream
+	bool		m_bshallow;	//!< if true only shallow data needs to be serialized
+	FEModel&	m_fem;		//!< the FE Model that is being serialized
 };
 
-template <typename T> inline DumpStream& DumpStream::operator << (T& o)
+template <typename T> inline DumpStream& DumpStream::operator << (const T& o)
 {
-	int l = sizeof(T);
-	write(&o, l);
+	write(&o, sizeof(T), 1);
 	return *this;
 }
 
 template <typename T> inline DumpStream& DumpStream::operator >> (T& o)
 {
-	int l = sizeof(T);
-	read(&o, l);
+	read(&o, sizeof(T), 1);
 	return *this;
 }
 
-template <> inline DumpStream& DumpStream::operator << (bool& o)
+template <> inline DumpStream& DumpStream::operator << (const bool& o)
 {
-	char b = (o==true?1:0);
-	write(&b, sizeof(char));
+	int b = (o==true?1:0);
+	write(&b, sizeof(int), 1);
 	return *this;
 }
 
 template <> inline DumpStream& DumpStream::operator >> (bool& o)
 {
-	char b;
-	read(&b, sizeof(char));
+	int b;
+	read(&b, sizeof(int), 1);
 	o = (b==1);
 	return *this;
 }
 
 template <typename T> inline DumpStream& DumpStream::operator << (std::vector<T>& o)
 {
-	DumpStream& This = *this;
 	int N = (int) o.size();
-	for (int i=0; i<N; ++i) This << o[i];
-	return This;
+	write(&N, sizeof(int), 1);
+	if (N > 0) write((T*)(&o[0]), sizeof(T), N);
+	return *this;
 }
 
 template <typename T> inline DumpStream& DumpStream::operator >> (std::vector<T>& o)
 {
 	DumpStream& This = *this;
-	int N = (int) o.size();
-	for (int i=0; i<N; ++i) This >> o[i];
+	int N;
+	read(&N, sizeof(int), 1);
+	if (N > 0)
+	{
+		o.resize(N);
+		read((T*)(&o[0]), sizeof(T), N);
+	}
 	return This;
 }
 
@@ -83,6 +116,7 @@ template <> inline DumpStream& DumpStream::operator << (std::vector<bool>& o)
 {
 	DumpStream& This = *this;
 	int N = (int) o.size();
+	write(&N, sizeof(int), 1);
 	for (int i=0; i<N; ++i) 
 	{
 		bool b = o[i];
@@ -94,12 +128,16 @@ template <> inline DumpStream& DumpStream::operator << (std::vector<bool>& o)
 template <> inline DumpStream& DumpStream::operator >> (std::vector<bool>& o)
 {
 	DumpStream& This = *this;
-	int N = (int) o.size();
-	for (int i=0; i<N; ++i) 
+	int N;
+	read(&N, sizeof(int), 1);
+	if (N > 0)
 	{
-		bool b;
-		This >> b;
-		o[i] = b;
+		for (int i=0; i<N; ++i) 
+		{
+			bool b;
+			This >> b;
+			o[i] = b;
+		}
 	}
 	return This;
 }

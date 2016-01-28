@@ -11,7 +11,6 @@ public:
 	FEConstBodyForce(FEModel* pfem) : FEBodyForce(pfem) { m_f = vec3d(0,0,0); }
 	vec3d force(FEMaterialPoint& pt) { return m_f; }
 	mat3ds stiffness(FEMaterialPoint& pt) { return mat3ds(0,0,0,0,0,0); }
-	void Serialize(DumpFile& ar);
 
 protected:
 	vec3d	m_f;
@@ -28,7 +27,7 @@ public:
 	FENonConstBodyForce(FEModel* pfem);
 	vec3d force(FEMaterialPoint& pt);
 	mat3ds stiffness(FEMaterialPoint& pt);
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public:
 	char	m_sz[3][256];
@@ -49,7 +48,7 @@ public:
 		return K*(pt.m_rt - c);
 	}
 	mat3ds stiffness(FEMaterialPoint& mp) { return (mat3dd(1) - dyad(n))*(-w*w); }
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 	
 public:
 	vec3d	n;	// rotation axis

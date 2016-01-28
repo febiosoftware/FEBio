@@ -26,3 +26,9 @@ void FEMaterialPoint::Init(bool bflag)
 {
 	if (m_pNext) m_pNext->Init(bflag);
 }
+
+void FEMaterialPoint::Serialize(DumpStream& ar)
+{
+	FEParamContainer::Serialize(ar);
+	if (m_pNext) m_pNext->Serialize(ar);
+}

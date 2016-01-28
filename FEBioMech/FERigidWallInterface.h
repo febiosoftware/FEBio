@@ -27,9 +27,6 @@ public:
 	//! Initializes data structures
 	bool Init();
 
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! Update the surface data
 	void Update() {}
 
@@ -38,7 +35,7 @@ public:
 
 	void UpdateNormals();
 
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! Unpack surface element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
@@ -89,9 +86,6 @@ public:
 	//! update rigid wall data
 	void Update(int niter);
 
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! calculate contact forces
 	virtual void ContactForces(FEGlobalVector& R);
 
@@ -105,7 +99,7 @@ public:
 	void SetMasterSurface(FERigidSurface* prs) { assert(m_mp == 0); m_mp = prs; }
 
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! return the master and slave surface
 	FESurface* GetMasterSurface() { return 0; }

@@ -137,67 +137,68 @@ double FEShellDomain::detJ0(FEShellElement &el, int n)
 }
 
 //-----------------------------------------------------------------------------
-void FEShellDomain::ShallowCopy(DumpStream& dmp, bool bsave)
+void FEShellDomain::Serialize(DumpStream &ar)
 {
-	int NEL = (int) m_Elem.size();
-	for (int i=0; i<NEL; ++i)
+	if (ar.IsShallow())
 	{
-		FEShellElement& el = m_Elem[i];
-		int nint = el.GaussPoints();
-		for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->ShallowCopy(dmp, bsave);
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEShellDomain::Serialize(DumpFile &ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << m_Node;
-		
-		for (size_t i=0; i<m_Elem.size(); ++i)
+		int NEL = (int) m_Elem.size();
+		for (int i=0; i<NEL; ++i)
 		{
 			FEShellElement& el = m_Elem[i];
-			ar << el.Type();
-
-			ar << el.GetMatID();
-			ar << el.GetID();
-			ar << el.m_node;
-
-			ar << el.m_h0;
-			ar << el.m_D0;
-
-			for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
+			int nint = el.GaussPoints();
+			for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->Serialize(ar);
 		}
 	}
 	else
 	{
-		int n, mat, nid;
-
-		ar >> m_Node;
-
-		FEModel& fem = *ar.GetFEModel();
-		FEMaterial* pmat = GetMaterial();
-		assert(pmat);
-
-		for (size_t i=0; i<m_Elem.size(); ++i)
+		if (ar.IsSaving())
 		{
-			FEShellElement& el = m_Elem[i];
-			ar >> n;
-
-			el.SetType(n);
-
-			ar >> mat; el.SetMatID(mat);
-			ar >> nid; el.SetID(nid);
-			ar >> el.m_node;
-
-			ar >> el.m_h0;
-			ar >> el.m_D0;
-
-			for (int j=0; j<el.GaussPoints(); ++j)
+			ar << m_Node;
+		
+			for (size_t i=0; i<m_Elem.size(); ++i)
 			{
-				el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
-				el.GetMaterialPoint(j)->Serialize(ar);
+				FEShellElement& el = m_Elem[i];
+				ar << el.Type();
+
+				ar << el.GetMatID();
+				ar << el.GetID();
+				ar << el.m_node;
+
+				ar << el.m_h0;
+				ar << el.m_D0;
+
+				for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
+			}
+		}
+		else
+		{
+			int n, mat, nid;
+
+			ar >> m_Node;
+
+			FEModel& fem = ar.GetFEModel();
+			FEMaterial* pmat = GetMaterial();
+			assert(pmat);
+
+			for (size_t i=0; i<m_Elem.size(); ++i)
+			{
+				FEShellElement& el = m_Elem[i];
+				ar >> n;
+
+				el.SetType(n);
+
+				ar >> mat; el.SetMatID(mat);
+				ar >> nid; el.SetID(nid);
+				ar >> el.m_node;
+
+				ar >> el.m_h0;
+				ar >> el.m_D0;
+
+				for (int j=0; j<el.GaussPoints(); ++j)
+				{
+					el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+					el.GetMaterialPoint(j)->Serialize(ar);
+				}
 			}
 		}
 	}

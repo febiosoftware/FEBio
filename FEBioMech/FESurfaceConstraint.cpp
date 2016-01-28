@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FESurfaceConstraint.h"
-#include "FECore/DumpFile.h"
 #include "FECore/FEModel.h"
 #include "FECore/FENormalProjection.h"
 #include "FECore/log.h"
@@ -54,35 +53,36 @@ vec3d FESurfaceConstraintSurface::CenterOfMass()
 }
 
 //-----------------------------------------------------------------------------
-void FESurfaceConstraintSurface::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	if (bsave)
-	{
-		dmp << m_Lm << m_gap;
-	}
-	else
-	{
-		dmp >> m_Lm >> m_gap;
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FESurfaceConstraintSurface::Serialize(DumpFile& ar)
+void FESurfaceConstraintSurface::Serialize(DumpStream& ar)
 {
 	FEContactSurface::Serialize(ar);
-	if (ar.IsSaving())
+	if (ar.IsShallow())
 	{
-		ar << m_gap;
-		ar << m_rs;
-		ar << m_Lm;
-		ar << m_nref;
+		if (ar.IsSaving())
+		{
+			ar << m_Lm << m_gap;
+		}
+		else
+		{
+			ar >> m_Lm >> m_gap;
+		}
 	}
 	else
 	{
-		ar >> m_gap;
-		ar >> m_rs;
-		ar >> m_Lm;
-		ar >> m_nref;
+		if (ar.IsSaving())
+		{
+			ar << m_gap;
+			ar << m_rs;
+			ar << m_Lm;
+			ar << m_nref;
+		}
+		else
+		{
+			ar >> m_gap;
+			ar >> m_rs;
+			ar >> m_Lm;
+			ar >> m_nref;
+		}
 	}
 }
 
@@ -332,14 +332,6 @@ void FESurfaceConstraint::Update(int niter)
 			ss.m_gap[i] = us - um - u0;
 		}
 	}
-}
-
-
-//-----------------------------------------------------------------------------
-void FESurfaceConstraint::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	m_ss.ShallowCopy(dmp, bsave);
-	m_ms.ShallowCopy(dmp, bsave);
 }
 
 
@@ -786,7 +778,7 @@ bool FESurfaceConstraint::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FESurfaceConstraint::Serialize(DumpFile &ar)
+void FESurfaceConstraint::Serialize(DumpStream &ar)
 {
 	// store contact data
 	FEContactInterface::Serialize(ar);

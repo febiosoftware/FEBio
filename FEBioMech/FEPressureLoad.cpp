@@ -334,7 +334,7 @@ bool FEPressureLoad::LinearPressureForce(FESurfaceElement& el, vector<double>& f
 
 //-----------------------------------------------------------------------------
 
-void FEPressureLoad::Serialize(DumpFile& ar)
+void FEPressureLoad::Serialize(DumpStream& ar)
 {
 	FESurfaceLoad::Serialize(ar);
 

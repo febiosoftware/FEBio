@@ -40,7 +40,7 @@ void FERigidConnector::BuildMatrixProfile(FEGlobalMatrix& M)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidConnector::Serialize(DumpFile& ar)
+void FERigidConnector::Serialize(DumpStream& ar)
 {
 	FENLConstraint::Serialize(ar);
 	if (ar.IsSaving())

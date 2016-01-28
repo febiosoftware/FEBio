@@ -13,7 +13,6 @@
 #include "vec3d.h"
 #include "quatd.h"
 #include "RigidBC.h"
-#include "DumpFile.h"
 #include "FEObject.h"
 
 //-----------------------------------------------------------------------------
@@ -46,10 +45,7 @@ public:
 	void Init();
 
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
-
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
+	void Serialize(DumpStream& ar);
 
 	//! get the material ID
 	int GetMaterialID() { return m_mat; }

@@ -1,5 +1,4 @@
 #pragma once
-#include "DumpFile.h"
 #include "FEModelComponent.h"
 
 //-----------------------------------------------------------------------------
@@ -18,9 +17,6 @@ public:
 public:
 	//! initialization
 	virtual bool Init() { return true; }
-
-	//! serialize data to archive  Note that this will use the base class
-	//virtual void Serialize(DumpFile& ar){}
 
 	//! update
 	virtual void Update(){}

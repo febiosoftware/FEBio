@@ -280,7 +280,7 @@ bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vect
 
 //-----------------------------------------------------------------------------
 //!
-void FESoluteFlux::Serialize(DumpFile& ar)
+void FESoluteFlux::Serialize(DumpStream& ar)
 {
 	FESurfaceLoad::Serialize(ar);
 

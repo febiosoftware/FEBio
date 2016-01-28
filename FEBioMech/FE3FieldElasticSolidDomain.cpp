@@ -554,7 +554,7 @@ bool FE3FieldElasticSolidDomain::Augment(int naug)
 
 //-----------------------------------------------------------------------------
 //! Data serialization
-void FE3FieldElasticSolidDomain::Serialize(DumpFile &ar)
+void FE3FieldElasticSolidDomain::Serialize(DumpStream &ar)
 {
 	FEElasticSolidDomain::Serialize(ar);
 

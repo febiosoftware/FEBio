@@ -1,8 +1,6 @@
 #pragma once
 
 #include "mat3d.h"
-#include "DumpFile.h"
-#include "DumpStream.h"
 #include "FEParameterList.h"
 #include <vector>
 using namespace std;
@@ -29,9 +27,6 @@ public:
 	//! copy material point data (for running restarts) \todo Is this still used?
 	virtual FEMaterialPoint* Copy() = 0;
 
-	//! copy material point data (for running restarts) \todo Is this still used?
-	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
-
 	//! get the number of material point components
 	virtual int Components() { return 1; }
 
@@ -49,6 +44,9 @@ public:
 
 	// assign the previous pointer
 	void SetPrev(FEMaterialPoint* pt);
+
+	// serialization
+	void Serialize(DumpStream& ar);
 
 protected:
 	FEMaterialPoint*	m_pNext;	//<! next data in the list

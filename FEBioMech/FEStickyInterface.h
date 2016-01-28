@@ -32,11 +32,8 @@ public:
 	//! Initializes data structures
 	bool Init();
 
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! data serialization
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 public:
 	void GetNodalContactGap     (int nface, double* gn);
@@ -73,9 +70,6 @@ public:
 	//! projects slave nodes onto master nodes
 	void ProjectSurface(FEStickySurface& ss, FEStickySurface& ms, bool bmove = false);
 
-	//! shallow copy
-	void ShallowCopy(DumpStream& dmp, bool bsave);
-
 	//! calculate contact forces
 	virtual void ContactForces(FEGlobalVector& R);
 
@@ -86,7 +80,7 @@ public:
 	virtual bool Augment(int naug);
 
 	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	void Serialize(DumpStream& ar);
 
 	//! return the master and slave surface
 	FESurface* GetMasterSurface() { return &ms; }

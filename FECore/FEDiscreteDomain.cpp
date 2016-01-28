@@ -24,18 +24,6 @@ bool FEDiscreteDomain::Initialize(FEModel &fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEDiscreteDomain::ShallowCopy(DumpStream& dmp, bool bsave)
-{
-	int NEL = (int) m_Elem.size();
-	for (int i=0; i<NEL; ++i)
-	{
-		FEDiscreteElement& el = m_Elem[i];
-		int nint = el.GaussPoints();
-		for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->ShallowCopy(dmp, bsave);
-	}
-}
-
-//-----------------------------------------------------------------------------
 void FEDiscreteDomain::AddElement(int eid, int n[2])
 {
 	FEDiscreteElement el;
@@ -47,48 +35,61 @@ void FEDiscreteDomain::AddElement(int eid, int n[2])
 }
 
 //-----------------------------------------------------------------------------
-void FEDiscreteDomain::Serialize(DumpFile& ar)
+void FEDiscreteDomain::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
+	if (ar.IsShallow())
 	{
-		ar << m_Node;
-		int nel = (int) m_Elem.size();
-		for (int i=0; i<nel; ++i)
+		int NEL = (int) m_Elem.size();
+		for (int i=0; i<NEL; ++i)
 		{
 			FEDiscreteElement& el = m_Elem[i];
-			int nmat = el.GetMatID();
-			ar << (int) el.Type();
-			
-			ar << nmat;
-			ar << el.GetID();
-			ar << el.m_node;
-
-			for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
+			int nint = el.GaussPoints();
+			for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->Serialize(ar);
 		}
 	}
 	else
 	{
-		FEMaterial* pmat = GetMaterial();
-		assert(pmat);
-
-		FEModel& fem = *ar.GetFEModel();
-		ar >> m_Node;
-		int n, mat, nid;
-		for (size_t i=0; i<m_Elem.size(); ++i)
+		if (ar.IsSaving())
 		{
-			FEDiscreteElement& el = m_Elem[i];
-			ar >> n;
-
-			el.SetType(n);
-
-			ar >> mat; el.SetMatID(mat);
-			ar >> nid; el.SetID(nid);
-			ar >> el.m_node;
-
-			for (int j=0; j<el.GaussPoints(); ++j)
+			ar << m_Node;
+			int nel = (int) m_Elem.size();
+			for (int i=0; i<nel; ++i)
 			{
-				el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
-				el.GetMaterialPoint(j)->Serialize(ar);
+				FEDiscreteElement& el = m_Elem[i];
+				int nmat = el.GetMatID();
+				ar << (int) el.Type();
+			
+				ar << nmat;
+				ar << el.GetID();
+				ar << el.m_node;
+
+				for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
+			}
+		}
+		else
+		{
+			FEMaterial* pmat = GetMaterial();
+			assert(pmat);
+
+			FEModel& fem = ar.GetFEModel();
+			ar >> m_Node;
+			int n, mat, nid;
+			for (size_t i=0; i<m_Elem.size(); ++i)
+			{
+				FEDiscreteElement& el = m_Elem[i];
+				ar >> n;
+
+				el.SetType(n);
+
+				ar >> mat; el.SetMatID(mat);
+				ar >> nid; el.SetID(nid);
+				ar >> el.m_node;
+
+				for (int j=0; j<el.GaussPoints(); ++j)
+				{
+					el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+					el.GetMaterialPoint(j)->Serialize(ar);
+				}
 			}
 		}
 	}
