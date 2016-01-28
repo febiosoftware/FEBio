@@ -50,6 +50,12 @@ void FEBioGlobalsSection::ParseGlobalData(XMLTag &tag)
 		// create new global data
 		FEGlobalData* pgd = fecore_new<FEGlobalData>(FEGLOBALDATA_ID, tag.Name(), &fem);
 
+		// TODO: We have to call the Init member here because solute data 
+		//       allocates the concentration dofs and they have to be allocated before 
+		//       materials are read in. I'd like to move this to FEModel::Init but not sure
+		//       yet how. 
+		pgd->Init();
+
 		// assign attributes
 		int natt = tag.m_natt;
 		for (int i=0; i<natt; ++i) pgd->SetAttribute(tag.m_att[i].m_szatt, tag.m_att[i].m_szatv);

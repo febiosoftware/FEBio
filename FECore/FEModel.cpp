@@ -90,6 +90,17 @@ bool FEModel::Init()
 	m_ftime = 0;
 	m_ftime0 = 0;
 
+	// initialize global data
+	// TODO: I'd like to do this here for consistency, but
+	//       the problem is that solute dofs (i.e. concentration dofs) have
+	//       to be allocated before the materials are read in.
+	//       So right now the Init function is called when the solute data is created.
+/*	for (int i=0; i<(int) m_GD.size(); ++i)
+	{
+		FEGlobalData* pd = m_GD[i]; assert(pd);
+		if (pd->Init() == false) return false;
+	}
+*/
 	// check step data
 	for (int i=0; i<(int) m_Step.size(); ++i)
 	{

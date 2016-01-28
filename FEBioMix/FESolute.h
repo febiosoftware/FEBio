@@ -123,6 +123,9 @@ class FESoluteData : public FEGlobalData
 public:
 	FESoluteData(FEModel* pfem);
 
+	//! initialization
+	bool Init();
+
 	//! Serialize solute data to archive
 	void Serialize(DumpStream& ar);
 

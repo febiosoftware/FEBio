@@ -17,6 +17,9 @@ public:
 	//! initialization
 	bool Init();
 
+	//! Serialization
+	void Serialize(DumpStream& ar);
+
 	// returns a pointer to a new material point object
 	virtual FEMaterialPoint* CreateMaterialPointData() = 0;
 	
@@ -141,16 +144,18 @@ public:
 	int SBMs		() { return (int) m_pSBM.size();	}
 	int Reactions	() { return (int) m_pReact.size();	}
 
+public: // parameters
+	double	m_phi0;			//!< solid volume fraction in reference configuration
+	double	m_rhoTw;		//!< true fluid density
+	double	m_penalty;		//!< penalty for enforcing electroneutrality
+	double	m_cFr;			//!< fixed charge density in reference configurations
+
 public:
-	double						m_phi0;			//!< solid volume fraction in reference configuration
-	double						m_rhoTw;		//!< true fluid density
-	double						m_cFr;			//!< fixed charge density in reference configurations
-	double						m_Rgas;			//!< universal gas constant
-	double						m_Tabs;			//!< absolute temperature
-	double						m_Fc;			//!< Faraday's constant
-	double						m_penalty;		//!< penalty for enforcing electroneutrality
-	int							m_zmin;			//!< minimum charge number in mixture
-	int							m_ndeg;			//!< polynomial degree of zeta in electroneutrality
+	double	m_Rgas;			//!< universal gas constant
+	double	m_Tabs;			//!< absolute temperature
+	double	m_Fc;			//!< Faraday's constant
+	int		m_zmin;			//!< minimum charge number in mixture
+	int		m_ndeg;			//!< polynomial degree of zeta in electroneutrality
 
 protected:
 	// material properties

@@ -2,4 +2,13 @@
 #include "FEGlobalData.h"
 
 //-----------------------------------------------------------------------------
-FEGlobalData::FEGlobalData() : FECoreBase(FEGLOBALDATA_ID){}
+FEGlobalData::FEGlobalData(FEModel* pfem) : FECoreBase(FEGLOBALDATA_ID)
+{
+	m_pfem = pfem;
+}
+
+//-----------------------------------------------------------------------------
+bool FEGlobalData::Init()
+{
+	return true;
+}

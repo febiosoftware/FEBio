@@ -16,21 +16,29 @@ BEGIN_PARAMETER_LIST(FESoluteData, FEGlobalData)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FESoluteData::FESoluteData(FEModel* pfem)
+FESoluteData::FESoluteData(FEModel* pfem) : FEGlobalData(pfem)
 { 
 	m_nID = -1; 
 	m_rhoT = 1; 
 	m_M = 1; 
 	m_z = 0; 
 	m_szname[0] = 0; 
+}
 
+//-----------------------------------------------------------------------------
+// TODO: Maybe I can use the ID to make sure the dof is not duplicated.
+bool FESoluteData::Init()
+{
 	// for each solute we have to add a concentration degree of freedom
-    DOFS& fedofs = pfem->GetDOFS();
+	FEModel& fem = *GetFEModel();
+    DOFS& fedofs = fem.GetDOFS();
 	int varC = fedofs.GetVariableIndex("concentration");
 	int cdofs = fedofs.GetVariableSize(varC);
 	char sz[8] = {0};
 	sprintf(sz, "c%d", cdofs+1);
 	fedofs.AddDOF(varC, sz);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -158,7 +166,7 @@ BEGIN_PARAMETER_LIST(FESBMData, FEGlobalData)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FESBMData::FESBMData(FEModel* pfem)
+FESBMData::FESBMData(FEModel* pfem) : FEGlobalData(pfem)
 { 
 	m_nID = -1; 
 	m_rhoT = 1; 

@@ -300,7 +300,7 @@ int FEMultiphasic::FindLocalSoluteID(int nid)
 }
 
 //-----------------------------------------------------------------------------
-bool FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
+bool FEMultiphasic::InitializeReaction(FEChemicalReaction* pReact)
 {
 	int isol, isbm, itot;
 	
@@ -309,60 +309,60 @@ bool FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
 	const int ntot = nsol + nsbm;
 	
 	// initialize the stoichiometric coefficients to zero
-	m_pReact->m_nsol = nsol;
-	m_pReact->m_vR.assign(ntot,0);
-	m_pReact->m_vP.assign(ntot,0);
-	m_pReact->m_v.assign(ntot,0);
+	pReact->m_nsol = nsol;
+	pReact->m_vR.assign(ntot,0);
+	pReact->m_vP.assign(ntot,0);
+	pReact->m_v.assign(ntot,0);
 	
 	// cycle through all the solutes in the mixture and determine
 	// if they participate in this reaction
 	itrmap it;
-	intmap solR = m_pReact->m_solR;
-	intmap solP = m_pReact->m_solP;
+	intmap solR = pReact->m_solR;
+	intmap solP = pReact->m_solP;
 	for (isol=0; isol<nsol; ++isol) {
 		int sid = m_pSolute[isol]->GetSoluteID();
 		it = solR.find(sid);
-		if (it != solR.end()) m_pReact->m_vR[isol] = it->second;
+		if (it != solR.end()) pReact->m_vR[isol] = it->second;
 		it = solP.find(sid);
-		if (it != solP.end()) m_pReact->m_vP[isol] = it->second;
+		if (it != solP.end()) pReact->m_vP[isol] = it->second;
 	}
 	
 	// cycle through all the solid-bound molecules in the mixture
 	// and determine if they participate in this reaction
-	intmap sbmR = m_pReact->m_sbmR;
-	intmap sbmP = m_pReact->m_sbmP;
+	intmap sbmR = pReact->m_sbmR;
+	intmap sbmP = pReact->m_sbmP;
 	for (isbm=0; isbm<nsbm; ++isbm) {
 		int sid = m_pSBM[isbm]->GetSBMID();
 		it = sbmR.find(sid);
-		if (it != sbmR.end()) m_pReact->m_vR[nsol+isbm] = it->second;
+		if (it != sbmR.end()) pReact->m_vR[nsol+isbm] = it->second;
 		it = sbmP.find(sid);
-		if (it != sbmP.end()) m_pReact->m_vP[nsol+isbm] = it->second;
+		if (it != sbmP.end()) pReact->m_vP[nsol+isbm] = it->second;
 	}
 	
 	// evaluate the net stoichiometric coefficient
 	for (itot=0; itot<ntot; ++itot) {
-		m_pReact->m_v[itot] = m_pReact->m_vP[itot] - m_pReact->m_vR[itot];
+		pReact->m_v[itot] = pReact->m_vP[itot] - pReact->m_vR[itot];
 	}
     
     // evaluate the weighted molar volume of reactants and products
-    if (!m_pReact->m_Vovr) {
-        m_pReact->m_Vbar = 0;
+    if (!pReact->m_Vovr) {
+        pReact->m_Vbar = 0;
         for (isol=0; isol<nsol; ++isol)
-            m_pReact->m_Vbar += m_pReact->m_v[isol]*m_pSolute[isol]->MolarMass()/m_pSolute[isol]->Density();
+            pReact->m_Vbar += pReact->m_v[isol]*m_pSolute[isol]->MolarMass()/m_pSolute[isol]->Density();
         for (isbm=0; isbm<nsbm; ++isbm)
-            m_pReact->m_Vbar += m_pReact->m_v[nsol+isbm]*m_pSBM[isbm]->MolarMass()/m_pSBM[isbm]->Density();
+            pReact->m_Vbar += pReact->m_v[nsol+isbm]*m_pSBM[isbm]->MolarMass()/m_pSBM[isbm]->Density();
     }
 	
 	// check that the chemical reaction satisfies electroneutrality
 	int znet = 0;
 	for (isol=0; isol<nsol; ++isol)
-		znet += m_pReact->m_v[isol]*m_pSolute[isol]->ChargeNumber();
+		znet += pReact->m_v[isol]*m_pSolute[isol]->ChargeNumber();
 	for (isbm=0; isbm<nsbm; ++isbm)
-		znet += m_pReact->m_v[nsol+isbm]*m_pSBM[isbm]->ChargeNumber();
+		znet += pReact->m_v[nsol+isbm]*m_pSBM[isbm]->ChargeNumber();
 	if (znet != 0) return MaterialError("chemical reaction must satisfy electroneutrality");
 	
 	// set pointer to this multiphasic material
-	m_pReact->m_pMP = this;
+	pReact->m_pMP = this;
 
 	return true;
 }
@@ -412,6 +412,30 @@ bool FEMultiphasic::Init()
 	if ((zmin || zmax) && (m_Fc <= 0)) return MaterialError("A positive Faraday constant Fc must be defined in Globals section");
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEMultiphasic::Serialize(DumpStream& ar)
+{
+	FEMaterial::Serialize(ar);
+
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_Rgas << m_Tabs << m_Fc;
+			ar << m_zmin << m_ndeg;
+		}
+		else
+		{
+			ar >> m_Rgas >> m_Tabs >> m_Fc;
+			ar >> m_zmin >> m_ndeg;
+
+			// restore the m_pMP pointers for reactions
+			int NR = (int) m_pReact.size();
+			for (int i=0; i<NR; ++i) m_pReact[i]->m_pMP = this;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

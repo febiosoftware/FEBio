@@ -996,26 +996,18 @@ void FEMultiphasicSolver::UpdateContact()
 
 void FEMultiphasicSolver::Serialize(DumpStream& ar)
 {
-
 	if (ar.IsSaving())
 	{
-		ar << m_Ptol;
-		ar << m_ndeq << m_npeq;
-	}
-	else
-	{
-		ar >> m_Ptol;
-		ar >> m_ndeq >> m_npeq;
-	}
-    
-	if (ar.IsSaving())
-	{
-		ar << m_Ctol;
+		ar << m_Ptol << m_Ctol;
+		ar << m_dofP << m_dofC;
+		ar << m_ndeq << m_npeq << m_nceq;
 		ar << m_nceq;
 	}
 	else
 	{
-		ar >> m_Ctol;
+		ar >> m_Ptol >> m_Ctol;
+		ar >> m_dofP >> m_dofC;
+		ar >> m_ndeq >> m_npeq >> m_nceq;
 		ar >> m_nceq;
 	}
 
