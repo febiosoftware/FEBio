@@ -323,7 +323,7 @@ bool FEAnalysis::Solve()
 	{
 		// keep a copy of the current state, in case
 		// we need to retry this time step
-		if (m_bautostep) { dmp.clear(); dmp.Open(true, true); m_fem.Serialize(dmp); }
+		if (m_bautostep) { dmp.clear(); m_fem.Serialize(dmp); }
 
 		// update time
 		m_fem.m_ftime += m_dt;
