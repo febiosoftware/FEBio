@@ -801,16 +801,17 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 
 void FEBiphasicSoluteSolver::Serialize(DumpStream& ar)
 {
-    
 	if (ar.IsSaving())
 	{
 		ar << m_Ctol;
 		ar << m_nceq;
+		ar << m_dofC;
 	}
 	else
 	{
 		ar >> m_Ctol;
 		ar >> m_nceq;
+		ar >> m_dofC;
 	}
 
 	FEBiphasicSolver::Serialize(ar);

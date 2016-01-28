@@ -9,7 +9,11 @@ class FETriphasic : public FEMaterial
 public:
 	FETriphasic(FEModel* pfem);
 
+	// initialization
 	bool Init();
+
+	// serialization
+	void Serialize(DumpStream& ar);
 	
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() 
@@ -78,10 +82,12 @@ public: // material parameters
 	double						m_phi0;			//!< solid volume fraction in reference configuration
 	double						m_rhoTw;		//!< true fluid density
 	double						m_cFr;			//!< fixed charge density in reference configurations
+	double						m_penalty;		//!< penalty for enforcing electroneutrality
+
+public:
 	double						m_Rgas;			//!< universal gas constant
 	double						m_Tabs;			//!< absolute temperature
 	double						m_Fc;			//!< Faraday's constant
-	double						m_penalty;		//!< penalty for enforcing electroneutrality
 
 public: // material properties
 	FEPropertyT<FEElasticMaterial>			m_pSolid;		//!< pointer to elastic solid material
