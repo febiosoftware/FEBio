@@ -15,6 +15,9 @@
 		D52A5B0F19A6815C009E3A47 /* tens4ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D52A5B0D19A6815C009E3A47 /* tens4ds.hpp */; };
 		D5307A4818B40A6B008C8463 /* FENormalProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5307A4618B40A6B008C8463 /* FENormalProjection.cpp */; };
 		D5307A4918B40A6B008C8463 /* FENormalProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A4718B40A6B008C8463 /* FENormalProjection.h */; };
+		D55E3AEF1C5BBEDD00815FCA /* DumpMemStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55E3AEC1C5BBEDD00815FCA /* DumpMemStream.cpp */; };
+		D55E3AF01C5BBEDD00815FCA /* DumpMemStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3AED1C5BBEDD00815FCA /* DumpMemStream.h */; };
+		D55E3AF11C5BBEDD00815FCA /* FEDataStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3AEE1C5BBEDD00815FCA /* FEDataStream.h */; };
 		D571F82B1B78C49C002FAACE /* FERigidSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D571F8291B78C49C002FAACE /* FERigidSystem.cpp */; };
 		D571F82C1B78C49C002FAACE /* FERigidSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = D571F82A1B78C49C002FAACE /* FERigidSystem.h */; };
 		D58D4D141B5D7E76002BB72A /* FECallback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58D4D111B5D7E76002BB72A /* FECallback.cpp */; };
@@ -228,6 +231,9 @@
 		D5307A4718B40A6B008C8463 /* FENormalProjection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENormalProjection.h; sourceTree = "<group>"; };
 		D53B72D51BA9000A000F572F /* FEInitialCondition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEInitialCondition.cpp; sourceTree = "<group>"; };
 		D53B72D61BA9000A000F572F /* FEInitialCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEInitialCondition.h; sourceTree = "<group>"; };
+		D55E3AEC1C5BBEDD00815FCA /* DumpMemStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DumpMemStream.cpp; sourceTree = "<group>"; };
+		D55E3AED1C5BBEDD00815FCA /* DumpMemStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DumpMemStream.h; sourceTree = "<group>"; };
+		D55E3AEE1C5BBEDD00815FCA /* FEDataStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDataStream.h; sourceTree = "<group>"; };
 		D571F8291B78C49C002FAACE /* FERigidSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidSystem.cpp; sourceTree = "<group>"; };
 		D571F82A1B78C49C002FAACE /* FERigidSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidSystem.h; sourceTree = "<group>"; };
 		D58D4D111B5D7E76002BB72A /* FECallback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECallback.cpp; sourceTree = "<group>"; };
@@ -476,6 +482,8 @@
 				D5A0A8EF186F4AC60046B0DE /* DOFS.h */,
 				D5E109F71865E15900B23922 /* DumpFile.cpp */,
 				D5E109F81865E15900B23922 /* DumpFile.h */,
+				D55E3AEC1C5BBEDD00815FCA /* DumpMemStream.cpp */,
+				D55E3AED1C5BBEDD00815FCA /* DumpMemStream.h */,
 				D5E109F91865E15900B23922 /* DumpStream.cpp */,
 				D5E109FA1865E15900B23922 /* DumpStream.h */,
 				D50E7EB51992EB8300950744 /* eig3.cpp */,
@@ -516,6 +524,7 @@
 				D5B572D4186CC76500D12E45 /* FECoreTask.h */,
 				D5CFECAA1C18ADAB00FCA009 /* FEDataExport.cpp */,
 				D5CFECAB1C18ADAB00FCA009 /* FEDataExport.h */,
+				D55E3AEE1C5BBEDD00815FCA /* FEDataStream.h */,
 				D5E10A141865E15900B23922 /* FEDiscreteDomain.cpp */,
 				D5E10A151865E15900B23922 /* FEDiscreteDomain.h */,
 				D5E10A161865E15900B23922 /* FEDiscreteMaterial.cpp */,
@@ -714,11 +723,13 @@
 				D59BBBB01AD771DD00E2991F /* tens3d.h in Headers */,
 				D5E10ADE1865E15900B23922 /* FESolver.h in Headers */,
 				D5E10ABB1865E15900B23922 /* FELinearConstraint.h in Headers */,
+				D55E3AF01C5BBEDD00815FCA /* DumpMemStream.h in Headers */,
 				D5307A4918B40A6B008C8463 /* FENormalProjection.h in Headers */,
 				D5A4EAED1B7BD1F0002E1641 /* FERigidSystem.h in Headers */,
 				D59BBBB91AD771DD00E2991F /* tens6d.h in Headers */,
 				D59BBBB11AD771DD00E2991F /* tens3dls.hpp in Headers */,
 				D5E10ABF1865E15900B23922 /* FEMaterialPoint.h in Headers */,
+				D55E3AF11C5BBEDD00815FCA /* FEDataStream.h in Headers */,
 				D5E10ADC1865E15900B23922 /* FESolidDomain.h in Headers */,
 				D5E10AFD1865E15900B23922 /* NodeDataRecord.h in Headers */,
 				D5E10B091865E15900B23922 /* tens4d.hpp in Headers */,
@@ -900,6 +911,7 @@
 				D5E10AC01865E15900B23922 /* FEMesh.cpp in Sources */,
 				D5E10A981865E15900B23922 /* FEBoundaryCondition.cpp in Sources */,
 				D5E10AE81865E15900B23922 /* Image.cpp in Sources */,
+				D55E3AEF1C5BBEDD00815FCA /* DumpMemStream.cpp in Sources */,
 				D5F9A96E1C3C4B8400D53C19 /* RigidBC.cpp in Sources */,
 				D5FA1BE21B74CDCB00EA5913 /* FEModelLoad.cpp in Sources */,
 				D50CB99B1B177CCC006E43E6 /* BC.cpp in Sources */,
