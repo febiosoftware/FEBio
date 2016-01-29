@@ -415,33 +415,56 @@ END_PARAMETER_LIST();
 // FEEllipsoidalFiberDistributionOld
 //-----------------------------------------------------------------------------
 
+FEEllipsoidalFiberDistributionOld::FEEllipsoidalFiberDistributionOld(FEModel* pfem) : FEElasticMaterial(pfem)
+{ 
+	m_nres = 0; 
+}
+
+//-----------------------------------------------------------------------------
 bool FEEllipsoidalFiberDistributionOld::Init()
 {
 	if (FEElasticMaterial::Init() == false) return false;
 
-	m_bfirst = true;
-	
-	if (m_bfirst)
-	{
-		// select the integration rule
-		const int nint = (m_nres == 0? NSTL  : NSTH  );
-		const double* phi = (m_nres == 0? PHIL  : PHIH  );
-		const double* the = (m_nres == 0? THETAL: THETAH);
-		const double* w   = (m_nres == 0? AREAL : AREAH );
-		
-		for (int n=0; n<nint; ++n)
-		{
-			m_cth[n] = cos(the[n]);
-			m_sth[n] = sin(the[n]);
-			m_cph[n] = cos(phi[n]);
-			m_sph[n] = sin(phi[n]);
-			m_w[n] = w[n];
-		}
-		
-		m_bfirst = false;
-	}
+	InitIntegrationRule();
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEEllipsoidalFiberDistributionOld::InitIntegrationRule()
+{
+	// select the integration rule
+	const int nint = (m_nres == 0? NSTL  : NSTH  );
+	const double* phi = (m_nres == 0? PHIL  : PHIH  );
+	const double* the = (m_nres == 0? THETAL: THETAH);
+	const double* w   = (m_nres == 0? AREAL : AREAH );
+		
+	for (int n=0; n<nint; ++n)
+	{
+		m_cth[n] = cos(the[n]);
+		m_sth[n] = sin(the[n]);
+		m_cph[n] = cos(phi[n]);
+		m_sph[n] = sin(phi[n]);
+		m_w[n] = w[n];
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEEllipsoidalFiberDistributionOld::Serialize(DumpStream& ar)
+{
+	FEElasticMaterial::Serialize(ar);
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_nres;
+		}
+		else
+		{
+			ar >> m_nres;
+			InitIntegrationRule();
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

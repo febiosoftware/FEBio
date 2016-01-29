@@ -24,8 +24,11 @@ public:
 	//! calculate strain energy density at material point
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
     
-	//! data initialization and checking
+	//! data initialization
 	bool Init();
+
+	//! serialization
+	void Serialize(DumpStream& ar);
 
 public:
 
@@ -62,6 +65,9 @@ public:
     
 	//! data initialization and checking
 	bool Init();
+
+	//! serialization
+	void Serialize(DumpStream& ar);
 
 public:
 

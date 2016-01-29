@@ -15,6 +15,9 @@ public:
 	//! material initialization
 	bool Init();
 
+	//! serialization
+	void Serialize(DumpStream& ar);
+
 	//! deviatoric stress
 	mat3ds DevStress(FEMaterialPoint& pt);
 

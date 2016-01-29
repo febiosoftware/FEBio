@@ -28,6 +28,14 @@ bool FEEFDMooneyRivlin::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEEFDMooneyRivlin::Serialize(DumpStream& ar)
+{
+	FEUncoupledMaterial::Serialize(ar);
+	m_MR.Serialize(ar);
+	m_EFD.Serialize(ar);
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FEEFDMooneyRivlin::DevStress(FEMaterialPoint& pt)
 {
 	return m_MR.DevStress(pt) + m_EFD.DevStress(pt);

@@ -39,10 +39,13 @@ public:
 class FEEllipsoidalFiberDistributionOld : public FEElasticMaterial
 {
 public:
-	FEEllipsoidalFiberDistributionOld(FEModel* pfem) : FEElasticMaterial(pfem) { m_nres = 0; }
+	FEEllipsoidalFiberDistributionOld(FEModel* pfem);
 	
 	//! Initialization
 	bool Init();
+
+	//! Serialization
+	void Serialize(DumpStream& ar);
 
 	//! Cauchy stress
 	virtual mat3ds Stress(FEMaterialPoint& mp);
@@ -52,19 +55,22 @@ public:
 	
 	//! calculate strain energy density at material point
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+
+protected:
+	void InitIntegrationRule();
     
-	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
-	
-public:
+public: // parameters
 	double	m_beta[3];	// power in power-law relation
 	double	m_ksi[3];	// coefficient in power-law relation
 
+private:
 	int		m_nres;	// integration rule
 	double	m_cth[NSTH];
 	double	m_sth[NSTH];
 	double	m_cph[NSTH];
 	double	m_sph[NSTH];
 	double	m_w[NSTH];
-    bool    m_bfirst;
+
+	// declare the parameter list
+	DECLARE_PARAMETER_LIST();
 };

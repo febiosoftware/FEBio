@@ -1344,4 +1344,30 @@ void FETiedBiphasicInterface::Serialize(DumpStream &ar)
 	// store contact surface data
 	m_ms.Serialize(ar);
 	m_ss.Serialize(ar);
+
+	// serialize pointers
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			int NE = m_ss.m_pme.size();
+			ar << NE;
+			for (int i=0; i<NE; ++i)
+			{
+				FESurfaceElement* pe = m_ss.m_pme[i];
+				if (pe) ar << pe->m_lid; else ar << -1;
+			}
+		}
+		else
+		{
+			int NE, lid;
+			ar >> NE;
+			m_ss.m_pme.resize(NE);
+			for (int i=0; i<NE; ++i)
+			{
+				ar >> lid;
+				if (lid < 0) m_ss.m_pme[i] = 0; else m_ss.m_pme[i] = &m_ms.Element(lid);
+			}
+		}
+	}
 }

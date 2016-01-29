@@ -29,6 +29,14 @@ bool FEEFDVerondaWestmann::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEEFDVerondaWestmann::Serialize(DumpStream& ar)
+{
+	FEUncoupledMaterial::Serialize(ar);
+	m_VW.Serialize(ar);
+	m_EFD.Serialize(ar);
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FEEFDVerondaWestmann::DevStress(FEMaterialPoint& pt)
 {
 	return m_VW.DevStress(pt) + m_EFD.DevStress(pt);

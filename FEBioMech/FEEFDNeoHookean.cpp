@@ -21,6 +21,13 @@ bool FEEFDNeoHookean::Init()
 	return true;
 }
 
+void FEEFDNeoHookean::Serialize(DumpStream& ar)
+{
+	FEElasticMaterial::Serialize(ar);
+	m_NH.Serialize(ar);
+	m_EFD.Serialize(ar);
+}
+
 mat3ds FEEFDNeoHookean::Stress(FEMaterialPoint& mp)
 {
 	// --- M A T R I X   C O N T R I B U T I O N ---
@@ -80,6 +87,13 @@ bool FEEFDNeoHookeanOld::Init()
 	if (m_NH.Init() == false) return false;
 	if (m_EFD.Init() == false) return false;
 	return true;
+}
+
+void FEEFDNeoHookeanOld::Serialize(DumpStream& ar)
+{
+	FEElasticMaterial::Serialize(ar);
+	m_NH.Serialize(ar);
+	m_EFD.Serialize(ar);
 }
 
 mat3ds FEEFDNeoHookeanOld::Stress(FEMaterialPoint& mp)
