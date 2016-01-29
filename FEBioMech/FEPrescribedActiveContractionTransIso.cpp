@@ -24,9 +24,9 @@ FEPrescribedActiveContractionTransIso::FEPrescribedActiveContractionTransIso(FEM
 }
 
 //-----------------------------------------------------------------------------
-bool FEPrescribedActiveContractionTransIso::Init()
+bool FEPrescribedActiveContractionTransIso::Validate()
 {
-	if (FEElasticMaterial::Init() == false) return false;
+	if (FEElasticMaterial::Validate() == false) return false;
 
     // convert angles from degrees to radians
     double pi = 4*atan(1.0);
@@ -38,6 +38,23 @@ bool FEPrescribedActiveContractionTransIso::Init()
     m_n0.z = cos(phi);
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEPrescribedActiveContractionTransIso::Serialize(DumpStream& ar)
+{
+	FEElasticMaterial::Serialize(ar);
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_n0;
+		}
+		else
+		{
+			ar >> m_n0;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

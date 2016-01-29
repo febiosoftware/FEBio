@@ -280,11 +280,11 @@ REGISTER_FECORE_CLASS(FEGenerationMaterial                 , FEMATERIAL_ID, "gen
 REGISTER_FECORE_CLASS(FEPRLig					           , FEMATERIAL_ID, "PRLig");
 REGISTER_FECORE_CLASS(FEFiberExpLinear					   , FEMATERIAL_ID, "fiber-exp-linear");
 REGISTER_FECORE_CLASS(FEUncoupledFiberExpLinear            , FEMATERIAL_ID, "uncoupled fiber-exp-linear");
-REGISTER_FECORE_CLASS(FEPrescribedActiveContractionUniaxial, FEMATERIAL_ID, "prescribed uniaxial active contraction");
-REGISTER_FECORE_CLASS(FEPrescribedActiveContractionUniaxialUC, FEMATERIAL_ID, "uncoupled prescribed uniaxial active contraction");
-REGISTER_FECORE_CLASS(FEPrescribedActiveContractionTransIso, FEMATERIAL_ID, "prescribed trans iso active contraction");
-REGISTER_FECORE_CLASS(FEPrescribedActiveContractionTransIsoUC, FEMATERIAL_ID, "uncoupled prescribed trans iso active contraction");
-REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropic, FEMATERIAL_ID, "prescribed isotropic active contraction");
+REGISTER_FECORE_CLASS(FEPrescribedActiveContractionUniaxial   , FEMATERIAL_ID, "prescribed uniaxial active contraction");
+REGISTER_FECORE_CLASS(FEPrescribedActiveContractionUniaxialUC , FEMATERIAL_ID, "uncoupled prescribed uniaxial active contraction");
+REGISTER_FECORE_CLASS(FEPrescribedActiveContractionTransIso   , FEMATERIAL_ID, "prescribed trans iso active contraction");
+REGISTER_FECORE_CLASS(FEPrescribedActiveContractionTransIsoUC , FEMATERIAL_ID, "uncoupled prescribed trans iso active contraction");
+REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropic  , FEMATERIAL_ID, "prescribed isotropic active contraction");
 REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropicUC, FEMATERIAL_ID, "uncoupled prescribed isotropic active contraction");
 
 REGISTER_FECORE_CLASS(FELinearSpring           , FEMATERIAL_ID, "linear");

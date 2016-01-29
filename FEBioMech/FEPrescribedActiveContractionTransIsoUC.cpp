@@ -24,10 +24,9 @@ FEPrescribedActiveContractionTransIsoUC::FEPrescribedActiveContractionTransIsoUC
 }
 
 //-----------------------------------------------------------------------------
-bool FEPrescribedActiveContractionTransIsoUC::Init()
+bool FEPrescribedActiveContractionTransIsoUC::Validate()
 {
-	if (FEUncoupledMaterial::Init() == false) return false;
-
+	if (FEUncoupledMaterial::Validate() == false) return false;
     // convert angles from degrees to radians
     double pi = 4*atan(1.0);
     double the = m_thd*pi/180.;
@@ -36,8 +35,24 @@ bool FEPrescribedActiveContractionTransIsoUC::Init()
     m_n0.x = cos(the)*sin(phi);
     m_n0.y = sin(the)*sin(phi);
     m_n0.z = cos(phi);
-
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEPrescribedActiveContractionTransIsoUC::Serialize(DumpStream& ar)
+{
+	FEUncoupledMaterial::Serialize(ar);
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_n0;
+		}
+		else
+		{
+			ar >> m_n0;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

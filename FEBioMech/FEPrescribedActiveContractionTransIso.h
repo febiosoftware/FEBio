@@ -20,8 +20,11 @@ public:
     //! constructor
     FEPrescribedActiveContractionTransIso(FEModel* pfem);
     
-    //! Initialization
-    bool Init();
+    //! Validation
+    bool Validate();
+
+	//! serialization
+	void Serialize(DumpStream& ar);
     
     //! stress
     mat3ds Stress(FEMaterialPoint& pt);

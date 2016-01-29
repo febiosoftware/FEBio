@@ -20,8 +20,11 @@ public:
     //! constructor
     FEPrescribedActiveContractionUniaxial(FEModel* pfem);
     
-    //! Initialization
-    bool Init();
+    //! validation
+    bool Validate();
+
+	//! serialization
+	void Serialize(DumpStream& ar);
     
     //! stress
     mat3ds Stress(FEMaterialPoint& pt);
@@ -33,6 +36,8 @@ public:
     double	m_T0;       // prescribed active stress
     double	m_thd;		// theta angle for fiber orientation (local coordinates system)
     double	m_phd;		// phi angle for fiber orientation (local coordinates system)
+
+private:
     vec3d	m_n0;		// unit vector along fiber direction (local coordinate system)
     
     DECLARE_PARAMETER_LIST();

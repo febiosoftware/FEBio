@@ -24,9 +24,9 @@ FEPrescribedActiveContractionUniaxialUC::FEPrescribedActiveContractionUniaxialUC
 }
 
 //-----------------------------------------------------------------------------
-bool FEPrescribedActiveContractionUniaxialUC::Init()
+bool FEPrescribedActiveContractionUniaxialUC::Validate()
 {
-	if (FEUncoupledMaterial::Init() == false) return false;
+	if (FEUncoupledMaterial::Validate() == false) return false;
 
     // convert angles from degrees to radians
     double pi = 4*atan(1.0);
@@ -38,6 +38,23 @@ bool FEPrescribedActiveContractionUniaxialUC::Init()
     m_n0.z = cos(phi);
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEPrescribedActiveContractionUniaxialUC::Serialize(DumpStream& ar)
+{
+	FEUncoupledMaterial::Serialize(ar);
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_n0;
+		}
+		else
+		{
+			ar >> m_n0;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
