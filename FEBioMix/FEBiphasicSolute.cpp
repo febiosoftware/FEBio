@@ -60,6 +60,23 @@ bool FEBiphasicSolute::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEBiphasicSolute::Serialize(DumpStream& ar)
+{
+	FEMaterial::Serialize(ar);
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_Rgas << m_Tabs << m_Mu;
+		}
+		else
+		{
+			ar >> m_Rgas >> m_Tabs >> m_Mu;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Porosity in current configuration
 double FEBiphasicSolute::Porosity(FEMaterialPoint& pt)
 {

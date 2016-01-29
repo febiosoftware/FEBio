@@ -32,6 +32,9 @@ public:
 
 public:
 	bool Init();
+
+	//! serialization
+	void Serialize(DumpStream& ar);
 	
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
@@ -65,9 +68,11 @@ public:
 	
 public: // material parameters
 	double						m_rhoTw;		//!< true fluid density
-	double						m_rhoTu;		//!< true solute density
-	double						m_Mu;			//!< solute molecular weight
 	double						m_phi0;			//!< solid volume fraction in reference configuration
+
+public:
+	double						m_Mu;			//!< solute molecular weight
+	double						m_rhoTu;		//!< true solute density
 	double						m_Rgas;			//!< universal gas constant
 	double						m_Tabs;			//!< absolute temperature
 
