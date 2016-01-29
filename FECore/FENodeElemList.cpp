@@ -197,6 +197,15 @@ void FENodeElemList::Create(FEDomain& dom)
 }
 
 //-----------------------------------------------------------------------------
+void FENodeElemList::Clear()
+{
+	m_nval.clear();
+	m_eref.clear();
+	m_iref.clear();
+	m_pn.clear();
+}
+
+//-----------------------------------------------------------------------------
 //! Save data to dump file
 
 void FENodeElemList::Serialize(DumpStream& ar)

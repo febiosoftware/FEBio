@@ -42,6 +42,9 @@ public:
 	//! serialize data to/from dump file
 	void Serialize(DumpStream& ar);
 
+	//! Clear the list
+	void Clear();
+
 	int MaxValence();
 	int Valence(int n) { return m_nval[n]; }
 	FEElement** ElementList(int n) { return &m_eref[0] + m_pn[n]; }

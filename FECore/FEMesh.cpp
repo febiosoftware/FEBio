@@ -525,6 +525,7 @@ void FEMesh::Clear()
 	m_NodeSet.clear();
 	m_FaceSet.clear();
 	m_ElSet.clear();
+	m_NEL.Clear();
 }
 
 //-----------------------------------------------------------------------------
