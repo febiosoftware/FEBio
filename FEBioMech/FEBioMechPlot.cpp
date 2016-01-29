@@ -1261,6 +1261,102 @@ bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+FEPlotNestedDamage::FEPlotNestedDamage(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
+{
+    m_pfem = pfem;
+    m_nmat = -1;
+}
+
+//-----------------------------------------------------------------------------
+// Resolve nested damage material by number
+bool FEPlotNestedDamage::SetFilter(int nmat)
+{
+    m_nmat = nmat-1;
+    return (m_nmat != -1);
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotNestedDamage::Save(FEDomain &dom, FEDataStream& a)
+{
+    int N = dom.Elements();
+    FEElasticMaterial* pmat = dom.GetMaterial()->GetElasticMaterial();
+    if (dynamic_cast<FEElasticMixture*>(pmat)||dynamic_cast<FEUncoupledElasticMixture*>(pmat))
+    {
+        int NC = pmat->Properties();
+        if ((m_nmat > -1) && (m_nmat < NC))
+        {
+            for (int i=0; i<N; ++i)
+            {
+                FEElement& el = dom.ElementRef(i);
+                
+                float D = 0.f;
+                int nint = el.GaussPoints();
+                for (int j=0; j<nint; ++j)
+                {
+                    FEElasticMixtureMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMixtureMaterialPoint>();
+                    FEDamageMaterialPoint* ppd = pt.GetPointData(m_nmat)->ExtractData<FEDamageMaterialPoint>();
+                    if (ppd) D += (float) ppd->m_D;
+                }
+                D /= (float) nint;
+                a.push_back(D);
+            }
+        }
+    }
+    else if (dynamic_cast<FEElasticMultigeneration*>(pmat))
+    {
+        FEElasticMultigeneration* pmg = dynamic_cast<FEElasticMultigeneration*>(pmat);
+        int NC = pmg->Properties();
+        if ((m_nmat > -1) && (m_nmat < NC))
+        {
+            for (int i=0; i<N; ++i)
+            {
+                FEElement& el = dom.ElementRef(i);
+                
+                float D = 0.f;
+                int nint = el.GaussPoints();
+                for (int j=0; j<nint; ++j)
+                {
+                    FEMultigenerationMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEMultigenerationMaterialPoint>();
+                    FEDamageMaterialPoint* ppd = pt.GetPointData(m_nmat)->ExtractData<FEDamageMaterialPoint>();
+                    FEElasticMixtureMaterialPoint* pem = pt.GetPointData(m_nmat)->ExtractData<FEElasticMixtureMaterialPoint>();
+                    if (ppd) D += (float) ppd->m_D;
+                    else if (pem)
+                    {
+                        int NE = (int)pem->m_w.size();
+                        for (int l=0; l<NE; ++l)
+                        {
+                            FEDamageMaterialPoint* ppd = pem->GetPointData(l)->ExtractData<FEDamageMaterialPoint>();
+                            if (ppd) D += (float) ppd->m_D;
+                        }
+                    }
+                }
+                D /= (float) nint;
+                a.push_back(D);
+            }
+        }
+    }
+    else
+    {
+        for (int i=0; i<N; ++i)
+        {
+            FEElement& el = dom.ElementRef(i);
+            
+            float D = 0.f;
+            int nint = el.GaussPoints();
+            for (int j=0; j<nint; ++j)
+            {
+                FEMaterialPoint& pt = *el.GetMaterialPoint(j);
+                FEDamageMaterialPoint* ppd = pt.ExtractData<FEDamageMaterialPoint>();
+                if (ppd) D += (float) ppd->m_D;
+            }
+            D /= (float) nint;
+            a.push_back(D);
+        }
+    }
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotMixtureVolumeFraction::Save(FEDomain &m, FEDataStream &a)
 {
 	// extract the mixture material

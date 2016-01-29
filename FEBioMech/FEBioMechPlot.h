@@ -339,6 +339,19 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Damage reduction factor
+class FEPlotNestedDamage : public FEDomainData
+{
+public:
+    FEPlotNestedDamage(FEModel* pfem);
+    bool Save(FEDomain& m, FEDataStream& a);
+    bool SetFilter(int nsol);
+protected:
+    int			m_nmat;
+    FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
 //! Mixture volume fraction
 class FEPlotMixtureVolumeFraction : public FEDomainData
 {

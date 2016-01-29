@@ -399,6 +399,7 @@ REGISTER_FECORE_CLASS(FEPlotFiberStretch         , FEPLOTDATA_ID, "fiber stretch
 REGISTER_FECORE_CLASS(FEPlotDevFiberStretch      , FEPLOTDATA_ID, "deviatoric fiber stretch");
 REGISTER_FECORE_CLASS(FEPlotShellThickness       , FEPLOTDATA_ID, "shell thickness"       );
 REGISTER_FECORE_CLASS(FEPlotDamage               , FEPLOTDATA_ID, "damage"                );
+REGISTER_FECORE_CLASS(FEPlotNestedDamage         , FEPLOTDATA_ID, "nested damage"         );
 REGISTER_FECORE_CLASS(FEPlotMixtureVolumeFraction, FEPLOTDATA_ID, "volume fraction"       );
 REGISTER_FECORE_CLASS(FEPlotUT4NodalStresses     , FEPLOTDATA_ID, "ut4 nodal stress"      );
 REGISTER_FECORE_CLASS(FEPlotShellStrain          , FEPLOTDATA_ID, "shell strain"          );
