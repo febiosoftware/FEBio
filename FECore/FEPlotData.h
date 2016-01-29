@@ -8,6 +8,14 @@
 #include "FEDataStream.h"
 
 //-----------------------------------------------------------------------------
+// Region types
+enum Region_Type {
+	FE_REGION_NODE,
+	FE_REGION_DOMAIN,
+	FE_REGION_SURFACE
+};
+
+//-----------------------------------------------------------------------------
 // forward declaration of model class
 class FEModel;
 
@@ -20,7 +28,7 @@ class FEModel;
 class FEPlotData : public FECoreBase
 {
 public:
-	FEPlotData(Var_Type t, Storage_Fmt s) : FECoreBase(FEPLOTDATA_ID) { m_ntype = t; m_sfmt = s; m_pfem = 0; }
+	FEPlotData(Region_Type R, Var_Type t, Storage_Fmt s) : FECoreBase(FEPLOTDATA_ID) { m_ntype = t; m_sfmt = s; m_nregion = R, m_pfem = 0; }
 	virtual void Save(FEModel& fem, Archive& ar) = 0;
 
 	// The filter can be used to pass additional information to the plot field.
@@ -34,6 +42,7 @@ public:
 	virtual bool SetFilter(const char* sz) { return false; }
 	virtual bool SetFilter(int n) { return false;}
 
+	Region_Type RegionType() { return m_nregion; }
 	Var_Type DataType() { return m_ntype; }
 	Storage_Fmt StorageFormat() { return m_sfmt; }
 
@@ -46,6 +55,7 @@ public:
 	FEModel* GetFEModel() { return m_pfem; }
 
 protected:
+	Region_Type		m_nregion;	//!< region type
 	Var_Type		m_ntype;	//!< data type
 	Storage_Fmt		m_sfmt;		//!< data storage format
 	vector<int>		m_item;		//!< Data will only be stored for the item's in this list
@@ -59,7 +69,7 @@ protected:
 class FENodeData : public FEPlotData
 {
 public:
-	FENodeData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
+	FENodeData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_NODE, t, s) {}
 	void Save(FEModel& fem, Archive& ar);
 	virtual bool Save(FEMesh& m, FEDataStream& a) = 0;
 };
@@ -70,7 +80,7 @@ public:
 class FEDomainData : public FEPlotData
 {
 public:
-	FEDomainData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
+	FEDomainData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_DOMAIN, t, s) {}
 	void Save(FEModel& fem, Archive& ar);
 	virtual bool Save(FEDomain& D, FEDataStream& a) = 0;
 };
@@ -81,7 +91,7 @@ public:
 class FESurfaceData : public FEPlotData
 {
 public:
-	FESurfaceData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
+	FESurfaceData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_SURFACE, t, s) {}
 	void Save(FEModel& fem, Archive& ar);
 	virtual bool Save(FESurface& S, FEDataStream& a) = 0;
 };

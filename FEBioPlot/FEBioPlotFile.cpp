@@ -6,7 +6,7 @@
 class FEPlotDataExport : public FEPlotData
 {
 public:
-	FEPlotDataExport(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(itype, fmt) { m_szname = szname; }
+	FEPlotDataExport(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(FE_REGION_SURFACE, itype, fmt) { m_szname = szname; }
 	void Save(FEModel& fem, Archive& ar)
 	{
 		FEMesh& mesh = fem.GetMesh();
@@ -168,9 +168,15 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 
 		// add the field to the plot file
         ps->SetDomainName(szdom);
-        if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname, item);
-        else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname, item);
-        else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, szname, item);
+		switch (ps->RegionType())
+		{
+		case FE_REGION_NODE   : return AddNodalVariable  (ps, szname, item);
+		case FE_REGION_DOMAIN : return AddDomainVariable (ps, szname, item);
+		case FE_REGION_SURFACE: return AddSurfaceVariable(ps, szname, item);
+		default:
+			assert(false);
+			return false;
+		}
 	}
 	else
 	{
@@ -229,7 +235,8 @@ bool FEBioPlotFile::Dictionary::AddMaterialVariable(FEPlotData* ps, const char* 
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szname, vector<int>& item)
 {
-	if (dynamic_cast<FENodeData*>(ps))
+	assert(ps->RegionType()==FE_REGION_NODE);
+	if (ps->RegionType()==FE_REGION_NODE)
 	{
 		DICTIONARY_ITEM it;
 		it.m_ntype = ps->DataType();
@@ -245,7 +252,8 @@ bool FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szn
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::Dictionary::AddDomainVariable(FEPlotData* ps, const char* szname, vector<int>& item)
 {
-	if (dynamic_cast<FEDomainData*>(ps))
+	assert(ps->RegionType()==FE_REGION_DOMAIN);
+	if (ps->RegionType()==FE_REGION_DOMAIN)
 	{
 		DICTIONARY_ITEM it;
 		it.m_ntype = ps->DataType();
@@ -261,7 +269,8 @@ bool FEBioPlotFile::Dictionary::AddDomainVariable(FEPlotData* ps, const char* sz
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* szname, vector<int>& item)
 {
-//	if (dynamic_cast<FESurfaceData*>(ps))
+	assert(ps->RegionType()==FE_REGION_SURFACE);
+	if (ps->RegionType()==FE_REGION_SURFACE)
 	{
 		DICTIONARY_ITEM it;
 		it.m_ntype = ps->DataType();
