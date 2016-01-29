@@ -38,7 +38,7 @@ void FEDamageMaterialPoint::Serialize(DumpStream& ar)
 {
     if (ar.IsSaving())
     {
-        ar << m_Etrial << m_Emax >> m_D;
+        ar << m_Etrial << m_Emax << m_D;
     }
     else
     {
