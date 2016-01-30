@@ -2842,15 +2842,15 @@ void FEFergusonShellQuadElementTraits::init()
         H[n][2] = Fr[1]*Fs[1];
         H[n][3] = Fr[0]*Fs[1];
 
-        P[0][n][0] = Fr[2]*Fs[0];
-        P[0][n][1] = Fr[3]*Fs[0];
-        P[0][n][2] = Fr[3]*Fs[1];
-        P[0][n][3] = Fr[2]*Fs[1];
+        P[n][0] = Fr[2]*Fs[0];
+        P[n][1] = Fr[3]*Fs[0];
+        P[n][2] = Fr[3]*Fs[1];
+        P[n][3] = Fr[2]*Fs[1];
         
-        P[1][n][0] = Fr[0]*Fs[2];
-        P[1][n][1] = Fr[1]*Fs[2];
-        P[1][n][2] = Fr[1]*Fs[3];
-        P[1][n][3] = Fr[0]*Fs[3];
+        Q[n][0] = Fr[0]*Fs[2];
+        Q[n][1] = Fr[1]*Fs[2];
+        Q[n][2] = Fr[1]*Fs[3];
+        Q[n][3] = Fr[0]*Fs[3];
         
         shape_deriv(Gr, gr[n]);
         shape_deriv(Gs, gs[n]);
@@ -2865,25 +2865,25 @@ void FEFergusonShellQuadElementTraits::init()
         Hs[n][2] = Fr[1]*Gs[1];
         Hs[n][3] = Fr[0]*Gs[1];
         
-        Pr[0][n][0] = Gr[2]*Fs[0];
-        Pr[0][n][1] = Gr[3]*Fs[0];
-        Pr[0][n][2] = Gr[3]*Fs[1];
-        Pr[0][n][3] = Gr[2]*Fs[1];
+        Pr[n][0] = Gr[2]*Fs[0];
+        Pr[n][1] = Gr[3]*Fs[0];
+        Pr[n][2] = Gr[3]*Fs[1];
+        Pr[n][3] = Gr[2]*Fs[1];
         
-        Ps[0][n][0] = Fr[2]*Gs[0];
-        Ps[0][n][1] = Fr[3]*Gs[0];
-        Ps[0][n][2] = Fr[3]*Gs[1];
-        Ps[0][n][3] = Fr[2]*Gs[1];
+        Ps[n][0] = Fr[2]*Gs[0];
+        Ps[n][1] = Fr[3]*Gs[0];
+        Ps[n][2] = Fr[3]*Gs[1];
+        Ps[n][3] = Fr[2]*Gs[1];
         
-        Pr[1][n][0] = Gr[0]*Fs[2];
-        Pr[1][n][1] = Gr[1]*Fs[2];
-        Pr[1][n][2] = Gr[1]*Fs[3];
-        Pr[1][n][3] = Gr[0]*Fs[3];
+        Qr[n][0] = Gr[0]*Fs[2];
+        Qr[n][1] = Gr[1]*Fs[2];
+        Qr[n][2] = Gr[1]*Fs[3];
+        Qr[n][3] = Gr[0]*Fs[3];
         
-        Ps[1][n][0] = Fr[0]*Gs[2];
-        Ps[1][n][1] = Fr[1]*Gs[2];
-        Ps[1][n][2] = Fr[1]*Gs[3];
-        Ps[1][n][3] = Fr[0]*Gs[3];
+        Qs[n][0] = Fr[0]*Gs[2];
+        Qs[n][1] = Fr[1]*Gs[2];
+        Qs[n][2] = Fr[1]*Gs[3];
+        Qs[n][3] = Fr[0]*Gs[3];
     }
 }
 

@@ -1176,12 +1176,12 @@ public:
         m_J0i.resize(ni);
         m_detJ0.resize(ni);
         
-        P[0].resize(ni, ne);
-        P[1].resize(ni, ne);
-        Pr[0].resize(ni, ne);
-        Pr[1].resize(ni, ne);
-        Ps[0].resize(ni, ne);
-        Ps[1].resize(ni, ne);
+        P.resize(ni, ne);
+        Q.resize(ni, ne);
+        Pr.resize(ni, ne);
+        Qr.resize(ni, ne);
+        Ps.resize(ni, ne);
+        Qs.resize(ni, ne);
     }
     
 public:
@@ -1208,13 +1208,13 @@ public:
     vector<double>	m_detJ0;	// jacobian determinant
 
 public:
-    matrix P[2];	//!< tangent shape function values at gausspoints.
+    matrix P, Q;	//!< tangent shape function values at gausspoints.
     
                     //!< The first index refers to the gauss-point,
                     //!< the second index to the shape function
     
     // local derivatives of shape functions at gauss points
-    matrix Pr[2], Ps[2];
+    matrix Pr, Ps, Qr, Qs;
     
     // shape function at r
     void shape(double* H, double r);

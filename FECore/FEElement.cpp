@@ -151,6 +151,49 @@ void FEShellElement::SetTraits(FEElementTraits* ptraits)
 }
 
 //-----------------------------------------------------------------------------
+FEFergusonShellElement::FEFergusonShellElement(const FEFergusonShellElement& el)
+{
+    // set the traits of the element
+    if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
+    
+    // copy base class data
+    m_mat = el.m_mat;
+    m_nID = el.m_nID;
+    m_node = el.m_node;
+    m_lnode = el.m_lnode;
+    
+    // copy shell data
+    m_h0 = el.m_h0;
+    m_D0 = el.m_D0;
+}
+
+//! assignment operator
+FEFergusonShellElement& FEFergusonShellElement::operator = (const FEFergusonShellElement& el)
+{
+    // set the traits of the element
+    if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
+    
+    // copy base class data
+    m_mat = el.m_mat;
+    m_nID = el.m_nID;
+    m_node = el.m_node;
+    m_lnode = el.m_lnode;
+    
+    // copy shell data
+    m_h0 = el.m_h0;
+    m_D0 = el.m_D0;
+    
+    return (*this);
+}
+
+void FEFergusonShellElement::SetTraits(FEElementTraits* ptraits)
+{
+    FEElement::SetTraits(ptraits);
+    m_h0.assign(Nodes(), 0.0);
+    m_D0.resize(Nodes());
+}
+
+//-----------------------------------------------------------------------------
 FESurfaceElement::FESurfaceElement() 
 { 
 	m_nelem = -1; m_lid = -1; 

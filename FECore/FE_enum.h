@@ -36,7 +36,8 @@ enum FE_Element_Shape {
     ET_QUAD9,
 	ET_TRI3,
     ET_TRI6,
-	ET_TRUSS2
+	ET_TRUSS2,
+    ET_FQUAD4
 };
 
 //-----------------------------------------------------------------------------
@@ -234,6 +235,7 @@ enum FE_Dump_Level {
 #define	FE_DOMAIN_TRUSS		5
 #define	FE_DOMAIN_DISCRETE	6
 #define	FE_DOMAIN_2D		7
+#define FE_DOMAIN_FERGUSON  8
 
 // --- data types ---
 enum Var_Type { PLT_FLOAT, PLT_VEC3F, PLT_MAT3FS, PLT_MAT3FD, PLT_TENS4FS, PLT_MAT3F };

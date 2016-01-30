@@ -81,6 +81,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 			else sztype = "elastic-solid";
 		}
 		else if ((eshape == ET_QUAD4) || (eshape == ET_TRI3))sztype = "elastic-shell";
+        else if ((eshape == ET_FQUAD4)) sztype = "elastic-ferguson-shell";
 		else if ((eshape == ET_TRUSS2)) sztype = "elastic-truss";
 		else return 0;
 	}
