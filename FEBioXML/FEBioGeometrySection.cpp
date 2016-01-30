@@ -136,7 +136,8 @@ FE_Element_Shape FEBioGeometrySection::ElementShape(XMLTag& t)
 	else if (t=="tri3"  ) return ET_TRI3;
     else if (t=="tri6"  ) return ET_TRI6;
 	else if (t=="truss2") return ET_TRUSS2;
-	else 
+    else if (t=="fquad4") return ET_FQUAD4;
+	else
 	{
 		assert(false);
 		throw XMLReader::InvalidTag(t);
@@ -162,6 +163,7 @@ FEDomain* FEBioGeometrySection::CreateDomain(const FE_Element_Shape& eshape, FEM
     else if (eshape == ET_QUAD4) spec.etype = m_pim->m_nquad4;
     else if (eshape == ET_QUAD8) spec.etype = m_pim->m_nquad8;
     else if (eshape == ET_QUAD9) spec.etype = m_pim->m_nquad9;
+    else if (eshape == ET_FQUAD4) spec.etype = m_pim->m_nfquad4;
 	
 	// get the domain type
 	FECoreKernel& febio = FECoreKernel::GetInstance();
@@ -281,6 +283,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		else if (tag == "quad4" ) etype = ET_QUAD4;
 		else if (tag == "tri3"  ) etype = ET_TRI3;
 		else if (tag == "truss2") etype = ET_TRUSS2;
+        else if (tag == "fquad4") etype = ET_FQUAD4;
 		else throw XMLReader::InvalidTag(tag);
 
 		switch (etype)
@@ -295,6 +298,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		case ET_QUAD4 : ReadElement(tag, dom.ElementRef(ne), FE_SHELL_QUAD, nid, nmat); break;
 		case ET_TRI3  : ReadElement(tag, dom.ElementRef(ne), FE_SHELL_TRI, nid, nmat); break;
 		case ET_TRUSS2: ReadElement(tag, dom.ElementRef(ne), FE_TRUSS, nid, nmat); break;
+        case ET_FQUAD4: ReadElement(tag, dom.ElementRef(ne), FE_FERGUSON_SHELL_QUAD, nid, nmat); break;
 		default:
 			throw FEBioImport::InvalidElementType();
 		}
@@ -348,7 +352,8 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	else if (strcmp(sztype, "tri3"  ) == 0) etype = ET_TRI3;
     else if (strcmp(sztype, "tri6"  ) == 0) etype = ET_TRI6;
 	else if (strcmp(sztype, "truss2") == 0) etype = ET_TRUSS2;
-	else 
+    else if (strcmp(sztype, "fquad4") == 0) etype = ET_FQUAD4;
+	else
 	{
 		// new way for defining element type and integration rule at the same time
 		// this is useful for multi-step analyses where the geometry is read in before the control section.
@@ -428,6 +433,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
     case ET_QUAD8 : el_type = FE2D_QUAD8G9   ; break;
     case ET_QUAD9 : el_type = FE2D_QUAD9G9   ; break;
 	case ET_TRUSS2: el_type = FE_TRUSS       ; break;
+    case ET_FQUAD4: el_type = FE_FERGUSON_SHELL_QUAD ; break;
 	default:
 		throw FEBioImport::InvalidElementType();
 	}
@@ -554,6 +560,7 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 		else if (tag == "quad4" ) etype = ET_QUAD4;
 		else if (tag == "tri3"  ) etype = ET_TRI3;
 		else if (tag == "truss2") etype = ET_TRUSS2;
+        else if (tag == "fquad4") etype = ET_FQUAD4;
 		else throw XMLReader::InvalidTag(tag);
 
 		switch (etype)
@@ -568,6 +575,7 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 		case ET_QUAD4 : ReadElement(tag, dom.ElementRef(ne), FE_SHELL_QUAD, nid, 0); break;
 		case ET_TRI3  : ReadElement(tag, dom.ElementRef(ne), FE_SHELL_TRI, nid, 0); break;
 		case ET_TRUSS2: ReadElement(tag, dom.ElementRef(ne), FE_TRUSS, nid, 0); break;
+        case ET_FQUAD4: ReadElement(tag, dom.ElementRef(ne), FE_FERGUSON_SHELL_QUAD, nid, 0); break;
 		default:
 			throw FEBioImport::InvalidElementType();
 		}
@@ -704,7 +712,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 			}
 			else if (tag == "thickness")
 			{
-				if (pe->Class() != FE_ELEM_SHELL) throw XMLReader::InvalidTag(tag);
+				if ((pe->Class() != FE_ELEM_SHELL) && (pe->Class() != FE_ELEM_FERGUSON_SHELL)) throw XMLReader::InvalidTag(tag);
 				FEShellElement* pse = static_cast<FEShellElement*> (pe);
 
 				// read shell thickness
