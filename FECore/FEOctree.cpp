@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEOctree.h"
 #include "FESurface.h"
+#include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
 // Create the eight children of an octree node and find their contents

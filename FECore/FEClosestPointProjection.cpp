@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEClosestPointProjection.h"
 #include "FEElemElemList.h"
+#include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
 // constructor

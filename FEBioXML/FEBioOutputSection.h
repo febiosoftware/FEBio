@@ -1,6 +1,8 @@
 #pragma once
 #include "FEBioImport.h"
 
+class FEFacetSet;
+
 //-----------------------------------------------------------------------------
 // Output Section
 class FEBioOutputSection : public FEBioFileSection

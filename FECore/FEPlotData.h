@@ -1,6 +1,5 @@
 #pragma once
 
-#include "FEMesh.h"
 #include "FESurface.h"
 #include "FECoreBase.h"
 #include "Archive.h"
@@ -16,8 +15,9 @@ enum Region_Type {
 };
 
 //-----------------------------------------------------------------------------
-// forward declaration of model class
+// forward declarations
 class FEModel;
+class FEMesh;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all classes that wish to store data to the 

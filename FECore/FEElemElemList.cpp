@@ -3,6 +3,7 @@
 #include "FENodeElemList.h"
 #include "FESolidDomain.h"
 #include "FESurface.h"
+#include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
 FEElemElemList::FEElemElemList(void)

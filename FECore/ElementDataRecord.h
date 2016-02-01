@@ -1,6 +1,10 @@
 #pragma once
 #include "FECoreBase.h"
 #include "DataStore.h"
+
+class FEElement;
+class FEElementSet;
+
 //-----------------------------------------------------------------------------
 //! Base class for element log data
 class FELogElemData : public FECoreBase

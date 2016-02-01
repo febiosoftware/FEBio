@@ -2,6 +2,7 @@
 #include "FETiedContactSurface.h"
 #include "FECore/FEShellDomain.h"
 #include "FECore/vector.h"
+#include <FECore/FEMesh.h>
 
 //-----------------------------------------------------------------------------
 //! Creates a surface for use with a sliding interface. All surface data

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FESurface.h"
+#include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
 FESurface::FESurface(FEMesh* pm) : FEDomain(FE_DOMAIN_SURFACE, pm) 

@@ -2,6 +2,8 @@
 #include "FECoreBase.h"
 #include "DataStore.h"
 
+class FENodeSet;
+
 //-----------------------------------------------------------------------------
 //! This is the base class for a node data value.
 //! \todo I'd like to modify this so I can pass the FENode class instead of the node number

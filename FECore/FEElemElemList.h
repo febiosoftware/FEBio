@@ -1,7 +1,10 @@
 #pragma once
-
-#include "FEMesh.h"
 #include <vector>
+
+//-----------------------------------------------------------------------------
+class FEMesh;
+class FESurface;
+class FEElement;
 
 //-----------------------------------------------------------------------------
 //! This class finds for each element the neighbouring elements

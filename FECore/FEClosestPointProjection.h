@@ -2,6 +2,7 @@
 #include "FESurface.h"
 #include "FENNQuery.h"
 #include "FEElemElemList.h"
+#include "FENodeElemList.h"
 
 //-----------------------------------------------------------------------------
 // This class can be used to find the closest point projection of a point

@@ -8,6 +8,8 @@
 #include <string>
 using namespace std;
 
+class FENodeSet;
+
 class FEBioImport;
 
 //-----------------------------------------------------------------------------

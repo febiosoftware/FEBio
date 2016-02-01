@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <queue>
 #include <stack>
+#include "vector.h"
+#include <assert.h>
 using namespace std;
 
 //-----------------------------------------------------------------------------

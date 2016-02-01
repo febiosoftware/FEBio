@@ -6,6 +6,7 @@ using namespace FECore;
 
 //-----------------------------------------------------------------------------
 class FEModel;
+class FEGlobalVector;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all loads that are applied to surfaces

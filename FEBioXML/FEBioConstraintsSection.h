@@ -1,6 +1,8 @@
 #pragma once
 #include "FEBioImport.h"
 
+class FEFacetSet;
+
 //-----------------------------------------------------------------------------
 // Constraints Section
 class FEBioConstraintsSection : public FEBioFileSection

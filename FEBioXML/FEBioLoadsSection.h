@@ -2,6 +2,12 @@
 #include "FEBioImport.h"
 
 //-----------------------------------------------------------------------------
+class FEFaceSet;
+class FEEdge;
+class FEFacetSet;
+class FESegmentSet;
+
+//-----------------------------------------------------------------------------
 // Loads Section (new in version 1.2)
 class FEBioLoadsSection : public FEBioFileSection
 {

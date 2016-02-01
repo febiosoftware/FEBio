@@ -6,6 +6,7 @@
 #include "FENNQuery.h"
 #include "FESurface.h"
 #include <stdlib.h>
+#include "FEMesh.h"
 using namespace std;
 
 int cmp_node(const void* e1, const void* e2)

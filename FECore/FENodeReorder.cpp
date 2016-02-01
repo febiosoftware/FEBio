@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FENodeReorder.h"
+#include "FEMesh.h"
 #include <stack>
 using namespace std;
 

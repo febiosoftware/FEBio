@@ -2,6 +2,8 @@
 #include "FEBioImport.h"
 #include "FECore/FESurfacePairInteraction.h"
 
+class FEFacetSet;
+
 //-----------------------------------------------------------------------------
 // Contact section (new in version 2.0)
 class FEBioContactSection : public FEBioFileSection

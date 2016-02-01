@@ -9,7 +9,6 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FECore/FEMesh.h"
 #include "FECore/FESurfacePairInteraction.h"
 
 class FEModel;

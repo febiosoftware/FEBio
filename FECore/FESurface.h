@@ -9,9 +9,12 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEMesh.h"
 #include "mat2d.h"
 #include "vec2d.h"
+#include "FEDomain.h"
+
+//-----------------------------------------------------------------------------
+class FEMesh;
 
 //-----------------------------------------------------------------------------
 //! Surface mesh

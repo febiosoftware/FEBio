@@ -2,6 +2,7 @@
 #include "FEMortarInterface.h"
 #include "FECore/mortar.h"
 #include "FECore/log.h"
+#include <FECore/FEMesh.h>
 
 //-----------------------------------------------------------------------------
 FEMortarInterface::FEMortarInterface(FEModel* pfem) : FEContactInterface(pfem)
