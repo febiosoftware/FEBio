@@ -3398,6 +3398,7 @@ FELineElementTraits::FELineElementTraits(int ni, int ne, FE_Element_Type et) : F
 	m_ntype = et;
 
 	gr.resize(ni);
+	gw.resize(ni);
 	Gr.resize(ni, ne);
     Grr.resize(ni, ne);
 }
