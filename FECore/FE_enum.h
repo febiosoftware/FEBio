@@ -15,8 +15,9 @@ enum FE_Element_Class {
 	FE_ELEM_SURFACE,
 	FE_ELEM_TRUSS,
 	FE_ELEM_DISCRETE,
-    FE_ELEM_FERGUSON_SHELL,	/// --> TODO: why is this here? This is just another shell so there is no need to define this.
-	FE_ELEM_2D
+    FE_ELEM_FERGUSON_SHELL,
+	FE_ELEM_2D,
+	FE_ELEM_EDGE
 };
 
 //-----------------------------------------------------------------------------
@@ -37,7 +38,8 @@ enum FE_Element_Shape {
 	ET_TRI3,
     ET_TRI6,
 	ET_TRUSS2,
-    ET_FQUAD4
+    ET_FQUAD4,
+	ET_LINE2
 };
 
 //-----------------------------------------------------------------------------
@@ -105,7 +107,10 @@ enum FE_Element_Type {
 	FE2D_TRI6G3,
 	FE2D_QUAD4G4,
 	FE2D_QUAD8G9,
-	FE2D_QUAD9G9
+	FE2D_QUAD9G9,
+
+	// line elements
+	FE_LINE2G1
 };
 
 //-----------------------------------------------------------------------------
@@ -144,6 +149,7 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FECALLBACK_ID				0x0012	// derived from FECallBack
 #define FEDOMAIN_ID					0x0013	// derived from FEDomain (TODO: work in progress)
 #define FEIC_ID						0x0014	// derived from initial condition
+#define FEEDGELOAD_ID				0x0015	// derived from FEEdgeLoad
 
 /////////////////////////////////////////////////////////////////////////////
 // ENUM: Linear solvers
@@ -236,6 +242,7 @@ enum FE_Dump_Level {
 #define	FE_DOMAIN_DISCRETE	6
 #define	FE_DOMAIN_2D		7
 #define FE_DOMAIN_FERGUSON  8
+#define FE_DOMAIN_EDGE		9
 
 // --- data types ---
 enum Var_Type { PLT_FLOAT, PLT_VEC3F, PLT_MAT3FS, PLT_MAT3FD, PLT_TENS4FS, PLT_MAT3F };

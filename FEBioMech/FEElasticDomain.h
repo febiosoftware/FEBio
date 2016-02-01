@@ -1,11 +1,12 @@
 #pragma once
-#include "FEBodyForce.h"
-#include "FECore/FESolver.h"
-#include "FECore/FEModel.h"
 #include <vector>
 using namespace std;
 
+//-----------------------------------------------------------------------------
 class FEModel;
+class FEGlobalVector;
+class FEBodyForce;
+class FESolver;
 
 //-----------------------------------------------------------------------------
 //! Abstract interface class for elastic domains.

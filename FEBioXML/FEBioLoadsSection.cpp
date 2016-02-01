@@ -28,6 +28,7 @@ void FEBioLoadsSection::Parse(XMLTag& tag)
 		{
 			if      (tag == "nodal_load"  ) ParseBCForce      (tag);
 			else if (tag == "surface_load") ParseSurfaceLoad20(tag);
+			else if (tag == "edge_load"   ) ParseEdgeLoad     (tag);
 			else if (tag == "body_load"   ) ParseBodyLoad20   (tag);
 			else throw XMLReader::InvalidTag(tag);
 		}
@@ -426,6 +427,98 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
+void FEBioLoadsSection::ParseEdgeLoad(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+
+	// create edge load
+	const char* sztype = tag.AttributeValue("type");
+	FEEdgeLoad* pel = fecore_new<FEEdgeLoad>(FEEDGELOAD_ID, sztype, &fem);
+	if (pel == 0) throw XMLReader::InvalidTag(tag);
+
+	// create a new edge
+	FEEdge* pedge = new FEEdge(&fem.GetMesh());
+	fem.GetMesh().AddEdge(pedge);
+	pel->SetEdge(pedge);
+
+	// read the parameters
+	FEParameterList& pl = pel->GetParameterList();
+
+	// read the pressure data
+	++tag;
+	do
+	{
+		if (m_pim->ReadParameter(tag, pl) == false)
+		{
+			if (tag == "edge")
+			{
+				// see if the surface is referenced by a set of defined explicitly
+				const char* szset = tag.AttributeValue("set", true);
+				if (szset)
+				{
+					// make sure this tag does not have any children
+					if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
+
+					// see if we can find the facet set
+					FEMesh& m = GetFEModel()->GetMesh();
+					FESegmentSet* ps = m.FindSegmentSet(szset);
+
+					// create an edge from the segment set
+					if (ps)
+					{
+						if (BuildEdge(*pedge, *ps) == false) throw XMLReader::InvalidTag(tag);
+						pel->Create(pedge->Elements());
+					}
+					else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
+				}
+				else
+				{
+					// count how many load cards there are
+					int npr = tag.children();
+					pedge->create(npr);
+					pel->Create(npr);
+
+					++tag;
+					int nf[FEElement::MAX_NODES ], N;
+					for (int i=0; i<npr; ++i)
+					{
+						FELineElement& el = pedge->Element(i);
+
+						for (int j=0; j<tag.m_natt; ++j)
+						{
+							XMLAtt& att = tag.m_att[j];
+							if (pel->SetFacetAttribute(i, att.m_szatt, att.m_szatv) == false) throw XMLReader::InvalidAttributeValue(tag, att.m_szatt, att.m_szatv);
+						}
+
+						if      (tag == "line2") el.SetType(FE_LINE2G1);
+						else throw XMLReader::InvalidTag(tag);
+
+						N = el.Nodes();
+						tag.value(nf, N);
+						for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+
+						++tag;
+					}
+				}
+			}
+			else throw XMLReader::InvalidTag(tag);
+		}
+		++tag;
+	}
+	while (!tag.isend());
+
+	// add edge load to model
+	fem.AddEdgeLoad(pel);
+
+	// add this boundary condition to the current step
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddModelComponent(pel);
+		pel->Deactivate();
+	}
+}
+
+//-----------------------------------------------------------------------------
 bool FEBioLoadsSection::BuildSurface(FESurface& s, FEFacetSet& fs)
 {
 	FEModel& fem = *GetFEModel();
@@ -458,6 +551,38 @@ bool FEBioLoadsSection::BuildSurface(FESurface& s, FEFacetSet& fs)
 
 	// copy the name
 	s.SetName(fs.GetName());
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioLoadsSection::BuildEdge(FEEdge& e, FESegmentSet& es)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& m = fem.GetMesh();
+	int NN = m.Nodes();
+
+	// count nr of segments
+	int nsegs = es.Segments();
+
+	// allocate storage for faces
+	e.create(nsegs);
+
+	// read segments
+	for (int i=0; i<nsegs; ++i)
+	{
+		FELineElement& el = e.Element(i);
+		FESegmentSet::SEGMENT& si = es.Segment(i);
+
+		if      (si.ntype == 2) el.SetType(FE_LINE2G1);
+		else return false;
+
+		int N = el.Nodes(); assert(N == si.ntype);
+		for (int j=0; j<N; ++j) el.m_node[j] = si.node[j];
+	}
+
+	// copy the name
+	e.SetName(es.GetName());
 
 	return true;
 }

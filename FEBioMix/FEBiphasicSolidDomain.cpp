@@ -1,7 +1,7 @@
 #include "FEBiphasicSolidDomain.h"
 #include "FECore/FEMesh.h"
 #include "FECore/log.h"
-#include "FECore/DOFS.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEElasticDomain(pfem)

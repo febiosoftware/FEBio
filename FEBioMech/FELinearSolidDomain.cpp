@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FELinearSolidDomain.h"
 #include "FEElasticMaterial.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 FELinearElasticDomain::FELinearElasticDomain(FEModel* pfem)
@@ -27,6 +28,10 @@ void FELinearSolidDomain::Reset()
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
 }
+
+//-----------------------------------------------------------------------------
+//! get the material (overridden from FEDomain)
+FEMaterial* FELinearSolidDomain::GetMaterial() { return m_pMat; }
 
 //-----------------------------------------------------------------------------
 //! \todo The material point initialization needs to move to the base class.

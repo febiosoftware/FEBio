@@ -1,8 +1,8 @@
 #pragma once
 #include "FECore/FESolidDomain.h"
-#include "FECore/FESolver.h"
-#include "FECore/FEModel.h"
-#include "FESolidMaterial.h"
+
+//-----------------------------------------------------------------------------
+class FESolidMaterial;
 
 //-----------------------------------------------------------------------------
 class FELinearElasticDomain
@@ -23,7 +23,7 @@ public:
 	FELinearSolidDomain(FEModel* pfem, FEMaterial* pmat);
 
 	//! get the material (overridden from FEDomain)
-	FEMaterial* GetMaterial() { return m_pMat; }
+	FEMaterial* GetMaterial();
 
 	//! Initialization
 	bool Initialize(FEModel& fem);

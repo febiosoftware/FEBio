@@ -6,13 +6,13 @@
 //  Copyright © 2015 febio.org. All rights reserved.
 //
 #pragma once
-#include "FEBioMech/FEBodyForce.h"
-#include "FECore/FESolver.h"
-#include "FECore/FEModel.h"
 #include <vector>
 using namespace std;
 
 class FEModel;
+class FESolver;
+class FEBodyForce;
+class FEGlobalVector;
 
 //-----------------------------------------------------------------------------
 //! Abstract interface class for fluid domains.

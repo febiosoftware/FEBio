@@ -6,6 +6,7 @@
 #include "FERigidMaterial.h"
 #include "FECore/log.h"
 #include "FECore/FEGlobalMatrix.h"
+#include <FECore/FEModel.h>
 #include "NumCore/NumCore.h"
 
 //-----------------------------------------------------------------------------

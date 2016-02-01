@@ -8,7 +8,6 @@
 
 #pragma once
 #include "FECore/FEDomain2D.h"
-#include "FECore/FEModel.h"
 #include "FEFluidDomain.h"
 #include "FEFluid.h"
 

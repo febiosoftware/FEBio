@@ -4,6 +4,7 @@
 #include "FEHeatTransferMaterial.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 FEThermoElasticSolidDomain::FEThermoElasticSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEElasticDomain(pfem)

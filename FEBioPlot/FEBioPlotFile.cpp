@@ -2,6 +2,7 @@
 #include "FEBioPlotFile.h"
 #include "FECore/FECoreKernel.h"
 #include "FECore/FEDataExport.h"
+#include "FECore/FEModel.h"
 
 class FEPlotDataExport : public FEPlotData
 {

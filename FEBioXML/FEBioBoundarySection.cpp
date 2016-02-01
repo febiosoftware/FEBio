@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEBioBoundarySection.h"
+#include "FECore/FEModel.h"
 #include "FECore/FEDiscreteMaterial.h"
 #include "FECore/FEDiscreteDomain.h"
 #include "FEBioMech/FERigidWallInterface.h"

@@ -8,7 +8,7 @@
 #include "FEBioMech/FEResidualVector.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
-#include "FECore/DOFS.h"
+#include <FECore/FEModel.h>
 #include "FECore/sys.h"
 
 //-----------------------------------------------------------------------------

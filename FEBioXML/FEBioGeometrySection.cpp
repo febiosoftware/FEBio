@@ -39,6 +39,7 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 			else if (tag == "ElementData") ParseElementDataSection(tag);
 			else if (tag == "NodeSet"    ) ParseNodeSetSection    (tag);
 			else if (tag == "Surface"    ) ParseSurfaceSection    (tag);
+			else if (tag == "Edge"       ) ParseEdgeSection       (tag);
 			else if (tag == "ElementSet" ) ParseElementSetSection (tag);
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
@@ -777,6 +778,56 @@ void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 	// read the node set
 	FENodeSet* pns = m_pim->ParseNodeSet(tag);
 	if (pns == 0) throw XMLReader::InvalidTag(tag);
+}
+
+//-----------------------------------------------------------------------------
+//! Reads a Geometry\Edge section.
+void FEBioGeometrySection::ParseEdgeSection(XMLTag& tag)
+{
+	// get the mesh
+	FEMesh& mesh = *m_pim->GetFEMesh();
+
+	// get the number of nodes
+	// (we use this for checking the node indices of the facets)
+	int NN = mesh.Nodes();
+
+	// get the required name attribute
+	const char* szname = tag.AttributeValue("name");
+
+	// count nr of segments
+	int nsegs = tag.children();
+
+	// allocate storage for segments
+	FESegmentSet* ps = new FESegmentSet;
+	ps->Create(nsegs);
+	ps->SetName(szname);
+
+	// add it to the mesh
+	mesh.AddSegmentSet(ps);
+
+	// read segments
+	++tag;
+	int nf[FEElement::MAX_NODES];
+	for (int i=0; i<nsegs; ++i)
+	{
+		FESegmentSet::SEGMENT& line = ps->Segment(i);
+
+		// set the facet type
+		if      (tag == "line2") line.ntype = 2;
+		else throw XMLReader::InvalidTag(tag);
+
+		// we assume that the segment type also defines the number of nodes
+		int N = line.ntype;
+		tag.value(nf, N);
+		for (int j=0; j<N; ++j) 
+		{
+			int nid = nf[j]-1;
+			if ((nid<0)||(nid>= NN)) throw XMLReader::InvalidValue(tag);
+			line.node[j] = nid;
+		}
+
+		++tag;
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -5,6 +5,8 @@
 #include <FECore/FERigidBody.h>
 #include <FECore/log.h>
 #include <FECore/sys.h>
+#include <FECore/FEModel.h>
+#include <FEBioMech/FEBodyForce.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FEBox.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
+#include <FECore/FEModel.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

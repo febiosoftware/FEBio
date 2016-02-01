@@ -14,9 +14,11 @@ protected:
 	void ParseBodyForce    (XMLTag& tag);
 	void ParseBodyLoad     (XMLTag& tag);
 	void ParseBodyLoad20   (XMLTag& tag);
+	void ParseEdgeLoad     (XMLTag& tag);
 	void ParseSurfaceLoad  (XMLTag& tag);
 	void ParseSurfaceLoad20(XMLTag& tag);
 
 protected:
 	bool BuildSurface(FESurface& s, FEFacetSet& f);
+	bool BuildEdge   (FEEdge&    s, FESegmentSet& f);
 };

@@ -1,7 +1,6 @@
 #pragma once
-
 #include "FECore/FESurface.h"
-#include "FECore/FEModel.h"
+#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 //! This class is the base class for rigid surfaces

@@ -13,6 +13,7 @@
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/LinearSolver.h"
 #include "FEContactInterface.h"
+#include <FECore/FEModel.h>
 #include <FECore/sys.h>
 #include <assert.h>
 

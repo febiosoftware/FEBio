@@ -333,3 +333,49 @@ FEElement2D& FEElement2D::operator = (const FEElement2D& el)
 
 	return (*this);
 }
+
+//-----------------------------------------------------------------------------
+FELineElement::FELineElement()
+{
+	m_lid = -1;
+}
+
+FELineElement::FELineElement(const FELineElement& el)
+{
+	// set the traits of the element
+	if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
+
+	// copy data
+	m_lid = el.m_lid;
+
+	// copy base class data
+	m_mat = el.m_mat;
+	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
+}
+
+FELineElement& FELineElement::operator = (const FELineElement& el)
+{
+	// set the traits of the element
+	if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
+
+	// copy data
+	m_lid = el.m_lid;
+
+	// copy base class data
+	m_mat = el.m_mat;
+	m_nID = el.m_nID;
+	m_node = el.m_node;
+	m_lnode = el.m_lnode;
+
+	return (*this);
+}
+
+void FELineElement::SetTraits(FEElementTraits* pt)
+{
+	// we don't allocate state data for surface elements
+	m_pT = pt;
+	m_node.resize(Nodes());
+	m_lnode.resize(Nodes());
+}

@@ -12,6 +12,7 @@
 #include "FEDomain.h"
 #include "FENodeElemList.h"
 #include "DumpStream.h"
+#include "FEEdge.h"
 
 //-----------------------------------------------------------------------------
 //  This class stores the coordinates of a bounding box
@@ -193,6 +194,32 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! This class defines a set of segments. This can be used in the creation of edges.
+class FESegmentSet
+{
+public:
+	struct SEGMENT
+	{
+		int	node[FEElement::MAX_NODES];
+		int	ntype;	//	2=line2
+	};
+
+public:
+	FESegmentSet();
+	const char* GetName() { return m_szname; }
+	void SetName(const char* sz);
+
+	void Create(int n);
+
+	int Segments() { return (int) m_Seg.size(); }
+	SEGMENT& Segment(int i);
+
+public:
+	vector<SEGMENT>	m_Seg;
+	char			m_szname[256];
+};
+
+//-----------------------------------------------------------------------------
 // This class defines a set of elements
 class FEElementSet
 {
@@ -307,9 +334,9 @@ public:
 	FENodeSet* FindNodeSet(const char* szname);
 
 	// --- ELEMENT SETS ---
-	int ElementSets() { return (int) m_ElSet.size(); }
-	FEElementSet& ElementSet(int n) { return *m_ElSet[n]; }
-	void AddElementSet(FEElementSet* pg) { m_ElSet.push_back(pg); }
+	int ElementSets() { return (int) m_ElemSet.size(); }
+	FEElementSet& ElementSet(int n) { return *m_ElemSet[n]; }
+	void AddElementSet(FEElementSet* pg) { m_ElemSet.push_back(pg); }
 
 	//! Find a element set by name
 	FEElementSet* FindElementSet(const char* szname);
@@ -328,10 +355,21 @@ public:
 	FESurface& Surface(int n) { return *m_Surf[n]; }
 	void AddSurface(FESurface* ps) { m_Surf.push_back(ps); }
 
+	// --- EDGES ---
+	int Edges() { return (int) m_Edge.size(); }
+	FEEdge& Edge(int n) { return *m_Edge[n]; }
+	void AddEdge(FEEdge* ps) { m_Edge.push_back(ps); }
+
 	// --- FACETSETS ---
 	int FacetSets() { return (int) m_FaceSet.size(); }
 	FEFacetSet& FacetSet(int n) { return *m_FaceSet[n]; }
 	void AddFacetSet(FEFacetSet* ps) { m_FaceSet.push_back(ps); }
+
+	// --- Segment Sets ---
+	int SegmentSets() { return (int) m_LineSet.size(); }
+	FESegmentSet& SegmentSet(int n) { return *m_LineSet[n]; }
+	void AddSegmentSet(FESegmentSet* ps) { m_LineSet.push_back(ps); }
+	FESegmentSet* FindSegmentSet(const char* szname);
 
 protected:
 	double SolidElementVolume(FESolidElement& el);
@@ -344,10 +382,12 @@ protected:
 	vector<FENode>		m_Node;		//!< nodes
 	vector<FEDomain*>	m_Domain;	//!< list of domains
 	vector<FESurface*>	m_Surf;		//!< surfaces
+	vector<FEEdge*>		m_Edge;		//!< Edges
 
 	vector<FENodeSet*>		m_NodeSet;	//!< node sets
+	vector<FESegmentSet*>	m_LineSet;	//!< segment sets
 	vector<FEFacetSet*>		m_FaceSet;	//!< facet sets
-	vector<FEElementSet*>	m_ElSet;	//!< element sets
+	vector<FEElementSet*>	m_ElemSet;	//!< element sets
 
 	FE_BOUNDING_BOX		m_box;	//!< bounding box
 

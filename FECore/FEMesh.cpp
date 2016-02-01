@@ -133,6 +133,32 @@ void FEFacetSet::SetName(const char* sz)
 }
 
 //=============================================================================
+// FESegmentSet
+//-----------------------------------------------------------------------------
+FESegmentSet::FESegmentSet()
+{
+	m_szname[0] = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FESegmentSet::Create(int n)
+{
+	m_Seg.resize(n);
+}
+
+//-----------------------------------------------------------------------------
+FESegmentSet::SEGMENT& FESegmentSet::Segment(int i)
+{
+	return m_Seg[i];
+}
+
+//-----------------------------------------------------------------------------
+void FESegmentSet::SetName(const char* sz)
+{
+	strcpy(m_szname, sz); 
+}
+
+//=============================================================================
 // FEElementSet
 //-----------------------------------------------------------------------------
 FEElementSet::FEElementSet(FEMesh* pm) : m_pmesh(pm)
@@ -518,13 +544,15 @@ void FEMesh::Clear()
 //	for (size_t i=0; i<m_Surf.size   (); ++i) delete m_Surf   [i];
 
 	for (size_t i=0; i<m_NodeSet.size(); ++i) delete m_NodeSet[i];
+	for (size_t i=0; i<m_LineSet.size(); ++i) delete m_LineSet[i];
 	for (size_t i=0; i<m_FaceSet.size(); ++i) delete m_FaceSet[i];
-	for (size_t i=0; i<m_ElSet.size  (); ++i) delete m_ElSet  [i];
+	for (size_t i=0; i<m_ElemSet.size  (); ++i) delete m_ElemSet[i];
 	m_Domain.clear();
 	m_Surf.clear();
 	m_NodeSet.clear();
+	m_LineSet.clear();
 	m_FaceSet.clear();
-	m_ElSet.clear();
+	m_ElemSet.clear();
 	m_NEL.Clear();
 }
 
@@ -699,11 +727,20 @@ FENodeSet* FEMesh::FindNodeSet(const char* szname)
 }
 
 //-----------------------------------------------------------------------------
+//! Find a segment set set by name
+
+FESegmentSet* FEMesh::FindSegmentSet(const char* szname)
+{
+	for (size_t i=0; i<m_LineSet.size(); ++i) if (strcmp(m_LineSet[i]->GetName(), szname) == 0) return m_LineSet[i];
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Find a element set by name
 
 FEElementSet* FEMesh::FindElementSet(const char* szname)
 {
-	for (size_t i=0; i<m_ElSet.size(); ++i) if (strcmp(m_ElSet[i]->GetName(), szname) == 0) return m_ElSet[i];
+	for (size_t i=0; i<m_ElemSet.size(); ++i) if (strcmp(m_ElemSet[i]->GetName(), szname) == 0) return m_ElemSet[i];
 	return 0;
 }
 

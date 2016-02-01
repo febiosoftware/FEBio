@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEElasticTrussDomain.h"
-#include "FECore/DOFS.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 //! Constructor

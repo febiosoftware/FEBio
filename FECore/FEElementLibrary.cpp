@@ -67,6 +67,7 @@ FEElementLibrary* FEElementLibrary::GetInstance()
 		n = m_pThis->RegisterTraits(new FE2DQuad4G4 ); assert(n==FE2D_QUAD4G4);
 		n = m_pThis->RegisterTraits(new FE2DQuad8G9 ); assert(n==FE2D_QUAD8G9);
 		n = m_pThis->RegisterTraits(new FE2DQuad9G9 ); assert(n==FE2D_QUAD9G9);
+		n = m_pThis->RegisterTraits(new FELine2G1   ); assert(n==FE_LINE2G1);
 	}
 	return m_pThis;
 }

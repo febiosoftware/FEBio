@@ -4,6 +4,7 @@
 #include "FEFluidDomain2D.h"
 #include "FEFluid.h"
 #include "FEBioPlot/FEBioPlotFile.h"
+#include <FECore/FEModel.h>
 
 //=============================================================================
 //                            N O D E   D A T A

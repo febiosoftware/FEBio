@@ -14,6 +14,7 @@
 #include "FECore/FEGlobalMatrix.h"
 #include "FEContactInterface.h"
 #include <FECore/sys.h>
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list

@@ -1,6 +1,5 @@
 #pragma once
 #include "FECore/FESolidDomain.h"
-#include "FECore/FEModel.h"
 #include "FEElasticDomain.h"
 #include "FESolidMaterial.h"
 

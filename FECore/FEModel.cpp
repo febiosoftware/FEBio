@@ -1317,6 +1317,21 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 			psl->Serialize(ar);
 		}
 
+		// edge loads
+		ar << (int) m_EL.size();
+		for (int i=0; i<(int) m_EL.size(); ++i)
+		{
+			FEEdgeLoad* pel = m_EL[i];
+
+			// get the edge
+			FEEdge& e = pel->Edge();
+			e.Serialize(ar);
+
+			// save the load data
+			ar << pel->GetTypeStr();
+			pel->Serialize(ar);
+		}
+
 		// body loads
 		ar << (int) m_BL.size();
 		for (int i=0; i<(int) m_BL.size(); ++i)
@@ -1436,6 +1451,29 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 
 			m_SL.push_back(ps);
 			m_mesh.AddSurface(psurf);
+		}
+
+		// edge loads
+		ar >> n;
+		m_EL.clear();
+		for (int i=0; i<n; ++i)
+		{
+			// create a new edge
+			FEEdge* pedge = new FEEdge(&m_mesh);
+			pedge->Serialize(ar);
+
+			// read load data
+			char sztype[256] = {0};
+			ar >> sztype;
+			FEEdgeLoad* pel = fecore_new<FEEdgeLoad>(FEEDGELOAD_ID, sztype, this);
+			assert(pel);
+			pel->SetEdge(pedge);
+
+			pel->Serialize(ar);
+			if (pel->IsActive()) pel->Activate(); else pel->Deactivate();
+
+			m_EL.push_back(pel);
+			m_mesh.AddEdge(pedge);
 		}
 
 		// body loads

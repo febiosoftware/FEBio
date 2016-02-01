@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "FEElasticShellDomain.h"
 #include "FEElasticMaterial.h"
-#include "FECore/log.h"
-#include "FECore/DOFS.h"
+#include "FEBodyForce.h"
+#include <FECore/log.h>
+#include <FECore/FEModel.h>
 #include <math.h>
 
 //-----------------------------------------------------------------------------

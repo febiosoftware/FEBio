@@ -10,6 +10,7 @@
 #include "FEMultiphasic.h"
 #include "FEBiphasicContactSurface.h"
 #include "FEBioPlot/FEBioPlotFile.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)

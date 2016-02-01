@@ -6,6 +6,7 @@
 #include "FERigidWallInterface.h"
 #include "FECore/FENNQuery.h"
 #include "FEElasticShellDomain.h"
+#include <FECore/FEModel.h>
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

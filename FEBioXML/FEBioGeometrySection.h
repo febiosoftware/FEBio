@@ -23,6 +23,7 @@ protected:
 	void ParseElementSection20  (XMLTag& tag);
 	void ParseElementDataSection(XMLTag& tag);
 	void ParseNodeSetSection    (XMLTag& tag);
+	void ParseEdgeSection       (XMLTag& tag);
 	void ParseSurfaceSection    (XMLTag& tag);
 	void ParseElementSetSection (XMLTag& tag);
 

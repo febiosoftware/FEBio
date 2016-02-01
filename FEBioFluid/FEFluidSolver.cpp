@@ -2,6 +2,7 @@
 #include "FEFluidSolver.h"
 #include "FEFluidDomain.h"
 #include "FEFluidResidualVector.h"
+#include "FECore/FEModel.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 #include "NumCore/NumCore.h"
@@ -9,6 +10,7 @@
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/BFGSSolver2.h"
 #include "FECore/sys.h"
+#include <FEBioMech/FEBodyForce.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list

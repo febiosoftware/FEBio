@@ -11,6 +11,7 @@
 #include "FESurfacePairInteraction.h"
 #include "FEAnalysis.h"
 #include "FESurfaceLoad.h"
+#include "FEEdgeLoad.h"
 #include "FENLConstraint.h"
 #include "FELinearConstraint.h"
 #include "FEObject.h"
@@ -149,6 +150,11 @@ public: // --- Boundary Conditions functions ---
 	int SurfaceLoads() { return (int) m_SL.size(); }
 	FESurfaceLoad* SurfaceLoad(int i) { return m_SL[i]; }
 	void AddSurfaceLoad(FESurfaceLoad* psl) { m_SL.push_back(psl); }
+
+	// edge loads
+	int EdgeLoads() { return (int) m_EL.size(); }
+	FEEdgeLoad* EdgeLoad(int i) { return m_EL[i]; }
+	void AddEdgeLoad(FEEdgeLoad* psl) { m_EL.push_back(psl); }
 
 public: // --- Body load functions --- 
 
@@ -314,6 +320,7 @@ protected:
 	std::vector<FEInitialCondition*>		m_IC;	//!< initial conditions
 	std::vector<FENodalLoad*>				m_FC;	//!< concentrated nodal loads
 	std::vector<FESurfaceLoad*>				m_SL;	//!< surface loads
+	std::vector<FEEdgeLoad*>				m_EL;	//!< edge loads
 	std::vector<FESurfacePairInteraction*>	m_CI;	//!< contact interface array
 	std::vector<FEBodyLoad*>				m_BL;	//!< body load data
 	std::vector<FENLConstraint*>			m_NLC;	//!< nonlinear constraints

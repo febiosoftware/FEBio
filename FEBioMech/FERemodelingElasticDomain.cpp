@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FERemodelingElasticDomain.h"
 #include "FERemodelingElasticMaterial.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 //! constructor

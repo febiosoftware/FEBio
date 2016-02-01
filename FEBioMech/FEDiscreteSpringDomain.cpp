@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEDiscreteSpringDomain.h"
-#include "FECore/DOFS.h"
+#include <FECore/FEModel.h>
 
 BEGIN_PARAMETER_LIST(FEDiscreteSpringDomain, FEDiscreteDomain)
 	ADD_PARAMETER(m_keps, FE_PARAM_DOUBLE, "k_eps");

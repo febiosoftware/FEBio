@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEUT4Domain.h"
 #include "FECore/FEMesh.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 // This function converts the Cauchy stress to a 2nd-PK stress

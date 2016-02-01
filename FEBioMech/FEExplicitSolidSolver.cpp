@@ -6,7 +6,7 @@
 #include "FEContactInterface.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
-#include "FECore/DOFS.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list

@@ -2,6 +2,7 @@
 #include "FEFluidDomainFactory.h"
 #include "FEFluid.h"
 #include "FEFluidDomain.h"
+#include <FECore/FEDomain.h>
 
 //-----------------------------------------------------------------------------
 FEDomain* FEFluidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)

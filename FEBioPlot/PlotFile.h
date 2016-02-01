@@ -11,7 +11,9 @@
 
 #include "FECore/FEMesh.h"
 #include "FECore/FEPlotData.h"
-#include "FECore/FEModel.h"
+
+//-----------------------------------------------------------------------------
+class FEModel;
 
 //-----------------------------------------------------------------------------
 //! This class implements the facilities to write to a plot database. 

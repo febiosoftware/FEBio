@@ -1,17 +1,10 @@
 #include "stdafx.h"
 #include "FEElasticSolidDomain.h"
 #include "FEElasticMaterial.h"
+#include "FEBodyForce.h"
 #include "FECore/log.h"
-#include "FECore/DOFS.h"
-
-#ifdef WIN32
-extern "C" int __cdecl omp_get_num_threads(void);
-extern "C" int __cdecl omp_get_thread_num(void);
-#else
-extern "C" int omp_get_num_threads(void);
-extern "C" int omp_get_thread_num(void);
-#endif
-
+#include <FECore/FEModel.h>
+#include <FECore/sys.h>
 
 //-----------------------------------------------------------------------------
 //! constructor

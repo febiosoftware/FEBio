@@ -319,9 +319,6 @@ public:
 public:
 	int		m_lid;			//!< local ID
 	int		m_nelem;		//!< index of solid or shell element this surface element is a face of
-
-	// This array is now defined the FEElement base class
-//	vector<int>	m_lnode;	//!< local node numbering (compared to m_node which is a global numbering)
 };
 
 //-----------------------------------------------------------------------------
@@ -484,5 +481,20 @@ public:
 	void project_to_nodes(double* ai, double* ao) { ((FE2DElementTraits*)m_pT)->project_to_nodes(ai, ao); }
 };
 
+//-----------------------------------------------------------------------------
+class FELineElement : public FEElement
+{
+public:
+	FELineElement();
+
+	FELineElement(const FELineElement& el);
+
+	FELineElement& operator = (const FELineElement& el);
+
+	void SetTraits(FEElementTraits* pt);
+
+public:
+	int	m_lid;	//!< local ID
+};
 
 #endif // !defined(AFX_FEELEMENT_H__2EE38101_58E2_4FEB_B214_BB71B6FB15FB__INCLUDED_)

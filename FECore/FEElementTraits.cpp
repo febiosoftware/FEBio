@@ -3386,3 +3386,88 @@ void FE2DQuad9G9::project_to_nodes(double* ai, double* ao)
 		for (int j=0; j<NELN; ++j) ao[i] += Ai[i][j]*b[j];
 	}
 }
+
+//=============================================================================
+//
+//                  L I N E    E L E M E N T S
+//
+//=============================================================================
+
+FELineElementTraits::FELineElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_EDGE)
+{
+	m_ntype = et;
+
+	gr.resize(ni);
+	Gr.resize(ni, ne);
+    Grr.resize(ni, ne);
+}
+
+//-----------------------------------------------------------------------------
+void FELineElementTraits::init()
+{
+	assert(nint > 0);
+	assert(neln > 0);
+
+	// evaluate shape functions
+	const int NE = FEElement::MAX_NODES;
+	double N[NE];
+	for (int n=0; n<nint; ++n)
+	{
+		shape(N, gr[n]);
+		for (int i=0; i<neln; ++i) H[n][i] = N[i]; 
+	}
+	
+	// evaluate shape function derivatives
+	double Nr[NE];
+	for (int n=0; n<nint; ++n)
+	{
+		shape_deriv(Nr, gr[n]);
+		for (int i=0; i<neln; ++i)
+		{
+			Gr[n][i] = Nr[i];
+		}
+	}
+}
+
+//=============================================================================
+//                         FELine2_
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+void FELine2_::shape(double* H, double r)
+{
+	H[0] = 0.5*(1.0 - r);
+	H[1] = 0.5*(1.0 + r);
+}
+
+//-----------------------------------------------------------------------------
+void FELine2_::shape_deriv(double* Hr, double r)
+{
+	Hr[0] = -0.5;
+	Hr[1] =  0.5;
+}
+
+//-----------------------------------------------------------------------------
+void FELine2_::shape_deriv2(double* Hrr, double r)
+{
+	Hrr[0] = 0;
+	Hrr[1] = 0;
+}
+
+//=============================================================================
+//                          FELine2G1 
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+FELine2G1::FELine2G1() : FELine2_(NINT, FE_LINE2G1)
+{
+	gr[0] = 0.0; gw[0] = 2.0;
+	init(); 
+}
+
+//-----------------------------------------------------------------------------
+void FELine2G1::project_to_nodes(double* ai, double* ao)
+{
+	ao[0] = ai[0];
+	ao[1] = ai[0];
+}

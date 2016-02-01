@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEUDGHexDomain.h"
 #include "FEElasticMaterial.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 FEUDGHexDomain::FEUDGHexDomain(FEModel* pfem) : FEElasticSolidDomain(pfem)

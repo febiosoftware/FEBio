@@ -1541,4 +1541,83 @@ private:
 	matrix	Ai;
 };
 
+//=============================================================================
+//                      L I N E   E L E M E N T S
+//
+// This section defines a set of element formulations used to describe edges. 
+//=============================================================================
+
+//=============================================================================
+class FELineElementTraits : public FEElementTraits
+{
+public:
+	FELineElementTraits(int ni, int ne, FE_Element_Type et);
+
+	// initialization
+	void init();
+
+	// shape functions at r
+	virtual void shape(double* H, double r) = 0;
+
+	// shape function derivatives at (r)
+	virtual void shape_deriv(double* Gr, double r) = 0;
+
+	// shape function second derivatives at (r)
+	virtual void shape_deriv2(double* Grr, double r) = 0;
+
+	// project integration point data to nodes
+	virtual void project_to_nodes(double* ai, double* ao) = 0;
+
+public:
+	vector<double> gr;	//!< integration point coordinates
+	vector<double> gw;	//!< integration point weights
+
+	// local derivatives of shape functions at gauss points
+	matrix Gr;
+    
+    // local second derivatives of shape functions at gauss points
+    matrix Grr;
+};
+
+//=============================================================================
+//
+//   FELine2_
+//   
+//=============================================================================
+
+//=============================================================================
+//! Base class for two-point lines
+class FELine2_ : public FELineElementTraits
+{
+public:
+	enum { NELN = 2 };
+
+public:
+	//! constructor
+	FELine2_(int ni, FE_Element_Type et) : FELineElementTraits(ni, NELN, et){}
+
+	//! shape function at (r)
+	void shape(double* H, double r);
+
+	//! shape function derivatives at (r)
+	void shape_deriv(double* Gr, double r);
+
+	//! shape function derivatives at (r)
+	void shape_deriv2(double* Grr, double r);
+};
+
+//=============================================================================
+class FELine2G1 : public FELine2_
+{
+public:
+	enum { NINT = 1 };
+
+public:
+	//! constructor
+	FELine2G1();
+
+	//! project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
+};
+
 #endif // !defined(AFX_FEELEMENTTRAITS_H__5AE1C578_7EC7_4C11_AC98_EBCCFD68B00C__INCLUDED_)
