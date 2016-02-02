@@ -333,15 +333,6 @@ void FESlidingInterfaceBW::Activate()
 	// don't forget to call the base class!
 	FEContactInterface::Activate();
 
-	// this contact implementation requires a non-symmetric stiffness matrix
-	// so inform the FEM class
-	if (!m_bsymm) 
-	{
-		// request a non-symmetric stiffness matrix
-		FESolver* psolver = GetFEModel()->GetCurrentStep()->GetFESolver();
-		psolver->m_bsymm = false;
-	}
-	
 	// calculate the penalty
 	if (m_bautopen) 
 	{

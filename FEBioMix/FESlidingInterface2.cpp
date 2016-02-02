@@ -486,15 +486,6 @@ bool FESlidingInterface2::Init()
 	if (m_ss.Init() == false) return false;
 	if (m_ms.Init() == false) return false;
 	
-	// this contact implementation requires a non-symmetric stiffness matrix
-	// so inform the FEM class
-	if (!m_bsymm) 
-	{
-		// request a non-symmetric stiffness matrix
-		FESolver* psolver = GetFEModel()->GetCurrentStep()->GetFESolver();
-		psolver->m_bsymm = false;
-	}
-
 	return true;
 }
 
