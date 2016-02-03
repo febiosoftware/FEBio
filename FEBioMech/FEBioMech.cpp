@@ -102,6 +102,7 @@
 #include "FEPrescribedActiveContractionTransIsoUC.h"
 #include "FEPrescribedActiveContractionIsotropic.h"
 #include "FEPrescribedActiveContractionIsotropicUC.h"
+#include "FEGentMaterial.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -224,6 +225,7 @@ REGISTER_FECORE_CLASS(FENeoHookean                   ,FEMATERIAL_ID, "neo-Hookea
 REGISTER_FECORE_CLASS(FENeoHookeanTransIso           ,FEMATERIAL_ID, "neo-Hookean transiso"          );
 REGISTER_FECORE_CLASS(FEOgdenMaterial                ,FEMATERIAL_ID, "Ogden"                         );
 REGISTER_FECORE_CLASS(FEOgdenUnconstrained           ,FEMATERIAL_ID, "Ogden unconstrained"           );
+REGISTER_FECORE_CLASS(FEGentMaterial                 ,FEMATERIAL_ID, "Gent"                          );
 REGISTER_FECORE_CLASS(FEOrthoElastic                 ,FEMATERIAL_ID, "orthotropic elastic"           );
 REGISTER_FECORE_CLASS(FEOrthotropicCLE               ,FEMATERIAL_ID, "orthotropic CLE"               );
 REGISTER_FECORE_CLASS(FEPerfectOsmometer             ,FEMATERIAL_ID, "perfect osmometer"             );
