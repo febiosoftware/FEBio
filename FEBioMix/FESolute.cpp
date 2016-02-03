@@ -74,6 +74,15 @@ void FESoluteData::Serialize(DumpStream &ar)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
+// Material parameters for FESoluteData
+BEGIN_PARAMETER_LIST(FESolute, FEMaterial)
+	ADD_PARAMETER(m_rhoT, FE_PARAM_DOUBLE, "density");
+	ADD_PARAMETER(m_M, FE_PARAM_DOUBLE, "molar_mass");
+	ADD_PARAMETER(m_z, FE_PARAM_INT, "charge_number");
+END_PARAMETER_LIST();
+
+
+//-----------------------------------------------------------------------------
 //! FESolute constructor
 
 FESolute::FESolute(FEModel* pfem) : FEMaterial(pfem)
@@ -128,12 +137,14 @@ void FESolute::Serialize(DumpStream& ar)
 	if (ar.IsSaving())
 	{
 		ar << GetSoluteID();
+		ar << GetSoluteLocalID();
 	}
 	else
 	{
-		int solID;
-		ar >> solID;
+		int solID, solLID;
+		ar >> solID >> solLID;
 		SetSoluteID(solID);
+		SetSoluteLocalID(solLID);
 	}
 }
 

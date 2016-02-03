@@ -197,6 +197,8 @@ public: // material properties
 	FEPropertyT<FESoluteDiffusivity>	m_pDiff;	//!< pointer to diffusivity material
 	FEPropertyT<FESoluteSolubility>		m_pSolub;	//!< pointer to solubility material
 	FEPropertyT<FESoluteSupply>			m_pSupp;	//!< pointer to solute supply material
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
