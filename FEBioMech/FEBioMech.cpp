@@ -211,6 +211,8 @@ REGISTER_FECORE_CLASS(FEFungOrthoCompressible        ,FEMATERIAL_ID, "Fung-ortho
 REGISTER_FECORE_CLASS(FEFungOrthotropic              ,FEMATERIAL_ID, "Fung orthotropic"              );
 REGISTER_FECORE_CLASS(FEGasserOgdenHolzapfel         ,FEMATERIAL_ID, "Gasser-Ogden-Holzapfel"        );
 REGISTER_FECORE_CLASS(FEGasserOgdenHolzapfelUC       ,FEMATERIAL_ID, "Gasser-Ogden-Holzapfel-uncoupled");
+REGISTER_FECORE_CLASS(FEGentMaterial                 ,FEMATERIAL_ID, "Gent"                          );
+REGISTER_FECORE_CLASS(FECompressibleGentMaterial     ,FEMATERIAL_ID, "compressible Gent"             );
 REGISTER_FECORE_CLASS(FEHolmesMow                    ,FEMATERIAL_ID, "Holmes-Mow"                    );
 REGISTER_FECORE_CLASS(FEIncompNeoHookean             ,FEMATERIAL_ID, "incomp neo-Hookean"            );
 REGISTER_FECORE_CLASS(FEIsotropicElastic             ,FEMATERIAL_ID, "isotropic elastic"             );
@@ -225,7 +227,6 @@ REGISTER_FECORE_CLASS(FENeoHookean                   ,FEMATERIAL_ID, "neo-Hookea
 REGISTER_FECORE_CLASS(FENeoHookeanTransIso           ,FEMATERIAL_ID, "neo-Hookean transiso"          );
 REGISTER_FECORE_CLASS(FEOgdenMaterial                ,FEMATERIAL_ID, "Ogden"                         );
 REGISTER_FECORE_CLASS(FEOgdenUnconstrained           ,FEMATERIAL_ID, "Ogden unconstrained"           );
-REGISTER_FECORE_CLASS(FEGentMaterial                 ,FEMATERIAL_ID, "Gent"                          );
 REGISTER_FECORE_CLASS(FEOrthoElastic                 ,FEMATERIAL_ID, "orthotropic elastic"           );
 REGISTER_FECORE_CLASS(FEOrthotropicCLE               ,FEMATERIAL_ID, "orthotropic CLE"               );
 REGISTER_FECORE_CLASS(FEPerfectOsmometer             ,FEMATERIAL_ID, "perfect osmometer"             );
