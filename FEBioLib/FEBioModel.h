@@ -52,6 +52,9 @@ protected:
 	void SerializeIOData   (DumpStream& ar);
 	void SerializeDataStore(DumpStream& ar);
 
+	bool InitLogFile();
+	bool InitPlotFile();
+
 public: // --- I/O functions ---
 	//! Add data record
 	void AddDataRecord(DataRecord* pd);

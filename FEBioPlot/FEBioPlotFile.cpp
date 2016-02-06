@@ -322,7 +322,24 @@ FEBioPlotFile::FEBioPlotFile(FEModel& fem) : m_fem(fem)
 //-----------------------------------------------------------------------------
 FEBioPlotFile::~FEBioPlotFile(void)
 {
+	// close the archive
 	Close();
+
+	// clear all arrays
+	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Glob.begin();
+	for (int i=0; i<(int) m_dic.m_Glob.size(); ++i, ++it) delete it->m_psave;
+
+	it = m_dic.m_Mat.begin();
+	for (int i=0; i<(int) m_dic.m_Mat.size(); ++i, ++it) delete it->m_psave;
+
+	it = m_dic.m_Node.begin();
+	for (int i=0; i<(int) m_dic.m_Node.size(); ++i, ++it) delete it->m_psave;
+
+	it = m_dic.m_Elem.begin();
+	for (int i=0; i<(int) m_dic.m_Elem.size(); ++i, ++it) delete it->m_psave;
+
+	it = m_dic.m_Face.begin();
+	for (int i=0; i<(int) m_dic.m_Face.size(); ++i, ++it) delete it->m_psave;
 }
 
 //-----------------------------------------------------------------------------
@@ -341,22 +358,6 @@ bool FEBioPlotFile::IsValid() const
 void FEBioPlotFile::Close()
 {
 	m_ar.Close();
-
-	int i;
-	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Glob.begin();
-	for (i=0; i<(int) m_dic.m_Glob.size(); ++i, ++it) delete it->m_psave;
-
-	it = m_dic.m_Mat.begin();
-	for (i=0; i<(int) m_dic.m_Mat.size(); ++i, ++it) delete it->m_psave;
-
-	it = m_dic.m_Node.begin();
-	for (i=0; i<(int) m_dic.m_Node.size(); ++i, ++it) delete it->m_psave;
-
-	it = m_dic.m_Elem.begin();
-	for (i=0; i<(int) m_dic.m_Elem.size(); ++i, ++it) delete it->m_psave;
-
-	it = m_dic.m_Face.begin();
-	for (i=0; i<(int) m_dic.m_Face.size(); ++i, ++it) delete it->m_psave;
 }
 
 //-----------------------------------------------------------------------------

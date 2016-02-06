@@ -263,14 +263,13 @@ void FEBioModel::Write(unsigned int nwhen)
 						delete m_plot;
 						m_plot = 0;
 					}
-
-					// Since it is assumed that for the first timestep
-					// there are no loads or initial displacements, the case n=0 is skipped.
-					// Therefor we can output those results here.
-					// TODO: Offcourse we should actually check if this is indeed
-					//       the case, otherwise we should also solve for t=0
-					m_plot->Write(*this);
 				}
+				// Since it is assumed that for the first timestep
+				// there are no loads or initial displacements, the case n=0 is skipped.
+				// Therefor we can output those results here.
+				// TODO: Offcourse we should actually check if this is indeed
+				//       the case, otherwise we should also solve for t=0
+				m_plot->Write(*this);
 			}
 			else
 			{
@@ -522,42 +521,7 @@ bool FEBioModel::Init()
 	TimerTracker t(m_InitTime);
 
 	// Open the logfile
-	if (!felog.is_valid()) 
-	{
-		// see if a valid log file name is defined.
-		const char* szlog = GetLogfileName();
-		if (szlog[0] == 0)
-		{
-			// if not, we take the input file name and set the extension to .log
-			char sz[1024] = {0};
-			strcpy(sz, GetInputFileName());
-			char *ch = strrchr(sz, '.');
-			if (ch) *ch = 0;
-			strcat(sz, ".log");
-			SetLogFilename(sz);
-		}
-		
-		if (felog.open(m_szlog) == false)
-		{
-			felog.printbox("FATAL ERROR", "Failed creating log file");
-			return false;
-		}
-
-		// make sure we have a step
-		if (m_pStep == 0)
-		{
-			felog.printf("FATAL ERROR: No step defined\n\n");
-			return false;
-		}
-
-		// if we don't want to output anything we only output to the logfile
-		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) felog.SetMode(Logfile::FILE_ONLY);
-
-		// print welcome message to file
-		Logfile::MODE m = felog.SetMode(Logfile::FILE_ONLY);
-		Hello();
-		felog.SetMode(m);
-	}
+	if (InitLogFile() == false) return false;
 
 	// open plot database file
 	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER)
@@ -614,6 +578,51 @@ bool FEBioModel::Init()
 }
 
 //-----------------------------------------------------------------------------
+// Opens the log file
+bool FEBioModel::InitLogFile()
+{
+	// Only do this if the log file is not valid
+	if (!felog.is_valid()) 
+	{
+		// see if a valid log file name is defined.
+		const char* szlog = GetLogfileName();
+		if (szlog[0] == 0)
+		{
+			// if not, we take the input file name and set the extension to .log
+			char sz[1024] = {0};
+			strcpy(sz, GetInputFileName());
+			char *ch = strrchr(sz, '.');
+			if (ch) *ch = 0;
+			strcat(sz, ".log");
+			SetLogFilename(sz);
+		}
+		
+		if (felog.open(m_szlog) == false)
+		{
+			felog.printbox("FATAL ERROR", "Failed creating log file");
+			return false;
+		}
+
+		// make sure we have a step
+		if (m_pStep == 0)
+		{
+			felog.printf("FATAL ERROR: No step defined\n\n");
+			return false;
+		}
+
+		// if we don't want to output anything we only output to the logfile
+		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) felog.SetMode(Logfile::FILE_ONLY);
+
+		// print welcome message to file
+		Logfile::MODE m = felog.SetMode(Logfile::FILE_ONLY);
+		Hello();
+		felog.SetMode(m);
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! This function resets the FEM data so that a new run can be done.
 //! This routine is called from the optimization routine.
 
@@ -621,7 +630,10 @@ bool FEBioModel::Reset()
 {
 	// Reset model data
 	FEModel::Reset();
-/*
+
+	// re-initialize the log file
+	if (InitLogFile() == false) return false;
+
 	// open plot database file
 	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER)
 	{
@@ -637,26 +649,6 @@ bool FEBioModel::Reset()
 		}
 	}
 
-	// Since it is assumed that for the first timestep
-	// there are no loads or initial displacements, the case n=0 is skipped.
-	// Therefor we can output those results here.
-	// Offcourse we should actually check if this is indeed
-	// the case, otherwise we should also solve for t=0
-	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER) m_plot->Write(*this);
-*/
-/*
-	// reset the log file
-	if (!log.is_valid())
-	{
-		log.open(m_szlog);
-
-		// if we don't want to output anything we only output to the logfile
-		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) log.SetMode(Logfile::FILE_ONLY);
-
-		// print welcome message to file
-		Hello();
-	}
-*/
 	// do the callback
 	DoCallback(CB_INIT);
 
@@ -749,6 +741,12 @@ bool FEBioModel::Solve()
 		// flush the log file
 		felog.flush();
 	}
+
+	// close the log file
+	felog.close();
+
+	// close the plot file
+	if (m_plot) m_plot->Close();
 
 	// We're done !
 	return bconv;
