@@ -85,6 +85,9 @@ void FEAnalysis::Reset()
 	m_ntotiter   = 0;		// total nr of non-linear iterations
 	m_ntimesteps = 0;		// time steps completed
 	m_ntotrhs    = 0;		// total nr of right hand side evaluations
+
+	// Deactivate the step
+	Deactivate();
 }
 
 //-----------------------------------------------------------------------------
