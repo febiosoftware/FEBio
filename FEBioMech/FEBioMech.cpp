@@ -403,6 +403,7 @@ REGISTER_FECORE_CLASS(FEPlotFiberVector          , FEPLOTDATA_ID, "fiber vector"
 REGISTER_FECORE_CLASS(FEPlotFiberStretch         , FEPLOTDATA_ID, "fiber stretch"         );
 REGISTER_FECORE_CLASS(FEPlotDevFiberStretch      , FEPLOTDATA_ID, "deviatoric fiber stretch");
 REGISTER_FECORE_CLASS(FEPlotShellThickness       , FEPLOTDATA_ID, "shell thickness"       );
+REGISTER_FECORE_CLASS(FEPlotShellDirector        , FEPLOTDATA_ID, "shell director"        );
 REGISTER_FECORE_CLASS(FEPlotDamage               , FEPLOTDATA_ID, "damage"                );
 REGISTER_FECORE_CLASS(FEPlotNestedDamage         , FEPLOTDATA_ID, "nested damage"         );
 REGISTER_FECORE_CLASS(FEPlotMixtureVolumeFraction, FEPLOTDATA_ID, "volume fraction"       );

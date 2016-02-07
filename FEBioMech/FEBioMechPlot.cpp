@@ -1171,13 +1171,42 @@ bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
 				FENode& nj = mesh.Node(e.m_node[j]);
 				vec3d D = e.m_D0[j] + nj.get_vec3d(dof_U, dof_V, dof_W);
 				double h = e.m_h0[j] * D.norm();
-				a.push_back((float) h);
+				a << h;
 			}
 		}
 		return true;
 	}
 	return false;
 }
+
+//-----------------------------------------------------------------------------
+//! Store shell directors
+bool FEPlotShellDirector::Save(FEDomain &dom, FEDataStream &a)
+{
+	const int dof_U = GetFEModel()->GetDOFIndex("u");
+	const int dof_V = GetFEModel()->GetDOFIndex("v");
+	const int dof_W = GetFEModel()->GetDOFIndex("w");
+	if (dom.Class() == FE_DOMAIN_SHELL)
+	{
+		FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
+		int NS = sd.Elements();
+		FEMesh& mesh = *sd.GetMesh();
+		for (int i=0; i<NS; ++i)
+		{
+			FEShellElement& e = sd.Element(i);
+			int n = e.Nodes();
+			for (int j=0; j<n; ++j)
+			{
+				FENode& nj = mesh.Node(e.m_node[j]);
+				vec3d D = e.m_D0[j] + nj.get_vec3d(dof_U, dof_V, dof_W);
+				a << D;
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
 
 //-----------------------------------------------------------------------------
 bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)

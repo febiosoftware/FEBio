@@ -321,6 +321,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Shell directors
+class FEPlotShellDirector : public FEDomainData
+{
+public:
+	FEPlotShellDirector(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_MULT){}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element elasticity tensor
 class FEPlotElementElasticity : public FEDomainData
 {
