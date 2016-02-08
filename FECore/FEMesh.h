@@ -15,6 +15,9 @@
 #include "FEEdge.h"
 
 //-----------------------------------------------------------------------------
+class FESurface;
+
+//-----------------------------------------------------------------------------
 //  This class stores the coordinates of a bounding box
 //
 struct FE_BOUNDING_BOX
@@ -270,16 +273,17 @@ public:
 	void AddNodes(int nodes);
 
 	//! return number of nodes
-	int Nodes() { return m_Node.size(); }
+	int Nodes() const { return m_Node.size(); }
 
 	//! return total nr of elements
-	int Elements();
+	int Elements() const;
 
 	//! return the nr of elements of a specific domain type
-	int Elements(int ndom_type);
+	int Elements(int ndom_type) const;
 
 	//! return reference to a node
 	FENode& Node(int i) { return m_Node[i]; }
+	const FENode& Node(int i) const { return m_Node[i]; }
 
 	//! Set the number of degrees of freedom on this mesh
 	void SetDOFS(int n);
@@ -370,6 +374,12 @@ public:
 	FESegmentSet& SegmentSet(int n) { return *m_LineSet[n]; }
 	void AddSegmentSet(FESegmentSet* ps) { m_LineSet.push_back(ps); }
 	FESegmentSet* FindSegmentSet(const char* szname);
+
+public:
+	//! Calculate the surface representing the element boundaries
+	//! boutside : include all exterior facets
+	//! binside  : include all interior facets
+	FESurface* ElementBoundarySurface(bool boutside = true, bool binside = false);
 
 protected:
 	double SolidElementVolume(FESolidElement& el);

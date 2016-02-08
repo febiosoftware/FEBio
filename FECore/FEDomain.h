@@ -61,13 +61,14 @@ public:
 	void SetMatID(int mid);
 
 	//! return number of nodes
-	int Nodes() { return (int) m_Node.size(); }
+	int Nodes() const { return (int) m_Node.size(); }
 
 	//! return a specific node
 	FENode& Node(int i);
+	const FENode& Node(int i) const;
 
 	//! return the global node index from a local index
-	int NodeIndex(int i) { return m_Node[i]; }
+	int NodeIndex(int i) const { return m_Node[i]; }
 
 public: // interface for derived classes
 	

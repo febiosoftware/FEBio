@@ -139,6 +139,13 @@ FENode& FEDomain::Node(int i)
 }
 
 //-----------------------------------------------------------------------------
+//! return a specific node
+const FENode& FEDomain::Node(int i) const
+{ 
+	return m_pMesh->Node(m_Node[i]); 
+}
+
+//-----------------------------------------------------------------------------
 void FEDomain::CopyFrom(FEDomain* pd)
 {
 	m_Node = pd->m_Node;

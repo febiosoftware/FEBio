@@ -14,6 +14,8 @@
 #include "FEModel.h"
 #include "log.h"
 #include "DOFS.h"
+#include "FEElemElemList.h"
+#include "FEElementList.h"
 
 //=============================================================================
 // FENode
@@ -360,7 +362,7 @@ void FEMesh::SetDOFS(int n)
 
 //-----------------------------------------------------------------------------
 //! Return the total number elements
-int FEMesh::Elements()
+int FEMesh::Elements() const
 {
 	int N = 0;
 	for (int i=0; i<(int) m_Domain.size(); ++i) 
@@ -372,7 +374,7 @@ int FEMesh::Elements()
 
 //-----------------------------------------------------------------------------
 //! Return the total number of elements of a specific domain type
-int FEMesh::Elements(int ndom_type)
+int FEMesh::Elements(int ndom_type) const
 {
 	int N = 0;
 	for (int i=0; i<(int) m_Domain.size(); ++i) 
@@ -935,4 +937,76 @@ void FEMesh::DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom)
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the surface representing the element boundaries
+//! boutside : include all exterior facets
+//! binside  : include all interior facets
+FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
+{
+	if ((boutside == false) && (binside == false)) return 0;
+
+	// create the element neighbor list
+	FEElemElemList EEL;
+	EEL.Create(this);
+
+	// get the number of elements in this mesh
+	int NE = Elements();
+
+	// count the number of facets we have to create
+	int NF = 0;
+	FEElementList EL(*this);
+	FEElementList::iterator it = EL.begin();
+	for (int i=0; i<NE; ++i, ++it)
+	{
+		FEElement& el = *it;
+		int nf = Faces(el);
+		for (int j=0; j<nf; ++j)
+		{
+			FEElement* pen = EEL.Neighbor(i, j);
+			if ((pen == 0) && boutside) ++NF;
+			if ((pen != 0) && binside ) ++NF;
+		}
+	}
+	// create the surface
+	FESurface* ps = new FESurface(this);
+	if (NF == 0) return 0;
+	ps->create(NF);
+
+	// build the surface elements
+	int face[FEElement::MAX_NODES];
+	NF = 0;
+	it = EL.begin();
+	for (int i=0; i<NE; ++i, ++it)
+	{
+		FEElement& el = *it;
+		int nf = Faces(el);
+		for (int j=0; j<nf; ++j)
+		{
+			FEElement* pen = EEL.Neighbor(i, j);
+			if (((pen == 0) && boutside)||
+				((pen != 0) && binside ))
+			{
+				FESurfaceElement& se = ps->Element(NF++);
+				GetFace(el, j, face);
+
+				se.SetType(FE_QUAD4G4);
+				se.m_nelem = el.GetID();
+				
+				int nn = se.Nodes();
+				for (int k=0; k<nn; ++k)
+				{
+					se.m_node[k] = face[k];
+				}
+			}
+		}
+	}
+
+	// initialize the surface. 
+	// This will set the local surface element ID's and also set the m_nelem IDs.
+	ps->Init();
+
+	// all done
+	return ps;
 }
