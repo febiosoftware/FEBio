@@ -84,6 +84,136 @@ bool FEElasticMultiscaleDomain2O::Initialize(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
+void FEElasticMultiscaleDomain2O::InternalForces(FEGlobalVector& R)
+{
+	// call base class first
+	FEElasticSolidDomain::InternalForces(R);
+
+	// add the flux parts
+	InternalWorkFlux(R);
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate contribution of discrete-Galerkin enforcement of stress flux.
+void FEElasticMultiscaleDomain2O::InternalWorkFlux(FEGlobalVector& R)
+{
+	vector<double> fe;
+	vector<int> lm;
+
+	// loop over all elements
+	int NE = Elements();
+	for (int i=0; i<NE; ++i)
+	{
+		FESolidElement& el = Element(i);
+		int neln = el.Nodes();
+
+		// allocate force vector
+		int ndof = neln*3;
+		fe.resize(ndof, 0.0);
+
+		// evaluate force vector
+		InternalElementWorkFlux(el, fe);
+
+		// unpack the LM values
+		UnpackLM(el, lm);
+
+		// assemble 
+		R.Assemble(el.m_node, lm, fe);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticMultiscaleDomain2O::InternalElementWorkFlux(FESolidElement& el, vector<double>& fe)
+{
+	FEMesh& mesh = *GetMesh();
+
+	double Ji[3][3];
+	double Gr[FEElement::MAX_NODES];
+	double Gs[FEElement::MAX_NODES];
+	double Gt[FEElement::MAX_NODES];
+
+	double Hr[FEElement::MAX_NODES];
+	double Hs[FEElement::MAX_NODES];
+
+	int neln = el.Nodes();
+
+	int face[FEElement::MAX_NODES];
+	vec3d rt[FEElement::MAX_NODES];
+
+	// get the integration rule
+	FEElementLibrary& ELib = *FEElementLibrary::GetInstance();
+	FESurfaceElementTraits& rule = dynamic_cast<FESurfaceElementTraits&>(*ELib.GetElementTraits(FE_TRI6G3));
+
+	// loop over all the element's faces
+	int nf = mesh.Faces(el);
+	for (int j=0; j<nf; ++j)
+	{
+		// determine the sign of the contribution based on the neigbor ID
+		double sgn = 1.0; // TODO: determine sign
+
+		// get the nodal coordinates of the face
+		int nn = mesh.GetFace(el, j, face);
+		for (int k=0; k<nn; ++k) rt[k] = mesh.Node(face[k]).m_rt;
+
+		// loop over integration rule
+		int nint = rule.nint;
+		vector<double>& gw = rule.gw;
+		for (int n=0; n<nint; ++n)
+		{
+			// iso-parametric coordinates in surface element
+			double h1 = rule.gr[n];
+			double h2 = rule.gs[n];
+
+			// calculate jacobian on surface
+			rule.shape_deriv(Hr, Hs, h1, h2);
+			vec3d r1(0,0,0), r2(0,0,0);
+			for (int k=0; k<nn; ++k)
+			{
+				r1 += rt[k]*Hr[k];
+				r2 += rt[k]*Hs[k];
+			}
+			vec3d nu = r1^r2;
+			double J = nu.norm();
+
+			// calculate iso-parametric coordinates in parent element
+			double g1, g2, g3;
+			switch (j)
+			{
+			case 0: g1 = h1; g2 = h2; g3 = 0.; break;
+			case 1: g1 = h1; g2 = 0.; g3 = h2; break;
+			case 2: g1 = 0.; g2 = h1; g3 = h2; break;
+			case 3: g1 = 1.0-h1-h2; g2 = h1; g3 = h2; break;
+			}
+
+			// evaluate the tensor at this integration point
+			// TODO: Not sure how to do this. Maybe evaluate nodal
+			//       values and then interpolate via shape functions?
+			mat3ds s;
+
+			// evaluate the spatial gradient of shape functions
+			invjact(el, Ji, g1, g2, g3);
+			el.shape_deriv(Gr, Gs, Gt, g1, g2, g3);
+			for (int i=0; i<neln; ++i)
+			{
+				// calculate global gradient of shape functions
+				// note that we need the transposed of Ji, not Ji itself !
+				vec3d G;
+				G.x = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
+				G.y = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
+				G.z = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
+
+				// put it all together
+				vec3d SgradN = s*(G*J);
+
+				fe[3*i  ] += SgradN.x*gw[n]*sgn;
+				fe[3*i+1] += SgradN.y*gw[n]*sgn;
+				fe[3*i+2] += SgradN.z*gw[n]*sgn;
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 void FEElasticMultiscaleDomain2O::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {

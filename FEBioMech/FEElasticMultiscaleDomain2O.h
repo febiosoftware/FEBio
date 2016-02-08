@@ -18,6 +18,13 @@ public:
 	void ElementInternalForce(FESolidElement& el, vector<double>& fe);
 	void UpdateElementStress(int iel, double dt);
 
+	//! internal stress forces
+	void InternalForces(FEGlobalVector& R);
+
+protected:
+	void InternalWorkFlux(FEGlobalVector& R);
+	void InternalElementWorkFlux(FESolidElement& el, vector<double>& fe);
+
 public:
 	// --- S T I F F N E S S ---
 	//! calculates the solid element stiffness matrix

@@ -370,9 +370,6 @@
     <ClInclude Include="..\..\FECore\FEEdgeLoad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FEDGFluxJump.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\FEElementList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -670,9 +667,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEEdgeLoad.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FECore\FEDGFluxJump.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEElementList.cpp">
