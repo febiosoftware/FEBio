@@ -233,6 +233,30 @@ FEMaterial* FEModel::FindMaterial(int nid)
 }
 
 //-----------------------------------------------------------------------------
+FEMaterial* FEModel::FindMaterial(const char* sz)
+{
+	for (int i=0; i<(int)m_MAT.size(); ++i)
+	{
+		FEMaterial* pm = m_MAT[i];
+		const char* szname = pm->GetName();
+		if (szname && (strcmp(szname, sz) == 0)) return pm;
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+FESurfaceLoad* FEModel::FindSurfaceLoad(const char* sz)
+{
+	for (int i=0; i<(int)m_SL.size(); ++i)
+	{
+		FESurfaceLoad* pl = m_SL[i];
+		const char* szname = pl->GetName();
+		if (szname && (strcmp(szname, sz) == 0)) return pl;
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Initialize material data (This also does an initial validation).
 bool FEModel::InitMaterials()
 {

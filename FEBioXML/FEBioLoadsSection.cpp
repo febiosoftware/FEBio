@@ -330,6 +330,10 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 	FESurfaceLoad* psl = fecore_new<FESurfaceLoad>(FESURFACELOAD_ID, sztype, &fem);
 	if (psl == 0) throw XMLReader::InvalidTag(tag);
 
+	// read name attribute
+	const char* szname = tag.AttributeValue("name", true);
+	if (szname) psl->SetName(szname);
+
 	// create a new surface
 	FESurface* psurf = new FESurface(&fem.GetMesh());
 	fem.GetMesh().AddSurface(psurf);

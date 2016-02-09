@@ -117,6 +117,9 @@ public: // --- Material functions ---
 	//! find a material based on its index
 	FEMaterial* FindMaterial(int nid);
 
+	//! find a material based on its name
+	FEMaterial* FindMaterial(const char* sz);
+
 	//! material initialization
 	bool InitMaterials();
 
@@ -236,6 +239,9 @@ public:	// --- Model Loads ----
 
 	//! initialize model loads
 	bool InitModelLoads();
+
+	//! find a surface load based on the name
+	FESurfaceLoad* FindSurfaceLoad(const char* sz);
 
 public: // --- parameter functions ---
 

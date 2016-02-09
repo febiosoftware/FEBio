@@ -81,6 +81,8 @@ public:
 
 	bool is_inside_range();
 
+	const char* name() { return m_szname; }
+
 public:
 	//! retrieves the value for a non-array item
 	template <class T> T& value() { return *((T*) m_pv); }
@@ -92,6 +94,7 @@ public:
 	template <class T> T* pvalue(int n);
 
 	//! assignment operators
+	// NOTE: This doesn't work if a load curve is used (use setvalue instead).
 	void operator = (double g) { assert(m_itype == FE_PARAM_DOUBLE); value<double>() = g; }
 	void operator = (int    n) { assert(m_itype == FE_PARAM_INT   ); value<int   >() = n; }
 	void operator = (bool   b) { assert(m_itype == FE_PARAM_BOOL  ); value<bool  >() = b; }
@@ -99,6 +102,18 @@ public:
 	void operator = (vec3d  v) { assert(m_itype == FE_PARAM_VEC3D ); value<vec3d >() = v; }
 	void operator = (mat3d  m) { assert(m_itype == FE_PARAM_MAT3D ); value<mat3d >() = m; }
 	void operator = (mat3ds m) { assert(m_itype == FE_PARAM_MAT3DS); value<mat3ds>() = m; }
+
+	// only implemented for double parameters
+	void setvalue(double v)
+	{
+		if (m_nlc == -1) value<double>() = v;
+		else
+		{
+			assert(m_itype == FE_PARAM_DOUBLE);
+			m_scl = v;
+		}
+	}
+
 
 	//! override the template for char pointers
 	char* cvalue() { return (char*) m_pv; }
