@@ -17,6 +17,15 @@ public:
 	//! destructor
 	virtual ~FECoreBase();
 
+	//! set material name
+	void SetName(const char* sz);
+
+	//! get the material's name
+	const char* GetName();
+
+	//! data serialization
+	void Serialize(DumpStream& ar);
+
 public:
 	//! return the super class id
 	SUPER_CLASS_ID GetSuperClassID();
@@ -50,6 +59,8 @@ private:
 	void SetTypeStr(const char* sz);
 
 private:
+	char			m_szname[128];	//!< user defined name of component
+
 	SUPER_CLASS_ID	m_sid;		//!< The super-class ID
 	const char*		m_sztype;	//!< the type string
 

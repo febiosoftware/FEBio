@@ -120,13 +120,15 @@ bool DataRecord::Write()
 	double val;
 
 	FILE* fplog = (FILE*) felog;
-
-	// make a note in the log file
-	fprintf(fplog, "\nData Record #%d\n", m_nid);
-	fprintf(fplog, "===========================================================================\n");
-	fprintf(fplog, "Step = %d\n", nstep);
-	fprintf(fplog, "Time = %.9lg\n", ftime);
-	fprintf(fplog, "Data = %s\n", m_szname);
+	if (fplog)
+	{
+		// make a note in the log file
+		fprintf(fplog, "\nData Record #%d\n", m_nid);
+		fprintf(fplog, "===========================================================================\n");
+		fprintf(fplog, "Step = %d\n", nstep);
+		fprintf(fplog, "Time = %.9lg\n", ftime);
+		fprintf(fplog, "Data = %s\n", m_szname);
+	}
 
 	// see if we are saving the data to the logfile or to a 
 	// seperate data file
@@ -135,6 +137,7 @@ bool DataRecord::Write()
 	{
 		// we store the data in the logfile
 		fp = fplog;
+		if (fp==0) return true;
 	}
 	else if (m_bcomm)
 	{

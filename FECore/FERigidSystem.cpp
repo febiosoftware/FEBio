@@ -32,10 +32,12 @@ FERigidBody* FERigidSystem::Object(int i)
 //! delete all rigid bodies
 void FERigidSystem::Clear()
 {
+	for (int i=0; i<(int)m_RB.size (); ++i) delete m_RB [i]; m_RB.clear ();
+	for (int i=0; i<(int)m_RN.size (); ++i) delete m_RN [i]; m_RN.clear ();
+	for (int i=0; i<(int)m_RBC.size(); ++i) delete m_RBC[i]; m_RBC.clear();
 	for (int i=0; i<(int)m_RDC.size(); ++i) delete m_RDC[i]; m_RDC.clear();
 	for (int i=0; i<(int)m_RBV.size(); ++i) delete m_RBV[i]; m_RBV.clear();
 	for (int i=0; i<(int)m_RBW.size(); ++i) delete m_RBW[i]; m_RBW.clear();
-	for (int i=0; i<(int)m_RN.size (); ++i) delete m_RN [i]; m_RN.clear ();
 }
 
 //-----------------------------------------------------------------------------
@@ -49,36 +51,48 @@ void FERigidSystem::Serialize(DumpStream& ar)
 	{
 		if (ar.IsSaving())
 		{
+			// rigid objects
+			int nrb = Objects();
+			ar << nrb;
+			for (int i=0; i<nrb; ++i) Object(i)->Serialize(ar);
+
 			// rigid nodes
 			ar << (int) m_RN.size();
-			for (int i=0; i<(int) m_RN.size(); ++i)
-			{
-				FERigidNode& rn = *m_RN[i];
-				rn.Serialize(ar);
-			}
+			for (int i=0; i<(int) m_RN.size(); ++i) m_RN[i]->Serialize(ar);
 
 			// fixed rigid body dofs
 			ar << (int) m_RBC.size();
-			for (int i=0; i<(int) m_RBC.size(); ++i)
-			{
-				FERigidBodyFixedBC& bc = *m_RBC[i];
-				bc.Serialize(ar);
-			}
+			for (int i=0; i<(int) m_RBC.size(); ++i) m_RBC[i]->Serialize(ar);
 
 			// rigid body displacements
 			ar << (int) m_RDC.size();
-			for (int i=0; i<(int) m_RDC.size(); ++i)
-			{
-				FERigidBodyDisplacement& dc = *m_RDC[i];
-				dc.Serialize(ar);
-			}
+			for (int i=0; i<(int) m_RDC.size(); ++i) m_RDC[i]->Serialize(ar);
+
+			// rigid body velocities
+			ar << (int) m_RBV.size();
+			for (int i=0; i<(int) m_RBV.size(); ++i) m_RBV[i]->Serialize(ar);
+
+			// rigid body angular velocities
+			ar << (int) m_RBW.size();
+			for (int i=0; i<(int) m_RBW.size(); ++i) m_RBW[i]->Serialize(ar);
 		}
 		else
 		{
+			Clear();
+
+			// rigid bodies
+			int nrb = 0;
+			ar >> nrb;
+			for (int i=0; i<nrb; ++i)
+			{
+				FERigidBody* prb = new FERigidBody(&m_fem);
+				prb->Serialize(ar);
+				AddRigidBody(prb);
+			}
+
 			// rigid nodes
 			int n = 0;
 			ar >> n;
-			m_RN.clear();
 			for (int i=0; i<n; ++i)
 			{
 				FERigidNode* prn = new FERigidNode(&m_fem);
@@ -89,7 +103,6 @@ void FERigidSystem::Serialize(DumpStream& ar)
 
 			// fixed rigid body dofs
 			ar >> n;
-			m_RBC.clear();
 			for (int i=0; i<n; ++i)
 			{
 				FERigidBodyFixedBC* pbc = new FERigidBodyFixedBC(&m_fem);
@@ -100,13 +113,32 @@ void FERigidSystem::Serialize(DumpStream& ar)
 
 			// rigid body displacements
 			ar >> n;
-			m_RDC.clear();
 			for (int i=0; i<n; ++i)
 			{
 				FERigidBodyDisplacement* pdc = new FERigidBodyDisplacement(&m_fem);
 				pdc->Serialize(ar);
 				if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
 				m_RDC.push_back(pdc);
+			}
+
+			// rigid body velocities
+			ar >> n;
+			for (int i=0; i<n; ++i)
+			{
+				FERigidBodyVelocity* pdc = new FERigidBodyVelocity(&m_fem);
+				pdc->Serialize(ar);
+				if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
+				m_RBV.push_back(pdc);
+			}
+
+			// rigid body angular velocities
+			ar >> n;
+			for (int i=0; i<n; ++i)
+			{
+				FERigidBodyAngularVelocity* pdc = new FERigidBodyAngularVelocity(&m_fem);
+				pdc->Serialize(ar);
+				if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
+				m_RBW.push_back(pdc);
 			}
 		}
 	}

@@ -7,13 +7,26 @@
 #define SQR(x) ((x)*(x))
 #endif
 
+void FEFiberDensityDistribution::Serialize(DumpStream& ar)
+{
+	FEMaterial::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << m_IFD;
+	}
+	else
+	{
+		ar >> m_IFD;
+	}
+}
+
 //-----------------------------------------------------------------------------
 // define the ellipsoidal fiber density distributionmaterial parameters
 BEGIN_PARAMETER_LIST(FEEllipsodialFiberDensityDistribution, FEFiberDensityDistribution)
 	ADD_PARAMETERV2(m_spa , FE_PARAM_DOUBLE, 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "spa" );
 END_PARAMETER_LIST();
 
-double FEEllipsodialFiberDensityDistribution::FiberDensity(const vec3d n0)
+double FEEllipsodialFiberDensityDistribution::FiberDensity(const vec3d& n0)
 {
     double R = 1.0/sqrt(SQR(n0.x/m_spa[0])+SQR(n0.y/m_spa[1])+SQR(n0.z/m_spa[2]));
     return R/m_IFD;
@@ -25,7 +38,7 @@ BEGIN_PARAMETER_LIST(FEVonMises3DFiberDensityDistribution, FEMaterial)
 	ADD_PARAMETER2(m_b, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
 END_PARAMETER_LIST();
 
-double FEVonMises3DFiberDensityDistribution::FiberDensity(const vec3d n0)
+double FEVonMises3DFiberDensityDistribution::FiberDensity(const vec3d& n0)
 {
     // The local x-direction is the principal fiber bundle direction
     // The x-component of n0 is cos(phi)
@@ -40,7 +53,7 @@ ADD_PARAMETER2(m_b, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
 ADD_PARAMETER2(m_c, FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0, 1), "cosg" );
 END_PARAMETER_LIST();
 
-double FEVonMises3DTwoFDDAxisymmetric::FiberDensity(const vec3d n0)
+double FEVonMises3DTwoFDDAxisymmetric::FiberDensity(const vec3d& n0)
 {
     // The local x-direction is the principal fiber bundle direction
     // The x-component of n0 is cos(phi)
@@ -59,7 +72,7 @@ BEGIN_PARAMETER_LIST(FEEllipticalFiberDensityDistribution, FEMaterial)
 	ADD_PARAMETER2(m_spa[1], FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "spa2" );
 END_PARAMETER_LIST();
 
-double FEEllipticalFiberDensityDistribution::FiberDensity(const vec3d n0)
+double FEEllipticalFiberDensityDistribution::FiberDensity(const vec3d& n0)
 {
     // 2d fibers lie in the local x-y plane
     // n0.x = cos(theta) and n0.y = sin(theta)
@@ -73,7 +86,7 @@ BEGIN_PARAMETER_LIST(FEVonMises2DFiberDensityDistribution, FEMaterial)
 	ADD_PARAMETER2(m_b, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
 END_PARAMETER_LIST();
 
-double FEVonMises2DFiberDensityDistribution::FiberDensity(const vec3d n0)
+double FEVonMises2DFiberDensityDistribution::FiberDensity(const vec3d& n0)
 {
     // The fiber bundle is in the x-y plane and
     // the local x-direction is the principal fiber bundle direction

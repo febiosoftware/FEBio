@@ -43,13 +43,6 @@ public:
 	FEElement* FindElementFromID(int nid);
 
 public:
-	// Set the domain name
-	void SetName(const char* szname);
-
-	// get the domain name
-	const char* GetName();
-
-public:
 	//! get the material of this domain
 	//! \todo Delete this.
 	virtual FEMaterial* GetMaterial() { return 0; }
@@ -130,9 +123,6 @@ protected:
 
 protected:
 	int	m_nclass;			//!< domain class
-
-private:
-	char	m_szname[MAX_DOMAIN_NAME];	//!< domain name
 
 private:
 	vector<FEDataExport*>	m_Data;	//!< list of data export classes

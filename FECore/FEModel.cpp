@@ -1208,34 +1208,13 @@ void FEModel::SerializeMaterials(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-//! \todo Serialize nonlinear constraints
 void FEModel::SerializeGeometry(DumpStream &ar)
 {
 	// serialize the mesh first 
 	m_mesh.Serialize(ar);
-	FERigidSystem& rigid = *GetRigidSystem();
 
-	// serialize the other geometry data
-	if (ar.IsSaving())
-	{
-		// FE objects
-		int nrb = rigid.Objects();
-		ar << nrb;
-		for (int i=0; i<nrb; ++i) rigid.Object(i)->Serialize(ar);
-	}
-	else
-	{
-		// rigid bodies
-		int nrb = 0;
-		ar >> nrb;
-		rigid.Clear();
-		for (int i=0; i<nrb; ++i)
-		{
-			FERigidBody* prb = new FERigidBody(this);
-			prb->Serialize(ar);
-			rigid.AddRigidBody(prb);
-		}
-	}
+	// serialize the rigid system
+	if (m_prs) m_prs->Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

@@ -12,7 +12,7 @@ static z_stream strm;
 //=============================================================================
 FileStream::FileStream()
 {
-	m_bufsize = 268435456;	// = 256K
+	m_bufsize = 262144;	// = 256K
 	m_current = 0;
 	m_buf  = new unsigned char[m_bufsize];
 	m_pout = new unsigned char[m_bufsize];

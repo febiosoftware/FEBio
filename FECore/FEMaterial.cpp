@@ -79,7 +79,6 @@ FEMaterial* FEProperty::Read(DumpStream& ar)
 FEMaterial::FEMaterial(FEModel* pfem) : FECoreBase(FEMATERIAL_ID), m_pfem(pfem)
 {
 	static int n = 1;
-	m_szname[0] = 0;
 	m_nID = -1;
 	m_pmap = 0;
 	m_pParent = 0;
@@ -97,20 +96,6 @@ FEMaterial::~FEMaterial()
 FEModel* FEMaterial::GetFEModel()
 {
 	return m_pfem;
-}
-
-//-----------------------------------------------------------------------------
-//! Sets the name of the material
-void FEMaterial::SetName(const char* sz)
-{ 
-	strcpy(m_szname, sz); 
-}
-
-//-----------------------------------------------------------------------------
-//! Return the name of the material
-const char* FEMaterial::GetName()
-{ 
-	return m_szname; 
 }
 
 //-----------------------------------------------------------------------------

@@ -241,12 +241,6 @@ public:
 	FEMaterial(FEModel* pfem);
 	virtual ~FEMaterial();
 
-	//! set material name
-	void SetName(const char* sz);
-
-	//! get the material's name
-	const char* GetName();
-
 	//! returns a pointer to a new material point object
 	virtual FEMaterialPoint* CreateMaterialPointData() { return 0; };
 
@@ -339,7 +333,6 @@ public:
 	FEMaterial* FindComponentByType(const char* sztype);
 
 private:
-	char	m_szname[128];	//!< name of material
 	int		m_nID;			//!< material ID
 	int		m_nRB;			//!< rigid body ID (TODO: I hope to remove this sometime)
 

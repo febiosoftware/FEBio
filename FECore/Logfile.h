@@ -115,7 +115,7 @@ public:
 	void SetLogStream(LogStream* ps) { m_ps = ps; }
 
 	// return the file handle
-	operator FILE* () { return m_fp->GetFileHandle(); }
+	operator FILE* () { return (m_fp ? m_fp->GetFileHandle() : 0); }
 
 private:
 	//! constructor is private so that you cannot create it directly

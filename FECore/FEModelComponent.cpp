@@ -20,36 +20,18 @@ FEModelComponent::FEModelComponent(SUPER_CLASS_ID sid, FEModel* pfem) : FECoreBa
 	// initialize parameters
 	m_pfem = pfem;
 	m_bactive = true;
-	m_szname = 0;
 }
 
 //-----------------------------------------------------------------------------
 FEModelComponent::~FEModelComponent()
 {
-	if (m_szname) delete [] m_szname;
+	
 }
 
 //-----------------------------------------------------------------------------
 FEModel* FEModelComponent::GetFEModel() const
 {
 	return m_pfem;
-}
-
-//-----------------------------------------------------------------------------
-const char* FEModelComponent::GetName()
-{
-	return m_szname;
-}
-
-//-----------------------------------------------------------------------------
-void FEModelComponent::SetName(const char* sz)
-{
-	if (sz == 0) return;
-	int l = strlen(sz);
-	if (m_szname) delete [] m_szname;
-	m_szname = new char[l+1];
-	if (l > 0) strncpy(m_szname, sz, l);
-	m_szname[l] = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -111,15 +93,11 @@ void FEModelComponent::Serialize(DumpStream& ar)
 		ar << m_nID;
 		ar << m_nClassID;
 		ar << m_bactive;
-		ar << m_szname;
 	}
 	else
 	{
-		char szname[256];
 		ar >> m_nID;
 		ar >> m_nClassID;
 		ar >> m_bactive;
-		ar >> szname;
-		SetName(szname);
 	}
 }

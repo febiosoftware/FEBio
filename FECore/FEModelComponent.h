@@ -51,12 +51,6 @@ public:
 	//! return the FE model
 	FEModel* GetFEModel() const;
 
-	//! return the name of the component
-	const char* GetName();
-
-	//! Set the name of the component
-	void SetName(const char* sz);
-
 	//! Get the class ID
 	int GetClassID() const;
 
@@ -81,5 +75,4 @@ private:
 	int			m_nClassID;	//!< the class ID
 	bool		m_bactive;	//!< flag indicating whether the component is active
 	FEModel*	m_pfem;		//!< model that this component belongs too
-	char*		m_szname;	//!< name of component
 };
