@@ -103,6 +103,7 @@
 #include "FEPrescribedActiveContractionIsotropic.h"
 #include "FEPrescribedActiveContractionIsotropicUC.h"
 #include "FEGentMaterial.h"
+#include "FEWrinkleOgdenMaterial.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -290,6 +291,8 @@ REGISTER_FECORE_CLASS(FEPrescribedActiveContractionTransIso   , FEMATERIAL_ID, "
 REGISTER_FECORE_CLASS(FEPrescribedActiveContractionTransIsoUC , FEMATERIAL_ID, "uncoupled prescribed trans iso active contraction");
 REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropic  , FEMATERIAL_ID, "prescribed isotropic active contraction");
 REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropicUC, FEMATERIAL_ID, "uncoupled prescribed isotropic active contraction");
+REGISTER_FECORE_CLASS(FEWrinkleOgdenMaterial                  , FEMATERIAL_ID, "wrinkle Ogden");
+REGISTER_FECORE_CLASS(FEElasticMembrane                       , FEMATERIAL_ID, "elastic membrane");
 
 REGISTER_FECORE_CLASS(FELinearSpring           , FEMATERIAL_ID, "linear");
 REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, FEMATERIAL_ID, "tension-only linear");
