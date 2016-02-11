@@ -1,5 +1,5 @@
 #include "FERestartDiagnostics.h"
-#include <FECore/FEModel.h>
+#include <FEBioLib/FEBioModel.h>
 #include <FECore/DumpFile.h>
 #include <FECore/log.h>
 
@@ -78,7 +78,7 @@ bool FERestartDiagnostic::Init(const char* sz)
 // run the diagnostic
 bool FERestartDiagnostic::Run()
 {
-	FEModel& fem = *GetFEModel();
+	FEBioModel& fem = dynamic_cast<FEBioModel&>(*GetFEModel());
 
 	while (fem.Solve() == false)
 	{
@@ -102,6 +102,14 @@ bool FERestartDiagnostic::Run()
 				fem.Serialize(m_dmp);
 			}
 			m_bok = false;
+
+			// reopen the log file for appending
+			const char* szlog = fem.GetLogfileName();
+			if (felog.append(szlog) == false)
+			{
+				printf("WARNING: Could not reopen log file. A new log file is created\n");
+				felog.open(szlog);
+			}
 
 			// reset output mode
 			felog.SetMode(Logfile::FILE_AND_SCREEN);

@@ -742,6 +742,10 @@ bool FEModel::DoCallback(unsigned int nevent)
 			}
 		}
 	}
+	catch (ExitRequest)
+	{
+		throw;
+	}
 	catch (...)
 	{
 		return false;
