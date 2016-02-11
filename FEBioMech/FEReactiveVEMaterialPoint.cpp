@@ -81,6 +81,10 @@ void FEReactiveVEMaterialPoint::Serialize(DumpStream& ar)
     {
         int n;
         ar >> n;
+		m_Fi.resize(n);
+		m_Ji.resize(n);
+		m_v.resize(n);
+		m_w.resize(n);
         for (int i=0; i<n; ++i) ar >> m_Fi[i] >> m_Ji[i] >> m_v[i] >> m_w[i];
     }
 }

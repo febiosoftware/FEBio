@@ -97,7 +97,6 @@ void FERigidSystem::Serialize(DumpStream& ar)
 			{
 				FERigidNode* prn = new FERigidNode(&m_fem);
 				prn->Serialize(ar);
-				if (prn->IsActive()) prn->Activate(); else prn->Deactivate();
 				m_RN.push_back(prn);
 			}
 
@@ -107,7 +106,6 @@ void FERigidSystem::Serialize(DumpStream& ar)
 			{
 				FERigidBodyFixedBC* pbc = new FERigidBodyFixedBC(&m_fem);
 				pbc->Serialize(ar);
-				if (pbc->IsActive()) pbc->Activate(); else pbc->Deactivate();
 				m_RBC.push_back(pbc);
 			}
 
@@ -117,7 +115,6 @@ void FERigidSystem::Serialize(DumpStream& ar)
 			{
 				FERigidBodyDisplacement* pdc = new FERigidBodyDisplacement(&m_fem);
 				pdc->Serialize(ar);
-				if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
 				m_RDC.push_back(pdc);
 			}
 
@@ -127,7 +124,6 @@ void FERigidSystem::Serialize(DumpStream& ar)
 			{
 				FERigidBodyVelocity* pdc = new FERigidBodyVelocity(&m_fem);
 				pdc->Serialize(ar);
-				if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
 				m_RBV.push_back(pdc);
 			}
 
@@ -137,7 +133,6 @@ void FERigidSystem::Serialize(DumpStream& ar)
 			{
 				FERigidBodyAngularVelocity* pdc = new FERigidBodyAngularVelocity(&m_fem);
 				pdc->Serialize(ar);
-				if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
 				m_RBW.push_back(pdc);
 			}
 		}

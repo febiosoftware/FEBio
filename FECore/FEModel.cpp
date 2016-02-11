@@ -1398,7 +1398,6 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 		{
 			FEFixedBC* pbc = new FEFixedBC(this);
 			pbc->Serialize(ar);
-			if (pbc->IsActive()) pbc->Activate(); else pbc->Deactivate();
 			m_BC.push_back(pbc);
 		}
 
@@ -1409,7 +1408,6 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 		{
 			FEPrescribedBC* pdc = new FEPrescribedBC(this);
 			pdc->Serialize(ar);
-			if (pdc->IsActive()) pdc->Activate(); else pdc->Deactivate();
 			m_DC.push_back(pdc);
 		}
 
@@ -1422,7 +1420,6 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 			FEInitialCondition* pic = fecore_new<FEInitialCondition>(FEIC_ID, sz, this);
 			assert(pic);
 			pic->Serialize(ar);
-			if (pic->IsActive()) pic->Activate(); else pic->Deactivate();
 			m_IC.push_back(pic);
 		}
 
@@ -1433,7 +1430,6 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 		{
 			FENodalLoad* pfc = new FENodalLoad(this);
 			pfc->Serialize(ar);
-			if (pfc->IsActive()) pfc->Activate(); else pfc->Deactivate();
 			m_FC.push_back(pfc);
 		}
 
@@ -1454,7 +1450,6 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 			ps->SetSurface(psurf);
 
 			ps->Serialize(ar);
-			if (ps->IsActive()) ps->Activate(); else ps->Deactivate();
 
 			m_SL.push_back(ps);
 			m_mesh.AddSurface(psurf);
@@ -1477,7 +1472,6 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 			pel->SetEdge(pedge);
 
 			pel->Serialize(ar);
-			if (pel->IsActive()) pel->Activate(); else pel->Deactivate();
 
 			m_EL.push_back(pel);
 			m_mesh.AddEdge(pedge);
@@ -1510,7 +1504,6 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 			assert(pml);
 
 			pml->Serialize(ar);
-			if (pml->IsActive()) pml->Activate(); else pml->Deactivate();
 			m_ML.push_back(pml);
 		}
 
