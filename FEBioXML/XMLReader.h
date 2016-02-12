@@ -236,6 +236,7 @@ protected: // helper functions
 protected:
 	FILE*	m_fp;		//!< the file pointer
 	int		m_nline;	//!< current line (used only as temp storage)
+	fpos_t	m_currentPos;	//!< current file position
 };
 
 //-----------------------------------------------------------------------------

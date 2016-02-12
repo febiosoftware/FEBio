@@ -394,7 +394,8 @@ bool XMLReader::FindTag(const char* sztag, XMLTag& tag)
 	// set the first tag
 	tag.m_preader = this;
 	tag.m_ncurrent_line = 1;
-	fgetpos(m_fp, &tag.m_fpos);
+	fgetpos(m_fp, &m_currentPos);
+	tag.m_fpos = m_currentPos;
 
 	// find the correct tag
 	try
@@ -425,7 +426,11 @@ void XMLReader::NextTag(XMLTag& tag)
 	m_nline = tag.m_ncurrent_line;
 
 	// set the current file position
-	fsetpos(m_fp, &tag.m_fpos);
+	if (m_currentPos != tag.m_fpos)
+	{
+		fsetpos(m_fp, &tag.m_fpos);
+		m_currentPos = tag.m_fpos;
+	}
 
 	// clear tag's content
 	tag.clear();
@@ -454,7 +459,8 @@ void XMLReader::NextTag(XMLTag& tag)
 	tag.m_ncurrent_line = m_nline;
 
 	// store start file pos for next element
-	fgetpos(m_fp, &tag.m_fpos);
+	fgetpos(m_fp, &m_currentPos);
+	tag.m_fpos = m_currentPos;
 }
 
 //-----------------------------------------------------------------------------
@@ -583,6 +589,7 @@ void XMLReader::ReadValue(XMLTag& tag)
 	if (!tag.isend())
 	{
 		tag.m_szval.clear();
+		tag.m_szval.reserve(256);
 		while ((ch=GetChar())!='<') 
 		{ 
 			tag.m_szval.push_back(ch);

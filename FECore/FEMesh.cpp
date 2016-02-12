@@ -991,7 +991,18 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 				FESurfaceElement& se = ps->Element(NF++);
 				GetFace(el, j, face);
 
-				se.SetType(FE_QUAD4G4);
+				switch (el.Type())
+				{
+				case FE_HEX8G8:
+				case FE_SHELL_QUAD:
+					se.SetType(FE_QUAD4G4); 
+					break;
+				case FE_TET4G1: 
+				case FE_SHELL_TRI:
+					se.SetType(FE_TRI3G1); 
+					break;
+				}
+				
 				se.m_nelem = el.GetID();
 				
 				int nn = se.Nodes();
