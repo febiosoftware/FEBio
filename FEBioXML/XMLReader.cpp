@@ -426,7 +426,7 @@ void XMLReader::NextTag(XMLTag& tag)
 	m_nline = tag.m_ncurrent_line;
 
 	// set the current file position
-	if (m_currentPos != tag.m_fpos)
+//	if (m_currentPos != tag.m_fpos)
 	{
 		fsetpos(m_fp, &tag.m_fpos);
 		m_currentPos = tag.m_fpos;
