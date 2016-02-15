@@ -18,6 +18,9 @@ public: // overloaded from base class
 	void Open(bool bsave, bool bshallow);
 	void check();
 
+	int size() const { return m_nsize; }
+	int reserved() const { return m_nreserved; }
+
 protected:
 	void grow_buffer(int l);
 	void set_position(int l);
