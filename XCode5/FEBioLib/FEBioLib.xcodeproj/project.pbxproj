@@ -9,13 +9,14 @@
 /* Begin PBXBuildFile section */
 		D513A2FA195246A400060C20 /* plugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D513A2F8195246A400060C20 /* plugin.cpp */; };
 		D513A2FB195246A400060C20 /* plugin.h in Headers */ = {isa = PBXBuildFile; fileRef = D513A2F9195246A400060C20 /* plugin.h */; };
+		D5B5ACB21C74BD6F0097B42B /* febio.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B5ACB01C74BD6F0097B42B /* febio.h */; };
+		D5B5ACB31C74BD6F0097B42B /* febiolib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B5ACB11C74BD6F0097B42B /* febiolib.cpp */; };
 		D5E1066E1865DF6F00B23922 /* FEBioModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E106601865DF6F00B23922 /* FEBioModel.cpp */; };
 		D5E1066F1865DF6F00B23922 /* FEBioModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E106611865DF6F00B23922 /* FEBioModel.h */; };
 		D5E106701865DF6F00B23922 /* FEBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E106621865DF6F00B23922 /* FEBox.cpp */; };
 		D5E106711865DF6F00B23922 /* FEBox.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E106631865DF6F00B23922 /* FEBox.h */; };
 		D5E106721865DF6F00B23922 /* getapppath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E106641865DF6F00B23922 /* getapppath.cpp */; };
 		D5E106731865DF6F00B23922 /* hello.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E106651865DF6F00B23922 /* hello.cpp */; };
-		D5E106741865DF6F00B23922 /* InitLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E106661865DF6F00B23922 /* InitLibrary.cpp */; };
 		D5E106751865DF6F00B23922 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E106671865DF6F00B23922 /* input.cpp */; };
 		D5E106761865DF6F00B23922 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E106681865DF6F00B23922 /* stdafx.cpp */; };
 		D5E106771865DF6F00B23922 /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E106691865DF6F00B23922 /* stdafx.h */; };
@@ -28,6 +29,8 @@
 /* Begin PBXFileReference section */
 		D513A2F8195246A400060C20 /* plugin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = plugin.cpp; sourceTree = "<group>"; };
 		D513A2F9195246A400060C20 /* plugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = plugin.h; sourceTree = "<group>"; };
+		D5B5ACB01C74BD6F0097B42B /* febio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febio.h; sourceTree = "<group>"; };
+		D5B5ACB11C74BD6F0097B42B /* febiolib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = febiolib.cpp; sourceTree = "<group>"; };
 		D5E106571865DF6000B23922 /* libFEBioLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E106601865DF6F00B23922 /* FEBioModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioModel.cpp; sourceTree = "<group>"; };
 		D5E106611865DF6F00B23922 /* FEBioModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioModel.h; sourceTree = "<group>"; };
@@ -35,7 +38,6 @@
 		D5E106631865DF6F00B23922 /* FEBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBox.h; sourceTree = "<group>"; };
 		D5E106641865DF6F00B23922 /* getapppath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = getapppath.cpp; sourceTree = "<group>"; };
 		D5E106651865DF6F00B23922 /* hello.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hello.cpp; sourceTree = "<group>"; };
-		D5E106661865DF6F00B23922 /* InitLibrary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InitLibrary.cpp; sourceTree = "<group>"; };
 		D5E106671865DF6F00B23922 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input.cpp; sourceTree = "<group>"; };
 		D5E106681865DF6F00B23922 /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stdafx.cpp; sourceTree = "<group>"; };
 		D5E106691865DF6F00B23922 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
@@ -75,13 +77,14 @@
 		D5E1065E1865DF6F00B23922 /* FEBioLib */ = {
 			isa = PBXGroup;
 			children = (
+				D5B5ACB01C74BD6F0097B42B /* febio.h */,
+				D5B5ACB11C74BD6F0097B42B /* febiolib.cpp */,
 				D5E106601865DF6F00B23922 /* FEBioModel.cpp */,
 				D5E106611865DF6F00B23922 /* FEBioModel.h */,
 				D5E106621865DF6F00B23922 /* FEBox.cpp */,
 				D5E106631865DF6F00B23922 /* FEBox.h */,
 				D5E106641865DF6F00B23922 /* getapppath.cpp */,
 				D5E106651865DF6F00B23922 /* hello.cpp */,
-				D5E106661865DF6F00B23922 /* InitLibrary.cpp */,
 				D5E106671865DF6F00B23922 /* input.cpp */,
 				D513A2F8195246A400060C20 /* plugin.cpp */,
 				D513A2F9195246A400060C20 /* plugin.h */,
@@ -105,6 +108,7 @@
 			files = (
 				D5E106771865DF6F00B23922 /* stdafx.h in Headers */,
 				D513A2FB195246A400060C20 /* plugin.h in Headers */,
+				D5B5ACB21C74BD6F0097B42B /* febio.h in Headers */,
 				D5E1067B1865DF6F00B23922 /* version.h in Headers */,
 				D5E106781865DF6F00B23922 /* targetver.h in Headers */,
 				D5E1066F1865DF6F00B23922 /* FEBioModel.h in Headers */,
@@ -164,13 +168,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D5E106741865DF6F00B23922 /* InitLibrary.cpp in Sources */,
 				D5E106701865DF6F00B23922 /* FEBox.cpp in Sources */,
 				D5E106751865DF6F00B23922 /* input.cpp in Sources */,
 				D513A2FA195246A400060C20 /* plugin.cpp in Sources */,
 				D5E1066E1865DF6F00B23922 /* FEBioModel.cpp in Sources */,
 				D5E106731865DF6F00B23922 /* hello.cpp in Sources */,
 				D5E106761865DF6F00B23922 /* stdafx.cpp in Sources */,
+				D5B5ACB31C74BD6F0097B42B /* febiolib.cpp in Sources */,
 				D5E106721865DF6F00B23922 /* getapppath.cpp in Sources */,
 				D5E106791865DF6F00B23922 /* validate.cpp in Sources */,
 			);
