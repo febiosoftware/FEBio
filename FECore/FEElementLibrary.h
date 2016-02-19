@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include <vector>
+#include "FE_enum.h"
 
 class FEElement;
 class FEElementTraits;
@@ -35,6 +36,15 @@ public:
 
 	//! return element traits data
 	static FEElementTraits* GetElementTraits(int ntype);
+
+	//! return the element shape of a given element type
+	static FE_Element_Shape GetElementShape(int ntype);
+
+	//! return the element class of a given element type
+	static FE_Element_Class GetElementClass(int ntype);
+
+	//! checks if the element spec is valid
+	static bool IsValid(const FE_Element_Spec& c);
 
 private:
 	//! constructor

@@ -67,6 +67,19 @@ public:
 	//! destructor
 	virtual ~FEElement() {}
 
+	//! get the element ID
+	int GetID() const { return m_nID; }
+
+	//! set the element ID
+	void SetID(int n) { m_nID = n; }
+
+	//! Get the element's material ID
+	int GetMatID() const { return m_mat; }
+
+	//! Set the element's material ID
+	void SetMatID(int id) { m_mat = id; }
+
+public:
 	//! Set the type of the element
 	void SetType(int ntype) { FEElementLibrary::SetElementTraits(*this, ntype); }
 
@@ -76,39 +89,32 @@ public:
 	//! Get the element traits
 	FEElementTraits* GetTraits() { return m_pT; }
 
-	//! get the element ID
-	int GetID() const { return m_nID; }
-
-	//! set the element ID
-	void SetID(int n) { m_nID = n; }
-
 	//! return number of nodes
 	int Nodes() const { return m_pT->neln; } 
 
-	//! return the type of element
-	int Type() const { return m_pT->m_ntype; } 
-
 	//! return the element class
-	int Class() const { return m_pT->m_nclass; }
+	int Class() const { return m_pT->Class(); }
 
-	//! Get the element's material ID
-	int GetMatID() const { return m_mat; } 
+	//! return the element shape
+	int Shape() const { return m_pT->Shape(); }
 
-	//! Set the element's material ID
-	void SetMatID(int id) { m_mat = id; }
+	//! return the type of element
+	int Type() const { return m_pT->Type(); }
 
 	//! return number of integration points
 	int GaussPoints() const { return m_pT->nint; } 
 
+	//! shape function values
+	double* H(int n) { return m_pT->H[n]; }
+
+public:
 	//! Get the material point data
 	FEMaterialPoint* GetMaterialPoint(int n) { return m_State[n]; }
 
 	//! set the material point data
 	void SetMaterialPointData(FEMaterialPoint* pmp, int n) { m_State[n] = pmp; }
 
-	//! shape function values
-	double* H(int n) { return m_pT->H[n]; }
-
+public:
 	//! evaluate scalar field at integration point
 	double Evaluate(double* fn, int n);
 

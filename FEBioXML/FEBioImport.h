@@ -225,7 +225,7 @@ public:
 	int value(XMLTag& tag, double* pf, int n);
 
 protected:
-	void ParseVersion			(XMLTag& tag);
+	void ParseVersion(XMLTag& tag);
 
 public:
 	FEModel*			m_pfem;		//!< pointer to the fem class

@@ -638,6 +638,7 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	// create a new spring "domain"
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 	FE_Element_Spec spec;
+	spec.eclass = FE_ELEM_TRUSS;
 	spec.eshape = ET_TRUSS2;
 	spec.etype  = FE_DISCRETE;
 	FEDiscreteDomain* pd = dynamic_cast<FEDiscreteDomain*>(febio.CreateDomain(spec, &mesh, pm));

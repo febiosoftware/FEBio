@@ -26,28 +26,29 @@ class FEElementTraits
 {
 public:
 	//! constructor
-	FEElementTraits(int ni, int ne, FE_Element_Type et, FE_Element_Class ec) : m_ntype(et), m_nclass(ec)
-	{
-		neln = ne;
-		nint = ni;
-		
-		H.resize(ni, ne);
-	}
+	FEElementTraits(int ni, int ne, FE_Element_Class c, FE_Element_Shape s, FE_Element_Type t);
 
 	//! destructor
 	virtual ~FEElementTraits(){}
+
+	//! return the element class
+	FE_Element_Class Class() const { return spec.eclass; }
+
+	//! return the element shape
+	FE_Element_Shape Shape() const { return spec.eshape; }
+
+	//! return the element type
+	FE_Element_Type Type() const { return spec.etype; }
 
 public:
 	int nint;	//!< number of integration points
 	int	neln;	//!< number of element nodes
 
 	matrix H;	//!< shape function values at gausspoints.
-
 				//!< The first index refers to the gauss-point,
 				//!< the second index to the shape function
 
-	int m_ntype;	//!< type of element
-	int	m_nclass;	//!< element class
+	FE_Element_Spec	spec;	//!< element specs
 
 private:
 
@@ -70,7 +71,7 @@ class FESolidElementTraits : public FEElementTraits
 {
 public:
 	//! constructor
-	FESolidElementTraits(int ni, int ne, FE_Element_Type et);
+	FESolidElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et);
 
 	//! initialize element traits data
 	void init();
@@ -118,7 +119,7 @@ public:
 	enum { NELN = 8 };
 
 public:
-	FEHex8_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, et) {}
+	FEHex8_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_HEX8, et) {}
 
 public:
 	//! values of shape functions
@@ -184,7 +185,7 @@ public:
 	enum { NELN = 4 };
 
 public:
-	FETet4_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, et) {}
+	FETet4_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_TET4, et) {}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -233,7 +234,7 @@ public:
 	enum { NELN = 6 };
 
 public:
-	FEPenta6_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, et){}
+	FEPenta6_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_PENTA6, et){}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -275,7 +276,7 @@ public:
 	enum { NELN = 10 };
 
 public:
-	FETet10_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, et){}
+	FETet10_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_TET10, et){}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -378,7 +379,7 @@ public:
 	enum { NELN = 15 };
 
 public:
-	FETet15_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, et){}
+	FETet15_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_TET15, et){}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -481,7 +482,7 @@ public:
 	enum { NELN = 20 };
 
 public:
-	FEHex20_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, et){}
+	FEHex20_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_HEX20, et){}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -521,7 +522,7 @@ public:
 	enum { NELN = 27 };
 
 public:
-	FEHex27_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, et){}
+	FEHex27_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_HEX27, et){}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -560,7 +561,7 @@ public:
 class FESurfaceElementTraits : public FEElementTraits
 {
 public:
-	FESurfaceElementTraits(int ni, int ne, FE_Element_Type et);
+	FESurfaceElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et);
 
 	// initialization
 	void init();
@@ -603,7 +604,7 @@ public:
 
 public:
 	//! constructor
-	FEQuad4_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, et){}
+	FEQuad4_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_QUAD4, et){}
 
 	//! shape functions at (r,s)
 	void shape(double* H, double r, double s);
@@ -662,7 +663,7 @@ public:
 
 public:
 	//! constructor
-	FETri3_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, et){}
+	FETri3_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_TRI3, et){}
 
 	//! shape function at (r,s)
 	void shape(double* H, double r, double s);
@@ -754,7 +755,7 @@ public:
 	enum { NELN = 6 };
 
 public:
-	FETri6_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, et){}
+	FETri6_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_TRI6, et){}
 
 	// shape function at (r,s)
 	void shape(double* H, double r, double s);
@@ -863,7 +864,7 @@ public:
 	enum { NELN = 6 };
 
 public:
-	FETri6m_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, et){}
+	FETri6m_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_TRI6, et){}
 
 	// shape function at (r,s)
 	void shape(double* H, double r, double s);
@@ -909,7 +910,7 @@ public:
 	enum { NELN = 7 };
 
 public:
-	FETri7_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, et){}
+	FETri7_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_TRI7, et){}
 
 	// shape function at (r,s)
 	void shape(double* H, double r, double s);
@@ -1013,7 +1014,7 @@ public:
 	enum { NELN = 8 };
 
 public:
-	FEQuad8_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, et) {}
+	FEQuad8_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_QUAD8, et) {}
 
 	// shape function at (r,s)
 	void shape(double* H, double r, double s);
@@ -1058,7 +1059,7 @@ public:
 	enum { NELN = 9 };
 
 public:
-	FEQuad9_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, et) {}
+	FEQuad9_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_QUAD9, et) {}
 
 	// shape function at (r,s)
 	void shape(double* H, double r, double s);
@@ -1102,7 +1103,7 @@ private:
 class FEShellElementTraits : public FEElementTraits
 {
 public:
-	FEShellElementTraits(int ni, int ne, FE_Element_Type et);
+	FEShellElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et);
 
 public:
 	// gauss-point coordinates and weights
@@ -1129,7 +1130,7 @@ public:
 	enum { NELN = 4 };
 
 public:
-	FEShellQuadElementTraits() : FEShellElementTraits(NINT, NELN, FE_SHELL_QUAD) { init(); }
+	FEShellQuadElementTraits() : FEShellElementTraits(NINT, NELN, ET_QUAD4, FE_SHELL_QUAD) { init(); }
 
 	void init();
 };
@@ -1144,7 +1145,7 @@ public:
 	enum { NELN = 3 };
 
 public:
-	FEShellTriElementTraits() : FEShellElementTraits(NINT, NELN, FE_SHELL_TRI) { init(); }
+	FEShellTriElementTraits() : FEShellElementTraits(NINT, NELN, ET_TRI3, FE_SHELL_TRI) { init(); }
 
 	void init();
 };
@@ -1155,7 +1156,7 @@ public:
 class FEFergusonShellElementTraits : public FEElementTraits
 {
 public:
-    FEFergusonShellElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_FERGUSON_SHELL)
+	FEFergusonShellElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, FE_ELEM_FERGUSON_SHELL, ET_FQUAD4, et)
     {
         gr.resize(ni);
         gs.resize(ni);
@@ -1255,7 +1256,7 @@ public:
 	enum { NELN = 2 };
 
 public:
-	FETrussElementTraits() : FEElementTraits(NINT, NELN, FE_TRUSS, FE_ELEM_TRUSS) { init(); }
+	FETrussElementTraits() : FEElementTraits(NINT, NELN, FE_ELEM_TRUSS, ET_TRUSS2, FE_TRUSS) { init(); }
 
 	void init();
 };
@@ -1274,7 +1275,7 @@ public:
 	enum { NELN = 2 };
 
 public:
-	FEDiscreteElementTraits() : FEElementTraits(NINT, NELN, FE_DISCRETE, FE_ELEM_DISCRETE) { init(); }
+	FEDiscreteElementTraits() : FEElementTraits(NINT, NELN, FE_ELEM_DISCRETE, ET_DISCRETE, FE_DISCRETE) { init(); }
 
 	void init() {}
 };
@@ -1292,7 +1293,7 @@ public:
 class FE2DElementTraits : public FEElementTraits
 {
 public:
-	FE2DElementTraits(int ni, int ne, FE_Element_Type et);
+	FE2DElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et);
 
 	// initialization
 	void init();
@@ -1337,7 +1338,7 @@ public:
 
 public:
 	//! constructor
-	FE2DTri3_(int ni, FE_Element_Type et) : FE2DElementTraits(ni, NELN, et){}
+	FE2DTri3_(int ni, FE_Element_Type et) : FE2DElementTraits(ni, NELN, ET_TRI3, et){}
 
 	//! shape function at (r,s)
 	void shape(double* H, double r, double s);
@@ -1378,7 +1379,7 @@ public:
 	enum { NELN = 6 };
 
 public:
-	FE2DTri6_(int ni, FE_Element_Type et) : FE2DElementTraits(ni, NELN, et){}
+	FE2DTri6_(int ni, FE_Element_Type et) : FE2DElementTraits(ni, NELN, ET_TRI6, et){}
 
 	// shape function at (r,s)
 	void shape(double* H, double r, double s);
@@ -1422,7 +1423,7 @@ public:
 
 public:
 	//! constructor
-	FE2DQuad4_(int ni, FE_Element_Type et) : FE2DElementTraits(ni, NELN, et){}
+	FE2DQuad4_(int ni, FE_Element_Type et) : FE2DElementTraits(ni, NELN, ET_QUAD4, et){}
 
 	//! shape functions at (r,s)
 	void shape(double* H, double r, double s);
@@ -1466,7 +1467,7 @@ public:
 	enum { NELN = 8 };
 
 public:
-	FE2DQuad8_(int ni, FE_Element_Type et) : FE2DElementTraits(ni, NELN, et) {}
+	FE2DQuad8_(int ni, FE_Element_Type et) : FE2DElementTraits(ni, NELN, ET_QUAD8, et) {}
 
 	// shape function at (r,s)
 	void shape(double* H, double r, double s);
@@ -1511,7 +1512,7 @@ public:
 	enum { NELN = 9 };
 
 public:
-	FE2DQuad9_(int ni, FE_Element_Type et) : FE2DElementTraits(ni, NELN, et) {}
+	FE2DQuad9_(int ni, FE_Element_Type et) : FE2DElementTraits(ni, NELN, ET_QUAD9, et) {}
 
 	// shape function at (r,s)
 	void shape(double* H, double r, double s);
@@ -1551,7 +1552,7 @@ private:
 class FELineElementTraits : public FEElementTraits
 {
 public:
-	FELineElementTraits(int ni, int ne, FE_Element_Type et);
+	FELineElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et);
 
 	// initialization
 	void init();
@@ -1594,7 +1595,7 @@ public:
 
 public:
 	//! constructor
-	FELine2_(int ni, FE_Element_Type et) : FELineElementTraits(ni, NELN, et){}
+	FELine2_(int ni, FE_Element_Type et) : FELineElementTraits(ni, NELN, ET_LINE2, et){}
 
 	//! shape function at (r)
 	void shape(double* H, double r);

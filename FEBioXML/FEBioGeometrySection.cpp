@@ -122,50 +122,108 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 
 //-----------------------------------------------------------------------------
 //! Get the element type from a XML tag
-FE_Element_Shape FEBioGeometrySection::ElementShape(XMLTag& t)
+FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 {
-	if      (t=="hex8"  ) return ET_HEX8;
-	else if (t=="hex20" ) return ET_HEX20;
-	else if (t=="hex27" ) return ET_HEX27;
-	else if (t=="penta6") return ET_PENTA6;
-	else if (t=="tet4"  ) return ET_TET4;
-	else if (t=="tet10" ) return ET_TET10;
-	else if (t=="tet15" ) return ET_TET15;
-	else if (t=="quad4" ) return ET_QUAD4;
-    else if (t=="quad8" ) return ET_QUAD8;
-    else if (t=="quad9" ) return ET_QUAD9;
-	else if (t=="tri3"  ) return ET_TRI3;
-    else if (t=="tri6"  ) return ET_TRI6;
-	else if (t=="truss2") return ET_TRUSS2;
-    else if (t=="fquad4") return ET_FQUAD4;
+	// determine the element shape 
+	FE_Element_Shape eshape = FE_ELEM_INVALID_SHAPE;
+	if      (strcmp(sztype, "hex8"  ) == 0) eshape = ET_HEX8;
+	else if (strcmp(sztype, "hex20" ) == 0) eshape = ET_HEX20;
+	else if (strcmp(sztype, "hex27" ) == 0) eshape = ET_HEX27;
+	else if (strcmp(sztype, "penta6") == 0) eshape = ET_PENTA6;
+	else if (strcmp(sztype, "tet4"  ) == 0) eshape = ET_TET4;
+	else if (strcmp(sztype, "tet10" ) == 0) eshape = ET_TET10;
+	else if (strcmp(sztype, "tet15" ) == 0) eshape = ET_TET15;
+	else if (strcmp(sztype, "quad4" ) == 0) eshape = ET_QUAD4;
+	else if (strcmp(sztype, "quad8" ) == 0) eshape = ET_QUAD8;
+	else if (strcmp(sztype, "quad9" ) == 0) eshape = ET_QUAD9;
+	else if (strcmp(sztype, "tri3"  ) == 0) eshape = ET_TRI3;
+	else if (strcmp(sztype, "tri6"  ) == 0) eshape = ET_TRI6;
+	else if (strcmp(sztype, "truss2") == 0) eshape = ET_TRUSS2;
+	else if (strcmp(sztype, "fquad4") == 0) eshape = ET_FQUAD4;
 	else
 	{
-		assert(false);
-		throw XMLReader::InvalidTag(t);
+		// new way for defining element type and integration rule at the same time
+		// this is useful for multi-step analyses where the geometry is read in before the control section.
+		if      (strcmp(sztype, "TET10G4"     ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G4; }
+		else if (strcmp(sztype, "TET10G8"     ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G8; }
+		else if (strcmp(sztype, "TET10GL11"   ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; }
+		else if (strcmp(sztype, "TET10G4_S3"  ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G4; m_pim->m_ntri6 = FE_TRI6G3; }
+		else if (strcmp(sztype, "TET10G8_S3"  ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G8; m_pim->m_ntri6 = FE_TRI6G3; }
+		else if (strcmp(sztype, "TET10GL11_S3") == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; m_pim->m_ntri6 = FE_TRI6G3; }
+		else if (strcmp(sztype, "TET10G4_S4"  ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G4; m_pim->m_ntri6 = FE_TRI6G4; }
+		else if (strcmp(sztype, "TET10G8_S4"  ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G8; m_pim->m_ntri6 = FE_TRI6G4; }
+		else if (strcmp(sztype, "TET10GL11_S4") == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; m_pim->m_ntri6 = FE_TRI6G4; }
+		else if (strcmp(sztype, "TET10G4_S7"  ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G4; m_pim->m_ntri6 = FE_TRI6G7; }
+		else if (strcmp(sztype, "TET10G8_S7"  ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G8; m_pim->m_ntri6 = FE_TRI6G7; }
+		else if (strcmp(sztype, "TET10GL11_S7") == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; m_pim->m_ntri6 = FE_TRI6G7; }
+		else if (strcmp(sztype, "TET15G8"     ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G8; }
+		else if (strcmp(sztype, "TET15G11"    ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; }
+		else if (strcmp(sztype, "TET15G15"    ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; }
+		else if (strcmp(sztype, "TET15G8_S3"  ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G8; m_pim->m_ntri7 = FE_TRI7G3; }
+		else if (strcmp(sztype, "TET15G11_S3" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G3; }
+		else if (strcmp(sztype, "TET15G15_S3" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G3; }
+		else if (strcmp(sztype, "TET15G8_S4"  ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G8; m_pim->m_ntri7 = FE_TRI7G4; }
+		else if (strcmp(sztype, "TET15G11_S4" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G4; }
+		else if (strcmp(sztype, "TET15G15_S4" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G4; }
+		else if (strcmp(sztype, "TET15G8_S7"  ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G8; m_pim->m_ntri7 = FE_TRI7G7; }
+		else if (strcmp(sztype, "TET15G11_S7" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G7; }
+		else if (strcmp(sztype, "TET15G15_S7" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G7; }
+		else
+		{
+			throw FEBioImport::InvalidElementType();
+		}
 	}
+
+	// this is a hack to choose between 2D elements and shell elements.
+	// NOTE: This is only used by quad/tri elements.
+	// TODO: find a better way
+	int NDIM = 3;
+	if (strcmp(m_pim->m_szmod, "fluid") == 0) NDIM = 2;
+
+	// determine the element type
+	FE_Element_Type etype = FE_ELEM_INVALID_TYPE;
+	switch (eshape)
+	{
+	case ET_HEX8  : etype = m_pim->m_nhex8; break;
+	case ET_PENTA6: etype = FE_PENTA6G6; break;
+	case ET_TET4  : etype = m_pim->m_ntet4; break;
+	case ET_TET10 : etype = m_pim->m_ntet10; break;
+	case ET_TET15 : etype = m_pim->m_ntet15; break;
+	case ET_HEX20 : etype = FE_HEX20G27; break;
+	case ET_HEX27 : etype = FE_HEX27G27; break;
+	case ET_QUAD4 : etype = (NDIM == 3 ? FE_SHELL_QUAD : FE2D_QUAD4G4); break;
+	case ET_TRI3  : etype = (NDIM == 3 ? FE_SHELL_TRI  : FE2D_TRI3G1 ); break;
+	case ET_TRI6  : etype = FE2D_TRI6G3; break;
+	case ET_QUAD8 : etype = FE2D_QUAD8G9; break;
+	case ET_QUAD9 : etype = FE2D_QUAD9G9; break;
+	case ET_TRUSS2: etype = FE_TRUSS; break;
+	case ET_FQUAD4: etype = FE_FERGUSON_SHELL_QUAD; break;
+	default:
+		throw FEBioImport::InvalidElementType();
+	}
+
+	// determine the element class
+	FE_Element_Class eclass = FEElementLibrary::GetElementClass(etype);
+
+	// return the spec
+	FE_Element_Spec spec;
+	spec.eclass = eclass;
+	spec.eshape = eshape;
+	spec.etype  = etype;
+	spec.m_bthree_field_hex = m_pim->m_b3field_hex;
+	spec.m_bthree_field_tet = m_pim->m_b3field_tet;
+	spec.m_but4 = m_pim->m_but4;
+
+	// Make sure this is a valid element specification
+	if (FEElementLibrary::IsValid(spec) == false) FEBioImport::InvalidElementType();
+
+	return spec;
 }
 
 //-----------------------------------------------------------------------------
 //! find the domain type for the element and material type
-FEDomain* FEBioGeometrySection::CreateDomain(const FE_Element_Shape& eshape, FEMesh* pm, FEMaterial* pmat)
+FEDomain* FEBioGeometrySection::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)
 {
-	// setup the element specs
-	FE_Element_Spec spec;
-	spec.eshape = eshape;
-	spec.m_bthree_field_hex = m_pim->m_b3field_hex;
-	spec.m_bthree_field_tet = m_pim->m_b3field_tet;
-	spec.m_but4 = m_pim->m_but4;
-	if      (eshape == ET_HEX8 ) spec.etype = m_pim->m_nhex8;
-	else if (eshape == ET_TET4 ) spec.etype = m_pim->m_ntet4;
-	else if (eshape == ET_TET10) spec.etype = m_pim->m_ntet10;
-	else if (eshape == ET_TET15) spec.etype = m_pim->m_ntet15;
-	else if (eshape == ET_TRI3 ) spec.etype = m_pim->m_ntri3;
-    else if (eshape == ET_TRI6 ) spec.etype = m_pim->m_ntri6;
-    else if (eshape == ET_QUAD4) spec.etype = m_pim->m_nquad4;
-    else if (eshape == ET_QUAD8) spec.etype = m_pim->m_nquad8;
-    else if (eshape == ET_QUAD9) spec.etype = m_pim->m_nquad9;
-    else if (eshape == ET_FQUAD4) spec.etype = m_pim->m_nfquad4;
-	
 	// get the domain type
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 	return febio.CreateDomain(spec, pm, pmat);
@@ -196,7 +254,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		if ((nmat < 0) || (nmat >= fem.Materials())) throw FEBioImport::InvalidMaterial(elems+1);
 
 		// get the element type
-		FE_Element_Shape etype = ElementShape(t);
+		FE_Element_Spec spec = ElementSpec(t.Name());
 
 		// get the element ID
 		int nid = -1;
@@ -210,7 +268,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		for (i=0; i<(int) dom.size(); ++i)
 		{
 			FEDOMAIN& d = dom[i];
-			if ((d.mat == nmat) && (d.elem == etype))
+			if ((d.mat == nmat) && (d.elem.eshape == spec.eshape))
 			{
 				ndom = i;
 				d.nel++;
@@ -221,7 +279,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		{
 			FEDOMAIN d;
 			d.mat = nmat;
-			d.elem = etype;
+			d.elem = spec;
 			d.nel = 1;
 			ndom = (int) dom.size();
 			dom.push_back(d);
@@ -272,37 +330,9 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		FEMaterial* pmat = fem.GetMaterial(nmat);
 		assert(pmat == dom.GetMaterial());
 
-		// determine element type
-		int etype = -1;
-		if      (tag == "hex8"  ) etype = ET_HEX8;
-		else if (tag == "hex20" ) etype = ET_HEX20;
-		else if (tag == "hex27" ) etype = ET_HEX27;
-		else if (tag == "penta6") etype = ET_PENTA6;
-		else if (tag == "tet4"  ) etype = ET_TET4;
-		else if (tag == "tet10" ) etype = ET_TET10;
-		else if (tag == "tet15" ) etype = ET_TET15;
-		else if (tag == "quad4" ) etype = ET_QUAD4;
-		else if (tag == "tri3"  ) etype = ET_TRI3;
-		else if (tag == "truss2") etype = ET_TRUSS2;
-        else if (tag == "fquad4") etype = ET_FQUAD4;
-		else throw XMLReader::InvalidTag(tag);
-
-		switch (etype)
-		{
-		case ET_HEX8  : ReadElement(tag, dom.ElementRef(ne), m_pim->m_nhex8, nid, nmat); break;
-		case ET_HEX20 : ReadElement(tag, dom.ElementRef(ne), FE_HEX20G27, nid, nmat); break;
-		case ET_HEX27 : ReadElement(tag, dom.ElementRef(ne), FE_HEX27G27, nid, nmat); break;
-		case ET_PENTA6: ReadElement(tag, dom.ElementRef(ne), FE_PENTA6G6, nid, nmat); break;
-		case ET_TET4  : ReadElement(tag, dom.ElementRef(ne), m_pim->m_ntet4, nid, nmat); break;
-		case ET_TET10 : ReadElement(tag, dom.ElementRef(ne), m_pim->m_ntet10, nid, nmat); break;
-		case ET_TET15 : ReadElement(tag, dom.ElementRef(ne), m_pim->m_ntet15, nid, nmat); break;
-		case ET_QUAD4 : ReadElement(tag, dom.ElementRef(ne), FE_SHELL_QUAD, nid, nmat); break;
-		case ET_TRI3  : ReadElement(tag, dom.ElementRef(ne), FE_SHELL_TRI, nid, nmat); break;
-		case ET_TRUSS2: ReadElement(tag, dom.ElementRef(ne), FE_TRUSS, nid, nmat); break;
-        case ET_FQUAD4: ReadElement(tag, dom.ElementRef(ne), FE_FERGUSON_SHELL_QUAD, nid, nmat); break;
-		default:
-			throw FEBioImport::InvalidElementType();
-		}
+		// determine element shape
+		FE_Element_Spec espec = ElementSpec(tag.Name());
+		ReadElement(tag, dom.ElementRef(ne), espec.etype, nid, nmat);
 
 		// go to next tag
 		++tag;
@@ -338,58 +368,14 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	const char* szname = tag.AttributeValue("elset", true);
 
 	// get the element type
-	FE_Element_Shape etype;
 	const char* sztype = tag.AttributeValue("type");
-	if      (strcmp(sztype, "hex8"  ) == 0) etype = ET_HEX8;
-	else if (strcmp(sztype, "hex20" ) == 0) etype = ET_HEX20;
-	else if (strcmp(sztype, "hex27" ) == 0) etype = ET_HEX27;
-	else if (strcmp(sztype, "penta6") == 0) etype = ET_PENTA6;
-	else if (strcmp(sztype, "tet4"  ) == 0) etype = ET_TET4;
-	else if (strcmp(sztype, "tet10" ) == 0) etype = ET_TET10;
-	else if (strcmp(sztype, "tet15" ) == 0) etype = ET_TET15;
-	else if (strcmp(sztype, "quad4" ) == 0) etype = ET_QUAD4;
-    else if (strcmp(sztype, "quad8" ) == 0) etype = ET_QUAD8;
-    else if (strcmp(sztype, "quad9" ) == 0) etype = ET_QUAD9;
-	else if (strcmp(sztype, "tri3"  ) == 0) etype = ET_TRI3;
-    else if (strcmp(sztype, "tri6"  ) == 0) etype = ET_TRI6;
-	else if (strcmp(sztype, "truss2") == 0) etype = ET_TRUSS2;
-    else if (strcmp(sztype, "fquad4") == 0) etype = ET_FQUAD4;
-	else
-	{
-		// new way for defining element type and integration rule at the same time
-		// this is useful for multi-step analyses where the geometry is read in before the control section.
-		if      (strcmp(sztype, "TET10G4"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G4;  }
-		else if (strcmp(sztype, "TET10G8"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G8;  }
-		else if (strcmp(sztype, "TET10GL11") == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11;}
-		else if (strcmp(sztype, "TET10G4_S3"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G4  ; m_pim->m_ntri6 = FE_TRI6G3; }
-		else if (strcmp(sztype, "TET10G8_S3"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G8  ; m_pim->m_ntri6 = FE_TRI6G3; }
-		else if (strcmp(sztype, "TET10GL11_S3") == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; m_pim->m_ntri6 = FE_TRI6G3; }
-		else if (strcmp(sztype, "TET10G4_S4"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G4  ; m_pim->m_ntri6 = FE_TRI6G4; }
-		else if (strcmp(sztype, "TET10G8_S4"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G8  ; m_pim->m_ntri6 = FE_TRI6G4; }
-		else if (strcmp(sztype, "TET10GL11_S4") == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; m_pim->m_ntri6 = FE_TRI6G4; }
-		else if (strcmp(sztype, "TET10G4_S7"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G4  ; m_pim->m_ntri6 = FE_TRI6G7; }
-		else if (strcmp(sztype, "TET10G8_S7"  ) == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10G8  ; m_pim->m_ntri6 = FE_TRI6G7; }
-		else if (strcmp(sztype, "TET10GL11_S7") == 0) { etype = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; m_pim->m_ntri6 = FE_TRI6G7; }
-		else if (strcmp(sztype, "TET15G8"  ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G8;  }
-		else if (strcmp(sztype, "TET15G11" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; }
-		else if (strcmp(sztype, "TET15G15" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; }
-		else if (strcmp(sztype, "TET15G8_S3"  ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G8 ; m_pim->m_ntri7 = FE_TRI7G3;}
-		else if (strcmp(sztype, "TET15G11_S3" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G3;}
-		else if (strcmp(sztype, "TET15G15_S3" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G3;}
-		else if (strcmp(sztype, "TET15G8_S4"  ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G8 ; m_pim->m_ntri7 = FE_TRI7G4;}
-		else if (strcmp(sztype, "TET15G11_S4" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G4;}
-		else if (strcmp(sztype, "TET15G15_S4" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G4;}
-		else if (strcmp(sztype, "TET15G8_S7"  ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G8 ; m_pim->m_ntri7 = FE_TRI7G7;}
-		else if (strcmp(sztype, "TET15G11_S7" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G7;}
-		else if (strcmp(sztype, "TET15G15_S7" ) == 0) { etype = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G7;}
-		else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-	}
+	FE_Element_Spec espec = ElementSpec(sztype);
 
 	// get the domain's material class
 	FEMaterial* pmat = fem.GetMaterial(nmat);
 
 	// create the new domain
-	FEDomain* pdom = CreateDomain(etype, &mesh, pmat);
+	FEDomain* pdom = CreateDomain(espec, &mesh, pmat);
 	if (pdom == 0) throw FEBioImport::FailedCreatingDomain();
 	FEDomain& dom = *pdom;
 	dom.SetName(szname);
@@ -413,32 +399,6 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 		mesh.AddElementSet(pg);
 	}
 
-	// get the dimensionality
-	int NDIM = 3;
-	if (dynamic_cast<FEDomain2D*>(pdom)) NDIM = 2;
-
-	// get the element type
-	int el_type = -1;
-	switch (etype)
-	{
-	case ET_HEX8  : el_type = m_pim->m_nhex8 ; break;
-	case ET_PENTA6: el_type = FE_PENTA6G6    ; break;
-	case ET_TET4  : el_type = m_pim->m_ntet4 ; break;
-	case ET_TET10 : el_type = m_pim->m_ntet10; break;
-	case ET_TET15 : el_type = m_pim->m_ntet15; break;
-	case ET_HEX20 : el_type = FE_HEX20G27    ; break;
-	case ET_HEX27 : el_type = FE_HEX27G27    ; break;
-	case ET_QUAD4 : el_type = (NDIM == 3 ? FE_SHELL_QUAD : FE2D_QUAD4G4) ; break;
-	case ET_TRI3  : el_type = (NDIM == 3 ? FE_SHELL_TRI  : FE2D_TRI3G1 ) ; break;
-    case ET_TRI6  : el_type = FE2D_TRI6G3    ; break;
-    case ET_QUAD8 : el_type = FE2D_QUAD8G9   ; break;
-    case ET_QUAD9 : el_type = FE2D_QUAD9G9   ; break;
-	case ET_TRUSS2: el_type = FE_TRUSS       ; break;
-    case ET_FQUAD4: el_type = FE_FERGUSON_SHELL_QUAD ; break;
-	default:
-		throw FEBioImport::InvalidElementType();
-	}
-
 	// read element data
 	++tag;
 	for (int i=0; i<elems; ++i)
@@ -460,7 +420,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 		if (pg) (*pg)[i] = nid;
 
 		// read the element data
-		ReadElement(tag, dom.ElementRef(i), el_type , nid, nmat);
+		ReadElement(tag, dom.ElementRef(i), espec.etype , nid, nmat);
 
 		// go to next tag
 		++tag;
@@ -489,14 +449,14 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 	while (!t.isend())
 	{
 		// get the element type
-		FE_Element_Shape etype = ElementShape(t);
+		FE_Element_Spec espec = ElementSpec(t.Name());
 
 		// find a domain for this element
 		int ndom = -1;
 		for (i=0; i<(int) dom.size(); ++i)
 		{
 			FEDOMAIN& d = dom[i];
-			if (d.elem == etype)
+			if (d.elem == espec)
 			{
 				ndom = i;
 				d.nel++;
@@ -507,7 +467,7 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 		{
 			FEDOMAIN d;
 			d.mat = 0;
-			d.elem = etype;
+			d.elem = espec;
 			d.nel = 1;
 			ndom = (int) dom.size();
 			dom.push_back(d);
@@ -550,36 +510,8 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 		FEDomain& dom = mesh.Domain(nd);
 
 		// determine element type
-		int etype = -1;
-		if      (tag == "hex8"  ) etype = ET_HEX8;
-		else if (tag == "hex20" ) etype = ET_HEX20;
-		else if (tag == "hex27" ) etype = ET_HEX27;
-		else if (tag == "penta6") etype = ET_PENTA6;
-		else if (tag == "tet4"  ) etype = m_pim->m_ntet4;
-		else if (tag == "tet10" ) etype = ET_TET10;
-		else if (tag == "tet15" ) etype = ET_TET15;
-		else if (tag == "quad4" ) etype = ET_QUAD4;
-		else if (tag == "tri3"  ) etype = ET_TRI3;
-		else if (tag == "truss2") etype = ET_TRUSS2;
-        else if (tag == "fquad4") etype = ET_FQUAD4;
-		else throw XMLReader::InvalidTag(tag);
-
-		switch (etype)
-		{
-		case ET_HEX8  : ReadElement(tag, dom.ElementRef(ne), m_pim->m_nhex8, nid, 0); break;
-		case ET_HEX20 : ReadElement(tag, dom.ElementRef(ne), FE_HEX20G27, nid, 0); break;
-		case ET_HEX27 : ReadElement(tag, dom.ElementRef(ne), FE_HEX27G27, nid, 0); break;
-		case ET_PENTA6: ReadElement(tag, dom.ElementRef(ne), FE_PENTA6G6, nid, 0); break;
-		case ET_TET4  : ReadElement(tag, dom.ElementRef(ne), m_pim->m_ntet4, nid, 0); break;
-		case ET_TET10 : ReadElement(tag, dom.ElementRef(ne), FE_TET10G4, nid, 0); break;
-		case ET_TET15 : ReadElement(tag, dom.ElementRef(ne), FE_TET15G8, nid, 0); break;
-		case ET_QUAD4 : ReadElement(tag, dom.ElementRef(ne), FE_SHELL_QUAD, nid, 0); break;
-		case ET_TRI3  : ReadElement(tag, dom.ElementRef(ne), FE_SHELL_TRI, nid, 0); break;
-		case ET_TRUSS2: ReadElement(tag, dom.ElementRef(ne), FE_TRUSS, nid, 0); break;
-        case ET_FQUAD4: ReadElement(tag, dom.ElementRef(ne), FE_FERGUSON_SHELL_QUAD, nid, 0); break;
-		default:
-			throw FEBioImport::InvalidElementType();
-		}
+		FE_Element_Spec espec = ElementSpec(tag.Name());
+		ReadElement(tag, dom.ElementRef(ne), espec.etype, nid, 0); break;
 
 		// go to next tag
 		++tag;

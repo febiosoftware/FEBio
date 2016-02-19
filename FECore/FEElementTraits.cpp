@@ -11,8 +11,18 @@
 #define SQR(x) ((x)*(x))
 #endif
 
+FEElementTraits::FEElementTraits(int ni, int ne, FE_Element_Class c, FE_Element_Shape s, FE_Element_Type t)
+{
+	neln = ne;
+	nint = ni;
+	spec.eclass = c;
+	spec.eshape = s;
+	spec.etype  = t;
+	H.resize(ni, ne);
+}
+
 //=============================================================================
-FESolidElementTraits::FESolidElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_SOLID) 
+FESolidElementTraits::FESolidElementTraits(int ni, int ne, FE_Element_Shape eshape, FE_Element_Type etype) : FEElementTraits(ni, ne, FE_ELEM_SOLID, eshape, etype) 
 {
 	gr.resize(ni);
 	gs.resize(ni);
@@ -1622,10 +1632,8 @@ void FEHex27G27::project_to_nodes(double* ai, double* ao)
 //
 //=============================================================================
 
-FESurfaceElementTraits::FESurfaceElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_SURFACE)
+FESurfaceElementTraits::FESurfaceElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et) : FEElementTraits(ni, ne, FE_ELEM_SURFACE, es, et)
 {
-	m_ntype = et;
-
 	gr.resize(ni);
 	gs.resize(ni);
 	gw.resize(ni);
@@ -2663,7 +2671,7 @@ void FEQuad9G9::project_to_nodes(double* ai, double* ao)
 //
 //=============================================================================
 
-FEShellElementTraits::FEShellElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_SHELL)
+FEShellElementTraits::FEShellElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et) : FEElementTraits(ni, ne, FE_ELEM_SHELL, es, et)
 {
 	gr.resize(ni);
 	gs.resize(ni);
@@ -2902,10 +2910,8 @@ void FETrussElementTraits::init()
 //
 //=============================================================================
 
-FE2DElementTraits::FE2DElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_2D)
+FE2DElementTraits::FE2DElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et) : FEElementTraits(ni, ne, FE_ELEM_2D, es, et)
 {
-	m_ntype = et;
-
 	gr.resize(ni);
 	gs.resize(ni);
 	gw.resize(ni);
@@ -3393,10 +3399,8 @@ void FE2DQuad9G9::project_to_nodes(double* ai, double* ao)
 //
 //=============================================================================
 
-FELineElementTraits::FELineElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et, FE_ELEM_EDGE)
+FELineElementTraits::FELineElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et) : FEElementTraits(ni, ne, FE_ELEM_EDGE, es, et)
 {
-	m_ntype = et;
-
 	gr.resize(ni);
 	gw.resize(ni);
 	Gr.resize(ni, ne);

@@ -9,6 +9,8 @@
 // Element Class:
 // Defines the general category of element.
 enum FE_Element_Class {
+	FE_ELEM_INVALID_CLASS,
+
 	FE_ELEM_SOLID,
 	FE_ELEM_SHELL,
 	FE_ELEM_BEAM,
@@ -25,6 +27,8 @@ enum FE_Element_Class {
 // This defines the general element shape classes. This classification differs from the
 // element types below, in that the latter is defined by a shape and integration rule.
 enum FE_Element_Shape {
+	FE_ELEM_INVALID_SHAPE,
+
 	ET_HEX8,
 	ET_HEX20,
 	ET_HEX27,
@@ -37,9 +41,11 @@ enum FE_Element_Shape {
     ET_QUAD9,
 	ET_TRI3,
     ET_TRI6,
+	ET_TRI7,
 	ET_TRUSS2,
     ET_FQUAD4,
-	ET_LINE2
+	ET_LINE2,
+	ET_DISCRETE
 };
 
 //-----------------------------------------------------------------------------
@@ -110,18 +116,40 @@ enum FE_Element_Type {
 	FE2D_QUAD9G9,
 
 	// line elements
-	FE_LINE2G1
+	FE_LINE2G1,
+
+	// unspecified
+	FE_ELEM_INVALID_TYPE = 0xFFFF
 };
 
 //-----------------------------------------------------------------------------
 //! Helper class for creating domain classes.
 struct FE_Element_Spec
 {
+	FE_Element_Class    eclass;
 	FE_Element_Shape	eshape;
 	FE_Element_Type		etype;
 	bool				m_bthree_field_hex;
 	bool				m_bthree_field_tet;
 	bool				m_but4;
+
+	FE_Element_Spec()
+	{
+		eclass = FE_ELEM_INVALID_CLASS;
+		eshape = FE_ELEM_INVALID_SHAPE;
+		etype  = FE_ELEM_INVALID_TYPE;
+		m_bthree_field_hex = false;
+		m_bthree_field_tet = false;
+		m_but4 = false;
+	}
+
+	bool operator == (const FE_Element_Spec& s)
+	{
+		if ((eclass == s.eclass) &&
+			(eshape == s.eshape) &&
+			(etype  == s.etype )) return true;
+		return false;
+	}
 };
 
 //-----------------------------------------------------------------------------

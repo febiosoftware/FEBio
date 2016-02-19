@@ -93,3 +93,28 @@ FEElementTraits* FEElementLibrary::GetElementTraits(int ntype)
 { 
 	return GetInstance()->m_Traits[ntype]; 
 }
+
+FE_Element_Shape FEElementLibrary::GetElementShape(int ntype)
+{
+	FEElementLibrary* p = GetInstance();
+	if ((ntype < 0)||(ntype >= p->m_Traits.size())) return FE_ELEM_INVALID_SHAPE;
+	return p->m_Traits[ntype]->Shape();
+}
+
+//! return the element class of a given element type
+FE_Element_Class FEElementLibrary::GetElementClass(int ntype)
+{
+	FEElementLibrary* p = GetInstance();
+	if ((ntype < 0) || (ntype >= p->m_Traits.size())) return FE_ELEM_INVALID_CLASS;
+	return p->m_Traits[ntype]->Class();
+}
+
+bool FEElementLibrary::IsValid(const FE_Element_Spec& c)
+{
+	if (c.eclass == FE_ELEM_INVALID_CLASS) return false;
+	if (c.eshape == FE_ELEM_INVALID_SHAPE) return false;
+	if (c.etype  == FE_ELEM_INVALID_TYPE ) return false;
+	if (c.eclass != GetElementClass(c.etype)) return false;
+	if (c.eshape != GetElementShape(c.etype)) return false;
+	return true;
+}

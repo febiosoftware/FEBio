@@ -8,7 +8,7 @@ class FEBioGeometrySection : public FEBioFileSection
 private:
 	struct FEDOMAIN 
 	{
-		FE_Element_Shape	elem;	// element type
+		FE_Element_Spec		elem;	// element type
 		int					mat;	// material ID
 		int					nel;	// number of elements
 	};
@@ -31,8 +31,8 @@ protected:
 
 	void ReadElement(XMLTag& tag, FEElement& el, int ntype, int nid, int nmat);
 
-	FE_Element_Shape ElementShape(XMLTag& tag);
-	FEDomain* CreateDomain(const FE_Element_Shape& eshape, FEMesh* pm, FEMaterial* pmat);
+	FE_Element_Spec ElementSpec(const char* sz);
+	FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat);
 
 protected:
 	vector<FEDOMAIN>	m_dom;

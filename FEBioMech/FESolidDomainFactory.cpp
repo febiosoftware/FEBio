@@ -27,13 +27,14 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 {
 	FEModel* pfem = pmat->GetFEModel();
 	const char* sztype = 0;
+	FE_Element_Class eclass = spec.eclass;
 	FE_Element_Shape eshape = spec.eshape;
 	FE_Element_Type etype = spec.etype;
 	if (dynamic_cast<FERigidMaterial*>(pmat))
 	{
 		// rigid elements
-		if ((eshape == ET_HEX8) || (eshape == ET_PENTA6) || (eshape == ET_TET4) || (eshape == ET_TET10) || (eshape == ET_TET15) || (eshape == ET_HEX20) || (eshape == ET_HEX27)) sztype = "rigid-solid";
-		else if ((eshape == ET_QUAD4) || (eshape == ET_TRI3)) sztype = "rigid-shell";
+		if      (eclass == FE_ELEM_SOLID) sztype = "rigid-solid";
+		else if (eclass == FE_ELEM_SHELL) sztype = "rigid-shell";
 		else return 0;
 	}
 	else if (dynamic_cast<FERemodelingElasticMaterial*>(pmat)) sztype = "remodeling-solid";
