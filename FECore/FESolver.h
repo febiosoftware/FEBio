@@ -29,6 +29,9 @@ public:
 	//! Initialize solver data
 	virtual bool Init();
 
+	//! Data serialization
+	void Serialize(DumpStream& ar);
+
 	//! Can this be removed?
 	virtual void Clean() = 0;
 

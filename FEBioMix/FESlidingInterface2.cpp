@@ -249,6 +249,7 @@ void FESlidingSurface2::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow())
 	{
+		FEContactSurface::Serialize(ar);
 		if (ar.IsSaving())
 		{
 			ar << m_bporo;
@@ -298,14 +299,6 @@ void FESlidingSurface2::Serialize(DumpStream& ar)
 			}
 			ar >> m_poro;
 			ar >> m_nn;
-
-			// reset element pointers
-			for (int i=0; i<Elements(); ++i)
-			{
-				vector<Data>& di = m_Data[i];
-				int n = (int) di.size();
-				for (int j=0; j<n; ++j) di[j].m_pme = 0;
-			}
 		}
 	}
 	else
@@ -1880,6 +1873,59 @@ void FESlidingInterface2::Serialize(DumpStream &ar)
 	// serialize contact surface data
 	m_ms.Serialize(ar);
 	m_ss.Serialize(ar);
+
+	// serialize pointers for deep streaming
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			int NE = m_ss.m_Data.size();
+			for (int i=0; i<NE; ++i)
+			{
+				int NI = m_ss.m_Data[i].size();
+				for (int j=0; j<NI; ++j)
+				{
+					FESurfaceElement* pe = m_ss.m_Data[i][j].m_pme;
+					if (pe) ar << pe->m_lid; else ar << -1;
+				}
+			}
+
+			NE = m_ms.m_Data.size();
+			for (int i = 0; i<NE; ++i)
+			{
+				int NI = m_ms.m_Data[i].size();
+				for (int j = 0; j<NI; ++j)
+				{
+					FESurfaceElement* pe = m_ms.m_Data[i][j].m_pme;
+					if (pe) ar << pe->m_lid; else ar << -1;
+				}
+			}
+		}
+		else
+		{
+			int NE = m_ss.m_Data.size(), nid;
+			for (int i = 0; i<NE; ++i)
+			{
+				int NI = m_ss.m_Data[i].size();
+				for (int j = 0; j<NI; ++j)
+				{
+					ar >> nid;
+					m_ss.m_Data[i][j].m_pme = (nid < 0 ? 0 : &m_ms.Element(nid));
+				}
+			}
+
+			NE = m_ms.m_Data.size();
+			for (int i = 0; i<NE; ++i)
+			{
+				int NI = m_ms.m_Data[i].size();
+				for (int j = 0; j<NI; ++j)
+				{
+					ar >> nid;
+					m_ms.m_Data[i][j].m_pme = (nid < 0 ? 0 : &m_ss.Element(nid));
+				}
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

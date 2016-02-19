@@ -47,3 +47,22 @@ bool FESolver::Init()
 {
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+void FESolver::Serialize(DumpStream& ar)
+{
+	FECoreBase::Serialize(ar);
+	if (ar.IsShallow())
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_bsymm;
+			ar << m_nrhs << m_niter << m_nref << m_ntotref << m_naug;
+		}
+		else
+		{
+			ar >> m_bsymm;
+			ar >> m_nrhs >> m_niter >> m_nref >> m_ntotref >> m_naug;
+		}
+	}
+}
