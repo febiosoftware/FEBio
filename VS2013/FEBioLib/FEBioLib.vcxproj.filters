@@ -39,6 +39,9 @@
     <ClInclude Include="..\..\FEBioLib\version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioLib\febio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioLib\FEBioModel.cpp">
@@ -53,9 +56,6 @@
     <ClCompile Include="..\..\FEBioLib\hello.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioLib\InitLibrary.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioLib\input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,6 +66,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\validate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioLib\febiolib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

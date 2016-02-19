@@ -480,6 +480,7 @@
     <ClInclude Include="..\..\FEBioMech\FEFungOrthotropic.h" />
     <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.h" />
     <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGentMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEHolmesMow.h" />
     <ClInclude Include="..\..\FEBioMech\FEHuiskesSupply.h" />
     <ClInclude Include="..\..\FEBioMech\FEIncompNeoHookean.h" />
@@ -489,6 +490,7 @@
     <ClInclude Include="..\..\FEBioMech\FELinearSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FELinearSolidSolver.h" />
     <ClInclude Include="..\..\FEBioMech\FELinearTransIso.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMembraneMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEMicroMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEMicroMaterial2O.h" />
     <ClInclude Include="..\..\FEBioMech\FEMooneyRivlin.h" />
@@ -574,6 +576,7 @@
     <ClInclude Include="..\..\FEBioMech\FEViscoElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEVolumeConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEVonMisesPlasticity.h" />
+    <ClInclude Include="..\..\FEBioMech\FEWrinkleOgdenMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\gauss.h" />
     <ClInclude Include="..\..\FEBioMech\gausskronrod.h" />
     <ClInclude Include="..\..\FEBioMech\geodesic.h" />
@@ -663,6 +666,7 @@
     <ClCompile Include="..\..\FEBioMech\FEFungOrthotropic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEGentMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHolmesMow.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHuiskesSupply.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEIncompNeoHookean.cpp" />
@@ -672,6 +676,7 @@
     <ClCompile Include="..\..\FEBioMech\FELinearSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FELinearSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioMech\FELinearTransIso.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMembraneMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMicroMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMicroMaterial2O.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMooneyRivlin.cpp" />
@@ -757,6 +762,7 @@
     <ClCompile Include="..\..\FEBioMech\FEViscoElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEVolumeConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEVonMisesPlasticity.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEWrinkleOgdenMaterial.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

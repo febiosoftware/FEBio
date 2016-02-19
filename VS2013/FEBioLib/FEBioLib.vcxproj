@@ -407,6 +407,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBioLib\febio.h" />
     <ClInclude Include="..\..\FEBioLib\FEBioModel.h" />
     <ClInclude Include="..\..\FEBioLib\FEBox.h" />
     <ClInclude Include="..\..\FEBioLib\plugin.h" />
@@ -416,11 +417,11 @@
     <ClInclude Include="..\..\FEBioLib\version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioLib\febiolib.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBioModel.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBox.cpp" />
     <ClCompile Include="..\..\FEBioLib\getapppath.cpp" />
     <ClCompile Include="..\..\FEBioLib\hello.cpp" />
-    <ClCompile Include="..\..\FEBioLib\InitLibrary.cpp" />
     <ClCompile Include="..\..\FEBioLib\input.cpp" />
     <ClCompile Include="..\..\FEBioLib\plugin.cpp" />
     <ClCompile Include="..\..\FEBioLib\stdafx.cpp" />
