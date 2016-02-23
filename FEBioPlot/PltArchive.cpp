@@ -110,7 +110,7 @@ void FileStream::Write(void* pd, size_t Size, size_t Count)
 		else
 		{
 			int nblock = m_bufsize - m_current;
-			if (nblock>0) memcpy(m_buf + m_current, pdata, nblock);
+			if (nblock>0) { memcpy(m_buf + m_current, pdata, nblock); m_current += nblock; }
 			Flush();
 			pdata += nblock;
 			nsize -= nblock;
