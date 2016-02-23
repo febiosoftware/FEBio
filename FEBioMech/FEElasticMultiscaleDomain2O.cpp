@@ -140,6 +140,10 @@ void FEElasticMultiscaleDomain2O::InternalElementWorkFlux(FESolidElement& el, ve
 	int face[FEElement::MAX_NODES];
 	vec3d rt[FEElement::MAX_NODES];
 
+	// get the material
+	FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(GetMaterial());
+	assert(pmat);
+
 	// get the integration rule
 	FEElementLibrary& ELib = *FEElementLibrary::GetInstance();
 	FESurfaceElementTraits& rule = dynamic_cast<FESurfaceElementTraits&>(*ELib.GetElementTraits(FE_TRI6G3));
@@ -186,9 +190,11 @@ void FEElasticMultiscaleDomain2O::InternalElementWorkFlux(FESolidElement& el, ve
 			}
 
 			// evaluate the tensor at this integration point
-			// TODO: Not sure how to do this. Maybe evaluate nodal
-			//       values and then interpolate via shape functions?
-			mat3ds s;
+			// setup a material point
+			FEElasticMaterialPoint pt;
+			defgrad(el, pt.m_F, g1, g2, g3);
+			pt.m_J = pt.m_F.det();
+			mat3ds s = pmat->Stress(pt);
 
 			// evaluate the spatial gradient of shape functions
 			invjact(el, Ji, g1, g2, g3);
@@ -345,6 +351,9 @@ void FEElasticMultiscaleDomain2O::UpdateElementStress(int iel, double dt)
 	// get the integration weights
 	double* gw = el.GaussWeights();
 
+	// calculate the stress at this material point
+	FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(m_pMat);
+
 	// loop over the integration points and calculate
 	// the stress at the integration point
 	for (int n=0; n<nint; ++n)
@@ -363,9 +372,6 @@ void FEElasticMultiscaleDomain2O::UpdateElementStress(int iel, double dt)
 		pt.m_J = defgrad(el, pt.m_F, n);
 		defhess(el, mmpt2O.m_G, n);
 
-		// calculate the stress at this material point
-		FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(m_pMat);
-		
 		pmat->Stress2O(mp);
 	}
 }

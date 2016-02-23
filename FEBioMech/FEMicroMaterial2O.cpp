@@ -88,7 +88,7 @@ BEGIN_PARAMETER_LIST(FEMicroMaterial2O, FEElasticMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEMicroMaterial2O::FEMicroMaterial2O(FEModel* pfem) : FEElasticMaterial(pfem)
+FEMicroMaterial2O::FEMicroMaterial2O(FEModel* pfem) : FEElasticMaterial2O(pfem)
 {
 	// initialize parameters
 	m_szrve[0] = 0;
@@ -466,8 +466,6 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp)
 
 	// calculate the difference between the macro and micro energy for Hill-Mandel condition
 	calc_energy_diff(mmpt2O.m_rve, mp);	
-
-	return;
 }
 
 //-----------------------------------------------------------------------------

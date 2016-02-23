@@ -1,5 +1,5 @@
 #pragma once
-#include "FEElasticMaterial.h"
+#include "FEElasticMaterial2O.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 #include "FEBioMech/FEPeriodicBoundary2O.h"
@@ -69,7 +69,7 @@ public:
 //! are calculated by solving a micro-structural RVE problem and return the
 //! averaged stress and condensed tangents.
 //!
-class FEMicroMaterial2O :	public FEElasticMaterial
+class FEMicroMaterial2O :	public FEElasticMaterial2O
 {
 public:
 	FEMicroMaterial2O(FEModel* pfem);
