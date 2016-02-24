@@ -384,6 +384,8 @@ bool FEModel::Solve()
 			break;
 		}
 
+		DoCallback(CB_STEP_ACTIVE);
+
 		// solve the analaysis step
 		bconv = m_pStep->Solve();
 

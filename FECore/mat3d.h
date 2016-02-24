@@ -346,6 +346,10 @@ public:
 	// double contraction
 	double dotdot(const mat3d& T);
 
+	// polar decomposition
+	void right_polar(mat3d& R, mat3ds& U);
+	void left_polar(mat3ds& V, mat3d& R);
+
 protected:
 	double d[3][3];	// matrix data
 

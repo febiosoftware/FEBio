@@ -154,3 +154,33 @@ void mat3ds::eigen2(double l[3], vec3d r[3])
         r[2] = vec3d(V[0][2],V[1][2],V[2][2]);
     }
 }
+
+//-----------------------------------------------------------------------------
+// calculates the unique right polar decomposition F = R*U
+void mat3d::right_polar(mat3d& R, mat3ds& U)
+{
+	mat3d& F = *this;
+	mat3ds C = (F.transpose()*F).sym();
+
+	double l[3];
+	vec3d v[3];
+	C.eigen2(l, v);
+
+	U = dyad(v[0])*sqrt(l[0]) + dyad(v[1])*sqrt(l[1]) + dyad(v[2])*sqrt(l[2]);
+	R = F*U.inverse();
+}
+
+//-----------------------------------------------------------------------------
+// calculates the unique left polar decomposition F = V*R
+void mat3d::left_polar(mat3ds& V, mat3d& R)
+{
+	mat3d& F = *this;
+	mat3ds b = (F*F.transpose()).sym();
+
+	double l[3];
+	vec3d v[3];
+	b.eigen2(l, v);
+
+	V = dyad(v[0])*sqrt(l[0]) + dyad(v[1])*sqrt(l[1]) + dyad(v[2])*sqrt(l[2]);
+	R = V.inverse()*F;
+}

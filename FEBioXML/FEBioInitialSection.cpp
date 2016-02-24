@@ -53,6 +53,18 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			}
 			while (!tag.isend());
 		}
+		else if (tag == "ic")
+		{
+			const char* sztype = tag.AttributeValue("type");
+			FEInitialCondition* pic = dynamic_cast<FEInitialCondition*>(fecore_new<FEInitialCondition>(FEIC_ID, sztype, &fem));
+			
+			fem.AddInitialCondition(pic);
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddModelComponent(pic);
+				pic->Deactivate();
+			}
+		}
 		else
 		{
 			// Get the degree of freedom

@@ -253,7 +253,7 @@ void FEBioModel::Write(unsigned int nwhen)
 		if (nplt != FE_PLOT_NEVER)
 		{
 			// try to open the plot file
-			if (nwhen == CB_INIT)
+			if (nwhen == CB_STEP_ACTIVE)
 			{
 				if (m_plot->IsValid() == false)
 				{
@@ -263,13 +263,14 @@ void FEBioModel::Write(unsigned int nwhen)
 						delete m_plot;
 						m_plot = 0;
 					}
+
+					// Since it is assumed that for the first timestep
+					// there are no loads or initial displacements, the case n=0 is skipped.
+					// Therefor we can output those results here.
+					// TODO: Offcourse we should actually check if this is indeed
+					//       the case, otherwise we should also solve for t=0
+					if (m_plot) m_plot->Write(*this);
 				}
-				// Since it is assumed that for the first timestep
-				// there are no loads or initial displacements, the case n=0 is skipped.
-				// Therefor we can output those results here.
-				// TODO: Offcourse we should actually check if this is indeed
-				//       the case, otherwise we should also solve for t=0
-				m_plot->Write(*this);
 			}
 			else
 			{
@@ -299,7 +300,7 @@ void FEBioModel::Write(unsigned int nwhen)
 				// output the state if requested
 				if (bout) 
 				{
-					m_plot->Write(*this);
+					if (m_plot) m_plot->Write(*this);
 				}
 			}
 		}
