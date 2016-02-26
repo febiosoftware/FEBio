@@ -22,6 +22,13 @@ void FEMaterialPoint::SetPrev(FEMaterialPoint* pt)
 	m_pPrev = pt;
 }
 
+// TODO: What if the next pointer is already assigned?
+void FEMaterialPoint::SetNext(FEMaterialPoint* pt)
+{
+	m_pNext = pt;
+	pt->m_pPrev = this;
+}
+
 void FEMaterialPoint::Init(bool bflag)
 {
 	if (m_pNext) m_pNext->Init(bflag);

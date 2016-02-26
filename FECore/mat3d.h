@@ -347,8 +347,11 @@ public:
 	double dotdot(const mat3d& T);
 
 	// polar decomposition
-	void right_polar(mat3d& R, mat3ds& U);
-	void left_polar(mat3ds& V, mat3d& R);
+	void right_polar(mat3d& R, mat3ds& U) const;
+	void left_polar(mat3ds& V, mat3d& R) const;
+
+	// return identity matrix
+	static mat3d identity() { return mat3d(1,0,0, 0,1,0, 0,0,1); }
 
 protected:
 	double d[3][3];	// matrix data

@@ -45,6 +45,11 @@ public:
 	// assign the previous pointer
 	void SetPrev(FEMaterialPoint* pt);
 
+	//! assign the next pointer
+	//! this also sets the prev pointer of the passed pointer
+	//! in other words, it makes this the parent of the passed pointer
+	void SetNext(FEMaterialPoint* pt);
+
 	// serialization
 	void Serialize(DumpStream& ar);
 
