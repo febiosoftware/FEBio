@@ -72,6 +72,11 @@ public:
 	//! create a linear solver factory
 	LinearSolver* CreateLinearSolver(int nsolver);
 
+public:
+	//! set the default linear solver
+	static void SetDefaultSolver(int nsolver) { m_ndefault_solver = nsolver; }
+	static int m_ndefault_solver;
+
 private:
 	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes

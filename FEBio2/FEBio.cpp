@@ -221,9 +221,9 @@ int main(int argc, char* argv[])
 	// (Set this before the configuration is read in because
 	//  the configuration can change the default linear solver.)
 #ifdef PARDISO
-	FEModel::SetDefaultSolver(PARDISO_SOLVER);
+	FECoreKernel::SetDefaultSolver(PARDISO_SOLVER);
 #else
-	FEModel::SetDefaultSolver(SKYLINE_SOLVER);
+	FECoreKernel::SetDefaultSolver(SKYLINE_SOLVER);
 #endif
 
 	// read the configration file if specified

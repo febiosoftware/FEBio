@@ -444,6 +444,7 @@
     <ClInclude Include="..\..\FEBioMech\FEElasticFiberMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticFiberMaterialUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticMaterial2O.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticMixture.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticMultigeneration.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticMultiscaleDomain1O.h" />
@@ -630,6 +631,7 @@
     <ClCompile Include="..\..\FEBioMech\FEElasticFiberMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticFiberMaterialUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticMaterial2O.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticMixture.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticMultigeneration.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticMultiscaleDomain1O.cpp" />

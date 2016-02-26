@@ -69,16 +69,16 @@ bool Configure(const char* szfile)
 					else if (tag == "linear_solver")
 					{
 						const char* szt = tag.AttributeValue("type");
-						if      (strcmp(szt, "skyline"           ) == 0) FEModel::SetDefaultSolver(SKYLINE_SOLVER   );
-						else if (strcmp(szt, "psldlt"            ) == 0) FEModel::SetDefaultSolver(PSLDLT_SOLVER    );
-						else if (strcmp(szt, "superlu"           ) == 0) FEModel::SetDefaultSolver(SUPERLU_SOLVER   );
-						else if (strcmp(szt, "superlu_mt"        ) == 0) FEModel::SetDefaultSolver(SUPERLU_MT_SOLVER);
-						else if (strcmp(szt, "pardiso"           ) == 0) FEModel::SetDefaultSolver(PARDISO_SOLVER   );
-						else if (strcmp(szt, "rcicg"             ) == 0) FEModel::SetDefaultSolver(RCICG_SOLVER     );
-						else if (strcmp(szt, "fgmres"            ) == 0) FEModel::SetDefaultSolver(FGMRES_SOLVER    );
-						else if (strcmp(szt, "fgmres_ilut"       ) == 0) FEModel::SetDefaultSolver(FGMRES_ILUT_SOLVER);
-						else if (strcmp(szt, "fgmres_ilu0"       ) == 0) FEModel::SetDefaultSolver(FGMRES_ILU0_SOLVER);
-						else if (strcmp(szt, "wsmp"              ) == 0) FEModel::SetDefaultSolver(WSMP_SOLVER      );
+						if      (strcmp(szt, "skyline"           ) == 0) FECoreKernel::SetDefaultSolver(SKYLINE_SOLVER   );
+						else if (strcmp(szt, "psldlt"            ) == 0) FECoreKernel::SetDefaultSolver(PSLDLT_SOLVER    );
+						else if (strcmp(szt, "superlu"           ) == 0) FECoreKernel::SetDefaultSolver(SUPERLU_SOLVER   );
+						else if (strcmp(szt, "superlu_mt"        ) == 0) FECoreKernel::SetDefaultSolver(SUPERLU_MT_SOLVER);
+						else if (strcmp(szt, "pardiso"           ) == 0) FECoreKernel::SetDefaultSolver(PARDISO_SOLVER   );
+						else if (strcmp(szt, "rcicg"             ) == 0) FECoreKernel::SetDefaultSolver(RCICG_SOLVER     );
+						else if (strcmp(szt, "fgmres"            ) == 0) FECoreKernel::SetDefaultSolver(FGMRES_SOLVER    );
+						else if (strcmp(szt, "fgmres_ilut"       ) == 0) FECoreKernel::SetDefaultSolver(FGMRES_ILUT_SOLVER);
+						else if (strcmp(szt, "fgmres_ilu0"       ) == 0) FECoreKernel::SetDefaultSolver(FGMRES_ILU0_SOLVER);
+						else if (strcmp(szt, "wsmp"              ) == 0) FECoreKernel::SetDefaultSolver(WSMP_SOLVER      );
 					}
 					else if (tag == "import")
 					{

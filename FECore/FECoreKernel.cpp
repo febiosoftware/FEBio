@@ -4,6 +4,9 @@
 #include <stdarg.h>
 using namespace std;
 
+// set the default linear solver (0 is equivalent to skyline solver)
+int FECoreKernel::m_ndefault_solver = 0;
+
 //-----------------------------------------------------------------------------
 //! Helper function for reporting errors
 bool fecore_error(const char* sz, ...)
