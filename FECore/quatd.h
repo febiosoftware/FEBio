@@ -39,7 +39,7 @@ public:
 		z = v.z*sina;
 	}
     
-	quatd (vec3d& v1, vec3d& v2)
+	quatd (const vec3d& v1, const vec3d& v2)
 	{
 		vec3d n = v1^v2;
 		n.unit();
