@@ -11,6 +11,10 @@
 		D50134591B1275260066E436 /* FEFiberPowLinearSBM.h in Headers */ = {isa = PBXBuildFile; fileRef = D50134571B1275260066E436 /* FEFiberPowLinearSBM.h */; };
 		D501345C1B127B790066E436 /* FEFiberExpPowSBM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D501345A1B127B790066E436 /* FEFiberExpPowSBM.cpp */; };
 		D501345D1B127B790066E436 /* FEFiberExpPowSBM.h in Headers */ = {isa = PBXBuildFile; fileRef = D501345B1B127B790066E436 /* FEFiberExpPowSBM.h */; };
+		D52145FC1C3EFC5800B5572C /* FESolubManning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52145FA1C3EFC5800B5572C /* FESolubManning.cpp */; };
+		D52145FD1C3EFC5800B5572C /* FESolubManning.h in Headers */ = {isa = PBXBuildFile; fileRef = D52145FB1C3EFC5800B5572C /* FESolubManning.h */; };
+		D52146001C40334600B5572C /* FEOsmCoefManning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52145FE1C40334600B5572C /* FEOsmCoefManning.cpp */; };
+		D52146011C40334600B5572C /* FEOsmCoefManning.h in Headers */ = {isa = PBXBuildFile; fileRef = D52145FF1C40334600B5572C /* FEOsmCoefManning.h */; };
 		D534C48218BA930A006B5E1B /* FEMultiphasicStandard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D534C48018BA930A006B5E1B /* FEMultiphasicStandard.cpp */; };
 		D534C48318BA930A006B5E1B /* FEMultiphasicStandard.h in Headers */ = {isa = PBXBuildFile; fileRef = D534C48118BA930A006B5E1B /* FEMultiphasicStandard.h */; };
 		D534C48618BAAE70006B5E1B /* FEMultiphasicMultigeneration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D534C48418BAAE70006B5E1B /* FEMultiphasicMultigeneration.cpp */; };
@@ -137,6 +141,10 @@
 		D50134571B1275260066E436 /* FEFiberPowLinearSBM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFiberPowLinearSBM.h; sourceTree = "<group>"; };
 		D501345A1B127B790066E436 /* FEFiberExpPowSBM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFiberExpPowSBM.cpp; sourceTree = "<group>"; };
 		D501345B1B127B790066E436 /* FEFiberExpPowSBM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFiberExpPowSBM.h; sourceTree = "<group>"; };
+		D52145FA1C3EFC5800B5572C /* FESolubManning.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolubManning.cpp; sourceTree = "<group>"; };
+		D52145FB1C3EFC5800B5572C /* FESolubManning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolubManning.h; sourceTree = "<group>"; };
+		D52145FE1C40334600B5572C /* FEOsmCoefManning.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOsmCoefManning.cpp; sourceTree = "<group>"; };
+		D52145FF1C40334600B5572C /* FEOsmCoefManning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOsmCoefManning.h; sourceTree = "<group>"; };
 		D534C48018BA930A006B5E1B /* FEMultiphasicStandard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicStandard.cpp; sourceTree = "<group>"; };
 		D534C48118BA930A006B5E1B /* FEMultiphasicStandard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicStandard.h; sourceTree = "<group>"; };
 		D534C48418BAAE70006B5E1B /* FEMultiphasicMultigeneration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicMultigeneration.cpp; sourceTree = "<group>"; };
@@ -355,6 +363,8 @@
 				D534C48118BA930A006B5E1B /* FEMultiphasicStandard.h */,
 				D5E108A21865E02800B23922 /* FEOsmCoefConst.cpp */,
 				D5E108A31865E02800B23922 /* FEOsmCoefConst.h */,
+				D52145FE1C40334600B5572C /* FEOsmCoefManning.cpp */,
+				D52145FF1C40334600B5572C /* FEOsmCoefManning.h */,
 				D5ECCEDB186644B00073481A /* FEOsmoticCoefficient.cpp */,
 				D5ECCEDC186644B00073481A /* FEOsmoticCoefficient.h */,
 				D5E108A41865E02800B23922 /* FEPermConstIso.cpp */,
@@ -387,6 +397,8 @@
 				D5E108BB1865E02800B23922 /* FESlidingInterfaceMP.h */,
 				D5E108BC1865E02800B23922 /* FESolubConst.cpp */,
 				D5E108BD1865E02800B23922 /* FESolubConst.h */,
+				D52145FA1C3EFC5800B5572C /* FESolubManning.cpp */,
+				D52145FB1C3EFC5800B5572C /* FESolubManning.h */,
 				D5E108BE1865E02800B23922 /* FESolute.cpp */,
 				D5E108BF1865E02800B23922 /* FESolute.h */,
 				D5E108C01865E02800B23922 /* FESoluteFlux.cpp */,
@@ -433,6 +445,7 @@
 				D5C69F891A375DE200EB52B2 /* FEActiveMomentumSupply.h in Headers */,
 				D5B1549D19A8CF1F00062638 /* FEReactionRateNims.h in Headers */,
 				D5E108F41865E02800B23922 /* FEDiffConstOrtho.h in Headers */,
+				D52146011C40334600B5572C /* FEOsmCoefManning.h in Headers */,
 				D5E109241865E02800B23922 /* FESolubConst.h in Headers */,
 				D5E109021865E02800B23922 /* FEMultiphasic.h in Headers */,
 				D5E108EE1865E02800B23922 /* FEConcentrationIndependentReaction.h in Headers */,
@@ -470,6 +483,7 @@
 				D5E108E81865E02800B23922 /* FEBiphasicSolver.h in Headers */,
 				D5E1090E1865E02800B23922 /* FEPermHolmesMow.h in Headers */,
 				D5E1090A1865E02800B23922 /* FEOsmCoefConst.h in Headers */,
+				D52145FD1C3EFC5800B5572C /* FESolubManning.h in Headers */,
 				D5E108F21865E02800B23922 /* FEDiffConstIso.h in Headers */,
 				D5E109201865E02800B23922 /* FESlidingInterface3.h in Headers */,
 				D5E109301865E02800B23922 /* FESupplyMichaelisMenten.h in Headers */,
@@ -544,6 +558,7 @@
 				D5E108D51865E02800B23922 /* FEBioMixData.cpp in Sources */,
 				D5E109251865E02800B23922 /* FESolute.cpp in Sources */,
 				D5ECCEE7186644B00073481A /* FESolutesMaterialPoint.cpp in Sources */,
+				D52146001C40334600B5572C /* FEOsmCoefManning.cpp in Sources */,
 				D5E1090D1865E02800B23922 /* FEPermHolmesMow.cpp in Sources */,
 				D5E108F51865E02800B23922 /* FEDiffRefIso.cpp in Sources */,
 				D5E109371865E02800B23922 /* FETriphasicDomain.cpp in Sources */,
@@ -585,6 +600,7 @@
 				D5E108F71865E02800B23922 /* FEFluidFlux.cpp in Sources */,
 				D5E109171865E02800B23922 /* FEReactionRateConst.cpp in Sources */,
 				D5E108EF1865E02800B23922 /* FEDiffAlbroIso.cpp in Sources */,
+				D52145FC1C3EFC5800B5572C /* FESolubManning.cpp in Sources */,
 				D5E109011865E02800B23922 /* FEMultiphasic.cpp in Sources */,
 				D5B1549C19A8CF1F00062638 /* FEReactionRateNims.cpp in Sources */,
 				D5E1091F1865E02800B23922 /* FESlidingInterface3.cpp in Sources */,
