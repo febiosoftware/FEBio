@@ -146,10 +146,10 @@ double FEFiberIntegrationTrapezoidal::StrainEnergyDensity(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-void FEFiberIntegrationTrapezoidal::IntegratedFiberDensity(double& IFD)
+double FEFiberIntegrationTrapezoidal::IntegratedFiberDensity()
 {
     // initialize integrated fiber density distribution
-    IFD = 1;
+    double IFD = 1;
     
 	double C = 0;
     
@@ -177,4 +177,5 @@ void FEFiberIntegrationTrapezoidal::IntegratedFiberDensity(double& IFD)
     
     // Multiply by 2 to take advantange of symmetry
 	IFD = C*2;
+    return IFD;
 }

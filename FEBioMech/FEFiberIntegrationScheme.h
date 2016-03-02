@@ -18,7 +18,7 @@ public:
     FEFiberIntegrationScheme(FEModel* pfem) : FEElasticMaterial(pfem) {}
     
     bool Init();
-    virtual void IntegratedFiberDensity(double& IFD) = 0;
+    virtual double IntegratedFiberDensity() = 0;
 
 public:
     FEElasticFiberMaterial*     m_pFmat;    // pointer to fiber material

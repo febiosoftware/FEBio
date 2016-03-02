@@ -475,7 +475,7 @@ double FEFiberIntegrationGaussKronrodUC::DevStrainEnergyDensity(FEMaterialPoint&
 }
 
 //-----------------------------------------------------------------------------
-void FEFiberIntegrationGaussKronrodUC::IntegratedFiberDensity(double& IFD)
+double FEFiberIntegrationGaussKronrodUC::IntegratedFiberDensity()
 {
     // establish local basis
     vec3d a[3], n0a;
@@ -484,7 +484,7 @@ void FEFiberIntegrationGaussKronrodUC::IntegratedFiberDensity(double& IFD)
     a[2] = vec3d(0,0,1);
     
     // initialize integrated fiber density
-    IFD = 1;
+    double IFD = 1;
     double C = 0;
     
     double phi, theta;
@@ -518,4 +518,5 @@ void FEFiberIntegrationGaussKronrodUC::IntegratedFiberDensity(double& IFD)
     
     // we multiply by two to add contribution from other half-sphere
     IFD = C*2;
+    return IFD;
 }

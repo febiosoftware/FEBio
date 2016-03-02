@@ -388,10 +388,10 @@ double FEFiberIntegrationTriangle::StrainEnergyDensity(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-void FEFiberIntegrationTriangle::IntegratedFiberDensity(double& IFD)
+double FEFiberIntegrationTriangle::IntegratedFiberDensity()
 {
     // initialize integrated fiber density distribution
-    IFD = 1;
+    double IFD = 1;
     
     // loop over all integration points
     double R;
@@ -412,4 +412,5 @@ void FEFiberIntegrationTriangle::IntegratedFiberDensity(double& IFD)
         C += R*m_w[n];
     }
     IFD = C;
+    return IFD;
 }

@@ -28,7 +28,7 @@ public:
 	double StrainEnergyDensity(FEMaterialPoint& mp);
     
     // Fiber density
-    void IntegratedFiberDensity(double& IFD);
+    double IntegratedFiberDensity();
     
 public:
     int             m_nth;  // number of trapezoidal integration points along theta

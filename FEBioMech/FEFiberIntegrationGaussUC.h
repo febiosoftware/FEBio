@@ -33,7 +33,7 @@ public:
 	double DevStrainEnergyDensity(FEMaterialPoint& mp);
     
     // Fiber density
-    void IntegratedFiberDensity(double& IFD);
+    double IntegratedFiberDensity();
     
 public:
 	int             m_nph;	// number of gauss integration points along phi

@@ -147,10 +147,10 @@ double FEFiberIntegrationGeodesicUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-void FEFiberIntegrationGeodesicUC::IntegratedFiberDensity(double& IFD)
+double FEFiberIntegrationGeodesicUC::IntegratedFiberDensity()
 {
     // initialize integrated fiber density distribution
-    IFD = 1;
+    double IFD = 1;
     
 	// loop over all integration points
 	double R;
@@ -171,4 +171,5 @@ void FEFiberIntegrationGeodesicUC::IntegratedFiberDensity(double& IFD)
 		C += R*m_w[n];
 	}
 	IFD = C;
+    return IFD;
 }

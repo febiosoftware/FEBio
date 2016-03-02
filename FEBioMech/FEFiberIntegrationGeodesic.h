@@ -32,7 +32,7 @@ public:
 	double StrainEnergyDensity(FEMaterialPoint& mp);
     
     // Fiber density
-    void IntegratedFiberDensity(double& IFD);
+    double IntegratedFiberDensity();
 
 	// serialization
 	void Serialize(DumpStream& ar);

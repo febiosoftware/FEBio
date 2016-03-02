@@ -22,7 +22,7 @@ public:
     FEFiberIntegrationSchemeUC(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
     
     bool Init();
-    virtual void IntegratedFiberDensity(double& IFD) = 0;
+    virtual double IntegratedFiberDensity() = 0;
     
 public:
     FEElasticFiberMaterialUC*   m_pFmat;    // pointer to fiber material
