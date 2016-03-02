@@ -14,7 +14,7 @@ bool FEFiberIntegrationScheme::Init()
     if (m_pFDD->Init() == false) return false;
     
     // evaluate the integrated fiber density distribution
-    m_pFDD->m_IFD = IntegratedFiberDensity();
+    if (m_pFDD->m_IFD == 1) m_pFDD->m_IFD = IntegratedFiberDensity();
 
 	return true;
 }

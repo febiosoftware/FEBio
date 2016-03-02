@@ -21,27 +21,45 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationGeodesicUC, FEFiberIntegrationSchemeUC)
     ADD_PARAMETER(m_nres, FE_PARAM_INT, "resolution");
 END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
+void FEFiberIntegrationGeodesicUC::Serialize(DumpStream& ar)
+{
+    FEFiberIntegrationSchemeUC::Serialize(ar);
+    if (ar.IsSaving() == false)
+    {
+        InitIntegrationRule();
+    }
+}
+
+//-----------------------------------------------------------------------------
 bool FEFiberIntegrationGeodesicUC::Init()
 {
 	if ((m_nres != 0) && (m_nres != 1)) return MaterialError("resolution must be 0 (low) or 1 (high).");
     
-	// select the integration rule
-	m_nint = (m_nres == 0? NSTL  : NSTH  );
-	const double* phi = (m_nres == 0? PHIL  : PHIH  );
-	const double* the = (m_nres == 0? THETAL: THETAH);
-	const double* w   = (m_nres == 0? AREAL : AREAH );
-		
-	for (int n=0; n<m_nint; ++n)
-	{
-		m_cth[n] = cos(the[n]);
-		m_sth[n] = sin(the[n]);
-		m_cph[n] = cos(phi[n]);
-		m_sph[n] = sin(phi[n]);
-		m_w[n] = w[n];
-	}
-		
+    // initialize integration rule data
+    InitIntegrationRule();
+    
     // also initialize the parent class
     return FEFiberIntegrationSchemeUC::Init();
+}
+
+//-----------------------------------------------------------------------------
+void FEFiberIntegrationGeodesicUC::InitIntegrationRule()
+{
+    // select the integration rule
+    m_nint = (m_nres == 0? NSTL  : NSTH  );
+    const double* phi = (m_nres == 0? PHIL  : PHIH  );
+    const double* the = (m_nres == 0? THETAL: THETAH);
+    const double* w   = (m_nres == 0? AREAL : AREAH );
+    
+    for (int n=0; n<m_nint; ++n)
+    {
+        m_cth[n] = cos(the[n]);
+        m_sth[n] = sin(the[n]);
+        m_cph[n] = cos(phi[n]);
+        m_sph[n] = sin(phi[n]);
+        m_w[n] = w[n];
+    }
 }
 
 //-----------------------------------------------------------------------------

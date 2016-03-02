@@ -30,6 +30,9 @@ public:
     // Fiber density
     double IntegratedFiberDensity();
     
+    // Serialization
+    void Serialize(DumpStream& ar);
+    
 public:
     int             m_nph;	// number of gauss integration points along phi
     int             m_nth;  // number of trapezoidal integration points along theta

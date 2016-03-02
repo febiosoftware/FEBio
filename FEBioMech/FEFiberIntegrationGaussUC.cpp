@@ -23,6 +23,19 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationGaussUC, FEFiberIntegrationSchemeUC)
     ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
 END_PARAMETER_LIST();
 
+void FEFiberIntegrationGaussUC::Serialize(DumpStream& ar)
+{
+    FEFiberIntegrationSchemeUC::Serialize(ar);
+    if (ar.IsSaving())
+    {
+        ar << m_gp << m_gw;
+    }
+    else
+    {
+        ar >> m_gp >> m_gw;
+    }
+}
+
 bool FEFiberIntegrationGaussUC::Init()
 {
 	if (m_nph < 1) return MaterialError("nph must be strictly greater than zero.");

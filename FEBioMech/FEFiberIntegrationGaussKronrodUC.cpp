@@ -23,6 +23,21 @@ ADD_PARAMETER(m_nph, FE_PARAM_INT, "nph");
 ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
 END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
+void FEFiberIntegrationGaussKronrodUC::Serialize(DumpStream& ar)
+{
+    FEFiberIntegrationSchemeUC::Serialize(ar);
+    if (ar.IsSaving())
+    {
+        ar << m_gp << m_gw;
+    }
+    else
+    {
+        ar >> m_gp >> m_gw;
+    }
+}
+
+//-----------------------------------------------------------------------------
 bool FEFiberIntegrationGaussKronrodUC::Init()
 {
     if (m_nth < 1) return MaterialError("nth must be strictly greater than zero.");
@@ -72,10 +87,9 @@ mat3ds FEFiberIntegrationGaussKronrodUC::DevStress(FEMaterialPoint& mp)
     // right Cauchy-Green tensor and its eigenvalues & eigenvectors
     mat3ds C = pt.DevRightCauchyGreen();
     mat3ds E = (C - mat3dd(1))/2;
-    double lE[3], lC[3];
-    vec3d vE[3], vC[3];
+    double lE[3];
+    vec3d vE[3];
     E.eigen2(lE,vE);//lE[2]>lE[1]>lE[0]
-    C.eigen2(lC, vC);
     const double eps = std::numeric_limits<double>::epsilon();
     
     // initialize stress tensor

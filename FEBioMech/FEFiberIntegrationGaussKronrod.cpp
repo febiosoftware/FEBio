@@ -23,6 +23,7 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationGaussKronrod, FEFiberIntegrationScheme)
 	ADD_PARAMETER(m_nth, FE_PARAM_INT, "nth");
 END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
 void FEFiberIntegrationGaussKronrod::Serialize(DumpStream& ar)
 {
 	FEFiberIntegrationScheme::Serialize(ar);
@@ -36,6 +37,7 @@ void FEFiberIntegrationGaussKronrod::Serialize(DumpStream& ar)
 	}
 }
 
+//-----------------------------------------------------------------------------
 bool FEFiberIntegrationGaussKronrod::Init()
 {
     if (m_nth < 1) return MaterialError("nth must be strictly greater than zero.");
@@ -84,11 +86,9 @@ mat3ds FEFiberIntegrationGaussKronrod::Stress(FEMaterialPoint& mp)
     
     // right Cauchy-Green tensor and its eigenvalues & eigenvectors
     mat3ds E = pt.Strain();
-    mat3ds C = pt.RightCauchyGreen();
-    double lE[3], lC[3];
-    vec3d vE[3], vC[3];
+    double lE[3];
+    vec3d vE[3];
     E.eigen2(lE,vE);//lE[2]>lE[1]>lE[0]
-    C.eigen2(lC, vC);
     const double eps = std::numeric_limits<double>::epsilon();
     
     // initialize stress tensor

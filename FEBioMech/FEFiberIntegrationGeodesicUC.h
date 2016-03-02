@@ -36,6 +36,12 @@ public:
     // Fiber density
     double IntegratedFiberDensity();
     
+    // serialization
+    void Serialize(DumpStream& ar);
+    
+protected:
+    void InitIntegrationRule();
+    
 public:
 	int             m_nres;	// resolution
     int             m_nint; // number of integration points
