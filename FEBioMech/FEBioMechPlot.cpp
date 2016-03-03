@@ -1170,12 +1170,31 @@ bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
 			{
 				FENode& nj = mesh.Node(e.m_node[j]);
 				vec3d D = e.m_D0[j] + nj.get_vec3d(dof_U, dof_V, dof_W);
-				double h = e.m_h0[j] * D.norm();
+				double h = D.norm();
 				a << h;
 			}
 		}
 		return true;
 	}
+    else if (dom.Class() == FE_DOMAIN_FERGUSON)
+    {
+        FEFergusonShellDomain& sd = static_cast<FEFergusonShellDomain&>(dom);
+        int NS = sd.Elements();
+        FEMesh& mesh = *sd.GetMesh();
+        for (int i=0; i<NS; ++i)
+        {
+            FEFergusonShellElement& e = sd.Element(i);
+            int n = e.Nodes();
+            for (int j=0; j<n; ++j)
+            {
+                FENode& nj = mesh.Node(e.m_node[j]);
+                vec3d D = e.m_D0[j] + nj.get_vec3d(dof_U, dof_V, dof_W);
+                double h = D.norm();
+                a << h;
+            }
+        }
+        return true;
+    }
 	return false;
 }
 
@@ -1204,6 +1223,24 @@ bool FEPlotShellDirector::Save(FEDomain &dom, FEDataStream &a)
 		}
 		return true;
 	}
+    else if (dom.Class() == FE_DOMAIN_FERGUSON)
+    {
+        FEFergusonShellDomain& sd = static_cast<FEFergusonShellDomain&>(dom);
+        int NS = sd.Elements();
+        FEMesh& mesh = *sd.GetMesh();
+        for (int i=0; i<NS; ++i)
+        {
+            FEFergusonShellElement& e = sd.Element(i);
+            int n = e.Nodes();
+            for (int j=0; j<n; ++j)
+            {
+                FENode& nj = mesh.Node(e.m_node[j]);
+                vec3d D = e.m_D0[j] + nj.get_vec3d(dof_U, dof_V, dof_W);
+                a << D;
+            }
+        }
+        return true;
+    }
 	return false;
 }
 
@@ -1432,30 +1469,45 @@ bool FEPlotUT4NodalStresses::Save(FEDomain& dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotShellStrain::Save(FEDomain &dom, FEDataStream &a)
 {
-	if (dom.Class() != FE_DOMAIN_SHELL) return false;
-
-	FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
-	int NE = sd.Elements();
-	for (int i=0; i<NE; ++i)
-	{
-		FEShellElement& el = sd.Element(i);
-		int ni = el.Nodes();
-		mat3ds E; E.zero();
-		for (int j=0; j<ni; ++j)
-		{
-			FEElasticMaterialPoint& ptm = *(el.GetMaterialPoint(j + ni)->ExtractData<FEElasticMaterialPoint>());
-			FEElasticMaterialPoint& pti = *(el.GetMaterialPoint(j     )->ExtractData<FEElasticMaterialPoint>());
-			FEElasticMaterialPoint& pto = *(el.GetMaterialPoint(j+2*ni)->ExtractData<FEElasticMaterialPoint>());
-
-			E += ptm.Strain();
-			E += pto.Strain();
-			E += pti.Strain();
-		}
-		E /= (3.0*ni);
-
-		a << E;
-	}
-	return true;
+    if (dom.Class() == FE_DOMAIN_SHELL) {
+        FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
+        int NE = sd.Elements();
+        for (int i=0; i<NE; ++i)
+        {
+            FEShellElement& el = sd.Element(i);
+            int nint = el.GaussPoints();
+            mat3ds E; E.zero();
+            for (int j=0; j<nint; ++j)
+            {
+                FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+                E += pt.Strain();
+            }
+            E /= nint;
+            
+            a << E;
+        }
+        return true;
+    }
+    else if (dom.Class() == FE_DOMAIN_FERGUSON) {
+        FEFergusonShellDomain& sd = static_cast<FEFergusonShellDomain&>(dom);
+        int NE = sd.Elements();
+        for (int i=0; i<NE; ++i)
+        {
+            FEFergusonShellElement& el = sd.Element(i);
+            int nint = el.GaussPoints();
+            mat3ds E; E.zero();
+            for (int j=0; j<nint; ++j)
+            {
+                FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+                E += pt.Strain();
+            }
+            E /= nint;
+            
+            a << E;
+        }
+        return true;
+    }
+    return false;
 }
 
 //-----------------------------------------------------------------------------

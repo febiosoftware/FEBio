@@ -27,6 +27,12 @@ public:
 	//! Reset element data
 	void Reset();
 
+    //! calculates covariant basis vectors at an integration point
+    void CoBaseVectors0(FEShellElement& el, int n, vec3d g[3]);
+    
+    //! calculates contravariant basis vectors at an integration point
+    void ContraBaseVectors0(FEShellElement& el, int n, vec3d g[3]);
+    
 	// inverse jacobian with respect to reference frame
 	double invjac0(FEShellElement& el, double J[3][3], int n);
 

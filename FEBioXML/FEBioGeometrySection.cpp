@@ -193,8 +193,8 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	case ET_HEX27 : etype = FE_HEX27G27; break;
 	case ET_QUAD4 : etype = (NDIM == 3 ? FE_SHELL_QUAD : FE2D_QUAD4G4); break;
 	case ET_TRI3  : etype = (NDIM == 3 ? FE_SHELL_TRI  : FE2D_TRI3G1 ); break;
-	case ET_TRI6  : etype = FE2D_TRI6G3; break;
-	case ET_QUAD8 : etype = FE2D_QUAD8G9; break;
+    case ET_TRI6  : etype = (NDIM == 3 ? FE_SHELL_TRI6 : FE2D_TRI6G3); break;
+	case ET_QUAD8 : etype = (NDIM == 3 ? FE_SHELL_QUAD8 : FE2D_QUAD8G9); break;
 	case ET_QUAD9 : etype = FE2D_QUAD9G9; break;
 	case ET_TRUSS2: etype = FE_TRUSS; break;
 	case ET_FQUAD4: etype = FE_FERGUSON_SHELL_QUAD; break;

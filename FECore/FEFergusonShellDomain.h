@@ -21,7 +21,7 @@ public:
     void create(int nsize) { m_Elem.resize(nsize); }
     
     //! return nr of elements
-    int Elements() { return m_Elem.size(); }
+    int Elements() { return (int)m_Elem.size(); }
     
     //! element access
     FEFergusonShellElement& Element(int n) { return m_Elem[n]; }
@@ -41,26 +41,43 @@ public:
     // jacobian with respect to reference frame
     double detJ0(FEFergusonShellElement& el, int n);
     
-    //! calculate jacobian in current frame
-    double detJt(FEFergusonShellElement& el, int n);
+    //! calculates referential covariant basis vectors at an integration point
+    void CoBaseVectors0(FEFergusonShellElement& el, int j, vec3d g[3]);
+    
+    //! calculates referential contravariant basis vectors at an integration point
+    void ContraBaseVectors0(FEFergusonShellElement& el, int j, vec3d g[3]);
     
     //! calculates covariant basis vectors at an integration point
     void CoBaseVectors(FEFergusonShellElement& el, int j, vec3d g[3]);
     
+    //! calculates mid-shell surface data at an integration point
+    void MidShellSurface(FEFergusonShellElement& el, int n,
+                         double& L, double& Lr, double& Ls,
+                         double& H, double& Hr, double& Hs,
+                         vec3d& ghr, vec3d& ghs,
+                         vec3d& ghrr, vec3d& ghrs, vec3d& ghss,
+                          vec3d& t,vec3d& tr, vec3d& ts);
+    
     //! calculates contravariant basis vectors at an integration point
     void ContraBaseVectors(FEFergusonShellElement& el, int j, vec3d g[3]);
     
-    //! calculates parametric derivatives of covariant basis vectors at an integration point
-    void CoBaseVectorDerivatives(FEFergusonShellElement& el, int j, vec3d dg[3][3]);
+    //! calculate jacobian in current frame
+    double detJt(FEFergusonShellElement& el, int n);
     
-    //! calculates parametric derivatives of contravariant basis vectors at an integration point
-    void ContraBaseVectorDerivatives(FEFergusonShellElement& el, int j, vec3d dg[3][3]);
+    // inverse jacobian with respect to current frame
+    double invjact(FEFergusonShellElement& el, double J[3][3], int n);
     
     // calculate deformation gradient
     double defgrad(FEFergusonShellElement& el, mat3d& F, int n);
     
-    // inverse jacobian with respect to current frame
-    double invjact(FEFergusonShellElement& el, double J[3][3], int n);
+    //! calculates nodal covariant basis vectors in reference frame
+    void NodalCoBaseVectors0(FEFergusonShellElement& el, vec3d* r0, vec3d* gr, vec3d* gs, vec3d* t);
+    
+    //! calculates nodal covariant basis vectors in current frame
+    void NodalCoBaseVectors(FEFergusonShellElement& el, vec3d* rt, vec3d* gr, vec3d* gs, vec3d* t, double* lam);
+    
+    //! calculates nodal covariant basis torsional tangents in current frame
+    void NodalCoBaseTorsionTangents(FEFergusonShellElement& el, vec3d* rt, vec3d* t, double* lam, mat3d* Gr, mat3d* Gs);
     
     //! Serialize domain data to archive
     void Serialize(DumpStream& ar);

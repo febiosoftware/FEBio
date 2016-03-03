@@ -385,18 +385,31 @@ public:
     
     virtual void SetTraits(FEElementTraits* ptraits);
     
+    
     double* GaussWeights() { return &((FEFergusonShellElementTraits*)(m_pT))->gw[0]; }	// weights of integration points
     
     double* Hr(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Hr[n]; }	// shape function derivative to r
     double* Hs(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Hs[n]; }	// shape function derivative to s
     
-    double* P(int n)  { return ((FEFergusonShellElementTraits*)(m_pT))->P[n];  }	// shape function derivative to r
+    double* Hrr(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Hrr[n]; }	// shape function second derivative to r
+    double* Hrs(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Hrs[n]; }	// shape function derivative to s
+    double* Hss(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Hss[n]; }	// shape function derivative to s
+    
+    double* P(int n)  { return ((FEFergusonShellElementTraits*)(m_pT))->P[n];  }	// shape function
     double* Pr(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Pr[n]; }	// shape function derivative to r
     double* Ps(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Ps[n]; }	// shape function derivative to s
     
-    double* Q(int n)  { return ((FEFergusonShellElementTraits*)(m_pT))->Q[n];  }	// shape function derivative to r
+    double* Prr(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Prr[n]; }	// shape function second derivative to r
+    double* Prs(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Prs[n]; }	// shape function cross derivative to r and s
+    double* Pss(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Pss[n]; }	// shape function second derivative to s
+    
+    double* Q(int n)  { return ((FEFergusonShellElementTraits*)(m_pT))->Q[n];  }	// shape function
     double* Qr(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Qr[n]; }	// shape function derivative to r
     double* Qs(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Qs[n]; }	// shape function derivative to s
+    
+    double* Qrr(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Qrr[n];  }	// shape function second derivative to r
+    double* Qrs(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Qrs[n]; }	// shape function cross derivative to r and s
+    double* Qss(int n) { return ((FEFergusonShellElementTraits*)(m_pT))->Qss[n]; }	// shape function second derivative to s
     
     void Init(bool bflag)
     {

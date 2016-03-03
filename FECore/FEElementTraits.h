@@ -1151,6 +1151,36 @@ public:
 };
 
 //=============================================================================
+// 8-node quadrilateral elements with 9*3-point gaussian quadrature
+//
+class FEShellQuad8ElementTraits : public FEShellElementTraits
+{
+public:
+    enum { NINT = 27 };
+    enum { NELN = 8 };
+    
+public:
+    FEShellQuad8ElementTraits() : FEShellElementTraits(NINT, NELN, ET_QUAD8, FE_SHELL_QUAD8) { init(); }
+    
+    void init();
+};
+
+//=============================================================================
+// 6-node triangular elements with 7*3-point gaussian quadrature
+//
+class FEShellTri6ElementTraits : public FEShellElementTraits
+{
+public:
+    enum { NINT = 21 };
+    enum { NELN = 6 };
+    
+public:
+    FEShellTri6ElementTraits() : FEShellElementTraits(NINT, NELN, ET_TRI6, FE_SHELL_TRI6) { init(); }
+    
+    void init();
+};
+
+//=============================================================================
 // This is the base class for Ferguson shell element traits
 //
 class FEFergusonShellElementTraits : public FEElementTraits
@@ -1166,6 +1196,10 @@ public:
         Hr.resize(ni, ne);
         Hs.resize(ni, ne);
         
+        Hrr.resize(ni, ne);
+        Hrs.resize(ni, ne);
+        Hss.resize(ni, ne);
+        
         D0.resize(ne);
         Dt.resize(ne);
         
@@ -1178,11 +1212,20 @@ public:
         m_detJ0.resize(ni);
         
         P.resize(ni, ne);
-        Q.resize(ni, ne);
         Pr.resize(ni, ne);
-        Qr.resize(ni, ne);
         Ps.resize(ni, ne);
+        
+        Prr.resize(ni, ne);
+        Prs.resize(ni, ne);
+        Pss.resize(ni, ne);
+
+        Q.resize(ni, ne);
+        Qr.resize(ni, ne);
         Qs.resize(ni, ne);
+        
+        Qrr.resize(ni, ne);
+        Qrs.resize(ni, ne);
+        Qss.resize(ni, ne);
     }
     
 public:
@@ -1196,8 +1239,18 @@ public:
     vector<vec3d>	D0;	//!< initial directors
     vector<vec3d>	Dt;	//!< current directors
     
+    //!< The first index refers to the gauss-point,
+    //!< the second index to the shape function
+    
     // local derivatives of shape functions at gauss points
     matrix Hr, Hs;
+    matrix Hrr, Hrs, Hss;
+    
+    matrix P, Q;	//!< tangent shape function values at gausspoints.
+    
+    // local derivatives of shape functions at gauss points
+    matrix Pr, Ps, Qr, Qs;
+    matrix Prr, Prs, Pss, Qrr, Qrs, Qss;
     
     // data used when unpacking
     vector<mat3d>	m_Jt;		// jacobian
@@ -1209,15 +1262,7 @@ public:
     vector<double>	m_detJ0;	// jacobian determinant
 
 public:
-    matrix P, Q;	//!< tangent shape function values at gausspoints.
-    
-                    //!< The first index refers to the gauss-point,
-                    //!< the second index to the shape function
-    
-    // local derivatives of shape functions at gauss points
-    matrix Pr, Ps, Qr, Qs;
-    
-    // shape function at r
+   // shape function at r
     void shape(double* H, double r);
     
     // shape function derivatives at r
@@ -1228,12 +1273,12 @@ public:
 };
 
 //=============================================================================
-// 4-node quadrilateral elements with 4*3-point gaussian quadrature
+// 4-node quadrilateral elements with 9*3-point gaussian quadrature
 //
 class FEFergusonShellQuadElementTraits : public FEFergusonShellElementTraits
 {
 public:
-    enum { NINT = 12 };
+    enum { NINT = 27 };
     enum { NELN = 4 };
     
 public:

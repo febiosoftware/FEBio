@@ -268,7 +268,7 @@ bool FERigidSystem::CreateObjects()
 	for (int nd = 0; nd<mesh.Domains(); ++nd)
 	{
 		FEDomain& dom = mesh.Domain(nd);
-		if (dom.Class() == FE_DOMAIN_SHELL)
+		if ((dom.Class() == FE_DOMAIN_SHELL) || (dom.Class() == FE_DOMAIN_FERGUSON))
 		{
 			FEMaterial* pmat = dom.GetMaterial();
 			if (pmat->IsRigid() == false)

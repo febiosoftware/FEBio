@@ -147,24 +147,41 @@ void FEElasticFergusonShellDomain::InternalForces(FEGlobalVector& R)
 
 void FEElasticFergusonShellDomain::ElementInternalForce(FEFergusonShellElement& el, vector<double>& fe)
 {
-    int i, n;
+    int i, j, n;
+    double fr[4][4] = {
+        {-0.5, 0.5, 0.0, 0.0},
+        {-0.5, 0.5, 0.0, 0.0},
+        { 0.0, 0.0, 0.5,-0.5},
+        { 0.0, 0.0, 0.4,-0.5}
+    };
+    double fs[4][4] = {
+        {-0.5, 0.0, 0.0, 0.5},
+        { 0.0,-0.5, 0.5, 0.0},
+        { 0.0,-0.5, 0.5, 0.0},
+        {-0.5, 0.0, 0.0, 0.5}
+    };
+    
+    // nodal covariant basis vectors and associated data
+    double lam[4];
+    vec3d rt[4], gr[4], gs[4], t[4];
+    mat3d Gr[4], Gs[4];
+    NodalCoBaseVectors(el, rt, gr, gs, t, lam);
+    NodalCoBaseTorsionTangents(el, rt, t, lam, Gr, Gs);
     
     // jacobian matrix, inverse jacobian matrix and determinants
-    double Ji[3][3], detJt;
+    double detJ;
     
-    const double* Gr, *Gs, *H;
+    const double *M, *Mr, *Ms;
+    const double *Mrr, *Mrs, *Mss;
+    const double *P, *Pr, *Ps;
+    const double *Prr, *Prs, *Pss;
+    const double *Q, *Qr, *Qs;
+    const double *Qrr, *Qrs, *Qss;
     
     int nint = el.GaussPoints();
     int neln = el.Nodes();
     
     double*	gw = el.GaussWeights();
-    double gt;
-    
-    double* h0 = &el.m_h0[0];
-    double za;
-    
-    double Nx, Ny, Nz;
-    double Mx, My, Mz;
     
     // repeat for all integration points
     for (n=0; n<nint; ++n)
@@ -172,59 +189,102 @@ void FEElasticFergusonShellDomain::ElementInternalForce(FEFergusonShellElement& 
         FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>());
         
         // calculate the jacobian
-        detJt = invjact(el, Ji, n);
+        detJ = detJt(el, n);
         
-        detJt *= gw[n];
+        detJ *= gw[n];
         
         // get the stress vector for this integration point
-        mat3ds& s = pt.m_s;
+        mat3ds& T = pt.m_s;
         
-        gt = el.gt(n);
+        // get relevant data for this integration point
+        vec3d gcnt[3];
+        vec3d ghr, ghs, ghrr, ghrs, ghss;
+        vec3d tn, trn, tsn;
+        double H, Hr, Hs, L, Lr, Ls;
+        ContraBaseVectors(el, n, gcnt);
+        MidShellSurface(el, n, L, Lr, Ls, H, Hr, Hs, ghr, ghs, ghrr, ghrs, ghss, tn, trn, tsn);
+        double eta = el.gt(n);
+        double gmag = (ghr ^ ghs).norm();
+        mat3ds Imttg = (mat3dd(1) - dyad(tn))/gmag;
+        mat3ds Imttgr = (dyads(tn, trn) + Imttg*(tn*((ghrr ^ ghs) + (ghr ^ ghrs))))/(-gmag);
+        mat3ds Imttgs = (dyads(tn, tsn) + Imttg*(tn*((ghrs ^ ghs) + (ghr ^ ghss))))/(-gmag);
+        mat3d Aghr, Aghs, Aghrr, Aghrs, Aghss;
+        Aghr.skew(ghr); Aghs.skew(ghs);
+        Aghrr.skew(ghrr); Aghrs.skew(ghrs); Aghss.skew(ghss);
         
-        Gr = el.Hr(n);
-        Gs = el.Hs(n);
-        H  = el.H(n);
+        M = el.H(n); Mr = el.Hr(n); Ms = el.Hs(n);
+        Mrr = el.Hrr(n); Mrs = el.Hrs(n); Mss = el.Hss(n);
+        P = el.P(n); Pr = el.Pr(n); Ps = el.Ps(n);
+        Prr = el.Prr(n); Prs = el.Prs(n); Pss = el.Pss(n);
+        Q = el.Q(n); Qr = el.Qr(n); Qs = el.Qs(n);
+        Qrr = el.Qrr(n); Qrs = el.Qrs(n); Qss = el.Qss(n);
+        
+        mat3ds Khr[4], Khs[4];
+        mat3ds Khrr[4], Khrs[4], Khss[4];
+        mat3d Qhr[4], Qhs[4];
+        mat3d Qhrr[4], Qhrs[4], Qhss[4];
+        mat3d Kr[4], Ks[4], Kt[4];
+        mat3d dQr[4], dQs[4], dQt[4];
+        
+        mat3dd I(1);
         
         for (i=0; i<neln; ++i)
         {
-            za = 0.5*gt*h0[i];
+            mat3ds pr, ps, prr, prs, pss;
+            pr.zero(); ps.zero(); prr.zero(); prs.zero(); pss.zero();
+            for (j=0; j<neln; ++j)
+            {
+                mat3ds Imtt = I - dyad(t[j]);
+                pr += Imtt*(Pr[j]*fr[j][i] + Qr[j]*fs[j][i]);
+                ps += Imtt*(Ps[j]*fr[j][i] + Qs[j]*fs[j][i]);
+                prr += Imtt*(Prr[j]*fr[j][i] + Qrr[j]*fs[j][i]);
+                prs += Imtt*(Prs[j]*fr[j][i] + Qrs[j]*fs[j][i]);
+                pss += Imtt*(Pss[j]*fr[j][i] + Qss[j]*fs[j][i]);
+            }
             
-            // calculate global gradient of shape functions
-            // note that we need the transposed of Ji, not Ji itself !
-            Nx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i];
-            Ny = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i];
-            Nz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i];
+            Khr[i] = mat3dd(Mr[i]) + pr;
+            Khs[i] = mat3dd(Ms[i]) + ps;
+            Khrr[i] = mat3dd(Mrr[i]) + prr;
+            Khrs[i] = mat3dd(Mrs[i]) + prs;
+            Khss[i] = mat3dd(Mss[i]) + pss;
+            Qhr[i] = Gr[i]*Pr[i] + Gs[i]*Qr[i];
+            Qhs[i] = Gr[i]*Ps[i] + Gs[i]*Qs[i];
+            Qhrr[i] = Gr[i]*Prr[i] + Gs[i]*Qrr[i];
+            Qhrs[i] = Gr[i]*Prs[i] + Gs[i]*Qrs[i];
+            Qhss[i] = Gr[i]*Pss[i] + Gs[i]*Qss[i];
             
-            Mx = za*Ji[0][0]*Gr[i] + za*Ji[1][0]*Gs[i] + Ji[2][0]*0.5*h0[i]*H[i];
-            My = za*Ji[0][1]*Gr[i] + za*Ji[1][1]*Gs[i] + Ji[2][1]*0.5*h0[i]*H[i];
-            Mz = za*Ji[0][2]*Gr[i] + za*Ji[1][2]*Gs[i] + Ji[2][2]*0.5*h0[i]*H[i];
+            mat3d AK = Imttg*(Aghr*Khs[i] - Aghs*Khr[i]);
+            Kr[i] = Khr[i] + AK*((L*Hr + Lr*H)*eta/2)
+            + Imttgr*(Aghr*Khs[i] - Aghs*Khr[i])*(L*H*eta/2)
+            + Imttg*(Aghrr*Khs[i] - Aghrs*Khr[i] + Aghr*Khrs[i] - Aghs*Khrr[i])*(L*H*eta/2);
+            Ks[i] = Khs[i] + AK*((L*Hs + Ls*H)*eta/2)
+            + Imttgs*(Aghr*Khs[i] - Aghs*Khr[i])*(L*H*eta/2)
+            + Imttg*(Aghrs*Khs[i] - Aghss*Khr[i] + Aghr*Khss[i] - Aghs*Khrs[i])*(L*H*eta/2);
+            Kt[i] = AK*(L*H/2);
+            
+            mat3d AQ = (tn & t[i])*M[i] + Imttg*(Aghr*Qhs[i] - Aghs*Qhr[i])*L;
+            dQr[i] = Qhr[i] + AQ*(Hr*eta/2)
+            + (((tn*Mr[i] + trn*M[i]) & t[i]) + (Imttg*Lr + Imttgr*L)*(Aghr*Qhs[i] - Aghs*Qhr[i]))*(H*eta/2)
+            + Imttg*(Aghrr*Qhs[i] - Aghrs*Qhr[i] + Aghr*Qhrs[i] - Aghs*Qhrr[i])*(L*H*eta/2);
+            dQs[i] = Qhs[i] + AQ*(Hs*eta/2)
+            + (((tn*Ms[i] + tsn*M[i]) & t[i]) + (Imttg*Ls + Imttgs*L)*(Aghr*Qhs[i] - Aghs*Qhr[i]))*(H*eta/2)
+            + Imttg*(Aghrs*Qhs[i] - Aghss*Qhr[i] + Aghr*Qhss[i] - Aghs*Qhrs[i])*(L*H*eta/2);
+            dQt[i] = AQ*(H/2);
+            
+            vec3d fu =  Kr[i].transpose()*T*gcnt[0] +  Ks[i].transpose()*T*gcnt[1] +  Kt[i].transpose()*T*gcnt[2];
+            vec3d fd = dQr[i].transpose()*T*gcnt[0] + dQs[i].transpose()*T*gcnt[1] + dQt[i].transpose()*T*gcnt[2];
             
             // calculate internal force
             // the '-' sign is so that the internal forces get subtracted
             // from the global residual vector
-            fe[6*i  ] -= ( Nx*s.xx()  +
-                          Ny*s.xy() +
-                          Nz*s.xz() )*detJt;
+
+            fe[6*i  ] -= fu.x*detJ;
+            fe[6*i+1] -= fu.y*detJ;
+            fe[6*i+2] -= fu.z*detJ;
             
-            fe[6*i+1] -= ( Ny*s.yy()  +
-                          Nx*s.xy() +
-                          Nz*s.yz() )*detJt;
-            
-            fe[6*i+2] -= ( Nz*s.zz()  +
-                          Ny*s.yz() +
-                          Nx*s.xz() )*detJt;
-            
-            fe[6*i+3] -= ( Mx*s.xx()  +
-                          My*s.xy() +
-                          Mz*s.xz() )*detJt;
-            
-            fe[6*i+4] -= ( My*s.yy()  +
-                          Mx*s.xy() +
-                          Mz*s.yz() )*detJt;
-            
-            fe[6*i+5] -= ( Mz*s.zz()  +
-                          My*s.yz() +
-                          Mx*s.xz() )*detJt;
+            fe[6*i+3] -= fd.x*detJ;
+            fe[6*i+4] -= fd.y*detJ;
+            fe[6*i+5] -= fd.z*detJ;
         }
     }
 }
@@ -360,45 +420,43 @@ void FEElasticFergusonShellDomain::ElementStiffness(int iel, matrix& ke)
     
     int i, i6, j, j6, n;
     
+    double fr[4][4] = {
+        {-0.5, 0.5, 0.0, 0.0},
+        {-0.5, 0.5, 0.0, 0.0},
+        { 0.0, 0.0, 0.5,-0.5},
+        { 0.0, 0.0, 0.4,-0.5}
+    };
+    double fs[4][4] = {
+        {-0.5, 0.0, 0.0, 0.5},
+        { 0.0,-0.5, 0.5, 0.0},
+        { 0.0,-0.5, 0.5, 0.0},
+        {-0.5, 0.0, 0.0, 0.5}
+    };
+    
     // Get the current element's data
     const int nint = el.GaussPoints();
     const int neln = el.Nodes();
     const int ndof = 6*neln;
     
-    // stiffness components for the initial stress component of stiffness matrix
-    double kab;
+    // nodal covariant basis vectors and associated data
+    double lam[4];
+    vec3d rt[4], gr[4], gs[4], t[4];
+    mat3d Gr[4], Gs[4];
+    NodalCoBaseVectors(el, rt, gr, gs, t, lam);
+    NodalCoBaseTorsionTangents(el, rt, t, lam, Gr, Gs);
     
-    // global derivatives of shape functions
-    // NOTE: hard-coding of quad elements!
-    // Gx = dH/dx
-    double Nx[4], Ny[4], Nz[4];
-    double Mx[4], My[4], Mz[4];
+    // jacobian matrix, inverse jacobian matrix and determinants
+    double detJ;
     
-    double Nxi, Nyi, Nzi;
-    double Nxj, Nyj, Nzj;
-    double Mxi, Myi, Mzi;
-    double Mxj, Myj, Mzj;
-    
-    // The 'D' matrix
-    double D[6][6] = {0};	// The 'D' matrix
-    
-    // The 'D*BL' matrix
-    double DBL[6][6];
-    
-    // element stress
-    mat3ds s;
-    
-    double *Grn, *Gsn, *Hn;
-    double Gr, Gs, H;
-    
-    // jacobian
-    double Ji[3][3], detJt;
+    const double *M, *Mr, *Ms;
+    const double *Mrr, *Mrs, *Mss;
+    const double *P, *Pr, *Ps;
+    const double *Prr, *Prs, *Pss;
+    const double *Q, *Qr, *Qs;
+    const double *Qrr, *Qrs, *Qss;
     
     // weights at gauss points
     const double *gw = el.GaussWeights();
-    
-    // calculate the average thickness
-    double* h0 = &el.m_h0[0], gt, za;
     
     // calculate element stiffness matrix
     ke.zero();
@@ -407,208 +465,239 @@ void FEElasticFergusonShellDomain::ElementStiffness(int iel, matrix& ke)
         FEMaterialPoint& mp = *(el.GetMaterialPoint(n));
         FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
         
-        // calculate jacobian
-        detJt = invjact(el, Ji, n)*gw[n];
+        // calculate the jacobian
+        detJ = detJt(el, n);
         
-        Grn = el.Hr(n);
-        Gsn = el.Hs(n);
-        Hn  = el.H(n);
+        detJ *= gw[n];
         
-        gt = el.gt(n);
+        // get the stress and elasticity tensors for this integration point
+        mat3ds T = pt.m_s;
+        tens4ds C = m_pMat->Tangent(mp);
+        
+        // get other relevant data for this integration point
+        vec3d gcnt[3];
+        vec3d ghr, ghs, ghrr, ghrs, ghss;
+        vec3d tn, trn, tsn;
+        double H, Hr, Hs, L, Lr, Ls;
+        ContraBaseVectors(el, n, gcnt);
+        MidShellSurface(el, n, L, Lr, Ls, H, Hr, Hs, ghr, ghs, ghrr, ghrs, ghss, tn, trn, tsn);
+        double eta = el.gt(n);
+        double gmag = (ghr ^ ghs).norm();
+        mat3ds Imttg = (mat3dd(1) - dyad(tn))/gmag;
+        mat3ds Imttgr = (dyads(tn, trn) + Imttg*(tn*((ghrr ^ ghs) + (ghr ^ ghrs))))/(-gmag);
+        mat3ds Imttgs = (dyads(tn, tsn) + Imttg*(tn*((ghrs ^ ghs) + (ghr ^ ghss))))/(-gmag);
+        mat3d Aghr, Aghs, Aghrr, Aghrs, Aghss;
+        Aghr.skew(ghr); Aghs.skew(ghs);
+        Aghrr.skew(ghrr); Aghrs.skew(ghrs); Aghss.skew(ghss);
+        
+        M = el.H(n); Mr = el.Hr(n); Ms = el.Hs(n);
+        Mrr = el.Hrr(n); Mrs = el.Hrs(n); Mss = el.Hss(n);
+        P = el.P(n); Pr = el.Pr(n); Ps = el.Ps(n);
+        Prr = el.Prr(n); Prs = el.Prs(n); Pss = el.Pss(n);
+        Q = el.Q(n); Qr = el.Qr(n); Qs = el.Qs(n);
+        Qrr = el.Qrr(n); Qrs = el.Qrs(n); Qss = el.Qss(n);
+        
+        mat3ds Khr[4], Khs[4];
+        mat3ds Khrr[4], Khrs[4], Khss[4];
+        mat3d Qhr[4], Qhs[4];
+        mat3d Qhrr[4], Qhrs[4], Qhss[4];
+        mat3d Kr[4], Ks[4], Kt[4];
+        mat3d dQr[4], dQs[4], dQt[4];
+        
+        mat3dd I(1);
+        
+        for (i=0; i<neln; ++i)
+        {
+            mat3ds pr, ps, prr, prs, pss;
+            pr.zero(); ps.zero(); prr.zero(); prs.zero(); pss.zero();
+            for (j=0; j<neln; ++j)
+            {
+                mat3ds Imtt = I - dyad(t[j]);
+                pr += Imtt*(Pr[j]*fr[j][i] + Qr[j]*fs[j][i]);
+                ps += Imtt*(Ps[j]*fr[j][i] + Qs[j]*fs[j][i]);
+                prr += Imtt*(Prr[j]*fr[j][i] + Qrr[j]*fs[j][i]);
+                prs += Imtt*(Prs[j]*fr[j][i] + Qrs[j]*fs[j][i]);
+                pss += Imtt*(Pss[j]*fr[j][i] + Qss[j]*fs[j][i]);
+            }
+            
+            Khr[i] = mat3dd(Mr[i]) + pr;
+            Khs[i] = mat3dd(Ms[i]) + ps;
+            Khrr[i] = mat3dd(Mrr[i]) + prr;
+            Khrs[i] = mat3dd(Mrs[i]) + prs;
+            Khss[i] = mat3dd(Mss[i]) + pss;
+            Qhr[i] = Gr[i]*Pr[i] + Gs[i]*Qr[i];
+            Qhs[i] = Gr[i]*Ps[i] + Gs[i]*Qs[i];
+            Qhrr[i] = Gr[i]*Prr[i] + Gs[i]*Qrr[i];
+            Qhrs[i] = Gr[i]*Prs[i] + Gs[i]*Qrs[i];
+            Qhss[i] = Gr[i]*Pss[i] + Gs[i]*Qss[i];
+            
+            mat3d AK = Imttg*(Aghr*Khs[i] - Aghs*Khr[i]);
+            Kr[i] = Khr[i] + AK*((L*Hr + Lr*H)*eta/2)
+            + Imttgr*(Aghr*Khs[i] - Aghs*Khr[i])*(L*H*eta/2)
+            + Imttg*(Aghrr*Khs[i] - Aghrs*Khr[i] + Aghr*Khrs[i] - Aghs*Khrr[i])*(L*H*eta/2);
+            Ks[i] = Khs[i] + AK*((L*Hs + Ls*H)*eta/2)
+            + Imttgs*(Aghr*Khs[i] - Aghs*Khr[i])*(L*H*eta/2)
+            + Imttg*(Aghrs*Khs[i] - Aghss*Khr[i] + Aghr*Khss[i] - Aghs*Khrs[i])*(L*H*eta/2);
+            Kt[i] = AK*(L*H/2);
+            
+            mat3d AQ = (tn & t[i])*M[i] + Imttg*(Aghr*Qhs[i] - Aghs*Qhr[i])*L;
+            dQr[i] = Qhr[i] + AQ*(Hr*eta/2)
+            + (((tn*Mr[i] + trn*M[i]) & t[i]) + (Imttg*Lr + Imttgr*L)*(Aghr*Qhs[i] - Aghs*Qhr[i]))*(H*eta/2)
+            + Imttg*(Aghrr*Qhs[i] - Aghrs*Qhr[i] + Aghr*Qhrs[i] - Aghs*Qhrr[i])*(L*H*eta/2);
+            dQs[i] = Qhs[i] + AQ*(Hs*eta/2)
+            + (((tn*Ms[i] + tsn*M[i]) & t[i]) + (Imttg*Ls + Imttgs*L)*(Aghr*Qhs[i] - Aghs*Qhr[i]))*(H*eta/2)
+            + Imttg*(Aghrs*Qhs[i] - Aghss*Qhr[i] + Aghr*Qhss[i] - Aghs*Qhrs[i])*(L*H*eta/2);
+            dQt[i] = AQ*(H/2);
+        }
         
         // ------------ constitutive component --------------
         
         // setup the material point
         // NOTE: deformation gradient has already been calculated in stress routine
         
-        // get the 'D' matrix
-        tens4ds C = m_pMat->Tangent(mp);
-        C.extract(D);
-        
-        for (i=0; i<neln; ++i)
-        {
-            Gr = Grn[i];
-            Gs = Gsn[i];
-            H  = Hn[i];
-            
-            za = 0.5*gt*h0[i];
-            
-            // calculate global gradient of shape functions
-            // note that we need the transposed of Ji, not Ji itself !
-            Nx[i] = Ji[0][0]*Gr+Ji[1][0]*Gs;
-            Ny[i] = Ji[0][1]*Gr+Ji[1][1]*Gs;
-            Nz[i] = Ji[0][2]*Gr+Ji[1][2]*Gs;
-            
-            Mx[i] = za*Ji[0][0]*Gr + za*Ji[1][0]*Gs + Ji[2][0]*0.5*h0[i]*H;
-            My[i] = za*Ji[0][1]*Gr + za*Ji[1][1]*Gs + Ji[2][1]*0.5*h0[i]*H;
-            Mz[i] = za*Ji[0][2]*Gr + za*Ji[1][2]*Gs + Ji[2][2]*0.5*h0[i]*H;
-        }
-        
         // we only calculate the upper triangular part
         // since ke is symmetric. The other part is
         // determined below using this symmetry.
+        mat3d Kuu, Kud, Kdu, Kdd;
         for (i=0, i6=0; i<neln; ++i, i6 += 6)
         {
-            Nxi = Nx[i];
-            Nyi = Ny[i];
-            Nzi = Nz[i];
-            
-            Mxi = Mx[i];
-            Myi = My[i];
-            Mzi = Mz[i];
-            
-            for (j=i, j6 = i6; j<neln; ++j, j6 += 6)
+            for (j=0, j6 = 0; j<neln; ++j, j6 += 6)
             {
-                Nxj = Nx[j];
-                Nyj = Ny[j];
-                Nzj = Nz[j];
+                Kuu
+                = Kr[i].transpose()*vdotTdotv(gcnt[0], C, gcnt[0])*Kr[j]
+                + Kr[i].transpose()*vdotTdotv(gcnt[0], C, gcnt[1])*Ks[j]
+                + Kr[i].transpose()*vdotTdotv(gcnt[0], C, gcnt[2])*Kt[j]
+                + Ks[i].transpose()*vdotTdotv(gcnt[1], C, gcnt[0])*Kr[j]
+                + Ks[i].transpose()*vdotTdotv(gcnt[1], C, gcnt[1])*Ks[j]
+                + Ks[i].transpose()*vdotTdotv(gcnt[1], C, gcnt[2])*Kt[j]
+                + Kt[i].transpose()*vdotTdotv(gcnt[2], C, gcnt[0])*Kr[j]
+                + Kt[i].transpose()*vdotTdotv(gcnt[2], C, gcnt[1])*Ks[j]
+                + Kt[i].transpose()*vdotTdotv(gcnt[2], C, gcnt[2])*Kt[j];
                 
-                Mxj = Mx[j];
-                Myj = My[j];
-                Mzj = Mz[j];
+                Kud
+                = Kr[i].transpose()*vdotTdotv(gcnt[0], C, gcnt[0])*dQr[j]
+                + Kr[i].transpose()*vdotTdotv(gcnt[0], C, gcnt[1])*dQs[j]
+                + Kr[i].transpose()*vdotTdotv(gcnt[0], C, gcnt[2])*dQt[j]
+                + Ks[i].transpose()*vdotTdotv(gcnt[1], C, gcnt[0])*dQr[j]
+                + Ks[i].transpose()*vdotTdotv(gcnt[1], C, gcnt[1])*dQs[j]
+                + Ks[i].transpose()*vdotTdotv(gcnt[1], C, gcnt[2])*dQt[j]
+                + Kt[i].transpose()*vdotTdotv(gcnt[2], C, gcnt[0])*dQr[j]
+                + Kt[i].transpose()*vdotTdotv(gcnt[2], C, gcnt[1])*dQs[j]
+                + Kt[i].transpose()*vdotTdotv(gcnt[2], C, gcnt[2])*dQt[j];
                 
+                Kdu
+                = dQr[i].transpose()*vdotTdotv(gcnt[0], C, gcnt[0])*Kr[j]
+                + dQr[i].transpose()*vdotTdotv(gcnt[0], C, gcnt[1])*Ks[j]
+                + dQr[i].transpose()*vdotTdotv(gcnt[0], C, gcnt[2])*Kt[j]
+                + dQs[i].transpose()*vdotTdotv(gcnt[1], C, gcnt[0])*Kr[j]
+                + dQs[i].transpose()*vdotTdotv(gcnt[1], C, gcnt[1])*Ks[j]
+                + dQs[i].transpose()*vdotTdotv(gcnt[1], C, gcnt[2])*Kt[j]
+                + dQt[i].transpose()*vdotTdotv(gcnt[2], C, gcnt[0])*Kr[j]
+                + dQt[i].transpose()*vdotTdotv(gcnt[2], C, gcnt[1])*Ks[j]
+                + dQt[i].transpose()*vdotTdotv(gcnt[2], C, gcnt[2])*Kt[j];
                 
-                // calculate D*BL matrices
-                DBL[0][0] = (D[0][0]*Nxj+D[0][3]*Nyj+D[0][5]*Nzj);
-                DBL[0][1] = (D[0][1]*Nyj+D[0][3]*Nxj+D[0][4]*Nzj);
-                DBL[0][2] = (D[0][2]*Nzj+D[0][4]*Nyj+D[0][5]*Nxj);
-                DBL[0][3] = (D[0][0]*Mxj+D[0][3]*Myj+D[0][5]*Mzj);
-                DBL[0][4] = (D[0][1]*Myj+D[0][3]*Mxj+D[0][4]*Mzj);
-                DBL[0][5] = (D[0][2]*Mzj+D[0][4]*Myj+D[0][5]*Mxj);
+                Kdd
+                = dQr[i].transpose()*vdotTdotv(gcnt[0], C, gcnt[0])*dQr[j]
+                + dQr[i].transpose()*vdotTdotv(gcnt[0], C, gcnt[1])*dQs[j]
+                + dQr[i].transpose()*vdotTdotv(gcnt[0], C, gcnt[2])*dQt[j]
+                + dQs[i].transpose()*vdotTdotv(gcnt[1], C, gcnt[0])*dQr[j]
+                + dQs[i].transpose()*vdotTdotv(gcnt[1], C, gcnt[1])*dQs[j]
+                + dQs[i].transpose()*vdotTdotv(gcnt[1], C, gcnt[2])*dQt[j]
+                + dQt[i].transpose()*vdotTdotv(gcnt[2], C, gcnt[0])*dQr[j]
+                + dQt[i].transpose()*vdotTdotv(gcnt[2], C, gcnt[1])*dQs[j]
+                + dQt[i].transpose()*vdotTdotv(gcnt[2], C, gcnt[2])*dQt[j];
                 
-                DBL[1][0] = (D[1][0]*Nxj+D[1][3]*Nyj+D[1][5]*Nzj);
-                DBL[1][1] = (D[1][1]*Nyj+D[1][3]*Nxj+D[1][4]*Nzj);
-                DBL[1][2] = (D[1][2]*Nzj+D[1][4]*Nyj+D[1][5]*Nxj);
-                DBL[1][3] = (D[1][0]*Mxj+D[1][3]*Myj+D[1][5]*Mzj);
-                DBL[1][4] = (D[1][1]*Myj+D[1][3]*Mxj+D[1][4]*Mzj);
-                DBL[1][5] = (D[1][2]*Mzj+D[1][4]*Myj+D[1][5]*Mxj);
+                Kuu *= detJ; Kud *= detJ; Kdu *= detJ; Kdd *= detJ;
                 
-                DBL[2][0] = (D[2][0]*Nxj+D[2][3]*Nyj+D[2][5]*Nzj);
-                DBL[2][1] = (D[2][1]*Nyj+D[2][3]*Nxj+D[2][4]*Nzj);
-                DBL[2][2] = (D[2][2]*Nzj+D[2][4]*Nyj+D[2][5]*Nxj);
-                DBL[2][3] = (D[2][0]*Mxj+D[2][3]*Myj+D[2][5]*Mzj);
-                DBL[2][4] = (D[2][1]*Myj+D[2][3]*Mxj+D[2][4]*Mzj);
-                DBL[2][5] = (D[2][2]*Mzj+D[2][4]*Myj+D[2][5]*Mxj);
+                ke[i6  ][j6  ] += Kuu(0,0); ke[i6  ][j6+1] += Kuu(0,1); ke[i6  ][j6+2] += Kuu(0,2);
+                ke[i6+1][j6  ] += Kuu(1,0); ke[i6+1][j6+1] += Kuu(1,1); ke[i6+1][j6+2] += Kuu(1,2);
+                ke[i6+2][j6  ] += Kuu(2,0); ke[i6+2][j6+1] += Kuu(2,1); ke[i6+2][j6+2] += Kuu(2,2);
                 
-                DBL[3][0] = (D[3][0]*Nxj+D[3][3]*Nyj+D[3][5]*Nzj);
-                DBL[3][1] = (D[3][1]*Nyj+D[3][3]*Nxj+D[3][4]*Nzj);
-                DBL[3][2] = (D[3][2]*Nzj+D[3][4]*Nyj+D[3][5]*Nxj);
-                DBL[3][3] = (D[3][0]*Mxj+D[3][3]*Myj+D[3][5]*Mzj);
-                DBL[3][4] = (D[3][1]*Myj+D[3][3]*Mxj+D[3][4]*Mzj);
-                DBL[3][5] = (D[3][2]*Mzj+D[3][4]*Myj+D[3][5]*Mxj);
+                ke[i6  ][j6+3] += Kud(0,0); ke[i6  ][j6+4] += Kud(0,1); ke[i6  ][j6+5] += Kud(0,2);
+                ke[i6+1][j6+3] += Kud(1,0); ke[i6+1][j6+4] += Kud(1,1); ke[i6+1][j6+5] += Kud(1,2);
+                ke[i6+2][j6+3] += Kud(2,0); ke[i6+2][j6+4] += Kud(2,1); ke[i6+2][j6+5] += Kud(2,2);
                 
-                DBL[4][0] = (D[4][0]*Nxj+D[4][3]*Nyj+D[4][5]*Nzj);
-                DBL[4][1] = (D[4][1]*Nyj+D[4][3]*Nxj+D[4][4]*Nzj);
-                DBL[4][2] = (D[4][2]*Nzj+D[4][4]*Nyj+D[4][5]*Nxj);
-                DBL[4][3] = (D[4][0]*Mxj+D[4][3]*Myj+D[4][5]*Mzj);
-                DBL[4][4] = (D[4][1]*Myj+D[4][3]*Mxj+D[4][4]*Mzj);
-                DBL[4][5] = (D[4][2]*Mzj+D[4][4]*Myj+D[4][5]*Mxj);
+                ke[i6+3][j6  ] += Kdu(0,0); ke[i6+3][j6+1] += Kdu(0,1); ke[i6+3][j6+2] += Kdu(0,2);
+                ke[i6+4][j6  ] += Kdu(1,0); ke[i6+4][j6+1] += Kdu(1,1); ke[i6+4][j6+2] += Kdu(1,2);
+                ke[i6+5][j6  ] += Kdu(2,0); ke[i6+5][j6+1] += Kdu(2,1); ke[i6+5][j6+2] += Kdu(2,2);
                 
-                DBL[5][0] = (D[5][0]*Nxj+D[5][3]*Nyj+D[5][5]*Nzj);
-                DBL[5][1] = (D[5][1]*Nyj+D[5][3]*Nxj+D[5][4]*Nzj);
-                DBL[5][2] = (D[5][2]*Nzj+D[5][4]*Nyj+D[5][5]*Nxj);
-                DBL[5][3] = (D[5][0]*Mxj+D[5][3]*Myj+D[5][5]*Mzj);
-                DBL[5][4] = (D[5][1]*Myj+D[5][3]*Mxj+D[5][4]*Mzj);
-                DBL[5][5] = (D[5][2]*Mzj+D[5][4]*Myj+D[5][5]*Mxj);
-                
-                ke[i6  ][j6  ] += (Nxi*DBL[0][0] + Nyi*DBL[3][0] + Nzi*DBL[5][0] )*detJt;
-                ke[i6  ][j6+1] += (Nxi*DBL[0][1] + Nyi*DBL[3][1] + Nzi*DBL[5][1] )*detJt;
-                ke[i6  ][j6+2] += (Nxi*DBL[0][2] + Nyi*DBL[3][2] + Nzi*DBL[5][2] )*detJt;
-                ke[i6  ][j6+3] += (Nxi*DBL[0][3] + Nyi*DBL[3][3] + Nzi*DBL[5][3] )*detJt;
-                ke[i6  ][j6+4] += (Nxi*DBL[0][4] + Nyi*DBL[3][4] + Nzi*DBL[5][4] )*detJt;
-                ke[i6  ][j6+5] += (Nxi*DBL[0][5] + Nyi*DBL[3][5] + Nzi*DBL[5][5] )*detJt;
-                
-                ke[i6+1][j6  ] += (Nyi*DBL[1][0] + Nxi*DBL[3][0] + Nzi*DBL[4][0] )*detJt;
-                ke[i6+1][j6+1] += (Nyi*DBL[1][1] + Nxi*DBL[3][1] + Nzi*DBL[4][1] )*detJt;
-                ke[i6+1][j6+2] += (Nyi*DBL[1][2] + Nxi*DBL[3][2] + Nzi*DBL[4][2] )*detJt;
-                ke[i6+1][j6+3] += (Nyi*DBL[1][3] + Nxi*DBL[3][3] + Nzi*DBL[4][3] )*detJt;
-                ke[i6+1][j6+4] += (Nyi*DBL[1][4] + Nxi*DBL[3][4] + Nzi*DBL[4][4] )*detJt;
-                ke[i6+1][j6+5] += (Nyi*DBL[1][5] + Nxi*DBL[3][5] + Nzi*DBL[4][5] )*detJt;
-                
-                ke[i6+2][j6  ] += (Nzi*DBL[2][0] + Nyi*DBL[4][0] + Nxi*DBL[5][0] )*detJt;
-                ke[i6+2][j6+1] += (Nzi*DBL[2][1] + Nyi*DBL[4][1] + Nxi*DBL[5][1] )*detJt;
-                ke[i6+2][j6+2] += (Nzi*DBL[2][2] + Nyi*DBL[4][2] + Nxi*DBL[5][2] )*detJt;
-                ke[i6+2][j6+3] += (Nzi*DBL[2][3] + Nyi*DBL[4][3] + Nxi*DBL[5][3] )*detJt;
-                ke[i6+2][j6+4] += (Nzi*DBL[2][4] + Nyi*DBL[4][4] + Nxi*DBL[5][4] )*detJt;
-                ke[i6+2][j6+5] += (Nzi*DBL[2][5] + Nyi*DBL[4][5] + Nxi*DBL[5][5] )*detJt;
-                
-                ke[i6+3][j6  ] += (Mxi*DBL[0][0] + Myi*DBL[3][0] + Mzi*DBL[5][0] )*detJt;
-                ke[i6+3][j6+1] += (Mxi*DBL[0][1] + Myi*DBL[3][1] + Mzi*DBL[5][1] )*detJt;
-                ke[i6+3][j6+2] += (Mxi*DBL[0][2] + Myi*DBL[3][2] + Mzi*DBL[5][2] )*detJt;
-                ke[i6+3][j6+3] += (Mxi*DBL[0][3] + Myi*DBL[3][3] + Mzi*DBL[5][3] )*detJt;
-                ke[i6+3][j6+4] += (Mxi*DBL[0][4] + Myi*DBL[3][4] + Mzi*DBL[5][4] )*detJt;
-                ke[i6+3][j6+5] += (Mxi*DBL[0][5] + Myi*DBL[3][5] + Mzi*DBL[5][5] )*detJt;
-                
-                ke[i6+4][j6  ] += (Myi*DBL[1][0] + Mxi*DBL[3][0] + Mzi*DBL[4][0] )*detJt;
-                ke[i6+4][j6+1] += (Myi*DBL[1][1] + Mxi*DBL[3][1] + Mzi*DBL[4][1] )*detJt;
-                ke[i6+4][j6+2] += (Myi*DBL[1][2] + Mxi*DBL[3][2] + Mzi*DBL[4][2] )*detJt;
-                ke[i6+4][j6+3] += (Myi*DBL[1][3] + Mxi*DBL[3][3] + Mzi*DBL[4][3] )*detJt;
-                ke[i6+4][j6+4] += (Myi*DBL[1][4] + Mxi*DBL[3][4] + Mzi*DBL[4][4] )*detJt;
-                ke[i6+4][j6+5] += (Myi*DBL[1][5] + Mxi*DBL[3][5] + Mzi*DBL[4][5] )*detJt;
-                
-                ke[i6+5][j6  ] += (Mzi*DBL[2][0] + Myi*DBL[4][0] + Mxi*DBL[5][0] )*detJt;
-                ke[i6+5][j6+1] += (Mzi*DBL[2][1] + Myi*DBL[4][1] + Mxi*DBL[5][1] )*detJt;
-                ke[i6+5][j6+2] += (Mzi*DBL[2][2] + Myi*DBL[4][2] + Mxi*DBL[5][2] )*detJt;
-                ke[i6+5][j6+3] += (Mzi*DBL[2][3] + Myi*DBL[4][3] + Mxi*DBL[5][3] )*detJt;
-                ke[i6+5][j6+4] += (Mzi*DBL[2][4] + Myi*DBL[4][4] + Mxi*DBL[5][4] )*detJt;
-                ke[i6+5][j6+5] += (Mzi*DBL[2][5] + Myi*DBL[4][5] + Mxi*DBL[5][5] )*detJt;
+                ke[i6+3][j6+3] += Kdd(0,0); ke[i6+3][j6+4] += Kdd(0,1); ke[i6+3][j6+5] += Kdd(0,2);
+                ke[i6+4][j6+3] += Kdd(1,0); ke[i6+4][j6+4] += Kdd(1,1); ke[i6+4][j6+5] += Kdd(1,2);
+                ke[i6+5][j6+3] += Kdd(2,0); ke[i6+5][j6+4] += Kdd(2,1); ke[i6+5][j6+5] += Kdd(2,2);
             }
         }
         
         // ------------ initial stress component --------------
         
-        // element's Cauchy-stress tensor at gauss point n
-        // s is the voight vector
-        s = pt.m_s;
-        
-        for (i=0; i<neln; ++i)
-            for (j=i; j<neln; ++j)
+        for (i=0, i6=0; i<neln; ++i, i6 += 6)
+        {
+            for (j=0, j6 = 0; j<neln; ++j, j6 += 6)
             {
-                // the v-v component
-                kab = (Nx[i]*(s.xx()*Nx[j]+s.xy()*Ny[j]+s.xz()*Nz[j]) +
-                       Ny[i]*(s.xy()*Nx[j]+s.yy()*Ny[j]+s.yz()*Nz[j]) +
-                       Nz[i]*(s.xz()*Nx[j]+s.yz()*Ny[j]+s.zz()*Nz[j]))*detJt;
+                Kuu
+                = Kr[i].transpose()*Kr[j]*(gcnt[0]*(T*gcnt[0]))
+                + Kr[i].transpose()*Ks[j]*(gcnt[0]*(T*gcnt[1]))
+                + Kr[i].transpose()*Kt[j]*(gcnt[0]*(T*gcnt[2]))
+                + Ks[i].transpose()*Kr[j]*(gcnt[1]*(T*gcnt[0]))
+                + Ks[i].transpose()*Ks[j]*(gcnt[1]*(T*gcnt[1]))
+                + Ks[i].transpose()*Kt[j]*(gcnt[1]*(T*gcnt[2]))
+                + Kt[i].transpose()*Kr[j]*(gcnt[2]*(T*gcnt[0]))
+                + Kt[i].transpose()*Ks[j]*(gcnt[2]*(T*gcnt[1]))
+                + Kt[i].transpose()*Kt[j]*(gcnt[2]*(T*gcnt[2]));
                 
-                ke[6*i  ][6*j  ] += kab;
-                ke[6*i+1][6*j+1] += kab;
-                ke[6*i+2][6*j+2] += kab;
+                Kud
+                = Kr[i].transpose()*dQr[j]*(gcnt[0]*(T*gcnt[0]))
+                + Kr[i].transpose()*dQs[j]*(gcnt[0]*(T*gcnt[1]))
+                + Kr[i].transpose()*dQt[j]*(gcnt[0]*(T*gcnt[2]))
+                + Ks[i].transpose()*dQr[j]*(gcnt[1]*(T*gcnt[0]))
+                + Ks[i].transpose()*dQs[j]*(gcnt[1]*(T*gcnt[1]))
+                + Ks[i].transpose()*dQt[j]*(gcnt[1]*(T*gcnt[2]))
+                + Kt[i].transpose()*dQr[j]*(gcnt[2]*(T*gcnt[0]))
+                + Kt[i].transpose()*dQs[j]*(gcnt[2]*(T*gcnt[1]))
+                + Kt[i].transpose()*dQt[j]*(gcnt[2]*(T*gcnt[2]));
                 
-                // the v-t component
-                kab = (Nx[i]*(s.xx()*Mx[j]+s.xy()*My[j]+s.xz()*Mz[j]) +
-                       Ny[i]*(s.xy()*Mx[j]+s.yy()*My[j]+s.yz()*Mz[j]) +
-                       Nz[i]*(s.xz()*Mx[j]+s.yz()*My[j]+s.zz()*Mz[j]))*detJt;
+                Kdu
+                = dQr[i].transpose()*Kr[j]*(gcnt[0]*(T*gcnt[0]))
+                + dQr[i].transpose()*Ks[j]*(gcnt[0]*(T*gcnt[1]))
+                + dQr[i].transpose()*Kt[j]*(gcnt[0]*(T*gcnt[2]))
+                + dQs[i].transpose()*Kr[j]*(gcnt[1]*(T*gcnt[0]))
+                + dQs[i].transpose()*Ks[j]*(gcnt[1]*(T*gcnt[1]))
+                + dQs[i].transpose()*Kt[j]*(gcnt[1]*(T*gcnt[2]))
+                + dQt[i].transpose()*Kr[j]*(gcnt[2]*(T*gcnt[0]))
+                + dQt[i].transpose()*Ks[j]*(gcnt[2]*(T*gcnt[1]))
+                + dQt[i].transpose()*Kt[j]*(gcnt[2]*(T*gcnt[2]));
                 
-                ke[6*i  ][6*j+3] += kab;
-                ke[6*i+1][6*j+4] += kab;
-                ke[6*i+2][6*j+5] += kab;
+                Kdd
+                = dQr[i].transpose()*dQr[j]*(gcnt[0]*(T*gcnt[0]))
+                + dQr[i].transpose()*dQs[j]*(gcnt[0]*(T*gcnt[1]))
+                + dQr[i].transpose()*dQt[j]*(gcnt[0]*(T*gcnt[2]))
+                + dQs[i].transpose()*dQr[j]*(gcnt[1]*(T*gcnt[0]))
+                + dQs[i].transpose()*dQs[j]*(gcnt[1]*(T*gcnt[1]))
+                + dQs[i].transpose()*dQt[j]*(gcnt[1]*(T*gcnt[2]))
+                + dQt[i].transpose()*dQr[j]*(gcnt[2]*(T*gcnt[0]))
+                + dQt[i].transpose()*dQs[j]*(gcnt[2]*(T*gcnt[1]))
+                + dQt[i].transpose()*dQt[j]*(gcnt[2]*(T*gcnt[2]));
                 
-                // the t-v component
-                kab = (Mx[i]*(s.xx()*Nx[j]+s.xy()*Ny[j]+s.xz()*Nz[j]) +
-                       My[i]*(s.xy()*Nx[j]+s.yy()*Ny[j]+s.yz()*Nz[j]) +
-                       Mz[i]*(s.xz()*Nx[j]+s.yz()*Ny[j]+s.zz()*Nz[j]))*detJt;
+                Kuu *= detJ; Kud *= detJ; Kdu *= detJ; Kdd *= detJ;
                 
-                ke[6*i+3][6*j  ] += kab;
-                ke[6*i+4][6*j+1] += kab;
-                ke[6*i+5][6*j+2] += kab;
+                ke[i6  ][j6  ] += Kuu(0,0); ke[i6  ][j6+1] += Kuu(0,1); ke[i6  ][j6+2] += Kuu(0,2);
+                ke[i6+1][j6  ] += Kuu(1,0); ke[i6+1][j6+1] += Kuu(1,1); ke[i6+1][j6+2] += Kuu(1,2);
+                ke[i6+2][j6  ] += Kuu(2,0); ke[i6+2][j6+1] += Kuu(2,1); ke[i6+2][j6+2] += Kuu(2,2);
                 
-                // the t-t component
-                kab = (Mx[i]*(s.xx()*Mx[j]+s.xy()*My[j]+s.xz()*Mz[j]) +
-                       My[i]*(s.xy()*Mx[j]+s.yy()*My[j]+s.yz()*Mz[j]) + 
-                       Mz[i]*(s.xz()*Mx[j]+s.yz()*My[j]+s.zz()*Mz[j]))*detJt;
+                ke[i6  ][j6+3] += Kud(0,0); ke[i6  ][j6+4] += Kud(0,1); ke[i6  ][j6+5] += Kud(0,2);
+                ke[i6+1][j6+3] += Kud(1,0); ke[i6+1][j6+4] += Kud(1,1); ke[i6+1][j6+5] += Kud(1,2);
+                ke[i6+2][j6+3] += Kud(2,0); ke[i6+2][j6+4] += Kud(2,1); ke[i6+2][j6+5] += Kud(2,2);
                 
-                ke[6*i+3][6*j+3] += kab;
-                ke[6*i+4][6*j+4] += kab;
-                ke[6*i+5][6*j+5] += kab;
+                ke[i6+3][j6  ] += Kdu(0,0); ke[i6+3][j6+1] += Kdu(0,1); ke[i6+3][j6+2] += Kdu(0,2);
+                ke[i6+4][j6  ] += Kdu(1,0); ke[i6+4][j6+1] += Kdu(1,1); ke[i6+4][j6+2] += Kdu(1,2);
+                ke[i6+5][j6  ] += Kdu(2,0); ke[i6+5][j6+1] += Kdu(2,1); ke[i6+5][j6+2] += Kdu(2,2);
+                
+                ke[i6+3][j6+3] += Kdd(0,0); ke[i6+3][j6+4] += Kdd(0,1); ke[i6+3][j6+5] += Kdd(0,2);
+                ke[i6+4][j6+3] += Kdd(1,0); ke[i6+4][j6+4] += Kdd(1,1); ke[i6+4][j6+5] += Kdd(1,2);
+                ke[i6+5][j6+3] += Kdd(2,0); ke[i6+5][j6+4] += Kdd(2,1); ke[i6+5][j6+5] += Kdd(2,2);
             }
+        }
         
     } // end loop over gauss-points
-    
-    // assign symmetic parts
-    // TODO: Can this be omitted by changing the Assemble routine so that it only
-    // grabs elements from the upper diagonal matrix?
-    for (i=0; i<ndof; ++i)
-        for (j=i+1; j<ndof; ++j)
-            ke[j][i] = ke[i][j];
 }
 
 

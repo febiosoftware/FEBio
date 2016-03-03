@@ -8,6 +8,7 @@
 #include "FEDiscreteDomain.h"
 #include "FETrussDomain.h"
 #include "FEShellDomain.h"
+#include "FEFergusonShellDomain.h"
 #include "FESolidDomain.h"
 #include "FEDomain2D.h"
 #include "FEMaterial.h"
@@ -486,6 +487,34 @@ void FEMesh::InitShellNormals()
 				}
 			}
 		}
+        else if (Domain(nd).Class() == FE_DOMAIN_FERGUSON)
+        {
+            FEFergusonShellDomain& sd = static_cast<FEFergusonShellDomain&>(Domain(nd));
+            vec3d r0[FEElement::MAX_NODES];
+            for (int i=0; i<sd.Elements(); ++i)
+            {
+                FEFergusonShellElement& el = sd.Element(i);
+                
+                int n = el.Nodes();
+                int* en = &el.m_node[0];
+                
+                // get the nodes
+                for (int j=0; j<n; ++j) r0[j] = Node(en[j]).m_r0;
+                
+                for (int j=0; j<n; ++j)
+                {
+                    int m0 = j;
+                    int m1 = (j+1)%n;
+                    int m2 = (j==0? n-1: j-1);
+                    
+                    vec3d a = r0[m0];
+                    vec3d b = r0[m1];
+                    vec3d c = r0[m2];
+                    
+                    D[en[m0]] += (b-a)^(c-a);
+                }
+            }
+        }
 	}
 
 	// make sure we start with unit directors
@@ -502,9 +531,19 @@ void FEMesh::InitShellNormals()
 			{
 				FEShellElement& el = sd.Element(i);
 				int ne = el.Nodes();
-				for (int j=0; j<ne; ++j) el.m_D0[j] = D[el.m_node[j]];
+				for (int j=0; j<ne; ++j) el.m_D0[j] = D[el.m_node[j]]*el.m_h0[j];
 			}
 		}
+        else if (Domain(nd).Class() == FE_DOMAIN_FERGUSON)
+        {
+            FEFergusonShellDomain& sd = static_cast<FEFergusonShellDomain&>(Domain(nd));
+            for (int i=0; i<sd.Elements(); ++i)
+            {
+                FEFergusonShellElement& el = sd.Element(i);
+                int ne = el.Nodes();
+                for (int j=0; j<ne; ++j) el.m_D0[j] = D[el.m_node[j]]*el.m_h0[j];
+            }
+        }
 	}
 }
 
@@ -672,37 +711,31 @@ double FEMesh::ShellElementVolume(FEShellElement& el)
 	int nint = el.GaussPoints();
 	double *w = el.GaussWeights();
 	double V = 0;
+    vec3d g[3];
 	for (int n=0; n<nint; ++n)
 	{
 		// jacobian matrix
-		double* h0 = &el.m_h0[0];
-		double gt = el.gt(n);
-		double J[3][3] = {0};
-		for (i=0; i<neln; ++i)
-		{
-			const double& Hri = el.Hr(n)[i];
-			const double& Hsi = el.Hs(n)[i];
-			const double& Hi = el.H(n)[i];
-			
-			const double& x = r0[i].x;
-			const double& y = r0[i].y;
-			const double& z = r0[i].z;
-			
-			const double& dx = D0[i].x;
-			const double& dy = D0[i].y;
-			const double& dz = D0[i].z;
-			
-			double za = 0.5*gt*h0[i];
-			
-			J[0][0] += Hri*x + Hri*za*dx; J[0][1] += Hsi*x + Hsi*za*dx; J[0][2] += 0.5*h0[i]*Hi*dx;
-			J[1][0] += Hri*y + Hri*za*dy; J[1][1] += Hsi*y + Hsi*za*dy; J[1][2] += 0.5*h0[i]*Hi*dy;
-			J[2][0] += Hri*z + Hri*za*dz; J[2][1] += Hsi*z + Hsi*za*dz; J[2][2] += 0.5*h0[i]*Hi*dz;
-		}
+		double eta = el.gt(n);
+        
+        double* Mr = el.Hr(n);
+        double* Ms = el.Hs(n);
+        double* M  = el.H(n);
+        
+        // evaluate covariant basis vectors
+        g[0] = g[1] = g[2] = vec3d(0,0,0);
+        for (i=0; i<neln; ++i)
+        {
+            g[0] += (r0[i] + D0[i]*eta/2)*Mr[i];
+            g[1] += (r0[i] + D0[i]*eta/2)*Ms[i];
+            g[2] += D0[i]*(M[i]/2);
+        }
 				
+        mat3d J = mat3d(g[0].x, g[1].x, g[2].x,
+                        g[0].y, g[1].y, g[2].y,
+                        g[0].z, g[1].z, g[2].z);
+        
 		// calculate the determinant
-		double detJ0 =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1]) 
-					  + J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0]) 
-					  + J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+        double detJ0 = J.det();
 
 		V += detJ0*w[n];
 	}
@@ -766,7 +799,9 @@ int FEMesh::Faces(FEElement& el)
 	case FE_TET15G15:
 	case FE_TET4G1: return 4;
 	case FE_SHELL_QUAD:
-	case FE_SHELL_TRI: return 1;
+    case FE_SHELL_QUAD8:
+	case FE_SHELL_TRI:
+    case FE_SHELL_TRI6: return 1;
 	default:
 		assert(false);
 	}
@@ -870,10 +905,18 @@ int FEMesh::GetFace(FEElement& el, int n, int* nf)
 		nn = 4;
 		nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[2]; nf[3] = en[3];
 		break;
+    case FE_SHELL_QUAD8:
+        nn = 8;
+        nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[2]; nf[3] = en[3]; nf[4] = en[4]; nf[5] = en[5]; nf[6] = en[6]; nf[7] = en[7];
+        break;
 	case FE_SHELL_TRI:
 		nn = 3;
 		nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[2];
 		break;
+    case FE_SHELL_TRI6:
+        nn = 6;
+        nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[2]; nf[3] = en[3]; nf[4] = en[4]; nf[5] = en[5];
+        break;
 	}
 
 	return nn;
@@ -997,10 +1040,16 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 				case FE_SHELL_QUAD:
 					se.SetType(FE_QUAD4G4); 
 					break;
+                case FE_SHELL_QUAD8:
+                    se.SetType(FE_QUAD8G9);
+                    break;
 				case FE_TET4G1: 
 				case FE_SHELL_TRI:
 					se.SetType(FE_TRI3G1); 
 					break;
+                case FE_SHELL_TRI6:
+                    se.SetType(FE_TRI6G7);
+                    break;
 				}
 				
 				se.m_nelem = el.GetID();
