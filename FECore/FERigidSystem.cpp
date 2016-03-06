@@ -261,29 +261,6 @@ bool FERigidSystem::CreateObjects()
 	FEModel& fem = m_fem;
 	FEMesh& mesh = fem.GetMesh();
 
-	// Find the nodes that are on a non-rigid shell. 
-	// These nodes will be assigned rotational degrees of freedom
-	// TODO: I'm not sure if this is a good place to do this.
-	for (int i=0; i<mesh.Nodes(); ++i) mesh.Node(i).m_bshell = false;
-	for (int nd = 0; nd<mesh.Domains(); ++nd)
-	{
-		FEDomain& dom = mesh.Domain(nd);
-		if ((dom.Class() == FE_DOMAIN_SHELL) || (dom.Class() == FE_DOMAIN_FERGUSON))
-		{
-			FEMaterial* pmat = dom.GetMaterial();
-			if (pmat->IsRigid() == false)
-			{
-				int N = dom.Elements();
-				for (int i=0; i<N; ++i)
-				{
-					FEElement& el = dom.ElementRef(i);
-					int n = el.Nodes();
-					for (int j=0; j<n; ++j) mesh.Node(el.m_node[j]).m_bshell = true;
-				}
-			}
-		}
-	}
-
 	// count the number of rigid materials
 	int NMAT = fem.Materials();
 	int nrm = 0;

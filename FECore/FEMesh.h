@@ -385,8 +385,8 @@ protected:
 	double SolidElementVolume(FESolidElement& el);
 	double ShellElementVolume(FEShellElement& el);
 
-	//! Initialize shell normals
-	void InitShellNormals();
+	//! Initialize shells
+	void InitShells();
 
 protected:
 	vector<FENode>		m_Node;		//!< nodes

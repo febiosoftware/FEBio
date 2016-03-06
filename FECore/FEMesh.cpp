@@ -449,7 +449,8 @@ int FEMesh::RemoveIsolatedVertices()
 
 //-----------------------------------------------------------------------------
 //! Calculate all shell normals (i.e. the shell directors).
-void FEMesh::InitShellNormals()
+//! And find shell nodes
+void FEMesh::InitShells()
 {
 	// zero initial directors for shell nodes
 	int NN = Nodes();
@@ -545,6 +546,29 @@ void FEMesh::InitShellNormals()
             }
         }
 	}
+
+	// Find the nodes that are on a non-rigid shell. 
+	// These nodes will be assigned rotational degrees of freedom
+	// TODO: Perhaps I should let the domains do this instead
+	for (int i=0; i<Nodes(); ++i) Node(i).m_bshell = false;
+	for (int nd = 0; nd<Domains(); ++nd)
+	{
+		FEDomain& dom = Domain(nd);
+		if ((dom.Class() == FE_DOMAIN_SHELL) || (dom.Class() == FE_DOMAIN_FERGUSON))
+		{
+			FEMaterial* pmat = dom.GetMaterial();
+			if (pmat->IsRigid() == false)
+			{
+				int N = dom.Elements();
+				for (int i=0; i<N; ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					int n = el.Nodes();
+					for (int j=0; j<n; ++j) Node(el.m_node[j]).m_bshell = true;
+				}
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -565,7 +589,7 @@ bool FEMesh::Init()
 	// Initialize shell normals (i.e. directors)
 	// NOTE: we do this before we check for inverted elements since the jacobian of a shell
 	//       depends on its normal.
-	InitShellNormals();
+	InitShells();
 
 	// reset data
 	// TODO: Not sure why this is here
