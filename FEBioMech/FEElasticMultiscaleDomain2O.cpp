@@ -59,6 +59,9 @@ bool FEElasticMultiscaleDomain2O::Initialize(FEModel& fem)
 		}
 	}
 
+	// setup the element neighbor list
+	m_EEL.Create(GetMesh());
+
 	// create the probes
 	int NP = pmat->Probes();
 	for (int i=0; i<NP; ++i)

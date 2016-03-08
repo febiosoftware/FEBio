@@ -1,6 +1,7 @@
 #pragma once
 #include "FEElasticSolidDomain.h"
 #include "FECore/tens3d.h"
+#include "FECore/FEElemElemList.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a domain used in an elastic remodeling problem.
@@ -32,4 +33,7 @@ public:
 	void ElementMaterialStiffness(FESolidElement &el, matrix &ke);
 
 	void defhess(FESolidElement &el, tens3drs &G, int n);
+
+private:
+	FEElemElemList	m_EEL;
 };
