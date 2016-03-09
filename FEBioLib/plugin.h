@@ -20,9 +20,26 @@ typedef void* FEBIO_PLUGIN_HANDLE;
 #endif
 
 //-----------------------------------------------------------------------------
+struct PLUGIN_INFO
+{
+	bool	bloaded;	// loaded successfully
+	int		major;	// major version number
+	int		minor;	// minor version number
+	int		patch;	// patch versin number
+};
+
+//-----------------------------------------------------------------------------
 //! This class defines a FEBio plugin
 class FEBioPlugin
 {
+public:
+	struct Version
+	{
+		int major;	// major version number
+		int	minor;	// minor version number
+		int	patch;	// patch versin number
+	};
+
 public:
 	FEBioPlugin();
 	~FEBioPlugin();
@@ -36,11 +53,15 @@ public:
 	//! get the plugin name
 	const char* GetName() const { return m_szname; }
 
+	//! return the version info
+	Version GetVersion() const { return m_version; }
+
 protected:
 	void SetNameFromFilePath(const char* szfile);
 
 private:
 	char					m_szname[1024];
+	Version					m_version;
 	FEBIO_PLUGIN_HANDLE		m_ph;
 };
 
@@ -53,7 +74,7 @@ public:
 	static FEBioPluginManager* GetInstance();
 
 	//! Load a plugin into memory
-	int LoadPlugin(const char* szfile);
+	int LoadPlugin(const char* szfile, PLUGIN_INFO& info);
 
 	//! Clean up
 	void DeleteThis();

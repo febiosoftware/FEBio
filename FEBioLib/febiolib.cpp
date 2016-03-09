@@ -187,10 +187,11 @@ bool ImportPlugin(const char* szfile)
 {
 	const char* sztitle = GetFileTitle(szfile);
 	FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
-	int nerr = pPM->LoadPlugin(szfile);
+	PLUGIN_INFO info;
+	int nerr = pPM->LoadPlugin(szfile, info);
 	switch (nerr)
 	{
-	case 0: fprintf(stderr, "Success loading plugin %s\n", sztitle); return true; break;
+	case 0: fprintf(stderr, "Success loading plugin %s (version %d.%d.%d)\n", sztitle, info.major, info.minor, info.patch); return true; break;
 	case 1: fprintf(stderr, "Failed loading plugin %s\n Reason: Failed to load the file.\n\n", szfile); break;
 	case 2: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginNumClasses not found.\n\n", szfile); break;
 	case 3: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginGetFactory not found.\n\n", szfile); break;
