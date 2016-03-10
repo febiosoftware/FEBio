@@ -74,7 +74,9 @@ public:
 
 	void Init();
 
-	void SetSphereCenter(vec3d c) { m_c = c; }
+	void SetSphereCenter(const vec3d& c) { m_c = c; }
+
+	void SetSphereVector(const vec3d& r) { m_r = r;}
 
 	mat3d LocalElementCoord(FEElement& el, int n);
 
@@ -82,6 +84,7 @@ public:
 
 public:
 	vec3d		m_c;	// center of map
+	vec3d		m_r;	// vector for parallel transport
 
 protected:
 	DECLARE_PARAMETER_LIST();

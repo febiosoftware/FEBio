@@ -108,13 +108,15 @@ void FELocalMap::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 
 BEGIN_PARAMETER_LIST(FESphericalMap, FECoordSysMap)
-	ADD_PARAMETER(m_c, FE_PARAM_VEC3D, "spherical");
+	ADD_PARAMETER(m_c, FE_PARAM_VEC3D, "center");
+	ADD_PARAMETER(m_r, FE_PARAM_VEC3D, "vector");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 FESphericalMap::FESphericalMap(FEModel* pfem): FECoordSysMap(pfem)
 {
-
+	m_c = vec3d(0,0,0);
+	m_r = vec3d(1,0,0);
 }
 
 //-----------------------------------------------------------------------------
@@ -135,6 +137,15 @@ mat3d FESphericalMap::LocalElementCoord(FEElement& el, int n)
 	for (int i=0; i<el.Nodes(); ++i) a += r0[i]*H[i];
 	a -= m_c;
 	a.unit();
+
+	// setup the rotation vector
+	vec3d x_unit(1,0,0);
+	quatd q(x_unit, a);
+
+	vec3d v = m_r;
+	v.unit();
+	q.RotateVector(v);
+	a = v;
 
 	vec3d d = r0[1] - r0[0];
 	d.unit();

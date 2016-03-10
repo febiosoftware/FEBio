@@ -57,6 +57,18 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 		{
 			const char* sztype = tag.AttributeValue("type");
 			FEInitialCondition* pic = dynamic_cast<FEInitialCondition*>(fecore_new<FEInitialCondition>(FEIC_ID, sztype, &fem));
+
+			if (tag.isleaf() == false)
+			{
+				FEParameterList& pl = pic->GetParameterList();
+				++tag;
+				do
+				{
+					if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+					++tag;
+				}
+				while (!tag.isend());
+			}
 			
 			fem.AddInitialCondition(pic);
 			if (m_pim->m_nsteps > 0)

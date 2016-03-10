@@ -1041,33 +1041,28 @@ bool FEPlotFiberVector::Save(FEDomain &dom, FEDataStream& a)
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if (pme == 0) return false;
 
-	if (dom.Class() == FE_DOMAIN_SOLID)
+	int BE = dom.Elements();
+	for (int i=0; i<BE; ++i)
 	{
-		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		int BE = bd.Elements();
-		for (int i=0; i<BE; ++i)
+		FEElement& el = dom.ElementRef(i);
+		int n = el.GaussPoints();
+		vec3d r = vec3d(0,0,0);
+		for (int j=0; j<n; ++j)
 		{
-			FESolidElement& el = bd.Element(i);
-			int n = el.GaussPoints();
-			vec3d r = vec3d(0,0,0);
-			for (int j=0; j<n; ++j)
-			{
-				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
-				vec3d ri;
-				ri.x = pt.m_Q[0][0];
-				ri.y = pt.m_Q[1][0];
-				ri.z = pt.m_Q[2][0];
+			FEElasticMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
+			vec3d ri;
+			ri.x = pt.m_Q[0][0];
+			ri.y = pt.m_Q[1][0];
+			ri.z = pt.m_Q[2][0];
 
-				r += pt.m_F*ri;
-			}
-//			r /= (double) n;
-			r.unit();
-
-			a << r;
+			r += pt.m_F*ri;
 		}
-		return true;
+//		r /= (double) n;
+		r.unit();
+
+		a << r;
 	}
-	return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
