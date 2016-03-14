@@ -530,6 +530,132 @@ void FEBioGeometrySection::ReadElement(XMLTag &tag, FEElement& el, int ntype, in
 }
 
 //-----------------------------------------------------------------------------
+void set_element_fiber(FEElement& el, const vec3d& v)
+{
+	// normalize fiber
+	vec3d a = v;
+	a.unit();
+
+	// set up a orthonormal coordinate system
+	vec3d b(0,1,0);
+	if (fabs(fabs(a*b) - 1) < 1e-7) b = vec3d(0,0,1);
+	vec3d c = a^b;
+	b = c^a;
+
+	// make sure they are unit vectors
+	b.unit();
+	c.unit();
+
+	for (int i=0; i<el.GaussPoints(); ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		mat3d& m = pt.m_Q;
+		m.zero();
+		m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
+		m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;
+		m[2][0] = a.z; m[2][1] = b.z; m[2][2] = c.z;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void set_element_mat_axis(FEElement& el, const vec3d& v1, const vec3d& v2)
+{
+	vec3d a = v1;
+	vec3d d = v2;
+				
+	vec3d c = a^d;
+	vec3d b = c^a;
+
+	// normalize
+	a.unit();
+	b.unit();
+	c.unit();
+
+	// assign to element
+	for (int i=0; i<el.GaussPoints(); ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		pt.m_Q = mat3d(a, b, c);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioGeometrySection::ParseElementData(FEElement& el, XMLTag& tag)
+{
+	vec3d a, d;
+	if (tag == "fiber")
+	{
+		// read the fiber direction
+		m_pim->value(tag, a);
+		set_element_fiber(el, a);
+	}
+	else if (tag == "mat_axis")
+	{
+		++tag;
+		do
+		{
+			if      (tag == "a") m_pim->value(tag, a);
+			else if (tag == "d") m_pim->value(tag, d);
+			else throw XMLReader::InvalidTag(tag);
+
+			++tag;
+		}
+		while (!tag.isend());
+		set_element_mat_axis(el, a, d);
+	}
+	else if (tag == "thickness")
+	{
+		if ((el.Class() != FE_ELEM_SHELL) && (el.Class() != FE_ELEM_FERGUSON_SHELL)) throw XMLReader::InvalidTag(tag);
+		FEShellElement& shell = static_cast<FEShellElement&> (el);
+
+		// read shell thickness
+		tag.value(&shell.m_h0[0],shell.Nodes());
+	}
+	else if (tag == "area")
+	{
+		if (el.Class() != FE_ELEM_TRUSS) throw XMLReader::InvalidTag(tag);
+		FETrussElement& truss = static_cast<FETrussElement&>(el);
+
+		// read truss area
+		m_pim->value(tag, truss.m_a0);
+	}
+	else
+	{
+		for (int i=0; i<el.GaussPoints(); ++i)
+		{
+			FEMaterialPoint* pt = el.GetMaterialPoint(i);
+			while (pt)
+			{
+				FEParameterList& pl = pt->GetParameterList();
+				if (m_pim->ReadParameter(tag, pl)) break;
+
+				FEElasticMixtureMaterialPoint* mPt = dynamic_cast<FEElasticMixtureMaterialPoint*>(pt);
+
+				bool tagFound=false;
+				if(mPt)
+				{
+					vector<FEMaterialPoint*> mPtV = mPt->m_mp;
+					for (int i=0; i<(int)mPtV.size(); ++i)
+					{
+						FEParameterList& pl = mPtV[i]->GetParameterList();
+						if (m_pim->ReadParameter(tag, pl))
+						{
+							tagFound=true;
+							break;
+						}
+					}
+				}
+
+				if(tagFound) break;
+
+				pt = pt->Next();
+				if (pt == 0) throw XMLReader::InvalidTag(tag);
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Reads the ElementData section from the FEBio input file
 
 void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
@@ -565,138 +691,50 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 	do
 	{
 		// make sure this is an "element" tag
-		if (tag != "element") throw XMLReader::InvalidTag(tag);
-
-		// get the element number
-		const char* szid = tag.AttributeValue("id");
-		int n = atoi(szid)-1;
-
-		// make sure the number is valid
-		if ((n<0) || (n>=nelems)) throw XMLReader::InvalidAttributeValue(tag, "id", szid);
-
-		// get a pointer to the element
-		FEElement* pe = pelem[n];
-
-		vec3d a;
-		++tag;
-		do
+		if (tag == "element")
 		{
-			if (tag == "fiber")
-			{
-				// read the fiber direction
-				m_pim->value(tag, a);
+			// get the element number
+			const char* szid = tag.AttributeValue("id");
+			int n = atoi(szid)-1;
 
-				// normalize fiber
-				a.unit();
+			// make sure the number is valid
+			if ((n<0) || (n>=nelems)) throw XMLReader::InvalidAttributeValue(tag, "id", szid);
 
-				// set up a orthonormal coordinate system
-				vec3d b(0,1,0);
-				if (fabs(fabs(a*b) - 1) < 1e-7) b = vec3d(0,0,1);
-				vec3d c = a^b;
-				b = c^a;
+			// get a pointer to the element
+			FEElement* pe = pelem[n];
 
-				// make sure they are unit vectors
-				b.unit();
-				c.unit();
-
-				for (int i=0; i<pe->GaussPoints(); ++i)
-				{
-					FEElasticMaterialPoint& pt = *pe->GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-					mat3d& m = pt.m_Q;
-					m.zero();
-					m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
-					m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;
-					m[2][0] = a.z; m[2][1] = b.z; m[2][2] = c.z;
-				}
-			}
-			else if (tag == "mat_axis")
-			{
-				vec3d a, d;
-
-				++tag;
-				do
-				{
-					if      (tag == "a") m_pim->value(tag, a);
-					else if (tag == "d") m_pim->value(tag, d);
-					else throw XMLReader::InvalidTag(tag);
-
-					++tag;
-				}
-				while (!tag.isend());
-
-				vec3d c = a^d;
-				vec3d b = c^a;
-
-				// normalize
-				a.unit();
-				b.unit();
-				c.unit();
-
-				// assign to element
-				for (int i=0; i<pe->GaussPoints(); ++i)
-				{
-					FEElasticMaterialPoint& pt = *pe->GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-					mat3d& m = pt.m_Q;
-					m.zero();
-					m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
-					m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;
-					m[2][0] = a.z; m[2][1] = b.z; m[2][2] = c.z;
-				}
-			}
-			else if (tag == "thickness")
-			{
-				if ((pe->Class() != FE_ELEM_SHELL) && (pe->Class() != FE_ELEM_FERGUSON_SHELL)) throw XMLReader::InvalidTag(tag);
-				FEShellElement* pse = static_cast<FEShellElement*> (pe);
-
-				// read shell thickness
-				tag.value(&pse->m_h0[0],pse->Nodes());
-			}
-			else if (tag == "area")
-			{
-				if (pe->Class() != FE_ELEM_TRUSS) throw XMLReader::InvalidTag(tag);
-				FETrussElement* pt = static_cast<FETrussElement*>(pe);
-
-				// read truss area
-				m_pim->value(tag, pt->m_a0);
-			}
-			else
-			{
-				for (int i=0; i<pe->GaussPoints(); ++i)
-				{
-					FEMaterialPoint* pt = pe->GetMaterialPoint(i);
-					while (pt)
-					{
-						FEParameterList& pl = pt->GetParameterList();
-						if (m_pim->ReadParameter(tag, pl)) break;
-
-						FEElasticMixtureMaterialPoint* mPt = dynamic_cast<FEElasticMixtureMaterialPoint*>(pt);
-
-						bool tagFound=false;
-						if(mPt)
-						{
-							vector<FEMaterialPoint*> mPtV = mPt->m_mp;
-							for (int i=0; i<(int)mPtV.size(); ++i)
-							{
-								FEParameterList& pl = mPtV[i]->GetParameterList();
-								if (m_pim->ReadParameter(tag, pl))
-								{
-									tagFound=true;
-									break;
-								}
-							}
-						}
-
-						if(tagFound)
-							break;
-						pt = pt->Next();
-						if (pt == 0) throw XMLReader::InvalidTag(tag);
-					}
-				}
-			}
 			++tag;
+			do
+			{
+				ParseElementData(*pe, tag);
+				++tag;
+			}
+			while (!tag.isend());
 		}
-		while (!tag.isend());
+		else if (tag == "elset")
+		{
+			const char* szname = tag.AttributeValue("set");
+			// find domain with this name
+			FEElementSet* pset = mesh.FindElementSet(szname);
+			if (pset == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szname);
 
+			++tag;
+			do
+			{
+				int n = pset->size();
+				for (int i=0; i<n; ++i)
+				{
+					// get a pointer to the element
+					int nid = (*pset)[i] - 1;
+					FEElement* pe = pelem[nid];
+					ParseElementData(*pe, tag);
+				}
+				++tag;
+			}
+			while (!tag.isend());
+		}
+		else throw XMLReader::InvalidTag(tag);
+		
 		++tag;
 	}
 	while (!tag.isend());

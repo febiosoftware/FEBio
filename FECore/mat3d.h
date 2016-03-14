@@ -259,6 +259,8 @@ public:
 
 	mat3d(const mat2d& m);
 
+	mat3d(const vec3d& e1, const vec3d& e2, const vec3d& e3);
+
 	// assignment operators
 	mat3d& operator = (const mat3dd& m);
 	mat3d& operator = (const mat3ds& m);

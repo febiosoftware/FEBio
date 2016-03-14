@@ -291,6 +291,7 @@ void FEBioModel::Write(unsigned int nwhen)
 					case CB_MAJOR_ITERS  : 
 						if ((nplt == FE_PLOT_MAJOR_ITRS ) && (pstep->m_ntimesteps % pstep->m_nplot_stride == 0)) bout = true; 
 						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_nmust >= 0)) bout = true;
+						if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
 						break;
 					case CB_AUGMENT: if (nplt == FE_PLOT_AUGMENTATIONS) bout = true; break;
 					case CB_SOLVED : if (nplt == FE_PLOT_FINAL) bout = true;

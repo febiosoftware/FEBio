@@ -26,6 +26,7 @@ protected:
 	void ParseEdgeSection       (XMLTag& tag);
 	void ParseSurfaceSection    (XMLTag& tag);
 	void ParseElementSetSection (XMLTag& tag);
+	void ParseElementData(FEElement& el, XMLTag& tag);
 
 	void ParseMesh(XMLTag& tag);
 
