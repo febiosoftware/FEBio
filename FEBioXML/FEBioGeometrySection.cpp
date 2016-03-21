@@ -15,8 +15,9 @@
 void FEBioGeometrySection::Parse(XMLTag& tag)
 {
 	m_pim->m_maxid = 0;
+	int nversion = m_pim->Version();
 
-	if (m_pim->Version() < 0x0200)
+	if (nversion < 0x0200)
 	{
 		++tag;
 		do
@@ -36,11 +37,17 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 		{
 			if      (tag == "Nodes"      ) ParseNodeSection       (tag);
 			else if (tag == "Elements"   ) ParseElementSection20  (tag);
-			else if (tag == "ElementData") ParseElementDataSection(tag);
 			else if (tag == "NodeSet"    ) ParseNodeSetSection    (tag);
 			else if (tag == "Surface"    ) ParseSurfaceSection    (tag);
 			else if (tag == "Edge"       ) ParseEdgeSection       (tag);
 			else if (tag == "ElementSet" ) ParseElementSetSection (tag);
+			else if (tag == "ElementData") 
+			{
+				// This section is no longer supported since 2.5 and replaced
+				// with the top level MeshData section.
+				if (nversion < 0x0205) ParseElementDataSection(tag);
+				else throw XMLReader::InvalidTag(tag);
+			}
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
 		}

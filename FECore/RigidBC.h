@@ -3,6 +3,7 @@
 
 //-----------------------------------------------------------------------------
 //! rigid node
+//! TODO: Replace this with a FERigidNodeSet class. 
 class FERigidNode : public FEBoundaryCondition
 {
 public:

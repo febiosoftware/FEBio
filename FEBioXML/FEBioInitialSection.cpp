@@ -10,6 +10,15 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 {
 	if (tag.isleaf()) return;
 
+	int nversion = m_pim->Version();
+	if (nversion < 0x0205) ParseInitialSection(tag);
+	else ParseInitialSection25(tag);
+}
+
+void FEBioInitialSection::ParseInitialSection(XMLTag& tag)
+{
+	if (tag.isleaf()) return;
+
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	DOFS& dofs = fem.GetDOFS();
@@ -92,13 +101,6 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 
 				ndof = dofs.GetDOF("concentration", isol);
 			}
-			else if (tag == "init")
-			{
-				// TODO: In the future I want to make this the preferred way of defining initial conditions
-				// get the bc attribute
-				const char* szbc = tag.AttributeValue("bc");
-				ndof = dofs.GetDOF(szbc);
-			}
 			else throw XMLReader::InvalidTag(tag);
 			if (ndof == -1) throw XMLReader::InvalidTag(tag);
 
@@ -130,6 +132,96 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			}
 			while (!tag.isend());
 		}
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioInitialSection::ParseInitialSection25(XMLTag& tag)
+{
+	if (tag.isleaf()) return;
+
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	DOFS& dofs = fem.GetDOFS();
+
+	// make sure we've read the nodes section
+	if (mesh.Nodes() == 0) throw XMLReader::InvalidTag(tag);
+
+	// read nodal data
+	++tag;
+	do
+	{
+		if (tag == "init")
+		{
+			// get the BC
+			const char* sz = tag.AttributeValue("bc");
+			int ndof = dofs.GetDOF(sz);
+			if (ndof == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+
+			// allocate initial condition
+			FEInitialBC* pic = dynamic_cast<FEInitialBC*>(fecore_new<FEInitialCondition>(FEIC_ID, "init_bc", &fem));
+			pic->SetDOF(ndof);
+
+			// add this boundary condition to the current step
+			fem.AddInitialCondition(pic);
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddModelComponent(pic);
+				pic->Deactivate();
+			}
+
+			double value = 0.0;
+
+			++tag;
+			do
+			{
+				if (tag == "value")
+				{
+					tag.value(value);
+				}
+				else if (tag == "node_set")
+				{
+					// find the node set
+					FENodeSet* pns = m_pim->ParseNodeSet(tag, "nset");
+					if (pns == 0) throw XMLReader::InvalidTag(tag);
+
+					// add the nodes
+					FENodeSet& ns = *pns;
+					int N = ns.size();
+					for (int i=0; i<N; ++i) pic->Add(ns[i], value);
+				}
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
+		}
+		else if (tag == "ic")
+		{
+			const char* sztype = tag.AttributeValue("type");
+			FEInitialCondition* pic = dynamic_cast<FEInitialCondition*>(fecore_new<FEInitialCondition>(FEIC_ID, sztype, &fem));
+
+			if (tag.isleaf() == false)
+			{
+				FEParameterList& pl = pic->GetParameterList();
+				++tag;
+				do
+				{
+					if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+					++tag;
+				}
+				while (!tag.isend());
+			}
+			
+			fem.AddInitialCondition(pic);
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddModelComponent(pic);
+				pic->Deactivate();
+			}
+		}
+		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());

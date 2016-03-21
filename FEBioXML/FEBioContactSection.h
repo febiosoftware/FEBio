@@ -15,6 +15,7 @@ public:
 protected:
 	void ParseRigidWall            (XMLTag& tag);
 	void ParseRigidInterface       (XMLTag& tag);
+	void ParseRigidInterface25     (XMLTag& tag);
 	void ParseLinearConstraint     (XMLTag& tag);
 
 protected:

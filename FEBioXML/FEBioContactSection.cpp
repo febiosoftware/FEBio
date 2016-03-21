@@ -29,7 +29,11 @@ void FEBioContactSection::Parse(XMLTag& tag)
 
 			// Not all contact interfaces can be automated, so we first handle these special cases
 			if      (strcmp(sztype, "rigid_wall"             ) == 0) ParseRigidWall            (tag);
-			else if (strcmp(sztype, "rigid"                  ) == 0) ParseRigidInterface       (tag);
+			else if (strcmp(sztype, "rigid"                  ) == 0)
+			{
+				if (nversion < 0x0205) ParseRigidInterface(tag);
+				else ParseRigidInterface25(tag);
+			}
 			else if (strcmp(sztype, "linear constraint"      ) == 0) ParseLinearConstraint     (tag);
 			else 
 			{
@@ -234,6 +238,57 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 
 		++tag;
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioContactSection::ParseRigidInterface25(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FERigidSystem& rigid = *fem.GetRigidSystem();
+
+	int NMAT = fem.Materials();
+
+	int rb = -1;
+
+	++tag;
+	do
+	{
+		if (tag == "rb")
+		{
+			tag.value(rb);
+			rb -= 1;
+		}
+		else if (tag == "node_set")
+		{
+			// make sure we have a valid rigid body reference
+			if ((rb < 0)||(rb>=NMAT)) throw XMLReader::InvalidAttributeValue(tag, "rb", tag.AttributeValue("rb"));
+
+			// find the node set
+			FENodeSet* pns = m_pim->ParseNodeSet(tag, "nset");
+			if (pns == 0) throw XMLReader::InvalidTag(tag);
+
+			// add the nodes
+			FENodeSet& ns = *pns;
+			int N = ns.size();
+			for (int i=0; i<N; ++i)
+			{
+				FERigidNode* prn = new FERigidNode(&fem);
+
+				if (m_pim->m_nsteps > 0)
+				{
+					GetStep()->AddModelComponent(prn);
+					prn->Deactivate();
+				}
+
+				prn->nid = ns[i];
+				prn->rid = rb;
+				rigid.AddRigidNode(prn);
+			}
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------

@@ -337,42 +337,114 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 void FEBioBoundarySection::ParseBCFix25(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
+	DOFS& dofs = fem.GetDOFS();
 	FEMesh& mesh = fem.GetMesh();
+	int NN = mesh.Nodes();
 
 	// get the required bc attribute
-	const char* szbc = tag.AttributeValue("bc");
-	int ndof = fem.GetDOFIndex(szbc);
-	if (ndof == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+	char szbc[8];
+	strcpy(szbc, tag.AttributeValue("bc"));
+
+	// process the bc string
+	vector<int> bc;
+
+	int ndof = dofs.GetDOF(szbc);
+	if (ndof >= 0) bc.push_back(ndof);
+	else
+	{
+		// get the DOF indices
+		const int dof_X = fem.GetDOFIndex("x");
+		const int dof_Y = fem.GetDOFIndex("y");
+		const int dof_Z = fem.GetDOFIndex("z");
+		const int dof_U = fem.GetDOFIndex("u");
+		const int dof_V = fem.GetDOFIndex("v");
+		const int dof_W = fem.GetDOFIndex("w");
+		const int dof_VX = fem.GetDOFIndex("vx");
+		const int dof_VY = fem.GetDOFIndex("vy");
+		const int dof_VZ = fem.GetDOFIndex("vz");
+
+		// The supported fixed BC strings don't quite follow the dof naming convention.
+		// For now, we'll check these BC explicitly, but I want to get rid of this in the future.
+		if      (strcmp(szbc, "xy"  ) == 0) { bc.push_back(dof_X ); bc.push_back(dof_Y); }
+		else if (strcmp(szbc, "yz"  ) == 0) { bc.push_back(dof_Y ); bc.push_back(dof_Z); }
+		else if (strcmp(szbc, "xz"  ) == 0) { bc.push_back(dof_X ); bc.push_back(dof_Z); }
+		else if (strcmp(szbc, "xyz" ) == 0) { bc.push_back(dof_X ); bc.push_back(dof_Y); bc.push_back(dof_Z); }
+		else if (strcmp(szbc, "uv"  ) == 0) { bc.push_back(dof_U ); bc.push_back(dof_V); }
+		else if (strcmp(szbc, "vw"  ) == 0) { bc.push_back(dof_V ); bc.push_back(dof_W); }
+		else if (strcmp(szbc, "uw"  ) == 0) { bc.push_back(dof_U ); bc.push_back(dof_W); }
+		else if (strcmp(szbc, "uvw" ) == 0) { bc.push_back(dof_U ); bc.push_back(dof_V); bc.push_back(dof_W); }
+	    else if (strcmp(szbc, "vxy" ) == 0) { bc.push_back(dof_VX); bc.push_back(dof_VY); }
+		else if (strcmp(szbc, "vyz" ) == 0) { bc.push_back(dof_VY); bc.push_back(dof_VZ); }
+		else if (strcmp(szbc, "vxz" ) == 0) { bc.push_back(dof_VX); bc.push_back(dof_VZ); }
+		else if (strcmp(szbc, "vxyz") == 0) { bc.push_back(dof_VX); bc.push_back(dof_VY); bc.push_back(dof_VZ); }
+		else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+	}
+
+	if (bc.empty()) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+	int nbc = bc.size();
 
 	// create the fixed BC's
-	FEFixedBC* pbc = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "fix", &fem));
-	pbc->SetDOF(ndof);
-
-	// add this boundary condition to the current step
-	fem.AddFixedBC(pbc);
-	if (m_pim->m_nsteps > 0)
+	vector<FEFixedBC*> pbc(nbc);
+	for (int i=0; i<nbc; ++i)
 	{
-		GetStep()->AddModelComponent(pbc);
-		pbc->Deactivate();
-	}
+		FEFixedBC* pbci = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "fix", &fem));
+		pbci->SetDOF(bc[i]);
+		pbc[i] = pbci;
+		fem.AddFixedBC(pbci);
 
-	// read the node sets
-	++tag;
-	do
-	{
-		if (tag == "node_set")
+		// add this boundary condition to the current step
+		if (m_pim->m_nsteps > 0)
 		{
-			FENodeSet* pns = m_pim->ParseNodeSet(tag);
-			if (pns == 0) throw XMLReader::InvalidTag(tag);
-
-			FENodeSet& ns = *pns;
-			int N = ns.size();
-			for (int i=0; i<N; ++i) pbc->AddNode(ns[i]);
+			GetStep()->AddModelComponent(pbci);
+			pbci->Deactivate();
 		}
-		else throw XMLReader::InvalidTag(tag);
-		++tag;
 	}
-	while (!tag.isend());
+
+	// see if the set attribute is defined
+	const char* szset = tag.AttributeValue("nset", true);
+	if (szset)
+	{
+		// make sure the tag is a leaf
+		if (tag.isleaf() == false) throw XMLReader::InvalidValue(tag);
+
+		// process the node set
+		FENodeSet* pns = mesh.FindNodeSet(szset);
+		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "nset", szset);
+
+		FENodeSet& ns = *pns;
+		int N = pns->size();
+		for (int i=0; i<N; ++i)
+		{
+			int n = ns[i];
+			if ((n < 0)||(n >= NN)) throw XMLReader::InvalidTag(tag);
+			for (int j=0; j<nbc; ++j) pbc[j]->AddNode(n);
+		}
+	}
+	else
+	{
+		// Read the fixed nodes
+		++tag;
+		do
+		{
+			if (tag == "node_set")
+			{
+				// find the node set
+				FENodeSet* pns = m_pim->ParseNodeSet(tag, "nset");
+				if (pns == 0) throw XMLReader::InvalidTag(tag);
+
+				// add the nodes
+				FENodeSet& ns = *pns;
+				int N = ns.size();
+				for (int i=0; i<N; ++i)
+				{
+					for (int j=0; j<nbc; ++j) pbc[j]->AddNode(ns[i]);
+				}
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -609,7 +681,7 @@ void FEBioBoundarySection::ParseBCPrescribe25(XMLTag& tag)
 		else if (tag == "node_set")
 		{
 			// find the node set
-			FENodeSet* pns = m_pim->ParseNodeSet(tag);
+			FENodeSet* pns = m_pim->ParseNodeSet(tag, "nset");
 			if (pns == 0) throw XMLReader::InvalidTag(tag);
 
 			// add the nodes

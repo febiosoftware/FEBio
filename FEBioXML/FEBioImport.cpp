@@ -20,6 +20,7 @@
 #include "FEBioOutputSection.h"
 #include "FEBioStepSection.h"
 #include "FEBioDiscreteSection.h"
+#include "FEBioMeshDataSection.h"
 #include "FEBioCodeSection.h"
 #include "FECore/DataStore.h"
 #include "FECore/log.h"
@@ -313,6 +314,9 @@ FEBioImport::FEBioImport()
 	m_map["Contact"    ] = new FEBioContactSection    (this);
 	m_map["Discrete"   ] = new FEBioDiscreteSection   (this);
 	m_map["Code"       ] = new FEBioCodeSection       (this);	// added in FEBio 2.4 (experimental feature!)
+
+	// version 2.5 only
+	m_map["MeshData"] = new FEBioMeshDataSection(this);
 }
 
 //=============================================================================
@@ -882,13 +886,13 @@ void FEBioImport::SetPlotCompression(int n)
 
 //-----------------------------------------------------------------------------
 // This tag parses a node set.
-FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag)
+FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENodeSet* pns = 0;
 
 	// see if the set attribute is defined
-	const char* szset = tag.AttributeValue("set", true);
+	const char* szset = tag.AttributeValue(szatt, true);
 	if (szset)
 	{
 		// Make sure this is an empty tag
@@ -896,7 +900,7 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag)
 
 		// find the node set
 		pns = mesh.FindNodeSet(szset);
-		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
+		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, szatt, szset);
 	}
 	else
 	{

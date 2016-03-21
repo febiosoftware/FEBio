@@ -203,7 +203,7 @@ public:
 
 public:
 	// Helper functions for reading node sets, surfaces, etc.
-	FENodeSet* ParseNodeSet(XMLTag& tag);
+	FENodeSet* ParseNodeSet(XMLTag& tag, const char* szatt = "set");
 
 public:
 	void ClearParams();
