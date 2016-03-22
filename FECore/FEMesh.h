@@ -149,15 +149,21 @@ public:
 
 	void create(int n);
 
-	int size() { return m_Node.size(); }
+	void add(int n);
+
+	void add(const FENodeSet& ns);
+
+	int size() const { return m_Node.size(); }
 
 	int& operator [] (int i) { return m_Node[i]; }
 
+	const int& operator [] (int i) const { return m_Node[i]; }
+
 	void SetID(int n) { m_nID = n; }
-	int GetID() { return m_nID; }
+	int GetID() const { return m_nID; }
 
 	void SetName(const char* sz);
-	const char* GetName() { return m_szname; }
+	const char* GetName() const { return m_szname; }
 
 	vector<int>& GetNodeList() { return m_Node; }
 

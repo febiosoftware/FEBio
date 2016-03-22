@@ -757,8 +757,11 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 
 void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 {
+	int nversion = m_pim->Version();
+	const char* szatt = (nversion < 0x0205 ? "set" : "nset");
+
 	// read the node set
-	FENodeSet* pns = m_pim->ParseNodeSet(tag);
+	FENodeSet* pns = m_pim->ParseNodeSet(tag, szatt);
 	if (pns == 0) throw XMLReader::InvalidTag(tag);
 }
 

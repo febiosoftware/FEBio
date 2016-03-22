@@ -913,12 +913,16 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 		pns = new FENodeSet(&mesh);
 		pns->SetName(szname);
 
+		// add the nodeset to the mesh
+		mesh.AddNodeSet(pns);
+
 		// read the nodes
-		vector<int> l;
 		if (tag.isleaf())
 		{
 			// This format is deprecated
+			vector<int> l;
 			ReadList(tag, l);
+			for (int i=0; i<l.size(); ++i) pns->add(FindNodeFromID(l[i]));
 		}
 		else
 		{
@@ -930,32 +934,35 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 				{
 					int nid = -1;
 					tag.AttributeValue("id", nid);
-					l.push_back(nid);
+
+					nid = FindNodeFromID(nid);
+					pns->add(nid);
+				}
+				else if (tag == "node_set")
+				{
+					const char* szset = tag.AttributeValue(szatt);
+					
+					// Make sure this is an empty tag
+					if (tag.isempty() == false) throw XMLReader::InvalidValue(tag);
+
+					// find the node set
+					FENodeSet* ps = mesh.FindNodeSet(szset);
+					if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, szatt, szset);
+
+					// add the node set
+					pns->add(*ps);
 				}
 				else if (tag == "node_list")
 				{
 					vector<int> nl;
 					ReadList(tag, nl);
-					l.insert(l.end(), nl.begin(), nl.end());
+					for (int i=0; i<nl.size(); ++i) pns->add(FindNodeFromID(nl[i]));
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
 			}
 			while (!tag.isend());
 		}
-
-		// only add non-empty node sets
-		if (l.empty() == false)
-		{
-			// assign indices to node set
-			int N = l.size();
-			pns->create(N);
-			for (int i=0; i<N; ++i) (*pns)[i] = FindNodeFromID(l[i]);
-
-			// add the nodeset to the mesh
-			mesh.AddNodeSet(pns);
-		}
-		else { delete pns; pns = 0; }
 	}
 
 	return pns;
