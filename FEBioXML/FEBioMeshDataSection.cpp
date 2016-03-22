@@ -45,7 +45,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			if      (strcmp(sztype, "shell thickness") == 0) ParseShellThickness(tag);
 			else if (strcmp(sztype, "fiber"          ) == 0) ParseMaterialFibers(tag);
 			else if (strcmp(sztype, "mat_axis"       ) == 0) ParseMaterialAxes  (tag);
-			else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+			else ParseMaterialData(tag, sztype);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
@@ -103,6 +103,41 @@ void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
+void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, const string& pname)
+{
+	vector<ELEMENT_DATA> data;
+	ParseElementData(tag, data, 1);
+	for (size_t i=0; i<data.size(); ++i)
+	{
+		ELEMENT_DATA& di = data[i];
+		FEElement& el = *m_pelem[di.nid];
+
+		for (int j=0; j<el.GaussPoints(); ++j)
+		{
+			FEMaterialPoint* pt = el.GetMaterialPoint(j);
+			while (pt)
+			{
+				FEParameterList& pl = pt->GetParameterList();
+				FEParam* p = pl.Find(pname.c_str());
+				if (p) 
+				{
+					if ((p->m_ndim == 1) && (p->m_itype == FE_PARAM_DOUBLE))
+					{
+						p->value<double>() = di.val[0];
+					}
+					pt = 0;
+				}
+				else
+				{
+					pt = pt->Next();
+					if (pt == 0) throw XMLReader::InvalidTag(tag);
+				}
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEBioMeshDataSection::ParseElementData(XMLTag& tag, vector<ELEMENT_DATA>& values, int nvalues)
 {
 	// get the total nr of elements
@@ -131,12 +166,12 @@ void FEBioMeshDataSection::ParseElementData(XMLTag& tag, vector<ELEMENT_DATA>& v
 			data.nval = tag.value(data.val, nvalues);
 			values.push_back(data);
 		}
-		else if (tag == "elset")
+		else if (tag == "elem_set")
 		{
-			const char* szname = tag.AttributeValue("set");
+			const char* szname = tag.AttributeValue("elset");
 			// find domain with this name
 			FEElementSet* pset = mesh.FindElementSet(szname);
-			if (pset == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szname);
+			if (pset == 0) throw XMLReader::InvalidAttributeValue(tag, "elset", szname);
 
 			double d[FEElement::MAX_NODES]; 
 			int nval = tag.value(d, nvalues);

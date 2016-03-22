@@ -20,6 +20,7 @@ protected:
 	void ParseShellThickness(XMLTag& tag);
 	void ParseMaterialFibers(XMLTag& tag);
 	void ParseMaterialAxes  (XMLTag& tag);
+	void ParseMaterialData  (XMLTag& tag, const string& name);
 
 private:
 	void ParseElementData(XMLTag& tag, vector<ELEMENT_DATA>& values, int nvalues);
