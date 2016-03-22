@@ -102,12 +102,12 @@ void FERigidSystem::Serialize(DumpStream& ar)
 				AddRigidBody(prb);
 			}
 
-			// rigid nodes
+			// rigid node sets
 			int n = 0;
 			ar >> n;
 			for (int i=0; i<n; ++i)
 			{
-				FERigidNode* prn = new FERigidNode(&m_fem);
+				FERigidNodeSet* prn = new FERigidNodeSet(&m_fem);
 				prn->Serialize(ar);
 				m_RN.push_back(prn);
 			}
@@ -185,7 +185,7 @@ void FERigidSystem::Activate()
 	// rigid nodes
 	for (int i=0; i<(int) m_RN.size(); ++i)
 	{
-		FERigidNode& rn = *m_RN[i];
+		FERigidNodeSet& rn = *m_RN[i];
 		if (rn.IsActive()) rn.Activate();
 	}
 
@@ -412,8 +412,8 @@ bool FERigidSystem::CreateObjects()
 	// assign correct rigid body ID's to rigid nodes
 	for (int i=0; i<(int) m_RN.size(); ++i)
 	{
-		FERigidNode& rn = *m_RN[i];
-		rn.rid = mrb[rn.rid];
+		FERigidNodeSet& rn = *m_RN[i];
+		rn.SetRigidID(mrb[rn.GetRigidID()]);
 	}
 
 	return true;

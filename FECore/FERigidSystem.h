@@ -49,10 +49,9 @@ public:
 	void UpdateMesh();
 
 public:
-	// rigid nodes
-	int RigidNodes() { return (int) m_RN.size(); }
-	FERigidNode* RigidNode(int i) { return m_RN[i]; }
-	void AddRigidNode(FERigidNode* prn) { m_RN.push_back(prn); }
+	int RigidNodeSets() { return (int) m_RN.size(); }
+	FERigidNodeSet* RigidNodeSet(int i) { return m_RN[i]; }
+	void AddRigidNodeSet(FERigidNodeSet* prn) { m_RN.push_back(prn); }
 
 	int FixedBCs() { return (int) m_RBC.size(); }
 	FERigidBodyFixedBC* FixedBC(int i) { return m_RBC[i]; }
@@ -76,7 +75,7 @@ protected:
 protected:
 	// Boundary/Initial conditions for rigid bodies
 	// TODO: I'd like to do something different with this. Perhaps place them in the BC or in some constraint section.
-	vector<FERigidNode*>				m_RN;	//!< rigid nodes
+	vector<FERigidNodeSet*>				m_RN;	//!< rigid node sets
 	vector<FERigidBodyFixedBC*>			m_RBC;	//!< rigid body fixed
 	vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
 	vector<FERigidBodyVelocity*>		m_RBV;	//!< rigid body initial velocities

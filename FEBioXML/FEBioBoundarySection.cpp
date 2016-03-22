@@ -930,23 +930,26 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		while (!t.isend()) { nrn++; ++t; }
 
 		++tag;
-		int id, rb;
+		int id, rb, rbp = -1;
+		FERigidNodeSet* prn = 0;
 		for (int i=0; i<nrn; ++i)
 		{
 			id = atoi(tag.AttributeValue("id"))-1;
 			rb = atoi(tag.AttributeValue("rb"))-1;
 
-			FERigidNode* prn = new FERigidNode(&fem);
-
-			prn->nid = id;
-			prn->rid = rb;
-			rigid.AddRigidNode(prn);
-
-			if (m_pim->m_nsteps > 0)
+			if ((prn == 0) || (rb != rbp))
 			{
-				GetStep()->AddModelComponent(prn);
-				prn->Deactivate();
+				prn = new FERigidNodeSet(&fem);
+				prn->SetRigidID(rb);
+				rigid.AddRigidNodeSet(prn);
+				if (m_pim->m_nsteps > 0)
+				{
+					GetStep()->AddModelComponent(prn);
+					prn->Deactivate();
+				}
+				rbp = rb;
 			}
+			prn->AddNode(id);
 
 			++tag;
 		}

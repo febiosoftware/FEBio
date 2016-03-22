@@ -1,38 +1,79 @@
 #include "stdafx.h"
 #include "RigidBC.h"
 #include "FEModel.h"
+#include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
-void FERigidNode::Activate()
+FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+{
+	m_rid = -1;
+}
+
+//-----------------------------------------------------------------------------
+FERigidNodeSet::FERigidNodeSet(const FERigidNodeSet& rs) : FEBoundaryCondition(FEBC_ID, rs.GetFEModel())
+{
+	m_rid = rs.m_rid;
+	m_node = rs.m_node;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidNodeSet::operator = (const FERigidNodeSet& rs)
+{
+	m_rid = rs.m_rid;
+	m_node = rs.m_node;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidNodeSet::AddNode(int nid)
+{
+	m_node.push_back(nid);
+}
+
+//-----------------------------------------------------------------------------
+void FERigidNodeSet::Activate()
 {
 	FEBoundaryCondition::Activate();
 	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nid);
-	node.m_rid = rid;
+	for (size_t i=0; i<m_node.size(); ++i)
+	{
+		FENode& node = mesh.Node(m_node[i]);
+		node.m_rid = m_rid;
+	}
 }
 
 //-----------------------------------------------------------------------------
-void FERigidNode::Deactivate()
+void FERigidNodeSet::SetNodeSet(FENodeSet& ns)
+{
+	int N = ns.size();
+	m_node.resize(N);
+	for (int i=0; i<N; ++i) m_node[i] = ns[i];
+}
+
+//-----------------------------------------------------------------------------
+void FERigidNodeSet::Deactivate()
 {
 	FEBoundaryCondition::Deactivate();
 	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nid);
-	node.m_rid = -1;
+	for (size_t i=0; i<m_node.size(); ++i)
+	{
+		FENode& node = mesh.Node(m_node[i]);
+		node.m_rid = -1;
+	}
 }
 
 //-----------------------------------------------------------------------------
-void FERigidNode::Serialize(DumpStream& ar)
+void FERigidNodeSet::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;
 
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << nid << rid;		
+		ar << m_node << m_rid;
 	}
 	else
 	{
-		ar >> nid >> rid;		
+		ar >> m_node >> m_rid;		
 	}
 }
 

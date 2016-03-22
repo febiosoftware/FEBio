@@ -1,22 +1,32 @@
 #pragma once
 #include "BC.h"
 
+class FENodeSet;
+
 //-----------------------------------------------------------------------------
-//! rigid node
-//! TODO: Replace this with a FERigidNodeSet class. 
-class FERigidNode : public FEBoundaryCondition
+//! rigid node set
+class FERigidNodeSet : public FEBoundaryCondition
 {
 public:
-	FERigidNode(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+	FERigidNodeSet(FEModel* pfem);
+	FERigidNodeSet(const FERigidNodeSet& rs);
+	void operator = (const FERigidNodeSet& rs);
 
 	void Serialize(DumpStream& ar);
 
 	void Activate();
 	void Deactivate();
 
+	int GetRigidID() const { return m_rid; }
+	void SetRigidID(int rid) { m_rid = rid; }
+
+	void SetNodeSet(FENodeSet& ns);
+
+	void AddNode(int nid);
+
 public:
-	int	nid;	// node number
-	int	rid;	// rigid body number
+	vector<int>		m_node;	// node number
+	int				m_rid;	// rigid body number
 };
 
 //-----------------------------------------------------------------------------

@@ -215,7 +215,8 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 	while (!t.isend()) { nrn++; ++t; }
 
 	++tag;
-	int id, rb;
+	int id, rb, rbp = -1;
+	FERigidNodeSet* prn = 0;
 	for (int i=0; i<nrn; ++i)
 	{
 		id = atoi(tag.AttributeValue("id"))-1;
@@ -224,17 +225,19 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 		// make sure we have a valid rigid body reference
 		if ((rb < 0)||(rb>=NMAT)) throw XMLReader::InvalidAttributeValue(tag, "rb", tag.AttributeValue("rb"));
 
-		FERigidNode* prn = new FERigidNode(&fem);
-
-		prn->nid = id;
-		prn->rid = rb;
-		rigid.AddRigidNode(prn);
-
-		if (m_pim->m_nsteps > 0)
+		if ((prn == 0) || (rb != rbp))
 		{
-			GetStep()->AddModelComponent(prn);
-			prn->Deactivate();
+			prn = new FERigidNodeSet(&fem);
+			prn->SetRigidID(rb);
+			rigid.AddRigidNodeSet(prn);
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddModelComponent(prn);
+				prn->Deactivate();
+			}
+			rbp = rb;
 		}
+		prn->AddNode(id);
 
 		++tag;
 	}
@@ -267,22 +270,16 @@ void FEBioContactSection::ParseRigidInterface25(XMLTag& tag)
 			FENodeSet* pns = m_pim->ParseNodeSet(tag, "nset");
 			if (pns == 0) throw XMLReader::InvalidTag(tag);
 
-			// add the nodes
-			FENodeSet& ns = *pns;
-			int N = ns.size();
-			for (int i=0; i<N; ++i)
+			// create new rigid node set
+			FERigidNodeSet* prn = new FERigidNodeSet(&fem);
+			prn->SetRigidID(rb);
+			prn->SetNodeSet(*pns);
+			rigid.AddRigidNodeSet(prn);
+
+			if (m_pim->m_nsteps > 0)
 			{
-				FERigidNode* prn = new FERigidNode(&fem);
-
-				if (m_pim->m_nsteps > 0)
-				{
-					GetStep()->AddModelComponent(prn);
-					prn->Deactivate();
-				}
-
-				prn->nid = ns[i];
-				prn->rid = rb;
-				rigid.AddRigidNode(prn);
+				GetStep()->AddModelComponent(prn);
+				prn->Deactivate();
 			}
 		}
 		else throw XMLReader::InvalidTag(tag);
