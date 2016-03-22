@@ -41,6 +41,11 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 			else if (tag == "Surface"    ) ParseSurfaceSection    (tag);
 			else if (tag == "Edge"       ) ParseEdgeSection       (tag);
 			else if (tag == "ElementSet" ) ParseElementSetSection (tag);
+			else if (tag == "DiscreteSet") 
+			{
+				if (nversion >= 0x0205) ParseDiscreteSetSection(tag);
+				else throw XMLReader::InvalidTag(tag);
+			}
 			else if (tag == "ElementData") 
 			{
 				// This section is no longer supported since 2.5 and replaced
@@ -755,6 +760,37 @@ void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 	// read the node set
 	FENodeSet* pns = m_pim->ParseNodeSet(tag);
 	if (pns == 0) throw XMLReader::InvalidTag(tag);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioGeometrySection::ParseDiscreteSetSection(XMLTag& tag)
+{
+	// get the mesh
+	FEMesh& mesh = *m_pim->GetFEMesh();
+
+	// get the name
+	const char* szname = tag.AttributeValue("name");
+
+	// create the discrete element set
+	FEDiscreteSet* ps = new FEDiscreteSet(&mesh);
+	ps->SetName(szname);
+	mesh.AddDiscreteSet(ps);
+
+	// read the node pairs
+	++tag;
+	do
+	{
+		if (tag == "nodes")
+		{
+			int n[2];
+			tag.value(n, 2);
+			n[0] -= 1; n[1] -= 1;
+			ps->add(n[0], n[1]);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------

@@ -110,6 +110,34 @@ void FENodeSet::SetName(const char* sz)
 }
 
 //=============================================================================
+// FEDiscreteSet
+//-----------------------------------------------------------------------------
+
+FEDiscreteSet::FEDiscreteSet(FEMesh* pm) : m_pmesh(pm)
+{
+
+}
+
+//-----------------------------------------------------------------------------
+void FEDiscreteSet::create(int n)
+{
+	m_pair.resize(n);
+}
+
+//-----------------------------------------------------------------------------
+void FEDiscreteSet::add(int n0, int n1)
+{
+	NodePair p = {n0, n1};
+	m_pair.push_back(p);
+}
+
+//-----------------------------------------------------------------------------
+void FEDiscreteSet::SetName(const char* sz)
+{
+	strcpy(m_szname, sz); 
+}
+
+//=============================================================================
 // FEFacetSet
 //-----------------------------------------------------------------------------
 FEFacetSet::FEFacetSet()
@@ -791,6 +819,15 @@ FENodeSet* FEMesh::FindNodeSet(const char* szname)
 FESegmentSet* FEMesh::FindSegmentSet(const char* szname)
 {
 	for (size_t i=0; i<m_LineSet.size(); ++i) if (strcmp(m_LineSet[i]->GetName(), szname) == 0) return m_LineSet[i];
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Find a discrete element set set by name
+
+FEDiscreteSet* FEMesh::FindDiscreteSet(const char* szname)
+{
+	for (size_t i=0; i<m_DiscSet.size(); ++i) if (strcmp(m_DiscSet[i]->GetName(), szname) == 0) return m_DiscSet[i];
 	return 0;
 }
 

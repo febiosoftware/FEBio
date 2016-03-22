@@ -170,6 +170,34 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+//! Defines a discrete element set (i.e. node-pairs)
+class FEDiscreteSet
+{
+public:
+	struct NodePair
+	{
+		int	n0, n1;
+	};
+
+public:
+	FEDiscreteSet(FEMesh* pm);
+	void create(int n);
+	int size() const { return m_pair.size(); }
+
+	void add(int n0, int n1);
+
+	void SetName(const char* sz);
+	const char* GetName() const { return m_szname; }
+
+	const NodePair& Element(int i) const { return m_pair[i]; }	
+
+private:
+	FEMesh*				m_pmesh;
+	vector<NodePair>	m_pair;		//!< list of discrete elements
+	char	m_szname[256];
+};
+
+//-----------------------------------------------------------------------------
 //! This class defines a set of facets. This can be used in the creation of
 //! surfaces.
 class FEFacetSet
@@ -375,6 +403,12 @@ public:
 	void AddSegmentSet(FESegmentSet* ps) { m_LineSet.push_back(ps); }
 	FESegmentSet* FindSegmentSet(const char* szname);
 
+	// --- Discrete Element Sets ---
+	int DiscreteSets() { return (int) m_DiscSet.size(); }
+	FEDiscreteSet& DiscreteSet(int n) { return *m_DiscSet[n]; }
+	void AddDiscreteSet(FEDiscreteSet* ps) { m_DiscSet.push_back(ps); }
+	FEDiscreteSet* FindDiscreteSet(const char* szname);
+
 public:
 	//! Calculate the surface representing the element boundaries
 	//! boutside : include all exterior facets
@@ -398,6 +432,7 @@ protected:
 	vector<FESegmentSet*>	m_LineSet;	//!< segment sets
 	vector<FEFacetSet*>		m_FaceSet;	//!< facet sets
 	vector<FEElementSet*>	m_ElemSet;	//!< element sets
+	vector<FEDiscreteSet*>	m_DiscSet;	//!< discrete element sets
 
 	FE_BOUNDING_BOX		m_box;	//!< bounding box
 
