@@ -857,6 +857,7 @@ void FEModel::CopyFrom(FEModel& fem)
 		pnew->m_final_time	= ps->m_final_time;
 		pnew->m_dt			= ps->m_dt;
 		pnew->m_dt0			= ps->m_dt0;
+		pnew->m_dtp         = ps->m_dtp;
 		pnew->m_tstart		= ps->m_tstart;
 		pnew->m_tend		= ps->m_tend;
 		pnew->m_bautostep	= ps->m_bautostep;

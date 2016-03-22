@@ -25,6 +25,7 @@ FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem)
 	m_final_time = 0.0;
 	m_dt = 0;
 	m_dt0 = 0;
+	m_dtp = 0;
 	m_bautostep = false;
 	m_iteopt = 11;
 	m_dtmax = m_dtmin = 0;
@@ -81,6 +82,7 @@ int FEAnalysis::ModelComponents() const
 void FEAnalysis::Reset()
 {
 	m_dt = m_dt0;
+	m_dtp = m_dt0;
 	m_ntotref    = 0;		// total nr of stiffness reformations
 	m_ntotiter   = 0;		// total nr of non-linear iterations
 	m_ntimesteps = 0;		// time steps completed
@@ -530,7 +532,7 @@ void FEAnalysis::Retry()
 
 void FEAnalysis::AutoTimeStep(int niter)
 {
-	double dtn = m_dt;
+	double dtn = m_dtp;
 	double told = m_fem.m_ftime;
 
 	// make sure the timestep size is at least the minimum
@@ -556,7 +558,7 @@ void FEAnalysis::AutoTimeStep(int niter)
 		if (scale >= 1)
 		{	
 			dtn = dtn + (dtmax - dtn)*MIN(.20, scale - 1);
-			dtn = MIN(dtn, 5.0*m_dt);
+			dtn = MIN(dtn, 5.0*m_dtp);
 			dtn = MIN(dtn, dtmax);
 		}
 		else	
@@ -572,6 +574,12 @@ void FEAnalysis::AutoTimeStep(int niter)
 		else if (dtn < m_dt)
 			felog.printf("\nAUTO STEPPER: decreasing time step, dt = %lg\n\n", dtn);
 	}
+
+	// Store this time step value. This is the value that will be used to evaluate
+	// the next time step increment. This will not include adjustments due to the must-point
+	// controller since this could create really small time steps that may be difficult to
+	// recover from. 
+	m_dtp = dtn;
 
 	// check for mustpoints
 	if (m_nmplc >= 0) dtn = CheckMustPoints(told, dtn);

@@ -44,7 +44,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	if      (tag == "title"             ) { tag.value(sztitle); fem.SetTitle(sztitle); }
 	else if (tag == "time_steps"        ) tag.value(pstep->m_ntime);
 	else if (tag == "final_time"        ) tag.value(pstep->m_final_time);
-	else if (tag == "step_size"         ) { tag.value(pstep->m_dt0); pstep->m_dt = pstep->m_dt0; }
+	else if (tag == "step_size"         ) { tag.value(pstep->m_dt0); pstep->m_dt = pstep->m_dt0; pstep->m_dtp = pstep->m_dt0; }
 	else if (tag == "optimize_bw"       ) tag.value(fem.m_bwopt);
 	else if (tag == "pressure_stiffness") tag.value(pstep->m_istiffpr);
 	else if (tag == "hourglass"         ) tag.value(fem.m_udghex_hg);
