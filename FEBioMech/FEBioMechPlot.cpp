@@ -924,7 +924,9 @@ bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotDevStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+    FEMaterial* pmm = dom.GetMaterial();
+    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
+    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
     FEUncoupledMaterial* pmu = dynamic_cast<FEUncoupledMaterial*>(pme);
     if ((pme == 0) || pme->IsRigid() || (pmu == 0)) return false;
     
