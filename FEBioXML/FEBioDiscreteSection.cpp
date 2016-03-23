@@ -201,7 +201,7 @@ void FEBioDiscreteSection::ParseDiscreteSection25(XMLTag& tag)
 						++tag;
 						do
 						{
-							if (tag == "nodes")
+							if (tag == "delem")
 							{
 								int n[2];
 								tag.value(n, 2);
