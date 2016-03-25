@@ -649,6 +649,7 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		ar << m_final_time;
 		ar << m_dt;
 		ar << m_dt0;
+		ar << m_dtp;
 		ar << m_tend;
 		ar << m_bautostep;
 		ar << m_iteopt;
@@ -693,6 +694,7 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		ar >> m_final_time;
 		ar >> m_dt;
 		ar >> m_dt0;
+		ar >> m_dtp;
 		ar >> m_tend;
 		ar >> m_bautostep;
 		ar >> m_iteopt;
