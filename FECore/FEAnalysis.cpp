@@ -521,6 +521,7 @@ void FEAnalysis::Retry()
 	// the new time step cannot be a must-point
 	m_nmust = -1;
 
+	m_dtp = dtn;
 	m_dt = dtn;
 }
 
