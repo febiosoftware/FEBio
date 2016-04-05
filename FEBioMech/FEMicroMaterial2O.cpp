@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEMicroMaterial2O.h"
-#include "FECore/FEElemElemList.h"
 #include "FECore/log.h"
 #include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
@@ -8,7 +7,6 @@
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FECore/tens3d.h"
-#include <sstream>
 
 //-----------------------------------------------------------------------------
 FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterialPoint(mp)
@@ -16,7 +14,6 @@ FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterial
 	m_tau.zero();
 	m_G.zero();
 
-	m_inf_str.zero();
 	m_inf_str_grad.zero();
 	m_E.zero();
 	m_H.zero();
@@ -95,9 +92,6 @@ FEMicroMaterial2O::FEMicroMaterial2O(FEModel* pfem) : FEElasticMaterial2O(pfem)
 	m_szbc[0] = 0;
 	m_bperiodic = false;
 
-	m_bb_x = 0.; m_bb_y = 0.; m_bb_z = 0.;
-	m_num_ext_node = 0;
-
 	AddProperty(&m_probe, "probe", false);
 }
 
@@ -115,42 +109,14 @@ FEMaterialPoint* FEMicroMaterial2O::CreateMaterialPointData()
 //-----------------------------------------------------------------------------
 bool FEMicroMaterial2O::Init()
 {
+	// initialize base class first
 	if (FEElasticMaterial::Init() == false) return false;
 
-	// load the RVE model
+	// load the master RVE model
 	FEBioImport fim;
 	if (fim.Load(m_mrve, m_szrve) == false)
 	{
 		return MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
-	}
-
-	// set the pardiso solver as default
-	m_mrve.m_nsolver = PARDISO_SOLVER;
-
-	// make sure the RVE problem doesn't output anything to a plot file
-	m_mrve.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
-
-	// create the BC's for this RVE
-	if (PrepRVE() == false) return MaterialError("An error occurred preparing RVE model");
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEMicroMaterial2O::PrepRVE()
-{
-	// find all boundar nodes
-	FindBoundaryNodes();
-
-	if (m_bperiodic == false)
-	{
-		// prep displacement BC's
-		if (PrepDisplacementBC() == false) return false;
-	}
-	else
-	{
-		// prep periodic BC's
-		if (PrepPeriodicBC() == false) return false;
 	}
 
 	// the logfile is a shared resource between the master FEM and the RVE
@@ -160,183 +126,10 @@ bool FEMicroMaterial2O::PrepRVE()
 	felog.SetMode(Logfile::NEVER);
 
 	// initialize RVE
-	if (m_mrve.Init() == false) return false;
-
-	// calculate intial RVE volume
-	m_V0 = 0;
-	double ve;
-	int nint;
-	double* w, J;
-	FEMesh& m = m_mrve.GetMesh();
-	for (int k=0; k<m.Domains(); ++k)
-	{
-		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
-		for (int i=0; i<dom.Elements(); ++i)
-		{
-			FESolidElement& el = dom.Element(i);
-			nint = el.GaussPoints();
-			w = el.GaussWeights();
-			ve = 0;
-			for (int n=0; n<nint; ++n)
-			{
-				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
-				J = dom.detJt(el, n);
-
-				ve += J*w[n];
-			}
-			m_V0 += ve;
-		}
-	}
+	if (m_mrve.Init(m_bperiodic, m_szbc) == false) return MaterialError("An error occurred preparing RVE model");
 
 	// reset the logfile mode
 	felog.SetMode(nmode);
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEMicroMaterial2O::FindBoundaryNodes()
-{
-	// first we need to find all the boundary nodes
-	FEMesh& m = m_mrve.GetMesh();
-	int N = m.Nodes();
-	m_BN.assign(N, 0);
-
-	// create the element-element list
-	FEElemElemList EEL;
-	EEL.Create(&m);
-
-	// LTE - Find the initial bounding box and center of the RVE
-	double xmin = 0.; double ymin = 0.; double zmin = 0.;
-	double xmax = 0.; double ymax = 0.; double zmax = 0.;
-	double centx = 0.; double centy = 0.; double centz = 0.;
-
-	FENode& node = m.Node(0);
-	xmin = node.m_r0.x; xmax = node.m_r0.x; 
-	ymin = node.m_r0.y; ymax = node.m_r0.y; 
-	zmin = node.m_r0.z; zmax = node.m_r0.z; 
-
-	for (int n = 1; n < N; ++n){
-		FENode& node = m.Node(n);
-
-		if (node.m_r0.x >= xmax) xmax = node.m_r0.x;
-		if (node.m_r0.x <= xmin) xmin = node.m_r0.x;
-		if (node.m_r0.y >= ymax) ymax = node.m_r0.y;
-		if (node.m_r0.y <= ymin) ymin = node.m_r0.y;
-		if (node.m_r0.z >= zmax) zmax = node.m_r0.z;
-		if (node.m_r0.z <= zmin) zmin = node.m_r0.z;
-	}
-
-	centx = xmin + (xmax - xmin)/2; centy = ymin + (ymax - ymin)/2; centz = zmin + (zmax - zmin)/2;
-	
-	// LTE - Recenter the RVE about the origin
-	for (int n = 0; n < N; ++n){
-		FENode& node = m.Node(n);
-		node.m_r0.x -= centx; node.m_r0.y -= centy; node.m_r0.z -= centz;
-		node.m_rt.x = node.m_r0.x; node.m_rt.y = node.m_r0.y; node.m_rt.z = node.m_r0.z;
-	}
-	
-	// LTE - Find the bounding box for the RVE (+/- lx, ly, lz)
-	m_bb_x = xmax - centx; m_bb_y = ymax - centy; m_bb_z = zmax - centz;
-	
-	// use the E-E list to tag all exterior nodes
-	int fn[FEElement::MAX_NODES], nf, M = 0;
-	for (int k=0; k<m.Domains(); ++k)
-	{
-		FEDomain& dom = m.Domain(k);
-		for (int i=0; i<dom.Elements(); ++i, ++M)
-		{
-			FEElement& el = dom.ElementRef(i);
-			nf = m.Faces(el);
-			for (int j=0; j<nf; ++j)
-			{
-				if (EEL.Neighbor(M, j) == 0)
-				{
-					// mark all nodes
-					int nn = m.GetFace(el, j, fn);
-					for (int k=0; k<nn; ++k)
-					{
-					FENode& node = m.Node(fn[k]);
-						
-					if (fabs(node.m_r0.x) >= 0.999*m_bb_x) m_BN[fn[k]] = 1;
-					if (fabs(node.m_r0.y) >= 0.999*m_bb_y) m_BN[fn[k]] = 1;
-					if (fabs(node.m_r0.z) >= 0.999*m_bb_z) m_BN[fn[k]] = 1;
-					}
-				}
-			}
-		}
-	}
-
-}
-
-//-----------------------------------------------------------------------------
-bool FEMicroMaterial2O::PrepDisplacementBC()
-{
-	FEMesh& m = m_mrve.GetMesh();
-	int N = m.Nodes();
-
-	// count the nr of exterior nodes
-	int NN = 0, i;
-	for (i=0; i<N; ++i) if (m_BN[i] == 1) ++NN;
-	m_num_ext_node = NN;
-
-	assert(NN > 0);
-
-	// create a load curve
-	FELoadCurve* plc = new FELoadCurve;
-	plc->SetInterpolation(FELoadCurve::LINEAR);
-	plc->Add(0.0, 0.0);
-	plc->Add(1.0, 1.0);
-	m_mrve.AddLoadCurve(plc);
-	int NLC = m_mrve.LoadCurves() - 1;
-
-	// create the DC's
-	NN = 0;
-	m_mrve.ClearBCs();
-	for (i=0; i<N; ++i)
-		if (m_BN[i] == 1)
-		{
-			for (int j=0; j<3; ++j, ++NN)
-			{
-				FEPrescribedBC* pdc = new FEPrescribedBC(&m_mrve);
-				pdc->SetDOF(j).SetLoadCurveIndex(NLC).SetScale(0.0);
-				pdc->AddNode(i);
-				m_mrve.AddPrescribedBC(pdc);
-			}
-		}
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEMicroMaterial2O::PrepPeriodicBC()
-{
-	// get the RVE mesh
-	FEMesh& m = m_mrve.GetMesh();
-
-	// create a load curve
-	FELoadCurve* plc = new FELoadCurve;
-	plc->SetInterpolation(FELoadCurve::LINEAR);
-	plc->Add(0.0, 0.0);
-	plc->Add(1.0, 1.0);
-	m_mrve.AddLoadCurve(plc);
-	int NLC = m_mrve.LoadCurves() - 1;
-
-	// find the node set that defines the corner nodes
-	FENodeSet* pset = m.FindNodeSet(m_szbc);
-	if (pset == 0) return false;
-
-	// create the DC's
-	m_mrve.ClearBCs();
-	int N = pset->size();
-	for (int i=0; i<N; ++i)
-		for (int j=0; j<3; ++j)
-		{
-			FEPrescribedBC* pdc = new FEPrescribedBC(&m_mrve);
-			pdc->SetDOF(j).SetLoadCurveIndex(NLC).SetScale(0.0);
-			pdc->AddNode((*pset)[i]);
-			m_mrve.AddPrescribedBC(pdc);
-		}
 
 	return true;
 }
@@ -349,24 +142,24 @@ void FEMicroMaterial2O::UpdateBC(FEModel& rve, mat3d& F, tens3drs& G)
 	FEMesh& m = rve.GetMesh();
 
 	// assign new DC's for the boundary nodes
-	int N = rve.PrescribedBCs()/3, i;
-	for (i=0; i<N; ++i)
+	FEPrescribedBC& dx = *rve.PrescribedBC(0);
+	FEPrescribedBC& dy = *rve.PrescribedBC(1);
+	FEPrescribedBC& dz = *rve.PrescribedBC(2);
+
+	for (int i=0; i<(int) dx.Items(); ++i)
 	{
-		FEPrescribedBC& dx = *rve.PrescribedBC(3*i  );
-		FEPrescribedBC& dy = *rve.PrescribedBC(3*i+1);
-		FEPrescribedBC& dz = *rve.PrescribedBC(3*i+2);
-
-		FENode& node = m.Node(dx.NodeID(0));
-
-		vec3d r0 = node.m_r0;
+		FENode& node = m.Node(dx.NodeID(i));
+		const vec3d& r0 = node.m_r0;
 		
-		// LTE - Apply the second order boundary conditions to the RVE problem
+		// Apply the second order boundary conditions to the RVE problem
 		vec3d r1 = F*r0 + G.contractdyad1(r0)*0.5;
 
-		dx.SetScale(r1.x - r0.x);
-		dy.SetScale(r1.y - r0.y);
-		dz.SetScale(r1.z - r0.z);
+		// set the node scale
+		dx.SetNodeScale(i, r1.x - r0.x);
+		dy.SetNodeScale(i, r1.y - r0.y);
+		dz.SetNodeScale(i, r1.z - r0.z);
 	}
+
 
 	if (m_bperiodic)
 	{
@@ -383,11 +176,6 @@ void FEMicroMaterial2O::UpdateBC(FEModel& rve, mat3d& F, tens3drs& G)
 			assert(pc);
 			pc->m_Fmacro = F;
 			pc->m_Gmacro = G;
-
-			//FE2OMicroConstraint* pmc = dynamic_cast<FE2OMicroConstraint*>(rve.NonlinearConstraint(i));
-			//assert(pmc);
-			//pmc->m_s.m_Fm = F;
-			//pmc->m_s.m_Gm = G;
 		}
 	}
 }
@@ -504,16 +292,7 @@ void FEMicroMaterial2O::AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3
 
 				vec3d x; x = node.m_rt;
 		
-				tau.d[0] += (x.x*f.x*x.x)*2.0; 
-				tau.d[1] += ((x.x*f.x*x.y + x.x*f.y*x.x + x.y*f.x*x.x)/3.)*2.0; 
-				tau.d[2] += ((x.x*f.x*x.z + x.x*f.z*x.x + x.z*f.x*x.x)/3.)*2.0;
-				tau.d[3] += ((x.x*f.y*x.y + x.y*f.x*x.y + x.y*f.y*x.x)/3.)*2.0; 
-				tau.d[4] += ((x.x*f.y*x.z + x.y*f.x*x.z + x.z*f.y*x.x + x.x*f.z*x.y + x.z*f.x*x.y + x.y*f.z*x.x)/6.)*2.0; 
-				tau.d[5] += ((x.x*f.z*x.z + x.z*f.x*x.z + x.z*f.z*x.x)/3.)*2.0;
-				tau.d[6] += (x.y*f.y*x.y)*2.0; 
-				tau.d[7] += ((x.y*f.y*x.z + x.y*f.z*x.y + x.z*f.y*x.y)/3.)*2.0;
-				tau.d[8] += ((x.y*f.z*x.z + x.z*f.y*x.z + x.z*f.z*x.y)/3.)*2.0;
-				tau.d[9] += (x.z*f.z*x.z)*2.0;
+				tau += dyad3s(x, f, x)*2.0;
 			}
 		}
 	}
@@ -543,20 +322,12 @@ void FEMicroMaterial2O::AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3
 
 		vec3d x; x = n.m_rt;
 		
-		tau.d[0] += x.x*f.x*x.x; 
-		tau.d[1] += (x.x*f.x*x.y + x.x*f.y*x.x + x.y*f.x*x.x)/3.; 
-		tau.d[2] += (x.x*f.x*x.z + x.x*f.z*x.x + x.z*f.x*x.x)/3.;
-		tau.d[3] += (x.x*f.y*x.y + x.y*f.x*x.y + x.y*f.y*x.x)/3.; 
-		tau.d[4] += (x.x*f.y*x.z + x.y*f.x*x.z + x.z*f.y*x.x + x.x*f.z*x.y + x.z*f.x*x.y + x.y*f.z*x.x)/6.; 
-		tau.d[5] += (x.x*f.z*x.z + x.z*f.x*x.z + x.z*f.z*x.x)/3.;
-		tau.d[6] += x.y*f.y*x.y; 
-		tau.d[7] += (x.y*f.y*x.z + x.y*f.z*x.y + x.z*f.y*x.y)/3.;
-		tau.d[8] += (x.y*f.z*x.z + x.z*f.y*x.z + x.z*f.z*x.y)/3.;
-		tau.d[9] += x.z*f.z*x.z; 
+		tau += dyad3s(x, f, x);
 	}
 
-	sa = s.sym() / (J*m_V0);
-	taua = tau / (2*J*m_V0);
+	double V0 = m_mrve.InitialVolume();
+	sa = s.sym() / (J*V0);
+	taua = tau / (2*J*V0);
 }
 
 //-----------------------------------------------------------------------------
@@ -634,7 +405,7 @@ void FEMicroMaterial2O::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp, ten
 				for (int j=0; j<ne; ++j)
 				{
 					FENode& nj = m.Node(el.m_node[j]);
-					if ((m_BN[el.m_node[i]] == 1) && (m_BN[el.m_node[j]] == 1))
+					if (m_mrve.IsBoundaryNode(el.m_node[i]) && m_mrve.IsBoundaryNode(el.m_node[j]))
 					{
 						// both nodes are boundary nodes
 						// so grab the element's submatrix
@@ -689,12 +460,12 @@ void FEMicroMaterial2O::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp, ten
 		}
 	}
 
-	// divide by volume																
-	c = tens4ds(D)/(pt.m_J * m_V0);
-	d = d/(2.*pt.m_J * m_V0);
-	e = e/(4.*pt.m_J * m_V0);
+	// divide by volume
+	double V0 = m_mrve.InitialVolume();
+	c = tens4ds(D)/(pt.m_J * V0);
+	d = d/(2.*pt.m_J * V0);
+	e = e/(4.*pt.m_J * V0);
 }
-
 
 //-----------------------------------------------------------------------------
 void FEMicroMaterial2O::calculate_d2O(tens5ds& d, double K[3][3], double Ri[3], double Rj[3] )
@@ -849,7 +620,6 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	tens3dls Ginvtrans = Ginv.transpose();
 	
 	// calculate infinitesimal strain
-	mmpt2O.m_inf_str = ((F.transpose() + F)*0.5 - mat3dd(1)).sym();
 	tens3d inf_strain_grad_nosym;
 
 	inf_strain_grad_nosym.d[0] =  G.d[0];
@@ -886,11 +656,11 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 
 	// calculate Green-Lagrange strain
 	mmpt2O.m_E = ((Ftrans*F - mat3dd(1))*0.5).sym();
-	mmpt2O.m_H = ((Gtrans.multiply2right(F).LStoUnsym() + G.multiply2left(Ftrans).RStoUnsym())*0.5).symm();
+	mmpt2O.m_H = (((Gtrans*F) + (Ftrans*G))*0.5).symm();
 
 	// calculate Euler-Almansi strain
 	mmpt2O.m_e = ((mat3dd(1) - Finvtrans*Finv)*0.5).sym();
-	mmpt2O.m_h = ((Ginvtrans.multiply2right(Finv).LStoUnsym() + Ginv.multiply2left(Finvtrans).RStoUnsym())*-0.5).symm();
+	mmpt2O.m_h = (((Ginvtrans*Finv) + (Finvtrans*Ginv))*-0.5).symm();
 	
 	// calculate the energy difference between macro point and RVE
 	// to verify that we have satisfied the Hill-Mandel condition
@@ -898,12 +668,12 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	tens3drs G_prev = mmpt2O.m_G_prev;
 
 	// calculate the macroscopic strain energy increment according to PK1 stress
-	mmpt2O.m_macro_energy_inc = mmpt2O.m_PK1.dotdot(pt.m_F - pt.m_F_prev) + mmpt2O.m_QK1.tripledot3rs(mmpt2O.m_G - mmpt2O.m_G_prev);
+	mmpt2O.m_macro_energy_inc = mmpt2O.m_PK1.dotdot(pt.m_F - pt.m_F_prev) + mmpt2O.m_QK1.tripledot(mmpt2O.m_G - mmpt2O.m_G_prev);
 
 	// calculate the macroscopic strain energy increment according to PK2 stress
 	/*mat3ds E_prev = ((F_prev.transpose()*F_prev - mat3dd(1))*0.5).sym();
 	tens3ds H_prev = ((G_prev.transpose().multiply2right(F).LStoUnsym() + G_prev.multiply2left(Ftrans).RStoUnsym())*0.5).symm();
-	mmpt2O.m_macro_energy_inc = mmpt2O.m_S.dotdot(mmpt2O.m_E - E_prev) + mmpt2O.m_T.tripledot3s(mmpt2O.m_H - H_prev);*/
+	mmpt2O.m_macro_energy_inc = mmpt2O.m_S.dotdot(mmpt2O.m_E - E_prev) + mmpt2O.m_T.tripledot(mmpt2O.m_H - H_prev);*/
 	
 	// calculate the macroscopic strain energy increment according to Cauchy stress
 	/*mat3d Finv_prev = F_prev.inverse();
@@ -912,7 +682,7 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	tens3drs Ginv_prev; Ginv_prev = G_prev; Ginv_prev.contractleg2(Finv_prev,1); Ginv_prev.contractleg2(Finv_prev,2); Ginv_prev.contractleg2(Finv_prev,3);
 	tens3dls Ginvtrans_prev = Ginv_prev.transpose();
 	tens3ds h_prev = ((Ginvtrans_prev.multiply2right(Finv_prev).LStoUnsym() + Ginv_prev.multiply2left(Finvtrans_prev).RStoUnsym())*-0.5).symm();
-	mmpt2O.m_macro_energy_inc = pt.m_s.dotdot(mmpt2O.m_e - e_prev) + mmpt2O.m_tau.tripledot3s(mmpt2O.m_h - h_prev);*/
+	mmpt2O.m_macro_energy_inc = pt.m_s.dotdot(mmpt2O.m_e - e_prev) + mmpt2O.m_tau.tripledot(mmpt2O.m_h - h_prev);*/
 
 	// calculate the microscopic strain energy increment
 	double rve_energy_avg = 0.;
@@ -987,7 +757,6 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	}
 
 	mmpt2O.m_micro_energy_inc = rve_energy_avg/V0;
-	//mmpt2O.m_micro_energy_inc = rve_energy_avg/v;
 }
 
 //-----------------------------------------------------------------------------
@@ -1024,26 +793,9 @@ void FEMicroMaterial2O::AveragedStress2OPK1(FEModel& rve, FEMaterialPoint &mp, m
 				// store the reaction forces on the master nodes as well?)
 				PK1 += (f & node.m_r0)*2.0;
 
-				vec3d X; X = node.m_r0;
+				vec3d X = node.m_r0;
 		
-				QK1.d[0] += 2.0*f.x*X.x*X.x; 
-				QK1.d[1] += 2.0*f.x*X.x*X.y;
-				QK1.d[2] += 2.0*f.x*X.x*X.z;
-				QK1.d[3] += 2.0*f.x*X.y*X.y;
-				QK1.d[4] += 2.0*f.x*X.y*X.z;
-				QK1.d[5] += 2.0*f.x*X.z*X.z;
-				QK1.d[6] += 2.0*f.y*X.x*X.x;
-				QK1.d[7] += 2.0*f.y*X.x*X.y;
-				QK1.d[8] += 2.0*f.y*X.x*X.z;
-				QK1.d[9] += 2.0*f.y*X.y*X.y;
-				QK1.d[10] += 2.0*f.y*X.y*X.z;
-				QK1.d[11] += 2.0*f.y*X.z*X.z;
-				QK1.d[12] += 2.0*f.z*X.x*X.x;
-				QK1.d[13] += 2.0*f.z*X.x*X.y;
-				QK1.d[14] += 2.0*f.z*X.x*X.z;
-				QK1.d[15] += 2.0*f.z*X.y*X.y;
-				QK1.d[16] += 2.0*f.z*X.y*X.z;
-				QK1.d[17] += 2.0*f.z*X.z*X.z;
+				QK1 += dyad3rs(f, X)*2.0;
 			}
 		}
 	}
@@ -1072,28 +824,12 @@ void FEMicroMaterial2O::AveragedStress2OPK1(FEModel& rve, FEMaterialPoint &mp, m
 		PK1 += f & n.m_r0;
 		vec3d X; X = n.m_r0;
 		
-		QK1.d[0] += f.x*X.x*X.x; 
-		QK1.d[1] += f.x*X.x*X.y;
-		QK1.d[2] += f.x*X.x*X.z;
-		QK1.d[3] += f.x*X.y*X.y;
-		QK1.d[4] += f.x*X.y*X.z;
-		QK1.d[5] += f.x*X.z*X.z;
-		QK1.d[6] += f.y*X.x*X.x;
-		QK1.d[7] += f.y*X.x*X.y;
-		QK1.d[8] += f.y*X.x*X.z;
-		QK1.d[9] += f.y*X.y*X.y;
-		QK1.d[10] += f.y*X.y*X.z;
-		QK1.d[11] += f.y*X.z*X.z;
-		QK1.d[12] += f.z*X.x*X.x;
-		QK1.d[13] += f.z*X.x*X.y;
-		QK1.d[14] += f.z*X.x*X.z;
-		QK1.d[15] += f.z*X.y*X.y;
-		QK1.d[16] += f.z*X.y*X.z;
-		QK1.d[17] += f.z*X.z*X.z;
+		QK1 += dyad3rs(f, X);
 	}
 
-	PK1a = PK1 / m_V0;
-	QK1a = QK1 / (2*m_V0);
+	double V0 = m_mrve.InitialVolume();
+	PK1a = PK1 / V0;
+	QK1a = QK1 / (2*V0);
 }
 
 //-----------------------------------------------------------------------------
@@ -1132,18 +868,9 @@ void FEMicroMaterial2O::AveragedStress2OPK2(FEModel& rve, FEMaterialPoint &mp, m
 				// store the reaction forces on the master nodes as well?)
 				S += (f0 & node.m_r0)*2.0;
 
-				vec3d X; X = node.m_r0;
+				vec3d X = node.m_r0;
 		
-				T.d[0] += (X.x*f0.x*X.x)*2.0; 
-				T.d[1] += ((X.x*f0.x*X.y + X.x*f0.y*X.x + X.y*f0.x*X.x)/3.)*2.0; 
-				T.d[2] += ((X.x*f0.x*X.z + X.x*f0.z*X.x + X.z*f0.x*X.x)/3.)*2.0;
-				T.d[3] += ((X.x*f0.y*X.y + X.y*f0.x*X.y + X.y*f0.y*X.x)/3.)*2.0; 
-				T.d[4] += ((X.x*f0.y*X.z + X.y*f0.x*X.z + X.z*f0.y*X.x + X.x*f0.z*X.y + X.z*f0.x*X.y + X.y*f0.z*X.x)/6.)*2.0; 
-				T.d[5] += ((X.x*f0.z*X.z + X.z*f0.x*X.z + X.z*f0.z*X.x)/3.)*2.0;
-				T.d[6] += (X.y*f0.y*X.y)*2.0; 
-				T.d[7] += ((X.y*f0.y*X.z + X.y*f0.z*X.y + X.z*f0.y*X.y)/3.)*2.0;
-				T.d[8] += ((X.y*f0.z*X.z + X.z*f0.y*X.z + X.z*f0.z*X.y)/3.)*2.0;
-				T.d[9] += (X.z*f0.z*X.z)*2.0;
+				T += dyad3s(X, f0, X)*2.0;
 			}
 		}
 	}
@@ -1172,20 +899,12 @@ void FEMicroMaterial2O::AveragedStress2OPK2(FEModel& rve, FEMaterialPoint &mp, m
 		
 		S += f0 & n.m_r0;
 
-		vec3d X; X = n.m_r0;
+		vec3d X = n.m_r0;
 		
-		T.d[0] += X.x*f0.x*X.x; 
-		T.d[1] += (X.x*f0.x*X.y + X.x*f0.y*X.x + X.y*f0.x*X.x)/3.; 
-		T.d[2] += (X.x*f0.x*X.z + X.x*f0.z*X.x + X.z*f0.x*X.x)/3.;
-		T.d[3] += (X.x*f0.y*X.y + X.y*f0.x*X.y + X.y*f0.y*X.x)/3.; 
-		T.d[4] += (X.x*f0.y*X.z + X.y*f0.x*X.z + X.z*f0.y*X.x + X.x*f0.z*X.y + X.z*f0.x*X.y + X.y*f0.z*X.x)/6.; 
-		T.d[5] += (X.x*f0.z*X.z + X.z*f0.x*X.z + X.z*f0.z*X.x)/3.;
-		T.d[6] += X.y*f0.y*X.y; 
-		T.d[7] += (X.y*f0.y*X.z + X.y*f0.z*X.y + X.z*f0.y*X.y)/3.;
-		T.d[8] += (X.y*f0.z*X.z + X.z*f0.y*X.z + X.z*f0.z*X.y)/3.;
-		T.d[9] += X.z*f0.z*X.z; 
+		T += dyad3s(X, f0, X);
 	}
 
-	Sa = S.sym() / m_V0;
-	Ta = T / (2*m_V0);
+	double V0 = m_mrve.InitialVolume();
+	Sa = S.sym() / V0;
+	Ta = T / (2*V0);
 }

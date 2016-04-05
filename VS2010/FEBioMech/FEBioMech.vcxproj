@@ -732,6 +732,7 @@
     <ClCompile Include="..\..\FEBioMech\FERigidSpring.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidWallInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERVEModel.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESlidingInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESlidingInterfaceBW.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESolidMaterial.cpp" />
@@ -916,6 +917,7 @@
     <ClInclude Include="..\..\FEBioMech\FERigidSpring.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidSurface.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidWallInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FERVEModel.h" />
     <ClInclude Include="..\..\FEBioMech\FESlidingInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FESlidingInterfaceBW.h" />
     <ClInclude Include="..\..\FEBioMech\FESolidMaterial.h" />

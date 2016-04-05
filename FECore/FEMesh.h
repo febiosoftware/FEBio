@@ -45,7 +45,7 @@ struct FE_BOUNDING_BOX
 		return d;
 	}
 
-	void operator += (vec3d r)
+	void operator += (const vec3d& r)
 	{
 		if (r.x < r0.x) r0.x = r.x;
 		if (r.y < r0.y) r0.y = r.y;

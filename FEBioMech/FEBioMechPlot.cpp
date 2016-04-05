@@ -253,7 +253,7 @@ bool FEPlotElementGnorm::Save(FEDomain& dom, FEDataStream& a)
 			}
 		}
 
-		L2_norm = (float) sqrt(Gavg.tripledot3rs(Gavg));
+		L2_norm = (float) sqrt(Gavg.tripledot(Gavg));
 
 		a.push_back(L2_norm);
 	}
@@ -389,7 +389,7 @@ bool FEPlotElementtaunorm::Save(FEDomain& dom, FEDataStream& a)
 				tau_avg += (pt2O.m_tau)*f;
 				
 				FEElasticMaterialPoint& pt = *ppt;
-				double norm = pt2O.m_G.tripledot3rs(pt2O.m_G);
+				double norm = pt2O.m_G.tripledot(pt2O.m_G);
 
 				pt2O.m_G_prev = pt2O.m_G;
 /*
@@ -400,7 +400,7 @@ bool FEPlotElementtaunorm::Save(FEDomain& dom, FEDataStream& a)
 */			}
 		}
 
-		L2_norm = (float) sqrt(tau_avg.tripledot3s(tau_avg));
+		L2_norm = (float) sqrt(tau_avg.tripledot(tau_avg));
 
 		a.push_back(L2_norm);
 	}
@@ -492,7 +492,7 @@ bool FEPlotElementQK1norm::Save(FEDomain& dom, FEDataStream& a)
 			}
 		}
 
-		L2_norm = (float) sqrt(QK1_avg.tripledot3rs(QK1_avg));
+		L2_norm = (float) sqrt(QK1_avg.tripledot(QK1_avg));
 
 		a.push_back(L2_norm);
 	}
@@ -584,7 +584,7 @@ bool FEPlotElementTnorm::Save(FEDomain& dom, FEDataStream& a)
 			}
 		}
 
-		L2_norm = (float) sqrt(T_avg.tripledot3s(T_avg));
+		L2_norm = (float) sqrt(T_avg.tripledot(T_avg));
 
 		a.push_back(L2_norm);
 	}
@@ -626,7 +626,7 @@ bool FEPlotElementinfstrnorm::Save(FEDomain& dom, FEDataStream& a)
 			}
 		}
 
-		L2_norm = (float) sqrt(inf_strain_avg.tripledot3s(inf_strain_avg));
+		L2_norm = (float) sqrt(inf_strain_avg.tripledot(inf_strain_avg));
 
 		a.push_back(L2_norm);
 	}
@@ -668,7 +668,7 @@ bool FEPlotElementGLstrnorm::Save(FEDomain& dom, FEDataStream& a)
 			}
 		}
 
-		L2_norm = (float) sqrt(Havg.tripledot3s(Havg));
+		L2_norm = (float) sqrt(Havg.tripledot(Havg));
 
 		a.push_back(L2_norm);
 	}
@@ -710,7 +710,7 @@ bool FEPlotElementEAstrnorm::Save(FEDomain& dom, FEDataStream& a)
 			}
 		}
 
-		L2_norm = (float) sqrt(havg.tripledot3s(havg));
+		L2_norm = (float) sqrt(havg.tripledot(havg));
 
 		a.push_back(L2_norm);
 	}

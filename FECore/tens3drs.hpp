@@ -1,8 +1,24 @@
 // NOTE: This file is automatically included from tens3drs.h
 // Users should not include this file manually!
 
-#include "matrix.h"
 #include "mat3d.h"
+
+inline tens3drs::tens3drs()
+{
+	zero();
+}
+	
+inline tens3drs::tens3drs(const double g)
+{
+	for (int i = 0; i < NNZ; i++)
+		d[i] = g;
+}
+
+inline tens3drs::tens3drs(double m[18])
+{
+	for (int i = 0; i < NNZ; i++)
+		d[i] = m[i];
+}
 
 // operator +
 inline tens3drs tens3drs::operator + (const tens3drs& t) const
@@ -90,13 +106,6 @@ inline tens3drs tens3drs::operator - () const
 	return s;
 }
 
-// trace
-// Note:  Not quite sure what the right trace for a 3rd order tensor is, this probably isn't it
-inline double tens3drs::tr() const
-{
-	return (d[0] + d[9] + d[17]);
-}
-
 // intialize to zero
 inline void tens3drs::zero()
 {
@@ -104,91 +113,70 @@ inline void tens3drs::zero()
 		d[i] = 0;
 }
 
-inline void tens3drs::unit()
-{
-	for (int i = 0; i < NNZ; i++)
-		if ((i == 0) || (i == 9) || (i == 17))
-			d[i] = 1.;
-		else
-			d[i] = 0;
-}
-
-// contract the right two legs by the dyad formed by a vector  xi = GijkXjXk
+// contract the right two legs by the dyad formed by a vector  xi = Gijk*Xj*Xk
 inline vec3d tens3drs::contractdyad1(const vec3d& v)
 {
     vec3d x;
-	x.x = d[0]*v.x*v.x + 2*d[1]*v.x*v.y + 2*d[2]*v.x*v.z + d[3]*v.y*v.y + 2*d[4]*v.y*v.z + d[5]*v.z*v.z;
-	x.y = d[6]*v.x*v.x + 2*d[7]*v.x*v.y + 2*d[8]*v.x*v.z + d[9]*v.y*v.y + 2*d[10]*v.y*v.z + d[11]*v.z*v.z;
+	x.x = d[ 0]*v.x*v.x + 2*d[ 1]*v.x*v.y + 2*d[ 2]*v.x*v.z + d[ 3]*v.y*v.y + 2*d[ 4]*v.y*v.z + d[ 5]*v.z*v.z;
+	x.y = d[ 6]*v.x*v.x + 2*d[ 7]*v.x*v.y + 2*d[ 8]*v.x*v.z + d[ 9]*v.y*v.y + 2*d[10]*v.y*v.z + d[11]*v.z*v.z;
 	x.z = d[12]*v.x*v.x + 2*d[13]*v.x*v.y + 2*d[14]*v.x*v.z + d[15]*v.y*v.y + 2*d[16]*v.y*v.z + d[17]*v.z*v.z;
 
 	return x;
 }
 
-// contract the right two legs by a symmetric 2o tensor  xi = GijkSjk
+// contract the right two legs by a symmetric 2o tensor  xi = Gijk*Sjk
 inline vec3d tens3drs::contract2s(const mat3ds& s)
 {
     vec3d x;
-	x.x = d[0]*s.xx() + 2*d[1]*s.xy() + 2*d[2]*s.xz() + d[3]*s.yy() + 2*d[4]*s.yz() + d[5]*s.zz();
-	x.y = d[6]*s.xx() + 2*d[7]*s.xy() + 2*d[8]*s.xz() + d[9]*s.yy() + 2*d[10]*s.yz() + d[11]*s.zz();
+	x.x = d[ 0]*s.xx() + 2*d[ 1]*s.xy() + 2*d[ 2]*s.xz() + d[ 3]*s.yy() + 2*d[ 4]*s.yz() + d[ 5]*s.zz();
+	x.y = d[ 6]*s.xx() + 2*d[ 7]*s.xy() + 2*d[ 8]*s.xz() + d[ 9]*s.yy() + 2*d[10]*s.yz() + d[11]*s.zz();
 	x.z = d[12]*s.xx() + 2*d[13]*s.xy() + 2*d[14]*s.xz() + d[15]*s.yy() + 2*d[16]*s.yz() + d[17]*s.zz();
 
 	return x;
 }
 
 // triple contraction by a similar 3o tensor m = GijkHijk
-inline double tens3drs::tripledot3rs(const tens3drs& H)
+inline double tens3drs::tripledot(const tens3drs& H)
 {
-	double m;
-	m = d[0]*H.d[0] + 2*d[1]*H.d[1] + 2*d[2]*H.d[2] + d[3]*H.d[3] + 2*d[4]*H.d[4] + d[5]*H.d[5]  + d[6]*H.d[6]  + 2*d[7]*H.d[7]  + 2*d[8]*H.d[8]  + d[9]*H.d[9]  + 2*d[10]*H.d[10]  + d[11]*H.d[11]  + d[12]*H.d[12]  + 2*d[13]*H.d[13]  + 2*d[14]*H.d[14]  + d[15]*H.d[15]  + 2*d[16]*H.d[16]  + d[17]*H.d[17];  
-
-	return m;
+	const double* h = H.d;
+	return d[0]*h[0] + 2*d[1]*h[1] + 2*d[2]*h[2] + d[3]*h[3] + 2*d[4]*h[4] + d[5]*h[5] + d[6]*h[6] + 2*d[7]*h[7] + 2*d[8]*h[8] + d[9]*h[9] 
+	+ 2*d[10]*h[10] + d[11]*h[11]  + d[12]*h[12]  + 2*d[13]*h[13]  + 2*d[14]*h[14]  + d[15]*h[15]  + 2*d[16]*h[16]  + d[17]*h[17];  
 }
 
-// contract the right two legs by the dyad formed by a vector  xi = GijkXjVk
+// contract the right two legs by the dyad formed by a vector  xi = Gijk*Vj*Wk
 inline vec3d tens3drs::contractdyad2(const vec3d& v, const vec3d& w)
 {
     vec3d x;
-	x.x = d[0]*v.x*w.x + d[1]*(v.x*w.y + v.y*w.x) + d[2]*(v.x*w.z + v.z*w.x) + d[3]*v.y*w.y + d[4]*(v.y*w.z + v.z*w.y) + d[5]*v.z*w.z;
-	x.y = d[6]*v.x*w.x + d[7]*(v.x*w.y + v.y*w.x) + d[8]*(v.x*w.z + v.z*w.x) + d[9]*v.y*w.y + d[10]*(v.y*w.z + v.z*w.y) + d[11]*v.z*w.z;
+	x.x = d[ 0]*v.x*w.x + d[ 1]*(v.x*w.y + v.y*w.x) + d[ 2]*(v.x*w.z + v.z*w.x) + d[ 3]*v.y*w.y + d[ 4]*(v.y*w.z + v.z*w.y) + d[ 5]*v.z*w.z;
+	x.y = d[ 6]*v.x*w.x + d[ 7]*(v.x*w.y + v.y*w.x) + d[ 8]*(v.x*w.z + v.z*w.x) + d[ 9]*v.y*w.y + d[10]*(v.y*w.z + v.z*w.y) + d[11]*v.z*w.z;
 	x.z = d[12]*v.x*w.x + d[13]*(v.x*w.y + v.y*w.x) + d[14]*(v.x*w.z + v.z*w.x) + d[15]*v.y*w.y + d[16]*(v.y*w.z + v.z*w.y) + d[17]*v.z*w.z;
 
 	return x;
 }
 
-// convert a RS tensor to an unsymmetric tensor class
-inline tens3d tens3drs::RStoUnsym()
+// calculates the dyadic product T_ijk = l_i*r_j*r_k
+inline tens3drs dyad3rs(const vec3d& l, const vec3d& r)
 {
-	tens3d G;
-
-	G.d[0] = d[0];
-	G.d[1] = d[1];
-	G.d[2] = d[2];
-	G.d[3] = d[1];
-	G.d[4] = d[3];
-	G.d[5] = d[4];
-	G.d[6] = d[2];
-	G.d[7] = d[4];
-	G.d[8] = d[5];
-	G.d[9] = d[6];
-	G.d[10] = d[7];
-	G.d[11] = d[8];
-	G.d[12] = d[7];
-	G.d[13] = d[9];
-	G.d[14] = d[10];
-	G.d[15] = d[8];	
-	G.d[16] = d[10];
-	G.d[17] = d[11];
-	G.d[18] = d[12];
-	G.d[19] = d[13];
-	G.d[20] = d[14];
-	G.d[21] = d[13];
-	G.d[22] = d[15];
-	G.d[23] = d[16];
-	G.d[24] = d[14];
-	G.d[25] = d[16];
-	G.d[26] = d[17];
-
-	return G;
+	tens3drs a;
+	a.d[ 0] = l.x*r.x*r.x; 
+	a.d[ 1] = l.x*r.x*r.y;
+	a.d[ 2] = l.x*r.x*r.z;
+	a.d[ 3] = l.x*r.y*r.y;
+	a.d[ 4] = l.x*r.y*r.z;
+	a.d[ 5] = l.x*r.z*r.z;
+	a.d[ 6] = l.y*r.x*r.x;
+	a.d[ 7] = l.y*r.x*r.y;
+	a.d[ 8] = l.y*r.x*r.z;
+	a.d[ 9] = l.y*r.y*r.y;
+	a.d[10] = l.y*r.y*r.z;
+	a.d[11] = l.y*r.z*r.z;
+	a.d[12] = l.z*r.x*r.x;
+	a.d[13] = l.z*r.x*r.y;
+	a.d[14] = l.z*r.x*r.z;
+	a.d[15] = l.z*r.y*r.y;
+	a.d[16] = l.z*r.y*r.z;
+	a.d[17] = l.z*r.z*r.z;
+	return a;
 }
 
 // calculate the transpose ((G_iJK)T = G_KJi)
@@ -196,21 +184,21 @@ inline tens3dls tens3drs::transpose()
 {
 	tens3dls GLC;
 
-	GLC.d[0] =  d[0];
-	GLC.d[3] =  d[1];
-	GLC.d[6] =  d[2];
-	GLC.d[9] =  d[3];
-	GLC.d[12] =  d[4];
-	GLC.d[15] =  d[5];
-	GLC.d[1] =  d[6];
-	GLC.d[4] =  d[7];
-	GLC.d[7] =  d[8];
-	GLC.d[10] =  d[9];
+	GLC.d[ 0] = d[ 0];
+	GLC.d[ 3] = d[ 1];
+	GLC.d[ 6] = d[ 2];
+	GLC.d[ 9] = d[ 3];
+	GLC.d[12] = d[ 4];
+	GLC.d[15] = d[ 5];
+	GLC.d[ 1] = d[ 6];
+	GLC.d[ 4] = d[ 7];
+	GLC.d[ 7] = d[ 8];
+	GLC.d[10] = d[ 9];
 	GLC.d[13] = d[10];
 	GLC.d[16] = d[11];
-	GLC.d[2] = d[12];
-	GLC.d[5] = d[13];
-	GLC.d[8] = d[14];
+	GLC.d[ 2] = d[12];
+	GLC.d[ 5] = d[13];
+	GLC.d[ 8] = d[14];
 	GLC.d[11] = d[15];
 	GLC.d[14] = d[16];
 	GLC.d[17] = d[17];
@@ -289,10 +277,11 @@ inline void tens3drs::contractleg2(const mat3d& F, int leg)
 }
 
 // multiply by a 2o tensor on the left (F_Ii * G_iJK)
-inline tens3drs tens3drs::multiply2left(const mat3d& F)
+inline tens3drs operator * (const mat3d& F, const tens3drs& t)
 {
 	tens3drs G;
 
+	const double* d = G.d;
 	G.d[0] = F(0,0)*d[0] + F(0,1)*d[6] + F(0,2)*d[12];
 	G.d[1] = F(0,0)*d[1] + F(0,1)*d[7] + F(0,2)*d[13];
 	G.d[2] = F(0,0)*d[2] + F(0,1)*d[8] + F(0,2)*d[14];

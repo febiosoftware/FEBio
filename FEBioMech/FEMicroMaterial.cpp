@@ -124,7 +124,6 @@ FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 	m_bperiodic = false;	// use displacement BCs by default
 
 	m_bb_x = 0.; m_bb_y = 0.; m_bb_z = 0.;
-	m_num_ext_node = 0;
 
 	AddProperty(&m_probe, "probe", false);
 }
@@ -318,7 +317,6 @@ bool FEMicroMaterial::PrepDisplacementBC()
 	// count the nr of exterior nodes
 	int NN = 0, i;
 	for (i=0; i<N; ++i) if (m_BN[i] == 1) ++NN;
-	m_num_ext_node = NN;
 
 	// Make sure we have boundary nodes
 	if (NN == 0) return false;
@@ -704,9 +702,6 @@ void FEMicroMaterial::calc_energy_diff(FEMaterialPoint& mp)
 	vec3d x = pt.m_rt;
 	vec3d X = pt.m_r0;
 
-	// calculate infinitesimal strain
-	mmpt.m_inf_str = ((F.transpose() + F)*0.5 - mat3dd(1)).sym();
-	
 	// calculate Green-Lagrange strain
 	mmpt.m_E = ((Ftrans*F - mat3dd(1))*0.5).sym();
 	

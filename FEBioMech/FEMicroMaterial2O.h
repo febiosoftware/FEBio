@@ -9,6 +9,7 @@
 #include "FECore/tens6d.h"
 #include "FE2OMicroConstraint.h"
 #include "FEMicroMaterial.h"
+#include "FERVEModel.h"
 
 //-----------------------------------------------------------------------------
 //! Material point class for the micro-material
@@ -39,7 +40,6 @@ public:
 	mat3ds     m_S;				// LTE - 2nd Piola-Kirchhoff stress
 	tens3ds    m_T;				// LTE - 2nd Piola-Kirchhoff stress moment
 
-	mat3ds     m_inf_str;		// LTE - infinitesimal strain
 	tens3ds    m_inf_str_grad;	// LTE - infinitesimal strain gradient
 	
 	mat3ds     m_E;				// LTE - Green-Lagrange strain
@@ -76,17 +76,10 @@ public:
 	~FEMicroMaterial2O(void);
 
 public:
-	char	m_szrve[256];	//!< filename for RVE file
-	char	m_szbc[256];	//!< name of nodeset defining boundary
-	bool	m_bperiodic;	//!< periodic bc flag
-	FEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
-
-protected:
-	double	m_V0;			//!< initial volume of RVE
-	vector<int> m_BN;		//!< boundary node flags
-
-	double m_bb_x; double m_bb_y; double m_bb_z;  // LTE - RVE bounding box
-	int m_num_ext_node;
+	char		m_szrve[256];	//!< filename for RVE file
+	char		m_szbc[256];	//!< name of nodeset defining boundary
+	bool		m_bperiodic;	//!< periodic bc flag
+	FERVEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
 
 public:
 	//! calculate stress at material point
@@ -104,11 +97,6 @@ public:
 	FEMaterialPoint* CreateMaterialPointData();
 
 protected:
-	bool PrepRVE();
-	bool PrepDisplacementBC();
-	bool PrepPeriodicBC();
-	void FindBoundaryNodes();
-
 	void UpdateBC(FEModel& rve, mat3d& F, tens3drs& G);
 	
 	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint &mp);

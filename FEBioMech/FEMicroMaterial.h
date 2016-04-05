@@ -46,7 +46,6 @@ public:
 	mat3ds     m_S;				// LTE - 2nd Piola-Kirchhoff stress
 	mat3d      m_PK1_prev;
 
-	mat3ds     m_inf_str;		// LTE - infinitesimal strain
 	mat3ds     m_E;				// LTE - Green-Lagrange strain
 	mat3ds     m_e;				// LTE - Euler-Almansi strain
 	
@@ -104,7 +103,6 @@ protected:
 	vector<int> m_BN;		//!< boundary node flags
 
 	double m_bb_x; double m_bb_y; double m_bb_z;  // LTE - RVE bounding box
-	int m_num_ext_node;
 
 public:
 	//! calculate stress at material point
