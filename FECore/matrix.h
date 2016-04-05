@@ -102,6 +102,13 @@ public:
 		m_pr[i][j] -= a(2,0); m_pr[i][j+1] -= a(2,1); m_pr[i][j+2] -= a(2,2);
 	}
 
+	void get(int i, int j, mat3d& a)
+	{
+		a[0][0] = m_pr[i  ][j]; a[0][1] = m_pr[i  ][j+1]; a[0][2] = m_pr[i  ][j+2];
+		a[1][0] = m_pr[i+1][j]; a[1][1] = m_pr[i+1][j+1]; a[1][2] = m_pr[i+1][j+2];
+		a[2][0] = m_pr[i+2][j]; a[2][1] = m_pr[i+2][j+1]; a[2][2] = m_pr[i+2][j+2];
+	}
+
 	// copy-lower-triangular
 	// make the matrix symmetric by copying the lower triangular part
 	void copy_lt()

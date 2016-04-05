@@ -8,14 +8,14 @@
 // Due to the major symmetry we can store this tensor as a 6x6 matrix.
 // The tensor is stored in column major order:
 //
-//     / 0   1   3   6   10   15  \
-//     |     2   4   7   11   16  |
-//     |         5   8   12   17  |
-// A = |             9   13   18  |
-//     |                 14   19  |
-//     \                      20  /
+//     / 0   1   3   6   10   15  \   / C0000  C0011  C0022  C0001  C0012  C0002 \
+//     |     2   4   7   11   16  |   |        C1111  C1122  C1101  C1112  C1102 |
+//     |         5   8   12   17  |   |               C2222  C2201  C2212  C2202 |
+// A = |             9   13   18  | = |                      C0101  C0112  C0102 |
+//     |                 14   19  |   |                             C1212  C1202 |
+//     \                      20  /   \                                    C0202 /
 //
-// Note that due to the minor symmetry we only store the upper matrix of this tensor
+// Note that due to the minor symmetry we only store the upper triangular matrix of this tensor
 //
 
 class tens4ds
@@ -24,7 +24,7 @@ public:
 	enum { NNZ = 21 };
 
 	// default constructor
-	tens4ds(){zero();}
+	tens4ds() {}
 	tens4ds(const double g)
 	{
 		d[ 0] = g;
@@ -118,8 +118,9 @@ tens4ds dyad2s(const mat3ds& a);
 tens4ds dyad2s(const mat3ds& a, const mat3ds& b);
 tens4ds dyad4s(const mat3ds& a);
 tens4ds dyad4s(const mat3ds& a, const mat3ds& b);
+tens4ds dyad4s(const vec3d& a, const mat3d& K, const vec3d& b);
 tens4ds ddots(const tens4ds& a, const tens4ds& b);
-mat3d vdotTdotv(const vec3d a, const tens4ds T, const vec3d b);
+mat3d vdotTdotv(const vec3d& a, const tens4ds& T, const vec3d& b);
 
 inline tens4ds operator * (const double g, const tens4ds& a) { return a*g; }
 

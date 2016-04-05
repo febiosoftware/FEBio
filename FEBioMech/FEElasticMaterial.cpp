@@ -12,8 +12,6 @@ FEElasticMaterialPoint::FEElasticMaterialPoint()
 	m_J = 1;
 	m_s.zero();
 	m_s0.zero();
-
-	m_F_prev.unit(); 
 }
 
 //-----------------------------------------------------------------------------

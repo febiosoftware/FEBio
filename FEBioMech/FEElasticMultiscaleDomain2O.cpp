@@ -48,14 +48,10 @@ bool FEElasticMultiscaleDomain2O::Initialize(FEModel& fem)
 			pt.m_J = defgrad(el, pt.m_F, j);
 			defhess(el, mmpt2O.m_G, j);
 
-			if (mmpt2O.m_rve_init == false)
-			{
-				mmpt2O.m_rve.CopyFrom(rve);
-				mmpt2O.m_rve.Init();
-				mmpt2O.m_rve_prev.CopyFrom(rve);
-				mmpt2O.m_rve_prev.Init();
-				mmpt2O.m_rve_init = true;
-			}
+			mmpt2O.m_F_prev = pt.m_F;
+			mmpt2O.m_G_prev = mmpt2O.m_G;
+			mmpt2O.m_rve.CopyFrom(rve);
+			mmpt2O.m_rve.Init();
 		}
 	}
 

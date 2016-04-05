@@ -1,16 +1,7 @@
 // NOTE: This file is automatically included from tens3drs.h
 // Users should not include this file manually!
 
-inline tens3d::tens3d()
-{
-	zero();
-
-}
-inline tens3d::tens3d(const double g)
-{
-	for (int i = 0; i < NNZ; i++)
-		d[i] = g;
-}
+inline tens3d::tens3d() {}
 
 inline tens3d::tens3d(double m[10])
 {

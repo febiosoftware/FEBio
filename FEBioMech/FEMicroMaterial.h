@@ -4,6 +4,7 @@
 #include "FECore/FEMaterial.h"
 #include "FEPeriodicBoundary1O.h"
 #include "FECore/FECallBack.h"
+#include "FERVEModel.h"
 
 //-----------------------------------------------------------------------------
 class FEBioPlotFile;
@@ -42,13 +43,9 @@ public:
 	void Serialize(DumpStream& ar);
 
 public:
-	mat3d      m_PK1;			// LTE - 1st Piola-Kirchhoff stress
-	mat3ds     m_S;				// LTE - 2nd Piola-Kirchhoff stress
-	mat3d      m_PK1_prev;
+	mat3ds		m_S;				// LTE - 2nd Piola-Kirchhoff stress
+	mat3d		m_F_prev;			// deformation gradient from last time step
 
-	mat3ds     m_E;				// LTE - Green-Lagrange strain
-	mat3ds     m_e;				// LTE - Euler-Almansi strain
-	
 	double     m_macro_energy;	// LTE - Macroscopic strain energy
 	double	   m_micro_energy;	// LTE - Volume-average of strain energy throughout the RVE solution
 	double	   m_energy_diff;	// LTE - Difference between macro energy and volume averaged energy of RVE (should be zero) 
@@ -56,11 +53,7 @@ public:
 	double	   m_macro_energy_inc;	// LTE - Macroscopic strain energy increment
 	double	   m_micro_energy_inc;	// LTE - Microscopic strain energy increment
 
-	bool    m_rve_init;			// LTE - Flag indicating that the rve has been initialized
-	FEModel m_rve;				// LTE - Current copy of the rve		
-	FEModel m_rve_prev;			// LTE - Previous converged state of the rve
-
-	tens4ds	m_Ka;				// LTE - Averaged rank 4 material stiffness
+	FEModel		m_rve;				// Local copy of the master rve
 };
 
 //-----------------------------------------------------------------------------
@@ -93,16 +86,10 @@ public:
 	~FEMicroMaterial(void);
 
 public:
-	char	m_szrve[256];	//!< filename for RVE file
-	char	m_szbc[256];	//!< name of nodeset defining boundary
-	bool	m_bperiodic;	//!< periodic bc flag
-	FEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
-
-protected:
-	double	m_V0;			//!< initial volume of RVE
-	vector<int> m_BN;		//!< boundary node flags
-
-	double m_bb_x; double m_bb_y; double m_bb_z;  // LTE - RVE bounding box
+	char		m_szrve[256];	//!< filename for RVE file
+	char		m_szbc[256];	//!< name of nodeset defining boundary
+	bool		m_bperiodic;	//!< periodic bc flag
+	FERVEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
 
 public:
 	//! calculate stress at material point
@@ -117,23 +104,20 @@ public:
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPointData();
 
+	// calculate the average PK1 stress
+	mat3d AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp);
+
+	// calculate the average PK2 stress
+	mat3ds AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp);
+
+	// average RVE energy
+	double micro_energy(FEModel& rve);
+
 protected:
-	bool PrepRVE();
-	bool PrepDisplacementBC();
-	bool PrepPeriodicBC();
-	void FindBoundaryNodes();
-
-	double InitVolume();
-
 	void UpdateBC(FEModel& rve, mat3d& F);
 	
 	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint& pt);
 	tens4ds AveragedStiffness(FEModel& rve, FEMaterialPoint& pt);
-
-	mat3d AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp);
-	mat3ds AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp);
-
-	void calc_energy_diff(FEMaterialPoint& pt);
 
 public:
 	int Probes() { return (int) m_probe.size(); }

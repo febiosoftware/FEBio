@@ -31,8 +31,6 @@ FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterial
 	m_Ea.zero();
 	
 	m_G_prev.zero();
-
-	m_rve_init = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -126,7 +124,7 @@ bool FEMicroMaterial2O::Init()
 	felog.SetMode(Logfile::NEVER);
 
 	// initialize RVE
-	if (m_mrve.Init(m_bperiodic, m_szbc) == false) return MaterialError("An error occurred preparing RVE model");
+	if (m_mrve.InitRVE(m_bperiodic, m_szbc) == false) return MaterialError("An error occurred preparing RVE model");
 
 	// reset the logfile mode
 	felog.SetMode(nmode);
@@ -244,7 +242,7 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp)
 	AveragedStress2O(mmpt2O.m_rve, mp, pt.m_s, mmpt2O.m_tau);
 	
 	// calculate the averaged PK1 stress
-	AveragedStress2OPK1(mmpt2O.m_rve, mp, mmpt2O.m_PK1, mmpt2O.m_QK1);
+//	AveragedStress2OPK1(mmpt2O.m_rve, mp, mmpt2O.m_PK1, mmpt2O.m_QK1);
 	
 	// calculate the averaged PK2 stress
 	AveragedStress2OPK2(mmpt2O.m_rve, mp, mmpt2O.m_S, mmpt2O.m_T);
@@ -299,7 +297,11 @@ void FEMicroMaterial2O::AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3
 
 	// get the reaction force vector from the solid solver
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
-	// the contact forces will be zero). 
+	// the contact forces will be zero).
+	FEPrescribedBC& dx = *rve.PrescribedBC(0);
+	FEPrescribedBC& dy = *rve.PrescribedBC(1);
+	FEPrescribedBC& dz = *rve.PrescribedBC(2);
+
 	const int dof_X = rve.GetDOFIndex("x");
 	const int dof_Y = rve.GetDOFIndex("y");
 	const int dof_Z = rve.GetDOFIndex("z");
@@ -307,20 +309,19 @@ void FEMicroMaterial2O::AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	int nbc = rve.PrescribedBCs();
-	
-	for (int i=0; i<nbc/3; ++i)
+
+	int N = dx.Items();
+	for (int i=0; i<N; ++i)
 	{
-		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
-		FENode& n = m.Node(dc.NodeID(0));
+		FENode& n = m.Node(dx.NodeID(i));
 		vec3d f;
 		f.x = R[-n.m_ID[dof_X]-2];
 		f.y = R[-n.m_ID[dof_Y]-2];
 		f.z = R[-n.m_ID[dof_Z]-2];
 				
-		s += f & n.m_rt;
+		s += (f & n.m_rt);
 
-		vec3d x; x = n.m_rt;
+		vec3d x = n.m_rt;
 		
 		tau += dyad3s(x, f, x);
 	}
@@ -606,7 +607,7 @@ double FEMicroMaterial2O::calc_6ds_comp(double K[3][3], double Ri[3], double Rj[
 void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 {
 	// get the deformation gradient and deformation hessian
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+/*	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
 	mat3d F = pt.m_F;
 	tens3drs G = mmpt2O.m_G;
@@ -616,7 +617,7 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 
 	mat3d Finv = F.inverse();
 	mat3d Finvtrans = Finv.transpose();
-	tens3drs Ginv; Ginv = G; Ginv.contractleg2(Finv,1); Ginv.contractleg2(Finv,2); Ginv.contractleg2(Finv,3);
+	tens3drs Ginv = G; Ginv.contractleg2(Finv,1); Ginv.contractleg2(Finv,2); Ginv.contractleg2(Finv,3);
 	tens3dls Ginvtrans = Ginv.transpose();
 	
 	// calculate infinitesimal strain
@@ -664,25 +665,25 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	
 	// calculate the energy difference between macro point and RVE
 	// to verify that we have satisfied the Hill-Mandel condition
-	mat3d F_prev = pt.m_F_prev;
+	mat3d F_prev = mmpt2O.m_F_prev;
 	tens3drs G_prev = mmpt2O.m_G_prev;
 
 	// calculate the macroscopic strain energy increment according to PK1 stress
-	mmpt2O.m_macro_energy_inc = mmpt2O.m_PK1.dotdot(pt.m_F - pt.m_F_prev) + mmpt2O.m_QK1.tripledot(mmpt2O.m_G - mmpt2O.m_G_prev);
+	mmpt2O.m_macro_energy_inc = mmpt2O.m_PK1.dotdot(pt.m_F - F_prev) + mmpt2O.m_QK1.tripledot(mmpt2O.m_G - mmpt2O.m_G_prev);
 
-	// calculate the macroscopic strain energy increment according to PK2 stress
-	/*mat3ds E_prev = ((F_prev.transpose()*F_prev - mat3dd(1))*0.5).sym();
-	tens3ds H_prev = ((G_prev.transpose().multiply2right(F).LStoUnsym() + G_prev.multiply2left(Ftrans).RStoUnsym())*0.5).symm();
-	mmpt2O.m_macro_energy_inc = mmpt2O.m_S.dotdot(mmpt2O.m_E - E_prev) + mmpt2O.m_T.tripledot(mmpt2O.m_H - H_prev);*/
-	
-	// calculate the macroscopic strain energy increment according to Cauchy stress
-	/*mat3d Finv_prev = F_prev.inverse();
-	mat3d Finvtrans_prev = Finv_prev.transpose();
-	mat3ds e_prev = ((mat3dd(1) - F_prev.transinv()*F_prev.inverse())*0.5).sym();
-	tens3drs Ginv_prev; Ginv_prev = G_prev; Ginv_prev.contractleg2(Finv_prev,1); Ginv_prev.contractleg2(Finv_prev,2); Ginv_prev.contractleg2(Finv_prev,3);
-	tens3dls Ginvtrans_prev = Ginv_prev.transpose();
-	tens3ds h_prev = ((Ginvtrans_prev.multiply2right(Finv_prev).LStoUnsym() + Ginv_prev.multiply2left(Finvtrans_prev).RStoUnsym())*-0.5).symm();
-	mmpt2O.m_macro_energy_inc = pt.m_s.dotdot(mmpt2O.m_e - e_prev) + mmpt2O.m_tau.tripledot(mmpt2O.m_h - h_prev);*/
+	//// calculate the macroscopic strain energy increment according to PK2 stress
+	///*mat3ds E_prev = ((F_prev.transpose()*F_prev - mat3dd(1))*0.5).sym();
+	//tens3ds H_prev = ((G_prev.transpose().multiply2right(F).LStoUnsym() + G_prev.multiply2left(Ftrans).RStoUnsym())*0.5).symm();
+	//mmpt2O.m_macro_energy_inc = mmpt2O.m_S.dotdot(mmpt2O.m_E - E_prev) + mmpt2O.m_T.tripledot(mmpt2O.m_H - H_prev);
+	//
+	//// calculate the macroscopic strain energy increment according to Cauchy stress
+	///*mat3d Finv_prev = F_prev.inverse();
+	//mat3d Finvtrans_prev = Finv_prev.transpose();
+	//mat3ds e_prev = ((mat3dd(1) - F_prev.transinv()*F_prev.inverse())*0.5).sym();
+	//tens3drs Ginv_prev; Ginv_prev = G_prev; Ginv_prev.contractleg2(Finv_prev,1); Ginv_prev.contractleg2(Finv_prev,2); Ginv_prev.contractleg2(Finv_prev,3);
+	//tens3dls Ginvtrans_prev = Ginv_prev.transpose();
+	//tens3ds h_prev = ((Ginvtrans_prev.multiply2right(Finv_prev).LStoUnsym() + Ginv_prev.multiply2left(Finvtrans_prev).RStoUnsym())*-0.5).symm();
+	//mmpt2O.m_macro_energy_inc = pt.m_s.dotdot(mmpt2O.m_e - e_prev) + mmpt2O.m_tau.tripledot(mmpt2O.m_h - h_prev);
 
 	// calculate the microscopic strain energy increment
 	double rve_energy_avg = 0.;
@@ -706,57 +707,119 @@ void FEMicroMaterial2O::calc_energy_diff(FEModel& rve, FEMaterialPoint& mp)
 	double v = 0.;
 
 	FEMesh& m = mmpt2O.m_rve.GetMesh();
-	FEMesh& m_prev = mmpt2O.m_rve_prev.GetMesh();
 
 	for (int k=0; k<m.Domains(); ++k)
 	{
 		FESolidDomain& dom = static_cast<FESolidDomain&>(m.Domain(k));
-		FESolidDomain& dom_prev = static_cast<FESolidDomain&>(m_prev.Domain(k));
 
 		for (int i=0; i<dom.Elements(); ++i)
 		{
 			FESolidElement& el = dom.Element(i);
-			FESolidElement& el_prev = dom_prev.Element(i);
 			
 			nint = el.GaussPoints();
 			w = el.GaussWeights();
 			
 			for (int n=0; n<nint; ++n)
 			{
-				FEElasticMaterialPoint& rve_pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
-				FEElasticMaterialPoint& rve_pt_prev = *el_prev.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+				FEMicroMaterialPoint2O& mmpt = *mp.ExtractData<FEMicroMaterialPoint2O>();
 
-				rve_F = rve_pt.m_F;
-				rve_F_prev = rve_pt_prev.m_F;
-				rve_s = rve_pt.m_s;
+				rve_F = pt.m_F;
+				rve_F_prev = mmpt.m_F_prev;
+				rve_s = pt.m_s;
 
-				// calculate microscopic strain energy according to PK1 stress
-				rve_PK1 = rve_F.det()*rve_s*rve_F.transinv();
-				J0 = dom.detJ0(el, n);		
-				V0 += J0*w[n];
-				rve_energy_avg += rve_PK1.dotdot(rve_F - rve_F_prev)*J0*w[n];
-								
-				// calculate microscopic strain energy according to PK2 stress
-				/*rve_E = ((rve_F.transpose()*rve_F - mat3dd(1))*0.5).sym();
-				rve_E_prev = ((rve_F_prev.transpose()*rve_F_prev - mat3dd(1))*0.5).sym();
-				rve_PK1 = rve_F.det()*rve_s*rve_F.transinv();
-				rve_S = (rve_F.inverse()*rve_PK1).sym();
-				J0 = dom.detJ0(el, n);		
-				V0 += J0*w[n];
-				rve_energy_avg += rve_S.dotdot(rve_E - rve_E_prev)*J0*w[n];*/
-				
-				// calculate microscopic strain energy according to Cauchy stress
-				/*rve_s = rve_pt.m_s;
-				rve_e = ((mat3dd(1) - rve_F.transinv()*rve_F.inverse())*0.5).sym();
-				rve_e_prev = ((mat3dd(1) - rve_F_prev.transinv()*rve_F_prev.inverse())*0.5).sym();
-				J = dom.detJt(el, n);		
-				v += J*w[n];		
-				rve_energy_avg += rve_s.dotdot(rve_e - rve_e_prev)*J*w[n];*/
+				//// calculate microscopic strain energy according to PK1 stress
+				//rve_PK1 = rve_F.det()*rve_s*rve_F.transinv();
+				//J0 = dom.detJ0(el, n);		
+				//V0 += J0*w[n];
+				//rve_energy_avg += rve_PK1.dotdot(rve_F - rve_F_prev)*J0*w[n];
+				//				
+				//// calculate microscopic strain energy according to PK2 stress
+				///*rve_E = ((rve_F.transpose()*rve_F - mat3dd(1))*0.5).sym();
+				//rve_E_prev = ((rve_F_prev.transpose()*rve_F_prev - mat3dd(1))*0.5).sym();
+				//rve_PK1 = rve_F.det()*rve_s*rve_F.transinv();
+				//rve_S = (rve_F.inverse()*rve_PK1).sym();
+				//J0 = dom.detJ0(el, n);		
+				//V0 += J0*w[n];
+				//rve_energy_avg += rve_S.dotdot(rve_E - rve_E_prev)*J0*w[n];
+				//
+				//// calculate microscopic strain energy according to Cauchy stress
+				///*rve_s = rve_pt.m_s;
+				//rve_e = ((mat3dd(1) - rve_F.transinv()*rve_F.inverse())*0.5).sym();
+				//rve_e_prev = ((mat3dd(1) - rve_F_prev.transinv()*rve_F_prev.inverse())*0.5).sym();
+				//J = dom.detJt(el, n);		
+				//v += J*w[n];		
+				//rve_energy_avg += rve_s.dotdot(rve_e - rve_e_prev)*J*w[n];
 			}
 		}
 	}
 
 	mmpt2O.m_micro_energy_inc = rve_energy_avg/V0;
+*/
+}
+
+
+//-----------------------------------------------------------------------------
+//! Calculate the average stress from the RVE solution.
+mat3d FEMicroMaterial2O::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	mat3d F = pt.m_F;
+	double J = pt.m_J;
+	
+	// get the RVE mesh
+	FEMesh& m = rve.GetMesh();
+
+	mat3d PK1; PK1.zero();
+
+	// for periodic BC's we take the reaction forces directly from the periodic constraints
+	if (m_bperiodic)
+	{
+		// get the reaction for from the periodic constraints
+		for (int i=0; i<3; ++i)
+		{
+			FEPeriodicBoundary1O* pbc = dynamic_cast<FEPeriodicBoundary1O*>(rve.SurfacePairInteraction(i));
+			assert(pbc);
+			FEPeriodicSurface& ss = pbc->m_ss;
+			int N = ss.Nodes();
+			for (int i=0; i<N; ++i)
+			{
+				FENode& node = ss.Node(i);
+				vec3d f = ss.m_Fr[i];
+
+				// We multiply by two since the reaction forces are only stored at the slave surface 
+				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
+				// store the reaction forces on the master nodes as well?)
+				PK1 += (f & node.m_r0)*2.0;
+			}
+		}
+	}
+
+	// get the reaction force vector from the solid solver
+	// (We also need to do this for the periodic BC, since at the prescribed nodes,
+	// the contact forces will be zero). 
+	const int dof_X = rve.GetDOFIndex("x");
+	const int dof_Y = rve.GetDOFIndex("y");
+	const int dof_Z = rve.GetDOFIndex("z");
+	FEAnalysis* pstep = rve.GetCurrentStep();
+	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
+	assert(ps);
+	vector<double>& R = ps->m_Fr;
+	FEPrescribedBC& dc = *rve.PrescribedBC(0);
+	int nitems = dc.Items();
+	for (int i=0; i<nitems; ++i)
+	{
+		FENode& n = m.Node(dc.NodeID(i));
+		vec3d f;
+		f.x = R[-n.m_ID[dof_X]-2];
+		f.y = R[-n.m_ID[dof_Y]-2];
+		f.z = R[-n.m_ID[dof_Z]-2];
+		PK1 += f & n.m_r0;
+	}
+
+	double V0 = m_mrve.InitialVolume();
+	return PK1 / V0;
 }
 
 //-----------------------------------------------------------------------------
@@ -803,6 +866,10 @@ void FEMicroMaterial2O::AveragedStress2OPK1(FEModel& rve, FEMaterialPoint &mp, m
 	// get the reaction force vector from the solid solver
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero). 
+	FEPrescribedBC& dx = *rve.PrescribedBC(0);
+	FEPrescribedBC& dy = *rve.PrescribedBC(1);
+	FEPrescribedBC& dz = *rve.PrescribedBC(2);
+
 	const int dof_X = rve.GetDOFIndex("x");
 	const int dof_Y = rve.GetDOFIndex("y");
 	const int dof_Z = rve.GetDOFIndex("z");
@@ -810,12 +877,10 @@ void FEMicroMaterial2O::AveragedStress2OPK1(FEModel& rve, FEMaterialPoint &mp, m
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	int nbc = rve.PrescribedBCs();
-	
-	for (int i=0; i<nbc/3; ++i)
+	int N = dx.Items();
+	for (int i=0; i<N; ++i)
 	{
-		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
-		FENode& n = m.Node(dc.NodeID(0));
+		FENode& n = m.Node(dx.NodeID(i));
 		vec3d f;
 		f.x = R[-n.m_ID[dof_X]-2];
 		f.y = R[-n.m_ID[dof_Y]-2];
@@ -878,6 +943,10 @@ void FEMicroMaterial2O::AveragedStress2OPK2(FEModel& rve, FEMaterialPoint &mp, m
 	// get the reaction force vector from the solid solver
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero). 
+	FEPrescribedBC& dx = *rve.PrescribedBC(0);
+	FEPrescribedBC& dy = *rve.PrescribedBC(1);
+	FEPrescribedBC& dz = *rve.PrescribedBC(2);
+
 	const int dof_X = rve.GetDOFIndex("x");
 	const int dof_Y = rve.GetDOFIndex("y");
 	const int dof_Z = rve.GetDOFIndex("z");
@@ -885,12 +954,12 @@ void FEMicroMaterial2O::AveragedStress2OPK2(FEModel& rve, FEMaterialPoint &mp, m
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	int nbc = rve.PrescribedBCs();
+
+	int N = dx.Items();
 	
-	for (int i=0; i<nbc/3; ++i)
+	for (int i=0; i<N; ++i)
 	{
-		FEPrescribedBC& dc = *rve.PrescribedBC(3*i);
-		FENode& n = m.Node(dc.NodeID(0));
+		FENode& n = m.Node(dx.NodeID(i));
 		vec3d f;
 		f.x = R[-n.m_ID[dof_X]-2];
 		f.y = R[-n.m_ID[dof_Y]-2];

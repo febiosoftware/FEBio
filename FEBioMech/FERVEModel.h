@@ -11,7 +11,7 @@ public:
 	~FERVEModel();
 
 	//! one time initialization
-	bool Init(bool bperiodic, const char* szbc);
+	bool InitRVE(bool bperiodic, const char* szbc);
 
 public:
 	//! Return the initial volume (calculated in Init)
@@ -34,7 +34,8 @@ protected:
 	bool PrepPeriodicBC(const char* szbc);
 
 private:
-	double			m_V0;	//!< initial volume
-	FE_BOUNDING_BOX	m_bb;	//!< bounding box of mesh
-	vector<int> m_BN;		//!< boundary node flags
+	double		m_V0;			//!< initial volume
+	bool		m_bperiodic;	//!< periodic BCs flag
+	FE_BOUNDING_BOX	m_bb;		//!< bounding box of mesh
+	vector<int> m_BN;			//!< boundary node flags
 };

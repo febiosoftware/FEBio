@@ -29,12 +29,13 @@ public:
 	void Serialize(DumpStream& ar);
 
 public:
+	mat3d	m_F_prev;	//!< deformation gradient at previous converged time step
+
 	tens3drs   m_G;				// LTE - Deformation Hessian
 	tens3ds    m_tau;			// LTE - Cauchy stress moment
 
 	tens3drs   m_G_prev; 		// LTE - Deformation Hessian
 
-	mat3d      m_PK1;			// LTE - 1st Piola-Kirchhoff stress
 	tens3drs   m_QK1;			// LTE - 1st Piola-Kirchhoff stress moment
 
 	mat3ds     m_S;				// LTE - 2nd Piola-Kirchhoff stress
@@ -55,9 +56,7 @@ public:
 	double	   m_macro_energy_inc;	// LTE - Macroscopic strain energy increment
 	double	   m_micro_energy_inc;	// LTE - Microscopic strain energy increment
 
-	bool m_rve_init;			// LTE - Flag indicating that the rve has been initialized
 	FEModel m_rve;				// LTE - Current copy of the rve		
-	FEModel m_rve_prev;			// LTE - Previous converged state of the rve
 
 	tens4ds	   m_Ca;			// LTE - Averaged rank 4 material stiffness
 	tens5ds    m_Da;			// LTE - Averaged rank 5 material stiffness
@@ -95,6 +94,9 @@ public:
 
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPointData();
+
+	//! calculate average PK1 stress
+	mat3d AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp);
 
 protected:
 	void UpdateBC(FEModel& rve, mat3d& F, tens3drs& G);

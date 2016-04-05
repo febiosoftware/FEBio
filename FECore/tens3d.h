@@ -24,7 +24,6 @@ public:
 public:
 	// constructors
 	tens3ds();
-	tens3ds(const double g);
 	tens3ds(double m[10]);
 
 	// arithmetic operators
@@ -69,7 +68,6 @@ public:
 public:
 	// constructors
 	tens3drs();
-	tens3drs(const double g);
 	tens3drs(double m[18]);
 
 	// arithmetic operators
@@ -119,7 +117,6 @@ public:
 public:
 	// constructors
 	tens3dls();
-	tens3dls(const double g);
 	tens3dls(double m[18]);
 
 	// arithmetic operators
@@ -164,7 +161,6 @@ public:
 public:
 	// constructors
 	tens3d();
-	tens3d(const double g);
 	tens3d(double m[10]);
 
 	// arithmetic operators

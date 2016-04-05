@@ -2,17 +2,8 @@
 // Users should not include this file manually!
 
 // default constructor
-inline tens3dls::tens3dls()
-{
-	zero();
-}
+inline tens3dls::tens3dls() {}
 	
-inline tens3dls::tens3dls(const double g)
-{
-	for (int i = 0; i < NNZ; i++)
-		d[i] = g;
-}
-
 inline tens3dls::tens3dls(double m[18])
 {
 	for (int i = 0; i < NNZ; i++)

@@ -691,6 +691,7 @@
     <ClInclude Include="..\..\FECore\mat2d.h" />
     <ClInclude Include="..\..\FECore\mat3d.h" />
     <ClInclude Include="..\..\FECore\mat3d.hpp" />
+    <ClInclude Include="..\..\FECore\mat6d.h" />
     <ClInclude Include="..\..\FECore\MathParser.h" />
     <ClInclude Include="..\..\FECore\matrix.h" />
     <ClInclude Include="..\..\FECore\MatrixProfile.h" />

@@ -3,17 +3,8 @@
 
 #include "mat3d.h"
 
-inline tens3drs::tens3drs()
-{
-	zero();
-}
+inline tens3drs::tens3drs() {}
 	
-inline tens3drs::tens3drs(const double g)
-{
-	for (int i = 0; i < NNZ; i++)
-		d[i] = g;
-}
-
 inline tens3drs::tens3drs(double m[18])
 {
 	for (int i = 0; i < NNZ; i++)

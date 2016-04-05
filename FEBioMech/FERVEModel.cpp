@@ -7,6 +7,8 @@
 //-----------------------------------------------------------------------------
 FERVEModel::FERVEModel()
 {
+	m_bperiodic = false;
+
 	// set the pardiso solver as default
 	m_nsolver = PARDISO_SOLVER;
 }
@@ -18,7 +20,7 @@ FERVEModel::~FERVEModel()
 
 //-----------------------------------------------------------------------------
 //! Initializes the RVE model and evaluates some useful quantities.
-bool FERVEModel::Init(bool bperiodic, const char* szbc)
+bool FERVEModel::InitRVE(bool bperiodic, const char* szbc)
 {
 	// make sure the RVE problem doesn't output anything to a plot file
 	GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
@@ -32,6 +34,7 @@ bool FERVEModel::Init(bool bperiodic, const char* szbc)
 
 	// generate prescribed BCs
 	// TODO: Make this part of the RVE definition
+	m_bperiodic = bperiodic;
 	if (bperiodic == false)
 	{
 		// prep displacement BC's

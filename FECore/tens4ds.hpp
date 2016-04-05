@@ -572,6 +572,42 @@ inline tens4ds ddots(const tens4ds& a, const tens4ds& b)
 }
 
 //-----------------------------------------------------------------------------
+// Evaluates the dyadic product C_ijkl = 0.25*(a_i * K_jk * b_l + perms.)
+inline tens4ds dyad4s(const vec3d& a, const mat3d& K, const vec3d& b)
+{
+	tens4ds c;
+
+	c(0,0) = a.x * K(0,0) * b.x;
+	c(1,1) = a.y * K(1,1) * b.y;
+	c(2,2) = a.z * K(2,2) * b.z;
+
+	c(0,1) = 0.5*(a.x * K(0,1) * b.y + a.y * K(1,0) * b.x);
+	c(0,2) = 0.5*(a.x * K(0,2) * b.z + a.z * K(2,0) * b.x);
+	c(1,2) = 0.5*(a.y * K(1,2) * b.z + a.z * K(2,1) * b.y);
+
+	c(0,3) = 0.25*(a.x * K(0,0) * b.y + a.x * K(0,1) * b.x + a.x * K(1,0) * b.x + a.y * K(0,0) * b.x);
+	c(0,4) = 0.25*(a.x * K(0,1) * b.z + a.x * K(0,2) * b.y + a.y * K(2,0) * b.x + a.z * K(1,0) * b.x);
+	c(0,5) = 0.25*(a.x * K(0,0) * b.z + a.x * K(0,2) * b.x + a.x * K(2,0) * b.x + a.z * K(0,0) * b.x);
+	c(1,3) = 0.25*(a.y * K(1,0) * b.y + a.y * K(1,1) * b.x + a.x * K(1,1) * b.y + a.y * K(0,1) * b.y);
+	c(1,4) = 0.25*(a.y * K(1,1) * b.z + a.y * K(1,2) * b.y + a.y * K(2,1) * b.y + a.z * K(1,1) * b.y);
+	c(1,5) = 0.25*(a.y * K(1,0) * b.z + a.y * K(1,2) * b.x + a.x * K(2,1) * b.y + a.z * K(0,1) * b.y);
+	c(2,3) = 0.25*(a.z * K(2,0) * b.y + a.z * K(2,1) * b.x + a.x * K(1,2) * b.z + a.y * K(0,2) * b.z);
+	c(2,4) = 0.25*(a.z * K(2,1) * b.z + a.z * K(2,2) * b.y + a.y * K(2,2) * b.z + a.z * K(1,2) * b.z);
+	c(2,5) = 0.25*(a.z * K(2,0) * b.z + a.z * K(2,2) * b.x + a.x * K(2,2) * b.z + a.z * K(0,2) * b.z);
+
+	c(3,3) = 0.25*(a.x * K(1,0) * b.y + a.x * K(1,1) * b.x + a.x * K(1,0) * b.y + a.y * K(0,0) * b.y);
+	c(3,4) = 0.25*(a.x * K(1,1) * b.z + a.x * K(1,2) * b.y + a.y * K(2,0) * b.y + a.z * K(1,0) * b.y);
+	c(3,5) = 0.25*(a.x * K(1,0) * b.z + a.x * K(1,2) * b.x + a.x * K(2,0) * b.y + a.z * K(0,0) * b.y);
+
+	c(4,4) = 0.25*(a.y * K(2,1) * b.z + a.y * K(2,2) * b.y + a.y * K(2,1) * b.z + a.z * K(1,1) * b.z);
+	c(4,5) = 0.25*(a.y * K(2,0) * b.z + a.y * K(2,2) * b.x + a.x * K(2,1) * b.z + a.z * K(0,1) * b.z);
+
+	c(5,5) = 0.25*(a.x * K(2,0) * b.z + a.x * K(2,2) * b.x + a.x * K(2,0) * b.z + a.z * K(0,0) * b.z);
+
+	return c;
+}
+
+//-----------------------------------------------------------------------------
 // double contraction of symmetric 4th-order tensor with a symmetric 2nd-order tensor
 // Aij = Dijkl Mkl
 inline mat3ds tens4ds::dot(const mat3ds &m) const
@@ -618,7 +654,7 @@ inline mat3ds tens4ds::dot2(const mat3d &m) const
 
 //-----------------------------------------------------------------------------
 // vdotTdotv_jk = a_i T_ijkl b_l
-inline mat3d vdotTdotv(const vec3d a, const tens4ds T, const vec3d b)
+inline mat3d vdotTdotv(const vec3d& a, const tens4ds& T, const vec3d& b)
 {
 	return mat3d(a.x*(b.x*T.d[0] + b.y*T.d[6] + b.z*T.d[15]) + a.y*(b.x*T.d[6] + b.y*T.d[9] + b.z*T.d[18]) + a.z*(b.x*T.d[15] + b.y*T.d[18] + b.z*T.d[20]),
 				 a.x*(b.y*T.d[1] + b.x*T.d[6] + b.z*T.d[10]) + a.y*(b.y*T.d[7] + b.x*T.d[9] + b.z*T.d[13]) + a.z*(b.y*T.d[16] + b.x*T.d[18] + b.z*T.d[19]),

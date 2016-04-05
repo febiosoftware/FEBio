@@ -36,14 +36,9 @@ bool FEElasticMultiscaleDomain1O::Initialize(FEModel& fem)
 			FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
 
 			// create the material point RVEs
-			if (mmpt.m_rve_init == false)
-			{
-				mmpt.m_rve.CopyFrom(rve);
-				mmpt.m_rve.Init();
-				mmpt.m_rve_prev.CopyFrom(rve);
-				mmpt.m_rve_prev.Init();
-				mmpt.m_rve_init = true;
-			}
+			mmpt.m_F_prev = pt.m_F;	// TODO: I think I can remove this line
+			mmpt.m_rve.CopyFrom(rve);
+			mmpt.m_rve.Init();
 		}
 	}
 
