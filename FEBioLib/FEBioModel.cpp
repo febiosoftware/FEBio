@@ -744,9 +744,6 @@ bool FEBioModel::Solve()
 		felog.flush();
 	}
 
-	// close the log file
-	felog.close();
-
 	// close the plot file
 	if (m_plot) m_plot->Close();
 

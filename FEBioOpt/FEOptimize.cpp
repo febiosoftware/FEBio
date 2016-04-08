@@ -13,14 +13,15 @@ FEOptimize::FEOptimize(FEModel* pfem) : FECoreTask(pfem), m_opt(*m_pfem)
 //-----------------------------------------------------------------------------
 bool FEOptimize::Init(const char* szfile)
 {
-	// TODO: the logfile has not been opened yet, so this will only get printed to the screen
-	felog.printbox("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E", "version 0.1");
-
 	// read the data from the xml input file
 	if (m_opt.Input(szfile) == false) return false;
 
 	// do initialization
+	felog.SetMode(Logfile::NEVER);
 	if (m_opt.Init() == false) return false;
+
+	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.printbox("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E", "version 0.1");
 
 	return true;
 }
