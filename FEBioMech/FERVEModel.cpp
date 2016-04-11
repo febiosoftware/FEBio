@@ -3,6 +3,7 @@
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEElemElemList.h"
 #include "FEElasticMaterial.h"
+#include "FEPeriodicBoundary1O.h"
 
 //-----------------------------------------------------------------------------
 FERVEModel::FERVEModel()
@@ -29,14 +30,14 @@ bool FERVEModel::InitRVE(bool bperiodic, const char* szbc)
 	// This also calculates the bounding box
 	CenterRVE();
 
-	// find the boundary nodes
-	FindBoundaryNodes(m_BN);
-
 	// generate prescribed BCs
 	// TODO: Make this part of the RVE definition
 	m_bperiodic = bperiodic;
 	if (bperiodic == false)
 	{
+		// find the boundary nodes
+		FindBoundaryNodes(m_BN);
+
 		// prep displacement BC's
 		if (PrepDisplacementBC() == false) return false;
 	}
@@ -209,8 +210,26 @@ bool FERVEModel::PrepDisplacementBC()
 //-----------------------------------------------------------------------------
 bool FERVEModel::PrepPeriodicBC(const char* szbc)
 {
+	// make sure the node set is valid
+	if ((szbc==0)||(szbc[0]==0)) return false;
+
 	// get the RVE mesh
 	FEMesh& m = GetMesh();
+
+	// find the node set that defines the corner nodes
+	FENodeSet* pset = m.FindNodeSet(szbc);
+	if (pset == 0) return false;
+	FENodeSet& ns = *pset;
+
+	// check the periodic constraints
+	int nc = SurfacePairInteractions();
+	if (nc != 3) return false;
+		
+	for (int i=0; i<3; ++i)
+	{
+		FEPeriodicBoundary1O* pbc = dynamic_cast<FEPeriodicBoundary1O*>(SurfacePairInteraction(i));
+		if (pbc == 0) return false;
+	}
 
 	// create a load curve
 	FELoadCurve* plc = new FELoadCurve;
@@ -220,10 +239,6 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	AddLoadCurve(plc);
 	int NLC = LoadCurves() - 1;
 
-	// find the node set that defines the corner nodes
-	FENodeSet* pset = m.FindNodeSet(szbc);
-	if (pset == 0) return false;
-
 	// create the DC's
 	ClearBCs();
 	FEPrescribedBC* pdc[3] = {0};
@@ -231,14 +246,16 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	pdc[1] = new FEPrescribedBC(this); pdc[1]->SetDOF(1).SetLoadCurveIndex(NLC).SetScale(1.0); AddPrescribedBC(pdc[1]);
 	pdc[2] = new FEPrescribedBC(this); pdc[2]->SetDOF(2).SetLoadCurveIndex(NLC).SetScale(1.0); AddPrescribedBC(pdc[2]);
 
-	int N = pset->size();
+	m_BN.assign(m.Nodes(), 0);
+
+	int N = ns.size();
 	for (int i=0; i<N; ++i)
-		for (int j=0; j<3; ++j)
-		{
-			pdc[0]->AddNode(i, 0.0);
-			pdc[1]->AddNode(i, 0.0);
-			pdc[2]->AddNode(i, 0.0);
-		}
+	{
+		m_BN[ns[i]] = 1;
+		pdc[0]->AddNode(ns[i], 0.0);
+		pdc[1]->AddNode(ns[i], 0.0);
+		pdc[2]->AddNode(ns[i], 0.0);
+	}
 
 	return true;
 }

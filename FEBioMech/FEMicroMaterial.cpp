@@ -160,10 +160,12 @@ bool FEMicroMaterial::Init()
 
 	// initialize the RVE model
 	// This also creates the necessary boundary conditions
-	if (m_mrve.InitRVE(m_bperiodic, m_szbc) == false) return MaterialError("An error occurred preparing RVE model");
+	bool bret = m_mrve.InitRVE(m_bperiodic, m_szbc); 
 
 	// reset the logfile mode
 	felog.SetMode(nmode);
+
+	if (bret == false) return MaterialError("An error occurred preparing RVE model");
 
 	return true;
 }
