@@ -12,7 +12,7 @@
 #include "FE3FieldElasticSolidDomain.h"
 #include <FECore/FERigidSystem.h>
 #include <FECore/FERigidBody.h>
-#include <FECore/rigidBC.h>
+#include <FECore/RigidBC.h>
 #include <FECore/BC.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FESurfaceLoad.h>

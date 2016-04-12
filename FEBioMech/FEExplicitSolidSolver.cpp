@@ -6,7 +6,7 @@
 #include "FEContactInterface.h"
 #include "FECore/FERigidBody.h"
 #include <FECore/FERigidSystem.h>
-#include <FECore/rigidBC.h>
+#include <FECore/RigidBC.h>
 #include <FECore/BC.h>
 #include <FECore/FESurfaceLoad.h>
 #include "FECore/log.h"
