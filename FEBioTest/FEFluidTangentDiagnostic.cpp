@@ -101,7 +101,7 @@ bool FEFluidTangentUniaxial::Init()
     int nd[4] = {0, 3, 4, 7};
     FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
     fem.AddPrescribedBC(pdc);
-    pdc->SetDOF(dof_VX).SetLoadCurveIndex(0).SetScale(m_velocity);
+    pdc->SetDOF(dof_VX).SetScale(m_velocity, 0);
     for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
     
     return true;
@@ -180,7 +180,7 @@ bool FEFluidTangentUniaxialSS::Init()
     int nd[4] = {0, 3, 4, 7};
     FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
     fem.AddPrescribedBC(pdc);
-    pdc->SetDOF(dof_vx).SetLoadCurveIndex(0).SetScale(m_velocity);
+    pdc->SetDOF(dof_vx).SetScale(m_velocity, 0);
     for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
     
     return true;

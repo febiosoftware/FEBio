@@ -56,12 +56,15 @@ void FENodalLoad::AddNodes(const FENodeSet& ns, double scale)
 }
 
 //-----------------------------------------------------------------------------
-void FENodalLoad::SetLoadCurveIndex(int lc)
+void FENodalLoad::SetLoad(double s, int lc)
 {
-	ParamString s("scale");
-	FEParam& p = *GetParameter(s);
-	p.m_nlc = lc;
-	p.m_scl = m_load;
+	m_load = s;
+	if (lc >= 0)
+	{
+		FEParam& p = *GetParameter(&m_load);
+		p.m_nlc = lc;
+		p.m_scl = m_load;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -154,9 +157,14 @@ void FEFixedBC::Deactivate()
 }
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FEPrescribedBC, FEBoundaryCondition)
+	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE, "scale");
+	ADD_PARAMETER(m_br   , FE_PARAM_BOOL  , "relative");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
 {
-	m_lc = -1;
 	m_scale = 0.0;
 	m_dof = -1;
 	m_br = false;
@@ -165,11 +173,25 @@ FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfe
 //-----------------------------------------------------------------------------
 FEPrescribedBC::FEPrescribedBC(FEModel* pfem, const FEPrescribedBC& bc) : FEBoundaryCondition(FEBC_ID, pfem)
 {
-	m_lc    = bc.m_lc;
 	m_scale = bc.m_scale;
 	m_dof   = bc.m_dof;
 	m_br    = bc.m_br;
 	m_item  = bc.m_item;
+}
+
+//-----------------------------------------------------------------------------
+// Sets the displacement scale factor. An optional load curve index can be given
+// of the load curve that will control the scale factor.
+FEPrescribedBC& FEPrescribedBC::SetScale(double s, int lc)
+{
+	m_scale = s;
+	if (lc >= 0)
+	{
+		FEParam& p = *GetParameter(&m_scale);
+		p.m_scl = m_scale;
+		p.m_nlc = lc;
+	}
+	return *this; 
 }
 
 //-----------------------------------------------------------------------------
@@ -192,16 +214,8 @@ bool FEPrescribedBC::Init()
 	// don't forget to call the base class
 	if (FEBoundaryCondition::Init() == false) return false;
 
-	// check the load curve ID
-	FEModel& fem = *GetFEModel();
-	int NLC = fem.LoadCurves();
-	if ((m_lc < -1) || (m_lc >= NLC))
-	{
-		felog.printf("ERROR: Invalid loadcurve in prescribed BC %d\n", GetID());
-		return false;
-	}
-
 	// make sure this is not a rigid node
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	int NN = mesh.Nodes();
 	for (size_t i=0; i<m_item.size(); ++i)
@@ -264,11 +278,6 @@ double FEPrescribedBC::NodeValue(int n) const
 {
 	const ITEM& it = m_item[n];
 	double val = m_scale*it.scale;
-	if (m_lc >= 0) 
-	{
-		FEModel& fem = *GetFEModel();
-		val *= fem.GetLoadCurve(m_lc)->Value();
-	}
 	if (m_br) val += it.ref;
 	return val;
 }
@@ -281,11 +290,11 @@ void FEPrescribedBC::Serialize(DumpStream& ar)
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << m_dof << m_lc << m_item << m_scale << m_br;
+		ar << m_dof << m_item << m_scale << m_br;
 	}
 	else
 	{
-		ar >> m_dof >> m_lc >> m_item >> m_scale >> m_br;
+		ar >> m_dof >> m_item >> m_scale >> m_br;
 	}
 }
 

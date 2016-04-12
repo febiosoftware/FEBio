@@ -42,12 +42,8 @@ public:
 	double NodeValue(int n) const;
 
 	//! get/set load 
-	void SetLoad(double s) { m_load = s; }
+	void SetLoad(double s, int lc = -1);
 	double GetLoad() const { return m_load; }
-
-	//! set the load curve index
-	//! this is used by the old way for setting up nodal loads
-	void SetLoadCurveIndex(int lc);
 
 	//! get/set degree of freedom
 	void SetDOF(int ndof) { m_dof = ndof; }
@@ -134,21 +130,21 @@ public:
 	void PrepStep(std::vector<double>& ui, bool brel = true);
 
 public:
-	FEPrescribedBC& SetScale(double s) { m_scale = s; return *this; }
+	FEPrescribedBC& SetScale(double s, int lc = -1);
 	FEPrescribedBC& SetDOF(int dof) { m_dof = dof; return *this; }
 	FEPrescribedBC& SetRelativeFlag(bool br) { m_br = br; return *this; }
-	FEPrescribedBC& SetLoadCurveIndex(int lc) { m_lc = lc; return *this; }
-	
+
 	void SetNodeScale(int n, double s) { m_item[n].scale = s; }
 
 	double GetScaleFactor() const { return m_scale; }
 	int GetDOF() const { return m_dof; }
 
 private:
-	double	m_scale;	//!< overall scale factor
 	int		m_dof;		//!< dof
-	int		m_lc;		//!< load curve
+	double	m_scale;	//!< overall scale factor
 	bool	m_br;		//!< flag for relative bc
 
 	vector<ITEM>	m_item;		//!< item list
+
+	DECLARE_PARAMETER_LIST();
 };

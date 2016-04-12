@@ -477,7 +477,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 
 		// create the bc
 		FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
-		pdc->SetScale(s).SetDOF(bc).SetLoadCurveIndex(lc);
+		pdc->SetScale(s, lc).SetDOF(bc);
 
 		// add this boundary condition to the current step
 		fem.AddPrescribedBC(pdc);
@@ -518,7 +518,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			tag.value(scale);
 
 			FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
-			pdc->SetDOF(bc).SetLoadCurveIndex(lc).SetScale(scale).SetRelativeFlag(br);
+			pdc->SetDOF(bc).SetScale(scale, lc).SetRelativeFlag(br);
 			pdc->AddNode(n);
 			fem.AddPrescribedBC(pdc);
 
@@ -569,7 +569,7 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 
 	// create a prescribed bc
 	FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
-	pdc->SetDOF(bc).SetLoadCurveIndex(lc).SetScale(scale).SetRelativeFlag(br);
+	pdc->SetDOF(bc).SetScale(scale, lc).SetRelativeFlag(br);
 
 	// add this boundary condition to the current step
 	fem.AddPrescribedBC(pdc);
@@ -641,40 +641,23 @@ void FEBioBoundarySection::ParseBCPrescribe25(XMLTag& tag)
 	}
 
 	// Read the parameter list
+	FEParameterList& pl = pdc->GetParameterList();
 	++tag;
 	do
 	{
-		if (tag == "scale")
+		if (m_pim->ReadParameter(tag, pl) == false)
 		{
-			// get the value
-			double scale = 1.0;
-			tag.value(scale);
+			if (tag == "node_set")
+			{
+				// find the node set
+				FENodeSet* pns = m_pim->ParseNodeSet(tag, "nset");
+				if (pns == 0) throw XMLReader::InvalidTag(tag);
 
-			// get the load curve number
-			int lc = -1;
-			sz = tag.AttributeValue("lc", true);
-			if (sz) { lc = atoi(sz) - 1; }
-
-			pdc->SetScale(scale);
-			pdc->SetLoadCurveIndex(lc);
+				// add the nodes
+				pdc->AddNodes(*pns);
+			}
+			else throw XMLReader::InvalidTag(tag);
 		}
-		else if (tag == "relative")
-		{
-			// determine whether prescribed BC is relative or absolute
-			bool br = false;
-			tag.value(br);
-			pdc->SetRelativeFlag(br);
-		}
-		else if (tag == "node_set")
-		{
-			// find the node set
-			FENodeSet* pns = m_pim->ParseNodeSet(tag, "nset");
-			if (pns == 0) throw XMLReader::InvalidTag(tag);
-
-			// add the nodes
-			pdc->AddNodes(*pns);
-		}
-		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());

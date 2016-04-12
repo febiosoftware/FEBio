@@ -183,8 +183,7 @@ void FEBioLoadsSection::ParseNodalLoad(XMLTag &tag)
 				// create new nodal force
 				FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
 				pfc->SetDOF(bc);
-				pfc->SetLoad(scale);
-				pfc->SetLoadCurveIndex(lc);	// NOTE: must be set after SetLoad(double)
+				pfc->SetLoad(scale, lc);
 				pfc->AddNode(n);
 				fem.AddNodalLoad(pfc);
 
@@ -212,8 +211,7 @@ void FEBioLoadsSection::ParseNodalLoad(XMLTag &tag)
 				// create new nodal force
 				FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
 				pfc->SetDOF(bc);
-				pfc->SetLoad(scale);
-				pfc->SetLoadCurveIndex(lc);	// NOTE: must be set after SetLoad(double)
+				pfc->SetLoad(scale, lc);
 				pfc->AddNode(n);
 				fem.AddNodalLoad(pfc);
 
@@ -251,8 +249,7 @@ void FEBioLoadsSection::ParseNodalLoad(XMLTag &tag)
 
 			FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
 			pfc->SetDOF(bc);
-			pfc->SetLoad(scale);
-			pfc->SetLoadCurveIndex(lc);	// NOTE: must be set after SetLoad(double)
+			pfc->SetLoad(scale, lc);
 			pfc->AddNode(n);
 			fem.AddNodalLoad(pfc);
 

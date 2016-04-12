@@ -126,20 +126,20 @@ bool FEMultiphasicTangentUniaxial::Init()
     int nd[4] = {1, 2, 5, 6};
     FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
     fem.AddPrescribedBC(pdc);
-    pdc->SetDOF(dof_x).SetLoadCurveIndex(0).SetScale(d);
+    pdc->SetDOF(dof_x).SetScale(d, 0);
     for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
     
     // Add a prescribed fluid pressure BC
     FEPrescribedBC* ppc = new FEPrescribedBC(&fem);
     fem.AddPrescribedBC(ppc);
-    ppc->SetDOF(dof_p).SetLoadCurveIndex(0).SetScale(pe);
+    ppc->SetDOF(dof_p).SetScale(pe, 0);
     for (i = 0; i<4; ++i) ppc->AddNode(nd[i]);
     
     // Add prescribed solute concentration BC
     for (i=0; i<nsol; ++i) {
         FEPrescribedBC* psc = new FEPrescribedBC(&fem);
         fem.AddPrescribedBC(psc);
-        psc->SetDOF(dof_c+i).SetLoadCurveIndex(0).SetScale(m_concentration);
+        psc->SetDOF(dof_c+i).SetScale(m_concentration, 0);
         for (i = 0; i<4; ++i) psc->AddNode(nd[i]);
     }
 

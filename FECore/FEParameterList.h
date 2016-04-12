@@ -173,6 +173,9 @@ public:
 	//! Add a parameter to the list
 	void AddParameter(void* pv, FEParamType type, int ndim, FEParamRange rng, double fmin, double fmax, const char* sz);
 
+	//! find a parameter using the data pointer
+	FEParam* Find(void* pv);
+
 	//! find a parameter using it's name (the safe way)
 	FEParam* Find(const char* sz);
 
@@ -247,6 +250,9 @@ public:
 
 	//! find a parameter using it's name
 	virtual FEParam* GetParameter(const ParamString& s);
+
+	//! find a parameter using a pointer to the variable
+	virtual FEParam* GetParameter(void* pv);
 
 	//! serialize parameter data
 	virtual void Serialize(DumpStream& ar);

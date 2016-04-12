@@ -194,9 +194,9 @@ bool FERVEModel::PrepDisplacementBC()
 
 	// we create three DCs, one for each displacement dof
 	FEPrescribedBC* pdc[3] = {0};
-	pdc[0] = new FEPrescribedBC(this); pdc[0]->SetDOF(0).SetLoadCurveIndex(NLC).SetScale(1.0); AddPrescribedBC(pdc[0]);
-	pdc[1] = new FEPrescribedBC(this); pdc[1]->SetDOF(1).SetLoadCurveIndex(NLC).SetScale(1.0); AddPrescribedBC(pdc[1]);
-	pdc[2] = new FEPrescribedBC(this); pdc[2]->SetDOF(2).SetLoadCurveIndex(NLC).SetScale(1.0); AddPrescribedBC(pdc[2]);
+	pdc[0] = new FEPrescribedBC(this); pdc[0]->SetDOF(0).SetScale(1.0, NLC); AddPrescribedBC(pdc[0]);
+	pdc[1] = new FEPrescribedBC(this); pdc[1]->SetDOF(1).SetScale(1.0, NLC); AddPrescribedBC(pdc[1]);
+	pdc[2] = new FEPrescribedBC(this); pdc[2]->SetDOF(2).SetScale(1.0, NLC); AddPrescribedBC(pdc[2]);
 
 	// assign the boundary nodes
 	for (i=0; i<N; ++i)
@@ -245,9 +245,9 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	// create the DC's
 	ClearBCs();
 	FEPrescribedBC* pdc[3] = {0};
-	pdc[0] = new FEPrescribedBC(this); pdc[0]->SetDOF(0).SetLoadCurveIndex(NLC).SetScale(1.0); AddPrescribedBC(pdc[0]);
-	pdc[1] = new FEPrescribedBC(this); pdc[1]->SetDOF(1).SetLoadCurveIndex(NLC).SetScale(1.0); AddPrescribedBC(pdc[1]);
-	pdc[2] = new FEPrescribedBC(this); pdc[2]->SetDOF(2).SetLoadCurveIndex(NLC).SetScale(1.0); AddPrescribedBC(pdc[2]);
+	pdc[0] = new FEPrescribedBC(this); pdc[0]->SetDOF(0).SetScale(1.0, NLC); AddPrescribedBC(pdc[0]);
+	pdc[1] = new FEPrescribedBC(this); pdc[1]->SetDOF(1).SetScale(1.0, NLC); AddPrescribedBC(pdc[1]);
+	pdc[2] = new FEPrescribedBC(this); pdc[2]->SetDOF(2).SetScale(1.0, NLC); AddPrescribedBC(pdc[2]);
 
 	// assign nodes to BCs
 	pdc[0]->AddNodes(ns, 0.0);

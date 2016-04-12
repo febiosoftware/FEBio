@@ -187,9 +187,6 @@ bool FEModel::InitBCs()
 	}
 //-->
 
-	// get the number of loadcurves
-	int NLC = LoadCurves();
-
 	// check the prescribed BC's
 	int NBC = PrescribedBCs();
 	for (int i=0; i<NBC; ++i)
@@ -613,6 +610,13 @@ bool FEModel::EvaluateAllParameterLists()
 
 		// evaluate its parameter list
 		if (EvaluateParameterList(pm) == false) return false;
+	}
+
+	// prescribed displacements
+	for (int i=0; i<(int) m_DC.size(); ++i)
+	{
+		FEParameterList& pl = m_DC[i]->GetParameterList();
+		if (EvaluateParameterList(pl) == false) return false;
 	}
 
 	// evaluate nodal loads

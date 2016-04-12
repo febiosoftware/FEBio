@@ -211,6 +211,26 @@ void FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, FEPara
 }
 
 //-----------------------------------------------------------------------------
+// Find a parameter using its data pointer
+FEParam* FEParameterList::Find(void* pv)
+{
+	FEParam* pp = 0;
+	if (m_pl.empty() == false)
+	{
+		list<FEParam>::iterator it;
+		for (it = m_pl.begin(); it != m_pl.end(); ++it)
+		{
+			if (it->m_pv == pv)
+			{
+				pp = &(*it);
+				break;
+			}
+		}
+	}
+	return pp;
+}
+
+//-----------------------------------------------------------------------------
 // This function searches the parameters in the list for a parameter
 // with the name given by the input argument
 // \param sz name of parameter to find
@@ -333,6 +353,13 @@ FEParam* FEParamContainer::GetParameter(const ParamString& s)
 {
 	FEParameterList& pl = GetParameterList();
 	return pl.Find(s.c_str());
+}
+
+//-----------------------------------------------------------------------------
+FEParam* FEParamContainer::GetParameter(void* pv)
+{
+	FEParameterList& pl = GetParameterList();
+	return pl.Find(pv);
 }
 
 //-----------------------------------------------------------------------------
