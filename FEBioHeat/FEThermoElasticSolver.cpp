@@ -6,7 +6,11 @@
 #include <FECore/log.h>
 #include <FECore/sys.h>
 #include <FECore/FEModel.h>
+#include <FECore/FEAnalysis.h>
 #include <FEBioMech/FEBodyForce.h>
+#include <FECore/FERigidSystem.h>
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEModelLoad.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list

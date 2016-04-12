@@ -2,6 +2,7 @@
 #include "FEBioMaterialSection.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! This function creates a material by checking the type attribute against

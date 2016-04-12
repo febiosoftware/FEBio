@@ -6,6 +6,7 @@
 #include "DataStore.h"
 #include "log.h"
 #include "FEModel.h"
+#include "FEAnalysis.h"
 
 //-----------------------------------------------------------------------------
 UnknownDataField::UnknownDataField(const char* sz)

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEResidualVector.h"
+#include "FECore/FERigidSystem.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/DOFS.h"
 #include "FECore/FEModel.h"

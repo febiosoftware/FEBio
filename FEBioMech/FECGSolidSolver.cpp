@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FECGSolidSolver.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEAnalysis.h"
 #include "FECore/FEMesh.h"
 #include "FECore/log.h"
 #include "FEContactInterface.h"
@@ -9,6 +10,13 @@
 #include "FEElasticDomain.h"
 #include "FEPointBodyForce.h"
 #include "FE3FieldElasticSolidDomain.h"
+#include <FECore/FERigidSystem.h>
+#include <FECore/FERigidBody.h>
+#include <FECore/rigidBC.h>
+#include <FECore/BC.h>
+#include <FECore/FEModelLoad.h>
+#include <FECore/FESurfaceLoad.h>
+#include "FECore/LoadCurve.h"
 #include "FECore/sys.h"
 
 //-----------------------------------------------------------------------------
@@ -1199,17 +1207,22 @@ void FECGSolidSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
 	int NNL = m_fem.NodalLoads();
 	for (int i = 0; i<NNL; ++i)
 	{
-		FENodalLoad& fc = *m_fem.NodalLoad(i);
+		const FENodalLoad& fc = *m_fem.NodalLoad(i);
 		if (fc.IsActive())
 		{
-			int nid = fc.m_node;	// node ID
-			int dof = fc.m_bc;		// degree of freedom
+			int dof = fc.GetDOF();
 
-			// get the nodal load value
-			double f = fc.Value();
+			int N = fc.Nodes();
+			for (int j=0; j<N; ++j)
+			{
+				int nid = fc.NodeID(j);
 
-			// assemble into residual
-			AssembleResidual(nid, dof, f, F);
+				// get the nodal load value
+				double f = fc.NodeValue(j);
+
+				// assemble into residual
+				AssembleResidual(nid, dof, f, F);
+			}
 		}
 	}
 }

@@ -1,5 +1,6 @@
 #include "FEPoroTraction.h"
 #include "FECore/FEModel.h"
+#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 FEPoroNormalTraction::LOAD::LOAD()

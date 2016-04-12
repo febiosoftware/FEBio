@@ -14,7 +14,12 @@
 #include "FECore/LinearSolver.h"
 #include "FEContactInterface.h"
 #include <FECore/FEModel.h>
+#include <FECore/FEAnalysis.h>
 #include <FECore/sys.h>
+#include <FECore/FERigidSystem.h>
+#include <FECore/RigidBC.h>
+#include <FECore/FEModelLoad.h>
+#include <FECore/LoadCurve.h>
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
@@ -1935,17 +1940,21 @@ void FESolidSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
 	int NNL = m_fem.NodalLoads();
 	for (int i=0; i<NNL; ++i)
 	{
-		FENodalLoad& fc = *m_fem.NodalLoad(i);
+		const FENodalLoad& fc = *m_fem.NodalLoad(i);
 		if (fc.IsActive())
 		{
-			int nid = fc.m_node;	// node ID
-			int dof = fc.m_bc;		// degree of freedom
+			int dof = fc.GetDOF();
+			int N = fc.Nodes();
+			for (int j=0; j<N; ++j)
+			{
+				int nid = fc.NodeID(j);
 
-			// get the nodal load value
-			double f = fc.Value();
+				// get the nodal load value
+				double f = fc.NodeValue(j);
 			
-			// assemble into residual
-			AssembleResidual(nid, dof, f, F);
+				// assemble into residual
+				AssembleResidual(nid, dof, f, F);
+			}
 		}
 	}
 }

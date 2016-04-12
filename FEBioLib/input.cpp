@@ -12,7 +12,11 @@
 #include "FEBioMix/FEMultiphasicSolver.h"
 #include "FEBioFluid/FEFluidSolver.h"
 #include "FEBioPlot/FEBioPlotFile.h"
+#include "FECore/FERigidSystem.h"
+#include "FECore/FEMaterial.h"
 #include "FECore/FERigidBody.h"
+#include "FECore/BC.h"
+#include "FECore/FEBodyLoad.h"
 #include "FECore/log.h"
 #include <string.h>
 

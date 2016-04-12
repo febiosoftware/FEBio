@@ -2,6 +2,8 @@
 #include "FEBioInitialSection.h"
 #include "FECore/FEModel.h"
 #include "FECore/DOFS.h"
+#include <FECore/FEInitialCondition.h>
+#include <FECore/FECoreKernel.h>
 
 //-----------------------------------------------------------------------------
 //! Read the Initial from the FEBio input file

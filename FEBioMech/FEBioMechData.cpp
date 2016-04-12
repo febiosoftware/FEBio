@@ -7,6 +7,7 @@
 #include "FESolidSolver2.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEAnalysis.h"
 #include "FERigidConnector.h"
 
 //-----------------------------------------------------------------------------

@@ -4,6 +4,8 @@
 #include "FEHeatTransferMaterial.h"
 #include "FEHeatSource.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEAnalysis.h"
+#include "FECore/BC.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -113,18 +115,20 @@ void FEHeatSolver::NodalFluxes(FEGlobalVector& R)
 	int ncnf = m_fem.NodalLoads();
 	for (int i=0; i<ncnf; ++i)
 	{
-		FENodalLoad& fc = *m_fem.NodalLoad(i);
-		if (fc.IsActive())
+		const FENodalLoad& fc = *m_fem.NodalLoad(i);
+		int dof = fc.GetDOF();
+		if (fc.IsActive() && (dof == dof_T))
 		{
-			int id	 = fc.m_node;	// node ID
-			int bc   = fc.m_bc;		// direction of force
-
-			FENode& node = mesh.Node(id);
-
-			int n = node.m_ID[bc];
-			if ((n >= 0) && (bc == dof_T)) 
+			int N = fc.Nodes();
+			for (int j=0; j<N; ++j)
 			{
-				R[n] = fc.Value();
+				int nid	 = fc.NodeID(j);
+				FENode& node = mesh.Node(nid);
+				int n = node.m_ID[dof];
+				if (n >= 0)
+				{
+					R[n] = fc.NodeValue(j);
+				}
 			}
 		}
 	}

@@ -10,6 +10,7 @@
 #include "FEDomain2D.h"
 #include "FEMesh.h"
 #include "FEModel.h"
+#include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
 void FEDomain2D::InitElements()

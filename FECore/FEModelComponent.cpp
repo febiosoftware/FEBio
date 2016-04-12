@@ -65,7 +65,7 @@ bool FEModelComponent::Init()
 }
 
 //-----------------------------------------------------------------------------
-bool FEModelComponent::IsActive()
+bool FEModelComponent::IsActive() const
 { 
 	return m_bactive; 
 }

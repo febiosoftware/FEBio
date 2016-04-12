@@ -2,7 +2,6 @@
 #include "FEBoundaryCondition.h"
 #include "FESurface.h"
 #include "FESolver.h"
-using namespace FECore;
 
 //-----------------------------------------------------------------------------
 class FEModel;

@@ -2,6 +2,9 @@
 #include "ObjectDataRecord.h"
 #include "FECoreKernel.h"
 #include "FEModel.h"
+#include "FERigidSystem.h"
+#include "FERigidBody.h"
+#include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
 void ObjectDataRecord::Parse(const char* szexpr)

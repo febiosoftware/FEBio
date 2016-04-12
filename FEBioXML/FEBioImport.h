@@ -22,7 +22,7 @@ public:
 	virtual void Parse(XMLTag& tag) = 0;
 
 	FEModel* GetFEModel();
-	FECore::FEAnalysis* GetStep();
+	FEAnalysis* GetStep();
 
 protected:
 	FEBioImport*	m_pim;
@@ -178,7 +178,7 @@ public:
 public:
 	FEModel* GetFEModel() { return m_pfem; }
 	FEMesh* GetFEMesh() { return m_pMesh; }
-	FECore::FEAnalysis*	GetStep();
+	FEAnalysis*	GetStep();
 
 	int Version() { return m_nversion; }
 
@@ -188,7 +188,7 @@ public:
 	void ReadList(XMLTag& tag, vector<int>& l);
 
 	FESolver* BuildSolver(const char* sztype, FEModel& fem);
-	FECore::FEAnalysis* CreateNewStep();
+	FEAnalysis* CreateNewStep();
 
 public:
 	void SetDumpfileName(const char* sz);
@@ -228,9 +228,9 @@ protected:
 	void ParseVersion(XMLTag& tag);
 
 public:
-	FEModel*			m_pfem;		//!< pointer to the fem class
-	FECore::FEAnalysis*	m_pStep;	//!< pointer to current analysis step
-	FEMesh*				m_pMesh;	//!< pointer to the mesh class
+	FEModel*		m_pfem;		//!< pointer to the fem class
+	FEAnalysis*		m_pStep;	//!< pointer to current analysis step
+	FEMesh*			m_pMesh;	//!< pointer to the mesh class
 
 public:
 	char	m_szpath[512];

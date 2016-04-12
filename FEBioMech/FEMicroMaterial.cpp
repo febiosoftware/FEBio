@@ -8,6 +8,7 @@
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include <FECore/mat6d.h>
+#include <FECore/BC.h>
 #include <sstream>
 
 //=============================================================================

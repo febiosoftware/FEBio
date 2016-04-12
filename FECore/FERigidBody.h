@@ -12,11 +12,11 @@
 #include "FE_enum.h"
 #include "vec3d.h"
 #include "quatd.h"
-#include "RigidBC.h"
 #include "FEObject.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;
+class FERigidBodyDisplacement;
 
 //-----------------------------------------------------------------------------
 //! rigid body class

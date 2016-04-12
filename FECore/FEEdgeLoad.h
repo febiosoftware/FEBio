@@ -1,6 +1,5 @@
 #pragma once
 #include "FEBoundaryCondition.h"
-using namespace FECore;
 
 //-----------------------------------------------------------------------------
 class FEEdge;

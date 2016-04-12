@@ -7,6 +7,7 @@
 #include "FEElasticShellDomain.h"
 #include "FECore/FEClosestPointProjection.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEGlobalMatrix.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

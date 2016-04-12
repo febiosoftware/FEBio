@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FERigidMaterial.h"
 #include "FECore/FEModel.h"
+#include "FECore/FERigidSystem.h"
 #include "FECore/FERigidBody.h"
 
 // define the material parameters

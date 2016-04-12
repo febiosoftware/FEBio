@@ -7,6 +7,8 @@
 //
 
 #include "FERigidConnector.h"
+#include "FECore/FERigidSystem.h"
+#include "FECore/FERigidBody.h"
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------

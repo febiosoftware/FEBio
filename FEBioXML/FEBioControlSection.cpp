@@ -3,7 +3,6 @@
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
-using namespace FECore;
 
 //-----------------------------------------------------------------------------
 void FEBioControlSection::Parse(XMLTag& tag)

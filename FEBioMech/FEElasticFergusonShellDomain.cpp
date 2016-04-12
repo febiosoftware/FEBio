@@ -12,6 +12,7 @@
 #include "FEBodyForce.h"
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
+#include <FECore/FEAnalysis.h>
 #include <math.h>
 
 //-----------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 #include "FECore/FENewtonSolver.h"
 #include "FECore/FETypes.h"
 #include "FECore/FERigidBody.h"
+#include "FECore/FEGlobalVector.h"
 
 //-----------------------------------------------------------------------------
 //! The FESolidSolver2 class solves large deformation solid mechanics problems

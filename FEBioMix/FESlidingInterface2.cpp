@@ -1,6 +1,7 @@
 #include "FESlidingInterface2.h"
 #include "FEBiphasic.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEAnalysis.h"
 #include "FECore/FENormalProjection.h"
 #include "FECore/log.h"
 

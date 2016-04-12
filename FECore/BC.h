@@ -3,28 +3,62 @@
 #include "FEGlobalVector.h"
 #include "FETypes.h"
 
-using namespace FECore;
-
 class FESolver;
+class FENodeSet;
 
 //-----------------------------------------------------------------------------
 //! Nodal load boundary condition
 class FENodalLoad : public FEBoundaryCondition
 {
+	struct ITEM
+	{
+		int		nid;	// nodal ID
+		double	scale;	// nodal scale factor
+	};
+
 public:
+	//! constructor
 	FENodalLoad(FEModel* pfem);
 
+	//! initialization
 	bool Init();
 
+	//! serialiation
 	void Serialize(DumpStream& ar);
 
-	double Value();
+	//! Add a node to the node set
+	void AddNode(int nid, double scale = 1.0);
 
-public:
-	double	m_s;		// scale factor
-	int		m_node;	// node number
-	int		m_bc;		// dof
-	int		m_lc;		// load curve
+	//! add a node set
+	void AddNodes(const FENodeSet& ns, double scale = 1.0);
+
+	//! number of nodes
+	int Nodes() const { return (int) m_item.size(); }
+
+	//! Node ID
+	int NodeID(int n) const { return m_item[n].nid; }
+
+	//! get nodal value
+	double NodeValue(int n) const;
+
+	//! get/set load 
+	void SetLoad(double s) { m_load = s; }
+	double GetLoad() const { return m_load; }
+
+	//! set the load curve index
+	//! this is used by the old way for setting up nodal loads
+	void SetLoadCurveIndex(int lc);
+
+	//! get/set degree of freedom
+	void SetDOF(int ndof) { m_dof = ndof; }
+	int GetDOF() const { return m_dof; }
+
+private:
+	double	m_load;		// applied load
+	int		m_dof;		// degree of freedom index
+	vector<ITEM>	m_item;	// item list
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
@@ -40,6 +74,9 @@ public:
 
 	//! add a node to the node set
 	void AddNode(int node);
+
+	//! add a node set
+	void AddNodes(const FENodeSet& ns);
 
 	//! set the degree of freedom that will be fixed
 	void SetDOF(int dof);
@@ -76,6 +113,8 @@ public:
 	FEPrescribedBC(FEModel* pfem, const FEPrescribedBC& bc);
 
 	void AddNode(int node, double scale = 1.0);
+	void AddNodes(const FENodeSet& s, double scale = 1.0);
+
 	int NodeID(int i) { return m_item[i].nid; }
 
 	size_t Items() const { return m_item.size(); }

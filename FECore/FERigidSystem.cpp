@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "FERigidSystem.h"
+#include "FERigidBody.h"
 #include "FEModel.h"
+#include "FEMaterial.h"
+#include "RigidBC.h"
 
 //-----------------------------------------------------------------------------
 //! constructor

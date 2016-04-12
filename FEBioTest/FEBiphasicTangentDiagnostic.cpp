@@ -11,6 +11,8 @@
 #include "FEBioLib/FEBox.h"
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSolidDomain.h"
+#include "FECore/BC.h"
+#include "FECore/LoadCurve.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

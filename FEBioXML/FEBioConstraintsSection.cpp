@@ -5,6 +5,8 @@
 #include "FEBioMech/FERigidForce.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include <FECore/FERigidSystem.h>
+#include <FECore/RigidBC.h>
 
 //=============================================================================
 //

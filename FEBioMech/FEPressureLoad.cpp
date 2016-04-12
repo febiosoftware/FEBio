@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEPressureLoad.h"
 #include "FECore/FEModel.h"
+#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 FEPressureLoad::LOAD::LOAD()

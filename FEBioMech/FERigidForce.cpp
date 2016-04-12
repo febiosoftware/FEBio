@@ -1,7 +1,11 @@
 #include "stdafx.h"
 #include "FERigidForce.h"
+#include "FECore/FERigidSystem.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEAnalysis.h"
+#include "FECore/FEMaterial.h"
+#include "FECore/LoadCurve.h"
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FERigidAxialForce, FEModelLoad);

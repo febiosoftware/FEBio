@@ -17,6 +17,7 @@
 #include "DOFS.h"
 #include "FEElemElemList.h"
 #include "FEElementList.h"
+#include "FESurface.h"
 
 //=============================================================================
 // FENode

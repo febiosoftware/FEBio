@@ -1,6 +1,8 @@
 #include "FEFluidFlux.h"
 #include "FECore/FESolver.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEAnalysis.h"
+#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 FEFluidFlux::LOAD::LOAD()

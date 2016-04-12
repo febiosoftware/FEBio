@@ -1,5 +1,6 @@
 #include "FEHeatFlux.h"
 #include "FECore/FEModel.h"
+#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 FEHeatFlux::LOAD::LOAD()

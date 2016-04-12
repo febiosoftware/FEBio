@@ -2,6 +2,7 @@
 #include "FEStickyInterface.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEClosestPointProjection.h"
+#include "FECore/FEGlobalMatrix.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

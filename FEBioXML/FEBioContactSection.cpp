@@ -4,6 +4,8 @@
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEModel.h>
+#include <FECore/FERigidSystem.h>
+#include <FECore/RigidBC.h>
 
 //-----------------------------------------------------------------------------
 //! Parse the Contact section (new in version 2.0)

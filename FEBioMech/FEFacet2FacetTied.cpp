@@ -2,6 +2,7 @@
 #include "FEFacet2FacetTied.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEClosestPointProjection.h"
+#include "FECore/FEGlobalMatrix.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

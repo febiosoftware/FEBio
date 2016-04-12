@@ -4,6 +4,7 @@
 #include "FECore/DOFS.h"
 #include "NumCore/LUSolver.h"
 #include <FECore/FEModel.h>
+#include <FECore/FEAnalysis.h>
 #include <FECore/sys.h>
 
 //-----------------------------------------------------------------------------

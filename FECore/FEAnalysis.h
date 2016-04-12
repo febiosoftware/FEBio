@@ -1,5 +1,4 @@
 #pragma once
-#include "FEBoundaryCondition.h"
 #include "FESurfacePairInteraction.h"
 #include "FENLConstraint.h"
 #include <vector>
@@ -9,8 +8,7 @@ class FEModel;
 class FESolver;
 class FEDomain;
 class DumpStream;
-
-namespace FECore {
+class FEBoundaryCondition;
 
 //-----------------------------------------------------------------------------
 //! Base class for finite element analysis
@@ -174,5 +172,3 @@ protected:
 
 public:
 };
-
-} // namespace FECore

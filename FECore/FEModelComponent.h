@@ -34,7 +34,7 @@ public:
 
 	//-----------------------------------------------------------------------------------
 	//! This function checks if the component is active in the current step. 
-	bool IsActive();
+	bool IsActive() const;
 
 	//-----------------------------------------------------------------------------------
 	//! Activate the component.

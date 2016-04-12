@@ -19,6 +19,7 @@
 #include "FEMicroMaterial2O.h"
 #include "FEFacet2FacetSliding.h"
 #include "FEMortarSlidingContact.h"
+#include <FECore/FERigidSystem.h>
 
 //=============================================================================
 //                            N O D E   D A T A

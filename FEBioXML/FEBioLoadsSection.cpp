@@ -3,6 +3,9 @@
 #include "FEBioMech/FEPointBodyForce.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include "FECore/BC.h"
+#include "FECore/FESurfaceLoad.h"
+#include "FECore/FEEdgeLoad.h"
 
 //-----------------------------------------------------------------------------
 //!  Parses the loads section from the xml file (version 1.2 or up)
@@ -17,16 +20,21 @@ void FEBioLoadsSection::Parse(XMLTag& tag)
 	++tag;
 	do
 	{
-		if (m_pim->Version() < 0x0200)
+		int nversion = m_pim->Version();
+		if (nversion < 0x0200)
 		{
-			if      (tag == "force"      ) ParseBCForce  (tag);
+			if      (tag == "force"      ) ParseNodalLoad(tag);
 			else if (tag == "body_force" ) ParseBodyForce(tag);
 			else if (tag == "heat_source") ParseBodyLoad (tag);
 			else ParseSurfaceLoad(tag);
 		}
 		else
 		{
-			if      (tag == "nodal_load"  ) ParseBCForce      (tag);
+			if      (tag == "nodal_load"  )
+			{
+				if (nversion < 0x0205) ParseNodalLoad(tag);
+				else ParseNodalLoad25(tag);
+			}
 			else if (tag == "surface_load") ParseSurfaceLoad20(tag);
 			else if (tag == "edge_load"   ) ParseEdgeLoad     (tag);
 			else if (tag == "body_load"   ) ParseBodyLoad20   (tag);
@@ -131,7 +139,7 @@ void FEBioLoadsSection::ParseBodyLoad20(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
+void FEBioLoadsSection::ParseNodalLoad(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -174,10 +182,10 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 				int n = ns[i];
 				// create new nodal force
 				FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
-				pfc->m_node = n;
-				pfc->m_bc = bc;
-				pfc->m_lc = lc;
-				pfc->m_s = scale;
+				pfc->SetDOF(bc);
+				pfc->SetLoad(scale);
+				pfc->SetLoadCurveIndex(lc);	// NOTE: must be set after SetLoad(double)
+				pfc->AddNode(n);
 				fem.AddNodalLoad(pfc);
 
 				// add this boundary condition to the current step
@@ -197,12 +205,16 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 				// get the nodal ID
 				int n = atoi(tag.AttributeValue("id"))-1;
 
+				// get the load scale factor
+				double scale = 0.0;
+				m_pim->value(tag, scale);
+
 				// create new nodal force
 				FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
-				pfc->m_node = n;
-				pfc->m_bc = bc;
-				pfc->m_lc = lc;
-				m_pim->value(tag, pfc->m_s);
+				pfc->SetDOF(bc);
+				pfc->SetLoad(scale);
+				pfc->SetLoadCurveIndex(lc);	// NOTE: must be set after SetLoad(double)
+				pfc->AddNode(n);
 				fem.AddNodalLoad(pfc);
 
 				// add this boundary condition to the current step
@@ -234,11 +246,14 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 			sz = tag.AttributeValue("lc");
 			int lc = atoi(sz) - 1;
 
+			double scale = 0.0;
+			m_pim->value(tag, scale);
+
 			FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
-			pfc->m_node = n;
-			pfc->m_bc = bc;
-			pfc->m_lc = lc;
-			m_pim->value(tag, pfc->m_s);
+			pfc->SetDOF(bc);
+			pfc->SetLoad(scale);
+			pfc->SetLoadCurveIndex(lc);	// NOTE: must be set after SetLoad(double)
+			pfc->AddNode(n);
 			fem.AddNodalLoad(pfc);
 
 			// add this boundary condition to the current step
@@ -251,6 +266,53 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 			++tag;
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioLoadsSection::ParseNodalLoad25(XMLTag &tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	DOFS& dofs = fem.GetDOFS();
+
+	// get the bc
+	const char* sz = tag.AttributeValue("bc");
+	int bc = dofs.GetDOF(sz);
+	if (bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+
+	// create nodal load
+	FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
+	pfc->SetDOF(bc);
+
+	// add nodal load to model
+	fem.AddNodalLoad(pfc);
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddModelComponent(pfc);
+		pfc->Deactivate();
+	}
+
+	// read parameters
+	FEParameterList& pl = pfc->GetParameterList();
+	++tag;
+	do
+	{
+		if (m_pim->ReadParameter(tag, pl) == false)
+		{
+			if (tag == "node_set")
+			{
+				// find the node set
+				FENodeSet* pns = m_pim->ParseNodeSet(tag, "nset");
+				if (pns == 0) throw XMLReader::InvalidTag(tag);
+
+				// add the nodes
+				pfc->AddNodes(*pns);
+			}
+			else throw XMLReader::InvalidTag(tag);
+		}
+		++tag;
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------

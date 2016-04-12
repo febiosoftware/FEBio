@@ -1,9 +1,22 @@
 #include "stdafx.h"
 #include "FEModel.h"
+#include "LoadCurve.h"
+#include "FEMaterial.h"
 #include "FERigidBody.h"
-#include <string>
-#include "log.h"
+#include "FERigidSystem.h"
+#include "FEModelLoad.h"
+#include "BC.h"
+#include "FESurfaceLoad.h"
+#include "FEEdgeLoad.h"
+#include "FEBodyLoad.h"
+#include "FEInitialCondition.h"
+#include "FESurfacePairInteraction.h"
+#include "FENLConstraint.h"
+#include "FEAnalysis.h"
+#include "FEGlobalData.h"
 #include "FECoreKernel.h"
+#include "log.h"
+#include <string>
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -600,6 +613,13 @@ bool FEModel::EvaluateAllParameterLists()
 
 		// evaluate its parameter list
 		if (EvaluateParameterList(pm) == false) return false;
+	}
+
+	// evaluate nodal loads
+	for (int i=0; i<(int)m_FC.size(); ++i)
+	{
+		FEParameterList& pl = m_FC[i]->GetParameterList();
+		if (EvaluateParameterList(pl) == false) return false;
 	}
 
 	// evaluate surface load parameter lists

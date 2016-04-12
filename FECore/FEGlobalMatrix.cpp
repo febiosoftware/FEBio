@@ -1,7 +1,10 @@
 #include "stdafx.h"
 #include "FEGlobalMatrix.h"
 #include "FEModel.h"
+#include "FEAnalysis.h"
 #include "FEMesh.h"
+#include "FERigidSystem.h"
+#include "FERigidBody.h"
 
 //-----------------------------------------------------------------------------
 //! Takes a SparseMatrix structure that defines the structure of the global matrix.

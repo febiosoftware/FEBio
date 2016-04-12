@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEConstrainedLMOptimizeMethod.h"
+#include "FECore/FEAnalysis.h"
 #include "FECore/log.h"
 
 #ifdef HAVE_LEVMAR

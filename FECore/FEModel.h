@@ -1,22 +1,7 @@
 #pragma once
 #include "DOFS.h"
-#include "FERigidSystem.h"
-#include "FEMaterial.h"
 #include "FEMesh.h"
-#include "LoadCurve.h"
-#include "BC.h"
-#include "FEInitialCondition.h"
-#include "FEModelLoad.h"
-#include "FEBodyLoad.h"
-#include "FESurfacePairInteraction.h"
-#include "FEAnalysis.h"
-#include "FESurfaceLoad.h"
-#include "FEEdgeLoad.h"
-#include "FENLConstraint.h"
 #include "FELinearConstraint.h"
-#include "FEObject.h"
-#include "DumpMemStream.h"
-#include "FEGlobalData.h"
 #include "FETypes.h"
 #include <string>
 #include <vector>
@@ -40,6 +25,24 @@ struct FECORE_CALLBACK {
 	void*			m_pd;		// pointer to user data
 	FECORE_CB_WHEN	m_nwhen;	// when to call function
 };
+
+//-----------------------------------------------------------------------------
+// forward declarations
+class FELoadCurve;
+class FEMaterial;
+class FEModelLoad;
+class FENodalLoad;
+class FEFixedBC;
+class FEPrescribedBC;
+class FEInitialCondition;
+class FESurfaceLoad;
+class FEEdgeLoad;
+class FEBodyLoad;
+class FENLConstraint;
+class FESurfacePairInteraction;
+class FERigidSystem;
+class FEAnalysis;
+class FEGlobalData;
 
 //-----------------------------------------------------------------------------
 //! The FEModel class stores all the data for the finite element model, including

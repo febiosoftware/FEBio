@@ -12,6 +12,8 @@
 #include "FEBioFluid/FEFluidSolver.h"
 #include "FEBioFluid/FEFluidDomain3D.h"
 #include "FECore/log.h"
+#include "FECore/BC.h"
+#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEFluidTangentUniaxial, FEFluidScenario)

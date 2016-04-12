@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "FELMOptimizeMethod.h"
+#include "FECore/FEAnalysis.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

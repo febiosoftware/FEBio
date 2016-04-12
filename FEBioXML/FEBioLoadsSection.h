@@ -16,7 +16,8 @@ public:
 	void Parse(XMLTag& tag);
 
 protected:
-	void ParseBCForce      (XMLTag& tag);
+	void ParseNodalLoad    (XMLTag& tag);
+	void ParseNodalLoad25  (XMLTag& tag);
 	void ParseBodyForce    (XMLTag& tag);
 	void ParseBodyLoad     (XMLTag& tag);
 	void ParseBodyLoad20   (XMLTag& tag);

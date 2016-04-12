@@ -11,6 +11,7 @@
 #include "FEMesh.h"
 #include "FEModel.h"
 #include "FECore/DOFS.h"
+#include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
 void FEFergusonShellDomain::InitElements()

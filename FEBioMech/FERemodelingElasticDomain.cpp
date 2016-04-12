@@ -2,6 +2,7 @@
 #include "FERemodelingElasticDomain.h"
 #include "FERemodelingElasticMaterial.h"
 #include <FECore/FEModel.h>
+#include "FECore/FEAnalysis.h"
 
 //-----------------------------------------------------------------------------
 //! constructor

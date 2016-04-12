@@ -8,6 +8,7 @@
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
 #include "FECore/DumpFile.h"
+#include "FECore/LoadCurve.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

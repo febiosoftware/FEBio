@@ -1,6 +1,7 @@
 #include "FEMultiphasicDomain.h"
 #include "FEMultiphasicMultigeneration.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEAnalysis.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 

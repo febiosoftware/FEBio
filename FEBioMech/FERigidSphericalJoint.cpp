@@ -4,9 +4,11 @@
 
 #include "stdafx.h"
 #include "FERigidSphericalJoint.h"
+#include "FECore/FERigidSystem.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidSphericalJoint, FERigidConnector);

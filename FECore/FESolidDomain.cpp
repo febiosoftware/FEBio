@@ -2,6 +2,7 @@
 #include "FESolidDomain.h"
 #include "FEMesh.h"
 #include "FEModel.h"
+#include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
 void FESolidDomain::CopyFrom(FEDomain* pd)

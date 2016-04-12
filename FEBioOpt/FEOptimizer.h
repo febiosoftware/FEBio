@@ -4,6 +4,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/Logfile.h"
 #include "FECore/FECoreTask.h"
+#include "FECore/LoadCurve.h"
 #include <vector>
 #include <string.h>
 

@@ -1,11 +1,17 @@
 #pragma once
 #include "FECoreBase.h"
-#include "FERigidBody.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
 // forward declarations
 class FEModel;
+class FERigidBody;
+class FEModelComponent;
+class FERigidNodeSet;
+class FERigidBodyFixedBC;
+class FERigidBodyDisplacement;
+class FERigidBodyVelocity;
+class FERigidBodyAngularVelocity;
 
 //-----------------------------------------------------------------------------
 //! The FERigidSystem class manages all rigid body paraphernalia.

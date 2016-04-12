@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEPowellOptimizeMethod.h"
+#include <FECore/FEAnalysis.h>
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

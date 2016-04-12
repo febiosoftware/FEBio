@@ -5,6 +5,7 @@
 #include "FEGlobalMatrix.h"
 #include "log.h"
 #include "FENodeReorder.h"
+#include "BC.h"
 
 //-----------------------------------------------------------------------------
 //! constructor

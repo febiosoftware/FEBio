@@ -5,8 +5,14 @@
 #include "FEPointBodyForce.h"
 #include "FEContactInterface.h"
 #include "FECore/FERigidBody.h"
+#include <FECore/FERigidSystem.h>
+#include <FECore/rigidBC.h>
+#include <FECore/BC.h>
+#include <FECore/FESurfaceLoad.h>
 #include "FECore/log.h"
 #include <FECore/FEModel.h>
+#include "FECore/FEAnalysis.h"
+#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -767,45 +773,50 @@ void FEExplicitSolidSolver::NodalForces(vector<double>& F, const FETimePoint& tp
 	int ncnf = m_fem.NodalLoads();
 	for (int i=0; i<ncnf; ++i)
 	{
-		FENodalLoad& fc = *m_fem.NodalLoad(i);
+		const FENodalLoad& fc = *m_fem.NodalLoad(i);
 		if (fc.IsActive())
 		{
-			int id	 = fc.m_node;	// node ID
-			int bc   = fc.m_bc;	// direction of force
+			int dof = fc.GetDOF();
 
-			FENode& node = mesh.Node(id);
-
-			int n = node.m_ID[bc];
-		
-			double f = fc.Value();
-			
-			if (n >= 0) F[n] = f;
-			else if (node.m_rid >=0)
+			int N = fc.Nodes();
+			for (int j=0; j<N; ++j)
 			{
-				// this is a rigid body node
-				FERigidBody& RB = *rigid.Object(node.m_rid);
+				int id	 = fc.NodeID(j);
 
-				// get the relative position
-				vec3d a = node.m_rt - RB.m_rt;
+				FENode& node = mesh.Node(id);
 
-				int* lm = RB.m_LM;
-				switch (bc)
+				int n = node.m_ID[dof];
+		
+				double f = fc.NodeValue(j);
+			
+				if (n >= 0) F[n] = f;
+				else if (node.m_rid >=0)
 				{
-				case 0:
-					if (lm[0] >= 0) F[lm[0]] +=  f;
-					if (lm[4] >= 0) F[lm[4]] +=  a.z*f;
-					if (lm[5] >= 0) F[lm[5]] += -a.y*f;
-					break;
-				case 1:
-					if (lm[1] >= 0) F[lm[1]] +=  f;
-					if (lm[3] >= 0) F[lm[3]] += -a.z*f;
-					if (lm[5] >= 0) F[lm[5]] +=  a.x*f;
-					break;
-				case 2:
-					if (lm[2] >= 0) F[lm[2]] +=  f;
-					if (lm[3] >= 0) F[lm[3]] +=  a.y*f;
-					if (lm[4] >= 0) F[lm[4]] += -a.x*f;
-					break;
+					// this is a rigid body node
+					FERigidBody& RB = *rigid.Object(node.m_rid);
+
+					// get the relative position
+					vec3d a = node.m_rt - RB.m_rt;
+
+					int* lm = RB.m_LM;
+					switch (dof)
+					{
+					case 0:
+						if (lm[0] >= 0) F[lm[0]] +=  f;
+						if (lm[4] >= 0) F[lm[4]] +=  a.z*f;
+						if (lm[5] >= 0) F[lm[5]] += -a.y*f;
+						break;
+					case 1:
+						if (lm[1] >= 0) F[lm[1]] +=  f;
+						if (lm[3] >= 0) F[lm[3]] += -a.z*f;
+						if (lm[5] >= 0) F[lm[5]] +=  a.x*f;
+						break;
+					case 2:
+						if (lm[2] >= 0) F[lm[2]] +=  f;
+						if (lm[3] >= 0) F[lm[3]] +=  a.y*f;
+						if (lm[4] >= 0) F[lm[4]] += -a.x*f;
+						break;
+					}
 				}
 			}
 		}

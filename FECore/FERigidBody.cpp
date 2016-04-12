@@ -7,6 +7,7 @@
 #include "FEMaterial.h"
 #include "FESolidDomain.h"
 #include "FEModel.h"
+#include "RigidBC.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidBody, FEObject);

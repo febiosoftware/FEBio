@@ -1,5 +1,6 @@
 #include "FERestartDiagnostics.h"
 #include <FEBioLib/FEBioModel.h>
+#include <FECore/FEAnalysis.h>
 #include <FECore/DumpFile.h>
 #include <FECore/log.h>
 

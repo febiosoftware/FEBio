@@ -3,6 +3,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/FEClosestPointProjection.h"
 #include "FECore/log.h"
+#include "FECore/FEGlobalMatrix.h"
 #include "FECore/FEDataExport.h"
 
 //-----------------------------------------------------------------------------

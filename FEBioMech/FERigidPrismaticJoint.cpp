@@ -6,11 +6,13 @@
 //  Copyright (c) 2015 febio.org. All rights reserved.
 //
 
-#include "FERigidPrismaticJoint.h"
 #include "stdafx.h"
+#include "FERigidPrismaticJoint.h"
+#include "FECore/FERigidSystem.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidPrismaticJoint, FERigidConnector);

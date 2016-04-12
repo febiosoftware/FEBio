@@ -164,7 +164,7 @@
 #include "FESRIElasticSolidDomain.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FEDiscreteSpringDomain.h"
-
+#include <FECore/RigidBC.h>
 
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.

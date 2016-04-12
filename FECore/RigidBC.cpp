@@ -2,6 +2,10 @@
 #include "RigidBC.h"
 #include "FEModel.h"
 #include "FEMesh.h"
+#include "FERigidBody.h"
+#include "FERigidSystem.h"
+#include "FEMaterial.h"
+#include "LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)

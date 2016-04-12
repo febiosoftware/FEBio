@@ -2,6 +2,7 @@
 #include "FEBioMech/FELinearSolidDomain.h"
 #include "FEBioMech/FELinearElastic.h"
 #include <FECore/FEModel.h>
+#include <FECore/FEAnalysis.h>
 
 //-----------------------------------------------------------------------------
 //! class constructor

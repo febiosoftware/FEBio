@@ -2,6 +2,7 @@
 #include "FEPeriodicBoundary2O.h"
 #include "FECore/FEModel.h"
 #include "FECore/FENormalProjection.h"
+#include "FECore/FEGlobalMatrix.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

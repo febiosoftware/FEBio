@@ -15,6 +15,9 @@
 #include "FEBioMech/FERigidDamper.h"
 #include "FEBioMech/FERigidAngularDamper.h"
 #include "FEBioMech/FERigidContractileForce.h"
+#include "FECore/BC.h"
+#include "FECore/RigidBC.h"
+#include "FECore/FERigidSystem.h"
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
@@ -310,13 +313,7 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 
 		FENodeSet& ns = *pns;
-		int N = pns->size();
-		for (int i=0; i<N; ++i)
-		{
-			int n = ns[i];
-			if ((n < 0)||(n >= NN)) throw XMLReader::InvalidTag(tag);
-			for (int j=0; j<nbc; ++j) pbc[j]->AddNode(n);
-		}
+		for (int j=0; j<nbc; ++j) pbc[j]->AddNodes(ns);
 	}
 	else
 	{
@@ -412,13 +409,7 @@ void FEBioBoundarySection::ParseBCFix25(XMLTag &tag)
 		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "nset", szset);
 
 		FENodeSet& ns = *pns;
-		int N = pns->size();
-		for (int i=0; i<N; ++i)
-		{
-			int n = ns[i];
-			if ((n < 0)||(n >= NN)) throw XMLReader::InvalidTag(tag);
-			for (int j=0; j<nbc; ++j) pbc[j]->AddNode(n);
-		}
+		for (int j=0; j<nbc; ++j) pbc[j]->AddNodes(ns);
 	}
 	else
 	{
@@ -496,10 +487,8 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			pdc->Deactivate();
 		}
 
-		// loop over all nodes in the nodeset
-		FENodeSet& ns = *ps;
-		int N = ns.size();
-		for (int i = 0; i<N; ++i) pdc->AddNode(ns[i]);
+		// add nodes in the nodeset
+		pdc->AddNodes(*ps);
 	}
 	else
 	{
@@ -602,9 +591,7 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 
 		// add the nodes
-		FENodeSet& ns = *pns;
-		int N = ns.size();
-		for (int i=0; i<N; ++i) pdc->AddNode(ns[i]);
+		pdc->AddNodes(*pns);
 	}
 	else
 	{
@@ -685,9 +672,7 @@ void FEBioBoundarySection::ParseBCPrescribe25(XMLTag& tag)
 			if (pns == 0) throw XMLReader::InvalidTag(tag);
 
 			// add the nodes
-			FENodeSet& ns = *pns;
-			int N = ns.size();
-			for (int i=0; i<N; ++i) pdc->AddNode(ns[i]);
+			pdc->AddNodes(*pns);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

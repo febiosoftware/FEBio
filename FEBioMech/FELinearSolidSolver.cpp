@@ -7,6 +7,8 @@
 #include "FECore/log.h"
 #include "FECore/FEGlobalMatrix.h"
 #include <FECore/FEModel.h>
+#include <FECore/BC.h>
+#include <FECore/FEAnalysis.h>
 #include "NumCore/NumCore.h"
 
 //-----------------------------------------------------------------------------
@@ -166,20 +168,23 @@ void FELinearSolidSolver::Residual()
 	int ncnf = m_fem.NodalLoads();
 	for (int i=0; i<ncnf; ++i)
 	{
-		FENodalLoad& fc = *m_fem.NodalLoad(i);
+		const FENodalLoad& fc = *m_fem.NodalLoad(i);
 		if (fc.IsActive())
 		{
-			int id	 = fc.m_node;	// node ID
-			int bc   = fc.m_bc;	// direction of force
+			int bc = fc.GetDOF();
+			int N = fc.Nodes();
+			for (int j=0; j<N; ++j)
+			{
+				int id	 = fc.NodeID(j);
+				FENode& node = mesh.Node(id);
+	
+				double f = fc.NodeValue(j);
 
-			FENode& node = mesh.Node(id);
-
-			double f = fc.Value();
-
-			int n = node.m_ID[bc];
-			if ((bc == 0) && (n >= 0)) m_R[n] = f;
-			if ((bc == 1) && (n >= 0)) m_R[n] = f;
-			if ((bc == 2) && (n >= 0)) m_R[n] = f;
+				int n = node.m_ID[bc];
+				if ((bc == 0) && (n >= 0)) m_R[n] = f;
+				if ((bc == 1) && (n >= 0)) m_R[n] = f;
+				if ((bc == 2) && (n >= 0)) m_R[n] = f;
+			}
 		}
 	}
 

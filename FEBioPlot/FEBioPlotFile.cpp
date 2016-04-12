@@ -3,6 +3,7 @@
 #include "FECore/FECoreKernel.h"
 #include "FECore/FEDataExport.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEMaterial.h"
 
 class FEPlotDataExport : public FEPlotData
 {

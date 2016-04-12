@@ -3,6 +3,7 @@
 #include "FECore/FEDiscreteMaterial.h"
 #include "FECore/FEDiscreteDomain.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEModelLoad.h"
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------

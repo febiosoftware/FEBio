@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FETractionLoad.h"
 #include "FECore/FEModel.h"
+#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 FETractionLoad::LOAD::LOAD()

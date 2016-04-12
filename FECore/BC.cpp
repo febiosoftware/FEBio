@@ -5,14 +5,18 @@
 #include "FERigidBody.h"
 #include "log.h"
 #include "DOFS.h"
+#include "LoadCurve.h"
+
+//-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FENodalLoad, FEBoundaryCondition)
+		ADD_PARAMETER(m_load, FE_PARAM_DOUBLE, "scale");
+END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
 {
-	m_s = 1.0;
-	m_lc = -1;
-	m_bc = -1;
-	m_node = -1;
+	m_load = 0.0;
+	m_dof = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -23,32 +27,49 @@ void FENodalLoad::Serialize(DumpStream& ar)
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << m_bc << m_lc << m_node << m_s;
+		ar << m_load << m_dof << m_item;
 	}
 	else
 	{
-		ar >> m_bc >> m_lc >> m_node >> m_s;
+		ar >> m_load >> m_dof >> m_item;
 	}
 }
 
 //-----------------------------------------------------------------------------
 bool FENodalLoad::Init()
 {
-	int NLC = GetFEModel()->LoadCurves();
-	if ((m_lc < 0)||(m_lc >= NLC))
-	{
-		felog.printf("ERROR: Invalid loadcurve in nodal load %d\n", GetID());
-		return false;
-	}
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-//! Return the current value of the nodal load
-double FENodalLoad::Value()
+void FENodalLoad::AddNode(int nid, double scale)
 {
-	FEModel& fem = *GetFEModel();
-	return m_s*fem.GetLoadCurve(m_lc)->Value();
+	ITEM item = {nid, scale};
+	m_item.push_back(item);
+}
+
+//-----------------------------------------------------------------------------
+void FENodalLoad::AddNodes(const FENodeSet& ns, double scale)
+{
+	int N = ns.size();
+	for (int i=0; i<N; ++i) AddNode(ns[i], scale);
+}
+
+//-----------------------------------------------------------------------------
+void FENodalLoad::SetLoadCurveIndex(int lc)
+{
+	ParamString s("scale");
+	FEParam& p = *GetParameter(s);
+	p.m_nlc = lc;
+	p.m_scl = m_load;
+}
+
+//-----------------------------------------------------------------------------
+//! Return the current value of the nodal load
+double FENodalLoad::NodeValue(int n) const
+{
+	const ITEM& it = m_item[n];
+	return m_load*it.scale;
 }
 
 //-----------------------------------------------------------------------------
@@ -68,6 +89,13 @@ FEFixedBC::FEFixedBC(FEModel* pfem, int node, int dof) : FEBoundaryCondition(FEB
 void FEFixedBC::AddNode(int node)
 {
 	m_node.push_back(node);
+}
+
+//-----------------------------------------------------------------------------
+void FEFixedBC::AddNodes(const FENodeSet& ns)
+{
+	int N = ns.size();
+	for (int i=0; i<N; ++i) AddNode(ns[i]);
 }
 
 //-----------------------------------------------------------------------------
@@ -152,6 +180,13 @@ void FEPrescribedBC::AddNode(int nid, double s)
 }
 
 //-----------------------------------------------------------------------------
+void FEPrescribedBC::AddNodes(const FENodeSet& nset, double s)
+{
+	int N = nset.size();
+	for (int i=0; i<N; ++i) AddNode(nset[i], s);
+}
+
+//-----------------------------------------------------------------------------
 bool FEPrescribedBC::Init()
 {
 	// don't forget to call the base class
@@ -227,7 +262,7 @@ void FEPrescribedBC::Deactivate()
 //-----------------------------------------------------------------------------
 double FEPrescribedBC::NodeValue(int n) const
 {
-	ITEM it = m_item[n];
+	const ITEM& it = m_item[n];
 	double val = m_scale*it.scale;
 	if (m_lc >= 0) 
 	{

@@ -1,8 +1,6 @@
 #pragma once
 #include "FEModelComponent.h"
 
-namespace FECore {
-
 //-----------------------------------------------------------------------------
 //! This class is the base class of all boundary conditions
 
@@ -16,5 +14,3 @@ public:
 	//! desctructor
 	virtual ~FEBoundaryCondition(){}
 };
-
-} // namespace FECore

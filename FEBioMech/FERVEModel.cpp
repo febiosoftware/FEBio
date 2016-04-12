@@ -2,8 +2,11 @@
 #include "FERVEModel.h"
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEElemElemList.h"
+#include "FECore/BC.h"
 #include "FEElasticMaterial.h"
 #include "FEPeriodicBoundary1O.h"
+#include "FECore/FEAnalysis.h"
+#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 FERVEModel::FERVEModel()
@@ -246,16 +249,15 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	pdc[1] = new FEPrescribedBC(this); pdc[1]->SetDOF(1).SetLoadCurveIndex(NLC).SetScale(1.0); AddPrescribedBC(pdc[1]);
 	pdc[2] = new FEPrescribedBC(this); pdc[2]->SetDOF(2).SetLoadCurveIndex(NLC).SetScale(1.0); AddPrescribedBC(pdc[2]);
 
-	m_BN.assign(m.Nodes(), 0);
+	// assign nodes to BCs
+	pdc[0]->AddNodes(ns, 0.0);
+	pdc[1]->AddNodes(ns, 0.0);
+	pdc[2]->AddNodes(ns, 0.0);
 
+	// create the boundary node flags
+	m_BN.assign(m.Nodes(), 0);
 	int N = ns.size();
-	for (int i=0; i<N; ++i)
-	{
-		m_BN[ns[i]] = 1;
-		pdc[0]->AddNode(ns[i], 0.0);
-		pdc[1]->AddNode(ns[i], 0.0);
-		pdc[2]->AddNode(ns[i], 0.0);
-	}
+	for (int i=0; i<N; ++i) m_BN[ns[i]] = 1;
 
 	return true;
 }
