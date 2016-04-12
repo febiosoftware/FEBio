@@ -15,10 +15,8 @@ public:
 	FESurfaceLoad(FEModel* pfem);
 	virtual ~FESurfaceLoad(void);
 
-	virtual void Create(int nfacets) = 0;
-
 	//! Set the surface to apply the load to
-	void SetSurface(FESurface* ps) { m_psurf = ps; }
+	virtual void SetSurface(FESurface* ps) { m_psurf = ps; }
 
 	//! Get the surface
 	FESurface& Surface() { return *m_psurf; }

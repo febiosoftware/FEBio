@@ -28,14 +28,18 @@ void FEBioLoadsSection::Parse(XMLTag& tag)
 			else if (tag == "heat_source") ParseBodyLoad (tag);
 			else ParseSurfaceLoad(tag);
 		}
-		else
+		else if (nversion == 0x0200)
 		{
-			if      (tag == "nodal_load"  )
-			{
-				if (nversion < 0x0205) ParseNodalLoad(tag);
-				else ParseNodalLoad25(tag);
-			}
+			if      (tag == "nodal_load"  ) ParseNodalLoad(tag);
 			else if (tag == "surface_load") ParseSurfaceLoad20(tag);
+			else if (tag == "edge_load"   ) ParseEdgeLoad     (tag);
+			else if (tag == "body_load"   ) ParseBodyLoad20   (tag);
+			else throw XMLReader::InvalidTag(tag);
+		}
+		else if (nversion > 0x0200)
+		{
+			if      (tag == "nodal_load"  ) ParseNodalLoad25(tag);
+			else if (tag == "surface_load") ParseSurfaceLoad25(tag);
 			else if (tag == "edge_load"   ) ParseEdgeLoad     (tag);
 			else if (tag == "body_load"   ) ParseBodyLoad20   (tag);
 			else throw XMLReader::InvalidTag(tag);
@@ -329,9 +333,6 @@ void FEBioLoadsSection::ParseSurfaceLoad(XMLTag& tag)
 	FESurfaceLoad* ps = fecore_new<FESurfaceLoad>(FESURFACELOAD_ID, tag.Name(), &fem);
 	if (ps == 0) throw XMLReader::InvalidTag(tag);
 
-	ps->Create(npr);
-	ps->SetSurface(psurf);
-
 	// parse attributes
 	for (int i=0; i<tag.m_natt; ++i)
 	{
@@ -367,6 +368,8 @@ void FEBioLoadsSection::ParseSurfaceLoad(XMLTag& tag)
 		++tag;
 	}
 
+	ps->SetSurface(psurf);
+
 	// add surface load to model
 	fem.AddSurfaceLoad(ps);
 
@@ -396,7 +399,6 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 	// create a new surface
 	FESurface* psurf = new FESurface(&fem.GetMesh());
 	fem.GetMesh().AddSurface(psurf);
-	psl->SetSurface(psurf);
 
 	// read the parameters
 	FEParameterList& pl = psl->GetParameterList();
@@ -432,8 +434,8 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 					// create a surface from the facet set
 					if (ps)
 					{
-						if (BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag);
-						psl->Create(psurf->Elements());
+						if (m_pim->BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag);
+						psl->SetSurface(psurf);
 					}
 					else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 				}
@@ -442,7 +444,6 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 					// count how many pressure cards there are
 					int npr = tag.children();
 					psurf->create(npr);
-					psl->Create(npr);
 
 					++tag;
 					int nf[FEElement::MAX_NODES ], N;
@@ -470,7 +471,56 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 
 						++tag;
 					}
+
+					psl->SetSurface(psurf);
 				}
+			}
+			else throw XMLReader::InvalidTag(tag);
+		}
+		++tag;
+	}
+	while (!tag.isend());
+
+	// add surface load to model
+	fem.AddSurfaceLoad(psl);
+
+	// add this boundary condition to the current step
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddModelComponent(psl);
+		psl->Deactivate();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioLoadsSection::ParseSurfaceLoad25(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+
+	// create surface load
+	const char* sztype = tag.AttributeValue("type");
+	FESurfaceLoad* psl = fecore_new<FESurfaceLoad>(FESURFACELOAD_ID, sztype, &fem);
+	if (psl == 0) throw XMLReader::InvalidTag(tag);
+
+	// read name attribute
+	const char* szname = tag.AttributeValue("name", true);
+	if (szname) psl->SetName(szname);
+
+	// read the parameters
+	FEParameterList& pl = psl->GetParameterList();
+
+	// read the pressure data
+	++tag;
+	do
+	{
+		if (m_pim->ReadParameter(tag, pl) == false)
+		{
+			if (tag == "surface")
+			{
+				FESurface* psurf = m_pim->ParseSurface(tag, "surf");
+				fem.GetMesh().AddSurface(psurf);
+				int nel = psurf->Elements();
+				psl->SetSurface(psurf);
 			}
 			else throw XMLReader::InvalidTag(tag);
 		}
@@ -579,43 +629,6 @@ void FEBioLoadsSection::ParseEdgeLoad(XMLTag& tag)
 		GetStep()->AddModelComponent(pel);
 		pel->Deactivate();
 	}
-}
-
-//-----------------------------------------------------------------------------
-bool FEBioLoadsSection::BuildSurface(FESurface& s, FEFacetSet& fs)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
-	int NN = m.Nodes();
-
-	// count nr of faces
-	int faces = fs.Faces();
-
-	// allocate storage for faces
-	s.create(faces);
-
-	// read faces
-	for (int i=0; i<faces; ++i)
-	{
-		FESurfaceElement& el = s.Element(i);
-		FEFacetSet::FACET& fi = fs.Face(i);
-
-		if      (fi.ntype == 4) el.SetType(FE_QUAD4G4);
-		else if (fi.ntype == 3) el.SetType(m_pim->m_ntri3);
-		else if (fi.ntype == 6) el.SetType(m_pim->m_ntri6);
-		else if (fi.ntype == 7) el.SetType(m_pim->m_ntri7);
-		else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
-		else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
-		else return false;
-
-		int N = el.Nodes(); assert(N == fi.ntype);
-		for (int j=0; j<N; ++j) el.m_node[j] = fi.node[j];
-	}
-
-	// copy the name
-	s.SetName(fs.GetName());
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------

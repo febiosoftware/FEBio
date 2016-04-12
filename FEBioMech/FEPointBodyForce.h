@@ -19,7 +19,6 @@ public:
 public:
 	double	m_a, m_b;
 	vec3d	m_rc;
-	int		m_rlc[3];
 	
 	int		m_inode;
 

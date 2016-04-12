@@ -626,6 +626,13 @@ bool FEModel::EvaluateAllParameterLists()
 		if (EvaluateParameterList(pl) == false) return false;
 	}
 
+	// evaluate edge load parameter lists
+	for (int i=0; i<EdgeLoads(); ++i)
+	{
+		FEParameterList& pl = EdgeLoad(i)->GetParameterList();
+		if (EvaluateParameterList(pl) == false) return false;
+	}
+
 	// evaluate surface load parameter lists
 	for (int i=0; i<SurfaceLoads(); ++i)
 	{

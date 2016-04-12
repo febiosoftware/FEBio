@@ -4,6 +4,7 @@
 #include "FECore/FEAnalysis.h"
 #include "FECore/FESolver.h"
 #include "FECore/DataStore.h"
+#include <FECore/FEMesh.h>
 #include <map>
 #include <string>
 using namespace std;
@@ -204,6 +205,9 @@ public:
 public:
 	// Helper functions for reading node sets, surfaces, etc.
 	FENodeSet* ParseNodeSet(XMLTag& tag, const char* szatt = "set");
+	FESurface* ParseSurface(XMLTag& tag, const char* szatt = "surf");
+
+	bool BuildSurface(FESurface& s, FEFacetSet& f);
 
 public:
 	void ClearParams();

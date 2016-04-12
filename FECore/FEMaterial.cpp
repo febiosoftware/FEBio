@@ -6,7 +6,6 @@
 #include "FEMaterial.h"
 #include <math.h>
 #include <stdarg.h>
-#include "FEModel.h"
 #include "FECoreKernel.h"
 
 //-----------------------------------------------------------------------------

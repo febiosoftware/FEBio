@@ -12,15 +12,14 @@ public:
 		LOAD();
 		double	hc;			// heat transfer coefficient
 		double	s[9];		// nodal scale factors
-		int		lc;			// load curve describing ambient temperature
 	};
 
 public:
 	//! constructor
 	FEConvectiveHeatFlux(FEModel* pfem);
 
-	//! allocate storage
-	void Create(int n);
+	//! Set the surface to apply the load to
+	void SetSurface(FESurface* ps);
 
 	//! get a heat flux load BC
 	LOAD& HeatFlux(int n) { return m_FC[n]; }

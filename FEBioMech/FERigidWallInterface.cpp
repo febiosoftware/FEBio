@@ -16,6 +16,7 @@ BEGIN_PARAMETER_LIST(FERigidWallInterface, FEContactInterface)
 	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
 	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"   );
 	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"     );
+	ADD_PARAMETER(m_d	   , FE_PARAM_DOUBLE, "offset"      );
 END_PARAMETER_LIST();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,8 +43,6 @@ FERigidWallSurface::FERigidWallSurface(FEModel* pfem) : FESurface(&pfem->GetMesh
 
 bool FERigidWallSurface::Init()
 {
-	int i, j, n;
-
 	// always intialize base class first!
 	if (FESurface::Init() == false) return false;
 
@@ -73,15 +72,15 @@ bool FERigidWallSurface::Init()
 		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m.Domain(nd));
 		if (psd)
 		{
-			for (i=0; i<psd->Elements(); ++i)
+			for (int i=0; i<psd->Elements(); ++i)
 			{
 				FEShellElement& el = psd->Element(i);
-				n = el.Nodes();
-				for (j=0; j<n; ++j) tag[el.m_node[j]] = 0.5*el.m_h0[j];
+				int n = el.Nodes();
+				for (int j=0; j<n; ++j) tag[el.m_node[j]] = 0.5*el.m_h0[j];
 			}
 		}
 	}
-	for (i=0; i<nn; ++i) m_off[i] = tag[NodeIndex(i)];
+	for (int i=0; i<nn; ++i) m_off[i] = tag[NodeIndex(i)];
 
 	return true;
 }
@@ -207,6 +206,7 @@ FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(p
 
 	m_eps = 0;
 	m_atol = 0;
+	m_d = 0.0;
 };
 
 //-----------------------------------------------------------------------------
@@ -320,6 +320,9 @@ void FERigidWallInterface::ProjectSurface(FERigidWallSurface& ss)
 
 		// get the local surface normal
 		np = m_mp->Normal(q);
+
+		// calculate offset
+		q += np*m_d;
 
 		// the slave normal is set to the master element normal
 		m_ss.m_nu[i] = np;
@@ -651,7 +654,6 @@ void FERigidWallInterface::Serialize(DumpStream &ar)
 			{
 				FEPlane* pp = dynamic_cast<FEPlane*>(m_mp);
 				ar << FE_RIGID_PLANE;
-				ar << pp->m_nplc;
 				double* a = pp->GetEquation();
 				ar << a[0] << a[1] << a[2] << a[3];
 			}
@@ -674,8 +676,6 @@ void FERigidWallInterface::Serialize(DumpStream &ar)
 				{
 					SetMasterSurface(new FEPlane(GetFEModel()));
 					FEPlane& pl = dynamic_cast<FEPlane&>(*m_mp);
-					ar >> pl.m_nplc;
-					if (pl.m_nplc >= 0) pl.m_pplc = GetFEModel()->GetLoadCurve(pl.m_nplc);
 					double* a = pl.GetEquation();
 					ar >> a[0] >> a[1] >> a[2] >> a[3];
 				}

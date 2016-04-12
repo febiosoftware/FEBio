@@ -11,7 +11,6 @@ public:
 	{
 		LOAD();
 		double	s[9];		// nodal scale factors
-		int		lc;			// load curve
 	};
 
 public:
@@ -22,8 +21,8 @@ public:
 
 	void SetMixture(bool bmix) { m_bmixture = bmix; }
 
-	//! allocate storage
-	void Create(int n);
+	//! Set the surface to apply the load to
+	void SetSurface(FESurface* ps);
 
 	//! get a flux BC
 	LOAD& FluidFlux(int n) { return m_PC[n]; }

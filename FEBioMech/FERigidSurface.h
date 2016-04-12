@@ -1,6 +1,8 @@
 #pragma once
-#include "FECore/FESurface.h"
-#include "FECore/LoadCurve.h"
+#include <FECore/FECoreBase.h>
+
+//-----------------------------------------------------------------------------
+class FEModel;
 
 //-----------------------------------------------------------------------------
 //! This class is the base class for rigid surfaces
@@ -13,7 +15,7 @@
 class FERigidSurface : public FECoreBase
 {
 public: // interface
-	FERigidSurface(FEModel* pfem) : m_pfem(pfem), FECoreBase(FERIGIDOBJECT_ID) {}
+	FERigidSurface(FEModel* pfem) : FECoreBase(FERIGIDOBJECT_ID) {}
 
 	//! intialize surface
 	virtual void Init() = 0;
@@ -23,9 +25,6 @@ public: // interface
 
 	//! projects the point on the surface
 	virtual vec3d Project(const vec3d& r) = 0;
-
-protected:
-	FEModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------
@@ -36,45 +35,22 @@ class FEPlane : public FERigidSurface
 {
 public:
 	//! constructor
-	FEPlane(FEModel* pfem) : FERigidSurface(pfem)
-	{
-		m_nplc = -1;
-		m_pplc = 0;
-	}
+	FEPlane(FEModel* pfem);
 
 	//! initialization
 	void Init();
 
 	//! return plane normal
-	vec3d Normal(const vec3d& r)
-	{
-		vec3d n(a[0], a[1], a[2]);
-		n.unit();
-		return n;
-	}
+	vec3d Normal(const vec3d& r);
 
 	//! project node onto plane
-	vec3d Project(const vec3d& r)
-	{
-		double d = a[3];
-		if (m_pplc) d += m_pplc->Value();
-
-		double l = a[0]*r.x + a[1]*r.y + a[2]*r.z - d;
-		return vec3d(r.x-l*a[0], r.y-l*a[1], r.z-l*a[2]);
-	}
+	vec3d Project(const vec3d& r);
 
 	//! get the initial plane equation
 	double* GetEquation() { return a; }
 
-	//! If a parameter has attributes, this function will be called
-	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval);
-
 protected:
 	double	a[4];	//!< plane equation
-
-public:
-	int				m_nplc;		//!< plane loadcurve number
-	FELoadCurve*	m_pplc;		//!< plane load curve
 
 	DECLARE_PARAMETER_LIST();
 };

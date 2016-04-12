@@ -2,13 +2,11 @@
 #include "FECore/FESolver.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
-#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 FEFluidFlux::LOAD::LOAD()
 { 
 	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = 1.0; 
-	lc = -1; 
 }
 
 //-----------------------------------------------------------------------------
@@ -36,9 +34,10 @@ FEFluidFlux::FEFluidFlux(FEModel* pfem) : FESurfaceLoad(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFlux::Create(int n) 
+void FEFluidFlux::SetSurface(FESurface* ps) 
 { 
-	m_PC.resize(n); 
+	FESurfaceLoad::SetSurface(ps);
+	m_PC.resize(ps->Elements()); 
 }
 
 //-----------------------------------------------------------------------------
@@ -67,7 +66,7 @@ bool FEFluidFlux::SetFacetAttribute(int nface, const char* szatt, const char* sz
 {
 	LOAD& pc = FluidFlux(nface);
 	if      (strcmp(szatt, "id") == 0) {}
-	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
+//	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
 	else if (strcmp(szatt, "scale") == 0)
 	{
 		double s = atof(szval);
@@ -528,7 +527,6 @@ void FEFluidFlux::Serialize(DumpStream& ar)
 		for (int i=0; i<(int) m_PC.size(); ++i)
 		{
 			LOAD& fc = m_PC[i];
-			ar << fc.lc;
 			ar << fc.s[0] << fc.s[1] << fc.s[2] << fc.s[3];
 			ar << fc.s[4] << fc.s[5] << fc.s[6] << fc.s[7] << fc.s[8];
 		}
@@ -543,7 +541,6 @@ void FEFluidFlux::Serialize(DumpStream& ar)
 		for (int i=0; i<n; ++i)
 		{
 			LOAD& fc = m_PC[i];
-			ar >> fc.lc;
 			ar >> fc.s[0] >> fc.s[1] >> fc.s[2] >> fc.s[3];
 			ar >> fc.s[4] >> fc.s[5] >> fc.s[6] >> fc.s[7] >> fc.s[8];
 		}
@@ -579,7 +576,6 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 			if (!m_blinear || m_bmixture)
 			{
 				double g = m_flux;
-				if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
 						
 				for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
 						
@@ -612,7 +608,6 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 			if (!m_blinear || m_bmixture)
 			{
 				double g = m_flux;
-				if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
 						
 				for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
 						
@@ -656,7 +651,6 @@ void FEFluidFlux::Residual(FEGlobalVector& R)
 			vector<double> wn(neln);
 				
 			double g = m_flux;
-			if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
 				
 			for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
 				
@@ -685,7 +679,6 @@ void FEFluidFlux::Residual(FEGlobalVector& R)
 			vector<double> wn(neln);
 				
 			double g = m_flux;
-			if (fc.lc >= 0) g *= fem.GetLoadCurve(fc.lc)->Value();
 				
 			for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
 				

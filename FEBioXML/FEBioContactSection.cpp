@@ -30,7 +30,11 @@ void FEBioContactSection::Parse(XMLTag& tag)
 			const char* sztype = tag.AttributeValue("type");
 
 			// Not all contact interfaces can be automated, so we first handle these special cases
-			if      (strcmp(sztype, "rigid_wall"             ) == 0) ParseRigidWall            (tag);
+			if      (strcmp(sztype, "rigid_wall"             ) == 0)
+			{
+				if (nversion <= 0x0200) ParseRigidWall(tag);
+				else ParseRigidWall25(tag);
+			}
 			else if (strcmp(sztype, "rigid"                  ) == 0)
 			{
 				if (nversion < 0x0205) ParseRigidInterface(tag);
@@ -178,9 +182,80 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 	++tag;
 	do
 	{
+		if (tag == "plane")
+		{
+			// In old formats, the load curve was set in the "plane" property.
+			// Now, we need to map this load curve to the "offset" parameter.
+			const char* sz = tag.AttributeValue("lc", true);
+			if (sz)
+			{
+				int nlc = atoi(sz)-1;
+				FEParameterList& pl = ps->GetParameterList();
+				FEParam& p = *pl.Find("offset");
+				p.m_nlc = nlc;
+				p.m_scl = 1.0;
+			}
+		}
+
 		if (m_pim->ReadParameter(tag, ps) == false)
 		{
 			if (tag == "surface")
+			{
+				FERigidWallSurface& s = ps->m_ss;
+
+				int nfmt = 0;
+				const char* szfmt = tag.AttributeValue("format", true);
+				if (szfmt)
+				{
+					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+				}
+
+				// read the surface section
+				ParseSurfaceSection(tag, s, nfmt, true);
+			}
+			else throw XMLReader::InvalidTag(tag);
+		}
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+
+//-----------------------------------------------------------------------------
+// --- R I G I D   W A L L   I N T E R F A C E ---
+void FEBioContactSection::ParseRigidWall25(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+
+	FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, "rigid_wall", GetFEModel()));
+	fem.AddSurfacePairInteraction(ps);
+
+	++tag;
+	do
+	{
+		if (m_pim->ReadParameter(tag, ps) == false)
+		{
+			if (tag == "wall")
+			{
+				const char* sztype = tag.AttributeValue("type");
+				FERigidSurface* psurf = fecore_new<FERigidSurface>(FERIGIDOBJECT_ID, sztype, &fem);
+
+				ps->SetMasterSurface(psurf);
+
+				if (tag.isleaf() == false)
+				{
+					FEParameterList& pl = psurf->GetParameterList();
+					++tag;
+					do
+					{
+						if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+						++tag;
+					}
+					while (!tag.isend());
+				}
+			}
+			else if (tag == "surface")
 			{
 				FERigidWallSurface& s = ps->m_ss;
 

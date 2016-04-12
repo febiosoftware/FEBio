@@ -133,6 +133,7 @@ public:
 
 	double		m_atol;		//!< augmentation tolerance
 	double		m_eps;		//!< penalty scale factor
+	double		m_d;		//!< normal offset
 
 	DECLARE_PARAMETER_LIST();
 };

@@ -5,7 +5,6 @@
 #include "FERigidBody.h"
 #include "log.h"
 #include "DOFS.h"
-#include "LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FENodalLoad, FEBoundaryCondition)

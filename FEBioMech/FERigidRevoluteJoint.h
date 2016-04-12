@@ -10,7 +10,6 @@
 #define __FEBioMech__FERigidRevoluteJoint__
 
 #include "FECore/vec3d.h"
-#include "FECore/LoadCurve.h"
 #include "FERigidConnector.h"
 
 //-----------------------------------------------------------------------------

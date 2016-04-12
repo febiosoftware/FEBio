@@ -1,12 +1,10 @@
 #include "stdafx.h"
 #include "FEFluidTractionLoad.h"
 #include "FECore/FEModel.h"
-#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 FEFluidTractionLoad::LOAD::LOAD()
 {
-	lc = -1;
 	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = vec3d(0,0,0);
 }
 
@@ -30,8 +28,11 @@ FEFluidTractionLoad::FEFluidTractionLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 
 //-----------------------------------------------------------------------------
 //! allocate storage
-void FEFluidTractionLoad::Create(int n)
+void FEFluidTractionLoad::SetSurface(FESurface* ps)
 {
+	FESurfaceLoad::SetSurface(ps);
+
+	int n = ps->Elements();
 	m_TC.resize(n); 
 
 	// TODO: This assumes the traction vector was read in before the surface
@@ -78,7 +79,6 @@ void FEFluidTractionLoad::Residual(FEGlobalVector& R)
 		FESurfaceElement& el = m_psurf->Element(iel);
 
 		double g = m_scale;
-		if (pc.lc >= 0) g *= fem.GetLoadCurve(pc.lc)->Value();
 
         int ndof = 3*el.Nodes();
 		fe.resize(ndof);
@@ -151,7 +151,6 @@ void FEFluidTractionLoad::Serialize(DumpStream& ar)
 		for (int i=0; i < (int) m_TC.size(); ++i)
 		{
 			LOAD& d = m_TC[i];
-			ar << d.lc;
 			ar << d.s[0] << d.s[1] << d.s[2] << d.s[3];
 			ar << d.s[4] << d.s[5] << d.s[6] << d.s[7] << d.s[8];
 		}
@@ -164,7 +163,6 @@ void FEFluidTractionLoad::Serialize(DumpStream& ar)
 		for (int i=0; i<n; ++i)
 		{
 			LOAD& d = m_TC[i];
-			ar >> d.lc;
 			ar >> d.s[0] >> d.s[1] >> d.s[2] >> d.s[3];
 			ar >> d.s[4] >> d.s[5] >> d.s[6] >> d.s[7] >> d.s[8];
 		}
@@ -177,7 +175,7 @@ bool FEFluidTractionLoad::SetFacetAttribute(int nface, const char* szatt, const 
 {
 	LOAD& tc = TractionLoad(nface);
 	if      (strcmp(szatt, "id") == 0) {}
-	else if (strcmp(szatt, "lc") == 0) tc.lc = atoi(szval) - 1;
+//	else if (strcmp(szatt, "lc") == 0) tc.lc = atoi(szval) - 1;
 	else if (strcmp(szatt, "ftx") == 0)
 	{
 		double tx = atof(szval);

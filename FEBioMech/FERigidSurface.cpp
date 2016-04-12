@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FERigidSurface.h"
-#include <FECore/FEModel.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 // FEPlane
@@ -12,22 +11,30 @@ BEGIN_PARAMETER_LIST(FEPlane, FERigidSurface)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
+FEPlane::FEPlane(FEModel* pfem) : FERigidSurface(pfem)
+{
+}
+
+//-----------------------------------------------------------------------------
 //! Initializes data for FEPlane
 
 void FEPlane::Init()
 {
-	// set the plane displacement curve
-	if (m_nplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_nplc);
 }
 
-bool FEPlane::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
+vec3d FEPlane::Normal(const vec3d& r)
 {
-	if (strcmp(szatt, "lc") == 0)
-	{
-		m_nplc = atoi(szval) - 1;
-		return true;
-	}
-	else return false;
+	vec3d n(a[0], a[1], a[2]);
+	n.unit();
+	return n;
+}
+
+vec3d FEPlane::Project(const vec3d& r)
+{
+	double d = a[3];
+
+	double l = a[0]*r.x + a[1]*r.y + a[2]*r.z - d;
+	return vec3d(r.x-l*a[0], r.y-l*a[1], r.z-l*a[2]);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,7 +46,6 @@ BEGIN_PARAMETER_LIST(FERigidSphere, FERigidSurface)
 	ADD_PARAMETER(m_R, FE_PARAM_DOUBLE, "radius");
 	ADD_PARAMETER(m_rc, FE_PARAM_VEC3D, "center");
 END_PARAMETER_LIST();
-
 
 //-----------------------------------------------------------------------------
 //! constructor

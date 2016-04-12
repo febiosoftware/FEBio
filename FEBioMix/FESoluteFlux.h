@@ -12,15 +12,14 @@ public:
 	{
 		LOAD();
 		double	s[9];		// nodal scale factors
-		int		lc;			// load curve
 	};
 
 public:
 	//! constructor
 	FESoluteFlux(FEModel* pfem);
 	
-	//! allocate storage
-	void Create(int n);
+	//! Set the surface to apply the load to
+	void SetSurface(FESurface* ps);
 
 	void SetLinear(bool blinear) { m_blinear = blinear; }
 

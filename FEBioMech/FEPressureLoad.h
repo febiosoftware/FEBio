@@ -12,15 +12,14 @@ public:
 	{
 		LOAD();
 		double	s[9];		// nodal scale factors
-		int		lc;			// load curve
 	};
 
 public:
 	//! constructor
 	FEPressureLoad(FEModel* pfem);
 
-	//! allocate storage
-	void Create(int n);
+	//! Set the surface to apply the load to
+	void SetSurface(FESurface* ps);
 
 	//! get a pressure load BC
 	LOAD& PressureLoad(int n) { return m_PC[n]; }
@@ -45,9 +44,11 @@ public:
 
 public:
 	//! set an attribute of the surface load
+	// NOTE: To be removed in FEBio 3.0
 	bool SetAttribute(const char* szatt, const char* szval);
 
 	//! set an attribute of a surface facet
+	// NOTE: To be removed in FEBio 3.0
 	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);
 
 protected:

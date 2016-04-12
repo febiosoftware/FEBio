@@ -10,7 +10,6 @@
 #define __FEBioMech__FERigidPrismaticJoint__
 
 #include "FECore/vec3d.h"
-#include "FECore/LoadCurve.h"
 #include "FERigidConnector.h"
 
 //-----------------------------------------------------------------------------

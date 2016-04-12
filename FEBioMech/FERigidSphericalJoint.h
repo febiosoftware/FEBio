@@ -10,7 +10,6 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/vec3d.h"
-#include "FECore/LoadCurve.h"
 #include "FERigidConnector.h"
 
 //-----------------------------------------------------------------------------

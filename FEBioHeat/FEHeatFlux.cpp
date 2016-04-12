@@ -1,12 +1,10 @@
 #include "FEHeatFlux.h"
 #include "FECore/FEModel.h"
-#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 FEHeatFlux::LOAD::LOAD()
 { 
 	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = 1.0; 
-	lc = -1; 
 }
 
 //-----------------------------------------------------------------------------
@@ -22,9 +20,10 @@ FEHeatFlux::FEHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem)
 
 //-----------------------------------------------------------------------------
 //! allocate storage
-void FEHeatFlux::Create(int n)
+void FEHeatFlux::SetSurface(FESurface* psurf)
 { 
-	m_FC.resize(n);
+	FESurfaceLoad::SetSurface(psurf);
+	m_FC.resize(psurf->Elements());
 }
 
 //-----------------------------------------------------------------------------
@@ -48,7 +47,6 @@ void FEHeatFlux::Residual(FEGlobalVector& R)
 		int ni = el.GaussPoints();
 
 		double g = m_flux;
-		if (hf.lc >= 0) g *= fem.GetLoadCurve(hf.lc)->Value();
 
 		// calculate nodal fluxes
 		double qn[FEElement::MAX_NODES];
@@ -114,7 +112,7 @@ bool FEHeatFlux::SetFacetAttribute(int nface, const char* szatt, const char* szv
 {
 	LOAD& pc = HeatFlux(nface);
 	if      (strcmp(szatt, "id") == 0) {}
-	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
+//	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
 	else if (strcmp(szatt, "scale") == 0)
 	{
 		double s = atof(szval);
@@ -138,7 +136,6 @@ void FEHeatFlux::Serialize(DumpStream &ar)
 		for (int i=0; i<(int) m_FC.size(); ++i)
 		{
 			LOAD& d = m_FC[i];
-			ar << d.lc;
 			ar << d.s[0] << d.s[1] << d.s[2] << d.s[3];
 			ar << d.s[4] << d.s[5] << d.s[6] << d.s[7] << d.s[8];
 		}
@@ -151,7 +148,6 @@ void FEHeatFlux::Serialize(DumpStream &ar)
 		for (int i=0; i<n; ++i)
 		{
 			LOAD& d = m_FC[i];
-			ar >> d.lc;
 			ar >> d.s[0] >> d.s[1] >> d.s[2] >> d.s[3];
 			ar >> d.s[4] >> d.s[5] >> d.s[6] >> d.s[7] >> d.s[8];
 		}

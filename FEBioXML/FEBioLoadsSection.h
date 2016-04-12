@@ -24,8 +24,8 @@ protected:
 	void ParseEdgeLoad     (XMLTag& tag);
 	void ParseSurfaceLoad  (XMLTag& tag);
 	void ParseSurfaceLoad20(XMLTag& tag);
+	void ParseSurfaceLoad25(XMLTag& tag);
 
 protected:
-	bool BuildSurface(FESurface& s, FEFacetSet& f);
 	bool BuildEdge   (FEEdge&    s, FESegmentSet& f);
 };

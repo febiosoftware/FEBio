@@ -8,7 +8,6 @@
 #include "FEUncoupledMaterial.h"
 #include "FEResidualVector.h"
 #include "FEElasticDomain.h"
-#include "FEPointBodyForce.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include <FECore/FERigidSystem.h>
 #include <FECore/FERigidBody.h>
@@ -16,7 +15,7 @@
 #include <FECore/BC.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FESurfaceLoad.h>
-#include "FECore/LoadCurve.h"
+#include "FEBodyForce.h"
 #include "FECore/sys.h"
 
 //-----------------------------------------------------------------------------
@@ -1002,20 +1001,6 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
 		dom.InternalForces(RHS);
-	}
-
-	// update body forces
-	for (int i = 0; i<m_fem.BodyLoads(); ++i)
-	{
-		// TODO: I don't like this but for now I'll hard-code the modification of the
-		//       force center position
-		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_fem.GetBodyLoad(i));
-		if (pbf)
-		{
-			if (pbf->m_rlc[0] >= 0) pbf->m_rc.x = m_fem.GetLoadCurve(pbf->m_rlc[0])->Value();
-			if (pbf->m_rlc[1] >= 0) pbf->m_rc.y = m_fem.GetLoadCurve(pbf->m_rlc[1])->Value();
-			if (pbf->m_rlc[2] >= 0) pbf->m_rc.z = m_fem.GetLoadCurve(pbf->m_rlc[2])->Value();
-		}
 	}
 
 	// calculate the body forces

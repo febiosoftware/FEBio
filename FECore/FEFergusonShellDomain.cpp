@@ -9,7 +9,6 @@
 #include "stdafx.h"
 #include "FEFergusonShellDomain.h"
 #include "FEMesh.h"
-#include "FEModel.h"
 #include "FECore/DOFS.h"
 #include "FECore/FEMaterial.h"
 

@@ -9,7 +9,6 @@
 #include "stdafx.h"
 #include "FEDomain2D.h"
 #include "FEMesh.h"
-#include "FEModel.h"
 #include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------

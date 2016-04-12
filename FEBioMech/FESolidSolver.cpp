@@ -2,7 +2,7 @@
 #include "FESolidSolver.h"
 #include "FERigidMaterial.h"
 #include "FE3FieldElasticSolidDomain.h"
-#include "FEPointBodyForce.h"
+#include "FEBodyForce.h"
 #include "FEPressureLoad.h"
 #include "FEResidualVector.h"
 #include "FECore/FENodeReorder.h"
@@ -19,7 +19,6 @@
 #include <FECore/FERigidSystem.h>
 #include <FECore/RigidBC.h>
 #include <FECore/FEModelLoad.h>
-#include <FECore/LoadCurve.h>
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
@@ -504,7 +503,7 @@ void FESolidSolver::Update(vector<double>& ui)
 	int NBL = m_fem.BodyLoads();
 	for (int i=0; i<NBL; ++i)
 	{
-		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_fem.GetBodyLoad(i));
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(i));
 		if (pbf) pbf->Update();
 	}
 }
@@ -1831,20 +1830,6 @@ bool FESolidSolver::Residual(vector<double>& R)
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
 		dom.InternalForces(RHS);
-	}
-
-	// update body forces
-	for (int i=0; i<m_fem.BodyLoads(); ++i)
-	{
-		// TODO: I don't like this but for now I'll hard-code the modification of the
-		//       force center position
-		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_fem.GetBodyLoad(i));
-		if (pbf)
-		{
-			if (pbf->m_rlc[0] >= 0) pbf->m_rc.x = m_fem.GetLoadCurve(pbf->m_rlc[0])->Value();
-			if (pbf->m_rlc[1] >= 0) pbf->m_rc.y = m_fem.GetLoadCurve(pbf->m_rlc[1])->Value();
-			if (pbf->m_rlc[2] >= 0) pbf->m_rc.z = m_fem.GetLoadCurve(pbf->m_rlc[2])->Value();
-		}
 	}
 
 	// calculate the body forces

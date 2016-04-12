@@ -969,6 +969,109 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 }
 
 //-----------------------------------------------------------------------------
+FESurface* FEBioImport::ParseSurface(XMLTag& tag, const char* szatt)
+{
+	FEMesh& m = GetFEModel()->GetMesh();
+
+	// create new surface
+	FESurface* psurf = new FESurface(&m);
+
+	// see if the surface is referenced by a set of defined explicitly
+	const char* szset = tag.AttributeValue(szatt, true);
+	if (szset)
+	{
+		// make sure this tag does not have any children
+		if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
+
+		// see if we can find the facet set
+		FEMesh& m = GetFEModel()->GetMesh();
+		FEFacetSet* ps = 0;
+		for (int i=0; i<m.FacetSets(); ++i)
+		{
+			FEFacetSet& fi = m.FacetSet(i);
+			if (strcmp(fi.GetName(), szset) == 0)
+			{
+				ps = &fi;
+				break;
+			}
+		}
+
+		// create a surface from the facet set
+		if (ps)
+		{
+			if (BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag);
+		}
+		else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
+	}
+	else
+	{
+		// count how many pressure cards there are
+		int npr = tag.children();
+		psurf->create(npr);
+
+		++tag;
+		int nf[FEElement::MAX_NODES ], N;
+		for (int i=0; i<npr; ++i)
+		{
+			FESurfaceElement& el = psurf->Element(i);
+
+			if      (tag == "quad4") el.SetType(FE_QUAD4G4);
+			else if (tag == "tri3" ) el.SetType(m_ntri3);
+			else if (tag == "tri6" ) el.SetType(m_ntri6);
+			else if (tag == "tri7" ) el.SetType(m_ntri7);
+			else if (tag == "quad8") el.SetType(FE_QUAD8G9);
+			else if (tag == "quad9") el.SetType(FE_QUAD9G9);
+			else throw XMLReader::InvalidTag(tag);
+
+			N = el.Nodes();
+			tag.value(nf, N);
+			for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+
+			++tag;
+		}
+	}
+
+	return psurf;
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioImport::BuildSurface(FESurface& s, FEFacetSet& fs)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& m = fem.GetMesh();
+	int NN = m.Nodes();
+
+	// count nr of faces
+	int faces = fs.Faces();
+
+	// allocate storage for faces
+	s.create(faces);
+
+	// read faces
+	for (int i=0; i<faces; ++i)
+	{
+		FESurfaceElement& el = s.Element(i);
+		FEFacetSet::FACET& fi = fs.Face(i);
+
+		if      (fi.ntype == 4) el.SetType(FE_QUAD4G4);
+		else if (fi.ntype == 3) el.SetType(m_ntri3);
+		else if (fi.ntype == 6) el.SetType(m_ntri6);
+		else if (fi.ntype == 7) el.SetType(m_ntri7);
+		else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
+		else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
+		else return false;
+
+		int N = el.Nodes(); assert(N == fi.ntype);
+		for (int j=0; j<N; ++j) el.m_node[j] = fi.node[j];
+	}
+
+	// copy the name
+	s.SetName(fs.GetName());
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 void FEBioImport::BuildNodeList()
 {
 	// find the min, max ID

@@ -12,15 +12,14 @@ public:
 	{
 		LOAD();
 		vec3d	s[9];		// nodal scale factors
-		int		lc;			// load curve
 	};
 
 public:
 	//! constructor
 	FETractionLoad(FEModel* pfem);
 
-	//! allocate storage
-	void Create(int n);
+	//! Set the surface to apply the load to
+	void SetSurface(FESurface* ps);
 
 	//! get a traction load BC
 	LOAD& TractionLoad(int n) { return m_TC[n]; }

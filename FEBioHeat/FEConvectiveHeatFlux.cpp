@@ -1,13 +1,11 @@
 #include "FEConvectiveHeatFlux.h"
 #include "FECore/FEModel.h"
-#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 FEConvectiveHeatFlux::LOAD::LOAD()
 { 
 	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = 1.0;
 	hc = 0.0;
-	lc = -1; 
 }
 
 //-----------------------------------------------------------------------------
@@ -24,8 +22,11 @@ FEConvectiveHeatFlux::FEConvectiveHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEConvectiveHeatFlux::Create(int n)
+void FEConvectiveHeatFlux::SetSurface(FESurface* psurf)
 {
+	FESurfaceLoad::SetSurface(psurf);
+
+	int n = psurf->Elements();
 	m_FC.resize(n);
 
 	// let's initialize the m_FC data array
@@ -53,7 +54,6 @@ void FEConvectiveHeatFlux::Residual(FEGlobalVector& R)
 
 		// get ambient temperature
 		double Tc = m_Ta;
-		if (hf.lc >= 0) Tc *= fem.GetLoadCurve(hf.lc)->Value();
 
 		// calculate nodal fluxes
 		double qn[FEElement::MAX_NODES];
@@ -202,7 +202,7 @@ bool FEConvectiveHeatFlux::SetFacetAttribute(int nface, const char* szatt, const
 {
 	LOAD& pc = HeatFlux(nface);
 	if      (strcmp(szatt, "id") == 0) {}
-	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
+//	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
 	else if (strcmp(szatt, "hc") == 0)
 	{
 		double hc = atof(szval);

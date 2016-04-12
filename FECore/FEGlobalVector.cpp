@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEGlobalVector.h"
-#include "FEModel.h"
 #include "vec3d.h"
 
 //-----------------------------------------------------------------------------

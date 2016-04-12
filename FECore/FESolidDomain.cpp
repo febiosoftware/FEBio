@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FESolidDomain.h"
 #include "FEMesh.h"
-#include "FEModel.h"
 #include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------

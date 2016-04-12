@@ -10,13 +10,11 @@ BEGIN_PARAMETER_LIST(FEPointBodyForce, FEBodyForce);
 	ADD_PARAMETER(m_rc, FE_PARAM_VEC3D, "rc");
 	ADD_PARAMETER(m_inode, FE_PARAM_INT, "node");
 	ADD_PARAMETER(m_brigid, FE_PARAM_BOOL, "rigid");
-	ADD_PARAMETERV(m_rlc, FE_PARAM_INT, 3, "rlc");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 FEPointBodyForce::FEPointBodyForce(FEModel* pfem) : FEBodyForce(pfem)
 {
-	m_rlc[0] = m_rlc[1] = m_rlc[2] = -1; 
 	m_pel = 0; 
 	m_brigid = true; 
 	m_inode = -1; 
@@ -67,13 +65,11 @@ void FEPointBodyForce::Serialize(DumpStream &ar)
 	if (ar.IsSaving())
 	{
 		ar << m_a << m_b << m_rc;
-		ar << m_rlc[0] << m_rlc[1] << m_rlc[2];
 		ar << m_inode << m_brigid;
 	}
 	else
 	{
 		ar >> m_a >> m_b >> m_rc;
-		ar >> m_rlc[0] >> m_rlc[1] >> m_rlc[2];
 		ar >> m_inode >> m_brigid;
 	}
 }
@@ -85,9 +81,6 @@ bool FEPointBodyForce::Init()
 	{
 		if (!m_brigid)
 		{
-			// make sure we don't move the point
-			m_rlc[0] = m_rlc[1] = m_rlc[2] = -1;
-
 			// find the element in which point r0 lies
 			FEMesh& m = GetFEModel()->GetMesh();
 			m_pel = m.FindSolidElement(m_rc, m_rs);
@@ -96,9 +89,6 @@ bool FEPointBodyForce::Init()
 	}
 	else 
 	{
-		// make sure we don't move the point
-		m_rlc[0] = m_rlc[1] = m_rlc[2] = -1;
-
 		FEMesh& m = GetFEModel()->GetMesh();
 		m_rc = m.Node(m_inode).m_r0;
 	}

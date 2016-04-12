@@ -17,6 +17,7 @@
 #include "FECore/FERigidBody.h"
 #include "FECore/BC.h"
 #include "FECore/FEBodyLoad.h"
+#include <FECore/LoadCurve.h>
 #include "FECore/log.h"
 #include <string.h>
 

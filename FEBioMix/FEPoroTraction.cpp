@@ -1,12 +1,10 @@
 #include "FEPoroTraction.h"
 #include "FECore/FEModel.h"
-#include "FECore/LoadCurve.h"
 
 //-----------------------------------------------------------------------------
 FEPoroNormalTraction::LOAD::LOAD()
 { 
 	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = 1.0; 
-	lc = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -33,9 +31,10 @@ FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem)
 
 //-----------------------------------------------------------------------------
 //! allocate storage
-void FEPoroNormalTraction::Create(int n)
+void FEPoroNormalTraction::SetSurface(FESurface* ps)
 { 
-	m_PC.resize(n); 
+	FESurfaceLoad::SetSurface(ps);
+	m_PC.resize(ps->Elements()); 
 }
 
 //-----------------------------------------------------------------------------
@@ -65,7 +64,7 @@ bool FEPoroNormalTraction::SetFacetAttribute(int nface, const char* szatt, const
 {
 	LOAD& pc = NormalTraction(nface);
 	if      (strcmp(szatt, "id") == 0) {}
-	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
+//	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
 	else if (strcmp(szatt, "scale") == 0)
 	{
 		double s = atof(szval);
@@ -352,7 +351,6 @@ void FEPoroNormalTraction::Serialize(DumpStream& ar)
 		for (int i=0; i<(int) m_PC.size(); ++i)
 		{
 			LOAD& pc = m_PC[i];
-			ar << pc.lc;
 			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
 			ar << pc.s[4] << pc.s[5] << pc.s[6] << pc.s[7] << pc.s[8];
 		}
@@ -367,7 +365,6 @@ void FEPoroNormalTraction::Serialize(DumpStream& ar)
 		for (int i=0; i<n; ++i)
 		{
 			LOAD& pc = m_PC[i];
-			ar >> pc.lc;
 			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
 			ar >> pc.s[4] >> pc.s[5] >> pc.s[6] >> pc.s[7] >> pc.s[8];
 		}
@@ -401,7 +398,6 @@ void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 		if (m_blinear == false)
 		{
 			double g = m_traction;
-			if (pc.lc >= 0) g *= fem.GetLoadCurve(pc.lc)->Value();
 
 			// evaluate the prescribed traction.
 			for (int j=0; j<neln; ++j) tn[j] = g*pc.s[j];
@@ -449,7 +445,6 @@ void FEPoroNormalTraction::Residual(FEGlobalVector& R)
 		vector<double> tn(neln);
 
 		double g = m_traction;
-		if (pc.lc >= 0) g *= fem.GetLoadCurve(pc.lc)->Value();
 
 		// evaluate the prescribed traction.
 		for (int j=0; j<neln; ++j) tn[j] = g*pc.s[j];
