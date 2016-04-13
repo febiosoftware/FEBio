@@ -2,6 +2,7 @@
 #include <list>
 #include <vector>
 #include <iostream>
+#include <typeinfo>
 #include "matrix.h"
 #include "mat3d.h"
 #include "vec3d.h"
