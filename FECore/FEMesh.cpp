@@ -8,7 +8,6 @@
 #include "FEDiscreteDomain.h"
 #include "FETrussDomain.h"
 #include "FEShellDomain.h"
-#include "FEFergusonShellDomain.h"
 #include "FESolidDomain.h"
 #include "FEDomain2D.h"
 #include "FEMaterial.h"
@@ -533,34 +532,6 @@ void FEMesh::InitShells()
 				}
 			}
 		}
-        else if (Domain(nd).Class() == FE_DOMAIN_FERGUSON)
-        {
-            FEFergusonShellDomain& sd = static_cast<FEFergusonShellDomain&>(Domain(nd));
-            vec3d r0[FEElement::MAX_NODES];
-            for (int i=0; i<sd.Elements(); ++i)
-            {
-                FEFergusonShellElement& el = sd.Element(i);
-                
-                int n = el.Nodes();
-                int* en = &el.m_node[0];
-                
-                // get the nodes
-                for (int j=0; j<n; ++j) r0[j] = Node(en[j]).m_r0;
-                
-                for (int j=0; j<n; ++j)
-                {
-                    int m0 = j;
-                    int m1 = (j+1)%n;
-                    int m2 = (j==0? n-1: j-1);
-                    
-                    vec3d a = r0[m0];
-                    vec3d b = r0[m1];
-                    vec3d c = r0[m2];
-                    
-                    D[en[m0]] += (b-a)^(c-a);
-                }
-            }
-        }
 	}
 
 	// make sure we start with unit directors
@@ -580,16 +551,6 @@ void FEMesh::InitShells()
 				for (int j=0; j<ne; ++j) el.m_D0[j] = D[el.m_node[j]]*el.m_h0[j];
 			}
 		}
-        else if (Domain(nd).Class() == FE_DOMAIN_FERGUSON)
-        {
-            FEFergusonShellDomain& sd = static_cast<FEFergusonShellDomain&>(Domain(nd));
-            for (int i=0; i<sd.Elements(); ++i)
-            {
-                FEFergusonShellElement& el = sd.Element(i);
-                int ne = el.Nodes();
-                for (int j=0; j<ne; ++j) el.m_D0[j] = D[el.m_node[j]]*el.m_h0[j];
-            }
-        }
 	}
 
 	// Find the nodes that are on a non-rigid shell. 
@@ -599,7 +560,7 @@ void FEMesh::InitShells()
 	for (int nd = 0; nd<Domains(); ++nd)
 	{
 		FEDomain& dom = Domain(nd);
-		if ((dom.Class() == FE_DOMAIN_SHELL) || (dom.Class() == FE_DOMAIN_FERGUSON))
+		if (dom.Class() == FE_DOMAIN_SHELL)
 		{
 			FEMaterial* pmat = dom.GetMaterial();
 			if (pmat->IsRigid() == false)

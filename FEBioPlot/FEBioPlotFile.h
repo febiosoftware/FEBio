@@ -3,7 +3,6 @@
 #include "PltArchive.h"
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEShellDomain.h"
-#include "FECore/FEFergusonShellDomain.h"
 #include "FECore/FETrussDomain.h"
 #include "FECore/FEDiscreteDomain.h"
 #include "FECore/FEDomain2D.h"
@@ -210,7 +209,6 @@ protected:
 
 	void WriteSolidDomain   (FESolidDomain&    dom);
 	void WriteShellDomain   (FEShellDomain&    dom);
-    void WriteFergusonShellDomain(FEFergusonShellDomain&    dom);
 	void WriteTrussDomain   (FETrussDomain&    dom);
 	void WriteDiscreteDomain(FEDiscreteDomain& dom);
     void WriteDomain2D      (FEDomain2D&       dom);

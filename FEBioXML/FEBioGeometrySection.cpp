@@ -151,7 +151,6 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	else if (strcmp(sztype, "tri3"  ) == 0) eshape = ET_TRI3;
 	else if (strcmp(sztype, "tri6"  ) == 0) eshape = ET_TRI6;
 	else if (strcmp(sztype, "truss2") == 0) eshape = ET_TRUSS2;
-	else if (strcmp(sztype, "fquad4") == 0) eshape = ET_FQUAD4;
 	else
 	{
 		// new way for defining element type and integration rule at the same time
@@ -209,7 +208,6 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	case ET_QUAD8 : etype = (NDIM == 3 ? FE_SHELL_QUAD8 : FE2D_QUAD8G9); break;
 	case ET_QUAD9 : etype = FE2D_QUAD9G9; break;
 	case ET_TRUSS2: etype = FE_TRUSS; break;
-	case ET_FQUAD4: etype = FE_FERGUSON_SHELL_QUAD; break;
 	default:
 		throw FEBioImport::InvalidElementType();
 	}
@@ -617,7 +615,7 @@ void FEBioGeometrySection::ParseElementData(FEElement& el, XMLTag& tag)
 	}
 	else if (tag == "thickness")
 	{
-		if ((el.Class() != FE_ELEM_SHELL) && (el.Class() != FE_ELEM_FERGUSON_SHELL)) throw XMLReader::InvalidTag(tag);
+		if (el.Class() != FE_ELEM_SHELL) throw XMLReader::InvalidTag(tag);
 		FEShellElement& shell = static_cast<FEShellElement&> (el);
 
 		// read shell thickness

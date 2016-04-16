@@ -17,7 +17,6 @@ enum FE_Element_Class {
 	FE_ELEM_SURFACE,
 	FE_ELEM_TRUSS,
 	FE_ELEM_DISCRETE,
-    FE_ELEM_FERGUSON_SHELL,
 	FE_ELEM_2D,
 	FE_ELEM_EDGE
 };
@@ -43,7 +42,6 @@ enum FE_Element_Shape {
     ET_TRI6,
 	ET_TRI7,
 	ET_TRUSS2,
-    ET_FQUAD4,
 	ET_LINE2,
 	ET_DISCRETE
 };
@@ -102,7 +100,6 @@ enum FE_Element_Type {
 	FE_SHELL_TRI,
     FE_SHELL_QUAD8,
     FE_SHELL_TRI6,
-    FE_FERGUSON_SHELL_QUAD,
 
 	// truss elements
 	FE_TRUSS,
@@ -271,8 +268,7 @@ enum FE_Dump_Level {
 #define	FE_DOMAIN_TRUSS		5
 #define	FE_DOMAIN_DISCRETE	6
 #define	FE_DOMAIN_2D		7
-#define FE_DOMAIN_FERGUSON  8
-#define FE_DOMAIN_EDGE		9
+#define FE_DOMAIN_EDGE		8
 
 // --- data types ---
 enum Var_Type { PLT_FLOAT, PLT_VEC3F, PLT_MAT3FS, PLT_MAT3FD, PLT_TENS4FS, PLT_MAT3F };

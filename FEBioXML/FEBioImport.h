@@ -269,7 +269,6 @@ public:
     FE_Element_Type		m_nquad4;	//!< quad4 integration rule
     FE_Element_Type		m_nquad8;	//!< quad8 integration rule
     FE_Element_Type		m_nquad9;	//!< quad9 integration rule
-    FE_Element_Type		m_nfquad4;	//!< fquad4 integration rule
 
 public:
 	// Build the node ID table

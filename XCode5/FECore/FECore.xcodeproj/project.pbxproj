@@ -18,8 +18,6 @@
 		D55E3AEF1C5BBEDD00815FCA /* DumpMemStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55E3AEC1C5BBEDD00815FCA /* DumpMemStream.cpp */; };
 		D55E3AF01C5BBEDD00815FCA /* DumpMemStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3AED1C5BBEDD00815FCA /* DumpMemStream.h */; };
 		D55E3AF11C5BBEDD00815FCA /* FEDataStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3AEE1C5BBEDD00815FCA /* FEDataStream.h */; };
-		D55E3AF81C5C1FC000815FCA /* FEFergusonShellDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55E3AF61C5C1FC000815FCA /* FEFergusonShellDomain.cpp */; };
-		D55E3AF91C5C1FC000815FCA /* FEFergusonShellDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3AF71C5C1FC000815FCA /* FEFergusonShellDomain.h */; };
 		D55E3B021C64091700815FCA /* FEEdge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55E3AFE1C64091700815FCA /* FEEdge.cpp */; };
 		D55E3B031C64091700815FCA /* FEEdge.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3AFF1C64091700815FCA /* FEEdge.h */; };
 		D55E3B041C64091700815FCA /* FEEdgeLoad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55E3B001C64091700815FCA /* FEEdgeLoad.cpp */; };
@@ -244,8 +242,6 @@
 		D55E3AEC1C5BBEDD00815FCA /* DumpMemStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DumpMemStream.cpp; sourceTree = "<group>"; };
 		D55E3AED1C5BBEDD00815FCA /* DumpMemStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DumpMemStream.h; sourceTree = "<group>"; };
 		D55E3AEE1C5BBEDD00815FCA /* FEDataStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDataStream.h; sourceTree = "<group>"; };
-		D55E3AF61C5C1FC000815FCA /* FEFergusonShellDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFergusonShellDomain.cpp; sourceTree = "<group>"; };
-		D55E3AF71C5C1FC000815FCA /* FEFergusonShellDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFergusonShellDomain.h; sourceTree = "<group>"; };
 		D55E3AFE1C64091700815FCA /* FEEdge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEEdge.cpp; sourceTree = "<group>"; };
 		D55E3AFF1C64091700815FCA /* FEEdge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEEdge.h; sourceTree = "<group>"; };
 		D55E3B001C64091700815FCA /* FEEdgeLoad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEEdgeLoad.cpp; sourceTree = "<group>"; };
@@ -571,8 +567,6 @@
 				D5E10A211865E15900B23922 /* FEElementTraits.h */,
 				D5E10A221865E15900B23922 /* FEException.cpp */,
 				D5E10A231865E15900B23922 /* FEException.h */,
-				D55E3AF61C5C1FC000815FCA /* FEFergusonShellDomain.cpp */,
-				D55E3AF71C5C1FC000815FCA /* FEFergusonShellDomain.h */,
 				D5B572D5186CC76500D12E45 /* FEGlobalData.cpp */,
 				D5B572D6186CC76500D12E45 /* FEGlobalData.h */,
 				D5E10A241865E15900B23922 /* FEGlobalMatrix.cpp */,
@@ -838,7 +832,6 @@
 				D5E10AF71865E15900B23922 /* MathParser.h in Headers */,
 				D5E10A8E1865E15900B23922 /* FE_enum.h in Headers */,
 				D5E10A821865E15900B23922 /* BC.h in Headers */,
-				D55E3AF91C5C1FC000815FCA /* FEFergusonShellDomain.h in Headers */,
 				D5FF08FF1BE452A50064FF98 /* fecore_debug.h in Headers */,
 				D5E10AB51865E15900B23922 /* FEGlobalMatrix.h in Headers */,
 			);
@@ -917,7 +910,6 @@
 				D5E10AF61865E15900B23922 /* MathParser.cpp in Sources */,
 				D5E10ACC1865E15900B23922 /* FENodeNodeList.cpp in Sources */,
 				D5E10AAE1865E15900B23922 /* FEElementLibrary.cpp in Sources */,
-				D55E3AF81C5C1FC000815FCA /* FEFergusonShellDomain.cpp in Sources */,
 				D59BBBB41AD771DD00E2991F /* tens5d.cpp in Sources */,
 				D5E10AFC1865E15900B23922 /* NodeDataRecord.cpp in Sources */,
 				D5B5ACC01C74CA6C0097B42B /* FEBox.cpp in Sources */,

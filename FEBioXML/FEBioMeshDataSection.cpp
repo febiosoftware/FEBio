@@ -63,7 +63,7 @@ void FEBioMeshDataSection::ParseShellThickness(XMLTag& tag)
 		ELEMENT_DATA& di = data[i];
 		FEElement& el = *m_pelem[di.nid];
 
-		if ((el.Class() != FE_ELEM_SHELL) && (el.Class() != FE_ELEM_FERGUSON_SHELL)) throw XMLReader::InvalidTag(tag);
+		if (el.Class() != FE_ELEM_SHELL) throw XMLReader::InvalidTag(tag);
 		FEShellElement& shell = static_cast<FEShellElement&> (el);
 		
 		int ne = shell.Nodes();
