@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D5CE283E1BCEC89C006D8A97 /* BlockMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CE28381BCEC89C006D8A97 /* BlockMatrix.cpp */; settings = {ASSET_TAGS = (); }; };
-		D5CE283F1BCEC89C006D8A97 /* BlockMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CE28391BCEC89C006D8A97 /* BlockMatrix.h */; settings = {ASSET_TAGS = (); }; };
-		D5CE28401BCEC89C006D8A97 /* BlockSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CE283A1BCEC89C006D8A97 /* BlockSolver.cpp */; settings = {ASSET_TAGS = (); }; };
-		D5CE28411BCEC89C006D8A97 /* BlockSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CE283B1BCEC89C006D8A97 /* BlockSolver.h */; settings = {ASSET_TAGS = (); }; };
-		D5CE28421BCEC89C006D8A97 /* FGMRESSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CE283C1BCEC89C006D8A97 /* FGMRESSolver.cpp */; settings = {ASSET_TAGS = (); }; };
-		D5CE28431BCEC89C006D8A97 /* FGMRESSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CE283D1BCEC89C006D8A97 /* FGMRESSolver.h */; settings = {ASSET_TAGS = (); }; };
+		D5CE283E1BCEC89C006D8A97 /* BlockMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CE28381BCEC89C006D8A97 /* BlockMatrix.cpp */; };
+		D5CE283F1BCEC89C006D8A97 /* BlockMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CE28391BCEC89C006D8A97 /* BlockMatrix.h */; };
+		D5CE28401BCEC89C006D8A97 /* BlockSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CE283A1BCEC89C006D8A97 /* BlockSolver.cpp */; };
+		D5CE28411BCEC89C006D8A97 /* BlockSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CE283B1BCEC89C006D8A97 /* BlockSolver.h */; };
+		D5CE28421BCEC89C006D8A97 /* FGMRESSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CE283C1BCEC89C006D8A97 /* FGMRESSolver.cpp */; };
+		D5CE28431BCEC89C006D8A97 /* FGMRESSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CE283D1BCEC89C006D8A97 /* FGMRESSolver.h */; };
 		D5E10B401865E1B600B23922 /* CompactMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B211865E1B600B23922 /* CompactMatrix.cpp */; };
 		D5E10B411865E1B600B23922 /* CompactMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10B221865E1B600B23922 /* CompactMatrix.h */; };
 		D5E10B421865E1B600B23922 /* ConjGradIterSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B231865E1B600B23922 /* ConjGradIterSolver.cpp */; };
@@ -430,6 +430,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
+				GCC_VERSION = com.intel.compilers.icc.latest;
 				HEADER_SEARCH_PATHS = /opt/intel/mkl/include;
 				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO -DMKL_ISS";
 				OTHER_CPLUSPLUSFLAGS = (

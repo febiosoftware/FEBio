@@ -390,6 +390,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_VERSION = com.intel.compilers.icc.latest;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/gerard/Documents/Programs/fem/FEBio/MRLProjects/FEBio2/XCode5/FEBioTest/build/Debug,

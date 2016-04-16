@@ -384,6 +384,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
+				GCC_VERSION = com.intel.compilers.icc.latest;
 				ICC_LANG_OPENMP = parallel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

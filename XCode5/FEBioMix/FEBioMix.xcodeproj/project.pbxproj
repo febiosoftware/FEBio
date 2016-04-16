@@ -766,6 +766,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
+				GCC_VERSION = com.intel.compilers.icc.latest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

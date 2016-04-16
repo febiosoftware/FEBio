@@ -7,7 +7,7 @@
 #ifdef PARDISO
 #undef PARDISO
 #endif
-#include "mkl_solver.h"
+#include "mkl_rci.h"
 #include "mkl_blas.h"
 #include "mkl_spblas.h"
 #endif // MKL_ISS

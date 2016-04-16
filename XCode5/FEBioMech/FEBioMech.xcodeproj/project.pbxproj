@@ -1745,6 +1745,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
+				GCC_VERSION = com.intel.compilers.icc.latest;
 				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DHAVE_GSL";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
