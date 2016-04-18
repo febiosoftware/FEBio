@@ -1747,14 +1747,7 @@ bool FEPlotRigidEuler::Save(FEDomain& dom, FEDataStream& a)
 	quat2euler(rb.m_qt, E);
     
 	// store Euler
-	a << E[0];
-	int NN = dom.Nodes();
-	for (int i=0; i<NN; ++i)
-	{
-		a.push_back((float) E[0]);
-		a.push_back((float) E[1]);
-		a.push_back((float) E[2]);
-	}
+	a << E[0] << E[1] << E[2];
     
 	return true;
 }
@@ -1826,15 +1819,7 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 		}
 
 		// push data to archive
-		for (int j=0; j<ne; ++j)
-		{
-			a.push_back((float)s[j].xx());
-			a.push_back((float)s[j].yy());
-			a.push_back((float)s[j].zz());
-			a.push_back((float)s[j].xy());
-			a.push_back((float)s[j].yz());
-			a.push_back((float)s[j].xz());
-		}
+		for (int j=0; j<ne; ++j) a << s[j];
 	}
 	return true;
 }
