@@ -558,9 +558,6 @@
     <ClCompile Include="..\..\FEBioMech\FEElasticDomain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEElasticFergusonShellDomain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEGentMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1137,9 +1134,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEMortarInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEElasticFergusonShellDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEGentMaterial.h">

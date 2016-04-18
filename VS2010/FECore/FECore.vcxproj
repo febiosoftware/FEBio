@@ -646,7 +646,6 @@
     <ClInclude Include="..\..\FECore\FEElementList.h" />
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
-    <ClInclude Include="..\..\FECore\FEFergusonShellDomain.h" />
     <ClInclude Include="..\..\FECore\FEGlobalData.h" />
     <ClInclude Include="..\..\FECore\FEGlobalMatrix.h" />
     <ClInclude Include="..\..\FECore\FEGlobalVector.h" />
@@ -767,7 +766,6 @@
     <ClCompile Include="..\..\FECore\FEElementList.cpp" />
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
     <ClCompile Include="..\..\FECore\FEException.cpp" />
-    <ClCompile Include="..\..\FECore\FEFergusonShellDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalData.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalMatrix.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalVector.cpp" />

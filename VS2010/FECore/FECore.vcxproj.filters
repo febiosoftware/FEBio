@@ -361,9 +361,6 @@
     <ClInclude Include="..\..\FECore\DumpMemStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FEFergusonShellDomain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\FEEdge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -661,9 +658,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\DumpMemStream.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FECore\FEFergusonShellDomain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEEdge.cpp">
