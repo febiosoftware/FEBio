@@ -122,7 +122,7 @@ mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// calculate stress
-	mat3ds s(0.0);
+	mat3ds s; s.zero();
 	for (int i=0; i < (int) m_pMat.size(); ++i)
 	{
 		// copy the elastic material point data to the components

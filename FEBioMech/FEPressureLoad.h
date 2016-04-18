@@ -59,10 +59,10 @@ protected:
 	void UnsymmetricPressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn);
 
 	//! Calculates external pressure forces
-	bool PressureForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
+	void PressureForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
 
 	//! Calculates the linear external pressure forces (ie. non-follower forces)
-	bool LinearPressureForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
+	void LinearPressureForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
 
 protected:
 	bool			m_blinear;	//!< pressure load type (linear or nonlinear)

@@ -96,7 +96,7 @@ bool FEThermoElasticSolidDomain::Initialize(FEModel &fem)
             FEElasticMaterialPoint&  pm = *(mp.ExtractData<FEElasticMaterialPoint >());
 			
             // initialize stress
-            pm.m_s = mat3ds(0.0); // m_pMat->Stress(mp);
+            pm.m_s.zero(); // m_pMat->Stress(mp);
 		}
 	}
 	

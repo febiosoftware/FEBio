@@ -45,7 +45,7 @@ tens4ds FEConstReferenceThermalConductivity::Tangent_Conductivity_Strain(FEMater
 mat3ds FEConstReferenceThermalConductivity::Tangent_Conductivity_Temperature(FEMaterialPoint& mp)
 {
 	// TODO: Implement this
-	mat3ds C(0.0);
+	mat3ds C; C.zero();
 	return C;
 }
 
@@ -101,6 +101,6 @@ tens4ds FEConstThermalConductivity::Tangent_Conductivity_Strain(FEMaterialPoint&
 mat3ds FEConstThermalConductivity::Tangent_Conductivity_Temperature(FEMaterialPoint& mp)
 {
 	// TODO: Implement this
-	mat3ds C(0.0);
+	mat3ds C; C.zero();
 	return C;
 }

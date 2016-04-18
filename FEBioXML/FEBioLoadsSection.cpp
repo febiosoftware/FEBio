@@ -444,6 +444,7 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 					// count how many pressure cards there are
 					int npr = tag.children();
 					psurf->create(npr);
+					psl->SetSurface(psurf);
 
 					++tag;
 					int nf[FEElement::MAX_NODES ], N;
@@ -471,8 +472,6 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 
 						++tag;
 					}
-
-					psl->SetSurface(psurf);
 				}
 			}
 			else throw XMLReader::InvalidTag(tag);

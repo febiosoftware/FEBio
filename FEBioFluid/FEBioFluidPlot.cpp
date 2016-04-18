@@ -311,7 +311,7 @@ bool FEPlotElementFluidStress::Save(FEDomain& dom, FEDataStream& a)
         // since the PLOT file requires floats we need to convert
         // the doubles to single precision
         // we output the average stress values of the gauss points
-		mat3ds s(0.0);
+		mat3ds s; s.zero();
         for (int j=0; j<nint; ++j)
         {
             FEFluidMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEFluidMaterialPoint>());
@@ -344,7 +344,7 @@ bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, FEDataStream& a)
         // since the PLOT file requires floats we need to convert
         // the doubles to single precision
         // we output the average stress values of the gauss points
-		mat3ds s(0.0);
+		mat3ds s; s.zero();
         for (int j=0; j<nint; ++j)
         {
             FEFluidMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEFluidMaterialPoint>());

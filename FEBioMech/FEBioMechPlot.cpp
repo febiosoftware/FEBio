@@ -262,7 +262,7 @@ bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 	{
 		FEElement& el = dom.ElementRef(i);
 
-		mat3ds s(0.0);
+		mat3ds s; s.zero();
 		int nint = el.GaussPoints();
 		double f = 1.0 / (double) nint;
 
@@ -1844,7 +1844,7 @@ bool FEPlotLagrangeStrain::Save(FEDomain& dom, FEDataStream& a)
 		// since the PLOT file requires floats we need to convert
 		// the doubles to single precision
 		// we output the average stress values of the gauss points
-		mat3ds s(0.0);
+		mat3ds s; s.zero();
 		for (int j = 0; j<nint; ++j)
 		{
 			FEElasticMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());

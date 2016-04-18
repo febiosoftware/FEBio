@@ -98,7 +98,8 @@ mat3ds FEOrthotropicCLE::Stress(FEMaterialPoint& mp)
     lam[1][1] = (K[1] >= 0) ? lp22 : lm22;
     lam[2][2] = (K[2] >= 0) ? lp33 : lm33;
     
-    mat3ds s(0);
+	mat3ds s; 
+	s.zero();
     
     for (i=0; i<3; ++i) {
         s += (A[i]*BmI+BmI*A[i])*(mu[i]/2);

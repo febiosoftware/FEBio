@@ -29,7 +29,7 @@ mat3ds FECoupledVerondaWestmann::Stress(FEMaterialPoint& mp)
 	double I1 = B.tr();
 
 	// identity tensor
-	mat3ds I(1.0);
+	mat3dd I(1.0);
 
 	// calculate stress
 	return B*(m_c1*m_c2*(2.0*exp(m_c2*(I1-3)) - I1)/J) + B2*(m_c1*m_c2/J) + I*(m_k*log(J)/J);

@@ -31,7 +31,7 @@ public:
 	mat3dd(){}
 
 	// constructors
-	mat3dd(double a);
+	explicit mat3dd(double a);
 	mat3dd(double a0, double a1, double a2);
 
 	// assignment operators
@@ -209,7 +209,14 @@ inline mat3ds operator * (double a, const mat3ds& m) { return m*a; }
 
 //-----------------------------------------------------------------------------
 //! This class describes an anti-symmetric 3D matrix of doubles
-//! \todo expand this class
+//! The matrix is defined such that for a vector b the following is true:
+//! A.b = a x b where A = mat3da(a).
+//!
+//     | 0 -z  y |   |   0  d0  d2 |
+// A = | z  0 -x | = | -d0   0  d1 |
+//     |-y  x  0 |   | -d2 -d1   0 |
+//
+
 class mat3da
 {
 public:
@@ -221,13 +228,29 @@ public:
 
 	// calculates the antisymmetric matrix from a vector
 	// A.b = a x b where A = mat3da(a).
-	mat3da(const vec3d& a);
+	explicit mat3da(const vec3d& a);
 
 	// access operator
-	double operator () (int i, int j);
+	double operator () (int i, int j) const;
 
-	// matrix multiplication
+	double& xy() { return d[0]; }
+	double& yz() { return d[1]; }
+	double& xz() { return d[2]; }
+
+	const double& xy() const { return d[0]; }
+	const double& yz() const { return d[1]; }
+	const double& xz() const { return d[2]; }
+
+	mat3da operator + (const mat3da& a);
+	mat3da operator - (const mat3da& a);
+
+	mat3da operator * (double g) const;
+
+	// matrix algebra
 	mat3d operator * (const mat3d& a);
+
+	// return the equivalent vector
+	vec3d vec() const { return vec3d(-d[1], d[2], -d[0]); }
 
 protected:
 	double	d[3];	// stores xy, yz, xz

@@ -81,33 +81,19 @@ public:
 	double inf_norm();
 
 public:
-	void set(int i, int j, const mat3d& a)
-	{
-		m_pr[i][j] = a(0,0); m_pr[i][j+1] = a(0,1); m_pr[i][j+2] = a(0,2); i++;
-		m_pr[i][j] = a(1,0); m_pr[i][j+1] = a(1,1); m_pr[i][j+2] = a(1,2); i++;
-		m_pr[i][j] = a(2,0); m_pr[i][j+1] = a(2,1); m_pr[i][j+2] = a(2,2);
-	}
+	void set(int i, int j, const mat3d& a);
+	
+	void add(int i, int j, const mat3ds& a);
+	void add(int i, int j, const mat3da& a);
+	void add(int i, int j, const mat3dd& a);
+	void add(int i, int j, const mat3d&  a);
 
-	void add(int i, int j, const mat3d& a)
-	{
-		m_pr[i][j] += a(0,0); m_pr[i][j+1] += a(0,1); m_pr[i][j+2] += a(0,2); i++;
-		m_pr[i][j] += a(1,0); m_pr[i][j+1] += a(1,1); m_pr[i][j+2] += a(1,2); i++;
-		m_pr[i][j] += a(2,0); m_pr[i][j+1] += a(2,1); m_pr[i][j+2] += a(2,2);
-	}
+	void sub(int i, int j, const mat3ds& a);
+	void sub(int i, int j, const mat3da& a);
+	void sub(int i, int j, const mat3dd& a);
+	void sub(int i, int j, const mat3d&  a);
 
-	void sub(int i, int j, const mat3d& a)
-	{
-		m_pr[i][j] -= a(0,0); m_pr[i][j+1] -= a(0,1); m_pr[i][j+2] -= a(0,2); i++;
-		m_pr[i][j] -= a(1,0); m_pr[i][j+1] -= a(1,1); m_pr[i][j+2] -= a(1,2); i++;
-		m_pr[i][j] -= a(2,0); m_pr[i][j+1] -= a(2,1); m_pr[i][j+2] -= a(2,2);
-	}
-
-	void get(int i, int j, mat3d& a)
-	{
-		a[0][0] = m_pr[i  ][j]; a[0][1] = m_pr[i  ][j+1]; a[0][2] = m_pr[i  ][j+2];
-		a[1][0] = m_pr[i+1][j]; a[1][1] = m_pr[i+1][j+1]; a[1][2] = m_pr[i+1][j+2];
-		a[2][0] = m_pr[i+2][j]; a[2][1] = m_pr[i+2][j+1]; a[2][2] = m_pr[i+2][j+2];
-	}
+	void get(int i, int j, mat3d& a);
 
 	// copy-lower-triangular
 	// make the matrix symmetric by copying the lower triangular part
@@ -156,5 +142,75 @@ protected:
 vector<double> operator / (vector<double>& b, matrix& m);
 vector<double> operator * (matrix& m, vector<double>& b);
 matrix outer_product(vector<double>& a);
+
+inline void matrix::set(int i, int j, const mat3d& a)
+{
+	m_pr[i][j] = a(0,0); m_pr[i][j+1] = a(0,1); m_pr[i][j+2] = a(0,2); i++;
+	m_pr[i][j] = a(1,0); m_pr[i][j+1] = a(1,1); m_pr[i][j+2] = a(1,2); i++;
+	m_pr[i][j] = a(2,0); m_pr[i][j+1] = a(2,1); m_pr[i][j+2] = a(2,2);
+}
+
+inline void matrix::add(int i, int j, const mat3ds& a)
+{
+	m_pr[i][j] += a.xx(); m_pr[i][j+1] += a.xy(); m_pr[i][j+2] += a.xz(); i++;
+	m_pr[i][j] += a.xy(); m_pr[i][j+1] += a.yy(); m_pr[i][j+2] += a.yz(); i++;
+	m_pr[i][j] += a.xz(); m_pr[i][j+1] += a.yz(); m_pr[i][j+2] += a.zz();
+}
+
+inline void matrix::add(int i, int j, const mat3da& a)
+{
+	m_pr[i][j+1] += a.xy(); m_pr[i][j+2] += a.xz(); i++;
+	m_pr[i][j  ] -= a.xy(); m_pr[i][j+2] += a.yz(); i++;
+	m_pr[i][j  ] -= a.xz(); m_pr[i][j+1] -= a.yz();
+}
+
+inline void matrix::add(int i, int j, const mat3dd& a)
+{
+	m_pr[i][j  ] += a.diag(0); i++;
+	m_pr[i][j+1] += a.diag(1); i++;
+	m_pr[i][j+2] += a.diag(2);
+}
+
+inline void matrix::add(int i, int j, const mat3d& a)
+{
+	m_pr[i][j] += a(0,0); m_pr[i][j+1] += a(0,1); m_pr[i][j+2] += a(0,2); i++;
+	m_pr[i][j] += a(1,0); m_pr[i][j+1] += a(1,1); m_pr[i][j+2] += a(1,2); i++;
+	m_pr[i][j] += a(2,0); m_pr[i][j+1] += a(2,1); m_pr[i][j+2] += a(2,2);
+}
+
+inline void matrix::sub(int i, int j, const mat3ds& a)
+{
+	m_pr[i][j] -= a.xx(); m_pr[i][j+1] -= a.xy(); m_pr[i][j+2] -= a.xz(); i++;
+	m_pr[i][j] -= a.xy(); m_pr[i][j+1] -= a.yy(); m_pr[i][j+2] -= a.yz(); i++;
+	m_pr[i][j] -= a.xz(); m_pr[i][j+1] -= a.yz(); m_pr[i][j+2] -= a.zz();
+}
+
+inline void matrix::sub(int i, int j, const mat3da& a)
+{
+	m_pr[i][j+1] -= a.xy(); m_pr[i][j+2] -= a.xz(); i++;
+	m_pr[i][j  ] += a.xy(); m_pr[i][j+2] -= a.yz(); i++;
+	m_pr[i][j  ] += a.xz(); m_pr[i][j+1] += a.yz();
+}
+
+inline void matrix::sub(int i, int j, const mat3dd& a)
+{
+	m_pr[i][j  ] -= a.diag(0); i++;
+	m_pr[i][j+1] -= a.diag(1); i++;
+	m_pr[i][j+2] -= a.diag(2);
+}
+
+inline void matrix::sub(int i, int j, const mat3d& a)
+{
+	m_pr[i][j] -= a(0,0); m_pr[i][j+1] -= a(0,1); m_pr[i][j+2] -= a(0,2); i++;
+	m_pr[i][j] -= a(1,0); m_pr[i][j+1] -= a(1,1); m_pr[i][j+2] -= a(1,2); i++;
+	m_pr[i][j] -= a(2,0); m_pr[i][j+1] -= a(2,1); m_pr[i][j+2] -= a(2,2);
+}
+
+inline void matrix::get(int i, int j, mat3d& a)
+{
+	a[0][0] = m_pr[i  ][j]; a[0][1] = m_pr[i  ][j+1]; a[0][2] = m_pr[i  ][j+2];
+	a[1][0] = m_pr[i+1][j]; a[1][1] = m_pr[i+1][j+1]; a[1][2] = m_pr[i+1][j+2];
+	a[2][0] = m_pr[i+2][j]; a[2][1] = m_pr[i+2][j+1]; a[2][2] = m_pr[i+2][j+2];
+}
 
 #endif // !defined(AFX_MATRIX_H__C0F2C6F6_AE26_4C7F_8C70_5A7BF5DD421E__INCLUDED_)

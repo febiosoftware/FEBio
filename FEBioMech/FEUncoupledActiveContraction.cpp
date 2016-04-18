@@ -48,7 +48,7 @@ mat3ds FEUncoupledActiveContraction::DevStress(FEMaterialPoint &mp)
 	double dl = strl - m_l0;
 
 	// calculate stress
-	mat3ds s(0.0);
+	mat3ds s; s.zero();
 	if (dl >= 0)
 	{
 		// calcium sensitivity

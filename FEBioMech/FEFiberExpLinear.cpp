@@ -42,7 +42,7 @@ mat3ds FEFiberExpLinear::Stress(FEMaterialPoint& mp)
 	double J = pt.m_J;
 
 	// fiber stress
-	mat3ds s(0);
+	mat3ds s; s.zero();
 
 	// calculate fiber stress
 	if (l > 1.0)

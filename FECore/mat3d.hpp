@@ -417,9 +417,25 @@ inline mat3da::mat3da(const vec3d& a)
 }
 
 // access operator
-inline double mat3da::operator ()(int i, int j)
+inline double mat3da::operator ()(int i, int j) const
 {
 	return (i==j? 0 : (i<j? d[((j-1)<<1)-i] : -d[((i-1)<<1)-j]));
+}
+
+// scalar multiplication
+inline mat3da mat3da::operator * (double g) const
+{
+	return mat3da(d[0]*g, d[1]*g, d[2]*g);
+}
+
+inline mat3da mat3da::operator + (const mat3da& a)
+{
+	return mat3da(d[0]+a.d[0], d[1]+a.d[1], d[2]+a.d[2]);
+}
+
+inline mat3da mat3da::operator - (const mat3da& a)
+{
+	return mat3da(d[0]-a.d[0], d[1]-a.d[1], d[2]-a.d[2]);
 }
 
 // matrix multiplication

@@ -29,7 +29,7 @@ mat3ds FECoupledMooneyRivlin::Stress(FEMaterialPoint& mp)
 	double I1 = B.tr();
 
 	// identity tensor
-	mat3ds I(1.0);
+	mat3dd I(1.0);
 
 	// calculate stress
 	return (B*(m_c1+I1*m_c2) - B2*m_c2 - I*(m_c1+2.0*m_c2))*(2.0/J) + I*(m_K*log(J)/J);

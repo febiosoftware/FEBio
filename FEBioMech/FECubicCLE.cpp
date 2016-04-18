@@ -88,7 +88,7 @@ mat3ds FECubicCLE::Stress(FEMaterialPoint& mp)
     lam[1][1] = (K[1] >= 0) ? m_lp1 : m_lm1;
     lam[2][2] = (K[2] >= 0) ? m_lp1 : m_lm1;
     
-    mat3ds s(0);
+	mat3ds s; s.zero();
     
     for (i=0; i<3; ++i) {
         s += (A[i]*BmI+BmI*A[i])*(mu[i]/2);

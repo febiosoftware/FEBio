@@ -106,7 +106,7 @@ mat3ds FECompressibleGentMaterial::Stress(FEMaterialPoint& mp)
 	double h = 0.5*(J*J - 1.0) - log(J);
 	double WJ = 2.0*k*(h*h*h)*(J - 1.0/J);
 
-	mat3ds I(1.0);
+	mat3dd I(1.0);
 	mat3ds s = b*(2.0*W1/J) + I*WJ;
 
 	return s;
@@ -131,7 +131,7 @@ tens4ds FECompressibleGentMaterial::Tangent(FEMaterialPoint& mp)
 	double WJ = 2.0*k*(h*h*h)*(J - 1.0/J);
 	double WJJ = 6*k*h*h*(J-1.0/J)*(J-1.0/J) + 2*k*h*h*h*(1.0 + 1.0/(J*J));
 
-	mat3ds I(1.0);
+	mat3dd I(1.0);
 	tens4ds IxI = dyad1s(I);
 	tens4ds I4  = dyad4s(I);
 	tens4ds BxB = dyad1s(b);
