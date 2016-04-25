@@ -65,8 +65,8 @@ bool FESurface::Init()
 	for (int i=0; i<ne; ++i)
 	{
 		FESurfaceElement& el = Element(i);
-		if (el.m_nelem < 0) el.m_nelem = FindElement(el);
-		assert(el.m_nelem >= 0);
+		if (el.m_elem[0] < 0) el.m_elem[0] = FindElement(el);
+		assert(el.m_elem[0] >= 0);
 	}
 
 	return true;
@@ -1483,7 +1483,7 @@ void FESurface::Serialize(DumpStream &ar)
 			ar << el.GetMatID() << el.GetID();
 			ar << el.m_node;
 			ar << el.m_lnode;
-			ar << el.m_nelem;
+			ar << el.m_elem[0] << el.m_elem[1];
 		}
 	}
 	else
@@ -1503,7 +1503,7 @@ void FESurface::Serialize(DumpStream &ar)
 			ar >> mat >> nid;
 			ar >> el.m_node;
 			ar >> el.m_lnode;
-			ar >> el.m_nelem;
+			ar >> el.m_elem[0] >> el.m_elem[1];
 			el.SetMatID(mat);
 			el.SetID(nid);
 		}

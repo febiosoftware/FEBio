@@ -130,7 +130,7 @@ bool FESlidingSurface3::Init()
 		FESurfaceElement& se = Element(i);
 		
 		// get the element this surface element belongs to
-		FEElement* pe = m_pMesh->FindElementFromID(se.m_nelem);
+		FEElement* pe = m_pMesh->FindElementFromID(se.m_elem[0]);
 		if (pe)
 		{
 			// get the material
@@ -697,7 +697,7 @@ void FESlidingInterface3::CalcAutoPenalty(FESlidingSurface3& s)
 		FESurfaceElement& el = s.Element(i);
 		
 		// find the element this face belongs to
-		FEElement* pe = m.FindElementFromID(el.m_nelem);
+		FEElement* pe = m.FindElementFromID(el.m_elem[0]);
 		assert(pe);
 		
 		// get the area of the surface element
@@ -735,7 +735,7 @@ void FESlidingInterface3::CalcAutoPressurePenalty(FESlidingSurface3& s)
 		FESurfaceElement& el = s.Element(i);
 		
 		// find the element this face belongs to
-		FEElement* pe = m.FindElementFromID(el.m_nelem);
+		FEElement* pe = m.FindElementFromID(el.m_elem[0]);
 		assert(pe);
 		
 		// get the area of the surface element
@@ -776,7 +776,7 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 	double eps = 0;
 	
 	// get the element this surface element belongs to
-	FEElement* pe = m.FindElementFromID(el.m_nelem);
+	FEElement* pe = m.FindElementFromID(el.m_elem[0]);
 	if (pe)
 	{
 		// get the material
@@ -849,7 +849,7 @@ void FESlidingInterface3::CalcAutoConcentrationPenalty(FESlidingSurface3& s)
 		FESurfaceElement& el = s.Element(i);
 		
 		// find the element this face belongs to
-		FEElement* pe = m.FindElementFromID(el.m_nelem);
+		FEElement* pe = m.FindElementFromID(el.m_elem[0]);
 		assert(pe);
 		
 		// get the area of the surface element
@@ -890,7 +890,7 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 	double eps = 0;
 	
 	// get the element this surface element belongs to
-	FEElement* pe = m.FindElementFromID(el.m_nelem);
+	FEElement* pe = m.FindElementFromID(el.m_elem[0]);
 	if (pe)
 	{
 		// get the material

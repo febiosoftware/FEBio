@@ -443,7 +443,7 @@ void FESlidingInterface::CalcAutoPenalty(FESlidingSurface& s)
 		FESurfaceElement& face = s.Element(i);
 
 		// grab the element this face belongs to
-		pe = mesh.FindElementFromID(face.m_nelem);
+		pe = mesh.FindElementFromID(face.m_elem[0]);
 		assert(pe);
 
 		// we need a measure for the modulus

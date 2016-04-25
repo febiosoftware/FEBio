@@ -323,8 +323,14 @@ public:
 	}
 
 public:
-	int		m_lid;			//!< local ID
-	int		m_nelem;		//!< index of solid or shell element this surface element is a face of
+	//! local ID of surface element
+	int		m_lid;
+
+	// indices of solid or shell element this surface is a face of
+	// For solids, a surface element can be connected to two elements 
+	// if the surface is an inside surface. For boundary surfaces
+	// the second element index is -1. 
+	int		m_elem[2];				
 };
 
 //-----------------------------------------------------------------------------

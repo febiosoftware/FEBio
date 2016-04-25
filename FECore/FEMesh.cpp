@@ -1086,12 +1086,15 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 				case FE_SHELL_TRI:
 					se.SetType(FE_TRI3G1); 
 					break;
+				case FE_TET10G4:
+				case FE_TET10G8:
                 case FE_SHELL_TRI6:
                     se.SetType(FE_TRI6G7);
                     break;
 				}
 				
-				se.m_nelem = el.GetID();
+				se.m_elem[0] = el.GetID();
+				if (pen) se.m_elem[1] = pen->GetID();
 				
 				int nn = se.Nodes();
 				for (int k=0; k<nn; ++k)

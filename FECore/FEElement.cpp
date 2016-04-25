@@ -153,7 +153,8 @@ void FEShellElement::SetTraits(FEElementTraits* ptraits)
 //-----------------------------------------------------------------------------
 FESurfaceElement::FESurfaceElement() 
 { 
-	m_nelem = -1; m_lid = -1; 
+	m_lid = -1; 
+	m_elem[0] = m_elem[1] = -1;
 }
 
 FESurfaceElement::FESurfaceElement(const FESurfaceElement& el)
@@ -169,7 +170,8 @@ FESurfaceElement::FESurfaceElement(const FESurfaceElement& el)
 
 	// copy surface element data
 	m_lid = el.m_lid;
-	m_nelem = el.m_nelem;
+	m_elem[0] = el.m_elem[0];
+	m_elem[1] = el.m_elem[1];
 }
 
 FESurfaceElement& FESurfaceElement::operator = (const FESurfaceElement& el)
@@ -186,7 +188,8 @@ FESurfaceElement& FESurfaceElement::operator = (const FESurfaceElement& el)
 
 	// copy surface element data
 	m_lid = el.m_lid;
-	m_nelem = el.m_nelem;
+	m_elem[0] = el.m_elem[0];
+	m_elem[1] = el.m_elem[1];
 
 	return (*this); 
 }

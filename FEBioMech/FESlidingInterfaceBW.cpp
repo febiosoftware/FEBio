@@ -429,7 +429,7 @@ void FESlidingInterfaceBW::CalcAutoPenalty(FESlidingSurfaceBW& s)
 		FESurfaceElement& el = s.Element(i);
 		
 		// find the element this face belongs to
-		FEElement* pe = m.FindElementFromID(el.m_nelem);
+		FEElement* pe = m.FindElementFromID(el.m_elem[0]);
 		assert(pe);
 		
 		// get the area of the surface element
