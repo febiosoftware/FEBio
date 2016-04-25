@@ -70,6 +70,10 @@ public:
 	tens3drs();
 	tens3drs(double m[18]);
 
+	// access operator (TODO: implement this)
+	double operator () (int i, int j, int k) const;
+	double& operator () (int i, int j, int k);
+
 	// arithmetic operators
 	tens3drs operator + (const tens3drs& t) const;
 	tens3drs operator - (const tens3drs& t) const;

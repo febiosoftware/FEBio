@@ -11,6 +11,20 @@ inline tens3drs::tens3drs(double m[18])
 		d[i] = m[i];
 }
 
+// access operator
+inline double tens3drs::operator () (int i, int j, int k) const
+{
+	const int m[3][3] = {{0,1,2},{1,3,4},{2,4,5}};
+	return d[6*i + m[j][k] ];
+}
+
+// access operator
+inline double& tens3drs::operator () (int i, int j, int k)
+{
+	const int m[3][3] = {{0,1,2},{1,3,4},{2,4,5}};
+	return d[6*i + m[j][k] ];
+}
+
 // operator +
 inline tens3drs tens3drs::operator + (const tens3drs& t) const
 {
@@ -126,12 +140,13 @@ inline vec3d tens3drs::contract2s(const mat3ds& s)
 	return x;
 }
 
-// triple contraction by a similar 3o tensor m = GijkHijk
+// triple contraction by a similar 3o tensor m = Gijk*Hijk
 inline double tens3drs::tripledot(const tens3drs& H)
 {
 	const double* h = H.d;
-	return d[0]*h[0] + 2*d[1]*h[1] + 2*d[2]*h[2] + d[3]*h[3] + 2*d[4]*h[4] + d[5]*h[5] + d[6]*h[6] + 2*d[7]*h[7] + 2*d[8]*h[8] + d[9]*h[9] 
-	+ 2*d[10]*h[10] + d[11]*h[11]  + d[12]*h[12]  + 2*d[13]*h[13]  + 2*d[14]*h[14]  + d[15]*h[15]  + 2*d[16]*h[16]  + d[17]*h[17];  
+	return	d[ 0]*h[ 0] + 2*d[ 1]*h[ 1] + 2*d[ 2]*h[ 2] + d[ 3]*h[ 3] + 2*d[ 4]*h[ 4] + d[ 5]*h[ 5] 
+		  + d[ 6]*h[ 6] + 2*d[ 7]*h[ 7] + 2*d[ 8]*h[ 8] + d[ 9]*h[ 9] + 2*d[10]*h[10] + d[11]*h[11]
+		  + d[12]*h[12] + 2*d[13]*h[13] + 2*d[14]*h[14] + d[15]*h[15] + 2*d[16]*h[16] + d[17]*h[17];  
 }
 
 // contract the right two legs by the dyad formed by a vector  xi = Gijk*Vj*Wk
@@ -272,25 +287,25 @@ inline tens3drs operator * (const mat3d& F, const tens3drs& t)
 {
 	tens3drs G;
 
-	const double* d = G.d;
-	G.d[0] = F(0,0)*d[0] + F(0,1)*d[6] + F(0,2)*d[12];
-	G.d[1] = F(0,0)*d[1] + F(0,1)*d[7] + F(0,2)*d[13];
-	G.d[2] = F(0,0)*d[2] + F(0,1)*d[8] + F(0,2)*d[14];
-	G.d[3] = F(0,0)*d[3] + F(0,1)*d[9] + F(0,2)*d[15];
-	G.d[4] = F(0,0)*d[4] + F(0,1)*d[10] + F(0,2)*d[16];
-	G.d[5] = F(0,0)*d[5] + F(0,1)*d[11] + F(0,2)*d[17];
+	const double* d = t.d;
+	G.d[ 0] = F(0,0)*d[0] + F(0,1)*d[ 6] + F(0,2)*d[12];
+	G.d[ 1] = F(0,0)*d[1] + F(0,1)*d[ 7] + F(0,2)*d[13];
+	G.d[ 2] = F(0,0)*d[2] + F(0,1)*d[ 8] + F(0,2)*d[14];
+	G.d[ 3] = F(0,0)*d[3] + F(0,1)*d[ 9] + F(0,2)*d[15];
+	G.d[ 4] = F(0,0)*d[4] + F(0,1)*d[10] + F(0,2)*d[16];
+	G.d[ 5] = F(0,0)*d[5] + F(0,1)*d[11] + F(0,2)*d[17];
 
-	G.d[6] = F(1,0)*d[0] + F(1,1)*d[6] + F(1,2)*d[12];
-	G.d[7] = F(1,0)*d[1] + F(1,1)*d[7] + F(1,2)*d[13];
-	G.d[8] = F(1,0)*d[2] + F(1,1)*d[8] + F(1,2)*d[14];
-	G.d[9] = F(1,0)*d[3] + F(1,1)*d[9] + F(1,2)*d[15];
+	G.d[ 6] = F(1,0)*d[0] + F(1,1)*d[ 6] + F(1,2)*d[12];
+	G.d[ 7] = F(1,0)*d[1] + F(1,1)*d[ 7] + F(1,2)*d[13];
+	G.d[ 8] = F(1,0)*d[2] + F(1,1)*d[ 8] + F(1,2)*d[14];
+	G.d[ 9] = F(1,0)*d[3] + F(1,1)*d[ 9] + F(1,2)*d[15];
 	G.d[10] = F(1,0)*d[4] + F(1,1)*d[10] + F(1,2)*d[16];
 	G.d[11] = F(1,0)*d[5] + F(1,1)*d[11] + F(1,2)*d[17];
 
-	G.d[12] = F(2,0)*d[0] + F(2,1)*d[6] + F(2,2)*d[12];
-	G.d[13] = F(2,0)*d[1] + F(2,1)*d[7] + F(2,2)*d[13];
-	G.d[14] = F(2,0)*d[2] + F(2,1)*d[8] + F(2,2)*d[14];
-	G.d[15] = F(2,0)*d[3] + F(2,1)*d[9] + F(2,2)*d[15];
+	G.d[12] = F(2,0)*d[0] + F(2,1)*d[ 6] + F(2,2)*d[12];
+	G.d[13] = F(2,0)*d[1] + F(2,1)*d[ 7] + F(2,2)*d[13];
+	G.d[14] = F(2,0)*d[2] + F(2,1)*d[ 8] + F(2,2)*d[14];
+	G.d[15] = F(2,0)*d[3] + F(2,1)*d[ 9] + F(2,2)*d[15];
 	G.d[16] = F(2,0)*d[4] + F(2,1)*d[10] + F(2,2)*d[16];
 	G.d[17] = F(2,0)*d[5] + F(2,1)*d[11] + F(2,2)*d[17];
 

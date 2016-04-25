@@ -26,13 +26,16 @@ protected:
 	void InternalWorkFlux(FEGlobalVector& R);
 	void InternalElementWorkFlux(FESolidElement& el, vector<double>& fe);
 
+	void ElementInternalForce_PF(FESolidElement& el, vector<double>& fe);
+	void ElementInternalForce_QG(FESolidElement& el, vector<double>& fe);
+
 public:
 	// --- S T I F F N E S S ---
 	//! calculates the solid element stiffness matrix
 	void ElementGeometricalStiffness(FESolidElement &el, matrix &ke);
 	void ElementMaterialStiffness(FESolidElement &el, matrix &ke);
 
-	void defhess(FESolidElement &el, tens3drs &G, int n);
+	void defhess(FESolidElement &el, int n, tens3drs &G);
 
 private:
 	FEElemElemList	m_EEL;

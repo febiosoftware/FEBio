@@ -29,38 +29,37 @@ public:
 	void Serialize(DumpStream& ar);
 
 public:
-	mat3d	m_F_prev;	//!< deformation gradient at previous converged time step
+	mat3d		m_F_prev;		//!< deformation gradient at previous converged time step
+	tens3drs   m_G_prev; 		//!< gradient of deformation gradient at previous time point
 
-	tens3drs   m_G;				// LTE - Deformation Hessian
-	tens3ds    m_tau;			// LTE - Cauchy stress moment
+	tens3drs   m_G;				//!< gradient of deformation gradient
 
-	tens3drs   m_G_prev; 		// LTE - Deformation Hessian
+	tens3ds    m_tau;			// TODO: remove
+	tens3drs   m_Q;				// Higher-order stress tensor
 
-	tens3drs   m_QK1;			// LTE - 1st Piola-Kirchhoff stress moment
+	mat3ds     m_S;				// LTE - 2nd Piola-Kirchhoff stress (TODO: remove)
+	tens3ds    m_T;				// LTE - 2nd Piola-Kirchhoff stress moment (TODO: remove)
 
-	mat3ds     m_S;				// LTE - 2nd Piola-Kirchhoff stress
-	tens3ds    m_T;				// LTE - 2nd Piola-Kirchhoff stress moment
-
-	tens3ds    m_inf_str_grad;	// LTE - infinitesimal strain gradient
+	tens3ds    m_inf_str_grad;	// LTE - infinitesimal strain gradient (TODO: remove)
 	
-	mat3ds     m_E;				// LTE - Green-Lagrange strain
-	tens3ds    m_H;				// LTE - Green-Lagrange strain gradient
+	mat3ds     m_E;				// LTE - Green-Lagrange strain	(TODO: remove)
+	tens3ds    m_H;				// LTE - Green-Lagrange strain gradient (TODO: remove)
 	
-	mat3ds     m_e;				// LTE - Euler-Almansi strain
-	tens3ds    m_h;				// LTE - Euler-Almansi strain graident
+	mat3ds     m_e;				// LTE - Euler-Almansi strain (TODO: remove)
+	tens3ds    m_h;				// LTE - Euler-Almansi strain graident (TODO: remove)
 
-	double     m_macro_energy;	// LTE - Total macroscopic strain energy
-	double	   m_micro_energy;	// LTE - Total volume-average of strain energy throughout the RVE solution
-	double	   m_energy_diff;	// LTE - Difference between macro energy and volume averaged energy of RVE (should be zero) 
+	double     m_macro_energy;	// LTE - Total macroscopic strain energy (TODO: remove)
+	double	   m_micro_energy;	// LTE - Total volume-average of strain energy throughout the RVE solution (TODO: remove)
+	double	   m_energy_diff;	// LTE - Difference between macro energy and volume averaged energy of RVE (should be zero)  (TODO: remove)
 
-	double	   m_macro_energy_inc;	// LTE - Macroscopic strain energy increment
-	double	   m_micro_energy_inc;	// LTE - Microscopic strain energy increment
+	double	   m_macro_energy_inc;	// LTE - Macroscopic strain energy increment (TODO: remove)
+	double	   m_micro_energy_inc;	// LTE - Microscopic strain energy increment (TODO: remove)
 
-	FEModel m_rve;				// LTE - Current copy of the rve		
+	tens4ds	   m_Ca;			//!< Averaged rank 4 material stiffness
+	tens5ds    m_Da;			//!< Averaged rank 5 material stiffness
+	tens6ds    m_Ea;			//!< Averaged rank 6 material stiffness
 
-	tens4ds	   m_Ca;			// LTE - Averaged rank 4 material stiffness
-	tens5ds    m_Da;			// LTE - Averaged rank 5 material stiffness
-	tens6ds    m_Ea;			// LTE - Averaged rank 6 material stiffness
+	FEModel m_rve;				//!< local copy of the rve		
 };
 
 //-----------------------------------------------------------------------------

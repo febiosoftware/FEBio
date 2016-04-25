@@ -434,7 +434,7 @@ bool FEPlotElementQK1norm::Save(FEDomain& dom, FEDataStream& a)
 		for (int j=0; j<nint; ++j)
 		{
 			FEMicroMaterialPoint2O& pt2O = *(el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
-			QK1_avg += pt2O.m_QK1;
+			QK1_avg += pt2O.m_Q;
 		}
 		QK1_avg *= f;
 

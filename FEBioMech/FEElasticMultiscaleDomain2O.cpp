@@ -46,7 +46,7 @@ bool FEElasticMultiscaleDomain2O::Initialize(FEModel& fem)
 			pt.m_rt = rt;
 
 			pt.m_J = defgrad(el, pt.m_F, j);
-			defhess(el, mmpt2O.m_G, j);
+			defhess(el, j, mmpt2O.m_G);
 
 			mmpt2O.m_F_prev = pt.m_F;
 			mmpt2O.m_G_prev = mmpt2O.m_G;
@@ -222,104 +222,171 @@ void FEElasticMultiscaleDomain2O::InternalElementWorkFlux(FESolidElement& el, ve
 //! calculates the internal equivalent nodal forces for solid elements
 void FEElasticMultiscaleDomain2O::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
-	int i, n;
+	// contribution from stress
+	ElementInternalForce_PF(el, fe);
 
-	// jacobian matrix, inverse jacobian matrix and determinants
-	double Ji[3][3], detJt;
+	// contriubtion from higher-order stress
+	ElementInternalForce_QG(el, fe);
+}
 
-	double Gx, Gy, Gz;
-	
-	mat3ds s; s.zero();
-	tens3ds tau; tau.zero();
-
-	const double* Gr, *Gs, *Gt;
-
+//-----------------------------------------------------------------------------
+void FEElasticMultiscaleDomain2O::ElementInternalForce_PF(FESolidElement& el, vector<double>& fe)
+{
+	double Ji[3][3];
 	int nint = el.GaussPoints();
 	int neln = el.Nodes();
-
 	double*	gw = el.GaussWeights();
-
+	
 	// repeat for all integration points
-	for (n=0; n<nint; ++n)
+	for (int n=0; n<nint; ++n)
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 		FEMicroMaterialPoint2O& mmpt2O = *(mp.ExtractData<FEMicroMaterialPoint2O>());
 
-		// calculate the jacobian
-		detJt = invjact(el, Ji, n);
-		
-		detJt *= gw[n];
+		// calculate the jacobian and its derivative
+		// (and multiply by integration weight)
+		double detJt = invjact(el, Ji, n)*gw[n];
 
 		// get the stress vector for this integration point
-		s = pt.m_s;
-		tau = mmpt2O.m_tau;
+		mat3ds& s = pt.m_s;
 
-		Gr = el.Gr(n);
-		Gs = el.Gs(n);
-		Gt = el.Gt(n);
+		double* Gr = el.Gr(n);
+		double* Gs = el.Gs(n);
+		double* Gt = el.Gt(n);
 
-		//// LTE 
-		// Calculate G (Deformation Hessian)
-		double *Grrn = el.Grr(n);
-		double *Grsn = el.Grs(n);
-		double *Grtn = el.Grt(n);
-
-		double *Gsrn = el.Gsr(n);
-		double *Gssn = el.Gss(n);
-		double *Gstn = el.Gst(n);
-
-		double *Gtrn = el.Gtr(n);
-		double *Gtsn = el.Gts(n);
-		double *Gttn = el.Gtt(n);
-
-
-		for (i=0; i<neln; ++i)
+		// --- first-order contribution ---
+		for (int i=0; i<neln; ++i)
 		{
 			// calculate global gradient of shape functions
 			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
+			double Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
+			double Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
+			double Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
 
-			double Grri = Grrn[i];
-			double Grsi = Grsn[i];
-			double Grti = Grtn[i];
-
-			double Gsri = Gsrn[i];
-			double Gssi = Gssn[i];
-			double Gsti = Gstn[i];
-
-			double Gtri = Gtrn[i];
-			double Gtsi = Gtsn[i];
-			double Gtti = Gttn[i];
-
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !	
-			// Calculate based on Gjk = Ji[l][j]*Glm*Ji[m][k]
-			double GXX = Ji[0][0]*Grri*Ji[0][0] + Ji[0][0]*Grsi*Ji[1][0] + Ji[0][0]*Grti*Ji[2][0] + Ji[1][0]*Gsri*Ji[0][0] + Ji[1][0]*Gssi*Ji[1][0] + Ji[1][0]*Gsti*Ji[2][0] + Ji[2][0]*Gtri*Ji[0][0] + Ji[2][0]*Gtsi*Ji[1][0] + Ji[2][0]*Gtti*Ji[2][0];
-			double GXY = Ji[0][0]*Grri*Ji[0][1] + Ji[0][0]*Grsi*Ji[1][1] + Ji[0][0]*Grti*Ji[2][1] + Ji[1][0]*Gsri*Ji[0][1] + Ji[1][0]*Gssi*Ji[1][1] + Ji[1][0]*Gsti*Ji[2][1] + Ji[2][0]*Gtri*Ji[0][1] + Ji[2][0]*Gtsi*Ji[1][1] + Ji[2][0]*Gtti*Ji[2][1];
-			double GXZ = Ji[0][0]*Grri*Ji[0][2] + Ji[0][0]*Grsi*Ji[1][2] + Ji[0][0]*Grti*Ji[2][2] + Ji[1][0]*Gsri*Ji[0][2] + Ji[1][0]*Gssi*Ji[1][2] + Ji[1][0]*Gsti*Ji[2][2] + Ji[2][0]*Gtri*Ji[0][2] + Ji[2][0]*Gtsi*Ji[1][2] + Ji[2][0]*Gtti*Ji[2][2];
-		
-			double GYX = Ji[0][1]*Grri*Ji[0][0] + Ji[0][1]*Grsi*Ji[1][0] + Ji[0][1]*Grti*Ji[2][0] + Ji[1][1]*Gsri*Ji[0][0] + Ji[1][1]*Gssi*Ji[1][0] + Ji[1][1]*Gsti*Ji[2][0] + Ji[2][1]*Gtri*Ji[0][0] + Ji[2][1]*Gtsi*Ji[1][0] + Ji[2][1]*Gtti*Ji[2][0];
-			double GYY = Ji[0][1]*Grri*Ji[0][1] + Ji[0][1]*Grsi*Ji[1][1] + Ji[0][1]*Grti*Ji[2][1] + Ji[1][1]*Gsri*Ji[0][1] + Ji[1][1]*Gssi*Ji[1][1] + Ji[1][1]*Gsti*Ji[2][1] + Ji[2][1]*Gtri*Ji[0][1] + Ji[2][1]*Gtsi*Ji[1][1] + Ji[2][1]*Gtti*Ji[2][1];
-			double GYZ = Ji[0][1]*Grri*Ji[0][2] + Ji[0][1]*Grsi*Ji[1][2] + Ji[0][1]*Grti*Ji[2][2] + Ji[1][1]*Gsri*Ji[0][2] + Ji[1][1]*Gssi*Ji[1][2] + Ji[1][1]*Gsti*Ji[2][2] + Ji[2][1]*Gtri*Ji[0][2] + Ji[2][1]*Gtsi*Ji[1][2] + Ji[2][1]*Gtti*Ji[2][2];
-
-			double GZX = Ji[0][2]*Grri*Ji[0][0] + Ji[0][2]*Grsi*Ji[1][0] + Ji[0][2]*Grti*Ji[2][0] + Ji[1][2]*Gsri*Ji[0][0] + Ji[1][2]*Gssi*Ji[1][0] + Ji[1][2]*Gsti*Ji[2][0] + Ji[2][2]*Gtri*Ji[0][0] + Ji[2][2]*Gtsi*Ji[1][0] + Ji[2][2]*Gtti*Ji[2][0];
-			double GZY = Ji[0][2]*Grri*Ji[0][1] + Ji[0][2]*Grsi*Ji[1][1] + Ji[0][2]*Grti*Ji[2][1] + Ji[1][2]*Gsri*Ji[0][1] + Ji[1][2]*Gssi*Ji[1][1] + Ji[1][2]*Gsti*Ji[2][1] + Ji[2][2]*Gtri*Ji[0][1] + Ji[2][2]*Gtsi*Ji[1][1] + Ji[2][2]*Gtti*Ji[2][1];
-			double GZZ = Ji[0][2]*Grri*Ji[0][2] + Ji[0][2]*Grsi*Ji[1][2] + Ji[0][2]*Grti*Ji[2][2] + Ji[1][2]*Gsri*Ji[0][2] + Ji[1][2]*Gssi*Ji[1][2] + Ji[1][2]*Gsti*Ji[2][2] + Ji[2][2]*Gtri*Ji[0][2] + Ji[2][2]*Gtsi*Ji[1][2] + Ji[2][2]*Gtti*Ji[2][2];
-			
 			// calculate internal force
 			// the '-' sign is so that the internal forces get subtracted
 			// from the global residual vector
-			fe[3*i  ] -=  (Gx*s.xx() + Gy*s.xy() + Gz*s.xz())*detJt +
-						   (tau.d[0]*GXX + tau.d[1]*(GXY + GYX) + tau.d[2]*(GXZ + GZX) + tau.d[3]*GYY + tau.d[4]*(GYZ + GZY) + tau.d[5]*GZZ)*detJt*detJt;
+			fe[3*i  ] -=  (Gx*s.xx() + Gy*s.xy() + Gz*s.xz())*detJt;
+			fe[3*i+1] -=  (Gx*s.xy() + Gy*s.yy() + Gz*s.yz())*detJt;
+			fe[3*i+2] -=  (Gx*s.xz() + Gy*s.yz() + Gz*s.zz())*detJt;
+		}
+	}
+}
 
-			fe[3*i+1] -=  (Gx*s.xy() + Gy*s.yy() + Gz*s.yz())*detJt +
-		   				   (tau.d[1]*GXX + tau.d[3]*(GXY + GYX) + tau.d[4]*(GXZ + GZX) + tau.d[6]*GYY + tau.d[7]*(GYZ + GZY) + tau.d[8]*GZZ)*detJt*detJt;
+//-----------------------------------------------------------------------------
+void FEElasticMultiscaleDomain2O::ElementInternalForce_QG(FESolidElement& el, vector<double>& fe)
+{
+	int nint = el.GaussPoints();
+	int neln = el.Nodes();
+	double*	gw = el.GaussWeights();
 
-			fe[3*i+2] -=  (Gx*s.xz() + Gy*s.yz() + Gz*s.zz())*detJt +
-		   				   (tau.d[2]*GXX + tau.d[4]*(GXY + GYX) + tau.d[5]*(GXZ + GZX) + tau.d[7]*GYY + tau.d[8]*(GYZ + GZY) + tau.d[9]*GZZ)*detJt*detJt;
+	// inverse of Jacobian matrix
+	double Ji[3][3];
+
+	// get the nodal positions
+	vec3d X[FEElement::MAX_NODES];
+	FEMesh& mesh = *GetMesh();
+	for (int i=0; i<neln; ++i) X[i] = mesh.Node(el.m_node[i]).m_r0;
+
+	// repeat for all integration points
+	for (int n=0; n<nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+		FEMicroMaterialPoint2O& mmpt2O = *(mp.ExtractData<FEMicroMaterialPoint2O>());
+
+		// get the higher-order stress
+		tens3drs& Q = mmpt2O.m_Q;
+
+		// we'll evaluate this term in the material frame
+		// so we need the Jacobian with respect to the reference configuration
+		double J0 = invjac0(el, Ji, n);
+
+		// shape function derivatives
+		double* Gr = el.Gr(n);
+		double* Gs = el.Gs(n);
+		double* Gt = el.Gt(n);
+
+		double *Grrn = el.Grr(n); double *Grsn = el.Grs(n); double *Grtn = el.Grt(n);
+		double *Gsrn = el.Gsr(n); double *Gssn = el.Gss(n); double *Gstn = el.Gst(n);
+		double *Gtrn = el.Gtr(n); double *Gtsn = el.Gts(n); double *Gttn = el.Gtt(n);
+
+		// calculate K = dJ/dr
+		double K[3][3][3] = {0};
+		for (int a=0; a<n; ++a)
+		{
+			// second derivatives of shape functions
+			double G2[3][3];
+			G2[0][0] = Grrn[a]; G2[0][1] = Grsn[a]; G2[0][2] = Grtn[a];
+			G2[1][0] = Gsrn[a]; G2[1][1] = Gssn[a]; G2[1][2] = Gstn[a];
+			G2[2][0] = Gtrn[a]; G2[2][1] = Gtsn[a]; G2[2][2] = Gttn[a];
+
+			for (int j=0; j<3; ++j)
+				for (int k=0; k<3; ++k)
+				{
+					K[0][j][k] += G2[j][k]*X[a].x;
+					K[1][j][k] += G2[j][k]*X[a].y;
+					K[2][j][k] += G2[j][k]*X[a].z;
+				}
+		}
+
+		// calculate A = -J^-1*dJ/drJ^-1
+		double A[3][3][3] = {0};
+		for (int i=0; i<3; ++i)
+			for (int j=0; j<3; ++j)
+			{
+				for (int p=0; p<3; ++p)
+					for (int q=0; q<3; ++q)
+					{
+						A[i][j][0] -= Ji[j][p]*K[p][q][0]*Ji[q][i];
+						A[i][j][1] -= Ji[j][p]*K[p][q][1]*Ji[q][i];
+						A[i][j][2] -= Ji[j][p]*K[p][q][2]*Ji[q][i];
+					}
+			}
+
+		// loop over nodes
+		for (int a=0; a<neln; ++a)
+		{
+			// first derivative of shape functions
+			double G1[3];
+			G1[0] = Gr[a];
+			G1[1] = Gs[a];
+			G1[2] = Gt[a];
+
+			// second derivatives of shape functions
+			double G2[3][3];
+			G2[0][0] = Grrn[a]; G2[0][1] = Grsn[a]; G2[0][2] = Grtn[a];
+			G2[1][0] = Gsrn[a]; G2[1][1] = Gssn[a]; G2[1][2] = Gstn[a];
+			G2[2][0] = Gtrn[a]; G2[2][1] = Gtsn[a]; G2[2][2] = Gttn[a];
+
+			// calculate dB/dr
+			double D[3][3] = {0};
+			for (int i=0; i<3; ++i)
+				for (int k=0; k<3; ++k)
+				{
+					for (int j=0; j<3; ++j) D[i][k] += A[i][j][k]*G1[j] + Ji[j][i]*G2[j][k];
+				}
+
+
+			// calculate global gradient of shape functions
+			double H[3][3] = {0};
+			for (int i=0; i<3; ++i)
+				for (int j=0; j<3; ++j)
+				{
+					H[i][j] += D[i][0]*Ji[0][j] + D[i][1]*Ji[1][j] + D[i][2]*Ji[2][j];
+				}
+
+			// calculate internal force
+			// the '-' sign is so that the internal forces get subtracted
+			// from the global residual vector
+			for (int j=0; j<3; ++j)
+				for (int k=0; k<3; ++k)
+				{
+					fe[3*a  ] -=  (Q(0,j,k)*H[j][k])*J0*gw[n];
+					fe[3*a+1] -=  (Q(1,j,k)*H[j][k])*J0*gw[n];
+					fe[3*a+2] -=  (Q(2,j,k)*H[j][k])*J0*gw[n];
+				}
 		}
 	}
 }
@@ -369,7 +436,7 @@ void FEElasticMultiscaleDomain2O::UpdateElementStress(int iel, double dt)
 
 		// get the deformation gradient and determinant
 		pt.m_J = defgrad(el, pt.m_F, n);
-		defhess(el, mmpt2O.m_G, n);
+		defhess(el, n, mmpt2O.m_G);
 
 		pmat->Stress2O(mp);
 	}
@@ -833,81 +900,109 @@ void FEElasticMultiscaleDomain2O::ElementMaterialStiffness(FESolidElement &el, m
 }
 
 //-----------------------------------------------------------------------------
-//! Calculate the deformation gradient of element el at integration point n.
-//! The deformation gradient is returned in F and its determinant is the return
-//! value of the function
-void FEElasticMultiscaleDomain2O::defhess(FESolidElement &el, tens3drs &G, int n)
+//! Calculate the gradient of deformation gradient of element el at integration point n.
+//! The gradient of the deformation gradient is returned in G.
+void FEElasticMultiscaleDomain2O::defhess(FESolidElement &el, int n, tens3drs &G)
 {
-	int i;
-
-	// number of nodes
 	int neln = el.Nodes();
 
-	// shape function derivatives
-	double *Grn = el.Gr(n);
-	double *Gsn = el.Gs(n);
-	double *Gtn = el.Gt(n);
+	// get the nodal positions
+	vec3d X[FEElement::MAX_NODES];
+	vec3d x[FEElement::MAX_NODES];
+	FEMesh& mesh = *GetMesh();
+	for (int i=0; i<neln; ++i)
+	{
+		X[i] = mesh.Node(el.m_node[i]).m_r0;
+		x[i] = mesh.Node(el.m_node[i]).m_rt;
+	}
 
-	// nodal points
-	vec3d r[FEElement::MAX_NODES];
-	for (i=0; i<neln; ++i) r[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-
-	// calculate inverse jacobian
+	// we need the Jacobian with respect to the reference configuration
 	double Ji[3][3];
 	invjac0(el, Ji, n);
 
-	//// LTE 
-	// Calculate G (Deformation Hessian)
-	double *Grrn = el.Grr(n);
-	double *Grsn = el.Grs(n);
-	double *Grtn = el.Grt(n);
+	// shape function derivatives
+	double* Gr = el.Gr(n);
+	double* Gs = el.Gs(n);
+	double* Gt = el.Gt(n);
 
-	double *Gsrn = el.Gsr(n);
-	double *Gssn = el.Gss(n);
-	double *Gstn = el.Gst(n);
+	double *Grrn = el.Grr(n); double *Grsn = el.Grs(n); double *Grtn = el.Grt(n);
+	double *Gsrn = el.Gsr(n); double *Gssn = el.Gss(n); double *Gstn = el.Gst(n);
+	double *Gtrn = el.Gtr(n); double *Gtsn = el.Gts(n); double *Gttn = el.Gtt(n);
 
-	double *Gtrn = el.Gtr(n);
-	double *Gtsn = el.Gts(n);
-	double *Gttn = el.Gtt(n);
-	
-	G.zero();
-
-	for (i=0; i<neln; ++i)
+	// calculate K = dJ/dr
+	double K[3][3][3] = {0};
+	for (int a=0; a<n; ++a)
 	{
-		double Grri = Grrn[i];
-		double Grsi = Grsn[i];
-		double Grti = Grtn[i];
+		// second derivatives of shape functions
+		double G2[3][3];
+		G2[0][0] = Grrn[a]; G2[0][1] = Grsn[a]; G2[0][2] = Grtn[a];
+		G2[1][0] = Gsrn[a]; G2[1][1] = Gssn[a]; G2[1][2] = Gstn[a];
+		G2[2][0] = Gtrn[a]; G2[2][1] = Gtsn[a]; G2[2][2] = Gttn[a];
 
-		double Gsri = Gsrn[i];
-		double Gssi = Gssn[i];
-		double Gsti = Gstn[i];
+		for (int j=0; j<3; ++j)
+			for (int k=0; k<3; ++k)
+			{
+				K[0][j][k] += G2[j][k]*X[a].x;
+				K[1][j][k] += G2[j][k]*X[a].y;
+				K[2][j][k] += G2[j][k]*X[a].z;
+			}
+	}
 
-		double Gtri = Gtrn[i];
-		double Gtsi = Gtsn[i];
-		double Gtti = Gttn[i];
+	// calculate A = -J^-1*dJ/drJ^-1
+	double A[3][3][3] = {0};
+	for (int i=0; i<3; ++i)
+		for (int j=0; j<3; ++j)
+		{
+			for (int p=0; p<3; ++p)
+				for (int q=0; q<3; ++q)
+				{
+					A[i][j][0] -= Ji[j][p]*K[p][q][0]*Ji[q][i];
+					A[i][j][1] -= Ji[j][p]*K[p][q][1]*Ji[q][i];
+					A[i][j][2] -= Ji[j][p]*K[p][q][2]*Ji[q][i];
+				}
+		}
 
-		double x = r[i].x;
-		double y = r[i].y;
-		double z = r[i].z;
+	// loop over nodes
+	G.zero();
+	for (int a=0; a<neln; ++a)
+	{
+		// first derivative of shape functions
+		double G1[3];
+		G1[0] = Gr[a];
+		G1[1] = Gs[a];
+		G1[2] = Gt[a];
+
+		// second derivatives of shape functions
+		double G2[3][3];
+		G2[0][0] = Grrn[a]; G2[0][1] = Grsn[a]; G2[0][2] = Grtn[a];
+		G2[1][0] = Gsrn[a]; G2[1][1] = Gssn[a]; G2[1][2] = Gstn[a];
+		G2[2][0] = Gtrn[a]; G2[2][1] = Gtsn[a]; G2[2][2] = Gttn[a];
+
+		// calculate dB/dr
+		double D[3][3] = {0};
+		for (int i=0; i<3; ++i)
+			for (int k=0; k<3; ++k)
+			{
+				for (int j=0; j<3; ++j) D[i][k] += A[i][j][k]*G1[j] + Ji[j][i]*G2[j][k];
+			}
 
 		// calculate global gradient of shape functions
-		// note that we need the transposed of Ji, not Ji itself !	
-		// Calculate based on Gjk = Ji[l][j]*Glm*Ji[m][k]
-		double GXX = Ji[0][0]*Grri*Ji[0][0] + Ji[0][0]*Grsi*Ji[1][0] + Ji[0][0]*Grti*Ji[2][0] + Ji[1][0]*Gsri*Ji[0][0] + Ji[1][0]*Gssi*Ji[1][0] + Ji[1][0]*Gsti*Ji[2][0] + Ji[2][0]*Gtri*Ji[0][0] + Ji[2][0]*Gtsi*Ji[1][0] + Ji[2][0]*Gtti*Ji[2][0];
-		double GXY = Ji[0][0]*Grri*Ji[0][1] + Ji[0][0]*Grsi*Ji[1][1] + Ji[0][0]*Grti*Ji[2][1] + Ji[1][0]*Gsri*Ji[0][1] + Ji[1][0]*Gssi*Ji[1][1] + Ji[1][0]*Gsti*Ji[2][1] + Ji[2][0]*Gtri*Ji[0][1] + Ji[2][0]*Gtsi*Ji[1][1] + Ji[2][0]*Gtti*Ji[2][1];
-		double GXZ = Ji[0][0]*Grri*Ji[0][2] + Ji[0][0]*Grsi*Ji[1][2] + Ji[0][0]*Grti*Ji[2][2] + Ji[1][0]*Gsri*Ji[0][2] + Ji[1][0]*Gssi*Ji[1][2] + Ji[1][0]*Gsti*Ji[2][2] + Ji[2][0]*Gtri*Ji[0][2] + Ji[2][0]*Gtsi*Ji[1][2] + Ji[2][0]*Gtti*Ji[2][2];
-		
-		double GYX = Ji[0][1]*Grri*Ji[0][0] + Ji[0][1]*Grsi*Ji[1][0] + Ji[0][1]*Grti*Ji[2][0] + Ji[1][1]*Gsri*Ji[0][0] + Ji[1][1]*Gssi*Ji[1][0] + Ji[1][1]*Gsti*Ji[2][0] + Ji[2][1]*Gtri*Ji[0][0] + Ji[2][1]*Gtsi*Ji[1][0] + Ji[2][1]*Gtti*Ji[2][0];
-		double GYY = Ji[0][1]*Grri*Ji[0][1] + Ji[0][1]*Grsi*Ji[1][1] + Ji[0][1]*Grti*Ji[2][1] + Ji[1][1]*Gsri*Ji[0][1] + Ji[1][1]*Gssi*Ji[1][1] + Ji[1][1]*Gsti*Ji[2][1] + Ji[2][1]*Gtri*Ji[0][1] + Ji[2][1]*Gtsi*Ji[1][1] + Ji[2][1]*Gtti*Ji[2][1];
-		double GYZ = Ji[0][1]*Grri*Ji[0][2] + Ji[0][1]*Grsi*Ji[1][2] + Ji[0][1]*Grti*Ji[2][2] + Ji[1][1]*Gsri*Ji[0][2] + Ji[1][1]*Gssi*Ji[1][2] + Ji[1][1]*Gsti*Ji[2][2] + Ji[2][1]*Gtri*Ji[0][2] + Ji[2][1]*Gtsi*Ji[1][2] + Ji[2][1]*Gtti*Ji[2][2];
+		double H[3][3] = {0};
+		for (int i=0; i<3; ++i)
+			for (int j=0; j<3; ++j)
+			{
+				H[i][j] += D[i][0]*Ji[0][j] + D[i][1]*Ji[1][j] + D[i][2]*Ji[2][j];
+			}
 
-		double GZX = Ji[0][2]*Grri*Ji[0][0] + Ji[0][2]*Grsi*Ji[1][0] + Ji[0][2]*Grti*Ji[2][0] + Ji[1][2]*Gsri*Ji[0][0] + Ji[1][2]*Gssi*Ji[1][0] + Ji[1][2]*Gsti*Ji[2][0] + Ji[2][2]*Gtri*Ji[0][0] + Ji[2][2]*Gtsi*Ji[1][0] + Ji[2][2]*Gtti*Ji[2][0];
-		double GZY = Ji[0][2]*Grri*Ji[0][1] + Ji[0][2]*Grsi*Ji[1][1] + Ji[0][2]*Grti*Ji[2][1] + Ji[1][2]*Gsri*Ji[0][1] + Ji[1][2]*Gssi*Ji[1][1] + Ji[1][2]*Gsti*Ji[2][1] + Ji[2][2]*Gtri*Ji[0][1] + Ji[2][2]*Gtsi*Ji[1][1] + Ji[2][2]*Gtti*Ji[2][1];
-		double GZZ = Ji[0][2]*Grri*Ji[0][2] + Ji[0][2]*Grsi*Ji[1][2] + Ji[0][2]*Grti*Ji[2][2] + Ji[1][2]*Gsri*Ji[0][2] + Ji[1][2]*Gssi*Ji[1][2] + Ji[1][2]*Gsti*Ji[2][2] + Ji[2][2]*Gtri*Ji[0][2] + Ji[2][2]*Gtsi*Ji[1][2] + Ji[2][2]*Gtti*Ji[2][2];
-
-		// calculate G
-		G.d[0] += GXX*x;   G.d[1] += 0.5*(GXY*x + GYX*x);  G.d[2] += 0.5*(GXZ*x + GZX*x);  G.d[3] += GYY*x;  G.d[4] += 0.5*(GYZ*x + GZY*x);  G.d[5] += GZZ*x; 
-		G.d[6] += GXX*y;   G.d[7] += 0.5*(GXY*y + GYX*y);  G.d[8] += 0.5*(GXZ*y + GZX*y);  G.d[9] += GYY*y; G.d[10] += 0.5*(GYZ*y + GZY*y); G.d[11] += GZZ*y;
-		G.d[12] += GXX*z; G.d[13] += 0.5*(GXY*z + GYX*z); G.d[14] += 0.5*(GXZ*z + GZX*z); G.d[15] += GYY*z; G.d[16] += 0.5*(GYZ*z + GZY*z); G.d[17] += GZZ*z;
+		// calculate gradient of deformation gradient
+		// Note that k >= j. Since tensdrs has symmetries this
+		// prevents overwriting of symmetric components
+		for (int j=0; j<3; ++j)
+			for (int k=j; k<3; ++k)
+			{
+				G(0,j,k) += H[j][k]*x[a].x;
+				G(1,j,k) += H[j][k]*x[a].y;
+				G(2,j,k) += H[j][k]*x[a].z;
+			}
 	}
 }
