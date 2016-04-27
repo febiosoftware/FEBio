@@ -1,6 +1,7 @@
 #pragma once
 #include "FEElasticSolidDomain.h"
-#include "FECore/tens3d.h"
+#include <FECore/tens3d.h>
+#include <FECore/tens6d.h>
 #include <FECore/FESurface.h>
 
 //-----------------------------------------------------------------------------
@@ -17,8 +18,11 @@ class FEElasticMultiscaleDomain2O : public FEElasticSolidDomain
 	public:
 		struct Data
 		{
-			FEMaterialPoint*	m_pt[2];
-			vec3d	ksi[2];
+			FEMaterialPoint*	m_pt[2];	//!< material point data for evaluating stresses
+			vec3d				ksi[2];		//!< local element coordinates
+			tens3drs			Qavg;		//!< average stress across interface
+			tens6ds				J0avg;		//!< average initial higher order stiffess across interface
+			mat3d				DgradU;		//!< displacement gradient jump across interface
 		};
 
 	public:
@@ -58,14 +62,16 @@ public:
 	void Update();
 
 protected:
-	void InternalWorkFlux(FEGlobalVector& R);
-	void InternalElementWorkFlux(FESurfaceElement& el, vector<double>& fe, int& nd);
+	// Discrete-Galerkin contribution to residual
+	void InternalForcesDG1(FEGlobalVector& R);
+	void InternalForcesDG2(FEGlobalVector& R);
 
 	void ElementInternalForce_PF(FESolidElement& el, vector<double>& fe);
 	void ElementInternalForce_QG(FESolidElement& el, vector<double>& fe);
 
 private:
 	void UpdateInternalSurfaceStresses();
+	void UpdateKinematics();
 
 public:
 	// --- S T I F F N E S S ---

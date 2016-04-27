@@ -3,6 +3,52 @@
 
 #include "matrix.h"
 
+inline tens4ds::tens4ds(const double g)
+{
+	d[ 0] = g;
+	d[ 1] = g; d[ 2] = g;
+	d[ 3] = g; d[ 4] = g; d[ 5] = g;
+	d[ 6] = g; d[ 7] = g; d[ 8] = g; d[ 9] = g;
+	d[10] = g; d[11] = g; d[12] = g; d[13] = g; d[14] = g;
+	d[15] = g; d[16] = g; d[17] = g; d[18] = g; d[19] = g; d[20] = g;
+}
+
+inline tens4ds::tens4ds(double m[6][6])
+{
+	d[ 0] = m[0][0];
+	d[ 1] = m[0][1]; d[ 2] = m[1][1];
+	d[ 3] = m[0][2]; d[ 4] = m[1][2]; d[ 5] = m[2][2];
+	d[ 6] = m[0][3]; d[ 7] = m[1][3]; d[ 8] = m[2][3]; d[ 9] = m[3][3];
+	d[10] = m[0][4]; d[11] = m[1][4]; d[12] = m[2][4]; d[13] = m[3][4]; d[14] = m[4][4];
+	d[15] = m[0][5]; d[16] = m[1][5]; d[17] = m[2][5]; d[18] = m[3][5]; d[19] = m[4][5]; d[20] = m[5][5];
+}
+
+inline double& tens4ds::operator () (int i, int j, int k, int l)
+{
+	const int m[3][3] = {{0,3,5},{3,1,4},{5,4,2}};
+	tens4ds& T = (*this);
+	return T(m[i][j], m[k][l]);
+}
+
+inline double tens4ds::operator () (int i, int j, int k, int l) const
+{
+	const int m[3][3] = {{0,3,5},{3,1,4},{5,4,2}};
+	const tens4ds& T = (*this);
+	return T(m[i][j], m[k][l]);
+}
+
+inline double& tens4ds::operator () (int i, int j)
+{
+	const int m[6] = {0, 1, 3, 6, 10, 15};
+	if (i<=j) return d[m[j]+i]; else return d[m[i]+j];
+}
+
+inline double tens4ds::operator () (int i, int j) const
+{
+	const int m[6] = {0, 1, 3, 6, 10, 15};
+	if (i<=j) return d[m[j]+i]; else return d[m[i]+j];
+}
+
 // operator +
 inline tens4ds tens4ds::operator + (const tens4ds& t) const
 {

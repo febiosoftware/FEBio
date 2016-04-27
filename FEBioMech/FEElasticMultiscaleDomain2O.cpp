@@ -265,14 +265,23 @@ void FEElasticMultiscaleDomain2O::InternalForces(FEGlobalVector& R)
 	// call base class first
 	FEElasticSolidDomain::InternalForces(R);
 
-	// add the flux parts
-	InternalWorkFlux(R);
+	// add the discrete-Galerkin contribution
+	InternalForcesDG1(R);
+	InternalForcesDG2(R);
 }
 
 //-----------------------------------------------------------------------------
 //! Evaluate contribution of discrete-Galerkin enforcement of stress flux.
-void FEElasticMultiscaleDomain2O::InternalWorkFlux(FEGlobalVector& R)
+void FEElasticMultiscaleDomain2O::InternalForcesDG1(FEGlobalVector& R)
 {
+	FEMesh& mesh = *GetMesh();
+
+	mat3d Ji;
+	double Gr[FEElement::MAX_NODES];
+	double Gs[FEElement::MAX_NODES];
+	double Gt[FEElement::MAX_NODES];
+	vec3d r0[FEElement::MAX_NODES];
+
 	vector<double> fe;
 	vector<int> lm;
 
@@ -281,99 +290,217 @@ void FEElasticMultiscaleDomain2O::InternalWorkFlux(FEGlobalVector& R)
 	int NF = m_surf.Elements();
 	for (int i=0; i<NF; ++i)
 	{
-		FESurfaceElement& el = m_surf.Element(i);
-		int neln = el.Nodes();
+		// get the next surface
+		FESurfaceElement& face = m_surf.Element(i);
+		int nfn = face.Nodes();
+		int nint = face.GaussPoints();
 
-		// allocate force vector
-		int ndof = neln*3;
-		fe.resize(ndof, 0.0);
+		// get the reference nodal coordinates
+		for (int j=0; j<nfn; ++j)
+		{
+			FENode& node = mesh.Node(face.m_node[j]);
+			r0[j] = node.m_r0;
+		}
 
-		// evaluate force vector
-		InternalElementWorkFlux(el, fe, nd);
+		// loop over both sides
+		for (int m=0; m<2; ++m)
+		{
+			// evaluate the spatial gradient of shape functions
+			FESolidElement& el = Element(face.m_elem[m]);
+			int neln = el.Nodes();
 
-		// unpack the LM values
-		UnpackLM(el, lm);
+			// sign
+			double sgn = (m==0 ? 1.0 : -1.0);
 
-		// assemble 
-		R.Assemble(el.m_node, lm, fe);
+			// allocate force vector
+			int ndof = neln*3;
+			fe.resize(ndof, 0.0);
+
+			// loop over all the integration points
+			double* gw = face.GaussWeights();
+			for (int n=0; n<nint; ++n)
+			{
+				// get facet data
+				FEInternalSurface2O::Data& data = m_surf.GetData(nd + n);
+
+				// average stress across interface
+				tens3drs& Qavg = data.Qavg;
+
+				// calculate jacobian and surface normal
+				double* Hr = face.Gr(n);
+				double* Hs = face.Gs(n);
+				vec3d r1(0,0,0), r2(0,0,0);
+				for (int k=0; k<nfn; ++k)
+				{
+					r1 += r0[k]*Hr[k];
+					r2 += r0[k]*Hs[k];
+				}	
+				vec3d nu = r1^r2;
+				double J = nu.unit();
+
+				// evaluate element Jacobian and shape function derivatives
+				// at this integration point
+				vec3d& ksi = data.ksi[m];
+				invjac0(el, ksi.x, ksi.y, ksi.z, Ji);
+				el.shape_deriv(Gr, Gs, Gt, ksi.x, ksi.y, ksi.z);
+
+				// loop over element nodes
+				for (int j=0; j<neln; ++j)
+				{
+					// calculate global gradient of shape functions
+					// note that we need the transposed of Ji, not Ji itself !
+					double G[3];
+					G[0] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
+					G[1] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
+					G[2] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
+
+					// put it all together
+					double f[3] = {0}, Nu[3] = {nu.x, nu.y, nu.z};
+					for (int k=0; k<3; ++k)
+						for (int l=0; l<3; ++l)
+						{
+							f[0] += Qavg(0,k,l)*G[k]*Nu[l];
+							f[1] += Qavg(1,k,l)*G[k]*Nu[l];
+							f[2] += Qavg(2,k,l)*G[k]*Nu[l];
+						}
+
+					// the negative sign is because we need to subtract the internal forces
+					// from the residual
+					fe[3*j  ] -= f[0]*gw[n]*J*sgn;
+					fe[3*j+1] -= f[1]*gw[n]*J*sgn;
+					fe[3*j+2] -= f[2]*gw[n]*J*sgn;
+				}
+			}
+
+			// unpack the LM values
+			UnpackLM(el, lm);
+
+			// assemble 
+			R.Assemble(el.m_node, lm, fe);
+		}
+
+		// don't forgot to increment data counter
+		nd += nint;
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticMultiscaleDomain2O::InternalElementWorkFlux(FESurfaceElement& face, vector<double>& fe, int& nd)
+//! Evaluate contribution of discrete-Galerkin enforcement of stress flux.
+void FEElasticMultiscaleDomain2O::InternalForcesDG2(FEGlobalVector& R)
 {
 	FEMesh& mesh = *GetMesh();
 
-	double Ji[3][3];
+	mat3d Ji;
 	double Gr[FEElement::MAX_NODES];
 	double Gs[FEElement::MAX_NODES];
 	double Gt[FEElement::MAX_NODES];
+	vec3d r0[FEElement::MAX_NODES];
 
-	int neln = face.Nodes();
+	vector<double> fe;
+	vector<int> lm;
 
-	vec3d rt[FEElement::MAX_NODES];
-
-	// get the material
-	FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(GetMaterial());
-	assert(pmat);
-
-	// loop over all the integration points
-	int nint = face.GaussPoints();
-	double* gw = face.GaussWeights();
-	for (int n=0; n<nint; ++n, ++nd)
+	// loop over all internal surfaces elements
+	int nd = 0;
+	int NF = m_surf.Elements();
+	for (int i=0; i<NF; ++i)
 	{
-		// calculate jacobian on surface
-		double* Hr = face.Gr(n);
-		double* Hs = face.Gs(n);
+		// get the next surface
+		FESurfaceElement& face = m_surf.Element(i);
+		int nfn = face.Nodes();
+		int nint = face.GaussPoints();
 
-		vec3d r1(0,0,0), r2(0,0,0);
-		for (int k=0; k<neln; ++k)
+		// get the reference nodal coordinates
+		for (int j=0; j<nfn; ++j)
 		{
-			r1 += rt[k]*Hr[k];
-			r2 += rt[k]*Hs[k];
-		}	
-		vec3d nu = r1^r2;
-		double J = nu.norm();
-
-		// shape function derivatives at either side
-		mat3d gradN[2];
-
-		// average stress
-		tens3drs Qavg; Qavg.zero();
-
-		FEInternalSurface2O::Data& data = m_surf.GetData(nd);
-
-		// evaluate the spatial gradient of shape functions
-		for (int k=0; k<2; ++k)
-		{
-			FESolidElement& el = Element(face.m_elem[k]);
-
-			vec3d ksi = data.ksi[k];
-
-			FEMaterialPoint& mp = *data.m_pt[k];
-			FEMicroMaterialPoint2O& mmpt2O = *(mp.ExtractData<FEMicroMaterialPoint2O>());
-			Qavg += mmpt2O.m_Q*0.5;
-		
-			invjact(el, Ji, ksi.x, ksi.y, ksi.z);
-			el.shape_deriv(Gr, Gs, Gt, ksi.x, ksi.y, ksi.z);
-/*			for (int i=0; i<neln; ++i)
-			{
-				// calculate global gradient of shape functions
-				// note that we need the transposed of Ji, not Ji itself !
-				vec3d G;
-				G.x = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-				G.y = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-				G.z = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-
-				// put it all together
-				vec3d SgradN = s*(G*J);
-
-				fe[3*i  ] += SgradN.x*gw[n];
-				fe[3*i+1] += SgradN.y*gw[n];
-				fe[3*i+2] += SgradN.z*gw[n];
-			}
-*/
+			FENode& node = mesh.Node(face.m_node[j]);
+			r0[j] = node.m_r0;
 		}
+
+		// loop over both sides
+		for (int m=0; m<2; ++m)
+		{
+			// evaluate the spatial gradient of shape functions
+			FESolidElement& el = Element(face.m_elem[m]);
+			int neln = el.Nodes();
+
+			// sign
+			double sgn = (m==0 ? 1.0 : -1.0);
+
+			// allocate force vector
+			int ndof = neln*3;
+			fe.resize(ndof, 0.0);
+
+			// loop over all the integration points
+			double* gw = face.GaussWeights();
+			for (int n=0; n<nint; ++n)
+			{
+				// get facet data
+				FEInternalSurface2O::Data& data = m_surf.GetData(nd + n);
+
+				// average stiffness across interface
+				tens6ds& J0avg = data.J0avg;
+
+				// displacement gradient jump
+				const mat3d& Du = data.DgradU;
+
+				// calculate jacobian and surface normal
+				double* Hr = face.Gr(n);
+				double* Hs = face.Gs(n);
+				vec3d r1(0,0,0), r2(0,0,0);
+				for (int k=0; k<nfn; ++k)
+				{
+					r1 += r0[k]*Hr[k];
+					r2 += r0[k]*Hs[k];
+				}	
+				vec3d nu = r1^r2;
+				double J = nu.unit();
+
+				// evaluate element Jacobian and shape function derivatives
+				// at this integration point
+				vec3d& ksi = data.ksi[m];
+				invjac0(el, ksi.x, ksi.y, ksi.z, Ji);
+				el.shape_deriv(Gr, Gs, Gt, ksi.x, ksi.y, ksi.z);
+
+				// loop over element nodes
+				for (int j=0; j<neln; ++j)
+				{
+					// calculate global gradient of shape functions
+					// note that we need the transposed of Ji, not Ji itself !
+					double G[3];
+					G[0] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
+					G[1] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
+					G[2] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
+
+					// put it all together
+					double f[3] = {0}, Nu[3] = {nu.x, nu.y, nu.z};
+					for (int k=0; k<3; ++k)
+						for (int l=0; l<3; ++l)
+							for (int p=0; p<3; ++p)
+								for (int q=0; q<3; ++q)
+									for (int r=0; r<3; ++r)
+									{
+										f[0] += Du(k,l)*Nu[p]*J0avg(k,l,p,0,q,r)*G[q]*Nu[r];
+										f[1] += Du(k,l)*Nu[p]*J0avg(k,l,p,1,q,r)*G[q]*Nu[r];
+										f[2] += Du(k,l)*Nu[p]*J0avg(k,l,p,2,q,r)*G[q]*Nu[r];
+									}
+
+					// the negative sign is because we need to subtract the internal forces
+					// from the residual
+					fe[3*j  ] -= f[0]*gw[n]*J*sgn;
+					fe[3*j+1] -= f[1]*gw[n]*J*sgn;
+					fe[3*j+2] -= f[2]*gw[n]*J*sgn;
+				}
+			}
+
+			// unpack the LM values
+			UnpackLM(el, lm);
+
+			// assemble 
+			R.Assemble(el.m_node, lm, fe);
+		}
+
+		// don't forgot to increment data counter
+		nd += nint;
 	}
 }
 
@@ -559,6 +686,84 @@ void FEElasticMultiscaleDomain2O::Update()
 
 	// update internal surfaces
 	UpdateInternalSurfaceStresses();
+
+	// update the kinematic variables
+	UpdateKinematics();
+}
+
+//-----------------------------------------------------------------------------
+// Update some kinematical quantities needed for evaluating the discrete-Galerkin terms
+void FEElasticMultiscaleDomain2O::UpdateKinematics()
+{
+	FEMesh& mesh = *GetMesh();
+
+	// nodal displacements
+	vec3d ut[FEElement::MAX_NODES];
+
+	// shape function derivatives
+	double Gr[FEElement::MAX_NODES];
+	double Gs[FEElement::MAX_NODES];
+	double Gt[FEElement::MAX_NODES];
+
+	// loop over all facets
+	int nd = 0;
+	int NF = m_surf.Elements();
+	for (int i=0; i<NF; ++i)
+	{
+		// get the next facet
+		FESurfaceElement& face = m_surf.Element(i);
+		int nfn  = face.Nodes();
+		int nint = face.GaussPoints();
+
+		// calculate the displacement gradient jump across this facet
+		for (int m=0; m<2; ++m)
+		{
+			// evaluate the spatial gradient of shape functions
+			FESolidElement& el = Element(face.m_elem[m]);
+			int neln = el.Nodes();
+
+			// get the nodal displacements
+			for (int j=0; j<neln; ++j)
+			{
+				FENode& node = mesh.Node(el.m_node[j]);
+				ut[j] = node.m_rt - node.m_r0;
+			}
+
+			// loop over all integration points
+			for (int n=0; n<nint; ++n)
+			{
+				// get the integration point data
+				FEInternalSurface2O::Data& data = m_surf.GetData(nd + n);
+
+				// evaluate element Jacobian and shape function derivatives
+				// at this integration point
+				vec3d& ksi = data.ksi[m];
+				mat3d Ji;
+				invjac0(el, ksi.x, ksi.y, ksi.z, Ji);
+				el.shape_deriv(Gr, Gs, Gt, ksi.x, ksi.y, ksi.z);
+
+				mat3d Gu; Gu.zero();
+				for (int j=0; j<neln; ++j)
+				{
+					// calculate global gradient of shape functions
+					// note that we need the transposed of Ji, not Ji itself !
+					double Gx = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
+					double Gy = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
+					double Gz = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
+
+					Gu[0][0] += ut[j].x*Gx; Gu[0][1] += ut[j].x*Gy; Gu[0][2] += ut[j].x*Gz;
+					Gu[1][0] += ut[j].y*Gx; Gu[1][1] += ut[j].y*Gy; Gu[1][2] += ut[j].y*Gz;
+					Gu[2][0] += ut[j].z*Gx; Gu[2][1] += ut[j].z*Gy; Gu[2][2] += ut[j].z*Gz;
+				}
+
+				if (m == 0) data.DgradU = Gu;
+				else data.DgradU -= Gu;
+			}
+		}
+
+		// don't forget to increment data counter
+		nd += nint;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -579,6 +784,8 @@ void FEElasticMultiscaleDomain2O::UpdateInternalSurfaceStresses()
 		for (int n=0; n<nint; ++n, ++nd)
 		{
 			FEInternalSurface2O::Data& data =  m_surf.GetData(nd);
+			data.Qavg.zero();
+			data.J0avg.zero();
 
 			// get the deformation gradient and determinant
 			for (int k=0; k<2; ++k)
@@ -598,6 +805,9 @@ void FEElasticMultiscaleDomain2O::UpdateInternalSurfaceStresses()
 
 				// evaluate stresses at this integration point
 				pmat->Stress2O(mp);
+
+				data.Qavg += pt2O.m_Q*0.5;
+				data.J0avg += pt2O.m_Ea;		// TODO: I only need to evaluate this on the first iteration
 			}
 		}
 	}

@@ -1,15 +1,40 @@
-// NOTE: This file is automatically included from tens5d.h
+// NOTE: This file is automatically included from tens6d.h
 // Users should not include this file manually!
 
 #include "matrix.h"
+
+inline tens6ds::tens6ds(const double g)
+{
+	for (int i = 0; i < NNZ; i++) d[i] = g;
+}
+
+inline tens6ds::tens6ds(double m[46])
+{
+	for (int i = 0; i < NNZ; i++) d[i] = m[i];
+}
+
+// access operator
+inline double tens6ds::operator() (int i, int j, int k, int l, int m, int n)
+{
+	// lookup table convering triplets to a row/column index
+	const int LUT[3][3][3] = {
+		{{0,1,2},{1,3,4},{2,4,5}},
+		{{1,3,4},{3,6,7},{4,7,8}},
+		{{2,4,5},{4,7,8},{5,8,9}}};
+
+	// index to start of columns
+	const int M[10] = {0,1,3,6,10,15,21,28,37,46};
+
+	int I = LUT[i][j][k];
+	int J = LUT[l][m][n];
+	return (I <= J ? d[M[J]+I] : d[M[I]+J]);
+}
 
 // operator +
 inline tens6ds tens6ds::operator + (const tens6ds& t) const
 {
 	tens6ds s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = d[i] + t.d[i];
-	
+	for (int i=0; i<NNZ; i++) s.d[i] = d[i] + t.d[i];
 	return s;
 }
 
@@ -17,9 +42,7 @@ inline tens6ds tens6ds::operator + (const tens6ds& t) const
 inline tens6ds tens6ds::operator - (const tens6ds& t) const
 {
 	tens6ds s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = d[i] - t.d[i];
-
+	for (int i=0; i<NNZ; i++) s.d[i] = d[i] - t.d[i];
 	return s;
 }
 
@@ -27,9 +50,7 @@ inline tens6ds tens6ds::operator - (const tens6ds& t) const
 inline tens6ds tens6ds::operator * (double g) const
 {
 	tens6ds s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = g*d[i];
-	
+	for (int i=0; i<NNZ; i++) s.d[i] = g*d[i];
 	return s;
 }
 
@@ -37,45 +58,35 @@ inline tens6ds tens6ds::operator * (double g) const
 inline tens6ds tens6ds::operator / (double g) const
 {
 	tens6ds s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = d[i]/g;
-	
+	for (int i=0; i<NNZ; i++) s.d[i] = d[i]/g;
 	return s;
 }
 
 // assignment operator +=
 inline tens6ds& tens6ds::operator += (const tens6ds& t)
 {
-	for (int i=0; i<NNZ; i++)
-		d[i] += t.d[i];
-	
+	for (int i=0; i<NNZ; i++) d[i] += t.d[i];
 	return (*this);
 }
 
 // assignment operator -=
 inline tens6ds& tens6ds::operator -= (const tens6ds& t)
 {
-	for (int i=0; i<NNZ; i++)
-		d[i] -= t.d[i];
-	
+	for (int i=0; i<NNZ; i++) d[i] -= t.d[i];
 	return (*this);
 }
 
 // assignment operator *=
 inline tens6ds& tens6ds::operator *= (double g)
 {
-	for (int i=0; i<NNZ; i++)
-		d[i] *= g;
-	
+	for (int i=0; i<NNZ; i++) d[i] *= g;
 	return (*this);
 }
 
 // assignment operator /=
 inline tens6ds& tens6ds::operator /= (double g)
 {
-	for (int i=0; i<NNZ; i++)
-		d[i] /= g;
-	
+	for (int i=0; i<NNZ; i++) d[i] /= g;
 	return (*this);
 }
 
@@ -83,35 +94,12 @@ inline tens6ds& tens6ds::operator /= (double g)
 inline tens6ds tens6ds::operator - () const
 {
 	tens6ds s;
-	for (int i = 0; i < NNZ; i++)
-		s.d[i] = -d[i];
-
+	for (int i = 0; i < NNZ; i++) s.d[i] = -d[i];
 	return s;
 }
 
 // intialize to zero
 inline void tens6ds::zero()
 {
-	for (int i = 0; i < NNZ; i++)
-		d[i] = 0;
+	for (int i = 0; i < NNZ; i++) d[i] = 0.0;
 }
-
-//inline void tens6ds::unit()
-//{
-//	for (int i = 0; i < NNZ; i++)
-//		if ((i==0) || (i==171) || (i==323))
-//			d[i] = 1.;
-//		else
-//			d[i] = 0.;
-//}
-
-//// contract on the right by a 3o tensor with RC symmetry  Hijk = EijklmnHlmn
-//inline tens3drs tens6ds::contract3s(tens3drs H)
-//{
-//    tens3drs K;
-//
-//	for (int i = 0; i < 18; i++)
-//		K.d[i] = d[0+18*i]*H.d[0] + 2*d[1+18*i]*H.d[1] + 2*d[2+18*i]*H.d[2] + d[3+18*i]*H.d[3] + 2*d[4+18*i]*H.d[4] + d[5+18*i]*H.d[5] + d[6+18*i]*H.d[6] + 2*d[7+18*i]*H.d[7] + 2*d[8+18*i]*H.d[8] + d[9+18*i]*H.d[9] + 2*d[10+18*i]*H.d[10] + d[11+18*i]*H.d[11] + d[12+18*i]*H.d[12] + 2*d[13+18*i]*H.d[13] + 2*d[14+18*i]*H.d[14] + d[15+18*i]*H.d[15] + 2*d[16+18*i]*H.d[16] + d[17+18*i]*H.d[17];
-//	
-//	return K;
-//}

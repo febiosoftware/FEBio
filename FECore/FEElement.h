@@ -184,16 +184,16 @@ public:
 	}
 
 	//! values of shape functions
-	void shape_fnc(double* H, double r, double s, double t) { ((FESolidElementTraits*)(m_pT))->shape_fnc(H, r, s, t); }
+	void shape_fnc(double* H, double r, double s, double t) const { ((FESolidElementTraits*)(m_pT))->shape_fnc(H, r, s, t); }
 
 	//! values of shape function derivatives
-	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t) { ((FESolidElementTraits*)(m_pT))->shape_deriv(Hr, Hs, Ht, r, s, t); }
+	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t) const { ((FESolidElementTraits*)(m_pT))->shape_deriv(Hr, Hs, Ht, r, s, t); }
 
 	//! values of shape function second derivatives
-	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t) { ((FESolidElementTraits*)(m_pT))->shape_deriv2(Hrr, Hss, Htt, Hrs, Hst, Hrt, r, s, t); }
+	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t) const { ((FESolidElementTraits*)(m_pT))->shape_deriv2(Hrr, Hss, Htt, Hrs, Hst, Hrt, r, s, t); }
 
 	//! this function projects data from the gauss-points to the nodal points
-	void project_to_nodes(double* ai, double* ao) { ((FESolidElementTraits*)m_pT)->project_to_nodes(ai, ao); }
+	void project_to_nodes(double* ai, double* ao) const { ((FESolidElementTraits*)m_pT)->project_to_nodes(ai, ao); }
 };
 
 //-----------------------------------------------------------------------------

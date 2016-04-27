@@ -1,55 +1,56 @@
 #pragma once
 
-#include "mat3d.h"
-#include "tens3d.h"
-
 //-----------------------------------------------------------------------------
-//! Class for 6th order tensor based on symmetry requirements for second-order hyperelasticity:
-//  - E = d2Phi/dGijkdGlmn  
-//  - full symmetry in the first three legs 
-//  - full symmetry in the last three legs 
-//  - major-like symmetry when switching the order of the partial derivatives (Eijklmn = Elmnijk)
-//  - 46 out of 729 compenents are unique
+//! Class for 6th order tensors. This class assumes the following symmetries:
+//  - full (minor) symmetry in the first three legs 
+//  - full (minor) symmetry in the last three legs 
+//  - major symmetry (A[i,j,k;l,m,n] = A[l,m,n;i,j,k])
 //
-// E111111	d[  0]	E113123	d[ 18]	E133233	d[ 36]			
-// E111112	d[  1]	E113133	d[ 19]	E133333	d[ 37]	
-// E111113	d[  2]	E113222	d[ 20]	E222222	d[ 38]	
-// E111122	d[  3]	E113223	d[ 21]	E222223	d[ 39]	
-// E111123	d[  4]	E113233	d[ 22]	E222233	d[ 40]	
-// E111133	d[  5]	E113333	d[ 23]	E222333	d[ 41]	
-// E111222	d[  6]	E122133	d[ 24]	E223233	d[ 42]	
-// E111223	d[  7]	E122222	d[ 25]	E223333	d[ 43]	
-// E111233	d[  8]	E122223	d[ 26]	E233333	d[ 44]	
-// E111333	d[  9]	E122233	d[ 27]	E333333	d[ 45]	
-// E112122	d[ 10]	E122333	d[ 28]	
-// E112123	d[ 11]	E123133	d[ 29]	
-// E112133	d[ 12]	E123222	d[ 30]	
-// E112222	d[ 13]	E123223	d[ 31]	
-// E112223	d[ 14]	E123233	d[ 32]	
-// E112233	d[ 15]	E123333	d[ 33]	
-// E112333	d[ 16]	E133222	d[ 34]	
-// E113122	d[ 17]	E133223	d[ 35]	
-
+// This tensor is effectively stored as an upper-triangular 10x10 matrix
+// using column major ordering.
+//    
+//       / 0  1  3  6 10 15 21 28 37 46 \     / A00 A01 A02  ...   A09 \
+//      |     2  4  7 11 16 22 29 38 47  |   |      A11 A12  ...   A19  |
+//      |        5  8 12 17 23 30 39 48  |   |          A22  ...   A18  |
+//      |           9 13 18 24 31 40 49  |   |            .             |
+//      |             14 19 25 32 41 50  |   |              .           |
+//  A = |                20 26 33 42 51  | = |                .         |
+//      |                   27 34 43 52  |   |                          |
+//      |                      35 44 53  |   |                          |
+//      |                         45 54  |   |                          |
+//      \                            55 /     \                    A99 / 
+//
+//  where A[I,J] = A[i,j,k;l,m,n] using the following convention
+//
+//    I/J  |  i/l   j/m    k/n
+// --------+-------------------
+//     0   |   0      0      0
+//     1   |   0      0      1
+//     2   |   0      0      2
+//     3   |   0      1      1
+//     4   |   0      1      2
+//     5   |   0      2      2
+//     6   |   1      1      1
+//     7   |   1      1      2
+//     8   |   1      2      2
+//     9   |   2      2      2
+//
 class tens6ds
 {
 public:
-	enum { NNZ = 46 };
+	enum { NNZ = 55 };
 
-	// default constructor
-	tens6ds(){zero();}
-	
-	tens6ds(const double g)
-	{
-		for (int i = 0; i < NNZ; i++)
-			d[i] = g;
-	}
+public:
+	// constructors
+	tens6ds(){}
+	explicit tens6ds(double g);
+	tens6ds(double m[46]);
 
-	tens6ds(double m[46])
-	{
-		for (int i = 0; i < NNZ; i++)
-			d[i] = m[i];
-	}
+public:
+	// access operator
+	double operator () (int i, int j, int k, int l, int m, int n);
 
+public:
 	// arithmetic operators
 	tens6ds operator + (const tens6ds& t) const;
 	tens6ds operator - (const tens6ds& t) const;
@@ -67,11 +68,6 @@ public:
 	
 	// initialize to zero
 	void zero();
-
-	//void unit();
-
-	//tens3drs contract3s(tens3drs H);
-
 
 public:
 	double d[NNZ];	// stored in column major order

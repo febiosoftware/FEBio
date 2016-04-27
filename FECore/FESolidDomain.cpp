@@ -309,17 +309,15 @@ double FESolidDomain::invjac0(FESolidElement& el, double Ji[3][3], int n)
 //! Calculate the inverse jacobian with respect to the reference frame at  
 //! integration point n. The inverse jacobian is retured in Ji
 //! The return value is the determinant of the Jacobian (not the inverse!)
-double FESolidDomain::invjac0(FESolidElement& el, double Ji[3][3], double r, double s, double t)
+double FESolidDomain::invjac0(const FESolidElement& el, double Ji[3][3], double r, double s, double t)
 {
-	int i;
-
 	// number of nodes
 	int neln = el.Nodes();
 
 	// nodal coordinates
 	const int NMAX = FEElement::MAX_NODES;
 	vec3d r0[NMAX];
-	for (i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+	for (int i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
 
 	// evaluate shape function derivatives
 	double Gr[NMAX], Gs[NMAX], Gt[NMAX];
@@ -327,7 +325,7 @@ double FESolidDomain::invjac0(FESolidElement& el, double Ji[3][3], double r, dou
 
 	// calculate Jacobian
 	double J[3][3] = {0};
-	for (i=0; i<neln; ++i)
+	for (int i=0; i<neln; ++i)
 	{
 		const double& Gri = Gr[i];
 		const double& Gsi = Gs[i];
@@ -366,6 +364,15 @@ double FESolidDomain::invjac0(FESolidElement& el, double Ji[3][3], double r, dou
 	Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
 
 	return det;
+}
+
+//-----------------------------------------------------------------------------
+double FESolidDomain::invjac0(const FESolidElement& el, double r, double s, double t, mat3d& J)
+{
+	double Ji[3][3];
+	double J0 = invjac0(el, Ji, r, s, t);
+	J = mat3d(Ji[0][0], Ji[0][1], Ji[0][2], Ji[1][0], Ji[1][1], Ji[1][2], Ji[2][0], Ji[2][1], Ji[2][2]);
+	return J0;
 }
 
 //-----------------------------------------------------------------------------

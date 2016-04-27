@@ -40,7 +40,10 @@ public:
 	double invjac0(FESolidElement& el, double J[3][3], int n);
 
 	//! calculate inverse jacobian matrix w.r.t. reference frame
-	double invjac0(FESolidElement& el, double J[3][3], double r, double s, double t);
+	double invjac0(const FESolidElement& el, double J[3][3], double r, double s, double t);
+
+	//! calculate inverse jacobian matrix w.r.t. reference frame
+	double invjac0(const FESolidElement& el, double r, double s, double t, mat3d& J);
 
 	//! calculate inverse jacobian matrix w.r.t. current frame
 	double invjact(FESolidElement& el, double J[3][3], int n);
