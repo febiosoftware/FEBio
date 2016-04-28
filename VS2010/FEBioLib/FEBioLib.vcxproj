@@ -633,7 +633,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)svnrev.py</Command>
+      <Command>python "$(SolutionDir)svnrev.py"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Commercial|x64'">
