@@ -37,6 +37,8 @@ class FEElasticMultiscaleDomain2O : public FEElasticSolidDomain
 
 		Data& GetData(int i) { return m_data[i]; }
 
+		FESurface* GetSurface() { return m_ps; }
+
 	private:
 		FESurface*		m_ps;
 		vector<Data>	m_data;
@@ -76,11 +78,15 @@ private:
 public:
 	// --- S T I F F N E S S ---
 	//! calculates the solid element stiffness matrix
-	void ElementGeometricalStiffness(FESolidElement &el, matrix &ke);
-	void ElementMaterialStiffness(FESolidElement &el, matrix &ke);
+	void ElementStiffness(FEModel& fem, int iel, matrix& ke);
 
 	void defhess(FESolidElement &el, int n, tens3drs &G);
 	void defhess(FESolidElement &el, double r, double s, double t, tens3drs &G);
+
+protected:
+	// Calculates second derivative of shape function N[node]
+	void shape_gradient2(const FESolidElement& el, vec3d* X, int n, int node, mat3d& H);
+	void shape_gradient2(const FESolidElement& el, vec3d* X, double r, double s, double t, int node, mat3d& H);
 
 private:
 	FEInternalSurface2O	m_surf;

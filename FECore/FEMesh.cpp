@@ -1112,3 +1112,19 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 	// all done
 	return ps;
 }
+
+//-----------------------------------------------------------------------------
+//! Retrieve the nodal coordinates of an element in the reference configuration.
+void FEMesh::GetInitialNodalCoordinates(const FEElement& el, vec3d* node)
+{
+	const int neln = el.Nodes();
+	for (int i=0; i<neln; ++i) node[i] = Node(el.m_node[i]).m_r0;
+}
+
+//-----------------------------------------------------------------------------
+//! Retrieve the nodal coordinates of an element in the current configuration.
+void FEMesh::GetNodalCoordinates(const FEElement& el, vec3d* node)
+{
+	const int neln = el.Nodes();
+	for (int i=0; i<neln; ++i) node[i] = Node(el.m_node[i]).m_rt;
+}

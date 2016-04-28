@@ -118,6 +118,9 @@ public:
 	//! Jacobian in reference configuration for integration point n
 	double jac0(FESurfaceElement& el, int n);
 
+	//! Jacobian in reference configuration for integration point n (and returns normal)
+	double jac0(const FESurfaceElement& el, int n, vec3d& nu);
+
 protected:
 	vector<FESurfaceElement>	m_el;	//!< surface elements
 };

@@ -251,20 +251,18 @@ double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, double r, double s, 
 //! Calculate the inverse jacobian with respect to the reference frame at  
 //! integration point n. The inverse jacobian is retured in Ji
 //! The return value is the determinant of the Jacobian (not the inverse!)
-double FESolidDomain::invjac0(FESolidElement& el, double Ji[3][3], int n)
+double FESolidDomain::invjac0(const FESolidElement& el, double Ji[3][3], int n)
 {
-	int i;
-
 	// number of nodes
 	int neln = el.Nodes();
 
 	// nodal coordinates
 	vec3d r0[FEElement::MAX_NODES];
-	for (i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+	for (int i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
 
 	// calculate Jacobian
 	double J[3][3] = {0};
-	for (i=0; i<neln; ++i)
+	for (int i=0; i<neln; ++i)
 	{
 		const double& Gri = el.Gr(n)[i];
 		const double& Gsi = el.Gs(n)[i];
@@ -653,14 +651,12 @@ double FESolidDomain::detJt(FESolidElement &el, int n)
 //! Calculate jacobian with respect to reference frame
 double FESolidDomain::detJ0(FESolidElement &el, int n)
 {
-	int i;
-
 	// number of nodes
 	int neln = el.Nodes();
 
 	// nodal coordinates
 	vec3d r0[FEElement::MAX_NODES];
-	for (i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+	for (int i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
 
 	// shape function derivatives
 	double* Grn = el.Gr(n);
@@ -669,7 +665,7 @@ double FESolidDomain::detJ0(FESolidElement &el, int n)
 	
 	// jacobian matrix
 	double J[3][3] = {0};
-	for (i=0; i<neln; ++i)
+	for (int i=0; i<neln; ++i)
 	{
 		const double& Gri = Grn[i];
 		const double& Gsi = Gsn[i];

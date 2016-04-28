@@ -839,7 +839,7 @@ double FESurface::jac0(FESurfaceElement &el, int n)
 
 	double* Gr = el.Gr(n);
 	double* Gs = el.Gs(n);
-	vec3d dxr, dxs;
+	vec3d dxr(0,0,0), dxs(0,0,0);
 	for (int k=0; k<nseln; ++k)
 	{
 		dxr.x += Gr[k]*r0[k].x;
@@ -851,6 +851,30 @@ double FESurface::jac0(FESurfaceElement &el, int n)
 		dxs.z += Gs[k]*r0[k].z;
 	}
 	return (dxr ^ dxs).norm();
+}
+
+//-----------------------------------------------------------------------------
+double FESurface::jac0(const FESurfaceElement &el, int n, vec3d& nu)
+{
+	const int nseln = el.Nodes();
+	vec3d r0[FEElement::MAX_NODES];
+	for (int i=0; i<nseln; ++i) r0[i] = GetMesh()->Node(el.m_node[i]).m_r0;
+
+	double* Gr = el.Gr(n);
+	double* Gs = el.Gs(n);
+	vec3d dxr(0,0,0), dxs(0,0,0);
+	for (int k=0; k<nseln; ++k)
+	{
+		dxr.x += Gr[k]*r0[k].x;
+		dxr.y += Gr[k]*r0[k].y;
+		dxr.z += Gr[k]*r0[k].z;
+
+		dxs.x += Gs[k]*r0[k].x;
+		dxs.y += Gs[k]*r0[k].y;
+		dxs.z += Gs[k]*r0[k].z;
+	}
+	nu = dxr ^ dxs;
+	return nu.unit();
 }
 
 //-----------------------------------------------------------------------------

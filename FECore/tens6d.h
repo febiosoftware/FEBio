@@ -43,8 +43,6 @@ public:
 public:
 	// constructors
 	tens6ds(){}
-	explicit tens6ds(double g);
-	tens6ds(double m[46]);
 
 public:
 	// access operator

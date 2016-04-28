@@ -1,8 +1,5 @@
 #pragma once
 
-#include "mat3d.h"
-#include "tens3d.h"
-
 //-----------------------------------------------------------------------------
 //! Class for 5th order tensor based on symmetry requirements for second-order hyperelasticity and Cauchy stress:
 //  - D = d2Phi/ddDijdHklm  
@@ -37,19 +34,10 @@ public:
 	enum { NNZ = 29 };
 
 	// default constructor
-	tens5ds(){zero();}
-	
-	tens5ds(const double g)
-	{
-		for (int i = 0; i < NNZ; i++)
-			d[i] = g;
-	}
+	tens5ds() {}
 
-	tens5ds(double m[29])
-	{
-		for (int i = 0; i < NNZ; i++)
-			d[i] = m[i];
-	}
+	// access operator
+	double operator () (int i, int j, int k, int l, int m) const;
 
 	// arithmetic operators
 	tens5ds operator + (const tens5ds& t) const;
@@ -68,11 +56,6 @@ public:
 	
 	// initialize to zero
 	void zero();
-
-	//void unit();
-
-	//mat3ds contract3s(tens3ds H);
-	//tens3drs contract2s(mat3ds s);
 
 public:
 	double d[NNZ];	// stored in column major order

@@ -3,16 +3,6 @@
 
 #include "matrix.h"
 
-inline tens6ds::tens6ds(const double g)
-{
-	for (int i = 0; i < NNZ; i++) d[i] = g;
-}
-
-inline tens6ds::tens6ds(double m[46])
-{
-	for (int i = 0; i < NNZ; i++) d[i] = m[i];
-}
-
 // access operator
 inline double tens6ds::operator() (int i, int j, int k, int l, int m, int n)
 {

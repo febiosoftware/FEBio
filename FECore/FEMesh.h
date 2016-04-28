@@ -421,6 +421,12 @@ public:
 	//! binside  : include all interior facets
 	FESurface* ElementBoundarySurface(bool boutside = true, bool binside = false);
 
+	//! get the nodal coordinates in reference configuration
+	void GetInitialNodalCoordinates(const FEElement& el, vec3d* node);
+
+	//! get the nodal coordinates in current configuration
+	void GetNodalCoordinates(const FEElement& el, vec3d* node);
+
 protected:
 	double SolidElementVolume(FESolidElement& el);
 	double ShellElementVolume(FEShellElement& el);
