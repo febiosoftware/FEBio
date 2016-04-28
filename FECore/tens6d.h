@@ -1,4 +1,5 @@
 #pragma once
+#include "tensor_base.h"
 
 //-----------------------------------------------------------------------------
 //! Class for 6th order tensors. This class assumes the following symmetries:
@@ -35,7 +36,7 @@
 //     8   |   1      2      2
 //     9   |   2      2      2
 //
-class tens6ds
+class tens6ds : public tensor_base<tens6ds, 55>
 {
 public:
 	enum { NNZ = 55 };
@@ -47,28 +48,6 @@ public:
 public:
 	// access operator
 	double operator () (int i, int j, int k, int l, int m, int n);
-
-public:
-	// arithmetic operators
-	tens6ds operator + (const tens6ds& t) const;
-	tens6ds operator - (const tens6ds& t) const;
-	tens6ds operator * (double g) const;
-	tens6ds operator / (double g) const;
-
-	// arithmetic assignment operators
-	tens6ds& operator += (const tens6ds& t);
-	tens6ds& operator -= (const tens6ds& t);
-	tens6ds& operator *= (double g);
-	tens6ds& operator /= (double g);
-
-	// unary operators
-	tens6ds operator - () const;
-	
-	// initialize to zero
-	void zero();
-
-public:
-	double d[NNZ];	// stored in column major order
 };
 
 // The following file contains the actual definition of the class functions

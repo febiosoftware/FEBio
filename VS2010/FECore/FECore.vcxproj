@@ -718,6 +718,7 @@
     <ClInclude Include="..\..\FECore\tens6d.h" />
     <ClInclude Include="..\..\FECore\tens6d.hpp" />
     <ClInclude Include="..\..\FECore\tens6ds.hpp" />
+    <ClInclude Include="..\..\FECore\tensor_base.h" />
     <ClInclude Include="..\..\FECore\Timer.h" />
     <ClInclude Include="..\..\FECore\vec2d.h" />
     <ClInclude Include="..\..\FECore\vec3d.h" />

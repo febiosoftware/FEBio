@@ -3,14 +3,6 @@
 
 #include "mat3d.h"
 
-inline tens3drs::tens3drs() {}
-	
-inline tens3drs::tens3drs(double m[18])
-{
-	for (int i = 0; i < NNZ; i++)
-		d[i] = m[i];
-}
-
 // access operator
 inline double tens3drs::operator () (int i, int j, int k) const
 {
@@ -23,99 +15,6 @@ inline double& tens3drs::operator () (int i, int j, int k)
 {
 	const int m[3][3] = {{0,1,2},{1,3,4},{2,4,5}};
 	return d[6*i + m[j][k] ];
-}
-
-// operator +
-inline tens3drs tens3drs::operator + (const tens3drs& t) const
-{
-	tens3drs s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = d[i] + t.d[i];
-	
-	return s;
-}
-
-// operator -
-inline tens3drs tens3drs::operator - (const tens3drs& t) const
-{
-	tens3drs s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = d[i] - t.d[i];
-
-	return s;
-}
-
-// operator *
-inline tens3drs tens3drs::operator * (double g) const
-{
-	tens3drs s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = g*d[i];
-	
-	return s;
-}
-
-// operator /
-inline tens3drs tens3drs::operator / (double g) const
-{
-	tens3drs s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = d[i]/g;
-	
-	return s;
-}
-
-// assignment operator +=
-inline tens3drs& tens3drs::operator += (const tens3drs& t)
-{
-	for (int i=0; i<NNZ; i++)
-		d[i] += t.d[i];
-	
-	return (*this);
-}
-
-// assignment operator -=
-inline tens3drs& tens3drs::operator -= (const tens3drs& t)
-{
-	for (int i=0; i<NNZ; i++)
-		d[i] -= t.d[i];
-	
-	return (*this);
-}
-
-// assignment operator *=
-inline tens3drs& tens3drs::operator *= (double g)
-{
-	for (int i=0; i<NNZ; i++)
-		d[i] *= g;
-	
-	return (*this);
-}
-
-// assignment operator /=
-inline tens3drs& tens3drs::operator /= (double g)
-{
-	for (int i=0; i<NNZ; i++)
-		d[i] /= g;
-	
-	return (*this);
-}
-
-// unary operator -
-inline tens3drs tens3drs::operator - () const
-{
-	tens3drs s;
-	for (int i = 0; i < NNZ; i++)
-		s.d[i] = -d[i];
-
-	return s;
-}
-
-// intialize to zero
-inline void tens3drs::zero()
-{
-	for (int i = 0; i < NNZ; i++)
-		d[i] = 0;
 }
 
 // contract the right two legs by the dyad formed by a vector  xi = Gijk*Xj*Xk

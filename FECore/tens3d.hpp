@@ -1,105 +1,10 @@
 // NOTE: This file is automatically included from tens3drs.h
 // Users should not include this file manually!
 
-inline tens3d::tens3d() {}
-
-inline tens3d::tens3d(double m[10])
+// access operator
+inline double tens3d::operator()(int i, int j, int k) const
 {
-	for (int i = 0; i < NNZ; i++)
-		d[i] = m[i];
-}
-
-// operator +
-inline tens3d tens3d::operator + (const tens3d& t) const
-{
-	tens3d s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = d[i] + t.d[i];
-	
-	return s;
-}
-
-// operator -
-inline tens3d tens3d::operator - (const tens3d& t) const
-{
-	tens3d s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = d[i] - t.d[i];
-
-	return s;
-}
-
-// operator *
-inline tens3d tens3d::operator * (double g) const
-{
-	tens3d s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = g*d[i];
-	
-	return s;
-}
-
-// operator /
-inline tens3d tens3d::operator / (double g) const
-{
-	tens3d s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = d[i]/g;
-	
-	return s;
-}
-
-// assignment operator +=
-inline tens3d& tens3d::operator += (const tens3d& t)
-{
-	for (int i=0; i<NNZ; i++)
-		d[i] += t.d[i];
-	
-	return (*this);
-}
-
-// assignment operator -=
-inline tens3d& tens3d::operator -= (const tens3d& t)
-{
-	for (int i=0; i<NNZ; i++)
-		d[i] -= t.d[i];
-	
-	return (*this);
-}
-
-// assignment operator *=
-inline tens3d& tens3d::operator *= (double g)
-{
-	for (int i=0; i<NNZ; i++)
-		d[i] *= g;
-	
-	return (*this);
-}
-
-// assignment operator /=
-inline tens3d& tens3d::operator /= (double g)
-{
-	for (int i=0; i<NNZ; i++)
-		d[i] /= g;
-	
-	return (*this);
-}
-
-// unary operator -
-inline tens3d tens3d::operator - () const
-{
-	tens3d s;
-	for (int i = 0; i < NNZ; i++)
-		s.d[i] = -d[i];
-
-	return s;
-}
-
-// intialize to zero
-inline void tens3d::zero()
-{
-	for (int i = 0; i < NNZ; i++)
-		d[i] = 0;
+	return d[i*9 + j*3 + k];
 }
 
 // symmetrize a general 3o tensor

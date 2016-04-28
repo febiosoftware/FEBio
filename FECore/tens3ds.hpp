@@ -1,111 +1,15 @@
 // NOTE: This file is automatically included from tens3drs.h
 // Users should not include this file manually!
 
-inline tens3ds::tens3ds() {}
-
-inline tens3ds::tens3ds(double m[10])
+// access operator
+inline double tens3ds::operator()(int i, int j, int k) const
 {
-	for (int i = 0; i < NNZ; i++)
-		d[i] = m[i];
-}
+	const int LUT[3][3][3] = {
+		{{0,1,2},{1,3,4},{2,4,5}},
+		{{1,3,4},{3,6,7},{4,7,8}},
+		{{2,4,5},{4,7,8},{5,8,9}}};
 
-// operator +
-inline tens3ds tens3ds::operator + (const tens3ds& t) const
-{
-	tens3ds s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = d[i] + t.d[i];
-	
-	return s;
-}
-
-// operator -
-inline tens3ds tens3ds::operator - (const tens3ds& t) const
-{
-	tens3ds s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = d[i] - t.d[i];
-
-	return s;
-}
-
-// operator *
-inline tens3ds tens3ds::operator * (double g) const
-{
-	tens3ds s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = g*d[i];
-	
-	return s;
-}
-
-// operator /
-inline tens3ds tens3ds::operator / (double g) const
-{
-	tens3ds s;
-	for (int i=0; i<NNZ; i++)
-		s.d[i] = d[i]/g;
-	
-	return s;
-}
-
-// assignment operator +=
-inline tens3ds& tens3ds::operator += (const tens3ds& t)
-{
-	for (int i=0; i<NNZ; i++)
-		d[i] += t.d[i];
-	
-	return (*this);
-}
-
-// assignment operator -=
-inline tens3ds& tens3ds::operator -= (const tens3ds& t)
-{
-	for (int i=0; i<NNZ; i++)
-		d[i] -= t.d[i];
-	
-	return (*this);
-}
-
-// assignment operator *=
-inline tens3ds& tens3ds::operator *= (double g)
-{
-	for (int i=0; i<NNZ; i++)
-		d[i] *= g;
-	
-	return (*this);
-}
-
-// assignment operator /=
-inline tens3ds& tens3ds::operator /= (double g)
-{
-	for (int i=0; i<NNZ; i++)
-		d[i] /= g;
-	
-	return (*this);
-}
-
-// unary operator -
-inline tens3ds tens3ds::operator - () const
-{
-	tens3ds s;
-	s.d[0] = -d[0];
-	s.d[1] = -d[1];
-	s.d[2] = -d[2];
-	s.d[3] = -d[3];
-	s.d[4] = -d[4];
-	s.d[5] = -d[5];
-	s.d[6] = -d[6];
-	s.d[7] = -d[7];
-	s.d[8] = -d[8];
-	s.d[9] = -d[9];
-	return s;
-}
-
-// intialize to zero
-inline void tens3ds::zero()
-{
-	d[0] = d[1] = d[2] = d[3] = d[4] = d[5] = d[6] = d[7] = d[8] = d[9] = 0.0;
+	return d[LUT[i][j][k]];
 }
 
 // contract the right two legs by the dyad formed by a vector  xi = Tijk*Xi*Xk
