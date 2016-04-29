@@ -36,9 +36,6 @@
     <ClInclude Include="..\FEBio2\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\FEBioMech\FEElasticFergusonShellDomain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\FEBio2\CommandManager.cpp">
@@ -60,9 +57,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\FEBio2\stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\FEBioMech\FEElasticFergusonShellDomain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

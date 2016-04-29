@@ -448,7 +448,6 @@
     <ClInclude Include="..\FEBio2\FEBioStdSolver.h" />
     <ClInclude Include="..\FEBio2\Interrupt.h" />
     <ClInclude Include="..\FEBio2\stdafx.h" />
-    <ClInclude Include="..\FEBioMech\FEElasticFergusonShellDomain.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\FEBio2\CommandManager.cpp" />
@@ -458,7 +457,6 @@
     <ClCompile Include="..\FEBio2\FEBioStdSolver.cpp" />
     <ClCompile Include="..\FEBio2\Interrupt.cpp" />
     <ClCompile Include="..\FEBio2\stdafx.cpp" />
-    <ClCompile Include="..\FEBioMech\FEElasticFergusonShellDomain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -357,7 +357,10 @@
     <ClInclude Include="..\..\FECore\FEElementList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FEFergusonShellDomain.h">
+    <ClInclude Include="..\..\FECore\tensor_base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FECore\FESurfaceMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -647,7 +650,7 @@
     <ClCompile Include="..\..\FECore\FEElementList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\FEFergusonShellDomain.cpp">
+    <ClCompile Include="..\..\FECore\FESurfaceMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

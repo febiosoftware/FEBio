@@ -439,7 +439,6 @@
     <ClInclude Include="..\..\FECore\FEElementList.h" />
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
-    <ClInclude Include="..\..\FECore\FEFergusonShellDomain.h" />
     <ClInclude Include="..\..\FECore\FEGlobalData.h" />
     <ClInclude Include="..\..\FECore\FEGlobalMatrix.h" />
     <ClInclude Include="..\..\FECore\FEGlobalVector.h" />
@@ -471,6 +470,7 @@
     <ClInclude Include="..\..\FECore\FESolver.h" />
     <ClInclude Include="..\..\FECore\FESurface.h" />
     <ClInclude Include="..\..\FECore\FESurfaceLoad.h" />
+    <ClInclude Include="..\..\FECore\FESurfaceMap.h" />
     <ClInclude Include="..\..\FECore\FESurfacePairInteraction.h" />
     <ClInclude Include="..\..\FECore\FETrussDomain.h" />
     <ClInclude Include="..\..\FECore\FETypes.h" />
@@ -507,6 +507,7 @@
     <ClInclude Include="..\..\FECore\tens5d.hpp" />
     <ClInclude Include="..\..\FECore\tens6d.h" />
     <ClInclude Include="..\..\FECore\tens6d.hpp" />
+    <ClInclude Include="..\..\FECore\tensor_base.h" />
     <ClInclude Include="..\..\FECore\Timer.h" />
     <ClInclude Include="..\..\FECore\vec2d.h" />
     <ClInclude Include="..\..\FECore\vec3d.h" />
@@ -553,7 +554,6 @@
     <ClCompile Include="..\..\FECore\FEElementList.cpp" />
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
     <ClCompile Include="..\..\FECore\FEException.cpp" />
-    <ClCompile Include="..\..\FECore\FEFergusonShellDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalData.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalMatrix.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalVector.cpp" />
@@ -584,6 +584,7 @@
     <ClCompile Include="..\..\FECore\FESolver.cpp" />
     <ClCompile Include="..\..\FECore\FESurface.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceLoad.cpp" />
+    <ClCompile Include="..\..\FECore\FESurfaceMap.cpp" />
     <ClCompile Include="..\..\FECore\FESurfacePairInteraction.cpp" />
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
     <ClCompile Include="..\..\FECore\Image.cpp" />

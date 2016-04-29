@@ -503,6 +503,7 @@
     <ClInclude Include="..\..\FEBioMech\FEMuscleMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FENeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FENeoHookeanTransIso.h" />
+    <ClInclude Include="..\..\FEBioMech\FENewtonianViscousSolid.h" />
     <ClInclude Include="..\..\FEBioMech\FEOgdenMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEOgdenUnconstrained.h" />
     <ClInclude Include="..\..\FEBioMech\FEOrthoElastic.h" />
@@ -544,6 +545,7 @@
     <ClInclude Include="..\..\FEBioMech\FERigidSpring.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidSurface.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidWallInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FERVEModel.h" />
     <ClInclude Include="..\..\FEBioMech\FESlidingInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FESlidingInterfaceBW.h" />
     <ClInclude Include="..\..\FEBioMech\FESolidDomainFactory.h" />
@@ -575,6 +577,7 @@
     <ClInclude Include="..\..\FEBioMech\FEUT4Domain.h" />
     <ClInclude Include="..\..\FEBioMech\FEVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioMech\FEViscoElasticMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEViscousMaterialPoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEVolumeConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEVonMisesPlasticity.h" />
     <ClInclude Include="..\..\FEBioMech\FEWrinkleOgdenMaterial.h" />
@@ -690,6 +693,7 @@
     <ClCompile Include="..\..\FEBioMech\FEMuscleMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FENeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FENeoHookeanTransIso.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FENewtonianViscousSolid.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEOgdenMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEOgdenUnconstrained.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEOrthoElastic.cpp" />
@@ -731,6 +735,7 @@
     <ClCompile Include="..\..\FEBioMech\FERigidSpring.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidWallInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERVEModel.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESlidingInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESlidingInterfaceBW.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESolidDomainFactory.cpp" />
@@ -762,6 +767,7 @@
     <ClCompile Include="..\..\FEBioMech\FEUT4Domain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEViscoElasticMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEViscousMaterialPoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEVolumeConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEVonMisesPlasticity.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEWrinkleOgdenMaterial.cpp" />
