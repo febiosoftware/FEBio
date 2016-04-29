@@ -25,7 +25,7 @@ public:
 public:
 
 	//! return number of edge elements
-	int Elements() { return m_Elem.size(); }
+	int Elements() const { return m_Elem.size(); }
 
 	//! return an element of the edge
 	FELineElement& Element(int i) { return m_Elem[i]; }

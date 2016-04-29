@@ -801,6 +801,15 @@ FESegmentSet* FEMesh::FindSegmentSet(const char* szname)
 }
 
 //-----------------------------------------------------------------------------
+//! Find a surface set set by name
+
+FESurface* FEMesh::FindSurface(const char* szname)
+{
+	for (size_t i=0; i<m_Surf.size(); ++i) if (strcmp(m_Surf[i]->GetName(), szname) == 0) return m_Surf[i];
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Find a discrete element set set by name
 
 FEDiscreteSet* FEMesh::FindDiscreteSet(const char* szname)

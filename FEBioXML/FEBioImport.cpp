@@ -27,6 +27,7 @@
 #include "FECore/Image.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include <FECore/FESurfaceMap.h>
 #include "FECore/DOFS.h"
 #include <string.h>
 #include <stdarg.h>
@@ -656,6 +657,22 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* sz
 					if (im.Load(szin) == false) throw XMLReader::InvalidValue(tag);
 				}
 				break;
+			case FE_PARAM_SURFACE_MAP:
+				{
+					// get the surface map
+					FESurfaceMap& map = pp->value<FESurfaceMap>();
+
+/*					// Find the surface
+					FEMesh& mesh = *GetFEMesh();
+					FESurface* ps = mesh.FindSurface(tag.AttributeValue("surf"));
+					if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "surf");
+
+					if (map.Create(ps) == false) throw XMLReader::InvalidAttributeValue(tag, "surf");
+*/
+					// read the surface map data
+					ParseSurfaceMap(tag, map);
+				};
+				break;
 			default:
 				assert(false);
 				return false;
@@ -741,6 +758,22 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam
 					im.Create(n[0], n[1], n[2]);
 					if (im.Load(szfile) == false) throw XMLReader::InvalidValue(tag);
 				}
+				break;
+			case FE_PARAM_SURFACE_MAP:
+				{
+					// get the surface map
+					FESurfaceMap& map = pp->value<FESurfaceMap>();
+
+/*					// Find the surface
+					FEMesh& mesh = *GetFEMesh();
+					FESurface* ps = mesh.FindSurface(tag.AttributeValue("surf"));
+					if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "surf");
+
+					if (map.Create(ps) == false) throw XMLReader::InvalidAttributeValue(tag, "surf");
+*/
+					// read the surface map data
+					ParseSurfaceMap(tag, map);
+				};
 				break;
 			default:
 				assert(false);
@@ -1069,6 +1102,27 @@ bool FEBioImport::BuildSurface(FESurface& s, FEFacetSet& fs)
 	s.SetName(fs.GetName());
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEBioImport::ParseSurfaceMap(XMLTag& tag, FESurfaceMap& map)
+{
+	int nid;
+	double v;
+	++tag;
+	do
+	{
+		if (tag == "face")
+		{
+			tag.AttributeValue("id", nid);
+			tag.value(v);
+
+			map.SetValue(nid - 1, v);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------

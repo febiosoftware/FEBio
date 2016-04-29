@@ -392,6 +392,7 @@ public:
 	int Surfaces() { return (int) m_Surf.size(); }
 	FESurface& Surface(int n) { return *m_Surf[n]; }
 	void AddSurface(FESurface* ps) { m_Surf.push_back(ps); }
+	FESurface* FindSurface(const char* szname);
 
 	// --- EDGES ---
 	int Edges() { return (int) m_Edge.size(); }

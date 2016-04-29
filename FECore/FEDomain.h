@@ -69,7 +69,7 @@ public: // interface for derived classes
 	virtual void create(int n) = 0;
 
 	//! return number of elements
-	virtual int Elements() = 0;
+	virtual int Elements() const = 0;
 
 	//! return a reference to an element \todo this is not the preferred interface but I've added it for now
 	virtual FEElement& ElementRef(int i) = 0;

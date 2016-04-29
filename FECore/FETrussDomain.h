@@ -9,7 +9,7 @@ public:
 	FETrussDomain(FEMesh* pm) : FEDomain(FE_DOMAIN_TRUSS, pm){}
 
 	void create(int n) { m_Elem.resize(n); }
-	int Elements() { return m_Elem.size(); }
+	int Elements() const { return m_Elem.size(); }
 
 	FETrussElement& Element(int i) { return m_Elem[i]; }
 

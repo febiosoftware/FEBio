@@ -3,17 +3,12 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-FEPressureLoad::LOAD::LOAD()
-{ 
-	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = 1.0;
-}
-
-//-----------------------------------------------------------------------------
 // Parameter block for pressure loads
 BEGIN_PARAMETER_LIST(FEPressureLoad, FESurfaceLoad)
 	ADD_PARAMETER(m_blinear , FE_PARAM_BOOL  , "linear"  );
 	ADD_PARAMETER(m_pressure, FE_PARAM_DOUBLE, "pressure");
 	ADD_PARAMETER(m_bsymm   , FE_PARAM_BOOL  , "symmetric_stiffness");
+	ADD_PARAMETER(m_PC      , FE_PARAM_SURFACE_MAP, "pressure_map");
 END_PARAMETER_LIST()
 
 //-----------------------------------------------------------------------------
@@ -35,7 +30,7 @@ FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 void FEPressureLoad::SetSurface(FESurface* ps)
 {
 	FESurfaceLoad::SetSurface(ps);
-	m_PC.resize(ps->Elements()); 
+	m_PC.Create(ps, 1.0); 
 }
 
 //-----------------------------------------------------------------------------
@@ -56,15 +51,12 @@ bool FEPressureLoad::SetAttribute(const char* szatt, const char* szval)
 //-----------------------------------------------------------------------------
 bool FEPressureLoad::SetFacetAttribute(int nface, const char* szatt, const char* szval)
 {
-	LOAD& pc = PressureLoad(nface);
 	if      (strcmp(szatt, "id") == 0) {}
 //	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
 	else if (strcmp(szatt, "scale") == 0)
 	{
 		double s = atof(szval);
-		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
-		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
-		pc.s[8] = s;
+		m_PC.SetValue(nface, s);
 	}
 	else return false;
 
@@ -273,29 +265,7 @@ void FEPressureLoad::Serialize(DumpStream& ar)
 {
 	FESurfaceLoad::Serialize(ar);
 
-	if (ar.IsSaving())
-	{
-		ar << (int) m_PC.size();
-		for (int i=0; i< (int) m_PC.size(); ++i)
-		{
-			LOAD& pc = m_PC[i];
-			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
-			ar << pc.s[4] << pc.s[5] << pc.s[6] << pc.s[7] << pc.s[8];
-		}
-	}
-	else
-	{
-		int n;
-		ar >> n;
-		m_PC.resize(n);
-		// pressure forces
-		for (int i=0; i<n; ++i)
-		{
-			LOAD& pc = m_PC[i];
-			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
-			ar >> pc.s[4] >> pc.s[5] >> pc.s[6] >> pc.s[7] >> pc.s[8];
-		}
-	}
+	m_PC.Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
@@ -325,10 +295,10 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 	matrix ke;
 	vector<int> lm;
 
-	int npr = m_PC.size();
+	FESurface& surf = Surface();
+	int npr = surf.Elements();
 	for (int m=0; m<npr; ++m)
 	{
-		LOAD& pc = m_PC[m];
 		// get the surface element
 		FESurfaceElement& el = m_psurf->Element(m);
 
@@ -339,7 +309,7 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 		// evaluate the prescribed traction.
 		// note the negative sign. This is because this boundary condition uses the 
 		// convention that a positive pressure is compressive
-		for (int j=0; j<neln; ++j) tn[j] = -m_pressure*pc.s[j];
+		for (int j=0; j<neln; ++j) tn[j] = -m_pressure*m_PC.GetValue(m);
 
 		// get the element stiffness matrix
 		int ndof = 3*neln;
@@ -362,10 +332,10 @@ void FEPressureLoad::Residual(FEGlobalVector& R)
 	vector<double> fe;
 	vector<int> lm;
 
-	int npr = m_PC.size();
+	FESurface& surf = Surface();
+	int npr = surf.Elements();
 	for (int i=0; i<npr; ++i)
 	{
-		LOAD& pc = m_PC[i];
 		FESurfaceElement& el = m_psurf->Element(i);
 
 		// calculate nodal normal tractions
@@ -375,7 +345,7 @@ void FEPressureLoad::Residual(FEGlobalVector& R)
 		// evaluate the prescribed traction.
 		// note the negative sign. This is because this boundary condition uses the 
 		// convention that a positive pressure is compressive
-		for (int j=0; j<el.Nodes(); ++j) tn[j] = -m_pressure*pc.s[j];
+		for (int j=0; j<el.Nodes(); ++j) tn[j] = -m_pressure*m_PC.GetValue(i);
 		
 		int ndof = 3*neln;
 		fe.resize(ndof);

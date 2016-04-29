@@ -1,5 +1,6 @@
 #pragma once
 #include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceMap.h>
 
 //-----------------------------------------------------------------------------
 //! The pressure surface is a surface domain that sustains pressure boundary
@@ -8,21 +9,11 @@
 class FEPressureLoad : public FESurfaceLoad
 {
 public:
-	struct LOAD
-	{
-		LOAD();
-		double	s[9];		// nodal scale factors
-	};
-
-public:
 	//! constructor
 	FEPressureLoad(FEModel* pfem);
 
 	//! Set the surface to apply the load to
 	void SetSurface(FESurface* ps);
-
-	//! get a pressure load BC
-	LOAD& PressureLoad(int n) { return m_PC[n]; }
 
 	//! calculate pressure stiffness
 	void StiffnessMatrix(FESolver* psolver);
@@ -68,7 +59,7 @@ protected:
 	bool			m_blinear;	//!< pressure load type (linear or nonlinear)
 	double			m_pressure;	//!< pressure value
 	bool			m_bsymm;	//!< use symmetric formulation
-	vector<LOAD>	m_PC;		//!< pressure load cards
+	FESurfaceMap	m_PC;		//!< pressure scale factors
 
 	// degrees of freedom
 	// (TODO: find a better way of defining this. 

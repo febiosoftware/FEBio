@@ -22,6 +22,7 @@ enum FEParamType {
 	FE_PARAM_MAT3DS,
 	FE_PARAM_IMAGE_3D,
 	FE_PARAM_STRING,
+	FE_PARAM_SURFACE_MAP
 };
 
 //-----------------------------------------------------------------------------
