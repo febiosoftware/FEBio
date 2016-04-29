@@ -9,6 +9,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 class DumpStream;
+class FEParam;
 
 //-----------------------------------------------------------------------------
 // Different supported parameter types
@@ -41,6 +42,58 @@ enum FEParamRange {
 };
 
 //-----------------------------------------------------------------------------
+// Base class for parameter validators. 
+class FEParamValidator
+{
+public:
+	FEParamValidator(){}
+	virtual ~FEParamValidator(){}
+
+	virtual bool is_valid(const FEParam& p) const = 0;
+
+	virtual FEParamValidator* copy() const = 0;
+
+	static const string& get_error_string();
+
+protected:
+	static void set_error_string(const std::string& s);
+	static std::string	m_err;
+};
+
+template <class T> class FEParamValidator_ : public FEParamValidator
+{
+public:
+	FEParamValidator* copy() const { return new T(static_cast<T const&>(*this)); }
+};
+
+class FEIntValidator : public FEParamValidator_<FEIntValidator>
+{
+public:
+	FEIntValidator(FEParamRange rng, int nmin, int nmax) : m_rng(rng), m_nmin(nmin), m_nmax(nmax) {}
+
+	bool is_valid(const FEParam& p) const;
+
+private:
+	FEParamRange	m_rng;
+	int				m_nmin;
+	int				m_nmax;
+};
+
+class FEDoubleValidator : public FEParamValidator_<FEDoubleValidator>
+{
+public:
+	FEDoubleValidator(FEParamRange rng, double fmin, double fmax) : m_rng(rng), m_fmin(fmin), m_fmax(fmax) {}
+
+	bool is_valid(const FEParam& p) const;
+
+private:
+	FEParamRange	m_rng;
+	double			m_fmin;
+	double			m_fmax;
+};
+
+
+//-----------------------------------------------------------------------------
 //! This class describes a user-defined parameter
 class FEParam
 {
@@ -49,47 +102,47 @@ public:
 	FEParamType	m_itype;	// type of variable
 	const char*	m_szname;	// name of the parameter
 	int			m_ndim;		// dimension of array
+	
+	// TODO: I want to look into the idea of generalizing this to "controllers". 
+	//       A controller would be anything that affects a parameter's value. Right now,
+	//       only load curves are used, but other controllers can be a mathematical expression,
+	//       or even a user-controlled interactive controller. 
 	int			m_nlc;		// load curve number for dynamic parameters (-1 for static)
+
+	// Can I put these two variables in a union?
 	double		m_scl;		// load curve scale factor
 	vec3d		m_vscl;		// scale factor for vectors
 
-	// range stuff
-	FEParamRange	m_irange;
-	union
-	{
-		// this value is used as the minimum for a range parameter
-		// or for the inf/sup for a half-open or half-closed parameter
-		int		m_imin;
-		double	m_dmin;
-	};
-	union
-	{
-		// this value is used as the maximum for a range parameter
-		int		m_imax;
-		double	m_dmax;
-	};
+	// parameter validator
+	FEParamValidator*	m_pvalid;
 
-	FEParam()
-	{
-		m_pv = 0;
-		m_itype = FE_PARAM_DOUBLE;
-		m_irange = FE_DONT_CARE;
-		m_ndim = 1;
-		m_nlc = -1;
-		m_scl = 1.0;
-		m_vscl = vec3d(0,0,0);
-	}
+public:
+	// constructor
+	FEParam();
+	FEParam(const FEParam& p);
+	FEParam& operator = (const FEParam& p);
 
-	bool is_inside_range();
+	// set the parameter's validator
+	void SetValidator(FEParamValidator* pvalid);
 
-	const char* name() { return m_szname; }
+	// see if the parameter's value is valid
+	bool is_valid() const;
+
+	// return the name of the parameter
+	const char* name() const { return m_szname; }
 
 public:
 	//! retrieves the value for a non-array item
 	template <class T> T& value() { return *((T*) m_pv); }
 
+	//! retrieves the value for a non-array item
+	template <class T> T value() const { return *((T*)m_pv); }
+
 	//! retrieves the value for an array item
 	template <class T> T* pvalue() { return (T*) m_pv; }
+
+	//! retrieves the value for an array item
+	template <class T> T value(int i) const { return ((T*)m_pv)[i]; }
 
 	//! retrieves pointer to element in array
 	template <class T> T* pvalue(int n);
