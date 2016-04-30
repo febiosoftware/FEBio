@@ -26,11 +26,11 @@
 void print_parameter(FEParam& p)
 {
 	char sz[512] = {0};
-	int l = strlen(p.m_szname);
-	sprintf(sz, "\t%-*s %.*s", l, p.m_szname, 50-l, "..................................................");
-	if (p.m_ndim == 1)
+	int l = strlen(p.name());
+	sprintf(sz, "\t%-*s %.*s", l, p.name(), 50-l, "..................................................");
+	if (p.dim() == 1)
 	{
-		switch (p.m_itype)
+		switch (p.type())
 		{
 		case FE_PARAM_DOUBLE : felog.printf("%s : %lg\n", sz, p.value<double>()); break;
 		case FE_PARAM_INT    : felog.printf("%s : %d\n" , sz, p.value<int   >()); break;
@@ -60,16 +60,16 @@ void print_parameter(FEParam& p)
 	}
 	else
 	{
-		switch (p.m_itype)
+		switch (p.type())
 		{
 		case FE_PARAM_INT:
 		case FE_PARAM_DOUBLE:
 			{
-				int n = p.m_ndim;
+				int n = p.dim();
 				felog.printf("%s : ", sz);
 				for (int k=0; k<n; ++k)
 				{
-					switch (p.m_itype)
+					switch (p.type())
 					{
 					case FE_PARAM_INT   : felog.printf("%d" , p.pvalue<int   >()[k]); break;
 					case FE_PARAM_DOUBLE: felog.printf("%lg", p.pvalue<double>()[k]); break;

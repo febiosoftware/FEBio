@@ -32,7 +32,7 @@ FERigidMaterial::FERigidMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 //-----------------------------------------------------------------------------
 void FERigidMaterial::SetParameter(FEParam& p)
 {
-	if (strcmp(p.m_szname, "center_of_mass") == 0)
+	if (strcmp(p.name(), "center_of_mass") == 0)
 	{
 		m_com = 1;
 	}

@@ -685,7 +685,7 @@ bool FEModel::EvaluateParameterList(FEParameterList &pl)
 			if (nlc >= NLC) return false;
 
 			double v = GetLoadCurve(nlc)->Value();
-			switch (pi->m_itype)
+			switch (pi->type())
 			{
 			case FE_PARAM_INT   : pi->value<int>() = (int) v; break;
 			case FE_PARAM_DOUBLE: pi->value<double>() = pi->m_scl*v; break;

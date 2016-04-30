@@ -95,7 +95,7 @@ void FENonLinearSpring::Serialize(DumpStream& ar)
 
 bool FENonLinearSpring::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
 {
-	if (strcmp(p.m_szname, "force") == 0)
+	if (strcmp(p.name(), "force") == 0)
 	{
 		if (strcmp(szatt, "lc") == 0)
 		{

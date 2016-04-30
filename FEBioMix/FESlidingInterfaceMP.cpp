@@ -587,7 +587,7 @@ bool FESlidingInterfaceMP::SetParameterAttribute(FEParam& p, const char* szatt, 
     DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
-	if (strcmp(p.m_szname, "ambient_concentration") == 0)
+	if (strcmp(p.name(), "ambient_concentration") == 0)
 	{
 		if (strcmp(szatt, "sol") == 0)
 		{

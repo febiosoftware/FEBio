@@ -35,7 +35,7 @@ bool FESolventSupplyStarling::SetParameterAttribute(FEParam& p, const char* szat
     DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
-	if (strcmp(p.m_szname, "qc") == 0)
+	if (strcmp(p.name(), "qc") == 0)
 	{
 		if (strcmp(szatt, "sol") == 0)
 		{
@@ -45,7 +45,7 @@ bool FESolventSupplyStarling::SetParameterAttribute(FEParam& p, const char* szat
 			return true;
 		}
 	}
-	else if (strcmp(p.m_szname, "cv") == 0)
+	else if (strcmp(p.name(), "cv") == 0)
 	{
 		if (strcmp(szatt, "sol") == 0)
 		{

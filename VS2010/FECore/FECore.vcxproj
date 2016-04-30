@@ -669,7 +669,9 @@
     <ClInclude Include="..\..\FECore\FENormalProjection.h" />
     <ClInclude Include="..\..\FECore\FEObject.h" />
     <ClInclude Include="..\..\FECore\FEOctree.h" />
+    <ClInclude Include="..\..\FECore\FEParam.h" />
     <ClInclude Include="..\..\FECore\FEParameterList.h" />
+    <ClInclude Include="..\..\FECore\FEParamValidator.h" />
     <ClInclude Include="..\..\FECore\FEPlotData.h" />
     <ClInclude Include="..\..\FECore\FERigidBody.h" />
     <ClInclude Include="..\..\FECore\FERigidSystem.h" />
@@ -790,7 +792,9 @@
     <ClCompile Include="..\..\FECore\FENodeReorder.cpp" />
     <ClCompile Include="..\..\FECore\FENormalProjection.cpp" />
     <ClCompile Include="..\..\FECore\FEOctree.cpp" />
+    <ClCompile Include="..\..\FECore\FEParam.cpp" />
     <ClCompile Include="..\..\FECore\FEParameterList.cpp" />
+    <ClCompile Include="..\..\FECore\FEParamValidator.cpp" />
     <ClCompile Include="..\..\FECore\FEPlotData.cpp" />
     <ClCompile Include="..\..\FECore\FERigidBody.cpp" />
     <ClCompile Include="..\..\FECore\FERigidSystem.cpp" />

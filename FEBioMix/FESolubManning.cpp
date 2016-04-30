@@ -303,7 +303,7 @@ void FESolubManning::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 bool FESolubManning::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
 {
-    if (strcmp(p.m_szname, "solub") == 0)
+    if (strcmp(p.name(), "solub") == 0)
     {
         if (strcmp(szatt, "lc") == 0)
         {

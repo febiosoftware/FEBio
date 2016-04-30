@@ -233,7 +233,7 @@ void FEOsmCoefManning::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 bool FEOsmCoefManning::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
 {
-    if (strcmp(p.m_szname, "osmc") == 0)
+    if (strcmp(p.name(), "osmc") == 0)
     {
         if (strcmp(szatt, "lc") == 0)
         {

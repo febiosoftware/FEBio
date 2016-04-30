@@ -121,7 +121,7 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, const string& pname)
 				FEParam* p = pl.Find(pname.c_str());
 				if (p) 
 				{
-					if ((p->m_ndim == 1) && (p->m_itype == FE_PARAM_DOUBLE))
+					if ((p->dim() == 1) && (p->type() == FE_PARAM_DOUBLE))
 					{
 						p->value<double>() = di.val[0];
 					}

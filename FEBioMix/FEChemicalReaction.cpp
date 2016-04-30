@@ -36,7 +36,7 @@ bool FEChemicalReaction::Init()
 //-----------------------------------------------------------------------------
 void FEChemicalReaction::SetParameter(FEParam& p)
 {
-	if (strcmp(p.m_szname, "Vbar") == 0)
+	if (strcmp(p.name(), "Vbar") == 0)
 	{
 		m_Vovr = true;
 	}
@@ -49,7 +49,7 @@ bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, co
     DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
-	if (strcmp(p.m_szname, "vR") == 0)
+	if (strcmp(p.name(), "vR") == 0)
 	{
 		if (strcmp(szatt, "sbm") == 0)
 		{
@@ -66,7 +66,7 @@ bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, co
 			return true;
 		}
 	}
-	else if (strcmp(p.m_szname, "vP") == 0)
+	else if (strcmp(p.name(), "vP") == 0)
 	{
 		if (strcmp(szatt, "sbm") == 0)
 		{

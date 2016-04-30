@@ -616,9 +616,9 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* sz
 	FEParam* pp = pl.Find((szparam == 0 ? tag.Name() : szparam));
 	if (pp)
 	{
-		if (pp->m_ndim == 1)
+		if (pp->dim() == 1)
 		{
-			switch (pp->m_itype)
+			switch (pp->type())
 			{
 			case FE_PARAM_DOUBLE : value(tag, pp->value<double>()); break;
 			case FE_PARAM_INT    : value(tag, pp->value<int   >()); break;
@@ -680,10 +680,10 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* sz
 		}
 		else
 		{
-			switch (pp->m_itype)
+			switch (pp->type())
 			{
-			case FE_PARAM_INT   : value(tag, pp->pvalue<int   >(), pp->m_ndim); break;
-			case FE_PARAM_DOUBLE: value(tag, pp->pvalue<double>(), pp->m_ndim); break;
+			case FE_PARAM_INT   : value(tag, pp->pvalue<int   >(), pp->dim()); break;
+			case FE_PARAM_DOUBLE: value(tag, pp->pvalue<double>(), pp->dim()); break;
 			}
 		}
 
@@ -700,7 +700,7 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* sz
 					int lc = atoi(tag.m_att[i].m_szatv)-1;
 					if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
 					pp->m_nlc = lc;
-					switch (pp->m_itype)
+					switch (pp->type())
 					{
 					case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
 					case FE_PARAM_VEC3D : pp->m_vscl = pp->value<vec3d>(); break;
@@ -733,9 +733,9 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam
 	FEParam* pp = pl.Find((szparam == 0 ? tag.Name() : szparam));
 	if (pp)
 	{
-		if (pp->m_ndim == 1)
+		if (pp->dim() == 1)
 		{
-			switch (pp->m_itype)
+			switch (pp->type())
 			{
 			case FE_PARAM_DOUBLE : value(tag, pp->value<double>() ); break;
 			case FE_PARAM_INT    : value(tag, pp->value<int   >() ); break;
@@ -782,10 +782,10 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam
 		}
 		else
 		{
-			switch (pp->m_itype)
+			switch (pp->type())
 			{
-			case FE_PARAM_INT   : value(tag, pp->pvalue<int   >(), pp->m_ndim); break;
-			case FE_PARAM_DOUBLE: value(tag, pp->pvalue<double>(), pp->m_ndim); break;
+			case FE_PARAM_INT   : value(tag, pp->pvalue<int   >(), pp->dim()); break;
+			case FE_PARAM_DOUBLE: value(tag, pp->pvalue<double>(), pp->dim()); break;
 			default:
 				assert(false);
 				return false;
@@ -805,7 +805,7 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam
 					int lc = atoi(tag.m_att[i].m_szatv)-1;
 					if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
 					pp->m_nlc = lc;
-					switch (pp->m_itype)
+					switch (pp->type())
 					{
 					case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
 					case FE_PARAM_VEC3D : pp->m_vscl = pp->value<vec3d>(); break;

@@ -19,9 +19,9 @@ bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 	FEParam* pp = pl.Find(tag.Name());
 	if (pp == 0) return false;
 
-	if (pp->m_ndim == 1)
+	if (pp->dim() == 1)
 	{
-		switch (pp->m_itype)
+		switch (pp->type())
 		{
 		case FE_PARAM_DOUBLE : tag.value(pp->value<double>() ); break;
 		case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
@@ -34,10 +34,10 @@ bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 	}
 	else
 	{
-		switch (pp->m_itype)
+		switch (pp->type())
 		{
-		case FE_PARAM_INT   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
-		case FE_PARAM_DOUBLE: tag.value(pp->pvalue<double>(), pp->m_ndim); break;
+		case FE_PARAM_INT   : tag.value(pp->pvalue<int   >(), pp->dim()); break;
+		case FE_PARAM_DOUBLE: tag.value(pp->pvalue<double>(), pp->dim()); break;
 		default:
 			assert(false);
 			return false;
@@ -53,7 +53,7 @@ bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 			int lc = atoi(tag.m_att[i].m_szatv) - 1;
 			if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
 			pp->m_nlc = lc;
-			switch (pp->m_itype)
+			switch (pp->type())
 			{
 			case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
 			}

@@ -56,7 +56,7 @@ bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
 			// extract the parameter
 			// Note that for now this only works for double parameters
 			FEParam* pv = mp.GetParameter(s);
-			if (pv && (pv->m_itype==FE_PARAM_DOUBLE))
+			if (pv && (pv->type()==FE_PARAM_DOUBLE))
 			{
 				E += pv->value<double>();
 				nc++;
