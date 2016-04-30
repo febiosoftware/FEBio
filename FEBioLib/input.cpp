@@ -91,7 +91,7 @@ void print_parameter_list(FEParameterList& pl)
 	int n = pl.Parameters();
 	if (n > 0)
 	{
-		list<FEParam>::iterator it = pl.first();
+		FEParamIterator it = pl.first();
 		for (int j=0; j<n; ++j, ++it) print_parameter(*it);
 	}
 }

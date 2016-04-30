@@ -699,12 +699,7 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* sz
 				{
 					int lc = atoi(tag.m_att[i].m_szatv)-1;
 					if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-					pp->m_nlc = lc;
-					switch (pp->type())
-					{
-					case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
-					case FE_PARAM_VEC3D : pp->m_vscl = pp->value<vec3d>(); break;
-					}
+					pp->SetLoadCurve(lc);
 				}
 /*				else 
 				{
@@ -804,12 +799,7 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam
 				{
 					int lc = atoi(tag.m_att[i].m_szatv)-1;
 					if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-					pp->m_nlc = lc;
-					switch (pp->type())
-					{
-					case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
-					case FE_PARAM_VEC3D : pp->m_vscl = pp->value<vec3d>(); break;
-					}
+					pp->SetLoadCurve(lc);
 				}
 /*				else 
 				{

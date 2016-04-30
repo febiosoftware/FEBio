@@ -5,6 +5,7 @@
 
 //-----------------------------------------------------------------------------
 class FEParamValidator;
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 // Different supported parameter types
@@ -25,7 +26,15 @@ enum FEParamType {
 //! This class describes a user-defined parameter
 class FEParam
 {
-public:
+private:
+	void*		m_pv;		// pointer to variable data
+	FEParamType	m_itype;	// type of variable
+	int			m_ndim;		// dimension of array
+	const char*	m_szname;	// name of the parameter
+
+	// parameter validator
+	FEParamValidator*	m_pvalid;
+
 	// TODO: I want to look into the idea of generalizing this to "controllers". 
 	//       A controller would be anything that affects a parameter's value. Right now,
 	//       only load curves are used, but other controllers can be a mathematical expression,
@@ -35,15 +44,6 @@ public:
 	// Can I put these two variables in a union?
 	double		m_scl;		// load curve scale factor
 	vec3d		m_vscl;		// scale factor for vectors
-
-private:
-	void*		m_pv;		// pointer to variable data
-	FEParamType	m_itype;	// type of variable
-	int			m_ndim;		// dimension of array
-	const char*	m_szname;	// name of the parameter
-
-	// parameter validator
-	FEParamValidator*	m_pvalid;
 
 public:
 	// constructor
@@ -69,6 +69,20 @@ public:
 	// data pointer
 	void* data_ptr() const { return m_pv; }
 
+	// set the load curve ID
+	void SetLoadCurve(int lc);
+	void SetLoadCurve(int lc, double s);
+
+	// get the load curve ID (or -1 if none)
+	int GetLoadCurve() const { return m_nlc; }
+
+	// get the scale factors
+	double GetScaleDouble() const { return m_scl; }
+	vec3d  GetScaleVec3d () const { return m_vscl; }
+
+public:
+	void Serialize(DumpStream& ar);
+
 public:
 	//! retrieves the value for a non-array item
 	template <class T> T& value() { return *((T*) m_pv); }
@@ -84,16 +98,6 @@ public:
 
 	//! retrieves pointer to element in array
 	template <class T> T* pvalue(int n);
-
-	//! assignment operators
-	// NOTE: This doesn't work if a load curve is used (use setvalue instead).
-	void operator = (double g) { assert(m_itype == FE_PARAM_DOUBLE); value<double>() = g; }
-	void operator = (int    n) { assert(m_itype == FE_PARAM_INT   ); value<int   >() = n; }
-	void operator = (bool   b) { assert(m_itype == FE_PARAM_BOOL  ); value<bool  >() = b; }
-	void operator = (vec2d  v) { assert(m_itype == FE_PARAM_VEC2D ); value<vec2d >() = v; }
-	void operator = (vec3d  v) { assert(m_itype == FE_PARAM_VEC3D ); value<vec3d >() = v; }
-	void operator = (mat3d  m) { assert(m_itype == FE_PARAM_MAT3D ); value<mat3d >() = m; }
-	void operator = (mat3ds m) { assert(m_itype == FE_PARAM_MAT3DS); value<mat3ds>() = m; }
 
 	// only implemented for double parameters
 	void setvalue(double v)

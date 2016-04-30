@@ -2,9 +2,10 @@
 #include "FEParamValidator.h"
 #include "FEParam.h"
 #include "FECoreKernel.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
-bool is_inside_range_int(int ival, FEParamRange rng, int imin, int imax)
+bool is_inside_range_int(int ival, int rng, int imin, int imax)
 {
 	switch (rng)
 	{
@@ -22,7 +23,7 @@ bool is_inside_range_int(int ival, FEParamRange rng, int imin, int imax)
 }
 
 //-----------------------------------------------------------------------------
-bool is_inside_range_double(double val, FEParamRange rng, double dmin, double dmax)
+bool is_inside_range_double(double val, int rng, double dmin, double dmax)
 {
 	switch (rng)
 	{
@@ -86,6 +87,21 @@ bool FEIntValidator::is_valid(const FEParam& p) const
 }
 
 //-----------------------------------------------------------------------------
+void FEIntValidator::Serialize(DumpStream& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_rng;
+		ar << m_nmin << m_nmax;
+	}
+	else
+	{
+		ar >> m_rng;
+		ar >> m_nmin >> m_nmax;
+	}
+}
+
+//-----------------------------------------------------------------------------
 bool FEDoubleValidator::is_valid(const FEParam& p) const
 {
 	if (p.type() != FE_PARAM_DOUBLE) return false;
@@ -128,4 +144,19 @@ bool FEDoubleValidator::is_valid(const FEParam& p) const
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEDoubleValidator::Serialize(DumpStream& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_rng;
+		ar << m_fmin << m_fmax;
+	}
+	else
+	{
+		ar >> m_rng;
+		ar >> m_fmin >> m_fmax;
+	}
 }

@@ -676,11 +676,11 @@ bool FEModel::EvaluateAllParameterLists()
 bool FEModel::EvaluateParameterList(FEParameterList &pl)
 {
 	const int NLC = LoadCurves();
-	list<FEParam>::iterator pi = pl.first();
+	FEParamIterator pi = pl.first();
 	for (int j=0; j<pl.Parameters(); ++j, ++pi)
 	{
-		int nlc = pi->m_nlc;
-		if (pi->m_nlc >= 0)
+		int nlc = pi->GetLoadCurve();
+		if (nlc >= 0)
 		{
 			if (nlc >= NLC) return false;
 
@@ -688,9 +688,9 @@ bool FEModel::EvaluateParameterList(FEParameterList &pl)
 			switch (pi->type())
 			{
 			case FE_PARAM_INT   : pi->value<int>() = (int) v; break;
-			case FE_PARAM_DOUBLE: pi->value<double>() = pi->m_scl*v; break;
+			case FE_PARAM_DOUBLE: pi->value<double>() = pi->GetScaleDouble()*v; break;
 			case FE_PARAM_BOOL  : pi->value<bool>() = (v > 0? true : false); break;
-			case FE_PARAM_VEC3D : pi->value<vec3d>() = pi->m_vscl*v; break;
+			case FE_PARAM_VEC3D : pi->value<vec3d>() = pi->GetScaleVec3d()*v; break;
 			default: 
 				assert(false);
 			}

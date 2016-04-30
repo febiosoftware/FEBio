@@ -2,6 +2,7 @@
 
 //-----------------------------------------------------------------------------
 class FEParam;
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 //! Range for parameters
@@ -32,6 +33,9 @@ public:
 
 	//! Creates a copy of the validator
 	virtual FEParamValidator* copy() const = 0;
+
+	//! Serialize validator data
+	virtual void Serialize(DumpStream& ar) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -55,10 +59,12 @@ public:
 	//! See if the parameter is an FE_PARAM_INT and within the specified range
 	bool is_valid(const FEParam& p) const;
 
+	void Serialize(DumpStream& ar);
+
 private:
-	FEParamRange	m_rng;
-	int				m_nmin;
-	int				m_nmax;
+	int		m_rng;
+	int		m_nmin;
+	int		m_nmax;
 };
 
 //-----------------------------------------------------------------------------
@@ -71,12 +77,13 @@ public:
 	//! See if the parameter is an FE_PARAM_DOUBLE and within the specified range
 	bool is_valid(const FEParam& p) const;
 
-private:
-	FEParamRange	m_rng;
-	double			m_fmin;
-	double			m_fmax;
-};
+	void Serialize(DumpStream& ar);
 
+private:
+	int			m_rng;
+	double		m_fmin;
+	double		m_fmax;
+};
 
 //-----------------------------------------------------------------------------
 // helper class for defining ranges

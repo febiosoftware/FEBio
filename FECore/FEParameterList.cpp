@@ -280,46 +280,7 @@ void FEParamContainer::Serialize(DumpStream& ar)
 		for (int i=0; i<NP; ++i)
 		{
 			FEParam& p = *it++;
-			ar << p.m_nlc;
-			ar << p.m_scl;
-			ar << p.m_vscl;
-			ar << (int) p.type();
-			ar << p.dim();
-			if (p.dim() == 1)
-			{
-				switch (p.type())
-				{
-				case FE_PARAM_INT   : ar << p.value<int   >(); break;
-				case FE_PARAM_BOOL  : ar << p.value<bool  >(); break;
-				case FE_PARAM_DOUBLE: ar << p.value<double>(); break;
-				case FE_PARAM_VEC3D : ar << p.value<vec3d >(); break;
-				case FE_PARAM_MAT3D : ar << p.value<mat3d >(); break;
-				case FE_PARAM_MAT3DS: ar << p.value<mat3ds>(); break;
-				case FE_PARAM_STRING: ar << (const char*) p.data_ptr(); break;
-				default:
-					assert(false);
-				}
-			}
-			else
-			{
-				switch (p.type())
-				{
-				case FE_PARAM_INT:
-					{
-						int* pi = (int*) p.data_ptr();
-						for (int i=0; i<p.dim(); ++i) ar << pi[i];
-					}
-					break;
-				case FE_PARAM_DOUBLE:
-					{
-						double* pv = (double*) p.data_ptr();
-						for (int i=0; i<p.dim(); ++i) ar << pv[i];
-					}
-					break;
-				default:
-					assert(false);
-				}
-			}
+			p.Serialize(ar);
 		}
 	}
 	else
@@ -334,49 +295,7 @@ void FEParamContainer::Serialize(DumpStream& ar)
 			for (int i=0; i<NP; ++i)
 			{
 				FEParam& p = *it++;
-				ar >> p.m_nlc;
-				ar >> p.m_scl;
-				ar >> p.m_vscl;
-				int ntype, ndim;
-				ar >> ntype;
-				ar >> ndim;
-				if (ndim != p.dim()) throw DumpStream::ReadError();
-				if (ntype != p.type()) throw DumpStream::ReadError();
-				if (p.dim() == 1)
-				{
-					switch (p.type())
-					{
-					case FE_PARAM_INT   : ar >> p.value<int   >(); break;
-					case FE_PARAM_BOOL  : ar >> p.value<bool  >(); break;
-					case FE_PARAM_DOUBLE: ar >> p.value<double>(); break;
-					case FE_PARAM_VEC3D : ar >> p.value<vec3d >(); break;
-					case FE_PARAM_MAT3D : ar >> p.value<mat3d >(); break;
-					case FE_PARAM_MAT3DS: ar >> p.value<mat3ds>(); break;
-					case FE_PARAM_STRING: ar >> (char*) p.data_ptr(); break;
-					default:
-						assert(false);
-					}
-				}
-				else
-				{
-					switch (p.type())
-					{
-					case FE_PARAM_INT:
-						{
-							int* pi = (int*) p.data_ptr();
-							for (int i=0; i<p.dim(); ++i) ar >> pi[i];
-						}
-						break;
-					case FE_PARAM_DOUBLE:
-						{
-							double* pv = (double*) p.data_ptr();
-							for (int i=0; i<p.dim(); ++i) ar >> pv[i];
-						}
-						break;
-					default:
-						assert(false);
-					}
-				}
+				p.Serialize(ar);
 			}
 		}
 	}

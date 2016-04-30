@@ -192,8 +192,7 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 				int nlc = atoi(sz)-1;
 				FEParameterList& pl = ps->GetParameterList();
 				FEParam& p = *pl.Find("offset");
-				p.m_nlc = nlc;
-				p.m_scl = 1.0;
+				p.SetLoadCurve(nlc, 1.0);
 			}
 		}
 

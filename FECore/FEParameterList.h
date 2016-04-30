@@ -14,6 +14,9 @@ class DumpStream;
 class FEParamContainer;
 
 //-----------------------------------------------------------------------------
+typedef list<FEParam>::iterator FEParamIterator;
+
+//-----------------------------------------------------------------------------
 //! A list of material parameters
 class FEParameterList
 {
@@ -40,7 +43,7 @@ public:
 	FEParam& operator [] (const char* sz) { return *Find(sz); }
 
 	//! returs the first parameter
-	list<FEParam>::iterator first() { return m_pl.begin(); }
+	FEParamIterator first() { return m_pl.begin(); }
 
 	//! number of parameters
 	int Parameters() { return m_pl.size(); }
