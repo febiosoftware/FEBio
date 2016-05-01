@@ -2,6 +2,7 @@
 #include "FECore/FESolidDomain.h"
 #include "FEElasticDomain.h"
 #include "FESolidMaterial.h"
+#include <FECore/FETypes.h>
 
 //-----------------------------------------------------------------------------
 //! domain described by Lagrange-type 3D volumetric elements
@@ -38,7 +39,7 @@ public: // overrides from FEDomain
 public: // overrides from FEElasticDomain
 
 	// update stresses
-	void Update();
+	void Update(const FETimePoint& tp);
 
 	// update the element stress
 	virtual void UpdateElementStress(int iel, double dt);
@@ -68,7 +69,7 @@ public:
 	// --- S T I F F N E S S ---
 
 	//! calculates the solid element stiffness matrix
-	virtual void ElementStiffness(FEModel& fem, int iel, matrix& ke);
+	virtual void ElementStiffness(const FETimePoint& tp, int iel, matrix& ke);
 
 	//! geometrical stiffness (i.e. initial stress)
 	virtual void ElementGeometricalStiffness(FESolidElement& el, matrix& ke);

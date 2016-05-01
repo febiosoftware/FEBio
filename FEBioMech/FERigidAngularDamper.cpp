@@ -128,8 +128,7 @@ void FERigidAngularDamper::StiffnessMatrix(FESolver* psolver, const FETimePoint&
     double gamma = tp.gamma;
     
     // get time increment
-    FEModel& fem = *GetFEModel();
-    double dt = fem.GetCurrentStep()->m_dt;
+    double dt = tp.dt;
     
     int j;
     
@@ -137,7 +136,8 @@ void FERigidAngularDamper::StiffnessMatrix(FESolver* psolver, const FETimePoint&
     matrix ke(12,12);
     ke.zero();
     
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+    FEModel& fem = *GetFEModel();
+	FERigidSystem& rigid = *fem.GetRigidSystem();
     FERigidBody& RBa = *rigid.Object(m_nRBa);
     FERigidBody& RBb = *rigid.Object(m_nRBb);
     

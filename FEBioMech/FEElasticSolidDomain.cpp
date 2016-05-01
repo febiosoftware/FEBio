@@ -664,7 +664,7 @@ void FEElasticSolidDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf
 //! the upper diagonal matrix due to the symmetry of the element stiffness matrix
 //! The last section of this function fills the rest of the element stiffness matrix.
 
-void FEElasticSolidDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
+void FEElasticSolidDomain::ElementStiffness(const FETimePoint& tp, int iel, matrix& ke)
 {
 	FESolidElement& el = Element(iel);
 
@@ -728,11 +728,10 @@ void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, dou
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::Update()
+void FEElasticSolidDomain::Update(const FETimePoint& tp)
 {
-	FEModel& fem = *GetFEModel();
-	double dt = fem.GetCurrentStep()->m_dt;
-
+    double dt = tp.dt;
+	
 	// TODO: This is temporary hack for running micro-materials in parallel. 
 	//	     Evaluating the stress for a micro-material will make FEBio solve
 	//       a new FE problem. We don't want to see the output of that problem.

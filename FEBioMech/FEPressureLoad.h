@@ -16,10 +16,10 @@ public:
 	void SetSurface(FESurface* ps);
 
 	//! calculate pressure stiffness
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(const FETimePoint& tp, FESolver* psolver);
 
 	//! calculate residual
-	void Residual(FEGlobalVector& R);
+	void Residual(const FETimePoint& tp, FEGlobalVector& R);
 
 	//! serialize data
 	void Serialize(DumpStream& ar);

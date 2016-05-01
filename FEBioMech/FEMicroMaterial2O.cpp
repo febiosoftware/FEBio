@@ -392,7 +392,7 @@ void FEMicroMaterial2O::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp, ten
 			ke.zero();
 
 			// calculate the element's stiffness matrix
-			bd.ElementStiffness(rve, n, ke);
+			bd.ElementStiffness(rve.GetTime(), n, ke);
 
 			// create the element's residual
 			fe.assign(ndof, 0);

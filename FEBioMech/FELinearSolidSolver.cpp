@@ -51,8 +51,10 @@ FELinearSolidSolver::~FELinearSolidSolver()
 bool FELinearSolidSolver::Quasin(double time)
 {
 	// prepare step
-	FEMaterialPoint::dt = m_fem.GetCurrentStep()->m_dt;
-	FEMaterialPoint::time = m_fem.m_ftime;
+    FETimePoint tp = m_fem.GetTime();
+
+	FEMaterialPoint::dt = tp.dt;
+	FEMaterialPoint::time = tp.t;
 
 	FEMesh& mesh = m_fem.GetMesh();
 	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
@@ -80,8 +82,6 @@ bool FELinearSolidSolver::Quasin(double time)
 			}
 		}
 	}
-
-	FETimePoint tp = m_fem.GetTime();
 
 	// start Newton-loop
 	bool bconv = false;
@@ -136,6 +136,7 @@ void FELinearSolidSolver::Update(vector<double>& u)
 {
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	FEMesh& mesh = m_fem.GetMesh();
+	FETimePoint tp = m_fem.GetTime();
 
 	// update nodal positions
 	int n;
@@ -148,7 +149,7 @@ void FELinearSolidSolver::Update(vector<double>& u)
 	}
 
 	// update the stresses on all domains
-	for (int i=0; i<pstep->Domains(); ++i) pstep->Domain(i)->Update();
+	for (int i=0; i<pstep->Domains(); ++i) pstep->Domain(i)->Update(tp);
 }
 
 //-----------------------------------------------------------------------------
@@ -163,6 +164,9 @@ void FELinearSolidSolver::Residual()
 
 	FEMesh& mesh = m_fem.GetMesh();
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
+
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
 
 	// loop over nodal forces
 	int ncnf = m_fem.NodalLoads();
@@ -200,7 +204,7 @@ void FELinearSolidSolver::Residual()
 	for (int i=0; i<nsl; ++i)
 	{
 		FEPressureLoad* pl = dynamic_cast<FEPressureLoad*>(m_fem.SurfaceLoad(i));
-		if (pl && (pl->IsLinear())) pl->Residual(RHS);
+		if (pl && (pl->IsLinear())) pl->Residual(tp, RHS);
 	}
 }
 

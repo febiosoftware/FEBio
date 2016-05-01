@@ -238,9 +238,10 @@ void FEFluidSolver::Update(vector<double>& ui)
 void FEFluidSolver::UpdateStresses()
 {
     FEMesh& mesh = m_fem.GetMesh();
+	FETimePoint tp = m_fem.GetTime();
     
     // update the stresses on all domains
-    for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update();
+    for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
 }
 
 //-----------------------------------------------------------------------------
@@ -323,8 +324,8 @@ void FEFluidSolver::PrepStep(double time)
     // NOTE: do this before the stresses are updated
     // TODO: does it matter if the stresses are updated before
     //       the material point data is initialized
-    FEMaterialPoint::dt = m_fem.GetCurrentStep()->m_dt;
-    FEMaterialPoint::time = m_fem.m_ftime;
+    FEMaterialPoint::dt = tp.dt;
+	FEMaterialPoint::time = tp.t;
     
     for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
     
@@ -890,6 +891,9 @@ bool FEFluidSolver::Residual(vector<double>& R)
 {
 	TimerTracker t(m_RHSTime);
 
+    // get the time information
+    FETimePoint tp = m_fem.GetTime();
+
     // initialize residual with concentrated nodal loads
     R = m_Fn;
     
@@ -942,11 +946,8 @@ bool FEFluidSolver::Residual(vector<double>& R)
     for (int i=0; i<nsl; ++i)
     {
         FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-        if (psl->IsActive()) psl->Residual(RHS);
+        if (psl->IsActive()) psl->Residual(tp, RHS);
     }
-    
-    // get the time information
-    FETimePoint tp = m_fem.GetTime();
     
     // calculate nonlinear constraint forces
     // note that these are the linear constraints

@@ -35,7 +35,7 @@ public:
 public: // overloads from FEElasticDomain
 
 	//! update the truss stresses
-	void Update();
+	void Update(const FETimePoint& tp);
 
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);

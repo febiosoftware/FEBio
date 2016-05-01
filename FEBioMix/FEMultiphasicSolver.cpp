@@ -562,7 +562,10 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 	TimerTracker t(m_RHSTime);
 
 	int i;
-	double dt = m_fem.GetCurrentStep()->m_dt;
+
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
+	double dt = tp.dt;
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -660,7 +663,7 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 	for (i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(RHS);
+		if (psl->IsActive()) psl->Residual(tp, RHS);
 	}
 
 	// calculate contact forces
@@ -668,9 +671,6 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 	{
 		ContactForces(RHS);
 	}
-
-	// get the time information
-	FETimePoint tp = m_fem.GetTime();
 
 	// calculate linear constraint forces
 	// note that these are the linear constraints
@@ -733,7 +733,7 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	bool bsymm = m_bsymm;
-	double dt = pstep->m_dt;
+	double dt = tp.dt;
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
@@ -784,7 +784,7 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
 
 		// respect the pressure stiffness flag
-		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
+		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(tp, this); 
 	}
 
 	// calculate nonlinear constraint stiffness
@@ -901,7 +901,7 @@ void FEMultiphasicSolver::UpdatePoro(vector<double>& ui)
 	int i, n;
 
 	FEMesh& mesh = m_fem.GetMesh();
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	double dt = m_fem.GetTime().dt;
 
 	// update poro-elasticity data
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -919,7 +919,7 @@ void FEMultiphasicSolver::UpdatePoro(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 
 		// update velocities
-		vec3d vt = (node.m_rt - node.m_rp) / pstep->m_dt;
+		vec3d vt = (node.m_rt - node.m_rp) / dt;
 		node.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
 	}
 }
@@ -931,7 +931,7 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 	int i, j, n;
 	
 	FEMesh& mesh = m_fem.GetMesh();
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	double dt = m_fem.GetTime().dt;
 	
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
@@ -961,7 +961,7 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 		
 		// update velocities
-		vec3d vt = (node.m_rt - node.m_rp) / pstep->m_dt;
+		vec3d vt = (node.m_rt - node.m_rp) / dt;
 		node.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
 	}
 }

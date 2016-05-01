@@ -1949,12 +1949,12 @@ void FEMultiphasicDomain::ElementGeometricalStiffness(FESolidElement &el, matrix
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::Update()
+void FEMultiphasicDomain::Update(const FETimePoint& tp)
 {
 	FEModel& fem = *GetFEModel();
 	bool berr = false;
 	int NE = (int) m_Elem.size();
-	double dt = fem.GetCurrentStep()->m_dt;
+	double dt = fem.GetTime().dt;
 	#pragma omp parallel for shared(NE, berr)
 	for (int i=0; i<NE; ++i)
 	{

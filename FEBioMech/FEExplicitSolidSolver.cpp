@@ -499,9 +499,10 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 void FEExplicitSolidSolver::UpdateStresses()
 {
 	FEMesh& mesh = m_fem.GetMesh();
+	FETimePoint tp = m_fem.GetTime();
 
 	// update the stresses on all domains
-	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update();
+	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
 }
 
 //-----------------------------------------------------------------------------
@@ -749,8 +750,8 @@ void FEExplicitSolidSolver::PrepStep(double time)
 	// NOTE: do this before the stresses are updated
 	// TODO: does it matter if the stresses are updated before
 	//       the material point data is initialized
-	FEMaterialPoint::dt = m_fem.GetCurrentStep()->m_dt;
-	FEMaterialPoint::time = m_fem.m_ftime;
+	FEMaterialPoint::dt = tp.dt;
+	FEMaterialPoint::time = tp.t;
 
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
 
@@ -847,7 +848,7 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 	FEMesh& mesh = m_fem.GetMesh();
 	int N = mesh.Nodes(); // this is the total number of nodes in the mesh
 	int j,iel;
-	double dt=m_fem.GetCurrentStep()->m_dt;
+    double dt = m_fem.GetTime().dt;
 	double avx = 0.0;  // average element velocity in each direction
 	double avy = 0.0;
 	double avz = 0.0;
@@ -972,6 +973,10 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	TimerTracker t(m_RHSTime);
 
 	int i;
+
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
+
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
 
@@ -1019,7 +1024,7 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	for (i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(RHS);
+		if (psl->IsActive()) psl->Residual(tp, RHS);
 	}
 
 	// calculate contact forces
@@ -1027,9 +1032,6 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	{
 		ContactForces(RHS);
 	}
-
-	// get the time information
-	FETimePoint tp = m_fem.GetTime();
 
 	// calculate nonlinear constraint forces
 	// note that these are the linear constraints
@@ -1096,7 +1098,7 @@ void FEExplicitSolidSolver::InertialForces(FEGlobalVector& R)
 	zero(F);
 
 	// calculate F
-	double dt = m_fem.GetCurrentStep()->m_dt;
+    double dt = m_fem.GetTime().dt;
 	double a = 4.0 / dt;
 	double b = a / dt;
 	for (int i=0; i<mesh.Nodes(); ++i)

@@ -271,7 +271,7 @@ void FEPressureLoad::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 void FEPressureLoad::UnpackLM(FEElement& el, vector<int>& lm)
 {
-	FEMesh& mesh = *Surface().GetMesh();
+	FEMesh& mesh = *GetSurface().GetMesh();
 	int N = el.Nodes();
 	lm.resize(N*3);
 	for (int i=0; i<N; ++i)
@@ -287,7 +287,7 @@ void FEPressureLoad::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
+void FEPressureLoad::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
 {
 	// We only need the stiffness for nonlinear pressure forces
 	if (m_blinear) return;
@@ -295,7 +295,7 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 	matrix ke;
 	vector<int> lm;
 
-	FESurface& surf = Surface();
+	FESurface& surf = GetSurface();
 	int npr = surf.Elements();
 	for (int m=0; m<npr; ++m)
 	{
@@ -327,12 +327,12 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::Residual(FEGlobalVector& R)
+void FEPressureLoad::Residual(const FETimePoint& tp, FEGlobalVector& R)
 {
 	vector<double> fe;
 	vector<int> lm;
 
-	FESurface& surf = Surface();
+	FESurface& surf = GetSurface();
 	int npr = surf.Elements();
 	for (int i=0; i<npr; ++i)
 	{

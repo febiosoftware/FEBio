@@ -20,7 +20,7 @@ public:
 	void StiffnessMatrix(FESolver* psolver);
 
 	// update domain data
-	void Update();
+	void Update(const FETimePoint& tp);
 
 protected: // element residual contributions
 	//! Calculates the internal stress vector for enhanced strain hex elements

@@ -36,7 +36,7 @@ public:
 public: // overridden from FEElasticDomain
 
 	// update stresses
-	void Update();
+	void Update(const FETimePoint& tp);
 
 	// calculate stiffness matrix
 	void StiffnessMatrix(FESolver* psolver);
@@ -46,7 +46,7 @@ protected:
 	void ElementDilatationalStiffness(FEModel& fem, int iel, matrix& ke);
 
 	//! material stiffness component
-	void ElementMaterialStiffness(FEModel& fem, int iel, matrix& ke);
+	void ElementMaterialStiffness(int iel, matrix& ke);
 
 	//! geometrical stiffness (i.e. initial stress)
 	void ElementGeometricalStiffness(int iel, matrix& ke);

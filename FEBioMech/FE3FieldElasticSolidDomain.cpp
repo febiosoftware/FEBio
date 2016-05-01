@@ -66,7 +66,7 @@ void FE3FieldElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 		ke.zero();
 
 		// calculate material stiffness (i.e. constitutive component)
-		ElementMaterialStiffness(fem, iel, ke);
+		ElementMaterialStiffness(iel, ke);
 
 		// calculate geometrical stiffness
 		ElementGeometricalStiffness(iel, ke);
@@ -178,7 +178,7 @@ void FE3FieldElasticSolidDomain::ElementDilatationalStiffness(FEModel& fem, int 
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FE3FieldElasticSolidDomain::ElementMaterialStiffness(FEModel& fem, int iel, matrix &ke)
+void FE3FieldElasticSolidDomain::ElementMaterialStiffness(int iel, matrix &ke)
 {
 	int i, i3, j, j3, n;
 
@@ -390,7 +390,7 @@ void FE3FieldElasticSolidDomain::ElementGeometricalStiffness(int iel, matrix &ke
 
 //-----------------------------------------------------------------------------
 //! This function loops over all elements and updates the stress
-void FE3FieldElasticSolidDomain::Update()
+void FE3FieldElasticSolidDomain::Update(const FETimePoint& tp)
 {
 	bool berr = false;
 	int NE = (int) m_Elem.size();

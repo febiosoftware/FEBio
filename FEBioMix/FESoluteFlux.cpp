@@ -314,10 +314,9 @@ void FESoluteFlux::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
+void FESoluteFlux::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
 {
-	FEModel& fem = psolver->GetFEModel();
-	double dt = fem.GetCurrentStep()->m_dt;
+	double dt = tp.dt;
 	
 	matrix ke;
 	vector<int> elm;
@@ -370,10 +369,9 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::Residual(FEGlobalVector& R)
+void FESoluteFlux::Residual(const FETimePoint& tp, FEGlobalVector& R)
 {
-	FEModel& fem = R.GetFEModel();
-	double dt = fem.GetCurrentStep()->m_dt;
+	double dt = tp.dt;
 	
 	vector<double> fe;
 	vector<int> elm;

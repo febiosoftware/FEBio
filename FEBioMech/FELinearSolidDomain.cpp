@@ -409,7 +409,7 @@ void FELinearSolidDomain::InternalForce(FESolidElement& el, vector<double>& fe)
 }
 
 //-----------------------------------------------------------------------------
-void FELinearSolidDomain::Update()
+void FELinearSolidDomain::Update(const FETimePoint& tp)
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{

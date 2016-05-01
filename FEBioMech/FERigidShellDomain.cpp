@@ -41,7 +41,7 @@ void FERigidShellDomain::InternalForces(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 //! update stresses for rigid shells.
 //!
-void FERigidShellDomain::Update()
+void FERigidShellDomain::Update(const FETimePoint& tp)
 {
 	// Nothing to see here. Please move on.
 }

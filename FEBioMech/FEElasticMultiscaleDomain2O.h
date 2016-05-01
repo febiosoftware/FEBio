@@ -61,7 +61,7 @@ public:
 	void InternalForces(FEGlobalVector& R);
 
 	//! overridden from FEElasticSolidDomain
-	void Update();
+	void Update(const FETimePoint& tp);
 
 protected:
 	// Discrete-Galerkin contribution to residual
@@ -78,7 +78,7 @@ private:
 public:
 	// --- S T I F F N E S S ---
 	//! calculates the solid element stiffness matrix
-	void ElementStiffness(FEModel& fem, int iel, matrix& ke);
+	void ElementStiffness(const FETimePoint& tp, int iel, matrix& ke);
 
 	void defhess(FESolidElement &el, int n, tens3drs &G);
 	void defhess(FESolidElement &el, double r, double s, double t, tens3drs &G);

@@ -579,11 +579,11 @@ void FEElasticMultiscaleDomain2O::ElementInternalForce_QG(FESolidElement& el, ve
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticMultiscaleDomain2O::Update()
+void FEElasticMultiscaleDomain2O::Update(const FETimePoint& tp)
 {
 	// call base class first
 	// (this will call FEElasticMultiscaleDomain2O::UpdateElementStress)
-	FEElasticSolidDomain::Update();
+	FEElasticSolidDomain::Update(tp);
 
 	// update internal surfaces
 	UpdateInternalSurfaceStresses();
@@ -753,7 +753,7 @@ void FEElasticMultiscaleDomain2O::UpdateElementStress(int iel, double dt)
 
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
-void FEElasticMultiscaleDomain2O::ElementStiffness(FEModel& fem, int iel, matrix& ke)
+void FEElasticMultiscaleDomain2O::ElementStiffness(const FETimePoint& tp, int iel, matrix& ke)
 {
 	FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(m_pMat);
 

@@ -515,10 +515,7 @@ bool FEModel::Reset()
 //! Get the current time information.
 FETimePoint FEModel::GetTime()
 {
-	FETimePoint pt;
-	pt.t = m_ftime;
-	pt.dt = GetCurrentStep()->m_dt;
-	return pt;
+	return FETimePoint(m_ftime, GetCurrentStep()->m_dt);
 }
 
 //=============================================================================
@@ -1347,7 +1344,7 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 			FESurfaceLoad* psl = m_SL[i];
 
 			// get the surface
-			FESurface& s = psl->Surface();
+			FESurface& s = psl->GetSurface();
 			s.Serialize(ar);
 
 			// save the load data

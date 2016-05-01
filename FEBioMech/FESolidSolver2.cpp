@@ -483,8 +483,6 @@ void FESolidSolver2::Update(vector<double>& ui)
 //! Updates the rigid body data
 void FESolidSolver2::UpdateRigidBodies(vector<double>& ui)
 {
-    double dt = m_fem.GetCurrentStep()->m_dt;
-    
 	// update rigid bodies
 	FERigidSystem& rigid = *m_fem.GetRigidSystem();
 	int nrb = rigid.Objects();
@@ -596,9 +594,10 @@ void FESolidSolver2::UpdateRigidBodies(vector<double>& ui)
 void FESolidSolver2::UpdateStresses()
 {
 	FEMesh& mesh = m_fem.GetMesh();
+	FETimePoint tp = m_fem.GetTime();
 
 	// update the stresses on all domains
-	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update();
+	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
 }
 
 //-----------------------------------------------------------------------------
@@ -635,9 +634,12 @@ bool FESolidSolver2::InitStep(double time)
 {
 	FEModel& fem = GetFEModel();
 
+	// get the time information
+	FETimePoint tp = fem.GetTime();
+
 	// evaluate load curve values at current (or intermediate) time
-	double t = time;
-	double dt = fem.GetCurrentStep()->m_dt;
+	double t = tp.t;
+	double dt = tp.dt;
 	double ta = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
 
 	return FESolver::InitStep(ta);
@@ -852,8 +854,8 @@ void FESolidSolver2::PrepStep(double time)
 	// NOTE: do this before the stresses are updated
 	// TODO: does it matter if the stresses are updated before
 	//       the material point data is initialized
-	FEMaterialPoint::dt = m_fem.GetCurrentStep()->m_dt;
-	FEMaterialPoint::time = m_fem.m_ftime;
+	FEMaterialPoint::dt = tp.dt;
+	FEMaterialPoint::time = tp.t;
 
 	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
 
@@ -1261,7 +1263,7 @@ bool FESolidSolver2::StiffnessMatrix(const FETimePoint& tp)
 		{
 			// respect the pressure stiffness flag
 			// TODO: Find a different solution for this. Maybe I can pass the flag to the pressure load?
-			if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
+			if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(tp, this); 
 		}
 	}
 
@@ -1327,7 +1329,7 @@ void FESolidSolver2::RigidMassMatrix(FERigidBody& RB)
     ke.zero();
         
     // Newmark integration rule
-    double dt = m_fem.GetCurrentStep()->m_dt;
+    double dt = m_fem.GetTime().dt;
     double beta = m_beta;
     double gamma = m_gamma;
     double a = 1./(beta*dt*dt);
@@ -1892,6 +1894,12 @@ bool FESolidSolver2::Residual(vector<double>& R)
 {
 	TimerTracker t(m_RHSTime);
 
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
+	tp.alpha = m_alpha;
+	tp.beta  = m_beta;
+	tp.gamma = m_gamma;
+
 	int i;
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -1940,7 +1948,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	for (i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(RHS);
+		if (psl->IsActive()) psl->Residual(tp, RHS);
 	}
 
 	// calculate contact forces
@@ -1948,12 +1956,6 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	{
 		ContactForces(RHS);
 	}
-
-	// get the time information
-	FETimePoint tp = m_fem.GetTime();
-	tp.alpha = m_alpha;
-	tp.beta  = m_beta;
-	tp.gamma = m_gamma;
 
 	// calculate nonlinear constraint forces
 	// note that these are the linear constraints
@@ -2048,11 +2050,13 @@ void FESolidSolver2::InertialForces(FEGlobalVector& R)
 	zero(F);
     
 	// calculate F
-	double dt = m_fem.GetCurrentStep()->m_dt;
+    double dt = m_fem.GetTime().dt;
+
     // Newmark rule
     double a = 1.0 / (m_beta*dt);
     double b = a / dt;
     double c = 1.0 - 0.5/m_beta;
+
     // update kinematics since acceleration is needed for inertial forces
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
@@ -2122,7 +2126,7 @@ void FESolidSolver2::RigidInertialForces(FERigidBody& RB, FEGlobalVector& R)
     fe[1] = -F.y;
     fe[2] = -F.z;
         
-    double dt = m_fem.GetCurrentStep()->m_dt;
+    double dt = m_fem.GetTime().dt;
         
     // evaluate mass moment of inertia at t and tp
     mat3d Rt = RB.m_qt.RotationMatrix();

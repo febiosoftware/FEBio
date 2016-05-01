@@ -37,7 +37,7 @@ public:
 	void InitElements();
 	
 	// update domain data
-	void Update();
+	void Update(const FETimePoint& tp);
 
 	//! update element state data
 	void UpdateElementStress(int iel);

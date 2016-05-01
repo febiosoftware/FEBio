@@ -33,7 +33,7 @@ public: // overrides from FEDomain
 public: // overrides from FEElasticDomain
     
     // update stresses
-    void Update();
+    void Update(const FETimePoint& tp);
     
     // update the element stress
     void UpdateElementStress(int iel, double dt);
@@ -60,7 +60,7 @@ public:
     // --- S T I F F N E S S ---
     
     //! calculates the solid element stiffness matrix
-    void ElementStiffness(FEModel& fem, int iel, matrix& ke);
+    void ElementStiffness(int iel, matrix& ke);
     
     //! material stiffness component
     void ElementMaterialStiffness(FESolidElement& el, matrix& ke);

@@ -486,8 +486,8 @@ bool FEThermoElasticSolver::Residual(vector<double>& R)
 {
 	TimerTracker t(m_RHSTime);
 
-	int i;
-	double dt = m_fem.GetCurrentStep()->m_dt;
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -501,7 +501,7 @@ bool FEThermoElasticSolver::Residual(vector<double>& R)
 	// zero rigid body reaction forces
 	FERigidSystem& rs = *m_fem.GetRigidSystem();
 	int NRB = rs.Objects();
-	for (i=0; i<NRB; ++i)
+	for (int i=0; i<NRB; ++i)
 	{
 		FERigidBody& RB = *rs.Object(i);
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
@@ -511,21 +511,21 @@ bool FEThermoElasticSolver::Residual(vector<double>& R)
 	FEMesh& mesh = m_fem.GetMesh();
 
 	// calculate internal stress force
-	for (i=0; i<mesh.Domains(); ++i)
+	for (int i=0; i<mesh.Domains(); ++i)
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
 		dom.InternalForces(RHS);
 	}
 
 	// calculate internal thermal work
-	for (i=0; i<mesh.Domains(); ++i)
+	for (int i=0; i<mesh.Domains(); ++i)
 	{
 		FEThermoElasticSolidDomain* pdom = dynamic_cast<FEThermoElasticSolidDomain*>(&mesh.Domain(i));
 		if (pdom) pdom->InternalThermalWork(R);
 	}
 
     // calculate the body forces
-    for (i=0; i<mesh.Domains(); ++i)
+    for (int i=0; i<mesh.Domains(); ++i)
     {
         FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
         for (int j=0; j<m_fem.BodyLoads(); ++j)
@@ -537,10 +537,10 @@ bool FEThermoElasticSolver::Residual(vector<double>& R)
     
 	// calculate forces due to surface loads
 	int nsl = m_fem.SurfaceLoads();
-	for (i=0; i<nsl; ++i)
+	for (int i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(RHS);
+		if (psl->IsActive()) psl->Residual(tp, RHS);
 	}
 
 	// calculate contact forces
@@ -549,9 +549,6 @@ bool FEThermoElasticSolver::Residual(vector<double>& R)
 		ContactForces(RHS);
 	}
 
-	// get the time information
-	FETimePoint tp = m_fem.GetTime();
-
 	// calculate nonlinear constraint forces
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
@@ -559,7 +556,7 @@ bool FEThermoElasticSolver::Residual(vector<double>& R)
 
 	// add model loads
 	int NML = m_fem.ModelLoads();
-	for (i=0; i<NML; ++i)
+	for (int i=0; i<NML; ++i)
 	{
 		FEModelLoad& mli = *m_fem.ModelLoad(i);
 		if (mli.IsActive())
@@ -570,7 +567,7 @@ bool FEThermoElasticSolver::Residual(vector<double>& R)
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
-	for (i=0; i<mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 		node.m_Fr = vec3d(0,0,0);

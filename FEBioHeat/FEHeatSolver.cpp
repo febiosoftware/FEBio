@@ -138,16 +138,19 @@ void FEHeatSolver::NodalFluxes(FEGlobalVector& R)
 //! Calculate heat surface flux contribution to residual.
 void FEHeatSolver::SurfaceFluxes(FEGlobalVector& R)
 {
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
+
 	int nsl = m_fem.SurfaceLoads();
 	for (int i=0; i<nsl; ++i)
 	{
 		// heat flux
 		FEHeatFlux* phf = dynamic_cast<FEHeatFlux*>(m_fem.SurfaceLoad(i));
-		if (phf && phf->IsActive()) phf->Residual(R);
+		if (phf && phf->IsActive()) phf->Residual(tp, R);
 
 		// convective heat flux
 		FEConvectiveHeatFlux* pchf = dynamic_cast<FEConvectiveHeatFlux*>(m_fem.SurfaceLoad(i));
-		if (pchf && pchf->IsActive()) pchf->Residual(R);
+		if (pchf && pchf->IsActive()) pchf->Residual(tp, R);
 	}
 }
 
@@ -174,8 +177,8 @@ bool FEHeatSolver::StiffnessMatrix()
 	// see if this is a dynamic problem
 	bool bdyn = (pstep->m_nanalysis == FE_DYNAMIC);
 
-	// get the time step size
-	double dt = m_fem.GetCurrentStep()->m_dt;
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
 
 	// Add stiffness contribution from all domains
 	for (int i=0; i<pstep->Domains(); ++i)
@@ -190,7 +193,7 @@ bool FEHeatSolver::StiffnessMatrix()
 		if (bdyn) 
 		{
 			m_brhs = true;
-			bd.CapacitanceMatrix(this, dt);
+			bd.CapacitanceMatrix(this, tp.dt);
 		}
 	}
 
@@ -199,7 +202,7 @@ bool FEHeatSolver::StiffnessMatrix()
 	for (int i=0; i<m_fem.SurfaceLoads(); ++i)
 	{
 		FEConvectiveHeatFlux* pbc = dynamic_cast<FEConvectiveHeatFlux*>(m_fem.SurfaceLoad(i));
-		if (pbc && pbc->IsActive()) pbc->StiffnessMatrix(this);
+		if (pbc && pbc->IsActive()) pbc->StiffnessMatrix(tp, this);
 	}
 
 	return true;

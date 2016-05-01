@@ -43,7 +43,7 @@ public: // overrides from FELinearElasticDomain
 	void RHS(FEGlobalVector& R);
 
 	//! Update domain data
-	void Update();
+	void Update(const FETimePoint& tp);
 
 protected:
 	void InitialStress(FESolidElement& el, vector<double>& fe);

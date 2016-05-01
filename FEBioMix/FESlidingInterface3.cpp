@@ -1273,7 +1273,7 @@ void FESlidingInterface3::ContactForces(FEGlobalVector& R)
 
 	FEModel& fem = *GetFEModel();
 
-	double dt = fem.GetCurrentStep()->m_dt;
+	double dt = fem.GetTime().dt;
 	
 	// loop over the nr of passes
 	int npass = (m_btwo_pass?2:1);
@@ -1892,7 +1892,7 @@ void FESlidingInterface3::ContactStiffness(FESolver* psolver)
 					// --- B I P H A S I C - S O L U T E  S T I F F N E S S ---
 					if (ssolu && msolu && (sid == mid))
 					{
-						double dt = fem.GetCurrentStep()->m_dt;
+						double dt = fem.GetTime().dt;
 						
 						double epsp = (tn > 0) ? m_epsp*pt.m_epsp : 0.;
 						double epsc = (tn > 0) ? m_epsc*pt.m_epsc : 0.;
@@ -1991,7 +1991,7 @@ void FESlidingInterface3::ContactStiffness(FESolver* psolver)
 						// the variable dt is either the timestep or one
 						// depending on whether we are using the symmetric
 						// poro version or not.
-						double dt = fem.GetCurrentStep()->m_dt;
+						double dt = fem.GetTime().dt;
 						
 						double epsp = (tn > 0) ? m_epsp*pt.m_epsp : 0.;
 						

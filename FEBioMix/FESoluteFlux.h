@@ -29,10 +29,10 @@ public:
 	LOAD& SoluteFlux(int n) { return m_PC[n]; }
 	
 	//! calculate flux stiffness
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(const FETimePoint& tp, FESolver* psolver);
 	
 	//! calculate residual
-	void Residual(FEGlobalVector& R);
+	void Residual(const FETimePoint& tp, FEGlobalVector& R);
 	
 	//! serialize data
 	void Serialize(DumpStream& ar);

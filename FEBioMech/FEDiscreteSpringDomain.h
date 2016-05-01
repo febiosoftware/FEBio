@@ -33,7 +33,7 @@ public: // overridden from FEElasticDomain
 	void InertialForces(FEGlobalVector& R, vector<double>& F) { }
 
 	//! update domain data
-	void Update(){}	
+	void Update(const FETimePoint& tp){}	
 
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);

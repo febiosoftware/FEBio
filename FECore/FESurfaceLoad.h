@@ -2,6 +2,7 @@
 #include "FEBoundaryCondition.h"
 #include "FESurface.h"
 #include "FESolver.h"
+#include "FETypes.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -19,7 +20,7 @@ public:
 	virtual void SetSurface(FESurface* ps) { m_psurf = ps; }
 
 	//! Get the surface
-	FESurface& Surface() { return *m_psurf; }
+	FESurface& GetSurface() { return *m_psurf; }
 
 public:
 	//! set an attribute of the surface load
@@ -30,10 +31,10 @@ public:
 
 public:
 	//! calculate stiffness matrix
-	virtual void StiffnessMatrix(FESolver* psolver) = 0;
+	virtual void StiffnessMatrix(const FETimePoint& tp, FESolver* psolver) = 0;
 
 	//! calculate residual
-	virtual void Residual(FEGlobalVector& R) = 0;
+	virtual void Residual(const FETimePoint& tp, FEGlobalVector& R) = 0;
 
 protected:
 	FESurface*	m_psurf;

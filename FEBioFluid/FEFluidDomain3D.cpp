@@ -570,13 +570,12 @@ void FEFluidDomain3D::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf)
 //! This function calculates the element stiffness matrix. It calls the material
 //! stiffness function
 
-void FEFluidDomain3D::ElementStiffness(FEModel& fem, int iel, matrix& ke)
+void FEFluidDomain3D::ElementStiffness(int iel, matrix& ke)
 {
     FESolidElement& el = Element(iel);
     
     // calculate material stiffness (i.e. constitutive component)
     ElementMaterialStiffness(el, ke);
-    
 }
 
 //-----------------------------------------------------------------------------
@@ -657,11 +656,8 @@ void FEFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidDomain3D::Update()
+void FEFluidDomain3D::Update(const FETimePoint& tp)
 {
-	FEModel& fem = *GetFEModel();
-    double dt = fem.GetCurrentStep()->m_dt;
-    
     // TODO: This is temporary hack for running micro-materials in parallel.
     //	     Evaluating the stress for a micro-material will make FEBio solve
     //       a new FE problem. We don't want to see the output of that problem.
@@ -679,7 +675,7 @@ void FEFluidDomain3D::Update()
     {
         try
         {
-            UpdateElementStress(i, dt);
+            UpdateElementStress(i, tp.dt);
         }
         catch (NegativeJacobian e)
         {

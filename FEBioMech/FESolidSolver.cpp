@@ -622,9 +622,10 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 void FESolidSolver::UpdateStresses()
 {
 	FEMesh& mesh = m_fem.GetMesh();
+	FETimePoint tp = m_fem.GetTime();
 
 	// update the stresses on all domains
-	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update();
+	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
 }
 
 //-----------------------------------------------------------------------------
@@ -849,8 +850,8 @@ void FESolidSolver::PrepStep(double time)
 	// NOTE: do this before the stresses are updated
 	// TODO: does it matter if the stresses are updated before
 	//       the material point data is initialized
-	FEMaterialPoint::dt = m_fem.GetCurrentStep()->m_dt;
-	FEMaterialPoint::time = m_fem.m_ftime;
+	FEMaterialPoint::dt = tp.dt;
+	FEMaterialPoint::time = tp.t;
 
 	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
 
@@ -1242,7 +1243,7 @@ bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 		{
 			// respect the pressure stiffness flag
 			// TODO: Find a different solution for this. Maybe I can pass the flag to the pressure load?
-			if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
+			if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(tp, this); 
 		}
 	}
 
@@ -1804,6 +1805,9 @@ bool FESolidSolver::Residual(vector<double>& R)
 {
 	TimerTracker t(m_RHSTime);
 
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
+
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
 
@@ -1851,7 +1855,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	for (int i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(RHS);
+		if (psl->IsActive()) psl->Residual(tp, RHS);
 	}
 
 	// calculate contact forces
@@ -1859,9 +1863,6 @@ bool FESolidSolver::Residual(vector<double>& R)
 	{
 		ContactForces(RHS);
 	}
-
-	// get the time information
-	FETimePoint tp = m_fem.GetTime();
 
 	// calculate nonlinear constraint forces
 	// note that these are the linear constraints
@@ -1956,8 +1957,11 @@ void FESolidSolver::InertialForces(FEGlobalVector& R)
 	vector<double> F(3*mesh.Nodes());
 	zero(F);
 
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
+
 	// calculate F
-	double dt = m_fem.GetCurrentStep()->m_dt;
+	double dt = tp.dt;
 	double a = 1.0 / (m_beta*dt);
 	double b = a / dt;
 	double c = 1.0 - 0.5/m_beta;

@@ -1398,7 +1398,7 @@ void FESlidingInterfaceMP::ContactForces(FEGlobalVector& R)
 	
 	FEModel& fem = *GetFEModel();
 	
-	double dt = fem.GetCurrentStep()->m_dt;
+	double dt = fem.GetTime().dt;
 	
 	// loop over the nr of passes
 	int npass = (m_btwo_pass?2:1);
@@ -1930,7 +1930,7 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
 					// --- M U L T I P H A S I C   S T I F F N E S S ---
 					if ((tn[j] > 0) && (sporo && mporo))
 					{
-						double dt = fem.GetCurrentStep()->m_dt;
+						double dt = fem.GetTime().dt;
 						
 						double epsp = m_epsp*pt.m_epsp;
 												

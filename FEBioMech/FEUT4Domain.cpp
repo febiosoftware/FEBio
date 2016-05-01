@@ -281,11 +281,11 @@ bool FEUT4Domain::Initialize(FEModel& mdl)
 
 //-----------------------------------------------------------------------------
 //! Update the nodal and element stresses
-void FEUT4Domain::Update()
+void FEUT4Domain::Update(const FETimePoint& tp)
 {
 	// updating the element stresses is easy, since we only
 	// need to call the base class
-	FEElasticSolidDomain::Update();
+	FEElasticSolidDomain::Update(tp);
 
 	// next we update the nodal data
 	int i, j, NE = Elements();
@@ -943,6 +943,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 void FEUT4Domain::ElementalStiffnessMatrix(FESolver *psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
+	FETimePoint tp = fem.GetTime();
 
 	// element stiffness matrix
 	matrix ke;
@@ -961,7 +962,7 @@ void FEUT4Domain::ElementalStiffnessMatrix(FESolver *psolver)
 		ke.zero();
 
 		// calculate the element stiffness matrix
-		ElementStiffness(fem, iel, ke);
+		ElementStiffness(tp, iel, ke);
 
 		// get the element equation numbers
 		UnpackLM(el, elm);
@@ -972,7 +973,7 @@ void FEUT4Domain::ElementalStiffnessMatrix(FESolver *psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FEUT4Domain::ElementStiffness(FEModel &fem, int iel, matrix &ke)
+void FEUT4Domain::ElementStiffness(const FETimePoint& tp, int iel, matrix &ke)
 {
 	FESolidElement& el = Element(iel);
 
@@ -983,7 +984,7 @@ void FEUT4Domain::ElementStiffness(FEModel &fem, int iel, matrix &ke)
 	// TODO: I don't know if the comment above applies anymore
 
 	// calculate material stiffness (i.e. constitutive component)
-	ElementMaterialStiffness(fem, el, ke);
+	ElementMaterialStiffness(el, ke);
 
 	// calculate geometrical stiffness
 	ElementGeometricalStiffness(el, ke);
@@ -1082,7 +1083,7 @@ void FEUT4Domain::ElementGeometricalStiffness(FESolidElement &el, matrix &ke)
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEUT4Domain::ElementMaterialStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
+void FEUT4Domain::ElementMaterialStiffness(FESolidElement &el, matrix &ke)
 {
 	int i, i3, j, j3, n;
 

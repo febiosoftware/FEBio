@@ -532,7 +532,7 @@ void FEFluidDomain2D::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf)
 //! This function calculates the element stiffness matrix. It calls the material
 //! stiffness function
 
-void FEFluidDomain2D::ElementStiffness(FEModel& fem, int iel, matrix& ke)
+void FEFluidDomain2D::ElementStiffness(int iel, matrix& ke)
 {
     FEElement2D& el = Element(iel);
     
@@ -610,11 +610,8 @@ void FEFluidDomain2D::ElementMassMatrix(FEElement2D& el, matrix& ke)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidDomain2D::Update()
+void FEFluidDomain2D::Update(const FETimePoint& tp)
 {
-	FEModel& fem = *GetFEModel();
-    double dt = fem.GetCurrentStep()->m_dt;
-    
     // TODO: This is temporary hack for running micro-materials in parallel.
     //	     Evaluating the stress for a micro-material will make FEBio solve
     //       a new FE problem. We don't want to see the output of that problem.
@@ -632,7 +629,7 @@ void FEFluidDomain2D::Update()
     {
         try
         {
-            UpdateElementStress(i, dt);
+            UpdateElementStress(i, tp.dt);
         }
         catch (NegativeJacobian e)
         {

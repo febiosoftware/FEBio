@@ -4,6 +4,7 @@
 #include "FE_enum.h"
 #include "FESolver.h"
 #include "FEGlobalVector.h"
+#include "FETypes.h"
 
 //-----------------------------------------------------------------------------
 // forward declaration of classes
@@ -99,7 +100,7 @@ public: // optional functions to overload
 
 	//! Update domain data.
 	//! (Called when the model state needs to be updated).
-	virtual void Update() {}
+	virtual void Update(const FETimePoint& tp) {}
 
 	//! build the matrix profile
 	virtual void BuildMatrixProfile(FEGlobalMatrix& M);

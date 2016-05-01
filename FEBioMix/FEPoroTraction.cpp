@@ -80,7 +80,7 @@ bool FEPoroNormalTraction::SetFacetAttribute(int nface, const char* szatt, const
 //-----------------------------------------------------------------------------
 void FEPoroNormalTraction::UnpackLM(FEElement& el, vector<int>& lm)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = *GetSurface().GetMesh();
 	int N = el.Nodes();
 	lm.resize(N*4);
 	for (int i=0; i<N; ++i)
@@ -372,9 +372,9 @@ void FEPoroNormalTraction::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
+void FEPoroNormalTraction::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
 {
-	FEModel& fem = psolver->GetFEModel();
+	FEMesh& mesh = *GetSurface().GetMesh();
 
 	matrix ke;
 
@@ -390,7 +390,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 
 		// fluid pressure
 		double pt[FEElement::MAX_NODES];
-		for (int i=0; i<neln; ++i) pt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).get(m_dofP);
+		for (int i=0; i<neln; ++i) pt[i] = mesh.Node(el.m_node[i]).get(m_dofP);
 			
 		// calculate nodal normal tractions
 		vector<double> tn(neln);
@@ -422,9 +422,9 @@ void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::Residual(FEGlobalVector& R)
+void FEPoroNormalTraction::Residual(const FETimePoint& tp, FEGlobalVector& R)
 {
-	FEModel& fem = R.GetFEModel();
+	FEMesh& mesh = *GetSurface().GetMesh();
 
 	vector<double> fe;
 
@@ -439,7 +439,7 @@ void FEPoroNormalTraction::Residual(FEGlobalVector& R)
 
 		// fluid pressure
 		double pt[FEElement::MAX_NODES];
-		for (int j=0; j<neln; ++j) pt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).get(m_dofP);
+		for (int j=0; j<neln; ++j) pt[j] = mesh.Node(el.m_node[j]).get(m_dofP);
 
 		// calculate nodal normal tractions
 		vector<double> tn(neln);

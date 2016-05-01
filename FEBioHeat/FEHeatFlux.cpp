@@ -28,7 +28,7 @@ void FEHeatFlux::SetSurface(FESurface* psurf)
 
 //-----------------------------------------------------------------------------
 //! Calculate the heat flux residual
-void FEHeatFlux::Residual(FEGlobalVector& R)
+void FEHeatFlux::Residual(const FETimePoint& tp, FEGlobalVector& R)
 {
 	int i, j, n;
 	FEModel& fem = R.GetFEModel();

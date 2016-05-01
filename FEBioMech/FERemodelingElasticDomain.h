@@ -21,9 +21,9 @@ public:
 	void StiffnessMatrix(FESolver* psolver);
 
 	//! calculates the solid element stiffness matrix (\todo is this actually used anywhere?)
-	virtual void ElementStiffness(FEModel& fem, int iel, matrix& ke);
+	virtual void ElementStiffness(const FETimePoint& tp, int iel, matrix& ke);
 
 private:
 	//! density stiffness component
-	void ElementDensityStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
+	void ElementDensityStiffness(double dt, FESolidElement& el, matrix& ke);
 };

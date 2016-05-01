@@ -61,6 +61,7 @@ void FERemodelingElasticDomain::StiffnessMatrix(FESolver* psolver)
 
 	// I only need this for the element density stiffness
 	FEModel& fem = psolver->GetFEModel();
+	double dt = fem.GetTime().dt;
 
 	#pragma omp parallel for
 	for (int iel=0; iel<NE; ++iel)
@@ -83,7 +84,7 @@ void FERemodelingElasticDomain::StiffnessMatrix(FESolver* psolver)
 		ElementMaterialStiffness(el, ke);
 
 		// calculate density stiffness
-		ElementDensityStiffness(fem, el, ke);
+		ElementDensityStiffness(dt, el, ke);
 
 		// assign symmetic parts
 		// TODO: Can this be omitted by changing the Assemble routine so that it only
@@ -103,7 +104,7 @@ void FERemodelingElasticDomain::StiffnessMatrix(FESolver* psolver)
 
 //-----------------------------------------------------------------------------
 //! calculates the solid element stiffness matrix
-void FERemodelingElasticDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
+void FERemodelingElasticDomain::ElementStiffness(const FETimePoint& tp, int iel, matrix& ke)
 {
 	FESolidElement& el = Element(iel);
 
@@ -114,15 +115,14 @@ void FERemodelingElasticDomain::ElementStiffness(FEModel& fem, int iel, matrix& 
 	ElementGeometricalStiffness(el, ke);
 
 	// calculate density stiffness
-	ElementDensityStiffness(fem, el, ke);
+	ElementDensityStiffness(tp.dt, el, ke);
 
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only
 	// grabs elements from the upper diagonal matrix?
 	int ndof = 3*el.Nodes();
-	int i, j;
-	for (i=0; i<ndof; ++i)
-		for (j=i+1; j<ndof; ++j)
+	for (int i=0; i<ndof; ++i)
+		for (int j=i+1; j<ndof; ++j)
 			ke[j][i] = ke[i][j];
 }
 
@@ -131,7 +131,7 @@ void FERemodelingElasticDomain::ElementStiffness(FEModel& fem, int iel, matrix& 
 //! calculates element's density stiffness component for integration point n
 //! \todo Remove the FEModel parameter. We only need to dt parameter, not the entire model.
 //! \todo Problems seem to run better without this stiffness matrix
-void FERemodelingElasticDomain::ElementDensityStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
+void FERemodelingElasticDomain::ElementDensityStiffness(double dt, FESolidElement &el, matrix &ke)
 {
 	int n, i, j;
 
@@ -149,9 +149,6 @@ void FERemodelingElasticDomain::ElementDensityStiffness(FEModel& fem, FESolidEle
         
     // nr of integration points
     int nint = el.GaussPoints();
-        
-    // get the time step value
-    double dt = fem.GetCurrentStep()->m_dt;
         
     // jacobian
     double Ji[3][3], detJt;

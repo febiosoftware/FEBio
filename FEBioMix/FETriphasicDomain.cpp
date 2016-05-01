@@ -1750,7 +1750,7 @@ void FETriphasicDomain::ElementGeometricalStiffness(FESolidElement &el, matrix &
 
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::Update()
+void FETriphasicDomain::Update(const FETimePoint& tp)
 {
 	bool berr = false;
 	int NE = (int) m_Elem.size();

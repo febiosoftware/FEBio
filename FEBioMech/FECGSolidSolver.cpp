@@ -416,8 +416,8 @@ void FECGSolidSolver::PrepStep(double time)
 	// NOTE: do this before the stresses are updated
 	// TODO: does it matter if the stresses are updated before
 	//       the material point data is initialized
-	FEMaterialPoint::dt = m_fem.GetCurrentStep()->m_dt;
-	FEMaterialPoint::time = m_fem.m_ftime;
+	FEMaterialPoint::dt = tp.dt;
+	FEMaterialPoint::time = tp.t;
 
 	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
 
@@ -975,6 +975,9 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 {
 	TimerTracker t(m_RHSTime);
 
+	// get the time information
+	FETimePoint tp = m_fem.GetTime();
+
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
 
@@ -1022,7 +1025,7 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	for (int i = 0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(RHS);
+		if (psl->IsActive()) psl->Residual(tp, RHS);
 	}
 
 	// calculate contact forces
@@ -1030,9 +1033,6 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	{
 		ContactForces(RHS);
 	}
-
-	// get the time information
-	FETimePoint tp = m_fem.GetTime();
 
 	// calculate nonlinear constraint forces
 	// note that these are the linear constraints
@@ -1077,9 +1077,10 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 void FECGSolidSolver::UpdateStresses()
 {
 	FEMesh& mesh = m_fem.GetMesh();
+	FETimePoint tp = m_fem.GetTime();
 
 	// update the stresses on all domains
-	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).Update();
+	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
 }
 
 //-----------------------------------------------------------------------------
@@ -1225,7 +1226,7 @@ void FECGSolidSolver::InertialForces(FEGlobalVector& R)
 	zero(F);
 
 	// calculate F
-	double dt = m_fem.GetCurrentStep()->m_dt;
+    double dt = m_fem.GetTime().dt;
 	double a = 1.0 / (m_beta*dt);
 	double b = a / dt;
 	double c = 1.0 - 0.5 / m_beta;

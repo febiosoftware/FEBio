@@ -627,14 +627,12 @@ void FETiedBiphasicInterface::ContactForces(FEGlobalVector& R)
 	double N[8*MN];
 
 	// get time step
-	double dt = GetFEModel()->GetCurrentStep()->m_dt;
+	// if we're using the symmetric formulation
+	// we need to multiply with the timestep
+    double dt = GetFEModel()->GetTime().dt;
 	
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
-	
-	// if we're using the symmetric formulation
-	// we need to multiply with the timestep
-//	double dt = fem.m_pStep->m_dt;
 	
 	// loop over the nr of passes
 	int npass = (m_btwo_pass?2:1);
@@ -810,7 +808,7 @@ void FETiedBiphasicInterface::ContactStiffness(FESolver* psolver)
 	matrix ke;
 
 	// get time step
-	double dt = GetFEModel()->GetCurrentStep()->m_dt;
+    double dt = GetFEModel()->GetTime().dt;
 	
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
