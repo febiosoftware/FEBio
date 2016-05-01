@@ -7,27 +7,26 @@
 //
 
 #include "FEOsmCoefManning.h"
-#include "FECore/FEModel.h"
+#include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEOsmCoefManning, FEOsmoticCoefficient)
-    ADD_PARAMETER2(m_ksi, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
-    ADD_PARAMETER (m_sol, FE_PARAM_INT, "co_ion");
-    ADD_PARAMETER2(m_osmc, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "osmc");
+    ADD_PARAMETER2(m_ksi , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
+    ADD_PARAMETER (m_sol , FE_PARAM_INT   , "co_ion");
+    ADD_PARAMETER (m_osmc, FE_PARAM_FUNC1D, "osmc"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
-FEOsmCoefManning::FEOsmCoefManning(FEModel* pfem) : FEOsmoticCoefficient(pfem)
+FEOsmCoefManning::FEOsmCoefManning(FEModel* pfem) : FEOsmoticCoefficient(pfem), m_osmc(pfem)
 {
     m_ksi = 1;
     m_sol = -1;
     m_lsol = -1;
-    m_lc = -1;
-    m_osmc = 1;
     m_pMP = nullptr;
-    m_pLC = nullptr;
+
+	m_osmc.SetLoadCurveIndex(-1, 1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -40,13 +39,6 @@ bool FEOsmCoefManning::Init()
     // extract the local id of the solute from the global id
     m_lsol = m_pMP->FindLocalSoluteID(m_sol-1); // m_sol must be zero-based
     if (m_lsol == -1) return MaterialError("Invalid value for sol");
-    
-    // extract optional load curve for Wells analysis
-    if (m_lc >= 0 && m_pLC == nullptr)
-    {
-        m_pLC = GetFEModel()->GetLoadCurve(m_lc);
-        if (m_pLC == 0) return false;
-    }
     
     return true;
 }
@@ -170,10 +162,7 @@ double FEOsmCoefManning::OsmoticCoefficient_Wells(FEMaterialPoint& mp)
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
     double ca = spt.m_ca[m_lsol];
-    double osmc = m_osmc;
-    
-    if (m_pLC != nullptr)
-        osmc *= m_pLC->Value(ca);
+    double osmc = m_osmc.value(ca);
     
     assert(osmc>0);
     
@@ -187,10 +176,7 @@ double FEOsmCoefManning::Tangent_OsmoticCoefficient_Strain_Wells(FEMaterialPoint
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
     double ca = spt.m_ca[m_lsol];
-    double dosmc = 0;
-    
-    if (m_pLC != nullptr)
-        dosmc = m_osmc*m_pLC->Deriv(ca);
+    double dosmc = m_osmc.derive(ca);
     
     double f = spt.m_dkdJ[m_lsol]*spt.m_c[m_lsol];
     
@@ -204,42 +190,10 @@ double FEOsmCoefManning::Tangent_OsmoticCoefficient_Concentration_Wells(FEMateri
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
     double ca = spt.m_ca[m_lsol];
-    double dosmc = 0;
-    
-    if (m_pLC != nullptr)
-        dosmc = m_osmc*m_pLC->Deriv(ca);
+    double dosmc = m_osmc.derive(ca);
     
     double f = spt.m_dkdc[m_lsol][isol]*spt.m_c[m_lsol];
     if (isol == m_lsol) f += spt.m_k[m_lsol];
     
     return dosmc*f;
-}
-
-//-----------------------------------------------------------------------------
-void FEOsmCoefManning::Serialize(DumpStream& ar)
-{
-    if (ar.IsSaving())
-    {
-        ar << m_osmc << m_lc;
-    }
-    else
-    {
-        ar >> m_osmc >> m_lc;
-        m_pLC = ar.GetFEModel().GetLoadCurve(m_lc);
-
-    }
-}
-
-//-----------------------------------------------------------------------------
-bool FEOsmCoefManning::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
-{
-    if (strcmp(p.name(), "osmc") == 0)
-    {
-        if (strcmp(szatt, "lc") == 0)
-        {
-            m_lc = atoi(szval) - 1;
-            return true;
-        }
-    }
-    return false;
 }

@@ -19,7 +19,8 @@ enum FEParamType {
 	FE_PARAM_MAT3DS,
 	FE_PARAM_IMAGE_3D,
 	FE_PARAM_STRING,
-	FE_PARAM_SURFACE_MAP
+	FE_PARAM_SURFACE_MAP,
+	FE_PARAM_FUNC1D
 };
 
 //-----------------------------------------------------------------------------
@@ -69,9 +70,10 @@ public:
 	// data pointer
 	void* data_ptr() const { return m_pv; }
 
-	// set the load curve ID
+	// set the load curve ID and scale factor
 	void SetLoadCurve(int lc);
 	void SetLoadCurve(int lc, double s);
+	void SetLoadCurve(int lc, const vec3d& v );
 
 	// get the load curve ID (or -1 if none)
 	int GetLoadCurve() const { return m_nlc; }
@@ -98,17 +100,6 @@ public:
 
 	//! retrieves pointer to element in array
 	template <class T> T* pvalue(int n);
-
-	// only implemented for double parameters
-	void setvalue(double v)
-	{
-		if (m_nlc == -1) value<double>() = v;
-		else
-		{
-			assert(m_itype == FE_PARAM_DOUBLE);
-			m_scl = v;
-		}
-	}
 
 	//! override the template for char pointers
 	char* cvalue() { return (char*) m_pv; }

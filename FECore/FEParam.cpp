@@ -2,6 +2,7 @@
 #include "FEParam.h"
 #include "FEParamValidator.h"
 #include "DumpStream.h"
+#include "FEFunction1D.h"
 
 //-----------------------------------------------------------------------------
 FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname)
@@ -74,24 +75,28 @@ void FEParam::SetValidator(FEParamValidator* pvalid)
 }
 
 //-----------------------------------------------------------------------------
-//! Sets the load curve ID
-//! This will also copy the current value to the scale factors for FE_PARAM_DOUBLE and FE_PARAM_VEC3D.
+//! Sets the load curve ID and scale factor
 void FEParam::SetLoadCurve(int lc)
 {
 	m_nlc = lc;
-	switch (type())
-	{
-	case FE_PARAM_DOUBLE: m_scl = value<double>(); break;
-	case FE_PARAM_VEC3D : m_vscl = value<vec3d>(); break;
-	}
 }
 
 //-----------------------------------------------------------------------------
+//! Sets the load curve ID and scale factor
 void FEParam::SetLoadCurve(int lc, double s)
 {
 	assert(m_itype == FE_PARAM_DOUBLE);
 	m_nlc = lc;
 	m_scl = s;
+}
+
+//-----------------------------------------------------------------------------
+//! Sets the load curve ID and scale factor
+void FEParam::SetLoadCurve(int lc, const vec3d& v)
+{
+	assert(m_itype == FE_PARAM_VEC3D);
+	m_nlc = lc;
+	m_vscl = v;
 }
 
 //-----------------------------------------------------------------------------
@@ -115,6 +120,12 @@ void FEParam::Serialize(DumpStream& ar)
 			case FE_PARAM_MAT3D : ar << value<mat3d >(); break;
 			case FE_PARAM_MAT3DS: ar << value<mat3ds>(); break;
 			case FE_PARAM_STRING: ar << (const char*) data_ptr(); break;
+			case FE_PARAM_FUNC1D: 
+				{
+					FEFunction1D& f = value<FEFunction1D>();
+					f.Serialize(ar);
+				}
+				break;
 			default:
 				assert(false);
 			}
@@ -161,6 +172,12 @@ void FEParam::Serialize(DumpStream& ar)
 			case FE_PARAM_MAT3D : ar >> value<mat3d >(); break;
 			case FE_PARAM_MAT3DS: ar >> value<mat3ds>(); break;
 			case FE_PARAM_STRING: ar >> (char*) data_ptr(); break;
+			case FE_PARAM_FUNC1D: 
+				{
+					FEFunction1D& f = value<FEFunction1D>();
+					f.Serialize(ar);
+				}
+				break;
 			default:
 				assert(false);
 			}

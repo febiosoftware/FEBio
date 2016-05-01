@@ -28,6 +28,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/FESurfaceMap.h>
+#include <FECore/FEFunction1D.h>
 #include "FECore/DOFS.h"
 #include <string.h>
 #include <stdarg.h>
@@ -614,208 +615,137 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* sz
 {
 	// see if we can find this parameter
 	FEParam* pp = pl.Find((szparam == 0 ? tag.Name() : szparam));
-	if (pp)
+	if (pp == 0) return false;
+	
+	if (pp->dim() == 1)
 	{
-		if (pp->dim() == 1)
+		switch (pp->type())
 		{
-			switch (pp->type())
+		case FE_PARAM_DOUBLE : value(tag, pp->value<double>()); break;
+		case FE_PARAM_INT    : value(tag, pp->value<int   >()); break;
+		case FE_PARAM_BOOL   : value(tag, pp->value<bool  >()); break;
+		case FE_PARAM_VEC3D  : value(tag, pp->value<vec3d >()); break;
+		case FE_PARAM_MAT3D  : value(tag, pp->value<mat3d >()); break;
+		case FE_PARAM_MAT3DS : value(tag, pp->value<mat3ds>()); break;
+		case FE_PARAM_STRING : value(tag, pp->cvalue()); break;
+		case FE_PARAM_IMAGE_3D:
 			{
-			case FE_PARAM_DOUBLE : value(tag, pp->value<double>()); break;
-			case FE_PARAM_INT    : value(tag, pp->value<int   >()); break;
-			case FE_PARAM_BOOL   : value(tag, pp->value<bool  >()); break;
-			case FE_PARAM_VEC3D  : value(tag, pp->value<vec3d >()); break;
-			case FE_PARAM_MAT3D  : value(tag, pp->value<mat3d >()); break;
-			case FE_PARAM_MAT3DS : value(tag, pp->value<mat3ds>()); break;
-			case FE_PARAM_STRING : value(tag, pp->cvalue()); break;
-			case FE_PARAM_IMAGE_3D:
+				const char* szfile = tag.AttributeValue("file");
+				++tag;
+				int n[3] = {0};
+				do
 				{
-					const char* szfile = tag.AttributeValue("file");
+					if (tag == "size") tag.value(n, 3);
+					else throw XMLReader::InvalidTag(tag);
 					++tag;
-					int n[3] = {0};
-					do
-					{
-						if (tag == "size") tag.value(n, 3);
-						else throw XMLReader::InvalidTag(tag);
-						++tag;
-					}
-					while (!tag.isend());
-					Image& im = pp->value<Image>();
-					im.Create(n[0], n[1], n[2]);
-
-					// see if we need to pre-pend a path
-					char szin[512];
-					strcpy(szin, szfile);
-					char* ch = strrchr(szin, '\\');
-					if (ch==0) ch = strrchr(szin, '/');
-					if (ch==0)
-					{
-						// pre-pend the name with the input path
-						sprintf(szin, "%s%s", m_szpath, szfile);
-					}
-
-					// Try to load the image file
-					if (im.Load(szin) == false) throw XMLReader::InvalidValue(tag);
 				}
-				break;
-			case FE_PARAM_SURFACE_MAP:
+				while (!tag.isend());
+				Image& im = pp->value<Image>();
+				im.Create(n[0], n[1], n[2]);
+				
+				// see if we need to pre-pend a path
+				char szin[512];
+				strcpy(szin, szfile);
+				char* ch = strrchr(szin, '\\');
+				if (ch==0) ch = strrchr(szin, '/');
+				if (ch==0)
 				{
-					// get the surface map
-					FESurfaceMap& map = pp->value<FESurfaceMap>();
+					// pre-pend the name with the input path
+					sprintf(szin, "%s%s", m_szpath, szfile);
+				}
 
-/*					// Find the surface
-					FEMesh& mesh = *GetFEMesh();
-					FESurface* ps = mesh.FindSurface(tag.AttributeValue("surf"));
-					if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "surf");
+				// Try to load the image file
+				if (im.Load(szin) == false) throw XMLReader::InvalidValue(tag);
+			}
+			break;
+		case FE_PARAM_SURFACE_MAP:
+			{
+				// get the surface map
+				FESurfaceMap& map = pp->value<FESurfaceMap>();
 
-					if (map.Create(ps) == false) throw XMLReader::InvalidAttributeValue(tag, "surf");
+/*				// Find the surface
+				FEMesh& mesh = *GetFEMesh();
+				FESurface* ps = mesh.FindSurface(tag.AttributeValue("surf"));
+				if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "surf");
+
+				if (map.Create(ps) == false) throw XMLReader::InvalidAttributeValue(tag, "surf");
 */
-					// read the surface map data
-					ParseSurfaceMap(tag, map);
-				};
-				break;
-			default:
-				assert(false);
-				return false;
-			}
-		}
-		else
-		{
-			switch (pp->type())
+				// read the surface map data
+				ParseSurfaceMap(tag, map);
+			};
+			break;
+		case FE_PARAM_FUNC1D:
 			{
-			case FE_PARAM_INT   : value(tag, pp->pvalue<int   >(), pp->dim()); break;
-			case FE_PARAM_DOUBLE: value(tag, pp->pvalue<double>(), pp->dim()); break;
+				int lc = -1;
+				tag.AttributeValue("lc", lc, true);
+				double v = 1.0;
+				tag.value(v);
+
+				FEFunction1D& f = pp->value<FEFunction1D>();
+				f.SetLoadCurveIndex(lc - 1, v);
 			}
+			break;
+		default:
+			assert(false);
+			return false;
 		}
-
-		int nattr = tag.m_natt;
-		for (int i=0; i<nattr; ++i)
-		{
-			const char* szat = tag.m_att[i].m_szatt;
-			if (pl.GetContainer()->SetParameterAttribute(*pp, szat, tag.m_att[i].m_szatv) == false)
-			{
-				// If we get here, the container did not understand the attribute.
-				// If the attribute is a "lc", we interpret it as a load curve
-				if (strcmp(szat, "lc") == 0)
-				{
-					int lc = atoi(tag.m_att[i].m_szatv)-1;
-					if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-					pp->SetLoadCurve(lc);
-				}
-/*				else 
-				{
-					throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-				}
-*/			}
-			// This is not true. Parameters can have attributes that are used for other purposed. E.g. The local fiber option.
-//			else felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
-		}
-
-		// give the parameter container a chance to do additional processing
-		pl.GetContainer()->SetParameter(*pp);
-
-		return true;
 	}
-	return false;
+	else
+	{
+		switch (pp->type())
+		{
+		case FE_PARAM_INT   : value(tag, pp->pvalue<int   >(), pp->dim()); break;
+		case FE_PARAM_DOUBLE: value(tag, pp->pvalue<double>(), pp->dim()); break;
+		}
+	}
+
+	int nattr = tag.m_natt;
+	for (int i=0; i<nattr; ++i)
+	{
+		const char* szat = tag.m_att[i].m_szatt;
+		if (pl.GetContainer()->SetParameterAttribute(*pp, szat, tag.m_att[i].m_szatv) == false)
+		{
+			// If we get here, the container did not understand the attribute.
+			// If the attribute is a "lc", we interpret it as a load curve
+			if (strcmp(szat, "lc") == 0)
+			{
+				int lc = atoi(tag.m_att[i].m_szatv)-1;
+				if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+				switch (pp->type())
+				{
+				case FE_PARAM_INT   : pp->SetLoadCurve(lc); break;
+				case FE_PARAM_BOOL  : pp->SetLoadCurve(lc); break;
+				case FE_PARAM_DOUBLE: pp->SetLoadCurve(lc, pp->value<double>()); break;
+				case FE_PARAM_VEC3D : pp->SetLoadCurve(lc, pp->value<vec3d >()); break;
+				case FE_PARAM_FUNC1D: break; // don't do anything for 1D functions since the lc attribute is already processed.
+				default:
+					assert(false);
+				}
+			}
+/*			else 
+			{
+				throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+			}
+*/		}
+		// This is not true. Parameters can have attributes that are used for other purposed. E.g. The local fiber option.
+//		else felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
+	}
+
+	// give the parameter container a chance to do additional processing
+	pl.GetContainer()->SetParameter(*pp);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! This function parses a parameter list
 bool FEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam)
 {
+	// get the parameter list
 	FEParameterList& pl = pc->GetParameterList();
 
 	// see if we can find this parameter
-	FEParam* pp = pl.Find((szparam == 0 ? tag.Name() : szparam));
-	if (pp)
-	{
-		if (pp->dim() == 1)
-		{
-			switch (pp->type())
-			{
-			case FE_PARAM_DOUBLE : value(tag, pp->value<double>() ); break;
-			case FE_PARAM_INT    : value(tag, pp->value<int   >() ); break;
-			case FE_PARAM_BOOL   : value(tag, pp->value<bool  >() ); break;
-			case FE_PARAM_VEC3D  : value(tag, pp->value<vec3d >() ); break;
-			case FE_PARAM_STRING : value(tag, pp->cvalue() ); break;
-			case FE_PARAM_IMAGE_3D:
-				{
-					const char* szfile = tag.AttributeValue("file");
-					++tag;
-					int n[3] = {0};
-					do
-					{
-						if (tag == "size") tag.value(n, 3);
-						else throw XMLReader::InvalidTag(tag);
-						++tag;
-					}
-					while (!tag.isend());
-					Image& im = pp->value<Image>();
-					im.Create(n[0], n[1], n[2]);
-					if (im.Load(szfile) == false) throw XMLReader::InvalidValue(tag);
-				}
-				break;
-			case FE_PARAM_SURFACE_MAP:
-				{
-					// get the surface map
-					FESurfaceMap& map = pp->value<FESurfaceMap>();
-
-/*					// Find the surface
-					FEMesh& mesh = *GetFEMesh();
-					FESurface* ps = mesh.FindSurface(tag.AttributeValue("surf"));
-					if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "surf");
-
-					if (map.Create(ps) == false) throw XMLReader::InvalidAttributeValue(tag, "surf");
-*/
-					// read the surface map data
-					ParseSurfaceMap(tag, map);
-				};
-				break;
-			default:
-				assert(false);
-				return false;
-			}
-		}
-		else
-		{
-			switch (pp->type())
-			{
-			case FE_PARAM_INT   : value(tag, pp->pvalue<int   >(), pp->dim()); break;
-			case FE_PARAM_DOUBLE: value(tag, pp->pvalue<double>(), pp->dim()); break;
-			default:
-				assert(false);
-				return false;
-			}
-		}
-
-		int nattr = tag.m_natt;
-		for (int i=0; i<nattr; ++i)
-		{
-			const char* szat = tag.m_att[i].m_szatt;
-			if (pl.GetContainer()->SetParameterAttribute(*pp, szat, tag.m_att[i].m_szatv) == false)
-			{
-				// If we get here, the container did not understand the attribute.
-				// If the attribute is a "lc", we interpret it as a load curve
-				if (strcmp(szat, "lc") == 0)
-				{
-					int lc = atoi(tag.m_att[i].m_szatv)-1;
-					if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-					pp->SetLoadCurve(lc);
-				}
-/*				else 
-				{
-					throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-				}
-*/			}
-			// This is not true. Parameters can have attributes that are used for other purposed. E.g. The local fiber option.
-//			else felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
-		}
-
-		// give the parameter container a chance to do additional processing
-		pl.GetContainer()->SetParameter(*pp);
-
-		return true;
-	}
-	else
+	if (ReadParameter(tag, pl, szparam) == false)
 	{
 		// if we get here, the parameter is not found.
 		// See if the parameter container has defined a property of this name

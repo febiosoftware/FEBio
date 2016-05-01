@@ -52,7 +52,15 @@ bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 		{
 			int lc = atoi(tag.m_att[i].m_szatv) - 1;
 			if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-			pp->SetLoadCurve(lc);
+			switch (pp->type())
+			{
+			case FE_PARAM_BOOL  :
+			case FE_PARAM_INT   : pp->SetLoadCurve(lc); break;
+			case FE_PARAM_DOUBLE: pp->SetLoadCurve(lc, pp->value<double>()); break;
+			case FE_PARAM_VEC3D : pp->SetLoadCurve(lc, pp->value<vec3d >()); break;
+			default:
+				assert(false);
+			}
 		}
 		else
 		{

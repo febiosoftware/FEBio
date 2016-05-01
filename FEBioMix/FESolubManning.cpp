@@ -7,27 +7,26 @@
 //
 
 #include "FESolubManning.h"
-#include "FECore/FEModel.h"
+#include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESolubManning, FESoluteSolubility)
-    ADD_PARAMETER2(m_ksi, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
-    ADD_PARAMETER (m_sol, FE_PARAM_INT, "co_ion");
-    ADD_PARAMETER2(m_solub, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "solub");
+    ADD_PARAMETER2(m_ksi  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
+    ADD_PARAMETER (m_sol  , FE_PARAM_INT   , "co_ion");
+    ADD_PARAMETER (m_solub, FE_PARAM_FUNC1D, "solub" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
-FESolubManning::FESolubManning(FEModel* pfem) : FESoluteSolubility(pfem)
+FESolubManning::FESolubManning(FEModel* pfem) : FESoluteSolubility(pfem), m_solub(pfem)
 {
     m_ksi = 1;
     m_sol = -1;
     m_lsol = -1;
-    m_solub = 1;
     m_bcoi = false;
-    m_lc = -1;
     m_pMP = nullptr;
+    m_solub.SetLoadCurveIndex(-1, 1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -51,13 +50,6 @@ bool FESolubManning::Init()
     // extract the local id of the solute from the global id
     m_lsol = m_pMP->FindLocalSoluteID(m_sol-1); // m_sol must be zero-based
     if (m_lsol == -1) return MaterialError("Invalid value for sol");
-    
-    // extract optional load curve for Wells analysis
-    if (m_lc >= 0 && m_pLC == nullptr)
-    {
-        m_pLC = GetFEModel()->GetLoadCurve(m_lc);
-        if (m_pLC == 0) return false;
-    }
     
     return true;
 }
@@ -238,10 +230,7 @@ double FESolubManning::Solubility_Wells(FEMaterialPoint& mp)
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
     double ca = spt.m_ca[m_lsol];
-    double solub = m_solub;
-    
-    if (m_pLC != nullptr)
-        solub *= m_pLC->Value(ca);
+    double solub = m_solub.value(ca);
     
     assert(solub>0);
     
@@ -255,10 +244,7 @@ double FESolubManning::Tangent_Solubility_Strain_Wells(FEMaterialPoint& mp)
     
     double ca = spt.m_ca[m_lsol];
     
-    double dsolub = 0;
-    
-    if (m_pLC != nullptr)
-        dsolub = m_solub*m_pLC->Deriv(ca);
+    double dsolub = m_solub.derive(ca);
     
     double f = spt.m_dkdJ[m_lsol]*spt.m_c[m_lsol];
     dsolub *= f;
@@ -273,10 +259,7 @@ double FESolubManning::Tangent_Solubility_Concentration_Wells(FEMaterialPoint& m
     
     double ca = spt.m_ca[m_lsol];
     
-    double dsolub = 0;
-    
-    if (m_pLC != nullptr)
-        dsolub = m_solub*m_pLC->Deriv(ca);
+    double dsolub = m_solub.derive(ca);
     
     double f = spt.m_dkdc[m_lsol][isol]*spt.m_c[m_lsol];
     if (isol == m_lsol) f += spt.m_k[m_lsol];
@@ -284,32 +267,4 @@ double FESolubManning::Tangent_Solubility_Concentration_Wells(FEMaterialPoint& m
     dsolub *= f;
     
     return dsolub;
-}
-
-//-----------------------------------------------------------------------------
-void FESolubManning::Serialize(DumpStream& ar)
-{
-    if (ar.IsSaving())
-    {
-        ar << m_solub << m_lc;
-    }
-    else
-    {
-        ar >> m_solub >> m_lc;
-        m_pLC = ar.GetFEModel().GetLoadCurve(m_lc);
-    }
-}
-
-//-----------------------------------------------------------------------------
-bool FESolubManning::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
-{
-    if (strcmp(p.name(), "solub") == 0)
-    {
-        if (strcmp(szatt, "lc") == 0)
-        {
-            m_lc = atoi(szval) - 1;
-            return true;
-        }
-    }
-    return false;
 }

@@ -1,6 +1,6 @@
 #pragma once
-#include "FECore/FEDiscreteMaterial.h"
-#include "FECore/LoadCurve.h"		
+#include <FECore/FEDiscreteMaterial.h>
+#include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
 //! material class for discrete elements
@@ -54,16 +54,9 @@ public:
 
 	double force    (double dl);
 	double stiffness(double dl);
-	bool Init();
-
-	void Serialize(DumpStream& ar);
-
-	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval);
 
 public:
-	double			m_F;	// force scale factor
-	int				m_nlc; // load curve ID
-	FELoadCurve*	m_plc; // force-displacement curve
+	FEFunction1D	m_F;	//!< force-displacement function
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
