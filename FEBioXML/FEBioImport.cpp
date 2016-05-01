@@ -775,8 +775,9 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam
 			else throw XMLReader::InvalidTag(tag);
 			return true;
 		}
+		else return false;
 	}
-	return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
