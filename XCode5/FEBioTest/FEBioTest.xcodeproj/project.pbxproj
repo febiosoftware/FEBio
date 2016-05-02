@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D52D3CFF1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D3CFD1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.cpp */; };
+		D52D3D001CD782BE0069FE17 /* FEContactDiagnosticBiphasic.h in Headers */ = {isa = PBXBuildFile; fileRef = D52D3CFE1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.h */; };
 		D53D74EA1B9BC9A600A770B5 /* FEBiphasicTangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53D74DA1B9BC9A600A770B5 /* FEBiphasicTangentDiagnostic.cpp */; };
 		D53D74EB1B9BC9A600A770B5 /* FEBiphasicTangentDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D53D74DB1B9BC9A600A770B5 /* FEBiphasicTangentDiagnostic.h */; };
 		D53D74EC1B9BC9A600A770B5 /* FEContactDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53D74DC1B9BC9A600A770B5 /* FEContactDiagnostic.cpp */; };
@@ -30,6 +32,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D52D3CFD1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactDiagnosticBiphasic.cpp; sourceTree = "<group>"; };
+		D52D3CFE1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEContactDiagnosticBiphasic.h; sourceTree = "<group>"; };
 		D53D74D21B9BC97F00A770B5 /* libFEBioTest.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioTest.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D53D74DA1B9BC9A600A770B5 /* FEBiphasicTangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicTangentDiagnostic.cpp; sourceTree = "<group>"; };
 		D53D74DB1B9BC9A600A770B5 /* FEBiphasicTangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicTangentDiagnostic.h; sourceTree = "<group>"; };
@@ -87,6 +91,8 @@
 				D53D74DB1B9BC9A600A770B5 /* FEBiphasicTangentDiagnostic.h */,
 				D53D74DC1B9BC9A600A770B5 /* FEContactDiagnostic.cpp */,
 				D53D74DD1B9BC9A600A770B5 /* FEContactDiagnostic.h */,
+				D52D3CFD1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.cpp */,
+				D52D3CFE1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.h */,
 				D53D74DE1B9BC9A600A770B5 /* FEDiagnostic.cpp */,
 				D53D74DF1B9BC9A600A770B5 /* FEDiagnostic.h */,
 				D5B264531BFBBF2D002DFDE8 /* FEFluidTangentDiagnostic.cpp */,
@@ -125,6 +131,7 @@
 				D53D74F71B9BC9A600A770B5 /* FEPrintMatrixDiagnostic.h in Headers */,
 				D55E3AEB1C5BBEC300815FCA /* FERestartDiagnostics.h in Headers */,
 				D53D74F31B9BC9A600A770B5 /* FEMultiphasicTangentDiagnostic.h in Headers */,
+				D52D3D001CD782BE0069FE17 /* FEContactDiagnosticBiphasic.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -194,6 +201,7 @@
 				D55E3AEA1C5BBEC300815FCA /* FERestartDiagnostic.cpp in Sources */,
 				D53D74EA1B9BC9A600A770B5 /* FEBiphasicTangentDiagnostic.cpp in Sources */,
 				D53D74EE1B9BC9A600A770B5 /* FEDiagnostic.cpp in Sources */,
+				D52D3CFF1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
