@@ -11,6 +11,7 @@
 #include "FEBiphasicTangentDiagnostic.h"
 #include "FEMultiphasicTangentDiagnostic.h"
 #include "FEFluidTangentDiagnostic.h"
+#include "FEContactDiagnosticBiphasic.h"
 #include "FECore/log.h"
 #include "FEBioXML/FEBioControlSection.h"
 #include "FEBioXML/FEBioMaterialSection.h"
@@ -67,6 +68,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
         else if (att == "print hbmatrix"          ) m_pdia = new FEPrintHBMatrixDiagnostic     (fem);
         else if (att == "memory test"             ) m_pdia = new FEMemoryDiagnostic            (fem);
         else if (att == "biphasic tangent test"   ) m_pdia = new FEBiphasicTangentDiagnostic   (fem);
+        else if (att == "biphasic contact test"   ) m_pdia = new FEContactDiagnosticBiphasic   (fem);
         else if (att == "multiphasic tangent test") m_pdia = new FEMultiphasicTangentDiagnostic(fem);
         else if (att == "fluid tangent test"      ) m_pdia = new FEFluidTangentDiagnostic      (fem);
 		else
