@@ -1180,7 +1180,7 @@ void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
                     double pn = Lm + eps*g;
                     pn = MBRACKET(pn);
                     
-                    if (pn != 0) {
+                    if (pn > 0) {
                         vec3d t = nu*(-pn);
                         
                         // calculate the force vector
@@ -1427,10 +1427,10 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                     pn = MBRACKET(pn);
                     
                     // only evaluate stiffness matrix if contact traction is non-zero
-                    if (pn != 0) {
+                    if (pn > 0) {
                         double tn = -pn;
                         
-                        double dtn = (pn > 0.)? eps : 0;
+                        double dtn = eps;
                         
                         // create the stiffness matrix
                         ke.resize(ndof, ndof); ke.zero();
@@ -1521,120 +1521,46 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                         // b. A-term
                         //-------------------------------------
                         
-                        if (!m_bsymm)
-                        {	// non-symmetric
-                            double s = knmult*tn*detJ[j]*w[j];
-                            // non-symmetric
-                            for (int l=0; l<nseln; ++l)
-                            {
-                                for (int k=0; k<nseln+nmeln; ++k)
-                                {
-                                    ke[k*ndpn  ][l*ndpn  ] -= -s*N[k]*As[l][0][0];
-                                    ke[k*ndpn  ][l*ndpn+1] -= -s*N[k]*As[l][0][1];
-                                    ke[k*ndpn  ][l*ndpn+2] -= -s*N[k]*As[l][0][2];
-                                    
-                                    ke[k*ndpn+1][l*ndpn  ] -= -s*N[k]*As[l][1][0];
-                                    ke[k*ndpn+1][l*ndpn+1] -= -s*N[k]*As[l][1][1];
-                                    ke[k*ndpn+1][l*ndpn+2] -= -s*N[k]*As[l][1][2];
-                                    
-                                    ke[k*ndpn+2][l*ndpn  ] -= -s*N[k]*As[l][2][0];
-                                    ke[k*ndpn+2][l*ndpn+1] -= -s*N[k]*As[l][2][1];
-                                    ke[k*ndpn+2][l*ndpn+2] -= -s*N[k]*As[l][2][2];
-                                }
-                            }
-                        }
-                        else
+                        tmp = knmult*tn*detJ[j]*w[j];
+                        // non-symmetric
+                        for (int l=0; l<nseln; ++l)
                         {
-                            double s = 0.5*knmult*tn*detJ[j]*w[j];
-                            // symmetric
-                            for (int l=0; l<nseln; ++l)
+                            for (int k=0; k<nseln+nmeln; ++k)
                             {
-                                for (int k=0; k<nseln+nmeln; ++k)
-                                {
-                                    ke[k*ndpn  ][l*ndpn  ] -= -s*N[k]*As[l][0][0];
-                                    ke[k*ndpn  ][l*ndpn+1] -= -s*N[k]*As[l][0][1];
-                                    ke[k*ndpn  ][l*ndpn+2] -= -s*N[k]*As[l][0][2];
-                                    
-                                    ke[k*ndpn+1][l*ndpn  ] -= -s*N[k]*As[l][1][0];
-                                    ke[k*ndpn+1][l*ndpn+1] -= -s*N[k]*As[l][1][1];
-                                    ke[k*ndpn+1][l*ndpn+2] -= -s*N[k]*As[l][1][2];
-                                    
-                                    ke[k*ndpn+2][l*ndpn  ] -= -s*N[k]*As[l][2][0];
-                                    ke[k*ndpn+2][l*ndpn+1] -= -s*N[k]*As[l][2][1];
-                                    ke[k*ndpn+2][l*ndpn+2] -= -s*N[k]*As[l][2][2];
-                                    
-                                    ke[l*ndpn  ][k*ndpn  ] -= -s*N[k]*As[l][0][0];
-                                    ke[l*ndpn+1][k*ndpn  ] -= -s*N[k]*As[l][0][1];
-                                    ke[l*ndpn+2][k*ndpn  ] -= -s*N[k]*As[l][0][2];
-                                    
-                                    ke[l*ndpn  ][k*ndpn+1] -= -s*N[k]*As[l][1][0];
-                                    ke[l*ndpn+1][k*ndpn+1] -= -s*N[k]*As[l][1][1];
-                                    ke[l*ndpn+2][k*ndpn+1] -= -s*N[k]*As[l][1][2];
-                                    
-                                    ke[l*ndpn  ][k*ndpn+2] -= -s*N[k]*As[l][2][0];
-                                    ke[l*ndpn+1][k*ndpn+2] -= -s*N[k]*As[l][2][1];
-                                    ke[l*ndpn+2][k*ndpn+2] -= -s*N[k]*As[l][2][2];
-                                }
+                                ke[k*ndpn  ][l*ndpn  ] -= -tmp*N[k]*As[l][0][0];
+                                ke[k*ndpn  ][l*ndpn+1] -= -tmp*N[k]*As[l][0][1];
+                                ke[k*ndpn  ][l*ndpn+2] -= -tmp*N[k]*As[l][0][2];
+                                
+                                ke[k*ndpn+1][l*ndpn  ] -= -tmp*N[k]*As[l][1][0];
+                                ke[k*ndpn+1][l*ndpn+1] -= -tmp*N[k]*As[l][1][1];
+                                ke[k*ndpn+1][l*ndpn+2] -= -tmp*N[k]*As[l][1][2];
+                                
+                                ke[k*ndpn+2][l*ndpn  ] -= -tmp*N[k]*As[l][2][0];
+                                ke[k*ndpn+2][l*ndpn+1] -= -tmp*N[k]*As[l][2][1];
+                                ke[k*ndpn+2][l*ndpn+2] -= -tmp*N[k]*As[l][2][2];
                             }
                         }
                         
                         // c. M-term
                         //---------------------------------------
                         
-                        if (!m_bsymm)
+                        tmp = tn*knmult*detJ[j]*w[j];
+                        // non-symmetric
+                        for (int k=0; k<nmeln; ++k)
                         {
-                            double s = tn*knmult*detJ[j]*w[j];
-                            // non-symmetric
-                            for (int k=0; k<nmeln; ++k)
+                            for (int l=0; l<nseln+nmeln; ++l)
                             {
-                                for (int l=0; l<nseln+nmeln; ++l)
-                                {
-                                    ke[(k+nseln)*ndpn  ][l*ndpn  ] -= s*N[l]*Mb[k][0][0];
-                                    ke[(k+nseln)*ndpn  ][l*ndpn+1] -= s*N[l]*Mb[k][0][1];
-                                    ke[(k+nseln)*ndpn  ][l*ndpn+2] -= s*N[l]*Mb[k][0][2];
-                                    
-                                    ke[(k+nseln)*ndpn+1][l*ndpn  ] -= s*N[l]*Mb[k][1][0];
-                                    ke[(k+nseln)*ndpn+1][l*ndpn+1] -= s*N[l]*Mb[k][1][1];
-                                    ke[(k+nseln)*ndpn+1][l*ndpn+2] -= s*N[l]*Mb[k][1][2];
-                                    
-                                    ke[(k+nseln)*ndpn+2][l*ndpn  ] -= s*N[l]*Mb[k][2][0];
-                                    ke[(k+nseln)*ndpn+2][l*ndpn+1] -= s*N[l]*Mb[k][2][1];
-                                    ke[(k+nseln)*ndpn+2][l*ndpn+2] -= s*N[l]*Mb[k][2][2];
-                                }
-                            }
-                        }
-                        else
-                        {
-                            double s = 0.5*knmult*tn*detJ[j]*w[j];
-                            // symmetric
-                            for (int k=0; k<nmeln; ++k)
-                            {
-                                for (int l=0; l<nseln+nmeln; ++l)
-                                {
-                                    ke[(k+nseln)*ndpn  ][l*ndpn  ] -= s*N[l]*Mb[k][0][0];
-                                    ke[(k+nseln)*ndpn  ][l*ndpn+1] -= s*N[l]*Mb[k][0][1];
-                                    ke[(k+nseln)*ndpn  ][l*ndpn+2] -= s*N[l]*Mb[k][0][2];
-                                    
-                                    ke[(k+nseln)*ndpn+1][l*ndpn  ] -= s*N[l]*Mb[k][1][0];
-                                    ke[(k+nseln)*ndpn+1][l*ndpn+1] -= s*N[l]*Mb[k][1][1];
-                                    ke[(k+nseln)*ndpn+1][l*ndpn+2] -= s*N[l]*Mb[k][1][2];
-                                    
-                                    ke[(k+nseln)*ndpn+2][l*ndpn  ] -= s*N[l]*Mb[k][2][0];
-                                    ke[(k+nseln)*ndpn+2][l*ndpn+1] -= s*N[l]*Mb[k][2][1];
-                                    ke[(k+nseln)*ndpn+2][l*ndpn+2] -= s*N[l]*Mb[k][2][2];
-                                    
-                                    ke[l*ndpn  ][(k+nseln)*ndpn  ] -= s*N[l]*Mb[k][0][0];
-                                    ke[l*ndpn+1][(k+nseln)*ndpn  ] -= s*N[l]*Mb[k][1][0];
-                                    ke[l*ndpn+2][(k+nseln)*ndpn  ] -= s*N[l]*Mb[k][2][0];
-                                    
-                                    ke[l*ndpn  ][(k+nseln)*ndpn+1] -= s*N[l]*Mb[k][0][1];
-                                    ke[l*ndpn+1][(k+nseln)*ndpn+1] -= s*N[l]*Mb[k][1][1];
-                                    ke[l*ndpn+2][(k+nseln)*ndpn+1] -= s*N[l]*Mb[k][2][1];
-                                    
-                                    ke[l*ndpn  ][(k+nseln)*ndpn+2] -= s*N[l]*Mb[k][0][2];
-                                    ke[l*ndpn+1][(k+nseln)*ndpn+2] -= s*N[l]*Mb[k][1][2];
-                                    ke[l*ndpn+2][(k+nseln)*ndpn+2] -= s*N[l]*Mb[k][2][2];
-                                }
+                                ke[(k+nseln)*ndpn  ][l*ndpn  ] -= tmp*N[l]*Mb[k][0][0];
+                                ke[(k+nseln)*ndpn  ][l*ndpn+1] -= tmp*N[l]*Mb[k][0][1];
+                                ke[(k+nseln)*ndpn  ][l*ndpn+2] -= tmp*N[l]*Mb[k][0][2];
+                                
+                                ke[(k+nseln)*ndpn+1][l*ndpn  ] -= tmp*N[l]*Mb[k][1][0];
+                                ke[(k+nseln)*ndpn+1][l*ndpn+1] -= tmp*N[l]*Mb[k][1][1];
+                                ke[(k+nseln)*ndpn+1][l*ndpn+2] -= tmp*N[l]*Mb[k][1][2];
+                                
+                                ke[(k+nseln)*ndpn+2][l*ndpn  ] -= tmp*N[l]*Mb[k][2][0];
+                                ke[(k+nseln)*ndpn+2][l*ndpn+1] -= tmp*N[l]*Mb[k][2][1];
+                                ke[(k+nseln)*ndpn+2][l*ndpn+2] -= tmp*N[l]*Mb[k][2][2];
                             }
                         }
                         
@@ -1642,7 +1568,6 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                         //---------------------------------------
                         
                         tmp = tn*knmult*detJ[j]*w[j];
-                        // non-symmetric
                         for (int k=0; k<nmeln; ++k)
                         {
                             for (int l=0; l<nseln; ++l)
@@ -1691,70 +1616,67 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                             double dt = fem.GetCurrentStep()->m_dt;
                             tmp = dt*w[j]*detJ[j];
                             
-                            double epsp = (pn > 0) ? m_epsp*pt.m_epsp : 0.;
+                            double epsp = m_epsp*pt.m_epsp;
+                            
                             
                             // --- S O L I D - P R E S S U R E   C O N T A C T ---
                             
-                            if (!m_bsymm)
-                            {
-                                
-                                // a. q-term
-                                //-------------------------------------
-                                for (k=0; k<nseln+nmeln; ++k)
-                                    for (l=0; l<nseln+nmeln; ++l)
-                                    {
-                                        ke[4*k + 3][4*l  ] -= -tmp*epsp*N[k]*N[l]*q2.x;
-                                        ke[4*k + 3][4*l+1] -= -tmp*epsp*N[k]*N[l]*q2.y;
-                                        ke[4*k + 3][4*l+2] -= -tmp*epsp*N[k]*N[l]*q2.z;
-                                    }
-                                
-                                double wn = pt.m_Lmp + epsp*pt.m_pg;
-                                
-                                // b. A-term
-                                //-------------------------------------
-                                
-                                for (l=0; l<nseln; ++l) {
-                                    vec3d Acn = Ac[l]*nu;
-                                    for (k=0; k<nseln+nmeln; ++k)
-                                    {
-                                        ke[4*k + 3][4*l  ] -= tmp*wn*N[k]*Acn.x;
-                                        ke[4*k + 3][4*l+1] -= tmp*wn*N[k]*Acn.y;
-                                        ke[4*k + 3][4*l+2] -= tmp*wn*N[k]*Acn.z;
-                                    }
+                            // a. q-term
+                            //-------------------------------------
+                            for (k=0; k<nseln+nmeln; ++k)
+                                for (l=0; l<nseln+nmeln; ++l)
+                                {
+                                    ke[4*k + 3][4*l  ] -= -tmp*epsp*N[k]*N[l]*q2.x;
+                                    ke[4*k + 3][4*l+1] -= -tmp*epsp*N[k]*N[l]*q2.y;
+                                    ke[4*k + 3][4*l+2] -= -tmp*epsp*N[k]*N[l]*q2.z;
                                 }
-                                
-                                // c. m-term
-                                //---------------------------------------
-                                
-                                for (k=0; k<nmeln; ++k) {
-                                    for (l=0; l<nseln+nmeln; ++l)
-                                    {
-                                        ke[4*(k+nseln) + 3][4*l  ] -= -tmp*wn*N[l]*mb[k].x;
-                                        ke[4*(k+nseln) + 3][4*l+1] -= -tmp*wn*N[l]*mb[k].y;
-                                        ke[4*(k+nseln) + 3][4*l+2] -= -tmp*wn*N[l]*mb[k].z;
-                                    }
-                                }
-
-                                // d. gc-term
-                                //-------------------------------------
+                            
+                            double wn = pt.m_Lmp + epsp*pt.m_pg;
+                            
+                            // b. A-term
+                            //-------------------------------------
+                            
+                            for (l=0; l<nseln; ++l) {
+                                vec3d Acn = Ac[l]*nu;
                                 for (k=0; k<nseln+nmeln; ++k)
-                                    for (l=0; l<nseln; ++l)
-                                    {
-                                        ke[4*k + 3][4*l  ] -= tmp*epsp*N[k]*gc[l]*nu.x;
-                                        ke[4*k + 3][4*l+1] -= tmp*epsp*N[k]*gc[l]*nu.y;
-                                        ke[4*k + 3][4*l+2] -= tmp*epsp*N[k]*gc[l]*nu.z;
-                                    }
-                                
-                                // e. Gbc-term
-                                //---------------------------------------
-                                
-                                for (k=0; k<nmeln; ++k) {
-                                    for (l=0; l<nseln; ++l)
-                                    {
-                                        ke[4*(k+nseln) + 3][4*l  ] -= tmp*wn*Gbc[k][l]*nu.x;
-                                        ke[4*(k+nseln) + 3][4*l+1] -= tmp*wn*Gbc[k][l]*nu.y;
-                                        ke[4*(k+nseln) + 3][4*l+2] -= tmp*wn*Gbc[k][l]*nu.z;
-                                    }
+                                {
+                                    ke[4*k + 3][4*l  ] -= tmp*wn*N[k]*Acn.x;
+                                    ke[4*k + 3][4*l+1] -= tmp*wn*N[k]*Acn.y;
+                                    ke[4*k + 3][4*l+2] -= tmp*wn*N[k]*Acn.z;
+                                }
+                            }
+                            
+                            // c. m-term
+                            //---------------------------------------
+                            
+                            for (k=0; k<nmeln; ++k) {
+                                for (l=0; l<nseln+nmeln; ++l)
+                                {
+                                    ke[4*(k+nseln) + 3][4*l  ] -= -tmp*wn*N[l]*mb[k].x;
+                                    ke[4*(k+nseln) + 3][4*l+1] -= -tmp*wn*N[l]*mb[k].y;
+                                    ke[4*(k+nseln) + 3][4*l+2] -= -tmp*wn*N[l]*mb[k].z;
+                                }
+                            }
+                            
+                            // d. gc-term
+                            //-------------------------------------
+                            for (k=0; k<nseln+nmeln; ++k)
+                                for (l=0; l<nseln; ++l)
+                                {
+                                    ke[4*k + 3][4*l  ] -= tmp*epsp*N[k]*gc[l]*nu.x;
+                                    ke[4*k + 3][4*l+1] -= tmp*epsp*N[k]*gc[l]*nu.y;
+                                    ke[4*k + 3][4*l+2] -= tmp*epsp*N[k]*gc[l]*nu.z;
+                                }
+                            
+                            // e. Gbc-term
+                            //---------------------------------------
+                            
+                            for (k=0; k<nmeln; ++k) {
+                                for (l=0; l<nseln; ++l)
+                                {
+                                    ke[4*(k+nseln) + 3][4*l  ] -= tmp*wn*Gbc[k][l]*nu.x;
+                                    ke[4*(k+nseln) + 3][4*l+1] -= tmp*wn*Gbc[k][l]*nu.y;
+                                    ke[4*(k+nseln) + 3][4*l+2] -= tmp*wn*Gbc[k][l]*nu.z;
                                 }
                             }
                             
