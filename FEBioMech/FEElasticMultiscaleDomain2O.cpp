@@ -159,7 +159,7 @@ bool FEElasticMultiscaleDomain2O::Initialize(FEModel& fem)
 	FEMesh& m = *GetMesh();
 		
 	FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(m_pMat);
-	FEModel& rve = pmat->m_mrve;
+	FERVEModel2O& rve = pmat->m_mrve;
 			
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
@@ -188,8 +188,10 @@ bool FEElasticMultiscaleDomain2O::Initialize(FEModel& fem)
 
 			mmpt2O.m_F_prev = pt.m_F;	//-> I don't think this does anything since Initialize is only called once
 			mmpt2O.m_G_prev = mmpt2O.m_G;
-			mmpt2O.m_rve.CopyFrom(rve);
-			mmpt2O.m_rve.Init();
+
+			// initialize the material point RVE
+			// This essentially copies the master RVE to the material point RVE
+			mmpt2O.m_rve.Init(rve);
 		}
 	}
 
@@ -210,8 +212,9 @@ bool FEElasticMultiscaleDomain2O::Initialize(FEModel& fem)
 				FEMaterialPoint& mp = *m_surf.GetData(i).m_pt[0];
 				FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
 
-				mmpt2O.m_rve.CopyFrom(rve);
-				mmpt2O.m_rve.Init();
+				// Initialize the material point RVE
+				// This essentially copies the master RVE model to the material points
+				mmpt2O.m_rve.Init(rve);
 			}
 		}
 	}

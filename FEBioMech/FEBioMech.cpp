@@ -113,6 +113,7 @@
 
 #include "FEFacet2FacetSliding.h"
 #include "FEPeriodicBoundary.h"
+#include "FEPeriodicBoundary2O.h"
 #include "FERigidWallInterface.h"
 #include "FESlidingInterface.h"
 #include "FESlidingInterfaceBW.h"

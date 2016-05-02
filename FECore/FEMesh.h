@@ -20,20 +20,23 @@ class FESurface;
 //-----------------------------------------------------------------------------
 //  This class stores the coordinates of a bounding box
 //
-struct FE_BOUNDING_BOX
+class FEBoundingBox
 {
-	vec3d	r0, r1; // coordinates of opposite corners
+public:
+	FEBoundingBox() {}
+	FEBoundingBox(const vec3d& x) : r0(x), r1(x) {}
+	FEBoundingBox(const vec3d& x0, const vec3d& x1) : r0(x0), r1(x1) {}
 
 	// center of box
-	vec3d center() { return (r0+r1)*0.5; }
+	vec3d center() const { return (r0+r1)*0.5; }
 
 	// dimensions of box
-	double width () { return (r1.x-r0.x); }
-	double height() { return (r1.y-r0.y); }
-	double depth () { return (r1.z-r0.z); }
+	double width () const { return (r1.x-r0.x); }
+	double height() const { return (r1.y-r0.y); }
+	double depth () const { return (r1.z-r0.z); }
 
 	// max dimension
-	double radius() 
+	double radius() const
 	{ 
 		double w = width();
 		double h = height();
@@ -45,7 +48,8 @@ struct FE_BOUNDING_BOX
 		return d;
 	}
 
-	void operator += (const vec3d& r)
+	// add a point and grow the box if necessary
+	void add(const vec3d& r)
 	{
 		if (r.x < r0.x) r0.x = r.x;
 		if (r.y < r0.y) r0.y = r.y;
@@ -55,6 +59,7 @@ struct FE_BOUNDING_BOX
 		if (r.z > r1.z) r1.z = r.z;
 	}
 
+	// inflate the box
 	void inflate(double dx, double dy, double dz)
 	{
 		r0.x -= dx; r1.x += dx;
@@ -62,11 +67,21 @@ struct FE_BOUNDING_BOX
 		r0.z -= dz; r1.z += dz;
 	}
 
+	// translate the box
+	void translate(const vec3d& t)
+	{
+		r0 += t;
+		r1 += t;
+	}
+
 	// check whether a point is inside or not
-	bool IsInside(vec3d r) 
+	bool IsInside(const vec3d& r) const
 	{ 
 		return ((r.x>=r0.x) && (r.y>=r0.y) && (r.z>=r0.z) && (r.x<=r1.x) && (r.y<=r1.y) && (r.z<=r1.z));
 	}
+
+private:
+	vec3d	r0, r1; // coordinates of opposite corners
 };
 
 //-----------------------------------------------------------------------------
@@ -326,7 +341,7 @@ public:
 	void UpdateBox();
 
 	//! retrieve the bounding box
-	FE_BOUNDING_BOX& GetBoundingBox() { return m_box; }
+	FEBoundingBox& GetBoundingBox() { return m_box; }
 
 	//! remove isolated vertices
 	int RemoveIsolatedVertices();
@@ -447,7 +462,7 @@ protected:
 	vector<FEElementSet*>	m_ElemSet;	//!< element sets
 	vector<FEDiscreteSet*>	m_DiscSet;	//!< discrete element sets
 
-	FE_BOUNDING_BOX		m_box;	//!< bounding box
+	FEBoundingBox		m_box;	//!< bounding box
 
 	FENodeElemList	m_NEL;
 

@@ -94,16 +94,12 @@ void FERVEModel::CenterRVE()
 	FENode& node = mesh.Node(0);
 
 	// setup bounding box
-	FE_BOUNDING_BOX box;
-	box.r0 = node.m_r0;
-	box.r1 = box.r0;
+	FEBoundingBox box(node.m_r0, node.m_r0);
 	const int NN = mesh.Nodes();
 	for (int i=1; i<NN; ++i)
 	{
 		FENode& node = mesh.Node(i);
-
-		const vec3d& ri = node.m_r0;
-		box += ri;
+		box.add(node.m_r0);
 	}
 
 	// get the center
@@ -118,8 +114,7 @@ void FERVEModel::CenterRVE()
 	}
 
 	// adjust bounding box
-	m_bb.r0 = box.r0 - c;
-	m_bb.r1 = box.r1 - c;
+	m_bb.translate(-c);
 }
 
 //-----------------------------------------------------------------------------

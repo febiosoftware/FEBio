@@ -1,15 +1,12 @@
 #pragma once
 #include "FEElasticMaterial2O.h"
-#include "FECore/FEModel.h"
-#include "FECore/FEMaterial.h"
-#include "FEBioMech/FEPeriodicBoundary2O.h"
-#include "FECore/tens3d.h"
-#include "FECore/tens4d.h"
-#include "FECore/tens5d.h"
-#include "FECore/tens6d.h"
+#include <FECore/tens3d.h>
+#include <FECore/tens4d.h>
+#include <FECore/tens5d.h>
+#include <FECore/tens6d.h>
 #include "FE2OMicroConstraint.h"
 #include "FEMicroMaterial.h"
-#include "FERVEModel.h"
+#include "FERVEModel2O.h"
 
 //-----------------------------------------------------------------------------
 //! Material point class for the micro-material
@@ -59,7 +56,7 @@ public:
 	tens5ds    m_Da;			//!< Averaged rank 5 material stiffness
 	tens6ds    m_Ea;			//!< Averaged rank 6 material stiffness
 
-	FEModel m_rve;				//!< local copy of the rve		
+	FEMicroModel2O m_rve;				//!< local copy of the rve		
 };
 
 //-----------------------------------------------------------------------------
@@ -67,25 +64,23 @@ public:
 //! are calculated by solving a micro-structural RVE problem and return the
 //! averaged stress and condensed tangents.
 //!
-class FEMicroMaterial2O :	public FEElasticMaterial2O
+class FEMicroMaterial2O : public FEElasticMaterial2O
 {
 public:
 	FEMicroMaterial2O(FEModel* pfem);
 	~FEMicroMaterial2O(void);
 
 public:
-	char		m_szrve[256];	//!< filename for RVE file
-	char		m_szbc[256];	//!< name of nodeset defining boundary
-	bool		m_bperiodic;	//!< periodic bc flag
-	FERVEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
+	char			m_szrve[256];	//!< filename for RVE file
+	char			m_szbc[256];	//!< name of nodeset defining boundary
+	bool			m_bperiodic;	//!< periodic bc flag
+	FERVEModel2O	m_mrve;			//!< the master RVE (Representive Volume Element)
 
 public:
 	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt);
 	void Stress2O(FEMaterialPoint &mp);
 
 	//! calculate tangent stiffness at material point
-	tens4ds Tangent(FEMaterialPoint& pt);
 	void Tangent2O(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e);
 	
 	//! data initialization
@@ -94,30 +89,19 @@ public:
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPointData();
 
-	//! calculate average PK1 stress
-	mat3d AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp);
-
 protected:
-	void UpdateBC(FEModel& rve, mat3d& F, tens3drs& G);
-	
-	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint &mp);
-	void AveragedStress2O(FEModel& rve, FEMaterialPoint &mp, mat3ds &sa, tens3ds &taua);
-	void AveragedStiffness(FEModel& rve, FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e);
-
-	void calculate_d2O(tens5ds& d, double K[3][3], double Ri[3], double Rj[3]);
-	double calc_5ds_comp(double K[3][3], double Ri[3], double Rj[3], int i, int j, int k, int l, int m);
-
-	void calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], double Rj[3]);
-	double calc_6ds_comp(double K[3][3], double Ri[3], double Rj[3], int i, int j, int k, int l, int m, int n);
-
 	void calc_energy_diff(FEModel& rve, FEMaterialPoint& pt);
-
-	void AveragedStress2OPK1(FEModel& rve, FEMaterialPoint &mp, mat3d &PK1a, tens3drs &QK1a);
-	void AveragedStress2OPK2(FEModel& rve, FEMaterialPoint &mp, mat3ds &Sa, tens3ds &Ta);
 
 public:
 	int Probes() { return (int) m_probe.size(); }
 	FEMicroProbe& Probe(int i) { return *m_probe[i]; }
+
+private:
+	// We don't need these functions
+	// TODO: Perhaps we should derive this class directly from FEMaterial so
+	//       that these functions are not inherited. 
+	mat3ds Stress(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt);
 
 protected:
 	FEVecPropertyT<FEMicroProbe>	m_probe;

@@ -50,5 +50,7 @@ public:
 	double operator () (int i, int j, int k, int l, int m, int n);
 };
 
+void calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], double Rj[3] );
+
 // The following file contains the actual definition of the class functions
 #include "tens6ds.hpp"

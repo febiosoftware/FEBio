@@ -18,7 +18,7 @@ inline double& tens3drs::operator () (int i, int j, int k)
 }
 
 // contract the right two legs by the dyad formed by a vector  xi = Gijk*Xj*Xk
-inline vec3d tens3drs::contractdyad1(const vec3d& v)
+inline vec3d tens3drs::contractdyad1(const vec3d& v) const
 {
     vec3d x;
 	x.x = d[ 0]*v.x*v.x + 2*d[ 1]*v.x*v.y + 2*d[ 2]*v.x*v.z + d[ 3]*v.y*v.y + 2*d[ 4]*v.y*v.z + d[ 5]*v.z*v.z;

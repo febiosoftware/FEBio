@@ -73,9 +73,8 @@ FESolidElement* FESolidDomain::FindElement(vec3d y, double r[3])
 		for (j=0; j<neln; ++j) x[j] = m_pMesh->Node(e.m_node[j]).m_rt;
 
 		// first, as a quick check, we see if y lies in the bounding box defined by x
-		FE_BOUNDING_BOX box;
-		box.r0 = box.r1 = x[0];
-		for (j=1; j<neln; ++j) box += x[j];
+		FEBoundingBox box(x[0]);
+		for (j=1; j<neln; ++j) box.add(x[j]);
 
 		if (box.IsInside(y))
 		{

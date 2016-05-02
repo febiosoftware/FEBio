@@ -402,7 +402,7 @@ bool FEPlotElementPK1norm::Save(FEDomain& dom, FEDataStream& a)
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 				FEMicroMaterialPoint2O* mmppt = mp.ExtractData<FEMicroMaterialPoint2O>();
-				PK1_avg += pm2O->AveragedStressPK1(mmppt->m_rve, mp);
+				PK1_avg += mmppt->m_rve.AveragedStressPK1(mp);
 			}
 			PK1_avg *= f;
 

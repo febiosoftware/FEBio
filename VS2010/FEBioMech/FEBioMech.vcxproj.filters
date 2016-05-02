@@ -579,6 +579,9 @@
     <ClCompile Include="..\..\FEBioMech\FENewtonianViscousSolid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FERVEModel2O.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h">
@@ -1155,6 +1158,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FENewtonianViscousSolid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FERVEModel2O.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

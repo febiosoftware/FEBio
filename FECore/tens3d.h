@@ -55,7 +55,7 @@ public:
 	double operator () (int i, int j, int k) const;
 	double& operator () (int i, int j, int k);
 
-	vec3d contractdyad1(const vec3d& v);
+	vec3d contractdyad1(const vec3d& v) const;
 	vec3d contract2s(const mat3ds& s);
 	double tripledot(const tens3drs& H);
 	vec3d contractdyad2(const vec3d& v, const vec3d& w);
