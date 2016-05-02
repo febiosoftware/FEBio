@@ -390,6 +390,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\FEBioTest\FEBiphasicTangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEContactDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBioTest\FEContactDiagnosticBiphasic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEFluidTangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEMemoryDiagnostic.cpp" />
@@ -402,6 +403,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\FEBioTest\FEBiphasicTangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEContactDiagnostic.h" />
+    <ClInclude Include="..\..\FEBioTest\FEContactDiagnosticBiphasic.h" />
     <ClInclude Include="..\..\FEBioTest\FEDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEFluidTangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEMemoryDiagnostic.h" />

@@ -631,6 +631,7 @@
     <ClCompile Include="..\..\FEBioMix\FESFDSBM.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESlidingInterface2.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESlidingInterface3.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FESlidingInterfaceBiphasic.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESlidingInterfaceMP.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESolubConst.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESolubManning.cpp" />
@@ -696,6 +697,7 @@
     <ClInclude Include="..\..\FEBioMix\FESFDSBM.h" />
     <ClInclude Include="..\..\FEBioMix\FESlidingInterface2.h" />
     <ClInclude Include="..\..\FEBioMix\FESlidingInterface3.h" />
+    <ClInclude Include="..\..\FEBioMix\FESlidingInterfaceBiphasic.h" />
     <ClInclude Include="..\..\FEBioMix\FESlidingInterfaceMP.h" />
     <ClInclude Include="..\..\FEBioMix\FESolubConst.h" />
     <ClInclude Include="..\..\FEBioMix\FESolubManning.h" />
