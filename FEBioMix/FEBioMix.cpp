@@ -42,6 +42,7 @@
 #include "FESoluteFlux.h"
 
 #include "FESlidingInterface2.h"
+#include "FESlidingInterfaceBiphasic.h"
 #include "FESlidingInterface3.h"
 #include "FESlidingInterfaceMP.h"
 #include "FETiedBiphasicInterface.h"
@@ -137,6 +138,7 @@ REGISTER_FECORE_CLASS(FESoluteFlux        , FESURFACELOAD_ID, "soluteflux"     )
 //-----------------------------------------------------------------------------
 // Contact interfaces
 REGISTER_FECORE_CLASS(FESlidingInterface2    , FESURFACEPAIRINTERACTION_ID, "sliding2"              );
+REGISTER_FECORE_CLASS(FESlidingInterfaceBiphasic, FESURFACEPAIRINTERACTION_ID, "sliding-biphasic"   );
 REGISTER_FECORE_CLASS(FESlidingInterface3    , FESURFACEPAIRINTERACTION_ID, "sliding3"              );
 REGISTER_FECORE_CLASS(FESlidingInterfaceMP   , FESURFACEPAIRINTERACTION_ID, "sliding-multiphasic"   );
 REGISTER_FECORE_CLASS(FETiedBiphasicInterface, FESURFACEPAIRINTERACTION_ID, "tied-biphasic"         );

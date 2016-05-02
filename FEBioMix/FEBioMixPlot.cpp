@@ -51,9 +51,6 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
         FEElement* pe = m_elem[j];
         if (pe)
         {
-            // get the material
-            FEMaterial* pm = m_pfem->GetMaterial(pe->GetMatID());
-            
             // evaluate the average fluid flux in this element
             int nint = pe->GaussPoints();
             vec3d w(0,0,0);
