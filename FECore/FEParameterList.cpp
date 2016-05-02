@@ -2,7 +2,7 @@
 #include "FEParameterList.h"
 #include "FECoreKernel.h"
 #include "DumpStream.h"
-#include <cstring>
+#include <string>
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
@@ -315,10 +315,10 @@ bool FEParamContainer::Validate()
 		FEParam& p = *pi;
 		if (p.is_valid() == false)
 		{
-			string err = fecore_get_error_string();
+            string err = fecore_get_error_string();
 
 			// report the error
-			return fecore_error(err.c_str());
+            return fecore_error(err.c_str());
 		}
 	}
 

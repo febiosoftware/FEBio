@@ -15,6 +15,7 @@
 		D52A5B0F19A6815C009E3A47 /* tens4ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D52A5B0D19A6815C009E3A47 /* tens4ds.hpp */; };
 		D5307A4818B40A6B008C8463 /* FENormalProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5307A4618B40A6B008C8463 /* FENormalProjection.cpp */; };
 		D5307A4918B40A6B008C8463 /* FENormalProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A4718B40A6B008C8463 /* FENormalProjection.h */; };
+		D53AA13A1CB6E02C00849D8E /* mat6d.h in Headers */ = {isa = PBXBuildFile; fileRef = D53AA1391CB6E02C00849D8E /* mat6d.h */; };
 		D55E3AEF1C5BBEDD00815FCA /* DumpMemStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55E3AEC1C5BBEDD00815FCA /* DumpMemStream.cpp */; };
 		D55E3AF01C5BBEDD00815FCA /* DumpMemStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3AED1C5BBEDD00815FCA /* DumpMemStream.h */; };
 		D55E3AF11C5BBEDD00815FCA /* FEDataStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3AEE1C5BBEDD00815FCA /* FEDataStream.h */; };
@@ -210,6 +211,15 @@
 		D5E10B0F1865E15900B23922 /* vector.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A7F1865E15900B23922 /* vector.h */; };
 		D5E365F31B32031200263DAD /* NLConstraintDataRecord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E365F11B32031200263DAD /* NLConstraintDataRecord.cpp */; };
 		D5E365F41B32031200263DAD /* NLConstraintDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E365F21B32031200263DAD /* NLConstraintDataRecord.h */; };
+		D5F02C2F1CD6F56D0005839E /* FEFunction1D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F02C261CD6F56D0005839E /* FEFunction1D.cpp */; };
+		D5F02C301CD6F56D0005839E /* FEFunction1D.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F02C271CD6F56D0005839E /* FEFunction1D.h */; };
+		D5F02C311CD6F56D0005839E /* FEParam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F02C281CD6F56D0005839E /* FEParam.cpp */; };
+		D5F02C321CD6F56D0005839E /* FEParam.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F02C291CD6F56D0005839E /* FEParam.h */; };
+		D5F02C331CD6F56D0005839E /* FEParamValidator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F02C2A1CD6F56D0005839E /* FEParamValidator.cpp */; };
+		D5F02C341CD6F56D0005839E /* FEParamValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F02C2B1CD6F56D0005839E /* FEParamValidator.h */; };
+		D5F02C351CD6F56D0005839E /* FESurfaceMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F02C2C1CD6F56D0005839E /* FESurfaceMap.cpp */; };
+		D5F02C361CD6F56D0005839E /* FESurfaceMap.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F02C2D1CD6F56D0005839E /* FESurfaceMap.h */; };
+		D5F02C371CD6F56D0005839E /* tensor_base.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F02C2E1CD6F56D0005839E /* tensor_base.h */; };
 		D5F0E92619D05B9F0073F72C /* erf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F0E92419D05B9F0073F72C /* erf.cpp */; };
 		D5F0E92719D05B9F0073F72C /* erf.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F0E92519D05B9F0073F72C /* erf.h */; };
 		D5F76A4F1BC9FD8400DFA30A /* FELinearSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F76A4D1BC9FD8400DFA30A /* FELinearSolver.cpp */; };
@@ -237,6 +247,7 @@
 		D52A5B0D19A6815C009E3A47 /* tens4ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens4ds.hpp; sourceTree = "<group>"; };
 		D5307A4618B40A6B008C8463 /* FENormalProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENormalProjection.cpp; sourceTree = "<group>"; };
 		D5307A4718B40A6B008C8463 /* FENormalProjection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENormalProjection.h; sourceTree = "<group>"; };
+		D53AA1391CB6E02C00849D8E /* mat6d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mat6d.h; sourceTree = "<group>"; };
 		D53B72D51BA9000A000F572F /* FEInitialCondition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEInitialCondition.cpp; sourceTree = "<group>"; };
 		D53B72D61BA9000A000F572F /* FEInitialCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEInitialCondition.h; sourceTree = "<group>"; };
 		D55E3AEC1C5BBEDD00815FCA /* DumpMemStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DumpMemStream.cpp; sourceTree = "<group>"; };
@@ -435,6 +446,15 @@
 		D5E10A7F1865E15900B23922 /* vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vector.h; sourceTree = "<group>"; };
 		D5E365F11B32031200263DAD /* NLConstraintDataRecord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NLConstraintDataRecord.cpp; sourceTree = "<group>"; };
 		D5E365F21B32031200263DAD /* NLConstraintDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NLConstraintDataRecord.h; sourceTree = "<group>"; };
+		D5F02C261CD6F56D0005839E /* FEFunction1D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFunction1D.cpp; sourceTree = "<group>"; };
+		D5F02C271CD6F56D0005839E /* FEFunction1D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFunction1D.h; sourceTree = "<group>"; };
+		D5F02C281CD6F56D0005839E /* FEParam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEParam.cpp; sourceTree = "<group>"; };
+		D5F02C291CD6F56D0005839E /* FEParam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEParam.h; sourceTree = "<group>"; };
+		D5F02C2A1CD6F56D0005839E /* FEParamValidator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEParamValidator.cpp; sourceTree = "<group>"; };
+		D5F02C2B1CD6F56D0005839E /* FEParamValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEParamValidator.h; sourceTree = "<group>"; };
+		D5F02C2C1CD6F56D0005839E /* FESurfaceMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESurfaceMap.cpp; sourceTree = "<group>"; };
+		D5F02C2D1CD6F56D0005839E /* FESurfaceMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESurfaceMap.h; sourceTree = "<group>"; };
+		D5F02C2E1CD6F56D0005839E /* tensor_base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tensor_base.h; sourceTree = "<group>"; };
 		D5F0E92419D05B9F0073F72C /* erf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = erf.cpp; sourceTree = "<group>"; };
 		D5F0E92519D05B9F0073F72C /* erf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = erf.h; sourceTree = "<group>"; };
 		D5F76A4D1BC9FD8400DFA30A /* FELinearSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELinearSolver.cpp; sourceTree = "<group>"; };
@@ -567,6 +587,8 @@
 				D5E10A211865E15900B23922 /* FEElementTraits.h */,
 				D5E10A221865E15900B23922 /* FEException.cpp */,
 				D5E10A231865E15900B23922 /* FEException.h */,
+				D5F02C261CD6F56D0005839E /* FEFunction1D.cpp */,
+				D5F02C271CD6F56D0005839E /* FEFunction1D.h */,
 				D5B572D5186CC76500D12E45 /* FEGlobalData.cpp */,
 				D5B572D6186CC76500D12E45 /* FEGlobalData.h */,
 				D5E10A241865E15900B23922 /* FEGlobalMatrix.cpp */,
@@ -612,8 +634,12 @@
 				D5E10A401865E15900B23922 /* FEObject.h */,
 				D5E10A411865E15900B23922 /* FEOctree.cpp */,
 				D5E10A421865E15900B23922 /* FEOctree.h */,
+				D5F02C281CD6F56D0005839E /* FEParam.cpp */,
+				D5F02C291CD6F56D0005839E /* FEParam.h */,
 				D5E10A431865E15900B23922 /* FEParameterList.cpp */,
 				D5E10A441865E15900B23922 /* FEParameterList.h */,
+				D5F02C2A1CD6F56D0005839E /* FEParamValidator.cpp */,
+				D5F02C2B1CD6F56D0005839E /* FEParamValidator.h */,
 				D5E10A451865E15900B23922 /* FEPlotData.cpp */,
 				D5E10A461865E15900B23922 /* FEPlotData.h */,
 				D5E10A471865E15900B23922 /* FERigidBody.cpp */,
@@ -630,6 +656,8 @@
 				D5E10A501865E15900B23922 /* FESurface.h */,
 				D5E10A511865E15900B23922 /* FESurfaceLoad.cpp */,
 				D5E10A521865E15900B23922 /* FESurfaceLoad.h */,
+				D5F02C2C1CD6F56D0005839E /* FESurfaceMap.cpp */,
+				D5F02C2D1CD6F56D0005839E /* FESurfaceMap.h */,
 				D5E10A531865E15900B23922 /* FESurfacePairInteraction.cpp */,
 				D5E10A541865E15900B23922 /* FESurfacePairInteraction.h */,
 				D5E10A551865E15900B23922 /* FETrussDomain.cpp */,
@@ -648,6 +676,7 @@
 				D5E10A631865E15900B23922 /* mat3d.cpp */,
 				D5E10A641865E15900B23922 /* mat3d.h */,
 				D5E10A651865E15900B23922 /* mat3d.hpp */,
+				D53AA1391CB6E02C00849D8E /* mat6d.h */,
 				D5E10A661865E15900B23922 /* MathParser.cpp */,
 				D5E10A671865E15900B23922 /* MathParser.h */,
 				D5E10A681865E15900B23922 /* matrix.cpp */,
@@ -693,6 +722,7 @@
 				D59BBBAC1AD771DD00E2991F /* tens6d.h */,
 				D59BBBAD1AD771DD00E2991F /* tens6d.hpp */,
 				D59BBBAE1AD771DD00E2991F /* tens6ds.hpp */,
+				D5F02C2E1CD6F56D0005839E /* tensor_base.h */,
 				D5E10A7A1865E15900B23922 /* Timer.cpp */,
 				D5E10A7B1865E15900B23922 /* Timer.h */,
 				D5E10A7C1865E15900B23922 /* vec2d.h */,
@@ -743,6 +773,7 @@
 				D5E10AB71865E15900B23922 /* FEGlobalVector.h in Headers */,
 				D5E10B0B1865E15900B23922 /* Timer.h in Headers */,
 				D5E10AB11865E15900B23922 /* FEElementTraits.h in Headers */,
+				D53AA13A1CB6E02C00849D8E /* mat6d.h in Headers */,
 				D5E10AC91865E15900B23922 /* FENNQuery.h in Headers */,
 				D59BBBB01AD771DD00E2991F /* tens3d.h in Headers */,
 				D5E10ADE1865E15900B23922 /* FESolver.h in Headers */,
@@ -750,6 +781,7 @@
 				D55E3AF01C5BBEDD00815FCA /* DumpMemStream.h in Headers */,
 				D5307A4918B40A6B008C8463 /* FENormalProjection.h in Headers */,
 				D5A4EAED1B7BD1F0002E1641 /* FERigidSystem.h in Headers */,
+				D5F02C361CD6F56D0005839E /* FESurfaceMap.h in Headers */,
 				D59BBBB91AD771DD00E2991F /* tens6d.h in Headers */,
 				D59BBBB11AD771DD00E2991F /* tens3dls.hpp in Headers */,
 				D5E10ABF1865E15900B23922 /* FEMaterialPoint.h in Headers */,
@@ -767,6 +799,7 @@
 				D5E10AE61865E15900B23922 /* FETrussDomain.h in Headers */,
 				D5E10AD21865E15900B23922 /* FEOctree.h in Headers */,
 				D5E10A8D1865E15900B23922 /* ElementDataRecord.h in Headers */,
+				D5F02C321CD6F56D0005839E /* FEParam.h in Headers */,
 				D5E10AC31865E15900B23922 /* FEModel.h in Headers */,
 				D59BBBBA1AD771DD00E2991F /* tens6d.hpp in Headers */,
 				D5F9A96F1C3C4B8400D53C19 /* RigidBC.h in Headers */,
@@ -799,8 +832,11 @@
 				D5E10AFF1865E15900B23922 /* ObjectDataRecord.h in Headers */,
 				D5E10A811865E15900B23922 /* Archive.h in Headers */,
 				D59BBBB31AD771DD00E2991F /* tens3ds.hpp in Headers */,
+				D5F02C301CD6F56D0005839E /* FEFunction1D.h in Headers */,
 				D5E10AA51865E15900B23922 /* FEDiscreteDomain.h in Headers */,
+				D5F02C371CD6F56D0005839E /* tensor_base.h in Headers */,
 				D5E10B051865E15900B23922 /* stdafx.h in Headers */,
+				D5F02C341CD6F56D0005839E /* FEParamValidator.h in Headers */,
 				D5E10AEE1865E15900B23922 /* LoadCurve.h in Headers */,
 				D5E10B0D1865E15900B23922 /* vec3d.h in Headers */,
 				D58D4D161B5D7E76002BB72A /* tens3d.hpp in Headers */,
@@ -889,6 +925,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D5C111351BCDE4D8005219CD /* FENewtonStrategy.cpp in Sources */,
+				D5F02C2F1CD6F56D0005839E /* FEFunction1D.cpp in Sources */,
 				D5E10AE31865E15900B23922 /* FESurfacePairInteraction.cpp in Sources */,
 				D5E10AA81865E15900B23922 /* FEDomain.cpp in Sources */,
 				D5E10AC21865E15900B23922 /* FEModel.cpp in Sources */,
@@ -916,6 +953,7 @@
 				D5F0E92619D05B9F0073F72C /* erf.cpp in Sources */,
 				D5A32E171C23146800162B01 /* FEDomain2D.cpp in Sources */,
 				D5E10AB01865E15900B23922 /* FEElementTraits.cpp in Sources */,
+				D5F02C331CD6F56D0005839E /* FEParamValidator.cpp in Sources */,
 				D5E10AAA1865E15900B23922 /* FEElemElemList.cpp in Sources */,
 				D5FF09021BE4539C0064FF98 /* mortar.cpp in Sources */,
 				D5E10ADD1865E15900B23922 /* FESolver.cpp in Sources */,
@@ -927,6 +965,8 @@
 				D5E10AED1865E15900B23922 /* LoadCurve.cpp in Sources */,
 				D5B572DB186CC76500D12E45 /* FECoreTask.cpp in Sources */,
 				D5E10AB61865E15900B23922 /* FEGlobalVector.cpp in Sources */,
+				D5F02C351CD6F56D0005839E /* FESurfaceMap.cpp in Sources */,
+				D5F02C311CD6F56D0005839E /* FEParam.cpp in Sources */,
 				D59BBBAF1AD771DD00E2991F /* tens3d.cpp in Sources */,
 				D5E10AE11865E15900B23922 /* FESurfaceLoad.cpp in Sources */,
 				D5E10AA41865E15900B23922 /* FEDiscreteDomain.cpp in Sources */,
