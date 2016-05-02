@@ -86,7 +86,7 @@ bool FESlidingSurfaceBiphasic::Init()
         FESurfaceElement& se = Element(i);
         
         // get the element this surface element belongs to
-        FEElement* pe = m_pMesh->FindElementFromID(se.m_nelem);
+        FEElement* pe = m_pMesh->FindElementFromID(se.m_elem[0]);
         if (pe)
         {
             // get the material
@@ -598,7 +598,7 @@ void FESlidingInterfaceBiphasic::CalcAutoPenalty(FESlidingSurfaceBiphasic& s)
         FESurfaceElement& el = s.Element(i);
         
         // find the element this face belongs to
-        FEElement* pe = m.FindElementFromID(el.m_nelem);
+        FEElement* pe = m.FindElementFromID(el.m_elem[0]);
         assert(pe);
         
         // get the area of the surface element
@@ -636,7 +636,7 @@ void FESlidingInterfaceBiphasic::CalcAutoPressurePenalty(FESlidingSurfaceBiphasi
         FESurfaceElement& el = s.Element(i);
         
         // find the element this face belongs to
-        FEElement* pe = m.FindElementFromID(el.m_nelem);
+        FEElement* pe = m.FindElementFromID(el.m_elem[0]);
         assert(pe);
         
         // get the area of the surface element
@@ -677,7 +677,7 @@ double FESlidingInterfaceBiphasic::AutoPressurePenalty(FESurfaceElement& el, FES
     double eps = 0;
     
     // get the element this surface element belongs to
-    FEElement* pe = m.FindElementFromID(el.m_nelem);
+    FEElement* pe = m.FindElementFromID(el.m_elem[0]);
     if (pe)
     {
         // get the material
