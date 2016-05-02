@@ -1,11 +1,19 @@
 #pragma once
 
 //-----------------------------------------------------------------------------
+// traits class for tensors. Classes derived from tensor_base must specialize
+// this class and define the NNZ enum variable which defines the number of components
+// stored for that tensor class.
+template <class T> class tensor_traits {};
+
+//-----------------------------------------------------------------------------
 // Template class for constructing some of the higher order tensor classes.
 // Defines storage as well as some basic operations that do not depend on the 
 // order in which the tensor components are stored.
-template <class T, int NNZ> class tensor_base
+template <class T> class tensor_base
 {
+	enum { NNZ = tensor_traits<T>::NNZ};
+
 public:
 	tensor_base(){}
 
@@ -32,7 +40,7 @@ public:
 };
 
 // operator +
-template<class T, int NNZ> T tensor_base<T,NNZ>::operator + (const T& t) const
+template<class T> T tensor_base<T>::operator + (const T& t) const
 {
 	T s;
 	for (int i=0; i<NNZ; i++) s.d[i] = d[i] + t.d[i];
@@ -40,7 +48,7 @@ template<class T, int NNZ> T tensor_base<T,NNZ>::operator + (const T& t) const
 }
 
 // operator -
-template<class T, int NNZ> T tensor_base<T,NNZ>::operator - (const T& t) const
+template<class T> T tensor_base<T>::operator - (const T& t) const
 {
 	T s;
 	for (int i=0; i<NNZ; i++) s.d[i] = d[i] - t.d[i];
@@ -48,7 +56,7 @@ template<class T, int NNZ> T tensor_base<T,NNZ>::operator - (const T& t) const
 }
 
 // operator *
-template<class T, int NNZ> T tensor_base<T,NNZ>::operator * (double g) const
+template<class T> T tensor_base<T>::operator * (double g) const
 {
 	T s;
 	for (int i=0; i<NNZ; i++) s.d[i] = g*d[i];
@@ -56,7 +64,7 @@ template<class T, int NNZ> T tensor_base<T,NNZ>::operator * (double g) const
 }
 
 // operator /
-template<class T, int NNZ> T tensor_base<T,NNZ>::operator / (double g) const
+template<class T> T tensor_base<T>::operator / (double g) const
 {
 	T s;
 	for (int i=0; i<NNZ; i++) s.d[i] = d[i]/g;
@@ -64,35 +72,35 @@ template<class T, int NNZ> T tensor_base<T,NNZ>::operator / (double g) const
 }
 
 // assignment operator +=
-template<class T, int NNZ> T& tensor_base<T,NNZ>::operator += (const T& t)
+template<class T> T& tensor_base<T>::operator += (const T& t)
 {
 	for (int i=0; i<NNZ; i++) d[i] += t.d[i];
 	return static_cast<T&>(*this);
 }
 
 // assignment operator -=
-template<class T, int NNZ> T& tensor_base<T,NNZ>::operator -= (const T& t)
+template<class T> T& tensor_base<T>::operator -= (const T& t)
 {
 	for (int i=0; i<NNZ; i++) d[i] -= t.d[i];
 	return static_cast<T&>(*this);
 }
 
 // assignment operator *=
-template<class T, int NNZ> T& tensor_base<T,NNZ>::operator *= (double g)
+template<class T> T& tensor_base<T>::operator *= (double g)
 {
 	for (int i=0; i<NNZ; i++) d[i] *= g;
 	return static_cast<T&>(*this);
 }
 
 // assignment operator /=
-template<class T, int NNZ> T& tensor_base<T,NNZ>::operator /= (double g)
+template<class T> T& tensor_base<T>::operator /= (double g)
 {
 	for (int i=0; i<NNZ; i++) d[i] /= g;
 	return static_cast<T&>(*this);
 }
 
 // unary operator -
-template<class T, int NNZ> T tensor_base<T,NNZ>::operator - () const
+template<class T> T tensor_base<T>::operator - () const
 {
 	T s;
 	for (int i = 0; i < NNZ; i++) s.d[i] = -d[i];
@@ -100,7 +108,7 @@ template<class T, int NNZ> T tensor_base<T,NNZ>::operator - () const
 }
 
 // intialize to zero
-template<class T, int NNZ> void tensor_base<T,NNZ>::zero()
+template<class T> void tensor_base<T>::zero()
 {
 	for (int i = 0; i < NNZ; i++) d[i] = 0.0;
 }

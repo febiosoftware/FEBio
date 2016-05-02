@@ -3,6 +3,11 @@
 #include "mat3d.h"
 
 //-----------------------------------------------------------------------------
+class tens4ds;
+class tens4dms;
+class tens4d;
+
+//-----------------------------------------------------------------------------
 //! Class for 4th order tensors with major and minor symmetries (i.e., super-symmetry)
 
 // Due to the major symmetry we can store this tensor as a 6x6 matrix.
@@ -186,12 +191,10 @@ tens4dms dyad1(const mat3ds& a, const mat3ds& b);
 //     \ 8   17  26   35   44   53   62   71   80  / | 20
 //
 
+template <> class tensor_traits<tens4d> {public: enum { NNZ = 81}; };
 
-class tens4d : public tensor_base<tens4d, 81>
+class tens4d : public tensor_base<tens4d>
 {
-public:
-	enum { NNZ = 81 };
-
 public:
 	// constructors
 	tens4d() {}

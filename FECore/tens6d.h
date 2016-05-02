@@ -2,6 +2,16 @@
 #include "tensor_base.h"
 
 //-----------------------------------------------------------------------------
+// Tensor classes defined in this file
+class tens6ds;
+class tens6d;
+
+//-----------------------------------------------------------------------------
+// traits for these classes defining the number of components
+template <> class tensor_traits<tens6ds>{public: enum { NNZ =  55}; };
+template <> class tensor_traits<tens6d >{public: enum { NNZ = 729}; };
+
+//-----------------------------------------------------------------------------
 //! Class for 6th order tensors. This class assumes the following symmetries:
 //  - full (minor) symmetry in the first three legs 
 //  - full (minor) symmetry in the last three legs 
@@ -36,11 +46,8 @@
 //     8   |   1      2      2
 //     9   |   2      2      2
 //
-class tens6ds : public tensor_base<tens6ds, 55>
+class tens6ds : public tensor_base<tens6ds>
 {
-public:
-	enum { NNZ = 55 };
-
 public:
 	// constructors
 	tens6ds(){}
@@ -55,17 +62,14 @@ void calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], double Rj[3] );
 
 //-----------------------------------------------------------------------------
 // class for general 6-th order tensors. No assumed symmetries
-class tens6d : public tensor_base<tens6d, 729>
+class tens6d : public tensor_base<tens6d>
 {
-public:
-	enum { NNZ = 729 };
-
 public:
 	// default constructor
 	tens6d() {}
 
 	// access operators
-	double operator () (int i, int j, int k, int l, int m, int n) const;
+	double  operator () (int i, int j, int k, int l, int m, int n) const;
 	double& operator () (int i, int j, int k, int l, int m, int n);
 };
 

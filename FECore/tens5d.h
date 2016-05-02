@@ -2,13 +2,21 @@
 #include "tensor_base.h"
 
 //-----------------------------------------------------------------------------
+// Classes defined in this file
+class tens5ds;
+class tens5d;
+
+//-----------------------------------------------------------------------------
+// traits for these classes defining the number of components
+template <> class tensor_traits<tens5ds> {public: enum { NNZ =  21}; };
+template <> class tensor_traits<tens5d > {public: enum { NNZ = 243}; };
+
+//-----------------------------------------------------------------------------
 //! Class for 5th order tensors with full symmetry (any pair of indices can be swapped)
 //
-class tens5ds : public tensor_base<tens5ds, 21>
+class tens5ds : public tensor_base<tens5ds>
 {
 public:
-	enum { NNZ = 21 };
-
 	// default constructor
 	tens5ds() {}
 
@@ -27,17 +35,14 @@ public:
 //      |  .                                 .  |
 //      \  26                               242 /
 //
-class tens5d : public tensor_base<tens5d, 243>
+class tens5d : public tensor_base<tens5d>
 {
-public:
-	enum { NNZ = 243 };
-
 public:
 	// default constructor
 	tens5d() {}
 
 	// access operators
-	double operator () (int i, int j, int k, int l, int m) const;
+	double  operator () (int i, int j, int k, int l, int m) const;
 	double& operator () (int i, int j, int k, int l, int m);
 };
 

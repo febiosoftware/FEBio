@@ -7,6 +7,12 @@ inline double tens3d::operator()(int i, int j, int k) const
 	return d[i*9 + j*3 + k];
 }
 
+// access operator
+inline double& tens3d::operator()(int i, int j, int k)
+{
+	return d[i*9 + j*3 + k];
+}
+
 // symmetrize a general 3o tensor
 inline tens3ds tens3d::symm()
 {
