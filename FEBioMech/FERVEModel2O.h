@@ -66,11 +66,11 @@ public:
 	//! calculate average PK1 stress
 	mat3d AveragedStressPK1(FEMaterialPoint &mp);
 
-	void AveragedStress2O   (FEMaterialPoint &mp, mat3ds&  sa, tens3ds&  taua);
-	void AveragedStress2OPK1(FEMaterialPoint &mp, mat3d& PK1a, tens3drs& QK1a);
-	void AveragedStress2OPK2(FEMaterialPoint &mp, mat3ds&  Sa, tens3ds&    Ta);
+	void AveragedStress2O   (mat3d&  Pa, tens3drs&  Qa);
+//	void AveragedStress2OPK1(FEMaterialPoint &mp, mat3d& PK1a, tens3drs& QK1a);
+//	void AveragedStress2OPK2(FEMaterialPoint &mp, mat3ds&  Sa, tens3ds&    Ta);
 	
-	void AveragedStiffness(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e);
+	void AveragedStiffness(FEMaterialPoint &mp, tens4d& C, tens5d& L, tens5d& H, tens6d& J);
 
 protected:
 	//! Update the boundary conditions

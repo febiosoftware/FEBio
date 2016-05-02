@@ -2,14 +2,6 @@
 #include "tens5d.h"
 #include <assert.h>
 
-// access operator
-double tens5ds::operator () (int i, int j, int k, int l, int m) const
-{
-	// TODO: implement this
-	assert(false);
-	return 0.0;
-}
-
 //-----------------------------------------------------------------------------
 double calc_5ds_comp(double K[3][3], double Ri[3], double Rj[3], int i, int j, int k, int l, int m)
 {

@@ -21,7 +21,7 @@ class FEElasticMultiscaleDomain2O : public FEElasticSolidDomain
 			FEMaterialPoint*	m_pt[2];	//!< material point data for evaluating stresses
 			vec3d				ksi[2];		//!< local element coordinates
 			tens3drs			Qavg;		//!< average stress across interface
-			tens6ds				J0avg;		//!< average initial higher order stiffess across interface
+			tens6d 				J0avg;		//!< average initial higher order stiffess across interface
 			mat3d				DgradU;		//!< displacement gradient jump across interface
 		};
 

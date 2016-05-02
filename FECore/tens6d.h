@@ -52,5 +52,23 @@ public:
 
 void calculate_e2O(tens6ds& e, double K[3][3], double Ri[3], double Rj[3] );
 
+
+//-----------------------------------------------------------------------------
+// class for general 6-th order tensors. No assumed symmetries
+class tens6d : public tensor_base<tens6d, 729>
+{
+public:
+	enum { NNZ = 729 };
+
+public:
+	// default constructor
+	tens6d() {}
+
+	// access operators
+	double operator () (int i, int j, int k, int l, int m, int n) const;
+	double& operator () (int i, int j, int k, int l, int m, int n);
+};
+
 // The following file contains the actual definition of the class functions
+#include "tens6d.hpp"
 #include "tens6ds.hpp"

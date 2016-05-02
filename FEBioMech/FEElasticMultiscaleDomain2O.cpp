@@ -180,14 +180,6 @@ bool FEElasticMultiscaleDomain2O::Initialize(FEModel& fem)
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 			FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
-			pt.m_r0 = r0;
-			pt.m_rt = rt;
-
-			pt.m_J = defgrad(el, pt.m_F, j);
-			defhess(el, j, mmpt2O.m_G);
-
-			mmpt2O.m_F_prev = pt.m_F;	//-> I don't think this does anything since Initialize is only called once
-			mmpt2O.m_G_prev = mmpt2O.m_G;
 
 			// initialize the material point RVE
 			// This essentially copies the master RVE to the material point RVE
@@ -419,7 +411,7 @@ void FEElasticMultiscaleDomain2O::InternalForcesDG2(FEGlobalVector& R)
 				FEInternalSurface2O::Data& data = m_surf.GetData(nd + n);
 
 				// average stiffness across interface
-				tens6ds& J0avg = data.J0avg;
+				tens6d& J0avg = data.J0avg;
 
 				// displacement gradient jump
 				const mat3d& Du = data.DgradU;
@@ -553,7 +545,7 @@ void FEElasticMultiscaleDomain2O::ElementInternalForce_QG(FESolidElement& el, ve
 		FEMicroMaterialPoint2O& mmpt2O = *(mp.ExtractData<FEMicroMaterialPoint2O>());
 
 		// get the higher-order stress
-		tens3drs& Q = mmpt2O.m_Q;
+		tens3drs& Q = mmpt2O.m_Qa;
 
 		// we'll evaluate this term in the material frame
 		// so we need the Jacobian with respect to the reference configuration
@@ -696,8 +688,8 @@ void FEElasticMultiscaleDomain2O::UpdateInternalSurfaceStresses()
 				// evaluate stresses at this integration point
 				pmat->Stress2O(mp);
 
-				data.Qavg += pt2O.m_Q*0.5;
-				data.J0avg += pt2O.m_Ea;		// TODO: I only need to evaluate this on the first iteration
+				data.Qavg += pt2O.m_Qa*0.5;
+				data.J0avg += pt2O.m_Ja;		// TODO: I only need to evaluate this on the first iteration
 			}
 		}
 	}
@@ -789,11 +781,11 @@ void FEElasticMultiscaleDomain2O::ElementStiffness(const FETimePoint& tp, int ie
 		FEMicroMaterialPoint2O& mmpt2O = *(mp.ExtractData<FEMicroMaterialPoint2O>());
 
 		// get the material tangents
-		tens4ds C; C.zero();
-		tens5ds L; L.zero();
-		tens5ds H; H.zero();	// TODO: Why is this not calculated?
-		tens6ds J; J.zero();
-		pmat->Tangent2O(mp, C, L, J);
+		tens4d C;
+		tens5d L;
+		tens5d H;
+		tens6d J;
+		pmat->Tangent2O(mp, C, L, H, J);
 
 		// Jacobian determinant 
 		double J0 = detJ0(el, ni);

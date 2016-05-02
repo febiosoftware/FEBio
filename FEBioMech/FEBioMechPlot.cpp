@@ -346,7 +346,7 @@ bool FEPlotElementtaunorm::Save(FEDomain& dom, FEDataStream& a)
 		for (int j=0; j<nint; ++j)
 		{
 			FEMicroMaterialPoint2O& pt2O = *(el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
-			tau_avg += pt2O.m_tau;
+//			tau_avg += pt2O.m_tau;
 		}
 		tau_avg *= f;
 
@@ -434,7 +434,7 @@ bool FEPlotElementQK1norm::Save(FEDomain& dom, FEDataStream& a)
 		for (int j=0; j<nint; ++j)
 		{
 			FEMicroMaterialPoint2O& pt2O = *(el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
-			QK1_avg += pt2O.m_Q;
+			QK1_avg += pt2O.m_Qa;
 		}
 		QK1_avg *= f;
 
@@ -469,7 +469,7 @@ bool FEPlotElementSnorm::Save(FEDomain& dom, FEDataStream& a)
 			else
 			{
 				FEMicroMaterialPoint2O* mmppt2O = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
-				if (mmppt2O) S_avg += mmppt2O->m_S;
+//				if (mmppt2O) S_avg += mmppt2O->m_S;
 			}
 		}
 		S_avg *= f;
@@ -501,7 +501,7 @@ bool FEPlotElementTnorm::Save(FEDomain& dom, FEDataStream& a)
 		for (int j=0; j<nint; ++j)
 		{
 			FEMicroMaterialPoint2O* ppt2O = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
-			if (ppt2O) T_avg += ppt2O->m_T;
+//			if (ppt2O) T_avg += ppt2O->m_T;
 		}
 		T_avg *= f;
 
@@ -531,7 +531,7 @@ bool FEPlotElementinfstrnorm::Save(FEDomain& dom, FEDataStream& a)
 		for (int j=0; j<nint; ++j)
 		{
 			FEMicroMaterialPoint2O* ppt2O = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
-			if (ppt2O) inf_strain_avg += ppt2O->m_inf_str_grad;
+//			if (ppt2O) inf_strain_avg += ppt2O->m_inf_str_grad;
 		}
 		inf_strain_avg *= f;
 
@@ -561,7 +561,7 @@ bool FEPlotElementGLstrnorm::Save(FEDomain& dom, FEDataStream& a)
 		for (int j=0; j<nint; ++j)
 		{
 			FEMicroMaterialPoint2O* ppt2O = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
-			if (ppt2O) Havg += ppt2O->m_H;
+//			if (ppt2O) Havg += ppt2O->m_H;
 		}
 		Havg *= f;
 
@@ -591,7 +591,7 @@ bool FEPlotElementEAstrnorm::Save(FEDomain& dom, FEDataStream& a)
 		for (int j=0; j<nint; ++j)
 		{
 			FEMicroMaterialPoint2O* ppt2O = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
-			if (ppt2O) havg += ppt2O->m_h;
+//			if (ppt2O) havg += ppt2O->m_h;
 		}
 		havg *= f;
 
@@ -625,7 +625,7 @@ bool FEPlotElementenergydiff::Save(FEDomain& dom, FEDataStream& a)
 			else
 			{
 				FEMicroMaterialPoint2O* mmppt2O = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
-				if (mmppt2O) energy_diff += mmppt2O->m_energy_diff;	
+//				if (mmppt2O) energy_diff += mmppt2O->m_energy_diff;	
 			}
 		}
 		energy_diff *= f;
@@ -659,7 +659,7 @@ bool FEPlotElementMacroEnergy::Save(FEDomain& dom, FEDataStream& a)
 			else
 			{
 				FEMicroMaterialPoint2O* mmppt2O = (el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
-				if (mmppt2O) macro_energy += mmppt2O->m_macro_energy;
+//				if (mmppt2O) macro_energy += mmppt2O->m_macro_energy;
 			}
 		}
 		macro_energy *= f;

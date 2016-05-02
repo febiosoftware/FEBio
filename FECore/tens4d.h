@@ -1,5 +1,5 @@
 #pragma once
-
+#include "tensor_base.h"
 #include "mat3d.h"
 
 //-----------------------------------------------------------------------------
@@ -173,19 +173,21 @@ tens4dms dyad1(const mat3ds& a, const mat3ds& b);
 // We store components of this tensor as a 9x9 matrix.
 // The tensor is stored in column major order:
 //
-//     / 0   9   18   27   36   45   54   63   72  \
-//     | 1   10  19   28   37   46   55   64   73  |
-//     | 2   11  20   29   38   47   56   65   74  |
-// A = | 3   12  21   30   39   48   57   66   75  |
-//     | 4   13  22   31   40   49   58   67   76  |
-//     | 5   14  23   32   41   50   59   68   77  |
-//     | 6   15  24   33   42   51   60   69   78  |
-//     | 7   16  25   34   43   52   61   70   79  |
-//     \ 8   17  26   35   44   53   62   71   80  /
+//       00  11  22   01   12   02   10   21   20    |
+//       --------------------------------------------+---
+//     / 0   9   18   27   36   45   54   63   72  \ | 00
+//     | 1   10  19   28   37   46   55   64   73  | | 11
+//     | 2   11  20   29   38   47   56   65   74  | | 22
+// A = | 3   12  21   30   39   48   57   66   75  | | 01
+//     | 4   13  22   31   40   49   58   67   76  | | 12
+//     | 5   14  23   32   41   50   59   68   77  | | 02
+//     | 6   15  24   33   42   51   60   69   78  | | 10
+//     | 7   16  25   34   43   52   61   70   79  | | 21
+//     \ 8   17  26   35   44   53   62   71   80  / | 20
 //
 
 
-class tens4d
+class tens4d : public tensor_base<tens4d, 81>
 {
 public:
 	enum { NNZ = 81 };
@@ -193,45 +195,15 @@ public:
 public:
 	// constructors
 	tens4d() {}
-	tens4d(const double g);
-	tens4d(double m[9][9]);
 
 public:
 	// access operators
 	double& operator () (int i, int j, int k, int l);
 	double operator () (int i, int j, int k, int l) const;
+
+private:
 	double& operator () (int i, int j);
 	double operator () (int i, int j) const;
-
-	// arithmetic operators
-	tens4d operator + (const tens4d& t) const;
-	tens4d operator - (const tens4d& t) const;
-	tens4d operator * (double g) const;
-	tens4d operator / (double g) const;
-
-	// arithmetic assignment operators
-	tens4d& operator += (const tens4d& t);
-	tens4d& operator -= (const tens4d& t);
-	tens4d& operator *= (double g);
-	tens4d& operator /= (double g);
-
-	// unary operators
-	tens4d operator - () const;
-	
-	// trace
-	double tr() const;
-	
-	// initialize to zero
-	void zero();
-
-	// extract 9x9 matrix
-	void extract(double d[9][9]);
-
-	// compute the super-symmetric (major and minor symmetric) component of the tensor
-	tens4ds supersymm() const;
-
-public:
-	double d[NNZ];	// stored in column major order
 };
 
 // The following file contains the actual definition of the class functions

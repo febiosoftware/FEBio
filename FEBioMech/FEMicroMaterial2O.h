@@ -26,13 +26,16 @@ public:
 	void Serialize(DumpStream& ar);
 
 public:
-	mat3d		m_F_prev;		//!< deformation gradient at previous converged time step
-	tens3drs   m_G_prev; 		//!< gradient of deformation gradient at previous time point
+	mat3d	m_Pa;				//!< averaged PK1 stress
 
 	tens3drs   m_G;				//!< gradient of deformation gradient
+	tens3drs   m_Qa;			//!< average higher-order stress tensor
 
-	tens3ds    m_tau;			// TODO: remove
-	tens3drs   m_Q;				// Higher-order stress tensor
+	tens4d	m_Ca;				//!< averaged 4-th order stiffness
+	tens5d	m_La, m_Ha;			//!< averaged 5-th order stiffness
+	tens6d	m_Ja;				//!< averaged 6-th order stiffness
+
+/*	tens3ds    m_tau;			// TODO: remove
 
 	mat3ds     m_S;				// LTE - 2nd Piola-Kirchhoff stress (TODO: remove)
 	tens3ds    m_T;				// LTE - 2nd Piola-Kirchhoff stress moment (TODO: remove)
@@ -55,6 +58,10 @@ public:
 	tens4ds	   m_Ca;			//!< Averaged rank 4 material stiffness
 	tens5ds    m_Da;			//!< Averaged rank 5 material stiffness
 	tens6ds    m_Ea;			//!< Averaged rank 6 material stiffness
+
+	mat3d		m_F_prev;		//!< deformation gradient at previous converged time step
+	tens3drs	m_G_prev; 		//!< gradient of deformation gradient at previous time point
+*/
 
 	FEMicroModel2O m_rve;				//!< local copy of the rve		
 };
@@ -81,7 +88,7 @@ public:
 	void Stress2O(FEMaterialPoint &mp);
 
 	//! calculate tangent stiffness at material point
-	void Tangent2O(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e);
+	void Tangent2O(FEMaterialPoint &mp, tens4d& C, tens5d& L, tens5d& H, tens6d& J);
 	
 	//! data initialization
 	bool Init();

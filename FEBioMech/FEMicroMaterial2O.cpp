@@ -13,8 +13,16 @@
 //-----------------------------------------------------------------------------
 FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterialPoint(mp)
 {
-	m_tau.zero();
 	m_G.zero();
+	m_Qa.zero();
+	m_Pa.zero();
+
+	m_Ca.zero();
+	m_La.zero();
+	m_Ha.zero();
+	m_Ja.zero();
+
+/*	m_tau.zero();
 
 	m_inf_str_grad.zero();
 	m_E.zero();
@@ -33,6 +41,7 @@ FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterial
 	m_Ea.zero();
 	
 	m_G_prev.zero();
+*/
 }
 
 //-----------------------------------------------------------------------------
@@ -46,13 +55,15 @@ void FEMicroMaterialPoint2O::Init(bool bflag)
 //! create a shallow copy
 FEMaterialPoint* FEMicroMaterialPoint2O::Copy()
 {
-	FEMicroMaterialPoint2O* mmpt2O = new FEMicroMaterialPoint2O(m_pNext?m_pNext->Copy():0);
-	mmpt2O->m_tau = m_tau;
-	mmpt2O->m_G = m_G;
-	mmpt2O->m_Ca = m_Ca;
-	mmpt2O->m_Da = m_Da;
-	mmpt2O->m_Ea = m_Ea;
-	return mmpt2O;
+	FEMicroMaterialPoint2O* pt = new FEMicroMaterialPoint2O(m_pNext?m_pNext->Copy():0);
+	pt->m_G = m_G;
+	pt->m_Qa = m_Qa;
+	pt->m_Pa = m_Pa;
+	pt->m_Ca = m_Ca;
+	pt->m_La = m_La;
+	pt->m_Ha = m_Ha;
+	pt->m_Ja = m_Ja;
+	return pt;
 }
 
 //-----------------------------------------------------------------------------
@@ -62,15 +73,13 @@ void FEMicroMaterialPoint2O::Serialize(DumpStream& ar)
 	FEMaterialPoint::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << m_Ca;
-		ar << m_Da;
-		ar << m_Ea;
+		ar << m_G  << m_Qa << m_Pa;
+		ar << m_Ca << m_La << m_Ha << m_Ja;
 	}
 	else
 	{
-		ar >> m_Ca;
-		ar >> m_Da;
-		ar >> m_Ea;
+		ar >> m_G  >> m_Qa >> m_Pa;
+		ar >> m_Ca >> m_La >> m_Ha >> m_Ja;
 	}
 }
 
@@ -159,12 +168,13 @@ mat3ds FEMicroMaterial2O::Stress(FEMaterialPoint &mp)
 // The stiffness is evaluated at the same time the stress is evaluated so we 
 // can just return it here. Note that this assumes that the stress function 
 // is always called prior to the tangent function.
-void  FEMicroMaterial2O::Tangent2O(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e)
+void  FEMicroMaterial2O::Tangent2O(FEMaterialPoint& mp, tens4d& C, tens5d& L, tens5d& H, tens6d& J)
 {
 	FEMicroMaterialPoint2O& mmpt = *mp.ExtractData<FEMicroMaterialPoint2O>();
-	c = mmpt.m_Ca;
-	d = mmpt.m_Da;
-	e = mmpt.m_Ea;
+	C = mmpt.m_Ca;
+	L = mmpt.m_La;
+	H = mmpt.m_Ha;
+	J = mmpt.m_Ja;
 }
 
 //-----------------------------------------------------------------------------
@@ -183,19 +193,19 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp)
 	if (bret == false) throw FEMultiScaleException();
 
 	// calculate the averaged Cauchy stress
-	mmpt2O.m_rve.AveragedStress2O(mp, pt.m_s, mmpt2O.m_tau);
+	mmpt2O.m_rve.AveragedStress2O(mmpt2O.m_Pa, mmpt2O.m_Qa);
 	
 	// calculate the averaged PK1 stress
 //	AveragedStress2OPK1(mmpt2O.m_rve, mp, mmpt2O.m_PK1, mmpt2O.m_QK1);
 	
 	// calculate the averaged PK2 stress
-	mmpt2O.m_rve.AveragedStress2OPK2(mp, mmpt2O.m_S, mmpt2O.m_T);
+//	mmpt2O.m_rve.AveragedStress2OPK2(mp, mmpt2O.m_S, mmpt2O.m_T);
 
 	// calculate the averaged stiffness
-	mmpt2O.m_rve.AveragedStiffness(mp, mmpt2O.m_Ca, mmpt2O.m_Da, mmpt2O.m_Ea);
+//	mmpt2O.m_rve.AveragedStiffness(mp, mmpt2O.m_Ca, mmpt2O.m_Da, mmpt2O.m_Ea);
 
 	// calculate the difference between the macro and micro energy for Hill-Mandel condition
-	calc_energy_diff(mmpt2O.m_rve, mp);	
+//	calc_energy_diff(mmpt2O.m_rve, mp);	
 }
 
 //-----------------------------------------------------------------------------

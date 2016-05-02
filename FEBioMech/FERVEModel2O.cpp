@@ -409,17 +409,13 @@ mat3d FEMicroModel2O::AveragedStressPK1(FEMaterialPoint &mp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the average stress from the RVE solution.
-void FEMicroModel2O::AveragedStress2O(FEMaterialPoint &mp, mat3ds &sa, tens3ds &taua)
+void FEMicroModel2O::AveragedStress2O(mat3d& Pa, tens3drs& Qa)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	mat3d F = pt.m_F;
-	double J = pt.m_J;
-
 	// get the RVE mesh
 	FEMesh& m = GetMesh();
 
-	mat3d s; s.zero();
-	tens3ds tau; tau.zero();
+	Pa.zero();
+	Qa.zero();
 
 	// for periodic BC's we take the reaction forces directly from the periodic constraints
 	if (m_bperiodic)
@@ -435,15 +431,14 @@ void FEMicroModel2O::AveragedStress2O(FEMaterialPoint &mp, mat3ds &sa, tens3ds &
 			{
 				FENode& node = ss.Node(i);
 				vec3d f = ss.m_Fr[i];
+				const vec3d& X = node.m_r0;
 				
 				// We multiply by two since the reaction forces are only stored at the slave surface 
 				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
 				// store the reaction forces on the master nodes as well?)
-				s += (f & node.m_rt)*2.0;
+				Pa += (f & X)*2.0;
 
-				vec3d x; x = node.m_rt;
-		
-				tau += dyad3s(x, f, x)*2.0;
+				Qa += dyad3rs(f, X)*2.0;
 			}
 		}
 	}
@@ -471,18 +466,19 @@ void FEMicroModel2O::AveragedStress2O(FEMaterialPoint &mp, mat3ds &sa, tens3ds &
 		f.x = R[-n.m_ID[dof_X]-2];
 		f.y = R[-n.m_ID[dof_Y]-2];
 		f.z = R[-n.m_ID[dof_Z]-2];
-				
-		s += (f & n.m_rt);
 
-		vec3d x = n.m_rt;
-		
-		tau += dyad3s(x, f, x);
+		const vec3d& X = n.m_r0;
+
+		Pa += (f & X);
+
+		Qa += dyad3rs(f, X);
 	}
 
-	sa = s.sym() / (J*m_V0);
-	taua = tau / (2*J*m_V0);
+	// divide by volume
+	Pa /= m_V0;
+	Qa /= 2*m_V0;
 }
-
+/*
 //-----------------------------------------------------------------------------
 //! Calculate the average stress from the RVE solution.
 void FEMicroModel2O::AveragedStress2OPK1(FEMaterialPoint &mp, mat3d &PK1a, tens3drs &QK1a)
@@ -636,10 +632,11 @@ void FEMicroModel2O::AveragedStress2OPK2(FEMaterialPoint &mp, mat3ds &Sa, tens3d
 	Sa = S.sym() / m_V0;
 	Ta = T / (2*m_V0);
 }
+*/
 
 //-----------------------------------------------------------------------------
 //! Calculate the average stiffness from the RVE solution.
-void FEMicroModel2O::AveragedStiffness(FEMaterialPoint &mp, tens4ds& c, tens5ds& d, tens6ds& e)
+void FEMicroModel2O::AveragedStiffness(FEMaterialPoint &mp, tens4d& C, tens5d& L, tens5d& H, tens6d& J)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -656,48 +653,34 @@ void FEMicroModel2O::AveragedStiffness(FEMaterialPoint &mp, tens4ds& c, tens5ds&
 	// element's residual
 	vector<double> fe;
 
-	// get deformation gradient and its inverse
-	mat3d F = pt.m_F;
-	mat3d Fi = F.inverse();
-	double J = pt.m_J;
-
-	// get the stress
-	//mat3ds s = pt.m_s;
-
 	// calculate the center point
 	vec3d rc(0,0,0);
-	for (int k=0; k<m.Nodes(); ++k) rc += m.Node(k).m_rt;
+	for (int k=0; k<m.Nodes(); ++k) rc += m.Node(k).m_r0;
 	rc /= (double) m.Nodes();
 
-	// LTE - Calculate the initial center point
-	vec3d rc0(0,0,0);
-	for (int k=0; k<m.Nodes(); ++k) rc0 += m.Node(k).m_r0;
-	rc0 /= (double) m.Nodes();
+	// zero the stiffness components
+	C.zero();
+	L.zero();
+	H.zero();
+	J.zero();
 
-	c.zero();
-	d.zero();
-	e.zero();
-
-	// LTE - elasticity tensor
-	double D[6][6] = {0};
-		
 	// calculate the stiffness matrix and residual
-	for (int k=0; k<m.Domains(); ++k)
+	for (int nd=0; nd<m.Domains(); ++nd)
 	{
-		FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(k));
-		int NS = bd.Elements();
-		for (int n=0; n<NS; ++n)
+		FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(nd));
+		int NEL = bd.Elements();
+		for (int ne=0; ne<NEL; ++ne)
 		{
-			FESolidElement& el = bd.Element(n);
+			FESolidElement& el = bd.Element(ne);
 
 			// create the element's stiffness matrix
-			int ne = el.Nodes();
-			int ndof = 3*ne;
+			int neln = el.Nodes();
+			int ndof = 3*neln;
 			ke.resize(ndof, ndof);
 			ke.zero();
 
 			// calculate the element's stiffness matrix
-			bd.ElementStiffness(GetTime(), n, ke);
+			bd.ElementStiffness(GetTime(), ne, ke);
 
 			// create the element's residual
 			fe.assign(ndof, 0);
@@ -706,69 +689,72 @@ void FEMicroModel2O::AveragedStiffness(FEMaterialPoint &mp, tens4ds& c, tens5ds&
 			bd.ElementInternalForce(el, fe);
 
 			// loop over the element's nodes
-			for (int i=0; i<ne; ++i)
+			for (int a=0; a<neln; ++a)
 			{
-				FENode& ni = m.Node(el.m_node[i]);
-				for (int j=0; j<ne; ++j)
+				FENode& na = m.Node(el.m_node[a]);
+				for (int b=0; b<neln; ++b)
 				{
-					FENode& nj = m.Node(el.m_node[j]);
-					if (IsBoundaryNode(el.m_node[i]) && IsBoundaryNode(el.m_node[j]))
+					FENode& nb = m.Node(el.m_node[b]);
+					if (IsBoundaryNode(el.m_node[a]) && IsBoundaryNode(el.m_node[b]))
 					{
 						// both nodes are boundary nodes
 						// so grab the element's submatrix
-						double K[3][3];
-						K[0][0] = ke[3*i  ][3*j  ]; K[0][1] = ke[3*i  ][3*j+1]; K[0][2] = ke[3*i  ][3*j+2];
-						K[1][0] = ke[3*i+1][3*j  ]; K[1][1] = ke[3*i+1][3*j+1]; K[1][2] = ke[3*i+1][3*j+2];
-						K[2][0] = ke[3*i+2][3*j  ]; K[2][1] = ke[3*i+2][3*j+1]; K[2][2] = ke[3*i+2][3*j+2];
+						mat3d K;
+						ke.get(3*a, 3*b, K);
 
-						// get the nodal positions
-						vec3d ri = ni.m_rt;
-						vec3d rj = nj.m_rt;
+						// get the nodal positions relative to the center
+						vec3d ra = na.m_r0 - rc;
+						vec3d rb = nb.m_r0 - rc;
 						
-						double Ri[3] = { ri.x, ri.y, ri.z };
-						double Rj[3] = { rj.x, rj.y, rj.z };
+						double Ra[3] = { ra.x, ra.y, ra.z };
+						double Rb[3] = { rb.x, rb.y, rb.z };
 
-						// create the elasticity tensor
-						D[0][0] += Ri[0]*K[0][0]*Rj[0]; 
-						D[1][1] += Ri[1]*K[1][1]*Rj[1]; 
-						D[2][2] += Ri[2]*K[2][2]*Rj[2]; 
+						// create the elasticity tensors
+						for (int i=0; i<3; ++i)
+							for (int j=0; j<3; ++j)
+								for (int k=0; k<3; ++k)
+									for (int l=0; l<3; ++l)
+									{
+										C(i, j, k, l) += K[i][k]*Rb[l]*Ra[j];
+									}
 
-						D[0][1] += Ri[0]*K[0][1]*Rj[1];
-						D[0][2] += Ri[0]*K[0][2]*Rj[2];
-						D[1][2] += Ri[1]*K[1][2]*Rj[2];
+						for (int i=0; i<3; ++i)
+							for (int j=0; j<3; ++j)
+								for (int k=0; k<3; ++k)
+									for (int l=0; l<3; ++l)
+										for (int m=0; m<3; ++m)
+										{
+											L(i, j, k, l, m) += K[i][k]*Rb[l]*Rb[m]*Ra[j];
+										}
 
-						D[0][3] += 0.5*(Ri[0]*K[0][0]*Rj[1] + Ri[0]*K[0][1]*Rj[0]);
-						D[0][4] += 0.5*(Ri[0]*K[0][1]*Rj[2] + Ri[0]*K[0][2]*Rj[1]);
-						D[0][5] += 0.5*(Ri[0]*K[0][0]*Rj[2] + Ri[0]*K[0][2]*Rj[0]);
+						for (int i=0; i<3; ++i)
+							for (int j=0; j<3; ++j)
+								for (int k=0; k<3; ++k)
+									for (int l=0; l<3; ++l)
+										for (int m=0; m<3; ++m)
+										{
+											H(i, j, k, l, m) += K[i][l]*Rb[m]*Ra[j]*Ra[k];
+										}
 
-						D[1][3] += 0.5*(Ri[1]*K[1][0]*Rj[1] + Ri[1]*K[1][1]*Rj[0]);
-						D[1][4] += 0.5*(Ri[1]*K[1][1]*Rj[2] + Ri[1]*K[1][2]*Rj[1]);
-						D[1][5] += 0.5*(Ri[1]*K[1][0]*Rj[2] + Ri[1]*K[1][2]*Rj[0]);
+						for (int i=0; i<3; ++i)
+							for (int j=0; j<3; ++j)
+								for (int k=0; k<3; ++k)
+									for (int l=0; l<3; ++l)
+										for (int m=0; m<3; ++m)
+											for (int n=0; n<3; ++n)
+											{
+												J(i, j, k, l, m, n) += K[i][l]*Rb[m]*Rb[n]*Ra[j]*Ra[k];
+											}
 
-						D[2][3] += 0.5*(Ri[2]*K[2][0]*Rj[1] + Ri[2]*K[2][1]*Rj[0]);
-						D[2][4] += 0.5*(Ri[2]*K[2][1]*Rj[2] + Ri[2]*K[2][2]*Rj[1]);
-						D[2][5] += 0.5*(Ri[2]*K[2][0]*Rj[2] + Ri[2]*K[2][2]*Rj[0]);
-
-						D[3][3] += 0.25*(Ri[0]*K[1][0]*Rj[1] + Ri[1]*K[0][0]*Rj[1] + Ri[0]*K[1][1]*Rj[0] + Ri[1]*K[0][1]*Rj[0]);
-						D[3][4] += 0.25*(Ri[0]*K[1][1]*Rj[2] + Ri[1]*K[0][1]*Rj[2] + Ri[0]*K[1][2]*Rj[1] + Ri[1]*K[0][2]*Rj[1]);
-						D[3][5] += 0.25*(Ri[0]*K[1][0]*Rj[2] + Ri[1]*K[0][0]*Rj[2] + Ri[0]*K[1][2]*Rj[0] + Ri[1]*K[0][2]*Rj[0]);
-
-						D[4][4] += 0.25*(Ri[1]*K[2][1]*Rj[2] + Ri[2]*K[1][1]*Rj[2] + Ri[1]*K[2][2]*Rj[1] + Ri[2]*K[1][2]*Rj[1]);
-						D[4][5] += 0.25*(Ri[1]*K[2][0]*Rj[2] + Ri[2]*K[1][0]*Rj[2] + Ri[1]*K[2][2]*Rj[0] + Ri[2]*K[1][2]*Rj[0]);
-
-						D[5][5] += 0.25*(Ri[0]*K[2][0]*Rj[2] + Ri[2]*K[0][0]*Rj[2] + Ri[0]*K[2][2]*Rj[0] + Ri[2]*K[0][2]*Rj[0]);
-
-						calculate_d2O(d, K, Ri, Rj);
-						calculate_e2O(e, K, Ri, Rj);
 					}
 				}
-				
 			}
 		}
 	}
 
 	// divide by volume
-	c = tens4ds(D)/(pt.m_J * m_V0);
-	d = d/(2.*pt.m_J * m_V0);
-	e = e/(4.*pt.m_J * m_V0);
+	C /= m_V0;
+	L /= m_V0;
+	H /= 2.0*m_V0;
+	J /= 2.0*m_V0;
 }

@@ -4,6 +4,15 @@
 // access operator
 inline double tens5d::operator () (int i, int j, int k, int l, int m) const
 {
-	// TODO: implement this
-	return 0.0;
+	int R = 3*(3*i + j) + k;
+	int C = 3*l + m;
+	return d[27*C + R];
+}
+
+// access operator
+inline double& tens5d::operator () (int i, int j, int k, int l, int m)
+{
+	int R = 3*(3*i + j) + k;
+	int C = 3*l + m;
+	return d[27*C + R];
 }
