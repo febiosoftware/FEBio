@@ -175,6 +175,7 @@ FEPrescribedBC::FEPrescribedBC(FEModel* pfem, const FEPrescribedBC& bc) : FEBoun
 	m_dof   = bc.m_dof;
 	m_br    = bc.m_br;
 	m_item  = bc.m_item;
+	CopyParameterListState(bc.GetParameterList());
 }
 
 //-----------------------------------------------------------------------------

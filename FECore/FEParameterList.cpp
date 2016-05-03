@@ -231,6 +231,13 @@ FEParameterList& FEParamContainer::GetParameterList()
 }
 
 //-----------------------------------------------------------------------------
+const FEParameterList& FEParamContainer::GetParameterList() const
+{
+	assert(m_pParam);
+	return *m_pParam;
+}
+
+//-----------------------------------------------------------------------------
 // Find a parameter from its name
 FEParam* FEParamContainer::GetParameter(const ParamString& s)
 {
@@ -323,4 +330,20 @@ bool FEParamContainer::Validate()
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEParamContainer::CopyParameterListState(const FEParameterList& pl)
+{
+	FEParameterList& pl_this = GetParameterList();
+	assert(pl_this.Parameters() == pl.Parameters());
+	int NP = pl.Parameters();
+	FEParamIteratorConst it_s = pl.first();
+	FEParamIterator it_d = pl_this.first();
+	for (int i=0; i<NP; ++i, ++it_s, ++it_d)
+	{
+		const FEParam& ps = *it_s;
+		FEParam& pd = *it_d;
+		if (pd.CopyState(ps) == false) { assert(false); }
+	}
 }

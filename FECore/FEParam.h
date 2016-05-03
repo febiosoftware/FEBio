@@ -82,6 +82,10 @@ public:
 	double GetScaleDouble() const { return m_scl; }
 	vec3d  GetScaleVec3d () const { return m_vscl; }
 
+	// Copy the state of one parameter to this parameter.
+	// This requires that the parameters are compatible (i.e. same type, etc.)
+	bool CopyState(const FEParam& p);
+
 public:
 	void Serialize(DumpStream& ar);
 

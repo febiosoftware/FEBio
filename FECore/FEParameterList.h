@@ -15,6 +15,7 @@ class FEParamContainer;
 
 //-----------------------------------------------------------------------------
 typedef list<FEParam>::iterator FEParamIterator;
+typedef list<FEParam>::const_iterator FEParamIteratorConst;
 
 //-----------------------------------------------------------------------------
 //! A list of material parameters
@@ -45,8 +46,11 @@ public:
 	//! returs the first parameter
 	FEParamIterator first() { return m_pl.begin(); }
 
+	//! returs the first parameter
+	FEParamIteratorConst first() const { return m_pl.begin(); }
+
 	//! number of parameters
-	int Parameters() { return m_pl.size(); }
+	int Parameters() const { return m_pl.size(); }
 
 	//! return the parameter container
 	FEParamContainer* GetContainer() { return m_pc; }
@@ -107,6 +111,7 @@ public:
 
 	//! return the material's parameter list
 	FEParameterList& GetParameterList();
+	const FEParameterList& GetParameterList() const;
 
 	//! find a parameter using it's name
 	virtual FEParam* GetParameter(const ParamString& s);
@@ -131,6 +136,11 @@ public:
 
 	//! If a parameter has attributes, this function will be called
 	virtual bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) { return false; }
+
+	//! This copies the state of a parameter list (i.e. assigned load curve IDs)
+	//! This function assumes that there is a one-to-one correspondence between
+	//! source and target parameter lists.
+	void CopyParameterListState(const FEParameterList& pl);
 
 protected:
 	//! This function will be overridden by each class that defines a parameter list

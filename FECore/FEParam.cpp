@@ -207,3 +207,18 @@ void FEParam::Serialize(DumpStream& ar)
 	// serialize the validator
 	if (m_pvalid) m_pvalid->Serialize(ar);
 }
+
+//-----------------------------------------------------------------------------
+//! This function copies the state of a parameter to this parameter.
+//! This assumes that the parameters are compatible (i.e. have the same type)
+//! This is used in FEParamContainer::CopyParameterListState()
+bool FEParam::CopyState(const FEParam& p)
+{
+	if (p.type() != type()) return false;
+
+	m_nlc = p.m_nlc;
+	m_scl = p.m_scl;
+	m_vscl = p.m_vscl;
+
+	return true;
+}
