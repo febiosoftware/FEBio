@@ -96,7 +96,7 @@ void FERVEModel2O::CenterRVE()
 	FENode& node = mesh.Node(0);
 
 	// setup bounding box
-	FEBoundingBox box(node.m_r0, node.m_r0);
+	FEBoundingBox box(node.m_r0);
 	const int NN = mesh.Nodes();
 	for (int i=1; i<NN; ++i)
 	{

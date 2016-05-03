@@ -184,6 +184,8 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
 	mat3d F = pt.m_F;
+	double J = pt.m_J;
+	mat3d Ft = F.transpose();
 	tens3drs G = mmpt2O.m_G;
 
 	// solve the RVE
@@ -194,6 +196,9 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp)
 
 	// calculate the averaged Cauchy stress
 	mmpt2O.m_rve.AveragedStress2O(mmpt2O.m_Pa, mmpt2O.m_Qa);
+
+	// calculate the Cauchy stress tensor
+	pt.m_s = (mmpt2O.m_Pa*Ft).sym()/J;
 	
 	// calculate the averaged PK1 stress
 //	AveragedStress2OPK1(mmpt2O.m_rve, mp, mmpt2O.m_PK1, mmpt2O.m_QK1);
@@ -202,7 +207,7 @@ void FEMicroMaterial2O::Stress2O(FEMaterialPoint &mp)
 //	mmpt2O.m_rve.AveragedStress2OPK2(mp, mmpt2O.m_S, mmpt2O.m_T);
 
 	// calculate the averaged stiffness
-//	mmpt2O.m_rve.AveragedStiffness(mp, mmpt2O.m_Ca, mmpt2O.m_Da, mmpt2O.m_Ea);
+	mmpt2O.m_rve.AveragedStiffness(mp, mmpt2O.m_Ca, mmpt2O.m_La, mmpt2O.m_Ha, mmpt2O.m_Ja);
 
 	// calculate the difference between the macro and micro energy for Hill-Mandel condition
 //	calc_energy_diff(mmpt2O.m_rve, mp);	

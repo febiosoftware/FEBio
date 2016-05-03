@@ -477,7 +477,7 @@ void FEElasticMultiscaleDomain2O::ElementInternalForce(FESolidElement& el, vecto
 	ElementInternalForce_PF(el, fe);
 
 	// contriubtion from higher-order stress
-	ElementInternalForce_QG(el, fe);
+//	ElementInternalForce_QG(el, fe);
 }
 
 //-----------------------------------------------------------------------------
@@ -747,6 +747,39 @@ void FEElasticMultiscaleDomain2O::UpdateElementStress(int iel, double dt)
 }
 
 //-----------------------------------------------------------------------------
+void FEElasticMultiscaleDomain2O::StiffnessMatrix(FESolver* psolver)
+{
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	FETimePoint tp = GetFEModel()->GetTime();
+	
+	#pragma omp parallel for shared (NE)
+	for (int iel=0; iel<NE; ++iel)
+	{
+		// element stiffness matrix
+		matrix ke;
+		vector<int> lm;
+		
+		FESolidElement& el = m_Elem[iel];
+
+		// create the element's stiffness matrix
+		int ndof = 3*el.Nodes();
+		ke.resize(ndof, ndof);
+		ke.zero();
+
+		// calculate element stiffness
+		ElementStiffness(tp, iel, ke);
+
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
+		// assemble element matrix in global stiffness matrix
+		#pragma omp critical
+		psolver->AssembleStiffness(el.m_node, lm, ke);
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 void FEElasticMultiscaleDomain2O::ElementStiffness(const FETimePoint& tp, int iel, matrix& ke)
 {
@@ -769,6 +802,8 @@ void FEElasticMultiscaleDomain2O::ElementStiffness(const FETimePoint& tp, int ie
 	vec3d X[FEElement::MAX_NODES];
 	FEMesh& mesh = *GetMesh();
 	mesh.GetInitialNodalCoordinates(el, X);
+
+	ke.zero();
 	
 	// calculate element stiffness matrix
 	const int nint = el.GaussPoints();
@@ -796,9 +831,6 @@ void FEElasticMultiscaleDomain2O::ElementStiffness(const FETimePoint& tp, int ie
 		// second derivative of shape functions
 		shape_gradient2(el, X, ni, G2);
 
-		// we only calculate the upper triangular part
-		// since ke is symmetric. The other part is
-		// determined below using this symmetry.
 		for (int a=0; a<neln; ++a)
 		{
 			double Ga[3] = {G[a].x, G[a].y, G[a].z};
@@ -814,17 +846,17 @@ void FEElasticMultiscaleDomain2O::ElementStiffness(const FETimePoint& tp, int ie
 				for (int j=0; j<3; ++j)
 					for (int l=0; l<3; ++l)
 					{
-						Kab[0][0] += (Ga[j]*C(0,j,0,l)*Gb[j]);
-						Kab[0][1] += (Ga[j]*C(0,j,1,l)*Gb[j]);
-						Kab[0][2] += (Ga[j]*C(0,j,2,l)*Gb[j]);
+						Kab[0][0] += (Ga[j]*C(0,j,0,l)*Gb[l]);
+						Kab[0][1] += (Ga[j]*C(0,j,1,l)*Gb[l]);
+						Kab[0][2] += (Ga[j]*C(0,j,2,l)*Gb[l]);
 
-						Kab[1][0] += (Ga[j]*C(1,j,0,l)*Gb[j]);
-						Kab[1][1] += (Ga[j]*C(1,j,1,l)*Gb[j]);
-						Kab[1][2] += (Ga[j]*C(1,j,2,l)*Gb[j]);
+						Kab[1][0] += (Ga[j]*C(1,j,0,l)*Gb[l]);
+						Kab[1][1] += (Ga[j]*C(1,j,1,l)*Gb[l]);
+						Kab[1][2] += (Ga[j]*C(1,j,2,l)*Gb[l]);
 
-						Kab[2][0] += (Ga[j]*C(2,j,0,l)*Gb[j]);
-						Kab[2][1] += (Ga[j]*C(2,j,1,l)*Gb[j]);
-						Kab[2][2] += (Ga[j]*C(2,j,2,l)*Gb[j]);
+						Kab[2][0] += (Ga[j]*C(2,j,0,l)*Gb[l]);
+						Kab[2][1] += (Ga[j]*C(2,j,1,l)*Gb[l]);
+						Kab[2][2] += (Ga[j]*C(2,j,2,l)*Gb[l]);
 
 					}
 

@@ -63,6 +63,10 @@ public:
 	//! overridden from FEElasticSolidDomain
 	void Update(const FETimePoint& tp);
 
+	//! calculates the global stiffness matrix for this domain
+	//! (overridden from FEElasticSolidDomain)
+	void StiffnessMatrix(FESolver* psolver);
+
 protected:
 	// Discrete-Galerkin contribution to residual
 	void InternalForcesDG1(FEGlobalVector& R);

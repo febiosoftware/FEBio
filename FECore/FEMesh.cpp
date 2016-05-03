@@ -1049,7 +1049,7 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 	}
 	// create the surface
 	FESurface* ps = new FESurface(this);
-	if (NF == 0) return 0;
+	if (NF == 0) return ps;
 	ps->create(NF);
 
 	// build the surface elements
