@@ -3,6 +3,7 @@
 #include "FEMicroMaterial2O.h"
 #include "FECore/mat3d.h"
 #include "FECore/tens6d.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // helper function for comparing two facets
@@ -65,13 +66,13 @@ vec2d map_facet_to_facet(int* na, int* nb, int nodes, double r, double s)
 	case 8:
 	case 9:
 		if (compare_quad(na, nb, 0, 1, 2, 3)) return vec2d(  r,   s);
-		if (compare_quad(na, nb, 3, 0, 1, 2)) return vec2d(  s, 1-r);
-		if (compare_quad(na, nb, 2, 3, 0, 1)) return vec2d(1-r, 1-s);
-		if (compare_quad(na, nb, 1, 2, 3, 0)) return vec2d(1-s,   r);
-		if (compare_quad(na, nb, 2, 1, 0, 3)) return vec2d(1-s, 1-r);
-		if (compare_quad(na, nb, 3, 2, 1, 0)) return vec2d(  r, 1-s);
+		if (compare_quad(na, nb, 3, 0, 1, 2)) return vec2d(  s,  -r);
+		if (compare_quad(na, nb, 2, 3, 0, 1)) return vec2d( -r,  -s);
+		if (compare_quad(na, nb, 1, 2, 3, 0)) return vec2d( -s,   r);
+		if (compare_quad(na, nb, 2, 1, 0, 3)) return vec2d( -s,  -r);
+		if (compare_quad(na, nb, 3, 2, 1, 0)) return vec2d(  r,  -s);
 		if (compare_quad(na, nb, 0, 3, 2, 1)) return vec2d(  s,   r);
-		if (compare_quad(na, nb, 1, 0, 3, 2)) return vec2d(1-r,   s);
+		if (compare_quad(na, nb, 1, 0, 3, 2)) return vec2d( -r,   s);
 		break;
 	}
 
@@ -275,7 +276,7 @@ bool FEElasticMultiscaleDomain2O::Initialize(FEModel& fem)
 		{
 			for (int k=0; k<2; ++k)
 			{
-				FEMaterialPoint& mp = *m_surf.GetData(i).m_pt[0];
+				FEMaterialPoint& mp = *m_surf.GetData(nnf).m_pt[k];
 				FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
 
 				// Initialize the material point RVE
@@ -445,6 +446,10 @@ void FEElasticMultiscaleDomain2O::InternalForcesDG2(FEGlobalVector& R)
 	FEMesh& mesh = *GetMesh();
 	FESurface& surf = *m_surf.GetSurface();
 
+	FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(GetMaterial());
+	assert(pmat);
+	double beta = pmat->m_beta;
+
 	mat3d Ji;
 	double Gr[FEElement::MAX_NODES];
 	double Gs[FEElement::MAX_NODES];
@@ -525,9 +530,9 @@ void FEElasticMultiscaleDomain2O::InternalForcesDG2(FEGlobalVector& R)
 
 					// the negative sign is because we need to subtract the internal forces
 					// from the residual
-					fe[3*j  ] -= f[0]*gw[n]*J*sgn;
-					fe[3*j+1] -= f[1]*gw[n]*J*sgn;
-					fe[3*j+2] -= f[2]*gw[n]*J*sgn;
+					fe[3*j  ] -= f[0]*gw[n]*J*sgn*beta;
+					fe[3*j+1] -= f[1]*gw[n]*J*sgn*beta;
+					fe[3*j+2] -= f[2]*gw[n]*J*sgn*beta;
 				}
 			}
 
@@ -551,7 +556,7 @@ void FEElasticMultiscaleDomain2O::ElementInternalForce(FESolidElement& el, vecto
 	ElementInternalForce_PF(el, fe);
 
 	// contriubtion from higher-order stress
-//	ElementInternalForce_QG(el, fe);
+	ElementInternalForce_QG(el, fe);
 }
 
 //-----------------------------------------------------------------------------
@@ -655,7 +660,13 @@ void FEElasticMultiscaleDomain2O::Update(const FETimePoint& tp)
 	FEElasticSolidDomain::Update(tp);
 
 	// update internal surfaces
+	Logfile::MODE nmode = felog.GetMode();
+	felog.SetMode(Logfile::NEVER);
+
 	UpdateInternalSurfaceStresses();
+
+	// reset the logfile mode
+	felog.SetMode(nmode);
 
 	// update the kinematic variables
 	UpdateKinematics();

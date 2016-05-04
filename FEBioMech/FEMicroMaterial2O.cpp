@@ -89,6 +89,7 @@ void FEMicroMaterialPoint2O::Serialize(DumpStream& ar)
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMicroMaterial2O, FEElasticMaterial)
 	ADD_PARAMETER(m_szrve    , FE_PARAM_STRING, "RVE"     );
+	ADD_PARAMETER(m_beta     , FE_PARAM_DOUBLE, "beta"    );
 	ADD_PARAMETER(m_szbc     , FE_PARAM_STRING, "bc_set"  );
 	ADD_PARAMETER(m_bperiodic, FE_PARAM_BOOL  , "periodic");
 END_PARAMETER_LIST();
@@ -100,6 +101,7 @@ FEMicroMaterial2O::FEMicroMaterial2O(FEModel* pfem) : FEElasticMaterial2O(pfem)
 	m_szrve[0] = 0;
 	m_szbc[0] = 0;
 	m_bperiodic = false;
+	m_beta = 10.0;
 
 	AddProperty(&m_probe, "probe", false);
 }

@@ -1044,7 +1044,7 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 		{
 			FEElement* pen = EEL.Neighbor(i, j);
 			if ((pen == 0) && boutside) ++NF;
-			if ((pen != 0) && binside ) ++NF;
+			if ((pen != 0) && (el.GetID() < pen->GetID()) && binside ) ++NF;
 		}
 	}
 	// create the surface
@@ -1064,7 +1064,7 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 		{
 			FEElement* pen = EEL.Neighbor(i, j);
 			if (((pen == 0) && boutside)||
-				((pen != 0) && binside ))
+				((pen != 0) && (el.GetID() < pen->GetID()) && binside ))
 			{
 				FESurfaceElement& se = ps->Element(NF++);
 				GetFace(el, j, face);
@@ -1075,9 +1075,13 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 				case FE_SHELL_QUAD:
 					se.SetType(FE_QUAD4G4); 
 					break;
+				case FE_HEX20G27:
                 case FE_SHELL_QUAD8:
                     se.SetType(FE_QUAD8G9);
                     break;
+				case FE_HEX27G27:
+					se.SetType(FE_QUAD9G9);
+					break;
 				case FE_TET4G1: 
 				case FE_SHELL_TRI:
 					se.SetType(FE_TRI3G1); 
@@ -1089,8 +1093,10 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
                     break;
 				}
 				
-				se.m_elem[0] = el.GetID();
-				if (pen) se.m_elem[1] = pen->GetID();
+				// TODO: 
+				// element IDs are global numbers. This is hack that may not always work!!
+				se.m_elem[0] = el.GetID() - 1;
+				if (pen) se.m_elem[1] = pen->GetID() - 1;
 				
 				int nn = se.Nodes();
 				for (int k=0; k<nn; ++k)

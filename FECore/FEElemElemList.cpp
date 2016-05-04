@@ -100,7 +100,7 @@ void FEElemElemList::Create(FEMesh* pmesh)
 							if (n1 == n0)
 							{
 								// check triangles
-								if ((n0 == 3) || (n0 == 6))
+								if ((n0 == 3) || (n0 == 6) || (n0 ==7))
 								{
 									if (((en0[0] == en1[0]) || (en0[0] == en1[1]) || (en0[0] == en1[2])) &&
 										((en0[1] == en1[0]) || (en0[1] == en1[1]) || (en0[1] == en1[2])) &&
@@ -112,7 +112,7 @@ void FEElemElemList::Create(FEMesh* pmesh)
 									}
 								}
 								// check quads
-								else if (n0 == 4)
+								else if ((n0 == 4) || (n0 == 8) || (n0 == 9))
 								{
 									if (((en0[0] == en1[0]) || (en0[0] == en1[1]) || (en0[0] == en1[2]) || (en0[0] == en1[3])) &&
 										((en0[1] == en1[0]) || (en0[1] == en1[1]) || (en0[1] == en1[2]) || (en0[1] == en1[3])) &&
