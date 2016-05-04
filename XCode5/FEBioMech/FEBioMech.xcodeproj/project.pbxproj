@@ -372,6 +372,8 @@
 		D5F65D9B1B1BD25F004C648D /* FERigidAngularDamper.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F65D991B1BD25F004C648D /* FERigidAngularDamper.h */; };
 		D5FA1BDE1B74CD9000EA5913 /* FERigidForce.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FA1BDC1B74CD9000EA5913 /* FERigidForce.cpp */; };
 		D5FA1BDF1B74CD9000EA5913 /* FERigidForce.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FA1BDD1B74CD9000EA5913 /* FERigidForce.h */; };
+		D5FC57F81CDABB4000C493A2 /* FERVEModel2O.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FC57F61CDABB4000C493A2 /* FERVEModel2O.cpp */; };
+		D5FC57F91CDABB4000C493A2 /* FERVEModel2O.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FC57F71CDABB4000C493A2 /* FERVEModel2O.h */; };
 		D5FF08F61BE4528E0064FF98 /* FEMortarSlidingContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FF08F21BE4528E0064FF98 /* FEMortarSlidingContact.cpp */; };
 		D5FF08F71BE4528E0064FF98 /* FEMortarSlidingContact.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FF08F31BE4528E0064FF98 /* FEMortarSlidingContact.h */; };
 		D5FF08F81BE4528E0064FF98 /* FEMortarTiedContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FF08F41BE4528E0064FF98 /* FEMortarTiedContact.cpp */; };
@@ -745,6 +747,8 @@
 		D5F65D991B1BD25F004C648D /* FERigidAngularDamper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidAngularDamper.h; sourceTree = "<group>"; };
 		D5FA1BDC1B74CD9000EA5913 /* FERigidForce.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidForce.cpp; sourceTree = "<group>"; };
 		D5FA1BDD1B74CD9000EA5913 /* FERigidForce.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidForce.h; sourceTree = "<group>"; };
+		D5FC57F61CDABB4000C493A2 /* FERVEModel2O.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERVEModel2O.cpp; sourceTree = "<group>"; };
+		D5FC57F71CDABB4000C493A2 /* FERVEModel2O.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERVEModel2O.h; sourceTree = "<group>"; };
 		D5FF08F21BE4528E0064FF98 /* FEMortarSlidingContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMortarSlidingContact.cpp; sourceTree = "<group>"; };
 		D5FF08F31BE4528E0064FF98 /* FEMortarSlidingContact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMortarSlidingContact.h; sourceTree = "<group>"; };
 		D5FF08F41BE4528E0064FF98 /* FEMortarTiedContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMortarTiedContact.cpp; sourceTree = "<group>"; };
@@ -1075,6 +1079,8 @@
 				D5E107361865DFAD00B23922 /* FERigidWallInterface.h */,
 				031FDFB71CC1942300048B41 /* FERVEModel.cpp */,
 				031FDFB81CC1942300048B41 /* FERVEModel.h */,
+				D5FC57F61CDABB4000C493A2 /* FERVEModel2O.cpp */,
+				D5FC57F71CDABB4000C493A2 /* FERVEModel2O.h */,
 				D5E107371865DFAD00B23922 /* FESlidingInterface.cpp */,
 				D5E107381865DFAD00B23922 /* FESlidingInterface.h */,
 				D5E107391865DFAD00B23922 /* FESlidingInterfaceBW.cpp */,
@@ -1188,6 +1194,7 @@
 				B465DA8A1B94A3A500EF4843 /* FESRIElasticSolidDomain.h in Headers */,
 				D5FF08F91BE4528E0064FF98 /* FEMortarTiedContact.h in Headers */,
 				D56DC22019532A83006C137D /* FERigidSphericalJoint.h in Headers */,
+				D5FC57F91CDABB4000C493A2 /* FERVEModel2O.h in Headers */,
 				D5E1081E1865DFAD00B23922 /* FESlidingInterface.h in Headers */,
 				D5E107B21865DFAD00B23922 /* FEElasticMixture.h in Headers */,
 				D5E107E61865DFAD00B23922 /* FELinearElastic.h in Headers */,
@@ -1471,6 +1478,7 @@
 				D5EDA6931AFAC7AE00C48076 /* FEFiberPowLinear.cpp in Sources */,
 				D595BB451899C7D90028A7F3 /* FESPRProjection.cpp in Sources */,
 				D51BB4051991819900638A8B /* FEElasticFiberMaterialUC.cpp in Sources */,
+				D5FC57F81CDABB4000C493A2 /* FERVEModel2O.cpp in Sources */,
 				D5C6D41B19CCAAD400E48AAF /* FEDamageMaterialUC.cpp in Sources */,
 				D5E108451865DFAD00B23922 /* FEUDGHexDomain.cpp in Sources */,
 				D5E108271865DFAD00B23922 /* FESolidSolver.cpp in Sources */,
