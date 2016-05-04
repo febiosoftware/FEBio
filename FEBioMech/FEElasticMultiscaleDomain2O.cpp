@@ -10,12 +10,20 @@ bool compare_facets(int* na, int* nb, int nodes)
 {
 	switch (nodes)
 	{
-	case 3:
-	case 6:
-	case 7:
+	case 3: // 3-node triangle
+	case 6: // 6-node triangle
+	case 7: // 7-node triangle
 		if ((na[0]!=nb[0])&&(na[0]!=nb[1])&&(na[0]!=nb[2])) return false;
 		if ((na[1]!=nb[0])&&(na[1]!=nb[1])&&(na[1]!=nb[2])) return false;
 		if ((na[2]!=nb[0])&&(na[2]!=nb[1])&&(na[2]!=nb[2])) return false;
+		break;
+	case 4: // 4-node quad
+	case 8: // 8-node quad
+	case 9: // 9-node quad
+		if ((na[0]!=nb[0])&&(na[0]!=nb[1])&&(na[0]!=nb[2])&&(na[0]!=nb[3])) return false;
+		if ((na[1]!=nb[0])&&(na[1]!=nb[1])&&(na[1]!=nb[2])&&(na[1]!=nb[3])) return false;
+		if ((na[2]!=nb[0])&&(na[2]!=nb[1])&&(na[2]!=nb[2])&&(na[2]!=nb[3])) return false;
+		if ((na[3]!=nb[0])&&(na[3]!=nb[1])&&(na[3]!=nb[2])&&(na[3]!=nb[3])) return false;
 		break;
 	default:
 		return false;
@@ -24,20 +32,46 @@ bool compare_facets(int* na, int* nb, int nodes)
 }
 
 //-----------------------------------------------------------------------------
+inline bool compare_tri(int* na, int* nb, int i, int j, int k)
+{
+	return ((na[0] == nb[i])&&(na[1] == nb[j])&&(na[2] == nb[k]));
+}
+
+//-----------------------------------------------------------------------------
+inline bool compare_quad(int* na, int* nb, int i, int j, int k, int l)
+{
+	return ((na[0] == nb[i])&&(na[1] == nb[j])&&(na[2] == nb[k])&&(na[3] == nb[l]));
+}
+
+//-----------------------------------------------------------------------------
 // helper function for mapping surface facet coordinates to element facet coordinates
 vec2d map_facet_to_facet(int* na, int* nb, int nodes, double r, double s)
 {
 	switch (nodes)
 	{
+	// triangles
 	case 3:
 	case 6:
 	case 7:
-		if ((na[0] == nb[0])&&(na[1] == nb[1])&&(na[2] == nb[2])) return vec2d(  r  ,     s);
-		if ((na[0] == nb[2])&&(na[1] == nb[0])&&(na[2] == nb[1])) return vec2d(    s, 1-r-s);
-		if ((na[0] == nb[1])&&(na[1] == nb[2])&&(na[2] == nb[0])) return vec2d(1-r-s,   r  );
-		if ((na[0] == nb[0])&&(na[1] == nb[2])&&(na[2] == nb[1])) return vec2d(    s,   r  );
-		if ((na[0] == nb[2])&&(na[1] == nb[1])&&(na[2] == nb[0])) return vec2d(  r  , 1-r-s);
-		if ((na[0] == nb[1])&&(na[1] == nb[0])&&(na[2] == nb[2])) return vec2d(1-r-s,     s);
+		if (compare_tri(na, nb, 0, 1, 2)) return vec2d(  r  ,     s);
+		if (compare_tri(na, nb, 2, 0, 1)) return vec2d(    s, 1-r-s);
+		if (compare_tri(na, nb, 1, 2, 0)) return vec2d(1-r-s,   r  );
+		if (compare_tri(na, nb, 0, 2, 1)) return vec2d(    s,   r  );
+		if (compare_tri(na, nb, 2, 1, 0)) return vec2d(  r  , 1-r-s);
+		if (compare_tri(na, nb, 1, 0, 2)) return vec2d(1-r-s,     s);
+		break;
+	// quads
+	case 4:
+	case 8:
+	case 9:
+		if (compare_quad(na, nb, 0, 1, 2, 3)) return vec2d(  r,   s);
+		if (compare_quad(na, nb, 3, 0, 1, 2)) return vec2d(  s, 1-r);
+		if (compare_quad(na, nb, 2, 3, 0, 1)) return vec2d(1-r, 1-s);
+		if (compare_quad(na, nb, 1, 2, 3, 0)) return vec2d(1-s,   r);
+		if (compare_quad(na, nb, 2, 1, 0, 3)) return vec2d(1-s, 1-r);
+		if (compare_quad(na, nb, 3, 2, 1, 0)) return vec2d(  r, 1-s);
+		if (compare_quad(na, nb, 0, 3, 2, 1)) return vec2d(  s,   r);
+		if (compare_quad(na, nb, 1, 0, 3, 2)) return vec2d(1-r,   s);
 		break;
 	}
 
@@ -45,6 +79,45 @@ vec2d map_facet_to_facet(int* na, int* nb, int nodes, double r, double s)
 	assert(false);
 	return vec2d(0,0);
 }
+
+//-----------------------------------------------------------------------------
+// Notice that this depends on how the facet nodes are numbered (see FEMesh::GetFace) 
+vec3d map_facet_to_volume_coordinates_tet(int nface, const vec2d& q)
+{
+	double h1 = q.x(), h2 = q.y(), h3 = 1.0 - h1 - h2;
+	double g1, g2, g3;
+	switch (nface)
+	{
+	case 0: g1 = h1; g2 = 0.; g3 = h2; break;
+	case 1: g1 = h3; g2 = h1; g3 = h2; break;
+	case 2: g1 = 0.; g2 = h3; g3 = h2; break;
+	case 3: g1 = h1; g2 = h3; g3 = 0.; break;
+	default:
+		assert(false);
+	}
+	return vec3d(g1, g2, g3);
+}
+
+//-----------------------------------------------------------------------------
+// Notice that this depends on how the facet nodes are numbered (see FEMesh::GetFace) 
+vec3d map_facet_to_volume_coordinates_hex(int nface, const vec2d& q)
+{
+	double h1 = q.x(), h2 = q.y();
+	double g1, g2, g3;
+	switch (nface)
+	{
+	case 0: g1 =  h1; g2 = -1.; g3 =  h2; break;
+	case 1: g1 =  1.; g2 =  h1; g3 =  h2; break;
+	case 2: g1 = -h1; g2 =  1.; g3 =  h2; break;
+	case 3: g1 = -1.; g2 = -h1; g3 =  h2; break;
+	case 4: g1 =  h2; g2 =  h1; g3 = -1.; break;
+	case 5: g1 =  h1; g2 =  h2; g3 =  1.; break;
+	default:
+		assert(false);
+	}
+	return vec3d(g1, g2, g3);
+}
+
 
 //-----------------------------------------------------------------------------
 // helper function that maps natural coordinates from facets to elements
@@ -60,20 +133,21 @@ vec3d map_facet_to_solid(FEMesh& mesh, FESurfaceElement& face, FESolidElement& e
 			// map the facet coordinates to the element's facet coordinates
 			// (faces can be rotated or inverted w.r.t. the element's face)
 			vec2d b = map_facet_to_facet(&face.m_node[0], fn, face.Nodes(), r, s);
-			double h1 = b.x(), h2 = b.y();
 
 			// convert facet coordinates to volume coordinates
-			// TODO: this is hard coded for tets! Need to generalize for hexes
-			double g1, g2, g3;
-			switch (i)
+			switch (el.Nodes())
 			{
-			case 0: g1 = h1; g2 = h2; g3 = 0.; break;
-			case 1: g1 = h1; g2 = 0.; g3 = h2; break;
-			case 2: g1 = 0.; g2 = h1; g3 = h2; break;
-			case 3: g1 = 1.0-h1-h2; g2 = h1; g3 = h2; break;
+			// tets
+			case 4:
+			case 10:
+			case 15: return map_facet_to_volume_coordinates_tet(i, b); break;
+			// hexes
+			case 8:
+			case 20:
+			case 27: return map_facet_to_volume_coordinates_hex(i, b); break;
 			}
 
-			return vec3d(g1, g2, g3);
+			assert(false);
 		}
 	}
 

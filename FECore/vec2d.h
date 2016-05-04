@@ -14,6 +14,9 @@ public:
 	double& x() { return r[0]; }
 	double& y() { return r[1]; }
 
+	double x() const { return r[0]; }
+	double y() const { return r[1]; }
+
 public: // arithmetic operators
 
 	vec2d operator + (const vec2d& v) { return vec2d(r[0]+v.r[0], r[1]+v.r[1]); }
