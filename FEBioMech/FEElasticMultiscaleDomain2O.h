@@ -39,9 +39,12 @@ class FEElasticMultiscaleDomain2O : public FEElasticSolidDomain
 
 		FESurface* GetSurface() { return m_ps; }
 
+		double GetElementSize() const { return m_h; }
+
 	private:
 		FESurface*		m_ps;
 		vector<Data>	m_data;
+		double			m_h;	//!< element size
 	};
 
 public:
@@ -90,7 +93,8 @@ public:
 
 	//! contributions from discontinuous Galerkin formulation
 	void StiffnessMatrixDG(FESolver* psolver);
-	void ElementStiffnessMatrixDG(FESurfaceElement& el, FEInternalSurface2O::Data* pdata, matrix& ke);
+	void ElementStiffnessMatrixDG1(FESurfaceElement& el, FEInternalSurface2O::Data* pdata, matrix& ke);
+	void ElementStiffnessMatrixDG3(FESurfaceElement& el, FEInternalSurface2O::Data* pdata, matrix& ke);
 
 	void defhess(FESolidElement &el, int n, tens3drs &G);
 	void defhess(FESolidElement &el, double r, double s, double t, tens3drs &G);
@@ -103,6 +107,7 @@ protected:
 	// Calculates second derivative of shape function N[node]
 	void shape_gradient2(const FESolidElement& el, vec3d* X, int n, mat3d* H);
 	void shape_gradient2(const FESolidElement& el, vec3d* X, double r, double s, double t, int node, mat3d& H);
+	void shape_gradient2(const FESolidElement& el, vec3d* X, double r, double s, double t, mat3d* H);
 
 private:
 	FEInternalSurface2O	m_surf;

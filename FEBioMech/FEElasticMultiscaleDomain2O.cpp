@@ -160,6 +160,7 @@ vec3d map_facet_to_solid(FEMesh& mesh, FESurfaceElement& face, FESolidElement& e
 //-----------------------------------------------------------------------------
 FEElasticMultiscaleDomain2O::FEInternalSurface2O::FEInternalSurface2O()
 {
+	m_h = 1.0;
 }
 
 bool FEElasticMultiscaleDomain2O::FEInternalSurface2O::Initialize(FEElasticMultiscaleDomain2O* dom)
@@ -210,6 +211,19 @@ bool FEElasticMultiscaleDomain2O::FEInternalSurface2O::Initialize(FEElasticMulti
 				m_data[nnf].ksi[k] = map_facet_to_solid(mesh, face, ek, h1, h2);
 			}
 		}
+	}
+
+	// calculate the element size
+	m_h = 0.0;
+	for (int i=0; i<NF; ++i)
+	{
+		FESurfaceElement& el = m_ps->Element(i);
+		int neln = el.Nodes();
+		FEBoundingBox box(mesh.Node(el.m_node[0]).m_r0);
+		for (int j=1; j<neln; ++j) box.add(mesh.Node(el.m_node[j]).m_r0);
+
+		double R = 0.5*box.radius();
+		if (R > m_h) m_h = R;
 	}
 
 	return true;
@@ -328,8 +342,8 @@ void FEElasticMultiscaleDomain2O::BuildMatrixProfile(FEGlobalMatrix& M)
 		FESurfaceElement& el = m_surf.Element(n);
 
 		// get the solid elements from this interface element
-		int ela_id = el.m_elem[0]; assert(ela_id >= 0);
-		int elb_id = el.m_elem[1]; assert(elb_id >= 0);
+		int ela_id = el.m_elem[1]; assert(ela_id >= 0);
+		int elb_id = el.m_elem[0]; assert(elb_id >= 0);
 		FESolidElement& ela = Element(ela_id);
 		FESolidElement& elb = Element(elb_id);
 		int nelna = ela.Nodes();
@@ -422,7 +436,7 @@ void FEElasticMultiscaleDomain2O::InternalForcesDG1(FEGlobalVector& R)
 			int neln = el.Nodes();
 
 			// sign
-			double sgn = (m==0 ? 1.0 : -1.0);
+			double sgn = (m==0 ? -1.0 : 1.0);
 
 			// allocate force vector
 			int ndof = neln*3;
@@ -498,6 +512,7 @@ void FEElasticMultiscaleDomain2O::InternalForcesDG2(FEGlobalVector& R)
 	FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(GetMaterial());
 	assert(pmat);
 	double beta = pmat->m_beta;
+	double h = m_surf.GetElementSize();
 
 	mat3d Ji;
 	double Gr[FEElement::MAX_NODES];
@@ -525,7 +540,7 @@ void FEElasticMultiscaleDomain2O::InternalForcesDG2(FEGlobalVector& R)
 			int neln = el.Nodes();
 
 			// sign
-			double sgn = (m==0 ? 1.0 : -1.0);
+			double sgn = (m==0 ? -1.0 : 1.0);
 
 			// allocate force vector
 			int ndof = neln*3;
@@ -579,9 +594,9 @@ void FEElasticMultiscaleDomain2O::InternalForcesDG2(FEGlobalVector& R)
 
 					// the negative sign is because we need to subtract the internal forces
 					// from the residual
-					fe[3*j  ] -= f[0]*gw[n]*J*sgn*beta;
-					fe[3*j+1] -= f[1]*gw[n]*J*sgn*beta;
-					fe[3*j+2] -= f[2]*gw[n]*J*sgn*beta;
+					fe[3*j  ] -= f[0]*gw[n]*J*sgn*beta/h;
+					fe[3*j+1] -= f[1]*gw[n]*J*sgn*beta/h;
+					fe[3*j+2] -= f[2]*gw[n]*J*sgn*beta/h;
 				}
 			}
 
@@ -773,7 +788,7 @@ void FEElasticMultiscaleDomain2O::UpdateKinematics()
 				for (int j=0; j<neln; ++j) Gu += ut[j] & G[j];
 
 				if (m == 0) data.DgradU = Gu;
-				else data.DgradU -= Gu;
+				else data.DgradU = Gu - data.DgradU;
 			}
 		}
 
@@ -823,7 +838,7 @@ void FEElasticMultiscaleDomain2O::UpdateInternalSurfaceStresses()
 				pmat->Stress2O(mp);
 
 				data.Qavg += pt2O.m_Qa*0.5;
-				data.J0avg += pt2O.m_Ja;		// TODO: I only need to evaluate this on the first iteration
+				data.J0avg += pt2O.m_Ja*0.5;		// TODO: I only need to evaluate this on the first iteration
 			}
 		}
 	}
@@ -933,20 +948,25 @@ void FEElasticMultiscaleDomain2O::StiffnessMatrixDG(FESolver* psolver)
 		// get the next surface element
 		FESurfaceElement& el = m_surf.Element(n);
 
-		// get the element stiffness matrix
-		ElementStiffnessMatrixDG(el, &m_surf.GetData(nd), ke);
-
 		// get the solid elements from this interface element
-		int ela_id = el.m_elem[0]; assert(ela_id >= 0);
-		int elb_id = el.m_elem[1]; assert(elb_id >= 0);
+		int ela_id = el.m_elem[1]; assert(ela_id >= 0);
+		int elb_id = el.m_elem[0]; assert(elb_id >= 0);
 		FESolidElement& ela = Element(ela_id);
 		FESolidElement& elb = Element(elb_id);
 		int nelna = ela.Nodes();
 		int nelnb = elb.Nodes();
 
+		// init element stiffness
+		int ndof = 3*(nelna + nelnb);
+		ke.resize(ndof, ndof);
+		ke.zero();
+
+		// get the element stiffness matrix
+//		ElementStiffnessMatrixDG1(el, &m_surf.GetData(nd), ke);
+		ElementStiffnessMatrixDG3(el, &m_surf.GetData(nd), ke);
+
 		// setup the LM vector
 		// TODO: this assumes that the X,Y,Z degrees of freedom are 0,1,2 respectively
-		int ndof = 3*(nelna + nelnb);
 		lm.resize(ndof);
 		for (int i=0; i<nelna; ++i)
 		{
@@ -977,18 +997,14 @@ void FEElasticMultiscaleDomain2O::StiffnessMatrixDG(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG(FESurfaceElement& face, FEInternalSurface2O::Data* pdata, matrix& ke)
+void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG1(FESurfaceElement& face, FEInternalSurface2O::Data* pdata, matrix& ke)
 {
-	// get the beta parameter
-	FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(GetMaterial());
-	double beta = pmat->m_beta;
-
-	// get the surface
 	FESurface& surf = *m_surf.GetSurface();
+	FEMesh& mesh = *GetMesh();
 
 	// get the solid elements of this interface element
-	FESolidElement& ela = Element(face.m_elem[0]);
-	FESolidElement& elb = Element(face.m_elem[1]);
+	FESolidElement& ela = Element(face.m_elem[1]);
+	FESolidElement& elb = Element(face.m_elem[0]);
 
 	// get the number nodes of each element
 	int nelna = ela.Nodes();
@@ -996,8 +1012,235 @@ void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG(FESurfaceElement& fac
 
 	// initialize the element stiffness matrix
 	int ndof = 3*(nelna + nelnb);
-	ke.resize(ndof, ndof);
-	ke.zero();
+
+	// nodal coordinates
+	vec3d Xa[FEElement::MAX_NODES];
+	vec3d Xb[FEElement::MAX_NODES];
+	for (int i=0; i<nelna; ++i) Xa[i] = mesh.Node(ela.m_node[i]).m_r0;
+	for (int i=0; i<nelnb; ++i) Xb[i] = mesh.Node(elb.m_node[i]).m_r0;
+
+	// shape function derivatives
+	vec3d Ga[FEElement::MAX_NODES];
+	vec3d Gb[FEElement::MAX_NODES];
+	mat3d Ha[FEElement::MAX_NODES];
+	mat3d Hb[FEElement::MAX_NODES];
+
+	// loop over all integration points
+	int nint = face.GaussPoints();
+	double* gw = face.GaussWeights();
+	for (int ng=0; ng<nint; ++ng)
+	{
+		// get the integration point data
+		FEInternalSurface2O::Data& data = pdata[ng];
+
+		// Jacobian and normal at this integration point
+		vec3d nu;
+		double J0 = surf.jac0(face, ng, nu);
+		double Nu[3] = {nu.x, nu.y, nu.z};
+
+		// shape function gradients at this integration point
+		shape_gradient(ela, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, Ga);
+		shape_gradient(elb, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, Gb);
+
+		shape_gradient2(ela, Xa, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, Ha);
+		shape_gradient2(elb, Xb, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, Hb);
+
+		// The a-a term
+		for (int a=0; a<nelna; ++a)
+			for (int b=0; b<nelna; ++b)
+			{
+				vec3d& GA = Ga[a];
+				vec3d& GB = Ga[b];
+				mat3d& G2B = Ha[b];
+
+				FEMicroMaterialPoint2O& pt = *data.m_pt[1]->ExtractData<FEMicroMaterialPoint2O>();
+				tens5d& H = pt.m_Ha;
+				tens6d& J = pt.m_Ja;
+
+				mat3d kab;
+				for (int i=0; i<3; ++i)
+					for (int k=0; k<3; ++k)
+					{
+						double kik = 0.0;
+						for (int l=0; l<3; ++l)
+						{
+							kik += GA.x*H(i,0,l,k,0)*GB.x + GA.x*H(i,0,l,k,1)*GB.y + GA.x*H(i,0,l,k,2)*GB.z;
+							kik += GA.y*H(i,1,l,k,0)*GB.x + GA.y*H(i,1,l,k,1)*GB.y + GA.y*H(i,1,l,k,2)*GB.z;
+							kik += GA.z*H(i,2,l,k,0)*GB.x + GA.z*H(i,2,l,k,1)*GB.y + GA.z*H(i,2,l,k,2)*GB.z;
+						}
+						kab[i][k] = kik*J0*gw[ng]*0.5;
+					}
+
+				for (int i=0; i<3; ++i)
+					for (int k=0; k<3; ++k)
+					{
+						double kik = 0.0;
+						for (int l=0; l<3; ++l)
+							for (int m=0; m<3; ++m)
+								for (int n=0; n<3; ++n)
+								{
+									kik += GA.x*J(i,0,k,l,m,n)*G2B[l][m] + GA.y*J(i,1,k,l,m,n)*G2B[l][m] + GA.z*J(i,2,k,l,m,n)*G2B[l][m];
+								}
+						kab[i][k] += kik*J0*gw[ng]*0.5;
+					}
+
+				// add it to the element matrix
+				ke.add(3*a, 3*b, kab);
+			}
+
+		// The a-b term
+		for (int a=0; a<nelna; ++a)
+			for (int b=0; b<nelnb; ++b)
+			{
+				vec3d& GA = Ga[a];
+				vec3d& GB = Gb[b];
+				mat3d& G2B = Hb[b];
+
+				FEMicroMaterialPoint2O& pt = *data.m_pt[0]->ExtractData<FEMicroMaterialPoint2O>();
+				tens5d& H = pt.m_Ha;
+				tens6d& J = pt.m_Ja;
+
+				mat3d kab;
+				for (int i=0; i<3; ++i)
+					for (int k=0; k<3; ++k)
+					{
+						double kik = 0.0;
+						for (int l=0; l<3; ++l)
+						{
+							kik += GA.x*H(i,0,l,k,0)*GB.x + GA.x*H(i,0,l,k,1)*GB.y + GA.x*H(i,0,l,k,2)*GB.z;
+							kik += GA.y*H(i,1,l,k,0)*GB.x + GA.y*H(i,1,l,k,1)*GB.y + GA.y*H(i,1,l,k,2)*GB.z;
+							kik += GA.z*H(i,2,l,k,0)*GB.x + GA.z*H(i,2,l,k,1)*GB.y + GA.z*H(i,2,l,k,2)*GB.z;
+						}
+						kab[i][k] = kik*J0*gw[ng]*0.5;
+					}
+
+				for (int i=0; i<3; ++i)
+					for (int k=0; k<3; ++k)
+					{
+						double kik = 0.0;
+						for (int l=0; l<3; ++l)
+							for (int m=0; m<3; ++m)
+								for (int n=0; n<3; ++n)
+								{
+									kik += GA.x*J(i,0,k,l,m,n)*G2B[l][m] + GA.y*J(i,1,k,l,m,n)*G2B[l][m] + GA.z*J(i,2,k,l,m,n)*G2B[l][m];
+								}
+						kab[i][k] += kik*J0*gw[ng]*0.5;
+					}
+
+				// add it to the element matrix
+				ke.add(3*a, 3*b, kab);
+			}
+
+		// The b-a term
+		for (int a=0; a<nelnb; ++a)
+			for (int b=0; b<nelna; ++b)
+			{
+				vec3d& GA = Gb[a];
+				vec3d& GB = Ga[b];
+				mat3d& G2B = Ha[b];
+
+				FEMicroMaterialPoint2O& pt = *data.m_pt[1]->ExtractData<FEMicroMaterialPoint2O>();
+				tens5d& H = pt.m_Ha;
+				tens6d& J = pt.m_Ja;
+
+				mat3d kab;
+				for (int i=0; i<3; ++i)
+					for (int k=0; k<3; ++k)
+					{
+						double kik = 0.0;
+						for (int l=0; l<3; ++l)
+						{
+							kik += GA.x*H(i,0,l,k,0)*GB.x + GA.x*H(i,0,l,k,1)*GB.y + GA.x*H(i,0,l,k,2)*GB.z;
+							kik += GA.y*H(i,1,l,k,0)*GB.x + GA.y*H(i,1,l,k,1)*GB.y + GA.y*H(i,1,l,k,2)*GB.z;
+							kik += GA.z*H(i,2,l,k,0)*GB.x + GA.z*H(i,2,l,k,1)*GB.y + GA.z*H(i,2,l,k,2)*GB.z;
+						}
+						kab[i][k] = kik*J0*gw[ng]*0.5;
+					}
+
+				for (int i=0; i<3; ++i)
+					for (int k=0; k<3; ++k)
+					{
+						double kik = 0.0;
+						for (int l=0; l<3; ++l)
+							for (int m=0; m<3; ++m)
+								for (int n=0; n<3; ++n)
+								{
+									kik += GA.x*J(i,0,k,l,m,n)*G2B[l][m] + GA.y*J(i,1,k,l,m,n)*G2B[l][m] + GA.z*J(i,2,k,l,m,n)*G2B[l][m];
+								}
+						kab[i][k] += kik*J0*gw[ng]*0.5;
+					}
+
+				// add it to the element matrix
+				ke.sub(3*a, 3*b, kab);
+			}
+
+		// The b-b term
+		for (int a=0; a<nelnb; ++a)
+			for (int b=0; b<nelnb; ++b)
+			{
+				vec3d& GA = Gb[a];
+				vec3d& GB = Gb[b];
+				mat3d& G2B = Hb[b];
+
+				FEMicroMaterialPoint2O& pt = *data.m_pt[0]->ExtractData<FEMicroMaterialPoint2O>();
+				tens5d& H = pt.m_Ha;
+				tens6d& J = pt.m_Ja;
+
+				mat3d kab;
+				for (int i=0; i<3; ++i)
+					for (int k=0; k<3; ++k)
+					{
+						double kik = 0.0;
+						for (int l=0; l<3; ++l)
+						{
+							kik += GA.x*H(i,0,l,k,0)*GB.x + GA.x*H(i,0,l,k,1)*GB.y + GA.x*H(i,0,l,k,2)*GB.z;
+							kik += GA.y*H(i,1,l,k,0)*GB.x + GA.y*H(i,1,l,k,1)*GB.y + GA.y*H(i,1,l,k,2)*GB.z;
+							kik += GA.z*H(i,2,l,k,0)*GB.x + GA.z*H(i,2,l,k,1)*GB.y + GA.z*H(i,2,l,k,2)*GB.z;
+						}
+						kab[i][k] = kik*J0*gw[ng]*0.5;
+					}
+
+				for (int i=0; i<3; ++i)
+					for (int k=0; k<3; ++k)
+					{
+						double kik = 0.0;
+						for (int l=0; l<3; ++l)
+							for (int m=0; m<3; ++m)
+								for (int n=0; n<3; ++n)
+								{
+									kik += GA.x*J(i,0,k,l,m,n)*G2B[l][m] + GA.y*J(i,1,k,l,m,n)*G2B[l][m] + GA.z*J(i,2,k,l,m,n)*G2B[l][m];
+								}
+						kab[i][k] += kik*J0*gw[ng]*0.5;
+					}
+
+				// add it to the element matrix
+				ke.sub(3*a, 3*b, kab);
+			}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG3(FESurfaceElement& face, FEInternalSurface2O::Data* pdata, matrix& ke)
+{
+	// get the beta parameter
+	FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(GetMaterial());
+	double beta = pmat->m_beta;
+
+	double h = m_surf.GetElementSize();
+
+	// get the surface
+	FESurface& surf = *m_surf.GetSurface();
+
+	// get the solid elements of this interface element
+	FESolidElement& ela = Element(face.m_elem[1]);
+	FESolidElement& elb = Element(face.m_elem[0]);
+
+	// get the number nodes of each element
+	int nelna = ela.Nodes();
+	int nelnb = elb.Nodes();
+
+	// initialize the element stiffness matrix
+	int ndof = 3*(nelna + nelnb);
 
 	// shape function derivatives
 	vec3d Ga[FEElement::MAX_NODES];
@@ -1017,8 +1260,8 @@ void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG(FESurfaceElement& fac
 		double Nu[3] = {nu.x, nu.y, nu.z};
 
 		// shape function gradients at this integration point
-		shape_gradient(ela, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, Ga);
-		shape_gradient(elb, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, Gb);
+		shape_gradient(ela, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, Ga);
+		shape_gradient(elb, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, Gb);
 
 		// average stiffness 
 		tens6d& Javg = data.J0avg;
@@ -1041,7 +1284,7 @@ void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG(FESurfaceElement& fac
 								kip += Ga[a].z*Ga[b].x*Javg(i,2,k,p,0,r)*NN + Ga[a].z*Ga[b].y*Javg(i,2,k,p,1,r)*NN + Ga[a].z*Ga[b].z*Javg(i,2,k,p,2,r)*NN;
 							}
 
-						kab[i][p] = kip;
+						kab[i][p] = kip*(beta/h)*J0*gw[n];
 					}
 
 				ke.add(3*a, 3*b, kab);
@@ -1065,7 +1308,7 @@ void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG(FESurfaceElement& fac
 								kip += Ga[a].z*Gb[b].x*Javg(i,2,k,p,0,r)*NN + Ga[a].z*Gb[b].y*Javg(i,2,k,p,1,r)*NN + Ga[a].z*Gb[b].z*Javg(i,2,k,p,2,r)*NN;
 							}
 
-						kab[i][p] = kip;
+						kab[i][p] = kip*(beta/h)*J0*gw[n];
 					}
 
 				ke.sub(3*a, 3*(nelna + b), kab);
@@ -1089,7 +1332,7 @@ void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG(FESurfaceElement& fac
 								kip += Gb[a].z*Ga[b].x*Javg(i,2,k,p,0,r)*NN + Gb[a].z*Ga[b].y*Javg(i,2,k,p,1,r)*NN + Gb[a].z*Ga[b].z*Javg(i,2,k,p,2,r)*NN;
 							}
 
-						kab[i][p] = kip;
+						kab[i][p] = kip*(beta/h)*J0*gw[n];
 					}
 
 				ke.sub(3*(a+nelna), 3*b, kab);
@@ -1113,17 +1356,10 @@ void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG(FESurfaceElement& fac
 								kip += Gb[a].z*Gb[b].x*Javg(i,2,k,p,0,r)*NN + Gb[a].z*Gb[b].y*Javg(i,2,k,p,1,r)*NN + Gb[a].z*Gb[b].z*Javg(i,2,k,p,2,r)*NN;
 							}
 
-						kab[i][p] = kip;
+						kab[i][p] = kip*(beta/h)*J0*gw[n];
 					}
 
 				ke.add(3*(nelna + a), 3*(nelna + b), kab);
-			}
-
-		// multiply with all the weights
-		for (int i=0; i<ndof; ++i)
-			for (int j=0; j<ndof; ++j)
-			{
-				ke[i][j] *= beta*J0*gw[n];
 			}
 	}
 }
@@ -1490,6 +1726,16 @@ void FEElasticMultiscaleDomain2O::shape_gradient2(const FESolidElement& el, vec3
 			{
 				Ha[i][j] = D[i][0]*Ji[0][j] + D[i][1]*Ji[1][j] + D[i][2]*Ji[2][j];
 			}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticMultiscaleDomain2O::shape_gradient2(const FESolidElement& el, vec3d* X, double r, double s, double t, mat3d* H)
+{
+	int neln = el.Nodes();
+	for (int i=0; i<neln; ++i)
+	{
+		shape_gradient2(el, X, r, s, t, i, H[i]);
 	}
 }
 
