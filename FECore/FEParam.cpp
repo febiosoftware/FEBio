@@ -3,6 +3,7 @@
 #include "FEParamValidator.h"
 #include "DumpStream.h"
 #include "FEFunction1D.h"
+#include "FESurfaceMap.h"
 
 //-----------------------------------------------------------------------------
 FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname)
@@ -113,13 +114,14 @@ void FEParam::Serialize(DumpStream& ar)
 		{
 			switch (m_itype)
 			{
-			case FE_PARAM_INT   : ar << value<int   >(); break;
-			case FE_PARAM_BOOL  : ar << value<bool  >(); break;
-			case FE_PARAM_DOUBLE: ar << value<double>(); break;
-			case FE_PARAM_VEC3D : ar << value<vec3d >(); break;
-			case FE_PARAM_MAT3D : ar << value<mat3d >(); break;
-			case FE_PARAM_MAT3DS: ar << value<mat3ds>(); break;
-			case FE_PARAM_STRING: ar << (const char*) data_ptr(); break;
+			case FE_PARAM_INT        : ar << value<int         >()   ; break;
+			case FE_PARAM_BOOL       : ar << value<bool        >()   ; break;
+			case FE_PARAM_DOUBLE     : ar << value<double      >()   ; break;
+			case FE_PARAM_VEC3D      : ar << value<vec3d       >()   ; break;
+			case FE_PARAM_MAT3D      : ar << value<mat3d       >()   ; break;
+			case FE_PARAM_MAT3DS     : ar << value<mat3ds      >()   ; break;
+			case FE_PARAM_SURFACE_MAP: ar << value<FESurfaceMap>()   ; break;
+			case FE_PARAM_STRING     : ar << (const char*) data_ptr(); break;
 			case FE_PARAM_FUNC1D: 
 				{
 					FEFunction1D& f = value<FEFunction1D>();
@@ -165,13 +167,14 @@ void FEParam::Serialize(DumpStream& ar)
 		{
 			switch (m_itype)
 			{
-			case FE_PARAM_INT   : ar >> value<int   >(); break;
-			case FE_PARAM_BOOL  : ar >> value<bool  >(); break;
-			case FE_PARAM_DOUBLE: ar >> value<double>(); break;
-			case FE_PARAM_VEC3D : ar >> value<vec3d >(); break;
-			case FE_PARAM_MAT3D : ar >> value<mat3d >(); break;
-			case FE_PARAM_MAT3DS: ar >> value<mat3ds>(); break;
-			case FE_PARAM_STRING: ar >> (char*) data_ptr(); break;
+			case FE_PARAM_INT        : ar >> value<int         >(); break;
+			case FE_PARAM_BOOL       : ar >> value<bool        >(); break;
+			case FE_PARAM_DOUBLE     : ar >> value<double      >(); break;
+			case FE_PARAM_VEC3D      : ar >> value<vec3d       >(); break;
+			case FE_PARAM_MAT3D      : ar >> value<mat3d       >(); break;
+			case FE_PARAM_MAT3DS     : ar >> value<mat3ds      >(); break;
+			case FE_PARAM_SURFACE_MAP: ar >> value<FESurfaceMap>(); break;
+			case FE_PARAM_STRING     : ar >> (char*) data_ptr()   ; break;
 			case FE_PARAM_FUNC1D: 
 				{
 					FEFunction1D& f = value<FEFunction1D>();
