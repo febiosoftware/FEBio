@@ -67,8 +67,12 @@ public:
 	//! (overridden from FEElasticSolidDomain)
 	void StiffnessMatrix(FESolver* psolver);
 
+	//! build the matrix profile
+	//! (overridden from FEDomain)
+	void BuildMatrixProfile(FEGlobalMatrix& M);
+
 protected:
-	// Discrete-Galerkin contribution to residual
+	// discontinuous-Galerkin contribution to residual
 	void InternalForcesDG1(FEGlobalVector& R);
 	void InternalForcesDG2(FEGlobalVector& R);
 
@@ -83,6 +87,10 @@ public:
 	// --- S T I F F N E S S ---
 	//! calculates the solid element stiffness matrix
 	void ElementStiffness(const FETimePoint& tp, int iel, matrix& ke);
+
+	//! contributions from discontinuous Galerkin formulation
+	void StiffnessMatrixDG(FESolver* psolver);
+	void ElementStiffnessMatrixDG(FESurfaceElement& el, FEInternalSurface2O::Data* pdata, matrix& ke);
 
 	void defhess(FESolidElement &el, int n, tens3drs &G);
 	void defhess(FESolidElement &el, double r, double s, double t, tens3drs &G);
