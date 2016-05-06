@@ -12,6 +12,7 @@ class FERigidBodyFixedBC;
 class FERigidBodyDisplacement;
 class FERigidBodyVelocity;
 class FERigidBodyAngularVelocity;
+class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
 //! The FERigidSystem class manages all rigid body paraphernalia.
@@ -53,6 +54,9 @@ public:
 
 	// update the mesh geometry
 	void UpdateMesh();
+
+	// build the matrix profile for the rigid system
+	void BuildMatrixProfile(FEGlobalMatrix& G);
 
 public:
 	int RigidNodeSets() { return (int) m_RN.size(); }

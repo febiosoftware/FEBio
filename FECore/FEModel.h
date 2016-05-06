@@ -43,6 +43,7 @@ class FESurfacePairInteraction;
 class FERigidSystem;
 class FEAnalysis;
 class FEGlobalData;
+class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
 //! The FEModel class stores all the data for the finite element model, including
@@ -88,6 +89,9 @@ public:
 
 	//! Validate BC's
 	bool InitBCs();
+
+	//! Build the matrix profile for this model
+	void BuildMatrixProfile(FEGlobalMatrix& G, bool breset);
 
 public:
 	//! set the problem title

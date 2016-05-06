@@ -1619,3 +1619,128 @@ void FEModel::SerializeAnalysisData(DumpStream &ar)
 		m_pStep = m_Step[m_nStep];
 	}
 }
+
+//-----------------------------------------------------------------------------
+void FEModel::BuildMatrixProfile(FEGlobalMatrix& G, bool breset)
+{
+	FEAnalysis* pstep = GetCurrentStep();
+	FEMesh& mesh = GetMesh();
+	FERigidSystem& rigid = *GetRigidSystem();
+    DOFS& fedofs = GetDOFS();
+    int MAX_NDOFS = fedofs.GetTotalDOFS();
+
+	// when reset is true we build the entire matrix profile
+	// (otherwise we only build the "dynamic" profile)
+	if (breset)
+	{
+		vector<int> elm;
+
+		// Add all elements to the profile
+		// Loop over all active domains
+		for (int nd=0; nd<mesh.Domains(); ++nd)
+		{
+			FEDomain& d = mesh.Domain(nd);
+			d.BuildMatrixProfile(G);
+		}
+
+		// Add rigid bodies to the profile
+		rigid.BuildMatrixProfile(G);
+
+		// Add linear constraints to the profile
+		// TODO: we need to add a function build_add(lmi, lmj) for
+		// this type of "elements". Now we allocate too much memory
+		if (m_LinC.size() > 0)
+		{
+			int nlin = (int) m_LinC.size();
+			vector<int> lm, elm;
+				
+			// do the cross-term
+			// TODO: I have to make this easier. For instance,
+			// keep a list that stores for each node the list of
+			// elements connected to that node.
+			// loop over all solid elements
+			for (int nd=0; nd<pstep->Domains(); ++nd)
+			{
+				FEDomain& dom = *pstep->Domain(nd);
+				for (int i=0; i<dom.Elements(); ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					dom.UnpackLM(el, elm);
+					int ne = (int)elm.size();
+
+					// see if this element connects to the 
+					// master node of a linear constraint ...
+					int m = el.Nodes();
+					for (int j=0; j<m; ++j)
+					{
+						for (int k=0; k<MAX_NDOFS; ++k)
+						{	
+							int n = m_LCT[el.m_node[j]*MAX_NDOFS + k];
+							if (n >= 0)
+							{
+								// ... it does so we need to connect the 
+								// element to the linear constraint
+								FELinearConstraint* plc = m_LCA[n];
+
+								int ns = (int)plc->slave.size();
+
+								lm.resize(ne + ns);
+								for (int l=0; l<ne; ++l) lm[l] = elm[l];
+									
+								list<FELinearConstraint::SlaveDOF>::iterator is = plc->slave.begin();
+								for (int l=ne; l<ne+ns; ++l, ++is) lm[l] = is->neq;
+
+								G.build_add(lm);
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			// TODO: do the same thing for shell elements
+
+			// do the constraint term
+			int ni;
+			list<FELinearConstraint>::iterator ic = m_LinC.begin();
+			int n = 0;
+			for (int i=0; i<nlin; ++i, ++ic) n += ic->slave.size();
+			lm.resize(n);
+			ic = m_LinC.begin();
+			n = 0;
+			for (int i=0; i<nlin; ++i, ++ic)
+			{
+				ni = (int)ic->slave.size();
+				list<FELinearConstraint::SlaveDOF>::iterator is = ic->slave.begin();
+				for (int j=0; j<ni; ++j, ++is) lm[n++] = is->neq;
+			}
+			G.build_add(lm);
+		}
+
+		// do the nonlinear constraints
+		int M = NonlinearConstraints();
+		for (int m=0; m<M; ++m)
+		{
+			FENLConstraint* pnlc = NonlinearConstraint(m);
+			if (pnlc->IsActive()) pnlc->BuildMatrixProfile(G);
+		}	
+	}
+	else
+	{
+		// Do the "dynamic" profile. That is the part of the profile that always changes
+		// This is mostly contact
+
+		// All following "elements" are nonstatic. That is, they can change
+		// connectivity between calls to this function. All of these elements
+		// are related to contact analysis (at this point).
+		if (SurfacePairInteractions() > 0)
+		{
+			// Add all contact interface elements
+			for (int i=0; i<SurfacePairInteractions(); ++i)
+			{
+				FESurfacePairInteraction* pci = SurfacePairInteraction(i);
+				if (pci->IsActive()) pci->BuildMatrixProfile(G);
+			}
+		}
+	}
+}

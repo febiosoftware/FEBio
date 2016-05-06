@@ -4,6 +4,7 @@
 #include "FEModel.h"
 #include "FEMaterial.h"
 #include "RigidBC.h"
+#include "FEGlobalMatrix.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -474,6 +475,22 @@ void FERigidSystem::UpdateMesh()
 				vec3d at = RB.m_qt*a0;
 				node.m_rt = RB.m_rt + at;
 			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FERigidSystem::BuildMatrixProfile(FEGlobalMatrix& G)
+{
+	if (Objects())
+	{
+		vector<int> lm(6);
+		int nrb = Objects();
+		for (int i=0; i<nrb; ++i)
+		{
+			FERigidBody& rb = *Object(i);
+			for (int j=0; j<6; ++j) lm[j] = rb.m_LM[j];
+			G.build_add(lm);
 		}
 	}
 }
