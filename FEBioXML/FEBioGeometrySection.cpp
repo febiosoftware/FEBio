@@ -420,7 +420,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 		tag.AttributeValue("id", nid);
 
 		// Make sure element IDs increase
-		if (nid <= m_pim->m_maxid) throw XMLReader::InvalidAttributeValue(tag, "id");
+//		if (nid <= m_pim->m_maxid) throw XMLReader::InvalidAttributeValue(tag, "id");
 
 		// keep track of the largest element ID
 		// (which by assumption is the ID that was just read in)

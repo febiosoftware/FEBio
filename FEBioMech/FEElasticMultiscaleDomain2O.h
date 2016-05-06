@@ -106,7 +106,6 @@ protected:
 
 	// Calculates second derivative of shape function N[node]
 	void shape_gradient2(const FESolidElement& el, vec3d* X, int n, mat3d* H);
-	void shape_gradient2(const FESolidElement& el, vec3d* X, double r, double s, double t, int node, mat3d& H);
 	void shape_gradient2(const FESolidElement& el, vec3d* X, double r, double s, double t, mat3d* H);
 
 private:

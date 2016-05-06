@@ -107,6 +107,16 @@ FESolidElement& FESolidElement::operator = (const FESolidElement& el)
 	return (*this);
 }
 
+vec3d FESolidElement::evaluate(vec3d* v, double r, double s, double t) const
+{
+	double H[FEElement::MAX_NODES];
+	shape_fnc(H, r, s, t);
+	int neln = Nodes();
+	vec3d p(0,0,0);
+	for (int i=0; i<neln; ++i) p += v[i]*H[i];
+	return p;
+}
+
 //-----------------------------------------------------------------------------
 FEShellElement::FEShellElement(const FEShellElement& el)
 {

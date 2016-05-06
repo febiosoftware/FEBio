@@ -194,6 +194,8 @@ public:
 
 	//! this function projects data from the gauss-points to the nodal points
 	void project_to_nodes(double* ai, double* ao) const { ((FESolidElementTraits*)m_pT)->project_to_nodes(ai, ao); }
+
+	vec3d evaluate(vec3d* v, double r, double s, double t) const;
 };
 
 //-----------------------------------------------------------------------------

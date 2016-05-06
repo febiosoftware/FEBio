@@ -210,6 +210,24 @@ bool FEElasticMultiscaleDomain2O::FEInternalSurface2O::Initialize(FEElasticMulti
 				// map the iso-parametric coordinates from the facet to the solid element
 				m_data[nnf].ksi[k] = map_facet_to_solid(mesh, face, ek, h1, h2);
 			}
+
+#ifdef _DEBUG
+			// This checks that the two integration points coincide physically at the same point
+			FESolidElement& ea = dom->Element(face.m_elem[0]);
+			FESolidElement& eb = dom->Element(face.m_elem[1]);
+			vec3d xa[FEElement::MAX_NODES];
+			vec3d xb[FEElement::MAX_NODES];
+			for (int a=0; a<ea.Nodes(); a++) xa[a] = mesh.Node(ea.m_node[a]).m_r0;
+			for (int b=0; b<eb.Nodes(); b++) xb[b] = mesh.Node(eb.m_node[b]).m_r0;
+			vec3d ksia = m_data[nnf].ksi[0];
+			vec3d ksib = m_data[nnf].ksi[1];
+
+			vec3d ra = ea.evaluate(xa, ksia.x, ksia.y, ksia.z);
+			vec3d rb = eb.evaluate(xb, ksib.x, ksib.y, ksib.z);
+			vec3d dr = ra - rb;
+			double Dr = dr.norm();
+			assert(Dr <1e-12);
+#endif
 		}
 	}
 
@@ -1568,12 +1586,14 @@ void FEElasticMultiscaleDomain2O::defhess(FESolidElement &el, double r, double s
 		x[i] = mesh.Node(el.m_node[i]).m_rt;
 	}
 
+	mat3d H[FEElement::MAX_NODES];
+	shape_gradient2(el, X, r, s, t, H);
+
 	// loop over nodes
 	G.zero();
 	for (int a=0; a<neln; ++a)
 	{
-		mat3d H;
-		shape_gradient2(el, X, r, s, t, a, H);
+		mat3d& Ha = H[a];
 
 		// calculate gradient of deformation gradient
 		// Note that k >= j. Since tensdrs has symmetries this
@@ -1581,9 +1601,9 @@ void FEElasticMultiscaleDomain2O::defhess(FESolidElement &el, double r, double s
 		for (int j=0; j<3; ++j)
 			for (int k=j; k<3; ++k)
 			{
-				G(0,j,k) += H[j][k]*x[a].x;
-				G(1,j,k) += H[j][k]*x[a].y;
-				G(2,j,k) += H[j][k]*x[a].z;
+				G(0,j,k) += Ha[j][k]*x[a].x;
+				G(1,j,k) += Ha[j][k]*x[a].y;
+				G(2,j,k) += Ha[j][k]*x[a].z;
 			}
 	}
 }
@@ -1730,19 +1750,9 @@ void FEElasticMultiscaleDomain2O::shape_gradient2(const FESolidElement& el, vec3
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticMultiscaleDomain2O::shape_gradient2(const FESolidElement& el, vec3d* X, double r, double s, double t, mat3d* H)
-{
-	int neln = el.Nodes();
-	for (int i=0; i<neln; ++i)
-	{
-		shape_gradient2(el, X, r, s, t, i, H[i]);
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! Calculates the second derivative of shape function N[node] with respect
 //! to the material coordinates.
-void FEElasticMultiscaleDomain2O::shape_gradient2(const FESolidElement& el, vec3d* X, double r, double s, double t, int node, mat3d& H)
+void FEElasticMultiscaleDomain2O::shape_gradient2(const FESolidElement& el, vec3d* X, double r, double s, double t, mat3d* H)
 {
 	int neln = el.Nodes();
 
@@ -1793,28 +1803,32 @@ void FEElasticMultiscaleDomain2O::shape_gradient2(const FESolidElement& el, vec3
 
 	// first derivative of shape functions
 	double G1[3];
-	G1[0] = Gr[node];
-	G1[1] = Gs[node];
-	G1[2] = Gt[node];
-
-	// second derivatives of shape functions
 	double G2[3][3];
-	G2[0][0] = Grr[node]; G2[0][1] = Grs[node]; G2[0][2] = Grt[node];
-	G2[1][0] = Grs[node]; G2[1][1] = Gss[node]; G2[1][2] = Gst[node];
-	G2[2][0] = Grt[node]; G2[2][1] = Gst[node]; G2[2][2] = Gtt[node];
+	for (int a=0; a<neln; ++a)
+	{
+		G1[0] = Gr[a];
+		G1[1] = Gs[a];
+		G1[2] = Gt[a];
 
-	// calculate dB/dr
-	double D[3][3] = {0};
-	for (int i=0; i<3; ++i)
-		for (int k=0; k<3; ++k)
-		{
-			for (int j=0; j<3; ++j) D[i][k] += A[i][j][k]*G1[j] + Ji[j][i]*G2[j][k];
-		}
+		// second derivatives of shape functions
+		G2[0][0] = Grr[a]; G2[0][1] = Grs[a]; G2[0][2] = Grt[a];
+		G2[1][0] = Grs[a]; G2[1][1] = Gss[a]; G2[1][2] = Gst[a];
+		G2[2][0] = Grt[a]; G2[2][1] = Gst[a]; G2[2][2] = Gtt[a];
 
-	// calculate global gradient of shape functions
-	for (int i=0; i<3; ++i)
-		for (int j=0; j<3; ++j)
-		{
-			H[i][j] = D[i][0]*Ji[0][j] + D[i][1]*Ji[1][j] + D[i][2]*Ji[2][j];
-		}
+		// calculate dB/dr
+		double D[3][3] = {0};
+		for (int i=0; i<3; ++i)
+			for (int k=0; k<3; ++k)
+			{
+				for (int j=0; j<3; ++j) D[i][k] += A[i][j][k]*G1[j] + Ji[j][i]*G2[j][k];
+			}
+
+		// calculate global gradient of shape functions
+		mat3d& Ha = H[a];
+		for (int i=0; i<3; ++i)
+			for (int j=0; j<3; ++j)
+			{
+				Ha[i][j] = D[i][0]*Ji[0][j] + D[i][1]*Ji[1][j] + D[i][2]*Ji[2][j];
+			}
+	}
 }
