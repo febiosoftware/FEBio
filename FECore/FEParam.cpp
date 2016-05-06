@@ -120,7 +120,12 @@ void FEParam::Serialize(DumpStream& ar)
 			case FE_PARAM_VEC3D      : ar << value<vec3d       >()   ; break;
 			case FE_PARAM_MAT3D      : ar << value<mat3d       >()   ; break;
 			case FE_PARAM_MAT3DS     : ar << value<mat3ds      >()   ; break;
-			case FE_PARAM_SURFACE_MAP: ar << value<FESurfaceMap>()   ; break;
+			case FE_PARAM_SURFACE_MAP:
+				{
+					FESurfaceMap& m = value<FESurfaceMap>();
+					m.Serialize(ar);
+				}
+				break;
 			case FE_PARAM_STRING     : ar << (const char*) data_ptr(); break;
 			case FE_PARAM_FUNC1D: 
 				{
@@ -173,7 +178,12 @@ void FEParam::Serialize(DumpStream& ar)
 			case FE_PARAM_VEC3D      : ar >> value<vec3d       >(); break;
 			case FE_PARAM_MAT3D      : ar >> value<mat3d       >(); break;
 			case FE_PARAM_MAT3DS     : ar >> value<mat3ds      >(); break;
-			case FE_PARAM_SURFACE_MAP: ar >> value<FESurfaceMap>(); break;
+			case FE_PARAM_SURFACE_MAP:
+				{
+					FESurfaceMap& m = value<FESurfaceMap>();
+					m.Serialize(ar);
+				}
+				break;
 			case FE_PARAM_STRING     : ar >> (char*) data_ptr()   ; break;
 			case FE_PARAM_FUNC1D: 
 				{
