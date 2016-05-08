@@ -154,8 +154,6 @@ void FESolidSolver::Serialize(DumpStream& ar)
 	
 	if (ar.IsSaving())
 	{
-		ar << m_Dtol << m_Etol << m_Rtol << m_Rmin;
-		ar << m_bsymm;
 		ar << m_nrhs;
 		ar << m_niter;
 		ar << m_nref << m_ntotref;
@@ -164,8 +162,6 @@ void FESolidSolver::Serialize(DumpStream& ar)
 	}
 	else
 	{
-		ar >> m_Dtol >> m_Etol >> m_Rtol >> m_Rmin;
-		ar >> m_bsymm;
 		ar >> m_nrhs;
 		ar >> m_niter;
 		ar >> m_nref >> m_ntotref;
