@@ -84,6 +84,13 @@ public:
 	double			m_beta;			//!< beta parameter for DG
 	FERVEModel2O	m_mrve;			//!< the master RVE (Representive Volume Element)
 
+	// flags for evaluating effects of stiffness contributions
+	// TODO: I'll probably delete this when all bugs are found
+	bool	m_bKDG1;
+	bool	m_bKDG2;
+	bool	m_bKDG3;
+	bool	m_buseJ0;
+
 public:
 	//! calculate stress at material point
 	void Stress2O(FEMaterialPoint &mp);

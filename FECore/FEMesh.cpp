@@ -1069,28 +1069,26 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 				FESurfaceElement& se = ps->Element(NF++);
 				GetFace(el, j, face);
 
-				switch (el.Type())
+				switch (el.Shape())
 				{
-				case FE_HEX8G8:
-				case FE_SHELL_QUAD:
+				case ET_HEX8:
 					se.SetType(FE_QUAD4G4); 
 					break;
-				case FE_HEX20G27:
-                case FE_SHELL_QUAD8:
+				case ET_HEX20:
                     se.SetType(FE_QUAD8G9);
                     break;
-				case FE_HEX27G27:
+				case ET_HEX27:
 					se.SetType(FE_QUAD9G9);
 					break;
-				case FE_TET4G1: 
-				case FE_SHELL_TRI:
+				case ET_TET4:
 					se.SetType(FE_TRI3G1); 
 					break;
-				case FE_TET10G4:
-				case FE_TET10G8:
-                case FE_SHELL_TRI6:
+				case ET_TET10:
+				case ET_TET15:
                     se.SetType(FE_TRI6G7);
                     break;
+				default:
+					assert(false);
 				}
 				
 				// TODO: 

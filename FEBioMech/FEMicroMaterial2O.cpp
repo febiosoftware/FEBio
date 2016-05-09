@@ -92,6 +92,10 @@ BEGIN_PARAMETER_LIST(FEMicroMaterial2O, FEElasticMaterial)
 	ADD_PARAMETER(m_beta     , FE_PARAM_DOUBLE, "beta"    );
 	ADD_PARAMETER(m_szbc     , FE_PARAM_STRING, "bc_set"  );
 	ADD_PARAMETER(m_bperiodic, FE_PARAM_BOOL  , "periodic");
+	ADD_PARAMETER(m_bKDG1    , FE_PARAM_BOOL  , "KDG1"    );
+	ADD_PARAMETER(m_bKDG2    , FE_PARAM_BOOL  , "KDG2"    );
+	ADD_PARAMETER(m_bKDG3    , FE_PARAM_BOOL  , "KDG3"    );
+	ADD_PARAMETER(m_buseJ0   , FE_PARAM_BOOL  , "useJ0"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -102,6 +106,11 @@ FEMicroMaterial2O::FEMicroMaterial2O(FEModel* pfem) : FEElasticMaterial2O(pfem)
 	m_szbc[0] = 0;
 	m_bperiodic = false;
 	m_beta = 10.0;
+
+	m_bKDG1 = true;
+	m_bKDG2 = true;
+	m_bKDG3 = true;
+	m_buseJ0 = true;
 
 	AddProperty(&m_probe, "probe", false);
 }

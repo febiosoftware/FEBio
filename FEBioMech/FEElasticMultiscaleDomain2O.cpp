@@ -253,6 +253,7 @@ bool FEElasticMultiscaleDomain2O::FEInternalSurface2O::Initialize(FEElasticMulti
 //! constructor
 FEElasticMultiscaleDomain2O::FEElasticMultiscaleDomain2O(FEModel* pfem) : FEElasticSolidDomain(pfem)
 {
+	m_binitJ0 = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -419,6 +420,7 @@ void FEElasticMultiscaleDomain2O::InternalForces(FEGlobalVector& R)
 	// add the discontinuous-Galerkin contribution
 	InternalForcesDG1(R);
 	InternalForcesDG2(R);
+	InternalForcesDG3(R);
 }
 
 //-----------------------------------------------------------------------------
@@ -458,7 +460,7 @@ void FEElasticMultiscaleDomain2O::InternalForcesDG1(FEGlobalVector& R)
 
 			// allocate force vector
 			int ndof = neln*3;
-			fe.resize(ndof, 0.0);
+			fe.assign(ndof, 0.0);
 
 			// loop over all the integration points
 			double* gw = face.GaussWeights();
@@ -521,8 +523,133 @@ void FEElasticMultiscaleDomain2O::InternalForcesDG1(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-//! Evaluate contribution of discontinuous-Galerkin enforcement of stress flux.
 void FEElasticMultiscaleDomain2O::InternalForcesDG2(FEGlobalVector& R)
+{
+	FEMesh& mesh = *GetMesh();
+	FESurface& surf = *m_surf.GetSurface();
+
+	vec3d X[FEElement::MAX_NODES];
+	vec3d G[FEElement::MAX_NODES];
+	mat3d H[FEElement::MAX_NODES];
+
+	vector<double> fe;
+	vector<int> lm;
+
+	// loop over all internal surface elements
+	int nd = 0;
+	int NF = m_surf.Elements();
+	for (int i=0; i<NF; ++i)
+	{
+		// get the next surface element
+		FESurfaceElement& face = m_surf.Element(i);
+		int nfn = face.Nodes();
+		int nint = face.GaussPoints();
+
+		// loop over both sides
+		for (int m=0; m<2; ++m)
+		{
+			FESolidElement& el = Element(face.m_elem[m]);
+			int neln = el.Nodes();
+
+			// get the initial nodal positions
+			for (int j=0; j<neln; ++j) X[j] = mesh.Node(el.m_node[j]).m_r0;
+
+			// allocate force vector
+			int ndof = neln*3;
+			fe.assign(ndof, 0.0);
+
+			// loop over integration points
+			double* gw = face.GaussWeights();
+			for  (int n=0; n<nint; ++n)
+			{
+				// get facet data
+				FEInternalSurface2O::Data& data = m_surf.GetData(nd + n);
+				const tens6d& J0 = data.J0[m];
+				const tens5d& H0 = data.H0[m];
+				const mat3d&  Du = data.DgradU;
+
+				// calculate jacobian and surface normal
+				vec3d nu(0,0,0);
+				double J = surf.jac0(face, n, nu);
+				double Nu[3] = {nu.x, nu.y, nu.z};
+
+				// evaluate element shape function derivatives
+				// at this integration point
+				vec3d& ksi = data.ksi[m];
+				shape_gradient(el, ksi.x, ksi.y, ksi.z, G);
+				shape_gradient2(el, X, ksi.x, ksi.y, ksi.z, H);
+
+				for (int a=0; a<neln; ++a)
+				{
+					double Ax[3][3][3] = {0};
+					double Ay[3][3][3] = {0};
+					double Az[3][3][3] = {0};
+					for (int j=0; j<3; ++j)
+						for (int k=0; k<3; ++k)
+						{
+							for (int q=0; q<3; ++q)
+							{
+								for (int r=0; r<3; ++r)
+								{
+									Ax[0][j][k] += J0(0, j, k, 0, q, r)*H[a](q ,r);
+									Ax[1][j][k] += J0(1, j, k, 0, q, r)*H[a](q ,r);
+									Ax[2][j][k] += J0(2, j, k, 0, q, r)*H[a](q ,r);
+
+									Ay[0][j][k] += J0(0, j, k, 1, q, r)*H[a](q ,r);
+									Ay[1][j][k] += J0(1, j, k, 1, q, r)*H[a](q ,r);
+									Ay[2][j][k] += J0(2, j, k, 1, q, r)*H[a](q ,r);
+
+									Az[0][j][k] += J0(0, j, k, 2, q, r)*H[a](q ,r);
+									Az[1][j][k] += J0(1, j, k, 2, q, r)*H[a](q ,r);
+									Az[2][j][k] += J0(2, j, k, 2, q, r)*H[a](q ,r);
+								}
+							}
+
+							Ax[0][j][k] += H0(0, j, k, 0, 0)*G[a].x + H0(0, j, k, 0, 1)*G[a].y + H0(0, j, k, 0, 2)*G[a].z;
+							Ax[1][j][k] += H0(1, j, k, 0, 0)*G[a].x + H0(1, j, k, 0, 1)*G[a].y + H0(1, j, k, 0, 2)*G[a].z;
+							Ax[2][j][k] += H0(2, j, k, 0, 0)*G[a].x + H0(2, j, k, 0, 1)*G[a].y + H0(2, j, k, 0, 2)*G[a].z;
+
+							Ay[0][j][k] += H0(0, j, k, 1, 0)*G[a].x + H0(0, j, k, 1, 1)*G[a].y + H0(0, j, k, 1, 2)*G[a].z;
+							Ay[1][j][k] += H0(1, j, k, 1, 0)*G[a].x + H0(1, j, k, 1, 1)*G[a].y + H0(1, j, k, 1, 2)*G[a].z;
+							Ay[2][j][k] += H0(2, j, k, 1, 0)*G[a].x + H0(2, j, k, 1, 1)*G[a].y + H0(2, j, k, 1, 2)*G[a].z;
+
+							Az[0][j][k] += H0(0, j, k, 2, 0)*G[a].x + H0(0, j, k, 2, 1)*G[a].y + H0(0, j, k, 2, 2)*G[a].z;
+							Az[1][j][k] += H0(1, j, k, 2, 0)*G[a].x + H0(1, j, k, 2, 1)*G[a].y + H0(1, j, k, 2, 2)*G[a].z;
+							Az[2][j][k] += H0(2, j, k, 2, 0)*G[a].x + H0(2, j, k, 2, 1)*G[a].y + H0(2, j, k, 2, 2)*G[a].z;
+						}
+
+						double fa[3] = {0};
+						for (int j=0; j<3; ++j)
+							for (int k=0; k<3; ++k)
+							{
+								fa[0] += Du(0,j)*Ax[0][j][k]*Nu[k] + Du(1,j)*Ax[1][j][k]*Nu[k] + Du(2,j)*Ax[2][j][k]*Nu[k];
+								fa[1] += Du(0,j)*Ay[0][j][k]*Nu[k] + Du(1,j)*Ay[1][j][k]*Nu[k] + Du(2,j)*Ay[2][j][k]*Nu[k];
+								fa[2] += Du(0,j)*Az[0][j][k]*Nu[k] + Du(1,j)*Az[1][j][k]*Nu[k] + Du(2,j)*Az[2][j][k]*Nu[k];
+							}
+
+					// the negative sign is because we need to subtract the internal forces
+					// from the residual
+					fe[3*a  ] -= fa[0]*J*gw[n]*0.5;
+					fe[3*a+1] -= fa[1]*J*gw[n]*0.5;
+					fe[3*a+2] -= fa[2]*J*gw[n]*0.5;
+				}
+			}
+
+			// unpack the LM values
+			UnpackLM(el, lm);
+
+			// assemble 
+			R.Assemble(el.m_node, lm, fe);
+		}
+
+		// don't forgot to increment data counter
+		nd += nint;
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate contribution of discontinuous-Galerkin enforcement of stress flux.
+void FEElasticMultiscaleDomain2O::InternalForcesDG3(FEGlobalVector& R)
 {
 	FEMesh& mesh = *GetMesh();
 	FESurface& surf = *m_surf.GetSurface();
@@ -562,7 +689,7 @@ void FEElasticMultiscaleDomain2O::InternalForcesDG2(FEGlobalVector& R)
 
 			// allocate force vector
 			int ndof = neln*3;
-			fe.resize(ndof, 0.0);
+			fe.assign(ndof, 0.0);
 
 			// loop over all the integration points
 			double* gw = face.GaussWeights();
@@ -834,7 +961,8 @@ void FEElasticMultiscaleDomain2O::UpdateInternalSurfaceStresses()
 		{
 			FEInternalSurface2O::Data& data =  m_surf.GetData(nd);
 			data.Qavg.zero();
-			data.J0avg.zero();
+			
+			if (m_binitJ0 == false) data.J0avg.zero();
 
 			// get the deformation gradient and determinant
 			for (int k=0; k<2; ++k)
@@ -856,10 +984,18 @@ void FEElasticMultiscaleDomain2O::UpdateInternalSurfaceStresses()
 				pmat->Stress2O(mp);
 
 				data.Qavg += pt2O.m_Qa*0.5;
-				data.J0avg += pt2O.m_Ja*0.5;		// TODO: I only need to evaluate this on the first iteration
+				if (m_binitJ0 == false)
+				{
+					data.J0[k] = pt2O.m_Ja;
+					data.H0[k] = pt2O.m_Ha;
+					data.J0avg += pt2O.m_Ja*0.5;
+				}
 			}
 		}
 	}
+
+	// set flag indicating J0 has been initialized
+	if (pmat->m_buseJ0) m_binitJ0 = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -952,6 +1088,14 @@ void FEElasticMultiscaleDomain2O::StiffnessMatrix(FESolver* psolver)
 //-----------------------------------------------------------------------------
 void FEElasticMultiscaleDomain2O::StiffnessMatrixDG(FESolver* psolver)
 {
+	FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(GetMaterial());
+	assert(pmat);
+
+	// get stiffness flags
+	bool bKDG1 = pmat->m_bKDG1;
+	bool bKDG3 = pmat->m_bKDG3;
+	if ((bKDG1==false)&&(bKDG3==false)) return;
+
 	matrix ke;
 	vector<int> lm;
 	vector<int> en;
@@ -980,8 +1124,8 @@ void FEElasticMultiscaleDomain2O::StiffnessMatrixDG(FESolver* psolver)
 		ke.zero();
 
 		// get the element stiffness matrix
-//		ElementStiffnessMatrixDG1(el, &m_surf.GetData(nd), ke);
-		ElementStiffnessMatrixDG3(el, &m_surf.GetData(nd), ke);
+		if (bKDG1) ElementStiffnessMatrixDG1(el, &m_surf.GetData(nd), ke);
+		if (bKDG3) ElementStiffnessMatrixDG3(el, &m_surf.GetData(nd), ke);
 
 		// setup the LM vector
 		// TODO: this assumes that the X,Y,Z degrees of freedom are 0,1,2 respectively
