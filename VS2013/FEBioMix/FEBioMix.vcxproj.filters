@@ -210,6 +210,9 @@
     <ClInclude Include="..\..\FEBioMix\FESolubManning.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMix\FESlidingInterfaceBiphasic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMix\FEBioMix.cpp">
@@ -399,6 +402,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMix\FESolubManning.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMix\FESlidingInterfaceBiphasic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

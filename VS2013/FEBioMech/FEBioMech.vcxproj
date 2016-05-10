@@ -451,6 +451,7 @@
     <ClInclude Include="..\..\FEBioMech\FEElasticMultiscaleDomain2O.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticShellDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticSolidDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticSolidDomain2O.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticTrussDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEEllipsoidalFiberDistribution.h" />
     <ClInclude Include="..\..\FEBioMech\FEExplicitSolidSolver.h" />
@@ -546,6 +547,7 @@
     <ClInclude Include="..\..\FEBioMech\FERigidSurface.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidWallInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FERVEModel.h" />
+    <ClInclude Include="..\..\FEBioMech\FERVEModel2O.h" />
     <ClInclude Include="..\..\FEBioMech\FESlidingInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FESlidingInterfaceBW.h" />
     <ClInclude Include="..\..\FEBioMech\FESolidDomainFactory.h" />
@@ -641,6 +643,7 @@
     <ClCompile Include="..\..\FEBioMech\FEElasticMultiscaleDomain2O.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticSolidDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticSolidDomain2O.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticTrussDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEllipsoidalFiberDistribution.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEExplicitSolidSolver.cpp" />
@@ -736,6 +739,7 @@
     <ClCompile Include="..\..\FEBioMech\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidWallInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERVEModel.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERVEModel2O.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESlidingInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESlidingInterfaceBW.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESolidDomainFactory.cpp" />
