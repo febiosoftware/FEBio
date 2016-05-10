@@ -238,6 +238,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(LMDir);$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
+    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Commercial|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -342,7 +343,7 @@
       <AdditionalDependencies>febioxmld.lib;febiomechd.lib;fecored.lib;numcored.lib;levmard.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_lapack95.lib;libiomp5mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Commercial|Win32'">

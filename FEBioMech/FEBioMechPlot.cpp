@@ -237,8 +237,8 @@ bool FEPlotElementGnorm::Save(FEDomain& dom, FEDataStream& a)
 		tens3drs Gavg; Gavg.zero();
 		for (int j=0; j<nint; ++j)
 		{
-			FEMicroMaterialPoint2O& mmpt2O = *(el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
-			Gavg += mmpt2O.m_G;
+			FEElasticMaterialPoint2O& pt2O = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint2O>());
+			Gavg += pt2O.m_G;
 		}
 		Gavg /= (double) nint;
 
@@ -433,8 +433,8 @@ bool FEPlotElementQK1norm::Save(FEDomain& dom, FEDataStream& a)
 		tens3drs QK1_avg; QK1_avg.zero();
 		for (int j=0; j<nint; ++j)
 		{
-			FEMicroMaterialPoint2O& pt2O = *(el.GetMaterialPoint(j)->ExtractData<FEMicroMaterialPoint2O>());
-			QK1_avg += pt2O.m_Qa;
+			FEElasticMaterialPoint2O& pt2O = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint2O>());
+			QK1_avg += pt2O.m_Q;
 		}
 		QK1_avg *= f;
 

@@ -236,6 +236,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir)..;$(MKLDir)\include;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Commercial|Win32'">
     <IncludePath>$(SolutionDir)..;$(FEBLMDir)\Nalpeiron;$(IncludePath)</IncludePath>
@@ -305,7 +306,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <OutputFile>$(OutDir)$(TargetName)d$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <PreBuildEvent>
       <Command>python "$(SolutionDir)svnrev.py"</Command>
