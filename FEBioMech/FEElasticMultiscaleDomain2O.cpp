@@ -1386,8 +1386,8 @@ void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG1(FESurfaceElement& fa
 //-----------------------------------------------------------------------------
 void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG2(FESurfaceElement& face, FEInternalSurface2O::Data* pdata, matrix& ke)
 {
+	// get the mesh and surface
 	FEMesh& mesh = *GetMesh();
-	// get the surface
 	FESurface& surf = *m_surf.GetSurface();
 
 	// get the solid elements of this interface element
@@ -1440,65 +1440,185 @@ void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG2(FESurfaceElement& fa
 		const tens6d& Jb = data.J0[0];
 
 		// The a-a term
-/*		for (int a=0; a<nelna; ++a)
+		for (int a=0; a<nelna; ++a)
 			for (int b=0; b<nelna; ++b)
 			{
 				double Ax[3][3][3] = {0};
 				double Ay[3][3][3] = {0};
 				double Az[3][3][3] = {0};
-				for (int j=0; j<3; ++j)
-					for (int k=0; k<3; ++k)
-					{
-						for (int q=0; q<3; ++q)
-						{
-							for (int r=0; r<3; ++r)
-							{
-								Ax[0][j][k] += Ja(0, j, k, 0, q, r)*G2[a](q ,r);
-								Ax[1][j][k] += Ja(1, j, k, 0, q, r)*G2[a](q ,r);
-								Ax[2][j][k] += Ja(2, j, k, 0, q, r)*G2[a](q ,r);
-
-								Ay[0][j][k] += Ja(0, j, k, 1, q, r)*G2[a](q ,r);
-								Ay[1][j][k] += Ja(1, j, k, 1, q, r)*G2[a](q ,r);
-								Ay[2][j][k] += Ja(2, j, k, 1, q, r)*G2[a](q ,r);
-
-								Az[0][j][k] += Ja(0, j, k, 2, q, r)*G2[a](q ,r);
-								Az[1][j][k] += Ja(1, j, k, 2, q, r)*G2[a](q ,r);
-								Az[2][j][k] += Ja(2, j, k, 2, q, r)*G2[a](q ,r);
-							}
-						}
-
-						Ax[0][j][k] += Ha(0, j, k, 0, 0)*G1a[a].x + Ha(0, j, k, 0, 1)*G1a[a].y + Ha(0, j, k, 0, 2)*G1a[a].z;
-						Ax[1][j][k] += Ha(1, j, k, 0, 0)*G1a[a].x + Ha(1, j, k, 0, 1)*G1a[a].y + Ha(1, j, k, 0, 2)*G1a[a].z;
-						Ax[2][j][k] += Ha(2, j, k, 0, 0)*G1a[a].x + Ha(2, j, k, 0, 1)*G1a[a].y + Ha(2, j, k, 0, 2)*G1a[a].z;
-
-						Ay[0][j][k] += Ha(0, j, k, 1, 0)*G1a[a].x + Ha(0, j, k, 1, 1)*G1a[a].y + Ha(0, j, k, 1, 2)*G1a[a].z;
-						Ay[1][j][k] += Ha(1, j, k, 1, 0)*G1a[a].x + Ha(1, j, k, 1, 1)*G1a[a].y + Ha(1, j, k, 1, 2)*G1a[a].z;
-						Ay[2][j][k] += Ha(2, j, k, 1, 0)*G1a[a].x + Ha(2, j, k, 1, 1)*G1a[a].y + Ha(2, j, k, 1, 2)*G1a[a].z;
-
-						Az[0][j][k] += Ha(0, j, k, 2, 0)*G1a[a].x + Ha(0, j, k, 2, 1)*G1a[a].y + Ha(0, j, k, 2, 2)*G1a[a].z;
-						Az[1][j][k] += Ha(1, j, k, 2, 0)*G1a[a].x + Ha(1, j, k, 2, 1)*G1a[a].y + Ha(1, j, k, 2, 2)*G1a[a].z;
-						Az[2][j][k] += Ha(2, j, k, 2, 0)*G1a[a].x + Ha(2, j, k, 2, 1)*G1a[a].y + Ha(2, j, k, 2, 2)*G1a[a].z;
-					}
-
-					mat3d kab; kab.zero();
+				for (int i=0; i<3; ++i)
 					for (int j=0; j<3; ++j)
 						for (int k=0; k<3; ++k)
 						{
-							kab(0,0) += G1b[b].x*(0,j)*Ax[0][j][k]*Nu[k] + G1b[b].y*Ax[1][j][k]*Nu[k] + G1b[b].z*Ax[2][j][k]*Nu[k];
-							kab(0,0) += G1b[b].x*(0,j)*Ax[0][j][k]*Nu[k] + G1b[b].y*Ax[1][j][k]*Nu[k] + G1b[b].z*Ax[2][j][k]*Nu[k];
+							for (int q=0; q<3; ++q)
+								for (int r=0; r<3; ++r)
+								{
+									Ax[i][j][k] += Ja(i, j, k, 0, q, r)*G2a[a](q ,r);
+									Ay[i][j][k] += Ja(i, j, k, 1, q, r)*G2a[a](q ,r);
+									Az[i][j][k] += Ja(i, j, k, 2, q, r)*G2a[a](q ,r);
+								}
 
-							fa[1] += Du(0,j)*Ay[0][j][k]*Nu[k] + Du(1,j)*Ay[1][j][k]*Nu[k] + Du(2,j)*Ay[2][j][k]*Nu[k];
-							fa[2] += Du(0,j)*Az[0][j][k]*Nu[k] + Du(1,j)*Az[1][j][k]*Nu[k] + Du(2,j)*Az[2][j][k]*Nu[k];
+							Ax[i][j][k] += Ha(i, j, k, 0, 0)*G1a[a].x + Ha(i, j, k, 0, 1)*G1a[a].y + Ha(i, j, k, 0, 2)*G1a[a].z;
+							Ay[i][j][k] += Ha(i, j, k, 1, 0)*G1a[a].x + Ha(i, j, k, 1, 1)*G1a[a].y + Ha(i, j, k, 1, 2)*G1a[a].z;
+							Az[i][j][k] += Ha(i, j, k, 2, 0)*G1a[a].x + Ha(i, j, k, 2, 1)*G1a[a].y + Ha(i, j, k, 2, 2)*G1a[a].z;
 						}
 
-					// the negative sign is because we need to subtract the internal forces
-					// from the residual
-					fe[3*a  ] -= fa[0]*J*gw[n]*0.5;
-					fe[3*a+1] -= fa[1]*J*gw[n]*0.5;
-					fe[3*a+2] -= fa[2]*J*gw[n]*0.5;
+				mat3d kab; kab.zero();
+				for (int k=0; k<3; ++k)
+				{
+					kab(0,0) += G1a[b].x*Ax[0][0][k]*Nu[k] + G1a[b].y*Ax[0][1][k]*Nu[k] + G1a[b].z*Ax[0][2][k]*Nu[k];
+					kab(0,1) += G1a[b].x*Ax[1][0][k]*Nu[k] + G1a[b].y*Ax[1][1][k]*Nu[k] + G1a[b].z*Ax[1][2][k]*Nu[k];
+					kab(0,2) += G1a[b].x*Ax[2][0][k]*Nu[k] + G1a[b].y*Ax[2][1][k]*Nu[k] + G1a[b].z*Ax[2][2][k]*Nu[k];
+
+					kab(1,0) += G1a[b].x*Ay[0][0][k]*Nu[k] + G1a[b].y*Ay[0][1][k]*Nu[k] + G1a[b].z*Ay[0][2][k]*Nu[k];
+					kab(1,1) += G1a[b].x*Ay[1][0][k]*Nu[k] + G1a[b].y*Ay[1][1][k]*Nu[k] + G1a[b].z*Ay[1][2][k]*Nu[k];
+					kab(1,2) += G1a[b].x*Ay[2][0][k]*Nu[k] + G1a[b].y*Ay[2][1][k]*Nu[k] + G1a[b].z*Ay[2][2][k]*Nu[k];
+
+					kab(2,0) += G1a[b].x*Az[0][0][k]*Nu[k] + G1a[b].y*Az[0][1][k]*Nu[k] + G1a[b].z*Az[0][2][k]*Nu[k];
+					kab(2,1) += G1a[b].x*Az[1][0][k]*Nu[k] + G1a[b].y*Az[1][1][k]*Nu[k] + G1a[b].z*Az[1][2][k]*Nu[k];
+					kab(2,2) += G1a[b].x*Az[2][0][k]*Nu[k] + G1a[b].y*Az[2][1][k]*Nu[k] + G1a[b].z*Az[2][2][k]*Nu[k];
 				}
-*/
-	}
+				// multiply by weights
+				kab *= J0*gw[n]*0.5;
+
+				ke.add(3*a, 3*b, kab);
+			}
+
+		// The a-b term
+		for (int a=0; a<nelna; ++a)
+			for (int b=0; b<nelnb; ++b)
+			{
+				double Ax[3][3][3] = {0};
+				double Ay[3][3][3] = {0};
+				double Az[3][3][3] = {0};
+				for (int i=0; i<3; ++i)
+					for (int j=0; j<3; ++j)
+						for (int k=0; k<3; ++k)
+						{
+							for (int q=0; q<3; ++q)
+								for (int r=0; r<3; ++r)
+								{
+									Ax[i][j][k] += Ja(i, j, k, 0, q, r)*G2a[a](q ,r);
+									Ay[i][j][k] += Ja(i, j, k, 1, q, r)*G2a[a](q ,r);
+									Az[i][j][k] += Ja(i, j, k, 2, q, r)*G2a[a](q ,r);
+								}
+
+							Ax[i][j][k] += Ha(i, j, k, 0, 0)*G1a[a].x + Ha(i, j, k, 0, 1)*G1a[a].y + Ha(i, j, k, 0, 2)*G1a[a].z;
+							Ay[i][j][k] += Ha(i, j, k, 1, 0)*G1a[a].x + Ha(i, j, k, 1, 1)*G1a[a].y + Ha(i, j, k, 1, 2)*G1a[a].z;
+							Az[i][j][k] += Ha(i, j, k, 2, 0)*G1a[a].x + Ha(i, j, k, 2, 1)*G1a[a].y + Ha(i, j, k, 2, 2)*G1a[a].z;
+						}
+
+				mat3d kab; kab.zero();
+				for (int k=0; k<3; ++k)
+				{
+					kab(0,0) += G1b[b].x*Ax[0][0][k]*Nu[k] + G1b[b].y*Ax[0][1][k]*Nu[k] + G1b[b].z*Ax[0][2][k]*Nu[k];
+					kab(0,1) += G1b[b].x*Ax[1][0][k]*Nu[k] + G1b[b].y*Ax[1][1][k]*Nu[k] + G1b[b].z*Ax[1][2][k]*Nu[k];
+					kab(0,2) += G1b[b].x*Ax[2][0][k]*Nu[k] + G1b[b].y*Ax[2][1][k]*Nu[k] + G1b[b].z*Ax[2][2][k]*Nu[k];
+
+					kab(1,0) += G1b[b].x*Ay[0][0][k]*Nu[k] + G1b[b].y*Ay[0][1][k]*Nu[k] + G1b[b].z*Ay[0][2][k]*Nu[k];
+					kab(1,1) += G1b[b].x*Ay[1][0][k]*Nu[k] + G1b[b].y*Ay[1][1][k]*Nu[k] + G1b[b].z*Ay[1][2][k]*Nu[k];
+					kab(1,2) += G1b[b].x*Ay[2][0][k]*Nu[k] + G1b[b].y*Ay[2][1][k]*Nu[k] + G1b[b].z*Ay[2][2][k]*Nu[k];
+
+					kab(2,0) += G1b[b].x*Az[0][0][k]*Nu[k] + G1b[b].y*Az[0][1][k]*Nu[k] + G1b[b].z*Az[0][2][k]*Nu[k];
+					kab(2,1) += G1b[b].x*Az[1][0][k]*Nu[k] + G1b[b].y*Az[1][1][k]*Nu[k] + G1b[b].z*Az[1][2][k]*Nu[k];
+					kab(2,2) += G1b[b].x*Az[2][0][k]*Nu[k] + G1b[b].y*Az[2][1][k]*Nu[k] + G1b[b].z*Az[2][2][k]*Nu[k];
+				}
+				// multiply by weights
+				kab *= J0*gw[n]*0.5;
+
+				ke.sub(3*a, 3*(nelna + b), kab);
+			}
+
+		// The b-a term
+		for (int a=0; a<nelnb; ++a)
+			for (int b=0; b<nelna; ++b)
+			{
+				double Ax[3][3][3] = {0};
+				double Ay[3][3][3] = {0};
+				double Az[3][3][3] = {0};
+				for (int i=0; i<3; ++i)
+					for (int j=0; j<3; ++j)
+						for (int k=0; k<3; ++k)
+						{
+							for (int q=0; q<3; ++q)
+								for (int r=0; r<3; ++r)
+								{
+									Ax[i][j][k] += Jb(i, j, k, 0, q, r)*G2b[a](q ,r);
+									Ay[i][j][k] += Jb(i, j, k, 1, q, r)*G2b[a](q ,r);
+									Az[i][j][k] += Jb(i, j, k, 2, q, r)*G2b[a](q ,r);
+								}
+
+							Ax[i][j][k] += Hb(i, j, k, 0, 0)*G1b[a].x + Hb(i, j, k, 0, 1)*G1b[a].y + Hb(i, j, k, 0, 2)*G1b[a].z;
+							Ay[i][j][k] += Hb(i, j, k, 1, 0)*G1b[a].x + Hb(i, j, k, 1, 1)*G1b[a].y + Hb(i, j, k, 1, 2)*G1b[a].z;
+							Az[i][j][k] += Hb(i, j, k, 2, 0)*G1b[a].x + Hb(i, j, k, 2, 1)*G1b[a].y + Hb(i, j, k, 2, 2)*G1b[a].z;
+						}
+
+				mat3d kab; kab.zero();
+				for (int k=0; k<3; ++k)
+				{
+					kab(0,0) += G1a[b].x*Ax[0][0][k]*Nu[k] + G1a[b].y*Ax[0][1][k]*Nu[k] + G1a[b].z*Ax[0][2][k]*Nu[k];
+					kab(0,1) += G1a[b].x*Ax[1][0][k]*Nu[k] + G1a[b].y*Ax[1][1][k]*Nu[k] + G1a[b].z*Ax[1][2][k]*Nu[k];
+					kab(0,2) += G1a[b].x*Ax[2][0][k]*Nu[k] + G1a[b].y*Ax[2][1][k]*Nu[k] + G1a[b].z*Ax[2][2][k]*Nu[k];
+
+					kab(1,0) += G1a[b].x*Ay[0][0][k]*Nu[k] + G1a[b].y*Ay[0][1][k]*Nu[k] + G1a[b].z*Ay[0][2][k]*Nu[k];
+					kab(1,1) += G1a[b].x*Ay[1][0][k]*Nu[k] + G1a[b].y*Ay[1][1][k]*Nu[k] + G1a[b].z*Ay[1][2][k]*Nu[k];
+					kab(1,2) += G1a[b].x*Ay[2][0][k]*Nu[k] + G1a[b].y*Ay[2][1][k]*Nu[k] + G1a[b].z*Ay[2][2][k]*Nu[k];
+
+					kab(2,0) += G1a[b].x*Az[0][0][k]*Nu[k] + G1a[b].y*Az[0][1][k]*Nu[k] + G1a[b].z*Az[0][2][k]*Nu[k];
+					kab(2,1) += G1a[b].x*Az[1][0][k]*Nu[k] + G1a[b].y*Az[1][1][k]*Nu[k] + G1a[b].z*Az[1][2][k]*Nu[k];
+					kab(2,2) += G1a[b].x*Az[2][0][k]*Nu[k] + G1a[b].y*Az[2][1][k]*Nu[k] + G1a[b].z*Az[2][2][k]*Nu[k];
+				}
+				// multiply by weights
+				kab *= J0*gw[n]*0.5;
+
+				ke.add(3*(nelna + a), 3*b, kab);
+			}
+
+		// The b-b term
+		for (int a=0; a<nelnb; ++a)
+			for (int b=0; b<nelnb; ++b)
+			{
+				double Ax[3][3][3] = {0};
+				double Ay[3][3][3] = {0};
+				double Az[3][3][3] = {0};
+				for (int i=0; i<3; ++i)
+					for (int j=0; j<3; ++j)
+						for (int k=0; k<3; ++k)
+						{
+							for (int q=0; q<3; ++q)
+								for (int r=0; r<3; ++r)
+								{
+									Ax[i][j][k] += Jb(i, j, k, 0, q, r)*G2b[a](q ,r);
+									Ay[i][j][k] += Jb(i, j, k, 1, q, r)*G2b[a](q ,r);
+									Az[i][j][k] += Jb(i, j, k, 2, q, r)*G2b[a](q ,r);
+								}
+
+							Ax[i][j][k] += Hb(i, j, k, 0, 0)*G1b[a].x + Hb(i, j, k, 0, 1)*G1b[a].y + Hb(i, j, k, 0, 2)*G1b[a].z;
+							Ay[i][j][k] += Hb(i, j, k, 1, 0)*G1b[a].x + Hb(i, j, k, 1, 1)*G1b[a].y + Hb(i, j, k, 1, 2)*G1b[a].z;
+							Az[i][j][k] += Hb(i, j, k, 2, 0)*G1b[a].x + Hb(i, j, k, 2, 1)*G1b[a].y + Hb(i, j, k, 2, 2)*G1b[a].z;
+						}
+
+				mat3d kab; kab.zero();
+				for (int k=0; k<3; ++k)
+				{
+					kab(0,0) += G1b[b].x*Ax[0][0][k]*Nu[k] + G1b[b].y*Ax[0][1][k]*Nu[k] + G1b[b].z*Ax[0][2][k]*Nu[k];
+					kab(0,1) += G1b[b].x*Ax[1][0][k]*Nu[k] + G1b[b].y*Ax[1][1][k]*Nu[k] + G1b[b].z*Ax[1][2][k]*Nu[k];
+					kab(0,2) += G1b[b].x*Ax[2][0][k]*Nu[k] + G1b[b].y*Ax[2][1][k]*Nu[k] + G1b[b].z*Ax[2][2][k]*Nu[k];
+
+					kab(1,0) += G1b[b].x*Ay[0][0][k]*Nu[k] + G1b[b].y*Ay[0][1][k]*Nu[k] + G1b[b].z*Ay[0][2][k]*Nu[k];
+					kab(1,1) += G1b[b].x*Ay[1][0][k]*Nu[k] + G1b[b].y*Ay[1][1][k]*Nu[k] + G1b[b].z*Ay[1][2][k]*Nu[k];
+					kab(1,2) += G1b[b].x*Ay[2][0][k]*Nu[k] + G1b[b].y*Ay[2][1][k]*Nu[k] + G1b[b].z*Ay[2][2][k]*Nu[k];
+
+					kab(2,0) += G1b[b].x*Az[0][0][k]*Nu[k] + G1b[b].y*Az[0][1][k]*Nu[k] + G1b[b].z*Az[0][2][k]*Nu[k];
+					kab(2,1) += G1b[b].x*Az[1][0][k]*Nu[k] + G1b[b].y*Az[1][1][k]*Nu[k] + G1b[b].z*Az[1][2][k]*Nu[k];
+					kab(2,2) += G1b[b].x*Az[2][0][k]*Nu[k] + G1b[b].y*Az[2][1][k]*Nu[k] + G1b[b].z*Az[2][2][k]*Nu[k];
+				}
+				// multiply by weights
+				kab *= J0*gw[n]*0.5;
+
+				ke.sub(3*(nelna + a), 3*(nelna + b), kab);
+			}
+		}
 }
 
 //-----------------------------------------------------------------------------
