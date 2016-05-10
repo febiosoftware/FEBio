@@ -1093,8 +1093,9 @@ void FEElasticMultiscaleDomain2O::StiffnessMatrixDG(FESolver* psolver)
 
 	// get stiffness flags
 	bool bKDG1 = pmat->m_bKDG1;
+	bool bKDG2 = pmat->m_bKDG2;
 	bool bKDG3 = pmat->m_bKDG3;
-	if ((bKDG1==false)&&(bKDG3==false)) return;
+	if ((bKDG1==false)&&(bKDG2==false)&&(bKDG3==false)) return;
 
 	matrix ke;
 	vector<int> lm;
@@ -1125,6 +1126,7 @@ void FEElasticMultiscaleDomain2O::StiffnessMatrixDG(FESolver* psolver)
 
 		// get the element stiffness matrix
 		if (bKDG1) ElementStiffnessMatrixDG1(el, &m_surf.GetData(nd), ke);
+		if (bKDG2) ElementStiffnessMatrixDG2(el, &m_surf.GetData(nd), ke);
 		if (bKDG3) ElementStiffnessMatrixDG3(el, &m_surf.GetData(nd), ke);
 
 		// setup the LM vector
@@ -1290,7 +1292,7 @@ void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG1(FESurfaceElement& fa
 					}
 
 				// add it to the element matrix
-				ke.add(3*a, 3*b, kab);
+				ke.add(3*a, 3*(nelna + b), kab);
 			}
 
 		// The b-a term
@@ -1333,7 +1335,7 @@ void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG1(FESurfaceElement& fa
 					}
 
 				// add it to the element matrix
-				ke.sub(3*a, 3*b, kab);
+				ke.sub(3*(nelna + a), 3*b, kab);
 			}
 
 		// The b-b term
@@ -1376,8 +1378,126 @@ void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG1(FESurfaceElement& fa
 					}
 
 				// add it to the element matrix
-				ke.sub(3*a, 3*b, kab);
+				ke.sub(3*(nelna + a), 3*(nelna + b), kab);
 			}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticMultiscaleDomain2O::ElementStiffnessMatrixDG2(FESurfaceElement& face, FEInternalSurface2O::Data* pdata, matrix& ke)
+{
+	FEMesh& mesh = *GetMesh();
+	// get the surface
+	FESurface& surf = *m_surf.GetSurface();
+
+	// get the solid elements of this interface element
+	FESolidElement& ela = Element(face.m_elem[1]);
+	FESolidElement& elb = Element(face.m_elem[0]);
+
+	// get the number nodes of each element
+	int nelna = ela.Nodes();
+	int nelnb = elb.Nodes();
+
+	// initialize the element stiffness matrix
+	int ndof = 3*(nelna + nelnb);
+
+	// shape function derivatives
+	vec3d G1a[FEElement::MAX_NODES];
+	vec3d G1b[FEElement::MAX_NODES];
+	mat3d G2a[FEElement::MAX_NODES];
+	mat3d G2b[FEElement::MAX_NODES];
+
+	// nodal coordinates
+	vec3d Xa[FEElement::MAX_NODES];
+	vec3d Xb[FEElement::MAX_NODES];
+	for (int i=0; i<nelna; ++i) Xa[i] = mesh.Node(ela.m_node[i]).m_r0;
+	for (int i=0; i<nelnb; ++i) Xb[i] = mesh.Node(elb.m_node[i]).m_r0;
+
+	// loop over all integration points
+	int nint = face.GaussPoints();
+	double* gw = face.GaussWeights();
+	for (int n=0; n<nint; ++n)
+	{
+		// get the integration point data
+		FEInternalSurface2O::Data& data = pdata[n];
+
+		// Jacobian and normal at this integration point
+		vec3d nu;
+		double J0 = surf.jac0(face, n, nu);
+		double Nu[3] = {nu.x, nu.y, nu.z};
+
+		// shape function gradients at this integration point
+		shape_gradient(ela, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, G1a);
+		shape_gradient(elb, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, G1b);
+		shape_gradient2(ela, Xa, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, G2a);
+		shape_gradient2(elb, Xb, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, G2b);
+
+		// stiffnesses
+		const tens5d& Ha = data.H0[1];
+		const tens5d& Hb = data.H0[0];
+
+		const tens6d& Ja = data.J0[1];
+		const tens6d& Jb = data.J0[0];
+
+		// The a-a term
+/*		for (int a=0; a<nelna; ++a)
+			for (int b=0; b<nelna; ++b)
+			{
+				double Ax[3][3][3] = {0};
+				double Ay[3][3][3] = {0};
+				double Az[3][3][3] = {0};
+				for (int j=0; j<3; ++j)
+					for (int k=0; k<3; ++k)
+					{
+						for (int q=0; q<3; ++q)
+						{
+							for (int r=0; r<3; ++r)
+							{
+								Ax[0][j][k] += Ja(0, j, k, 0, q, r)*G2[a](q ,r);
+								Ax[1][j][k] += Ja(1, j, k, 0, q, r)*G2[a](q ,r);
+								Ax[2][j][k] += Ja(2, j, k, 0, q, r)*G2[a](q ,r);
+
+								Ay[0][j][k] += Ja(0, j, k, 1, q, r)*G2[a](q ,r);
+								Ay[1][j][k] += Ja(1, j, k, 1, q, r)*G2[a](q ,r);
+								Ay[2][j][k] += Ja(2, j, k, 1, q, r)*G2[a](q ,r);
+
+								Az[0][j][k] += Ja(0, j, k, 2, q, r)*G2[a](q ,r);
+								Az[1][j][k] += Ja(1, j, k, 2, q, r)*G2[a](q ,r);
+								Az[2][j][k] += Ja(2, j, k, 2, q, r)*G2[a](q ,r);
+							}
+						}
+
+						Ax[0][j][k] += Ha(0, j, k, 0, 0)*G1a[a].x + Ha(0, j, k, 0, 1)*G1a[a].y + Ha(0, j, k, 0, 2)*G1a[a].z;
+						Ax[1][j][k] += Ha(1, j, k, 0, 0)*G1a[a].x + Ha(1, j, k, 0, 1)*G1a[a].y + Ha(1, j, k, 0, 2)*G1a[a].z;
+						Ax[2][j][k] += Ha(2, j, k, 0, 0)*G1a[a].x + Ha(2, j, k, 0, 1)*G1a[a].y + Ha(2, j, k, 0, 2)*G1a[a].z;
+
+						Ay[0][j][k] += Ha(0, j, k, 1, 0)*G1a[a].x + Ha(0, j, k, 1, 1)*G1a[a].y + Ha(0, j, k, 1, 2)*G1a[a].z;
+						Ay[1][j][k] += Ha(1, j, k, 1, 0)*G1a[a].x + Ha(1, j, k, 1, 1)*G1a[a].y + Ha(1, j, k, 1, 2)*G1a[a].z;
+						Ay[2][j][k] += Ha(2, j, k, 1, 0)*G1a[a].x + Ha(2, j, k, 1, 1)*G1a[a].y + Ha(2, j, k, 1, 2)*G1a[a].z;
+
+						Az[0][j][k] += Ha(0, j, k, 2, 0)*G1a[a].x + Ha(0, j, k, 2, 1)*G1a[a].y + Ha(0, j, k, 2, 2)*G1a[a].z;
+						Az[1][j][k] += Ha(1, j, k, 2, 0)*G1a[a].x + Ha(1, j, k, 2, 1)*G1a[a].y + Ha(1, j, k, 2, 2)*G1a[a].z;
+						Az[2][j][k] += Ha(2, j, k, 2, 0)*G1a[a].x + Ha(2, j, k, 2, 1)*G1a[a].y + Ha(2, j, k, 2, 2)*G1a[a].z;
+					}
+
+					mat3d kab; kab.zero();
+					for (int j=0; j<3; ++j)
+						for (int k=0; k<3; ++k)
+						{
+							kab(0,0) += G1b[b].x*(0,j)*Ax[0][j][k]*Nu[k] + G1b[b].y*Ax[1][j][k]*Nu[k] + G1b[b].z*Ax[2][j][k]*Nu[k];
+							kab(0,0) += G1b[b].x*(0,j)*Ax[0][j][k]*Nu[k] + G1b[b].y*Ax[1][j][k]*Nu[k] + G1b[b].z*Ax[2][j][k]*Nu[k];
+
+							fa[1] += Du(0,j)*Ay[0][j][k]*Nu[k] + Du(1,j)*Ay[1][j][k]*Nu[k] + Du(2,j)*Ay[2][j][k]*Nu[k];
+							fa[2] += Du(0,j)*Az[0][j][k]*Nu[k] + Du(1,j)*Az[1][j][k]*Nu[k] + Du(2,j)*Az[2][j][k]*Nu[k];
+						}
+
+					// the negative sign is because we need to subtract the internal forces
+					// from the residual
+					fe[3*a  ] -= fa[0]*J*gw[n]*0.5;
+					fe[3*a+1] -= fa[1]*J*gw[n]*0.5;
+					fe[3*a+2] -= fa[2]*J*gw[n]*0.5;
+				}
+*/
 	}
 }
 

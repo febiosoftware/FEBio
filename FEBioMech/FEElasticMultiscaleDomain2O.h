@@ -98,6 +98,7 @@ public:
 	//! contributions from discontinuous Galerkin formulation
 	void StiffnessMatrixDG(FESolver* psolver);
 	void ElementStiffnessMatrixDG1(FESurfaceElement& el, FEInternalSurface2O::Data* pdata, matrix& ke);
+	void ElementStiffnessMatrixDG2(FESurfaceElement& el, FEInternalSurface2O::Data* pdata, matrix& ke);
 	void ElementStiffnessMatrixDG3(FESurfaceElement& el, FEInternalSurface2O::Data* pdata, matrix& ke);
 
 	void defhess(FESolidElement &el, int n, tens3drs &G);
