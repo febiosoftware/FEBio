@@ -224,7 +224,7 @@ bool FEPlotMortarContactGap::Save(FESurface& S, FEDataStream& a)
 //! Store the average deformation Hessian (G) for each element. 
 bool FEPlotElementGnorm::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEMicroMaterial2O* pme = dynamic_cast<FEMicroMaterial2O*>(dom.GetMaterial()->GetElasticMaterial());
+	FEElasticMaterial2O* pme = dynamic_cast<FEElasticMaterial2O*>(dom.GetMaterial()->GetElasticMaterial());
 	if (pme == 0) return false;
 	
 	// write solid element data
