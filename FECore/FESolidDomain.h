@@ -25,7 +25,9 @@ public:
 	FESolidElement& Element(int n) { return m_Elem[n]; }
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
-	int GetElementType() { return m_Elem[0].Type(); }
+	int GetElementType() const { return m_Elem[0].Type(); }
+
+	int GetElementShape() const { return m_Elem[0].Shape(); }
 
 	//! find the element in which point y lies
 	FESolidElement* FindElement(vec3d y, double r[3]);
