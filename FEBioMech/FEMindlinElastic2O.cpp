@@ -58,7 +58,7 @@ void FEMindlinElastic2O::Stress(FEMaterialPoint& mp, mat3d& P, tens3drs& Q)
 					a += 2.0*m_a3*G(p,i,i)*I(q,r);
 				}
 				a += 2.0*m_a4*G(p,q,r);
-				a += 0.5*m_a5*(3.0*G(q,p,r) + G(r,p,q));
+				a += m_a5*(G(q,p,r) + G(r,p,q));
 
 				Q(p,q,r) = a;
 			}
@@ -118,7 +118,7 @@ void FEMindlinElastic2O::Tangent(FEMaterialPoint& mp, tens4d& C, tens5d& L, tens
 							a += 0.5*m_a2*(2.0*I(j,k)*I(l,n)*I(i,m) + I(j,l)*I(m,n)*I(i,k) + I(i,j)*I(k,l)*I(m,n));
 							a += 2.0*m_a3*I(i,l)*I(m,n)*I(j,k);
 							a += 2.0*m_a4*I(i,l)*I(j,m)*I(k,n);
-							a += 0.5*m_a5*(3.0*I(j,l)*I(i,m)*I(k,n) + I(k,l)*I(i,m)*I(j,n));
+							a += m_a5*(I(j,l)*I(i,m)*I(k,n) + I(k,l)*I(i,m)*I(j,n));
 
 							J(i,j,k,l,m,n) = a;
 						}
