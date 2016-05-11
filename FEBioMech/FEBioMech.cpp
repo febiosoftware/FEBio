@@ -105,6 +105,7 @@
 #include "FEPrescribedActiveContractionIsotropicUC.h"
 #include "FEGentMaterial.h"
 #include "FEWrinkleOgdenMaterial.h"
+#include "FEMindlinElastic2O.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -283,6 +284,7 @@ REGISTER_FECORE_CLASS(FECoupledTransIsoMooneyRivlin        , FEMATERIAL_ID, "cou
 REGISTER_FECORE_CLASS(FEMicroMaterial                      , FEMATERIAL_ID, "micro-material");
 REGISTER_FECORE_CLASS(FEMicroMaterial2O                    , FEMATERIAL_ID, "micro-material2O");
 REGISTER_FECORE_CLASS(FEMicroProbe                         , FEMATERIAL_ID, "probe");
+REGISTER_FECORE_CLASS(FEMindlinElastic2O                   , FEMATERIAL_ID, "mindlin elastic");
 REGISTER_FECORE_CLASS(FEGenerationMaterial                 , FEMATERIAL_ID, "generation");
 REGISTER_FECORE_CLASS(FEPRLig					           , FEMATERIAL_ID, "PRLig");
 REGISTER_FECORE_CLASS(FEFiberExpLinear					   , FEMATERIAL_ID, "fiber-exp-linear");
@@ -327,19 +329,20 @@ REGISTER_FECORE_CLASS(FEDamageCriterionMNLS                , FEMATERIAL_ID, "DC 
 
 //-----------------------------------------------------------------------------
 // domain classes
-REGISTER_FECORE_CLASS(FERigidSolidDomain        , FEDOMAIN_ID, "rigid-solid"      );
-REGISTER_FECORE_CLASS(FERigidShellDomain        , FEDOMAIN_ID, "rigid-shell"      );
-REGISTER_FECORE_CLASS(FERemodelingElasticDomain , FEDOMAIN_ID, "remodeling-solid" );
-REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain1O, FEDOMAIN_ID, "elastic-10-solid" );
-REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain2O, FEDOMAIN_ID, "elastic-20-solid" );
-REGISTER_FECORE_CLASS(FE3FieldElasticSolidDomain, FEDOMAIN_ID, "three-field-solid");
-REGISTER_FECORE_CLASS(FEUDGHexDomain            , FEDOMAIN_ID, "udg-hex"          );
-REGISTER_FECORE_CLASS(FESRIElasticSolidDomain   , FEDOMAIN_ID, "sri-solid"        );
-REGISTER_FECORE_CLASS(FEUT4Domain               , FEDOMAIN_ID, "ut4-solid"        );
-REGISTER_FECORE_CLASS(FEElasticSolidDomain      , FEDOMAIN_ID, "elastic-solid"    );
-REGISTER_FECORE_CLASS(FEElasticShellDomain      , FEDOMAIN_ID, "elastic-shell"    );
-REGISTER_FECORE_CLASS(FEElasticTrussDomain      , FEDOMAIN_ID, "elastic-truss"    );
-REGISTER_FECORE_CLASS(FEDiscreteSpringDomain    , FEDOMAIN_ID, "discrete-spring"  );
+REGISTER_FECORE_CLASS(FERigidSolidDomain         , FEDOMAIN_ID, "rigid-solid"       );
+REGISTER_FECORE_CLASS(FERigidShellDomain         , FEDOMAIN_ID, "rigid-shell"       );
+REGISTER_FECORE_CLASS(FERemodelingElasticDomain  , FEDOMAIN_ID, "remodeling-solid"  );
+REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain1O, FEDOMAIN_ID, "elastic-mm-solid"  );
+REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain2O, FEDOMAIN_ID, "elastic-mm-solid2O");
+REGISTER_FECORE_CLASS(FEElasticSolidDomain2O     , FEDOMAIN_ID, "elastic-solid2O"   );
+REGISTER_FECORE_CLASS(FE3FieldElasticSolidDomain , FEDOMAIN_ID, "three-field-solid" );
+REGISTER_FECORE_CLASS(FEUDGHexDomain             , FEDOMAIN_ID, "udg-hex"           );
+REGISTER_FECORE_CLASS(FESRIElasticSolidDomain    , FEDOMAIN_ID, "sri-solid"         );
+REGISTER_FECORE_CLASS(FEUT4Domain                , FEDOMAIN_ID, "ut4-solid"         );
+REGISTER_FECORE_CLASS(FEElasticSolidDomain       , FEDOMAIN_ID, "elastic-solid"     );
+REGISTER_FECORE_CLASS(FEElasticShellDomain       , FEDOMAIN_ID, "elastic-shell"     );
+REGISTER_FECORE_CLASS(FEElasticTrussDomain       , FEDOMAIN_ID, "elastic-truss"     );
+REGISTER_FECORE_CLASS(FEDiscreteSpringDomain     , FEDOMAIN_ID, "discrete-spring"   );
 
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad

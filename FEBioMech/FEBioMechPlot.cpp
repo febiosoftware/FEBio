@@ -419,7 +419,7 @@ bool FEPlotElementPK1norm::Save(FEDomain& dom, FEDataStream& a)
 //! Store the norm of the average PK1 stress moment for each element. 
 bool FEPlotElementQK1norm::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEMicroMaterial2O* pme = dynamic_cast<FEMicroMaterial2O*>(dom.GetMaterial()->GetElasticMaterial());
+	FEElasticMaterial2O* pme = dynamic_cast<FEElasticMaterial2O*>(dom.GetMaterial()->GetElasticMaterial());
 	if (pme == 0) return false;
 	
 	// write solid element data

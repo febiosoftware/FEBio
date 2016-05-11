@@ -46,6 +46,9 @@ public: // these functions must be implemented by derived classes
 	//! J = dQ/dG
 	virtual void Tangent(FEMaterialPoint& mp, tens4d& C, tens5d& L, tens5d& H, tens6d& J) = 0;
 
+	//! create material point data
+	FEMaterialPoint* CreateMaterialPointData();
+
 public:
 	double			m_beta;			//!< beta parameter for DG
 

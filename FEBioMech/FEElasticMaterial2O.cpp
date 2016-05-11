@@ -62,6 +62,12 @@ FEElasticMaterial2O::FEElasticMaterial2O(FEModel* pfem) : FEElasticMaterial(pfem
 }
 
 //-----------------------------------------------------------------------------
+FEMaterialPoint* FEElasticMaterial2O::CreateMaterialPointData()
+{
+	return new FEElasticMaterialPoint2O(new FEElasticMaterialPoint);
+}
+
+//-----------------------------------------------------------------------------
 // The stiffness is evaluated at the same time the stress is evaluated so we 
 // can just return it here. Note that this assumes that the stress function 
 // is always called prior to the tangent function.

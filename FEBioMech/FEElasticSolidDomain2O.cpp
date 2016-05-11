@@ -518,7 +518,7 @@ void FEElasticSolidDomain2O::UpdateElementStress(int iel, double dt)
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEElasticMaterialPoint2O& mmpt2O = *(mp.ExtractData<FEElasticMaterialPoint2O>());
+		FEElasticMaterialPoint2O& pt2O = *(mp.ExtractData<FEElasticMaterialPoint2O>());
 		
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
@@ -528,10 +528,15 @@ void FEElasticSolidDomain2O::UpdateElementStress(int iel, double dt)
 
 		// get the deformation gradient and determinant
 		pt.m_J = defgrad(el, pt.m_F, n);
-		defhess(el, n, mmpt2O.m_G);
+		defhess(el, n, pt2O.m_G);
 
 		// evaluate stresses
-		pmat->Stress(mp, mmpt2O.m_PK1, mmpt2O.m_Q);
+		pmat->Stress(mp, pt2O.m_PK1, pt2O.m_Q);
+
+		// store the Cauchy stress as well
+		double J = pt.m_J;
+		const mat3d Ft = pt.m_F.transpose();
+		pt.m_s = (pt2O.m_PK1*Ft).sym()/J;	
 	}
 }
 
@@ -1834,9 +1839,7 @@ void FEElasticSolidDomain2O::ElementStiffness(const FETimePoint& tp, int iel, ma
 							}
 
 				// multiply by jacobian and integration weight
-				for (int i=0; i<3; ++i)
-					for (int j=0; j<3; ++j)
-						Kab[i][j] *= J0*gw[ni];
+				Kab *= J0*gw[ni];
 
 				// add it to the element matrix
 				ke.add(3*a, 3*b, Kab);

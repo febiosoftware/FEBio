@@ -110,11 +110,6 @@ void FEMicroMaterial2O::Stress(FEMaterialPoint &mp, mat3d& P, tens3drs& Q)
 
 	// calculate the averaged Cauchy stress
 	mmpt2O.m_rve.AveragedStress2O(P, Q);
-
-	// calculate the Cauchy stress tensor
-	double J = pt.m_J;
-	const mat3d Ft = F.transpose();
-	pt.m_s = (P*Ft).sym()/J;
 }
 
 //-----------------------------------------------------------------------------
