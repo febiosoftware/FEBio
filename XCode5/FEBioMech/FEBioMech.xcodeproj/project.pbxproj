@@ -118,6 +118,10 @@
 		D5B8EAFD1BB4DE17009D101B /* FEElasticMultiscaleDomain1O.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B8EAF91BB4DE17009D101B /* FEElasticMultiscaleDomain1O.h */; };
 		D5B8EAFE1BB4DE17009D101B /* FEElasticMultiscaleDomain2O.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B8EAFA1BB4DE17009D101B /* FEElasticMultiscaleDomain2O.cpp */; };
 		D5B8EAFF1BB4DE17009D101B /* FEElasticMultiscaleDomain2O.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B8EAFB1BB4DE17009D101B /* FEElasticMultiscaleDomain2O.h */; };
+		D5C015001CEF4F1000EE43D5 /* FEElasticSolidDomain2O.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C014FC1CEF4F1000EE43D5 /* FEElasticSolidDomain2O.cpp */; };
+		D5C015011CEF4F1000EE43D5 /* FEElasticSolidDomain2O.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C014FD1CEF4F1000EE43D5 /* FEElasticSolidDomain2O.h */; };
+		D5C015021CEF4F1000EE43D5 /* FEMindlinElastic2O.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C014FE1CEF4F1000EE43D5 /* FEMindlinElastic2O.cpp */; };
+		D5C015031CEF4F1000EE43D5 /* FEMindlinElastic2O.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C014FF1CEF4F1000EE43D5 /* FEMindlinElastic2O.h */; };
 		D5C69F921A41EA9000EB52B2 /* FEFiberExpLinear.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C69F8E1A41EA9000EB52B2 /* FEFiberExpLinear.cpp */; };
 		D5C69F931A41EA9000EB52B2 /* FEFiberExpLinear.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C69F8F1A41EA9000EB52B2 /* FEFiberExpLinear.h */; };
 		D5C69F941A41EA9000EB52B2 /* FEUncoupledFiberExpLinear.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C69F901A41EA9000EB52B2 /* FEUncoupledFiberExpLinear.cpp */; };
@@ -492,6 +496,10 @@
 		D5B8EAF91BB4DE17009D101B /* FEElasticMultiscaleDomain1O.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElasticMultiscaleDomain1O.h; sourceTree = "<group>"; };
 		D5B8EAFA1BB4DE17009D101B /* FEElasticMultiscaleDomain2O.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElasticMultiscaleDomain2O.cpp; sourceTree = "<group>"; };
 		D5B8EAFB1BB4DE17009D101B /* FEElasticMultiscaleDomain2O.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElasticMultiscaleDomain2O.h; sourceTree = "<group>"; };
+		D5C014FC1CEF4F1000EE43D5 /* FEElasticSolidDomain2O.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElasticSolidDomain2O.cpp; sourceTree = "<group>"; };
+		D5C014FD1CEF4F1000EE43D5 /* FEElasticSolidDomain2O.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElasticSolidDomain2O.h; sourceTree = "<group>"; };
+		D5C014FE1CEF4F1000EE43D5 /* FEMindlinElastic2O.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMindlinElastic2O.cpp; sourceTree = "<group>"; };
+		D5C014FF1CEF4F1000EE43D5 /* FEMindlinElastic2O.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMindlinElastic2O.h; sourceTree = "<group>"; };
 		D5C69F8E1A41EA9000EB52B2 /* FEFiberExpLinear.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFiberExpLinear.cpp; sourceTree = "<group>"; };
 		D5C69F8F1A41EA9000EB52B2 /* FEFiberExpLinear.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFiberExpLinear.h; sourceTree = "<group>"; };
 		D5C69F901A41EA9000EB52B2 /* FEUncoupledFiberExpLinear.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEUncoupledFiberExpLinear.cpp; sourceTree = "<group>"; };
@@ -889,6 +897,8 @@
 				D5E106D01865DFAC00B23922 /* FEElasticShellDomain.h */,
 				D5E106D11865DFAC00B23922 /* FEElasticSolidDomain.cpp */,
 				D5E106D21865DFAC00B23922 /* FEElasticSolidDomain.h */,
+				D5C014FC1CEF4F1000EE43D5 /* FEElasticSolidDomain2O.cpp */,
+				D5C014FD1CEF4F1000EE43D5 /* FEElasticSolidDomain2O.h */,
 				D5E106D31865DFAC00B23922 /* FEElasticTrussDomain.cpp */,
 				D5E106D41865DFAC00B23922 /* FEElasticTrussDomain.h */,
 				D5E106D51865DFAC00B23922 /* FEEllipsoidalFiberDistribution.cpp */,
@@ -975,6 +985,8 @@
 				D5E1070A1865DFAD00B23922 /* FEMicroMaterial.h */,
 				D59BBB9C1AD771B800E2991F /* FEMicroMaterial2O.cpp */,
 				D59BBB9D1AD771B800E2991F /* FEMicroMaterial2O.h */,
+				D5C014FE1CEF4F1000EE43D5 /* FEMindlinElastic2O.cpp */,
+				D5C014FF1CEF4F1000EE43D5 /* FEMindlinElastic2O.h */,
 				D5E1070B1865DFAD00B23922 /* FEMooneyRivlin.cpp */,
 				D5E1070C1865DFAD00B23922 /* FEMooneyRivlin.h */,
 				D5D4CC1A1BF7D6CD00A2BD96 /* FEMortarContactSurface.cpp */,
@@ -1317,6 +1329,7 @@
 				D5E108461865DFAD00B23922 /* FEUDGHexDomain.h in Headers */,
 				D5E1083C1865DFAD00B23922 /* FETractionLoad.h in Headers */,
 				D51BB4061991819900638A8B /* FEElasticFiberMaterialUC.h in Headers */,
+				D5C015011CEF4F1000EE43D5 /* FEElasticSolidDomain2O.h in Headers */,
 				D5E1083A1865DFAD00B23922 /* FETiedInterface.h in Headers */,
 				D5E107791865DFAD00B23922 /* FE2DTransIsoVerondaWestmann.h in Headers */,
 				D5E107C61865DFAD00B23922 /* FEFiberExpPow.h in Headers */,
@@ -1351,6 +1364,7 @@
 				D5F65D9B1B1BD25F004C648D /* FERigidAngularDamper.h in Headers */,
 				D5C6D41819CB640D00E48AAF /* FEDamageCDF.h in Headers */,
 				D5B5ACBB1C74BD8C0097B42B /* FEWrinkleOgdenMaterial.h in Headers */,
+				D5C015031CEF4F1000EE43D5 /* FEMindlinElastic2O.h in Headers */,
 				D5E107CA1865DFAD00B23922 /* FEFiberIntegrationGauss.h in Headers */,
 				D5E107A51865DFAD00B23922 /* FEEFDMooneyRivlin.h in Headers */,
 				D5E108281865DFAD00B23922 /* FESolidSolver.h in Headers */,
@@ -1421,6 +1435,7 @@
 				D5FF08F81BE4528E0064FF98 /* FEMortarTiedContact.cpp in Sources */,
 				D5E1080D1865DFAD00B23922 /* FERemodelingElasticMaterial.cpp in Sources */,
 				D59D17D7192BD83B007C880C /* FECoupledVerondaWestmann.cpp in Sources */,
+				D5C015021CEF4F1000EE43D5 /* FEMindlinElastic2O.cpp in Sources */,
 				D5E107761865DFAD00B23922 /* FE2DTransIsoMooneyRivlin.cpp in Sources */,
 				D553C6241A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.cpp in Sources */,
 				D5E108491865DFAD00B23922 /* FEUncoupledElasticMixture.cpp in Sources */,
@@ -1497,6 +1512,7 @@
 				031FDFBB1CC1942300048B41 /* FERVEModel.cpp in Sources */,
 				D5E107E51865DFAD00B23922 /* FELinearElastic.cpp in Sources */,
 				D54CBF041AB340B1003CF33F /* FEPrescribedActiveContractionTransIsoUC.cpp in Sources */,
+				D5C015001CEF4F1000EE43D5 /* FEElasticSolidDomain2O.cpp in Sources */,
 				D5E107901865DFAD00B23922 /* FEContinuousFiberDistribution.cpp in Sources */,
 				D5E1078C1865DFAD00B23922 /* FEConstBodyForce.cpp in Sources */,
 				D59BBBA01AD771B800E2991F /* FEMicroMaterial2O.cpp in Sources */,
@@ -1719,7 +1735,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.intel.compilers.icc.15_0_0;
+				GCC_VERSION = com.intel.compilers.icc.latest;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
