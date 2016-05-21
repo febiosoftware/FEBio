@@ -8,6 +8,7 @@
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
 #include "FESlidingInterfaceMP.h"
+#include "FESlidingInterfaceBiphasic.h"
 #include "FEBioMech/FEPressureLoad.h"
 #include "FEBioMech/FEResidualVector.h"
 #include "FECore/FERigidBody.h"
@@ -982,6 +983,8 @@ void FEMultiphasicSolver::UpdateContact()
 		if (psi3) psi3->MarkAmbient();
 		FESlidingInterfaceMP* psiMP = dynamic_cast<FESlidingInterfaceMP*>(pci);
 		if (psiMP) psiMP->MarkAmbient();
+        FESlidingInterfaceBiphasic* psib = dynamic_cast<FESlidingInterfaceBiphasic*>(pci);
+        if (psib) psib->MarkFreeDraining();
 	}
 
 	// Update all contact interfaces
@@ -998,6 +1001,8 @@ void FEMultiphasicSolver::UpdateContact()
 		if (psi3) psi3->SetAmbient();
 		FESlidingInterfaceMP* psiMP = dynamic_cast<FESlidingInterfaceMP*>(pci);
 		if (psiMP) psiMP->SetAmbient();
+        FESlidingInterfaceBiphasic* psib = dynamic_cast<FESlidingInterfaceBiphasic*>(pci);
+        if (psib) psib->SetFreeDraining();
 	}
 }
 
