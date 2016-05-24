@@ -1,5 +1,6 @@
 #pragma once
-#include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FESurfaceMap.h>
 
 //-----------------------------------------------------------------------------
 //! FETractionLoad is a surface that has a constant (deformation independant)
@@ -8,21 +9,11 @@
 class FETractionLoad : public FESurfaceLoad
 {
 public:
-	struct LOAD
-	{
-		LOAD();
-		vec3d	s[9];		// nodal scale factors
-	};
-
-public:
 	//! constructor
 	FETractionLoad(FEModel* pfem);
 
 	//! Set the surface to apply the load to
 	void SetSurface(FESurface* ps);
-
-	//! get a traction load BC
-	LOAD& TractionLoad(int n) { return m_TC[n]; }
 
 	//! calculate traction stiffness (there is none)
 	void StiffnessMatrix(const FETimePoint& tp, FESolver* psolver) {}
@@ -30,22 +21,14 @@ public:
 	//! calculate residual
 	void Residual(const FETimePoint& tp, FEGlobalVector& R);
 
-	//! serialize data to archive
-	void Serialize(DumpStream& ar);
-
 	//! Unpack surface element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
-public:
-	//! set an attribute of a surface facet
-	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);
-
 private:
 	double	m_scale;	//!< magnitude of traction load
-	vec3d	m_traction;	//!< traction vector
 
 protected:
-	vector<LOAD>	m_TC;		//!< traction boundary cards
+	FESurfaceMap	m_TC;		//!< traction boundary cards
 
 	// degrees of freedom
 	// (TODO: find a better way of defining this. 

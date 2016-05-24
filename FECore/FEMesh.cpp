@@ -779,6 +779,13 @@ FENodeSet* FEMesh::FindNodeSet(const char* szname)
 }
 
 //-----------------------------------------------------------------------------
+FEFacetSet* FEMesh::FindFacetSet(const char* szname)
+{
+	for (size_t i=0; i<(int)m_FaceSet.size(); ++i) if (strcmp(m_FaceSet[i]->GetName(), szname) == 0) return m_FaceSet[i];
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Find a segment set set by name
 
 FESegmentSet* FEMesh::FindSegmentSet(const char* szname)

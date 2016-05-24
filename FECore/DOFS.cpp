@@ -294,6 +294,25 @@ int DOFS::GetDOF(const char* szdof)
 }
 
 //-----------------------------------------------------------------------------
+void DOFS::GetDOFList(const char* sz, std::vector<int>& dofs)
+{
+	const char* ch = sz;
+	char szdof[8] = {0}, *c = szdof;
+	do
+	{
+		if ((*ch==',')||(*ch==0))
+		{
+			*c = 0;
+			dofs.push_back(GetDOF(szdof));
+			c = szdof;
+			if (*ch != 0) ch++; else ch = 0;
+		}
+		else *c++ = *ch++;
+	}
+	while (ch);
+}
+
+//-----------------------------------------------------------------------------
 //! get the size of the dof array of a variable
 int DOFS::GetVariableSize(const char* szvar)
 {

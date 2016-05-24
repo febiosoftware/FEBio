@@ -371,8 +371,9 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	if (ch==0) ch = strrchr(m_szpath, '/');
 	if (ch==0) m_szpath[0] = 0; else *(ch+1)=0;
 
-	// clear the parameters 
+	// clean up
 	ClearParams();
+	ClearSurfaceMaps();
 
 	// read the file
 	return ReadFile(szfile);
@@ -663,15 +664,38 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* sz
 				// get the surface map
 				FESurfaceMap& map = pp->value<FESurfaceMap>();
 
-/*				// Find the surface
-				FEMesh& mesh = *GetFEMesh();
-				FESurface* ps = mesh.FindSurface(tag.AttributeValue("surf"));
-				if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "surf");
-
-				if (map.Create(ps) == false) throw XMLReader::InvalidAttributeValue(tag, "surf");
-*/
 				// read the surface map data
-				ParseSurfaceMap(tag, map);
+				const char* szmap = tag.AttributeValue("surface_data", true);
+				if (szmap)
+				{
+					FESurfaceMap* pdata = FindSurfaceMap(szmap);
+					if (pdata == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_data");
+
+					// make sure the types match
+					if (map.DataType() != pdata->DataType()) throw XMLReader::InvalidAttributeValue(tag, "surface_data", szmap);
+
+					// copy data
+					map = *pdata;
+				}
+				else 
+				{
+					if (tag.isleaf())
+					{
+						if (map.DataType() == FE_DOUBLE)
+						{
+							double v;
+							tag.value(v);
+							map.SetValue(v);
+						}
+						else if (map.DataType() == FE_VEC3D)
+						{
+							double v[3] = {0};
+							tag.value(v, 3);
+							map.SetValue(vec3d(v[0], v[1], v[2]));
+						}
+					}
+					else ParseSurfaceMap(tag, map);
+				}
 			};
 			break;
 		case FE_PARAM_FUNC1D:
@@ -1025,25 +1049,76 @@ bool FEBioImport::BuildSurface(FESurface& s, FEFacetSet& fs)
 	return true;
 }
 
+
+//-----------------------------------------------------------------------------
+void FEBioImport::ClearSurfaceMaps()
+{
+	// clear the surface maps
+	for (int i=0; i<(int) m_surfaceMap.size(); ++i) delete m_surfaceMap[i];
+	m_surfaceMap.clear();
+}
+
+//-----------------------------------------------------------------------------
+void FEBioImport::AddSurfaceMap(FESurfaceMap* map)
+{
+	m_surfaceMap.push_back(map);
+}
+
+//-----------------------------------------------------------------------------
+FESurfaceMap* FEBioImport::FindSurfaceMap(const char* szmap)
+{
+	for (int i=0; i<(int) m_surfaceMap.size(); ++i)
+	{
+		if (m_surfaceMap[i]->GetName() == std::string(szmap)) return m_surfaceMap[i];
+	}
+	return 0;
+}
+
 //-----------------------------------------------------------------------------
 void FEBioImport::ParseSurfaceMap(XMLTag& tag, FESurfaceMap& map)
 {
-	int nid;
-	double v;
-	++tag;
-	do
-	{
-		if (tag == "face")
-		{
-			tag.AttributeValue("id", nid);
-			tag.value(v);
+	int dataType = map.DataType();
 
-			map.SetValue(nid - 1, v);
-		}
-		else throw XMLReader::InvalidTag(tag);
+	if (dataType == FE_DOUBLE)
+	{
 		++tag;
+		do
+		{
+			if (tag == "face")
+			{
+				int nid;
+				tag.AttributeValue("id", nid);
+
+				double v;
+				tag.value(v);
+
+				map.SetValue(nid - 1, v);
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
 	}
-	while (!tag.isend());
+	else if (dataType == FE_VEC3D)
+	{
+		++tag;
+		do
+		{
+			if (tag == "face")
+			{
+				int nid;
+				tag.AttributeValue("id", nid);
+
+				double v[3];
+				tag.value(v, 3);
+
+				map.SetValue(nid - 1, vec3d(v[0], v[1], v[2]));
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+	}
 }
 
 //-----------------------------------------------------------------------------

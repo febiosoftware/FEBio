@@ -212,6 +212,11 @@ public:
 
 	bool BuildSurface(FESurface& s, FEFacetSet& f);
 
+	void AddSurfaceMap(FESurfaceMap* map);
+	void ClearSurfaceMaps();
+
+	FESurfaceMap* FindSurfaceMap(const char* szmap);
+
 public:
 	void ClearParams();
 
@@ -253,6 +258,8 @@ public:
 	vector<DataRecord*>		m_data;
 
 	vector<XMLParam>	m_Param;	// parameter list
+
+	vector<FESurfaceMap*>	m_surfaceMap;
 
 public:
 	char	m_szmod[256];	//!< module type string

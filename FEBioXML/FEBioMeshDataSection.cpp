@@ -41,11 +41,33 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 	{
 		if (tag == "elem_data")
 		{
-			const char* sztype = tag.AttributeValue("type");
+			const char* sztype = tag.AttributeValue("var");
 			if      (strcmp(sztype, "shell thickness") == 0) ParseShellThickness(tag);
 			else if (strcmp(sztype, "fiber"          ) == 0) ParseMaterialFibers(tag);
 			else if (strcmp(sztype, "mat_axis"       ) == 0) ParseMaterialAxes  (tag);
 			else ParseMaterialData(tag, sztype);
+		}
+		else if (tag == "surface_data")
+		{
+			const char* szsurf = tag.AttributeValue("surf");
+			FEFacetSet* psurf = mesh.FindFacetSet(szsurf);
+			if (psurf == 0) throw XMLReader::InvalidAttributeValue(tag, "surf", szsurf);
+
+			const char* sztype = tag.AttributeValue("data_type", true);
+			if (sztype == 0) sztype = "scalar";
+
+			int dataType = -1;
+			if      (strcmp(sztype, "scalar") == 0) dataType = FE_DOUBLE;
+			else if (strcmp(sztype, "vec3"  ) == 0) dataType = FE_VEC3D;
+			if (dataType == -1) throw XMLReader::InvalidAttributeValue(tag, "data_type", sztype);
+
+			const char* szname = tag.AttributeValue("name");
+			FESurfaceMap* pdata = new FESurfaceMap(dataType);
+			m_pim->AddSurfaceMap(pdata);
+
+			pdata->SetName(szname);
+			pdata->Create(psurf);
+			m_pim->ParseSurfaceMap(tag, *pdata);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

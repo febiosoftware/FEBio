@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include <string.h>
 #include "vec3d.h"
 #include "mat3d.h"
@@ -49,12 +50,14 @@ public: // output operators
 	DumpStream& operator << (const char* sz);
 	DumpStream& operator << (char* sz);
 	DumpStream& operator << (const double a[3][3]);
+	DumpStream& operator << (const std::string& s);
 	template <typename T> DumpStream& operator << (const T& o);
 	template <typename T> DumpStream& operator << (std::vector<T>& o);
 
 public: // input operators
 	DumpStream& operator >> (char* sz);
 	DumpStream& operator >> (double a[3][3]);
+	DumpStream& operator >> (std::string& s);
 	template <typename T> DumpStream& operator >> (T& o);
 	template <typename T> DumpStream& operator >> (std::vector<T>& o);
 

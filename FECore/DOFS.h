@@ -2,6 +2,7 @@
 #define __FECore__DOFS__
 #include <vector>
 
+
 class DumpStream;
 
 //-----------------------------------------------------------------------------
@@ -95,6 +96,9 @@ public:
 	//! return a dof index from the dof symbol
 	//! this function returns -1 if the symbol is not recognized
 	int GetDOF(const char* szdof);
+
+	//! return a list of dofs from comma seperated list dof symbols
+	void GetDOFList(const char* sz, std::vector<int>& dofs);
 
 	//! return a dof index from a variable
 	//! this function returns -1 if the symbol is not recognized

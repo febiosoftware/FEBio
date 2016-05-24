@@ -39,6 +39,14 @@ DumpStream& DumpStream::operator << (char* sz)
 }
 
 //-----------------------------------------------------------------------------
+DumpStream& DumpStream::operator<<(const std::string& s)
+{
+	const char* sz = s.c_str();
+	this->operator<<(sz);
+	return *this;
+}
+
+//-----------------------------------------------------------------------------
 DumpStream& DumpStream::operator << (const double a[3][3])
 {
 	write(a, sizeof(double), 9);
@@ -53,6 +61,15 @@ DumpStream& DumpStream::operator >> (char* sz)
 	if (n>0) read(sz, sizeof(char), n);
 	sz[n] = 0;
 	return (*this);
+}
+
+//-----------------------------------------------------------------------------
+DumpStream& DumpStream::operator >> (std::string& s)
+{
+	char buf[64]={0};
+	this->operator>>(buf);
+	s = std::string(buf);
+	return *this;
 }
 
 //-----------------------------------------------------------------------------

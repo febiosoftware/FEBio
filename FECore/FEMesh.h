@@ -237,7 +237,7 @@ public:
 
 	void Create(int n);
 
-	int Faces() { return (int) m_Face.size(); }
+	int Faces() const { return (int) m_Face.size(); }
 	FACET& Face(int i);
 
 public:
@@ -418,6 +418,7 @@ public:
 	int FacetSets() { return (int) m_FaceSet.size(); }
 	FEFacetSet& FacetSet(int n) { return *m_FaceSet[n]; }
 	void AddFacetSet(FEFacetSet* ps) { m_FaceSet.push_back(ps); }
+	FEFacetSet* FindFacetSet(const char* szname);
 
 	// --- Segment Sets ---
 	int SegmentSets() { return (int) m_LineSet.size(); }

@@ -2,23 +2,16 @@
 #include "FETractionLoad.h"
 #include "FECore/FEModel.h"
 
-//-----------------------------------------------------------------------------
-FETractionLoad::LOAD::LOAD()
-{
-	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = vec3d(0,0,0);
-}
-
 //=============================================================================
 BEGIN_PARAMETER_LIST(FETractionLoad, FESurfaceLoad)
 	ADD_PARAMETER(m_scale   , FE_PARAM_DOUBLE, "scale"   );
-	ADD_PARAMETER(m_traction, FE_PARAM_VEC3D , "traction");
+	ADD_PARAMETER(m_TC      , FE_PARAM_SURFACE_MAP, "traction");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem)
+FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_TC(FE_VEC3D)
 {
-	m_traction = vec3d(0,0,0);
 	m_scale = 1.0;
 
 	// get the degrees of freedom
@@ -33,14 +26,9 @@ void FETractionLoad::SetSurface(FESurface* ps)
 {
 	FESurfaceLoad::SetSurface(ps);
 
+	// This assumes the traction vector was read in before the surface
 	int n = ps->Elements();
-	m_TC.resize(n); 
-
-	// TODO: This assumes the traction vector was read in before the surface
-	for (int i=0; i<n; i++)
-	{
-		for (int j=0; j<9; ++j) m_TC[i].s[j] = m_traction;
-	}
+	m_TC.Create(ps); 
 }
 
 //-----------------------------------------------------------------------------
@@ -52,12 +40,12 @@ void FETractionLoad::Residual(const FETimePoint& tp, FEGlobalVector& R)
 
 	vec3d r0[FEElement::MAX_NODES];
 
-	int i, n;
-	int npr = m_TC.size();
-	for (int iel=0; iel<npr; ++iel)
+	FESurface& surf = *m_psurf;
+	FEMesh& mesh = *surf.GetMesh();
+	int NF = surf.Elements();
+	for (int iel=0; iel<NF; ++iel)
 	{
-		LOAD& pc = m_TC[iel];
-		FESurfaceElement& el = m_psurf->Element(iel);
+		FESurfaceElement& el = surf.Element(iel);
 
 		double g = m_scale;
 
@@ -71,28 +59,27 @@ void FETractionLoad::Residual(const FETimePoint& tp, FEGlobalVector& R)
 		int neln = el.Nodes();
 
 		// nodal coordinates
-		for (i=0; i<neln; ++i) r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
+		for (int i=0; i<neln; ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
+
+		// calculate the scaled traction for this element
+		vec3d t = m_TC.GetValue<vec3d>(iel)*g;
 
 		double* Gr, *Gs;
 		double* N;
 		double* w  = el.GaussWeights();
 
-		vec3d dxr, dxs;
-
 		// repeat over integration points
 		zero(fe);
-		for (n=0; n<nint; ++n)
+		for (int n=0; n<nint; ++n)
 		{
 			N  = el.H(n);
 			Gr = el.Gr(n);
 			Gs = el.Gs(n);
 
-			// calculate the traction at the integration point
-			vec3d t = el.eval(pc.s, n)*g;
 
 			// calculate the tangent vectors
-			dxr = dxs = vec3d(0,0,0);
-			for (i=0; i<neln; ++i) 
+			vec3d dxr(0,0,0), dxs(0,0,0);
+			for (int i=0; i<neln; ++i) 
 			{
 				dxr.x += Gr[i]*r0[i].x;
 				dxr.y += Gr[i]*r0[i].y;
@@ -105,7 +92,7 @@ void FETractionLoad::Residual(const FETimePoint& tp, FEGlobalVector& R)
 
 			vec3d f = t*((dxr ^ dxs).norm()*w[n]);
 
-			for (i=0; i<neln; ++i)
+			for (int i=0; i<neln; ++i)
 			{
 				fe[3*i  ] += N[i]*f.x;
 				fe[3*i+1] += N[i]*f.y;
@@ -119,68 +106,6 @@ void FETractionLoad::Residual(const FETimePoint& tp, FEGlobalVector& R)
 		// add element force vector to global force vector
 		R.Assemble(el.m_node, lm, fe);
 	}
-}
-
-//-----------------------------------------------------------------------------
-void FETractionLoad::Serialize(DumpStream& ar)
-{
-	FESurfaceLoad::Serialize(ar);
-
-	if (ar.IsSaving())
-	{
-		ar << (int) m_TC.size();
-		for (int i=0; i < (int) m_TC.size(); ++i)
-		{
-			LOAD& d = m_TC[i];
-			ar << d.s[0] << d.s[1] << d.s[2] << d.s[3];
-			ar << d.s[4] << d.s[5] << d.s[6] << d.s[7] << d.s[8];
-		}
-	}
-	else
-	{
-		int n;
-		ar >> n;
-		m_TC.resize(n);
-		for (int i=0; i<n; ++i)
-		{
-			LOAD& d = m_TC[i];
-			ar >> d.s[0] >> d.s[1] >> d.s[2] >> d.s[3];
-			ar >> d.s[4] >> d.s[5] >> d.s[6] >> d.s[7] >> d.s[8];
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-// \deprecated This is only needed for parsing the obsolete 1.2 format
-bool FETractionLoad::SetFacetAttribute(int nface, const char* szatt, const char* szval)
-{
-	LOAD& tc = TractionLoad(nface);
-	if      (strcmp(szatt, "id") == 0) {}
-//	else if (strcmp(szatt, "lc") == 0) tc.lc = atoi(szval) - 1;
-	else if (strcmp(szatt, "tx") == 0)
-	{
-		double tx = atof(szval);
-		tc.s[0].x = tc.s[1].x = tc.s[2].x = tc.s[3].x = tx;
-		tc.s[4].x = tc.s[5].x = tc.s[6].x = tc.s[7].x = tx;
-		tc.s[8].x = tx;
-	}
-	else if (strcmp(szatt, "ty") == 0)
-	{
-		double ty = atof(szval);
-		tc.s[0].y = tc.s[1].y = tc.s[2].y = tc.s[3].y = ty;
-		tc.s[4].y = tc.s[5].y = tc.s[6].y = tc.s[7].y = ty;
-		tc.s[8].y = ty;
-	}
-	else if (strcmp(szatt, "tz") == 0)
-	{
-		double tz = atof(szval);
-		tc.s[0].z = tc.s[1].z = tc.s[2].z = tc.s[3].z = tz;
-		tc.s[4].z = tc.s[5].z = tc.s[6].z = tc.s[7].z = tz;
-		tc.s[8].z = tz;
-	}
-	else return false;
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------
