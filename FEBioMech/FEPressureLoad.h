@@ -34,10 +34,6 @@ public:
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 public:
-	//! set an attribute of the surface load
-	// NOTE: To be removed in FEBio 3.0
-	bool SetAttribute(const char* szatt, const char* szval);
-
 	//! set an attribute of a surface facet
 	// NOTE: To be removed in FEBio 3.0
 	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);

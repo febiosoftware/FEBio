@@ -49,7 +49,7 @@ public:
 	//! get the initial plane equation
 	double* GetEquation() { return a; }
 
-protected:
+public:
 	double	a[4];	//!< plane equation
 
 	DECLARE_PARAMETER_LIST();

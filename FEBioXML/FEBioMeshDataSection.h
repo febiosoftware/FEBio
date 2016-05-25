@@ -7,7 +7,6 @@ class FEBioMeshDataSection : public FEBioFileSection
 {
 	struct ELEMENT_DATA
 	{
-		int		nid;
 		int		nval;	// number of values read
 		double	val[FEElement::MAX_NODES];	// scalar value
 	};
@@ -17,13 +16,13 @@ public:
 	void Parse(XMLTag& tag);
 
 protected:
-	void ParseShellThickness(XMLTag& tag);
-	void ParseMaterialFibers(XMLTag& tag);
-	void ParseMaterialAxes  (XMLTag& tag);
-	void ParseMaterialData  (XMLTag& tag, const string& name);
+	void ParseShellThickness(XMLTag& tag, FEElementSet& set);
+	void ParseMaterialFibers(XMLTag& tag, FEElementSet& set);
+	void ParseMaterialAxes  (XMLTag& tag, FEElementSet& set);
+	void ParseMaterialData  (XMLTag& tag, FEElementSet& set, const string& name);
 
 private:
-	void ParseElementData(XMLTag& tag, vector<ELEMENT_DATA>& values, int nvalues);
+	void ParseElementData(XMLTag& tag, FEElementSet& set, vector<ELEMENT_DATA>& values, int nvalues);
 
 private:
 	vector<FEElement*> m_pelem;

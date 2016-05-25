@@ -3,7 +3,7 @@
 #include "FEParamValidator.h"
 #include "DumpStream.h"
 #include "FEFunction1D.h"
-#include "FESurfaceMap.h"
+#include "FEDataArray.h"
 
 //-----------------------------------------------------------------------------
 FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname)
@@ -120,9 +120,9 @@ void FEParam::Serialize(DumpStream& ar)
 			case FE_PARAM_VEC3D      : ar << value<vec3d       >()   ; break;
 			case FE_PARAM_MAT3D      : ar << value<mat3d       >()   ; break;
 			case FE_PARAM_MAT3DS     : ar << value<mat3ds      >()   ; break;
-			case FE_PARAM_SURFACE_MAP:
+			case FE_PARAM_DATA_ARRAY :
 				{
-					FESurfaceMap& m = value<FESurfaceMap>();
+					FEDataArray& m = value<FEDataArray>();
 					m.Serialize(ar);
 				}
 				break;
@@ -178,9 +178,9 @@ void FEParam::Serialize(DumpStream& ar)
 			case FE_PARAM_VEC3D      : ar >> value<vec3d       >(); break;
 			case FE_PARAM_MAT3D      : ar >> value<mat3d       >(); break;
 			case FE_PARAM_MAT3DS     : ar >> value<mat3ds      >(); break;
-			case FE_PARAM_SURFACE_MAP:
+			case FE_PARAM_DATA_ARRAY :
 				{
-					FESurfaceMap& m = value<FESurfaceMap>();
+					FEDataArray& m = value<FEDataArray>();
 					m.Serialize(ar);
 				}
 				break;

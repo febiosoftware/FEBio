@@ -1,6 +1,7 @@
 #pragma once
 #include "FEBoundaryCondition.h"
 #include "FEGlobalVector.h"
+#include "FEDataArray.h"
 #include "FETypes.h"
 
 class FESolver;
@@ -10,12 +11,6 @@ class FENodeSet;
 //! Nodal load boundary condition
 class FENodalLoad : public FEBoundaryCondition
 {
-	struct ITEM
-	{
-		int		nid;	// nodal ID
-		double	scale;	// nodal scale factor
-	};
-
 public:
 	//! constructor
 	FENodalLoad(FEModel* pfem);
@@ -36,23 +31,25 @@ public:
 	int Nodes() const { return (int) m_item.size(); }
 
 	//! Node ID
-	int NodeID(int n) const { return m_item[n].nid; }
+	int NodeID(int n) const { return m_item[n]; }
 
 	//! get nodal value
 	double NodeValue(int n) const;
 
 	//! get/set load 
 	void SetLoad(double s, int lc = -1);
-	double GetLoad() const { return m_load; }
+	double GetLoad() const { return m_scale; }
 
 	//! get/set degree of freedom
 	void SetDOF(int ndof) { m_dof = ndof; }
 	int GetDOF() const { return m_dof; }
 
 private:
-	double	m_load;		// applied load
 	int		m_dof;		// degree of freedom index
-	vector<ITEM>	m_item;	// item list
+
+	double			m_scale;	// applied load scale factor
+	vector<int>		m_item;		// item list
+	FEDataArray		m_data;		// nodal data
 
 	DECLARE_PARAMETER_LIST();
 };
@@ -100,7 +97,6 @@ class FEPrescribedBC : public FEBoundaryCondition
 	struct ITEM
 	{
 		int		nid;	// nodal ID
-		double	scale;	// nodal scale factor
 		double	ref;	// reference value (for relative BC's)
 	};
 
@@ -134,15 +130,16 @@ public:
 	FEPrescribedBC& SetDOF(int dof) { m_dof = dof; return *this; }
 	FEPrescribedBC& SetRelativeFlag(bool br) { m_br = br; return *this; }
 
-	void SetNodeScale(int n, double s) { m_item[n].scale = s; }
+	void SetNodeScale(int n, double s) { m_data.set(n, s); }
 
 	double GetScaleFactor() const { return m_scale; }
 	int GetDOF() const { return m_dof; }
 
 private:
-	int		m_dof;		//!< dof
-	double	m_scale;	//!< overall scale factor
-	bool	m_br;		//!< flag for relative bc
+	int			m_dof;		//!< dof
+	double		m_scale;	//!< overall scale factor
+	bool		m_br;		//!< flag for relative bc
+	FEDataArray	m_data;		//!< nodal displacement values
 
 	vector<ITEM>	m_item;		//!< item list
 

@@ -8,7 +8,7 @@ BEGIN_PARAMETER_LIST(FEPressureLoad, FESurfaceLoad)
 	ADD_PARAMETER(m_blinear , FE_PARAM_BOOL  , "linear"  );
 	ADD_PARAMETER(m_pressure, FE_PARAM_DOUBLE, "pressure");
 	ADD_PARAMETER(m_bsymm   , FE_PARAM_BOOL  , "symmetric_stiffness");
-	ADD_PARAMETER(m_PC      , FE_PARAM_SURFACE_MAP, "pressure_map");
+	ADD_PARAMETER(m_PC      , FE_PARAM_DATA_ARRAY, "value");
 END_PARAMETER_LIST()
 
 //-----------------------------------------------------------------------------
@@ -16,8 +16,10 @@ END_PARAMETER_LIST()
 FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE)
 { 
 	m_blinear = false;
-	m_pressure = 1.0;
+	m_pressure = 0.0;
 	m_bsymm = true;
+
+	m_PC.set(1.0);
 
 	// get the degrees of freedom
 	m_dofX = pfem->GetDOFIndex("x");
@@ -31,22 +33,6 @@ void FEPressureLoad::SetSurface(FESurface* ps)
 {
 	FESurfaceLoad::SetSurface(ps);
 	m_PC.Create(ps); 
-	m_PC.SetValue(1.0);
-}
-
-//-----------------------------------------------------------------------------
-//! \deprecated This function is only used by the 1.2 file reader and is to be 
-//! considered obsolete.
-bool FEPressureLoad::SetAttribute(const char* szatt, const char* szval)
-{
-	if (strcmp(szatt, "type") == 0)
-	{
-		if      (strcmp(szval, "linear"   ) == 0) SetLinear(true );
-		else if (strcmp(szval, "nonlinear") == 0) SetLinear(false);
-		else return false;
-		return true;
-	}
-	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,7 +43,7 @@ bool FEPressureLoad::SetFacetAttribute(int nface, const char* szatt, const char*
 	else if (strcmp(szatt, "scale") == 0)
 	{
 		double s = atof(szval);
-		m_PC.SetValue(nface, s);
+		m_PC.set(nface, s);
 	}
 	else return false;
 
@@ -310,7 +296,7 @@ void FEPressureLoad::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
 		// evaluate the prescribed traction.
 		// note the negative sign. This is because this boundary condition uses the 
 		// convention that a positive pressure is compressive
-		for (int j=0; j<neln; ++j) tn[j] = -m_pressure*m_PC.GetValue<double>(m);
+		for (int j=0; j<neln; ++j) tn[j] = -m_pressure*m_PC.get<double>(m);
 
 		// get the element stiffness matrix
 		int ndof = 3*neln;
@@ -346,7 +332,7 @@ void FEPressureLoad::Residual(const FETimePoint& tp, FEGlobalVector& R)
 		// evaluate the prescribed traction.
 		// note the negative sign. This is because this boundary condition uses the 
 		// convention that a positive pressure is compressive
-		for (int j=0; j<el.Nodes(); ++j) tn[j] = -m_pressure*m_PC.GetValue<double>(i);
+		for (int j=0; j<el.Nodes(); ++j) tn[j] = -m_pressure*m_PC.get<double>(i);
 		
 		int ndof = 3*neln;
 		fe.resize(ndof);

@@ -35,10 +35,14 @@ void FEBioContactSection::Parse(XMLTag& tag)
 				if (nversion <= 0x0200) ParseRigidWall(tag);
 				else ParseRigidWall25(tag);
 			}
-			else if (strcmp(sztype, "rigid"                  ) == 0)
+			else if (strcmp(sztype, "rigid") == 0)
 			{
 				if (nversion < 0x0205) ParseRigidInterface(tag);
-				else ParseRigidInterface25(tag);
+				else 
+				{
+					// Rigid boundaries are now defined in the Boundary section
+					throw XMLReader::InvalidAttributeValue(tag, "type", "rigid");
+				}
 			}
 			else if (strcmp(sztype, "linear constraint"      ) == 0) ParseLinearConstraint     (tag);
 			else 
@@ -49,7 +53,10 @@ void FEBioContactSection::Parse(XMLTag& tag)
 				if (pci)
 				{
 					fem.AddSurfacePairInteraction(pci);
-					ParseContactInterface(tag, pci);
+
+					if (m_pim->Version() <= 0x0200) ParseContactInterface(tag, pci);
+					else ParseContactInterface25(tag, pci);
+
 					// add this boundary condition to the current step
 					if (m_pim->m_nsteps > 0)
 					{
@@ -65,7 +72,7 @@ void FEBioContactSection::Parse(XMLTag& tag)
 					// now it is preferred that they are defined in the Constraints section. For backward
 					// compatibility we still allow constraints to be defined in this section. 
 					FENLConstraint* pc = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, &fem);
-					if (pc)
+					if (pc && (m_pim->Version() <= 0x0200))
 					{
 						FEParameterList& pl = pc->GetParameterList();
 						++tag;
@@ -171,6 +178,30 @@ void FEBioContactSection::ParseContactInterface(XMLTag& tag, FESurfacePairIntera
 }
 
 //-----------------------------------------------------------------------------
+void FEBioContactSection::ParseContactInterface25(XMLTag& tag, FESurfacePairInteraction* pci)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& m = fem.GetMesh();
+
+	// get the surface pair
+	const char* szpair = tag.AttributeValue("surface_pair");
+	FEBioImport::SurfacePair* surfacePair = m_pim->FindSurfacePair(szpair);
+	if (surfacePair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
+
+	// build the surfaces
+	if (BuildSurface(*pci->GetMasterSurface(), *surfacePair->pmaster, pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
+	if (BuildSurface(*pci->GetSlaveSurface (), *surfacePair->pslave , pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
+
+	// get the parameter list
+	FEParameterList& pl = pci->GetParameterList();
+	m_pim->ReadParameterList(tag, pl);
+
+	// Make sure we have a master and a slave interface
+	FESurface* pss = pci->GetSlaveSurface (); if ((pss == 0) || (pss->Elements()==0)) throw FEBioImport::MissingSlaveSurface ();
+	FESurface* pms = pci->GetMasterSurface(); if ((pms == 0) || (pms->Elements()==0)) throw FEBioImport::MissingMasterSurface();
+}
+
+//-----------------------------------------------------------------------------
 // --- R I G I D   W A L L   I N T E R F A C E ---
 void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 {
@@ -226,54 +257,19 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 void FEBioContactSection::ParseRigidWall25(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, "rigid_wall", GetFEModel()));
 	fem.AddSurfacePairInteraction(ps);
 
-	++tag;
-	do
-	{
-		if (m_pim->ReadParameter(tag, ps) == false)
-		{
-			if (tag == "wall")
-			{
-				const char* sztype = tag.AttributeValue("type");
-				FERigidSurface* psurf = fecore_new<FERigidSurface>(FERIGIDOBJECT_ID, sztype, &fem);
+	// get and build the surface
+	const char* sz = tag.AttributeValue("surface");
+	FEFacetSet* pface = mesh.FindFacetSet(sz);
+	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+	if (BuildSurface(ps->m_ss, *pface, ps->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 
-				ps->SetMasterSurface(psurf);
-
-				if (tag.isleaf() == false)
-				{
-					FEParameterList& pl = psurf->GetParameterList();
-					++tag;
-					do
-					{
-						if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-						++tag;
-					}
-					while (!tag.isend());
-				}
-			}
-			else if (tag == "surface")
-			{
-				FERigidWallSurface& s = ps->m_ss;
-
-				int nfmt = 0;
-				const char* szfmt = tag.AttributeValue("format", true);
-				if (szfmt)
-				{
-					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
-					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
-				}
-
-				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt, true);
-			}
-			else throw XMLReader::InvalidTag(tag);
-		}
-		++tag;
-	}
-	while (!tag.isend());
+	FEParameterList& pl = ps->GetParameterList();
+	m_pim->ReadParameterList(tag, pl);
 }
 
 //-----------------------------------------------------------------------------
@@ -317,51 +313,6 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 
 		++tag;
 	}
-}
-
-//-----------------------------------------------------------------------------
-void FEBioContactSection::ParseRigidInterface25(XMLTag& tag)
-{
-	FEModel& fem = *GetFEModel();
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-
-	int NMAT = fem.Materials();
-
-	int rb = -1;
-
-	++tag;
-	do
-	{
-		if (tag == "rb")
-		{
-			tag.value(rb);
-			rb -= 1;
-		}
-		else if (tag == "node_set")
-		{
-			// make sure we have a valid rigid body reference
-			if ((rb < 0)||(rb>=NMAT)) throw XMLReader::InvalidAttributeValue(tag, "rb", tag.AttributeValue("rb"));
-
-			// find the node set
-			FENodeSet* pns = m_pim->ParseNodeSet(tag, "nset");
-			if (pns == 0) throw XMLReader::InvalidTag(tag);
-
-			// create new rigid node set
-			FERigidNodeSet* prn = new FERigidNodeSet(&fem);
-			prn->SetRigidID(rb);
-			prn->SetNodeSet(*pns);
-			rigid.AddRigidNodeSet(prn);
-
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(prn);
-				prn->Deactivate();
-			}
-		}
-		else throw XMLReader::InvalidTag(tag);
-		++tag;
-	}
-	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------

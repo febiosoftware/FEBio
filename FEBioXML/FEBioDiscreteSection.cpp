@@ -128,7 +128,7 @@ void FEBioDiscreteSection::ParseDiscreteSection25(XMLTag& tag)
 	++tag;
 	do
 	{
-		if (tag == "discrete_mat")
+		if (tag == "discrete_material")
 		{
 			// determine the discrete material type
 			const char* szt = tag.AttributeValue("type");
@@ -174,56 +174,25 @@ void FEBioDiscreteSection::ParseDiscreteSection25(XMLTag& tag)
 			FEDiscreteDomain* pd = dynamic_cast<FEDiscreteDomain*>(febio.CreateDomain(spec, &mesh, dmat[mid - 1]));
 			mesh.AddDomain(pd);
 
+			// get the discrete set
+			const char* szset = tag.AttributeValue("discrete_set");
+			FEDiscreteSet* pset = mesh.FindDiscreteSet(szset);
+			if (pset == 0) throw XMLReader::InvalidAttributeValue(tag, "discrete_set", szset);
+
+			// build the springs
+			int N = pset->size();
+			for (int i=0; i<N; ++i)
+			{
+				const FEDiscreteSet::NodePair& np = pset->Element(i);
+				int n[2] = {np.n0, np.n1};
+				pd->AddElement(++m_pim->m_maxid, n);
+			}
+
 			// get the domain parameters
 			FEParameterList& pl = pd->GetParameterList();
+			m_pim->ReadParameterList(tag, pl);
 
-			++tag;
-			do
-			{
-				if (tag == "discrete_set")
-				{
-					const char* szset = tag.AttributeValue("dset", true);
-					if (szset)
-					{
-						if (!tag.isempty()) throw XMLReader::InvalidValue(tag);
-						FEDiscreteSet* pset = mesh.FindDiscreteSet(szset);
-						if (pset == 0) throw XMLReader::InvalidAttributeValue(tag, "dset", szset);
-
-						int N = pset->size();
-						for (int i=0; i<N; ++i)
-						{
-							const FEDiscreteSet::NodePair& np = pset->Element(i);
-							int n[2] = {np.n0, np.n1};
-							pd->AddElement(++m_pim->m_maxid, n);
-						}
-					}
-					else
-					{
-						++tag;
-						do
-						{
-							if (tag == "delem")
-							{
-								int n[2];
-								tag.value(n, 2);
-								n[0] -= 1;
-								n[1] -= 1;
-								pd->AddElement(++m_pim->m_maxid, n);
-							}
-							else throw XMLReader::InvalidTag(tag);
-							++tag;
-						}
-						while (!tag.isend());
-					}
-				}
-				else
-				{
-					if (m_pim->ReadParameter(tag, pl) == 0) throw XMLReader::InvalidTag(tag);
-				}
-				++tag;
-			}
-			while (!tag.isend());
-
+			// initialize domain
 			pd->InitMaterialPointData();
 		}
 		else if (tag == "rigid_axial_force") ParseRigidAxialForce(tag);

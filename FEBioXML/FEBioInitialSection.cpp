@@ -162,9 +162,15 @@ void FEBioInitialSection::ParseInitialSection25(XMLTag& tag)
 			int ndof = dofs.GetDOF(sz);
 			if (ndof == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
+			// get the node set
+			const char* szset = tag.AttributeValue("node_set");
+			FENodeSet* pns = mesh.FindNodeSet(szset);
+			if (pns == 0) throw XMLReader::InvalidTag(tag);
+
 			// allocate initial condition
 			FEInitialBC* pic = dynamic_cast<FEInitialBC*>(fecore_new<FEInitialCondition>(FEIC_ID, "init_bc", &fem));
 			pic->SetDOF(ndof);
+			pic->SetNodes(*pns);
 
 			// add this boundary condition to the current step
 			fem.AddInitialCondition(pic);
@@ -174,30 +180,9 @@ void FEBioInitialSection::ParseInitialSection25(XMLTag& tag)
 				pic->Deactivate();
 			}
 
-			double value = 0.0;
-
-			++tag;
-			do
-			{
-				if (tag == "value")
-				{
-					tag.value(value);
-				}
-				else if (tag == "node_set")
-				{
-					// find the node set
-					FENodeSet* pns = m_pim->ParseNodeSet(tag, "nset");
-					if (pns == 0) throw XMLReader::InvalidTag(tag);
-
-					// add the nodes
-					FENodeSet& ns = *pns;
-					int N = ns.size();
-					for (int i=0; i<N; ++i) pic->Add(ns[i], value);
-				}
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
-			}
-			while (!tag.isend());
+			// read parameters
+			FEParameterList& pl = pic->GetParameterList();
+			m_pim->ReadParameterList(tag, pl);
 		}
 		else if (tag == "ic")
 		{

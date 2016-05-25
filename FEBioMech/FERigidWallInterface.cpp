@@ -13,10 +13,11 @@
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FERigidWallInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
-	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"   );
-	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"     );
-	ADD_PARAMETER(m_d	   , FE_PARAM_DOUBLE, "offset"      );
+	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL  , "laugon"      ); 
+	ADD_PARAMETER(m_atol    , FE_PARAM_DOUBLE, "tolerance"   );
+	ADD_PARAMETER(m_eps     , FE_PARAM_DOUBLE, "penalty"     );
+	ADD_PARAMETER(m_d	    , FE_PARAM_DOUBLE, "offset"      );
+	ADD_PARAMETERV(m_plane.a, FE_PARAM_DOUBLE, 4, "plane"   );
 END_PARAMETER_LIST();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -197,12 +198,10 @@ void FERigidWallSurface::UnpackLM(FEElement& el, vector<int>& lm)
 
 //-----------------------------------------------------------------------------
 //! constructor
-FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem)
+FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_plane(pfem)
 {
 	static int count = 1;
 	SetID(count++);
-
-	m_mp = 0;
 
 	m_eps = 0;
 	m_atol = 0;
@@ -218,44 +217,9 @@ bool FERigidWallInterface::Init()
 	if (m_ss.Init() == false) return false;
 
 	// initialize rigid surface
-	m_mp->Init();
+	m_plane.Init();
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! get the number of properties
-int FERigidWallInterface::Properties()
-{
-	return 2;
-}
-
-//-----------------------------------------------------------------------------
-//! get a specific property
-FECoreBase* FERigidWallInterface::GetProperty(int i)
-{
-	switch (i)
-	{
-	case 0: if (m_mp == 0) SetMasterSurface(new FEPlane(GetFEModel())); break;
-	case 1: if (m_mp == 0) SetMasterSurface(new FERigidSphere(GetFEModel())); break;
-	}
-	return m_mp;
-}
-
-//-----------------------------------------------------------------------------
-//! find a property index ( returns <0 for error)
-int FERigidWallInterface::FindPropertyIndex(const char* szname)
-{
-	if (strcmp(szname, "plane" ) == 0) return 0;
-	if (strcmp(szname, "sphere") == 0) return 1;
-	return -1;
-}
-
-//-----------------------------------------------------------------------------
-//! set a property (returns false on error)
-bool FERigidWallInterface::SetProperty(int i, FECoreBase* pm)
-{
-	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -316,10 +280,10 @@ void FERigidWallInterface::ProjectSurface(FERigidWallSurface& ss)
 		r = m_ss.Node(i).m_rt;
 
 		// project this node onto the plane
-		q = m_mp->Project(r);
+		q = m_plane.Project(r);
 
 		// get the local surface normal
-		np = m_mp->Normal(q);
+		np = m_plane.Normal(q);
 
 		// calculate offset
 		q += np*m_d;
@@ -644,53 +608,5 @@ void FERigidWallInterface::Serialize(DumpStream &ar)
 {
 	FEContactInterface::Serialize(ar);
 	m_ss.Serialize(ar);
-
-	if (ar.IsShallow() == false)
-	{
-		if (ar.IsSaving())
-		{
-			// plane data
-			if (dynamic_cast<FEPlane*>(m_mp))
-			{
-				FEPlane* pp = dynamic_cast<FEPlane*>(m_mp);
-				ar << FE_RIGID_PLANE;
-				double* a = pp->GetEquation();
-				ar << a[0] << a[1] << a[2] << a[3];
-			}
-			else if (dynamic_cast<FERigidSphere*>(m_mp))
-			{
-				FERigidSphere* ps = dynamic_cast<FERigidSphere*>(m_mp);
-				ar << FE_RIGID_SPHERE;
-				ar << ps->m_rc;
-				ar << ps->m_R;
-			}
-		}
-		else
-		{
-			// plane data
-			int ntype;
-			ar >> ntype;
-			switch (ntype)
-			{
-			case FE_RIGID_PLANE:
-				{
-					SetMasterSurface(new FEPlane(GetFEModel()));
-					FEPlane& pl = dynamic_cast<FEPlane&>(*m_mp);
-					double* a = pl.GetEquation();
-					ar >> a[0] >> a[1] >> a[2] >> a[3];
-				}
-				break;
-			case FE_RIGID_SPHERE:
-				{
-					SetMasterSurface(new FERigidSphere(GetFEModel()));
-					FERigidSphere& s = dynamic_cast<FERigidSphere&>(*m_mp);
-					ar >> s.m_rc;
-					ar >> s.m_R;
-				}
-				break;
-			default:
-				assert(false);
-			}
-		}
-	}
+	m_plane.Serialize(ar);
 }

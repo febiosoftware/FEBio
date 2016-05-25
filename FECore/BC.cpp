@@ -8,14 +8,16 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FENodalLoad, FEBoundaryCondition)
-		ADD_PARAMETER(m_load, FE_PARAM_DOUBLE, "scale");
+	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE    , "scale");
+	ADD_PARAMETER(m_data , FE_PARAM_DATA_ARRAY, "value");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem), m_data(FE_DOUBLE)
 {
-	m_load = 0.0;
+	m_scale = 1.0;
 	m_dof = -1;
+	m_data.set(1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -26,11 +28,11 @@ void FENodalLoad::Serialize(DumpStream& ar)
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << m_load << m_dof << m_item;
+		ar << m_dof << m_item;
 	}
 	else
 	{
-		ar >> m_load >> m_dof >> m_item;
+		ar >> m_dof >> m_item;
 	}
 }
 
@@ -43,8 +45,8 @@ bool FENodalLoad::Init()
 //-----------------------------------------------------------------------------
 void FENodalLoad::AddNode(int nid, double scale)
 {
-	ITEM item = {nid, scale};
-	m_item.push_back(item);
+	m_item.push_back(nid);
+	m_data.push_back(scale);
 }
 
 //-----------------------------------------------------------------------------
@@ -57,11 +59,11 @@ void FENodalLoad::AddNodes(const FENodeSet& ns, double scale)
 //-----------------------------------------------------------------------------
 void FENodalLoad::SetLoad(double s, int lc)
 {
-	m_load = s;
+	m_scale = s;
 	if (lc >= 0)
 	{
-		FEParam& p = *GetParameter(&m_load);
-		p.SetLoadCurve(lc, m_load);
+		FEParam& p = *GetParameter(&m_scale);
+		p.SetLoadCurve(lc, m_scale);
 	}
 }
 
@@ -69,8 +71,7 @@ void FENodalLoad::SetLoad(double s, int lc)
 //! Return the current value of the nodal load
 double FENodalLoad::NodeValue(int n) const
 {
-	const ITEM& it = m_item[n];
-	return m_load*it.scale;
+	return m_scale*m_data.get<double>(n);
 }
 
 //-----------------------------------------------------------------------------
@@ -158,23 +159,26 @@ void FEFixedBC::Deactivate()
 BEGIN_PARAMETER_LIST(FEPrescribedBC, FEBoundaryCondition)
 	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE, "scale");
 	ADD_PARAMETER(m_br   , FE_PARAM_BOOL  , "relative");
+	ADD_PARAMETER(m_data , FE_PARAM_DATA_ARRAY, "value");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem), m_data(FE_DOUBLE)
 {
 	m_scale = 0.0;
 	m_dof = -1;
 	m_br = false;
+	m_data.set(1.0);
 }
 
 //-----------------------------------------------------------------------------
-FEPrescribedBC::FEPrescribedBC(FEModel* pfem, const FEPrescribedBC& bc) : FEBoundaryCondition(FEBC_ID, pfem)
+FEPrescribedBC::FEPrescribedBC(FEModel* pfem, const FEPrescribedBC& bc) : FEBoundaryCondition(FEBC_ID, pfem), m_data(FE_DOUBLE)
 {
 	m_scale = bc.m_scale;
 	m_dof   = bc.m_dof;
 	m_br    = bc.m_br;
 	m_item  = bc.m_item;
+	m_data  = bc.m_data;
 	CopyParameterListState(bc.GetParameterList());
 }
 
@@ -195,8 +199,9 @@ FEPrescribedBC& FEPrescribedBC::SetScale(double s, int lc)
 //-----------------------------------------------------------------------------
 void FEPrescribedBC::AddNode(int nid, double s)
 {
-	ITEM item = {nid, s, 0.0};
+	ITEM item = {nid, s};
 	m_item.push_back(item);
+	m_data.push_back(s);
 }
 
 //-----------------------------------------------------------------------------
@@ -275,7 +280,7 @@ void FEPrescribedBC::Deactivate()
 double FEPrescribedBC::NodeValue(int n) const
 {
 	const ITEM& it = m_item[n];
-	double val = m_scale*it.scale;
+	double val = m_scale*m_data.get<double>(n);
 	if (m_br) val += it.ref;
 	return val;
 }
@@ -288,11 +293,11 @@ void FEPrescribedBC::Serialize(DumpStream& ar)
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << m_dof << m_item << m_scale << m_br;
+		ar << m_dof << m_item;
 	}
 	else
 	{
-		ar >> m_dof >> m_item >> m_scale >> m_br;
+		ar >> m_dof >> m_item;
 	}
 }
 

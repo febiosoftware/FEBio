@@ -1,7 +1,10 @@
 #pragma once
 #include "FEModelComponent.h"
 #include <vector>
+#include "FEDataArray.h"
 using namespace std;
+
+class FENodeSet;
 
 //-----------------------------------------------------------------------------
 //! Base class for defining initial conditions.
@@ -16,12 +19,6 @@ public:
 // Class representing an initial condition on a degree of freedom
 class FEInitialBC : public FEInitialCondition
 {
-	struct ITEM
-	{
-		int		nid;	//!< node ID
-		double	v;		//!< initial value
-	};
-
 public:
 	FEInitialBC(FEModel* pfem);
 
@@ -31,11 +28,16 @@ public:
 
 	void Activate();
 
-	void Add(int nid, double v) { ITEM it = {nid, v}; m_item.push_back(it); }
+	void SetNodes(const FENodeSet& set);
+
+	void Add(int node, double value);
 
 public:
-	vector<ITEM>	m_item;		//!< node value pairs
 	int				m_dof;		//!< degree of freedom
+	vector<int>		m_item;		//!< node IDs
+	FEDataArray		m_data;		//!< nodal values
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------

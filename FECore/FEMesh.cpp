@@ -57,6 +57,7 @@ FENode::FENode(const FENode& n)
 	m_ap = n.m_ap;
 	m_Fr = n.m_Fr;
 
+	m_nID = n.m_nID;
 	m_rid = n.m_rid;
 	m_bshell = n.m_bshell;
 	m_bexclude = n.m_bexclude;
@@ -77,6 +78,7 @@ FENode& FENode::operator = (const FENode& n)
 	m_ap = n.m_ap;
 	m_Fr = n.m_Fr;
 
+	m_nID = n.m_nID;
 	m_rid = n.m_rid;
 	m_bshell = n.m_bshell;
 	m_bexclude = n.m_bexclude;

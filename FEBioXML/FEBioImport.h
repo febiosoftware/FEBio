@@ -166,6 +166,13 @@ public:
 		char	m_szval[MAX_TAG];	// parameter value
 	};
 
+	//-------------------------------------------------------------------------
+	struct SurfacePair
+	{
+		char		szname[256];
+		FEFacetSet*	pmaster;
+		FEFacetSet*	pslave;
+	};
 
 public:
 	//! constructor
@@ -186,6 +193,7 @@ public:
 
 	bool ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam = 0);
 	bool ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam = 0);
+	void ReadParameterList(XMLTag& tag, FEParameterList& pl);
 
 	void ReadList(XMLTag& tag, vector<int>& l);
 
@@ -208,14 +216,13 @@ public:
 	FENodeSet* ParseNodeSet(XMLTag& tag, const char* szatt = "set");
 	FESurface* ParseSurface(XMLTag& tag, const char* szatt = "surf");
 
-	void ParseSurfaceMap(XMLTag& tag, FESurfaceMap& map);
-
 	bool BuildSurface(FESurface& s, FEFacetSet& f);
 
-	void AddSurfaceMap(FESurfaceMap* map);
-	void ClearSurfaceMaps();
+	void ParseDataArray(XMLTag& tag, FEDataArray& map, const char* sztag);
+	void AddDataArray(const char* szname, FEDataArray* map);
+	void ClearDataArrays();
 
-	FESurfaceMap* FindSurfaceMap(const char* szmap);
+	FEDataArray* FindDataArray(const char* szmap);
 
 public:
 	void ClearParams();
@@ -259,7 +266,11 @@ public:
 
 	vector<XMLParam>	m_Param;	// parameter list
 
-	vector<FESurfaceMap*>	m_surfaceMap;
+	vector<pair<string, FEDataArray*> >	m_Data;
+
+	void AddSurfacePair(SurfacePair& p) { m_surfacePair.push_back(p); }
+	SurfacePair* FindSurfacePair(const char* szname);
+	
 
 public:
 	char	m_szmod[256];	//!< module type string
@@ -297,6 +308,8 @@ public:
 protected:
 	int			m_node_off;		//!< node offset (i.e. lowest node ID)
 	vector<int>	m_node_list;	//!< map node ID's to their nodes.
+
+	vector<SurfacePair>	m_surfacePair;
 
 protected:
 	FEBioFileSectionMap	m_map;

@@ -281,9 +281,15 @@ void FEBioLoadsSection::ParseNodalLoad25(XMLTag &tag)
 	int bc = dofs.GetDOF(sz);
 	if (bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
+	// get the node set
+	const char* szset = tag.AttributeValue("node_set");
+	FENodeSet* nodeSet = mesh.FindNodeSet(szset);
+	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+
 	// create nodal load
 	FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
 	pfc->SetDOF(bc);
+	pfc->AddNodes(*nodeSet);
 
 	// add nodal load to model
 	fem.AddNodalLoad(pfc);
@@ -295,25 +301,7 @@ void FEBioLoadsSection::ParseNodalLoad25(XMLTag &tag)
 
 	// read parameters
 	FEParameterList& pl = pfc->GetParameterList();
-	++tag;
-	do
-	{
-		if (m_pim->ReadParameter(tag, pl) == false)
-		{
-			if (tag == "node_set")
-			{
-				// find the node set
-				FENodeSet* pns = m_pim->ParseNodeSet(tag, "nset");
-				if (pns == 0) throw XMLReader::InvalidTag(tag);
-
-				// add the nodes
-				pfc->AddNodes(*pns);
-			}
-			else throw XMLReader::InvalidTag(tag);
-		}
-		++tag;
-	}
-	while (!tag.isend());
+	m_pim->ReadParameterList(tag, pl);
 }
 
 //-----------------------------------------------------------------------------
@@ -495,6 +483,7 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 void FEBioLoadsSection::ParseSurfaceLoad25(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	// create surface load
 	const char* sztype = tag.AttributeValue("type");
@@ -505,27 +494,20 @@ void FEBioLoadsSection::ParseSurfaceLoad25(XMLTag& tag)
 	const char* szname = tag.AttributeValue("name", true);
 	if (szname) psl->SetName(szname);
 
+	// get the surface
+	const char* szset = tag.AttributeValue("surface");
+	FEFacetSet* pface = mesh.FindFacetSet(szset);
+	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
+
+	FESurface* psurf = new FESurface(&mesh);
+	m_pim->BuildSurface(*psurf, *pface);
+	
+	mesh.AddSurface(psurf);
+	psl->SetSurface(psurf);
+
 	// read the parameters
 	FEParameterList& pl = psl->GetParameterList();
-
-	// read the pressure data
-	++tag;
-	do
-	{
-		if (m_pim->ReadParameter(tag, pl) == false)
-		{
-			if (tag == "surface")
-			{
-				FESurface* psurf = m_pim->ParseSurface(tag, "surf");
-				fem.GetMesh().AddSurface(psurf);
-				int nel = psurf->Elements();
-				psl->SetSurface(psurf);
-			}
-			else throw XMLReader::InvalidTag(tag);
-		}
-		++tag;
-	}
-	while (!tag.isend());
+	m_pim->ReadParameterList(tag, pl);
 
 	// add surface load to model
 	fem.AddSurfaceLoad(psl);

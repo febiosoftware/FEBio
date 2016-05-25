@@ -4,8 +4,8 @@
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FETractionLoad, FESurfaceLoad)
-	ADD_PARAMETER(m_scale   , FE_PARAM_DOUBLE, "scale"   );
-	ADD_PARAMETER(m_TC      , FE_PARAM_SURFACE_MAP, "traction");
+	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE    , "scale"   );
+	ADD_PARAMETER(m_TC   , FE_PARAM_DATA_ARRAY, "traction");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -62,7 +62,7 @@ void FETractionLoad::Residual(const FETimePoint& tp, FEGlobalVector& R)
 		for (int i=0; i<neln; ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
 
 		// calculate the scaled traction for this element
-		vec3d t = m_TC.GetValue<vec3d>(iel)*g;
+		vec3d t = m_TC.get<vec3d>(iel)*g;
 
 		double* Gr, *Gs;
 		double* N;

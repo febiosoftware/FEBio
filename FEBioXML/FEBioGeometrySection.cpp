@@ -46,6 +46,11 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 				if (nversion >= 0x0205) ParseDiscreteSetSection(tag);
 				else throw XMLReader::InvalidTag(tag);
 			}
+			else if (tag == "SurfacePair")
+			{
+				if (nversion >= 0x0205) ParseSurfacePairSection(tag);
+				else throw XMLReader::InvalidTag(tag);
+			}
 			else if (tag == "ElementData") 
 			{
 				// This section is no longer supported since 2.5 and replaced
@@ -86,7 +91,8 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	int nodes = tag.children();
 
 	// see if this list defines a set
-	const char* szl = tag.AttributeValue("set", true);
+	const char* szref = (m_pim->Version() >= 0x0205 ? "name" : "set");
+	const char* szl = tag.AttributeValue(szref, true);
 	FENodeSet* ps = 0;
 	if (szl)
 	{
@@ -375,7 +381,8 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	if ((nmat < 0) || (nmat >= fem.Materials())) throw FEBioImport::InvalidDomainMaterial();
 
 	// get the name
-	const char* szname = tag.AttributeValue("elset", true);
+	const char* szref = (m_pim->Version() >= 0x0205 ? "name" : "elset");
+	const char* szname = tag.AttributeValue(szref, true);
 
 	// get the element type
 	const char* sztype = tag.AttributeValue("type");
@@ -756,7 +763,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 {
 	int nversion = m_pim->Version();
-	const char* szatt = (nversion < 0x0205 ? "set" : "nset");
+	const char* szatt = (nversion < 0x0205 ? "set" : "node_set");
 
 	// read the node set
 	FENodeSet* pns = m_pim->ParseNodeSet(tag, szatt);
@@ -842,6 +849,38 @@ void FEBioGeometrySection::ParseEdgeSection(XMLTag& tag)
 
 		++tag;
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioGeometrySection::ParseSurfacePairSection(XMLTag& tag)
+{
+	FEBioImport::SurfacePair p;
+	const char* szname = tag.AttributeValue("name");
+	strcpy(p.szname, szname);
+
+	FEMesh& mesh = *m_pim->GetFEMesh();
+
+	++tag;
+	do
+	{
+		if (tag == "master")
+		{
+			const char* sz = tag.AttributeValue("surface");
+			p.pmaster = mesh.FindFacetSet(sz);
+			if (p.pmaster == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+		}
+		else if (tag == "slave")
+		{
+			const char* sz = tag.AttributeValue("surface");
+			p.pslave = mesh.FindFacetSet(sz);
+			if (p.pslave == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+
+	m_pim->AddSurfacePair(p);
 }
 
 //-----------------------------------------------------------------------------

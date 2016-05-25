@@ -16,6 +16,12 @@
 
 void FEBioConstraintsSection::Parse(XMLTag &tag)
 {
+	if (m_pim->Version() <= 0x0200) Parse20(tag);
+	else Parse25(tag);
+}
+
+void FEBioConstraintsSection::Parse20(XMLTag &tag)
+{
 	// make sure there is something to read
 	if (tag.isleaf()) return;
 
@@ -122,6 +128,87 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 				fem.AddNonlinearConstraint(plc);
 
 				// add this boundary condition to the current step
+				if (m_pim->m_nsteps > 0)
+				{
+					GetStep()->AddModelComponent(plc);
+					plc->Deactivate();
+				}
+			}
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+void FEBioConstraintsSection::Parse25(XMLTag &tag)
+{
+	// make sure there is something to read
+	if (tag.isleaf()) return;
+
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	++tag;
+	do
+	{
+		if (tag == "constraint")
+		{
+			const char* sztype = tag.AttributeValue("type", true);
+			if (sztype == 0)
+			{
+				// check the name attribute
+				const char* szname = tag.AttributeValue("name");
+				if (szname == 0) throw XMLReader::InvalidAttributeValue(tag, "name", "(unknown)");
+
+				// make sure this is a leaf
+				if (tag.isempty() == false) throw XMLReader::InvalidValue(tag);
+
+				// see if we can find this constraint
+				FEModel& fem = *GetFEModel();
+				int NLC = fem.NonlinearConstraints();
+				FENLConstraint* plc = 0;
+				for (int i=0; i<NLC; ++i)
+				{
+					FENLConstraint* pci = fem.NonlinearConstraint(i);
+					const char* szc = pci->GetName();
+					if (szc && (strcmp(szname, szc) == 0)) { plc = pci; }
+				}
+				if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "name", szname);
+
+				// add this boundary condition to the current step
+				if (m_pim->m_nsteps > 0)
+				{
+					GetStep()->AddModelComponent(plc);
+					plc->Deactivate();
+				}
+			}
+			else
+			{
+				FENLConstraint* plc = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, m_pim->GetFEModel());
+				if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+				const char* szname = tag.AttributeValue("name", true);
+				if (szname) plc->SetName(szname);
+
+				// get the surface
+				// Note that not all constraints define a surface
+				FESurface* psurf = plc->GetSurface(sztype);
+				if (psurf)
+				{
+					mesh.AddSurface(psurf);
+					const char* szsurf = tag.AttributeValue("surface");
+					FEFacetSet* pface = mesh.FindFacetSet(szsurf);
+					if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
+					if (BuildSurface(*psurf, *pface, true) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
+				}
+
+				// read the parameter list
+				FEParameterList& pl = plc->GetParameterList();
+				m_pim->ReadParameterList(tag, pl);
+
+				// add this constraint to the current step
+				fem.AddNonlinearConstraint(plc);
 				if (m_pim->m_nsteps > 0)
 				{
 					GetStep()->AddModelComponent(plc);

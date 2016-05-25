@@ -16,11 +16,11 @@ protected:
 	void ParseRigidWall            (XMLTag& tag);
 	void ParseRigidWall25          (XMLTag& tag);
 	void ParseRigidInterface       (XMLTag& tag);
-	void ParseRigidInterface25     (XMLTag& tag);
 	void ParseLinearConstraint     (XMLTag& tag);
 
 protected:
 	void ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci);
+	void ParseContactInterface25(XMLTag& tag, FESurfacePairInteraction* pci);
 	bool ParseSurfaceSection  (XMLTag& tag, FESurface& s, int nfmt, bool bnodal);
 
 protected:

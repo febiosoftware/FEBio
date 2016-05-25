@@ -71,9 +71,6 @@ public:
 	//! constructor
 	FERigidWallInterface(FEModel* pfem);
 
-	//! destructor
-	virtual ~FERigidWallInterface() { if (m_mp) delete m_mp; }
-
 	//! intializes rigid wall interface
 	bool Init();
 
@@ -95,14 +92,11 @@ public:
 	//! calculate Lagrangian augmentations
 	virtual bool Augment(int naug);
 
-	//! Set the master surface
-	void SetMasterSurface(FERigidSurface* prs) { assert(m_mp == 0); m_mp = prs; }
-
 	//! serialize data to archive
 	void Serialize(DumpStream& ar);
 
 	//! return the master and slave surface
-	FESurface* GetMasterSurface() { return 0; }
+	FESurface* GetMasterSurface () { return 0; }
 	FESurface* GetSlaveSurface () { return &m_ss; }
 
 	//! return integration rule class
@@ -111,23 +105,9 @@ public:
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEGlobalMatrix& K);
 
-public: // inherited from FECoreBase
-
-	//! get the number of properties
-	int Properties();
-
-	//! get a specific property
-	FECoreBase* GetProperty(int i);
-
-	//! find a property index ( returns <0 for error)
-	int FindPropertyIndex(const char* szname);
-
-	//! set a property (returns false on error)
-	bool SetProperty(int i, FECoreBase* pm);
-
 public:
 	FERigidWallSurface	m_ss;		//!< slave surface
-	FERigidSurface		*m_mp;		//!< master surface
+	FEPlane				m_plane;	//!< master surface
 
 	int nse;	//!< number of slave elements
 
