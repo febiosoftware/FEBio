@@ -10,6 +10,8 @@
 		D50CB99B1B177CCC006E43E6 /* BC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50CB99A1B177CCC006E43E6 /* BC.cpp */; };
 		D50E7EB71992EB8300950744 /* eig3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50E7EB51992EB8300950744 /* eig3.cpp */; };
 		D50E7EB81992EB8300950744 /* eig3.h in Headers */ = {isa = PBXBuildFile; fileRef = D50E7EB61992EB8300950744 /* eig3.h */; };
+		D5222BF11CF743AF00F0E505 /* FEDataArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5222BEF1CF743AF00F0E505 /* FEDataArray.cpp */; };
+		D5222BF21CF743AF00F0E505 /* FEDataArray.h in Headers */ = {isa = PBXBuildFile; fileRef = D5222BF01CF743AF00F0E505 /* FEDataArray.h */; };
 		D52A2ECB1BCCA1E4005007BB /* BFGSSolver2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52A2EC91BCCA1E4005007BB /* BFGSSolver2.cpp */; };
 		D52A5B0E19A6815C009E3A47 /* tens4dms.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D52A5B0C19A6815C009E3A47 /* tens4dms.hpp */; };
 		D52A5B0F19A6815C009E3A47 /* tens4ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D52A5B0D19A6815C009E3A47 /* tens4ds.hpp */; };
@@ -244,6 +246,8 @@
 		D50CB99A1B177CCC006E43E6 /* BC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BC.cpp; sourceTree = "<group>"; };
 		D50E7EB51992EB8300950744 /* eig3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = eig3.cpp; sourceTree = "<group>"; };
 		D50E7EB61992EB8300950744 /* eig3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eig3.h; sourceTree = "<group>"; };
+		D5222BEF1CF743AF00F0E505 /* FEDataArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDataArray.cpp; sourceTree = "<group>"; };
+		D5222BF01CF743AF00F0E505 /* FEDataArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDataArray.h; sourceTree = "<group>"; };
 		D52A2EC91BCCA1E4005007BB /* BFGSSolver2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BFGSSolver2.cpp; sourceTree = "<group>"; };
 		D52A5B0C19A6815C009E3A47 /* tens4dms.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens4dms.hpp; sourceTree = "<group>"; };
 		D52A5B0D19A6815C009E3A47 /* tens4ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens4ds.hpp; sourceTree = "<group>"; };
@@ -566,6 +570,8 @@
 				D5CCDAFE1B87BF4C00B1B3B0 /* FECorePlot.h */,
 				D5B572D3186CC76500D12E45 /* FECoreTask.cpp */,
 				D5B572D4186CC76500D12E45 /* FECoreTask.h */,
+				D5222BEF1CF743AF00F0E505 /* FEDataArray.cpp */,
+				D5222BF01CF743AF00F0E505 /* FEDataArray.h */,
 				D5CFECAA1C18ADAB00FCA009 /* FEDataExport.cpp */,
 				D5CFECAB1C18ADAB00FCA009 /* FEDataExport.h */,
 				D55E3AEE1C5BBEDD00815FCA /* FEDataStream.h */,
@@ -761,6 +767,7 @@
 				D5E10AE91865E15900B23922 /* Image.h in Headers */,
 				D5FA1BE31B74CDCB00EA5913 /* FEModelLoad.h in Headers */,
 				D5E10AC11865E15900B23922 /* FEMesh.h in Headers */,
+				D5222BF21CF743AF00F0E505 /* FEDataArray.h in Headers */,
 				D5E10AAF1865E15900B23922 /* FEElementLibrary.h in Headers */,
 				D5E10A991865E15900B23922 /* FEBoundaryCondition.h in Headers */,
 				D5E10AF41865E15900B23922 /* mat3d.h in Headers */,
@@ -1031,6 +1038,7 @@
 				D5E10A881865E15900B23922 /* DumpFile.cpp in Sources */,
 				D5E10AA01865E15900B23922 /* FECore.cpp in Sources */,
 				D5A0A8F0186F4AC60046B0DE /* DOFS.cpp in Sources */,
+				D5222BF11CF743AF00F0E505 /* FEDataArray.cpp in Sources */,
 				D5E10AC81865E15900B23922 /* FENNQuery.cpp in Sources */,
 				D5E10AEB1865E15900B23922 /* LinearSolver.cpp in Sources */,
 				D5FAB1521BAC5A760057818F /* FEInitialCondition.cpp in Sources */,
