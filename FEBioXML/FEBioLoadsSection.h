@@ -22,6 +22,7 @@ protected:
 	void ParseBodyLoad     (XMLTag& tag);
 	void ParseBodyLoad20   (XMLTag& tag);
 	void ParseEdgeLoad     (XMLTag& tag);
+	void ParseEdgeLoad25   (XMLTag& tag);
 	void ParseSurfaceLoad  (XMLTag& tag);
 	void ParseSurfaceLoad20(XMLTag& tag);
 	void ParseSurfaceLoad25(XMLTag& tag);

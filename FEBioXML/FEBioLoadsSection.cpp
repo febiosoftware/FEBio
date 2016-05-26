@@ -30,7 +30,7 @@ void FEBioLoadsSection::Parse(XMLTag& tag)
 		}
 		else if (nversion == 0x0200)
 		{
-			if      (tag == "nodal_load"  ) ParseNodalLoad(tag);
+			if      (tag == "nodal_load"  ) ParseNodalLoad    (tag);
 			else if (tag == "surface_load") ParseSurfaceLoad20(tag);
 			else if (tag == "edge_load"   ) ParseEdgeLoad     (tag);
 			else if (tag == "body_load"   ) ParseBodyLoad20   (tag);
@@ -38,9 +38,9 @@ void FEBioLoadsSection::Parse(XMLTag& tag)
 		}
 		else if (nversion > 0x0200)
 		{
-			if      (tag == "nodal_load"  ) ParseNodalLoad25(tag);
+			if      (tag == "nodal_load"  ) ParseNodalLoad25  (tag);
 			else if (tag == "surface_load") ParseSurfaceLoad25(tag);
-			else if (tag == "edge_load"   ) ParseEdgeLoad     (tag);
+			else if (tag == "edge_load"   ) ParseEdgeLoad25   (tag);
 			else if (tag == "body_load"   ) ParseBodyLoad20   (tag);
 			else throw XMLReader::InvalidTag(tag);
 		}
@@ -132,13 +132,7 @@ void FEBioLoadsSection::ParseBodyLoad20(XMLTag& tag)
 	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, sztype, &fem);
 	if (pbl == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 	FEParameterList& PL = pbl->GetParameterList();
-	++tag;
-	do
-	{
-		if (m_pim->ReadParameter(tag, PL) == false) throw XMLReader::InvalidTag(tag);
-		++tag;
-	}
-	while (!tag.isend());
+	m_pim->ReadParameterList(tag, PL);
 	fem.AddBodyLoad(pbl);
 }
 
@@ -600,6 +594,43 @@ void FEBioLoadsSection::ParseEdgeLoad(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
+
+	// add edge load to model
+	fem.AddEdgeLoad(pel);
+
+	// add this boundary condition to the current step
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddModelComponent(pel);
+		pel->Deactivate();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioLoadsSection::ParseEdgeLoad25(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// create edge load
+	const char* sztype = tag.AttributeValue("type");
+	FEEdgeLoad* pel = fecore_new<FEEdgeLoad>(FEEDGELOAD_ID, sztype, &fem);
+	if (pel == 0) throw XMLReader::InvalidTag(tag);
+
+	// create a new edge
+	FEEdge* pedge = new FEEdge(&fem.GetMesh());
+	mesh.AddEdge(pedge);
+	pel->SetEdge(pedge);
+
+	// get the segment set
+	const char* szedge = tag.AttributeValue("edge");
+	FESegmentSet* pset = mesh.FindSegmentSet(szedge);
+	if (pset == 0) throw XMLReader::InvalidAttributeValue(tag, "edge", szedge);
+	if (BuildEdge(*pedge, *pset) == false) throw XMLReader::InvalidTag(tag);
+
+	// read the parameters
+	FEParameterList& pl = pel->GetParameterList();
+	m_pim->ReadParameterList(tag, pl);
 
 	// add edge load to model
 	fem.AddEdgeLoad(pel);

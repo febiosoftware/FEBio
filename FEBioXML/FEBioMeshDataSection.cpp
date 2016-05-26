@@ -86,6 +86,28 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			pdata->Create(psurf);
 			m_pim->ParseDataArray(tag, *pdata, "face");
 		}
+		else if (tag == "EdgeData")
+		{
+			const char* szedge = tag.AttributeValue("edge");
+			FESegmentSet* pset = mesh.FindSegmentSet(szedge);
+			if (pset == 0) throw XMLReader::InvalidAttributeValue(tag, "edge", szedge);
+
+			const char* sztype = tag.AttributeValue("data_type", true);
+			if (sztype == 0) sztype = "scalar";
+
+			int dataType = -1;
+			if      (strcmp(sztype, "scalar") == 0) dataType = FE_DOUBLE;
+			else if (strcmp(sztype, "vec2"  ) == 0) dataType = FE_VEC2D;
+			else if (strcmp(sztype, "vec3"  ) == 0) dataType = FE_VEC3D;
+			if (dataType == -1) throw XMLReader::InvalidAttributeValue(tag, "data_type", sztype);
+
+			const char* szname = tag.AttributeValue("name");
+			FEDataArray* pdata = new FEDataArray(dataType);
+			m_pim->AddDataArray(szname, pdata);
+
+			pdata->resize(pset->Segments());
+			m_pim->ParseDataArray(tag, *pdata, "edge");
+		}
 		else if (tag == "NodeData")
 		{
 			const char* szset = tag.AttributeValue("node_set");
