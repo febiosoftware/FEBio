@@ -23,7 +23,12 @@ void FEBioStepSection::Parse(XMLTag& tag)
 	++m_pim->m_nsteps;
 
 	FEBioFileSectionMap Map;
-	Map["Module"     ] = new FEBioModuleSection     (m_pim);
+	if (m_pim->Version() < 0x0205)
+	{
+		// Module section must be defined at the top of the file
+		// for version 2.5 and cannot be redefined
+		Map["Module"     ] = new FEBioModuleSection     (m_pim);
+	}
 	Map["Control"    ] = new FEBioControlSection    (m_pim);
 	Map["Constraints"] = new FEBioConstraintsSection(m_pim);
 	Map["Boundary"   ] = new FEBioBoundarySection   (m_pim);
