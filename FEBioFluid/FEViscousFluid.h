@@ -21,6 +21,9 @@ public:
     virtual tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp) = 0;
     
     //! dynamic viscosity
-    virtual double DynamicViscosity(FEMaterialPoint& mp) = 0;
+    virtual double ShearViscosity(FEMaterialPoint& mp) = 0;
+    
+    //! bulk viscosity
+    virtual double BulkViscosity(FEMaterialPoint& mp) = 0;
     
 };

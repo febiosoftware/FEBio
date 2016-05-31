@@ -275,7 +275,7 @@ bool FEFluidTangentDiagnostic::Run()
     // set up the element stiffness matrix
     matrix k0(4*N, 4*N);
     k0.zero();
-    bd.ElementMaterialStiffness(el, k0);
+    bd.ElementStiffness(el, k0);
     bd.ElementMassMatrix(el,k0);
     
     // print the element stiffness matrix

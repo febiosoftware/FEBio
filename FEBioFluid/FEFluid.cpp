@@ -141,7 +141,7 @@ mat3ds FEFluid::Tangent_Strain(FEMaterialPoint& mp)
 //! calculate current fluid kinematic viscosity
 double FEFluid::KinematicViscosity(FEMaterialPoint& mp)
 {
-    return m_pViscous->DynamicViscosity(mp)/Density(mp);
+    return m_pViscous->ShearViscosity(mp)/Density(mp);
 }
 
 //-----------------------------------------------------------------------------

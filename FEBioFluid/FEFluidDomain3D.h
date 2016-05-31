@@ -60,10 +60,9 @@ public:
     // --- S T I F F N E S S ---
     
     //! calculates the solid element stiffness matrix
-    void ElementStiffness(int iel, matrix& ke);
-    
-    //! material stiffness component
-    void ElementMaterialStiffness(FESolidElement& el, matrix& ke);
+    void ElementStiffness(FESolidElement& el, matrix& ke);
+    void ElementStiffnessGalerkin(FESolidElement& el, matrix& ke);
+    void ElementStiffnessSUPG(FESolidElement& el, matrix& ke);
     
     //! calculates the solid element mass matrix
     void ElementMassMatrix(FESolidElement& el, matrix& ke);
@@ -75,6 +74,8 @@ public:
     
     //! Calculates the internal stress vector for solid elements
     void ElementInternalForce(FESolidElement& el, vector<double>& fe);
+    void ElementInternalForceGalerkin(FESolidElement& el, vector<double>& fe);
+    void ElementInternalForceSUPG(FESolidElement& el, vector<double>& fe);
     
     //! Calculatess external body forces for solid elements
     void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe);
@@ -83,6 +84,7 @@ public:
     void ElementInertialForce(FESolidElement& el, vector<double>& fe);
     
     // ---
+    double tauSUPG(FEMaterialPoint& mp, const int neln, const vector<vec3d> gradN);
     
 protected:
     FEFluid*	m_pMat;

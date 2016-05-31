@@ -52,8 +52,15 @@ tens4ds FENewtonianFluid::Tangent_RateOfDeformation(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! kinematic viscosity
-double FENewtonianFluid::DynamicViscosity(FEMaterialPoint& mp)
+//! dynamic shear viscosity
+double FENewtonianFluid::ShearViscosity(FEMaterialPoint& mp)
 {
     return m_mu;
+}
+
+//-----------------------------------------------------------------------------
+//! bulke viscosity
+double FENewtonianFluid::BulkViscosity(FEMaterialPoint& mp)
+{
+    return m_kappa;
 }

@@ -20,7 +20,10 @@ public:
     tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp);
     
     //! dynamic viscosity
-    double DynamicViscosity(FEMaterialPoint& mp);
+    double ShearViscosity(FEMaterialPoint& mp);
+    
+    //! bulk viscosity
+    double BulkViscosity(FEMaterialPoint& mp);
     
 public:
     double	m_kappa;	//!< bulk viscosity

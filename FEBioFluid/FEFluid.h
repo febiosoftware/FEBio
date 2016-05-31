@@ -82,9 +82,6 @@ public:
     //! acoustic speed
     double AcousticSpeed(FEMaterialPoint& mp);
     
-public: // material parameters
-    vector<FEBodyForce*>        m_bf;       //!< body forces acting on this viscous fluid material
-
 private: // material properties
 	FEPropertyT<FEElasticFluid>	m_pElastic;	//!< pointer to elastic part fluid material
     FEPropertyT<FEViscousFluid> m_pViscous; //!< pointer to viscous part of fluid material
