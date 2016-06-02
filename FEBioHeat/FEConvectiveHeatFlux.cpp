@@ -2,36 +2,24 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-FEConvectiveHeatFlux::LOAD::LOAD()
-{ 
-	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = 1.0;
-	hc = 0.0;
-}
-
-//-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEConvectiveHeatFlux, FESurfaceLoad)
 	ADD_PARAMETER(m_hc, FE_PARAM_DOUBLE, "hc");
 	ADD_PARAMETER(m_Ta, FE_PARAM_DOUBLE, "Ta");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEConvectiveHeatFlux::FEConvectiveHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem)
+FEConvectiveHeatFlux::FEConvectiveHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_FC(FE_DOUBLE)
 {
 	m_hc = 0;
 	m_Ta = 1.0;
+	m_FC.set(1.0);
 }
 
 //-----------------------------------------------------------------------------
 void FEConvectiveHeatFlux::SetSurface(FESurface* psurf)
 {
 	FESurfaceLoad::SetSurface(psurf);
-
-	int n = psurf->Elements();
-	m_FC.resize(n);
-
-	// let's initialize the m_FC data array
-	// NOTE: This assumes that the hc parameter is read in before the surface in the input file
-	for (int i=0; i<n; ++i) m_FC[i].hc = m_hc;
+	m_FC.Create(psurf);
 }
 
 //-----------------------------------------------------------------------------
@@ -46,18 +34,14 @@ void FEConvectiveHeatFlux::Residual(const FETimePoint& tp, FEGlobalVector& R)
 	int nfc = m_psurf->Elements();
 	for (int i=0; i<nfc; ++i)
 	{
-		LOAD& hf = HeatFlux(i);
 		FESurfaceElement& el = m_psurf->Element(i);
 
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
 
-		// get ambient temperature
-		double Tc = m_Ta;
-
 		// calculate nodal fluxes
 		double qn[FEElement::MAX_NODES];
-		for (int j=0; j<el.Nodes(); ++j) qn[j] = Tc*hf.s[j]*hf.hc;
+		for (int j=0; j<el.Nodes(); ++j) qn[j] = m_Ta*m_FC.get<double>(i)*m_hc;
 
 		vector<double> fe(ne);
 
@@ -128,8 +112,6 @@ void FEConvectiveHeatFlux::StiffnessMatrix(const FETimePoint& tp, FESolver* psol
 	int npr = m_FC.size();
 	for (int m=0; m<npr; ++m)
 	{
-		LOAD& fc = m_FC[m];
-
 		// get the surface element
 		FESurfaceElement& el = m_psurf->Element(m);
 
@@ -139,7 +121,7 @@ void FEConvectiveHeatFlux::StiffnessMatrix(const FETimePoint& tp, FESolver* psol
 		ke.resize(ndof, ndof);
 
 		// calculate pressure stiffness
-		ElementStiffness(el, ke, fc.hc);
+		ElementStiffness(el, ke, m_hc);
 
 		// get the element's LM vector
 		vector<int> lm(neln);
@@ -194,43 +176,5 @@ void FEConvectiveHeatFlux::ElementStiffness(FESurfaceElement& el, matrix& ke, do
 				ke[i][j] += kij;
 			}
 		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-bool FEConvectiveHeatFlux::SetFacetAttribute(int nface, const char* szatt, const char* szval)
-{
-	LOAD& pc = HeatFlux(nface);
-	if      (strcmp(szatt, "id") == 0) {}
-//	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
-	else if (strcmp(szatt, "hc") == 0)
-	{
-		double hc = atof(szval);
-		pc.hc = hc;
-	}
-	else if (strcmp(szatt, "scale") == 0)
-	{
-		double s = atof(szval);
-		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
-		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
-		pc.s[8] = s;
-	}
-	else return false;
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEConvectiveHeatFlux::Serialize(DumpStream& ar)
-{
-	FESurfaceLoad::Serialize(ar);
-	
-	if (ar.IsSaving())
-	{
-		ar << m_FC;
-	}
-	else
-	{
-		ar >> m_FC;
 	}
 }

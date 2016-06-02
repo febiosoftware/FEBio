@@ -25,11 +25,10 @@ public:
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 private:
-	double	m_scale;	//!< magnitude of traction load
+	double			m_scale;	//!< scale factor for traction load
+	FESurfaceMap	m_TC;		//!< traction loads
 
 protected:
-	FESurfaceMap	m_TC;		//!< traction boundary cards
-
 	// degrees of freedom
 	// (TODO: find a better way of defining this. 
 	//        I don't want to have to do this in each class)

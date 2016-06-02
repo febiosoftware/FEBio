@@ -1,18 +1,12 @@
 #pragma once
 #include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceMap.h>
 
 //-----------------------------------------------------------------------------
 //! This boundary condition sustains a fluid flux on a surface
 //!
 class FEFluidFlux : public FESurfaceLoad
 {
-public:
-	struct LOAD
-	{
-		LOAD();
-		double	s[9];		// nodal scale factors
-	};
-
 public:
 	//! constructor
 	FEFluidFlux(FEModel* pfem);
@@ -24,27 +18,14 @@ public:
 	//! Set the surface to apply the load to
 	void SetSurface(FESurface* ps);
 
-	//! get a flux BC
-	LOAD& FluidFlux(int n) { return m_PC[n]; }
-
 	//! calculate flux stiffness
 	void StiffnessMatrix(const FETimePoint& tp, FESolver* psolver);
 
 	//! calculate residual
 	void Residual(const FETimePoint& tp, FEGlobalVector& R);
 
-	//! serialize data
-	void Serialize(DumpStream& ar);
-
 	//! unpack LM data
 	void UnpackLM(FEElement& el, vector<int>& lm);
-
-public:
-	//! set an attribute of the surface load
-	bool SetAttribute(const char* szatt, const char* szval);
-
-	//! set an attribute of a surface facet
-	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);
 
 protected:
 	//! calculate stiffness for an element
@@ -71,7 +52,7 @@ protected:
 	bool	m_blinear;		//!< type (linear or nonlinear)
 
 	// Fluid flux boundary data
-	vector<LOAD>	m_PC;		//!< fluid flux boundary cards
+	FESurfaceMap	m_PC;		//!< fluid flux boundary cards
 
 	// degrees of freedom
 	// (TODO: find a better way of defining this. 

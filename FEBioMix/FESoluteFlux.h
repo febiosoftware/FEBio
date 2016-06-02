@@ -1,5 +1,6 @@
 #pragma once
-#include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FESurfaceMap.h>
 
 //-----------------------------------------------------------------------------
 //! The flux surface is a surface domain that sustains a solute flux boundary
@@ -7,13 +8,6 @@
 //!
 class FESoluteFlux : public FESurfaceLoad
 {
-public:
-	struct LOAD
-	{
-		LOAD();
-		double	s[9];		// nodal scale factors
-	};
-
 public:
 	//! constructor
 	FESoluteFlux(FEModel* pfem);
@@ -25,26 +19,13 @@ public:
 
 	void SetSolute(int isol) { m_isol = isol; }
 	
-	//! get a flux BC
-	LOAD& SoluteFlux(int n) { return m_PC[n]; }
-	
 	//! calculate flux stiffness
 	void StiffnessMatrix(const FETimePoint& tp, FESolver* psolver);
 	
 	//! calculate residual
 	void Residual(const FETimePoint& tp, FEGlobalVector& R);
 	
-	//! serialize data
-	void Serialize(DumpStream& ar);
-
 	void UnpackLM(FEElement& el, vector<int>& lm);
-
-public:
-	//! set an attribute of the surface load
-	bool SetAttribute(const char* szatt, const char* szval);
-
-	//! set an attribute of a surface facet
-	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);
 
 protected:
 	//! calculate stiffness for an element
@@ -57,17 +38,16 @@ protected:
 	bool LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn, double dt);
 	
 protected:
-	double	m_flux;		//!< flux magnitude
+	double	m_flux;		//!< flux scale factor magnitude
 	bool	m_blinear;	//!< linear or not (true is non-follower, false is follower)
 	int		m_isol;		//!< solute index
+	FESurfaceMap	m_PC;		//!< solute flux boundary cards
 
+protected:
 	int	m_dofX;
 	int	m_dofY;
 	int	m_dofZ;
 	int	m_dofC;
-
-	// solute flux boundary data
-	vector<LOAD>	m_PC;		//!< solute flux boundary cards
 
 	DECLARE_PARAMETER_LIST();
 };

@@ -25,9 +25,6 @@ FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_TC(FE_VEC
 void FETractionLoad::SetSurface(FESurface* ps)
 {
 	FESurfaceLoad::SetSurface(ps);
-
-	// This assumes the traction vector was read in before the surface
-	int n = ps->Elements();
 	m_TC.Create(ps); 
 }
 
@@ -47,8 +44,6 @@ void FETractionLoad::Residual(const FETimePoint& tp, FEGlobalVector& R)
 	{
 		FESurfaceElement& el = surf.Element(iel);
 
-		double g = m_scale;
-
 		int ndof = 3*el.Nodes();
 		fe.resize(ndof);
 
@@ -62,7 +57,7 @@ void FETractionLoad::Residual(const FETimePoint& tp, FEGlobalVector& R)
 		for (int i=0; i<neln; ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
 
 		// calculate the scaled traction for this element
-		vec3d t = m_TC.get<vec3d>(iel)*g;
+		vec3d t = m_TC.get<vec3d>(iel)*m_scale;
 
 		double* Gr, *Gs;
 		double* N;

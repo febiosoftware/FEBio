@@ -1,18 +1,12 @@
 #pragma once
 #include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceMap.h>
 
 //-----------------------------------------------------------------------------
 //! This boundary condition applies a poro-elastic normal traction on a surface
 //!
 class FEPoroNormalTraction : public FESurfaceLoad
 {
-public:
-	struct LOAD
-	{
-		LOAD();
-		double	s[9];		// nodal scale factors
-	};
-
 public:
 	//! constructor
 	FEPoroNormalTraction(FEModel* pfem);
@@ -24,27 +18,14 @@ public:
 
 	void SetEffective(bool beff) { m_beffective = beff; }
 
-	//! get a pressure load BC
-	LOAD& NormalTraction(int n) { return m_PC[n]; }
-
 	//! calculate pressure stiffness
 	void StiffnessMatrix(const FETimePoint& tp, FESolver* psolver);
 
 	//! calculate residual
 	void Residual(const FETimePoint& tp, FEGlobalVector& R);
 
-	//! serialize data
-	void Serialize(DumpStream& ar);
-
 	//! unpack LM data
 	void UnpackLM(FEElement& el, vector<int>& lm);
-
-public:
-	//! set an attribute of the surface load
-	bool SetAttribute(const char* szatt, const char* szval);
-
-	//! set an attribute of a surface facet
-	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);
 
 protected:
 	//! calculate stiffness for an element
@@ -62,7 +43,7 @@ protected:
 	bool	m_beffective;	//!< effective or total normal traction
 
 	// pressure boundary data
-	vector<LOAD>	m_PC;		//!< pressure boundary cards
+	FESurfaceMap	m_PC;		//!< pressure boundary cards
 
 	// degrees of freedom
 	// (TODO: find a better way of defining this. 

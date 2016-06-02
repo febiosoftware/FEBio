@@ -1128,7 +1128,7 @@ void FEBioBoundarySection::ParseBCRigid(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-// The rigid body "constraints" are move to the Boundary section in 2.5
+// The rigid body "constraints" are moved to the Boundary section in 2.5
 void FEBioBoundarySection::ParseRigidBody(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();

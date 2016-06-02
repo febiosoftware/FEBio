@@ -2,25 +2,21 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-FEPoroNormalTraction::LOAD::LOAD()
-{ 
-	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = 1.0; 
-}
-
-//-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEPoroNormalTraction, FESurfaceLoad)
 	ADD_PARAMETER(m_traction  , FE_PARAM_DOUBLE, "traction" );
 	ADD_PARAMETER(m_blinear   , FE_PARAM_BOOL  , "linear"   );
 	ADD_PARAMETER(m_beffective, FE_PARAM_BOOL  , "effective");
+	ADD_PARAMETER(m_PC        , FE_PARAM_DATA_ARRAY, "value");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem)
+FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE)
 { 
 	m_traction = 1.0;
 	m_blinear = false; 
 	m_beffective = false; 
+	m_PC.set(1.0);
 
 	// get the degrees of freedom
 	m_dofX = pfem->GetDOFIndex("x");
@@ -34,47 +30,7 @@ FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem)
 void FEPoroNormalTraction::SetSurface(FESurface* ps)
 { 
 	FESurfaceLoad::SetSurface(ps);
-	m_PC.resize(ps->Elements()); 
-}
-
-//-----------------------------------------------------------------------------
-//! \deprecated This function is only needed for the 1.2 file format which is obsolete
-bool FEPoroNormalTraction::SetAttribute(const char* szatt, const char* szval)
-{
-	if (strcmp(szatt, "type") == 0)
-	{
-		if      (strcmp(szval, "linear"   ) == 0) SetLinear(true );
-		else if (strcmp(szval, "nonlinear") == 0) SetLinear(false);
-		else return false;
-		return true;
-	}
-	else if (strcmp(szatt, "traction") == 0)
-	{
-		if      (strcmp(szval, "effective") == 0) SetEffective(true);
-		else if (strcmp(szval, "total"    ) == 0) SetEffective(false);
-		else if (strcmp(szval, "mixture"  ) == 0) SetEffective(false);
-		else return false;
-		return true;
-	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPoroNormalTraction::SetFacetAttribute(int nface, const char* szatt, const char* szval)
-{
-	LOAD& pc = NormalTraction(nface);
-	if      (strcmp(szatt, "id") == 0) {}
-//	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
-	else if (strcmp(szatt, "scale") == 0)
-	{
-		double s = atof(szval);
-		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
-		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
-		pc.s[8] = s;
-	}
-	else return false;
-
-	return true;
+	m_PC.Create(ps); 
 }
 
 //-----------------------------------------------------------------------------
@@ -338,40 +294,6 @@ bool FEPoroNormalTraction::LinearTractionForce(FESurfaceElement& el, vector<doub
 }
 
 //-----------------------------------------------------------------------------
-
-void FEPoroNormalTraction::Serialize(DumpStream& ar)
-{
-	FESurfaceLoad::Serialize(ar);
-
-	if (ar.IsSaving())
-	{
-		ar << m_traction;
-		ar << m_blinear << m_beffective;
-		ar << (int) m_PC.size();
-		for (int i=0; i<(int) m_PC.size(); ++i)
-		{
-			LOAD& pc = m_PC[i];
-			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
-			ar << pc.s[4] << pc.s[5] << pc.s[6] << pc.s[7] << pc.s[8];
-		}
-	}
-	else
-	{
-		int n;
-		ar >> m_traction;
-		ar >> m_blinear >> m_beffective;
-		ar >> n;
-		m_PC.resize(n);
-		for (int i=0; i<n; ++i)
-		{
-			LOAD& pc = m_PC[i];
-			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
-			ar >> pc.s[4] >> pc.s[5] >> pc.s[6] >> pc.s[7] >> pc.s[8];
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
 void FEPoroNormalTraction::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
 {
 	FEMesh& mesh = *GetSurface().GetMesh();
@@ -383,7 +305,6 @@ void FEPoroNormalTraction::StiffnessMatrix(const FETimePoint& tp, FESolver* psol
 	int npr = m_PC.size();
 	for (int m=0; m<npr; ++m)
 	{
-		LOAD& pc = m_PC[m];
 		// get the surface element
 		FESurfaceElement& el = m_psurf->Element(m);
 		int neln = el.Nodes();
@@ -397,10 +318,8 @@ void FEPoroNormalTraction::StiffnessMatrix(const FETimePoint& tp, FESolver* psol
 
 		if (m_blinear == false)
 		{
-			double g = m_traction;
-
 			// evaluate the prescribed traction.
-			for (int j=0; j<neln; ++j) tn[j] = g*pc.s[j];
+			for (int j=0; j<neln; ++j) tn[j] = m_traction*m_PC.get<double>(m);
 
 			// if the prescribed traction is effective, evaluate the total traction
 			if (m_beffective) for (int j=0; j<neln; ++j) tn[j] -= pt[j];
@@ -433,7 +352,6 @@ void FEPoroNormalTraction::Residual(const FETimePoint& tp, FEGlobalVector& R)
 	int npr = m_PC.size();
 	for (int i=0; i<npr; ++i)
 	{
-		LOAD& pc = m_PC[i];
 		FESurfaceElement& el = m_psurf->Element(i);
 		int neln = el.Nodes();
 
@@ -444,10 +362,8 @@ void FEPoroNormalTraction::Residual(const FETimePoint& tp, FEGlobalVector& R)
 		// calculate nodal normal tractions
 		vector<double> tn(neln);
 
-		double g = m_traction;
-
 		// evaluate the prescribed traction.
-		for (int j=0; j<neln; ++j) tn[j] = g*pc.s[j];
+		for (int j=0; j<neln; ++j) tn[j] = m_traction*m_PC.get<double>(i);
 		
 		// if the prescribed traction is effective, evaluate the total traction
 		if (m_beffective) for (int j=0; j<neln; ++j) tn[j] -= pt[j];

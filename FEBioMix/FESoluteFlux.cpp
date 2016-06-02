@@ -3,25 +3,21 @@
 #include "FECore/FEAnalysis.h"
 
 //-----------------------------------------------------------------------------
-FESoluteFlux::LOAD::LOAD()
-{ 
-	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = s[8] = 1.0; 
-}
-
-//-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FESoluteFlux, FESurfaceLoad)
 	ADD_PARAMETER(m_flux, FE_PARAM_DOUBLE, "flux");
 	ADD_PARAMETER(m_blinear, FE_PARAM_BOOL, "linear");
 	ADD_PARAMETER(m_isol, FE_PARAM_INT, "solute_id");
+	ADD_PARAMETER(m_PC  , FE_PARAM_DATA_ARRAY, "value");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem)
+FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE)
 { 
 	m_flux = 1.0;
 	m_blinear = false; 
 	m_isol = 0; 
+	m_PC.set(1.0);
 
 	m_dofX = pfem->GetDOFIndex("x");
 	m_dofY = pfem->GetDOFIndex("y");
@@ -34,39 +30,7 @@ FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem)
 void FESoluteFlux::SetSurface(FESurface* ps)
 { 
 	FESurfaceLoad::SetSurface(ps);
-	m_PC.resize(ps->Elements()); 
-}
-
-//-----------------------------------------------------------------------------
-//! \deprecated Only used by the 1.2 file reader
-bool FESoluteFlux::SetAttribute(const char* szatt, const char* szval)
-{
-	if (strcmp(szatt, "type") == 0)
-	{
-		if      (strcmp(szval, "linear"   ) == 0) SetLinear(true );
-		else if (strcmp(szval, "nonlinear") == 0) SetLinear(false);
-		else return false;
-		return true;
-	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-bool FESoluteFlux::SetFacetAttribute(int nface, const char* szatt, const char* szval)
-{
-	LOAD& pc = SoluteFlux(nface);
-	if      (strcmp(szatt, "id") == 0) {}
-//	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
-	else if (strcmp(szatt, "scale") == 0)
-	{
-		double s = atof(szval);
-		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
-		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
-		pc.s[8] = s;
-	}
-	else return false;
-
-	return true;
+	m_PC.Create(ps);
 }
 
 //-----------------------------------------------------------------------------
@@ -280,40 +244,6 @@ bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vect
 }
 
 //-----------------------------------------------------------------------------
-//!
-void FESoluteFlux::Serialize(DumpStream& ar)
-{
-	FESurfaceLoad::Serialize(ar);
-
-	if (ar.IsSaving())
-	{
-		// solute fluxes
-		ar << m_blinear << m_isol;
-		ar << (int) m_PC.size();
-		for (int i=0; i<(int) m_PC.size(); ++i)
-		{
-			LOAD& fc = m_PC[i];
-			ar << fc.s[0] << fc.s[1] << fc.s[2] << fc.s[3];
-			ar << fc.s[4] << fc.s[5] << fc.s[6] << fc.s[7] << fc.s[8];
-		}
-	}
-	else
-	{
-		// solute fluxes
-		int n;
-		ar >> m_blinear >> m_isol;
-		ar >> n;
-		m_PC.resize(n);
-		for (int i=0; i<(int) m_PC.size(); ++i)
-		{
-			LOAD& fc = m_PC[i];
-			ar >> fc.s[0] >> fc.s[1] >> fc.s[2] >> fc.s[3];
-			ar >> fc.s[4] >> fc.s[5] >> fc.s[6] >> fc.s[7] >> fc.s[8];
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
 void FESoluteFlux::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
 {
 	double dt = tp.dt;
@@ -324,7 +254,6 @@ void FESoluteFlux::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
 	int nfr = m_PC.size();
 	for (int m=0; m<nfr; ++m)
 	{
-		LOAD& fc = m_PC[m];
 		// get the surface element
 		FESurfaceElement& el = m_psurf->Element(m);
 			
@@ -334,9 +263,7 @@ void FESoluteFlux::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
 				
 		if (m_blinear == false)
 		{
-			double g = m_flux;
-					
-			for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
+			for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.get<double>(m);
 					
 			// get the element stiffness matrix
 			int ndof = neln*4;
@@ -379,17 +306,13 @@ void FESoluteFlux::Residual(const FETimePoint& tp, FEGlobalVector& R)
 	int nfr = m_PC.size();
 	for (int i=0; i<nfr; ++i)
 	{
-		LOAD& fc = m_PC[i];
-
 		FESurfaceElement& el = m_psurf->Element(i);
 			
 		// calculate nodal normal solute flux
 		int neln = el.Nodes();
 		vector<double> wn(neln);
 			
-		double g = m_flux;
-			
-		for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
+		for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.get<double>(i);
 			
 		int ndof = neln;
 		fe.resize(ndof);
