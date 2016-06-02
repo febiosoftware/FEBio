@@ -441,7 +441,7 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			dofs.SetDOFName(varQR, 1, "Rv");
 			dofs.SetDOFName(varQR, 2, "Rw");
 			int varT = dofs.AddVariable("temperature");
-			dofs.SetDOFName(varT, 0, "T");
+			dofs.SetDOFName(varT, 0, "t");
 			int varV = dofs.AddVariable("velocity", VAR_VEC3);
 			dofs.SetDOFName(varV, 0, "vx");
 			dofs.SetDOFName(varV, 1, "vy");
