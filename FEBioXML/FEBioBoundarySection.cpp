@@ -404,7 +404,13 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 
 		// find the dof index from its symbol
 		int bc = dofs.GetDOF(sz);
-		if (bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+		if (bc == -1) 
+		{
+			// the temperature degree of freedom was renamed
+			// for backward compatibility we need to check for it
+			if (strcmp(sz, "t") == 0) bc = dofs.GetDOF("T");
+			throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+		}
 
 		// get the lc attribute
 		sz = tag.AttributeValue("lc");
@@ -498,7 +504,13 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 	// get the BC
 	const char* sz = tag.AttributeValue("bc");
 	int bc = dofs.GetDOF(sz);
-	if (bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+	if (bc == -1) 
+	{
+		// the temperature degree of freedom was renamed
+		// for backward compatibility we need to check for it
+		if (strcmp(sz, "t") == 0) bc = dofs.GetDOF("T");
+		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+	}
 
 	// get the load curve number
 	int lc = -1;
