@@ -329,12 +329,6 @@ void FEBioLoadsSection::ParseSurfaceLoad(XMLTag& tag)
 	{
 		FESurfaceElement& el = psurf->Element(i);
 
-		for (int j=0; j<tag.m_natt; ++j)
-		{
-			XMLAtt& att = tag.m_att[j];
-			if (ps->SetFacetAttribute(i, att.m_szatt, att.m_szatv) == false) throw XMLReader::InvalidAttributeValue(tag, att.m_szatt, att.m_szatv);
-		}
-
 		if      (tag == "quad4") el.SetType(FE_QUAD4G4);
 		else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
 		else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
@@ -433,12 +427,6 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 					for (int i=0; i<npr; ++i)
 					{
 						FESurfaceElement& el = psurf->Element(i);
-
-						for (int j=0; j<tag.m_natt; ++j)
-						{
-							XMLAtt& att = tag.m_att[j];
-							if (psl->SetFacetAttribute(i, att.m_szatt, att.m_szatv) == false) throw XMLReader::InvalidAttributeValue(tag, att.m_szatt, att.m_szatv);
-						}
 
 						if      (tag == "quad4") el.SetType(FE_QUAD4G4);
 						else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
@@ -571,12 +559,6 @@ void FEBioLoadsSection::ParseEdgeLoad(XMLTag& tag)
 					for (int i=0; i<npr; ++i)
 					{
 						FELineElement& el = pedge->Element(i);
-
-						for (int j=0; j<tag.m_natt; ++j)
-						{
-							XMLAtt& att = tag.m_att[j];
-							if (pel->SetFacetAttribute(i, att.m_szatt, att.m_szatv) == false) throw XMLReader::InvalidAttributeValue(tag, att.m_szatt, att.m_szatv);
-						}
 
 						if      (tag == "line2") el.SetType(FE_LINE2G1);
 						else throw XMLReader::InvalidTag(tag);

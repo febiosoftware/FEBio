@@ -36,21 +36,6 @@ void FEPressureLoad::SetSurface(FESurface* ps)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPressureLoad::SetFacetAttribute(int nface, const char* szatt, const char* szval)
-{
-	if      (strcmp(szatt, "id") == 0) {}
-//	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
-	else if (strcmp(szatt, "scale") == 0)
-	{
-		double s = atof(szval);
-		m_PC.set(nface, s);
-	}
-	else return false;
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to hydrostatic pressure
 void FEPressureLoad::PressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn)
 {

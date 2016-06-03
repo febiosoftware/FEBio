@@ -26,9 +26,6 @@ public:
 	//! set an attribute of the surface load
 	virtual bool SetAttribute(const char* szatt, const char* szval) { return false; }
 
-	//! set an attribute of a surface facet
-	virtual bool SetFacetAttribute(int nface, const char* szatt, const char* szval) { return false; }
-
 public:
 	//! calculate stiffness matrix
 	virtual void StiffnessMatrix(const FETimePoint& tp, FESolver* psolver) = 0;

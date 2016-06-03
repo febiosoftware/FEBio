@@ -33,11 +33,6 @@ public:
 	//! Unpack surface element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
-public:
-	//! set an attribute of a surface facet
-	// NOTE: To be removed in FEBio 3.0
-	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);
-
 protected:
 	//! calculate stiffness for an element
 	void PressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn);
