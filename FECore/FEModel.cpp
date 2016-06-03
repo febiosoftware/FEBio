@@ -773,6 +773,10 @@ bool FEModel::DoCallback(unsigned int nevent)
 	{
 		throw;
 	}
+	catch (ForceConversion)
+	{
+		throw;
+	}
 	catch (...)
 	{
 		return false;

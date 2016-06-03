@@ -48,7 +48,7 @@ bool FEBiphasicSolver::Init()
 	if (FESolidSolver2::Init() == false) return false;
 
 	// allocate poro-vectors
-	assert(m_ndeq > 0);
+//	assert(m_ndeq > 0);
 	m_di.assign(m_ndeq, 0);
 	m_Di.assign(m_ndeq, 0);
 

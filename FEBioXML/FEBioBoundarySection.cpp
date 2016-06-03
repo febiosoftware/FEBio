@@ -521,6 +521,12 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 	double scale = 1.0;
 	tag.AttributeValue("scale", scale, true);
 
+	// if the value is a leaf, the scale factor is defined as the value
+	if (tag.isleaf())
+	{
+		tag.value(scale);
+	}
+
 	// create a prescribed bc
 	FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
 	pdc->SetDOF(bc).SetScale(scale, lc).SetRelativeFlag(br);
