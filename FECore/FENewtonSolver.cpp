@@ -91,7 +91,7 @@ bool FENewtonSolver::ReformStiffness(const FETimePoint& tp)
         if (!CreateStiffness(m_niter == 0)) return false;
         
         // reset reshape flag, except for contact
-        m_breshape = (m_fem.SurfacePairInteractions() > 0? true : false);
+        m_breshape = (((m_fem.SurfacePairInteractions() > 0) || (m_fem.NonlinearConstraints() > 0)) ? true : false);
     }
     
     // calculate the global stiffness matrix

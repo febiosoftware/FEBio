@@ -616,6 +616,7 @@ void FESolidSolver2::UpdateConstraints()
 	tp.alpha = m_alpha;
 	tp.beta  = m_beta;
 	tp.gamma = m_gamma;
+	tp.niter = m_niter;
 
 	// Update all nonlinear constraints
 	for (int i=0; i<m_fem.NonlinearConstraints(); ++i) 

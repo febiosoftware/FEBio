@@ -141,6 +141,7 @@
 #include "FERigidAngularDamper.h"
 #include "FERigidContractileForce.h"
 #include "FERigidForce.h"
+#include "FEDiscreteContact.h"
 
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
@@ -371,6 +372,7 @@ REGISTER_FECORE_CLASS(FERigidDamper          , FENLCONSTRAINT_ID, "rigid damper"
 REGISTER_FECORE_CLASS(FERigidAngularDamper   , FENLCONSTRAINT_ID, "rigid angular damper"   );
 REGISTER_FECORE_CLASS(FERigidContractileForce, FENLCONSTRAINT_ID, "rigid contractile force");
 REGISTER_FECORE_CLASS(FEVolumeConstraint     , FENLCONSTRAINT_ID, "volume"                 );
+REGISTER_FECORE_CLASS(FEDiscreteContact      , FENLCONSTRAINT_ID, "discrete contact"       );
 REGISTER_FECORE_CLASS(FEDistanceConstraint   , FENLCONSTRAINT_ID, "node distance"          );
 REGISTER_FECORE_CLASS(FE2OMicroConstraint    , FENLCONSTRAINT_ID, "2O microfluc"           );
 

@@ -9,6 +9,7 @@ struct FETimePoint
 		alpha = 1.0;
 		beta = 0.25;
 		gamma = 0.5;
+		niter = 0;
 	}
 
 	FETimePoint(double time, double tinc)
@@ -18,6 +19,7 @@ struct FETimePoint
 		alpha = 1.0;
 		beta = 0.25;
 		gamma = 0.5;
+		niter = 0;
 	}
 
 
@@ -28,4 +30,6 @@ struct FETimePoint
 	double	alpha;
 	double	beta;
 	double	gamma;
+
+	int		niter;	// iteration number
 };

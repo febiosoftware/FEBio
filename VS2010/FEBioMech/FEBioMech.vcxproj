@@ -580,6 +580,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioMech\FEDiscreteContact.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticMaterial2O.cpp">
       <FileType>Document</FileType>
     </ClCompile>
@@ -807,6 +808,7 @@
     <ClInclude Include="..\..\FEBioMech\FEDamageMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDiscreteContact.h" />
     <ClInclude Include="..\..\FEBioMech\FEDiscreteSpringDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEDistanceConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEDonnanEquilibrium.h" />

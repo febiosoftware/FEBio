@@ -7,6 +7,7 @@
 #include "FECore/FECoreKernel.h"
 #include <FECore/FERigidSystem.h>
 #include <FECore/RigidBC.h>
+#include <FEBioMech/FEDiscreteContact.h>
 
 //=============================================================================
 //
@@ -201,6 +202,16 @@ void FEBioConstraintsSection::Parse25(XMLTag &tag)
 					FEFacetSet* pface = mesh.FindFacetSet(szsurf);
 					if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
 					if (BuildSurface(*psurf, *pface, true) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
+				}
+
+				// get the nodeset (this is needed by FEDiscreteContact)
+				if (dynamic_cast<FEDiscreteContact*>(plc))
+				{
+					FEDiscreteContact* pdc = dynamic_cast<FEDiscreteContact*>(plc);
+					const char* szdset = tag.AttributeValue("discrete_set");
+					FEDiscreteSet* pset = mesh.FindDiscreteSet(szdset);
+					if (pset == 0) throw XMLReader::InvalidAttributeValue(tag, "discrete_set", szdset);
+					pdc->SetDiscreteSet(pset);
 				}
 
 				// read the parameter list

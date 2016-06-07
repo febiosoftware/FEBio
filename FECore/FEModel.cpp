@@ -1720,7 +1720,11 @@ void FEModel::BuildMatrixProfile(FEGlobalMatrix& G, bool breset)
 			}
 			G.build_add(lm);
 		}
-
+	}
+	else
+	{
+		// Do the "dynamic" profile. That is the part of the profile that always changes
+		// This is mostly contact
 		// do the nonlinear constraints
 		int M = NonlinearConstraints();
 		for (int m=0; m<M; ++m)
@@ -1728,11 +1732,6 @@ void FEModel::BuildMatrixProfile(FEGlobalMatrix& G, bool breset)
 			FENLConstraint* pnlc = NonlinearConstraint(m);
 			if (pnlc->IsActive()) pnlc->BuildMatrixProfile(G);
 		}	
-	}
-	else
-	{
-		// Do the "dynamic" profile. That is the part of the profile that always changes
-		// This is mostly contact
 
 		// All following "elements" are nonstatic. That is, they can change
 		// connectivity between calls to this function. All of these elements
