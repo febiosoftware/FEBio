@@ -1699,6 +1699,43 @@ void FESolidSolver2::AssembleStiffness(std::vector<int>& lm, matrix& ke)
 void FESolidSolver2::AssembleStiffness2(vector<int>& lmi, vector<int>& lmj, matrix& ke)
 {
 	m_pK->Assemble(ke, lmi, lmj);
+
+	// adjust for prescribed dofs
+	vector<double>& ui = m_ui;
+
+	SparseMatrix& K = *m_pK;
+	// loop over columns
+	int cols = ke.columns();
+	int rows = ke.rows();
+	for (int j=0; j<cols; ++j)
+	{
+		int J = -lmj[j] - 2;
+		if ((J >= 0) && (J<m_nreq))
+		{
+			// dof j is a prescribed degree of freedom
+
+			// loop over rows
+			for (int i=0; i<rows; ++i)
+				{
+					int I = lmi[i];
+					if (I >= 0)
+					{
+						// dof i is not a prescribed degree of freedom
+						m_Fd[I] -= ke[i][j]*ui[J];
+					}
+				}
+
+			// set the diagonal element of K to 1
+			K.set(J,J, 1);			
+		}
+	}
+
+	// see if there are any rigid body dofs here
+	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	if (rigid.Objects()) 
+	{
+		assert(false);
+	}
 }
 
 //-----------------------------------------------------------------------------
