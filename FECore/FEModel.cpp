@@ -679,7 +679,7 @@ bool FEModel::EvaluateParameterList(FEParameterList &pl)
 		int nlc = pi->GetLoadCurve();
 		if (nlc >= 0)
 		{
-			if (nlc >= NLC) return false;
+			if (nlc >= NLC) return fecore_error("Invalid load curve ID");
 
 			double v = GetLoadCurve(nlc)->Value();
 			switch (pi->type())
