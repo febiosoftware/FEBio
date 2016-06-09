@@ -52,13 +52,13 @@ public:
 	//! solve the step
 	bool DoSolve(double time);
 
-	void PrepStep(double time);
+	void PrepStep(const FETimeInfo& timeInfo);
 
-	void NodalForces(vector<double>& F, const FETimePoint& tp);
+	void NodalForces(vector<double>& F, const FETimeInfo& tp);
 
 	bool Residual(vector<double>& R);
 
-	void NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp);
+	void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);
 
 	void InertialForces(FEGlobalVector& R);
 	

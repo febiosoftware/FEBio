@@ -11,21 +11,23 @@ FEMaterialPoint* FERemodelingMaterialPoint::Copy()
 }
 
 //-----------------------------------------------------------------------------
-void FERemodelingMaterialPoint::Init(bool bflag)
+void FERemodelingMaterialPoint::Init()
 {
-	if (bflag)
-	{
-		// intialize data to zero
-        m_sed = m_dsed = 0; 
-		m_rhor = m_rhorp = 0;
-	}
-	else
-	{
-		m_rhorp = m_rhor;
-	}
+	// intialize data to zero
+	m_sed = m_dsed = 0; 
+	m_rhor = m_rhorp = 0;
         
 	// don't forget to initialize the base class
-    FEMaterialPoint::Init(bflag);
+    FEMaterialPoint::Init();
+}
+
+//-----------------------------------------------------------------------------
+void FERemodelingMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+	m_rhorp = m_rhor;
+        
+	// don't forget to initialize the base class
+    FEMaterialPoint::Update(timeInfo);
 }
 
 //-----------------------------------------------------------------------------

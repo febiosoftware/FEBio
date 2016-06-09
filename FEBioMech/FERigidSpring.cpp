@@ -96,7 +96,7 @@ void FERigidSpring::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidSpring::Residual(FEGlobalVector& R, const FETimePoint& tp)
+void FERigidSpring::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
     vector<double> fa(6);
     vector<double> fb(6);
@@ -145,7 +145,7 @@ void FERigidSpring::Residual(FEGlobalVector& R, const FETimePoint& tp)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidSpring::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
+void FERigidSpring::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	double alpha = tp.alpha;
     
@@ -293,13 +293,13 @@ void FERigidSpring::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidSpring::Augment(int naug, const FETimePoint& tp)
+bool FERigidSpring::Augment(int naug, const FETimeInfo& tp)
 {
     return true;
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSpring::Update(const FETimePoint& tp)
+void FERigidSpring::Update(const FETimeInfo& tp)
 {
     vec3d ra, rb, c;
     vec3d za, zb;

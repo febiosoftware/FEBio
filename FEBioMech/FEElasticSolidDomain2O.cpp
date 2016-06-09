@@ -197,8 +197,8 @@ bool FEElasticSolidDomain2O::FEInternalSurface2O::Initialize(FEElasticSolidDomai
 			m_data[nnf].m_pt[0] = pmat->CreateMaterialPointData();
 			m_data[nnf].m_pt[1] = pmat->CreateMaterialPointData();
 
-			m_data[nnf].m_pt[0]->Init(true);
-			m_data[nnf].m_pt[1]->Init(true);
+			m_data[nnf].m_pt[0]->Init();
+			m_data[nnf].m_pt[1]->Init();
 
 			// iso-parametric coordinates in surface element
 			double h1 = face.gr(n);
@@ -318,9 +318,9 @@ void FEElasticSolidDomain2O::BuildMatrixProfile(FEGlobalMatrix& M)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain2O::InitElements()
+void FEElasticSolidDomain2O::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
-	FEElasticSolidDomain::InitElements();
+	FEElasticSolidDomain::PreSolveUpdate(timeInfo);
 
 	int NF = m_surf.Elements(), nd = 0;
 	for (int i=0; i<NF; ++i)
@@ -330,14 +330,14 @@ void FEElasticSolidDomain2O::InitElements()
 		for (int n=0; n<nint; ++n, ++nd)
 		{
 			FEInternalSurface2O::Data& data = m_surf.GetData(nd);
-			data.m_pt[0]->Init(false);
-			data.m_pt[1]->Init(false);
+			data.m_pt[0]->Update(timeInfo);
+			data.m_pt[1]->Update(timeInfo);
 		}
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain2O::Update(const FETimePoint& tp)
+void FEElasticSolidDomain2O::Update(const FETimeInfo& tp)
 {
 	// call base class first
 	// (this will call FEElasticMultiscaleDomain2O::UpdateElementStress)
@@ -994,7 +994,7 @@ void FEElasticSolidDomain2O::StiffnessMatrix(FESolver* psolver)
 {
 	// repeat over all solid elements
 	int NE = m_Elem.size();
-	FETimePoint tp = GetFEModel()->GetTime();
+	FETimeInfo tp = GetFEModel()->GetTime();
 	
 	#pragma omp parallel for shared (NE)
 	for (int iel=0; iel<NE; ++iel)
@@ -1704,7 +1704,7 @@ void FEElasticSolidDomain2O::ElementStiffnessMatrixDG3(FESurfaceElement& face, F
 
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
-void FEElasticSolidDomain2O::ElementStiffness(const FETimePoint& tp, int iel, matrix& ke)
+void FEElasticSolidDomain2O::ElementStiffness(const FETimeInfo& tp, int iel, matrix& ke)
 {
 	FEElasticMaterial2O* pmat = dynamic_cast<FEElasticMaterial2O*>(m_pMat);
 

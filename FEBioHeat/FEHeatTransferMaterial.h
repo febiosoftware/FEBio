@@ -32,11 +32,6 @@ public:
 		FEMaterialPoint::Serialize(ar);
 	}
 
-	void Init(bool bflag)
-	{
-		if (m_pNext) m_pNext->Init(bflag);
-	}
-
 public:
 	double	m_T;	//!< current temperature
 	double	m_T0;	//!< reference temperature

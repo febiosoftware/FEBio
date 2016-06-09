@@ -259,7 +259,7 @@ void FEPressureLoad::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
+void FEPressureLoad::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 {
 	// We only need the stiffness for nonlinear pressure forces
 	if (m_blinear) return;
@@ -299,7 +299,7 @@ void FEPressureLoad::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::Residual(const FETimePoint& tp, FEGlobalVector& R)
+void FEPressureLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 {
 	vector<double> fe;
 	vector<int> lm;

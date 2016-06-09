@@ -390,7 +390,7 @@ void FE3FieldElasticSolidDomain::ElementGeometricalStiffness(int iel, matrix &ke
 
 //-----------------------------------------------------------------------------
 //! This function loops over all elements and updates the stress
-void FE3FieldElasticSolidDomain::Update(const FETimePoint& tp)
+void FE3FieldElasticSolidDomain::Update(const FETimeInfo& tp)
 {
 	bool berr = false;
 	int NE = (int) m_Elem.size();

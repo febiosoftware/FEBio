@@ -17,7 +17,7 @@ public:
 	void Serialize(DumpStream& ar);
     
 	//! Initialize material point data
-	void Init(bool bflag);
+	void Init();
 	
 public:
 	// solutes material data

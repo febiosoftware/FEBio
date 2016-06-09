@@ -1021,7 +1021,7 @@ FESurface* FEBioImport::ParseSurface(XMLTag& tag, const char* szatt)
 	{
 		// count how many pressure cards there are
 		int npr = tag.children();
-		psurf->create(npr);
+		psurf->Create(npr);
 
 		++tag;
 		int nf[FEElement::MAX_NODES ], N;
@@ -1059,7 +1059,7 @@ bool FEBioImport::BuildSurface(FESurface& s, FEFacetSet& fs)
 	int faces = fs.Faces();
 
 	// allocate storage for faces
-	s.create(faces);
+	s.Create(faces);
 
 	// read faces
 	for (int i=0; i<faces; ++i)

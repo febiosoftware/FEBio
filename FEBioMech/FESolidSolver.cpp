@@ -252,7 +252,7 @@ bool FESolidSolver::InitEquations()
 //
 bool FESolidSolver::Augment()
 {
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	// Assume we will pass (can't hurt to be optimistic)
 	bool bconv = true;
@@ -618,7 +618,7 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 void FESolidSolver::UpdateStresses()
 {
 	FEMesh& mesh = m_fem.GetMesh();
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	// update the stresses on all domains
 	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
@@ -640,7 +640,7 @@ void FESolidSolver::UpdateContact()
 //! Update nonlinear constraints
 void FESolidSolver::UpdateConstraints()
 {
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	// Update all nonlinear constraints
 	for (int i=0; i<m_fem.NonlinearConstraints(); ++i) 
@@ -652,7 +652,7 @@ void FESolidSolver::UpdateConstraints()
 
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first BFGS-iteration. 
-void FESolidSolver::PrepStep(double time)
+void FESolidSolver::PrepStep(const FETimeInfo& timeInfo)
 {
 	TimerTracker t(m_UpdateTime);
 
@@ -679,7 +679,7 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// TODO: Pass this parameter to this function instead of time
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry
@@ -846,10 +846,10 @@ void FESolidSolver::PrepStep(double time)
 	// NOTE: do this before the stresses are updated
 	// TODO: does it matter if the stresses are updated before
 	//       the material point data is initialized
-	FEMaterialPoint::dt = tp.dt;
-	FEMaterialPoint::time = tp.t;
+	FEMaterialPoint::dt = tp.timeIncrement;
+	FEMaterialPoint::time = tp.currentTime;
 
-	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
+	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(timeInfo);
 
 	// update stresses
 	UpdateStresses();
@@ -908,10 +908,10 @@ bool FESolidSolver::Quasin(double time)
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// prepare for the first iteration
-	PrepStep(time);
+	FETimeInfo tp = m_fem.GetTime();
+	PrepStep(tp);
 
 	// calculate initial stiffness matrix
-	FETimePoint tp = m_fem.GetTime();
 	if (ReformStiffness(tp) == false) return false;
 
 	// calculate initial residual
@@ -1172,7 +1172,7 @@ bool FESolidSolver::Quasin(double time)
 
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
-bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
+bool FESolidSolver::StiffnessMatrix(const FETimeInfo& tp)
 {
 	// get the stiffness matrix
 	SparseMatrix& K = *m_pK;
@@ -1213,7 +1213,7 @@ bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 	if (pstep->m_nanalysis == FE_DYNAMIC)
 	{
 		// scale factor
-		double dt = tp.dt;
+		double dt = tp.timeIncrement;
 		double a = 1.0 / (m_beta*dt*dt);
 
 		// loop over all domains
@@ -1271,7 +1271,7 @@ bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the stiffness contribution due to nonlinear constraints
-void FESolidSolver::NonLinearConstraintStiffness(const FETimePoint& tp)
+void FESolidSolver::NonLinearConstraintStiffness(const FETimeInfo& tp)
 {
 	int N = m_fem.NonlinearConstraints();
 	for (int i=0; i<N; ++i) 
@@ -1802,7 +1802,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	TimerTracker t(m_RHSTime);
 
 	// get the time information
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -1900,7 +1900,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 //-----------------------------------------------------------------------------
 //! calculate the nonlinear constraint forces 
-void FESolidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp)
+void FESolidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int N = m_fem.NonlinearConstraints();
 	for (int i=0; i<N; ++i) 
@@ -1913,7 +1913,7 @@ void FESolidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimePoi
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
 
-void FESolidSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
+void FESolidSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
 {
 	// zero nodal force vector
 	zero(F);
@@ -1954,10 +1954,10 @@ void FESolidSolver::InertialForces(FEGlobalVector& R)
 	zero(F);
 
 	// get the time information
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	// calculate F
-	double dt = tp.dt;
+	double dt = tp.timeIncrement;
 	double a = 1.0 / (m_beta*dt);
 	double b = a / dt;
 	double c = 1.0 - 0.5/m_beta;

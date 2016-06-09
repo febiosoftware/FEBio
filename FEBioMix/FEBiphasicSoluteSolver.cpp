@@ -106,7 +106,7 @@ bool FEBiphasicSoluteSolver::InitEquations()
 
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
-void FEBiphasicSoluteSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
+void FEBiphasicSoluteSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
 {
 	// zero nodal force vector
 	zero(F);
@@ -130,7 +130,7 @@ void FEBiphasicSoluteSolver::NodalForces(vector<double>& F, const FETimePoint& t
 			
 				// For pressure and concentration loads, multiply by dt
 				// for consistency with evaluation of residual and stiffness matrix
-				if ((dof == m_dofP) || (dof >= m_dofC)) f *= tp.dt;
+				if ((dof == m_dofP) || (dof >= m_dofC)) f *= tp.timeIncrement;
 
 				// assemble into residual
 				AssembleResidual(nid, dof, f, F);
@@ -142,10 +142,10 @@ void FEBiphasicSoluteSolver::NodalForces(vector<double>& F, const FETimePoint& t
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first QN iteration. 
 //!
-void FEBiphasicSoluteSolver::PrepStep(double time)
+void FEBiphasicSoluteSolver::PrepStep(const FETimeInfo& timeInfo)
 {
 	for (int j=0; j<(int)m_nceq.size(); ++j) if (m_nceq[j]) zero(m_Ci[j]);
-	FEBiphasicSolver::PrepStep(time);
+	FEBiphasicSolver::PrepStep(timeInfo);
 }
 
 //-----------------------------------------------------------------------------
@@ -190,10 +190,10 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// prepare for the first iteration
-	PrepStep(time);
+	FETimeInfo tp = m_fem.GetTime();
+	PrepStep(tp);
 
 	// calculate initial stiffness matrix
-	FETimePoint tp = m_fem.GetTime();
 	if (ReformStiffness(tp) == false) return false;
 
 	// calculate initial residual
@@ -518,8 +518,8 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	int i;
 
 	// get the time information
-	FETimePoint tp = m_fem.GetTime();
-	double dt = tp.dt;
+	FETimeInfo tp = m_fem.GetTime();
+	double dt = tp.timeIncrement;
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -638,7 +638,7 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
 
-bool FEBiphasicSoluteSolver::StiffnessMatrix(const FETimePoint& tp)
+bool FEBiphasicSoluteSolver::StiffnessMatrix(const FETimeInfo& tp)
 {
 	// get the stiffness matrix
 	SparseMatrix& K = *m_pK;
@@ -661,7 +661,7 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix(const FETimePoint& tp)
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	bool bsymm = m_bsymm;
-	double dt = tp.dt;
+	double dt = tp.timeIncrement;
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
@@ -768,7 +768,7 @@ void FEBiphasicSoluteSolver::UpdateKinematics(vector<double>& ui)
 void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 {
 	FEMesh& mesh = m_fem.GetMesh();
-	double dt = m_fem.GetTime().dt;
+	double dt = m_fem.GetTime().timeIncrement;
 	
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();

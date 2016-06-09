@@ -122,7 +122,7 @@ void FERigidSphericalJoint::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidSphericalJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
+void FERigidSphericalJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
     vector<double> fa(6);
     vector<double> fb(6);
@@ -180,7 +180,7 @@ void FERigidSphericalJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidSphericalJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
+void FERigidSphericalJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
     int j;
 
@@ -348,7 +348,7 @@ void FERigidSphericalJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidSphericalJoint::Augment(int naug, const FETimePoint& tp)
+bool FERigidSphericalJoint::Augment(int naug, const FETimeInfo& tp)
 {
     vec3d ra, rb, qa, qb, c, ksi, Lm;
     vec3d za, zb;
@@ -434,7 +434,7 @@ bool FERigidSphericalJoint::Augment(int naug, const FETimePoint& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSphericalJoint::Update(const FETimePoint& tp)
+void FERigidSphericalJoint::Update(const FETimeInfo& tp)
 {
     vec3d ra, rb;
     vec3d za, zb;

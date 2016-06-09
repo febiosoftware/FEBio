@@ -21,8 +21,6 @@ public:
 
 	FEMaterialPoint* Copy();
 
-	void Init(bool bflag);
-
 	void Serialize(DumpStream& ar);
 
 public:

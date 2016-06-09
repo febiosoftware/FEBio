@@ -240,7 +240,7 @@ bool FESolidSolver2::InitEquations()
 //
 bool FESolidSolver2::Augment()
 {
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 	tp.alpha = m_alpha;
 	tp.beta  = m_beta;
 	tp.gamma = m_gamma;
@@ -590,7 +590,7 @@ void FESolidSolver2::UpdateRigidBodies(vector<double>& ui)
 void FESolidSolver2::UpdateStresses()
 {
 	FEMesh& mesh = m_fem.GetMesh();
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	// update the stresses on all domains
 	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
@@ -612,11 +612,11 @@ void FESolidSolver2::UpdateContact()
 //! Update nonlinear constraints
 void FESolidSolver2::UpdateConstraints()
 {
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 	tp.alpha = m_alpha;
 	tp.beta  = m_beta;
 	tp.gamma = m_gamma;
-	tp.niter = m_niter;
+	tp.currentIteration = m_niter;
 
 	// Update all nonlinear constraints
 	for (int i=0; i<m_fem.NonlinearConstraints(); ++i) 
@@ -632,11 +632,11 @@ bool FESolidSolver2::InitStep(double time)
 	FEModel& fem = GetFEModel();
 
 	// get the time information
-	FETimePoint tp = fem.GetTime();
+	FETimeInfo tp = fem.GetTime();
 
 	// evaluate load curve values at current (or intermediate) time
-	double t = tp.t;
-	double dt = tp.dt;
+	double t = tp.currentTime;
+	double dt = tp.timeIncrement;
 	double ta = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
 
 	return FESolver::InitStep(ta);
@@ -644,7 +644,7 @@ bool FESolidSolver2::InitStep(double time)
 
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first BFGS-iteration. 
-void FESolidSolver2::PrepStep(double time)
+void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
 {
 	TimerTracker t(m_UpdateTime);
 
@@ -670,7 +670,7 @@ void FESolidSolver2::PrepStep(double time)
 		ni.m_ap = ni.m_at;
 	}
 
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry
@@ -851,10 +851,10 @@ void FESolidSolver2::PrepStep(double time)
 	// NOTE: do this before the stresses are updated
 	// TODO: does it matter if the stresses are updated before
 	//       the material point data is initialized
-	FEMaterialPoint::dt = tp.dt;
-	FEMaterialPoint::time = tp.t;
+	FEMaterialPoint::dt = tp.timeIncrement;
+	FEMaterialPoint::time = tp.currentTime;
 
-	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
+	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(timeInfo);
 
 	// update stresses
 	UpdateStresses();
@@ -908,14 +908,14 @@ bool FESolidSolver2::Quasin(double time)
 	// Get the current step
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
-	// prepare for the first iteration
-	PrepStep(time);
-
 	// get the time information
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 	tp.alpha = m_alpha;
 	tp.beta  = m_beta;
 	tp.gamma = m_gamma;
+
+	// prepare for the first iteration
+	PrepStep(tp);
 
 	// calculate initial stiffness matrix
 	if (ReformStiffness(tp) == false) return false;
@@ -1181,7 +1181,7 @@ bool FESolidSolver2::Quasin(double time)
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
 
-bool FESolidSolver2::StiffnessMatrix(const FETimePoint& tp)
+bool FESolidSolver2::StiffnessMatrix(const FETimeInfo& tp)
 {
 	// get the stiffness matrix
 	SparseMatrix& K = *m_pK;
@@ -1223,7 +1223,7 @@ bool FESolidSolver2::StiffnessMatrix(const FETimePoint& tp)
 	if (pstep->m_nanalysis == FE_DYNAMIC)
 	{
 		// scale factor
-		double dt = tp.dt;
+		double dt = tp.timeIncrement;
 		double a = 1.0 / (m_beta*dt*dt);
 
 		// loop over all domains (except rigid)
@@ -1291,7 +1291,7 @@ bool FESolidSolver2::StiffnessMatrix(const FETimePoint& tp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the stiffness contribution due to nonlinear constraints
-void FESolidSolver2::NonLinearConstraintStiffness(const FETimePoint& tp)
+void FESolidSolver2::NonLinearConstraintStiffness(const FETimeInfo& tp)
 {
 	int N = m_fem.NonlinearConstraints();
 	for (int i=0; i<N; ++i) 
@@ -1326,7 +1326,7 @@ void FESolidSolver2::RigidMassMatrix(FERigidBody& RB)
     ke.zero();
         
     // Newmark integration rule
-    double dt = m_fem.GetTime().dt;
+    double dt = m_fem.GetTime().timeIncrement;
     double beta = m_beta;
     double gamma = m_gamma;
     double a = 1./(beta*dt*dt);
@@ -1929,7 +1929,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	TimerTracker t(m_RHSTime);
 
 	// get the time information
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 	tp.alpha = m_alpha;
 	tp.beta  = m_beta;
 	tp.gamma = m_gamma;
@@ -2031,7 +2031,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 
 //-----------------------------------------------------------------------------
 //! calculate the nonlinear constraint forces 
-void FESolidSolver2::NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp)
+void FESolidSolver2::NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int N = m_fem.NonlinearConstraints();
 	for (int i=0; i<N; ++i) 
@@ -2043,7 +2043,7 @@ void FESolidSolver2::NonLinearConstraintForces(FEGlobalVector& R, const FETimePo
 
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
-void FESolidSolver2::NodalForces(vector<double>& F, const FETimePoint& tp)
+void FESolidSolver2::NodalForces(vector<double>& F, const FETimeInfo& tp)
 {
 	// zero nodal force vector
 	zero(F);
@@ -2084,7 +2084,7 @@ void FESolidSolver2::InertialForces(FEGlobalVector& R)
 	zero(F);
     
 	// calculate F
-    double dt = m_fem.GetTime().dt;
+    double dt = m_fem.GetTime().timeIncrement;
 
     // Newmark rule
     double a = 1.0 / (m_beta*dt);
@@ -2160,7 +2160,7 @@ void FESolidSolver2::RigidInertialForces(FERigidBody& RB, FEGlobalVector& R)
     fe[1] = -F.y;
     fe[2] = -F.z;
         
-    double dt = m_fem.GetTime().dt;
+    double dt = m_fem.GetTime().timeIncrement;
         
     // evaluate mass moment of inertia at t and tp
     mat3d Rt = RB.m_qt.RotationMatrix();

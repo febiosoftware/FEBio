@@ -80,7 +80,7 @@ void FERigidAngularDamper::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidAngularDamper::Residual(FEGlobalVector& R, const FETimePoint& tp)
+void FERigidAngularDamper::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
     vector<double> fa(6);
     vector<double> fb(6);
@@ -121,14 +121,14 @@ void FERigidAngularDamper::Residual(FEGlobalVector& R, const FETimePoint& tp)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidAngularDamper::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
+void FERigidAngularDamper::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
     double alpha = tp.alpha;
     double beta  = tp.beta;
     double gamma = tp.gamma;
     
     // get time increment
-    double dt = tp.dt;
+    double dt = tp.timeIncrement;
     
     int j;
     
@@ -198,13 +198,13 @@ void FERigidAngularDamper::StiffnessMatrix(FESolver* psolver, const FETimePoint&
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidAngularDamper::Augment(int naug, const FETimePoint& tp)
+bool FERigidAngularDamper::Augment(int naug, const FETimeInfo& tp)
 {
     return true;
 }
 
 //-----------------------------------------------------------------------------
-void FERigidAngularDamper::Update(const FETimePoint& tp)
+void FERigidAngularDamper::Update(const FETimeInfo& tp)
 {
 	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
     FERigidBody& RBa = *rigid.Object(m_nRBa);

@@ -16,22 +16,21 @@ FEMaterialPoint* FEDamageMaterialPoint::Copy()
     return pt;
 }
 
-void FEDamageMaterialPoint::Init(bool bflag)
+void FEDamageMaterialPoint::Init()
 {
-    if (bflag)
-    {
-        // intialize data to zero
-        m_Emax = 0;
-        m_Etrial = 0;
-        m_D = 0;
-    }
-    else
-    {
-        m_Emax = max(m_Emax, m_Etrial);
-    }
-    
-    // don't forget to intialize the nested data
-    if (m_pNext) m_pNext->Init(bflag);
+	FEMaterialPoint::Init();
+
+	// intialize data to zero
+	m_Emax = 0;
+	m_Etrial = 0;
+	m_D = 0;
+}
+
+void FEDamageMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+	FEMaterialPoint::Update(timeInfo);
+
+	m_Emax = max(m_Emax, m_Etrial);
 }
 
 void FEDamageMaterialPoint::Serialize(DumpStream& ar)

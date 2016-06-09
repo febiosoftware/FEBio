@@ -10,7 +10,7 @@ public:
 	FEElasticMaterialPoint();
 
 	//! Initialize material point data
-	void Init(bool bflag);
+	void Init();
 
 	//! create a shallow copy
 	FEMaterialPoint* Copy();

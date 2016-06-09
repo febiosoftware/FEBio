@@ -48,7 +48,7 @@ public:
 public: // overrides from FEElasticDomain
 
 	//! Update domain data
-	void Update(const FETimePoint& tp);
+	void Update(const FETimeInfo& tp);
 
 	//! calculates the internal force vector
 	void InternalForces(FEGlobalVector& R);
@@ -71,7 +71,7 @@ protected:
 	void ElementalStiffnessMatrix(FESolver* psolver);
 
 	//! calculates the solid element stiffness matrix
-	void ElementStiffness(const FETimePoint& tp, int iel, matrix& ke);
+	void ElementStiffness(const FETimeInfo& tp, int iel, matrix& ke);
 
 	//! Calculates the nodal stiffness matrix
 	void NodalStiffnessMatrix(FESolver* psolver);

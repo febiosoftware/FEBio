@@ -17,39 +17,36 @@ FEMaterialPoint* FESolutesMaterialPoint::Copy()
 
 //-----------------------------------------------------------------------------
 //! Initialize material point data
-void FESolutesMaterialPoint::Init(bool bflag)
+void FESolutesMaterialPoint::Init()
 {
-	if (bflag)
-	{
-		m_nsol = m_nsbm = 0;
-		m_psi = m_cF = 0;
-		m_Ie = vec3d(0,0,0);
-		m_rhor = 0;
-        m_c.clear();
-        m_gradc.clear();
-        m_j.clear();
-        m_ca.clear();
-        m_crp.clear();
-        m_sbmr.clear();
-        m_sbmrp.clear();
-        m_sbmrhat.clear();
-        m_sbmrmin.clear();
-        m_sbmrmax.clear();
-        m_k.clear();
-        m_dkdJ.clear();
-        m_dkdJJ.clear();
-        m_dkdc.clear();
-        m_dkdJc.clear();
-        m_dkdcc.clear();
-        m_dkdr.clear();
-        m_dkdJr.clear();
-        m_dkdrc.clear();
-        m_cri.clear();
-        m_crd.clear();
-	}
+	m_nsol = m_nsbm = 0;
+	m_psi = m_cF = 0;
+	m_Ie = vec3d(0,0,0);
+	m_rhor = 0;
+    m_c.clear();
+    m_gradc.clear();
+    m_j.clear();
+    m_ca.clear();
+    m_crp.clear();
+    m_sbmr.clear();
+    m_sbmrp.clear();
+    m_sbmrhat.clear();
+    m_sbmrmin.clear();
+    m_sbmrmax.clear();
+    m_k.clear();
+    m_dkdJ.clear();
+    m_dkdJJ.clear();
+    m_dkdc.clear();
+    m_dkdJc.clear();
+    m_dkdcc.clear();
+    m_dkdr.clear();
+    m_dkdJr.clear();
+    m_dkdrc.clear();
+    m_cri.clear();
+    m_crd.clear();
     
 	// don't forget to initialize the base class
-    FEMaterialPoint::Init(bflag);
+    FEMaterialPoint::Init();
 }
 
 //-----------------------------------------------------------------------------

@@ -30,7 +30,7 @@ void FETractionLoad::SetSurface(FESurface* ps)
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the traction load
-void FETractionLoad::Residual(const FETimePoint& tp, FEGlobalVector& R)
+void FETractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 {
 	vector<double> fe;
 	vector<int> lm;

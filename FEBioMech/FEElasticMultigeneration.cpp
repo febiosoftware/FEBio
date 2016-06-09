@@ -104,24 +104,28 @@ void FEMultigenerationMaterialPoint::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEMultigenerationMaterialPoint::Init(bool bflag)
+void FEMultigenerationMaterialPoint::Init()
 {
-    FEMaterialPoint::Init(bflag);
-    for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Init(bflag);
+    FEMaterialPoint::Init();
+    for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Init();
 
-	if (bflag)
-	{
-		m_tgen = 0.0;
-        m_ngen = 1;
-	}
+	m_tgen = 0.0;
+	m_ngen = 1;
+}
+
+//-----------------------------------------------------------------------------
+void FEMultigenerationMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+    FEMaterialPoint::Update(timeInfo);
+    for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Update(timeInfo);
 
 	// get the time
-	double t = FEMaterialPoint::time;
+	double t = timeInfo.currentTime;
 
 	// Check if this constitutes a new generation
 	int igen = m_pmat->CheckGeneration(t);
 	t = m_pmat->m_MG[igen]->btime;
-	if ((bflag == false) && (t>m_tgen))
+	if (t>m_tgen)
 	{
 		FEElasticMaterialPoint& pt = *((*this).ExtractData<FEElasticMaterialPoint>());
 					

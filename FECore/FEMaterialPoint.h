@@ -2,6 +2,7 @@
 
 #include "mat3d.h"
 #include "FEParameterList.h"
+#include "FETypes.h"
 #include <vector>
 using namespace std;
 
@@ -22,7 +23,11 @@ public:
 
 public:
 	//! The init function is used to intialize data
-	virtual void Init(bool bflag);
+	virtual void Init();
+
+	//! The Update function is used to update material point data
+	//! Note that this gets called at the start of the time step during PreSolveUpdate
+	virtual void Update(const FETimeInfo& timeInfo);
 
 	//! copy material point data (for running restarts) \todo Is this still used?
 	virtual FEMaterialPoint* Copy() = 0;

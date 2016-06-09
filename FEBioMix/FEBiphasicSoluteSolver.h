@@ -18,7 +18,7 @@ public:
 	bool InitEquations();
 
 	//! prepares the data for the first QN iteration
-	virtual void PrepStep(double time);
+	virtual void PrepStep(const FETimeInfo& timeInfo);
 
 	//! Performs a Newton-Raphson iteration
 	bool Quasin(double time);
@@ -29,13 +29,13 @@ public:
 public:
 	//! Calculates concentrated nodal forces (overridden from FESolidSolver2)
 	//! (This function is called from FESolidSolver2::PrepStep)
-	virtual void NodalForces(vector<double>& F, const FETimePoint& tp);
+	virtual void NodalForces(vector<double>& F, const FETimeInfo& tp);
 
 	//! Calculates residual (overridden from FEBiphasicSolver)
 	virtual bool Residual(vector<double>& R);
 
 	//! calculates the global stiffness matrix (overridden from FESolidSolver2)
-	virtual bool StiffnessMatrix(const FETimePoint& tp);
+	virtual bool StiffnessMatrix(const FETimeInfo& tp);
 
 	//! update kinematics
 	virtual void UpdateKinematics(vector<double>& ui);

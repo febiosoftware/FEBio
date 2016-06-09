@@ -25,5 +25,5 @@ public:
 	void InternalForces(FESolver* psolver, vector<double>& R);
 
 	// update domain data
-	void Update(const FETimePoint& tp);
+	void Update(const FETimeInfo& tp);
 };

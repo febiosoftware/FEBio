@@ -7,8 +7,6 @@ class FEDiscreteMaterialPoint : public FEMaterialPoint
 {
 public:
 	FEMaterialPoint* Copy();
-
-	void Init(bool bflag);
 };
 
 //-----------------------------------------------------------------------------

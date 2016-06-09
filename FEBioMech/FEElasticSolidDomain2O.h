@@ -65,14 +65,14 @@ public:
 	bool Initialize(FEModel& fem);
 
 	//! initialize elements
-	void InitElements();
+	void PreSolveUpdate(const FETimeInfo& timeInfo);
 
 	//! build the matrix profile
 	//! (overridden from FEDomain)
 	void BuildMatrixProfile(FEGlobalMatrix& M);
 
 	//! overridden from FEElasticSolidDomain
-	void Update(const FETimePoint& tp);
+	void Update(const FETimeInfo& tp);
 
 public:
 	//! internal stress forces
@@ -96,7 +96,7 @@ protected:
 
 	// --- S T I F F N E S S ---
 	//! calculates the solid element stiffness matrix
-	void ElementStiffness(const FETimePoint& tp, int iel, matrix& ke);
+	void ElementStiffness(const FETimeInfo& tp, int iel, matrix& ke);
 
 	//! contributions from discontinuous Galerkin formulation
 	void StiffnessMatrixDG(FESolver* psolver);

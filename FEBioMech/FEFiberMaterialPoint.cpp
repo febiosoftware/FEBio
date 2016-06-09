@@ -19,15 +19,12 @@ FEMaterialPoint* FEFiberMaterialPoint::Copy()
 
 //-----------------------------------------------------------------------------
 //! Initializes material point data.
-void FEFiberMaterialPoint::Init(bool bflag)
+void FEFiberMaterialPoint::Init()
 {
-	if (bflag)
-	{
-        m_n0 = vec3d(1,0,0);
-	}
-    
+	m_n0 = vec3d(1,0,0);
+
 	// don't forget to intialize the base class data
-	FEMaterialPoint::Init(bflag);
+	FEMaterialPoint::Init();
 }
 
 //-----------------------------------------------------------------------------

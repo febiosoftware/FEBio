@@ -16,10 +16,10 @@ public:
 	void Serialize(DumpStream& ar);
 
 	//! Residual
-	void Residual(FEGlobalVector& R, const FETimePoint& tp);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
 
 	//! Stiffness matrix
-	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
 
 public:
 	int		m_ida, m_idb;		//!< rigid body ID's
@@ -58,10 +58,10 @@ public:
 	void Serialize(DumpStream& ar);
 
 	//! Residual
-	void Residual(FEGlobalVector& R, const FETimePoint& tp);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
 
 	//! Stiffness matrix
-	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
 
 public:
 	int		m_ntype;	//!< type of force (0=loadcurve, 1=target)

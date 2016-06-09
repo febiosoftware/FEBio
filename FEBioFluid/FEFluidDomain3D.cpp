@@ -102,7 +102,7 @@ bool FEFluidDomain3D::Initialize(FEModel &fem)
 
 //-----------------------------------------------------------------------------
 //! Initialize element data
-void FEFluidDomain3D::InitElements()
+void FEFluidDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
     const int NE = FEElement::MAX_NODES;
     vec3d x0[NE], vp[NE], r0, v;
@@ -131,7 +131,7 @@ void FEFluidDomain3D::InitElements()
                 throw DoRunningRestart();
             }
             
-            mp.Init(false);
+            mp.Update(timeInfo);
         }
     }
 }
@@ -826,7 +826,7 @@ void FEFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidDomain3D::Update(const FETimePoint& tp)
+void FEFluidDomain3D::Update(const FETimeInfo& tp)
 {
     // TODO: This is temporary hack for running micro-materials in parallel.
     //	     Evaluating the stress for a micro-material will make FEBio solve
@@ -845,7 +845,7 @@ void FEFluidDomain3D::Update(const FETimePoint& tp)
     {
         try
         {
-            UpdateElementStress(i, tp.dt);
+            UpdateElementStress(i, tp.timeIncrement);
         }
         catch (NegativeJacobian e)
         {

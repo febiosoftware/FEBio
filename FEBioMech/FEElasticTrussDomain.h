@@ -18,7 +18,7 @@ public:
 	void Reset();
 
 	//! Initialize elements
-	void InitElements();
+	void PreSolveUpdate(const FETimeInfo& timeInfo);
 
 	//! Unpack truss element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
@@ -35,7 +35,7 @@ public:
 public: // overloads from FEElasticDomain
 
 	//! update the truss stresses
-	void Update(const FETimePoint& tp);
+	void Update(const FETimeInfo& tp);
 
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);

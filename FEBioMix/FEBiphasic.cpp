@@ -37,19 +37,16 @@ void FEBiphasicMaterialPoint::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicMaterialPoint::Init(bool bflag)
+void FEBiphasicMaterialPoint::Init()
 {
-	if (bflag)
-	{
-		m_p = m_pa = 0;
-		m_gradp = vec3d(0,0,0);
-		m_w = vec3d(0,0,0);
-		m_phi0 = m_phi0p = 0;
-		m_phi0hat = 0;
-        m_Jp = 1;
-	}
+	m_p = m_pa = 0;
+	m_gradp = vec3d(0,0,0);
+	m_w = vec3d(0,0,0);
+	m_phi0 = m_phi0p = 0;
+	m_phi0hat = 0;
+	m_Jp = 1;
 
-	if (m_pNext) m_pNext->Init(bflag);
+	FEMaterialPoint::Init();
 }
 
 //============================================================================

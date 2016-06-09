@@ -43,14 +43,19 @@ FEElement* FEDomain::FindElementFromID(int nid)
 }
 
 //-----------------------------------------------------------------------------
-void FEDomain::InitMaterialPointData()
+// This routine allocates the material point data for the element's integration points.
+// Currently, this has to be called after the elements have been assigned a type (since this
+// determines how many integration point an element gets). 
+void FEDomain::CreateMaterialPointData()
 {
 	FEMaterial* pmat = GetMaterial();
-
-	for (int i=0; i<Elements(); ++i)
+	if (pmat != 0)
 	{
-		FEElement& el = ElementRef(i);
-		for (int k=0; k<el.GaussPoints(); ++k) el.SetMaterialPointData(pmat->CreateMaterialPointData(), k);
+		for (int i=0; i<Elements(); ++i)
+		{
+			FEElement& el = ElementRef(i);
+			for (int k=0; k<el.GaussPoints(); ++k) el.SetMaterialPointData(pmat->CreateMaterialPointData(), k);
+		}
 	}
 }
 

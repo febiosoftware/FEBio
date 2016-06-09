@@ -57,8 +57,10 @@ public:
 	//! data serialization
 	void Serialize(DumpStream& ar);
 
-	void Init(bool bflag);
-		
+	void Init();
+
+	void Update(const FETimeInfo& timeInfo);
+
     FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }
     
 public:

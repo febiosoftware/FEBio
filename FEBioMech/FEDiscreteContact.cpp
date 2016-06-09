@@ -49,9 +49,9 @@ void FEDiscreteContact::Activate()
 	ProjectSurface(true);
 }
 
-void FEDiscreteContact::Update(const FETimePoint& tp)
+void FEDiscreteContact::Update(const FETimeInfo& tp)
 {
-	bool bupdate = (m_bfirst || (m_nsegup == 0)? true : (tp.niter <= m_nsegup));
+	bool bupdate = (m_bfirst || (m_nsegup == 0)? true : (tp.currentIteration <= m_nsegup));
 	ProjectSurface(true);
 	m_bfirst = false;
 }
@@ -165,7 +165,7 @@ void FEDiscreteContact::ProjectSurface(bool bsegup)
 	}
 }
 
-void FEDiscreteContact::Residual(FEGlobalVector& R, const FETimePoint& tp)
+void FEDiscreteContact::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	// element contact force vector
 	vector<double> fe;
@@ -295,7 +295,7 @@ void FEDiscreteContact::ContactNodalForce(FEDiscreteContact::NODE& nodeData, FES
 	for (int l=0; l<ndof; ++l) fe[l] = tn*N[l];
 }
 
-void FEDiscreteContact::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
+void FEDiscreteContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	matrix ke;
 
@@ -515,7 +515,7 @@ void FEDiscreteContact::ContactNodalStiffness(FEDiscreteContact::NODE& nodeData,
 }
 
 
-bool FEDiscreteContact::Augment(int naug, const FETimePoint& tp)
+bool FEDiscreteContact::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;

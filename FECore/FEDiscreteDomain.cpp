@@ -4,6 +4,14 @@
 #include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
+void FEDiscreteDomain::Create(int nelems, int elemType)
+{ 
+	m_Elem.resize(nelems); 
+	if (elemType != -1)
+		for (int i=0; i<nelems; ++i) m_Elem[i].SetType(elemType);
+}
+
+//-----------------------------------------------------------------------------
 bool FEDiscreteDomain::Initialize(FEModel &fem)
 {
 	if (FEDomain::Initialize(fem) == false) return false;

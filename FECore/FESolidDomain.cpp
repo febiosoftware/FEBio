@@ -4,6 +4,14 @@
 #include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
+void FESolidDomain::Create(int nsize, int elemType)
+{
+	m_Elem.resize(nsize);
+	if (elemType != -1)
+		for (int i=0; i<nsize; ++i) m_Elem[i].SetType(elemType);
+}
+
+//-----------------------------------------------------------------------------
 void FESolidDomain::CopyFrom(FEDomain* pd)
 {
 	FESolidDomain* psd = dynamic_cast<FESolidDomain*>(pd);
@@ -14,7 +22,12 @@ void FESolidDomain::CopyFrom(FEDomain* pd)
 // Reset data
 void FESolidDomain::Reset()
 {
-	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		FESolidElement& el = Element(i);
+		int nint = el.GaussPoints();
+		for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->Init();
+	}
 }
 
 //-----------------------------------------------------------------------------

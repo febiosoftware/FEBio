@@ -12,20 +12,33 @@
 #include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-void FEDomain2D::InitElements()
+void FEDomain2D::Create(int nelems, int elemType)
+{
+	m_Elem.resize(nelems);
+	if (elemType != -1) 
+		for (int i=0; i<nelems; ++i) m_Elem[i].SetType(elemType);
+}
+
+//-----------------------------------------------------------------------------
+void FEDomain2D::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
     for (size_t i=0; i<m_Elem.size(); ++i)
     {
         FEElement2D& el = m_Elem[i];
         int n = el.GaussPoints();
-        for (int j=0; j<n; ++j) el.GetMaterialPoint(j)->Init(false);
+        for (int j=0; j<n; ++j) el.GetMaterialPoint(j)->Update(timeInfo);
     }
 }
 
 //-----------------------------------------------------------------------------
 void FEDomain2D::Reset()
 {
-    for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
+    for (int i=0; i<(int) m_Elem.size(); ++i) 
+	{
+        FEElement2D& el = m_Elem[i];
+        int n = el.GaussPoints();
+        for (int j=0; j<n; ++j) el.GetMaterialPoint(j)->Init();
+	}
 }
 
 //-----------------------------------------------------------------------------

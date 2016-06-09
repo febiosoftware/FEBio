@@ -6,15 +6,18 @@
 class FETrussDomain : public FEDomain
 {
 public:
-	FETrussDomain(FEMesh* pm) : FEDomain(FE_DOMAIN_TRUSS, pm){}
+	FETrussDomain(FEMesh* pm);
 
-	void create(int n) { m_Elem.resize(n); }
+public:
+	void Create(int nsize, int elemType);
+
 	int Elements() const { return m_Elem.size(); }
 
 	FETrussElement& Element(int i) { return m_Elem[i]; }
 
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
+public:
 	//! Calculate the truss normal
 	vec3d TrussNormal(FETrussElement& el);
 

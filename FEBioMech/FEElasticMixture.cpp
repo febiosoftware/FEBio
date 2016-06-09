@@ -26,17 +26,21 @@ FEMaterialPoint* FEElasticMixtureMaterialPoint::Copy()
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticMixtureMaterialPoint::Init(bool bflag)
+void FEElasticMixtureMaterialPoint::Init()
 {
-	if (bflag)
-	{
-		for (int i=0; i<(int) m_w.size(); ++i) m_w[i] = 1.0;
-	}
+	for (int i=0; i<(int) m_w.size(); ++i) m_w[i] = 1.0;
 
 	// don't forget to initialize the base class
-    FEMaterialPoint::Init(bflag);
+    FEMaterialPoint::Init();
 
-	for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Init(bflag);
+	for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Init();
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticMixtureMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+	FEMaterialPoint::Update(timeInfo);
+	for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Update(timeInfo);
 }
 
 //-----------------------------------------------------------------------------

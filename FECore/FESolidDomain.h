@@ -10,7 +10,7 @@ public:
 	FESolidDomain(FEMesh* pm) : FEDomain(FE_DOMAIN_SOLID, pm) {}
 
 	//! create storage for elements
-	void create(int nsize) { m_Elem.resize(nsize); }
+	void Create(int nsize, int elemType);
 
 	//! return nr of elements
 	int Elements() const { return m_Elem.size(); }

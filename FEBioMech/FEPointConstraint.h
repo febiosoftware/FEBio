@@ -20,13 +20,13 @@ public:
 	void Serialize(DumpStream& ar);
 
 	//! Calculate the constraint force
-	void Residual(FEGlobalVector& R, const FETimePoint& tp);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
 
 	//! calculate the constraint stiffness
-	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
 
 	//! augmentations \todo implement this
-	bool Augment(int naug, const FETimePoint& tp) { return true; }
+	bool Augment(int naug, const FETimeInfo& tp) { return true; }
 
 	//! build connectivity for matrix profile
 	void BuildMatrixProfile(FEGlobalMatrix& M);

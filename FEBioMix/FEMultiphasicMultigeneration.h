@@ -20,7 +20,8 @@ public:
     
 	void Serialize(DumpStream& ar);
     
-	void Init(bool bflag);
+	void Init();
+	void Update(const FETimeInfo& timeInfo);
     
 public:
 	// multigenerational material data

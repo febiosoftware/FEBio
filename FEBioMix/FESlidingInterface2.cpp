@@ -1063,7 +1063,7 @@ void FESlidingInterface2::ContactForces(FEGlobalVector& R)
 
 	// if we're using the symmetric formulation
 	// we need to multiply with the timestep
-	double dt = fem.GetTime().dt;
+	double dt = fem.GetTime().timeIncrement;
 
 	// loop over the nr of passes
 	int npass = (m_btwo_pass?2:1);
@@ -1600,7 +1600,7 @@ void FESlidingInterface2::ContactStiffness(FESolver* psolver)
 						// the variable dt is either the timestep or one
 						// depending on whether we are using the symmetric
 						// poro version or not.
-						double dt = fem.GetTime().dt;
+						double dt = fem.GetTime().timeIncrement;
 						
 						double epsp = (tn > 0) ? m_epsp*pt.m_epsp : 0.;
 						

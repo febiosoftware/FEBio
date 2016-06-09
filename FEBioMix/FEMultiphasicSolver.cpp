@@ -147,14 +147,14 @@ bool FEMultiphasicSolver::InitEquations()
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first QN iteration. 
 //!
-void FEMultiphasicSolver::PrepStep(double time)
+void FEMultiphasicSolver::PrepStep(const FETimeInfo& timeInfo)
 {
 	for (int j=0; j<(int)m_nceq.size(); ++j) if (m_nceq[j]) zero(m_Ci[j]);
 
 	zero(m_Pi);
 	zero(m_Di);
 
-	FESolidSolver2::PrepStep(time);
+	FESolidSolver2::PrepStep(timeInfo);
 }
 
 //-----------------------------------------------------------------------------
@@ -199,10 +199,10 @@ bool FEMultiphasicSolver::Quasin(double time)
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// prepare for the first iteration
-	PrepStep(time);
+	FETimeInfo tp = m_fem.GetTime();
+	PrepStep(tp);
 
 	// calculate initial stiffness matrix
-	FETimePoint tp = m_fem.GetTime();
 	if (ReformStiffness(tp) == false) return false;
 
 	// calculate initial residual
@@ -519,7 +519,7 @@ bool FEMultiphasicSolver::Quasin(double time)
 
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
-void FEMultiphasicSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
+void FEMultiphasicSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
 {
 	// zero nodal force vector
 	zero(F);
@@ -543,7 +543,7 @@ void FEMultiphasicSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
 			
 				// For pressure and concentration loads, multiply by dt
 				// for consistency with evaluation of residual and stiffness matrix
-				if ((dof == m_dofP) || (dof >= m_dofC)) f *= tp.dt;
+				if ((dof == m_dofP) || (dof >= m_dofC)) f *= tp.timeIncrement;
 
 				// assemble into residual
 				AssembleResidual(nid, dof, f, F);
@@ -565,8 +565,8 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 	int i;
 
 	// get the time information
-	FETimePoint tp = m_fem.GetTime();
-	double dt = tp.dt;
+	FETimeInfo tp = m_fem.GetTime();
+	double dt = tp.timeIncrement;
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -711,7 +711,7 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
 
-bool FEMultiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
+bool FEMultiphasicSolver::StiffnessMatrix(const FETimeInfo& tp)
 {
 	// get the stiffness matrix
 	SparseMatrix& K = *m_pK;
@@ -734,7 +734,7 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	bool bsymm = m_bsymm;
-	double dt = tp.dt;
+	double dt = tp.timeIncrement;
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
@@ -746,7 +746,7 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 			FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
 			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
 
-			if      (pbd) pbd->StiffnessMatrixSS(this, bsymm, tp.dt);
+			if      (pbd) pbd->StiffnessMatrixSS(this, bsymm, tp.timeIncrement);
 			else if (pbs) pbs->StiffnessMatrixSS(this, bsymm, tp);
 			else if (ptd) ptd->StiffnessMatrixSS(this, bsymm, tp);
 			else if (pmd) pmd->StiffnessMatrixSS(this, bsymm, tp);
@@ -764,7 +764,7 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 			FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
 			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
 
-			if      (pbd) pbd->StiffnessMatrix(this, bsymm, tp.dt);
+			if      (pbd) pbd->StiffnessMatrix(this, bsymm, tp.timeIncrement);
 			else if (pbs) pbs->StiffnessMatrix(this, bsymm, tp);
 			else if (ptd) ptd->StiffnessMatrix(this, bsymm, tp);
 			else if (pmd) pmd->StiffnessMatrix(this, bsymm, tp);
@@ -902,7 +902,7 @@ void FEMultiphasicSolver::UpdatePoro(vector<double>& ui)
 	int i, n;
 
 	FEMesh& mesh = m_fem.GetMesh();
-	double dt = m_fem.GetTime().dt;
+	double dt = m_fem.GetTime().timeIncrement;
 
 	// update poro-elasticity data
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -932,7 +932,7 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 	int i, j, n;
 	
 	FEMesh& mesh = m_fem.GetMesh();
-	double dt = m_fem.GetTime().dt;
+	double dt = m_fem.GetTime().timeIncrement;
 	
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();

@@ -360,7 +360,7 @@ void FEMesh::Serialize(DumpStream& ar)
 				FEDomain* pd = fecore_new<FEDomain>(FEDOMAIN_ID, sz, &fem);
 				assert(pd);
 				pd->SetMaterial(pm);
-				pd->create(ne);
+				pd->Create(ne);
 				pd->Serialize(ar);
 
 				AddDomain(pd);
@@ -1059,7 +1059,7 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 	// create the surface
 	FESurface* ps = new FESurface(this);
 	if (NF == 0) return ps;
-	ps->create(NF);
+	ps->Create(NF);
 
 	// build the surface elements
 	int face[FEElement::MAX_NODES];

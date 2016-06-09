@@ -16,8 +16,8 @@ public:
 	//! initialize edge data structure
 	virtual bool Init();
 
-	//! creates surface
-	void create(int n);
+	//! creates edge
+	void Create(int nelems, int elemType = -1);
 
 	//! serialization
 	void Serialize(DumpStream& ar);

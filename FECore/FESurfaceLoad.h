@@ -28,10 +28,10 @@ public:
 
 public:
 	//! calculate stiffness matrix
-	virtual void StiffnessMatrix(const FETimePoint& tp, FESolver* psolver) = 0;
+	virtual void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) = 0;
 
 	//! calculate residual
-	virtual void Residual(const FETimePoint& tp, FEGlobalVector& R) = 0;
+	virtual void Residual(const FETimeInfo& tp, FEGlobalVector& R) = 0;
 
 protected:
 	FESurface*	m_psurf;

@@ -49,7 +49,7 @@ public:
 	//{ --- Solution functions ---
 
 		//! prepares the data for the first QN iteration
-		virtual void PrepStep(double time);
+		virtual void PrepStep(const FETimeInfo& timeInfo);
 
 		//! Performs a Newton-Raphson iteration
 		virtual bool Quasin(double time);
@@ -79,7 +79,7 @@ public:
 	//{ --- Stiffness matrix routines ---
 
 		//! calculates the global stiffness matrix
-		virtual bool StiffnessMatrix(const FETimePoint& tp);
+		virtual bool StiffnessMatrix(const FETimeInfo& tp);
 
 		//! contact stiffness
 		void ContactStiffness();
@@ -88,7 +88,7 @@ public:
 		void RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
 
 		//! calculates stiffness contributon of nonlinear constraints
-		void NonLinearConstraintStiffness(const FETimePoint& tp);
+		void NonLinearConstraintStiffness(const FETimeInfo& tp);
 	//}
 
 	//{ --- Residual routines ---
@@ -97,7 +97,7 @@ public:
 		// NOTE: I made this function virtual so that derived class (i.e. the bi/multi-phasic solvers)
 		//       can handle applied pressure and concentration "forces". But I really want to get rid 
 		//       of this function eventually.
-		virtual void NodalForces(vector<double>& F, const FETimePoint& tp);
+		virtual void NodalForces(vector<double>& F, const FETimeInfo& tp);
 
 		//! Calculate inertial forces for dynamic problems
 		void InertialForces(FEGlobalVector& R);
@@ -109,7 +109,7 @@ public:
 		virtual bool Residual(vector<double>& R);
 
 		//! Calculate nonlinear constraint forces
-		void NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp);
+		void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);
 	//}
 
 public:

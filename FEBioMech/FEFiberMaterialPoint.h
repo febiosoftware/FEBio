@@ -23,7 +23,7 @@ public:
 	FEMaterialPoint* Copy();
     
 	//! Initialize material point data
-	void Init(bool bflag);
+	void Init();
     
 	//! Serialize data to archive
 	void Serialize(DumpStream& ar);

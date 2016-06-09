@@ -25,15 +25,15 @@ public:
 	virtual ~FENLConstraint();
 
 public:
-	virtual void Residual(FEGlobalVector& R, const FETimePoint& tp) = 0;
-	virtual void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp) = 0;
-	virtual bool Augment(int naug, const FETimePoint& tp) = 0;
+	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp) = 0;
+	virtual void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) = 0;
+	virtual bool Augment(int naug, const FETimeInfo& tp) = 0;
 	virtual void CopyFrom(FENLConstraint* plc) {}
 	virtual void BuildMatrixProfile(FEGlobalMatrix& M) = 0;
 
 	// update state
 	virtual void Reset() {}
-	virtual void Update(const FETimePoint& tp) {}
+	virtual void Update(const FETimeInfo& tp) {}
 
 	virtual FESurface* GetSurface(const char* sz) { return 0; }
 };

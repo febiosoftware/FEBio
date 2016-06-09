@@ -34,10 +34,10 @@ public:
 	void Activate();
 
 	//! initialize elements for this domain
-	void InitElements();
+	void PreSolveUpdate(const FETimeInfo& timeInfo);
 
 	// update domain data
-	void Update(const FETimePoint& tp);
+	void Update(const FETimeInfo& tp);
 
 	// update element stress
 	void UpdateElementStress(int iel, double dt, bool sstate);
@@ -60,10 +60,10 @@ public:
 
 public:
 	//! calculates the global stiffness matrix for this domain
-	virtual void StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp);
+	virtual void StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimeInfo& tp);
 
 	//! calculates the global stiffness matrix for this domain (steady-state case)
-	virtual void StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp);
+	virtual void StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimeInfo& tp);
 
 protected:
 	//! element internal force vector

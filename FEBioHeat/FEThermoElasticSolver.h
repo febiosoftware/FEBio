@@ -17,7 +17,7 @@ public:
 	bool InitEquations();
 
 	// prepare first QN-iteration
-	void PrepStep(double time);
+	void PrepStep(const FETimeInfo& timeInfo);
 
 	// Solver a time-step using a Quasi-Newton method
 	bool Quasin(double time);

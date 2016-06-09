@@ -246,7 +246,7 @@ bool FEBioConstraintsSection::BuildSurface(FESurface& s, FEFacetSet& fs, bool bn
 	int faces = fs.Faces();
 
 	// allocate storage for faces
-	s.create(faces);
+	s.Create(faces);
 
 	// read faces
 	for (int i=0; i<faces; ++i)
@@ -642,7 +642,7 @@ bool FEBioConstraintsSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int
 	while (!t.isend()) { faces++; ++t; }
 
 	// allocate storage for faces
-	s.create(faces);
+	s.Create(faces);
 
 	// read faces
 	++tag;

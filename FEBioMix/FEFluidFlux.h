@@ -19,10 +19,10 @@ public:
 	void SetSurface(FESurface* ps);
 
 	//! calculate flux stiffness
-	void StiffnessMatrix(const FETimePoint& tp, FESolver* psolver);
+	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver);
 
 	//! calculate residual
-	void Residual(const FETimePoint& tp, FEGlobalVector& R);
+	void Residual(const FETimeInfo& tp, FEGlobalVector& R);
 
 	//! unpack LM data
 	void UnpackLM(FEElement& el, vector<int>& lm);

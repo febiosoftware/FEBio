@@ -22,7 +22,7 @@ void FEThermoElasticSolidDomain::SetMaterial(FEMaterial* pmat)
 
 //-----------------------------------------------------------------------------
 //! Initialize element data
-void FEThermoElasticSolidDomain::InitElements()
+void FEThermoElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
 	const int NE = FEElement::MAX_NODES;
 	vec3d x0[NE], xt[NE], r0, rt;
@@ -50,7 +50,7 @@ void FEThermoElasticSolidDomain::InitElements()
 
 			pt.m_J = defgrad(el, pt.m_F, j);
 
-			mp.Init(false);
+			mp.Update(timeInfo);
 		}
 	}
 }
@@ -840,7 +840,7 @@ void FEThermoElasticSolidDomain::ElementGradientStiffness(FESolidElement &el, ma
 }
 
 //-----------------------------------------------------------------------------
-void FEThermoElasticSolidDomain::Update(const FETimePoint& tp)
+void FEThermoElasticSolidDomain::Update(const FETimeInfo& tp)
 {
 	bool berr = false;
 	int NE = (int) m_Elem.size();

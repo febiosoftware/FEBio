@@ -37,7 +37,7 @@ public:
 	void SetMaterial(FEMaterial* pmat);
 
 	//! Update state data
-	void Update(const FETimePoint& tp);
+	void Update(const FETimeInfo& tp);
 
 public: // overloaded from FEHeatDomain
 

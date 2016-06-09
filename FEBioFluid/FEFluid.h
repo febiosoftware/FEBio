@@ -20,7 +20,7 @@ public:
 	void Serialize(DumpStream& ar);
 
 	//! Data initialization
-	void Init(bool bflag);
+	void Init();
 
 public:
     mat3ds RateOfDeformation() { return m_L.sym(); }

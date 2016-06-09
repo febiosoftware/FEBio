@@ -61,7 +61,7 @@ void FERemodelingElasticDomain::StiffnessMatrix(FESolver* psolver)
 
 	// I only need this for the element density stiffness
 	FEModel& fem = psolver->GetFEModel();
-	double dt = fem.GetTime().dt;
+	double dt = fem.GetTime().timeIncrement;
 
 	#pragma omp parallel for
 	for (int iel=0; iel<NE; ++iel)
@@ -104,7 +104,7 @@ void FERemodelingElasticDomain::StiffnessMatrix(FESolver* psolver)
 
 //-----------------------------------------------------------------------------
 //! calculates the solid element stiffness matrix
-void FERemodelingElasticDomain::ElementStiffness(const FETimePoint& tp, int iel, matrix& ke)
+void FERemodelingElasticDomain::ElementStiffness(const FETimeInfo& tp, int iel, matrix& ke)
 {
 	FESolidElement& el = Element(iel);
 
@@ -115,7 +115,7 @@ void FERemodelingElasticDomain::ElementStiffness(const FETimePoint& tp, int iel,
 	ElementGeometricalStiffness(el, ke);
 
 	// calculate density stiffness
-	ElementDensityStiffness(tp.dt, el, ke);
+	ElementDensityStiffness(tp.timeIncrement, el, ke);
 
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only

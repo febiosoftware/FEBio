@@ -21,7 +21,7 @@ public:
 	void Serialize(DumpStream& ar);
 
 	//! Data initialization
-	void Init(bool bflag);
+	void Init();
 
 public:
 	// poro-elastic material data

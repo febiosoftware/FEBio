@@ -106,7 +106,7 @@ void FEElasticSolidDomain::Activate()
 
 //-----------------------------------------------------------------------------
 //! Initialize element data
-void FEElasticSolidDomain::InitElements()
+void FEElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
 	const int NE = FEElement::MAX_NODES;
 	vec3d x0[NE], xt[NE], r0, rt;
@@ -134,7 +134,7 @@ void FEElasticSolidDomain::InitElements()
 
 			pt.m_J = defgrad(el, pt.m_F, j);
 
-			mp.Init(false);
+			mp.Update(timeInfo);
 		}
 	}
 }
@@ -664,7 +664,7 @@ void FEElasticSolidDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf
 //! the upper diagonal matrix due to the symmetry of the element stiffness matrix
 //! The last section of this function fills the rest of the element stiffness matrix.
 
-void FEElasticSolidDomain::ElementStiffness(const FETimePoint& tp, int iel, matrix& ke)
+void FEElasticSolidDomain::ElementStiffness(const FETimeInfo& tp, int iel, matrix& ke)
 {
 	FESolidElement& el = Element(iel);
 
@@ -728,9 +728,9 @@ void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, dou
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::Update(const FETimePoint& tp)
+void FEElasticSolidDomain::Update(const FETimeInfo& tp)
 {
-    double dt = tp.dt;
+    double dt = tp.timeIncrement;
 	
 	// TODO: This is temporary hack for running micro-materials in parallel. 
 	//	     Evaluating the stress for a micro-material will make FEBio solve

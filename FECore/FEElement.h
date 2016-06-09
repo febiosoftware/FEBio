@@ -176,13 +176,6 @@ public:
 	double* Gst(int n) const { return ((FESolidElementTraits*)(m_pT))->Gst[n]; }	// shape function 2nd derivative to st
 	double* Gtt(int n) const { return ((FESolidElementTraits*)(m_pT))->Gtt[n]; }	// shape function 2nd derivative to tt
 
-	//! intialize element data
-	void Init(bool bflag)
-	{
-		int nint = GaussPoints();
-		for (int i=0; i<nint; ++i) m_State[i]->Init(bflag);
-	}
-
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t) const { ((FESolidElementTraits*)(m_pT))->shape_fnc(H, r, s, t); }
 
@@ -359,12 +352,6 @@ public:
 	double* Hr(int n) { return ((FEShellElementTraits*)(m_pT))->Hr[n]; }	// shape function derivative to r
 	double* Hs(int n) { return ((FEShellElementTraits*)(m_pT))->Hs[n]; }	// shape function derivative to s
 
-	void Init(bool bflag)
-	{
-		int nint = GaussPoints();
-		for (int i=0; i<nint; ++i) m_State[i]->Init(bflag);
-	}
-
 	double gr(int n) { return ((FEShellElementTraits*)(m_pT))->gr[n]; }
 	double gs(int n) { return ((FEShellElementTraits*)(m_pT))->gs[n]; }
 	double gt(int n) { return ((FEShellElementTraits*)(m_pT))->gt[n]; }
@@ -384,12 +371,6 @@ public:
 	FETrussElement(const FETrussElement& el);
 
 	FETrussElement& operator = (const FETrussElement& el);
-
-	//! intialize element data
-	void Init(bool bflag)
-	{
-		m_State[0]->Init(bflag);
-	}
 
 public:
 	double	m_a0;	// cross-sectional area
@@ -431,13 +412,6 @@ public:
     double* Hrs(int n) { return ((FE2DElementTraits*)(m_pT))->Grs[n]; }	// shape function 2nd derivative to rs
     double* Hss(int n) { return ((FE2DElementTraits*)(m_pT))->Gss[n]; }	// shape function 2nd derivative to ss
     
-	//! intialize element data
-	void Init(bool bflag)
-	{
-		int nint = GaussPoints();
-		for (int i=0; i<nint; ++i) m_State[i]->Init(bflag);
-	}
-
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s) { ((FE2DElementTraits*)(m_pT))->shape(H, r, s); }
 

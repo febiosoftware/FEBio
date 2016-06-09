@@ -110,12 +110,12 @@ bool FEThermoElasticSolver::InitEquations()
 //!       I need to move to this method, but since it will
 //!       change the order of some operations I need to make
 //!       sure it won't break anything
-void FEThermoElasticSolver::PrepStep(double time)
+void FEThermoElasticSolver::PrepStep(const FETimeInfo& timeInfo)
 {
 	zero(m_Ti);
 	zero(m_Di);
 
-	FESolidSolver::PrepStep(time);
+	FESolidSolver::PrepStep(timeInfo);
 }
 
 //-----------------------------------------------------------------------------
@@ -148,10 +148,10 @@ bool FEThermoElasticSolver::Quasin(double time)
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// prepare for the first iteration
-	PrepStep(time);
+	FETimeInfo tp = m_fem.GetTime();
+	PrepStep(tp);
 
 	// calculate initial stiffness matrix
-	FETimePoint tp = m_fem.GetTime();
 	if (ReformStiffness(tp) == false) return false;
 
 	// calculate initial residual
@@ -487,7 +487,7 @@ bool FEThermoElasticSolver::Residual(vector<double>& R)
 	TimerTracker t(m_RHSTime);
 
 	// get the time information
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;

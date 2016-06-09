@@ -29,19 +29,19 @@ public:
     bool Init();
     
     //! calculates the joint forces
-    void Residual(FEGlobalVector& R, const FETimePoint& tp);
+    void Residual(FEGlobalVector& R, const FETimeInfo& tp);
     
     //! calculates the joint stiffness
-    void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
+    void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
     
     //! calculate Lagrangian augmentation
-    bool Augment(int naug, const FETimePoint& tp);
+    bool Augment(int naug, const FETimeInfo& tp);
     
     //! serialize data to archive
     void Serialize(DumpStream& ar);
     
     //! update state
-    void Update(const FETimePoint& tp);
+    void Update(const FETimeInfo& tp);
     
     //! Reset data
     void Reset();

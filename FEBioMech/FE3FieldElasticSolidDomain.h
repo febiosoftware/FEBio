@@ -36,7 +36,7 @@ public:
 public: // overridden from FEElasticDomain
 
 	// update stresses
-	void Update(const FETimePoint& tp);
+	void Update(const FETimeInfo& tp);
 
 	// calculate stiffness matrix
 	void StiffnessMatrix(FESolver* psolver);

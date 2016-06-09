@@ -281,7 +281,7 @@ bool FEUT4Domain::Initialize(FEModel& mdl)
 
 //-----------------------------------------------------------------------------
 //! Update the nodal and element stresses
-void FEUT4Domain::Update(const FETimePoint& tp)
+void FEUT4Domain::Update(const FETimeInfo& tp)
 {
 	// updating the element stresses is easy, since we only
 	// need to call the base class
@@ -322,7 +322,7 @@ void FEUT4Domain::Update(const FETimePoint& tp)
 	//		 For now, I solve this by copying the Q parameter
 	//       from the first element that the node connects to
 	FEElasticMaterialPoint pt;
-	pt.Init(true);
+	pt.Init();
 
 	// loop over all the nodes
 	for (i=0; i<(int) m_NODE.size(); ++i)
@@ -792,7 +792,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 	//		 We solve this for now by copying the Q data from the
 	//       first element that connects to this node
 	FEElasticMaterialPoint pt;
-	pt.Init(true);
+	pt.Init();
 	pt.m_Q = ppe[0]->GetMaterialPoint(0)->ExtractData<FEElasticMaterialPoint>()->m_Q;
 
 	// set the material point data
@@ -943,7 +943,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 void FEUT4Domain::ElementalStiffnessMatrix(FESolver *psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
-	FETimePoint tp = fem.GetTime();
+	FETimeInfo tp = fem.GetTime();
 
 	// element stiffness matrix
 	matrix ke;
@@ -973,7 +973,7 @@ void FEUT4Domain::ElementalStiffnessMatrix(FESolver *psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FEUT4Domain::ElementStiffness(const FETimePoint& tp, int iel, matrix &ke)
+void FEUT4Domain::ElementStiffness(const FETimeInfo& tp, int iel, matrix &ke)
 {
 	FESolidElement& el = Element(iel);
 

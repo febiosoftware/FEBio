@@ -14,27 +14,28 @@ public:
 		return pt;
 	}
 
-	void Init(bool bflag)
+	void Init()
 	{
-		FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
-		if (bflag)
-		{
-			// intialize data to zero
-			e0.zero();
-			e1.zero();
-			sn.zero();
-			b = false;
-			Y1 = Y0;
-		}
-		else
-		{
-			e0 = e1;
-			sn = pt.m_s;
-			Y0 = Y1;
-		}
+		// intialize data to zero
+		e0.zero();
+		e1.zero();
+		sn.zero();
+		b = false;
+		Y1 = Y0;
 
 		// don't forget to intialize the nested data
-		if (m_pNext) m_pNext->Init(bflag);
+		FEMaterialPoint::Init();
+	}
+
+	void Update(const FETimeInfo& timeInfo)
+	{
+		FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
+		e0 = e1;
+		sn = pt.m_s;
+		Y0 = Y1;
+
+		// don't forget to call the base class
+		FEMaterialPoint::Update(timeInfo);
 	}
 
 	void Serialize(DumpStream& ar)

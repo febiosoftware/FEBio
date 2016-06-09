@@ -205,7 +205,7 @@ public: // --- Analysis steps functions ---
 	void SetCurrentStep(FEAnalysis* pstep) { m_pStep = pstep; }
 
 	//! Get the current time
-	FETimePoint GetTime();
+	FETimeInfo GetTime();
 
 public: // --- Contact interface functions ---
 

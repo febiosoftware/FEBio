@@ -320,7 +320,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 
 		// add it to the mesh
 		assert(d.nel);
-		pdom->create(d.nel);
+		pdom->Create(d.nel, d.elem.etype);
 		mesh.AddDomain(pdom);
 
 		// we reset the nr of elements since we'll be using 
@@ -337,18 +337,19 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		int ne = dom[nd].nel++;
 
 		// get the domain to which this element belongs
-		FEDomain& dom = mesh.Domain(nd);
+		FEDomain& domi = mesh.Domain(nd);
 
 		// get the material ID
 		int nmat = atoi(tag.AttributeValue("mat"))-1;
 
 		// get the material class
 		FEMaterial* pmat = fem.GetMaterial(nmat);
-		assert(pmat == dom.GetMaterial());
+		assert(pmat == domi.GetMaterial());
 
 		// determine element shape
 		FE_Element_Spec espec = ElementSpec(tag.Name());
-		ReadElement(tag, dom.ElementRef(ne), espec.etype, nid, nmat);
+		if (espec.etype != dom[ED[i]].elem.etype) throw XMLReader::InvalidTag(tag);
+		ReadElement(tag, domi.ElementRef(ne), nid, nmat);
 
 		// go to next tag
 		++tag;
@@ -358,7 +359,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 	for (i=0; i<mesh.Domains(); ++i)
 	{
 		FEDomain& d = mesh.Domain(i);
-		d.InitMaterialPointData();
+		d.CreateMaterialPointData();
 	}
 }
 
@@ -402,7 +403,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	assert(elems);
 
 	// add domain it to the mesh
-	pdom->create(elems);
+	pdom->Create(elems, espec.etype);
 	mesh.AddDomain(pdom);
 	int nd = NDOM;
 
@@ -437,14 +438,14 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 		if (pg) (*pg)[i] = nid;
 
 		// read the element data
-		ReadElement(tag, dom.ElementRef(i), espec.etype , nid, nmat);
+		ReadElement(tag, dom.ElementRef(i), nid, nmat);
 
 		// go to next tag
 		++tag;
 	}
 
 	// assign material point data
-	dom.InitMaterialPointData();
+	dom.CreateMaterialPointData();
 }
 
 //-----------------------------------------------------------------------------
@@ -507,7 +508,7 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 
 		// add it to the mesh
 		assert(d.nel);
-		pdom->create(d.nel);
+		pdom->Create(d.nel, d.elem.etype);
 		mesh.AddDomain(pdom);
 
 		// we reset the nr of elements since we'll be using 
@@ -528,7 +529,7 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 
 		// determine element type
 		FE_Element_Spec espec = ElementSpec(tag.Name());
-		ReadElement(tag, dom.ElementRef(ne), espec.etype, nid, 0); break;
+		ReadElement(tag, dom.ElementRef(ne), nid, 0); break;
 
 		// go to next tag
 		++tag;
@@ -536,9 +537,8 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioGeometrySection::ReadElement(XMLTag &tag, FEElement& el, int ntype, int nid, int nmat)
+void FEBioGeometrySection::ReadElement(XMLTag &tag, FEElement& el, int nid, int nmat)
 {
-	el.SetType(ntype);
 	el.SetID(nid);
 	int n[FEElement::MAX_NODES];
 	tag.value(n,el.Nodes());

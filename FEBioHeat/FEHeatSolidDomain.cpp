@@ -187,7 +187,7 @@ void FEHeatSolidDomain::ElementCapacitance(FESolidElement &el, matrix &ke, doubl
 //-----------------------------------------------------------------------------
 // This function updates the domain state data. 
 // This function is called during FESolver::Update after the nodal variables are udpated.
-void FEHeatSolidDomain::Update(const FETimePoint& tp)
+void FEHeatSolidDomain::Update(const FETimeInfo& tp)
 {
 	FEMesh& mesh = *GetMesh();
 	int NE = Elements();

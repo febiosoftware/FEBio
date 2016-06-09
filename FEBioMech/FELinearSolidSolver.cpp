@@ -51,13 +51,13 @@ FELinearSolidSolver::~FELinearSolidSolver()
 bool FELinearSolidSolver::Quasin(double time)
 {
 	// prepare step
-    FETimePoint tp = m_fem.GetTime();
+    FETimeInfo tp = m_fem.GetTime();
 
-	FEMaterialPoint::dt = tp.dt;
-	FEMaterialPoint::time = tp.t;
+	FEMaterialPoint::dt = tp.timeIncrement;
+	FEMaterialPoint::time = tp.currentTime;
 
 	FEMesh& mesh = m_fem.GetMesh();
-	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
+	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
 	// set-up the prescribed displacements
 	zero(m_d);
@@ -136,7 +136,7 @@ void FELinearSolidSolver::Update(vector<double>& u)
 {
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	FEMesh& mesh = m_fem.GetMesh();
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	// update nodal positions
 	int n;
@@ -166,7 +166,7 @@ void FELinearSolidSolver::Residual()
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// get the time information
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	// loop over nodal forces
 	int ncnf = m_fem.NodalLoads();
@@ -213,7 +213,7 @@ void FELinearSolidSolver::Residual()
 //! FELinearSolidSolver::ElementStiffness() for each element and then assembles the
 //! element stiffness matrix into the global matrix.
 //!
-bool FELinearSolidSolver::StiffnessMatrix(const FETimePoint& tp)
+bool FELinearSolidSolver::StiffnessMatrix(const FETimeInfo& tp)
 {
 	FEMesh& mesh = m_fem.GetMesh();
 

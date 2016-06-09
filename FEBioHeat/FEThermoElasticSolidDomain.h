@@ -21,7 +21,7 @@ public:
 	void Reset();
 
 	//! intitialize element data
-	void InitElements();
+	void PreSolveUpdate(const FETimeInfo& timeInfo);
 
 	//! Unpack solid element data  (overridden from FEDomain)
 	void UnpackLM(FEElement& el, vector<int>& lm);
@@ -34,7 +34,7 @@ public:
 
 public:
 	// update domain data
-	void Update(const FETimePoint& tp);
+	void Update(const FETimeInfo& tp);
 
 	// update element stress
 	void UpdateElementStress(int iel);

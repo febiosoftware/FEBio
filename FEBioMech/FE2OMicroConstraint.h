@@ -39,15 +39,15 @@ public:
 	FE2OMicroConstraint(FEModel* pfem);
 
 	void Activate();
-	void Residual(FEGlobalVector& R, const FETimePoint& tp);
-	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
-	bool Augment(int naug, const FETimePoint& tp);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+	bool Augment(int naug, const FETimeInfo& tp);
 	void Serialize(DumpStream& ar);
 	void CopyFrom(FENLConstraint* plc);
 
 	// update state
 	void Reset();
-	void Update(const FETimePoint& tp);
+	void Update(const FETimeInfo& tp);
 
 	FESurface* GetSurface(const char* sz);
 

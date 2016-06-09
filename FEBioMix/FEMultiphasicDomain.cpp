@@ -262,9 +262,9 @@ void FEMultiphasicDomain::Reset()
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::InitElements()
+void FEMultiphasicDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
-	FESolidDomain::InitElements();
+	FESolidDomain::PreSolveUpdate(timeInfo);
 
 	const int NE = FEElement::MAX_NODES;
 	vec3d x0[NE], xt[NE], r0, rt;
@@ -292,7 +292,7 @@ void FEMultiphasicDomain::InitElements()
 
 			pt.m_J = defgrad(el, pt.m_F, j);
 
-			mp.Init(false);
+			mp.Update(timeInfo);
 		}
 	}
 
@@ -913,7 +913,7 @@ bool FEMultiphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp)
+void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimeInfo& tp)
 {
 	const int nsol = m_pMat->Solutes();
 
@@ -937,7 +937,7 @@ void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const F
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementMultiphasicStiffness(el, ke, bsymm, tp.dt);
+		ElementMultiphasicStiffness(el, ke, bsymm, tp.timeIncrement);
 			
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -967,7 +967,7 @@ void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const F
 	}
 }
 
-void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp)
+void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimeInfo& tp)
 {
 	const int nsol = m_pMat->Solutes();
 
@@ -991,7 +991,7 @@ void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const
 		ke.resize(ndof, ndof);
 			
 		// calculate the element stiffness matrix
-		ElementMultiphasicStiffnessSS(el, ke, bsymm, tp.dt);
+		ElementMultiphasicStiffnessSS(el, ke, bsymm, tp.timeIncrement);
 			
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -1949,12 +1949,12 @@ void FEMultiphasicDomain::ElementGeometricalStiffness(FESolidElement &el, matrix
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::Update(const FETimePoint& tp)
+void FEMultiphasicDomain::Update(const FETimeInfo& tp)
 {
 	FEModel& fem = *GetFEModel();
 	bool berr = false;
 	int NE = (int) m_Elem.size();
-	double dt = fem.GetTime().dt;
+	double dt = fem.GetTime().timeIncrement;
 	#pragma omp parallel for shared(NE, berr)
 	for (int i=0; i<NE; ++i)
 	{

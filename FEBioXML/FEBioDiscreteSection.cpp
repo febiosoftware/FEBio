@@ -93,7 +93,7 @@ void FEBioDiscreteSection::ParseSpringSection(XMLTag &tag)
 	}
 	while (!tag.isend());
 
-	pd->InitMaterialPointData();
+	pd->CreateMaterialPointData();
 }
 
 //---------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ void FEBioDiscreteSection::ParseDiscreteSection25(XMLTag& tag)
 			m_pim->ReadParameterList(tag, pl);
 
 			// initialize domain
-			pd->InitMaterialPointData();
+			pd->CreateMaterialPointData();
 		}
 		else if (tag == "rigid_axial_force") ParseRigidAxialForce(tag);
 		else throw XMLReader::InvalidTag(tag);

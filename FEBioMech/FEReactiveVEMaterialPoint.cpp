@@ -26,43 +26,47 @@ FEMaterialPoint* FEReactiveVEMaterialPoint::Copy()
 
 //-----------------------------------------------------------------------------
 //! Initializes material point data.
-void FEReactiveVEMaterialPoint::Init(bool bflag)
+void FEReactiveVEMaterialPoint::Init()
 {
-    FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
-    if (bflag)
-    {
-        // initialize data to zero
-        m_Fi.clear();
-        m_Ji.clear();
-        m_v.clear();
-        m_w.clear();
-    }
-    else
-    {
-        // check if the current deformation gradient is different from that of
-        // the last generation, in which case store the current state
-        if (m_pRve) {
-            if (m_pRve->NewGeneration(*this)) {
-                m_Fi.push_back(pt.m_F.inverse());
-                m_Ji.push_back(1./pt.m_J);
-                m_v.push_back(FEMaterialPoint::time);
-                double w = m_pRve->ReformingBondMassFraction(*this);
-                m_w.push_back(w);
-            }
-        }
-        else {
-            if (m_pRuc->NewGeneration(*this)) {
-                m_Fi.push_back(pt.m_F.inverse());
-                m_Ji.push_back(1./pt.m_J);
-                m_v.push_back(FEMaterialPoint::time);
-                double w = m_pRuc->ReformingBondMassFraction(*this);
-                m_w.push_back(w);
-            }
-        }
-    }
+	// initialize data to zero
+	m_Fi.clear();
+	m_Ji.clear();
+	m_v.clear();
+	m_w.clear();
     
     // don't forget to initialize the base class
-    FEMaterialPoint::Init(bflag);
+    FEMaterialPoint::Init();
+}
+
+//-----------------------------------------------------------------------------
+//! Update material point data.
+void FEReactiveVEMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+    FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
+
+	// check if the current deformation gradient is different from that of
+	// the last generation, in which case store the current state
+	if (m_pRve) {
+	    if (m_pRve->NewGeneration(*this)) {
+		    m_Fi.push_back(pt.m_F.inverse());
+	        m_Ji.push_back(1./pt.m_J);
+			m_v.push_back(timeInfo.currentTime);
+			double w = m_pRve->ReformingBondMassFraction(*this);
+			m_w.push_back(w);
+		}
+	}
+	else {
+		if (m_pRuc->NewGeneration(*this)) {
+			m_Fi.push_back(pt.m_F.inverse());
+			m_Ji.push_back(1./pt.m_J);
+			m_v.push_back(timeInfo.currentTime);
+			double w = m_pRuc->ReformingBondMassFraction(*this);
+			m_w.push_back(w);
+		}
+	}
+    
+    // don't forget to initialize the base class
+    FEMaterialPoint::Update(timeInfo);
 }
 
 //-----------------------------------------------------------------------------

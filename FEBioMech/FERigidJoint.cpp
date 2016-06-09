@@ -86,7 +86,7 @@ void FERigidJoint::BuildMatrixProfile(FEGlobalMatrix& M)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
+void FERigidJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	vector<double> fa(6);
 	vector<double> fb(6);
@@ -133,7 +133,7 @@ void FERigidJoint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
+void FERigidJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	int j, k;
 
@@ -246,7 +246,7 @@ void FERigidJoint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidJoint::Augment(int naug, const FETimePoint& tp)
+bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;
@@ -319,7 +319,7 @@ void FERigidJoint::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidJoint::Update(const FETimePoint& tp)
+void FERigidJoint::Update(const FETimeInfo& tp)
 {
 	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
     FERigidBody& RBa = *rigid.Object(m_nRBa);

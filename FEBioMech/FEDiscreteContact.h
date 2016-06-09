@@ -37,11 +37,11 @@ public:
 	bool Init();
 	void Activate();
 
-	void Residual(FEGlobalVector& R, const FETimePoint& tp);
-	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
-	bool Augment(int naug, const FETimePoint& tp);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+	bool Augment(int naug, const FETimeInfo& tp);
 	void BuildMatrixProfile(FEGlobalMatrix& M);
-	void Update(const FETimePoint& tp);
+	void Update(const FETimeInfo& tp);
 
 	void SetDiscreteSet(FEDiscreteSet* pset);
 

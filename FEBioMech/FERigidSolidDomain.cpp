@@ -39,7 +39,7 @@ void FERigidSolidDomain::InternalForces(FESolver* psolver, vector<double>& R)
 //-----------------------------------------------------------------------------
 //! We don't need to update the stresses for rigid elements
 //!
-void FERigidSolidDomain::Update(const FETimePoint& tp)
+void FERigidSolidDomain::Update(const FETimeInfo& tp)
 {
 	// Nothing to see here. Please move on.
 }

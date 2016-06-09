@@ -139,7 +139,7 @@ void FEHeatSolver::NodalFluxes(FEGlobalVector& R)
 void FEHeatSolver::SurfaceFluxes(FEGlobalVector& R)
 {
 	// get the time information
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	int nsl = m_fem.SurfaceLoads();
 	for (int i=0; i<nsl; ++i)
@@ -178,7 +178,7 @@ bool FEHeatSolver::StiffnessMatrix()
 	bool bdyn = (pstep->m_nanalysis == FE_DYNAMIC);
 
 	// get the time information
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	// Add stiffness contribution from all domains
 	for (int i=0; i<pstep->Domains(); ++i)
@@ -193,7 +193,7 @@ bool FEHeatSolver::StiffnessMatrix()
 		if (bdyn) 
 		{
 			m_brhs = true;
-			bd.CapacitanceMatrix(this, tp.dt);
+			bd.CapacitanceMatrix(this, tp.timeIncrement);
 		}
 	}
 

@@ -3,6 +3,19 @@
 #include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
+FETrussDomain::FETrussDomain(FEMesh* pm) : FEDomain(FE_DOMAIN_TRUSS, pm)
+{
+}
+
+//-----------------------------------------------------------------------------
+void FETrussDomain::Create(int nsize, int elemType)
+{
+	m_Elem.resize(nsize);
+	if (elemType != -1)
+		for (int i=0; i<nsize; ++i) m_Elem[i].SetType(elemType);
+}
+
+//-----------------------------------------------------------------------------
 vec3d FETrussDomain::TrussNormal(FETrussElement& el)
 {
 	vec3d rt[2];

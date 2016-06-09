@@ -23,22 +23,19 @@ FEMaterialPoint* FEElasticMaterialPoint::Copy()
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticMaterialPoint::Init(bool bflag)
+void FEElasticMaterialPoint::Init()
 {
-	if (bflag)
-	{
-		m_F.unit();
+	m_F.unit();
 
-		m_J = 1;
+	m_J = 1;
 
-		m_s.zero();
-		m_s0.zero();
+	m_s.zero();
+	m_s0.zero();
 
-//		m_Q.unit();
-	}
+//	m_Q.unit();
 
 	// don't forget to initialize the base class
-    FEMaterialPoint::Init(bflag);
+    FEMaterialPoint::Init();
 }
 
 //-----------------------------------------------------------------------------

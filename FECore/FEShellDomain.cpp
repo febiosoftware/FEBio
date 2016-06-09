@@ -4,20 +4,33 @@
 #include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-void FEShellDomain::InitElements()
+void FEShellDomain::Create(int nelems, int elemType)
+{
+	m_Elem.resize(nelems);
+	if (elemType != -1)
+		for (int i=0; i<nelems; ++i) m_Elem[i].SetType(elemType);
+}
+
+//-----------------------------------------------------------------------------
+void FEShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FEShellElement& el = m_Elem[i];
 		int n = el.GaussPoints();
-		for (int j=0; j<n; ++j) el.GetMaterialPoint(j)->Init(false);
+		for (int j=0; j<n; ++j) el.GetMaterialPoint(j)->Update(timeInfo);
 	}
 }
 
 //-----------------------------------------------------------------------------
 void FEShellDomain::Reset()
 {
-	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		FEShellElement& el = m_Elem[i];
+		int n = el.GaussPoints();
+		for (int j=0; j<n; ++j) el.GetMaterialPoint(j)->Init();
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -32,39 +32,45 @@ FEMaterialPoint* FEViscoElasticMaterialPoint::Copy()
 
 //-----------------------------------------------------------------------------
 //! Initializes material point data.
-void FEViscoElasticMaterialPoint::Init(bool bflag)
+void FEViscoElasticMaterialPoint::Init()
 {
 	FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
-	if (bflag)
-	{
-		// intialize data to zero
-		m_se.zero();
-		m_Sep.zero();
-//        m_sed = 0.0;
-//        m_sedp = 0.0;
-		for (int i=0; i<MAX_TERMS; ++i) {
-            m_H[i].zero();
-            m_Hp[i].zero();
-//            m_Hsed[i] = 0;
-//            m_Hsedp[i] = 0;
-        };
-	}
-	else
-	{
-		// the elastic stress stored in pt is the Cauchy stress.
-		// however, we need to store the 2nd PK stress
-		m_Sep = pt.pull_back(m_se);
-//        m_sedp = m_sed;
 
-		// copy previous data
-		for (int i=0; i<MAX_TERMS; ++i) {
-            m_Hp[i] = m_H[i];
-//            m_Hsedp[i] = m_Hsed[i];
-        }
+	// intialize data to zero
+	m_se.zero();
+	m_Sep.zero();
+//	m_sed = 0.0;
+//  m_sedp = 0.0;
+	for (int i=0; i<MAX_TERMS; ++i) {
+		m_H[i].zero();
+		m_Hp[i].zero();
+//      m_Hsed[i] = 0;
+//      m_Hsedp[i] = 0;
 	}
 
     // don't forget to initialize the base class
-    FEMaterialPoint::Init(bflag);
+    FEMaterialPoint::Init();
+}
+
+//-----------------------------------------------------------------------------
+//! Update material point data.
+void FEViscoElasticMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+	FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
+
+	// the elastic stress stored in pt is the Cauchy stress.
+	// however, we need to store the 2nd PK stress
+	m_Sep = pt.pull_back(m_se);
+//  m_sedp = m_sed;
+
+	// copy previous data
+	for (int i=0; i<MAX_TERMS; ++i) {
+		m_Hp[i] = m_H[i];
+//      m_Hsedp[i] = m_Hsed[i];
+    }
+
+    // don't forget to call the base class
+    FEMaterialPoint::Update(timeInfo);
 }
 
 //-----------------------------------------------------------------------------

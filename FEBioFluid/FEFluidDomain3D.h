@@ -20,7 +20,7 @@ public:
     bool Initialize(FEModel& fem);
     
     //! initialize elements
-    void InitElements();
+    void PreSolveUpdate(const FETimeInfo& timeInfo);
     
 public: // overrides from FEDomain
     
@@ -33,7 +33,7 @@ public: // overrides from FEDomain
 public: // overrides from FEElasticDomain
     
     // update stresses
-    void Update(const FETimePoint& tp);
+    void Update(const FETimeInfo& tp);
     
     // update the element stress
     void UpdateElementStress(int iel, double dt);

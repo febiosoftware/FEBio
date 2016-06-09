@@ -20,11 +20,6 @@ public:
 		FEMaterialPoint::Serialize(ar);
 	}
 
-	void Init(bool bflag)
-	{
-		FEMaterialPoint::Init(bflag);
-	}
-
 public:
 	// calculate membrane strain
 	void strain(double e[3]);

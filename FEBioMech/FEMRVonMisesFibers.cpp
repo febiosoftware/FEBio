@@ -44,22 +44,6 @@ FEMaterialPoint* FEMRVonMisesMaterialPoint::Copy()
 }
 
 //-----------------------------------------------------------------------------
-void FEMRVonMisesMaterialPoint::Init(bool bflag)
-{
-	if (bflag)
-	{
-		// first initialization
-	}
-	else
-	{
-		// called before the start of every time step
-	}
-
-	// don't forget to intialize the base data
-	FEElasticMaterialPoint::Init(bflag);
-}
-
-//-----------------------------------------------------------------------------
 void FEMRVonMisesMaterialPoint::Serialize(DumpStream& ar)
 {
 	if (m_pNext) m_pNext->Serialize(ar);

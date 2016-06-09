@@ -23,7 +23,7 @@ public:
 	void Activate();
 
 	//! initialize elements
-	virtual void InitElements();
+	void PreSolveUpdate(const FETimeInfo& timeInfo);
 
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
@@ -39,7 +39,7 @@ public: // overrides from FEDomain
 public: // overrides from FEElasticDomain
 
 	// update stresses
-	void Update(const FETimePoint& tp);
+	void Update(const FETimeInfo& tp);
 
 	// update the element stress
 	virtual void UpdateElementStress(int iel, double dt);
@@ -69,7 +69,7 @@ public:
 	// --- S T I F F N E S S ---
 
 	//! calculates the solid element stiffness matrix
-	virtual void ElementStiffness(const FETimePoint& tp, int iel, matrix& ke);
+	virtual void ElementStiffness(const FETimeInfo& tp, int iel, matrix& ke);
 
 	//! geometrical stiffness (i.e. initial stress)
 	virtual void ElementGeometricalStiffness(FESolidElement& el, matrix& ke);

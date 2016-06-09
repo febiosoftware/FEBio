@@ -386,7 +386,7 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 	int faces = tag.children();
 
 	// allocate storage for faces
-	s.create(faces);
+	s.Create(faces);
 
 	// read faces
 	++tag;
@@ -458,7 +458,7 @@ bool FEBioContactSection::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal
 	int faces = fs.Faces();
 
 	// allocate storage for faces
-	s.create(faces);
+	s.Create(faces);
 
 	// read faces
 	for (int i=0; i<faces; ++i)

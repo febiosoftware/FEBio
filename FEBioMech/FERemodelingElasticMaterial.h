@@ -32,8 +32,10 @@ public:
     
 	FEMaterialPoint* Copy();
     
-	void Init(bool bflag);
+	void Init();
     
+	void Update(const FETimeInfo& timeInfo);
+
 	void Serialize(DumpStream& ar);
 
 public:

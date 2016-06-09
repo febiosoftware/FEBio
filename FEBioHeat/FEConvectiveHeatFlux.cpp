@@ -24,7 +24,7 @@ void FEConvectiveHeatFlux::SetSurface(FESurface* psurf)
 
 //-----------------------------------------------------------------------------
 //! residual
-void FEConvectiveHeatFlux::Residual(const FETimePoint& tp, FEGlobalVector& R)
+void FEConvectiveHeatFlux::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 {
 	FEModel& fem = R.GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -100,7 +100,7 @@ void FEConvectiveHeatFlux::Residual(const FETimePoint& tp, FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! stiffness matrix
-void FEConvectiveHeatFlux::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
+void FEConvectiveHeatFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
 	FEMesh& mesh = fem.GetMesh();

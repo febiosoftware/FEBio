@@ -29,9 +29,14 @@ void FEMaterialPoint::SetNext(FEMaterialPoint* pt)
 	pt->m_pPrev = this;
 }
 
-void FEMaterialPoint::Init(bool bflag)
+void FEMaterialPoint::Init()
 {
-	if (m_pNext) m_pNext->Init(bflag);
+	if (m_pNext) m_pNext->Init();
+}
+
+void FEMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+	if (m_pNext) m_pNext->Update(timeInfo);
 }
 
 void FEMaterialPoint::Serialize(DumpStream& ar)

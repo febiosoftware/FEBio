@@ -35,7 +35,7 @@ public:
 	virtual bool Init();
 
 	//! creates surface
-	void create(int n) { m_el.resize(n); }
+	void Create(int nsize, int elemType = -1);
 
 	//! serialization
 	void Serialize(DumpStream& ar);

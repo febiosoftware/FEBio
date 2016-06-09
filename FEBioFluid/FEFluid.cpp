@@ -47,23 +47,18 @@ void FEFluidMaterialPoint::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidMaterialPoint::Init(bool bflag)
+void FEFluidMaterialPoint::Init()
 {
-	if (bflag)
-	{
-		m_p = 0;
-        m_L.zero();
-        m_J = 1;
-        m_Jp = 1;
-        m_vt = m_vp = m_at = m_gradJ = vec3d(0,0,0);
-        m_s.zero();
-        m_lapv = m_gdiv = vec3d(0,0,0);
-	}
-
-	if (m_pNext) m_pNext->Init(bflag);
+	m_p = 0;
+	m_L.zero();
+	m_J = 1;
+	m_Jp = 1;
+	m_vt = m_vp = m_at = m_gradJ = vec3d(0,0,0);
+	m_s.zero();
+	m_lapv = m_gdiv = vec3d(0,0,0);
     
     // don't forget to initialize the base class
-    FEMaterialPoint::Init(bflag);
+    FEMaterialPoint::Init();
 }
 
 //============================================================================

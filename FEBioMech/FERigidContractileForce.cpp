@@ -90,7 +90,7 @@ void FERigidContractileForce::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidContractileForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
+void FERigidContractileForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
     vector<double> fa(6);
     vector<double> fb(6);
@@ -139,7 +139,7 @@ void FERigidContractileForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidContractileForce::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
+void FERigidContractileForce::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
  	double alpha = tp.alpha;
      
@@ -287,13 +287,13 @@ void FERigidContractileForce::StiffnessMatrix(FESolver* psolver, const FETimePoi
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidContractileForce::Augment(int naug, const FETimePoint& tp)
+bool FERigidContractileForce::Augment(int naug, const FETimeInfo& tp)
 {
     return true;
 }
 
 //-----------------------------------------------------------------------------
-void FERigidContractileForce::Update(const FETimePoint& tp)
+void FERigidContractileForce::Update(const FETimeInfo& tp)
 {
     vec3d ra, rb, c;
     vec3d za, zb;

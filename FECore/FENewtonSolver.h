@@ -54,7 +54,7 @@ public:
 	FEGlobalMatrix& GetStiffnessMatrix();
 
 	//! reform the stiffness matrix
-    bool ReformStiffness(const FETimePoint& tp);
+    bool ReformStiffness(const FETimeInfo& tp);
 
     //! recalculates the shape of the stiffness matrix
     bool CreateStiffness(bool breset);
@@ -68,7 +68,7 @@ protected:
 	virtual bool Quasin(double time) = 0;
 
     //! calculates the global stiffness matrix (needs to be overwritten by derived classes)
-    virtual bool StiffnessMatrix(const FETimePoint& tp) = 0;
+    virtual bool StiffnessMatrix(const FETimeInfo& tp) = 0;
 
 public:
 	// line search options

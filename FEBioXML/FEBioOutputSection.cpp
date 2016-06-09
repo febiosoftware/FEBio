@@ -320,7 +320,7 @@ bool FEBioOutputSection::BuildSurface(FESurface& s, FEFacetSet& fs)
     int faces = fs.Faces();
     
     // allocate storage for faces
-    s.create(faces);
+    s.Create(faces);
     
     // read faces
     for (int i=0; i<faces; ++i)

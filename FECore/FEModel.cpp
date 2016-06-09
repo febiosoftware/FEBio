@@ -513,9 +513,9 @@ bool FEModel::Reset()
 
 //-----------------------------------------------------------------------------
 //! Get the current time information.
-FETimePoint FEModel::GetTime()
+FETimeInfo FEModel::GetTime()
 {
-	return FETimePoint(m_ftime, GetCurrentStep()->m_dt);
+	return FETimeInfo(m_ftime, GetCurrentStep()->m_dt);
 }
 
 //=============================================================================

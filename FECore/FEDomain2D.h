@@ -18,7 +18,7 @@ public:
     FEDomain2D(FEMesh* pm) : FEDomain(FE_DOMAIN_2D, pm) {}
     
     //! create storage for elements
-    void create(int nsize) { m_Elem.resize(nsize); }
+    void Create(int nelems, int elemType);
     
     //! return nr of elements
     int Elements() const { return m_Elem.size(); }
@@ -30,7 +30,7 @@ public:
     int GetElementType() { return m_Elem[0].Type(); }
     
     //! Initialize elements
-    void InitElements();
+    void PreSolveUpdate(const FETimeInfo& timeInfo);
     
     //! Reset element data
     void Reset();

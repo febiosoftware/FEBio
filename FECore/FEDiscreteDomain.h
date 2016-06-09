@@ -8,7 +8,7 @@ class FEDiscreteDomain : public FEDomain
 public:
 	FEDiscreteDomain(FEMesh* pm) : FEDomain(FE_DOMAIN_DISCRETE, pm) {}
 
-	void create(int n) { m_Elem.resize(n); }
+	void Create(int nelems, int elemType);
 	int Elements() const { return (int) m_Elem.size(); }
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 

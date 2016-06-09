@@ -83,7 +83,7 @@ void FERigidAxialForce::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! Residual
-void FERigidAxialForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
+void FERigidAxialForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
 	FERigidBody& bodyA = *rigid.Object(m_ida);
@@ -132,7 +132,7 @@ void FERigidAxialForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
 //! Stiffness matrix
 //! TODO: Only the stiffness contribution in the were the axial forces are applied
 //!       to the center of mass has been implemented. 
-void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
+void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	// Get the rigid bodies
 	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
@@ -278,7 +278,7 @@ double FERigidBodyForce::Value()
 
 //-----------------------------------------------------------------------------
 //! Residual
-void FERigidBodyForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
+void FERigidBodyForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEModel& fem = *GetFEModel();
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -302,7 +302,7 @@ void FERigidBodyForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
 
 			double t0 = pstep->m_tstart;
 			double t1 = pstep->m_tend;
-			double w = (tp.t - t0)/(t1 - t0);
+			double w = (tp.currentTime - t0)/(t1 - t0);
 			assert((w>=-0.0000001)&&(w<=1.0000001));
 			double f0 = m_trg, f1 = sf;
 
@@ -331,7 +331,7 @@ void FERigidBodyForce::Residual(FEGlobalVector& R, const FETimePoint& tp)
 
 //-----------------------------------------------------------------------------
 //! Stiffness matrix
-void FERigidBodyForce::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
+void FERigidBodyForce::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	// I think for follower forces, I need to contribute to the stiffness matrix, but I'm not sure yet what.
 }

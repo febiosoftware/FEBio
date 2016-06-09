@@ -17,7 +17,10 @@ public:
 	FEMaterialPoint* Copy();
 
 	//! material point initialization
-	void Init(bool bflag);
+	void Init();
+
+	//! material point update
+	void Update(const FETimeInfo& timeInfo);
 
 	//! data serialization
 	void Serialize(DumpStream& ar);

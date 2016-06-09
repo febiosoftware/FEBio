@@ -1,35 +1,35 @@
 #pragma once
 
 //-----------------------------------------------------------------------------
-struct FETimePoint
+struct FETimeInfo
 {
-	FETimePoint()
+	FETimeInfo()
 	{
-		t = dt = 0.0;
+		currentTime = 0.0;
+		timeIncrement = 0.0;
 		alpha = 1.0;
 		beta = 0.25;
 		gamma = 0.5;
-		niter = 0;
+		currentIteration = 0;
 	}
 
-	FETimePoint(double time, double tinc)
+	FETimeInfo(double time, double tinc)
 	{
-		t = time;
-		dt = tinc;
+		currentTime = time;
+		timeIncrement = tinc;
 		alpha = 1.0;
 		beta = 0.25;
 		gamma = 0.5;
-		niter = 0;
+		currentIteration = 0;
 	}
 
-
-	double	t;		// current time value
-	double	dt;		// current time step (difference between this time and previous one)
+	double	currentTime;	//!< current time value
+	double	timeIncrement;		//!< current time step (difference between this time and previous one)
 
 	// HHT time integration parameters
 	double	alpha;
 	double	beta;
 	double	gamma;
 
-	int		niter;	// iteration number
+	int		currentIteration;	//!< iteration number
 };

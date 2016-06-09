@@ -608,7 +608,7 @@ void FEElasticShellDomain::ElementBodyForce(FEModel& fem, FEShellElement& el, ve
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticShellDomain::Update(const FETimePoint& tp)
+void FEElasticShellDomain::Update(const FETimeInfo& tp)
 {
 	FEMesh& mesh = *GetMesh();
 	vec3d r0[FEElement::MAX_NODES], rt[FEElement::MAX_NODES];

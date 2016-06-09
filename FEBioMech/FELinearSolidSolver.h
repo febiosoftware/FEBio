@@ -28,7 +28,7 @@ protected:
 	void Residual();
 
 	//! calculate the stiffness matrix
-	bool StiffnessMatrix(const FETimePoint& tp);
+	bool StiffnessMatrix(const FETimeInfo& tp);
 
 	//! update solution
 	void Update(vector<double>& u);

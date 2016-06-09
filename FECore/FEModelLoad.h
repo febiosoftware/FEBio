@@ -21,8 +21,8 @@ public:
 	// the following functions.
 
 	//! evaluate the contribution to the residual
-	virtual void Residual(FEGlobalVector& R, const FETimePoint& tp) = 0;
+	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp) = 0;
 
 	//! evaluate the contribution to the global stiffness matrix
-	virtual void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp) = 0;
+	virtual void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) = 0;
 };

@@ -59,18 +59,19 @@ FEMicroMaterialPoint::FEMicroMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoin
 
 //-----------------------------------------------------------------------------
 //! Initialize material point data
-void FEMicroMaterialPoint::Init(bool bflag)
+void FEMicroMaterialPoint::Init()
 {
-	FEMaterialPoint::Init(bflag);
-	if (bflag)
-	{
-		m_F_prev.unit();
-	}
-	else
-	{
-		FEElasticMaterialPoint& pt = *ExtractData<FEElasticMaterialPoint>();
-		m_F_prev = pt.m_F;
-	}
+	FEMaterialPoint::Init();
+	m_F_prev.unit();
+}
+
+//-----------------------------------------------------------------------------
+//! Initialize material point data
+void FEMicroMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+	FEMaterialPoint::Update(timeInfo);
+	FEElasticMaterialPoint& pt = *ExtractData<FEElasticMaterialPoint>();
+	m_F_prev = pt.m_F;
 }
 
 //-----------------------------------------------------------------------------

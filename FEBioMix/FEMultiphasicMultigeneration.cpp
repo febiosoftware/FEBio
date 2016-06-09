@@ -198,52 +198,53 @@ void FEMultigenSBMMaterialPoint::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEMultigenSBMMaterialPoint::Init(bool bflag)
+void FEMultigenSBMMaterialPoint::Init()
 {
-	FEMaterialPoint::Init(bflag);
+	FEMaterialPoint::Init();
     
-	if (bflag)
-	{
-		m_Fi.clear();
-		m_Ji.clear();
-		m_tgen = 0.0;
+	m_Fi.clear();
+	m_Ji.clear();
+	m_tgen = 0.0;
         
-        FESolutesMaterialPoint& spt = *((*this).ExtractData<FESolutesMaterialPoint>());
-        m_nsbm = spt.m_nsbm;
-        m_ngen = 1; // first generation starts at t=0
-        mat3d Fi(mat3dd(1.0));
-        double Ji = 1;
-        m_Fi.push_back(Fi);
-        m_Ji.push_back(Ji);
-        m_lsbmr.resize(m_nsbm,0.0);
-        m_gsbmr.push_back(m_lsbmr);
-        m_gsbmrp.push_back(m_lsbmr);
-	}
-    else
-    {
-        // get the time
-        double t = FEMaterialPoint::time;
+	FESolutesMaterialPoint& spt = *((*this).ExtractData<FESolutesMaterialPoint>());
+	m_nsbm = spt.m_nsbm;
+	m_ngen = 1; // first generation starts at t=0
+	mat3d Fi(mat3dd(1.0));
+	double Ji = 1;
+	m_Fi.push_back(Fi);
+	m_Ji.push_back(Ji);
+	m_lsbmr.resize(m_nsbm,0.0);
+	m_gsbmr.push_back(m_lsbmr);
+	m_gsbmrp.push_back(m_lsbmr);
+}
+
+//-----------------------------------------------------------------------------
+void FEMultigenSBMMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+	FEMaterialPoint::Update(timeInfo);
+
+	// get the time
+	double t = timeInfo.currentTime;
         
-        // Check if this constitutes a new generation
-        int ngen = m_pmat->CheckGeneration(t);
-        t = m_pmat->GetGenerationTime(ngen);
+	// Check if this constitutes a new generation
+	int ngen = m_pmat->CheckGeneration(t);
+	t = m_pmat->GetGenerationTime(ngen);
         
-        if (t>m_tgen) {
-            // new generation
-            FEElasticMaterialPoint& pt = *((*this).ExtractData<FEElasticMaterialPoint>());
-            FESolutesMaterialPoint& spt = *((*this).ExtractData<FESolutesMaterialPoint>());
+	if (t>m_tgen) {
+		// new generation
+		FEElasticMaterialPoint& pt = *((*this).ExtractData<FEElasticMaterialPoint>());
+		FESolutesMaterialPoint& spt = *((*this).ExtractData<FESolutesMaterialPoint>());
             
-            // push back F and J to define relative deformation gradient of this generation
-            mat3d F = pt.m_F;
-            double J = pt.m_J;
-            m_Fi.push_back(F.inverse());
-            m_Ji.push_back(1.0/J);
-            m_lsbmr = spt.m_sbmr;           // sbmr content at start of generation
-            vector<double> gsbmr(m_nsbm,0); // incremental sbmr content for this generation
-            m_gsbmr.push_back(gsbmr);
-            m_gsbmrp.push_back(gsbmr);
-            m_tgen = t;
-            ++m_ngen;
-        }
-    }
+		// push back F and J to define relative deformation gradient of this generation
+		mat3d F = pt.m_F;
+		double J = pt.m_J;
+		m_Fi.push_back(F.inverse());
+		m_Ji.push_back(1.0/J);
+		m_lsbmr = spt.m_sbmr;           // sbmr content at start of generation
+		vector<double> gsbmr(m_nsbm,0); // incremental sbmr content for this generation
+		m_gsbmr.push_back(gsbmr);
+		m_gsbmrp.push_back(gsbmr);
+		m_tgen = t;
+		++m_ngen;
+	}
 }

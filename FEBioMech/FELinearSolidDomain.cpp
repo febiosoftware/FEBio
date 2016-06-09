@@ -26,7 +26,12 @@ FELinearSolidDomain::FELinearSolidDomain(FEModel* pfem, FEMaterial* pmat) : FESo
 //-----------------------------------------------------------------------------
 void FELinearSolidDomain::Reset()
 {
-	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
+	for (int i=0; i<(int) m_Elem.size(); ++i)
+	{
+		FESolidElement& el = Element(i);
+		int nint = el.GaussPoints();
+		for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->Init();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -58,7 +63,7 @@ bool FELinearSolidDomain::Initialize(FEModel &mdl)
 }
 
 //-----------------------------------------------------------------------------
-void FELinearSolidDomain::InitElements()
+void FELinearSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
 	vec3d x0[FEElement::MAX_NODES];
 	vec3d xt[FEElement::MAX_NODES];
@@ -87,7 +92,7 @@ void FELinearSolidDomain::InitElements()
 
 			pt.m_J = defgrad(el, pt.m_F, j);
 
-			mp.Init(false);
+			mp.Update(timeInfo);
 		}
 	}
 }
@@ -409,7 +414,7 @@ void FELinearSolidDomain::InternalForce(FESolidElement& el, vector<double>& fe)
 }
 
 //-----------------------------------------------------------------------------
-void FELinearSolidDomain::Update(const FETimePoint& tp)
+void FELinearSolidDomain::Update(const FETimeInfo& tp)
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{

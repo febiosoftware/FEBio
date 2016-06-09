@@ -238,7 +238,7 @@ void FEFluidSolver::Update(vector<double>& ui)
 void FEFluidSolver::UpdateStresses()
 {
     FEMesh& mesh = m_fem.GetMesh();
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
     
     // update the stresses on all domains
     for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
@@ -257,7 +257,7 @@ void FEFluidSolver::UpdateStresses()
 //
 bool FEFluidSolver::Augment()
 {
-    FETimePoint tp = m_fem.GetTime();
+    FETimeInfo tp = m_fem.GetTime();
     
     // Assume we will pass (can't hurt to be optimistic)
     bool bconv = true;
@@ -275,7 +275,7 @@ bool FEFluidSolver::Augment()
 
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first BFGS-iteration.
-void FEFluidSolver::PrepStep(double time)
+void FEFluidSolver::PrepStep(const FETimeInfo& timeInfo)
 {
 	TimerTracker t(m_UpdateTime);
 
@@ -301,13 +301,10 @@ void FEFluidSolver::PrepStep(double time)
         ni.m_ap = ni.m_at;
     }
     
-    // TODO: Pass this parameter to this function instead of time
-    FETimePoint tp = m_fem.GetTime();
-    
     // apply concentrated nodal forces
     // since these forces do not depend on the geometry
     // we can do this once outside the NR loop.
-    NodalForces(m_Fn, tp);
+    NodalForces(m_Fn, timeInfo);
     
     // apply prescribed velocities
     // we save the prescribed velocity increments in the ui vector
@@ -324,10 +321,11 @@ void FEFluidSolver::PrepStep(double time)
     // NOTE: do this before the stresses are updated
     // TODO: does it matter if the stresses are updated before
     //       the material point data is initialized
-    FEMaterialPoint::dt = tp.dt;
-	FEMaterialPoint::time = tp.t;
+    FEMaterialPoint::dt = timeInfo.timeIncrement;
+	FEMaterialPoint::time = timeInfo.currentTime;
     
-    for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
+	// update domain data
+    for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(timeInfo);
     
     // update stresses
     UpdateStresses();
@@ -363,10 +361,10 @@ bool FEFluidSolver::Quasin(double time)
     FEAnalysis* pstep = m_fem.GetCurrentStep();
     
     // prepare for the first iteration
-    PrepStep(time);
+	FETimeInfo tp = m_fem.GetTime();
+    PrepStep(tp);
     
     // calculate initial stiffness matrix
-	FETimePoint tp = m_fem.GetTime();
     if (ReformStiffness(tp) == false) return false;
     
     // calculate initial residual
@@ -631,7 +629,7 @@ bool FEFluidSolver::Quasin(double time)
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
 
-bool FEFluidSolver::StiffnessMatrix(const FETimePoint& tp)
+bool FEFluidSolver::StiffnessMatrix(const FETimeInfo& tp)
 {
     // get the stiffness matrix
     SparseMatrix& K = *m_pK;
@@ -685,7 +683,7 @@ bool FEFluidSolver::StiffnessMatrix(const FETimePoint& tp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the stiffness contribution due to nonlinear constraints
-void FEFluidSolver::NonLinearConstraintStiffness(const FETimePoint& tp)
+void FEFluidSolver::NonLinearConstraintStiffness(const FETimeInfo& tp)
 {
     int N = m_fem.NonlinearConstraints();
     for (int i=0; i<N; ++i)
@@ -892,7 +890,7 @@ bool FEFluidSolver::Residual(vector<double>& R)
 	TimerTracker t(m_RHSTime);
 
     // get the time information
-    FETimePoint tp = m_fem.GetTime();
+    FETimeInfo tp = m_fem.GetTime();
 
     // initialize residual with concentrated nodal loads
     R = m_Fn;
@@ -986,7 +984,7 @@ bool FEFluidSolver::Residual(vector<double>& R)
 
 //-----------------------------------------------------------------------------
 //! calculate the nonlinear constraint forces
-void FEFluidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp)
+void FEFluidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp)
 {
     int N = m_fem.NonlinearConstraints();
     for (int i=0; i<N; ++i)
@@ -999,7 +997,7 @@ void FEFluidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimePoi
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
 
-void FEFluidSolver::NodalForces(vector<double>& F, const FETimePoint& tp)
+void FEFluidSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
 {
     // zero nodal force vector
     zero(F);

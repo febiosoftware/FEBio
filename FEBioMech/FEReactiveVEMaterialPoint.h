@@ -30,7 +30,10 @@ public:
     FEMaterialPoint* Copy();
     
     //! Initialize material point data
-    void Init(bool bflag);
+    void Init();
+
+    //! Update material point data
+    void Update(const FETimeInfo& timeInfo);
     
     //! Serialize data to archive
     void Serialize(DumpStream& ar);

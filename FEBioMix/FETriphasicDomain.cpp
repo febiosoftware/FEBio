@@ -219,9 +219,9 @@ void FETriphasicDomain::Reset()
 }
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::InitElements()
+void FETriphasicDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
-	FESolidDomain::InitElements();
+	FESolidDomain::PreSolveUpdate(timeInfo);
 
 	const int NE = FEElement::MAX_NODES;
 	vec3d x0[NE], xt[NE], r0, rt;
@@ -249,7 +249,7 @@ void FETriphasicDomain::InitElements()
 
 			pt.m_J = defgrad(el, pt.m_F, j);
 
-			mp.Init(false);
+			mp.Update(timeInfo);
 		}
 	}
 	
@@ -811,7 +811,7 @@ bool FETriphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector<d
 }
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp)
+void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimeInfo& tp)
 {
 	FETriphasic* pm = m_pMat;
 
@@ -835,7 +835,7 @@ void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FET
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementTriphasicStiffness(el, ke, bsymm, tp.dt);
+		ElementTriphasicStiffness(el, ke, bsymm, tp.timeIncrement);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -860,7 +860,7 @@ void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FET
 }
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp)
+void FETriphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimeInfo& tp)
 {
 	// get the elements material
 	FETriphasic* pm = m_pMat;
@@ -885,7 +885,7 @@ void FETriphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const F
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementTriphasicStiffnessSS(el, ke, bsymm, tp.dt);
+		ElementTriphasicStiffnessSS(el, ke, bsymm, tp.timeIncrement);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -1750,7 +1750,7 @@ void FETriphasicDomain::ElementGeometricalStiffness(FESolidElement &el, matrix &
 
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::Update(const FETimePoint& tp)
+void FETriphasicDomain::Update(const FETimeInfo& tp)
 {
 	bool berr = false;
 	int NE = (int) m_Elem.size();

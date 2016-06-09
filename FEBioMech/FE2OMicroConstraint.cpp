@@ -30,7 +30,7 @@ void FEMicroFlucSurface::CopyFrom(FEMicroFlucSurface& s)
 
 	// create elements
 	int NE = s.Elements();
-	create(NE);
+	Create(NE);
 	for (int i=0; i<NE; ++i) Element(i) = s.Element(i);
 
 	// copy surface data
@@ -168,7 +168,7 @@ void FE2OMicroConstraint::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FE2OMicroConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
+void FE2OMicroConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEMesh& mesh = *m_s.GetMesh();
 
@@ -240,7 +240,7 @@ void FE2OMicroConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FE2OMicroConstraint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
+void FE2OMicroConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	FEMesh& mesh = *m_s.GetMesh();
 
@@ -338,7 +338,7 @@ void FE2OMicroConstraint::StiffnessMatrix(FESolver* psolver, const FETimePoint& 
 }
 
 //-----------------------------------------------------------------------------
-bool FE2OMicroConstraint::Augment(int naug, const FETimePoint& tp)
+bool FE2OMicroConstraint::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we are augmenting
 	if ((m_blaugon == false) || (m_atol <= 0.0)) return true;
@@ -398,7 +398,7 @@ void FE2OMicroConstraint::Reset()
 
 //-----------------------------------------------------------------------------
 // This function is called when the FE model's state needs to be updated.
-void FE2OMicroConstraint::Update(const FETimePoint& tp)
+void FE2OMicroConstraint::Update(const FETimeInfo& tp)
 {
 	// calculate the current volume
 	m_s.m_c = m_s.SurfMicrofluc();

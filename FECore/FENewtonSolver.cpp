@@ -76,7 +76,7 @@ void FENewtonSolver::CheckZeroDiagonal(bool bcheck, double ztol)
 
 //-----------------------------------------------------------------------------
 //! Reforms a stiffness matrix and factorizes it
-bool FENewtonSolver::ReformStiffness(const FETimePoint& tp)
+bool FENewtonSolver::ReformStiffness(const FETimeInfo& tp)
 {
     // first, let's make sure we have not reached the max nr of reformations allowed
     if (m_nref >= m_maxref) throw MaxStiffnessReformations();

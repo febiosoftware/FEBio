@@ -34,7 +34,7 @@ void FEVolumeSurface::CopyFrom(FEVolumeSurface& s)
 
 	// create elements
 	int NE = s.Elements();
-	create(NE);
+	Create(NE);
 	for (int i=0; i<NE; ++i) Element(i) = s.Element(i);
 
 	// copy surface data
@@ -185,7 +185,7 @@ void FEVolumeConstraint::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FEVolumeConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
+void FEVolumeConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEMesh& mesh = *m_s.GetMesh();
 
@@ -249,7 +249,7 @@ void FEVolumeConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEVolumeConstraint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
+void FEVolumeConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	FEMesh& mesh = *m_s.GetMesh();
 
@@ -353,7 +353,7 @@ void FEVolumeConstraint::StiffnessMatrix(FESolver* psolver, const FETimePoint& t
 }
 
 //-----------------------------------------------------------------------------
-bool FEVolumeConstraint::Augment(int naug, const FETimePoint& tp)
+bool FEVolumeConstraint::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we are augmenting
 	if ((m_blaugon == false) || (m_atol <= 0.0)) return true;
@@ -399,7 +399,7 @@ void FEVolumeConstraint::Reset()
 
 //-----------------------------------------------------------------------------
 // This function is called when the FE model's state needs to be updated.
-void FEVolumeConstraint::Update(const FETimePoint& tp)
+void FEVolumeConstraint::Update(const FETimeInfo& tp)
 {
 	// calculate the current volume
 	m_s.m_Vt = m_s.Volume();

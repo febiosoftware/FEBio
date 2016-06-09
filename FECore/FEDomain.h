@@ -19,6 +19,17 @@ class FEGlobalMatrix;
 //! This class describes a physical domain that will be divided into elements
 //! of a specific type. All elements in the domain have to have the same type
 //! and material. 
+//! Creating a domain requires the following steps:
+//! 1. Create an instance of domain class 
+//! 2. Call its Create(int nsize, int elemType) member with the number of elements and element type
+//! 3. For each element of the domain, call the SetMatID, and set the node numbers
+//! 4. Attach the domain to the mesh FEMesh::AddDomain
+//! 5. Call the CreateMaterialPointData
+//! \todo I'd like to simplify these steps:
+//! A. Creating a domain should automatically add it to the mesh (eliminate step 4)
+//! B. Also, I want to eliminate the call to SetMatID. 
+//! C. perhaps the call to CreateMaterialPointData can be done in Create? 
+//! 
 class FEDomain : public FECoreBase
 {
 public:
@@ -66,8 +77,8 @@ public:
 
 public: // interface for derived classes
 	
-	//! create a domain of n elements
-	virtual void create(int n) = 0;
+	//! create a domain of n elements of type
+	virtual void Create(int nelems, int elemType = -1) = 0;
 
 	//! return number of elements
 	virtual int Elements() const = 0;
@@ -87,26 +98,33 @@ public: // optional functions to overload
 	virtual void CopyFrom(FEDomain* pd);
 
 	//! initialize domain
+	//! one-time initialization, called during model initialization
 	virtual bool Initialize(FEModel& fem);
 
-	//! Initialize elements of domain
-	virtual void InitElements() {}
-
-	//! Initialize material point data for the elements
-	void InitMaterialPointData();
+	//! This function is called at the start of a solution step.
+	//! Domain classes can use this to update time dependant quantities
+	//! \todo replace this by a version of Update that takes a flag that indicates
+	//! whether the update is final or not
+	virtual void PreSolveUpdate(const FETimeInfo& timeInfo) {}
 
 	//! Activate the domain
 	virtual void Activate();
 
 	//! Update domain data.
-	//! (Called when the model state needs to be updated).
-	virtual void Update(const FETimePoint& tp) {}
+	//! This is called when the model state needs to be updated (i.e. at the end of each Newton iteration)
+	virtual void Update(const FETimeInfo& tp) {}
 
 	//! build the matrix profile
 	virtual void BuildMatrixProfile(FEGlobalMatrix& M);
 
 public:
 	void SetDOF(vector<int>& dof);
+
+	//! Allocate material point data for the elements
+	//! This is called after elements get read in from the input file.
+	//! And must be called before material point data can be accessed.
+	//! \todo Perhaps I can make this part of the "creation" routine
+	void CreateMaterialPointData();
 
 public:
 	// This is an experimental feature.

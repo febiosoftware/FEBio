@@ -96,9 +96,7 @@ bool FEPrintMatrixDiagnostic::Run()
 	if (!solver.CreateStiffness(true)) return false;
 
 	// calculate the stiffness matrices
-	FETimePoint tp; 
-	tp.t = 0.0;
-	tp.dt = 0.0;
+	FETimeInfo tp; 
 	solver.StiffnessMatrix(tp);
 
 	// print the matrix

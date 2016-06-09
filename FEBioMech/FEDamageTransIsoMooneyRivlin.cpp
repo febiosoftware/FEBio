@@ -1,6 +1,55 @@
 #include "stdafx.h"
 #include "FEDamageTransIsoMooneyRivlin.h"
 
+FETIMRDamageMaterialPoint::FETIMRDamageMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+
+FEMaterialPoint* FETIMRDamageMaterialPoint::Copy()
+{
+	FETIMRDamageMaterialPoint* pt = new FETIMRDamageMaterialPoint(*this);
+	if (m_pNext) pt->m_pNext = m_pNext->Copy();
+	return pt;
+}
+
+void FETIMRDamageMaterialPoint::Init()
+{
+	FEMaterialPoint::Init();
+
+	FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
+
+	// intialize data to zero
+	m_MEmax = 0;
+	m_MEtrial = 0;
+	m_Dm = 0;
+
+	m_FEmax = 0;
+	m_FEtrial = 0;
+	m_Df = 0;
+}
+
+void FETIMRDamageMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+	FEMaterialPoint::Update(timeInfo);
+
+	m_MEmax = max(m_MEmax, m_MEtrial);
+	m_FEmax = max(m_FEmax, m_FEtrial);
+}
+
+void FETIMRDamageMaterialPoint::Serialize(DumpStream& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_MEtrial << m_MEmax << m_Dm;
+		ar << m_FEtrial << m_FEmax << m_Df;
+	}
+	else
+	{
+		ar >> m_MEtrial >> m_MEmax >> m_Dm;
+		ar >> m_FEtrial >> m_FEmax >> m_Df;
+	}
+	FEMaterialPoint::Serialize(ar);
+}
+
+
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageTransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER2(m_c1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c1");

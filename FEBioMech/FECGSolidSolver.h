@@ -55,16 +55,16 @@ protected:
 	void ContactForces(FEGlobalVector& R);
 
 	//! the non-linear constraint forces
-	void NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp);
+	void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);
 
 	//! nodal forces
-	void NodalForces(vector<double>& F, const FETimePoint& tp);
+	void NodalForces(vector<double>& F, const FETimeInfo& tp);
 
 	//! Inertial forces
 	void InertialForces(FEGlobalVector& R);
 
 	//! helper function for setting up the solution phase
-	void PrepStep(double time);
+	void PrepStep(const FETimeInfo& timeInfo);
 
 	//! modified linesearch for Hager-Zhang solver
 	double LineSearchCG(double s);

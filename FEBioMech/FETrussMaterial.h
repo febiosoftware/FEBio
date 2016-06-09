@@ -27,9 +27,9 @@ public:
 		FEMaterialPoint::Serialize(ar);
 	}
 
-	void Init(bool bflag)
+	void Init()
 	{
-		if (m_pNext) m_pNext->Init(bflag);
+		FEMaterialPoint::Init();
 		m_l = 1;
 		m_tau = 0;
 	}

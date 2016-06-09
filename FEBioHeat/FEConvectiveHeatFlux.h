@@ -15,10 +15,10 @@ public:
 	void SetSurface(FESurface* ps);
 
 	//! stiffness matrix
-	void StiffnessMatrix(const FETimePoint& tp, FESolver* psolver);
+	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver);
 	
 	//! residual
-	void Residual(const FETimePoint& tp, FEGlobalVector& R);
+	void Residual(const FETimeInfo& tp, FEGlobalVector& R);
 
 protected:
 	void ElementStiffness(FESurfaceElement& el, matrix& ke, double hc);

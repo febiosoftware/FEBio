@@ -193,9 +193,9 @@ void FEBiphasicSoluteDomain::Reset()
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSoluteDomain::InitElements()
+void FEBiphasicSoluteDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
-	FESolidDomain::InitElements();
+	FESolidDomain::PreSolveUpdate(timeInfo);
 
 	const int NE = FEElement::MAX_NODES;
 	vec3d x0[NE], xt[NE], r0, rt;
@@ -223,7 +223,7 @@ void FEBiphasicSoluteDomain::InitElements()
 
 			pt.m_J = defgrad(el, pt.m_F, j);
 
-			mp.Init(false);
+			mp.Update(timeInfo);
 		}
 	}
     
@@ -759,7 +759,7 @@ bool FEBiphasicSoluteDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vec
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSoluteDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp)
+void FEBiphasicSoluteDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimeInfo& tp)
 {
 	// repeat over all solid elements
 	const int NE = (int)m_Elem.size();
@@ -781,7 +781,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, cons
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementBiphasicSoluteStiffness(el, ke, bsymm, tp.dt);
+		ElementBiphasicSoluteStiffness(el, ke, bsymm, tp.timeIncrement);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -809,7 +809,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, cons
 
 //-----------------------------------------------------------------------------
 
-void FEBiphasicSoluteDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp)
+void FEBiphasicSoluteDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimeInfo& tp)
 {
 	// repeat over all solid elements
 	const int NE = (int)m_Elem.size();
@@ -830,7 +830,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, co
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementBiphasicSoluteStiffnessSS(el, ke, bsymm, tp.dt);
+		ElementBiphasicSoluteStiffnessSS(el, ke, bsymm, tp.timeIncrement);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -1504,10 +1504,10 @@ void FEBiphasicSoluteDomain::ElementGeometricalStiffness(FESolidElement &el, mat
 
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSoluteDomain::Update(const FETimePoint& tp)
+void FEBiphasicSoluteDomain::Update(const FETimeInfo& tp)
 {
 	FEModel& fem = *GetFEModel();
-	double dt = fem.GetTime().dt;
+	double dt = fem.GetTime().timeIncrement;
 	bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
 	bool berr = false;
 

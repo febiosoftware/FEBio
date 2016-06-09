@@ -9,12 +9,6 @@ FEMaterialPoint* FEDiscreteMaterialPoint::Copy()
 	return pt;
 }
 
-//-----------------------------------------------------------------------------
-void FEDiscreteMaterialPoint::Init(bool bflag)
-{
-	if (m_pNext) m_pNext->Init(bflag);
-}
-
 //=============================================================================
 FEDiscreteMaterial::FEDiscreteMaterial(FEModel* pfem) : FEMaterial(pfem) {}
 

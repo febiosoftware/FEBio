@@ -78,7 +78,7 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 	int faces = tag.children();
 
 	// allocate storage for faces
-	s.create(faces);
+	s.Create(faces);
 
 	// read faces
 	++tag;
@@ -632,9 +632,8 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	FEDiscreteDomain* pd = dynamic_cast<FEDiscreteDomain*>(febio.CreateDomain(spec, &mesh, pm));
 	mesh.AddDomain(pd);
 
-	pd->create(1);
+	pd->Create(1, FE_DISCRETE);
 	FEDiscreteElement& de = pd->Element(0);
-	de.SetType(FE_DISCRETE);
 	de.SetID(++m_pim->m_maxid);
 	
 	// add a new material for each spring
@@ -667,7 +666,7 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	}
 	while (!tag.isend());
 
-	pd->InitMaterialPointData();
+	pd->CreateMaterialPointData();
 }
 
 //-----------------------------------------------------------------------------

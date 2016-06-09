@@ -294,7 +294,7 @@ bool FEPoroNormalTraction::LinearTractionForce(FESurfaceElement& el, vector<doub
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
+void FEPoroNormalTraction::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 {
 	FEMesh& mesh = *GetSurface().GetMesh();
 
@@ -341,7 +341,7 @@ void FEPoroNormalTraction::StiffnessMatrix(const FETimePoint& tp, FESolver* psol
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::Residual(const FETimePoint& tp, FEGlobalVector& R)
+void FEPoroNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 {
 	FEMesh& mesh = *GetSurface().GetMesh();
 

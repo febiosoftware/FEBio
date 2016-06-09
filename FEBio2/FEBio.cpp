@@ -165,7 +165,7 @@ bool break_point_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	const double eps = 1e-12;
 
 	// see if a break-point has been reached
-	double t = pfem->GetTime().t;
+	double t = pfem->GetTime().currentTime;
 
 	Interruption itr;
 	int nbp = break_points.size();

@@ -351,7 +351,7 @@ void FELinearSolver::Serialize(DumpStream& ar)
 void FELinearSolver::Update(vector<double>& u)
 {
 	FEMesh& mesh = m_fem.GetMesh();
-	FETimePoint tp = m_fem.GetTime();
+	FETimeInfo tp = m_fem.GetTime();
 
 	// update nodal variables
 	for (int i=0; i<mesh.Nodes(); ++i)

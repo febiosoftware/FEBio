@@ -52,7 +52,7 @@ void FEPeriodicSurface::CopyFrom(FEPeriodicSurface& s)
 {
 	m_Node = s.m_Node;
 	int NE = s.Elements();
-	create(NE);
+	Create(NE);
 	for (int i=0; i<NE; ++i) Element(i) = s.Element(i);
 }
 

@@ -55,13 +55,13 @@ public:
 	void Serialize(DumpStream& ar);
 
 	//! add the linear constraint contributions to the residual
-	void Residual(FEGlobalVector& R, const FETimePoint& tp);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
 
 	//! add the linear constraint contributions to the stiffness matrix
-	void StiffnessMatrix(FESolver* psolver, const FETimePoint& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
 
 	//! do the augmentation
-	bool Augment(int naug, const FETimePoint& tp);
+	bool Augment(int naug, const FETimeInfo& tp);
 
 	//! build connectivity for matrix profile
 	void BuildMatrixProfile(FEGlobalMatrix& M);

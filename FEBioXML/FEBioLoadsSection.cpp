@@ -308,7 +308,7 @@ void FEBioLoadsSection::ParseSurfaceLoad(XMLTag& tag)
 
 	// create a new surface
 	FESurface* psurf = new FESurface(&fem.GetMesh());
-	psurf->create(npr);
+	psurf->Create(npr);
 	fem.GetMesh().AddSurface(psurf);
 
 	// create surface load
@@ -419,7 +419,7 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 				{
 					// count how many pressure cards there are
 					int npr = tag.children();
-					psurf->create(npr);
+					psurf->Create(npr);
 					psl->SetSurface(psurf);
 
 					++tag;
@@ -551,7 +551,7 @@ void FEBioLoadsSection::ParseEdgeLoad(XMLTag& tag)
 				{
 					// count how many load cards there are
 					int npr = tag.children();
-					pedge->create(npr);
+					pedge->Create(npr);
 					pel->Create(npr);
 
 					++tag;
@@ -636,7 +636,7 @@ bool FEBioLoadsSection::BuildEdge(FEEdge& e, FESegmentSet& es)
 	int nsegs = es.Segments();
 
 	// allocate storage for faces
-	e.create(nsegs);
+	e.Create(nsegs);
 
 	// read segments
 	for (int i=0; i<nsegs; ++i)

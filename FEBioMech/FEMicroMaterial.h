@@ -34,7 +34,10 @@ public:
 	FEMicroMaterialPoint(FEMaterialPoint* mp);
 
 	//! Initialize material point data
-	void Init(bool bflag);
+	void Init();
+
+	//! Update material point data
+	void Update(const FETimeInfo& timeInfo);
 
 	//! create a shallow copy
 	FEMaterialPoint* Copy();

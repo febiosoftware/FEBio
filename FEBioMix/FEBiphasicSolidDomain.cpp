@@ -22,7 +22,7 @@ void FEBiphasicSolidDomain::SetMaterial(FEMaterial* pmat)
 
 //-----------------------------------------------------------------------------
 //! Initialize element data
-void FEBiphasicSolidDomain::InitElements()
+void FEBiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
 	const int NE = FEElement::MAX_NODES;
 	vec3d x0[NE], xt[NE], r0, rt;
@@ -53,7 +53,7 @@ void FEBiphasicSolidDomain::InitElements()
 
             pb.m_Jp = pt.m_J;
             
-			mp.Init(false);
+			mp.Update(timeInfo);
 		}
 	}
 }
@@ -1113,7 +1113,7 @@ void FEBiphasicSolidDomain::ElementGeometricalStiffness(FESolidElement &el, matr
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSolidDomain::Update(const FETimePoint& tp)
+void FEBiphasicSolidDomain::Update(const FETimeInfo& tp)
 {
 	bool berr = false;
 	int NE = (int) m_Elem.size();

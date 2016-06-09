@@ -10,53 +10,14 @@
 class FETIMRDamageMaterialPoint : public FEMaterialPoint
 {
 public:
-	FETIMRDamageMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+	FETIMRDamageMaterialPoint(FEMaterialPoint *pt);
 
-	FEMaterialPoint* Copy()
-	{
-		FETIMRDamageMaterialPoint* pt = new FETIMRDamageMaterialPoint(*this);
-		if (m_pNext) pt->m_pNext = m_pNext->Copy();
-		return pt;
-	}
+	FEMaterialPoint* Copy();
 
-	void Init(bool bflag)
-	{
-		FEElasticMaterialPoint& pt = *m_pNext->ExtractData<FEElasticMaterialPoint>();
-		if (bflag)
-		{
-			// intialize data to zero
-			m_MEmax = 0;
-			m_MEtrial = 0;
-			m_Dm = 0;
+	void Init();
+	void Update(const FETimeInfo& timeInfo);
 
-			m_FEmax = 0;
-			m_FEtrial = 0;
-			m_Df = 0;
-		}
-		else
-		{
-			m_MEmax = max(m_MEmax, m_MEtrial);
-			m_FEmax = max(m_FEmax, m_FEtrial);
-		}
-
-		// don't forget to intialize the nested data
-		if (m_pNext) m_pNext->Init(bflag);
-	}
-
-	void Serialize(DumpStream& ar)
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_MEtrial << m_MEmax << m_Dm;
-			ar << m_FEtrial << m_FEmax << m_Df;
-		}
-		else
-		{
-			ar >> m_MEtrial >> m_MEmax >> m_Dm;
-			ar >> m_FEtrial >> m_FEmax >> m_Df;
-		}
-		FEMaterialPoint::Serialize(ar);
-	}
+	void Serialize(DumpStream& ar);
 
 public:
 	// matrix

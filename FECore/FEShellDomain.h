@@ -10,7 +10,7 @@ public:
 	FEShellDomain(FEMesh* pm) : FEDomain(FE_DOMAIN_SHELL, pm) {}
 
 	//! create storage for elements
-	void create(int nsize) { m_Elem.resize(nsize); }
+	void Create(int nsize, int elemType);
 
 	//! return nr of elements
 	int Elements() const { return m_Elem.size(); }
@@ -21,8 +21,8 @@ public:
 
 	int GetElementType() { return m_Elem[0].Type(); }
 
-	//! Initialize elements
-	void InitElements();
+	//! Update element data prior to solving time step
+	void PreSolveUpdate(const FETimeInfo& timeInfo);
 
 	//! Reset element data
 	void Reset();

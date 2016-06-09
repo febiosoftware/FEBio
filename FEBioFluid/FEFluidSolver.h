@@ -46,7 +46,7 @@ public:
     //{ --- Solution functions ---
     
     //! prepares the data for the first QN iteration
-    void PrepStep(double time);
+    void PrepStep(const FETimeInfo& timeInfo);
     
     //! Performs a Newton-Raphson iteration
     bool Quasin(double time);
@@ -63,21 +63,21 @@ public:
     //{ --- Stiffness matrix routines ---
     
     //! calculates the global stiffness matrix
-    bool StiffnessMatrix(const FETimePoint& tp);
+    bool StiffnessMatrix(const FETimeInfo& tp);
     
     //! calculates stiffness contributon of nonlinear constraints
-    void NonLinearConstraintStiffness(const FETimePoint& tp);
+    void NonLinearConstraintStiffness(const FETimeInfo& tp);
     
     //{ --- Residual routines ---
     
     //! Calculates concentrated nodal forces
-    void NodalForces(vector<double>& F, const FETimePoint& tp);
+    void NodalForces(vector<double>& F, const FETimeInfo& tp);
     
     //! Calculates residual
     bool Residual(vector<double>& R);
     
     //! Calculate nonlinear constraint forces
-    void NonLinearConstraintForces(FEGlobalVector& R, const FETimePoint& tp);
+    void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);
     
 public:
     // convergence tolerances

@@ -17,21 +17,22 @@ FEMaterialPoint* FEViscousMaterialPoint::Copy()
     return pt;
 }
 
-void FEViscousMaterialPoint::Init(bool bflag)
+void FEViscousMaterialPoint::Init()
 {
-    if (bflag)
-    {
-        // initialize data to identity
-        m_Fp = mat3dd(1);
-    }
-    else
-    {
-        FEElasticMaterialPoint& pt = *this->ExtractData<FEElasticMaterialPoint>();
-        m_Fp = pt.m_F;
-    }
+	// initialize data to identity
+    m_Fp = mat3dd(1);
     
     // don't forget to intialize the nested data
-    if (m_pNext) m_pNext->Init(bflag);
+    FEMaterialPoint::Init();
+}
+
+void FEViscousMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+	FEElasticMaterialPoint& pt = *this->ExtractData<FEElasticMaterialPoint>();
+    m_Fp = pt.m_F;
+    
+    // don't forget to call base class
+    FEMaterialPoint::Update(timeInfo);
 }
 
 void FEViscousMaterialPoint::Serialize(DumpStream& ar)

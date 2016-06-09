@@ -43,7 +43,7 @@ public: // overrides from FEElasticDomain
 	void BodyForce(FEGlobalVector& R, FEBodyForce& bf);
 
 	// update stresses
-	void Update(const FETimePoint& tp);
+	void Update(const FETimeInfo& tp);
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolver* psolver);

@@ -244,9 +244,9 @@ bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vect
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
+void FESoluteFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 {
-	double dt = tp.dt;
+	double dt = tp.timeIncrement;
 	
 	matrix ke;
 	vector<int> elm;
@@ -296,9 +296,9 @@ void FESoluteFlux::StiffnessMatrix(const FETimePoint& tp, FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::Residual(const FETimePoint& tp, FEGlobalVector& R)
+void FESoluteFlux::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 {
-	double dt = tp.dt;
+	double dt = tp.timeIncrement;
 	
 	vector<double> fe;
 	vector<int> elm;

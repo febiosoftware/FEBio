@@ -67,7 +67,7 @@ void FEPointConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 }
 
 //-----------------------------------------------------------------------------
-void FEPointConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
+void FEPointConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int i;
 	FEMesh& m = GetFEModel()->GetMesh();
@@ -125,7 +125,7 @@ void FEPointConstraint::Residual(FEGlobalVector& R, const FETimePoint& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPointConstraint::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
+void FEPointConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	int i, j;
 	FEMesh& m = GetFEModel()->GetMesh();

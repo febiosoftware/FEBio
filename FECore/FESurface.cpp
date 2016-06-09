@@ -13,6 +13,14 @@ FESurface::FESurface(FEMesh* pm) : FEDomain(FE_DOMAIN_SURFACE, pm)
 }
 
 //-----------------------------------------------------------------------------
+void FESurface::Create(int nsize, int elemType)
+{
+	m_el.resize(nsize);
+	if (elemType != -1)
+		for (int i=0; i<nsize; ++i) m_el[i].SetType(elemType);
+}
+
+//-----------------------------------------------------------------------------
 //! Initialize surface node data structure
 //! Note that it is assumed that the element array is already created
 //! and initialized.
@@ -1514,7 +1522,7 @@ void FESurface::Serialize(DumpStream &ar)
 	{
 		int ne=0;
 		ar >> ne;
-		create(ne);
+		Create(ne);
 
 		for (int k=0; k<ne; ++k)
 		{

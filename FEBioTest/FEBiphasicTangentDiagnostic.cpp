@@ -77,15 +77,14 @@ bool FEBiphasicTangentUniaxial::Init()
     // create a biphasic domain
     FEBiphasicSolidDomain* pd = new FEBiphasicSolidDomain(&fem);
 	pd->SetMaterial(pmat);
-    pd->create(1);
+    pd->Create(1, FE_HEX8G8);
     m.AddDomain(pd);
     FESolidElement& el = pd->Element(0);
-    el.SetType(FE_HEX8G8);
     el.SetID(1);
     el.SetMatID(0);
     for (i=0; i<8; ++i) el.m_node[i] = i;
     
-    pd->InitMaterialPointData();
+    pd->CreateMaterialPointData();
     
     // convert strain to a displacement
     double d = sqrt(2*m_strain+1) - 1;

@@ -462,7 +462,7 @@ void FEUDGHexDomain::UDGMaterialStiffness(FESolidElement &el, matrix &ke)
 }
 
 //-----------------------------------------------------------------------------
-void FEUDGHexDomain::Update(const FETimePoint& tp)
+void FEUDGHexDomain::Update(const FETimeInfo& tp)
 {
 	int nint, neln;
 	double* gw;

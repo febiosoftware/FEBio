@@ -101,7 +101,7 @@ double FELinearConstraintSet::constraint(FEAugLagLinearConstraint& LC)
 //! This function performs an augmentation, if the Lagrange multiplier 
 //! has not converged
 
-bool FELinearConstraintSet::Augment(int naug, const FETimePoint& tp)
+bool FELinearConstraintSet::Augment(int naug, const FETimeInfo& tp)
 {
 	int M = m_LC.size(), i;
 	list<FEAugLagLinearConstraint*>::iterator im = m_LC.begin();
@@ -150,7 +150,7 @@ bool FELinearConstraintSet::Augment(int naug, const FETimePoint& tp)
 //-----------------------------------------------------------------------------
 //! This function calculates the contribution to the residual.
 
-void FELinearConstraintSet::Residual(FEGlobalVector& R, const FETimePoint& tp)
+void FELinearConstraintSet::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
@@ -176,7 +176,7 @@ void FELinearConstraintSet::Residual(FEGlobalVector& R, const FETimePoint& tp)
 //-----------------------------------------------------------------------------
 //! This function calculates the contribution to the stiffness matrix.
 
-void FELinearConstraintSet::StiffnessMatrix(FESolver* psolver, const FETimePoint& tp)
+void FELinearConstraintSet::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
 

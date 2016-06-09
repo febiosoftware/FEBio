@@ -301,13 +301,12 @@ bool FEContactBiphasicTangentHex8::Init()
     // get the one-and-only domain
     FEBiphasicSolidDomain* pbd = new FEBiphasicSolidDomain(&fem);
     pbd->SetMaterial(pm);
-    pbd->create(2);
+    pbd->Create(2, FE_HEX8G8);
     mesh.AddDomain(pbd);
     
     FESolidElement& el0 = pbd->Element(0);
     FESolidElement& el1 = pbd->Element(1);
     
-    el0.SetType(FE_HEX8G8);
     el0.SetID(1);
     el0.SetMatID(0);
     el0.m_node[0] = 0;
@@ -319,7 +318,6 @@ bool FEContactBiphasicTangentHex8::Init()
     el0.m_node[6] = 6;
     el0.m_node[7] = 7;
     
-    el1.SetType(FE_HEX8G8);
     el1.SetID(2);
     el1.SetMatID(0);
     el1.m_node[0] = 8;
@@ -331,7 +329,7 @@ bool FEContactBiphasicTangentHex8::Init()
     el1.m_node[6] = 14;
     el1.m_node[7] = 15;
     
-    pbd->InitMaterialPointData();
+    pbd->CreateMaterialPointData();
     
     // --- create the sliding interface ---
     FESlidingInterfaceBiphasic* ps = new FESlidingInterfaceBiphasic(&fem);
@@ -342,15 +340,13 @@ bool FEContactBiphasicTangentHex8::Init()
     ps->m_bautopen = true;
     ps->m_bsymm = false;
     FESlidingSurfaceBiphasic& ms = ps->m_ms;
-    ms.create(1);
-    ms.Element(0).SetType(FE_QUAD4G4);
+    ms.Create(1, FE_QUAD4G4);
     ms.Element(0).m_node[0] = 4;
     ms.Element(0).m_node[1] = 5;
     ms.Element(0).m_node[2] = 6;
     ms.Element(0).m_node[3] = 7;
     FESlidingSurfaceBiphasic& ss = ps->m_ss;
-    ss.create(1);
-    ss.Element(0).SetType(FE_QUAD4G4);
+    ss.Create(1, FE_QUAD4G4);
     ss.Element(0).m_node[0] = 11;
     ss.Element(0).m_node[1] = 10;
     ss.Element(0).m_node[2] = 9;
@@ -451,27 +447,25 @@ bool FEContactBiphasicTangentHex20::Init()
     // get the one-and-only domain
     FEBiphasicSolidDomain* pbd = new FEBiphasicSolidDomain(&fem);
     pbd->SetMaterial(pm);
-    pbd->create(2);
+    pbd->Create(2, FE_HEX20G27);
     mesh.AddDomain(pbd);
     
     FESolidElement& el0 = pbd->Element(0);
     FESolidElement& el1 = pbd->Element(1);
     
-    el0.SetType(FE_HEX20G27);
     el0.SetID(1);
     el0.SetMatID(0);
     for (int i=0; i<20; ++i) {
         el0.m_node[i] = el0n[i] - 1;
     }
     
-    el1.SetType(FE_HEX20G27);
     el1.SetID(2);
     el1.SetMatID(0);
     for (int i=0; i<20; ++i) {
         el1.m_node[i] = el1n[i] - 1;
     }
     
-    pbd->InitMaterialPointData();
+    pbd->CreateMaterialPointData();
     
     // --- create the sliding interface ---
     FESlidingInterfaceBiphasic* ps = new FESlidingInterfaceBiphasic(&fem);
@@ -482,13 +476,11 @@ bool FEContactBiphasicTangentHex20::Init()
     ps->m_bautopen = true;
     ps->m_bsymm = false;
     FESlidingSurfaceBiphasic& ms = ps->m_ms;
-    ms.create(1);
-    ms.Element(0).SetType(FE_QUAD8G9);
+    ms.Create(1, FE_QUAD8G9);
     for (int i=0; i<8; ++i)
         ms.Element(0).m_node[i] = msn[i] - 1;
     FESlidingSurfaceBiphasic& ss = ps->m_ss;
-    ss.create(1);
-    ss.Element(0).SetType(FE_QUAD8G9);
+    ss.Create(1, FE_QUAD8G9);
     for (int i=0; i<8; ++i)
         ss.Element(0).m_node[i] = ssn[i] - 1;
     fem.AddSurfacePairInteraction(ps);
