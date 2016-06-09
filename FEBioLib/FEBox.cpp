@@ -68,6 +68,7 @@ void FEBox::Create(FEModel* pfem, int nx, int ny, int nz, vec3d r0, vec3d r1, in
 	n = 0;
 	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(pfem);
 	pbd->Create(elems, nhex);
+	pbd->SetMatID(-1);
 	AddDomain(pbd);
 	for (i=0; i<nx; ++i)
 	{
@@ -78,7 +79,6 @@ void FEBox::Create(FEModel* pfem, int nx, int ny, int nz, vec3d r0, vec3d r1, in
 				FESolidElement& el = pbd->Element(n);
 
 				el.SetID(n+1);
-				el.SetMatID(-1);
 
 				en = &el.m_node[0];
 

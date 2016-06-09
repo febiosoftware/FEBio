@@ -17,15 +17,7 @@ bool FEDiscreteDomain::Initialize(FEModel &fem)
 	if (FEDomain::Initialize(fem) == false) return false;
 
 	FEMaterial* pmat = GetMaterial();
-	if (pmat)
-	{
-		int mid = pmat->GetID();
-		int NE = Elements();
-		for (int i=0; i<NE; ++i)
-		{
-			Element(i).SetMatID(mid);
-		}
-	}
+	if (pmat) SetMatID(pmat->GetID());
 
 	return true;
 }

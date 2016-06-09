@@ -639,7 +639,7 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	// add a new material for each spring
 	fem.AddMaterial(pm);
 	pm->SetID(fem.Materials());
-	de.SetMatID(fem.Materials()-1);
+	pd->SetMatID(fem.Materials()-1);
 
 	// read spring discrete elements
 	++tag;

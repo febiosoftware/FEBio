@@ -341,6 +341,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 
 		// get the material ID
 		int nmat = atoi(tag.AttributeValue("mat"))-1;
+		domi.SetMatID(nmat);
 
 		// get the material class
 		FEMaterial* pmat = fem.GetMaterial(nmat);
@@ -349,7 +350,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		// determine element shape
 		FE_Element_Spec espec = ElementSpec(tag.Name());
 		if (espec.etype != dom[ED[i]].elem.etype) throw XMLReader::InvalidTag(tag);
-		ReadElement(tag, domi.ElementRef(ne), nid, nmat);
+		ReadElement(tag, domi.ElementRef(ne), nid);
 
 		// go to next tag
 		++tag;
@@ -404,6 +405,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 
 	// add domain it to the mesh
 	pdom->Create(elems, espec.etype);
+	pdom->SetMatID(nmat);
 	mesh.AddDomain(pdom);
 	int nd = NDOM;
 
@@ -438,7 +440,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 		if (pg) (*pg)[i] = nid;
 
 		// read the element data
-		ReadElement(tag, dom.ElementRef(i), nid, nmat);
+		ReadElement(tag, dom.ElementRef(i), nid);
 
 		// go to next tag
 		++tag;
@@ -509,6 +511,7 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 		// add it to the mesh
 		assert(d.nel);
 		pdom->Create(d.nel, d.elem.etype);
+		pdom->SetMatID(0);
 		mesh.AddDomain(pdom);
 
 		// we reset the nr of elements since we'll be using 
@@ -529,7 +532,7 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 
 		// determine element type
 		FE_Element_Spec espec = ElementSpec(tag.Name());
-		ReadElement(tag, dom.ElementRef(ne), nid, 0); break;
+		ReadElement(tag, dom.ElementRef(ne), nid); break;
 
 		// go to next tag
 		++tag;
@@ -537,13 +540,12 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioGeometrySection::ReadElement(XMLTag &tag, FEElement& el, int nid, int nmat)
+void FEBioGeometrySection::ReadElement(XMLTag &tag, FEElement& el, int nid)
 {
 	el.SetID(nid);
 	int n[FEElement::MAX_NODES];
 	tag.value(n,el.Nodes());
 	m_pim->GlobalToLocalID(n, el.Nodes(), el.m_node);
-	el.SetMatID(nmat);
 }
 
 //-----------------------------------------------------------------------------

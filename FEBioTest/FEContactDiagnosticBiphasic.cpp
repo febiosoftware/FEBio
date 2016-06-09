@@ -302,13 +302,13 @@ bool FEContactBiphasicTangentHex8::Init()
     FEBiphasicSolidDomain* pbd = new FEBiphasicSolidDomain(&fem);
     pbd->SetMaterial(pm);
     pbd->Create(2, FE_HEX8G8);
+	pbd->SetMatID(0);
     mesh.AddDomain(pbd);
     
     FESolidElement& el0 = pbd->Element(0);
     FESolidElement& el1 = pbd->Element(1);
     
     el0.SetID(1);
-    el0.SetMatID(0);
     el0.m_node[0] = 0;
     el0.m_node[1] = 1;
     el0.m_node[2] = 2;
@@ -319,7 +319,6 @@ bool FEContactBiphasicTangentHex8::Init()
     el0.m_node[7] = 7;
     
     el1.SetID(2);
-    el1.SetMatID(0);
     el1.m_node[0] = 8;
     el1.m_node[1] = 9;
     el1.m_node[2] = 10;
@@ -448,19 +447,18 @@ bool FEContactBiphasicTangentHex20::Init()
     FEBiphasicSolidDomain* pbd = new FEBiphasicSolidDomain(&fem);
     pbd->SetMaterial(pm);
     pbd->Create(2, FE_HEX20G27);
+	pbd->SetMatID(0);
     mesh.AddDomain(pbd);
     
     FESolidElement& el0 = pbd->Element(0);
     FESolidElement& el1 = pbd->Element(1);
     
     el0.SetID(1);
-    el0.SetMatID(0);
     for (int i=0; i<20; ++i) {
         el0.m_node[i] = el0n[i] - 1;
     }
     
     el1.SetID(2);
-    el1.SetMatID(0);
     for (int i=0; i<20; ++i) {
         el1.m_node[i] = el1n[i] - 1;
     }

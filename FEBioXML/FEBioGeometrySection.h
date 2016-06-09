@@ -32,7 +32,7 @@ protected:
 
 	void ParseMesh(XMLTag& tag);
 
-	void ReadElement(XMLTag& tag, FEElement& el, int nid, int nmat);
+	void ReadElement(XMLTag& tag, FEElement& el, int nid);
 
 	FE_Element_Spec ElementSpec(const char* sz);
 	FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat);

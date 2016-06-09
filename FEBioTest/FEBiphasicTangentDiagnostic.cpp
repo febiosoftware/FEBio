@@ -78,10 +78,10 @@ bool FEBiphasicTangentUniaxial::Init()
     FEBiphasicSolidDomain* pd = new FEBiphasicSolidDomain(&fem);
 	pd->SetMaterial(pmat);
     pd->Create(1, FE_HEX8G8);
+	pd->SetMatID(0);
     m.AddDomain(pd);
     FESolidElement& el = pd->Element(0);
     el.SetID(1);
-    el.SetMatID(0);
     for (i=0; i<8; ++i) el.m_node[i] = i;
     
     pd->CreateMaterialPointData();
