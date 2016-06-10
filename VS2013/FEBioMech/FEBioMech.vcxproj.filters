@@ -591,6 +591,9 @@
     <ClInclude Include="..\..\FEBioMech\FEMindlinElastic2O.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEDiscreteContact.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1149,6 +1152,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEMindlinElastic2O.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEDiscreteContact.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
