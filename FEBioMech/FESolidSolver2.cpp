@@ -851,9 +851,6 @@ void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
 	// NOTE: do this before the stresses are updated
 	// TODO: does it matter if the stresses are updated before
 	//       the material point data is initialized
-	FEMaterialPoint::dt = tp.timeIncrement;
-	FEMaterialPoint::time = tp.currentTime;
-
 	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(timeInfo);
 
 	// update stresses

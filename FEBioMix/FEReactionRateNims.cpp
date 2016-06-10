@@ -55,7 +55,7 @@ bool FEReactionRateNims::Init()
 double FEReactionRateNims::ReactionRate(FEMaterialPoint& pt)
 {
     // get the time
-	double t = FEMaterialPoint::time;
+	double t = GetFEModel()->GetTime().currentTime;
     
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
     double c = spt.m_ca[m_lid];

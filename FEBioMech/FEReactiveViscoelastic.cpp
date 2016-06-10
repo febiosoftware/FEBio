@@ -8,6 +8,7 @@
 
 #include "FEReactiveViscoelastic.h"
 #include "FECore/FECoreKernel.h"
+#include <FECore/FEModel.h>
 #include <limits>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -142,7 +143,7 @@ double FEReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMaterialPoint&
     double w = 0;
     
     // current time
-    double time = FEMaterialPoint::time;
+    double time = GetFEModel()->GetTime().currentTime;
     
     switch (m_btype) {
         case 1:
@@ -221,7 +222,8 @@ double FEReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMaterialPoint
 //! Stress function
 mat3ds FEReactiveViscoelasticMaterial::Stress(FEMaterialPoint& mp)
 {
-   if (mp.dt == 0) return mat3ds(0,0,0,0,0,0);
+	double dt = GetFEModel()->GetTime().timeIncrement;
+	if (dt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
     
 	// get the elastic part
 	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -327,7 +329,8 @@ tens4ds FEReactiveViscoelasticMaterial::Tangent(FEMaterialPoint& mp)
 //! strain energy density function
 double FEReactiveViscoelasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 {
-    if (mp.dt == 0) return 0;
+	double dt = GetFEModel()->GetTime().timeIncrement;
+	if (dt == 0) return 0;
     
     // get the elastic part
     FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();

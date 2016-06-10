@@ -51,7 +51,7 @@ public:
 
 public:
 	//! Get active domains
-	int Domains() { return m_Dom.size(); }
+	int Domains() { return (int)m_Dom.size(); }
 
 	//! Get active domain
 	FEDomain* Domain(int i);

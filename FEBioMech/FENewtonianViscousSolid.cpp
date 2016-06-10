@@ -7,6 +7,7 @@
 //
 
 #include "FENewtonianViscousSolid.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -41,7 +42,8 @@ tens4ds FENewtonianViscousSolid::Tangent(FEMaterialPoint& mp)
     
     mat3dd I(1);
     
-    tens4ds Cv = (dyad1s(I, A)*(m_kappa-2*m_mu/3) + dyad4s(I, A)*(2*m_mu))/(2*mp.dt);
+	double dt = GetFEModel()->GetTime().timeIncrement;
+	tens4ds Cv = (dyad1s(I, A)*(m_kappa - 2 * m_mu / 3) + dyad4s(I, A)*(2 * m_mu)) / (2 * dt);
     
     return Cv;
 }

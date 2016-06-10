@@ -92,7 +92,7 @@ public:
 	int FindPoint(double t, double& tval);
 
 	//! return nr of points
-	int Points() const { return m_lp.size(); }
+	int Points() const { return (int)m_lp.size(); }
 
 	//! see if there is a point at time t
 	bool HasPoint(double t) const;

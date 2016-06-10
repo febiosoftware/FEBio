@@ -13,7 +13,7 @@ public:
 	void Create(int nsize, int elemType);
 
 	//! return nr of elements
-	int Elements() const { return m_Elem.size(); }
+	int Elements() const { return (int)m_Elem.size(); }
 
 	//! element access
 	FEShellElement& Element(int n) { return m_Elem[n]; }

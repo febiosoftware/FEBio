@@ -154,13 +154,13 @@ class OLeaf<const char*> : public OChunk
 public:
 	OLeaf(unsigned int nid, const char* sz) : OChunk(nid)
 	{
-		int l = strlen(sz);
+		int l = (int)strlen(sz);
 		m_psz = new char[l+1];
 		memcpy(m_psz, sz, l+1);
 	}
 	~OLeaf() { delete m_psz; }
 
-	int Size() { return strlen(m_psz)+sizeof(int); }
+	int Size() { return (int)strlen(m_psz)+sizeof(int); }
 	void Write(FileStream* fp)
 	{
 		fp->Write(&m_nID , sizeof(unsigned int), 1);
@@ -181,7 +181,7 @@ class OLeaf<vector<T> > : public OChunk
 public:
 	OLeaf(unsigned int nid, vector<T>& a) : OChunk(nid)
 	{
-		m_nsize = a.size();
+		m_nsize = (int)a.size();
 		assert(m_nsize > 0);
 		m_pd = new T[m_nsize];
 		memcpy(m_pd, &a[0], sizeof(T)*m_nsize);

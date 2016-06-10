@@ -75,7 +75,7 @@ void FELinearConstraintSet::BuildMatrixProfile(FEGlobalMatrix& M)
 
 double FELinearConstraintSet::constraint(FEAugLagLinearConstraint& LC)
 {
-	int n = LC.m_dof.size();
+	int n = (int)LC.m_dof.size();
 	double c = 0;
 	list<FEAugLagLinearConstraint::DOF>::iterator it = LC.m_dof.begin();
 	double u;

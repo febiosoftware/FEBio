@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FERemodelingElasticMaterial.h"
 #include "FECore/FECoreKernel.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 FEMaterialPoint* FERemodelingMaterialPoint::Copy()
@@ -76,7 +77,7 @@ double FERemodelingElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 //! Stress function
 mat3ds FERemodelingElasticMaterial::Stress(FEMaterialPoint& mp)
 {
-	double dt = FEMaterialPoint::dt;
+	double dt = GetFEModel()->GetTime().timeIncrement;
 
     FERemodelingMaterialPoint& rpt = *(mp.ExtractData<FERemodelingMaterialPoint>());
 

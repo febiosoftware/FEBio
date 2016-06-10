@@ -13,7 +13,7 @@ public:
 	void Create(int nsize, int elemType);
 
 	//! return nr of elements
-	int Elements() const { return m_Elem.size(); }
+	int Elements() const { return (int)m_Elem.size(); }
 
 	//! reset data (overridden from FEDomain)
 	void Reset();

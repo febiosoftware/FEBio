@@ -40,7 +40,7 @@ vec3d FENonConstBodyForce::force(FEMaterialPoint &mp)
 	m.SetVariable("x", r.x);
 	m.SetVariable("y", r.y);
 	m.SetVariable("z", r.z);
-	m.SetVariable("t", mp.time);
+//	m.SetVariable("t", mp.time);
 
 	// calculate the force
 	vec3d f;

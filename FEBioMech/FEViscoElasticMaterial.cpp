@@ -2,6 +2,7 @@
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledMaterial.h"
 #include "FECore/FECoreKernel.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -141,7 +142,8 @@ FEMaterialPoint* FEViscoElasticMaterial::CreateMaterialPointData()
 //! Stress function
 mat3ds FEViscoElasticMaterial::Stress(FEMaterialPoint& mp)
 {
-    if (mp.dt == 0) return mat3ds(0,0,0,0,0,0);
+	double dt = GetFEModel()->GetTime().timeIncrement;
+	if (dt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
     
 	// get the elastic part
 	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -161,7 +163,7 @@ mat3ds FEViscoElasticMaterial::Stress(FEMaterialPoint& mp)
 	// calculate new history variables
 	// terms are accumulated in S, the total PK2-stress
 	mat3ds S = Se*m_g0;
-	double dt = mp.dt, g, h;
+	double g, h;
 	for (int i=0; i<MAX_TERMS; ++i)
 	{
 		g = exp(-dt/m_t[i]);
@@ -180,12 +182,13 @@ mat3ds FEViscoElasticMaterial::Stress(FEMaterialPoint& mp)
 //! Material tangent
 tens4ds FEViscoElasticMaterial::Tangent(FEMaterialPoint& pt)
 {
+	double dt = GetFEModel()->GetTime().timeIncrement;
+
 	// calculate the spatial elastic tangent
 	tens4ds C = m_Base->Tangent(pt);
-	if (pt.dt == 0.0) return C;
+	if (dt == 0.0) return C;
 
 	// calculate the visco scale factor
-	double dt = pt.dt;
 	double f = m_g0, g, h;
 	for (int i=0; i<MAX_TERMS; ++i)
 	{

@@ -47,7 +47,7 @@ public:
 public:
 
 	//! return number of surface elements
-	int Elements() const { return m_el.size(); }
+	int Elements() const { return (int)m_el.size(); }
 
 	//! return an element of the surface
 	FESurfaceElement& Element(int i) { return m_el[i]; }

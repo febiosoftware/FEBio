@@ -55,7 +55,7 @@ public:
 	void UpdateProfile(vector< vector<int> >& LM, int N);
 
 	//! returns the size of the profile. That is the nr of equations
-	int size() { return m_prof.size(); }
+	int size() { return (int)m_prof.size(); }
 
 	//! returns the non-zero row indices (in condensed format) for a column
 	vector<int>& column(int i) { return m_prof[i]; }

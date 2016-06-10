@@ -33,6 +33,7 @@ public:
     
 public:
     mat3d	m_Fp;		//!< deformation gradient at previous time point
+	double	m_dt;		//!< time increment \todo this is a temporary construct. Fix this.
 };
 
 #endif /* FEViscousMaterialPoint_hpp */

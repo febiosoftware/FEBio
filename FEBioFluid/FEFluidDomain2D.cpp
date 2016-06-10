@@ -194,6 +194,8 @@ void FEFluidDomain2D::ElementInternalForce(FEElement2D& el, vector<double>& fe)
     vector<vec3d> gradN(neln);
     
     double*	gw = el.GaussWeights();
+
+	double dt = GetFEModel()->GetTime().timeIncrement;
     
     // repeat for all integration points
     for (n=0; n<nint; ++n)
@@ -221,7 +223,7 @@ void FEFluidDomain2D::ElementInternalForce(FEElement2D& el, vector<double>& fe)
         for (i=0; i<neln; ++i)
         {
             vec3d fs = s*gradN[i];
-            double fJ = (((pt.m_J - pt.m_Jp)/mp.dt)*m_btrans + pt.m_gradJ*pt.m_vt - pt.m_J*pt.m_L.trace())*H[i];
+            double fJ = (((pt.m_J - pt.m_Jp)/dt)*m_btrans + pt.m_gradJ*pt.m_vt - pt.m_J*pt.m_L.trace())*H[i];
             
             // calculate internal force
             // the '-' sign is so that the internal forces get subtracted
@@ -357,6 +359,8 @@ void FEFluidDomain2D::ElementBodyForceStiffness(FEBodyForce& BF, FEElement2D &el
 void FEFluidDomain2D::ElementMaterialStiffness(FEElement2D &el, matrix &ke)
 {
     int i, i3, j, j3, n;
+
+	double dt = GetFEModel()->GetTime().timeIncrement;
     
     // Get the current element's data
     const int nint = el.GaussPoints();
@@ -412,7 +416,7 @@ void FEFluidDomain2D::ElementMaterialStiffness(FEElement2D &el, matrix &ke)
                 mat3d Kv = vdotTdotv(gradN[i], cv, gradN[j])*detJ;
                 vec3d kv = (pt.m_gradJ*H[j] - gradN[j]*pt.m_J)*(H[i]*detJ);
                 vec3d kJ = (mat3dd(-dpdJ) + svJ)*gradN[i]*(H[j]*detJ);
-                double k = (H[j]*((1.0*m_btrans)/mp.dt - pt.m_L.trace()) + gradN[j]*pt.m_vt)*(H[i]*detJ);
+                double k = (H[j]*((1.0*m_btrans)/dt - pt.m_L.trace()) + gradN[j]*pt.m_vt)*(H[i]*detJ);
                 
                 ke[i3  ][j3  ] += Kv(0,0);
                 ke[i3  ][j3+1] += Kv(0,1);
@@ -582,7 +586,7 @@ void FEFluidDomain2D::ElementMassMatrix(FEElement2D& el, matrix& ke)
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         
-        double dt = mp.dt;
+		double dt = GetFEModel()->GetTime().timeIncrement;
         double dens = m_pMat->Density(mp);
         
         // evaluate spatial gradient of shape functions

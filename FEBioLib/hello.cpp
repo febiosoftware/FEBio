@@ -103,7 +103,7 @@ int Hello()
 	felog.printf("  http://febio.org                                                         \n");
 	felog.printf("                                                                           \n");
 	felog.printf("  FEBio is a registered trademark.                                         \n");
-	felog.printf("  copyright (c) 2006-2015 - All rights reserved                            \n");
+	felog.printf("  copyright (c) 2006-2016 - All rights reserved                            \n");
 	felog.printf("                                                                           \n");
 
 #ifdef NALPLIB
@@ -111,9 +111,9 @@ int Hello()
 
 	if (NSL.CheckLicense()) return 1;
 #else
-	felog.printf(" This is the NON-COMMERCIAL version of FEBio. This version may only be          \n");
-	felog.printf(" used for non-commercial purposes as described in the license agreement.        \n");
-	felog.printf(" To obtain a valid commercial license file, please contact the developers.      \n");
+	felog.printf(" This is the NON-COMMERCIAL version of FEBio. This version may only be  \n");
+	felog.printf(" used for non-commercial purposes as described in the license agreement.\n");
+	felog.printf(" To obtain a valid commercial license file, please contact the developers.\n");
 #endif
 
 	/* Used with KeyGen

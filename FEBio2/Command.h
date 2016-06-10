@@ -14,7 +14,7 @@ public:
 
 	void SetName(const char* szname)
 	{
-		int l = strlen(szname);
+		int l = (int)strlen(szname);
 		assert(l);
 		m_pszname = new char[l+1];
 		strcpy(m_pszname, szname);
@@ -22,7 +22,7 @@ public:
 
 	void SetDescription(const char* szdesc)
 	{
-		int l = strlen(szdesc);
+		int l = (int)strlen(szdesc);
 		assert(l);
 		m_pszdesc = new char[l+1];
 		strcpy(m_pszdesc, szdesc);

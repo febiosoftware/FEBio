@@ -133,9 +133,9 @@ public:
 	public:
 		bool AddVariable(FEModel* pfem, const char* szname, vector<int>& item, const char* szdom = "");
 
-		int NodalVariables  () { return m_Node.size(); }
-		int DomainVarialbes () { return m_Elem.size(); }
-		int SurfaceVariables() { return m_Face.size(); }
+		int NodalVariables() { return (int)m_Node.size(); }
+		int DomainVarialbes() { return (int)m_Elem.size(); }
+		int SurfaceVariables() { return (int)m_Face.size(); }
 
 		void Defaults(FEModel& fem);
 

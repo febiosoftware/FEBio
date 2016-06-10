@@ -50,7 +50,7 @@ public:
 	FEParamIteratorConst first() const { return m_pl.begin(); }
 
 	//! number of parameters
-	int Parameters() const { return m_pl.size(); }
+	int Parameters() const { return (int) m_pl.size(); }
 
 	//! return the parameter container
 	FEParamContainer* GetContainer() { return m_pc; }

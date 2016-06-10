@@ -413,12 +413,6 @@ void FECGSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 	if (m_fem.NonlinearConstraints() > 0) UpdateConstraints();
 
 	// intialize material point data
-	// NOTE: do this before the stresses are updated
-	// TODO: does it matter if the stresses are updated before
-	//       the material point data is initialized
-	FEMaterialPoint::dt = tp.timeIncrement;
-	FEMaterialPoint::time = tp.currentTime;
-
 	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(timeInfo);
 
 	// update stresses

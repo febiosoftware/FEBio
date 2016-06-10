@@ -11,7 +11,7 @@ public:
 public:
 	void Create(int nsize, int elemType);
 
-	int Elements() const { return m_Elem.size(); }
+	int Elements() const { return (int)m_Elem.size(); }
 
 	FETrussElement& Element(int i) { return m_Elem[i]; }
 

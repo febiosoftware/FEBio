@@ -109,7 +109,7 @@ public:	// --- Load curve functions ----
 	FELoadCurve* GetLoadCurve(int i) { return m_LC[i]; }
 
 	//! get the number of loadcurves
-	int LoadCurves() { return m_LC.size(); }
+	int LoadCurves() { return (int)m_LC.size(); }
 
 public: // --- Material functions ---
 
@@ -117,7 +117,7 @@ public: // --- Material functions ---
 	void AddMaterial(FEMaterial* pm) { m_MAT.push_back(pm); }
 
 	//! get the number of materials
-	int Materials() { return m_MAT.size(); }
+	int Materials() { return (int)m_MAT.size(); }
 
 	//! return a pointer to a material
 	FEMaterial* GetMaterial(int i) { return m_MAT[i]; }
@@ -210,7 +210,7 @@ public: // --- Analysis steps functions ---
 public: // --- Contact interface functions ---
 
 	//! return number of surface pair interactions
-	int SurfacePairInteractions() { return m_CI.size(); } 
+	int SurfacePairInteractions() { return (int)m_CI.size(); }
 
 	//! retrive a surface pair interaction
 	FESurfacePairInteraction* SurfacePairInteraction(int i) { return m_CI[i]; }

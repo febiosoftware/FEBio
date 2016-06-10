@@ -168,7 +168,7 @@ public:
 
 	void add(const FENodeSet& ns);
 
-	int size() const { return m_Node.size(); }
+	int size() const { return (int) m_Node.size(); }
 
 	int& operator [] (int i) { return m_Node[i]; }
 
@@ -203,7 +203,7 @@ public:
 public:
 	FEDiscreteSet(FEMesh* pm);
 	void create(int n);
-	int size() const { return m_pair.size(); }
+	int size() const { return (int)m_pair.size(); }
 
 	void add(int n0, int n1);
 
@@ -281,7 +281,7 @@ public:
 
 	void create(int n);
 
-	int size() { return m_Elem.size(); }
+	int size() { return (int)m_Elem.size(); }
 
 	int& operator [] (int i) { return m_Elem[i]; }
 
@@ -322,7 +322,7 @@ public:
 	void AddNodes(int nodes);
 
 	//! return number of nodes
-	int Nodes() const { return m_Node.size(); }
+	int Nodes() const { return (int)m_Node.size(); }
 
 	//! return total nr of elements
 	int Elements() const;

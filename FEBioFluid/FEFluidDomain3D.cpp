@@ -199,6 +199,8 @@ void FEFluidDomain3D::ElementInternalForceGalerkin(FESolidElement& el, vector<do
     vector<vec3d> gradN(neln);
     
     double*	gw = el.GaussWeights();
+
+	double dt = GetFEModel()->GetTime().timeIncrement;
     
     // repeat for all integration points
     for (n=0; n<nint; ++n)
@@ -229,7 +231,7 @@ void FEFluidDomain3D::ElementInternalForceGalerkin(FESolidElement& el, vector<do
         
         // this is the governing equation for J
         double divv = pt.m_L.trace();
-        double f = ((pt.m_J - pt.m_Jp)/mp.dt)*m_btrans + pt.m_gradJ*pt.m_vt - pt.m_J*divv;
+        double f = ((pt.m_J - pt.m_Jp)/dt)*m_btrans + pt.m_gradJ*pt.m_vt - pt.m_J*divv;
         
         for (i=0; i<neln; ++i)
         {
@@ -265,6 +267,8 @@ void FEFluidDomain3D::ElementInternalForceSUPG(FESolidElement& el, vector<double
     int neln = el.Nodes();
     
     double tau;
+
+	double dt = GetFEModel()->GetTime().timeIncrement;
     
     // gradient of shape functions
     vector<vec3d> gradN(neln);
@@ -310,7 +314,7 @@ void FEFluidDomain3D::ElementInternalForceSUPG(FESolidElement& el, vector<double
         
         // this is the governing equation for J
         double divv = pt.m_L.trace();
-        double f = ((pt.m_J - pt.m_Jp)/mp.dt)*m_btrans + pt.m_gradJ*pt.m_vt - pt.m_J*divv;
+        double f = ((pt.m_J - pt.m_Jp)/dt)*m_btrans + pt.m_gradJ*pt.m_vt - pt.m_J*divv;
         
         for (i=0; i<neln; ++i)
         {
@@ -473,6 +477,8 @@ void FEFluidDomain3D::ElementStiffnessGalerkin(FESolidElement &el, matrix &ke)
     
     // gradient of shape functions
     vector<vec3d> gradN(neln);
+
+	double dt = GetFEModel()->GetTime().timeIncrement;
     
     double *H, *Gr, *Gs, *Gt;
     
@@ -519,7 +525,7 @@ void FEFluidDomain3D::ElementStiffnessGalerkin(FESolidElement &el, matrix &ke)
                 mat3d Kvv = vdotTdotv(gradN[i], cv, gradN[j]);
                 vec3d kJv = (pt.m_gradJ*H[j] - gradN[j]*pt.m_J)*H[i];
                 vec3d kvJ = (sJ*gradN[i])*H[j];
-                double kJJ = (H[j]*((1.0*m_btrans)/mp.dt - divv) + gradN[j]*pt.m_vt)*H[i];
+                double kJJ = (H[j]*((1.0*m_btrans)/dt - divv) + gradN[j]*pt.m_vt)*H[i];
                 
                 ke[i4  ][j4  ] += Kvv(0,0)*detJ;
                 ke[i4  ][j4+1] += Kvv(0,1)*detJ;
@@ -566,6 +572,8 @@ void FEFluidDomain3D::ElementStiffnessSUPG(FESolidElement &el, matrix &ke)
     
     // weights at gauss points
     const double *gw = el.GaussWeights();
+
+	double dt = GetFEModel()->GetTime().timeIncrement;
     
     // calculate element stiffness matrix
     for (n=0; n<nint; ++n)
@@ -606,7 +614,7 @@ void FEFluidDomain3D::ElementStiffnessSUPG(FESolidElement &el, matrix &ke)
         
         // this is the governing equation for J
         double divv = pt.m_L.trace();
-        double f = ((pt.m_J - pt.m_Jp)/mp.dt)*m_btrans + pt.m_gradJ*pt.m_vt - pt.m_J*divv;
+        double f = ((pt.m_J - pt.m_Jp)/dt)*m_btrans + pt.m_gradJ*pt.m_vt - pt.m_J*divv;
         
         double dpdJJ = m_pMat->GetElastic()->Tangent_Pressure_Strain_Strain(mp);
         // TODO: add viscosity derivatives terms
@@ -616,7 +624,7 @@ void FEFluidDomain3D::ElementStiffnessSUPG(FESolidElement &el, matrix &ke)
         for (j=0, j4 = 0; j<neln; ++j, j4 += 4)
         {
             // TODO: add Cb term
-            mat3d Fb = (mat3dd(gradN[j]*pt.m_vt + H[j]/mp.dt*m_btrans)
+            mat3d Fb = (mat3dd(gradN[j]*pt.m_vt + H[j]/dt*m_btrans)
                         + pt.m_L*H[j])*(-rho);
             vec3d fb = (divTJp + pt.m_at*(rho/pt.m_J))*H[j] + sJ*gradN[j];
             for (i=0, i4=0; i<neln; ++i, i4 += 4)
@@ -624,7 +632,7 @@ void FEFluidDomain3D::ElementStiffnessSUPG(FESolidElement &el, matrix &ke)
                 mat3d Kvv = (mat3dd(gradN[i]*fv*H[j]) + (pt.m_vt & (Fb.transpose()*gradN[i])))*tau;
                 vec3d kJv = (gradN[i]*(f*H[j]) + (pt.m_gradJ*H[j] - gradN[j]*pt.m_J)*(gradN[i]*pt.m_vt))*tau;
                 vec3d kvJ = pt.m_vt*(gradN[i]*fb*tau);
-                double kJJ = ((1.0*m_btrans/mp.dt - divv)*H[j] + gradN[j]*pt.m_vt)*(gradN[i]*pt.m_vt)*tau;
+                double kJJ = ((1.0*m_btrans/dt - divv)*H[j] + gradN[j]*pt.m_vt)*(gradN[i]*pt.m_vt)*tau;
                 
                 ke[i4  ][j4  ] += Kvv(0,0)*detJ;
                 ke[i4  ][j4+1] += Kvv(0,1)*detJ;
@@ -769,6 +777,8 @@ void FEFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
     
     // weights at gauss points
     const double *gw = el.GaussWeights();
+
+	double dt = GetFEModel()->GetTime().timeIncrement;
     
     // calculate element stiffness matrix
     for (n=0; n<nint; ++n)
@@ -791,7 +801,6 @@ void FEFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         
-        double dt = mp.dt;
         double dens = m_pMat->Density(mp);
         
         // evaluate spatial gradient of shape functions
@@ -1001,6 +1010,8 @@ double FEFluidDomain3D::tauSUPG(FEMaterialPoint& mp, const int neln, const vecto
     double tau, tau1, tau2, tau3;
     tau = tau1 = tau2 = tau3 = 0;
 
+	double dt = GetFEModel()->GetTime().timeIncrement;
+
     FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
     
     double c = m_pMat->AcousticSpeed(mp);
@@ -1013,7 +1024,7 @@ double FEFluidDomain3D::tauSUPG(FEMaterialPoint& mp, const int neln, const vecto
         tau1 += c*fabs(j*gradN[i]) + fabs(pt.m_vt*gradN[i]);
         tau3 += fabs(r*gradN[i]);
     }
-    tau2 = 2./mp.dt;
+    tau2 = 2./dt;
     tau3 = nu*tau3*tau3;
     tau = tau1*tau1 + m_btrans*tau2*tau2 + tau3*tau3;
     if (tau > 0) tau = pow(tau,-0.5);

@@ -61,10 +61,6 @@ public:
 protected:
 	FEMaterialPoint*	m_pNext;	//<! next data in the list
 	FEMaterialPoint*	m_pPrev;	//<! previous data in the list
-
-public:
-	static double time;	// time value
-	static double dt; // time increment
 };
 
 //-----------------------------------------------------------------------------

@@ -53,9 +53,6 @@ bool FELinearSolidSolver::Quasin(double time)
 	// prepare step
     FETimeInfo tp = m_fem.GetTime();
 
-	FEMaterialPoint::dt = tp.timeIncrement;
-	FEMaterialPoint::time = tp.currentTime;
-
 	FEMesh& mesh = m_fem.GetMesh();
 	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 

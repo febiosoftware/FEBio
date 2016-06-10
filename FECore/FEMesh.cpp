@@ -634,7 +634,7 @@ void FEMesh::Reset()
         node.m_Fr = vec3d(0,0,0);
 
 		// reset ID arrays
-		int ndof = node.m_ID.size();
+		int ndof = (int)node.m_ID.size();
 		for (int i=0; i<ndof; ++i) 
 		{
 			node.m_ID[i] = DOF_FIXED;
