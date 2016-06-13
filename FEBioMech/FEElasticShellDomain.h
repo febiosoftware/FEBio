@@ -14,7 +14,7 @@ public:
 	FEElasticShellDomain& operator = (FEElasticShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	//! Initialize domain
-	bool Initialize(FEModel& fem);
+	bool Initialize();
 
 	//! Activate the domain
 	void Activate();

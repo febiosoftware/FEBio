@@ -84,9 +84,6 @@ public:
 	// get the rigid system
 	FERigidSystem* GetRigidSystem() { return m_prs; }
 
-	//! Initialize mesh data
-	bool InitMesh();
-
 	//! Validate BC's
 	bool InitBCs();
 

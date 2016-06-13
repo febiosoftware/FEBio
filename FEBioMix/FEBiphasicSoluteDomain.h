@@ -28,7 +28,7 @@ public:
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 	//! initialize class
-	bool Initialize(FEModel& fem);
+	bool Initialize();
 
 	//! Activate
 	void Activate();

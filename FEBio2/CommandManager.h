@@ -16,11 +16,11 @@ public:
 
 public:
 	void AddCommand(Command* pcmd) { m_Cmd.push_back(pcmd); }
-	int Size() { return m_Cmd.size(); }
+	int Size() { return (int)m_Cmd.size(); }
 
 	Command* Find(const char* szcmd)
 	{
-		int N = m_Cmd.size();
+		int N = (int)m_Cmd.size();
 		if (N == 0) return 0;
 
 		list<Command*>::iterator ic = m_Cmd.begin();

@@ -11,7 +11,7 @@ public:
 	FERigidSolidDomain(FEModel* pfem);
 
 	//! Initialize
-	bool Initialize(FEModel& fem);
+	bool Initialize();
 
 	//! reset data
 	void Reset();

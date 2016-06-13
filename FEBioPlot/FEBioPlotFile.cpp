@@ -344,6 +344,34 @@ FEBioPlotFile::~FEBioPlotFile(void)
 }
 
 //-----------------------------------------------------------------------------
+bool FEBioPlotFile::AddVariable(FEPlotData* ps, const char* szname)
+{
+	vector<int> dummy;
+	switch (ps->RegionType())
+	{
+	case FE_REGION_NODE: return m_dic.AddNodalVariable(ps, szname, dummy);
+	case FE_REGION_DOMAIN: return m_dic.AddDomainVariable(ps, szname, dummy);
+	case FE_REGION_SURFACE: return m_dic.AddSurfaceVariable(ps, szname, dummy);
+	default:
+		assert(false);
+		return false;
+	}
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioPlotFile::AddVariable(const char* sz)
+{
+	vector<int> dummy;
+	return AddVariable(sz, dummy);
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioPlotFile::AddVariable(const char* sz, vector<int>& item, const char* szdom)
+{ 
+	return m_dic.AddVariable(&m_fem, sz, item, szdom); 
+}
+
+//-----------------------------------------------------------------------------
 void FEBioPlotFile::SetCompression(int n)
 {
 	m_ncompress = n;

@@ -215,14 +215,15 @@ void FEUT4Domain::BuildMatrixProfile(FEGlobalMatrix& M)
 //-----------------------------------------------------------------------------
 //! Initialization for the UT4Domain.
 //! Note that we first initialize the base class before initializing the domain.
-bool FEUT4Domain::Initialize(FEModel& mdl)
+bool FEUT4Domain::Initialize()
 {
 	// first call the base class
-	if (FEElasticSolidDomain::Initialize(mdl) == false) return false;
+	if (FEElasticSolidDomain::Initialize() == false) return false;
 
 	// copy model parameters
-	m_alpha = mdl.m_ut4_alpha;
-	m_bdev  = mdl.m_ut4_bdev;
+	FEModel& fem = *GetFEModel();
+	m_alpha = fem.m_ut4_alpha;
+	m_bdev  = fem.m_ut4_bdev;
 
 	// next, we need to identify all the nodes that belong to this domain
 	// we do this by looping over all the elements and tagging the nodes
@@ -230,7 +231,7 @@ bool FEUT4Domain::Initialize(FEModel& mdl)
 	m_tag.assign(NN, -1);
 
 	int i, j;
-	int N = m_Node.size();
+	int N = (int)m_Node.size();
 	for (i=0; i<N; ++i) m_tag[m_Node[i]] = i;
 
 	// allocate node structure
@@ -496,7 +497,7 @@ void FEUT4Domain::ElementInternalForces(FEGlobalVector& R)
 
 	vector<int> lm;
 
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -951,7 +952,7 @@ void FEUT4Domain::ElementalStiffnessMatrix(FESolver *psolver)
 	vector<int> elm;
 
 	// repeat over all solid elements
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];

@@ -12,9 +12,9 @@ void FEDiscreteDomain::Create(int nelems, int elemType)
 }
 
 //-----------------------------------------------------------------------------
-bool FEDiscreteDomain::Initialize(FEModel &fem)
+bool FEDiscreteDomain::Initialize()
 {
-	if (FEDomain::Initialize(fem) == false) return false;
+	if (FEDomain::Initialize() == false) return false;
 
 	FEMaterial* pmat = GetMaterial();
 	if (pmat) SetMatID(pmat->GetID());

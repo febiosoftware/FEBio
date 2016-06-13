@@ -39,19 +39,24 @@ void FEElasticSolidDomain::SetMaterial(FEMaterial* pmat)
 
 //-----------------------------------------------------------------------------
 //! \todo The material point initialization needs to move to the base class.
-bool FEElasticSolidDomain::Initialize(FEModel &fem)
+bool FEElasticSolidDomain::Initialize()
 {
 	// initialize base class
-	FESolidDomain::Initialize(fem);
+	FESolidDomain::Initialize();
 
 	// get the elements material
-	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-
-	// assign local coordinate system to each integration point
-	for (size_t i=0; i<m_Elem.size(); ++i)
+	if (m_pMat)
 	{
-		FESolidElement& el = m_Elem[i];
-		for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
+		FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
+		if (pme)
+		{
+			// assign local coordinate system to each integration point
+			for (size_t i=0; i<m_Elem.size(); ++i)
+			{
+				FESolidElement& el = m_Elem[i];
+				for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
+			}
+		}
 	}
 
 	// check for initially inverted elements

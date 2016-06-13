@@ -13,11 +13,12 @@ FEElasticMultiscaleDomain1O::FEElasticMultiscaleDomain1O(FEModel* pfem) : FEElas
 
 //-----------------------------------------------------------------------------
 //! intialize domain
-bool FEElasticMultiscaleDomain1O::Initialize(FEModel& fem)
+bool FEElasticMultiscaleDomain1O::Initialize()
 {
-	if (FEElasticSolidDomain::Initialize(fem) == false) return false;
+	if (FEElasticSolidDomain::Initialize() == false) return false;
 
 	// get the material
+	FEModel& fem = *GetFEModel();
 	FEMicroMaterial* pmat = dynamic_cast<FEMicroMaterial*>(m_pMat);
 	if (m_pMat == 0) return false;
 

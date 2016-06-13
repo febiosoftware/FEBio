@@ -30,10 +30,10 @@ void FERemodelingElasticDomain::Reset()
 
 //-----------------------------------------------------------------------------
 //! \todo The material point initialization needs to move to the base class.
-bool FERemodelingElasticDomain::Initialize(FEModel &fem)
+bool FERemodelingElasticDomain::Initialize()
 {
 	// initialize base class
-	if (FEElasticSolidDomain::Initialize(fem) == false) return false;
+	if (FEElasticSolidDomain::Initialize() == false) return false;
 
 	// get the elements material
 	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();

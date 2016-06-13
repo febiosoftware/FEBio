@@ -590,6 +590,12 @@ bool FEMesh::Init()
 	// TODO: Not sure why this is here
 	Reset();
 
+	// initialize all domains
+	for (int i = 0; i<Domains(); ++i)
+	{
+		if (Domain(i).Initialize() == false) return false;
+	}
+
 	// All done
 	return true;
 }

@@ -168,7 +168,7 @@ bool break_point_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	double t = pfem->GetTime().currentTime;
 
 	Interruption itr;
-	int nbp = break_points.size();
+	int nbp = (int)break_points.size();
 	for (int i=0; i<nbp; ++i)
 	{
 		pair<double, int>& bpi = break_points[i];

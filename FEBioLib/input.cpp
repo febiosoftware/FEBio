@@ -26,7 +26,7 @@
 void print_parameter(FEParam& p)
 {
 	char sz[512] = {0};
-	int l = strlen(p.name());
+	int l = (int)strlen(p.name());
 	sprintf(sz, "\t%-*s %.*s", l, p.name(), 50-l, "..................................................");
 	if (p.dim() == 1)
 	{

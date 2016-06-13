@@ -182,7 +182,9 @@ public:
 	bool Write(FEModel& fem);
 
 	//! Add a variable to the dictionary
-	bool AddVariable(const char* sz, vector<int>& item, const char* szdom = "") { return m_dic.AddVariable(&m_fem, sz, item, szdom); }
+	bool AddVariable(FEPlotData* ps, const char* szname);
+	bool AddVariable(const char* sz);
+	bool AddVariable(const char* sz, vector<int>& item, const char* szdom = "");
 
 	//! Set the compression level
 	void SetCompression(int n);

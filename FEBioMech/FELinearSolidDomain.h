@@ -26,7 +26,7 @@ public:
 	FEMaterial* GetMaterial();
 
 	//! Initialization
-	bool Initialize(FEModel& fem);
+	bool Initialize();
 
 	//! reset element data
 	void Reset();

@@ -14,10 +14,12 @@ FEElasticMultiscaleDomain2O::FEElasticMultiscaleDomain2O(FEModel* pfem) : FEElas
 
 //-----------------------------------------------------------------------------
 //! Initialize element data
-bool FEElasticMultiscaleDomain2O::Initialize(FEModel& fem)
+bool FEElasticMultiscaleDomain2O::Initialize()
 {
 	// initialize base class first
-	if (FEElasticSolidDomain2O::Initialize(fem) == false) return false;
+	if (FEElasticSolidDomain2O::Initialize() == false) return false;
+
+	FEModel& fem = *GetFEModel();
 
 	// initialze RVEs
 	const int NE = FEElement::MAX_NODES;

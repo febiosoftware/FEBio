@@ -17,7 +17,7 @@ public:
     FEFluidDomain3D& operator = (FEFluidDomain3D& d);
     
     //! initialize class
-    bool Initialize(FEModel& fem);
+    bool Initialize();
     
     //! initialize elements
     void PreSolveUpdate(const FETimeInfo& timeInfo);

@@ -257,10 +257,10 @@ FEElasticSolidDomain2O::FEElasticSolidDomain2O(FEModel* pfem) : FEElasticSolidDo
 
 //-----------------------------------------------------------------------------
 //! Initialize element data
-bool FEElasticSolidDomain2O::Initialize(FEModel& fem)
+bool FEElasticSolidDomain2O::Initialize()
 {
 	// initialize base class first
-	if (FEElasticSolidDomain::Initialize(fem) == false) return false;
+	if (FEElasticSolidDomain::Initialize() == false) return false;
 
 	// initialize the internal surface data
 	if (m_surf.Initialize(this) == false) return false;

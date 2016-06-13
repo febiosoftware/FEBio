@@ -10,7 +10,7 @@ public:
 	FEUDGHexDomain(FEModel* pfem);
 
 	//! initialize class
-	bool Initialize(FEModel& fem);
+	bool Initialize();
 
 public:
 	//! calculates the residual

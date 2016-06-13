@@ -285,7 +285,7 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 	}
 
 	if (bc.empty()) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
-	int nbc = bc.size();
+	int nbc = (int)bc.size();
 
 	// create the fixed BC's
 	vector<FEFixedBC*> pbc(nbc);
@@ -353,7 +353,7 @@ void FEBioBoundarySection::ParseBCFix25(XMLTag &tag)
 
 	// check the list
 	if (bc.empty()) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
-	int nbc = bc.size();
+	int nbc = (int)bc.size();
 	for (int i=0; i<nbc; ++i) if (bc[i] == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
 	// get the nodeset

@@ -26,7 +26,11 @@ void FESolidDomain::Reset()
 	{
 		FESolidElement& el = Element(i);
 		int nint = el.GaussPoints();
-		for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->Init();
+		for (int j=0; j<nint; ++j)
+		{
+			FEMaterialPoint* pt = el.GetMaterialPoint(j);
+			if (pt) pt->Init();
+		}
 	}
 }
 

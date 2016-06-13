@@ -129,7 +129,7 @@ public:
 	//! return a linear constraint
 	OPT_LIN_CONSTRAINT& Constraint(int i) { return m_LinCon[i]; }
 
-	int Variables() { return m_Var.size(); }
+	int Variables() { return (int)m_Var.size(); }
 
 	OPT_VARIABLE& Variable(int n) { return m_Var[n]; }
 

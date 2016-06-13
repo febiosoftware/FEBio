@@ -56,10 +56,11 @@ void FEThermoElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 }
 
 //-----------------------------------------------------------------------------
-bool FEThermoElasticSolidDomain::Initialize(FEModel &fem)
+bool FEThermoElasticSolidDomain::Initialize()
 {
 	// initialize base class
-	FESolidDomain::Initialize(fem);
+	FESolidDomain::Initialize();
+	FEModel& fem = *GetFEModel();
 	const int dof_T = fem.GetDOFS().GetDOF("T");
 	if (dof_T == -1) { assert(false); return false; }
     

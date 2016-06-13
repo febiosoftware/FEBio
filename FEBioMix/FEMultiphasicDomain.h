@@ -37,7 +37,7 @@ public:
 	void StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimeInfo& tp);
 	
 	//! initialize class
-	bool Initialize(FEModel& fem);
+	bool Initialize();
 
 	//! activate
 	void Activate();

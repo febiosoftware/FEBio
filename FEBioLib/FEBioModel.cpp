@@ -224,7 +224,7 @@ bool FEBioModel::Input(const char* szfile)
 	}
 
 	// add the data records
-	int ND = fim.m_data.size();
+	int ND = (int)fim.m_data.size();
 	for (int i=0; i<ND; ++i) AddDataRecord(fim.m_data[i]);
 
 	// we're done reading

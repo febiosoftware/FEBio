@@ -17,7 +17,7 @@ public:
 	FEElasticSolidDomain& operator = (FEElasticSolidDomain& d);
 
 	//! initialize class
-	bool Initialize(FEModel& fem);
+	bool Initialize();
 
 	//! activate
 	void Activate();

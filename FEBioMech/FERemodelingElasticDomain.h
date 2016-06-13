@@ -15,7 +15,7 @@ public:
 	void Reset();
 
 	//! initialize class
-	bool Initialize(FEModel& fem);
+	bool Initialize();
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolver* psolver);

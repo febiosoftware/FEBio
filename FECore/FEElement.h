@@ -158,6 +158,10 @@ public:
 	//! assignment operator
 	FESolidElement& operator = (const FESolidElement& el);
 
+	double gr(int n) const { return ((FESolidElementTraits*)(m_pT))->gr[n]; }	// integration point coordinate r
+	double gs(int n) const { return ((FESolidElementTraits*)(m_pT))->gs[n]; }	// integration point coordinate s
+	double gt(int n) const { return ((FESolidElementTraits*)(m_pT))->gt[n]; }	// integration point coordinate t
+
 	double* GaussWeights() const { return &((FESolidElementTraits*)(m_pT))->gw[0]; }			// weights of integration points
 
 	double* Gr(int n) const { return ((FESolidElementTraits*)(m_pT))->Gr[n]; }	// shape function derivative to r

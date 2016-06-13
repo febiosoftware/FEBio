@@ -207,7 +207,7 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 	m_yopt = y;
 
 	// now calculate the derivatives using forward differences
-	int ndata = x.size();
+	int ndata = (int)x.size();
 	vector<double> a1(a);
 	vector<double> y1(ndata);
 	int ma = a.size();

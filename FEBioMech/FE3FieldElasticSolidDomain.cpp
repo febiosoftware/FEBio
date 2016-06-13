@@ -6,11 +6,11 @@
 
 //-----------------------------------------------------------------------------
 //! Initialize the 3-field domain data
-bool FE3FieldElasticSolidDomain::Initialize(FEModel &fem)
+bool FE3FieldElasticSolidDomain::Initialize()
 {
 	// make sure the domain material uses an uncoupled formulation
 	if (dynamic_cast<FEUncoupledMaterial*>(m_pMat) == 0) return false;
-	if (FEElasticSolidDomain::Initialize(fem) == false) return false;
+	if (FEElasticSolidDomain::Initialize() == false) return false;
 
 	// allocate element data
 	int NE = Elements();

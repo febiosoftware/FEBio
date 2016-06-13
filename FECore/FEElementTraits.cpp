@@ -529,7 +529,7 @@ void FETet10_::shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, 
 	Hrr[4] = -8.0; Hss[4] =  0.0; Htt[4] =  0.0;
 	Hrr[5] =  0.0; Hss[5] =  0.0; Htt[5] =  0.0;
 	Hrr[6] =  0.0; Hss[6] = -8.0; Htt[6] =  0.0;
-	Hrr[7] =  0.0; Hss[7] =  0.0; Htt[7] =  8.0;
+	Hrr[7] =  0.0; Hss[7] =  0.0; Htt[7] =  -8.0;
 	Hrr[8] =  0.0; Hss[8] =  0.0; Htt[8] =  0.0;
 	Hrr[9] =  0.0; Hss[9] =  0.0; Htt[9] =  0.0;
 

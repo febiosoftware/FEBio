@@ -59,13 +59,14 @@ void FEBiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBiphasicSolidDomain::Initialize(FEModel &fem)
+bool FEBiphasicSolidDomain::Initialize()
 {
 	// initialize base class
-	FESolidDomain::Initialize(fem);
+	FESolidDomain::Initialize();
     
     // initialize body forces
-    m_pMat->m_bf.clear();
+	FEModel& fem = *GetFEModel();
+	m_pMat->m_bf.clear();
     for (int j=0; j<fem.BodyLoads(); ++j)
     {
         FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));

@@ -139,7 +139,7 @@ bool FEModel::Init()
 	if (InitBCs() == false) return false;
 
 	// initialize material data
-	// NOTE: call this before InitMesh since we need to initialize the FECoordSysMap
+	// NOTE: call this before FEMesh::Init() since we need to initialize the FECoordSysMap
 	//       before we can calculate the local element coordinate systems.
 	// NOTE: This must be called after the rigid system is initialiazed since the rigid materials will
 	//       reference the rigid bodies
@@ -154,7 +154,7 @@ bool FEModel::Init()
 	// NOTE: this must be done AFTER the elements have been assigned material point data !
 	// this is because the mesh data is reset
 	// TODO: perhaps I should not reset the mesh data during the initialization
-	if (InitMesh() == false) return false;
+	if (m_mesh.Init() == false) return false;
 
 	// initialize contact data
 	if (InitContact() == false) return false;
@@ -201,28 +201,6 @@ bool FEModel::InitBCs()
 	{
 		FENodalLoad* pbc = NodalLoad(i);
 		if (pbc->Init() == false) return false;
-	}
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Update the mesh data. This function calculates the initial directors
-//! for the shell elements.
-
-// NOTE: This function needs to be called after the rigid bodies have been
-// initialized
-
-bool FEModel::InitMesh()
-{
-	// Initialize mesh
-	if (m_mesh.Init() == false) return false;
-
-	// intialize domain data
-	// TODO: I'd like the mesh to take care of this, but I need to pass a FEModel pointer for some reason.
-	for (int i=0; i<m_mesh.Domains(); ++i)
-	{
-		if (m_mesh.Domain(i).Initialize(*this) == false) return false;
 	}
 
 	return true;

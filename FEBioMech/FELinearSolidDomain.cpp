@@ -40,10 +40,10 @@ FEMaterial* FELinearSolidDomain::GetMaterial() { return m_pMat; }
 
 //-----------------------------------------------------------------------------
 //! \todo The material point initialization needs to move to the base class.
-bool FELinearSolidDomain::Initialize(FEModel &mdl)
+bool FELinearSolidDomain::Initialize()
 {
 	// initialize base class
-	FESolidDomain::Initialize(mdl);
+	FESolidDomain::Initialize();
 
 	// set the local element coordinate system
 	// this is defined by the material's fiber or matrix option

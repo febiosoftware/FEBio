@@ -78,7 +78,7 @@ void FEDomain::SetDOF(vector<int>& dof)
 void FEDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	int N = el.Nodes();
-	int ndofs = m_dof.size();
+	int ndofs = (int)m_dof.size();
 	lm.resize(N*ndofs);
 	for (int i=0; i<N; ++i)
 	{
@@ -142,7 +142,7 @@ void FEDomain::CopyFrom(FEDomain* pd)
 }
 
 //-----------------------------------------------------------------------------
-bool FEDomain::Initialize(FEModel& fem)
+bool FEDomain::Initialize()
 {
 	// make sure that there are elements in this domain
 	if (Elements() == 0) return false;
