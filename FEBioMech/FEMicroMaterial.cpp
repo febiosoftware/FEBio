@@ -12,9 +12,9 @@
 #include <sstream>
 
 //=============================================================================
-FERVEProbe::FERVEProbe(FEModel& fem, FEModel& rve, const char* szfile) : FECallBack(&fem, CB_MAJOR_ITERS | CB_INIT | CB_SOLVED), m_rve(rve), m_file(szfile) 
+FERVEProbe::FERVEProbe(FEModel& fem, FEModel& rve, const char* szfile) : FECallBack(&fem, CB_ALWAYS), m_rve(rve), m_file(szfile) 
 {
-
+	m_bdebug = false;
 }
 
 bool FERVEProbe::Execute(FEModel& fem, int nwhen)
@@ -30,12 +30,15 @@ bool FERVEProbe::Execute(FEModel& fem, int nwhen)
 		}
 
 		// write the initial state
-		m_xplt->Write(m_rve);
+		Save();
+	}
+	else if (nwhen == CB_MINOR_ITERS)
+	{
+		if (m_bdebug) Save();
 	}
 	else if (nwhen == CB_MAJOR_ITERS)	// store the current state
 	{
-		// write the deformed state
-		if (m_xplt) m_xplt->Write(m_rve);
+		Save();
 	}
 	else if (nwhen == CB_SOLVED)	// clean up
 	{
@@ -44,6 +47,11 @@ bool FERVEProbe::Execute(FEModel& fem, int nwhen)
 	}
 
 	return true;
+}
+
+void FERVEProbe::Save()
+{
+	if (m_xplt) m_xplt->Write(m_rve);
 }
 
 //=============================================================================
@@ -100,6 +108,7 @@ BEGIN_PARAMETER_LIST(FEMicroProbe, FEMaterial)
 	ADD_PARAMETER(m_neid  , FE_PARAM_INT   , "element_id");
 	ADD_PARAMETER(m_ngp   , FE_PARAM_INT   , "gausspt"   );
 	ADD_PARAMETER(m_szfile, FE_PARAM_STRING, "file"      );
+	ADD_PARAMETER(m_bdebug, FE_PARAM_BOOL  , "debug"     );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -108,6 +117,12 @@ FEMicroProbe::FEMicroProbe(FEModel* pfem) : FEMaterial(pfem)
 	m_neid = -1;	// invalid element - this must be defined by user
 	m_ngp = 1;		// by default, first gauss point (note is one-based!)
 	sprintf(m_szfile, "rve.xplt");
+	m_probe = 0;
+}
+
+FEMicroProbe::~FEMicroProbe()
+{
+	if (m_probe) delete m_probe;
 }
 
 //=============================================================================
@@ -232,7 +247,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	felog.SetMode(nmode);
 
 	// make sure it converged
-	if (bret == false) throw FEMultiScaleException();
+	if (bret == false) throw FEMultiScaleException(-1, -1);
 
 	// calculate the averaged Cauchy stress
 	mat3ds sa = AveragedStress(mmpt.m_rve, mp);

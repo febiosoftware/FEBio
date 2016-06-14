@@ -33,10 +33,10 @@ bool FEElasticMultiscaleDomain2O::Initialize()
 	{
 		FESolidElement& el = m_Elem[i];
 		int neln = el.Nodes();
-		for (int i=0; i<neln; ++i)
+		for (int j=0; j<neln; ++j)
 		{
-			x0[i] = m.Node(el.m_node[i]).m_r0;
-			xt[i] = m.Node(el.m_node[i]).m_rt;
+			x0[j] = m.Node(el.m_node[j]).m_r0;
+			xt[j] = m.Node(el.m_node[j]).m_rt;
 		}
 
 		int n = el.GaussPoints();
@@ -48,6 +48,8 @@ bool FEElasticMultiscaleDomain2O::Initialize()
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 			FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
+			mmpt2O.m_elem_id = el.GetID();
+			mmpt2O.m_gpt_id = j;
 
 			// initialize the material point RVE
 			// This essentially copies the master RVE to the material point RVE
@@ -68,6 +70,8 @@ bool FEElasticMultiscaleDomain2O::Initialize()
 			{
 				FEMaterialPoint& mp = *m_surf.GetData(nnf).m_pt[k];
 				FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
+				mmpt2O.m_elem_id = -i-1;
+				mmpt2O.m_gpt_id = n + k*nint;
 
 				// Initialize the material point RVE
 				// This essentially copies the master RVE model to the material points
@@ -81,9 +85,11 @@ bool FEElasticMultiscaleDomain2O::Initialize()
 	for (int i=0; i<NP; ++i)
 	{
 		FEMicroProbe& p = pmat->Probe(i);
-		FEElement* pel = FindElementFromID(p.m_neid);
-		if (pel)
+		if (p.m_neid > 0)
 		{
+			FEElement* pel = FindElementFromID(p.m_neid);
+			if (pel == 0) return fecore_error("Invalid Element ID for micro probe %d in material %d (%s)", i + 1, m_pMat->GetID(), m_pMat->GetName());
+
 			int nint = pel->GaussPoints();
 			int ngp = p.m_ngp - 1;
 			if ((ngp>=0)&&(ngp<nint))
@@ -91,11 +97,63 @@ bool FEElasticMultiscaleDomain2O::Initialize()
 				FEMaterialPoint& mp = *pel->GetMaterialPoint(ngp);
 				FEMicroMaterialPoint2O& mmpt = *mp.ExtractData<FEMicroMaterialPoint2O>();
 				FERVEProbe* prve = new FERVEProbe(fem, mmpt.m_rve, p.m_szfile);
+				p.m_probe = prve;
+				prve->SetDebugFlag(p.m_bdebug);
 			}
 			else return fecore_error("Invalid gausspt number for micro-probe %d in material %d (%s)", i+1, m_pMat->GetID(), m_pMat->GetName());
 		}
-		else return fecore_error("Invalid Element ID for micro probe %d in material %d (%s)", i+1, m_pMat->GetID(), m_pMat->GetName());
+		else 
+		{
+			int fid = -p.m_neid-1;
+			if ((fid < 0) || (fid >= m_surf.Elements())) return fecore_error("Invalid surface ID for micro-probe");
+			int nnf = 0;
+			for (int j=0; j<fid; ++j)
+			{
+				FESurfaceElement& el = m_surf.Element(j);
+				int nint = el.GaussPoints();
+				nnf += nint;
+			}
+
+			FESurfaceElement& face = m_surf.Element(fid);
+			int nint = face.GaussPoints();
+			int k = (p.m_ngp-1)/nint;
+			int gpt = (p.m_ngp-1)%nint;
+			nnf += gpt;
+
+			FEMaterialPoint& mp = *m_surf.GetData(nnf).m_pt[k];
+			FEMicroMaterialPoint2O& mmpt2O = *mp.ExtractData<FEMicroMaterialPoint2O>();
+			if (mmpt2O.m_elem_id != p.m_neid ) return false;
+			if (mmpt2O.m_gpt_id  != p.m_ngp-1) return false;
+
+			FERVEProbe* prve = new FERVEProbe(fem, mmpt2O.m_rve, p.m_szfile);
+			p.m_probe = prve;
+			prve->SetDebugFlag(p.m_bdebug);
+		}
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticMultiscaleDomain2O::Update(const FETimeInfo& timeInfo)
+{
+	try
+	{
+		// call base class
+		FEElasticSolidDomain2O::Update(timeInfo);
+	}
+	catch (FEMultiScaleException e)
+	{
+		// store all the probes
+		FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(m_pMat);
+		int NP = pmat->Probes();
+		for (int i=0; i<NP; ++i)
+		{
+			FEMicroProbe& p = pmat->Probe(i);
+			if (p.m_probe && p.m_bdebug) p.m_probe->Save();
+		}
+
+		// retrhow
+		throw;
+	}
 }

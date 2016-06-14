@@ -17,4 +17,7 @@ public:
 	
 	//! initialize class
 	bool Initialize();
+
+	//! Update 
+	void Update(const FETimeInfo& timeInfo);
 };

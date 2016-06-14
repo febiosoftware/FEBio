@@ -24,6 +24,8 @@ public:
 
 public:
 	FEMicroModel2O m_rve;				//!< local copy of the rve		
+	int		m_elem_id;		//!< element ID
+	int		m_gpt_id;		//!< Gauss point index (0-based)
 };
 
 //-----------------------------------------------------------------------------

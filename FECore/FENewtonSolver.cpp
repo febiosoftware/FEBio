@@ -444,10 +444,14 @@ bool FENewtonSolver::SolveStep(double time)
 		felog.printbox("ERROR", "Problem diverging uncontrollably.");
 		return false;
 	}
-	catch (FEMultiScaleException)
+	catch (FEMultiScaleException e)
 	{
 		// the RVE problem didn't solve
-		felog.printbox("ERROR", "The RVE problem has failed. Aborting macro run.");
+		// logging was turned off during multi-scale runs
+		// so we need to turn it back on
+		felog.SetMode(Logfile::SCREEN_ONLY);
+		felog.printbox("ERROR", "The RVE problem has failed at element %d, gauss point %d.\nAborting macro run.", e.elemId, e.gptIndex+1);
+
 		return false;
 	}
 	catch (DoRunningRestart)

@@ -19,10 +19,16 @@ public:
 
 	bool Execute(FEModel& fem, int nwhen);
 
+	void Save();
+
+	void SetDebugFlag(bool b) { m_bdebug = b; }
+	bool GetDebugFlag() const { return m_bdebug; }
+
 private:
 	FEModel&			m_rve;		//!< The RVE model to keep track of
 	FEBioPlotFile*		m_xplt;		//!< the actual plot file
 	std::string			m_file;		//!< file name
+	bool				m_bdebug;
 };
 
 //-----------------------------------------------------------------------------
@@ -68,11 +74,14 @@ class FEMicroProbe : public FEMaterial
 
 public:
 	FEMicroProbe(FEModel* pfem);
+	~FEMicroProbe();
 
 public:
 	int		m_neid;					//!< element Id
 	int		m_ngp;					//!< Gauss-point (one-based!)
 	char	m_szfile[MAX_FILE];		//!< file name
+	bool	m_bdebug;				//!< debug flag
+	FERVEProbe*	m_probe;
 
 	DECLARE_PARAMETER_LIST();
 };

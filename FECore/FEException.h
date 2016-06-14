@@ -70,7 +70,15 @@ class NANDetected {};
 
 class FatalError {};
 
-class FEMultiScaleException {};
+class FEMultiScaleException
+{
+public:
+	FEMultiScaleException(int eid, int gpt) : elemId(eid), gptIndex(gpt) {}
+
+public:
+	int elemId;
+	int gptIndex;
+};
 
 class DoRunningRestart{};
 

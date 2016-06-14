@@ -13,6 +13,8 @@
 //-----------------------------------------------------------------------------
 FEMicroMaterialPoint2O::FEMicroMaterialPoint2O(FEMaterialPoint* mp) : FEMaterialPoint(mp)
 {
+	m_elem_id = -1;
+	m_gpt_id = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -106,7 +108,7 @@ void FEMicroMaterial2O::Stress(FEMaterialPoint &mp, mat3d& P, tens3drs& Q)
 	bool bret = mmpt2O.m_rve.Solve(F, G);
 
 	// make sure it converged
-	if (bret == false) throw FEMultiScaleException();
+	if (bret == false) throw FEMultiScaleException(mmpt2O.m_elem_id, mmpt2O.m_gpt_id);
 
 	// calculate the averaged Cauchy stress
 	mmpt2O.m_rve.AveragedStress2O(P, Q);
