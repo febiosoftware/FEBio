@@ -139,7 +139,8 @@ public:
 		int		m_nmplc;		//!< must point load curve number
 		int		m_naggr;		//!< aggressivness parameter
 		int		m_nmust;		//!< current must-point
-		//}
+		int		m_next_must;	//!< next must-point to visit
+	//}
 
 	// --- Quasi-Newton Solver Variables ---
 	//{

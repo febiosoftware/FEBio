@@ -275,13 +275,12 @@ double FELoadCurve::ExtendValue(double t) const
 }
 
 //-----------------------------------------------------------------------------
-// FUNCTION : LoadCurve::FindPoint(double t)
 // This function finds the index of the first load point 
 // for which the time is greater than t.
 // It returns -1 if t is larger than the last time value
 //
 
-int FELoadCurve::FindPoint(double t, double& tval)
+int FELoadCurve::FindPoint(double t, double& tval, int startIndex)
 {
 	switch (m_ext)
 	{
@@ -302,7 +301,9 @@ int FELoadCurve::FindPoint(double t, double& tval)
 		}
 		break;
 	default:
-		for (int i=0; i<Points(); ++i)
+		if (startIndex < 0) startIndex = 0;
+		if (startIndex >= Points()) return -1;
+		for (int i=startIndex; i<Points(); ++i)
 		{
 			double ti = m_lp[i].time;
 			if (ti > t) { tval = ti; return i; }
