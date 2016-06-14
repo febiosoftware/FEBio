@@ -294,7 +294,8 @@ void FEBioModel::Write(unsigned int nwhen)
 						if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
 						break;
 					case CB_AUGMENT: if (nplt == FE_PLOT_AUGMENTATIONS) bout = true; break;
-					case CB_SOLVED : if (nplt == FE_PLOT_FINAL) bout = true;
+					case CB_SOLVED : if (nplt == FE_PLOT_FINAL) bout = true; break;
+					case CB_STEP_SOLVED: if (nplt == FE_PLOT_STEP_FINAL) bout = true;  break;
 					}
 				}
 

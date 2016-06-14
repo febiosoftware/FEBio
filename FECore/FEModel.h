@@ -17,6 +17,7 @@
 #define CB_SOLVED		0x00000010		//!< Call at the end of FEModel::Solve
 #define CB_UPDATE_TIME	0x00000020		//!< Call when time is updated and right before time step is solved (in FEAnalysis::Solve)
 #define CB_AUGMENT		0x00000040		//!< The model is entering augmentations (called before Augment)
+#define CB_STEP_SOLVED	0x00000080		//!< The step was solved
 
 typedef unsigned int FECORE_CB_WHEN;
 typedef bool (*FECORE_CB_FNC)(FEModel*,unsigned int,void*);

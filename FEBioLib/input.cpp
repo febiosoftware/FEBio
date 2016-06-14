@@ -253,6 +253,7 @@ void echo_input(FEBioModel& fem)
 	case FE_PLOT_MINOR_ITRS : felog.printf("\tplot level ................................ : minor iterations\n"); break;
 	case FE_PLOT_MUST_POINTS: felog.printf("\tplot level ................................ : must points only\n"); break;
 	case FE_PLOT_FINAL      : felog.printf("\tplot level ................................ : final state\n"); break;
+	case FE_PLOT_STEP_FINAL : felog.printf("\tplot level ................................ : step final state\n"); break;
 	}
 
 	PlotFile* pplt = fem.GetPlotFile();

@@ -377,6 +377,9 @@ bool FEModel::Solve()
 		// break if the step has failed
 		if (bconv == false) break;
 
+		// do callbacks
+		DoCallback(CB_STEP_SOLVED);
+
 		// wrap it up
 		m_pStep->Deactivate();
 	}
