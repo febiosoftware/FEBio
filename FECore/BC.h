@@ -90,9 +90,39 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+// base class for prescribed boundary conditions
+class FEPrescribedBC : public FEBoundaryCondition
+{
+public:
+	FEPrescribedBC(FEModel* pfem);
+
+public:
+	// implement these functions
+
+	// assign a node set to the prescribed BC
+	virtual void AddNodes(const FENodeSet& set) = 0;
+
+	// This function is called when the solver needs to know the 
+	// prescribed dof values. The brel flag indicates wheter the total 
+	// value is needed or the value with respect to the current nodal dof value
+	virtual void PrepStep(std::vector<double>& ui, bool brel = true) = 0;
+
+	// This is called during nodal update and should be used to enforce the 
+	// nodal degrees of freedoms
+	virtual void Update() = 0;
+
+	// Also implement the following functions.
+	// These are already declared in base classes.
+//  bool Init();
+//  void Activate();
+//  void Deactivate();
+//  void Serialize(DumpStream& ar);
+};
+
+//-----------------------------------------------------------------------------
 //! prescribed boundary condition data
 //! \todo Should I make a derived class for the relative prescribed BC's?
-class FEPrescribedBC : public FEBoundaryCondition
+class FEPrescribedDOF : public FEPrescribedBC
 {
 	struct ITEM
 	{
@@ -101,16 +131,18 @@ class FEPrescribedBC : public FEBoundaryCondition
 	};
 
 public:
-	FEPrescribedBC(FEModel* pfem);
-	FEPrescribedBC(FEModel* pfem, const FEPrescribedBC& bc);
+	FEPrescribedDOF(FEModel* pfem);
+	FEPrescribedDOF(FEModel* pfem, const FEPrescribedDOF& bc);
 
 	void AddNode(int node, double scale = 1.0);
-	void AddNodes(const FENodeSet& s, double scale = 1.0);
+	void AddNodes(const FENodeSet& s, double scale);
+	void AddNodes(const FENodeSet& s) { AddNodes(s, 1.0); }
 
 	int NodeID(int i) { return m_item[i].nid; }
 
 	size_t Items() const { return m_item.size(); }
 
+public:
 	void Serialize(DumpStream& ar);
 
 	void Activate();
@@ -119,21 +151,21 @@ public:
 
 	bool Init();
 
-	double NodeValue(int n) const;
-
 	void Update();
 
 	void PrepStep(std::vector<double>& ui, bool brel = true);
 
 public:
-	FEPrescribedBC& SetScale(double s, int lc = -1);
-	FEPrescribedBC& SetDOF(int dof) { m_dof = dof; return *this; }
-	FEPrescribedBC& SetRelativeFlag(bool br) { m_br = br; return *this; }
+	FEPrescribedDOF& SetScale(double s, int lc = -1);
+	FEPrescribedDOF& SetDOF(int dof) { m_dof = dof; return *this; }
+	FEPrescribedDOF& SetRelativeFlag(bool br) { m_br = br; return *this; }
 
 	void SetNodeScale(int n, double s) { m_data.set(n, s); }
 
 	double GetScaleFactor() const { return m_scale; }
 	int GetDOF() const { return m_dof; }
+
+	double NodeValue(int n) const;
 
 private:
 	int			m_dof;		//!< dof

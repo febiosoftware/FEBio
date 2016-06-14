@@ -198,9 +198,9 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 	mat3d U = F - mat3dd(1.0);
 
 	// assign new DC's for the boundary nodes
-	FEPrescribedBC& dx = *rve.PrescribedBC(0);
-	FEPrescribedBC& dy = *rve.PrescribedBC(1);
-	FEPrescribedBC& dz = *rve.PrescribedBC(2);
+	FEPrescribedDOF& dx = dynamic_cast<FEPrescribedDOF&>(*rve.PrescribedBC(0));
+	FEPrescribedDOF& dy = dynamic_cast<FEPrescribedDOF&>(*rve.PrescribedBC(1));
+	FEPrescribedDOF& dz = dynamic_cast<FEPrescribedDOF&>(*rve.PrescribedBC(2));
 
 	int n = dx.Items();
 	for (int j=0; j<n; ++j)
@@ -504,7 +504,7 @@ mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	FEPrescribedBC& dc = *rve.PrescribedBC(0);
+	FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*rve.PrescribedBC(0));
 	int nitems = dc.Items();
 	for (int i=0; i<nitems; ++i)
 	{
@@ -568,7 +568,7 @@ mat3ds FEMicroMaterial::AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp)
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	FEPrescribedBC& dc = *rve.PrescribedBC(0);
+	FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*rve.PrescribedBC(0));
 	int nitems = dc.Items();
 	for (int i=0; i<nitems; ++i)
 	{

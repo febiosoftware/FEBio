@@ -155,15 +155,21 @@ void FEFixedBC::Deactivate()
 	}
 }
 
-//-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEPrescribedBC, FEBoundaryCondition)
+//=============================================================================
+FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+{
+}
+
+
+//=============================================================================
+BEGIN_PARAMETER_LIST(FEPrescribedDOF, FEPrescribedBC)
 	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE, "scale");
 	ADD_PARAMETER(m_br   , FE_PARAM_BOOL  , "relative");
 	ADD_PARAMETER(m_data , FE_PARAM_DATA_ARRAY, "value");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem), m_data(FE_DOUBLE)
+FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem) : FEPrescribedBC(pfem), m_data(FE_DOUBLE)
 {
 	m_scale = 0.0;
 	m_dof = -1;
@@ -172,7 +178,7 @@ FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfe
 }
 
 //-----------------------------------------------------------------------------
-FEPrescribedBC::FEPrescribedBC(FEModel* pfem, const FEPrescribedBC& bc) : FEBoundaryCondition(FEBC_ID, pfem), m_data(FE_DOUBLE)
+FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem, const FEPrescribedDOF& bc) : FEPrescribedBC(pfem), m_data(FE_DOUBLE)
 {
 	m_scale = bc.m_scale;
 	m_dof   = bc.m_dof;
@@ -185,7 +191,7 @@ FEPrescribedBC::FEPrescribedBC(FEModel* pfem, const FEPrescribedBC& bc) : FEBoun
 //-----------------------------------------------------------------------------
 // Sets the displacement scale factor. An optional load curve index can be given
 // of the load curve that will control the scale factor.
-FEPrescribedBC& FEPrescribedBC::SetScale(double s, int lc)
+FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)
 {
 	m_scale = s;
 	if (lc >= 0)
@@ -197,7 +203,7 @@ FEPrescribedBC& FEPrescribedBC::SetScale(double s, int lc)
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedBC::AddNode(int nid, double s)
+void FEPrescribedDOF::AddNode(int nid, double s)
 {
 	ITEM item = {nid, s};
 	m_item.push_back(item);
@@ -205,17 +211,17 @@ void FEPrescribedBC::AddNode(int nid, double s)
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedBC::AddNodes(const FENodeSet& nset, double s)
+void FEPrescribedDOF::AddNodes(const FENodeSet& nset, double s)
 {
 	int N = nset.size();
 	for (int i=0; i<N; ++i) AddNode(nset[i], s);
 }
 
 //-----------------------------------------------------------------------------
-bool FEPrescribedBC::Init()
+bool FEPrescribedDOF::Init()
 {
 	// don't forget to call the base class
-	if (FEBoundaryCondition::Init() == false) return false;
+	if (FEPrescribedBC::Init() == false) return false;
 
 	// make sure this is not a rigid node
 	FEModel& fem = *GetFEModel();
@@ -236,9 +242,9 @@ bool FEPrescribedBC::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedBC::Activate()
+void FEPrescribedDOF::Activate()
 {
-	FEBoundaryCondition::Activate();
+	FEPrescribedBC::Activate();
 
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -262,9 +268,9 @@ void FEPrescribedBC::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedBC::Deactivate()
+void FEPrescribedDOF::Deactivate()
 {
-	FEBoundaryCondition::Deactivate();
+	FEPrescribedBC::Deactivate();
 
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -277,7 +283,7 @@ void FEPrescribedBC::Deactivate()
 }
 
 //-----------------------------------------------------------------------------
-double FEPrescribedBC::NodeValue(int n) const
+double FEPrescribedDOF::NodeValue(int n) const
 {
 	const ITEM& it = m_item[n];
 	double val = m_scale*m_data.get<double>(n);
@@ -286,11 +292,11 @@ double FEPrescribedBC::NodeValue(int n) const
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedBC::Serialize(DumpStream& ar)
+void FEPrescribedDOF::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;
 
-	FEBoundaryCondition::Serialize(ar);
+	FEPrescribedBC::Serialize(ar);
 	if (ar.IsSaving())
 	{
 		ar << m_dof << m_item;
@@ -304,7 +310,7 @@ void FEPrescribedBC::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 //! Update the values of the prescribed degrees of freedom.
 //! This is called during model update (FESolver::Update)
-void FEPrescribedBC::Update()
+void FEPrescribedDOF::Update()
 {
 	// get the mesh
 	FEMesh& mesh = GetFEModel()->GetMesh();
@@ -313,13 +319,13 @@ void FEPrescribedBC::Update()
 	for (size_t i = 0; i<m_item.size(); ++i)
 	{
 		FENode& node = mesh.Node(m_item[i].nid);
-		double g = NodeValue(i);
+		double g = NodeValue((int)i);
 		node.set(m_dof, g);
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
+void FEPrescribedDOF::PrepStep(std::vector<double>& ui, bool brel)
 {
 	// get the mesh
 	FEMesh& mesh = GetFEModel()->GetMesh();
@@ -327,7 +333,7 @@ void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 	for (size_t i = 0; i<m_item.size(); ++i)
 	{
 		FENode& node = mesh.Node(m_item[i].nid);
-		double dq = NodeValue(i);
+		double dq = NodeValue((int)i);
 		int I = -node.m_ID[m_dof] - 2;
 		if (I >= 0) ui[I] = (brel ? dq - node.get(m_dof) : dq);
 	}

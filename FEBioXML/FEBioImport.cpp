@@ -29,6 +29,7 @@
 #include "FECore/FECoreKernel.h"
 #include <FECore/FESurfaceMap.h>
 #include <FECore/FEFunction1D.h>
+#include <FECore/tens3d.h>
 #include "FECore/DOFS.h"
 #include <string.h>
 #include <stdarg.h>
@@ -248,6 +249,15 @@ void FEBioImport::value(XMLTag& tag, mat3ds& m)
 	int n = sscanf(sz, "%lg,%lg,%lg,%lg,%lg,%lg", &x, &y, &z, &xy, &yz, &xz);
 	if (n != 6) throw XMLReader::XMLSyntaxError();
 	m = mat3ds(x, y, z, xy, yz, xz);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioImport::value(XMLTag& tag, tens3drs& m)
+{
+	double v[18];
+	int n = value(tag, v, 18);
+	if (n != 18) throw XMLReader::InvalidValue(tag);
+	for (int i=0; i<18; ++i) m.d[i] = v[i];
 }
 
 //-----------------------------------------------------------------------------
@@ -622,13 +632,14 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* sz
 	{
 		switch (pp->type())
 		{
-		case FE_PARAM_DOUBLE : value(tag, pp->value<double>()); break;
-		case FE_PARAM_INT    : value(tag, pp->value<int   >()); break;
-		case FE_PARAM_BOOL   : value(tag, pp->value<bool  >()); break;
-		case FE_PARAM_VEC3D  : value(tag, pp->value<vec3d >()); break;
-		case FE_PARAM_MAT3D  : value(tag, pp->value<mat3d >()); break;
-		case FE_PARAM_MAT3DS : value(tag, pp->value<mat3ds>()); break;
-		case FE_PARAM_STRING : value(tag, pp->cvalue()); break;
+		case FE_PARAM_DOUBLE  : value(tag, pp->value<double  >()); break;
+		case FE_PARAM_INT     : value(tag, pp->value<int     >()); break;
+		case FE_PARAM_BOOL    : value(tag, pp->value<bool    >()); break;
+		case FE_PARAM_VEC3D   : value(tag, pp->value<vec3d   >()); break;
+		case FE_PARAM_MAT3D   : value(tag, pp->value<mat3d   >()); break;
+		case FE_PARAM_MAT3DS  : value(tag, pp->value<mat3ds  >()); break;
+		case FE_PARAM_TENS3DRS: value(tag, pp->value<tens3drs>()); break;
+		case FE_PARAM_STRING  : value(tag, pp->cvalue()); break;
 		case FE_PARAM_IMAGE_3D:
 			{
 				const char* szfile = tag.AttributeValue("file");

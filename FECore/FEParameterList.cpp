@@ -2,6 +2,7 @@
 #include "FEParameterList.h"
 #include "FECoreKernel.h"
 #include "DumpStream.h"
+#include "tens3d.h"
 #include <string>
 #include <assert.h>
 
@@ -32,6 +33,7 @@ void FEParameterList::operator = (FEParameterList& l)
 			case FE_PARAM_VEC3D : d.value<vec3d >() = s.value<vec3d >(); break;
 			case FE_PARAM_MAT3D : d.value<mat3d >() = s.value<mat3d >(); break;
 			case FE_PARAM_MAT3DS: d.value<mat3ds>() = s.value<mat3ds>(); break;
+			case FE_PARAM_TENS3DRS: d.value<tens3drs>() = s.value<tens3drs>(); break;
 			default:
 				assert(false);
 			}

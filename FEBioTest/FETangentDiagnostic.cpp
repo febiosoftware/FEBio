@@ -108,7 +108,7 @@ bool FETangentUniaxial::Init()
 
 	// Add a prescribed BC
 	int nd[4] = {1, 2, 5, 6};
-	FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
+	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
 	fem.AddPrescribedBC(pdc);
 	pdc->SetDOF(dof_X).SetScale(d, 0);
 	for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
@@ -185,7 +185,7 @@ bool FETangentSimpleShear::Init()
 	fem.AddLoadCurve(plc);
 
 	// Add a prescribed BC
-	FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
+	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
 	fem.AddPrescribedBC(pdc);
 	pdc->SetDOF(dof_X).SetScale(d, 0);
 	int nd[4] = { 4, 5, 6, 7 };

@@ -4,6 +4,7 @@
 #include "DumpStream.h"
 #include "FEFunction1D.h"
 #include "FEDataArray.h"
+#include "tens3d.h"
 
 //-----------------------------------------------------------------------------
 FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname)
@@ -120,6 +121,7 @@ void FEParam::Serialize(DumpStream& ar)
 			case FE_PARAM_VEC3D      : ar << value<vec3d       >()   ; break;
 			case FE_PARAM_MAT3D      : ar << value<mat3d       >()   ; break;
 			case FE_PARAM_MAT3DS     : ar << value<mat3ds      >()   ; break;
+			case FE_PARAM_TENS3DRS   : ar << value<tens3drs>(); break;
 			case FE_PARAM_DATA_ARRAY :
 				{
 					FEDataArray& m = value<FEDataArray>();
@@ -178,6 +180,7 @@ void FEParam::Serialize(DumpStream& ar)
 			case FE_PARAM_VEC3D      : ar >> value<vec3d       >(); break;
 			case FE_PARAM_MAT3D      : ar >> value<mat3d       >(); break;
 			case FE_PARAM_MAT3DS     : ar >> value<mat3ds      >(); break;
+			case FE_PARAM_TENS3DRS   : ar >> value<tens3drs>(); break;
 			case FE_PARAM_DATA_ARRAY :
 				{
 					FEDataArray& m = value<FEDataArray>();

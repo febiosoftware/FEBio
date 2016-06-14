@@ -167,6 +167,7 @@
 #include "FE3FieldElasticSolidDomain.h"
 #include "FEDiscreteSpringDomain.h"
 #include <FECore/RigidBC.h>
+#include "FEBCPrescribedDeformation.h"
 
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
@@ -344,6 +345,11 @@ REGISTER_FECORE_CLASS(FEElasticSolidDomain       , FEDOMAIN_ID, "elastic-solid" 
 REGISTER_FECORE_CLASS(FEElasticShellDomain       , FEDOMAIN_ID, "elastic-shell"     );
 REGISTER_FECORE_CLASS(FEElasticTrussDomain       , FEDOMAIN_ID, "elastic-truss"     );
 REGISTER_FECORE_CLASS(FEDiscreteSpringDomain     , FEDOMAIN_ID, "discrete-spring"   );
+
+
+//-----------------------------------------------------------------------------
+// classes derived from FEBoundaryCondition
+REGISTER_FECORE_CLASS(FEBCPrescribedDeformation, FEBC_ID, "prescribed deformation");
 
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad

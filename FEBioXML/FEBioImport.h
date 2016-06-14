@@ -6,6 +6,7 @@
 #include "FECore/DataStore.h"
 #include <FECore/FEMesh.h>
 #include <FECore/FESurfaceMap.h>
+#include <FECore/tens3d.h>
 #include <map>
 #include <string>
 using namespace std;
@@ -239,6 +240,7 @@ public:
 	void value(XMLTag& tag, vec3d&  v);
 	void value(XMLTag& tag, mat3d&  m);
 	void value(XMLTag& tag, mat3ds& m);
+	void value(XMLTag& tag, tens3drs& m);
 	void value(XMLTag& tag, char* szstr);
 	int value(XMLTag& tag, int* pi, int n);
 	int value(XMLTag& tag, double* pf, int n);

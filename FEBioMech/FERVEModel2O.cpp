@@ -190,10 +190,10 @@ bool FERVEModel2O::PrepDisplacementBC()
 	ClearBCs();
 
 	// we create three DCs, one for each displacement dof
-	FEPrescribedBC* pdc[3] = {0};
-	pdc[0] = new FEPrescribedBC(this); pdc[0]->SetDOF(0).SetScale(1.0, NLC); AddPrescribedBC(pdc[0]);
-	pdc[1] = new FEPrescribedBC(this); pdc[1]->SetDOF(1).SetScale(1.0, NLC); AddPrescribedBC(pdc[1]);
-	pdc[2] = new FEPrescribedBC(this); pdc[2]->SetDOF(2).SetScale(1.0, NLC); AddPrescribedBC(pdc[2]);
+	FEPrescribedDOF* pdc[3] = { 0 };
+	pdc[0] = new FEPrescribedDOF(this); pdc[0]->SetDOF(0).SetScale(1.0, NLC); AddPrescribedBC(pdc[0]);
+	pdc[1] = new FEPrescribedDOF(this); pdc[1]->SetDOF(1).SetScale(1.0, NLC); AddPrescribedBC(pdc[1]);
+	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2).SetScale(1.0, NLC); AddPrescribedBC(pdc[2]);
 
 	// assign the boundary nodes
 	for (i=0; i<N; ++i)
@@ -241,10 +241,10 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 
 	// create the DC's
 	ClearBCs();
-	FEPrescribedBC* pdc[3] = {0};
-	pdc[0] = new FEPrescribedBC(this); pdc[0]->SetDOF(0).SetScale(1.0, NLC); AddPrescribedBC(pdc[0]);
-	pdc[1] = new FEPrescribedBC(this); pdc[1]->SetDOF(1).SetScale(1.0, NLC); AddPrescribedBC(pdc[1]);
-	pdc[2] = new FEPrescribedBC(this); pdc[2]->SetDOF(2).SetScale(1.0, NLC); AddPrescribedBC(pdc[2]);
+	FEPrescribedDOF* pdc[3] = { 0 };
+	pdc[0] = new FEPrescribedDOF(this); pdc[0]->SetDOF(0).SetScale(1.0, NLC); AddPrescribedBC(pdc[0]);
+	pdc[1] = new FEPrescribedDOF(this); pdc[1]->SetDOF(1).SetScale(1.0, NLC); AddPrescribedBC(pdc[1]);
+	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2).SetScale(1.0, NLC); AddPrescribedBC(pdc[2]);
 
 	// assign nodes to BCs
 	pdc[0]->AddNodes(ns, 0.0);
@@ -309,9 +309,9 @@ void FEMicroModel2O::UpdateBC(const mat3d& F, const tens3drs& G)
 	FEMesh& m = GetMesh();
 
 	// assign new DC's for the boundary nodes
-	FEPrescribedBC& dx = *PrescribedBC(0);
-	FEPrescribedBC& dy = *PrescribedBC(1);
-	FEPrescribedBC& dz = *PrescribedBC(2);
+	FEPrescribedDOF& dx = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(0));
+	FEPrescribedDOF& dy = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(1));
+	FEPrescribedDOF& dz = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(2));
 
 	for (int i=0; i<(int) dx.Items(); ++i)
 	{
@@ -392,7 +392,7 @@ mat3d FEMicroModel2O::AveragedStressPK1(FEMaterialPoint &mp)
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	FEPrescribedBC& dc = *PrescribedBC(0);
+	FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(0));
 	int nitems = dc.Items();
 	for (int i=0; i<nitems; ++i)
 	{
@@ -446,9 +446,9 @@ void FEMicroModel2O::AveragedStress2O(mat3d& Pa, tens3drs& Qa)
 	// get the reaction force vector from the solid solver
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero).
-	FEPrescribedBC& dx = *PrescribedBC(0);
-	FEPrescribedBC& dy = *PrescribedBC(1);
-	FEPrescribedBC& dz = *PrescribedBC(2);
+	FEPrescribedDOF& dx = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(0));
+	FEPrescribedDOF& dy = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(1));
+	FEPrescribedDOF& dz = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(2));
 
 	const int dof_X = GetDOFIndex("x");
 	const int dof_Y = GetDOFIndex("y");

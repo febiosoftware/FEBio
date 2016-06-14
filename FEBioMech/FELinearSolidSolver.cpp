@@ -62,7 +62,7 @@ bool FELinearSolidSolver::Quasin(double time)
 	int nbc = m_fem.PrescribedBCs();
 	for (int i=0; i<nbc; ++i)
 	{
-		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
+		FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*m_fem.PrescribedBC(i));
 		if (dc.IsActive())
 		{
 			int bc = dc.GetDOF();

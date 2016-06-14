@@ -53,7 +53,8 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 		{
 			if      (tag == "fix"              ) ParseBCFix25      (tag);
 			else if (tag == "prescribe"        ) ParseBCPrescribe25(tag);
-			else if (tag == "rigid"            ) ParseBCRigid      (tag);
+			else if (tag == "bc"               ) ParseBC(tag);
+			else if (tag == "rigid") ParseBCRigid(tag);
 			else if (tag == "rigid_body"       ) ParseRigidBody    (tag);
 			else if (tag == "linear_constraint") ParseConstraints  (tag);
 			else throw XMLReader::InvalidTag(tag);
@@ -424,7 +425,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		m_pim->value(tag, s);
 
 		// create the bc
-		FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
+		FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
 		pdc->SetScale(s, lc).SetDOF(bc);
 
 		// add this boundary condition to the current step
@@ -465,7 +466,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			double scale;
 			tag.value(scale);
 
-			FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
+			FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
 			pdc->SetDOF(bc).SetScale(scale, lc).SetRelativeFlag(br);
 			pdc->AddNode(n);
 			fem.AddPrescribedBC(pdc);
@@ -528,7 +529,7 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 	}
 
 	// create a prescribed bc
-	FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
+	FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
 	pdc->SetDOF(bc).SetScale(scale, lc).SetRelativeFlag(br);
 
 	// add this boundary condition to the current step
@@ -594,8 +595,46 @@ void FEBioBoundarySection::ParseBCPrescribe25(XMLTag& tag)
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// create a prescribed bc
-	FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
+	FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
 	pdc->SetDOF(bc);
+	pdc->AddNodes(*nodeSet);
+
+	// add this boundary condition to the current step
+	fem.AddPrescribedBC(pdc);
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddModelComponent(pdc);
+		pdc->Deactivate();
+	}
+
+	// Read the parameter list
+	FEParameterList& pl = pdc->GetParameterList();
+	m_pim->ReadParameterList(tag, pl);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioBoundarySection::ParseBC(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// double-check the version
+	int nversion = m_pim->Version();
+	if (nversion < 0x0205) throw XMLReader::InvalidTag(tag);
+
+	// get the type string
+	const char* sztype = tag.AttributeValue("type");
+
+	// create the boundary condition
+	FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, sztype, &fem));
+	if (pdc == 0) throw XMLReader::InvalidTag(tag);
+
+	// get the node set
+	const char* szset = tag.AttributeValue("node_set");
+	FENodeSet* nodeSet = mesh.FindNodeSet(szset);;
+	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+
+	// add the nodes to the BC
 	pdc->AddNodes(*nodeSet);
 
 	// add this boundary condition to the current step

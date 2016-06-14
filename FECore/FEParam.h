@@ -20,7 +20,8 @@ enum FEParamType {
 	FE_PARAM_IMAGE_3D,
 	FE_PARAM_STRING,
 	FE_PARAM_DATA_ARRAY,
-	FE_PARAM_FUNC1D
+	FE_PARAM_FUNC1D,
+	FE_PARAM_TENS3DRS
 };
 
 //-----------------------------------------------------------------------------

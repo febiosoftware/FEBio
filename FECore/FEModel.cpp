@@ -971,7 +971,7 @@ void FEModel::CopyFrom(FEModel& fem)
 	for (int i=0; i<NDC; ++i)
 	{
 		FEPrescribedBC* pbc = fem.PrescribedBC(i);
-		FEPrescribedBC* pnew = new FEPrescribedBC(this, *pbc);
+		FEPrescribedBC* pnew = new FEPrescribedDOF(this, dynamic_cast<FEPrescribedDOF&>(*pbc));
 
 		// add to model
 		AddPrescribedBC(pnew);
@@ -1416,7 +1416,7 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 		m_DC.clear();
 		for (int i=0; i<n; ++i) 
 		{
-			FEPrescribedBC* pdc = new FEPrescribedBC(this);
+			FEPrescribedBC* pdc = fecore_new<FEPrescribedBC>(FEBC_ID, sz, this);
 			pdc->Serialize(ar);
 			m_DC.push_back(pdc);
 		}

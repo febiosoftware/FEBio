@@ -35,9 +35,9 @@ REGISTER_FECORE_CLASS(FEVectorMap        , FECOORDSYSMAP_ID, "vector"     );
 REGISTER_FECORE_CLASS(FESphericalAngleMap, FECOORDSYSMAP_ID, "angles"     );
 REGISTER_FECORE_CLASS(FEPolarMap         , FECOORDSYSMAP_ID, "polar"      );
 
-REGISTER_FECORE_CLASS(FEFixedBC     , FEBC_ID, "fix"      );
-REGISTER_FECORE_CLASS(FEPrescribedBC, FEBC_ID, "prescribe");
-REGISTER_FECORE_CLASS(FENodalLoad   , FEBC_ID, "nodal load");
+REGISTER_FECORE_CLASS(FEFixedBC      , FEBC_ID, "fix"      );
+REGISTER_FECORE_CLASS(FEPrescribedDOF, FEBC_ID, "prescribe");
+REGISTER_FECORE_CLASS(FENodalLoad    , FEBC_ID, "nodal load");
 
 REGISTER_FECORE_CLASS(FEInitialBC     , FEIC_ID, "init_bc"       );
 REGISTER_FECORE_CLASS(FEInitialBCVec3D, FEIC_ID, "init_bc_vec3d" );

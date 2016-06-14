@@ -22,6 +22,7 @@ protected:
 	void ParseSpringSection (XMLTag& tag);
 	void ParseBCRigid       (XMLTag& tag);	// version 2.5 and up
 	void ParseRigidBody     (XMLTag& tag);  // version 2.5 and up
+	void ParseBC            (XMLTag& tag);  // version 2.5 and up
 
 protected:
 	void ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* psi);
