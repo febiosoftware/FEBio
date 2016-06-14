@@ -17,6 +17,27 @@ BEGIN_PARAMETER_LIST(FEEllipsoidalFiberDistribution, FEElasticMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
+bool FEEllipsoidalFiberDistribution::Validate()
+{
+	vec3d n0a;
+	for (int n = 0; n<MAX_INT; ++n)
+	{
+		// set the global fiber direction in material coordinate system
+		n0a.x = XYZ2[n][0];
+		n0a.y = XYZ2[n][1];
+		n0a.z = XYZ2[n][2];
+
+		// calculate material coefficients
+		double ksi = 1.0 / sqrt(SQR(n0a.x / m_ksi[0]) + SQR(n0a.y / m_ksi[1]) + SQR(n0a.z / m_ksi[2]));
+		double beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
+
+		m_ksi_array[n] = ksi;
+		m_beta_array[n] = beta;
+	}
+	return FEElasticMaterial::Validate();
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FEEllipsoidalFiberDistribution::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -35,8 +56,7 @@ mat3ds FEEllipsoidalFiberDistribution::Stress(FEMaterialPoint& mp)
 	mat3ds s;
 	s.zero();
 
-	const int nint = 45;
-	for (int n=0; n<nint; ++n)
+	for (int n=0; n<MAX_INT; ++n)
 	{
 		// set the global fiber direction in material coordinate system
 		n0a.x = XYZ2[n][0];
@@ -45,12 +65,8 @@ mat3ds FEEllipsoidalFiberDistribution::Stress(FEMaterialPoint& mp)
 		double wn = XYZ2[n][3];
 
 		// calculate material coefficients
-		// TODO: There is an obvious optimization opportunity here, since the values of ksi
-		//       and beta can be precalculated and reused. I have not done this yet since I
-		//       need to figure out how to initialize the material parameters for each time
-		//       step (instead of once at the start) in case the values depend on load curves.
-		double ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
-		double beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
+		double ksi  = m_ksi_array[n];
+		double beta = m_beta_array[n];
 		
 		// --- quadrant 1,1,1 ---
 
@@ -166,8 +182,7 @@ tens4ds FEEllipsoidalFiberDistribution::Tangent(FEMaterialPoint& mp)
 	tens4ds c;
 	c.zero();
 	
-	const int nint = 45;
-	for (int n=0; n<nint; ++n)
+	for (int n=0; n<MAX_INT; ++n)
 	{
 		// set the global fiber direction in material coordinate system
 		n0a.x = XYZ2[n][0];
@@ -176,8 +191,8 @@ tens4ds FEEllipsoidalFiberDistribution::Tangent(FEMaterialPoint& mp)
 		double wn = XYZ2[n][3];
 
 		// calculate material coefficients
-		double ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
-		double beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
+		double ksi = m_ksi_array[n];
+		double beta = m_beta_array[n];
 
 		// --- quadrant 1,1,1 ---
 
@@ -310,13 +325,9 @@ double FEEllipsoidalFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 		double wn = XYZ2[n][3];
         
 		// calculate material coefficients
-		// TODO: There is an obvious optimization opportunity here, since the values of ksi
-		//       and beta can be precalculated and reused. I have not done this yet since I
-		//       need to figure out how to initialize the material parameters for each time
-		//       step (instead of once at the start) in case the values depend on load curves.
-		double ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
-		double beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
-		
+		double ksi = m_ksi_array[n];
+		double beta = m_beta_array[n];
+
 		// --- quadrant 1,1,1 ---
         
 		// rotate to reference configuration

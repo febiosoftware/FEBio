@@ -11,8 +11,12 @@
 
 class FEEllipsoidalFiberDistribution : public FEElasticMaterial
 {
+	enum { MAX_INT = 45 };
+
 public:
 	FEEllipsoidalFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem) {}
+
+	bool Validate();
 	
 	//! Cauchy stress
 	virtual mat3ds Stress(FEMaterialPoint& mp);
@@ -29,8 +33,9 @@ public:
 public:
 	double	m_beta[3];	// power in power-law relation
 	double	m_ksi[3];	// coefficient in power-law relation
+	double	m_beta_array[MAX_INT];
+	double	m_ksi_array[MAX_INT];
 };
-
 
 //-----------------------------------------------------------------------------
 //! Material class for the ellipsoidal fiber distribution
