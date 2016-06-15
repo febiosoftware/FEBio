@@ -580,6 +580,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioMech\FEBCPrescribedDeformation.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDiscreteContact.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticMaterial2O.cpp">
       <FileType>Document</FileType>
@@ -782,6 +783,7 @@
     <ClInclude Include="..\..\FEBioMech\FE3FieldElasticSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBioMech\FEAugLagLinearConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEBCPrescribedDeformation.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMech.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMechData.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMechPlot.h" />
