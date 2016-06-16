@@ -620,7 +620,7 @@ double FEAnalysis::CheckMustPoints(double t, double dt)
 		FELoadCurve::LOADPOINT lp = lc.LoadPoint(m_next_must);
 
 		// skip the 0-value if it's defined
-		if (lp.time == 0.0) lc.LoadPoint(++m_next_must);
+		if (lp.time == 0.0) lp = lc.LoadPoint(++m_next_must);
 
 		// TODO: what happens when dtnew < dtmin and the next time step fails??
 		if (tmust > lp.time)
