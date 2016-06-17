@@ -18,7 +18,7 @@ FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem)
 	m_psolver = 0;
 	m_tend = 0.0;
 	m_nmust = -1;
-	m_next_must = 0;
+	m_next_must = -1;
 
 	// --- Analysis data ---
 	m_nanalysis = FE_STATIC;	// do quasi-static analysis
@@ -617,10 +617,22 @@ double FEAnalysis::CheckMustPoints(double t, double dt)
 	m_nmust = -1;
 	if (m_next_must < lc.Points())
 	{
-		FELoadCurve::LOADPOINT lp = lc.LoadPoint(m_next_must);
+		FELoadCurve::LOADPOINT lp;
+		if (m_next_must < 0)
+		{
+			// find the first must-point that is past this time
+			m_next_must = 0;
+			do
+			{
+				lp = lc.LoadPoint(m_next_must);
+				if (tmust > lp.time) ++m_next_must;
+			}
+			while ((tmust > lp.time)&&(m_next_must < lc.Points()));
 
-		// skip the 0-value if it's defined
-		if (lp.time == 0.0) lp = lc.LoadPoint(++m_next_must);
+			// make sure we did not pass all must points
+			if (m_next_must >= lc.Points()) return dt;
+		}
+		else lp = lc.LoadPoint(m_next_must);
 
 		// TODO: what happens when dtnew < dtmin and the next time step fails??
 		if (tmust > lp.time)
