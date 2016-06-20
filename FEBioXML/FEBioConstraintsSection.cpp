@@ -324,7 +324,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 					else throw XMLReader::InvalidAttributeValue(tag, "relative", szrel);
 				}
 
-				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement(&fem);
+				FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "rigid_prescribed", &fem));
 				pDC->id = nmat;
 				pDC->bc = bc;
 				pDC->lc = lc;
@@ -389,7 +389,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				const char* szlc = tag.AttributeValue("lc");
 				int lc = atoi(szlc) - 1;
 
-				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement(&fem);
+				FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "rigid_prescribed", &fem));
 				pDC->id = nmat;
 				pDC->bc = bc;
 				pDC->lc = lc;
@@ -493,7 +493,7 @@ void FEBioConstraintsSection::ParseRigidConstraint20(XMLTag& tag)
 			}
 
 			// create the rigid displacement constraint
-			FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement(&fem);
+			FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "rigid_prescribed", &fem));
 			pDC->id = nmat;
 			pDC->bc = bc;
 			pDC->lc = lc;

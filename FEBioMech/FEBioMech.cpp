@@ -401,9 +401,10 @@ REGISTER_FECORE_CLASS(FEMortarTiedContact    , FESURFACEPAIRINTERACTION_ID, "mor
 //-----------------------------------------------------------------------------
 // classes derived directly from FEModelLoad
 // TODO: define another SUPER_CLASS_ID for this
-REGISTER_FECORE_CLASS(FERigidAxialForce , FEBC_ID, "rigid_axial_force");
-REGISTER_FECORE_CLASS(FERigidBodyForce  , FEBC_ID, "rigid_force"      );
-REGISTER_FECORE_CLASS(FERigidBodyFixedBC, FEBC_ID, "rigid_fixed"      );
+REGISTER_FECORE_CLASS(FERigidAxialForce      , FEBC_ID, "rigid_axial_force");
+REGISTER_FECORE_CLASS(FERigidBodyForce       , FEBC_ID, "rigid_force"      );
+REGISTER_FECORE_CLASS(FERigidBodyFixedBC     , FEBC_ID, "rigid_fixed"      );
+REGISTER_FECORE_CLASS(FERigidBodyDisplacement, FEBC_ID, "rigid_prescribed" );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData

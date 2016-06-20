@@ -1233,7 +1233,7 @@ void FEBioBoundarySection::ParseRigidBody(XMLTag& tag)
 			}
 
 			// create the rigid displacement constraint
-			FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement(&fem);
+			FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "rigid_prescribed", &fem));
 			pDC->id = nmat;
 			pDC->bc = bc;
 			pDC->lc = lc;
