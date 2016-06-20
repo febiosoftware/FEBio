@@ -1419,7 +1419,7 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 		m_DC.clear();
 		for (int i=0; i<n; ++i) 
 		{
-			FEPrescribedBC* pdc = fecore_new<FEPrescribedBC>(FEBC_ID, sz, this);
+			FEPrescribedDOF* pdc = fecore_new<FEPrescribedDOF>(FEBC_ID, "prescribe", this);
 			pdc->Serialize(ar);
 			m_DC.push_back(pdc);
 		}
