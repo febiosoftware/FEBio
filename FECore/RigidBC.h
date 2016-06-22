@@ -12,6 +12,8 @@ public:
 	FERigidNodeSet(const FERigidNodeSet& rs);
 	void operator = (const FERigidNodeSet& rs);
 
+	bool Init();
+
 	void Serialize(DumpStream& ar);
 
 	void Activate();

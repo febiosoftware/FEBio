@@ -34,6 +34,21 @@ void FERigidNodeSet::AddNode(int nid)
 }
 
 //-----------------------------------------------------------------------------
+bool FERigidNodeSet::Init()
+{
+	FEModel& fem = *GetFEModel();
+
+	FEMaterial* pm = fem.GetMaterial(GetRigidID());
+	if (pm->IsRigid() == false) return false;
+	if (pm->GetRigidBodyID() < 0) return false;
+
+	// assign correct rigid body ID's to rigid nodes
+	SetRigidID(pm->GetRigidBodyID());
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 void FERigidNodeSet::Activate()
 {
 	FEBoundaryCondition::Activate();

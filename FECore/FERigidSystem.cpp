@@ -252,6 +252,12 @@ bool FERigidSystem::Init()
 		FERigidBodyAngularVelocity& RW = *m_RBW[i];
 		if (RW.Init() == false) return false;
 	}
+	// assign correct rigid body ID's to rigid nodes
+	for (int i = 0; i<(int)m_RN.size(); ++i)
+	{
+		FERigidNodeSet& rn = *m_RN[i];
+		if (rn.Init() == false) return false;
+	}
 	return true;
 }
 
@@ -411,13 +417,6 @@ bool FERigidSystem::CreateObjects()
 
 		// add it to the pile
 		m_RB.push_back(prb);
-	}
-
-	// assign correct rigid body ID's to rigid nodes
-	for (int i=0; i<(int) m_RN.size(); ++i)
-	{
-		FERigidNodeSet& rn = *m_RN[i];
-		rn.SetRigidID(mrb[rn.GetRigidID()]);
 	}
 
 	return true;
