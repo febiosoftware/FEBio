@@ -281,7 +281,7 @@ void FEBioModel::Write(unsigned int nwhen)
 				bool bdebug = GetDebugFlag();
 
 				// when debugging we always output
-				// (this coule mean we may end up writing the same state multiple times)
+				// (this could mean we may end up writing the same state multiple times)
 				if (bdebug) bout = true;
 				else
 				{

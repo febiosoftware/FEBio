@@ -439,6 +439,9 @@ bool FEAnalysis::Solve()
 		}
 		else 
 		{
+			// This will allow states that have negative Jacobians to be stored
+			m_fem.DoCallback(CB_MINOR_ITERS);
+
 			// Report the sad news to the user.
 			felog.printf("\n\n------- failed to converge at time : %lg\n\n", m_fem.m_ftime);
 
