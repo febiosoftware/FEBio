@@ -172,15 +172,19 @@ bool FEBioModel::Input(const char* szfile)
 	// create file reader
 	FEBioImport fim;
 
+	fprintf(stdout, "Reading file %s ...", szfile);
+
 	// Load the file
 	if (fim.Load(*this, szfile) == false)
 	{
+		fprintf(stdout, "FAILED!\n");
 		char szerr[256];
 		fim.GetErrorMessage(szerr);
 		fprintf(stderr, szerr);
 
 		return false;
 	}
+	else fprintf(stdout, "SUCCESS!\n");
 
 	// set the input file name
 	SetInputFilename(szfile);

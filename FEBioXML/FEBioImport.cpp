@@ -23,7 +23,6 @@
 #include "FEBioMeshDataSection.h"
 #include "FEBioCodeSection.h"
 #include "FECore/DataStore.h"
-#include "FECore/log.h"
 #include "FECore/Image.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
@@ -406,8 +405,7 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 	}
 	catch (...)
 	{
-		felog.printf("An error occured while finding the febio_spec tag.\nIs this a valid FEBio input file?\n\n");
-		return false;
+		return errf("An error occured while finding the febio_spec tag.\nIs this a valid FEBio input file?\n\n");
 	}
 
 	// parse the file
@@ -538,25 +536,22 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 	// --- XML Reader Exceptions ---
 	catch (XMLReader::Error& e)
 	{
-		felog.printf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
-		return false;
+		return errf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 	}
 	// --- FEBioImport Exceptions ---
 	catch (FEBioImport::Exception& e)
 	{
-		felog.printf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
-		return false;
+		return errf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 	}
 	// --- Exception from DataStore ---
 	catch (UnknownDataField& e)
 	{
-		felog.printf("Fatal Error: \"%s\" is not a valid field variable name (line %d)\n", e.m_szdata, xml.GetCurrentLine()-1);
-		return false;
+		return errf("Fatal Error: \"%s\" is not a valid field variable name (line %d)\n", e.m_szdata, xml.GetCurrentLine()-1);
 	}
 	// --- Unknown exceptions ---
 	catch (...)
 	{
-		felog.printf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
+		return errf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
 		return false;
 	}
 
