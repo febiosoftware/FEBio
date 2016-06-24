@@ -9,6 +9,7 @@
 #include "FEBioPlot/FEBioPlotFile.h"
 #include <FECore/mat6d.h>
 #include <FECore/BC.h>
+#include "FEBCPrescribedDeformation.h"
 #include <sstream>
 
 //=============================================================================
@@ -194,27 +195,9 @@ void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
 	// get the mesh
 	FEMesh& m = rve.GetMesh();
 
-	// displacement gradient
-	mat3d U = F - mat3dd(1.0);
-
 	// assign new DC's for the boundary nodes
-	FEPrescribedDOF& dx = dynamic_cast<FEPrescribedDOF&>(*rve.PrescribedBC(0));
-	FEPrescribedDOF& dy = dynamic_cast<FEPrescribedDOF&>(*rve.PrescribedBC(1));
-	FEPrescribedDOF& dz = dynamic_cast<FEPrescribedDOF&>(*rve.PrescribedBC(2));
-
-	int n = dx.Items();
-	for (int j=0; j<n; ++j)
-	{
-		int nid = dx.NodeID(j);
-		FENode& node = m.Node(nid);
-
-		vec3d& r0 = node.m_r0;
-		vec3d dr = U*r0;
-
-		dx.SetNodeScale(j, dr.x);
-		dy.SetNodeScale(j, dr.y);
-		dz.SetNodeScale(j, dr.z);
-	}
+	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*rve.PrescribedBC(0));
+	dc.SetDeformationGradient(F);
 
 	if (m_bperiodic)
 	{
@@ -504,7 +487,7 @@ mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*rve.PrescribedBC(0));
+	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*rve.PrescribedBC(0));
 	int nitems = dc.Items();
 	for (int i=0; i<nitems; ++i)
 	{
@@ -568,7 +551,7 @@ mat3ds FEMicroMaterial::AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp)
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*rve.PrescribedBC(0));
+	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*rve.PrescribedBC(0));
 	int nitems = dc.Items();
 	for (int i=0; i<nitems; ++i)
 	{

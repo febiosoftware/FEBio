@@ -15,6 +15,11 @@ FEBCPrescribedDeformation::FEBCPrescribedDeformation(FEModel* pfem) : FEPrescrib
 	m_G.zero();
 }
 
+void FEBCPrescribedDeformation::AddNode(int n)
+{
+	m_node.push_back(n);
+}
+
 void FEBCPrescribedDeformation::AddNodes(const FENodeSet& set)
 {
 	int N = set.size();
@@ -62,6 +67,18 @@ void FEBCPrescribedDeformation::Deactivate()
 		node.m_BC[dofY] = DOF_OPEN;
 		node.m_BC[dofZ] = DOF_OPEN;
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBCPrescribedDeformation::SetDeformationGradient(const mat3d& F)
+{
+	m_F = F;
+}
+
+//-----------------------------------------------------------------------------
+void FEBCPrescribedDeformation::SetDeformationHessian(const tens3drs& G)
+{
+	m_G = G;
 }
 
 //-----------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 #include "FEPeriodicBoundary1O.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/LoadCurve.h"
+#include "FEBCPrescribedDeformation.h"
 
 //-----------------------------------------------------------------------------
 FERVEModel::FERVEModel()
@@ -187,19 +188,15 @@ bool FERVEModel::PrepDisplacementBC()
 	// clear all BCs
 	ClearBCs();
 
-	// we create three DCs, one for each displacement dof
-	FEPrescribedDOF* pdc[3] = {0};
-	pdc[0] = new FEPrescribedDOF(this); pdc[0]->SetDOF(0).SetScale(1.0, NLC); AddPrescribedBC(pdc[0]);
-	pdc[1] = new FEPrescribedDOF(this); pdc[1]->SetDOF(1).SetScale(1.0, NLC); AddPrescribedBC(pdc[1]);
-	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2).SetScale(1.0, NLC); AddPrescribedBC(pdc[2]);
+	// we create the prescribed deformation BC
+	FEBCPrescribedDeformation* pdc = new FEBCPrescribedDeformation(this);
+	AddPrescribedBC(pdc);
 
 	// assign the boundary nodes
 	for (i=0; i<N; ++i)
 		if (m_BN[i] == 1)
 		{
-			pdc[0]->AddNode(i, 0.0);
-			pdc[1]->AddNode(i, 0.0);
-			pdc[2]->AddNode(i, 0.0);
+			pdc->AddNode(i);
 		}
 
 	return true;
@@ -239,15 +236,11 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 
 	// create the DC's
 	ClearBCs();
-	FEPrescribedDOF* pdc[3] = {0};
-	pdc[0] = new FEPrescribedDOF(this); pdc[0]->SetDOF(0).SetScale(1.0, NLC); AddPrescribedBC(pdc[0]);
-	pdc[1] = new FEPrescribedDOF(this); pdc[1]->SetDOF(1).SetScale(1.0, NLC); AddPrescribedBC(pdc[1]);
-	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2).SetScale(1.0, NLC); AddPrescribedBC(pdc[2]);
+	FEBCPrescribedDeformation* pdc = new FEBCPrescribedDeformation(this);
+	AddPrescribedBC(pdc);
 
 	// assign nodes to BCs
-	pdc[0]->AddNodes(ns, 0.0);
-	pdc[1]->AddNodes(ns, 0.0);
-	pdc[2]->AddNodes(ns, 0.0);
+	pdc->AddNodes(ns);
 
 	// create the boundary node flags
 	m_BN.assign(m.Nodes(), 0);

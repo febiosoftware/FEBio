@@ -8,6 +8,7 @@ public:
 	FEBCPrescribedDeformation(FEModel* pfem);
 
 public:
+	void AddNode(int n);
 	void AddNodes(const FENodeSet& set);
 
 	void Activate();
@@ -17,6 +18,13 @@ public:
 	void PrepStep(std::vector<double>& ui, bool brel);
 
 	void Update();
+
+	int Items() const { return (int) m_node.size(); }
+
+	int NodeID(int index) const { return m_node[index]; }
+
+	void SetDeformationGradient(const mat3d& F);
+	void SetDeformationHessian(const tens3drs& G);
 
 protected:
 	vec3d NodeValue(const vec3d& X);
