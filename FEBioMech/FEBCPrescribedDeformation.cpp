@@ -15,6 +15,16 @@ FEBCPrescribedDeformation::FEBCPrescribedDeformation(FEModel* pfem) : FEPrescrib
 	m_G.zero();
 }
 
+void FEBCPrescribedDeformation::CopyFrom(FEPrescribedBC* pbc)
+{
+	FEBCPrescribedDeformation* ps = dynamic_cast<FEBCPrescribedDeformation*>(pbc); assert(ps);
+	m_scale = ps->m_scale;
+	m_F = ps->m_F;
+	m_G = ps->m_G;
+	m_node = ps->m_node;
+	CopyParameterListState(ps->GetParameterList());
+}
+
 void FEBCPrescribedDeformation::AddNode(int n)
 {
 	m_node.push_back(n);

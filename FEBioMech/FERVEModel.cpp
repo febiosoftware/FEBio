@@ -189,7 +189,7 @@ bool FERVEModel::PrepDisplacementBC()
 	ClearBCs();
 
 	// we create the prescribed deformation BC
-	FEBCPrescribedDeformation* pdc = new FEBCPrescribedDeformation(this);
+	FEBCPrescribedDeformation* pdc = fecore_new<FEBCPrescribedDeformation>(FEBC_ID, "prescribed deformation", this);
 	AddPrescribedBC(pdc);
 
 	// assign the boundary nodes
@@ -236,7 +236,7 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 
 	// create the DC's
 	ClearBCs();
-	FEBCPrescribedDeformation* pdc = new FEBCPrescribedDeformation(this);
+	FEBCPrescribedDeformation* pdc = fecore_new<FEBCPrescribedDeformation>(FEBC_ID, "prescribed deformation", this);
 	AddPrescribedBC(pdc);
 
 	// assign nodes to BCs

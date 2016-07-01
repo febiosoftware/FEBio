@@ -26,6 +26,8 @@ public:
 	void SetDeformationGradient(const mat3d& F);
 	void SetDeformationHessian(const tens3drs& G);
 
+	void CopyFrom(FEPrescribedBC* pbc);
+
 protected:
 	vec3d NodeValue(const vec3d& X);
 

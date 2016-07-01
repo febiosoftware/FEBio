@@ -308,6 +308,18 @@ void FEPrescribedDOF::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
+void FEPrescribedDOF::CopyFrom(FEPrescribedBC* pbc)
+{
+	FEPrescribedDOF* ps = dynamic_cast<FEPrescribedDOF*>(pbc); assert(ps);
+	m_dof   = ps->m_dof;
+	m_scale = ps->m_scale;
+	m_br    = ps->m_br;
+	m_data  = ps->m_data;
+	m_item  = ps->m_item;
+	CopyParameterListState(ps->GetParameterList());
+}
+
+//-----------------------------------------------------------------------------
 //! Update the values of the prescribed degrees of freedom.
 //! This is called during model update (FESolver::Update)
 void FEPrescribedDOF::Update()

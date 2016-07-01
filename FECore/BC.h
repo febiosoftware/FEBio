@@ -111,6 +111,9 @@ public:
 	// nodal degrees of freedoms
 	virtual void Update() = 0;
 
+	// copy data from another class
+	virtual void CopyFrom(FEPrescribedBC* pbc) = 0;
+
 	// Also implement the following functions.
 	// These are already declared in base classes.
 //  bool Init();
@@ -154,6 +157,8 @@ public:
 	void Update();
 
 	void PrepStep(std::vector<double>& ui, bool brel = true);
+
+	void CopyFrom(FEPrescribedBC* pbc);
 
 public:
 	FEPrescribedDOF& SetScale(double s, int lc = -1);

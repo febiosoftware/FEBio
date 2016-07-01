@@ -974,7 +974,12 @@ void FEModel::CopyFrom(FEModel& fem)
 	for (int i=0; i<NDC; ++i)
 	{
 		FEPrescribedBC* pbc = fem.PrescribedBC(i);
-		FEPrescribedBC* pnew = new FEPrescribedDOF(this, dynamic_cast<FEPrescribedDOF&>(*pbc));
+		const char* sz = pbc->GetTypeStr();
+
+		FEPrescribedBC* pnew = fecore_new<FEPrescribedBC>(FEBC_ID, sz, this);
+		assert(pnew);
+
+		pnew->CopyFrom(pbc);
 
 		// add to model
 		AddPrescribedBC(pnew);
