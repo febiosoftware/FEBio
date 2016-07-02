@@ -94,6 +94,7 @@ void FEBioInitialSection::ParseInitialSection(XMLTag& tag)
 			int ndof = -1;
 			if      (tag == "temperature"   ) ndof = dofs.GetDOF("T");
 			else if (tag == "fluid_pressure") ndof = dofs.GetDOF("p");
+            else if (tag == "dilatation"    ) ndof = dofs.GetDOF("e");
 			else if (tag == "concentration" )
 			{
 				// TODO: Add a check to make sure that a solute with this ID exists

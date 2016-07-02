@@ -127,6 +127,22 @@ public:
 	//! evaluate vector field at integration point
 	vec3d Evaluate(vec3d* vn, int n);
 
+    bool HasNode(int n)
+    {
+        int l = Nodes();
+        for (int i=0; i<l; ++i)
+            if (m_node[i] == n) return true;
+        return false;
+    }
+    
+    int FindNode(int n)
+    {
+        int l = Nodes();
+        for (int i=0; i<l; ++i)
+            if (m_node[i] == n) return i;
+        return -1;
+    }
+    
 protected:
 	int		m_nID;		//!< element ID
 	int		m_mat;		//!< material index
@@ -311,14 +327,6 @@ public:
 	void project_to_nodes(double* ai, double* ao)
 	{
 		((FESurfaceElementTraits*)m_pT)->project_to_nodes(ai, ao);
-	}
-
-	bool HasNode(int n)
-	{ 
-		int l = Nodes(); 
-		for (int i=0; i<l; ++i) 
-			if (m_node[i] == n) return true; 
-		return false;
 	}
 
 public:

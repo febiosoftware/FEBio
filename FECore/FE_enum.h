@@ -93,7 +93,9 @@ enum FE_Element_Type {
 	FE_TRI7G7,
 	FE_TRI7GL7,
 	FE_QUAD8G9,
+    FE_QUAD8NI,
 	FE_QUAD9G9,
+    FE_QUAD9NI,
 
 	// shell elements
 	FE_SHELL_QUAD,

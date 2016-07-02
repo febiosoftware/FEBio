@@ -400,6 +400,8 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 			if      (tag == "quad4") el.SetType(FE_QUAD4NI);
 			else if (tag == "tri3" ) el.SetType(FE_TRI3NI );
 			else if (tag == "tri6" ) el.SetType(FE_TRI6NI );
+            else if (tag == "quad8" ) el.SetType(FE_QUAD8NI);
+            else if (tag == "quad9" ) el.SetType(FE_QUAD9NI);
 			else throw XMLReader::InvalidTag(tag);
 		}
 		else
@@ -472,6 +474,8 @@ bool FEBioContactSection::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal
 			if      (fi.ntype == 4) el.SetType(FE_QUAD4NI);
 			else if (fi.ntype == 3) el.SetType(FE_TRI3NI );
 			else if (fi.ntype == 6) el.SetType(FE_TRI6NI );
+            else if (fi.ntype == 8) el.SetType(FE_QUAD8NI);
+            else if (fi.ntype == 9) el.SetType(FE_QUAD9NI);
 			else return false;
 		}
 		else

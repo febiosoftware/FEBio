@@ -1045,6 +1045,24 @@ private:
 };
 
 //=============================================================================
+//! class implementing 8-node quad quadrilateral with 8 nodal integration points
+//
+class FEQuad8NI : public FEQuad8_
+{
+public:
+    enum { NINT = 8 };
+    
+    // constructor
+    FEQuad8NI();
+    
+    // project integration point data to nodes
+    void project_to_nodes(double* ai, double* ao);
+    
+private:
+    matrix	Ai;
+};
+
+//=============================================================================
 //
 //   FEQuad9
 //   
@@ -1087,6 +1105,24 @@ public:
 
 private:
 	matrix	Ai;
+};
+
+//=============================================================================
+//! class implementing 9-node quad quadrilateral with 9 nodal integration points
+//
+class FEQuad9NI : public FEQuad9_
+{
+public:
+    enum { NINT = 9 };
+    
+    // constructor
+    FEQuad9NI();
+    
+    // project integration point data to nodes
+    void project_to_nodes(double* ai, double* ao);
+    
+private:
+    matrix	Ai;
 };
 
 //=============================================================================
