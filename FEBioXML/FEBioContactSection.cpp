@@ -198,7 +198,9 @@ void FEBioContactSection::ParseContactInterface25(XMLTag& tag, FESurfacePairInte
 
 	// Make sure we have a master and a slave interface
 	FESurface* pss = pci->GetSlaveSurface (); if ((pss == 0) || (pss->Elements()==0)) throw FEBioImport::MissingSlaveSurface ();
+	m.AddSurface(pss);
 	FESurface* pms = pci->GetMasterSurface(); if ((pms == 0) || (pms->Elements()==0)) throw FEBioImport::MissingMasterSurface();
+	m.AddSurface(pms);
 }
 
 //-----------------------------------------------------------------------------
