@@ -597,6 +597,9 @@
     <ClInclude Include="..\..\FEBioMech\FEBCPrescribedDeformation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FERigidSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1161,6 +1164,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEBCPrescribedDeformation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FERigidSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

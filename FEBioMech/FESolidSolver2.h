@@ -4,6 +4,7 @@
 #include "FECore/FETypes.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/FEGlobalVector.h"
+#include "FERigidSolver.h"
 
 //-----------------------------------------------------------------------------
 //! The FESolidSolver2 class solves large deformation solid mechanics problems
@@ -71,9 +72,6 @@ public:
 		//! Update Stresses
 		void UpdateStresses();
 
-		//! Update rigid body data
-		void UpdateRigidBodies(vector<double>& ui);
-
 		//! update contact data
 		virtual void UpdateContact();
 
@@ -120,15 +118,6 @@ public:
 		void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);
 	//}
 
-	//{ --- Rigid body routines ---
-
-		//! calculate rigid body mass matrix
-		void RigidMassMatrix(FERigidBody& RB);
-
-		//! calculate rigid inertial forces
-		void RigidInertialForces(FERigidBody& RB, FEGlobalVector& R);
-	//}
-
 public:
 	// convergence tolerances
 	double	m_Rtol;			//!< residual tolerance
@@ -171,6 +160,9 @@ protected:
 	int		m_dofRU;
 	int		m_dofRV;
 	int		m_dofRW;
+
+private:
+	FERigidSolver	m_rigidSolver;
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
