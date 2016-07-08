@@ -900,6 +900,8 @@ bool FESolidSolver2::StiffnessMatrix(const FETimeInfo& tp)
 				edom.MassMatrix(this, a);
 			}
 		}
+
+		m_rigidSolver.RigidMassMatrix(this, tp);
 	}
 
 	// calculate contact stiffness
@@ -930,7 +932,7 @@ bool FESolidSolver2::StiffnessMatrix(const FETimeInfo& tp)
 	for (int i = 0; i<m_fem.ModelLoads(); ++i) m_fem.ModelLoad(i)->StiffnessMatrix(this, tp);
 
 	// add contributions from rigid bodies
-	m_rigidSolver.StiffnessMatrix(this, tp);
+	m_rigidSolver.StiffnessMatrix(*m_pK, tp);
 
 	return true;
 }

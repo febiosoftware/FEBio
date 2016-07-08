@@ -3,6 +3,7 @@
 #include "FECore/FENewtonSolver.h"
 #include "FECore/FETypes.h"
 #include "FECore/FEGlobalVector.h"
+#include "FERigidSolver.h"
 
 //-----------------------------------------------------------------------------
 //! The FESolidSolver class solves large deformation solid mechanics problems
@@ -57,14 +58,8 @@ public:
 		//! update nodal positions, velocities, accelerations, etc.
 		virtual void UpdateKinematics(vector<double>& ui);
 
-		//! update rigid body kinematics for dynamic problems
-		void UpdateRigidKinematics();
-
 		//! Update Stresses
 		void UpdateStresses();
-
-		//! Update rigid body data
-		void UpdateRigidBodies(vector<double>& ui);
 
 		//! update contact data
 		virtual void UpdateContact();
@@ -83,9 +78,6 @@ public:
 
 		//! contact stiffness
 		void ContactStiffness();
-
-		//! calculate the rigid stiffnes matrices
-		void RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
 
 		//! calculates stiffness contributon of nonlinear constraints
 		void NonLinearConstraintStiffness(const FETimeInfo& tp);
@@ -155,6 +147,9 @@ protected:
 	int		m_dofRU;
 	int		m_dofRV;
 	int		m_dofRW;
+
+protected:
+	FERigidSolverOld	m_rigidSolver;
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

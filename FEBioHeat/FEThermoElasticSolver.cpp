@@ -8,7 +8,6 @@
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <FEBioMech/FEBodyForce.h>
-#include <FECore/FERigidSystem.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelLoad.h>
 
@@ -499,13 +498,7 @@ bool FEThermoElasticSolver::Residual(vector<double>& R)
 	FEResidualVector RHS(GetFEModel(), R, m_Fr);
 
 	// zero rigid body reaction forces
-	FERigidSystem& rs = *m_fem.GetRigidSystem();
-	int NRB = rs.Objects();
-	for (int i=0; i<NRB; ++i)
-	{
-		FERigidBody& RB = *rs.Object(i);
-		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
-	}
+	m_rigidSolver.Residual();
 
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();

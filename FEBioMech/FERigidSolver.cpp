@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FERigidSolver.h"
 #include "FESolidSolver2.h"
+#include "FERigidMaterial.h"
 #include <FECore/FERigidSystem.h>
 #include <FECore/FERigidBody.h>
 #include <FECore/FEModel.h>
@@ -8,10 +9,13 @@
 #include <FECore/FEAnalysis.h>
 #include <FECore/SparseMatrix.h>
 #include <FECore/log.h>
+#include <FECore/FEMaterial.h>
 
 FERigidSolver::FERigidSolver(FEModel* fem) : m_fem(fem)
 {
 	m_dofX = m_dofY = m_dofZ = -1;
+
+	m_bAllowMixedBCs = false;
 }
 
 int FERigidSolver::InitEquations(int neq)
@@ -99,16 +103,19 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 			if (RB.m_prb == 0)
 			{
 				// if all rotation dofs are fixed or prescribed, set the flag
-				if (RB.m_pDC[3] || RB.m_pDC[4] || RB.m_pDC[5])
+				if (m_bAllowMixedBCs==false)
 				{
-					bool bpofr[3] = { false };
-					for (int j = 3; j<6; ++j) if (RB.m_pDC[j] || (RB.m_LM[j] < 0)) bpofr[j - 3] = true;
-					if (bpofr[0] && bpofr[1] && bpofr[2]) RB.m_bpofr = true;
-					else
+					if (RB.m_pDC[3] || RB.m_pDC[4] || RB.m_pDC[5])
 					{
-						felog.printf("FATAL ERROR: Rigid body rotations cannot mix prescribed and free components.\n");
-						felog.printf("Rigid body: %d, Material: %d\n", RB.m_nID, RB.GetMaterialID());
-						throw "FATAL ERROR";
+						bool bpofr[3] = { false };
+						for (int j = 3; j<6; ++j) if (RB.m_pDC[j] || (RB.m_LM[j] < 0)) bpofr[j - 3] = true;
+						if (bpofr[0] && bpofr[1] && bpofr[2]) RB.m_bpofr = true;
+						else
+						{
+							felog.printf("FATAL ERROR: Rigid body rotations cannot mix prescribed and free components.\n");
+							felog.printf("Rigid body: %d, Material: %d\n", RB.m_nID, RB.GetMaterialID());
+							throw "FATAL ERROR";
+						}
 					}
 				}
 
@@ -221,164 +228,13 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSolver::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap)
-{
-	FERigidSystem& rigid = *m_fem->GetRigidSystem();
-	int nrb = rigid.Objects();
-	for (int i = 0; i<nrb; ++i)
-	{
-		// get the rigid body
-		FERigidBody& RB = *rigid.Object(i);
-		if (RB.m_prb == 0)
-		{
-			int *lm = RB.m_LM;
-			vec3d v;
-			quatd qUi;
-
-			// first do the displacements
-			for (int j = 0; j<3; ++j)
-			if (lm[j] >= 0) Ui[lm[j]] += ui[lm[j]];
-
-			// next, we do the rotations. We do this separately since
-			// they need to be interpreted differently than displacements
-			vec3d vUi(0, 0, 0);
-			vec3d vui(0, 0, 0);
-			if (lm[3] >= 0) { vUi.x = Ui[lm[3]]; vui.x = ui[lm[3]]; }
-			if (lm[4] >= 0) { vUi.y = Ui[lm[4]]; vui.y = ui[lm[4]]; }
-			if (lm[5] >= 0) { vUi.z = Ui[lm[5]]; vui.z = ui[lm[5]]; }
-			if (emap) qUi = quatd(vUi);
-			else qUi = quatd(2 * atan(vUi.norm() / 2), vUi);     // Cayley transform
-			quatd qui(2 * atan(vui.norm() / 2), vui);            // Cayley transform
-			quatd q = qui*qUi;
-			q.MakeUnit();
-			if (emap) v = q.GetVector()*q.GetAngle();
-			else v = q.GetVector()*(2 * tan(q.GetAngle() / 2)); // Cayley transform
-			if (lm[3] >= 0) Ui[lm[3]] = v.x;
-			if (lm[4] >= 0) Ui[lm[4]] = v.y;
-			if (lm[5] >= 0) Ui[lm[5]] = v.z;
-		}
-	}
-}
-
-
-//-----------------------------------------------------------------------------
-//! Updates the rigid body data
-void FERigidSolver::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
-{
-	// update rigid bodies
-	FERigidSystem& rigid = *m_fem->GetRigidSystem();
-	int nrb = rigid.Objects();
-	for (int i = 0; i<nrb; ++i)
-	{
-		// get the rigid body
-		FERigidBody& RB = *rigid.Object(i);
-		int *lm = RB.m_LM;
-		double* du = RB.m_du;
-
-		// first do the displacements
-		if (RB.m_prb == 0)
-		{
-			FERigidBodyDisplacement* pdc;
-			for (int j = 0; j<3; ++j)
-			{
-				pdc = RB.m_pDC[j];
-				if (pdc)
-				{
-					int lc = pdc->lc;
-					// TODO: do I need to take the line search step into account here?
-					du[j] = (lc < 0 ? 0 : pdc->Value() - RB.m_Up[j]);
-				}
-				else
-				{
-					du[j] = (lm[j] >= 0 ? Ui[lm[j]] + ui[lm[j]] : 0);
-				}
-			}
-		}
-
-		RB.m_rt.x = RB.m_rp.x + du[0];
-		RB.m_rt.y = RB.m_rp.y + du[1];
-		RB.m_rt.z = RB.m_rp.z + du[2];
-
-		// next, we do the rotations. We do this seperatly since
-		// they need to be interpreted differently than displacements
-		if (RB.m_prb == 0)
-		{
-			quatd qdu;          // quaternion of net increment
-
-			if (RB.m_bpofr) {
-				// if all rotation components are known (prescribed or fixed)
-				// evaluate net increment from load curve
-				double Ut[3] = { 0 };
-				for (int j = 3; j<6; ++j) {
-					if (RB.m_pDC[j]) {
-						int lc = RB.m_pDC[j]->lc;
-						Ut[j - 3] = RB.m_pDC[j]->Value();
-					}
-				}
-				quatd qUt(vec3d(Ut[0], Ut[1], Ut[2]));
-				qdu = qUt*RB.m_qp.Inverse();
-			}
-			else
-			{
-				// rotation components are either free or fixed
-				vec3d vUi(0, 0, 0);   // initialize total increment so far
-				vec3d vui(0, 0, 0);   // initialize current increment
-				if (lm[3] >= 0) { vUi.x = Ui[lm[3]]; vui.x = ui[lm[3]]; }
-				if (lm[4] >= 0) { vUi.y = Ui[lm[4]]; vui.y = ui[lm[4]]; }
-				if (lm[5] >= 0) { vUi.z = Ui[lm[5]]; vui.z = ui[lm[5]]; }
-				quatd qUi(2 * atan(vUi.norm() / 2), vUi);                    // Cayley transform
-				quatd qui(2 * atan(vui.norm() / 2), vui);                    // Cayley transform
-				qdu = qui*qUi;
-			}
-
-			qdu.MakeUnit();                                         // clean-up roundoff errors
-			vec3d vdu = qdu.GetVector()*(2 * tan(qdu.GetAngle() / 2));  // Cayley transform
-			du[3] = vdu.x; du[4] = vdu.y; du[5] = vdu.z;
-
-		}
-
-		vec3d vdu(du[3], du[4], du[5]);
-		quatd qdu(2 * atan(vdu.norm() / 2), vdu);
-		RB.m_qt = qdu*RB.m_qp;     // update at the current time step
-		RB.m_qt.MakeUnit();
-
-		if (RB.m_prb) du = RB.m_dul;
-		// update RB center of mass translations
-		RB.m_Ut[0] = RB.m_Up[0] + du[0];
-		RB.m_Ut[1] = RB.m_Up[1] + du[1];
-		RB.m_Ut[2] = RB.m_Up[2] + du[2];
-		// update RB rotations
-		vec3d vUt = RB.m_qt.GetVector()*RB.m_qt.GetAngle();
-		RB.m_Ut[3] = vUt.x;
-		RB.m_Ut[4] = vUt.y;
-		RB.m_Ut[5] = vUt.z;
-	}
-
-	// update the mesh' nodes
-	rigid.UpdateMesh();
-
-	// Since the rigid nodes are repositioned we need to update the displacement DOFS
-	FEMesh& mesh = m_fem->GetMesh();
-	int N = mesh.Nodes();
-	for (int i = 0; i<N; ++i)
-	{
-		FENode& node = mesh.Node(i);
-		if (node.m_rid >= 0)
-		{
-			vec3d ut = node.m_rt - node.m_r0;
-			node.set_vec3d(m_dofX, m_dofY, m_dofZ, ut);
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! This function calculates the rigid stiffness matrices
 void FERigidSolver::RigidStiffness(SparseMatrix& K, vector<double>& ui, vector<double>& F, vector<int>& en, vector<int>& elm, matrix& ke, double alpha)
 {
 	FERigidSystem& rigid = *m_fem->GetRigidSystem();
 	if (rigid.Objects() == 0) return;
 
-	int i, j, k, l, n = en.size();
+	int i, j, k, l, n = (int)en.size();
 
 	// get nodal DOFS
 	DOFS& fedofs = m_fem->GetDOFS();
@@ -682,7 +538,441 @@ void FERigidSolver::Residual()
 	}
 }
 
-void FERigidSolver::InertialForces(FEGlobalVector& R, const FETimeInfo& timeInfo, double beta, double gamma)
+//-----------------------------------------------------------------------------
+void FERigidSolver::StiffnessMatrix(SparseMatrix& K, const FETimeInfo& tp)
+{
+	FERigidSystem& rigid = *m_fem->GetRigidSystem();
+
+	// we still need to set the diagonal elements to 1
+	// for the prescribed rigid body dofs.
+	int NRB = rigid.Objects();
+	for (int i = 0; i<NRB; ++i)
+	{
+		FERigidBody& rb = *rigid.Object(i);
+		for (int j = 0; j<6; ++j)
+		if (rb.m_LM[j] < -1)
+		{
+			int I = -rb.m_LM[j] - 2;
+			K.set(I, I, 1);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the contribution to the mass matrix from the rigid bodies
+void FERigidSolver::RigidMassMatrix(FESolidSolver2* solver, const FETimeInfo& timeInfo)
+{
+	FERigidSystem& rigid = *m_fem->GetRigidSystem();
+
+	// element stiffness matrix
+	vector<int> lm;
+	matrix ke;
+
+	// 6 dofs per rigid body
+	ke.resize(6, 6);
+
+	// Newmark integration rule
+	double dt = timeInfo.timeIncrement;
+	double beta = timeInfo.beta;
+	double gamma = timeInfo.gamma;
+	double a = 1. / (beta*dt*dt);
+
+	for (int i=0; i<rigid.Objects(); ++i)
+	{
+		FERigidBody& RB = *rigid.Object(i);
+
+		// mass matrix
+		double M = RB.m_mass*a;
+
+		ke.zero();
+		ke[0][0] = M;
+		ke[1][1] = M;
+		ke[2][2] = M;
+
+		// evaluate mass moment of inertia at t
+		mat3d Rt = RB.m_qt.RotationMatrix();
+		mat3ds Jt = (Rt*RB.m_moi*Rt.transpose()).sym();
+
+		// incremental rotation in spatial frame
+		quatd q = RB.m_qt*RB.m_qp.Inverse();
+		q.MakeUnit();                           // clean-up roundoff errors
+		double theta = 2 * tan(q.GetAngle() / 2);   // get theta from Cayley transform
+		vec3d e = q.GetVector();
+
+		// skew-symmetric tensor whose axial vector is the incremental rotation
+		mat3d qhat;
+		qhat.skew(e*theta);
+
+		// generate tensor T(theta)
+		mat3d T = mat3dd(1) + qhat / 2 + dyad(e*theta) / 4;
+
+		// skew-symmetric of angular momentum
+		mat3d Jw;
+		Jw.skew(Jt*RB.m_wt);
+
+		// rotational inertia stiffness
+		mat3d K = (Jt*T)*a*gamma - Jw / dt;
+
+		ke[3][3] = K(0, 0); ke[3][4] = K(0, 1); ke[3][5] = K(0, 2);
+		ke[4][3] = K(1, 0); ke[4][4] = K(1, 1); ke[4][5] = K(1, 2);
+		ke[5][3] = K(2, 0); ke[5][4] = K(2, 1); ke[5][5] = K(2, 2);
+
+		lm.assign(RB.m_LM, RB.m_LM + 6);
+
+		solver->AssembleStiffness(lm, ke);
+	}
+}
+
+//=================================================================================================
+// FERigidSolverOld
+//=================================================================================================
+
+//-----------------------------------------------------------------------------
+//! This function updates the rigid body linear and angular velocity by solving
+//! an overdetermined system of linear equations using the least-square method. 
+void FERigidSolverOld::UpdateRigidKinematics()
+{
+	// get the model and mesh
+	FEModel& fem = *m_fem;
+	FEMesh& mesh = fem.GetMesh();
+	FERigidSystem& rigid = *fem.GetRigidSystem();
+
+	// loop over all rigid bodies
+	int NRB = rigid.Objects();
+	for (int j = 0; j<NRB; ++j)
+	{
+		// get the rigid body
+		FERigidBody& rb = *rigid.Object(j);
+
+		// right-hand side and least-square matrix
+		vector<double> r; r.assign(6, 0.0);
+		matrix m(6, 6); m.zero();
+
+		// we need to loop over all domains that define this rigid body
+		int ncnt = 0;
+		int NDOM = mesh.Domains();
+		for (int n = 0; n<NDOM; ++n)
+		{
+			FEDomain& dom = mesh.Domain(n);
+			FEMaterial* pm = dom.GetMaterial();
+			if (pm->IsRigid())
+			{
+				FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
+				if (prm->GetRigidBodyID() == j)
+				{
+					// now loop over all the nodes
+					int NN = dom.Nodes();
+					for (int i = 0; i<NN; ++i, ncnt++)
+					{
+						vec3d ri = dom.Node(i).m_rt - rb.m_rt;
+						vec3d vi = dom.Node(i).get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
+
+						vec3d wi = ri ^ vi;
+
+						// right-hand side
+						r[0] += vi.x;
+						r[1] += vi.y;
+						r[2] += vi.z;
+						r[3] += wi.x;
+						r[4] += wi.y;
+						r[5] += wi.z;
+
+						// least-squares matrix
+						m[0][0] += 1.0;
+						m[1][1] += 1.0;
+						m[2][2] += 1.0;
+
+						m[0][4] += ri.z; m[0][5] += -ri.y;
+						m[1][3] += -ri.z; m[1][5] += ri.x;
+						m[2][3] += ri.y; m[2][4] += -ri.x;
+
+						m[3][4] += -ri.z; m[3][5] += ri.y;
+						m[4][3] += ri.z; m[4][5] += -ri.x;
+						m[5][3] += -ri.y; m[5][4] += ri.x;
+
+						m[3][3] += ri.y*ri.y + ri.z*ri.z; m[3][4] += -ri.x*ri.y; m[3][5] += -ri.x*ri.z;
+						m[4][4] += ri.x*ri.x + ri.z*ri.z; m[4][3] += -ri.x*ri.y; m[4][5] += -ri.y*ri.z;
+						m[5][5] += ri.x*ri.x + ri.y*ri.y; m[5][3] += -ri.x*ri.z; m[5][4] += -ri.y*ri.z;
+					}
+				}
+			}
+		}
+
+		// solve for the rigid body velocity (if we have enough nodes)
+		if (ncnt > 2)
+		{
+			vector<double> VR = r / m;
+			rb.m_vt = vec3d(VR[0], VR[1], VR[2]);
+			rb.m_wt = vec3d(VR[3], VR[4], VR[5]);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Updates the rigid body data
+void FERigidSolverOld::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui, bool bnewUpdate)
+{
+	// get the number of rigid bodies
+	FERigidSystem& rigid = *m_fem->GetRigidSystem();
+	const int NRB = rigid.Objects();
+
+	// first calculate the rigid body displacement increments
+	for (int i = 0; i<NRB; ++i)
+	{
+		// get the rigid body
+		FERigidBody& RB = *rigid.Object(i);
+		int *lm = RB.m_LM;
+		double* du = RB.m_du;
+
+		if (RB.m_prb == 0)
+		{
+			for (int j = 0; j<6; ++j)
+			{
+				du[j] = (lm[j] >= 0 ? Ui[lm[j]] + ui[lm[j]] : 0);
+			}
+		}
+	}
+
+	// for prescribed displacements, the displacement increments are evaluated differently
+	// TODO: Is this really necessary? Why can't the ui vector contain the correct values?
+	const int NRD = rigid.PrescribedBCs();
+	for (int i = 0; i<NRD; ++i)
+	{
+		FERigidBodyDisplacement& dc = *rigid.PrescribedBC(i);
+		if (dc.IsActive())
+		{
+			FERigidBody& RB = *rigid.Object(dc.id);
+			if (RB.m_prb == 0)
+			{
+				RB.m_du[dc.bc] = (dc.lc < 0 ? 0 : dc.Value() - RB.m_Up[dc.bc]);
+			}
+		}
+	}
+
+	// update the rigid bodies
+	for (int i = 0; i<NRB; ++i)
+	{
+		// get the rigid body
+		FERigidBody& RB = *rigid.Object(i);
+		double* du = RB.m_du;
+
+		if (bnewUpdate)
+		{
+			// This is the "new" update algorithm which addressesses a couple issues
+			// with the old method, namely that prescribed rotational dofs aren't update correctly.
+			// Unfortunately, it seems to produce worse convergence in some cases, especially with line search
+			// and it doesn't work when rigid bodies are used in a hierarchy
+			if (RB.m_prb) du = RB.m_dul;
+			RB.m_Ut[0] = RB.m_Up[0] + du[0];
+			RB.m_Ut[1] = RB.m_Up[1] + du[1];
+			RB.m_Ut[2] = RB.m_Up[2] + du[2];
+			RB.m_Ut[3] = RB.m_Up[3] + du[3];
+			RB.m_Ut[4] = RB.m_Up[4] + du[4];
+			RB.m_Ut[5] = RB.m_Up[5] + du[5];
+
+			RB.m_rt = RB.m_r0 + vec3d(RB.m_Ut[0], RB.m_Ut[1], RB.m_Ut[2]);
+
+			vec3d Rt(RB.m_Ut[3], RB.m_Ut[4], RB.m_Ut[5]);
+			RB.m_qt = quatd(Rt);
+		}
+		else
+		{
+			// This is the "old" update algorithm which has some issues. It does not produce the correct
+			// rigid body orientation when the rotational degrees of freedom are prescribed.
+			RB.m_rt.x = RB.m_rp.x + du[0];
+			RB.m_rt.y = RB.m_rp.y + du[1];
+			RB.m_rt.z = RB.m_rp.z + du[2];
+
+			vec3d r = vec3d(du[3], du[4], du[5]);
+			double w = sqrt(r.x*r.x + r.y*r.y + r.z*r.z);
+			quatd dq = quatd(w, r);
+
+			RB.m_qt = dq*RB.m_qp;
+			RB.m_qt.MakeUnit();
+
+			if (RB.m_prb) du = RB.m_dul;
+			RB.m_Ut[0] = RB.m_Up[0] + du[0];
+			RB.m_Ut[1] = RB.m_Up[1] + du[1];
+			RB.m_Ut[2] = RB.m_Up[2] + du[2];
+			RB.m_Ut[3] = RB.m_Up[3] + du[3];
+			RB.m_Ut[4] = RB.m_Up[4] + du[4];
+			RB.m_Ut[5] = RB.m_Up[5] + du[5];
+		}
+	}
+
+	// we need to update the position of rigid nodes
+	rigid.UpdateMesh();
+
+	// Since the rigid nodes are repositioned we need to update the displacement DOFS
+	FEMesh& mesh = m_fem->GetMesh();
+	int N = mesh.Nodes();
+	for (int i = 0; i<N; ++i)
+	{
+		FENode& node = mesh.Node(i);
+		if (node.m_rid >= 0)
+		{
+			vec3d ut = node.m_rt - node.m_r0;
+			node.set_vec3d(m_dofX, m_dofY, m_dofZ, ut);
+		}
+	}
+}
+
+//=================================================================================================
+// FERigidSolverNew
+//=================================================================================================
+
+//-----------------------------------------------------------------------------
+void FERigidSolverNew::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap)
+{
+	FERigidSystem& rigid = *m_fem->GetRigidSystem();
+	int nrb = rigid.Objects();
+	for (int i = 0; i<nrb; ++i)
+	{
+		// get the rigid body
+		FERigidBody& RB = *rigid.Object(i);
+		if (RB.m_prb == 0)
+		{
+			int *lm = RB.m_LM;
+			vec3d v;
+			quatd qUi;
+
+			// first do the displacements
+			for (int j = 0; j<3; ++j)
+			if (lm[j] >= 0) Ui[lm[j]] += ui[lm[j]];
+
+			// next, we do the rotations. We do this separately since
+			// they need to be interpreted differently than displacements
+			vec3d vUi(0, 0, 0);
+			vec3d vui(0, 0, 0);
+			if (lm[3] >= 0) { vUi.x = Ui[lm[3]]; vui.x = ui[lm[3]]; }
+			if (lm[4] >= 0) { vUi.y = Ui[lm[4]]; vui.y = ui[lm[4]]; }
+			if (lm[5] >= 0) { vUi.z = Ui[lm[5]]; vui.z = ui[lm[5]]; }
+			if (emap) qUi = quatd(vUi);
+			else qUi = quatd(2 * atan(vUi.norm() / 2), vUi);     // Cayley transform
+			quatd qui(2 * atan(vui.norm() / 2), vui);            // Cayley transform
+			quatd q = qui*qUi;
+			q.MakeUnit();
+			if (emap) v = q.GetVector()*q.GetAngle();
+			else v = q.GetVector()*(2 * tan(q.GetAngle() / 2)); // Cayley transform
+			if (lm[3] >= 0) Ui[lm[3]] = v.x;
+			if (lm[4] >= 0) Ui[lm[4]] = v.y;
+			if (lm[5] >= 0) Ui[lm[5]] = v.z;
+		}
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+//! Updates the rigid body data
+void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
+{
+	// update rigid bodies
+	FERigidSystem& rigid = *m_fem->GetRigidSystem();
+	int nrb = rigid.Objects();
+	for (int i = 0; i<nrb; ++i)
+	{
+		// get the rigid body
+		FERigidBody& RB = *rigid.Object(i);
+		int *lm = RB.m_LM;
+		double* du = RB.m_du;
+
+		// first do the displacements
+		if (RB.m_prb == 0)
+		{
+			FERigidBodyDisplacement* pdc;
+			for (int j = 0; j<3; ++j)
+			{
+				pdc = RB.m_pDC[j];
+				if (pdc)
+				{
+					int lc = pdc->lc;
+					// TODO: do I need to take the line search step into account here?
+					du[j] = (lc < 0 ? 0 : pdc->Value() - RB.m_Up[j]);
+				}
+				else
+				{
+					du[j] = (lm[j] >= 0 ? Ui[lm[j]] + ui[lm[j]] : 0);
+				}
+			}
+		}
+
+		RB.m_rt.x = RB.m_rp.x + du[0];
+		RB.m_rt.y = RB.m_rp.y + du[1];
+		RB.m_rt.z = RB.m_rp.z + du[2];
+
+		// next, we do the rotations. We do this seperatly since
+		// they need to be interpreted differently than displacements
+		if (RB.m_prb == 0)
+		{
+			quatd qdu;          // quaternion of net increment
+
+			if (RB.m_bpofr) {
+				// if all rotation components are known (prescribed or fixed)
+				// evaluate net increment from load curve
+				double Ut[3] = { 0 };
+				for (int j = 3; j<6; ++j) {
+					if (RB.m_pDC[j]) {
+						int lc = RB.m_pDC[j]->lc;
+						Ut[j - 3] = RB.m_pDC[j]->Value();
+					}
+				}
+				quatd qUt(vec3d(Ut[0], Ut[1], Ut[2]));
+				qdu = qUt*RB.m_qp.Inverse();
+			}
+			else
+			{
+				// rotation components are either free or fixed
+				vec3d vUi(0, 0, 0);   // initialize total increment so far
+				vec3d vui(0, 0, 0);   // initialize current increment
+				if (lm[3] >= 0) { vUi.x = Ui[lm[3]]; vui.x = ui[lm[3]]; }
+				if (lm[4] >= 0) { vUi.y = Ui[lm[4]]; vui.y = ui[lm[4]]; }
+				if (lm[5] >= 0) { vUi.z = Ui[lm[5]]; vui.z = ui[lm[5]]; }
+				quatd qUi(2 * atan(vUi.norm() / 2), vUi);                    // Cayley transform
+				quatd qui(2 * atan(vui.norm() / 2), vui);                    // Cayley transform
+				qdu = qui*qUi;
+			}
+
+			qdu.MakeUnit();                                         // clean-up roundoff errors
+			vec3d vdu = qdu.GetVector()*(2 * tan(qdu.GetAngle() / 2));  // Cayley transform
+			du[3] = vdu.x; du[4] = vdu.y; du[5] = vdu.z;
+
+		}
+
+		vec3d vdu(du[3], du[4], du[5]);
+		quatd qdu(2 * atan(vdu.norm() / 2), vdu);
+		RB.m_qt = qdu*RB.m_qp;     // update at the current time step
+		RB.m_qt.MakeUnit();
+
+		if (RB.m_prb) du = RB.m_dul;
+		// update RB center of mass translations
+		RB.m_Ut[0] = RB.m_Up[0] + du[0];
+		RB.m_Ut[1] = RB.m_Up[1] + du[1];
+		RB.m_Ut[2] = RB.m_Up[2] + du[2];
+		// update RB rotations
+		vec3d vUt = RB.m_qt.GetVector()*RB.m_qt.GetAngle();
+		RB.m_Ut[3] = vUt.x;
+		RB.m_Ut[4] = vUt.y;
+		RB.m_Ut[5] = vUt.z;
+	}
+
+	// update the mesh' nodes
+	rigid.UpdateMesh();
+
+	// Since the rigid nodes are repositioned we need to update the displacement DOFS
+	FEMesh& mesh = m_fem->GetMesh();
+	int N = mesh.Nodes();
+	for (int i = 0; i<N; ++i)
+	{
+		FENode& node = mesh.Node(i);
+		if (node.m_rid >= 0)
+		{
+			vec3d ut = node.m_rt - node.m_r0;
+			node.set_vec3d(m_dofX, m_dofY, m_dofZ, ut);
+		}
+	}
+}
+
+void FERigidSolverNew::InertialForces(FEGlobalVector& R, const FETimeInfo& timeInfo, double beta, double gamma)
 {
 	// Newmark rule
 	double dt = timeInfo.timeIncrement;
@@ -754,93 +1044,4 @@ void FERigidSolver::InertialForces(FEGlobalVector& R, const FETimeInfo& timeInfo
 		// add to rigid body torque
 		RB.m_Mr += M;
 	}
-}
-
-//-----------------------------------------------------------------------------
-void FERigidSolver::StiffnessMatrix(FESolidSolver2* solver, const FETimeInfo& tp)
-{
-	FEAnalysis* pstep = m_fem->GetCurrentStep();
-	FERigidSystem& rigid = *m_fem->GetRigidSystem();
-	if (pstep->m_nanalysis == FE_DYNAMIC)
-	{
-		// loop over all rigid bodies
-		for (int i = 0; i<rigid.Objects(); ++i)
-		{
-			FERigidBody& RB = *rigid.Object(i);
-			RigidMassMatrix(solver, RB, tp);
-		}
-	}
-
-	// we still need to set the diagonal elements to 1
-	// for the prescribed rigid body dofs.
-	SparseMatrix& K = *solver->GetStiffnessMatrix().GetSparseMatrixPtr();
-	int NRB = rigid.Objects();
-	for (int i = 0; i<NRB; ++i)
-	{
-		FERigidBody& rb = *rigid.Object(i);
-		for (int j = 0; j<6; ++j)
-		if (rb.m_LM[j] < -1)
-		{
-			int I = -rb.m_LM[j] - 2;
-			K.set(I, I, 1);
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! This function calculates the contribution to the mass matrix from the rigid bodies
-void FERigidSolver::RigidMassMatrix(FESolidSolver2* solver, FERigidBody& RB, const FETimeInfo& timeInfo)
-{
-	// element stiffness matrix
-	vector<int> lm;
-	matrix ke;
-
-	// 6 dofs per rigid body
-	ke.resize(6, 6);
-	ke.zero();
-
-	// Newmark integration rule
-	double dt = timeInfo.timeIncrement;
-	double beta = timeInfo.beta;
-	double gamma = timeInfo.gamma;
-	double a = 1. / (beta*dt*dt);
-
-	// mass matrix
-	double M = RB.m_mass*a;
-
-	ke[0][0] = M;
-	ke[1][1] = M;
-	ke[2][2] = M;
-
-	// evaluate mass moment of inertia at t
-	mat3d Rt = RB.m_qt.RotationMatrix();
-	mat3ds Jt = (Rt*RB.m_moi*Rt.transpose()).sym();
-
-	// incremental rotation in spatial frame
-	quatd q = RB.m_qt*RB.m_qp.Inverse();
-	q.MakeUnit();                           // clean-up roundoff errors
-	double theta = 2 * tan(q.GetAngle() / 2);   // get theta from Cayley transform
-	vec3d e = q.GetVector();
-
-	// skew-symmetric tensor whose axial vector is the incremental rotation
-	mat3d qhat;
-	qhat.skew(e*theta);
-
-	// generate tensor T(theta)
-	mat3d T = mat3dd(1) + qhat / 2 + dyad(e*theta) / 4;
-
-	// skew-symmetric of angular momentum
-	mat3d Jw;
-	Jw.skew(Jt*RB.m_wt);
-
-	// rotational inertia stiffness
-	mat3d K = (Jt*T)*a*gamma - Jw / dt;
-
-	ke[3][3] = K(0, 0); ke[3][4] = K(0, 1); ke[3][5] = K(0, 2);
-	ke[4][3] = K(1, 0); ke[4][4] = K(1, 1); ke[4][5] = K(1, 2);
-	ke[5][3] = K(2, 0); ke[5][4] = K(2, 1); ke[5][5] = K(2, 2);
-
-	lm.assign(RB.m_LM, RB.m_LM + 6);
-
-	solver->AssembleStiffness(lm, ke);
 }

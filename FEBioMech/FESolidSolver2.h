@@ -161,8 +161,8 @@ protected:
 	int		m_dofRV;
 	int		m_dofRW;
 
-private:
-	FERigidSolver	m_rigidSolver;
+protected:
+	FERigidSolverNew	m_rigidSolver;
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

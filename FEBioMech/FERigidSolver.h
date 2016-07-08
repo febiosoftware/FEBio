@@ -19,6 +19,9 @@ class FERigidSolver
 public:
 	FERigidSolver(FEModel* fem);
 
+	// destructor
+	virtual ~FERigidSolver(){}
+
 	// initialize the equation
 	// neq is the number of equations that already have been assigned
 	// returns the new total number of equations or -1 on error
@@ -26,12 +29,6 @@ public:
 
 	// This is called at the start of each time step
 	void PrepStep(const FETimeInfo& timeInfo, vector<double>& ui);
-
-	// update rigid DOF increments
-	void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
-
-	// update rigid bodies
-	void UpdateRigidBodies(vector<double> &Ui, vector<double>& ui);
 
 	// correct stiffness matrix for rigid bodies
 	void RigidStiffness(SparseMatrix& K, vector<double>& ui, vector<double>& F, vector<int>& en, vector<int>& elm, matrix& ke, double alpha);
@@ -43,17 +40,47 @@ public:
 	// Currently, this is used for resetting rigid body forces
 	void Residual();
 
-	// evaluate inertial data
-	void InertialForces(FEGlobalVector& R, const FETimeInfo& timeInfo, double beta, double gamma);
-
 	// contribution from rigid bodies to stiffness matrix
-	void StiffnessMatrix(FESolidSolver2* solver, const FETimeInfo& tp);
+	void StiffnessMatrix(SparseMatrix& K, const FETimeInfo& tp);
 
 	// calculate contribution to mass matrix from a rigid body
-	void RigidMassMatrix(FESolidSolver2* solver, FERigidBody& RB, const FETimeInfo& timeInfo);
+	void RigidMassMatrix(FESolidSolver2* solver, const FETimeInfo& timeInfo);
 
-private:
+public:
+	void AllowMixedBCs(bool b) { m_bAllowMixedBCs = b; }
+
+protected:
 	FEModel*	m_fem;
 	int			m_dofX, m_dofY, m_dofZ;
 	int			m_dofVX, m_dofVY, m_dofVZ;
+	bool		m_bAllowMixedBCs;
+};
+
+//-----------------------------------------------------------------------------
+class FERigidSolverOld : public FERigidSolver
+{
+public:
+	FERigidSolverOld(FEModel* fem) : FERigidSolver(fem) { AllowMixedBCs(true); }
+
+	//! update rigid body kinematics for dynamic problems
+	void UpdateRigidKinematics();
+
+	//! Update rigid body data
+	void UpdateRigidBodies(vector<double>& Ui, vector<double>& ui, bool bnewUpdate);
+};
+
+//-----------------------------------------------------------------------------
+class FERigidSolverNew : public FERigidSolver
+{
+public:
+	FERigidSolverNew(FEModel* fem) : FERigidSolver(fem){}
+
+	// evaluate inertial data
+	void InertialForces(FEGlobalVector& R, const FETimeInfo& timeInfo, double beta, double gamma);
+
+	// update rigid DOF increments
+	void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
+
+	// update rigid bodies
+	void UpdateRigidBodies(vector<double> &Ui, vector<double>& ui);
 };

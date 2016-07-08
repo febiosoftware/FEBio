@@ -18,7 +18,6 @@
 #include <FECore/FEModel.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
-#include <FECore/FERigidSystem.h>
 #include <FECore/RigidBC.h>
 
 //-----------------------------------------------------------------------------
@@ -578,13 +577,7 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 	FEResidualVector RHS(GetFEModel(), R, m_Fr);
 
 	// zero rigid body reaction forces
-	FERigidSystem& rs = *m_fem.GetRigidSystem();
-	int NRB = rs.Objects();
-	for (i=0; i<NRB; ++i)
-	{
-		FERigidBody& RB = *rs.Object(i);
-		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
-	}
+	m_rigidSolver.Residual();
 
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
@@ -793,20 +786,8 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimeInfo& tp)
 	// constrainst enforced with augmented lagrangian
 	NonLinearConstraintStiffness(tp);
 
-	// we still need to set the diagonal elements to 1
-	// for the prescribed rigid body dofs.
-	FERigidSystem& rs = *m_fem.GetRigidSystem();
-	int NRB = rs.Objects();
-	for (i=0; i<NRB; ++i)
-	{
-		FERigidBody& rb = *rs.Object(i);
-		for (j=0; j<6; ++j)
-			if (rb.m_LM[j] < -1)
-			{
-				I = -rb.m_LM[j]-2;
-				K.set(I,I, 1);
-			}
-	}
+	// add contributions from rigid bodies
+	m_rigidSolver.StiffnessMatrix(*m_pK, tp);
 
 	return true;
 }
