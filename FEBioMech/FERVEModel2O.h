@@ -18,6 +18,9 @@ public:
 	//! one time initialization
 	bool InitRVE(bool bperiodic, const char* szbc);
 
+	// scale the geometry
+	void ScaleGeometry(double scale);
+
 public:
 	//! Return the initial volume (calculated in Init)
 	double InitialVolume() const { return m_V0; }

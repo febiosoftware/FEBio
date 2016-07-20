@@ -119,6 +119,7 @@ FEMicroProbe::FEMicroProbe(FEModel* pfem) : FEMaterial(pfem)
 	m_ngp = 1;		// by default, first gauss point (note is one-based!)
 	sprintf(m_szfile, "rve.xplt");
 	m_probe = 0;
+	m_bdebug = false;
 }
 
 FEMicroProbe::~FEMicroProbe()

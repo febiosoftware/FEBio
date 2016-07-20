@@ -40,6 +40,7 @@ BEGIN_PARAMETER_LIST(FEMicroMaterial2O, FEElasticMaterial2O)
 	ADD_PARAMETER(m_szrve    , FE_PARAM_STRING, "RVE"     );
 	ADD_PARAMETER(m_szbc     , FE_PARAM_STRING, "bc_set"  );
 	ADD_PARAMETER(m_bperiodic, FE_PARAM_BOOL  , "periodic");
+	ADD_PARAMETER(m_scale    , FE_PARAM_DOUBLE, "scale");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -49,6 +50,7 @@ FEMicroMaterial2O::FEMicroMaterial2O(FEModel* pfem) : FEElasticMaterial2O(pfem)
 	m_szrve[0] = 0;
 	m_szbc[0] = 0;
 	m_bperiodic = false;
+	m_scale = 1.0;
 
 	AddProperty(&m_probe, "probe", false);
 }
@@ -82,6 +84,9 @@ bool FEMicroMaterial2O::Init()
 	// the RVE problem.
 	Logfile::MODE nmode = felog.GetMode();
 	felog.SetMode(Logfile::NEVER);
+
+	// scale geometry
+	m_mrve.ScaleGeometry(m_scale);
 
 	// initialize master RVE
 	if (m_mrve.InitRVE(m_bperiodic, m_szbc) == false) return MaterialError("An error occurred preparing RVE model");

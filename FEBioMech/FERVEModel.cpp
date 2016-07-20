@@ -40,7 +40,22 @@ bool FERVEModel::InitRVE(bool bperiodic, const char* szbc)
 	if (bperiodic == false)
 	{
 		// find the boundary nodes
-		FindBoundaryNodes(m_BN);
+		if ((szbc) && (szbc[0] != 0))
+		{
+			// get the RVE mesh
+			FEMesh& m = GetMesh();
+
+			// find the node set that defines the corner nodes
+			FENodeSet* pset = m.FindNodeSet(szbc);
+			if (pset == 0) return false;
+
+			FENodeSet& ns = *pset;
+
+			int NN = m.Nodes();
+			m_BN.assign(NN, 0);
+			for (int i=0; i<pset->size(); ++i) m_BN[ns[i]] = 1; 
+		}
+		else FindBoundaryNodes(m_BN);
 
 		// prep displacement BC's
 		if (PrepDisplacementBC() == false) return false;

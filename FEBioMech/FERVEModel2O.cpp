@@ -9,6 +9,7 @@
 #include "FECore/LoadCurve.h"
 #include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
+#include "FEBCPrescribedDeformation.h"
 
 //-----------------------------------------------------------------------------
 FERVEModel2O::FERVEModel2O()
@@ -22,6 +23,18 @@ FERVEModel2O::FERVEModel2O()
 //-----------------------------------------------------------------------------
 FERVEModel2O::~FERVEModel2O()
 {
+}
+
+//-----------------------------------------------------------------------------
+void FERVEModel2O::ScaleGeometry(double scale)
+{
+	FEMesh& mesh = GetMesh();
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		node.m_r0 *= scale;
+		node.m_rt *= scale;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -41,7 +54,22 @@ bool FERVEModel2O::InitRVE(bool bperiodic, const char* szbc)
 	if (bperiodic == false)
 	{
 		// find the boundary nodes
-		FindBoundaryNodes(m_BN);
+		if ((szbc) && (szbc[0] != 0))
+		{
+			// get the RVE mesh
+			FEMesh& m = GetMesh();
+
+			// find the node set that defines the corner nodes
+			FENodeSet* pset = m.FindNodeSet(szbc);
+			if (pset == 0) return false;
+
+			FENodeSet& ns = *pset;
+
+			int NN = m.Nodes();
+			m_BN.assign(NN, 0);
+			for (int i = 0; i<pset->size(); ++i) m_BN[ns[i]] = 1;
+		}
+		else FindBoundaryNodes(m_BN);
 
 		// prep displacement BC's
 		if (PrepDisplacementBC() == false) return false;
@@ -189,20 +217,16 @@ bool FERVEModel2O::PrepDisplacementBC()
 	// clear all BCs
 	ClearBCs();
 
-	// we create three DCs, one for each displacement dof
-	FEPrescribedDOF* pdc[3] = { 0 };
-	pdc[0] = new FEPrescribedDOF(this); pdc[0]->SetDOF(0).SetScale(1.0, NLC); AddPrescribedBC(pdc[0]);
-	pdc[1] = new FEPrescribedDOF(this); pdc[1]->SetDOF(1).SetScale(1.0, NLC); AddPrescribedBC(pdc[1]);
-	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2).SetScale(1.0, NLC); AddPrescribedBC(pdc[2]);
+	// we create the prescribed deformation BC
+	FEBCPrescribedDeformation* pdc = fecore_new<FEBCPrescribedDeformation>(FEBC_ID, "prescribed deformation", this);
+	AddPrescribedBC(pdc);
 
 	// assign the boundary nodes
-	for (i=0; i<N; ++i)
-		if (m_BN[i] == 1)
-		{
-			pdc[0]->AddNode(i, 0.0);
-			pdc[1]->AddNode(i, 0.0);
-			pdc[2]->AddNode(i, 0.0);
-		}
+	for (i = 0; i<N; ++i)
+	if (m_BN[i] == 1)
+	{
+		pdc->AddNode(i);
+	}
 
 	return true;
 }
@@ -309,23 +333,9 @@ void FEMicroModel2O::UpdateBC(const mat3d& F, const tens3drs& G)
 	FEMesh& m = GetMesh();
 
 	// assign new DC's for the boundary nodes
-	FEPrescribedDOF& dx = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(0));
-	FEPrescribedDOF& dy = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(1));
-	FEPrescribedDOF& dz = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(2));
-
-	for (int i=0; i<(int) dx.Items(); ++i)
-	{
-		FENode& node = m.Node(dx.NodeID(i));
-		const vec3d& r0 = node.m_r0;
-		
-		// Apply the second order boundary conditions to the RVE problem
-		vec3d r1 = F*r0 + G.contractdyad1(r0)*0.5;
-
-		// set the node scale
-		dx.SetNodeScale(i, r1.x - r0.x);
-		dy.SetNodeScale(i, r1.y - r0.y);
-		dz.SetNodeScale(i, r1.z - r0.z);
-	}
+	FEBCPrescribedDeformation& bc = dynamic_cast<FEBCPrescribedDeformation&>(*PrescribedBC(0));
+	bc.SetDeformationGradient(F);
+	bc.SetDeformationHessian(G);
 
 	if (m_bperiodic)
 	{
@@ -392,7 +402,7 @@ mat3d FEMicroModel2O::AveragedStressPK1(FEMaterialPoint &mp)
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(0));
+	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*PrescribedBC(0));
 	int nitems = dc.Items();
 	for (int i=0; i<nitems; ++i)
 	{
@@ -446,9 +456,7 @@ void FEMicroModel2O::AveragedStress2O(mat3d& Pa, tens3drs& Qa)
 	// get the reaction force vector from the solid solver
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero).
-	FEPrescribedDOF& dx = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(0));
-	FEPrescribedDOF& dy = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(1));
-	FEPrescribedDOF& dz = dynamic_cast<FEPrescribedDOF&>(*PrescribedBC(2));
+	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*PrescribedBC(0));
 
 	const int dof_X = GetDOFIndex("x");
 	const int dof_Y = GetDOFIndex("y");
@@ -458,10 +466,10 @@ void FEMicroModel2O::AveragedStress2O(mat3d& Pa, tens3drs& Qa)
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 
-	int N = dx.Items();
+	int N = dc.Items();
 	for (int i=0; i<N; ++i)
 	{
-		FENode& n = m.Node(dx.NodeID(i));
+		FENode& n = m.Node(dc.NodeID(i));
 		vec3d f;
 		f.x = R[-n.m_ID[dof_X]-2];
 		f.y = R[-n.m_ID[dof_Y]-2];
