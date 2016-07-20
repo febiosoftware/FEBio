@@ -7,7 +7,6 @@
 #include "FEBioMech/FEElasticDomain.h"
 #include "FEBioMech/FEPressureLoad.h"
 #include "FEBioMech/FEResidualVector.h"
-#include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/sys.h"
 #include <FECore/FEModel.h>
@@ -57,16 +56,9 @@ bool FEBiphasicSolver::Init()
 		m_Pi.assign(m_npeq, 0);
 
 		// we need to fill the total displacement vector m_Ut
-		// TODO: I need to find an easier way to do this
+		// (displacements are already handled in base class)
 		FEMesh& mesh = m_fem.GetMesh();
-		int i, n;
-		for (i=0; i<mesh.Nodes(); ++i)
-		{
-			FENode& node = mesh.Node(i);
-
-			// pressure dofs
-			n = node.m_ID[m_dofP]; if (n >= 0) m_Ut[n] = node.get(m_dofP);
-		}
+		gather(m_Ut, mesh, m_dofP);
 	}
 
 	return true;
@@ -701,23 +693,21 @@ void FEBiphasicSolver::UpdateKinematics(vector<double>& ui)
 //! Updates the poroelastic data
 void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 {
-	int i, n;
-
 	FEMesh& mesh = m_fem.GetMesh();
 	double dt = m_fem.GetTime().timeIncrement;
 
 	// update poro-elasticity data
-	for (i=0; i<mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 
 		// update nodal pressures
-		n = node.m_ID[m_dofP];
+		int n = node.m_ID[m_dofP];
 		if (n >= 0) node.set(m_dofP, 0 + m_Ut[n] + m_Ui[n] + ui[n]);
 	}
 
 	// update poro-elasticity data
-	for (i=0; i<mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 

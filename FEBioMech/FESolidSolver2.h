@@ -2,7 +2,6 @@
 
 #include "FECore/FENewtonSolver.h"
 #include "FECore/FETypes.h"
-#include "FECore/FERigidBody.h"
 #include "FECore/FEGlobalVector.h"
 #include "FERigidSolver.h"
 

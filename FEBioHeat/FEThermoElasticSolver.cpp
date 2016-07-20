@@ -2,7 +2,6 @@
 #include "FEBioMech/FEResidualVector.h"
 #include <FEBioMech/FEElasticDomain.h>
 #include "FEThermoElasticSolidDomain.h"
-#include <FECore/FERigidBody.h>
 #include <FECore/log.h>
 #include <FECore/sys.h>
 #include <FECore/FEModel.h>
@@ -63,15 +62,8 @@ bool FEThermoElasticSolver::Init()
 		m_Ti.assign(m_nteq, 0);
 
 		// we need to fill the total displacement vector m_Ut
-		// TODO: I need to find an easier way to do this
 		FEMesh& mesh = m_fem.GetMesh();
-		for (int i=0; i<mesh.Nodes(); ++i)
-		{
-			FENode& node = mesh.Node(i);
-
-			// temperature dofs
-			int n = node.m_ID[m_dofT]; if (n >= 0) m_Ut[n] = node.get(m_dofT);
-		}
+		gather(m_Ut, mesh, m_dofT);
 	}
 
 	return true;
@@ -583,15 +575,10 @@ void FEThermoElasticSolver::Update(vector<double>& ui)
 	// update all elastic data
 	FESolidSolver::Update(ui);
 
+	// total temperature
+	vector<double> u = m_Ut + m_Ui + ui;
+
 	// update nodal temperatures
 	FEMesh& mesh = m_fem.GetMesh();
-	const int NN = mesh.Nodes();
-	for (int i=0; i<NN; ++i)
-	{
-		FENode& node = mesh.Node(i);
-
-		// current temperature = initial + total at prev conv step + total increment so far + current increment
-		int n = node.m_ID[m_dofT];
-		if (n >= 0) node.set(m_dofT, m_Ut[n] + m_Ui[n] + ui[n]);
-	}
+	scatter(u, mesh, m_dofT);
 }

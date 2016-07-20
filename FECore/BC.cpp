@@ -2,7 +2,6 @@
 #include "BC.h"
 #include "FEModel.h"
 #include "FESolver.h"
-#include "FERigidBody.h"
 #include "log.h"
 #include "DOFS.h"
 

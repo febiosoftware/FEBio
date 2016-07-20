@@ -16,6 +16,8 @@
 #include "vec3d.h"
 using namespace std;
 
+class FEMesh;
+
 double operator*(const vector<double>& a, const vector<double>& b);
 vector<double> operator - (vector<double>& a, vector<double>& b);
 template<typename T> void zero(vector<T>& a) { fill(a.begin(), a.end(), T(0)); }
@@ -27,5 +29,12 @@ vector<double> operator + (const vector<double>& a, const vector<double>& b);
 
 // copy vector and scale
 void vcopys(vector<double>& a, const vector<double>& b, double s);
+
+// gather operation (copy mesh data to vector)
+void gather(vector<double>& v, FEMesh& mesh, int ndof);
+void gather(vector<double>& v, FEMesh& mesh, const vector<int>& dof);
+
+// scatter operation (copy vector data to mesh)
+void scatter(vector<double>& v, FEMesh& mesh, int ndof);
 
 #endif // AFX_VECTOR_H__9F132D73_20B9_4AE9_A40B_EE4FB9D0FABD__INCLUDED_

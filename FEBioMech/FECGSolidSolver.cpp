@@ -120,25 +120,14 @@ bool FECGSolidSolver::Init()
 	m_Ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);
 
-	int i, n;
-
 	// we need to fill the total displacement vector m_Ut
-	// TODO: I need to find an easier way to do this
 	FEMesh& mesh = m_fem.GetMesh();
-	for (i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-
-		// displacement dofs
-		n = node.m_ID[m_dofX]; if (n >= 0) m_Ut[n] = node.get(m_dofX);
-		n = node.m_ID[m_dofY]; if (n >= 0) m_Ut[n] = node.get(m_dofY);
-		n = node.m_ID[m_dofZ]; if (n >= 0) m_Ut[n] = node.get(m_dofZ);
-
-		// rotational dofs
-		n = node.m_ID[m_dofU]; if (n >= 0) m_Ut[n] = node.get(m_dofU);
-		n = node.m_ID[m_dofV]; if (n >= 0) m_Ut[n] = node.get(m_dofV);
-		n = node.m_ID[m_dofW]; if (n >= 0) m_Ut[n] = node.get(m_dofW);
-	}
+	gather(m_Ut, mesh, m_dofX);
+	gather(m_Ut, mesh, m_dofY);
+	gather(m_Ut, mesh, m_dofZ);
+	gather(m_Ut, mesh, m_dofU);
+	gather(m_Ut, mesh, m_dofV);
+	gather(m_Ut, mesh, m_dofW);
 
 	return true;
 }
@@ -717,34 +706,29 @@ bool FECGSolidSolver::SolveStep(double time)
 //! accelerations, etc.
 void FECGSolidSolver::UpdateKinematics(vector<double>& ui)
 {
-	int i, n;
-
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
 
 	// update rigid bodies
 	UpdateRigidBodies(ui);
 
+	// total displacements
+	vector<double> U(m_Ut.size());
+	for (size_t i=0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ui[i] + m_Ut[i];
+
 	// update flexible nodes
-	for (i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-
-		// displacement dofs
-		// current position = initial + total at prev conv step + total increment so far + current increment  
-		if ((n = node.m_ID[m_dofX]) >= 0) node.set(m_dofX, m_Ut[n] + m_Ui[n] + ui[n]);
-		if ((n = node.m_ID[m_dofY]) >= 0) node.set(m_dofY, m_Ut[n] + m_Ui[n] + ui[n]);
-		if ((n = node.m_ID[m_dofZ]) >= 0) node.set(m_dofZ, m_Ut[n] + m_Ui[n] + ui[n]);
-
-		// rotational dofs
-		if ((n = node.m_ID[m_dofU]) >= 0) node.set(m_dofU, m_Ut[n] + m_Ui[n] + ui[n]);
-		if ((n = node.m_ID[m_dofV]) >= 0) node.set(m_dofV, m_Ut[n] + m_Ui[n] + ui[n]);
-		if ((n = node.m_ID[m_dofW]) >= 0) node.set(m_dofW, m_Ut[n] + m_Ui[n] + ui[n]);
-	}
+	// translational dofs
+	scatter(U, mesh, m_dofX);
+	scatter(U, mesh, m_dofY);
+	scatter(U, mesh, m_dofZ);
+	// rotational dofs
+	scatter(U, mesh, m_dofU);
+	scatter(U, mesh, m_dofV);
+	scatter(U, mesh, m_dofW);
 
 	// make sure the prescribed displacements are fullfilled
 	int ndis = m_fem.PrescribedBCs();
-	for (i=0; i<ndis; ++i)
+	for (int i=0; i<ndis; ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
 		if (dc.IsActive()) dc.Update();
@@ -752,7 +736,7 @@ void FECGSolidSolver::UpdateKinematics(vector<double>& ui)
 
 	// Update the spatial nodal positions
 	// Don't update rigid nodes since they are already updated
-	for (i=0; i<mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 		if (node.m_rid == -1)

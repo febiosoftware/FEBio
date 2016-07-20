@@ -2,7 +2,6 @@
 #include "FEModel.h"
 #include "LoadCurve.h"
 #include "FEMaterial.h"
-#include "FERigidBody.h"
 #include "FERigidSystem.h"
 #include "FEModelLoad.h"
 #include "BC.h"

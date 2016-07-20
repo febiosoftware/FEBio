@@ -7,7 +7,6 @@
 #include "FECore/ElementDataRecord.h"
 #include "FECore/ObjectDataRecord.h"
 #include "FECore/NLConstraintDataRecord.h"
-#include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FECoreKernel.h"
 #include "FECore/DumpFile.h"

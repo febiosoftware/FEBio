@@ -6,7 +6,6 @@
 #include "FETriphasicDomain.h"
 #include "FEBioMech/FEPressureLoad.h"
 #include "FEBioMech/FEResidualVector.h"
-#include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEModelLoad.h>
@@ -58,20 +57,15 @@ bool FEBiphasicSoluteSolver::Init()
 	}
 	
 	// we need to fill the total displacement vector m_Ut
-	// TODO: I need to find an easier way to do this
-	FEMesh& mesh = m_fem.GetMesh();
-	for (i=0; i<mesh.Nodes(); ++i)
+	vector<int> dofs;
+	for (int i=0; i<MAX_CDOFS; ++i) 
 	{
-		FENode& node = mesh.Node(i);
-		
-		// concentration dofs
-		for (j=0; j<MAX_CDOFS; ++j) {
-			if (m_nceq[j]) {
-				n = node.m_ID[m_dofC+j];
-				if (n >= 0) m_Ut[n] = node.get(m_dofC + j);
-			}
-		}
+		if (m_nceq[j])
+			dofs.push_back(m_dofC + j);
 	}
+
+	FEMesh& mesh = m_fem.GetMesh();
+	gather(m_Ut, mesh, dofs);
 
 	return true;
 }
