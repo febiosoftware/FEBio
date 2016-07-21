@@ -58,7 +58,7 @@ bool FEBiphasicSoluteSolver::Init()
 	
 	// we need to fill the total displacement vector m_Ut
 	vector<int> dofs;
-	for (int i=0; i<MAX_CDOFS; ++i) 
+	for (int j=0; j<MAX_CDOFS; ++j) 
 	{
 		if (m_nceq[j])
 			dofs.push_back(m_dofC + j);
