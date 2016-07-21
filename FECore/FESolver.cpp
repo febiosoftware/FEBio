@@ -45,7 +45,8 @@ bool FESolver::InitStep(double time)
 //-----------------------------------------------------------------------------
 bool FESolver::Init()
 {
-	return true;
+	// parameter checking
+	return Validate();
 }
 
 //-----------------------------------------------------------------------------

@@ -12,7 +12,7 @@ class FEBoundaryCondition;
 
 //-----------------------------------------------------------------------------
 //! Base class for finite element analysis
-class FEAnalysis
+class FEAnalysis : public FECoreBase
 {
 public:
 	//! constructor
@@ -171,5 +171,5 @@ protected:
 	std::vector<int>				m_Dom;	//!< list of active domains for this analysis
 	std::vector<FEModelComponent*>	m_MC;	//!< array of model components active during this step
 
-public:
+	DECLARE_PARAMETER_LIST();
 };

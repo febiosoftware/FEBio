@@ -166,7 +166,7 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FENLCONSTRAINT_ID           0x0006	// derived from FENLConstraint
 #define FECOORDSYSMAP_ID            0x0007	// derived from FECoordSysMap
 #define FEPLOTDATA_ID               0x0008	// derived from FEPlotData
-//#define FEANALYSIS_ID               0x0009	// derived from FEAnalysis (Obsolete from 2.5)
+#define FEANALYSIS_ID               0x0009	// derived from FEAnalysis
 #define FESURFACEPAIRINTERACTION_ID 0x000A	// derived from FESurfacePairInteraction
 #define FENODELOGDATA_ID            0x000B	// derived from FENodeLogData
 #define FEELEMLOGDATA_ID            0x000C	// derived from FElemLogData

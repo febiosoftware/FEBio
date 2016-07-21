@@ -2,8 +2,8 @@
 #include "BC.h"
 #include "FEModel.h"
 #include "FESolver.h"
-#include "log.h"
 #include "DOFS.h"
+#include "FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FENodalLoad, FEBoundaryCondition)
@@ -232,8 +232,7 @@ bool FEPrescribedDOF::Init()
 		if ((nid < 0) || (nid >= NN)) return false;
 		if (mesh.Node(nid).m_rid != -1)
 		{
-			felog.printf("ERROR: Rigid nodes cannot be prescribed.\n");
-			return false;
+			return fecore_error("Rigid nodes cannot be prescribed.");
 		}
 	}
 
@@ -259,7 +258,7 @@ void FEPrescribedDOF::Activate()
 		// evaluate the relative offset
 		if (m_br)
 		{
-			assert(m_dof < node.m_val.size());
+			assert(m_dof < (int)node.m_val.size());
 			double r = node.get(m_dof);
 			m_item[j].ref = r;
 		}

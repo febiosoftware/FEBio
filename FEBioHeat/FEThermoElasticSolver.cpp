@@ -61,7 +61,7 @@ bool FEThermoElasticSolver::Init()
 		m_ti.assign(m_nteq, 0);
 		m_Ti.assign(m_nteq, 0);
 
-		// we need to fill the total displacement vector m_Ut
+		// we need to fill the total solution vector
 		FEMesh& mesh = m_fem.GetMesh();
 		gather(m_Ut, mesh, m_dofT);
 	}

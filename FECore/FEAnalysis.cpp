@@ -12,8 +12,14 @@
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
 
+BEGIN_PARAMETER_LIST(FEAnalysis, FECoreBase)
+	ADD_PARAMETER2(m_ntime     , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0)  , "time_steps");
+	ADD_PARAMETER2(m_dt0       , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size");
+	ADD_PARAMETER2(m_final_time, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
+END_PARAMETER_LIST()
+
 //-----------------------------------------------------------------------------
-FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem)
+FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID)
 {
 	m_psolver = 0;
 	m_tend = 0.0;
@@ -107,15 +113,7 @@ void FEAnalysis::SetFESolver(FESolver* psolver)
 //! Data initialization and data chekcing.
 bool FEAnalysis::Init()
 {
-	if ((m_ntime <= 0) && (m_final_time <= 0.0)) { felog.printf("Invalid number of time steps for analysis step.\n"); return false; }
-	if ((m_ntime >  0) && (m_final_time >  0.0)) { felog.printf("You must either set the number of time steps or the final time but not both.\n"); return false; }
-	if (m_dt0   <= 0) { felog.printf("Invalid time step size for analysis step\n"); return false; }
-	if (m_bautostep)
-	{
-//		if (m_pStep->m_dtmin <= 0) return err("Invalid minimum time step size");
-//		if (m_pStep->m_dtmax <= 0) return err("Invalid maximum time step size");
-	}
-	return true;
+	return Validate();
 }
 
 //-----------------------------------------------------------------------------
@@ -195,6 +193,8 @@ bool FEAnalysis::Activate()
 	// do one time initialization of solver data
 	if (psolver->Init() == false)
 	{
+		const char* szerr = fecore_get_error_string();
+		felog.printf("ERROR: %s\n", szerr);
 		felog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");
 		return false;
 	}

@@ -22,10 +22,10 @@
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FESolidSolver, FENewtonSolver)
-	ADD_PARAMETER(m_Dtol         , FE_PARAM_DOUBLE, "dtol"        );
-	ADD_PARAMETER(m_Etol         , FE_PARAM_DOUBLE, "etol"        );
-	ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );
-	ADD_PARAMETER(m_Rmin         , FE_PARAM_DOUBLE, "min_residual");
+	ADD_PARAMETER2(m_Dtol        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "dtol"        );
+	ADD_PARAMETER2(m_Etol        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "etol"        );
+	ADD_PARAMETER2(m_Rtol        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"        );
+	ADD_PARAMETER2(m_Rmin        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
 	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
 	ADD_PARAMETER(m_gamma        , FE_PARAM_DOUBLE, "gamma"       );
 	ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
@@ -107,12 +107,6 @@ bool FESolidSolver::Init()
 {
 	// initialize base class
 	if (FENewtonSolver::Init() == false) return false;
-
-	// check parameters
-	if (m_Dtol <  0.0) { felog.printf("Error: dtol must be nonnegative.\n"   ); return false; }
-	if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }
-	if (m_Rtol <  0.0) { felog.printf("Error: rtol must be nonnegative.\n"); return false; }
-	if (m_Rmin <  0.0) { felog.printf("Error: min_residual must be nonnegative.\n"  ); return false; }
 
 	// allocate vectors
 	int neq = m_neq;

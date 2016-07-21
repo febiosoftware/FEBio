@@ -12,12 +12,12 @@
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
-	ADD_PARAMETER(m_LStol    , FE_PARAM_DOUBLE, "lstol"   );
-	ADD_PARAMETER(m_LSmin    , FE_PARAM_DOUBLE, "lsmin"   );
-	ADD_PARAMETER(m_LSiter   , FE_PARAM_INT   , "lsiter"  );
-	ADD_PARAMETER(m_maxref   , FE_PARAM_INT   , "max_refs");
-	ADD_PARAMETER(m_maxups   , FE_PARAM_INT   , "max_ups" );
-	ADD_PARAMETER(m_cmax     , FE_PARAM_DOUBLE, "cmax"    );
+	ADD_PARAMETER2(m_LStol    , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "lstol"   );
+	ADD_PARAMETER2(m_LSmin    , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "lsmin"   );
+	ADD_PARAMETER2(m_LSiter   , FE_PARAM_INT   , FE_RANGE_GREATER(0.0), "lsiter"  );
+	ADD_PARAMETER2(m_maxref   , FE_PARAM_INT   , FE_RANGE_GREATER(0.0), "max_refs");
+	ADD_PARAMETER2(m_maxups   , FE_PARAM_INT   , FE_RANGE_GREATER(0.0), "max_ups" );
+	ADD_PARAMETER2(m_cmax     , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "cmax"    );
 	ADD_PARAMETER(m_nqnsolver, FE_PARAM_INT   , "qnmethod");
 	ADD_PARAMETER(m_bzero_diagonal, FE_PARAM_BOOL  , "check_zero_diagonal");
 	ADD_PARAMETER(m_zero_tol      , FE_PARAM_DOUBLE, "zero_diagonal_tol"  );
@@ -191,15 +191,8 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 //-----------------------------------------------------------------------------
 bool FENewtonSolver::Init()
 {
+	// Base class initialization and validation
 	if (FESolver::Init() == false) return false;
-
-	// check parameters
-	if (m_LStol  < 0.0) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
-	if (m_LSmin  < 0.0) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
-	if (m_LSiter < 0  ) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
-	if (m_maxref < 0  ) { felog.printf("Error: max_refs must be nonnegative.\n"); return false; }
-	if (m_maxups < 0) { felog.printf("Error: max_ups must be nonnegative.\n" ); return false; }
-	if (m_cmax   < 0) { felog.printf("Error: cmax must be nonnegative.\n"    ); return false; }
 
 	// choose a solution strategy
 	switch (m_nqnsolver)
