@@ -12,12 +12,12 @@
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
-	ADD_PARAMETER2(m_LStol    , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "lstol"   );
-	ADD_PARAMETER2(m_LSmin    , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "lsmin"   );
-	ADD_PARAMETER2(m_LSiter   , FE_PARAM_INT   , FE_RANGE_GREATER(0.0), "lsiter"  );
-	ADD_PARAMETER2(m_maxref   , FE_PARAM_INT   , FE_RANGE_GREATER(0.0), "max_refs");
-	ADD_PARAMETER2(m_maxups   , FE_PARAM_INT   , FE_RANGE_GREATER(0.0), "max_ups" );
-	ADD_PARAMETER2(m_cmax     , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "cmax"    );
+	ADD_PARAMETER2(m_LStol    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lstol"   );
+	ADD_PARAMETER2(m_LSmin    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
+	ADD_PARAMETER2(m_LSiter   , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
+	ADD_PARAMETER2(m_maxref   , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_refs");
+	ADD_PARAMETER2(m_maxups   , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" );
+	ADD_PARAMETER2(m_cmax     , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
 	ADD_PARAMETER(m_nqnsolver, FE_PARAM_INT   , "qnmethod");
 	ADD_PARAMETER(m_bzero_diagonal, FE_PARAM_BOOL  , "check_zero_diagonal");
 	ADD_PARAMETER(m_zero_tol      , FE_PARAM_DOUBLE, "zero_diagonal_tol"  );
