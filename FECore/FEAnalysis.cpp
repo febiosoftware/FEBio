@@ -13,7 +13,7 @@
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
 
 BEGIN_PARAMETER_LIST(FEAnalysis, FECoreBase)
-	ADD_PARAMETER2(m_ntime     , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0)  , "time_steps");
+	ADD_PARAMETER2(m_ntime     , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
 	ADD_PARAMETER2(m_dt0       , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size");
 	ADD_PARAMETER2(m_final_time, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
 END_PARAMETER_LIST()
