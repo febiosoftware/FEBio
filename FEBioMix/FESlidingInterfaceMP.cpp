@@ -564,6 +564,7 @@ FESlidingInterfaceMP::FESlidingInterfaceMP(FEModel* pfem) : FEContactInterface(p
     m_ambc.assign(MAX_CDOFS,0);
 	m_nsegup = 0;
 	m_bautopen = false;
+    m_bupdtpen = false;
 	
 	m_naugmin = 0;
 	m_naugmax = 10;
