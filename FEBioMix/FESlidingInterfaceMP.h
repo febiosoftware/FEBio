@@ -154,6 +154,8 @@ protected:
 	
 	void CalcAutoConcentrationPenalty(FESlidingSurfaceMP& s, const int isol);
 	double AutoConcentrationPenalty(FESurfaceElement& el, FESlidingSurfaceMP& s, const int isol);
+    
+    double AutoPenalty(FESurfaceElement& el, FESurface &s);
 	
 public:
 	FESlidingSurfaceMP	m_ms;	//!< master surface
@@ -172,8 +174,9 @@ public:
 	int				m_naugmin;		//!< minimum nr of augmentations
 	int				m_nsegup;		//!< segment update parameter
 	
-	double			m_epsn;		//!< normal penalty factor
-	bool			m_bautopen;	//!< use autopenalty factor
+	double			m_epsn;         //!< normal penalty factor
+	bool			m_bautopen;     //!< use autopenalty factor
+    bool            m_bupdtpen;     //!< update penalty at each time step
 	
 	// multiphasic contact parameters
 	double	m_epsp;					//!< fluid volumetric flow rate penalty
