@@ -336,6 +336,7 @@ void FESlidingSurfaceMP::Serialize(DumpStream& ar)
 		if (ar.IsSaving())
 		{
 			int N = (int) m_Data.size();
+            ar << N;
 			for (int i=0; i<N; ++i)
 			{
 				vector<Data>& di = m_Data[i];
@@ -361,7 +362,9 @@ void FESlidingSurfaceMP::Serialize(DumpStream& ar)
 		}
 		else
 		{
-			int N = (int) m_Data.size();
+			int N;
+            ar >> N;
+            m_Data.resize(N);
 			for (int i=0; i<N; ++i)
 			{
 				vector<Data>& di = m_Data[i];
@@ -384,14 +387,6 @@ void FESlidingSurfaceMP::Serialize(DumpStream& ar)
 			}
 			ar >> m_nn;
 			ar >> m_sid;
-        
-			// reset element pointers
-			for (int i=0; i<Elements(); ++i)
-			{
-				vector<Data>& di = m_Data[i];
-				int n = (int) di.size();
-				for (int j=0; j<n; ++j) di[j].m_pme = 0;
-			}
 		}
 	}
 	else
@@ -416,6 +411,7 @@ void FESlidingSurfaceMP::Serialize(DumpStream& ar)
 		if (ar.IsSaving())
 		{
 			int N = (int) m_Data.size();
+            ar << N;
 			for (int i=0; i<N; ++i)
 			{
 				vector<Data>& di = m_Data[i];
@@ -441,7 +437,9 @@ void FESlidingSurfaceMP::Serialize(DumpStream& ar)
 		}
 		else
 		{
-			int N = (int) m_Data.size();
+			int N;
+            ar >> N;
+            m_Data.resize(N);
 			for (int i=0; i<N; ++i)
 			{
 				vector<Data>& di = m_Data[i];
@@ -2274,6 +2272,57 @@ void FESlidingInterfaceMP::Serialize(DumpStream &ar)
 	// serialize contact surface data
 	m_ms.Serialize(ar);
 	m_ss.Serialize(ar);
+    
+    if (ar.IsShallow())
+    {
+        if (ar.IsSaving())
+        {
+            ar << m_epsp;
+            ar << m_epsc;
+            ar << m_ambp;
+            ar << m_ambc;
+            ar << m_sid;
+            ar << m_ssl;
+            ar << m_msl;
+            ar << m_sz;
+        }
+        else
+        {
+            ar >> m_epsp;
+            ar >> m_epsc;
+            ar >> m_ambp;
+            ar >> m_ambc;
+            ar >> m_sid;
+            ar >> m_ssl;
+            ar >> m_msl;
+            ar >> m_sz;
+        }
+    }
+    else
+    {
+        if (ar.IsSaving())
+        {
+            ar << m_epsp;
+            ar << m_epsc;
+            ar << m_ambp;
+            ar << m_ambc;
+            ar << m_sid;
+            ar << m_ssl;
+            ar << m_msl;
+            ar << m_sz;
+        }
+        else
+        {
+            ar >> m_epsp;
+            ar >> m_epsc;
+            ar >> m_ambp;
+            ar >> m_ambc;
+            ar >> m_sid;
+            ar >> m_ssl;
+            ar >> m_msl;
+            ar >> m_sz;
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
