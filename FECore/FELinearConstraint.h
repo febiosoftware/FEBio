@@ -1,6 +1,6 @@
 #pragma once
 #include "FEModelComponent.h"
-#include <list>
+#include <vector>
 using namespace std;
 
 //-----------------------------------------------------------------------------

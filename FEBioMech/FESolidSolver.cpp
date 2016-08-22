@@ -17,6 +17,7 @@
 #include <FECore/sys.h>
 #include <FECore/RigidBC.h>
 #include <FECore/FEModelLoad.h>
+#include <FECore/FELinearConstraintManager.h>
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
@@ -286,19 +287,19 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 	// enforce the linear constraints
 	// TODO: do we really have to do this? Shouldn't the algorithm
 	// already guarantee that the linear constraints are satisfied?
-	if (m_fem.m_LinC.size() > 0)
+	FELinearConstraintManager& LCM = m_fem.GetLinearConstraintManager();
+	if (LCM.LinearConstraints() > 0)
 	{
-		int nlin = m_fem.m_LinC.size();
-		list<FELinearConstraint>::iterator it = m_fem.m_LinC.begin();
+		int nlin = LCM.LinearConstraints();
 		double d;
-		for (int n=0; n<nlin; ++n, ++it)
+		for (int n=0; n<nlin; ++n)
 		{
-			FELinearConstraint& lc = *it;
+			const FELinearConstraint& lc = LCM.LinearConstraint(n);
 			FENode& node = mesh.Node(lc.master.node);
 
 			d = 0;
 			int ns = lc.slave.size();
-			list<FELinearConstraint::SlaveDOF>::iterator si = lc.slave.begin();
+			list<FELinearConstraint::SlaveDOF>::const_iterator si = lc.slave.begin();
 			for (int i=0; i<ns; ++i, ++si)
 			{
 				FENode& node = mesh.Node(si->node);
@@ -802,21 +803,18 @@ bool FESolidSolver::StiffnessMatrix(const FETimeInfo& tp)
 	// zero the residual adjustment vector
 	zero(m_Fd);
 
-	// nodal degrees of freedom
-	int i, j, I;
-
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
 
 	// calculate the stiffness matrix for each domain
-	for (i=0; i<mesh.Domains(); ++i) 
+	for (int i=0; i<mesh.Domains(); ++i) 
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
 		dom.StiffnessMatrix(this);
 	}
 
 	// calculate the body force stiffness matrix for each domain
-	for (i=0; i<mesh.Domains(); ++i) 
+	for (int i = 0; i<mesh.Domains(); ++i)
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
 		int NBL = m_fem.BodyLoads();
@@ -836,7 +834,7 @@ bool FESolidSolver::StiffnessMatrix(const FETimeInfo& tp)
 		double a = 1.0 / (m_beta*dt*dt);
 
 		// loop over all domains
-		for (i=0; i<mesh.Domains(); ++i) 
+		for (int i = 0; i<mesh.Domains(); ++i)
 		{
 			FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
 			dom.MassMatrix(this, a);
@@ -851,7 +849,7 @@ bool FESolidSolver::StiffnessMatrix(const FETimeInfo& tp)
 
 	// calculate stiffness matrices for surface loads
 	int nsl = m_fem.SurfaceLoads();
-	for (i=0; i<nsl; ++i)
+	for (int i = 0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
 		if (psl->IsActive())
@@ -868,7 +866,7 @@ bool FESolidSolver::StiffnessMatrix(const FETimeInfo& tp)
 	NonLinearConstraintStiffness(tp);
 
 	// calculate the stiffness contributions for the rigid forces
-	for (i=0; i<m_fem.ModelLoads(); ++i) m_fem.ModelLoad(i)->StiffnessMatrix(this, tp);
+	for (int i = 0; i<m_fem.ModelLoads(); ++i) m_fem.ModelLoad(i)->StiffnessMatrix(this, tp);
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
@@ -952,107 +950,10 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 	vector<double>& ui = m_ui;
 
 	// adjust for linear constraints
-	if (m_fem.m_LinC.size() > 0)
+	FELinearConstraintManager& LCM = m_fem.GetLinearConstraintManager();
+	if (LCM.LinearConstraints() > 0)
 	{
-		int i, j, l;
-		int nlin = m_fem.m_LinC.size();
-
-		int ndof = ke.rows();
-		int ndn = ndof / en.size();
-
-		SparseMatrix& K = *m_pK;
-
-		// loop over all stiffness components 
-		// and correct for linear constraints
-		int ni, nj, li, lj, I, J, k;
-		double kij;
-		for (i=0; i<ndof; ++i)
-		{
-			ni = MAX_NDOFS*(en[i/ndn]) + i%ndn;
-			li = m_fem.m_LCT[ni];
-			for (j=0; j<ndof; ++j)
-			{
-				nj = MAX_NDOFS*(en[j/ndn]) + j%ndn;
-				lj = m_fem.m_LCT[nj];
-
-				if ((li >= 0) && (lj < 0))
-				{
-					// dof i is constrained
-					FELinearConstraint& Li = *m_fem.m_LCA[li];
-
-					assert(elm[i] == -1);
-
-					list<FELinearConstraint::SlaveDOF>::iterator is = Li.slave.begin();
-					for (k=0; k<(int)Li.slave.size(); ++k, ++is)
-					{
-						I = is->neq;
-						J = elm[j];
-						kij = is->val*ke[i][j];
-						if ((J>=I) && (I >=0)) K.add(I,J, kij);
-						else
-						{
-							// adjust for prescribed dofs
-							J = -J-2;
-							if ((J>=0) && (J<m_nreq) && (I>=0)) m_Fd[I] -= kij*ui[J];
-						}
-					}
-				}
-				else if ((lj >= 0) && (li < 0))
-				{
-					// dof j is constrained
-					FELinearConstraint& Lj = *m_fem.m_LCA[lj];
-
-					assert(elm[j] == -1);
-
-					list<FELinearConstraint::SlaveDOF>::iterator js = Lj.slave.begin();
-
-					for (k=0; k<(int)Lj.slave.size(); ++k, ++js)
-					{
-						I = elm[i];
-						J = js->neq;
-						kij = js->val*ke[i][j];
-						if ((J>=I) && (I >=0)) K.add(I,J, kij);
-						else
-						{
-							// adjust for prescribed dofs
-							J = -J-2;
-							if ((J>=0) && (J<m_nreq) && (I>=0)) m_Fd[I] -= kij*ui[J];
-						}
-					}
-				}
-				else if ((li >= 0) && (lj >= 0))
-				{
-					// both dof i and j are constrained
-					FELinearConstraint& Li = *m_fem.m_LCA[li];
-					FELinearConstraint& Lj = *m_fem.m_LCA[lj];
-
-					list<FELinearConstraint::SlaveDOF>::iterator is = Li.slave.begin();
-					list<FELinearConstraint::SlaveDOF>::iterator js = Lj.slave.begin();
-
-					assert(elm[i] == -1);
-					assert(elm[j] == -1);
-
-					for (k=0; k<(int)Li.slave.size(); ++k, ++is)
-					{
-						js = Lj.slave.begin();
-						for  (l=0; l<(int)Lj.slave.size(); ++l, ++js)
-						{
-							I = is->neq;
-							J = js->neq;
-							kij = ke[i][j]*is->val*js->val;
-
-							if ((J>=I) && (I >=0)) K.add(I,J, kij);
-							else
-							{
-								// adjust for prescribed dofs
-								J = -J-2;
-								if ((J>=0) && (J<m_nreq) && (I>=0)) m_Fd[I] -= kij*ui[J];
-							}
-						}
-					}
-				}
-			}
-		}
+		LCM.AssembleStiffness(*m_pK, m_Fd, m_ui, en, elm, ke);
 	}
 
 	// adjust stiffness matrix for prescribed degrees of freedom

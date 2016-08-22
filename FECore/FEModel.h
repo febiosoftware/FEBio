@@ -1,8 +1,8 @@
 #pragma once
 #include "DOFS.h"
 #include "FEMesh.h"
-#include "FELinearConstraint.h"
 #include "FETypes.h"
+#include "FEModelComponent.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -45,6 +45,7 @@ class FERigidSystem;
 class FEAnalysis;
 class FEGlobalData;
 class FEGlobalMatrix;
+class FELinearConstraintManager;
 
 //-----------------------------------------------------------------------------
 //! The FEModel class stores all the data for the finite element model, including
@@ -84,6 +85,9 @@ public:
 
 	// get the rigid system
 	FERigidSystem* GetRigidSystem() { return m_prs; }
+
+	// get the linear constraint manager
+	FELinearConstraintManager& GetLinearConstraintManager();
 
 	//! Validate BC's
 	bool InitBCs();
@@ -352,11 +356,8 @@ protected:
 	// the rigid body system
 	FERigidSystem*		m_prs;	//!< the rigid body system manages rigid bodies
 
-public:
 	// linear constraint data
-	list<FELinearConstraint>	m_LinC;		//!< linear constraints data
-	vector<int>					m_LCT;		//!< linear constraint table
-	vector<FELinearConstraint*>	m_LCA;		//!< linear constraint array (temporary solution!)
+	FELinearConstraintManager*	m_LCM;
 
 protected:
 	char	m_sztitle[MAX_STRING];	//!< problem title

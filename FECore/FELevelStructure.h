@@ -65,7 +65,7 @@ public:
 	void Create(FENodeNodeList& L, int nroot);
 
 	//! return the depth, ie. the number of levels.
-	int Depth() { return m_lval.size(); }
+	int Depth() const { return (int) m_lval.size(); }
 
 	//! return the width of the level structure
 	int Width() { return m_nwidth; }

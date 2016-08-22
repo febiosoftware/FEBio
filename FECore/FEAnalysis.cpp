@@ -8,6 +8,7 @@
 #include "FEBoundaryCondition.h"
 #include "DumpMemStream.h"
 #include "LoadCurve.h"
+#include "FELinearConstraintManager.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -201,14 +202,11 @@ bool FEAnalysis::Activate()
 
 	// initialize linear constraints
 	// Must be done after equations are initialized
-	if (InitLinearConstraints() == false) return false;
+	if (m_fem.GetLinearConstraintManager().Initialize() == false) return false;
 
 	// activate the linear constraints
-	if (m_fem.m_LinC.size())
-	{
-		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
-		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il) il->Activate();
-	}
+	// TODO: Why is this done here and not during activation?
+	m_fem.GetLinearConstraintManager().Activate();
 
 	return true;
 }
@@ -227,65 +225,6 @@ void FEAnalysis::Deactivate()
 
 	// deactivate the time step
 	m_bactive = false;
-}
-
-//-----------------------------------------------------------------------------
-//! This function initializes the linear constraint table (LCT). This table
-//! contains for each dof the linear constraint it belongs to. (or -1 if it is
-//! not constraint)
-
-bool FEAnalysis::InitLinearConstraints()
-{
-	int nlin = m_fem.m_LinC.size();
-	if (nlin == 0) return true;
-	int i;
-
-	FEMesh& mesh = m_fem.GetMesh();
-
-	// set the equation numbers for the linear constraints
-	list<FELinearConstraint>::iterator it = m_fem.m_LinC.begin();
-	for (i=0; i<nlin; ++i, ++it)
-	{
-		FELinearConstraint& lc = *it;
-		lc.master.neq = mesh.Node(lc.master.node).m_ID[lc.master.bc];
-
-		// make sure the master did not get assigned an equation
-		assert(lc.master.neq == -1);
-
-		// set the slave equation numbers
-		list<FELinearConstraint::SlaveDOF>::iterator is = lc.slave.begin();
-		int nn = lc.slave.size();
-		for (int n=0; n<nn; ++n, ++is)
-		{
-			FELinearConstraint::SlaveDOF& sn = *is;
-			sn.neq = mesh.Node(sn.node).m_ID[sn.bc];
-		}		
-	}
-
-	// create the linear constraint table
-    DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_NDOFS = fedofs.GetTotalDOFS();
-	m_fem.m_LCT.assign(mesh.Nodes()*MAX_NDOFS, -1);
-
-	list<FELinearConstraint>::iterator ic = m_fem.m_LinC.begin();
-	for (i=0; i<nlin; ++i, ++ic)
-	{
-		FELinearConstraint& lc = *ic;
-		int n = lc.master.node;
-		int m = lc.master.bc;
-		
-		m_fem.m_LCT[n*MAX_NDOFS+m] = i;
-	}
-
-	// to simplify accessing the linear constraint data
-	// we store all pointers in an array
-	// TODO: perhaps I should store the linear constraints that way
-	// anyways and get rid of the list
-	m_fem.m_LCA.resize(nlin);
-	ic = m_fem.m_LinC.begin();
-	for (i=0; i<nlin; ++i, ++ic) m_fem.m_LCA[i] = &(*ic);
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------

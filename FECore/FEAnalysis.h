@@ -98,9 +98,6 @@ public:
 	int GetDumpLevel() { return m_ndump; }
 
 protected:
-	//! initialize constraint data
-	bool InitLinearConstraints();
-
 	//! Do a running restart
 	void Retry();
 

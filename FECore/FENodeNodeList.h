@@ -36,7 +36,7 @@ public:
 	//! create the node-node list for a domain
 	void Create(FEDomain& dom);
 
-	int Size() { return m_nval.size(); }
+	int Size() const { return (int) m_nval.size(); }
 
 	int Valence(int i) { return m_nval[i]; }
 	int* NodeList(int i) { return &m_nref[0] + m_pn[i]; }

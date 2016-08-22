@@ -14,6 +14,7 @@
 #include "FEAnalysis.h"
 #include "FEGlobalData.h"
 #include "FECoreKernel.h"
+#include "FELinearConstraintManager.h"
 #include "log.h"
 #include <string>
 using namespace std;
@@ -40,6 +41,10 @@ FEModel::FEModel(void)
 	// create a rigid system
 	// TODO: Perhaps I can set it inially to zero and only allocate it if a rigid body is defined
 	m_prs = new FERigidSystem(this);
+
+	// create the linear constraint manager
+	// TODO: Perhaps I can set it inially to zero and only allocate it if a rigid body is defined
+	m_LCM = new FELinearConstraintManager(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -79,6 +84,12 @@ void FEModel::Clear()
 
 	// clear the mesh
 	m_mesh.Clear();
+}
+
+//-----------------------------------------------------------------------------
+FELinearConstraintManager& FEModel::GetLinearConstraintManager()
+{
+	return *m_LCM;
 }
 
 //-----------------------------------------------------------------------------
@@ -1374,21 +1385,6 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 			ml.Serialize(ar);
 		}
 
-		// linear constraints
-		ar << (int) m_LinC.size();
-		list<FELinearConstraint>::iterator it = m_LinC.begin();
-		for (int i=0; i<(int) m_LinC.size(); ++i, ++it) it->Serialize(ar);
-
-		ar << m_LCT;
-
-		// aug lag linear constraints
-/*		n = (int) m_LCSet.size();
-		ar << n;
-		if (m_LCSet.empty() == false)
-		{
-			for (i=0; i<n; ++i) m_LCSet[i]->Serialize(ar);
-		}
-*/
 		// nonlinear constraints
 		int n = m_NLC.size();
 		ar << n;
@@ -1524,23 +1520,6 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 			m_ML.push_back(pml);
 		}
 
-		// linear constraints
-		ar >> n;
-		FELinearConstraint LC(this);
-		for (int i=0; i<n; ++i)
-		{
-			LC.Serialize(ar);
-			m_LinC.push_back(LC);
-		}
-
-		ar >> m_LCT;
-
-		// reset the pointer table
-		int nlin = m_LinC.size();
-		m_LCA.resize(nlin);
-		list<FELinearConstraint>::iterator ic = m_LinC.begin();
-		for (int i=0; i<nlin; ++i, ++ic) m_LCA[i] = &(*ic);
-
 		// non-linear constraints
 		ar >> n;
 		m_NLC.clear();
@@ -1558,6 +1537,9 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 
 	// serialize rigid stuff
 	if (m_prs) m_prs->Serialize(ar);
+
+	// serialize linear constraints
+	if (m_LCM) m_LCM->Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
@@ -1635,76 +1617,8 @@ void FEModel::BuildMatrixProfile(FEGlobalMatrix& G, bool breset)
 		// Add rigid bodies to the profile
 		rigid.BuildMatrixProfile(G);
 
-		// Add linear constraints to the profile
-		// TODO: we need to add a function build_add(lmi, lmj) for
-		// this type of "elements". Now we allocate too much memory
-		if (m_LinC.size() > 0)
-		{
-			int nlin = (int) m_LinC.size();
-			vector<int> lm, elm;
-				
-			// do the cross-term
-			// TODO: I have to make this easier. For instance,
-			// keep a list that stores for each node the list of
-			// elements connected to that node.
-			// loop over all solid elements
-			for (int nd=0; nd<pstep->Domains(); ++nd)
-			{
-				FEDomain& dom = *pstep->Domain(nd);
-				for (int i=0; i<dom.Elements(); ++i)
-				{
-					FEElement& el = dom.ElementRef(i);
-					dom.UnpackLM(el, elm);
-					int ne = (int)elm.size();
-
-					// see if this element connects to the 
-					// master node of a linear constraint ...
-					int m = el.Nodes();
-					for (int j=0; j<m; ++j)
-					{
-						for (int k=0; k<MAX_NDOFS; ++k)
-						{	
-							int n = m_LCT[el.m_node[j]*MAX_NDOFS + k];
-							if (n >= 0)
-							{
-								// ... it does so we need to connect the 
-								// element to the linear constraint
-								FELinearConstraint* plc = m_LCA[n];
-
-								int ns = (int)plc->slave.size();
-
-								lm.resize(ne + ns);
-								for (int l=0; l<ne; ++l) lm[l] = elm[l];
-									
-								list<FELinearConstraint::SlaveDOF>::iterator is = plc->slave.begin();
-								for (int l=ne; l<ne+ns; ++l, ++is) lm[l] = is->neq;
-
-								G.build_add(lm);
-								break;
-							}
-						}
-					}
-				}
-			}
-
-			// TODO: do the same thing for shell elements
-
-			// do the constraint term
-			int ni;
-			list<FELinearConstraint>::iterator ic = m_LinC.begin();
-			int n = 0;
-			for (int i=0; i<nlin; ++i, ++ic) n += ic->slave.size();
-			lm.resize(n);
-			ic = m_LinC.begin();
-			n = 0;
-			for (int i=0; i<nlin; ++i, ++ic)
-			{
-				ni = (int)ic->slave.size();
-				list<FELinearConstraint::SlaveDOF>::iterator is = ic->slave.begin();
-				for (int j=0; j<ni; ++j, ++is) lm[n++] = is->neq;
-			}
-			G.build_add(lm);
-		}
+		// linear constraints
+		if (m_LCM) m_LCM->BuildMatrixProfile(G);
 	}
 	else
 	{

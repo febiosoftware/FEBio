@@ -11,7 +11,8 @@
 #include <FECore/FESurfaceLoad.h>
 #include "FECore/log.h"
 #include <FECore/FEModel.h>
-#include "FECore/FEAnalysis.h"
+#include <FECore/FEAnalysis.h>
+#include <FECore/FELinearConstraintManager.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -360,19 +361,19 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 	// enforce the linear constraints
 	// TODO: do we really have to do this? Shouldn't the algorithm
 	// already guarantee that the linear constraints are satisfied?
-	if (m_fem.m_LinC.size() > 0)
+	FELinearConstraintManager& LCM = m_fem.GetLinearConstraintManager();
+	if (LCM.LinearConstraints() > 0)
 	{
-		int nlin = m_fem.m_LinC.size();
-		list<FELinearConstraint>::iterator it = m_fem.m_LinC.begin();
+		int nlin = LCM.LinearConstraints();
 		double d;
-		for (int n=0; n<nlin; ++n, ++it)
+		for (int n=0; n<nlin; ++n)
 		{
-			FELinearConstraint& lc = *it;
+			const FELinearConstraint& lc = LCM.LinearConstraint(n);
 			FENode& node = mesh.Node(lc.master.node);
 
 			d = 0;
 			int ns = lc.slave.size();
-			list<FELinearConstraint::SlaveDOF>::iterator si = lc.slave.begin();
+			list<FELinearConstraint::SlaveDOF>::const_iterator si = lc.slave.begin();
 			for (int i=0; i<ns; ++i, ++si)
 			{
 				FENode& node = mesh.Node(si->node);

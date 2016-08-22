@@ -20,6 +20,7 @@
 #include "FECore/RigidBC.h"
 #include "FECore/FERigidSystem.h"
 #include "FECore/FECoreKernel.h"
+#include <FECore/FELinearConstraintManager.h>
 
 //-----------------------------------------------------------------------------
 //!  Parses the boundary section from the xml file
@@ -761,7 +762,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 	while (!tag.isend());
 
 	// add the linear constraint to the system
-	fem.m_LinC.push_back(LC);
+	fem.GetLinearConstraintManager().AddLinearConstraint(LC);
 }
 
 //-----------------------------------------------------------------------------
