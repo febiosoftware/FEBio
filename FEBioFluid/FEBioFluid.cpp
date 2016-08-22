@@ -11,6 +11,7 @@
 #include "FEFluidDomain2D.h"
 
 #include "FEFluidTractionLoad.h"
+#include "FEFluidNormalTraction.h"
 
 #include "FEBioFluidPlot.h"
 #include "FEBioFluidData.h"
@@ -48,6 +49,7 @@ REGISTER_FECORE_CLASS(FEFluidDomain2D               , FEDOMAIN_ID, "fluid2D"    
 //-----------------------------------------------------------------------------
 // Surface loads
 REGISTER_FECORE_CLASS(FEFluidTractionLoad           , FESURFACELOAD_ID, "fluid traction");
+REGISTER_FECORE_CLASS(FEFluidNormalTraction         , FESURFACELOAD_ID, "fluid normal traction");
     
 
 //-----------------------------------------------------------------------------
