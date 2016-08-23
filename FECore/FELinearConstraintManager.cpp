@@ -62,6 +62,9 @@ void FELinearConstraintManager::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 {
+	int nlin = (int)m_LinC.size();
+	if (nlin == 0) return;
+
 	FEAnalysis* pstep = m_fem->GetCurrentStep();
 
 	DOFS& fedofs = m_fem->GetDOFS();
@@ -70,73 +73,65 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 	// Add linear constraints to the profile
 	// TODO: we need to add a function build_add(lmi, lmj) for
 	// this type of "elements". Now we allocate too much memory
-	if (m_LinC.size() > 0)
+	vector<int> lm, elm;
+
+	// do the cross-term
+	// TODO: I have to make this easier. For instance,
+	// keep a list that stores for each node the list of
+	// elements connected to that node.
+	// loop over all solid elements
+	for (int nd = 0; nd<pstep->Domains(); ++nd)
 	{
-		int nlin = (int)m_LinC.size();
-		vector<int> lm, elm;
-
-		// do the cross-term
-		// TODO: I have to make this easier. For instance,
-		// keep a list that stores for each node the list of
-		// elements connected to that node.
-		// loop over all solid elements
-		for (int nd = 0; nd<pstep->Domains(); ++nd)
+		FEDomain& dom = *pstep->Domain(nd);
+		for (int i = 0; i<dom.Elements(); ++i)
 		{
-			FEDomain& dom = *pstep->Domain(nd);
-			for (int i = 0; i<dom.Elements(); ++i)
+			FEElement& el = dom.ElementRef(i);
+			dom.UnpackLM(el, elm);
+			int ne = (int)elm.size();
+
+			// see if this element connects to the 
+			// master node of a linear constraint ...
+			int m = el.Nodes();
+			for (int j = 0; j<m; ++j)
 			{
-				FEElement& el = dom.ElementRef(i);
-				dom.UnpackLM(el, elm);
-				int ne = (int)elm.size();
-
-				// see if this element connects to the 
-				// master node of a linear constraint ...
-				int m = el.Nodes();
-				for (int j = 0; j<m; ++j)
+				for (int k = 0; k<MAX_NDOFS; ++k)
 				{
-					for (int k = 0; k<MAX_NDOFS; ++k)
+					int n = m_LCT[el.m_node[j] * MAX_NDOFS + k];
+					if (n >= 0)
 					{
-						int n = m_LCT[el.m_node[j] * MAX_NDOFS + k];
-						if (n >= 0)
-						{
-							// ... it does so we need to connect the 
-							// element to the linear constraint
-							FELinearConstraint* plc = &m_LinC[n];
+						// ... it does so we need to connect the 
+						// element to the linear constraint
+						FELinearConstraint* plc = &m_LinC[n];
+						
+						int ns = (int)plc->slave.size();
 
-							int ns = (int)plc->slave.size();
+						lm.resize(ne + ns);
+						for (int l = 0; l<ne; ++l) lm[l] = elm[l];
 
-							lm.resize(ne + ns);
-							for (int l = 0; l<ne; ++l) lm[l] = elm[l];
+						list<FELinearConstraint::SlaveDOF>::iterator is = plc->slave.begin();
+						for (int l = ne; l<ne + ns; ++l, ++is) lm[l] = is->neq;
 
-							list<FELinearConstraint::SlaveDOF>::iterator is = plc->slave.begin();
-							for (int l = ne; l<ne + ns; ++l, ++is) lm[l] = is->neq;
-
-							G.build_add(lm);
-							break;
-						}
+						G.build_add(lm);
 					}
 				}
 			}
 		}
-
-		// TODO: do the same thing for shell elements
-
-		// do the constraint term
-		int ni;
-		vector<FELinearConstraint>::iterator ic = m_LinC.begin();
-		int n = 0;
-		for (int i = 0; i<nlin; ++i, ++ic) n += (int) ic->slave.size();
-		lm.resize(n);
-		ic = m_LinC.begin();
-		n = 0;
-		for (int i = 0; i<nlin; ++i, ++ic)
-		{
-			ni = (int)ic->slave.size();
-			list<FELinearConstraint::SlaveDOF>::iterator is = ic->slave.begin();
-			for (int j = 0; j<ni; ++j, ++is) lm[n++] = is->neq;
-		}
-		G.build_add(lm);
 	}
+
+	// do the constraint term
+	vector<FELinearConstraint>::iterator ic = m_LinC.begin();
+	int n = 0;
+	for (int i = 0; i<nlin; ++i, ++ic) n += (int) ic->slave.size();
+	lm.resize(n);
+	ic = m_LinC.begin();
+	n = 0;
+	for (int i = 0; i<nlin; ++i, ++ic)
+	{
+		int ni = (int)ic->slave.size();
+		list<FELinearConstraint::SlaveDOF>::iterator is = ic->slave.begin();
+		for (int j = 0; j<ni; ++j, ++is) lm[n++] = is->neq;
+	}
+	G.build_add(lm);
 }
 
 //-----------------------------------------------------------------------------
@@ -147,13 +142,12 @@ bool FELinearConstraintManager::Initialize()
 {
 	int nlin = LinearConstraints();
 	if (nlin == 0) return true;
-	int i;
 
 	FEMesh& mesh = m_fem->GetMesh();
 
 	// set the equation numbers for the linear constraints
 	vector<FELinearConstraint>::iterator it = m_LinC.begin();
-	for (i = 0; i<nlin; ++i, ++it)
+	for (int i = 0; i<nlin; ++i, ++it)
 	{
 		FELinearConstraint& lc = *it;
 		lc.master.neq = mesh.Node(lc.master.node).m_ID[lc.master.bc];
@@ -177,7 +171,7 @@ bool FELinearConstraintManager::Initialize()
 	m_LCT.assign(mesh.Nodes()*MAX_NDOFS, -1);
 
 	vector<FELinearConstraint>::iterator ic = m_LinC.begin();
-	for (i = 0; i<nlin; ++i, ++ic)
+	for (int i = 0; i<nlin; ++i, ++ic)
 	{
 		FELinearConstraint& lc = *ic;
 		int n = lc.master.node;

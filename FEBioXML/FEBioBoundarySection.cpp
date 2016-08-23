@@ -724,19 +724,29 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 	if (tag.isleaf()) return;
 
 	// read the master node
-	FELinearConstraint LC(&fem);
-	int node;
-	tag.AttributeValue("node", node);
-	LC.master.node = m_pim->FindNodeFromID(node);
+	int nodeID;
+	tag.AttributeValue("node", nodeID);
+	int masterNode = m_pim->FindNodeFromID(nodeID);
 
+	// get the dofs
 	const char* szbc = tag.AttributeValue("bc");
-	int dof = dofs.GetDOF(szbc);
-	if (dof < 0) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
-	LC.master.bc = dof;
+	vector<int> dofList;
+	dofs.GetDOFList(szbc, dofList);
+	int ndofs = (int) dofList.size();
 
-	// we must deactive the master dof
-	// so that it does not get assigned an equation
-	fem.AddFixedBC(LC.master.node, LC.master.bc);
+	// allocate linear constraints
+	vector<FELinearConstraint> LC(ndofs, FELinearConstraint(&fem));
+	for (int i=0; i<ndofs; ++i)
+	{
+		int dof = dofList[i];
+		if (dof < 0) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+		LC[i].master.bc = dof;
+		LC[i].master.node = masterNode;
+
+		// we must deactive the master dof
+		// so that it does not get assigned an equation
+		fem.AddFixedBC(masterNode, dof);
+	}
 
 	// read the slave nodes
 	++tag;
@@ -746,18 +756,30 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 		if (tag == "node")
 		{
 			// get the node
-			dof.node = m_pim->ReadNodeID(tag);
+			int slaveNode = m_pim->ReadNodeID(tag);
 
 			// get the dof
-			const char* szbc = tag.AttributeValue("bc");
-			dof.bc = dofs.GetDOF(szbc);
-			if (dof.bc < 0) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+			// (if ommitted we take the master dof)
+			int slaveDOF = -1;
+			const char* szbc = tag.AttributeValue("bc", true);
+			if (szbc)
+			{
+				slaveDOF = dofs.GetDOF(szbc);
+				if (slaveDOF < 0) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+			}
 
 			// get the coefficient
-			tag.value(dof.val);
+			double val;
+			tag.value(val);
 
 			// add it to the list
-			LC.slave.push_back(dof);
+			for (int i=0; i<ndofs; ++i)
+			{
+				dof.node = slaveNode;
+				dof.bc   = (slaveDOF < 0 ? LC[i].master.bc : slaveDOF);
+				dof.val  = val;
+				LC[i].slave.push_back(dof);
+			}
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
@@ -765,7 +787,8 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 	while (!tag.isend());
 
 	// add the linear constraint to the system
-	fem.GetLinearConstraintManager().AddLinearConstraint(LC);
+	for (int i=0; i<ndofs; ++i)
+		fem.GetLinearConstraintManager().AddLinearConstraint(LC[i]);
 }
 
 //-----------------------------------------------------------------------------

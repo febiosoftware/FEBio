@@ -10,13 +10,13 @@ FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC) : FEModelCo
 	master = LC.master;
 	int n = (int) LC.slave.size();
 	list<SlaveDOF>::const_iterator it = LC.slave.begin();
-	for (int i=0; i<n; ++i) slave.push_back(*it);
+	for (int i=0; i<n; ++i, ++it) slave.push_back(*it);
 }
 
 //-----------------------------------------------------------------------------
 double FELinearConstraint::FindDOF(int n)
 {
-	int N = slave.size();
+	int N = (int) slave.size();
 	list<SlaveDOF>::iterator it = slave.begin();
 	for (int i=0; i<N; ++i, ++it) if (it->neq == n) return it->val;
 
