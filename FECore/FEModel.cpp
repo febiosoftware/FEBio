@@ -768,6 +768,10 @@ bool FEModel::DoCallback(unsigned int nevent)
 	{
 		throw;
 	}
+	catch (IterationFailure)
+	{
+		throw;
+	}
 	catch (...)
 	{
 		return false;

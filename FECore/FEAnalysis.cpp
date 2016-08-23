@@ -465,7 +465,12 @@ void FEAnalysis::Retry()
 	m_nretries++;
 
 	// the new time step cannot be a must-point
-	m_nmust = -1;
+	if (m_nmust != -1)
+	{
+		// if we were at a must-point, make sure we can hit this must-point again
+		m_next_must--;
+		m_nmust = -1;
+	}
 
 	m_dtp = dtn;
 	m_dt = dtn;
