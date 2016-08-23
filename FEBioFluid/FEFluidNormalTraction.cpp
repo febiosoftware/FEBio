@@ -113,7 +113,7 @@ void FEFluidNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
                 dxs.z += Gs[i]*r0[i].z;
             }
             
-            vec3d normal = dxr ^ dxs; normal.unit();
+            vec3d normal = dxr ^ dxs;
             vec3d f = normal*(tn*w[n]);
             
             for (i=0; i<neln; ++i)
