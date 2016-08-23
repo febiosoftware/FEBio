@@ -180,45 +180,15 @@ void FEFluidSolver::UpdateKinematics(vector<double>& vi)
         FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
         if (dc.IsActive()) dc.Update();
     }
-    
-    // enforce the linear constraints
-    // TODO: do we really have to do this? Shouldn't the algorithm
-    // already guarantee that the linear constraints are satisfied?
+
+	// enforce the linear constraints
+	// TODO: do we really have to do this? Shouldn't the algorithm
+	// already guarantee that the linear constraints are satisfied?
 	FELinearConstraintManager& LCM = m_fem.GetLinearConstraintManager();
-    if (LCM.LinearConstraints() > 0)
-    {
-		int nlin = LCM.LinearConstraints();
-        double d;
-        for (int n=0; n<nlin; ++n)
-        {
-            const FELinearConstraint& lc = LCM.LinearConstraint(n);
-            FENode& node = mesh.Node(lc.master.node);
-            
-            d = 0;
-            int ns = (int)lc.slave.size();
-            list<FELinearConstraint::SlaveDOF>::const_iterator si = lc.slave.begin();
-            for (int i=0; i<ns; ++i, ++si)
-            {
-                FENode& node = mesh.Node(si->node);
-                switch (si->bc)
-                {
-                    case 0: d += si->val*node.get(m_dofVX); break;
-                    case 1: d += si->val*node.get(m_dofVY); break;
-                    case 2: d += si->val*node.get(m_dofVZ); break;
-                    case 3: d += si->val*node.get(m_dofE); break;
-                }
-            }
-            
-            switch (lc.master.bc)
-            {
-                case 0: node.set(m_dofVX, d); break;
-                case 1: node.set(m_dofVY, d); break;
-                case 2: node.set(m_dofVZ, d); break;
-                case 3: node.set(m_dofE, d); break;
-            }
-        }
-    }
-    
+	if (LCM.LinearConstraints() > 0)
+	{
+		LCM.Update();
+	}
 }
 
 //-----------------------------------------------------------------------------

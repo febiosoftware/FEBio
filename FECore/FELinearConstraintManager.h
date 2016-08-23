@@ -39,6 +39,9 @@ public:
 	// assemble element matrix into (reduced) global matrix
 	void AssembleStiffness(FEGlobalMatrix& K, vector<double>& R, vector<double>& ui, vector<int>& en, vector<int>& elm, matrix& ke);
 
+	// update nodal variables
+	void Update();
+
 private:
 	FEModel* m_fem;
 	vector<FELinearConstraint>	m_LinC;		//!< linear constraints data

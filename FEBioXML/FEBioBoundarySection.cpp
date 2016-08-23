@@ -718,6 +718,7 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
+	DOFS& dofs = fem.GetDOFS();
 
 	// make sure there is a constraint defined
 	if (tag.isleaf()) return;
@@ -729,14 +730,13 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 	LC.master.node = m_pim->FindNodeFromID(node);
 
 	const char* szbc = tag.AttributeValue("bc");
-	if      (strcmp(szbc, "x") == 0) LC.master.bc = 0;
-	else if (strcmp(szbc, "y") == 0) LC.master.bc = 1;
-	else if (strcmp(szbc, "z") == 0) LC.master.bc = 2;
-	else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+	int dof = dofs.GetDOF(szbc);
+	if (dof < 0) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+	LC.master.bc = dof;
 
 	// we must deactive the master dof
 	// so that it does not get assigned an equation
-	fem.AddFixedBC(node-1, LC.master.bc);
+	fem.AddFixedBC(LC.master.node, LC.master.bc);
 
 	// read the slave nodes
 	++tag;
@@ -745,15 +745,18 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 		FELinearConstraint::SlaveDOF dof;
 		if (tag == "node")
 		{
-			tag.value(dof.val);
+			// get the node
 			dof.node = m_pim->ReadNodeID(tag);
 
+			// get the dof
 			const char* szbc = tag.AttributeValue("bc");
-			if      (strcmp(szbc, "x") == 0) dof.bc = 0;
-			else if (strcmp(szbc, "y") == 0) dof.bc = 1;
-			else if (strcmp(szbc, "z") == 0) dof.bc = 2;
-			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+			dof.bc = dofs.GetDOF(szbc);
+			if (dof.bc < 0) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
+			// get the coefficient
+			tag.value(dof.val);
+
+			// add it to the list
 			LC.slave.push_back(dof);
 		}
 		else throw XMLReader::InvalidTag(tag);

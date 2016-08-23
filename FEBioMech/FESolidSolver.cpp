@@ -275,6 +275,15 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 		if (dc.IsActive()) dc.Update();
 	}
 
+	// enforce the linear constraints
+	// TODO: do we really have to do this? Shouldn't the algorithm
+	// already guarantee that the linear constraints are satisfied?
+	FELinearConstraintManager& LCM = m_fem.GetLinearConstraintManager();
+	if (LCM.LinearConstraints() > 0)
+	{
+		LCM.Update();
+	}
+
 	// Update the spatial nodal positions
 	// Don't update rigid nodes since they are already updated
 	for (int i = 0; i<mesh.Nodes(); ++i)
@@ -283,43 +292,6 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 		if (node.m_rid == -1)
 			node.m_rt = node.m_r0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ);
 	}
-
-	// enforce the linear constraints
-	// TODO: do we really have to do this? Shouldn't the algorithm
-	// already guarantee that the linear constraints are satisfied?
-	FELinearConstraintManager& LCM = m_fem.GetLinearConstraintManager();
-	if (LCM.LinearConstraints() > 0)
-	{
-		int nlin = LCM.LinearConstraints();
-		double d;
-		for (int n=0; n<nlin; ++n)
-		{
-			const FELinearConstraint& lc = LCM.LinearConstraint(n);
-			FENode& node = mesh.Node(lc.master.node);
-
-			d = 0;
-			int ns = lc.slave.size();
-			list<FELinearConstraint::SlaveDOF>::const_iterator si = lc.slave.begin();
-			for (int i=0; i<ns; ++i, ++si)
-			{
-				FENode& node = mesh.Node(si->node);
-				switch (si->bc)
-				{
-				case 0: d += si->val*(node.m_rt.x - node.m_r0.x); break;
-				case 1: d += si->val*(node.m_rt.y - node.m_r0.y); break;
-				case 2: d += si->val*(node.m_rt.z - node.m_r0.z); break;
-				}
-			}
-
-			switch (lc.master.bc)
-			{
-			case 0: node.m_rt.x = node.m_r0.x + d; break;
-			case 1: node.m_rt.y = node.m_r0.y + d; break;
-			case 2: node.m_rt.z = node.m_r0.z + d; break;
-			}
-		}
-	}
-
 
 	// update velocity and accelerations
 	// for dynamic simulations
@@ -599,7 +571,7 @@ bool FESolidSolver::Quasin(double time)
 		if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
 
 		// update total displacements
-		int neq = m_Ui.size();
+		int neq = (int)m_Ui.size();
 		for (i=0; i<neq; ++i) m_Ui[i] += s*m_ui[i];
 		normU  = m_Ui*m_Ui;
 
