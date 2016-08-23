@@ -27,6 +27,8 @@
 		D55E3B051C64091700815FCA /* FEEdgeLoad.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3B011C64091700815FCA /* FEEdgeLoad.h */; };
 		D571F82B1B78C49C002FAACE /* FERigidSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D571F8291B78C49C002FAACE /* FERigidSystem.cpp */; };
 		D571F82C1B78C49C002FAACE /* FERigidSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = D571F82A1B78C49C002FAACE /* FERigidSystem.h */; };
+		D57F1A231D6C5B8800A63B5D /* FELinearConstraintManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57F1A211D6C5B8800A63B5D /* FELinearConstraintManager.cpp */; };
+		D57F1A241D6C5B8800A63B5D /* FELinearConstraintManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D57F1A221D6C5B8800A63B5D /* FELinearConstraintManager.h */; };
 		D58D4D141B5D7E76002BB72A /* FECallback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58D4D111B5D7E76002BB72A /* FECallback.cpp */; };
 		D58D4D151B5D7E76002BB72A /* FECallBack.h in Headers */ = {isa = PBXBuildFile; fileRef = D58D4D121B5D7E76002BB72A /* FECallBack.h */; };
 		D58D4D161B5D7E76002BB72A /* tens3d.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D58D4D131B5D7E76002BB72A /* tens3d.hpp */; };
@@ -265,6 +267,8 @@
 		D55E3B011C64091700815FCA /* FEEdgeLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEEdgeLoad.h; sourceTree = "<group>"; };
 		D571F8291B78C49C002FAACE /* FERigidSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidSystem.cpp; sourceTree = "<group>"; };
 		D571F82A1B78C49C002FAACE /* FERigidSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidSystem.h; sourceTree = "<group>"; };
+		D57F1A211D6C5B8800A63B5D /* FELinearConstraintManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELinearConstraintManager.cpp; sourceTree = "<group>"; };
+		D57F1A221D6C5B8800A63B5D /* FELinearConstraintManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELinearConstraintManager.h; sourceTree = "<group>"; };
 		D58D4D111B5D7E76002BB72A /* FECallback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECallback.cpp; sourceTree = "<group>"; };
 		D58D4D121B5D7E76002BB72A /* FECallBack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECallBack.h; sourceTree = "<group>"; };
 		D58D4D131B5D7E76002BB72A /* tens3d.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens3d.hpp; sourceTree = "<group>"; };
@@ -613,6 +617,8 @@
 				D5E10A291865E15900B23922 /* FELevelStructure.h */,
 				D5E10A2A1865E15900B23922 /* FELinearConstraint.cpp */,
 				D5E10A2B1865E15900B23922 /* FELinearConstraint.h */,
+				D57F1A211D6C5B8800A63B5D /* FELinearConstraintManager.cpp */,
+				D57F1A221D6C5B8800A63B5D /* FELinearConstraintManager.h */,
 				D5F76A4D1BC9FD8400DFA30A /* FELinearSolver.cpp */,
 				D5F76A4E1BC9FD8400DFA30A /* FELinearSolver.h */,
 				D5E10A2C1865E15900B23922 /* FEMaterial.cpp */,
@@ -862,6 +868,7 @@
 				D5E10AF91865E15900B23922 /* matrix.h in Headers */,
 				D5BE04D619A5806400AD08F8 /* version.h in Headers */,
 				D59BBBB61AD771DD00E2991F /* tens5d.hpp in Headers */,
+				D57F1A241D6C5B8800A63B5D /* FELinearConstraintManager.h in Headers */,
 				D5FF08FD1BE452A50064FF98 /* fecore_debug_t.h in Headers */,
 				D5E10ACD1865E15900B23922 /* FENodeNodeList.h in Headers */,
 				D5E10A841865E15900B23922 /* BFGSSolver.h in Headers */,
@@ -978,6 +985,7 @@
 				D5E10B0A1865E15900B23922 /* Timer.cpp in Sources */,
 				D5E10AED1865E15900B23922 /* LoadCurve.cpp in Sources */,
 				D5B572DB186CC76500D12E45 /* FECoreTask.cpp in Sources */,
+				D57F1A231D6C5B8800A63B5D /* FELinearConstraintManager.cpp in Sources */,
 				D5E10AB61865E15900B23922 /* FEGlobalVector.cpp in Sources */,
 				D5F02C351CD6F56D0005839E /* FESurfaceMap.cpp in Sources */,
 				D5F02C311CD6F56D0005839E /* FEParam.cpp in Sources */,
