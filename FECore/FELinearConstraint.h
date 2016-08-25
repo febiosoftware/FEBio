@@ -4,40 +4,41 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------
-//! A degree of freedom structure
-class DOF
-{
-public:
-	DOF() { node = bc = neq = -1; }
-public:
-	int	node;	// the node to which this dof belongs to
-	int	bc;		// the degree of freedom
-	int	neq;	// the equation number (or -1 if none)
-};
-
-//-----------------------------------------------------------------------------
 //! linear constraint
 class FELinearConstraint : public FEModelComponent
 {
 public:
-	class SlaveDOF : public DOF
+	class DOF
 	{
 	public:
-		SlaveDOF() : val(0){}
-		double	val;	// coefficient value
+		DOF()
+		{
+			node = dof = -1;
+			val = 0.0;
+		}
+
+	public:
+		int		node;	// node number
+		int		dof;	// degree of freedom
+		double	val;	// coefficient value (ignored for master)
 	};
 
 public:
-	FELinearConstraint(FEModel* pfem) : FEModelComponent(FEBC_ID, pfem) {}
+	// constructors
+	FELinearConstraint(FEModel* pfem);
 	FELinearConstraint(const FELinearConstraint& LC);
 
-	double FindDOF(int n);
-
+	// serialization
 	void Serialize(DumpStream& ar);
 
+	// initialize the linear constraint
+	bool Init();
+
+	// make the constraint active
 	void Activate();
+	void Deactivate();
 
 public:
-	DOF				master;	// master degree of freedom
-	list<SlaveDOF>	slave;	// list of slave nodes
+	DOF			master;	// master degree of freedom
+	vector<DOF>	slave;	// list of slave nodes
 };

@@ -204,10 +204,6 @@ bool FEAnalysis::Activate()
 	// Must be done after equations are initialized
 	if (m_fem.GetLinearConstraintManager().Initialize() == false) return false;
 
-	// activate the linear constraints
-	// TODO: Why is this done here and not during activation?
-	m_fem.GetLinearConstraintManager().Activate();
-
 	return true;
 }
 

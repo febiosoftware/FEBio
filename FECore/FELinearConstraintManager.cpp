@@ -66,6 +66,7 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 	if (nlin == 0) return;
 
 	FEAnalysis* pstep = m_fem->GetCurrentStep();
+	FEMesh& mesh = m_fem->GetMesh();
 
 	DOFS& fedofs = m_fem->GetDOFS();
 	int MAX_NDOFS = fedofs.GetTotalDOFS();
@@ -108,8 +109,12 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 						lm.resize(ne + ns);
 						for (int l = 0; l<ne; ++l) lm[l] = elm[l];
 
-						list<FELinearConstraint::SlaveDOF>::iterator is = plc->slave.begin();
-						for (int l = ne; l<ne + ns; ++l, ++is) lm[l] = is->neq;
+						vector<FELinearConstraint::DOF>::iterator is = plc->slave.begin();
+						for (int l = ne; l<ne + ns; ++l, ++is) 
+						{
+							int neq = mesh.Node(is->node).m_ID[is->dof];
+							lm[l] = neq;
+						}
 
 						G.build_add(lm);
 					}
@@ -128,8 +133,12 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 	for (int i = 0; i<nlin; ++i, ++ic)
 	{
 		int ni = (int)ic->slave.size();
-		list<FELinearConstraint::SlaveDOF>::iterator is = ic->slave.begin();
-		for (int j = 0; j<ni; ++j, ++is) lm[n++] = is->neq;
+		vector<FELinearConstraint::DOF>::iterator is = ic->slave.begin();
+		for (int j = 0; j<ni; ++j, ++is) 
+		{
+			int neq = mesh.Node(is->node).m_ID[is->dof];
+			lm[n++] = neq;
+		}
 	}
 	G.build_add(lm);
 }
@@ -145,26 +154,6 @@ bool FELinearConstraintManager::Initialize()
 
 	FEMesh& mesh = m_fem->GetMesh();
 
-	// set the equation numbers for the linear constraints
-	vector<FELinearConstraint>::iterator it = m_LinC.begin();
-	for (int i = 0; i<nlin; ++i, ++it)
-	{
-		FELinearConstraint& lc = *it;
-		lc.master.neq = mesh.Node(lc.master.node).m_ID[lc.master.bc];
-
-		// make sure the master did not get assigned an equation
-		assert(lc.master.neq == -1);
-
-		// set the slave equation numbers
-		list<FELinearConstraint::SlaveDOF>::iterator is = lc.slave.begin();
-		int nn = (int) lc.slave.size();
-		for (int n = 0; n<nn; ++n, ++is)
-		{
-			FELinearConstraint::SlaveDOF& sn = *is;
-			sn.neq = mesh.Node(sn.node).m_ID[sn.bc];
-		}
-	}
-
 	// create the linear constraint table
 	DOFS& fedofs = m_fem->GetDOFS();
 	int MAX_NDOFS = fedofs.GetTotalDOFS();
@@ -175,7 +164,7 @@ bool FELinearConstraintManager::Initialize()
 	{
 		FELinearConstraint& lc = *ic;
 		int n = lc.master.node;
-		int m = lc.master.bc;
+		int m = lc.master.dof;
 
 		m_LCT[n*MAX_NDOFS + m] = i;
 	}
@@ -184,18 +173,24 @@ bool FELinearConstraintManager::Initialize()
 }
 
 //-----------------------------------------------------------------------------
+// This gets called during model activation, i.e. activation of permanent model components.
 void FELinearConstraintManager::Activate()
 {
 	if (m_LinC.size())
 	{
 		vector<FELinearConstraint>::iterator il = m_LinC.begin();
-		for (int l = 0; l<(int)m_LinC.size(); ++l, ++il) il->Activate();
+		for (int l = 0; l<(int)m_LinC.size(); ++l, ++il) 
+		{
+			if (il->IsActive()) il->Activate();
+		}
 	}
 }
 
 //-----------------------------------------------------------------------------
 void FELinearConstraintManager::AssembleResidual(vector<double>& R, vector<int>& en, vector<int>& elm, vector<double>& fe)
 {
+	FEMesh& mesh = m_fem->GetMesh();
+
 	// get nodal DOFS
 	DOFS& fedofs = m_fem->GetDOFS();
 	int MAX_NDOFS = fedofs.GetTotalDOFS();
@@ -219,13 +214,14 @@ void FELinearConstraintManager::AssembleResidual(vector<double>& R, vector<int>&
 			// now loop over all "slave" nodes and
 			// add the contribution to the residual
 			int ns = (int)lc.slave.size();
-			list<FELinearConstraint::SlaveDOF>::iterator is = lc.slave.begin();
+			vector<FELinearConstraint::DOF>::iterator is = lc.slave.begin();
 			for (int j = 0; j<ns; ++j, ++is)
 			{
-				int I = is->neq;
+				int I = mesh.Node(is->node).m_ID[is->dof];
 				if (I >= 0)
 				{
 					double A = is->val;
+#pragma omp atomic
 					R[I] += A*fe[i];
 				}
 			}
@@ -236,6 +232,8 @@ void FELinearConstraintManager::AssembleResidual(vector<double>& R, vector<int>&
 //-----------------------------------------------------------------------------
 void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<double>& R, vector<double>& ui, vector<int>& en, vector<int>& elm, matrix& ke)
 {
+	FEMesh& mesh = m_fem->GetMesh();
+
 	// get nodal DOFS
 	DOFS& fedofs = m_fem->GetDOFS();
 	int MAX_NDOFS = fedofs.GetTotalDOFS();
@@ -267,10 +265,10 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 
 				assert(elm[i] == -1);
 
-				list<FELinearConstraint::SlaveDOF>::iterator is = Li.slave.begin();
+				vector<FELinearConstraint::DOF>::iterator is = Li.slave.begin();
 				for (k = 0; k<(int)Li.slave.size(); ++k, ++is)
 				{
-					I = is->neq;
+					I = mesh.Node(is->node).m_ID[is->dof];
 					J = elm[j];
 					kij = is->val*ke[i][j];
 					if ((J >= I) && (I >= 0)) K.add(I, J, kij);
@@ -289,12 +287,12 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 
 				assert(elm[j] == -1);
 
-				list<FELinearConstraint::SlaveDOF>::iterator js = Lj.slave.begin();
+				vector<FELinearConstraint::DOF>::iterator js = Lj.slave.begin();
 
 				for (k = 0; k<(int)Lj.slave.size(); ++k, ++js)
 				{
 					I = elm[i];
-					J = js->neq;
+					J = mesh.Node(js->node).m_ID[js->dof];
 					kij = js->val*ke[i][j];
 					if ((J >= I) && (I >= 0)) K.add(I, J, kij);
 					else
@@ -311,8 +309,8 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 				FELinearConstraint& Li = m_LinC[li];
 				FELinearConstraint& Lj = m_LinC[lj];
 
-				list<FELinearConstraint::SlaveDOF>::iterator is = Li.slave.begin();
-				list<FELinearConstraint::SlaveDOF>::iterator js = Lj.slave.begin();
+				vector<FELinearConstraint::DOF>::iterator is = Li.slave.begin();
+				vector<FELinearConstraint::DOF>::iterator js = Lj.slave.begin();
 
 				assert(elm[i] == -1);
 				assert(elm[j] == -1);
@@ -322,8 +320,8 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 					js = Lj.slave.begin();
 					for (l = 0; l<(int)Lj.slave.size(); ++l, ++js)
 					{
-						I = is->neq;
-						J = js->neq;
+						I = mesh.Node(is->node).m_ID[is->dof];
+						J = mesh.Node(js->node).m_ID[js->dof];;
 						kij = ke[i][j] * is->val*js->val;
 
 						if ((J >= I) && (I >= 0)) K.add(I, J, kij);
@@ -353,15 +351,15 @@ void FELinearConstraintManager::Update()
 		// evaluate the linear constraint
 		double d = 0;
 		int ns = (int)lc.slave.size();
-		list<FELinearConstraint::SlaveDOF>::const_iterator si = lc.slave.begin();
+		vector<FELinearConstraint::DOF>::const_iterator si = lc.slave.begin();
 		for (int i = 0; i<ns; ++i, ++si)
 		{
 			FENode& slaveNode = mesh.Node(si->node);
-			d += si->val*slaveNode.get(si->bc);
+			d += si->val*slaveNode.get(si->dof);
 		}
 
 		// assign to master node
 		FENode& masterNode = mesh.Node(lc.master.node);
-		masterNode.set(lc.master.bc, d);
+		masterNode.set(lc.master.dof, d);
 	}
 }

@@ -45,5 +45,5 @@ public:
 private:
 	FEModel* m_fem;
 	vector<FELinearConstraint>	m_LinC;		//!< linear constraints data
-	vector<int>					m_LCT;		//!< linear constraint table
+	vector<int>					m_LCT;		//!< linear constraint table	(TODO: replace by a matrix<int>)
 };

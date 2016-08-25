@@ -740,19 +740,15 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 	{
 		int dof = dofList[i];
 		if (dof < 0) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
-		LC[i].master.bc = dof;
+		LC[i].master.dof = dof;
 		LC[i].master.node = masterNode;
-
-		// we must deactive the master dof
-		// so that it does not get assigned an equation
-		fem.AddFixedBC(masterNode, dof);
 	}
 
 	// read the slave nodes
 	++tag;
 	do
 	{
-		FELinearConstraint::SlaveDOF dof;
+		FELinearConstraint::DOF dof;
 		if (tag == "node")
 		{
 			// get the node
@@ -776,7 +772,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 			for (int i=0; i<ndofs; ++i)
 			{
 				dof.node = slaveNode;
-				dof.bc   = (slaveDOF < 0 ? LC[i].master.bc : slaveDOF);
+				dof.dof  = (slaveDOF < 0 ? LC[i].master.dof : slaveDOF);
 				dof.val  = val;
 				LC[i].slave.push_back(dof);
 			}
@@ -788,7 +784,15 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 
 	// add the linear constraint to the system
 	for (int i=0; i<ndofs; ++i)
+	{
 		fem.GetLinearConstraintManager().AddLinearConstraint(LC[i]);
+
+		if (m_pim->m_nsteps > 0)
+		{
+			GetStep()->AddModelComponent(&LC[i]);
+			LC[i].Deactivate();
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

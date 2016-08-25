@@ -452,6 +452,9 @@ void FEModel::Activate()
 
 	// activate rigid components
 	if (m_prs) m_prs->Activate();
+
+	// activate linear constraints
+	if (m_LCM) m_LCM->Activate();
 }
 
 //-----------------------------------------------------------------------------
