@@ -500,6 +500,7 @@
     <ClInclude Include="..\..\FECore\RigidBC.h" />
     <ClInclude Include="..\..\FECore\SparseMatrix.h" />
     <ClInclude Include="..\..\FECore\stdafx.h" />
+    <ClInclude Include="..\..\FECore\table.h" />
     <ClInclude Include="..\..\FECore\targetver.h" />
     <ClInclude Include="..\..\FECore\tens3d.h" />
     <ClInclude Include="..\..\FECore\tens3d.hpp" />

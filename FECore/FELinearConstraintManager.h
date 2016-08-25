@@ -1,5 +1,6 @@
 #pragma once
 #include "FELinearConstraint.h"
+#include "table.h"
 
 class FEGlobalMatrix;
 class matrix;
@@ -45,5 +46,5 @@ public:
 private:
 	FEModel* m_fem;
 	vector<FELinearConstraint>	m_LinC;		//!< linear constraints data
-	vector<int>					m_LCT;		//!< linear constraint table	(TODO: replace by a matrix<int>)
+	table<int>					m_LCT;		//!< linear constraint table
 };

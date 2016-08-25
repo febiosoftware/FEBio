@@ -68,9 +68,6 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 	FEAnalysis* pstep = m_fem->GetCurrentStep();
 	FEMesh& mesh = m_fem->GetMesh();
 
-	DOFS& fedofs = m_fem->GetDOFS();
-	int MAX_NDOFS = fedofs.GetTotalDOFS();
-
 	// Add linear constraints to the profile
 	// TODO: we need to add a function build_add(lmi, lmj) for
 	// this type of "elements". Now we allocate too much memory
@@ -94,10 +91,11 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 			// master node of a linear constraint ...
 			int m = el.Nodes();
 			for (int j = 0; j<m; ++j)
-			{
-				for (int k = 0; k<MAX_NDOFS; ++k)
+			{	
+				int ncols = m_LCT.columns();
+				for (int k = 0; k<ncols; ++k)
 				{
-					int n = m_LCT[el.m_node[j] * MAX_NDOFS + k];
+					int n = m_LCT(el.m_node[j], k);
 					if (n >= 0)
 					{
 						// ... it does so we need to connect the 
@@ -152,12 +150,41 @@ bool FELinearConstraintManager::Initialize()
 	int nlin = LinearConstraints();
 	if (nlin == 0) return true;
 
+	// ensure that none of the master nodes are slave nodes in any of the active linear constraints
+	for (int i=0; i<nlin; ++i)
+	{
+		FELinearConstraint& lci = m_LinC[i];
+		if (lci.IsActive())
+		{
+			FELinearConstraint::DOF& masterDOF = lci.master;
+			for (int j=0; j<nlin; j++)
+			{
+				FELinearConstraint& lcj = m_LinC[j];
+				if (lcj.IsActive())
+				{
+					int n = lcj.slave.size();
+					for (int k=0; k<n; ++k)
+					{
+						FELinearConstraint::DOF& slaveDOF = lcj.slave[k];
+						if ((slaveDOF.node == masterDOF.node) && (slaveDOF.dof == masterDOF.dof)) return false;
+					}
+
+					// also make sure the master dof is not repeated
+					if (i != j)
+					{
+						if ((lci.master.node == lcj.master.node) && (lci.master.dof == lcj.master.dof)) return false;
+					}
+				}
+			}
+		}
+	}
+
 	FEMesh& mesh = m_fem->GetMesh();
 
 	// create the linear constraint table
 	DOFS& fedofs = m_fem->GetDOFS();
 	int MAX_NDOFS = fedofs.GetTotalDOFS();
-	m_LCT.assign(mesh.Nodes()*MAX_NDOFS, -1);
+	m_LCT.resize(mesh.Nodes(), MAX_NDOFS, -1);
 
 	vector<FELinearConstraint>::iterator ic = m_LinC.begin();
 	for (int i = 0; i<nlin; ++i, ++ic)
@@ -166,7 +193,7 @@ bool FELinearConstraintManager::Initialize()
 		int n = lc.master.node;
 		int m = lc.master.dof;
 
-		m_LCT[n*MAX_NDOFS + m] = i;
+		m_LCT(n, m) = i;
 	}
 
 	return true;
@@ -191,10 +218,6 @@ void FELinearConstraintManager::AssembleResidual(vector<double>& R, vector<int>&
 {
 	FEMesh& mesh = m_fem->GetMesh();
 
-	// get nodal DOFS
-	DOFS& fedofs = m_fem->GetDOFS();
-	int MAX_NDOFS = fedofs.GetTotalDOFS();
-
 	int ndof = (int)fe.size();
 	int ndn = ndof / (int)en.size();
 
@@ -202,9 +225,7 @@ void FELinearConstraintManager::AssembleResidual(vector<double>& R, vector<int>&
 	for (int i = 0; i<ndof; ++i)
 	{
 		// see if this dof belongs to a linear constraint
-		int n = MAX_NDOFS*(en[i / ndn]) + i%ndn;
-		int l = m_LCT[n];
-
+		int l = m_LCT(en[i / ndn], i%ndn);
 		if (l >= 0)
 		{
 			// if so, get the linear constraint
@@ -234,12 +255,6 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 {
 	FEMesh& mesh = m_fem->GetMesh();
 
-	// get nodal DOFS
-	DOFS& fedofs = m_fem->GetDOFS();
-	int MAX_NDOFS = fedofs.GetTotalDOFS();
-
-	int i, j, l;
-
 	int ndof = ke.rows();
 	int ndn = ndof / (int)en.size();
 
@@ -247,16 +262,12 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 
 	// loop over all stiffness components 
 	// and correct for linear constraints
-	int ni, nj, li, lj, I, J, k;
-	double kij;
-	for (i = 0; i<ndof; ++i)
+	for (int i = 0; i<ndof; ++i)
 	{
-		ni = MAX_NDOFS*(en[i / ndn]) + i%ndn;
-		li = m_LCT[ni];
-		for (j = 0; j<ndof; ++j)
+		int li = m_LCT(en[i / ndn], i%ndn);
+		for (int j = 0; j<ndof; ++j)
 		{
-			nj = MAX_NDOFS*(en[j / ndn]) + j%ndn;
-			lj = m_LCT[nj];
+			int lj = m_LCT(en[j / ndn], j%ndn);
 
 			if ((li >= 0) && (lj < 0))
 			{
@@ -266,11 +277,11 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 				assert(elm[i] == -1);
 
 				vector<FELinearConstraint::DOF>::iterator is = Li.slave.begin();
-				for (k = 0; k<(int)Li.slave.size(); ++k, ++is)
+				for (int k = 0; k<(int)Li.slave.size(); ++k, ++is)
 				{
-					I = mesh.Node(is->node).m_ID[is->dof];
-					J = elm[j];
-					kij = is->val*ke[i][j];
+					int I = mesh.Node(is->node).m_ID[is->dof];
+					int J = elm[j];
+					double kij = is->val*ke[i][j];
 					if ((J >= I) && (I >= 0)) K.add(I, J, kij);
 					else
 					{
@@ -289,11 +300,11 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 
 				vector<FELinearConstraint::DOF>::iterator js = Lj.slave.begin();
 
-				for (k = 0; k<(int)Lj.slave.size(); ++k, ++js)
+				for (int k = 0; k<(int)Lj.slave.size(); ++k, ++js)
 				{
-					I = elm[i];
-					J = mesh.Node(js->node).m_ID[js->dof];
-					kij = js->val*ke[i][j];
+					int I = elm[i];
+					int J = mesh.Node(js->node).m_ID[js->dof];
+					double kij = js->val*ke[i][j];
 					if ((J >= I) && (I >= 0)) K.add(I, J, kij);
 					else
 					{
@@ -315,14 +326,14 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 				assert(elm[i] == -1);
 				assert(elm[j] == -1);
 
-				for (k = 0; k<(int)Li.slave.size(); ++k, ++is)
+				for (int k = 0; k<(int)Li.slave.size(); ++k, ++is)
 				{
 					js = Lj.slave.begin();
-					for (l = 0; l<(int)Lj.slave.size(); ++l, ++js)
+					for (int l = 0; l<(int)Lj.slave.size(); ++l, ++js)
 					{
-						I = mesh.Node(is->node).m_ID[is->dof];
-						J = mesh.Node(js->node).m_ID[js->dof];;
-						kij = ke[i][j] * is->val*js->val;
+						int I = mesh.Node(is->node).m_ID[is->dof];
+						int J = mesh.Node(js->node).m_ID[js->dof];;
+						double kij = ke[i][j] * is->val*js->val;
 
 						if ((J >= I) && (I >= 0)) K.add(I, J, kij);
 						else
@@ -339,6 +350,7 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 }
 
 //-----------------------------------------------------------------------------
+// This updates the nodal degrees of freedom of the master nodes.
 void FELinearConstraintManager::Update()
 {
 	FEMesh& mesh = m_fem->GetMesh();
