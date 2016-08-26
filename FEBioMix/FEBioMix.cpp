@@ -32,8 +32,10 @@
 #include "FEReactionRateNims.h"
 #include "FEReactionRateExpSED.h"
 #include "FEMassActionForward.h"
+#include "FEMassActionForwardEffective.h"
 #include "FEMichaelisMenten.h"
 #include "FEMassActionReversible.h"
+#include "FEMassActionReversibleEffective.h"
 #include "FEConcentrationIndependentReaction.h"
 #include "FEActiveConstantSupply.h"
 
@@ -116,8 +118,10 @@ REGISTER_FECORE_CLASS(FEReactionRateHuiskes		    	  ,FEMATERIAL_ID, "Huiskes rea
 REGISTER_FECORE_CLASS(FEReactionRateNims		    	  ,FEMATERIAL_ID, "Nims reaction rate"        );
 REGISTER_FECORE_CLASS(FEReactionRateExpSED                ,FEMATERIAL_ID, "exp-sed reaction rate"     );
 REGISTER_FECORE_CLASS(FEMassActionForward		    	  ,FEMATERIAL_ID, "mass-action-forward"       );
+REGISTER_FECORE_CLASS(FEMassActionForwardEffective		  ,FEMATERIAL_ID, "mass-action-forward-effective");
 REGISTER_FECORE_CLASS(FEConcentrationIndependentReaction  ,FEMATERIAL_ID, "concentration-independent");
 REGISTER_FECORE_CLASS(FEMassActionReversible              ,FEMATERIAL_ID, "mass-action-reversible"   );
+REGISTER_FECORE_CLASS(FEMassActionReversibleEffective     ,FEMATERIAL_ID, "mass-action-reversible-effective");
 REGISTER_FECORE_CLASS(FEMichaelisMenten                   ,FEMATERIAL_ID, "Michaelis-Menten"         );
 REGISTER_FECORE_CLASS(FESolidBoundMolecule                ,FEMATERIAL_ID, "solid_bound"              );
 REGISTER_FECORE_CLASS(FEActiveConstantSupply              ,FEMATERIAL_ID, "active-const-supply"      );
