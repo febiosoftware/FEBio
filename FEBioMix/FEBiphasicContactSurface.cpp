@@ -36,7 +36,7 @@ vec3d FEBiphasicContactSurface::GetFluidForce()
 void FEBiphasicContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	int N = el.Nodes();
-	lm.resize(N*4);
+	lm.assign(N*4, -1);
 
 	// pack the equation numbers
 	for (int i=0; i<N; ++i)
@@ -52,6 +52,6 @@ void FEBiphasicContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 		lm[3*i+2] = id[m_dofZ];
 
 		// now the pressure dofs
-		lm[3*N+i] = id[m_dofP];
+		if (m_dofP >= 0) lm[3*N+i] = id[m_dofP];
 	}
 }

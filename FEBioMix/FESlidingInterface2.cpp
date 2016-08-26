@@ -213,6 +213,7 @@ vec3d FESlidingSurface2::GetFluidForce()
 	
 	// initialize contact force
 	vec3d f(0,0,0);
+	if (m_dofP < 0) return f;
 	
 	// loop over all elements of the surface
 	for (n=0; n<Elements(); ++n)
@@ -1286,8 +1287,11 @@ void FESlidingInterface2::ContactStiffness(FESolver* psolver)
 			int nint = se.GaussPoints();
 
 			// nodal pressures
-			double pn[MN];
-			for (j=0; j<nseln; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).get(m_dofP);
+			double pn[MN] = {0};
+			if (sporo)
+			{
+				for (j=0; j<nseln; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).get(m_dofP);
+			}
 
 			// copy the LM vector
 			ss.UnpackLM(se, sLM);
@@ -1333,8 +1337,11 @@ void FESlidingInterface2::ContactStiffness(FESolver* psolver)
 					int nmeln = me.Nodes();
 
 					// nodal pressure
-					double pm[MN];
-					for (k=0; k<nmeln; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).get(m_dofP);
+					double pm[MN] = {0};
+					if (sporo && mporo)
+					{
+						for (k=0; k<nmeln; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).get(m_dofP);
+					}
 
 					// copy the LM vector
 					ms.UnpackLM(me, mLM);
