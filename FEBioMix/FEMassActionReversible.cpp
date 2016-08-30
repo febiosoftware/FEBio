@@ -178,7 +178,7 @@ double FEMassActionReversible::Tangent_ReactionSupply_Concentration(FEMaterialPo
 	double dzhatFdc = 0;
 	for (int isol=0; isol<nsol; ++isol) {
 		dzhatFdc += m_vR[isol]*spt.m_dkdc[isol][sol]/spt.m_k[isol];
-		if ((isol == sol) && spt.m_c[sol] > 0)
+		if ((isol == sol) && (spt.m_c[sol] > 0))
 			dzhatFdc += m_vR[isol]/spt.m_c[sol];
 	}
 	
@@ -189,7 +189,7 @@ double FEMassActionReversible::Tangent_ReactionSupply_Concentration(FEMaterialPo
 	double dzhatRdc = 0;
 	for (int isol=0; isol<nsol; ++isol) {
 		dzhatRdc += m_vP[isol]*spt.m_dkdc[isol][sol]/spt.m_k[isol];
-		if ((isol == sol) && spt.m_c[sol] > 0)
+		if ((isol == sol) && (spt.m_c[sol] > 0))
 			dzhatRdc += m_vP[isol]/spt.m_c[sol];
 	}
 	

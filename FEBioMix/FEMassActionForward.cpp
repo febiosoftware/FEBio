@@ -105,7 +105,7 @@ double FEMassActionForward::Tangent_ReactionSupply_Concentration(FEMaterialPoint
 	double dzhatdc = 0;
 	for (int isol=0; isol<nsol; ++isol) {
 		dzhatdc += m_vR[isol]*spt.m_dkdc[isol][sol]/spt.m_k[isol];
-		if ((isol == sol) && spt.m_c[sol] > 0)
+		if ((isol == sol) && (spt.m_c[sol] > 0))
 			dzhatdc += m_vR[isol]/spt.m_c[sol];
 	}
 	

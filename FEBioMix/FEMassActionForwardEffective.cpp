@@ -89,7 +89,7 @@ double FEMassActionForwardEffective::Tangent_ReactionSupply_Concentration(FEMate
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
     double zhat = ReactionSupply(pt);
     double dzhatdc = 0;
-    if (zhat > 0) dzhatdc = m_vR[sol]/spt.m_c[sol]*zhat;
+    if ((zhat > 0) && (spt.m_c[sol] > 0)) dzhatdc = m_vR[sol]/spt.m_c[sol]*zhat;
     
     return dzhatdc;
 }

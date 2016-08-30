@@ -159,12 +159,12 @@ double FEMassActionReversibleEffective::Tangent_ReactionSupply_Concentration(FEM
     // forward reaction
     double zhatF = FwdReactionSupply(pt);
     double dzhatFdc = 0;
-    if (zhatF > 0) dzhatFdc = m_vR[sol]*zhatF/spt.m_c[sol];
+    if ((zhatF > 0) && (spt.m_c[sol] > 0)) dzhatFdc = m_vR[sol]*zhatF/spt.m_c[sol];
     
     // reverse reaction
     double zhatR = RevReactionSupply(pt);
     double dzhatRdc = 0;
-    if (zhatR > 0) dzhatRdc = m_vP[sol]*zhatR/spt.m_c[sol];
+    if ((zhatR > 0) && (spt.m_c[sol] > 0)) dzhatRdc = m_vP[sol]*zhatR/spt.m_c[sol];
 
     return dzhatFdc - dzhatRdc;
 }
