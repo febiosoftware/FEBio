@@ -655,6 +655,7 @@
     <ClInclude Include="..\..\FECore\FEInitialCondition.h" />
     <ClInclude Include="..\..\FECore\FELevelStructure.h" />
     <ClInclude Include="..\..\FECore\FELinearConstraint.h" />
+    <ClInclude Include="..\..\FECore\FELinearConstraintManager.h" />
     <ClInclude Include="..\..\FECore\FELinearSolver.h" />
     <ClInclude Include="..\..\FECore\FEMaterial.h" />
     <ClInclude Include="..\..\FECore\FEMaterialPoint.h" />
@@ -709,6 +710,7 @@
     <ClInclude Include="..\..\FECore\SparseMatrix.h" />
     <ClInclude Include="..\..\FECore\stdafx.h" />
     <ClInclude Include="..\..\FECore\sys.h" />
+    <ClInclude Include="..\..\FECore\table.h" />
     <ClInclude Include="..\..\FECore\targetver.h" />
     <ClInclude Include="..\..\FECore\tens3d.h" />
     <ClInclude Include="..\..\FECore\tens3d.hpp" />
@@ -783,6 +785,7 @@
     <ClCompile Include="..\..\FECore\FEInitialCondition.cpp" />
     <ClCompile Include="..\..\FECore\FELevelStructure.cpp" />
     <ClCompile Include="..\..\FECore\FELinearConstraint.cpp" />
+    <ClCompile Include="..\..\FECore\FELinearConstraintManager.cpp" />
     <ClCompile Include="..\..\FECore\FELinearSolver.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterialPoint.cpp" />

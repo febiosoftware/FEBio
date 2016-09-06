@@ -594,6 +594,8 @@
     <ClCompile Include="..\..\FEBioMix\FEFiberExpPowSBM.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEFiberPowLinearSBM.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEHydraulicPermeability.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMassActionForwardEffective.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMassActionReversibleEffective.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMixDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolute.cpp" />
@@ -660,6 +662,8 @@
     <ClInclude Include="..\..\FEBioMix\FEFiberExpPowSBM.h" />
     <ClInclude Include="..\..\FEBioMix\FEFiberPowLinearSBM.h" />
     <ClInclude Include="..\..\FEBioMix\FEHydraulicPermeability.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMassActionForwardEffective.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMassActionReversibleEffective.h" />
     <ClInclude Include="..\..\FEBioMix\FEMixDomainFactory.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolute.h" />
