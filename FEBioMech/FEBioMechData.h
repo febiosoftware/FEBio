@@ -423,6 +423,30 @@ public:
 	double value(FEElement& el);
 };
 
+//-----------------------------------------------------------------------------
+class FELogElemFiberVectorX : public FELogElemData
+{
+public:
+	FELogElemFiberVectorX(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemFiberVectorY : public FELogElemData
+{
+public:
+	FELogElemFiberVectorY(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemFiberVectorZ : public FELogElemData
+{
+public:
+	FELogElemFiberVectorZ(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
 //=============================================================================
 // R I G I D   B O D Y    D A T A
 //=============================================================================

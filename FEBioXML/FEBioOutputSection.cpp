@@ -122,11 +122,14 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 				else if (strcmp(sz, "off") == 0) prec->SetComments(false); 
 			}
 
-			sz = tag.AttributeValue("elset", true);
+			const char* sztmp = "elset";
+			if (m_pim->Version() >= 0x0205) sztmp = "elem_set";
+
+			sz = tag.AttributeValue(sztmp, true);
 			if (sz)
 			{
 				FEElementSet* pes = mesh.FindElementSet(sz);
-				if (pes == 0) throw XMLReader::InvalidAttributeValue(tag, "elset", sz);
+				if (pes == 0) throw XMLReader::InvalidAttributeValue(tag, sztmp, sz);
 				prec->SetItemList(pes);
 			}
 			else prec->DataRecord::SetItemList(tag.szvalue());

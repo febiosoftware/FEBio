@@ -899,10 +899,7 @@ bool FEPlotFiberVector::Save(FEDomain &dom, FEDataStream& a)
 		for (int j=0; j<n; ++j)
 		{
 			FEElasticMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
-			vec3d ri;
-			ri.x = pt.m_Q[0][0];
-			ri.y = pt.m_Q[1][0];
-			ri.z = pt.m_Q[2][0];
+			vec3d ri = pt.m_Q.col(0);
 
 			r += pt.m_F*ri;
 		}

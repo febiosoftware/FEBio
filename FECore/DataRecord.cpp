@@ -145,6 +145,13 @@ bool DataRecord::Write()
 						*ch = '%'; sz = ch+2;
 						fprintf(fp, "%d", nitem);
 					}
+					else if (ch[1]=='l')
+					{
+						*ch = 0;
+						fprintf(fp, "%s", sz);
+						*ch = '%'; sz = ch + 2;
+						fprintf(fp, "%d", i+1);
+					}
 					else if (ch[1]=='g')
 					{
 						*ch = 0;
