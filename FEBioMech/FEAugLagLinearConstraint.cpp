@@ -126,7 +126,7 @@ bool FELinearConstraintSet::Augment(int naug, const FETimeInfo& tp)
 		p = fabs((L1 - L0)/L1);
 	else p = fabs(L1 - L0);
 
-	felog.printf("linear constraint set %d: %15.7lg %15.7lg %15.7lg", m_nID, L0, fabs(L1 - L0), fabs(m_tol*L1));
+	felog.printf("linear constraint set %d: %15.7lg %15.7lg %15.7lg\n", m_nID, L0, fabs(L1 - L0), fabs(m_tol*L1));
 
 	bool bconv = false;
 	if (p <= m_tol) bconv = true;
