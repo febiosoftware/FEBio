@@ -43,26 +43,26 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 //-----------------------------------------------------------------------------
 void ElementDataRecord::BuildELT()
 {
-	int i, j;
 	m_ELT.clear();
 	FEMesh& m = m_pfem->GetMesh();
 	int NE = m.Elements();
 	m_ELT.resize(NE);
-	for (i=0; i<NE; ++i) 
+	for (int i=0; i<NE; ++i) 
 	{
 		m_ELT[i].ndom = -1;
 		m_ELT[i].nid  = -1;
 	}
 
-	for (i=0; i<m.Domains(); ++i)
+	int n = 0;
+	for (int i=0; i<m.Domains(); ++i)
 	{
 		FEDomain& d = m.Domain(i);
 		int ne = d.Elements();
-		for (j=0; j<ne; ++j)
+		for (int j=0; j<ne; ++j, ++n)
 		{
 			FEElement& el = d.ElementRef(j);
-			m_ELT[el.GetID()-1].ndom = i;
-			m_ELT[el.GetID()-1].nid  = j;
+			m_ELT[n].ndom = i;
+			m_ELT[n].nid  = j;
 		}
 	}
 }
