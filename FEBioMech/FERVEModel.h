@@ -1,6 +1,8 @@
 #pragma once
 #include "FECore/FEModel.h"
 
+class FEBCPrescribedDeformation;
+
 //-----------------------------------------------------------------------------
 // Class describing the RVE model.
 // This is used by the homogenization code.
@@ -38,4 +40,5 @@ private:
 	bool			m_bperiodic;	//!< periodic BCs flag
 	FEBoundingBox	m_bb;		//!< bounding box of mesh
 	vector<int>		m_BN;			//!< boundary node flags
+	FEBCPrescribedDeformation*	m_PD;	//!< prescribed deformation
 };
