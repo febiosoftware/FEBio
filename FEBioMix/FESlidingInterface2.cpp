@@ -137,6 +137,8 @@ void FESlidingSurface2::UpdateNodeNormals()
 //-----------------------------------------------------------------------------
 vec3d FESlidingSurface2::GetContactForce()
 {
+	return m_Ft;
+/*
 	int n, i;
 	
 	// initialize contact force
@@ -165,6 +167,7 @@ vec3d FESlidingSurface2::GetContactForce()
 	}
 	
 	return f;
+*/
 }
 
 //-----------------------------------------------------------------------------
@@ -1066,6 +1069,9 @@ void FESlidingInterface2::ContactForces(FEGlobalVector& R)
 	// we need to multiply with the timestep
 	double dt = fem.GetTime().timeIncrement;
 
+	m_ss.m_Ft = vec3d(0, 0, 0);
+	m_ms.m_Ft = vec3d(0, 0, 0);
+
 	// loop over the nr of passes
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
@@ -1193,6 +1199,16 @@ void FESlidingInterface2::ContactForces(FEGlobalVector& R)
 					}
 
 					for (k=0; k<ndof; ++k) fe[k] += tn*N[k]*detJ[j]*w[j];
+
+					for (int k=0; k<nseln; ++k)
+					{
+						ss.m_Ft += vec3d(fe[k*3], fe[k*3+1], fe[k*3+2]);
+					}
+
+					for (int k = 0; k<nmeln; ++k)
+					{
+						ms.m_Ft += vec3d(fe[(k + nseln) * 3], fe[(k + nseln) * 3 + 1], fe[(k + nseln) * 3 + 2]);
+					}
 
 					// assemble the global residual
 					R.Assemble(en, LM, fe);
