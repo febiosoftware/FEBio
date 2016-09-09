@@ -20,6 +20,15 @@ FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC) : FEModelCo
 }
 
 //-----------------------------------------------------------------------------
+void FELinearConstraint::CopyFrom(const FELinearConstraint& LC)
+{
+	master = LC.master;
+	int n = (int)LC.slave.size();
+	vector<DOF>::const_iterator it = LC.slave.begin();
+	for (int i = 0; i<n; ++i, ++it) slave.push_back(*it);
+}
+
+//-----------------------------------------------------------------------------
 // Initialization.
 // Make sure the master dof does not appear as a slave dof
 bool FELinearConstraint::Init()

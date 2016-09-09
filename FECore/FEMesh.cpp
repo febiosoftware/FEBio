@@ -782,6 +782,7 @@ FENodeSet* FEMesh::FindNodeSet(int nid)
 
 FENodeSet* FEMesh::FindNodeSet(const char* szname)
 {
+	if (szname == 0) return 0;
 	for (size_t i=0; i<m_NodeSet.size(); ++i) if (strcmp(m_NodeSet[i]->GetName(), szname) == 0) return m_NodeSet[i];
 	return 0;
 }

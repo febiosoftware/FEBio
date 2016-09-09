@@ -62,7 +62,7 @@ public:
 	double	   m_macro_energy_inc;	// LTE - Macroscopic strain energy increment
 	double	   m_micro_energy_inc;	// LTE - Microscopic strain energy increment
 
-	FEModel		m_rve;				// Local copy of the master rve
+	FERVEModel	m_rve;				// Local copy of the master rve
 };
 
 //-----------------------------------------------------------------------------
@@ -100,7 +100,7 @@ public:
 public:
 	char		m_szrve[256];	//!< filename for RVE file
 	char		m_szbc[256];	//!< name of nodeset defining boundary
-	bool		m_bperiodic;	//!< periodic bc flag
+	int			m_bctype;		//!< periodic bc flag
 	FERVEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
 
 public:
@@ -126,8 +126,6 @@ public:
 	double micro_energy(FEModel& rve);
 
 protected:
-	void UpdateBC(FEModel& rve, mat3d& F);
-	
 	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint& pt);
 	tens4ds AveragedStiffness(FEModel& rve, FEMaterialPoint& pt);
 

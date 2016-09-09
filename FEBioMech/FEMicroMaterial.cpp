@@ -134,7 +134,8 @@ FEMicroProbe::~FEMicroProbe()
 BEGIN_PARAMETER_LIST(FEMicroMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_szrve    , FE_PARAM_STRING, "RVE"     );
 	ADD_PARAMETER(m_szbc     , FE_PARAM_STRING, "bc_set"  );
-	ADD_PARAMETER(m_bperiodic, FE_PARAM_BOOL  , "periodic");
+	ADD_PARAMETER(m_bctype   , FE_PARAM_INT   , "bc_type" );
+	ADD_PARAMETER(m_bctype   , FE_PARAM_INT   , "periodic"); // obsolete
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -143,7 +144,7 @@ FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 	// initialize parameters
 	m_szrve[0] = 0;
 	m_szbc[0] = 0;
-	m_bperiodic = false;	// use displacement BCs by default
+	m_bctype = FERVEModel::DISPLACEMENT;	// use displacement BCs by default
 
 	AddProperty(&m_probe, "probe", false);
 }
@@ -179,7 +180,7 @@ bool FEMicroMaterial::Init()
 
 	// initialize the RVE model
 	// This also creates the necessary boundary conditions
-	bool bret = m_mrve.InitRVE(m_bperiodic, m_szbc); 
+	bool bret = m_mrve.InitRVE(m_bctype, m_szbc); 
 
 	// reset the logfile mode
 	felog.SetMode(nmode);
@@ -187,30 +188,6 @@ bool FEMicroMaterial::Init()
 	if (bret == false) return MaterialError("An error occurred preparing RVE model");
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Assign the prescribed displacement to the boundary nodes.
-void FEMicroMaterial::UpdateBC(FEModel& rve, mat3d& F)
-{
-	// get the mesh
-	FEMesh& m = rve.GetMesh();
-
-	// assign new DC's for the boundary nodes
-	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*rve.PrescribedBC(0));
-	dc.SetDeformationGradient(F);
-
-	if (m_bperiodic)
-	{
-		// loop over periodic boundaries
-		for (int i=0; i<3; ++i)
-		{
-			FEPeriodicBoundary1O* pc = dynamic_cast<FEPeriodicBoundary1O*>(rve.SurfacePairInteraction(i));
-			assert(pc);
-
-			pc->m_Fmacro = F;
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -223,7 +200,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	mat3d F = pt.m_F;
 	
 	// update the BC's
-	UpdateBC(mmpt.m_rve, F);
+	mmpt.m_rve.Update(F);
 
 	// solve the RVE
 	Logfile::MODE nmode = felog.GetMode(); felog.SetMode(Logfile::NEVER);
@@ -267,7 +244,7 @@ mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 	// for periodic BC's we take the reaction forces directly from the periodic constraints
 	// TODO: Figure out a way to store all the reaction forces on the nodes
 	//       That way, we don't need to do this anymore.
-	if (m_bperiodic)
+	if (m_bctype == FERVEModel::PERIODIC_AL)
 	{
 		// get the reaction for from the periodic constraints
 		for (int i=0; i<3; ++i)
@@ -456,7 +433,7 @@ mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
 	mat3d PK1; PK1.zero();
 
 	// for periodic BC's we take the reaction forces directly from the periodic constraints
-	if (m_bperiodic)
+	if (m_bctype == FERVEModel::PERIODIC_AL)
 	{
 		// get the reaction for from the periodic constraints
 		for (int i=0; i<3; ++i)
@@ -519,7 +496,7 @@ mat3ds FEMicroMaterial::AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp)
 	mat3d S; S.zero();
 
 	// for periodic BC's we take the reaction forces directly from the periodic constraints
-	if (m_bperiodic)
+	if (m_bctype == FERVEModel::PERIODIC_AL)
 	{
 		// get the reaction for from the periodic constraints
 		for (int i=0; i<3; ++i)

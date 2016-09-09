@@ -12,7 +12,7 @@
 //-----------------------------------------------------------------------------
 FERVEModel::FERVEModel()
 {
-	m_bperiodic = false;
+	m_bctype = DISPLACEMENT;
 
 	// set the pardiso solver as default
 	m_nsolver = PARDISO_SOLVER;
@@ -24,8 +24,22 @@ FERVEModel::~FERVEModel()
 }
 
 //-----------------------------------------------------------------------------
+// copy from the master RVE
+void FERVEModel::CopyFrom(FERVEModel& rve)
+{
+	// base class does most work
+	FEModel::CopyFrom(rve);
+
+	// copy the rest
+	m_bctype = rve.m_bctype;
+	m_V0 = rve.m_V0;
+	m_bb = rve.m_bb;
+	m_BN = rve.m_BN;
+}
+
+//-----------------------------------------------------------------------------
 //! Initializes the RVE model and evaluates some useful quantities.
-bool FERVEModel::InitRVE(bool bperiodic, const char* szbc)
+bool FERVEModel::InitRVE(int rveType, const char* szbc)
 {
 	// make sure the RVE problem doesn't output anything to a plot file
 	GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
@@ -36,8 +50,8 @@ bool FERVEModel::InitRVE(bool bperiodic, const char* szbc)
 
 	// generate prescribed BCs
 	// TODO: Make this part of the RVE definition
-	m_bperiodic = bperiodic;
-	if (bperiodic == false)
+	m_bctype = rveType;
+	if (m_bctype == DISPLACEMENT)
 	{
 		// find the boundary nodes
 		if ((szbc) && (szbc[0] != 0))
@@ -60,11 +74,30 @@ bool FERVEModel::InitRVE(bool bperiodic, const char* szbc)
 		// prep displacement BC's
 		if (PrepDisplacementBC() == false) return false;
 	}
-	else
+	else if (m_bctype == PERIODIC_AL)
 	{
 		// prep periodic BC's
 		if (PrepPeriodicBC(szbc) == false) return false;
 	}
+	else if (m_bctype == PERIODIC_LC)
+	{
+		// user needs to define corner nodes
+		// get the RVE mesh
+		FEMesh& m = GetMesh();
+
+		// find the node set that defines the corner nodes
+		FENodeSet* pset = m.FindNodeSet(szbc);
+		if (pset == 0) return false;
+
+		FENodeSet& ns = *pset;
+
+		int NN = m.Nodes();
+		m_BN.assign(NN, 0);
+		for (int i = 0; i<pset->size(); ++i) m_BN[ns[i]] = 1;
+
+		if (PrepDisplacementBC() == false) return false;
+	}
+	else return false;
 
 	// initialize base class
 	if (FEModel::Init() == false) return false;
@@ -206,7 +239,6 @@ bool FERVEModel::PrepDisplacementBC()
 	// we create the prescribed deformation BC
 	FEBCPrescribedDeformation* pdc = fecore_new<FEBCPrescribedDeformation>(FEBC_ID, "prescribed deformation", this);
 	AddPrescribedBC(pdc);
-	m_PD = pdc;
 
 	// assign the boundary nodes
 	for (i=0; i<N; ++i)
@@ -254,7 +286,6 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	ClearBCs();
 	FEBCPrescribedDeformation* pdc = fecore_new<FEBCPrescribedDeformation>(FEBC_ID, "prescribed deformation", this);
 	AddPrescribedBC(pdc);
-	m_PD = pdc;
 
 	// assign nodes to BCs
 	pdc->AddNodes(ns);
@@ -265,4 +296,27 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	for (int i=0; i<N; ++i) m_BN[ns[i]] = 1;
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FERVEModel::Update(const mat3d& F)
+{
+	// get the mesh
+	FEMesh& m = GetMesh();
+
+	// assign new DC's for the boundary nodes
+	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*PrescribedBC(0));
+	dc.SetDeformationGradient(F);
+
+	if (m_bctype == FERVEModel::PERIODIC_AL)
+	{
+		// loop over periodic boundaries
+		for (int i = 0; i<3; ++i)
+		{
+			FEPeriodicBoundary1O* pc = dynamic_cast<FEPeriodicBoundary1O*>(SurfacePairInteraction(i));
+			assert(pc);
+
+			pc->m_Fmacro = F;
+		}
+	}
 }

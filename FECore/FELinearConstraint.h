@@ -28,6 +28,9 @@ public:
 	FELinearConstraint(FEModel* pfem);
 	FELinearConstraint(const FELinearConstraint& LC);
 
+	// copy data
+	void CopyFrom(const FELinearConstraint& LC);
+
 	// serialization
 	void Serialize(DumpStream& ar);
 

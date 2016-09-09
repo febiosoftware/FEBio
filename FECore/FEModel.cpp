@@ -82,6 +82,9 @@ void FEModel::Clear()
 	// clear the rigid system (if there is one)
 	if (m_prs) m_prs->Clear();
 
+	// clear the linear constraints
+	if (m_LCM) m_LCM->Clear();
+
 	// clear the mesh
 	m_mesh.Clear();
 }
@@ -1056,6 +1059,14 @@ void FEModel::CopyFrom(FEModel& fem)
 	{
 		FELoadCurve* plc = new FELoadCurve(*fem.m_LC[i]);
 		m_LC.push_back(plc);
+	}
+
+	// copy linear constraints
+	if (fem.m_LCM)
+	{
+		if (m_LCM) delete m_LCM;
+		m_LCM = new FELinearConstraintManager(this);
+		m_LCM->CopyFrom(*fem.m_LCM);
 	}
 }
 

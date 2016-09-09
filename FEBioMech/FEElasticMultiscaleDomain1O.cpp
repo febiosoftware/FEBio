@@ -23,7 +23,7 @@ bool FEElasticMultiscaleDomain1O::Initialize()
 	if (m_pMat == 0) return false;
 
 	// get the master RVE
-	FEModel& rve = pmat->m_mrve;
+	FERVEModel& rve = pmat->m_mrve;
 
 	// loop over all elements
 	for (size_t i=0; i<m_Elem.size(); ++i)

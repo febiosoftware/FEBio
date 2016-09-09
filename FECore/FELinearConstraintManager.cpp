@@ -11,6 +11,25 @@ FELinearConstraintManager::FELinearConstraintManager(FEModel* fem) : m_fem(fem)
 }
 
 //-----------------------------------------------------------------------------
+void FELinearConstraintManager::Clear()
+{
+	m_LinC.clear();
+}
+
+//-----------------------------------------------------------------------------
+void FELinearConstraintManager::CopyFrom(const FELinearConstraintManager& lcm)
+{
+	m_LinC.clear();
+	for (int i=0; i<lcm.LinearConstraints(); ++i)
+	{
+		FELinearConstraint lc(m_fem);
+		lc.CopyFrom(lcm.LinearConstraint(i));
+		m_LinC.push_back(lc);
+	}
+	InitTable();
+}
+
+//-----------------------------------------------------------------------------
 void FELinearConstraintManager::AddLinearConstraint(FELinearConstraint& lc)
 {
 	m_LinC.push_back(lc);
@@ -179,6 +198,14 @@ bool FELinearConstraintManager::Initialize()
 		}
 	}
 
+	// initialize the lookup table
+	InitTable();
+
+	return true;
+}
+
+void FELinearConstraintManager::InitTable()
+{
 	FEMesh& mesh = m_fem->GetMesh();
 
 	// create the linear constraint table
@@ -187,6 +214,7 @@ bool FELinearConstraintManager::Initialize()
 	m_LCT.resize(mesh.Nodes(), MAX_NDOFS, -1);
 
 	vector<FELinearConstraint>::iterator ic = m_LinC.begin();
+	int nlin = LinearConstraints();
 	for (int i = 0; i<nlin; ++i, ++ic)
 	{
 		FELinearConstraint& lc = *ic;
@@ -195,8 +223,6 @@ bool FELinearConstraintManager::Initialize()
 
 		m_LCT(n, m) = i;
 	}
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -12,6 +12,12 @@ class FELinearConstraintManager
 public:
 	FELinearConstraintManager(FEModel* fem);
 
+	// Clear all constraints
+	void Clear();
+
+	// copy data
+	void CopyFrom(const FELinearConstraintManager& lcm);
+
 	// serialize linear constraints
 	void Serialize(DumpStream& ar);
 
@@ -42,6 +48,9 @@ public:
 
 	// update nodal variables
 	void Update();
+
+protected:
+	void InitTable();
 
 private:
 	FEModel* m_fem;
