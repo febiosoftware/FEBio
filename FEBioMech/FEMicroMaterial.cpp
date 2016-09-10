@@ -134,6 +134,7 @@ FEMicroProbe::~FEMicroProbe()
 BEGIN_PARAMETER_LIST(FEMicroMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_szrve    , FE_PARAM_STRING, "RVE"     );
 	ADD_PARAMETER(m_szbc     , FE_PARAM_STRING, "bc_set"  );
+	ADD_PARAMETER(m_szforce  , FE_PARAM_STRING, "force_set");
 	ADD_PARAMETER(m_bctype   , FE_PARAM_INT   , "bc_type" );
 	ADD_PARAMETER(m_bctype   , FE_PARAM_INT   , "periodic"); // obsolete
 END_PARAMETER_LIST();
@@ -144,6 +145,7 @@ FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 	// initialize parameters
 	m_szrve[0] = 0;
 	m_szbc[0] = 0;
+	m_szforce[0] = 0;
 	m_bctype = FERVEModel::DISPLACEMENT;	// use displacement BCs by default
 
 	AddProperty(&m_probe, "probe", false);
@@ -180,7 +182,7 @@ bool FEMicroMaterial::Init()
 
 	// initialize the RVE model
 	// This also creates the necessary boundary conditions
-	bool bret = m_mrve.InitRVE(m_bctype, m_szbc); 
+	bool bret = m_mrve.InitRVE(m_bctype, m_szbc, m_szforce); 
 
 	// reset the logfile mode
 	felog.SetMode(nmode);
@@ -231,7 +233,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the average stress from the RVE solution.
-mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
+mat3ds FEMicroMaterial::AveragedStress(FERVEModel& rve, FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	double J = pt.m_J;
@@ -277,18 +279,33 @@ mat3ds FEMicroMaterial::AveragedStress(FEModel& rve, FEMaterialPoint &mp)
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 
-	// calculate the averaged stress
-	// TODO: This might be more efficient if we keep a list of boundary nodes
-	int NN = m.Nodes();
-	for (int j=0; j<NN; ++j)
+	if (m_bctype != FERVEModel::PERIODIC_LC)
 	{
-		if (m_mrve.IsBoundaryNode(j))
+		// calculate the averaged stress
+		// TODO: This might be more efficient if we keep a list of boundary nodes
+		int NN = m.Nodes();
+		for (int j=0; j<NN; ++j)
 		{
-			FENode& n = m.Node(j);
+			if (m_mrve.IsBoundaryNode(j))
+			{
+				FENode& n = m.Node(j);
+				vec3d f;
+				f.x = R[-n.m_ID[dof_X]-2];
+				f.y = R[-n.m_ID[dof_Y]-2];
+				f.z = R[-n.m_ID[dof_Z]-2];
+				T += f & n.m_rt;
+			}
+		}
+	}
+	else
+	{
+		for (int i=0; i<rve.m_FN.size(); ++i)
+		{
+			FENode& n = m.Node(rve.m_FN[i]);
 			vec3d f;
-			f.x = R[-n.m_ID[dof_X]-2];
-			f.y = R[-n.m_ID[dof_Y]-2];
-			f.z = R[-n.m_ID[dof_Z]-2];
+			f.x = R[-n.m_ID[dof_X] - 2];
+			f.y = R[-n.m_ID[dof_Y] - 2];
+			f.z = R[-n.m_ID[dof_Z] - 2];
 			T += f & n.m_rt;
 		}
 	}

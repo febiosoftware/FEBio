@@ -100,6 +100,7 @@ public:
 public:
 	char		m_szrve[256];	//!< filename for RVE file
 	char		m_szbc[256];	//!< name of nodeset defining boundary
+	char		m_szforce[256];	//!< name of nodeset defining reaction forces
 	int			m_bctype;		//!< periodic bc flag
 	FERVEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
 
@@ -126,7 +127,7 @@ public:
 	double micro_energy(FEModel& rve);
 
 protected:
-	mat3ds AveragedStress(FEModel& rve, FEMaterialPoint& pt);
+	mat3ds AveragedStress(FERVEModel& rve, FEMaterialPoint& pt);
 	tens4ds AveragedStiffness(FEModel& rve, FEMaterialPoint& pt);
 
 public:

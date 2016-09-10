@@ -21,7 +21,7 @@ public:
 	~FERVEModel();
 
 	//! one time initialization
-	bool InitRVE(int rveType, const char* szbc);
+	bool InitRVE(int rveType, const char* szbc, const char* szforce = 0);
 
 	//! Return the initial volume (calculated in Init)
 	double InitialVolume() const { return m_V0; }
@@ -53,4 +53,7 @@ private:
 	int				m_bctype;			//!< RVE type
 	FEBoundingBox	m_bb;				//!< bounding box of mesh
 	vector<int>		m_BN;				//!< boundary node flags
+
+public:
+	vector<int>		m_FN;				//!< list of force nodes
 };

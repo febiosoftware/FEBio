@@ -35,11 +35,12 @@ void FERVEModel::CopyFrom(FERVEModel& rve)
 	m_V0 = rve.m_V0;
 	m_bb = rve.m_bb;
 	m_BN = rve.m_BN;
+	m_FN = rve.m_FN;
 }
 
 //-----------------------------------------------------------------------------
 //! Initializes the RVE model and evaluates some useful quantities.
-bool FERVEModel::InitRVE(int rveType, const char* szbc)
+bool FERVEModel::InitRVE(int rveType, const char* szbc, const char* szforce)
 {
 	// make sure the RVE problem doesn't output anything to a plot file
 	GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
@@ -94,6 +95,10 @@ bool FERVEModel::InitRVE(int rveType, const char* szbc)
 		int NN = m.Nodes();
 		m_BN.assign(NN, 0);
 		for (int i = 0; i<pset->size(); ++i) m_BN[ns[i]] = 1;
+
+		FENodeSet* pfs = m.FindNodeSet(szforce);
+		if (pfs == 0) return false;
+		m_FN = pfs->GetNodeList();
 
 		if (PrepDisplacementBC() == false) return false;
 	}
