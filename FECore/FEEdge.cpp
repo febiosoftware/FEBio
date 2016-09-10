@@ -13,6 +13,29 @@ FEEdge::~FEEdge()
 }
 
 //-----------------------------------------------------------------------------
+FENodeSet FEEdge::GetNodeSet()
+{
+	FEMesh* pm = GetMesh();
+	FENodeSet set(pm);
+
+	vector<int> tag(pm->Nodes(), 0);
+	for (int i = 0; i<Elements(); ++i)
+	{
+		FELineElement& el = Element(i);
+		int ne = el.Nodes();
+		for (int j = 0; j<ne; ++j)
+		{
+			if (tag[el.m_node[j]] == 0)
+			{
+				set.add(el.m_node[j]);
+				tag[el.m_node[j]] = 1;
+			}
+		}
+	}
+	return set;
+}
+
+//-----------------------------------------------------------------------------
 bool FEEdge::Init()
 {
 	// make sure that there is an edge defined

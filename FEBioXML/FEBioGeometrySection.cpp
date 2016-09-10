@@ -51,7 +51,12 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 				if (nversion >= 0x0205) ParseSurfacePairSection(tag);
 				else throw XMLReader::InvalidTag(tag);
 			}
-			else if (tag == "ElementData") 
+			else if (tag == "NodeSetPair")
+			{
+				if (nversion >= 0x0205) ParseNodeSetPairSection(tag);
+				else throw XMLReader::InvalidTag(tag);
+			}
+			else if (tag == "ElementData")
 			{
 				// This section is no longer supported since 2.5 and replaced
 				// with the top level MeshData section.
@@ -883,6 +888,37 @@ void FEBioGeometrySection::ParseSurfacePairSection(XMLTag& tag)
 	while (!tag.isend());
 
 	m_pim->AddSurfacePair(p);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioGeometrySection::ParseNodeSetPairSection(XMLTag& tag)
+{
+	FEBioImport::NodeSetPair p;
+	const char* szname = tag.AttributeValue("name");
+	strcpy(p.szname, szname);
+
+	FEMesh& mesh = *m_pim->GetFEMesh();
+
+	++tag;
+	do
+	{
+		if (tag == "master")
+		{
+			const char* sz = tag.AttributeValue("node_set");
+			p.pmaster = mesh.FindNodeSet(sz);
+			if (p.pmaster == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", sz);
+		}
+		else if (tag == "slave")
+		{
+			const char* sz = tag.AttributeValue("node_set");
+			p.pslave = mesh.FindNodeSet(sz);
+			if (p.pslave == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", sz);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	} while (!tag.isend());
+
+	m_pim->AddNodeSetPair(p);
 }
 
 //-----------------------------------------------------------------------------

@@ -29,6 +29,23 @@ void FELinearConstraint::CopyFrom(const FELinearConstraint& LC)
 }
 
 //-----------------------------------------------------------------------------
+void FELinearConstraint::SetMasterDOF(int dof, int node)
+{
+	master.dof = dof;
+	master.node = node;
+}
+
+//-----------------------------------------------------------------------------
+void FELinearConstraint::AddSlaveDof(int dof, int node, double v)
+{
+	DOF d;
+	d.dof = dof;
+	d.node = node;
+	d.val = v;
+	slave.push_back(d);
+}
+
+//-----------------------------------------------------------------------------
 // Initialization.
 // Make sure the master dof does not appear as a slave dof
 bool FELinearConstraint::Init()

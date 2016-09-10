@@ -1227,3 +1227,11 @@ FEBioImport::SurfacePair* FEBioImport::FindSurfacePair(const char* szname)
 		if (strcmp(m_surfacePair[i].szname, szname) == 0) return &m_surfacePair[i];
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+FEBioImport::NodeSetPair* FEBioImport::FindNodeSetPair(const char* szname)
+{
+	for (int i = 0; i<m_nsetPair.size(); ++i)
+	if (strcmp(m_nsetPair[i].szname, szname) == 0) return &m_nsetPair[i];
+	return 0;
+}

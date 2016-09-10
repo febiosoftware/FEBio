@@ -24,6 +24,8 @@ protected:
 	void ParseRigidBody     (XMLTag& tag);  // version 2.5 and up
 	void ParseBC            (XMLTag& tag);  // version 2.5 and up
 
+	void ParsePeriodicLinearConstraint(XMLTag& tag); // version 2.5 (temporary construction)
+
 protected:
 	void ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* psi);
 	bool ParseSurfaceSection  (XMLTag& tag, FESurface& s, int nfmt, bool bnodal);

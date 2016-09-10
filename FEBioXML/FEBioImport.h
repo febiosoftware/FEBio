@@ -175,6 +175,14 @@ public:
 		FEFacetSet*	pslave;
 	};
 
+	//-------------------------------------------------------------------------
+	struct NodeSetPair
+	{
+		char		szname[256];
+		FENodeSet*	pmaster;
+		FENodeSet*	pslave;
+	};
+
 public:
 	//! constructor
 	FEBioImport();
@@ -272,7 +280,9 @@ public:
 
 	void AddSurfacePair(SurfacePair& p) { m_surfacePair.push_back(p); }
 	SurfacePair* FindSurfacePair(const char* szname);
-	
+
+	void AddNodeSetPair(NodeSetPair& p) { m_nsetPair.push_back(p); }
+	NodeSetPair* FindNodeSetPair(const char* szname);
 
 public:
 	char	m_szmod[256];	//!< module type string
@@ -312,6 +322,7 @@ protected:
 	vector<int>	m_node_list;	//!< map node ID's to their nodes.
 
 	vector<SurfacePair>	m_surfacePair;
+	vector<NodeSetPair>	m_nsetPair;
 
 protected:
 	FEBioFileSectionMap	m_map;

@@ -2,6 +2,8 @@
 #include "FEDomain.h"
 #include <vector>
 
+class FENodeSet;
+
 //-----------------------------------------------------------------------------
 // This class represents an edge of a domain.
 class FEEdge : public FEDomain
@@ -21,6 +23,9 @@ public:
 
 	//! serialization
 	void Serialize(DumpStream& ar);
+
+	//! extract node set
+	FENodeSet GetNodeSet();
 
 public:
 

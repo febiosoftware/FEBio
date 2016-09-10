@@ -21,6 +21,7 @@
 #include "FECore/FERigidSystem.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/FELinearConstraintManager.h>
+#include <FEBioMech/FEPeriodicLinearConstraint.h>
 
 //-----------------------------------------------------------------------------
 //!  Parses the boundary section from the xml file
@@ -58,6 +59,7 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 			else if (tag == "rigid") ParseBCRigid(tag);
 			else if (tag == "rigid_body"       ) ParseRigidBody    (tag);
 			else if (tag == "linear_constraint") ParseConstraints  (tag);
+			else if (tag == "periodic_linear_constraint") ParsePeriodicLinearConstraint(tag);
 			else throw XMLReader::InvalidTag(tag);
 		}
 		++tag;
@@ -793,6 +795,61 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 			LC[i].Deactivate();
 		}
 	}
+}
+
+void FEBioBoundarySection::ParsePeriodicLinearConstraint(XMLTag& tag)
+{
+	FEModel* fem = GetFEModel();
+	FEMesh& mesh = fem->GetMesh();
+	FEPeriodicLinearConstraint plc;
+	++tag;
+	do
+	{
+		if (tag == "constrain")
+		{
+			const char* sz = tag.AttributeValue("surface_pair", true);
+			if (sz)
+			{
+				FEBioImport::SurfacePair* spair = m_pim->FindSurfacePair(sz);
+				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", sz);
+
+				FESurface* ms = new FESurface(&mesh); m_pim->BuildSurface(*ms, *spair->pmaster);
+				FESurface* ss = new FESurface(&mesh); m_pim->BuildSurface(*ss, *spair->pslave);
+				plc.AddNodeSetPair(ms->GetNodeSet(), ss->GetNodeSet());
+			}
+			else
+			{
+				sz = tag.AttributeValue("edge_pair");
+				FEBioImport::NodeSetPair* spair = m_pim->FindNodeSetPair(sz);
+				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "edge_pair", sz);
+
+				// make sure this gets pushed to the front because edges need to be processed first
+				plc.AddNodeSetPair(*spair->pmaster, *spair->pslave, false);
+			}
+		}
+		else if (tag == "exclude")
+		{
+			const char* sz = tag.AttributeValue("node_set");
+			FENodeSet* ps = mesh.FindNodeSet(sz);
+			if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", sz);
+			plc.ExcludeNodes(*ps);
+		}
+		else if (tag == "reference_node")
+		{
+			int n = 0;
+			tag.value(n);
+			plc.SetReferenceNode(n - 1);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+
+	// generate the linear constraints
+	plc.GenerateConstraints(fem);
+
+	// don't forget to activate
+
 }
 
 //-----------------------------------------------------------------------------

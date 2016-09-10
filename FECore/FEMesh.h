@@ -160,7 +160,11 @@ class FEMesh;
 class FENodeSet
 {
 public:
+	FENodeSet();
 	FENodeSet(FEMesh* pm);
+	FENodeSet(const FENodeSet& ns);
+
+	void operator = (const FENodeSet& ns);
 
 	void create(int n);
 
@@ -181,6 +185,8 @@ public:
 	const char* GetName() const { return m_szname; }
 
 	vector<int>& GetNodeList() { return m_Node; }
+
+	FENode* Node(int i);
 
 protected:
 	FEMesh*	m_pmesh;

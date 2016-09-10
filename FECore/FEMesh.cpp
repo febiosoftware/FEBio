@@ -93,9 +93,30 @@ FENode& FENode::operator = (const FENode& n)
 //=============================================================================
 // FENodeSet
 //-----------------------------------------------------------------------------
+FENodeSet::FENodeSet() : m_pmesh(0), m_nID(-1)
+{
+}
+
+//-----------------------------------------------------------------------------
 FENodeSet::FENodeSet(FEMesh* pm) : m_pmesh(pm), m_nID(-1)
 { 
 	m_szname[0] = 0; 
+}
+
+//-----------------------------------------------------------------------------
+FENodeSet::FENodeSet(const FENodeSet& n)
+{
+	m_pmesh = n.m_pmesh;
+	m_Node = n.m_Node;
+	strcpy(m_szname, n.m_szname);
+}
+
+//-----------------------------------------------------------------------------
+void FENodeSet::operator = (const FENodeSet& n)
+{
+	m_pmesh = n.m_pmesh;
+	m_Node = n.m_Node;
+	strcpy(m_szname, n.m_szname);
 }
 
 //-----------------------------------------------------------------------------
@@ -125,6 +146,12 @@ void FENodeSet::add(const FENodeSet& ns)
 void FENodeSet::SetName(const char* sz)
 {
 	strcpy(m_szname, sz); 
+}
+
+//-----------------------------------------------------------------------------
+FENode* FENodeSet::Node(int i)
+{
+	return &m_pmesh->Node(m_Node[i]); 
 }
 
 //=============================================================================

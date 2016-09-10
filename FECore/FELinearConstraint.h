@@ -41,6 +41,10 @@ public:
 	void Activate();
 	void Deactivate();
 
+	void SetMasterDOF(int dof, int node);
+
+	void AddSlaveDof(int dof, int node, double v);
+
 public:
 	DOF			master;	// master degree of freedom
 	vector<DOF>	slave;	// list of slave nodes

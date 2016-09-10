@@ -15,6 +15,7 @@
 
 //-----------------------------------------------------------------------------
 class FEMesh;
+class FENodeSet;
 
 //-----------------------------------------------------------------------------
 //! Surface mesh
@@ -43,6 +44,9 @@ public:
 	//! Unpack surface element data
 	//! TODO: This is obsolete. Remove this.
 	void UnpackLM(FEElement& el, vector<int>& lm);
+	
+	//! Extract a node set from this surface
+	FENodeSet GetNodeSet();
 
 public:
 
