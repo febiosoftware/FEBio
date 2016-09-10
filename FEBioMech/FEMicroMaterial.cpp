@@ -134,7 +134,6 @@ FEMicroProbe::~FEMicroProbe()
 BEGIN_PARAMETER_LIST(FEMicroMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_szrve    , FE_PARAM_STRING, "RVE"     );
 	ADD_PARAMETER(m_szbc     , FE_PARAM_STRING, "bc_set"  );
-	ADD_PARAMETER(m_szforce  , FE_PARAM_STRING, "force_set");
 	ADD_PARAMETER(m_bctype   , FE_PARAM_INT   , "bc_type" );
 	ADD_PARAMETER(m_bctype   , FE_PARAM_INT   , "periodic"); // obsolete
 END_PARAMETER_LIST();
@@ -145,7 +144,6 @@ FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 	// initialize parameters
 	m_szrve[0] = 0;
 	m_szbc[0] = 0;
-	m_szforce[0] = 0;
 	m_bctype = FERVEModel::DISPLACEMENT;	// use displacement BCs by default
 
 	AddProperty(&m_probe, "probe", false);
@@ -182,7 +180,7 @@ bool FEMicroMaterial::Init()
 
 	// initialize the RVE model
 	// This also creates the necessary boundary conditions
-	bool bret = m_mrve.InitRVE(m_bctype, m_szbc, m_szforce); 
+	bool bret = m_mrve.InitRVE(m_bctype, m_szbc); 
 
 	// reset the logfile mode
 	felog.SetMode(nmode);
@@ -213,7 +211,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	if (bret == false) throw FEMultiScaleException(-1, -1);
 
 	// calculate the averaged Cauchy stress
-	mat3ds sa = AveragedStress(mmpt.m_rve, mp);
+	mat3ds sa = mmpt.m_rve.StressAverage(mp);
 	
 	// calculate the difference between the macro and micro energy for Hill-Mandel condition
 	mmpt.m_micro_energy = micro_energy(mmpt.m_rve);	
@@ -228,171 +226,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 {
 	FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
-	return AveragedStiffness(mmpt.m_rve, mp);
-}
-
-//-----------------------------------------------------------------------------
-//! Calculate the average stress from the RVE solution.
-mat3ds FEMicroMaterial::AveragedStress(FERVEModel& rve, FEMaterialPoint &mp)
-{
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	double J = pt.m_J;
-
-	// get the RVE mesh
-	FEMesh& m = rve.GetMesh();
-
-	mat3d T; T.zero();
-
-	// for periodic BC's we take the reaction forces directly from the periodic constraints
-	// TODO: Figure out a way to store all the reaction forces on the nodes
-	//       That way, we don't need to do this anymore.
-	if (m_bctype == FERVEModel::PERIODIC_AL)
-	{
-		// get the reaction for from the periodic constraints
-		for (int i=0; i<3; ++i)
-		{
-			FEPeriodicBoundary1O* pbc = dynamic_cast<FEPeriodicBoundary1O*>(rve.SurfacePairInteraction(i));
-			assert(pbc);
-			FEPeriodicSurface& ss = pbc->m_ss;
-			int N = ss.Nodes();
-			for (int i=0; i<N; ++i)
-			{
-				FENode& node = ss.Node(i);
-				vec3d f = ss.m_Fr[i];
-
-				// We multiply by two since the reaction forces are only stored at the slave surface 
-				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
-				// store the reaction forces on the master nodes as well?)
-				T += (f & node.m_rt)*2.0;
-			}
-		}
-	}
-
-	// get the reaction force vector from the solid solver
-	// (We also need to do this for the periodic BC, since at the prescribed nodes,
-	// the contact forces will be zero). 
-	const int dof_X = rve.GetDOFIndex("x");
-	const int dof_Y = rve.GetDOFIndex("y");
-	const int dof_Z = rve.GetDOFIndex("z");
-	FEAnalysis* pstep = rve.GetCurrentStep();
-	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
-	assert(ps);
-	vector<double>& R = ps->m_Fr;
-
-	if (m_bctype != FERVEModel::PERIODIC_LC)
-	{
-		// calculate the averaged stress
-		// TODO: This might be more efficient if we keep a list of boundary nodes
-		int NN = m.Nodes();
-		for (int j=0; j<NN; ++j)
-		{
-			if (m_mrve.IsBoundaryNode(j))
-			{
-				FENode& n = m.Node(j);
-				vec3d f;
-				f.x = R[-n.m_ID[dof_X]-2];
-				f.y = R[-n.m_ID[dof_Y]-2];
-				f.z = R[-n.m_ID[dof_Z]-2];
-				T += f & n.m_rt;
-			}
-		}
-	}
-	else
-	{
-		for (int i=0; i<rve.m_FN.size(); ++i)
-		{
-			FENode& n = m.Node(rve.m_FN[i]);
-			vec3d f;
-			f.x = R[-n.m_ID[dof_X] - 2];
-			f.y = R[-n.m_ID[dof_Y] - 2];
-			f.z = R[-n.m_ID[dof_Z] - 2];
-			T += f & n.m_rt;
-		}
-	}
-
-	double V0 = m_mrve.InitialVolume();
-	return T.sym() / (J*V0);
-}
-
-//-----------------------------------------------------------------------------
-//! Calculate the average stiffness from the RVE solution.
-tens4ds FEMicroMaterial::AveragedStiffness(FEModel& rve, FEMaterialPoint &mp)
-{
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
-	// get the mesh
-	FEMesh& m = rve.GetMesh();
-
-	// the element's stiffness matrix
-	matrix ke;
-
-	// element's residual
-	vector<double> fe;
-
-	// calculate the center point
-	vec3d rc(0,0,0);
-	for (int k=0; k<m.Nodes(); ++k) rc += m.Node(k).m_rt;
-	rc /= (double) m.Nodes();
-
-	// elasticity tensor
-	tens4ds c(0.);
-		
-	// calculate the stiffness matrix and residual
-	for (int k=0; k<m.Domains(); ++k)
-	{
-		FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(k));
-		int NS = bd.Elements();
-		for (int n=0; n<NS; ++n)
-		{
-			FESolidElement& e = bd.Element(n);
-
-			// create the element's stiffness matrix
-			int ne = e.Nodes();
-			int ndof = 3*ne;
-			ke.resize(ndof, ndof);
-			ke.zero();
-
-			// calculate the element's stiffness matrix
-			bd.ElementStiffness(rve.GetTime(), n, ke);
-
-			// create the element's residual
-			fe.assign(ndof, 0);
-
-			// calculate the element's residual
-			bd.ElementInternalForce(e, fe);
-
-			// loop over the element's nodes
-			for (int i=0; i<ne; ++i)
-			{
-				FENode& ni = m.Node(e.m_node[i]);
-				for (int j=0; j<ne; ++j)
-				{
-					FENode& nj = m.Node(e.m_node[j]);
-					if (m_mrve.IsBoundaryNode(e.m_node[i]) && m_mrve.IsBoundaryNode(e.m_node[j]))
-					{
-						// both nodes are boundary nodes
-						// so grab the element's submatrix
-						mat3d K;
-						ke.get(3*i, 3*j, K);
-
-						// get the nodal positions
-						vec3d ri = ni.m_rt - rc;
-						vec3d rj = nj.m_rt - rc;
-
-						// create the elasticity tensor
-						c += dyad4s(ri, K, rj);
-					}
-				}
-			}
-		}
-	}
-
-	// divide by volume
-	double V0 = m_mrve.InitialVolume();
-	double Vi = 1.0/(pt.m_J * V0);
-	c *= Vi; 
-
-	return c;
+	return mmpt.m_rve.StiffnessAverage(mp);
 }
 
 //-----------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 #pragma once
 #include "FECore/FEModel.h"
+#include <FECore/tens4d.h>
 
 class FEBCPrescribedDeformation;
 
@@ -21,10 +22,13 @@ public:
 	~FERVEModel();
 
 	//! one time initialization
-	bool InitRVE(int rveType, const char* szbc, const char* szforce = 0);
+	bool InitRVE(int rveType, const char* szbc);
 
 	//! Return the initial volume (calculated in Init)
 	double InitialVolume() const { return m_V0; }
+
+	//! return current volume (calculated each time)
+	double CurrentVolume();
 
 	//! see if node is boundary node
 	bool IsBoundaryNode(int i) const { return (m_BN[i]==1); }
@@ -34,6 +38,12 @@ public:
 
 	// copy from the master RVE
 	void CopyFrom(FERVEModel& rve);
+
+	//! Calculate the stress average
+	mat3ds StressAverage(FEMaterialPoint& mp);
+
+	//! Calculate the stiffness average
+	tens4ds StiffnessAverage(FEMaterialPoint &mp);
 
 protected:
 	//! Calculate the initial volume
@@ -45,7 +55,7 @@ protected:
 	//! Center the RVE
 	void CenterRVE();
 
-	bool PrepDisplacementBC();
+	bool PrepDisplacementBC(const FENodeSet& set);
 	bool PrepPeriodicBC(const char* szbc);
 
 private:
@@ -53,7 +63,4 @@ private:
 	int				m_bctype;			//!< RVE type
 	FEBoundingBox	m_bb;				//!< bounding box of mesh
 	vector<int>		m_BN;				//!< boundary node flags
-
-public:
-	vector<int>		m_FN;				//!< list of force nodes
 };

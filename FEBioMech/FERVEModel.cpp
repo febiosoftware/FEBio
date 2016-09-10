@@ -8,6 +8,8 @@
 #include "FECore/FEAnalysis.h"
 #include "FECore/LoadCurve.h"
 #include "FEBCPrescribedDeformation.h"
+#include "FESolidSolver2.h"
+#include "FEElasticSolidDomain.h"
 
 //-----------------------------------------------------------------------------
 FERVEModel::FERVEModel()
@@ -35,12 +37,11 @@ void FERVEModel::CopyFrom(FERVEModel& rve)
 	m_V0 = rve.m_V0;
 	m_bb = rve.m_bb;
 	m_BN = rve.m_BN;
-	m_FN = rve.m_FN;
 }
 
 //-----------------------------------------------------------------------------
 //! Initializes the RVE model and evaluates some useful quantities.
-bool FERVEModel::InitRVE(int rveType, const char* szbc, const char* szforce)
+bool FERVEModel::InitRVE(int rveType, const char* szbc)
 {
 	// make sure the RVE problem doesn't output anything to a plot file
 	GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
@@ -66,14 +67,29 @@ bool FERVEModel::InitRVE(int rveType, const char* szbc, const char* szforce)
 
 			FENodeSet& ns = *pset;
 
+			// prep displacement BC's
+			if (PrepDisplacementBC(ns) == false) return false;
+
+			// tag all boundary nodes
 			int NN = m.Nodes();
 			m_BN.assign(NN, 0);
 			for (int i=0; i<pset->size(); ++i) m_BN[ns[i]] = 1; 
 		}
-		else FindBoundaryNodes(m_BN);
+		else 
+		{
+			// find all boundary nodes
+			FindBoundaryNodes(m_BN);
+			
+			// create a (temporary) node set from the boundary nodes
+			FEMesh& mesh = GetMesh();
+			FENodeSet set(&mesh);
 
-		// prep displacement BC's
-		if (PrepDisplacementBC() == false) return false;
+			int NN = mesh.Nodes();
+			for (int i = 0; i<NN; ++i) if (m_BN[i] == 1) set.add(i);
+
+			// prep the displacement BCs
+			if (PrepDisplacementBC(set) == false) return false;
+		}
 	}
 	else if (m_bctype == PERIODIC_AL)
 	{
@@ -89,18 +105,10 @@ bool FERVEModel::InitRVE(int rveType, const char* szbc, const char* szforce)
 		// find the node set that defines the corner nodes
 		FENodeSet* pset = m.FindNodeSet(szbc);
 		if (pset == 0) return false;
+		if (PrepDisplacementBC(*pset) == false) return false;
 
-		FENodeSet& ns = *pset;
-
-		int NN = m.Nodes();
-		m_BN.assign(NN, 0);
-		for (int i = 0; i<pset->size(); ++i) m_BN[ns[i]] = 1;
-
-		FENodeSet* pfs = m.FindNodeSet(szforce);
-		if (pfs == 0) return false;
-		m_FN = pfs->GetNodeList();
-
-		if (PrepDisplacementBC() == false) return false;
+		// get all the boundary nodes
+		FindBoundaryNodes(m_BN);
 	}
 	else return false;
 
@@ -219,17 +227,8 @@ void FERVEModel::FindBoundaryNodes(vector<int>& BN)
 
 //-----------------------------------------------------------------------------
 // Setup the displacement boundary conditions.
-bool FERVEModel::PrepDisplacementBC()
+bool FERVEModel::PrepDisplacementBC(const FENodeSet& ns)
 {
-	FEMesh& m = GetMesh();
-	int N = m.Nodes();
-
-	// count the nr of exterior nodes
-	int NN = 0, i;
-	for (i=0; i<N; ++i) if (m_BN[i] == 1) ++NN;
-
-	assert(NN > 0);
-
 	// create a load curve
 	FELoadCurve* plc = new FELoadCurve;
 	plc->SetInterpolation(FELoadCurve::LINEAR);
@@ -246,11 +245,7 @@ bool FERVEModel::PrepDisplacementBC()
 	AddPrescribedBC(pdc);
 
 	// assign the boundary nodes
-	for (i=0; i<N; ++i)
-		if (m_BN[i] == 1)
-		{
-			pdc->AddNode(i);
-		}
+	for (int i=0; i<ns.size(); ++i) pdc->AddNode(ns[i]);
 
 	return true;
 }
@@ -324,4 +319,251 @@ void FERVEModel::Update(const mat3d& F)
 			pc->m_Fmacro = F;
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! return current volume (calculated each time)
+double FERVEModel::CurrentVolume()
+{
+	// get the RVE mesh
+	FEMesh& m = GetMesh();
+
+	double V = 0.0;
+	for (int i = 0; i<m.Domains(); ++i)
+	{
+		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(m.Domain(i));
+		int NE = dom.Elements();
+		for (int j = 0; j<NE; ++j)
+		{
+			FESolidElement& el = dom.Element(j);
+
+			int ni = el.GaussPoints();
+			int ne = el.Nodes();
+			double* w = el.GaussWeights();
+			for (int n = 0; n<ni; ++n)
+			{
+				FEMaterialPoint& pt = *el.GetMaterialPoint(n);
+				FEElasticMaterialPoint& ep = *pt.ExtractData<FEElasticMaterialPoint>();
+
+				// calculate Jacobian
+				double Jn = dom.detJt(el, n);
+
+				// add it all up
+				V += w[n] * Jn;
+			}
+		}
+	}
+
+	return V;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the stress average
+mat3ds FERVEModel::StressAverage(FEMaterialPoint& mp)
+{
+	// get the RVE mesh
+	FEMesh& m = GetMesh();
+
+	mat3ds T; T.zero();
+
+	for (int i=0; i<m.Domains(); ++i)
+	{
+		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(m.Domain(i));
+		int NE = dom.Elements();
+		for (int j=0; j<NE; ++j)
+		{
+			FESolidElement& el = dom.Element(j);
+
+			int ni = el.GaussPoints();
+			int ne = el.Nodes();
+			double* w = el.GaussWeights();
+			for (int n=0; n<ni; ++n)
+			{
+				FEMaterialPoint& pt = *el.GetMaterialPoint(n);
+				FEElasticMaterialPoint& ep = *pt.ExtractData<FEElasticMaterialPoint>();
+
+				// calculate Jacobian
+				double Jn = dom.detJt(el, n);
+
+				// add it all up
+				T += ep.m_s*(w[n]*Jn);
+			}
+		}
+	}
+
+/*	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	double J = pt.m_J;
+	double V0 = InitialVolume();
+	return T / (J*V0);
+*/
+	return T / CurrentVolume();
+}
+
+/*
+//-----------------------------------------------------------------------------
+//! Calculate the stress average
+mat3ds FERVEModel::StressAverage(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	double J = pt.m_J;
+
+	// get the RVE mesh
+	FEMesh& m = GetMesh();
+
+	mat3d T; T.zero();
+
+	// for periodic BC's we take the reaction forces directly from the periodic constraints
+	// TODO: Figure out a way to store all the reaction forces on the nodes
+	//       That way, we don't need to do this anymore.
+	if (m_bctype == FERVEModel::PERIODIC_AL)
+	{
+		// get the reaction for from the periodic constraints
+		for (int i = 0; i<3; ++i)
+		{
+			FEPeriodicBoundary1O* pbc = dynamic_cast<FEPeriodicBoundary1O*>(SurfacePairInteraction(i));
+			assert(pbc);
+			FEPeriodicSurface& ss = pbc->m_ss;
+			int N = ss.Nodes();
+			for (int i = 0; i<N; ++i)
+			{
+				FENode& node = ss.Node(i);
+				vec3d f = ss.m_Fr[i];
+
+				// We multiply by two since the reaction forces are only stored at the slave surface 
+				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
+				// store the reaction forces on the master nodes as well?)
+				T += (f & node.m_rt)*2.0;
+			}
+		}
+	}
+
+	// get the reaction force vector from the solid solver
+	// (We also need to do this for the periodic BC, since at the prescribed nodes,
+	// the contact forces will be zero). 
+	const int dof_X = GetDOFIndex("x");
+	const int dof_Y = GetDOFIndex("y");
+	const int dof_Z = GetDOFIndex("z");
+	FEAnalysis* pstep = GetCurrentStep();
+	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
+	assert(ps);
+	vector<double>& R = ps->m_Fr;
+
+	if (m_bctype != FERVEModel::PERIODIC_LC)
+	{
+		// calculate the averaged stress
+		// TODO: This might be more efficient if we keep a list of boundary nodes
+		int NN = m.Nodes();
+		for (int j = 0; j<NN; ++j)
+		{
+			if (IsBoundaryNode(j))
+			{
+				FENode& n = m.Node(j);
+				vec3d f;
+				f.x = R[-n.m_ID[dof_X] - 2];
+				f.y = R[-n.m_ID[dof_Y] - 2];
+				f.z = R[-n.m_ID[dof_Z] - 2];
+				T += f & n.m_rt;
+			}
+		}
+	}
+	else
+	{
+		for (int i = 0; i<m_FN.size(); ++i)
+		{
+			FENode& n = m.Node(m_FN[i]);
+			vec3d f;
+			f.x = R[-n.m_ID[dof_X] - 2];
+			f.y = R[-n.m_ID[dof_Y] - 2];
+			f.z = R[-n.m_ID[dof_Z] - 2];
+			T += f & n.m_rt;
+		}
+	}
+
+	double V0 = InitialVolume();
+	return T.sym() / (J*V0);
+}
+*/
+
+
+//-----------------------------------------------------------------------------
+//! Calculate the average stiffness from the RVE solution.
+tens4ds FERVEModel::StiffnessAverage(FEMaterialPoint &mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// get the mesh
+	FEMesh& m = GetMesh();
+
+	// the element's stiffness matrix
+	matrix ke;
+
+	// element's residual
+	vector<double> fe;
+
+	// calculate the center point
+	vec3d rc(0, 0, 0);
+	for (int k = 0; k<m.Nodes(); ++k) rc += m.Node(k).m_rt;
+	rc /= (double)m.Nodes();
+
+	// elasticity tensor
+	tens4ds c(0.);
+
+	// calculate the stiffness matrix and residual
+	for (int k = 0; k<m.Domains(); ++k)
+	{
+		FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(k));
+		int NS = bd.Elements();
+		for (int n = 0; n<NS; ++n)
+		{
+			FESolidElement& e = bd.Element(n);
+
+			// create the element's stiffness matrix
+			int ne = e.Nodes();
+			int ndof = 3 * ne;
+			ke.resize(ndof, ndof);
+			ke.zero();
+
+			// calculate the element's stiffness matrix
+			bd.ElementStiffness(GetTime(), n, ke);
+
+			// create the element's residual
+			fe.assign(ndof, 0);
+
+			// calculate the element's residual
+			bd.ElementInternalForce(e, fe);
+
+			// loop over the element's nodes
+			for (int i = 0; i<ne; ++i)
+			{
+				FENode& ni = m.Node(e.m_node[i]);
+				for (int j = 0; j<ne; ++j)
+				{
+					FENode& nj = m.Node(e.m_node[j]);
+					if (IsBoundaryNode(e.m_node[i]) && IsBoundaryNode(e.m_node[j]))
+					{
+						// both nodes are boundary nodes
+						// so grab the element's submatrix
+						mat3d K;
+						ke.get(3 * i, 3 * j, K);
+
+						// get the nodal positions
+						vec3d ri = ni.m_rt - rc;
+						vec3d rj = nj.m_rt - rc;
+
+						// create the elasticity tensor
+						c += dyad4s(ri, K, rj);
+					}
+				}
+			}
+		}
+	}
+
+	// divide by volume
+/*	double V0 = InitialVolume();
+	double Vi = 1.0 / (pt.m_J * V0);
+*/
+	double Vi = 1.0 / CurrentVolume();
+	c *= Vi;
+
+	return c;
 }
