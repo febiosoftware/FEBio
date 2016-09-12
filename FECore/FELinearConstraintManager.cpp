@@ -308,7 +308,7 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 					int I = mesh.Node(is->node).m_ID[is->dof];
 					int J = elm[j];
 					double kij = is->val*ke[i][j];
-					if ((J >= I) && (I >= 0)) K.add(I, J, kij);
+					if ((J >= 0) && (I >= 0)) K.add(I, J, kij);
 					else
 					{
 						// adjust for prescribed dofs
@@ -331,7 +331,7 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 					int I = elm[i];
 					int J = mesh.Node(js->node).m_ID[js->dof];
 					double kij = js->val*ke[i][j];
-					if ((J >= I) && (I >= 0)) K.add(I, J, kij);
+					if ((J >= 0) && (I >= 0)) K.add(I, J, kij);
 					else
 					{
 						// adjust for prescribed dofs
@@ -361,7 +361,7 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 						int J = mesh.Node(js->node).m_ID[js->dof];;
 						double kij = ke[i][j] * is->val*js->val;
 
-						if ((J >= I) && (I >= 0)) K.add(I, J, kij);
+						if ((J >= 0) && (I >= 0)) K.add(I, J, kij);
 						else
 						{
 							// adjust for prescribed dofs
