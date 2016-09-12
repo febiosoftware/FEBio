@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEVonMisesPlasticity, FEElasticMaterial)
+BEGIN_PARAMETER_LIST(FEVonMisesPlasticity, FESolidMaterial)
 	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
 	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
 	ADD_PARAMETER2(m_Y, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "Y");
@@ -11,7 +11,7 @@ END_PARAMETER_LIST();
 
 
 //-----------------------------------------------------------------------------
-FEVonMisesPlasticity::FEVonMisesPlasticity(FEModel* pfem) : FEElasticMaterial(pfem)
+FEVonMisesPlasticity::FEVonMisesPlasticity(FEModel* pfem) : FESolidMaterial(pfem)
 {
 	m_E = m_v = m_Y = m_H = 0;
 	m_K = m_G = 0;
@@ -20,12 +20,20 @@ FEVonMisesPlasticity::FEVonMisesPlasticity(FEModel* pfem) : FEElasticMaterial(pf
 //-----------------------------------------------------------------------------
 bool FEVonMisesPlasticity::Init()
 {
-	if (FEElasticMaterial::Init() == false) return false;
+	if (FESolidMaterial::Init() == false) return false;
 
 	m_K = m_E/(3.0*(1.0 - 2*m_v));
 	m_G = m_E/(2.0*(1.0 +   m_v));
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FEVonMisesPlasticity::CreateMaterialPointData()
+{
+	FEJ2PlasticMaterialPoint* pt = new FEJ2PlasticMaterialPoint(new FEElasticMaterialPoint);
+	pt->Y0 = m_Y;
+	return pt;
 }
 
 //-----------------------------------------------------------------------------

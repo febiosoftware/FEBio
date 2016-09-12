@@ -63,7 +63,7 @@ public:
 //-----------------------------------------------------------------------------
 //! This class implements a simple von-Mises plasticity model with isotropic
 //! hardening. 
-class FEVonMisesPlasticity : public FEElasticMaterial
+class FEVonMisesPlasticity : public FESolidMaterial
 {
 public:
 	FEVonMisesPlasticity(FEModel* pfem);
@@ -78,18 +78,13 @@ public:
 	double	m_H;	//!< hardening modulus 
 
 public:
-	virtual FEMaterialPoint* CreateMaterialPointData()
-	{ 
-		FEJ2PlasticMaterialPoint* pt = new FEJ2PlasticMaterialPoint(new FEElasticMaterialPoint); 
-		pt->Y0 = m_Y;
-		return pt;
-	}
+	FEMaterialPoint* CreateMaterialPointData();
 
 	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt);
 
 	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt);
 
 	//! data initialization and checking
 	bool Init();
