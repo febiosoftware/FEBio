@@ -12,7 +12,7 @@
 #include "FEUncoupledMaterial.h"
 #include "FEElasticFiberMaterialUC.h"
 #include "FEFiberDensityDistribution.h"
-#include "FEFiberIntegrationSchemeUC.h"
+#include "FEFiberIntegrationScheme.h"
 #include "FEFiberMaterialPoint.h"
 
 //  This material is a container for a fiber material, a fiber density
@@ -29,23 +29,28 @@ public:
     
 public:
 	//! calculate stress at material point
-	mat3ds DevStress(FEMaterialPoint& pt) { return m_pFint->DevStress(pt); }
+	mat3ds DevStress(FEMaterialPoint& pt);
     
 	//! calculate tangent stiffness at material point
-	tens4ds DevTangent(FEMaterialPoint& pt) { return m_pFint->DevTangent(pt); }
+	tens4ds DevTangent(FEMaterialPoint& pt);
     
 	//! calculate deviatoric strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& pt) { return m_pFint->DevStrainEnergyDensity(pt); }
+	double DevStrainEnergyDensity(FEMaterialPoint& pt);
     
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() {
         return new FEFiberMaterialPoint(m_pFint->CreateMaterialPointData());
     }
+
+protected:
+	// integrated Fiber density
+	void IntegrateFiberDensity();
     
 public:
     FEPropertyT<FEElasticFiberMaterialUC>   m_pFmat;    // pointer to fiber material
 	FEPropertyT<FEFiberDensityDistribution> m_pFDD;     // pointer to fiber density distribution
-	FEPropertyT<FEFiberIntegrationSchemeUC> m_pFint;    // pointer to fiber integration scheme
+	FEPropertyT<FEFiberIntegrationScheme>	m_pFint;    // pointer to fiber integration scheme
+	double	m_IFD;	// integrated fiber distribution
 };
 
 #endif /* defined(__FEBioMech__FEContinuousFiberDistributionUC__) */

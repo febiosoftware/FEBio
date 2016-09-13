@@ -60,7 +60,9 @@ mat3ds FEFiberExponentialPower::Stress(FEMaterialPoint& mp)
 		mat3ds N = dyad(nt);
 		
 		// calculate strain energy derivative
-		Wl = m_ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
+		double Ib = pow(In_1, m_beta - 1.0);
+		Wl = m_ksi*Ib*exp(m_alpha*(Ib*In_1));
+//		Wl = m_ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
 		
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);

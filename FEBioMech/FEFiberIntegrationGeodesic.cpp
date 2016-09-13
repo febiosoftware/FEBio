@@ -12,6 +12,54 @@
 #define SQR(x) ((x)*(x))
 #endif
 
+class FEFiberIntegrationGeodesic::Iterator : public FEFiberIntegrationSchemeIterator
+{
+public:
+	Iterator(int nint, const double* cth, const double* cph, const double* sth, const double* sph, const double* wn)
+	{
+		m_nint = nint;
+		m_cth = cth;
+		m_cph = cph;
+		m_sth = sth;
+		m_sph = sph;
+		m_wn = wn;
+
+		n = -1;
+		Next();
+	}
+
+	bool IsValid()
+	{
+		return (n < m_nint);
+	}
+
+	// move to the next integration point
+	bool Next()
+	{
+		n++;
+		if (n < m_nint)
+		{
+			m_fiber.x = m_cth[n] * m_sph[n];
+			m_fiber.y = m_sth[n] * m_sph[n];
+			m_fiber.z = m_cph[n];
+
+			m_weight = m_wn[n];
+
+			return true;
+		}
+		else return false;
+	}
+
+public:
+	int		n;
+	int		m_nint;
+	const double* m_cth;
+	const double* m_cph;
+	const double* m_sth;
+	const double* m_sph;
+	const double* m_wn;
+};
+
 //-----------------------------------------------------------------------------
 // FEFiberIntegrationGeodesic
 //-----------------------------------------------------------------------------
@@ -30,6 +78,17 @@ void FEFiberIntegrationGeodesic::Serialize(DumpStream& ar)
 	{
 		InitIntegrationRule();
 	}
+}
+
+//-----------------------------------------------------------------------------
+FEFiberIntegrationGeodesic::FEFiberIntegrationGeodesic(FEModel* pfem) : FEFiberIntegrationScheme(pfem)
+{ 
+	m_nres = 0; 
+}
+
+//-----------------------------------------------------------------------------
+FEFiberIntegrationGeodesic::~FEFiberIntegrationGeodesic()
+{
 }
 
 //-----------------------------------------------------------------------------
@@ -63,6 +122,13 @@ void FEFiberIntegrationGeodesic::InitIntegrationRule()
 	}
 }
 
+//-----------------------------------------------------------------------------
+FEFiberIntegrationSchemeIterator* FEFiberIntegrationGeodesic::GetIterator(FEMaterialPoint* mp)
+{
+	return new Iterator(m_nint, &m_cth[0], &m_cph[0], &m_sth[0], &m_sph[0], &m_w[0]);
+}
+
+/*
 //-----------------------------------------------------------------------------
 mat3ds FEFiberIntegrationGeodesic::Stress(FEMaterialPoint& mp)
 {
@@ -189,3 +255,4 @@ double FEFiberIntegrationGeodesic::IntegratedFiberDensity()
 	IFD = C;
     return IFD;
 }
+*/

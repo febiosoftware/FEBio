@@ -8,13 +8,6 @@
 
 #include "FEFiberIntegrationScheme.h"
 
-bool FEFiberIntegrationScheme::Init()
+FEFiberIntegrationScheme::FEFiberIntegrationScheme(FEModel* pfem) : FEMaterial(pfem)
 {
-    if (m_pFmat->Init() == false) return false;
-    if (m_pFDD->Init() == false) return false;
-    
-    // evaluate the integrated fiber density distribution
-    if (m_pFDD->m_IFD == 1) m_pFDD->m_IFD = IntegratedFiberDensity();
-
-	return true;
 }

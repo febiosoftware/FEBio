@@ -3,7 +3,7 @@
 //  FEBioXCode4
 //
 //
-
+/*
 #include "stdafx.h"
 #include "FEFiberIntegrationGaussKronrodUC.h"
 #include "gausskronrod.h"
@@ -534,3 +534,4 @@ double FEFiberIntegrationGaussKronrodUC::IntegratedFiberDensity()
     IFD = C*2;
     return IFD;
 }
+*/

@@ -7,19 +7,6 @@
 #define SQR(x) ((x)*(x))
 #endif
 
-void FEFiberDensityDistribution::Serialize(DumpStream& ar)
-{
-	FEMaterial::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_IFD;
-	}
-	else
-	{
-		ar >> m_IFD;
-	}
-}
-
 //-----------------------------------------------------------------------------
 // define the ellipsoidal fiber density distributionmaterial parameters
 BEGIN_PARAMETER_LIST(FEEllipsodialFiberDensityDistribution, FEFiberDensityDistribution)
@@ -29,7 +16,7 @@ END_PARAMETER_LIST();
 double FEEllipsodialFiberDensityDistribution::FiberDensity(const vec3d& n0)
 {
     double R = 1.0/sqrt(SQR(n0.x/m_spa[0])+SQR(n0.y/m_spa[1])+SQR(n0.z/m_spa[2]));
-    return R/m_IFD;
+    return R;
 }
 
 //-----------------------------------------------------------------------------
@@ -43,7 +30,7 @@ double FEVonMises3DFiberDensityDistribution::FiberDensity(const vec3d& n0)
     // The local x-direction is the principal fiber bundle direction
     // The x-component of n0 is cos(phi)
     double R = exp(m_b*(2*SQR(n0.x)-1));
-    return R/m_IFD;
+    return R;
 }
 
 //-----------------------------------------------------------------------------
@@ -62,7 +49,7 @@ double FEVonMises3DTwoFDDAxisymmetric::FiberDensity(const vec3d& n0)
     double cp = cphi*m_c - sphi*sing;
     double cm = cphi*m_c + sphi*sing;
     double R = exp(m_b*(2*SQR(cp)-1)) + exp(m_b*(2*SQR(cm)-1));
-    return R/m_IFD;
+    return R;
 }
 
 //-----------------------------------------------------------------------------
@@ -77,7 +64,7 @@ double FEEllipticalFiberDensityDistribution::FiberDensity(const vec3d& n0)
     // 2d fibers lie in the local x-y plane
     // n0.x = cos(theta) and n0.y = sin(theta)
     double R = 1.0/sqrt(SQR(n0.x/m_spa[0])+SQR(n0.y/m_spa[1]));
-    return R/m_IFD;
+    return R;
 }
 
 //-----------------------------------------------------------------------------
@@ -92,5 +79,5 @@ double FEVonMises2DFiberDensityDistribution::FiberDensity(const vec3d& n0)
     // the local x-direction is the principal fiber bundle direction
     // The x-component of n0 is cos(theta)
     double R = exp(m_b*(2*SQR(n0.x)-1));
-    return R/m_IFD;
+    return R;
 }

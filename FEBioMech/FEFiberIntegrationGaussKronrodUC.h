@@ -2,7 +2,7 @@
 //  FEFiberIntegrationGaussKronrodUC.h
 //
 //
-
+/*
 #pragma once
 #include "FEFiberIntegrationSchemeUC.h"
 
@@ -42,3 +42,4 @@ public:
     // declare the parameter list
     DECLARE_PARAMETER_LIST();
 };
+*/

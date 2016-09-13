@@ -23,26 +23,27 @@ public:
     // Initialization
     bool Init();
 
-	// serialization
-	void Serialize(DumpStream& ar);
-
 public:
 	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt) { return m_pFint->Stress(pt); }
+	mat3ds Stress(FEMaterialPoint& pt);
     
 	//! calculate tangent stiffness at material point
-	tens4ds Tangent(FEMaterialPoint& pt) { return m_pFint->Tangent(pt); }
+	tens4ds Tangent(FEMaterialPoint& pt);
     
 	//! calculate strain energy density at material point
-	double StrainEnergyDensity(FEMaterialPoint& pt) { return m_pFint->StrainEnergyDensity(pt); }
-    
+	double StrainEnergyDensity(FEMaterialPoint& pt);
+
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() {
-        return new FEFiberMaterialPoint(m_pFint->CreateMaterialPointData());
-    }
+	FEMaterialPoint* CreateMaterialPointData();
+
+protected:
+	// integrated Fiber density
+	void IntegrateFiberDensity();
     
-public:
+protected:
     FEPropertyT<FEElasticFiberMaterial>     m_pFmat;    // pointer to fiber material
 	FEPropertyT<FEFiberDensityDistribution> m_pFDD;     // pointer to fiber density distribution
 	FEPropertyT<FEFiberIntegrationScheme>   m_pFint;    // pointer to fiber integration scheme
+
+	double m_IFD;      // integrated fiber density
 };

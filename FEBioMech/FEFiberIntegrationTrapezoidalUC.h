@@ -5,7 +5,7 @@
 //  Created by Gerard Ateshian on 8/5/14.
 //  Copyright (c) 2014 febio.org. All rights reserved.
 //
-
+/*
 #ifndef __FEBioMech__FEFiberIntegrationTrapezoidalUC__
 #define __FEBioMech__FEFiberIntegrationTrapezoidalUC__
 

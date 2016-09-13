@@ -5,7 +5,7 @@
 //  Created by Gerard Ateshian on 8/5/14.
 //  Copyright (c) 2014 febio.org. All rights reserved.
 //
-
+/*
 #include "FEFiberIntegrationSchemeUC.h"
 
 bool FEFiberIntegrationSchemeUC::Init()
@@ -18,3 +18,4 @@ bool FEFiberIntegrationSchemeUC::Init()
 
 	return true;
 }
+*/

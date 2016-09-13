@@ -12,6 +12,64 @@
 #define SQR(x) ((x)*(x))
 #endif
 
+class FEFiberIntegrationTrapezoidal::Iterator : public FEFiberIntegrationSchemeIterator
+{
+public:
+	Iterator(FEMaterialPoint* mp, int nth)
+	{
+		m_nth = nth;
+
+		if (mp)
+		{
+			FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
+			// get the element's local coordinate system
+			mat3d Q = pt.m_Q;
+			a0 = Q.col(0); //(Q(0, 0), Q(1, 0), Q(2, 0)); // local x-direction unit vector
+			a1 = Q.col(1); //(Q(0, 1), Q(1, 1), Q(2, 1)); // local y-direction unit vector
+		}
+		else
+		{
+			a0 = vec3d(1,0,0);
+			a1 = vec3d(0,1,0);
+		}
+
+		double pi = 4 * atan(1.0);
+		dth = pi / m_nth;  // integrate from 0 to pi
+
+		i = -1;
+		Next();
+	}
+
+	bool IsValid()
+	{
+		return (i < m_nth);
+	}
+
+	// move to the next integration point
+	bool Next()
+	{
+		++i;
+		if (i < m_nth)
+		{
+			double theta = i*dth;
+			m_fiber = a0*cos(theta) + a1*sin(theta);
+
+			// Multiply by 2 since fibers along theta+pi have same stress as along theta
+			m_weight = dth*2.0;
+
+			return true;
+		}
+		else return false;
+	}
+
+public:
+	int	m_nth;
+	double dth;
+	vec3d a0, a1;
+
+	int i;
+};
+
 //-----------------------------------------------------------------------------
 // FEFiberIntegrationTrapezoidal
 //-----------------------------------------------------------------------------
@@ -23,6 +81,22 @@ BEGIN_PARAMETER_LIST(FEFiberIntegrationTrapezoidal, FEFiberIntegrationScheme)
 	ADD_PARAMETER2(m_nth, FE_PARAM_INT, FE_RANGE_GREATER(0), "nth");
 END_PARAMETER_LIST();
 
+FEFiberIntegrationTrapezoidal::FEFiberIntegrationTrapezoidal(FEModel* pfem) : FEFiberIntegrationScheme(pfem)
+{ 
+	m_nth = 12; 
+}
+
+FEFiberIntegrationTrapezoidal::~FEFiberIntegrationTrapezoidal()
+{
+}
+
+//-----------------------------------------------------------------------------
+FEFiberIntegrationSchemeIterator* FEFiberIntegrationTrapezoidal::GetIterator(FEMaterialPoint* mp)
+{
+	return new Iterator(mp, m_nth);
+}
+
+/*
 //-----------------------------------------------------------------------------
 mat3ds FEFiberIntegrationTrapezoidal::Stress(FEMaterialPoint& mp)
 {
@@ -179,3 +253,4 @@ double FEFiberIntegrationTrapezoidal::IntegratedFiberDensity()
 	IFD = C*2;
     return IFD;
 }
+*/

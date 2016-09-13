@@ -5,7 +5,7 @@
 //  Created by Gerard Ateshian on 8/5/14.
 //  Copyright (c) 2014 febio.org. All rights reserved.
 //
-
+/*
 #include "FEFiberIntegrationGeodesicUC.h"
 
 #ifndef SQR
@@ -191,3 +191,4 @@ double FEFiberIntegrationGeodesicUC::IntegratedFiberDensity()
 	IFD = C;
     return IFD;
 }
+*/

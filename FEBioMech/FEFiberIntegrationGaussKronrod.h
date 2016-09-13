@@ -12,34 +12,34 @@
 class FEFiberIntegrationGaussKronrod : public FEFiberIntegrationScheme
 {
 public:
-    FEFiberIntegrationGaussKronrod(FEModel* pfem) : FEFiberIntegrationScheme(pfem) { m_nph = 7; m_nth = 31; }
-    ~FEFiberIntegrationGaussKronrod() {}
+	class Iterator;
+
+	struct GKRULE
+	{
+		int	m_nph; // number of gauss integration points along phi
+		int	m_nth; // number of trapezoidal integration points along theta
+		const double*	m_gp; // gauss points
+		const double*	m_gw; // gauss weights
+	};
+
+public:
+    FEFiberIntegrationGaussKronrod(FEModel* pfem);
+    ~FEFiberIntegrationGaussKronrod();
 	
 	//! Initialization
 	bool Init();
     
-	//! Cauchy stress
-	mat3ds Stress(FEMaterialPoint& mp);
-    
-	// Spatial tangent
-	tens4ds Tangent(FEMaterialPoint& mp);
-    
-	//! Strain energy density
-	double StrainEnergyDensity(FEMaterialPoint& mp);
-    
-    // Fiber density
-    double IntegratedFiberDensity();
-
 	// Serialization
 	void Serialize(DumpStream& ar);
-    
-public: // parameters
-	int             m_nph;	// number of gauss integration points along phi
-    int             m_nth;  // number of trapezoidal integration points along theta
+
+	// get the iterator
+	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp);
 
 protected:
-    vector<double>  m_gp;   // gauss points
-    vector<double>  m_gw;   // gauss weights
+	bool InitRule();
+    
+protected: // parameters
+	GKRULE	m_rule;
     
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

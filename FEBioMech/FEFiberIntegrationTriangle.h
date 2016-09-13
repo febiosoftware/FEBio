@@ -12,27 +12,20 @@
 //
 class FEFiberIntegrationTriangle : public FEFiberIntegrationScheme
 {
+	class Iterator;
+
 public:
-    FEFiberIntegrationTriangle(FEModel* pfem) : FEFiberIntegrationScheme(pfem) { m_nres = 0; }
-    ~FEFiberIntegrationTriangle() {}
+    FEFiberIntegrationTriangle(FEModel* pfem);
+    ~FEFiberIntegrationTriangle();
 	
 	//! Initialization
 	bool Init();
     
-	//! Cauchy stress
-	mat3ds Stress(FEMaterialPoint& mp);
-    
-	// Spatial tangent
-	tens4ds Tangent(FEMaterialPoint& mp);
-    
-	//! Strain energy density
-	double StrainEnergyDensity(FEMaterialPoint& mp);
-    
-    // Fiber density
-    double IntegratedFiberDensity();
-
 	// serialization
 	void Serialize(DumpStream& ar);
+
+	// create iterator
+	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp);
 
 protected:
 	void InitIntegrationRule();

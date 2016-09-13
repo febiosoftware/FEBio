@@ -15,32 +15,25 @@
 //
 class FEFiberIntegrationGeodesic : public FEFiberIntegrationScheme
 {
+	class Iterator;
+
 public:
-    FEFiberIntegrationGeodesic(FEModel* pfem) : FEFiberIntegrationScheme(pfem) { m_nres = 0; }
-    ~FEFiberIntegrationGeodesic() {}
+    FEFiberIntegrationGeodesic(FEModel* pfem);
+    ~FEFiberIntegrationGeodesic();
 	
 	//! Initialization
 	bool Init();
     
-	//! Cauchy stress
-	mat3ds Stress(FEMaterialPoint& mp);
-    
-	// Spatial tangent
-	tens4ds Tangent(FEMaterialPoint& mp);
-    
-	//! Strain energy density
-	double StrainEnergyDensity(FEMaterialPoint& mp);
-    
-    // Fiber density
-    double IntegratedFiberDensity();
-
 	// serialization
 	void Serialize(DumpStream& ar);
+
+	// get iterator
+	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp);
 
 protected:
 	void InitIntegrationRule();  
 
-public: // parameters
+private: // parameters
 	int             m_nres;	// resolution
 
 protected:

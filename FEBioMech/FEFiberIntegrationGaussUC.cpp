@@ -5,7 +5,7 @@
 //  Created by Gerard Ateshian on 8/5/14.
 //  Copyright (c) 2014 febio.org. All rights reserved.
 //
-
+/*
 #include "FEFiberIntegrationGaussUC.h"
 #include "gauss.h"
 
@@ -564,3 +564,4 @@ double FEFiberIntegrationGaussUC::IntegratedFiberDensity()
 	IFD = C*2;
     return IFD;
 }
+*/

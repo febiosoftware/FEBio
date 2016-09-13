@@ -14,15 +14,10 @@
 class FEFiberDensityDistribution : public FEMaterial
 {
 public:
-    FEFiberDensityDistribution(FEModel* pfem) : FEMaterial(pfem) { m_IFD = 1; }
+    FEFiberDensityDistribution(FEModel* pfem) : FEMaterial(pfem) {}
     
     // Evaluation of fiber density along n0
     virtual double FiberDensity(const vec3d& n0) = 0;
-
-	void Serialize(DumpStream& ar);
-    
-public:
-    double m_IFD;      // integrated fiber density
 };
 
 //---------------------------------------------------------------------------
@@ -33,7 +28,7 @@ class FESphericalFiberDensityDistribution : public FEFiberDensityDistribution
 public:
     FESphericalFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) {}
     
-    double FiberDensity(const vec3d& n0) { return 1.0/m_IFD; }  
+    double FiberDensity(const vec3d& n0) { return 1.0; }  
 };
 
 //---------------------------------------------------------------------------
@@ -96,7 +91,7 @@ class FECircularFiberDensityDistribution : public FEFiberDensityDistribution
 public:
     FECircularFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) {}
     
-    double FiberDensity(const vec3d& n0) { return 1.0/m_IFD; }
+    double FiberDensity(const vec3d& n0) { return 1.0; }
 };
 
 //---------------------------------------------------------------------------

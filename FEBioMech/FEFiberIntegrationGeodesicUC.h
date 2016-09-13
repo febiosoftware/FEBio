@@ -5,7 +5,7 @@
 //  Created by Gerard Ateshian on 8/5/14.
 //  Copyright (c) 2014 febio.org. All rights reserved.
 //
-
+/*
 #ifndef __FEBioMech__FEFiberIntegrationGeodesicUC__
 #define __FEBioMech__FEFiberIntegrationGeodesicUC__
 
@@ -56,3 +56,4 @@ public:
 };
 
 #endif /* defined(__FEBioMech__FEFiberIntegrationGeodesicUC__) */
+

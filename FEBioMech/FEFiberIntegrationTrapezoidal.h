@@ -14,23 +14,16 @@
 //
 class FEFiberIntegrationTrapezoidal : public FEFiberIntegrationScheme
 {
+	class Iterator;
+
 public:
-    FEFiberIntegrationTrapezoidal(FEModel* pfem) : FEFiberIntegrationScheme(pfem) { m_nth = 12; }
-    ~FEFiberIntegrationTrapezoidal() {}
-	
-	//! Cauchy stress
-	mat3ds Stress(FEMaterialPoint& mp);
+    FEFiberIntegrationTrapezoidal(FEModel* pfem);
+    ~FEFiberIntegrationTrapezoidal();
+
+	// get iterator	
+	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp);
     
-	// Spatial tangent
-	tens4ds Tangent(FEMaterialPoint& mp);
-    
-	//! Strain energy density
-	double StrainEnergyDensity(FEMaterialPoint& mp);
-    
-    // Fiber density
-    double IntegratedFiberDensity();
-    
-public:
+private:
     int             m_nth;  // number of trapezoidal integration points along theta
 
 	// declare the parameter list
