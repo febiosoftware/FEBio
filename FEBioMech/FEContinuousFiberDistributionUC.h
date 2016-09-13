@@ -38,9 +38,7 @@ public:
 	double DevStrainEnergyDensity(FEMaterialPoint& pt);
     
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() {
-        return new FEFiberMaterialPoint(m_pFint->CreateMaterialPointData());
-    }
+	FEMaterialPoint* CreateMaterialPointData();
 
 protected:
 	// integrated Fiber density

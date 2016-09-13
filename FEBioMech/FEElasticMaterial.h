@@ -43,6 +43,7 @@ public:
 	mat3d	m_F;	//!< deformation gradient
 	double	m_J;	//!< determinant of F
 	mat3d	m_Q;	//!< local material orientation
+	bool	m_buncoupled;	//!< set to true if this material point was created by an uncoupled material
 
 	// solid material data
 	mat3ds		m_s;		//!< Cauchy stress

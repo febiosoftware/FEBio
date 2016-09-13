@@ -29,9 +29,7 @@ public:
 		{
 			FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
 			// right Cauchy-Green tensor and its eigenvalues & eigenvectors
-			// TODO: for uncoupled formulations we need to use the deviatoric version
-			// mat3ds C = pt.DevRightCauchyGreen();
-			mat3ds C = pt.RightCauchyGreen();
+			mat3ds C = (pt.m_buncoupled ? pt.DevRightCauchyGreen() : pt.RightCauchyGreen());
 			C.eigen(lC, vC);
 
 			// check if there is no tension

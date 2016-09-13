@@ -75,6 +75,9 @@ public:
 
 	//! calculate strain energy (do not overload!)
 	double StrainEnergyDensity(FEMaterialPoint& pt);
+
+	// Create material point data
+	FEMaterialPoint* CreateMaterialPointData();
     
 public:
 	double	m_K;		//!< bulk modulus

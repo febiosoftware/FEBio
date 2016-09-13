@@ -78,3 +78,12 @@ double FEUncoupledMaterial::StrainEnergyDensity(FEMaterialPoint &mp)
 	// calculate the stress as a sum of deviatoric stress and pressure
 	return U(pt.m_J) + DevStrainEnergyDensity(mp);
 }
+
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FEUncoupledMaterial::CreateMaterialPointData()
+{
+	FEMaterialPoint* mp = FEElasticMaterial::CreateMaterialPointData();
+	FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
+	pt.m_buncoupled = true;
+	return mp;
+}

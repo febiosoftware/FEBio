@@ -31,9 +31,8 @@ public:
 
 			// right Cauchy-Green tensor and its eigenvalues & eigenvectors
 			// TODO: for uncoupled formulations we need to use the deviatoric strain-energy
-//			mat3ds C = pt.DevRightCauchyGreen();
-//			mat3ds E = (C - mat3dd(1)) / 2;
-			mat3ds E = pt.Strain();
+			mat3ds C = (pt.m_buncoupled? pt.DevRightCauchyGreen() : pt.RightCauchyGreen());
+			mat3ds E = (C - mat3dd(1)) * 0.5;
 			E.eigen2(lE, vE);//lE[2]>lE[1]>lE[0]
 
 			// check if there is no tension

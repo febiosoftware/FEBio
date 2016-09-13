@@ -37,6 +37,13 @@ bool FEContinuousFiberDistributionUC::Init()
 }
 
 //-----------------------------------------------------------------------------
+// returns a pointer to a new material point object
+FEMaterialPoint* FEContinuousFiberDistributionUC::CreateMaterialPointData() 
+{
+	return new FEFiberMaterialPoint(m_pFmat->CreateMaterialPointData());
+}
+
+//-----------------------------------------------------------------------------
 //! calculate stress at material point
 mat3ds FEContinuousFiberDistributionUC::DevStress(FEMaterialPoint& mp)
 { 
