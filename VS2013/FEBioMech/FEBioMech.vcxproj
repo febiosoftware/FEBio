@@ -432,6 +432,7 @@
     <ClInclude Include="..\..\FEBioMech\FEDamageMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDeformableSpringDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEDiscreteContact.h" />
     <ClInclude Include="..\..\FEBioMech\FEDiscreteSpringDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEDistanceConstraint.h" />
@@ -629,6 +630,7 @@
     <ClCompile Include="..\..\FEBioMech\FEDamageMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDeformableSpringDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDiscreteContact.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDiscreteSpringDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDistanceConstraint.cpp" />

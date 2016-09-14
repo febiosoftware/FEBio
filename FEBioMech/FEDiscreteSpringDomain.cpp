@@ -2,15 +2,10 @@
 #include "FEDiscreteSpringDomain.h"
 #include <FECore/FEModel.h>
 
-BEGIN_PARAMETER_LIST(FEDiscreteSpringDomain, FEDiscreteDomain)
-	ADD_PARAMETER(m_keps, FE_PARAM_DOUBLE, "k_eps");
-END_PARAMETER_LIST();
-
 //-----------------------------------------------------------------------------
 FEDiscreteSpringDomain::FEDiscreteSpringDomain(FEModel* pfem) : FEDiscreteDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
-	m_keps = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -115,38 +110,6 @@ void FEDiscreteSpringDomain::InternalForces(FEGlobalVector& R)
 		// assemble element
 		R.Assemble(en, lm, fe);
 	}
-
-	if (m_keps > 0)
-	{
-		double eps = m_keps;
-		lm.resize(3);
-		en.resize(1);
-		fe.resize(3);
-		int NN = Nodes();
-		for (int i=1; i<NN-1; ++i)
-		{
-			int i0 = i - 1;
-			int i1 = i + 1;
-
-			vec3d xi = Node(i).m_rt;
-			vec3d x0 = Node(i0).m_rt;
-			vec3d x1 = Node(i1).m_rt;
-
-			vec3d r = xi - x0;
-			vec3d s = x1 - x0; s.unit();
-			vec3d d = r - s*(r*s);
-
-			fe[0] = -eps*d.x;
-			fe[1] = -eps*d.y;
-			fe[2] = -eps*d.z;
-
-			en[0] = m_Node[i];
-			lm[0] = Node(i).m_ID[m_dofX];
-			lm[1] = Node(i).m_ID[m_dofY];
-			lm[2] = Node(i).m_ID[m_dofZ];
-			R.Assemble(en, lm, fe);
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -228,57 +191,5 @@ void FEDiscreteSpringDomain::StiffnessMatrix(FESolver* psolver)
 
 		// assemble the element into the global system
 		psolver->AssembleStiffness(en, lm, ke);
-	}
-
-	// Add Bending stiffness
-	if (m_keps > 0)
-	{
-		double eps = m_keps;
-		vector<int> lmi(3);
-		vector<int>	lmj(9);
-		en.resize(3);
-		int NN = Nodes();
-		for (int i=1; i<NN-1; ++i)
-		{
-			int i0 = i - 1;
-			int i1 = i + 1;
-
-			vec3d xi = Node(i).m_rt;
-			vec3d x0 = Node(i0).m_rt;
-			vec3d x1 = Node(i1).m_rt;
-
-			vec3d r = xi - x0*0.5 - x1*0.5;
-			vec3d s = x1 - x0; 
-			double L = s.unit();
-			double c = (r*s)*(-eps/L);
-
-			mat3ds SxS = dyad(s);
-			mat3ds K = (mat3dd(1.0) - SxS)*(eps);
-
-			ke.resize(3, 9);
-			ke.zero();
-			ke[0][0] = eps; ke[0][3] = -0.5*eps; ke[0][6] = -0.5*eps;
-			ke[1][1] = eps; ke[1][4] = -0.5*eps; ke[1][7] = -0.5*eps;
-			ke[2][2] = eps; ke[2][5] = -0.5*eps; ke[2][8] = -0.5*eps;
-
-			vector<int>& IDi = Node(i ).m_ID;
-			vector<int>& ID0 = Node(i0).m_ID;
-			vector<int>& ID1 = Node(i1).m_ID;
-
-			lmi[0] = IDi[m_dofX];
-			lmi[1] = IDi[m_dofY];
-			lmi[2] = IDi[m_dofZ];
-
-			lmj[0] = IDi[m_dofX];
-			lmj[1] = IDi[m_dofY];
-			lmj[2] = IDi[m_dofZ];
-			lmj[3] = ID0[m_dofX];
-			lmj[4] = ID0[m_dofY];
-			lmj[5] = ID0[m_dofZ];
-			lmj[6] = ID1[m_dofX];
-			lmj[7] = ID1[m_dofY];
-			lmj[8] = ID1[m_dofZ];
-			psolver->AssembleStiffness2(lmi, lmj, ke);
-		}
 	}
 }

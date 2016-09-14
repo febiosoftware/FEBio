@@ -168,9 +168,24 @@ void FEBioDiscreteSection::ParseDiscreteSection25(XMLTag& tag)
 
 			// create a new spring "domain"
 			FE_Element_Spec spec;
-			spec.eclass = FE_ELEM_TRUSS;
+			spec.eclass = FE_ELEM_DISCRETE;
 			spec.eshape = ET_TRUSS2;
 			spec.etype  = FE_DISCRETE;
+
+			const char* sztype = tag.AttributeValue("type");
+			if (sztype)
+			{
+				if (strcmp(sztype, "wire") == 0)
+				{
+					spec.eclass = FE_ELEM_WIRE;					
+				}
+				else if (strcmp(sztype, "spring") == 0)
+				{
+					spec.eclass = FE_ELEM_DISCRETE;
+				}
+				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+			}
+
 			FEDiscreteDomain* pd = dynamic_cast<FEDiscreteDomain*>(febio.CreateDomain(spec, &mesh, dmat[mid - 1]));
 			mesh.AddDomain(pd);
 

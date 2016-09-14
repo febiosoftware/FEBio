@@ -166,6 +166,7 @@
 #include "FESRIElasticSolidDomain.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FEDiscreteSpringDomain.h"
+#include "FEDeformableSpringDomain.h"
 #include <FECore/RigidBC.h>
 #include "FEBCPrescribedDeformation.h"
 
@@ -345,7 +346,7 @@ REGISTER_FECORE_CLASS(FEElasticSolidDomain       , FEDOMAIN_ID, "elastic-solid" 
 REGISTER_FECORE_CLASS(FEElasticShellDomain       , FEDOMAIN_ID, "elastic-shell"     );
 REGISTER_FECORE_CLASS(FEElasticTrussDomain       , FEDOMAIN_ID, "elastic-truss"     );
 REGISTER_FECORE_CLASS(FEDiscreteSpringDomain     , FEDOMAIN_ID, "discrete-spring"   );
-
+REGISTER_FECORE_CLASS(FEDeformableSpringDomain   , FEDOMAIN_ID, "deformable-spring" );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEBoundaryCondition

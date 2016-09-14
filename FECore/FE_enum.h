@@ -18,7 +18,9 @@ enum FE_Element_Class {
 	FE_ELEM_TRUSS,
 	FE_ELEM_DISCRETE,
 	FE_ELEM_2D,
-	FE_ELEM_EDGE
+	FE_ELEM_EDGE,
+
+	FE_ELEM_WIRE = 100	// temporary. Can change.
 };
 
 //-----------------------------------------------------------------------------

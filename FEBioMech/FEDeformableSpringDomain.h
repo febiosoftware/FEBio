@@ -1,15 +1,15 @@
 #pragma once
-#include "FECore/FEDiscreteDomain.h"
+#include <FECore/FEDiscreteDomain.h>
 #include "FEElasticDomain.h"
 #include "FESpringMaterial.h"
 
 //-----------------------------------------------------------------------------
-//! domain for discrete elements
-class FEDiscreteSpringDomain : public FEDiscreteDomain, public FEElasticDomain
+//! domain for deformable springs
+class FEDeformableSpringDomain : public FEDiscreteDomain, public FEElasticDomain
 {
 public:
 	//! constructor
-	FEDiscreteSpringDomain(FEModel* pfem);
+	FEDeformableSpringDomain(FEModel* pfem);
 
 	//! Unpack LM data
 	void UnpackLM(FEElement& el, vector<int>& lm);
@@ -27,13 +27,13 @@ public: // overridden from FEElasticDomain
 	//! calculate stiffness matrix
 	void StiffnessMatrix(FESolver* psolver);
 	void MassMatrix(FESolver* psolver, double scale) {}
-	void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf) {}
+	void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) {}
 
 	//! Calculates inertial forces for dynamic problems | todo implement (removed assert DSR)
 	void InertialForces(FEGlobalVector& R, vector<double>& F) { }
 
 	//! update domain data
-	void Update(const FETimeInfo& tp){}	
+	void Update(const FETimeInfo& tp){}
 
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);
@@ -42,5 +42,13 @@ public: // overridden from FEElasticDomain
 	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) {}
 
 protected:
+	double InitialLength();
+	double CurrentLength();
+
+protected:
 	FESpringMaterial*	m_pMat;
+	double				m_keps;
+	double				m_L0;	//!< initial spring length
+
+	DECLARE_PARAMETER_LIST();
 };
