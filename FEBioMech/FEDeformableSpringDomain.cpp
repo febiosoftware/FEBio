@@ -123,6 +123,13 @@ void FEDeformableSpringDomain::InternalForces(FEGlobalVector& R)
 
 	vector<int> en(2), lm(6);
 
+	// calculate current length
+	double L = CurrentLength();
+	double DL = L - m_L0;
+
+	// calculate force
+	double F = m_pMat->force(DL);
+
 	for (size_t i = 0; i<m_Elem.size(); ++i)
 	{
 		// get the discrete element
@@ -144,9 +151,6 @@ void FEDeformableSpringDomain::InternalForces(FEGlobalVector& R)
 		double L0 = (r02 - r01).norm();
 		double Lt = (rt2 - rt1).norm();
 		double DL = Lt - L0;
-
-		// evaluate the spring force
-		double F = m_pMat->force(DL);
 
 		// set up the force vector
 		fe[0] = F*e.x;
@@ -207,9 +211,16 @@ void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
 {
 	FEMesh& mesh = *m_pMesh;
 
+	// calculate current length
+	double L = CurrentLength();
+	double DL = L - m_L0;
+
+	// evaluate the stiffness
+	double F = m_pMat->force(DL);
+	double E = m_pMat->stiffness(DL);
+
 	matrix ke(6, 6);
 	ke.zero();
-
 	vector<int> en(2), lm(6);
 
 	// loop over all discrete elements
@@ -228,7 +239,7 @@ void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
 		vec3d& rt1 = n1.m_rt;
 		vec3d& rt2 = n2.m_rt;
 
-		vec3d e = rt2 - rt1;
+		vec3d e = rt2 - rt1; e.unit();
 
 		// calculate nodal displacements
 		vec3d u1 = rt1 - r01;
@@ -239,9 +250,6 @@ void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
 		double Lt = (rt2 - rt1).norm();
 		double DL = Lt - L0;
 
-		// evaluate the stiffness
-		double F = m_pMat->force(DL);
-		double E = m_pMat->stiffness(DL);
 
 		if (Lt == 0) { F = 0; Lt = 1; e = vec3d(1, 1, 1); }
 
