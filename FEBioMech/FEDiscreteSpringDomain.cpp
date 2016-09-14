@@ -140,11 +140,7 @@ void FEDiscreteSpringDomain::StiffnessMatrix(FESolver* psolver)
 		vec3d& rt1 = n1.m_rt;
 		vec3d& rt2 = n2.m_rt;
 
-		vec3d e = rt2 - rt1; 
-
-		// calculate nodal displacements
-		vec3d u1 = rt1 - r01;
-		vec3d u2 = rt2 - r02;
+		vec3d e = rt2 - rt1; e.unit();
 
 		// calculate spring lengths
 		double L0 = (r02 - r01).norm();
