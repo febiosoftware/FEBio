@@ -253,9 +253,12 @@ int DOFS::GetDOF(const char* szvar, int n)
 	Var* pvar = GetVariable(szvar);
 	if (pvar)
 	{
-		assert((n>=0)&&(n<(int)pvar->m_dof.size()));
-		DOF_ITEM& it = pvar->m_dof[n];
-		return it.ndof;
+//		assert((n >= 0) && (n<(int)pvar->m_dof.size()));
+		if ((n >= 0) && (n<(int)pvar->m_dof.size()))
+		{
+			DOF_ITEM& it = pvar->m_dof[n];
+			return it.ndof;
+		}
 	}
 	return -1;
 }
