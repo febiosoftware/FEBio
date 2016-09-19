@@ -581,6 +581,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FEBCPrescribedDeformation.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEDeformableSpringDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDiscreteContact.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticMaterial2O.cpp">
       <FileType>Document</FileType>
@@ -704,6 +705,7 @@
     <ClCompile Include="..\..\FEBioMech\FEPeriodicBoundary.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPeriodicBoundary1O.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPeriodicBoundary2O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPeriodicLinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPointConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropic.cpp" />
@@ -811,6 +813,7 @@
     <ClInclude Include="..\..\FEBioMech\FEDamageMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioMech\FEDeformableSpringDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEDiscreteContact.h" />
     <ClInclude Include="..\..\FEBioMech\FEDiscreteSpringDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEDistanceConstraint.h" />
@@ -896,6 +899,7 @@
     <ClInclude Include="..\..\FEBioMech\FEPeriodicBoundary.h" />
     <ClInclude Include="..\..\FEBioMech\FEPeriodicBoundary1O.h" />
     <ClInclude Include="..\..\FEBioMech\FEPeriodicBoundary2O.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPeriodicLinearConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEPointConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropic.h" />

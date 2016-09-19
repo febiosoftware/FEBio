@@ -597,6 +597,12 @@
     <ClCompile Include="..\..\FEBioMech\FERigidSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEPeriodicLinearConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEDeformableSpringDomain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FE2DFiberNeoHookean.h">
@@ -1191,6 +1197,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FERigidSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEPeriodicLinearConstraint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEDeformableSpringDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
