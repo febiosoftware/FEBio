@@ -172,7 +172,7 @@ void FEBioDiscreteSection::ParseDiscreteSection25(XMLTag& tag)
 			spec.eshape = ET_TRUSS2;
 			spec.etype  = FE_DISCRETE;
 
-			const char* sztype = tag.AttributeValue("type");
+			const char* sztype = tag.AttributeValue("type", true);
 			if (sztype)
 			{
 				if (strcmp(sztype, "wire") == 0)
