@@ -17,6 +17,7 @@
 #include "FEElemElemList.h"
 #include "FEElementList.h"
 #include "FESurface.h"
+#include <algorithm>
 
 //=============================================================================
 // FENode
@@ -1143,6 +1144,104 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 				for (int k=0; k<nn; ++k)
 				{
 					se.m_node[k] = face[k];
+				}
+			}
+		}
+	}
+
+	// initialize the surface. 
+	// This will set the local surface element ID's and also set the m_nelem IDs.
+	ps->Init();
+
+	// all done
+	return ps;
+}
+FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool boutside, bool binside)
+{
+	if ((boutside == false) && (binside == false)) return nullptr;
+
+	// create the element neighbor list
+	FEElemElemList EEL;
+	EEL.Create(this);
+
+	// get the number of elements in this mesh
+	int NE = Elements();
+
+	// count the number of facets we have to create
+	int NF = 0;
+
+	for (auto i = 0; i < domains.size(); i++)
+	{
+		for (auto j = 0; j < domains[i]->Elements(); j++)
+		{
+			FEElement& el = domains[i]->ElementRef(j);
+			auto nf = Faces(el);
+			for (auto k = 0; k<nf; ++k)
+			{
+				FEElement* pen = EEL.Neighbor(el.GetID()-1, k);
+				if ((pen == nullptr) && boutside) ++NF;
+				else if (pen && (std::find(domains.begin(), domains.end(), pen->GetDomain()) == domains.end()) && boutside) ++NF;
+				if ((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetDomain()) != domains.end())) ++NF;
+			}
+		}
+	}
+
+	// create the surface
+	FESurface* ps = new FESurface(this);
+	if (NF == 0) return ps;
+	ps->Create(NF);
+
+	// build the surface elements
+	int face[FEElement::MAX_NODES];
+	NF = 0;
+	for (auto i = 0; i < domains.size(); i++)
+	{
+		for (auto j = 0; j < domains[i]->Elements(); j++)
+		{
+			FEElement& el = domains[i]->ElementRef(j);
+			int nf = Faces(el);
+			for (int k = 0; k < nf; ++k)
+			{
+				FEElement* pen = EEL.Neighbor(el.GetID()-1, k);
+				if (((pen == nullptr) && boutside) ||
+					(pen && (std::find(domains.begin(), domains.end(), pen->GetDomain()) == domains.end()) && boutside) ||
+					((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetDomain()) != domains.end())))
+				{
+					FESurfaceElement& se = ps->Element(NF++);
+					GetFace(el, k, face);
+
+					switch (el.Shape())
+					{
+					case ET_HEX8:
+						se.SetType(FE_QUAD4G4);
+						break;
+					case ET_HEX20:
+						se.SetType(FE_QUAD8G9);
+						break;
+					case ET_HEX27:
+						se.SetType(FE_QUAD9G9);
+						break;
+					case ET_TET4:
+						se.SetType(FE_TRI3G1);
+						break;
+					case ET_TET10:
+					case ET_TET15:
+						se.SetType(FE_TRI6G7);
+						break;
+					default:
+						assert(false);
+					}
+
+					// TODO: 
+					// element IDs are global numbers. This is hack that may not always work!!
+					se.m_elem[0] = el.GetID() - 1;
+					if (pen) se.m_elem[1] = pen->GetID() - 1;
+
+					int nn = se.Nodes();
+					for (int p = 0; p < nn; ++p)
+					{
+						se.m_node[p] = face[p];
+					}
 				}
 			}
 		}

@@ -444,6 +444,12 @@ public:
 	//! binside  : include all interior facets
 	FESurface* ElementBoundarySurface(bool boutside = true, bool binside = false);
 
+	//! Calculate the surface representing the element boundaries
+	//! domains  : a list of which domains to create the surface from 
+	//! boutside : include all exterior facets
+	//! binside  : include all interior facets
+	FESurface* ElementBoundarySurface(std::vector<FEDomain*> domains, bool boutside = true, bool binside = false);
+
 	//! get the nodal coordinates in reference configuration
 	void GetInitialNodalCoordinates(const FEElement& el, vec3d* node);
 

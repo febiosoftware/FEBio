@@ -15,8 +15,10 @@
 #include "FE_enum.h"
 #include "FEException.h"
 
+class FEMesh;
 //-----------------------------------------------------------------------------
 class FEElementTraits;
+class FEDomain;
 
 //-----------------------------------------------------------------------------
 //! The FEElementState class stores the element state data. The state is defined
@@ -78,6 +80,14 @@ public:
 
 	//! Set the element's material ID
 	void SetMatID(int id) { m_mat = id; }
+
+	//Get the domain that contains this element
+	FEDomain * GetDomain() const { return m_dom; }
+
+	//Set the domain that contains this element
+	void SetDomain(FEDomain * dom){ m_dom = dom; }
+
+
 
 public:
 	//! Set the type of the element
@@ -146,6 +156,7 @@ public:
 protected:
 	int		m_nID;		//!< element ID
 	int		m_mat;		//!< material index
+	FEDomain * m_dom;
 
 public:
 	vector<int>		m_node;		//!< connectivity
