@@ -112,6 +112,8 @@
 		D5A12B1A1875B02C008BF405 /* FEContactSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A12B181875B02C008BF405 /* FEContactSurface.cpp */; };
 		D5A12B1B1875B02C008BF405 /* FEContactSurface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A12B191875B02C008BF405 /* FEContactSurface.h */; };
 		D5A32E101C20F9F100162B01 /* FEElasticDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A32E0F1C20F9F100162B01 /* FEElasticDomain.cpp */; };
+		D5B042541D97270E00519C2B /* FEDeformableSpringDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B042521D97270E00519C2B /* FEDeformableSpringDomain.cpp */; };
+		D5B042551D97270E00519C2B /* FEDeformableSpringDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B042531D97270E00519C2B /* FEDeformableSpringDomain.h */; };
 		D5B572E1186CD45900D12E45 /* FERemodelingElasticDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B572DF186CD45900D12E45 /* FERemodelingElasticDomain.cpp */; };
 		D5B572E2186CD45900D12E45 /* FERemodelingElasticDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B572E0186CD45900D12E45 /* FERemodelingElasticDomain.h */; };
 		D5B57D0518A40AFC005C9598 /* FEStickyInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B57D0318A40AFC005C9598 /* FEStickyInterface.cpp */; };
@@ -498,6 +500,8 @@
 		D5A12B181875B02C008BF405 /* FEContactSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactSurface.cpp; sourceTree = "<group>"; };
 		D5A12B191875B02C008BF405 /* FEContactSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEContactSurface.h; sourceTree = "<group>"; };
 		D5A32E0F1C20F9F100162B01 /* FEElasticDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElasticDomain.cpp; sourceTree = "<group>"; };
+		D5B042521D97270E00519C2B /* FEDeformableSpringDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDeformableSpringDomain.cpp; sourceTree = "<group>"; };
+		D5B042531D97270E00519C2B /* FEDeformableSpringDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDeformableSpringDomain.h; sourceTree = "<group>"; };
 		D5B572DF186CD45900D12E45 /* FERemodelingElasticDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERemodelingElasticDomain.cpp; sourceTree = "<group>"; };
 		D5B572E0186CD45900D12E45 /* FERemodelingElasticDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERemodelingElasticDomain.h; sourceTree = "<group>"; };
 		D5B57D0318A40AFC005C9598 /* FEStickyInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEStickyInterface.cpp; sourceTree = "<group>"; };
@@ -877,6 +881,8 @@
 				D5E106B31865DFAC00B23922 /* FEDamageNeoHookean.h */,
 				D5E106B41865DFAC00B23922 /* FEDamageTransIsoMooneyRivlin.cpp */,
 				D5E106B51865DFAC00B23922 /* FEDamageTransIsoMooneyRivlin.h */,
+				D5B042521D97270E00519C2B /* FEDeformableSpringDomain.cpp */,
+				D5B042531D97270E00519C2B /* FEDeformableSpringDomain.h */,
 				D555F1031D60D94A0070B8AE /* FEDiscreteContact.cpp */,
 				D555F1041D60D94A0070B8AE /* FEDiscreteContact.h */,
 				D5E106B61865DFAC00B23922 /* FEDiscreteSpringDomain.cpp */,
@@ -1267,6 +1273,7 @@
 				D5E1077D1865DFAD00B23922 /* FEArrudaBoyce.h in Headers */,
 				D5E108321865DFAD00B23922 /* FESurfaceConstraint.h in Headers */,
 				D5E108201865DFAD00B23922 /* FESlidingInterfaceBW.h in Headers */,
+				D5B042551D97270E00519C2B /* FEDeformableSpringDomain.h in Headers */,
 				D5E107F21865DFAD00B23922 /* FEMooneyRivlin.h in Headers */,
 				D593574D1B11046A00AF4DF8 /* FERigidContractileForce.h in Headers */,
 				D5E107B61865DFAD00B23922 /* FEElasticShellDomain.h in Headers */,
@@ -1570,6 +1577,7 @@
 				D5FF08F61BE4528E0064FF98 /* FEMortarSlidingContact.cpp in Sources */,
 				D5E108251865DFAD00B23922 /* FESolidMaterial.cpp in Sources */,
 				D5E107AA1865DFAD00B23922 /* FEEFDVerondaWestmann.cpp in Sources */,
+				D5B042541D97270E00519C2B /* FEDeformableSpringDomain.cpp in Sources */,
 				D5E107781865DFAD00B23922 /* FE2DTransIsoVerondaWestmann.cpp in Sources */,
 				D5E107D91865DFAD00B23922 /* FEGasserOgdenHolzapfel.cpp in Sources */,
 				D5E107F71865DFAD00B23922 /* FENeoHookean.cpp in Sources */,
