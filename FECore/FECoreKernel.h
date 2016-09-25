@@ -130,6 +130,9 @@ template <typename TBase> inline TBase* fecore_new(SUPER_CLASS_ID sid, const cha
 	return static_cast<TBase*>(fecore.Create(sid, sztype, pfem));
 }
 
+//=============================================================================
+// TODO: Move all this stuff to sdk.h
+
 //-----------------------------------------------------------------------------
 // Template class for factory classes for plugins
 template <typename T, SUPER_CLASS_ID sid> class FEPluginFactory_T : public FECoreFactory

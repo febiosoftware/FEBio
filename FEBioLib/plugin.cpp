@@ -113,7 +113,10 @@ int FEBioPlugin::Load(const char* szfile)
 
 	// find the GetFactory function
 	PLUGIN_GETFACTORY_FNC pfnc_get = (PLUGIN_GETFACTORY_FNC) FindPluginFunc(ph, "PluginGetFactory");
-	if (pfnc_get == 0) return 3;
+
+	// NOTE: As of 2.6, the PluginGetFactory function is optional. This is because the 
+	// REGISTER_FECORE_CLASS can be used to register a new plugin class in PluginInitialize.
+//	if (pfnc_get == 0) return 3;
 	
 	// find the plugin's initialization function
 	PLUGIN_INIT_FNC pfnc_init = (PLUGIN_INIT_FNC) FindPluginFunc(ph, "PluginInitialize");
@@ -127,32 +130,37 @@ int FEBioPlugin::Load(const char* szfile)
 	if (pfnc_init) pfnc_init(febio);
 
 	// find out how many classes there are in this plugin
-	if (pfnc_cnt)
+	// This is only called when the PluginGetFactory function was found. 
+	// (As of 2.6, this is no longer a required function)
+	if (pfnc_get)
 	{
-		int NC = pfnc_cnt();
-		// call the get factory functions
-		for (int i=0; i<NC; ++i)
+		if (pfnc_cnt)
 		{
-			FECoreFactory* pfac = pfnc_get(i);
-			if (pfac) febio.RegisterClass(pfac);
-		}
-	}
-	else
-	{
-		// As of 2.5, the PluginNumClasses is no longer required. 
-		// In this case, the PluginGetFactory is called until null is returned.
-		FECoreFactory* pfac = 0;
-		int i = 0;
-		do
-		{
-			pfac = pfnc_get(i);
-			if (pfac)
+			int NC = pfnc_cnt();
+			// call the get factory functions
+			for (int i=0; i<NC; ++i)
 			{
-				febio.RegisterClass(pfac);
-				i++;
+				FECoreFactory* pfac = pfnc_get(i);
+				if (pfac) febio.RegisterClass(pfac);
 			}
 		}
-		while (pfac);
+		else
+		{
+			// As of 2.5, the PluginNumClasses is no longer required. 
+			// In this case, the PluginGetFactory is called until null is returned.
+			FECoreFactory* pfac = 0;
+			int i = 0;
+			do
+			{
+				pfac = pfnc_get(i);
+				if (pfac)
+				{
+					febio.RegisterClass(pfac);
+					i++;
+				}
+			}
+			while (pfac);
+		}
 	}
 
 	// If we get here everything seems okay so let's store the handle
