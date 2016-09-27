@@ -1170,13 +1170,13 @@ FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool b
 	// count the number of facets we have to create
 	int NF = 0;
 
-	for (auto i = 0; i < domains.size(); i++)
+	for (int i = 0; i < domains.size(); i++)
 	{
-		for (auto j = 0; j < domains[i]->Elements(); j++)
+		for (int j = 0; j < domains[i]->Elements(); j++)
 		{
 			FEElement& el = domains[i]->ElementRef(j);
-			auto nf = Faces(el);
-			for (auto k = 0; k<nf; ++k)
+			int nf = Faces(el);
+			for (int k = 0; k<nf; ++k)
 			{
 				FEElement* pen = EEL.Neighbor(el.GetID()-1, k);
 				if ((pen == nullptr) && boutside) ++NF;
@@ -1194,9 +1194,9 @@ FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool b
 	// build the surface elements
 	int face[FEElement::MAX_NODES];
 	NF = 0;
-	for (auto i = 0; i < domains.size(); i++)
+	for (int i = 0; i < domains.size(); i++)
 	{
-		for (auto j = 0; j < domains[i]->Elements(); j++)
+		for (int j = 0; j < domains[i]->Elements(); j++)
 		{
 			FEElement& el = domains[i]->ElementRef(j);
 			int nf = Faces(el);
