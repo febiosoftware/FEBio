@@ -272,7 +272,7 @@ void FEBioModel::Write(unsigned int nwhen)
 					// Therefor we can output those results here.
 					// TODO: Offcourse we should actually check if this is indeed
 					//       the case, otherwise we should also solve for t=0
-					if (m_plot) m_plot->Write(*this);
+					if (m_plot) m_plot->Write(*this, (float) m_ftime);
 				}
 			}
 			else
@@ -305,7 +305,7 @@ void FEBioModel::Write(unsigned int nwhen)
 				// output the state if requested
 				if (bout) 
 				{
-					if (m_plot) m_plot->Write(*this);
+					if (m_plot) m_plot->Write(*this, (float)m_ftime);
 				}
 			}
 		}

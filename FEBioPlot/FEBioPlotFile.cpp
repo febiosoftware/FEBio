@@ -939,7 +939,7 @@ void FEBioPlotFile::WriteNodeSetSection(FEMesh& m)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Write(FEModel &fem)
+bool FEBioPlotFile::Write(FEModel &fem, float ftime)
 {
 	// store the fem pointer
 	m_pfem = &fem;
@@ -951,8 +951,7 @@ bool FEBioPlotFile::Write(FEModel &fem)
 		// state header
 		m_ar.BeginChunk(PLT_STATE_HEADER);
 		{
-			float f = (float) fem.m_ftime;
-			m_ar.WriteChunk(PLT_STATE_HDR_TIME, f);
+			m_ar.WriteChunk(PLT_STATE_HDR_TIME, ftime);
 		}
 		m_ar.EndChunk();
 

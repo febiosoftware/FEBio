@@ -179,7 +179,7 @@ public:
 	bool Append(FEModel& fem, const char* szfile);
 
 	//! Write current FE state to plot database
-	bool Write(FEModel& fem);
+	bool Write(FEModel& fem, float ftime);
 
 	//! Add a variable to the dictionary
 	bool AddVariable(FEPlotData* ps, const char* szname);

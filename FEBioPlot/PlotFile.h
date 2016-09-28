@@ -37,7 +37,7 @@ public:
 	virtual bool Append(FEModel& fem, const char* szfile) = 0;
 
 	//! Write current FE state to plot database
-	virtual bool Write(FEModel& fem) = 0;
+	virtual bool Write(FEModel& fem, float ftime) = 0;
 
 	//! see if the plot file is valid
 	virtual bool IsValid() const = 0;
