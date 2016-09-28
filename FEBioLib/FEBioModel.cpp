@@ -171,19 +171,19 @@ bool FEBioModel::Input(const char* szfile)
 	// create file reader
 	FEBioImport fim;
 
-	fprintf(stdout, "Reading file %s ...", szfile);
+	felog.printf("Reading file %s ...", szfile);
 
 	// Load the file
 	if (fim.Load(*this, szfile) == false)
 	{
-		fprintf(stdout, "FAILED!\n");
+		felog.printf("FAILED!\n");
 		char szerr[256];
 		fim.GetErrorMessage(szerr);
-		fprintf(stderr, szerr);
+		felog.printf(szerr);
 
 		return false;
 	}
-	else fprintf(stdout, "SUCCESS!\n");
+	else felog.printf("SUCCESS!\n");
 
 	// set the input file name
 	SetInputFilename(szfile);
@@ -617,10 +617,10 @@ bool FEBioModel::InitLogFile()
 		}
 
 		// if we don't want to output anything we only output to the logfile
-		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) felog.SetMode(Logfile::FILE_ONLY);
+		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) felog.SetMode(Logfile::LOG_FILE);
 
 		// print welcome message to file
-		Logfile::MODE m = felog.SetMode(Logfile::FILE_ONLY);
+		Logfile::MODE m = felog.SetMode(Logfile::LOG_FILE);
 		Hello();
 		felog.SetMode(m);
 	}
@@ -682,16 +682,16 @@ bool FEBioModel::Solve()
 	// stop total time tracker
 	m_SolveTime.stop();
 
-	// get and print elapsed time
-	if (felog.GetMode() != Logfile::NEVER)
-	{
-		char sztime[64];
-		Logfile::MODE old_mode = felog.SetMode(Logfile::SCREEN_ONLY);
-		m_SolveTime.time_str(sztime);
-		felog.printf("\n Elapsed time : %s\n\n", sztime);
+	// print the elapsed time
+	char sztime[64];
+	m_SolveTime.time_str(sztime);
+	felog.printf("\n Elapsed time : %s\n\n", sztime);
 
+	// print additional stats to the log file only
+	if (felog.GetMode() & Logfile::LOG_FILE)
+	{
 		// print more detailed timing info to the log file
-		felog.SetMode(Logfile::FILE_ONLY);
+		Logfile::MODE old_mode = felog.SetMode(Logfile::LOG_FILE);
 
 		// sum up all the times spend in the linear solvers
 		double total_time = 0.0;

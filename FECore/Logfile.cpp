@@ -81,7 +81,7 @@ Logfile::Logfile()
 
 	m_ps = 0;
 
-	m_mode = FILE_AND_SCREEN;
+	m_mode = LOG_FILE_AND_SCREEN;
 }
 
 //-----------------------------------------------------------------------------
@@ -153,10 +153,10 @@ void Logfile::printf(const char* sz, ...)
 	va_end(args);
 	
 	// print to file
-	if (m_fp && (m_mode & FILE_ONLY)) m_fp->print(sztxt);
+	if (m_fp && (m_mode & LOG_FILE)) m_fp->print(sztxt);
 
 	// print to screen
-	if (m_ps && (m_mode & SCREEN_ONLY)) m_ps->print(sztxt);
+	if (m_ps && (m_mode & LOG_SCREEN)) m_ps->print(sztxt);
 }
 
 //-----------------------------------------------------------------------------

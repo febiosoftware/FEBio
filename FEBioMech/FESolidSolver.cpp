@@ -525,7 +525,7 @@ bool FESolidSolver::Quasin(double time)
 	{
 		Logfile::MODE oldmode = felog.GetMode();
 		if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);
+			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
 		felog.printf(" %d\n", m_niter+1);
 		felog.SetMode(oldmode);
@@ -593,7 +593,7 @@ bool FESolidSolver::Quasin(double time)
 		// print convergence summary
 		oldmode = felog.GetMode();
 		if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);
+			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
 		felog.printf(" Nonlinear solution status: time= %lg\n", time); 
 		felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
@@ -743,9 +743,9 @@ bool FESolidSolver::Quasin(double time)
 	if (bconv)
 	{
 		Logfile::MODE mode = felog.GetMode();
-		if (mode != Logfile::NEVER)
+		if (mode != Logfile::LOG_NEVER)
 		{
-			felog.SetMode(Logfile::FILE_ONLY);
+			felog.SetMode(Logfile::LOG_FILE);
 			felog.printf("\nconvergence summary\n");
 			felog.printf("    number of iterations   : %d\n", m_niter);
 			felog.printf("    number of reformations : %d\n", m_nref);

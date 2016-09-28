@@ -484,7 +484,7 @@ bool FECGSolidSolver::SolveStep(double time)
 	{
 		Logfile::MODE oldmode = felog.GetMode();
 		if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);
+			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
 		felog.printf(" %d\n", m_niter+1);
 		felog.SetMode(oldmode);
@@ -591,7 +591,7 @@ bool FECGSolidSolver::SolveStep(double time)
 		// print convergence summary
 		oldmode = felog.GetMode();
 		if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);
+			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
 		felog.printf(" Nonlinear solution status: time= %lg\n", time); 
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
@@ -683,8 +683,8 @@ bool FECGSolidSolver::SolveStep(double time)
 	// print a convergence summary to the felog file
 	if (bconv)
 	{
-		Logfile::MODE mode = felog.SetMode(Logfile::FILE_ONLY);
-		if (mode != Logfile::NEVER)
+		Logfile::MODE mode = felog.SetMode(Logfile::LOG_FILE);
+		if (mode != Logfile::LOG_NEVER)
 		{
 			felog.printf("\nconvergence summary\n");
 			felog.printf("    number of iterations   : %d\n", m_niter);

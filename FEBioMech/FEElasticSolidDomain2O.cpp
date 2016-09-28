@@ -345,7 +345,7 @@ void FEElasticSolidDomain2O::Update(const FETimeInfo& tp)
 
 	// update internal surfaces
 	Logfile::MODE nmode = felog.GetMode();
-	felog.SetMode(Logfile::NEVER);
+	felog.SetMode(Logfile::LOG_NEVER);
 
 	UpdateInternalSurfaceStresses();
 

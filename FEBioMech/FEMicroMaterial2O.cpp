@@ -83,7 +83,7 @@ bool FEMicroMaterial2O::Init()
 	// in order not to corrupt the logfile we don't print anything for
 	// the RVE problem.
 	Logfile::MODE nmode = felog.GetMode();
-	felog.SetMode(Logfile::NEVER);
+	felog.SetMode(Logfile::LOG_NEVER);
 
 	// scale geometry
 	m_mrve.ScaleGeometry(m_scale);

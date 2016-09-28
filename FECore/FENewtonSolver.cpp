@@ -442,7 +442,7 @@ bool FENewtonSolver::SolveStep(double time)
 		// the RVE problem didn't solve
 		// logging was turned off during multi-scale runs
 		// so we need to turn it back on
-		felog.SetMode(Logfile::SCREEN_ONLY);
+		felog.SetMode(Logfile::LOG_SCREEN);
 		felog.printbox("ERROR", "The RVE problem has failed at element %d, gauss point %d.\nAborting macro run.", e.elemId, e.gptIndex+1);
 
 		return false;

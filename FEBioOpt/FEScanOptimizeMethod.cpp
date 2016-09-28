@@ -127,7 +127,7 @@ bool FEScanOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<
 	// reset the FEM data
 	fem.Reset();
 
-	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 	felog.printf("\n----- Iteration: %d -----\n", opt.m_niter);
 	for (int i=0; i<nvar; ++i) 
 	{
@@ -136,11 +136,11 @@ bool FEScanOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<
 	}
 
 	// solve the FE problem
-	felog.SetMode(Logfile::NEVER);
+	felog.SetMode(Logfile::LOG_NEVER);
 
 	bool bret = m_pOpt->RunTask();
 
-	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 	if (bret)
 	{
 		FELoadCurve& rlc = opt.ReactionLoad();

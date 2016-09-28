@@ -71,7 +71,7 @@ private:
 class Logfile  
 {
 public:
-	enum MODE { NEVER = 0, FILE_ONLY = 1, SCREEN_ONLY, FILE_AND_SCREEN };
+	enum MODE { LOG_NEVER = 0, LOG_FILE = 1, LOG_SCREEN, LOG_FILE_AND_SCREEN };
 
 public:
 

@@ -49,7 +49,7 @@ FELMOptimizeMethod::FELMOptimizeMethod()
 	m_fdiff  = 0.001;
 	m_nmax   = 100;
 	m_bcov   = 0;
-    m_loglevel = Logfile::NEVER;
+	m_loglevel = Logfile::LOG_NEVER;
 }
 
 //-----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	// return value
 	double fret = 0.0;
 
-	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 
 	int niter = 1;
 
@@ -155,7 +155,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 		return false;
 	}
 
-	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 
 	// print reaction forces
 	felog.printf("\n\tFunction values:\n\n");
@@ -251,7 +251,7 @@ bool FELMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<do
 	// reset the FEM data
 	fem.Reset();
 
-	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 	felog.printf("\n----- Iteration: %d -----\n", opt.m_niter);
 	for (int i=0; i<nvar; ++i) 
 	{
@@ -264,7 +264,7 @@ bool FELMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<do
 
 	bool bret = m_pOpt->RunTask();
 
-	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 	if (bret)
 	{
 		FELoadCurve& rlc = opt.ReactionLoad();

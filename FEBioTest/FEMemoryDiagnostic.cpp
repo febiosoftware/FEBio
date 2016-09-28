@@ -44,7 +44,7 @@ bool FEMemoryDiagnostic::Run()
 	// in order not to corrupt the logfile we don't print anything for
 	// the RVE problem.
 	Logfile::MODE nmode = felog.GetMode();
-	felog.SetMode(Logfile::NEVER);
+	felog.SetMode(Logfile::LOG_NEVER);
 
 	// run the problem
 	FEModel& fem = GetFEModel();

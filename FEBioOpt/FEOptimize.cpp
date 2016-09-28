@@ -17,10 +17,10 @@ bool FEOptimize::Init(const char* szfile)
 	if (m_opt.Input(szfile) == false) return false;
 
 	// do initialization
-	felog.SetMode(Logfile::NEVER);
+	felog.SetMode(Logfile::LOG_NEVER);
 	if (m_opt.Init() == false) return false;
 
-	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 	felog.printbox("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E", "version 0.1");
 
 	return true;

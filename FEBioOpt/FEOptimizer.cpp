@@ -171,10 +171,10 @@ bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 					char szval[256];
 					tag.value(szval);
 					if		(strcmp(szval, "LOG_DEFAULT"        ) == 0) {} // don't change the plot level
-					else if (strcmp(szval, "LOG_NEVER"          ) == 0) popt->m_loglevel = Logfile::NEVER;
-					else if (strcmp(szval, "LOG_FILE_ONLY"      ) == 0) popt->m_loglevel = Logfile::FILE_ONLY;
-					else if (strcmp(szval, "LOG_SCREEN_ONLY"    ) == 0) popt->m_loglevel = Logfile::SCREEN_ONLY;
-					else if (strcmp(szval, "LOG_FILE_AND_SCREEN") == 0) popt->m_loglevel = Logfile::FILE_AND_SCREEN;
+					else if (strcmp(szval, "LOG_NEVER"          ) == 0) popt->m_loglevel = Logfile::LOG_NEVER;
+					else if (strcmp(szval, "LOG_FILE_ONLY"      ) == 0) popt->m_loglevel = Logfile::LOG_FILE;
+					else if (strcmp(szval, "LOG_SCREEN_ONLY"    ) == 0) popt->m_loglevel = Logfile::LOG_SCREEN;
+					else if (strcmp(szval, "LOG_FILE_AND_SCREEN") == 0) popt->m_loglevel = Logfile::LOG_FILE_AND_SCREEN;
 					else throw XMLReader::InvalidValue(tag);
 				}
 				else if (tag == "print_level")

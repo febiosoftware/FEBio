@@ -745,7 +745,7 @@ void FEElasticSolidDomain::Update(const FETimeInfo& tp)
 	//       the RVE problem.
 	// TODO: Maybe I need to create a new domain class for micro-material.
 	Logfile::MODE nmode = felog.GetMode();
-	felog.SetMode(Logfile::NEVER);
+	felog.SetMode(Logfile::LOG_NEVER);
 
 	bool berr = false;
 	int NE = (int) m_Elem.size();

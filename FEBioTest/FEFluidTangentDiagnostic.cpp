@@ -255,13 +255,13 @@ void FEFluidTangentDiagnostic::print_matrix(matrix& m)
 // of the element residual.
 bool FEFluidTangentDiagnostic::Run()
 {
-    Logfile::MODE oldmode = felog.SetMode(Logfile::FILE_ONLY);
+	Logfile::MODE oldmode = felog.SetMode(Logfile::LOG_FILE);
     
     // solve the problem
-    felog.SetMode(Logfile::NEVER);
+	felog.SetMode(Logfile::LOG_NEVER);
     FEModel& fem = GetFEModel();
     fem.Solve();
-    felog.SetMode(Logfile::FILE_ONLY);
+	felog.SetMode(Logfile::LOG_FILE);
     
     FEMesh& mesh = fem.GetMesh();
     FEFluidDomain3D& bd = static_cast<FEFluidDomain3D&>(mesh.Domain(0));

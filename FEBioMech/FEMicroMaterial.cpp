@@ -176,7 +176,7 @@ bool FEMicroMaterial::Init()
 	// in order not to corrupt the logfile we don't print anything for
 	// the RVE problem.
 	Logfile::MODE nmode = felog.GetMode();
-	felog.SetMode(Logfile::NEVER);
+	felog.SetMode(Logfile::LOG_NEVER);
 
 	// initialize the RVE model
 	// This also creates the necessary boundary conditions
@@ -203,7 +203,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	mmpt.m_rve.Update(F);
 
 	// solve the RVE
-	Logfile::MODE nmode = felog.GetMode(); felog.SetMode(Logfile::NEVER);
+	Logfile::MODE nmode = felog.GetMode(); felog.SetMode(Logfile::LOG_NEVER);
 	bool bret = mmpt.m_rve.Solve();
 	felog.SetMode(nmode);
 

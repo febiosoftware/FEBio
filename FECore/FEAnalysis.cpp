@@ -242,7 +242,7 @@ bool FEAnalysis::Solve()
 	{
 		printf("\nProgress:\n");
 		for (int i=0; i<50; ++i) printf("\xB0"); printf("\r");
-		felog.SetMode(Logfile::FILE_ONLY);
+		felog.SetMode(Logfile::LOG_FILE);
 	}
 
 	// if we restarted we need to update the timestep
@@ -417,7 +417,7 @@ bool FEAnalysis::Solve()
 
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)
 	{
-		felog.SetMode(Logfile::FILE_AND_SCREEN);
+		felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 	}
 
 	if (GetPrintLevel() != FE_PRINT_NEVER)

@@ -158,7 +158,7 @@ bool FEThermoElasticSolver::Quasin(double time)
 	{
 		oldmode = felog.GetMode();
 		if ((m_fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);
+			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
 		felog.printf(" %d\n", m_niter+1);
 		felog.SetMode(oldmode);
@@ -252,7 +252,7 @@ bool FEThermoElasticSolver::Quasin(double time)
 		// print convergence summary
 		oldmode = felog.GetMode();
 		if ((m_fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);
+			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
 		felog.printf(" Nonlinear solution status: time= %lg\n", time); 
 		felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
@@ -396,8 +396,8 @@ bool FEThermoElasticSolver::Quasin(double time)
 	// print a convergence summary to the felog file
 	if (bconv)
 	{
-		Logfile::MODE mode = felog.SetMode(Logfile::FILE_ONLY);
-		if (mode != Logfile::NEVER)
+		Logfile::MODE mode = felog.SetMode(Logfile::LOG_FILE);
+		if (mode != Logfile::LOG_NEVER)
 		{
 			felog.printf("\nconvergence summary\n");
 			felog.printf("    number of iterations   : %d\n", m_niter);

@@ -482,7 +482,7 @@ int Run(CMDOPTIONS& ops)
 	// if silent mode only output to file
 	if (ops.bsilent)
 	{
-		felog.SetMode(Logfile::FILE_ONLY);
+		felog.SetMode(Logfile::LOG_FILE);
 		Console::GetHandle()->Deactivate();
 	}
 

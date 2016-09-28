@@ -62,7 +62,7 @@ bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	double fret = 0;
 	powell(p, xi, nvar, 0.001, &niter, &fret, objfun);
 
-	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 
 	felog.printf("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
 
@@ -154,7 +154,7 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 	fem.Reset();
 
 	// suppress output
-	felog.SetMode(Logfile::NEVER);
+	felog.SetMode(Logfile::LOG_NEVER);
 
 	double fobj = 0;
 
@@ -165,7 +165,7 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 	}
 	else
 	{
-		felog.SetMode(Logfile::FILE_AND_SCREEN);
+		felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 
 		// evaluate reaction forces at correct times
 		OPT_OBJECTIVE& obj = opt.GetObjective();

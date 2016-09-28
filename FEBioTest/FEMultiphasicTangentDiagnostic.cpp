@@ -217,17 +217,17 @@ void FEMultiphasicTangentDiagnostic::print_matrix(matrix& m)
 // of the element residual.
 bool FEMultiphasicTangentDiagnostic::Run()
 {
-    Logfile::MODE oldmode = felog.SetMode(Logfile::FILE_ONLY);
+	Logfile::MODE oldmode = felog.SetMode(Logfile::LOG_FILE);
     
     // solve the problem
-    felog.SetMode(Logfile::NEVER);
+	felog.SetMode(Logfile::LOG_NEVER);
 	FEModel& fem = GetFEModel();
     if (fem.Solve() == false)
 	{
 		felog.SetMode(oldmode);
 		return false;
 	}
-    felog.SetMode(Logfile::FILE_ONLY);
+	felog.SetMode(Logfile::LOG_FILE);
     
     // get the material
     FEMaterial* pmat = fem.GetMaterial(0);

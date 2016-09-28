@@ -108,16 +108,16 @@ void print_parameter_list(FEParameterList& pl)
 void echo_input(FEBioModel& fem)
 {
 	// don't output when no output is requested
-	if (felog.GetMode() == Logfile::NEVER) return;
+	if (felog.GetMode() == Logfile::LOG_NEVER) return;
 
 	// echo input
 	int i, j;
 
 	// we only output this data to the felog file and not the screen
-	Logfile::MODE old_mode = felog.SetMode(Logfile::FILE_ONLY);
+	Logfile::MODE old_mode = felog.SetMode(Logfile::LOG_FILE);
 
 	// if for some reason the old_mode was set to NEVER, we should not output anything
-	if (old_mode == Logfile::NEVER)
+	if (old_mode == Logfile::LOG_NEVER)
 	{
 		felog.SetMode(old_mode);
 		return;

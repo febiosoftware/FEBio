@@ -242,13 +242,13 @@ bool FETangentDiagnostic::Init()
 // of the element residual.
 bool FETangentDiagnostic::Run()
 {
-	Logfile::MODE oldmode = felog.SetMode(Logfile::FILE_ONLY);
+	Logfile::MODE oldmode = felog.SetMode(Logfile::LOG_FILE);
 
 	// solve the problem
 	FEModel& fem = GetFEModel();
-	felog.SetMode(Logfile::NEVER);
+	felog.SetMode(Logfile::LOG_NEVER);
 	fem.Solve();
-	felog.SetMode(Logfile::FILE_ONLY);
+	felog.SetMode(Logfile::LOG_FILE);
 
 	FEMesh& mesh = fem.GetMesh();
 	FEElasticSolidDomain& bd = static_cast<FEElasticSolidDomain&>(mesh.Domain(0));

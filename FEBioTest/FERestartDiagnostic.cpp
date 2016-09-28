@@ -44,7 +44,7 @@ bool restart_test_cb(FEModel* pfem, unsigned int nwen, void* pd)
 	ptask->m_bok = true;
 
 	// suppress the error output
-	felog.SetMode(Logfile::NEVER);
+	felog.SetMode(Logfile::LOG_NEVER);
 
 	return false;
 }
@@ -113,7 +113,7 @@ bool FERestartDiagnostic::Run()
 			}
 
 			// reset output mode
-			felog.SetMode(Logfile::FILE_AND_SCREEN);
+			felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 		}
 		else return false;
 	}
