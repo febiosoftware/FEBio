@@ -55,7 +55,7 @@ FEConstrainedLMOptimizeMethod::FEConstrainedLMOptimizeMethod()
 	m_objtol = 0.001;
 	m_fdiff  = 0.001;
 	m_nmax   = 100;
-    m_loglevel = Logfile::NEVER;
+    m_loglevel = Logfile::LOG_NEVER;
 }
 
 //-----------------------------------------------------------------------------
@@ -108,7 +108,7 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	// return value
 	double fret = 0.0;
 
-	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 
 	int niter = 1;
 
@@ -173,7 +173,7 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 		return false;
 	}
 
-	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 
 	felog.printf("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
 
@@ -268,7 +268,7 @@ bool FEConstrainedLMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a
 	// reset the FEM data
 	fem.Reset();
 
-	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 	felog.printf("\n----- Iteration: %d -----\n", opt.m_niter);
 	for (int i=0; i<nvar; ++i) 
 	{
@@ -281,7 +281,7 @@ bool FEConstrainedLMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a
 
 	bool bret = m_pOpt->RunTask();
 
-	felog.SetMode(Logfile::FILE_AND_SCREEN);
+	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 	if (bret)
 	{
 		double chisq = 0.0;
