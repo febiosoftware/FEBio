@@ -16,8 +16,9 @@ BEGIN_PARAMETER_LIST(FECoupledTransIsoMooneyRivlin, FEElasticMaterial)
 	ADD_PARAMETER(m_c3  , FE_PARAM_DOUBLE, "c3");
 	ADD_PARAMETER(m_c4  , FE_PARAM_DOUBLE, "c4");
 	ADD_PARAMETER(m_c5  , FE_PARAM_DOUBLE, "c5");
-	ADD_PARAMETER2(m_flam, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda");
-	ADD_PARAMETER2(m_K   , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0)         , "k");
+	ADD_PARAMETER2(m_flam, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda"); // consider obsolete (use lam_max)
+	ADD_PARAMETER2(m_flam, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(1.0), "lam_max");
+	ADD_PARAMETER2(m_K, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "k");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
