@@ -56,10 +56,12 @@ void FEBioDiscreteSection::ParseSpringSection(XMLTag &tag)
 	// create a new spring "domain"
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 	FE_Element_Spec spec;
-	spec.eclass = FE_ELEM_TRUSS;
-	spec.eshape = ET_TRUSS2;
+	spec.eclass = FE_ELEM_DISCRETE;
+	spec.eshape = ET_DISCRETE;
 	spec.etype  = FE_DISCRETE;
 	FEDiscreteDomain* pd = dynamic_cast<FEDiscreteDomain*>(febio.CreateDomain(spec, &mesh, pm));
+	assert(pd);
+	if (pd == 0) throw FEBioImport::InvalidDomainType();
 	mesh.AddDomain(pd);
 
 	// read spring discrete elements
