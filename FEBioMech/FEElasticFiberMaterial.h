@@ -1,11 +1,4 @@
-//
-//  FEElasticFiberMaterial.h
-//
-//  Created by Gerard Ateshian on 11/16/13.
-//
-
 #pragma once
-
 #include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -14,9 +7,19 @@
 class FEElasticFiberMaterial : public FEElasticMaterial
 {
 public:
-    FEElasticFiberMaterial(FEModel* pfem) : FEElasticMaterial(pfem) {}
-    
-    void SetFiberDirection(FEMaterialPoint& mp, const vec3d n0);
+    FEElasticFiberMaterial(FEModel* pfem);
+
+	FEMaterialPoint* CreateMaterialPointData();
+
+	vec3d GetFiberVector(FEMaterialPoint& mp);
+
+protected:
+	// NOTE: Some fiber materials define a theta, phi parameter to define the fiber vector.
+	//       Although this is deprecated, for backward compatibility this was feature was moved here
+	double	m_thd;
+	double	m_phd;
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
@@ -25,8 +28,7 @@ public:
 class FEFiberExponentialPower : public FEElasticFiberMaterial
 {
 public:
-	FEFiberExponentialPower(FEModel* pfem) : FEElasticFiberMaterial(pfem) {
-        m_alpha = 0; m_beta = 2; m_ksi = 0; m_mu = 0; }
+	FEFiberExponentialPower(FEModel* pfem);
 	
 	//! Initialization
 	bool Validate();
@@ -56,7 +58,7 @@ public:
 class FEFiberNH : public FEElasticFiberMaterial
 {
 public:
-	FEFiberNH(FEModel* pfem) : FEElasticFiberMaterial(pfem) { m_mu = 0; }
+	FEFiberNH(FEModel* pfem);
 	
 	//! Cauchy stress
 	mat3ds Stress(FEMaterialPoint& mp);
@@ -80,8 +82,7 @@ public:
 class FEFiberPowerLinear : public FEElasticFiberMaterial
 {
 public:
-    FEFiberPowerLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem) {
-        m_E = 0; m_lam0 = 1; m_beta = 3; }
+    FEFiberPowerLinear(FEModel* pfem);
     
     //! Initialization
     bool Validate();

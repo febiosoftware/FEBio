@@ -42,6 +42,8 @@ const double gw[nint] = {
     (18+sqrt(30.))/36.,
     (18-sqrt(30.))/36.
 };*/
+
+/*
 const int nint = 5;
 const double gp[nint] = {
     -1./3.*sqrt(5+2*sqrt(10./7.)),
@@ -436,3 +438,4 @@ tens4ds FEEFD::Tangent(FEMaterialPoint& mp)
 	// we multiply by two to add contribution from other half-sphere
 	return c*(2.0*4.0/J);
 }
+*/

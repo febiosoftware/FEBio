@@ -17,9 +17,12 @@
 class FEElasticFiberMaterialUC : public FEUncoupledMaterial
 {
 public:
-    FEElasticFiberMaterialUC(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
-    
-    void SetFiberDirection(FEMaterialPoint& mp, const vec3d n0);
+    FEElasticFiberMaterialUC(FEModel* pfem);
+
+	// returns a pointer to a new material point object
+	FEMaterialPoint* CreateMaterialPointData();
+
+	vec3d GetFiberVector(FEMaterialPoint& mp);
 };
 
 //-----------------------------------------------------------------------------
@@ -28,8 +31,7 @@ public:
 class FEFiberExponentialPowerUC : public FEElasticFiberMaterialUC
 {
 public:
-	FEFiberExponentialPowerUC(FEModel* pfem) : FEElasticFiberMaterialUC(pfem) {
-        m_alpha = 0; m_beta = 2; m_ksi = 0; m_mu = 0; }
+	FEFiberExponentialPowerUC(FEModel* pfem);
 	
 	//! Validation
 	bool Validate();

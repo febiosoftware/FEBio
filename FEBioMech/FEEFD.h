@@ -1,14 +1,5 @@
-//
-//  FEEFD.h
-//  FEBioXCode4
-//
-//  Created by Gerard Ateshian on 5/18/13.
-//  Copyright (c) 2013 Columbia University. All rights reserved.
-//
-
-#ifndef __FEBioXCode4__FEEFD__
-#define __FEBioXCode4__FEEFD__
-
+#pragma once
+/*
 #include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -34,5 +25,4 @@ public:
 	double	m_ksi[3];	// coefficient in power-law relation
 };
 
-
-#endif /* defined(__FEBioXCode4__FEEFD__) */
+*/

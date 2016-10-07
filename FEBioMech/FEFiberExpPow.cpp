@@ -2,32 +2,18 @@
 #include "FEFiberExpPow.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberExpPow, FEElasticMaterial)
+BEGIN_PARAMETER_LIST(FEFiberExpPow, FEElasticFiberMaterial)
 	ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 	ADD_PARAMETER2(m_beta , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
 	ADD_PARAMETER2(m_ksi  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" );
-	ADD_PARAMETER(m_thd, FE_PARAM_DOUBLE, "theta");
-	ADD_PARAMETER(m_phd, FE_PARAM_DOUBLE, "phi");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 // FEFiberExpPow
 //-----------------------------------------------------------------------------
 
-bool FEFiberExpPow::Init()
-{
-	if (FEElasticMaterial::Init() == false) return false;
-
-	// convert angles from degrees to radians
-	double pi = 4*atan(1.0);
-	double the = m_thd*pi/180.;
-	double phi = m_phd*pi/180.;
-	// fiber direction in local coordinate system (reference configuration)
-	m_n0.x = cos(the)*sin(phi);
-	m_n0.y = sin(the)*sin(phi);
-	m_n0.z = cos(phi);
-
-	return true;
+FEFiberExpPow::FEFiberExpPow(FEModel* pfem) : FEElasticFiberMaterial(pfem)
+{ 
 }
 
 //-----------------------------------------------------------------------------
@@ -40,29 +26,27 @@ mat3ds FEFiberExpPow::Stress(FEMaterialPoint& mp)
 	double J = pt.m_J;
 	
 	// loop over all integration points
-	vec3d n0, nt;
-	double In_1, Wl;
-	const double eps = 0;
 	mat3ds C = pt.RightCauchyGreen();
 	mat3ds s;
 	
 	// evaluate fiber direction in global coordinate system
-	n0 = pt.m_Q*m_n0;
+	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
-	In_1 = n0*(C*n0) - 1.0;
+	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
+	const double eps = 0;
 	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
-		nt = F*n0;
+		vec3d nt = F*n0;
 		
 		// calculate the outer product of nt
 		mat3ds N = dyad(nt);
 		
 		// calculate strain energy derivative
-		Wl = m_ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
+		double Wl = m_ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
 		
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);
@@ -85,23 +69,21 @@ tens4ds FEFiberExpPow::Tangent(FEMaterialPoint& mp)
 	double J = pt.m_J;
 	
 	// loop over all integration points
-	vec3d n0, nt;
-	double In_1, Wll;
-	const double eps = 0;
 	mat3ds C = pt.RightCauchyGreen();
 	tens4ds c;
 	
 	// evaluate fiber direction in global coordinate system
-	n0 = pt.m_Q*m_n0;
+	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
-	In_1 = n0*(C*n0) - 1.0;
+	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
+	const double eps = 0;
 	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
-		nt = F*n0;
+		vec3d nt = F*n0;
 		
 		// calculate the outer product of nt
 		mat3ds N = dyad(nt);
@@ -109,7 +91,7 @@ tens4ds FEFiberExpPow::Tangent(FEMaterialPoint& mp)
 		
 		// calculate strain energy 2nd derivative
 		double tmp = m_alpha*pow(In_1, m_beta);
-		Wll = m_ksi*pow(In_1, m_beta-2.0)*((tmp+1)*m_beta-1.0)*exp(tmp);
+		double Wll = m_ksi*pow(In_1, m_beta-2.0)*((tmp+1)*m_beta-1.0)*exp(tmp);
 		
 		// calculate the fiber tangent
 		c = NxN*(4.0*Wll/J);
@@ -130,16 +112,14 @@ double FEFiberExpPow::StrainEnergyDensity(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// loop over all integration points
-	vec3d n0;
-	double In_1;
 	const double eps = 0;
 	mat3ds C = pt.RightCauchyGreen();
 	
 	// evaluate fiber direction in global coordinate system
-	n0 = pt.m_Q*m_n0;
+	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
-	In_1 = n0*(C*n0) - 1.0;
+	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
 	if (In_1 >= eps)

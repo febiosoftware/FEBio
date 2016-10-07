@@ -12,7 +12,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFiberExpLinear::FEFiberExpLinear(FEModel* pfem) : FEElasticMaterial(pfem)
+FEFiberExpLinear::FEFiberExpLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem)
 {
 	m_c3 = 0;
 	m_c4 = 0;
@@ -28,10 +28,7 @@ mat3ds FEFiberExpLinear::Stress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// get the material fiber axis
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = GetFiberVector(mp);
 
 	// get the spatial fiber vector and stretch
 	vec3d a = pt.m_F*a0;
@@ -71,10 +68,7 @@ tens4ds FEFiberExpLinear::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// get the material fiber axis
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = GetFiberVector(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;

@@ -1,10 +1,10 @@
 #pragma once
-#include "FEElasticMaterial.h"
+#include "FEElasticFiberMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! This class represents a fiber material with an exponential toe-region
 //! and a linear region.
-class FEFiberExpLinear : public FEElasticMaterial
+class FEFiberExpLinear : public FEElasticFiberMaterial
 {
 public:
 	//! constructor

@@ -1,11 +1,3 @@
-//
-//  FEContinuousFiberDistributionUC.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 8/5/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
 #include "FEContinuousFiberDistributionUC.h"
 
 //-----------------------------------------------------------------------------
@@ -40,7 +32,7 @@ bool FEContinuousFiberDistributionUC::Init()
 // returns a pointer to a new material point object
 FEMaterialPoint* FEContinuousFiberDistributionUC::CreateMaterialPointData() 
 {
-	return new FEFiberMaterialPoint(m_pFmat->CreateMaterialPointData());
+	return m_pFmat->CreateMaterialPointData();
 }
 
 //-----------------------------------------------------------------------------
@@ -48,6 +40,7 @@ FEMaterialPoint* FEContinuousFiberDistributionUC::CreateMaterialPointData()
 mat3ds FEContinuousFiberDistributionUC::DevStress(FEMaterialPoint& mp)
 { 
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEFiberMaterialPoint& fp = *mp.ExtractData<FEFiberMaterialPoint>();
 
 	// calculate stress
 	mat3ds s; s.zero();
@@ -63,7 +56,7 @@ mat3ds FEContinuousFiberDistributionUC::DevStress(FEMaterialPoint& mp)
 		{
 			// set the fiber direction
 			vec3d& n0 = it->m_fiber;
-			m_pFmat->SetFiberDirection(pt, n0);
+			fp.m_n0 = n0;
 
 			// rotate to local configuration to evaluate ellipsoidally distributed material coefficients
 			vec3d n0a = QT*n0;
@@ -87,6 +80,7 @@ mat3ds FEContinuousFiberDistributionUC::DevStress(FEMaterialPoint& mp)
 tens4ds FEContinuousFiberDistributionUC::DevTangent(FEMaterialPoint& mp)
 { 
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEFiberMaterialPoint& fp = *mp.ExtractData<FEFiberMaterialPoint>();
 
 	// get the element's local coordinate system
 	mat3d QT = (pt.m_Q).transpose();
@@ -102,8 +96,7 @@ tens4ds FEContinuousFiberDistributionUC::DevTangent(FEMaterialPoint& mp)
 		{
 			// set fiber direction in global coordinate system
 			vec3d& n0e = it->m_fiber;
-
-			m_pFmat->SetFiberDirection(mp, n0e);
+			fp.m_n0 = n0e;
 
 			// rotate to local configuration to evaluate ellipsoidally distributed material coefficients
 			vec3d n0a = QT*n0e;
@@ -127,6 +120,7 @@ tens4ds FEContinuousFiberDistributionUC::DevTangent(FEMaterialPoint& mp)
 double FEContinuousFiberDistributionUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
 { 
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEFiberMaterialPoint& fp = *mp.ExtractData<FEFiberMaterialPoint>();
 
 	// get the element's local coordinate system
 	mat3d QT = (pt.m_Q).transpose();
@@ -139,7 +133,7 @@ double FEContinuousFiberDistributionUC::DevStrainEnergyDensity(FEMaterialPoint& 
 		{
 			// set fiber direction in global coordinate system
 			vec3d& n0e = it->m_fiber;
-			m_pFmat->SetFiberDirection(mp, n0e);
+			fp.m_n0 = n0e;
 
 			// rotate to local configuration to evaluate ellipsoidally distributed material coefficients
 			vec3d n0a = QT*n0e;

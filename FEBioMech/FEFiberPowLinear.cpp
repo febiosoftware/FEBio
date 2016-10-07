@@ -1,40 +1,19 @@
-//
-//  FEFiberPowLinear.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 5/2/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
 #include "FEFiberPowLinear.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberPowLinear, FEElasticMaterial)
+BEGIN_PARAMETER_LIST(FEFiberPowLinear, FEElasticFiberMaterial)
     ADD_PARAMETER2(m_E    , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E"    );
     ADD_PARAMETER2(m_lam0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER(1.0), "lam0" );
     ADD_PARAMETER2(m_beta , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
-    ADD_PARAMETER(m_thd  , FE_PARAM_DOUBLE, "theta");
-    ADD_PARAMETER(m_phd  , FE_PARAM_DOUBLE, "phi"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 // FEFiberPowLinear
 //-----------------------------------------------------------------------------
 
-bool FEFiberPowLinear::Init()
+FEFiberPowLinear::FEFiberPowLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem)
 {
-	if (FEElasticMaterial::Init() == false) return false;
 
-    // convert angles from degrees to radians
-    double pi = 4*atan(1.0);
-    double the = m_thd*pi/180.;
-    double phi = m_phd*pi/180.;
-    // fiber direction in local coordinate system (reference configuration)
-    m_n0.x = cos(the)*sin(phi);
-    m_n0.y = sin(the)*sin(phi);
-    m_n0.z = cos(phi);
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -52,29 +31,27 @@ mat3ds FEFiberPowLinear::Stress(FEMaterialPoint& mp)
     double J = pt.m_J;
     
     // loop over all integration points
-    vec3d n0, nt;
-    double In, sn;
     const double eps = 0;
     mat3ds C = pt.RightCauchyGreen();
     mat3ds s;
     
     // evaluate fiber direction in global coordinate system
-    n0 = pt.m_Q*m_n0;
+    vec3d n0 = GetFiberVector(mp);
     
     // Calculate In
-    In = n0*(C*n0);
+    double In = n0*(C*n0);
     
     // only take fibers in tension into consideration
     if (In - 1 > eps)
     {
         // get the global spatial fiber direction in current configuration
-        nt = F*n0/sqrt(In);
+        vec3d nt = F*n0/sqrt(In);
         
         // calculate the outer product of nt
         mat3ds N = dyad(nt);
         
         // calculate the fiber stress magnitude
-        sn = (In < I0) ?
+        double sn = (In < I0) ?
         2*In*ksi*pow(In-1, m_beta-1) :
         2*b*In - m_E*sqrt(In);
         
@@ -103,30 +80,28 @@ tens4ds FEFiberPowLinear::Tangent(FEMaterialPoint& mp)
     double J = pt.m_J;
     
     // loop over all integration points
-    vec3d n0, nt;
-    double In, cn;
     const double eps = 0;
     mat3ds C = pt.RightCauchyGreen();
     tens4ds c;
     
     // evaluate fiber direction in global coordinate system
-    n0 = pt.m_Q*m_n0;
+    vec3d n0 = GetFiberVector(mp);
     
     // Calculate In
-    In = n0*(C*n0);
+    double In = n0*(C*n0);
     
     // only take fibers in tension into consideration
     if (In - 1 > eps)
     {
         // get the global spatial fiber direction in current configuration
-        nt = F*n0/sqrt(In);
+        vec3d nt = F*n0/sqrt(In);
         
         // calculate the outer product of nt
         mat3ds N = dyad(nt);
         tens4ds NxN = dyad1s(N);
         
         // calculate modulus
-        cn = (In < I0) ?
+        double cn = (In < I0) ?
         4*In*In*ksi*(m_beta-1)*pow(In-1, m_beta-2) :
         m_E*sqrt(In);
         
@@ -154,16 +129,14 @@ double FEFiberPowLinear::StrainEnergyDensity(FEMaterialPoint& mp)
     double b = ksi*pow(I0-1, m_beta-1) + m_E/2/sqrt(I0);
     
     // loop over all integration points
-    vec3d n0;
-    double In;
     const double eps = 0;
     mat3ds C = pt.RightCauchyGreen();
     
     // evaluate fiber direction in global coordinate system
-    n0 = pt.m_Q*m_n0;
+    vec3d n0 = GetFiberVector(mp);
     
     // Calculate In = n0*C*n0
-    In = n0*(C*n0);
+    double In = n0*(C*n0);
     
     // only take fibers in tension into consideration
     if (In - 1 > eps)

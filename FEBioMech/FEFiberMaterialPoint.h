@@ -1,14 +1,4 @@
-//
-//  FEFiberMaterialPoint.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 8/5/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FEFiberMaterialPoint__
-#define __FEBioMech__FEFiberMaterialPoint__
-
+#pragma once
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -17,7 +7,7 @@ class FEFiberMaterialPoint : public FEMaterialPoint
 {
 public:
 	//! constructor
-	FEFiberMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+	FEFiberMaterialPoint(FEMaterialPoint *pt = 0) : FEMaterialPoint(pt) {}
     
 	//! copy material point data
 	FEMaterialPoint* Copy();
@@ -31,6 +21,3 @@ public:
 public:
     vec3d   m_n0;    //!< fiber direction, reference configuration, global CS
 };
-
-
-#endif /* defined(__FEBioMech__FEFiberMaterialPoint__) */
