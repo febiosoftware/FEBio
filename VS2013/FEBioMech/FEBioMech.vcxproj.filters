@@ -606,6 +606,9 @@
     <ClInclude Include="..\..\FEBioMech\FEDeformableSpringDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEFiberEFDNeoHookean.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1179,6 +1182,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEDeformableSpringDomain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEFiberEFDNeoHookean.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

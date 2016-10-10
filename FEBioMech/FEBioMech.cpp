@@ -26,6 +26,7 @@
 #include "FEFiberNeoHookean.h"
 #include "FEFiberPowLinear.h"
 #include "FEFiberPowLinearUncoupled.h"
+#include "FEFiberEFDNeoHookean.h"
 #include "FEFungOrthoCompressible.h"
 #include "FEFungOrthotropic.h"
 #include "FEGasserOgdenHolzapfel.h"

@@ -461,6 +461,7 @@
     <ClInclude Include="..\..\FEBioMech\FEFacet2FacetSliding.h" />
     <ClInclude Include="..\..\FEBioMech\FEFacet2FacetTied.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberDensityDistribution.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberEFDNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberExpLinear.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberExpPow.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberExpPowUncoupled.h" />
@@ -659,6 +660,7 @@
     <ClCompile Include="..\..\FEBioMech\FEFacet2FacetSliding.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFacet2FacetTied.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberDensityDistribution.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberEFDNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberExpLinear.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberExpPow.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberExpPowUncoupled.cpp" />
