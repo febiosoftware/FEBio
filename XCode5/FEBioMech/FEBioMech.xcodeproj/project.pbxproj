@@ -49,6 +49,8 @@
 		D51BB41A19919CAC00638A8B /* FEFiberIntegrationTriangleUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D51BB41819919CAC00638A8B /* FEFiberIntegrationTriangleUC.h */; };
 		D51BB41D19919E1100638A8B /* FEFiberIntegrationTrapezoidalUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D51BB41B19919E1100638A8B /* FEFiberIntegrationTrapezoidalUC.cpp */; };
 		D51BB41E19919E1100638A8B /* FEFiberIntegrationTrapezoidalUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D51BB41C19919E1100638A8B /* FEFiberIntegrationTrapezoidalUC.h */; };
+		D529776D1DAC74B500BD65C4 /* FEFiberEFDNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D529776B1DAC74B500BD65C4 /* FEFiberEFDNeoHookean.cpp */; };
+		D529776E1DAC74B500BD65C4 /* FEFiberEFDNeoHookean.h in Headers */ = {isa = PBXBuildFile; fileRef = D529776C1DAC74B500BD65C4 /* FEFiberEFDNeoHookean.h */; };
 		D52D154A1A00D9A1005A6CB9 /* FERigidRevoluteJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D15481A00D9A1005A6CB9 /* FERigidRevoluteJoint.cpp */; };
 		D52D154B1A00D9A1005A6CB9 /* FERigidRevoluteJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D52D15491A00D9A1005A6CB9 /* FERigidRevoluteJoint.h */; };
 		D53981761D8244A400F07DD6 /* FEPeriodicLinearConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53981741D8244A400F07DD6 /* FEPeriodicLinearConstraint.cpp */; };
@@ -437,6 +439,8 @@
 		D51BB41819919CAC00638A8B /* FEFiberIntegrationTriangleUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFiberIntegrationTriangleUC.h; sourceTree = "<group>"; };
 		D51BB41B19919E1100638A8B /* FEFiberIntegrationTrapezoidalUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFiberIntegrationTrapezoidalUC.cpp; sourceTree = "<group>"; };
 		D51BB41C19919E1100638A8B /* FEFiberIntegrationTrapezoidalUC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFiberIntegrationTrapezoidalUC.h; sourceTree = "<group>"; };
+		D529776B1DAC74B500BD65C4 /* FEFiberEFDNeoHookean.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFiberEFDNeoHookean.cpp; sourceTree = "<group>"; };
+		D529776C1DAC74B500BD65C4 /* FEFiberEFDNeoHookean.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFiberEFDNeoHookean.h; sourceTree = "<group>"; };
 		D52D15481A00D9A1005A6CB9 /* FERigidRevoluteJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidRevoluteJoint.cpp; sourceTree = "<group>"; };
 		D52D15491A00D9A1005A6CB9 /* FERigidRevoluteJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidRevoluteJoint.h; sourceTree = "<group>"; };
 		D53981741D8244A400F07DD6 /* FEPeriodicLinearConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPeriodicLinearConstraint.cpp; sourceTree = "<group>"; };
@@ -937,6 +941,8 @@
 				D5E106DC1865DFAC00B23922 /* FEFacet2FacetTied.h */,
 				D5E106DD1865DFAC00B23922 /* FEFiberDensityDistribution.cpp */,
 				D5E106DE1865DFAC00B23922 /* FEFiberDensityDistribution.h */,
+				D529776B1DAC74B500BD65C4 /* FEFiberEFDNeoHookean.cpp */,
+				D529776C1DAC74B500BD65C4 /* FEFiberEFDNeoHookean.h */,
 				D5C69F8E1A41EA9000EB52B2 /* FEFiberExpLinear.cpp */,
 				D5C69F8F1A41EA9000EB52B2 /* FEFiberExpLinear.h */,
 				D5E106DF1865DFAC00B23922 /* FEFiberExpPow.cpp */,
@@ -1239,6 +1245,7 @@
 				D5FC57F91CDABB4000C493A2 /* FERVEModel2O.h in Headers */,
 				D5E1081E1865DFAD00B23922 /* FESlidingInterface.h in Headers */,
 				D5E107B21865DFAD00B23922 /* FEElasticMixture.h in Headers */,
+				D529776E1DAC74B500BD65C4 /* FEFiberEFDNeoHookean.h in Headers */,
 				D5E107E61865DFAD00B23922 /* FELinearElastic.h in Headers */,
 				D58EEA121AC463950020B7CB /* FECubicCLE.h in Headers */,
 				D5E107E81865DFAD00B23922 /* FELinearOrthotropic.h in Headers */,
@@ -1461,6 +1468,7 @@
 			files = (
 				D5F407CB197D7DDE0059F0B1 /* FESolidSolver2.cpp in Sources */,
 				D5B572E1186CD45900D12E45 /* FERemodelingElasticDomain.cpp in Sources */,
+				D529776D1DAC74B500BD65C4 /* FEFiberEFDNeoHookean.cpp in Sources */,
 				D5E107F31865DFAD00B23922 /* FEMRVonMisesFibers.cpp in Sources */,
 				D5E107EB1865DFAD00B23922 /* FELinearSolidSolver.cpp in Sources */,
 				D51BB3F3198FCA6A00638A8B /* FEFiberIntegrationTriangle.cpp in Sources */,
