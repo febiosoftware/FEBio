@@ -2,7 +2,7 @@
 #include "FEFiberEFDNeoHookean.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberNeoHookean, FEElasticMaterial)
+BEGIN_PARAMETER_LIST(FEFiberEFDNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
 	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
 	ADD_PARAMETERV(m_a, FE_PARAM_DOUBLE, 3, "a");
@@ -18,14 +18,14 @@ END_PARAMETER_LIST();
 //////////////////////////////////////////////////////////////////////
 
 
-FEFiberNeoHookean::FEFiberNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem)
+FEFiberEFDNeoHookean::FEFiberEFDNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem)
 {
     m_nres = 0;
 	m_a[0] = m_a[1] = m_a[2] = 0;
 	m_ac = 0;
 }
 
-bool FEFiberNeoHookean::Init()
+bool FEFiberEFDNeoHookean::Init()
 {
 	if (FEElasticMaterial::Init() == false) return false;
 
@@ -54,7 +54,7 @@ bool FEFiberNeoHookean::Init()
 	return true;
 }
 
-mat3ds FEFiberNeoHookean::Stress(FEMaterialPoint& mp)
+mat3ds FEFiberEFDNeoHookean::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -140,7 +140,7 @@ mat3ds FEFiberNeoHookean::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-tens4ds FEFiberNeoHookean::Tangent(FEMaterialPoint& mp)
+tens4ds FEFiberEFDNeoHookean::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -166,7 +166,7 @@ tens4ds FEFiberNeoHookean::Tangent(FEMaterialPoint& mp)
 	return tens4ds(D);
 }
 
-double FEFiberNeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
+double FEFiberEFDNeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     

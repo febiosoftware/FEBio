@@ -211,7 +211,7 @@ REGISTER_FECORE_CLASS(FEEllipsoidalFiberDistribution ,FEMATERIAL_ID, "ellipsoida
 REGISTER_FECORE_CLASS(FEEllipsoidalFiberDistributionOld,FEMATERIAL_ID, "ellipsoidal fiber distribution (old)");
 REGISTER_FECORE_CLASS(FEFiberExpPow                  ,FEMATERIAL_ID, "fiber-exp-pow"                 );
 REGISTER_FECORE_CLASS(FEFiberExpPowUncoupled         ,FEMATERIAL_ID, "fiber-exp-pow-uncoupled"       );
-REGISTER_FECORE_CLASS(FEFiberNeoHookean              ,FEMATERIAL_ID, "fiber neo-Hookean"             );
+REGISTER_FECORE_CLASS(FEFiberEFDNeoHookean           ,FEMATERIAL_ID, "fiber neo-Hookean"             );
 REGISTER_FECORE_CLASS(FEFiberPowLinear               ,FEMATERIAL_ID, "fiber-pow-linear"              );
 REGISTER_FECORE_CLASS(FEFiberPowLinearUncoupled      ,FEMATERIAL_ID, "fiber-pow-linear-uncoupled"    );
 REGISTER_FECORE_CLASS(FEFungOrthoCompressible        ,FEMATERIAL_ID, "Fung-ortho-compressible"       );

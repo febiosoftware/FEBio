@@ -5,10 +5,10 @@
 // for the integration over a unit sphere in spherical coordinates
 #include "geodesic.h"
 
-class FEFiberNeoHookean : public FEElasticMaterial
+class FEFiberEFDNeoHookean : public FEElasticMaterial
 {
 public:
-	FEFiberNeoHookean(FEModel* pfem);
+	FEFiberEFDNeoHookean(FEModel* pfem);
 
 public:
 	//! calculate stress at material point
