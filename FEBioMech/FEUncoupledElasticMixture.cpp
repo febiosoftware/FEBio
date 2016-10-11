@@ -46,10 +46,18 @@ void FEUncoupledElasticMixture::SetLocalCoordinateSystem(FEElement& el, int n, F
 //-----------------------------------------------------------------------------
 bool FEUncoupledElasticMixture::Init()
 {
-	m_K = 0.0;
-	for (int i=0; i < (int)m_pMat.size(); ++i) {
-        m_pMat[i]->Init();
-		m_K += m_pMat[i]->m_K;	// Sum up all the values of the bulk moduli
+	// NOTE: The calculation of K used to be the sum of all solid K's.
+	//       But that doesn't follow the formulation and should be deprecated.
+	//       Ideally, this function should be removed, but for backward compatiblity
+	//       the old algorithm is retained (for now), only if the parent's K = 0. 
+	//       Of course, if the user defined K for both the mixture and its components
+	//       the behavior will be different. 
+	if (m_K == 0.0)
+	{
+		for (int i=0; i < (int)m_pMat.size(); ++i) {
+			m_pMat[i]->Init();
+			m_K += m_pMat[i]->m_K;	// Sum up all the values of the bulk moduli
+		}
 	}
 
 	return FEUncoupledMaterial::Init();

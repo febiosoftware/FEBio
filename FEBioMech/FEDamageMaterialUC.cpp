@@ -22,6 +22,13 @@ FEDamageMaterialUC::FEDamageMaterialUC(FEModel* pfem) : FEUncoupledMaterial(pfem
 }
 
 //-----------------------------------------------------------------------------
+// returns a pointer to a new material point object
+FEMaterialPoint* FEDamageMaterialUC::CreateMaterialPointData()
+{
+	return new FEDamageMaterialPoint(m_pBase->CreateMaterialPointData());
+}
+
+//-----------------------------------------------------------------------------
 //! Initialization.
 bool FEDamageMaterialUC::Init()
 {

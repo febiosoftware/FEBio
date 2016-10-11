@@ -219,9 +219,6 @@
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTriangleUC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEFiberMaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEFiberMaterialPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -609,6 +606,9 @@
     <ClInclude Include="..\..\FEBioMech\FEFiberEFDNeoHookean.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEActiveFiberContraction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -807,9 +807,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTriangleUC.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEFiberMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEFiberMaterialPoint.cpp">
@@ -1185,6 +1182,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEFiberEFDNeoHookean.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEActiveFiberContraction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -20,9 +20,15 @@ END_PARAMETER_LIST();
 //////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-FETransIsoVerondaWestmann::FETransIsoVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem)
+FETransIsoVerondaWestmann::FETransIsoVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem)
 {
 	AddProperty(&m_ac, "active_contraction", false);
+}
+
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FETransIsoVerondaWestmann::CreateMaterialPointData()
+{
+	return m_fib.CreateMaterialPointData();
 }
 
 //-----------------------------------------------------------------------------
@@ -57,7 +63,7 @@ mat3ds FETransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 	mat3ds s = T.dev()*(2.0/J);
 
 	// add the passive fiber stress
-	s += m_fib.Stress(mp);
+	s += m_fib.DevStress(mp);
 
 	// add the active fiber stress
 	if ((FEActiveFiberContraction*)m_ac) s += m_ac->FiberStress(mp);
@@ -116,7 +122,7 @@ tens4ds FETransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
-	return c + m_fib.Tangent(mp);
+	return c + m_fib.DevTangent(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -139,7 +145,7 @@ double FETransIsoVerondaWestmann::DevStrainEnergyDensity(FEMaterialPoint& mp)
     double sed = m_c1*(exp(m_c2*(I1-3))-1) - m_c1*m_c2*(I2-3)/2;
     
 	// add the fiber strain energy density
-	sed += m_fib.StrainEnergyDensity(mp);
+	sed += m_fib.DevStrainEnergyDensity(mp);
     
 	return sed;
 }

@@ -1,14 +1,4 @@
-//
-//  FEElasticFiberMaterialUC.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 8/5/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FEElasticFiberMaterialUC__
-#define __FEBioMech__FEElasticFiberMaterialUC__
-
+#pragma once
 #include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -23,6 +13,14 @@ public:
 	FEMaterialPoint* CreateMaterialPointData();
 
 	vec3d GetFiberVector(FEMaterialPoint& mp);
+
+protected:
+	// NOTE: Some fiber materials define a theta, phi parameter to define the fiber vector.
+	//       Although this is deprecated, for backward compatibility this was feature was moved here
+	double	m_thd;
+	double	m_phd;
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
@@ -78,5 +76,3 @@ public:
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };
-
-#endif /* defined(__FEBioMech__FEElasticFiberMaterialUC__) */

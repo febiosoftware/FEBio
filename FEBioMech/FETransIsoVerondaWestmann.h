@@ -10,7 +10,8 @@
 #endif // _MSC_VER > 1000
 
 #include "FEUncoupledMaterial.h"
-#include "FEFiberMaterial.h"
+#include "FEUncoupledFiberExpLinear.h"
+#include "FEActiveFiberContraction.h"
 
 //-----------------------------------------------------------------------------
 //! Transversely Isotropic Veronda-Westmann material
@@ -36,13 +37,16 @@ public:
 
 	//! calculate deviatoric strain energy density at material point
 	virtual double DevStrainEnergyDensity(FEMaterialPoint& pt);
+
+	//! Create material point data
+	FEMaterialPoint* CreateMaterialPointData();
     
+protected:
+	FEUncoupledFiberExpLinear	m_fib;
+	FEPropertyT<FEActiveFiberContraction>	m_ac;
+
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
-
-protected:
-	FEFiberMaterial	m_fib;
-	FEPropertyT<FEActiveFiberContraction>	m_ac;
 };
 
 #endif // !defined(AFX_FETRANSISOVERONDAWESTMANN_H__0FDCFE28_F8ED_4E54_A70E_A8877038CE15__INCLUDED_)

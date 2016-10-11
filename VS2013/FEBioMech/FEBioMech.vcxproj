@@ -403,6 +403,7 @@
     <ClInclude Include="..\..\FEBioMech\FE2DTransIsoVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioMech\FE2OMicroConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FE3FieldElasticSolidDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEActiveFiberContraction.h" />
     <ClInclude Include="..\..\FEBioMech\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBioMech\FEAugLagLinearConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEBCPrescribedDeformation.h" />
@@ -477,7 +478,6 @@
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTrapezoidalUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTriangle.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTriangleUC.h" />
-    <ClInclude Include="..\..\FEBioMech\FEFiberMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberMaterialPoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberPowLinear.h" />
@@ -602,6 +602,7 @@
     <ClCompile Include="..\..\FEBioMech\FE2DTransIsoVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioMech\FE2OMicroConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FE3FieldElasticSolidDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEActiveFiberContraction.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEAugLagLinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBCPrescribedDeformation.cpp" />
@@ -676,7 +677,6 @@
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTrapezoidalUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTriangle.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTriangleUC.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FEFiberMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberMaterialPoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberPowLinear.cpp" />

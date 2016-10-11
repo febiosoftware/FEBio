@@ -1,15 +1,42 @@
 #include "FEElasticFiberMaterialUC.h"
 #include "FEFiberMaterialPoint.h"
 
+BEGIN_PARAMETER_LIST(FEElasticFiberMaterialUC, FEUncoupledMaterial)
+	ADD_PARAMETER(m_thd, FE_PARAM_DOUBLE, "theta");
+	ADD_PARAMETER(m_phd, FE_PARAM_DOUBLE, "phi");
+END_PARAMETER_LIST();
+
 //-----------------------------------------------------------------------------
 FEElasticFiberMaterialUC::FEElasticFiberMaterialUC(FEModel* pfem) : FEUncoupledMaterial(pfem) 
 {
+	m_thd = 0.0;
+	m_phd = 90.0;
 }
 
 //-----------------------------------------------------------------------------
 FEMaterialPoint* FEElasticFiberMaterialUC::CreateMaterialPointData()
 {
-	return new FEFiberMaterialPoint(FEUncoupledMaterial::CreateMaterialPointData());
+	FEFiberMaterialPoint* fp = new FEFiberMaterialPoint(FEUncoupledMaterial::CreateMaterialPointData());
+
+	// Some fiber materials defined the theta,phi parameters for setting the fiber vector
+	// Although this is deprecated, we still support it here for backward compatibility
+	if ((m_thd != 0.0) || (m_phd != 90.0))
+	{
+		// convert angles from degrees to radians
+		double pi = 4 * atan(1.0);
+		double the = m_thd*pi / 180.;
+		double phi = m_phd*pi / 180.;
+
+		// fiber direction in local coordinate system (reference configuration)
+		vec3d n0;
+		n0.x = cos(the)*sin(phi);
+		n0.y = sin(the)*sin(phi);
+		n0.z = cos(phi);
+		n0.unit();
+		fp->m_n0 = n0;
+	}
+
+	return fp;
 }
 
 //-----------------------------------------------------------------------------
@@ -22,7 +49,7 @@ vec3d FEElasticFiberMaterialUC::GetFiberVector(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-// FEFiberExponentialPower
+// FEFiberExponentialPowerUC
 //-----------------------------------------------------------------------------
 
 // define the material parameters
@@ -152,8 +179,7 @@ tens4ds FEFiberExponentialPowerUC::DevTangent(FEMaterialPoint& mp)
     mat3dd I(1);
 	tens4ds IxI = dyad1s(I);
 	tens4ds I4  = dyad4s(I);
-	c += ((I4+IxI/3.0)*s.tr() - dyad1s(I,s))*(2./3.)
-	- (ddots(IxI, c)-IxI*(c.tr()/3.))/3.;
+	c += ((I4+IxI/3.0)*s.tr() - dyad1s(I,s))*(2./3.) - (ddots(IxI, c)-IxI*(c.tr()/3.))/3.;
     
 	return c;
 }
@@ -162,13 +188,10 @@ tens4ds FEFiberExponentialPowerUC::DevTangent(FEMaterialPoint& mp)
 //! Strain energy density
 double FEFiberExponentialPowerUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
-    double sed = 0.0;
-    
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     FEFiberMaterialPoint& pf = *mp.ExtractData<FEFiberMaterialPoint>();
 	
 	// loop over all integration points
-	const double eps = 0;
 	mat3ds C = pt.DevRightCauchyGreen();
     mat3ds C2 = C*C;
 	
@@ -179,6 +202,8 @@ double FEFiberExponentialPowerUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
+	const double eps = 0;
+	double sed = 0.0;
 	if (In_1 > eps)
 	{
 		// calculate strain energy density

@@ -10,7 +10,8 @@
 #endif // _MSC_VER > 1000
 
 #include "FEUncoupledMaterial.h"
-#include "FEFiberMaterial.h"
+#include "FEUncoupledFiberExpLinear.h"
+#include "FEActiveFiberContraction.h"
 
 //-----------------------------------------------------------------------------
 //! Transversely Isotropic Mooney-Rivlin material
@@ -29,20 +30,23 @@ public:
 
 public:
 	//! calculate deviatoric stress at material point
-	virtual mat3ds DevStress(FEMaterialPoint& pt);
+	mat3ds DevStress(FEMaterialPoint& pt);
 
 	//! calculate deviatoric tangent stiffness at material point
-	virtual tens4ds DevTangent(FEMaterialPoint& pt);
+	tens4ds DevTangent(FEMaterialPoint& pt);
 
 	//! calculate deviatoric strain energy density at material point
-	virtual double DevStrainEnergyDensity(FEMaterialPoint& pt);
+	double DevStrainEnergyDensity(FEMaterialPoint& pt);
+
+	//! Create material point data
+	FEMaterialPoint* CreateMaterialPointData();
     
+protected:
+	FEUncoupledFiberExpLinear				m_fib;
+	FEPropertyT<FEActiveFiberContraction>	m_ac;
+
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
-
-protected:
-	FEFiberMaterial	m_fib;
-	FEPropertyT<FEActiveFiberContraction>	m_ac;
 };
 
 #endif // !defined(AFX_FETRANSISOMOONEYRIVLIN_H__E918D89B_4CCD_44B9_9731_19CEC4EDF406__INCLUDED_)

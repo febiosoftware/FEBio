@@ -1,8 +1,12 @@
 #include "stdafx.h"
 #include "FEUncoupledFiberExpLinear.h"
+#include <stdlib.h>
+#ifdef HAVE_GSL
+#include "gsl/gsl_sf_expint.h"
+#endif
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEUncoupledFiberExpLinear, FEUncoupledMaterial);
+BEGIN_PARAMETER_LIST(FEUncoupledFiberExpLinear, FEElasticFiberMaterialUC);
 	ADD_PARAMETER2(m_c3  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "c3");
 	ADD_PARAMETER2(m_c4  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "c4");
 	ADD_PARAMETER2(m_c5  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "c5");
@@ -10,7 +14,7 @@ BEGIN_PARAMETER_LIST(FEUncoupledFiberExpLinear, FEUncoupledMaterial);
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEUncoupledFiberExpLinear::FEUncoupledFiberExpLinear(FEModel* pfem) : FEUncoupledMaterial(pfem)
+FEUncoupledFiberExpLinear::FEUncoupledFiberExpLinear(FEModel* pfem) : FEElasticFiberMaterialUC(pfem)
 {
 	m_c3 = m_c4 = m_c5 = 0;
 	m_lam1 = 1;
@@ -30,10 +34,7 @@ mat3ds FEUncoupledFiberExpLinear::DevStress(FEMaterialPoint &mp)
 	double twoJi = 2.0*Ji;
 
 	// get the initial fiber direction
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = GetFiberVector(mp);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -94,10 +95,7 @@ tens4ds FEUncoupledFiberExpLinear::DevTangent(FEMaterialPoint &mp)
 	double Ji = 1.0 / J;
 
 	// get initial local material axis
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = GetFiberVector(mp);
 
 	// calculate current local material axis
 	vec3d a = F*a0;
@@ -160,6 +158,46 @@ tens4ds FEUncoupledFiberExpLinear::DevTangent(FEMaterialPoint &mp)
 //! Fiber material strain energy density
 double FEUncoupledFiberExpLinear::DevStrainEnergyDensity(FEMaterialPoint &mp)
 {
-	// TODO: implement this
-	return 0.0;
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// get the deformation gradient
+	mat3d F = pt.m_F;
+	double J = pt.m_J;
+	double Jm13 = pow(J, -1.0 / 3.0);
+
+	// get the initial fiber direction
+	vec3d a0;
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
+
+	// calculate the current material axis lam*a = F*a0;
+	vec3d a = F*a0;
+
+	// normalize material axis and store fiber stretch
+	double lam, lamd;
+	lam = a.unit();
+	lamd = lam*Jm13; // i.e. lambda tilde
+
+	// strain energy density
+	double sed = 0.0;
+#ifdef HAVE_GSL
+	if (lamd > 1)
+	{
+		if (lamd < m_lam1)
+		{
+			sed = m_c3*(exp(-m_c4)*
+				(gsl_sf_expint_Ei(m_c4*lamd) - gsl_sf_expint_Ei(m_c4))
+				- log(lamd));
+		}
+		else
+		{
+			double c6 = m_c3*(exp(m_c4*(m_lam1 - 1)) - 1) - m_c5*m_lam1;
+			sed = m_c5*(lamd - 1) + c6*log(lamd);
+		}
+	}
+#endif
+	// --- active contraction contribution to sed is zero ---
+
+	return sed;
 }

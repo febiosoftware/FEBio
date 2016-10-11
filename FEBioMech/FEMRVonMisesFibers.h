@@ -11,13 +11,13 @@
 #endif // _MSC_VER > 1000
 
 #include "FEUncoupledMaterial.h"
-#include "FEFiberMaterial.h"
+#include "FEUncoupledFiberExpLinear.h"
 
 //-----------------------------------------------------------------------------
-class FEMRVonMisesMaterialPoint : public FEElasticMaterialPoint
+class FEMRVonMisesMaterialPoint : public FEMaterialPoint
 {
 public:
-	FEMRVonMisesMaterialPoint(){}
+	FEMRVonMisesMaterialPoint(FEMaterialPoint* mp = 0);
 
 	FEMaterialPoint* Copy();
 
@@ -65,7 +65,7 @@ public:
 	DECLARE_PARAMETER_LIST();
 
 protected:
-	FEFiberMaterial	m_fib;
+	FEUncoupledFiberExpLinear	m_fib;
 };
 
 #endif // !defined(AFX_FEVonMisesFibers_H__E918D89B_4CCD_44B9_9731_19CEC4EDF406__INCLUDED_)

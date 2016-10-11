@@ -39,10 +39,7 @@ public:
 	bool Init();
     
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData()
-	{
-        return new FEDamageMaterialPoint(new FEElasticMaterialPoint);
-	}
+	FEMaterialPoint* CreateMaterialPointData();
     
     // get the elastic material
     FEUncoupledMaterial* GetElasticMaterial() { return m_pBase; }

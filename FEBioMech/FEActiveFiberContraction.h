@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/FEMaterial.h"
+#include <FECore/FEMaterial.h>
 
 //-----------------------------------------------------------------------------
 //! A material class describing the active fiber contraction
@@ -27,29 +27,4 @@ protected:
 	double	m_refl;		//!< sarcomere length
 
 	DECLARE_PARAMETER_LIST();
-};
-
-//-----------------------------------------------------------------------------
-//! Base class for fiber materials.
-class FEFiberMaterial
-{
-public:
-	//! Constructor
-	FEFiberMaterial();
-
-	//! Calculate the fiber stress
-	mat3ds Stress(FEMaterialPoint& mp);
-
-	//! Calculate the fiber tangent
-	tens4ds Tangent(FEMaterialPoint& mp);
-
-	//! Calculate the fiber strain energy density
-	double StrainEnergyDensity(FEMaterialPoint& mp);
-    
-public:
-	double	m_c3;		//!< Exponential stress coefficient
-	double	m_c4;		//!< Fiber uncrimping coefficient
-	double	m_c5;		//!< Modulus of straightened fibers
-
-	double	m_lam1;		//!< fiber stretch for straightened fibers
 };

@@ -7,7 +7,7 @@
 #include <fstream>
 
 // define the material point parameters
-BEGIN_PARAMETER_LIST(FEMRVonMisesMaterialPoint, FEElasticMaterialPoint)
+BEGIN_PARAMETER_LIST(FEMRVonMisesMaterialPoint, FEMaterialPoint)
 	ADD_PARAMETER(m_kf, FE_PARAM_DOUBLE, "kf");
 	ADD_PARAMETER(m_tp, FE_PARAM_DOUBLE, "tp");
 END_PARAMETER_LIST();
@@ -34,6 +34,11 @@ BEGIN_PARAMETER_LIST(FEMRVonMisesFibers, FEUncoupledMaterial)
 END_PARAMETER_LIST();
 
 //=============================================================================
+FEMRVonMisesMaterialPoint::FEMRVonMisesMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoint(mp)
+{
+
+}
+
 FEMaterialPoint* FEMRVonMisesMaterialPoint::Copy()
 {
 	FEMRVonMisesMaterialPoint* pt = new FEMRVonMisesMaterialPoint(*this);
@@ -141,12 +146,12 @@ double bessi1(double X)
 }
 
 //-----------------------------------------------------------------------------
-FEMRVonMisesFibers::FEMRVonMisesFibers(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
+FEMRVonMisesFibers::FEMRVonMisesFibers(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem) {}
 
 //-----------------------------------------------------------------------------
 FEMaterialPoint* FEMRVonMisesFibers::CreateMaterialPointData()
 {
-	FEMRVonMisesMaterialPoint* pt = new FEMRVonMisesMaterialPoint();
+	FEMRVonMisesMaterialPoint* pt = new FEMRVonMisesMaterialPoint(m_fib.CreateMaterialPointData());
 	pt->m_kf = kf;
 	pt->m_tp = tp;
 	return pt;
@@ -155,11 +160,12 @@ FEMaterialPoint* FEMRVonMisesFibers::CreateMaterialPointData()
 //-----------------------------------------------------------------------------
 mat3ds FEMRVonMisesFibers::DevStress(FEMaterialPoint& mp)
 {
-	FEMRVonMisesMaterialPoint& pt = *mp.ExtractData<FEMRVonMisesMaterialPoint>();
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEMRVonMisesMaterialPoint& vmpt = *mp.ExtractData<FEMRVonMisesMaterialPoint>();
 
 	// get some of the material parmaters from the material point
-	double kf = pt.m_kf;
-	double tp = pt.m_tp;
+	double kf = vmpt.m_kf;
+	double tp = vmpt.m_tp;
 
 	// deformation gradient
 	mat3d& F = pt.m_F;
@@ -286,7 +292,7 @@ mat3ds FEMRVonMisesFibers::DevStress(FEMaterialPoint& mp)
 		
 		// add the fiber stress by Gauss integration : m_fib.Stress(mp) is the deviatoric stress due to the fibers in direction pp[i], 
 		// distribution is the probability of having a fiber in this direction, and wmg[i] is the Gauss Weight for integration
-		s += wmg[i]*distribution*m_fib.Stress(mp);
+		s += wmg[i]*distribution*m_fib.DevStress(mp);
 	}
 
 	//the first column of Q was modified at every step of the previous loop and its true value was stored in a0:
@@ -299,11 +305,12 @@ mat3ds FEMRVonMisesFibers::DevStress(FEMaterialPoint& mp)
 
 tens4ds FEMRVonMisesFibers::DevTangent(FEMaterialPoint& mp)
 {
-	FEMRVonMisesMaterialPoint& pt = *mp.ExtractData<FEMRVonMisesMaterialPoint>();
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEMRVonMisesMaterialPoint& vmpt = *mp.ExtractData<FEMRVonMisesMaterialPoint>();
 
 	// get some of the material parmaters from the material point
-	double kf = pt.m_kf;
-	double tp = pt.m_tp;
+	double kf = vmpt.m_kf;
+	double tp = vmpt.m_tp;
 
 	// deformation gradient
 	mat3d& F = pt.m_F;
@@ -443,7 +450,7 @@ tens4ds FEMRVonMisesFibers::DevTangent(FEMaterialPoint& mp)
 		
 	// add the fiber stress by Gauss integration : m_fib.Tangent(mp) is the contribution to the tangent of the fibers in direction pp[i], 
 	// distribution is the probability of having a fiber in this direction, and wmg[i] is the Gauss Weight for integration
-		c += wmg[i]*distribution*m_fib.Tangent(mp);
+		c += wmg[i]*distribution*m_fib.DevTangent(mp);
 	}
 
 	//the first column of Q was modified at every step of the previous loop and its true value was stored in a0:

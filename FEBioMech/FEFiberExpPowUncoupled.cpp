@@ -2,32 +2,18 @@
 #include "FEFiberExpPowUncoupled.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberExpPowUncoupled, FEUncoupledMaterial)
+BEGIN_PARAMETER_LIST(FEFiberExpPowUncoupled, FEElasticFiberMaterialUC)
 	ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 	ADD_PARAMETER2(m_beta , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
 	ADD_PARAMETER2(m_ksi  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" );
-	ADD_PARAMETER(m_thd, FE_PARAM_DOUBLE, "theta");
-	ADD_PARAMETER(m_phd, FE_PARAM_DOUBLE, "phi");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 // FEFiberExpPowUncoupled
 //-----------------------------------------------------------------------------
 
-bool FEFiberExpPowUncoupled::Init()
-{
-	if (FEUncoupledMaterial::Init() == false) return false;
-
-	// convert angles from degrees to radians
-	double pi = 4*atan(1.0);
-	double the = m_thd*pi/180.;
-	double phi = m_phd*pi/180.;
-	// fiber direction in local coordinate system (reference configuration)
-	m_n0.x = cos(the)*sin(phi);
-	m_n0.y = sin(the)*sin(phi);
-	m_n0.z = cos(phi);
-
-	return true;
+FEFiberExpPowUncoupled::FEFiberExpPowUncoupled(FEModel* pfem) : FEElasticFiberMaterialUC(pfem)
+{ 
 }
 
 //-----------------------------------------------------------------------------
@@ -40,29 +26,27 @@ mat3ds FEFiberExpPowUncoupled::DevStress(FEMaterialPoint& mp)
 	mat3d F = pt.m_F*pow(J,-1.0/3.0);
 	
 	// loop over all integration points
-	vec3d n0, nt;
-	double In_1, Wl;
 	const double eps = 0;
 	mat3ds C = pt.DevRightCauchyGreen();
 	mat3ds s;
 	
 	// evaluate fiber direction in global coordinate system
-	n0 = pt.m_Q*m_n0;
+	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
-	In_1 = n0*(C*n0) - 1.0;
+	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
 	if (In_1 > eps)
 	{
 		// get the global spatial fiber direction in current configuration
-		nt = F*n0;
+		vec3d nt = F*n0;
 		
 		// calculate the outer product of nt
 		mat3ds N = dyad(nt);
 		
 		// calculate strain energy derivative
-		Wl = m_ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
+		double Wl = m_ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
 		
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);
@@ -85,24 +69,22 @@ tens4ds FEFiberExpPowUncoupled::DevTangent(FEMaterialPoint& mp)
 	mat3d F = pt.m_F*pow(J,-1.0/3.0);
 	
 	// loop over all integration points
-	vec3d n0, nt;
-	double In_1, Wl, Wll;
 	const double eps = 0;
 	mat3ds C = pt.DevRightCauchyGreen();
 	mat3ds s;
 	tens4ds c;
 	
 	// evaluate fiber direction in global coordinate system
-	n0 = pt.m_Q*m_n0;
+	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
-	In_1 = n0*(C*n0) - 1.0;
+	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
 	if (In_1 > eps)
 	{
 		// get the global spatial fiber direction in current configuration
-		nt = F*n0;
+		vec3d nt = F*n0;
 		
 		// calculate the outer product of nt
 		mat3ds N = dyad(nt);
@@ -110,8 +92,8 @@ tens4ds FEFiberExpPowUncoupled::DevTangent(FEMaterialPoint& mp)
 		
 		// calculate strain energy derivatives
 		double tmp = m_alpha*pow(In_1, m_beta);
-		Wl = m_ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
-		Wll = m_ksi*pow(In_1, m_beta-2.0)*((tmp+1)*m_beta-1.0)*exp(tmp);
+		double Wl = m_ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
+		double Wll = m_ksi*pow(In_1, m_beta-2.0)*((tmp+1)*m_beta-1.0)*exp(tmp);
 		
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);
@@ -142,18 +124,16 @@ double FEFiberExpPowUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// loop over all integration points
-	vec3d n0;
-	double In_1;
-	const double eps = 0;
 	mat3ds C = pt.DevRightCauchyGreen();
 	
 	// evaluate fiber direction in global coordinate system
-	n0 = pt.m_Q*m_n0;
+	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
-	In_1 = n0*(C*n0) - 1.0;
+	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
+	const double eps = 0;
 	if (In_1 > eps)
 	{
 		// calculate strain energy derivative

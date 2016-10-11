@@ -7,13 +7,10 @@ class FEFiberMaterialPoint : public FEMaterialPoint
 {
 public:
 	//! constructor
-	FEFiberMaterialPoint(FEMaterialPoint *pt = 0) : FEMaterialPoint(pt) {}
+	FEFiberMaterialPoint(FEMaterialPoint *pt = 0);
     
 	//! copy material point data
 	FEMaterialPoint* Copy();
-    
-	//! Initialize material point data
-	void Init();
     
 	//! Serialize data to archive
 	void Serialize(DumpStream& ar);

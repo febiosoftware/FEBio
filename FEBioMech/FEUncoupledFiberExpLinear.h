@@ -1,10 +1,10 @@
 #pragma once
-#include "FEUncoupledMaterial.h"
+#include "FEElasticFiberMaterialUC.h"
 
 //-----------------------------------------------------------------------------
 //! Uncoupled formulation of the fiber-exp-linear material for use with uncoupled
 //! solid mixtures.
-class FEUncoupledFiberExpLinear : public FEUncoupledMaterial
+class FEUncoupledFiberExpLinear : public FEElasticFiberMaterialUC
 {
 public:
 	//! Constructor
