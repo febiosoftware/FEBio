@@ -89,9 +89,6 @@ public:
 		//! contact stiffness
 		void ContactStiffness();
 
-		//! calculate the rigid stiffnes matrices
-		void RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
-
 		//! calculates stiffness contributon of nonlinear constraints
 		void NonLinearConstraintStiffness(const FETimeInfo& tp);
 	//}
