@@ -47,7 +47,8 @@ protected:
 
 protected:
 	FESpringMaterial*	m_pMat;
-	double				m_keps;
+	double				m_kbend;	// bending stiffness
+	double				m_kstab;	// stabilization penalty
 	double				m_L0;	//!< initial spring length
 
 	DECLARE_PARAMETER_LIST();
