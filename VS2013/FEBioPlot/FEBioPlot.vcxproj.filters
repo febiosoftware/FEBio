@@ -33,6 +33,9 @@
     <ClInclude Include="..\..\FEBioPlot\targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioPlot\FEBioPlotFile2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioPlot\FEBioPlotFile.cpp">
@@ -45,6 +48,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioPlot\stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioPlot\FEBioPlotFile2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

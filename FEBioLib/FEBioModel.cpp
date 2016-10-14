@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEBioModel.h"
 #include "FEBioPlot/FEBioPlotFile.h"
+#include "FEBioPlot/FEBioPlotFile2.h"
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioXML/FERestartImport.h"
 #include "FECore/NodeDataRecord.h"
@@ -194,35 +195,72 @@ bool FEBioModel::Input(const char* szfile)
 	if (fim.m_szplt[0]) SetPlotFilename(fim.m_szplt);
 
 	// set the plot file
-	FEBioPlotFile* pplt = new FEBioPlotFile(*this);
-	m_plot = pplt;
-
-	// set compression
-	pplt->SetCompression(fim.m_nplot_compression);
-
-	// define the plot file variables
-	FEMesh& mesh = GetMesh();
-	int NP = (int) fim.m_plot.size();
-	for (int i=0; i<NP; ++i)
+	if (strcmp(fim.m_szplot_type, "febio") == 0)
 	{
-		FEBioImport::PlotVariable& var = fim.m_plot[i];
+		FEBioPlotFile* pplt = new FEBioPlotFile(*this);
+		m_plot = pplt;
 
-		vector<int> item = var.m_item;
-		if (item.empty() == false)
+		// set compression
+		pplt->SetCompression(fim.m_nplot_compression);
+
+		// define the plot file variables
+		FEMesh& mesh = GetMesh();
+		int NP = (int) fim.m_plot.size();
+		for (int i=0; i<NP; ++i)
 		{
-			// TODO: currently, this is only supported for domain variables, where
-			//       the list is a list of materials
-			vector<int> lmat = var.m_item;
+			FEBioImport::PlotVariable& var = fim.m_plot[i];
 
-			// convert the material list to a domain list
-			mesh.DomainListFromMaterial(lmat, item);
+			vector<int> item = var.m_item;
+			if (item.empty() == false)
+			{
+				// TODO: currently, this is only supported for domain variables, where
+				//       the list is a list of materials
+				vector<int> lmat = var.m_item;
+
+				// convert the material list to a domain list
+				mesh.DomainListFromMaterial(lmat, item);
+			}
+
+			// add the plot output variable
+			if (pplt->AddVariable(var.m_szvar, item, var.m_szdom) == false)
+			{
+				felog.printf("FATAL ERROR: Output variable \"%s\" is not defined\n", var.m_szvar);
+				return false;
+			}
 		}
+	}
+	else if (strcmp(fim.m_szplot_type, "febio2") == 0)
+	{
+		FEBioPlotFile2* pplt = new FEBioPlotFile2(*this);
+		m_plot = pplt;
 
-		// add the plot output variable
-		if (pplt->AddVariable(var.m_szvar, item, var.m_szdom) == false)
+		// set compression
+		pplt->SetCompression(fim.m_nplot_compression);
+
+		// define the plot file variables
+		FEMesh& mesh = GetMesh();
+		int NP = (int)fim.m_plot.size();
+		for (int i = 0; i<NP; ++i)
 		{
-			felog.printf("FATAL ERROR: Output variable \"%s\" is not defined\n", var.m_szvar);
-			return false;
+			FEBioImport::PlotVariable& var = fim.m_plot[i];
+
+			vector<int> item = var.m_item;
+			if (item.empty() == false)
+			{
+				// TODO: currently, this is only supported for domain variables, where
+				//       the list is a list of materials
+				vector<int> lmat = var.m_item;
+
+				// convert the material list to a domain list
+				mesh.DomainListFromMaterial(lmat, item);
+			}
+
+			// add the plot output variable
+			if (pplt->AddVariable(var.m_szvar, item, var.m_szdom) == false)
+			{
+				felog.printf("FATAL ERROR: Output variable \"%s\" is not defined\n", var.m_szvar);
+				return false;
+			}
 		}
 	}
 
