@@ -21,6 +21,11 @@ FEResidualVector::~FEResidualVector()
 void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe)
 {
     
+    FEModel& fem = GetFEModel();
+    int dofU = fem.GetDOFIndex("u");
+    int dofV = fem.GetDOFIndex("v");
+    int dofW = fem.GetDOFIndex("w");
+    
     vector<double>& R = m_R;
     
     int i, j, I, n, l;
@@ -84,32 +89,39 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
                         
                         // add to total torque of this body
                         a = node.m_rt - RB.m_rt;
+                        vec3d m = a ^ F;
+                        
+                        if (node.m_bshell) {
+                            vec3d d = node.m_d0 + node.get_vec3d(dofU, dofV, dofW);
+                            vec3d Fd(fe[i+3], fe[i+4], fe[i+5]);
+                            m += d ^ Fd;
+                        }
                         
                         n = lm[3];
                         if (n >= 0)
                         {
 #pragma omp atomic
-                            R[n] += a.y*F.z-a.z*F.y;
+                            R[n] += m.x;
                         }
 #pragma omp atomic
-                        RB.m_Mr.x -= a.y*F.z-a.z*F.y;
+                        RB.m_Mr.x -= m.x;
                         n = lm[4];
                         if (n >= 0)
                         {
 #pragma omp atomic
-                            R[n] += a.z*F.x-a.x*F.z;
+                            R[n] += m.y;
                         }
                         
 #pragma omp atomic
-                        RB.m_Mr.y -= a.z*F.x-a.x*F.z;
+                        RB.m_Mr.y -= m.y;
                         n = lm[5];
                         if (n >= 0)
                         {
 #pragma omp atomic
-                            R[n] += a.x*F.y-a.y*F.x;
+                            R[n] += m.z;
                         }
 #pragma omp atomic
-                        RB.m_Mr.z -= a.x*F.y-a.y*F.x;
+                        RB.m_Mr.z -= m.z;
                         /*
                          // if the rotational degrees of freedom are constrained for a rigid node
                          // then we need to add an additional component to the residual

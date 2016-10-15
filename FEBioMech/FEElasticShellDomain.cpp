@@ -117,7 +117,7 @@ void FEElasticShellDomain::CoBaseVectors(FEShellElement& el, int n, vec3d g[3])
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         r[i] = ni.m_rt;
-        D[i] = el.m_D0[i] + ni.get_vec3d(m_dofU, m_dofV, m_dofW);
+        D[i] = ni.m_d0 + ni.get_vec3d(m_dofU, m_dofV, m_dofW);
     }
     
     double eta = el.gt(n);

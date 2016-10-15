@@ -1010,7 +1010,7 @@ bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
 			for (int j=0; j<n; ++j)
 			{
 				FENode& nj = mesh.Node(e.m_node[j]);
-				vec3d D = e.m_D0[j] + nj.get_vec3d(dof_U, dof_V, dof_W);
+				vec3d D = nj.m_d0 + nj.get_vec3d(dof_U, dof_V, dof_W);
 				double h = D.norm();
 				a << h;
 			}
@@ -1039,7 +1039,7 @@ bool FEPlotShellDirector::Save(FEDomain &dom, FEDataStream &a)
 			for (int j=0; j<n; ++j)
 			{
 				FENode& nj = mesh.Node(e.m_node[j]);
-				vec3d D = e.m_D0[j] + nj.get_vec3d(dof_U, dof_V, dof_W);
+				vec3d D = nj.m_d0 + nj.get_vec3d(dof_U, dof_V, dof_W);
 				a << D;
 			}
 		}

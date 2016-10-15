@@ -381,7 +381,6 @@ public:
 
 public:
 	vector<double>	m_h0;	//!< initial shell thicknesses
-	vector<vec3d>	m_D0;	//!< initial shell directors
 };
 
 //-----------------------------------------------------------------------------

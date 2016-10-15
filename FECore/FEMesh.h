@@ -130,6 +130,8 @@ public: // geometry data
 	vec3d	m_ap;	//!< previous acceleration
 
 	vec3d	m_Fr;	//!< nodal reaction forces
+    
+    vec3d   m_d0;   //!< initial director
 
 public:	// rigid body data
 	int		m_rid;		//!< rigid body number

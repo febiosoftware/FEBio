@@ -509,13 +509,14 @@ int FEMesh::RemoveIsolatedVertices()
 }
 
 //-----------------------------------------------------------------------------
-//! Calculate all shell normals (i.e. the shell directors).
+//! Calculate all shell directors.
 //! And find shell nodes
 void FEMesh::InitShells()
 {
 	// zero initial directors for shell nodes
 	int NN = Nodes();
 	vector<vec3d> D(NN, vec3d(0,0,0));
+    vector<int> ND(NN, 0);
 
 	// loop over all domains
 	for (int nd = 0; nd < Domains(); ++nd)
@@ -544,33 +545,21 @@ void FEMesh::InitShells()
 					vec3d a = r0[m0];
 					vec3d b = r0[m1];
 					vec3d c = r0[m2];
+                    vec3d d = (b-a)^(c-a); d.unit();
 
-					D[en[m0]] += (b-a)^(c-a);
+					D[en[m0]] += d*el.m_h0[j];
+                    ++ND[en[m0]];
 				}
 			}
 		}
 	}
 
-	// make sure we start with unit directors
-	for (int i=0; i<NN; ++i) D[i].unit();
+    // assign initial directors to shell nodes
+	// make sure we average the directors
+    for (int i=0; i<NN; ++i)
+        if (ND[i] > 0) Node(i).m_d0 = D[i]/ND[i];
 
-	// assign directors to shells 
-	for (int nd = 0; nd < Domains(); ++nd)
-	{
-		// Calculate the shell directors as the local node normals
-		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
-		{
-			FEShellDomain& sd = static_cast<FEShellDomain&>(Domain(nd));
-			for (int i=0; i<sd.Elements(); ++i)
-			{
-				FEShellElement& el = sd.Element(i);
-				int ne = el.Nodes();
-				for (int j=0; j<ne; ++j) el.m_D0[j] = D[el.m_node[j]]*el.m_h0[j];
-			}
-		}
-	}
-
-	// Find the nodes that are on a non-rigid shell. 
+	// Find the nodes that are on a non-rigid shell.
 	// These nodes will be assigned rotational degrees of freedom
 	// TODO: Perhaps I should let the domains do this instead
 	for (int i=0; i<Nodes(); ++i) Node(i).m_bshell = false;
@@ -758,7 +747,7 @@ double FEMesh::ShellElementVolume(FEShellElement& el)
 	for (i=0; i<neln; ++i)
 	{
 		r0[i] = Node(el.m_node[i]).m_r0;
-		D0[i] = el.m_D0[i];
+		D0[i] = Node(el.m_node[i]).m_d0;
 	}
 
 	int nint = el.GaussPoints();

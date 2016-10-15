@@ -33,9 +33,15 @@ public:
 	// correct stiffness matrix for rigid bodies
 	void RigidStiffness(SparseMatrix& K, vector<double>& ui, vector<double>& F, vector<int>& en, vector<int>& elm, matrix& ke, double alpha);
 
-	// adjust residual for rigid bodies
+    // correct stiffness matrix for rigid bodies accounting for rigid-body-deformable-shell interfaces
+    void RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vector<double>& F, vector<int>& en, vector<int>& elm, matrix& ke, double alpha);
+    
+    // correct stiffness matrix for rigid bodies accounting for rigid-body-deformable-shell interfaces
+    void RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vector<double>& F, vector<int>& en, vector<int>& elm, matrix& ke, double alpha);
+    
+	// adjust residual for rigid-deformable interface nodes
 	void AssembleResidual(int node_id, int dof, double f, vector<double>& R);
-
+    
 	// this is called during residual evaluation
 	// Currently, this is used for resetting rigid body forces
 	void Residual();
@@ -53,6 +59,7 @@ protected:
 	FEModel*	m_fem;
 	int			m_dofX, m_dofY, m_dofZ;
 	int			m_dofVX, m_dofVY, m_dofVZ;
+    int			m_dofU, m_dofV, m_dofW;
 	bool		m_bAllowMixedBCs;
 };
 

@@ -47,7 +47,7 @@ void FEShellDomain::CoBaseVectors0(FEShellElement& el, int n, vec3d g[3])
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         r[i] = ni.m_r0;
-        D[i] = el.m_D0[i];
+        D[i] = ni.m_d0;
     }
     
     double eta = el.gt(n);
@@ -160,7 +160,6 @@ void FEShellDomain::Serialize(DumpStream &ar)
 				ar << el.m_node;
 
 				ar << el.m_h0;
-				ar << el.m_D0;
 
 				for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
 			}
@@ -187,7 +186,6 @@ void FEShellDomain::Serialize(DumpStream &ar)
 				ar >> el.m_node;
 
 				ar >> el.m_h0;
-				ar >> el.m_D0;
 
 				for (int j=0; j<el.GaussPoints(); ++j)
 				{

@@ -131,7 +131,6 @@ FEShellElement::FEShellElement(const FEShellElement& el)
 
 	// copy shell data
 	m_h0 = el.m_h0;
-	m_D0 = el.m_D0;
 }
 
 //! assignment operator
@@ -148,7 +147,6 @@ FEShellElement& FEShellElement::operator = (const FEShellElement& el)
 
 	// copy shell data
 	m_h0 = el.m_h0;
-	m_D0 = el.m_D0;
 
 	return (*this);
 }
@@ -157,7 +155,6 @@ void FEShellElement::SetTraits(FEElementTraits* ptraits)
 {
 	FEElement::SetTraits(ptraits);
 	m_h0.assign(Nodes(), 0.0);
-	m_D0.resize(Nodes());
 }
 
 //-----------------------------------------------------------------------------
