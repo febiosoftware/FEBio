@@ -384,6 +384,9 @@
     <ClInclude Include="..\..\FECore\table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FECore\Callback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp">
@@ -690,6 +693,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FELinearConstraintManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FECore\Callback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

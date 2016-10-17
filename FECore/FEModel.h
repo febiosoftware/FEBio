@@ -3,29 +3,10 @@
 #include "FEMesh.h"
 #include "FETypes.h"
 #include "FEModelComponent.h"
+#include "Callback.h"
 #include <string>
 #include <vector>
 #include <map>
-
-//-----------------------------------------------------------------------------
-// callback structure
-#define CB_ALWAYS		0xFFFFFFFF		//!< Call for all reasons
-#define CB_INIT			0x00000001		//!< Call after model initialization (i.e. FEModel::Init())
-#define CB_STEP_ACTIVE	0x00000002		//!< call after step was activated (i.e. 
-#define CB_MAJOR_ITERS	0x00000004		//!< Call at the end of each major converged iteration
-#define CB_MINOR_ITERS	0x00000008		//!< Call for each minor iteration
-#define CB_SOLVED		0x00000010		//!< Call at the end of FEModel::Solve
-#define CB_UPDATE_TIME	0x00000020		//!< Call when time is updated and right before time step is solved (in FEAnalysis::Solve)
-#define CB_AUGMENT		0x00000040		//!< The model is entering augmentations (called before Augment)
-#define CB_STEP_SOLVED	0x00000080		//!< The step was solved
-
-typedef unsigned int FECORE_CB_WHEN;
-typedef bool (*FECORE_CB_FNC)(FEModel*,unsigned int,void*);
-struct FECORE_CALLBACK {
-	FECORE_CB_FNC	m_pcb;		// pointer to callback function
-	void*			m_pd;		// pointer to user data
-	FECORE_CB_WHEN	m_nwhen;	// when to call function
-};
 
 //-----------------------------------------------------------------------------
 // forward declarations
@@ -52,7 +33,7 @@ class FELinearConstraintManager;
 //! geometry, analysis steps, boundary and loading conditions, contact interfaces
 //! and so on.
 //!
-class FEModel
+class FEModel : public CallbackHandler
 {
 public:
 	enum {MAX_STRING = 256};
@@ -275,9 +256,6 @@ public:	// --- Miscellaneous routines ---
 	//! find a model componnet from its class ID
 	FEModelComponent* FindModelComponent(int nid);
 
-	//! set callback function
-	void AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void* pd);
-
 	//! call the callback function
 	//! This function returns fals if the run is to be aborted
 	bool DoCallback(unsigned int nevent);
@@ -361,7 +339,6 @@ protected:
 
 protected:
 	char	m_sztitle[MAX_STRING];	//!< problem title
-	list<FECORE_CALLBACK>	m_pcb;	//!< pointer to callback function
 
 protected: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants

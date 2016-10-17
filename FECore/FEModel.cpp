@@ -372,7 +372,7 @@ bool FEModel::Solve()
 	for (size_t nstep=m_nStep; nstep < m_Step.size(); ++nstep)
 	{
 		// set the current analysis step
-		m_nStep = nstep;
+		m_nStep = (int) nstep;
 		m_pStep = m_Step[nstep];
 
 		// intitialize step data
@@ -736,35 +736,14 @@ int FEModel::GetDOFIndex(const char* szvar, int n)
 }
 
 //-----------------------------------------------------------------------------
-// This function adds a callback routine
-//
-void FEModel::AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void *pd)
-{
-	FECORE_CALLBACK cb;
-	cb.m_pcb = pcb;
-	cb.m_pd = pd;
-	cb.m_nwhen = nwhen;
-
-	m_pcb.push_back(cb);
-}
-
-//-----------------------------------------------------------------------------
 // Call the callback function if there is one defined
 //
 bool FEModel::DoCallback(unsigned int nevent)
 {
 	try
 	{
-		list<FECORE_CALLBACK>::iterator it = m_pcb.begin();
-		for (int i=0; i<(int) m_pcb.size(); ++i, ++it)
-		{
-			// call the callback function
-			if (it->m_nwhen & nevent)
-			{
-				bool bret = (it->m_pcb)(this, nevent, it->m_pd);
-				if (bret == false) return false;
-			}
-		}
+		// do the callbacks
+		CallbackHandler::DoCallback(this, nevent);
 	}
 	catch (ExitRequest)
 	{
@@ -1404,7 +1383,7 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 		}
 
 		// nonlinear constraints
-		int n = m_NLC.size();
+		int n = (int) m_NLC.size();
 		ar << n;
 		if (n) 
 		{

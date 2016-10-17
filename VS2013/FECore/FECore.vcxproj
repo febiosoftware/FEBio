@@ -402,6 +402,7 @@
     <ClInclude Include="..\..\FECore\BC.h" />
     <ClInclude Include="..\..\FECore\BFGSSolver.h" />
     <ClInclude Include="..\..\FECore\BFGSSolver2.h" />
+    <ClInclude Include="..\..\FECore\Callback.h" />
     <ClInclude Include="..\..\FECore\DataRecord.h" />
     <ClInclude Include="..\..\FECore\DataStore.h" />
     <ClInclude Include="..\..\FECore\DOFS.h" />
@@ -526,6 +527,7 @@
     <ClCompile Include="..\..\FECore\BC.cpp" />
     <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
     <ClCompile Include="..\..\FECore\BFGSSolver2.cpp" />
+    <ClCompile Include="..\..\FECore\Callback.cpp" />
     <ClCompile Include="..\..\FECore\colsol.cpp" />
     <ClCompile Include="..\..\FECore\DataRecord.cpp" />
     <ClCompile Include="..\..\FECore\DataStore.cpp" />
