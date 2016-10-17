@@ -454,7 +454,7 @@ bool FEBioPlotFile2::WriteHeader(FEModel& fem)
 	// software flag
 	char sz[256] = {0};
 	sprintf(sz, "FEBio %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
-	m_ar.WriteChunk(PLT_HDR_SOFTWARE, sz);
+	m_ar.WriteChunk(PLT_HDR_SOFTWARE, (const char*)sz);
 
 	return true;
 }
