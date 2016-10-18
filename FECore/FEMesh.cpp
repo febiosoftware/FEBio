@@ -57,6 +57,7 @@ FENode::FENode(const FENode& n)
 	m_vp = n.m_vp;
 	m_ap = n.m_ap;
 	m_Fr = n.m_Fr;
+    m_d0 = n.m_d0;
 
 	m_nID = n.m_nID;
 	m_rid = n.m_rid;
@@ -78,6 +79,7 @@ FENode& FENode::operator = (const FENode& n)
 	m_vp = n.m_vp;
 	m_ap = n.m_ap;
 	m_Fr = n.m_Fr;
+    m_d0 = n.m_d0;
 
 	m_nID = n.m_nID;
 	m_rid = n.m_rid;
