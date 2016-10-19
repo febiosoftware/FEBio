@@ -73,6 +73,8 @@
 		D5C8C65F1D6FDC0D00ABCAC7 /* table.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C8C65E1D6FDC0D00ABCAC7 /* table.h */; };
 		D5CCDAFF1B87BF4C00B1B3B0 /* FECorePlot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CCDAFD1B87BF4C00B1B3B0 /* FECorePlot.cpp */; };
 		D5CCDB001B87BF4C00B1B3B0 /* FECorePlot.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CCDAFE1B87BF4C00B1B3B0 /* FECorePlot.h */; };
+		D5CFC78D1DB78F730077B242 /* Callback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CFC78B1DB78F730077B242 /* Callback.cpp */; };
+		D5CFC78E1DB78F730077B242 /* Callback.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CFC78C1DB78F730077B242 /* Callback.h */; };
 		D5CFC84A1BD5C03700E214CC /* FEBroydenStrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CFC8481BD5C03700E214CC /* FEBroydenStrategy.cpp */; };
 		D5CFC84B1BD5C03700E214CC /* FEBroydenStrategy.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CFC8491BD5C03700E214CC /* FEBroydenStrategy.h */; };
 		D5CFECAC1C18ADAB00FCA009 /* FEDataExport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CFECAA1C18ADAB00FCA009 /* FEDataExport.cpp */; };
@@ -314,6 +316,8 @@
 		D5C8C65E1D6FDC0D00ABCAC7 /* table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = table.h; sourceTree = "<group>"; };
 		D5CCDAFD1B87BF4C00B1B3B0 /* FECorePlot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECorePlot.cpp; sourceTree = "<group>"; };
 		D5CCDAFE1B87BF4C00B1B3B0 /* FECorePlot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECorePlot.h; sourceTree = "<group>"; };
+		D5CFC78B1DB78F730077B242 /* Callback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Callback.cpp; sourceTree = "<group>"; };
+		D5CFC78C1DB78F730077B242 /* Callback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Callback.h; sourceTree = "<group>"; };
 		D5CFC8481BD5C03700E214CC /* FEBroydenStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBroydenStrategy.cpp; sourceTree = "<group>"; };
 		D5CFC8491BD5C03700E214CC /* FEBroydenStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBroydenStrategy.h; sourceTree = "<group>"; };
 		D5CFECAA1C18ADAB00FCA009 /* FEDataExport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDataExport.cpp; sourceTree = "<group>"; };
@@ -525,6 +529,8 @@
 				D5E109F31865E15900B23922 /* BFGSSolver.h */,
 				D52A2EC91BCCA1E4005007BB /* BFGSSolver2.cpp */,
 				D5C111311BCD331E005219CD /* BFGSSolver2.h */,
+				D5CFC78B1DB78F730077B242 /* Callback.cpp */,
+				D5CFC78C1DB78F730077B242 /* Callback.h */,
 				D5E109F41865E15900B23922 /* colsol.cpp */,
 				D5C014F81CEF4EE700EE43D5 /* DataRecord.cpp */,
 				D5C014F91CEF4EE700EE43D5 /* DataRecord.h */,
@@ -877,6 +883,7 @@
 				D5E10ACD1865E15900B23922 /* FENodeNodeList.h in Headers */,
 				D5E10A841865E15900B23922 /* BFGSSolver.h in Headers */,
 				D5E10A9F1865E15900B23922 /* FECoordSysMap.h in Headers */,
+				D5CFC78E1DB78F730077B242 /* Callback.h in Headers */,
 				D5B5ACC11C74CA6C0097B42B /* FEBox.h in Headers */,
 				D5D5A6B91AE6E46D000A5475 /* tens3d.hpp in Headers */,
 				D5E10AD61865E15900B23922 /* FEPlotData.h in Headers */,
@@ -997,6 +1004,7 @@
 				D5E10AE11865E15900B23922 /* FESurfaceLoad.cpp in Sources */,
 				D5E10AA41865E15900B23922 /* FEDiscreteDomain.cpp in Sources */,
 				D595BB421899C7B40028A7F3 /* svd.cpp in Sources */,
+				D5CFC78D1DB78F730077B242 /* Callback.cpp in Sources */,
 				D5E10AF81865E15900B23922 /* matrix.cpp in Sources */,
 				D5E10B021865E15900B23922 /* SparseMatrix.cpp in Sources */,
 				D58D4D141B5D7E76002BB72A /* FECallback.cpp in Sources */,

@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		D513A2F21952466000060C20 /* PltArchive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D513A2F01952466000060C20 /* PltArchive.cpp */; };
 		D513A2F31952466000060C20 /* PltArchive.h in Headers */ = {isa = PBXBuildFile; fileRef = D513A2F11952466000060C20 /* PltArchive.h */; };
+		D5CFC7911DB78F840077B242 /* FEBioPlotFile2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CFC78F1DB78F840077B242 /* FEBioPlotFile2.cpp */; };
+		D5CFC7921DB78F840077B242 /* FEBioPlotFile2.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CFC7901DB78F840077B242 /* FEBioPlotFile2.h */; };
 		D5E1097B1865E0D900B23922 /* FEBioPlotFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E109741865E0D900B23922 /* FEBioPlotFile.cpp */; };
 		D5E1097C1865E0D900B23922 /* FEBioPlotFile.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E109751865E0D900B23922 /* FEBioPlotFile.h */; };
 		D5E1097D1865E0D900B23922 /* PlotFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E109761865E0D900B23922 /* PlotFile.cpp */; };
@@ -21,6 +23,8 @@
 /* Begin PBXFileReference section */
 		D513A2F01952466000060C20 /* PltArchive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PltArchive.cpp; sourceTree = "<group>"; };
 		D513A2F11952466000060C20 /* PltArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PltArchive.h; sourceTree = "<group>"; };
+		D5CFC78F1DB78F840077B242 /* FEBioPlotFile2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioPlotFile2.cpp; sourceTree = "<group>"; };
+		D5CFC7901DB78F840077B242 /* FEBioPlotFile2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioPlotFile2.h; sourceTree = "<group>"; };
 		D5E1096B1865E0CB00B23922 /* libFEBioPlot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioPlot.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E109741865E0D900B23922 /* FEBioPlotFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioPlotFile.cpp; sourceTree = "<group>"; };
 		D5E109751865E0D900B23922 /* FEBioPlotFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioPlotFile.h; sourceTree = "<group>"; };
@@ -63,6 +67,8 @@
 			children = (
 				D5E109741865E0D900B23922 /* FEBioPlotFile.cpp */,
 				D5E109751865E0D900B23922 /* FEBioPlotFile.h */,
+				D5CFC78F1DB78F840077B242 /* FEBioPlotFile2.cpp */,
+				D5CFC7901DB78F840077B242 /* FEBioPlotFile2.h */,
 				D5E109761865E0D900B23922 /* PlotFile.cpp */,
 				D5E109771865E0D900B23922 /* PlotFile.h */,
 				D513A2F01952466000060C20 /* PltArchive.cpp */,
@@ -82,6 +88,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5CFC7921DB78F840077B242 /* FEBioPlotFile2.h in Headers */,
 				D5E109801865E0D900B23922 /* stdafx.h in Headers */,
 				D5E109811865E0D900B23922 /* targetver.h in Headers */,
 				D5E1097C1865E0D900B23922 /* FEBioPlotFile.h in Headers */,
@@ -145,6 +152,7 @@
 				D513A2F21952466000060C20 /* PltArchive.cpp in Sources */,
 				D5E1097D1865E0D900B23922 /* PlotFile.cpp in Sources */,
 				D5E1097B1865E0D900B23922 /* FEBioPlotFile.cpp in Sources */,
+				D5CFC7911DB78F840077B242 /* FEBioPlotFile2.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
