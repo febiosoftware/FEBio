@@ -179,15 +179,8 @@ void FEElasticSolidDomain::InternalForces(FEGlobalVector& R)
 
 void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
-	int i, n;
-
 	// jacobian matrix, inverse jacobian matrix and determinants
-	double Ji[3][3], detJt;
-
-	double Gx, Gy, Gz;
-	mat3ds s;
-
-	const double* Gr, *Gs, *Gt;
+	double Ji[3][3];
 
 	int nint = el.GaussPoints();
 	int neln = el.Nodes();
@@ -195,30 +188,30 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 	double*	gw = el.GaussWeights();
 
 	// repeat for all integration points
-	for (n=0; n<nint; ++n)
+	for (int n=0; n<nint; ++n)
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// calculate the jacobian
-		detJt = invjact(el, Ji, n);
+		double detJt = invjact(el, Ji, n);
 
 		detJt *= gw[n];
 
 		// get the stress vector for this integration point
-		s = pt.m_s;
+		mat3ds s = pt.m_s;
 
-		Gr = el.Gr(n);
-		Gs = el.Gs(n);
-		Gt = el.Gt(n);
+		const double* Gr = el.Gr(n);
+		const double* Gs = el.Gs(n);
+		const double* Gt = el.Gt(n);
 
-		for (i=0; i<neln; ++i)
+		for (int i=0; i<neln; ++i)
 		{
 			// calculate global gradient of shape functions
 			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
+			double Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
+			double Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
+			double Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
 
 			// calculate internal force
 			// the '-' sign is so that the internal forces get subtracted
