@@ -21,7 +21,9 @@ public:
 	//! find the intersection of a ray with the surface
 	FESurfaceElement* Project(vec3d r, vec3d n, double rs[2]);
 	FESurfaceElement* Project2(vec3d r, vec3d n, double rs[2]);
-	FESurfaceElement* Project3(vec3d r, vec3d n, double rs[2], int* pei = 0);
+	FESurfaceElement* Project3(const vec3d& r, const vec3d& n, double rs[2], int* pei = 0);
+
+	vec3d Project(const vec3d& r, const vec3d& N);
 
 private:
 	double	m_tol;	//!< projection tolerance

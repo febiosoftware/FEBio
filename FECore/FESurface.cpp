@@ -21,6 +21,42 @@ void FESurface::Create(int nsize, int elemType)
 }
 
 //-----------------------------------------------------------------------------
+void FESurface::BuildFromSet(FEFacetSet& set)
+{
+	FEMesh& m = *GetMesh();
+	int NN = m.Nodes();
+
+	// count nr of faces
+	int faces = set.Faces();
+
+	// allocate storage for faces
+	Create(faces);
+
+	// read faces
+	for (int i = 0; i<faces; ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		FEFacetSet::FACET& fi = set.Face(i);
+
+		if (fi.ntype == 4) el.SetType(FE_QUAD4G4);
+		else if (fi.ntype == 3) el.SetType(FE_TRI3G1);
+		else if (fi.ntype == 6) el.SetType(FE_TRI6G3);
+		else if (fi.ntype == 7) el.SetType(FE_TRI7G4);
+		else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
+		else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
+		else assert(false);
+
+		int N = el.Nodes(); assert(N == fi.ntype);
+		for (int j = 0; j<N; ++j) el.m_node[j] = fi.node[j];
+	}
+
+	// copy the name
+	SetName(set.GetName());
+
+	Init();
+}
+
+//-----------------------------------------------------------------------------
 // extract the nodes from this surface
 FENodeSet FESurface::GetNodeSet()
 {
@@ -1489,6 +1525,19 @@ bool IntersectTri7(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 	}
 	
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+void FESurface::Invert()
+{
+	int tmp[FEElement::MAX_NODES];
+	for (int i=0; i<Elements(); ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		int neln = el.Nodes();
+		for (int j=0; j<neln; ++j) tmp[j] = el.m_node[j];
+		for (int j=0; j<neln; ++j) el.m_node[j] = tmp[neln-j-1];
+	}
 }
 
 //-----------------------------------------------------------------------------

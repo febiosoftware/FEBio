@@ -1,9 +1,12 @@
 #include "stdafx.h"
 #include "FENormalProjection.h"
+#include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
 FENormalProjection::FENormalProjection(FESurface& s) : m_surf(s)
 {
+	m_tol = 0.0;
+	m_rad = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -106,7 +109,7 @@ FESurfaceElement* FENormalProjection::Project2(vec3d r, vec3d n, double rs[2])
 //! It returns a pointer to the element, as well as the isoparametric coordinates
 //! of the intersection point.
 //!
-FESurfaceElement* FENormalProjection::Project3(vec3d r, vec3d n, double rs[2], int* pei)
+FESurfaceElement* FENormalProjection::Project3(const vec3d& r, const vec3d& n, double rs[2], int* pei)
 {
 //	double g, gmin = 1e99, r2[2] = {rs[0], rs[1]};
 	double g, gmax = -1e99, r2[2] = {rs[0], rs[1]};
@@ -142,4 +145,20 @@ FESurfaceElement* FENormalProjection::Project3(vec3d r, vec3d n, double rs[2], i
 
 	// return the intersected element (or zero if none)
 	return pme;
+}
+
+//-----------------------------------------------------------------------------
+vec3d FENormalProjection::Project(const vec3d& x, const vec3d& N)
+{
+	double rs[2];
+	FESurfaceElement* pe = FENormalProjection::Project3(x, N, rs);
+	if (pe)
+	{
+		FEMesh& mesh = *m_surf.GetMesh();
+		vec3d r[FEElement::MAX_NODES];
+		for (int i=0; i<pe->Nodes(); ++i) r[i] = mesh.Node(pe->m_node[i]).m_rt;
+		vec3d q = pe->eval(r, rs[0], rs[1]);
+		return q;
+	}
+	else return x;
 }

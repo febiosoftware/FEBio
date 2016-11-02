@@ -89,6 +89,9 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				FEDomain* dom = mesh.FindDomain(szset);
 				if (dom == 0) throw XMLReader::InvalidAttributeValue(tag, "el_set", szset);
 
+				// give the generator a chance to validate itself
+				if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
+
 				// generate the data
 				if (gen->Apply(dom, szvar) == false) throw FEBioImport::DataGeneratorError();
 			}

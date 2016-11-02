@@ -10,6 +10,11 @@ FEDataGenerator::~FEDataGenerator()
 {
 }
 
+bool FEDataGenerator::Init()
+{
+	return true;
+}
+
 bool FEDataGenerator::Apply(FEDomain* part, const char* szvar)
 {
 	// check input

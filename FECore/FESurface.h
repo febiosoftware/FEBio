@@ -16,6 +16,7 @@
 //-----------------------------------------------------------------------------
 class FEMesh;
 class FENodeSet;
+class FEFacetSet;
 
 //-----------------------------------------------------------------------------
 //! Surface mesh
@@ -37,6 +38,9 @@ public:
 
 	//! creates surface
 	void Create(int nsize, int elemType = -1);
+
+	//! Build a surface from a facet set
+	void BuildFromSet(FEFacetSet& set);
 
 	//! serialization
 	void Serialize(DumpStream& ar);
@@ -72,6 +76,9 @@ public:
 
 	//! See if a ray intersects an element
 	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps);
+
+	//! Invert the surface
+	void Invert();
 
 public:
 	//! calculate the surface area of a surface element

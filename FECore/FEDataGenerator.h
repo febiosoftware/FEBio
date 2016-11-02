@@ -13,6 +13,10 @@ public:
 	FEDataGenerator();
 	virtual ~FEDataGenerator();
 
+	// this function gives the data generator a chance to initialize itself
+	// and check for any input problems.
+	virtual bool Init();
+
 	// This function evaluates the variable at all the integration points
 	// of the elements in the element set by calling the value function.
 	virtual bool Apply(FEDomain* part, const char* szvar);
