@@ -429,6 +429,7 @@
     <ClInclude Include="..\..\FECore\fecore_debug_t.h" />
     <ClInclude Include="..\..\FECore\FEDataArray.h" />
     <ClInclude Include="..\..\FECore\FEDataExport.h" />
+    <ClInclude Include="..\..\FECore\FEDataGenerator.h" />
     <ClInclude Include="..\..\FECore\FEDataStream.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteMaterial.h" />
@@ -553,6 +554,7 @@
     <ClCompile Include="..\..\FECore\fecore_debug.cpp" />
     <ClCompile Include="..\..\FECore\FEDataArray.cpp" />
     <ClCompile Include="..\..\FECore\FEDataExport.cpp" />
+    <ClCompile Include="..\..\FECore\FEDataGenerator.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain.cpp" />

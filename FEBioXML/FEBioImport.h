@@ -142,6 +142,13 @@ public:
 		MissingMasterSurface();
 	};
 
+	//! error in data generation
+	class DataGeneratorError : public Exception
+	{
+	public: 
+		DataGeneratorError();
+	};
+
 public:
 	//-------------------------------------------------------------------------
 	class PlotVariable

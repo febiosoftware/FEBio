@@ -2,6 +2,8 @@
 #include "FEBioMeshDataSection.h"
 #include "FECore/FEModel.h"
 #include "FECore/DOFS.h"
+#include <FECore/FEDataGenerator.h>
+#include <FECore/FECoreKernel.h>
 
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::Parse(XMLTag& tag)
@@ -57,11 +59,39 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			FEElementSet* part = mesh.FindElementSet(szset);
 			if (part == 0) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szset);
 
-			const char* sztype = tag.AttributeValue("var");
-			if      (strcmp(sztype, "shell thickness") == 0) ParseShellThickness(tag, *part);
-			else if (strcmp(sztype, "fiber"          ) == 0) ParseMaterialFibers(tag, *part);
-			else if (strcmp(sztype, "mat_axis"       ) == 0) ParseMaterialAxes  (tag, *part);
-			else ParseMaterialData(tag, *part, sztype);
+			// see if the data will be generated or tabulated
+			const char* szgen = tag.AttributeValue("generator", true);
+
+			if (szgen == 0)
+			{
+				// data is tabulated and mapped directly to a variable.
+				const char* szvar = tag.AttributeValue("var");
+				if      (strcmp(szvar, "shell thickness") == 0) ParseShellThickness(tag, *part);
+				else if (strcmp(szvar, "fiber"          ) == 0) ParseMaterialFibers(tag, *part);
+				else if (strcmp(szvar, "mat_axis"       ) == 0) ParseMaterialAxes  (tag, *part);
+				else ParseMaterialData(tag, *part, szvar);
+			}
+			else
+			{
+				// data will be generated
+				FEDataGenerator* gen = fecore_new<FEDataGenerator>(FEDATAGENERATOR_ID, szgen, &fem);
+				if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
+
+				// get the variable
+				const char* szvar = tag.AttributeValue("var");
+
+				// read the parameters
+				FEParameterList& pl = gen->GetParameterList();
+				m_pim->ReadParameterList(tag, pl);
+
+				// get the domain
+				FEMesh& mesh = fem.GetMesh();
+				FEDomain* dom = mesh.FindDomain(szset);
+				if (dom == 0) throw XMLReader::InvalidAttributeValue(tag, "el_set", szset);
+
+				// generate the data
+				if (gen->Apply(dom, szvar) == false) throw FEBioImport::DataGeneratorError();
+			}
 		}
 		else if (tag == "SurfaceData")
 		{

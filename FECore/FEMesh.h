@@ -408,6 +408,8 @@ public:
 
 	void AddDomain(FEDomain* pd) { m_Domain.push_back(pd); }
 
+	FEDomain* FindDomain(const char* szname);
+
 	//! get a list of domains that belong to a specific material
 	void DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom);
 

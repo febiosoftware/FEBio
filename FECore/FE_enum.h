@@ -181,6 +181,7 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FEDOMAIN_ID					0x0013	// derived from FEDomain (TODO: work in progress)
 #define FEIC_ID						0x0014	// derived from initial condition
 #define FEEDGELOAD_ID				0x0015	// derived from FEEdgeLoad
+#define FEDATAGENERATOR_ID			0x0016	// derived from FEDataGenerator
 
 /////////////////////////////////////////////////////////////////////////////
 // ENUM: Linear solvers

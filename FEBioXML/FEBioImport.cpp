@@ -124,6 +124,12 @@ FEBioImport::MissingMasterSurface::MissingMasterSurface()
 }
 
 //-----------------------------------------------------------------------------
+FEBioImport::DataGeneratorError::DataGeneratorError()
+{
+	SetErrorString("Error in data generation");
+}
+
+//-----------------------------------------------------------------------------
 FEModel* FEBioFileSection::GetFEModel() { return m_pim->GetFEModel(); }
 FEAnalysis* FEBioFileSection::GetStep() { return m_pim->GetStep(); }
 

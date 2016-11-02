@@ -850,6 +850,15 @@ FEElementSet* FEMesh::FindElementSet(const char* szname)
 }
 
 //-----------------------------------------------------------------------------
+//! Find a domain
+
+FEDomain* FEMesh::FindDomain(const char* szname)
+{
+	for (size_t i = 0; i<m_Domain.size(); ++i) if (strcmp(m_Domain[i]->GetName(), szname) == 0) return m_Domain[i];
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 int FEMesh::Faces(FEElement& el)
 {
 	switch (el.Type())
