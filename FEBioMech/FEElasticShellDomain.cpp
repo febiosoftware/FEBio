@@ -31,24 +31,21 @@ bool FEElasticShellDomain::Initialize()
 	// error flag (set true on error)
 	bool bmerr = false;
 
-	// set the local coordinate system for each integration point
-	FECoordSysMap* pmap = m_pMat->GetElasticMaterial()->GetCoordinateSystemMap();
-	for (size_t i=0; i<m_Elem.size(); ++i)
-	{
-		// unpack element data
-		FEShellElement& el = m_Elem[i];
-
-		// set the local element coordinates
-		if (pmap)
-		{
-			for (int n=0; n<el.GaussPoints(); ++n)
-			{
-				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();
-				pt.m_Q = pmap->LocalElementCoord(el, n);
-			}
-		}
-	}
-
+    // get the elements material
+    if (m_pMat)
+    {
+        FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
+        if (pme)
+        {
+            // assign local coordinate system to each integration point
+            for (size_t i=0; i<m_Elem.size(); ++i)
+            {
+                FEShellElement& el = m_Elem[i];
+                for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
+            }
+        }
+    }
+    
 	// check for initially inverted shells
 	for (int i=0; i<Elements(); ++i)
 	{
