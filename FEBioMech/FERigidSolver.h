@@ -10,6 +10,7 @@ class SparseMatrix;
 class FEGlobalVector;
 class FERigidBody;
 class FESolidSolver2;
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 //! This is a helper class that helps the solid deformables solvers update the 
@@ -51,6 +52,9 @@ public:
 
 	// calculate contribution to mass matrix from a rigid body
 	void RigidMassMatrix(FESolidSolver2* solver, const FETimeInfo& timeInfo);
+
+	//! Serialization
+	void Serialize(DumpStream& ar);
 
 public:
 	void AllowMixedBCs(bool b) { m_bAllowMixedBCs = b; }

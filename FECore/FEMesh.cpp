@@ -335,6 +335,7 @@ void FEMesh::Serialize(DumpStream& ar)
 				ar << node.m_rt;
 				ar << node.m_vp;
 				ar << node.m_val;
+				ar << node.m_d0;
 			}
 
 			// write domain data
@@ -373,6 +374,7 @@ void FEMesh::Serialize(DumpStream& ar)
 				ar >> node.m_rt;
 				ar >> node.m_vp;
 				ar >> node.m_val;
+				ar >> node.m_d0;
 			}
 
 			// read domain data

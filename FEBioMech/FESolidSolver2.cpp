@@ -156,6 +156,9 @@ void FESolidSolver2::Serialize(DumpStream& ar)
 		// This can be zero in a multi-step analysis for steps that have not yet been initialized.)
 		if (m_neq > 0) Init();
 	}
+
+	// serialize rigid solver
+	m_rigidSolver.Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

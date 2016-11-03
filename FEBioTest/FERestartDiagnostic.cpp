@@ -105,13 +105,13 @@ bool FERestartDiagnostic::Run()
 			m_bok = false;
 
 			// reopen the log file for appending
-			const char* szlog = fem.GetLogfileName();
+/*			const char* szlog = fem.GetLogfileName();
 			if (felog.append(szlog) == false)
 			{
 				printf("WARNING: Could not reopen log file. A new log file is created\n");
 				felog.open(szlog);
 			}
-
+*/
 			// reset output mode
 			felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 		}

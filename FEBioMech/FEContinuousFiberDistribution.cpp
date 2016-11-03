@@ -1,11 +1,3 @@
-//
-//  FEContinuousFiberDistribution.cpp
-//  FEBioXCode4
-//
-//  Created by Gerard Ateshian on 11/17/13.
-//  Copyright (c) 2013 Columbia University. All rights reserved.
-//
-
 #include "FEContinuousFiberDistribution.h"
 
 //-----------------------------------------------------------------------------
@@ -39,6 +31,24 @@ bool FEContinuousFiberDistribution::Init()
 FEMaterialPoint* FEContinuousFiberDistribution::CreateMaterialPointData()
 {
 	return m_pFmat->CreateMaterialPointData();
+}
+
+//-----------------------------------------------------------------------------
+//! Serialization
+void FEContinuousFiberDistribution::Serialize(DumpStream& ar)
+{	
+	FEElasticMaterial::Serialize(ar);
+
+	if (ar.IsShallow()) return;
+
+	if (ar.IsSaving())
+	{
+		ar << m_IFD;
+	}
+	else
+	{
+		ar >> m_IFD;
+	}
 }
 
 //-----------------------------------------------------------------------------

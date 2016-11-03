@@ -743,7 +743,8 @@ bool FEModel::DoCallback(unsigned int nevent)
 	try
 	{
 		// do the callbacks
-		CallbackHandler::DoCallback(this, nevent);
+		bool bret = CallbackHandler::DoCallback(this, nevent);
+		return bret;
 	}
 	catch (ExitRequest)
 	{

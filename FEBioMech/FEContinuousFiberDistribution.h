@@ -36,6 +36,9 @@ public:
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData();
 
+	//! Serialization
+	void Serialize(DumpStream& ar);
+
 protected:
 	// integrated Fiber density
 	void IntegrateFiberDensity();

@@ -10,6 +10,7 @@
 #include <FECore/SparseMatrix.h>
 #include <FECore/log.h>
 #include <FECore/FEMaterial.h>
+#include <FECore/Archive.h>
 
 FERigidSolver::FERigidSolver(FEModel* fem) : m_fem(fem)
 {
@@ -75,6 +76,28 @@ int FERigidSolver::InitEquations(int neq)
 	}
 
 	return neq;
+}
+
+//-----------------------------------------------------------------------------
+//! Serialization
+void FERigidSolver::Serialize(DumpStream& ar)
+{
+	if (ar.IsShallow()) return;
+
+	if (ar.IsSaving())
+	{
+		ar << m_dofX << m_dofY << m_dofZ;
+		ar << m_dofVX << m_dofVY << m_dofVZ;
+		ar << m_dofU << m_dofV << m_dofW;
+		ar << m_bAllowMixedBCs;
+	}
+	else
+	{
+		ar >> m_dofX >> m_dofY >> m_dofZ;
+		ar >> m_dofVX >> m_dofVY >> m_dofVZ;
+		ar >> m_dofU >> m_dofV >> m_dofW;
+		ar >> m_bAllowMixedBCs;
+	}
 }
 
 //-----------------------------------------------------------------------------

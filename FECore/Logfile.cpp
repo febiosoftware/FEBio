@@ -44,7 +44,11 @@ bool LogFileStream::open(const char* szfile)
 bool LogFileStream::append(const char* szfile)
 {
 	// make sure we don't have a log file already open
-	if (m_fp) return false;
+	if (m_fp)
+	{
+		fseek(m_fp, SEEK_END, 0);
+		return true;
+	}
 
 	// create the log file
 	m_fp = fopen(szfile, "a+t");

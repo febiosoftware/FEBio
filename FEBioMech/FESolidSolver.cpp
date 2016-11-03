@@ -156,6 +156,8 @@ void FESolidSolver::Serialize(DumpStream& ar)
 		// re-initialize data
 		Init();
 	}
+
+	m_rigidSolver.Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
