@@ -58,7 +58,10 @@ void FELinearConstraintManager::Serialize(DumpStream& ar)
 		vector<FELinearConstraint>::iterator it = m_LinC.begin();
 		for (int i = 0; i<(int)m_LinC.size(); ++i, ++it) it->Serialize(ar);
 
-		ar << m_LCT;
+		int nr = m_LCT.rows();
+		int nc = m_LCT.columns();
+		ar << nr << nc;
+		ar.write(&m_LCT(0,0), sizeof(int), nr*nc);
 	}
 	else
 	{
@@ -73,7 +76,10 @@ void FELinearConstraintManager::Serialize(DumpStream& ar)
 			m_LinC.push_back(LC);
 		}
 
-		ar >> m_LCT;
+		int nr, nc;
+		ar >> nr >> nc;
+		m_LCT.resize(nr, nc);
+		ar.read(&m_LCT(0,0), sizeof(int), nr*nc);
 	}
 }
 

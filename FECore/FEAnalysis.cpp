@@ -282,12 +282,12 @@ bool FEAnalysis::Solve()
 			break;
 		}
 
-		// do the callback
-		m_fem.DoCallback(CB_UPDATE_TIME);
-
-		// solve this timestep,
 		try
 		{
+			// do the callback
+			m_fem.DoCallback(CB_UPDATE_TIME);
+
+			// solve this timestep,
 			bconv = GetFESolver()->SolveStep(m_fem.m_ftime);
 		}
 		catch (ExitRequest)

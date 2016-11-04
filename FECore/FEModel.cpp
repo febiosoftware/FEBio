@@ -748,7 +748,8 @@ bool FEModel::DoCallback(unsigned int nevent)
 	}
 	catch (ExitRequest)
 	{
-		throw;
+		if (nevent == CB_MAJOR_ITERS) return false;
+		else throw;
 	}
 	catch (ForceConversion)
 	{
