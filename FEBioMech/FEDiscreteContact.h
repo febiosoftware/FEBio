@@ -1,6 +1,7 @@
 #pragma once
 #include <FECore/FENLConstraint.h>
 #include "FEContactSurface.h"
+#include "FEDeformableSpringDomain.h"
 
 //-----------------------------------------------------------------------------
 class FEDiscreteSet;
@@ -68,4 +69,40 @@ protected:
 	int		m_nsegup;	//!< number of segment updates (or zero)
 
 	DECLARE_PARAMETER_LIST();
+};
+
+//-----------------------------------------------------------------------------
+class FEDiscreteContact2 : public FENLConstraint
+{
+	struct NODE
+	{
+		int		node;				// node index (local ID into discrete domain)
+		FESurfaceElement*	pe;		// master element
+		double	proj[2];			// natural coordinates of projection
+		vec3d	nu;					// normal on master surface
+		vec3d	q;					// new position
+	};
+
+public:
+	FEDiscreteContact2(FEModel* fem);
+
+	bool Init();
+	void Activate();
+
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+	void BuildMatrixProfile(FEGlobalMatrix& M);
+	void Update(const FETimeInfo& tp);
+	bool Augment(int naug, const FETimeInfo& tp) { return true; }
+
+	void SetDiscreteDomain(FEDeformableSpringDomain2* dom) { m_dom = dom; }
+	FESurface* GetSurface(const char* sz) { return &m_surf; }
+
+protected:
+	void ProjectNodes();
+
+protected:
+	FEDiscreteContactSurface	m_surf;
+	FEDeformableSpringDomain2*	m_dom;
+	vector<NODE>	m_nodeData;
 };

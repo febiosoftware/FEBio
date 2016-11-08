@@ -669,3 +669,205 @@ void FEDiscreteContact::BuildMatrixProfile(FEGlobalMatrix& K)
 		}
 	}
 }
+
+//=============================================================================
+FEDiscreteContact2::FEDiscreteContact2(FEModel* fem) : FENLConstraint(fem), m_surf(fem)
+{
+	m_dom = 0;	
+}
+
+bool FEDiscreteContact2::Init()
+{
+	// let's make sure we have a discrete domain set
+	if (m_dom == 0) return false;
+
+	// initialize node data
+	int NN = m_dom->Nodes();
+	m_nodeData.resize(NN);
+	for (int i=0; i<NN; ++i)
+	{
+		NODE& nd = m_nodeData[i];
+		nd.node = i;
+		nd.pe = 0;
+	}
+
+	// initialize surface
+	if (m_surf.Init() == false) return false;
+
+	// let's do base class initiialization
+	return FENLConstraint::Init();
+}
+
+void FEDiscreteContact2::Activate()
+{
+	FENLConstraint::Activate();
+	ProjectNodes();
+}
+
+void FEDiscreteContact2::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+{
+	int NN = m_dom->Nodes();
+
+	FEMesh& mesh = *m_surf.GetMesh();
+
+	// skip first and last
+	for (int n=1; n<NN-1; ++n)
+	{
+		if (m_dom->IsAnchored(n))
+		{
+			NODE& nodeData = m_nodeData[n];
+			assert(nodeData.pe);
+			FESurfaceElement& el = *nodeData.pe;
+
+			double r = nodeData.proj[0];
+			double s = nodeData.proj[1];
+
+			double H[FEElement::MAX_NODES];
+			int neln = el.Nodes();
+
+			el.shape_fnc(H, r, s);
+
+			vec3d F = m_dom->NodalForce(n);
+
+			vector<double> fe(3*neln, 0.0);
+			for (int i=0; i<neln; ++i)
+			{
+				fe[3*i  ] = H[i]*F.x;
+				fe[3*i+1] = H[i]*F.y;
+				fe[3*i+2] = H[i]*F.z;
+			}
+
+			vector<int> lm(3*neln, -1);
+			for (int i=0; i<neln; ++i)
+			{
+				FENode& nodei = mesh.Node(el.m_node[i]);
+				lm[3*i  ] = nodei.m_ID[0];
+				lm[3*i+1] = nodei.m_ID[1];
+				lm[3*i+2] = nodei.m_ID[2];
+			}
+
+			R.Assemble(el.m_node, lm, fe);
+		}
+	}
+}
+
+void FEDiscreteContact2::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+{
+}
+
+void FEDiscreteContact2::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+}
+
+void FEDiscreteContact2::Update(const FETimeInfo& tp)
+{
+	ProjectNodes();
+}
+
+void FEDiscreteContact2::ProjectNodes()
+{
+	// setup closest point projection
+	FEClosestPointProjection cpp(m_surf);
+	cpp.SetTolerance(0.01);
+	cpp.SetSearchRadius(0.0);
+	cpp.HandleSpecialCases(true);
+	cpp.Init();
+
+	// number of nodes
+	int NN = m_dom->Nodes();
+
+	bool bdone = false;
+
+	const int maxIter = 100;
+	int iter = 0;
+	while ((bdone == false) && (iter < maxIter))
+	{
+		bdone = true;
+		iter++;
+
+		// skip first and last
+		for (int i = 1; i<NN - 1; ++i)
+		{
+			FENode& nd = m_dom->Node(i);
+			NODE& nodeData = m_nodeData[i];
+				
+			// get nodal position
+			vec3d x = nd.m_rt;
+
+			// If the node is in contact, let's see if it remains in contact
+			if (nodeData.pe != 0)
+			{
+				FESurfaceElement& mel = *nodeData.pe;
+				double r = nodeData.proj[0];
+				double s = nodeData.proj[1];
+
+				// calculate new position and normal
+				vec3d q = m_surf.Local2Global(mel, r, s);
+				nodeData.nu = m_surf.SurfaceNormal(mel, r, s);
+
+				// determine if node should remain in contact depending on whether
+				// the force would pull the node of the surface or not
+				vec3d F = m_dom->NodalForce(i);
+				if (F*nodeData.nu > 0)
+				{
+					// node leaves contact
+					m_dom->AnchorNode(i, false);
+					nodeData.pe = 0;
+				}
+				else
+				{
+					// node remains in contact, so update position
+					nodeData.q = q;
+
+					// get the tangential component of the force
+					vec3d nu = nodeData.nu;
+					vec3d tau = m_dom->Tangent(i);
+					vec3d mu = tau ^ nu;
+					double t = fabs(F*mu);
+					double f = F.norm();
+					if ((t > 0) && (t / f > 0.01))
+					{
+						// tangential component too big
+						// release contact and flag for redo
+						m_dom->AnchorNode(i, false);
+						nodeData.pe = 0;
+						bdone = false;
+					}
+				}
+			}
+			else
+			{
+				// see it the node establishes contact
+				vec2d rs(0, 0); vec3d q;
+				FESurfaceElement* pe = cpp.Project(x, q, rs);
+
+				// if it does, update nodal data
+				// and position the node
+				if (pe)
+				{
+					vec3d nu = m_surf.SurfaceNormal(*pe, rs.x(), rs.y());
+					if (nu*(x - q) < 0)
+					{
+						nodeData.pe = pe;
+						nodeData.proj[0] = rs.x();
+						nodeData.proj[1] = rs.y();
+						nodeData.nu = nu;
+						nodeData.q = q;
+
+						m_dom->AnchorNode(i, true);
+					}
+				}
+			}
+		}
+
+		// update anchor positions
+		for (int i=1; i<NN-1; ++i)
+		{
+			NODE& nodeData = m_nodeData[i];
+			if (nodeData.pe != 0) m_dom->SetNodePosition(i, nodeData.q);
+		}
+
+		// tell the domain to update the positions of the free nodes
+		m_dom->UpdateNodes();
+	}
+}

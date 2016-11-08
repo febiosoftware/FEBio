@@ -214,6 +214,16 @@ void FEBioConstraintsSection::Parse25(XMLTag &tag)
 					pdc->SetDiscreteSet(pset);
 				}
 
+				// get the nodeset (this is needed by FEDiscreteContact2)
+				if (dynamic_cast<FEDiscreteContact2*>(plc))
+				{
+					FEDiscreteContact2* pdc = dynamic_cast<FEDiscreteContact2*>(plc);
+					const char* szdset = tag.AttributeValue("discrete_set");
+					FEDeformableSpringDomain2* pdom = dynamic_cast<FEDeformableSpringDomain2*>(mesh.FindDomain(szdset));
+					if (pdom == 0) throw XMLReader::InvalidAttributeValue(tag, "discrete_set", szdset);
+					pdc->SetDiscreteDomain(pdom);
+				}
+
 				// read the parameter list
 				FEParameterList& pl = plc->GetParameterList();
 				m_pim->ReadParameterList(tag, pl);

@@ -415,3 +415,394 @@ void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
 		}
 	}
 }
+
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+FEDeformableSpringDomain2::FEDeformableSpringDomain2(FEModel* pfem) : FEDiscreteDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
+{
+	m_pMat = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FEDeformableSpringDomain2::SetMaterial(FEMaterial* pmat)
+{
+	m_pMat = dynamic_cast<FESpringMaterial*>(pmat);
+	assert(m_pMat);
+}
+
+//-----------------------------------------------------------------------------
+// Only two nodes contribute to this spring
+void FEDeformableSpringDomain2::UnpackLM(FEElement &el, vector<int>& lm)
+{
+	int N = Nodes();
+	lm.resize(2 * 6);
+	for (int i = 0; i<2; ++i)
+	{
+		int n = (i==0? 0 : N-1);
+		FENode& node = Node(n);
+		vector<int>& id = node.m_ID;
+
+		// first the displacement dofs
+		lm[3 * i    ] = id[m_dofX];
+		lm[3 * i + 1] = id[m_dofY];
+		lm[3 * i + 2] = id[m_dofZ];
+
+		// rigid rotational dofs
+		lm[3  + 3 * i    ] = id[m_dofRU];
+		lm[3  + 3 * i + 1] = id[m_dofRV];
+		lm[3  + 3 * i + 2] = id[m_dofRW];
+	}
+}
+
+//-----------------------------------------------------------------------------
+bool FEDeformableSpringDomain2::Initialize()
+{
+	if (FEDiscreteDomain::Initialize() == false) return false;
+
+	// initialize node data
+	int NN = Nodes();
+	m_nodeData.resize(NN);
+	for (int i=0; i<NN; ++i) m_nodeData[i].banchor = false;
+
+	// anchor first and last
+	m_nodeData[0].banchor = true;
+	m_nodeData[NN-1].banchor = true;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEDeformableSpringDomain2::Activate()
+{
+	int N = Nodes();
+	for (int i = 0; i<2; ++i)
+	{
+		int n = (i == 0 ? 0 : N - 1);
+		FENode& node = Node(n);
+		if (node.m_bexclude == false)
+		{
+			if (node.m_rid < 0)
+			{
+				node.m_ID[m_dofX] = DOF_ACTIVE;
+				node.m_ID[m_dofY] = DOF_ACTIVE;
+				node.m_ID[m_dofZ] = DOF_ACTIVE;
+			}
+		}
+	}
+
+	// Not sure if this necessary, but let's just do it to be sure
+	UpdateNodes();
+
+	// calculate the spring lengths
+	m_L0 = InitialLength();
+	m_Lt = CurrentLength();
+}
+
+//-----------------------------------------------------------------------------
+double FEDeformableSpringDomain2::InitialLength()
+{
+	FEMesh& mesh = *m_pMesh;
+
+	double L = 0.0;
+	for (size_t i = 0; i<m_Elem.size(); ++i)
+	{
+		// get the discrete element
+		FEDiscreteElement& el = m_Elem[i];
+
+		// get the nodes
+		FENode& n1 = mesh.Node(el.m_node[0]);
+		FENode& n2 = mesh.Node(el.m_node[1]);
+
+		// get the nodal positions
+		vec3d& r1 = n1.m_r0;
+		vec3d& r2 = n2.m_r0;
+
+		L += (r2 - r1).norm();
+	}
+	return L;
+}
+
+//-----------------------------------------------------------------------------
+double FEDeformableSpringDomain2::CurrentLength()
+{
+	FEMesh& mesh = *m_pMesh;
+
+	double L = 0.0;
+	for (size_t i = 0; i<m_Elem.size(); ++i)
+	{
+		// get the discrete element
+		FEDiscreteElement& el = m_Elem[i];
+
+		// get the nodes
+		FENode& n1 = mesh.Node(el.m_node[0]);
+		FENode& n2 = mesh.Node(el.m_node[1]);
+
+		// get the nodal positions
+		vec3d& r1 = n1.m_rt;
+		vec3d& r2 = n2.m_rt;
+
+		L += (r2 - r1).norm();
+	}
+	return L;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the forces due to discrete elements (i.e. springs)
+
+void FEDeformableSpringDomain2::InternalForces(FEGlobalVector& R)
+{
+	FEMesh& mesh = *m_pMesh;
+
+	vector<double> fe(6);
+	vec3d u1, u2;
+
+	vector<int> en(2), lm(6);
+
+	// calculate length increment
+	double DL = m_Lt - m_L0;
+
+	// calculate force
+	double F = m_pMat->force(DL);
+
+	int N = Elements();
+	for (size_t i = 0; i<2; ++i)
+	{
+		int n = (i==0? 0 : N-1);
+		double sign = (i == 0 ? 1 : -1);
+
+		// get the discrete element
+		FEDiscreteElement& el = Element(n);
+
+		// get the nodes
+		FENode& n1 = mesh.Node(el.m_node[0]);
+		FENode& n2 = mesh.Node(el.m_node[1]);
+
+		// get the nodal positions
+		vec3d& r01 = n1.m_r0;
+		vec3d& r02 = n2.m_r0;
+		vec3d& rt1 = n1.m_rt;
+		vec3d& rt2 = n2.m_rt;
+
+		vec3d e = rt2 - rt1; e.unit();
+
+		// set up the force vector
+		fe[i*3    ] = sign*F*e.x;
+		fe[i*3 + 1] = sign*F*e.y;
+		fe[i*3 + 2] = sign*F*e.z;
+
+		// setup the node vector
+		en[i] = el.m_node[i];
+
+		// set up the LM vector
+		if (i==0) UnpackLM(el, lm);
+	}
+
+	// assemble element
+	R.Assemble(en, lm, fe);
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the discrete element stiffness
+
+void FEDeformableSpringDomain2::StiffnessMatrix(FESolver* psolver)
+{
+	FEMesh& mesh = *m_pMesh;
+
+	matrix ke(6, 6);
+	ke.zero();
+
+	vector<int> en(2), lm(6);
+
+	// get the nodes of the element
+	int NN = Nodes();
+	FENode& n1 = Node(0);
+	FENode& n2 = Node(NN-1);
+
+	// get the nodal positions
+	vec3d& r01 = n1.m_r0;
+	vec3d& r02 = n2.m_r0;
+	vec3d& rt1 = n1.m_rt;
+	vec3d& rt2 = n2.m_rt;
+
+	vec3d e = rt2 - rt1; e.unit();
+
+	// calculate spring lengths
+	double L0 = (r02 - r01).norm();
+	double Lt = (rt2 - rt1).norm();
+	double DL = Lt - L0;
+
+	// evaluate the stiffness
+	double F = m_pMat->force(DL);
+	double E = m_pMat->stiffness(DL);
+
+	if (Lt == 0) { F = 0; Lt = 1; e = vec3d(1, 1, 1); }
+
+	double A[3][3] = { 0 };
+	A[0][0] = ((E - F / Lt)*e.x*e.x + F / Lt);
+	A[1][1] = ((E - F / Lt)*e.y*e.y + F / Lt);
+	A[2][2] = ((E - F / Lt)*e.z*e.z + F / Lt);
+
+	A[0][1] = A[1][0] = (E - F / Lt)*e.x*e.y;
+	A[1][2] = A[2][1] = (E - F / Lt)*e.y*e.z;
+	A[0][2] = A[2][0] = (E - F / Lt)*e.x*e.z;
+
+	ke[0][0] = A[0][0]; ke[0][1] = A[0][1]; ke[0][2] = A[0][2];
+	ke[1][0] = A[1][0]; ke[1][1] = A[1][1]; ke[1][2] = A[1][2];
+	ke[2][0] = A[2][0]; ke[2][1] = A[2][1]; ke[2][2] = A[2][2];
+
+	ke[0][3] = -A[0][0]; ke[0][4] = -A[0][1]; ke[0][5] = -A[0][2];
+	ke[1][3] = -A[1][0]; ke[1][4] = -A[1][1]; ke[1][5] = -A[1][2];
+	ke[2][3] = -A[2][0]; ke[2][4] = -A[2][1]; ke[2][5] = -A[2][2];
+
+	ke[3][0] = -A[0][0]; ke[3][1] = -A[0][1]; ke[3][2] = -A[0][2];
+	ke[4][0] = -A[1][0]; ke[4][1] = -A[1][1]; ke[4][2] = -A[1][2];
+	ke[5][0] = -A[2][0]; ke[5][1] = -A[2][1]; ke[5][2] = -A[2][2];
+
+	ke[3][3] = A[0][0]; ke[3][4] = A[0][1]; ke[3][5] = A[0][2];
+	ke[4][3] = A[1][0]; ke[4][4] = A[1][1]; ke[4][5] = A[1][2];
+	ke[5][3] = A[2][0]; ke[5][4] = A[2][1]; ke[5][5] = A[2][2];
+
+	// setup the node vector
+	en[0] = m_Node[0];
+	en[1] = m_Node[NN-1];
+
+	// set up the LM vector
+	UnpackLM(Element(0), lm);
+
+	// assemble the element into the global system
+	psolver->AssembleStiffness(en, lm, ke);
+}
+
+//-----------------------------------------------------------------------------
+void FEDeformableSpringDomain2::Update(const FETimeInfo& tp)
+{
+	// update wire partition and nodal positions
+	UpdateNodes();
+}
+
+//-----------------------------------------------------------------------------
+void FEDeformableSpringDomain2::SetNodePosition(int node, const vec3d& r)
+{
+	FENode& nd = Node(node);
+	nd.m_rt = r;
+	vec3d u = nd.m_rt - nd.m_r0;
+	nd.set_vec3d(m_dofX, m_dofY, m_dofZ, u);
+}
+
+//-----------------------------------------------------------------------------
+void FEDeformableSpringDomain2::UpdateNodes()
+{
+	// clear wires
+	m_wire.clear();
+
+	// make sure we have enough nodes
+	int NN = Nodes();
+	if (NN < 2) return;
+
+	// partition into wire segments
+	int nanchors = 0;
+	for (int i=0; i<NN; ++i) if (m_nodeData[i].banchor) nanchors++;
+	assert(nanchors >= 2);
+	if (nanchors < 2) return;
+
+	int wires = nanchors - 1;
+	m_wire.resize(wires);
+	int n = 0;
+	for (int i=0; i<NN; ++i)
+	{
+		if (m_nodeData[i].banchor)
+		{
+			if (n > 0    ) m_wire[n-1].node[1] = i;
+			if (n < wires) m_wire[n  ].node[0] = i;
+			n++;
+		}
+	}
+
+	// position the internal nodes
+	for (int i=0; i<wires; ++i)
+	{
+		Wire& wire = m_wire[i];
+
+		int n0 = wire.node[0];
+		int n1 = wire.node[1];
+
+		vec3d r0 = Node(n0).m_rt;
+		vec3d r1 = Node(n1).m_rt;
+
+		for (int n = n0+1; n<=n1-1; ++n)
+		{
+			assert(m_nodeData[n].banchor == false);
+
+			double w = (double) (n - n0) / (double)(n1 - n0);
+
+			FENode& nd = Node(n);
+			nd.m_rt = r0 + (r1 - r0)*w;
+			vec3d u = nd.m_rt - nd.m_r0;
+			nd.set_vec3d(m_dofX, m_dofY, m_dofZ, u);
+		}
+	}
+
+	// re-calculate current length
+	m_Lt = CurrentLength();
+}
+
+//-----------------------------------------------------------------------------
+//! Anchor (or release) a node
+void FEDeformableSpringDomain2::AnchorNode(int node, bool banchor)
+{
+	m_nodeData[node].banchor = banchor;
+}
+
+//-----------------------------------------------------------------------------
+vec3d FEDeformableSpringDomain2::NodalForce(int node)
+{
+	int NN = Nodes();
+	if ((node <= 0) || (node >= NN -1)) return vec3d(0,0,0);
+
+	vec3d r = Node(node).m_rt;
+	vec3d rm = Node(node-1).m_rt;
+	vec3d rp = Node(node+1).m_rt;
+
+	double F = SpringForce();
+
+	vec3d A = rm - r; A.unit(); A *= F;
+	vec3d B = rp - r; B.unit(); B *= F;
+
+	vec3d D = A + B;
+
+	return D;
+}
+
+//-----------------------------------------------------------------------------
+//! get net spring force
+double FEDeformableSpringDomain2::SpringForce()
+{
+	return m_pMat->force(m_Lt - m_L0);
+}
+
+//-----------------------------------------------------------------------------
+//! tangent
+vec3d FEDeformableSpringDomain2::Tangent(int node)
+{
+	int NN = Nodes();
+	if (NN < 2) return vec3d(0,0,0);
+	if (node == 0)
+	{
+		vec3d t = Node(node+1).m_rt - Node(node).m_r0;
+		t.unit();
+		return t;
+	}
+	else if (node == NN-1)
+	{
+		vec3d t = Node(node).m_rt - Node(node - 1).m_r0;
+		t.unit();
+		return t;
+	}
+	else
+	{
+		vec3d t = Node(node + 1).m_rt - Node(node - 1).m_rt;
+		t.unit();
+		return t;
+	}
+}

@@ -196,6 +196,9 @@ void FEBioDiscreteSection::ParseDiscreteSection25(XMLTag& tag)
 			FEDiscreteSet* pset = mesh.FindDiscreteSet(szset);
 			if (pset == 0) throw XMLReader::InvalidAttributeValue(tag, "discrete_set", szset);
 
+			// set the name of the domain
+			pd->SetName(szset);
+
 			// build the springs
 			int N = pset->size();
 			for (int i=0; i<N; ++i)

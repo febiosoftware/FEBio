@@ -348,6 +348,7 @@ REGISTER_FECORE_CLASS(FEElasticShellDomain       , FEDOMAIN_ID, "elastic-shell" 
 REGISTER_FECORE_CLASS(FEElasticTrussDomain       , FEDOMAIN_ID, "elastic-truss"     );
 REGISTER_FECORE_CLASS(FEDiscreteSpringDomain     , FEDOMAIN_ID, "discrete-spring"   );
 REGISTER_FECORE_CLASS(FEDeformableSpringDomain   , FEDOMAIN_ID, "deformable-spring" );
+REGISTER_FECORE_CLASS(FEDeformableSpringDomain2  , FEDOMAIN_ID, "deformable-spring2");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEBoundaryCondition
@@ -381,6 +382,7 @@ REGISTER_FECORE_CLASS(FERigidAngularDamper   , FENLCONSTRAINT_ID, "rigid angular
 REGISTER_FECORE_CLASS(FERigidContractileForce, FENLCONSTRAINT_ID, "rigid contractile force");
 REGISTER_FECORE_CLASS(FEVolumeConstraint     , FENLCONSTRAINT_ID, "volume"                 );
 REGISTER_FECORE_CLASS(FEDiscreteContact      , FENLCONSTRAINT_ID, "discrete contact"       );
+REGISTER_FECORE_CLASS(FEDiscreteContact2     , FENLCONSTRAINT_ID, "discrete contact2"      );
 REGISTER_FECORE_CLASS(FEDistanceConstraint   , FENLCONSTRAINT_ID, "node distance"          );
 REGISTER_FECORE_CLASS(FE2OMicroConstraint    , FENLCONSTRAINT_ID, "2O microfluc"           );
 
