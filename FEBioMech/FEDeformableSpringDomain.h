@@ -23,6 +23,8 @@ public:
 	void Activate();
 
 public: // overridden from FEElasticDomain
+	//! build the matrix profile
+	void BuildMatrixProfile(FEGlobalMatrix& K);
 
 	//! calculate stiffness matrix
 	void StiffnessMatrix(FESolver* psolver);

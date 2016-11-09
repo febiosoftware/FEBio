@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEDeformableSpringDomain.h"
 #include <FECore/FEModel.h>
+#include <FECore/FEGlobalMatrix.h>
 
 BEGIN_PARAMETER_LIST(FEDeformableSpringDomain, FEDiscreteDomain)
 	ADD_PARAMETER(m_kbend, FE_PARAM_DOUBLE, "k_bend");
@@ -20,6 +21,34 @@ void FEDeformableSpringDomain::SetMaterial(FEMaterial* pmat)
 {
 	m_pMat = dynamic_cast<FESpringMaterial*>(pmat);
 	assert(m_pMat);
+}
+
+//-----------------------------------------------------------------------------
+void FEDeformableSpringDomain::BuildMatrixProfile(FEGlobalMatrix& K)
+{
+	// we connect each node to its two neighbors
+	int NN = Nodes();
+	for (int i=1; i<NN-1; ++i)
+	{
+		vector<int> lm(3*6, -1);
+		for (int j=0; j<3; ++j)
+		{
+			int n = i-1+j;
+			vector<int>& id = Node(n).m_ID;
+
+			// first the displacement dofs
+			lm[6 * j    ] = id[m_dofX];
+			lm[6 * j + 1] = id[m_dofY];
+			lm[6 * j + 2] = id[m_dofZ];
+
+			// rigid rotational dofs
+			lm[6 * j + 3] = id[m_dofRU];
+			lm[6 * j + 4] = id[m_dofRV];
+			lm[6 * j + 5] = id[m_dofRW];
+		}
+
+		K.build_add(lm);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -175,7 +204,7 @@ void FEDeformableSpringDomain::InternalForces(FEGlobalVector& R)
 
 	if (m_kbend > 0)
 	{
-		double eps = m_kbend;
+/*		double eps = m_kbend;
 		lm.resize(3);
 		en.resize(1);
 		fe.resize(3);
@@ -203,6 +232,34 @@ void FEDeformableSpringDomain::InternalForces(FEGlobalVector& R)
 			lm[2] = Node(i).m_ID[m_dofZ];
 			R.Assemble(en, lm, fe);
 		}
+*/
+		double eps = m_kbend;
+		lm.resize(3);
+		en.resize(1);
+		fe.resize(3);
+		int NN = Nodes();
+		for (int i = 1; i<NN - 1; ++i)
+		{
+			int i0 = i - 1;
+			int i1 = i + 1;
+
+			vec3d xi = Node(i).m_rt;
+			vec3d x0 = Node(i0).m_rt;
+			vec3d x1 = Node(i1).m_rt;
+
+			vec3d d = xi - (x0 + x1)*0.5;
+
+			fe[0] = -eps*d.x;
+			fe[1] = -eps*d.y;
+			fe[2] = -eps*d.z;
+
+			en[0] = m_Node[i];
+			lm[0] = Node(i).m_ID[m_dofX];
+			lm[1] = Node(i).m_ID[m_dofY];
+			lm[2] = Node(i).m_ID[m_dofZ];
+			R.Assemble(en, lm, fe);
+		}
+
 	}
 
 	if (m_kstab > 0)
@@ -342,23 +399,11 @@ void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
 			int i0 = i - 1;
 			int i1 = i + 1;
 
-			vec3d xi = Node(i).m_rt;
-			vec3d x0 = Node(i0).m_rt;
-			vec3d x1 = Node(i1).m_rt;
-
-			vec3d r = xi - x0*0.5 - x1*0.5;
-			vec3d s = x1 - x0;
-			double L = s.unit();
-			double c = (r*s)*(-eps / L);
-
-			mat3ds SxS = dyad(s);
-			mat3ds K = (mat3dd(1.0) - SxS)*(eps);
-
 			ke.resize(3, 9);
 			ke.zero();
-			ke[0][0] = eps; ke[0][3] = -0.5*eps; ke[0][6] = -0.5*eps;
-			ke[1][1] = eps; ke[1][4] = -0.5*eps; ke[1][7] = -0.5*eps;
-			ke[2][2] = eps; ke[2][5] = -0.5*eps; ke[2][8] = -0.5*eps;
+			ke[0][0] = -eps; ke[0][3] = 0.5*eps; ke[0][6] = 0.5*eps;
+			ke[1][1] = -eps; ke[1][4] = 0.5*eps; ke[1][7] = 0.5*eps;
+			ke[2][2] = -eps; ke[2][5] = 0.5*eps; ke[2][8] = 0.5*eps;
 
 			vector<int>& IDi = Node(i).m_ID;
 			vector<int>& ID0 = Node(i0).m_ID;
