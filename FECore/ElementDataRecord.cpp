@@ -4,6 +4,12 @@
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
+ElementDataRecord::ElementDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile)
+{
+	m_offset = 0;
+}
+
+//-----------------------------------------------------------------------------
 void ElementDataRecord::Parse(const char *szexpr)
 {
 	char szcopy[MAX_STRING] = {0};
@@ -31,13 +37,18 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 
 	// find the element
 	FEMesh& mesh = m_pfem->GetMesh();
-	assert((item >= 1) && (item <= mesh.Elements()));
-	ELEMREF e = m_ELT[item-1];
-	assert((e.ndom != -1) && (e.nid != -1));
-	FEElement* pe = &mesh.Domain(e.ndom).ElementRef(e.nid); assert(pe);
+	int index = item - m_offset;
+	if ((index >= 0) && (index < m_ELT.size()))
+	{
+		ELEMREF& e = m_ELT[index];
+		assert((e.ndom != -1) && (e.nid != -1));
+		FEElement* pe = &mesh.Domain(e.ndom).ElementRef(e.nid); assert(pe);
+		assert(pe->GetID() == item);
 
-	// get the element value
-	return m_Data[ndata]->value(*pe);
+		// get the element value
+		return m_Data[ndata]->value(*pe);
+	}
+	else return 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -45,24 +56,44 @@ void ElementDataRecord::BuildELT()
 {
 	m_ELT.clear();
 	FEMesh& m = m_pfem->GetMesh();
-	int NE = m.Elements();
-	m_ELT.resize(NE);
-	for (int i=0; i<NE; ++i) 
+
+	// find the min, max ID
+	int minID = -1, maxID = 0;
+	for (int i = 0; i<m.Domains(); ++i)
+	{
+		FEDomain& dom = m.Domain(i);
+		int NE = dom.Elements();
+		for (int j = 0; j<NE; ++j)
+		{
+			FEElement& el = dom.ElementRef(j);
+			int id = el.GetID(); assert(id > 0);
+
+			if ((minID < 0) || (id < minID)) minID = id;
+			if (id > maxID) maxID = id;
+		}
+	}
+
+	// allocate lookup table
+	int nsize = maxID - minID + 1;
+	m_ELT.resize(nsize);
+	for (int i=0; i<nsize; ++i) 
 	{
 		m_ELT[i].ndom = -1;
 		m_ELT[i].nid  = -1;
 	}
 
-	int n = 0;
+	// build lookup table
+	m_offset = minID;
 	for (int i=0; i<m.Domains(); ++i)
 	{
 		FEDomain& d = m.Domain(i);
 		int ne = d.Elements();
-		for (int j=0; j<ne; ++j, ++n)
+		for (int j=0; j<ne; ++j)
 		{
 			FEElement& el = d.ElementRef(j);
-			m_ELT[n].ndom = i;
-			m_ELT[n].nid  = j;
+			int id = el.GetID() - minID;
+			m_ELT[id].ndom = i;
+			m_ELT[id].nid  = j;
 		}
 	}
 }
@@ -73,7 +104,17 @@ void ElementDataRecord::SelectAllItems()
 	FEMesh& m = m_pfem->GetMesh();
 	int n = m.Elements();
 	m_item.resize(n);
-	for (int i=0; i<n; ++i) m_item[i] = i+1;
+	n = 0;
+	for (int i=0; i<m.Domains(); ++i)
+	{
+		FEDomain& dom = m.Domain(i);
+		int NE = dom.Elements();
+		for (int j=0; j<NE; ++j, n++)
+		{
+			FEElement& el = dom.ElementRef(j);
+			m_item[n] = el.GetID();
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

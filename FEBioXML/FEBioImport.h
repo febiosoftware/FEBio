@@ -190,9 +190,26 @@ public:
 		FENodeSet*	pslave;
 	};
 
+	//-------------------------------------------------------------------------
+	class Part
+	{
+	public:
+		Part();
+
+		void SetName(const string& name);
+
+		const string& Name();
+
+	private:
+		string	m_name;
+	};
+
 public:
 	//! constructor
 	FEBioImport();
+
+	//! destructor
+	~FEBioImport();
 
 	//! Load the model data from file.
 	bool Load(FEModel& fem, const char* szfile);
@@ -291,6 +308,8 @@ public:
 	void AddNodeSetPair(NodeSetPair& p) { m_nsetPair.push_back(p); }
 	NodeSetPair* FindNodeSetPair(const char* szname);
 
+	Part* CreatePart(const string& name);
+
 public:
 	char	m_szmod[256];	//!< module type string
 	int		m_nsteps;		//!< nr of step sections read
@@ -328,6 +347,7 @@ protected:
 	int			m_node_off;		//!< node offset (i.e. lowest node ID)
 	vector<int>	m_node_list;	//!< map node ID's to their nodes.
 
+	vector<Part*>		m_part;			//!< list of parts
 	vector<SurfacePair>	m_surfacePair;
 	vector<NodeSetPair>	m_nsetPair;
 

@@ -208,7 +208,7 @@ public:
 	void Close();
 
 	//! Find a tag
-	bool FindTag(const char* sztag, XMLTag& tag);
+	bool FindTag(const char* xpath, XMLTag& tag);
 
 	//! Get the next tag
 	void NextTag(XMLTag& tag);

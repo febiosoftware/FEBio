@@ -166,6 +166,33 @@ FEBioImport::PlotVariable::PlotVariable(const char* szvar, vector<int>& item, co
     strcpy(m_szdom, szdom);
 }
 
+//=============================================================================
+FEBioImport::Part::Part()
+{
+}
+
+void FEBioImport::Part::SetName(const string& name)
+{
+	m_name = name;
+}
+
+const string& FEBioImport::Part::Name()
+{
+	return m_name;
+}
+
+FEBioImport::Part* FEBioImport::CreatePart(const string& name)
+{
+	Part* part = new Part;
+	part->SetName(name);
+	m_part.push_back(part);
+	return part;
+}
+
+//=============================================================================
+//  The FEBioImport class imports an XML formatted FEBio input file.
+//  The actual file is parsed using the XMLReader class.
+//
 //-----------------------------------------------------------------------------
 void FEBioImport::ClearParams()
 {
@@ -336,10 +363,15 @@ FEBioImport::FEBioImport()
 	m_map["MeshData"] = new FEBioMeshDataSection(this);
 }
 
-//=============================================================================
-//  The FEBioImport class imports an XML formatted FEBio input file.
-//  The actual file is parsed using the XMLReader class.
-//
+//-----------------------------------------------------------------------------
+FEBioImport::~FEBioImport()
+{
+	// clear parts
+	for (size_t i=0; i<m_part.size(); ++i) delete m_part[i];
+	m_part.clear();
+}
+
+//-----------------------------------------------------------------------------
 bool FEBioImport::Load(FEModel& fem, const char* szfile)
 {
 	// keep a pointer to the fem object

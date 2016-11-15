@@ -17,57 +17,11 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 	m_pim->m_maxid = 0;
 	int nversion = m_pim->Version();
 
-	if (nversion < 0x0200)
-	{
-		++tag;
-		do
-		{
-			if      (tag == "Nodes"      ) ParseNodeSection       (tag);
-			else if (tag == "Elements"   ) ParseElementSection    (tag);
-			else if (tag == "ElementData") ParseElementDataSection(tag);
-			else throw XMLReader::InvalidTag(tag);
-			++tag;
-		}
-		while (!tag.isend());
-	}
-	else
-	{
-		++tag;
-		do
-		{
-			if      (tag == "Nodes"      ) ParseNodeSection       (tag);
-			else if (tag == "Elements"   ) ParseElementSection20  (tag);
-			else if (tag == "NodeSet"    ) ParseNodeSetSection    (tag);
-			else if (tag == "Surface"    ) ParseSurfaceSection    (tag);
-			else if (tag == "Edge"       ) ParseEdgeSection       (tag);
-			else if (tag == "ElementSet" ) ParseElementSetSection (tag);
-			else if (tag == "DiscreteSet") 
-			{
-				if (nversion >= 0x0205) ParseDiscreteSetSection(tag);
-				else throw XMLReader::InvalidTag(tag);
-			}
-			else if (tag == "SurfacePair")
-			{
-				if (nversion >= 0x0205) ParseSurfacePairSection(tag);
-				else throw XMLReader::InvalidTag(tag);
-			}
-			else if (tag == "NodeSetPair")
-			{
-				if (nversion >= 0x0205) ParseNodeSetPairSection(tag);
-				else throw XMLReader::InvalidTag(tag);
-			}
-			else if (tag == "ElementData")
-			{
-				// This section is no longer supported since 2.5 and replaced
-				// with the top level MeshData section.
-				if (nversion < 0x0205) ParseElementDataSection(tag);
-				else throw XMLReader::InvalidTag(tag);
-			}
-			else throw XMLReader::InvalidTag(tag);
-			++tag;
-		}
-		while (!tag.isend());
-	}
+	// parse the Geometry section
+	if      (nversion  < 0x0200) Parse12(tag);
+	else if (nversion == 0x0200) Parse20(tag);
+	else if (nversion == 0x0205) Parse25(tag);
+	else throw FEBioImport::InvalidVersion();
 
 	// At this point the mesh is completely read in.
 	// Now we can allocate the degrees of freedom.
@@ -79,9 +33,112 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 	fem.GetMesh().SetDOFS(MAX_DOFS);
 }
 
+void FEBioGeometrySection::Parse12(XMLTag& tag)
+{
+	++tag;
+	do
+	{
+		if      (tag == "Nodes"      ) ParseNodeSection(tag);
+		else if (tag == "Elements"   ) ParseElementSection(tag);
+		else if (tag == "ElementData") ParseElementDataSection(tag);
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	} 
+	while (!tag.isend());
+}
+
+void FEBioGeometrySection::Parse20(XMLTag& tag)
+{
+	++tag;
+	do
+	{
+		if      (tag == "Nodes"      ) ParseNodeSection       (tag);
+		else if (tag == "Elements"   ) ParseElementSection20  (tag);
+		else if (tag == "NodeSet"    ) ParseNodeSetSection    (tag);
+		else if (tag == "Surface"    ) ParseSurfaceSection    (tag);
+		else if (tag == "Edge"       ) ParseEdgeSection       (tag);
+		else if (tag == "ElementSet" ) ParseElementSetSection (tag);
+		else if (tag == "ElementData") ParseElementDataSection(tag);
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+void FEBioGeometrySection::Parse25(XMLTag& tag)
+{
+	++tag;
+	do
+	{
+		if      (tag == "Nodes"      ) ParseNodeSection       (tag);
+		else if (tag == "Elements"   ) ParseElementSection20  (tag);
+		else if (tag == "NodeSet"    ) ParseNodeSetSection    (tag);
+		else if (tag == "Surface"    ) ParseSurfaceSection    (tag);
+		else if (tag == "Edge"       ) ParseEdgeSection       (tag);
+		else if (tag == "ElementSet" ) ParseElementSetSection (tag);
+		else if (tag == "DiscreteSet") ParseDiscreteSetSection(tag);
+		else if (tag == "SurfacePair") ParseSurfacePairSection(tag);
+		else if (tag == "NodeSetPair") ParseNodeSetPairSection(tag);
+		else if (tag == "Part"       ) ParsePartSection       (tag);
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
+{
+	// get the part name
+	const char* szname = tag.AttributeValue("name");
+
+	// Create a new part
+	FEBioImport::Part* part = m_pim->CreatePart(szname);
+
+	// see if the from attribute is defined
+	const char* szfrom = tag.AttributeValue("from", true);
+	if (szfrom)
+	{
+		// make sure this is an empty leaf
+		if (tag.isempty() == false) throw XMLReader::InvalidValue(tag);
+
+		// redirect input to another file
+		char xpath[256] = {0};
+		sprintf(xpath, "febio_spec/Geometry/Part[@name=%s]", szname);
+		XMLReader xml;
+		if (xml.Open(szfrom) == false) throw XMLReader::InvalidAttributeValue(tag, "from", szfrom);
+		XMLTag tag2;
+		if (xml.FindTag(xpath, tag2) == false) throw XMLReader::InvalidAttributeValue(tag, "from", szfrom);
+
+		// read the part
+		ParsePart(tag2, part);
+	}
+	else ParsePart(tag, part);
+}
+
+void FEBioGeometrySection::ParsePart(XMLTag& tag, FEBioImport::Part* part)
+{
+	// read the part's sections
+	++tag;
+	do
+	{
+		if      (tag == "Nodes"      ) ParseNodeSection       (tag, part);
+		else if (tag == "Elements"   ) ParseElementSection20  (tag, part);
+		else if (tag == "NodeSet"    ) ParseNodeSetSection    (tag, part);
+		else if (tag == "Surface"    ) ParseSurfaceSection    (tag, part);
+		else if (tag == "Edge"       ) ParseEdgeSection       (tag);
+		else if (tag == "ElementSet" ) ParseElementSetSection (tag);
+		else if (tag == "DiscreteSet") ParseDiscreteSetSection(tag);
+		else if (tag == "SurfacePair") ParseSurfacePairSection(tag);
+		else if (tag == "NodeSetPair") ParseNodeSetPairSection(tag);
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	} while (!tag.isend());
+}
+
 //-----------------------------------------------------------------------------
 //! Reads the Nodes section of the FEBio input file
-void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
+void FEBioGeometrySection::ParseNodeSection(XMLTag& tag, FEBioImport::Part* part)
 {
 	FEMesh& mesh = *m_pim->GetFEMesh();
 	int N0 = mesh.Nodes();
@@ -102,7 +159,17 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	if (szl)
 	{
 		ps = new FENodeSet(&mesh);
-		ps->SetName(szl);
+
+		// create a name
+		char szname[256] = {0};
+		if (part)
+		{
+			string partName = part->Name();
+			sprintf(szname, "%s.%s", partName.c_str(), szl);
+		}
+		else sprintf(szname, "%s", szl);
+
+		ps->SetName(szname);
 		ps->create(nodes);
 		mesh.AddNodeSet(ps);
 	}
@@ -133,7 +200,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 		++tag;
 	}
 
-	// If a node-set is defined add these nodes to the node-set
+	// If a node set is defined add these nodes to the node-set
 	if (ps)
 	{
 		for (int i=0; i<nodes; ++i) (*ps)[i] = N0+i;
@@ -375,7 +442,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 //! by the module (structural, poro, heat, etc), the element type (solid, shell,
 //! etc.) and the material. 
 //!
-void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
+void FEBioGeometrySection::ParseElementSection20(XMLTag& tag, FEBioImport::Part* part)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -384,19 +451,36 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 
 	// get the material ID
 	const char* szmat = tag.AttributeValue("mat");
-	int nmat = atoi(szmat)-1;
-	if ((nmat < 0) || (nmat >= fem.Materials())) throw FEBioImport::InvalidDomainMaterial();
+
+	// as of 2.5, we allow materials to be referenced by name, so try this first
+	FEMaterial* pmat = fem.FindMaterial(szmat);
+	if (pmat == 0)
+	{
+		// if we didn't find the material we assume that the material tag uses an ID
+		int nmat = atoi(szmat) - 1;
+		if ((nmat < 0) || (nmat >= fem.Materials())) throw FEBioImport::InvalidDomainMaterial();
+	
+		// get the domain's material class
+		pmat = fem.GetMaterial(nmat);
+	}
 
 	// get the name
 	const char* szref = (m_pim->Version() >= 0x0205 ? "name" : "elset");
-	const char* szname = tag.AttributeValue(szref, true);
+	const char* sztag = tag.AttributeValue(szref, true);
+
+	// prepend part name
+	char szname[256] = {0};
+	if (sztag && part)
+	{
+		// create a name
+		string partName = part->Name();
+		sprintf(szname, "%s.%s", partName.c_str(), sztag);
+	}
+	else sprintf(szname, "%s", sztag);
 
 	// get the element type
 	const char* sztype = tag.AttributeValue("type");
 	FE_Element_Spec espec = ElementSpec(sztype);
-
-	// get the domain's material class
-	FEMaterial* pmat = fem.GetMaterial(nmat);
 
 	// create the new domain
 	FEDomain* pdom = CreateDomain(espec, &mesh, pmat);
@@ -410,13 +494,13 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 
 	// add domain it to the mesh
 	pdom->Create(elems, espec.etype);
-	pdom->SetMatID(nmat);
+	pdom->SetMatID(pmat->GetID());
 	mesh.AddDomain(pdom);
 	int nd = NDOM;
 
 	// for named domains, we'll also create an element set
 	FEElementSet* pg = 0;
-	if (szname)
+	if (sztag)
 	{
 		pg = new FEElementSet(&mesh);
 		pg->SetName(szname);
@@ -767,7 +851,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 //-----------------------------------------------------------------------------
 //! Reads the Geometry::Groups section of the FEBio input file
 
-void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
+void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag, FEBioImport::Part* part)
 {
 	int nversion = m_pim->Version();
 	const char* szatt = (nversion < 0x0205 ? "set" : "node_set");
@@ -775,6 +859,18 @@ void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 	// read the node set
 	FENodeSet* pns = m_pim->ParseNodeSet(tag, szatt);
 	if (pns == 0) throw XMLReader::InvalidTag(tag);
+
+	// prepend part name
+	if (part)
+	{
+		const char* szset = pns->GetName();
+
+		// create a name
+		char szname[256] = {0};
+		string partName = part->Name();
+		sprintf(szname, "%s.%s", partName.c_str(), szset);
+		pns->SetName(szname);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -923,7 +1019,7 @@ void FEBioGeometrySection::ParseNodeSetPairSection(XMLTag& tag)
 
 //-----------------------------------------------------------------------------
 //! Reads a Geometry\Surface section.
-void FEBioGeometrySection::ParseSurfaceSection(XMLTag& tag)
+void FEBioGeometrySection::ParseSurfaceSection(XMLTag& tag, FEBioImport::Part* part)
 {
 	// get the mesh
 	FEMesh& mesh = *m_pim->GetFEMesh();
@@ -933,7 +1029,17 @@ void FEBioGeometrySection::ParseSurfaceSection(XMLTag& tag)
 	int NN = mesh.Nodes();
 
 	// get the required name attribute
-	const char* szname = tag.AttributeValue("name");
+	const char* sztag = tag.AttributeValue("name");
+
+	// prepend part name
+	char szname[256] = { 0 };
+	if (sztag && part)
+	{
+		// create a name
+		string partName = part->Name();
+		sprintf(szname, "%s.%s", partName.c_str(), sztag);
+	}
+	else sprintf(szname, "%s", sztag);
 
 	// count nr of faces
 	int faces = tag.children();

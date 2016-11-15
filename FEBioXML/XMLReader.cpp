@@ -386,7 +386,117 @@ bool XMLReader::Open(const char* szfile)
 }
 
 //-----------------------------------------------------------------------------
-bool XMLReader::FindTag(const char* sztag, XMLTag& tag)
+
+class XMLPath
+{
+	struct TAG
+	{
+		char*	tag;
+		char*	att;
+		char*	atv;
+	};
+
+public:
+	XMLPath(const char* xpath)
+	{
+		int l = strlen(xpath);
+		m_path = new char[l+1];
+		strncpy(m_path, xpath, l);
+		m_path[l] = 0;
+		m_index = 0;
+		parse();
+	}
+
+	~XMLPath()
+	{
+		delete [] m_path;
+	}
+
+	void next() { m_index++; }
+
+	bool match(XMLTag& tag)
+	{
+		// make sure index is valid
+		if ((m_index < 0) || (m_index >= (int) m_tag.size())) return false;
+
+		// get current tag
+		TAG& t = m_tag[m_index];
+
+		// do tag name compare?
+		if (strcmp(t.tag, tag.m_sztag) != 0) return false;
+
+		// if tag requires attribute, make sure it exist
+		if (t.att)
+		{
+			const char* szatt = tag.AttributeValue(t.att, true);
+			if (szatt)
+			{
+				// if the value is specified, make sure it matches too
+				if (t.atv)
+				{
+					if (strcmp(t.atv, szatt) == 0) return true;
+					else return false;
+				}
+				else return false;
+			}
+			else return false;
+		}
+		else return true;
+	}
+
+	bool valid() { return ((m_index >= 0) && (m_index < m_tag.size())); }
+
+private:
+	void parse()
+	{
+		char* sz = m_path;
+		char* ch = strchr(m_path, '/');
+		do
+		{
+			TAG tag;
+			tag.tag = sz;
+			tag.att = 0;
+			tag.atv = 0;
+
+			if (ch) *ch = 0;
+			if (sz)
+			{
+				char* cl = strchr(sz, '[');
+				if (cl)
+				{
+					char* cr = strchr(cl+1, ']');
+					if (cr) 
+					{
+						*cl++ = 0;
+						if (cl[0]=='@') cl++;
+						tag.att = cl;
+
+						*cr = 0;
+						cr = strchr(cl, '=');
+						if (cr)
+						{
+							*cr++ = 0;
+							tag.atv = cr;
+						}
+					}
+				}
+			}
+
+			sz = (ch ? ch + 1 : 0);
+			if (ch) ch = strchr(sz, '/');
+
+			m_tag.push_back(tag);
+		}
+		while (sz);
+	}
+
+private:
+	char*	m_path;
+	vector<TAG>	m_tag;
+	int			m_index;
+};
+
+bool XMLReader::FindTag(const char* xpath, XMLTag& tag)
 {
 	// go to the beginning of the file
 	fseek(m_fp, 0, SEEK_SET);
@@ -397,16 +507,30 @@ bool XMLReader::FindTag(const char* sztag, XMLTag& tag)
 	fgetpos(m_fp, &m_currentPos);
 	tag.m_fpos = m_currentPos;
 
+	XMLPath path(xpath);
+
 	// find the correct tag
+	bool bfound = false;
 	try
 	{
-		bool bfound = false;
+		// get the next tag
+		NextTag(tag);
 		do
 		{
-			NextTag(tag);
-			if (strcmp(sztag, tag.m_sztag) == 0) bfound = true;
+			// check for match
+			if (path.match(tag))
+			{
+				path.next();
+				if (path.valid()) NextTag(tag);
+				bfound = true;
+			}
+			else
+			{
+				SkipTag(tag);
+				bfound = false;
+			}
 		}
-		while (!bfound);
+		while (path.valid());
 	}
 	catch (...)
 	{
@@ -414,7 +538,7 @@ bool XMLReader::FindTag(const char* sztag, XMLTag& tag)
 		return false;
 	}
 
-	return true;
+	return bfound;
 }
 
 //-----------------------------------------------------------------------------

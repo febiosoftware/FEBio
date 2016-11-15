@@ -233,6 +233,7 @@ FEMaterial* FEModel::FindMaterial(int nid)
 //-----------------------------------------------------------------------------
 FEMaterial* FEModel::FindMaterial(const char* sz)
 {
+	if (sz == 0) return 0;
 	for (int i=0; i<(int)m_MAT.size(); ++i)
 	{
 		FEMaterial* pm = m_MAT[i];
@@ -245,7 +246,8 @@ FEMaterial* FEModel::FindMaterial(const char* sz)
 //-----------------------------------------------------------------------------
 FESurfaceLoad* FEModel::FindSurfaceLoad(const char* sz)
 {
-	for (int i=0; i<(int)m_SL.size(); ++i)
+	if (sz == 0) return 0;
+	for (int i = 0; i<(int)m_SL.size(); ++i)
 	{
 		FESurfaceLoad* pl = m_SL[i];
 		const char* szname = pl->GetName();

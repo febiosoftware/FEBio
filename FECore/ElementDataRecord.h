@@ -27,7 +27,7 @@ class ElementDataRecord : public DataRecord
 	};
 
 public:
-	ElementDataRecord(FEModel* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
+	ElementDataRecord(FEModel* pfem, const char* szfile);
 	double Evaluate(int item, int ndata);
 	void Parse(const char* sz);
 	void SelectAllItems();
@@ -39,5 +39,6 @@ protected:
 
 protected:
 	vector<ELEMREF>	m_ELT;
+	int				m_offset;
 	vector<FELogElemData*>	m_Data;
 };
