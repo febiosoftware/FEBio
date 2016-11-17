@@ -130,6 +130,12 @@ FEBioImport::DataGeneratorError::DataGeneratorError()
 }
 
 //-----------------------------------------------------------------------------
+FEBioImport::FailedBuildingPart::FailedBuildingPart(const std::string& partName)
+{
+	SetErrorString("Failed building part %s", partName.c_str());
+}
+
+//-----------------------------------------------------------------------------
 FEModel* FEBioFileSection::GetFEModel() { return m_pim->GetFEModel(); }
 FEAnalysis* FEBioFileSection::GetStep() { return m_pim->GetStep(); }
 
@@ -164,29 +170,6 @@ FEBioImport::PlotVariable::PlotVariable(const char* szvar, vector<int>& item, co
     strcpy(m_szvar, szvar);
     m_item = item;
     strcpy(m_szdom, szdom);
-}
-
-//=============================================================================
-FEBioImport::Part::Part()
-{
-}
-
-void FEBioImport::Part::SetName(const string& name)
-{
-	m_name = name;
-}
-
-const string& FEBioImport::Part::Name()
-{
-	return m_name;
-}
-
-FEBioImport::Part* FEBioImport::CreatePart(const string& name)
-{
-	Part* part = new Part;
-	part->SetName(name);
-	m_part.push_back(part);
-	return part;
 }
 
 //=============================================================================
@@ -366,9 +349,6 @@ FEBioImport::FEBioImport()
 //-----------------------------------------------------------------------------
 FEBioImport::~FEBioImport()
 {
-	// clear parts
-	for (size_t i=0; i<m_part.size(); ++i) delete m_part[i];
-	m_part.clear();
 }
 
 //-----------------------------------------------------------------------------

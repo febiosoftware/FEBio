@@ -172,6 +172,8 @@ public:
 
 	void add(int n);
 
+	void add(const vector<int>& ns);
+
 	void add(const FENodeSet& ns);
 
 	int size() const { return (int) m_Node.size(); }

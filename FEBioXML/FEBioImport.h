@@ -149,6 +149,13 @@ public:
 		DataGeneratorError();
 	};
 
+	//! failed building a part
+	class FailedBuildingPart : public Exception
+	{
+	public:
+		FailedBuildingPart(const std::string& partName);
+	};
+
 public:
 	//-------------------------------------------------------------------------
 	class PlotVariable
@@ -188,20 +195,6 @@ public:
 		char		szname[256];
 		FENodeSet*	pmaster;
 		FENodeSet*	pslave;
-	};
-
-	//-------------------------------------------------------------------------
-	class Part
-	{
-	public:
-		Part();
-
-		void SetName(const string& name);
-
-		const string& Name();
-
-	private:
-		string	m_name;
 	};
 
 public:
@@ -308,8 +301,6 @@ public:
 	void AddNodeSetPair(NodeSetPair& p) { m_nsetPair.push_back(p); }
 	NodeSetPair* FindNodeSetPair(const char* szname);
 
-	Part* CreatePart(const string& name);
-
 public:
 	char	m_szmod[256];	//!< module type string
 	int		m_nsteps;		//!< nr of step sections read
@@ -347,7 +338,6 @@ protected:
 	int			m_node_off;		//!< node offset (i.e. lowest node ID)
 	vector<int>	m_node_list;	//!< map node ID's to their nodes.
 
-	vector<Part*>		m_part;			//!< list of parts
 	vector<SurfacePair>	m_surfacePair;
 	vector<NodeSetPair>	m_nsetPair;
 
