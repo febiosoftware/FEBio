@@ -287,6 +287,11 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 		else if (strcmp(szbc, "vyz" ) == 0) { bc.push_back(dof_VY); bc.push_back(dof_VZ); }
 		else if (strcmp(szbc, "vxz" ) == 0) { bc.push_back(dof_VX); bc.push_back(dof_VZ); }
 		else if (strcmp(szbc, "vxyz") == 0) { bc.push_back(dof_VX); bc.push_back(dof_VY); bc.push_back(dof_VZ); }
+		else if (strcmp(szbc, "xyzuvw") == 0)
+		{
+			bc.push_back(dof_X); bc.push_back(dof_Y); bc.push_back(dof_Z);
+			bc.push_back(dof_U); bc.push_back(dof_V); bc.push_back(dof_W);
+		}
 		else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 	}
 
