@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <FECore/FEElement.h>
+#include <FECore/FETransform.h>
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -177,7 +178,7 @@ public:
 
 	Part* FindPart(const string& name);
 
-	bool BuildPart(FEModel& fem, Part& part, const vec3d& pos = vec3d(0,0,0));
+	bool BuildPart(FEModel& fem, Part& part, const FETransform& T = FETransform());
 
 private:
 	std::vector<Part*>	m_Part;

@@ -181,7 +181,7 @@ void FEBioGeometrySection::ParseInstanceSection(XMLTag& tag)
 	newPart->SetName(szname);
 
 	// parse any child tags
-	vec3d pos(0,0,0);
+	FETransform transform;
 	if (tag.isleaf() == false)
 	{
 		++tag;
@@ -191,7 +191,29 @@ void FEBioGeometrySection::ParseInstanceSection(XMLTag& tag)
 			{
 				double r[3];
 				tag.value(r, 3);
-				pos = vec3d(r[0], r[1], r[2]);
+				transform.SetTranslation(vec3d(r[0], r[1], r[2]));
+			}
+			else if (tag == "rotate")
+			{
+				double a[3], b[3]; double w;
+				++tag;
+				do
+				{
+					if (tag == "a") tag.value(a, 3);
+					else if (tag == "b") tag.value(b, 3);
+					else if (tag == "angle") tag.value(w);
+					else throw XMLReader::InvalidTag(tag);
+					++tag;
+				}
+				while (!tag.isend());
+
+				transform.SetRotation(vec3d(a[0], a[1], a[2]), vec3d(b[0], b[1], b[2]), w);
+			}
+			else if (tag == "scale")
+			{
+				double s[3];
+				tag.value(s, 3);
+				transform.SetScale(s[0], s[1], s[2]);
 			}
 			else if (tag == "Elements")
 			{
@@ -215,7 +237,7 @@ void FEBioGeometrySection::ParseInstanceSection(XMLTag& tag)
 	}
 
 	// build this part
-	if (m_feb.BuildPart(*GetFEModel(), *newPart, pos) == false) throw FEBioImport::FailedBuildingPart(newPart->Name());
+	if (m_feb.BuildPart(*GetFEModel(), *newPart, transform) == false) throw FEBioImport::FailedBuildingPart(newPart->Name());
 }
 
 //-----------------------------------------------------------------------------
