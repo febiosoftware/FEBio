@@ -126,6 +126,9 @@ public:
 	//! multiply with vector
 	void mult_vector(const vector<double>& x, vector<double>& r);
 
+	//! see if a matrix element is defined
+	bool check(int i, int j);
+
 protected:
 	bool m_brow_based;	//!< flag indicating whether the matrix is stored row-based on column-based
 };

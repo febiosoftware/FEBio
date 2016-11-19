@@ -21,6 +21,7 @@ SparseMatrixProfile::SparseMatrixProfile(int n)
 		for (int i=0; i<n; ++i)
 		{
 			vector<int>& a = m_prof[i];
+			a.reserve(10);
 			a.resize(2);
 			a[0] = i;
 			a[1] = i;
@@ -231,4 +232,178 @@ SparseMatrixProfile SparseMatrixProfile::GetBlockProfile(int nrow0, int ncol0, i
 	}
 
 	return bMP;
+}
+
+//-----------------------------------------------------------------------------
+// this sort function is defined in qsort.cpp
+void qsort(int n, int* arr, int* indx);
+
+//-----------------------------------------------------------------------------
+void SparseMatrixProfile::insertRowIndex(int ncol, vector<int>& row)
+{
+	const int M = (int) row.size();
+	if (M == 0) return;
+
+	// get the column data and its size
+	vector<int>& a = m_prof[ncol];
+	int N = (int)a.size();
+
+	// sort the rows
+	vector<int> P(M);
+	qsort(M, &row[0], &P[0]);
+
+	// loop over all indices
+	int n = 0;
+	for (int m=0; m<M; ++m)
+	{
+		// get the next row index
+		int nrow = row[P[m]];
+
+		// we only store upper triangular profile
+		if ((nrow >= 0) && (nrow < ncol))
+		{
+			bool bdone = false;
+			do
+			{
+				int n0 = a[n  ];	// start row
+				int n1 = a[n+1];	// end row
+				int n2 = (n<N-2? a[n+2] : -1);	// start row of next pair
+				assert(n1 >= n0);
+				assert((n2==-1)||(n2 > n1+1));
+
+				// see if the row is already inserted
+				if ((nrow < n0) || (nrow > n1))
+				{
+					// check for merge
+					if ((nrow == n1+1) && (nrow == n2-1))
+					{
+						// we must merge the two pairs
+						assert(n<N-2);
+						a[n + 1] = a[n+3];
+						a.erase(a.begin() + n+2, a.begin() + n + 4);
+						N -= 2;
+						bdone = true;
+					}
+					else if (nrow == n0 - 1)
+					{
+						// see if we can simply grow the interval
+						a[n] = nrow;
+						bdone = true;
+					}
+					else if (nrow == n1 + 1)
+					{
+						a[n+1] = nrow;
+						bdone = true;
+					}
+					else if (nrow < n0)
+					{
+						// see if we need to insert the row
+						N += 2;
+						a.resize(N);
+						for (int i=N-2; i>=n+2; i-=2)
+						{
+							a[i] = a[i-2];
+							a[i+1] = a[i-1];
+						}
+						a[n] = nrow;
+						a[n+1] = nrow;
+						bdone = true;
+					}
+					else n += 2;
+				}
+				else bdone = true;
+			}
+			while ((bdone == false)&&(n<N));
+
+			if (bdone == false)
+			{
+				a.push_back(nrow);
+				a.push_back(nrow);
+				N += 2;
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void SparseMatrixProfile::UpdateProfile2(vector< vector<int> >& LM, int M)
+{
+	int i, j, k, l, iel, n, *lm, N, Ntot = 0;
+
+	// get the nr of equations
+	int neq = m_prof.size();
+
+	// make sure there is work to do
+	if (neq == 0) return;
+
+	// Count the number of elements that contribute to a certain column
+	// The pval array stores this number (which I also call the valence
+	// of the column)
+	int* pval = new int[neq];
+	if (pval == 0) throw MemException(sizeof(int)*neq);
+
+	// initial column valences to zero
+	for (i = 0; i<neq; ++i) pval[i] = 0;
+
+	// fill the valence array
+	for (i = 0; i<M; ++i)
+	{
+		lm = &(LM[i])[0];
+		N = LM[i].size();
+		Ntot += N;
+		for (j = 0; j<N; ++j)
+		{
+			if (lm[j] >= 0) pval[lm[j]]++;
+		}
+	}
+
+	// create a "compact" 2D array that stores for each column the element
+	// numbers that contribute to that column. The compact array consists
+	// of two arrays. The first one (pelc) contains all element numbers, sorted
+	// by column. The second array stores for each column a pointer to the first
+	// element in the pelc array that contributes to that column.
+	int* pelc = new int[Ntot];
+	if (pelc == 0) throw MemException(sizeof(int)*Ntot);
+
+	int** ppelc = new int*[neq];
+	if (ppelc == 0) throw MemException(sizeof(int*)*neq);
+
+	// set the column pointers
+	ppelc[0] = pelc;
+	for (i = 1; i<neq; ++i) ppelc[i] = ppelc[i - 1] + pval[i - 1];
+
+	// fill the pelc array
+	for (i = 0; i<M; ++i)
+	{
+		lm = &(LM[i])[0];
+		N = LM[i].size();
+		for (j = 0; j<N; ++j)
+		{
+			if (lm[j] >= 0) *(ppelc[lm[j]])++ = i;
+		}
+	}
+
+	// reset pelc pointers
+	ppelc[0] = pelc;
+	for (i = 1; i<neq; ++i) ppelc[i] = ppelc[i - 1] + pval[i - 1];
+
+	// loop over all columns
+	int nold;
+	for (i = 0; i<neq; ++i)
+	{
+		if (pval[i] > 0)
+		{
+			for (j = 0; j<pval[i]; ++j)
+			{
+				iel = (ppelc[i])[j];
+				vector<int>& lm = LM[iel];
+				insertRowIndex(i, lm);
+			}
+		}
+	}
+
+	// cleanup temp data structures
+	delete[] ppelc;
+	delete[] pelc;
+	delete[] pval;
 }

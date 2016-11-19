@@ -24,7 +24,7 @@ class FEMesh;
 class FEGlobalMatrix
 {
 protected:
-	enum { MAX_LM_SIZE = 4096 };
+	enum { MAX_LM_SIZE = 32000 };
 
 public:
 	//! constructor

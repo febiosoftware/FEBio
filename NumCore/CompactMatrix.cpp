@@ -446,6 +446,8 @@ void CompactUnSymmMatrix::Create(SparseMatrixProfile& mp)
 //! into the global stiffness matrix which is in compact column storage and
 //! the matrix is unsymmetric
 //!
+
+/*
 void CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
 {
 	int i, j, I, J;
@@ -459,6 +461,76 @@ void CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
 			for (j=0; j<N; ++j)
 			{
 				if ((J = LM[j]) >= 0) add(I,J, ke[i][j]);
+			}
+		}
+	}
+}
+*/
+
+void CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
+{
+	// get the number of degrees of freedom
+	const int N = ke.rows();
+
+	// find the permutation array that sorts LM in ascending order
+	// we can use this to speed up the row search (i.e. loop over n below)
+	static vector<int> P; P.resize(N);
+	qsort(N, &LM[0], &P[0]);
+
+	// get the data pointers 
+	int* indices = Indices();
+	int* pointers = Pointers();
+	double* pd = Values();
+	int offset = Offset();
+
+	// find the starting index
+	int N0 = 0;
+	while ((N0<N) && (LM[P[N0]]<0)) ++N0;
+
+	// assemble element stiffness
+	if (m_brow_based)
+	{
+		for (int m = N0; m<N; ++m)
+		{
+			int j = P[m];
+			int J = LM[j];
+			int n = 0;
+			double* pm = pd + pointers[J] - offset;
+			int* pi = indices + pointers[J] - offset;
+			int l = pointers[J + 1] - pointers[J];
+			for (int k = N0; k<N; ++k)
+			{
+				int i = P[k];
+				int I = LM[i] + offset;
+				for (; n<l; ++n)
+				if (pi[n] == I)
+				{
+					pm[n] += ke[j][i];	// (i,j) is swapped since the matrix is row-based
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		for (int m = N0; m<N; ++m)
+		{
+			int j = P[m];
+			int J = LM[j];
+			int n = 0;
+			double* pm = pd + pointers[J] - offset;
+			int* pi = indices + pointers[J] - offset;
+			int l = pointers[J + 1] - pointers[J];
+			for (int k = N0; k<N; ++k)
+			{
+				int i = P[k];
+				int I = LM[i] + offset;
+				for (; n<l; ++n)
+				if (pi[n] == I)
+				{
+					pm[n] += ke[i][j];
+					break;
+				}
 			}
 		}
 	}
@@ -485,6 +557,7 @@ void CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LM
 }
 
 //-----------------------------------------------------------------------------
+/*
 void CompactUnSymmMatrix::add(int i, int j, double v)
 {
 	if (m_brow_based)
@@ -509,6 +582,49 @@ void CompactUnSymmMatrix::add(int i, int j, double v)
 	}
 	assert(false);
 }
+*/
+
+//-----------------------------------------------------------------------------
+// This algorithm uses a binary search for locating the correct row index
+// This assumes that the indices are ordered!
+void CompactUnSymmMatrix::add(int i, int j, double v)
+{
+	if (m_brow_based)
+	{
+		i ^= j; j ^= i; i ^= j;
+	}
+	assert((i >= 0) && (i<m_ndim));
+	assert((j >= 0) && (j<m_ndim));
+
+	int* pi = m_pindices + m_ppointers[j];
+	pi -= m_offset;
+	i += m_offset;
+	double* pd = m_pd + (m_ppointers[j] - m_offset);
+	int n1 = m_ppointers[j + 1] - m_ppointers[j] - 1;
+	int n0 = 0;
+	int n = n1 / 2;
+	do
+	{
+		int m = pi[n];
+		if (m == i)
+		{
+			pd[n] += v;
+			return;
+		}
+		else if (m < i)
+		{
+			n0 = n;
+			n = (n0 + n1 + 1) >> 1;
+		}
+		else
+		{
+			n1 = n;
+			n = (n0 + n1) >> 1;
+		}
+	} while (n0 != n1);
+	assert(false);
+}
+
 
 //-----------------------------------------------------------------------------
 void CompactUnSymmMatrix::set(int i, int j, double v)
@@ -546,6 +662,23 @@ double CompactUnSymmMatrix::get(int i, int j)
 		if (pi[n] == i + m_offset) return m_pd[ m_ppointers[j] + n - m_offset ];
 	}
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+bool CompactUnSymmMatrix::check(int i, int j)
+{
+	if (m_brow_based)
+	{
+		i ^= j; j ^= i; i ^= j;
+	}
+	int* pi = m_pindices + m_ppointers[j];
+	pi -= m_offset;
+	int l = m_ppointers[j + 1] - m_ppointers[j];
+	for (int n = 0; n<l; ++n)
+	{
+		if (pi[n] == i + m_offset) return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------

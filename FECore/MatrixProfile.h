@@ -53,12 +53,16 @@ public:
 
 	//! updates the profile for an array of elements
 	void UpdateProfile(vector< vector<int> >& LM, int N);
+	void UpdateProfile2(vector< vector<int> >& LM, int N);
 
 	//! returns the size of the profile. That is the nr of equations
 	int size() { return (int)m_prof.size(); }
 
 	//! returns the non-zero row indices (in condensed format) for a column
 	vector<int>& column(int i) { return m_prof[i]; }
+
+//protected:
+	void insertRowIndex(int ncol, vector<int>& row);
 
 public:
 	SparseMatrixProfile GetBlockProfile(int nrow0, int ncol0, int nrow1, int ncol1) const;
