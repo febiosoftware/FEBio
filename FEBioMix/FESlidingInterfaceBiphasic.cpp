@@ -192,20 +192,21 @@ double FESlidingSurfaceBiphasic::GetContactArea()
         {
             // get data for this integration point
             Data& data = m_Data[n][i];
-            double s = (data.m_Ln > 0) ? 1 : 0;
+			if (data.m_Ln > 0)
+			{
+	            // get the base vectors
+		        vec3d g[2];
+			    CoBaseVectors(el, i, g);
             
-            // get the base vectors
-            vec3d g[2];
-            CoBaseVectors(el, i, g);
+				// normal (magnitude = area)
+				vec3d n = g[0] ^ g[1];
             
-            // normal (magnitude = area)
-            vec3d n = g[0] ^ g[1];
+				// gauss weight
+				double w = el.GaussWeights()[i];
             
-            // gauss weight
-            double w = el.GaussWeights()[i];
-            
-            // contact force
-            a += n.norm()*(w*s);
+				// contact force
+				a += n.norm()*w;
+			}
         }
     }
     
