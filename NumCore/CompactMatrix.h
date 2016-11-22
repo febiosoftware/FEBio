@@ -42,6 +42,9 @@ public:
 	//! Create the matrix
 	void alloc(int N, int nz, double* pv, int *pi, int* pp);
 
+	//! see if a matrix element is defined
+	virtual bool check(int i, int j) = 0;
+
 protected:
 	double*	m_pd;			//!< matrix values
 	int*	m_pindices;		//!< indices
@@ -87,6 +90,9 @@ public:
 
 	//! multiply with vector
 	void mult_vector(const double* x, double* r);
+
+	//! see if a matrix element is defined
+	bool check(int i, int j);
 };
 
 //=============================================================================

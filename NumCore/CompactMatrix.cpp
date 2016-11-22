@@ -277,6 +277,7 @@ void CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
 
 //-----------------------------------------------------------------------------
 //! add a matrix item
+/*
 void CompactSymmMatrix::add(int i, int j, double v)
 {
 
@@ -300,6 +301,74 @@ void CompactSymmMatrix::add(int i, int j, double v)
 		assert(false);
 	}
 }
+*/
+
+//-----------------------------------------------------------------------------
+//! add a matrix item
+void CompactSymmMatrix::add(int i, int j, double v)
+{
+	// only add to lower triangular part
+	// since FEBio only works with the upper triangular part
+	// we have to swap the indices
+	i ^= j; j ^= i; i ^= j;
+
+	if (j <= i)
+	{
+		double* pd = m_pd + (m_ppointers[j] - m_offset);
+		int* pi = m_pindices + m_ppointers[j];
+		pi -= m_offset;
+		i += m_offset;
+		int n1 = m_ppointers[j + 1] - m_ppointers[j] - 1;
+		int n0 = 0;
+		int n = n1 / 2;
+		do
+		{
+			int m = pi[n];
+			if (m == i)
+			{
+				pd[n] += v;
+				return;
+			}
+			else if (m < i)
+			{
+				n0 = n;
+				n = (n0 + n1 + 1) >> 1;
+			}
+			else
+			{
+				n1 = n;
+				n = (n0 + n1) >> 1;
+			}
+		} while (n0 != n1);
+
+		assert(false);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! check fo a matrix item
+bool CompactSymmMatrix::check(int i, int j)
+{
+	// only add to lower triangular part
+	// since FEBio only works with the upper triangular part
+	// we have to swap the indices
+	i ^= j; j ^= i; i ^= j;
+
+	if (j <= i)
+	{
+		int* pi = m_pindices + m_ppointers[j];
+		pi -= m_offset;
+		int l = m_ppointers[j + 1] - m_ppointers[j];
+		for (int n = 0; n<l; ++n)
+		if (pi[n] == i + m_offset)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 
 //-----------------------------------------------------------------------------
 //! set matrix item
