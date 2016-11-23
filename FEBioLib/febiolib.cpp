@@ -13,6 +13,10 @@
 #include "plugin.h"
 #include <map>
 
+#ifndef WIN32
+#include <dlfcn.h>
+#endif
+
 namespace febio {
 
 //-----------------------------------------------------------------------------
@@ -192,7 +196,12 @@ bool ImportPlugin(const char* szfile)
 	switch (nerr)
 	{
 	case 0: fprintf(stderr, "Success loading plugin %s (version %d.%d.%d)\n", sztitle, info.major, info.minor, info.patch); return true; break;
-	case 1: fprintf(stderr, "Failed loading plugin %s\n Reason: Failed to load the file.\n\n", szfile); break;
+	case 1:
+		fprintf(stderr, "Failed loading plugin %s\n Reason: Failed to load the file.\n\n", szfile); break;
+#ifndef WIN32
+		fprintf(stderr, "dlopen failed: %s\n\n", dlerror());
+#endif
+		break;
 	case 2: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginNumClasses not found.\n\n", szfile); break;
 	case 3: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginGetFactory not found.\n\n", szfile); break;
 	case 4: fprintf(stderr, "Failed loading plugin %s\n Reason: Invalid number of classes returned by PluginNumClasses.\n\n", szfile); break;

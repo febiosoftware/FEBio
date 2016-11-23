@@ -608,6 +608,7 @@
     <ClInclude Include="..\..\FECore\BC.h" />
     <ClInclude Include="..\..\FECore\BFGSSolver.h" />
     <ClInclude Include="..\..\FECore\BFGSSolver2.h" />
+    <ClInclude Include="..\..\FECore\Callback.h" />
     <ClInclude Include="..\..\FECore\DataRecord.h" />
     <ClInclude Include="..\..\FECore\DataStore.h" />
     <ClInclude Include="..\..\FECore\DOFS.h" />
@@ -635,6 +636,7 @@
     <ClInclude Include="..\..\FECore\fecore_debug_t.h" />
     <ClInclude Include="..\..\FECore\FEDataArray.h" />
     <ClInclude Include="..\..\FECore\FEDataExport.h" />
+    <ClInclude Include="..\..\FECore\FEDataGenerator.h" />
     <ClInclude Include="..\..\FECore\FEDataStream.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteMaterial.h" />
@@ -686,6 +688,7 @@
     <ClInclude Include="..\..\FECore\FESurfaceLoad.h" />
     <ClInclude Include="..\..\FECore\FESurfaceMap.h" />
     <ClInclude Include="..\..\FECore\FESurfacePairInteraction.h" />
+    <ClInclude Include="..\..\FECore\FETransform.h" />
     <ClInclude Include="..\..\FECore\FETrussDomain.h" />
     <ClInclude Include="..\..\FECore\FETypes.h" />
     <ClInclude Include="..\..\FECore\FE_enum.h" />
@@ -739,6 +742,7 @@
     <ClCompile Include="..\..\FECore\BC.cpp" />
     <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
     <ClCompile Include="..\..\FECore\BFGSSolver2.cpp" />
+    <ClCompile Include="..\..\FECore\Callback.cpp" />
     <ClCompile Include="..\..\FECore\colsol.cpp" />
     <ClCompile Include="..\..\FECore\DataRecord.cpp" />
     <ClCompile Include="..\..\FECore\DataStore.cpp" />
@@ -766,6 +770,7 @@
     <ClCompile Include="..\..\FECore\fecore_debug.cpp" />
     <ClCompile Include="..\..\FECore\FEDataArray.cpp" />
     <ClCompile Include="..\..\FECore\FEDataExport.cpp" />
+    <ClCompile Include="..\..\FECore\FEDataGenerator.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain.cpp" />
@@ -815,6 +820,7 @@
     <ClCompile Include="..\..\FECore\FESurfaceLoad.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceMap.cpp" />
     <ClCompile Include="..\..\FECore\FESurfacePairInteraction.cpp" />
+    <ClCompile Include="..\..\FECore\FETransform.cpp" />
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
     <ClCompile Include="..\..\FECore\Image.cpp" />
     <ClCompile Include="..\..\FECore\LinearSolver.cpp" />

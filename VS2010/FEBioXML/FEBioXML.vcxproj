@@ -615,6 +615,7 @@
     <ClCompile Include="..\..\FEBioXML\FEBioOutputSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioParametersSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioStepSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBModel.cpp" />
     <ClCompile Include="..\..\FEBioXML\FERestartImport.cpp" />
     <ClCompile Include="..\..\FEBioXML\FileImport.cpp" />
     <ClCompile Include="..\..\FEBioXML\XMLReader.cpp" />
@@ -639,6 +640,7 @@
     <ClInclude Include="..\..\FEBioXML\FEBioOutputSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioParametersSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioStepSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBModel.h" />
     <ClInclude Include="..\..\FEBioXML\FERestartImport.h" />
     <ClInclude Include="..\..\FEBioXML\FileImport.h" />
     <ClInclude Include="..\..\FEBioXML\stdafx.h" />
