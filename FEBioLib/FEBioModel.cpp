@@ -326,11 +326,23 @@ void FEBioModel::Write(unsigned int nwhen)
 				if (bdebug) bout = true;
 				else
 				{
+					int currentStep = pstep->m_ntimesteps;
+					int lastStep = pstep->m_ntime;
+					int nmin = pstep->m_nplotRange[0]; if (nmin < 0) nmin = lastStep + nmin + 1;
+					int nmax = pstep->m_nplotRange[1]; if (nmax < 0) nmax = lastStep + nmax + 1;
+
+					bool inRange = true;
+					if (pstep->m_bautostep == false)
+					{
+						inRange = false;
+						if ((currentStep >= nmin) && (currentStep <= nmax)) inRange = true;
+					}
+
 					switch (nwhen)
 					{
 					case CB_MINOR_ITERS: if (nplt == FE_PLOT_MINOR_ITRS   ) bout = true; break;
 					case CB_MAJOR_ITERS  : 
-						if ((nplt == FE_PLOT_MAJOR_ITRS ) && (pstep->m_ntimesteps % pstep->m_nplot_stride == 0)) bout = true; 
+						if ((nplt == FE_PLOT_MAJOR_ITRS ) && inRange && ((pstep->m_ntimesteps - nmin + 1) % pstep->m_nplot_stride == 0)) bout = true; 
 						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_nmust >= 0)) bout = true;
 						if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
 						break;

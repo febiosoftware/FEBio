@@ -128,6 +128,12 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 		if (n<=0) n = 1;
 		pstep->SetPlotStride(n);
 	}
+	else if (tag == "plot_range")
+	{
+		int n[2];
+		tag.value(n, 2);
+		pstep->SetPlotRange(n[0], n[1]);
+	}
 	else if (tag == "print_level")
 	{
 		char szval[256];

@@ -71,10 +71,13 @@ public:
 
 public:
 	//! sets the plot level
-	void SetPlotLevel(int n) { m_nplot = n; }
+	void SetPlotLevel(int n);
 
 	//! sets the plot stride
-	void SetPlotStride(int n) { m_nplot_stride = n; }
+	void SetPlotStride(int n);
+
+	//! sets the plot range
+	void SetPlotRange(int n0, int n1);
 
 	//! get the plot level
 	int GetPlotLevel() { return m_nplot; }
@@ -156,6 +159,7 @@ public:
 		int		m_nplot;		//!< plot level
 		int		m_noutput;		//!< data output level
 		int		m_nplot_stride;	//!< stride for plotting
+		int		m_nplotRange[2];	//!< plot range
 		int		m_ndump;		//!< create a restart file or not
 	//}
 

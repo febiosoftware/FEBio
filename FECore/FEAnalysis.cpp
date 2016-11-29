@@ -60,6 +60,8 @@ FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID)
 	m_nprint  = FE_PRINT_MINOR_ITRS;
 	m_noutput = FE_OUTPUT_MAJOR_ITRS;
 	m_nplot_stride = 1;
+	m_nplotRange[0] = 1;
+	m_nplotRange[1] = -1;
 
 	m_bactive = false;
 }
@@ -87,6 +89,22 @@ void FEAnalysis::AddModelComponent(FEModelComponent* pmc)
 int FEAnalysis::ModelComponents() const
 {
 	return (int) m_MC.size();
+}
+
+//-----------------------------------------------------------------------------
+//! sets the plot level
+void FEAnalysis::SetPlotLevel(int n) { m_nplot = n; }
+
+//-----------------------------------------------------------------------------
+//! sets the plot stride
+void FEAnalysis::SetPlotStride(int n) { m_nplot_stride = n; }
+
+//-----------------------------------------------------------------------------
+//! sets the plot range
+void FEAnalysis::SetPlotRange(int n0, int n1)
+{
+	m_nplotRange[0] = n0;
+	m_nplotRange[1] = n1; 
 }
 
 //-----------------------------------------------------------------------------
@@ -636,6 +654,7 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		ar << m_noutput;
 		ar << m_ndump;
 		ar << m_nplot_stride;
+		ar << m_nplotRange[0] << m_nplotRange[1];
 
 		// store the class IDs for the active model components
 		ar << (int) m_MC.size();
@@ -681,6 +700,7 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		ar >> m_noutput;
 		ar >> m_ndump;
 		ar >> m_nplot_stride;
+		ar >> m_nplotRange[0] >> m_nplotRange[1];
 
 #ifdef _DEBUG
 		m_ndump = FE_DUMP_NEVER;
