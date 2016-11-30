@@ -342,22 +342,33 @@ void FEBioModel::Write(unsigned int nwhen)
 					int nmax = pstep->m_nplotRange[1]; if (nmax < 0) nmax = lastStep + nmax + 1;
 
 					bool inRange = true;
+					bool isStride = true;
 					if (pstep->m_bautostep == false)
 					{
 						inRange = false;
 						if ((currentStep >= nmin) && (currentStep <= nmax)) inRange = true;
+
+						isStride = ((pstep->m_ntimesteps - nmin) % pstep->m_nplot_stride) == 0;
 					}
 
 					switch (nwhen)
 					{
 					case CB_MINOR_ITERS: if (nplt == FE_PLOT_MINOR_ITRS   ) bout = true; break;
 					case CB_MAJOR_ITERS  : 
-						if ((nplt == FE_PLOT_MAJOR_ITRS ) && inRange && ((pstep->m_ntimesteps - nmin) % pstep->m_nplot_stride == 0)) bout = true; 
+						if ((nplt == FE_PLOT_MAJOR_ITRS ) && inRange && isStride) bout = true; 
 						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_nmust >= 0)) bout = true;
 						if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
 						break;
 					case CB_AUGMENT: if (nplt == FE_PLOT_AUGMENTATIONS) bout = true; break;
-					case CB_SOLVED : if (nplt == FE_PLOT_FINAL) bout = true; break;
+					case CB_SOLVED : 
+						if (nplt == FE_PLOT_FINAL) bout = true; 
+						if (nplt == FE_PLOT_MAJOR_ITRS)
+						{
+							// we want to force storing the final time step, but we have to make sure 
+							// it hasn't been stored already during the CB_MAJOR_ITERS callback.
+							if ((inRange == false) || (isStride == false)) bout = true;
+						}
+						break;
 					case CB_STEP_SOLVED: if (nplt == FE_PLOT_STEP_FINAL) bout = true;  break;
 					}
 				}
