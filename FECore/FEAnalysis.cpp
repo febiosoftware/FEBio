@@ -60,7 +60,7 @@ FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID)
 	m_nprint  = FE_PRINT_MINOR_ITRS;
 	m_noutput = FE_OUTPUT_MAJOR_ITRS;
 	m_nplot_stride = 1;
-	m_nplotRange[0] = 1;
+	m_nplotRange[0] = 0;
 	m_nplotRange[1] = -1;
 
 	m_bactive = false;

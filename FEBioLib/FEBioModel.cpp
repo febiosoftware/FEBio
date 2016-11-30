@@ -310,7 +310,8 @@ void FEBioModel::Write(unsigned int nwhen)
 					// Therefor we can output those results here.
 					// TODO: Offcourse we should actually check if this is indeed
 					//       the case, otherwise we should also solve for t=0
-					if (m_plot) m_plot->Write(*this, (float) m_ftime);
+					// Only output the initial state if requested
+					if (m_plot && (pstep->m_nplotRange[0] == 0)) m_plot->Write(*this, (float) m_ftime);
 				}
 			}
 			else
@@ -342,7 +343,7 @@ void FEBioModel::Write(unsigned int nwhen)
 					{
 					case CB_MINOR_ITERS: if (nplt == FE_PLOT_MINOR_ITRS   ) bout = true; break;
 					case CB_MAJOR_ITERS  : 
-						if ((nplt == FE_PLOT_MAJOR_ITRS ) && inRange && ((pstep->m_ntimesteps - nmin + 1) % pstep->m_nplot_stride == 0)) bout = true; 
+						if ((nplt == FE_PLOT_MAJOR_ITRS ) && inRange && ((pstep->m_ntimesteps - nmin) % pstep->m_nplot_stride == 0)) bout = true; 
 						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_nmust >= 0)) bout = true;
 						if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
 						break;
