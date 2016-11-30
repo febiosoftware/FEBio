@@ -79,6 +79,9 @@ public:
 	//! sets the plot range
 	void SetPlotRange(int n0, int n1);
 
+	//! sets the zero-state plot flag
+	void SetPlotZeroState(bool b);
+
 	//! get the plot level
 	int GetPlotLevel() { return m_nplot; }
 
@@ -160,6 +163,7 @@ public:
 		int		m_noutput;		//!< data output level
 		int		m_nplot_stride;	//!< stride for plotting
 		int		m_nplotRange[2];	//!< plot range
+		bool	m_bplotZero;		//!< Force plotting of time step "zero"
 		int		m_ndump;		//!< create a restart file or not
 	//}
 

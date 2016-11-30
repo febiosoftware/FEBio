@@ -60,8 +60,9 @@ FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID)
 	m_nprint  = FE_PRINT_MINOR_ITRS;
 	m_noutput = FE_OUTPUT_MAJOR_ITRS;
 	m_nplot_stride = 1;
-	m_nplotRange[0] = 0;
-	m_nplotRange[1] = -1;
+	m_nplotRange[0] = 0; // by default, will store step zero.
+	m_nplotRange[1] = -1; // by default, store last time step
+	m_bplotZero = false; // don't force plotting step zero.
 
 	m_bactive = false;
 }
@@ -105,6 +106,13 @@ void FEAnalysis::SetPlotRange(int n0, int n1)
 {
 	m_nplotRange[0] = n0;
 	m_nplotRange[1] = n1; 
+}
+
+//-----------------------------------------------------------------------------
+//! sets the zero-state plot flag
+void FEAnalysis::SetPlotZeroState(bool b)
+{
+	m_bplotZero = b;	
 }
 
 //-----------------------------------------------------------------------------
@@ -655,6 +663,7 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		ar << m_ndump;
 		ar << m_nplot_stride;
 		ar << m_nplotRange[0] << m_nplotRange[1];
+		ar << m_bplotZero;
 
 		// store the class IDs for the active model components
 		ar << (int) m_MC.size();
@@ -701,6 +710,7 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		ar >> m_ndump;
 		ar >> m_nplot_stride;
 		ar >> m_nplotRange[0] >> m_nplotRange[1];
+		ar >> m_bplotZero;
 
 #ifdef _DEBUG
 		m_ndump = FE_DUMP_NEVER;
