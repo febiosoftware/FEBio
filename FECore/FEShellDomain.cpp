@@ -2,7 +2,7 @@
 #include "FEShellDomain.h"
 #include "FEMesh.h"
 #include "FEMaterial.h"
-#include <FESolidDomain.h>
+#include "FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
 void FEShellDomain::Create(int nelems, int elemType)
