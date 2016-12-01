@@ -22,6 +22,9 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
 {
     
     FEModel& fem = GetFEModel();
+    int dofX = fem.GetDOFIndex("x");
+    int dofY = fem.GetDOFIndex("y");
+    int dofZ = fem.GetDOFIndex("z");
     int dofU = fem.GetDOFIndex("u");
     int dofV = fem.GetDOFIndex("v");
     int dofW = fem.GetDOFIndex("w");
@@ -90,11 +93,14 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
                         // add to total torque of this body
                         a = node.m_rt - RB.m_rt;
                         vec3d m = a ^ F;
+                        vec3d f = F;
                         
                         if (node.m_bshell) {
-                            vec3d d = node.m_d0 + node.get_vec3d(dofU, dofV, dofW);
+                            vec3d d = node.m_d0 + node.get_vec3d(dofX, dofY, dofZ) - node.get_vec3d(dofU, dofV, dofW);
+                            vec3d b = a - d;
                             vec3d Fd(fe[i+3], fe[i+4], fe[i+5]);
-                            m += d ^ Fd;
+                            f += Fd;
+                            m += b ^ Fd;
                         }
                         
                         n = lm[3];
@@ -138,27 +144,27 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
                         if (n >= 0)
                         {
 #pragma omp atomic
-                            R[n] += F.x; 
+                            R[n] += f.x;
                         }
 #pragma omp atomic
-                        RB.m_Fr.x -= F.x;
+                        RB.m_Fr.x -= f.x;
                         n = lm[1];
                         if (n >= 0) 
                         {
 #pragma omp atomic
-                            R[n] += F.y;
+                            R[n] += f.y;
                         }
 #pragma omp atomic
-                        RB.m_Fr.y -= F.y;
+                        RB.m_Fr.y -= f.y;
                         
                         n = lm[2];
                         if (n >= 0)
                         {
 #pragma omp atomic
-                            R[n] += F.z; 
+                            R[n] += f.z;
                         }
 #pragma omp atomic
-                        RB.m_Fr.z -= F.z;
+                        RB.m_Fr.z -= f.z;
                     }
                 }
             }

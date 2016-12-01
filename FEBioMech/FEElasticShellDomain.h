@@ -36,8 +36,8 @@ public: // overrides from FEElasticDomain
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);
 
-	//! Calculates inertial forces for dynamic problems | todo implement this (removed assert DSR)
-	void InertialForces(FEGlobalVector& R, vector<double>& F) { }
+	//! Calculates inertial forces for dynamic problems
+    void InertialForces(FEGlobalVector& R, vector<double>& F);
 
 	//! calculate body force
 	void BodyForce(FEGlobalVector& R, FEBodyForce& bf);
@@ -48,11 +48,11 @@ public: // overrides from FEElasticDomain
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolver* psolver);
 
-	// inertial stiffness \todo implement this (removed assert DSR)
-	void MassMatrix(FESolver* psolver, double scale) { }
+	// inertial stiffness
+    void MassMatrix(FESolver* psolver, double scale);
 
-	// body force stiffness \todo implement this (removed assert DSR)
-	void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf) { }
+	// body force stiffness
+    void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf);
 
 public:
     //! calculates covariant basis vectors at an integration point
@@ -67,7 +67,10 @@ public:
 	// calculate deformation gradient
 	double defgrad(FEShellElement& el, mat3d& F, int n);
 
-	// inverse jacobian with respect to current frame
+    //! evaluate a vector function over the shell
+    vec3d evaluate(FEShellElement& el, vec3d* vn, vec3d* dvn, int n);
+    
+    // inverse jacobian with respect to current frame
 	double invjact(FEShellElement& el, double J[3][3], int n);
  
 public:
@@ -87,10 +90,13 @@ public:
 
 	//! Calculate extenral body forces for shell elements
 	void ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe);
-
+    
+    //! calculates the solid element mass matrix
+    void ElementMassMatrix(FEShellElement& el, matrix& ke, double a);
+    
+    //! calculates the stiffness matrix due to body forces
+    void ElementBodyForceStiffness(FEBodyForce& bf, FEShellElement& el, matrix& ke);
+    
 protected:
 	FESolidMaterial*	m_pMat;
-	int					m_dofU;
-	int					m_dofV;
-	int					m_dofW;
 };

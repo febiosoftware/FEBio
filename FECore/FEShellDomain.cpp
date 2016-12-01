@@ -2,6 +2,7 @@
 #include "FEShellDomain.h"
 #include "FEMesh.h"
 #include "FEMaterial.h"
+#include <FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
 void FEShellDomain::Create(int nelems, int elemType)
@@ -20,6 +21,12 @@ void FEShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 		int n = el.GaussPoints();
 		for (int j=0; j<n; ++j) el.GetMaterialPoint(j)->Update(timeInfo);
 	}
+    
+    // check for solid-shell interfaces
+    if (!m_binit) {
+        FindSSI();
+        m_binit = true;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -61,8 +68,8 @@ void FEShellDomain::CoBaseVectors0(FEShellElement& el, int n, vec3d g[3])
     
     for (i=0; i<neln; ++i)
     {
-        g[0] += (r[i] + D[i]*eta/2)*Mr[i];
-        g[1] += (r[i] + D[i]*eta/2)*Ms[i];
+        g[0] += (r[i] - D[i]*(1-eta)/2)*Mr[i];
+        g[1] += (r[i] - D[i]*(1-eta)/2)*Ms[i];
         g[2] += D[i]*(M[i]/2);
     }
 }
@@ -195,4 +202,85 @@ void FEShellDomain::Serialize(DumpStream &ar)
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Find interfaces between solid element faces and shell elements
+//!
+void FEShellDomain::FindSSI()
+{
+    // find out if there are solid domains in this model
+    vector<FESolidDomain*> psd;
+    FEMesh* mesh = GetMesh();
+    int ndom = mesh->Domains();
+    for (int i=0; i<ndom; ++i) {
+        FEDomain& pdom = mesh->Domain(i);
+        FESolidDomain* psdom = dynamic_cast<FESolidDomain*>(&pdom);
+        if (psdom) psd.push_back(psdom);
+    }
+    size_t nsdom = psd.size();
+    
+    // if there are no solid domains we're done
+    if (nsdom == 0) return;
+    
+    FEMesh& m = *GetMesh();
+    int nelem = Elements();
+    int nf[9], nn;
+    vec3d g[3];
+    
+    // check all elements in this shell domain
+    for (int i=0; i<nelem; ++i) {
+        FEShellElement& el = *dynamic_cast<FEShellElement*>(&ElementRef(i));
+        
+        // check all solid domains
+        for (int k=0; k<nsdom; ++k) {
+            
+            // check each solid element in this domain
+            int nselem = psd[k]->Elements();
+            for (int l=0; l<nselem; ++l) {
+                FEElement& sel = psd[k]->ElementRef(l);
+                
+                // check all faces of this solid element
+                int nfaces = m.Faces(sel);
+                for (int j=0; j<nfaces; ++j) {
+                    nn = m.GetFace(sel, j, nf);
+                    
+                    bool found = false;
+                    if (nn == el.Nodes())
+                    {
+                        switch (nn)
+                        {
+                            case 3: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) found = true; break;
+                            case 4: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) found = true; break;
+                            case 6: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) found = true; break;
+                            case 7: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) found = true; break;
+                            case 8: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) found = true; break;
+                            case 9: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) found = true; break;
+                            default:
+                                assert(false);
+                        }
+                    }
+                    if (found) {
+                        // check interface side
+                        // get outward normal to solid element face
+                        vec3d n0 = mesh->Node(nf[0]).m_r0, n1 = mesh->Node(nf[1]).m_r0, n2 = mesh->Node(nf[2]).m_r0;
+                        vec3d nsld = (n1 - n0) ^ (n2 - n1);
+                        // get outward normal to shell face
+                        CoBaseVectors0(el, 0, g);
+                        vec3d nshl = g[2];
+                        nshl.unit();
+                        // compare normals
+                        if (nsld*nshl > 0) {
+                            // store result
+                            sel.m_bitfc.resize(sel.Nodes(), false);
+                            for (int n=0; n<nn; ++n) {
+                                int m = sel.FindNode(nf[n]);
+                                if (m > -1) sel.m_bitfc[m] = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

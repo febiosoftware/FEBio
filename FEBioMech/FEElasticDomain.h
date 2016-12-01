@@ -56,7 +56,14 @@ protected:
 	int					m_dofX;		//!< X-dof index
 	int					m_dofY;		//!< Y-dof index
 	int					m_dofZ;		//!< Z-dof index
-	int					m_dofRU;
+    int					m_dofU;
+    int					m_dofV;
+    int					m_dofW;
+    int					m_dofRU;
 	int					m_dofRV;	
 	int					m_dofRW;
+    
+    int                 m_dofAU;
+    int                 m_dofAV;
+    int                 m_dofAW;
 };

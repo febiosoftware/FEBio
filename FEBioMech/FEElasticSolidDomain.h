@@ -92,7 +92,10 @@ public:
 	void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe);
 
 	// ---
-
+    // calculate deformation gradient
+    double defgrad(FESolidElement& el, mat3d& F, int n);
+    
+    
 protected:
 	FESolidMaterial*	m_pMat;
 };

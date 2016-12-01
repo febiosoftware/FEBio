@@ -165,6 +165,9 @@ public:
 	// into the node list of a domain.
 	vector<int>		m_lnode;	//!< local connectivity
 
+public:
+    vector<bool>    m_bitfc;    // flag for interface nodes
+    
 protected:
 	FEElementState		m_State;	//!< element state data
 	FEElementTraits*	m_pT;		//!< pointer to element traits

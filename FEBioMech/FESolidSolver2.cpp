@@ -77,8 +77,28 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSol
 	dofs.SetDOFName(varV, 0, "vx");
 	dofs.SetDOFName(varV, 1, "vy");
 	dofs.SetDOFName(varV, 2, "vz");
-
-	// get the DOF indices
+    int varQP = dofs.AddVariable("previous rotation", VAR_VEC3);
+    dofs.SetDOFName(varQP, 0, "up");
+    dofs.SetDOFName(varQP, 1, "vp");
+    dofs.SetDOFName(varQP, 2, "wp");
+    int varQV = dofs.AddVariable("shell velocity", VAR_VEC3);
+    dofs.SetDOFName(varQV, 0, "vu");
+    dofs.SetDOFName(varQV, 1, "vv");
+    dofs.SetDOFName(varQV, 2, "vw");
+    int varQA = dofs.AddVariable("shell acceleration", VAR_VEC3);
+    dofs.SetDOFName(varQA, 0, "au");
+    dofs.SetDOFName(varQA, 1, "av");
+    dofs.SetDOFName(varQA, 2, "aw");
+    int varQVP = dofs.AddVariable("previous shell velocity", VAR_VEC3);
+    dofs.SetDOFName(varQVP, 0, "vup");
+    dofs.SetDOFName(varQVP, 1, "vvp");
+    dofs.SetDOFName(varQVP, 2, "vwp");
+    int varQAP = dofs.AddVariable("previous shell acceleration", VAR_VEC3);
+    dofs.SetDOFName(varQAP, 0, "aup");
+    dofs.SetDOFName(varQAP, 1, "avp");
+    dofs.SetDOFName(varQAP, 2, "awp");
+    
+    // get the DOF indices
 	m_dofX  = pfem->GetDOFIndex("x");
 	m_dofY  = pfem->GetDOFIndex("y");
 	m_dofZ  = pfem->GetDOFIndex("z");
@@ -91,6 +111,23 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSol
 	m_dofRU = pfem->GetDOFIndex("Ru");
 	m_dofRV = pfem->GetDOFIndex("Rv");
 	m_dofRW = pfem->GetDOFIndex("Rw");
+    
+    m_dofVU  = pfem->GetDOFIndex("vu");
+    m_dofVV  = pfem->GetDOFIndex("vv");
+    m_dofVW  = pfem->GetDOFIndex("vw");
+    m_dofAU  = pfem->GetDOFIndex("au");
+    m_dofAV  = pfem->GetDOFIndex("av");
+    m_dofAW  = pfem->GetDOFIndex("aw");
+    
+    m_dofUP  = pfem->GetDOFIndex("up");
+    m_dofVP  = pfem->GetDOFIndex("vp");
+    m_dofWP  = pfem->GetDOFIndex("wp");
+    m_dofVUP  = pfem->GetDOFIndex("vup");
+    m_dofVVP  = pfem->GetDOFIndex("vvp");
+    m_dofVWP  = pfem->GetDOFIndex("vwp");
+    m_dofAUP  = pfem->GetDOFIndex("aup");
+    m_dofAVP  = pfem->GetDOFIndex("avp");
+    m_dofAWP  = pfem->GetDOFIndex("awp");
 }
 
 //-----------------------------------------------------------------------------
@@ -299,8 +336,18 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 			n.m_at = (n.m_rt - n.m_rp)*b - n.m_vp*a + n.m_ap*c;
 			vec3d vt = n.m_vp + (n.m_ap*(1.0 - m_gamma) + n.m_at*m_gamma)*dt;
 			n.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
-		}
-	}
+            
+            // shell kinematics
+            vec3d qt = n.get_vec3d(m_dofU, m_dofV, m_dofW);
+            vec3d qp = n.get_vec3d(m_dofUP, m_dofVP, m_dofWP);
+            vec3d vqp = n.get_vec3d(m_dofVUP, m_dofVVP, m_dofVWP);
+            vec3d aqp = n.get_vec3d(m_dofAUP, m_dofAVP, m_dofAWP);
+            vec3d aqt = (qt - qp)*b - vqp*a + aqp*c;
+            vec3d vqt = vqp + (aqp*(1.0 - m_gamma) + aqt*m_gamma)*dt;
+            n.set_vec3d(m_dofAU, m_dofAV, m_dofAW, aqt);
+            n.set_vec3d(m_dofVU, m_dofVV, m_dofVW, vqt);
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -442,7 +489,10 @@ void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
 		ni.m_rp = ni.m_rt;
 		ni.m_vp = ni.get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
 		ni.m_ap = ni.m_at;
-	}
+        ni.set_vec3d(m_dofUP, m_dofVP, m_dofWP, ni.get_vec3d(m_dofU, m_dofV, m_dofW));
+        ni.set_vec3d(m_dofVUP, m_dofVVP, m_dofVWP, ni.get_vec3d(m_dofVU, m_dofVV, m_dofVW));
+        ni.set_vec3d(m_dofAUP, m_dofAVP, m_dofAWP, ni.get_vec3d(m_dofAU, m_dofAV, m_dofAW));
+    }
 
 	FETimeInfo tp = m_fem.GetTime();
 
@@ -1244,7 +1294,17 @@ void FESolidSolver2::InertialForces(FEGlobalVector& R)
         F[3*i  ] = node.m_at.x;
         F[3*i+1] = node.m_at.y;
         F[3*i+2] = node.m_at.z;
-	}
+        
+        // shell kinematics
+        vec3d qt = node.get_vec3d(m_dofU, m_dofV, m_dofW);
+        vec3d qp = node.get_vec3d(m_dofUP, m_dofVP, m_dofWP);
+        vec3d vqp = node.get_vec3d(m_dofVUP, m_dofVVP, m_dofVWP);
+        vec3d aqp = node.get_vec3d(m_dofAUP, m_dofAVP, m_dofAWP);
+        vec3d aqt = (qt - qp)*b - vqp*a + aqp*c;
+        vec3d vqt = vqp + (aqp*(1.0 - m_gamma) + aqt*m_gamma)*dt;
+        node.set_vec3d(m_dofAU, m_dofAV, m_dofAW, aqt);
+        node.set_vec3d(m_dofVU, m_dofVV, m_dofVW, vqt);
+    }
     
 	// calculate the inertial forces for all elastic domains (except rigid domains)
 	for (int nd = 0; nd < mesh.Domains(); ++nd)

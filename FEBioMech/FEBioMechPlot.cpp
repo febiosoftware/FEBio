@@ -995,6 +995,9 @@ bool FEPlotDevFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 //! Store shell thicknesses
 bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
 {
+    const int dof_X = GetFEModel()->GetDOFIndex("x");
+    const int dof_Y = GetFEModel()->GetDOFIndex("y");
+    const int dof_Z = GetFEModel()->GetDOFIndex("z");
 	const int dof_U = GetFEModel()->GetDOFIndex("u");
 	const int dof_V = GetFEModel()->GetDOFIndex("v");
 	const int dof_W = GetFEModel()->GetDOFIndex("w");
@@ -1010,7 +1013,7 @@ bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
 			for (int j=0; j<n; ++j)
 			{
 				FENode& nj = mesh.Node(e.m_node[j]);
-				vec3d D = nj.m_d0 + nj.get_vec3d(dof_U, dof_V, dof_W);
+				vec3d D = nj.m_d0 + nj.get_vec3d(dof_X, dof_Y, dof_Z) - nj.get_vec3d(dof_U, dof_V, dof_W);
 				double h = D.norm();
 				a << h;
 			}
@@ -1024,6 +1027,9 @@ bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
 //! Store shell directors
 bool FEPlotShellDirector::Save(FEDomain &dom, FEDataStream &a)
 {
+    const int dof_X = GetFEModel()->GetDOFIndex("x");
+    const int dof_Y = GetFEModel()->GetDOFIndex("y");
+    const int dof_Z = GetFEModel()->GetDOFIndex("z");
 	const int dof_U = GetFEModel()->GetDOFIndex("u");
 	const int dof_V = GetFEModel()->GetDOFIndex("v");
 	const int dof_W = GetFEModel()->GetDOFIndex("w");
@@ -1039,7 +1045,7 @@ bool FEPlotShellDirector::Save(FEDomain &dom, FEDataStream &a)
 			for (int j=0; j<n; ++j)
 			{
 				FENode& nj = mesh.Node(e.m_node[j]);
-				vec3d D = nj.m_d0 + nj.get_vec3d(dof_U, dof_V, dof_W);
+				vec3d D = nj.m_d0 + nj.get_vec3d(dof_X, dof_Y, dof_Z) - nj.get_vec3d(dof_U, dof_V, dof_W);
 				a << D;
 			}
 		}

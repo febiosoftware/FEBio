@@ -541,8 +541,8 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
     int *lmi, *lmj;
     int I, J;
     
-    vec3d zi, zj, di, dj;
-    mat3d Zi, Zj, Di, Dj;
+    vec3d ai, aj, bi, bj;
+    mat3d Ai, Aj, Bi, Bj;
     
     int ndof = ke.columns() / n;
     
@@ -562,12 +562,12 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
             lmj = RBj.m_LM;
             
             // get the relative distance to the center of mass
-            zj = nodej.m_rt - RBj.m_rt;
-            Zj.skew(zj);
+            aj = nodej.m_rt - RBj.m_rt;
+            Aj.skew(aj);
             
             // get the shell director
-            dj = nodej.m_d0 + nodej.get_vec3d(m_dofU, m_dofV, m_dofW);
-            Dj.skew(dj);
+            bj = aj - (nodej.m_d0 + nodej.get_vec3d(m_dofX, m_dofY, m_dofZ) - nodej.get_vec3d(m_dofU, m_dofV, m_dofW));
+            Bj.skew(bj);
             
             // loop over rows
             for (i = 0; i<n; ++i)
@@ -581,15 +581,15 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                           kij[1][0], kij[1][1], kij[1][2],
                           kij[2][0], kij[2][1], kij[2][2]);
                 
-                mat3d Kud(kij[0][3], kij[0][4], kij[0][5],
+                mat3d Kuw(kij[0][3], kij[0][4], kij[0][5],
                           kij[1][3], kij[1][4], kij[1][5],
                           kij[2][3], kij[2][4], kij[2][5]);
                 
-                mat3d Kdu(kij[3][0], kij[3][1], kij[3][2],
+                mat3d Kwu(kij[3][0], kij[3][1], kij[3][2],
                           kij[4][0], kij[4][1], kij[4][2],
                           kij[5][0], kij[5][1], kij[5][2]);
                 
-                mat3d Kdd(kij[3][3], kij[3][4], kij[3][5],
+                mat3d Kww(kij[3][3], kij[3][4], kij[3][5],
                           kij[4][3], kij[4][4], kij[4][5],
                           kij[5][3], kij[5][4], kij[5][5]);
                 
@@ -604,38 +604,38 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     lmi = RBi.m_LM;
                     
                     // get the relative distance (use alpha rule)
-                    zi = (nodei.m_rt - RBi.m_rt)*alpha + (nodei.m_rp - RBi.m_rp)*(1 - alpha);
-                    Zi.skew(zi);
+                    ai = (nodei.m_rt - RBi.m_rt)*alpha + (nodei.m_rp - RBi.m_rp)*(1 - alpha);
+                    Ai.skew(ai);
                     
                     // get the shell director
-                    di = nodei.m_d0 + nodei.get_vec3d(m_dofU, m_dofV, m_dofW);
-                    Di.skew(di);
+                    bi = ai - (nodei.m_d0 + nodei.get_vec3d(m_dofX, m_dofY, m_dofZ) - nodei.get_vec3d(m_dofU, m_dofV, m_dofW));
+                    Bi.skew(bi);
                     
                     mat3d M;
                     
                     // Kuu transformation
-                    M = Kuu*alpha;
+                    M = (Kuu + Kwu + Kuw + Kww)*alpha;
                     KR[0][0] = M[0][0]; KR[0][1] = M[0][1]; KR[0][2] = M[0][2];
                     KR[1][0] = M[1][0]; KR[1][1] = M[1][1]; KR[1][2] = M[1][2];
                     KR[2][0] = M[2][0]; KR[2][1] = M[2][1]; KR[2][2] = M[2][2];
                     
                     
-                    // Kud transformation
-                    M = (Kuu*Zj + Kud*Dj)*(-alpha);
+                    // Kuw transformation
+                    M = ((Kuu + Kwu)*Aj + (Kuw + Kww)*Bj)*(-alpha);
                     KR[0][3] = M[0][0]; KR[0][4] = M[0][1]; KR[0][5] = M[0][2];
                     KR[1][3] = M[1][0]; KR[1][4] = M[1][1]; KR[1][5] = M[1][2];
                     KR[2][3] = M[2][0]; KR[2][4] = M[2][1]; KR[2][5] = M[2][2];
                     
                     
-                    // Kdu transformation
-                    M = (Zi*Kuu + Di*Kdu)*alpha;
+                    // Kwu transformation
+                    M = (Ai*(Kuu + Kuw) + Bi*(Kwu + Kww))*alpha;
                     KR[3][0] = M[0][0]; KR[3][1] = M[0][1]; KR[3][2] = M[0][2];
                     KR[4][0] = M[1][0]; KR[4][1] = M[1][1]; KR[4][2] = M[1][2];
                     KR[5][0] = M[2][0]; KR[5][1] = M[2][1]; KR[5][2] = M[2][2];
                     
                     
-                    // Kdd transformation
-                    M = ((Zi*Kuu + Di*Kdu)*Zj + (Zi*Kud + Di*Kdd)*Dj)*(-alpha);
+                    // Kww transformation
+                    M = ((Ai*Kuu + Bi*Kwu)*Aj + (Ai*Kuw + Bi*Kww)*Bj)*(-alpha);
                     KR[3][3] = M[0][0]; KR[3][4] = M[0][1]; KR[3][5] = M[0][2];
                     KR[4][3] = M[1][0]; KR[4][4] = M[1][1]; KR[4][5] = M[1][2];
                     KR[5][3] = M[2][0]; KR[5][4] = M[2][1]; KR[5][5] = M[2][2];
@@ -659,10 +659,10 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     // rigid dofs of node j
                     for (k = 3; k<ndof; ++k) {
                         vec3d kpu(kij[k][0], kij[k][1], kij[k][2]);
-                        vec3d kpd(kij[k][3], kij[k][4], kij[k][5]);
-                        vec3d m = kpu*alpha;
+                        vec3d kpw(kij[k][3], kij[k][4], kij[k][5]);
+                        vec3d m = (kpu + kpw)*alpha;
                         KF[k][0] = m.x; KF[k][1] = m.y; KF[k][2] = m.z;
-                        m = (Zj*kpu + Dj*kpd)*alpha;
+                        m = (Aj*kpu + Bj*kpw)*alpha;
                         KF[k][3] = m.x; KF[k][4] = m.y; KF[k][5] = m.z;
                     }
                     
@@ -683,9 +683,10 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     // now the transpose location
                     for (l = 3; l<ndof; ++l) {
                         vec3d kup(kij[0][l], kij[1][l], kij[2][l]);
-                        vec3d kdp(kij[3][l], kij[4][l], kij[5][l]);
-                        vec3d m = Zi*kup + Di*kdp;
-                        KF[l][0] = kup.x; KF[l][1] = kup.y; KF[l][2] = kup.z;
+                        vec3d kwp(kij[3][l], kij[4][l], kij[5][l]);
+                        vec3d m = kup + kwp;
+                        KF[l][0] = m.x; KF[l][1] = m.y; KF[l][2] = m.z;
+                        m = Ai*kup + Bi*kwp;
                         KF[l][3] = m.x; KF[l][4] = m.y; KF[l][5] = m.z;
                     }
                     
@@ -711,10 +712,10 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     // Kij
                     for (k = 0; k<ndof; ++k) {
                         vec3d kpu(kij[k][0], kij[k][1], kij[k][2]);
-                        vec3d kpd(kij[k][3], kij[k][4], kij[k][5]);
-                        vec3d m = kpu*alpha;
+                        vec3d kpw(kij[k][3], kij[k][4], kij[k][5]);
+                        vec3d m = (kpu + kpw)*alpha;
                         KF[k][0] = m.x; KF[k][1] = m.y; KF[k][2] = m.z;
-                        m = (Zj*kpu + Dj*kpd)*alpha;
+                        m = (Aj*kpu + Bj*kpw)*alpha;
                         KF[k][3] = m.x; KF[k][4] = m.y; KF[k][5] = m.z;
                     }
                     
@@ -750,12 +751,12 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     lmi = RBi.m_LM;
                     
                     // get the relative distance (use alpha rule)
-                    zi = (nodei.m_rt - RBi.m_rt)*alpha + (nodei.m_rp - RBi.m_rp)*(1 - alpha);
-                    Zi.skew(zi);
+                    ai = (nodei.m_rt - RBi.m_rt)*alpha + (nodei.m_rp - RBi.m_rp)*(1 - alpha);
+                    Ai.skew(ai);
                     
                     // get the shell director
-                    di = nodei.m_d0 + nodei.get_vec3d(m_dofU, m_dofV, m_dofW);
-                    Di.skew(di);
+                    bi = ai - (nodei.m_d0 + nodei.get_vec3d(m_dofX, m_dofY, m_dofZ) - nodei.get_vec3d(m_dofU, m_dofV, m_dofW));
+                    Bi.skew(bi);
                     
                     // get the element sub-matrix
                     for (k = 0; k<ndof; ++k)
@@ -767,9 +768,10 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     // Kij
                     for (k = 0; k<ndof; ++k) {
                         vec3d kup(kij[0][k], kij[1][k], kij[2][k]);
-                        vec3d kdp(kij[3][k], kij[4][k], kij[5][k]);
-                        vec3d m = Zi*kup + Di*kdp;
-                        KF[k][0] = kup.x; KF[k][1] = kup.y; KF[k][2] = kup.z;
+                        vec3d kwp(kij[3][k], kij[4][k], kij[5][k]);
+                        vec3d m = kup + kwp;
+                        KF[k][0] = m.x; KF[k][1] = m.y; KF[k][2] = m.z;
+                        m = Ai*kup + Bi*kwp;
                         KF[k][3] = m.x; KF[k][4] = m.y; KF[k][5] = m.z;
                     }
                     
@@ -795,11 +797,17 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
 void FERigidSolver::AssembleResidual(int node_id, int dof, double f, vector<double>& R)
 {
     FEMesh& mesh = m_fem->GetMesh();
+    FERigidSystem& rigid = *m_fem->GetRigidSystem();
+ 
+    // get the equation number
     FENode& node = mesh.Node(node_id);
-    if (node.m_rid >= 0)
+    int n = node.m_ID[dof];
+    
+    // assemble into global vector
+    if (n >= 0) R[n] += f;
+    else if (node.m_rid >= 0)
     {
         // this is a rigid body node
-        FERigidSystem& rigid = *m_fem->GetRigidSystem();
         FERigidBody& RB = *rigid.Object(node.m_rid);
         
         // get the relative position
@@ -826,21 +834,25 @@ void FERigidSolver::AssembleResidual(int node_id, int dof, double f, vector<doub
         }
         if (node.m_bshell) {
             // get the shell director
-            vec3d d = node.m_d0 + node.get_vec3d(m_dofU, m_dofV, m_dofW);
+            vec3d d = node.m_d0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ) - node.get_vec3d(m_dofU, m_dofV, m_dofW);
+            vec3d b = a - d;
             if (dof == m_dofU)
             {
-                if (lm[4] >= 0) R[lm[4]] += d.z*f;
-                if (lm[5] >= 0) R[lm[5]] += -d.y*f;
+                if (lm[0] >= 0) R[lm[0]] +=  f;
+                if (lm[4] >= 0) R[lm[4]] += b.z*f;
+                if (lm[5] >= 0) R[lm[5]] += -b.y*f;
             }
             else if (dof == m_dofV)
             {
-                if (lm[3] >= 0) R[lm[3]] += -d.z*f;
-                if (lm[5] >= 0) R[lm[5]] += d.x*f;
+                if (lm[1] >= 0) R[lm[1]] +=  f;
+                if (lm[3] >= 0) R[lm[3]] += -b.z*f;
+                if (lm[5] >= 0) R[lm[5]] += b.x*f;
             }
             else if (dof == m_dofW)
             {
-                if (lm[3] >= 0) R[lm[3]] += d.y*f;
-                if (lm[4] >= 0) R[lm[4]] += -d.x*f;
+                if (lm[2] >= 0) R[lm[2]] +=  f;
+                if (lm[3] >= 0) R[lm[3]] += b.y*f;
+                if (lm[4] >= 0) R[lm[4]] += -b.x*f;
             }
         }
     }
@@ -1294,7 +1306,8 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
                 FERigidBody& RB = *rigid.Object(node.m_rid);
                 // evaluate the director in the current configuration
                 vec3d d = RB.m_qt*node.m_d0 - node.m_d0;
-                node.set_vec3d(m_dofU, m_dofV, m_dofW, d);
+                // evaluate the back face displacement increments
+                node.set_vec3d(m_dofU, m_dofV, m_dofW, ut - d);
             }
 		}
 	}

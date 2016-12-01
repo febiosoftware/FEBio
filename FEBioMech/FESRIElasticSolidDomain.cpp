@@ -85,7 +85,7 @@ void FESRIElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<do
 
 		// setup the material point
 		FEElasticMaterialPoint pt;
-		pt.m_J = defgrad(el, pt.m_F, r, s, t);
+		pt.m_J = FESolidDomain::defgrad(el, pt.m_F, r, s, t);
 
 		// calculate the jacobian
 		double detJt = invjact(el, Ji, r, s, t);

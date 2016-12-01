@@ -42,6 +42,11 @@ public:
 	//! Serialize domain data to archive
 	void Serialize(DumpStream& ar);
 
+public:
+    //! Find interfaces between solid element faces and shell elements
+    void FindSSI();
+    
 protected:
 	vector<FEShellElement>	m_Elem;	//!< array of elements
+    bool                    m_binit;    //!< initialization flag
 };
