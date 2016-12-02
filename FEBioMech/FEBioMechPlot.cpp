@@ -827,29 +827,62 @@ bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+// TODO: Should I call the density for remodeling materials something else? 
+//       Or maybe the FEElasticMaterialPoint should define a density parameter
+//       that will be updated by the materials to define the current density?
 bool FEPlotDensity::Save(FEDomain &dom, FEDataStream& a)
 {
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		int N = bd.Elements();
-		for (int i=0; i<bd.Elements(); ++i)
+		FEElasticMaterial* em = dynamic_cast<FEElasticMaterial*>(bd.GetMaterial());
+		if (em == 0) return false;
+
+		FERemodelingElasticMaterial* rm = dynamic_cast<FERemodelingElasticMaterial*>(em);
+		if (rm)
 		{
-			FESolidElement& el = bd.Element(i);
-			
-			// calculate average mass density
-			double ew = 0;
-			for (int j=0; j<el.GaussPoints(); ++j)
+			int N = bd.Elements();
+			for (int i=0; i<bd.Elements(); ++i)
 			{
-				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-				FERemodelingMaterialPoint* pt = (mp.ExtractData<FERemodelingMaterialPoint>());
-				if (pt) ew += pt->m_rhor;
-			}
-			ew /= el.GaussPoints();
+				FESolidElement& el = bd.Element(i);
 			
-			a.push_back((float) ew);
+				// calculate average mass density
+				double ew = 0;
+				for (int j=0; j<el.GaussPoints(); ++j)
+				{
+					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+					FERemodelingMaterialPoint* pt = (mp.ExtractData<FERemodelingMaterialPoint>());
+					if (pt) ew += pt->m_rhor;
+				}
+				ew /= el.GaussPoints();
+			
+				a << ew;
+			}
+			return true;
 		}
-		return true;
+		else
+		{
+			double rho0 = em->Density();
+			int N = bd.Elements();
+			for (int i = 0; i<bd.Elements(); ++i)
+			{
+				FESolidElement& el = bd.Element(i);
+				int nint = el.GaussPoints();
+
+				// calculate average mass density
+				double ew = 0;
+				for (int j = 0; j<nint; ++j)
+				{
+					FEElasticMaterialPoint& mp = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
+					double J = mp.m_F.det();
+					ew += rho0 / J;
+				}
+				ew /= nint;
+
+				a << ew;
+			}
+			return true;
+		}
 	}
 	return false;
 }
