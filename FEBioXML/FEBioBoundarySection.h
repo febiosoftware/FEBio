@@ -25,6 +25,7 @@ protected:
 	void ParseBC            (XMLTag& tag);  // version 2.5 and up
 
 	void ParsePeriodicLinearConstraint(XMLTag& tag); // version 2.5 (temporary construction)
+	void ParseMergeConstraint(XMLTag& tag); // version 2.5
 
 protected:
 	void ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* psi);

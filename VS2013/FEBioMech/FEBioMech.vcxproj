@@ -497,6 +497,7 @@
     <ClInclude Include="..\..\FEBioMech\FELinearSolidSolver.h" />
     <ClInclude Include="..\..\FEBioMech\FELinearTransIso.h" />
     <ClInclude Include="..\..\FEBioMech\FEMembraneMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMergedConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEMicroMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEMicroMaterial2O.h" />
     <ClInclude Include="..\..\FEBioMech\FEMindlinElastic2O.h" />
@@ -696,6 +697,7 @@
     <ClCompile Include="..\..\FEBioMech\FELinearSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioMech\FELinearTransIso.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMembraneMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMergedConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMicroMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMicroMaterial2O.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMindlinElastic2O.cpp" />

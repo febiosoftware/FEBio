@@ -323,7 +323,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 		int faces = surf->Facets();
 
 		// create a new facet set
-		FEFacetSet* fset = new FEFacetSet;
+		FEFacetSet* fset = new FEFacetSet(&mesh);
 		string name = partName + "." + surf->Name();
 		fset->SetName(name.c_str());
 

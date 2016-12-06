@@ -1254,7 +1254,7 @@ void FEBioGeometrySection::ParseSurfaceSection(XMLTag& tag)
 	int faces = tag.children();
 
 	// allocate storage for faces
-	FEFacetSet* ps = new FEFacetSet;
+	FEFacetSet* ps = new FEFacetSet(&mesh);
 	ps->Create(faces);
 	ps->SetName(szname);
 

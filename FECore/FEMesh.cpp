@@ -198,7 +198,7 @@ void FEDiscreteSet::SetName(const char* sz)
 //=============================================================================
 // FEFacetSet
 //-----------------------------------------------------------------------------
-FEFacetSet::FEFacetSet()
+FEFacetSet::FEFacetSet(FEMesh* mesh) : m_mesh(mesh)
 {
 	m_szname[0] = 0;
 }
@@ -219,6 +219,29 @@ FEFacetSet::FACET& FEFacetSet::Face(int i)
 void FEFacetSet::SetName(const char* sz)
 {
 	strcpy(m_szname, sz); 
+}
+
+//-----------------------------------------------------------------------------
+FENodeSet FEFacetSet::GetNodeSet()
+{
+	FEMesh* pm = m_mesh;
+	FENodeSet set(pm);
+
+	vector<int> tag(pm->Nodes(), 0);
+	for (int i = 0; i<Faces(); ++i)
+	{
+		FACET& el = m_Face[i];
+		int ne = el.ntype;
+		for (int j = 0; j<ne; ++j)
+		{
+			if (tag[el.node[j]] == 0)
+			{
+				set.add(el.node[j]);
+				tag[el.node[j]] = 1;
+			}
+		}
+	}
+	return set;
 }
 
 //=============================================================================

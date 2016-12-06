@@ -241,7 +241,7 @@ public:
 	};
 
 public:
-	FEFacetSet();
+	FEFacetSet(FEMesh* mesh);
 	const char* GetName() { return m_szname; }
 	void SetName(const char* sz);
 
@@ -250,9 +250,12 @@ public:
 	int Faces() const { return (int) m_Face.size(); }
 	FACET& Face(int i);
 
+	FENodeSet GetNodeSet();
+
 public:
 	vector<FACET>	m_Face;
 	char			m_szname[256];
+	FEMesh*			m_mesh;
 };
 
 //-----------------------------------------------------------------------------

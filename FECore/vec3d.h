@@ -41,7 +41,11 @@ public:
 		return d;
 	}
 
+	// length of vector
 	double norm() const { return sqrt(x*x+y*y+z*z); }
+
+	// length square of vector
+	double norm2() const { return (x*x + y*y + z*z); }
 
 public:
 	double x, y, z;

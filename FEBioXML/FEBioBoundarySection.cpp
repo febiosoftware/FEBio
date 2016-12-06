@@ -22,6 +22,7 @@
 #include "FECore/FECoreKernel.h"
 #include <FECore/FELinearConstraintManager.h>
 #include <FEBioMech/FEPeriodicLinearConstraint.h>
+#include <FEBioMech/FEMergedConstraint.h>
 
 //-----------------------------------------------------------------------------
 //!  Parses the boundary section from the xml file
@@ -56,10 +57,11 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 			if      (tag == "fix"              ) ParseBCFix25      (tag);
 			else if (tag == "prescribe"        ) ParseBCPrescribe25(tag);
 			else if (tag == "bc"               ) ParseBC(tag);
-			else if (tag == "rigid") ParseBCRigid(tag);
+			else if (tag == "rigid"            ) ParseBCRigid(tag);
 			else if (tag == "rigid_body"       ) ParseRigidBody    (tag);
 			else if (tag == "linear_constraint") ParseConstraints  (tag);
 			else if (tag == "periodic_linear_constraint") ParsePeriodicLinearConstraint(tag);
+			else if (tag == "merge"            ) ParseMergeConstraint(tag);
 			else throw XMLReader::InvalidTag(tag);
 		}
 		++tag;
@@ -800,6 +802,34 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 			LC[i].Deactivate();
 		}
 	}
+}
+
+void FEBioBoundarySection::ParseMergeConstraint(XMLTag& tag)
+{
+	// make sure this is an empty tag
+	if (tag.isempty() == false) throw XMLReader::InvalidValue(tag);
+
+	// get the dofs
+	const char* szbc = tag.AttributeValue("bc");
+
+	// get the surface pair name
+	const char* szsp = tag.AttributeValue("surface_pair");
+
+	// get the dof list
+	FEModel& fem = *GetFEModel();
+	DOFS& dof = fem.GetDOFS();
+	vector<int> dofs;
+	dof.GetDOFList(szbc, dofs);
+	if (dofs.empty()) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+
+	// get the surfaces
+	FEBioImport::SurfacePair* sp = m_pim->FindSurfacePair(szsp);
+	if (sp == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szsp);
+
+	// merge the interfaces
+	FEMergedConstraint merge(fem);
+	if (merge.Merge(sp->pmaster, sp->pslave, dofs) == false)
+		throw XMLReader::InvalidTag(tag);
 }
 
 void FEBioBoundarySection::ParsePeriodicLinearConstraint(XMLTag& tag)

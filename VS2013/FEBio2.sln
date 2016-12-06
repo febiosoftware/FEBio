@@ -306,8 +306,8 @@ Global
 		{360F2374-8E71-411B-B1A0-5103ED9A852A}.Debug OMP|Mixed Platforms.Build.0 = Debug|Win32
 		{360F2374-8E71-411B-B1A0-5103ED9A852A}.Debug OMP|Win32.ActiveCfg = Debug OMP|Win32
 		{360F2374-8E71-411B-B1A0-5103ED9A852A}.Debug OMP|Win32.Build.0 = Debug OMP|Win32
-		{360F2374-8E71-411B-B1A0-5103ED9A852A}.Debug OMP|x64.ActiveCfg = Debug|x64
-		{360F2374-8E71-411B-B1A0-5103ED9A852A}.Debug OMP|x64.Build.0 = Debug|x64
+		{360F2374-8E71-411B-B1A0-5103ED9A852A}.Debug OMP|x64.ActiveCfg = Debug OMP|x64
+		{360F2374-8E71-411B-B1A0-5103ED9A852A}.Debug OMP|x64.Build.0 = Debug OMP|x64
 		{360F2374-8E71-411B-B1A0-5103ED9A852A}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{360F2374-8E71-411B-B1A0-5103ED9A852A}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{360F2374-8E71-411B-B1A0-5103ED9A852A}.Debug|Win32.ActiveCfg = Debug|Win32
@@ -330,8 +330,8 @@ Global
 		{6F6A89EA-D4F4-4005-8C2C-A51AF5ED296F}.Debug OMP|Mixed Platforms.Build.0 = Debug|Win32
 		{6F6A89EA-D4F4-4005-8C2C-A51AF5ED296F}.Debug OMP|Win32.ActiveCfg = Debug OMP|Win32
 		{6F6A89EA-D4F4-4005-8C2C-A51AF5ED296F}.Debug OMP|Win32.Build.0 = Debug OMP|Win32
-		{6F6A89EA-D4F4-4005-8C2C-A51AF5ED296F}.Debug OMP|x64.ActiveCfg = Debug|x64
-		{6F6A89EA-D4F4-4005-8C2C-A51AF5ED296F}.Debug OMP|x64.Build.0 = Debug|x64
+		{6F6A89EA-D4F4-4005-8C2C-A51AF5ED296F}.Debug OMP|x64.ActiveCfg = Debug OMP|x64
+		{6F6A89EA-D4F4-4005-8C2C-A51AF5ED296F}.Debug OMP|x64.Build.0 = Debug OMP|x64
 		{6F6A89EA-D4F4-4005-8C2C-A51AF5ED296F}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{6F6A89EA-D4F4-4005-8C2C-A51AF5ED296F}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{6F6A89EA-D4F4-4005-8C2C-A51AF5ED296F}.Debug|Win32.ActiveCfg = Debug|Win32
@@ -353,5 +353,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal
