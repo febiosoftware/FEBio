@@ -596,6 +596,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioMech\FEMergedConstraint.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioBoundarySection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioCodeSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioConstraintsSection.cpp" />
@@ -621,6 +622,7 @@
     <ClCompile Include="..\..\FEBioXML\XMLReader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBioMech\FEMergedConstraint.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioBoundarySection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioCodeSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioConstraintsSection.h" />
