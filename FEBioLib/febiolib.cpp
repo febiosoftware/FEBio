@@ -197,7 +197,7 @@ bool ImportPlugin(const char* szfile)
 	{
 	case 0: fprintf(stderr, "Success loading plugin %s (version %d.%d.%d)\n", sztitle, info.major, info.minor, info.patch); return true; break;
 	case 1:
-		fprintf(stderr, "Failed loading plugin %s\n Reason: Failed to load the file.\n\n", szfile); break;
+		fprintf(stderr, "Failed loading plugin %s\n Reason: Failed to load the file.\n\n", szfile);
 #ifndef WIN32
 		fprintf(stderr, "dlopen failed: %s\n\n", dlerror());
 #endif
