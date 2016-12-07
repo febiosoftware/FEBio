@@ -475,6 +475,26 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			int varE = dofs.AddVariable("fluid dilation");
 			dofs.SetDOFName(varE, 0, "e");
 			int varC = dofs.AddVariable("concentration", VAR_ARRAY); // we start with zero concentrations
+			int varQP = dofs.AddVariable("previous rotation", VAR_VEC3);
+			dofs.SetDOFName(varQP, 0, "up");
+			dofs.SetDOFName(varQP, 1, "vp");
+			dofs.SetDOFName(varQP, 2, "wp");
+			int varQV = dofs.AddVariable("shell velocity", VAR_VEC3);
+			dofs.SetDOFName(varQV, 0, "vu");
+			dofs.SetDOFName(varQV, 1, "vv");
+			dofs.SetDOFName(varQV, 2, "vw");
+			int varQA = dofs.AddVariable("shell acceleration", VAR_VEC3);
+			dofs.SetDOFName(varQA, 0, "au");
+			dofs.SetDOFName(varQA, 1, "av");
+			dofs.SetDOFName(varQA, 2, "aw");
+			int varQVP = dofs.AddVariable("previous shell velocity", VAR_VEC3);
+			dofs.SetDOFName(varQVP, 0, "vup");
+			dofs.SetDOFName(varQVP, 1, "vvp");
+			dofs.SetDOFName(varQVP, 2, "vwp");
+			int varQAP = dofs.AddVariable("previous shell acceleration", VAR_VEC3);
+			dofs.SetDOFName(varQAP, 0, "aup");
+			dofs.SetDOFName(varQAP, 1, "avp");
+			dofs.SetDOFName(varQAP, 2, "awp");
 		}
 
 		// parse the file
