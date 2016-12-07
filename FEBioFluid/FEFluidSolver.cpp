@@ -27,6 +27,7 @@ BEGIN_PARAMETER_LIST(FEFluidSolver, FENewtonSolver)
 	ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
 	ADD_PARAMETER(m_bdoreforms   , FE_PARAM_BOOL  , "do_reforms"  );
 	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
+	ADD_PARAMETER(m_breformtimestep, FE_PARAM_BOOL, "reform_each_time_step");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -45,6 +46,7 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
     m_bsymm = false;
     m_bdivreform = true;
     m_bdoreforms = true;
+	m_breformtimestep = true;
 
     m_baugment = false;
     
@@ -255,7 +257,6 @@ void FEFluidSolver::PrepStep(const FETimeInfo& timeInfo)
     m_nrhs  = 0;	// nr of RHS evaluations
     m_nref  = 0;	// nr of stiffness reformations
     m_ntotref = 0;
-    m_pbfgs->m_nups	= 0;	// nr of stiffness updates between reformations
     m_naug  = 0;	// nr of augmentations
     
     // zero total velocities
@@ -323,7 +324,6 @@ bool FEFluidSolver::Quasin(double time)
     
     // initialize flags
     bool bconv = false;		// convergence flag
-    bool breform = false;	// reformation flag
     
     // Get the current step
     FEAnalysis* pstep = m_fem.GetCurrentStep();
@@ -332,9 +332,18 @@ bool FEFluidSolver::Quasin(double time)
 	FETimeInfo tp = m_fem.GetTime();
     PrepStep(tp);
     
-    // calculate initial stiffness matrix
-    if (ReformStiffness(tp) == false) return false;
-    
+	// calculate initial stiffness matrix
+	bool breform = m_breformtimestep;
+	if (pstep->m_ntotiter == 0) breform = true;
+	if (breform)
+	{
+		// reset the bfgs updates
+		if (ReformStiffness(tp) == false) return false;
+	}
+
+	// reset reformation flag to false so that we won't reform until necessary
+	breform = false;
+
     // calculate initial residual
     if (Residual(m_R0) == false) return false;
     

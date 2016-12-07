@@ -124,6 +124,7 @@ public:
 	// strategy parameters
 	bool	m_bdivreform;	//!< reform when diverging
 	bool	m_bdoreforms;	//!< do reformations
+	bool	m_breformtimestep;	//!< reform at start of time step
 
 	// equation numbers
 	int		m_nreq;			//!< start of rigid body equations

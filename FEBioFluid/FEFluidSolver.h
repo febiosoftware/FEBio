@@ -89,7 +89,8 @@ public:
     // strategy parameters
     bool	m_bdivreform;	//!< reform when diverging
     bool	m_bdoreforms;	//!< do reformations
-    
+	bool	m_breformtimestep;	//!< reform at start of time step
+
 public:
     vector<double> m_Fn;	//!< concentrated nodal force vector
     vector<double> m_Fr;	//!< nodal reaction forces

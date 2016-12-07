@@ -33,6 +33,7 @@ BEGIN_PARAMETER_LIST(FESolidSolver2, FENewtonSolver)
     ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
 	ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
 	ADD_PARAMETER(m_bdoreforms   , FE_PARAM_BOOL  , "do_reforms"  );
+	ADD_PARAMETER(m_breformtimestep, FE_PARAM_BOOL, "reform_each_time_step");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -51,6 +52,7 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSol
 
 	m_bdivreform = true;
 	m_bdoreforms = true;
+	m_breformtimestep = true;
 
 	// default Newmark parameters for trapezoidal time integration
     m_alpha = 1.0;
@@ -474,7 +476,6 @@ void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
 	m_nrhs  = 0;	// nr of RHS evaluations
 	m_nref  = 0;	// nr of stiffness reformations
 	m_ntotref = 0;
-	m_pbfgs->m_nups	= 0;	// nr of stiffness updates between reformations
 	m_naug  = 0;	// nr of augmentations
 
 	// zero total displacements
@@ -574,7 +575,6 @@ bool FESolidSolver2::Quasin(double time)
 
 	// initialize flags
 	bool bconv = false;		// convergence flag
-	bool breform = false;	// reformation flag
 	bool sdflag = true;		// flag for steepest descent iterations in NLCG
 
 	// Get the current step
@@ -590,7 +590,16 @@ bool FESolidSolver2::Quasin(double time)
 	PrepStep(tp);
 
 	// calculate initial stiffness matrix
-	if (ReformStiffness(tp) == false) return false;
+	bool breform = m_breformtimestep;
+	if (pstep->m_ntotiter == 0) breform = true;
+	if (breform)
+	{
+		// reset the bfgs updates
+		if (ReformStiffness(tp) == false) return false;
+	}
+
+	// reset reformation flag to false so that we won't reform until necessary
+	breform = false;
 
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;
