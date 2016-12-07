@@ -58,6 +58,9 @@ public:
 	// serialization
 	void Serialize(DumpStream& ar);
 
+	// find a parameter with a given name
+	FEParam* FindParameter(const char* szname);
+
 protected:
 	FEMaterialPoint*	m_pNext;	//<! next data in the list
 	FEMaterialPoint*	m_pPrev;	//<! previous data in the list

@@ -185,7 +185,7 @@
     <LibraryPath>$(OutDir);$(MKLDir)\ia32\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir);$(MKLDir)\em64t\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>

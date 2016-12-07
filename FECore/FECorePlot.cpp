@@ -3,7 +3,7 @@
 #include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-FEPlotMaterialParameter::FEPlotMaterialParameter(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM) {}
+FEPlotMaterialParameter::FEPlotMaterialParameter(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM) { m_index = 0; }
 
 //-----------------------------------------------------------------------------
 // This plot field requires a filter which defines the material name and 
@@ -14,6 +14,16 @@ bool FEPlotMaterialParameter::SetFilter(const char* sz)
 	strcpy(szbuf, sz);
 	char* ch = strchr(szbuf, '.');
 	if (ch) *ch++ = 0; else return false;
+	char* chl = strchr(ch, '[');
+	if (chl)
+	{
+		*chl++ = 0;
+		char* chr = strrchr(chl, ']');
+		if (chr == 0) return false;
+		*chr=0;
+		m_index = atoi(chl);
+		if (m_index < 0) return false;
+	}
 
 	strcpy(m_szmat, szbuf);
 	strcpy(m_szparam, ch);
@@ -55,10 +65,10 @@ bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
 
 			// extract the parameter
 			// Note that for now this only works for double parameters
-			FEParam* pv = mp.GetParameter(s);
-			if (pv && (pv->type()==FE_PARAM_DOUBLE))
+			FEParam* pv = mp.FindParameter(m_szparam);
+			if (pv && (pv->type()==FE_PARAM_DOUBLE) && (m_index < pv->dim()))
 			{
-				E += pv->value<double>();
+				E += pv->value<double>(m_index);
 				nc++;
 			}
 		}

@@ -387,10 +387,10 @@
     <ClInclude Include="..\..\FECore\Callback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FEDataGenerator.h">
+    <ClInclude Include="..\..\FECore\FETransform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FETransform.h">
+    <ClInclude Include="..\..\FECore\FEDataGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -704,10 +704,10 @@
     <ClCompile Include="..\..\FECore\Callback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\FEDataGenerator.cpp">
+    <ClCompile Include="..\..\FECore\FETransform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\FETransform.cpp">
+    <ClCompile Include="..\..\FECore\FEDataGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

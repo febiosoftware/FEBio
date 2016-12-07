@@ -41,3 +41,17 @@ void FEMaterialPoint::Serialize(DumpStream& ar)
 	FEParamContainer::Serialize(ar);
 	if (m_pNext) m_pNext->Serialize(ar);
 }
+
+// find a parameter with a given name
+FEParam* FEMaterialPoint::FindParameter(const char* szname)
+{
+	FEMaterialPoint* pt = this;
+	while (pt)
+	{
+		FEParameterList& pl = pt->GetParameterList();
+		FEParam* p = pl.Find(szname);
+		if (p) return p;
+		else pt = pt->Next();
+	}
+	return 0;
+}
