@@ -474,7 +474,6 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			dofs.SetDOFName(varV, 2, "vz");
 			int varE = dofs.AddVariable("fluid dilation");
 			dofs.SetDOFName(varE, 0, "e");
-			int varC = dofs.AddVariable("concentration", VAR_ARRAY); // we start with zero concentrations
 			int varQP = dofs.AddVariable("previous rotation", VAR_VEC3);
 			dofs.SetDOFName(varQP, 0, "up");
 			dofs.SetDOFName(varQP, 1, "vp");
@@ -495,6 +494,8 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			dofs.SetDOFName(varQAP, 0, "aup");
 			dofs.SetDOFName(varQAP, 1, "avp");
 			dofs.SetDOFName(varQAP, 2, "awp");
+			// must be last variable definition!!
+			int varC = dofs.AddVariable("concentration", VAR_ARRAY); // we start with zero concentrations
 		}
 
 		// parse the file
