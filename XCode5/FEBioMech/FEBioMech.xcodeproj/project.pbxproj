@@ -113,6 +113,8 @@
 		D59D17D6192BD83B007C880C /* FECoupledMooneyRivlin.h in Headers */ = {isa = PBXBuildFile; fileRef = D59D17D2192BD83B007C880C /* FECoupledMooneyRivlin.h */; };
 		D59D17D7192BD83B007C880C /* FECoupledVerondaWestmann.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59D17D3192BD83B007C880C /* FECoupledVerondaWestmann.cpp */; };
 		D59D17D8192BD83B007C880C /* FECoupledVerondaWestmann.h in Headers */ = {isa = PBXBuildFile; fileRef = D59D17D4192BD83B007C880C /* FECoupledVerondaWestmann.h */; };
+		D59F6B0B1DF9DDAD000E7922 /* FEMergedConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59F6B091DF9DDAD000E7922 /* FEMergedConstraint.cpp */; };
+		D59F6B0C1DF9DDAD000E7922 /* FEMergedConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D59F6B0A1DF9DDAD000E7922 /* FEMergedConstraint.h */; };
 		D5A12B1A1875B02C008BF405 /* FEContactSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A12B181875B02C008BF405 /* FEContactSurface.cpp */; };
 		D5A12B1B1875B02C008BF405 /* FEContactSurface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A12B191875B02C008BF405 /* FEContactSurface.h */; };
 		D5A32E101C20F9F100162B01 /* FEElasticDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A32E0F1C20F9F100162B01 /* FEElasticDomain.cpp */; };
@@ -503,6 +505,8 @@
 		D59D17D2192BD83B007C880C /* FECoupledMooneyRivlin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECoupledMooneyRivlin.h; sourceTree = "<group>"; };
 		D59D17D3192BD83B007C880C /* FECoupledVerondaWestmann.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECoupledVerondaWestmann.cpp; sourceTree = "<group>"; };
 		D59D17D4192BD83B007C880C /* FECoupledVerondaWestmann.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECoupledVerondaWestmann.h; sourceTree = "<group>"; };
+		D59F6B091DF9DDAD000E7922 /* FEMergedConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMergedConstraint.cpp; sourceTree = "<group>"; };
+		D59F6B0A1DF9DDAD000E7922 /* FEMergedConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMergedConstraint.h; sourceTree = "<group>"; };
 		D5A12B181875B02C008BF405 /* FEContactSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactSurface.cpp; sourceTree = "<group>"; };
 		D5A12B191875B02C008BF405 /* FEContactSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEContactSurface.h; sourceTree = "<group>"; };
 		D5A32E0F1C20F9F100162B01 /* FEElasticDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElasticDomain.cpp; sourceTree = "<group>"; };
@@ -1013,6 +1017,8 @@
 				D5E107081865DFAD00B23922 /* FELinearTransIso.h */,
 				D5B5ACB41C74BD8C0097B42B /* FEMembraneMaterial.cpp */,
 				D5B5ACB51C74BD8C0097B42B /* FEMembraneMaterial.h */,
+				D59F6B091DF9DDAD000E7922 /* FEMergedConstraint.cpp */,
+				D59F6B0A1DF9DDAD000E7922 /* FEMergedConstraint.h */,
 				D5E107091865DFAD00B23922 /* FEMicroMaterial.cpp */,
 				D5E1070A1865DFAD00B23922 /* FEMicroMaterial.h */,
 				D59BBB9C1AD771B800E2991F /* FEMicroMaterial2O.cpp */,
@@ -1347,6 +1353,7 @@
 				D5F407CC197D7DDE0059F0B1 /* FESolidSolver2.h in Headers */,
 				D5B6ED801B02306600126821 /* FERigidDamper.h in Headers */,
 				D5E1077F1865DFAD00B23922 /* FEAugLagLinearConstraint.h in Headers */,
+				D59F6B0C1DF9DDAD000E7922 /* FEMergedConstraint.h in Headers */,
 				D5FF08F71BE4528E0064FF98 /* FEMortarSlidingContact.h in Headers */,
 				D54CBF091AB34286003CF33F /* FEPrescribedActiveContractionIsotropic.h in Headers */,
 				D51BB3FE1991238100638A8B /* FEFiberMaterialPoint.h in Headers */,
@@ -1605,6 +1612,7 @@
 				D593574C1B11046A00AF4DF8 /* FERigidContractileForce.cpp in Sources */,
 				D5E107821865DFAD00B23922 /* FEBioMechData.cpp in Sources */,
 				D5E1080F1865DFAD00B23922 /* FEResidualVector.cpp in Sources */,
+				D59F6B0B1DF9DDAD000E7922 /* FEMergedConstraint.cpp in Sources */,
 				D5E107FF1865DFAD00B23922 /* FEOrthoElastic.cpp in Sources */,
 				D5E107C11865DFAD00B23922 /* FEFacet2FacetTied.cpp in Sources */,
 				D5E107CB1865DFAD00B23922 /* FEFiberIntegrationGeodesic.cpp in Sources */,
