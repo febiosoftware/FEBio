@@ -19,7 +19,6 @@ bool FEDataGenerator::Init()
 bool FEDataGenerator::Apply(FEDomain* part, const char* szvar)
 {
 	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-	felog.printf("HELLO!!!!!!!!!!!!!\n");
 
 	// check input
 	if (part == 0) return false;
@@ -40,8 +39,6 @@ bool FEDataGenerator::Apply(FEDomain* part, const char* szvar)
 	}
 
 	FEMesh& mesh = *part->GetMesh();
-
-	felog.printf("HELLO!!!!!!!!!!!!!\n");
 
 	vec3d r[FEElement::MAX_NODES];
 	size_t nsize = part->Elements();
