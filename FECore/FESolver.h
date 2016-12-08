@@ -74,6 +74,7 @@ public: //TODO Move these parameters elsewhere
 	Timer	m_StiffnessTime;	//!< time evaluating stiffness matrix
 	Timer	m_RHSTime;			//!< time evaluating right-hand-side
 	Timer	m_UpdateTime;		//!< time updating model
+	Timer	m_QNTime;			//!< time in quasi-Newton updates
 
 	// counters
 	int		m_nrhs;			//!< nr of right hand side evalutations

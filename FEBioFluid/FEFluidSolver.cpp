@@ -404,17 +404,21 @@ bool FEFluidSolver::Quasin(double time)
         }
         
         // calculate norms
-        normR1 = m_R1*m_R1;
-        normu  = (m_ui*m_ui)*(s*s);
-        normE1 = s*fabs(m_ui*m_R1);
+		m_UpdateTime.start();
+		{
+			normR1 = m_R1*m_R1;
+			normu  = (m_ui*m_ui)*(s*s);
+			normE1 = s*fabs(m_ui*m_R1);
         
-        // check for nans
-        if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
+			// check for nans
+			if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
         
-        // update total velocities
-        int neq = (int)m_Vi.size();
-        for (i=0; i<neq; ++i) m_Vi[i] += s*m_ui[i];
-        normU  = m_Vi*m_Vi;
+			// update total velocities
+			int neq = (int)m_Vi.size();
+			for (i=0; i<neq; ++i) m_Vi[i] += s*m_ui[i];
+			normU  = m_Vi*m_Vi;
+		}
+		m_UpdateTime.stop();
         
         // check residual norm
         if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;
@@ -484,6 +488,7 @@ bool FEFluidSolver::Quasin(double time)
                 {
                     if (m_pbfgs->m_nups < m_pbfgs->m_maxups-1)
                     {
+						m_QNTime.start();
                         if (m_pbfgs->Update(s, m_ui, m_R0, m_R1) == false)
                         {
                             // Stiffness update has failed.
@@ -492,7 +497,8 @@ bool FEFluidSolver::Quasin(double time)
                             felog.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
                             breform = true;
                         }
-                    }
+						m_QNTime.stop();
+					}
                     else
                     {
                         // we've reached the max nr of BFGS updates, so
@@ -511,8 +517,10 @@ bool FEFluidSolver::Quasin(double time)
             // we must set this to zero before the reformation
             // because we assume that the prescribed velocities are stored
             // in the m_ui vector.
+			m_UpdateTime.start();
             zero(m_ui);
-            
+			m_UpdateTime.stop();
+
             // reform stiffness matrices if necessary
             if (breform && m_bdoreforms)
             {
@@ -526,8 +534,10 @@ bool FEFluidSolver::Quasin(double time)
             }
             
             // copy last calculated residual
+			m_RHSTime.start();
             m_R0 = m_R1;
-        }
+			m_RHSTime.stop();
+		}
         else if (m_baugment)
         {
             // we have converged, so let's see if the augmentations have converged as well

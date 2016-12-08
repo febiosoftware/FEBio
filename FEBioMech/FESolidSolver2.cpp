@@ -658,16 +658,20 @@ bool FESolidSolver2::Quasin(double time)
 		}
 
 		// update total displacements
-		int neq = (int)m_Ui.size();
-        vector<double> ui(m_ui);
-        for (i=0; i<neq; ++i) ui[i] *= s;
-        UpdateIncrements(m_Ui, ui, false);
+		m_UpdateTime.start();
+		{
+			int neq = (int)m_Ui.size();
+			vector<double> ui(m_ui);
+			for (i=0; i<neq; ++i) ui[i] *= s;
+			UpdateIncrements(m_Ui, ui, false);
 
-		// calculate norms
-		normR1 = m_R1*m_R1;
-		normu  = (m_ui*m_ui)*(s*s);
-		normU  = m_Ui*m_Ui;
-		normE1 = s*fabs(m_ui*m_R1);
+			// calculate norms
+			normR1 = m_R1*m_R1;
+			normu  = (m_ui*m_ui)*(s*s);
+			normU  = m_Ui*m_Ui;
+			normE1 = s*fabs(m_ui*m_R1);
+		}
+		m_UpdateTime.stop();
 
 		// check for nans
 		if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
@@ -740,6 +744,7 @@ bool FESolidSolver2::Quasin(double time)
 				{
 					if (m_pbfgs->m_nups < m_pbfgs->m_maxups-1)
 					{
+						m_QNTime.start();
 						if (m_pbfgs->Update(s, m_ui, m_R0, m_R1) == false)
 						{
 							// Stiffness update has failed.
@@ -748,6 +753,7 @@ bool FESolidSolver2::Quasin(double time)
 							felog.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
 							breform = true;
 						}
+						m_QNTime.stop();
 					}
 					else
 					{

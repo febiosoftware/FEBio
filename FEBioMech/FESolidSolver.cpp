@@ -542,13 +542,17 @@ bool FESolidSolver::Quasin(double time)
 		m_SolverTime.stop();
 
 		// set initial convergence norms
-		if (m_niter == 0)
+		m_UpdateTime.start();
 		{
-			normRi = fabs(m_R0*m_R0);
-			normEi = fabs(m_ui*m_R0);
-			normUi = fabs(m_ui*m_ui);
-			normEm = normEi;
+			if (m_niter == 0)
+			{
+				normRi = fabs(m_R0*m_R0);
+				normEi = fabs(m_ui*m_R0);
+				normUi = fabs(m_ui*m_ui);
+				normEm = normEi;
+			}
 		}
+		m_UpdateTime.stop();
 
 		// perform a linesearch
 		// the geometry is also updated in the line search
@@ -565,9 +569,13 @@ bool FESolidSolver::Quasin(double time)
 		}
 
 		// calculate norms
-		normR1 = m_R1*m_R1;
-		normu  = (m_ui*m_ui)*(s*s);
-		normE1 = s*fabs(m_ui*m_R1);
+		m_UpdateTime.start();
+		{
+			normR1 = m_R1*m_R1;
+			normu  = (m_ui*m_ui)*(s*s);
+			normE1 = s*fabs(m_ui*m_R1);
+		}
+		m_UpdateTime.stop();
 
 		// check for nans
 		if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
@@ -645,6 +653,7 @@ bool FESolidSolver::Quasin(double time)
 				{
 					if (m_pbfgs->m_nups < m_pbfgs->m_maxups-1)
 					{
+						m_QNTime.start();
 						if (m_pbfgs->Update(s, m_ui, m_R0, m_R1) == false)
 						{
 							// Stiffness update has failed.
@@ -653,6 +662,7 @@ bool FESolidSolver::Quasin(double time)
 							felog.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
 							breform = true;
 						}
+						m_QNTime.stop();
 					}
 					else
 					{

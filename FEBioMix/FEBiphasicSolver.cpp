@@ -181,20 +181,24 @@ bool FEBiphasicSolver::Quasin(double time)
 		m_SolverTime.stop();
 
 		// check for nans
-		double du = m_ui*m_ui;
-		if (ISNAN(du)) throw NANDetected();
-
-		// extract the pressure increments
-		GetDisplacementData(m_di, m_ui);
-
-		// set initial convergence norms
-		if (m_niter == 0)
+		m_UpdateTime.start();
 		{
-			normRi = fabs(m_R0*m_R0);
-			normEi = fabs(m_ui*m_R0);
-			normDi = fabs(m_di*m_di);
-			normEm = normEi;
+			double du = m_ui*m_ui;
+			if (ISNAN(du)) throw NANDetected();
+
+			// extract the pressure increments
+			GetDisplacementData(m_di, m_ui);
+
+			// set initial convergence norms
+			if (m_niter == 0)
+			{
+				normRi = fabs(m_R0*m_R0);
+				normEi = fabs(m_ui*m_R0);
+				normDi = fabs(m_di*m_di);
+				normEm = normEi;
+			}
 		}
+		m_UpdateTime.stop();
 
 		// perform a linesearch
 		// the geometry is also updated in the line search
@@ -210,17 +214,21 @@ bool FEBiphasicSolver::Quasin(double time)
 			Residual(m_R1);
 		}
 
-		// update all degrees of freedom
-		for (i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
+		m_UpdateTime.start();
+		{
+			// update all degrees of freedom
+			for (i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
 
-		// update displacements
-		for (i=0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
+			// update displacements
+			for (i=0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
 
-		// calculate norms
-		normR1 = m_R1*m_R1;
-		normd  = (m_di*m_di)*(s*s);
-		normD  = m_Di*m_Di;
-		normE1 = s*fabs(m_ui*m_R1);
+			// calculate norms
+			normR1 = m_R1*m_R1;
+			normd  = (m_di*m_di)*(s*s);
+			normD  = m_Di*m_Di;
+			normE1 = s*fabs(m_ui*m_R1);
+		}
+		m_UpdateTime.stop();
 
 		// check residual norm
 		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	
@@ -310,6 +318,7 @@ bool FEBiphasicSolver::Quasin(double time)
 				{
 					if (m_pbfgs->m_nups < m_pbfgs->m_maxups-1)
 					{
+						m_QNTime.start();
 						if (m_pbfgs->Update(s, m_ui, m_R0, m_R1) == false)
 						{
 							// Stiffness update has failed.
@@ -318,6 +327,7 @@ bool FEBiphasicSolver::Quasin(double time)
 							felog.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
 							breform = true;
 						}
+						m_QNTime.stop();
 					}
 					else
 					{

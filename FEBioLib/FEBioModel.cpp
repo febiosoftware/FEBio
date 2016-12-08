@@ -775,6 +775,7 @@ bool FEBioModel::Solve()
 		double total_stiff  = 0.0;
 		double total_rhs    = 0.0;
 		double total_update = 0.0;
+		double total_qn     = 0.0;
 		int NS = Steps();
 		for (int i = 0; i<NS; ++i)
 		{
@@ -787,6 +788,7 @@ bool FEBioModel::Solve()
 				total_stiff  += psolve->m_StiffnessTime.GetTime();
 				total_rhs    += psolve->m_RHSTime.GetTime();
 				total_update += psolve->m_UpdateTime.GetTime();
+				total_qn     += psolve->m_QNTime.GetTime();
 			}
 		}
 
@@ -800,6 +802,7 @@ bool FEBioModel::Solve()
 		Timer::time_str(total_stiff , sztime); felog.printf("\t   evaluating stiffness ......... : %s (%lg sec)\n\n", sztime, total_stiff );
 		Timer::time_str(total_rhs   , sztime); felog.printf("\t   evaluating residual .......... : %s (%lg sec)\n\n", sztime, total_rhs   );
 		Timer::time_str(total_update, sztime); felog.printf("\t   model update ................. : %s (%lg sec)\n\n", sztime, total_update);
+		Timer::time_str(total_qn    , sztime); felog.printf("\t   QN updates ................... : %s (%lg sec)\n\n", sztime, total_qn);
 		Timer::time_str(total_linsol, sztime); felog.printf("\t   time in linear solver ........ : %s (%lg sec)\n\n", sztime, total_linsol);
 		Timer::time_str(total_time  , sztime); felog.printf("\tTotal elapsed time .............. : %s (%lg sec)\n\n", sztime, total_time  );
 
