@@ -12,6 +12,7 @@
 
 #include "FEFluidTractionLoad.h"
 #include "FEFluidNormalTraction.h"
+#include "FEFluidResistanceBC.h"
 
 #include "FEConstraintFrictionlessWall.h"
 #include "FEConstraintNormalFlow.h"
@@ -53,6 +54,7 @@ REGISTER_FECORE_CLASS(FEFluidDomain2D               , FEDOMAIN_ID, "fluid2D"    
 // Surface loads
 REGISTER_FECORE_CLASS(FEFluidTractionLoad           , FESURFACELOAD_ID, "fluid traction");
 REGISTER_FECORE_CLASS(FEFluidNormalTraction         , FESURFACELOAD_ID, "fluid normal traction");
+REGISTER_FECORE_CLASS(FEFluidResistanceBC           , FESURFACELOAD_ID, "fluid resistance");
     
 //-----------------------------------------------------------------------------
 // constraint classes
