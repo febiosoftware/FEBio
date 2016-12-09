@@ -10,6 +10,7 @@
 #include "FEMultiphasic.h"
 #include "FEBiphasicContactSurface.h"
 #include "FEBioPlot/FEBioPlotFile.h"
+#include "FEBioFluid/FEFluid.h"
 #include <FECore/FEModel.h>
 
 //=============================================================================
@@ -57,8 +58,10 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
             for (int n=0; n<nint; ++n)
             {
                 FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
-                FEBiphasicMaterialPoint* pt = mp.ExtractData<FEBiphasicMaterialPoint>();
-                if (pt) w += pt->m_w;
+                FEBiphasicMaterialPoint* ptb = mp.ExtractData<FEBiphasicMaterialPoint>();
+                FEFluidMaterialPoint* ptf = mp.ExtractData<FEFluidMaterialPoint>();
+                if (ptb) w += ptb->m_w;
+                else if (ptf) w += ptf->m_vt/ptf->m_J;
             }
             w /= nint;
             
