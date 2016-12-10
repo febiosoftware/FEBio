@@ -293,7 +293,7 @@ bool FEAnalysis::Solve()
 	{
 		// keep a copy of the current state, in case
 		// we need to retry this time step
-		if (m_bautostep) 
+		if (m_bautostep && (m_maxretries > 0)) 
 		{ 
 			FESolver* solver = GetFESolver();
 			solver->m_UpdateTime.start();

@@ -284,6 +284,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidNormalTraction.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidResidualVector.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidResistanceBC.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidTractionLoad.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEIdealFluid.cpp" />
@@ -307,6 +308,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidDomainFactory.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidNormalTraction.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidResidualVector.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidResistanceBC.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidTractionLoad.h" />
     <ClInclude Include="..\..\FEBioFluid\FEIdealFluid.h" />
