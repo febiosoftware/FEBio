@@ -159,11 +159,8 @@ void FEFluidSolver::UpdateKinematics(vector<double>& vi)
     // get the mesh
     FEMesh& mesh = m_fem.GetMesh();
     
-    int NN = mesh.Nodes();
-    
     // update nodes
-#pragma omp parallel for
-    for (i=0; i<NN; ++i)
+    for (i=0; i<mesh.Nodes(); ++i)
     {
         FENode& node = mesh.Node(i);
         
