@@ -383,9 +383,9 @@ bool FEFluidSolver::Quasin(double time)
         // set initial convergence norms
         if (m_niter == 0)
         {
-            normRi = fabs(m_R0*m_R0);
-            normEi = fabs(m_ui*m_R0);
-            normUi = fabs(m_ui*m_ui);
+            normRi = fabs(m_R0*m_R0)/m_R0.size();
+            normEi = fabs(m_ui*m_R0)/m_R0.size();
+            normUi = fabs(m_ui*m_ui)/m_ui.size();
             normEm = normEi;
         }
         
@@ -406,9 +406,9 @@ bool FEFluidSolver::Quasin(double time)
         // calculate norms
 		m_UpdateTime.start();
 		{
-			normR1 = m_R1*m_R1;
-			normu  = (m_ui*m_ui)*(s*s);
-			normE1 = s*fabs(m_ui*m_R1);
+			normR1 = m_R1*m_R1/m_R1.size();
+			normu  = (m_ui*m_ui)*(s*s)/m_ui.size();
+			normE1 = s*fabs(m_ui*m_R1)/m_R1.size();
         
 			// check for nans
 			if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
@@ -416,7 +416,7 @@ bool FEFluidSolver::Quasin(double time)
 			// update total velocities
 			int neq = (int)m_Vi.size();
 			for (i=0; i<neq; ++i) m_Vi[i] += s*m_ui[i];
-			normU  = m_Vi*m_Vi;
+			normU  = m_Vi*m_Vi/neq;
 		}
 		m_UpdateTime.stop();
         
