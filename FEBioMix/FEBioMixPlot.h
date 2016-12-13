@@ -214,6 +214,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Nodal effective downstream fluid pressures
+class FEPlotEffectiveShellFluidPressure : public FEDomainData
+{
+public:
+    FEPlotEffectiveShellFluidPressure(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
+    bool Save(FEDomain& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Nodal effective solute concentrations (for biphasic-solute problems)
 class FEPlotEffectiveSoluteConcentration : public FEDomainData
 {

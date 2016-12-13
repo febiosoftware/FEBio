@@ -192,7 +192,7 @@ bool FEBiphasicTangentDiagnostic::Run()
     matrix k0(4*N, 4*N);
     k0.zero();
 	double dt = m_pscn->m_dt;
-    bd.ElementBiphasicStiffness(el, k0, false, dt);
+    bd.ElementBiphasicStiffness(el, k0, false);
     
     // print the element stiffness matrix
     felog.printf("\nActual stiffness matrix:\n");
@@ -263,23 +263,15 @@ void FEBiphasicTangentDiagnostic::deriv_residual(matrix& ke)
     int N = mesh.Nodes();
     
     // first calculate the initial residual
-    vector<double> f0(4*N), f0u(3*N), f0p(N);
-    zero(f0u); zero(f0p);
-    bd.ElementInternalForce(el, f0u);
-	double dt = m_pscn->m_dt;
-    bd.ElementInternalFluidWork(el, f0p, dt);
-    for (i=0; i<N; ++i) {
-        f0[4*i  ] = f0u[3*i  ];
-        f0[4*i+1] = f0u[3*i+1];
-        f0[4*i+2] = f0u[3*i+2];
-        f0[4*i+3] = f0p[i    ];
-    }
+    vector<double> f0(4*N);
+    zero(f0);
+    bd.ElementInternalForce(el, f0);
     
     // now calculate the perturbed residuals
     ke.resize(4*N, 4*N);
     ke.zero();
     double dx = 1e-8;
-    vector<double> f1(4*N), f1u(3*N), f1p(N);
+    vector<double> f1(4*N);
     for (j=0; j<4*N; ++j)
     {
         FENode& node = mesh.Node(el.m_node[j/4]);
@@ -295,15 +287,8 @@ void FEBiphasicTangentDiagnostic::deriv_residual(matrix& ke)
         
         solver.UpdateStresses();
         
-        zero(f1u); zero(f1p);
-        bd.ElementInternalForce(el, f1u);
-        bd.ElementInternalFluidWork(el, f1p, dt);
-        for (k=0; k<N; ++k) {
-            f1[4*k  ] = f1u[3*k  ];
-            f1[4*k+1] = f1u[3*k+1];
-            f1[4*k+2] = f1u[3*k+2];
-            f1[4*k+3] = f1p[k    ];
-        }
+        zero(f1);
+        bd.ElementInternalForce(el, f1);
         
         switch (nj)
         {

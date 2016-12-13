@@ -58,6 +58,7 @@
 
 #include "FEMixDomainFactory.h"
 #include "FEBiphasicSolidDomain.h"
+#include "FEBiphasicShellDomain.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FETriphasicDomain.h"
 #include "FEMultiphasicDomain.h"
@@ -129,6 +130,7 @@ REGISTER_FECORE_CLASS(FEActiveConstantSupply              ,FEMATERIAL_ID, "activ
 //-----------------------------------------------------------------------------
 // Domain classes
 REGISTER_FECORE_CLASS(FEBiphasicSolidDomain , FEDOMAIN_ID, "biphasic-solid"       );
+REGISTER_FECORE_CLASS(FEBiphasicShellDomain , FEDOMAIN_ID, "biphasic-shell"       );
 REGISTER_FECORE_CLASS(FEBiphasicSoluteDomain, FEDOMAIN_ID, "biphasic-solute-solid");
 REGISTER_FECORE_CLASS(FETriphasicDomain     , FEDOMAIN_ID, "triphasic-solid"      );
 REGISTER_FECORE_CLASS(FEMultiphasicDomain   , FEDOMAIN_ID, "multiphasic-solid"    );
@@ -151,6 +153,7 @@ REGISTER_FECORE_CLASS(FETiedBiphasicInterface, FESURFACEPAIRINTERACTION_ID, "tie
 // classes derived from FEPlotData
 REGISTER_FECORE_CLASS(FEPlotEffectiveElasticity		     , FEPLOTDATA_ID, "effective elasticity"            );
 REGISTER_FECORE_CLASS(FEPlotEffectiveFluidPressure		 , FEPLOTDATA_ID, "effective fluid pressure"        );
+REGISTER_FECORE_CLASS(FEPlotEffectiveShellFluidPressure  , FEPLOTDATA_ID, "effective shell fluid pressure");
 REGISTER_FECORE_CLASS(FEPlotActualFluidPressure          , FEPLOTDATA_ID, "fluid pressure"                  );
 REGISTER_FECORE_CLASS(FEPlotFluidFlux                    , FEPLOTDATA_ID, "fluid flux"                      );
 REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentration , FEPLOTDATA_ID, "effective solute concentration"  );

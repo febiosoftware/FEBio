@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/FESolidDomain.h"
-#include "FEBioMech/FEElasticDomain.h"
+#include "FEBiphasicDomain.h"
 #include "FEBiphasic.h"
 
 //-----------------------------------------------------------------------------
@@ -8,7 +8,7 @@
 //! Note that this class inherits from FEElasticSolidDomain since the biphasic domain
 //! also needs to calculate elastic stiffness contributions.
 //!
-class FEBiphasicSolidDomain : public FESolidDomain, public FEElasticDomain
+class FEBiphasicSolidDomain : public FESolidDomain, public FEBiphasicDomain
 {
 public:
 	//! constructor
@@ -43,46 +43,31 @@ public:
 	void UpdateElementStress(int iel);
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver, bool bsymm, double dt);
+	void StiffnessMatrix(FESolver* psolver, bool bsymm);
 
 	//! calculates the global stiffness matrix (steady-state case)
-	void StiffnessMatrixSS(FESolver* psolver, bool bsymm, double dt);
+	void StiffnessMatrixSS(FESolver* psolver, bool bsymm);
 	
 public:
 	// internal work (overridden from FEElasticDomain)
 	void InternalForces(FEGlobalVector& R);
 
-	//! internal fluid work
-	void InternalFluidWork(vector<double>& R, double dt);
-
-	//! internal fluid work (steady state analysis)
-	void InternalFluidWorkSS(vector<double>& R, double dt);
-
+    // internal work (steady-state case)
+    void InternalForcesSS(FEGlobalVector& R);
+    
 public:
 	//! element internal force vector
 	void ElementInternalForce(FESolidElement& el, vector<double>& fe);
 	
-	//! Calculates the internal fluid forces
-	bool ElementInternalFluidWork(FESolidElement& elem, vector<double>& fe, double dt);
-	
-	//! Calculates the internal fluid forces for steady-state response
-	bool ElementInternalFluidWorkSS(FESolidElement& elem, vector<double>& fe, double dt);
-	
+    //! element internal force vector (steady-state case)
+    void ElementInternalForceSS(FESolidElement& el, vector<double>& fe);
+    
 	//! calculates the element biphasic stiffness matrix
-	bool ElementBiphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm, double dt);
+	bool ElementBiphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm);
 	
 	//! calculates the element biphasic stiffness matrix for steady-state response
-	bool ElementBiphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm, double dt);
+	bool ElementBiphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm);
 	
-	//! calculates the solid element stiffness matrix
-	void SolidElementStiffness(FESolidElement& el, matrix& ke);
-
-	//! geometrical stiffness
-	void ElementGeometricalStiffness(FESolidElement &el, matrix &ke);
-
-	//! material stiffness component
-	void ElementBiphasicMaterialStiffness(FESolidElement& el, matrix& ke);
-
 public: // overridden from FEElasticDomain, but not all implemented in this domain
     void BodyForce(FEGlobalVector& R, FEBodyForce& bf);
     void ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe);
@@ -102,11 +87,4 @@ public: // biphasic domain "properties"
 	// assumption in this implementation. Consequently, the fluid flux would be a good example of a domain property.
 	// That is why I've taken this calculation out of the FEBiphasic class and placed it here. 
 	vec3d FluidFlux(FEMaterialPoint& mp);
-
-protected:
-	FEBiphasic*	m_pMat;
-	int			m_dofP;		//!< pressure dof index
-	int			m_dofVX;
-	int			m_dofVY;
-	int			m_dofVZ;
 };

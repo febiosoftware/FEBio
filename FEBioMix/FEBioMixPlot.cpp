@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEBioMixPlot.h"
 #include "FEBiphasicSolidDomain.h"
+#include "FEBiphasicShellDomain.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FETriphasicDomain.h"
 #include "FEMultiphasicDomain.h"
@@ -1108,6 +1109,27 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 		return true;
 	}
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveShellFluidPressure::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEBiphasicShellDomain*  pbsd= dynamic_cast<FEBiphasicShellDomain* >(&dom);
+    if (pbsd)
+    {
+        // get the pressure dof index
+        int dof_q = GetFEModel()->GetDOFIndex("q");
+        if (dof_q == -1) return false;
+        
+        int N = dom.Nodes();
+        for (int i=0; i<N; ++i)
+        {
+            FENode& node = dom.Node(i);
+            a << node.get(dof_q);
+        }
+        return true;
+    }
+    return false;
 }
 
 //-----------------------------------------------------------------------------

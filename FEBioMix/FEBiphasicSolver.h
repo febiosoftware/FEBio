@@ -70,7 +70,8 @@ public:
 
 protected:
 	int	m_dofP;	//!< pressure dof index
-
+    int	m_dofQ;	//!< shell pressure dof index
+    
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

@@ -1,6 +1,6 @@
 #include "FEBiphasicSolver.h"
-#include "FEBiphasicSolidDomain.h"
-#include "FEBioMech/FEElasticSolidDomain.h"
+#include "FEBiphasicDomain.h"
+#include "FEBioMech/FEElasticDomain.h"
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
 #include "FESlidingInterfaceBiphasic.h"
@@ -32,9 +32,12 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 	DOFS& dofs = pfem->GetDOFS();
 	int varP = dofs.AddVariable("fluid pressure");
 	dofs.SetDOFName(varP, 0, "p");
-
+    int varQ = dofs.AddVariable("shell fluid pressure");
+    dofs.SetDOFName(varQ, 0, "q");
+    
 	// get pressure dof
 	m_dofP = pfem->GetDOFIndex("p");
+    m_dofQ = pfem->GetDOFIndex("q");
 }
 
 //-----------------------------------------------------------------------------
@@ -46,11 +49,10 @@ bool FEBiphasicSolver::Init()
 	if (FESolidSolver2::Init() == false) return false;
 
 	// allocate poro-vectors
-//	assert(m_ndeq > 0);
-	m_di.assign(m_ndeq, 0);
+    assert((m_ndeq > 0) || (m_npeq > 0));
+    m_di.assign(m_ndeq, 0);
 	m_Di.assign(m_ndeq, 0);
 
-//	assert(m_npeq > 0);
 	if (m_npeq > 0) {
 		m_pi.assign(m_npeq, 0);
 		m_Pi.assign(m_npeq, 0);
@@ -59,7 +61,8 @@ bool FEBiphasicSolver::Init()
 		// (displacements are already handled in base class)
 		FEMesh& mesh = m_fem.GetMesh();
 		gather(m_Ut, mesh, m_dofP);
-	}
+        gather(m_Ut, mesh, m_dofQ);
+    }
 
 	return true;
 }
@@ -84,8 +87,12 @@ bool FEBiphasicSolver::InitEquations()
 		if (n.m_ID[m_dofX] != -1) m_ndeq++;
 		if (n.m_ID[m_dofY] != -1) m_ndeq++;
 		if (n.m_ID[m_dofZ] != -1) m_ndeq++;
-		if (n.m_ID[m_dofP] != -1) m_npeq++;
-	}
+        if (n.m_ID[m_dofU] != -1) m_ndeq++;
+        if (n.m_ID[m_dofV] != -1) m_ndeq++;
+        if (n.m_ID[m_dofW] != -1) m_ndeq++;
+        if (n.m_ID[m_dofP] != -1) m_npeq++;
+        if (n.m_ID[m_dofQ] != -1) m_npeq++;
+    }
 
 	return true;
 }
@@ -458,7 +465,7 @@ void FEBiphasicSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
 			
 				// For pressure and concentration loads, multiply by dt
 				// for consistency with evaluation of residual and stiffness matrix
-				if (dof == m_dofP) f *= tp.timeIncrement;
+				if ((dof == m_dofP) || (dof == m_dofQ)) f *= tp.timeIncrement;
 
 				// assemble into residual
 				AssembleResidual(nid, dof, f, F);
@@ -499,35 +506,38 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	FEMesh& mesh = m_fem.GetMesh();
 
 	// calculate internal stress force
-	for (i=0; i<mesh.Domains(); ++i)
-	{
-		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		dom.InternalForces(RHS);
-	}
-
-	// calculate internal fluid work
 	if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
 	{
 		for (i=0; i<mesh.Domains(); ++i)
 		{
-			FEBiphasicSolidDomain* pdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-			if (pdom) pdom->InternalFluidWorkSS(R, dt);
-		}
+			FEBiphasicDomain* pdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
+			if (pdom) pdom->InternalForcesSS(RHS);
+            else
+            {
+                FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+                dom.InternalForces(RHS);
+            }
+        }
 	}
 	else
 	{
 		for (i=0; i<mesh.Domains(); ++i)
 		{
-			FEBiphasicSolidDomain* pdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-			if (pdom) pdom->InternalFluidWork(R, dt);
+			FEBiphasicDomain* pdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
+			if (pdom) pdom->InternalForces(RHS);
+            else
+            {
+                FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+                dom.InternalForces(RHS);
+            }
 		}
 	}
 
     // calculate the body forces
     for (i=0; i<mesh.Domains(); ++i)
     {
-        FEBiphasicSolidDomain* pbdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-        FEElasticSolidDomain* pedom = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
+        FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
+        FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
         for (int j=0; j<m_fem.BodyLoads(); ++j)
         {
             FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
@@ -619,8 +629,8 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimeInfo& tp)
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
             // Biphasic analyses may include biphasic and elastic domains
-			FEBiphasicSolidDomain* pbdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-			if (pbdom) pbdom->StiffnessMatrixSS(this, bsymm, dt);
+			FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
+			if (pbdom) pbdom->StiffnessMatrixSS(this, bsymm);
             else
 			{
 				FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
@@ -633,8 +643,8 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimeInfo& tp)
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
             // Biphasic analyses may include biphasic and elastic domains
-			FEBiphasicSolidDomain* pbdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-			if (pbdom) pbdom->StiffnessMatrix(this, bsymm, dt);
+			FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
+			if (pbdom) pbdom->StiffnessMatrix(this, bsymm);
             else 
 			{
 				FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
@@ -647,8 +657,8 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimeInfo& tp)
 	// TODO: This is not  going to work with FEDiscreteSpringDomain
     for (i=0; i<mesh.Domains(); ++i)
     {
-        FEBiphasicSolidDomain* pbdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-        FEElasticSolidDomain* pedom = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
+        FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
+        FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
         int NBL = m_fem.BodyLoads();
         for (int j=0; j<NBL; ++j)
         {
@@ -703,21 +713,25 @@ void FEBiphasicSolver::UpdateKinematics(vector<double>& ui)
 //! Updates the poroelastic data
 void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 {
-	FEMesh& mesh = m_fem.GetMesh();
+    int i, n;
+    
+    FEMesh& mesh = m_fem.GetMesh();
 	double dt = m_fem.GetTime().timeIncrement;
 
 	// update poro-elasticity data
-	for (int i=0; i<mesh.Nodes(); ++i)
+	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 
 		// update nodal pressures
-		int n = node.m_ID[m_dofP];
+		n = node.m_ID[m_dofP];
 		if (n >= 0) node.set(m_dofP, 0 + m_Ut[n] + m_Ui[n] + ui[n]);
-	}
+        n = node.m_ID[m_dofQ];
+        if (n >= 0) node.set(m_dofQ, 0 + m_Ut[n] + m_Ui[n] + ui[n]);
+    }
 
 	// update poro-elasticity data
-	for (int i=0; i<mesh.Nodes(); ++i)
+	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 
@@ -809,7 +823,14 @@ void FEBiphasicSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 			pi[m++] = ui[nid];
 			assert(m <= (int) pi.size());
 		}
-	}
+        nid = n.m_ID[m_dofQ];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            pi[m++] = ui[nid];
+            assert(m <= (int) pi.size());
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------

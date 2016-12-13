@@ -462,6 +462,8 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			dofs.SetDOFName(varQ, 2, "w");
 			int varP = dofs.AddVariable("fluid pressure");
 			dofs.SetDOFName(varP, 0, "p");
+            int varSP = dofs.AddVariable("shell fluid pressure");
+            dofs.SetDOFName(varSP, 0, "q");
 			int varQR = dofs.AddVariable("rigid rotation", VAR_VEC3);
 			dofs.SetDOFName(varQR, 0, "Ru");
 			dofs.SetDOFName(varQR, 1, "Rv");
