@@ -48,6 +48,12 @@ const FELinearConstraint& FELinearConstraintManager::LinearConstraint(int i) con
 }
 
 //-----------------------------------------------------------------------------
+FELinearConstraint& FELinearConstraintManager::LinearConstraint(int i)
+{
+	return m_LinC[i];
+}
+
+//-----------------------------------------------------------------------------
 void FELinearConstraintManager::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;
@@ -191,13 +197,19 @@ bool FELinearConstraintManager::Initialize()
 					for (int k=0; k<n; ++k)
 					{
 						FELinearConstraint::DOF& slaveDOF = lcj.slave[k];
-						if ((slaveDOF.node == masterDOF.node) && (slaveDOF.dof == masterDOF.dof)) return false;
+						if ((slaveDOF.node == masterDOF.node) && (slaveDOF.dof == masterDOF.dof)) 
+						{
+							return false;
+						}
 					}
 
 					// also make sure the master dof is not repeated
 					if (i != j)
 					{
-						if ((lci.master.node == lcj.master.node) && (lci.master.dof == lcj.master.dof)) return false;
+						if ((lci.master.node == lcj.master.node) && (lci.master.dof == lcj.master.dof)) 
+						{
+							return false;
+						}
 					}
 				}
 			}
@@ -404,6 +416,6 @@ void FELinearConstraintManager::Update()
 
 		// assign to master node
 		FENode& masterNode = mesh.Node(lc.master.node);
-		masterNode.set(lc.master.dof, d);
+		masterNode.set(lc.master.dof, d + lc.m_off);
 	}
 }

@@ -612,6 +612,9 @@
     <ClInclude Include="..\..\FEBioMech\FEMergedConstraint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEPeriodicLinearConstraint2O.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1191,6 +1194,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEMergedConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEPeriodicLinearConstraint2O.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

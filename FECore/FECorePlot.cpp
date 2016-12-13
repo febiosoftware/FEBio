@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "FECorePlot.h"
 #include "FEMaterial.h"
+#include "FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
-FEPlotMaterialParameter::FEPlotMaterialParameter(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM) { m_index = 0; }
+FEPlotMaterialParameter::FEPlotMaterialParameter(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_MULT) { m_index = 0; }
 
 //-----------------------------------------------------------------------------
 // This plot field requires a filter which defines the material name and 
@@ -46,6 +47,8 @@ bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
 	// to reference a specific parameter
 	ParamString s(m_szparam);
 
+	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
+
 	// loop over all the elements in the domain
 	int NE = dom.Elements();
 	for (int i=0; i<NE; ++i)
@@ -54,8 +57,11 @@ bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
 		// we only calculate the element's average
 		// but since most material parameters can only defined 
 		// at the element level, this should get the same answer
-		FEElement& e = dom.ElementRef(i);
+		FESolidElement& e = sd.Element(i);
 		int nint = e.GaussPoints();
+		int neln = e.Nodes();
+
+		vector<double> gv(nint);
 		double E = 0.0;
 		int nc = 0;
 		for (int j=0; j<nint; ++j)
@@ -68,14 +74,19 @@ bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
 			FEParam* pv = mp.FindParameter(m_szparam);
 			if (pv && (pv->type()==FE_PARAM_DOUBLE) && (m_index < pv->dim()))
 			{
-				E += pv->value<double>(m_index);
+				gv[j] = pv->value<double>(m_index);
 				nc++;
 			}
 		}
-		if (nc > 0) E /= (double) nc;
+
+		vector<double> nv(neln, 0.0);
+		if (nc == nint)
+		{
+			e.project_to_nodes(&gv[0], &nv[0]);
+		}
 
 		// store the result
-		a << E;
+		for (int j=0; j<neln; ++j) a << nv[j];
 	}
 
 	return true;

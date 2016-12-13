@@ -22,6 +22,7 @@
 #include "FECore/FECoreKernel.h"
 #include <FECore/FELinearConstraintManager.h>
 #include <FEBioMech/FEPeriodicLinearConstraint.h>
+#include <FEBioMech/FEPeriodicLinearConstraint2O.h>
 #include <FEBioMech/FEMergedConstraint.h>
 
 //-----------------------------------------------------------------------------
@@ -61,7 +62,8 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 			else if (tag == "rigid_body"       ) ParseRigidBody    (tag);
 			else if (tag == "linear_constraint") ParseConstraints  (tag);
 			else if (tag == "periodic_linear_constraint") ParsePeriodicLinearConstraint(tag);
-			else if (tag == "merge"            ) ParseMergeConstraint(tag);
+			else if (tag == "periodic_linear_constraint_2O") ParsePeriodicLinearConstraint2O(tag);
+			else if (tag == "merge") ParseMergeConstraint(tag);
 			else throw XMLReader::InvalidTag(tag);
 		}
 		++tag;
@@ -882,6 +884,57 @@ void FEBioBoundarySection::ParsePeriodicLinearConstraint(XMLTag& tag)
 
 	// generate the linear constraints
 	plc.GenerateConstraints(fem);
+
+	// don't forget to activate
+
+}
+
+void FEBioBoundarySection::ParsePeriodicLinearConstraint2O(XMLTag& tag)
+{
+	FEModel* fem = GetFEModel();
+	FEMesh& mesh = fem->GetMesh();
+	FEPeriodicLinearConstraint2O plc;
+	++tag;
+	do
+	{
+		if (tag == "constrain")
+		{
+			const char* sz = tag.AttributeValue("surface_pair", true);
+			if (sz)
+			{
+				FEBioImport::SurfacePair* spair = m_pim->FindSurfacePair(sz);
+				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", sz);
+
+				FESurface* ms = new FESurface(&mesh); m_pim->BuildSurface(*ms, *spair->pmaster);
+				FESurface* ss = new FESurface(&mesh); m_pim->BuildSurface(*ss, *spair->pslave);
+				plc.AddNodeSetPair(ms->GetNodeSet(), ss->GetNodeSet());
+			}
+			else
+			{
+				sz = tag.AttributeValue("edge_set");
+				FEBioImport::NodeSetSet* nsset = m_pim->FindNodeSetSet(sz);
+				if (nsset == 0) throw XMLReader::InvalidAttributeValue(tag, "edge_set", sz);
+
+				// make sure this gets pushed to the front because edges need to be processed first
+				plc.AddNodeSetSet(nsset->set, nsset->count, false);
+			}
+		}
+		else if (tag == "exclude")
+		{
+			const char* sz = tag.AttributeValue("node_set");
+			FENodeSet* ps = mesh.FindNodeSet(sz);
+			if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", sz);
+			plc.ExcludeNodes(*ps);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	} while (!tag.isend());
+
+	// generate the linear constraints
+	if (plc.GenerateConstraints(fem) == false)
+	{
+		throw XMLReader::InvalidTag(tag);
+	}
 
 	// don't forget to activate
 

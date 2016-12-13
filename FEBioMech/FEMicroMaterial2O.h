@@ -42,7 +42,7 @@ public:
 public:
 	char			m_szrve[256];	//!< filename for RVE file
 	char			m_szbc[256];	//!< name of nodeset defining boundary
-	bool			m_bperiodic;	//!< periodic bc flag
+	int				m_rveType;		//!< RVE type
 	double			m_scale;		//!< geometry scale factor
 	FERVEModel2O	m_mrve;			//!< the master RVE (Representive Volume Element)
 

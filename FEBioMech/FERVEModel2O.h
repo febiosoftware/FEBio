@@ -12,11 +12,19 @@
 class FERVEModel2O : public FEModel
 {
 public:
+	enum RVE_TYPE
+	{
+		DISPLACEMENT,		// prescribed displacement
+		PERIODIC_AL,		// periodic, augmented Lagrangian
+		PERIODIC_LC			// periodic, linear constraints
+	};
+
+public:
 	FERVEModel2O();
 	~FERVEModel2O();
 
 	//! one time initialization
-	bool InitRVE(bool bperiodic, const char* szbc);
+	bool InitRVE(int rveType, const char* szbc);
 
 	// scale the geometry
 	void ScaleGeometry(double scale);
@@ -26,7 +34,7 @@ public:
 	double InitialVolume() const { return m_V0; }
 
 	//! periodicity flag
-	bool IsPeriodic() const { return m_bperiodic; }
+	int RVEType() const { return m_rveType; }
 
 	//! get boundary nodes
 	const vector<int>& BoundaryList() const { return m_BN; }
@@ -43,10 +51,11 @@ protected:
 
 	bool PrepDisplacementBC();
 	bool PrepPeriodicBC(const char* szbc);
+	bool PrepPeriodicLC(const char* szbc);
 
 private:
 	double			m_V0;			//!< initial volume
-	bool			m_bperiodic;	//!< periodic BCs flag
+	int				m_rveType;		//!< type of RVE
 	FEBoundingBox	m_bb;			//!< bounding box of mesh
 	vector<int>		m_BN;			//!< boundary node flags
 };
@@ -83,7 +92,7 @@ protected:
 	bool IsBoundaryNode(int i) const { return ((*m_BN)[i]==1); }
 
 protected:
-	bool	m_bperiodic;	//!< flag for periodic BC's
+	int		m_rveType;		//!< RVE type flag
 	double	m_V0;			//!< initial RVE volume
 	const vector<int>*	m_BN;
 };

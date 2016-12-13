@@ -29,7 +29,7 @@ inline vec3d tens3drs::contractdyad1(const vec3d& v) const
 }
 
 // contract the right two legs by a symmetric 2o tensor  xi = Gijk*Sjk
-inline vec3d tens3drs::contract2s(const mat3ds& s)
+inline vec3d tens3drs::contract2s(const mat3ds& s) const
 {
     vec3d x;
 	x.x = d[ 0]*s.xx() + 2*d[ 1]*s.xy() + 2*d[ 2]*s.xz() + d[ 3]*s.yy() + 2*d[ 4]*s.yz() + d[ 5]*s.zz();

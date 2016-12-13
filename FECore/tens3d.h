@@ -42,7 +42,7 @@ tens3ds dyad3s(const vec3d& l, const vec3d& r);
 //-----------------------------------------------------------------------------
 //! Class for 3rd order tensor with right-conjugate symmetry Gijk = Gikj (only 18 out of 27 components are unique)
 
-// We store this tensor as a 1x10 array.
+// We store this tensor as a 1x18 array.
 // [G] = [G111 G112 G113 G122 G123 G133 G211 G212 G213 G222 G223 G233 G311 G312 G313 G322 G323 G333]
 //     =    G0   G1   G2   G3   G4   G5   G6   G7   G8   G9  G10  G11  G12  G13  G14  G15  G16  G17
 
@@ -57,7 +57,7 @@ public:
 	double& operator () (int i, int j, int k);
 
 	vec3d contractdyad1(const vec3d& v) const;
-	vec3d contract2s(const mat3ds& s);
+	vec3d contract2s(const mat3ds& s) const;
 	double tripledot(const tens3drs& H);
 	vec3d contractdyad2(const vec3d& v, const vec3d& w);
 	tens3dls transpose();
@@ -70,7 +70,7 @@ tens3drs dyad3rs(const vec3d& l, const vec3d& r);
 //-----------------------------------------------------------------------------
 //! Class for 3rd order tensor with left-conjugate symmetry Gijk = Gjik (only 18 out of 27 components are unique)
 
-// We store this tensor as a 1x10 array.
+// We store this tensor as a 1x18 array.
 // [G] = [G111 G112 G113 G121 G122 G123 G131 G132 G133 G221 G222 G223 G231 G232 G233 G331 G332 G333]
 //     =    G0   G1   G2   G3   G4   G5   G6   G7   G8   G9  G10  G11  G12  G13  G14  G15  G16  G17
 

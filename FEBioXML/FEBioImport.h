@@ -197,6 +197,18 @@ public:
 		FENodeSet*	pslave;
 	};
 
+	//-------------------------------------------------------------------------
+	struct NodeSetSet
+	{
+		NodeSetSet() { count = 0; }
+		enum {MAX_SETS = 32};
+		char		szname[256];
+		FENodeSet*	set[MAX_SETS];
+		int			count;
+
+		void add(FENodeSet* ps) { set[count++] = ps; }
+	};
+
 public:
 	//! constructor
 	FEBioImport();
@@ -301,6 +313,9 @@ public:
 	void AddNodeSetPair(NodeSetPair& p) { m_nsetPair.push_back(p); }
 	NodeSetPair* FindNodeSetPair(const char* szname);
 
+	void AddNodeSetSet(NodeSetSet& p) { m_nsetSet.push_back(p); }
+	NodeSetSet* FindNodeSetSet(const char* szname);
+
 public:
 	char	m_szmod[256];	//!< module type string
 	int		m_nsteps;		//!< nr of step sections read
@@ -340,6 +355,7 @@ protected:
 
 	vector<SurfacePair>	m_surfacePair;
 	vector<NodeSetPair>	m_nsetPair;
+	vector<NodeSetSet>	m_nsetSet;
 
 protected:
 	FEBioFileSectionMap	m_map;

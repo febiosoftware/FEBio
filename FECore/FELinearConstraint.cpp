@@ -7,13 +7,14 @@
 //-----------------------------------------------------------------------------
 FELinearConstraint::FELinearConstraint(FEModel* pfem) : FEModelComponent(FEBC_ID, pfem) 
 {
-	
+	m_off = 0.0;
 }
 
 //-----------------------------------------------------------------------------
 FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC) : FEModelComponent(FEBC_ID, LC.GetFEModel())
 {
 	master = LC.master;
+	m_off = LC.m_off;
 	int n = (int) LC.slave.size();
 	vector<DOF>::const_iterator it = LC.slave.begin();
 	for (int i=0; i<n; ++i, ++it) slave.push_back(*it);
@@ -23,6 +24,7 @@ FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC) : FEModelCo
 void FELinearConstraint::CopyFrom(const FELinearConstraint& LC)
 {
 	master = LC.master;
+	m_off = LC.m_off;
 	int n = (int)LC.slave.size();
 	vector<DOF>::const_iterator it = LC.slave.begin();
 	for (int i = 0; i<n; ++i, ++it) slave.push_back(*it);

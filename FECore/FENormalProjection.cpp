@@ -111,15 +111,19 @@ FESurfaceElement* FENormalProjection::Project2(vec3d r, vec3d n, double rs[2])
 //!
 FESurfaceElement* FENormalProjection::Project3(const vec3d& r, const vec3d& n, double rs[2], int* pei)
 {
-//	double g, gmin = 1e99, r2[2] = {rs[0], rs[1]};
+	// let's find all the candidate surface elements
+	set<int>selist;
+	m_OT.FindCandidateSurfaceElements(r, n, selist);
+
 	double g, gmax = -1e99, r2[2] = {rs[0], rs[1]};
 	int imin = -1;
 	FESurfaceElement* pme = 0;
 
 	// loop over all surface element
-	for (int i=0; i<m_surf.Elements(); ++i)
+	set<int>::iterator it;
+	for (it = selist.begin(); it != selist.end(); ++it)
 	{
-		FESurfaceElement& el = m_surf.Element(i);
+		FESurfaceElement& el = m_surf.Element(*it);
 
 		// see if the ray intersects this element
 		if (m_surf.Intersect(el, r, n, r2, g, m_tol))
@@ -134,7 +138,7 @@ FESurfaceElement* FENormalProjection::Project3(const vec3d& r, const vec3d& n, d
 				pme = &el;
 //				gmin = g;
 				gmax = g;
-				imin = i;
+				imin = *it;
 				rs[0] = r2[0];
 				rs[1] = r2[1];
 			}

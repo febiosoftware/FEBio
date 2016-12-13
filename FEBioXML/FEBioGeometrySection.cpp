@@ -86,6 +86,7 @@ void FEBioGeometrySection::Parse25(XMLTag& tag)
 		else if (tag == "DiscreteSet") ParseDiscreteSetSection(tag);
 		else if (tag == "SurfacePair") ParseSurfacePairSection(tag);
 		else if (tag == "NodeSetPair") ParseNodeSetPairSection(tag);
+		else if (tag == "NodeSetSet" ) ParseNodeSetSetSection (tag);
 		else if (tag == "Part"       ) ParsePartSection       (tag);
 		else if (tag == "Instance"   ) ParseInstanceSection   (tag);
 		else throw XMLReader::InvalidTag(tag);
@@ -1235,6 +1236,34 @@ void FEBioGeometrySection::ParseNodeSetPairSection(XMLTag& tag)
 
 	m_pim->AddNodeSetPair(p);
 }
+
+//-----------------------------------------------------------------------------
+void FEBioGeometrySection::ParseNodeSetSetSection(XMLTag& tag)
+{
+	FEBioImport::NodeSetSet p;
+	const char* szname = tag.AttributeValue("name");
+	strcpy(p.szname, szname);
+
+	FEMesh& mesh = *m_pim->GetFEMesh();
+
+	++tag;
+	do
+	{
+		if (tag == "node_set")
+		{
+			const char* sz = tag.AttributeValue("node_set");
+			FENodeSet* ns = mesh.FindNodeSet(sz);
+			if (ns == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", sz);
+			p.add(ns);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+
+	m_pim->AddNodeSetSet(p);
+}
+
 
 //-----------------------------------------------------------------------------
 //! Reads a Geometry\Surface section.

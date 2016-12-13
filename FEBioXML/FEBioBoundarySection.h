@@ -24,7 +24,8 @@ protected:
 	void ParseRigidBody     (XMLTag& tag);  // version 2.5 and up
 	void ParseBC            (XMLTag& tag);  // version 2.5 and up
 
-	void ParsePeriodicLinearConstraint(XMLTag& tag); // version 2.5 (temporary construction)
+	void ParsePeriodicLinearConstraint  (XMLTag& tag); // version 2.5 (temporary construction)
+	void ParsePeriodicLinearConstraint2O(XMLTag& tag); // version 2.5 (temporary construction)
 	void ParseMergeConstraint(XMLTag& tag); // version 2.5
 
 protected:

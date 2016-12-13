@@ -352,7 +352,8 @@ REGISTER_FECORE_CLASS(FEDeformableSpringDomain2  , FEDOMAIN_ID, "deformable-spri
 
 //-----------------------------------------------------------------------------
 // classes derived from FEBoundaryCondition
-REGISTER_FECORE_CLASS(FEBCPrescribedDeformation, FEBC_ID, "prescribed deformation");
+REGISTER_FECORE_CLASS(FEBCPrescribedDeformation  , FEBC_ID, "prescribed deformation"   );
+REGISTER_FECORE_CLASS(FEBCPrescribedDeformation2O, FEBC_ID, "prescribed deformation 2O");
 
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad

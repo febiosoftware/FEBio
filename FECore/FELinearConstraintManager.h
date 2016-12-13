@@ -33,6 +33,9 @@ public:
 	// return linear constraint
 	const FELinearConstraint& LinearConstraint(int i) const;
 
+	// return linear constraint
+	FELinearConstraint& LinearConstraint(int i);
+
 public:
 	// one-time initialization
 	bool Initialize();

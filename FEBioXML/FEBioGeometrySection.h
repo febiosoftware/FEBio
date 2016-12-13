@@ -33,6 +33,7 @@ protected:
 	void ParseEdgeSection       (XMLTag& tag);
 	void ParseSurfaceSection    (XMLTag& tag);
 	void ParseNodeSetPairSection(XMLTag& tag);
+	void ParseNodeSetSetSection (XMLTag& tag);
 	void ParseSurfacePairSection(XMLTag& tag);
 	void ParseElementSetSection (XMLTag& tag);
 	void ParsePartSection       (XMLTag& tag);

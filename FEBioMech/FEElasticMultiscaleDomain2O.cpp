@@ -53,7 +53,7 @@ bool FEElasticMultiscaleDomain2O::Initialize()
 
 			// initialize the material point RVE
 			// This essentially copies the master RVE to the material point RVE
-			mmpt2O.m_rve.Init(rve);
+			if (mmpt2O.m_rve.Init(rve) == false) return false;
 		}
 	}
 

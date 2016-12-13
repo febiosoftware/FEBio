@@ -10,11 +10,12 @@
 #include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
 #include "FEBCPrescribedDeformation.h"
+#include <FECore/FELinearConstraintManager.h>
 
 //-----------------------------------------------------------------------------
 FERVEModel2O::FERVEModel2O()
 {
-	m_bperiodic = false;
+	m_rveType = FERVEModel2O::DISPLACEMENT;
 
 	// set the pardiso solver as default
 	m_nsolver = PARDISO_SOLVER;
@@ -39,7 +40,7 @@ void FERVEModel2O::ScaleGeometry(double scale)
 
 //-----------------------------------------------------------------------------
 //! Initializes the RVE model and evaluates some useful quantities.
-bool FERVEModel2O::InitRVE(bool bperiodic, const char* szbc)
+bool FERVEModel2O::InitRVE(int rveType, const char* szbc)
 {
 	// make sure the RVE problem doesn't output anything to a plot file
 	GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
@@ -50,8 +51,8 @@ bool FERVEModel2O::InitRVE(bool bperiodic, const char* szbc)
 
 	// generate prescribed BCs
 	// TODO: Make this part of the RVE definition
-	m_bperiodic = bperiodic;
-	if (bperiodic == false)
+	m_rveType = rveType;
+	if (rveType == FERVEModel2O::DISPLACEMENT)
 	{
 		// find the boundary nodes
 		if ((szbc) && (szbc[0] != 0))
@@ -74,11 +75,16 @@ bool FERVEModel2O::InitRVE(bool bperiodic, const char* szbc)
 		// prep displacement BC's
 		if (PrepDisplacementBC() == false) return false;
 	}
-	else
+	else if (rveType == FERVEModel2O::PERIODIC_AL)
 	{
 		// prep periodic BC's
 		if (PrepPeriodicBC(szbc) == false) return false;
 	}
+	else if (rveType == FERVEModel2O::PERIODIC_LC)
+	{
+		if (PrepPeriodicLC(szbc) == false) return false;
+	}
+	else return false;
 
 	// initialize base class
 	if (FEModel::Init() == false) return false;
@@ -218,13 +224,15 @@ bool FERVEModel2O::PrepDisplacementBC()
 	ClearBCs();
 
 	// we create the prescribed deformation BC
-	FEBCPrescribedDeformation* pdc = fecore_new<FEBCPrescribedDeformation>(FEBC_ID, "prescribed deformation", this);
+	FEBCPrescribedDeformation2O* pdc = fecore_new<FEBCPrescribedDeformation2O>(FEBC_ID, "prescribed deformation 2O", this);
 	AddPrescribedBC(pdc);
 
 	// assign the boundary nodes
+	int c = -1;
 	for (i = 0; i<N; ++i)
 	if (m_BN[i] == 1)
 	{
+		if (c == -1) { pdc->SetReferenceNode(m_BN[i]); c = 1; }
 		pdc->AddNode(i);
 	}
 
@@ -283,10 +291,50 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FERVEModel2O::PrepPeriodicLC(const char* szbc)
+{
+	// make sure the node set is valid
+	if ((szbc == 0) || (szbc[0] == 0)) return false;
+
+	// get the RVE mesh
+	FEMesh& m = GetMesh();
+
+	// find the node set that defines the corner nodes
+	FENodeSet* pset = m.FindNodeSet(szbc);
+	if (pset == 0) return false;
+	FENodeSet& ns = *pset;
+
+	// create a load curve
+	FELoadCurve* plc = new FELoadCurve;
+	plc->SetInterpolation(FELoadCurve::LINEAR);
+	plc->Add(0.0, 0.0);
+	plc->Add(1.0, 1.0);
+	AddLoadCurve(plc);
+	int NLC = LoadCurves() - 1;
+
+	// we create the prescribed deformation BC
+	FEBCPrescribedDeformation2O* pdc = fecore_new<FEBCPrescribedDeformation2O>(FEBC_ID, "prescribed deformation 2O", this);
+	AddPrescribedBC(pdc);
+
+	// assign nodes to BCs
+	pdc->SetReferenceNode(ns[0]);
+	pdc->AddNodes(ns);
+	pdc->SetScale(1.0, NLC);
+
+	// create the boundary node flags
+	m_BN.assign(m.Nodes(), 0);
+	int N = ns.size();
+	for (int i = 0; i<N; ++i) m_BN[ns[i]] = 1;
+
+	return true;
+}
+
+
 //=============================================================================
 FEMicroModel2O::FEMicroModel2O()
 {
-	m_bperiodic = false;
+	m_rveType = FERVEModel2O::DISPLACEMENT;
 	m_V0 = 0.0;
 	m_BN = 0;
 }
@@ -307,7 +355,7 @@ bool FEMicroModel2O::Init(FERVEModel2O& rve)
 
 	// copy some stuff from the master RVE model
 	m_V0 = rve.InitialVolume();
-	m_bperiodic = rve.IsPeriodic();
+	m_rveType = rve.RVEType();
 	m_BN = &rve.BoundaryList();
 	if (m_BN == 0) return false;
 
@@ -333,11 +381,11 @@ void FEMicroModel2O::UpdateBC(const mat3d& F, const tens3drs& G)
 	FEMesh& m = GetMesh();
 
 	// assign new DC's for the boundary nodes
-	FEBCPrescribedDeformation& bc = dynamic_cast<FEBCPrescribedDeformation&>(*PrescribedBC(0));
+	FEBCPrescribedDeformation2O& bc = dynamic_cast<FEBCPrescribedDeformation2O&>(*PrescribedBC(0));
 	bc.SetDeformationGradient(F);
 	bc.SetDeformationHessian(G);
 
-	if (m_bperiodic)
+	if (m_rveType == FERVEModel2O::PERIODIC_AL)
 	{
 		// get the "displacement" component of the deformation gradient
 		mat3d U = F - mat3dd(1);
@@ -352,6 +400,38 @@ void FEMicroModel2O::UpdateBC(const mat3d& F, const tens3drs& G)
 			assert(pc);
 			pc->m_Fmacro = F;
 			pc->m_Gmacro = G;
+		}
+	}
+	else if (m_rveType == FERVEModel2O::PERIODIC_LC)
+	{
+		// get the linear constraint manager
+		FELinearConstraintManager& LM = GetLinearConstraintManager();
+
+		mat3d U = F - mat3dd(1.0);
+
+		// loop over all the linear constraints
+		const int NL = LM.LinearConstraints();
+		for (int i=0; i<NL; ++i)
+		{
+			FELinearConstraint& lc = LM.LinearConstraint(i);
+
+			FENode& slaveNode = m.Node(lc.master.node);
+			FENode& masterNode = m.Node(lc.slave[0].node);
+
+			vec3d Xp = slaveNode.m_r0;
+			vec3d Xm = masterNode.m_r0;
+
+			mat3ds XXp = dyad(Xp);
+			mat3ds XXm = dyad(Xm);
+
+			vec3d d = U*(Xp - Xm) + (G.contract2s(XXp - XXm))*0.5;
+
+			switch (lc.master.dof)
+			{
+			case 0: lc.m_off = d.x; break;
+			case 1: lc.m_off = d.y; break;
+			case 2: lc.m_off = d.z; break;
+			}
 		}
 	}
 }
@@ -370,7 +450,7 @@ mat3d FEMicroModel2O::AveragedStressPK1(FEMaterialPoint &mp)
 	mat3d PK1; PK1.zero();
 
 	// for periodic BC's we take the reaction forces directly from the periodic constraints
-	if (m_bperiodic)
+	if (m_rveType == FERVEModel2O::PERIODIC_AL)
 	{
 		// get the reaction for from the periodic constraints
 		for (int i=0; i<3; ++i)
@@ -402,7 +482,7 @@ mat3d FEMicroModel2O::AveragedStressPK1(FEMaterialPoint &mp)
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*PrescribedBC(0));
+	FEBCPrescribedDeformation2O& dc = dynamic_cast<FEBCPrescribedDeformation2O&>(*PrescribedBC(0));
 	int nitems = dc.Items();
 	for (int i=0; i<nitems; ++i)
 	{
@@ -428,7 +508,7 @@ void FEMicroModel2O::AveragedStress2O(mat3d& Pa, tens3drs& Qa)
 	Qa.zero();
 
 	// for periodic BC's we take the reaction forces directly from the periodic constraints
-	if (m_bperiodic)
+	if (m_rveType == FERVEModel2O::PERIODIC_AL)
 	{
 		// get the reaction for from the periodic constraints
 		for (int i=0; i<3; ++i)
@@ -456,7 +536,7 @@ void FEMicroModel2O::AveragedStress2O(mat3d& Pa, tens3drs& Qa)
 	// get the reaction force vector from the solid solver
 	// (We also need to do this for the periodic BC, since at the prescribed nodes,
 	// the contact forces will be zero).
-	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*PrescribedBC(0));
+	FEBCPrescribedDeformation2O& dc = dynamic_cast<FEBCPrescribedDeformation2O&>(*PrescribedBC(0));
 
 	const int dof_X = GetDOFIndex("x");
 	const int dof_Y = GetDOFIndex("y");

@@ -1274,3 +1274,11 @@ FEBioImport::NodeSetPair* FEBioImport::FindNodeSetPair(const char* szname)
 	if (strcmp(m_nsetPair[i].szname, szname) == 0) return &m_nsetPair[i];
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+FEBioImport::NodeSetSet* FEBioImport::FindNodeSetSet(const char* szname)
+{
+	for (int i = 0; i<m_nsetSet.size(); ++i)
+	if (strcmp(m_nsetSet[i].szname, szname) == 0) return &m_nsetSet[i];
+	return 0;
+}

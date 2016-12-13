@@ -45,7 +45,10 @@ public:
 
 	void AddSlaveDof(int dof, int node, double v);
 
+	void SetOffset(double d) { m_off = d; }
+
 public:
 	DOF			master;	// master degree of freedom
 	vector<DOF>	slave;	// list of slave nodes
+	double		m_off;	// offset value
 };
