@@ -27,3 +27,8 @@ void FETransform::SetRotation(const vec3d& a, const vec3d& b, double angle)
 	double w = angle*PI/180.0;
 	m_rot = quatd(angle, N);
 }
+
+void FETransform::SetRotation(const quatd& q)
+{
+	m_rot = q;
+}

@@ -17,6 +17,9 @@ public:
 	// set the translation
 	void SetTranslation(const vec3d& t);
 
+	// set the rotation
+	void SetRotation(const quatd& q);
+
 	// set the rotation using axis (a,b) and rotation angle (degrees)
 	void SetRotation(const vec3d& a, const vec3d& b, double angle);
 

@@ -250,6 +250,8 @@ public:
 	int Faces() const { return (int) m_Face.size(); }
 	FACET& Face(int i);
 
+	void Add(FEFacetSet* pf);
+
 	FENodeSet GetNodeSet();
 
 public:

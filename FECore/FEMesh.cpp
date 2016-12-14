@@ -222,6 +222,12 @@ void FEFacetSet::SetName(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
+void FEFacetSet::Add(FEFacetSet* pf)
+{
+	m_Face.insert(m_Face.end(), pf->m_Face.begin(), pf->m_Face.end());
+}
+
+//-----------------------------------------------------------------------------
 FENodeSet FEFacetSet::GetNodeSet()
 {
 	FEMesh* pm = m_mesh;

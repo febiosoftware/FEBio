@@ -196,7 +196,12 @@ void FEBioGeometrySection::ParseInstanceSection(XMLTag& tag)
 			}
 			else if (tag == "rotate")
 			{
-				double a[3], b[3]; double w;
+				double v[4];
+				tag.value(v, 4);
+				quatd q(v[0], v[1], v[2], v[3]);
+				transform.SetRotation(q);
+
+/*				double a[3], b[3]; double w;
 				++tag;
 				do
 				{
@@ -209,6 +214,7 @@ void FEBioGeometrySection::ParseInstanceSection(XMLTag& tag)
 				while (!tag.isend());
 
 				transform.SetRotation(vec3d(a[0], a[1], a[2]), vec3d(b[0], b[1], b[2]), w);
+*/
 			}
 			else if (tag == "scale")
 			{
@@ -1279,44 +1285,74 @@ void FEBioGeometrySection::ParseSurfaceSection(XMLTag& tag)
 	// get the required name attribute
 	const char* szname = tag.AttributeValue("name");
 
-	// count nr of faces
-	int faces = tag.children();
-
-	// allocate storage for faces
-	FEFacetSet* ps = new FEFacetSet(&mesh);
-	ps->Create(faces);
-	ps->SetName(szname);
-
-	// add it to the mesh
-	mesh.AddFacetSet(ps);
-
-	// read faces
-	++tag;
-	int nf[FEElement::MAX_NODES];
-	for (int i=0; i<faces; ++i)
+	// if parts are defined we use the new format
+	if (m_feb.Parts() > 0)
 	{
-		FEFacetSet::FACET& face = ps->Face(i);
+		FEFacetSet* ps = new FEFacetSet(&mesh);
+		ps->SetName(szname);
 
-		// set the facet type
-		if      (tag == "quad4") face.ntype = 4;
-		else if (tag == "tri3" ) face.ntype = 3;
-		else if (tag == "tri6" ) face.ntype = 6;
-		else if (tag == "tri7" ) face.ntype = 7;
-		else if (tag == "quad8") face.ntype = 8;
-		else if (tag == "quad9") face.ntype = 9;
-		else throw XMLReader::InvalidTag(tag);
+		// add it to the mesh
+		mesh.AddFacetSet(ps);
 
-		// we assume that the facet type also defines the number of nodes
-		int N = face.ntype;
-		tag.value(nf, N);
-		for (int j=0; j<N; ++j) 
-		{
-			int nid = nf[j]-1;
-			if ((nid<0)||(nid>= NN)) throw XMLReader::InvalidValue(tag);
-			face.node[j] = nid;
-		}
-
+		// read the child surfaces
 		++tag;
+		do
+		{
+			if (tag == "Surface")
+			{
+				const char* szatt = tag.AttributeValue("surface");
+				FEFacetSet* pf = mesh.FindFacetSet(szatt);
+				if (pf == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szatt);
+
+				ps->Add(pf);
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+
+	}
+	else
+	{
+		// count nr of faces
+		int faces = tag.children();
+
+		// allocate storage for faces
+		FEFacetSet* ps = new FEFacetSet(&mesh);
+		ps->Create(faces);
+		ps->SetName(szname);
+
+		// add it to the mesh
+		mesh.AddFacetSet(ps);
+
+		// read faces
+		++tag;
+		int nf[FEElement::MAX_NODES];
+		for (int i=0; i<faces; ++i)
+		{
+			FEFacetSet::FACET& face = ps->Face(i);
+
+			// set the facet type
+			if      (tag == "quad4") face.ntype = 4;
+			else if (tag == "tri3" ) face.ntype = 3;
+			else if (tag == "tri6" ) face.ntype = 6;
+			else if (tag == "tri7" ) face.ntype = 7;
+			else if (tag == "quad8") face.ntype = 8;
+			else if (tag == "quad9") face.ntype = 9;
+			else throw XMLReader::InvalidTag(tag);
+
+			// we assume that the facet type also defines the number of nodes
+			int N = face.ntype;
+			tag.value(nf, N);
+			for (int j=0; j<N; ++j) 
+			{
+				int nid = nf[j]-1;
+				if ((nid<0)||(nid>= NN)) throw XMLReader::InvalidValue(tag);
+				face.node[j] = nid;
+			}
+
+			++tag;
+		}
 	}
 }
 
