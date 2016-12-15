@@ -29,9 +29,13 @@ void FEBiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 		int neln = el.Nodes();
 		for (int i=0; i<neln; ++i)
 		{
-			x0[i] = m.Node(el.m_node[i]).m_r0;
-			xt[i] = m.Node(el.m_node[i]).m_rt;
-            pn[i] = m.Node(el.m_node[i]).get(m_dofP);
+            FENode& node = m.Node(el.m_node[i]);
+			x0[i] = node.m_r0;
+			xt[i] = node.m_rt;
+            if (!node.m_bshell || (node.m_ID[m_dofQ] == DOF_INACTIVE))
+                pn[i] = node.get(m_dofP);
+            else
+                pn[i] = node.get(m_dofQ);
         }
 
 		int n = el.GaussPoints();
@@ -828,9 +832,13 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 	double pn[FEElement::MAX_NODES];
 	for (int j=0; j<neln; ++j)
 	{
-		r0[j] = mesh.Node(el.m_node[j]).m_r0;
-		rt[j] = mesh.Node(el.m_node[j]).m_rt;
-		pn[j] = mesh.Node(el.m_node[j]).get(m_dofP);
+        FENode& node = mesh.Node(el.m_node[j]);
+		r0[j] = node.m_r0;
+		rt[j] = node.m_rt;
+        if (!node.m_bshell || (node.m_ID[m_dofQ] == DOF_INACTIVE))
+            pn[j] = node.get(m_dofP);
+        else
+            pn[j] = node.get(m_dofQ);
 	}
 
 	// loop over the integration points and calculate

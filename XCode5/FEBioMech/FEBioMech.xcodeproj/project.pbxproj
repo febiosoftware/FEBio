@@ -57,6 +57,8 @@
 		D533E7431DAEB14A00D5CB82 /* FEActiveFiberContraction.h in Headers */ = {isa = PBXBuildFile; fileRef = D533E7411DAEB14A00D5CB82 /* FEActiveFiberContraction.h */; };
 		D53981761D8244A400F07DD6 /* FEPeriodicLinearConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53981741D8244A400F07DD6 /* FEPeriodicLinearConstraint.cpp */; };
 		D53981771D8244A400F07DD6 /* FEPeriodicLinearConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D53981751D8244A400F07DD6 /* FEPeriodicLinearConstraint.h */; };
+		D546F0611E035C3C00B7FFAF /* FEElasticShellDomainOld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D546F05F1E035C3C00B7FFAF /* FEElasticShellDomainOld.cpp */; };
+		D546F0621E035C3C00B7FFAF /* FEElasticShellDomainOld.h in Headers */ = {isa = PBXBuildFile; fileRef = D546F0601E035C3C00B7FFAF /* FEElasticShellDomainOld.h */; };
 		D548B9BE19DB52D4005AF337 /* FEOsmoticVirialExpansion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D548B9BC19DB52D4005AF337 /* FEOsmoticVirialExpansion.cpp */; };
 		D548B9BF19DB52D4005AF337 /* FEOsmoticVirialExpansion.h in Headers */ = {isa = PBXBuildFile; fileRef = D548B9BD19DB52D4005AF337 /* FEOsmoticVirialExpansion.h */; };
 		D54A4E4A1A2B65F50032E843 /* FEReactiveVEMaterialPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54A4E481A2B65F50032E843 /* FEReactiveVEMaterialPoint.cpp */; };
@@ -451,6 +453,8 @@
 		D533E7411DAEB14A00D5CB82 /* FEActiveFiberContraction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEActiveFiberContraction.h; sourceTree = "<group>"; };
 		D53981741D8244A400F07DD6 /* FEPeriodicLinearConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPeriodicLinearConstraint.cpp; sourceTree = "<group>"; };
 		D53981751D8244A400F07DD6 /* FEPeriodicLinearConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPeriodicLinearConstraint.h; sourceTree = "<group>"; };
+		D546F05F1E035C3C00B7FFAF /* FEElasticShellDomainOld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElasticShellDomainOld.cpp; sourceTree = "<group>"; };
+		D546F0601E035C3C00B7FFAF /* FEElasticShellDomainOld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElasticShellDomainOld.h; sourceTree = "<group>"; };
 		D548B9BC19DB52D4005AF337 /* FEOsmoticVirialExpansion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOsmoticVirialExpansion.cpp; sourceTree = "<group>"; };
 		D548B9BD19DB52D4005AF337 /* FEOsmoticVirialExpansion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOsmoticVirialExpansion.h; sourceTree = "<group>"; };
 		D54A4E481A2B65F50032E843 /* FEReactiveVEMaterialPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactiveVEMaterialPoint.cpp; sourceTree = "<group>"; };
@@ -935,6 +939,8 @@
 				D5B8EAFB1BB4DE17009D101B /* FEElasticMultiscaleDomain2O.h */,
 				D5E106CF1865DFAC00B23922 /* FEElasticShellDomain.cpp */,
 				D5E106D01865DFAC00B23922 /* FEElasticShellDomain.h */,
+				D546F05F1E035C3C00B7FFAF /* FEElasticShellDomainOld.cpp */,
+				D546F0601E035C3C00B7FFAF /* FEElasticShellDomainOld.h */,
 				D5E106D11865DFAC00B23922 /* FEElasticSolidDomain.cpp */,
 				D5E106D21865DFAC00B23922 /* FEElasticSolidDomain.h */,
 				D5C014FC1CEF4F1000EE43D5 /* FEElasticSolidDomain2O.cpp */,
@@ -1266,6 +1272,7 @@
 				031FDFBE1CC1942300048B41 /* FEViscousMaterialPoint.h in Headers */,
 				D59D17D6192BD83B007C880C /* FECoupledMooneyRivlin.h in Headers */,
 				D5E107911865DFAD00B23922 /* FEContinuousFiberDistribution.h in Headers */,
+				D546F0621E035C3C00B7FFAF /* FEElasticShellDomainOld.h in Headers */,
 				D5E108081865DFAD00B23922 /* FEPointConstraint.h in Headers */,
 				D5E107AE1865DFAD00B23922 /* FEElasticFiberMaterial.h in Headers */,
 				D595BB461899C7D90028A7F3 /* FESPRProjection.h in Headers */,
@@ -1589,6 +1596,7 @@
 				D5E108291865DFAD00B23922 /* FESphericalFiberDistribution.cpp in Sources */,
 				D50824A61AFAFC860094BC4C /* FEFiberPowLinearUncoupled.cpp in Sources */,
 				D5E107F11865DFAD00B23922 /* FEMooneyRivlin.cpp in Sources */,
+				D546F0611E035C3C00B7FFAF /* FEElasticShellDomainOld.cpp in Sources */,
 				D51BB4091991830800638A8B /* FEFiberIntegrationSchemeUC.cpp in Sources */,
 				D5FA1BDE1B74CD9000EA5913 /* FERigidForce.cpp in Sources */,
 				D5B8EAFE1BB4DE17009D101B /* FEElasticMultiscaleDomain2O.cpp in Sources */,

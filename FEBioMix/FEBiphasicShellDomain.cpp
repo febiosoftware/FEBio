@@ -1394,8 +1394,7 @@ vec3d FEBiphasicShellDomain::gradient(FEShellElement& el, double* pn, double* dp
     const double* Mr, *Ms, *M;
     double eta;
     vec3d gcnt[3];
-    vec3d gradM, gradP, GradM, GradP, gradMu, gradMd;
-    double Mu, Md;
+    vec3d gradM, gradMu, gradMd;
     vec3d gradp(0,0,0);
     
     eta = el.gt(n);
@@ -1413,8 +1412,6 @@ vec3d FEBiphasicShellDomain::gradient(FEShellElement& el, double* pn, double* dp
         gradM = gcnt[0]*Mr[i] + gcnt[1]*Ms[i];
         gradMu = (gradM*(1+eta) + gcnt[2]*M[i])/2;
         gradMd = (gradM*(1-eta) - gcnt[2]*M[i])/2;
-        Mu = (1+eta)/2*M[i];
-        Md = (1-eta)/2*M[i];
         gradp += gradMu*pn[i] + gradMd*dpn[i];
     }
     

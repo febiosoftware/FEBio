@@ -138,16 +138,17 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 {
-	if (dom.Class() != FE_DOMAIN_SOLID) return false;
-	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-	if ((dynamic_cast<FEBiphasicSolidDomain* >(&bd)) || 
-		(dynamic_cast<FEBiphasicSoluteDomain*>(&bd)) ||
-		(dynamic_cast<FETriphasicDomain*     >(&bd)) ||
-		(dynamic_cast<FEMultiphasicDomain*   >(&bd)))
+	FESolidDomain* bd = dynamic_cast<FESolidDomain*>(&dom);
+    FEShellDomain* bsd = dynamic_cast<FEShellDomain*>(&dom);
+	if (bd && (
+        (dynamic_cast<FEBiphasicSolidDomain* >(bd)) ||
+		(dynamic_cast<FEBiphasicSoluteDomain*>(bd)) ||
+		(dynamic_cast<FETriphasicDomain*     >(bd)) ||
+		(dynamic_cast<FEMultiphasicDomain*   >(bd))))
 	{
-		for (int i=0; i<bd.Elements(); ++i)
+		for (int i=0; i<bd->Elements(); ++i)
 		{
-			FESolidElement& el = bd.Element(i);
+			FESolidElement& el = bd->Element(i);
 
 			// calculate average flux
 			vec3d ew = vec3d(0,0,0);
@@ -164,6 +165,28 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 		}
 		return true;
 	}
+    else if (bsd &&
+             (dynamic_cast<FEBiphasicShellDomain* >(bsd)))
+    {
+        for (int i=0; i<bsd->Elements(); ++i)
+        {
+            FEShellElement& el = bsd->Element(i);
+            
+            // calculate average flux
+            vec3d ew = vec3d(0,0,0);
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+                
+                if (pt) ew += pt->m_w;
+            }
+            ew /= el.GaussPoints();
+            
+            a << ew;
+        }
+        return true;
+    }
 
 	return false;
 }
@@ -1090,7 +1113,7 @@ bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 {
-	FEBiphasicSolidDomain*  pd  = dynamic_cast<FEBiphasicSolidDomain* >(&dom);
+	FEBiphasicDomain*       pd  = dynamic_cast<FEBiphasicDomain*      >(&dom);
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
 	FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
