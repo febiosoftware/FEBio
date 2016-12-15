@@ -405,6 +405,8 @@
     <ClInclude Include="..\..\FEBioMix\FEBioMixPlot.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasic.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicContactSurface.h" />
+    <ClInclude Include="..\..\FEBioMix\FEBiphasicDomain.h" />
+    <ClInclude Include="..\..\FEBioMix\FEBiphasicShellDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolute.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSoluteDomain.h" />
@@ -474,6 +476,8 @@
     <ClCompile Include="..\..\FEBioMix\FEBioMixPlot.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasic.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicContactSurface.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEBiphasicDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEBiphasicShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolute.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSoluteDomain.cpp" />
