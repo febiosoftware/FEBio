@@ -615,6 +615,9 @@
     <ClInclude Include="..\..\FEBioMech\FEPeriodicLinearConstraint2O.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEElasticShellDomainOld.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1197,6 +1200,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEPeriodicLinearConstraint2O.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEElasticShellDomainOld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
