@@ -620,6 +620,7 @@
     <ClCompile Include="..\..\FEBioXML\FERestartImport.cpp" />
     <ClCompile Include="..\..\FEBioXML\FileImport.cpp" />
     <ClCompile Include="..\..\FEBioXML\XMLReader.cpp" />
+    <ClCompile Include="..\..\FEBioXML\xmltool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMech\FEMergedConstraint.h" />
@@ -647,6 +648,7 @@
     <ClInclude Include="..\..\FEBioXML\FileImport.h" />
     <ClInclude Include="..\..\FEBioXML\stdafx.h" />
     <ClInclude Include="..\..\FEBioXML\XMLReader.h" />
+    <ClInclude Include="..\..\FEBioXML\xmltool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
