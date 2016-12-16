@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D546F0651E037D7400B7FFAF /* xmltool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D546F0631E037D7400B7FFAF /* xmltool.cpp */; };
+		D546F0661E037D7400B7FFAF /* xmltool.h in Headers */ = {isa = PBXBuildFile; fileRef = D546F0641E037D7400B7FFAF /* xmltool.h */; };
 		D58D4D191B5D804F002BB72A /* FEBioCodeSection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58D4D171B5D804F002BB72A /* FEBioCodeSection.cpp */; };
 		D58D4D1A1B5D804F002BB72A /* FEBioCodeSection.h in Headers */ = {isa = PBXBuildFile; fileRef = D58D4D181B5D804F002BB72A /* FEBioCodeSection.h */; };
 		D5D4B7581DE5BA8D00D02B27 /* FEBModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D4B7561DE5BA8D00D02B27 /* FEBModel.cpp */; };
@@ -57,6 +59,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D546F0631E037D7400B7FFAF /* xmltool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xmltool.cpp; sourceTree = "<group>"; };
+		D546F0641E037D7400B7FFAF /* xmltool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xmltool.h; sourceTree = "<group>"; };
 		D58D4D171B5D804F002BB72A /* FEBioCodeSection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioCodeSection.cpp; sourceTree = "<group>"; };
 		D58D4D181B5D804F002BB72A /* FEBioCodeSection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioCodeSection.h; sourceTree = "<group>"; };
 		D5D4B7561DE5BA8D00D02B27 /* FEBModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBModel.cpp; sourceTree = "<group>"; };
@@ -184,6 +188,8 @@
 				D5E109B61865E11600B23922 /* stdafx.h */,
 				D5E109B71865E11600B23922 /* XMLReader.cpp */,
 				D5E109B81865E11600B23922 /* XMLReader.h */,
+				D546F0631E037D7400B7FFAF /* xmltool.cpp */,
+				D546F0641E037D7400B7FFAF /* xmltool.h */,
 			);
 			name = FEBioXML;
 			path = ../../FEBioXML;
@@ -198,6 +204,7 @@
 			files = (
 				D5E109DB1865E11600B23922 /* stdafx.h in Headers */,
 				D5F705F51A6DB9A300A44888 /* FEBioIncludeSection.h in Headers */,
+				D546F0661E037D7400B7FFAF /* xmltool.h in Headers */,
 				D5E109C41865E11600B23922 /* FEBioGeometrySection.h in Headers */,
 				D5E109BA1865E11600B23922 /* FEBioBoundarySection.h in Headers */,
 				D5E109D81865E11600B23922 /* FERestartImport.h in Headers */,
@@ -293,6 +300,7 @@
 				D58D4D191B5D804F002BB72A /* FEBioCodeSection.cpp in Sources */,
 				D5E109C91865E11600B23922 /* FEBioInitialSection.cpp in Sources */,
 				D5E109C11865E11600B23922 /* FEBioDiscreteSection.cpp in Sources */,
+				D546F0651E037D7400B7FFAF /* xmltool.cpp in Sources */,
 				D5E109C31865E11600B23922 /* FEBioGeometrySection.cpp in Sources */,
 				D5E109D51865E11600B23922 /* FEBioStepSection.cpp in Sources */,
 				D5E109DC1865E11600B23922 /* XMLReader.cpp in Sources */,
