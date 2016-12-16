@@ -288,10 +288,12 @@ void FERigidSolver::RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vec
     // get nodal DOFS
     DOFS& fedofs = m_fem->GetDOFS();
     int MAX_NDOFS = fedofs.GetTotalDOFS();
+
+	int ndof = ke.columns() / n;
     
-    vector< vector<double> > kij; kij.assign(MAX_NDOFS, vector<double>(MAX_NDOFS));
-    
-    vector< vector<double> > KF; KF.assign(MAX_NDOFS, vector<double>(6));
+    matrix kij(ndof, ndof);
+    matrix KF(ndof, 6);
+
     double KR[6][6];
     
     int *lmi, *lmj;
@@ -300,8 +302,7 @@ void FERigidSolver::RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vec
     vec3d zi, zj;
     mat3d Zi, Zj;
     
-    int ndof = ke.columns() / n;
-    
+   
     FEMesh& mesh = m_fem->GetMesh();
     
     // loop over columns

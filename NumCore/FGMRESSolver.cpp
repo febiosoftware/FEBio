@@ -201,9 +201,9 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 
 	// Set the desired parameters:
 	ipar[4] = M;	// max number of iterations
-	ipar[7] = 1;	// do not do the stopping test for maximal number of iterations
-	ipar[8] = 1;		// do residual stopping test
-	ipar[9] = 0;		// do not request the user defined stopping test
+	ipar[7] = 1;	// do the stopping test for maximal number of iterations
+	ipar[8] = 1;	// do residual stopping test
+	ipar[9] = 0;	// do not request the user defined stopping test
 	ipar[10]=1;		// do the pre-conditioned version of the FGMRES iterative solver
 	ipar[11]=1;		// do the check of the norm of the next generated vector automatically
 //	dpar[0]=1.0E-3;	// set the relative tolerance to 1.0D-3 instead of default value 1.0D-6
