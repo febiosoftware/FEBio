@@ -109,6 +109,8 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 //=============================================================================
 FGMRES_ILUT_Solver::FGMRES_ILUT_Solver() : m_pA(0)
 {
+	m_maxfill = 1;
+	m_fillTol = 1e-6;
 }
 
 //-----------------------------------------------------------------------------
@@ -156,13 +158,11 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 
 	// calculate the pre-conditioner
 	int ierr;
-	double tol = 1e-6;
-	int maxfil = 1;
-	const int PCsize = (2*maxfil+1)*N-maxfil*(maxfil+1)+1;
+	const int PCsize = (2 * m_maxfill + 1)*N - m_maxfill*(m_maxfill + 1) + 1;
 	vector<double> bilut(PCsize);
 	vector<int> jbilut(PCsize);
 	vector<int> ibilut(N+1);
-	dcsrilut(&ivar, pa, ia, ja, &bilut[0], &ibilut[0], &jbilut[0], &tol, &maxfil, ipar, dpar, &ierr);
+	dcsrilut(&ivar, pa, ia, ja, &bilut[0], &ibilut[0], &jbilut[0], &m_fillTol, &m_maxfill, ipar, dpar, &ierr);
 	if (ierr != 0) { MKL_Free_Buffers(); return false; }
 
 	// Set the desired parameters:

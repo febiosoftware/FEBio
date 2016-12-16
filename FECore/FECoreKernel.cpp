@@ -156,6 +156,18 @@ const FECoreFactory* FECoreKernel::GetFactoryClass(int i)
 }
 
 //-----------------------------------------------------------------------------
+FECoreFactory* FECoreKernel::FindFactoryClass(int classID, const char* sztype)
+{
+	for (size_t i=0; i<m_Fac.size(); ++i)
+	{
+		FECoreFactory* fac = m_Fac[i];
+		if ((fac->GetSuperClassID() == classID) &&
+			(strcmp(fac->GetTypeStr(), sztype) == 0)) return fac;
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Register a new domain class
 void FECoreKernel::RegisterDomain(FEDomainFactory* pf)
 {
@@ -186,6 +198,17 @@ LinearSolver* FECoreKernel::CreateLinearSolver(int nsolver)
 	{
 		FELinearSolverFactory* pls = m_LS[i];
 		if (pls->GetID() == nsolver) return pls->Create();
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+FELinearSolverFactory* FECoreKernel::FindLinearSolverFactory(int nsolver)
+{
+	for (int i = 0; i<(int)m_LS.size(); ++i)
+	{
+		FELinearSolverFactory* pls = m_LS[i];
+		if (pls->GetID() == nsolver) return pls;
 	}
 	return 0;
 }

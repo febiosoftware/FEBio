@@ -27,6 +27,39 @@ public:
 	LinearSolver* Create() { return new T(); }
 };
 
+template <> class LinearSolverFactory_T<FGMRES_ILUT_Solver, FGMRES_ILUT_SOLVER> : public FELinearSolverFactory
+{
+public:
+	LinearSolverFactory_T() : FELinearSolverFactory(FGMRES_ILUT_SOLVER)
+	{
+		FECoreKernel& fecore = FECoreKernel::GetInstance();
+		fecore.RegisterLinearSolver(this);
+
+		m_fillTol = 1e-6;
+		m_maxfill = 1;
+	}
+	LinearSolver* Create() 
+	{ 
+		FGMRES_ILUT_Solver* ls = new FGMRES_ILUT_Solver();
+		ls->m_maxfill = m_maxfill;
+		ls->m_fillTol = m_fillTol;
+		return ls;
+	}
+
+private:
+	int	m_maxfill;		// max fill in values (I think this is in terms of bandwidth, not actual values)
+	double	m_fillTol;	// tolerance for fill in criterion
+
+	DECLARE_PARAMETER_LIST();
+};
+
+typedef LinearSolverFactory_T<FGMRES_ILUT_Solver, FGMRES_ILUT_SOLVER> FGMRES_ILUT_SolverFactory;
+
+BEGIN_PARAMETER_LIST(FGMRES_ILUT_SolverFactory, FELinearSolverFactory)
+	ADD_PARAMETER(m_maxfill, FE_PARAM_INT, "maxfil");
+	ADD_PARAMETER(m_fillTol, FE_PARAM_DOUBLE, "tol")
+END_PARAMETER_LIST();
+
 #define REGISTER_LINEAR_SOLVER(theSolver, theID) static LinearSolverFactory_T<theSolver, theID> _##theSolver;
 }
 

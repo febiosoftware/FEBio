@@ -59,7 +59,7 @@ public:
 // factory class for linear solvers.
 class LinearSolver;
 
-class FELinearSolverFactory
+class FELinearSolverFactory : public FEParamContainer
 {
 public:
 	FELinearSolverFactory(int nid) : m_nsolver_id(nid) {}

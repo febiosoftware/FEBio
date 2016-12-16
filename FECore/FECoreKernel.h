@@ -50,6 +50,9 @@ public:
 	//! return a factory class
 	const FECoreFactory* GetFactoryClass(int i);
 
+	//! find a factory class
+	FECoreFactory* FindFactoryClass(int classID, const char* sztype);
+
 public:
 	//! Register a new domain class
 	void RegisterDomain(FEDomainFactory* pf);
@@ -71,6 +74,9 @@ public:
 
 	//! create a linear solver factory
 	LinearSolver* CreateLinearSolver(int nsolver);
+
+	//! Find linear solver factory
+	FELinearSolverFactory* FindLinearSolverFactory(int nsolver);
 
 public:
 	//! set the default linear solver

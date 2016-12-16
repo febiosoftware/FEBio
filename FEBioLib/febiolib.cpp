@@ -7,6 +7,7 @@
 #include "FEBioOpt/FEBioOpt.h"
 #include "FEBioFluid/FEBioFluid.h"
 #include <FEBioXML/XMLReader.h>
+#include <FEBioXML/xmltool.h>
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include "febio.h"
@@ -73,16 +74,43 @@ bool Configure(const char* szfile)
 					else if (tag == "linear_solver")
 					{
 						const char* szt = tag.AttributeValue("type");
-						if      (strcmp(szt, "skyline"           ) == 0) FECoreKernel::SetDefaultSolver(SKYLINE_SOLVER   );
-						else if (strcmp(szt, "psldlt"            ) == 0) FECoreKernel::SetDefaultSolver(PSLDLT_SOLVER    );
-						else if (strcmp(szt, "superlu"           ) == 0) FECoreKernel::SetDefaultSolver(SUPERLU_SOLVER   );
-						else if (strcmp(szt, "superlu_mt"        ) == 0) FECoreKernel::SetDefaultSolver(SUPERLU_MT_SOLVER);
-						else if (strcmp(szt, "pardiso"           ) == 0) FECoreKernel::SetDefaultSolver(PARDISO_SOLVER   );
-						else if (strcmp(szt, "rcicg"             ) == 0) FECoreKernel::SetDefaultSolver(RCICG_SOLVER     );
-						else if (strcmp(szt, "fgmres"            ) == 0) FECoreKernel::SetDefaultSolver(FGMRES_SOLVER    );
-						else if (strcmp(szt, "fgmres_ilut"       ) == 0) FECoreKernel::SetDefaultSolver(FGMRES_ILUT_SOLVER);
-						else if (strcmp(szt, "fgmres_ilu0"       ) == 0) FECoreKernel::SetDefaultSolver(FGMRES_ILU0_SOLVER);
-						else if (strcmp(szt, "wsmp"              ) == 0) FECoreKernel::SetDefaultSolver(WSMP_SOLVER      );
+						int nsolver = -1;
+						if      (strcmp(szt, "skyline"           ) == 0) FECoreKernel::SetDefaultSolver(nsolver = SKYLINE_SOLVER   );
+						else if (strcmp(szt, "psldlt"            ) == 0) FECoreKernel::SetDefaultSolver(nsolver = PSLDLT_SOLVER    );
+						else if (strcmp(szt, "superlu"           ) == 0) FECoreKernel::SetDefaultSolver(nsolver = SUPERLU_SOLVER   );
+						else if (strcmp(szt, "superlu_mt"        ) == 0) FECoreKernel::SetDefaultSolver(nsolver = SUPERLU_MT_SOLVER);
+						else if (strcmp(szt, "pardiso"           ) == 0) FECoreKernel::SetDefaultSolver(nsolver = PARDISO_SOLVER   );
+						else if (strcmp(szt, "rcicg"             ) == 0) FECoreKernel::SetDefaultSolver(nsolver = RCICG_SOLVER     );
+						else if (strcmp(szt, "fgmres"            ) == 0) FECoreKernel::SetDefaultSolver(nsolver = FGMRES_SOLVER    );
+						else if (strcmp(szt, "fgmres_ilut"       ) == 0) FECoreKernel::SetDefaultSolver(nsolver = FGMRES_ILUT_SOLVER);
+						else if (strcmp(szt, "fgmres_ilu0"       ) == 0) FECoreKernel::SetDefaultSolver(nsolver = FGMRES_ILU0_SOLVER);
+						else if (strcmp(szt, "wsmp"              ) == 0) FECoreKernel::SetDefaultSolver(nsolver = WSMP_SOLVER      );
+						else { fprintf(stderr, "Invalid linear solver\n"); return false; }
+
+						if (tag.isleaf() == false)
+						{
+							FECoreKernel& fecore = FECoreKernel::GetInstance();
+							FELinearSolverFactory* fac = fecore.FindLinearSolverFactory(nsolver);
+							if (fac == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+
+							// read the solver parameters
+							FEParameterList& PL = fac->GetParameterList();
+							++tag;
+							do
+							{
+								FEParam* p = PL.Find(tag.m_sztag);
+								if (p)
+								{
+									if (xmlReadParameter(tag, PL) == false)
+									{
+										fprintf(stderr, "Invalid linear solver parameter value\n"); return false;
+									}
+								}
+								else { fprintf(stderr, "Invalid linear solver parameter\n"); return false; }
+								++tag;
+							}
+							while (!tag.isend());
+						}
 					}
 					else if (tag == "import")
 					{

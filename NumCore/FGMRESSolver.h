@@ -54,6 +54,10 @@ public:
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
+public:
+	int		m_maxfill;
+	double	m_fillTol;
+
 private:
 	CompactUnSymmMatrix*	m_pA;		//!< the sparse matrix format
 };
