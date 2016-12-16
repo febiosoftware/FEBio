@@ -247,7 +247,7 @@ bool FEMultiphasicTangentDiagnostic::Run()
     matrix k0(ndpn*N, ndpn*N);
     k0.zero();
 	double dt = m_pscn->m_dt;
-    md.ElementMultiphasicStiffness(el, k0, false, dt);
+    md.ElementMultiphasicStiffness(el, k0, false);
     
     // print the element stiffness matrix
     felog.printf("\nActual stiffness matrix:\n");
@@ -321,28 +321,17 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
     int N = mesh.Nodes();
     
     // first calculate the initial residual
-    vector<double> f0(ndpn*N), f0u(3*N), f0p(N);
+    vector<double> f0(ndpn*N);
     vector< vector<double> > f0c(nsol,vector<double>(N));
-    zero(f0u); zero(f0p); for (isol=0; isol<nsol; ++isol) zero(f0c[isol]);
+    zero(f0);
 	double dt = m_pscn->m_dt;
-    md.ElementInternalForce(el, f0u);
-    md.ElementInternalFluidWork(el, f0p, dt);
-    for (isol=0; isol<nsol; ++isol) md.ElementInternalSoluteWork(el, f0c[isol], dt, isol);
-    for (i=0; i<N; ++i) {
-        f0[ndpn*i  ] = f0u[3*i  ];
-        f0[ndpn*i+1] = f0u[3*i+1];
-        f0[ndpn*i+2] = f0u[3*i+2];
-        f0[ndpn*i+3] = f0p[i    ];
-        for (isol=0; isol<nsol; ++isol)
-            f0[ndpn*i+4+isol] = f0c[isol][i];
-    }
+    md.ElementInternalForce(el, f0);
     
     // now calculate the perturbed residuals
     ke.resize(ndpn*N, ndpn*N);
     ke.zero();
     double dx = 1e-8;
-    vector<double> f1(ndpn*N), f1u(3*N), f1p(N);
-    vector< vector<double> > f1c(nsol,vector<double>(N));
+    vector<double> f1(ndpn*N);
     for (j=0; j<ndpn*N; ++j)
     {
         FENode& node = mesh.Node(el.m_node[j/ndpn]);
@@ -360,18 +349,8 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
         
         solver.UpdateStresses();
         
-        zero(f1u); zero(f1p); for (isol=0; isol<nsol; ++isol) zero(f1c[isol]);
-        md.ElementInternalForce(el, f1u);
-        md.ElementInternalFluidWork(el, f1p, dt);
-        for (isol=0; isol<nsol; ++isol) md.ElementInternalSoluteWork(el, f1c[isol], dt, isol);
-        for (k=0; k<N; ++k) {
-            f1[ndpn*k  ] = f1u[3*k  ];
-            f1[ndpn*k+1] = f1u[3*k+1];
-            f1[ndpn*k+2] = f1u[3*k+2];
-            f1[ndpn*k+3] = f1p[k    ];
-            for (isol=0; isol<nsol; ++isol)
-                f1[ndpn*k+4+isol] = f1c[isol][k];
-        }
+        zero(f1);
+        md.ElementInternalForce(el, f1);
         
         switch (nj)
         {

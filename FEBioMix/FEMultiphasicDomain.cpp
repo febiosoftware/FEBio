@@ -29,11 +29,11 @@ void FEMultiphasicDomain::SetMaterial(FEMaterial* pmat)
 void FEMultiphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
     // get nodal DOFS
-    DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
+    const int nsol = m_pMat->Solutes();
     
 	int N = el.Nodes();
-	lm.resize(N*(7+MAX_CDOFS));
+    int ndpn = 4+nsol;
+	lm.resize(N*(ndpn+3));
 	
 	for (int i=0; i<N; ++i)
 	{
@@ -43,22 +43,22 @@ void FEMultiphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[m_dofX];
-		lm[3*i+1] = id[m_dofY];
-		lm[3*i+2] = id[m_dofZ];
+		lm[ndpn*i  ] = id[m_dofX];
+		lm[ndpn*i+1] = id[m_dofY];
+		lm[ndpn*i+2] = id[m_dofZ];
 
 		// now the pressure dofs
-		lm[3*N+i] = id[m_dofP];
-
-		// rigid rotational dofs
+		lm[ndpn*i+3] = id[m_dofP];
+        
+        // concentration dofs
+        for (int k=0; k<nsol; ++k)
+            lm[ndpn*i+4+k] = id[m_dofC+m_pMat->GetSolute(k)->GetSoluteID()];
+        
+        // rigid rotational dofs
 		// TODO: Do we really need this?
-		lm[4*N + 3*i  ] = id[m_dofRU];
-		lm[4*N + 3*i+1] = id[m_dofRV];
-		lm[4*N + 3*i+2] = id[m_dofRW];
-
-		// concentration dofs
-		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(7+k)*N + i] = id[m_dofC+k];
+		lm[ndpn*N + 3*i  ] = id[m_dofRU];
+		lm[ndpn*N + 3*i+1] = id[m_dofRV];
+		lm[ndpn*N + 3*i+2] = id[m_dofRW];
 	}
 }
 
@@ -286,51 +286,33 @@ void FEMultiphasicDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 			rt = el.Evaluate(xt, j);
 
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			pt.m_r0 = r0;
-			pt.m_rt = rt;
-
-			pt.m_J = defgrad(el, pt.m_F, j);
-
-			mp.Update(timeInfo);
-		}
-	}
-
-	// store previous mesh state
-	// we need it for receptor-ligand complex calculations
-	for (int i=0; i<(int) m_Elem.size(); ++i)
-	{
-		// get the solid element
-		FESolidElement& el = m_Elem[i];
-		
-		// get the number of integration points
-		int nint = el.GaussPoints();
-		
-		// loop over the integration points
-		for (int n=0; n<nint; ++n)
-		{
-			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-            FEElasticMaterialPoint& pe = *(mp.ExtractData<FEElasticMaterialPoint>());
-			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-			FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
+			FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
+            FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+            FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             FEMultigenSBMMaterialPoint& pmg = *(mp.ExtractData<FEMultigenSBMMaterialPoint>());
-			
-			// reset referential solid volume fraction at previous time
-			pt.m_phi0p = pt.m_phi0;
+
+            pe.m_r0 = r0;
+			pe.m_rt = rt;
+
+			pe.m_J = defgrad(el, pe.m_F, j);
 
             // reset determinant of solid deformation gradient at previous time
             pt.m_Jp = pe.m_J;
+            
+            // reset referential solid volume fraction at previous time
+            pt.m_phi0p = pt.m_phi0;
             
             // reset referential actual solute concentration at previous time
             for (int j=0; j<m_pMat->Solutes(); ++j) {
                 ps.m_crp[j] = pe.m_J*m_pMat->Porosity(mp)*ps.m_ca[j];
             }
             
-			// reset referential solid-bound molecule concentrations at previous time
-			for (int j=0; j<ps.m_nsbm; ++j) {
-				ps.m_sbmrp[j] = ps.m_sbmr[j];
-			}
-			// reset generational referential solid-bound molecule concentrations at previous time
+            // reset referential solid-bound molecule concentrations at previous time
+            for (int j=0; j<ps.m_nsbm; ++j) {
+                ps.m_sbmrp[j] = ps.m_sbmr[j];
+            }
+            
+            // reset generational referential solid-bound molecule concentrations at previous time
             if (&pmg) {
                 for (int i=0; i<pmg.m_ngen; ++i) {
                     for (int j=0; j<ps.m_nsbm; ++j) {
@@ -342,7 +324,9 @@ void FEMultiphasicDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             // reset chemical reaction element data
             for (int j=0; j<m_pMat->Reactions(); ++j)
                 m_pMat->GetReaction(j)->InitializeElementData(mp);
-		}
+
+            mp.Update(timeInfo);
+        }
 	}
 }
 
@@ -350,7 +334,12 @@ void FEMultiphasicDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 void FEMultiphasicDomain::InternalForces(FEGlobalVector& R)
 {
 	size_t NE = m_Elem.size();
-	#pragma omp parallel for shared (NE)
+
+    // get nodal DOFS
+    int nsol = m_pMat->Solutes();
+    int ndpn = 4+nsol;
+    
+#pragma omp parallel for
 	for (int i=0; i<NE; ++i)
 	{
 		// element force vector
@@ -361,7 +350,7 @@ void FEMultiphasicDomain::InternalForces(FEGlobalVector& R)
 		FESolidElement& el = m_Elem[i];
 
 		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
+		int ndof = ndpn*el.Nodes();
 		fe.assign(ndof, 0);
 
 		// calculate internal force vector
@@ -381,650 +370,323 @@ void FEMultiphasicDomain::InternalForces(FEGlobalVector& R)
 
 void FEMultiphasicDomain::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
-	int i, n;
+	int i, isol, n;
 
 	// jacobian matrix, inverse jacobian matrix and determinants
 	double Ji[3][3], detJt;
 
-	double Gx, Gy, Gz;
+    vec3d gradN;
 	mat3ds s;
 
-	const double* Gr, *Gs, *Gt;
+	const double* Gr, *Gs, *Gt, *H;
 
 	int nint = el.GaussPoints();
 	int neln = el.Nodes();
 
 	double*	gw = el.GaussWeights();
 
+    const int nsol = m_pMat->Solutes();
+    int ndpn = 4+nsol;
+    
+    const int nreact = m_pMat->Reactions();
+    
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    
 	// repeat for all integration points
 	for (n=0; n<nint; ++n)
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-
+        FEBiphasicMaterialPoint& bpt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+        FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
+        
 		// calculate the jacobian
 		detJt = invjact(el, Ji, n);
 
 		detJt *= gw[n];
 
-		// get the stress vector for this integration point
-		s = pt.m_s;
-
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		Gt = el.Gt(n);
 
-		for (i=0; i<neln; ++i)
+        H = el.H(n);
+        
+        // next we get the determinant
+        double Jp = bpt.m_Jp;
+        double J = pt.m_J;
+        
+        // and then finally
+        double divv = ((J-Jp)/dt)/J;
+        
+        // get the stress for this integration point
+        s = pt.m_s;
+        
+        // get the flux
+        vec3d& w = bpt.m_w;
+        
+        vector<vec3d> j(spt.m_j);
+        vector<int> z(nsol);
+        vector<double> kappa(spt.m_k);
+        vec3d je(0,0,0);
+        
+        for (isol=0; isol<nsol; ++isol) {
+            // get the charge number
+            z[isol] = m_pMat->GetSolute(isol)->ChargeNumber();
+            je += j[isol]*z[isol];
+        }
+        
+        // evaluate the porosity, its derivative w.r.t. J, and its gradient
+        double phiw = m_pMat->Porosity(mp);
+        vector<double> chat(nsol,0);
+        
+        // get the solvent supply
+        double phiwhat = 0;
+        if (m_pMat->GetSolventSupply()) phiwhat = m_pMat->GetSolventSupply()->Supply(mp);
+        
+        // chemical reactions
+        for (i=0; i<nreact; ++i) {
+            FEChemicalReaction* pri = m_pMat->GetReaction(i);
+            double zhat = pri->ReactionSupply(mp);
+            phiwhat += phiw*pri->m_Vbar*zhat;
+            for (isol=0; isol<nsol; ++isol)
+                chat[isol] += phiw*zhat*pri->m_v[isol];
+        }
+        
+        for (i=0; i<neln; ++i)
 		{
 			// calculate global gradient of shape functions
 			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-
-			// calculate internal force
+            gradN = vec3d(Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i],
+                          Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i],
+                          Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i]);
+            
+            // calculate internal force
+            vec3d fu = s*gradN;
+            
 			// the '-' sign is so that the internal forces get subtracted
 			// from the global residual vector
-			fe[3*i  ] -= ( Gx*s.xx() +
-				           Gy*s.xy() +
-					       Gz*s.xz() )*detJt;
-
-			fe[3*i+1] -= ( Gy*s.yy() +
-				           Gx*s.xy() +
-					       Gz*s.yz() )*detJt;
-
-			fe[3*i+2] -= ( Gz*s.zz() +
-				           Gy*s.yz() +
-					       Gx*s.xz() )*detJt;
-		}
+            fe[ndpn*i  ] -= fu.x*detJt;
+            fe[ndpn*i+1] -= fu.y*detJt;
+            fe[ndpn*i+2] -= fu.z*detJt;
+            fe[ndpn*i+3] -= dt*(w*gradN + (phiwhat - divv)*H[i])*detJt;
+            for (isol=0; isol<nsol; ++isol)
+                fe[ndpn*i+4+isol] -= dt*(gradN*(j[isol]+je*m_pMat->m_penalty)
+                             + H[i]*(chat[isol] - (phiw*spt.m_ca[isol] - spt.m_crp[isol]/J)/dt)
+                             )*detJt;
+        }
 	}
 }
 
 //-----------------------------------------------------------------------------
-//! calculates the internal equivalent nodal forces due to the solute work
-//! for steady-state response (zero solid velocity, zero time derivative of
-//! solute concentration)
-//! Note that we only use the first n entries in fe, where n is the number
-//! of nodes
-void FEMultiphasicDomain::InternalSoluteWorkSS(vector<double>& R, double dt)
+void FEMultiphasicDomain::InternalForcesSS(FEGlobalVector& R)
 {
-	const int nsol = m_pMat->Solutes();
-
-	int NE = (int)m_Elem.size();
+    size_t NE = m_Elem.size();
     
-    #pragma omp parallel for shared(NE)
-	for (int i=0; i<NE; ++i)
-	{
-		// get the element
-		FESolidElement& el = m_Elem[i];
-		int neln = el.Nodes();
-			
-		// unpack the element
-		vector<int> elm;
-		UnpackLM(el, elm);
-			
-		// get the element force vector
-		vector<double> fe(neln);
-			
-        for (int isol=0; isol<nsol; ++isol)
-        {
-            // calculate solute internal work
-            ElementInternalSoluteWorkSS(el, fe, dt, isol);
-            
-            // add solute work to global residual
-            #pragma omp critical
-            {
-                int dofc = neln*(7 + m_pMat->GetSolute(isol)->GetSoluteID());
-                for (int j=0; j<neln; ++j)
-                {
-                    int J = elm[dofc+j];
-                    if (J >= 0) R[J] += fe[j];
-                }
-            }
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-bool FEMultiphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector<double>& fe, double dt, const int sol)
-{
-	int i, isol, n;
-	
-	int nint = el.GaussPoints();
-	int neln = el.Nodes();
-	
-	// jacobian
-	double Ji[3][3], detJ;
-	
-	double *Gr, *Gs, *Gt, *H;
-	
-	// gradient of shape functions
-	vector<vec3d> gradN(neln);
-	
-	// gauss-weights
-	double* wg = el.GaussWeights();
-	
-	const int nsol = m_pMat->Solutes();
-	vector<int> z(nsol);
-	
-	const int nreact = m_pMat->Reactions();
-	
-	zero(fe);
-	
-	// loop over gauss-points
-	for (n=0; n<nint; ++n)
-	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
-		
-		// calculate jacobian
-		detJ = invjact(el, Ji, n);
-		
-        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
-        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
-        vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
+    // get nodal DOFS
+    int nsol = m_pMat->Solutes();
+    int ndpn = 4+nsol;
+    
+#pragma omp parallel for
+    for (int i=0; i<NE; ++i)
+    {
+        // element force vector
+        vector<double> fe;
+        vector<int> lm;
         
-		Gr = el.Gr(n);
-		Gs = el.Gs(n);
-		Gt = el.Gt(n);
-		
-		H = el.H(n);
-		
-		for (i=0; i<neln; ++i)
-		{
-            // save spatial gradient of shape functions
-            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
-		}
-		
-		vector<vec3d> j(spt.m_j);
-		vec3d je(0,0,0);
-		
-		for (isol=0; isol<nsol; ++isol) {
-			// get the charge number
-			z[isol] = m_pMat->GetSolute(isol)->ChargeNumber();
-			// current density (flux units)
-			je += j[isol]*z[isol];
-		}
-
-		// chemical reactions
-		double phiw = m_pMat->Porosity(mp);
-		double chat = 0;
-		for (i=0; i<nreact; ++i)
-			chat += m_pMat->GetReaction(i)->m_v[sol]*m_pMat->GetReaction(i)->ReactionSupply(mp);
-
-		// update force vector
-		for (i=0; i<neln; ++i)
-		{
-			fe[i] -= dt*(gradN[i]*(j[sol]+je*m_pMat->m_penalty)
-						 + H[i]*phiw*chat
-						 )*detJ*wg[n];
-		}
-	}
-
-	return true;
+        // get the element
+        FESolidElement& el = m_Elem[i];
+        
+        // get the element force vector and initialize it to zero
+        int ndof = ndpn*el.Nodes();
+        fe.assign(ndof, 0);
+        
+        // calculate internal force vector
+        ElementInternalForceSS(el, fe);
+        
+        // get the element's LM vector
+        UnpackLM(el, lm);
+        
+        // assemble element 'fe'-vector into global R vector
+        //#pragma omp critical
+        R.Assemble(el.m_node, lm, fe);
+    }
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::InternalSoluteWork(vector<double>& R, double dt)
-{
-	const int nsol = m_pMat->Solutes();
+//! calculates the internal equivalent nodal forces for solid elements
 
-	int NE = (int)m_Elem.size();
+void FEMultiphasicDomain::ElementInternalForceSS(FESolidElement& el, vector<double>& fe)
+{
+    int i, isol, n;
     
-	#pragma omp parallel for shared(NE)
-	for (int i=0; i<NE; ++i)
-	{
-		// get the element
-		FESolidElement& el = m_Elem[i];
-		int neln = el.Nodes();
-			
-		// unpack the element
-		vector<int> elm;
-		UnpackLM(el, elm);
-			
-		// get the element force vector
-		vector<double> fe(neln);
-			
-		for (int isol=0; isol<nsol; ++isol) 
-		{
-			// calculate solute internal work
-			ElementInternalSoluteWork(el, fe, dt, isol);
-				
-			// add solute work to global residual
-            #pragma omp critical
-            {
-                int dofc = neln*(7 + m_pMat->GetSolute(isol)->GetSoluteID());
-                for (int j=0; j<neln; ++j)
-                {
-                    int J = elm[dofc + j];
-                    if (J >= 0) R[J] += fe[j];
-                }
-            }
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! calculates the internal equivalent nodal forces due to the fluid work
-//! Note that we only use the first n entries in fe, where n is the number
-//! of nodes
-bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<double>& fe, double dt, const int sol)
-{
-	int i, isol, n;
-	
-	int nint = el.GaussPoints();
-	int neln = el.Nodes();
-	
-	// jacobian
-	double Ji[3][3], detJ;
-	
-	double *Gr, *Gs, *Gt, *H;
-	
-	// gradient of shape functions
-	vector<vec3d> gradN(neln);
-	
-	// gauss-weights
-	double* wg = el.GaussWeights();
-	
-	const int nsol = m_pMat->Solutes();
-	
-	const int nreact = m_pMat->Reactions();
-	
-	zero(fe);
-	
-	// loop over gauss-points
-	for (n=0; n<nint; ++n)
-	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
-		
-		// calculate jacobian
-		detJ = invjact(el, Ji, n);
-		
-		vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
-		vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
-		vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
-		
-		Gr = el.Gr(n);
-		Gs = el.Gs(n);
-		Gt = el.Gt(n);
-		
-		H = el.H(n);
-		
-		for (i=0; i<neln; ++i)
-		{
-			// save spatial gradient of shape functions
-            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
-		}
-		
-		// next we get the determinant
-		double J = ept.m_J;
-		
-		vector<vec3d> j(spt.m_j);
-		vector<double> c(spt.m_c);
-		vector<int> z(nsol);
-		vector<double> kappa(spt.m_k);
-		vec3d je(0,0,0);
-		
-		for (isol=0; isol<nsol; ++isol) {
-			// get the charge number
-			z[isol] = m_pMat->GetSolute(isol)->ChargeNumber();
-			je += j[isol]*z[isol];
-		}
-		
-		// evaluate the porosity, its derivative w.r.t. J, and its gradient
-		double phiw = m_pMat->Porosity(mp);
-        double chat = 0;
-		
-		// chemical reactions
+    // jacobian matrix, inverse jacobian matrix and determinants
+    double Ji[3][3], detJt;
+    
+    vec3d gradN;
+    mat3ds s;
+    
+    const double* Gr, *Gs, *Gt, *H;
+    
+    int nint = el.GaussPoints();
+    int neln = el.Nodes();
+    
+    double*	gw = el.GaussWeights();
+    
+    const int nsol = m_pMat->Solutes();
+    int ndpn = 4+nsol;
+    
+    const int nreact = m_pMat->Reactions();
+    
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    
+    // repeat for all integration points
+    for (n=0; n<nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+        FEBiphasicMaterialPoint& bpt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+        FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
+        
+        // calculate the jacobian
+        detJt = invjact(el, Ji, n);
+        
+        detJt *= gw[n];
+        
+        Gr = el.Gr(n);
+        Gs = el.Gs(n);
+        Gt = el.Gt(n);
+        
+        H = el.H(n);
+        
+        // get the stress for this integration point
+        s = pt.m_s;
+        
+        // get the flux
+        vec3d& w = bpt.m_w;
+        
+        vector<vec3d> j(spt.m_j);
+        vector<int> z(nsol);
+        vector<double> kappa(spt.m_k);
+        vec3d je(0,0,0);
+        
+        for (isol=0; isol<nsol; ++isol) {
+            // get the charge number
+            z[isol] = m_pMat->GetSolute(isol)->ChargeNumber();
+            je += j[isol]*z[isol];
+        }
+        
+        // evaluate the porosity, its derivative w.r.t. J, and its gradient
+        double phiw = m_pMat->Porosity(mp);
+        vector<double> chat(nsol,0);
+        
+        // get the solvent supply
+        double phiwhat = 0;
+        if (m_pMat->GetSolventSupply()) phiwhat = m_pMat->GetSolventSupply()->Supply(mp);
+        
+        // chemical reactions
         for (i=0; i<nreact; ++i) {
-			FEChemicalReaction* pri = m_pMat->GetReaction(i);
+            FEChemicalReaction* pri = m_pMat->GetReaction(i);
             double zhat = pri->ReactionSupply(mp);
-            chat += phiw*zhat*pri->m_v[sol];
+            phiwhat += phiw*pri->m_Vbar*zhat;
+            for (isol=0; isol<nsol; ++isol)
+                chat[isol] += phiw*zhat*pri->m_v[isol];
         }
-
-		// update force vector
-		for (i=0; i<neln; ++i)
-		{
-            fe[i] -= dt*(gradN[i]*(j[sol]+je*m_pMat->m_penalty)
-                         + H[i]*(chat - (phiw*spt.m_ca[sol] - spt.m_crp[sol]/J)/dt)
-                         )*detJ*wg[n];
-		}
-	}
-	
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEMultiphasicDomain::InternalFluidWork(vector<double>& R, double dt)
-{
-	int NE = (int)m_Elem.size();
-    
-    #pragma omp parallel for shared(NE)
-	for (int i=0; i<NE; ++i)
-	{
-		// get the element
-		FESolidElement& el = m_Elem[i];
-		int neln = el.Nodes();
-			
-		// unpack the element
-		vector<int> elm;
-		UnpackLM(el, elm);
-			
-		// calculate fluid internal work
-		vector<double> fe(neln);
-		ElementInternalFluidWork(el, fe, dt);
-			
-		// add fluid work to global residual
-        #pragma omp critical
-        {
-            for (int j=0; j<neln; ++j)
-            {
-                int J = elm[3*neln+j];
-                if (J >= 0) R[J] += fe[j];
-            }
-        }
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! calculates the internal equivalent nodal forces due to the fluid work
-//! Note that we only use the first n entries in fe, where n is the number
-//! of nodes
-
-bool FEMultiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<double>& fe, double dt)
-{
-	int i, n;
-	
-	int nint = el.GaussPoints();
-	int neln = el.Nodes();
-	
-	// jacobian
-	double Ji[3][3], detJ;
-	
-	double *Gr, *Gs, *Gt, *H;
-	
-    // gradient of shape functions
-    vector<vec3d> gradN(neln);
-    
-	// gauss-weights
-	double* wg = el.GaussWeights();
-	
-	const int nreact = m_pMat->Reactions();
-	
-	zero(fe);
-	
-	// loop over gauss-points
-	for (n=0; n<nint; ++n)
-	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-		
-		// calculate jacobian
-		detJ = invjact(el, Ji, n);
-		
-        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
-        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
-        vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
         
-		Gr = el.Gr(n);
-		Gs = el.Gs(n);
-		Gt = el.Gt(n);
-		
-		H = el.H(n);
-		
-        // evaluate spatial gradient of shape functions
-		for (i=0; i<neln; ++i)
-            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
-		
-		// next we get the determinant
-		double J = ept.m_J;
-        double Jp = ppt.m_Jp;
-		
-		// and then finally
-		double divv = ((J-Jp)/dt)/J;
-		
-		// get the flux
-		vec3d& w = ppt.m_w;
-
-		// get the solvent supply
-		double phiwhat = 0;
-		if (m_pMat->GetSolventSupply()) phiwhat = m_pMat->GetSolventSupply()->Supply(mp);
-	
-		// chemical reactions
-        double phiw = m_pMat->Porosity(mp);
-		for (i=0; i<nreact; ++i)
-		{
-			FEChemicalReaction* pr = m_pMat->GetReaction(i);
-			phiwhat += phiw*pr->m_Vbar*pr->ReactionSupply(mp);
-		}
-
-		// update force vector
-		for (i=0; i<neln; ++i)
-			fe[i] -= dt*(gradN[i]*w + (phiwhat - divv)*H[i])*detJ*wg[n];
-	}
-	
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEMultiphasicDomain::InternalFluidWorkSS(vector<double>& R, double dt)
-{
-	int NE = (int)m_Elem.size();
-    
-    #pragma omp parallel for shared(NE)
-	for (int i=0; i<NE; ++i)
-	{
-		// get the element
-		FESolidElement& el = m_Elem[i];
-		int neln = el.Nodes();
-			
-		// unpack the element
-		vector<int> elm;
-		UnpackLM(el, elm);
-			
-		// calculate fluid internal work
-		vector<double> fe(neln);
-		ElementInternalFluidWorkSS(el, fe, dt);
-			
-		// add fluid work to global residual
-		#pragma omp critical
-        {
-            for (int j=0; j<neln; ++j)
-            {
-                int J = elm[3*neln+j];
-                if (J >= 0) R[J] += fe[j];
-            }
-        }
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! calculates the internal equivalent nodal forces due to the fluid work
-//! for a steady-state analysis (zero solid velocity)
-//! Note that we only use the first n entries in fe, where n is the number
-//! of nodes
-
-bool FEMultiphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<double>& fe, double dt)
-{
-	int i, n;
-	
-	int nint = el.GaussPoints();
-	int neln = el.Nodes();
-	
-	// jacobian
-	double Ji[3][3], detJ;
-	
-	double *Gr, *Gs, *Gt, *H;
-	
-    // gradient of shape functions
-    vector<vec3d> gradN(neln);
-    
-	// gauss-weights
-	double* wg = el.GaussWeights();
-	
-	const int nreact = m_pMat->Reactions();
-
-	zero(fe);
-	
-	// loop over gauss-points
-	for (n=0; n<nint; ++n)
-	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-		
-		// calculate jacobian
-		detJ = invjact(el, Ji, n);
-		
-        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
-        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
-        vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
-        
-		Gr = el.Gr(n);
-		Gs = el.Gs(n);
-		Gt = el.Gt(n);
-
-		H = el.H(n);
-		
-        // evaluate spatial gradient of shape functions
         for (i=0; i<neln; ++i)
-            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
-		
-		// get the solvent flux
-		vec3d& w = ppt.m_w;
-
-		// get the solvent supply
-		double phiwhat = 0;
-		if (m_pMat->GetSolventSupply()) phiwhat = m_pMat->GetSolventSupply()->Supply(mp);
-		
-		// chemical reactions
-        double phiw = m_pMat->Porosity(mp);
-		for (i=0; i<nreact; ++i)
-			phiwhat += phiw*m_pMat->GetReaction(i)->m_Vbar*m_pMat->GetReaction(i)->ReactionSupply(mp);
-
-		// update force vector
-		for (i=0; i<neln; ++i)
-			fe[i] -= dt*(gradN[i]*w + H[i]*phiwhat)*detJ*wg[n];
-	}
-	
-	return true;
+        {
+            // calculate global gradient of shape functions
+            // note that we need the transposed of Ji, not Ji itself !
+            gradN = vec3d(Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i],
+                          Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i],
+                          Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i]);
+            
+            // calculate internal force
+            vec3d fu = s*gradN;
+            
+            // the '-' sign is so that the internal forces get subtracted
+            // from the global residual vector
+            fe[ndpn*i  ] -= fu.x*detJt;
+            fe[ndpn*i+1] -= fu.y*detJt;
+            fe[ndpn*i+2] -= fu.z*detJt;
+            fe[ndpn*i+3] -= dt*(w*gradN + H[i]*phiwhat)*detJt;
+            for (isol=0; isol<nsol; ++isol)
+                fe[ndpn*i+4+isol] -= dt*(gradN*(j[isol]+je*m_pMat->m_penalty)
+                                         + H[i]*phiw*chat[isol]
+                                         )*detJt;
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimeInfo& tp)
+void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
 {
 	const int nsol = m_pMat->Solutes();
-
+    int ndpn = 4+nsol;
+    
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
     
-    #pragma omp parallel for shared (NE)
+    #pragma omp parallel for
 	for (int iel=0; iel<NE; ++iel)
 	{
 		// element stiffness matrix
 		matrix ke;
-		vector<int> elm;
+		vector<int> lm;
 		
 		FESolidElement& el = m_Elem[iel];
-		UnpackLM(el, elm);
+		UnpackLM(el, lm);
 			
 		// allocate stiffness matrix
 		int neln = el.Nodes();
-		int ndpn = 4+nsol;
 		int ndof = neln*ndpn;
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementMultiphasicStiffness(el, ke, bsymm, tp.timeIncrement);
+		ElementMultiphasicStiffness(el, ke, bsymm);
 			
-		// TODO: the problem here is that the LM array that is returned by the UnpackLM
-		// function does not give the equation numbers in the right order. For this reason we
-		// have to create a new lm array and place the equation numbers in the right order.
-		// What we really ought to do is fix the UnpackLM function so that it returns
-		// the LM vector in the right order for solute-solid elements.
+        // assemble element matrix in global stiffness matrix
         #pragma omp critical
-        {
-            vector<int> lm(ndof);
-            int isol;
-            vector<int> dofc(nsol);
-            for (isol=0; isol<nsol; ++isol)
-                dofc[isol] = neln*(7 + m_pMat->GetSolute(isol)->GetSoluteID());
-            for (int i=0; i<neln; ++i)
-            {
-                lm[ndpn*i  ] = elm[3*i];
-                lm[ndpn*i+1] = elm[3*i+1];
-                lm[ndpn*i+2] = elm[3*i+2];
-                lm[ndpn*i+3] = elm[3*neln+i];
-                for (isol=0; isol<nsol; ++isol)
-                    lm[ndpn*i+4+isol] = elm[dofc[isol]+i];
-            }
-			
-            // assemble element matrix in global stiffness matrix
-            psolver->AssembleStiffness(el.m_node, lm, ke);
-        }
+        psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
 
-void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimeInfo& tp)
+//-----------------------------------------------------------------------------
+void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm)
 {
-	const int nsol = m_pMat->Solutes();
-
+    const int nsol = m_pMat->Solutes();
+    int ndpn = 4+nsol;
+    
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
     
-    #pragma omp parallel for shared (NE)
+    #pragma omp parallel for
 	for (int iel=0; iel<NE; ++iel)
 	{
-		// element stiffness matrix
+        // element stiffness matrix
 		matrix ke;
-		vector<int> elm;
+		vector<int> lm;
 		
 		FESolidElement& el = m_Elem[iel];
-		UnpackLM(el, elm);
+		UnpackLM(el, lm);
 		
 		// allocate stiffness matrix
 		int neln = el.Nodes();
-		int ndpn = 4+nsol;
 		int ndof = neln*ndpn;
-		ke.resize(ndof, ndof);
+        ke.resize(ndof, ndof);
 			
 		// calculate the element stiffness matrix
-		ElementMultiphasicStiffnessSS(el, ke, bsymm, tp.timeIncrement);
+		ElementMultiphasicStiffnessSS(el, ke, bsymm);
 			
-		// TODO: the problem here is that the LM array that is returned by the UnpackLM
-		// function does not give the equation numbers in the right order. For this reason we
-		// have to create a new lm array and place the equation numbers in the right order.
-		// What we really ought to do is fix the UnpackLM function so that it returns
-		// the LM vector in the right order for solute-solid elements.
+        // assemble element matrix in global stiffness matrix
         #pragma omp critical
-        {
-            vector<int> lm(ndof);
-            int isol;
-            vector<int> dofc(nsol);
-            for (isol=0; isol<nsol; ++isol)
-                dofc[isol] = neln*(7 + m_pMat->GetSolute(isol)->GetSoluteID());
-            for (int i=0; i<neln; ++i)
-            {
-                lm[ndpn*i  ] = elm[3*i];
-                lm[ndpn*i+1] = elm[3*i+1];
-                lm[ndpn*i+2] = elm[3*i+2];
-                lm[ndpn*i+3] = elm[3*neln+i];
-                for (isol=0; isol<nsol; ++isol)
-                    lm[ndpn*i+4+isol] = elm[dofc[isol]+i];
-            }
-			
-            // assemble element matrix in global stiffness matrix
-            psolver->AssembleStiffness(el.m_node, lm, ke);
-        }
+        psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
 
 //-----------------------------------------------------------------------------
 //! calculates element stiffness matrix for element iel
 //!
-bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm, double dt)
+bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm)
 {
 	int i, j, isol, jsol, n, ireact, isbm;
 	
@@ -1038,37 +700,22 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 	
 	// Gradient of shape functions
 	vector<vec3d> gradN(neln);
-	double tmp;
 	
 	// gauss-weights
 	double* gw = el.GaussWeights();
 	
-	FEMultiphasic* pm = m_pMat;
-	const int nsol = pm->Solutes();
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    
+	const int nsol = m_pMat->Solutes();
 	int ndpn = 4+nsol;
 	
-	const int nsbm   = pm->SBMs();
-	const int nreact = pm->Reactions();
+	const int nsbm   = m_pMat->SBMs();
+	const int nreact = m_pMat->Reactions();
 
-	// zero stiffness matrix
-	ke.zero();
-	
-	// calculate solid stiffness matrix
-	int ndof = 3*el.Nodes();
-	matrix ks(ndof, ndof); ks.zero();
-	SolidElementStiffness(el, ks);
-	
-	// copy solid stiffness matrix into ke
-	for (i=0; i<neln; ++i)
-		for (j=0; j<neln; ++j)
-		{
-			ke[ndpn*i  ][ndpn*j] = ks[3*i  ][3*j  ]; ke[ndpn*i  ][ndpn*j+1] = ks[3*i  ][3*j+1]; ke[ndpn*i  ][ndpn*j+2] = ks[3*i  ][3*j+2];
-			ke[ndpn*i+1][ndpn*j] = ks[3*i+1][3*j  ]; ke[ndpn*i+1][ndpn*j+1] = ks[3*i+1][3*j+1]; ke[ndpn*i+1][ndpn*j+2] = ks[3*i+1][3*j+2];
-			ke[ndpn*i+2][ndpn*j] = ks[3*i+2][3*j  ]; ke[ndpn*i+2][ndpn*j+1] = ks[3*i+2][3*j+1]; ke[ndpn*i+2][ndpn*j+2] = ks[3*i+2][3*j+2];
-		}
-	
-
-	// loop over gauss-points
+    // zero stiffness matrix
+    ke.zero();
+    
+    // loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
@@ -1077,7 +724,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 		FESolutesMaterialPoint&  spt = *(mp.ExtractData<FESolutesMaterialPoint >());
 		
 		// calculate jacobian
-		detJ = invjact(el, Ji, n);
+		detJ = invjact(el, Ji, n)*gw[n];
 		
 		vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
 		vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -1093,6 +740,12 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 		for (i=0; i<neln; ++i)
             gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
 		
+        // get stress tensor
+        mat3ds s = ept.m_s;
+        
+        // get elasticity tensor
+        tens4ds C = m_pMat->Tangent(mp);
+        
 		// next we get the determinant
 		double J = ept.m_J;
 		
@@ -1108,7 +761,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 		
         // get the charge number
 		for (isol=0; isol<nsol; ++isol)
-			z[isol] = pm->GetSolute(isol)->ChargeNumber();
+			z[isol] = m_pMat->GetSolute(isol)->ChargeNumber();
 		
 		vector<double> dkdJ(spt.m_dkdJ);
 		vector< vector<double> > dkdc(spt.m_dkdc);
@@ -1117,17 +770,17 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 		vector< vector< vector<double> > > dkdrc(spt.m_dkdrc);
 		
 		// evaluate the porosity and its derivative
-		double phiw = pm->Porosity(mp);
+		double phiw = m_pMat->Porosity(mp);
         double phi0 = ppt.m_phi0;
 		double phis = 1. - phiw;
 		double dpdJ = phis/J;
 		
 		// evaluate the osmotic coefficient
-		double osmc = pm->GetOsmoticCoefficient()->OsmoticCoefficient(mp);
+		double osmc = m_pMat->GetOsmoticCoefficient()->OsmoticCoefficient(mp);
 		
 		// evaluate the permeability
-		mat3ds K = pm->GetPermeability()->Permeability(mp);
-		tens4ds dKdE = pm->GetPermeability()->Tangent_Permeability_Strain(mp);
+		mat3ds K = m_pMat->GetPermeability()->Permeability(mp);
+		tens4ds dKdE = m_pMat->GetPermeability()->Tangent_Permeability_Strain(mp);
 		
 		vector<mat3ds> dKdc(nsol);
 		vector<mat3ds> D(nsol);
@@ -1145,29 +798,29 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 		double Phip = 0;
 		vector<double> Phic(nsol,0);
         vector<mat3ds> dchatde(nsol);
-		if (pm->GetSolventSupply()) {
-			Phie = pm->GetSolventSupply()->Tangent_Supply_Strain(mp);
-			Phip = pm->GetSolventSupply()->Tangent_Supply_Pressure(mp);
+		if (m_pMat->GetSolventSupply()) {
+			Phie = m_pMat->GetSolventSupply()->Tangent_Supply_Strain(mp);
+			Phip = m_pMat->GetSolventSupply()->Tangent_Supply_Pressure(mp);
 		}
         
         // chemical reactions
 		for (i=0; i<nreact; ++i)
-			Phie += pm->GetReaction(i)->m_Vbar*(I*pm->GetReaction(i)->ReactionSupply(mp)
-              +pm->GetReaction(i)->Tangent_ReactionSupply_Strain(mp)*(J*phiw));
+			Phie += m_pMat->GetReaction(i)->m_Vbar*(I*m_pMat->GetReaction(i)->ReactionSupply(mp)
+              +m_pMat->GetReaction(i)->Tangent_ReactionSupply_Strain(mp)*(J*phiw));
 		
 		for (isol=0; isol<nsol; ++isol) {
 			// evaluate the permeability derivatives
-			dKdc[isol] = pm->GetPermeability()->Tangent_Permeability_Concentration(mp,isol);
+			dKdc[isol] = m_pMat->GetPermeability()->Tangent_Permeability_Concentration(mp,isol);
 			
 			// evaluate the diffusivity tensor and its derivatives
-			D[isol] = pm->GetSolute(isol)->m_pDiff->Diffusivity(mp);
-			dDdE[isol] = pm->GetSolute(isol)->m_pDiff->Tangent_Diffusivity_Strain(mp);
+			D[isol] = m_pMat->GetSolute(isol)->m_pDiff->Diffusivity(mp);
+			dDdE[isol] = m_pMat->GetSolute(isol)->m_pDiff->Tangent_Diffusivity_Strain(mp);
 			
 			// evaluate the solute free diffusivity
-			D0[isol] = pm->GetSolute(isol)->m_pDiff->Free_Diffusivity(mp);
+			D0[isol] = m_pMat->GetSolute(isol)->m_pDiff->Free_Diffusivity(mp);
 			
 			// evaluate the derivative of the osmotic coefficient
-			dodc[isol] = pm->GetOsmoticCoefficient()->Tangent_OsmoticCoefficient_Concentration(mp,isol);
+			dodc[isol] = m_pMat->GetOsmoticCoefficient()->Tangent_OsmoticCoefficient_Concentration(mp,isol);
 			
 			// evaluate the stress tangent with concentration
 //			dTdc[isol] = pm->GetSolid()->Tangent_Concentration(mp,isol);
@@ -1176,28 +829,28 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 			ImD[isol] = I-D[isol]/D0[isol];
 			
 			for (jsol=0; jsol<nsol; ++jsol) {
-				dDdc[isol][jsol] = pm->GetSolute(isol)->m_pDiff->Tangent_Diffusivity_Concentration(mp,jsol);
-				dD0dc[isol][jsol] = pm->GetSolute(isol)->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,jsol);
+				dDdc[isol][jsol] = m_pMat->GetSolute(isol)->m_pDiff->Tangent_Diffusivity_Concentration(mp,jsol);
+				dD0dc[isol][jsol] = m_pMat->GetSolute(isol)->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,jsol);
 			}
 			
 			// evaluate the solvent supply tangent with concentration
-			if (pm->GetSolventSupply()) Phic[isol] = pm->GetSolventSupply()->Tangent_Supply_Concentration(mp,isol);
+			if (m_pMat->GetSolventSupply()) Phic[isol] = m_pMat->GetSolventSupply()->Tangent_Supply_Concentration(mp,isol);
 
             // chemical reactions
             dchatde[isol].zero();
             for (ireact=0; ireact<nreact; ++ireact) {
-                dchatde[isol] += pm->GetReaction(ireact)->m_v[isol]
-                *(I*pm->GetReaction(ireact)->ReactionSupply(mp)
-                  +pm->GetReaction(ireact)->Tangent_ReactionSupply_Strain(mp)*(J*phiw));
-                Phic[isol] += phiw*pm->GetReaction(ireact)->m_Vbar
-                *pm->GetReaction(ireact)->Tangent_ReactionSupply_Concentration(mp, isol);
+                dchatde[isol] += m_pMat->GetReaction(ireact)->m_v[isol]
+                *(I*m_pMat->GetReaction(ireact)->ReactionSupply(mp)
+                  +m_pMat->GetReaction(ireact)->Tangent_ReactionSupply_Strain(mp)*(J*phiw));
+                Phic[isol] += phiw*m_pMat->GetReaction(ireact)->m_Vbar
+                *m_pMat->GetReaction(ireact)->Tangent_ReactionSupply_Concentration(mp, isol);
             }
 		}
 		
 		// Miscellaneous constants
-		double R = pm->m_Rgas;
-		double T = pm->m_Tabs;
-		double penalty = pm->m_penalty;
+		double R = m_pMat->m_Rgas;
+		double T = m_pMat->m_Tabs;
+		double penalty = m_pMat->m_penalty;
 		
 		// evaluate the effective permeability and its derivatives
 		mat3ds Ki = K.inverse();
@@ -1231,11 +884,16 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 		vector< vector<double> > dchatdc(nsol, vector<double>(nsol));
 		double sum;
 		mat3ds De;
-		tmp = detJ*gw[n];
 		for (i=0; i<neln; ++i)
 		{
 			for (j=0; j<neln; ++j)
 			{
+                // Kuu matrix
+                mat3d Kuu = (mat3dd(gradN[i]*(s*gradN[j])) + vdotTdotv(gradN[i], C, gradN[j]))*detJ;
+                ke[ndpn*i  ][ndpn*j  ] += Kuu[0][0]; ke[ndpn*i  ][ndpn*j+1] += Kuu[0][1]; ke[ndpn*i  ][ndpn*j+2] += Kuu[0][2];
+                ke[ndpn*i+1][ndpn*j  ] += Kuu[1][0]; ke[ndpn*i+1][ndpn*j+1] += Kuu[1][1]; ke[ndpn*i+1][ndpn*j+2] += Kuu[1][2];
+                ke[ndpn*i+2][ndpn*j  ] += Kuu[2][0]; ke[ndpn*i+2][ndpn*j+1] += Kuu[2][1]; ke[ndpn*i+2][ndpn*j+2] += Kuu[2][2];
+                
 				// calculate the kpu matrix
 				gp = vec3d(0,0,0);
 				for (isol=0; isol<nsol; ++isol) gp += (D[isol]*gradc[isol])*(kappa[isol]/D0[isol]);
@@ -1247,19 +905,19 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 					+ (Ke*vdotTdotv(gradc[isol], dDdE[isol], gradN[j]))*(-kappa[isol]*R*T/D0[isol]);
 				}
 				qpu = -gradN[j]*(1.0/dt);
-				vtmp = (wu.transpose()*gradN[i] + (qpu + Phie*gradN[j])*H[i])*(tmp*dt);
+				vtmp = (wu.transpose()*gradN[i] + (qpu + Phie*gradN[j])*H[i])*(detJ*dt);
 				ke[ndpn*i+3][ndpn*j  ] += vtmp.x;
 				ke[ndpn*i+3][ndpn*j+1] += vtmp.y;
 				ke[ndpn*i+3][ndpn*j+2] += vtmp.z;
 				
 				// calculate the kup matrix
-				vtmp = -gradN[i]*H[j]*tmp;
+				vtmp = -gradN[i]*H[j]*detJ;
 				ke[ndpn*i  ][ndpn*j+3] += vtmp.x;
 				ke[ndpn*i+1][ndpn*j+3] += vtmp.y;
 				ke[ndpn*i+2][ndpn*j+3] += vtmp.z;
 				
 				// calculate the kpp matrix
-				ke[ndpn*i+3][ndpn*j+3] += (H[i]*H[j]*Phip - gradN[i]*(Ke*gradN[j]))*(tmp*dt);
+				ke[ndpn*i+3][ndpn*j+3] += (H[i]*H[j]*Phip - gradN[i]*(Ke*gradN[j]))*(detJ*dt);
 				
 				// calculate kcu matrix data
 				jue.zero();
@@ -1281,14 +939,14 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
                         double sum1 = 0;
                         double sum2 = 0;
                         for (isbm=0; isbm<nsbm; ++isbm) {
-                            sum1 += pm->SBMMolarMass(isbm)*pm->GetReaction(ireact)->m_v[nsol+isbm]*
-                            ((J-phi0)*dkdr[isol][isbm]-kappa[isol]/pm->SBMDensity(isbm));
-                            sum2 += pm->SBMMolarMass(isbm)*pm->GetReaction(ireact)->m_v[nsol+isbm]*
-                            (dkdr[isol][isbm]+(J-phi0)*dkdJr[isol][isbm]-dkdJ[isol]/pm->SBMDensity(isbm));
+                            sum1 += m_pMat->SBMMolarMass(isbm)*m_pMat->GetReaction(ireact)->m_v[nsol+isbm]*
+                            ((J-phi0)*dkdr[isol][isbm]-kappa[isol]/m_pMat->SBMDensity(isbm));
+                            sum2 += m_pMat->SBMMolarMass(isbm)*m_pMat->GetReaction(ireact)->m_v[nsol+isbm]*
+                            (dkdr[isol][isbm]+(J-phi0)*dkdJr[isol][isbm]-dkdJ[isol]/m_pMat->SBMDensity(isbm));
                         }
-                        double zhat = pm->GetReaction(ireact)->ReactionSupply(mp);
+                        double zhat = m_pMat->GetReaction(ireact)->ReactionSupply(mp);
                         mat3dd zhatI(zhat);
-                        mat3ds dzde = pm->GetReaction(ireact)->Tangent_ReactionSupply_Strain(mp);
+                        mat3ds dzde = m_pMat->GetReaction(ireact)->Tangent_ReactionSupply_Strain(mp);
                         qcu[isol] -= ((zhatI+dzde*(J-phi0))*gradN[j])*(sum1*c[isol])
                         +gradN[j]*(c[isol]*(J-phi0)*sum2*zhat);
                     }
@@ -1298,7 +956,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 					
 					// calculate the kcu matrix
 					vtmp = ((ju[isol]+jue*penalty).transpose()*gradN[i]
-							+ (qcu[isol] + dchatde[isol]*gradN[j])*H[i])*(tmp*dt);
+							+ (qcu[isol] + dchatde[isol]*gradN[j])*H[i])*(detJ*dt);
 					ke[ndpn*i+4+isol][ndpn*j  ] += vtmp.x;
 					ke[ndpn*i+4+isol][ndpn*j+1] += vtmp.y;
 					ke[ndpn*i+4+isol][ndpn*j+2] += vtmp.z;
@@ -1308,13 +966,13 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 															  (D[isol]*(kappa[isol]*c[isol]/D0[isol])
 															   +De*penalty)
 															  *(Ke*gradN[j])
-															  ))*(tmp*dt);
+															  ))*(detJ*dt);
 				
 					// calculate the kuc matrix
 					sum = 0;
 					for (jsol=0; jsol<nsol; ++jsol)
 						sum += c[jsol]*(dodc[isol]*kappa[jsol]+osmc*dkdc[jsol][isol]);
-					vtmp = (dTdc[isol]*gradN[i] - gradN[i]*(R*T*(osmc*kappa[isol]+sum)))*H[j]*tmp;
+					vtmp = (dTdc[isol]*gradN[i] - gradN[i]*(R*T*(osmc*kappa[isol]+sum)))*H[j]*detJ;
 					ke[ndpn*i  ][ndpn*j+4+isol] += vtmp.x;
 					ke[ndpn*i+1][ndpn*j+4+isol] += vtmp.y;
 					ke[ndpn*i+2][ndpn*j+4+isol] += vtmp.z;
@@ -1326,7 +984,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 								+dDdc[jsol][isol]*kappa[jsol])/D0[jsol]*gradc[jsol];
 					wc[isol] = (dKedc[isol]*gp)*(-H[j])
 					-Ke*((D[isol]*gradN[j])*(kappa[isol]/D0[isol])+vtmp*H[j])*(R*T);
-					ke[ndpn*i+3][ndpn*j+4+isol] += (gradN[i]*wc[isol]+H[i]*H[j]*Phic[isol])*(tmp*dt);
+					ke[ndpn*i+3][ndpn*j+4+isol] += (gradN[i]*wc[isol]+H[i]*H[j]*Phic[isol])*(detJ*dt);
 					
 				}
 				
@@ -1353,18 +1011,18 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 						// chemical reactions
 						dchatdc[isol][jsol] = 0;
 						for (ireact=0; ireact<nreact; ++ireact) {
-							dchatdc[isol][jsol] += pm->GetReaction(ireact)->m_v[isol]
-							*pm->GetReaction(ireact)->Tangent_ReactionSupply_Concentration(mp,jsol);
+							dchatdc[isol][jsol] += m_pMat->GetReaction(ireact)->m_v[isol]
+							*m_pMat->GetReaction(ireact)->Tangent_ReactionSupply_Concentration(mp,jsol);
                             double sum1 = 0;
                             double sum2 = 0;
                             for (isbm=0; isbm<nsbm; ++isbm) {
-                                sum1 += pm->SBMMolarMass(isbm)*pm->GetReaction(ireact)->m_v[nsol+isbm]*
-                                ((J-phi0)*dkdr[isol][isbm]-kappa[isol]/pm->SBMDensity(isbm));
-                                sum2 += pm->SBMMolarMass(isbm)*pm->GetReaction(ireact)->m_v[nsol+isbm]*
-                                ((J-phi0)*dkdrc[isol][isbm][jsol]-dkdc[isol][jsol]/pm->SBMDensity(isbm));
+                                sum1 += m_pMat->SBMMolarMass(isbm)*m_pMat->GetReaction(ireact)->m_v[nsol+isbm]*
+                                ((J-phi0)*dkdr[isol][isbm]-kappa[isol]/m_pMat->SBMDensity(isbm));
+                                sum2 += m_pMat->SBMMolarMass(isbm)*m_pMat->GetReaction(ireact)->m_v[nsol+isbm]*
+                                ((J-phi0)*dkdrc[isol][isbm][jsol]-dkdc[isol][jsol]/m_pMat->SBMDensity(isbm));
                             }
-                            double zhat = pm->GetReaction(ireact)->ReactionSupply(mp);
-                            double dzdc = pm->GetReaction(ireact)->Tangent_ReactionSupply_Concentration(mp, jsol);
+                            double zhat = m_pMat->GetReaction(ireact)->ReactionSupply(mp);
+                            double dzdc = m_pMat->GetReaction(ireact)->Tangent_ReactionSupply_Concentration(mp, jsol);
                             if (jsol != isol) {
                                 qcc[isol][jsol] -= H[j]*phiw*c[isol]*(dzdc*sum1+zhat*sum2);
                             }
@@ -1380,7 +1038,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 					for (jsol=0; jsol<nsol; ++jsol) {
 						ke[ndpn*i+4+isol][ndpn*j+4+jsol] += (gradN[i]*(jc[isol][jsol]+jce[jsol]*penalty)
 															 + H[i]*(qcc[isol][jsol]
-																	 + H[j]*phiw*dchatdc[isol][jsol]))*(tmp*dt);
+																	 + H[j]*phiw*dchatdc[isol][jsol]))*(detJ*dt);
 					}
 				}
 			}
@@ -1388,7 +1046,8 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 	}
 	
 	// Enforce symmetry by averaging top-right and bottom-left corners of stiffness matrix
-	if (bsymm) {
+    double tmp;
+    if (bsymm) {
 		for (i=0; i<ndpn*neln; ++i)
 			for (j=i+1; j<ndpn*neln; ++j) {
 				tmp = 0.5*(ke[i][j]+ke[j][i]);
@@ -1404,7 +1063,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 //! for steady-state response (zero solid velocity, zero time derivative of
 //! solute concentration)
 //!
-bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm, double dt)
+bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm)
 {
 	int i, j, isol, jsol, n, ireact;
 	
@@ -1418,35 +1077,19 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 	
 	// Gradient of shape functions
 	vector<vec3d> gradN(neln);
-	double tmp;
 	
 	// gauss-weights
 	double* gw = el.GaussWeights();
 	
-	// get the element's material
-	FEMultiphasic* pm = m_pMat;
-
-	const int nsol = pm->Solutes();
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    
+	const int nsol = m_pMat->Solutes();
 	int ndpn = 4+nsol;
 	
-	const int nreact = pm->Reactions();
+	const int nreact = m_pMat->Reactions();
 
 	// zero stiffness matrix
 	ke.zero();
-	
-	// calculate solid stiffness matrix
-	int ndof = 3*el.Nodes();
-	matrix ks(ndof, ndof); ks.zero();
-	SolidElementStiffness(el, ks);
-	
-	// copy solid stiffness matrix into ke
-	for (i=0; i<neln; ++i)
-		for (j=0; j<neln; ++j)
-		{
-			ke[ndpn*i  ][ndpn*j] = ks[3*i  ][3*j  ]; ke[ndpn*i  ][ndpn*j+1] = ks[3*i  ][3*j+1]; ke[ndpn*i  ][ndpn*j+2] = ks[3*i  ][3*j+2];
-			ke[ndpn*i+1][ndpn*j] = ks[3*i+1][3*j  ]; ke[ndpn*i+1][ndpn*j+1] = ks[3*i+1][3*j+1]; ke[ndpn*i+1][ndpn*j+2] = ks[3*i+1][3*j+2];
-			ke[ndpn*i+2][ndpn*j] = ks[3*i+2][3*j  ]; ke[ndpn*i+2][ndpn*j+1] = ks[3*i+2][3*j+1]; ke[ndpn*i+2][ndpn*j+2] = ks[3*i+2][3*j+2];
-		}
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -1457,7 +1100,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 		FESolutesMaterialPoint&  spt = *(mp.ExtractData<FESolutesMaterialPoint >());
 		
 		// calculate jacobian
-		detJ = invjact(el, Ji, n);
+		detJ = invjact(el, Ji, n)*gw[n];
 		
 		vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
 		vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -1473,6 +1116,11 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
         for (i=0; i<neln; ++i)
             gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
         
+        // get stress tensor
+        mat3ds s = ept.m_s;
+        
+        // get elasticity tensor
+        tens4ds C = m_pMat->Tangent(mp);
 		
 		// next we get the determinant
 		double J = ept.m_J;
@@ -1490,22 +1138,22 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 		
         // get the charge number
 		for (isol=0; isol<nsol; ++isol)
-			z[isol] = pm->GetSolute(isol)->ChargeNumber();
+			z[isol] = m_pMat->GetSolute(isol)->ChargeNumber();
 		
 		vector<double> dkdJ(spt.m_dkdJ);
 		vector< vector<double> > dkdc(spt.m_dkdc);
 		
 		// evaluate the porosity and its derivative
-		double phiw = pm->Porosity(mp);
+		double phiw = m_pMat->Porosity(mp);
 		double phis = 1. - phiw;
 		double dpdJ = phis/J;
 		
 		// evaluate the osmotic coefficient
-		double osmc = pm->GetOsmoticCoefficient()->OsmoticCoefficient(mp);
+		double osmc = m_pMat->GetOsmoticCoefficient()->OsmoticCoefficient(mp);
 		
 		// evaluate the permeability
-		mat3ds K = pm->GetPermeability()->Permeability(mp);
-		tens4ds dKdE = pm->GetPermeability()->Tangent_Permeability_Strain(mp);
+		mat3ds K = m_pMat->GetPermeability()->Permeability(mp);
+		tens4ds dKdE = m_pMat->GetPermeability()->Tangent_Permeability_Strain(mp);
 		
 		vector<mat3ds> dKdc(nsol);
 		vector<mat3ds> D(nsol);
@@ -1523,30 +1171,30 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 		mat3ds Phie; Phie.zero();
 		double Phip = 0;
 		vector<double> Phic(nsol,0);
-		if (pm->GetSolventSupply()) {
-			phiwhat = pm->GetSolventSupply()->Supply(mp);
-			Phie = pm->GetSolventSupply()->Tangent_Supply_Strain(mp);
-			Phip = pm->GetSolventSupply()->Tangent_Supply_Pressure(mp);
+		if (m_pMat->GetSolventSupply()) {
+			phiwhat = m_pMat->GetSolventSupply()->Supply(mp);
+			Phie = m_pMat->GetSolventSupply()->Tangent_Supply_Strain(mp);
+			Phip = m_pMat->GetSolventSupply()->Tangent_Supply_Pressure(mp);
 		}
 		
         // chemical reactions
 		for (i=0; i<nreact; ++i)
-			Phie += pm->GetReaction(i)->m_Vbar*(I*pm->GetReaction(i)->ReactionSupply(mp)
-                                             +pm->GetReaction(i)->Tangent_ReactionSupply_Strain(mp)*(J*phiw));
+			Phie += m_pMat->GetReaction(i)->m_Vbar*(I*m_pMat->GetReaction(i)->ReactionSupply(mp)
+                                             +m_pMat->GetReaction(i)->Tangent_ReactionSupply_Strain(mp)*(J*phiw));
 		
 		for (isol=0; isol<nsol; ++isol) {
 			// evaluate the permeability derivatives
-			dKdc[isol] = pm->GetPermeability()->Tangent_Permeability_Concentration(mp,isol);
+			dKdc[isol] = m_pMat->GetPermeability()->Tangent_Permeability_Concentration(mp,isol);
 			
 			// evaluate the diffusivity tensor and its derivatives
-			D[isol] = pm->GetSolute(isol)->m_pDiff->Diffusivity(mp);
-			dDdE[isol] = pm->GetSolute(isol)->m_pDiff->Tangent_Diffusivity_Strain(mp);
+			D[isol] = m_pMat->GetSolute(isol)->m_pDiff->Diffusivity(mp);
+			dDdE[isol] = m_pMat->GetSolute(isol)->m_pDiff->Tangent_Diffusivity_Strain(mp);
 			
 			// evaluate the solute free diffusivity
-			D0[isol] = pm->GetSolute(isol)->m_pDiff->Free_Diffusivity(mp);
+			D0[isol] = m_pMat->GetSolute(isol)->m_pDiff->Free_Diffusivity(mp);
 			
 			// evaluate the derivative of the osmotic coefficient
-			dodc[isol] = pm->GetOsmoticCoefficient()->Tangent_OsmoticCoefficient_Concentration(mp,isol);
+			dodc[isol] = m_pMat->GetOsmoticCoefficient()->Tangent_OsmoticCoefficient_Concentration(mp,isol);
 			
 			// evaluate the stress tangent with concentration
 //			dTdc[isol] = pm->GetSolid()->Tangent_Concentration(mp,isol);
@@ -1555,19 +1203,19 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 			ImD[isol] = I-D[isol]/D0[isol];
 			
 			for (jsol=0; jsol<nsol; ++jsol) {
-				dDdc[isol][jsol] = pm->GetSolute(isol)->m_pDiff->Tangent_Diffusivity_Concentration(mp,jsol);
-				dD0dc[isol][jsol] = pm->GetSolute(isol)->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,jsol);
+				dDdc[isol][jsol] = m_pMat->GetSolute(isol)->m_pDiff->Tangent_Diffusivity_Concentration(mp,jsol);
+				dD0dc[isol][jsol] = m_pMat->GetSolute(isol)->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,jsol);
 			}
 
 			// evaluate the solvent supply tangent with concentration
-			if (pm->GetSolventSupply()) Phic[isol] = pm->GetSolventSupply()->Tangent_Supply_Concentration(mp,isol);
+			if (m_pMat->GetSolventSupply()) Phic[isol] = m_pMat->GetSolventSupply()->Tangent_Supply_Concentration(mp,isol);
 			
 		}
 		
 		// Miscellaneous constants
-		double R = pm->m_Rgas;
-		double T = pm->m_Tabs;
-		double penalty = pm->m_penalty;
+		double R = m_pMat->m_Rgas;
+		double T = m_pMat->m_Tabs;
+		double penalty = m_pMat->m_penalty;
 		
 		// evaluate the effective permeability and its derivatives
 		mat3ds Ki = K.inverse();
@@ -1600,11 +1248,16 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 		vector< vector<double> > dchatdc(nsol, vector<double>(nsol));
 		double sum;
 		mat3ds De;
-		tmp = detJ*gw[n];
 		for (i=0; i<neln; ++i)
 		{
 			for (j=0; j<neln; ++j)
 			{
+                // Kuu matrix
+                mat3d Kuu = (mat3dd(gradN[i]*(s*gradN[j])) + vdotTdotv(gradN[i], C, gradN[j]))*detJ;
+                ke[ndpn*i  ][ndpn*j  ] += Kuu[0][0]; ke[ndpn*i  ][ndpn*j+1] += Kuu[0][1]; ke[ndpn*i  ][ndpn*j+2] += Kuu[0][2];
+                ke[ndpn*i+1][ndpn*j  ] += Kuu[1][0]; ke[ndpn*i+1][ndpn*j+1] += Kuu[1][1]; ke[ndpn*i+1][ndpn*j+2] += Kuu[1][2];
+                ke[ndpn*i+2][ndpn*j  ] += Kuu[2][0]; ke[ndpn*i+2][ndpn*j+1] += Kuu[2][1]; ke[ndpn*i+2][ndpn*j+2] += Kuu[2][2];
+                
 				// calculate the kpu matrix
 				gp = vec3d(0,0,0);
 				for (isol=0; isol<nsol; ++isol) gp += (D[isol]*gradc[isol])*(kappa[isol]/D0[isol]);
@@ -1616,19 +1269,19 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 					+ (Ke*vdotTdotv(gradc[isol], dDdE[isol], gradN[j]))*(-kappa[isol]*R*T/D0[isol]);
 				}
 				qpu = Phie*gradN[j];
-				vtmp = (wu.transpose()*gradN[i] + qpu*H[i])*(tmp*dt);
+				vtmp = (wu.transpose()*gradN[i] + qpu*H[i])*(detJ*dt);
 				ke[ndpn*i+3][ndpn*j  ] += vtmp.x;
 				ke[ndpn*i+3][ndpn*j+1] += vtmp.y;
 				ke[ndpn*i+3][ndpn*j+2] += vtmp.z;
 				
 				// calculate the kup matrix
-				vtmp = -gradN[i]*H[j]*tmp;
+				vtmp = -gradN[i]*H[j]*detJ;
 				ke[ndpn*i  ][ndpn*j+3] += vtmp.x;
 				ke[ndpn*i+1][ndpn*j+3] += vtmp.y;
 				ke[ndpn*i+2][ndpn*j+3] += vtmp.z;
 				
 				// calculate the kpp matrix
-				ke[ndpn*i+3][ndpn*j+3] += (H[i]*H[j]*Phip - gradN[i]*(Ke*gradN[j]))*(tmp*dt);
+				ke[ndpn*i+3][ndpn*j+3] += (H[i]*H[j]*Phip - gradN[i]*(Ke*gradN[j]))*(detJ*dt);
 				
 				// calculate kcu matrix data
 				jue.zero();
@@ -1648,7 +1301,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 				for (isol=0; isol<nsol; ++isol) {
 					
 					// calculate the kcu matrix
-					vtmp = ((ju[isol]+jue*penalty).transpose()*gradN[i])*(tmp*dt);
+					vtmp = ((ju[isol]+jue*penalty).transpose()*gradN[i])*(detJ*dt);
 					ke[ndpn*i+4+isol][ndpn*j  ] += vtmp.x;
 					ke[ndpn*i+4+isol][ndpn*j+1] += vtmp.y;
 					ke[ndpn*i+4+isol][ndpn*j+2] += vtmp.z;
@@ -1658,13 +1311,13 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 															  (D[isol]*(kappa[isol]*c[isol]/D0[isol])
 															   +De*penalty)
 															  *(Ke*gradN[j])
-															  ))*(tmp*dt);
+															  ))*(detJ*dt);
 					
 					// calculate the kuc matrix
 					sum = 0;
 					for (jsol=0; jsol<nsol; ++jsol)
 						sum += c[jsol]*(dodc[isol]*kappa[jsol]+osmc*dkdc[jsol][isol]);
-					vtmp = (dTdc[isol]*gradN[i] - gradN[i]*(R*T*(osmc*kappa[isol]+sum)))*H[j]*tmp;
+					vtmp = (dTdc[isol]*gradN[i] - gradN[i]*(R*T*(osmc*kappa[isol]+sum)))*H[j]*detJ;
 					ke[ndpn*i  ][ndpn*j+4+isol] += vtmp.x;
 					ke[ndpn*i+1][ndpn*j+4+isol] += vtmp.y;
 					ke[ndpn*i+2][ndpn*j+4+isol] += vtmp.z;
@@ -1676,7 +1329,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 								 +dDdc[jsol][isol]*kappa[jsol])/D0[jsol]*gradc[jsol];
 					wc[isol] = (dKedc[isol]*gp)*(-H[j])
 					-Ke*((D[isol]*gradN[j])*(kappa[isol]/D0[isol])+vtmp*H[j])*(R*T);
-					ke[ndpn*i+3][ndpn*j+4+isol] += (gradN[i]*wc[isol]+H[i]*H[j]*Phic[isol])*(tmp*dt);
+					ke[ndpn*i+3][ndpn*j+4+isol] += (gradN[i]*wc[isol]+H[i]*H[j]*Phic[isol])*(detJ*dt);
 					
 				}
 				
@@ -1699,8 +1352,8 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 						// chemical reactions
 						dchatdc[isol][jsol] = 0;
 						for (ireact=0; ireact<nreact; ++ireact)
-							dchatdc[isol][jsol] += pm->GetReaction(ireact)->m_v[isol]
-							*pm->GetReaction(ireact)->Tangent_ReactionSupply_Concentration(mp,jsol);
+							dchatdc[isol][jsol] += m_pMat->GetReaction(ireact)->m_v[isol]
+							*m_pMat->GetReaction(ireact)->Tangent_ReactionSupply_Concentration(mp,jsol);
 					}
 				}
 				
@@ -1708,7 +1361,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 				for (isol=0; isol<nsol; ++isol) {
 					for (jsol=0; jsol<nsol; ++jsol) {
 						ke[ndpn*i+4+isol][ndpn*j+4+jsol] += (gradN[i]*(jc[isol][jsol]+jce[jsol]*penalty)
-															 + H[i]*H[j]*phiw*dchatdc[isol][jsol])*(tmp*dt);
+															 + H[i]*H[j]*phiw*dchatdc[isol][jsol])*(detJ*dt);
 					}
 				}
 			}
@@ -1716,6 +1369,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 	}
 	
 	// Enforce symmetry by averaging top-right and bottom-left corners of stiffness matrix
+    double tmp;
 	if (bsymm) {
 		for (i=0; i<ndpn*neln; ++i)
 			for (j=i+1; j<ndpn*neln; ++j) {
@@ -1725,227 +1379,6 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 	}
 	
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! This function calculates the element stiffness matrix. It calls the material
-//! stiffness function, the geometrical stiffness function and, if necessary, the
-//! dilatational stiffness function. Note that these three functions only calculate
-//! the upper diagonal matrix due to the symmetry of the element stiffness matrix
-//! The last section of this function fills the rest of the element stiffness matrix.
-
-void FEMultiphasicDomain::SolidElementStiffness(FESolidElement& el, matrix& ke)
-{
-	// calculate material stiffness (i.e. constitutive component)
-	ElementMultiphasicMaterialStiffness(el, ke);
-	
-	// calculate geometrical stiffness
-	ElementGeometricalStiffness(el, ke);
-	
-	// assign symmetic parts
-	// TODO: Can this be omitted by changing the Assemble routine so that it only
-	// grabs elements from the upper diagonal matrix?
-	int ndof = 3*el.Nodes();
-	int i, j;
-	for (i=0; i<ndof; ++i)
-		for (j=i+1; j<ndof; ++j)
-			ke[j][i] = ke[i][j];
-}
-
-//-----------------------------------------------------------------------------
-//! Calculates element material stiffness element matrix
-
-void FEMultiphasicDomain::ElementMultiphasicMaterialStiffness(FESolidElement &el, matrix &ke)
-{
-	// get the material
-	FEMultiphasic* pmat = m_pMat;
-	
-	int i, i3, j, j3, n;
-	
-	// Get the current element's data
-	const int nint = el.GaussPoints();
-	const int neln = el.Nodes();
-	
-	// global derivatives of shape functions
-	const int NE = FEElement::MAX_NODES;
-	double Gx[NE], Gy[NE], Gz[NE];
-	
-	double Gxi, Gyi, Gzi;
-	double Gxj, Gyj, Gzj;
-	
-	// The 'D' matrix
-	double D[6][6] = {0};	// The 'D' matrix
-	
-	// The 'D*BL' matrix
-	double DBL[6][3];
-	
-	double *Grn, *Gsn, *Gtn;
-	double Gr, Gs, Gt;
-	
-	// jacobian
-	double Ji[3][3], detJt;
-	
-	// weights at gauss points
-	const double *gw = el.GaussWeights();
-	
-	// calculate element stiffness matrix
-	for (n=0; n<nint; ++n)
-	{
-		// calculate jacobian
-		detJt = invjact(el, Ji, n)*gw[n];
-		
-		Grn = el.Gr(n);
-		Gsn = el.Gs(n);
-		Gtn = el.Gt(n);
-		
-		// setup the material point
-		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		
-		// get the 'D' matrix
-		tens4ds C = pmat->Tangent(mp);
-		C.extract(D);
-		
-		for (i=0; i<neln; ++i)
-		{
-			Gr = Grn[i];
-			Gs = Gsn[i];
-			Gt = Gtn[i];
-			
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx[i] = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
-			Gy[i] = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
-			Gz[i] = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
-		}
-		
-		// we only calculate the upper triangular part
-		// since ke is symmetric. The other part is
-		// determined below using this symmetry.
-		for (i=0, i3=0; i<neln; ++i, i3 += 3)
-		{
-			Gxi = Gx[i];
-			Gyi = Gy[i];
-			Gzi = Gz[i];
-			
-			for (j=i, j3 = i3; j<neln; ++j, j3 += 3)
-			{
-				Gxj = Gx[j];
-				Gyj = Gy[j];
-				Gzj = Gz[j];
-				
-				// calculate D*BL matrices
-				DBL[0][0] = (D[0][0]*Gxj+D[0][3]*Gyj+D[0][5]*Gzj);
-				DBL[0][1] = (D[0][1]*Gyj+D[0][3]*Gxj+D[0][4]*Gzj);
-				DBL[0][2] = (D[0][2]*Gzj+D[0][4]*Gyj+D[0][5]*Gxj);
-				
-				DBL[1][0] = (D[1][0]*Gxj+D[1][3]*Gyj+D[1][5]*Gzj);
-				DBL[1][1] = (D[1][1]*Gyj+D[1][3]*Gxj+D[1][4]*Gzj);
-				DBL[1][2] = (D[1][2]*Gzj+D[1][4]*Gyj+D[1][5]*Gxj);
-				
-				DBL[2][0] = (D[2][0]*Gxj+D[2][3]*Gyj+D[2][5]*Gzj);
-				DBL[2][1] = (D[2][1]*Gyj+D[2][3]*Gxj+D[2][4]*Gzj);
-				DBL[2][2] = (D[2][2]*Gzj+D[2][4]*Gyj+D[2][5]*Gxj);
-				
-				DBL[3][0] = (D[3][0]*Gxj+D[3][3]*Gyj+D[3][5]*Gzj);
-				DBL[3][1] = (D[3][1]*Gyj+D[3][3]*Gxj+D[3][4]*Gzj);
-				DBL[3][2] = (D[3][2]*Gzj+D[3][4]*Gyj+D[3][5]*Gxj);
-				
-				DBL[4][0] = (D[4][0]*Gxj+D[4][3]*Gyj+D[4][5]*Gzj);
-				DBL[4][1] = (D[4][1]*Gyj+D[4][3]*Gxj+D[4][4]*Gzj);
-				DBL[4][2] = (D[4][2]*Gzj+D[4][4]*Gyj+D[4][5]*Gxj);
-				
-				DBL[5][0] = (D[5][0]*Gxj+D[5][3]*Gyj+D[5][5]*Gzj);
-				DBL[5][1] = (D[5][1]*Gyj+D[5][3]*Gxj+D[5][4]*Gzj);
-				DBL[5][2] = (D[5][2]*Gzj+D[5][4]*Gyj+D[5][5]*Gxj);
-				
-				ke[i3  ][j3  ] += (Gxi*DBL[0][0] + Gyi*DBL[3][0] + Gzi*DBL[5][0] )*detJt;
-				ke[i3  ][j3+1] += (Gxi*DBL[0][1] + Gyi*DBL[3][1] + Gzi*DBL[5][1] )*detJt;
-				ke[i3  ][j3+2] += (Gxi*DBL[0][2] + Gyi*DBL[3][2] + Gzi*DBL[5][2] )*detJt;
-				
-				ke[i3+1][j3  ] += (Gyi*DBL[1][0] + Gxi*DBL[3][0] + Gzi*DBL[4][0] )*detJt;
-				ke[i3+1][j3+1] += (Gyi*DBL[1][1] + Gxi*DBL[3][1] + Gzi*DBL[4][1] )*detJt;
-				ke[i3+1][j3+2] += (Gyi*DBL[1][2] + Gxi*DBL[3][2] + Gzi*DBL[4][2] )*detJt;
-				
-				ke[i3+2][j3  ] += (Gzi*DBL[2][0] + Gyi*DBL[4][0] + Gxi*DBL[5][0] )*detJt;
-				ke[i3+2][j3+1] += (Gzi*DBL[2][1] + Gyi*DBL[4][1] + Gxi*DBL[5][1] )*detJt;
-				ke[i3+2][j3+2] += (Gzi*DBL[2][2] + Gyi*DBL[4][2] + Gxi*DBL[5][2] )*detJt;
-			}
-		}
-	}
-}
-
-
-//-----------------------------------------------------------------------------
-//! calculates element's geometrical stiffness component for integration point n
-void FEMultiphasicDomain::ElementGeometricalStiffness(FESolidElement &el, matrix &ke)
-{
-	int n, i, j;
-
-	double Gx[FEElement::MAX_NODES];
-	double Gy[FEElement::MAX_NODES];
-	double Gz[FEElement::MAX_NODES];
-	double *Grn, *Gsn, *Gtn;
-	double Gr, Gs, Gt;
-
-	// nr of nodes
-	int neln = el.Nodes();
-
-	// nr of integration points
-	int nint = el.GaussPoints();
-
-	// jacobian
-	double Ji[3][3], detJt;
-
-	// weights at gauss points
-	const double *gw = el.GaussWeights();
-
-	// stiffness component for the initial stress component of stiffness matrix
-	double kab;
-
-	// calculate geometrical element stiffness matrix
-	for (n=0; n<nint; ++n)
-	{
-		// calculate jacobian
-		detJt = invjact(el, Ji, n)*gw[n];
-
-		Grn = el.Gr(n);
-		Gsn = el.Gs(n);
-		Gtn = el.Gt(n);
-
-		for (i=0; i<neln; ++i)
-		{
-			Gr = Grn[i];
-			Gs = Gsn[i];
-			Gt = Gtn[i];
-
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx[i] = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
-			Gy[i] = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
-			Gz[i] = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
-		}
-
-		// get the material point data
-		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-
-		// element's Cauchy-stress tensor at gauss point n
-		// s is the voight vector
-		mat3ds& s = pt.m_s;
-
-		for (i=0; i<neln; ++i)
-			for (j=i; j<neln; ++j)
-			{
-				kab = (Gx[i]*(s.xx()*Gx[j]+s.xy()*Gy[j]+s.xz()*Gz[j]) +
-					   Gy[i]*(s.xy()*Gx[j]+s.yy()*Gy[j]+s.yz()*Gz[j]) + 
-					   Gz[i]*(s.xz()*Gx[j]+s.yz()*Gy[j]+s.zz()*Gz[j]))*detJt;
-
-				ke[3*i  ][3*j  ] += kab;
-				ke[3*i+1][3*j+1] += kab;
-				ke[3*i+2][3*j+2] += kab;
-			}
-	}
 }
 
 //-----------------------------------------------------------------------------

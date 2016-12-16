@@ -589,69 +589,37 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
         FEDomain& dom = mesh.Domain(i);
         FEElasticDomain* ped = dynamic_cast<FEElasticDomain*>(&dom);
         FEBiphasicDomain*  pbd = dynamic_cast<FEBiphasicDomain* >(&dom);
+        FEBiphasicSoluteDomain* pbs = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+        FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
+        FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
         if (pbd) {
             if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
                 pbd->InternalForcesSS(RHS);
             else
                 pbd->InternalForces(RHS);
         }
+        else if (pbs) {
+            if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+                pbs->InternalForcesSS(RHS);
+            else
+                pbs->InternalForces(RHS);
+        }
+        else if (ptd) {
+            if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+                ptd->InternalForcesSS(RHS);
+            else
+                ptd->InternalForces(RHS);
+        }
+        else if (pmd) {
+            if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+                pmd->InternalForcesSS(RHS);
+            else
+                pmd->InternalForces(RHS);
+        }
         else if (ped)
             ped->InternalForces(RHS);
     }
     
-    if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
-	{
-		for (i=0; i<mesh.Domains(); ++i) 
-		{
-			FEDomain& dom = mesh.Domain(i);
-			FEBiphasicSoluteDomain* pbs = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
-			FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
-			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
-
-			if (pbs)
-			{
-				pbs->InternalFluidWorkSS(R, dt);
-				pbs->InternalSoluteWorkSS(R, dt);
-			} 
-			else if (ptd)
-			{
-				ptd->InternalFluidWorkSS(R, dt);
-				ptd->InternalSoluteWorkSS(R, dt);
-			}
-			else if (pmd)
-			{
-				pmd->InternalFluidWorkSS (R, dt);
-				pmd->InternalSoluteWorkSS(R, dt);
-			}
-		}
-	}
-	else
-	{
-		for (i=0; i<mesh.Domains(); ++i) 
-		{
-			FEDomain& dom = mesh.Domain(i);
-			FEBiphasicSoluteDomain* pbs = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
-			FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
-			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
-
-			if (pbs)
-			{
-				pbs->InternalFluidWork(R, dt);
-				pbs->InternalSoluteWork(R, dt);
-			}
-			else if (ptd)
-			{
-				ptd->InternalFluidWork(R, dt);
-				ptd->InternalSoluteWork(R, dt);
-			}
-			else if (pmd)
-			{
- 				pmd->InternalFluidWork (R, dt);
-				pmd->InternalSoluteWork(R, dt);
-			}
-		}
-	}
-
 	// calculate forces due to surface loads
 	int nsl = m_fem.SurfaceLoads();
 	for (i=0; i<nsl; ++i)
@@ -740,9 +708,9 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimeInfo& tp)
 			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
 
 			if      (pbd) pbd->StiffnessMatrixSS(this, bsymm);
-			else if (pbs) pbs->StiffnessMatrixSS(this, bsymm, tp);
-			else if (ptd) ptd->StiffnessMatrixSS(this, bsymm, tp);
-			else if (pmd) pmd->StiffnessMatrixSS(this, bsymm, tp);
+			else if (pbs) pbs->StiffnessMatrixSS(this, bsymm);
+			else if (ptd) ptd->StiffnessMatrixSS(this, bsymm);
+			else if (pmd) pmd->StiffnessMatrixSS(this, bsymm);
             else if (pde) pde->StiffnessMatrix(this);
 		}
 	}
@@ -758,9 +726,9 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimeInfo& tp)
 			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
 
 			if      (pbd) pbd->StiffnessMatrix(this, bsymm);
-			else if (pbs) pbs->StiffnessMatrix(this, bsymm, tp);
-			else if (ptd) ptd->StiffnessMatrix(this, bsymm, tp);
-			else if (pmd) pmd->StiffnessMatrix(this, bsymm, tp);
+			else if (pbs) pbs->StiffnessMatrix(this, bsymm);
+			else if (ptd) ptd->StiffnessMatrix(this, bsymm);
+			else if (pmd) pmd->StiffnessMatrix(this, bsymm);
             else if (pde) pde->StiffnessMatrix(this);
 		}
 	}

@@ -224,7 +224,7 @@ void FEBiphasicSolidDomain::ElementInternalForce(FESolidElement& el, vector<doub
     // jacobian matrix, inverse jacobian matrix and determinants
     double Ji[3][3], detJt;
     
-    vec3d gradN, GradN;
+    vec3d gradN;
     mat3ds s;
     
     const double* Gr, *Gs, *Gt, *H;
@@ -234,15 +234,7 @@ void FEBiphasicSolidDomain::ElementInternalForce(FESolidElement& el, vector<doub
     
     double*	gw = el.GaussWeights();
     
-    FEMesh& mesh = *GetMesh();
-    
     double dt = GetFEModel()->GetTime().timeIncrement;
-    
-    vec3d rp[FEElement::MAX_NODES];
-    for (i=0; i<neln; ++i)
-    {
-        rp[i] = mesh.Node(el.m_node[i]).m_rp;
-    }
     
     // repeat for all integration points
     for (n=0; n<nint; ++n)
@@ -352,15 +344,7 @@ void FEBiphasicSolidDomain::ElementInternalForceSS(FESolidElement& el, vector<do
     
     double*	gw = el.GaussWeights();
     
-    FEMesh& mesh = *GetMesh();
-    
     double dt = GetFEModel()->GetTime().timeIncrement;
-    
-    vec3d rp[FEElement::MAX_NODES];
-    for (i=0; i<neln; ++i)
-    {
-        rp[i] = mesh.Node(el.m_node[i]).m_rp;
-    }
     
     // repeat for all integration points
     for (n=0; n<nint; ++n)

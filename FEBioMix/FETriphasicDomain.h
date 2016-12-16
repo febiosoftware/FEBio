@@ -46,55 +46,28 @@ public:
 	// internal work (overridden from FEElasticDomain)
 	void InternalForces(FEGlobalVector& R);
 
-	// internal fluid work
-	void InternalFluidWork(vector<double>& R, double dt);
-
-	// internal fluid work (steady state analysis)
-	void InternalFluidWorkSS(vector<double>& R, double dt);
-
-	// solute work
-	void InternalSoluteWork(vector<double>& R, double dt);
-
-	// solute work (steady state analysis)
-	void InternalSoluteWorkSS(vector<double>& R, double dt);
-
+    // internal work (steady-state case)
+    void InternalForcesSS(FEGlobalVector& R);
+    
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimeInfo& tp);
+	void StiffnessMatrix(FESolver* psolver, bool bsymm);
 
 	//! calculates the global stiffness matrix for this domain (steady-state case)
-	void StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimeInfo& tp);
+	void StiffnessMatrixSS(FESolver* psolver, bool bsymm);
 
 protected:
 	//! element internal force vector
 	void ElementInternalForce(FESolidElement& el, vector<double>& fe);
 
-	//! Calculates the internal fluid forces
-	bool ElementInternalFluidWork(FESolidElement& elem, vector<double>& fe, double dt);
-	
-	//! Calculates the internal fluid forces for steady-state response
-	bool ElementInternalFluidWorkSS(FESolidElement& elem, vector<double>& fe, double dt);
-	
-	//! Calculates the internal solute forces
-	bool ElementInternalSoluteWork(FESolidElement& elem, vector<double>& fe, double dt, const int ion);
-	
-	//! Calculates the internal solute forces for steady-state response
-	bool ElementInternalSoluteWorkSS(FESolidElement& elem, vector<double>& fe, double dt, const int ion);
+    //! element internal force vector (steady-state case)
+    void ElementInternalForceSS(FESolidElement& el, vector<double>& fe);
+    
+	//! calculates the element triphasic stiffness matrix
+	bool ElementTriphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm);
 	
 	//! calculates the element triphasic stiffness matrix
-	bool ElementTriphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm, double dt);
+	bool ElementTriphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm);
 	
-	//! calculates the element triphasic stiffness matrix
-	bool ElementTriphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm, double dt);
-	
-	//! calculates the solid element stiffness matrix for steady-state response
-	void SolidElementStiffness(FESolidElement& el, matrix& ke);
-	
-	//! material stiffness component
-	void ElementTriphasicMaterialStiffness(FESolidElement& el, matrix& ke);
-
-	//! geometrical stiffness
-	void ElementGeometricalStiffness(FESolidElement &el, matrix &ke);
-
 protected: // overridden from FEElasticDomain, but not implemented in this domain
 	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) {}
 	void InertialForces(FEGlobalVector& R, vector<double>& F) {}
