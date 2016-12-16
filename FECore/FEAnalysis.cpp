@@ -322,6 +322,12 @@ bool FEAnalysis::Solve()
 			// solve this timestep,
 			bconv = GetFESolver()->SolveStep(m_fem.m_ftime);
 		}
+		catch (LinearSolverFailed)
+		{
+			bconv = false;
+			felog.printbox("FATAL ERROR", "Linear solver failed to find solution. Aborting run.");
+			break;
+		}
 		catch (ExitRequest)
 		{
 			bconv = false;

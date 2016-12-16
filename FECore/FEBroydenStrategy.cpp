@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEBroydenStrategy.h"
 #include "LinearSolver.h"
+#include "FEException.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -29,7 +30,8 @@ bool FEBroydenStrategy::Update(double s, vector<double>& ui, vector<double>& R0,
 {
 	// calculate q1
 	vector<double> q(m_neq);
-	m_plinsolve->BackSolve(q, R1);
+	if (m_plinsolve->BackSolve(q, R1) == false)
+		throw LinearSolverFailed();
 
 	// loop over update vectors
 	for (int j=0; j<m_nups; ++j)
@@ -66,13 +68,15 @@ void FEBroydenStrategy::SolveEquations(vector<double>& x, vector<double>& b)
 	// loop over update vectors
 	if (m_nups == 0)
 	{
-		m_plinsolve->BackSolve(x, b);
+		if (m_plinsolve->BackSolve(x, b) == false)
+			throw LinearSolverFailed();
 	}
 	else
 	{
 		// calculate q1
 		vector<double> q(m_neq);
-		m_plinsolve->BackSolve(q, b);
+		if (m_plinsolve->BackSolve(q, b) == false)
+			throw LinearSolverFailed();
 
 		for (int j=0; j<m_nups-1; ++j)
 		{

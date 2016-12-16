@@ -191,7 +191,8 @@ bool FELinearSolver::SolveStep(double time)
 
 	// solve the equations
 	vector<double> u(m_neq);
-	m_pls->BackSolve(u, m_R);
+	if (m_pls->BackSolve(u, m_R) == false)
+		throw LinearSolverFailed();
 
 	// update solution
 	Update(u);

@@ -11,8 +11,8 @@ public:
 	//! constructor
 	FGMRESSolver();
 
-	//! do any pre-processing (does nothing for iterative solvers)
-	bool PreProcess() { return true; }
+	//! do any pre-processing (allocates temp storage)
+	bool PreProcess();
 
 	//! Factor the matrix (does nothing for iterative solvers)
 	bool Factor() { return true; }
@@ -26,8 +26,12 @@ public:
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
+public:
+	int		m_maxiter;
+
 private:
 	CompactUnSymmMatrix*	m_pA;		//!< the sparse matrix format
+	vector<double>	m_tmp;
 };
 
 //-----------------------------------------------------------------------------
@@ -39,8 +43,8 @@ public:
 	//! constructor
 	FGMRES_ILUT_Solver();
 
-	//! do any pre-processing (does nothing for iterative solvers)
-	bool PreProcess() { return true; }
+	//! do any pre-processing
+	bool PreProcess();
 
 	//! Factor the matrix (does nothing for iterative solvers)
 	bool Factor() { return true; }
@@ -55,11 +59,13 @@ public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
 public:
+	int		m_maxiter;
 	int		m_maxfill;
 	double	m_fillTol;
 
 private:
 	CompactUnSymmMatrix*	m_pA;		//!< the sparse matrix format
+	vector<double>	m_tmp;
 };
 
 //-----------------------------------------------------------------------------
@@ -71,8 +77,8 @@ public:
 	//! constructor
 	FGMRES_ILU0_Solver();
 
-	//! do any pre-processing (does nothing for iterative solvers)
-	bool PreProcess() { return true; }
+	//! do any pre-processing
+	bool PreProcess();
 
 	//! Factor the matrix (does nothing for iterative solvers)
 	bool Factor() { return true; }
@@ -86,6 +92,10 @@ public:
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
+public:
+	int		m_maxiter;
+
 private:
 	CompactUnSymmMatrix*	m_pA;		//!< the sparse matrix format
+	vector<double>	m_tmp;
 };

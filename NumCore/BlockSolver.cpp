@@ -102,7 +102,8 @@ bool BlockSolver::BackSolve(vector<double>& x, vector<double>& b)
 		// backsolve the equations
 		for (int i=0; i<NP; ++i)
 		{
-			m_solver[i]->BackSolve(X[i], T[i]);
+			if (m_solver[i]->BackSolve(X[i], T[i]) == false)
+				return false;
 		}
 
 		// TODO: check convergence

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "BFGSSolver.h"
 #include "FESolver.h"
+#include "FEException.h"
 
 //-----------------------------------------------------------------------------
 // BFGSSolver
@@ -126,7 +127,10 @@ void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 	}
 
 	// perform a backsubstitution
-	m_plinsolve->BackSolve(x, tmp);
+	if (m_plinsolve->BackSolve(x, tmp) == false)
+	{
+		throw LinearSolverFailed();
+	}
 
 	// loop again over all update vectors
 	for (i=0; i<m_nups; ++i)

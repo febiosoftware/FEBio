@@ -1,14 +1,7 @@
-//
-//  BFGSSolver2.cpp
-//  FECore
-//
-//  Created by Gerard Ateshian on 10/12/15.
-//  Copyright © 2015 febio.org. All rights reserved.
-//
-
 #include "BFGSSolver2.h"
 #include "stdafx.h"
 #include "FESolver.h"
+#include "FEException.h"
 
 //-----------------------------------------------------------------------------
 // BFGSSolver2
@@ -93,7 +86,8 @@ void BFGSSolver2::SolveEquations(vector<double>& x, vector<double>& b)
         tmp = b;
         
         // perform a backsubstitution
-        m_plinsolve->BackSolve(x, tmp);
+        if (m_plinsolve->BackSolve(x, tmp) == false) 
+			throw LinearSolverFailed();
     }
     else
     {

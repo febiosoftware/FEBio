@@ -80,6 +80,8 @@ public:
 	int gptIndex;
 };
 
+class LinearSolverFailed {};
+
 class DoRunningRestart{};
 
 
