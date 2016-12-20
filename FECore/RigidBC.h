@@ -7,6 +7,11 @@ class FENodeSet;
 //! rigid node set
 class FERigidNodeSet : public FEBoundaryCondition
 {
+	enum {
+		HINGED_SHELL,
+		CLAMPED_SHELL
+	};
+
 public:
 	FERigidNodeSet(FEModel* pfem);
 	FERigidNodeSet(const FERigidNodeSet& rs);
@@ -29,6 +34,9 @@ public:
 public:
 	vector<int>		m_node;	// node number
 	int				m_rid;	// rigid body number
+
+private: // parameters
+	int	m_nshellBC;		//!< flag defining how shells are attached (0=hinged, 1=clamped)
 };
 
 //-----------------------------------------------------------------------------

@@ -9,14 +9,14 @@
 #ifndef FEBiphasicShellDomain_hpp
 #define FEBiphasicShellDomain_hpp
 
-#include "FECore/FEShellDomain.h"
+#include <FEBioMech/FESSIShellDomain.h>
 #include "FEBiphasicDomain.h"
 #include "FEBiphasic.h"
 
 //-----------------------------------------------------------------------------
 //! Domain class for biphasic 3D shell elements
 //!
-class FEBiphasicShellDomain : public FEShellDomain, public FEBiphasicDomain
+class FEBiphasicShellDomain : public FESSIShellDomain, public FEBiphasicDomain
 {
 public:
     //! constructor
@@ -75,20 +75,8 @@ public:
     
     //! calculates the element biphasic stiffness matrix for steady-state response
     bool ElementBiphasicStiffnessSS(FEShellElement& el, matrix& ke, bool bsymm);
-    
-public:
-	//! calculates covariant basis vectors at an integration point
-	void CoBaseVectors0(FEShellElement& el, int n, vec3d g[3]);
 
-	//! calculates contravariant basis vectors at an integration point
-	void ContraBaseVectors0(FEShellElement& el, int n, vec3d g[3]);
-
-	// inverse jacobian with respect to reference frame
-	double invjac0(FEShellElement& el, double J[3][3], int n);
-
-	// jacobian with respect to reference frame
-	double detJ0(FEShellElement& el, int n);
-
+public:    
     //! calculates covariant basis vectors at an integration point
     void CoBaseVectors(FEShellElement& el, int n, vec3d g[3]);
     
@@ -130,16 +118,10 @@ public: // biphasic domain "properties"
     // That is why I've taken this calculation out of the FEBiphasic class and placed it here.
     vec3d FluidFlux(FEMaterialPoint& mp);
 
-public:
-	//! Find interfaces between solid element faces and shell elements
-	void FindSSI();
-    
 protected:
     int					m_dofU;
     int					m_dofV;
     int					m_dofW;
-
-	bool                    m_binit;    //!< initialization flag
 };
 
 #endif /* FEBiphasicShellDomain_hpp */

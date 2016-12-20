@@ -112,7 +112,7 @@ void FEDomain::Activate()
 	for (int i=0; i<Nodes(); ++i)
 	{
 		FENode& node = Node(i);
-		if (node.m_bexclude == false)
+		if (node.HasFlags(FENode::EXCLUDE) == false)
 		{
 			for (int j=0; j<ndofs; ++j) node.m_ID[m_dof[j]] = DOF_ACTIVE;
 		}

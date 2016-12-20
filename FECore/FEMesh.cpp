@@ -24,12 +24,8 @@
 //-----------------------------------------------------------------------------
 FENode::FENode()
 {
-	// exclude flag (true if the node should not be part of the analysis.
-	// For instance, if it is isolated).
-	m_bexclude = false;
-
-	// shell flag
-	m_bshell = false;
+	// set the default state
+	m_nstate = 0;
 
 	// rigid body data
 	m_rid = -1;
@@ -61,8 +57,7 @@ FENode::FENode(const FENode& n)
 
 	m_nID = n.m_nID;
 	m_rid = n.m_rid;
-	m_bshell = n.m_bshell;
-	m_bexclude = n.m_bexclude;
+	m_nstate = n.m_nstate;
 
 	m_ID = n.m_ID;
 	m_BC = n.m_BC;
@@ -83,8 +78,7 @@ FENode& FENode::operator = (const FENode& n)
 
 	m_nID = n.m_nID;
 	m_rid = n.m_rid;
-	m_bshell = n.m_bshell;
-	m_bexclude = n.m_bexclude;
+	m_nstate = n.m_nstate;
 
 	m_ID = n.m_ID;
 	m_BC = n.m_BC;
@@ -376,10 +370,9 @@ void FEMesh::Serialize(DumpStream& ar)
 			for (int i=0; i<nn; ++i)
 			{
 				FENode& node = Node(i);
+				ar << node.m_nstate;
 				ar << node.m_ap;
 				ar << node.m_at;
-				ar << node.m_bshell;
-				ar << node.m_bexclude;
 				ar << node.m_Fr;
 				ar << node.m_ID;
 				ar << node.m_BC;
@@ -415,10 +408,9 @@ void FEMesh::Serialize(DumpStream& ar)
 			for (int i=0; i<nn; ++i)
 			{
 				FENode& node = Node(i);
+				ar >> node.m_nstate;
 				ar >> node.m_ap;
 				ar >> node.m_at;
-				ar >> node.m_bshell;
-				ar >> node.m_bexclude;
 				ar >> node.m_Fr;
 				ar >> node.m_ID;
 				ar >> node.m_BC;
@@ -560,7 +552,7 @@ int FEMesh::RemoveIsolatedVertices()
 		{
 			++ni;
 			FENode& node = Node(i);
-			node.m_bexclude = true;
+			node.m_nstate |= FENode::EXCLUDE;
 		}
 
 	return ni;
@@ -580,7 +572,7 @@ void FEMesh::InitShells()
 	// Find the nodes that are on a non-rigid shell. 
 	// These nodes will be assigned rotational degrees of freedom
 	// TODO: Perhaps I should let the domains do this instead
-	for (int i = 0; i<Nodes(); ++i) Node(i).m_bshell = false;
+	for (int i = 0; i<Nodes(); ++i) Node(i).m_nstate &= ~FENode::SHELL;
 	for (int nd = 0; nd<Domains(); ++nd)
 	{
 		FEDomain& dom = Domain(nd);
@@ -594,7 +586,7 @@ void FEMesh::InitShells()
 				{
 					FEElement& el = dom.ElementRef(i);
 					int n = el.Nodes();
-					for (int j = 0; j<n; ++j) Node(el.m_node[j]).m_bshell = true;
+					for (int j = 0; j<n; ++j) Node(el.m_node[j]).m_nstate |= FENode::SHELL;
 				}
 			}
 		}

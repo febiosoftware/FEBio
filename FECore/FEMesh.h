@@ -98,6 +98,14 @@ private:
 class FENode
 {
 public:
+	// Node status flags
+	enum Status {
+		EXCLUDE     = 1,	// exclude node from analysis
+		SHELL       = 2,	// this node belongs to a shell
+		RIGID_CLAMP = 4,	// this node should be clamped to a rigid body (only applies to shell nodes)
+	};
+
+public:
 	//! default constructor
 	FENode();
 
@@ -115,6 +123,9 @@ public:
 
 	//! Set the node ID
 	void SetID(int n) { m_nID = n; }
+
+	//! see if status flags are set
+	bool HasFlags(unsigned int flags) { return ((m_nstate & flags) != 0); }
 
 protected:
 	int		m_nID;	//!< nodal ID
@@ -134,9 +145,8 @@ public: // geometry data
     vec3d   m_d0;   //!< initial director
 
 public:	// rigid body data
-	int		m_rid;		//!< rigid body number
-	bool	m_bshell;	//!< does this node belong to a non-rigid shell element?
-	bool	m_bexclude;	//!< exclude this node from the analysis
+	unsigned int	m_nstate;	//!< node state flags
+	int				m_rid;		//!< rigid body number
 
 public:
 	double get(int n) const { return m_val[n]; }

@@ -84,7 +84,7 @@ void FEElasticShellDomainOld::Activate()
 	for (int i=0; i<Nodes(); ++i)
 	{
 		FENode& node = Node(i);
-		if (node.m_bexclude == false)
+		if (node.HasFlags(FENode::EXCLUDE) == false)
 		{
 			if (node.m_rid < 0)
 			{
@@ -93,7 +93,7 @@ void FEElasticShellDomainOld::Activate()
 				node.m_ID[m_dofZ] = DOF_ACTIVE;
 			}
 
-			if (node.m_bshell)
+			if (node.HasFlags(FENode::SHELL))
 			{
 				node.m_ID[m_dofU] = DOF_ACTIVE;
 				node.m_ID[m_dofV] = DOF_ACTIVE;

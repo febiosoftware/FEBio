@@ -32,7 +32,7 @@ void FEBiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             FENode& node = m.Node(el.m_node[i]);
 			x0[i] = node.m_r0;
 			xt[i] = node.m_rt;
-            if (!node.m_bshell || (node.m_ID[m_dofQ] == DOF_INACTIVE))
+            if (!node.HasFlags(FENode::SHELL) || (node.m_ID[m_dofQ] == DOF_INACTIVE))
                 pn[i] = node.get(m_dofP);
             else
                 pn[i] = node.get(m_dofQ);
@@ -96,7 +96,7 @@ void FEBiphasicSolidDomain::Activate()
 	for (int i=0; i<Nodes(); ++i)
 	{
 		FENode& node = Node(i);
-		if (node.m_bexclude == false)
+		if (node.HasFlags(FENode::EXCLUDE) == false)
 		{
 			if (node.m_rid < 0)
 			{
@@ -819,7 +819,7 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
         FENode& node = mesh.Node(el.m_node[j]);
 		r0[j] = node.m_r0;
 		rt[j] = node.m_rt;
-        if (!node.m_bshell || (node.m_ID[m_dofQ] == DOF_INACTIVE))
+        if (!node.HasFlags(FENode::SHELL) || (node.m_ID[m_dofQ] == DOF_INACTIVE))
             pn[j] = node.get(m_dofP);
         else
             pn[j] = node.get(m_dofQ);

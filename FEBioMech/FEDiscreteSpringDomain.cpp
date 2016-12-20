@@ -43,7 +43,7 @@ void FEDiscreteSpringDomain::Activate()
 	for (int i=0; i<Nodes(); ++i)
 	{
 		FENode& node = Node(i);
-		if (node.m_bexclude == false)
+		if (node.HasFlags(FENode::EXCLUDE) == false)
 		{
 			if (node.m_rid < 0)
 			{

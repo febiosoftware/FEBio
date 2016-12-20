@@ -11,6 +11,7 @@
 FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
 {
 	m_rid = -1;
+	m_nshellBC = CLAMPED_SHELL;
 }
 
 //-----------------------------------------------------------------------------
