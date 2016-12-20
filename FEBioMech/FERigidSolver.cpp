@@ -67,7 +67,7 @@ int FERigidSolver::InitEquations(int neq)
 			node.m_ID[dofRU] = (RB.m_LM[3] >= 0 ? -RB.m_LM[3] - 2 : RB.m_LM[3]);
 			node.m_ID[dofRV] = (RB.m_LM[4] >= 0 ? -RB.m_LM[4] - 2 : RB.m_LM[4]);
 			node.m_ID[dofRW] = (RB.m_LM[5] >= 0 ? -RB.m_LM[5] - 2 : RB.m_LM[5]);
-			if (node.HasFlags(FENode::SHELL)) {
+			if (node.HasFlags(FENode::SHELL | FENode::RIGID_CLAMP)) {
                 node.m_ID[m_dofU] = (RB.m_LM[3] >= 0 ? -RB.m_LM[3] - 2 : RB.m_LM[3]);
                 node.m_ID[m_dofV] = (RB.m_LM[4] >= 0 ? -RB.m_LM[4] - 2 : RB.m_LM[4]);
                 node.m_ID[m_dofW] = (RB.m_LM[5] >= 0 ? -RB.m_LM[5] - 2 : RB.m_LM[5]);
@@ -833,7 +833,7 @@ void FERigidSolver::AssembleResidual(int node_id, int dof, double f, vector<doub
             if (lm[3] >= 0) R[lm[3]] += a.y*f;
             if (lm[4] >= 0) R[lm[4]] += -a.x*f;
         }
-		if (node.HasFlags(FENode::SHELL)) {
+		if (node.HasFlags(FENode::SHELL | FENode::RIGID_CLAMP)) {
             // get the shell director
             vec3d d = node.m_d0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ) - node.get_vec3d(m_dofU, m_dofV, m_dofW);
             vec3d b = a - d;
@@ -1302,7 +1302,7 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 			vec3d ut = node.m_rt - node.m_r0;
 			node.set_vec3d(m_dofX, m_dofY, m_dofZ, ut);
             
-			if (node.HasFlags(FENode::SHELL)) {
+			if (node.HasFlags(FENode::SHELL | FENode::RIGID_CLAMP)) {
                 // get the rigid body
                 FERigidBody& RB = *rigid.Object(node.m_rid);
                 // evaluate the director in the current configuration

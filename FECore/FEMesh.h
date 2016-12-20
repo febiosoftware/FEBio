@@ -125,7 +125,13 @@ public:
 	void SetID(int n) { m_nID = n; }
 
 	//! see if status flags are set
-	bool HasFlags(unsigned int flags) { return ((m_nstate & flags) != 0); }
+	bool HasFlags(unsigned int flags) const { return ((m_nstate & flags) != 0); }
+
+	//! set the status flags
+	void SetFlags(unsigned int flags) { m_nstate = flags; }
+
+	//! get the status falgs
+	unsigned int Flags() const { return m_nstate; }
 
 protected:
 	int		m_nID;	//!< nodal ID

@@ -1327,8 +1327,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 // (Used to be defined in the Contact section)
 void FEBioBoundarySection::ParseBCRigid(XMLTag& tag)
 {
-	if (!tag.isempty()) throw XMLReader::InvalidValue(tag);
-
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -1358,6 +1356,12 @@ void FEBioBoundarySection::ParseBCRigid(XMLTag& tag)
 	{
 		GetStep()->AddModelComponent(prn);
 		prn->Deactivate();
+	}
+
+	if (!tag.isempty())
+	{
+		FEParameterList& PL = prn->GetParameterList();
+		m_pim->ReadParameterList(tag, PL);
 	}
 }
 

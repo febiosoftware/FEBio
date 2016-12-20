@@ -7,6 +7,10 @@
 #include "FEMaterial.h"
 #include "LoadCurve.h"
 
+BEGIN_PARAMETER_LIST(FERigidNodeSet, FEBoundaryCondition)
+	ADD_PARAMETER(m_nshellBC, FE_PARAM_INT, "clamp_shells");
+END_PARAMETER_LIST();
+
 //-----------------------------------------------------------------------------
 FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
 {
@@ -57,6 +61,11 @@ void FERigidNodeSet::Activate()
 	for (size_t i=0; i<m_node.size(); ++i)
 	{
 		FENode& node = mesh.Node(m_node[i]);
+		if (m_nshellBC == CLAMPED_SHELL)
+		{
+			if (node.HasFlags(FENode::SHELL)) 
+				node.SetFlags(node.Flags() | FENode::RIGID_CLAMP);
+		}
 		node.m_rid = m_rid;
 	}
 }
@@ -77,6 +86,11 @@ void FERigidNodeSet::Deactivate()
 	for (size_t i=0; i<m_node.size(); ++i)
 	{
 		FENode& node = mesh.Node(m_node[i]);
+		if (m_nshellBC == CLAMPED_SHELL)
+		{
+			if (node.HasFlags(FENode::SHELL))
+				node.SetFlags(node.Flags() & ~FENode::RIGID_CLAMP);
+		}
 		node.m_rid = -1;
 	}
 }
