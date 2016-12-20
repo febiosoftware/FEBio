@@ -33,6 +33,7 @@ SparseMatrix* FGMRESSolver::CreateSparseMatrix(Matrix_Type ntype)
 //-----------------------------------------------------------------------------
 bool FGMRESSolver::PreProcess() 
 {
+#ifdef MKL_ISS
 	// number of equations
 	MKL_INT N = m_pA->Size();
 
@@ -43,6 +44,9 @@ bool FGMRESSolver::PreProcess()
 	m_tmp.resize((N*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
 
 	return true; 
+#else
+	return false;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -145,6 +149,7 @@ SparseMatrix* FGMRES_ILUT_Solver::CreateSparseMatrix(Matrix_Type ntype)
 //-----------------------------------------------------------------------------
 bool FGMRES_ILUT_Solver::PreProcess()
 {
+#ifdef MKL_ISS
 	// number of equations
 	MKL_INT N = m_pA->Size();
 
@@ -155,6 +160,9 @@ bool FGMRES_ILUT_Solver::PreProcess()
 	m_tmp.resize((N*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
 
 	return true;
+#else
+	return false;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -311,6 +319,7 @@ SparseMatrix* FGMRES_ILU0_Solver::CreateSparseMatrix(Matrix_Type ntype)
 //-----------------------------------------------------------------------------
 bool FGMRES_ILU0_Solver::PreProcess()
 {
+#ifdef MKL_ISS
 	// number of equations
 	MKL_INT N = m_pA->Size();
 
@@ -321,7 +330,11 @@ bool FGMRES_ILU0_Solver::PreProcess()
 	m_tmp.resize((N*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
 
 	return true;
+#else
+	return false;
+#endif
 }
+
 //-----------------------------------------------------------------------------
 bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 {
