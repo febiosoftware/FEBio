@@ -1148,10 +1148,6 @@ public:
 	vector<double> gt;
 	vector<double> gw;
 
-	// directors
-	vector<vec3d>	D0;	//!< initial directors
-	vector<vec3d>	Dt;	//!< current directors
-
 	// local derivatives of shape functions at gauss points
 	matrix Hr, Hs;
 };

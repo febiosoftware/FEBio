@@ -384,6 +384,9 @@ public:
 
 public:
 	vector<double>	m_h0;	//!< initial shell thicknesses
+
+	// \todo Can I move this to the old shell domain class? 
+	vector<vec3d>	m_D0;	//!< initial shell directors (not used by the new shell formulation)
 };
 
 //-----------------------------------------------------------------------------

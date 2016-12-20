@@ -19,6 +19,9 @@ public:
 	//! Activate the domain
 	void Activate();
 
+	//! update prior to solve
+	void PreSolveUpdate(const FETimeInfo& timeInfo);
+
 	//! Unpack shell element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
@@ -55,6 +58,18 @@ public: // overrides from FEElasticDomain
     void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf);
 
 public:
+	//! calculates covariant basis vectors at an integration point
+	void CoBaseVectors0(FEShellElement& el, int n, vec3d g[3]);
+
+	//! calculates contravariant basis vectors at an integration point
+	void ContraBaseVectors0(FEShellElement& el, int n, vec3d g[3]);
+
+	// inverse jacobian with respect to reference frame
+	double invjac0(FEShellElement& el, double J[3][3], int n);
+
+	// jacobian with respect to reference frame
+	double detJ0(FEShellElement& el, int n);
+
     //! calculates covariant basis vectors at an integration point
     void CoBaseVectors(FEShellElement& el, int n, vec3d g[3]);
     
@@ -96,7 +111,12 @@ public:
     
     //! calculates the stiffness matrix due to body forces
     void ElementBodyForceStiffness(FEBodyForce& bf, FEShellElement& el, matrix& ke);
-    
+
+public:
+	//! Find interfaces between solid element faces and shell elements
+	void FindSSI();
+
 protected:
 	FESolidMaterial*	m_pMat;
+	bool                    m_binit;    //!< initialization flag
 };

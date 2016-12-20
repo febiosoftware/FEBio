@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "FERigidWallInterface.h"
 #include "FECore/FENNQuery.h"
-#include "FEElasticShellDomain.h"
+#include <FECore/FEShellDomain.h>
 #include <FECore/FEModel.h>
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/log.h"
@@ -70,7 +70,7 @@ bool FERigidWallSurface::Init()
 	zero(tag);
 	for (int nd=0; nd<m.Domains(); ++nd)
 	{
-		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m.Domain(nd));
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
 		if (psd)
 		{
 			for (int i=0; i<psd->Elements(); ++i)

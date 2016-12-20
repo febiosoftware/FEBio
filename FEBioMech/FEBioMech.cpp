@@ -156,6 +156,7 @@
 #include "FESolidDomainFactory.h"
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
+#include "FEElasticShellDomainOld.h"
 #include "FEElasticTrussDomain.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidShellDomain.h"
@@ -345,6 +346,7 @@ REGISTER_FECORE_CLASS(FESRIElasticSolidDomain    , FEDOMAIN_ID, "sri-solid"     
 REGISTER_FECORE_CLASS(FEUT4Domain                , FEDOMAIN_ID, "ut4-solid"         );
 REGISTER_FECORE_CLASS(FEElasticSolidDomain       , FEDOMAIN_ID, "elastic-solid"     );
 REGISTER_FECORE_CLASS(FEElasticShellDomain       , FEDOMAIN_ID, "elastic-shell"     );
+REGISTER_FECORE_CLASS(FEElasticShellDomainOld    , FEDOMAIN_ID, "elastic-shell-old" );
 REGISTER_FECORE_CLASS(FEElasticTrussDomain       , FEDOMAIN_ID, "elastic-truss"     );
 REGISTER_FECORE_CLASS(FEDiscreteSpringDomain     , FEDOMAIN_ID, "discrete-spring"   );
 REGISTER_FECORE_CLASS(FEDeformableSpringDomain   , FEDOMAIN_ID, "deformable-spring" );

@@ -2830,11 +2830,7 @@ FEShellElementTraits::FEShellElementTraits(int ni, int ne, FE_Element_Shape es, 
 
 	Hr.resize(ni, ne);
 	Hs.resize(ni, ne);
-
-	D0.resize(ne);
-	Dt.resize(ne);
 }
-
 
 //=============================================================================
 //                          F E S H E L L Q U A D E L E M E N T

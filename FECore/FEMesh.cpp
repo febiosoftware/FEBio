@@ -302,12 +302,27 @@ void FEElementSet::SetName(const char* sz)
 //-----------------------------------------------------------------------------
 FEMesh::FEMesh()
 {
+	m_defaultShell = NEW_SHELL;
 }
 
 //-----------------------------------------------------------------------------
 FEMesh::~FEMesh()
 {
 	Clear();
+}
+
+//-----------------------------------------------------------------------------
+//! get the default shell formulation
+FEMesh::SHELL_FORMULATION FEMesh::GetShellFormulation()
+{
+	return m_defaultShell;
+}
+
+//-----------------------------------------------------------------------------
+//! set the default shell formulation
+void FEMesh::SetShellFormulation(FEMesh::SHELL_FORMULATION shellType)
+{
+	m_defaultShell = shellType;
 }
 
 //-----------------------------------------------------------------------------
@@ -552,9 +567,44 @@ int FEMesh::RemoveIsolatedVertices()
 }
 
 //-----------------------------------------------------------------------------
+void FEMesh::InitShells()
+{
+	switch (m_defaultShell)
+	{
+	case OLD_SHELL: InitShellsOld(); break;
+	case NEW_SHELL: InitShellsNew(); break;
+	default:
+		assert(false);
+	}
+
+	// Find the nodes that are on a non-rigid shell. 
+	// These nodes will be assigned rotational degrees of freedom
+	// TODO: Perhaps I should let the domains do this instead
+	for (int i = 0; i<Nodes(); ++i) Node(i).m_bshell = false;
+	for (int nd = 0; nd<Domains(); ++nd)
+	{
+		FEDomain& dom = Domain(nd);
+		if (dom.Class() == FE_DOMAIN_SHELL)
+		{
+			FEMaterial* pmat = dom.GetMaterial();
+			if (pmat->IsRigid() == false)
+			{
+				int N = dom.Elements();
+				for (int i = 0; i<N; ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					int n = el.Nodes();
+					for (int j = 0; j<n; ++j) Node(el.m_node[j]).m_bshell = true;
+				}
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate all shell directors.
 //! And find shell nodes
-void FEMesh::InitShells()
+void FEMesh::InitShellsNew()
 {
 	// zero initial directors for shell nodes
 	int NN = Nodes();
@@ -601,26 +651,67 @@ void FEMesh::InitShells()
 	// make sure we average the directors
     for (int i=0; i<NN; ++i)
         if (ND[i] > 0) Node(i).m_d0 = D[i]/ND[i];
+}
 
-	// Find the nodes that are on a non-rigid shell.
-	// These nodes will be assigned rotational degrees of freedom
-	// TODO: Perhaps I should let the domains do this instead
-	for (int i=0; i<Nodes(); ++i) Node(i).m_bshell = false;
-	for (int nd = 0; nd<Domains(); ++nd)
+
+//-----------------------------------------------------------------------------
+//! Calculate all shell normals (i.e. the shell directors).
+//! And find shell nodes
+void FEMesh::InitShellsOld()
+{
+	// zero initial directors for shell nodes
+	int NN = Nodes();
+	vector<vec3d> D(NN, vec3d(0, 0, 0));
+
+	// loop over all domains
+	for (int nd = 0; nd < Domains(); ++nd)
 	{
-		FEDomain& dom = Domain(nd);
-		if (dom.Class() == FE_DOMAIN_SHELL)
+		// Calculate the shell directors as the local node normals
+		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
 		{
-			FEMaterial* pmat = dom.GetMaterial();
-			if (pmat->IsRigid() == false)
+			FEShellDomain& sd = static_cast<FEShellDomain&>(Domain(nd));
+			vec3d r0[FEElement::MAX_NODES];
+			for (int i = 0; i<sd.Elements(); ++i)
 			{
-				int N = dom.Elements();
-				for (int i=0; i<N; ++i)
+				FEShellElement& el = sd.Element(i);
+
+				int n = el.Nodes();
+				int* en = &el.m_node[0];
+
+				// get the nodes
+				for (int j = 0; j<n; ++j) r0[j] = Node(en[j]).m_r0;
+
+				for (int j = 0; j<n; ++j)
 				{
-					FEElement& el = dom.ElementRef(i);
-					int n = el.Nodes();
-					for (int j=0; j<n; ++j) Node(el.m_node[j]).m_bshell = true;
+					int m0 = j;
+					int m1 = (j + 1) % n;
+					int m2 = (j == 0 ? n - 1 : j - 1);
+
+					vec3d a = r0[m0];
+					vec3d b = r0[m1];
+					vec3d c = r0[m2];
+
+					D[en[m0]] += (b - a) ^ (c - a);
 				}
+			}
+		}
+	}
+
+	// make sure we start with unit directors
+	for (int i = 0; i<NN; ++i) D[i].unit();
+
+	// assign directors to shells 
+	for (int nd = 0; nd < Domains(); ++nd)
+	{
+		// Calculate the shell directors as the local node normals
+		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
+		{
+			FEShellDomain& sd = static_cast<FEShellDomain&>(Domain(nd));
+			for (int i = 0; i<sd.Elements(); ++i)
+			{
+				FEShellElement& el = sd.Element(i);
+				int ne = el.Nodes();
+				for (int j = 0; j<ne; ++j) el.m_D0[j] = D[el.m_node[j]] * el.m_h0[j];
 			}
 		}
 	}
@@ -725,7 +816,10 @@ double FEMesh::ElementVolume(FEElement &el)
 	switch (el.Class())
 	{
 	case FE_ELEM_SOLID: V = SolidElementVolume(static_cast<FESolidElement&>(el)); break;
-	case FE_ELEM_SHELL: V = ShellElementVolume(static_cast<FEShellElement&>(el)); break;
+	case FE_ELEM_SHELL:
+		if (m_defaultShell == OLD_SHELL) V = ShellOldElementVolume(static_cast<FEShellElement&>(el)); 
+		else V = ShellNewElementVolume(static_cast<FEShellElement&>(el));
+		break;
 	}
 	return V;
 }
@@ -778,9 +872,61 @@ double FEMesh::SolidElementVolume(FESolidElement& el)
 	return V;
 }
 
+
 //-----------------------------------------------------------------------------
 //! \todo Replace this with what FEBio 1.x does.
-double FEMesh::ShellElementVolume(FEShellElement& el)
+double FEMesh::ShellOldElementVolume(FEShellElement& el)
+{
+	int i;
+	int neln = el.Nodes();
+
+	// initial nodal coordinates and directors
+	vec3d r0[FEElement::MAX_NODES], D0[FEElement::MAX_NODES];
+	for (i = 0; i<neln; ++i)
+	{
+		r0[i] = Node(el.m_node[i]).m_r0;
+		D0[i] = el.m_D0[i];
+	}
+
+	int nint = el.GaussPoints();
+	double *w = el.GaussWeights();
+	double V = 0;
+	vec3d g[3];
+	for (int n = 0; n<nint; ++n)
+	{
+		// jacobian matrix
+		double eta = el.gt(n);
+
+		double* Mr = el.Hr(n);
+		double* Ms = el.Hs(n);
+		double* M = el.H(n);
+
+		// evaluate covariant basis vectors
+		g[0] = g[1] = g[2] = vec3d(0, 0, 0);
+		for (i = 0; i<neln; ++i)
+		{
+			g[0] += (r0[i] + D0[i] * eta / 2)*Mr[i];
+			g[1] += (r0[i] + D0[i] * eta / 2)*Ms[i];
+			g[2] += D0[i] * (M[i] / 2);
+		}
+
+		mat3d J = mat3d(g[0].x, g[1].x, g[2].x,
+			g[0].y, g[1].y, g[2].y,
+			g[0].z, g[1].z, g[2].z);
+
+		// calculate the determinant
+		double detJ0 = J.det();
+
+		V += detJ0*w[n];
+	}
+
+	return V;
+}
+
+
+//-----------------------------------------------------------------------------
+//! \todo Replace this with what FEBio 1.x does.
+double FEMesh::ShellNewElementVolume(FEShellElement& el)
 {
 	int i;
 	int neln = el.Nodes();

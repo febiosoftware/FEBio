@@ -5,6 +5,7 @@
 #include "FERemodelingElasticMaterial.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidShellDomain.h"
+#include "FEElasticShellDomainOld.h"
 #include "FEElasticMixture.h"
 #include "FEElasticMultigeneration.h"
 #include "FEUT4Domain.h"
@@ -1036,22 +1037,44 @@ bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
 	const int dof_W = GetFEModel()->GetDOFIndex("w");
 	if (dom.Class() == FE_DOMAIN_SHELL)
 	{
-		FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
-		int NS = sd.Elements();
-		FEMesh& mesh = *sd.GetMesh();
-		for (int i=0; i<NS; ++i)
+		if (dynamic_cast<FEElasticShellDomainOld*>(&dom))
 		{
-			FEShellElement& e = sd.Element(i);
-			int n = e.Nodes();
-			for (int j=0; j<n; ++j)
+			FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
+			int NS = sd.Elements();
+			FEMesh& mesh = *sd.GetMesh();
+			for (int i = 0; i<NS; ++i)
 			{
-				FENode& nj = mesh.Node(e.m_node[j]);
-				vec3d D = nj.m_d0 + nj.get_vec3d(dof_X, dof_Y, dof_Z) - nj.get_vec3d(dof_U, dof_V, dof_W);
-				double h = D.norm();
-				a << h;
+				FEShellElement& e = sd.Element(i);
+				int n = e.Nodes();
+				for (int j = 0; j<n; ++j)
+				{
+					FENode& nj = mesh.Node(e.m_node[j]);
+					vec3d D = e.m_D0[j] + nj.get_vec3d(dof_U, dof_V, dof_W);
+					double h = D.norm();
+					a << h;
+				}
 			}
+			return true;
 		}
-		return true;
+		else
+		{
+			FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
+			int NS = sd.Elements();
+			FEMesh& mesh = *sd.GetMesh();
+			for (int i=0; i<NS; ++i)
+			{	
+				FEShellElement& e = sd.Element(i);
+				int n = e.Nodes();
+				for (int j=0; j<n; ++j)
+				{
+					FENode& nj = mesh.Node(e.m_node[j]);
+					vec3d D = nj.m_d0 + nj.get_vec3d(dof_X, dof_Y, dof_Z) - nj.get_vec3d(dof_U, dof_V, dof_W);
+					double h = D.norm();
+					a << h;
+				}
+			}
+			return true;
+		}
 	}
 	return false;
 }
@@ -1068,25 +1091,45 @@ bool FEPlotShellDirector::Save(FEDomain &dom, FEDataStream &a)
 	const int dof_W = GetFEModel()->GetDOFIndex("w");
 	if (dom.Class() == FE_DOMAIN_SHELL)
 	{
-		FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
-		int NS = sd.Elements();
-		FEMesh& mesh = *sd.GetMesh();
-		for (int i=0; i<NS; ++i)
+		if (dynamic_cast<FEElasticShellDomainOld*>(&dom))
 		{
-			FEShellElement& e = sd.Element(i);
-			int n = e.Nodes();
-			for (int j=0; j<n; ++j)
+			FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
+			int NS = sd.Elements();
+			FEMesh& mesh = *sd.GetMesh();
+			for (int i = 0; i<NS; ++i)
 			{
-				FENode& nj = mesh.Node(e.m_node[j]);
-				vec3d D = nj.m_d0 + nj.get_vec3d(dof_X, dof_Y, dof_Z) - nj.get_vec3d(dof_U, dof_V, dof_W);
-				a << D;
+				FEShellElement& e = sd.Element(i);
+				int n = e.Nodes();
+				for (int j = 0; j<n; ++j)
+				{
+					FENode& nj = mesh.Node(e.m_node[j]);
+					vec3d D = e.m_D0[j] + nj.get_vec3d(dof_U, dof_V, dof_W);
+					a << D;
+				}
 			}
+			return true;
 		}
-		return true;
+		else
+		{
+			FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
+			int NS = sd.Elements();
+			FEMesh& mesh = *sd.GetMesh();
+			for (int i=0; i<NS; ++i)
+			{
+				FEShellElement& e = sd.Element(i);
+				int n = e.Nodes();
+				for (int j=0; j<n; ++j)
+				{
+					FENode& nj = mesh.Node(e.m_node[j]);
+					vec3d D = nj.m_d0 + nj.get_vec3d(dof_X, dof_Y, dof_Z) - nj.get_vec3d(dof_U, dof_V, dof_W);
+					a << D;
+				}
+			}
+			return true;
+		}
 	}
 	return false;
 }
-
 
 //-----------------------------------------------------------------------------
 bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)

@@ -82,7 +82,16 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_hex)) sztype = "three-field-solid";
 			else sztype = "elastic-solid";
 		}
-		else if ((eshape == ET_QUAD4) || (eshape == ET_TRI3) || (eshape == ET_QUAD8) || (eshape == ET_TRI6))sztype = "elastic-shell";
+		else if ((eshape == ET_QUAD4) || (eshape == ET_TRI3) || (eshape == ET_QUAD8) || (eshape == ET_TRI6)) 
+		{
+			switch (pm->GetShellFormulation())
+			{
+			case FEMesh::NEW_SHELL: sztype = "elastic-shell"; break;
+			case FEMesh::OLD_SHELL: sztype = "elastic-shell-old"; break;
+			default: 
+				return 0;
+			}
+		}
 		else if (eshape == ET_TRUSS2) sztype = "elastic-truss";
 		else return 0;
 	}

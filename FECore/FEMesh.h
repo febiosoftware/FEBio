@@ -317,6 +317,15 @@ protected:
 class FEMesh  
 {
 public:
+	// shell formulations
+	// todo: Can I move this elsewhere? I want the mesh to be independent of the shell formulation, but
+	//       this was the easiest way to merge the old and new shell formulation.
+	enum SHELL_FORMULATION {
+		NEW_SHELL,
+		OLD_SHELL
+	};
+
+public:
 	//! constructor
 	FEMesh();
 
@@ -366,6 +375,12 @@ public:
 
 	//! Calculates an elements volume
 	double ElementVolume(FEElement& el);
+
+	//! get the default shell formulation
+	SHELL_FORMULATION GetShellFormulation();
+
+	//! set the default shell formulation
+	void SetShellFormulation(SHELL_FORMULATION shellType);
 
 	//! Get the face nodes from a given element
 	int GetFace(FEElement& el, int n, int* nf);
@@ -469,10 +484,13 @@ public:
 
 protected:
 	double SolidElementVolume(FESolidElement& el);
-	double ShellElementVolume(FEShellElement& el);
+	double ShellNewElementVolume(FEShellElement& el);
+	double ShellOldElementVolume(FEShellElement& el);
 
 	//! Initialize shells
 	void InitShells();
+	void InitShellsNew();
+	void InitShellsOld();
 
 protected:
 	vector<FENode>		m_Node;		//!< nodes
@@ -489,6 +507,8 @@ protected:
 	FEBoundingBox		m_box;	//!< bounding box
 
 	FENodeElemList	m_NEL;
+
+	SHELL_FORMULATION	m_defaultShell;
 
 private:
 	//! hide the copy constructor

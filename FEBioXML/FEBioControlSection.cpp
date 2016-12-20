@@ -165,6 +165,19 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	}
 	else if (tag == "use_three_field_hex") tag.value(m_pim->m_b3field_hex);
 	else if (tag == "use_three_field_tet") tag.value(m_pim->m_b3field_tet);
+	else if (tag == "shell_formulation")
+	{
+		FEMesh& mesh = GetFEModel()->GetMesh();
+		int nshell = 0;
+		tag.value(nshell);
+		switch (nshell)
+		{
+		case 0: mesh.SetShellFormulation(FEMesh::OLD_SHELL); break;
+		case 1: mesh.SetShellFormulation(FEMesh::NEW_SHELL); break;
+		default:
+			throw XMLReader::InvalidValue(tag);
+		}
+	}
 	else if (tag == "integration")
 	{
 		++tag;

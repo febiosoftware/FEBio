@@ -55,6 +55,18 @@ public: // overrides from FEElasticDomain
 	void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf) { }
 
 public:
+	//! calculates covariant basis vectors at an integration point
+	void CoBaseVectors0(FEShellElement& el, int n, vec3d g[3]);
+
+	//! calculates contravariant basis vectors at an integration point
+	void ContraBaseVectors0(FEShellElement& el, int n, vec3d g[3]);
+
+	// inverse jacobian with respect to reference frame
+	double invjac0(FEShellElement& el, double J[3][3], int n);
+
+	// jacobian with respect to reference frame
+	double detJ0(FEShellElement& el, int n);
+
     //! calculates covariant basis vectors at an integration point
     void CoBaseVectors(FEShellElement& el, int n, vec3d g[3]);
     

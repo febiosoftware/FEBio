@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "FESlidingInterface.h"
-#include "FEElasticShellDomain.h"
+#include <FECore/FEShellDomain.h>
 #include "FECore/FEClosestPointProjection.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEGlobalMatrix.h"
@@ -151,7 +151,7 @@ bool FESlidingSurface::Init()
 	zero(tag);
 	for (int nd=0; nd<m.Domains(); ++nd)
 	{
-		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m.Domain(nd));
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)
