@@ -95,6 +95,8 @@
 		D56DC22019532A83006C137D /* FERigidSphericalJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D56DC21C19532A83006C137D /* FERigidSphericalJoint.h */; };
 		D57549771AC3A0D6002934C7 /* FEOrthotropicCLE.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57549751AC3A0D6002934C7 /* FEOrthotropicCLE.cpp */; };
 		D57549781AC3A0D6002934C7 /* FEOrthotropicCLE.h in Headers */ = {isa = PBXBuildFile; fileRef = D57549761AC3A0D6002934C7 /* FEOrthotropicCLE.h */; };
+		D576040E1E11B4D8008106EE /* FESSIShellDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D576040C1E11B4D8008106EE /* FESSIShellDomain.cpp */; };
+		D576040F1E11B4D8008106EE /* FESSIShellDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D576040D1E11B4D8008106EE /* FESSIShellDomain.h */; };
 		D57C1D0519AB8AC20091EAE4 /* FEReactiveViscoelastic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57C1D0319AB8AC20091EAE4 /* FEReactiveViscoelastic.cpp */; };
 		D57C1D0619AB8AC20091EAE4 /* FEReactiveViscoelastic.h in Headers */ = {isa = PBXBuildFile; fileRef = D57C1D0419AB8AC20091EAE4 /* FEReactiveViscoelastic.h */; };
 		D57C1D0919ABB99F0091EAE4 /* FEBondRelaxation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57C1D0719ABB99F0091EAE4 /* FEBondRelaxation.cpp */; };
@@ -491,6 +493,8 @@
 		D56DC21C19532A83006C137D /* FERigidSphericalJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidSphericalJoint.h; sourceTree = "<group>"; };
 		D57549751AC3A0D6002934C7 /* FEOrthotropicCLE.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOrthotropicCLE.cpp; sourceTree = "<group>"; };
 		D57549761AC3A0D6002934C7 /* FEOrthotropicCLE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOrthotropicCLE.h; sourceTree = "<group>"; };
+		D576040C1E11B4D8008106EE /* FESSIShellDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESSIShellDomain.cpp; sourceTree = "<group>"; };
+		D576040D1E11B4D8008106EE /* FESSIShellDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESSIShellDomain.h; sourceTree = "<group>"; };
 		D57C1D0319AB8AC20091EAE4 /* FEReactiveViscoelastic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactiveViscoelastic.cpp; sourceTree = "<group>"; };
 		D57C1D0419AB8AC20091EAE4 /* FEReactiveViscoelastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReactiveViscoelastic.h; sourceTree = "<group>"; };
 		D57C1D0719ABB99F0091EAE4 /* FEBondRelaxation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBondRelaxation.cpp; sourceTree = "<group>"; };
@@ -1167,6 +1171,8 @@
 				D595BB441899C7D90028A7F3 /* FESPRProjection.h */,
 				B465DA871B94A3A500EF4843 /* FESRIElasticSolidDomain.cpp */,
 				B465DA881B94A3A500EF4843 /* FESRIElasticSolidDomain.h */,
+				D576040C1E11B4D8008106EE /* FESSIShellDomain.cpp */,
+				D576040D1E11B4D8008106EE /* FESSIShellDomain.h */,
 				D5B57D0318A40AFC005C9598 /* FEStickyInterface.cpp */,
 				D5B57D0418A40AFC005C9598 /* FEStickyInterface.h */,
 				D5E107491865DFAD00B23922 /* FEStVenantKirchhoff.cpp */,
@@ -1348,6 +1354,7 @@
 				D5B8EAFF1BB4DE17009D101B /* FEElasticMultiscaleDomain2O.h in Headers */,
 				D5E1078D1865DFAD00B23922 /* FEConstBodyForce.h in Headers */,
 				D51BB41A19919CAC00638A8B /* FEFiberIntegrationTriangleUC.h in Headers */,
+				D576040F1E11B4D8008106EE /* FESSIShellDomain.h in Headers */,
 				D5E107931865DFAD00B23922 /* FECoupledTransIsoMooneyRivlin.h in Headers */,
 				D5E107871865DFAD00B23922 /* FEBodyForce.h in Headers */,
 				D5C8AABA1AE5D73000E36822 /* FERigidPrismaticJoint.h in Headers */,
@@ -1523,6 +1530,7 @@
 				D5E107CD1865DFAD00B23922 /* FEFiberIntegrationScheme.cpp in Sources */,
 				D58EEA111AC463950020B7CB /* FECubicCLE.cpp in Sources */,
 				D5D806081C7D270B00547F07 /* FEElasticMaterial2O.cpp in Sources */,
+				D576040E1E11B4D8008106EE /* FESSIShellDomain.cpp in Sources */,
 				D5E107E91865DFAD00B23922 /* FELinearSolidDomain.cpp in Sources */,
 				D5E108331865DFAD00B23922 /* FETCNonlinearOrthotropic.cpp in Sources */,
 				D5E107C71865DFAD00B23922 /* FEFiberExpPowUncoupled.cpp in Sources */,

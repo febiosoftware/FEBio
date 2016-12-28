@@ -262,17 +262,21 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 //! This function calculates the rigid stiffness matrices
 void FERigidSolver::RigidStiffness(SparseMatrix& K, vector<double>& ui, vector<double>& F, vector<int>& en, vector<int>& elm, matrix& ke, double alpha)
 {
-	int n = (int)en.size();
-	FEMesh& mesh = m_fem->GetMesh();
-
-    for (int j = 0; j<n; ++j)
-    {
-		if (!mesh.Node(en[j]).HasFlags(FENode::SHELL) || !mesh.Node(en[j]).HasFlags(FENode::RIGID_CLAMP)) {
-            RigidStiffnessSolid(K, ui, F, en, elm, ke, alpha);
-            return;
+    int n = (int)en.size();
+    FEMesh& mesh = m_fem->GetMesh();
+    
+    bool bclamped_shell = false;
+    for (int j = 0; j<n; ++j) {
+        if (mesh.Node(en[j]).HasFlags(FENode::SHELL) && mesh.Node(en[j]).HasFlags(FENode::RIGID_CLAMP)) {
+            bclamped_shell = true;
+            break;
         }
     }
-    RigidStiffnessShell(K, ui, F, en, elm, ke, alpha);
+    if (bclamped_shell)
+        RigidStiffnessShell(K, ui, F, en, elm, ke, alpha);
+    else
+        RigidStiffnessSolid(K, ui, F, en, elm, ke, alpha);
+    return;
 }
 
 //-----------------------------------------------------------------------------
