@@ -90,7 +90,7 @@ void FEHeatSolver::Update(vector<double>& u)
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual
-void FEHeatSolver::RHSVector(FEGlobalVector& R)
+void FEHeatSolver::ForceVector(FEGlobalVector& R)
 {
 	// Add nodal flux contributions
 	NodalFluxes(R);

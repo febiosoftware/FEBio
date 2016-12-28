@@ -63,8 +63,11 @@ void FEGlobalMatrix::build_flush()
 	for (i=0; i<m_nlm; ++i)
 	{
 		n = m_LM[i].size();
-		lm = &(m_LM[i])[0];
-		for (j=0; j<n; ++j) if (lm[j] < -1) lm[j] = -lm[j]-2;
+		if (n > 0)
+		{
+			lm = &(m_LM[i])[0];
+			for (j=0; j<n; ++j) if (lm[j] < -1) lm[j] = -lm[j]-2;
+		}
 	}
 
 	m_pMP->UpdateProfile(m_LM, m_nlm);

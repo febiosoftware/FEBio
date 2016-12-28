@@ -22,6 +22,11 @@ FEModel& FESolver::GetFEModel()
 }
 
 //-----------------------------------------------------------------------------
+void FESolver::Clean()
+{
+}
+
+//-----------------------------------------------------------------------------
 //! This function is called right before SolveStep and should be used to initialize
 //! time dependent information and other settings.
 bool FESolver::InitStep(double time)

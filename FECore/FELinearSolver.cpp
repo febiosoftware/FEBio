@@ -5,6 +5,7 @@
 #include "FEGlobalMatrix.h"
 #include "log.h"
 #include "FENodeReorder.h"
+#include "FEStiffnessMatrix.h"
 #include "BC.h"
 
 //-----------------------------------------------------------------------------
@@ -181,7 +182,7 @@ bool FELinearSolver::SolveStep(double time)
 	vector<double> F(m_neq);
 	FEModel& fem = GetFEModel();
 	FEGlobalVector rhs(fem, m_R, F);
-	RHSVector(rhs);
+	ForceVector(rhs);
 
 	// increase RHS counter
 	m_nrhs++;
@@ -282,6 +283,13 @@ bool FELinearSolver::ReformStiffness()
 	m_ntotref++;
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FELinearSolver::StiffnessMatrix()
+{
+	FEStiffnessMatrix K(*m_pK, m_R, m_u);
+	return StiffnessMatrix(K);
 }
 
 //-----------------------------------------------------------------------------

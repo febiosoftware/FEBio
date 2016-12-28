@@ -32,8 +32,8 @@ public:
 	//! Data serialization
 	void Serialize(DumpStream& ar);
 
-	//! Can this be removed?
-	virtual void Clean() = 0;
+	//! This is called by FEAnalaysis::Deactivate
+	virtual void Clean();
 
 public:
 	//! assemble global stiffness matrix (TODO: this is only used by rigid joints)

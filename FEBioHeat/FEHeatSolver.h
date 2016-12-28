@@ -25,7 +25,7 @@ public:
 protected: // from FELinearSolver
 
 	//! calculate the residual
-	void RHSVector(FEGlobalVector& R);
+	void ForceVector(FEGlobalVector& R);
 
 	//! calculate the stiffness matrix
 	bool StiffnessMatrix(); 

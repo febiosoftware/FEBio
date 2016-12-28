@@ -5,6 +5,7 @@
 // forward declarations
 class FEGlobalVector;
 class FEGlobalMatrix;
+class FEStiffnessMatrix;
 class LinearSolver;
 
 //-----------------------------------------------------------------------------
@@ -45,11 +46,14 @@ public: // from FESolver
 
 public: // these functions need to be implemented by the derived class
 
-	//! Evaluate the right-hand side vector
-	virtual void RHSVector(FEGlobalVector& R) = 0;
+	//! Evaluate the right-hand side "force" vector
+	virtual void ForceVector(FEGlobalVector& R) = 0;
 
-	//! Evaluate the stiffness matrix
-	virtual bool StiffnessMatrix() = 0;
+	//! Evaluate the stiffness matrix (new interface)
+	virtual bool StiffnessMatrix(FEStiffnessMatrix& K) { return false; }
+
+	//! Evaluate the stiffness matrix (old interface)
+	virtual bool StiffnessMatrix();
 
 	//! Update the model state
 	virtual void Update(vector<double>& u);

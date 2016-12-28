@@ -95,17 +95,14 @@ void FEElasticShellDomain::Activate()
 				node.m_ID[m_dofX] = DOF_ACTIVE;
 				node.m_ID[m_dofY] = DOF_ACTIVE;
 				node.m_ID[m_dofZ] = DOF_ACTIVE;
-			}
 
-			if (node.HasFlags(FENode::SHELL))
-			{
-				node.m_ID[m_dofU] = DOF_ACTIVE;
-				node.m_ID[m_dofV] = DOF_ACTIVE;
-				node.m_ID[m_dofW] = DOF_ACTIVE;
-                node.m_ID[m_dofAU] = DOF_ACTIVE;
-                node.m_ID[m_dofAV] = DOF_ACTIVE;
-                node.m_ID[m_dofAW] = DOF_ACTIVE;
-            }
+				if (node.HasFlags(FENode::SHELL))
+				{
+					node.m_ID[m_dofU] = DOF_ACTIVE;
+					node.m_ID[m_dofV] = DOF_ACTIVE;
+					node.m_ID[m_dofW] = DOF_ACTIVE;
+				}
+			}
 		}
 	}
 }
