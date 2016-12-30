@@ -364,7 +364,7 @@ void FEBioBoundarySection::ParseBCFix25(XMLTag &tag)
 
 	// process the bc string
 	vector<int> bc;
-	dofs.GetDOFList(szbc, bc);
+	dofs.ParseDOFString(szbc, bc);
 
 	// check the list
 	if (bc.empty()) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
@@ -742,7 +742,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 	// get the dofs
 	const char* szbc = tag.AttributeValue("bc");
 	vector<int> dofList;
-	dofs.GetDOFList(szbc, dofList);
+	dofs.ParseDOFString(szbc, dofList);
 	int ndofs = (int) dofList.size();
 
 	// allocate linear constraints
@@ -821,7 +821,7 @@ void FEBioBoundarySection::ParseMergeConstraint(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	DOFS& dof = fem.GetDOFS();
 	vector<int> dofs;
-	dof.GetDOFList(szbc, dofs);
+	dof.ParseDOFString(szbc, dofs);
 	if (dofs.empty()) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
 	// get the surfaces

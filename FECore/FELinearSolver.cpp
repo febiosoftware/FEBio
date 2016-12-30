@@ -5,7 +5,7 @@
 #include "FEGlobalMatrix.h"
 #include "log.h"
 #include "FENodeReorder.h"
-#include "FEStiffnessMatrix.h"
+#include "FELinearSystem.h"
 #include "BC.h"
 
 //-----------------------------------------------------------------------------
@@ -288,7 +288,7 @@ bool FELinearSolver::ReformStiffness()
 //-----------------------------------------------------------------------------
 bool FELinearSolver::StiffnessMatrix()
 {
-	FEStiffnessMatrix K(*m_pK, m_R, m_u);
+	FELinearSystem K(*m_pK, m_R, m_u);
 	return StiffnessMatrix(K);
 }
 

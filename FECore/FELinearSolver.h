@@ -5,7 +5,7 @@
 // forward declarations
 class FEGlobalVector;
 class FEGlobalMatrix;
-class FEStiffnessMatrix;
+class FELinearSystem;
 class LinearSolver;
 
 //-----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ public: // these functions need to be implemented by the derived class
 	virtual void ForceVector(FEGlobalVector& R) = 0;
 
 	//! Evaluate the stiffness matrix (new interface)
-	virtual bool StiffnessMatrix(FEStiffnessMatrix& K) { return false; }
+	virtual bool StiffnessMatrix(FELinearSystem& K) { return false; }
 
 	//! Evaluate the stiffness matrix (old interface)
 	virtual bool StiffnessMatrix();

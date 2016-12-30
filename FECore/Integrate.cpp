@@ -13,9 +13,6 @@ void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, double D, matrix& ke)
 	double Gi[3], Gj[3];
 	double DB[3];
 
-	// zero stiffness matrix
-	ke.zero();
-
 	// loop over all integration points
 	const double *gw = el.GaussWeights();
 	for (int n = 0; n<ni; ++n)
@@ -56,6 +53,35 @@ void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, double D, matrix& ke)
 				DB[2] = D*Gj[2];
 
 				ke[i][j] += (Gi[0] * DB[0] + Gi[1] * DB[1] + Gi[2] * DB[2])*detJt*gw[n];
+			}
+		}
+	}
+}
+
+void IntegrateNCN(FESolidDomain& dom, FESolidElement& el, double C, matrix& ke)
+{
+	// number of nodes
+	int ne = el.Nodes();
+
+	// jacobian
+	double Ji[3][3];
+
+	// loop over all integration points
+	const double *gw = el.GaussWeights();
+	int ni = el.GaussPoints();
+	for (int n = 0; n<ni; ++n)
+	{
+		// calculate jacobian
+		double detJt = dom.invjact(el, Ji, n);
+
+		// shape function values at integration point n
+		double* H = el.H(n);
+
+		for (int i = 0; i<ne; ++i)
+		{
+			for (int j = 0; j<ne; ++j)
+			{
+				ke[i][j] += H[i] * H[j]*C*detJt*gw[n];
 			}
 		}
 	}

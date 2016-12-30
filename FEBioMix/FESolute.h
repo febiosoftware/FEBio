@@ -137,7 +137,6 @@ public:
 	double	m_rhoT;			//!< true solute density
 	double	m_M;			//!< solute molecular weight
 	int		m_z;			//!< solute charge number
-	char	m_szname[128];	//!< solute name
 
 	DECLARE_PARAMETER_LIST();
 };
@@ -219,7 +218,6 @@ public:
 	double	m_rhoT;			//!< SBM true density
 	double	m_M;			//!< SBM molar mass
 	int		m_z;			//!< SBM charge number
-	char	m_szname[128];	//!< SBM name
 
 	DECLARE_PARAMETER_LIST();
 };

@@ -75,6 +75,44 @@ private:
 	char	m_szname[256];
 };
 
+class FEPlotArrayVariable : public FENodeData
+{
+public:
+	FEPlotArrayVariable(const char* szname, int index) : FENodeData(PLT_FLOAT, FMT_NODE) { strcpy(m_szname, szname); m_index = index; }
+	bool Save(FEMesh& mesh, FEDataStream& str)
+	{
+		// get the DOFS
+		FEModel& fem = *GetFEModel();
+		DOFS& dofs = fem.GetDOFS();
+
+		// see if this variable exists
+		int nvar = dofs.GetVariableIndex(m_szname);
+		if (nvar < 0) return false;
+
+		// get the size of the variable
+		int n = dofs.GetVariableSize(nvar);
+		if (n == 0) return false;
+
+		// get the start index of the DOFS
+		int ndof = dofs.GetDOF(nvar, 0);
+		if (ndof < 0) return false;
+
+		// store the nodal data
+		int NN = mesh.Nodes();
+		for (int i = 0; i<NN; ++i)
+		{
+			FENode& node = mesh.Node(i);
+			str << node.get(ndof + m_index);
+		}
+
+		return true;
+	}
+
+private:
+	char	m_szname[256];
+	int		m_index;
+};
+
 //-----------------------------------------------------------------------------
 //! Adds a variable to the plot file. 
 //! 
@@ -203,18 +241,30 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 
 		// If we still didn't find it, maybe it's a model variable.
 		DOFS& dofs = pfem->GetDOFS();
-		int nvar = dofs.GetVariableIndex(szname);
+		int nvar = dofs.GetVariableIndex(sz);
 		if (nvar >= 0)
 		{
 			int ntype = dofs.GetVariableType(nvar);
 			if (ntype == VAR_SCALAR)
 			{
-				ps = new FEPlotVariable(szname, PLT_FLOAT, FMT_NODE);
+				ps = new FEPlotVariable(sz, PLT_FLOAT, FMT_NODE);
 				return AddNodalVariable(ps, szname, item);
 			}
 			else if (ntype == VAR_VEC3)
 			{
-				ps = new FEPlotVariable(szname, PLT_VEC3F, FMT_NODE);
+				ps = new FEPlotVariable(sz, PLT_VEC3F, FMT_NODE);
+				return AddNodalVariable(ps, szname, item);
+			}
+			else if (ntype == VAR_ARRAY)
+			{
+				int ndofs = dofs.GetVariableSize(sz);
+				if (ntype == 0)
+				{
+					index = dofs.GetIndex(sz, szflt);
+				}
+				if ((index < 0) || (index >= ndofs)) return false;
+
+				ps = new FEPlotArrayVariable(sz, index);
 				return AddNodalVariable(ps, szname, item);
 			}
 		}

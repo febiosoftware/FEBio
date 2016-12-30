@@ -133,10 +133,10 @@ int DOFS::AddVariable(const char* szvar, int ntype)
 
 	// allocate degrees of freedom
 	int ndof = 0;
-	if (ntype == VAR_SCALAR) ndof = 1;
+	if      (ntype == VAR_SCALAR) ndof = 1;
 	else if (ntype == VAR_VEC2  ) ndof = 2;
 	else if (ntype == VAR_VEC3  ) ndof = 3;
-	else if (ntype == VAR_ARRAY) ndof = 0;		// for array we start with no dofs predefined (use AddDOF to a dofs to an array variable)
+	else if (ntype == VAR_ARRAY ) ndof = 0;		// for array we start with no dofs predefined (use AddDOF to a dofs to an array variable)
 	else { assert(false); return -1; }
 
 	if (ndof > 0) var.m_dof.resize(ndof);
@@ -245,6 +245,18 @@ int DOFS::AddDOF(int nvar, const char* sz)
 }
 
 //-----------------------------------------------------------------------------
+int DOFS::GetIndex(const char* varName, const char* szdof)
+{
+	Var* var = GetVariable(varName);
+	if (var == 0) return -1;
+	for (int i=0; i<(int)var->m_dof.size(); ++i)
+	{
+		if (strcmp(var->m_dof[i].sz, szdof) == 0) return i;
+	}
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
 //! Return the DOF index from a variable and an index into the variable's dof array.
 //! This index is used in the FENode::get(), FENode::set() functions to set 
 //! the values of nodal values. This index is also used in the FENode::m_ID and FENode::m_BC arrays.
@@ -297,7 +309,26 @@ int DOFS::GetDOF(const char* szdof)
 }
 
 //-----------------------------------------------------------------------------
-void DOFS::GetDOFList(const char* sz, std::vector<int>& dofs)
+//! Returns a list of DOF indices for a variable. 
+//! The returned list will be empty if the variable is not known
+void DOFS::GetDOFList(const char* varName, std::vector<int>& dofs)
+{
+	// make sure we start with an empty list
+	dofs.clear();
+
+	// get the variable
+	Var* var = GetVariable(varName);
+	if (var == 0) return;
+
+	// fill the dof list
+	int n = (int) var->m_dof.size();
+	if (n==0) return;
+	dofs.resize(n);
+	for (int i=0; i<n; ++i) dofs[i] = var->m_dof[i].ndof;
+}
+
+//-----------------------------------------------------------------------------
+void DOFS::ParseDOFString(const char* sz, std::vector<int>& dofs)
 {
 	const char* ch = sz;
 	char szdof[8] = {0}, *c = szdof;

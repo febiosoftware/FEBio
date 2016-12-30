@@ -120,6 +120,10 @@ public: // optional functions to overload
 public:
 	void SetDOF(vector<int>& dof);
 
+	int GetDOFS() const { return (int) m_dof.size(); }
+
+	const vector<int>& GetDOFList() const { return m_dof; }
+
 	//! Allocate material point data for the elements
 	//! This is called after elements get read in from the input file.
 	//! And must be called before material point data can be accessed.

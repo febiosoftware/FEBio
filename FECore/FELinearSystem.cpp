@@ -1,14 +1,14 @@
 #include "stdafx.h"
-#include "FEStiffnessMatrix.h"
+#include "FELinearSystem.h"
 
 //-----------------------------------------------------------------------------
-FEStiffnessMatrix::FEStiffnessMatrix(FEGlobalMatrix& K, vector<double>& F, vector<double>& u) : m_K(K), m_F(F), m_u(u)
+FELinearSystem::FELinearSystem(FEGlobalMatrix& K, vector<double>& F, vector<double>& u) : m_K(K), m_F(F), m_u(u)
 {
 }
 
 //-----------------------------------------------------------------------------
 //! assemble global stiffness matrix
-void FEStiffnessMatrix::Assemble(vector<int>& en, vector<int>& elm, matrix& ke)
+void FELinearSystem::AssembleLHS(vector<int>& elm, matrix& ke)
 {
 	// assemble into the global stiffness
 	m_K.Assemble(ke, elm);
@@ -43,6 +43,39 @@ void FEStiffnessMatrix::Assemble(vector<int>& en, vector<int>& elm, matrix& ke)
 			// set the rhs vector to the prescribed value
 			// that way the solution vector will contain the prescribed value
 			m_F[J] = m_u[J];
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FELinearSystem::AssembleRHS(vector<int>& lm, matrix& ke, vector<double>& U)
+{
+	int ne = (int)lm.size();
+	for (int j = 0; j<ne; ++j)
+	{
+		if (lm[j] >= 0)
+		{
+			double q = 0;
+			for (int k = 0; k<ne; ++k)
+			{
+				if (lm[k] >= 0) q += ke[j][k] * U[lm[k]];
+				else if (-lm[k] - 2 >= 0) q += ke[j][k] * U[-lm[k] - 2];
+			}
+			m_F[lm[j]] += q;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FELinearSystem::AssembleRHS(vector<int>& lm, vector<double>& fe)
+{
+	const int n = (int)lm.size();
+	for (int i = 0; i<n; ++i)
+	{
+		int nid = lm[i];
+		if (nid >= 0) 
+		{
+			m_F[nid] += fe[i];
 		}
 	}
 }
