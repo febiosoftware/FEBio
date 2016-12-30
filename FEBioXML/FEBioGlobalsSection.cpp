@@ -61,14 +61,17 @@ void FEBioGlobalsSection::ParseGlobalData(XMLTag &tag)
 		for (int i=0; i<natt; ++i) pgd->SetAttribute(tag.m_att[i].m_szatt, tag.m_att[i].m_szatv);
 
 		// read solute properties
-		FEParameterList& pl = pgd->GetParameterList();
-		++tag;
-		do
+		if (tag.isleaf() == false)
 		{
-			if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+			FEParameterList& pl = pgd->GetParameterList();
 			++tag;
+			do
+			{
+				if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
 		}
-		while (!tag.isend());
 		
 		fem.AddGlobalData(pgd);
 		

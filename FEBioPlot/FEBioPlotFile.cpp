@@ -163,7 +163,7 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 	// extract the filter
 	char* szflt = strchr(sz, '[');
 	int index = 0;
-	int ntype = 0;
+	int fltType = 0;
 	if (szflt)
 	{
 		*szflt++ = 0;
@@ -183,7 +183,7 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 		}
 		else
 		{
-			ntype = 1;
+			fltType = 1;
 			index = atoi(szflt);
 		}
 	}
@@ -196,11 +196,11 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 		ps->SetItemList(item);
 		if (szflt) 
 		{
-			if (ntype == 0) 
+			if (fltType == 0)
 			{
 				if (ps->SetFilter(szflt) == false) return false;
 			}
-			else if (ntype == 1)
+			else if (fltType == 1)
 			{
 				if (ps->SetFilter(index) == false) return false;
 			}
@@ -244,21 +244,21 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 		int nvar = dofs.GetVariableIndex(sz);
 		if (nvar >= 0)
 		{
-			int ntype = dofs.GetVariableType(nvar);
-			if (ntype == VAR_SCALAR)
+			int vartype = dofs.GetVariableType(nvar);
+			if (vartype == VAR_SCALAR)
 			{
 				ps = new FEPlotVariable(sz, PLT_FLOAT, FMT_NODE);
 				return AddNodalVariable(ps, szname, item);
 			}
-			else if (ntype == VAR_VEC3)
+			else if (vartype == VAR_VEC3)
 			{
 				ps = new FEPlotVariable(sz, PLT_VEC3F, FMT_NODE);
 				return AddNodalVariable(ps, szname, item);
 			}
-			else if (ntype == VAR_ARRAY)
+			else if (vartype == VAR_ARRAY)
 			{
 				int ndofs = dofs.GetVariableSize(sz);
-				if (ntype == 0)
+				if (fltType == 0)
 				{
 					index = dofs.GetIndex(sz, szflt);
 				}
