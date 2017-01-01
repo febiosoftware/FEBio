@@ -75,11 +75,11 @@ private:
 	char	m_szname[256];
 };
 
-class FEPlotArrayVariable : public FENodeData
+class FEPlotArrayVariable : public FEDomainData
 {
 public:
-	FEPlotArrayVariable(const char* szname, int index) : FENodeData(PLT_FLOAT, FMT_NODE) { strcpy(m_szname, szname); m_index = index; }
-	bool Save(FEMesh& mesh, FEDataStream& str)
+	FEPlotArrayVariable(const char* szname, int index) : FEDomainData(PLT_FLOAT, FMT_NODE) { strcpy(m_szname, szname); m_index = index; }
+	bool Save(FEDomain& D, FEDataStream& a)
 	{
 		// get the DOFS
 		FEModel& fem = *GetFEModel();
@@ -94,15 +94,28 @@ public:
 		if (n == 0) return false;
 
 		// get the start index of the DOFS
-		int ndof = dofs.GetDOF(nvar, 0);
+		int ndof = dofs.GetDOF(nvar, m_index);
 		if (ndof < 0) return false;
 
+		// see if this domain contains this dof
+		vector<int> domDofs = D.GetDOFList();
+		bool bfound = false;
+		for (int i=0; i<(int)domDofs.size();++i)
+		{
+			if (domDofs[i] == ndof)
+			{
+				bfound = true;
+				break;
+			}
+		}
+		if (bfound == false) return false;
+
 		// store the nodal data
-		int NN = mesh.Nodes();
+		int NN = D.Nodes();
 		for (int i = 0; i<NN; ++i)
 		{
-			FENode& node = mesh.Node(i);
-			str << node.get(ndof + m_index);
+			FENode& node = D.Node(i);
+			a << node.get(ndof);
 		}
 
 		return true;
@@ -265,7 +278,7 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 				if ((index < 0) || (index >= ndofs)) return false;
 
 				ps = new FEPlotArrayVariable(sz, index);
-				return AddNodalVariable(ps, szname, item);
+				return AddDomainVariable(ps, szname, item);
 			}
 		}
 	}
