@@ -32,7 +32,7 @@ void FEBiphasicShellDomain::SetMaterial(FEMaterial* pmat)
 void FEBiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
     // initialize base class
-    FEShellDomain::PreSolveUpdate(timeInfo);
+    FESSIShellDomain::PreSolveUpdate(timeInfo);
 
     const int NE = FEElement::MAX_NODES;
     vec3d x0[NE], xt[NE], r0, rt;
@@ -81,7 +81,7 @@ void FEBiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 bool FEBiphasicShellDomain::Initialize()
 {
     // initialize base class
-    FEShellDomain::Initialize();
+    FESSIShellDomain::Initialize();
     
     // error flag (set true on error)
     bool bmerr = false;
@@ -136,16 +136,19 @@ void FEBiphasicShellDomain::Activate()
                 node.m_ID[m_dofX] = DOF_ACTIVE;
                 node.m_ID[m_dofY] = DOF_ACTIVE;
                 node.m_ID[m_dofZ] = DOF_ACTIVE;
+                
+                if (node.HasFlags(FENode::SHELL))
+                {
+                    node.m_ID[m_dofU] = DOF_ACTIVE;
+                    node.m_ID[m_dofV] = DOF_ACTIVE;
+                    node.m_ID[m_dofW] = DOF_ACTIVE;
+                }
             }
             
             node.m_ID[m_dofP] = DOF_ACTIVE;
+            
             if (node.HasFlags(FENode::SHELL))
-            {
-                node.m_ID[m_dofU] = DOF_ACTIVE;
-                node.m_ID[m_dofV] = DOF_ACTIVE;
-                node.m_ID[m_dofW] = DOF_ACTIVE;
                 node.m_ID[m_dofQ] = DOF_ACTIVE;
-            }
         }
     }
 }
@@ -188,7 +191,7 @@ void FEBiphasicShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
 void FEBiphasicShellDomain::Reset()
 {
     // reset base class data
-    FEShellDomain::Reset();
+    FESSIShellDomain::Reset();
     
     // get the biphasic material
     FEBiphasic* pmb = m_pMat;
