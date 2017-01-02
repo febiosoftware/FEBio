@@ -27,10 +27,10 @@
 		D55E3B051C64091700815FCA /* FEEdgeLoad.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3B011C64091700815FCA /* FEEdgeLoad.h */; };
 		D571F82B1B78C49C002FAACE /* FERigidSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D571F8291B78C49C002FAACE /* FERigidSystem.cpp */; };
 		D571F82C1B78C49C002FAACE /* FERigidSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = D571F82A1B78C49C002FAACE /* FERigidSystem.h */; };
-		D57604141E145C77008106EE /* FEStiffnessMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57604101E145C77008106EE /* FEStiffnessMatrix.cpp */; };
-		D57604151E145C77008106EE /* FEStiffnessMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D57604111E145C77008106EE /* FEStiffnessMatrix.h */; };
 		D57604161E145C77008106EE /* Integrate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57604121E145C77008106EE /* Integrate.cpp */; };
 		D57604171E145C77008106EE /* Integrate.h in Headers */ = {isa = PBXBuildFile; fileRef = D57604131E145C77008106EE /* Integrate.h */; };
+		D576041A1E1AC17A008106EE /* FELinearSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57604181E1AC17A008106EE /* FELinearSystem.cpp */; };
+		D576041B1E1AC17A008106EE /* FELinearSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = D57604191E1AC17A008106EE /* FELinearSystem.h */; };
 		D57F1A231D6C5B8800A63B5D /* FELinearConstraintManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57F1A211D6C5B8800A63B5D /* FELinearConstraintManager.cpp */; };
 		D57F1A241D6C5B8800A63B5D /* FELinearConstraintManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D57F1A221D6C5B8800A63B5D /* FELinearConstraintManager.h */; };
 		D58D4D141B5D7E76002BB72A /* FECallback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58D4D111B5D7E76002BB72A /* FECallback.cpp */; };
@@ -278,10 +278,10 @@
 		D55E3B011C64091700815FCA /* FEEdgeLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEEdgeLoad.h; sourceTree = "<group>"; };
 		D571F8291B78C49C002FAACE /* FERigidSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidSystem.cpp; sourceTree = "<group>"; };
 		D571F82A1B78C49C002FAACE /* FERigidSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidSystem.h; sourceTree = "<group>"; };
-		D57604101E145C77008106EE /* FEStiffnessMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEStiffnessMatrix.cpp; sourceTree = "<group>"; };
-		D57604111E145C77008106EE /* FEStiffnessMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEStiffnessMatrix.h; sourceTree = "<group>"; };
 		D57604121E145C77008106EE /* Integrate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Integrate.cpp; sourceTree = "<group>"; };
 		D57604131E145C77008106EE /* Integrate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Integrate.h; sourceTree = "<group>"; };
+		D57604181E1AC17A008106EE /* FELinearSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELinearSystem.cpp; sourceTree = "<group>"; };
+		D57604191E1AC17A008106EE /* FELinearSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELinearSystem.h; sourceTree = "<group>"; };
 		D57F1A211D6C5B8800A63B5D /* FELinearConstraintManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELinearConstraintManager.cpp; sourceTree = "<group>"; };
 		D57F1A221D6C5B8800A63B5D /* FELinearConstraintManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELinearConstraintManager.h; sourceTree = "<group>"; };
 		D58D4D111B5D7E76002BB72A /* FECallback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECallback.cpp; sourceTree = "<group>"; };
@@ -647,6 +647,8 @@
 				D57F1A221D6C5B8800A63B5D /* FELinearConstraintManager.h */,
 				D5F76A4D1BC9FD8400DFA30A /* FELinearSolver.cpp */,
 				D5F76A4E1BC9FD8400DFA30A /* FELinearSolver.h */,
+				D57604181E1AC17A008106EE /* FELinearSystem.cpp */,
+				D57604191E1AC17A008106EE /* FELinearSystem.h */,
 				D5E10A2C1865E15900B23922 /* FEMaterial.cpp */,
 				D5E10A2D1865E15900B23922 /* FEMaterial.h */,
 				D5E10A2E1865E15900B23922 /* FEMaterialPoint.cpp */,
@@ -696,8 +698,6 @@
 				D5E10A4C1865E15900B23922 /* FESolidDomain.h */,
 				D5E10A4D1865E15900B23922 /* FESolver.cpp */,
 				D5E10A4E1865E15900B23922 /* FESolver.h */,
-				D57604101E145C77008106EE /* FEStiffnessMatrix.cpp */,
-				D57604111E145C77008106EE /* FEStiffnessMatrix.h */,
 				D5E10A4F1865E15900B23922 /* FESurface.cpp */,
 				D5E10A501865E15900B23922 /* FESurface.h */,
 				D5E10A511865E15900B23922 /* FESurfaceLoad.cpp */,
@@ -803,7 +803,6 @@
 				D5A0A8F1186F4AC60046B0DE /* DOFS.h in Headers */,
 				D5E10B031865E15900B23922 /* SparseMatrix.h in Headers */,
 				D5CCDB001B87BF4C00B1B3B0 /* FECorePlot.h in Headers */,
-				D57604151E145C77008106EE /* FEStiffnessMatrix.h in Headers */,
 				D5E10AE91865E15900B23922 /* Image.h in Headers */,
 				D5FA1BE31B74CDCB00EA5913 /* FEModelLoad.h in Headers */,
 				D5E10AC11865E15900B23922 /* FEMesh.h in Headers */,
@@ -860,6 +859,7 @@
 				D5B572DC186CC76500D12E45 /* FECoreTask.h in Headers */,
 				D5E10AF21865E15900B23922 /* mat2d.h in Headers */,
 				D5B572DE186CC76500D12E45 /* FEGlobalData.h in Headers */,
+				D576041B1E1AC17A008106EE /* FELinearSystem.h in Headers */,
 				D5E10AAD1865E15900B23922 /* FEElement.h in Headers */,
 				D5E10AE01865E15900B23922 /* FESurface.h in Headers */,
 				D5E10AB91865E15900B23922 /* FELevelStructure.h in Headers */,
@@ -1045,7 +1045,6 @@
 				D5E10A981865E15900B23922 /* FEBoundaryCondition.cpp in Sources */,
 				D5E10AE81865E15900B23922 /* Image.cpp in Sources */,
 				D55E3AEF1C5BBEDD00815FCA /* DumpMemStream.cpp in Sources */,
-				D57604141E145C77008106EE /* FEStiffnessMatrix.cpp in Sources */,
 				D5F9A96E1C3C4B8400D53C19 /* RigidBC.cpp in Sources */,
 				D5FA1BE21B74CDCB00EA5913 /* FEModelLoad.cpp in Sources */,
 				D50CB99B1B177CCC006E43E6 /* BC.cpp in Sources */,
@@ -1079,6 +1078,7 @@
 				D5E10A8F1865E15900B23922 /* FEAnalysis.cpp in Sources */,
 				D5B572D9186CC76500D12E45 /* FECoreKernel.cpp in Sources */,
 				D5C014FA1CEF4EE700EE43D5 /* DataRecord.cpp in Sources */,
+				D576041A1E1AC17A008106EE /* FELinearSystem.cpp in Sources */,
 				D5E10AD91865E15900B23922 /* FEShellDomain.cpp in Sources */,
 				D5E10ADF1865E15900B23922 /* FESurface.cpp in Sources */,
 				D5E10AD11865E15900B23922 /* FEOctree.cpp in Sources */,
