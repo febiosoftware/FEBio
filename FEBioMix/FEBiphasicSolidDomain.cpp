@@ -104,10 +104,24 @@ void FEBiphasicSolidDomain::Activate()
 				node.m_ID[m_dofY] = DOF_ACTIVE;
 				node.m_ID[m_dofZ] = DOF_ACTIVE;
 			}
-
-			node.m_ID[m_dofP] = DOF_ACTIVE;
 		}
 	}
+
+    // Activate dof_P, except when a biphasic solid is connected to the
+    // back of a shell element, in which case activate dof_Q for those nodes.
+    FEMesh& m = *GetMesh();
+    for (int i=0; i<Elements(); ++i) {
+        FESolidElement& el = m_Elem[i];
+        int neln = el.Nodes();
+        for (int j=0; j<neln; ++j)
+        {
+            FENode& node = m.Node(el.m_node[j]);
+            if (el.m_bitfc.size()>0 && el.m_bitfc[i])
+                node.m_ID[m_dofQ] = DOF_ACTIVE;
+            else
+                node.m_ID[m_dofP] = DOF_ACTIVE;
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
