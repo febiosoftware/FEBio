@@ -221,14 +221,14 @@ void FEBiphasicShellDomain::Reset()
 //-----------------------------------------------------------------------------
 void FEBiphasicShellDomain::InternalForces(FEGlobalVector& R)
 {
-    // element force vector
-    vector<double> fe;
-    vector<int> lm;
-    
-    size_t NE = m_Elem.size();
+    int NE = m_Elem.size();
 #pragma omp parallel for shared (NE)
     for (int i=0; i<NE; ++i)
     {
+        // element force vector
+        vector<double> fe;
+        vector<int> lm;
+        
         // get the element
         FEShellElement& el = m_Elem[i];
         
@@ -340,14 +340,14 @@ void FEBiphasicShellDomain::ElementInternalForce(FEShellElement& el, vector<doub
 //-----------------------------------------------------------------------------
 void FEBiphasicShellDomain::InternalForcesSS(FEGlobalVector& R)
 {
-    // element force vector
-    vector<double> fe;
-    vector<int> lm;
-    
-    size_t NE = m_Elem.size();
+    int NE = m_Elem.size();
 #pragma omp parallel for shared (NE)
     for (int i=0; i<NE; ++i)
     {
+        // element force vector
+        vector<double> fe;
+        vector<int> lm;
+        
         // get the element
         FEShellElement& el = m_Elem[i];
         
@@ -454,7 +454,7 @@ void FEBiphasicShellDomain::ElementInternalForceSS(FEShellElement& el, vector<do
 void FEBiphasicShellDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
 {
     // repeat over all solid elements
-    size_t NE = m_Elem.size();
+    int NE = m_Elem.size();
     
 #pragma omp parallel for shared(NE)
     for (int iel=0; iel<NE; ++iel)
@@ -485,7 +485,7 @@ void FEBiphasicShellDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
 void FEBiphasicShellDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm)
 {
     // repeat over all solid elements
-    size_t NE = m_Elem.size();
+    int NE = m_Elem.size();
     
 #pragma omp parallel for shared(NE)
     for (int iel=0; iel<NE; ++iel)
