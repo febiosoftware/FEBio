@@ -31,7 +31,7 @@ public:
 	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval);
     
 	//! set value of indexed parameters
-	void SetIndexedParameter(idmap p, int id, double val) { p.insert(std::pair<int, double>(id, val)); }
+	void SetIndexedParameter(idmap& p, int id, double val) { p.insert(std::pair<int, double>(id, val)); }
     
 public:
 	double		m_kp;				//!< coefficient of pressure drop
