@@ -55,25 +55,6 @@ public: // overrides from FEElasticDomain
     void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf);
 
 public:
-    //! calculates covariant basis vectors at an integration point
-    void CoBaseVectors(FEShellElement& el, int n, vec3d g[3]);
-    
-    //! calculates contravariant basis vectors at an integration point
-    void ContraBaseVectors(FEShellElement& el, int n, vec3d g[3]);
-    
-    // jacobian with respect to current frame
-    double detJ(FEShellElement& el, int n);
-    
-	// calculate deformation gradient
-	double defgrad(FEShellElement& el, mat3d& F, int n);
-
-    //! evaluate a vector function over the shell
-    vec3d evaluate(FEShellElement& el, vec3d* vn, vec3d* dvn, int n);
-    
-    // inverse jacobian with respect to current frame
-	double invjact(FEShellElement& el, double J[3][3], int n);
- 
-public:
 
 	// --- S T I F F N E S S --- 
 

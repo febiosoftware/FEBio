@@ -76,28 +76,6 @@ public:
     //! calculates the element biphasic stiffness matrix for steady-state response
     bool ElementBiphasicStiffnessSS(FEShellElement& el, matrix& ke, bool bsymm);
 
-public:    
-    //! calculates covariant basis vectors at an integration point
-    void CoBaseVectors(FEShellElement& el, int n, vec3d g[3]);
-    
-    //! calculates contravariant basis vectors at an integration point
-    void ContraBaseVectors(FEShellElement& el, int n, vec3d g[3]);
-    
-    // jacobian with respect to current frame
-    double detJ(FEShellElement& el, int n);
-    
-    // calculate deformation gradient
-    double defgrad(FEShellElement& el, mat3d& F, int n);
-    
-    // inverse jacobian with respect to current frame
-    double invjact(FEShellElement& el, double J[3][3], int n);
-    
-    //! evaluate a scalar function over the shell
-    double evaluate(FEShellElement& el, double* pn, double* dpn, int n);
-    
-    //! calculate the gradient of a scalar function over the shell
-    vec3d gradient(FEShellElement& el, double* pn, double* dpn, int n);
-    
 public: // overridden from FEElasticDomain, but not all implemented in this domain
     void BodyForce(FEGlobalVector& R, FEBodyForce& bf);
     void ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe);
