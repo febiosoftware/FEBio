@@ -1,6 +1,7 @@
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 //! Surface that sustains a convective heat flux boundary condition
@@ -14,8 +15,11 @@ public:
 	//! Set the surface to apply the load to
 	void SetSurface(FESurface* ps);
 
-	//! stiffness matrix
-	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver);
+	//! stiffness matrix (TODO: obsolete interface. Remove it.)
+	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) { assert(false); }
+
+	//! stiffness matrix (new interface)
+	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp);
 	
 	//! residual
 	void Residual(const FETimeInfo& tp, FEGlobalVector& R);

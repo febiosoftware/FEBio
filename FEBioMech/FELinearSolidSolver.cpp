@@ -92,7 +92,7 @@ bool FELinearSolidSolver::Quasin(double time)
 	do
 	{
 		// build the residual
-		Residual();
+		Residual(m_R);
 
 		// build the stiffness matrix
 		m_d = DI;
@@ -152,13 +152,13 @@ void FELinearSolidSolver::Update(vector<double>& u)
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual
-void FELinearSolidSolver::Residual()
+bool FELinearSolidSolver::Residual(vector<double>& R)
 {
-	zero(m_R);
+	zero(R);
 
-	vector<double> dummy(m_R);
+	vector<double> dummy(R);
 
-	FEGlobalVector RHS(GetFEModel(), m_R, dummy);
+	FEGlobalVector RHS(GetFEModel(), R, dummy);
 
 	FEMesh& mesh = m_fem.GetMesh();
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
@@ -183,9 +183,9 @@ void FELinearSolidSolver::Residual()
 				double f = fc.NodeValue(j);
 
 				int n = node.m_ID[bc];
-				if ((bc == 0) && (n >= 0)) m_R[n] = f;
-				if ((bc == 1) && (n >= 0)) m_R[n] = f;
-				if ((bc == 2) && (n >= 0)) m_R[n] = f;
+				if ((bc == 0) && (n >= 0)) R[n] = f;
+				if ((bc == 1) && (n >= 0)) R[n] = f;
+				if ((bc == 2) && (n >= 0)) R[n] = f;
 			}
 		}
 	}
@@ -204,6 +204,8 @@ void FELinearSolidSolver::Residual()
 		FEPressureLoad* pl = dynamic_cast<FEPressureLoad*>(m_fem.SurfaceLoad(i));
 		if (pl && (pl->IsLinear())) pl->Residual(tp, RHS);
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

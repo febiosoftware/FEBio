@@ -789,7 +789,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 		try
 		{
 			Update(ul);
-			Evaluate(m_R1);
+			Residual(m_R1);
 		}
 		catch (...)
 		{
@@ -831,7 +831,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 				try
 				{
 					Update(ul);
-					Evaluate(m_R1);
+					Residual(m_R1);
 				}
 				catch (...)
 				{
@@ -858,7 +858,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 					try
 					{
 						Update(ul);
-						Evaluate(m_R1);
+						Residual(m_R1);
 					}
 					catch (...)
 					{
@@ -903,7 +903,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 			try
 			{
 				Update(ul);
-				Evaluate(m_R1);
+				Residual(m_R1);
 			}
 			catch (...)
 			{

@@ -9,9 +9,8 @@ class FELinearSystem;
 class LinearSolver;
 
 //-----------------------------------------------------------------------------
-//! Abstract Base class for finite element solution algorithms that require the solution
-//! of linear system of equations. This can be simple linear solution algorithm, but
-//! also nonlinear algorithms that require solving a linear system of equations (e.g. Newton solvers)
+//! Abstract Base class for finite element solution algorithms (i.e. "FE solvers") that require the solution
+//! of a linear system of equations.
 class FELinearSolver : public FESolver
 {
 public:
@@ -38,9 +37,6 @@ public: // from FESolver
 	//! Clean up data
 	void Clean();
 
-	//! assemble global stiffness matrix
-	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
-
 	//! Serialization
 	void Serialize(DumpStream& ar);
 
@@ -49,11 +45,8 @@ public: // these functions need to be implemented by the derived class
 	//! Evaluate the right-hand side "force" vector
 	virtual void ForceVector(FEGlobalVector& R) = 0;
 
-	//! Evaluate the stiffness matrix (new interface)
+	//! Evaluate the stiffness matrix
 	virtual bool StiffnessMatrix(FELinearSystem& K) { return false; }
-
-	//! Evaluate the stiffness matrix (old interface)
-	virtual bool StiffnessMatrix();
 
 	//! Update the model state
 	virtual void Update(vector<double>& u);
@@ -66,6 +59,10 @@ protected: // some helper functions
 	//! Create and evaluate the stiffness matrix
 	bool CreateStiffness();
 
+private:
+	//! assemble global stiffness matrix (TODO: remove this)
+	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) { assert(false); }
+	
 protected:
 	vector<double>		m_R;	//!< RHS vector
 	vector<double>		m_u;	//!< vector containing prescribed values

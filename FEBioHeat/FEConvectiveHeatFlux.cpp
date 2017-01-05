@@ -100,9 +100,9 @@ void FEConvectiveHeatFlux::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! stiffness matrix
-void FEConvectiveHeatFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
+void FEConvectiveHeatFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	FEModel& fem = psolver->GetFEModel();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	const int dof_T = fem.GetDOFS().GetDOF("T");
 	if (dof_T == -1) { assert(false); return; }
@@ -128,7 +128,7 @@ void FEConvectiveHeatFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolv
 		for (int j=0; j<neln; ++j) lm[j] = mesh.Node(el.m_node[j]).m_ID[dof_T];
 
 		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.AssembleLHS(lm, ke);
 	}
 }
 

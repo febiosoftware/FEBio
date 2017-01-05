@@ -25,7 +25,7 @@ public:
 
 protected:
 	//! calculate the residual
-	void Residual();
+	bool Residual(vector<double>& R);
 
 	//! calculate the stiffness matrix
 	bool StiffnessMatrix(const FETimeInfo& tp);

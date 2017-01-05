@@ -70,6 +70,9 @@ protected:
     //! calculates the global stiffness matrix (needs to be overwritten by derived classes)
     virtual bool StiffnessMatrix(const FETimeInfo& tp) = 0;
 
+	//! calculates the global residual vector (needs to be overwritten by derived classes)
+	virtual bool Residual(vector<double>& R) = 0;
+
 public:
 	// line search options
 	double	m_LSmin;		//!< minimum line search step

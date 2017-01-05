@@ -1,6 +1,7 @@
 #pragma once
-#include "FECore/FESolidDomain.h"
-#include "FECore/FESolver.h"
+#include <FECore/FESolidDomain.h>
+#include <FECore/FESolver.h>
+#include <FECore/FELinearSystem.h>
 #include "FEHeatTransferMaterial.h"
 
 class FEModel;
@@ -11,8 +12,8 @@ class FEHeatDomain
 public:
 	FEHeatDomain(FEModel* pfem) : m_pfem(pfem) {}
 	virtual ~FEHeatDomain(){}
-	virtual void ConductionMatrix (FESolver* pnls) = 0;
-	virtual void CapacitanceMatrix(FESolver* pnls, double dt) = 0;
+	virtual void ConductionMatrix (FELinearSystem& ls) = 0;
+	virtual void CapacitanceMatrix(FELinearSystem& ls, double dt) = 0;
 
 	FEModel* GetFEModel() { return m_pfem; }
 
@@ -42,10 +43,10 @@ public:
 public: // overloaded from FEHeatDomain
 
 	//! Calculate the conduction stiffness 
-	void ConductionMatrix(FESolver* psolver);
+	void ConductionMatrix(FELinearSystem& ls);
 
 	//! Calculate capacitance stiffness matrix
-	void CapacitanceMatrix(FESolver* psolver, double dt);
+	void CapacitanceMatrix(FELinearSystem& ls, double dt);
 
 protected:
 	//! calculate the conductive element stiffness matrix

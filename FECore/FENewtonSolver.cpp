@@ -490,7 +490,7 @@ double FENewtonSolver::LineSearch(double s)
 		Update(ul);
 
 		// calculate residual at this point
-		Evaluate(m_R1);
+		Residual(m_R1);
 
 		// make sure we are still in a valid range
 		if (s < m_LSmin)
@@ -506,7 +506,7 @@ double FENewtonSolver::LineSearch(double s)
 			Update(ul);
 
 			// recalculate residual at this point
-			Evaluate(m_R1);
+			Residual(m_R1);
 
 			// return and hope for the best
 			break;
@@ -558,7 +558,7 @@ double FENewtonSolver::LineSearch(double s)
 		s = smin;
 		vcopys(ul, m_ui, s);
 		Update(ul);
-		Evaluate(m_R1);
+		Residual(m_R1);
 	}
 	return s;
 }

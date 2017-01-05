@@ -25,6 +25,10 @@ void FELinearSolver::Clean()
 }
 
 //-----------------------------------------------------------------------------
+//! This function sets the degrees of freedom that will be used by this solver.
+//! This is used in the InitEquations method that initializes the equation numbers
+//! and the Update method which maps the solution of the linear system to the nodal
+//! data.
 void FELinearSolver::SetDOF(vector<int>& dof)
 {
 	m_dof = dof;
@@ -205,53 +209,6 @@ bool FELinearSolver::SolveStep(double time)
 }
 
 //-----------------------------------------------------------------------------
-//! assemble global stiffness matrix
-void FELinearSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
-{
-	// assemble into the global stiffness
-	m_pK->Assemble(ke, elm);
-
-	// if there are prescribed bc's we need to adjust the rhs vector
-	if (m_fem.PrescribedBCs() > 0)
-	{
-		int i, j;
-		int I, J;
-
-		SparseMatrix& K = *m_pK;
-
-		int N = ke.rows();
-
-		// loop over columns
-		for (j=0; j<N; ++j)
-		{
-			J = -elm[j]-2;
-			if ((J >= 0) && (J<m_neq))
-			{
-				// dof j is a prescribed degree of freedom
-
-				// loop over rows
-				for (i=0; i<N; ++i)
-				{
-					I = elm[i];
-					if (I >= 0)
-					{
-						// dof i is not a prescribed degree of freedom
-						m_R[I] -= ke[i][j]*m_u[J];
-					}
-				}
-
-				// set the diagonal element of K to 1
-				K.set(J,J, 1);
-
-				// set the rhs vector to the prescribed value
-				// that way the solution vector will contain the prescribed value
-				m_R[J] = m_u[J];
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
 bool FELinearSolver::ReformStiffness()
 {
 	// recalculate the shape of the stiffness matrix if necessary
@@ -269,7 +226,8 @@ bool FELinearSolver::ReformStiffness()
 
 	// calculate the stiffness matrix
 	// (This is done by the derived class)
-	if (!StiffnessMatrix()) return false;
+	FELinearSystem K(*m_pK, m_R, m_u);
+	if (!StiffnessMatrix(K)) return false;
 
 	// factorize the stiffness matrix
 	m_SolverTime.start();
@@ -283,13 +241,6 @@ bool FELinearSolver::ReformStiffness()
 	m_ntotref++;
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FELinearSolver::StiffnessMatrix()
-{
-	FELinearSystem K(*m_pK, m_R, m_u);
-	return StiffnessMatrix(K);
 }
 
 //-----------------------------------------------------------------------------

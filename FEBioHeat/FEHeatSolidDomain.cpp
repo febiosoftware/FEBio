@@ -22,7 +22,7 @@ void FEHeatSolidDomain::SetMaterial(FEMaterial* pmat)
 
 //-----------------------------------------------------------------------------
 // Calculate the heat conduction matrix
-void FEHeatSolidDomain::ConductionMatrix(FESolver* psolver)
+void FEHeatSolidDomain::ConductionMatrix(FELinearSystem& ls)
 {
 	vector<int> lm;
 
@@ -40,15 +40,23 @@ void FEHeatSolidDomain::ConductionMatrix(FESolver* psolver)
 		UnpackLM(el, lm);
 
 		// assemble into global matrix
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+		ls.AssembleLHS(lm, ke);
 	}
 }
 
 //-----------------------------------------------------------------------------
 // Calculate the capacitance matrix
-void FEHeatSolidDomain::CapacitanceMatrix(FESolver* psolver, double dt)
+void FEHeatSolidDomain::CapacitanceMatrix(FELinearSystem& ls, double dt)
 {
 	vector<int> lm;
+	vector<double> fe;
+
+	vector<int> dofs = GetDOFList();
+	assert(dofs.size()==1);
+	int dofT = dofs[0];
+
+	// get the mesh
+	FEMesh& mesh = *GetMesh();
 
 	// loop over all elements in domain
 	for (int i=0; i<(int) m_Elem.size(); ++i)
@@ -64,7 +72,20 @@ void FEHeatSolidDomain::CapacitanceMatrix(FESolver* psolver, double dt)
 		UnpackLM(el, lm);
 
 		// assemble into global matrix
-		psolver->AssembleStiffness(el.m_node, lm, kc);
+		ls.AssembleLHS(lm, kc);
+
+		// we also need to assemble this in the right-hand side
+		fe.resize(ne, 0.0);
+		for (int i = 0; i<ne; ++i)
+		{
+			fe[i] = mesh.Node(el.m_node[i]).get(dofT);
+		}
+
+		// multiply with me
+		fe = kc*fe;
+
+		// assemble this vector to the right-hand side
+		ls.AssembleRHS(lm, fe);
 	}
 }
 

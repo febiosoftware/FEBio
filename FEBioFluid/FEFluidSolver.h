@@ -39,8 +39,6 @@ public:
     //! Perform an update
     void Update(vector<double>& ui);
     
-    //! Evaluate system, i.e. calculate residual
-    void Evaluate(vector<double>& R) { Residual(R); }
     //}
     
     //{ --- Solution functions ---

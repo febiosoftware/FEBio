@@ -16,7 +16,6 @@ END_PARAMETER_LIST();
 //! constructor for the class
 FEHeatSolver::FEHeatSolver(FEModel* pfem) : FELinearSolver(pfem)
 {
-	m_brhs = false;
 	m_ntotref = 0;
 	m_niter = 0;
 	m_nrhs = 0;
@@ -50,16 +49,9 @@ bool FEHeatSolver::Init()
 
 	// allocate data structures
 	int neq = NumberOfEquations();
-	m_Tp.assign(neq, 0);
 
-	// set initial temperatures
+	// get mesh
 	FEMesh& mesh = m_fem.GetMesh();
-	for (int i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		int nid = node.m_ID[dof_T];
-		if (nid >= 0) m_Tp[nid] = node.get(dof_T);
-	}
 
 	// Identify the heat-transfer domains
 	// TODO: I want this to be done automatically
@@ -74,18 +66,6 @@ bool FEHeatSolver::Init()
 	assert(pstep->Domains() != 0);
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! update solution
-void FEHeatSolver::Update(vector<double>& u)
-{
-	// call base class. 
-	// This updates nodal variables and calls FEDomain::Update
-	FELinearSolver::Update(u);
-
-	// copy new temperatures to old temperature
-	m_Tp = u;
 }
 
 //-----------------------------------------------------------------------------
@@ -170,7 +150,7 @@ void FEHeatSolver::HeatSources(FEGlobalVector& R)
 //! Calculate the global stiffness matrix. This function simply calls 
 //! HeatStiffnessMatrix() for each domain which will calculate the
 //! contribution to the global stiffness matrix from each domain.
-bool FEHeatSolver::StiffnessMatrix()
+bool FEHeatSolver::StiffnessMatrix(FELinearSystem& LS)
 {
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
@@ -186,73 +166,21 @@ bool FEHeatSolver::StiffnessMatrix()
 		FEHeatDomain& bd = dynamic_cast<FEHeatDomain&>(*pstep->Domain(i));
 
 		// add the conduction stiffness
-		m_brhs = false;
-		bd.ConductionMatrix(this);
+		bd.ConductionMatrix(LS);
 
 		// for a dynamic analysis add the capacitance matrix
 		if (bdyn) 
 		{
-			m_brhs = true;
-			bd.CapacitanceMatrix(this, tp.timeIncrement);
+			bd.CapacitanceMatrix(LS, tp.timeIncrement);
 		}
 	}
 
 	// add convective heat fluxes
-	m_brhs = false;
 	for (int i=0; i<m_fem.SurfaceLoads(); ++i)
 	{
 		FEConvectiveHeatFlux* pbc = dynamic_cast<FEConvectiveHeatFlux*>(m_fem.SurfaceLoad(i));
-		if (pbc && pbc->IsActive()) pbc->StiffnessMatrix(tp, this);
+		if (pbc && pbc->IsActive()) pbc->StiffnessMatrix(LS, tp);
 	}
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Assembles the element stiffness matrix into the global stiffness matrix. 
-//! This function is modified from the base class for including capacitance matrix
-void FEHeatSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& ke)
-{
-	// Call base class
-	FELinearSolver::AssembleStiffness(en, lm, ke);
-
-	// see if we need to modify the RHS
-	// (This is needed for the capacitance matrix)
-	if (m_brhs)
-	{
-		int ne = (int) lm.size();
-		for (int j=0; j<ne; ++j)
-		{
-			if (lm[j] >= 0)
-			{
-				double q = 0;
-				for (int k=0; k<ne; ++k)
-				{
-					if (lm[k] >= 0) q += ke[j][k]*m_Tp[lm[k]];
-					else if (-lm[k]-2 >= 0) q += ke[j][k]*m_Tp[-lm[k]-2];
-				}
-				m_R[lm[j]] += q;
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Serializes data to the archive.
-//! Still need to implement this.
-//!
-void FEHeatSolver::Serialize(DumpStream &ar)
-{
-	FELinearSolver::Serialize(ar);
-
-	if (ar.IsSaving())
-	{
-		ar << m_Tp;
-		ar << m_brhs;
-	}
-	else
-	{
-		ar >> m_Tp;
-		ar >> m_brhs;
-	}
 }

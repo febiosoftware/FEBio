@@ -55,10 +55,6 @@ public:
 	//! Solve an analysis step
 	virtual bool SolveStep(double time) = 0;
 
-public:
-	//! Evaluate the state of the current system
-	virtual void Evaluate(std::vector<double>& F) { assert(false); };
-
 	//! Update the state of the sytem
 	virtual void Update(std::vector<double>& u) { assert(false); };
 

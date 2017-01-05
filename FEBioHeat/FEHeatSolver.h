@@ -19,19 +19,13 @@ public:
 	//! one-time initialization
 	bool Init();
 
-	//! serialize data
-	void Serialize(DumpStream& ar);
-
 protected: // from FELinearSolver
 
 	//! calculate the residual
 	void ForceVector(FEGlobalVector& R);
 
 	//! calculate the stiffness matrix
-	bool StiffnessMatrix(); 
-
-	//! update solution
-	void Update(vector<double>& u);
+	bool StiffnessMatrix(FELinearSystem& LS); 
 
 protected:	// RHS helper functions
 	//! Nodal fluxes
@@ -43,16 +37,7 @@ protected:	// RHS helper functions
 	//! Heat Sources
 	void HeatSources(FEGlobalVector& R);
 
-public:
-	//! assemble element stiffness matrix
-	void AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& ke);
-
-public:
-	vector<double>	m_Tp;	//!< previous temperatures
-
 protected:
-	bool	m_brhs;	//!< flag used to indicate if element stiffness must be assembled into RHS
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };
