@@ -37,6 +37,7 @@ enum FE_Element_Shape {
 	ET_TET4,
 	ET_TET10,
 	ET_TET15,
+	ET_TET20,
 	ET_QUAD4,
     ET_QUAD8,
     ET_QUAD9,
@@ -74,6 +75,7 @@ enum FE_Element_Type {
 	FE_TET15G11,
 	FE_TET15G15,
 	FE_TET15G15RI4,
+	FE_TET20G15,
 	FE_HEX20G27,
 	FE_HEX27G27,
 

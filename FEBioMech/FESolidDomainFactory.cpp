@@ -54,7 +54,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 				else sztype = "elastic-solid";
 			}
 		}
-		else if ((eshape == ET_TET10) || (eshape == ET_TET15))
+		else if ((eshape == ET_TET10) || (eshape == ET_TET15) || (eshape == ET_TET20))
 		{
 			if ((etype == FE_TET10G8RI4)||(etype == FE_TET10G4RI1))
 			{

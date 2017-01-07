@@ -371,6 +371,7 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	else if (strcmp(sztype, "tet4"  ) == 0) eshape = ET_TET4;
 	else if (strcmp(sztype, "tet10" ) == 0) eshape = ET_TET10;
 	else if (strcmp(sztype, "tet15" ) == 0) eshape = ET_TET15;
+	else if (strcmp(sztype, "tet20" ) == 0) eshape = ET_TET20;
 	else if (strcmp(sztype, "quad4" ) == 0) eshape = ET_QUAD4;
 	else if (strcmp(sztype, "quad8" ) == 0) eshape = ET_QUAD8;
 	else if (strcmp(sztype, "quad9" ) == 0) eshape = ET_QUAD9;
@@ -426,6 +427,7 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	case ET_TET4  : etype = m_pim->m_ntet4; break;
 	case ET_TET10 : etype = m_pim->m_ntet10; break;
 	case ET_TET15 : etype = m_pim->m_ntet15; break;
+	case ET_TET20 : etype = m_pim->m_ntet20; break;
 	case ET_HEX20 : etype = FE_HEX20G27; break;
 	case ET_HEX27 : etype = FE_HEX27G27; break;
 	case ET_QUAD4 : etype = (NDIM == 3 ? FE_SHELL_QUAD : FE2D_QUAD4G4); break;

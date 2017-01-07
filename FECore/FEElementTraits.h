@@ -466,6 +466,48 @@ public:
 	FETet15G15RI4();
 };
 
+//=============================================================================
+//
+//   FETet20
+//   
+//=============================================================================
+
+//=============================================================================
+//! Base class for 20-node cubic tetrahedral elements
+class FETet20_ : public FESolidElementTraits
+{
+public:
+	enum { NELN = 20 };
+
+public:
+	FETet20_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_TET20, et){}
+
+	//! values of shape functions
+	void shape_fnc(double* H, double r, double s, double t);
+
+	//! values of shape function derivatives
+	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
+
+	//! values of shape function second derivatives
+	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
+};
+
+//=============================================================================
+// 20-node tetrahedral element using a 15-point Gaussian integration rule
+class FETet20G15 : public FETet20_
+{
+public:
+	enum { NINT = 15 };
+
+public:
+	FETet20G15();
+
+	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix N;
+	matrix Ai;
+};
 
 //=============================================================================
 //

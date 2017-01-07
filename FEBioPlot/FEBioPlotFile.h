@@ -112,7 +112,8 @@ public:
 		PLT_ELEM_HEX27,
         PLT_ELEM_TRI6,
         PLT_ELEM_QUAD8,
-        PLT_ELEM_QUAD9
+        PLT_ELEM_QUAD9,
+		PLT_ELEM_TET20
 	};
 
 	// size of name variables
