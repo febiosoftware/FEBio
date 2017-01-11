@@ -1086,6 +1086,26 @@ private:
 	matrix	Ai;
 };
 
+
+//=============================================================================
+//  10-node triangular element with 12-point gaussian quadrature
+//
+class FETri10G12 : public FETri10_
+{
+public:
+	enum { NINT = 12 };
+
+public:
+	// constructor
+	FETri10G12();
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix	Ai;
+};
+
 //=============================================================================
 //
 //   FEQuad8

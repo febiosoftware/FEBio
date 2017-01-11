@@ -244,7 +244,8 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 				}
 				else if (elem == "tri10")
 				{
-					if (strcmp(szv, "GAUSS7") == 0) m_pim->m_ntri10 = FE_TRI10G7;
+					if      (strcmp(szv, "GAUSS7" ) == 0) m_pim->m_ntri10 = FE_TRI10G7;
+					else if (strcmp(szv, "GAUSS12") == 0) m_pim->m_ntri10 = FE_TRI10G12;
 					else throw XMLReader::InvalidValue(tag);
 				}
 				else if (elem == "tet4")
