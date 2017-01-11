@@ -52,6 +52,9 @@ END_PARAMETER_LIST();
 
 FERigidSphere::FERigidSphere(FEModel *pfem) : FERigidSurface(pfem)
 {
+	m_rc = vec3d(0,0,0);
+	m_uc = vec3d(0,0,0);
+	m_R = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -66,7 +69,7 @@ void FERigidSphere::Init()
 
 vec3d FERigidSphere::Center()
 {
-	vec3d rc = m_rc;
+	vec3d rc = m_rc + m_uc;
 	return rc;
 }
 

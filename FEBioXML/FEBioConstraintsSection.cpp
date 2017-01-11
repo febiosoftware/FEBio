@@ -276,12 +276,13 @@ bool FEBioConstraintsSection::BuildSurface(FESurface& s, FEFacetSet& fs, bool bn
 		}
 		else
 		{
-			if      (fi.ntype == 4) el.SetType(FE_QUAD4G4);
-			else if (fi.ntype == 3) el.SetType(m_pim->m_ntri3);
-			else if (fi.ntype == 6) el.SetType(m_pim->m_ntri6);
-			else if (fi.ntype == 7) el.SetType(m_pim->m_ntri7);
-			else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
-			else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
+			if      (fi.ntype ==  4) el.SetType(FE_QUAD4G4);
+			else if (fi.ntype ==  3) el.SetType(m_pim->m_ntri3);
+			else if (fi.ntype ==  6) el.SetType(m_pim->m_ntri6);
+			else if (fi.ntype ==  7) el.SetType(m_pim->m_ntri7);
+			else if (fi.ntype == 10) el.SetType(m_pim->m_ntri10);
+			else if (fi.ntype ==  8) el.SetType(FE_QUAD8G9);
+			else if (fi.ntype ==  9) el.SetType(FE_QUAD9G9);
 			else return false;
 		}
 
@@ -678,6 +679,7 @@ bool FEBioConstraintsSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int
 			else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
 			else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
 			else if (tag == "tri7" ) el.SetType(m_pim->m_ntri7);
+			else if (tag == "tri10") el.SetType(m_pim->m_ntri10);
 			else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 			else if (tag == "quad9") el.SetType(FE_QUAD9G9);
 			else throw XMLReader::InvalidTag(tag);

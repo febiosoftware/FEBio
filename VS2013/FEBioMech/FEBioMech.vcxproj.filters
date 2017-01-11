@@ -621,6 +621,9 @@
     <ClInclude Include="..\..\FEBioMech\FESSIShellDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FERigidSphereContact.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1209,6 +1212,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FESSIShellDomain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FERigidSphereContact.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

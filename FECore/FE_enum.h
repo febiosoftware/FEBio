@@ -44,6 +44,7 @@ enum FE_Element_Shape {
 	ET_TRI3,
     ET_TRI6,
 	ET_TRI7,
+	ET_TRI10,
 	ET_TRUSS2,
 	ET_LINE2,
 	ET_DISCRETE
@@ -96,6 +97,7 @@ enum FE_Element_Type {
 	FE_TRI7G4,
 	FE_TRI7G7,
 	FE_TRI7GL7,
+	FE_TRI10G7,
 	FE_QUAD8G9,
     FE_QUAD8NI,
 	FE_QUAD9G9,

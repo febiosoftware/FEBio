@@ -78,6 +78,7 @@ protected:
 
 public:
 	vec3d	m_rc;		//!< center of sphere
+	vec3d	m_uc;		//!< displacement of center
 	double	m_R;		//!< radius
 
 	DECLARE_PARAMETER_LIST();

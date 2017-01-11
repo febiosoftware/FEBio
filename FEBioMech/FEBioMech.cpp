@@ -117,6 +117,7 @@
 #include "FEPeriodicBoundary.h"
 #include "FEPeriodicBoundary2O.h"
 #include "FERigidWallInterface.h"
+#include "FERigidSphereContact.h"
 #include "FESlidingInterface.h"
 #include "FESlidingInterfaceBW.h"
 #include "FESurfaceConstraint.h"
@@ -396,6 +397,7 @@ REGISTER_FECORE_CLASS(FEPeriodicBoundary     , FESURFACEPAIRINTERACTION_ID, "per
 REGISTER_FECORE_CLASS(FEPeriodicBoundary1O   , FESURFACEPAIRINTERACTION_ID, "periodic boundary1O"        );
 REGISTER_FECORE_CLASS(FEPeriodicBoundary2O   , FESURFACEPAIRINTERACTION_ID, "periodic boundary2O"        );
 REGISTER_FECORE_CLASS(FERigidWallInterface   , FESURFACEPAIRINTERACTION_ID, "rigid_wall"                 );
+REGISTER_FECORE_CLASS(FERigidSphereContact   , FESURFACEPAIRINTERACTION_ID, "rigid sphere"               );
 REGISTER_FECORE_CLASS(FESlidingInterface     , FESURFACEPAIRINTERACTION_ID, "sliding_with_gaps"          );
 REGISTER_FECORE_CLASS(FESlidingInterfaceBW   , FESURFACEPAIRINTERACTION_ID, "sliding-tension-compression");
 REGISTER_FECORE_CLASS(FESurfaceConstraint    , FESURFACEPAIRINTERACTION_ID, "surface constraint"         );

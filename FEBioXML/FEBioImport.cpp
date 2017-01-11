@@ -385,6 +385,7 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	m_ntri6  = FE_TRI6G7;
 	m_ntri3  = FE_TRI3G3;
 	m_ntri7  = FE_TRI7G7;
+	m_ntri10 = FE_TRI10G7;
 
 	// 3-field formulation flags
 	m_b3field_hex = true;
@@ -1081,6 +1082,7 @@ FESurface* FEBioImport::ParseSurface(XMLTag& tag, const char* szatt)
 			else if (tag == "tri3" ) el.SetType(m_ntri3);
 			else if (tag == "tri6" ) el.SetType(m_ntri6);
 			else if (tag == "tri7" ) el.SetType(m_ntri7);
+			else if (tag == "tri10") el.SetType(m_ntri10);
 			else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 			else if (tag == "quad9") el.SetType(FE_QUAD9G9);
 			else throw XMLReader::InvalidTag(tag);
@@ -1119,6 +1121,7 @@ bool FEBioImport::BuildSurface(FESurface& s, FEFacetSet& fs)
 		else if (fi.ntype == 3) el.SetType(m_ntri3);
 		else if (fi.ntype == 6) el.SetType(m_ntri6);
 		else if (fi.ntype == 7) el.SetType(m_ntri7);
+		else if (fi.ntype == 10) el.SetType(m_ntri10);
 		else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
 		else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
 		else return false;

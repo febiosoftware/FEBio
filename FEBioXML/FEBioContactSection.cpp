@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEBioContactSection.h"
 #include "FEBioMech/FERigidWallInterface.h"
+#include <FEBioMech/FERigidSphereContact.h>
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEModel.h>
@@ -34,6 +35,11 @@ void FEBioContactSection::Parse(XMLTag& tag)
 			{
 				if (nversion <= 0x0200) ParseRigidWall(tag);
 				else ParseRigidWall25(tag);
+			}
+			else if (strcmp(sztype, "rigid sphere") == 0)
+			{
+				if (nversion >= 0x0205) ParseRigidSphere(tag);
+				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 			}
 			else if (strcmp(sztype, "rigid") == 0)
 			{
@@ -275,6 +281,25 @@ void FEBioContactSection::ParseRigidWall25(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
+void FEBioContactSection::ParseRigidSphere(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	FERigidSphereContact* ps = dynamic_cast<FERigidSphereContact*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, "rigid sphere", GetFEModel()));
+	fem.AddSurfacePairInteraction(ps);
+
+	// get and build the surface
+	const char* sz = tag.AttributeValue("surface");
+	FEFacetSet* pface = mesh.FindFacetSet(sz);
+	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+	if (BuildSurface(ps->m_ss, *pface, false) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+
+	FEParameterList& pl = ps->GetParameterList();
+	m_pim->ReadParameterList(tag, pl);
+}
+
+//-----------------------------------------------------------------------------
 // --- R I G I D   B O D Y   I N T E R F A C E ---
 void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 {
@@ -412,6 +437,7 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 			else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
 			else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
 			else if (tag == "tri7" ) el.SetType(m_pim->m_ntri7);
+			else if (tag == "tri10") el.SetType(m_pim->m_ntri10);
 			else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 			else if (tag == "quad9") el.SetType(FE_QUAD9G9);
 			else throw XMLReader::InvalidTag(tag);
@@ -482,12 +508,13 @@ bool FEBioContactSection::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal
 		}
 		else
 		{
-			if      (fi.ntype == 4) el.SetType(FE_QUAD4G4);
-			else if (fi.ntype == 3) el.SetType(m_pim->m_ntri3);
-			else if (fi.ntype == 6) el.SetType(m_pim->m_ntri6);
-			else if (fi.ntype == 7) el.SetType(m_pim->m_ntri7);
-			else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
-			else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
+			if      (fi.ntype ==  4) el.SetType(FE_QUAD4G4);
+			else if (fi.ntype ==  3) el.SetType(m_pim->m_ntri3);
+			else if (fi.ntype ==  6) el.SetType(m_pim->m_ntri6);
+			else if (fi.ntype ==  7) el.SetType(m_pim->m_ntri7);
+			else if (fi.ntype == 10) el.SetType(m_pim->m_ntri10);
+			else if (fi.ntype ==  8) el.SetType(FE_QUAD8G9);
+			else if (fi.ntype ==  9) el.SetType(FE_QUAD9G9);
 			else return false;
 		}
 
