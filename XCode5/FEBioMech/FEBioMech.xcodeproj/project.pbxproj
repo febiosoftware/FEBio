@@ -97,6 +97,8 @@
 		D57549781AC3A0D6002934C7 /* FEOrthotropicCLE.h in Headers */ = {isa = PBXBuildFile; fileRef = D57549761AC3A0D6002934C7 /* FEOrthotropicCLE.h */; };
 		D576040E1E11B4D8008106EE /* FESSIShellDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D576040C1E11B4D8008106EE /* FESSIShellDomain.cpp */; };
 		D576040F1E11B4D8008106EE /* FESSIShellDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D576040D1E11B4D8008106EE /* FESSIShellDomain.h */; };
+		D5797EFD1E26BAC0009ACA24 /* FERigidSphereContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5797EFB1E26BAC0009ACA24 /* FERigidSphereContact.cpp */; };
+		D5797EFE1E26BAC0009ACA24 /* FERigidSphereContact.h in Headers */ = {isa = PBXBuildFile; fileRef = D5797EFC1E26BAC0009ACA24 /* FERigidSphereContact.h */; };
 		D57C1D0519AB8AC20091EAE4 /* FEReactiveViscoelastic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57C1D0319AB8AC20091EAE4 /* FEReactiveViscoelastic.cpp */; };
 		D57C1D0619AB8AC20091EAE4 /* FEReactiveViscoelastic.h in Headers */ = {isa = PBXBuildFile; fileRef = D57C1D0419AB8AC20091EAE4 /* FEReactiveViscoelastic.h */; };
 		D57C1D0919ABB99F0091EAE4 /* FEBondRelaxation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57C1D0719ABB99F0091EAE4 /* FEBondRelaxation.cpp */; };
@@ -495,6 +497,8 @@
 		D57549761AC3A0D6002934C7 /* FEOrthotropicCLE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOrthotropicCLE.h; sourceTree = "<group>"; };
 		D576040C1E11B4D8008106EE /* FESSIShellDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESSIShellDomain.cpp; sourceTree = "<group>"; };
 		D576040D1E11B4D8008106EE /* FESSIShellDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESSIShellDomain.h; sourceTree = "<group>"; };
+		D5797EFB1E26BAC0009ACA24 /* FERigidSphereContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidSphereContact.cpp; sourceTree = "<group>"; };
+		D5797EFC1E26BAC0009ACA24 /* FERigidSphereContact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidSphereContact.h; sourceTree = "<group>"; };
 		D57C1D0319AB8AC20091EAE4 /* FEReactiveViscoelastic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactiveViscoelastic.cpp; sourceTree = "<group>"; };
 		D57C1D0419AB8AC20091EAE4 /* FEReactiveViscoelastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReactiveViscoelastic.h; sourceTree = "<group>"; };
 		D57C1D0719ABB99F0091EAE4 /* FEBondRelaxation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBondRelaxation.cpp; sourceTree = "<group>"; };
@@ -1139,6 +1143,8 @@
 				D5E107321865DFAD00B23922 /* FERigidSolidDomain.h */,
 				D555F1051D60D94A0070B8AE /* FERigidSolver.cpp */,
 				D555F1061D60D94A0070B8AE /* FERigidSolver.h */,
+				D5797EFB1E26BAC0009ACA24 /* FERigidSphereContact.cpp */,
+				D5797EFC1E26BAC0009ACA24 /* FERigidSphereContact.h */,
 				D56DC21B19532A83006C137D /* FERigidSphericalJoint.cpp */,
 				D56DC21C19532A83006C137D /* FERigidSphericalJoint.h */,
 				D561928B1B0188200034DD51 /* FERigidSpring.cpp */,
@@ -1261,6 +1267,7 @@
 				D5E107D61865DFAD00B23922 /* FEFungOrthoCompressible.h in Headers */,
 				D57549781AC3A0D6002934C7 /* FEOrthotropicCLE.h in Headers */,
 				D5D806091C7D270B00547F07 /* FEElasticMaterial2O.h in Headers */,
+				D5797EFE1E26BAC0009ACA24 /* FERigidSphereContact.h in Headers */,
 				D5E107DA1865DFAD00B23922 /* FEGasserOgdenHolzapfel.h in Headers */,
 				D5E107971865DFAD00B23922 /* FEDamageMooneyRivlin.h in Headers */,
 				B465DA8A1B94A3A500EF4843 /* FESRIElasticSolidDomain.h in Headers */,
@@ -1628,6 +1635,7 @@
 				031FDFC11CC1947100048B41 /* FENewtonianViscousSolid.cpp in Sources */,
 				D555F10B1D60D94A0070B8AE /* FERigidSolver.cpp in Sources */,
 				D5E108051865DFAD00B23922 /* FEPointBodyForce.cpp in Sources */,
+				D5797EFD1E26BAC0009ACA24 /* FERigidSphereContact.cpp in Sources */,
 				D5E108071865DFAD00B23922 /* FEPointConstraint.cpp in Sources */,
 				D51BB3F1198FCA6A00638A8B /* FEFiberIntegrationGaussKronrod.cpp in Sources */,
 				D5E107C31865DFAD00B23922 /* FEFiberDensityDistribution.cpp in Sources */,
