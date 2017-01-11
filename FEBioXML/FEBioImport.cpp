@@ -558,7 +558,9 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 					if (xml2.FindTag("febio_spec", tag2) == false) return errf("FATAL ERROR: febio_spec tag was not found. This is not a valid input file.\n\n");
 
 					// find the section we are looking for
-					if (xml2.FindTag(tag.Name(), tag2) == false) return errf("FATAL ERROR: Couldn't find %s section in file %s.\n\n", tag.Name(), szinc);
+					char sz[512] = {0};
+					sprintf(sz, "febio_spec/%s", tag.Name());
+					if (xml2.FindTag(sz, tag2) == false) return errf("FATAL ERROR: Couldn't find %s section in file %s.\n\n", tag.Name(), szinc);
 
 					// parse the section
 					is->second->Parse(tag2);

@@ -158,7 +158,7 @@ int FESurface::FindElement(FESurfaceElement& el)
 		FEElement& e = *ppe[i];
 		int nfaces = mesh.Faces(e);
 		
-		int nf[9], nn;
+		int nf[FEElement::MAX_NODES], nn;
 		for (int j=0; j<nfaces; ++j)
 		{
 			nn = mesh.GetFace(e, j, nf);
@@ -166,12 +166,13 @@ int FESurface::FindElement(FESurfaceElement& el)
 			{
 				switch (nn)
 				{
-				case 3: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
-				case 4: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.GetID(); break;
-				case 6: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
-				case 7: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
-				case 8: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.GetID(); break;
-				case 9: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.GetID(); break;
+				case  3: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
+				case  4: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.GetID(); break;
+				case  6: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
+				case  7: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
+				case  8: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.GetID(); break;
+				case  9: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.GetID(); break;
+				case 10: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
 				default:
 					assert(false);
 				}
