@@ -1137,7 +1137,7 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveShellFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEBiphasicShellDomain*  pbsd= dynamic_cast<FEBiphasicShellDomain* >(&dom);
+    FEBiphasicDomain*  pbsd= dynamic_cast<FEBiphasicDomain* >(&dom);
     if (pbsd)
     {
         // get the pressure dof index

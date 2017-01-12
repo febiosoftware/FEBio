@@ -19,7 +19,6 @@ FEElasticShellDomain& FEElasticShellDomain::operator = (FEElasticShellDomain& d)
 { 
 	m_Elem = d.m_Elem; 
 	m_pMesh = d.m_pMesh; 
-	m_binit = d.m_binit;
 	return (*this); 
 }
 

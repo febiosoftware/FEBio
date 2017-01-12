@@ -5,7 +5,6 @@
 //-----------------------------------------------------------------------------
 FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomain(&pfem->GetMesh())
 {
-	m_binit = false;
     m_dofx = pfem->GetDOFIndex("x");
     m_dofy = pfem->GetDOFIndex("y");
     m_dofz = pfem->GetDOFIndex("z");
@@ -15,15 +14,17 @@ FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomain(&pfem->GetMesh
 }
 
 //-----------------------------------------------------------------------------
+bool FESSIShellDomain::Initialize()
+{
+    FEShellDomain::Initialize();
+    FindSSI();
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 void FESSIShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
 	FEShellDomain::PreSolveUpdate(timeInfo);
-
-	if (m_binit == false)
-	{
-		FindSSI();
-		m_binit = true;
-	}
 }
 
 //-----------------------------------------------------------------------------

@@ -116,7 +116,7 @@ void FEBiphasicSolidDomain::Activate()
         for (int j=0; j<neln; ++j)
         {
             FENode& node = m.Node(el.m_node[j]);
-            if (el.m_bitfc.size()>0 && el.m_bitfc[i])
+            if (el.m_bitfc.size()>0 && el.m_bitfc[j])
                 node.m_ID[m_dofQ] = DOF_ACTIVE;
             else
                 node.m_ID[m_dofP] = DOF_ACTIVE;

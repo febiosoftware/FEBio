@@ -10,6 +10,10 @@ class FESSIShellDomain : public FEShellDomain
 public:
 	FESSIShellDomain(FEModel* pfem);
 
+    //! initialize domain
+    //! one-time initialization, called during model initialization
+    bool Initialize();
+    
 	//! Update element data prior to solving time step
 	void PreSolveUpdate(const FETimeInfo& timeInfo);
 
@@ -56,7 +60,6 @@ public:
     vec3d gradient(FEShellElement& el, double* pn, double* dpn, int n);
     
 protected:
-	bool	m_binit;
     int     m_dofx;
     int     m_dofy;
     int     m_dofz;
