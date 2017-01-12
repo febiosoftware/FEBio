@@ -26,6 +26,7 @@ FEDomain* FEMixDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* 
 	{
 		// biphasic solute elements
 		if (eclass == FE_ELEM_SOLID) sztype = "biphasic-solute-solid";
+        else if (eclass == FE_ELEM_SHELL) sztype = "biphasic-solute-shell";
 		else return 0;
 	}
 	else if (dynamic_cast<FETriphasic*>(pmat))

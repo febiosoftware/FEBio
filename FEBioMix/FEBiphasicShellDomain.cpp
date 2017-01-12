@@ -36,11 +36,11 @@ void FEBiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 
     const int NE = FEElement::MAX_NODES;
     vec3d x0[NE], xt[NE], r0, rt;
-    double pn[NE], qn[NE], p, q;
+    double pn[NE], qn[NE], p;
     FEMesh& m = *GetMesh();
-    for (size_t i=0; i<m_Elem.size(); ++i)
+    for (size_t iel=0; iel<m_Elem.size(); ++iel)
     {
-        FEShellElement& el = m_Elem[i];
+        FEShellElement& el = m_Elem[iel];
         int neln = el.Nodes();
         for (int i=0; i<neln; ++i)
         {
@@ -55,8 +55,7 @@ void FEBiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
         {
             r0 = el.Evaluate(x0, j);
             rt = el.Evaluate(xt, j);
-            p = el.Evaluate(pn, j);
-            q = el.Evaluate(qn, j);
+            p = evaluate(el, pn, qn, j);
             
             FEMaterialPoint& mp = *el.GetMaterialPoint(j);
             FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -221,7 +220,7 @@ void FEBiphasicShellDomain::Reset()
 //-----------------------------------------------------------------------------
 void FEBiphasicShellDomain::InternalForces(FEGlobalVector& R)
 {
-    int NE = m_Elem.size();
+    int NE = (int)m_Elem.size();
 #pragma omp parallel for shared (NE)
     for (int i=0; i<NE; ++i)
     {
@@ -340,7 +339,7 @@ void FEBiphasicShellDomain::ElementInternalForce(FEShellElement& el, vector<doub
 //-----------------------------------------------------------------------------
 void FEBiphasicShellDomain::InternalForcesSS(FEGlobalVector& R)
 {
-    int NE = m_Elem.size();
+    int NE = (int)m_Elem.size();
 #pragma omp parallel for shared (NE)
     for (int i=0; i<NE; ++i)
     {
@@ -454,7 +453,7 @@ void FEBiphasicShellDomain::ElementInternalForceSS(FEShellElement& el, vector<do
 void FEBiphasicShellDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
 {
     // repeat over all solid elements
-    int NE = m_Elem.size();
+    int NE = (int)m_Elem.size();
     
 #pragma omp parallel for shared(NE)
     for (int iel=0; iel<NE; ++iel)
@@ -485,7 +484,7 @@ void FEBiphasicShellDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
 void FEBiphasicShellDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm)
 {
     // repeat over all solid elements
-    int NE = m_Elem.size();
+    int NE = (int)m_Elem.size();
     
 #pragma omp parallel for shared(NE)
     for (int iel=0; iel<NE; ++iel)
@@ -946,7 +945,7 @@ void FEBiphasicShellDomain::UpdateElementStress(int iel)
         // get the deformation gradient and determinant
         pt.m_J = defgrad(el, pt.m_F, n);
         
-        // poroelasticity data
+        // biphasic data
         FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
         
         // evaluate fluid pressure at gauss-point

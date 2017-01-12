@@ -141,9 +141,6 @@ bool FEBiphasicSolver::Quasin(double time)
 	bool bconv = false;		// convergence flag
 	bool breform = false;	// reformation flag
 
-	// get the current step
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
-
 	// prepare for the first iteration
 	FETimeInfo tp = m_fem.GetTime();
 	PrepStep(tp);
@@ -488,7 +485,6 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 
 	// get the time information
 	FETimeInfo tp = m_fem.GetTime();
-	double dt = tp.timeIncrement;
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -615,7 +611,7 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimeInfo& tp)
 	matrix ke;
 
 	// nodal degrees of freedom
-	int i, j, I;
+	int i;
 
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
@@ -623,7 +619,6 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimeInfo& tp)
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	bool bsymm = m_bsymm;
-	double dt = tp.timeIncrement;
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
@@ -744,8 +739,6 @@ void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 //-----------------------------------------------------------------------------
 void FEBiphasicSolver::UpdateContact()
 {
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
-
 	// mark all free-draining surfaces
 	for (int i=0; i<m_fem.SurfacePairInteractions(); ++i) 
 	{

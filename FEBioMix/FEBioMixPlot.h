@@ -256,6 +256,39 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Nodal effective solute concentrations (for biphasic-solute problems)
+class FEPlotEffectiveShellSoluteConcentration : public FEDomainData
+{
+public:
+    FEPlotEffectiveShellSoluteConcentration(FEModel* pfem);
+    bool SetFilter(const char* sz);
+    bool SetFilter(int nsol);
+    bool Save(FEDomain& m, FEDataStream& a);
+protected:
+    int			m_nsol;
+    FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! Base class for nodal effective solute concentrations
+class FEPlotEffectiveShellSolConcentration_ : public FEDomainData
+{
+public:
+    FEPlotEffectiveShellSolConcentration_(FEModel* pfem, int nsol) : FEDomainData(PLT_FLOAT, FMT_NODE), m_nsol(nsol) {}
+    bool Save(FEDomain& m, FEDataStream& a);
+private:
+    int m_nsol;
+};
+
+//-----------------------------------------------------------------------------
+//! template class for instantiating nodal effective solute concentrations
+template<int SOL> class FEPlotEffectiveShellSolConcentrationT : public FEPlotEffectiveShellSolConcentration_
+{
+public:
+    FEPlotEffectiveShellSolConcentrationT(FEModel* pfem) : FEPlotEffectiveShellSolConcentration_(pfem, SOL) {}
+};
+
+//-----------------------------------------------------------------------------
 //! Receptor-ligand complex concentration
 class FEPlotReceptorLigandConcentration : public FEDomainData
 {

@@ -30,8 +30,9 @@ FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel* pfem) : FEBiphasicSolver
 	// (We start with zero concentration degrees of freedom)
 	DOFS& dofs = pfem->GetDOFS();
 	int varC = dofs.AddVariable("concentration", VAR_ARRAY);
+    int varD = dofs.AddVariable("shell concentration", VAR_ARRAY);
 
-	m_dofC = -1;
+	m_dofC = m_dofD = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -42,16 +43,17 @@ bool FEBiphasicSoluteSolver::Init()
 	// initialize base class
 	if (FEBiphasicSolver::Init() == false) return false;
 
-	int i, j, n;
+	int i;
     
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
+    int MAX_DDOFS = fedofs.GetVariableSize("shell concentration");
     
 	// allocate concentration-vectors
-	m_ci.assign(MAX_CDOFS,vector<double>(0,0));
-	m_Ci.assign(MAX_CDOFS,vector<double>(0,0));
-	for (i=0; i<MAX_CDOFS; ++i) {
+	m_ci.assign(MAX_CDOFS+MAX_DDOFS,vector<double>(0,0));
+	m_Ci.assign(MAX_CDOFS+MAX_DDOFS,vector<double>(0,0));
+	for (i=0; i<MAX_CDOFS+MAX_DDOFS; ++i) {
 		m_ci[i].assign(m_nceq[i], 0);
 		m_Ci[i].assign(m_nceq[i], 0);
 	}
@@ -63,6 +65,11 @@ bool FEBiphasicSoluteSolver::Init()
 		if (m_nceq[j])
 			dofs.push_back(m_dofC + j);
 	}
+    for (int j=0; j<MAX_DDOFS; ++j)
+    {
+        if (m_nceq[MAX_CDOFS+j])
+            dofs.push_back(m_dofD + j);
+    }
 
 	FEMesh& mesh = m_fem.GetMesh();
 	gather(m_Ut, mesh, dofs);
@@ -85,13 +92,16 @@ bool FEBiphasicSoluteSolver::InitEquations()
     DOFS& fedofs = m_fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
 	m_dofC = m_fem.GetDOFIndex("concentration", 0);
+    m_dofD = m_fem.GetDOFIndex("shell concentration", 0);
 
     m_nceq.assign(MAX_CDOFS, 0);
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& n = mesh.Node(i);
-		for (int j=0; j<MAX_CDOFS; ++j)
+        for (int j=0; j<MAX_CDOFS; ++j) {
 			if (n.m_ID[m_dofC+j] != -1) m_nceq[j]++;
+            if (n.m_ID[m_dofD+j] != -1) m_nceq[j]++;
+        }
 	}
 	
 	return true;
@@ -123,7 +133,7 @@ void FEBiphasicSoluteSolver::NodalForces(vector<double>& F, const FETimeInfo& tp
 			
 				// For pressure and concentration loads, multiply by dt
 				// for consistency with evaluation of residual and stiffness matrix
-				if ((dof == m_dofP) || (dof >= m_dofC)) f *= tp.timeIncrement;
+				if ((dof == m_dofP) || (dof == m_dofQ) || (dof >= m_dofC)) f *= tp.timeIncrement;
 
 				// assemble into residual
 				AssembleResidual(nid, dof, f, F);
@@ -178,9 +188,6 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 	// initialize flags
 	bool bconv = false;		// convergence flag
 	bool breform = false;	// reformation flag
-
-	// get the current step
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// prepare for the first iteration
 	FETimeInfo tp = m_fem.GetTime();
@@ -524,7 +531,6 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 
 	// get the time information
 	FETimeInfo tp = m_fem.GetTime();
-	double dt = tp.timeIncrement;
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -638,7 +644,7 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix(const FETimeInfo& tp)
 	matrix ke;
 
 	// nodal degrees of freedom
-	int i, j, I;
+	int i;
 
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
@@ -646,7 +652,6 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix(const FETimeInfo& tp)
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	bool bsymm = m_bsymm;
-	double dt = tp.timeIncrement;
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
@@ -720,6 +725,13 @@ void FEBiphasicSoluteSolver::GetConcentrationData(vector<double> &ci, vector<dou
 			ci[m++] = ui[nid];
 			assert(m <= (int) ci.size());
 		}
+        nid = n.m_ID[m_dofD+sol];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            ci[m++] = ui[nid];
+            assert(m <= (int) ci.size());
+        }
 	}
 }
 
@@ -746,6 +758,7 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
+    int MAX_DDOFS = fedofs.GetVariableSize("shell concentration");
     
 	// update solute data
 	for (int i=0; i<mesh.Nodes(); ++i)
@@ -755,7 +768,6 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 		// update nodal concentration
 		for (int j=0; j<MAX_CDOFS; ++j) {
 			int n = node.m_ID[m_dofC+j];
-//			if (n >= 0) node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 			// Force the concentrations to remain positive
 			if (n >= 0) {
 				double ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
@@ -763,6 +775,15 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 				node.set(m_dofC + j, ct);
 			}
 		}
+        for (int j=0; j<MAX_DDOFS; ++j) {
+            int n = node.m_ID[m_dofD+j];
+            // Force the concentrations to remain positive
+            if (n >= 0) {
+                double ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+                if (ct < 0) ct = 0.0;
+                node.set(m_dofD + j, ct);
+            }
+        }
 	}
 	
 	// update solute data
@@ -786,12 +807,14 @@ void FEBiphasicSoluteSolver::Serialize(DumpStream& ar)
 		ar << m_Ctol;
 		ar << m_nceq;
 		ar << m_dofC;
+        ar << m_dofD;
 	}
 	else
 	{
 		ar >> m_Ctol;
 		ar >> m_nceq;
 		ar >> m_dofC;
+        ar >> m_dofD;
 	}
 
 	FEBiphasicSolver::Serialize(ar);

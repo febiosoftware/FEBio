@@ -59,7 +59,8 @@
 #include "FEMixDomainFactory.h"
 #include "FEBiphasicSolidDomain.h"
 #include "FEBiphasicShellDomain.h"
-#include "FEBiphasicSoluteDomain.h"
+#include "FEBiphasicSoluteSolidDomain.h"
+#include "FEBiphasicSoluteShellDomain.h"
 #include "FETriphasicDomain.h"
 #include "FEMultiphasicDomain.h"
 
@@ -129,11 +130,12 @@ REGISTER_FECORE_CLASS(FEActiveConstantSupply              ,FEMATERIAL_ID, "activ
 
 //-----------------------------------------------------------------------------
 // Domain classes
-REGISTER_FECORE_CLASS(FEBiphasicSolidDomain , FEDOMAIN_ID, "biphasic-solid"       );
-REGISTER_FECORE_CLASS(FEBiphasicShellDomain , FEDOMAIN_ID, "biphasic-shell"       );
-REGISTER_FECORE_CLASS(FEBiphasicSoluteDomain, FEDOMAIN_ID, "biphasic-solute-solid");
-REGISTER_FECORE_CLASS(FETriphasicDomain     , FEDOMAIN_ID, "triphasic-solid"      );
-REGISTER_FECORE_CLASS(FEMultiphasicDomain   , FEDOMAIN_ID, "multiphasic-solid"    );
+REGISTER_FECORE_CLASS(FEBiphasicSolidDomain      , FEDOMAIN_ID, "biphasic-solid"       );
+REGISTER_FECORE_CLASS(FEBiphasicShellDomain      , FEDOMAIN_ID, "biphasic-shell"       );
+REGISTER_FECORE_CLASS(FEBiphasicSoluteSolidDomain, FEDOMAIN_ID, "biphasic-solute-solid");
+REGISTER_FECORE_CLASS(FEBiphasicSoluteShellDomain, FEDOMAIN_ID, "biphasic-solute-shell");
+REGISTER_FECORE_CLASS(FETriphasicDomain          , FEDOMAIN_ID, "triphasic-solid"      );
+REGISTER_FECORE_CLASS(FEMultiphasicDomain        , FEDOMAIN_ID, "multiphasic-solid"    );
 
 //-----------------------------------------------------------------------------
 // Surface loads
@@ -162,26 +164,32 @@ REGISTER_FECORE_CLASS(FEPlotSoluteFlux                   , FEPLOTDATA_ID, "solut
 REGISTER_FECORE_CLASS(FEPlotReceptorLigandConcentration  , FEPLOTDATA_ID, "receptor-ligand concentration"   );
 REGISTER_FECORE_CLASS(FEPlotSBMConcentration             , FEPLOTDATA_ID, "sbm concentration"			    );
 REGISTER_FECORE_CLASS_T(FEPlotEffectiveSolConcentrationT , FEPLOTDATA_ID, 0, "effective solute 1 concentration");
+REGISTER_FECORE_CLASS_T(FEPlotEffectiveShellSolConcentrationT , FEPLOTDATA_ID, 0, "effective shell solute 1 concentration");
 REGISTER_FECORE_CLASS_T(FEPlotActualSolConcentrationT    , FEPLOTDATA_ID, 0, "solute 1 concentration"          );
 REGISTER_FECORE_CLASS_T(FEPlotSolFluxT                   , FEPLOTDATA_ID, 0, "solute 1 flux"                   );
 REGISTER_FECORE_CLASS_T(FEPlotSBMConcentrationT          , FEPLOTDATA_ID, 0, "sbm 1 concentration"			   );
 REGISTER_FECORE_CLASS_T(FEPlotEffectiveSolConcentrationT , FEPLOTDATA_ID, 1, "effective solute 2 concentration");
+REGISTER_FECORE_CLASS_T(FEPlotEffectiveShellSolConcentrationT , FEPLOTDATA_ID, 1, "effective shell solute 2 concentration");
 REGISTER_FECORE_CLASS_T(FEPlotActualSolConcentrationT    , FEPLOTDATA_ID, 1, "solute 2 concentration"          );
 REGISTER_FECORE_CLASS_T(FEPlotSolFluxT                   , FEPLOTDATA_ID, 1, "solute 2 flux"                   );
 REGISTER_FECORE_CLASS_T(FEPlotSBMConcentrationT          , FEPLOTDATA_ID, 1, "sbm 2 concentration"			   );
 REGISTER_FECORE_CLASS_T(FEPlotEffectiveSolConcentrationT , FEPLOTDATA_ID, 2, "effective solute 3 concentration");
+REGISTER_FECORE_CLASS_T(FEPlotEffectiveShellSolConcentrationT , FEPLOTDATA_ID, 2, "effective shell solute 3 concentration");
 REGISTER_FECORE_CLASS_T(FEPlotActualSolConcentrationT    , FEPLOTDATA_ID, 2, "solute 3 concentration"          );
 REGISTER_FECORE_CLASS_T(FEPlotSolFluxT                   , FEPLOTDATA_ID, 2, "solute 3 flux"                   );
 REGISTER_FECORE_CLASS_T(FEPlotSBMConcentrationT          , FEPLOTDATA_ID, 2, "sbm 3 concentration"			   );
 REGISTER_FECORE_CLASS_T(FEPlotEffectiveSolConcentrationT , FEPLOTDATA_ID, 3, "effective solute 4 concentration");
+REGISTER_FECORE_CLASS_T(FEPlotEffectiveShellSolConcentrationT , FEPLOTDATA_ID, 3, "effective shell solute 4 concentration");
 REGISTER_FECORE_CLASS_T(FEPlotActualSolConcentrationT    , FEPLOTDATA_ID, 3, "solute 4 concentration"          );
 REGISTER_FECORE_CLASS_T(FEPlotSolFluxT                   , FEPLOTDATA_ID, 3, "solute 4 flux"                   );
 REGISTER_FECORE_CLASS_T(FEPlotSBMConcentrationT          , FEPLOTDATA_ID, 3, "sbm 4 concentration"			   );
 REGISTER_FECORE_CLASS_T(FEPlotEffectiveSolConcentrationT , FEPLOTDATA_ID, 4, "effective solute 5 concentration");
+REGISTER_FECORE_CLASS_T(FEPlotEffectiveShellSolConcentrationT , FEPLOTDATA_ID, 4, "effective shell solute 5 concentration");
 REGISTER_FECORE_CLASS_T(FEPlotActualSolConcentrationT    , FEPLOTDATA_ID, 4, "solute 5 concentration"          );
 REGISTER_FECORE_CLASS_T(FEPlotSolFluxT                   , FEPLOTDATA_ID, 4, "solute 5 flux"                   );
 REGISTER_FECORE_CLASS_T(FEPlotSBMConcentrationT          , FEPLOTDATA_ID, 4, "sbm 5 concentration"			   );
 REGISTER_FECORE_CLASS_T(FEPlotEffectiveSolConcentrationT , FEPLOTDATA_ID, 5, "effective solute 6 concentration");
+REGISTER_FECORE_CLASS_T(FEPlotEffectiveShellSolConcentrationT , FEPLOTDATA_ID, 5, "effective shell solute 6 concentration");
 REGISTER_FECORE_CLASS_T(FEPlotActualSolConcentrationT    , FEPLOTDATA_ID, 5, "solute 6 concentration"          );
 REGISTER_FECORE_CLASS_T(FEPlotSolFluxT                   , FEPLOTDATA_ID, 5, "solute 6 flux"                   );
 REGISTER_FECORE_CLASS_T(FEPlotSBMConcentrationT          , FEPLOTDATA_ID, 5, "sbm 6 concentration"			   );

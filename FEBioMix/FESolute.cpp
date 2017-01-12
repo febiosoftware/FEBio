@@ -33,10 +33,14 @@ bool FESoluteData::Init()
 	FEModel& fem = *GetFEModel();
     DOFS& fedofs = fem.GetDOFS();
 	int varC = fedofs.GetVariableIndex("concentration");
+    int varD = fedofs.GetVariableIndex("shell concentration");
 	int cdofs = fedofs.GetVariableSize(varC);
+    int ddofs = fedofs.GetVariableSize(varD);
 	char sz[8] = {0};
 	sprintf(sz, "c%d", cdofs+1);
 	fedofs.AddDOF(varC, sz);
+    sprintf(sz, "d%d", ddofs+1);
+    fedofs.AddDOF(varD, sz);
 
 	return true;
 }

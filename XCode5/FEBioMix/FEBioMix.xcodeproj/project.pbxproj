@@ -27,6 +27,10 @@
 		D577FBDA1CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h in Headers */ = {isa = PBXBuildFile; fileRef = D577FBD81CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h */; };
 		D58570F91A81BEC60038367C /* FEReactionRateExpSED.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58570F71A81BEC60038367C /* FEReactionRateExpSED.cpp */; };
 		D58570FA1A81BEC60038367C /* FEReactionRateExpSED.h in Headers */ = {isa = PBXBuildFile; fileRef = D58570F81A81BEC60038367C /* FEReactionRateExpSED.h */; };
+		D598BB6C1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D598BB6A1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.cpp */; };
+		D598BB6D1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D598BB6B1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.h */; };
+		D598BB701E049B0E00DE5E25 /* FEBiphasicSoluteShellDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D598BB6E1E049B0E00DE5E25 /* FEBiphasicSoluteShellDomain.cpp */; };
+		D598BB711E049B0E00DE5E25 /* FEBiphasicSoluteShellDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D598BB6F1E049B0E00DE5E25 /* FEBiphasicSoluteShellDomain.h */; };
 		D59F6B0F1E007D7D000E7922 /* FEBiphasicDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59F6B0D1E007D7D000E7922 /* FEBiphasicDomain.cpp */; };
 		D59F6B101E007D7D000E7922 /* FEBiphasicDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D59F6B0E1E007D7D000E7922 /* FEBiphasicDomain.h */; };
 		D59F6B131E008219000E7922 /* FEBiphasicShellDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59F6B111E008219000E7922 /* FEBiphasicShellDomain.cpp */; };
@@ -167,6 +171,10 @@
 		D577FBD81CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESlidingInterfaceBiphasic.h; sourceTree = "<group>"; };
 		D58570F71A81BEC60038367C /* FEReactionRateExpSED.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactionRateExpSED.cpp; sourceTree = "<group>"; };
 		D58570F81A81BEC60038367C /* FEReactionRateExpSED.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReactionRateExpSED.h; sourceTree = "<group>"; };
+		D598BB6A1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicSoluteSolidDomain.cpp; sourceTree = "<group>"; };
+		D598BB6B1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicSoluteSolidDomain.h; sourceTree = "<group>"; };
+		D598BB6E1E049B0E00DE5E25 /* FEBiphasicSoluteShellDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicSoluteShellDomain.cpp; sourceTree = "<group>"; };
+		D598BB6F1E049B0E00DE5E25 /* FEBiphasicSoluteShellDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicSoluteShellDomain.h; sourceTree = "<group>"; };
 		D59F6B0D1E007D7D000E7922 /* FEBiphasicDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicDomain.cpp; sourceTree = "<group>"; };
 		D59F6B0E1E007D7D000E7922 /* FEBiphasicDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicDomain.h; sourceTree = "<group>"; };
 		D59F6B111E008219000E7922 /* FEBiphasicShellDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicShellDomain.cpp; sourceTree = "<group>"; };
@@ -341,6 +349,10 @@
 				D5E108791865E02800B23922 /* FEBiphasicSolute.h */,
 				D5E1087C1865E02800B23922 /* FEBiphasicSoluteDomain.cpp */,
 				D5E1087D1865E02800B23922 /* FEBiphasicSoluteDomain.h */,
+				D598BB6E1E049B0E00DE5E25 /* FEBiphasicSoluteShellDomain.cpp */,
+				D598BB6F1E049B0E00DE5E25 /* FEBiphasicSoluteShellDomain.h */,
+				D598BB6A1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.cpp */,
+				D598BB6B1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.h */,
 				D5E1087E1865E02800B23922 /* FEBiphasicSoluteSolver.cpp */,
 				D5E1087F1865E02800B23922 /* FEBiphasicSoluteSolver.h */,
 				D5E108801865E02800B23922 /* FEBiphasicSolver.cpp */,
@@ -476,6 +488,7 @@
 				D5E108F81865E02800B23922 /* FEFluidFlux.h in Headers */,
 				D5C69F891A375DE200EB52B2 /* FEActiveMomentumSupply.h in Headers */,
 				D5B1549D19A8CF1F00062638 /* FEReactionRateNims.h in Headers */,
+				D598BB711E049B0E00DE5E25 /* FEBiphasicSoluteShellDomain.h in Headers */,
 				D5E108F41865E02800B23922 /* FEDiffConstOrtho.h in Headers */,
 				D52146011C40334600B5572C /* FEOsmCoefManning.h in Headers */,
 				D5E109241865E02800B23922 /* FESolubConst.h in Headers */,
@@ -490,6 +503,7 @@
 				D50134591B1275260066E436 /* FEFiberPowLinearSBM.h in Headers */,
 				D5E108DA1865E02800B23922 /* FEBiphasic.h in Headers */,
 				D5E109161865E02800B23922 /* FEPoroTraction.h in Headers */,
+				D598BB6D1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.h in Headers */,
 				D5E108EA1865E02800B23922 /* FECarterHayes.h in Headers */,
 				D5E108D41865E02800B23922 /* FEBioMix.h in Headers */,
 				D5E108FA1865E02800B23922 /* FEMassActionForward.h in Headers */,
@@ -613,6 +627,7 @@
 				D5E109331865E02800B23922 /* FETiedBiphasicInterface.cpp in Sources */,
 				D5E108D31865E02800B23922 /* FEBioMix.cpp in Sources */,
 				D5E109351865E02800B23922 /* FETriphasic.cpp in Sources */,
+				D598BB701E049B0E00DE5E25 /* FEBiphasicSoluteShellDomain.cpp in Sources */,
 				D5E1092F1865E02800B23922 /* FESupplyMichaelisMenten.cpp in Sources */,
 				D577FBD91CD63A5E00E4857B /* FESlidingInterfaceBiphasic.cpp in Sources */,
 				D534C48218BA930A006B5E1B /* FEMultiphasicStandard.cpp in Sources */,
@@ -624,6 +639,7 @@
 				D5E108ED1865E02800B23922 /* FEConcentrationIndependentReaction.cpp in Sources */,
 				D5E109091865E02800B23922 /* FEOsmCoefConst.cpp in Sources */,
 				D5ECCEE9186644B00073481A /* FESolventSupply.cpp in Sources */,
+				D598BB6C1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.cpp in Sources */,
 				D5E109211865E02800B23922 /* FESlidingInterfaceMP.cpp in Sources */,
 				D5E108E71865E02800B23922 /* FEBiphasicSolver.cpp in Sources */,
 				D59F6B0F1E007D7D000E7922 /* FEBiphasicDomain.cpp in Sources */,

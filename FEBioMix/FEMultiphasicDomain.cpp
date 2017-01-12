@@ -269,9 +269,9 @@ void FEMultiphasicDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 	const int NE = FEElement::MAX_NODES;
 	vec3d x0[NE], xt[NE], r0, rt;
 	FEMesh& m = *GetMesh();
-	for (size_t i=0; i<m_Elem.size(); ++i)
+	for (size_t iel=0; iel<m_Elem.size(); ++iel)
 	{
-		FESolidElement& el = m_Elem[i];
+		FESolidElement& el = m_Elem[iel];
 		int neln = el.Nodes();
 		for (int i=0; i<neln; ++i)
 		{

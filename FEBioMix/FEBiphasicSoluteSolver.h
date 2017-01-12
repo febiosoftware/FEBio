@@ -55,6 +55,7 @@ public:
 	vector< vector<double> >	m_Ci;	//!< Total concentration vector for iteration
 
 	int	m_dofC;	//!< concentration dof
+    int	m_dofD;	//!< shell concentration dof
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

@@ -3,6 +3,8 @@
 #include "FEBiphasicSolidDomain.h"
 #include "FEBiphasicShellDomain.h"
 #include "FEBiphasicSoluteDomain.h"
+#include "FEBiphasicSoluteSolidDomain.h"
+#include "FEBiphasicSoluteShellDomain.h"
 #include "FETriphasicDomain.h"
 #include "FEMultiphasicDomain.h"
 #include "FEBiphasic.h"
@@ -85,10 +87,10 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
 //-----------------------------------------------------------------------------
 bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 {
-	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-	if ((dynamic_cast<FEBiphasicSolidDomain* >(&bd)) || 
-		(dynamic_cast<FEBiphasicSoluteDomain*>(&bd)) ||
+    FEShellDomain& bsd = static_cast<FEShellDomain&>(dom);
+	if ((dynamic_cast<FEBiphasicSolidDomain* >(&bd)) ||
+		(dynamic_cast<FEBiphasicSoluteSolidDomain*>(&bd)) ||
 		(dynamic_cast<FETriphasicDomain*     >(&bd)) ||
 		(dynamic_cast<FEMultiphasicDomain*   >(&bd)))
 	{
@@ -111,6 +113,29 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 		}
 		return true;
 	}
+    else if ((dynamic_cast<FEBiphasicShellDomain* >(&bsd)) ||
+             (dynamic_cast<FEBiphasicSoluteShellDomain* >(&bsd))
+             )
+    {
+        for (int i=0; i<bsd.Elements(); ++i)
+        {
+            FEShellElement& el = bsd.Element(i);
+            
+            // calculate average pressure
+            double ew = 0;
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+                
+                if (pt) ew += pt->m_pa;
+            }
+            ew /= el.GaussPoints();
+            
+            a << ew;
+        }
+        return true;
+    }
     else if (dynamic_cast<FEFluidDomain* >(&bd))
     {
         for (int i=0; i<bd.Elements(); ++i)
@@ -142,7 +167,7 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
     FEShellDomain* bsd = dynamic_cast<FEShellDomain*>(&dom);
 	if (bd && (
         (dynamic_cast<FEBiphasicSolidDomain* >(bd)) ||
-		(dynamic_cast<FEBiphasicSoluteDomain*>(bd)) ||
+		(dynamic_cast<FEBiphasicSoluteSolidDomain*>(bd)) ||
 		(dynamic_cast<FETriphasicDomain*     >(bd)) ||
 		(dynamic_cast<FEMultiphasicDomain*   >(bd))))
 	{
@@ -165,8 +190,9 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 		}
 		return true;
 	}
-    else if (bsd &&
-             (dynamic_cast<FEBiphasicShellDomain* >(bsd)))
+    else if (bsd && (
+                     (dynamic_cast<FEBiphasicShellDomain* >(bsd)) ||
+                     (dynamic_cast<FEBiphasicSoluteShellDomain* >(bsd))))
     {
         for (int i=0; i<bsd->Elements(); ++i)
         {
@@ -194,10 +220,9 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotNodalFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 {
-	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
 	if ((dynamic_cast<FEBiphasicSolidDomain* >(&bd)) ||
-		(dynamic_cast<FEBiphasicSoluteDomain*>(&bd)) ||
+		(dynamic_cast<FEBiphasicSoluteSolidDomain*>(&bd)) ||
 		(dynamic_cast<FETriphasicDomain*     >(&bd)) ||
 		(dynamic_cast<FEMultiphasicDomain*   >(&bd)))
 	{
@@ -690,7 +715,7 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
-	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FEBiphasicSoluteSolidDomain* psd = dynamic_cast<FEBiphasicSoluteSolidDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
 	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
@@ -1138,7 +1163,8 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 bool FEPlotEffectiveShellFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 {
     FEBiphasicDomain*  pbsd= dynamic_cast<FEBiphasicDomain* >(&dom);
-    if (pbsd)
+    FEBiphasicSoluteShellDomain*  pbssd= dynamic_cast<FEBiphasicSoluteShellDomain* >(&dom);
+    if (pbsd || pbssd)
     {
         // get the pressure dof index
         int dof_q = GetFEModel()->GetDOFIndex("q");
@@ -1262,11 +1288,117 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+FEPlotEffectiveShellSoluteConcentration::FEPlotEffectiveShellSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE)
+{
+    m_pfem = pfem;
+    m_nsol = 0;
+}
+
+//-----------------------------------------------------------------------------
+// Resolve solute by name
+bool FEPlotEffectiveShellSoluteConcentration::SetFilter(const char* sz)
+{
+    m_nsol = GetSoluteID(*m_pfem, sz);
+    return (m_nsol != -1);
+}
+
+//-----------------------------------------------------------------------------
+// Resolve solute by solute ID
+bool FEPlotEffectiveShellSoluteConcentration::SetFilter(int nsol)
+{
+    m_nsol = GetSoluteID(*m_pfem, nsol);
+    return (m_nsol != -1);
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveShellSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
+{
+    // make sure we have a valid index
+    int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
+    if (nsid == -1) return false;
+    
+    // get the dof
+    const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", nsid);
+    
+    int N = dom.Nodes();
+    for (int i=0; i<N; ++i)
+    {
+        FENode& node = dom.Node(i);
+        a << node.get(dof_D);
+    }
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveShellSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEBiphasicSolute* pbm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+    if (pbm)
+    {
+        // Check if this solute is present in this specific biphasic-solute mixture
+        bool present = (pbm->GetSolute()->GetSoluteID() == m_nsol);
+        if (!present) return false;
+        
+        // get the dof
+        const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
+        
+        int N = dom.Nodes();
+        for (int i=0; i<N; ++i)
+        {
+            FENode& node = dom.Node(i);
+            a << node.get(dof_D);
+        }
+        return true;
+    }
+    
+    FETriphasic* ptm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+    if (ptm)
+    {
+        // Check if this solute is present in this specific triphasic mixture
+        bool present = (ptm->m_pSolute[0]->GetSoluteID() == m_nsol) || (ptm->m_pSolute[1]->GetSoluteID() == m_nsol);
+        if (!present) return false;
+        
+        // get the dof
+        const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
+        
+        int N = dom.Nodes();
+        for (int i=0; i<N; ++i)
+        {
+            FENode& node = dom.Node(i);
+            a << node.get(dof_D);
+        }
+        return true;
+    }
+    
+    FEMultiphasic* pmm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+    if (pmm)
+    {
+        // Check if this solute is present in this specific multiphasic mixture
+        bool present = false;
+        for (int i=0; i<pmm->Solutes(); ++i)
+            if (pmm->GetSolute(i)->GetSoluteID() == m_nsol) {present = true; break;}
+        if (!present) return false;
+        
+        // get the dof
+        const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
+        
+        int N = dom.Nodes();
+        for (int i=0; i<N; ++i)
+        {
+            FENode& node = dom.Node(i);
+            a << node.get(dof_D);
+        }
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
-	FEBiphasicSoluteDomain* pbd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FEBiphasicSoluteSolidDomain* pbd = dynamic_cast<FEBiphasicSoluteSolidDomain*>(&dom);
 	if (pbd)
 	{
 		for (i=0; i<pbd->Elements(); ++i)
