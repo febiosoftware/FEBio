@@ -659,6 +659,7 @@
     <ClInclude Include="..\..\FECore\FELinearConstraint.h" />
     <ClInclude Include="..\..\FECore\FELinearConstraintManager.h" />
     <ClInclude Include="..\..\FECore\FELinearSolver.h" />
+    <ClInclude Include="..\..\FECore\FELinearSystem.h" />
     <ClInclude Include="..\..\FECore\FEMaterial.h" />
     <ClInclude Include="..\..\FECore\FEMaterialPoint.h" />
     <ClInclude Include="..\..\FECore\FEMesh.h" />
@@ -684,7 +685,6 @@
     <ClInclude Include="..\..\FECore\FEShellDomain.h" />
     <ClInclude Include="..\..\FECore\FESolidDomain.h" />
     <ClInclude Include="..\..\FECore\FESolver.h" />
-    <ClInclude Include="..\..\FECore\FEStiffnessMatrix.h" />
     <ClInclude Include="..\..\FECore\FESurface.h" />
     <ClInclude Include="..\..\FECore\FESurfaceLoad.h" />
     <ClInclude Include="..\..\FECore\FESurfaceMap.h" />
@@ -794,6 +794,7 @@
     <ClCompile Include="..\..\FECore\FELinearConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FELinearConstraintManager.cpp" />
     <ClCompile Include="..\..\FECore\FELinearSolver.cpp" />
+    <ClCompile Include="..\..\FECore\FELinearSystem.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterialPoint.cpp" />
     <ClCompile Include="..\..\FECore\FEMesh.cpp" />
@@ -818,7 +819,6 @@
     <ClCompile Include="..\..\FECore\FEShellDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESolidDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESolver.cpp" />
-    <ClCompile Include="..\..\FECore\FEStiffnessMatrix.cpp" />
     <ClCompile Include="..\..\FECore\FESurface.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceLoad.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceMap.cpp" />

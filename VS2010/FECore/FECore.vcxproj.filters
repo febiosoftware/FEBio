@@ -415,10 +415,10 @@
     <ClInclude Include="..\..\FECore\FETransform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FEStiffnessMatrix.h">
+    <ClInclude Include="..\..\FECore\Integrate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\Integrate.h">
+    <ClInclude Include="..\..\FECore\FELinearSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -747,10 +747,10 @@
     <ClCompile Include="..\..\FECore\FETransform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\FEStiffnessMatrix.cpp">
+    <ClCompile Include="..\..\FECore\Integrate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\Integrate.cpp">
+    <ClCompile Include="..\..\FECore\FELinearSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
