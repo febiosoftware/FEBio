@@ -108,6 +108,12 @@ public:
 	//! calculate the global position of an integration point
 	vec3d Local2Global(FESurfaceElement& el, int n);
 
+    //! calculate the global position of a point on the surface at previous time
+    vec3d Local2GlobalP(FESurfaceElement& el, double r, double s);
+    
+    //! calculate the global position of an integration point at previous time
+    vec3d Local2GlobalP(FESurfaceElement& el, int n);
+    
 	//! calculates the covariant base vectors of a surface at an integration point
 	void CoBaseVectors(FESurfaceElement& el, int j, vec3d t[2]);
 

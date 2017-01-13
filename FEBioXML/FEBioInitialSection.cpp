@@ -94,6 +94,7 @@ void FEBioInitialSection::ParseInitialSection(XMLTag& tag)
 			int ndof = -1;
 			if      (tag == "temperature"   ) ndof = dofs.GetDOF("T");
 			else if (tag == "fluid_pressure") ndof = dofs.GetDOF("p");
+            else if (tag == "fluid_shell_pressure") ndof = dofs.GetDOF("q");
             else if (tag == "dilatation"    ) ndof = dofs.GetDOF("e");
 			else if (tag == "concentration" )
 			{
@@ -104,6 +105,15 @@ void FEBioInitialSection::ParseInitialSection(XMLTag& tag)
 
 				ndof = dofs.GetDOF("concentration", isol);
 			}
+            else if (tag == "shell_concentration" )
+            {
+                // TODO: Add a check to make sure that a solute with this ID exists
+                int isol = 0;
+                const char* sz = tag.AttributeValue("sol", true);
+                if (sz) isol = atoi(sz) - 1;
+                
+                ndof = dofs.GetDOF("shell concentration", isol);
+            }
 			else throw XMLReader::InvalidTag(tag);
 			if (ndof == -1) throw XMLReader::InvalidTag(tag);
 

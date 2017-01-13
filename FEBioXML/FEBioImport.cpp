@@ -500,6 +500,8 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			dofs.SetDOFName(varQAP, 2, "awp");
 			// must be last variable definition!!
 			int varC = dofs.AddVariable("concentration", VAR_ARRAY); // we start with zero concentrations
+            // must be last variable definition!!
+            int varSC = dofs.AddVariable("shell concentration", VAR_ARRAY); // we start with zero concentrations
 		}
 
 		// parse the file

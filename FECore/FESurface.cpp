@@ -697,6 +697,42 @@ vec3d FESurface::Local2Global(FESurfaceElement &el, int n)
 }
 
 //-----------------------------------------------------------------------------
+//! Given an element an the natural coordinates of a point in this element, this
+//! function returns the global position vector at the previous time.
+vec3d FESurface::Local2GlobalP(FESurfaceElement &el, double r, double s)
+{
+    // get the mesh
+    FEMesh& mesh = *m_pMesh;
+    
+    // get the coordinates of the element nodes
+    int ne = el.Nodes();
+    vec3d y[FEElement::MAX_NODES];
+    for (int l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).m_rp;
+    
+    // calculate the element position
+    return el.eval(y, r, s);
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the global location of an integration point
+//!
+
+vec3d FESurface::Local2GlobalP(FESurfaceElement &el, int n)
+{
+    FEMesh& m = *m_pMesh;
+    
+    // get the shape functions at this integration point
+    double* H = el.H(n);
+    
+    // calculate the location
+    vec3d r;
+    int ne = el.Nodes();
+    for (int i=0; i<ne; ++i) r += m.Node(el.m_node[i]).m_rp*H[i];
+    
+    return r;
+}
+
+//-----------------------------------------------------------------------------
 //! This function calculates the noraml of a surface element at integration
 //! point n
 

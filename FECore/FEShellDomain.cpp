@@ -73,7 +73,6 @@ void FEShellDomain::Serialize(DumpStream &ar)
 
 			ar >> m_Node;
 
-			FEModel& fem = ar.GetFEModel();
 			FEMaterial* pmat = GetMaterial();
 			assert(pmat);
 
