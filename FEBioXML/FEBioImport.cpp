@@ -22,6 +22,7 @@
 #include "FEBioDiscreteSection.h"
 #include "FEBioMeshDataSection.h"
 #include "FEBioCodeSection.h"
+#include "FEBioRigidSection.h"
 #include "FECore/DataStore.h"
 #include "FECore/Image.h"
 #include "FECore/FEModel.h"
@@ -344,6 +345,7 @@ FEBioImport::FEBioImport()
 
 	// version 2.5 only
 	m_map["MeshData"] = new FEBioMeshDataSection(this);
+	m_map["Rigid"   ] = new FEBioRigidSection   (this); // added in FEBio 2.6 (experimental feature!)
 }
 
 //-----------------------------------------------------------------------------

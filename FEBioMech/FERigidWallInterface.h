@@ -15,7 +15,7 @@
 #include "FECore/vec3d.h"
 #include "FECore/vec2d.h"
 #include "FECore/FENNQuery.h"
-#include "FERigidSurface.h"
+#include <FECore/FERigidSurface.h>
 
 //-----------------------------------------------------------------------------
 class FERigidWallSurface : public FESurface
@@ -107,7 +107,7 @@ public:
 
 public:
 	FERigidWallSurface	m_ss;		//!< slave surface
-	FEPlane				m_plane;	//!< master surface
+	FERigidPlane		m_plane;	//!< master surface
 
 	int nse;	//!< number of slave elements
 

@@ -550,12 +550,11 @@
     <ClInclude Include="..\..\FEBioMech\FERigidPrismaticJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidRevoluteJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidShellDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidSlidingContact.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidSolver.h" />
-    <ClInclude Include="..\..\FEBioMech\FERigidSphereContact.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidSphericalJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidSpring.h" />
-    <ClInclude Include="..\..\FEBioMech\FERigidSurface.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidWallInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FERVEModel.h" />
     <ClInclude Include="..\..\FEBioMech\FERVEModel2O.h" />
@@ -754,12 +753,11 @@
     <ClCompile Include="..\..\FEBioMech\FERigidPrismaticJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidRevoluteJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidShellDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidSlidingContact.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSolver.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FERigidSphereContact.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSphericalJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSpring.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidWallInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERVEModel.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERVEModel2O.cpp" />

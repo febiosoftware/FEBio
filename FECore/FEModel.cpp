@@ -39,11 +39,9 @@ FEModel::FEModel(void)
 	m_nsolver = FECoreKernel::m_ndefault_solver;
 
 	// create a rigid system
-	// TODO: Perhaps I can set it inially to zero and only allocate it if a rigid body is defined
 	m_prs = new FERigidSystem(this);
 
 	// create the linear constraint manager
-	// TODO: Perhaps I can set it inially to zero and only allocate it if a rigid body is defined
 	m_LCM = new FELinearConstraintManager(this);
 }
 
@@ -663,6 +661,9 @@ bool FEModel::EvaluateAllParameterLists()
 		FEParameterList& pl = m_ML[i]->GetParameterList();
 		if (EvaluateParameterList(pl) == false) return false;
 	}
+
+	// give the rigid system a chance
+	if (m_prs->EvaluateParameterLists() == false) return false;
 
 	return true;
 }

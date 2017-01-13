@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FEBioContactSection.h"
 #include "FEBioMech/FERigidWallInterface.h"
-#include <FEBioMech/FERigidSphereContact.h>
 #include "FEBioMech/FEAugLagLinearConstraint.h"
+#include <FEBioMech/FERigidSlidingContact.h>
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEModel.h>
 #include <FECore/FERigidSystem.h>
@@ -36,9 +36,9 @@ void FEBioContactSection::Parse(XMLTag& tag)
 				if (nversion <= 0x0200) ParseRigidWall(tag);
 				else ParseRigidWall25(tag);
 			}
-			else if (strcmp(sztype, "rigid sphere") == 0)
+			else if (strcmp(sztype, "rigid sliding") == 0)
 			{
-				if (nversion >= 0x0205) ParseRigidSphere(tag);
+				if (nversion >= 0x0205) ParseRigidSliding(tag);
 				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 			}
 			else if (strcmp(sztype, "rigid") == 0)
@@ -281,19 +281,19 @@ void FEBioContactSection::ParseRigidWall25(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioContactSection::ParseRigidSphere(XMLTag& tag)
+void FEBioContactSection::ParseRigidSliding(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	FERigidSphereContact* ps = dynamic_cast<FERigidSphereContact*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, "rigid sphere", GetFEModel()));
+	FERigidSlidingContact* ps = fecore_new<FERigidSlidingContact>(FESURFACEPAIRINTERACTION_ID, "rigid sliding", GetFEModel());
 	fem.AddSurfacePairInteraction(ps);
 
 	// get and build the surface
 	const char* sz = tag.AttributeValue("surface");
 	FEFacetSet* pface = mesh.FindFacetSet(sz);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
-	if (BuildSurface(ps->m_ss, *pface, false) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+	if (BuildSurface(*ps->GetSlaveSurface(), *pface, false) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 
 	FEParameterList& pl = ps->GetParameterList();
 	m_pim->ReadParameterList(tag, pl);

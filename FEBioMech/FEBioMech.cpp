@@ -117,7 +117,7 @@
 #include "FEPeriodicBoundary.h"
 #include "FEPeriodicBoundary2O.h"
 #include "FERigidWallInterface.h"
-#include "FERigidSphereContact.h"
+#include "FERigidSlidingContact.h"
 #include "FESlidingInterface.h"
 #include "FESlidingInterfaceBW.h"
 #include "FESurfaceConstraint.h"
@@ -397,7 +397,7 @@ REGISTER_FECORE_CLASS(FEPeriodicBoundary     , FESURFACEPAIRINTERACTION_ID, "per
 REGISTER_FECORE_CLASS(FEPeriodicBoundary1O   , FESURFACEPAIRINTERACTION_ID, "periodic boundary1O"        );
 REGISTER_FECORE_CLASS(FEPeriodicBoundary2O   , FESURFACEPAIRINTERACTION_ID, "periodic boundary2O"        );
 REGISTER_FECORE_CLASS(FERigidWallInterface   , FESURFACEPAIRINTERACTION_ID, "rigid_wall"                 );
-REGISTER_FECORE_CLASS(FERigidSphereContact   , FESURFACEPAIRINTERACTION_ID, "rigid sphere"               );
+REGISTER_FECORE_CLASS(FERigidSlidingContact  , FESURFACEPAIRINTERACTION_ID, "rigid sliding"               );
 REGISTER_FECORE_CLASS(FESlidingInterface     , FESURFACEPAIRINTERACTION_ID, "sliding_with_gaps"          );
 REGISTER_FECORE_CLASS(FESlidingInterfaceBW   , FESURFACEPAIRINTERACTION_ID, "sliding-tension-compression");
 REGISTER_FECORE_CLASS(FESurfaceConstraint    , FESURFACEPAIRINTERACTION_ID, "surface constraint"         );
@@ -406,6 +406,13 @@ REGISTER_FECORE_CLASS(FEStickyInterface      , FESURFACEPAIRINTERACTION_ID, "sti
 REGISTER_FECORE_CLASS(FEFacet2FacetTied      , FESURFACEPAIRINTERACTION_ID, "facet-to-facet tied"        );
 REGISTER_FECORE_CLASS(FEMortarSlidingContact , FESURFACEPAIRINTERACTION_ID, "mortar-sliding"             );
 REGISTER_FECORE_CLASS(FEMortarTiedContact    , FESURFACEPAIRINTERACTION_ID, "mortar-tied"                );
+
+//-----------------------------------------------------------------------------
+// classes derived from FERigidSurface
+REGISTER_FECORE_CLASS(FERigidPlane    , FERIGIDOBJECT_ID, "plane"   );
+REGISTER_FECORE_CLASS(FERigidSphere   , FERIGIDOBJECT_ID, "sphere"  );
+REGISTER_FECORE_CLASS(FERigidCylinder , FERIGIDOBJECT_ID, "cylinder");
+REGISTER_FECORE_CLASS(FERigidEllipsoid, FERIGIDOBJECT_ID, "ellipsoid");
 
 //-----------------------------------------------------------------------------
 // classes derived directly from FEModelLoad

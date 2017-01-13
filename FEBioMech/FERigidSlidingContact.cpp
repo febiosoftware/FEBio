@@ -1,21 +1,17 @@
 #include "stdafx.h"
-#include "FERigidSphereContact.h"
-#include <FECore/FEShellDomain.h>
+#include "FERigidSlidingContact.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/log.h>
+#include <FECore/FERigidSystem.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FERigidSphereContact, FEContactInterface)
-	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL  , "laugon"      ); 
-	ADD_PARAMETER(m_atol    , FE_PARAM_DOUBLE, "tolerance"   );
-	ADD_PARAMETER(m_eps     , FE_PARAM_DOUBLE, "penalty"     );
-	ADD_PARAMETER(m_sphere.m_R , FE_PARAM_DOUBLE, "radius" );
-	ADD_PARAMETER(m_sphere.m_rc, FE_PARAM_VEC3D, "center");
-	ADD_PARAMETER(m_sphere.m_uc.x, FE_PARAM_DOUBLE, "ux");
-	ADD_PARAMETER(m_sphere.m_uc.y, FE_PARAM_DOUBLE, "uy");
-	ADD_PARAMETER(m_sphere.m_uc.z, FE_PARAM_DOUBLE, "uz");
+BEGIN_PARAMETER_LIST(FERigidSlidingContact, FEContactInterface)
+	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL  , "laugon"   ); 
+	ADD_PARAMETER(m_atol    , FE_PARAM_DOUBLE, "tolerance");
+	ADD_PARAMETER(m_eps     , FE_PARAM_DOUBLE, "penalty"  );
+	ADD_PARAMETER(m_rigidName, FE_PARAM_STRING, "rigid"   );
 END_PARAMETER_LIST();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,7 +19,7 @@ END_PARAMETER_LIST();
 ///////////////////////////////////////////////////////////////////////////////
 
 
-FERigidSphereSurface::FERigidSphereSurface(FEModel* pfem) : FESurface(&pfem->GetMesh())
+FERigidSlidingSurface::FERigidSlidingSurface(FEModel* pfem) : FESurface(&pfem->GetMesh())
 { 
 	m_NQ.Attach(this); 
 
@@ -40,7 +36,7 @@ FERigidSphereSurface::FERigidSphereSurface(FEModel* pfem) : FESurface(&pfem->Get
 //! Note that it is assumed that the element array is already created
 //! and initialized.
 
-bool FERigidSphereSurface::Init()
+bool FERigidSlidingSurface::Init()
 {
 	// always intialize base class first!
 	if (FESurface::Init() == false) return false;
@@ -72,13 +68,13 @@ bool FERigidSphereSurface::Init()
 
 //-----------------------------------------------------------------------------
 // TODO: I don't think we need this
-vec3d FERigidSphereSurface::traction(int inode)
+vec3d FERigidSlidingSurface::traction(int inode)
 {
 	return vec3d(0,0,0);
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSphereSurface::Serialize(DumpStream &ar)
+void FERigidSlidingSurface::Serialize(DumpStream &ar)
 {
 	FESurface::Serialize(ar);
 	if (ar.IsSaving())
@@ -106,7 +102,7 @@ void FERigidSphereSurface::Serialize(DumpStream &ar)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSphereSurface::UnpackLM(FEElement& el, vector<int>& lm)
+void FERigidSlidingSurface::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	int N = el.Nodes();
 	lm.resize(N*3);
@@ -123,37 +119,55 @@ void FERigidSphereSurface::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FERigidSphereContact
+// FERigidSlidingContact
 ///////////////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
 //! constructor
-FERigidSphereContact::FERigidSphereContact(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_sphere(pfem)
+FERigidSlidingContact::FERigidSlidingContact(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem)
 {
 	static int count = 1;
 	SetID(count++);
 
+	m_rigid = 0;
 	m_eps = 0;
 	m_atol = 0;
+	m_rigidName[0] = 0;
 };
+
+//-----------------------------------------------------------------------------
+FERigidSlidingContact::~FERigidSlidingContact()
+{
+	m_rigid = 0;
+}
 
 //-----------------------------------------------------------------------------
 //! Initializes the rigid wall interface data
 
-bool FERigidSphereContact::Init()
+bool FERigidSlidingContact::Init()
 {
+	// make sure a rigid surface was defined
+	if (m_rigid == 0)
+	{
+		FERigidSystem* rs = GetFEModel()->GetRigidSystem();
+		if (rs == 0) return false;
+
+		m_rigid = rs->FindRigidSurface(m_rigidName);
+		if (m_rigid == 0) return false;
+	}
+
 	// create the surface
 	if (m_ss.Init() == false) return false;
 
 	// initialize rigid surface
-	m_sphere.Init();
+	if (m_rigid->Init() == false) return false;
 
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
-void FERigidSphereContact::BuildMatrixProfile(FEGlobalMatrix& K)
+void FERigidSlidingContact::BuildMatrixProfile(FEGlobalMatrix& K)
 {
 	FEModel& fem = *GetFEModel();
 
@@ -175,7 +189,7 @@ void FERigidSphereContact::BuildMatrixProfile(FEGlobalMatrix& K)
 		// see if any integration points are in contact
 		for (int j=0; j<el.GaussPoints(); ++j)
 		{
-			FERigidSphereSurface::DATA& d = m_ss.m_data[c + j];
+			FERigidSlidingSurface::DATA& d = m_ss.m_data[c + j];
 			if (d.gap >= 0)
 			{
 				m_ss.UnpackLM(el, lm);
@@ -188,7 +202,7 @@ void FERigidSphereContact::BuildMatrixProfile(FEGlobalMatrix& K)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSphereContact::Activate()
+void FERigidSlidingContact::Activate()
 {
 	// don't forget to call the base class
 	FEContactInterface::Activate();
@@ -200,7 +214,7 @@ void FERigidSphereContact::Activate()
 //-----------------------------------------------------------------------------
 //!  Projects the slave surface onto the master plane
 
-void FERigidSphereContact::ProjectSurface(FERigidSphereSurface& ss)
+void FERigidSlidingContact::ProjectSurface(FERigidSlidingSurface& ss)
 {
 	vec3d rt[FEElement::MAX_NODES];
 
@@ -222,16 +236,16 @@ void FERigidSphereContact::ProjectSurface(FERigidSphereSurface& ss)
 		for (int j=0; j<nint; ++j)
 		{
 			// get the integration point data
-			FERigidSphereSurface::DATA& d = m_ss.m_data[c++];
+			FERigidSlidingSurface::DATA& d = m_ss.m_data[c++];
 
 			// get the nodal position
 			vec3d r = el.Evaluate(rt, j);
 
 			// project this node onto the plane
-			vec3d q = m_sphere.Project(r);
+			vec3d q = m_rigid->Project(r);
 
 			// get the local surface normal
-			vec3d np = m_sphere.Normal(q);
+			vec3d np = m_rigid->Normal(q);
 
 			// the slave normal is set to the master element normal
 			d.nu = np;
@@ -245,7 +259,7 @@ void FERigidSphereContact::ProjectSurface(FERigidSphereSurface& ss)
 //-----------------------------------------------------------------------------
 //!  Updates rigid wall data
 
-void FERigidSphereContact::Update(int niter)
+void FERigidSlidingContact::Update(int niter)
 {
 	// project slave surface onto master surface
 	ProjectSurface(m_ss);
@@ -253,7 +267,7 @@ void FERigidSphereContact::Update(int niter)
 
 //-----------------------------------------------------------------------------
 
-void FERigidSphereContact::ContactForces(FEGlobalVector& R)
+void FERigidSlidingContact::ContactForces(FEGlobalVector& R)
 {
 	vector<int> lm;
 	const int MELN = FEElement::MAX_NODES;
@@ -308,7 +322,7 @@ void FERigidSphereContact::ContactForces(FEGlobalVector& R)
 		for (int j = 0; j<nint; ++j)
 		{
 			// get integration point data
-			FERigidSphereSurface::DATA& d = m_ss.m_data[c++];
+			FERigidSlidingSurface::DATA& d = m_ss.m_data[c++];
 
 			// calculate shape functions
 			double* H = se.H(j);
@@ -347,7 +361,7 @@ void FERigidSphereContact::ContactForces(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSphereContact::ContactStiffness(FESolver* psolver)
+void FERigidSlidingContact::ContactStiffness(FESolver* psolver)
 {
 	vector<int> lm;
 	const int MELN = FEElement::MAX_NODES;
@@ -404,7 +418,7 @@ void FERigidSphereContact::ContactStiffness(FESolver* psolver)
 		for (int j = 0; j<nint; ++j)
 		{
 			// get integration point data
-			FERigidSphereSurface::DATA& d = m_ss.m_data[c++];
+			FERigidSlidingSurface::DATA& d = m_ss.m_data[c++];
 
 			// calculate shape functions
 			double* H = se.H(j);
@@ -453,7 +467,7 @@ void FERigidSphereContact::ContactStiffness(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidSphereContact::Augment(int naug)
+bool FERigidSlidingContact::Augment(int naug)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;
@@ -469,7 +483,7 @@ bool FERigidSphereContact::Augment(int naug)
 		FESurfaceElement& el = m_ss.Element(i);
 		for (int j=0; j<el.GaussPoints(); ++j)
 		{
-			FERigidSphereSurface::DATA& d = m_ss.m_data[c++];
+			FERigidSlidingSurface::DATA& d = m_ss.m_data[c++];
 			normL0 += d.Lm*d.Lm;
 		}
 	}
@@ -485,7 +499,7 @@ bool FERigidSphereContact::Augment(int naug)
 		FESurfaceElement& el = m_ss.Element(i);
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
-			FERigidSphereSurface::DATA& d = m_ss.m_data[c++];
+			FERigidSlidingSurface::DATA& d = m_ss.m_data[c++];
 			
 			// update Lagrange multipliers
 			double Lm = d.Lm + m_eps*d.gap;
@@ -504,7 +518,7 @@ bool FERigidSphereContact::Augment(int naug)
 	normgc = sqrt(normgc / N);
 
 	// check convergence of constraints
-	felog.printf(" rigid sphere contact # %d\n", GetID());
+	felog.printf(" rigid sliding contact # %d\n", GetID());
 	felog.printf("                        CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
@@ -520,7 +534,7 @@ bool FERigidSphereContact::Augment(int naug)
 			FESurfaceElement& el = m_ss.Element(i);
 			for (int j = 0; j<el.GaussPoints(); ++j)
 			{
-				FERigidSphereSurface::DATA& d = m_ss.m_data[c++];
+				FERigidSlidingSurface::DATA& d = m_ss.m_data[c++];
 	
 				double Lm = d.Lm + m_eps*d.gap;
 				d.Lm = MBRACKET(Lm);
@@ -533,9 +547,9 @@ bool FERigidSphereContact::Augment(int naug)
 
 //-----------------------------------------------------------------------------
 
-void FERigidSphereContact::Serialize(DumpStream &ar)
+void FERigidSlidingContact::Serialize(DumpStream &ar)
 {
 	FEContactInterface::Serialize(ar);
 	m_ss.Serialize(ar);
-	m_sphere.Serialize(ar);
+	if (m_rigid) m_rigid->Serialize(ar);
 }

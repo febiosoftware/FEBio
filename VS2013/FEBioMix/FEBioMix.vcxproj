@@ -410,6 +410,8 @@
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolute.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSoluteDomain.h" />
+    <ClInclude Include="..\..\FEBioMix\FEBiphasicSoluteShellDomain.h" />
+    <ClInclude Include="..\..\FEBioMix\FEBiphasicSoluteSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSoluteSolver.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolver.h" />
     <ClInclude Include="..\..\FEBioMix\FECarterHayes.h" />
@@ -481,6 +483,8 @@
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolute.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSoluteDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEBiphasicSoluteShellDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEBiphasicSoluteSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSoluteSolver.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolver.cpp" />
     <ClCompile Include="..\..\FEBioMix\FECarterHayes.cpp" />

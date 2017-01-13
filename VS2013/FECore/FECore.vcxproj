@@ -473,6 +473,7 @@
     <ClInclude Include="..\..\FECore\FEParamValidator.h" />
     <ClInclude Include="..\..\FECore\FEPlotData.h" />
     <ClInclude Include="..\..\FECore\FERigidBody.h" />
+    <ClInclude Include="..\..\FECore\FERigidSurface.h" />
     <ClInclude Include="..\..\FECore\FERigidSystem.h" />
     <ClInclude Include="..\..\FECore\FEShellDomain.h" />
     <ClInclude Include="..\..\FECore\FESolidDomain.h" />
@@ -599,6 +600,7 @@
     <ClCompile Include="..\..\FECore\FEParamValidator.cpp" />
     <ClCompile Include="..\..\FECore\FEPlotData.cpp" />
     <ClCompile Include="..\..\FECore\FERigidBody.cpp" />
+    <ClCompile Include="..\..\FECore\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FECore\FERigidSystem.cpp" />
     <ClCompile Include="..\..\FECore\FEShellDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESolidDomain.cpp" />

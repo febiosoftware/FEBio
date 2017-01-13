@@ -12,6 +12,7 @@ class FERigidBodyFixedBC;
 class FERigidBodyDisplacement;
 class FERigidBodyVelocity;
 class FERigidBodyAngularVelocity;
+class FERigidSurface;
 class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
@@ -21,6 +22,9 @@ class FERigidSystem
 public:
 	//! constructor
 	FERigidSystem(FEModel* pfem);
+
+	//! destructor
+	~FERigidSystem();
 
 	//! Add a rigid body
 	void AddRigidBody(FERigidBody* prb);
@@ -58,6 +62,9 @@ public:
 	// build the matrix profile for the rigid system
 	void BuildMatrixProfile(FEGlobalMatrix& G);
 
+	// evaluate parameter lists
+	bool EvaluateParameterLists();
+
 public:
 	int RigidNodeSets() { return (int) m_RN.size(); }
 	FERigidNodeSet* RigidNodeSet(int i) { return m_RN[i]; }
@@ -79,6 +86,11 @@ public:
 	FERigidBodyAngularVelocity* InitialAngularVelocity(int i) { return m_RBW[i]; }
 	void AddInitialAngularVelocity(FERigidBodyAngularVelocity* pbw) { m_RBW.push_back(pbw); }
 
+public:
+	void AddRigidSurface(FERigidSurface* prs);
+
+	FERigidSurface* FindRigidSurface(const char* szname);
+
 protected:
 	bool CreateObjects();
 
@@ -93,5 +105,6 @@ protected:
 
 private:
 	FEModel&					m_fem;	//!< the FE model this system is attached to
-	std::vector<FERigidBody*>	m_RB;	//!< the list of rigid bodies in this system
+	vector<FERigidBody*>	m_RB;	//!< the list of rigid bodies in this system
+	vector<FERigidSurface*>	m_RS;	//!< rigid surfaces
 };

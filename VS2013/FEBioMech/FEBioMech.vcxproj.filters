@@ -333,9 +333,6 @@
     <ClInclude Include="..\..\FEBioMech\FERigidSphericalJoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FERigidSurface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FERigidWallInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -618,10 +615,10 @@
     <ClInclude Include="..\..\FEBioMech\FESSIShellDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FERigidSphereContact.h">
+    <ClInclude Include="..\..\FEBioMech\FESPRProjection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FESPRProjection.h">
+    <ClInclude Include="..\..\FEBioMech\FERigidSlidingContact.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -938,9 +935,6 @@
     <ClCompile Include="..\..\FEBioMech\FERigidSphericalJoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FERigidSurface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FERigidWallInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1211,10 +1205,10 @@
     <ClCompile Include="..\..\FEBioMech\FESSIShellDomain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FERigidSphereContact.cpp">
+    <ClCompile Include="..\..\FEBioMech\FESPRProjection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FESPRProjection.cpp">
+    <ClCompile Include="..\..\FEBioMech\FERigidSlidingContact.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

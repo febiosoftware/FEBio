@@ -5,6 +5,7 @@
 #include "FEMaterial.h"
 #include "RigidBC.h"
 #include "FEGlobalMatrix.h"
+#include "FERigidSurface.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -17,6 +18,12 @@ FERigidSystem::FERigidSystem(FEModel* pfem) : m_fem(*pfem)
 void FERigidSystem::AddRigidBody(FERigidBody* prb)
 {
 	if (prb) m_RB.push_back(prb);
+}
+
+//-----------------------------------------------------------------------------
+FERigidSystem::~FERigidSystem()
+{
+	Clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -42,6 +49,7 @@ void FERigidSystem::Clear()
 	for (int i=0; i<(int)m_RDC.size(); ++i) delete m_RDC[i]; m_RDC.clear();
 	for (int i=0; i<(int)m_RBV.size(); ++i) delete m_RBV[i]; m_RBV.clear();
 	for (int i=0; i<(int)m_RBW.size(); ++i) delete m_RBW[i]; m_RBW.clear();
+	for (int i=0; i<(int)m_RS.size (); ++i) delete m_RS [i]; m_RS.clear ();
 }
 
 //-----------------------------------------------------------------------------
@@ -492,4 +500,32 @@ void FERigidSystem::BuildMatrixProfile(FEGlobalMatrix& G)
 			G.build_add(lm);
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+bool FERigidSystem::EvaluateParameterLists()
+{
+	for (size_t i=0; i<m_RS.size(); ++i)
+	{
+		FEParameterList& pl = m_RS[i]->GetParameterList();
+		if (m_fem.EvaluateParameterList(pl) == false) return false;
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidSystem::AddRigidSurface(FERigidSurface* rs)
+{
+	m_RS.push_back(rs);
+}
+
+//-----------------------------------------------------------------------------
+FERigidSurface* FERigidSystem::FindRigidSurface(const char* szname)
+{
+	for (size_t i=0; i<m_RS.size(); ++i)
+	{
+		FERigidSurface* rs = m_RS[i];
+		if (strcmp(szname, rs->GetName()) == 0) return rs;
+	}
+	return 0;
 }

@@ -5,10 +5,10 @@
 #include <FECore/vec2d.h>
 #include <FECore/FENNQuery.h>
 #include "FEContactInterface.h"
-#include "FERigidSurface.h"
+#include <FECore/FERigidSurface.h>
 
 //-----------------------------------------------------------------------------
-class FERigidSphereSurface : public FESurface
+class FERigidSlidingSurface : public FESurface
 {
 public:
 	struct DATA
@@ -20,7 +20,7 @@ public:
 
 public:
 	//! constructor
-	FERigidSphereSurface(FEModel* pfem);
+	FERigidSlidingSurface(FEModel* pfem);
 
 	//! Initializes data structures
 	bool Init();
@@ -47,25 +47,26 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! This class implements a sliding contact interface with a rigid wall
-
-//! This class is a specialization of the general sliding interface where
-//! the master surface is a rigid wall
-
-class FERigidSphereContact : public FEContactInterface
+//! This class implements a sliding contact interface with a rigid boundary.
+//! The rigid boundary is represented by a rigid surface
+//
+class FERigidSlidingContact : public FEContactInterface
 {
 public:
 	//! constructor
-	FERigidSphereContact(FEModel* pfem);
+	FERigidSlidingContact(FEModel* pfem);
 
-	//! intializes rigid wall interface
+	//! destructor
+	~FERigidSlidingContact();
+
+	//! intializes rigid sliding interface
 	bool Init();
 
 	//! interface activation
 	void Activate();
 
 	//! project slave nodes onto master plane
-	void ProjectSurface(FERigidSphereSurface& s);
+	void ProjectSurface(FERigidSlidingSurface& s);
 
 	//! update rigid wall data
 	void Update(int niter);
@@ -92,14 +93,15 @@ public:
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEGlobalMatrix& K);
 
-public:
-	FERigidSphereSurface	m_ss;		//!< slave surface
-	FERigidSphere			m_sphere;	//!< master surface
+private:
+	FERigidSlidingSurface	m_ss;		//!< slave surface
+	FERigidSurface*			m_rigid;	//!< master surface
 
-	int nse;	//!< number of slave elements
 
-	double		m_atol;		//!< augmentation tolerance
-	double		m_eps;		//!< penalty scale factor
+public: // parameters
+	double		m_atol;				//!< augmentation tolerance
+	double		m_eps;				//!< penalty scale factor
+	char		m_rigidName[64];	//!< name of rigid surface object
 
 	DECLARE_PARAMETER_LIST();
 };
