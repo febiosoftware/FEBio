@@ -1,4 +1,3 @@
-#pragma once
 #include "stdafx.h"
 #include "FEScanOptimizeMethod.h"
 #include "FECore/log.h"
