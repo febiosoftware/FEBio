@@ -522,6 +522,8 @@ void FEBiphasicSoluteShellDomain::ElementInternalForceSS(FEShellElement& el, vec
         Ms = el.Hs(n);
         M  = el.H(n);
         
+        ContraBaseVectors(el, n, gcnt);
+        
         // next we get the determinant
         double J = pt.m_J;
         
