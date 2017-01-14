@@ -808,7 +808,7 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffness(FEShellElement&
                 vec3d kwp = gradMw[i]*(-Mu[j]*detJ);
                 vec3d kwq = gradMw[i]*(-Mw[j]*detJ);
                 
-                ke[10*i  ][10*j+6] += kup.z; ke[10*i  ][10*j+7] += kuq.x;
+                ke[10*i  ][10*j+6] += kup.x; ke[10*i  ][10*j+7] += kuq.x;
                 ke[10*i+1][10*j+6] += kup.y; ke[10*i+1][10*j+7] += kuq.y;
                 ke[10*i+2][10*j+6] += kup.z; ke[10*i+2][10*j+7] += kuq.z;
                 
@@ -822,7 +822,7 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffness(FEShellElement&
                 vec3d kwc = (dTdc*gradMw[i] - gradMw[i]*(R*T*(dodc*kappa*c+osmc*dkdc*c+osmc*kappa)))*Mu[j]*detJ;
                 vec3d kwd = (dTdc*gradMw[i] - gradMw[i]*(R*T*(dodc*kappa*c+osmc*dkdc*c+osmc*kappa)))*Mw[j]*detJ;
                 
-                ke[10*i  ][10*j+8] += kuc.z; ke[10*i  ][10*j+9] += kud.x;
+                ke[10*i  ][10*j+8] += kuc.x; ke[10*i  ][10*j+9] += kud.x;
                 ke[10*i+1][10*j+8] += kuc.y; ke[10*i+1][10*j+9] += kud.y;
                 ke[10*i+2][10*j+8] += kuc.z; ke[10*i+2][10*j+9] += kud.z;
                 
