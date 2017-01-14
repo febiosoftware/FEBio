@@ -16,6 +16,7 @@ public:
 		double	gap;	//!< gap function
 		vec3d	nu;		//!< master normal at slave point
 		double	Lm;		//!< Lagrange multiplier
+		double	eps;	//!< penalty parameter
 	};
 
 public:
@@ -88,10 +89,13 @@ public:
 	FESurface* GetSlaveSurface() { return &m_ss; }
 
 	//! return integration rule class
-	bool UseNodalIntegration() { return true; }
+	bool UseNodalIntegration() { return false; }
 
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEGlobalMatrix& K);
+
+	//! Calculate auto-penalty
+	void CalcAutoPenalty(FERigidSlidingSurface& s);
 
 private:
 	FERigidSlidingSurface	m_ss;		//!< slave surface
@@ -101,6 +105,10 @@ private:
 public: // parameters
 	double		m_atol;				//!< augmentation tolerance
 	double		m_eps;				//!< penalty scale factor
+	double		m_gtol;				//!< gap tolerance
+	int			m_naugmin;			//!< min nr of augmentations
+	int			m_naugmax;			//!< max nr of augmentations
+	bool		m_bautopen;			//!< auto-penalty flag
 	char		m_rigidName[64];	//!< name of rigid surface object
 
 	DECLARE_PARAMETER_LIST();

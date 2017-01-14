@@ -8,10 +8,14 @@
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FERigidSlidingContact, FEContactInterface)
-	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL  , "laugon"   ); 
-	ADD_PARAMETER(m_atol    , FE_PARAM_DOUBLE, "tolerance");
-	ADD_PARAMETER(m_eps     , FE_PARAM_DOUBLE, "penalty"  );
-	ADD_PARAMETER(m_rigidName, FE_PARAM_STRING, "rigid"   );
+	ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"   ); 
+	ADD_PARAMETER(m_atol     , FE_PARAM_DOUBLE, "tolerance");
+	ADD_PARAMETER(m_eps      , FE_PARAM_DOUBLE, "penalty"  );
+	ADD_PARAMETER(m_gtol     , FE_PARAM_DOUBLE, "gaptol"   );
+	ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"   );
+	ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"   );
+	ADD_PARAMETER(m_bautopen , FE_PARAM_BOOL  , "auto_penalty");
+	ADD_PARAMETER(m_rigidName, FE_PARAM_STRING, "rigid");
 END_PARAMETER_LIST();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,6 +64,7 @@ bool FERigidSlidingSurface::Init()
 		d.gap = 0.0;
 		d.Lm = 0.0;
 		d.nu = vec3d(0,0,0);
+		d.eps = 1.0;
 	}
 
 	return true;
@@ -132,6 +137,10 @@ FERigidSlidingContact::FERigidSlidingContact(FEModel* pfem) : FEContactInterface
 	m_rigid = 0;
 	m_eps = 0;
 	m_atol = 0;
+	m_gtol = 0;
+	m_naugmin = 0;
+	m_naugmax = 10;
+	m_bautopen = false;
 	m_rigidName[0] = 0;
 };
 
@@ -163,6 +172,45 @@ bool FERigidSlidingContact::Init()
 	if (m_rigid->Init() == false) return false;
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidSlidingContact::CalcAutoPenalty(FERigidSlidingSurface& s)
+{
+	// get the mesh
+	FEMesh& m = GetFEModel()->GetMesh();
+
+	// loop over all surface elements
+	int c = 0;
+	for (int i = 0; i<s.Elements(); ++i)
+	{
+		// get the surface element
+		FESurfaceElement& el = s.Element(i);
+
+		// find the element this face belongs to
+		FEElement* pe = m.FindElementFromID(el.m_elem[0]);
+		assert(pe);
+
+		// get the area of the surface element
+		double A = s.FaceArea(el);
+
+		// get the volume of the volume element
+		double V = m.ElementVolume(*pe);
+
+		// calculate a modulus
+		double K = AutoPenalty(el, s);
+
+		// calculate penalty
+		double eps = K*A / V;
+
+		// assign to integation points of surface element
+		int nint = el.GaussPoints();
+		for (int j = 0; j<nint; ++j)
+		{
+			FERigidSlidingSurface::DATA& pt = s.m_data[c++];
+			pt.eps = eps;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -206,6 +254,9 @@ void FERigidSlidingContact::Activate()
 {
 	// don't forget to call the base class
 	FEContactInterface::Activate();
+
+	// calculate penalty factors
+	if (m_bautopen) CalcAutoPenalty(m_ss);
 
 	// project slave surface onto master surface
 	ProjectSurface(m_ss);
@@ -337,7 +388,7 @@ void FERigidSlidingContact::ContactForces(FEGlobalVector& R)
 			double Lm = d.Lm;
 
 			// penalty value
-			double eps = m_eps;
+			double eps = m_eps*d.eps;
 
 			// contact traction
 			double tn = Lm + eps*g;
@@ -437,7 +488,7 @@ void FERigidSlidingContact::ContactStiffness(FESolver* psolver)
 			double Lm = d.Lm;
 
 			// penalty value
-			double eps = m_eps;
+			double eps = m_eps*d.eps;
 
 			// contact traction
 			double tn = Lm + eps*g;
@@ -472,9 +523,6 @@ bool FERigidSlidingContact::Augment(int naug)
 	// make sure we need to augment
 	if (!m_blaugon) return true;
 
-	// let's stay positive
-	bool bconv = true;
-
 	// calculate initial norms
 	double normL0 = 0;
 	int c = 0;
@@ -502,7 +550,8 @@ bool FERigidSlidingContact::Augment(int naug)
 			FERigidSlidingSurface::DATA& d = m_ss.m_data[c++];
 			
 			// update Lagrange multipliers
-			double Lm = d.Lm + m_eps*d.gap;
+			double eps = m_eps*d.eps;
+			double Lm = d.Lm + eps*d.gap;
 			Lm = MBRACKET(Lm);
 			normL1 += Lm*Lm;
 			if (d.gap > 0)
@@ -517,15 +566,26 @@ bool FERigidSlidingContact::Augment(int naug)
 	normL1 = sqrt(normL1);
 	normgc = sqrt(normgc / N);
 
+	// calculate and print convergence norms
+	double lnorm = 0;
+	if (normL1 != 0) lnorm = fabs(normL1 - normL0) / normL1; else lnorm = fabs(normL1 - normL0);
+
 	// check convergence of constraints
 	felog.printf(" rigid sliding contact # %d\n", GetID());
 	felog.printf("                        CURRENT        REQUIRED\n");
-	double pctn = 0;
-	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
-	felog.printf("    normal force : %15le %15le\n", pctn, m_atol);
-	felog.printf("    gap function : %15le       ***\n", normgc);
-		
-	if (pctn >= m_atol)
+	felog.printf("    normal force : %15le", lnorm);
+	if (m_atol > 0) felog.printf("%15le\n", m_atol); else felog.printf("       ***\n");
+	felog.printf("    gap function : %15le", normgc);
+	if (m_gtol > 0) felog.printf("%15le\n", m_gtol); else felog.printf("       ***\n");
+
+	// check convergence
+	bool bconv = true;
+	if ((m_atol > 0) && (lnorm >= m_atol)) bconv = false;
+	if ((m_gtol > 0) && (normgc > m_gtol)) bconv = false;
+	if (m_naugmin > naug) bconv = false;
+	if (m_naugmax <= naug) bconv = true;
+
+	if (bconv == false)
 	{
 		bconv = false;
 		c = 0;
@@ -536,7 +596,8 @@ bool FERigidSlidingContact::Augment(int naug)
 			{
 				FERigidSlidingSurface::DATA& d = m_ss.m_data[c++];
 	
-				double Lm = d.Lm + m_eps*d.gap;
+				double eps = m_eps*d.eps;
+				double Lm = d.Lm + eps*d.gap;
 				d.Lm = MBRACKET(Lm);
 			}	
 		}
