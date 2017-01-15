@@ -5,10 +5,11 @@
 #include <FECore/vec2d.h>
 #include <FECore/FENNQuery.h>
 #include "FEContactInterface.h"
+#include "FEContactSurface.h"
 #include <FECore/FERigidSurface.h>
 
 //-----------------------------------------------------------------------------
-class FERigidSlidingSurface : public FESurface
+class FERigidSlidingSurface : public FEContactSurface
 {
 public:
 	struct DATA
@@ -29,19 +30,23 @@ public:
 	//! Update the surface data
 	void Update() {}
 
-	//! Calculate the total traction at a node
-	vec3d traction(int inode);
-
 	// serialize surface data
 	void Serialize(DumpStream& ar);
 
 	//! Unpack surface element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
+	//! Calculate the total traction at a node
+	vec3d traction(int inode);
+
+	//! total contact force
+	vec3d GetContactForce();
+
 public:
 	int	m_dofX;
 	int	m_dofY;
 	int	m_dofZ;
+	vec3d	m_Fc;	//!< total contact force
 
 	vector<DATA>	m_data;		//!< integration point data
 	FENNQuery		m_NQ;		//!< this structure is used in finding the master element that corresponds to a slave node

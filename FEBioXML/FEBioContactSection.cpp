@@ -294,6 +294,7 @@ void FEBioContactSection::ParseRigidSliding(XMLTag& tag)
 	FEFacetSet* pface = mesh.FindFacetSet(sz);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 	if (BuildSurface(*ps->GetSlaveSurface(), *pface, false) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+	mesh.AddSurface(ps->GetSlaveSurface());
 
 	FEParameterList& pl = ps->GetParameterList();
 	m_pim->ReadParameterList(tag, pl);

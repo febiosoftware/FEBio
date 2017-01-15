@@ -23,9 +23,11 @@ END_PARAMETER_LIST();
 ///////////////////////////////////////////////////////////////////////////////
 
 
-FERigidSlidingSurface::FERigidSlidingSurface(FEModel* pfem) : FESurface(&pfem->GetMesh())
+FERigidSlidingSurface::FERigidSlidingSurface(FEModel* pfem) : FEContactSurface(pfem)
 { 
 	m_NQ.Attach(this); 
+
+	m_Fc = vec3d(0,0,0);
 
 	// I want to use the FEModel class for this, but don't know how
 	DOFS& dofs = pfem->GetDOFS();
@@ -76,6 +78,12 @@ bool FERigidSlidingSurface::Init()
 vec3d FERigidSlidingSurface::traction(int inode)
 {
 	return vec3d(0,0,0);
+}
+
+//-----------------------------------------------------------------------------
+vec3d FERigidSlidingSurface::GetContactForce()
+{
+	return m_Fc;
 }
 
 //-----------------------------------------------------------------------------
@@ -326,6 +334,9 @@ void FERigidSlidingContact::ContactForces(FEGlobalVector& R)
 	vec3d r0[MELN];
 	vector<double> fe;
 
+	// zero total force
+	m_ss.m_Fc = vec3d(0,0,0);
+
 	// loop over all slave elements
 	int c = 0;
 	for (int i = 0; i<m_ss.Elements(); ++i)
@@ -404,6 +415,14 @@ void FERigidSlidingContact::ContactForces(FEGlobalVector& R)
 				fe[3 * k + 2] = H[k] * nu.z;
 			}
 			for (int k = 0; k<ndof; ++k) fe[k] *= tn*detJ[j] * w[j];
+
+			// add to total reaction force
+			for (int k=0; k<neln; ++k)
+			{
+				m_ss.m_Fc.x += fe[3*k  ];
+				m_ss.m_Fc.y += fe[3*k+1];
+				m_ss.m_Fc.z += fe[3*k+2];
+			}
 
 			// assemble the global residual
 			R.Assemble(se.m_node, lm, fe);
