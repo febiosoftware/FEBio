@@ -131,7 +131,7 @@ void FESurfaceData::Save(FEModel &fem, Archive& ar)
 		{
 		case FMT_NODE: nsize *= S.Nodes(); break;
 		case FMT_ITEM: nsize *= S.Elements(); break;
-		case FMT_MULT: nsize *= 9*S.Elements(); break;
+		case FMT_MULT: nsize *= 10*S.Elements(); break;
 		case FMT_REGION: 
 			// one value per surface so nsize remains unchanged
 			break;

@@ -32,7 +32,7 @@ public:
 	enum { PLT_VERSION = 0x0004 };
 
 	// max nodes per facet
-	enum { PLT_MAX_FACET_NODES = 9 };
+	enum { PLT_MAX_FACET_NODES = 10 };
 
 	// file tags
 	enum { 
