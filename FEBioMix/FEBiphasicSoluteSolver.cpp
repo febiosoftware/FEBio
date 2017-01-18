@@ -51,9 +51,9 @@ bool FEBiphasicSoluteSolver::Init()
     int MAX_DDOFS = fedofs.GetVariableSize("shell concentration");
     
 	// allocate concentration-vectors
-	m_ci.assign(MAX_CDOFS+MAX_DDOFS,vector<double>(0,0));
-	m_Ci.assign(MAX_CDOFS+MAX_DDOFS,vector<double>(0,0));
-	for (i=0; i<MAX_CDOFS+MAX_DDOFS; ++i) {
+	m_ci.assign(MAX_CDOFS,vector<double>(0,0));
+	m_Ci.assign(MAX_CDOFS,vector<double>(0,0));
+	for (i=0; i<MAX_CDOFS; ++i) {
 		m_ci[i].assign(m_nceq[i], 0);
 		m_Ci[i].assign(m_nceq[i], 0);
 	}
@@ -67,7 +67,7 @@ bool FEBiphasicSoluteSolver::Init()
 	}
     for (int j=0; j<MAX_DDOFS; ++j)
     {
-        if (m_nceq[MAX_CDOFS+j])
+        if (m_nceq[j])
             dofs.push_back(m_dofD + j);
     }
 
