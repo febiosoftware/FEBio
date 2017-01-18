@@ -279,9 +279,6 @@
     <ClCompile Include="..\..\FEBioMech\FEAugLagLinearConstraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FERigidSurface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FERemodelingElasticMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -615,7 +612,7 @@
     <ClCompile Include="..\..\FEBioMech\FEElasticShellDomainOld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FERigidSphereContact.cpp">
+    <ClCompile Include="..\..\FEBioMech\FERigidSlidingContact.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -888,9 +885,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEAugLagLinearConstraint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FERigidSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FERemodelingElasticMaterial.h">
@@ -1232,7 +1226,10 @@
     <ClInclude Include="..\..\FEBioMech\FEElasticShellDomainOld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FERigidSphereContact.h">
+    <ClInclude Include="..\..\FEBioMech\FERigidSlidingContact.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FECore\FERigidSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
