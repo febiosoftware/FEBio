@@ -14,6 +14,7 @@
 % License: CSL#005010
 
 \usepackage{latexsym}
+\hypersetup{colorlinks=true,citecolor=blue,filecolor=blue,urlcolor=blue,linkcolor=blue}
 \end_preamble
 \use_default_options false
 \begin_modules
@@ -45,11 +46,11 @@ figs-within-sections
 \spacing single
 \use_hyperref true
 \pdf_bookmarks true
-\pdf_bookmarksnumbered false
+\pdf_bookmarksnumbered true
 \pdf_bookmarksopen false
 \pdf_bookmarksopenlevel 1
 \pdf_breaklinks false
-\pdf_pdfborder false
+\pdf_pdfborder true
 \pdf_colorlinks false
 \pdf_backref false
 \pdf_pdfusetitle true
@@ -140,7 +141,7 @@ figs-within-sections
 
 \begin_layout Title
 \begin_inset Graphics
-	filename Figures/FigFEBioTitle.pdf
+	filename Figures/FigFEBioTitle.png
 	width 4.88in
 
 \end_inset
@@ -9211,7 +9212,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigNodeNumberingSolidElements.pdf
+	filename Figures/FigNodeNumberingSolidElements.png
 
 \end_inset
 
@@ -9267,7 +9268,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigNodeNumberingShellElements.pdf
+	filename Figures/FigNodeNumberingShellElements.png
 
 \end_inset
 
@@ -18083,7 +18084,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigLoadCurveTypes.pdf
+	filename Figures/FigLoadCurveTypes.png
 
 \end_inset
 
@@ -18256,7 +18257,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigLoadCurveExtend.pdf
+	filename Figures/FigLoadCurveExtend.png
 
 \end_inset
 
@@ -23929,7 +23930,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigLocalFiberDirectionOption.pdf
+	filename Figures/FigLocalFiberDirectionOption.png
 
 \end_inset
 
@@ -23987,7 +23988,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigSphericalFiberDirectionOption.pdf
+	filename Figures/FigSphericalFiberDirectionOption.png
 
 \end_inset
 
@@ -24044,7 +24045,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigVectorFiberDirectionOption.pdf
+	filename Figures/FigVectorFiberDirectionOption.png
 
 \end_inset
 
@@ -24185,7 +24186,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigSphericalAngles.pdf
+	filename Figures/FigSphericalAngles.png
 
 \end_inset
 
@@ -26378,7 +26379,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigSphericalAngles.pdf
+	filename Figures/FigSphericalAngles.png
 
 \end_inset
 
@@ -34792,7 +34793,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigSphericalAngles.pdf
+	filename Figures/FigSphericalAngles.png
 
 \end_inset
 
@@ -43142,7 +43143,7 @@ It requires no additional parameters.
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/FigSphericalDistribution.pdf
+	filename Figures/FigSphericalDistribution.png
 
 \end_inset
 
@@ -43303,7 +43304,7 @@ The value of
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/FigEllipsoidalDistribution.pdf
+	filename Figures/FigEllipsoidalDistribution.png
 
 \end_inset
 
@@ -43456,7 +43457,7 @@ The concentration parameter
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/FigPiPeriodicVonMisesDistribution.pdf
+	filename Figures/FigPiPeriodicVonMisesDistribution.png
 
 \end_inset
 
@@ -43711,7 +43712,7 @@ The semi-principal axis
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/FigEllipticalDistribution.pdf
+	filename Figures/FigEllipticalDistribution.png
 
 \end_inset
 
@@ -43870,7 +43871,7 @@ The concentration parameter
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/FigVonMisesDistribution.pdf
+	filename Figures/FigVonMisesDistribution.png
 
 \end_inset
 
@@ -44276,7 +44277,7 @@ The parameter <resolution> must be one of the values 20, 34, 60, 74, 196,
 
 
 \begin_inset Graphics
-	filename Figures/FigFiniteElementIntegration.pdf
+	filename Figures/FigFiniteElementIntegration.png
 
 \end_inset
 
@@ -47627,7 +47628,7 @@ represents the maximum allowable damage.
 
 
 \begin_inset Graphics
-	filename Figures/FigDamageCDFSimo.pdf
+	filename Figures/FigDamageCDFSimo.png
 
 \end_inset
 
@@ -47883,7 +47884,7 @@ which shows that
 
 
 \begin_inset Graphics
-	filename Figures/FigDamageCDFLogNormal.pdf
+	filename Figures/FigDamageCDFLogNormal.png
 
 \end_inset
 
@@ -48143,7 +48144,7 @@ which shows that
 
 
 \begin_inset Graphics
-	filename Figures/FigDamageCDFWeibull.pdf
+	filename Figures/FigDamageCDFWeibull.png
 
 \end_inset
 
@@ -48403,7 +48404,7 @@ which shows that
 
 
 \begin_inset Graphics
-	filename Figures/FigDamageCDFQuintic.pdf
+	filename Figures/FigDamageCDFQuintic.png
 
 \end_inset
 
@@ -48595,7 +48596,7 @@ where
 
 
 \begin_inset Graphics
-	filename Figures/FigDamageCDFStep.pdf
+	filename Figures/FigDamageCDFStep.png
 
 \end_inset
 
@@ -60510,7 +60511,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigSphericalAngles.pdf
+	filename Figures/FigSphericalAngles.png
 
 \end_inset
 
@@ -60867,7 +60868,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigSphericalAngles.pdf
+	filename Figures/FigSphericalAngles.png
 
 \end_inset
 
@@ -61443,7 +61444,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigSphericalAngles.pdf
+	filename Figures/FigSphericalAngles.png
 
 \end_inset
 
@@ -61796,7 +61797,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigSphericalAngles.pdf
+	filename Figures/FigSphericalAngles.png
 
 \end_inset
 

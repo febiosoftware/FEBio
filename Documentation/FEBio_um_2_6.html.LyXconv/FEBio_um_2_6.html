@@ -4,12 +4,22 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <meta name="generator" content="http://www.nongnu.org/elyxer/"/>
-<meta name="create-date" content="2017-01-18"/>
+<meta name="create-date" content="2017-01-20"/>
 <link rel="stylesheet" href="http://elyxer.nongnu.org/lyx.css" type="text/css" media="all"/>
 <title>Converted document</title>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+});
+</script>
 <script type="text/javascript"
   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
+<style>
+span.MathJax_Preview {
+  color: black;
+}
+</style>
 </head>
 <body>
 <div id="globalWrapper">
@@ -21,6 +31,45 @@
 Warning: <a href="http://www.mathjax.org/">MathJax</a> requires JavaScript to correctly process the mathematics on this page. Please enable JavaScript on your browser.
 </div><hr/>
 </noscript>
+<div class="Unindented">
+<span class="MathJax_Preview"><script type="math/tex">
+
+\newcommand{\Dev}{\operatorname{Dev}}
+{\text{Dev}}
+
+</script>
+</span><span class="MathJax_Preview"><script type="math/tex">
+
+\newcommand{\dev}{\operatorname{dev}}
+{\text{dev}}
+
+</script>
+</span><span class="MathJax_Preview"><script type="math/tex">
+
+\newcommand{\grad}{\operatorname{grad}}
+{\text{grad}}
+
+</script>
+</span><span class="MathJax_Preview"><script type="math/tex">
+
+\newcommand{\divg}{\operatorname{div}}
+{\text{div}}
+
+</script>
+</span><span class="MathJax_Preview"><script type="math/tex">
+
+\newcommand{\Ei}{\operatorname{Ei}}
+{\text{Ei}}
+
+</script>
+</span><span class="MathJax_Preview"><script type="math/tex">
+
+\newcommand{\tr}{\operatorname{tr}}
+{\text{tr}}
+
+</script>
+</span>
+</div>
 <h1 class="title">
 <img class="embedded" src="Figures/FigFEBioTitle.png" alt="figure Figures/FigFEBioTitle.png" style="width: 4.88in; max-width: 573px; height: auto; max-height: 206px;"/>
 <b><br/>User’s Manual Version 2.6</b>
@@ -8781,7 +8830,7 @@ current density
 Element
 </td>
 <td align="left" valign="top" style="width: 3in;">
-Electric current density, Eq.<a class="Reference" href="#eq:mp-electric-current-density">(↓)</a> 
+Electric current density, Eq.\eqref{eq:mp-electric-current-density} 
 </td>
 
 </tr>
@@ -8811,7 +8860,7 @@ Element
 Deviatoric strain energy density <span class="MathJax_Preview"><script type="math/tex">
 \tilde{\Psi}\left(\mathbf{\tilde{C}}\right)
 </script>
-</span>, Eq.<a class="Reference" href="#eq1">(↓)</a> 
+</span>, Eq.\eqref{eq1} 
 </td>
 
 </tr>
@@ -8838,10 +8887,10 @@ Node
 Fluid pressure <span class="MathJax_Preview"><script type="math/tex">
 p
 </script>
-</span> for biphasic materials, Eq.<a class="Reference" href="#eq:bp-stress">(↓)</a>, or <span class="MathJax_Preview"><script type="math/tex">
+</span> for biphasic materials, Eq.\eqref{eq:bp-stress}, or <span class="MathJax_Preview"><script type="math/tex">
 \tilde{p}
 </script>
-</span> for biphasic-solute, Eq.<a class="Reference" href="#eq:bs-effective-p-c">(↓)</a> and triphasic/multiphasic materials, Eq.<a class="Reference" href="#eq:mp-effective-p-c">(↓)</a> 
+</span> for biphasic-solute, Eq.\eqref{eq:bs-effective-p-c} and triphasic/multiphasic materials, Eq.\eqref{eq:mp-effective-p-c} 
 </td>
 
 </tr>
@@ -8856,7 +8905,7 @@ Node
 Effective solute concentration <span class="MathJax_Preview"><script type="math/tex">
 \tilde{c}
 </script>
-</span> for biphasic-solute materials, Eq.<a class="Reference" href="#eq:bs-effective-p-c">(↓)</a>, and triphasic/multiphasic materials, Eq.<a class="Reference" href="#eq:mp-effective-p-c">(↓)</a> 
+</span> for biphasic-solute materials, Eq.\eqref{eq:bs-effective-p-c}, and triphasic/multiphasic materials, Eq.\eqref{eq:mp-effective-p-c} 
 </td>
 
 </tr>
@@ -8898,7 +8947,7 @@ Element
 Fixed charge density <span class="MathJax_Preview"><script type="math/tex">
 c^{F}
 </script>
-</span> in current configuration, Eq.<a class="Reference" href="#eq:mp-CFD-mass-balance">(↓)</a> 
+</span> in current configuration, Eq.\eqref{eq:mp-CFD-mass-balance} 
 </td>
 
 </tr>
@@ -8925,7 +8974,7 @@ Element
 Fluid flux <span class="MathJax_Preview"><script type="math/tex">
 \mathbf{w}
 </script>
-</span> in biphasic, Eq.<a class="Reference" href="#eq:bp-flux">(↓)</a>, biphasic-solute, Eq.<a class="Reference" href="#eq:bs-fluxes-w-j">(↓)</a>, and triphasic/multiphasic materials, Eq.<a class="Reference" href="#eq:mp-fluxes-w-j">(↓)</a> 
+</span> in biphasic, Eq.\eqref{eq:bp-flux}, biphasic-solute, Eq.\eqref{eq:bs-fluxes-w-j}, and triphasic/multiphasic materials, Eq.\eqref{eq:mp-fluxes-w-j} 
 </td>
 
 </tr>
@@ -8955,7 +9004,7 @@ Element
 Fluid pressure <span class="MathJax_Preview"><script type="math/tex">
 p
 </script>
-</span> in biphasic, Eq.<a class="Reference" href="#eq:bp-stress">(↓)</a>, biphasic-solute, Eq.<a class="Reference" href="#eq:bs-effective-p-c">(↓)</a>, and triphasic/multiphasic materials, Eq.<a class="Reference" href="#eq:mp-effective-p-c">(↓)</a> 
+</span> in biphasic, Eq.\eqref{eq:bp-stress}, biphasic-solute, Eq.\eqref{eq:bs-effective-p-c}, and triphasic/multiphasic materials, Eq.\eqref{eq:mp-effective-p-c} 
 </td>
 
 </tr>
@@ -9009,7 +9058,7 @@ Element
 Referential fixed charge density <span class="MathJax_Preview"><script type="math/tex">
 c_{r}^{F}
 </script>
-</span>, Eq.<a class="Reference" href="#eq:mp-CFD-mass-balance">(↓)</a>, which may evolve with chemical reactions, Eq.<a class="Reference" href="#eq:cr-referential-FCD">(↓)</a> 
+</span>, Eq.\eqref{eq:mp-CFD-mass-balance}, which may evolve with chemical reactions, Eq.\eqref{eq:cr-referential-FCD} 
 </td>
 
 </tr>
@@ -9024,7 +9073,7 @@ Element
 Referential solid volume fraction <span class="MathJax_Preview"><script type="math/tex">
 \varphi_{r}^{s}
 </script>
-</span>, which may evolve with chemical reactions, Eq.<a class="Reference" href="#eq:cr-referential-solid-vol-frac">(↓)</a> 
+</span>, which may evolve with chemical reactions, Eq.\eqref{eq:cr-referential-solid-vol-frac} 
 </td>
 
 </tr>
@@ -9192,10 +9241,10 @@ Element
 Solute flux <span class="MathJax_Preview"><script type="math/tex">
 \mathbf{j}
 </script>
-</span> in biphasic-solute materials, Eq.<a class="Reference" href="#eq:bs-fluxes-w-j">(↓)</a>, or <span class="MathJax_Preview"><script type="math/tex">
+</span> in biphasic-solute materials, Eq.\eqref{eq:bs-fluxes-w-j}, or <span class="MathJax_Preview"><script type="math/tex">
 \mathbf{j}^{\alpha}
 </script>
-</span> in triphasic/multiphasic materials, Eq.<a class="Reference" href="#eq:mp-fluxes-w-j">(↓)</a>. 
+</span> in triphasic/multiphasic materials, Eq.\eqref{eq:mp-fluxes-w-j}. 
 </td>
 
 </tr>
@@ -21715,7 +21764,7 @@ d_{0}
 </span> is the solid matrix porosity in the current configuration. The above expressions for the solvent and solute flux do not account for external body forces.
 </div>
 <div class="Indented">
-The governing equations for a biphasic-solute material are the momentum balance for the mixture, Eq.<a class="Reference" href="#eq:bp-momentum-balance">(↓)</a>, the mass balance for the mixture, which reduces to Eq.<a class="Reference" href="#eq:bp-mixture-mass-balance">(↓)</a> under the assumption of dilute solutions, and the mass balance for the solute, <span class="MathJax_Preview">
+The governing equations for a biphasic-solute material are the momentum balance for the mixture, Eq.\eqref{eq:bp-momentum-balance}, the mass balance for the mixture, which reduces to Eq.\eqref{eq:bp-mixture-mass-balance} under the assumption of dilute solutions, and the mass balance for the solute, <span class="MathJax_Preview">
 <script type="math/tex;mode=display">
 \begin{equation}
 \frac{\partial\left(\varphi^{w}c\right)}{\partial t}+\divg\left(\mathbf{j}+\varphi^{w}c\mathbf{v}^{s}\right)=0\,.\label{eq:bs-solute-mass-balance}
@@ -24080,7 +24129,7 @@ Thus, formulating constitutive relations for <span class="MathJax_Preview"><scri
 </script>
 
 </span>
-the relations of <a class="Reference" href="#eq:cr-concentration-supply">(↓)</a>-<a class="Reference" href="#eq:cr-net-stoich-coeff">(↓)</a> still apply but the constitutive relation for <span class="MathJax_Preview"><script type="math/tex">
+the relations of \eqref{eq:cr-concentration-supply}-\eqref{eq:cr-net-stoich-coeff} still apply but the constitutive relation for <span class="MathJax_Preview"><script type="math/tex">
 \hat{\zeta}
 </script>
 </span> would be different.
@@ -24186,19 +24235,19 @@ c^{\sigma}=\frac{\rho_{r}^{\sigma}}{\left(J-\varphi_{r}^{s}\right)M^{\sigma}},\q
 Internally, the content of solid-bound species is stored in <span class="MathJax_Preview"><script type="math/tex">
 \rho_{r}^{\sigma}
 </script>
-</span> and <a class="Reference" href="#eq:concentration-density-relations">(↓)</a> is used to evaluate <span class="MathJax_Preview"><script type="math/tex">
+</span> and \eqref{eq:concentration-density-relations} is used to evaluate <span class="MathJax_Preview"><script type="math/tex">
 c^{\sigma}
 </script>
 </span> when needed for the calculation of <span class="MathJax_Preview"><script type="math/tex">
 \hat{\zeta}
 </script>
-</span>. If a solid-bound molecule is involved in a chemical reaction, equation <a class="Reference" href="#eq:cr-sbm-mass-balance">(↓)</a> is integrated to produce an updated value of <span class="MathJax_Preview"><script type="math/tex">
+</span>. If a solid-bound molecule is involved in a chemical reaction, equation \eqref{eq:cr-sbm-mass-balance} is integrated to produce an updated value of <span class="MathJax_Preview"><script type="math/tex">
 \rho_{r}^{\sigma}
 </script>
 </span>, using <span class="MathJax_Preview"><script type="math/tex">
 \hat{\rho}_{r}^{\sigma}=\left({J-\varphi_{r}^{s}}\right)M^{\sigma}\nu^{\sigma}\hat{\zeta}
 </script>
-</span> based on <a class="Reference" href="#eq:cr-concentration-supply">(↓)</a> and <a class="Reference" href="#eq:concentration-density-relations">(↓)</a>.
+</span> based on \eqref{eq:cr-concentration-supply} and \eqref{eq:concentration-density-relations}.
 </div>
 <div class="Indented">
 Evolving solid content due to chemical reactions implies that the referential solid volume fraction <span class="MathJax_Preview"><script type="math/tex">
@@ -24278,10 +24327,10 @@ M^{\alpha}
 The user may opt to model only the glucose reactant and the protein product explicitly, while the presence of all other species in this reaction is implicit. In these types of analyses the user must beware of potential inconsistencies in the evolving mass of reactants and products since only some of those constituents are modeled explicitly. In particular, the evolution of <span class="MathJax_Preview"><script type="math/tex">
 \varphi_{r}^{s}
 </script>
-</span> as given in <b><a class="Reference" href="#eq:cr-referential-solid-vol-frac">(↓)</a></b> can only account for the explicitly modeled solid-bound molecules. Furthermore, when some reactants and products are implicit, the value of the reaction molar volume <span class="MathJax_Preview"><script type="math/tex">
+</span> as given in <b>\eqref{eq:cr-referential-solid-vol-frac}</b> can only account for the explicitly modeled solid-bound molecules. Furthermore, when some reactants and products are implicit, the value of the reaction molar volume <span class="MathJax_Preview"><script type="math/tex">
 \overline{\mathcal{V}}
 </script>
-</span> calculated in the code becomes inaccurate and may produce unexpected results in the evaluation of the mixture mass balance relation in <a class="Reference" href="#eq:cr-mixture-mass-balance">(↓)</a>. Therefore, the user is given the option to override the value of <span class="MathJax_Preview"><script type="math/tex">
+</span> calculated in the code becomes inaccurate and may produce unexpected results in the evaluation of the mixture mass balance relation in \eqref{eq:cr-mixture-mass-balance}. Therefore, the user is given the option to override the value of <span class="MathJax_Preview"><script type="math/tex">
 \overline{\mathcal{V}}
 </script>
 </span> calculated in the code. In particular, if the precise molar volumes of all the species in a reaction are not known, assuming that <span class="MathJax_Preview"><script type="math/tex">
@@ -24290,7 +24339,7 @@ The user may opt to model only the glucose reactant and the protein product expl
 </span> is a reasonable choice equivalent to assuming that all the constituents have approximately the same density <span class="MathJax_Preview"><script type="math/tex">
 \rho_{T}^{\alpha}
 </script>
-</span>, as may be deduced from <a class="Reference" href="#eq:cr-balanced-reaction">(↓)</a>.
+</span>, as may be deduced from \eqref{eq:cr-balanced-reaction}.
 </div>
 <div class="Indented">
 Since the electroneutrality condition is enforced in multiphasic mixtures in FEBio, it follows that chemical reactions must not violate this condition. Enforcing electroneutrality in a chemical reaction is equivalent to satisfying <span class="MathJax_Preview">
