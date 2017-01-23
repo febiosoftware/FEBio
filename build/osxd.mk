@@ -3,7 +3,7 @@
 CC = icpc
 
 # Remove -DHAVE_LEVMAR and $(LEV_LIB) from LIBS if not linking with the Lourakis levmar routine.
-DEF = -DPARDISO -DHAVE_LEVMAR -DSVN
+DEF = -DPARDISO -DHAVE_LEVMAR -DHAVE_ZLIB -DSVN
 
 FLG = -O3 -fopenmp -fPIC -static-intel -no-intel-extensions
 
@@ -13,7 +13,7 @@ INTEL_INC = $(INTELROOT)/compiler/include
 INTEL_LIB = $(INTELROOT)/compiler/lib/
 MKL_PATH = $(MKLROOT)/lib/
 MKL_LIB = $(MKL_PATH)libmkl_intel_lp64.a $(MKL_PATH)libmkl_intel_thread.a $(MKL_PATH)libmkl_core.a \
-	$(INTEL_LIB)libiomp5.a
+	$(INTEL_LIB)libiomp5.a -pthread -lz
 
 #Levmar library
 LEV_LIB = -llevmar_$(PLAT)
