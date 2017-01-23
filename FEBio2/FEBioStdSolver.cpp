@@ -4,7 +4,6 @@
 #include "FEBioTest/FEDiagnostic.h"
 #include "FEBioTest/FETangentDiagnostic.h"
 #include "FEBioTest/FERestartDiagnostics.h"
-#include "FEBioLib/FEBox.h"
 #include "FECore/log.h"
 #include "FEBioXML/FERestartImport.h"
 #include "FECore/DumpFile.h"
