@@ -631,7 +631,7 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffness(FEShellElement& el, matrix&
                 vec3d kdp = gradMd[i]*(Mu[j]*detJt);
                 vec3d kdq = gradMd[i]*(Md[j]*detJt);
                 
-                ke[8*i  ][8*j+6] -= kup.z;
+                ke[8*i  ][8*j+6] -= kup.x;
                 ke[8*i+1][8*j+6] -= kup.y;
                 ke[8*i+2][8*j+6] -= kup.z;
                 
@@ -813,7 +813,7 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffnessSS(FEShellElement& el, matri
                 vec3d kdp = gradMd[i]*(Mu[j]*detJt);
                 vec3d kdq = gradMd[i]*(Md[j]*detJt);
                 
-                ke[8*i  ][8*j+6] -= kup.z;
+                ke[8*i  ][8*j+6] -= kup.x;
                 ke[8*i+1][8*j+6] -= kup.y;
                 ke[8*i+2][8*j+6] -= kup.z;
                 

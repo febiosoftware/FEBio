@@ -349,6 +349,10 @@ void echo_input(FEBioModel& fem)
 			felog.printf("Rigid Body %d:\n", rb.m_nID+1);
 			felog.printf("\tmaterial id    : %d\n", rb.m_mat+1);
 			felog.printf("\tcenter of mass : %lg, %lg, %lg\n", rb.m_r0.x, rb.m_r0.y, rb.m_r0.z);
+            felog.printf("\tmass           : %lg\n", rb.m_mass);
+            felog.printf("\tIxx Ixy Ixz    : %lg, %lg, %lg\n", rb.m_moi.xx(), rb.m_moi.xy(), rb.m_moi.xz());
+            felog.printf("\tIxy Iyy Iyz    : %lg, %lg, %lg\n", rb.m_moi.xy(), rb.m_moi.yy(), rb.m_moi.yz());
+            felog.printf("\tIxz Iyz Izz    : %lg, %lg, %lg\n", rb.m_moi.xz(), rb.m_moi.yz(), rb.m_moi.zz());
 		}
 		felog.printf("\n\n");
 	}
