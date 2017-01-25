@@ -1318,9 +1318,53 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 	}
 }
 
-void FERigidSolverNew::InertialForces(FEGlobalVector& R, const FETimeInfo& timeInfo, double beta, double gamma)
+//-----------------------------------------------------------------------------
+//! evaluate body forces
+void FERigidSolverNew::BodyForces(FEGlobalVector& R, const FETimeInfo& timeInfo, FEBodyForce& pbf)
+{
+    FERigidSystem& rigid = *m_fem->GetRigidSystem();
+    int nrb = rigid.Objects();
+    
+    // calculate body forces on rigid bodies
+    for (int i = 0; i<rigid.Objects(); ++i)
+    {
+        FERigidBody& RB = *rigid.Object(i);
+        
+        // 3 translation dofs of rigid body needed for body force
+        vector<double> fe(3);
+        vector<int>	LM(3);
+        
+        // create a material point to evaluate the body force
+        FEElasticMaterialPoint mp;
+        mp.m_r0 = RB.m_r0;
+        mp.m_rt = RB.m_rt;
+        mp.m_F = RB.m_qt.RotationMatrix();
+        
+        // body force = mass*body force per mass (recall that body forces are negated in FEBio)
+        vec3d F = pbf.force(mp)*(-RB.m_mass);
+        
+        fe[0] = F.x;
+        fe[1] = F.y;
+        fe[2] = F.z;
+        
+        // pack the equation numbers
+        LM[0] = RB.m_LM[0];
+        LM[1] = RB.m_LM[1];
+        LM[2] = RB.m_LM[2];
+        R.Assemble(LM, fe);
+        
+        // add to rigid body force
+        RB.m_Fr += F;
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! evaluate inertia forces
+void FERigidSolverNew::InertialForces(FEGlobalVector& R, const FETimeInfo& timeInfo)
 {
 	// Newmark rule
+    double beta = timeInfo.beta;
+    double gamma = timeInfo.gamma;
 	double dt = timeInfo.timeIncrement;
 	double a = 1.0 / (beta*dt);
 	double b = a / dt;

@@ -414,8 +414,11 @@ void FESolidSolver2::UpdateStresses()
 {
 	FEMesh& mesh = m_fem.GetMesh();
 	FETimeInfo tp = m_fem.GetTime();
-
-	// update the stresses on all domains
+    tp.alpha = m_alpha;
+    tp.beta  = m_beta;
+    tp.gamma = m_gamma;
+    
+    // update the stresses on all domains
 	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
 }
 
@@ -456,8 +459,11 @@ bool FESolidSolver2::InitStep(double time)
 
 	// get the time information
 	FETimeInfo tp = fem.GetTime();
-
-	// evaluate load curve values at current (or intermediate) time
+    tp.alpha = m_alpha;
+    tp.beta  = m_beta;
+    tp.gamma = m_gamma;
+    
+    // evaluate load curve values at current (or intermediate) time
 	double t = tp.currentTime;
 	double dt = tp.timeIncrement;
 	double ta = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
@@ -496,8 +502,11 @@ void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
     }
 
 	FETimeInfo tp = m_fem.GetTime();
-
-	// apply concentrated nodal forces
+    tp.alpha = m_alpha;
+    tp.beta  = m_beta;
+    tp.gamma = m_gamma;
+    
+    // apply concentrated nodal forces
 	// since these forces do not depend on the geometry
 	// we can do this once outside the NR loop.
 	NodalForces(m_Fn, tp);
@@ -889,17 +898,22 @@ bool FESolidSolver2::StiffnessMatrix(const FETimeInfo& tp)
 		dom.StiffnessMatrix(this);
 	}
 
-	// calculate the body force stiffness matrix for each domain
+	// calculate the body force stiffness matrix for each non-rigid domain
 	for (int i = 0; i<mesh.Domains(); ++i)
 	{
-		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		int NBL = m_fem.BodyLoads();
-		for (int j=0; j<NBL; ++j)
-		{
-			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
-			if (pbf) dom.BodyForceStiffness(this, *pbf);
-		}
+        FEDomain& dom = mesh.Domain(i);
+        if (dom.GetMaterial()->IsRigid() == false)
+        {
+            FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
+            for (int j=0; j<m_fem.BodyLoads(); ++j)
+            {
+                FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+                if (pbf) edom.BodyForceStiffness(this, *pbf);
+            }
+        }
 	}
+    
+    // TODO: add body force stiffness for rigid bodies
 
 	// Add mass matrix for dynamic problems
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
@@ -1165,22 +1179,38 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	// calculate the internal (stress) forces
 	for (i=0; i<mesh.Domains(); ++i)
 	{
-		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		dom.InternalForces(RHS);
+        FEDomain& dom = mesh.Domain(i);
+        if (dom.GetMaterial()->IsRigid() == false)
+        {
+            FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
+            edom.InternalForces(RHS);
+        }
 	}
 
 	// calculate the body forces
 	for (i=0; i<mesh.Domains(); ++i)
 	{
-		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		for (int j=0; j<m_fem.BodyLoads(); ++j)
-		{
-			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
-			dom.BodyForce(RHS, *pbf);
-		}
+        FEDomain& dom = mesh.Domain(i);
+        if (dom.GetMaterial()->IsRigid() == false)
+        {
+            FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
+            for (int j=0; j<m_fem.BodyLoads(); ++j)
+            {
+                FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+                edom.BodyForce(RHS, *pbf);
+            }
+        }
 	}
-
-	// calculate inertial forces for dynamic problems
+    
+    // calculate body forces for rigid bodies
+    for (int j=0; j<m_fem.BodyLoads(); ++j)
+    {
+        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+        m_rigidSolver.BodyForces(RHS, tp, *pbf);
+    }
+    
+    
+    // calculate inertial forces for dynamic problems
 	if (m_fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) InertialForces(RHS);
 
 	// calculate forces due to surface loads
@@ -1290,8 +1320,11 @@ void FESolidSolver2::InertialForces(FEGlobalVector& R)
 	zero(F);
     
 	// calculate F
-	FETimeInfo timeInfo = m_fem.GetTime();
-    double dt = timeInfo.timeIncrement;
+	FETimeInfo tp = m_fem.GetTime();
+    tp.alpha = m_alpha;
+    tp.beta  = m_beta;
+    tp.gamma = m_gamma;
+    double dt = tp.timeIncrement;
 
     // Newmark rule
     double a = 1.0 / (m_beta*dt);
@@ -1333,5 +1366,5 @@ void FESolidSolver2::InertialForces(FEGlobalVector& R)
 	}
 
 	// update rigid bodies
-	m_rigidSolver.InertialForces(R, timeInfo, m_beta, m_gamma);
+	m_rigidSolver.InertialForces(R, tp);
 }

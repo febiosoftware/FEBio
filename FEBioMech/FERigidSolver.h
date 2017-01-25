@@ -1,4 +1,5 @@
 #pragma once
+#include "FEBodyForce.h"
 #include <FECore/FETypes.h>
 #include <vector>
 using namespace std;
@@ -86,8 +87,11 @@ class FERigidSolverNew : public FERigidSolver
 public:
 	FERigidSolverNew(FEModel* fem) : FERigidSolver(fem){}
 
-	// evaluate inertial data
-	void InertialForces(FEGlobalVector& R, const FETimeInfo& timeInfo, double beta, double gamma);
+    // evaluate body forces
+    void BodyForces(FEGlobalVector& R, const FETimeInfo& timeInfo, FEBodyForce& pbf);
+    
+    // evaluate inertial data
+	void InertialForces(FEGlobalVector& R, const FETimeInfo& timeInfo);
 
 	// update rigid DOF increments
 	void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
