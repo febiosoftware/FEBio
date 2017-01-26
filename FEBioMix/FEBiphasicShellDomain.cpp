@@ -674,7 +674,7 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffness(FEShellElement& el, matrix&
             for (j=0; j<neln; ++j)
             {
                 double kpp = (gradMu[i]*(K*gradMu[j]) - Phip*Mu[i]*Mu[j])*(detJt*dt);
-                double kpq = (gradMu[i]*(K*gradMd[j]) - Phip*Mu[i]*Mu[j])*(detJt*dt);
+                double kpq = (gradMu[i]*(K*gradMd[j]) - Phip*Mu[i]*Md[j])*(detJt*dt);
                 double kqp = (gradMd[i]*(K*gradMu[j]) - Phip*Md[i]*Mu[j])*(detJt*dt);
                 double kqq = (gradMd[i]*(K*gradMd[j]) - Phip*Md[i]*Md[j])*(detJt*dt);
                 

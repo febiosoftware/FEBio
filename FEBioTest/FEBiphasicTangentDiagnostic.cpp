@@ -175,9 +175,16 @@ bool FEBiphasicTangentDiagnostic::Run()
 {
     Logfile::MODE oldmode = felog.SetMode(Logfile::LOG_FILE);
     
+    FEModel& fem = GetFEModel();
+    FEAnalysis* pstep = fem.GetCurrentStep();
+    double dt = m_pscn->m_dt;
+    pstep->m_dt = pstep->m_dt0 =dt;
+    pstep->m_tstart = 0;
+    pstep->m_tend = dt;
+    pstep->m_final_time = dt;
+    
     // solve the problem
 	felog.SetMode(Logfile::LOG_NEVER);
-	FEModel& fem = GetFEModel();
     fem.Solve();
 	felog.SetMode(Logfile::LOG_FILE);
     
@@ -191,7 +198,6 @@ bool FEBiphasicTangentDiagnostic::Run()
     // set up the element stiffness matrix
     matrix k0(4*N, 4*N);
     k0.zero();
-	double dt = m_pscn->m_dt;
     bd.ElementBiphasicStiffness(el, k0, false);
     
     // print the element stiffness matrix
@@ -245,6 +251,11 @@ void FEBiphasicTangentDiagnostic::deriv_residual(matrix& ke)
     // get the solver
 	FEModel& fem = GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
+    double dt = m_pscn->m_dt;
+    pstep->m_dt = pstep->m_dt0 =dt;
+    pstep->m_tstart = 0;
+    pstep->m_tend = dt;
+    pstep->m_final_time = dt;
 	FEBiphasicSolver& solver = static_cast<FEBiphasicSolver&>(*pstep->GetFESolver());
 
 	// get the DOFs
