@@ -13492,7 +13492,16 @@ normal penalty scale factor (1)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13504,7 +13513,16 @@ normal penalty scale factor (1)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13516,7 +13534,16 @@ normal penalty scale factor (1)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13528,7 +13555,16 @@ normal penalty scale factor (1)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13569,7 +13605,16 @@ auto-penalty calculation flag (2)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13581,7 +13626,16 @@ auto-penalty calculation flag (2)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13593,7 +13647,16 @@ auto-penalty calculation flag (2)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13605,7 +13668,16 @@ auto-penalty calculation flag (2)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13646,7 +13718,16 @@ two-pass flag (3)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13658,7 +13739,16 @@ two-pass flag (3)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13670,7 +13760,16 @@ two-pass flag (3)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13682,7 +13781,16 @@ two-pass flag (3)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13723,7 +13831,16 @@ augmented Lagrangian flag (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13735,7 +13852,16 @@ augmented Lagrangian flag (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13747,7 +13873,16 @@ augmented Lagrangian flag (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13759,7 +13894,16 @@ augmented Lagrangian flag (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13801,7 +13945,16 @@ aug.
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13813,7 +13966,16 @@ aug.
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13825,7 +13987,16 @@ aug.
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13837,7 +14008,16 @@ aug.
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13878,7 +14058,16 @@ tolerance for gap value (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13890,7 +14079,16 @@ tolerance for gap value (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13902,7 +14100,16 @@ tolerance for gap value (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13914,7 +14121,16 @@ tolerance for gap value (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13955,7 +14171,16 @@ minimum number of augmentations (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13967,7 +14192,16 @@ minimum number of augmentations (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -13979,7 +14213,16 @@ minimum number of augmentations (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14029,7 +14272,16 @@ maximum number of augmentations (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14041,7 +14293,16 @@ maximum number of augmentations (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14053,7 +14314,16 @@ maximum number of augmentations (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14103,7 +14373,16 @@ frictional coefficient (5)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14171,7 +14450,16 @@ tangential penalty factor (5)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14239,7 +14527,16 @@ tangential stiffness multiplier (5)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14307,7 +14604,16 @@ maximum number of segment updates (6)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14328,7 +14634,16 @@ maximum number of segment updates (6)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14396,7 +14711,16 @@ symmetric stiffness matrix flag (7)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14408,7 +14732,16 @@ symmetric stiffness matrix flag (7)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14449,7 +14782,16 @@ Projection search tolerance (8)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14461,7 +14803,16 @@ Projection search tolerance (8)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14473,7 +14824,16 @@ Projection search tolerance (8)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14485,7 +14845,16 @@ Projection search tolerance (8)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14535,7 +14904,16 @@ search radius (9)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14547,7 +14925,16 @@ search radius (9)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14559,7 +14946,16 @@ search radius (9)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
@@ -14618,7 +15014,16 @@ tension flag (10)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\CIRCLE$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bullet$
+\end_layout
+
 \end_inset
 
 
