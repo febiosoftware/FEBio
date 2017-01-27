@@ -219,9 +219,16 @@ bool FEMultiphasicTangentDiagnostic::Run()
 {
 	Logfile::MODE oldmode = felog.SetMode(Logfile::LOG_FILE);
     
+    FEModel& fem = GetFEModel();
+    FEAnalysis* pstep = fem.GetCurrentStep();
+    double dt = m_pscn->m_dt;
+    pstep->m_dt = pstep->m_dt0 =dt;
+    pstep->m_tstart = 0;
+    pstep->m_tend = dt;
+    pstep->m_final_time = dt;
+
     // solve the problem
 	felog.SetMode(Logfile::LOG_NEVER);
-	FEModel& fem = GetFEModel();
     if (fem.Solve() == false)
 	{
 		felog.SetMode(oldmode);
@@ -246,8 +253,11 @@ bool FEMultiphasicTangentDiagnostic::Run()
     // set up the element stiffness matrix
     matrix k0(ndpn*N, ndpn*N);
     k0.zero();
-	double dt = m_pscn->m_dt;
     md.ElementMultiphasicStiffness(el, k0, false);
+    double k0max = 0;
+    for (int i=0; i<ndpn*N; ++i)
+        for (int j=0; j<ndpn*N; ++j)
+            if (fabs(k0[i][j]) > k0max) k0max = fabs(k0[i][j]);
     
     // print the element stiffness matrix
     felog.printf("\nActual stiffness matrix:\n");
@@ -270,7 +280,7 @@ bool FEMultiphasicTangentDiagnostic::Run()
         for (j=0; j<ndpn*N; ++j)
         {
             kd[i][j] = k0[i][j] - k1[i][j];
-            kij = 100.0*fabs(kd[i][j] / k0[0][0]);
+            kij = 100.0*fabs(kd[i][j] / k0max);
             if (kij > kmax)
             {
                 kmax = kij;
@@ -300,6 +310,11 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
     // get the solver
 	FEModel& fem = GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
+    double dt = m_pscn->m_dt;
+    pstep->m_dt = pstep->m_dt0 =dt;
+    pstep->m_tstart = 0;
+    pstep->m_tend = dt;
+    pstep->m_final_time = dt;
 	FEMultiphasicSolver& solver = static_cast<FEMultiphasicSolver&>(*pstep->GetFESolver());
     
     // get the material
@@ -311,6 +326,9 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
     
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
+    const int dof_x = fem.GetDOFIndex("x");
+    const int dof_y = fem.GetDOFIndex("y");
+    const int dof_z = fem.GetDOFIndex("z");
 	const int dof_p = fem.GetDOFIndex("p");
 	const int dof_c = fem.GetDOFIndex("concentration", 0);
     
@@ -324,7 +342,6 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
     vector<double> f0(ndpn*N);
     vector< vector<double> > f0c(nsol,vector<double>(N));
     zero(f0);
-	double dt = m_pscn->m_dt;
     md.ElementInternalForce(el, f0);
     
     // now calculate the perturbed residuals
@@ -339,9 +356,9 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.m_rt.x += dx; break;
-            case 1: node.m_rt.y += dx; break;
-            case 2: node.m_rt.z += dx; break;
+            case 0: node.inc(dof_x, dx); node.m_rt.x += dx; break;
+            case 1: node.inc(dof_y, dx); node.m_rt.y += dx; break;
+            case 2: node.inc(dof_z, dx); node.m_rt.z += dx; break;
             case 3: node.inc(dof_p, dx); break;
             default: node.inc(dof_c + nj-4, dx); break;
         }
@@ -354,9 +371,9 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.m_rt.x -= dx; break;
-            case 1: node.m_rt.y -= dx; break;
-            case 2: node.m_rt.z -= dx; break;
+            case 0: node.dec(dof_x, dx); node.m_rt.x -= dx; break;
+            case 1: node.dec(dof_y, dx); node.m_rt.y -= dx; break;
+            case 2: node.dec(dof_z, dx); node.m_rt.z -= dx; break;
             case 3: node.dec(dof_p, dx); break;
             default: node.dec(dof_c + nj-4, dx); break;
         }
