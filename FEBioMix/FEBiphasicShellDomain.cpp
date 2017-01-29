@@ -521,8 +521,6 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffness(FEShellElement& el, matrix&
     // jacobian matrix determinant
     double detJt;
     
-    mat3ds s;
-    
     const double* Mr, *Ms, *M;
     
     int nint = el.GaussPoints();
@@ -571,6 +569,9 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffness(FEShellElement& el, matrix&
             Mu[i] = (1+eta)/2*M[i];
             Md[i] = (1-eta)/2*M[i];
         }
+        
+        // get the stress
+        mat3ds s = ept.m_s;
         
         // get elasticity tensor
         tens4ds c = m_pMat->Tangent(pt);
@@ -703,8 +704,6 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffnessSS(FEShellElement& el, matri
     // jacobian matrix determinant
     double detJt;
     
-    mat3ds s;
-    
     const double* Mr, *Ms, *M;
     
     int nint = el.GaussPoints();
@@ -753,6 +752,9 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffnessSS(FEShellElement& el, matri
             Mu[i] = (1+eta)/2*M[i];
             Md[i] = (1-eta)/2*M[i];
         }
+        
+        // get the stress
+        mat3ds s = ept.m_s;
         
         // get elasticity tensor
         tens4ds c = m_pMat->Tangent(pt);
