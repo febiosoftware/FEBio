@@ -45,7 +45,7 @@ public:
 	void Attach(FESurface* ps) { m_ps = ps; }
 	
 	//! initialize search structures
-	void Init();
+	void Init(const double stol);
 	
 	//! find all candidate surface elements intersected by ray
 	void FindCandidateSurfaceElements(vec3d p, vec3d n, std::set<int>& sel);

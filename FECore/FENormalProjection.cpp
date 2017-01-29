@@ -13,7 +13,7 @@ FENormalProjection::FENormalProjection(FESurface& s) : m_surf(s)
 void FENormalProjection::Init()
 {
 	m_OT.Attach(&m_surf);
-	m_OT.Init();
+	m_OT.Init(m_tol);
 }
 
 //-----------------------------------------------------------------------------

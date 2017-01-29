@@ -232,7 +232,7 @@ FEOctree::~FEOctree()
 
 //-----------------------------------------------------------------------------
 
-void FEOctree::Init()
+void FEOctree::Init(const double stol)
 {
 	assert(m_ps);
 	int i;
@@ -261,6 +261,11 @@ void FEOctree::Init()
 		if (fenode.z < root.cmin.z) root.cmin.z = fenode.z;
 		if (fenode.z > root.cmax.z) root.cmax.z = fenode.z;
 	}
+    
+    // expand bounding box by search tolerance stol
+    double d = (root.cmax - root.cmin).norm()*stol;
+    root.cmin -= vec3d(d, d, d);
+    root.cmax += vec3d(d, d, d);
 	
 	// Recursively create children of this root
 	if (root.selist.size()) {

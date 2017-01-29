@@ -106,6 +106,11 @@ bool FEContactDiagnosticBiphasic::Run()
     FEModel& fem = GetFEModel();
     FEMesh& mesh = fem.GetMesh();
     FEAnalysis* pstep = fem.GetCurrentStep();
+    double dt = m_pscn->m_dt;
+    pstep->m_dt = pstep->m_dt0 =dt;
+    pstep->m_tstart = 0;
+    pstep->m_tend = dt;
+    pstep->m_final_time = dt;
     pstep->Activate();
     FEBiphasicSolver& solver = static_cast<FEBiphasicSolver&>(*pstep->GetFESolver());
     solver.m_bsymm = false;
@@ -168,6 +173,11 @@ void FEContactDiagnosticBiphasic::deriv_residual(matrix& K)
     // get the solver
     FEModel& fem = GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
+    double dt = m_pscn->m_dt;
+    pstep->m_dt = pstep->m_dt0 =dt;
+    pstep->m_tstart = 0;
+    pstep->m_tend = dt;
+    pstep->m_final_time = dt;
     FEBiphasicSolver& solver = static_cast<FEBiphasicSolver&>(*pstep->GetFESolver());
     
     // get the DOFs
@@ -334,10 +344,12 @@ bool FEContactBiphasicTangentHex8::Init()
     FESlidingInterfaceBiphasic* ps = new FESlidingInterfaceBiphasic(&fem);
     ps->m_atol = 0.1;
     ps->m_epsn = 1;
+    ps->m_epsp = 1;
     ps->m_btwo_pass = false;
     ps->m_nsegup = 0;
     ps->m_bautopen = true;
     ps->m_bsymm = false;
+    ps->m_stol = 0.01;
     FESlidingSurfaceBiphasic& ms = ps->m_ms;
     ms.Create(1, FE_QUAD4G4);
     ms.Element(0).m_node[0] = 4;
@@ -469,6 +481,7 @@ bool FEContactBiphasicTangentHex20::Init()
     FESlidingInterfaceBiphasic* ps = new FESlidingInterfaceBiphasic(&fem);
     ps->m_atol = 0.1;
     ps->m_epsn = 1;
+    ps->m_epsp = 1;
     ps->m_btwo_pass = false;
     ps->m_nsegup = 0;
     ps->m_bautopen = true;
