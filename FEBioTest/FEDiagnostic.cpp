@@ -9,6 +9,7 @@
 #include "FEPrintHBMatrixDiagnostic.h"
 #include "FEMemoryDiagnostic.h"
 #include "FEBiphasicTangentDiagnostic.h"
+#include "FETiedBiphasicDiagnostic.h"
 #include "FEMultiphasicTangentDiagnostic.h"
 #include "FEFluidTangentDiagnostic.h"
 #include "FEContactDiagnosticBiphasic.h"
@@ -69,6 +70,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
         else if (att == "memory test"             ) m_pdia = new FEMemoryDiagnostic            (fem);
         else if (att == "biphasic tangent test"   ) m_pdia = new FEBiphasicTangentDiagnostic   (fem);
         else if (att == "biphasic contact test"   ) m_pdia = new FEContactDiagnosticBiphasic   (fem);
+        else if (att == "tied biphasic test"      ) m_pdia = new FETiedBiphasicDiagnostic      (fem);
         else if (att == "multiphasic tangent test") m_pdia = new FEMultiphasicTangentDiagnostic(fem);
         else if (att == "fluid tangent test"      ) m_pdia = new FEFluidTangentDiagnostic      (fem);
 		else

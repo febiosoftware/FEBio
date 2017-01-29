@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D5203E5F1E3E86C00011583A /* FETiedBiphasicDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5203E5D1E3E86C00011583A /* FETiedBiphasicDiagnostic.cpp */; };
+		D5203E601E3E86C00011583A /* FETiedBiphasicDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5203E5E1E3E86C00011583A /* FETiedBiphasicDiagnostic.h */; };
 		D52D3CFF1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D3CFD1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.cpp */; };
 		D52D3D001CD782BE0069FE17 /* FEContactDiagnosticBiphasic.h in Headers */ = {isa = PBXBuildFile; fileRef = D52D3CFE1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.h */; };
 		D53D74EA1B9BC9A600A770B5 /* FEBiphasicTangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53D74DA1B9BC9A600A770B5 /* FEBiphasicTangentDiagnostic.cpp */; };
@@ -32,6 +34,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D5203E5D1E3E86C00011583A /* FETiedBiphasicDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETiedBiphasicDiagnostic.cpp; sourceTree = "<group>"; };
+		D5203E5E1E3E86C00011583A /* FETiedBiphasicDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETiedBiphasicDiagnostic.h; sourceTree = "<group>"; };
 		D52D3CFD1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactDiagnosticBiphasic.cpp; sourceTree = "<group>"; };
 		D52D3CFE1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEContactDiagnosticBiphasic.h; sourceTree = "<group>"; };
 		D53D74D21B9BC97F00A770B5 /* libFEBioTest.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioTest.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -109,6 +113,8 @@
 				D55E3AE91C5BBEC300815FCA /* FERestartDiagnostics.h */,
 				D53D74E81B9BC9A600A770B5 /* FETangentDiagnostic.cpp */,
 				D53D74E91B9BC9A600A770B5 /* FETangentDiagnostic.h */,
+				D5203E5D1E3E86C00011583A /* FETiedBiphasicDiagnostic.cpp */,
+				D5203E5E1E3E86C00011583A /* FETiedBiphasicDiagnostic.h */,
 			);
 			name = FEBioTest;
 			path = ../../FEBioTest;
@@ -132,6 +138,7 @@
 				D55E3AEB1C5BBEC300815FCA /* FERestartDiagnostics.h in Headers */,
 				D53D74F31B9BC9A600A770B5 /* FEMultiphasicTangentDiagnostic.h in Headers */,
 				D52D3D001CD782BE0069FE17 /* FEContactDiagnosticBiphasic.h in Headers */,
+				D5203E601E3E86C00011583A /* FETiedBiphasicDiagnostic.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,6 +208,7 @@
 				D55E3AEA1C5BBEC300815FCA /* FERestartDiagnostic.cpp in Sources */,
 				D53D74EA1B9BC9A600A770B5 /* FEBiphasicTangentDiagnostic.cpp in Sources */,
 				D53D74EE1B9BC9A600A770B5 /* FEDiagnostic.cpp in Sources */,
+				D5203E5F1E3E86C00011583A /* FETiedBiphasicDiagnostic.cpp in Sources */,
 				D52D3CFF1CD782BE0069FE17 /* FEContactDiagnosticBiphasic.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
