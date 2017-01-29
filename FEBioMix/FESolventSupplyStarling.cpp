@@ -24,8 +24,10 @@ FESolventSupplyStarling::FESolventSupplyStarling(FEModel* pfem) : FESolventSuppl
 	DOFS& fedofs = pfem->GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
-    m_qc.assign(MAX_CDOFS,0);
-    m_cv.assign(MAX_CDOFS,0);
+    if (MAX_CDOFS > 0) {
+        m_qc.assign(MAX_CDOFS,0);
+        m_cv.assign(MAX_CDOFS,0);
+    }
 }
 
 //-----------------------------------------------------------------------------
