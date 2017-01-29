@@ -51,7 +51,10 @@ bool FEFluidTangentUniaxial::Init()
     };
     
     FEModel& fem = GetDiagnostic()->GetFEModel();
-	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
+    FEAnalysis* pstep = fem.GetCurrentStep();
+    pstep->m_nanalysis = FE_DYNAMIC;
+
+    int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 	const int dof_VX = fem.GetDOFIndex("vx");
 	const int dof_VY = fem.GetDOFIndex("vy");
 	const int dof_VZ = fem.GetDOFIndex("vz");
@@ -130,16 +133,21 @@ bool FEFluidTangentUniaxialSS::Init()
         { 0,-1,-1, 0},{ 0,-1,-1,-1},{ 0,-1,-1,-1}, { 0,-1,-1, 0}
     };
     
+    FEModel& fem = GetDiagnostic()->GetFEModel();
+    FEAnalysis* pstep = fem.GetCurrentStep();
+    pstep->m_nanalysis = FE_STEADY_STATE;
+    
+    int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
+    const int dof_VX = fem.GetDOFIndex("vx");
+    const int dof_VY = fem.GetDOFIndex("vy");
+    const int dof_VZ = fem.GetDOFIndex("vz");
+    const int dof_E  = fem.GetDOFIndex("e");
+    
     // --- create the FE problem ---
     // create the mesh
-    FEModel& fem = GetDiagnostic()->GetFEModel();
     FEMesh& m = fem.GetMesh();
     m.CreateNodes(8);
-    int dof_vx = fem.GetDOFIndex("vx");
-    int dof_vy = fem.GetDOFIndex("vy");
-    int dof_vz = fem.GetDOFIndex("vz");
-    int dof_e  = fem.GetDOFIndex("e" );
-
+    m.SetDOFS(MAX_DOFS);
     for (i=0; i<8; ++i)
     {
         FENode& n = m.Node(i);
@@ -147,10 +155,10 @@ bool FEFluidTangentUniaxialSS::Init()
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_vx);
-        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_vy);
-        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_vz);
-        if (BC[i][3] == -1) fem.AddFixedBC(i, dof_e);
+        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_VX);
+        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_VY);
+        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_VZ);
+        if (BC[i][3] == -1) fem.AddFixedBC(i, dof_E);
     }
     
     // get the material
@@ -160,7 +168,7 @@ bool FEFluidTangentUniaxialSS::Init()
     FEFluidDomain3D* pd = new FEFluidDomain3D(&fem);
     pd->SetMaterial(pmat);
     pd->Create(1, FE_HEX8G8);
-	pd->SetMatID(0);
+    pd->SetMatID(0);
     m.AddDomain(pd);
     FESolidElement& el = pd->Element(0);
     el.SetID(1);
@@ -176,9 +184,9 @@ bool FEFluidTangentUniaxialSS::Init()
     
     // Add a prescribed BC
     int nd[4] = {0, 3, 4, 7};
-	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
+    FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
     fem.AddPrescribedBC(pdc);
-    pdc->SetDOF(dof_vx).SetScale(m_velocity, 0);
+    pdc->SetDOF(dof_VX).SetScale(m_velocity, 0);
     for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
     
     return true;
@@ -191,8 +199,6 @@ FEFluidTangentDiagnostic::FEFluidTangentDiagnostic(FEModel& fem) : FEDiagnostic(
     m_pscn = 0;
     
     FEAnalysis* pstep = new FEAnalysis(&fem);
-    pstep->m_nanalysis = FE_DYNAMIC;
-//    pstep->m_nanalysis = FE_STEADY_STATE;
     
     // create a new solver
     FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "fluid", &fem);
@@ -260,6 +266,13 @@ bool FEFluidTangentDiagnostic::Run()
     // solve the problem
 	felog.SetMode(Logfile::LOG_NEVER);
     FEModel& fem = GetFEModel();
+    FEAnalysis* pstep = fem.GetCurrentStep();
+    double dt = m_pscn->m_dt;
+    pstep->m_dt = pstep->m_dt0 = dt;
+    pstep->m_tstart = 0;
+    pstep->m_tend = dt;
+    pstep->m_final_time = dt;
+    pstep->Activate();
     fem.Solve();
 	felog.SetMode(Logfile::LOG_FILE);
     
@@ -327,6 +340,11 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
     // get the solver
     FEModel& fem = GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
+    double dt = m_pscn->m_dt;
+    pstep->m_dt = pstep->m_dt0 = dt;
+    pstep->m_tstart = 0;
+    pstep->m_tend = dt;
+    pstep->m_final_time = dt;
     FEFluidSolver& solver = static_cast<FEFluidSolver&>(*pstep->GetFESolver());
 
 	// get the dof indices
