@@ -523,6 +523,9 @@ void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
 		if (dc.IsActive()) dc.PrepStep(ui);
 	}
 
+	// do the linear constraints
+	m_fem.GetLinearConstraintManager().PrepStep();
+
 	// initialize rigid bodies
 	m_rigidSolver.PrepStep(timeInfo, ui);
 

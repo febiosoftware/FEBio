@@ -284,6 +284,7 @@
     <ClCompile Include="..\..\FEBioTest\FEPrintMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FERestartDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FETangentDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBioTest\FETiedBiphasicDiagnostic.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioTest\FEBiphasicTangentDiagnostic.h" />
@@ -297,6 +298,7 @@
     <ClInclude Include="..\..\FEBioTest\FEPrintMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FERestartDiagnostics.h" />
     <ClInclude Include="..\..\FEBioTest\FETangentDiagnostic.h" />
+    <ClInclude Include="..\..\FEBioTest\FETiedBiphasicDiagnostic.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

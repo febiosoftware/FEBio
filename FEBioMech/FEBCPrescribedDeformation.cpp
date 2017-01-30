@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEBCPrescribedDeformation.h"
+#include <FECore/FELinearConstraintManager.h>
 #include <FECore/FEModel.h>
 
 BEGIN_PARAMETER_LIST(FEBCPrescribedDeformation, FEPrescribedBC)
@@ -318,4 +319,37 @@ void FEBCPrescribedDeformation2O::PrepStep(std::vector<double>& ui, bool brel)
 		I = -node.m_ID[dofY] - 2; if (I >= 0) ui[I] = (brel ? u.y - node.get(dofY) : u.y);
 		I = -node.m_ID[dofZ] - 2; if (I >= 0) ui[I] = (brel ? u.z - node.get(dofZ) : u.z);
 	}
+
+
+	// THIS IS A HACK!!!! FIX THIS!!!
+/*
+	// get the mesh
+	mat3d U = m_F - mat3dd(1.0);
+	FELinearConstraintManager& LM = fem.GetLinearConstraintManager();
+	const int NL = LM.LinearConstraints();
+	for (int i = 0; i<NL; ++i)
+	{
+		FELinearConstraint& lc = LM.LinearConstraint(i);
+
+		FENode& slaveNode = mesh.Node(lc.master.node);
+		FENode& masterNode = mesh.Node(lc.slave[0].node);
+
+		vec3d Xp = slaveNode.m_r0;
+		vec3d Xm = masterNode.m_r0;
+
+		mat3ds XXp = dyad(Xp);
+		mat3ds XXm = dyad(Xm);
+
+		vec3d d = (U*(Xp - Xm) + (m_G.contract2s(XXp - XXm))*0.5)*m_scale;
+
+		switch (lc.master.dof)
+		{
+		case 0: lc.m_off = d.x; break;
+		case 1: lc.m_off = d.y; break;
+		case 2: lc.m_off = d.z; break;
+		}
+
+	}
+*/
+	// END HACK
 }

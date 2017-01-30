@@ -51,6 +51,9 @@
     <ClCompile Include="..\..\FEBioTest\FEContactDiagnosticBiphasic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioTest\FETiedBiphasicDiagnostic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioTest\FEBiphasicTangentDiagnostic.h">
@@ -84,6 +87,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioTest\FEContactDiagnosticBiphasic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioTest\FETiedBiphasicDiagnostic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

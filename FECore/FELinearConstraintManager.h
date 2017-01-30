@@ -49,6 +49,9 @@ public:
 	// assemble element matrix into (reduced) global matrix
 	void AssembleStiffness(FEGlobalMatrix& K, vector<double>& R, vector<double>& ui, vector<int>& en, vector<int>& elm, matrix& ke);
 
+	// called before the first reformation for each time step
+	void PrepStep();
+
 	// update nodal variables
 	void Update();
 
@@ -59,4 +62,5 @@ private:
 	FEModel* m_fem;
 	vector<FELinearConstraint>	m_LinC;		//!< linear constraints data
 	table<int>					m_LCT;		//!< linear constraint table
+	vector<double>				m_up;		//!< the inhomogenous component of the linear constraint
 };

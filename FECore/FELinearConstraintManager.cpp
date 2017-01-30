@@ -219,7 +219,31 @@ bool FELinearConstraintManager::Initialize()
 	// initialize the lookup table
 	InitTable();
 
+	// set the prescribed value array
+	m_up.assign(m_LinC.size(), 0.0);
+
 	return true;
+}
+
+void FELinearConstraintManager::PrepStep()
+{
+	FEMesh& mesh = m_fem->GetMesh();
+
+	for (int i=0; i<m_LinC.size(); ++i)
+	{
+		FELinearConstraint& lc = m_LinC[i];
+		FENode& node = mesh.Node(lc.master.node);
+		double u = node.get(lc.master.dof);
+
+		double v = 0;
+		for (int j=0; j<lc.slave.size(); ++j)
+		{
+			FENode& nj = mesh.Node(lc.slave[j].node);
+			v += lc.slave[j].val* nj.get(lc.slave[j].dof);
+		}
+
+		m_up[i] = v + lc.m_off - u;
+	}
 }
 
 void FELinearConstraintManager::InitTable()
@@ -357,6 +381,14 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 						if ((J >= 0) && (I >= 0)) R[I] -= kij*ui[J];
 					}
 				}
+
+				// adjust right-hand side for inhomogeneous linear constraints
+				if (Lj.m_off != 0.0)
+				{
+					double ri = ke[i][j]*m_up[lj];
+					int I = elm[i];
+					if (I >= 0) R[i] -= ri;
+				}
 			}
 			else if ((li >= 0) && (lj >= 0))
 			{
@@ -386,6 +418,18 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 							J = -J - 2;
 							if ((J >= 0) && (I >= 0)) R[I] -= kij*ui[J];
 						}
+					}
+				}
+
+				// adjust for inhomogeneous linear constraints
+				if (Lj.m_off != 0.0)
+				{
+					is = Li.slave.begin();
+					for (int k = 0; k<(int)Li.slave.size(); ++k, ++is)
+					{
+						int I = mesh.Node(is->node).m_ID[is->dof];
+						double ri = is->val * ke[i][j] * m_up[lj];
+						if (I >= 0) R[i] -= ri;
 					}
 				}
 			}
@@ -418,4 +462,6 @@ void FELinearConstraintManager::Update()
 		FENode& masterNode = mesh.Node(lc.master.node);
 		masterNode.set(lc.master.dof, d + lc.m_off);
 	}
+
+	m_up.assign(m_LinC.size(), 0.0);
 }
