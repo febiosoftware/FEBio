@@ -16438,11 +16438,27 @@ key "Betsch96"
  elements in such problems.
 \end_layout
 
+\begin_layout Standard
+Starting with FEBio 2.6, two shell formulations have become available: The
+ original formulation, where nodes are located at the mid-surface through
+ the thickness of the shell, and a new formulation where nodes are located
+ on the front face of the shell.
+ The original formulation uses nodal displacements and directors as degrees
+ of freedom; the new formulation uses front and back face nodal displacements.
+ The new formulation is designed to properly accommodate shells attached
+ to the surface of a solid element, or shells sandwiched between two solid
+ elements, with minimal alterations to the rest of the code.
+ The original formulation does not strictly enforce continuity of all the
+ relevant degrees of freedom in those situations.
+ However, this original formulation is maintained in the code for backward
+ compatibility.
+\end_layout
+
 \begin_layout Subsection
-Shell formulation
+Shell with mid-surface nodal displacements
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Shell-formulation"
+name "subsec:Shell-formulation-standalone"
 
 \end_inset
 
@@ -16552,7 +16568,7 @@ status open
 \align center
 
 \series bold
-Example of shell elements with four nodal positions 
+Example of shell elements with four mid-surface nodal positions 
 \begin_inset Formula $\mathbf{\hat{x}}_{b}$
 \end_inset
 
@@ -16564,7 +16580,7 @@ Example of shell elements with four nodal positions
 \begin_inset Formula $b=1-4)$
 \end_inset
 
-.
+, reduced from a solid element.
  
 \end_layout
 
@@ -16637,7 +16653,7 @@ from which we may evaluate the contravariant basis vectors
  Then, the gradients of the shape functions are given by 
 \begin_inset Formula 
 \begin{equation}
-\nabla M_{b}=\frac{\partial M_{b}}{\partial\xi_{\alpha}}\mathbf{g}^{\alpha},\quad\nabla\left(\frac{1}{2}\xi_{3}M_{b}\right)=\frac{1}{2}\left(\xi_{3}\nabla M_{b}+M_{b}\mathbf{g}^{3}\right)\,.\label{eq388}
+\grad M_{b}=\frac{\partial M_{b}}{\partial\xi_{\alpha}}\mathbf{g}^{\alpha},\quad\grad\left(\frac{1}{2}\xi_{3}M_{b}\right)=\frac{1}{2}\left(\xi_{3}\grad M_{b}+M_{b}\mathbf{g}^{3}\right)\,.\label{eq388}
 \end{equation}
 
 \end_inset
@@ -16668,7 +16684,62 @@ and the incremental displacement is
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Standard
+In FEBio, for historical reasons, the nodal director 
+\begin_inset Formula $\mathbf{d}_{b}$
+\end_inset
+
+ is currently called 
+\emph on
+rotation
+\emph default
+.
+ This is a misnomer and users should treat this 
+\emph on
+rotation
+\emph default
+ as the vector 
+\begin_inset Formula $\mathbf{d}_{a}$
+\end_inset
+
+ whose components have units of length.
+ Thus, fixing or prescribing 
+\emph on
+rotation
+\emph default
+ components in the input file effectively places these constraints on the
+ components of the nodal director; similarly, requesting 
+\emph on
+rotation
+\emph default
+ in the output files will produce the components of the director.
+\end_layout
+
+\begin_layout Standard
+When this type of shell is connected face-to-face with a solid element,
+ the nodes located at 
+\begin_inset Formula $\mathbf{\hat{x}}_{b}$
+\end_inset
+
+ automatically share their displacement degrees of freedom 
+\begin_inset Formula $\mathbf{u}_{b}$
+\end_inset
+
+ with the corresponding nodes from the face of the solid element.
+ However, no continuity is enforced between the directors 
+\begin_inset Formula $\mathbf{d}_{b}$
+\end_inset
+
+ and the solid element deformation.
+ One consequence of this condition is that a shell sandwiched between two
+ solid elements will not detect out-of-plane shear and normal stresses transmitt
+ed by the solid element(s).
+ Another consequence is that bending of the solid element(s) will not produce
+ a bending moment in the shell.
+ Therefore, these shell elements are best used as shell-only structures.
+\end_layout
+
+\begin_layout Subsubsection
 Elastic Shell
 \begin_inset CommandInset label
 LatexCommand label
@@ -16683,7 +16754,7 @@ name "subsec:Elastic-Shell"
 For an elastic shell, the internal virtual work becomes 
 \begin_inset Formula 
 \begin{equation}
-\delta W_{\text{int}}^{e}=\int\limits _{\Omega^{e}}\boldsymbol{\sigma}:\nabla\delta\mathbf{u}\,dv=\sum\limits _{a=1}^{n}\left[\begin{array}{cc}
+\delta W_{\text{int}}^{e}=\int\limits _{\Omega^{e}}\boldsymbol{\sigma}:\grad\delta\mathbf{u}\,dv=\sum\limits _{a=1}^{n}\left[\begin{array}{cc}
 \delta\mathbf{\hat{u}}_{a} & \delta\mathbf{d}_{a}\end{array}\right]\cdot\left[\begin{array}{c}
 \mathbf{f}_{a}^{u}\\
 \mathbf{f}_{a}^{d}
@@ -16695,7 +16766,7 @@ For an elastic shell, the internal virtual work becomes
 where 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{f}_{a}^{u}=\int\limits _{\Omega^{e}}\boldsymbol{\sigma}\cdot\nabla M_{a}\,dv,\quad\mathbf{f}_{a}^{d}=\int\limits _{\Omega^{e}}\boldsymbol{\sigma}\cdot\nabla\left(\frac{1}{2}\xi_{3}M_{a}\right)\,dv\,.\label{eq392}
+\mathbf{f}_{a}^{u}=\int\limits _{\Omega^{e}}\boldsymbol{\sigma}\cdot\grad M_{a}\,dv,\quad\mathbf{f}_{a}^{d}=\int\limits _{\Omega^{e}}\boldsymbol{\sigma}\cdot\grad\left(\frac{1}{2}\xi_{3}M_{a}\right)\,dv\,.\label{eq392}
 \end{equation}
 
 \end_inset
@@ -16704,8 +16775,8 @@ The linearization of the internal virtual work is
 \begin_inset Formula 
 \begin{equation}
 \begin{array}{c}
-D\left(\delta W_{\text{int}}^{e}\right)\left[\Delta\mathbf{u}\right]=\int\limits _{\Omega^{e}}\tr\left(\nabla\Delta\mathbf{u}\cdot\boldsymbol{\sigma}\cdot\nabla^{T}\delta\mathbf{u}\right)\,dv\\
-+\int\limits _{\Omega^{e}}\nabla\delta\mathbf{u}:\boldsymbol{\mathcal{C}}:\nabla^{T}\Delta\mathbf{u}\,dv
+D\left(\delta W_{\text{int}}^{e}\right)\left[\Delta\mathbf{u}\right]=\int\limits _{\Omega^{e}}\tr\left(\grad\Delta\mathbf{u}\cdot\boldsymbol{\sigma}\cdot\grad^{T}\delta\mathbf{u}\right)\,dv\\
++\int\limits _{\Omega^{e}}\grad\delta\mathbf{u}:\boldsymbol{\mathcal{C}}:\grad^{T}\Delta\mathbf{u}\,dv
 \end{array}\,.\label{eq393}
 \end{equation}
 
@@ -16714,7 +16785,7 @@ D\left(\delta W_{\text{int}}^{e}\right)\left[\Delta\mathbf{u}\right]=\int\limits
 The first of these integrals may be discretized as 
 \begin_inset Formula 
 \begin{equation}
-\int\limits _{\Omega^{e}}\tr\left(\nabla\Delta\mathbf{u}\cdot\boldsymbol{\sigma}\cdot\nabla^{T}\delta\mathbf{u}\right)\,dv=\sum\limits _{a=1}^{m}\sum\limits _{b=1}^{m}\left[\begin{array}{cc}
+\int\limits _{\Omega^{e}}\tr\left(\grad\Delta\mathbf{u}\cdot\boldsymbol{\sigma}\cdot\grad^{T}\delta\mathbf{u}\right)\,dv=\sum\limits _{a=1}^{m}\sum\limits _{b=1}^{m}\left[\begin{array}{cc}
 \delta\mathbf{\hat{u}}_{a} & \delta\mathbf{d}_{a}\end{array}\right]\left[\begin{array}{cc}
 \mathbf{K}_{ab}^{uu} & \mathbf{K}_{ab}^{ud}\\
 \mathbf{K}_{ab}^{du} & \mathbf{K}_{ab}^{dd}
@@ -16729,8 +16800,10 @@ The first of these integrals may be discretized as
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{K}_{ab}^{uu} & =\int\limits _{\Omega^{e}}\left(\nabla M_{a}\cdot\boldsymbol{\sigma}\cdot\nabla M_{b}\right)\mathbf{I}\,dv & \mathbf{K}_{ab}^{ud} & =\int\limits _{\Omega^{e}}\left(\nabla M_{a}\cdot\boldsymbol{\sigma}\cdot\nabla\left(\frac{1}{2}\xi_{3}M_{b}\right)\right)\mathbf{I}\,dv\\
-\mathbf{K}_{ab}^{du} & =\int\limits _{\Omega^{e}}\left(\nabla\left(\frac{1}{2}\xi_{3}M_{a}\right)\cdot\boldsymbol{\sigma}\cdot\nabla M_{b}\right)\mathbf{I}\,dv & \mathbf{K}_{ab}^{dd} & =\int\limits _{\Omega^{e}}\left(\nabla\left(\frac{1}{2}\xi_{3}M_{a}\right)\cdot\boldsymbol{\sigma}\cdot\nabla\left(\frac{1}{2}\xi_{3}M_{b}\right)\right)\mathbf{I}\,dv
+\begin{aligned}\mathbf{K}_{ab}^{uu} & =\int\limits _{\Omega^{e}}\left(\grad M_{a}\cdot\boldsymbol{\sigma}\cdot\grad M_{b}\right)\mathbf{I}\,dv\\
+\mathbf{K}_{ab}^{ud} & =\int\limits _{\Omega^{e}}\left(\grad M_{a}\cdot\boldsymbol{\sigma}\cdot\grad\left(\frac{1}{2}\xi_{3}M_{b}\right)\right)\mathbf{I}\,dv\\
+\mathbf{K}_{ab}^{du} & =\int\limits _{\Omega^{e}}\left(\grad\left(\frac{1}{2}\xi_{3}M_{a}\right)\cdot\boldsymbol{\sigma}\cdot\grad M_{b}\right)\mathbf{I}\,dv\\
+\mathbf{K}_{ab}^{dd} & =\int\limits _{\Omega^{e}}\left(\grad\left(\frac{1}{2}\xi_{3}M_{a}\right)\cdot\boldsymbol{\sigma}\cdot\grad\left(\frac{1}{2}\xi_{3}M_{b}\right)\right)\mathbf{I}\,dv
 \end{aligned}
 \,.\label{eq395}
 \end{equation}
@@ -16747,7 +16820,7 @@ reference "eq393"
  becomes 
 \begin_inset Formula 
 \begin{equation}
-\int\limits _{\Omega^{e}}\nabla\delta\mathbf{u}:\boldsymbol{\mathcal{C}}:\nabla^{T}\Delta\mathbf{u}\,dv=\sum\limits _{a=1}^{m}\sum\limits _{b=1}^{m}\left[\begin{array}{cc}
+\int\limits _{\Omega^{e}}\grad\delta\mathbf{u}:\boldsymbol{\mathcal{C}}:\grad^{T}\Delta\mathbf{u}\,dv=\sum\limits _{a=1}^{m}\sum\limits _{b=1}^{m}\left[\begin{array}{cc}
 \delta\mathbf{\hat{u}}_{a} & \delta\mathbf{d}_{a}\end{array}\right]\left[\begin{array}{cc}
 \mathbf{K}_{ab}^{uu} & \mathbf{K}_{ab}^{ud}\\
 \mathbf{K}_{ab}^{du} & \mathbf{K}_{ab}^{dd}
@@ -16762,8 +16835,10 @@ reference "eq393"
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{K}_{ab}^{uu} & =\int\limits _{\Omega^{e}}\nabla M_{a}\cdot\boldsymbol{\mathcal{C}}\cdot\nabla M_{b}\,dv & \mathbf{K}_{ab}^{ud} & =\int\limits _{\Omega^{e}}\nabla M_{a}\cdot\boldsymbol{\mathcal{C}}\cdot\nabla\left(\frac{1}{2}\xi_{3}M_{b}\right)\,dv\\
-\mathbf{K}_{ab}^{du} & =\int\limits _{\Omega^{e}}\nabla\left(\frac{1}{2}\xi_{3}M_{a}\right)\cdot\boldsymbol{\mathcal{C}}\cdot\nabla M_{b}\,dv & \mathbf{K}_{ab}^{dd} & =\int\limits _{\Omega^{e}}\nabla\left(\frac{1}{2}\xi_{3}M_{a}\right)\cdot\boldsymbol{\mathcal{C}}\cdot\nabla\left(\frac{1}{2}\xi_{3}M_{b}\right)\,dv
+\begin{aligned}\mathbf{K}_{ab}^{uu} & =\int\limits _{\Omega^{e}}\grad M_{a}\cdot\boldsymbol{\mathcal{C}}\cdot\grad M_{b}\,dv\\
+\mathbf{K}_{ab}^{ud} & =\int\limits _{\Omega^{e}}\grad M_{a}\cdot\boldsymbol{\mathcal{C}}\cdot\grad\left(\frac{1}{2}\xi_{3}M_{b}\right)\,dv\\
+\mathbf{K}_{ab}^{du} & =\int\limits _{\Omega^{e}}\grad\left(\frac{1}{2}\xi_{3}M_{a}\right)\cdot\boldsymbol{\mathcal{C}}\cdot\grad M_{b}\,dv\\
+\mathbf{K}_{ab}^{dd} & =\int\limits _{\Omega^{e}}\grad\left(\frac{1}{2}\xi_{3}M_{a}\right)\cdot\boldsymbol{\mathcal{C}}\cdot\grad\left(\frac{1}{2}\xi_{3}M_{b}\right)\,dv
 \end{aligned}
 \,.\label{eq397}
 \end{equation}
@@ -16780,7 +16855,7 @@ s integration.
  and six-node triangular shell elements.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Quadrilateral shells
 \begin_inset CommandInset label
 LatexCommand label
@@ -16821,7 +16896,7 @@ M_{4} & =\frac{1}{4}\left(1-r\right)\left(1+s\right)-\frac{1}{2}\left(M_{7}+M_{8
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Triangular shells
 \begin_inset CommandInset label
 LatexCommand label
@@ -16906,6 +16981,814 @@ Different shell elements available in FEBio.
 
 
 \begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Shells with front and back face nodal displacements
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Shells-front-back"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We create a shell formulation by reducing a 3D element interpolation which
+ is linear along 
+\begin_inset Formula $\xi_{3}$
+\end_inset
+
+.
+ The nodal positions at the back of the shell (
+\begin_inset Formula $\xi_{3}=-1$
+\end_inset
+
+) are denoted by 
+\begin_inset Formula $\mathbf{y}_{a}$
+\end_inset
+
+ and those on the front of the shell (
+\begin_inset Formula $\xi_{3}=+1$
+\end_inset
+
+) are denoted by 
+\begin_inset Formula $\mathbf{x}_{a}$
+\end_inset
+
+, thus
+\begin_inset Formula 
+\begin{equation}
+\mathbf{x}\left(\xi_{i}\right)=\sum_{a}M_{a}\left(\xi_{1},\xi_{2}\right)\left(\frac{1+\xi_{3}}{2}\mathbf{x}_{a}+\frac{1-\xi_{3}}{2}\mathbf{y}_{a}\right)=\sum_{a}M_{a}\left(\xi_{1},\xi_{2}\right)\left(\mathbf{x}_{a}-\frac{1-\xi_{3}}{2}\mathbf{d}_{a}\right)\label{eq:solid-element-interpolation}
+\end{equation}
+
+\end_inset
+
+The vector from 
+\begin_inset Formula $\mathbf{y}_{a}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathbf{x}_{a}$
+\end_inset
+
+ is the director, 
+\begin_inset Formula $\mathbf{d}_{a}$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\mathbf{d}_{a}=\mathbf{x}_{a}-\mathbf{y}_{a}
+\]
+
+\end_inset
+
+From this relation we can get the shell covariant basis vectors,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{g}_{\alpha}\left(\xi_{i}\right) & =\frac{\partial\mathbf{x}}{\partial\xi_{\alpha}}=\sum_{a}\frac{\partial M_{a}}{\partial\xi_{\alpha}}\left(\frac{1+\xi_{3}}{2}\mathbf{x}_{a}+\frac{1-\xi_{3}}{2}\mathbf{y}_{a}\right)=\sum_{a}\frac{\partial M_{a}}{\partial\xi_{\alpha}}\left(\mathbf{x}_{a}-\frac{1-\xi_{3}}{2}\mathbf{d}_{a}\right)\\
+\mathbf{g}_{3}\left(\xi_{i}\right) & =\frac{\partial\mathbf{x}}{\partial\xi_{3}}=\sum_{a}\frac{1}{2}M_{a}\left(\xi_{1},\xi_{2}\right)\left(\mathbf{x}_{a}-\mathbf{y}_{a}\right)=\sum_{a}\frac{1}{2}M_{a}\left(\xi_{1},\xi_{2}\right)\mathbf{d}_{a}
+\end{aligned}
+\label{eq:shell-covariant-basis}
+\end{equation}
+
+\end_inset
+
+from which we may evaluate the contravariant basis vectors 
+\begin_inset Formula $\mathbf{g}^{i}$
+\end_inset
+
+.
+ Let the front-face and back-face displacements be denoted by 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+, respectively.
+ It follows that 
+\begin_inset Formula $\mathbf{x}_{a}=\mathbf{X}_{a}+\mathbf{u}_{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{y}_{a}=\mathbf{Y}_{a}+\mathbf{w}_{a}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{X}_{a}$
+\end_inset
+
+ represents the shell nodal positions in the reference configuration, provided
+ as nodal coordinates in the input file, and 
+\begin_inset Formula $\mathbf{Y}_{a}=\mathbf{X}_{a}-\mathbf{D}_{a}$
+\end_inset
+
+ is evaluated from the user-defined referential shell thickness, and the
+ surface surface normals evaluated at each node.
+ If the shell surface is not planar in the reference configuration, users
+ must be careful to select shell thicknesses that don't produce inverted
+ elements (negative Jacobians) as a result of this extrapolation.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Figures/FigShellElementsFB.pdf
+	lyxscale 45
+	scale 45
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+
+\series bold
+Example of shell element with front-face nodal positions 
+\begin_inset Formula $\mathbf{x}_{b}$
+\end_inset
+
+ and back-face nodal positions 
+\begin_inset Formula $\mathbf{y}_{b}$
+\end_inset
+
+ (
+\begin_inset Formula $b=1-4)$
+\end_inset
+
+, reduced from a solid element.
+ 
+\end_layout
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It follows that the virtual displacement is
+\begin_inset Formula 
+\begin{equation}
+\delta\mathbf{u}\left(\xi_{i}\right)=\sum_{a}M_{a}\left(\frac{1+\xi_{3}}{2}\delta\mathbf{u}_{a}+\frac{1-\xi_{3}}{2}\delta\mathbf{w}_{a}\right)\,,\label{eq:shell-virtual-velocity}
+\end{equation}
+
+\end_inset
+
+and the incremental displacement is
+\begin_inset Formula 
+\begin{equation}
+\Delta\mathbf{u}\left(\xi_{i}\right)=\sum_{b}M_{b}\left(\frac{1+\xi_{3}}{2}\Delta\mathbf{u}_{b}+\frac{1-\xi_{3}}{2}\Delta\mathbf{w}_{b}\right)\,,\label{eq:shell-incremental-displacement}
+\end{equation}
+
+\end_inset
+
+so that
+\begin_inset Formula 
+\begin{equation}
+\grad\delta\mathbf{u}=\sum_{a}\delta\mathbf{u}_{a}\otimes\grad\left(\frac{1+\xi_{3}}{2}M_{a}\right)+\delta\mathbf{w}_{a}\otimes\grad\left(\frac{1-\xi_{3}}{2}M_{a}\right)\,,\label{eq:gradient-virtual-velocity}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\grad\Delta\mathbf{u}=\sum_{b}\Delta\mathbf{u}_{b}\otimes\grad\left(\frac{1+\xi_{3}}{2}M_{b}\right)+\Delta\mathbf{w}_{b}\otimes\grad\left(\frac{1-\xi_{3}}{2}M_{b}\right)\label{eq:gradient-incremental-displacement}
+\end{equation}
+
+\end_inset
+
+Note that
+\begin_inset Formula 
+\begin{equation}
+\grad M_{b}=\frac{\partial M_{b}}{\partial\xi_{\alpha}}\mathbf{g}^{\alpha}\,,\label{eq:shell-shape-gradient-M}
+\end{equation}
+
+\end_inset
+
+so that
+\begin_inset Formula 
+\begin{equation}
+\grad\left(\frac{1+\xi_{3}}{2}M_{b}\right)=\frac{1}{2}\left(\left(1+\xi_{3}\right)\grad M_{b}+M_{b}\mathbf{g}^{3}\right)\label{eq:shell-shape-gradient-Mu}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\grad\left(\frac{1-\xi_{3}}{2}M_{b}\right)=\frac{1}{2}\left(\left(1-\xi_{3}\right)\grad M_{b}-M_{b}\mathbf{g}^{3}\right)\label{eq:shell-shape-gradient-Md}
+\end{equation}
+
+\end_inset
+
+To evaluate the deformation gradient in this shell element, we use
+\begin_inset Formula 
+\[
+\mathbf{F}=\Grad\mathbf{x}=\sum_{b}\mathbf{u}_{b}\otimes\Grad\left(\frac{1+\xi_{3}}{2}M_{b}\right)+\mathbf{w}_{b}\otimes\grad\left(\frac{1-\xi_{3}}{2}M_{b}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this formulation, when a shell element is connected face-to-face with
+ a solid element, the nodal displacements of the solid element face are
+ set to coincide with the back-face nodal displacements 
+\begin_inset Formula $\mathbf{w}_{b}$
+\end_inset
+
+ of the shell.
+ When a user prescribes displacement components on that shared face, they
+ apply to the front-face displacements 
+\begin_inset Formula $\mathbf{u}_{b}$
+\end_inset
+
+.
+ Similarly, prescribed pressures and contact pressures act on the shell
+ front face.
+\end_layout
+
+\begin_layout Standard
+When a shell element is sandwiched between two solid elements, the nodal
+ displacements of the solid element facing the shell back face are set to
+ coincide with the shell back-face nodal displacements 
+\begin_inset Formula $\mathbf{w}_{b}$
+\end_inset
+
+, whereas the nodal displacements of the solid element facing the shell
+ front face are set to coincide with the shell front-face nodal displacements
+ 
+\begin_inset Formula $\mathbf{u}_{a}$
+\end_inset
+
+.
+ If the shell thickness exceeds the thickness of the solid element connected
+ to its back face, results become unpredictable.
+\end_layout
+
+\begin_layout Subsubsection
+Elastic Shell
+\end_layout
+
+\begin_layout Standard
+For an elastic solid, the internal virtual work is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W_{int} & =\int_{v}\boldsymbol{\sigma}:\grad\delta\mathbf{u}\,dv\\
+ & =\sum_{a}\left[\begin{array}{cc}
+\delta\mathbf{u}_{a} & \delta\mathbf{w}_{a}\end{array}\right]\left[\begin{array}{c}
+\mathbf{f}_{a}^{u}\\
+\mathbf{f}_{a}^{w}
+\end{array}\right]
+\end{aligned}
+\,,\label{eq:virtual-work-internal}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{f}_{a}^{u} & =\int_{v}\boldsymbol{\sigma}\cdot\grad\left(\frac{1+\xi_{3}}{2}M_{a}\right)\,dv\\
+\mathbf{f}_{a}^{w} & =\int_{v}\boldsymbol{\sigma}\cdot\grad\left(\frac{1-\xi_{3}}{2}M_{a}\right)\,dv
+\end{aligned}
+\,.\label{eq:shell-internal-force}
+\end{equation}
+
+\end_inset
+
+For the external work of body forces,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W_{ext} & =\int_{v}\delta\mathbf{u}\cdot\rho\mathbf{b}\,dv\\
+ & =\sum_{a=1}^{m}\delta\mathbf{u}_{a}\cdot\mathbf{f}_{a}^{u}+\delta\mathbf{w}_{a}\cdot\mathbf{f}_{a}^{w}
+\end{aligned}
+\,,\label{eq:virtual-work-external}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{f}_{a}^{u} & =\int_{v}\frac{1+\xi_{3}}{2}M_{a}\rho\mathbf{b}\,dv\\
+\mathbf{f}_{a}^{w} & =\int_{v}\frac{1-\xi_{3}}{2}M_{a}\rho\mathbf{b}\,dv
+\end{aligned}
+\,.\label{eq:shell-external-force}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The linearization of the internal virtual work is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\left(\delta W_{int}\right)\left[\Delta\mathbf{u}\right] & =\int_{v}\tr\left(\grad\Delta\mathbf{u}\cdot\boldsymbol{\sigma}\cdot\grad^{T}\delta\mathbf{u}\right)\,dv\\
+ & +\int_{v}\grad\delta\mathbf{u}:\boldsymbol{\mathcal{C}}:\grad^{T}\Delta\mathbf{u}\,dv
+\end{aligned}
+\,.\label{eq:linearized-internal-work}
+\end{equation}
+
+\end_inset
+
+So
+\begin_inset Formula 
+\begin{equation}
+\int_{v}\tr\left(\grad\Delta\mathbf{u}\cdot\boldsymbol{\sigma}\cdot\grad^{T}\delta\mathbf{u}\right)\,dv=\sum_{a}\sum_{b}\left[\begin{array}{cc}
+\delta\mathbf{u}_{a} & \delta\mathbf{w}_{a}\end{array}\right]\left[\begin{array}{cc}
+\mathbf{K}_{ab}^{uu} & \mathbf{K}_{ab}^{uw}\\
+\mathbf{K}_{ab}^{wu} & \mathbf{K}_{ab}^{ww}
+\end{array}\right]\left[\begin{array}{c}
+\Delta\mathbf{u}_{b}\\
+\Delta\mathbf{w}_{b}
+\end{array}\right]\,,\label{eq:discretized-geometric-stiffness}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}_{ab}^{uu} & =\int_{v}\left(\grad\left(\frac{1+\xi_{3}}{2}M_{a}\right)\cdot\boldsymbol{\sigma}\cdot\grad\left(\frac{1+\xi_{3}}{2}M_{b}\right)\right)\mathbf{I}\,dv\\
+\mathbf{K}_{ab}^{uw} & =\int_{v}\left(\grad\left(\frac{1+\xi_{3}}{2}M_{a}\right)\cdot\boldsymbol{\sigma}\cdot\grad\left(\frac{1-\xi_{3}}{2}M_{b}\right)\right)\mathbf{I}\,dv\\
+\mathbf{K}_{ab}^{wu} & =\int_{v}\left(\grad\left(\frac{1-\xi_{3}}{2}M_{a}\right)\cdot\boldsymbol{\sigma}\cdot\grad\left(\frac{1+\xi_{3}}{2}M_{b}\right)\right)\mathbf{I}\,dv\\
+\mathbf{K}_{ab}^{ww} & =\int_{v}\left(\grad\left(\frac{1-\xi_{3}}{2}M_{a}\right)\cdot\boldsymbol{\sigma}\cdot\grad\left(\frac{1-\xi_{3}}{2}M_{b}\right)\right)\mathbf{I}\,dv
+\end{aligned}
+\,.\label{eq:shell-geometric-stiffness}
+\end{equation}
+
+\end_inset
+
+Similarly,
+\begin_inset Formula 
+\begin{equation}
+\int_{v}\grad\delta\mathbf{u}:\boldsymbol{\mathcal{C}}:\grad^{T}\Delta\mathbf{u}\,dv=\sum_{a}\sum_{b}\left[\begin{array}{cc}
+\delta\mathbf{u}_{a} & \delta\mathbf{w}_{a}\end{array}\right]\left[\begin{array}{cc}
+\mathbf{K}_{ab}^{uu} & \mathbf{K}_{ab}^{uw}\\
+\mathbf{K}_{ab}^{wu} & \mathbf{K}_{ab}^{ww}
+\end{array}\right]\left[\begin{array}{c}
+\Delta\mathbf{u}_{b}\\
+\Delta\mathbf{w}_{b}
+\end{array}\right]\,,\label{eq:discretized-material-stiffness}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}_{ab}^{uu} & =\int_{v}\grad\left(\frac{1+\xi_{3}}{2}M_{a}\right)\cdot\boldsymbol{\mathcal{C}}\cdot\grad\left(\frac{1+\xi_{3}}{2}M_{b}\right)\,dv\\
+\mathbf{K}_{ab}^{uw} & =\int_{v}\grad\left(\frac{1+\xi_{3}}{2}M_{a}\right)\cdot\boldsymbol{\mathcal{C}}\cdot\grad\left(\frac{1-\xi_{3}}{2}M_{b}\right)\,dv\\
+\mathbf{K}_{ab}^{wu} & =\int_{v}\grad\left(\frac{1-\xi_{3}}{2}M_{a}\right)\cdot\boldsymbol{\mathcal{C}}\cdot\grad\left(\frac{1+\xi_{3}}{2}M_{b}\right)\,dv\\
+\mathbf{K}_{ab}^{ww} & =\int_{v}\grad\left(\frac{1-\xi_{3}}{2}M_{a}\right)\cdot\boldsymbol{\mathcal{C}}\cdot\grad\left(\frac{1-\xi_{3}}{2}M_{b}\right)\,dv
+\end{aligned}
+\,.\label{eq:shell-material-stiffness}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The linearization of the external work is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\left(\delta W_{ext}\right) & =\sum_{a=1}^{m}\sum_{b=1}^{m}\int_{v}\left(\frac{1+\xi_{3}}{2}M_{a}\delta\mathbf{u}_{a}+\frac{1-\xi_{3}}{2}M_{a}\delta\mathbf{w}_{a}\right)\cdot\rho\grad\mathbf{b}\cdot\left(\frac{1+\xi_{3}}{2}\Delta\mathbf{u}_{b}+\frac{1-\xi_{3}}{2}M_{b}\Delta\mathbf{w}_{b}\right)\,dv\\
+ & =\sum_{a}\sum_{b}\left[\begin{array}{cc}
+\delta\mathbf{u}_{a} & \delta\mathbf{w}_{a}\end{array}\right]\left[\begin{array}{cc}
+\mathbf{K}_{ab}^{uu} & \mathbf{K}_{ab}^{uw}\\
+\mathbf{K}_{ab}^{wu} & \mathbf{K}_{ab}^{ww}
+\end{array}\right]\left[\begin{array}{c}
+\Delta\mathbf{u}_{b}\\
+\Delta\mathbf{w}_{b}
+\end{array}\right]
+\end{aligned}
+\,,\label{eq:linearized-external-work}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}_{ab}^{uu} & =\int_{V}\left(\frac{1+\xi_{3}}{2}\right)^{2}M_{a}M_{b}\rho_{0}\grad\mathbf{b}\,dV\\
+\mathbf{K}_{ab}^{uw} & =\int_{V}\left(\frac{1+\xi_{3}}{2}\right)\left(\frac{1-\xi_{3}}{2}\right)M_{a}M_{b}\rho_{0}\grad\mathbf{b}\,dV\\
+\mathbf{K}_{ab}^{wu} & =\int_{V}\left(\frac{1+\xi_{3}}{2}\right)\left(\frac{1-\xi_{3}}{2}\right)M_{a}M_{b}\rho_{0}\grad\mathbf{b}\,dV\\
+\mathbf{K}_{ab}^{ww} & =\int_{V}\left(\frac{1-\xi_{3}}{2}\right)^{2}M_{a}M_{b}\rho_{0}\grad\mathbf{b}\,dV
+\end{aligned}
+\,.\label{eq:shell-external-stiffness}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+External work of surface forces
+\end_layout
+
+\begin_layout Standard
+We assume that surface forces are applied on the shell front face (
+\begin_inset Formula $\xi_{3}=+1$
+\end_inset
+
+).
+ Therefore, the external work of surface forces has the form
+\begin_inset Formula 
+\begin{equation}
+\delta W_{ext}=\int_{\partial v}\delta\mathbf{u}\left(\xi_{1},\xi_{2},+1\right)\cdot\mathbf{t}\,da=\sum_{a}\delta\mathbf{u}_{a}\cdot\int_{\partial v}M_{a}\left(\xi_{1},\xi_{2}\right)\mathbf{t}\,da\label{eq:fbs-ext-work}
+\end{equation}
+
+\end_inset
+
+In other words, the treatment of surface forces on a shell becomes identical
+ to the treatment of surface forces on the face of a solid.
+ No special treatment is needed.
+\end_layout
+
+\begin_layout Subsubsection
+Shell on top of solid element
+\end_layout
+
+\begin_layout Standard
+When a shell is coincident with the face of a solid element, we assume that
+ the face of the solid element coincides with the back face (
+\begin_inset Formula $\xi_{3}=-1$
+\end_inset
+
+) of the shell element.
+ This means that the solid element nodal displacements 
+\begin_inset Formula $\mathbf{u}_{b}$
+\end_inset
+
+ on that face coincide with the shell nodal displacements 
+\begin_inset Formula $\mathbf{w}_{b}$
+\end_inset
+
+.
+ Therefore, when we use UnpackLM for those solid elements, we should reassign
+ the DOF ID's of the 
+\begin_inset Formula $\mathbf{u}_{b}$
+\end_inset
+
+ displacements to those of the 
+\begin_inset Formula $\mathbf{w}_{b}$
+\end_inset
+
+ displacements stored in that same node.
+\end_layout
+
+\begin_layout Subsubsection
+Shell sandwiched between solid elements
+\end_layout
+
+\begin_layout Standard
+When a shell is sandwiched between two solid elements, we reassign the DOF
+ ID's of the the solid 
+\begin_inset Formula $\mathbf{u}_{b}$
+\end_inset
+
+ displacements facing the back of the shell to those of the shell 
+\begin_inset Formula $\mathbf{w}_{b}$
+\end_inset
+
+ displacements stored in that same node.
+ The DOF ID's of solid 
+\begin_inset Formula $\mathbf{u}_{b}$
+\end_inset
+
+ displacements facing the front of the shell remain unchanged; they will
+ coincide with those of the corresponding solid element nodes.
+\end_layout
+
+\begin_layout Subsubsection
+Rigid-Shell Interface
+\end_layout
+
+\begin_layout Standard
+When the node of a deformable shell belongs to a rigid body, we need to
+ substitute the nodal degrees of freedom with the rigid body degrees of
+ freedom.
+ The positions of the shell front face and back face nodes are 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{x}_{b} & =\mathbf{r}+\boldsymbol{\Lambda}\cdot\left(\mathbf{X}_{b}-\mathbf{R}\right)\equiv\mathbf{r}+\mathbf{a}_{b}\\
+\mathbf{y}_{b} & =\mathbf{r}+\boldsymbol{\Lambda}\cdot\left(\mathbf{Y}_{b}-\mathbf{R}\right)\equiv\mathbf{r}+\mathbf{b}_{b}
+\end{aligned}
+\,,\label{eq:fbs-rigid-shell}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{r}$
+\end_inset
+
+ is the current position of the rigid body center of mass and 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ is its initial position; 
+\begin_inset Formula $\boldsymbol{\Lambda}$
+\end_inset
+
+ is the rotation tensor for the rigid body.
+ We assume that 
+\begin_inset Formula $\mathbf{x}_{b}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{y}_{b}$
+\end_inset
+
+ are connected to the same rigid body.
+ From these relations it follows that virtual displacements are
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta\mathbf{u}_{a} & =\delta\mathbf{r}-\hat{\mathbf{a}}_{a}\cdot\delta\boldsymbol{\theta}\\
+\delta\mathbf{w}_{b} & =\delta\mathbf{r}-\hat{\mathbf{b}}_{a}\cdot\delta\boldsymbol{\theta}
+\end{aligned}
+\,,\label{eq:fbs-rsi-virtual}
+\end{equation}
+
+\end_inset
+
+and incremental displacements are
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\Delta\mathbf{u}_{b} & =\Delta\mathbf{r}-\hat{\mathbf{a}}_{b}\cdot\Delta\boldsymbol{\theta}\\
+\Delta\mathbf{w}_{b} & =\Delta\mathbf{r}-\hat{\mathbf{b}}_{b}\cdot\Delta\boldsymbol{\theta}
+\end{aligned}
+\,,\label{eq:fbs-rsi-incremental}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\hat{\mathbf{a}}$
+\end_inset
+
+ is the skew-symmetric tensor whose dual vector is 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+, such that 
+\begin_inset Formula $\hat{\mathbf{a}}\cdot\mathbf{v}=\mathbf{a}\times\mathbf{v}$
+\end_inset
+
+ for any vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+.
+ When nodes are flexible (when they do not belong to any rigid body), the
+ virtual work has the general form
+\begin_inset Formula 
+\begin{equation}
+\delta W=\sum_{a=1}^{m}\delta\mathbf{u}_{a}\cdot\mathbf{f}_{a}^{u}+\delta\mathbf{w}_{a}\cdot\mathbf{f}_{a}^{w}+\delta p_{a}\,f_{a}^{p}=\sum_{a=1}^{m}\left[\begin{array}{ccc}
+\delta\mathbf{v}_{a} & \delta\mathbf{w}_{a} & \delta p_{a}\end{array}\right]\left[\begin{array}{c}
+\mathbf{f}_{a}^{u}\\
+\mathbf{f}_{a}^{w}\\
+f_{a}^{p}
+\end{array}\right]\,,\label{eq:fbs-rsi-work}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $p$
+\end_inset
+
+ denotes any additional degree-of-freedom at that node.
+ If node 
+\begin_inset Formula $a$
+\end_inset
+
+ is rigid we get
+\begin_inset Formula 
+\begin{equation}
+\left[\begin{array}{ccc}
+\delta\mathbf{u}_{a} & \delta\mathbf{w}_{a} & \delta p_{a}\end{array}\right]=\left[\begin{array}{ccc}
+\delta\mathbf{r} & \delta\boldsymbol{\theta} & \delta p_{a}\end{array}\right]\left[\begin{array}{ccc}
+\mathbf{I} & \mathbf{I} & \mathbf{0}\\
+\hat{\mathbf{a}}_{a} & \hat{\mathbf{b}}_{a} & \mathbf{0}\\
+\mathbf{0} & \mathbf{0} & 1
+\end{array}\right]\,.\label{eq:fbs-rsi-a-rigid}
+\end{equation}
+
+\end_inset
+
+If node 
+\begin_inset Formula $b$
+\end_inset
+
+ is rigid we get
+\begin_inset Formula 
+\begin{equation}
+\left[\begin{array}{c}
+\Delta\mathbf{u}_{b}\\
+\Delta\mathbf{w}_{b}\\
+\Delta p_{b}
+\end{array}\right]=\left[\begin{array}{ccc}
+\mathbf{I} & -\hat{\mathbf{a}}_{b} & \mathbf{0}\\
+\mathbf{I} & -\hat{\mathbf{b}}_{b} & \mathbf{0}\\
+\mathbf{0} & \mathbf{0} & 1
+\end{array}\right]\left[\begin{array}{c}
+\Delta\mathbf{r}\\
+\Delta\boldsymbol{\theta}\\
+\Delta p_{b}
+\end{array}\right]\,.\label{eq:fbs-rsi-b-rigid}
+\end{equation}
+
+\end_inset
+
+When node 
+\begin_inset Formula $a$
+\end_inset
+
+ belongs to a rigid body, the expression for 
+\begin_inset Formula $\delta W$
+\end_inset
+
+ must be substituted with
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W & =\sum_{a=1}^{m}\left[\begin{array}{ccc}
+\delta\mathbf{u}_{a} & \delta\mathbf{w}_{a} & \delta p_{a}\end{array}\right]\left[\begin{array}{c}
+\mathbf{f}_{a}^{u}\\
+\mathbf{f}_{a}^{w}\\
+f_{a}^{p}
+\end{array}\right]\\
+ & =\sum_{a=1}^{m}\left[\begin{array}{ccc}
+\delta\mathbf{r} & \delta\boldsymbol{\omega} & \delta p_{a}\end{array}\right]\left[\begin{array}{c}
+\mathbf{f}_{a}^{u}+\mathbf{f}_{a}^{w}\\
+\hat{\mathbf{a}}_{a}^{n+\alpha}\cdot\mathbf{f}_{a}^{u}+\hat{\mathbf{b}}_{a}^{n+\alpha}\cdot\mathbf{f}_{a}^{w}\\
+f_{a}^{p}
+\end{array}\right]
+\end{aligned}
+\,.\label{eq:fbs-rsi-work-2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Similarly, the linearized virtual work has the general form
+\begin_inset Formula 
+\begin{equation}
+D\delta W=\sum_{a}\sum_{b}\left[\begin{array}{ccc}
+\delta\mathbf{u}_{a} & \delta\mathbf{w}_{a} & \delta p_{a}\end{array}\right]\left[\begin{array}{ccc}
+\mathbf{K}_{ab}^{uu} & \mathbf{K}_{ab}^{uw} & \mathbf{k}_{ab}^{up}\\
+\mathbf{K}_{ab}^{wu} & \mathbf{K}_{ab}^{ww} & \mathbf{k}_{ab}^{wp}\\
+\mathbf{k}_{ab}^{pu} & \mathbf{k}_{ab}^{pw} & k_{ab}^{pp}
+\end{array}\right]\left[\begin{array}{c}
+\Delta\mathbf{u}_{b}\\
+\Delta\mathbf{w}_{b}\\
+\Delta p_{b}
+\end{array}\right]\,.\label{eq:fbs-rsi-D-work}
+\end{equation}
+
+\end_inset
+
+When node 
+\begin_inset Formula $a$
+\end_inset
+
+ is rigid but node 
+\begin_inset Formula $b$
+\end_inset
+
+ is not,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W & =\sum_{a}\sum_{b}\left[\begin{array}{ccc}
+\delta\mathbf{r} & \delta\boldsymbol{\theta} & \delta p_{a}\end{array}\right]\times\\
+ & \left[\begin{array}{ccc}
+\mathbf{K}_{ab}^{uu}+\mathbf{K}_{ab}^{wu} & \mathbf{K}_{ab}^{uw}+\mathbf{K}_{ab}^{ww} & \mathbf{k}_{ab}^{up}+\mathbf{k}_{ab}^{wp}\\
+\hat{\mathbf{a}}_{a}\cdot\mathbf{K}_{ab}^{uu}+\hat{\mathbf{b}}_{a}\cdot\mathbf{K}_{ab}^{wu} & \hat{\mathbf{a}}_{a}\cdot\mathbf{K}_{ab}^{uw}+\hat{\mathbf{b}}_{a}\cdot\mathbf{K}_{ab}^{ww} & \hat{\mathbf{a}}_{a}\cdot\mathbf{k}_{ab}^{up}+\hat{\mathbf{b}}_{a}\cdot\mathbf{k}_{ab}^{wp}\\
+\mathbf{k}_{ab}^{pu} & \mathbf{k}_{ab}^{pw} & k_{ab}^{pp}
+\end{array}\right]\\
+ & \times\left[\begin{array}{c}
+\Delta\mathbf{u}_{b}\\
+\Delta\mathbf{w}_{b}\\
+\Delta p_{b}
+\end{array}\right]
+\end{aligned}
+\,.\label{eq:fbs-rsi-D-work-2}
+\end{equation}
+
+\end_inset
+
+If nodes 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ are both rigid,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W & =\sum_{a}\sum_{b}\left[\begin{array}{ccc}
+\delta\mathbf{r} & \delta\boldsymbol{\theta} & \delta p_{a}\end{array}\right]\times\\
+ & \left[\begin{array}{ccc}
+\mathbf{K}_{ab}^{uu}+\mathbf{K}_{ab}^{wu}+\mathbf{K}_{ab}^{uw}+\mathbf{K}_{ab}^{ww} & \left(\begin{aligned}-\left(\mathbf{K}_{ab}^{uu}+\mathbf{K}_{ab}^{wu}\right)\cdot\hat{\mathbf{a}}_{b}\\
+-\left(\mathbf{K}_{ab}^{uw}+\mathbf{K}_{ab}^{ww}\right)\cdot\hat{\mathbf{b}}_{b}
+\end{aligned}
+\right) & \mathbf{k}_{ab}^{up}+\mathbf{k}_{ab}^{wp}\\
+\left(\begin{aligned}\hat{\mathbf{a}}_{a}\cdot\left(\mathbf{K}_{ab}^{uu}+\mathbf{K}_{ab}^{uw}\right)\\
++\hat{\mathbf{b}}_{a}\cdot\left(\mathbf{K}_{ab}^{wu}+\mathbf{K}_{ab}^{ww}\right)
+\end{aligned}
+\right) & \left(\begin{aligned}-\left(\hat{\mathbf{a}}_{a}\cdot\mathbf{K}_{ab}^{uu}+\hat{\mathbf{b}}_{a}\cdot\mathbf{K}_{ab}^{wu}\right)\cdot\hat{\mathbf{a}}_{b}\\
+-\left(\hat{\mathbf{a}}_{a}\cdot\mathbf{K}_{ab}^{uw}+\hat{\mathbf{b}}_{a}\cdot\mathbf{K}_{ab}^{ww}\right)\cdot\hat{\mathbf{b}}_{b}
+\end{aligned}
+\right) & \hat{\mathbf{a}}_{a}\cdot\mathbf{k}_{ab}^{up}+\hat{\mathbf{b}}_{a}\cdot\mathbf{k}_{ab}^{wp}\\
+\mathbf{k}_{ab}^{pu}+\mathbf{k}_{ab}^{pw} & \hat{\mathbf{a}}_{b}\cdot\mathbf{k}_{ab}^{pu}+\hat{\mathbf{b}}_{b}\cdot\mathbf{k}_{ab}^{pw} & k_{ab}^{pp}
+\end{array}\right]\\
+ & \times\left[\begin{array}{c}
+\Delta\mathbf{r}\\
+\Delta\boldsymbol{\theta}\\
+\Delta p_{b}
+\end{array}\right]
+\end{aligned}
+\,.\label{eq:fbs-rsi-D-work-3}
+\end{equation}
+
+\end_inset
+
+If node 
+\begin_inset Formula $a$
+\end_inset
+
+ is not rigid and node 
+\begin_inset Formula $b$
+\end_inset
+
+ is rigid,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W & =\sum_{a}\sum_{b}\left[\begin{array}{ccc}
+\delta\mathbf{u}_{a} & \delta\mathbf{w}_{a} & \delta p_{a}\end{array}\right]\times\\
+ & \left[\begin{array}{ccc}
+\mathbf{K}_{ab}^{uu}+\mathbf{K}_{ab}^{wu} & -\mathbf{K}_{ab}^{uu}\cdot\hat{\mathbf{a}}_{b}-\mathbf{K}_{ab}^{uw}\cdot\hat{\mathbf{b}}_{b} & \mathbf{k}_{ab}^{up}\\
+\mathbf{K}_{ab}^{wu}+\mathbf{K}_{ab}^{ww} & -\mathbf{K}_{ab}^{wu}\cdot\hat{\mathbf{a}}_{b}-\mathbf{K}_{ab}^{ww}\cdot\hat{\mathbf{b}}_{b} & \mathbf{k}_{ab}^{wp}\\
+\mathbf{k}_{ab}^{pu}+\mathbf{k}_{ab}^{pw} & \hat{\mathbf{a}}_{b}\cdot\mathbf{k}_{ab}^{pu}+\hat{\mathbf{b}}_{b}\cdot\mathbf{k}_{ab}^{pw} & k_{ab}^{pp}
+\end{array}\right]\left[\begin{array}{c}
+\Delta\mathbf{r}\\
+\Delta\boldsymbol{\theta}\\
+\Delta p_{b}
+\end{array}\right]
+\end{aligned}
+\,.\label{eq:fbs-rsi-D-work-4}
+\end{equation}
+
 \end_inset
 
 
