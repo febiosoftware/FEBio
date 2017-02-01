@@ -512,6 +512,28 @@ private:
 };
 
 //-----------------------------------------------------------------------------
+//! Rigid body linear momentum
+class FEPlotRigidLinearMomentum : public FEDomainData
+{
+public:
+    FEPlotRigidLinearMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+private:
+    FEModel* m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! Rigid body angular momentum
+class FEPlotRigidAngularMomentum : public FEDomainData
+{
+public:
+    FEPlotRigidAngularMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+private:
+    FEModel* m_pfem;
+};
+
+//-----------------------------------------------------------------------------
 //! Rigid Euler angles
 class FEPlotRigidEuler : public FEDomainData
 {

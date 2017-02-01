@@ -189,7 +189,7 @@ void FERigidCylindricalJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     vec3d c = P*(rb + zb - ra - za) - p;
     m_F = m_L + c*m_eps + ea[0]*m_Fp;
     
-    vec3d ksi = (ea[0] ^ eb[0])/2;
+    vec3d ksi;
     if (m_bq) {
         quatd q = (alpha*RBb.m_qt+(1-alpha)*RBb.m_qp)*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
         quatd a(m_qp,ea[0]);
@@ -197,6 +197,8 @@ void FERigidCylindricalJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
     }
+    else
+        ksi = (ea[0] ^ eb[0])/2;
     m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
     
     fa[0] = m_F.x;
@@ -217,6 +219,11 @@ void FERigidCylindricalJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     
     for (int i=0; i<6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] += fa[i];
     for (int i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fb[i];
+    
+    RBa.m_Fr += vec3d(fa[0],fa[1],fa[2]);
+    RBa.m_Mr += vec3d(fa[3],fa[4],fa[5]);
+    RBb.m_Fr += vec3d(fb[0],fb[1],fb[2]);
+    RBb.m_Mr += vec3d(fb[3],fb[4],fb[5]);
 }
 
 //-----------------------------------------------------------------------------

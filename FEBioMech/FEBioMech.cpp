@@ -138,6 +138,7 @@
 #include "FERigidPrismaticJoint.h"
 #include "FERigidCylindricalJoint.h"
 #include "FERigidPlanarJoint.h"
+#include "FERigidLock.h"
 #include "FERigidSpring.h"
 #include "FERigidDamper.h"
 #include "FERigidAngularDamper.h"
@@ -380,6 +381,7 @@ REGISTER_FECORE_CLASS(FERigidRevoluteJoint   , FENLCONSTRAINT_ID, "rigid revolut
 REGISTER_FECORE_CLASS(FERigidPrismaticJoint  , FENLCONSTRAINT_ID, "rigid prismatic joint"  );
 REGISTER_FECORE_CLASS(FERigidCylindricalJoint, FENLCONSTRAINT_ID, "rigid cylindrical joint");
 REGISTER_FECORE_CLASS(FERigidPlanarJoint     , FENLCONSTRAINT_ID, "rigid planar joint"     );
+REGISTER_FECORE_CLASS(FERigidLock            , FENLCONSTRAINT_ID, "rigid lock"             );
 REGISTER_FECORE_CLASS(FERigidSpring          , FENLCONSTRAINT_ID, "rigid spring"           );
 REGISTER_FECORE_CLASS(FERigidDamper          , FENLCONSTRAINT_ID, "rigid damper"           );
 REGISTER_FECORE_CLASS(FERigidAngularDamper   , FENLCONSTRAINT_ID, "rigid angular damper"   );
@@ -484,6 +486,8 @@ REGISTER_FECORE_CLASS(FEPlotRigidAcceleration       , FEPLOTDATA_ID, "rigid acce
 REGISTER_FECORE_CLASS(FEPlotRigidRotation           , FEPLOTDATA_ID, "rigid angular position"    );
 REGISTER_FECORE_CLASS(FEPlotRigidAngularVelocity    , FEPLOTDATA_ID, "rigid angular velocity"    );
 REGISTER_FECORE_CLASS(FEPlotRigidAngularAcceleration, FEPLOTDATA_ID, "rigid angular acceleration");
+REGISTER_FECORE_CLASS(FEPlotRigidLinearMomentum     , FEPLOTDATA_ID, "rigid linear momentum"     );
+REGISTER_FECORE_CLASS(FEPlotRigidAngularMomentum    , FEPLOTDATA_ID, "rigid angular momentum"    );
 REGISTER_FECORE_CLASS(FEPlotRigidKineticEnergy      , FEPLOTDATA_ID, "rigid kinetic energy"      );
 REGISTER_FECORE_CLASS(FEPlotRigidEuler              , FEPLOTDATA_ID, "Euler angle"               );
 REGISTER_FECORE_CLASS(FEPlotRigidRotationVector     , FEPLOTDATA_ID, "rotation vector"           );

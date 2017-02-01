@@ -126,6 +126,11 @@ void FERigidAxialForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 	n = bodyB.m_LM[3]; if (n >= 0) R[n] -= Mb.x;
 	n = bodyB.m_LM[4]; if (n >= 0) R[n] -= Mb.y;
 	n = bodyB.m_LM[5]; if (n >= 0) R[n] -= Mb.z;
+    
+    bodyA.m_Fr += F;
+    bodyA.m_Mr += Ma;
+    bodyB.m_Fr -= F;
+    bodyB.m_Mr -= Mb;
 }
 
 //-----------------------------------------------------------------------------

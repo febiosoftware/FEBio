@@ -1427,11 +1427,5 @@ void FERigidSolverNew::InertialForces(FEGlobalVector& R, const FETimeInfo& timeI
 		LM[4] = RB.m_LM[4];
 		LM[5] = RB.m_LM[5];
 		R.Assemble(LM, fe);
-
-		// add to rigid body force
-		RB.m_Fr += F;
-
-		// add to rigid body torque
-		RB.m_Mr += M;
 	}
 }

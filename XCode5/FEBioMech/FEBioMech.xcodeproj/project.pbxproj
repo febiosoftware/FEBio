@@ -23,6 +23,8 @@
 		D509A2441A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D509A2421A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.cpp */; };
 		D50CB99E1B17EFF0006E43E6 /* FERigidPlanarJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50CB99C1B17EFF0006E43E6 /* FERigidPlanarJoint.cpp */; };
 		D50CB99F1B17EFF0006E43E6 /* FERigidPlanarJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D50CB99D1B17EFF0006E43E6 /* FERigidPlanarJoint.h */; };
+		D50F58731E41884300634BB4 /* FERigidLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50F58711E41884300634BB4 /* FERigidLock.cpp */; };
+		D50F58741E41884300634BB4 /* FERigidLock.h in Headers */ = {isa = PBXBuildFile; fileRef = D50F58721E41884300634BB4 /* FERigidLock.h */; };
 		D515BD3A18DB3D7B00B661B2 /* FEPRLig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D515BD3818DB3D7B00B661B2 /* FEPRLig.cpp */; };
 		D515BD3B18DB3D7B00B661B2 /* FEPRLig.h in Headers */ = {isa = PBXBuildFile; fileRef = D515BD3918DB3D7B00B661B2 /* FEPRLig.h */; };
 		D51BB3F1198FCA6A00638A8B /* FEFiberIntegrationGaussKronrod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D51BB3ED198FCA6A00638A8B /* FEFiberIntegrationGaussKronrod.cpp */; };
@@ -421,6 +423,8 @@
 		D509A2421A45CD2D00C4E55F /* FEGasserOgdenHolzapfelUC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEGasserOgdenHolzapfelUC.cpp; sourceTree = "<group>"; };
 		D50CB99C1B17EFF0006E43E6 /* FERigidPlanarJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidPlanarJoint.cpp; sourceTree = "<group>"; };
 		D50CB99D1B17EFF0006E43E6 /* FERigidPlanarJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidPlanarJoint.h; sourceTree = "<group>"; };
+		D50F58711E41884300634BB4 /* FERigidLock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidLock.cpp; sourceTree = "<group>"; };
+		D50F58721E41884300634BB4 /* FERigidLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidLock.h; sourceTree = "<group>"; };
 		D515BD3818DB3D7B00B661B2 /* FEPRLig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPRLig.cpp; sourceTree = "<group>"; };
 		D515BD3918DB3D7B00B661B2 /* FEPRLig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPRLig.h; sourceTree = "<group>"; };
 		D51BB3ED198FCA6A00638A8B /* FEFiberIntegrationGaussKronrod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFiberIntegrationGaussKronrod.cpp; sourceTree = "<group>"; };
@@ -1125,6 +1129,8 @@
 				D5FA1BDD1B74CD9000EA5913 /* FERigidForce.h */,
 				D5E1072B1865DFAD00B23922 /* FERigidJoint.cpp */,
 				D5E1072C1865DFAD00B23922 /* FERigidJoint.h */,
+				D50F58711E41884300634BB4 /* FERigidLock.cpp */,
+				D50F58721E41884300634BB4 /* FERigidLock.h */,
 				D5E1072D1865DFAD00B23922 /* FERigidMaterial.cpp */,
 				D5E1072E1865DFAD00B23922 /* FERigidMaterial.h */,
 				D50CB99C1B17EFF0006E43E6 /* FERigidPlanarJoint.cpp */,
@@ -1293,6 +1299,7 @@
 				D5E1078B1865DFAD00B23922 /* FECellGrowth.h in Headers */,
 				D5E108021865DFAD00B23922 /* FEPerfectOsmometer.h in Headers */,
 				D5C6D41419CB628700E48AAF /* FEDamageCriterion.h in Headers */,
+				D50F58741E41884300634BB4 /* FERigidLock.h in Headers */,
 				D555F10A1D60D94A0070B8AE /* FEDiscreteContact.h in Headers */,
 				D51BB412199197A100638A8B /* FEFiberIntegrationGeodesicUC.h in Headers */,
 				D5E107831865DFAD00B23922 /* FEBioMechData.h in Headers */,
@@ -1549,6 +1556,7 @@
 				D5E107941865DFAD00B23922 /* FECoupledTransIsoVerondaWestmann.cpp in Sources */,
 				D55E3AFC1C6408ED00815FCA /* FEGentMaterial.cpp in Sources */,
 				D5E107921865DFAD00B23922 /* FECoupledTransIsoMooneyRivlin.cpp in Sources */,
+				D50F58731E41884300634BB4 /* FERigidLock.cpp in Sources */,
 				D5B5ACBA1C74BD8C0097B42B /* FEWrinkleOgdenMaterial.cpp in Sources */,
 				D5E107A81865DFAD00B23922 /* FEEFDUncoupled.cpp in Sources */,
 				D555CB961AB27C5C0054CED3 /* FEDistanceConstraint.cpp in Sources */,

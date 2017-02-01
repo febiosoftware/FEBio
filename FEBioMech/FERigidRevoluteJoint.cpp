@@ -176,16 +176,17 @@ void FERigidRevoluteJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     vec3d c = rb + zb - ra - za;
     m_F = m_L + c*m_eps;
     
-    vec3d ksi = (ea[0] ^ eb[0])/2;
+    vec3d ksi;
     if (m_bq) {
         quatd q = (alpha*RBb.m_qt+(1-alpha)*RBb.m_qp)*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
         quatd a(m_qp,ea[0]);
         quatd r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
-        m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
     }
-    else m_M = ea[0]*m_Mp;
+    else
+        ksi = (ea[0] ^ eb[0])/2;
+    m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
     
     fa[0] = m_F.x;
     fa[1] = m_F.y;
@@ -205,6 +206,11 @@ void FERigidRevoluteJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     
     for (int i=0; i<6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] += fa[i];
     for (int i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fb[i];
+    
+    RBa.m_Fr += vec3d(fa[0],fa[1],fa[2]);
+    RBa.m_Mr += vec3d(fa[3],fa[4],fa[5]);
+    RBb.m_Fr += vec3d(fb[0],fb[1],fb[2]);
+    RBb.m_Mr += vec3d(fb[3],fb[4],fb[5]);
 }
 
 //-----------------------------------------------------------------------------
@@ -264,7 +270,7 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
     m_F = m_L + c*m_eps;
     mat3dd I(1);
     
-    vec3d ksi = (ea[0] ^ eb[0])/2;
+    vec3d ksi;
     quatd q, a, r;
     if (m_bq) {
         q = (alpha*RBb.m_qt+(1-alpha)*RBb.m_qp)*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
@@ -272,9 +278,10 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
         r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
-        m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
     }
-    else m_M = ea[0]*m_Mp;
+    else
+        ksi = (ea[0] ^ eb[0])/2;
+    m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
     
     mat3d eahat[3], ebhat[3], eathat[3], ebthat[3];
     for (j=0; j<3; ++j) {
@@ -465,7 +472,6 @@ bool FERigidRevoluteJoint::Augment(int naug, const FETimeInfo& tp)
     
     normF1 = sqrt(Lm*Lm);
     
-    ksi = (ea[0] ^ eb[0])/2;
     if (m_bq) {
         quatd q = (alpha*RBb.m_qt+(1-alpha)*RBb.m_qp)*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
         quatd a(m_qp,ea[0]);
@@ -473,6 +479,8 @@ bool FERigidRevoluteJoint::Augment(int naug, const FETimeInfo& tp)
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
     }
+    else
+        ksi = (ea[0] ^ eb[0])/2;
     
     normM0 = sqrt(m_U*m_U);
     
@@ -561,16 +569,17 @@ void FERigidRevoluteJoint::Update(const FETimeInfo& tp)
     vec3d c = rb + zb - ra - za;
     m_F = m_L + c*m_eps;
     
-    vec3d ksi = (ea[0] ^ eb[0])/2;
+    vec3d ksi;
     if (m_bq) {
         quatd q = (alpha*RBb.m_qt+(1-alpha)*RBb.m_qp)*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
         quatd a(m_qp,ea[0]);
         quatd r = a*q.Inverse();
         r.MakeUnit();
         ksi = r.GetVector()*r.GetAngle();
-        m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
     }
-    else m_M = ea[0]*m_Mp;
+    else
+        ksi = (ea[0] ^ eb[0])/2;
+    m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
     
 }
 

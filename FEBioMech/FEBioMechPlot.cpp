@@ -1810,6 +1810,45 @@ bool FEPlotRigidKineticEnergy::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotRigidLinearMomentum::Save(FEDomain& dom, FEDataStream& a)
+{
+    // get the rigid material
+    FEMaterial* pm = dom.GetMaterial();
+    if (pm->IsRigid() == false) return false;
+    FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
+    
+    // get the rigid body
+    FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+    FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+    
+    // store linear momentum (mass x velocity)
+    a << rb.m_vt*rb.m_mass;
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotRigidAngularMomentum::Save(FEDomain& dom, FEDataStream& a)
+{
+    // get the rigid material
+    FEMaterial* pm = dom.GetMaterial();
+    if (pm->IsRigid() == false) return false;
+    FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
+    
+    // get the rigid body
+    FERigidSystem& rigid = *m_pfem->GetRigidSystem();
+    FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
+    
+    // store angular momentum (mass moment of inertia x angular velocity)
+    mat3d Rt = rb.m_qt.RotationMatrix();
+    mat3ds Jt = (Rt*rb.m_moi*Rt.transpose()).sym();
+    
+    a << Jt*rb.m_wt;
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotRigidEuler::Save(FEDomain& dom, FEDataStream& a)
 {
 	// get the rigid material
