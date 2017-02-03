@@ -55,6 +55,8 @@ public: // parameters
     int     m_naugmax;  //! maximum number of augmentations
     double	m_eps;	//! penalty factor for constraining force
     double	m_ups;	//! penalty factor for constraining moment
+    double	m_cps;	//! linear damping coefficient for constraining force
+    double	m_rps;	//! angular damping coefficient for constraining moment
     vec3d	m_q0;	//! initial position of joint
     double  m_qp;   //! prescribed rotation
     bool    m_bq;   //! flag for prescribing rotation
