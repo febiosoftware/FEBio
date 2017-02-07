@@ -196,25 +196,29 @@ void FEBioGeometrySection::ParseInstanceSection(XMLTag& tag)
 			}
 			else if (tag == "rotate")
 			{
-				double v[4];
-				tag.value(v, 4);
-				quatd q(v[0], v[1], v[2], v[3]);
-				transform.SetRotation(q);
+				const char* sztype = tag.AttributeValue("type", true);
+				if (sztype == 0) sztype = "quaternion";
 
-/*				double a[3], b[3]; double w;
-				++tag;
-				do
+				if (strcmp(sztype, "quaternion") == 0)
 				{
-					if (tag == "a") tag.value(a, 3);
-					else if (tag == "b") tag.value(b, 3);
-					else if (tag == "angle") tag.value(w);
-					else throw XMLReader::InvalidTag(tag);
-					++tag;
+					double v[4];
+					tag.value(v, 4);
+					quatd q(v[0], v[1], v[2], v[3]);
+					transform.SetRotation(q);
 				}
-				while (!tag.isend());
-
-				transform.SetRotation(vec3d(a[0], a[1], a[2]), vec3d(b[0], b[1], b[2]), w);
-*/
+				else if (strcmp(sztype, "vector") == 0)
+				{
+					double v[3];
+					tag.value(v, 3);
+					transform.SetRotation(vec3d(v[0], v[1], v[2]));
+				}
+				else if (strcmp(sztype, "Euler") == 0)
+				{
+					double v[3];
+					tag.value(v, 3);
+					transform.SetRotation(v[0], v[1], v[2]);
+				}
+				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 			}
 			else if (tag == "scale")
 			{

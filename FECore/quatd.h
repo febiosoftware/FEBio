@@ -274,6 +274,11 @@ public:
 
 	static quatd slerp(quatd &q1, quatd &q2, const double t);
 
+	// set a quaternion defined via the XYZ Euler angles (in radians)
+	// Convention is first rotate about z, then x, and then y
+	// This conforms to the Tait-Bryan angles (roll, pitch, yaw)
+	void SetEuler(double x, double y, double z);
+	void GetEuler(double& x, double& y, double& z) const;
 
 public:
 	double w;
@@ -285,6 +290,7 @@ inline quatd operator * (const double a, const quatd& q)
 	return q*a;
 }
 
+// TODO: What Euler convention do these functions assume?
 // convert euler-angles to a rotation matrix
 // l[0] = psi   (x-rotation)
 // l[1] = theta (y-rotation)

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "quatd.h"
+#include <math.h>
 
 #ifndef PI
 #define PI 3.14159265358979
@@ -27,6 +28,45 @@ quatd quatd::slerp(quatd &q1, quatd &q2, const double t)
 		return (q1*sin(angle*(1-t)) + q3*sin(angle*t))/sin(angle);
 	} else // if the angle is small, use linear interpolation								
 		return quatd::lerp(q1,q3,t);
+}
+
+
+//-----------------------------------------------------------------------------
+void quatd::SetEuler(double X, double Y, double Z)
+{
+	// calculate cos and sin of angles
+	double cz = cos(Z*0.5);
+	double sz = sin(Z*0.5);
+	double cx = cos(X*0.5);
+	double sx = sin(X*0.5);
+	double cy = cos(Y*0.5);
+	double sy = sin(Y*0.5);
+
+	// define quaternion
+	w = cz * cx * cy + sz * sx * sy;
+	x = cz * sx * cy - sz * cx * sy;
+	y = cz * cx * sy + sz * sx * cy;
+	z = sz * cx * cy - cz * sx * sy;
+}
+
+//-----------------------------------------------------------------------------
+void quatd::GetEuler(double& X, double& Y, double& Z) const
+{
+	// roll (x-axis rotation)
+	double t0 = +2.0 * (w * x + y * z);
+	double t1 = +1.0 - 2.0 * (x*x + y*y);
+	X = atan2(t0, t1);
+
+	// pitch (y-axis rotation)
+	double t2 = +2.0 * (w*y - z*x);
+	t2 = t2 > 1.0 ? 1.0 : t2;
+	t2 = t2 < -1.0 ? -1.0 : t2;
+	Y = asin(t2);
+
+	// yaw (z-axis rotation)
+	double t3 = +2.0 * (w * z + x * y);
+	double t4 = +1.0 - 2.0 * (y*y + z*z);
+	Z = atan2(t3, t4);
 }
 
 //-----------------------------------------------------------------------------
