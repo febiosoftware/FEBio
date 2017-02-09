@@ -39,7 +39,7 @@ void FEMicroMaterialPoint2O::Serialize(DumpStream& ar)
 BEGIN_PARAMETER_LIST(FEMicroMaterial2O, FEElasticMaterial2O)
 	ADD_PARAMETER(m_szrve    , FE_PARAM_STRING, "RVE"     );
 	ADD_PARAMETER(m_szbc     , FE_PARAM_STRING, "bc_set"  );
-	ADD_PARAMETER(m_rveType  , FE_PARAM_INT   , "bc_type" );
+	ADD_PARAMETER(m_rveType  , FE_PARAM_INT   , "rve_type" );
 	ADD_PARAMETER(m_scale    , FE_PARAM_DOUBLE, "scale");
 END_PARAMETER_LIST();
 
