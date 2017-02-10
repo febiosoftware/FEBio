@@ -1162,13 +1162,13 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveShellFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEBiphasicDomain*  pbsd= dynamic_cast<FEBiphasicDomain* >(&dom);
+    FEBiphasicShellDomain*  pbsd= dynamic_cast<FEBiphasicShellDomain* >(&dom);
     FEBiphasicSoluteShellDomain*  pbssd= dynamic_cast<FEBiphasicSoluteShellDomain* >(&dom);
     if (pbsd || pbssd)
     {
         // get the pressure dof index
         int dof_q = GetFEModel()->GetDOFIndex("q");
-        if (dof_q == -1) return false;
+        assert (dof_q != -1);
         
         int N = dom.Nodes();
         for (int i=0; i<N; ++i)
@@ -1313,82 +1313,96 @@ bool FEPlotEffectiveShellSoluteConcentration::SetFilter(int nsol)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveShellSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
-    // make sure we have a valid index
-    int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
-    if (nsid == -1) return false;
-    
-    // get the dof
-    const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", nsid);
-    
-    int N = dom.Nodes();
-    for (int i=0; i<N; ++i)
+    FEBiphasicShellDomain*  pbsd= dynamic_cast<FEBiphasicShellDomain* >(&dom);
+    FEBiphasicSoluteShellDomain*  pbssd= dynamic_cast<FEBiphasicSoluteShellDomain* >(&dom);
+    if (pbsd || pbssd)
     {
-        FENode& node = dom.Node(i);
-        a << node.get(dof_D);
+        // make sure we have a valid index
+        int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
+        if (nsid == -1) return false;
+        
+        // get the dof
+        const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", nsid);
+        
+        int N = dom.Nodes();
+        for (int i=0; i<N; ++i)
+        {
+            FENode& node = dom.Node(i);
+            a << node.get(dof_D);
+        }
+        return true;
     }
-    return true;
+    return false;
 }
 
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveShellSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEBiphasicSolute* pbm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
-    if (pbm)
+    FEBiphasicShellDomain*  pbsd= dynamic_cast<FEBiphasicShellDomain* >(&dom);
+    FEBiphasicSoluteShellDomain*  pbssd= dynamic_cast<FEBiphasicSoluteShellDomain* >(&dom);
+    if (pbsd || pbssd)
     {
-        // Check if this solute is present in this specific biphasic-solute mixture
-        bool present = (pbm->GetSolute()->GetSoluteID() == m_nsol);
-        if (!present) return false;
-        
-        // get the dof
-        const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
-        
-        int N = dom.Nodes();
-        for (int i=0; i<N; ++i)
+        FEBiphasicSolute* pbm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+        if (pbm)
         {
-            FENode& node = dom.Node(i);
-            a << node.get(dof_D);
+            // Check if this solute is present in this specific biphasic-solute mixture
+            bool present = (pbm->GetSolute()->GetSoluteID() == m_nsol);
+            if (!present) return false;
+            
+            // get the dof
+            const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
+            assert (dof_D != -1);
+            
+            int N = dom.Nodes();
+            for (int i=0; i<N; ++i)
+            {
+                FENode& node = dom.Node(i);
+                a << node.get(dof_D);
+            }
+            return true;
         }
-        return true;
-    }
-    
-    FETriphasic* ptm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
-    if (ptm)
-    {
-        // Check if this solute is present in this specific triphasic mixture
-        bool present = (ptm->m_pSolute[0]->GetSoluteID() == m_nsol) || (ptm->m_pSolute[1]->GetSoluteID() == m_nsol);
-        if (!present) return false;
         
-        // get the dof
-        const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
-        
-        int N = dom.Nodes();
-        for (int i=0; i<N; ++i)
+        FETriphasic* ptm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+        if (ptm)
         {
-            FENode& node = dom.Node(i);
-            a << node.get(dof_D);
+            // Check if this solute is present in this specific triphasic mixture
+            bool present = (ptm->m_pSolute[0]->GetSoluteID() == m_nsol) || (ptm->m_pSolute[1]->GetSoluteID() == m_nsol);
+            if (!present) return false;
+            
+            // get the dof
+            const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
+            assert (dof_D != -1);
+            
+            int N = dom.Nodes();
+            for (int i=0; i<N; ++i)
+            {
+                FENode& node = dom.Node(i);
+                a << node.get(dof_D);
+            }
+            return true;
         }
-        return true;
-    }
-    
-    FEMultiphasic* pmm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
-    if (pmm)
-    {
-        // Check if this solute is present in this specific multiphasic mixture
-        bool present = false;
-        for (int i=0; i<pmm->Solutes(); ++i)
-            if (pmm->GetSolute(i)->GetSoluteID() == m_nsol) {present = true; break;}
-        if (!present) return false;
         
-        // get the dof
-        const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
-        
-        int N = dom.Nodes();
-        for (int i=0; i<N; ++i)
+        FEMultiphasic* pmm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+        if (pmm)
         {
-            FENode& node = dom.Node(i);
-            a << node.get(dof_D);
+            // Check if this solute is present in this specific multiphasic mixture
+            bool present = false;
+            for (int i=0; i<pmm->Solutes(); ++i)
+                if (pmm->GetSolute(i)->GetSoluteID() == m_nsol) {present = true; break;}
+            if (!present) return false;
+            
+            // get the dof
+            const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
+            assert (dof_D != -1);
+            
+            int N = dom.Nodes();
+            for (int i=0; i<N; ++i)
+            {
+                FENode& node = dom.Node(i);
+                a << node.get(dof_D);
+            }
+            return true;
         }
-        return true;
     }
     return false;
 }
