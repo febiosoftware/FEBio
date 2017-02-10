@@ -10969,7 +10969,7 @@ fix
 \end_layout
 
 \begin_layout LyX-Code
-<fix bc="x" node_set="
+<fix bc="x" set="
 \shape italic
 nodeset
 \shape default
@@ -11026,7 +11026,7 @@ boundary condition.
 \end_layout
 
 \begin_layout LyX-Code
-<rigid rb="2" node_set="set1"/>
+<rigid rb="2" set="set1"/>
 \end_layout
 
 \begin_layout Standard
@@ -21313,8 +21313,8 @@ For example, to store the (average) Cauchy stress for all elements, define
 \end_layout
 
 \begin_layout LyX-Code
-<element_data data="sxx;syy;szz;sxy;syz;sxz" name="element stresses"> </element_
-data>
+<element_data data="sx;sy;sz;sxy;syz;sxz" name="element stresses"> </element_dat
+a>
 \end_layout
 
 \begin_layout Subsubsection
