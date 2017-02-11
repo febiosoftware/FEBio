@@ -25062,8 +25062,8 @@ reference "sec:Triphasic-Multiphasic-Materials"
 \begin_inset Formula $w_{n}^{\left(i\right)}$
 \end_inset
 
- and effective solute fluxes 
-\begin_inset Formula $\tilde{j}_{n}^{\alpha\left(i\right)}$
+ and solute fluxes 
+\begin_inset Formula $j_{n}^{\alpha\left(i\right)}$
 \end_inset
 
  for solute 
@@ -25079,7 +25079,7 @@ reference "sec:Triphasic-Multiphasic-Materials"
 \begin{equation}
 \begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\left(1\right)}\,da^{\left(1\right)}\\
  & +\int_{\gamma^{\left(1\right)}}\left(\delta\tilde{p}^{\left(1\right)}-\delta\tilde{p}^{\left(2\right)}\right)w_{n}^{\left(1\right)}\,da^{\left(1\right)}\\
- & +\sum\limits _{\alpha}\int_{\gamma^{\left(1\right)}}\left(\delta\tilde{c}^{\alpha\left(1\right)}-\delta\tilde{c}^{\alpha\left(2\right)}\right)\tilde{j}_{n}^{\alpha\left(1\right)}\,da^{\left(1\right)}
+ & +\sum\limits _{\alpha}\int_{\gamma^{\left(1\right)}}\left(\delta\tilde{c}^{\alpha\left(1\right)}-\delta\tilde{c}^{\alpha\left(2\right)}\right)j_{n}^{\alpha\left(1\right)}\,da^{\left(1\right)}
 \end{aligned}
 \,.\label{eq651}
 \end{equation}
@@ -25130,7 +25130,7 @@ Now the contact integral may be rewritten as
 \begin{equation}
 \begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)t_{n}\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}\\
  & +\int_{\gamma^{\left(1\right)}}\left(\delta\tilde{p}^{\left(1\right)}-\delta\tilde{p}^{\left(2\right)}\right)w_{n}^{\left(1\right)}\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}\\
- & +\sum\limits _{\alpha}\int_{\gamma^{\left(1\right)}}\left(\delta\tilde{c}^{\alpha\left(1\right)}-\delta\tilde{c}^{\alpha\left(2\right)}\right)\tilde{j}_{n}^{\alpha\left(1\right)}\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}
+ & +\sum\limits _{\alpha}\int_{\gamma^{\left(1\right)}}\left(\delta\tilde{c}^{\alpha\left(1\right)}-\delta\tilde{c}^{\alpha\left(2\right)}\right)j_{n}^{\alpha\left(1\right)}\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}
 \end{aligned}
 \,,\label{eq654}
 \end{equation}
@@ -25300,29 +25300,6 @@ Dj_{n}^{\gamma} & =\varepsilon_{c}\left(\Delta\tilde{c}^{\gamma\left(1\right)}-\
 
 \end_inset
 
-The effective normal fluid flux is given in Eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq289"
-
-\end_inset
-
-, 
-\begin_inset Formula 
-\begin{equation}
-\tilde{j}_{n}^{\gamma}=j_{n}^{\gamma}+\sum\limits _{\beta}z^{\beta}j_{n}^{\beta}\,,\label{eq663}
-\end{equation}
-
-\end_inset
-
-so that 
-\begin_inset Formula 
-\begin{equation}
-D\tilde{j}_{n}^{\gamma}=\varepsilon_{c}\left(\Delta\tilde{c}^{\gamma\left(1\right)}-\Delta\tilde{c}^{\gamma\left(2\right)}-\frac{\partial\tilde{c}^{\gamma\left(2\right)}}{\partial\eta_{\left(2\right)}^{\alpha}}\Delta\eta_{\left(2\right)}^{\alpha}\right)+\sum\limits _{\beta}z^{\beta}\varepsilon_{c}\left(\Delta\tilde{c}^{\beta\left(1\right)}-\Delta\tilde{c}^{\beta\left(2\right)}-\frac{\partial\tilde{c}^{\beta\left(2\right)}}{\partial\eta_{\left(2\right)}^{\alpha}}\Delta\eta_{\left(2\right)}^{\alpha}\right)\,.\label{eq664}
-\end{equation}
-
-\end_inset
-
 Given these relations, it can be shown that the directional derivatives
  of the various terms appearing in the integrand of 
 \begin_inset Formula $\delta G_{c}$
@@ -25357,11 +25334,11 @@ Given these relations, it can be shown that the directional derivatives
 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned} & -D\left(\tilde{j}_{n}^{\gamma}\left(\delta\tilde{c}^{\gamma\left(1\right)}-\delta\tilde{c}^{\gamma\left(2\right)}\right)\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\right)=\\
- & -J_{\eta}^{\left(1\right)}\varepsilon_{c}\left(\delta\tilde{c}^{\gamma\left(1\right)}-\delta\tilde{c}^{\gamma\left(2\right)}\right)\left[\Delta\tilde{c}^{\gamma\left(1\right)}-\Delta\tilde{c}^{\gamma\left(2\right)}+\sum\limits _{\beta}z^{\beta}\left(\Delta\tilde{c}^{\beta\left(1\right)}-\Delta\tilde{c}^{\beta\left(2\right)}\right)\right]\\
- & +J_{\eta}^{\left(1\right)}\varepsilon_{c}\left(\delta\tilde{c}^{\gamma\left(1\right)}-\delta\tilde{c}^{\gamma\left(2\right)}\right)\left(\frac{\partial\tilde{c}^{\gamma\left(1\right)}}{\partial\eta_{\left(1\right)}^{\alpha}}\mathbf{g}_{\alpha}^{\left(1\right)}+\sum\limits _{\beta}z^{\beta}\frac{\partial\tilde{c}^{\beta\left(1\right)}}{\partial\eta_{\left(1\right)}^{\alpha}}\mathbf{g}_{\alpha}^{\left(1\right)}\right)\cdot\left(\Delta\mathbf{u}^{\left(1\right)}-\Delta\mathbf{u}^{\left(2\right)}\right)\\
- & +J_{\eta}^{\left(1\right)}\tilde{j}_{n}^{\gamma}\frac{\partial\delta\tilde{c}^{\gamma\left(1\right)}}{\partial\eta_{\left(1\right)}^{\alpha}}\mathbf{g}_{\alpha}^{\left(1\right)}\cdot\left(\Delta\mathbf{u}^{\left(1\right)}-\Delta\mathbf{u}^{\left(2\right)}\right)\\
- & +\tilde{j}_{n}^{\gamma}\left(\delta\tilde{c}^{\gamma\left(1\right)}-\delta\tilde{c}^{\gamma\left(2\right)}\right)\mathbf{n}^{\left(1\right)}\cdot\left(\mathbf{g}_{2}^{\left(1\right)}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{1}}-\mathbf{g}_{1}^{\left(1\right)}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{2}}\right)
+\begin{aligned} & -D\left(j_{n}^{\gamma}\left(\delta\tilde{c}^{\gamma\left(1\right)}-\delta\tilde{c}^{\gamma\left(2\right)}\right)\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\right)=\\
+ & -J_{\eta}^{\left(1\right)}\varepsilon_{c}\left(\delta\tilde{c}^{\gamma\left(1\right)}-\delta\tilde{c}^{\gamma\left(2\right)}\right)\left(\Delta\tilde{c}^{\gamma\left(1\right)}-\Delta\tilde{c}^{\gamma\left(2\right)}\right)\\
+ & +J_{\eta}^{\left(1\right)}\varepsilon_{c}\left(\delta\tilde{c}^{\gamma\left(1\right)}-\delta\tilde{c}^{\gamma\left(2\right)}\right)\frac{\partial\tilde{c}^{\gamma\left(1\right)}}{\partial\eta_{\left(1\right)}^{\alpha}}\mathbf{g}_{\alpha}^{\left(1\right)}\cdot\left(\Delta\mathbf{u}^{\left(1\right)}-\Delta\mathbf{u}^{\left(2\right)}\right)\\
+ & +J_{\eta}^{\left(1\right)}j_{n}^{\gamma}\frac{\partial\delta\tilde{c}^{\gamma\left(1\right)}}{\partial\eta_{\left(1\right)}^{\alpha}}\mathbf{g}_{\alpha}^{\left(1\right)}\cdot\left(\Delta\mathbf{u}^{\left(1\right)}-\Delta\mathbf{u}^{\left(2\right)}\right)\\
+ & +j_{n}^{\gamma}\left(\delta\tilde{c}^{\gamma\left(1\right)}-\delta\tilde{c}^{\gamma\left(2\right)}\right)\mathbf{n}^{\left(1\right)}\cdot\left(\mathbf{g}_{2}^{\left(1\right)}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{1}}-\mathbf{g}_{1}^{\left(1\right)}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{2}}\right)
 \end{aligned}
 \label{eq667}
 \end{equation}
@@ -25390,7 +25367,7 @@ name "subsec:MP-Discretization"
 The contact integral may be discretized as 
 \begin_inset Formula 
 \begin{equation}
-\delta G_{c}=\sum\limits _{e=1}^{n_{e}^{\left(1\right)}}\sum\limits _{k=1}^{n_{\mbox{int}}^{\left(e\right)}}W_{k}J_{\eta}^{\left(1\right)}\left[t_{n}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{n}^{\left(1\right)}+w_{n}\left(\delta\tilde{p}^{\left(1\right)}-\delta\tilde{p}^{\left(2\right)}\right)+\sum\limits _{\gamma}\tilde{j}_{n}^{\gamma}\left(\delta\tilde{c}^{\gamma\left(1\right)}-\delta\tilde{c}^{\gamma\left(2\right)}\right)\right]\,.\label{eq668}
+\delta G_{c}=\sum\limits _{e=1}^{n_{e}^{\left(1\right)}}\sum\limits _{k=1}^{n_{\mbox{int}}^{\left(e\right)}}W_{k}J_{\eta}^{\left(1\right)}\left[t_{n}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{n}^{\left(1\right)}+w_{n}\left(\delta\tilde{p}^{\left(1\right)}-\delta\tilde{p}^{\left(2\right)}\right)+\sum\limits _{\gamma}j_{n}^{\gamma}\left(\delta\tilde{c}^{\gamma\left(1\right)}-\delta\tilde{c}^{\gamma\left(2\right)}\right)\right]\,.\label{eq668}
 \end{equation}
 
 \end_inset
@@ -25417,15 +25394,15 @@ Then,
 \delta\mathbf{v}_{a}^{\left(1\right)} & \delta\tilde{p}_{a}^{\left(1\right)} & \delta\tilde{c}_{a}^{\alpha\left(1\right)} & \delta\tilde{c}_{a}^{\beta\left(1\right)}\end{array}\right]\cdot\left[\begin{array}{c}
 \mathbf{f}_{a}^{\left(1\right)}\\
 w_{a}^{\left(1\right)}\\
-\tilde{j}_{a}^{\alpha\left(1\right)}\\
-\tilde{j}_{a}^{\beta\left(1\right)}
+j_{a}^{\alpha\left(1\right)}\\
+j_{a}^{\beta\left(1\right)}
 \end{array}\right]\right.\\
  & +\left.\sum\limits _{b=1}^{m^{\left(2\right)}}\left[\begin{array}{cccc}
 \delta\mathbf{v}_{b}^{\left(2\right)} & \delta\tilde{p}_{b}^{\left(2\right)} & \delta\tilde{c}_{b}^{\alpha\left(2\right)} & \delta\tilde{c}_{b}^{\beta\left(2\right)}\end{array}\right]\cdot\left[\begin{array}{c}
 \mathbf{f}_{b,k}^{\left(2\right)}\\
 w_{b,k}^{\left(2\right)}\\
-\tilde{j}_{b,k}^{\alpha\left(2\right)}\\
-\tilde{j}_{b,k}^{\beta\left(2\right)}
+j_{b,k}^{\alpha\left(2\right)}\\
+j_{b,k}^{\beta\left(2\right)}
 \end{array}\right]\right)\,,
 \end{aligned}
 \label{eq670}
@@ -25438,7 +25415,7 @@ where
 \begin{equation}
 \begin{aligned}\mathbf{f}_{a}^{\left(1\right)} & =t_{n}N_{a}^{\left(1\right)}\mathbf{n}^{\left(1\right)} & \mathbf{f}_{b,k}^{\left(2\right)} & =-t_{n}N_{b}^{\left(2\right)}\mathbf{n}^{\left(1\right)}\\
 w_{a}^{\left(1\right)} & =w_{n}N_{a}^{\left(1\right)} & w_{b,k}^{\left(2\right)} & =-w_{n}N_{b}^{\left(2\right)}\\
-\tilde{j}_{a}^{\gamma\left(1\right)} & =\tilde{j}_{n}^{\gamma}N_{a}^{\left(1\right)} & \tilde{j}_{b,k}^{\gamma\left(2\right)} & =-\tilde{j}_{n}^{\gamma}N_{b}^{\left(2\right)}
+j_{a}^{\gamma\left(1\right)} & =j_{n}^{\gamma}N_{a}^{\left(1\right)} & j_{b,k}^{\gamma\left(2\right)} & =-j_{n}^{\gamma}N_{b}^{\left(2\right)}
 \end{aligned}
 \,.\label{eq671}
 \end{equation}
@@ -25453,8 +25430,8 @@ Similarly,
  & \left(\sum\limits _{c=1}^{m^{\left(1\right)}}\left[\begin{array}{cccc}
 \mathbf{K}_{ac}^{\left(1,1\right)} & 0 & 0 & 0\\
 \mathbf{g}_{ac}^{\left(1,1\right)} & g_{ac}^{\left(1,1\right)} & 0 & 0\\
-\mathbf{h}_{ac}^{\alpha\left(1,1\right)} & 0 & h_{ac}^{\alpha\alpha\left(1,1\right)} & h_{ac}^{\alpha\beta\left(1,1\right)}\\
-\mathbf{h}_{ac}^{\beta\left(1,1\right)} & 0 & h_{ac}^{\beta\alpha\left(1,1\right)} & h_{ac}^{\beta\beta\left(1,1\right)}
+\mathbf{h}_{ac}^{\alpha\left(1,1\right)} & 0 & h_{ac}^{\alpha\alpha\left(1,1\right)} & 0\\
+\mathbf{h}_{ac}^{\beta\left(1,1\right)} & 0 & 0 & h_{ac}^{\beta\beta\left(1,1\right)}
 \end{array}\right]\cdot\left[\begin{array}{c}
 \Delta\mathbf{u}_{c}^{\left(1\right)}\\
 \Delta\tilde{p}_{c}^{\left(1\right)}\\
@@ -25464,8 +25441,8 @@ Similarly,
  & +\left.\sum\limits _{d=1}^{m_{k}^{\left(2\right)}}\left[\begin{array}{cccc}
 \mathbf{K}_{ad,k}^{\left(1,2\right)} & 0 & 0 & 0\\
 \mathbf{g}_{ad,k}^{\left(1,2\right)} & g_{ad,k}^{\left(1,2\right)} & 0 & 0\\
-\mathbf{h}_{ad,k}^{\alpha\left(1,2\right)} & 0 & h_{ad,k}^{\alpha\alpha\left(1,2\right)} & h_{ad,k}^{\alpha\beta\left(1,2\right)}\\
-\mathbf{h}_{ad,k}^{\beta\left(1,2\right)} & 0 & h_{ad,k}^{\beta\alpha\left(1,2\right)} & h_{ad,k}^{\beta\beta\left(1,2\right)}
+\mathbf{h}_{ad,k}^{\alpha\left(1,2\right)} & 0 & h_{ad,k}^{\alpha\alpha\left(1,2\right)} & 0\\
+\mathbf{h}_{ad,k}^{\beta\left(1,2\right)} & 0 & 0 & h_{ad,k}^{\beta\beta\left(1,2\right)}
 \end{array}\right]\cdot\left[\begin{array}{c}
 \Delta\mathbf{u}_{d}^{\left(2\right)}\\
 \Delta\tilde{p}_{d}^{\left(2\right)}\\
@@ -25477,8 +25454,8 @@ Similarly,
  & \left(\sum\limits _{c=1}^{m^{\left(1\right)}}\left[\begin{array}{cccc}
 \mathbf{K}_{bc,k}^{\left(2,1\right)} & 0 & 0 & 0\\
 \mathbf{g}_{bc,k}^{\left(2,1\right)} & g_{bc,k}^{\left(2,1\right)} & 0 & 0\\
-\mathbf{h}_{bc,k}^{\alpha\left(2,1\right)} & 0 & h_{bc,k}^{\alpha\alpha\left(2,1\right)} & h_{bc,k}^{\alpha\beta\left(2,1\right)}\\
-\mathbf{h}_{bc,k}^{\beta\left(2,1\right)} & 0 & h_{bc,k}^{\beta\alpha\left(2,1\right)} & h_{bc,k}^{\beta\beta\left(2,1\right)}
+\mathbf{h}_{bc,k}^{\alpha\left(2,1\right)} & 0 & h_{bc,k}^{\alpha\alpha\left(2,1\right)} & 0\\
+\mathbf{h}_{bc,k}^{\beta\left(2,1\right)} & 0 & 0 & h_{bc,k}^{\beta\beta\left(2,1\right)}
 \end{array}\right]\cdot\left[\begin{array}{c}
 \Delta\mathbf{u}_{c}^{\left(1\right)}\\
 \Delta\tilde{p}_{c}^{\left(1\right)}\\
@@ -25488,8 +25465,8 @@ Similarly,
  & +\left.\left.\sum\limits _{d=1}^{m_{k}^{\left(2\right)}}\left[\begin{array}{cccc}
 \mathbf{K}_{bd,k}^{\left(2,2\right)} & 0 & 0 & 0\\
 \mathbf{g}_{bd,k}^{\left(2,2\right)} & g_{bd,k}^{\left(2,2\right)} & 0 & 0\\
-\mathbf{h}_{bd,k}^{\alpha\left(2,2\right)} & 0 & h_{bd,k}^{\alpha\alpha\left(2,2\right)} & h_{bd,k}^{\alpha\beta\left(2,2\right)}\\
-\mathbf{h}_{bd,k}^{\beta\left(2,2\right)} & 0 & h_{bd,k}^{\beta\alpha\left(2,2\right)} & h_{bd,k}^{\beta\beta\left(2,2\right)}
+\mathbf{h}_{bd,k}^{\alpha\left(2,2\right)} & 0 & h_{bd,k}^{\alpha\alpha\left(2,2\right)} & 0\\
+\mathbf{h}_{bd,k}^{\beta\left(2,2\right)} & 0 & 0 & h_{bd,k}^{\beta\beta\left(2,2\right)}
 \end{array}\right]\cdot\left[\begin{array}{c}
 \Delta\mathbf{u}_{d}^{\left(2\right)}\\
 \Delta\tilde{p}_{d}^{\left(2\right)}\\
@@ -25542,10 +25519,10 @@ g_{bc,k}^{\left(2,1\right)} & =\varepsilon_{p}N_{b}^{\left(2\right)}N_{c}^{\left
 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{h}_{ac}^{\gamma\left(1,1\right)} & =N_{a}^{\left(1\right)}\left(N_{c}^{\left(1\right)}\varepsilon_{c}\mathbf{\tilde{q}}^{\gamma\left(1\right)}-\mathbf{A}_{c}^{\left(1\right)}\cdot\tilde{j}_{n}^{\gamma}\mathbf{n}^{\left(1\right)}\right)\\
-\mathbf{h}_{ad,k}^{\gamma\left(1,2\right)} & =-N_{a}^{\left(1\right)}N_{d}^{\left(2\right)}\varepsilon_{c}\mathbf{\tilde{q}}^{\gamma\left(1\right)}\\
-\mathbf{h}_{bc,k}^{\gamma\left(2,1\right)} & =N_{b}^{\left(2\right)}\left(-N_{c}^{\left(1\right)}\varepsilon_{c}\mathbf{\tilde{q}}^{\gamma\left(1\right)}+\mathbf{A}_{c}^{\left(1\right)}\cdot\tilde{j}_{n}^{\gamma}\mathbf{n}^{\left(1\right)}\right)+N_{c}^{\left(1\right)}\tilde{j}_{n}^{\gamma}\mathbf{m}_{b}^{\left(2\right)}\\
-\mathbf{h}_{bd,k}^{\gamma\left(2,2\right)} & =N_{b}^{\left(2\right)}N_{d}^{\left(2\right)}\varepsilon_{c}\mathbf{\tilde{q}}^{\gamma\left(1\right)}-N_{d}^{\left(2\right)}\tilde{j}_{n}^{\gamma}\mathbf{m}_{b}^{\left(2\right)}
+\begin{aligned}\mathbf{h}_{ac}^{\gamma\left(1,1\right)} & =N_{a}^{\left(1\right)}\left(N_{c}^{\left(1\right)}\varepsilon_{c}\mathbf{q}^{\gamma\left(1\right)}-\mathbf{A}_{c}^{\left(1\right)}\cdot j_{n}^{\gamma}\mathbf{n}^{\left(1\right)}\right)\\
+\mathbf{h}_{ad,k}^{\gamma\left(1,2\right)} & =-N_{a}^{\left(1\right)}N_{d}^{\left(2\right)}\varepsilon_{c}\mathbf{q}^{\gamma\left(1\right)}\\
+\mathbf{h}_{bc,k}^{\gamma\left(2,1\right)} & =N_{b}^{\left(2\right)}\left(-N_{c}^{\left(1\right)}\varepsilon_{c}\mathbf{q}^{\gamma\left(1\right)}+\mathbf{A}_{c}^{\left(1\right)}\cdot j_{n}^{\gamma}\mathbf{n}^{\left(1\right)}\right)+N_{c}^{\left(1\right)}j_{n}^{\gamma}\mathbf{m}_{b}^{\left(2\right)}\\
+\mathbf{h}_{bd,k}^{\gamma\left(2,2\right)} & =N_{b}^{\left(2\right)}N_{d}^{\left(2\right)}\varepsilon_{c}\mathbf{q}^{\gamma\left(1\right)}-N_{d}^{\left(2\right)}j_{n}^{\gamma}\mathbf{m}_{b}^{\left(2\right)}
 \end{aligned}
 \,,\label{eq676}
 \end{equation}
@@ -25555,10 +25532,10 @@ g_{bc,k}^{\left(2,1\right)} & =\varepsilon_{p}N_{b}^{\left(2\right)}N_{c}^{\left
 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}h_{ac}^{\gamma\gamma\left(1,1\right)} & =-\varepsilon_{c}\left(1+z^{\gamma}\right)N_{a}^{\left(1\right)}N_{c}^{\left(1\right)} & h_{ac}^{\alpha\beta\left(1,1\right)} & =-\varepsilon_{c}z^{\beta}N_{a}^{\left(1\right)}N_{c}^{\left(1\right)}\\
-h_{ad,k}^{\gamma\gamma\left(1,2\right)} & =\varepsilon_{c}\left(1+z^{\gamma}\right)N_{a}^{\left(1\right)}N_{d}^{\left(2\right)} & h_{ad,k}^{\alpha\beta\left(1,2\right)} & =\varepsilon_{c}z^{\beta}N_{a}^{\left(1\right)}N_{d}^{\left(2\right)}\\
-h_{bc,k}^{\gamma\gamma\left(2,1\right)} & =\varepsilon_{c}\left(1+z^{\gamma}\right)N_{b}^{\left(2\right)}N_{c}^{\left(1\right)} & h_{bc,k}^{\alpha\beta\left(2,1\right)} & =\varepsilon_{c}z^{\beta}N_{b}^{\left(2\right)}N_{c}^{\left(1\right)}\\
-h_{bd,k}^{\gamma\gamma\left(2,2\right)} & =-\varepsilon_{c}\left(1+z^{\gamma}\right)N_{b}^{\left(2\right)}N_{d}^{\left(2\right)} & h_{bd,k}^{\alpha\beta\left(2,2\right)} & =-\varepsilon_{c}z^{\beta}N_{b}^{\left(2\right)}N_{d}^{\left(2\right)}
+\begin{aligned}h_{ac}^{\gamma\gamma\left(1,1\right)} & =-\varepsilon_{c}N_{a}^{\left(1\right)}N_{c}^{\left(1\right)}\\
+h_{ad,k}^{\gamma\gamma\left(1,2\right)} & =\varepsilon_{c}N_{a}^{\left(1\right)}N_{d}^{\left(2\right)}\\
+h_{bc,k}^{\gamma\gamma\left(2,1\right)} & =\varepsilon_{c}N_{b}^{\left(2\right)}N_{c}^{\left(1\right)}\\
+h_{bd,k}^{\gamma\gamma\left(2,2\right)} & =-\varepsilon_{c}N_{b}^{\left(2\right)}N_{d}^{\left(2\right)}
 \end{aligned}
 \,,\label{eq677}
 \end{equation}
@@ -25570,8 +25547,7 @@ and
 \begin{equation}
 \begin{aligned}\mathbf{N}^{\left(1\right)} & =\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)} & \mathbf{A}_{c}^{\left(1\right)} & =\frac{1}{J_{\eta}^{\left(1\right)}}\boldsymbol{\mathcal{A}}\left\{ \frac{\partial N_{c}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{1}}\mathbf{g}_{2}^{\left(1\right)}-\frac{\partial N_{c}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{2}}\mathbf{g}_{1}^{\left(1\right)}\right\} \\
 \mathbf{M}_{b}^{\left(2\right)} & =\mathbf{n}^{\left(2\right)}\otimes\mathbf{m}_{b}^{\left(2\right)} & \mathbf{m}_{b}^{\left(2\right)} & =\frac{\partial N_{b}^{\left(2\right)}}{\partial\eta_{\left(2\right)}^{\alpha}}\mathbf{g}_{\left(2\right)}^{\alpha}\\
-\mathbf{p}^{\left(1\right)} & =\frac{\partial\tilde{p}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{\alpha}}\mathbf{g}_{\left(1\right)}^{\alpha} & \mathbf{q}^{\gamma\left(1\right)} & =\frac{\partial\tilde{c}^{\gamma\left(1\right)}}{\partial\eta_{\left(1\right)}^{\alpha}}\mathbf{g}_{\left(1\right)}^{\alpha}\\
-\mathbf{\tilde{q}}^{\gamma\left(1\right)} & =\mathbf{q}^{\gamma\left(1\right)}+\sum\limits _{\beta}z^{\beta}\mathbf{q}^{\beta\left(1\right)}
+\mathbf{p}^{\left(1\right)} & =\frac{\partial\tilde{p}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{\alpha}}\mathbf{g}_{\left(1\right)}^{\alpha} & \mathbf{q}^{\gamma\left(1\right)} & =\frac{\partial\tilde{c}^{\gamma\left(1\right)}}{\partial\eta_{\left(1\right)}^{\alpha}}\mathbf{g}_{\left(1\right)}^{\alpha}
 \end{aligned}
 \,.\label{eq678}
 \end{equation}
@@ -26120,7 +26096,46 @@ D\delta p^{\left(1\right)} & =0 & D\delta p^{\left(2\right)} & =0
 
 \end_inset
 
+If 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
 
+ and 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+ are not initially conforming, continuity of fluid pressure and normal flux
+ will only be enforced within the contact interface; unlike the sliding
+ biphasic contact interface (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Biphasic-Contact"
+
+\end_inset
+
+), free-draining conditions are not set automatically on regions of 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+ where a solution for 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+ was not found.
+ Therefore, these regions naturally enforce zero fluid flux (impermeable
+ boundary), unless an explicit boundary condition on the pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ is prescribed over those regions.
 \end_layout
 
 \begin_layout Subsection
@@ -26360,6 +26375,594 @@ and
 \begin_inset Formula 
 \begin{equation}
 \mathbf{a}_{c}^{\left(1\right)}=\frac{1}{J_{\eta}^{\left(1\right)}}\mathbf{n}^{\left(1\right)}\times\left(\mathbf{g}_{2}^{\left(1\right)}\frac{\partial N_{c}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{1}}-\mathbf{g}_{1}^{\left(1\right)}\frac{\partial N_{c}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{2}}\right)\,.\label{eq716}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Tied Multiphasic Contact
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Tied-Multiphasic-Contact"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Triphasic-Multiphasic-Materials"
+
+\end_inset
+
+ for a review of multiphasic materials, and 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian12"
+
+\end_inset
+
+ for additional details on contact interfaces involving solutes.
+ The contact interface is defined between surfaces 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+.
+ Due to continuity requirements on the traction and fluxes, the external
+ virtual work resulting from contact tractions 
+\begin_inset Formula $\mathbf{t}^{\left(i\right)}$
+\end_inset
+
+, solvent fluxes 
+\begin_inset Formula $w_{n}^{\left(i\right)}$
+\end_inset
+
+ and solute fluxes 
+\begin_inset Formula $j_{n}^{\alpha\left(i\right)}$
+\end_inset
+
+ (
+\begin_inset Formula $i=1,2)$
+\end_inset
+
+ may be combined into the contact integral 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\left(1\right)}\,da^{\left(1\right)}\\
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta\tilde{p}^{\left(1\right)}-\delta\tilde{p}^{\left(2\right)}\right)w_{n}^{\left(1\right)}\,da^{\left(1\right)}\\
+ & +\sum_{\alpha}\int_{\gamma^{\left(1\right)}}\left(\delta\tilde{c}^{\alpha\left(1\right)}-\delta\tilde{c}^{\alpha\left(2\right)}\right)j_{n}^{\alpha\left(1\right)}\,da^{\left(1\right)}\,.
+\end{aligned}
+\label{eq696-1}
+\end{equation}
+
+\end_inset
+
+Note that the summation in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq696-1"
+
+\end_inset
+
+ is performed only over solutes that are present on both sides of the contact
+ interface.
+ No special treatment is needed for solutes that only belong to one side,
+ since the natural boundary condition for these solutes enforces zero normal
+ flux across the contact interface.
+\end_layout
+
+\begin_layout Standard
+To evaluate and linearize 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+, define the covariant basis vectors on each surface as 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{g}_{\alpha}^{\left(i\right)}=\frac{\partial\mathbf{x}^{\left(i\right)}}{\partial\eta_{\left(i\right)}^{\alpha}},\quad\alpha=1,2,\label{eq697-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{x}^{\left(i\right)}$
+\end_inset
+
+ represents the spatial position of points on 
+\begin_inset Formula $\gamma^{\left(i\right)}$
+\end_inset
+
+, and 
+\begin_inset Formula $\eta_{\left(i\right)}^{\alpha}$
+\end_inset
+
+ represent the parametric coordinates of that point.
+ The unit outward normal on each surface is then given by 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{n}^{\left(i\right)}=\frac{\mathbf{g}_{1}^{\left(i\right)}\times\mathbf{g}_{2}^{\left(i\right)}}{\left|\mathbf{g}_{1}^{\left(i\right)}\times\mathbf{g}_{2}^{\left(i\right)}\right|}\,.\label{eq698-1}
+\end{equation}
+
+\end_inset
+
+Now the contact integral may be rewritten as 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}\,\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}\\
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta\tilde{p}^{\left(1\right)}-\delta\tilde{p}^{\left(2\right)}\right)w_{n}\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}\\
+ & +\sum_{\alpha}\int_{\gamma^{\left(1\right)}}\left(\delta\tilde{c}^{\alpha\left(1\right)}-\delta\tilde{c}^{\alpha\left(2\right)}\right)j_{n}^{\alpha}\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}
+\end{aligned}
+\,,\label{eq699-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{t}\equiv\mathbf{t}^{\left(1\right)}$
+\end_inset
+
+, 
+\begin_inset Formula $w_{n}\equiv w_{n}^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $j_{n}^{\alpha}\equiv j_{n}^{\alpha\left(1\right)}$
+\end_inset
+
+.
+ The linearization 
+\begin_inset Formula $D\delta G_{c}$
+\end_inset
+
+ of 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+ has the form 
+\begin_inset Formula 
+\begin{equation}
+D\delta G_{c}=\sum\limits _{i=1}^{2}D\delta G_{c}\left[\Delta\mathbf{u}^{\left(i\right)}\right]+D\delta G_{c}\left[\Delta\tilde{p}^{\left(i\right)}\right]+\sum_{\alpha}D\delta G_{c}\left[\Delta\tilde{c}^{\alpha\left(i\right)}\right]\,.\label{eq700-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Gap Function
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tied-MP-Gap-Function"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The vector gap function 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+, representing the distance between the contact surfaces, is defined by
+ 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{g}=\mathbf{x}^{\left(2\right)}-\mathbf{x}^{\left(1\right)}\,.\label{eq701-1}
+\end{equation}
+
+\end_inset
+
+The premise of a tied interface is that the parametric coordinates of 
+\begin_inset Formula $\mathbf{x}^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{x}^{\left(2\right)}$
+\end_inset
+
+ are both invariants (i.e., they are determined in the reference configuration
+ and remain unchanged over time).
+ The parametric coordinates of 
+\begin_inset Formula $\mathbf{x}^{\left(1\right)}$
+\end_inset
+
+ correspond to the integration points on 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+, and those of 
+\begin_inset Formula $\mathbf{x}^{\left(2\right)}$
+\end_inset
+
+ are evaluated once, in the reference configuration, by shooting a ray from
+ the integration point on 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ to intersect 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+.
+ It follows from this premise that 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\mathbf{x}^{\left(i\right)} & =\Delta\mathbf{u}^{\left(i\right)} & D\delta\mathbf{v}^{\left(i\right)} & =\mathbf{0}\\
+D\tilde{p}^{\left(i\right)} & =\Delta\tilde{p}^{\left(i\right)} & D\delta\tilde{p}^{\left(i\right)} & =0\\
+D\tilde{c}^{\alpha\left(i\right)} & =\Delta\tilde{c}^{\alpha\left(i\right)} & D\delta\tilde{c}^{\alpha\left(i\right)} & =0
+\end{aligned}
+\quad i=1,2\,.\label{eq702-1}
+\end{equation}
+
+\end_inset
+
+If 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+ are not initially conforming, continuity of effective fluid pressure and
+ solute concentration, as well as normal fluid and solute fluxes, will only
+ be enforced within the contact interface; unlike the sliding multiphasic
+ contact interface (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Multiphasic-Contact"
+
+\end_inset
+
+), ambient conditions are not set automatically on regions of 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+ where a solution for 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+ was not found.
+ Therefore, these regions naturally enforce zero fluid and solute flux (impermea
+ble boundary), unless an explicit boundary condition on the effective pressure
+ 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ or solute concentrations 
+\begin_inset Formula $\tilde{c}^{\alpha}$
+\end_inset
+
+ are prescribed over those regions.
+\end_layout
+
+\begin_layout Subsection
+Penalty Method
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tied-MP-Penalty-Method"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let the tied contact traction be described by the penalty function, 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{t}=\varepsilon_{n}\mathbf{g}\,,\label{eq703-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\varepsilon_{n}$
+\end_inset
+
+ is a penalty factor associated with 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+.
+ Similarly, let 
+\begin_inset Formula 
+\begin{equation}
+w_{n}=\varepsilon_{p}\pi=\varepsilon_{p}\left(\tilde{p}^{\left(1\right)}-\tilde{p}^{\left(2\right)}\right)\,,\label{eq704-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\varepsilon_{p}$
+\end_inset
+
+ is a penalty factor associated with 
+\begin_inset Formula $w_{n}$
+\end_inset
+
+, and
+\begin_inset Formula 
+\begin{equation}
+j_{n}^{\alpha}=\varepsilon_{c}\chi^{\alpha}=\varepsilon_{c}^{\alpha}\left(\tilde{c}^{\alpha\left(1\right)}-\tilde{c}^{\alpha\left(2\right)}\right)\,,\label{eq704-1b}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\varepsilon_{c}^{\alpha}$
+\end_inset
+
+ is a penalty factor associated with 
+\begin_inset Formula $j_{n}^{\alpha}$
+\end_inset
+
+.
+ It follows that 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\mathbf{t} & =\varepsilon_{n}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)\,,\\
+Dw_{n} & =\varepsilon_{p}\left(\Delta\tilde{p}^{\left(1\right)}-\Delta\tilde{p}^{\left(2\right)}\right)\,,\\
+Dj_{n}^{\alpha} & =\varepsilon_{c}^{\alpha}\left(\Delta\tilde{c}^{\alpha\left(1\right)}-\Delta\tilde{c}^{\alpha\left(2\right)}\right)\,.
+\end{aligned}
+\label{eq705-1}
+\end{equation}
+
+\end_inset
+
+Given these relations, it can be shown that the directional derivatives
+ of the various terms appearing in the integrand of 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+ are 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned} & -D\left(J_{\eta}^{\left(1\right)}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}\right)=\\
+ & \left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\varepsilon_{n}J_{\eta}^{\left(1\right)}\mathbf{I}\cdot\left(\Delta\mathbf{u}^{\left(1\right)}-\Delta\mathbf{u}^{\left(2\right)}\right)\\
+ & +\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}\otimes\left[\left(\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{n}^{\left(1\right)}\right)\cdot\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{2}}-\left(\mathbf{g}_{2}^{\left(1\right)}\times\mathbf{n}^{\left(1\right)}\right)\cdot\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{1}}\right]
+\end{aligned}
+\,,\label{eq706-1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned} & -D\left(w_{n}\left(\delta p^{\left(1\right)}-\delta p^{\left(2\right)}\right)J_{\eta}^{\left(1\right)}\right)=\\
+ & -J_{\eta}^{\left(1\right)}\varepsilon_{p}\left(\delta p^{\left(1\right)}-\delta p^{\left(2\right)}\right)\left(\Delta\tilde{p}^{\left(1\right)}-\Delta\tilde{p}^{\left(2\right)}\right)\\
+ & +w_{n}\left(\delta p^{\left(1\right)}-\delta p^{\left(2\right)}\right)\mathbf{n}^{\left(1\right)}\cdot\left(\mathbf{g}_{2}^{\left(1\right)}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{1}}-\mathbf{g}_{1}^{\left(1\right)}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{2}}\right)
+\end{aligned}
+\,,\label{eq707-1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned} & -D\left(j_{n}^{\alpha}\left(\delta\tilde{c}^{\alpha\left(1\right)}-\delta\tilde{c}^{\alpha\left(2\right)}\right)J_{\eta}^{\left(1\right)}\right)=\\
+ & -J_{\eta}^{\left(1\right)}\left(\delta\tilde{c}^{\alpha\left(1\right)}-\delta\tilde{c}^{\alpha\left(2\right)}\right)\varepsilon_{c}^{\alpha}\left(\Delta\tilde{c}^{\alpha\left(1\right)}-\Delta\tilde{c}^{\alpha\left(2\right)}\right)\\
+ & +j_{n}^{\alpha}\left(\delta\tilde{c}^{\alpha\left(1\right)}-\delta\tilde{c}^{\alpha\left(2\right)}\right)\mathbf{n}^{\left(1\right)}\cdot\left(\mathbf{g}_{2}^{\left(1\right)}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{1}}-\mathbf{g}_{1}^{\left(1\right)}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{2}}\right)
+\end{aligned}
+\,,\label{eq707-1b}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $J_{\eta}^{\left(1\right)}=\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Discretization
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tied-BP-Discretization-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The contact integral may be discretized as 
+\begin_inset Formula 
+\begin{equation}
+\delta G_{c}=\sum\limits _{e=1}^{n_{e}^{\left(1\right)}}\sum\limits _{k=1}^{n_{\mbox{int}}^{\left(e\right)}}W_{k}J_{\eta}^{\left(1\right)}\left[\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}+w_{n}\left(\delta p^{\left(1\right)}-\delta p^{\left(2\right)}\right)+\sum_{\alpha}j_{n}^{\alpha}\left(\delta\tilde{c}^{\alpha\left(1\right)}-\delta\tilde{c}^{\alpha\left(2\right)}\right)\right]\,.\label{eq708-1}
+\end{equation}
+
+\end_inset
+
+The variables may be interpolated over each element face according to 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta\mathbf{v}^{\left(1\right)} & =\sum\limits _{a=1}^{m^{\left(1\right)}}N_{a}^{\left(1\right)}\delta\mathbf{v}_{a}^{\left(1\right)} & \delta\mathbf{v}^{\left(2\right)} & =\sum\limits _{b=1}^{m^{\left(2\right)}}N_{b}^{\left(2\right)}\delta\mathbf{v}_{b}^{\left(2\right)}\\
+\Delta\mathbf{u}^{\left(1\right)} & =\sum\limits _{c=1}^{m^{\left(1\right)}}N_{c}^{\left(1\right)}\Delta\mathbf{u}_{c}^{\left(1\right)} & \Delta\mathbf{u}^{\left(2\right)} & =\sum\limits _{d=1}^{m^{\left(2\right)}}N_{d}^{\left(2\right)}\Delta\mathbf{u}_{d}^{\left(2\right)}\\
+\delta\tilde{p}^{\left(1\right)} & =\sum\limits _{a=1}^{m^{\left(1\right)}}N_{a}^{\left(1\right)}\delta\tilde{p}_{a}^{\left(1\right)} & \delta p^{\left(2\right)} & =\sum\limits _{b=1}^{m^{\left(2\right)}}N_{b}^{\left(2\right)}\delta\tilde{p}_{b}^{\left(2\right)}\\
+\Delta\tilde{p}^{\left(1\right)} & =\sum\limits _{c=1}^{m^{\left(1\right)}}N_{c}^{\left(1\right)}\Delta\tilde{p}_{c}^{\left(1\right)} & \Delta\tilde{p}^{\left(2\right)} & =\sum\limits _{d=1}^{m^{\left(2\right)}}N_{d}^{\left(2\right)}\Delta\tilde{p}_{d}^{\left(2\right)}\\
+\delta\tilde{c}^{\alpha\left(1\right)} & =\sum\limits _{a=1}^{m^{\left(1\right)}}N_{a}^{\left(1\right)}\delta\tilde{c}_{a}^{\alpha\left(1\right)} & \delta c^{\alpha\left(2\right)} & =\sum\limits _{b=1}^{m^{\left(2\right)}}N_{b}^{\left(2\right)}\delta\tilde{c}_{b}^{\alpha\left(2\right)}\\
+\Delta\tilde{c}^{\alpha\left(1\right)} & =\sum\limits _{c=1}^{m^{\left(1\right)}}N_{c}^{\left(1\right)}\Delta\tilde{c}_{c}^{\alpha\left(1\right)} & \Delta\tilde{c}^{\alpha\left(2\right)} & =\sum\limits _{d=1}^{m^{\left(2\right)}}N_{d}^{\left(2\right)}\Delta\tilde{c}_{d}^{\alpha\left(2\right)}
+\end{aligned}
+\,.\label{eq709-1}
+\end{equation}
+
+\end_inset
+
+Then, 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\sum\limits _{e=1}^{n_{e}^{\left(1\right)}}\sum\limits _{k=1}^{n_{\mbox{int}}^{\left(e\right)}}W_{k}J_{\eta}^{\left(1\right)}\left(\sum\limits _{a=1}^{m^{\left(1\right)}}\left[\begin{array}{cccc}
+\delta\mathbf{v}_{a}^{\left(1\right)} & \delta\tilde{p}_{a}^{\left(1\right)} & \delta\tilde{c}^{\alpha\left(1\right)} & \delta\tilde{c}^{\beta\left(1\right)}\end{array}\right]\cdot\left[\begin{array}{c}
+\mathbf{f}_{a}^{\left(1\right)}\\
+w_{a}^{\left(1\right)}\\
+j_{n}^{\alpha\left(1\right)}\\
+j_{n}^{\beta\left(1\right)}
+\end{array}\right]\right.\\
+ & \left.+\sum\limits _{b=1}^{m_{k}^{\left(2\right)}}\left[\begin{array}{cccc}
+\delta\mathbf{v}_{b,k}^{\left(1\right)} & \delta\tilde{p}_{b,k}^{\left(1\right)} & \delta\tilde{c}_{b,k}^{\alpha\left(1\right)} & \delta\tilde{c}_{b,k}^{\beta\left(1\right)}\end{array}\right]\cdot\left[\begin{array}{c}
+\mathbf{f}_{b,k}^{\left(1\right)}\\
+w_{b,k}^{\left(1\right)}\\
+j_{b,k}^{\alpha\left(1\right)}\\
+j_{b,k}^{\beta\left(1\right)}
+\end{array}\right]\right)
+\end{aligned}
+\,,\label{eq710-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{f}_{a}^{\left(1\right)} & =N_{a}^{\left(1\right)}\mathbf{t} & \mathbf{f}_{b,k}^{\left(2\right)} & =-N_{b}^{\left(2\right)}\mathbf{t}\\
+w_{a}^{\left(1\right)} & =N_{a}^{\left(1\right)}w_{n} & w_{b,k}^{\left(2\right)} & =-N_{b}^{\left(2\right)}w_{n}\\
+j_{a}^{\gamma\left(1\right)} & =N_{a}^{\left(1\right)}j_{n}^{\gamma} & j_{b,k}^{\gamma\left(2\right)} & =-N_{b}^{\left(2\right)}j_{n}^{\gamma}
+\end{aligned}
+\,.\label{eq711-1}
+\end{equation}
+
+\end_inset
+
+Similarly, 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}-D\delta G_{c} & =\sum\limits _{e=1}^{n_{e}^{\left(1\right)}}\sum\limits _{k=1}^{n_{\mbox{int}}^{\left(e\right)}}W_{k}J_{\eta}^{\left(1\right)}\\
+ & \times\left(\sum\limits _{a=1}^{m^{\left(1\right)}}\left[\begin{array}{cccc}
+\delta\mathbf{v}_{a}^{\left(1\right)} & \delta\tilde{p}_{a}^{\left(1\right)} & \delta\tilde{c}_{a}^{\alpha\left(1\right)} & \delta\tilde{c}_{a}^{\beta\left(1\right)}\end{array}\right]\cdot\left(\sum\limits _{c=1}^{m^{\left(1\right)}}\left[\begin{array}{cccc}
+\mathbf{K}_{ac}^{\left(1,1\right)} & \mathbf{0} & \mathbf{0} & \mathbf{0}\\
+\mathbf{k}_{ac}^{\left(1,1\right)} & k_{ac}^{\left(1,1\right)} & 0 & 0\\
+\mathbf{k}_{ac}^{\alpha\left(1,1\right)} & 0 & k_{ac}^{\alpha\alpha\left(1,1\right)} & 0\\
+\mathbf{k}_{ac}^{\beta\left(1,1\right)} & 0 & 0 & k_{ac}^{\beta\beta\left(1,1\right)}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{u}_{c}^{\left(1\right)}\\
+\Delta\tilde{p}_{c}^{\left(1\right)}\\
+\Delta\tilde{c}_{c}^{\alpha\left(1\right)}\\
+\Delta\tilde{c}_{c}^{\beta\left(1\right)}
+\end{array}\right]\right.\right.\\
+ & +\left.\sum\limits _{d=1}^{m_{k}^{\left(2\right)}}\left[\begin{array}{cccc}
+\mathbf{K}_{ad,k}^{\left(1,2\right)} & \mathbf{0} & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & k_{ad,k}^{\left(1,2\right)} & 0 & 0\\
+\mathbf{0} & 0 & k_{ad,k}^{\alpha\alpha\left(1,2\right)} & 0\\
+\mathbf{0} & 0 & 0 & k_{ad,k}^{\beta\beta\left(1,2\right)}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{u}_{d}^{\left(2\right)}\\
+\Delta\tilde{p}_{d}^{\left(2\right)}\\
+\Delta\tilde{c}_{d}^{\alpha\left(2\right)}\\
+\Delta\tilde{c}_{d}^{\beta\left(2\right)}
+\end{array}\right]\right)\\
+ & +\sum\limits _{b=1}^{m_{k}^{\left(2\right)}}\left[\begin{array}{cccc}
+\delta\mathbf{v}_{b,k}^{\left(2\right)} & \delta\tilde{p}_{b,k}^{\left(2\right)} & \delta\tilde{c}_{b,k}^{\alpha\left(2\right)} & \delta\tilde{c}_{b,k}^{\beta\left(2\right)}\end{array}\right]\cdot\left(\sum\limits _{c=1}^{m^{\left(1\right)}}\left[\begin{array}{cccc}
+\mathbf{K}_{bc,k}^{\left(2,1\right)} & \mathbf{0} & \mathbf{0} & \mathbf{0}\\
+\mathbf{k}_{bc,k}^{\left(2,1\right)} & k_{bc,k}^{\left(2,1\right)} & 0 & 0\\
+\mathbf{k}_{bc,k}^{\alpha\left(2,1\right)} & 0 & k_{bc,k}^{\alpha\alpha\left(2,1\right)} & 0\\
+\mathbf{k}_{bc,k}^{\beta\left(2,1\right)} & 0 & 0 & k_{bc,k}^{\beta\beta\left(2,1\right)}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{u}_{c}^{\left(1\right)}\\
+\Delta\tilde{p}_{c}^{\left(1\right)}\\
+\Delta\tilde{c}_{c}^{\alpha\left(1\right)}
+\end{array}\right]\right.\\
+ & +\left.\left.\sum\limits _{d=1}^{m_{k}^{\left(2\right)}}\left[\begin{array}{cccc}
+\mathbf{K}_{bd,k}^{\left(2,2\right)} & \mathbf{0} & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & k_{bd,k}^{\left(2,2\right)} & 0 & 0\\
+\mathbf{0} & 0 & k_{bd,k}^{\alpha\alpha\left(2,2\right)} & 0\\
+\mathbf{0} & 0 & 0 & k_{bd,k}^{\beta\beta\left(2,2\right)}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{u}_{d}^{\left(2\right)}\\
+\Delta\tilde{p}_{d}^{\left(2\right)}\\
+\Delta\tilde{c}_{d}^{\alpha\left(2\right)}\\
+\Delta\tilde{c}_{d}^{\beta\left(2\right)}
+\end{array}\right]\right)\right)\,,
+\end{aligned}
+\label{eq712-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}_{ac}^{\left(1,1\right)} & =N_{a}^{\left(1\right)}\left(\varepsilon_{n}N_{c}^{\left(1\right)}\mathbf{I}+\mathbf{t}\otimes\mathbf{a}_{c}^{\left(1\right)}\right)\\
+\mathbf{K}_{ad,k}^{\left(1,2\right)} & =-\varepsilon_{n}N_{a}^{\left(1\right)}N_{d}^{\left(2\right)}\mathbf{I}\\
+\mathbf{K}_{bc,k}^{\left(2,1\right)} & =-N_{b}^{\left(2\right)}\left(\varepsilon_{n}N_{c}^{\left(1\right)}\mathbf{I}+\mathbf{t}\otimes\mathbf{a}_{c}^{\left(1\right)}\right)\\
+\mathbf{K}_{bd,k}^{\left(2,2\right)} & =\varepsilon_{n}N_{b}^{\left(2\right)}N_{d}^{\left(2\right)}\mathbf{I}
+\end{aligned}
+\,,\label{eq713-1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{k}_{ac}^{\left(1,1\right)} & =N_{a}^{\left(1\right)}w_{n}\mathbf{a}_{c}^{\left(1\right)}\\
+\mathbf{k}_{bc,k}^{\left(2,1\right)} & =-N_{b}^{\left(2\right)}w_{n}\mathbf{a}_{c}^{\left(1\right)}\\
+\mathbf{k}_{ac}^{\alpha\left(1,1\right)} & =N_{a}^{\left(1\right)}j_{n}^{\alpha}\mathbf{a}_{c}^{\left(1\right)}\\
+\mathbf{k}_{bc,k}^{\alpha\left(2,1\right)} & =-N_{b}^{\left(2\right)}j_{n}^{\alpha}\mathbf{a}_{c}^{\left(1\right)}
+\end{aligned}
+\,,\label{eq714-1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}k_{ac}^{\left(1,1\right)} & =-\varepsilon_{p}N_{a}^{\left(1\right)}N_{c}^{\left(1\right)}\\
+k_{ad,k}^{\left(1,2\right)} & =\varepsilon_{p}N_{a}^{\left(1\right)}N_{d}^{\left(2\right)}\\
+k_{bc,k}^{\left(2,1\right)} & =\varepsilon_{p}N_{b}^{\left(2\right)}N_{c}^{\left(1\right)}\\
+k_{bd,k}^{\left(2,2\right)} & =-\varepsilon_{p}N_{b}^{\left(2\right)}N_{d}^{\left(2\right)}
+\end{aligned}
+\,,\label{eq715-1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}k_{ac}^{\gamma\gamma\left(1,1\right)} & =-\varepsilon_{c}^{\gamma}N_{a}^{\left(1\right)}N_{c}^{\left(1\right)}\\
+k_{ad,k}^{\gamma\gamma\left(1,2\right)} & =\varepsilon_{c}^{\gamma}N_{a}^{\left(1\right)}N_{d}^{\left(2\right)}\\
+k_{bc,k}^{\gamma\gamma\left(2,1\right)} & =\varepsilon_{c}^{\gamma}N_{b}^{\left(2\right)}N_{c}^{\left(1\right)}\\
+k_{bd,k}^{\gamma\gamma\left(2,2\right)} & =-\varepsilon_{c}^{\gamma}N_{b}^{\left(2\right)}N_{d}^{\left(2\right)}
+\end{aligned}
+\label{eq715-1b}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{a}_{c}^{\left(1\right)}=\frac{1}{J_{\eta}^{\left(1\right)}}\mathbf{n}^{\left(1\right)}\times\left(\mathbf{g}_{2}^{\left(1\right)}\frac{\partial N_{c}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{1}}-\mathbf{g}_{1}^{\left(1\right)}\frac{\partial N_{c}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{2}}\right)\,.\label{eq716-1}
 \end{equation}
 
 \end_inset
