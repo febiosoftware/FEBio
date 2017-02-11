@@ -3307,7 +3307,7 @@ FEShellTri3G9::FEShellTri3G9() : FEShellTri3_(NINT, FE_SHELL_TRI3G9)
     const double a = 1.0 / 6.0;
     const double b = 2.0 / 3.0;
     const double w1 = 5.0 / 9.0;
-    const double w2 = 5.0 / 9.0;
+    const double w2 = 8.0 / 9.0;
     
     gr[0] = a; gs[0] = a; gt[0] = -b; gw[0] = a*w1;
     gr[1] = b; gs[1] = a; gt[1] = -b; gw[1] = a*w1;
