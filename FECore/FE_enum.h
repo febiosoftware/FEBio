@@ -106,9 +106,17 @@ enum FE_Element_Type {
 
 	// shell elements
 	FE_SHELL_QUAD,
-	FE_SHELL_TRI,
+    FE_SHELL_QUAD4G8,
+    FE_SHELL_QUAD4G12,
     FE_SHELL_QUAD8,
+    FE_SHELL_QUAD8G18,
+    FE_SHELL_QUAD8G27,
+	FE_SHELL_TRI,
+    FE_SHELL_TRI3G6,
+    FE_SHELL_TRI3G9,
     FE_SHELL_TRI6,
+    FE_SHELL_TRI6G14,
+    FE_SHELL_TRI6G21,
 
 	// truss elements
 	FE_TRUSS,

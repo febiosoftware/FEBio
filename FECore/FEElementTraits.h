@@ -1257,6 +1257,47 @@ public:
 
 	// local derivatives of shape functions at gauss points
 	matrix Hr, Hs;
+    
+    void init() {}
+};
+
+//=============================================================================
+// 4-node quadrilateral elements
+//
+class FEShellQuad4_ : public FEShellElementTraits
+{
+public:
+    enum { NELN = 4 };
+    
+public:
+    FEShellQuad4_(int ni, FE_Element_Type et) : FEShellElementTraits(ni, NELN, ET_QUAD4, et) {}
+    
+};
+
+//=============================================================================
+// 4-node quadrilateral elements with 4*2-point gaussian quadrature
+//
+class FEShellQuad4G8 : public FEShellQuad4_
+{
+public:
+    enum { NINT = 8 };
+    
+public:
+    FEShellQuad4G8();
+    
+};
+
+//=============================================================================
+// 4-node quadrilateral elements with 4*3-point gaussian quadrature
+//
+class FEShellQuad4G12 : public FEShellQuad4_
+{
+public:
+    enum { NINT = 12 };
+    
+public:
+    FEShellQuad4G12();
+    
 };
 
 //=============================================================================
@@ -1275,6 +1316,45 @@ public:
 };
 
 //=============================================================================
+// 3-node triangular elements
+//
+class FEShellTri3_ : public FEShellElementTraits
+{
+public:
+    enum { NELN = 3 };
+    
+public:
+    FEShellTri3_(int ni, FE_Element_Type et) : FEShellElementTraits(ni, NELN, ET_TRI3, et) {}
+    
+};
+
+//=============================================================================
+// 3-node triangular elements with 3*2-point gaussian quadrature
+//
+class FEShellTri3G6 : public FEShellTri3_
+{
+public:
+    enum { NINT = 6 };
+    
+public:
+    FEShellTri3G6();
+    
+};
+
+//=============================================================================
+// 3-node triangular elements with 3*3-point gaussian quadrature
+//
+class FEShellTri3G9 : public FEShellTri3_
+{
+public:
+    enum { NINT = 9 };
+    
+public:
+    FEShellTri3G9();
+    
+};
+
+//=============================================================================
 // 3-node triangular elements with 3*3-point gaussian quadrature 
 //
 class FEShellTriElementTraits : public FEShellElementTraits
@@ -1290,6 +1370,45 @@ public:
 };
 
 //=============================================================================
+// 8-node quadrilateral elements
+//
+class FEShellQuad8_ : public FEShellElementTraits
+{
+public:
+    enum { NELN = 8 };
+    
+public:
+    FEShellQuad8_(int ni, FE_Element_Type et) : FEShellElementTraits(ni, NELN, ET_QUAD8, et) {}
+    
+};
+
+//=============================================================================
+// 8-node quadrilateral elements with 9*2-point gaussian quadrature
+//
+class FEShellQuad8G18 : public FEShellQuad8_
+{
+public:
+    enum { NINT = 18 };
+    
+public:
+    FEShellQuad8G18();
+    
+};
+
+//=============================================================================
+// 8-node quadrilateral elements with 9*3-point gaussian quadrature
+//
+class FEShellQuad8G27 : public FEShellQuad8_
+{
+public:
+    enum { NINT = 27 };
+    
+public:
+    FEShellQuad8G27();
+    
+};
+
+//=============================================================================
 // 8-node quadrilateral elements with 9*3-point gaussian quadrature
 //
 class FEShellQuad8ElementTraits : public FEShellElementTraits
@@ -1302,6 +1421,45 @@ public:
     FEShellQuad8ElementTraits() : FEShellElementTraits(NINT, NELN, ET_QUAD8, FE_SHELL_QUAD8) { init(); }
     
     void init();
+};
+
+//=============================================================================
+// 6-node triangular elements
+//
+class FEShellTri6_ : public FEShellElementTraits
+{
+public:
+    enum { NELN = 6 };
+    
+public:
+    FEShellTri6_(int ni, FE_Element_Type et) : FEShellElementTraits(ni, NELN, ET_TRI6, et) {}
+    
+};
+
+//=============================================================================
+// 6-node triangular elements with 7*2-point gaussian quadrature
+//
+class FEShellTri6G14 : public FEShellTri6_
+{
+public:
+    enum { NINT = 14 };
+    
+public:
+    FEShellTri6G14();
+    
+};
+
+//=============================================================================
+// 6-node triangular elements with 7*3-point gaussian quadrature
+//
+class FEShellTri6G21 : public FEShellTri6_
+{
+public:
+    enum { NINT = 21 };
+    
+public:
+    FEShellTri6G21();
+    
 };
 
 //=============================================================================

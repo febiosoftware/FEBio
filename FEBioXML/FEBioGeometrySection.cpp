@@ -376,11 +376,11 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	else if (strcmp(sztype, "tet10" ) == 0) eshape = ET_TET10;
 	else if (strcmp(sztype, "tet15" ) == 0) eshape = ET_TET15;
 	else if (strcmp(sztype, "tet20" ) == 0) eshape = ET_TET20;
-	else if (strcmp(sztype, "quad4" ) == 0) eshape = ET_QUAD4;
-	else if (strcmp(sztype, "quad8" ) == 0) eshape = ET_QUAD8;
+    else if (strcmp(sztype, "quad4" ) == 0) { eshape = ET_QUAD4; m_pim->m_nquad4 = FE_SHELL_QUAD;  }
+    else if (strcmp(sztype, "quad8" ) == 0) { eshape = ET_QUAD8; m_pim->m_nquad8 = FE_SHELL_QUAD8; }
 	else if (strcmp(sztype, "quad9" ) == 0) eshape = ET_QUAD9;
-	else if (strcmp(sztype, "tri3"  ) == 0) eshape = ET_TRI3;
-	else if (strcmp(sztype, "tri6"  ) == 0) eshape = ET_TRI6;
+    else if (strcmp(sztype, "tri3"  ) == 0) { eshape = ET_TRI3; m_pim->m_ntri3 = FE_SHELL_TRI;  }
+    else if (strcmp(sztype, "tri6"  ) == 0) { eshape = ET_TRI6; m_pim->m_ntri6 = FE_SHELL_TRI6; }
 	else if (strcmp(sztype, "truss2") == 0) eshape = ET_TRUSS2;
 	else
 	{
@@ -410,6 +410,14 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 		else if (strcmp(sztype, "TET15G8_S7"  ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G8; m_pim->m_ntri7 = FE_TRI7G7; }
 		else if (strcmp(sztype, "TET15G11_S7" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G7; }
 		else if (strcmp(sztype, "TET15G15_S7" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G7; }
+        else if (strcmp(sztype, "QUAD4G8"     ) == 0) { eshape = ET_QUAD4; m_pim->m_nquad4 = FE_SHELL_QUAD4G8;  }
+        else if (strcmp(sztype, "QUAD4G12"    ) == 0) { eshape = ET_QUAD4; m_pim->m_nquad4 = FE_SHELL_QUAD4G12; }
+        else if (strcmp(sztype, "QUAD8G18"    ) == 0) { eshape = ET_QUAD8; m_pim->m_nquad8 = FE_SHELL_QUAD8G18; }
+        else if (strcmp(sztype, "QUAD8G27"    ) == 0) { eshape = ET_QUAD8; m_pim->m_nquad8 = FE_SHELL_QUAD8G27; }
+        else if (strcmp(sztype, "TRI3G6"      ) == 0) { eshape = ET_TRI3 ; m_pim->m_ntri3  = FE_SHELL_TRI3G6;   }
+        else if (strcmp(sztype, "TRI3G9"      ) == 0) { eshape = ET_TRI3 ; m_pim->m_ntri3  = FE_SHELL_TRI3G9;   }
+        else if (strcmp(sztype, "TRI6G14"     ) == 0) { eshape = ET_TRI6 ; m_pim->m_ntri6  = FE_SHELL_TRI6G14;  }
+        else if (strcmp(sztype, "TRI6G21"     ) == 0) { eshape = ET_TRI6 ; m_pim->m_ntri6  = FE_SHELL_TRI6G21;  }
 		else
 		{
 			throw FEBioImport::InvalidElementType();
@@ -434,10 +442,10 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	case ET_TET20 : etype = m_pim->m_ntet20; break;
 	case ET_HEX20 : etype = FE_HEX20G27; break;
 	case ET_HEX27 : etype = FE_HEX27G27; break;
-	case ET_QUAD4 : etype = (NDIM == 3 ? FE_SHELL_QUAD : FE2D_QUAD4G4); break;
-	case ET_TRI3  : etype = (NDIM == 3 ? FE_SHELL_TRI  : FE2D_TRI3G1 ); break;
-    case ET_TRI6  : etype = (NDIM == 3 ? FE_SHELL_TRI6 : FE2D_TRI6G3); break;
-	case ET_QUAD8 : etype = (NDIM == 3 ? FE_SHELL_QUAD8 : FE2D_QUAD8G9); break;
+	case ET_QUAD4 : etype = (NDIM == 3 ? m_pim->m_nquad4 : FE2D_QUAD4G4); break;
+	case ET_TRI3  : etype = (NDIM == 3 ? m_pim->m_ntri3  : FE2D_TRI3G1 ); break;
+    case ET_TRI6  : etype = (NDIM == 3 ? m_pim->m_ntri6  : FE2D_TRI6G3 ); break;
+	case ET_QUAD8 : etype = (NDIM == 3 ? m_pim->m_nquad8 : FE2D_QUAD8G9); break;
 	case ET_QUAD9 : etype = FE2D_QUAD9G9; break;
 	case ET_TRUSS2: etype = FE_TRUSS; break;
 	default:

@@ -701,10 +701,22 @@ void FEBioPlotFile2::WriteShellDomain(FEShellDomain& dom)
 	int dtype = 0;
 	switch (etype)
 	{
-		case FE_SHELL_QUAD : ne = 4; dtype = PLT_ELEM_QUAD; break;
-		case FE_SHELL_TRI  : ne = 3; dtype = PLT_ELEM_TRI; break;
-        case FE_SHELL_QUAD8: ne = 8; dtype = PLT_ELEM_QUAD8; break;
-        case FE_SHELL_TRI6 : ne = 6; dtype = PLT_ELEM_TRI6; break;
+		case FE_SHELL_QUAD :
+        case FE_SHELL_QUAD4G8 :
+        case FE_SHELL_QUAD4G12 :
+            ne = 4; dtype = PLT_ELEM_QUAD; break;
+		case FE_SHELL_TRI  :
+        case FE_SHELL_TRI3G6  :
+        case FE_SHELL_TRI3G9  :
+            ne = 3; dtype = PLT_ELEM_TRI; break;
+        case FE_SHELL_QUAD8:
+        case FE_SHELL_QUAD8G18:
+        case FE_SHELL_QUAD8G27:
+            ne = 8; dtype = PLT_ELEM_QUAD8; break;
+        case FE_SHELL_TRI6 :
+        case FE_SHELL_TRI6G14 :
+        case FE_SHELL_TRI6G21 :
+            ne = 6; dtype = PLT_ELEM_TRI6; break;
         default:
             assert(false);
 	}
