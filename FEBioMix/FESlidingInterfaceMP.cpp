@@ -28,8 +28,8 @@ ADD_PARAMETER(m_epsc     , FE_PARAM_DOUBLE, "concentration_penalty");
 ADD_PARAMETER(m_bsymm    , FE_PARAM_BOOL  , "symmetric_stiffness"  );
 ADD_PARAMETER(m_srad     , FE_PARAM_DOUBLE, "search_radius"        );
 ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"               );
-ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"             );
-ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"             );
+ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"               );
+ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"               );
 ADD_PARAMETER(m_ambp     , FE_PARAM_DOUBLE, "ambient_pressure"     );
 ADD_PARAMETER(m_ambctmp  , FE_PARAM_DOUBLE, "ambient_concentration");
 END_PARAMETER_LIST();
@@ -1434,18 +1434,13 @@ void FESlidingInterfaceMP::ContactForces(FEGlobalVector& R)
                 wn[j] = pt.m_Lmp + epsp*pt.m_pg;
                 
                 // normal solute flux
-                double je = 0;      // normal current density (flux units)
                 for (int isol=0; isol<nsol; ++isol)
                 {
                     int l = sl[isol];
                     double epsc = m_epsc*pt.m_epsc[l];
                     jn[isol][j] = pt.m_Lmc[l] + epsc*pt.m_cg[l];
-                    je += m_sz[isol]*jn[isol][j];
                 }
                 
-                // normal effective solute flux
-                for (int isol=0; isol<nsol; ++isol)
-                    jn[isol][j] += je;
 			}
 			
 			// loop over all integration points
@@ -1677,19 +1672,13 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
                 wn[j] = pd.m_Lmp + epsp*pd.m_pg;
                 
                 // normal solute flux
-                double je = 0;      // normal current density (flux units)
                 for (int isol=0; isol<nsol; ++isol)
                 {
                     int l = sl[isol];
                     double epsc = m_epsc*pd.m_epsc[l];
                     jn[isol][j] = pd.m_Lmc[l] + epsc*pd.m_cg[l];
-                    je += m_sz[isol]*jn[isol][j];
                 }
                 
-                // normal effective solute flux
-                for (int isol=0; isol<nsol; ++isol)
-                    jn[isol][j] += je;
-				
                 // contravariant basis vectors of slave surface
                 vec3d Gs[2];
                 ss.ContraBaseVectors(se, j, Gs);
@@ -1703,17 +1692,11 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
 				}
                 
 				// q vectors (gradients of effective solute concentrations on slave surface)
-                vec3d qve(0,0,0);
 				for (int isol=0; isol<nsol; ++isol) {
 					double dcr = se.eval_deriv1(&cn[isol][0], j);
 					double dcs = se.eval_deriv2(&cn[isol][0], j);
                     qv[isol][j] = Gs[0]*dcr + Gs[1]*dcs;
-                    qve += qv[isol][j]*m_sz[isol];
 				}
-                
-                // effective q vectors
-                for (int isol=0; isol<nsol; ++isol)
-                    qv[isol][j] += qve;
 			}
 			
 			// loop over all integration points
@@ -1979,9 +1962,6 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
                                     double epsc = m_epsc*pt.m_epsc[sl[isol]];
                                     double hac = (-Hs[a]*Hs[c]*epsc)*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l+4+isol] += hac;
-                                    for (int jsol=0; jsol<nsol; ++jsol) {
-                                        ke[k+4+isol][l+4+jsol] += hac*m_sz[jsol];
-                                    }
                                 }
                             }
                             for (int d=0; d<nmeln; ++d) {
@@ -1992,9 +1972,6 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
                                     double epsc = m_epsc*pt.m_epsc[sl[isol]];
                                     double had = (Hs[a]*Hm[d]*epsc)*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l+4+isol] += had;
-                                    for (int jsol=0; jsol<nsol; ++jsol) {
-                                        ke[k+4+isol][l+4+jsol] += had*m_sz[jsol];
-                                    }
                                 }
                             }
                         }
@@ -2008,9 +1985,6 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
                                     double epsc = m_epsc*pt.m_epsc[sl[isol]];
                                     double hbc = (Hm[b]*Hs[c]*epsc)*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l+4+isol] += hbc;
-                                    for (int jsol=0; jsol<nsol; ++jsol) {
-                                        ke[k+4+isol][l+4+jsol] += hbc*m_sz[jsol];
-                                    }
                                 }
                             }
                             for (int d=0; d<nmeln; ++d) {
@@ -2021,9 +1995,6 @@ void FESlidingInterfaceMP::ContactStiffness(FESolver* psolver)
                                     double epsc = m_epsc*pt.m_epsc[sl[isol]];
                                     double hbd = (-Hm[b]*Hm[d]*epsc)*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l+4+isol] += hbd;
-                                    for (int jsol=0; jsol<nsol; ++jsol) {
-                                        ke[k+4+isol][l+4+jsol] += hbd*m_sz[jsol];
-                                    }
                                 }
                             }
                         }

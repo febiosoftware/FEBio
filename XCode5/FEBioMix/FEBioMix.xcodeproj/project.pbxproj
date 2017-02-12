@@ -25,6 +25,8 @@
 		D534C48718BAAE70006B5E1B /* FEMultiphasicMultigeneration.h in Headers */ = {isa = PBXBuildFile; fileRef = D534C48518BAAE70006B5E1B /* FEMultiphasicMultigeneration.h */; };
 		D577FBD91CD63A5E00E4857B /* FESlidingInterfaceBiphasic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D577FBD71CD63A5E00E4857B /* FESlidingInterfaceBiphasic.cpp */; };
 		D577FBDA1CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h in Headers */ = {isa = PBXBuildFile; fileRef = D577FBD81CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h */; };
+		D5794FF41E35243700FC1CBD /* FETiedMultiphasicInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5794FF21E35243700FC1CBD /* FETiedMultiphasicInterface.cpp */; };
+		D5794FF51E35243700FC1CBD /* FETiedMultiphasicInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5794FF31E35243700FC1CBD /* FETiedMultiphasicInterface.h */; };
 		D58570F91A81BEC60038367C /* FEReactionRateExpSED.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58570F71A81BEC60038367C /* FEReactionRateExpSED.cpp */; };
 		D58570FA1A81BEC60038367C /* FEReactionRateExpSED.h in Headers */ = {isa = PBXBuildFile; fileRef = D58570F81A81BEC60038367C /* FEReactionRateExpSED.h */; };
 		D598BB6C1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D598BB6A1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.cpp */; };
@@ -169,6 +171,8 @@
 		D534C48518BAAE70006B5E1B /* FEMultiphasicMultigeneration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicMultigeneration.h; sourceTree = "<group>"; };
 		D577FBD71CD63A5E00E4857B /* FESlidingInterfaceBiphasic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESlidingInterfaceBiphasic.cpp; sourceTree = "<group>"; };
 		D577FBD81CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESlidingInterfaceBiphasic.h; sourceTree = "<group>"; };
+		D5794FF21E35243700FC1CBD /* FETiedMultiphasicInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETiedMultiphasicInterface.cpp; sourceTree = "<group>"; };
+		D5794FF31E35243700FC1CBD /* FETiedMultiphasicInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETiedMultiphasicInterface.h; sourceTree = "<group>"; };
 		D58570F71A81BEC60038367C /* FEReactionRateExpSED.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactionRateExpSED.cpp; sourceTree = "<group>"; };
 		D58570F81A81BEC60038367C /* FEReactionRateExpSED.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReactionRateExpSED.h; sourceTree = "<group>"; };
 		D598BB6A1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicSoluteSolidDomain.cpp; sourceTree = "<group>"; };
@@ -461,6 +465,8 @@
 				D5E108CB1865E02800B23922 /* FESupplySynthesisBinding.h */,
 				D5E108CC1865E02800B23922 /* FETiedBiphasicInterface.cpp */,
 				D5E108CD1865E02800B23922 /* FETiedBiphasicInterface.h */,
+				D5794FF21E35243700FC1CBD /* FETiedMultiphasicInterface.cpp */,
+				D5794FF31E35243700FC1CBD /* FETiedMultiphasicInterface.h */,
 				D5E108CE1865E02800B23922 /* FETriphasic.cpp */,
 				D5E108CF1865E02800B23922 /* FETriphasic.h */,
 				D5E108D01865E02800B23922 /* FETriphasicDomain.cpp */,
@@ -527,6 +533,7 @@
 				D5E109261865E02800B23922 /* FESolute.h in Headers */,
 				D5ECCEE2186644B00073481A /* FEBiphasicContactSurface.h in Headers */,
 				D50F0ECD1D6CBD0A0095E621 /* FEMassActionForwardEffective.h in Headers */,
+				D5794FF51E35243700FC1CBD /* FETiedMultiphasicInterface.h in Headers */,
 				D5E109281865E02800B23922 /* FESoluteFlux.h in Headers */,
 				D5E108E81865E02800B23922 /* FEBiphasicSolver.h in Headers */,
 				D5E1090E1865E02800B23922 /* FEPermHolmesMow.h in Headers */,
@@ -603,6 +610,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5794FF41E35243700FC1CBD /* FETiedMultiphasicInterface.cpp in Sources */,
 				D5E109051865E02800B23922 /* FEMultiphasicDomain.cpp in Sources */,
 				D5E108D51865E02800B23922 /* FEBioMixData.cpp in Sources */,
 				D5E109251865E02800B23922 /* FESolute.cpp in Sources */,

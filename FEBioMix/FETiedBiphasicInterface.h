@@ -6,6 +6,25 @@
 class FETiedBiphasicSurface : public FEBiphasicContactSurface
 {
 public:
+    //! Integration point data
+    class Data
+    {
+    public:
+        Data();
+        
+    public:
+        vec3d	m_Gap;	//!< initial gap in reference configuration
+        vec3d	m_dg;	//!< gap function at integration points
+        vec3d	m_nu;	//!< normal at integration points
+        vec2d	m_rs;	//!< natural coordinates of projection of integration point
+        vec3d	m_Lmd;	//!< lagrange multipliers for displacements
+        double	m_Lmp;	//!< lagrange multipliers for fluid pressures
+        double	m_epsn;	//!< penalty factors
+        double	m_epsp;	//!< pressure penalty factors
+        double	m_pg;	//!< pressure "gap"
+        FESurfaceElement*	m_pme;	//!< master element of projected integration point
+    };
+    
 	//! constructor
 	FETiedBiphasicSurface(FEModel* pfem);
 	
@@ -25,24 +44,9 @@ protected:
 public:
 	bool				m_bporo;	//!< set poro-mode
 	
-	vector<vec3d>				m_Gap;	//!< initial gap in reference configuration
-	vector<vec3d>				m_dg;	//!< gap function at integration points
-	vector<vec3d>				m_nu;	//!< normal at integration points
-	vector<vec2d>				m_rs;	//!< natural coordinates of projection of integration point
-	vector<vec3d>				m_Lmd;	//!< lagrange multipliers for displacements
-	vector<double>				m_Lmp;	//!< lagrange multipliers for fluid pressures
-	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
-	vector<int>					m_nei;	//!< surface element indices into arrays
-	vector<bool>				m_poro;	//!< surface element poro status
-	
-	vector<double>				m_epsn;	//!< penalty factors
-	vector<double>				m_epsp;	//!< pressure penalty factors
-	
-	vector<vec3d>				m_nn;	//!< node normals
-	
-	// biphasic data
-	vector<double>				m_pg;	//!< pressure "gap"
-	
+    vector< vector<Data> >  m_Data;	//!< integration point data
+    vector<bool>			m_poro;	//!< surface element poro status
+    vector<vec3d>			m_nn;	//!< node normals
 };
 
 //-----------------------------------------------------------------------------

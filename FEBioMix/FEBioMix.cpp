@@ -48,6 +48,7 @@
 #include "FESlidingInterface3.h"
 #include "FESlidingInterfaceMP.h"
 #include "FETiedBiphasicInterface.h"
+#include "FETiedMultiphasicInterface.h"
 
 #include "FEBiphasicSolver.h"
 #include "FEBiphasicSoluteSolver.h"
@@ -145,12 +146,13 @@ REGISTER_FECORE_CLASS(FESoluteFlux        , FESURFACELOAD_ID, "soluteflux"     )
 
 //-----------------------------------------------------------------------------
 // Contact interfaces
-REGISTER_FECORE_CLASS(FESlidingInterface2    , FESURFACEPAIRINTERACTION_ID, "sliding2"              );
-REGISTER_FECORE_CLASS(FESlidingInterfaceBiphasic, FESURFACEPAIRINTERACTION_ID, "sliding-biphasic"   );
-REGISTER_FECORE_CLASS(FESlidingInterface3    , FESURFACEPAIRINTERACTION_ID, "sliding3"              );
-REGISTER_FECORE_CLASS(FESlidingInterfaceMP   , FESURFACEPAIRINTERACTION_ID, "sliding-multiphasic"   );
-REGISTER_FECORE_CLASS(FETiedBiphasicInterface, FESURFACEPAIRINTERACTION_ID, "tied-biphasic"         );
-
+REGISTER_FECORE_CLASS(FESlidingInterface2       , FESURFACEPAIRINTERACTION_ID, "sliding2"              );
+REGISTER_FECORE_CLASS(FESlidingInterfaceBiphasic, FESURFACEPAIRINTERACTION_ID, "sliding-biphasic"      );
+REGISTER_FECORE_CLASS(FESlidingInterface3       , FESURFACEPAIRINTERACTION_ID, "sliding3"              );
+REGISTER_FECORE_CLASS(FESlidingInterfaceMP      , FESURFACEPAIRINTERACTION_ID, "sliding-multiphasic"   );
+REGISTER_FECORE_CLASS(FETiedBiphasicInterface   , FESURFACEPAIRINTERACTION_ID, "tied-biphasic"         );
+REGISTER_FECORE_CLASS(FETiedMultiphasicInterface, FESURFACEPAIRINTERACTION_ID, "tied-multiphasic"      );
+    
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
 REGISTER_FECORE_CLASS(FEPlotEffectiveElasticity		     , FEPLOTDATA_ID, "effective elasticity"            );
