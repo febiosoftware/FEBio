@@ -78,6 +78,14 @@ public:
 	//! Add a solute component
 	void AddSolute(FESolute* ps);
 
+public:
+    FEElasticMaterial*			GetSolid()				{ return m_pSolid; }
+    FEHydraulicPermeability*	GetPermeability()		{ return m_pPerm;  }
+    FEOsmoticCoefficient*		GetOsmoticCoefficient() { return m_pOsmC;  }
+    FESolute*					GetSolute(int i)        { return m_pSolute[i]; }
+    
+    int Solutes		() { return (int) m_pSolute.size(); }
+
 public: // material parameters
 	double						m_phi0;			//!< solid volume fraction in reference configuration
 	double						m_rhoTw;		//!< true fluid density

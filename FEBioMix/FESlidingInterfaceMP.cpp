@@ -2,6 +2,7 @@
 #include "FESlidingInterfaceMP.h"
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
+#include "FETriphasic.h"
 #include "FEMultiphasic.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
@@ -126,15 +127,26 @@ bool FESlidingSurfaceMP::Init()
 			// check type of element
 			FEBiphasic* pb = dynamic_cast<FEBiphasic*> (pm);
 			FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);
+            FETriphasic* ptp = dynamic_cast<FETriphasic*> (pm);
 			FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*> (pm);
 			if (pb) {
 				m_bporo = true;
 				nsol = 0;
-			} else if (pbs) {
+			}
+            else if (pbs) {
 				m_bporo = m_bsolu = true;
 				nsol = 1;
 				m_sid.assign(nsol, pbs->GetSolute()->GetSoluteID());
-			} else if (pmp) {
+			}
+            else if (ptp) {
+                m_bporo = m_bsolu = true;
+                nsol = ptp->Solutes();
+                m_sid.resize(nsol);
+                for (int isol=0; isol<nsol; ++isol) {
+                    m_sid[isol] = ptp->GetSolute(isol)->GetSoluteID();
+                }
+            }
+            else if (pmp) {
 				m_bporo = m_bsolu = true;
 				nsol = pmp->Solutes();
 				m_sid.resize(nsol);
@@ -851,6 +863,10 @@ double FESlidingInterfaceMP::AutoPenalty(FESurfaceElement& el, FESurface &s)
                 FEMultiphasic* pmm = dynamic_cast<FEMultiphasic*>(pme);
                 S = pmm->Tangent(mp);
             }
+            else if (dynamic_cast<FETriphasic*>(pme)) {
+                FETriphasic* pms = dynamic_cast<FETriphasic*>(pme);
+                S = pms->Tangent(mp);
+            }
             else if (dynamic_cast<FEBiphasicSolute*>(pme)) {
                 FEBiphasicSolute* pms = dynamic_cast<FEBiphasicSolute*>(pme);
                 S = pms->Tangent(mp);
@@ -911,6 +927,7 @@ double FESlidingInterfaceMP::AutoPressurePenalty(FESurfaceElement& el, FESliding
 		// check type of element
 		FEBiphasic* pb = dynamic_cast<FEBiphasic*> (pm);
 		FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);
+        FETriphasic* ptp = dynamic_cast<FETriphasic*> (pm);
 		FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*> (pm);
         if (pb) {
             double k[3][3];
@@ -919,6 +936,8 @@ double FESlidingInterfaceMP::AutoPressurePenalty(FESurfaceElement& el, FESliding
         }
 		else if (pbs)
 			K = pbs->GetPermeability()->Permeability(mp);
+        else if (ptp)
+            K = ptp->GetPermeability()->Permeability(mp);
 		else if (pmp)
 			K = pmp->GetPermeability()->Permeability(mp);
         
@@ -999,12 +1018,18 @@ double FESlidingInterfaceMP::AutoConcentrationPenalty(FESurfaceElement& el,
         
 		// see if this is a biphasic-solute or multiphasic element
 		FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);
+        FETriphasic* ptp = dynamic_cast<FETriphasic*> (pm);
 		FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*> (pm);
 		if (pbs)
 		{
 			D = pbs->GetSolute()->m_pDiff->Diffusivity(mp)
 			*(pbs->Porosity(mp)*pbs->GetSolute()->m_pSolub->Solubility(mp));
 		}
+        else if (ptp)
+        {
+            D = ptp->GetSolute(isol)->m_pDiff->Diffusivity(mp)
+            *(ptp->Porosity(mp)*ptp->GetSolute(isol)->m_pSolub->Solubility(mp));
+        }
 		else if (pmp)
 		{
 			D = pmp->GetSolute(isol)->m_pDiff->Diffusivity(mp)

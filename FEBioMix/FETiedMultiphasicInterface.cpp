@@ -592,6 +592,10 @@ double FETiedMultiphasicInterface::AutoPenalty(FESurfaceElement& el, FESurface &
                 FEMultiphasic* pmm = dynamic_cast<FEMultiphasic*>(pme);
                 S = pmm->Tangent(mp);
             }
+            else if (dynamic_cast<FETriphasic*>(pme)) {
+                FETriphasic* pmt = dynamic_cast<FETriphasic*>(pme);
+                S = pmt->Tangent(mp);
+            }
             else if (dynamic_cast<FEBiphasicSolute*>(pme)) {
                 FEBiphasicSolute* pms = dynamic_cast<FEBiphasicSolute*>(pme);
                 S = pms->Tangent(mp);
@@ -690,12 +694,15 @@ double FETiedMultiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FET
         // check type of element
         FEBiphasic* pb = dynamic_cast<FEBiphasic*> (pm);
         FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);
+        FETriphasic* ptp = dynamic_cast<FETriphasic*> (pm);
         FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*> (pm);
         if (pb) {
             double k[3][3];
             pb->Permeability(k, mp);
             K = mat3ds(k[0][0], k[1][1], k[2][2], k[0][1], k[1][2], k[0][2]);
         }
+        else if (ptp)
+            K = ptp->GetPermeability()->Permeability(mp);
         else if (pbs)
             K = pbs->GetPermeability()->Permeability(mp);
         else if (pmp)
@@ -775,11 +782,17 @@ double FETiedMultiphasicInterface::AutoConcentrationPenalty(FESurfaceElement& el
         
         // see if this is a biphasic-solute or multiphasic element
         FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);
+        FETriphasic* ptp = dynamic_cast<FETriphasic*> (pm);
         FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*> (pm);
         if (pbs)
         {
             D = pbs->GetSolute()->m_pDiff->Diffusivity(mp)
             *(pbs->Porosity(mp)*pbs->GetSolute()->m_pSolub->Solubility(mp));
+        }
+        else if (ptp)
+        {
+            D = ptp->GetSolute(isol)->m_pDiff->Diffusivity(mp)
+            *(ptp->Porosity(mp)*ptp->GetSolute(isol)->m_pSolub->Solubility(mp));
         }
         else if (pmp)
         {
