@@ -59,6 +59,12 @@ public:
     //! calculate the gradient of a scalar function over the shell
     vec3d gradient(FEShellElement& el, double* pn, double* dpn, int n);
     
+    //! evaluate a scalar function over the shell
+    double evaluate(FEShellElement& el, vector<double> pn, vector<double> dpn, int n);
+    
+    //! calculate the gradient of a scalar function over the shell
+    vec3d gradient(FEShellElement& el, vector<double> pn, vector<double> dpn, int n);
+    
 protected:
     int     m_dofx;
     int     m_dofy;

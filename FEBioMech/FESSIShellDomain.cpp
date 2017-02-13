@@ -408,3 +408,62 @@ vec3d FESSIShellDomain::gradient(FEShellElement& el, double* pn, double* dpn, in
     
     return gradp;
 }
+
+//-----------------------------------------------------------------------------
+//! evaluate a scalar function over the shell
+double FESSIShellDomain::evaluate(FEShellElement& el, vector<double> pn, vector<double> dpn, int n)
+{
+    const double *M;
+    double eta;
+    vec3d gcnt[3];
+    double Mu, Md;
+    double p = 0;
+    
+    eta = el.gt(n);
+    
+    M  = el.H(n);
+    
+    ContraBaseVectors(el, n, gcnt);
+    
+    int neln = el.Nodes();
+    
+    for (int i=0; i<neln; ++i)
+    {
+        Mu = (1+eta)/2*M[i];
+        Md = (1-eta)/2*M[i];
+        p += Mu*pn[i] + Md*dpn[i];
+    }
+    
+    return p;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate the gradient of a scalar function over the shell
+vec3d FESSIShellDomain::gradient(FEShellElement& el, vector<double> pn, vector<double> dpn, int n)
+{
+    const double* Mr, *Ms, *M;
+    double eta;
+    vec3d gcnt[3];
+    vec3d gradM, gradMu, gradMd;
+    vec3d gradp(0,0,0);
+    
+    eta = el.gt(n);
+    
+    Mr = el.Hr(n);
+    Ms = el.Hs(n);
+    M  = el.H(n);
+    
+    ContraBaseVectors(el, n, gcnt);
+    
+    int neln = el.Nodes();
+    
+    for (int i=0; i<neln; ++i)
+    {
+        gradM = gcnt[0]*Mr[i] + gcnt[1]*Ms[i];
+        gradMu = (gradM*(1+eta) + gcnt[2]*M[i])/2;
+        gradMd = (gradM*(1-eta) - gcnt[2]*M[i])/2;
+        gradp += gradMu*pn[i] + gradMd*dpn[i];
+    }
+    
+    return gradp;
+}

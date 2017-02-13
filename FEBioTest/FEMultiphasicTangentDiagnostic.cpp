@@ -10,7 +10,7 @@
 #include "FETangentDiagnostic.h"
 #include "FEBioLib/FEBox.h"
 #include "FEBioMix/FEMultiphasicSolver.h"
-#include "FEBioMix/FEMultiphasicDomain.h"
+#include "FEBioMix/FEMultiphasicSolidDomain.h"
 #include "FECore/BC.h"
 #include "FECore/FEInitialCondition.h"
 #include "FECore/LoadCurve.h"
@@ -101,7 +101,7 @@ bool FEMultiphasicTangentUniaxial::Init()
     }
     
     // create a multiphasic domain
-    FEMultiphasicDomain* pd = new FEMultiphasicDomain(&fem);
+    FEMultiphasicSolidDomain* pd = new FEMultiphasicSolidDomain(&fem);
 	pd->SetMaterial(pmat);
     pd->Create(1, FE_HEX8G8);
 	pd->SetMatID(0);
@@ -244,7 +244,7 @@ bool FEMultiphasicTangentDiagnostic::Run()
     int ndpn = 4+nsol;
     
     FEMesh& mesh = fem.GetMesh();
-    FEMultiphasicDomain& md = static_cast<FEMultiphasicDomain&>(mesh.Domain(0));
+    FEMultiphasicSolidDomain& md = static_cast<FEMultiphasicSolidDomain&>(mesh.Domain(0));
     
     // get the one and only element
     FESolidElement& el = md.Element(0);
@@ -332,7 +332,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
 	const int dof_p = fem.GetDOFIndex("p");
 	const int dof_c = fem.GetDOFIndex("concentration", 0);
     
-    FEMultiphasicDomain& md = static_cast<FEMultiphasicDomain&>(mesh.Domain(0));
+    FEMultiphasicSolidDomain& md = static_cast<FEMultiphasicSolidDomain&>(mesh.Domain(0));
     
     // get the one and only element
     FESolidElement& el = md.Element(0);
