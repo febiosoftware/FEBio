@@ -53,7 +53,7 @@ public: // parameters
 
 protected:
     bool	m_binit;	//! is spring initialized?
-    double  m_L0;       //! spring resting length
+    double  m_L0;       //! spring free length
 	vec3d	m_qa0;      //! initial relative position vector of spring on body A
     vec3d	m_qb0;      //! initial relative position vector of spring on body B
     

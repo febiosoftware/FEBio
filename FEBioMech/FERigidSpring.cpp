@@ -20,6 +20,7 @@ BEGIN_PARAMETER_LIST(FERigidSpring, FERigidConnector);
     ADD_PARAMETER(m_k   , FE_PARAM_DOUBLE, "k"          );
     ADD_PARAMETER(m_a0  , FE_PARAM_VEC3D , "insertion_a");
     ADD_PARAMETER(m_b0  , FE_PARAM_VEC3D , "insertion_b");
+    ADD_PARAMETER(m_L0  , FE_PARAM_DOUBLE, "free_length");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -65,8 +66,8 @@ bool FERigidSpring::Init()
     FERigidBody& ra = *rs.Object(m_nRBa);
     FERigidBody& rb = *rs.Object(m_nRBb);
 
-    // get initial length of spring
-    m_L0 = (m_b0 - m_a0).norm();
+    // if not specified by use, get free length of spring
+    if (m_L0 == 0) m_L0 = (m_b0 - m_a0).norm();
     // set spring insertions relative to rigid body center of mass
     m_qa0 = m_a0 - ra.m_r0;
     m_qb0 = m_b0 - rb.m_r0;
