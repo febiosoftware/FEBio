@@ -39,6 +39,7 @@ FEDomain* FEMixDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* 
 	{
 		// multiphasic elements
 		if (eclass == FE_ELEM_SOLID)  sztype = "multiphasic-solid";
+        else if (eclass == FE_ELEM_SHELL) sztype = "multiphasic-shell";
 		else return 0;
 	}
 

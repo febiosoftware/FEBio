@@ -929,11 +929,8 @@ double FESlidingInterfaceMP::AutoPressurePenalty(FESurfaceElement& el, FESliding
 		FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);
         FETriphasic* ptp = dynamic_cast<FETriphasic*> (pm);
 		FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*> (pm);
-        if (pb) {
-            double k[3][3];
-			pb->Permeability(k, mp);
-            K = mat3ds(k[0][0], k[1][1], k[2][2], k[0][1], k[1][2], k[0][2]);
-        }
+        if (pb)
+            K = pb->GetPermeability()->Permeability(mp);
 		else if (pbs)
 			K = pbs->GetPermeability()->Permeability(mp);
         else if (ptp)

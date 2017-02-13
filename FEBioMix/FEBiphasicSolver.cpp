@@ -798,7 +798,28 @@ void FEBiphasicSolver::GetDisplacementData(vector<double> &di, vector<double> &u
 			di[m++] = ui[nid];
 			assert(m <= (int) di.size());
 		}
-	}
+        nid = n.m_ID[m_dofU];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            di[m++] = ui[nid];
+            assert(m <= (int) di.size());
+        }
+        nid = n.m_ID[m_dofV];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            di[m++] = ui[nid];
+            assert(m <= (int) di.size());
+        }
+        nid = n.m_ID[m_dofW];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            di[m++] = ui[nid];
+            assert(m <= (int) di.size());
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------

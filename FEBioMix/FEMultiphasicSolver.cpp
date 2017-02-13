@@ -37,7 +37,16 @@ FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 	DOFS& dofs = pfem->GetDOFS();
 	int varP = dofs.AddVariable("fluid pressure");
 	dofs.SetDOFName(varP, 0, "p");
-	dofs.AddVariable("concentration", VAR_ARRAY);	// we start with zero concentrations
+    int varQ = dofs.AddVariable("shell fluid pressure");
+    dofs.SetDOFName(varQ, 0, "q");
+    int varC = dofs.AddVariable("concentration", VAR_ARRAY);
+    int varD = dofs.AddVariable("shell concentration", VAR_ARRAY);
+    
+    // get pressure dof
+    m_dofP = pfem->GetDOFIndex("p");
+    m_dofQ = pfem->GetDOFIndex("q");
+
+    m_dofC = m_dofD = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -49,11 +58,10 @@ bool FEMultiphasicSolver::Init()
 	if (FESolidSolver2::Init() == false) return false;
 
 	// allocate poro-vectors
-	assert(m_ndeq > 0);
-	m_di.assign(m_ndeq, 0);
+    assert((m_ndeq > 0) || (m_npeq > 0));
+    m_di.assign(m_ndeq, 0);
 	m_Di.assign(m_ndeq, 0);
 
-//	assert(m_npeq > 0);
 	if (m_npeq > 0) {
 		m_pi.assign(m_npeq, 0);
 		m_Pi.assign(m_npeq, 0);
@@ -62,11 +70,13 @@ bool FEMultiphasicSolver::Init()
 		// (displacements are already handled in base class)
 		FEMesh& mesh = m_fem.GetMesh();
 		gather(m_Ut, mesh, m_dofP);
-	}
+        gather(m_Ut, mesh, m_dofQ);
+    }
 
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
+    int MAX_DDOFS = fedofs.GetVariableSize("shell concentration");
     
 	// allocate concentration-vectors
 	m_ci.assign(MAX_CDOFS,vector<double>(0,0));
@@ -83,8 +93,13 @@ bool FEMultiphasicSolver::Init()
 			dofs.push_back(m_dofC + j);	
 		}
 	}
-
-	FEMesh& mesh = m_fem.GetMesh();
+    for (int j=0; j<MAX_DDOFS; ++j)
+    {
+        if (m_nceq[j])
+            dofs.push_back(m_dofD + j);
+    }
+    
+    FEMesh& mesh = m_fem.GetMesh();
 	gather(m_Ut, mesh, dofs);
 
 	return true;
@@ -99,8 +114,10 @@ bool FEMultiphasicSolver::InitEquations()
 
 	// get dofs
 	m_dofP = m_fem.GetDOFIndex("p");
-	m_dofC = m_fem.GetDOFIndex("concentration", 0);
-
+    m_dofQ = m_fem.GetDOFIndex("q");
+    m_dofC = m_fem.GetDOFIndex("concentration", 0);
+    m_dofD = m_fem.GetDOFIndex("shell concentration", 0);
+    
 	// determined the nr of pressure and concentration equations
 	FEMesh& mesh = m_fem.GetMesh();
 	m_ndeq = m_npeq = 0;
@@ -111,8 +128,12 @@ bool FEMultiphasicSolver::InitEquations()
 		if (n.m_ID[m_dofX] != -1) m_ndeq++;
 		if (n.m_ID[m_dofY] != -1) m_ndeq++;
 		if (n.m_ID[m_dofZ] != -1) m_ndeq++;
-		if (n.m_ID[m_dofP] != -1) m_npeq++;
-	}
+        if (n.m_ID[m_dofU] != -1) m_ndeq++;
+        if (n.m_ID[m_dofV] != -1) m_ndeq++;
+        if (n.m_ID[m_dofW] != -1) m_ndeq++;
+        if (n.m_ID[m_dofP] != -1) m_npeq++;
+        if (n.m_ID[m_dofQ] != -1) m_npeq++;
+    }
 	
 	// determine the nr of concentration equations
     DOFS& fedofs = m_fem.GetDOFS();
@@ -123,9 +144,11 @@ bool FEMultiphasicSolver::InitEquations()
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& n = mesh.Node(i);
-		for (int j=0; j<(int)m_nceq.size(); ++j)
-			if (n.m_ID[m_dofC+j] != -1) m_nceq[j]++;
-	}
+        for (int j=0; j<MAX_CDOFS; ++j) {
+            if (n.m_ID[m_dofC+j] != -1) m_nceq[j]++;
+            if (n.m_ID[m_dofD+j] != -1) m_nceq[j]++;
+        }
+    }
 	
 	return true;
 }
@@ -540,7 +563,7 @@ void FEMultiphasicSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
 			
 				// For pressure and concentration loads, multiply by dt
 				// for consistency with evaluation of residual and stiffness matrix
-				if ((dof == m_dofP) || (dof >= m_dofC)) f *= tp.timeIncrement;
+				if ((dof == m_dofP) || (dof == m_dofQ) || (dof >= m_dofC)) f *= tp.timeIncrement;
 
 				// assemble into residual
 				AssembleResidual(nid, dof, f, F);
@@ -784,6 +807,27 @@ void FEMultiphasicSolver::GetDisplacementData(vector<double> &di, vector<double>
 			di[m++] = ui[nid];
 			assert(m <= (int) di.size());
 		}
+        nid = n.m_ID[m_dofU];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            di[m++] = ui[nid];
+            assert(m <= (int) di.size());
+        }
+        nid = n.m_ID[m_dofV];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            di[m++] = ui[nid];
+            assert(m <= (int) di.size());
+        }
+        nid = n.m_ID[m_dofW];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            di[m++] = ui[nid];
+            assert(m <= (int) di.size());
+        }
 	}
 }
 
@@ -802,7 +846,14 @@ void FEMultiphasicSolver::GetPressureData(vector<double> &pi, vector<double> &ui
 			pi[m++] = ui[nid];
 			assert(m <= (int) pi.size());
 		}
-	}
+        nid = n.m_ID[m_dofQ];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            pi[m++] = ui[nid];
+            assert(m <= (int) pi.size());
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -820,7 +871,14 @@ void FEMultiphasicSolver::GetConcentrationData(vector<double> &ci, vector<double
 			ci[m++] = ui[nid];
 			assert(m <= (int) ci.size());
 		}
-	}
+        nid = n.m_ID[m_dofD+sol];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            ci[m++] = ui[nid];
+            assert(m <= (int) ci.size());
+        }
+    }
 }
 
 
@@ -856,7 +914,9 @@ void FEMultiphasicSolver::UpdatePoro(vector<double>& ui)
 		// update nodal pressures
 		n = node.m_ID[m_dofP];
 		if (n >= 0) node.set(m_dofP, 0 + m_Ut[n] + m_Ui[n] + ui[n]);
-	}
+        n = node.m_ID[m_dofQ];
+        if (n >= 0) node.set(m_dofQ, 0 + m_Ut[n] + m_Ui[n] + ui[n]);
+    }
 
 	// update poro-elasticity data
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -881,6 +941,7 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
     // get number of DOFS
     DOFS& fedofs = m_fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
+    int MAX_DDOFS = fedofs.GetVariableSize("shell concentration");
     
 	// update solute data
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -890,7 +951,6 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 		// update nodal concentration
 		for (j=0; j<MAX_CDOFS; ++j) {
 			n = node.m_ID[m_dofC+j];
-//			if (n >= 0) node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 			// Force the concentrations to remain positive
 			if (n >= 0) {
 				double ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
@@ -898,17 +958,16 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 				node.set(m_dofC + j, ct);
 			}
 		}
-	}
-	
-	// update solute data
-	for (i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		
-		// update velocities
-		vec3d vt = (node.m_rt - node.m_rp) / dt;
-		node.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
-	}
+        for (int j=0; j<MAX_DDOFS; ++j) {
+            int n = node.m_ID[m_dofD+j];
+            // Force the concentrations to remain positive
+            if (n >= 0) {
+                double ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+                if (ct < 0) ct = 0.0;
+                node.set(m_dofD + j, ct);
+            }
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -956,14 +1015,14 @@ void FEMultiphasicSolver::Serialize(DumpStream& ar)
 	if (ar.IsSaving())
 	{
 		ar << m_Ptol << m_Ctol;
-		ar << m_dofP << m_dofC;
+		ar << m_dofP << m_dofQ << m_dofC << m_dofD;
 		ar << m_ndeq << m_npeq << m_nceq;
 		ar << m_nceq;
 	}
 	else
 	{
 		ar >> m_Ptol >> m_Ctol;
-		ar >> m_dofP >> m_dofC;
+		ar >> m_dofP >> m_dofQ >> m_dofC >> m_dofD;
 		ar >> m_ndeq >> m_npeq >> m_nceq;
 		ar >> m_nceq;
 	}

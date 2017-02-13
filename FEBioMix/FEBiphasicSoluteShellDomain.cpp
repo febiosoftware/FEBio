@@ -671,10 +671,6 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffness(FEShellElement&
         // calculate jacobian
         detJ = invjact(el, Ji, n)*gw[n];
         
-        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
-        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
-        vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
-        
         eta = el.gt(n);
         
         Mr = el.Hr(n);

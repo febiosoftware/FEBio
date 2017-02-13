@@ -6,7 +6,8 @@
 #include "FEBiphasicSoluteSolidDomain.h"
 #include "FEBiphasicSoluteShellDomain.h"
 #include "FETriphasicDomain.h"
-#include "FEMultiphasicDomain.h"
+#include "FEMultiphasicSolidDomain.h"
+#include "FEMultiphasicShellDomain.h"
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
@@ -92,7 +93,7 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 	if ((dynamic_cast<FEBiphasicSolidDomain* >(&bd)) ||
 		(dynamic_cast<FEBiphasicSoluteSolidDomain*>(&bd)) ||
 		(dynamic_cast<FETriphasicDomain*     >(&bd)) ||
-		(dynamic_cast<FEMultiphasicDomain*   >(&bd)))
+		(dynamic_cast<FEMultiphasicSolidDomain*   >(&bd)))
 	{
 		for (int i=0; i<bd.Elements(); ++i)
 		{
@@ -113,8 +114,9 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 		}
 		return true;
 	}
-    else if ((dynamic_cast<FEBiphasicShellDomain* >(&bsd)) ||
-             (dynamic_cast<FEBiphasicSoluteShellDomain* >(&bsd))
+    else if ((dynamic_cast<FEBiphasicShellDomain*>(&bsd)) ||
+             (dynamic_cast<FEBiphasicSoluteShellDomain*>(&bsd)) ||
+             (dynamic_cast<FEMultiphasicShellDomain*>(&bsd))
              )
     {
         for (int i=0; i<bsd.Elements(); ++i)
@@ -169,7 +171,7 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
         (dynamic_cast<FEBiphasicSolidDomain* >(bd)) ||
 		(dynamic_cast<FEBiphasicSoluteSolidDomain*>(bd)) ||
 		(dynamic_cast<FETriphasicDomain*     >(bd)) ||
-		(dynamic_cast<FEMultiphasicDomain*   >(bd))))
+		(dynamic_cast<FEMultiphasicSolidDomain*>(bd))))
 	{
 		for (int i=0; i<bd->Elements(); ++i)
 		{
@@ -191,8 +193,10 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 		return true;
 	}
     else if (bsd && (
-                     (dynamic_cast<FEBiphasicShellDomain* >(bsd)) ||
-                     (dynamic_cast<FEBiphasicSoluteShellDomain* >(bsd))))
+                     (dynamic_cast<FEBiphasicShellDomain*>(bsd)) ||
+                     (dynamic_cast<FEBiphasicSoluteShellDomain*>(bsd)) ||
+                     (dynamic_cast<FEMultiphasicShellDomain*>(bsd))
+                     ))
     {
         for (int i=0; i<bsd->Elements(); ++i)
         {
@@ -224,7 +228,7 @@ bool FEPlotNodalFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 	if ((dynamic_cast<FEBiphasicSolidDomain* >(&bd)) ||
 		(dynamic_cast<FEBiphasicSoluteSolidDomain*>(&bd)) ||
 		(dynamic_cast<FETriphasicDomain*     >(&bd)) ||
-		(dynamic_cast<FEMultiphasicDomain*   >(&bd)))
+		(dynamic_cast<FEMultiphasicSolidDomain*>(&bd)))
 	{
 		for (int i=0; i<bd.Elements(); ++i)
 		{
@@ -715,77 +719,60 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
-	FEBiphasicSoluteSolidDomain* psd = dynamic_cast<FEBiphasicSoluteSolidDomain*>(&dom);
-	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
-	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
-	if (psd)
-	{
-		for (i=0; i<psd->Elements(); ++i)
-		{
-			FESolidElement& el = psd->Element(i);
-			
-			// calculate average concentration
-			ew = 0;
-			for (j=0; j<el.GaussPoints(); ++j)
-			{
-				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
-				
-				if (pt) ew += pt->m_ca[0];
-			}
-			
-			ew /= el.GaussPoints();
-			
-			a << ew;
-		}
-		return true;
-	}
-	else if (ptd)
-	{
-		for (i=0; i<ptd->Elements(); ++i)
-		{
-			FESolidElement& el = ptd->Element(i);
-			
-			// calculate average concentration
-			ew = 0;
-			for (j=0; j<el.GaussPoints(); ++j)
-			{
-				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
-				
-				if (pt) ew += pt->m_ca[0] + pt->m_ca[1];
-			}
-			
-			ew /= el.GaussPoints();
-			
-			a << ew;
-		}
-		return true;
-	}
-	else if (pmd)
-	{
-		for (i=0; i<pmd->Elements(); ++i)
-		{
-			FESolidElement& el = pmd->Element(i);
-			
-			// calculate average concentration
-			ew = 0;
-			for (j=0; j<el.GaussPoints(); ++j)
-			{
-				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
-				
-				if (pt)
+    
+    FESolidDomain* sdom = dynamic_cast<FESolidDomain*>(&dom);
+    FEShellDomain* ldom = dynamic_cast<FEShellDomain*>(&dom);
+    if (sdom && (
+        dynamic_cast<FEBiphasicSoluteSolidDomain*>(&dom) ||
+        dynamic_cast<FETriphasicDomain*>(&dom) ||
+        dynamic_cast<FEMultiphasicSolidDomain*>(&dom))) {
+        for (i=0; i<sdom->Elements(); ++i)
+        {
+            FESolidElement& el = sdom->Element(i);
+            
+            // calculate average concentration
+            ew = 0;
+            for (j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+                
+                if (pt)
                     for (int isol=0; isol<(int)pt->m_ca.size(); ++isol)
                         ew += pt->m_ca[isol];
-			}
-			
-			ew /= el.GaussPoints();
-			
-			a << ew;
-		}
-		return true;
-	}
+            }
+            
+            ew /= el.GaussPoints();
+            
+            a << ew;
+        }
+        return true;
+    }
+    else if (ldom && (
+             dynamic_cast<FEBiphasicSoluteShellDomain*>(&dom) ||
+             dynamic_cast<FEMultiphasicShellDomain*>(&dom))) {
+        for (i=0; i<ldom->Elements(); ++i)
+        {
+            FEShellElement& el = ldom->Element(i);
+            
+            // calculate average concentration
+            ew = 0;
+            for (j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+                
+                if (pt)
+                    for (int isol=0; isol<(int)pt->m_ca.size(); ++isol)
+                        ew += pt->m_ca[isol];
+            }
+            
+            ew /= el.GaussPoints();
+            
+            a << ew;
+        }
+        return true;
+    }
 	return false;
 }
 
@@ -851,7 +838,8 @@ bool FEPlotSBMConcentration_::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
-	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
+	FEMultiphasicSolidDomain* pmd = dynamic_cast<FEMultiphasicSolidDomain*>(&dom);
+    FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (pmd)
 	{
 		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
@@ -881,6 +869,35 @@ bool FEPlotSBMConcentration_::Save(FEDomain &dom, FEDataStream& a)
 		}
 		return true;
 	}
+    else if (psd)
+    {
+        FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+        // Check if this solid-bound molecule is present in this specific multiphasic mixture
+        int sid = -1;
+        for (i=0; i<pm->SBMs(); ++i)
+            if (pm->GetSBM(i)->GetSBMID() == m_nsbm) {sid = i; break;}
+        if (sid == -1) return false;
+        
+        for (i=0; i<psd->Elements(); ++i)
+        {
+            FEShellElement& el = psd->Element(i);
+            
+            // calculate average concentration
+            ew = 0;
+            for (j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
+                
+                if (st) ew += pm->SBMConcentration(mp,sid);
+            }
+            
+            ew /= el.GaussPoints();
+            
+            a << ew;
+        }
+        return true;
+    }
 	return false;
 }
 
@@ -890,7 +907,8 @@ bool FEPlotElectricPotential::Save(FEDomain &dom, FEDataStream& a)
 	int i, j;
 	double ew;
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
-	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
+	FEMultiphasicSolidDomain* pmd = dynamic_cast<FEMultiphasicSolidDomain*>(&dom);
+    FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (ptd)
 	{
 		for (i=0; i<ptd->Elements(); ++i)
@@ -935,6 +953,28 @@ bool FEPlotElectricPotential::Save(FEDomain &dom, FEDataStream& a)
 		}
 		return true;
 	}
+    else if (psd)
+    {
+        for (i=0; i<psd->Elements(); ++i)
+        {
+            FEShellElement& el = psd->Element(i);
+            
+            // calculate average electric potential
+            ew = 0;
+            for (j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+                
+                if (pt) ew += pt->m_psi;
+            }
+            
+            ew /= el.GaussPoints();
+            
+            a << ew;
+        }
+        return true;
+    }
 	return false;
 }
 
@@ -944,7 +984,8 @@ bool FEPlotCurrentDensity::Save(FEDomain &dom, FEDataStream& a)
 	int i, j;
 	vec3d ew;
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
-	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
+	FEMultiphasicSolidDomain* pmd = dynamic_cast<FEMultiphasicSolidDomain*>(&dom);
+    FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (ptd)
 	{
 		for (i=0; i<ptd->Elements(); ++i)
@@ -989,6 +1030,28 @@ bool FEPlotCurrentDensity::Save(FEDomain &dom, FEDataStream& a)
 		}
 		return true;
 	}
+    else if (psd)
+    {
+        for (i=0; i<psd->Elements(); ++i)
+        {
+            FEShellElement& el = psd->Element(i);
+            
+            // calculate average flux
+            ew = vec3d(0,0,0);
+            for (j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+                
+                if (pt) ew += pt->m_Ie;
+            }
+            
+            ew /= el.GaussPoints();
+            
+            a << ew;
+        }
+        return true;
+    }
 	return false;
 }
 
@@ -997,7 +1060,8 @@ bool FEPlotReferentialSolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
-	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
+	FEMultiphasicSolidDomain* pmd = dynamic_cast<FEMultiphasicSolidDomain*>(&dom);
+    FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (pmd)
 	{
 		for (i=0; i<pmd->Elements(); ++i)
@@ -1020,6 +1084,28 @@ bool FEPlotReferentialSolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
 		}
 		return true;
 	}
+    else if (psd)
+    {
+        for (i=0; i<psd->Elements(); ++i)
+        {
+            FEShellElement& el = psd->Element(i);
+            
+            // calculate average concentration
+            ew = 0;
+            for (j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+                
+                if (pt) ew += pt->m_phi0;
+            }
+            
+            ew /= el.GaussPoints();
+            
+            a << ew;
+        }
+        return true;
+    }
 	return false;
 }
 
@@ -1029,7 +1115,8 @@ bool FEPlotFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
 	int i, j;
 	double ew;
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
-	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
+	FEMultiphasicSolidDomain* pmd = dynamic_cast<FEMultiphasicSolidDomain*>(&dom);
+    FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (ptd)
 	{
 		for (i=0; i<ptd->Elements(); ++i)
@@ -1074,6 +1161,28 @@ bool FEPlotFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
 		}
 		return true;
 	}
+    else if (psd)
+    {
+        for (i=0; i<psd->Elements(); ++i)
+        {
+            FEShellElement& el = psd->Element(i);
+            
+            // calculate average electric potential
+            ew = 0;
+            for (j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+                
+                if (pt) ew += pt->m_cF;
+            }
+            
+            ew /= el.GaussPoints();
+            
+            a << ew;
+        }
+        return true;
+    }
 	return false;
 }
 
@@ -1083,7 +1192,8 @@ bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
 	int i, j;
 	double ew;
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
-	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
+	FEMultiphasicSolidDomain* pmd = dynamic_cast<FEMultiphasicSolidDomain*>(&dom);
+    FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (ptd)
 	{
 		for (i=0; i<ptd->Elements(); ++i)
@@ -1132,6 +1242,30 @@ bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
 		}
 		return true;
 	}
+    else if (psd)
+    {
+        for (i=0; i<psd->Elements(); ++i)
+        {
+            FEShellElement& el = psd->Element(i);
+            
+            // calculate average electric potential
+            ew = 0;
+            for (j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEElasticMaterialPoint*  ept = (mp.ExtractData<FEElasticMaterialPoint >());
+                FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+                FESolutesMaterialPoint*  spt = (mp.ExtractData<FESolutesMaterialPoint >());
+                
+                if (spt) ew += (ept->m_J - bpt->m_phi0)*spt->m_cF/(1 - bpt->m_phi0);
+            }
+            
+            ew /= el.GaussPoints();
+            
+            a << ew;
+        }
+        return true;
+    }
 	return false;
 }
 
@@ -1162,9 +1296,10 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveShellFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEBiphasicShellDomain*  pbsd= dynamic_cast<FEBiphasicShellDomain* >(&dom);
-    FEBiphasicSoluteShellDomain*  pbssd= dynamic_cast<FEBiphasicSoluteShellDomain* >(&dom);
-    if (pbsd || pbssd)
+    FEBiphasicShellDomain* pbsd = dynamic_cast<FEBiphasicShellDomain*>(&dom);
+    FEBiphasicSoluteShellDomain* pbssd = dynamic_cast<FEBiphasicSoluteShellDomain*>(&dom);
+    FEMultiphasicShellDomain* pmpsd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
+    if (pbsd || pbssd || pmpsd)
     {
         // get the pressure dof index
         int dof_q = GetFEModel()->GetDOFIndex("q");
@@ -1313,9 +1448,10 @@ bool FEPlotEffectiveShellSoluteConcentration::SetFilter(int nsol)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveShellSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEBiphasicShellDomain*  pbsd= dynamic_cast<FEBiphasicShellDomain* >(&dom);
-    FEBiphasicSoluteShellDomain*  pbssd= dynamic_cast<FEBiphasicSoluteShellDomain* >(&dom);
-    if (pbsd || pbssd)
+    FEBiphasicShellDomain* pbsd = dynamic_cast<FEBiphasicShellDomain*>(&dom);
+    FEBiphasicSoluteShellDomain* pbssd = dynamic_cast<FEBiphasicSoluteShellDomain*>(&dom);
+    FEMultiphasicShellDomain* pmpsd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
+    if (pbsd || pbssd || pmpsd)
     {
         // make sure we have a valid index
         int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
@@ -1338,9 +1474,10 @@ bool FEPlotEffectiveShellSoluteConcentration::Save(FEDomain &dom, FEDataStream& 
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveShellSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEBiphasicShellDomain*  pbsd= dynamic_cast<FEBiphasicShellDomain* >(&dom);
-    FEBiphasicSoluteShellDomain*  pbssd= dynamic_cast<FEBiphasicSoluteShellDomain* >(&dom);
-    if (pbsd || pbssd)
+    FEBiphasicShellDomain* pbsd = dynamic_cast<FEBiphasicShellDomain*>(&dom);
+    FEBiphasicSoluteShellDomain* pbssd = dynamic_cast<FEBiphasicSoluteShellDomain*>(&dom);
+    FEMultiphasicShellDomain* pmpsd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
+    if (pbsd || pbssd || pmpsd)
     {
         FEBiphasicSolute* pbm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
         if (pbm)
@@ -1413,6 +1550,7 @@ bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, FEDataStream& a)
 	int i, j;
 	double ew;
 	FEBiphasicSoluteSolidDomain* pbd = dynamic_cast<FEBiphasicSoluteSolidDomain*>(&dom);
+    FEBiphasicSoluteShellDomain* psd = dynamic_cast<FEBiphasicSoluteShellDomain*>(&dom);
 	if (pbd)
 	{
 		for (i=0; i<pbd->Elements(); ++i)
@@ -1435,6 +1573,28 @@ bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, FEDataStream& a)
 		}
 		return true;
 	}
+    else if (psd)
+    {
+        for (i=0; i<psd->Elements(); ++i)
+        {
+            FEShellElement& el = psd->Element(i);
+            
+            // calculate average concentration
+            ew = 0;
+            for (j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+                
+                if (pt) ew += pt->m_sbmr[0];
+            }
+            
+            ew /= el.GaussPoints();
+            
+            a << ew;
+        }
+        return true;
+    }
 	return false;
 }
 
@@ -1489,7 +1649,8 @@ bool FEPlotSBMRefAppDensity_::Save(FEDomain &dom, FEDataStream& a)
 {
 	int i, j;
 	double ew;
-	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
+	FEMultiphasicSolidDomain* pmd = dynamic_cast<FEMultiphasicSolidDomain*>(&dom);
+    FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (pmd)
 	{
 		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
@@ -1519,6 +1680,35 @@ bool FEPlotSBMRefAppDensity_::Save(FEDomain &dom, FEDataStream& a)
 		}
 		return true;
 	}
+    else if (psd)
+    {
+        FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+        // Check if this solid-bound molecule is present in this specific multiphasic mixture
+        int sid = -1;
+        for (i=0; i<pm->SBMs(); ++i)
+            if (pm->GetSBM(i)->GetSBMID() == m_nsbm) {sid = i; break;}
+        if (sid == -1) return false;
+        
+        for (i=0; i<psd->Elements(); ++i)
+        {
+            FEShellElement& el = psd->Element(i);
+            
+            // calculate average concentration
+            ew = 0;
+            for (j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
+                
+                if (st) ew += st->m_sbmr[sid];
+            }
+            
+            ew /= el.GaussPoints();
+            
+            a << ew;
+        }
+        return true;
+    }
 	return false;
 }
 
@@ -1527,8 +1717,10 @@ bool FEPlotEffectiveElasticity::Save(FEDomain &dom, FEDataStream& a)
 {
     tens4ds c;
     
-	if (dom.Class() != FE_DOMAIN_SOLID) return false;
+	if ((dom.Class() != FE_DOMAIN_SOLID)
+        && (dom.Class() != FE_DOMAIN_SHELL)) return false;
 	FESolidDomain* pbd = static_cast<FESolidDomain*>(&dom);
+    FEShellDomain* psd = static_cast<FEShellDomain*>(&dom);
     
     FEBiphasic*       pb  = dynamic_cast<FEBiphasic      *> (dom.GetMaterial());
     FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -1536,31 +1728,61 @@ bool FEPlotEffectiveElasticity::Save(FEDomain &dom, FEDataStream& a)
     FEMultiphasic*    pmp = dynamic_cast<FEMultiphasic   *> (dom.GetMaterial());
     if ((pb == 0) && (pbs == 0) && (ptp == 0) && (pmp == 0)) return false;
 
-    for (int i=0; i<pbd->Elements(); ++i)
-    {
-        FESolidElement& el = pbd->Element(i);
-        
-        int nint = el.GaussPoints();
-        double f = 1.0 / (double) nint;
-        
-        // since the PLOT file requires floats we need to convert
-        // the doubles to single precision
-        // we output the average stress values of the gauss points
-        tens4ds s(0.0);
-        for (int j=0; j<nint; ++j)
+    if (pbd) {
+        for (int i=0; i<pbd->Elements(); ++i)
         {
-            FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
-            if (pb) c = pb->Tangent(pt);
-            else if (pbs) c = pbs->Tangent(pt);
-            else if (ptp) c = ptp->Tangent(pt);
-            else if (pmp) c = pmp->Tangent(pt);
+            FESolidElement& el = pbd->Element(i);
             
-            s += c;
+            int nint = el.GaussPoints();
+            double f = 1.0 / (double) nint;
+            
+            // since the PLOT file requires floats we need to convert
+            // the doubles to single precision
+            // we output the average stress values of the gauss points
+            tens4ds s(0.0);
+            for (int j=0; j<nint; ++j)
+            {
+                FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
+                if (pb) c = pb->Tangent(pt);
+                else if (pbs) c = pbs->Tangent(pt);
+                else if (ptp) c = ptp->Tangent(pt);
+                else if (pmp) c = pmp->Tangent(pt);
+                
+                s += c;
+            }
+            s *= f;
+            
+            // store average elasticity
+            a << s;
         }
-		s *= f;
-
-		// store average elasticity
-        a << s;
+    }
+    else if (psd) {
+        for (int i=0; i<psd->Elements(); ++i)
+        {
+            FEShellElement& el = psd->Element(i);
+            
+            int nint = el.GaussPoints();
+            double f = 1.0 / (double) nint;
+            
+            // since the PLOT file requires floats we need to convert
+            // the doubles to single precision
+            // we output the average stress values of the gauss points
+            tens4ds s(0.0);
+            for (int j=0; j<nint; ++j)
+            {
+                FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
+                if (pb) c = pb->Tangent(pt);
+                else if (pbs) c = pbs->Tangent(pt);
+                else if (ptp) c = ptp->Tangent(pt);
+                else if (pmp) c = pmp->Tangent(pt);
+                
+                s += c;
+            }
+            s *= f;
+            
+            // store average elasticity
+            a << s;
+        }
     }
     
     return true;

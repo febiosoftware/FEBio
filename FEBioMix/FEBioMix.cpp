@@ -63,7 +63,8 @@
 #include "FEBiphasicSoluteSolidDomain.h"
 #include "FEBiphasicSoluteShellDomain.h"
 #include "FETriphasicDomain.h"
-#include "FEMultiphasicDomain.h"
+#include "FEMultiphasicSolidDomain.h"
+#include "FEMultiphasicShellDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Initialization of the FEBioMix module. This function registers all the classes
@@ -136,8 +137,9 @@ REGISTER_FECORE_CLASS(FEBiphasicShellDomain      , FEDOMAIN_ID, "biphasic-shell"
 REGISTER_FECORE_CLASS(FEBiphasicSoluteSolidDomain, FEDOMAIN_ID, "biphasic-solute-solid");
 REGISTER_FECORE_CLASS(FEBiphasicSoluteShellDomain, FEDOMAIN_ID, "biphasic-solute-shell");
 REGISTER_FECORE_CLASS(FETriphasicDomain          , FEDOMAIN_ID, "triphasic-solid"      );
-REGISTER_FECORE_CLASS(FEMultiphasicDomain        , FEDOMAIN_ID, "multiphasic-solid"    );
-
+REGISTER_FECORE_CLASS(FEMultiphasicSolidDomain   , FEDOMAIN_ID, "multiphasic-solid"    );
+REGISTER_FECORE_CLASS(FEMultiphasicShellDomain   , FEDOMAIN_ID, "multiphasic-shell"    );
+    
 //-----------------------------------------------------------------------------
 // Surface loads
 REGISTER_FECORE_CLASS(FEPoroNormalTraction, FESURFACELOAD_ID, "normal_traction");

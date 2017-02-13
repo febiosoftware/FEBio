@@ -77,8 +77,10 @@ public:
 
 protected:
 	int	m_dofP;	//!< pressure dof index
-	int	m_dofC;	//!< concentration dof index
-
+    int	m_dofQ;	//!< shell pressure dof index
+    int	m_dofC;	//!< concentration dof index
+    int	m_dofD;	//!< shell concentration dof
+    
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };
