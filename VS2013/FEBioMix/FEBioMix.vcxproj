@@ -434,6 +434,8 @@
     <ClInclude Include="..\..\FEBioMix\FEMultiphasic.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicMultigeneration.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMultiphasicShellDomain.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMultiphasicSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicSolver.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicStandard.h" />
     <ClInclude Include="..\..\FEBioMix\FEOsmCoefConst.h" />
@@ -466,6 +468,7 @@
     <ClInclude Include="..\..\FEBioMix\FESupplyMichaelisMenten.h" />
     <ClInclude Include="..\..\FEBioMix\FESupplySynthesisBinding.h" />
     <ClInclude Include="..\..\FEBioMix\FETiedBiphasicInterface.h" />
+    <ClInclude Include="..\..\FEBioMix\FETiedMultiphasicInterface.h" />
     <ClInclude Include="..\..\FEBioMix\FETriphasic.h" />
     <ClInclude Include="..\..\FEBioMix\FETriphasicDomain.h" />
     <ClInclude Include="..\..\FEBioMix\stdafx.h" />
@@ -507,6 +510,8 @@
     <ClCompile Include="..\..\FEBioMix\FEMultiphasic.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicMultigeneration.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMultiphasicShellDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMultiphasicSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicSolver.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicStandard.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEOsmCoefConst.cpp" />
@@ -539,6 +544,7 @@
     <ClCompile Include="..\..\FEBioMix\FESupplyMichaelisMenten.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESupplySynthesisBinding.cpp" />
     <ClCompile Include="..\..\FEBioMix\FETiedBiphasicInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FETiedMultiphasicInterface.cpp" />
     <ClCompile Include="..\..\FEBioMix\FETriphasic.cpp" />
     <ClCompile Include="..\..\FEBioMix\FETriphasicDomain.cpp" />
   </ItemGroup>

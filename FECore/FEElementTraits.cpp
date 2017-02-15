@@ -3352,19 +3352,20 @@ void FEShellTriElementTraits::init()
 
 	const double a = 1.0 / 6.0;
 	const double b = 2.0 / 3.0;
-	const double w = 5.0 / 9.0;
+	const double w1 = 5.0 / 9.0;
+	const double w2 = 8.0 / 9.0;
 
-	gr[0] = a; gs[0] = a; gt[0] = -b; gw[0] = a*w;
-	gr[1] = b; gs[1] = a; gt[1] = -b; gw[1] = a*w;
-	gr[2] = a; gs[2] = b; gt[2] = -b; gw[2] = a*w;
+	gr[0] = a; gs[0] = a; gt[0] = -b; gw[0] = a*w1;
+	gr[1] = b; gs[1] = a; gt[1] = -b; gw[1] = a*w1;
+	gr[2] = a; gs[2] = b; gt[2] = -b; gw[2] = a*w1;
 
-	gr[3] = a; gs[3] = a; gt[3] =  0; gw[3] = a*w;
-	gr[4] = b; gs[4] = a; gt[4] =  0; gw[4] = a*w;
-	gr[5] = a; gs[5] = b; gt[5] =  0; gw[5] = a*w;
+	gr[3] = a; gs[3] = a; gt[3] = 0; gw[3] = a*w2;
+	gr[4] = b; gs[4] = a; gt[4] = 0; gw[4] = a*w2;
+	gr[5] = a; gs[5] = b; gt[5] = 0; gw[5] = a*w2;
 
-	gr[6] = a; gs[6] = a; gt[6] =  b; gw[6] = a*w;
-	gr[7] = b; gs[7] = a; gt[7] =  b; gw[7] = a*w;
-	gr[8] = a; gs[8] = b; gt[8] =  b; gw[8] = a*w;
+	gr[6] = a; gs[6] = a; gt[6] = b; gw[6] = a*w1;
+	gr[7] = b; gs[7] = a; gt[7] = b; gw[7] = a*w1;
+	gr[8] = a; gs[8] = b; gt[8] = b; gw[8] = a*w1;
 
 	for (n=0; n<NINT; ++n)
 	{
