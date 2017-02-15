@@ -416,10 +416,9 @@ void FESlidingSurface2::GetNodalContactTraction(int nface, vec3d* pt)
 	for (int k=0; k<ni; ++k)
 	{
 		FESlidingSurface2::Data& pt = m_Data[nface][k];
-		double gi = pt.m_gap;
 		double Li = pt.m_Ln;
 		vec3d  ti = pt.m_nu;
-		if (gi > 0) t = ti*(Li); else t = vec3d(0,0,0);
+		t = ti*(Li);
 		tix[k] = t.x; tiy[k] = t.y; tiz[k] = t.z;
 	}
 
