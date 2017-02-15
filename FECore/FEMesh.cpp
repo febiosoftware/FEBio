@@ -1057,16 +1057,12 @@ int FEMesh::Faces(FEElement& el)
 	case FE_TET15G15:
 	case FE_TET20G15:
 	case FE_TET4G1: return 4;
-	case FE_SHELL_QUAD:
     case FE_SHELL_QUAD4G8:
     case FE_SHELL_QUAD4G12:
-    case FE_SHELL_QUAD8:
     case FE_SHELL_QUAD8G18:
     case FE_SHELL_QUAD8G27:
-    case FE_SHELL_TRI:
     case FE_SHELL_TRI3G6:
     case FE_SHELL_TRI3G9:
-    case FE_SHELL_TRI6:
     case FE_SHELL_TRI6G14:
     case FE_SHELL_TRI6G21: return 1;
 	default:
@@ -1178,25 +1174,21 @@ int FEMesh::GetFace(FEElement& el, int n, int* nf)
 		case 5: nf[0] = en[4]; nf[1] = en[5]; nf[2] = en[6]; nf[3] = en[7]; nf[4] = en[12]; nf[5] = en[13]; nf[6] = en[14]; nf[7] = en[15]; nf[8] = en[25]; break;
 		}
 		break;
-	case FE_SHELL_QUAD:
     case FE_SHELL_QUAD4G8:
     case FE_SHELL_QUAD4G12:
         nn = 4;
 		nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[2]; nf[3] = en[3];
 		break;
-    case FE_SHELL_QUAD8:
     case FE_SHELL_QUAD8G18:
     case FE_SHELL_QUAD8G27:
         nn = 8;
         nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[2]; nf[3] = en[3]; nf[4] = en[4]; nf[5] = en[5]; nf[6] = en[6]; nf[7] = en[7];
         break;
-	case FE_SHELL_TRI:
     case FE_SHELL_TRI3G6:
     case FE_SHELL_TRI3G9:
         nn = 3;
 		nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[2];
 		break;
-    case FE_SHELL_TRI6:
     case FE_SHELL_TRI6G14:
     case FE_SHELL_TRI6G21:
         nn = 6;

@@ -1301,21 +1301,6 @@ public:
 };
 
 //=============================================================================
-// 4-node quadrilateral elements with 4*3-point gaussian quadrature 
-//
-class FEShellQuadElementTraits : public FEShellElementTraits
-{
-public:
-	enum { NINT = 12 };
-	enum { NELN = 4 };
-
-public:
-	FEShellQuadElementTraits() : FEShellElementTraits(NINT, NELN, ET_QUAD4, FE_SHELL_QUAD) { init(); }
-
-	void init();
-};
-
-//=============================================================================
 // 3-node triangular elements
 //
 class FEShellTri3_ : public FEShellElementTraits
@@ -1352,21 +1337,6 @@ public:
 public:
     FEShellTri3G9();
     
-};
-
-//=============================================================================
-// 3-node triangular elements with 3*3-point gaussian quadrature 
-//
-class FEShellTriElementTraits : public FEShellElementTraits
-{
-public:
-	enum { NINT = 9 };
-	enum { NELN = 3 };
-
-public:
-	FEShellTriElementTraits() : FEShellElementTraits(NINT, NELN, ET_TRI3, FE_SHELL_TRI) { init(); }
-
-	void init();
 };
 
 //=============================================================================
@@ -1409,21 +1379,6 @@ public:
 };
 
 //=============================================================================
-// 8-node quadrilateral elements with 9*3-point gaussian quadrature
-//
-class FEShellQuad8ElementTraits : public FEShellElementTraits
-{
-public:
-    enum { NINT = 27 };
-    enum { NELN = 8 };
-    
-public:
-    FEShellQuad8ElementTraits() : FEShellElementTraits(NINT, NELN, ET_QUAD8, FE_SHELL_QUAD8) { init(); }
-    
-    void init();
-};
-
-//=============================================================================
 // 6-node triangular elements
 //
 class FEShellTri6_ : public FEShellElementTraits
@@ -1460,21 +1415,6 @@ public:
 public:
     FEShellTri6G21();
     
-};
-
-//=============================================================================
-// 6-node triangular elements with 7*3-point gaussian quadrature
-//
-class FEShellTri6ElementTraits : public FEShellElementTraits
-{
-public:
-    enum { NINT = 21 };
-    enum { NELN = 6 };
-    
-public:
-    FEShellTri6ElementTraits() : FEShellElementTraits(NINT, NELN, ET_TRI6, FE_SHELL_TRI6) { init(); }
-    
-    void init();
 };
 
 //=============================================================================

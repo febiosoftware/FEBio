@@ -378,11 +378,11 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	else if (strcmp(sztype, "tet10" ) == 0) eshape = ET_TET10;
 	else if (strcmp(sztype, "tet15" ) == 0) eshape = ET_TET15;
 	else if (strcmp(sztype, "tet20" ) == 0) eshape = ET_TET20;
-    else if (strcmp(sztype, "quad4" ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD; }   // default shell type for quad4
-    else if (strcmp(sztype, "quad8" ) == 0) { eshape = ET_QUAD8; stype = FE_SHELL_QUAD8;}   // default shell type for quad8
+    else if (strcmp(sztype, "quad4" ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; }   // default shell type for quad4
+    else if (strcmp(sztype, "quad8" ) == 0) { eshape = ET_QUAD8; stype = FE_SHELL_QUAD8G18;}   // default shell type for quad8
 	else if (strcmp(sztype, "quad9" ) == 0) eshape = ET_QUAD9;
-    else if (strcmp(sztype, "tri3"  ) == 0) { eshape = ET_TRI3; stype = FE_SHELL_TRI; }     // default shell type for tri3
-    else if (strcmp(sztype, "tri6"  ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6;}     // default shell type for tri6
+    else if (strcmp(sztype, "tri3"  ) == 0) { eshape = ET_TRI3; stype = FE_SHELL_TRI3G6; }     // default shell type for tri3
+    else if (strcmp(sztype, "tri6"  ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G14;}     // default shell type for tri6
 	else if (strcmp(sztype, "truss2") == 0) eshape = ET_TRUSS2;
 	else
 	{
