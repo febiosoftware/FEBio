@@ -1076,7 +1076,7 @@ bool FEMultiphasicShellDomain::ElementMultiphasicStiffness(FEShellElement& el, m
                     + (((D[isol]*gradc[isol]) & gradMw[j])*(-phis)
                        +(D[isol]*((gradMw[j]*w)*2) - ((D[isol]*w) & gradMw[j]))*c[isol]/D0[isol]
                        )*kappa[isol]
-                    +D[isol]*wu*(kappa[isol]*c[isol]/D0[isol]);
+                    +D[isol]*ww*(kappa[isol]*c[isol]/D0[isol]);
                     jue += ju[isol]*z[isol];
                     jwe += jw[isol]*z[isol];
                     De += D[isol]*(z[isol]*kappa[isol]*c[isol]/D0[isol]);
@@ -1552,7 +1552,7 @@ bool FEMultiphasicShellDomain::ElementMultiphasicStiffnessSS(FEShellElement& el,
                     + (((D[isol]*gradc[isol]) & gradMw[j])*(-phis)
                        +(D[isol]*((gradMw[j]*w)*2) - ((D[isol]*w) & gradMw[j]))*c[isol]/D0[isol]
                        )*kappa[isol]
-                    +D[isol]*wu*(kappa[isol]*c[isol]/D0[isol]);
+                    +D[isol]*ww*(kappa[isol]*c[isol]/D0[isol]);
                     jue += ju[isol]*z[isol];
                     jwe += jw[isol]*z[isol];
                     De += D[isol]*(z[isol]*kappa[isol]*c[isol]/D0[isol]);
