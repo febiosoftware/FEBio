@@ -61,17 +61,17 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	int i;
 
 	// set the variables
-	int ma = opt.Variables();
+	int ma = opt.InputParameters();
 	vector<double> a(ma);
 	for (i=0; i<ma; ++i)
 	{
-		OPT_VARIABLE& var = opt.Variable(i);
-		a[i] = var.m_val;
+		FEInputParameter& var = *opt.GetInputParameter(i);
+		a[i] = var.GetValue();
 	}
 
 	// set the data
-	OPT_OBJECTIVE& obj = opt.GetObjective();
-	FELoadCurve& lc = opt.GetLoadCurve(obj.m_nlc);
+	FEObjectiveFunction& obj = opt.GetObjective();
+	FELoadCurve& lc = obj.GetLoadCurve(obj.m_nlc);
 	int ndata = lc.Points();
 	vector<double> x(ndata), y(ndata);
 	for (i=0; i<ndata; ++i) 
@@ -173,8 +173,9 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	felog.printf("\tVariables:\n\n");
 	for (i=0; i<ma; ++i)
 	{
-		OPT_VARIABLE& var = opt.Variable(i);
-		felog.printf("\t\t%-15s : %.16lg\n", var.m_szname, a[i]);
+		FEInputParameter& var = *opt.GetInputParameter(i);
+		string name = var.GetName();
+		felog.printf("\t\t%-15s : %.16lg\n", name.c_str(), a[i]);
 	}
 
 	felog.printf("\n\tFinal objective value: %15lg\n\n", fret);
@@ -190,13 +191,13 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 
 	// poor man's box constraints
 	double dir = 1;	// forward difference by default
-	for (int i=0; i<opt.Variables(); ++i)
+	for (int i=0; i<opt.InputParameters(); ++i)
 	{
-		OPT_VARIABLE& var = opt.Variable(i);
-		if (a[i] < var.m_min) {
-			a[i] = var.m_min;
-		} else if (a[i] >= var.m_max) {
-			a[i] = var.m_max;
+		FEInputParameter& var = *opt.GetInputParameter(i);
+		if (a[i] < var.MinValue()) {
+			a[i] = var.MinValue();
+		} else if (a[i] >= var.MaxValue()) {
+			a[i] = var.MaxValue();
 			dir = -1;	// use backward difference
 		}
 	}
@@ -213,7 +214,9 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 	int ma = a.size();
 	for (int i=0; i<ma; ++i)
 	{
-		double b = opt.Variable(i).m_sf;
+		FEInputParameter& var = *opt.GetInputParameter(i);
+
+		double b = var.ScaleFactor();
 
 		a1[i] = a1[i] + dir*m_fdiff*(fabs(b) + fabs(a[i]));
 		assert(a1[i] != a[i]);
@@ -237,15 +240,16 @@ bool FELMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<do
 	FEModel& fem = opt.GetFEM();
 
 	// reset reaction force data
-	FELoadCurve& lc = opt.ReactionLoad();
+	FEObjectiveFunction& obj = opt.GetObjective();
+	FELoadCurve& lc = obj.ReactionLoad();
 	lc.Clear();
 
 	// set the material parameters
-	int nvar = opt.Variables();
+	int nvar = opt.InputParameters();
 	for (int i=0; i<nvar; ++i)
 	{
-		OPT_VARIABLE& var = opt.Variable(i);
-		*(var.m_pd) = a[i];
+		FEInputParameter& var = *opt.GetInputParameter(i);
+		var.SetValue(a[i]);
 	}
 
 	// reset the FEM data
@@ -255,8 +259,9 @@ bool FELMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<do
 	felog.printf("\n----- Iteration: %d -----\n", opt.m_niter);
 	for (int i=0; i<nvar; ++i) 
 	{
-		OPT_VARIABLE& var = opt.Variable(i);
-		felog.printf("%-15s = %lg\n", var.m_szname, a[i]);
+		FEInputParameter& var = *opt.GetInputParameter(i);
+		string name = var.GetName();
+		felog.printf("%-15s = %lg\n", name.c_str(), a[i]);
 	}
 
 	// solve the FE problem
@@ -267,7 +272,7 @@ bool FELMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<do
 	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 	if (bret)
 	{
-		FELoadCurve& rlc = opt.ReactionLoad();
+		FELoadCurve& rlc = obj.ReactionLoad();
 		int ndata = x.size();
 		felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
 		for (int i=0; i<ndata; ++i) 

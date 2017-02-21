@@ -35,8 +35,8 @@ void clevmar_cb(double *p, double *hx, int m, int n, void *adata)
 	for (int i=0; i<m; ++i) a[i] = p[i];
 
 	// set the data
-	OPT_OBJECTIVE& obj = opt.GetObjective();
-	FELoadCurve& lc = opt.GetLoadCurve(obj.m_nlc);
+	FEObjectiveFunction& obj = opt.GetObjective();
+	FELoadCurve& lc = obj.GetLoadCurve(obj.m_nlc);
 	vector<double> x(n), y(n);
 	for (int i=0; i<n; ++i) x[i] = lc.LoadPoint(i).time;
 	
@@ -67,17 +67,17 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	FEOptimizeData& opt = *pOpt;
 
 	// set the variables
-	int ma = opt.Variables();
+	int ma = opt.InputParameters();
 	vector<double> a(ma);
 	for (int i=0; i<ma; ++i)
 	{
-		OPT_VARIABLE& var = opt.Variable(i);
-		a[i] = var.m_val;
+		FEInputParameter& var = *opt.GetInputParameter(i);
+		a[i] = var.GetValue();
 	}
 
 	// set the data
-	OPT_OBJECTIVE& obj = opt.GetObjective();
-	FELoadCurve& lc = opt.GetLoadCurve(obj.m_nlc);
+	FEObjectiveFunction& obj = opt.GetObjective();
+	FELoadCurve& lc = obj.GetLoadCurve(obj.m_nlc);
 	int ndata = lc.Points();
 	vector<double> x(ndata), y(ndata);
 	for (int i=0; i<ndata; ++i) 
@@ -120,10 +120,10 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 		for (int i=0; i<ma; ++i) p[i] = a[i];
 
 		double* lb = new double[ma];
-		for (int i=0; i<ma; ++i) lb[i] = opt.Variable(i).m_min;
+		for (int i=0; i<ma; ++i) lb[i] = opt.GetInputParameter(i)->MinValue();
 
 		double* ub = new double[ma];
-		for (int i=0; i<ma; ++i) ub[i] = opt.Variable(i).m_max;
+		for (int i=0; i<ma; ++i) ub[i] = opt.GetInputParameter(i)->MaxValue();
 
 		double* q = new double[ndata];
 		for (int i=0; i<ndata; ++i) q[i] = y[i];
@@ -195,8 +195,9 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	felog.printf("\tVariables:\n\n");
 	for (int i=0; i<ma; ++i)
 	{
-		OPT_VARIABLE& var = opt.Variable(i);
-		felog.printf("\t\t%-15s : %.16lg\n", var.m_szname, a[i]);
+		FEInputParameter& var = *opt.GetInputParameter(i);
+		string name = var.GetName();
+		felog.printf("\t\t%-15s : %.16lg\n", name.c_str(), a[i]);
 	}
 
 	return true;
@@ -211,13 +212,13 @@ void FEConstrainedLMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a,
 	// poor man's box constraints
 	int ma = (int)a.size();
 	vector<int> dir(ma,1);	// forward difference by default
-	for (int i=0; i<opt.Variables(); ++i)
+	for (int i=0; i<opt.InputParameters(); ++i)
 	{
-		OPT_VARIABLE& var = opt.Variable(i);
-		if (a[i] < var.m_min) {
-			a[i] = var.m_min;
-		} else if (a[i] >= var.m_max) {
-			a[i] = var.m_max;
+		FEInputParameter& var = *opt.GetInputParameter(i);
+		if (a[i] < var.MinValue()) {
+			a[i] = var.MinValue();
+		} else if (a[i] >= var.MaxValue()) {
+			a[i] = var.MaxValue();
 			dir[i] = -1;	// use backward difference
 		}
 	}
@@ -233,7 +234,7 @@ void FEConstrainedLMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a,
 	vector<double> y1(ndata);
 	for (int i=0; i<ma; ++i)
 	{
-		double b = opt.Variable(i).m_sf;
+		double b = opt.GetInputParameter(i)->ScaleFactor();
 
 		a1[i] = a1[i] + dir[i]*m_fdiff*(b + fabs(a[i]));
 
@@ -256,15 +257,16 @@ bool FEConstrainedLMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a
 	FEModel& fem = opt.GetFEM();
 
 	// reset reaction force data
-	FELoadCurve& lc = opt.ReactionLoad();
+	FEObjectiveFunction& obj = opt.GetObjective();
+	FELoadCurve& lc = obj.ReactionLoad();
 	lc.Clear();
 
 	// set the material parameters
-	int nvar = opt.Variables();
+	int nvar = opt.InputParameters();
 	for (int i=0; i<nvar; ++i)
 	{
-		OPT_VARIABLE& var = opt.Variable(i);
-		*(var.m_pd) = a[i];
+		FEInputParameter& var = *opt.GetInputParameter(i);
+		var.SetValue(a[i]);
 	}
 
 	// reset the FEM data
@@ -274,8 +276,9 @@ bool FEConstrainedLMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a
 	felog.printf("\n----- Iteration: %d -----\n", opt.m_niter);
 	for (int i=0; i<nvar; ++i) 
 	{
-		OPT_VARIABLE& var = opt.Variable(i);
-		felog.printf("%-15s = %lg\n", var.m_szname, a[i]);
+		FEInputParameter& var = *opt.GetInputParameter(i);
+		string name = var.GetName();
+		felog.printf("%-15s = %lg\n", name.c_str(), a[i]);
 	}
 
 	// solve the FE problem
@@ -287,7 +290,7 @@ bool FEConstrainedLMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a
 	if (bret)
 	{
 		double chisq = 0.0;
-		FELoadCurve& rlc = opt.ReactionLoad();
+		FELoadCurve& rlc = obj.ReactionLoad();
 		int ndata = (int)x.size();
 		if (m_print_level == PRINT_VERBOSE) felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
 		for (int i=0; i<ndata; ++i) 

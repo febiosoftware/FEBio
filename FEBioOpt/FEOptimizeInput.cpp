@@ -210,7 +210,7 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 {
 	FEModel& fem = opt.GetFEM();
 
-	OPT_OBJECTIVE obj;
+	FEObjectiveFunction& obj = opt.GetObjective();
 
 	++tag;
 	do
@@ -222,8 +222,6 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 			// get the loadcurve for this objective function
 			tag.AttributeValue("lc", obj.m_nlc);
 			obj.m_nlc--;
-
-			opt.SetObjective(obj);
 		}
 		else throw XMLReader::InvalidTag(tag);
 
@@ -240,34 +238,29 @@ bool FEOptimizeInput::ParseParameters(XMLTag& tag, FEOptimizeData& opt)
 	FEModel& fem = opt.GetFEM();
 
 	// read the parameters
-	OPT_VARIABLE var;
 	++tag;
 	do
 	{
 		if (tag == "param")
 		{
+			FEModelParameter* var = new FEModelParameter(&fem);
+
 			// get the variable name
 			const char* sz = tag.AttributeValue("name");
 			if (sz == 0) throw InvalidVariableName("[Unknown]");
 
-			strcpy(var.m_szname, sz);
-
-			// find the variable
-			double* pd = fem.FindParameter(sz);
-			if (pd == 0) throw InvalidVariableName(sz);
-
-			var.m_pd = pd;
+			if (var->SetParameter(sz) == 0) throw InvalidVariableName(sz);
 
 			// set initial values and bounds
 			double d[4] = { 0, 0, 0, 1 };
 			tag.value(d, 4);
-			var.m_val = d[0];
-			var.m_min = d[1];
-			var.m_max = d[2];
-			var.m_sf = d[3];
+			var->SetValue(d[0]);
+			var->MinValue() = d[1];
+			var->MaxValue() = d[2];
+			var->ScaleFactor() = d[3];
 
 			// add the variable
-			opt.AddVariable(var);
+			opt.AddInputParameter(var);
 		}
 		else throw XMLReader::InvalidTag(tag);
 
@@ -281,7 +274,7 @@ bool FEOptimizeInput::ParseParameters(XMLTag& tag, FEOptimizeData& opt)
 //! Parse the Constraints
 bool FEOptimizeInput::ParseConstraints(XMLTag &tag, FEOptimizeData &opt)
 {
-	int NP = opt.Variables();
+	int NP = opt.InputParameters();
 	if ((NP > OPT_MAX_VAR) || (NP < 2)) throw XMLReader::InvalidTag(tag);
 
 	double v[OPT_MAX_VAR + 1];
@@ -310,6 +303,8 @@ bool FEOptimizeInput::ParseConstraints(XMLTag &tag, FEOptimizeData &opt)
 //! Read the load data section of the input file
 bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 {
+	FEObjectiveFunction& obj = opt.GetObjective();
+
 	++tag;
 	do
 	{
@@ -371,7 +366,7 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 				plc->Create(nlp);
 				plc->SetInterpolation(ntype);
 				plc->SetExtendMode(nextm);
-				opt.AddLoadCurve(plc);
+				obj.AddLoadCurve(plc);
 
 				// set the load points
 				for (int i = 0; i<nlp; ++i)
@@ -392,7 +387,7 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 				plc->Create(nlp);
 				plc->SetInterpolation(ntype);
 				plc->SetExtendMode(nextm);
-				opt.AddLoadCurve(plc);
+				obj.AddLoadCurve(plc);
 
 				// read the points
 				double d[2];

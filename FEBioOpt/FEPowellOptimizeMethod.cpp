@@ -32,11 +32,11 @@ bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	m_pOpt = pOpt;
 	FEOptimizeData& opt = *pOpt;
 
-	int nvar = opt.Variables();
+	int nvar = opt.InputParameters();
 
 	// set the initial guess
 	double* p = new double[nvar];
-	for (i=0; i<nvar; ++i) p[i] = opt.Variable(i).m_val;
+	for (i=0; i<nvar; ++i) p[i] = opt.GetInputParameter(i)->GetValue();
 
 	// set the initial search directions
 	double* xi = new double[nvar*nvar];
@@ -73,14 +73,15 @@ bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	felog.printf("\tVariables:\n\n");
 	for (i=0; i<nvar; ++i)
 	{
-		OPT_VARIABLE& var = opt.Variable(i);
-		felog.printf("\t\t%-15s : %.16lg\n", var.m_szname, p[i]);
+		FEInputParameter& var = *opt.GetInputParameter(i);
+		string name = var.GetName();
+		felog.printf("\t\t%-15s : %.16lg\n", name.c_str(), p[i]);
 	}
 
 	// evaluate reaction forces at correct times
-	OPT_OBJECTIVE& obj = opt.GetObjective();
-	FELoadCurve& rlc = opt.ReactionLoad();
-	FELoadCurve& olc = opt.GetLoadCurve(obj.m_nlc);
+	FEObjectiveFunction& obj = opt.GetObjective();
+	FELoadCurve& rlc = obj.ReactionLoad();
+	FELoadCurve& olc = obj.GetLoadCurve(obj.m_nlc);
 
 	felog.printf("\n\tFunction values:\n\n");
 	felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
@@ -113,11 +114,11 @@ bool fecb(FEModel* pmdl, unsigned int nwhen, void* pd)
 	double time = fem.m_ftime;
 
 	// evaluate the current reaction force value
-	OPT_OBJECTIVE& obj = opt.GetObjective();
+	FEObjectiveFunction& obj = opt.GetObjective();
 	double value = *(obj.m_pd);
 
 	// add the data pair to the loadcurve
-	FELoadCurve& lc = opt.ReactionLoad();
+	FELoadCurve& lc = obj.ReactionLoad();
 	lc.Add(time, value);
 
 	return true;
@@ -137,18 +138,20 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 	FEModel& fem = opt.GetFEM();
 
 	// reset reaction force data
-	FELoadCurve& lc = opt.ReactionLoad();
+	FEObjectiveFunction& obj = opt.GetObjective();
+	FELoadCurve& lc = obj.ReactionLoad();
 	lc.Clear();
 
 	felog.printf("\n----- Iteration: %d -----\n", opt.m_niter);
 
-	// set the material parameters
-	int nvar = opt.Variables();
+	// set the input parameters
+	int nvar = opt.InputParameters();
 	for (int i=0; i<nvar; ++i)
 	{
-		OPT_VARIABLE& var = opt.Variable(i);
-		*(var.m_pd) = p[i];
-		felog.printf("  %-15s: %.16lg\n", var.m_szname, p[i]);
+		FEInputParameter& var = *opt.GetInputParameter(i);
+		var.SetValue(p[i]);
+		string name = var.GetName();
+		felog.printf("  %-15s: %.16lg\n", name.c_str(), p[i]);
 	}
 
 	// reset the FEM data
@@ -169,9 +172,9 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 		felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 
 		// evaluate reaction forces at correct times
-		OPT_OBJECTIVE& obj = opt.GetObjective();
-		FELoadCurve& rlc = opt.ReactionLoad();
-		FELoadCurve& olc = opt.GetLoadCurve(obj.m_nlc);
+		FEObjectiveFunction& obj = opt.GetObjective();
+		FELoadCurve& rlc = obj.ReactionLoad();
+		FELoadCurve& olc = obj.GetLoadCurve(obj.m_nlc);
 
 		felog.printf("\n\tFunction values:\n\n");
 		felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");

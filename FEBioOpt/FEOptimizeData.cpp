@@ -4,6 +4,47 @@
 #include "FEOptimizeInput.h"
 #include <FECore/FECoreKernel.h>
 
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+FEModelParameter::FEModelParameter(FEModel* fem) : FEInputParameter(fem)
+{
+	m_pd = 0;
+}
+
+//-----------------------------------------------------------------------------
+bool FEModelParameter::SetParameter(const string& paramName)
+{
+	SetName(paramName);
+
+	// find the variable
+	FEModel& fem = *GetFEModel();
+	double* pd = fem.FindParameter(paramName.c_str());
+	if (pd == 0) return false;
+
+	// store the pointer to the parameter
+	m_pd = pd;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+double FEModelParameter::GetValue()
+{
+	if (m_pd) return *m_pd;
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+bool FEModelParameter::SetValue(double newValue)
+{
+	if (m_pd == 0) return false;
+	(*m_pd) = newValue;
+	return true;
+}
+
+//=============================================================================
+
 //-----------------------------------------------------------------------------
 FEOptimizeData::FEOptimizeData(FEModel& fem) : m_fem(fem)
 {
@@ -30,7 +71,7 @@ bool FEOptimizeData::Init()
 	if (m_pTask->Init(0) == false) return false;
 
 	// find the variable
-	OPT_OBJECTIVE& obj = GetObjective();
+	FEObjectiveFunction& obj = GetObjective();
 	obj.m_pd = m_fem.FindParameter(obj.m_szname);
 	if (obj.m_pd == 0) return false;
 
