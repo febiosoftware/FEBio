@@ -1,5 +1,6 @@
 #pragma once
-#include "FEOptimizer.h"
+#include "FEOptimizeMethod.h"
+#include <FECore/matrix.h>
 
 //----------------------------------------------------------------------------
 //! Optimization method using contrained Levenberg-Marquardt method

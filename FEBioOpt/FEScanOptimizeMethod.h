@@ -1,6 +1,5 @@
 #pragma once
-
-#include "FEOptimizer.h"
+#include "FEOptimizeMethod.h"
 
 //----------------------------------------------------------------------------
 //! Basic method that scans the parameter space for a minimum.

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEOptimize.h"
-#include "FEOptimizer.h"
+#include "FEOptimizeData.h"
 #include "FECore/FECoreKernel.h"
 #include "FECore/log.h"
 

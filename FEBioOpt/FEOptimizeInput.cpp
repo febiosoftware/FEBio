@@ -1,14 +1,16 @@
-#include "FEOptimizer.h"
+#include "stdafx.h"
+#include "FEOptimizeData.h"
 #include "FELMOptimizeMethod.h"
 #include "FEPowellOptimizeMethod.h"
 #include "FEScanOptimizeMethod.h"
 #include "FEConstrainedLMOptimizeMethod.h"
-#include "FECore/log.h"
+#include "FEOptimizeInput.h"
+#include <FECore/log.h>
 
 //=============================================================================
 InvalidVariableName::InvalidVariableName(const char* sz)
-{ 
-	strcpy(szname, sz); 
+{
+	strcpy(szname, sz);
 }
 
 //-----------------------------------------------------------------------------
@@ -23,10 +25,10 @@ bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 	{
 		switch (pp->type())
 		{
-		case FE_PARAM_DOUBLE : tag.value(pp->value<double>() ); break;
-		case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
-		case FE_PARAM_BOOL   : tag.value(pp->value<bool  >() ); break;
-		case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
+		case FE_PARAM_DOUBLE: tag.value(pp->value<double>()); break;
+		case FE_PARAM_INT: tag.value(pp->value<int   >()); break;
+		case FE_PARAM_BOOL: tag.value(pp->value<bool  >()); break;
+		case FE_PARAM_STRING: tag.value(pp->cvalue()); break;
 		default:
 			assert(false);
 			return false;
@@ -36,7 +38,7 @@ bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 	{
 		switch (pp->type())
 		{
-		case FE_PARAM_INT   : tag.value(pp->pvalue<int   >(), pp->dim()); break;
+		case FE_PARAM_INT: tag.value(pp->pvalue<int   >(), pp->dim()); break;
 		case FE_PARAM_DOUBLE: tag.value(pp->pvalue<double>(), pp->dim()); break;
 		default:
 			assert(false);
@@ -45,7 +47,7 @@ bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 	}
 
 	int nattr = tag.m_natt;
-	for (int i=0; i<nattr; ++i)
+	for (int i = 0; i<nattr; ++i)
 	{
 		const char* szat = tag.m_att[i].m_szatt;
 		if (strcmp(szat, "lc") == 0)
@@ -54,17 +56,17 @@ bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 			if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
 			switch (pp->type())
 			{
-			case FE_PARAM_BOOL  :
-			case FE_PARAM_INT   : pp->SetLoadCurve(lc); break;
+			case FE_PARAM_BOOL:
+			case FE_PARAM_INT: pp->SetLoadCurve(lc); break;
 			case FE_PARAM_DOUBLE: pp->SetLoadCurve(lc, pp->value<double>()); break;
-			case FE_PARAM_VEC3D : pp->SetLoadCurve(lc, pp->value<vec3d >()); break;
+			case FE_PARAM_VEC3D: pp->SetLoadCurve(lc, pp->value<vec3d >()); break;
 			default:
 				assert(false);
 			}
 		}
 		else
 		{
-			felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
+			felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line - 1);
 		}
 	}
 
@@ -97,21 +99,20 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		bool bret = true;
 		do
 		{
-			if		(tag == "Model"      ) ; // No longer used, but included for backwards compatibility
-			else if (tag == "Task"       ) bret = ParseTask       (tag, opt);
-			else if (tag == "Options"    ) bret = ParseOptions    (tag, opt);
-			else if (tag == "Function"   ) bret = ParseObjective  (tag, opt);
-			else if (tag == "Parameters" ) bret = ParseParameters (tag, opt);
+			if (tag == "Model"); // No longer used, but included for backwards compatibility
+			else if (tag == "Task") bret = ParseTask(tag, opt);
+			else if (tag == "Options") bret = ParseOptions(tag, opt);
+			else if (tag == "Function") bret = ParseObjective(tag, opt);
+			else if (tag == "Parameters") bret = ParseParameters(tag, opt);
 			else if (tag == "Constraints") bret = ParseConstraints(tag, opt);
-			else if (tag == "LoadData"   ) bret = ParseLoadData   (tag, opt);
+			else if (tag == "LoadData") bret = ParseLoadData(tag, opt);
 			else throw XMLReader::InvalidTag(tag);
 
 			if (bret == false) return false;
 
 			// go to the next tag
 			++tag;
-		}
-		while (!tag.isend());
+		} while (!tag.isend());
 	}
 	catch (InvalidVariableName e)
 	{
@@ -147,9 +148,9 @@ bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 	if (szt == 0) popt = new FELMOptimizeMethod;
 	else
 	{
-		if      (strcmp(szt, "levmar"            ) == 0) popt = new FELMOptimizeMethod;
-		else if (strcmp(szt, "powell"            ) == 0) popt = new FEPowellOptimizeMethod;
-		else if (strcmp(szt, "scan"              ) == 0) popt = new FEScanOptimizeMethod;
+		if (strcmp(szt, "levmar") == 0) popt = new FELMOptimizeMethod;
+		else if (strcmp(szt, "powell") == 0) popt = new FEPowellOptimizeMethod;
+		else if (strcmp(szt, "scan") == 0) popt = new FEScanOptimizeMethod;
 #ifdef HAVE_LEVMAR
 		else if (strcmp(szt, "constrained levmar") == 0) popt = new FEConstrainedLMOptimizeMethod;
 #endif
@@ -166,14 +167,14 @@ bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 		{
 			if (ReadParameter(tag, pl) == false)
 			{
-				if (tag == "log_level"   )
+				if (tag == "log_level")
 				{
 					char szval[256];
 					tag.value(szval);
-					if		(strcmp(szval, "LOG_DEFAULT"        ) == 0) {} // don't change the plot level
-					else if (strcmp(szval, "LOG_NEVER"          ) == 0) popt->m_loglevel = Logfile::LOG_NEVER;
-					else if (strcmp(szval, "LOG_FILE_ONLY"      ) == 0) popt->m_loglevel = Logfile::LOG_FILE;
-					else if (strcmp(szval, "LOG_SCREEN_ONLY"    ) == 0) popt->m_loglevel = Logfile::LOG_SCREEN;
+					if (strcmp(szval, "LOG_DEFAULT") == 0) {} // don't change the plot level
+					else if (strcmp(szval, "LOG_NEVER") == 0) popt->m_loglevel = Logfile::LOG_NEVER;
+					else if (strcmp(szval, "LOG_FILE_ONLY") == 0) popt->m_loglevel = Logfile::LOG_FILE;
+					else if (strcmp(szval, "LOG_SCREEN_ONLY") == 0) popt->m_loglevel = Logfile::LOG_SCREEN;
 					else if (strcmp(szval, "LOG_FILE_AND_SCREEN") == 0) popt->m_loglevel = Logfile::LOG_FILE_AND_SCREEN;
 					else throw XMLReader::InvalidValue(tag);
 				}
@@ -181,14 +182,13 @@ bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 				{
 					char szval[256];
 					tag.value(szval);
-					if      (strcmp(szval, "PRINT_ITERATIONS") == 0) popt->m_print_level = PRINT_ITERATIONS;
-					else if (strcmp(szval, "PRINT_VERBOSE"   ) == 0) popt->m_print_level = PRINT_VERBOSE;
+					if (strcmp(szval, "PRINT_ITERATIONS") == 0) popt->m_print_level = PRINT_ITERATIONS;
+					else if (strcmp(szval, "PRINT_VERBOSE") == 0) popt->m_print_level = PRINT_VERBOSE;
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
 			++tag;
-		}
-		while (!tag.isend());
+		} while (!tag.isend());
 	}
 
 	opt.SetSolver(popt);
@@ -228,8 +228,7 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 		else throw XMLReader::InvalidTag(tag);
 
 		++tag;
-	}
-	while (!tag.isend());
+	} while (!tag.isend());
 
 	return true;
 }
@@ -256,16 +255,16 @@ bool FEOptimizeInput::ParseParameters(XMLTag& tag, FEOptimizeData& opt)
 			// find the variable
 			double* pd = fem.FindParameter(sz);
 			if (pd == 0) throw InvalidVariableName(sz);
-			
+
 			var.m_pd = pd;
 
 			// set initial values and bounds
-			double d[4] = {0, 0, 0, 1};
+			double d[4] = { 0, 0, 0, 1 };
 			tag.value(d, 4);
 			var.m_val = d[0];
 			var.m_min = d[1];
 			var.m_max = d[2];
-			var.m_sf  = d[3];
+			var.m_sf = d[3];
 
 			// add the variable
 			opt.AddVariable(var);
@@ -273,8 +272,7 @@ bool FEOptimizeInput::ParseParameters(XMLTag& tag, FEOptimizeData& opt)
 		else throw XMLReader::InvalidTag(tag);
 
 		++tag;
-	}
-	while (!tag.isend());
+	} while (!tag.isend());
 
 	return true;
 }
@@ -286,25 +284,24 @@ bool FEOptimizeInput::ParseConstraints(XMLTag &tag, FEOptimizeData &opt)
 	int NP = opt.Variables();
 	if ((NP > OPT_MAX_VAR) || (NP < 2)) throw XMLReader::InvalidTag(tag);
 
-	double v[OPT_MAX_VAR+1];
+	double v[OPT_MAX_VAR + 1];
 	++tag;
 	do
 	{
 		if (tag == "constraint")
 		{
-			int m = tag.value(v, OPT_MAX_VAR+1);
-			if (m != NP+1) throw XMLReader::InvalidValue(tag);
+			int m = tag.value(v, OPT_MAX_VAR + 1);
+			if (m != NP + 1) throw XMLReader::InvalidValue(tag);
 
 			OPT_LIN_CONSTRAINT con;
-			for (int i=0; i<NP; ++i) con.a[i] = v[i];
+			for (int i = 0; i<NP; ++i) con.a[i] = v[i];
 			con.b = v[NP];
 
 			opt.AddLinearConstraint(con);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
-	}
-	while (!tag.isend());
+	} while (!tag.isend());
 
 	return true;
 }
@@ -325,7 +322,7 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 			const char* szt = tag.AttributeValue("type", true);
 			if (szt)
 			{
-				if      (strcmp(szt, "step"  ) == 0) ntype = FELoadCurve::STEP;
+				if (strcmp(szt, "step") == 0) ntype = FELoadCurve::STEP;
 				else if (strcmp(szt, "linear") == 0) ntype = FELoadCurve::LINEAR;
 				else if (strcmp(szt, "smooth") == 0) ntype = FELoadCurve::SMOOTH;
 				else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
@@ -335,9 +332,9 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 			const char* szm = tag.AttributeValue("extend", true);
 			if (szm)
 			{
-				if      (strcmp(szm, "constant"     ) == 0) nextm = FELoadCurve::CONSTANT;
-				else if (strcmp(szm, "extrapolate"  ) == 0) nextm = FELoadCurve::EXTRAPOLATE;
-				else if (strcmp(szm, "repeat"       ) == 0) nextm = FELoadCurve::REPEAT;
+				if (strcmp(szm, "constant") == 0) nextm = FELoadCurve::CONSTANT;
+				else if (strcmp(szm, "extrapolate") == 0) nextm = FELoadCurve::EXTRAPOLATE;
+				else if (strcmp(szm, "repeat") == 0) nextm = FELoadCurve::REPEAT;
 				else if (strcmp(szm, "repeat offset") == 0) nextm = FELoadCurve::REPEAT_OFFSET;
 				else throw XMLReader::InvalidAttributeValue(tag, "extend", szt);
 			}
@@ -352,8 +349,8 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 				// read the data form a text file
 				FILE* fp = fopen(szf, "rt");
 				if (fp == 0) throw XMLReader::InvalidAttributeValue(tag, "import", szf);
-				vector< pair<double,double> > data;
-				char szline[256] = {0};
+				vector< pair<double, double> > data;
+				char szline[256] = { 0 };
 				do
 				{
 					fgets(szline, 255, fp);
@@ -361,16 +358,15 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 					int n = sscanf(szline, "%lg%lg", &t, &v);
 					if (n == 2)
 					{
-						data.push_back(pair<double,double>(t,v));
+						data.push_back(pair<double, double>(t, v));
 					}
 					else break;
-				}
-				while ((feof(fp) == 0) && (ferror(fp) == 0));
+				} while ((feof(fp) == 0) && (ferror(fp) == 0));
 
 				fclose(fp);
 
 				// create the load curve
-				const int nlp = (const int) data.size();
+				const int nlp = (const int)data.size();
 				FELoadCurve* plc = new FELoadCurve;
 				plc->Create(nlp);
 				plc->SetInterpolation(ntype);
@@ -378,7 +374,7 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 				opt.AddLoadCurve(plc);
 
 				// set the load points
-				for (int i=0; i<nlp; ++i)
+				for (int i = 0; i<nlp; ++i)
 				{
 					plc->LoadPoint(i).time = data[i].first;
 					plc->LoadPoint(i).value = data[i].second;
@@ -401,10 +397,10 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 				// read the points
 				double d[2];
 				++tag;
-				for (int i=0; i<nlp; ++i)
+				for (int i = 0; i<nlp; ++i)
 				{
 					tag.value(d, 2);
-					plc->LoadPoint(i).time  = d[0];
+					plc->LoadPoint(i).time = d[0];
 					plc->LoadPoint(i).value = d[1];
 
 					++tag;
@@ -414,72 +410,7 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 		else throw XMLReader::InvalidTag(tag);
 
 		++tag;
-	}
-	while (!tag.isend());
+	} while (!tag.isend());
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-// FEOptimizeData
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-FEOptimizeData::FEOptimizeData(FEModel& fem) : m_fem(fem)
-{
-	m_pSolver = 0;
-	m_pTask = 0;
-}
-
-//-----------------------------------------------------------------------------
-FEOptimizeData::~FEOptimizeData(void)
-{
-	delete m_pSolver;
-}
-
-//-----------------------------------------------------------------------------
-bool FEOptimizeData::Init()
-{
-	// allocate default optimization solver if none specified in input file
-	if (m_pSolver == 0) m_pSolver = new FELMOptimizeMethod;
-
-	// allocate default solver if none specified in input file
-	if (m_pTask == 0) m_pTask = fecore_new<FECoreTask>(FETASK_ID, "solve", &m_fem);
-
-	// do the initialization of the task
-	if (m_pTask->Init(0) == false) return false;
-
-	// find the variable
-	OPT_OBJECTIVE& obj = GetObjective();
-	obj.m_pd = m_fem.FindParameter(obj.m_szname);
-	if (obj.m_pd == 0) return false;
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEOptimizeData::Solve()
-{
-	// make sure we have a task that will solve the FE model
-	if (m_pTask == 0) return false;
-
-	// go for it!
-	return m_pSolver->Solve(this);
-}
-
-//-----------------------------------------------------------------------------
-//! Read the data from the input file
-//!
-bool FEOptimizeData::Input(const char *szfile)
-{
-	FEOptimizeInput in;
-	if (in.Input(szfile, this) == false) return false;
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEOptimizeData::RunTask()
-{
-	if (m_pTask == 0) return false;
-	return m_pTask->Run();
 }

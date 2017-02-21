@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "FEConstrainedLMOptimizeMethod.h"
+#include "FEOptimizeData.h"
+#include "FEOptimizeInput.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/log.h"
 
@@ -207,7 +209,7 @@ void FEConstrainedLMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a,
 	FEOptimizeData& opt = *m_pOpt;
 
 	// poor man's box constraints
-	int ma = a.size();
+	int ma = (int)a.size();
 	vector<int> dir(ma,1);	// forward difference by default
 	for (int i=0; i<opt.Variables(); ++i)
 	{
@@ -226,7 +228,7 @@ void FEConstrainedLMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a,
 	m_yopt = y;
 
 	// now calculate the derivatives using forward differences
-	int ndata = x.size();
+	int ndata = (int)x.size();
 	vector<double> a1(a);
 	vector<double> y1(ndata);
 	for (int i=0; i<ma; ++i)
@@ -286,7 +288,7 @@ bool FEConstrainedLMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a
 	{
 		double chisq = 0.0;
 		FELoadCurve& rlc = opt.ReactionLoad();
-		int ndata = x.size();
+		int ndata = (int)x.size();
 		if (m_print_level == PRINT_VERBOSE) felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
 		for (int i=0; i<ndata; ++i) 
 		{

@@ -1,5 +1,5 @@
 #pragma once
-#include "FEOptimizer.h"
+#include "FEOptimizeMethod.h"
 
 //----------------------------------------------------------------------------
 //! Optimization method using Powell's method

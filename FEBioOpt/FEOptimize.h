@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/FECoreTask.h"
-#include "FEOptimizer.h"
+#include "FEOptimizeData.h"
 
 //-----------------------------------------------------------------------------
 // This class defines the FEOptimize task. It allows FEBio to call the optimization

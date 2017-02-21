@@ -1,6 +1,6 @@
 #pragma once
-#include "FEOptimizer.h"
-#include "FECore/Logfile.h"
+#include "FEOptimizeMethod.h"
+#include <FECore/matrix.h>
 #include <vector>
 using namespace std;
 

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEScanOptimizeMethod.h"
+#include "FEOptimizeData.h"
 #include "FECore/log.h"
 
 BEGIN_PARAMETER_LIST(FEScanOptimizeMethod, FEOptimizeMethod)

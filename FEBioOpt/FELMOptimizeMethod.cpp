@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "FELMOptimizeMethod.h"
+#include "FEOptimizeData.h"
+#include "FEOptimizeInput.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/log.h"
 

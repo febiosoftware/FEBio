@@ -1,5 +1,4 @@
 #pragma once
-
 #include "FEBioXML/XMLReader.h"
 #include "FECore/FEModel.h"
 #include "FECore/Logfile.h"
@@ -9,59 +8,7 @@
 #include <string.h>
 
 //-----------------------------------------------------------------------------
-// IO exceptions
-
-//! the variable name is not recognized
-class InvalidVariableName
-{
-public:
-	InvalidVariableName(const char* sz);
-	char szname[256];
-};
-
-//! there is nothing to optimize
-class NothingToOptimize{};
-
-//! FEBio error terminated during the optimization
-class FEErrorTermination{};
-
-//-----------------------------------------------------------------------------
-class FEOptimizeData;
-
-//=============================================================================
-//! Class that reads the optimization input file
-class FEOptimizeInput
-{
-public:
-	bool Input(const char* szfile, FEOptimizeData* pOpt);
-
-protected:
-	bool ParseOptions    (XMLTag& tag, FEOptimizeData& opt);
-	bool ParseTask       (XMLTag& tag, FEOptimizeData& opt);
-	bool ParseObjective  (XMLTag& tag, FEOptimizeData& opt);
-	bool ParseParameters (XMLTag& tag, FEOptimizeData& opt);
-	bool ParseConstraints(XMLTag& tag, FEOptimizeData& opt);
-	bool ParseLoadData   (XMLTag& tag, FEOptimizeData& opt);
-
-protected:
-	bool ReadParameter(XMLTag& tag, FEParameterList& pl);
-};
-
-//=============================================================================
-enum {
-	PRINT_ITERATIONS,
-	PRINT_VERBOSE
-};
-
-//=============================================================================
-//! optimization method - this class does the actual work
-class FEOptimizeMethod : public FEParamContainer
-{
-public:
-	virtual bool Solve(FEOptimizeData* pOpt) = 0;
-	Logfile::MODE	m_loglevel; // log file output level
-	int		m_print_level;	// level of detailed output
-};
+class FEOptimizeMethod;
 
 //=============================================================================
 struct OPT_VARIABLE
