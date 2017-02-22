@@ -19,7 +19,11 @@ class FEOptimizeMethod : public FEParamContainer
 {
 public:
 	// Implement this function for solve an optimization problem
-	virtual bool Solve(FEOptimizeData* pOpt) = 0;
+	// should return the optimal values for the input parameters in a, the optimal
+	// values of the measurement vector in ymin and
+	// the corresponding objective value in obj.
+	// If this function returns false, something went wrong
+	virtual bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj) = 0;
 
 public:
 	Logfile::MODE	m_loglevel;		//!< log file output level

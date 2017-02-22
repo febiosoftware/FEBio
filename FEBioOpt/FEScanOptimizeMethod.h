@@ -6,15 +6,11 @@
 class FEScanOptimizeMethod : public FEOptimizeMethod
 {
 public:
-	bool Solve(FEOptimizeData* pOpt);
-
-protected:
-	bool FESolve(vector<double>& x, vector<double>& a, vector<double>& y);
-
-private:
-	FEOptimizeData* m_pOpt;
-	double	m_inc[32];
+	// this implements the solution algorithm.
+	// returns the optimal parameter values in amin
+	// returns the optimal measurement vector in ymin
+	// returns the optimal objective function value in minObj
+	bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj);
 
 	DECLARE_PARAMETER_LIST();
 };
-

@@ -5,6 +5,10 @@
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
+#define VERSION 1
+#define SUB_VERSION	0
+
+//-----------------------------------------------------------------------------
 FEOptimize::FEOptimize(FEModel* pfem) : FECoreTask(pfem), m_opt(*m_pfem)
 {
 
@@ -21,7 +25,9 @@ bool FEOptimize::Init(const char* szfile)
 	if (m_opt.Init() == false) return false;
 
 	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-	felog.printbox("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E", "version 0.1");
+	char szversion[32] = {0};
+	sprintf(szversion, "version %d.%d", VERSION, SUB_VERSION);
+	felog.printbox("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E", szversion);
 
 	return true;
 }
@@ -33,9 +39,9 @@ bool FEOptimize::Run()
 	bool bret = m_opt.Solve();
 
 	if (bret)
-		felog.printf(" N O R M A L   T E R M I N A T I O N\n\n");
+		felog.printf("\n\n N O R M A L   T E R M I N A T I O N\n\n");
 	else 
-		felog.printf(" E R R O R   T E R M I N A T I O N\n\n");
+		felog.printf("\n\n E R R O R   T E R M I N A T I O N\n\n");
 
 	return bret;
 }

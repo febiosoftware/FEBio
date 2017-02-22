@@ -91,6 +91,22 @@ struct OPT_LIN_CONSTRAINT
 class FEObjectiveFunction
 {
 public:
+	FEObjectiveFunction(FEModel* fem);
+
+	// one-time initialization
+	bool Init();
+
+	// call before the next FESolve
+	void Reset();
+
+	// evaluate objective function
+	// also returns the measurement vector in y
+	double Evaluate(vector<double>& y);
+
+	// return the FE model
+	FEModel* GetFEM() { return m_fem; }
+
+public:
 	char	m_szname[128];	//!< name of objective
 	double*	m_pd;			//!< pointer to variable data
 	int		m_nlc;			//!< load curve
@@ -103,6 +119,7 @@ public:
 	FELoadCurve& GetLoadCurve(int n) { return *m_LC[n]; }
 
 public:
+	FEModel*	m_fem;
 	FELoadCurve	m_rf;		//!< reaction force data
 
 	std::vector<FELoadCurve*>	m_LC;	//!< load curves. (TODO: Not sure why there can be more than one)
@@ -129,6 +146,9 @@ public:
 
 	//! return the FE Model
 	FEModel& GetFEM() { return m_fem; }
+
+	//! solve the FE problem with a new set of parameters
+	bool FESolve(const vector<double>& a);
 
 public:
 	// return the number of input parameters

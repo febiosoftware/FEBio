@@ -40,8 +40,6 @@ void mrqcof(vector<double>& x,
 			double& chisq,
 			void funcs(vector<double>& , vector<double>&, vector<double>&, matrix&));
 
-extern bool fecb(FEModel* pfem, unsigned int nwhen, void* pd);
-
 //-----------------------------------------------------------------------------
 FELMOptimizeMethod::FELMOptimizeMethod()
 {
@@ -53,7 +51,7 @@ FELMOptimizeMethod::FELMOptimizeMethod()
 }
 
 //-----------------------------------------------------------------------------
-bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
+bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vector<double>& ymin, double* minObj)
 {
 	m_pOpt = pOpt;
 	FEOptimizeData& opt = *pOpt;
@@ -79,7 +77,6 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 		x[i] = lc.LoadPoint(i).time;
 		y[i] = lc.LoadPoint(i).value;
 	}
-	m_y0 = y;
 
 	// set the sigma's
 	// for now we set them all to 1
@@ -91,13 +88,6 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 
 	// allocate vectors for mrqmin
 	vector<double> oneda(ma), atry(ma), beta(ma), da(ma);
-
-	// set the FEM callback function
-	FEModel& fem = opt.GetFEM();
-	fem.AddCallback(fecb, CB_MAJOR_ITERS | CB_INIT, &opt);
-
-	// don't plot anything
-	fem.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
 
 	// set the this pointer
 	m_pThis = this;
@@ -155,30 +145,10 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 		return false;
 	}
 
-	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-
-	// print reaction forces
-	felog.printf("\n\tFunction values:\n\n");
-	felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
-	for (i=0; i<ndata; ++i)
-	{
-		felog.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, m_yopt[i], y[i], fabs(m_yopt[i] - y[i]));
-	}
-
-	felog.printf("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
-
-	felog.printf("\tMajor iterations ....................... : %d\n\n", niter);
-	felog.printf("\tMinor iterations ....................... : %d\n\n", opt.m_niter);
-
-	felog.printf("\tVariables:\n\n");
-	for (i=0; i<ma; ++i)
-	{
-		FEInputParameter& var = *opt.GetInputParameter(i);
-		string name = var.GetName();
-		felog.printf("\t\t%-15s : %.16lg\n", name.c_str(), a[i]);
-	}
-
-	felog.printf("\n\tFinal objective value: %15lg\n\n", fret);
+	// store optimal values
+	amin = a;
+	ymin = m_yopt;
+	if (minObj) *minObj = fret;
 
 	return true;
 }
@@ -203,8 +173,9 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 	}
 	
 	// evaluate at a
-	if (FESolve(x, a, y) == false) throw FEErrorTermination();
+	if (opt.FESolve(a) == false) throw FEErrorTermination();
 	
+	opt.GetObjective().Evaluate(y);
 	m_yopt = y;
 
 	// now calculate the derivatives using forward differences
@@ -221,68 +192,11 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 		a1[i] = a1[i] + dir*m_fdiff*(fabs(b) + fabs(a[i]));
 		assert(a1[i] != a[i]);
 
-		if (FESolve(x, a1, y1) == false) throw FEErrorTermination();
+		if (opt.FESolve(a1) == false) throw FEErrorTermination();
+		opt.GetObjective().Evaluate(y1);
 		for (int j=0; j<ndata; ++j) dyda[j][i] = (y1[j] - y[j])/(a1[i] - a[i]);
 		a1[i] = a[i];
 	}
-}
-
-//-----------------------------------------------------------------------------
-bool FELMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<double> &y)
-{
-	// get the optimization data
-	FEOptimizeData& opt = *m_pOpt;
-
-	// increase iterator counter
-	opt.m_niter++;
-
-	// get the FEM data
-	FEModel& fem = opt.GetFEM();
-
-	// reset reaction force data
-	FEObjectiveFunction& obj = opt.GetObjective();
-	FELoadCurve& lc = obj.ReactionLoad();
-	lc.Clear();
-
-	// set the material parameters
-	int nvar = opt.InputParameters();
-	for (int i=0; i<nvar; ++i)
-	{
-		FEInputParameter& var = *opt.GetInputParameter(i);
-		var.SetValue(a[i]);
-	}
-
-	// reset the FEM data
-	fem.Reset();
-
-	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-	felog.printf("\n----- Iteration: %d -----\n", opt.m_niter);
-	for (int i=0; i<nvar; ++i) 
-	{
-		FEInputParameter& var = *opt.GetInputParameter(i);
-		string name = var.GetName();
-		felog.printf("%-15s = %lg\n", name.c_str(), a[i]);
-	}
-
-	// solve the FE problem
-	felog.SetMode(m_loglevel);
-
-	bool bret = m_pOpt->RunTask();
-
-	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-	if (bret)
-	{
-		FELoadCurve& rlc = obj.ReactionLoad();
-		int ndata = x.size();
-		felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
-		for (int i=0; i<ndata; ++i) 
-		{
-			y[i] = rlc.Value(x[i]);
-			felog.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, y[i], m_y0[i], fabs(y[i] - m_y0[i]));
-		}
-	}
-
-	return bret;
 }
 
 //-----------------------------------------------------------------------------

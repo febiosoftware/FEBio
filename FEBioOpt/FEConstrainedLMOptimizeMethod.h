@@ -9,11 +9,9 @@ class FEConstrainedLMOptimizeMethod : public FEOptimizeMethod
 {
 public:
 	FEConstrainedLMOptimizeMethod();
-	bool Solve(FEOptimizeData* pOpt);
+	bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj);
 
 	FEOptimizeData* GetOptimizeData() { return m_pOpt; }
-
-	bool FESolve(vector<double>& x, vector<double>& a, vector<double>& y);
 
 protected:
 	FEOptimizeData* m_pOpt;
@@ -32,7 +30,6 @@ public:
 
 public:
 	vector<double>	m_yopt;	// optimal y-values
-	vector<double>	m_y0;	// initial (target) y-values
 
 	DECLARE_PARAMETER_LIST();
 };

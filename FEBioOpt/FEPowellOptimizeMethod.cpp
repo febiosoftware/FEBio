@@ -9,7 +9,6 @@
 void linmin(double* p, double* xi, int n, double* fret, double (*fnc)(double[]));
 void powell(double* p, double* xi, int n, double ftol, int* iter, double* fret, double (*fnc)(double[]));
 double brent(double ax, double bx, double cx, double (*f)(double), double tol, double* xmin);
-bool fecb(FEModel* pfem, unsigned int nwhen, void* pd);
 void mnbrak(double* ax, double* bx, double* cx, double* fa, double* fb, double* fc, double (*fnc)(double));
 double golden(double ax, double bx, double cx, double (*f)(double), double tol, double* xmin);
 
@@ -25,35 +24,24 @@ FEPowellOptimizeMethod* FEPowellOptimizeMethod::m_pThis = 0;
 // FEPowellOptimizeMethod
 //-----------------------------------------------------------------------------
 
-bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt)
+bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vector<double>& ymin, double* minObj)
 {
-	int i, j;
-
 	m_pOpt = pOpt;
 	FEOptimizeData& opt = *pOpt;
 
 	int nvar = opt.InputParameters();
 
 	// set the initial guess
-	double* p = new double[nvar];
-	for (i=0; i<nvar; ++i) p[i] = opt.GetInputParameter(i)->GetValue();
+	vector<double> p(nvar);
+	for (int i=0; i<nvar; ++i) p[i] = opt.GetInputParameter(i)->GetValue();
 
 	// set the initial search directions
-	double* xi = new double[nvar*nvar];
-	for (i=0; i<nvar; ++i)
+	vector<double> xi(nvar*nvar);
+	for (int i=0; i<nvar; ++i)
 	{
-		for (j=0; j<nvar; ++j) xi[i*nvar + j] = 0;
+		for (int j=0; j<nvar; ++j) xi[i*nvar + j] = 0;
 		xi[i*nvar + i] = 0.05*(1.0 + p[i]);
 	}
-
-	opt.m_niter = 0;
-
-	// set the FEM callback function
-	FEModel& fem = opt.GetFEM();
-	fem.AddCallback(fecb, CB_MAJOR_ITERS | CB_INIT, &opt);
-
-	// don't plot anything
-	fem.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
 
 	// don't forget to set this
 	m_pThis = this;
@@ -61,65 +49,11 @@ bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	// call the powell routine
 	int niter = 0;
 	double fret = 0;
-	powell(p, xi, nvar, 0.001, &niter, &fret, objfun);
+	powell(&p[0], &xi[0], nvar, 0.001, &niter, &fret, objfun);
 
-	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-
-	felog.printf("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
-
-	felog.printf("\tMajor iterations ....................... : %d\n\n", niter);
-	felog.printf("\tMinor iterations ....................... : %d\n\n", opt.m_niter);
-
-	felog.printf("\tVariables:\n\n");
-	for (i=0; i<nvar; ++i)
-	{
-		FEInputParameter& var = *opt.GetInputParameter(i);
-		string name = var.GetName();
-		felog.printf("\t\t%-15s : %.16lg\n", name.c_str(), p[i]);
-	}
-
-	// evaluate reaction forces at correct times
-	FEObjectiveFunction& obj = opt.GetObjective();
-	FELoadCurve& rlc = obj.ReactionLoad();
-	FELoadCurve& olc = obj.GetLoadCurve(obj.m_nlc);
-
-	felog.printf("\n\tFunction values:\n\n");
-	felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
-	for (i=0; i<olc.Points(); ++i)
-	{
-		LOADPOINT& p = olc.LoadPoint(i);
-		double f = rlc.Value(p.time);
-		felog.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, f, p.value, fabs(f - p.value));
-	}
-
-	felog.printf("\n\tFinal objective value: %15lg\n\n", fret);
-
-	// done
-	delete [] p;
-	delete [] xi;
-
-	return true;
-}
-
-//-------------------------------------------------------------------
-bool fecb(FEModel* pmdl, unsigned int nwhen, void* pd)
-{
-	// get the optimizaton data
-	FEOptimizeData& opt = *((FEOptimizeData*) pd);
-
-	// get the FEM data
-	FEModel& fem = opt.GetFEM();
-
-	// get the current time value
-	double time = fem.m_ftime;
-
-	// evaluate the current reaction force value
-	FEObjectiveFunction& obj = opt.GetObjective();
-	double value = *(obj.m_pd);
-
-	// add the data pair to the loadcurve
-	FELoadCurve& lc = obj.ReactionLoad();
-	lc.Add(time, value);
+	// store optimal values
+	amin = p;
+	if (minObj) *minObj = fret;
 
 	return true;
 }
