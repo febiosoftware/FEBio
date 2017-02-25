@@ -15,14 +15,17 @@
 		D5307A3918B406B8008C8463 /* FELMOptimizeMethod.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A2918B406B8008C8463 /* FELMOptimizeMethod.h */; };
 		D5307A3A18B406B8008C8463 /* FEOptimize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5307A2A18B406B8008C8463 /* FEOptimize.cpp */; };
 		D5307A3B18B406B8008C8463 /* FEOptimize.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A2B18B406B8008C8463 /* FEOptimize.h */; };
-		D5307A3C18B406B8008C8463 /* FEOptimizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5307A2C18B406B8008C8463 /* FEOptimizer.cpp */; };
-		D5307A3D18B406B8008C8463 /* FEOptimizer.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A2D18B406B8008C8463 /* FEOptimizer.h */; };
 		D5307A3E18B406B8008C8463 /* FEPowellOptimizeMethod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5307A2E18B406B8008C8463 /* FEPowellOptimizeMethod.cpp */; };
 		D5307A3F18B406B8008C8463 /* FEPowellOptimizeMethod.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A2F18B406B8008C8463 /* FEPowellOptimizeMethod.h */; };
 		D5307A4018B406B8008C8463 /* FEScanOptimizeMethod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5307A3018B406B8008C8463 /* FEScanOptimizeMethod.cpp */; };
 		D5307A4118B406B8008C8463 /* FEScanOptimizeMethod.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A3118B406B8008C8463 /* FEScanOptimizeMethod.h */; };
 		D5307A4218B406B8008C8463 /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A3218B406B8008C8463 /* stdafx.h */; };
 		D5307A4318B406B8008C8463 /* targetver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A3318B406B8008C8463 /* targetver.h */; };
+		D55AC4FB1E61EAB900BBA0D1 /* FEOptimizeData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55AC4F61E61EAB900BBA0D1 /* FEOptimizeData.cpp */; };
+		D55AC4FC1E61EAB900BBA0D1 /* FEOptimizeData.h in Headers */ = {isa = PBXBuildFile; fileRef = D55AC4F71E61EAB900BBA0D1 /* FEOptimizeData.h */; };
+		D55AC4FD1E61EAB900BBA0D1 /* FEOptimizeInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55AC4F81E61EAB900BBA0D1 /* FEOptimizeInput.cpp */; };
+		D55AC4FE1E61EAB900BBA0D1 /* FEOptimizeInput.h in Headers */ = {isa = PBXBuildFile; fileRef = D55AC4F91E61EAB900BBA0D1 /* FEOptimizeInput.h */; };
+		D55AC4FF1E61EAB900BBA0D1 /* FEOptimizeMethod.h in Headers */ = {isa = PBXBuildFile; fileRef = D55AC4FA1E61EAB900BBA0D1 /* FEOptimizeMethod.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,14 +38,17 @@
 		D5307A2918B406B8008C8463 /* FELMOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELMOptimizeMethod.h; sourceTree = "<group>"; };
 		D5307A2A18B406B8008C8463 /* FEOptimize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOptimize.cpp; sourceTree = "<group>"; };
 		D5307A2B18B406B8008C8463 /* FEOptimize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOptimize.h; sourceTree = "<group>"; };
-		D5307A2C18B406B8008C8463 /* FEOptimizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOptimizer.cpp; sourceTree = "<group>"; };
-		D5307A2D18B406B8008C8463 /* FEOptimizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOptimizer.h; sourceTree = "<group>"; };
 		D5307A2E18B406B8008C8463 /* FEPowellOptimizeMethod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPowellOptimizeMethod.cpp; sourceTree = "<group>"; };
 		D5307A2F18B406B8008C8463 /* FEPowellOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPowellOptimizeMethod.h; sourceTree = "<group>"; };
 		D5307A3018B406B8008C8463 /* FEScanOptimizeMethod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEScanOptimizeMethod.cpp; sourceTree = "<group>"; };
 		D5307A3118B406B8008C8463 /* FEScanOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEScanOptimizeMethod.h; sourceTree = "<group>"; };
 		D5307A3218B406B8008C8463 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
 		D5307A3318B406B8008C8463 /* targetver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = targetver.h; sourceTree = "<group>"; };
+		D55AC4F61E61EAB900BBA0D1 /* FEOptimizeData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOptimizeData.cpp; sourceTree = "<group>"; };
+		D55AC4F71E61EAB900BBA0D1 /* FEOptimizeData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOptimizeData.h; sourceTree = "<group>"; };
+		D55AC4F81E61EAB900BBA0D1 /* FEOptimizeInput.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOptimizeInput.cpp; sourceTree = "<group>"; };
+		D55AC4F91E61EAB900BBA0D1 /* FEOptimizeInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOptimizeInput.h; sourceTree = "<group>"; };
+		D55AC4FA1E61EAB900BBA0D1 /* FEOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOptimizeMethod.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,8 +89,11 @@
 				D5307A2918B406B8008C8463 /* FELMOptimizeMethod.h */,
 				D5307A2A18B406B8008C8463 /* FEOptimize.cpp */,
 				D5307A2B18B406B8008C8463 /* FEOptimize.h */,
-				D5307A2C18B406B8008C8463 /* FEOptimizer.cpp */,
-				D5307A2D18B406B8008C8463 /* FEOptimizer.h */,
+				D55AC4F61E61EAB900BBA0D1 /* FEOptimizeData.cpp */,
+				D55AC4F71E61EAB900BBA0D1 /* FEOptimizeData.h */,
+				D55AC4F81E61EAB900BBA0D1 /* FEOptimizeInput.cpp */,
+				D55AC4F91E61EAB900BBA0D1 /* FEOptimizeInput.h */,
+				D55AC4FA1E61EAB900BBA0D1 /* FEOptimizeMethod.h */,
 				D5307A2E18B406B8008C8463 /* FEPowellOptimizeMethod.cpp */,
 				D5307A2F18B406B8008C8463 /* FEPowellOptimizeMethod.h */,
 				D5307A3018B406B8008C8463 /* FEScanOptimizeMethod.cpp */,
@@ -104,12 +113,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				D5307A4218B406B8008C8463 /* stdafx.h in Headers */,
+				D55AC4FE1E61EAB900BBA0D1 /* FEOptimizeInput.h in Headers */,
+				D55AC4FC1E61EAB900BBA0D1 /* FEOptimizeData.h in Headers */,
 				D5307A3F18B406B8008C8463 /* FEPowellOptimizeMethod.h in Headers */,
 				D5307A4318B406B8008C8463 /* targetver.h in Headers */,
 				D5307A3918B406B8008C8463 /* FELMOptimizeMethod.h in Headers */,
 				D5307A3518B406B8008C8463 /* FEBioOpt.h in Headers */,
+				D55AC4FF1E61EAB900BBA0D1 /* FEOptimizeMethod.h in Headers */,
 				D5307A4118B406B8008C8463 /* FEScanOptimizeMethod.h in Headers */,
-				D5307A3D18B406B8008C8463 /* FEOptimizer.h in Headers */,
 				D5307A3B18B406B8008C8463 /* FEOptimize.h in Headers */,
 				D5307A3718B406B8008C8463 /* FEConstrainedLMOptimizeMethod.h in Headers */,
 			);
@@ -166,11 +177,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D55AC4FD1E61EAB900BBA0D1 /* FEOptimizeInput.cpp in Sources */,
 				D5307A4018B406B8008C8463 /* FEScanOptimizeMethod.cpp in Sources */,
 				D5307A3818B406B8008C8463 /* FELMOptimizeMethod.cpp in Sources */,
 				D5307A3E18B406B8008C8463 /* FEPowellOptimizeMethod.cpp in Sources */,
-				D5307A3C18B406B8008C8463 /* FEOptimizer.cpp in Sources */,
 				D5307A3618B406B8008C8463 /* FEConstrainedLMOptimizeMethod.cpp in Sources */,
+				D55AC4FB1E61EAB900BBA0D1 /* FEOptimizeData.cpp in Sources */,
 				D5307A3418B406B8008C8463 /* FEBioOpt.cpp in Sources */,
 				D5307A3A18B406B8008C8463 /* FEOptimize.cpp in Sources */,
 			);
