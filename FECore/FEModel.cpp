@@ -521,65 +521,57 @@ FETimeInfo FEModel::GetTime()
 
 //-----------------------------------------------------------------------------
 //! Return a pointer to the named variable
+//! This function returns a pointer to a named variable.
 
-//! This function returns a pointer to a named variable. Currently, we only
-//! support names of the form:
-//!		material_name.parameter_name
-//!		material_name.elastic.parameter_name (nested material)
-//!		material_name.solid_name.parameter_name (solid mixture)
-//!		material_name.solid.parameter_name (biphasic material)
-//!		material_name.permeability.parameter_name (biphasic material)
-//!		material_name.solid.solid_name.parameter_name (biphasic material with solid mixture)
-//! The 'material_name' is a user defined name for a material.
-//! The 'parameter_name' is the predefined name of the variable.
-//! The keywords 'elastic', 'solid', and 'permeability' must appear as shown.
-//! \todo perhaps I should use XPath to refer to material parameters ?
-
-double* FEModel::FindParameter(const char* szparam)
+double* FEModel::FindParameter(const ParamString& paramString)
 {
-	char szname[256];
-	strcpy(szname, szparam);
+	// make sure it starts with fem
+	if (paramString != "fem") return 0;
 
-	// get the material and parameter name
-	char* ch = strchr((char*)szname, '.');
-	if (ch == 0) return 0;
-	*ch = 0;
-	const char* szmat = szname;
-	const char* szvar = ch+1;
-
-	// find the material with the same name
-	FEMaterial* pmat = 0;
-	int nmat = -1;
-	for (int i=0; i<Materials(); ++i)
+	// see what the next reference is
+	ParamString next = paramString.next();
+	if (next == "material")
 	{
-		pmat = GetMaterial(i);
-		nmat = i;
-		if (strcmp(szmat, pmat->GetName()) == 0) break;
-		pmat = 0;
+		FEMaterial* mat = 0;
+		int id = next.Index();
+		if (id > 0) mat = GetMaterial(id - 1);
+		else if (next.IndexString()) mat = FindMaterial(next.IndexString());
+		if (mat != 0)
+		{
+			FEParam* param = mat->GetParameter(next.next());
+			if (param) return param->pvalue<double>(0);
+		}
 	}
-
-	// make sure we found a material with the same name
-	if (pmat == 0) return 0;
-
-	// if the variable is a vector, then we require an index
-	char* szarg = strchr((char*) szvar, '[');
-	int index = 0;
-	if (szarg)
+	else if (next == "rigidbody")
 	{
-		*szarg = 0; szarg++;
-		const char* ch = strchr(szarg, ']');
-		assert(ch);
-		index = atoi(szarg);
+		FEMaterial* mat = 0;
+		if (next.IndexString()) mat = FindMaterial(next.IndexString());
+		if ((mat != 0) && (mat->IsRigid()))
+		{
+			if (m_prs) return m_prs->FindParameter(mat->GetID() - 1, next.next(), 0);
+		}
 	}
-
-	// find the material parameter
-	ParamString sz(szvar);
-	FEParam* pp = pmat->GetParameter(sz);
-	if (pp) return pp->pvalue<double>(index);
-
-	// if we get here we didn't find
-	// Let's try the rigid system
-	if (m_prs) return m_prs->FindParameter(nmat, sz, index);
+	else if (next == "loadcurve")
+	{
+		FELoadCurve* lc = 0;
+		int id = next.Index();
+		if (id > 0) lc = GetLoadCurve(id - 1);
+		if (lc)
+		{
+			ParamString point = next.next();
+			if (point == "point")
+			{
+				int id = point.Index();
+				if ((id > 0)&&(id <= lc->Points()))
+				{
+					LOADPOINT& lp = lc->LoadPoint(id - 1);
+					ParamString param = point.next();
+					if (param == "time") return &lp.time;
+					else if (param == "value") return &lp.value;
+				}
+			}
+		}
+	}
 
 	// oh, oh, we didn't find it
 	return 0;

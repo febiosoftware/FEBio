@@ -34,6 +34,7 @@ bool FEPlotMaterialParameter::SetFilter(const char* sz)
 
 //-----------------------------------------------------------------------------
 // The Save function stores the material parameter data to the plot file.
+// TODO: use ParamString
 bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
 {
 	// First, get the domain material
@@ -42,10 +43,6 @@ bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
 
 	// check the name of this material
 	if (strcmp(pmat->GetName(), m_szmat) != 0) return false;
-
-	// setup the parameter string which is a way
-	// to reference a specific parameter
-	ParamString s(m_szparam);
 
 	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
 

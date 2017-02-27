@@ -47,86 +47,13 @@ bool FEModelParameter::SetValue(double newValue)
 
 //=============================================================================
 
-//-------------------------------------------------------------------
-bool fecb(FEModel* pmdl, unsigned int nwhen, void* pd)
-{
-	// get the optimizaton data
-	FEObjectiveFunction& obj = *((FEObjectiveFunction*)pd);
-
-	// get the FEM data
-	FEModel& fem = *obj.GetFEM();
-
-	// get the current time value
-	double time = fem.m_ftime;
-
-	// evaluate the current reaction force value
-	double value = *(obj.m_pd);
-
-	// add the data pair to the loadcurve
-	FELoadCurve& lc = obj.ReactionLoad();
-	lc.Add(time, value);
-
-	return true;
-}
-
-FEObjectiveFunction::FEObjectiveFunction(FEModel* fem) : m_fem(fem)
-{
-	
-}
-
-bool FEObjectiveFunction::Init()
-{
-	// make sure we have a model
-	if (m_fem == 0) return false;
-
-	// find all the parameters
-	m_pd = m_fem->FindParameter(m_szname);
-	if (m_pd == 0) return false;
-
-	// register callback
-	m_fem->AddCallback(fecb, CB_INIT | CB_MAJOR_ITERS, (void*) this);
-
-	return true;
-}
-
-void FEObjectiveFunction::Reset()
-{
-	FELoadCurve& lc = ReactionLoad();
-	lc.Clear();
-}
-
-double FEObjectiveFunction::Evaluate(vector<double>& y)
-{
-	FELoadCurve& lc = GetLoadCurve(m_nlc);
-	int ndata = lc.Points();
-	y.resize(ndata);
-
-	double chisq = 0.0;
-	FELoadCurve& rlc = ReactionLoad();
-	felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
-	for (int i = 0; i<ndata; ++i)
-	{
-		double xi = lc.LoadPoint(i).time;
-		double y0i = lc.LoadPoint(i).value;
-
-		y[i] = rlc.Value(xi);
-		double dy = (y[i] - y0i);
-		chisq += dy*dy;
-		felog.printf("%5d: %15.10lg %15.10lg %15lg\n", i + 1, y[i], y0i, fabs(y[i] - y0i));
-	}
-	felog.printf("objective value: %lg\n", chisq);
-
-	return chisq;
-}
-
-//=============================================================================
-
 //-----------------------------------------------------------------------------
-FEOptimizeData::FEOptimizeData(FEModel& fem) : m_fem(fem), m_obj(&fem)
+FEOptimizeData::FEOptimizeData(FEModel& fem) : m_fem(fem)
 {
 	m_pSolver = 0;
 	m_pTask = 0;
 	m_niter = 0;
+	m_obj = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -148,7 +75,8 @@ bool FEOptimizeData::Init()
 	if (m_pTask->Init(0) == false) return false;
 
 	// initialize the objective function
-	if (m_obj.Init() == false) return false;
+	if (m_obj == 0) return false;
+	if (m_obj->Init() == false) return false;
 
 	// don't plot anything
 	m_fem.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);

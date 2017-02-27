@@ -3,7 +3,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/Logfile.h"
 #include "FECore/FECoreTask.h"
-#include "FECore/LoadCurve.h"
+#include "FEObjectiveFunction.h"
 #include <vector>
 #include <string>
 using namespace std;
@@ -87,45 +87,6 @@ struct OPT_LIN_CONSTRAINT
 };
 
 //=============================================================================
-//! This class evaluates the objective function
-class FEObjectiveFunction
-{
-public:
-	FEObjectiveFunction(FEModel* fem);
-
-	// one-time initialization
-	bool Init();
-
-	// call before the next FESolve
-	void Reset();
-
-	// evaluate objective function
-	// also returns the measurement vector in y
-	double Evaluate(vector<double>& y);
-
-	// return the FE model
-	FEModel* GetFEM() { return m_fem; }
-
-public:
-	char	m_szname[128];	//!< name of objective
-	double*	m_pd;			//!< pointer to variable data
-	int		m_nlc;			//!< load curve
-
-	//! add a loadcurve
-	void AddLoadCurve(FELoadCurve* plc) { m_LC.push_back(plc); }
-
-	FELoadCurve& ReactionLoad() { return m_rf; }
-
-	FELoadCurve& GetLoadCurve(int n) { return *m_LC[n]; }
-
-public:
-	FEModel*	m_fem;
-	FELoadCurve	m_rf;		//!< reaction force data
-
-	std::vector<FELoadCurve*>	m_LC;	//!< load curves. (TODO: Not sure why there can be more than one)
-};
-
-//=============================================================================
 //! optimization analyses
 //! 
 class FEOptimizeData
@@ -170,8 +131,9 @@ public:
 	//! return a linear constraint
 	OPT_LIN_CONSTRAINT& Constraint(int i) { return m_LinCon[i]; }
 
-	FEObjectiveFunction& GetObjective() { return m_obj; }
+	FEObjectiveFunction& GetObjective() { return *m_obj; }
 
+	void SetObjective(FEObjectiveFunction* obj) { m_obj = obj; }
 
 	void SetSolver(FEOptimizeMethod* po) { m_pSolver = po; }
 
@@ -185,7 +147,7 @@ public:
 protected:
 	FEModel&	m_fem;
 
-	FEObjectiveFunction	m_obj;		//!< the objective function
+	FEObjectiveFunction*	m_obj;		//!< the objective function
 
 	FEOptimizeMethod*	m_pSolver;
 

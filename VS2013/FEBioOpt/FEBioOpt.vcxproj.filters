@@ -51,6 +51,9 @@
     <ClInclude Include="..\..\FEBioOpt\FEOptimizeData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioOpt\FEObjectiveFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioOpt\FEBioOpt.cpp">
@@ -75,6 +78,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioOpt\FEOptimizeData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioOpt\FEObjectiveFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

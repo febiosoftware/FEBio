@@ -56,12 +56,10 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vecto
 	m_pOpt = pOpt;
 	FEOptimizeData& opt = *pOpt;
 
-	int i;
-
 	// set the variables
 	int ma = opt.InputParameters();
 	vector<double> a(ma);
-	for (i=0; i<ma; ++i)
+	for (int i=0; i<ma; ++i)
 	{
 		FEInputParameter& var = *opt.GetInputParameter(i);
 		a[i] = var.GetValue();
@@ -69,19 +67,17 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vecto
 
 	// set the data
 	FEObjectiveFunction& obj = opt.GetObjective();
-	FELoadCurve& lc = obj.GetLoadCurve(obj.m_nlc);
-	int ndata = lc.Points();
+	int ndata = obj.Measurements();
 	vector<double> x(ndata), y(ndata);
-	for (i=0; i<ndata; ++i) 
-	{
-		x[i] = lc.LoadPoint(i).time;
-		y[i] = lc.LoadPoint(i).value;
-	}
+	obj.GetMeasurements(y);
+
+	// we don't really need x so we create a dummy array
+	for (int i = 0; i<ndata; ++i) x[i] = i;
 
 	// set the sigma's
 	// for now we set them all to 1
 	vector<double> sig(ndata);
-	for (i=0; i<ndata; ++i) sig[i] = 1;
+	for (int i = 0; i<ndata; ++i) sig[i] = 1;
 
 	// allocate matrices
 	matrix covar(ma, ma), alpha(ma, ma);

@@ -65,66 +65,24 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 	// get the optimization data
 	FEOptimizeData& opt = *m_pOpt;
 
-	// increase iterator counter
-	opt.m_niter++;
-
-	// get the FEM data
-	FEModel& fem = opt.GetFEM();
-
-	// reset reaction force data
-	FEObjectiveFunction& obj = opt.GetObjective();
-	FELoadCurve& lc = obj.ReactionLoad();
-	lc.Clear();
-
-	felog.printf("\n----- Iteration: %d -----\n", opt.m_niter);
-
 	// set the input parameters
 	int nvar = opt.InputParameters();
-	for (int i=0; i<nvar; ++i)
-	{
-		FEInputParameter& var = *opt.GetInputParameter(i);
-		var.SetValue(p[i]);
-		string name = var.GetName();
-		felog.printf("  %-15s: %.16lg\n", name.c_str(), p[i]);
-	}
+	vector<double> a(nvar);
+	for (int i=0; i<nvar; ++i) a[i] = p[i];
 
-	// reset the FEM data
-	fem.Reset();
-
-	// suppress output
-	felog.SetMode(Logfile::LOG_NEVER);
-
-	double fobj = 0;
-
-	if (m_pOpt->RunTask() == false)
+	// solve the FE problem with the new parameters
+	if (opt.FESolve(a) == false)
 	{
 		felog.printf("\n\n\nAAAAAAAAARRRRRRRRRGGGGGGGGHHHHHHHHHHH !!!!!!!!!!!!!\n\n\n\n");
 		return 0;
 	}
 	else
 	{
-		felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-
-		// evaluate reaction forces at correct times
+		// evaluate objective function
 		FEObjectiveFunction& obj = opt.GetObjective();
-		FELoadCurve& rlc = obj.ReactionLoad();
-		FELoadCurve& olc = obj.GetLoadCurve(obj.m_nlc);
-
-		felog.printf("\n\tFunction values:\n\n");
-		felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
-		for (int i=0; i<olc.Points(); ++i)
-		{
-			LOADPOINT& p = olc.LoadPoint(i);
-
-			double f = rlc.Value(p.time);
-			fobj += (f - p.value)*(f - p.value);
-			felog.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, f, p.value, fabs(f - p.value));
-		}
+		double fobj = obj.Evaluate();
+		return fobj;
 	}
-
-	felog.printf("\n objective function: %.16lg\n", fobj);
-
-	return fobj;
 }
 
 //=============================================================================

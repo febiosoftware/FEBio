@@ -523,7 +523,7 @@ int Run(CMDOPTIONS& ops)
 	// initialize the task
 	if (ptask->Init(ops.szctrl) == false)
 	{
-		fprintf(stderr, "Failed initializing the task: %s", ops.sztask);
+		fprintf(stderr, "Failed initializing the task: %s\n", ops.sztask);
 		return 1;
 	}
 

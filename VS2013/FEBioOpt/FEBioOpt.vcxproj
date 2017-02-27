@@ -400,6 +400,7 @@
     <ClInclude Include="..\..\FEBioOpt\FEBioOpt.h" />
     <ClInclude Include="..\..\FEBioOpt\FEConstrainedLMOptimizeMethod.h" />
     <ClInclude Include="..\..\FEBioOpt\FELMOptimizeMethod.h" />
+    <ClInclude Include="..\..\FEBioOpt\FEObjectiveFunction.h" />
     <ClInclude Include="..\..\FEBioOpt\FEOptimize.h" />
     <ClInclude Include="..\..\FEBioOpt\FEOptimizeData.h" />
     <ClInclude Include="..\..\FEBioOpt\FEOptimizeInput.h" />
@@ -413,6 +414,7 @@
     <ClCompile Include="..\..\FEBioOpt\FEBioOpt.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEConstrainedLMOptimizeMethod.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FELMOptimizeMethod.cpp" />
+    <ClCompile Include="..\..\FEBioOpt\FEObjectiveFunction.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEOptimize.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEOptimizeData.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEOptimizeInput.cpp" />

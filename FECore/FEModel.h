@@ -249,7 +249,7 @@ public: // --- parameter functions ---
 	bool EvaluateParameterList(FECoreBase* pc);
 
 	//! return a pointer to the named variable
-	double* FindParameter(const char* szname);
+	double* FindParameter(const ParamString& param);
 
 public:	// --- Miscellaneous routines ---
 

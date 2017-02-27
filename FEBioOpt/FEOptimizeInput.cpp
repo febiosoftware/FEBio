@@ -90,6 +90,14 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 	XMLTag tag;
 	if (xml.FindTag("febio_optimize", tag) == false) return false;
 
+	// check for the version attribute
+	const char* szversion = tag.AttributeValue("version", true);
+	if ((szversion == 0) || (strcmp(szversion, "1.0") != 0))
+	{
+		fprintf(stderr, "\nFATAL ERROR: Invalid version number for febio_optimize!\n\n");
+		return false;
+	}
+
 	FEOptimizeData& opt = *pOpt;
 
 	// parse the file
@@ -99,13 +107,12 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		bool bret = true;
 		do
 		{
-			if (tag == "Model"); // No longer used, but included for backwards compatibility
-			else if (tag == "Task") bret = ParseTask(tag, opt);
-			else if (tag == "Options") bret = ParseOptions(tag, opt);
-			else if (tag == "Function") bret = ParseObjective(tag, opt);
-			else if (tag == "Parameters") bret = ParseParameters(tag, opt);
+			if      (tag == "Task"       ) bret = ParseTask(tag, opt);
+			else if (tag == "Options"    ) bret = ParseOptions(tag, opt);
+			else if (tag == "Objective"  ) bret = ParseObjective(tag, opt);
+			else if (tag == "Parameters" ) bret = ParseParameters(tag, opt);
 			else if (tag == "Constraints") bret = ParseConstraints(tag, opt);
-			else if (tag == "LoadData") bret = ParseLoadData(tag, opt);
+			else if (tag == "LoadData"   ) bret = ParseLoadData(tag, opt);
 			else throw XMLReader::InvalidTag(tag);
 
 			if (bret == false) return false;
@@ -210,18 +217,19 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 {
 	FEModel& fem = opt.GetFEM();
 
-	FEObjectiveFunction& obj = opt.GetObjective();
+	FEDataFitObjective* obj = new FEDataFitObjective(&fem);
+	opt.SetObjective(obj);
 
 	++tag;
 	do
 	{
 		if (tag == "fnc")
 		{
-			tag.value(obj.m_szname);
+			tag.value(obj->m_szname);
 
 			// get the loadcurve for this objective function
-			tag.AttributeValue("lc", obj.m_nlc);
-			obj.m_nlc--;
+			tag.AttributeValue("lc", obj->m_nlc);
+			obj->m_nlc--;
 		}
 		else throw XMLReader::InvalidTag(tag);
 
@@ -366,7 +374,13 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 				plc->Create(nlp);
 				plc->SetInterpolation(ntype);
 				plc->SetExtendMode(nextm);
-				obj.AddLoadCurve(plc);
+
+				// TODO: This is a hack. Find a better way
+				if (dynamic_cast<FEDataFitObjective*>(&obj))
+				{
+					(dynamic_cast<FEDataFitObjective*>(&obj))->AddLoadCurve(plc);
+				}
+				
 
 				// set the load points
 				for (int i = 0; i<nlp; ++i)
@@ -387,7 +401,12 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 				plc->Create(nlp);
 				plc->SetInterpolation(ntype);
 				plc->SetExtendMode(nextm);
-				obj.AddLoadCurve(plc);
+
+				// TODO: This is a hack. Find a better way
+				if (dynamic_cast<FEDataFitObjective*>(&obj))
+				{
+					(dynamic_cast<FEDataFitObjective*>(&obj))->AddLoadCurve(plc);
+				}
 
 				// read the points
 				double d[2];

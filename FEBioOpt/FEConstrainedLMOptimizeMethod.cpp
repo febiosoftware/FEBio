@@ -26,20 +26,15 @@ void clevmar_cb(double *p, double *hx, int m, int n, void *adata)
 
 	// get the optimization data
 	FEOptimizeData& opt = *pLM->GetOptimizeData();
-
-	// set the variables
-	vector<double> a(m);
-	for (int i=0; i<m; ++i) a[i] = p[i];
-
-	// set the data
 	FEObjectiveFunction& obj = opt.GetObjective();
-	FELoadCurve& lc = obj.GetLoadCurve(obj.m_nlc);
-	vector<double> y(n, 0.0);
-	
+
 	// evaluate at a
+	vector<double> a(m);
+	for (int i = 0; i<m; ++i) a[i] = p[i];
 	if (opt.FESolve(a) == false) throw FEErrorTermination();
 
 	// store the measurement vector
+	vector<double> y(n, 0.0);
 	opt.GetObjective().Evaluate(y);
 	for (int i=0; i<n; ++i) hx[i] = y[i];
 
@@ -72,16 +67,11 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 		a[i] = var.GetValue();
 	}
 
-	// set the data
+	// get the data
 	FEObjectiveFunction& obj = opt.GetObjective();
-	FELoadCurve& lc = obj.GetLoadCurve(obj.m_nlc);
-	int ndata = lc.Points();
-	vector<double> x(ndata), y(ndata);
-	for (int i=0; i<ndata; ++i) 
-	{
-		x[i] = lc.LoadPoint(i).time;
-		y[i] = lc.LoadPoint(i).value;
-	}
+	int ndata = obj.Measurements();
+	vector<double> y(ndata, 0);
+	obj.GetMeasurements(y);
 
 	// set the sigma's
 	// for now we set them all to 1

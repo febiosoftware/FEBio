@@ -503,6 +503,7 @@
     <ClInclude Include="..\..\FECore\NLConstraintDataRecord.h" />
     <ClInclude Include="..\..\FECore\NodeDataRecord.h" />
     <ClInclude Include="..\..\FECore\ObjectDataRecord.h" />
+    <ClInclude Include="..\..\FECore\ParamString.h" />
     <ClInclude Include="..\..\FECore\quatd.h" />
     <ClInclude Include="..\..\FECore\RigidBC.h" />
     <ClInclude Include="..\..\FECore\SparseMatrix.h" />
@@ -626,6 +627,7 @@
     <ClCompile Include="..\..\FECore\NLConstraintDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\NodeDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\ObjectDataRecord.cpp" />
+    <ClCompile Include="..\..\FECore\ParamString.cpp" />
     <ClCompile Include="..\..\FECore\qsort.cpp" />
     <ClCompile Include="..\..\FECore\quatd.cpp" />
     <ClCompile Include="..\..\FECore\RigidBC.cpp" />
