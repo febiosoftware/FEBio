@@ -562,7 +562,8 @@ double* FEModel::FindParameter(const ParamString& paramString)
 		if (next.IndexString()) mat = FindMaterial(next.IndexString());
 		if ((mat != 0) && (mat->IsRigid()))
 		{
-			if (m_prs) return m_prs->FindParameter(mat->GetID() - 1, next.next(), 0);
+            ParamString nnext = next.next();
+			if (m_prs) return m_prs->FindParameter(mat->GetID() - 1, nnext, 0);
 		}
 	}
 	else if (next == "loadcurve")

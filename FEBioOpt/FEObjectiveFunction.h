@@ -1,6 +1,7 @@
 #pragma once
 #include <FECore/LoadCurve.h>
 #include <vector>
+#include <string>
 using namespace std;
 
 class FEModel;

@@ -21,6 +21,8 @@
 		D5307A4118B406B8008C8463 /* FEScanOptimizeMethod.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A3118B406B8008C8463 /* FEScanOptimizeMethod.h */; };
 		D5307A4218B406B8008C8463 /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A3218B406B8008C8463 /* stdafx.h */; };
 		D5307A4318B406B8008C8463 /* targetver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A3318B406B8008C8463 /* targetver.h */; };
+		D543AB6E1E676B3A00A72E7E /* FEObjectiveFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D543AB6C1E676B3A00A72E7E /* FEObjectiveFunction.cpp */; };
+		D543AB6F1E676B3A00A72E7E /* FEObjectiveFunction.h in Headers */ = {isa = PBXBuildFile; fileRef = D543AB6D1E676B3A00A72E7E /* FEObjectiveFunction.h */; };
 		D55AC4FB1E61EAB900BBA0D1 /* FEOptimizeData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55AC4F61E61EAB900BBA0D1 /* FEOptimizeData.cpp */; };
 		D55AC4FC1E61EAB900BBA0D1 /* FEOptimizeData.h in Headers */ = {isa = PBXBuildFile; fileRef = D55AC4F71E61EAB900BBA0D1 /* FEOptimizeData.h */; };
 		D55AC4FD1E61EAB900BBA0D1 /* FEOptimizeInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55AC4F81E61EAB900BBA0D1 /* FEOptimizeInput.cpp */; };
@@ -44,6 +46,8 @@
 		D5307A3118B406B8008C8463 /* FEScanOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEScanOptimizeMethod.h; sourceTree = "<group>"; };
 		D5307A3218B406B8008C8463 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
 		D5307A3318B406B8008C8463 /* targetver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = targetver.h; sourceTree = "<group>"; };
+		D543AB6C1E676B3A00A72E7E /* FEObjectiveFunction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEObjectiveFunction.cpp; sourceTree = "<group>"; };
+		D543AB6D1E676B3A00A72E7E /* FEObjectiveFunction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEObjectiveFunction.h; sourceTree = "<group>"; };
 		D55AC4F61E61EAB900BBA0D1 /* FEOptimizeData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOptimizeData.cpp; sourceTree = "<group>"; };
 		D55AC4F71E61EAB900BBA0D1 /* FEOptimizeData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOptimizeData.h; sourceTree = "<group>"; };
 		D55AC4F81E61EAB900BBA0D1 /* FEOptimizeInput.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOptimizeInput.cpp; sourceTree = "<group>"; };
@@ -87,6 +91,8 @@
 				D5307A2718B406B8008C8463 /* FEConstrainedLMOptimizeMethod.h */,
 				D5307A2818B406B8008C8463 /* FELMOptimizeMethod.cpp */,
 				D5307A2918B406B8008C8463 /* FELMOptimizeMethod.h */,
+				D543AB6C1E676B3A00A72E7E /* FEObjectiveFunction.cpp */,
+				D543AB6D1E676B3A00A72E7E /* FEObjectiveFunction.h */,
 				D5307A2A18B406B8008C8463 /* FEOptimize.cpp */,
 				D5307A2B18B406B8008C8463 /* FEOptimize.h */,
 				D55AC4F61E61EAB900BBA0D1 /* FEOptimizeData.cpp */,
@@ -119,6 +125,7 @@
 				D5307A4318B406B8008C8463 /* targetver.h in Headers */,
 				D5307A3918B406B8008C8463 /* FELMOptimizeMethod.h in Headers */,
 				D5307A3518B406B8008C8463 /* FEBioOpt.h in Headers */,
+				D543AB6F1E676B3A00A72E7E /* FEObjectiveFunction.h in Headers */,
 				D55AC4FF1E61EAB900BBA0D1 /* FEOptimizeMethod.h in Headers */,
 				D5307A4118B406B8008C8463 /* FEScanOptimizeMethod.h in Headers */,
 				D5307A3B18B406B8008C8463 /* FEOptimize.h in Headers */,
@@ -180,6 +187,7 @@
 				D55AC4FD1E61EAB900BBA0D1 /* FEOptimizeInput.cpp in Sources */,
 				D5307A4018B406B8008C8463 /* FEScanOptimizeMethod.cpp in Sources */,
 				D5307A3818B406B8008C8463 /* FELMOptimizeMethod.cpp in Sources */,
+				D543AB6E1E676B3A00A72E7E /* FEObjectiveFunction.cpp in Sources */,
 				D5307A3E18B406B8008C8463 /* FEPowellOptimizeMethod.cpp in Sources */,
 				D5307A3618B406B8008C8463 /* FEConstrainedLMOptimizeMethod.cpp in Sources */,
 				D55AC4FB1E61EAB900BBA0D1 /* FEOptimizeData.cpp in Sources */,

@@ -18,6 +18,8 @@
 		D5307A4818B40A6B008C8463 /* FENormalProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5307A4618B40A6B008C8463 /* FENormalProjection.cpp */; };
 		D5307A4918B40A6B008C8463 /* FENormalProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D5307A4718B40A6B008C8463 /* FENormalProjection.h */; };
 		D53AA13A1CB6E02C00849D8E /* mat6d.h in Headers */ = {isa = PBXBuildFile; fileRef = D53AA1391CB6E02C00849D8E /* mat6d.h */; };
+		D543AB721E676B5C00A72E7E /* ParamString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D543AB701E676B5C00A72E7E /* ParamString.cpp */; };
+		D543AB731E676B5C00A72E7E /* ParamString.h in Headers */ = {isa = PBXBuildFile; fileRef = D543AB711E676B5C00A72E7E /* ParamString.h */; };
 		D55E3AEF1C5BBEDD00815FCA /* DumpMemStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55E3AEC1C5BBEDD00815FCA /* DumpMemStream.cpp */; };
 		D55E3AF01C5BBEDD00815FCA /* DumpMemStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3AED1C5BBEDD00815FCA /* DumpMemStream.h */; };
 		D55E3AF11C5BBEDD00815FCA /* FEDataStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3AEE1C5BBEDD00815FCA /* FEDataStream.h */; };
@@ -271,6 +273,8 @@
 		D53AA1391CB6E02C00849D8E /* mat6d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mat6d.h; sourceTree = "<group>"; };
 		D53B72D51BA9000A000F572F /* FEInitialCondition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEInitialCondition.cpp; sourceTree = "<group>"; };
 		D53B72D61BA9000A000F572F /* FEInitialCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEInitialCondition.h; sourceTree = "<group>"; };
+		D543AB701E676B5C00A72E7E /* ParamString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParamString.cpp; sourceTree = "<group>"; };
+		D543AB711E676B5C00A72E7E /* ParamString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParamString.h; sourceTree = "<group>"; };
 		D55E3AEC1C5BBEDD00815FCA /* DumpMemStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DumpMemStream.cpp; sourceTree = "<group>"; };
 		D55E3AED1C5BBEDD00815FCA /* DumpMemStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DumpMemStream.h; sourceTree = "<group>"; };
 		D55E3AEE1C5BBEDD00815FCA /* FEDataStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDataStream.h; sourceTree = "<group>"; };
@@ -747,6 +751,8 @@
 				D5E10A6D1865E15900B23922 /* NodeDataRecord.h */,
 				D5E10A6E1865E15900B23922 /* ObjectDataRecord.cpp */,
 				D5E10A6F1865E15900B23922 /* ObjectDataRecord.h */,
+				D543AB701E676B5C00A72E7E /* ParamString.cpp */,
+				D543AB711E676B5C00A72E7E /* ParamString.h */,
 				D5E10A701865E15900B23922 /* qsort.cpp */,
 				D596022F195B65E6000A675D /* quatd.cpp */,
 				D5E10A711865E15900B23922 /* quatd.h */,
@@ -849,6 +855,7 @@
 				D5E10ADC1865E15900B23922 /* FESolidDomain.h in Headers */,
 				D5E10AFD1865E15900B23922 /* NodeDataRecord.h in Headers */,
 				D55E3B031C64091700815FCA /* FEEdge.h in Headers */,
+				D543AB731E676B5C00A72E7E /* ParamString.h in Headers */,
 				D5E10B091865E15900B23922 /* tens4d.hpp in Headers */,
 				D5E10A8B1865E15900B23922 /* DumpStream.h in Headers */,
 				D5CFC84B1BD5C03700E214CC /* FEBroydenStrategy.h in Headers */,
@@ -1095,6 +1102,7 @@
 				D50E7EB71992EB8300950744 /* eig3.cpp in Sources */,
 				D5E10AE51865E15900B23922 /* FETrussDomain.cpp in Sources */,
 				D5E10A881865E15900B23922 /* DumpFile.cpp in Sources */,
+				D543AB721E676B5C00A72E7E /* ParamString.cpp in Sources */,
 				D5E10AA01865E15900B23922 /* FECore.cpp in Sources */,
 				D5A0A8F0186F4AC60046B0DE /* DOFS.cpp in Sources */,
 				D5222BF11CF743AF00F0E505 /* FEDataArray.cpp in Sources */,
