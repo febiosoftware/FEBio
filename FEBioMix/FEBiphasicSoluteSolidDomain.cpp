@@ -12,7 +12,7 @@
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
-FEBiphasicSoluteSolidDomain::FEBiphasicSoluteSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEBiphasicSoluteDomain(pfem)
+FEBiphasicSoluteSolidDomain::FEBiphasicSoluteSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicSoluteDomain(pfem)
 {
 }
 

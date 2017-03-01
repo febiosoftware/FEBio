@@ -452,7 +452,7 @@ void FEElasticSolidDomain2O::UpdateInternalSurfaceStresses()
 				FESolidElement& ek = Element(face.m_elem[k]);
 
 				// evaluate deformation gradient, Jacobian and Hessian for this element
-				pt.m_J = FESolidDomain::defgrad(ek, pt.m_F, ksi.x, ksi.y, ksi.z);
+				pt.m_J = defgrad(ek, pt.m_F, ksi.x, ksi.y, ksi.z);
 				defhess(ek, ksi.x, ksi.y, ksi.z, pt2O.m_G);
 
 				// evaluate stresses at this integration point

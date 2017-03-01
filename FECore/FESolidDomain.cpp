@@ -1,7 +1,17 @@
 #include "stdafx.h"
 #include "FESolidDomain.h"
-#include "FEMesh.h"
 #include "FEMaterial.h"
+
+//-----------------------------------------------------------------------------
+FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, &pfem->GetMesh())
+{
+    m_dofx = pfem->GetDOFIndex("x");
+    m_dofy = pfem->GetDOFIndex("y");
+    m_dofz = pfem->GetDOFIndex("z");
+    m_dofu = pfem->GetDOFIndex("u");
+    m_dofv = pfem->GetDOFIndex("v");
+    m_dofw = pfem->GetDOFIndex("w");
+}
 
 //-----------------------------------------------------------------------------
 void FESolidDomain::Create(int nsize, int elemType)
@@ -175,7 +185,17 @@ double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, int n)
 	vec3d r[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) r[i] = m_pMesh->Node(el.m_node[i]).m_rt;
 
-	// calculate inverse jacobian
+    // check for solid-shell interface nodes
+    if (el.m_bitfc.size()) {
+        for (i=0; i<neln; ++i) {
+            if (el.m_bitfc[i]) {
+                FENode& nd = m_pMesh->Node(el.m_node[i]);
+                r[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofu, m_dofv, m_dofw);
+            }
+        }
+    }
+    
+    // calculate inverse jacobian
 	double Ji[3][3];
 	invjac0(el, Ji, n);
 
@@ -227,6 +247,16 @@ double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, double r, double s, 
 	vec3d rt[FEElement::MAX_NODES];
 	for (int i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
 
+    // check for solid-shell interface nodes
+    if (el.m_bitfc.size()) {
+        for (int i=0; i<neln; ++i) {
+            if (el.m_bitfc[i]) {
+                FENode& nd = m_pMesh->Node(el.m_node[i]);
+                rt[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofu, m_dofv, m_dofw);
+            }
+        }
+    }
+    
 	// calculate inverse jacobian
 	double Ji[3][3];
 	invjac0(el, Ji, r, s, t);
@@ -276,6 +306,16 @@ double FESolidDomain::invjac0(const FESolidElement& el, double Ji[3][3], int n)
 	vec3d r0[FEElement::MAX_NODES];
 	for (int i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
 
+    // check for solid-shell interface nodes
+    if (el.m_bitfc.size()) {
+        for (int i=0; i<neln; ++i) {
+            if (el.m_bitfc[i]) {
+                FENode& nd = m_pMesh->Node(el.m_node[i]);
+                r0[i] -= nd.m_d0;
+            }
+        }
+    }
+    
 	// calculate Jacobian
 	double J[3][3] = {0};
 	for (int i=0; i<neln; ++i)
@@ -333,6 +373,16 @@ double FESolidDomain::invjac0(const FESolidElement& el, double Ji[3][3], double 
 	vec3d r0[NMAX];
 	for (int i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
 
+    // check for solid-shell interface nodes
+    if (el.m_bitfc.size()) {
+        for (int i=0; i<neln; ++i) {
+            if (el.m_bitfc[i]) {
+                FENode& nd = m_pMesh->Node(el.m_node[i]);
+                r0[i] -= nd.m_d0;
+            }
+        }
+    }
+    
 	// evaluate shape function derivatives
 	double Gr[NMAX], Gs[NMAX], Gt[NMAX];
 	el.shape_deriv(Gr, Gs, Gt, r, s, t);
@@ -404,6 +454,16 @@ double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], int n)
 	vec3d rt[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
 
+    // check for solid-shell interface nodes
+    if (el.m_bitfc.size()) {
+        for (i=0; i<neln; ++i) {
+            if (el.m_bitfc[i]) {
+                FENode& nd = m_pMesh->Node(el.m_node[i]);
+                rt[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofu, m_dofv, m_dofw);
+            }
+        }
+    }
+    
 	// calculate jacobian
 	double J[3][3] = {0};
 	for (i=0; i<neln; ++i)
@@ -461,6 +521,16 @@ double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], double r, dou
 	vec3d r0[NMAX];
 	for (int i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_rt;
 
+    // check for solid-shell interface nodes
+    if (el.m_bitfc.size()) {
+        for (int i=0; i<neln; ++i) {
+            if (el.m_bitfc[i]) {
+                FENode& nd = m_pMesh->Node(el.m_node[i]);
+                r0[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofu, m_dofv, m_dofw);
+            }
+        }
+    }
+    
 	// evaluate shape function derivatives
 	double Gr[NMAX], Gs[NMAX], Gt[NMAX];
 	el.shape_deriv(Gr, Gs, Gt, r, s, t);
@@ -633,6 +703,16 @@ double FESolidDomain::detJt(FESolidElement &el, int n)
 	vec3d rt[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
 
+    // check for solid-shell interface nodes
+    if (el.m_bitfc.size()) {
+        for (i=0; i<neln; ++i) {
+            if (el.m_bitfc[i]) {
+                FENode& nd = m_pMesh->Node(el.m_node[i]);
+                rt[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofu, m_dofv, m_dofw);
+            }
+        }
+    }
+    
 	// shape function derivatives
 	double* Grn = el.Gr(n);
 	double* Gsn = el.Gs(n);
@@ -674,6 +754,16 @@ double FESolidDomain::detJ0(FESolidElement &el, int n)
 	vec3d r0[FEElement::MAX_NODES];
 	for (int i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
 
+    // check for solid-shell interface nodes
+    if (el.m_bitfc.size()) {
+        for (int i=0; i<neln; ++i) {
+            if (el.m_bitfc[i]) {
+                FENode& nd = m_pMesh->Node(el.m_node[i]);
+                r0[i] -= nd.m_d0;
+            }
+        }
+    }
+    
 	// shape function derivatives
 	double* Grn = el.Gr(n);
 	double* Gsn = el.Gs(n);
@@ -720,13 +810,26 @@ void FESolidDomain::CoBaseVectors(FESolidElement& el, int j, vec3d g[3])
     double* Hs = el.Gs(j);
     double* Ht = el.Gt(j);
     
+    // nodal coordinates
+    vec3d rt[FEElement::MAX_NODES];
+    for (int i=0; i<n; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+    
+    // check for solid-shell interface nodes
+    if (el.m_bitfc.size()) {
+        for (int i=0; i<n; ++i) {
+            if (el.m_bitfc[i]) {
+                FENode& nd = m_pMesh->Node(el.m_node[i]);
+                rt[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofu, m_dofv, m_dofw);
+            }
+        }
+    }
+    
     g[0] = g[1] = g[2] = vec3d(0,0,0);
     for (int i=0; i<n; ++i)
     {
-        vec3d rt = m.Node(el.m_node[i]).m_rt;
-        g[0] += rt*Hr[i];
-        g[1] += rt*Hs[i];
-        g[2] += rt*Ht[i];
+        g[0] += rt[i]*Hr[i];
+        g[1] += rt[i]*Hs[i];
+        g[2] += rt[i]*Ht[i];
     }
 }
 

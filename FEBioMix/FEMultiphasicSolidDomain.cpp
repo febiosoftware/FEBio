@@ -18,7 +18,7 @@
 #endif
 
 //-----------------------------------------------------------------------------
-FEMultiphasicSolidDomain::FEMultiphasicSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEMultiphasicDomain(pfem)
+FEMultiphasicSolidDomain::FEMultiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEMultiphasicDomain(pfem)
 {
     m_pMat = 0;
     m_dofP = pfem->GetDOFIndex("p");

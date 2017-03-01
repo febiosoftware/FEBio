@@ -11,7 +11,7 @@
 //! constructor
 //! Some derived classes will pass 0 to the pmat, since the pmat variable will be
 //! to initialize another material. These derived classes will set the m_pMat variable as well.
-FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
+FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
 }
@@ -979,70 +979,4 @@ void FEElasticSolidDomain::InertialForces2(FEGlobalVector& R, vector<double>& F)
         // assemble fe into R
         R.Assemble(el.m_node, lm, fe);
     }
-}
-
-//-----------------------------------------------------------------------------
-//! Calculate the deformation gradient of element el at integration point n.
-//! The deformation gradient is returned in F and its determinant is the return
-//! value of the function
-double FEElasticSolidDomain::defgrad(FESolidElement &el, mat3d &F, int n)
-{
-    int i;
-    
-    // number of nodes
-    int neln = el.Nodes();
-    
-    // shape function derivatives
-    double *Grn = el.Gr(n);
-    double *Gsn = el.Gs(n);
-    double *Gtn = el.Gt(n);
-    
-    // nodal points
-    vec3d r[FEElement::MAX_NODES];
-    for (i=0; i<neln; ++i) r[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-    
-    // check for solid-shell interface nodes
-    if (el.m_bitfc.size()) {
-        for (i=0; i<neln; ++i) {
-            if (el.m_bitfc[i]) {
-                FENode& nd = m_pMesh->Node(el.m_node[i]);
-                r[i] -= nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
-            }
-        }
-    }
-    
-    // calculate inverse jacobian
-    double Ji[3][3];
-    invjac0(el, Ji, n);
-    
-    // calculate deformation gradient
-    F[0][0] = F[0][1] = F[0][2] = 0;
-    F[1][0] = F[1][1] = F[1][2] = 0;
-    F[2][0] = F[2][1] = F[2][2] = 0;
-    for (i=0; i<neln; ++i)
-    {
-        double Gri = Grn[i];
-        double Gsi = Gsn[i];
-        double Gti = Gtn[i];
-        
-        double x = r[i].x;
-        double y = r[i].y;
-        double z = r[i].z;
-        
-        // calculate global gradient of shape functions
-        // note that we need the transposed of Ji, not Ji itself !
-        double GX = Ji[0][0]*Gri+Ji[1][0]*Gsi+Ji[2][0]*Gti;
-        double GY = Ji[0][1]*Gri+Ji[1][1]*Gsi+Ji[2][1]*Gti;
-        double GZ = Ji[0][2]*Gri+Ji[1][2]*Gsi+Ji[2][2]*Gti;
-        
-        // calculate deformation gradient F
-        F[0][0] += GX*x; F[0][1] += GY*x; F[0][2] += GZ*x;
-        F[1][0] += GX*y; F[1][1] += GY*y; F[1][2] += GZ*y;
-        F[2][0] += GX*z; F[2][1] += GY*z; F[2][2] += GZ*z;
-    }
-    
-    double D = F.det();
-    if (D <= 0) throw NegativeJacobian(el.GetID(), n, D, &el);
-    
-    return D;
 }

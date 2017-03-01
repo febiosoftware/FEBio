@@ -10,7 +10,7 @@ FELinearElasticDomain::FELinearElasticDomain(FEModel* pfem)
 
 //-----------------------------------------------------------------------------
 //! constructor
-FELinearSolidDomain::FELinearSolidDomain(FEModel* pfem, FEMaterial* pmat) : FESolidDomain(&pfem->GetMesh()), FELinearElasticDomain(pfem)
+FELinearSolidDomain::FELinearSolidDomain(FEModel* pfem, FEMaterial* pmat) : FESolidDomain(pfem), FELinearElasticDomain(pfem)
 {
 	m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
 	assert(false);

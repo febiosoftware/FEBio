@@ -1,5 +1,6 @@
 #pragma once
 #include "FEDomain.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 //! abstract base class for 3D volumetric elements
@@ -7,7 +8,7 @@ class FESolidDomain : public FEDomain
 {
 public:
 	//! constructor
-	FESolidDomain(FEMesh* pm) : FEDomain(FE_DOMAIN_SOLID, pm) {}
+    FESolidDomain(FEModel* pfem);
 
 	//! create storage for elements
 	void Create(int nsize, int elemType);
@@ -98,4 +99,10 @@ public:
 
 protected:
 	vector<FESolidElement>	m_Elem;		//!< array of elements
+    int     m_dofx;
+    int     m_dofy;
+    int     m_dofz;
+    int     m_dofu;
+    int     m_dofv;
+    int     m_dofw;
 };
