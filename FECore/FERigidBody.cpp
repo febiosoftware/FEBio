@@ -17,6 +17,9 @@ BEGIN_PARAMETER_LIST(FERigidBody, FEObject);
 	ADD_PARAMETER(m_Mr.x, FE_PARAM_DOUBLE, "Mx");
 	ADD_PARAMETER(m_Mr.y, FE_PARAM_DOUBLE, "My");
 	ADD_PARAMETER(m_Mr.z, FE_PARAM_DOUBLE, "Mz");
+	ADD_PARAMETER(m_euler.x, FE_PARAM_DOUBLE, "eulerX");
+	ADD_PARAMETER(m_euler.y, FE_PARAM_DOUBLE, "eulerY");
+	ADD_PARAMETER(m_euler.z, FE_PARAM_DOUBLE, "eulerZ");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -44,6 +47,7 @@ FERigidBody::FERigidBody(FEModel* pfem) : FEObject(pfem)
     
 	// initialize orientation
 	m_qt = quatd(0, vec3d(0,0,1));
+	m_euler = vec3d(0,0,0);
     
     // initialize angular velocity and acceleration
     m_wt = m_alt = vec3d(0,0,0);
@@ -77,6 +81,7 @@ void FERigidBody::Reset()
     
 	// initialize orientation
 	m_qp = m_qt = quatd(0, vec3d(0,0,1));
+	m_euler = vec3d(0,0,0);
 
     // initialize angular velocity and acceleration
     m_wp = m_wt = vec3d(0,0,0);
@@ -255,7 +260,7 @@ void FERigidBody::Serialize(DumpStream& ar)
 			ar << m_rp << m_rt;
 			ar << m_vp << m_vt;
 			ar << m_ap << m_at;
-			ar << m_qp << m_qt;
+			ar << m_qp << m_qt << m_euler;
 			ar << m_wp << m_wt;
 			ar << m_alp << m_alt;
 			for (int i=0; i<6; ++i)
@@ -274,7 +279,7 @@ void FERigidBody::Serialize(DumpStream& ar)
 			ar >> m_rp >> m_rt;
 			ar >> m_vp >> m_vt;
 			ar >> m_ap >> m_at;
-			ar >> m_qp >> m_qt;
+			ar >> m_qp >> m_qt >> m_euler;
 			ar >> m_wp >> m_wt;
 			ar >> m_alp >> m_alt;
 			for (int i=0; i<6; ++i)
@@ -292,7 +297,7 @@ void FERigidBody::Serialize(DumpStream& ar)
 		{
 			ar << m_nID << m_mat << m_mass << m_moi << m_Fr << m_Mr;
 			ar << m_r0 << m_rt << m_rp << m_vt << m_vp << m_at << m_ap;
-			ar << m_qt << m_qp << m_wt << m_wp << m_alt << m_alp;
+			ar << m_qt << m_qp << m_euler << m_wt << m_wp << m_alt << m_alp;
 			ar << m_bpofr;
 			ar.write(m_BC , sizeof(int), 6);
 			ar.write(m_LM , sizeof(int), 6);
@@ -305,7 +310,7 @@ void FERigidBody::Serialize(DumpStream& ar)
 		{
 			ar >> m_nID >> m_mat >> m_mass >> m_moi >> m_Fr >> m_Mr;
 			ar >> m_r0 >> m_rt >> m_rp >> m_vt >> m_vp >> m_at >> m_ap;
-			ar >> m_qt >> m_qp >> m_wt >> m_wp >> m_alt >> m_alp;
+			ar >> m_qt >> m_qp >> m_euler >> m_wt >> m_wp >> m_alt >> m_alp;
 			ar >> m_bpofr;
 			ar.read(m_BC , sizeof(int), 6);
 			ar.read(m_LM , sizeof(int   ), 6);

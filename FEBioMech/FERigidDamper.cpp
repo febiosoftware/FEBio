@@ -103,7 +103,7 @@ void FERigidDamper::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 	double alpha = tp.alpha;
     
     // body A
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     vec3d za = zat*alpha + zap*(1-alpha);
     vec3d vat = RBa.m_vt + (RBa.m_wt ^ zat);
@@ -111,7 +111,7 @@ void FERigidDamper::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     vec3d va = vat*alpha + vap*(1-alpha);
     
     // body b
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     vec3d zb = zbt*alpha + zbp*(1-alpha);
     vec3d vbt = RBb.m_vt + (RBb.m_wt ^ zbt);
@@ -170,7 +170,7 @@ void FERigidDamper::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
     mat3dd I(1);
     
     // body A
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     vec3d za = zat*alpha + zap*(1-alpha);
     mat3d zahat; zahat.skew(za);
@@ -178,12 +178,12 @@ void FERigidDamper::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
     vec3d vat = RBa.m_vt + (RBa.m_wt ^ zat);
     vec3d vap = RBa.m_vp + (RBa.m_wp ^ zap);
     vec3d va = vat*alpha + vap*(1-alpha);
-    quatd qai = RBa.m_qt*RBa.m_qp.Inverse(); qai.MakeUnit();
+	quatd qai = RBa.GetRotation()*RBa.m_qp.Inverse(); qai.MakeUnit();
     vec3d cai = qai.GetVector()*(2*tan(qai.GetAngle()/2));
     mat3d Ta = I + skew(cai)/2 + dyad(cai)/4;
     
     // body b
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     vec3d zb = zbt*alpha + zbp*(1-alpha);
     mat3d zbhat; zbhat.skew(zb);
@@ -191,7 +191,7 @@ void FERigidDamper::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
     vec3d vbt = RBb.m_vt + (RBb.m_wt ^ zbt);
     vec3d vbp = RBb.m_vp + (RBb.m_wp ^ zbp);
     vec3d vb = vbt*alpha + vbp*(1-alpha);
-    quatd qbi = RBb.m_qt*RBb.m_qp.Inverse(); qbi.MakeUnit();
+	quatd qbi = RBb.GetRotation()*RBb.m_qp.Inverse(); qbi.MakeUnit();
     vec3d cbi = qbi.GetVector()*(2*tan(qbi.GetAngle()/2));
     mat3d Tb = I + skew(cbi)/2 + dyad(cbi)/4;
     
@@ -326,14 +326,14 @@ void FERigidDamper::Update(const FETimeInfo& tp)
 	double alpha = tp.alpha;
 
     // body A
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     vec3d vat = RBa.m_vt + (RBa.m_wt ^ zat);
     vec3d vap = RBa.m_vp + (RBa.m_wp ^ zap);
     vec3d va = vat*alpha + vap*(1-alpha);
     
     // body b
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     vec3d vbt = RBb.m_vt + (RBb.m_wt ^ zbt);
     vec3d vbp = RBb.m_vp + (RBb.m_wp ^ zbp);

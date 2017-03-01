@@ -135,13 +135,13 @@ void FERigidSphericalJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     vec3d za = zat*alpha + zap*(1-alpha);
     
     // body b
     vec3d rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     vec3d zb = zbt*alpha + zbp*(1-alpha);
     
@@ -149,7 +149,7 @@ void FERigidSphericalJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     m_F = m_L + c*m_eps;
     
     if (m_bq) {
-        quatd q = (alpha*RBb.m_qt+(1-alpha)*RBb.m_qp)*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
+		quatd q = (alpha*RBb.GetRotation() + (1 - alpha)*RBb.m_qp)*(alpha*RBa.GetRotation() + (1 - alpha)*RBa.m_qp).Inverse();
         quatd a(vec3d(m_qpx,m_qpy,m_qpz));
         quatd r = a*q.Inverse();
         r.MakeUnit();
@@ -201,7 +201,7 @@ void FERigidSphericalJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo&
     
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     vec3d za = zat*alpha + zap*(1-alpha);
     mat3d zahat; zahat.skew(za);
@@ -209,7 +209,7 @@ void FERigidSphericalJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo&
     
     // body b
     vec3d rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     vec3d zb = zbt*alpha + zbp*(1-alpha);
     mat3d zbhat; zbhat.skew(zb);
@@ -221,7 +221,7 @@ void FERigidSphericalJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo&
     
     quatd q, a, r;
     if (m_bq) {
-        q = (alpha*RBb.m_qt+(1-alpha)*RBb.m_qp)*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
+		q = (alpha*RBb.GetRotation() + (1 - alpha)*RBb.m_qp)*(alpha*RBa.GetRotation() + (1 - alpha)*RBa.m_qp).Inverse();
         a = quatd(vec3d(m_qpx,m_qpy,m_qpz));
         r = a*q.Inverse();
         r.MakeUnit();
@@ -232,8 +232,8 @@ void FERigidSphericalJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo&
     
     mat3d K, Wba(0,0,0,0,0,0,0,0,0), Wab(0,0,0,0,0,0,0,0,0);
     if (m_bq) {
-        quatd qa = RBa.m_qt*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
-        quatd qb = RBb.m_qt*(alpha*RBb.m_qt+(1-alpha)*RBb.m_qp).Inverse();
+		quatd qa = RBa.GetRotation()*(alpha*RBa.GetRotation() + (1 - alpha)*RBa.m_qp).Inverse();
+		quatd qb = RBb.GetRotation()*(alpha*RBb.GetRotation() + (1 - alpha)*RBb.m_qp).Inverse();
         qa.MakeUnit();
         qb.MakeUnit();
         mat3d Qa = qa.RotationMatrix();
@@ -371,11 +371,11 @@ bool FERigidSphericalJoint::Augment(int naug, const FETimeInfo& tp)
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     za = zat*alpha + zap*(1-alpha);
     
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     zb = zbt*alpha + zbp*(1-alpha);
     
@@ -403,7 +403,7 @@ bool FERigidSphericalJoint::Augment(int naug, const FETimeInfo& tp)
     if (m_gtol && (gap >= m_gtol)) bconv = false;
 
     if (m_bq) {
-        quatd q = (alpha*RBb.m_qt+(1-alpha)*RBb.m_qp)*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
+		quatd q = (alpha*RBb.GetRotation() + (1 - alpha)*RBb.m_qp)*(alpha*RBa.GetRotation() + (1 - alpha)*RBa.m_qp).Inverse();
         quatd a(vec3d(m_qpx,m_qpy,m_qpz));
         quatd r = a*q.Inverse();
         r.MakeUnit();
@@ -453,11 +453,11 @@ void FERigidSphericalJoint::Update(const FETimeInfo& tp)
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     za = zat*alpha + zap*(1-alpha);
     
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     zb = zbt*alpha + zbp*(1-alpha);
     
@@ -465,7 +465,7 @@ void FERigidSphericalJoint::Update(const FETimeInfo& tp)
     m_F = m_L + c*m_eps;
     
     if (m_bq) {
-        quatd q = (alpha*RBb.m_qt+(1-alpha)*RBb.m_qp)*(alpha*RBa.m_qt+(1-alpha)*RBa.m_qp).Inverse();
+		quatd q = (alpha*RBb.GetRotation() + (1 - alpha)*RBb.m_qp)*(alpha*RBa.GetRotation() + (1 - alpha)*RBa.m_qp).Inverse();
         quatd a(vec3d(m_qpx,m_qpy,m_qpz));
         quatd r = a*q.Inverse();
         r.MakeUnit();

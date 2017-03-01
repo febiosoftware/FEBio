@@ -423,8 +423,9 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 		double w = sqrt(r.x*r.x + r.y*r.y + r.z*r.z);
 		quatd dq = quatd(w, r);
 
-		RB.m_qt = dq*RB.m_qp;
-		RB.m_qt.MakeUnit();
+		quatd Q = dq*RB.m_qp;
+		Q.MakeUnit();
+		RB.SetRotation(Q);
 
 		if (RB.m_prb) du = RB.m_dul;
 		RB.m_Ut[0] = RB.m_Up[0] + du[0];
@@ -638,7 +639,7 @@ void FEExplicitSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 				FERigidBody* pprb = RB.m_prb;
 
 				vec3d r0 = RB.m_rt;
-				quatd Q0 = RB.m_qt;
+				quatd Q0 = RB.GetRotation();
 
 				dr = Q0*dr;
 				dq = Q0*dq*Q0.Inverse();
@@ -648,7 +649,7 @@ void FEExplicitSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 					vec3d r1 = pprb->m_rt;
 					dul = pprb->m_dul;
 
-					quatd Q1 = pprb->m_qt;
+					quatd Q1 = pprb->GetRotation();
 					
 					dr = r0 + dr - r1;
 

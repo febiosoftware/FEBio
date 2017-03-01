@@ -217,24 +217,53 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 {
 	FEModel& fem = opt.GetFEM();
 
-	FEDataFitObjective* obj = new FEDataFitObjective(&fem);
-	opt.SetObjective(obj);
+	const char* sztype = tag.AttributeValue("type");
+	if (sztype == 0) return false;
 
-	++tag;
-	do
+	if (strcmp(sztype, "data-fit") == 0)
 	{
-		if (tag == "fnc")
-		{
-			tag.value(obj->m_szname);
-
-			// get the loadcurve for this objective function
-			tag.AttributeValue("lc", obj->m_nlc);
-			obj->m_nlc--;
-		}
-		else throw XMLReader::InvalidTag(tag);
+		FEDataFitObjective* obj = new FEDataFitObjective(&fem);
+		opt.SetObjective(obj);
 
 		++tag;
-	} while (!tag.isend());
+		do
+		{
+			if (tag == "fnc")
+			{
+				tag.value(obj->m_szname);
+
+				// get the loadcurve for this objective function
+				tag.AttributeValue("lc", obj->m_nlc);
+				obj->m_nlc--;
+			}
+			else throw XMLReader::InvalidTag(tag);
+
+			++tag;
+		} while (!tag.isend());
+	}
+	else
+	{
+		FEMinimizeObjective* obj = new FEMinimizeObjective(&fem);
+		opt.SetObjective(obj);
+
+		++tag;
+		do
+		{
+			if (tag == "var")
+			{
+				const char* szname = tag.AttributeValue("name");
+				if (szname == 0) return false;
+
+				double d[2] = {0};
+				tag.value(d, 2);
+
+				if (obj->AddFunction(szname, d[0]) == false) throw XMLReader::InvalidAttributeValue(tag, "name", szname);
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+	}
 
 	return true;
 }

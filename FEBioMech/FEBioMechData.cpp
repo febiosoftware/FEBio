@@ -703,15 +703,15 @@ double FELogElemFiberVectorZ::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
-double FELogRigidBodyR11::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,0)); }
-double FELogRigidBodyR12::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,1)); }
-double FELogRigidBodyR13::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(0,2)); }
-double FELogRigidBodyR21::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(1,0)); }
-double FELogRigidBodyR22::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(1,1)); }
-double FELogRigidBodyR23::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(1,2)); }
-double FELogRigidBodyR31::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(2,0)); }
-double FELogRigidBodyR32::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(2,1)); }
-double FELogRigidBodyR33::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.m_qt.RotationMatrix()(2,2)); }
+double FELogRigidBodyR11::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.GetRotation().RotationMatrix()(0,0)); }
+double FELogRigidBodyR12::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.GetRotation().RotationMatrix()(0, 1)); }
+double FELogRigidBodyR13::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.GetRotation().RotationMatrix()(0, 2)); }
+double FELogRigidBodyR21::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.GetRotation().RotationMatrix()(1, 0)); }
+double FELogRigidBodyR22::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.GetRotation().RotationMatrix()(1, 1)); }
+double FELogRigidBodyR23::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.GetRotation().RotationMatrix()(1, 2)); }
+double FELogRigidBodyR31::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.GetRotation().RotationMatrix()(2, 0)); }
+double FELogRigidBodyR32::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.GetRotation().RotationMatrix()(2, 1)); }
+double FELogRigidBodyR33::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return (o.GetRotation().RotationMatrix()(2, 2)); }
 
 //-----------------------------------------------------------------------------
 double FELogRigidBodyPosX::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_rt.x; }
@@ -729,9 +729,9 @@ double FELogRigidBodyAccY::value(FEObject& rb) { return static_cast<FERigidBody&
 double FELogRigidBodyAccZ::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_at.z; }
 
 //-----------------------------------------------------------------------------
-double FELogRigidBodyAngPosX::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return ((o.m_qt.GetVector()).x*o.m_qt.GetAngle()); }
-double FELogRigidBodyAngPosY::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return ((o.m_qt.GetVector()).y*o.m_qt.GetAngle()); }
-double FELogRigidBodyAngPosZ::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return ((o.m_qt.GetVector()).z*o.m_qt.GetAngle()); }
+double FELogRigidBodyAngPosX::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return ((o.GetRotation().GetVector()).x*o.GetRotation().GetAngle()); }
+double FELogRigidBodyAngPosY::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return ((o.GetRotation().GetVector()).y*o.GetRotation().GetAngle()); }
+double FELogRigidBodyAngPosZ::value(FEObject& rb) { FERigidBody& o = static_cast<FERigidBody&>(rb); return ((o.GetRotation().GetVector()).z*o.GetRotation().GetAngle()); }
 
 //-----------------------------------------------------------------------------
 double FELogRigidBodyAngVelX::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_wt.x; }
@@ -744,10 +744,10 @@ double FELogRigidBodyAngAccY::value(FEObject& rb) { return static_cast<FERigidBo
 double FELogRigidBodyAngAccZ::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_alt.z; }
 
 //-----------------------------------------------------------------------------
-double FELogRigidBodyQuatX::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_qt.x; }
-double FELogRigidBodyQuatY::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_qt.y; }
-double FELogRigidBodyQuatZ::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_qt.z; }
-double FELogRigidBodyQuatW::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_qt.w; }
+double FELogRigidBodyQuatX::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).GetRotation().x; }
+double FELogRigidBodyQuatY::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).GetRotation().y; }
+double FELogRigidBodyQuatZ::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).GetRotation().z; }
+double FELogRigidBodyQuatW::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).GetRotation().w; }
 
 //-----------------------------------------------------------------------------
 double FELogRigidBodyForceX::value(FEObject& rb) { return static_cast<FERigidBody&>(rb).m_Fr.x; }

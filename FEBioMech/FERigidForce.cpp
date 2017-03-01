@@ -45,12 +45,12 @@ bool FERigidAxialForce::Init()
 
 	// get the attachment position in global coordinates for body A
 	vec3d da0 = (m_brelative ? m_ra0 : m_ra0 - bodyA.m_r0);
-	vec3d da = bodyA.m_qt*da0;
+	vec3d da = bodyA.GetRotation()*da0;
 	vec3d a = da + bodyA.m_rt;
 
 	// get the attachment position in global coordinates for body B
 	vec3d db0 = (m_brelative ? m_rb0 : m_rb0 - bodyB.m_r0);
-	vec3d db = bodyB.m_qt*db0;
+	vec3d db = bodyB.GetRotation()*db0;
 	vec3d b = db + bodyB.m_rt;
 
 	// get the unit axial vector
@@ -91,12 +91,12 @@ void FERigidAxialForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 	// get the attachment position in global coordinates for body A
 	vec3d da0 = (m_brelative ? m_ra0 : m_ra0 - bodyA.m_r0);
-	vec3d da = bodyA.m_qt*da0;
+	vec3d da = bodyA.GetRotation()*da0;
 	vec3d a = da + bodyA.m_rt;
 
 	// get the attachment position in global coordinates for body B
 	vec3d db0 = (m_brelative ? m_rb0 : m_rb0 - bodyB.m_r0);
-	vec3d db = bodyB.m_qt*db0;
+	vec3d db = bodyB.GetRotation()*db0;
 	vec3d b = db + bodyB.m_rt;
 
 	// get the unit axial vector
@@ -146,12 +146,12 @@ void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 
 	// get the attachment position in global coordinates for body A
 	vec3d da0 = (m_brelative ? m_ra0 : m_ra0 - bodyA.m_r0);
-	vec3d da = bodyA.m_qt*da0;
+	vec3d da = bodyA.GetRotation()*da0;
 	vec3d pa = da + bodyA.m_rt;
 
 	// get the attachment position in global coordinates for body B
 	vec3d db0 = (m_brelative ? m_rb0 : m_rb0 - bodyB.m_r0);
-	vec3d db = bodyB.m_qt*db0;
+	vec3d db = bodyB.GetRotation()*db0;
 	vec3d pb = db + bodyB.m_rt;
 
 	// setup the axial unit vector
@@ -324,7 +324,7 @@ void FERigidBodyForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 		else if (bc == 2) f.z = Value();
 	
 		// apply the rigid body rotation
-		f = rb.m_qt*f;
+		f = rb.GetRotation()*f;
 
 		// add to the residual
 		int n;

@@ -98,3 +98,43 @@ public:
 	FELoadCurve	m_rf;		//!< reaction force data
 	std::vector<FELoadCurve*>	m_LC;	//!< load curves. (TODO: Not sure why there can be more than one)
 };
+
+//=============================================================================
+// Objective function for minimization of model parameters
+class FEMinimizeObjective : public FEObjectiveFunction
+{
+	class Function
+	{
+	public:
+		string		name;
+		double*		var;
+
+		double	y0;		// target value (i.e. "measurment")
+
+	public:
+		Function() : var(0), y0(0.0) {}
+		Function(const Function& f) { name = f.name; var = f.var; y0 = f.y0; }
+		void operator = (const Function& f) { name = f.name; var = f.var; y0 = f.y0; }
+	};
+
+public:
+	FEMinimizeObjective(FEModel* fem);
+
+	// one-time initialization
+	bool Init();
+
+	bool AddFunction(const char* szname, double targetValue);
+
+public:
+	// return number of measurements
+	int Measurements();
+
+	// evaluate the function values
+	void EvaluateFunctions(vector<double>& f);
+
+	// get the measurement vector
+	void GetMeasurements(vector<double>& y);
+
+private:
+	std::vector<Function>	m_Func;
+};

@@ -147,3 +147,71 @@ void FEDataFitObjective::EvaluateFunctions(vector<double>& f)
 		f[i] = rlc.Value(xi);
 	}
 }
+
+
+//=============================================================================
+FEMinimizeObjective::FEMinimizeObjective(FEModel* fem) : FEObjectiveFunction(fem)
+{
+}
+
+bool FEMinimizeObjective::AddFunction(const char* szname, double targetValue)
+{
+	// make sure we have a model
+	FEModel* fem = GetFEM();
+	if (fem == 0) return false;
+
+	// create a new function
+	Function fnc;
+	fnc.name = szname;
+	fnc.y0 = targetValue;
+
+	m_Func.push_back(fnc);
+
+	return true;
+}
+
+bool FEMinimizeObjective::Init()
+{
+	if (FEObjectiveFunction::Init() == false) return false;
+
+	FEModel* fem = GetFEM();
+	if (fem == 0) return false;
+
+	int N = (int) m_Func.size();
+	for (int i=0; i<N; ++i)
+	{
+		Function& Fi = m_Func[i];
+		Fi.var = fem->FindParameter(Fi.name.c_str());
+		if (Fi.var == 0) return false;
+	}
+
+	return true;
+}
+
+int FEMinimizeObjective::Measurements()
+{
+	return (int) m_Func.size();
+}
+
+
+void FEMinimizeObjective::EvaluateFunctions(vector<double>& f)
+{
+	int N = (int)m_Func.size();
+	f.resize(N);
+	for (int i=0; i<N; ++i)
+	{
+		Function& Fi = m_Func[i];
+		if (Fi.var) f[i] = *Fi.var;
+		else f[i] = 0;
+	}
+}
+
+void FEMinimizeObjective::GetMeasurements(vector<double>& y)
+{
+	int N = (int) m_Func.size();
+	y.resize(N);
+	for (int i=0; i<N; ++i)
+	{
+		y[i] = m_Func[i].y0;
+	}
+}

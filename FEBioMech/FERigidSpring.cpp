@@ -110,13 +110,13 @@ void FERigidSpring::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     vec3d za = zat*alpha + zap*(1-alpha);
     
     // body b
     vec3d rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     vec3d zb = zbt*alpha + zbp*(1-alpha);
     
@@ -167,7 +167,7 @@ void FERigidSpring::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
     
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     vec3d za = zat*alpha + zap*(1-alpha);
     mat3d zahat; zahat.skew(za);
@@ -175,7 +175,7 @@ void FERigidSpring::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
     
     // body b
     vec3d rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     vec3d zb = zbt*alpha + zbp*(1-alpha);
     mat3d zbhat; zbhat.skew(zb);
@@ -319,11 +319,11 @@ void FERigidSpring::Update(const FETimeInfo& tp)
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     za = zat*alpha + zap*(1-alpha);
     
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     zb = zbt*alpha + zbp*(1-alpha);
     

@@ -221,7 +221,7 @@ public:
 	}
 
 	// use only when *this is unit vector
-	vec3d operator * (const vec3d& r)
+	vec3d operator * (const vec3d& r) const
 	{
 		vec3d n = r;
 
@@ -252,7 +252,7 @@ public:
 	}
 
 	//! Convert a quaternion to a rotation matrix
-	mat3d RotationMatrix()
+	mat3d RotationMatrix() const
 	{
 		return mat3d(
 			w*w + x*x - y*y - z*z,
@@ -301,13 +301,13 @@ mat3d euler2rot(double l[3]);
 // l[0] = psi   (x-rotation)
 // l[1] = theta (y-rotation)
 // l[2] = phi   (z-rotation)
-void rot2euler(mat3d& m, double l[3]);
+void rot2euler(const mat3d& m, double l[3]);
 
 // extract euler angles from a quaternion
 // l[0] = psi   (x-rotation)
 // l[1] = theta (y-rotation)
 // l[2] = phi   (z-rotation)
-void quat2euler(quatd& q, double l[3]);
+void quat2euler(const quatd& q, double l[3]);
 
 
 

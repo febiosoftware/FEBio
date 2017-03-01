@@ -1741,7 +1741,7 @@ bool FEPlotRigidRotation::Save(FEDomain& dom, FEDataStream& a)
 	// get the rigid body
 	FERigidSystem& rigid = *m_pfem->GetRigidSystem();
 	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
-    vec3d q = rb.m_qt.GetVector()*rb.m_qt.GetAngle();
+	vec3d q = rb.GetRotation().GetRotationVector();
     
 	// store rotation vector
 	a << q;
@@ -1799,7 +1799,7 @@ bool FEPlotRigidKineticEnergy::Save(FEDomain& dom, FEDataStream& a)
     vec3d v = rb.m_vt;
     double m = rb.m_mass;
     vec3d w = rb.m_wt;
-    mat3d Rt = rb.m_qt.RotationMatrix();
+	mat3d Rt = rb.GetRotation().RotationMatrix();
     mat3ds Jt = (Rt*rb.m_moi*Rt.transpose()).sym();
     double ke = ((v*v)*m + w*(Jt*w))/2;
     
@@ -1840,7 +1840,7 @@ bool FEPlotRigidAngularMomentum::Save(FEDomain& dom, FEDataStream& a)
     FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
     
     // store angular momentum (mass moment of inertia x angular velocity)
-    mat3d Rt = rb.m_qt.RotationMatrix();
+	mat3d Rt = rb.GetRotation().RotationMatrix();
     mat3ds Jt = (Rt*rb.m_moi*Rt.transpose()).sym();
     
     a << Jt*rb.m_wt;
@@ -1862,7 +1862,7 @@ bool FEPlotRigidEuler::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the Euler angles
 	double E[3];
-	quat2euler(rb.m_qt, E);
+	quat2euler(rb.GetRotation(), E);
     
 	// store Euler
 	a << E[0] << E[1] << E[2];
@@ -1884,8 +1884,7 @@ bool FEPlotRigidRotationVector::Save(FEDomain& dom, FEDataStream& a)
 	FERigidBody& rb = *rigid.Object(prm->GetRigidBodyID());
 
 	// get the rotation vector and angle
-	double w = rb.m_qt.GetAngle();
-	vec3d r = rb.m_qt.GetVector()*w;
+	vec3d r = rb.GetRotation().GetRotationVector();
     
 	// store rotation vector
 	a << r;

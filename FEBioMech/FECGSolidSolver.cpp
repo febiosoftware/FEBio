@@ -302,7 +302,7 @@ void FECGSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 				FERigidBody* pprb = RB.m_prb;
 
 				vec3d r0 = RB.m_rt;
-				quatd Q0 = RB.m_qt;
+				quatd Q0 = RB.GetRotation();
 
 				dr = Q0*dr;
 				dq = Q0*dq*Q0.Inverse();
@@ -312,7 +312,7 @@ void FECGSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 					vec3d r1 = pprb->m_rt;
 					dul = pprb->m_dul;
 
-					quatd Q1 = pprb->m_qt;
+					quatd Q1 = pprb->GetRotation();
 
 					dr = r0 + dr - r1;
 
@@ -1315,7 +1315,7 @@ void FECGSolidSolver::UpdateRigidBodies(vector<double>& ui)
 		RB.m_rt = RB.m_r0 + vec3d(RB.m_Ut[0], RB.m_Ut[1], RB.m_Ut[2]);
 
 		vec3d Rt(RB.m_Ut[3], RB.m_Ut[4], RB.m_Ut[5]);
-		RB.m_qt = quatd(Rt);
+		RB.SetRotation(quatd(Rt));
 	}
 
 	// we need to update the position of rigid nodes

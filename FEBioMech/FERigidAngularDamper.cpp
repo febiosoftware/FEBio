@@ -150,13 +150,13 @@ void FERigidAngularDamper::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
     
     // body A
     vec3d wa = RBa.m_wt*alpha + RBa.m_wp*(1-alpha);
-    quatd qai = RBa.m_qt*RBa.m_qp.Inverse(); qai.MakeUnit();
+	quatd qai = RBa.GetRotation()*RBa.m_qp.Inverse(); qai.MakeUnit();
     vec3d cai = qai.GetVector()*(2*tan(qai.GetAngle()/2));
     mat3d Ta = I + skew(cai)/2 + dyad(cai)/4;
     
     // body b
     vec3d wb = RBb.m_wt*alpha + RBb.m_wp*(1-alpha);
-    quatd qbi = RBb.m_qt*RBb.m_qp.Inverse(); qbi.MakeUnit();
+	quatd qbi = RBb.GetRotation()*RBb.m_qp.Inverse(); qbi.MakeUnit();
     vec3d cbi = qbi.GetVector()*(2*tan(qbi.GetAngle()/2));
     mat3d Tb = I + skew(cbi)/2 + dyad(cbi)/4;
     

@@ -479,7 +479,7 @@ void FERigidSystem::UpdateMesh()
 			if (node.m_rid == RB.m_nID)
 			{
 				vec3d a0 = node.m_r0 - RB.m_r0;
-				vec3d at = RB.m_qt*a0;
+				vec3d at = RB.GetRotation()*a0;
 				node.m_rt = RB.m_rt + at;
 			}
 		}

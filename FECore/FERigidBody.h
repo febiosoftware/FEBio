@@ -54,6 +54,15 @@ public:
     vec3d CayleyIncrementalCompoundRotation();
 
 public:
+	const quatd& GetRotation() const { return m_qt; }
+	quatd GetPreviousRotation() const { return m_qp; }
+	void SetRotation(const quatd& q)
+	{
+		m_qt = q;
+		m_qt.GetEuler(m_euler.x, m_euler.y, m_euler.z);
+	}
+
+public:
 	int		m_nID;		//!< ID of rigid body
 	int		m_mat;		//!< material ID (TODO: Since rigid bodies can have multiple materials, I want to remove this)
 	double	m_mass;		//!< total mass of rigid body
@@ -70,10 +79,16 @@ public:
     
 	vec3d	m_ap;	//!< previous acceleration of rigid body
 	vec3d	m_at;	//!< current acceleration of rigid body
-    
+
 	quatd	m_qp;	//!< previous orientation of rigid body
-	quatd	m_qt;	//!< current orientation of rigid body
-    
+
+private:
+	// TODO: This is a hack!I only need this so I can access the euler angles directly from
+	//       the optimization module. Need to figure out a better way.
+	quatd	m_qt;		//!< current orientation of rigid body
+	vec3d	m_euler;	//!< Euler angles of rotation 
+
+public:
     vec3d   m_wp;   //!< previous angular velocity of rigid body
     vec3d   m_wt;   //!< current angular velocity of rigid body
     

@@ -105,7 +105,7 @@ void FERigidJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 	// body A
 	vec3d a = m_qa0;
-	RBa.m_qt.RotateVector(a);
+	RBa.GetRotation().RotateVector(a);
 
 	fa[0] = m_F.x;
 	fa[1] = m_F.y;
@@ -117,7 +117,7 @@ void FERigidJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 	// body b
 	a = m_qb0;
-	RBb.m_qt.RotateVector(a);
+	RBb.GetRotation().RotateVector(a);
 
 	fb[0] = -m_F.x;
 	fb[1] = -m_F.y;
@@ -154,14 +154,14 @@ void FERigidJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
     FERigidBody& RBb = *rigid.Object(m_nRBb);
 
 	a = m_qa0;
-	RBa.m_qt.RotateVector(a);
+	RBa.GetRotation().RotateVector(a);
 
 	y1[0][0] =    0; y1[0][1] =  a.z; y1[0][2] = -a.y;
 	y1[1][0] = -a.z; y1[1][1] =    0; y1[1][2] =  a.x;
 	y1[2][0] =  a.y; y1[2][1] = -a.x; y1[2][2] =    0;
 
 	a = m_qb0;
-	RBb.m_qt.RotateVector(a);
+	RBb.GetRotation().RotateVector(a);
 
 	y2[0][0] =    0; y2[0][1] =  a.z; y2[0][2] = -a.y;
 	y2[1][0] = -a.z; y2[1][1] =    0; y2[1][2] =  a.x;
@@ -268,10 +268,10 @@ bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 	rb = RBb.m_rt;
 
 	qa = m_qa0;
-	RBa.m_qt.RotateVector(qa);
+	RBa.GetRotation().RotateVector(qa);
 
 	qb = m_qb0;
-	RBb.m_qt.RotateVector(qb);
+	RBb.GetRotation().RotateVector(qb);
 
 	c = ra + qa - rb - qb;
 
@@ -334,10 +334,10 @@ void FERigidJoint::Update(const FETimeInfo& tp)
 	vec3d rb = RBb.m_rt;
 
 	vec3d qa = m_qa0;
-	RBa.m_qt.RotateVector(qa);
+	RBa.GetRotation().RotateVector(qa);
 
 	vec3d qb = m_qb0;
-	RBb.m_qt.RotateVector(qb);
+	RBb.GetRotation().RotateVector(qb);
 
 	vec3d c = ra + qa - rb - qb;
 	m_F = m_L + c*m_eps;

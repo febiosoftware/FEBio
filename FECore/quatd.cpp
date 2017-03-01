@@ -90,7 +90,7 @@ mat3d euler2rot(double l[3])
 // l[0] = psi   (x-rotation)
 // l[1] = theta (y-rotation)
 // l[2] = phi   (z-rotation)
-void rot2euler(mat3d& m, double l[3])
+void rot2euler(const mat3d& m, double l[3])
 {
 	const double e = 1e-12;
 	if (fabs(m(2,0) - 1.0) < e)
@@ -119,7 +119,7 @@ void rot2euler(mat3d& m, double l[3])
 
 //-----------------------------------------------------------------------------
 // convert a quaternion to Euler angles
-void quat2euler(quatd& q, double l[3])
+void quat2euler(const quatd& q, double l[3])
 {
 	mat3d Q = q.RotationMatrix();
 	rot2euler(Q, l);

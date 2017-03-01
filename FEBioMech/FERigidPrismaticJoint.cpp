@@ -151,12 +151,12 @@ void FERigidPrismaticJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     vec3d za = zat*alpha + zap*(1-alpha);
-    eat[0] = m_ea0[0]; RBa.m_qt.RotateVector(eat[0]);
-    eat[1] = m_ea0[1]; RBa.m_qt.RotateVector(eat[1]);
-    eat[2] = m_ea0[2]; RBa.m_qt.RotateVector(eat[2]);
+	eat[0] = m_ea0[0]; RBa.GetRotation().RotateVector(eat[0]);
+	eat[1] = m_ea0[1]; RBa.GetRotation().RotateVector(eat[1]);
+	eat[2] = m_ea0[2]; RBa.GetRotation().RotateVector(eat[2]);
     eap[0] = m_ea0[0]; RBa.m_qp.RotateVector(eap[0]);
     eap[1] = m_ea0[1]; RBa.m_qp.RotateVector(eap[1]);
     eap[2] = m_ea0[2]; RBa.m_qp.RotateVector(eap[2]);
@@ -166,12 +166,12 @@ void FERigidPrismaticJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     
     // body b
     vec3d rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     vec3d zb = zbt*alpha + zbp*(1-alpha);
-    ebt[0] = m_eb0[0]; RBb.m_qt.RotateVector(ebt[0]);
-    ebt[1] = m_eb0[1]; RBb.m_qt.RotateVector(ebt[1]);
-    ebt[2] = m_eb0[2]; RBb.m_qt.RotateVector(ebt[2]);
+	ebt[0] = m_eb0[0]; RBb.GetRotation().RotateVector(ebt[0]);
+	ebt[1] = m_eb0[1]; RBb.GetRotation().RotateVector(ebt[1]);
+	ebt[2] = m_eb0[2]; RBb.GetRotation().RotateVector(ebt[2]);
     ebp[0] = m_eb0[0]; RBb.m_qp.RotateVector(ebp[0]);
     ebp[1] = m_eb0[1]; RBb.m_qp.RotateVector(ebp[1]);
     ebp[2] = m_eb0[2]; RBb.m_qp.RotateVector(ebp[2]);
@@ -266,12 +266,12 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo&
     
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     vec3d za = zat*alpha + zap*(1-alpha);
-    eat[0] = m_ea0[0]; RBa.m_qt.RotateVector(eat[0]);
-    eat[1] = m_ea0[1]; RBa.m_qt.RotateVector(eat[1]);
-    eat[2] = m_ea0[2]; RBa.m_qt.RotateVector(eat[2]);
+	eat[0] = m_ea0[0]; RBa.GetRotation().RotateVector(eat[0]);
+	eat[1] = m_ea0[1]; RBa.GetRotation().RotateVector(eat[1]);
+	eat[2] = m_ea0[2]; RBa.GetRotation().RotateVector(eat[2]);
     eap[0] = m_ea0[0]; RBa.m_qp.RotateVector(eap[0]);
     eap[1] = m_ea0[1]; RBa.m_qp.RotateVector(eap[1]);
     eap[2] = m_ea0[2]; RBa.m_qp.RotateVector(eap[2]);
@@ -283,12 +283,12 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo&
     
     // body b
     vec3d rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     vec3d zb = zbt*alpha + zbp*(1-alpha);
-    ebt[0] = m_eb0[0]; RBb.m_qt.RotateVector(ebt[0]);
-    ebt[1] = m_eb0[1]; RBb.m_qt.RotateVector(ebt[1]);
-    ebt[2] = m_eb0[2]; RBb.m_qt.RotateVector(ebt[2]);
+	ebt[0] = m_eb0[0]; RBb.GetRotation().RotateVector(ebt[0]);
+	ebt[1] = m_eb0[1]; RBb.GetRotation().RotateVector(ebt[1]);
+	ebt[2] = m_eb0[2]; RBb.GetRotation().RotateVector(ebt[2]);
     ebp[0] = m_eb0[0]; RBb.m_qp.RotateVector(ebp[0]);
     ebp[1] = m_eb0[1]; RBb.m_qp.RotateVector(ebp[1]);
     ebp[2] = m_eb0[2]; RBb.m_qp.RotateVector(ebp[2]);
@@ -333,7 +333,7 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo&
         vec3d vat = RBa.m_vt + (RBa.m_wt ^ zat);
         vec3d vap = RBa.m_vp + (RBa.m_wp ^ zap);
         vec3d va = vat*alpha + vap*(1-alpha);
-        quatd qai = RBa.m_qt*RBa.m_qp.Inverse(); qai.MakeUnit();
+		quatd qai = RBa.GetRotation()*RBa.m_qp.Inverse(); qai.MakeUnit();
         vec3d cai = qai.GetVector()*(2*tan(qai.GetAngle()/2));
         mat3d Ta = I + skew(cai)/2 + dyad(cai)/4;
         vec3d wa = RBa.m_wt*alpha + RBa.m_wp*(1-alpha);
@@ -342,7 +342,7 @@ void FERigidPrismaticJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo&
         vec3d vbt = RBb.m_vt + (RBb.m_wt ^ zbt);
         vec3d vbp = RBb.m_vp + (RBb.m_wp ^ zbp);
         vec3d vb = vbt*alpha + vbp*(1-alpha);
-        quatd qbi = RBb.m_qt*RBb.m_qp.Inverse(); qbi.MakeUnit();
+		quatd qbi = RBb.GetRotation()*RBb.m_qp.Inverse(); qbi.MakeUnit();
         vec3d cbi = qbi.GetVector()*(2*tan(qbi.GetAngle()/2));
         mat3d Tb = I + skew(cbi)/2 + dyad(cbi)/4;
         vec3d wb = RBb.m_wt*alpha + RBb.m_wp*(1-alpha);
@@ -494,12 +494,12 @@ bool FERigidPrismaticJoint::Augment(int naug, const FETimeInfo& tp)
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     za = zat*alpha + zap*(1-alpha);
-    eat[0] = m_ea0[0]; RBa.m_qt.RotateVector(eat[0]);
-    eat[1] = m_ea0[1]; RBa.m_qt.RotateVector(eat[1]);
-    eat[2] = m_ea0[2]; RBa.m_qt.RotateVector(eat[2]);
+	eat[0] = m_ea0[0]; RBa.GetRotation().RotateVector(eat[0]);
+	eat[1] = m_ea0[1]; RBa.GetRotation().RotateVector(eat[1]);
+	eat[2] = m_ea0[2]; RBa.GetRotation().RotateVector(eat[2]);
     eap[0] = m_ea0[0]; RBa.m_qp.RotateVector(eap[0]);
     eap[1] = m_ea0[1]; RBa.m_qp.RotateVector(eap[1]);
     eap[2] = m_ea0[2]; RBa.m_qp.RotateVector(eap[2]);
@@ -507,12 +507,12 @@ bool FERigidPrismaticJoint::Augment(int naug, const FETimeInfo& tp)
     ea[1] = eat[1]*alpha + eap[1]*(1-alpha);
     ea[2] = eat[2]*alpha + eap[2]*(1-alpha);
     
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     zb = zbt*alpha + zbp*(1-alpha);
-    ebt[0] = m_eb0[0]; RBb.m_qt.RotateVector(ebt[0]);
-    ebt[1] = m_eb0[1]; RBb.m_qt.RotateVector(ebt[1]);
-    ebt[2] = m_eb0[2]; RBb.m_qt.RotateVector(ebt[2]);
+	ebt[0] = m_eb0[0]; RBb.GetRotation().RotateVector(ebt[0]);
+	ebt[1] = m_eb0[1]; RBb.GetRotation().RotateVector(ebt[1]);
+	ebt[2] = m_eb0[2]; RBb.GetRotation().RotateVector(ebt[2]);
     ebp[0] = m_eb0[0]; RBb.m_qp.RotateVector(ebp[0]);
     ebp[1] = m_eb0[1]; RBb.m_qp.RotateVector(ebp[1]);
     ebp[2] = m_eb0[2]; RBb.m_qp.RotateVector(ebp[2]);
@@ -594,12 +594,12 @@ void FERigidPrismaticJoint::Update(const FETimeInfo& tp)
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     
-    vec3d zat = m_qa0; RBa.m_qt.RotateVector(zat);
+	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
     za = zat*alpha + zap*(1-alpha);
-    eat[0] = m_ea0[0]; RBa.m_qt.RotateVector(eat[0]);
-    eat[1] = m_ea0[1]; RBa.m_qt.RotateVector(eat[1]);
-    eat[2] = m_ea0[2]; RBa.m_qt.RotateVector(eat[2]);
+	eat[0] = m_ea0[0]; RBa.GetRotation().RotateVector(eat[0]);
+	eat[1] = m_ea0[1]; RBa.GetRotation().RotateVector(eat[1]);
+	eat[2] = m_ea0[2]; RBa.GetRotation().RotateVector(eat[2]);
     eap[0] = m_ea0[0]; RBa.m_qp.RotateVector(eap[0]);
     eap[1] = m_ea0[1]; RBa.m_qp.RotateVector(eap[1]);
     eap[2] = m_ea0[2]; RBa.m_qp.RotateVector(eap[2]);
@@ -607,12 +607,12 @@ void FERigidPrismaticJoint::Update(const FETimeInfo& tp)
     ea[1] = eat[1]*alpha + eap[1]*(1-alpha);
     ea[2] = eat[2]*alpha + eap[2]*(1-alpha);
     
-    vec3d zbt = m_qb0; RBb.m_qt.RotateVector(zbt);
+	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     zb = zbt*alpha + zbp*(1-alpha);
-    ebt[0] = m_eb0[0]; RBb.m_qt.RotateVector(ebt[0]);
-    ebt[1] = m_eb0[1]; RBb.m_qt.RotateVector(ebt[1]);
-    ebt[2] = m_eb0[2]; RBb.m_qt.RotateVector(ebt[2]);
+	ebt[0] = m_eb0[0]; RBb.GetRotation().RotateVector(ebt[0]);
+	ebt[1] = m_eb0[1]; RBb.GetRotation().RotateVector(ebt[1]);
+	ebt[2] = m_eb0[2]; RBb.GetRotation().RotateVector(ebt[2]);
     ebp[0] = m_eb0[0]; RBb.m_qp.RotateVector(ebp[0]);
     ebp[1] = m_eb0[1]; RBb.m_qp.RotateVector(ebp[1]);
     ebp[2] = m_eb0[2]; RBb.m_qp.RotateVector(ebp[2]);

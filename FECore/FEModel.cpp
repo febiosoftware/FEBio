@@ -43,6 +43,9 @@ FEModel::FEModel(void)
 
 	// create the linear constraint manager
 	m_LCM = new FELinearConstraintManager(this);
+
+	// Add all properties
+	m_Props.push_back(new FEModelProperty_T<FEMaterial>(m_MAT, "material"));
 }
 
 //-----------------------------------------------------------------------------
@@ -50,6 +53,9 @@ FEModel::FEModel(void)
 FEModel::~FEModel(void)
 {
 	Clear();
+
+	for (int i=0; i<(int) m_Props.size(); ++i) delete m_Props[i];
+	m_Props.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -530,19 +536,27 @@ double* FEModel::FindParameter(const ParamString& paramString)
 
 	// see what the next reference is
 	ParamString next = paramString.next();
-	if (next == "material")
+
+	// try all properties first
+	for (int i=0; i<(int)m_Props.size(); ++i)
 	{
-		FEMaterial* mat = 0;
-		int id = next.Index();
-		if (id > 0) mat = GetMaterial(id - 1);
-		else if (next.IndexString()) mat = FindMaterial(next.IndexString());
-		if (mat != 0)
+		FEModelProperty& prop = *m_Props[i];
+		if (next.c_str() == prop.GetName())
 		{
-			FEParam* param = mat->GetParameter(next.next());
-			if (param) return param->pvalue<double>(0);
+			int id = next.Index();
+			FECoreBase* p = 0;
+			if ((id >= 0) && (id < prop.Count())) p = prop[id];
+			else if (next.IndexString()) p = prop[next.IndexString()];
+			if (p)
+			{
+				FEParam* param = p->GetParameter(next.next());
+				if (param) return param->pvalue<double>(0);
+			}
 		}
 	}
-	else if (next == "rigidbody")
+
+	// if we get here, handle some special cases
+	if (next == "rigidbody")
 	{
 		FEMaterial* mat = 0;
 		if (next.IndexString()) mat = FindMaterial(next.IndexString());
@@ -555,16 +569,16 @@ double* FEModel::FindParameter(const ParamString& paramString)
 	{
 		FELoadCurve* lc = 0;
 		int id = next.Index();
-		if (id > 0) lc = GetLoadCurve(id - 1);
+		if (id >= 0) lc = GetLoadCurve(id);
 		if (lc)
 		{
 			ParamString point = next.next();
 			if (point == "point")
 			{
 				int id = point.Index();
-				if ((id > 0)&&(id <= lc->Points()))
+				if ((id >= 0)&&(id < lc->Points()))
 				{
-					LOADPOINT& lp = lc->LoadPoint(id - 1);
+					LOADPOINT& lp = lc->LoadPoint(id);
 					ParamString param = point.next();
 					if (param == "time") return &lp.time;
 					else if (param == "value") return &lp.value;

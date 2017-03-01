@@ -29,6 +29,62 @@ class FEGlobalMatrix;
 class FELinearConstraintManager;
 
 //-----------------------------------------------------------------------------
+// Model property class
+
+class FEModelProperty
+{
+public:
+	FEModelProperty() {}
+	FEModelProperty(const string& name) : m_name(name) {}
+
+	FECoreBase* operator [] (int i) { return at(i); }
+
+	FECoreBase* operator [] (const string& name)
+	{
+		int N = Count();
+		for (int i=0; i<N; ++i)
+		{
+			FECoreBase* it = at(i);
+			if (it->GetName() == name) return it;
+		}
+		return 0;
+	}
+
+	const string& GetName() const { return m_name; }
+
+	void SetName(const string& name) { m_name = name; }
+
+public:
+	virtual int Count() const = 0;
+
+	virtual FECoreBase* at(int i) = 0;
+
+private:
+	string	m_name;
+
+private:
+	FEModelProperty(const FEModelProperty&) {}
+	void operator = (const FEModelProperty&) {}
+};
+
+template <typename T> class FEModelProperty_T : public FEModelProperty
+{
+public:
+	FEModelProperty_T(std::vector<T*>& data, const string& name) : FEModelProperty(name), m_data(data) {}
+
+	int Count() const { return (int) m_data.size(); }
+
+	FECoreBase* at(int i) { return m_data[i]; }
+
+private:
+	std::vector<T*>&	m_data;
+
+private:
+	FEModelProperty_T(const FEModelProperty_T& p){}
+	void operator = (const FEModelProperty_T& p) {}
+};
+
+//-----------------------------------------------------------------------------
 //! The FEModel class stores all the data for the finite element model, including
 //! geometry, analysis steps, boundary and loading conditions, contact interfaces
 //! and so on.
@@ -343,4 +399,7 @@ protected:
 protected: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
 	vector<FEGlobalData*>	m_GD;		//!< global data structures
+
+protected: // properties
+	std::vector<FEModelProperty*>	m_Props;
 };
