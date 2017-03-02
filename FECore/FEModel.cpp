@@ -819,7 +819,7 @@ double* GetParameterComponent(const ParamString& paramName, FEParam* param)
 		assert(v);
 		if (v)
 		{
-			ParamString& c = paramName.next();
+			ParamString c = paramName.next();
 			if      (c == "x") return &v->x;
 			else if (c == "y") return &v->y;
 			else if (c == "z") return &v->z;
@@ -857,7 +857,7 @@ double* FEModel::FindParameter(const ParamString& paramString)
 		if (next.IndexString()) mat = FindMaterial(next.IndexString());
 		if ((mat != 0) && (mat->IsRigid()))
 		{
-			ParamString& paramName = next.next();
+			ParamString paramName = next.next();
 
 			// the rigid bodies are dealt with differently
 			int nmat = mat->GetID() - 1;
