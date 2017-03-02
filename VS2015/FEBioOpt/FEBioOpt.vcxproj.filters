@@ -59,9 +59,6 @@
     <ClCompile Include="..\..\FEBioOpt\FEOptimize.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioOpt\FEOptimizer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioOpt\FEPowellOptimizeMethod.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

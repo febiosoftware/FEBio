@@ -752,7 +752,6 @@
     <ClCompile Include="..\..\FEBioMech\FERigidSolver.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSphericalJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSpring.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidWallInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERVEModel.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERVEModel2O.cpp" />

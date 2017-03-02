@@ -424,6 +424,9 @@
     <ClInclude Include="..\..\FECore\FERigidSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FECore\ParamString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\DumpFile.cpp">
@@ -757,6 +760,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FERigidSurface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FECore\ParamString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

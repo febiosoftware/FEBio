@@ -412,7 +412,6 @@
     <ClCompile Include="..\..\FEBioOpt\FEConstrainedLMOptimizeMethod.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FELMOptimizeMethod.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEOptimize.cpp" />
-    <ClCompile Include="..\..\FEBioOpt\FEOptimizer.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEPowellOptimizeMethod.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEScanOptimizeMethod.cpp" />
   </ItemGroup>

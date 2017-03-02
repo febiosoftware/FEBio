@@ -926,9 +926,6 @@
     <ClCompile Include="..\..\FEBioMech\FERigidSphericalJoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FERigidSurface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FERigidWallInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

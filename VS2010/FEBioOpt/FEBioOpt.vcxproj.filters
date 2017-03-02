@@ -39,6 +39,9 @@
     <ClCompile Include="..\..\FEBioOpt\FEOptimizeInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioOpt\FEObjectiveFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioOpt\targetver.h">
@@ -72,6 +75,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioOpt\FEOptimizeMethod.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioOpt\FEObjectiveFunction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
