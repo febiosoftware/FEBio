@@ -28,7 +28,7 @@ public:
 	virtual ~FECoordSysMap();
 
 	//! initialization
-	virtual void Init();
+	bool Init();
 
 	//! return the local coordinate system at an element's gauss point
 	virtual mat3d LocalElementCoord(FEElement& el, int n) = 0;
@@ -50,7 +50,7 @@ class FELocalMap : public FECoordSysMap
 public:
 	FELocalMap(FEModel* pfem);
 
-	void Init();
+	bool Init();
 
 	void SetLocalNodes(int n1, int n2, int n3);
 
@@ -72,7 +72,7 @@ class FESphericalMap : public FECoordSysMap
 public:
 	FESphericalMap(FEModel* pfem);
 
-	void Init();
+	bool Init();
 
 	void SetSphereCenter(const vec3d& c) { m_c = c; }
 
@@ -98,7 +98,7 @@ class FECylindricalMap : public FECoordSysMap
 public:
 	FECylindricalMap(FEModel* pfem);
 
-	void Init();
+	bool Init();
 
 	void SetCylinderCenter(vec3d c) { m_c = c; }
 
@@ -126,7 +126,7 @@ class FEPolarMap : public FECoordSysMap
 public:
 	FEPolarMap(FEModel* pfem);
 
-	void Init();
+	bool Init();
 
 	void SetCenter(vec3d c) { m_c = c; }
 
@@ -159,7 +159,7 @@ class FEVectorMap : public FECoordSysMap
 public:
 	FEVectorMap(FEModel* pfem);
 
-	void Init();
+	bool Init();
 
 	void SetVectors(vec3d a, vec3d d);
 
@@ -179,7 +179,7 @@ class FESphericalAngleMap : public FECoordSysMap
 public:
 	FESphericalAngleMap(FEModel* pfem);
 
-	void Init();
+	bool Init();
 
 	void SetAngles(double theta, double phi);
 

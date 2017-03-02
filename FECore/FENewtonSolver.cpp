@@ -216,7 +216,7 @@ bool FENewtonSolver::Init()
     if (m_plinsolve == 0)
     {
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		m_plinsolve = fecore.CreateLinearSolver(m_fem.m_nsolver);
+		m_plinsolve = fecore.CreateLinearSolver(m_fem.GetLinearSolverType());
         if (m_plinsolve == 0)
         {
             felog.printbox("FATAL ERROR","Unknown solver type selected\n");
@@ -285,7 +285,7 @@ bool FENewtonSolver::InitEquations()
     int neq = 0;
     
     // see if we need to optimize the bandwidth
-    if (m_fem.m_bwopt)
+    if (m_fem.OptimizeBandwidth())
     {
         // reorder the node numbers
         vector<int> P(mesh.Nodes());

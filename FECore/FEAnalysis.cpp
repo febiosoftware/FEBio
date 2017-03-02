@@ -7,7 +7,7 @@
 #include "MatrixProfile.h"
 #include "FEBoundaryCondition.h"
 #include "DumpMemStream.h"
-#include "LoadCurve.h"
+#include "FEDataLoadCurve.h"
 #include "FELinearConstraintManager.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
@@ -168,8 +168,8 @@ bool FEAnalysis::Activate()
 	// determine the end time
 	double Dt;
 	if (m_ntime == -1) Dt = m_final_time; else Dt = m_dt0*m_ntime;
-	m_tstart = m_fem.m_ftime0;
-	m_tend = m_fem.m_ftime0 + Dt;
+	m_tstart = m_fem.GetStartTime();
+	m_tend = m_tstart + Dt;
 
 	// For now, add all domains to the analysis step
 	FEMesh& mesh = m_fem.GetMesh();
@@ -205,7 +205,7 @@ bool FEAnalysis::Activate()
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		int nbc = node.m_ID.size();
+		int nbc = (int)node.m_ID.size();
 		for (int j=0; j<nbc; ++j)
 		{
 			if (node.m_ID[j] == DOF_ACTIVE) node.m_ID[j] = node.m_BC[j];
@@ -258,7 +258,7 @@ bool FEAnalysis::Solve()
 	bool bconv = true;
 
 	// calculate end time value
-	double starttime = m_fem.m_ftime0;
+	double starttime = m_fem.GetStartTime();
 //	double endtime = m_fem.m_ftime0 + m_ntime*m_dt0;
 	double endtime = m_tend;
 	const double eps = endtime*1e-7;
@@ -276,7 +276,7 @@ bool FEAnalysis::Solve()
 	if (m_ntimesteps != 0)
 	{
 		// update time step
-		if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(GetFESolver()->m_niter);
+		if (m_bautostep && (m_fem.GetCurrentTime() + eps < endtime)) AutoTimeStep(GetFESolver()->m_niter);
 	}
 	else
 	{
@@ -289,7 +289,7 @@ bool FEAnalysis::Solve()
 
 	// repeat for all timesteps
 	m_nretries = 0;
-	while (endtime - m_fem.m_ftime > eps)
+	while (endtime - m_fem.GetCurrentTime() > eps)
 	{
 		// keep a copy of the current state, in case
 		// we need to retry this time step
@@ -302,13 +302,14 @@ bool FEAnalysis::Solve()
 		}
 
 		// update time
-		m_fem.m_ftime += m_dt;
-		felog.printf("\n===== beginning time step %d : %lg =====\n", m_ntimesteps + 1, m_fem.m_ftime);
+		double newTime = m_fem.GetCurrentTime() + m_dt;
+		m_fem.SetCurrentTime(newTime);
+		felog.printf("\n===== beginning time step %d : %lg =====\n", m_ntimesteps + 1, newTime);
 
 		// initialize the solver step
 		// (This basically evaluates all the parameter lists, but let's the solver
 		//  customize this process to the specific needs of the solver)
-		if (GetFESolver()->InitStep(m_fem.m_ftime) == false)
+		if (GetFESolver()->InitStep(newTime) == false)
 		{
 			bconv = false;
 			break;
@@ -320,7 +321,7 @@ bool FEAnalysis::Solve()
 			m_fem.DoCallback(CB_UPDATE_TIME);
 
 			// solve this timestep,
-			bconv = GetFESolver()->SolveStep(m_fem.m_ftime);
+			bconv = GetFESolver()->SolveStep(newTime);
 		}
 		catch (LinearSolverFailed)
 		{
@@ -391,7 +392,7 @@ bool FEAnalysis::Solve()
 		{
 			// Yes! We have converged!
 			if (GetPrintLevel() != FE_PRINT_NEVER)
-				felog.printf("\n\n------- converged at time : %lg\n\n", m_fem.m_ftime);
+				felog.printf("\n\n------- converged at time : %lg\n\n", m_fem.GetCurrentTime());
 
 			// update nr of completed timesteps
 			m_ntimesteps++;
@@ -408,7 +409,7 @@ bool FEAnalysis::Solve()
 			m_nretries = 0;
 
 			// update time step
-			if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(psolver->m_niter);
+			if (m_bautostep && (m_fem.GetCurrentTime() + eps < endtime)) AutoTimeStep(psolver->m_niter);
 		}
 		else 
 		{
@@ -416,7 +417,7 @@ bool FEAnalysis::Solve()
 			m_fem.DoCallback(CB_MINOR_ITERS);
 
 			// Report the sad news to the user.
-			felog.printf("\n\n------- failed to converge at time : %lg\n\n", m_fem.m_ftime);
+			felog.printf("\n\n------- failed to converge at time : %lg\n\n", m_fem.GetCurrentTime());
 
 			// If we have auto time stepping, decrease time step and let's retry
 			if (m_bautostep && (m_nretries < m_maxretries))
@@ -440,7 +441,7 @@ bool FEAnalysis::Solve()
 		// print a progress bar
 		if (GetPrintLevel() == FE_PRINT_PROGRESS)
 		{
-			int l = (int)(50*m_fem.m_ftime / endtime);
+			int l = (int)(50 * m_fem.GetCurrentTime() / endtime);
 			for (int i=0; i<l; ++i) printf("\xB2"); printf("\r");
 			fflush(stdout);
 		}
@@ -451,7 +452,7 @@ bool FEAnalysis::Solve()
 	}
 
 	// TODO: Why is this here?
-	m_fem.m_ftime0 = m_fem.m_ftime;
+	m_fem.SetStartTime(m_fem.GetCurrentTime());
 
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)
 	{
@@ -519,7 +520,7 @@ void FEAnalysis::Retry()
 void FEAnalysis::AutoTimeStep(int niter)
 {
 	double dtn = m_dtp;
-	double told = m_fem.m_ftime;
+	double told = m_fem.GetCurrentTime();
 
 	// make sure the timestep size is at least the minimum
 	if (dtn < m_dtmin) dtn = m_dtmin;
@@ -594,11 +595,11 @@ double FEAnalysis::CheckMustPoints(double t, double dt)
 	double dtnew = dt;
 	const double eps = m_tend*1e-07;
 	double tmust = tnew + eps;
-	FELoadCurve& lc = *m_fem.GetLoadCurve(m_nmplc);
+	FEDataLoadCurve& lc = dynamic_cast<FEDataLoadCurve&>(*m_fem.GetLoadCurve(m_nmplc));
 	m_nmust = -1;
 	if (m_next_must < lc.Points())
 	{
-		FELoadCurve::LOADPOINT lp;
+		FEDataLoadCurve::LOADPOINT lp;
 		if (m_next_must < 0)
 		{
 			// find the first must-point that is past this time

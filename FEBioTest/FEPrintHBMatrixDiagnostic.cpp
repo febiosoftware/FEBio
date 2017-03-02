@@ -23,7 +23,6 @@ FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEModel& fem) : FEDiagnosti
 {
 	FEAnalysis* pstep = new FEAnalysis(&fem);
     fem.AddStep(pstep);
-    fem.m_nStep = 0;
     fem.SetCurrentStep(pstep);
 }
 

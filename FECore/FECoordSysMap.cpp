@@ -20,7 +20,7 @@ FECoordSysMap::~FECoordSysMap() {}
 
 //-----------------------------------------------------------------------------
 //! initialization
-void FECoordSysMap::Init() {}
+bool FECoordSysMap::Init() { return true; }
 
 
 //=============================================================================
@@ -40,10 +40,11 @@ FELocalMap::FELocalMap(FEModel* pfem) : FECoordSysMap(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FELocalMap::Init()
+bool FELocalMap::Init()
 {
 	if ((m_n[0]==-1)&&(m_n[1]==-1)&&(m_n[2]==-1)) { m_n[0] = 0; m_n[1] = 1; m_n[2] = 3; }
 	if (m_n[2] == -1) m_n[2] = m_n[1];
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -120,9 +121,9 @@ FESphericalMap::FESphericalMap(FEModel* pfem): FECoordSysMap(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FESphericalMap::Init()
+bool FESphericalMap::Init()
 {
-
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -203,10 +204,11 @@ FECylindricalMap::FECylindricalMap(FEModel* pfem) : FECoordSysMap(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FECylindricalMap::Init()
+bool FECylindricalMap::Init()
 {
 	m_a.unit();
 	m_r.unit();
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -291,11 +293,12 @@ FEPolarMap::FEPolarMap(FEModel* pfem) : FECoordSysMap(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEPolarMap::Init()
+bool FEPolarMap::Init()
 {
 	m_a.unit();
 	m_d0.unit();
 	m_d1.unit();
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -384,11 +387,12 @@ FEVectorMap::FEVectorMap(FEModel* pfem) : FECoordSysMap(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEVectorMap::Init()
+bool FEVectorMap::Init()
 {
 	m_a.unit();
 	m_d = vec3d(1,0,0);
 	if (m_a*m_d > .999) m_d = vec3d(0,1,0);
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -449,8 +453,9 @@ FESphericalAngleMap::FESphericalAngleMap(FEModel* pfem) : FECoordSysMap(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FESphericalAngleMap::Init()
+bool FESphericalAngleMap::Init()
 {
+	return true;
 }
 
 //-----------------------------------------------------------------------------

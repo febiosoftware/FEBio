@@ -71,7 +71,7 @@ void DataRecord::SetFormat(const char* sz)
 bool DataRecord::Write()
 {
 	int nstep = m_pfem->GetCurrentStep()->m_ntimesteps;
-	double ftime = m_pfem->m_ftime;
+	double ftime = m_pfem->GetCurrentTime();
 	double val;
 
 	FILE* fplog = (FILE*) felog;

@@ -29,67 +29,11 @@ class FEGlobalMatrix;
 class FELinearConstraintManager;
 
 //-----------------------------------------------------------------------------
-// Model property class
-
-class FEModelProperty
-{
-public:
-	FEModelProperty() {}
-	FEModelProperty(const string& name) : m_name(name) {}
-
-	FECoreBase* operator [] (int i) { return at(i); }
-
-	FECoreBase* operator [] (const string& name)
-	{
-		int N = Count();
-		for (int i=0; i<N; ++i)
-		{
-			FECoreBase* it = at(i);
-			if (it->GetName() == name) return it;
-		}
-		return 0;
-	}
-
-	const string& GetName() const { return m_name; }
-
-	void SetName(const string& name) { m_name = name; }
-
-public:
-	virtual int Count() const = 0;
-
-	virtual FECoreBase* at(int i) = 0;
-
-private:
-	string	m_name;
-
-private:
-	FEModelProperty(const FEModelProperty&) {}
-	void operator = (const FEModelProperty&) {}
-};
-
-template <typename T> class FEModelProperty_T : public FEModelProperty
-{
-public:
-	FEModelProperty_T(std::vector<T*>& data, const string& name) : FEModelProperty(name), m_data(data) {}
-
-	int Count() const { return (int) m_data.size(); }
-
-	FECoreBase* at(int i) { return m_data[i]; }
-
-private:
-	std::vector<T*>&	m_data;
-
-private:
-	FEModelProperty_T(const FEModelProperty_T& p){}
-	void operator = (const FEModelProperty_T& p) {}
-};
-
-//-----------------------------------------------------------------------------
 //! The FEModel class stores all the data for the finite element model, including
 //! geometry, analysis steps, boundary and loading conditions, contact interfaces
 //! and so on.
 //!
-class FEModel : public CallbackHandler
+class FEModel : public FECoreBase, public CallbackHandler
 {
 public:
 	enum {MAX_STRING = 256};
@@ -118,10 +62,10 @@ public:
 
 public:
 	// get the FE mesh
-	FEMesh& GetMesh() { return m_mesh; }
+	FEMesh& GetMesh();
 
 	// get the rigid system
-	FERigidSystem* GetRigidSystem() { return m_prs; }
+	FERigidSystem* GetRigidSystem();
 
 	// get the linear constraint manager
 	FELinearConstraintManager& GetLinearConstraintManager();
@@ -142,24 +86,24 @@ public:
 public:	// --- Load curve functions ----
 
 	//! Add a loadcurve to the model
-	void AddLoadCurve(FELoadCurve* plc) { m_LC.push_back(plc); }
+	void AddLoadCurve(FELoadCurve* plc);
 
 	//! get a loadcurve
-	FELoadCurve* GetLoadCurve(int i) { return m_LC[i]; }
+	FELoadCurve* GetLoadCurve(int i);
 
 	//! get the number of loadcurves
-	int LoadCurves() { return (int)m_LC.size(); }
+	int LoadCurves() const;
 
 public: // --- Material functions ---
 
 	//! Add a material to the model
-	void AddMaterial(FEMaterial* pm) { m_MAT.push_back(pm); }
+	void AddMaterial(FEMaterial* pm);
 
 	//! get the number of materials
-	int Materials() { return (int)m_MAT.size(); }
+	int Materials();
 
 	//! return a pointer to a material
-	FEMaterial* GetMaterial(int i) { return m_MAT[i]; }
+	FEMaterial* GetMaterial(int i);
 
 	//! find a material based on its index
 	FEMaterial* FindMaterial(int nid);
@@ -175,50 +119,50 @@ public: // --- Material functions ---
 
 public: // --- Boundary Conditions functions ---
 	// fixed BC
-	int FixedBCs() { return (int) m_BC.size(); }
-	FEFixedBC* FixedBC(int i) { return m_BC[i]; }
-	void AddFixedBC(FEFixedBC* pbc) { m_BC.push_back(pbc); }
+	int FixedBCs();
+	FEFixedBC* FixedBC(int i);
+	void AddFixedBC(FEFixedBC* pbc);
 	void AddFixedBC(int node, int bc);
 
 	// prescribed BC's
-	int PrescribedBCs() { return (int) m_DC.size(); }
-	FEPrescribedBC* PrescribedBC(int i) { return m_DC[i]; }
-	void AddPrescribedBC(FEPrescribedBC* pbc) { m_DC.push_back(pbc); }
+	int PrescribedBCs();
+	FEPrescribedBC* PrescribedBC(int i);
+	void AddPrescribedBC(FEPrescribedBC* pbc);
 	void ClearBCs();
 
 	// initial conditions
-	int InitialConditions() { return (int) m_IC.size(); }
-	FEInitialCondition* InitialCondition(int i) { return m_IC[i]; }
-	void AddInitialCondition(FEInitialCondition* pbc) { m_IC.push_back(pbc); }
+	int InitialConditions();
+	FEInitialCondition* InitialCondition(int i);
+	void AddInitialCondition(FEInitialCondition* pbc);
 
 	// nodal loads
-	int NodalLoads() { return (int) m_FC.size(); }
-	FENodalLoad* NodalLoad(int i) { return m_FC[i]; }
-	void AddNodalLoad(FENodalLoad* pfc) { m_FC.push_back(pfc); }
+	int NodalLoads();
+	FENodalLoad* NodalLoad(int i);
+	void AddNodalLoad(FENodalLoad* pfc);
 
 	// surface loads
-	int SurfaceLoads() { return (int) m_SL.size(); }
-	FESurfaceLoad* SurfaceLoad(int i) { return m_SL[i]; }
-	void AddSurfaceLoad(FESurfaceLoad* psl) { m_SL.push_back(psl); }
+	int SurfaceLoads();
+	FESurfaceLoad* SurfaceLoad(int i);
+	void AddSurfaceLoad(FESurfaceLoad* psl);
 
 	// edge loads
-	int EdgeLoads() { return (int) m_EL.size(); }
-	FEEdgeLoad* EdgeLoad(int i) { return m_EL[i]; }
-	void AddEdgeLoad(FEEdgeLoad* psl) { m_EL.push_back(psl); }
+	int EdgeLoads();
+	FEEdgeLoad* EdgeLoad(int i);
+	void AddEdgeLoad(FEEdgeLoad* psl);
 
 public: // --- Body load functions --- 
 
 	//! Add a body load to the model
-	void AddBodyLoad(FEBodyLoad* pf) { m_BL.push_back(pf); }
+	void AddBodyLoad(FEBodyLoad* pf);
 
 	//! get the number of body loads
-	int BodyLoads() { return (int) m_BL.size(); }
+	int BodyLoads();
 
 	//! return a pointer to a body load
-	FEBodyLoad* GetBodyLoad(int i) { return m_BL[i]; }
+	FEBodyLoad* GetBodyLoad(int i);
 
 	//! see if there are any body loads
-	bool HasBodyLoads() { return !m_BL.empty();}
+	bool HasBodyLoads();
 
 	//! Init body loads
 	bool InitBodyLoads();
@@ -226,36 +170,54 @@ public: // --- Body load functions ---
 public: // --- Analysis steps functions ---
 
 	//! retrieve the number of steps
-	int Steps() { return (int) m_Step.size(); }
+	int Steps();
 
 	//! clear the steps
-	void ClearSteps() { m_Step.clear(); }
+	void ClearSteps();
 
 	//! Add an analysis step
-	void AddStep(FEAnalysis* pstep) { m_Step.push_back(pstep); }
+	void AddStep(FEAnalysis* pstep);
 
 	//! Get a particular step
-	FEAnalysis* GetStep(int i) { return m_Step[i]; }
+	FEAnalysis* GetStep(int i);
 
 	//! Get the current step
-	FEAnalysis* GetCurrentStep() { return m_pStep; }
+	FEAnalysis* GetCurrentStep();
+
+	//! Set the current step index
+	int GetCurrentStepIndex() const;
 
 	//! Set the current step
-	void SetCurrentStep(FEAnalysis* pstep) { m_pStep = pstep; }
+	void SetCurrentStep(FEAnalysis* pstep);
+
+	//! Set the current step index
+	void SetCurrentStepIndex(int n);
 
 	//! Get the current time
 	FETimeInfo GetTime();
 
+	//! Get the start time
+	double GetStartTime() const;
+
+	//! Set the start time
+	void SetStartTime(double t);
+
+	//! Get the current time
+	double GetCurrentTime() const;
+
+	//! Set the current time
+	void SetCurrentTime(double t);
+
 public: // --- Contact interface functions ---
 
 	//! return number of surface pair interactions
-	int SurfacePairInteractions() { return (int)m_CI.size(); }
+	int SurfacePairInteractions();
 
 	//! retrive a surface pair interaction
-	FESurfacePairInteraction* SurfacePairInteraction(int i) { return m_CI[i]; }
+	FESurfacePairInteraction* SurfacePairInteraction(int i);
 
 	//! Add a surface pair interaction
-	void AddSurfacePairInteraction(FESurfacePairInteraction* pci) { m_CI.push_back(pci); }
+	void AddSurfacePairInteraction(FESurfacePairInteraction* pci);
 
 	//! Initializes contact data
 	bool InitContact();
@@ -263,26 +225,26 @@ public: // --- Contact interface functions ---
 public: // --- Nonlinear constraints functions ---
 
 	//! return number of nonlinear constraints
-	int NonlinearConstraints() { return (int) m_NLC.size(); }
+	int NonlinearConstraints();
 
 	//! retrieve a nonlinear constraint
-	FENLConstraint* NonlinearConstraint(int i) { return m_NLC[i]; }
+	FENLConstraint* NonlinearConstraint(int i);
 
 	//! add a nonlinear constraint
-	void AddNonlinearConstraint(FENLConstraint* pnlc) { m_NLC.push_back(pnlc); }
+	void AddNonlinearConstraint(FENLConstraint* pnlc);
 
 	//! Initialize constraint data
 	bool InitConstraints();
 
 public:	// --- Model Loads ----
 	//! return the number of model loads
-	int ModelLoads() { return (int) m_ML.size(); }
+	int ModelLoads();
 
 	//! retrieve a model load
-	FEModelLoad* ModelLoad(int i) { return m_ML[i]; }
+	FEModelLoad* ModelLoad(int i);
 
 	//! Add a model load
-	void AddModelLoad(FEModelLoad* pml) { m_ML.push_back(pml); }
+	void AddModelLoad(FEModelLoad* pml);
 
 	//! initialize model loads
 	bool InitModelLoads();
@@ -326,7 +288,19 @@ public:	// --- Miscellaneous routines ---
 	int GetDOFIndex(const char* szvar, int n);
 
 	//! serialize data for restarts
-	virtual bool Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar);
+
+	//! Get the linear solver type
+	int GetLinearSolverType() const;
+
+	//! set the linear solver type
+	void SetLinearSolverType(int ntype);
+
+	//! see if we need to optimize bandwidth of linear system
+	bool OptimizeBandwidth() const;
+
+	//! Set the optimize band width flag
+	void SetOptimizeBandwidth(bool b);
 
 protected:
 	// helper functions for serialization
@@ -347,59 +321,13 @@ public: // Global data
 	void SetGlobalConstant(const string& s, double v);
 	double GetGlobalConstant(const string& s);
 
-public: // TODO: Find a better place for these parameters
-	// I want to make this parameter part of the FEAnalysis, since 
-	// it could be different analysis steps (in multi-step problems) may
-	// require different solvers.
-	int		m_nsolver;			//!< type of (linear) solver selected
-
-	int		m_bwopt;			//!< bandwidth optimization flag
-	int		m_nStep;			//!< current analysis step
-	double	m_ftime;			//!< current time value
-	double	m_ftime0;			//!< start time of current step
-	int		m_nplane_strain;	//!< run analysis in plain strain mode \todo Move to the analysis class?
+public:
+	// TODO: put this somewhere else
 	double	m_ut4_alpha;		//!< UT4 integration alpha value
 	bool	m_ut4_bdev;			//!< UT4 integration deviatoric formulation flag
 	double	m_udghex_hg;		//!< hourglass parameter for UDGhex integration
 
-protected:
-	std::vector<FELoadCurve*>				m_LC;	//!< load curve data
-	std::vector<FEMaterial*>				m_MAT;	//!< array of materials
-	std::vector<FEFixedBC*>					m_BC;	//!< fixed constraints
-	std::vector<FEPrescribedBC*>			m_DC;	//!< prescribed constraints
-	std::vector<FEInitialCondition*>		m_IC;	//!< initial conditions
-	std::vector<FENodalLoad*>				m_FC;	//!< concentrated nodal loads
-	std::vector<FESurfaceLoad*>				m_SL;	//!< surface loads
-	std::vector<FEEdgeLoad*>				m_EL;	//!< edge loads
-	std::vector<FESurfacePairInteraction*>	m_CI;	//!< contact interface array
-	std::vector<FEBodyLoad*>				m_BL;	//!< body load data
-	std::vector<FENLConstraint*>			m_NLC;	//!< nonlinear constraints
-	std::vector<FEModelLoad*>				m_ML;	//!< model loads
-
-protected:
-	std::vector<FEAnalysis*>	m_Step;		//!< array of analysis steps
-	FEAnalysis*					m_pStep;	//!< pointer to current analysis step
-
-protected:
-	// DOFS data
-	DOFS	m_dofs;				//!< list of degree of freedoms in this model
-
-	// Geometry data
-	FEMesh		m_mesh;			//!< the one and only FE mesh
-
-	// the rigid body system
-	FERigidSystem*		m_prs;	//!< the rigid body system manages rigid bodies
-
-	// linear constraint data
-	FELinearConstraintManager*	m_LCM;
-
-protected:
-	char	m_sztitle[MAX_STRING];	//!< problem title
-
-protected: // Global Data
-	std::map<string, double> m_Const;	//!< Global model constants
-	vector<FEGlobalData*>	m_GD;		//!< global data structures
-
-protected: // properties
-	std::vector<FEModelProperty*>	m_Props;
+private:
+	class Implementation;
+	Implementation*	m_imp;
 };

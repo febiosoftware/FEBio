@@ -52,7 +52,7 @@ bool FERVEProbe::Execute(FEModel& fem, int nwhen)
 
 void FERVEProbe::Save()
 {
-	if (m_xplt) m_xplt->Write(m_rve, (float) m_rve.m_ftime);
+	if (m_xplt) m_xplt->Write(m_rve, (float) m_rve.GetCurrentTime());
 }
 
 //=============================================================================

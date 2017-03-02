@@ -34,7 +34,7 @@ class ParamString
 {
 public:
 	//! constructor
-	ParamString(const char* sz);
+	explicit ParamString(const char* sz);
 
 	//! copy constructor
 	ParamString(const ParamString& p);

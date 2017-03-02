@@ -15,13 +15,12 @@ FEModelParameter::FEModelParameter(FEModel* fem) : FEInputParameter(fem)
 }
 
 //-----------------------------------------------------------------------------
-bool FEModelParameter::SetParameter(const string& paramName)
+bool FEModelParameter::Init()
 {
-	SetName(paramName);
-
 	// find the variable
 	FEModel& fem = *GetFEModel();
-	double* pd = fem.FindParameter(paramName.c_str());
+	string name = GetName();
+	double* pd = fem.FindParameter(ParamString(name.c_str()));
 	if (pd == 0) return false;
 
 	// store the pointer to the parameter
@@ -73,6 +72,16 @@ bool FEOptimizeData::Init()
 
 	// do the initialization of the task
 	if (m_pTask->Init(0) == false) return false;
+
+	// initialize all input parameters
+	for (int i=0; i<(int)m_Var.size(); ++i)
+	{
+		FEInputParameter* p = m_Var[i];
+		if ((p==0) || (p->Init() == false)) return false;
+
+		// set the initial value
+		p->SetValue(p->InitValue());
+	}
 
 	// initialize the objective function
 	if (m_obj == 0) return false;

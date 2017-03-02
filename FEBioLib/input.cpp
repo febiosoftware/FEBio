@@ -17,7 +17,7 @@
 #include "FECore/FERigidBody.h"
 #include "FECore/BC.h"
 #include "FECore/FEBodyLoad.h"
-#include <FECore/LoadCurve.h>
+#include <FECore/FEDataLoadCurve.h>
 #include "FECore/log.h"
 #include <string.h>
 
@@ -171,7 +171,6 @@ void echo_input(FEBioModel& fem)
 	}
 	felog.printf("\tAnalysis type .................................. : %s\n", szan);
 
-	felog.printf("\tPlane strain mode .............................. : %s\n", (fem.m_nplane_strain != -1? "yes" : "no"));
 	if (step.m_ntime > 0)
 		felog.printf("\tNumber of timesteps ............................ : %d\n", step.m_ntime);
 	else
@@ -430,11 +429,14 @@ void echo_input(FEBioModel& fem)
 	{
 		if (i>0) felog.printf("---------------------------------------------------------------------------\n");
 		felog.printf("%3d\n", i+1);
-		FELoadCurve* plc = fem.GetLoadCurve(i);
-		for (j=0; j<plc->Points(); ++j)
+		FEDataLoadCurve* plc = dynamic_cast<FEDataLoadCurve*>(fem.GetLoadCurve(i));
+		if (plc)
 		{
-			LOADPOINT& pt = plc->LoadPoint(j);
-			felog.printf("%10lg%10lg\n", pt.time, pt.value);
+			for (j=0; j<plc->Points(); ++j)
+			{
+				LOADPOINT pt = plc->LoadPoint(j);
+				felog.printf("%10lg%10lg\n", pt.time, pt.value);
+			}
 		}
 	}
 	felog.printf("\n\n");
@@ -442,7 +444,7 @@ void echo_input(FEBioModel& fem)
 	felog.printf(" LINEAR SOLVER DATA\n");
 	felog.printf("===========================================================================\n");
 	felog.printf("\tSolver type ............................... : ");
-	switch (fem.m_nsolver)
+	switch (fem.GetLinearSolverType())
 	{
 	case SKYLINE_SOLVER     : felog.printf("Skyline\n"           ); break;
 	case PSLDLT_SOLVER      : felog.printf("PSLDLT\n"            ); break;

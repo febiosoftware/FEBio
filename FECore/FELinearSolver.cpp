@@ -53,7 +53,7 @@ bool FELinearSolver::Init()
 	if (m_pls == 0)
 	{
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		m_pls = fecore.CreateLinearSolver(m_fem.m_nsolver);
+		m_pls = fecore.CreateLinearSolver(m_fem.GetLinearSolverType());
 		if (m_pls == 0)
 		{
 			felog.printbox("FATAL ERROR","Unknown solver type selected\n");
@@ -110,7 +110,7 @@ bool FELinearSolver::InitEquations()
 	if (ndof == 0) return false;
 
 	// see if we need to optimize the bandwidth
-	if (m_fem.m_bwopt)
+	if (m_fem.OptimizeBandwidth())
 	{
 		// reorder the node numbers
 		vector<int> P(mesh.Nodes());

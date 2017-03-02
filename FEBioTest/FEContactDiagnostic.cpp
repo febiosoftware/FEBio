@@ -41,7 +41,6 @@ FEContactDiagnostic::FEContactDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
 	FEAnalysis* pstep = new FEAnalysis(&fem);
     fem.AddStep(pstep);
-    fem.m_nStep = 0;
     fem.SetCurrentStep(pstep);
 }
 
@@ -203,7 +202,7 @@ bool FEContactDiagnostic::Init()
 	fem.AddSurfacePairInteraction(ps);
 
 	// --- set fem data ---
-	fem.m_nsolver = LU_SOLVER;	// make sure we have the LU solver
+	fem.SetLinearSolverType(LU_SOLVER);	// make sure we have the LU solver
 
 	return FEDiagnostic::Init();
 }

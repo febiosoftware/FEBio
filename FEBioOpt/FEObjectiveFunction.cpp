@@ -71,20 +71,20 @@ bool fecb(FEModel* pmdl, unsigned int nwhen, void* pd)
 	FEModel& fem = *obj.GetFEM();
 
 	// get the current time value
-	double time = fem.m_ftime;
+	double time = fem.GetTime().currentTime;
 
 	// evaluate the current reaction force value
 	double value = *(obj.m_pd);
 
 	// add the data pair to the loadcurve
-	FELoadCurve& lc = obj.ReactionLoad();
+	FEDataLoadCurve& lc = obj.ReactionLoad();
 	lc.Add(time, value);
 
 	return true;
 }
 
 //----------------------------------------------------------------------------
-FEDataFitObjective::FEDataFitObjective(FEModel* fem) : FEObjectiveFunction(fem)
+FEDataFitObjective::FEDataFitObjective(FEModel* fem) : FEObjectiveFunction(fem), m_lc(fem), m_rf(fem)
 {
 
 }
@@ -98,7 +98,7 @@ bool FEDataFitObjective::Init()
 	FEModel& fem = *GetFEM();
 
 	// find all the parameters
-	m_pd = fem.FindParameter(m_szname);
+	m_pd = fem.FindParameter(ParamString(m_name.c_str()));
 	if (m_pd == 0) return false;
 
 	// register callback
@@ -114,7 +114,7 @@ void FEDataFitObjective::Reset()
 	FEObjectiveFunction::Reset();
 
 	// reset the reaction force load curve
-	FELoadCurve& lc = ReactionLoad();
+	FEDataLoadCurve& lc = ReactionLoad();
 	lc.Clear();
 }
 
@@ -122,7 +122,7 @@ void FEDataFitObjective::Reset()
 // return the number of measurements. I.e. the size of the measurement vector
 int FEDataFitObjective::Measurements()
 {
-	FELoadCurve& lc = GetLoadCurve(m_nlc);
+	FEDataLoadCurve& lc = GetDataCurve();
 	return lc.Points();
 }
 
@@ -130,7 +130,7 @@ int FEDataFitObjective::Measurements()
 // Evaluate the measurement vector and return in y0
 void FEDataFitObjective::GetMeasurements(vector<double>& y0)
 {
-	FELoadCurve& lc = GetLoadCurve(m_nlc);
+	FEDataLoadCurve& lc = GetDataCurve();
 	int ndata = lc.Points();
 	y0.resize(ndata);
 	for (int i = 0; i<ndata; ++i) y0[i] = lc.LoadPoint(i).value;
@@ -138,7 +138,7 @@ void FEDataFitObjective::GetMeasurements(vector<double>& y0)
 
 void FEDataFitObjective::EvaluateFunctions(vector<double>& f)
 {
-	FELoadCurve& lc = GetLoadCurve(m_nlc);
+	FEDataLoadCurve& lc = GetDataCurve();
 	int ndata = lc.Points();
 	FELoadCurve& rlc = ReactionLoad();
 	for (int i = 0; i<ndata; ++i)
@@ -181,7 +181,7 @@ bool FEMinimizeObjective::Init()
 	for (int i=0; i<N; ++i)
 	{
 		Function& Fi = m_Func[i];
-		Fi.var = fem->FindParameter(Fi.name.c_str());
+		Fi.var = fem->FindParameter(ParamString(Fi.name.c_str()));
 		if (Fi.var == 0) return false;
 	}
 

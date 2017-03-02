@@ -5,6 +5,7 @@
 #include "BC.h"
 #include "FEInitialCondition.h"
 #include "FECorePlot.h"
+#include "FEDataLoadCurve.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -28,6 +29,7 @@ const char* FECore::get_version_string()
 //-----------------------------------------------------------------------------
 void FECore::InitModule()
 {
+// coordinate system map
 REGISTER_FECORE_CLASS(FELocalMap         , FECOORDSYSMAP_ID, "local"      );
 REGISTER_FECORE_CLASS(FESphericalMap     , FECOORDSYSMAP_ID, "spherical"  );
 REGISTER_FECORE_CLASS(FECylindricalMap   , FECOORDSYSMAP_ID, "cylindrical");
@@ -35,12 +37,19 @@ REGISTER_FECORE_CLASS(FEVectorMap        , FECOORDSYSMAP_ID, "vector"     );
 REGISTER_FECORE_CLASS(FESphericalAngleMap, FECOORDSYSMAP_ID, "angles"     );
 REGISTER_FECORE_CLASS(FEPolarMap         , FECOORDSYSMAP_ID, "polar"      );
 
+// boundary conditions
 REGISTER_FECORE_CLASS(FEFixedBC      , FEBC_ID, "fix"      );
 REGISTER_FECORE_CLASS(FEPrescribedDOF, FEBC_ID, "prescribe");
 REGISTER_FECORE_CLASS(FENodalLoad    , FEBC_ID, "nodal load");
 
+// initial conditions
 REGISTER_FECORE_CLASS(FEInitialBC     , FEIC_ID, "init_bc"       );
 REGISTER_FECORE_CLASS(FEInitialBCVec3D, FEIC_ID, "init_bc_vec3d" );
 
+// plot field
 REGISTER_FECORE_CLASS(FEPlotMaterialParameter, FEPLOTDATA_ID, "parameter");
+
+// load curves
+REGISTER_FECORE_CLASS(FEDataLoadCurve, FELOADCURVE_ID, "loadcurve");
+REGISTER_FECORE_CLASS(FELinearRamp   , FELOADCURVE_ID, "linear ramp");
 }

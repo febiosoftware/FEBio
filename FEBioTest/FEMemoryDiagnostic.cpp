@@ -8,7 +8,6 @@ FEMemoryDiagnostic::FEMemoryDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 
 	FEAnalysis* pstep = new FEAnalysis(&fem);
 	fem.AddStep(pstep);
-	fem.m_nStep = 0;
 	fem.SetCurrentStep(pstep);
 }
 

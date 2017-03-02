@@ -145,12 +145,12 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 	{
 		if (strcmp(argv[1], "time") == 0)
 		{
-			printf("Time : %lg\n", m_pfem->m_ftime);
+			printf("Time : %lg\n", m_pfem->GetCurrentTime());
 		}
 		else
 		{
 			// assume it is a material parameter
-			double* pd = m_pfem->FindParameter(argv[1]);
+			double* pd = m_pfem->FindParameter(ParamString(argv[1]));
 			if (pd)
 			{
 				printf("%lg\n", *pd);
@@ -222,7 +222,7 @@ int FEBioCmd_Time::run(int nargs, char **argv)
 
 	double endtime = m_pfem->GetCurrentStep()->m_tend;
 
-	double pct = (m_pfem->m_ftime - m_pfem->GetCurrentStep()->m_dt) / endtime;
+	double pct = (m_pfem->GetCurrentTime() - m_pfem->GetCurrentStep()->m_dt) / endtime;
 	if ((pct != 0) && (m_pfem->GetCurrentStep()->m_ntimesteps != 0))
 	{
 		double sec1 = sec0*(1.0/pct - 1.0);

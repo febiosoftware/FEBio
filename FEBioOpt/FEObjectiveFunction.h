@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/LoadCurve.h>
+#include <FECore/FEDataLoadCurve.h>
 #include <vector>
 #include <string>
 using namespace std;
@@ -74,12 +74,11 @@ public:
 	void Reset();
 
 public:
-	//! add a loadcurve
-	void AddLoadCurve(FELoadCurve* plc) { m_LC.push_back(plc); }
+	// get the reaction load curve
+	FEDataLoadCurve& ReactionLoad() { return m_rf; }
 
-	FELoadCurve& ReactionLoad() { return m_rf; }
-
-	FELoadCurve& GetLoadCurve(int n) { return *m_LC[n]; }
+	// get the load curve providing the measurement vector
+	FEDataLoadCurve& GetDataCurve() { return m_lc; }
 
 public:
 	// return number of measurements
@@ -92,12 +91,11 @@ public:
 	void GetMeasurements(vector<double>& y);
 
 public:
-	char	m_szname[128];	//!< name of objective
+	string	m_name;			//!< name of parameter that generates the function data
 	double*	m_pd;			//!< pointer to variable data
-	int		m_nlc;			//!< load curve
 
-	FELoadCurve	m_rf;		//!< reaction force data
-	std::vector<FELoadCurve*>	m_LC;	//!< load curves. (TODO: Not sure why there can be more than one)
+	FEDataLoadCurve		m_rf;		//!< reaction force data
+	FEDataLoadCurve		m_lc;
 };
 
 //=============================================================================

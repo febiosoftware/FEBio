@@ -169,6 +169,7 @@ struct FE_Element_Spec
 //! with the kernel. It effectively defines the base class that a class
 //! is derived from.
 typedef unsigned int SUPER_CLASS_ID;
+#define FEOBJECT_ID					0x0000	// derived from FECoreBase (TODO: work in progress)
 #define FETASK_ID                   0x0001	// derived from FECoreTask
 #define FESOLVER_ID                 0x0002	// derived from FESolver
 #define FEMATERIAL_ID               0x0003	// derived from FEMaterial
@@ -191,6 +192,8 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FEIC_ID						0x0014	// derived from initial condition
 #define FEEDGELOAD_ID				0x0015	// derived from FEEdgeLoad
 #define FEDATAGENERATOR_ID			0x0016	// derived from FEDataGenerator
+#define FELOADCURVE_ID				0x0017	// derived from FELoadCurve (TODO: work in progress)
+#define FEMODEL_ID					0x0018	// derived from FEModel (TODO: work in progress)
 
 /////////////////////////////////////////////////////////////////////////////
 // ENUM: Linear solvers

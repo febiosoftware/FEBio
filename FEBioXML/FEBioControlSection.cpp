@@ -39,30 +39,15 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEAnalysis* pstep = GetStep();
 	char sztitle[256];
+	bool b;
 
 	if      (tag == "title"             ) { tag.value(sztitle); fem.SetTitle(sztitle); }
 	else if (tag == "time_steps"        ) tag.value(pstep->m_ntime);
 	else if (tag == "final_time"        ) tag.value(pstep->m_final_time);
 	else if (tag == "step_size"         ) { tag.value(pstep->m_dt0); pstep->m_dt = pstep->m_dt0; pstep->m_dtp = pstep->m_dt0; }
-	else if (tag == "optimize_bw"       ) tag.value(fem.m_bwopt);
+	else if (tag == "optimize_bw"       ) { tag.value(b); fem.SetOptimizeBandwidth(b); }
 	else if (tag == "pressure_stiffness") tag.value(pstep->m_istiffpr);
 	else if (tag == "hourglass"         ) tag.value(fem.m_udghex_hg);
-	else if (tag == "plane_strain"      )
-	{
-		int bc = 2;
-		XMLAtt* patt = tag.Attribute("bc", true);
-		if (patt)
-		{
-			XMLAtt& att = *patt;
-			if      (att == "x") bc = 0;
-			else if (att == "y") bc = 1;
-			else if (att == "z") bc = 2;
-			else throw XMLReader::InvalidAttributeValue(tag, "bc", att.cvalue());
-		}
-		bool b = false;
-		tag.value(b);
-		if (b) fem.m_nplane_strain = bc; else fem.m_nplane_strain = -1;
-	}
 	else if (tag == "analysis")
 	{
 		XMLAtt& att = tag.Attribute("type");

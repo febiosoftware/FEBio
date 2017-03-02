@@ -112,7 +112,6 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 			else if (tag == "Objective"  ) bret = ParseObjective(tag, opt);
 			else if (tag == "Parameters" ) bret = ParseParameters(tag, opt);
 			else if (tag == "Constraints") bret = ParseConstraints(tag, opt);
-			else if (tag == "LoadData"   ) bret = ParseLoadData(tag, opt);
 			else throw XMLReader::InvalidTag(tag);
 
 			if (bret == false) return false;
@@ -230,11 +229,52 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 		{
 			if (tag == "fnc")
 			{
-				tag.value(obj->m_szname);
+				const char* szname = tag.AttributeValue("name");
+				obj->m_name = szname;
+			}
+			else if (tag == "data")
+			{
+				FEDataLoadCurve& lc = obj->GetDataCurve();
+				lc.Clear();
 
-				// get the loadcurve for this objective function
-				tag.AttributeValue("lc", obj->m_nlc);
-				obj->m_nlc--;
+				// see if the user wants to read the data from a text file
+				const char* szf = tag.AttributeValue("import", true);
+				if (szf)
+				{
+					// make sure this tag is a leaf
+					if ((tag.isempty() == false) || (tag.isleaf() == false)) throw XMLReader::InvalidValue(tag);
+
+					// read the data form a text file
+					FILE* fp = fopen(szf, "rt");
+					if (fp == 0) throw XMLReader::InvalidAttributeValue(tag, "import", szf);
+					char szline[256] = { 0 };
+					do
+					{
+						fgets(szline, 255, fp);
+						double t, v;
+						int n = sscanf(szline, "%lg%lg", &t, &v);
+						if (n == 2)
+						{
+							lc.Add(t, v);
+						}
+						else break;
+					} 
+					while ((feof(fp) == 0) && (ferror(fp) == 0));
+
+					fclose(fp);
+				}
+				else
+				{
+					double v[2] = {0};
+					++tag;
+					do
+					{
+						tag.value(v,2);
+						lc.Add(v[0], v[1]);
+						++tag;
+					}
+					while (!tag.isend());
+				}
 			}
 			else throw XMLReader::InvalidTag(tag);
 
@@ -285,15 +325,14 @@ bool FEOptimizeInput::ParseParameters(XMLTag& tag, FEOptimizeData& opt)
 			// get the variable name
 			const char* sz = tag.AttributeValue("name");
 			if (sz == 0) throw InvalidVariableName("[Unknown]");
-
-			if (var->SetParameter(sz) == 0) throw InvalidVariableName(sz);
+			var->SetName(sz);
 
 			// set initial values and bounds
 			double d[4] = { 0, 0, 0, 1 };
 			tag.value(d, 4);
-			var->SetValue(d[0]);
-			var->MinValue() = d[1];
-			var->MaxValue() = d[2];
+			var->InitValue()   = d[0];
+			var->MinValue()    = d[1];
+			var->MaxValue()    = d[2];
 			var->ScaleFactor() = d[3];
 
 			// add the variable
@@ -330,128 +369,6 @@ bool FEOptimizeInput::ParseConstraints(XMLTag &tag, FEOptimizeData &opt)
 			opt.AddLinearConstraint(con);
 		}
 		else throw XMLReader::InvalidTag(tag);
-		++tag;
-	} while (!tag.isend());
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Read the load data section of the input file
-bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
-{
-	FEObjectiveFunction& obj = opt.GetObjective();
-
-	++tag;
-	do
-	{
-		if (tag == "loadcurve")
-		{
-			FELoadCurve::INTFUNC ntype = FELoadCurve::LINEAR;
-			FELoadCurve::EXTMODE nextm = FELoadCurve::CONSTANT;
-
-			// get the (optional) type
-			const char* szt = tag.AttributeValue("type", true);
-			if (szt)
-			{
-				if (strcmp(szt, "step") == 0) ntype = FELoadCurve::STEP;
-				else if (strcmp(szt, "linear") == 0) ntype = FELoadCurve::LINEAR;
-				else if (strcmp(szt, "smooth") == 0) ntype = FELoadCurve::SMOOTH;
-				else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-			}
-
-			// get the optional extend mode
-			const char* szm = tag.AttributeValue("extend", true);
-			if (szm)
-			{
-				if (strcmp(szm, "constant") == 0) nextm = FELoadCurve::CONSTANT;
-				else if (strcmp(szm, "extrapolate") == 0) nextm = FELoadCurve::EXTRAPOLATE;
-				else if (strcmp(szm, "repeat") == 0) nextm = FELoadCurve::REPEAT;
-				else if (strcmp(szm, "repeat offset") == 0) nextm = FELoadCurve::REPEAT_OFFSET;
-				else throw XMLReader::InvalidAttributeValue(tag, "extend", szt);
-			}
-
-			// see if the user wants to read the data from a text file
-			const char* szf = tag.AttributeValue("import", true);
-			if (szf)
-			{
-				// make sure this tag is a leaf
-				if ((tag.isempty() == false) || (tag.isleaf() == false)) throw XMLReader::InvalidValue(tag);
-
-				// read the data form a text file
-				FILE* fp = fopen(szf, "rt");
-				if (fp == 0) throw XMLReader::InvalidAttributeValue(tag, "import", szf);
-				vector< pair<double, double> > data;
-				char szline[256] = { 0 };
-				do
-				{
-					fgets(szline, 255, fp);
-					double t, v;
-					int n = sscanf(szline, "%lg%lg", &t, &v);
-					if (n == 2)
-					{
-						data.push_back(pair<double, double>(t, v));
-					}
-					else break;
-				} while ((feof(fp) == 0) && (ferror(fp) == 0));
-
-				fclose(fp);
-
-				// create the load curve
-				const int nlp = (const int)data.size();
-				FELoadCurve* plc = new FELoadCurve;
-				plc->Create(nlp);
-				plc->SetInterpolation(ntype);
-				plc->SetExtendMode(nextm);
-
-				// TODO: This is a hack. Find a better way
-				if (dynamic_cast<FEDataFitObjective*>(&obj))
-				{
-					(dynamic_cast<FEDataFitObjective*>(&obj))->AddLoadCurve(plc);
-				}
-				
-
-				// set the load points
-				for (int i = 0; i<nlp; ++i)
-				{
-					plc->LoadPoint(i).time = data[i].first;
-					plc->LoadPoint(i).value = data[i].second;
-				}
-			}
-			else
-			{
-				// count how many points we have
-				XMLTag t(tag); ++t;
-				int nlp = 0;
-				while (!t.isend()) { ++nlp; ++t; }
-
-				// create the loadcurve
-				FELoadCurve* plc = new FELoadCurve;
-				plc->Create(nlp);
-				plc->SetInterpolation(ntype);
-				plc->SetExtendMode(nextm);
-
-				// TODO: This is a hack. Find a better way
-				if (dynamic_cast<FEDataFitObjective*>(&obj))
-				{
-					(dynamic_cast<FEDataFitObjective*>(&obj))->AddLoadCurve(plc);
-				}
-
-				// read the points
-				double d[2];
-				++tag;
-				for (int i = 0; i<nlp; ++i)
-				{
-					tag.value(d, 2);
-					plc->LoadPoint(i).time = d[0];
-					plc->LoadPoint(i).value = d[1];
-
-					++tag;
-				}
-			}
-		}
-		else throw XMLReader::InvalidTag(tag);
-
 		++tag;
 	} while (!tag.isend());
 

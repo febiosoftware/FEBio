@@ -621,7 +621,7 @@ FEAnalysis* FEBioImport::GetStep()
 		if (m_pfem->Steps() == 1) 
 		{
 			m_pfem->SetCurrentStep(m_pStep);
-			m_pfem->m_nStep = 0;
+			m_pfem->SetCurrentStepIndex(0);
 		}
 	}
 	return m_pStep;

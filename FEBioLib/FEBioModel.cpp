@@ -319,7 +319,8 @@ void FEBioModel::Write(unsigned int nwhen)
 						if (pstep->m_bautostep == false) bout = (pstep->m_nplotRange[0] == 0) || (pstep->m_bplotZero);
 
 						// store initial time step (i.e. time step zero)
-						if (bout) m_plot->Write(*this, (float) m_ftime);
+						double time = GetTime().currentTime;
+						if (bout) m_plot->Write(*this, (float) time);
 					}
 				}
 			}
@@ -376,7 +377,8 @@ void FEBioModel::Write(unsigned int nwhen)
 				// output the state if requested
 				if (bout) 
 				{
-					if (m_plot) m_plot->Write(*this, (float)m_ftime);
+					double time = GetTime().currentTime;
+					if (m_plot) m_plot->Write(*this, (float)time);
 				}
 			}
 		}
@@ -448,7 +450,7 @@ void FEBioModel::DumpData()
 //!  format is used for reading and writing.
 //! \param[in] ar the archive to which the data is serialized
 //! \sa DumpFile
-bool FEBioModel::Serialize(DumpStream& ar)
+void FEBioModel::Serialize(DumpStream& ar)
 {
 	// don't need to do anything for running restarts
 	if (ar.IsShallow())
@@ -470,7 +472,7 @@ bool FEBioModel::Serialize(DumpStream& ar)
 			ar >> nversion;
 
 			// make sure it is the right version
-			if (nversion != RSTRTVERSION) return false;
+			if (nversion != RSTRTVERSION) return;
 		}
 
 		// serialize model data
@@ -482,8 +484,6 @@ bool FEBioModel::Serialize(DumpStream& ar)
 		// --- Save IO Data
 		SerializeIOData(ar);
 	}
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -494,7 +494,6 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 	{
 		// file names
 		ar << m_szfile << m_szplot << m_szlog << m_szdump;
-		ar << m_sztitle;
 
 		// plot file
 		int npltfmt = 2;
@@ -507,7 +506,6 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 	{
 		// file names
 		ar >> m_szfile >> m_szplot >> m_szlog >> m_szdump;
-		ar >> m_sztitle;
 
 		// don't forget to call store the input file name so
 		// that m_szfile_title gets initialized
@@ -601,7 +599,8 @@ bool FEBioModel::Init()
 	if (InitLogFile() == false) return false;
 
 	// open plot database file
-	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER)
+	FEAnalysis* step = GetCurrentStep();
+	if (step->GetPlotLevel() != FE_PLOT_NEVER)
 	{
 		if (m_plot == 0) 
 		{
@@ -681,14 +680,15 @@ bool FEBioModel::InitLogFile()
 		}
 
 		// make sure we have a step
-		if (m_pStep == 0)
+		FEAnalysis* step = GetCurrentStep();
+		if (step == 0)
 		{
 			felog.printf("FATAL ERROR: No step defined\n\n");
 			return false;
 		}
 
 		// if we don't want to output anything we only output to the logfile
-		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) felog.SetMode(Logfile::LOG_FILE);
+		if (step->GetPrintLevel() == FE_PRINT_NEVER) felog.SetMode(Logfile::LOG_FILE);
 
 		// print welcome message to file
 		Logfile::MODE m = felog.SetMode(Logfile::LOG_FILE);
@@ -712,7 +712,8 @@ bool FEBioModel::Reset()
 	if (InitLogFile() == false) return false;
 
 	// open plot database file
-	if (m_pStep->GetPlotLevel() != FE_PLOT_NEVER)
+	FEAnalysis* step =  GetCurrentStep();
+	if (step->GetPlotLevel() != FE_PLOT_NEVER)
 	{
 		if (m_plot == 0) 
 		{

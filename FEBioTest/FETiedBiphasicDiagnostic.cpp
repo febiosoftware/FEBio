@@ -29,7 +29,6 @@ FETiedBiphasicDiagnostic::FETiedBiphasicDiagnostic(FEModel& fem) : FEDiagnostic(
     pstep->SetFESolver(pnew_solver);
     
     fem.AddStep(pstep);
-    fem.m_nStep = 0;
     fem.SetCurrentStep(pstep);
 }
 

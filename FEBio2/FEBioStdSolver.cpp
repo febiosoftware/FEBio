@@ -53,7 +53,7 @@ bool FEBioRestart::Init(const char *szfile)
 		// read the archive
 		try
 		{
-			if (fem.Serialize(ar) == false) { fprintf(stderr, "FATAL ERROR: failed reading restart data from archive %s\n", szfile); return false; }
+			fem.Serialize(ar);
 		}
 		catch (...)
 		{
@@ -87,7 +87,7 @@ bool FEBioRestart::Init(const char *szfile)
 	}
 
 	// inform the user from where the problem is restarted
-	felog.printbox(" - R E S T A R T -", "Restarting from time %lg.\n", fem.m_ftime);
+	felog.printbox(" - R E S T A R T -", "Restarting from time %lg.\n", fem.GetCurrentTime());
 
 	return true;
 }

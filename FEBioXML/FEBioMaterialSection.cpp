@@ -43,10 +43,10 @@ FEMaterial* FEBioMaterialSection::CreateMaterial(XMLTag& tag)
 // This helper function checks if all the required material properties are defined
 void ValidateMaterial(FEMaterial* pmat)
 {
-	int NP = pmat->MaterialProperties();
+	int NP = pmat->PropertyClasses();
 	for (int i=0; i<NP; ++i)
 	{
-		FEProperty* pi = pmat->MaterialProperty(i);
+		FEProperty* pi = pmat->PropertyClass(i);
 		if (pi->m_brequired && (pi->size()==0))
 		{
 			throw FEBioImport::MissingMaterialProperty(pmat->GetName(), pi->GetName());

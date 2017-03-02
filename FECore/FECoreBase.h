@@ -1,9 +1,11 @@
 #pragma once
 #include "FEParameterList.h"
 #include "FE_enum.h"
+#include "FEProperty.h"
 
 //-----------------------------------------------------------------------------
 class FECoreFactory;
+class FEModel;
 
 //-----------------------------------------------------------------------------
 //! Base class for most classes in FECore library and the base class for all 
@@ -17,14 +19,20 @@ public:
 	//! destructor
 	virtual ~FECoreBase();
 
-	//! set material name
+	//! set class name
 	void SetName(const char* sz);
 
-	//! get the material's name
+	//! get the class' name
 	const char* GetName();
 
 	//! data serialization
 	void Serialize(DumpStream& ar);
+
+	//! Initialization
+	virtual bool Init();
+
+	//! validates all properties and parameters
+	bool Validate();
 
 public:
 	//! return the super class id
@@ -39,19 +47,48 @@ public: // interface for managing attributes
 	//! Set the attribute
 	virtual bool SetAttribute(const char* szname, const char* szval) { return true; }
 
+public:
+	//! return a parameter
+	FEParam* GetParameter(const ParamString& s);
+
 public: // interface for getting/setting properties
 
 	//! get the number of properties
-	virtual int Properties () { return 0; }
+	int Properties();
 
-	//! get a specific property
-	virtual FECoreBase* GetProperty(int i) { return 0; }
+	//! Set a property
+	bool SetProperty(int nid, FECoreBase* pm);
+
+	//! return a property
+	FECoreBase* GetProperty(int i);
 
 	//! find a property index ( returns <0 for error)
-	virtual int FindPropertyIndex(const char* szname) { return -1; }
+	int FindPropertyIndex(const char* szname);
 
-	//! set a property (returns false on error)
-	virtual bool SetProperty(int i, FECoreBase* pm) { return false; }
+	//! return a property (class)
+	FEProperty* FindProperty(const char* sz);
+
+	//! return the number of properties defined
+	int PropertyClasses() { return (int)m_Prop.size(); }
+
+	//! return a property
+	FEProperty* PropertyClass(int i) { return m_Prop[i]; }
+
+public:
+	//! Get the parent of this object (zero if none)
+	FECoreBase* GetParent() { return m_pParent; }
+
+	//! Get the ancestor of this class (this if none)
+	FECoreBase* GetAncestor() { FECoreBase* mp = GetParent(); return (mp ? mp->GetAncestor() : this); }
+
+	//! Set the parent of this class
+	void SetParent(FECoreBase* parent) { m_pParent = parent; }
+
+protected:
+	//! Add a property
+	//! Call this in the constructor of derived classes to 
+	//! build the property list
+	void AddProperty(FEProperty* pp, const char* sz, bool brequired = true);
 
 private:
 	//! Set the type string (This is used by the factory methods to make sure 
@@ -60,9 +97,11 @@ private:
 
 private:
 	char			m_szname[128];	//!< user defined name of component
-
+	FECoreBase*		m_pParent;		//!< pointer to "parent" object (if any) (NOTE: only used by materials)
 	SUPER_CLASS_ID	m_sid;		//!< The super-class ID
 	const char*		m_sztype;	//!< the type string
+
+	vector<FEProperty*>	m_Prop;		//!< list of properties
 
 	friend class FECoreFactory;
 };

@@ -13,7 +13,7 @@
 #include "FEBioFluid/FEFluidDomain3D.h"
 #include "FECore/log.h"
 #include "FECore/BC.h"
-#include "FECore/LoadCurve.h"
+#include "FECore/FEDataLoadCurve.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEFluidTangentUniaxial, FEFluidScenario)
@@ -94,9 +94,7 @@ bool FEFluidTangentUniaxial::Init()
     pd->CreateMaterialPointData();
     
     // Add a loadcurve
-    FELoadCurve* plc = new FELoadCurve;
-    plc->Add(0, 0);
-    plc->Add(1, 1);
+	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
     fem.AddLoadCurve(plc);
     
     // Add a prescribed BC
@@ -177,9 +175,7 @@ bool FEFluidTangentUniaxialSS::Init()
     pd->CreateMaterialPointData();
     
     // Add a loadcurve
-    FELoadCurve* plc = new FELoadCurve;
-    plc->Add(0, 0);
-    plc->Add(1, 1);
+	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
     fem.AddLoadCurve(plc);
     
     // Add a prescribed BC
@@ -207,7 +203,6 @@ FEFluidTangentDiagnostic::FEFluidTangentDiagnostic(FEModel& fem) : FEDiagnostic(
     pstep->SetFESolver(pnew_solver);
     
     fem.AddStep(pstep);
-    fem.m_nStep = 0;
     fem.SetCurrentStep(pstep);
 }
 

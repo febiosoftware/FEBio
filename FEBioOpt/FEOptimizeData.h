@@ -21,12 +21,18 @@ public:
 	FEInputParameter(FEModel* fem) : m_fem(fem) { m_min = -1e99; m_max = 1e99; m_scale = 1.0; }
 	virtual ~FEInputParameter() {}
 
+	// implement this to initialize the input parameter
+	virtual bool Init() { return true; }
+
 	//! return the current value of the input parameter
 	virtual double GetValue() = 0;
 
 	//! set the current value of the input parameter.
 	//! should return false is the passed value is invalid
 	virtual bool SetValue(double newValue) = 0;
+
+	//! get/set the initial value
+	double& InitValue() { return m_initVal; }
 
 	//! get/set the min value
 	double& MinValue() { return m_min; }
@@ -48,6 +54,7 @@ public:
 
 private:
 	string		m_name;			//!< name of input parameter
+	double		m_initVal;		//!< initial value
 	double		m_min, m_max;	//!< min, max values for parameter
 	double		m_scale;		//!< scale factor
 	FEModel*	m_fem;			//!< pointer to model data
@@ -60,9 +67,8 @@ class FEModelParameter : public FEInputParameter
 public:
 	FEModelParameter(FEModel* fem);
 
-	//! set the parameter via its name
-	//! returns false if the parameter is not found
-	bool SetParameter(const string& paramName);
+	//! Initialize
+	bool Init();
 
 public:
 	//! return the current value of the input parameter

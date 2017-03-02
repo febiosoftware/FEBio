@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEBioLoadDataSection.h"
 #include "FECore/FEModel.h"
-#include "FECore/LoadCurve.h"
+#include "FECore/FEDataLoadCurve.h"
 
 //-----------------------------------------------------------------------------
 //!  This function reads the load data section from the xml file
@@ -32,21 +32,21 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 			if (nid != nlc+1) throw XMLReader::InvalidAttributeValue(tag, "id");
 
 			// default type and extend mode
-			FELoadCurve::INTFUNC ntype = FELoadCurve::LINEAR;
-			FELoadCurve::EXTMODE nextm = FELoadCurve::CONSTANT;
+			FEDataLoadCurve::INTFUNC ntype = FEDataLoadCurve::LINEAR;
+			FEDataLoadCurve::EXTMODE nextm = FEDataLoadCurve::CONSTANT;
 
 			// For backward compatibility we must set the default to STEP for the mustpoint loadcurve
 			// Note that this assumes that the step has already been read in.
-			if (nid == nmplc) ntype = FELoadCurve::STEP;
+			if (nid == nmplc) ntype = FEDataLoadCurve::STEP;
 
 			// get the (optional) type
 			XMLAtt* patt = tag.Attribute("type", true);
 			if (patt)
 			{
 				XMLAtt& type = *patt;
-				if      (type == "step"  ) ntype = FELoadCurve::STEP;
-				else if (type == "linear") ntype = FELoadCurve::LINEAR;
-				else if (type == "smooth") ntype = FELoadCurve::SMOOTH;
+				if      (type == "step"  ) ntype = FEDataLoadCurve::STEP;
+				else if (type == "linear") ntype = FEDataLoadCurve::LINEAR;
+				else if (type == "smooth") ntype = FEDataLoadCurve::SMOOTH;
 				else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
 			}
 
@@ -55,10 +55,10 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 			if (patt)
 			{
 				XMLAtt& ext = *patt;
-				if      (ext == "constant"     ) nextm = FELoadCurve::CONSTANT;
-				else if (ext == "extrapolate"  ) nextm = FELoadCurve::EXTRAPOLATE;
-				else if (ext == "repeat"       ) nextm = FELoadCurve::REPEAT;
-				else if (ext == "repeat offset") nextm = FELoadCurve::REPEAT_OFFSET;
+				if      (ext == "constant"     ) nextm = FEDataLoadCurve::CONSTANT;
+				else if (ext == "extrapolate"  ) nextm = FEDataLoadCurve::EXTRAPOLATE;
+				else if (ext == "repeat"       ) nextm = FEDataLoadCurve::REPEAT;
+				else if (ext == "repeat offset") nextm = FEDataLoadCurve::REPEAT_OFFSET;
 				else throw XMLReader::InvalidAttributeValue(tag, "extend", ext.cvalue());
 			}
 
@@ -66,8 +66,7 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 			int nlp = tag.children();
 
 			// create the loadcurve
-			FELoadCurve* plc = new FELoadCurve;
-			plc->Create(nlp);
+			FEDataLoadCurve* plc = new FEDataLoadCurve(&fem);
 			plc->SetInterpolation(ntype);
 			plc->SetExtendMode(nextm);
 
@@ -77,9 +76,7 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 			for (int i=0; i<nlp; ++i)
 			{
 				tag.value(d, 2);
-				plc->LoadPoint(i).time  = d[0];
-				plc->LoadPoint(i).value = d[1];
-
+				plc->Add(d[0], d[1]);
 				++tag;
 			}
 

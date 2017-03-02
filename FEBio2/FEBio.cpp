@@ -63,6 +63,13 @@ extern "C" void __cdecl omp_set_num_threads(int);
 #endif
 
 //-----------------------------------------------------------------------------
+// TODO: On Windows the GetCurrentTime macro gets in here via plugin.h. 
+// I need to look into how to prevent this
+#ifdef GetCurrentTime
+#undef GetCurrentTime
+#endif
+
+//-----------------------------------------------------------------------------
 //!  Command line options
 
 //! This structures stores the command line options that were input by the user
@@ -111,10 +118,11 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	int nsteps = fem.Steps();
 
 	// calculate progress
-	double starttime = fem.m_ftime0;
+	double starttime = fem.GetStartTime();
 	double endtime = fem.GetCurrentStep()->m_tend;
 	double f = 0.0;
-	if (endtime > 0.0) f = 100.f*(fem.m_ftime - starttime) / (endtime - starttime);
+	double ftime = fem.GetCurrentTime();
+	if (endtime > 0.0) f = 100.f*(ftime - starttime) / (endtime - starttime);
 
 	// check debug flag
 	bool bdebug = fem.GetDebugFlag();
@@ -135,7 +143,7 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	if (szfile == 0) szfile = "";
 
 	if (nsteps > 1)
-		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s %s", fem.m_nStep+1, nsteps, f, szfile, szvers, (bdebug?"(debug mode)": ""));
+		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s %s", fem.GetCurrentStepIndex() + 1, nsteps, f, szfile, szvers, (bdebug?"(debug mode)": ""));
 	else
 		pShell->SetTitle("(%.f%%) %s - %s %s", f, szfile, szvers, (bdebug?"(debug mode)": ""));
 

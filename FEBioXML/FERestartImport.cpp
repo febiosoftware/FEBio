@@ -8,7 +8,7 @@
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
 #include "FECore/DumpFile.h"
-#include "FECore/LoadCurve.h"
+#include "FECore/FEDataLoadCurve.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -57,7 +57,7 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 		if (ar.Open(szar) == false) return errf("FATAL ERROR: failed opening restart archive\n");
 
 		// read the archive
-		if (fem.Serialize(ar) == false) return errf("FATAL ERROR: failed reading restart data from archive %s\n", szar);
+		fem.Serialize(ar);
 
 		// read the restart data
 		++tag;
@@ -105,7 +105,8 @@ bool FERestartImport::ParseLoadSection(XMLTag& tag)
 			int nid = atoi(szid);
 
 			// find the loadcurve with this ID
-			FELoadCurve* plc = fem.GetLoadCurve(nid-1);
+			FEDataLoadCurve* plc = dynamic_cast<FEDataLoadCurve*>(fem.GetLoadCurve(nid - 1));
+			if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "id", szid);
 
 			// count how many points we have
 			XMLTag t(tag); ++t;
@@ -113,7 +114,7 @@ bool FERestartImport::ParseLoadSection(XMLTag& tag)
 			while (!t.isend()) { ++nlp; ++t; }
 
 			// create the loadcurve
-			plc->Create(nlp);
+			plc->Clear();
 
 			// read the points
 			double d[2];
@@ -121,8 +122,7 @@ bool FERestartImport::ParseLoadSection(XMLTag& tag)
 			for (int i=0; i<nlp; ++i)
 			{
 				tag.value(d, 2);
-				plc->LoadPoint(i).time  = d[0];
-				plc->LoadPoint(i).value = d[1];
+				plc->Add(d[0], d[1]);
 
 				++tag;
 			}

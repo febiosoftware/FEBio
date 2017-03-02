@@ -6,7 +6,7 @@
 #include "FEElasticMaterial.h"
 #include "FEPeriodicBoundary1O.h"
 #include "FECore/FEAnalysis.h"
-#include "FECore/LoadCurve.h"
+#include "FECore/FEDataLoadCurve.h"
 #include "FEBCPrescribedDeformation.h"
 #include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
@@ -17,7 +17,7 @@ FERVEModel::FERVEModel()
 	m_bctype = DISPLACEMENT;
 
 	// set the pardiso solver as default
-	m_nsolver = PARDISO_SOLVER;
+	SetLinearSolverType(PARDISO_SOLVER);
 }
 
 //-----------------------------------------------------------------------------
@@ -230,10 +230,7 @@ void FERVEModel::FindBoundaryNodes(vector<int>& BN)
 bool FERVEModel::PrepDisplacementBC(const FENodeSet& ns)
 {
 	// create a load curve
-	FELoadCurve* plc = new FELoadCurve;
-	plc->SetInterpolation(FELoadCurve::LINEAR);
-	plc->Add(0.0, 0.0);
-	plc->Add(1.0, 1.0);
+	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
 	AddLoadCurve(plc);
 	int NLC = LoadCurves() - 1;
 
@@ -275,10 +272,7 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	}
 
 	// create a load curve
-	FELoadCurve* plc = new FELoadCurve;
-	plc->SetInterpolation(FELoadCurve::LINEAR);
-	plc->Add(0.0, 0.0);
-	plc->Add(1.0, 1.0);
+	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
 	AddLoadCurve(plc);
 	int NLC = LoadCurves() - 1;
 

@@ -6,7 +6,7 @@
 #include "FEElasticMaterial.h"
 #include "FEPeriodicBoundary2O.h"
 #include "FECore/FEAnalysis.h"
-#include "FECore/LoadCurve.h"
+#include "FECore/FEDataLoadCurve.h"
 #include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
 #include "FEBCPrescribedDeformation.h"
@@ -18,7 +18,7 @@ FERVEModel2O::FERVEModel2O()
 	m_rveType = FERVEModel2O::DISPLACEMENT;
 
 	// set the pardiso solver as default
-	m_nsolver = PARDISO_SOLVER;
+	SetLinearSolverType(PARDISO_SOLVER);
 }
 
 //-----------------------------------------------------------------------------
@@ -213,10 +213,7 @@ bool FERVEModel2O::PrepDisplacementBC()
 	assert(NN > 0);
 
 	// create a load curve
-	FELoadCurve* plc = new FELoadCurve;
-	plc->SetInterpolation(FELoadCurve::LINEAR);
-	plc->Add(0.0, 0.0);
-	plc->Add(1.0, 1.0);
+	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
 	AddLoadCurve(plc);
 	int NLC = LoadCurves() - 1;
 
@@ -264,10 +261,7 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 	}
 
 	// create a load curve
-	FELoadCurve* plc = new FELoadCurve;
-	plc->SetInterpolation(FELoadCurve::LINEAR);
-	plc->Add(0.0, 0.0);
-	plc->Add(1.0, 1.0);
+	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
 	AddLoadCurve(plc);
 	int NLC = LoadCurves() - 1;
 
@@ -306,10 +300,7 @@ bool FERVEModel2O::PrepPeriodicLC(const char* szbc)
 	FENodeSet& ns = *pset;
 
 	// create a load curve
-	FELoadCurve* plc = new FELoadCurve;
-	plc->SetInterpolation(FELoadCurve::LINEAR);
-	plc->Add(0.0, 0.0);
-	plc->Add(1.0, 1.0);
+	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
 	AddLoadCurve(plc);
 	int NLC = LoadCurves() - 1;
 

@@ -82,7 +82,7 @@ public:
 	// solver parameters
 	int					m_nqnsolver;	//!< quasi-Newton strategy that will be selected
 	int					m_maxups;		//!< max number of quasi-newton updates
-	int					m_cmax;			//!< max condition numbers
+	double				m_cmax;			//!< max condition numbers
 	int					m_maxref;		//!< max nr of reformations per time step
 	FENewtonStrategy*	m_pbfgs;		//!< class handling the specific stiffness update logic
 

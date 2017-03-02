@@ -35,7 +35,6 @@ protected:
 	bool ParseObjective(XMLTag& tag, FEOptimizeData& opt);
 	bool ParseParameters(XMLTag& tag, FEOptimizeData& opt);
 	bool ParseConstraints(XMLTag& tag, FEOptimizeData& opt);
-	bool ParseLoadData(XMLTag& tag, FEOptimizeData& opt);
 
 protected:
 	bool ReadParameter(XMLTag& tag, FEParameterList& pl);

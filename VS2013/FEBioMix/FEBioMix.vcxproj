@@ -398,6 +398,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBioFluid\FETangentialDamping.h" />
     <ClInclude Include="..\..\FEBioMix\FEActiveConstantSupply.h" />
     <ClInclude Include="..\..\FEBioMix\FEActiveMomentumSupply.h" />
     <ClInclude Include="..\..\FEBioMix\FEBioMix.h" />
@@ -474,6 +475,7 @@
     <ClInclude Include="..\..\FEBioMix\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioFluid\FETangentialDamping.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEActiveConstantSupply.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEActiveMomentumSupply.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBioMix.cpp" />

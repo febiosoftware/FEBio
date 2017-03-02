@@ -61,7 +61,7 @@ void FENodalLoad::SetLoad(double s, int lc)
 	m_scale = s;
 	if (lc >= 0)
 	{
-		FEParam& p = *GetParameter(&m_scale);
+		FEParam& p = *FEParamContainer::GetParameter((void*)(&m_scale));
 		p.SetLoadCurve(lc, m_scale);
 	}
 }
@@ -195,7 +195,7 @@ FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)
 	m_scale = s;
 	if (lc >= 0)
 	{
-		FEParam& p = *GetParameter(&m_scale);
+		FEParam& p = *FEParamContainer::GetParameter((void*)(&m_scale));
 		p.SetLoadCurve(lc, m_scale);
 	}
 	return *this; 
