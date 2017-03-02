@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEHeatSolidDomain::FEHeatSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEHeatDomain(pfem)
+FEHeatSolidDomain::FEHeatSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEHeatDomain(pfem)
 {
 	m_pMat = 0;
 

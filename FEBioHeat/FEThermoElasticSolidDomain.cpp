@@ -7,7 +7,7 @@
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
-FEThermoElasticSolidDomain::FEThermoElasticSolidDomain(FEModel* pfem) : FESolidDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
+FEThermoElasticSolidDomain::FEThermoElasticSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
 	m_dofT = pfem->GetDOFIndex("T");
