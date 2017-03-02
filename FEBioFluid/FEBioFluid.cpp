@@ -14,6 +14,7 @@
 #include "FEFluidNormalTraction.h"
 #include "FEFluidResistanceBC.h"
 #include "FETangentialDamping.h"
+#include "FETangentialFlowStabilization.h"
 
 #include "FEConstraintFrictionlessWall.h"
 #include "FEConstraintNormalFlow.h"
@@ -57,6 +58,7 @@ REGISTER_FECORE_CLASS(FEFluidTractionLoad           , FESURFACELOAD_ID, "fluid t
 REGISTER_FECORE_CLASS(FEFluidNormalTraction         , FESURFACELOAD_ID, "fluid normal traction");
 REGISTER_FECORE_CLASS(FEFluidResistanceBC           , FESURFACELOAD_ID, "fluid resistance");
 REGISTER_FECORE_CLASS(FETangentialDamping           , FESURFACELOAD_ID, "fluid tangential damping");
+REGISTER_FECORE_CLASS(FETangentialFlowStabilization , FESURFACELOAD_ID, "fluid tangential stabilization");
     
 //-----------------------------------------------------------------------------
 // constraint classes
