@@ -307,7 +307,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 
 		// copy indices
 		vector<int> nodeList = set->NodeList();
-		int nn = nodeList.size();
+		int nn = (int)nodeList.size();
 		for (int j=0; j<nn; ++j) nodeList[j] = NLT[nodeList[j] - noff];
 		feset->add(nodeList);
 

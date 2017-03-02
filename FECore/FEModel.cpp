@@ -18,6 +18,7 @@
 #include "log.h"
 #include "FERigidBody.h"
 #include <string>
+#include <map>
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -53,27 +54,27 @@ public: // TODO: Find a better place for these parameters
 	int		m_linearSolver;			//!< type of (linear) solver selected
 
 	int		m_bwopt;			//!< bandwidth optimization flag
-	int		m_nStep;			//!< current analysis step
 	double	m_ftime;			//!< current time value
 	double	m_ftime0;			//!< start time of current step
 
 public:
-	FEVecPropertyT<FELoadCurve>				m_LC;	//!< load curve data
-	FEVecPropertyT<FEMaterial>				m_MAT;	//!< array of materials
-	std::vector<FEFixedBC*>					m_BC;	//!< fixed constraints
-	std::vector<FEPrescribedBC*>			m_DC;	//!< prescribed constraints
-	std::vector<FEInitialCondition*>		m_IC;	//!< initial conditions
-	std::vector<FENodalLoad*>				m_FC;	//!< concentrated nodal loads
-	std::vector<FESurfaceLoad*>				m_SL;	//!< surface loads
-	std::vector<FEEdgeLoad*>				m_EL;	//!< edge loads
-	std::vector<FESurfacePairInteraction*>	m_CI;	//!< contact interface array
-	std::vector<FEBodyLoad*>				m_BL;	//!< body load data
-	std::vector<FENLConstraint*>			m_NLC;	//!< nonlinear constraints
-	std::vector<FEModelLoad*>				m_ML;	//!< model loads
+	FEVecPropertyT<FEMaterial>					m_MAT;		//!< array of materials
+	FEVecPropertyT<FEFixedBC>					m_BC;		//!< fixed constraints
+	FEVecPropertyT<FEPrescribedBC>				m_DC;		//!< prescribed constraints
+	FEVecPropertyT<FENodalLoad>					m_FC;		//!< concentrated nodal loads
+	FEVecPropertyT<FESurfaceLoad>				m_SL;		//!< surface loads
+	FEVecPropertyT<FEEdgeLoad>					m_EL;		//!< edge loads
+	FEVecPropertyT<FEBodyLoad>					m_BL;		//!< body load data
+	FEVecPropertyT<FEInitialCondition>			m_IC;		//!< initial conditions
+	FEVecPropertyT<FESurfacePairInteraction>	m_CI;		//!< contact interface array
+	FEVecPropertyT<FENLConstraint>				m_NLC;		//!< nonlinear constraints
+	FEVecPropertyT<FEModelLoad>					m_ML;		//!< model loads
+	FEVecPropertyT<FELoadCurve>					m_LC;		//!< load curve data
+	FEVecPropertyT<FEAnalysis>					m_Step;		//!< array of analysis steps
 
 public:
-	std::vector<FEAnalysis*>	m_Step;		//!< array of analysis steps
-	FEAnalysis*					m_pStep;	//!< pointer to current analysis step
+	FEAnalysis*		m_pStep;	//!< pointer to current analysis step
+	int				m_nStep;	//!< current index of analysis step
 
 public:
 	// DOFS data
@@ -103,9 +104,23 @@ FEModel::FEModel(void) : FECoreBase(FEMODEL_ID), m_imp(new FEModel::Implementati
 	m_ut4_bdev = false;
 	m_udghex_hg = 1.0;
 
+	// set the name
+	SetName("fem");
+
 	// Add all properties
 	AddProperty(&m_imp->m_MAT, "material");
-	AddProperty(&m_imp->m_LC, "loadcurve");
+	AddProperty(&m_imp->m_BC , "fixedbc");
+	AddProperty(&m_imp->m_DC , "prescribedbc");
+	AddProperty(&m_imp->m_FC , "nodalload");
+	AddProperty(&m_imp->m_SL , "surfaceload");
+	AddProperty(&m_imp->m_EL , "edgeload");
+	AddProperty(&m_imp->m_BL , "bodyload");
+	AddProperty(&m_imp->m_IC , "initial" );
+	AddProperty(&m_imp->m_CI , "contact");
+	AddProperty(&m_imp->m_NLC, "constraint");
+	AddProperty(&m_imp->m_ML , "modelload");
+	AddProperty(&m_imp->m_LC , "loadcurve");
+	AddProperty(&m_imp->m_Step, "step");
 }
 
 //-----------------------------------------------------------------------------
@@ -121,23 +136,23 @@ void FEModel::Clear()
 	// clear dofs
 	m_imp->m_dofs.Reset();
 
-	// clear model components
-	size_t i;
-	for (i = 0; i<m_imp->m_Step.size(); ++i) delete m_imp->m_Step[i]; m_imp->m_Step.clear();
-	for (i = 0; i<m_imp->m_CI.size(); ++i) delete m_imp->m_CI[i]; m_imp->m_CI.clear();
+	// clear all properties
 	m_imp->m_MAT.Clear();
+	m_imp->m_BC.Clear();
+	m_imp->m_DC.Clear();
+	m_imp->m_FC.Clear();
+	m_imp->m_SL.Clear();
+	m_imp->m_EL.Clear();
+	m_imp->m_BL.Clear();
+	m_imp->m_IC.Clear();
+	m_imp->m_CI.Clear();
+	m_imp->m_NLC.Clear();
+	m_imp->m_ML.Clear();
 	m_imp->m_LC.Clear();
-	for (i = 0; i<m_imp->m_BL.size() ; ++i) delete m_imp->m_BL[i] ; m_imp->m_BL.clear();
-	for (i = 0; i<m_imp->m_BC.size() ; ++i) delete m_imp->m_BC[i] ; m_imp->m_BC.clear();
-	for (i = 0; i<m_imp->m_DC.size() ; ++i) delete m_imp->m_DC[i] ; m_imp->m_DC.clear();
-	for (i = 0; i<m_imp->m_IC.size() ; ++i) delete m_imp->m_IC[i] ; m_imp->m_IC.clear();
-	for (i = 0; i<m_imp->m_FC.size() ; ++i) delete m_imp->m_FC[i] ; m_imp->m_FC.clear();
-	for (i = 0; i<m_imp->m_SL.size() ; ++i) delete m_imp->m_SL[i] ; m_imp->m_SL.clear();
-	for (i = 0; i<m_imp->m_ML.size() ; ++i) delete m_imp->m_ML[i] ; m_imp->m_ML.clear();
-	for (i = 0; i<m_imp->m_NLC.size(); ++i) delete m_imp->m_NLC[i]; m_imp->m_NLC.clear();
+	m_imp->m_Step.Clear();
 
 	// global data
-	for (i = 0; i<m_imp->m_GD.size(); ++i) delete m_imp->m_GD[i]; m_imp->m_GD.clear();
+	for (size_t i = 0; i<m_imp->m_GD.size(); ++i) delete m_imp->m_GD[i]; m_imp->m_GD.clear();
 	m_imp->m_Const.clear();
 
 	// clear the rigid system (if there is one)
@@ -183,7 +198,7 @@ int FEModel::FixedBCs() { return (int)m_imp->m_BC.size(); }
 FEFixedBC* FEModel::FixedBC(int i) { return m_imp->m_BC[i]; }
 
 //-----------------------------------------------------------------------------
-void FEModel::AddFixedBC(FEFixedBC* pbc) { m_imp->m_BC.push_back(pbc); }
+void FEModel::AddFixedBC(FEFixedBC* pbc) { m_imp->m_BC.AddProperty(pbc); }
 
 //-----------------------------------------------------------------------------
 int FEModel::PrescribedBCs() { return (int)m_imp->m_DC.size(); }
@@ -192,7 +207,7 @@ int FEModel::PrescribedBCs() { return (int)m_imp->m_DC.size(); }
 FEPrescribedBC* FEModel::PrescribedBC(int i) { return m_imp->m_DC[i]; }
 
 //-----------------------------------------------------------------------------
-void FEModel::AddPrescribedBC(FEPrescribedBC* pbc) { m_imp->m_DC.push_back(pbc); }
+void FEModel::AddPrescribedBC(FEPrescribedBC* pbc) { m_imp->m_DC.AddProperty(pbc); }
 
 //-----------------------------------------------------------------------------
 int FEModel::InitialConditions() { return (int)m_imp->m_IC.size(); }
@@ -201,7 +216,7 @@ int FEModel::InitialConditions() { return (int)m_imp->m_IC.size(); }
 FEInitialCondition* FEModel::InitialCondition(int i) { return m_imp->m_IC[i]; }
 
 //-----------------------------------------------------------------------------
-void FEModel::AddInitialCondition(FEInitialCondition* pbc) { m_imp->m_IC.push_back(pbc); }
+void FEModel::AddInitialCondition(FEInitialCondition* pbc) { m_imp->m_IC.AddProperty(pbc); }
 
 //-----------------------------------------------------------------------------
 int FEModel::NodalLoads() { return (int)m_imp->m_FC.size(); }
@@ -210,7 +225,7 @@ int FEModel::NodalLoads() { return (int)m_imp->m_FC.size(); }
 FENodalLoad* FEModel::NodalLoad(int i) { return m_imp->m_FC[i]; }
 
 //-----------------------------------------------------------------------------
-void FEModel::AddNodalLoad(FENodalLoad* pfc) { m_imp->m_FC.push_back(pfc); }
+void FEModel::AddNodalLoad(FENodalLoad* pfc) { m_imp->m_FC.AddProperty(pfc); }
 
 //-----------------------------------------------------------------------------
 int FEModel::SurfaceLoads() { return (int)m_imp->m_SL.size(); }
@@ -219,7 +234,7 @@ int FEModel::SurfaceLoads() { return (int)m_imp->m_SL.size(); }
 FESurfaceLoad* FEModel::SurfaceLoad(int i) { return m_imp->m_SL[i]; }
 
 //-----------------------------------------------------------------------------
-void FEModel::AddSurfaceLoad(FESurfaceLoad* psl) { m_imp->m_SL.push_back(psl); }
+void FEModel::AddSurfaceLoad(FESurfaceLoad* psl) { m_imp->m_SL.AddProperty(psl); }
 
 //-----------------------------------------------------------------------------
 int FEModel::EdgeLoads() { return (int)m_imp->m_EL.size(); }
@@ -228,11 +243,11 @@ int FEModel::EdgeLoads() { return (int)m_imp->m_EL.size(); }
 FEEdgeLoad* FEModel::EdgeLoad(int i) { return m_imp->m_EL[i]; }
 
 //-----------------------------------------------------------------------------
-void FEModel::AddEdgeLoad(FEEdgeLoad* psl) { m_imp->m_EL.push_back(psl); }
+void FEModel::AddEdgeLoad(FEEdgeLoad* psl) { m_imp->m_EL.AddProperty(psl); }
 
 //-----------------------------------------------------------------------------
 //! Add a body load to the model
-void FEModel::AddBodyLoad(FEBodyLoad* pf) { m_imp->m_BL.push_back(pf); }
+void FEModel::AddBodyLoad(FEBodyLoad* pf) { m_imp->m_BL.AddProperty(pf); }
 
 //-----------------------------------------------------------------------------
 //! get the number of body loads
@@ -243,20 +258,16 @@ int FEModel::BodyLoads() { return (int)m_imp->m_BL.size(); }
 FEBodyLoad* FEModel::GetBodyLoad(int i) { return m_imp->m_BL[i]; }
 
 //-----------------------------------------------------------------------------
-//! see if there are any body loads
-bool FEModel::HasBodyLoads() { return !m_imp->m_BL.empty(); }
-
-//-----------------------------------------------------------------------------
 //! retrieve the number of steps
 int FEModel::Steps() { return (int)m_imp->m_Step.size(); }
 
 //-----------------------------------------------------------------------------
 //! clear the steps
-void FEModel::ClearSteps() { m_imp->m_Step.clear(); }
+void FEModel::ClearSteps() { m_imp->m_Step.Clear(); }
 
 //-----------------------------------------------------------------------------
 //! Add an analysis step
-void FEModel::AddStep(FEAnalysis* pstep) { m_imp->m_Step.push_back(pstep); }
+void FEModel::AddStep(FEAnalysis* pstep) { m_imp->m_Step.AddProperty(pstep); }
 
 //-----------------------------------------------------------------------------
 //! Get a particular step
@@ -294,7 +305,7 @@ FESurfacePairInteraction* FEModel::SurfacePairInteraction(int i) { return m_imp-
 
 //-----------------------------------------------------------------------------
 //! Add a surface pair interaction
-void FEModel::AddSurfacePairInteraction(FESurfacePairInteraction* pci) { m_imp->m_CI.push_back(pci); }
+void FEModel::AddSurfacePairInteraction(FESurfacePairInteraction* pci) { m_imp->m_CI.AddProperty(pci); }
 
 //-----------------------------------------------------------------------------
 //! return number of nonlinear constraints
@@ -306,7 +317,7 @@ FENLConstraint* FEModel::NonlinearConstraint(int i) { return m_imp->m_NLC[i]; }
 
 //-----------------------------------------------------------------------------
 //! add a nonlinear constraint
-void FEModel::AddNonlinearConstraint(FENLConstraint* pnlc) { m_imp->m_NLC.push_back(pnlc); }
+void FEModel::AddNonlinearConstraint(FENLConstraint* pnlc) { m_imp->m_NLC.AddProperty(pnlc); }
 
 //-----------------------------------------------------------------------------
 //! return the number of model loads
@@ -318,7 +329,7 @@ FEModelLoad* FEModel::ModelLoad(int i) { return m_imp->m_ML[i]; }
 
 //-----------------------------------------------------------------------------
 //! Add a model load
-void FEModel::AddModelLoad(FEModelLoad* pml) { m_imp->m_ML.push_back(pml); }
+void FEModel::AddModelLoad(FEModelLoad* pml) { m_imp->m_ML.AddProperty(pml); }
 
 //-----------------------------------------------------------------------------
 // get the FE mesh
@@ -343,10 +354,8 @@ void FEModel::AddFixedBC(int node, int bc)
 //-----------------------------------------------------------------------------
 void FEModel::ClearBCs()
 {
-	for (size_t i = 0; i<m_imp->m_DC.size(); ++i) delete m_imp->m_DC[i];
-	for (size_t i = 0; i<m_imp->m_BC.size(); ++i) delete m_imp->m_BC[i];
-	m_imp->m_DC.clear();
-	m_imp->m_BC.clear();
+	m_imp->m_DC.Clear();
+	m_imp->m_BC.Clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -743,7 +752,7 @@ bool FEModel::Reset()
 	if (m_imp->m_prs && (m_imp->m_prs->Reset() == false)) return false;
 
 	// set up rigid joints
-	if (!m_imp->m_NLC.empty())
+	if (m_imp->m_NLC.size() > 0)
 	{
 		int NC = (int)m_imp->m_NLC.size();
 		for (int i=0; i<NC; ++i)
@@ -828,8 +837,8 @@ double* GetParameterComponent(const ParamString& paramName, FEParam* param)
 
 double* FEModel::FindParameter(const ParamString& paramString)
 {
-	// make sure it starts with fem
-	if (paramString != "fem") return 0;
+	// make sure it starts with the name of this model
+	if (paramString != GetName()) return 0;
 
 	// see what the next reference is
 	ParamString next = paramString.next();
@@ -1702,49 +1711,49 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 		// fixed bc's
 		// NOTE: I think this may create a memory leak if m_BC is not empty
 		ar >> n;
-		m_imp->m_BC.clear();
+		m_imp->m_BC.Clear();
 		for (int i=0; i<n; ++i) 
 		{
 			FEFixedBC* pbc = new FEFixedBC(this);
 			pbc->Serialize(ar);
-			m_imp->m_BC.push_back(pbc);
+			AddFixedBC(pbc);
 		}
 
 		// displacements
 		ar >> n;
-		m_imp->m_DC.clear();
+		m_imp->m_DC.Clear();
 		for (int i=0; i<n; ++i) 
 		{
 			FEPrescribedDOF* pdc = fecore_new<FEPrescribedDOF>(FEBC_ID, "prescribe", this);
 			pdc->Serialize(ar);
-			m_imp->m_DC.push_back(pdc);
+			AddPrescribedBC(pdc);
 		}
 
 		// initial conditions
 		ar >> n;
-		m_imp->m_IC.clear();
+		m_imp->m_IC.Clear();
 		for (int i=0; i<n; ++i) 
 		{
 			ar >> sz;
 			FEInitialCondition* pic = fecore_new<FEInitialCondition>(FEIC_ID, sz, this);
 			assert(pic);
 			pic->Serialize(ar);
-			m_imp->m_IC.push_back(pic);
+			AddInitialCondition(pic);
 		}
 
 		// nodal loads
 		ar >> n;
-		m_imp->m_FC.clear();
+		m_imp->m_FC.Clear();
 		for (int i=0; i<n; ++i)
 		{
 			FENodalLoad* pfc = new FENodalLoad(this);
 			pfc->Serialize(ar);
-			m_imp->m_FC.push_back(pfc);
+			AddNodalLoad(pfc);
 		}
 
 		// surface loads
 		ar >> n;
-		m_imp->m_SL.clear();
+		m_imp->m_SL.Clear();
 		for (int i=0; i<n; ++i)
 		{
 			// create a new surface
@@ -1760,13 +1769,13 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 
 			ps->Serialize(ar);
 
-			m_imp->m_SL.push_back(ps);
+			m_imp->m_SL.AddProperty(ps);
 			m_imp->m_mesh.AddSurface(psurf);
 		}
 
 		// edge loads
 		ar >> n;
-		m_imp->m_EL.clear();
+		m_imp->m_EL.Clear();
 		for (int i=0; i<n; ++i)
 		{
 			// create a new edge
@@ -1782,14 +1791,14 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 
 			pel->Serialize(ar);
 
-			m_imp->m_EL.push_back(pel);
+			m_imp->m_EL.AddProperty(pel);
 			m_imp->m_mesh.AddEdge(pedge);
 		}
 
 		// body loads
 		int nbl;
 		ar >> nbl;
-		m_imp->m_BL.clear();
+		m_imp->m_BL.Clear();
 		char szbl[256] = {0};
 		for (int i=0; i<nbl; ++i)
 		{
@@ -1798,12 +1807,12 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 			assert(pbl);
 
 			pbl->Serialize(ar);
-			m_imp->m_BL.push_back(pbl);
+			m_imp->m_BL.AddProperty(pbl);
 		}
 
 		// model loads
 		ar >> n;
-		m_imp->m_ML.clear();
+		m_imp->m_ML.Clear();
 		for (int i=0; i<n; ++i)
 		{
 			// read load data
@@ -1813,12 +1822,12 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 			assert(pml);
 
 			pml->Serialize(ar);
-			m_imp->m_ML.push_back(pml);
+			AddModelLoad(pml);
 		}
 
 		// non-linear constraints
 		ar >> n;
-		m_imp->m_NLC.clear();
+		m_imp->m_NLC.Clear();
 		for (int i=0; i<n; ++i)
 		{
 			char sztype[256] = { 0 };
@@ -1827,7 +1836,7 @@ void FEModel::SerializeBoundaryData(DumpStream& ar)
 			assert(pc);
 
 			pc->Serialize(ar);
-			m_imp->m_NLC.push_back(pc);
+			AddNonlinearConstraint(pc);
 		}
 	}
 
@@ -1860,7 +1869,7 @@ void FEModel::SerializeAnalysisData(DumpStream &ar)
 	}
 	else
 	{
-		m_imp->m_Step.clear();
+		m_imp->m_Step.Clear();
 
 		char sztype[256] = {0};
 
@@ -1871,7 +1880,7 @@ void FEModel::SerializeAnalysisData(DumpStream &ar)
 		{
 			FEAnalysis* pstep = new FEAnalysis(this); assert(pstep);
 			pstep->Serialize(ar);
-			m_imp->m_Step.push_back(pstep);
+			AddStep(pstep);
 		}
 		ar >> m_imp->m_nStep;
 		ar >> m_imp->m_ftime >> m_imp->m_ftime0;

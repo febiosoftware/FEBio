@@ -158,7 +158,7 @@ void FEThermoElasticSolidDomain::Reset()
 //-----------------------------------------------------------------------------
 void FEThermoElasticSolidDomain::InternalForces(FEGlobalVector& R)
 {
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 	#pragma omp parallel for shared (NE)
 	for (int i=0; i<NE; ++i)
 	{
@@ -253,7 +253,7 @@ void FEThermoElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector
 // Calculate the work due to the heat flux
 void FEThermoElasticSolidDomain::InternalThermalWork(vector<double>& R)
 {
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 
 	for (int i=0; i<NE; ++i)
 	{
@@ -329,7 +329,7 @@ bool FEThermoElasticSolidDomain::ElementInternalThermalWork(FESolidElement& el, 
 void FEThermoElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
 	// repeat over all solid elements
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
     
     #pragma omp parallel for shared(NE)
 	for (int iel=0; iel<NE; ++iel)

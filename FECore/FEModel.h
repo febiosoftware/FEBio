@@ -5,8 +5,6 @@
 #include "FEModelComponent.h"
 #include "Callback.h"
 #include <string>
-#include <vector>
-#include <map>
 
 //-----------------------------------------------------------------------------
 // forward declarations
@@ -160,9 +158,6 @@ public: // --- Body load functions ---
 
 	//! return a pointer to a body load
 	FEBodyLoad* GetBodyLoad(int i);
-
-	//! see if there are any body loads
-	bool HasBodyLoads();
 
 	//! Init body loads
 	bool InitBodyLoads();

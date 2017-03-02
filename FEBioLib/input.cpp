@@ -356,7 +356,7 @@ void echo_input(FEBioModel& fem)
 		felog.printf("\n\n");
 	}
 
-	if (fem.HasBodyLoads())
+	if (fem.BodyLoads() > 0)
 	{
 		felog.printf(" BODY LOAD DATA\n");
 		felog.printf("===========================================================================\n");
