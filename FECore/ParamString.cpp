@@ -27,6 +27,18 @@ ParamString::ParamString(const char* szparam)
 			tmp.clear();
 			in = 0;
 		}
+		else if (*sz == '(')
+		{
+			in = 2;
+		}
+		else if (*sz == ')')
+		{
+			if (in == 2)
+			{
+				const char* s = tmp.c_str();
+				p.id = atoi(s);
+			}
+		}
 		else if (*sz == '[')
 		{
 			in = 1;
@@ -41,13 +53,14 @@ ParamString::ParamString(const char* szparam)
 		}
 		else if (*sz == '\'')
 		{
-			in = 2;
+			in = 3;
 		}
 		else 
 		{
 			if      (in == 0) p.name.push_back(*sz);
 			else if (in == 1) tmp.push_back(*sz);
-			else p.idName.push_back(*sz);
+			else if (in == 2) tmp.push_back(*sz);
+			else if (in == 3) p.idName.push_back(*sz);
 		}
 
 		// next char

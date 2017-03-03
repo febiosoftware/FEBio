@@ -812,7 +812,11 @@ double* GetParameterComponent(const ParamString& paramName, FEParam* param)
 	if (param == 0) return 0;
 
 	if (param->type() == FE_PARAM_DOUBLE)
-		return param->pvalue<double>(0);
+	{
+		int lc = param->GetLoadCurve();
+		if (lc == -1) return param->pvalue<double>(0);
+		else return &param->GetScaleDouble();
+	}
 	else if (param->type() == FE_PARAM_VEC3D)
 	{
 		vec3d* v = param->pvalue<vec3d>(0);
@@ -851,6 +855,49 @@ double* FEModel::FindParameter(const ParamString& paramString)
 	}
 
 	// if we get here, handle some special cases
+	if (next == "mesh")
+	{
+		ParamString& nodeString = next.next();
+		if (nodeString == "node")
+		{
+			FEMesh& mesh = GetMesh();
+			FENode* node = 0;
+			int nid = nodeString.Index();
+			if (nid < 0)
+			{
+				ParamString fnc = nodeString.next();
+				if (fnc == "fromId")
+				{
+					nid = fnc.Index();
+					node = mesh.FindNodeFromID(nid);
+					nodeString = nodeString.next();
+				}
+				else return 0;
+			}
+			else if ((nid >=0) && (nid < mesh.Nodes()))
+			{
+				node = &mesh.Node(nid);
+			}
+
+			if (node)
+			{
+				ParamString& paramString = nodeString.next();
+				if (paramString == "position")
+				{
+					vec3d& rt = node->m_rt;
+					ParamString& c = paramString.next();
+					if (c == "x") return &rt.x;
+					if (c == "y") return &rt.y;
+					if (c == "z") return &rt.z;
+					return 0;
+				}
+				else return 0;
+			}
+			else return 0;
+		}
+		else return 0;
+	}
+
 	if ((next == "rigidbody") && m_imp->m_prs)
 	{
 		FEMaterial* mat = 0;

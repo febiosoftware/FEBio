@@ -1200,6 +1200,19 @@ int FEMesh::GetFace(FEElement& el, int n, int* nf)
 }
 
 //-----------------------------------------------------------------------------
+//! Find a node from a given ID. return 0 if the node cannot be found.
+
+FENode* FEMesh::FindNodeFromID(int nid)
+{
+	for (int i = 0; i<Nodes(); ++i)
+	{
+		FENode& node = Node(i);
+		if (node.GetID() == nid) return &node;
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Find an element from a given ID. return 0 if the element cannot be found.
 
 FEElement* FEMesh::FindElementFromID(int nid)

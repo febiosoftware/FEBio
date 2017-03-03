@@ -291,6 +291,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEIdealGas.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FENeoHookeanFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FENewtonianFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FETangentialFlowStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEViscousFluid.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -315,6 +316,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEIdealGas.h" />
     <ClInclude Include="..\..\FEBioFluid\FENeoHookeanFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FENewtonianFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FETangentialFlowStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FEViscousFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\stdafx.h" />
   </ItemGroup>

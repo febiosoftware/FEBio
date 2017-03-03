@@ -404,6 +404,9 @@ public:
 	//! return the nr of faces an element has
 	int Faces(FEElement& el);
 
+	//! Finds a node from a given ID
+	FENode* FindNodeFromID(int nid);
+
 	//! Finds an element from a given ID
 	FEElement* FindElementFromID(int nid);
 

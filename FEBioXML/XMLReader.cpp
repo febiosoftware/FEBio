@@ -610,18 +610,13 @@ void XMLReader::ReadTag(XMLTag& tag)
 			ch = GetChar(); if (ch != '-') throw XMLSyntaxError();
 
 			// find the end of the comment
+			int n = 0;
 			do
 			{
 				ch = GetChar();
-				if (ch == '-')
-				{
-					ch = GetChar();
-					if (ch == '-')
-					{
-						ch = GetChar();
-						if (ch == '>') break;
-					}
-				}
+				if (ch == '-') n++;
+				else if ((ch == '>') && (n >= 2)) break;
+				else n = 0;
 			}
 			while (1);
 		}

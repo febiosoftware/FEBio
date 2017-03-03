@@ -80,8 +80,8 @@ public:
 	int GetLoadCurve() const { return m_nlc; }
 
 	// get the scale factors
-	double GetScaleDouble() const { return m_scl; }
-	vec3d  GetScaleVec3d () const { return m_vscl; }
+	double& GetScaleDouble() { return m_scl; }
+	vec3d & GetScaleVec3d () { return m_vscl; }
 
 	// Copy the state of one parameter to this parameter.
 	// This requires that the parameters are compatible (i.e. same type, etc.)
