@@ -857,7 +857,7 @@ double* FEModel::FindParameter(const ParamString& paramString)
 	// if we get here, handle some special cases
 	if (next == "mesh")
 	{
-		ParamString& nodeString = next.next();
+		ParamString nodeString = next.next();
 		if (nodeString == "node")
 		{
 			FEMesh& mesh = GetMesh();
@@ -881,11 +881,11 @@ double* FEModel::FindParameter(const ParamString& paramString)
 
 			if (node)
 			{
-				ParamString& paramString = nodeString.next();
+				ParamString paramString = nodeString.next();
 				if (paramString == "position")
 				{
 					vec3d& rt = node->m_rt;
-					ParamString& c = paramString.next();
+					ParamString c = paramString.next();
 					if (c == "x") return &rt.x;
 					if (c == "y") return &rt.y;
 					if (c == "z") return &rt.z;
