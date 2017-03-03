@@ -1,24 +1,24 @@
 //
-//  FETangentialFlowStabilization.cpp
+//  FEBackFlowStabilization.cpp
 //  FEBioFluid
 //
 //  Created by Gerard Ateshian on 3/2/17.
 //  Copyright © 2017 febio.org. All rights reserved.
 //
 
-#include "FETangentialFlowStabilization.h"
+#include "FEBackFlowStabilization.h"
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
-BEGIN_PARAMETER_LIST(FETangentialFlowStabilization, FESurfaceLoad)
-    ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
-    ADD_PARAMETER(m_rho, FE_PARAM_DOUBLE, "density");
+BEGIN_PARAMETER_LIST(FEBackFlowStabilization, FESurfaceLoad)
+ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
+ADD_PARAMETER(m_rho, FE_PARAM_DOUBLE, "density");
 END_PARAMETER_LIST()
 
 //-----------------------------------------------------------------------------
 //! constructor
-FETangentialFlowStabilization::FETangentialFlowStabilization(FEModel* pfem) : FESurfaceLoad(pfem)
+FEBackFlowStabilization::FEBackFlowStabilization(FEModel* pfem) : FESurfaceLoad(pfem)
 {
     m_beta = 1.0;
     m_rho = 1.0;
@@ -31,7 +31,7 @@ FETangentialFlowStabilization::FETangentialFlowStabilization(FEModel* pfem) : FE
 
 //-----------------------------------------------------------------------------
 //! allocate storage
-void FETangentialFlowStabilization::SetSurface(FESurface* ps)
+void FEBackFlowStabilization::SetSurface(FESurface* ps)
 {
     FESurfaceLoad::SetSurface(ps);
 }
@@ -39,7 +39,7 @@ void FETangentialFlowStabilization::SetSurface(FESurface* ps)
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to hydrostatic pressure
 
-void FETangentialFlowStabilization::ElementStiffness(FESurfaceElement& el, matrix& ke)
+void FEBackFlowStabilization::ElementStiffness(FESurfaceElement& el, matrix& ke)
 {
     int nint = el.GaussPoints();
     int neln = el.Nodes();
@@ -77,26 +77,27 @@ void FETangentialFlowStabilization::ElementStiffness(FESurfaceElement& el, matri
         vec3d n = dxr ^ dxs;
         double da = n.unit();
         
-        vec3d vtau = (I - dyad(n))*v;
-        vtau.unit();
-        mat3ds K = (I - dyad(n) + dyad(vtau))*(-m_beta*m_rho*da*w[k]);
-        
-        // calculate stiffness component
-        for (int i=0; i<neln; ++i)
-            for (int j=0; j<neln; ++j)
-            {
-                mat3ds Kab = K*(N[i]*N[j]);
-                ke[3*i  ][3*j  ] -= Kab.xx(); ke[3*i  ][3*j+1] -= Kab.xy(); ke[3*i  ][3*j+2] -= Kab.xz();
-                ke[3*i+1][3*j  ] -= Kab.xy(); ke[3*i+1][3*j+1] -= Kab.yy(); ke[3*i+1][3*j+2] -= Kab.yz();
-                ke[3*i+2][3*j  ] -= Kab.xz(); ke[3*i+2][3*j+1] -= Kab.yz(); ke[3*i+2][3*j+2] -= Kab.zz();
-            }
+        double vn = v*n;
+        if (vn < 0) {
+            mat3d K = (I*vn + (v & n))*(m_beta*m_rho*da*w[k]);
+            
+            // calculate stiffness component
+            for (int i=0; i<neln; ++i)
+                for (int j=0; j<neln; ++j)
+                {
+                    mat3d Kab = K*(N[i]*N[j]);
+                    ke[3*i  ][3*j  ] -= Kab(0,0); ke[3*i  ][3*j+1] -= Kab(0,1); ke[3*i  ][3*j+2] -= Kab(0,2);
+                    ke[3*i+1][3*j  ] -= Kab(1,0); ke[3*i+1][3*j+1] -= Kab(1,1); ke[3*i+1][3*j+2] -= Kab(1,2);
+                    ke[3*i+2][3*j  ] -= Kab(2,0); ke[3*i+2][3*j+1] -= Kab(2,1); ke[3*i+2][3*j+2] -= Kab(2,2);
+                }
+        }
     }
 }
 
 //-----------------------------------------------------------------------------
 //! calculates the element force
 
-void FETangentialFlowStabilization::ElementForce(FESurfaceElement& el, vector<double>& fe)
+void FEBackFlowStabilization::ElementForce(FESurfaceElement& el, vector<double>& fe)
 {
     // nr integration points
     int nint = el.GaussPoints();
@@ -137,27 +138,29 @@ void FETangentialFlowStabilization::ElementForce(FESurfaceElement& el, vector<do
         double da = n.unit();
         
         // force vector
-        vec3d vtau = (I - dyad(n))*v;
-        vec3d f = vtau*vtau.norm()*(-m_beta*m_rho*da*w[j]);
-        
-        for (int i=0; i<neln; ++i)
-        {
-            fe[3*i  ] += N[i]*f.x;
-            fe[3*i+1] += N[i]*f.y;
-            fe[3*i+2] += N[i]*f.z;
+        double vn = v*n;
+        if (vn < 0) {
+            vec3d f = v*vn*(m_beta*m_rho*da*w[j]);
+            
+            for (int i=0; i<neln; ++i)
+            {
+                fe[3*i  ] += N[i]*f.x;
+                fe[3*i+1] += N[i]*f.y;
+                fe[3*i+2] += N[i]*f.z;
+            }
         }
     }
 }
 
 //-----------------------------------------------------------------------------
 
-void FETangentialFlowStabilization::Serialize(DumpStream& ar)
+void FEBackFlowStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialFlowStabilization::UnpackLM(FEElement& el, vector<int>& lm)
+void FEBackFlowStabilization::UnpackLM(FEElement& el, vector<int>& lm)
 {
     FEMesh& mesh = *GetSurface().GetMesh();
     int N = el.Nodes();
@@ -175,7 +178,7 @@ void FETangentialFlowStabilization::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialFlowStabilization::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
+void FEBackFlowStabilization::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 {
     matrix ke;
     vector<int> lm;
@@ -207,7 +210,7 @@ void FETangentialFlowStabilization::StiffnessMatrix(const FETimeInfo& tp, FESolv
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialFlowStabilization::Residual(const FETimeInfo& tp, FEGlobalVector& R)
+void FEBackFlowStabilization::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 {
     vector<double> fe;
     vector<int> lm;
