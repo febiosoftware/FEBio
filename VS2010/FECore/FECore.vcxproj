@@ -637,6 +637,7 @@
     <ClInclude Include="..\..\FECore\FEDataArray.h" />
     <ClInclude Include="..\..\FECore\FEDataExport.h" />
     <ClInclude Include="..\..\FECore\FEDataGenerator.h" />
+    <ClInclude Include="..\..\FECore\FEDataLoadCurve.h" />
     <ClInclude Include="..\..\FECore\FEDataStream.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteMaterial.h" />
@@ -680,6 +681,7 @@
     <ClInclude Include="..\..\FECore\FEParameterList.h" />
     <ClInclude Include="..\..\FECore\FEParamValidator.h" />
     <ClInclude Include="..\..\FECore\FEPlotData.h" />
+    <ClInclude Include="..\..\FECore\FEProperty.h" />
     <ClInclude Include="..\..\FECore\FERigidBody.h" />
     <ClInclude Include="..\..\FECore\FERigidSurface.h" />
     <ClInclude Include="..\..\FECore\FERigidSystem.h" />
@@ -775,6 +777,7 @@
     <ClCompile Include="..\..\FECore\FEDataArray.cpp" />
     <ClCompile Include="..\..\FECore\FEDataExport.cpp" />
     <ClCompile Include="..\..\FECore\FEDataGenerator.cpp" />
+    <ClCompile Include="..\..\FECore\FEDataLoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain.cpp" />
@@ -816,6 +819,7 @@
     <ClCompile Include="..\..\FECore\FEParameterList.cpp" />
     <ClCompile Include="..\..\FECore\FEParamValidator.cpp" />
     <ClCompile Include="..\..\FECore\FEPlotData.cpp" />
+    <ClCompile Include="..\..\FECore\FEProperty.cpp" />
     <ClCompile Include="..\..\FECore\FERigidBody.cpp" />
     <ClCompile Include="..\..\FECore\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FECore\FERigidSystem.cpp" />

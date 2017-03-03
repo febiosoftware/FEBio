@@ -87,6 +87,12 @@
     <ClCompile Include="..\..\FEBioFluid\FETangentialDamping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEBackFlowStabilization.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FETangentialFlowStabilization.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidData.h">
@@ -159,6 +165,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioFluid\FETangentialDamping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEBackFlowStabilization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FETangentialFlowStabilization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
