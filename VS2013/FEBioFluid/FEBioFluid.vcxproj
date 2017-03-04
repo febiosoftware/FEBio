@@ -270,6 +270,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioFluid\FEBackFlowStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidData.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidPlot.cpp" />
@@ -295,6 +296,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEViscousFluid.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBioFluid\FEBackFlowStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidData.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidPlot.h" />
