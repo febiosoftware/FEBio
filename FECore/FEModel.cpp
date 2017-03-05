@@ -452,7 +452,23 @@ bool FEModel::InitBCs()
 		if (pbc->Init() == false) return false;
 	}
 
-	return true;
+    // check the surface loads
+    int NSL = SurfaceLoads();
+    for (int i=0; i<NSL; ++i)
+    {
+        FESurfaceLoad* pbc = SurfaceLoad(i);
+        if (pbc->Init() == false) return false;
+    }
+    
+    // check the edge loads
+    int NEL = EdgeLoads();
+    for (int i=0; i<NEL; ++i)
+    {
+        FEEdgeLoad* pbc = EdgeLoad(i);
+        if (pbc->Init() == false) return false;
+    }
+    
+    return true;
 }
 
 //-----------------------------------------------------------------------------
