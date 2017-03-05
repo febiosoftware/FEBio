@@ -15,7 +15,7 @@
 class FEDiagnostic;
 
 //-----------------------------------------------------------------------------
-class FEDiagnosticScenario : public FEParamContainer
+class FECORE_EXPORT FEDiagnosticScenario : public FEParamContainer
 {
 public:
 	FEDiagnosticScenario(FEDiagnostic* pdia) : m_pdia(pdia) {};
@@ -72,7 +72,7 @@ public:
 //! The FEDiagnosticImport class creates a specific diagnostic test. Currently
 //! the only way to create a diagnostic is to load a diagnostic from file
 
-class FEDiagnosticImport : public FEBioImport
+class FECORE_EXPORT FEDiagnosticImport : public FEBioImport
 {
 public:
 	FEDiagnostic* LoadFile(FEModel& fem, const char* szfile);

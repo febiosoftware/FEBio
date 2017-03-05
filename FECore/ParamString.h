@@ -1,10 +1,11 @@
 #pragma once
 #include <vector>
 #include <string>
+#include "fecore_export.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
-class ParamRef
+class FECORE_EXPORT ParamRef
 {
 public:
 	string	name;		// name of parameter
@@ -30,7 +31,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // helper class for retrieving parameters
-class ParamString
+class FECORE_EXPORT ParamString
 {
 public:
 	//! constructor

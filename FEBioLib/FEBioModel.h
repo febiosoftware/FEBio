@@ -3,6 +3,7 @@
 #include "FECore/Timer.h"
 #include "FECore/DataStore.h"
 #include "FEBioPlot/PlotFile.h"
+#include <FECore/FECoreKernel.h>
 
 //-----------------------------------------------------------------------------
 //! The FEBio model specializes the FEModel class to implement FEBio specific
@@ -10,7 +11,7 @@
 //!
 //! In addition it adds support for all I/O capabilities. 
 //!
-class FEBioModel : public FEModel
+class FECORE_EXPORT FEBioModel : public FEModel
 {
 public:
 	//! constructor

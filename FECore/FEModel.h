@@ -4,6 +4,7 @@
 #include "FETypes.h"
 #include "FEModelComponent.h"
 #include "Callback.h"
+#include "FECoreKernel.h"
 #include <string>
 
 //-----------------------------------------------------------------------------
@@ -31,7 +32,7 @@ class FELinearConstraintManager;
 //! geometry, analysis steps, boundary and loading conditions, contact interfaces
 //! and so on.
 //!
-class FEModel : public FECoreBase, public CallbackHandler
+class FECORE_EXPORT FEModel : public FECoreBase, public CallbackHandler
 {
 public:
 	enum {MAX_STRING = 256};

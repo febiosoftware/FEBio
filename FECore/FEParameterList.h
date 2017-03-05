@@ -8,6 +8,7 @@
 #include "FEParam.h"
 #include "FEParamValidator.h"
 #include "ParamString.h"
+#include "fecore_export.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -63,7 +64,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Base class for classes that wish to support parameter lists
-class FEParamContainer
+class FECORE_EXPORT FEParamContainer
 {
 public:
 	//! constructor

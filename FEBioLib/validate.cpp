@@ -1,5 +1,5 @@
 #include "stdafx.h"
-
+#include "febio.h"
 #include "validate.h"
 #include <string>
 #include <iostream>
@@ -86,17 +86,13 @@ bool read_str(char* sz, int len, FILE* fp)
 }
 
 //-----------------------------------------------------------------------------
-// function to return the application path
-extern int get_app_path (char *pname, size_t pathsize);
-
-//-----------------------------------------------------------------------------
 // Try to load a license key
 void FEBioLicenseKey::Load()
 {
 #ifdef FEBIO_LICENSE
 	// get the application path
 	char szpath[4096] = {0};
-	get_app_path(szpath, 4095);
+	febio::get_app_path(szpath, 4095);
 	char* ch = strrchr(szpath, '/');
 	if (ch == 0) ch = strrchr(szpath, '\\');
 	if (ch) *(ch+1) = 0; else szpath[0] = 0;

@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <FECore/fecore_export.h>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -67,7 +68,7 @@ private:
 
 //-----------------------------------------------------------------------------
 //! This class manages all the plugins
-class FEBioPluginManager
+class FECORE_EXPORT FEBioPluginManager
 {
 public:
 	//! Get the plugin manager

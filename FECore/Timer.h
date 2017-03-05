@@ -9,6 +9,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "fecore_export.h"
+
 //-----------------------------------------------------------------------------
 //! This class implements a simple timer. 
 
@@ -16,7 +18,7 @@
 //! function stops it and the GetTime function returns the time elapsed between
 //! the call to start and stop
 
-class Timer  
+class FECORE_EXPORT Timer  
 {
 public:
 	//! constructor

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "febio.h"
 
 #ifdef WIN32
 #include "windows.h"
@@ -20,7 +21,7 @@
 // This code is from Ian MacArthur from the FLTK forum: fltk.general 
 //
 
-int get_app_path (char *pname, size_t pathsize)
+int febio::get_app_path (char *pname, size_t pathsize)
 {
 	long result;
 

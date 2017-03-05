@@ -95,10 +95,8 @@ struct CMDOPTIONS
 // forward declarations
 //
 bool ParseCmdLine(int argc, char* argv[], CMDOPTIONS& ops);
-int Hello();
 int Run(CMDOPTIONS& ops);
 int prompt(CMDOPTIONS& ops);
-int get_app_path (char *pname, size_t pathsize);
 
 //-----------------------------------------------------------------------------
 // we use the console to log output 
@@ -219,9 +217,9 @@ int main(int argc, char* argv[])
 
 	// print welcome message
 #ifdef NALPLIB
-	if (Hello()) return 1;
+	if (febio::Hello()) return 1;
 #else
-	if (ops.bsplash && (!ops.bsilent)) Hello();
+	if (ops.bsplash && (!ops.bsilent)) febio::Hello();
 #endif
 	// Initialize FEBio library
 	febio::InitLibrary();
@@ -272,7 +270,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 
 	// set the location of the configuration file
 	char szpath[1024] = {0};
-	get_app_path (szpath, 1023);
+	febio::get_app_path (szpath, 1023);
 
 	char* ch = strrchr(szpath, '\\');
 	if (ch == 0) ch = strrchr(szpath, '/');

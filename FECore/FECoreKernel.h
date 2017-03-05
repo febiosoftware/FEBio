@@ -18,7 +18,7 @@ class Logfile;
 //! different modules. In particular, it manages the factory classes
 //! which are responsible for the creation of different classes that are registered
 //! with the kernel.
-class FECoreKernel
+class FECORE_EXPORT FECoreKernel
 {
 public:
 	// Do not call this function from a plugin as it will not return the correct
@@ -147,11 +147,3 @@ public:
 	FEPluginFactory_T(const char* sz) : FECoreFactory(sid, sz){}
 	void* Create(FEModel* pfem) { return new T(pfem); }
 };
-
-//------------------------------------------------------------------------------
-// This is for functions exported from a plugin
-#ifdef WIN32
-#define FECORE_EXPORT extern "C" __declspec(dllexport)
-#else
-#define FECORE_EXPORT extern "C"
-#endif

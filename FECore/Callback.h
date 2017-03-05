@@ -1,5 +1,6 @@
 #pragma once
 #include <list>
+#include "fecore_export.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations.
@@ -30,7 +31,7 @@ struct FECORE_CALLBACK {
 
 //-----------------------------------------------------------------------------
 // class that handles callbacks
-class CallbackHandler
+class FECORE_EXPORT CallbackHandler
 {
 public:
 	CallbackHandler();

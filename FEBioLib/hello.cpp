@@ -5,6 +5,7 @@
 	#include "FEBioNSL.h"
 #endif
 #include "FECore/log.h"
+#include "febio.h"
 #include <stdio.h>
 
 unsigned char banner[] = {
@@ -72,7 +73,7 @@ void print_banner() {}
 
 #endif
 */
-int Hello()
+int febio::Hello()
 {
 	//int nlic = GetLicenseKeyStatus(); // For KeyGen
 

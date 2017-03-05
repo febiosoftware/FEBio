@@ -12,6 +12,7 @@
 #include "FECore/FECoreKernel.h"
 #include "FECore/DumpFile.h"
 #include "FECore/DOFS.h"
+#include "febio.h"
 #include "version.h"
 
 //-----------------------------------------------------------------------------
@@ -583,10 +584,6 @@ void FEBioModel::SerializeDataStore(DumpStream& ar)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-// Forward declarations
-int Hello();
-
-//-----------------------------------------------------------------------------
 //! This function performs one-time-initialization stuff. All the different 
 //! modules are initialized here as well. This routine also performs some
 //! data checks
@@ -692,7 +689,7 @@ bool FEBioModel::InitLogFile()
 
 		// print welcome message to file
 		Logfile::MODE m = felog.SetMode(Logfile::LOG_FILE);
-		Hello();
+		febio::Hello();
 		felog.SetMode(m);
 	}
 

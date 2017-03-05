@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include <stdio.h>
+#include <FECore/fecore_export.h>
 
 //-----------------------------------------------------------------------------
 // Forward declaration of the FE model
@@ -19,7 +20,7 @@ class FEModel;
 //! Base class for file import classes. This class offers a simple error reporting
 //! mechanism and manages the FILE* pointer. 
 
-class FEFileImport  
+class FECORE_EXPORT FEFileImport
 {
 public:
 	//! constructor

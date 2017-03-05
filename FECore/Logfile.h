@@ -9,10 +9,11 @@
 #pragma once
 #endif // _MSC_VER > 1000
 #include <stdio.h>
+#include "fecore_export.h"
 
 //-----------------------------------------------------------------------------
 // class used to create an abstract interface to a screen
-class LogStream
+class FECORE_EXPORT LogStream
 {
 public:
 	LogStream() {}
@@ -27,7 +28,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // A stream that outputs to a file
-class LogFileStream : public LogStream
+class FECORE_EXPORT LogFileStream : public LogStream
 {
 public:
 	// constructor
@@ -68,7 +69,7 @@ private:
 //! Note that this class is implemented as a singleton, in other words, only one
 //! instance can be created.
 
-class Logfile  
+class FECORE_EXPORT Logfile
 {
 public:
 	enum MODE { LOG_NEVER = 0, LOG_FILE = 1, LOG_SCREEN, LOG_FILE_AND_SCREEN };
