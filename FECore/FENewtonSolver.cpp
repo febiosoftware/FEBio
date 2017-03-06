@@ -17,6 +17,8 @@ BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
 	ADD_PARAMETER2(m_LSiter   , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
 	ADD_PARAMETER2(m_maxref   , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_refs");
 	ADD_PARAMETER2(m_maxups   , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" );
+	ADD_PARAMETER2(m_max_buf_size, FE_PARAM_INT, FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size");
+	ADD_PARAMETER(m_cycle_buffer , FE_PARAM_BOOL, "qn_cycle_buffer");
 	ADD_PARAMETER2(m_cmax     , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
 	ADD_PARAMETER(m_nqnsolver, FE_PARAM_INT   , "qnmethod");
 	ADD_PARAMETER(m_bzero_diagonal, FE_PARAM_BOOL  , "check_zero_diagonal");
@@ -38,6 +40,8 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 
 	m_cmax   = 1e5;
 	m_maxups = 10;
+	m_max_buf_size = 0;
+	m_cycle_buffer = true;
 	m_nqnsolver = QN_BFGS;
 	m_pbfgs = 0;
 
@@ -206,6 +210,8 @@ bool FENewtonSolver::Init()
 
 	// set the solution parameters
 	m_pbfgs->m_maxups = m_maxups;
+	m_pbfgs->m_max_buf_size = m_max_buf_size;
+	m_pbfgs->m_cycle_buffer = m_cycle_buffer;
 	m_pbfgs->m_cmax   = m_cmax;
 
     // Now that we have determined the equation numbers we can continue
@@ -352,6 +358,8 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 		{
 			ar << m_nqnsolver;
 			ar << m_pbfgs->m_maxups;
+			ar << m_pbfgs->m_max_buf_size;
+			ar << m_pbfgs->m_cycle_buffer;
 			ar << m_pbfgs->m_cmax;
 			ar << m_pbfgs->m_nups;
 		}
@@ -377,6 +385,8 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 			}
 
 			ar >> m_pbfgs->m_maxups;
+			ar >> m_pbfgs->m_max_buf_size;
+			ar >> m_pbfgs->m_cycle_buffer;
 			ar >> m_pbfgs->m_cmax;
 			ar >> m_pbfgs->m_nups;
 		}

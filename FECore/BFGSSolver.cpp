@@ -20,9 +20,11 @@ BFGSSolver::BFGSSolver()
 // Initialization method
 void BFGSSolver::Init(int neq, LinearSolver* pls)
 {
+	if (m_max_buf_size <= 0) m_max_buf_size = m_maxups;
+
 	// allocate storage for BFGS update vectors
-	m_V.resize(m_maxups, neq);
-	m_W.resize(m_maxups, neq);
+	m_V.resize(m_max_buf_size, neq);
+	m_W.resize(m_max_buf_size, neq);
 
 	m_D.resize(neq);
 	m_G.resize(neq);
@@ -46,24 +48,19 @@ void BFGSSolver::Init(int neq, LinearSolver* pls)
 
 bool BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1)
 {
-	int i;
-	double dg, dh,dgi, c, r;
-	double *vn, *wn;
-
-	int neq = ui.size();
-
 	// calculate the BFGS update vectors
-	for (i=0; i<neq; ++i)	
+	int neq = ui.size();
+	for (int i = 0; i<neq; ++i)
 	{
 		m_D[i] = s*ui[i];
 		m_G[i] = R0[i] - R1[i];
 		m_H[i] = R0[i]*s;
 	}
 
-	dg = m_D*m_G;
-	dh = m_D*m_H;
-	dgi = 1.0 / dg;
-	r = dg/dh;
+	double dg = m_D*m_G;
+	double dh = m_D*m_H;
+	double dgi = 1.0 / dg;
+	double r = dg / dh;
 
 	// check to see if this is still a pos definite update
 //	if (r <= 0) 
@@ -73,19 +70,25 @@ bool BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector
 
 	// calculate the condition number
 //	c = sqrt(r);
-	c = sqrt(fabs(r));
+	double c = sqrt(fabs(r));
 
 	// make sure c is less than the the maximum.
 	if (c > m_cmax) return false;
 
-	vn = m_V[m_nups];
-	wn = m_W[m_nups];
+	// get the correct buffer to fill
+	int n = (m_nups % m_max_buf_size);
 
-	// TODO: There might be a bug here. Check signs!
-	for (i=0; i<neq; ++i)	
+	// do the update only when allowed
+	if ((m_nups < m_max_buf_size) || (m_cycle_buffer == true))
 	{
-		vn[i] = -m_H[i]*c - m_G[i];
-		wn[i] = m_D[i]*dgi;
+		double* vn = m_V[n];
+		double* wn = m_W[n];
+
+		for (int i=0; i<neq; ++i)	
+		{
+			vn[i] = -m_H[i]*c - m_G[i];
+			wn[i] = m_D[i]*dgi;
+		}
 	}
 
 	// increment update counter
@@ -101,9 +104,6 @@ bool BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector
 
 void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 {
-	int i, j;
-	double *vi, *wi, vr, wr;
-
 	// get the nr of equations
 	int neq = x.size();
 
@@ -114,16 +114,28 @@ void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 	static vector<double> tmp;
 	tmp = b;
 
-	// loop over all update vectors
-	for (i=m_nups-1; i>=0; --i)
+	// number of updates can be larger than buffer size, so clamp it
+	int nups = (m_nups> m_max_buf_size ? m_max_buf_size : m_nups);
+
+	// get the "0" buffer index
+	int n0 = 0;
+	if ((m_nups > m_max_buf_size) && (m_cycle_buffer == true))
 	{
-		vi = m_V[i];
-		wi = m_W[i];
+		n0 = m_nups % m_max_buf_size;
+	}
 
-		wr = 0;
-		for (j=0; j<neq; j++) wr += wi[j]*tmp[j];
+	// loop over all update vectors
+	for (int i=nups-1; i>=0; --i)
+	{
+		int n = (n0 + i) % m_max_buf_size;
 
-		for (j=0; j<neq; j++) tmp[j] += vi[j]*wr;
+		double* vi = m_V[n];
+		double* wi = m_W[n];
+
+		double wr = 0;
+		for (int j = 0; j<neq; j++) wr += wi[j] * tmp[j];
+
+		for (int j = 0; j<neq; j++) tmp[j] += vi[j] * wr;
 	}
 
 	// perform a backsubstitution
@@ -133,14 +145,16 @@ void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 	}
 
 	// loop again over all update vectors
-	for (i=0; i<m_nups; ++i)
+	for (int i = 0; i<nups; ++i)
 	{
-		vi = m_V[i];
-		wi = m_W[i];
+		int n = (n0 + i) % m_max_buf_size;
 
-		vr = 0;
-		for (j=0; j<neq; ++j) vr += vi[j]*x[j];
+		double* vi = m_V[n];
+		double* wi = m_W[n];
 
-		for (j=0; j<neq; ++j) x[j] += wi[j]*vr;
+		double vr = 0;
+		for (int j = 0; j<neq; ++j) vr += vi[j] * x[j];
+
+		for (int j = 0; j<neq; ++j) x[j] += wi[j] * vr;
 	}
 }

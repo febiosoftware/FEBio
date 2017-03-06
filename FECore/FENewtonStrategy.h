@@ -30,6 +30,8 @@ public:
 
 public:
 	int		m_maxups;		//!< max nr of QN iters permitted between stiffness reformations
+	int		m_max_buf_size;	//!< max buffer size for update vector storage
+	bool	m_cycle_buffer;	//!< recycle the buffer when updates is larger than buffer size
 	double	m_cmax;			//!< maximum value for the condition number
 	int		m_nups;			//!< nr of stiffness updates
 };
