@@ -5,10 +5,10 @@
 #include "stdafx.h"
 #include "FERigidWallInterface.h"
 #include "FECore/FENNQuery.h"
-#include <FECore/FEShellDomain.h>
 #include <FECore/FEModel.h>
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/log.h"
+#include <FEBioMech/FEElasticShellDomainOld.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -70,7 +70,7 @@ bool FERigidWallSurface::Init()
 	zero(tag);
 	for (int nd=0; nd<m.Domains(); ++nd)
 	{
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
+		FEElasticShellDomainOld* psd = dynamic_cast<FEElasticShellDomainOld*>(&m.Domain(nd));
 		if (psd)
 		{
 			for (int i=0; i<psd->Elements(); ++i)
