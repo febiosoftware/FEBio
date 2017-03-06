@@ -1,5 +1,6 @@
 #pragma once
 #include <FECore/fecore_export.h>
+#include <cstddef>
 
 //-----------------------------------------------------------------------------
 // Defines the FEBio namespace
