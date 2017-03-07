@@ -16,10 +16,18 @@ class ParamString;
 class FEProperty
 {
 public:
+	enum Flags
+	{
+		Required      = 0x01,		// the property is required
+		ValueProperty = 0x02		// the property is a "value" property
+	};
+
+public:
 	//! Name of the property.
 	//! Note that the name is not copied so it must point to a static string.
 	const char*		m_szname;
 	bool			m_brequired;	// true if this flag is required (false if optional). Used in FEMaterial::Init().
+	bool			m_bvalue;		// true if this is a "value" property (i.e. a property that has a param of the same name)
 
 public:
 	// Set\Get the name of the property

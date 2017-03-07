@@ -60,7 +60,7 @@ public: // interface for getting/setting properties
 	bool SetProperty(int nid, FECoreBase* pm);
 
 	//! return a property
-	FECoreBase* GetProperty(int i);
+	virtual FECoreBase* GetProperty(int i);
 
 	//! find a property index ( returns <0 for error)
 	int FindPropertyIndex(const char* szname);
@@ -88,7 +88,7 @@ protected:
 	//! Add a property
 	//! Call this in the constructor of derived classes to 
 	//! build the property list
-	void AddProperty(FEProperty* pp, const char* sz, bool brequired = true);
+	void AddProperty(FEProperty* pp, const char* sz, unsigned int flags = FEProperty::Required);
 
 private:
 	//! Set the type string (This is used by the factory methods to make sure 

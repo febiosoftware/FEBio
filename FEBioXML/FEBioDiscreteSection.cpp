@@ -120,6 +120,26 @@ void FEBioDiscreteSection::ParseRigidAxialForce(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
+void FEBioDiscreteSection::ParseRigidCable(XMLTag& tag)
+{
+	// create a new rigid constraint
+	FEModelLoad* pml = fecore_new<FEModelLoad>(FEBC_ID, tag.Name(), GetFEModel());
+
+	// read all parameters and properties
+	++tag;
+	do
+	{
+		if (m_pim->ReadParameter(tag, pml) == false) throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+
+	// add it to the model
+	FEModel& fem = *GetFEModel();
+	fem.AddModelLoad(pml);
+}
+
+//-----------------------------------------------------------------------------
 void FEBioDiscreteSection::ParseDiscreteSection25(XMLTag& tag)
 {
 	FECoreKernel& febio = FECoreKernel::GetInstance();
@@ -216,6 +236,7 @@ void FEBioDiscreteSection::ParseDiscreteSection25(XMLTag& tag)
 			pd->CreateMaterialPointData();
 		}
 		else if (tag == "rigid_axial_force") ParseRigidAxialForce(tag);
+		else if (tag == "rigid_cable") ParseRigidCable(tag);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}

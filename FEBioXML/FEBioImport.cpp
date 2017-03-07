@@ -855,6 +855,14 @@ bool FEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam
 			FECoreBase* pp = pc->GetProperty(n);
 			if (pp)
 			{
+				// process attributes first
+				for (int i = 0; i<tag.m_natt; ++i)
+				{
+					XMLAtt& att = tag.m_att[i];
+					if (pp->SetAttribute(att.m_szatt, att.m_szatv) == false) throw XMLReader::InvalidAttributeValue(tag, att.m_szatt);
+				}
+
+				// process the parameter lists
 				if (!tag.isleaf())
 				{
 					++tag;

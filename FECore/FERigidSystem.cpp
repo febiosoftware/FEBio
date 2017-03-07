@@ -529,3 +529,14 @@ FERigidSurface* FERigidSystem::FindRigidSurface(const char* szname)
 	}
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+int FERigidSystem::FindRigidbodyFromMaterialID(int matId)
+{
+	for (int i=0; i<m_RB.size(); ++i)
+	{
+		FERigidBody& rb = *m_RB[i];
+		if (rb.GetMaterialID() == matId) return i;
+	}
+	return -1;
+}

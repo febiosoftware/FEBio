@@ -117,10 +117,11 @@ bool FECoreBase::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FECoreBase::AddProperty(FEProperty* pp, const char* sz, bool brequired)
+void FECoreBase::AddProperty(FEProperty* pp, const char* sz, unsigned int flags)
 {
 	pp->SetName(sz);
-	pp->m_brequired = brequired;
+	pp->m_brequired = ((flags & FEProperty::Required) != 0);
+	pp->m_bvalue    = ((flags & FEProperty::ValueProperty) != 0);
 	m_Prop.push_back(pp);
 }
 

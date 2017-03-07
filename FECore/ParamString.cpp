@@ -107,6 +107,17 @@ ParamString ParamString::next() const
 }
 
 //-----------------------------------------------------------------------------
+ParamString ParamString::last() const
+{
+	ParamString p;
+	if (m_param.size() > 1)
+	{
+		p.m_param.push_back(m_param[m_param.size()-1]);
+	}
+	return p;
+}
+
+//-----------------------------------------------------------------------------
 bool ParamString::operator==(const string& s) const
 {
 	if (m_param.empty()) return false;

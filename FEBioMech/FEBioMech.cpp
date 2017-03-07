@@ -144,6 +144,7 @@
 #include "FERigidAngularDamper.h"
 #include "FERigidContractileForce.h"
 #include "FERigidForce.h"
+#include "FERigidCable.h"
 #include "FEDiscreteContact.h"
 
 #include "FESolidSolver.h"
@@ -423,6 +424,7 @@ REGISTER_FECORE_CLASS(FERigidAxialForce      , FEBC_ID, "rigid_axial_force");
 REGISTER_FECORE_CLASS(FERigidBodyForce       , FEBC_ID, "rigid_force"      );
 REGISTER_FECORE_CLASS(FERigidBodyFixedBC     , FEBC_ID, "rigid_fixed"      );
 REGISTER_FECORE_CLASS(FERigidBodyDisplacement, FEBC_ID, "rigid_prescribed" );
+REGISTER_FECORE_CLASS(FERigidCable           , FEBC_ID, "rigid_cable"      );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData

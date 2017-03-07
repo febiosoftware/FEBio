@@ -52,6 +52,9 @@ public:
 	//! return a new string starting from the next component
 	ParamString next() const;
 
+	//! return the last string
+	ParamString last() const;
+
 public:
 
 	//! compare to a string

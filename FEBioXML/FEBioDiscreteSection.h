@@ -15,4 +15,5 @@ protected:
 protected:
 	void ParseSpringSection  (XMLTag& tag);
 	void ParseRigidAxialForce(XMLTag& tag);
+	void ParseRigidCable     (XMLTag& tag);
 };

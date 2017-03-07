@@ -839,10 +839,9 @@ double* GetParameterComponent(const ParamString& paramName, FEParam* param)
 		assert(v);
 		if (v)
 		{
-			ParamString c = paramName.next();
-			if      (c == "x") return &v->x;
-			else if (c == "y") return &v->y;
-			else if (c == "z") return &v->z;
+			if      (paramName == "x") return &v->x;
+			else if (paramName == "y") return &v->y;
+			else if (paramName == "z") return &v->z;
 			else return 0;
 		}
 		else return 0;
@@ -866,8 +865,8 @@ double* FEModel::FindParameter(const ParamString& paramString)
 	FEParam* param = GetParameter(next);
 	if (param)
 	{
-		ParamString paramName = paramString.next();
-		return GetParameterComponent(paramName, param);
+		ParamString paramComp = next.last();
+		return GetParameterComponent(paramComp, param);
 	}
 
 	// if we get here, handle some special cases
@@ -931,7 +930,7 @@ double* FEModel::FindParameter(const ParamString& paramString)
 				if (ob && (ob->GetMaterialID() == nmat))
 				{
 					FEParam* pp = ob->GetParameter(paramName);
-					return GetParameterComponent(paramName, pp);
+					return GetParameterComponent(paramName.last(), pp);
 				}
 			}
 		}

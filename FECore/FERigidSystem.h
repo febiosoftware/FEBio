@@ -65,6 +65,9 @@ public:
 	// evaluate parameter lists
 	bool EvaluateParameterLists();
 
+	// find a rigid body from a material ID
+	int FindRigidbodyFromMaterialID(int matId);
+
 public:
 	int RigidNodeSets() { return (int) m_RN.size(); }
 	FERigidNodeSet* RigidNodeSet(int i) { return m_RN[i]; }

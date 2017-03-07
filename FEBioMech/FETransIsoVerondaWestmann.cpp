@@ -22,7 +22,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FETransIsoVerondaWestmann::FETransIsoVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem)
 {
-	AddProperty(&m_ac, "active_contraction", false);
+	AddProperty(&m_ac, "active_contraction", 0);
 }
 
 //-----------------------------------------------------------------------------

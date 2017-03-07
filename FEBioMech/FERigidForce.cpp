@@ -184,7 +184,7 @@ void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 	K.add(0,6, M);
 	K.add(0,9, MB);
 	K.add(3,3, SA*L + AMA);
-	K.add(3,6, MA);
+	K.add(3,6, MA); // ---> I think this should be AM, not MA
 	K.sub(3,9, AMB);
 	K.sub(6,6,M);
 	K.sub(6,9, MB);
