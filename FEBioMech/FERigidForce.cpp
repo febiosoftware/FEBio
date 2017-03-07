@@ -159,7 +159,7 @@ void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 	double L = N.unit();
 
 	// calculate the force value
-	double f = - m_s / L;
+	double f = -m_s / L;
 
 	// build the stiffness matrix components
 	mat3ds M = mat3dd(1.0) - dyad(N);
@@ -169,6 +169,7 @@ void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 
 	mat3d MA = M*A;
 	mat3d MB = M*B;
+	mat3d AM = A*M;
 
 	mat3d AMA = A*MA;
 	mat3d BMB = B*MB;
@@ -184,7 +185,7 @@ void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 	K.add(0,6, M);
 	K.add(0,9, MB);
 	K.add(3,3, SA*L + AMA);
-	K.add(3,6, MA); // ---> I think this should be AM, not MA
+	K.add(3,6, AM);
 	K.sub(3,9, AMB);
 	K.sub(6,6,M);
 	K.sub(6,9, MB);

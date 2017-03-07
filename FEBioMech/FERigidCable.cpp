@@ -212,6 +212,9 @@ void FERigidCable::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 		// since this is a symmetric matrix, fill the bottom triangular part
 		K.copy_ut();
 
+		// TODO: Not sure why, but it looks like I need a negative sign
+		K *= -1.0;
+
 		// get the equation numbers
 		vector<int> lm(12);
 		lm[0] = bodyA.m_LM[0];
