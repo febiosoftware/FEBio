@@ -97,8 +97,8 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 	}
 	else if (dynamic_cast<FEDiscreteMaterial*>(pmat))
 	{
-		if      (eclass == FE_ELEM_WIRE    ) sztype = "deformable-spring";
-//		if      (eclass == FE_ELEM_WIRE    ) sztype = "deformable-spring2";
+//		if      (eclass == FE_ELEM_WIRE    ) sztype = "deformable-spring";
+		if      (eclass == FE_ELEM_WIRE    ) sztype = "deformable-spring2";
 		else if (eclass == FE_ELEM_DISCRETE) sztype = "discrete-spring";
 		else return 0;
 	}

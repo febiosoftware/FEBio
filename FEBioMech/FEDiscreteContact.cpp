@@ -776,9 +776,13 @@ void FEDiscreteContact2::ProjectNodes()
 	// number of nodes
 	int NN = m_dom->Nodes();
 
+	double L = m_dom->InitialLength();
+
 	bool bdone = false;
 
-	const int maxIter = 100;
+	m_dom->UpdateNodes();
+
+	const int maxIter = 1000;
 	int iter = 0;
 	while ((bdone == false) && (iter < maxIter))
 	{
@@ -797,42 +801,52 @@ void FEDiscreteContact2::ProjectNodes()
 			// If the node is in contact, let's see if it remains in contact
 			if (nodeData.pe != 0)
 			{
+				// TODO: project the node on the surface to make sure we are using the updated projection position
 				FESurfaceElement& mel = *nodeData.pe;
 				double r = nodeData.proj[0];
 				double s = nodeData.proj[1];
 
-				// calculate new position and normal
-				vec3d q = m_surf.Local2Global(mel, r, s);
-				nodeData.nu = m_surf.SurfaceNormal(mel, r, s);
+				// find the position of neighbors
+				vec3d ra = m_dom->Node(i - 1).m_rt;
+				vec3d rb = m_dom->Node(i + 1).m_rt;
 
-				// determine if node should remain in contact depending on whether
-				// the force would pull the node of the surface or not
-				vec3d F = m_dom->NodalForce(i);
-				if (F*nodeData.nu > 0)
-				{
-					// node leaves contact
-					m_dom->AnchorNode(i, false);
-					nodeData.pe = 0;
-				}
-				else
-				{
-					// node remains in contact, so update position
-					nodeData.q = q;
+				// evaluate center
+				vec3d c = (ra + rb)*0.5;
 
-					// get the tangential component of the force
-					vec3d nu = nodeData.nu;
-					vec3d tau = m_dom->Tangent(i);
-					vec3d mu = tau ^ nu;
-					double t = fabs(F*mu);
-					double f = F.norm();
-					if ((t > 0) && (t / f > 0.01))
+				// project onto surface
+				vec2d rs(r,s);
+				vec3d q;
+				FESurfaceElement* pe = cpp.Project(c, q, rs);
+				if (pe)
+				{
+					vec3d nu = m_surf.SurfaceNormal(*pe, rs.x(), rs.y());
+					double gap = nu*(c - q);
+					if (gap < 0)
 					{
-						// tangential component too big
-						// release contact and flag for redo
+						nodeData.pe = pe;
+						nodeData.proj[0] = rs.x();
+						nodeData.proj[1] = rs.y();
+						nodeData.nu = nu;
+						nodeData.q = q;
+
+						// see if the node moved significantly
+						double d = (q - x).norm();
+						if (d / L > 1e-5) bdone = false;
+					}
+					else
+					{
+						// projection failed, release node and redo
 						m_dom->AnchorNode(i, false);
 						nodeData.pe = 0;
 						bdone = false;
 					}
+				}
+				else
+				{
+					// projection faild, release node and redo
+					m_dom->AnchorNode(i, false);
+					nodeData.pe = 0;
+					bdone = false;
 				}
 			}
 			else
@@ -855,6 +869,7 @@ void FEDiscreteContact2::ProjectNodes()
 						nodeData.q = q;
 
 						m_dom->AnchorNode(i, true);
+						bdone = false;
 					}
 				}
 			}
@@ -870,4 +885,7 @@ void FEDiscreteContact2::ProjectNodes()
 		// tell the domain to update the positions of the free nodes
 		m_dom->UpdateNodes();
 	}
+
+	assert(iter < maxIter);
+	felog.printf("iterations = %d\n", iter);
 }

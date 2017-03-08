@@ -67,11 +67,6 @@ class FEDeformableSpringDomain2 : public FEDiscreteDomain, public FEElasticDomai
 		bool	banchor;
 	};
 
-	struct Wire
-	{
-		int	node[2];
-	};
-
 public:
 	//! constructor
 	FEDeformableSpringDomain2(FEModel* pfem);
@@ -132,7 +127,7 @@ public: // overridden from FEElasticDomain
 	//! calculate bodyforces (not used since springs are considered mass-less)
 	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) {}
 
-protected:
+public:
 	double InitialLength();
 	double CurrentLength();
 
@@ -141,5 +136,4 @@ protected:
 	double				m_L0;	//!< initial wire length
 	double				m_Lt;	//!< current wire length
 	vector<NodeData>	m_nodeData;
-	vector<Wire>		m_wire;
 };

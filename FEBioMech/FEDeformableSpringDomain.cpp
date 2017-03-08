@@ -736,56 +736,39 @@ void FEDeformableSpringDomain2::SetNodePosition(int node, const vec3d& r)
 }
 
 //-----------------------------------------------------------------------------
+// This functions distributes the nodes that are not anchored evenly between anchor
+// points.
 void FEDeformableSpringDomain2::UpdateNodes()
 {
-	// clear wires
-	m_wire.clear();
-
 	// make sure we have enough nodes
+	// We need more than 2 nodes since the outer nodes are always anchored.
 	int NN = Nodes();
-	if (NN < 2) return;
+	if (NN <= 2) return;
 
-	// partition into wire segments
-	int nanchors = 0;
-	for (int i=0; i<NN; ++i) if (m_nodeData[i].banchor) nanchors++;
-	assert(nanchors >= 2);
-	if (nanchors < 2) return;
-
-	int wires = nanchors - 1;
-	m_wire.resize(wires);
-	int n = 0;
-	for (int i=0; i<NN; ++i)
+	// find wire segments
+	int n0 = 0, n1 = 1;
+	while (n0 < NN-1)
 	{
-		if (m_nodeData[i].banchor)
+		if (m_nodeData[n1].banchor)
 		{
-			if (n > 0    ) m_wire[n-1].node[1] = i;
-			if (n < wires) m_wire[n  ].node[0] = i;
-			n++;
+			vec3d r0 = Node(n0).m_rt;
+			vec3d r1 = Node(n1).m_rt;
+
+			for (int n = n0+1; n<=n1-1; ++n)
+			{
+				assert(m_nodeData[n].banchor == false);
+
+				double w = (double) (n - n0) / (double)(n1 - n0);
+
+				FENode& nd = Node(n);
+				nd.m_rt = r0 + (r1 - r0)*w;
+				vec3d u = nd.m_rt - nd.m_r0;
+				nd.set_vec3d(m_dofX, m_dofY, m_dofZ, u);
+			}
+
+			n0 = n1;
 		}
-	}
-
-	// position the internal nodes
-	for (int i=0; i<wires; ++i)
-	{
-		Wire& wire = m_wire[i];
-
-		int n0 = wire.node[0];
-		int n1 = wire.node[1];
-
-		vec3d r0 = Node(n0).m_rt;
-		vec3d r1 = Node(n1).m_rt;
-
-		for (int n = n0+1; n<=n1-1; ++n)
-		{
-			assert(m_nodeData[n].banchor == false);
-
-			double w = (double) (n - n0) / (double)(n1 - n0);
-
-			FENode& nd = Node(n);
-			nd.m_rt = r0 + (r1 - r0)*w;
-			vec3d u = nd.m_rt - nd.m_r0;
-			nd.set_vec3d(m_dofX, m_dofY, m_dofZ, u);
-		}
+		n1++;
 	}
 
 	// re-calculate current length
@@ -834,13 +817,13 @@ vec3d FEDeformableSpringDomain2::Tangent(int node)
 	if (NN < 2) return vec3d(0,0,0);
 	if (node == 0)
 	{
-		vec3d t = Node(node+1).m_rt - Node(node).m_r0;
+		vec3d t = Node(node+1).m_rt - Node(node).m_rt;
 		t.unit();
 		return t;
 	}
 	else if (node == NN-1)
 	{
-		vec3d t = Node(node).m_rt - Node(node - 1).m_r0;
+		vec3d t = Node(node).m_rt - Node(node - 1).m_rt;
 		t.unit();
 		return t;
 	}
