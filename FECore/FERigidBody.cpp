@@ -18,7 +18,7 @@ BEGIN_PARAMETER_LIST(FERigidBody, FEObject);
 	ADD_PARAMETER(m_Mr.y, FE_PARAM_DOUBLE, "My");
 	ADD_PARAMETER(m_Mr.z, FE_PARAM_DOUBLE, "Mz");
 	ADD_PARAMETER(m_euler, FE_PARAM_VEC3D, "euler");
-	ADD_PARAMETER(m_r0, FE_PARAM_VEC3D, "initialPosition");
+	ADD_PARAMETER(m_r0, FE_PARAM_VEC3D, "initial_position");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

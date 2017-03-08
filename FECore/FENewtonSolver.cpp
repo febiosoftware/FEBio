@@ -533,7 +533,7 @@ double FENewtonSolver::LineSearch(double s)
 
 		// make sure that r1 does not happen to be really close to zero,
 		// since in that case we won't find any better solution.
-		if (fabs(r1) < 1.e-20) r = 0;
+		if (fabs(r1) < 1.e-17) r = 0;
 		else r = fabs(r1 / r0);
 
 		if (r > m_LStol)
