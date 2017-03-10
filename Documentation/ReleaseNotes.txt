@@ -41,6 +41,68 @@ at http://mrlforums.sci.utah.edu/forums/.
 
 ===========================================================================
 
+ R E L E A S E   2.5.2    11/17/2016
+
+===========================================================================
+
+1. A bug was fixed in exporting element data to the log file.
+
+2. An issue was fixed with the definition of fixed bcs in the 2.0 format.
+
+===========================================================================
+
+ R E L E A S E   2.5.0
+
+===========================================================================
+
+A. Features and Bug Fixes
+-------------------------
+
+1. FEBio 2.5 defines a new format specification (FEBio format specification version 2.5) which improves support for using set definitions. It also replaces the ElementData section, which used to be defined in the Geometry section, with the more versatile MeshData section. This new section not only allows users to define element data, but also surface data and nodal data. This data can then be mapped to boundary conditions and loads to create spatically varying data fields. The Discrete section is also reformatted so that large discrete element sets can be defined more concisely. 
+
+2. SPR stresses now support HEX20 and HEX27 elements. The SPR stresses are more accurately recovered stressed and should be the preferred stress measures for higher order elements. 
+
+3. Several improvements and bug fixes have been made for first order computational homogenization problems. Users can now also define "probes" which allow the deformation of the RVE models to be tracked.
+
+4. Higher order shell elements can now be defined. A quad8 shell defines an eight node quadratic quadrilateral shell. A tri6 shell defines a six node quadratic triangular shell element.  These shell elements overcome the locking behavior characteristic of quad4 and tri3 shells.  They should be used as the preferred choice. Shell “rotation” degrees of freedom refer to the “director” degrees of freedom, which is a vector whose length is the shell thickness in the current configuration, and whose direction represents the rotation degrees of freedom.
+
+5. A coupled and uncoupled formulation of the Gent hyperelastic material have been implemented.
+
+6. The reported timings at the end of the log file are broken down by the different solution steps. The reported timings are now more accurate (Windows only).
+
+7. The Broyden solution strategy was implemented and can be used as an alternative quasi-newton solver to the standard BFGS method. The Brodyden method performs much better than BFGS for non-symmetric problems (e.g. biphasic, multiphasic).
+
+8. Several preconditioners for the FGMRES iterative solver have been implemented. 
+
+B. Changes to the plugin framework
+------------------------------------
+
+1. The FE_SDK_VERSION was increased to 2.5.0. This implies that plugins need to be rebuild before they can be used with the 2.5 version of FEBio. Some minor changes to the plugin may also be necessary. 
+
+2. Material plugins that implement the Init function must now return a bool:
+
+bool MyMaterial::Init()
+{
+	if (something is wrong) return false;
+	else return true;
+}
+
+3. Plot variables now use the general FEDataStream class for storing data.
+
+bool MyPlotVariable::Save(FEDomain& dom, FEDataStream& a)
+{
+	for (int i=0; i<dom.Elements(); ++i)
+	{
+		mat3ds s = dom.TaxReturnValue(2016);
+		a << s;
+	}
+	return true;
+}
+
+4. The PluginNumClasses funcion is no longer required. If it is not defined, FEBio will keep calling the PluginGetFactory until it returns null. 
+
+===========================================================================
+
  R E L E A S E   2.4.1  12/11/2015
 
 ===========================================================================
