@@ -9,6 +9,20 @@
 //=============================================================================
 //                            N O D E   D A T A
 //=============================================================================
+
+//-----------------------------------------------------------------------------
+//! Store the nodal displacements
+bool FEPlotDisplacement::Save(FEMesh& m, FEDataStream& a)
+{
+    // loop over all nodes
+    for (int i=0; i<m.Nodes(); ++i)
+    {
+        FENode& node = m.Node(i);
+        a << node.m_rt - node.m_r0;
+    }
+    return true;
+}
+
 //-----------------------------------------------------------------------------
 //! Store the nodal dilatations
 bool FEPlotFluidDilatation::Save(FEMesh& m, FEDataStream& a)

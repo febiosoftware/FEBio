@@ -1,8 +1,5 @@
 #include "FEBioFluid.h"
 #include "FEFluid.h"
-#include "FEIdealGas.h"
-#include "FEIdealFluid.h"
-#include "FENeoHookeanFluid.h"
 #include "FENewtonianFluid.h"
 #include "FECarreauFluid.h"
 
@@ -12,6 +9,7 @@
 
 #include "FEFluidTractionLoad.h"
 #include "FEFluidNormalTraction.h"
+#include "FEFluidNormalVelocity.h"
 #include "FEFluidResistanceBC.h"
 #include "FETangentialDamping.h"
 #include "FETangentialFlowStabilization.h"
@@ -42,9 +40,6 @@ REGISTER_FECORE_CLASS(FEFluidSolver        , FESOLVER_ID, "fluid"         );
 //-----------------------------------------------------------------------------
 // Materials
 REGISTER_FECORE_CLASS(FEFluid                       ,FEMATERIAL_ID, "fluid"             );
-REGISTER_FECORE_CLASS(FEIdealGas                    ,FEMATERIAL_ID, "ideal gas"         );
-REGISTER_FECORE_CLASS(FEIdealFluid                  ,FEMATERIAL_ID, "ideal fluid"       );
-REGISTER_FECORE_CLASS(FENeoHookeanFluid             ,FEMATERIAL_ID, "neo-Hookean fluid" );
 REGISTER_FECORE_CLASS(FENewtonianFluid              ,FEMATERIAL_ID, "Newtonian fluid"   );
 REGISTER_FECORE_CLASS(FECarreauFluid                ,FEMATERIAL_ID, "Carreau fluid"     );
 
@@ -57,6 +52,7 @@ REGISTER_FECORE_CLASS(FEFluidDomain2D               , FEDOMAIN_ID, "fluid2D"    
 // Surface loads
 REGISTER_FECORE_CLASS(FEFluidTractionLoad           , FESURFACELOAD_ID, "fluid traction");
 REGISTER_FECORE_CLASS(FEFluidNormalTraction         , FESURFACELOAD_ID, "fluid normal traction");
+REGISTER_FECORE_CLASS(FEFluidNormalVelocity         , FESURFACELOAD_ID, "fluid normal velocity");
 REGISTER_FECORE_CLASS(FEFluidResistanceBC           , FESURFACELOAD_ID, "fluid resistance");
 REGISTER_FECORE_CLASS(FETangentialDamping           , FESURFACELOAD_ID, "fluid tangential damping");
 REGISTER_FECORE_CLASS(FETangentialFlowStabilization , FESURFACELOAD_ID, "fluid tangential stabilization");
@@ -69,7 +65,8 @@ REGISTER_FECORE_CLASS(FEConstraintNormalFlow        , FENLCONSTRAINT_ID, "normal
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
-REGISTER_FECORE_CLASS(FEPlotFluidDilatation         , FEPLOTDATA_ID, "fluid dilatation"   );
+REGISTER_FECORE_CLASS(FEPlotDisplacement            , FEPLOTDATA_ID, "displacement"             );
+REGISTER_FECORE_CLASS(FEPlotFluidDilatation         , FEPLOTDATA_ID, "fluid dilatation"         );
 REGISTER_FECORE_CLASS(FEPlotElasticFluidPressure	, FEPLOTDATA_ID, "elastic fluid pressure"   );
 REGISTER_FECORE_CLASS(FEPlotFluidVolumeRatio		, FEPLOTDATA_ID, "fluid volume ratio"       );
 REGISTER_FECORE_CLASS(FEPlotFluidDensity            , FEPLOTDATA_ID, "fluid density"            );

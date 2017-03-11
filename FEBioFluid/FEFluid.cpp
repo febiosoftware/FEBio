@@ -4,7 +4,7 @@
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFluid, FEMaterial)
     ADD_PARAMETER2(m_rhor, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "density");
-    ADD_PARAMETER(m_bsupg, FE_PARAM_BOOL, "supg");
+    ADD_PARAMETER2(m_k, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
 END_PARAMETER_LIST();
 
 //============================================================================
@@ -71,10 +71,9 @@ void FEFluidMaterialPoint::Init()
 FEFluid::FEFluid(FEModel* pfem) : FEMaterial(pfem)
 { 
 	m_rhor = 1;
-    m_bsupg = false;
+    m_k = 1;
 
 	// set material properties
-	AddProperty(&m_pElastic, "elastic"  );
 	AddProperty(&m_pViscous ,"viscous"  );
 }
 
@@ -95,6 +94,23 @@ double FEFluid::Density(FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
+//! bulk modulus
+double FEFluid::BulkModulus(FEMaterialPoint& mp)
+{
+    return m_k;
+}
+
+//-----------------------------------------------------------------------------
+//! elastic pressure
+double FEFluid::Pressure(FEMaterialPoint& mp)
+{
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    double p = m_k*(1-fp.m_J);
+
+    return p;
+}
+
+//-----------------------------------------------------------------------------
 //! The stress of a fluid material is the sum of the fluid pressure
 //! and the viscous stress.
 
@@ -103,7 +119,7 @@ mat3ds FEFluid::Stress(FEMaterialPoint& mp)
 	// calculate solid material stress
 	mat3ds s = m_pViscous->Stress(mp);
     
-    double p = m_pElastic->Pressure(mp);
+    double p = Pressure(mp);
 	
 	// add fluid pressure
 	s.xx() -= p;
@@ -122,12 +138,10 @@ mat3ds FEFluid::Tangent_Strain(FEMaterialPoint& mp)
     // get tangent of viscous stress
     mat3ds sJ = m_pViscous->Tangent_Strain(mp);
     
-    double dpdJ = m_pElastic->Tangent_Pressure_Strain(mp);
-    
     // add tangent of fluid pressure
-    sJ.xx() -= dpdJ;
-    sJ.yy() -= dpdJ;
-    sJ.zz() -= dpdJ;
+    sJ.xx() += m_k;
+    sJ.yy() += m_k;
+    sJ.zz() += m_k;
     
     return sJ;
 }
@@ -143,7 +157,7 @@ double FEFluid::KinematicViscosity(FEMaterialPoint& mp)
 //! calculate current acoustic speed
 double FEFluid::AcousticSpeed(FEMaterialPoint& mp)
 {
-    double c = sqrt(m_pElastic->BulkModulus(mp)/Density(mp));
+    double c = sqrt(BulkModulus(mp)/Density(mp));
     
     return c;
 }

@@ -7,6 +7,7 @@
 //
 
 #include "FEFluidResistanceBC.h"
+#include "FEFluid.h"
 #include "stdafx.h"
 #include "FECore/FEModel.h"
 
@@ -20,6 +21,7 @@ END_PARAMETER_LIST();
 FEFluidResistanceBC::FEFluidResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem)
 {
     m_R = 0.0;
+    m_k = 1.0;
     
     m_dofVX = pfem->GetDOFIndex("vx");
     m_dofVY = pfem->GetDOFIndex("vy");
@@ -35,180 +37,74 @@ void FEFluidResistanceBC::SetSurface(FESurface* ps)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidResistanceBC::UnpackLM(FEElement& el, vector<int>& lm)
+//! initialize
+bool FEFluidResistanceBC::Init()
 {
-    FEMesh& mesh = GetFEModel()->GetMesh();
-    int N = el.Nodes();
-    lm.resize(N*3);
-    for (int i=0; i<N; ++i)
+    FEModelComponent::Init();
+    
+    FESurface* ps = &GetSurface();
+    ps->Init();
+    // get fluid bulk modulus from first surface element
+    // assuming the entire surface bounds the same fluid
+    FESurfaceElement& el = ps->Element(0);
+    FEMesh* mesh = ps->GetMesh();
+    FEElement* pe = mesh->FindElementFromID(el.m_elem[0]);
+    if (pe == nullptr) return false;
+    // get the material
+    FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+    FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
+    if (fluid == nullptr) return false;
+    // get the bulk modulus
+    FEMaterialPoint* fp = fluid->CreateMaterialPointData();
+    m_k = fluid->BulkModulus(*fp);
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Mark the nodes with prescribed dilatation
+void FEFluidResistanceBC::MarkDilatation()
+{
+    // prescribe this dilatation at the nodes
+    FESurface* ps = &GetSurface();
+    
+    for (int i=0; i<ps->Nodes(); ++i)
     {
-        int n = el.m_node[i];
-        FENode& node = mesh.Node(n);
-        vector<int>& id = node.m_ID;
-        
-        lm[3*i  ] = id[m_dofVX];
-        lm[3*i+1] = id[m_dofVY];
-        lm[3*i+2] = id[m_dofVZ];
+        int id = ps->Node(i).m_ID[m_dofE];
+        if (id >= 0)
+        {
+            FENode& node = ps->Node(i);
+            // mark node as having prescribed DOF
+            node.m_ID[m_dofE] = -id-2;
+        }
     }
 }
 
 //-----------------------------------------------------------------------------
-//! Calculate the residual for the traction load
-void FEFluidResistanceBC::Residual(const FETimeInfo& tp, FEGlobalVector& R)
+//! Evaluate and prescribe the resistance pressure
+void FEFluidResistanceBC::SetDilatation()
 {
-    FEModel& fem = R.GetFEModel();
-    
-    vector<double> fe;
-    vector<int> elm;
-    
-    vec3d r0[FEElement::MAX_NODES];
-    
     // evaluate the flow rate
     double Q = FlowRate();
     
     // calculate the resistance pressure
     double p = m_R*Q;
     
-    int i, n;
-    int npr = (int)m_psurf->Elements();
-    for (int iel=0; iel<npr; ++iel)
-    {
-        FESurfaceElement& el = m_psurf->Element(iel);
-        
-        int ndof = 3*el.Nodes();
-        fe.resize(ndof);
-        
-        // nr integration points
-        int nint = el.GaussPoints();
-        
-        // nr of element nodes
-        int neln = el.Nodes();
-        
-        // nodal coordinates
-        for (i=0; i<neln; ++i) r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
-        
-        double* Gr, *Gs;
-        double* N;
-        double* w  = el.GaussWeights();
-        
-        vec3d dxr, dxs;
-        
-        // repeat over integration points
-        zero(fe);
-        for (n=0; n<nint; ++n)
-        {
-            N  = el.H(n);
-            Gr = el.Gr(n);
-            Gs = el.Gs(n);
-            
-            // calculate the tangent vectors
-            dxr = dxs = vec3d(0,0,0);
-            for (i=0; i<neln; ++i)
-            {
-                dxr.x += Gr[i]*r0[i].x;
-                dxr.y += Gr[i]*r0[i].y;
-                dxr.z += Gr[i]*r0[i].z;
-                
-                dxs.x += Gs[i]*r0[i].x;
-                dxs.y += Gs[i]*r0[i].y;
-                dxs.z += Gs[i]*r0[i].z;
-            }
-            
-            vec3d normal = dxr ^ dxs;
-            vec3d f = normal*(-p*w[n]);
-            
-            for (i=0; i<neln; ++i)
-            {
-                fe[3*i  ] += N[i]*f.x;
-                fe[3*i+1] += N[i]*f.y;
-                fe[3*i+2] += N[i]*f.z;
-            }
-        }
-        
-        // get the element's LM vector and adjust it
-        UnpackLM(el, elm);
-        
-        // add element force vector to global force vector
-        R.Assemble(el.m_node, elm, fe);
-    }
-}
+    // calculate the dilatation
+    double e = -p/m_k;
+    
+    // prescribe this dilatation at the nodes
+    FESurface* ps = &GetSurface();
 
-//-----------------------------------------------------------------------------
-//! evaluate the stiffness matrix
-void FEFluidResistanceBC::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
-{
-    matrix ke;
-    vector<int> lm;
-    
-    FESurface& surf = GetSurface();
-    int npr = surf.Elements();
-    for (int m=0; m<npr; ++m)
+    for (int i=0; i<ps->Nodes(); ++i)
     {
-        // get the surface element
-        FESurfaceElement& el = m_psurf->Element(m);
-        
-        // calculate nodal normal tractions
-        int neln = el.Nodes();
-        vector<double> tn(neln);
-        
-        // get the element stiffness matrix
-        int ndof = 3*neln;
-        ke.resize(ndof, ndof);
-        
-        // calculate pressure stiffness
-        FluidResistanceStiffness(el, ke);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble element matrix in global stiffness matrix
-        psolver->AssembleStiffness(el.m_node, lm, ke);
-    }
-}
-
-//-----------------------------------------------------------------------------
-//! calculate stiffness for an element
-void FEFluidResistanceBC::FluidResistanceStiffness(FESurfaceElement& el, matrix& ke)
-{
-    int nint = el.GaussPoints();
-    int neln = el.Nodes();
-    
-    // gauss weights
-    double* w = el.GaussWeights();
-    
-    // nodal coordinates
-    FEMesh& mesh = *m_psurf->GetMesh();
-    vec3d rt[FEElement::MAX_NODES];
-    for (int j=0; j<neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_rt;
-    
-    // repeat over integration points
-    ke.zero();
-    for (int n=0; n<nint; ++n)
-    {
-        double* N = el.H(n);
-        double* Gr = el.Gr(n);
-        double* Gs = el.Gs(n);
-        
-        vec3d dxr(0,0,0), dxs(0,0,0);
-        for (int i=0; i<neln; ++i)
+        if (ps->Node(i).m_ID[m_dofE] < -1)
         {
-            dxr += rt[i]*Gr[i];
-            dxs += rt[i]*Gs[i];
+            FENode& node = ps->Node(i);
+            // set node as having prescribed DOF
+            node.set(m_dofE, e);
         }
-        
-        vec3d nu = dxr ^ dxs;
-        double da = nu.unit();
-        
-        // calculate stiffness component
-        for (int i=0; i<neln; ++i)
-            for (int j=0; j<neln; ++j)
-            {
-                mat3ds kab = dyad(nu)*(m_R*N[i]*N[j]*w[n]*da);
-                
-                ke.add(3*i, 3*j, kab);
-            }
     }
-    
 }
 
 //-----------------------------------------------------------------------------

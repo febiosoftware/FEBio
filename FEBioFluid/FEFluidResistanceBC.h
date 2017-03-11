@@ -26,22 +26,26 @@ public:
     void SetSurface(FESurface* ps);
     
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver);
+    void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) {}
     
     //! calculate residual
-    void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+    void Residual(const FETimeInfo& tp, FEGlobalVector& R) {}
     
-    //! Unpack surface element data
-    void UnpackLM(FEElement& el, vector<int>& lm);
+    //! mark the dilatation
+    void MarkDilatation();
+    
+    //! set the dilatation
+    void SetDilatation();
     
     //! evaluate flow rate
     double FlowRate();
     
-    //! calculate stiffness for an element
-    void FluidResistanceStiffness(FESurfaceElement& el, matrix& ke);
+    //! initialize
+    bool Init();
 
 private:
     double			m_R;	//!< flow resistance
+    double          m_k;    //!< fluid bulk modulus
     
     int		m_dofVX;
     int		m_dofVY;

@@ -378,7 +378,6 @@ void FEFluidDomain2D::ElementMaterialStiffness(FEElement2D &el, matrix &ke)
     const double *gw = el.GaussWeights();
     
     // get materials
-    FEElasticFluid* m_pElastic = m_pMat->GetElastic();
     FEViscousFluid* m_pViscous = m_pMat->GetViscous();
     
     // calculate element stiffness matrix
@@ -400,7 +399,7 @@ void FEFluidDomain2D::ElementMaterialStiffness(FEElement2D &el, matrix &ke)
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         
         // get the tangents
-        double dpdJ = m_pElastic->Tangent_Pressure_Strain(mp);
+        double dpdJ = m_pMat->Tangent_Pressure_Strain(mp);
         mat3ds svJ = m_pViscous->Tangent_Strain(mp);
         tens4ds cv = m_pViscous->Tangent_RateOfDeformation(mp);
         
@@ -698,7 +697,7 @@ void FEFluidDomain2D::UpdateElementStress(int iel, double dt)
         pt.m_s = m_pMat->Stress(mp);
         
         // calculate the fluid pressure
-        pt.m_p = m_pMat->GetElastic()->Pressure(mp);
+        pt.m_p = m_pMat->Pressure(mp);
     }
 }
 

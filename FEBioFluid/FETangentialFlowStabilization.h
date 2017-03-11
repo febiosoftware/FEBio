@@ -14,8 +14,8 @@
 
 //-----------------------------------------------------------------------------
 //! Tangential flow stabilization prescribes a shear traction that opposes
-//! tangential fluid velocity on a boundary surface.  This can help stabilize
-//! inflow conditions.
+//! tangential fluid velocity on a boundary surface, in the presence of normal
+//! flow.  This can help stabilize inflow/outflow conditions.
 class FETangentialFlowStabilization : public FESurfaceLoad
 {
 public:
@@ -37,6 +37,9 @@ public:
     //! Unpack surface element data
     void UnpackLM(FEElement& el, vector<int>& lm);
     
+    //! initialization
+    bool Init();
+    
 protected:
     //! calculate stiffness for an element
     void ElementStiffness(FESurfaceElement& el, matrix& ke);
@@ -45,13 +48,14 @@ protected:
     void ElementForce(FESurfaceElement& el, vector<double>& fe);
     
 protected:
-    double			m_beta;      //!< damping coefficient
+    double			m_beta;     //!< damping coefficient
     double          m_rho;      //!< fluid density
     
     // degrees of freedom
     int		m_dofVX;
     int		m_dofVY;
     int		m_dofVZ;
+    int		m_dofE;
     
     DECLARE_PARAMETER_LIST();
 };

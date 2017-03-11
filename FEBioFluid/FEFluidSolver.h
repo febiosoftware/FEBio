@@ -23,6 +23,9 @@ public:
     //! Initializes data structures
     bool Init();
     
+    //! Initialize linear equation system
+    bool InitEquations();
+    
 public:
     //! assemble the element residual into the global residual
     //! \todo This was implemented for nodal forces
@@ -77,10 +80,15 @@ public:
     //! Calculate nonlinear constraint forces
     void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);
     
+protected:
+    void GetVelocityData(vector<double>& vi, vector<double>& ui);
+    void GetDilatationData(vector<double>& ei, vector<double>& ui);
+    
 public:
     // convergence tolerances
     double	m_Rtol;			//!< residual tolerance
     double	m_Vtol;			//!< velocity tolerance
+    double	m_Dtol;			//!< dilatation tolerance
     double	m_Etol;			//!< energy tolerance
     double	m_Rmin;			//!< min residual value
     
@@ -90,12 +98,21 @@ public:
 	bool	m_breformtimestep;	//!< reform at start of time step
 
 public:
+    // equation numbers
+    int		m_nveq;				//!< number of equations related to velocity dofs
+    int		m_ndeq;				//!< number of equations related to dilatation dofs
+    
+public:
     vector<double> m_Fn;	//!< concentrated nodal force vector
+    vector<double> m_Ui;	//!< Total DOF vector for iteration
+    vector<double> m_Ut;	//!< Total DOF vector at time t (incl all previous timesteps)
     vector<double> m_Fr;	//!< nodal reaction forces
+    vector<double> m_vi;	//!< velocity increment vector
     vector<double> m_Vi;	//!< Total velocity vector for iteration
-    vector<double> m_Vt;	//!< Total velocity vector at time t (incl all previous timesteps)
     vector<double> m_Fd;	//!< residual correction due to prescribed velocities
-
+    vector<double> m_di;	//!< dilatation increment vector
+    vector<double> m_Di;	//!< Total dilatation vector for iteration
+    
 public:
     bool		m_baugment;		//!< augmentation flag
     

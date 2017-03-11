@@ -1,7 +1,6 @@
 #pragma once
 #include "FECore/FEMaterial.h"
 #include "FEBioMech/FEBodyForce.h"
-#include "FEElasticFluid.h"
 #include "FEViscousFluid.h"
 
 //-----------------------------------------------------------------------------
@@ -64,14 +63,20 @@ public:
     //! tangent of stress with respect to rate of deformation tensor D
     tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp)  { return m_pViscous->Tangent_RateOfDeformation(mp); }
     
+    //! elastic pressure
+    double Pressure(FEMaterialPoint& mp);
+    
+    //! tangent of elastic pressure with respect to strain J
+    double Tangent_Pressure_Strain(FEMaterialPoint& mp) { return -m_k; }
+    
+    //! 2nd tangent of elastic pressure with respect to strain J
+    double Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp) { return 0; }
+    
 	//! referential fluid density
 	double ReferentialDensity() { return m_rhor; }
 
     //! calculate current fluid density
     double Density(FEMaterialPoint& pt);
-    
-    //! return elastic part
-    FEElasticFluid* GetElastic() { return m_pElastic; }
     
     //! return viscous part
     FEViscousFluid* GetViscous() { return m_pViscous; }
@@ -82,13 +87,15 @@ public:
     //! acoustic speed
     double AcousticSpeed(FEMaterialPoint& mp);
     
+    //! bulk modulus
+    double BulkModulus(FEMaterialPoint& mp);
+    
 private: // material properties
-	FEPropertyT<FEElasticFluid>	m_pElastic;	//!< pointer to elastic part fluid material
     FEPropertyT<FEViscousFluid> m_pViscous; //!< pointer to viscous part of fluid material
 	
 public:
     double						m_rhor;     //!< referential fluid density
-    bool                        m_bsupg;    //!< flag for SUPG stabilization
+    double                      m_k;        //!< bulk modulus at J=1
     
     // declare parameter list
     DECLARE_PARAMETER_LIST();

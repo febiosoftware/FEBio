@@ -13,9 +13,8 @@
 #include <FECore/FESurfaceMap.h>
 
 //-----------------------------------------------------------------------------
-//! Tangential flow stabilization prescribes a shear traction that opposes
-//! tangential fluid velocity on a boundary surface.  This can help stabilize
-//! inflow conditions.
+//! Backflow stabilization prescribes a normal traction that opposes
+//! backflow on a boundary surface.
 class FEBackFlowStabilization : public FESurfaceLoad
 {
 public:
@@ -26,16 +25,22 @@ public:
     void SetSurface(FESurface* ps);
     
     //! calculate pressure stiffness
-    void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver);
+    void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) {}
     
     //! calculate residual
-    void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+    void Residual(const FETimeInfo& tp, FEGlobalVector& R) {}
     
     //! serialize data
     void Serialize(DumpStream& ar);
     
-    //! Unpack surface element data
-    void UnpackLM(FEElement& el, vector<int>& lm);
+    //! mark the dilatation
+    void MarkDilatation();
+    
+    //! set the dilatation
+    void SetDilatation();
+    
+    //! initialization
+    bool Init();
     
 protected:
     //! calculate stiffness for an element
@@ -45,13 +50,18 @@ protected:
     void ElementForce(FESurfaceElement& el, vector<double>& fe);
     
 protected:
-    double			m_beta;      //!< damping coefficient
+    double			m_beta;     //!< backflow stabilization coefficient
     double          m_rho;      //!< fluid density
+    bool            m_bout;     //!< outflow flag
+    double          m_dir;      //!< flow direction
+    double          m_k;        //!< fluid bulk modulus
+    vector<vec3d>   m_nu;       //!< nodal normals
     
     // degrees of freedom
     int		m_dofVX;
     int		m_dofVY;
     int		m_dofVZ;
+    int		m_dofE;
     
     DECLARE_PARAMETER_LIST();
 };

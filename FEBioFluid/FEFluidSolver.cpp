@@ -13,6 +13,8 @@
 #include <FEBioMech/FEBodyForce.h>
 #include <FECore/BC.h>
 #include <FECore/FESurfaceLoad.h>
+#include "FEFluidResistanceBC.h"
+#include "FEBackFlowStabilization.h"
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
@@ -21,10 +23,11 @@
 // define the parameter list
 BEGIN_PARAMETER_LIST(FEFluidSolver, FENewtonSolver)
 	ADD_PARAMETER(m_Vtol         , FE_PARAM_DOUBLE, "vtol"        );
+    ADD_PARAMETER(m_Dtol         , FE_PARAM_DOUBLE, "dtol"        );
     ADD_PARAMETER(m_Etol         , FE_PARAM_DOUBLE, "etol"        );
 	ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );
 	ADD_PARAMETER(m_Rmin         , FE_PARAM_DOUBLE, "min_residual");
-	ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
+    ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
 	ADD_PARAMETER(m_bdoreforms   , FE_PARAM_BOOL  , "do_reforms"  );
 	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
 	ADD_PARAMETER(m_breformtimestep, FE_PARAM_BOOL, "reform_each_time_step");
@@ -39,8 +42,11 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
     m_Rtol = 0.001;
     m_Etol = 0.01;
     m_Vtol = 0.001;
+    m_Dtol = 0.001;
     m_Rmin = 1.0e-20;
     
+    m_nveq = 0;
+    m_ndeq = 0;
     m_niter = 0;
     
     m_bsymm = false;
@@ -88,6 +94,7 @@ bool FEFluidSolver::Init()
 
     // check parameters
     if (m_Vtol <  0.0) { felog.printf("Error: vtol must be nonnegative.\n"); return false; }
+    if (m_Dtol <  0.0) { felog.printf("Error: dtol must be nonnegative.\n"); return false; }
     if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }
     if (m_Rtol <  0.0) { felog.printf("Error: rtol must be nonnegative.\n"); return false; }
     if (m_Rmin <  0.0) { felog.printf("Error: min_residual must be nonnegative.\n"  ); return false; }
@@ -97,12 +104,16 @@ bool FEFluidSolver::Init()
     m_Fn.assign(neq, 0);
     m_Fd.assign(neq, 0);
     m_Fr.assign(neq, 0);
-    m_Vi.assign(neq, 0);
-    m_Vt.assign(neq, 0);
+    m_Ui.assign(neq, 0);
+    m_Ut.assign(neq, 0);
+    m_vi.assign(m_nveq,0);
+    m_Vi.assign(m_nveq,0);
+    m_di.assign(m_ndeq,0);
+    m_Di.assign(m_ndeq,0);
     
     int i, n;
     
-    // we need to fill the total velocity vector m_Vt
+    // we need to fill the total DOF vector m_Ut
     // TODO: I need to find an easier way to do this
     FEMesh& mesh = m_fem.GetMesh();
     for (i=0; i<mesh.Nodes(); ++i)
@@ -110,15 +121,101 @@ bool FEFluidSolver::Init()
         FENode& node = mesh.Node(i);
         
         // velocity dofs
-        n = node.m_ID[m_dofVX]; if (n >= 0) m_Vt[n] = node.get(m_dofVX);
-        n = node.m_ID[m_dofVY]; if (n >= 0) m_Vt[n] = node.get(m_dofVY);
-        n = node.m_ID[m_dofVZ]; if (n >= 0) m_Vt[n] = node.get(m_dofVZ);
+        n = node.m_ID[m_dofVX]; if (n >= 0) m_Ut[n] = node.get(m_dofVX);
+        n = node.m_ID[m_dofVY]; if (n >= 0) m_Ut[n] = node.get(m_dofVY);
+        n = node.m_ID[m_dofVZ]; if (n >= 0) m_Ut[n] = node.get(m_dofVZ);
         
         // dilatation dofs
-        n = node.m_ID[m_dofE]; if (n >= 0) m_Vt[n] = node.get(m_dofE);
+        n = node.m_ID[m_dofE]; if (n >= 0) m_Ut[n] = node.get(m_dofE);
+    }
+    
+    // TODO: move this somewhere else
+    int nsl = m_fem.SurfaceLoads();
+    for (int i=0; i<nsl; ++i)
+    {
+        FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
+        FEFluidResistanceBC* pfr = dynamic_cast<FEFluidResistanceBC*>(psl);
+        FEBackFlowStabilization* pbs = dynamic_cast<FEBackFlowStabilization*>(psl);
+        if (pfr && psl->IsActive()) pfr->MarkDilatation();
+        else if (pbs && psl->IsActive()) pbs->MarkDilatation();
     }
     
     return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Initialize equations
+bool FEFluidSolver::InitEquations()
+{
+    // base class initialization
+    FENewtonSolver::InitEquations();
+    
+    int i;
+    
+    // determined the nr of velocity and dilatation equations
+    FEMesh& mesh = m_fem.GetMesh();
+    m_nveq = m_ndeq = 0;
+    
+    for (i=0; i<mesh.Nodes(); ++i)
+    {
+        FENode& n = mesh.Node(i);
+        if (n.m_ID[m_dofVX] != -1) m_nveq++;
+        if (n.m_ID[m_dofVY] != -1) m_nveq++;
+        if (n.m_ID[m_dofVZ] != -1) m_nveq++;
+        if (n.m_ID[m_dofE ] != -1) m_ndeq++;
+    }
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidSolver::GetVelocityData(vector<double> &vi, vector<double> &ui)
+{
+    int N = m_fem.GetMesh().Nodes(), nid, m = 0;
+    zero(vi);
+    for (int i=0; i<N; ++i)
+    {
+        FENode& n = m_fem.GetMesh().Node(i);
+        nid = n.m_ID[m_dofVX];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            vi[m++] = ui[nid];
+            assert(m <= (int) vi.size());
+        }
+        nid = n.m_ID[m_dofVY];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            vi[m++] = ui[nid];
+            assert(m <= (int) vi.size());
+        }
+        nid = n.m_ID[m_dofVZ];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            vi[m++] = ui[nid];
+            assert(m <= (int) vi.size());
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidSolver::GetDilatationData(vector<double> &ei, vector<double> &ui)
+{
+    int N = m_fem.GetMesh().Nodes(), nid, m = 0;
+    zero(ei);
+    for (int i=0; i<N; ++i)
+    {
+        FENode& n = m_fem.GetMesh().Node(i);
+        nid = n.m_ID[m_dofE];
+        if (nid != -1)
+        {
+            nid = (nid < -1 ? -nid-2 : nid);
+            ei[m++] = ui[nid];
+            assert(m <= (int) ei.size());
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -131,7 +228,7 @@ void FEFluidSolver::Serialize(DumpStream& ar)
     
     if (ar.IsSaving())
     {
-        ar << m_Vtol << m_Etol << m_Rtol << m_Rmin;
+        ar << m_Vtol << m_Dtol << m_Etol << m_Rtol << m_Rmin;
         ar << m_bsymm;
         ar << m_nrhs;
         ar << m_niter;
@@ -140,7 +237,7 @@ void FEFluidSolver::Serialize(DumpStream& ar)
     }
     else
     {
-        ar >> m_Vtol >> m_Etol >> m_Rtol >> m_Rmin;
+        ar >> m_Vtol >> m_Dtol >> m_Etol >> m_Rtol >> m_Rmin;
         ar >> m_bsymm;
         ar >> m_nrhs;
         ar >> m_niter;
@@ -152,7 +249,7 @@ void FEFluidSolver::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 //! Update the kinematics of the model, such as nodal positions, velocities,
 //! accelerations, etc.
-void FEFluidSolver::UpdateKinematics(vector<double>& vi)
+void FEFluidSolver::UpdateKinematics(vector<double>& ui)
 {
     int i, n;
     
@@ -166,13 +263,13 @@ void FEFluidSolver::UpdateKinematics(vector<double>& vi)
         
         // velocity dofs
         // current velocity = total at prev conv step + total increment so far + current increment
-        if ((n = node.m_ID[m_dofVX]) >= 0) node.set(m_dofVX, m_Vt[n] + m_Vi[n] + vi[n]);
-        if ((n = node.m_ID[m_dofVY]) >= 0) node.set(m_dofVY, m_Vt[n] + m_Vi[n] + vi[n]);
-        if ((n = node.m_ID[m_dofVZ]) >= 0) node.set(m_dofVZ, m_Vt[n] + m_Vi[n] + vi[n]);
+        if ((n = node.m_ID[m_dofVX]) >= 0) node.set(m_dofVX, m_Ut[n] + m_Ui[n] + ui[n]);
+        if ((n = node.m_ID[m_dofVY]) >= 0) node.set(m_dofVY, m_Ut[n] + m_Ui[n] + ui[n]);
+        if ((n = node.m_ID[m_dofVZ]) >= 0) node.set(m_dofVZ, m_Ut[n] + m_Ui[n] + ui[n]);
         
         // dilatation dofs
         // current dilatation = total at prev conv step + total increment so far + current increment
-        if ((n = node.m_ID[m_dofE]) >= 0) node.set(m_dofE, m_Vt[n] + m_Vi[n] + vi[n]);
+        if ((n = node.m_ID[m_dofE]) >= 0) node.set(m_dofE, m_Ut[n] + m_Ui[n] + ui[n]);
     }
     
     // make sure the prescribed velocities are fullfilled
@@ -201,6 +298,17 @@ void FEFluidSolver::Update(vector<double>& ui)
 
     // update kinematics
     UpdateKinematics(ui);
+    
+    // TODO: move this somewhere else
+    int nsl = m_fem.SurfaceLoads();
+    for (int i=0; i<nsl; ++i)
+    {
+        FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
+        FEFluidResistanceBC* pfr = dynamic_cast<FEFluidResistanceBC*>(psl);
+        FEBackFlowStabilization* pbs = dynamic_cast<FEBackFlowStabilization*>(psl);
+        if (pfr && psl->IsActive()) pfr->SetDilatation();
+        else if (pbs && psl->IsActive()) pbs->SetDilatation();
+    }
     
     // update element stresses
     UpdateStresses();
@@ -259,8 +367,8 @@ void FEFluidSolver::PrepStep(const FETimeInfo& timeInfo)
     m_ntotref = 0;
     m_naug  = 0;	// nr of augmentations
     
-    // zero total velocities
-    zero(m_Vi);
+    // zero total DOFs
+    zero(m_Ui);
     
     // store previous mesh state
     // we need them for strain and acceleration calculations
@@ -315,12 +423,15 @@ bool FEFluidSolver::Quasin(double time)
     // convergence norms
     double	normR1;		// residual norm
     double	normE1;		// energy norm
-    double	normU;		// velocity norm
-    double	normu;		// velocity increment norm
-    double	normRi = 0;		// initial residual norm
-    double	normUi = 0;		// initial velocity norm
+    double	normV;		// velocity norm
+    double	normv;		// velocity increment norm
+    double	normRi = 0;	// initial residual norm
+    double	normVi = 0;	// initial velocity norm
     double	normEi;		// initial energy norm
     double	normEm;		// max energy norm
+    double	normDi;		// initial dilatation norm
+    double	normD;		// current dilatation norm
+    double	normd;		// incremement dilatation norm
     
     // initialize flags
     bool bconv = false;		// convergence flag
@@ -373,6 +484,7 @@ bool FEFluidSolver::Quasin(double time)
         
         // assume we'll converge.
         bconv = true;
+        
         // solve the equations
         m_SolverTime.start();
         {
@@ -380,14 +492,27 @@ bool FEFluidSolver::Quasin(double time)
         }
         m_SolverTime.stop();
         
-        // set initial convergence norms
-        if (m_niter == 0)
+        // check for nans
+        m_UpdateTime.start();
         {
-            normRi = fabs(m_R0*m_R0);
-            normEi = fabs(m_ui*m_R0);
-            normUi = fabs(m_ui*m_ui);
-            normEm = normEi;
+            double du = m_ui*m_ui;
+            if (ISNAN(du)) throw NANDetected();
+            
+            // extract the velocity and dilatation increments
+            GetVelocityData(m_vi, m_ui);
+            GetDilatationData(m_di, m_ui);
+            
+            // set initial convergence norms
+            if (m_niter == 0)
+            {
+                normRi = fabs(m_R0*m_R0);
+                normEi = fabs(m_ui*m_R0);
+                normVi = fabs(m_vi*m_vi);
+                normDi = fabs(m_di*m_di);
+                normEm = normEi;
+            }
         }
+        m_UpdateTime.stop();
         
         // perform a linesearch
         // the geometry is also updated in the line search
@@ -406,17 +531,25 @@ bool FEFluidSolver::Quasin(double time)
         // calculate norms
 		m_UpdateTime.start();
 		{
-			normR1 = m_R1*m_R1;
-			normu  = (m_ui*m_ui)*(s*s);
-			normE1 = s*fabs(m_ui*m_R1);
+            // update all degrees of freedom
+            for (i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
+            
+            // update velocities
+            for (i=0; i<m_nveq; ++i) m_Vi[i] += s*m_vi[i];
+
+            // update dilatations
+            for (i=0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
+            
+            // calculate the norms
+            normR1 = m_R1*m_R1;
+			normv  = (m_vi*m_vi)*(s*s);
+            normV  = m_Vi*m_Vi;
+            normd  = (m_di*m_di)*(s*s);
+            normD  = m_Di*m_Di;
+            normE1 = s*fabs(m_ui*m_R1);
         
 			// check for nans
-			if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
-        
-			// update total velocities
-			int neq = (int)m_Vi.size();
-			for (i=0; i<neq; ++i) m_Vi[i] += s*m_ui[i];
-			normU  = m_Vi*m_Vi;
+			if (ISNAN(normR1)) throw NANDetected();
 		}
 		m_UpdateTime.stop();
         
@@ -424,7 +557,10 @@ bool FEFluidSolver::Quasin(double time)
         if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;
         
         // check velocity norm
-        if ((m_Vtol > 0) && (normu  > (m_Vtol*m_Vtol)*normU )) bconv = false;
+        if ((m_Vtol > 0) && (normv  > (m_Vtol*m_Vtol)*normV )) bconv = false;
+        
+        // check dilatation norm
+        if ((m_Dtol > 0) && (normd  > (m_Dtol*m_Dtol)*normD )) bconv = false;
         
         // check energy norm
         if ((m_Etol > 0) && (normE1 > m_Etol*normEi)) bconv = false;
@@ -448,7 +584,8 @@ bool FEFluidSolver::Quasin(double time)
         felog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
         felog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
         felog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
-        felog.printf("\t   velocity         %15le %15le %15le \n", normUi, normu ,(m_Vtol*m_Vtol)*normU );
+        felog.printf("\t   velocity         %15le %15le %15le \n", normVi, normv ,(m_Vtol*m_Vtol)*normV );
+        felog.printf("\t   dilatation       %15le %15le %15le \n", normDi, normd ,(m_Dtol*m_Dtol)*normD );
         
         felog.SetMode(oldmode);
         
@@ -478,6 +615,8 @@ bool FEFluidSolver::Quasin(double time)
                 normEm = normE1;
                 normEi = normE1;
                 normRi = normR1;
+                normVi = normv;
+                normDi = normd;
                 breform = true;
             }
             else
@@ -607,7 +746,7 @@ bool FEFluidSolver::Quasin(double time)
     // if converged we update the total velocities
     if (bconv)
     {
-        m_Vt += m_Vi;
+        m_Ut += m_Ui;
     }
     
     return bconv;
@@ -650,6 +789,14 @@ bool FEFluidSolver::StiffnessMatrix(const FETimeInfo& tp)
             FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
             if (pbf) dom.BodyForceStiffness(this, *pbf);
         }
+    }
+    
+    // calculate stiffness matrix due to surface loads
+    int nsl = m_fem.SurfaceLoads();
+    for (int i=0; i<nsl; ++i)
+    {
+        FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
+        if (psl->IsActive()) psl->StiffnessMatrix(tp, this);
     }
     
     // Add mass matrix

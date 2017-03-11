@@ -3,8 +3,8 @@
 #include <FECore/FESurfaceMap.h>
 
 //-----------------------------------------------------------------------------
-//! FEFluidTractionLoad is a fluid surface that has a constant
-//! traction force on it.
+//! FEFluidTractionLoad is a fluid surface that has a prescribed
+//! viscous traction vector on it.
 //!
 class FEFluidTractionLoad : public FESurfaceLoad
 {

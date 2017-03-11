@@ -8,12 +8,12 @@
 
 #include "FETangentialFlowStabilization.h"
 #include "FECore/FEModel.h"
+#include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
 BEGIN_PARAMETER_LIST(FETangentialFlowStabilization, FESurfaceLoad)
     ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
-    ADD_PARAMETER(m_rho, FE_PARAM_DOUBLE, "density");
 END_PARAMETER_LIST()
 
 //-----------------------------------------------------------------------------
@@ -27,6 +27,7 @@ FETangentialFlowStabilization::FETangentialFlowStabilization(FEModel* pfem) : FE
     m_dofVX = pfem->GetDOFIndex("vx");
     m_dofVY = pfem->GetDOFIndex("vy");
     m_dofVZ = pfem->GetDOFIndex("vz");
+    m_dofE = pfem->GetDOFIndex("e");
 }
 
 //-----------------------------------------------------------------------------
@@ -34,6 +35,30 @@ FETangentialFlowStabilization::FETangentialFlowStabilization(FEModel* pfem) : FE
 void FETangentialFlowStabilization::SetSurface(FESurface* ps)
 {
     FESurfaceLoad::SetSurface(ps);
+}
+
+//-----------------------------------------------------------------------------
+//! initialize
+bool FETangentialFlowStabilization::Init()
+{
+    FEModelComponent::Init();
+    
+    FESurface* ps = &GetSurface();
+    ps->Init();
+    // get fluid density from first surface element
+    // assuming the entire surface bounds the same fluid
+    FESurfaceElement& el = ps->Element(0);
+    FEMesh* mesh = ps->GetMesh();
+    FEElement* pe = mesh->FindElementFromID(el.m_elem[0]);
+    if (pe == nullptr) return false;
+    // get the material
+    FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+    FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
+    if (fluid == nullptr) return false;
+    // get the density
+    m_rho = fluid->m_rhor;
+    
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -78,17 +103,17 @@ void FETangentialFlowStabilization::ElementStiffness(FESurfaceElement& el, matri
         double da = n.unit();
         
         vec3d vtau = (I - dyad(n))*v;
-        vtau.unit();
-        mat3ds K = (I - dyad(n) + dyad(vtau))*(-m_beta*m_rho*da*w[k]);
+        double vmag = vtau.unit();
+        mat3d K = (I - dyad(n) + dyad(vtau))*(-m_beta*m_rho*vmag*da*w[k]);
         
         // calculate stiffness component
         for (int i=0; i<neln; ++i)
             for (int j=0; j<neln; ++j)
             {
-                mat3ds Kab = K*(N[i]*N[j]);
-                ke[3*i  ][3*j  ] -= Kab.xx(); ke[3*i  ][3*j+1] -= Kab.xy(); ke[3*i  ][3*j+2] -= Kab.xz();
-                ke[3*i+1][3*j  ] -= Kab.xy(); ke[3*i+1][3*j+1] -= Kab.yy(); ke[3*i+1][3*j+2] -= Kab.yz();
-                ke[3*i+2][3*j  ] -= Kab.xz(); ke[3*i+2][3*j+1] -= Kab.yz(); ke[3*i+2][3*j+2] -= Kab.zz();
+                mat3d Kab = K*(N[i]*N[j]);
+                ke[3*i  ][3*j  ] -= Kab(0,0); ke[3*i  ][3*j+1] -= Kab(0,1); ke[3*i  ][3*j+2] -= Kab(0,2);
+                ke[3*i+1][3*j  ] -= Kab(1,0); ke[3*i+1][3*j+1] -= Kab(1,1); ke[3*i+1][3*j+2] -= Kab(1,2);
+                ke[3*i+2][3*j  ] -= Kab(2,0); ke[3*i+2][3*j+1] -= Kab(2,1); ke[3*i+2][3*j+2] -= Kab(2,2);
             }
     }
 }
@@ -136,9 +161,11 @@ void FETangentialFlowStabilization::ElementForce(FESurfaceElement& el, vector<do
         vec3d n = dxr ^ dxs;
         double da = n.unit();
         
-        // force vector
+        // tangential traction = -beta*density*|tangential velocity|*(tangential velocity)
         vec3d vtau = (I - dyad(n))*v;
-        vec3d f = vtau*vtau.norm()*(-m_beta*m_rho*da*w[j]);
+        double vmag = vtau.norm();
+        // force vector (change sign for inflow vs outflow)
+        vec3d f = vtau*(-m_beta*m_rho*vmag*da*w[j]);
         
         for (int i=0; i<neln; ++i)
         {
@@ -161,16 +188,17 @@ void FETangentialFlowStabilization::UnpackLM(FEElement& el, vector<int>& lm)
 {
     FEMesh& mesh = *GetSurface().GetMesh();
     int N = el.Nodes();
-    lm.resize(N*3);
+    lm.resize(N*4);
     for (int i=0; i<N; ++i)
     {
         int n = el.m_node[i];
         FENode& node = mesh.Node(n);
         vector<int>& id = node.m_ID;
         
-        lm[3*i  ] = id[m_dofVX];
-        lm[3*i+1] = id[m_dofVY];
-        lm[3*i+2] = id[m_dofVZ];
+        lm[4*i  ] = id[m_dofVX];
+        lm[4*i+1] = id[m_dofVY];
+        lm[4*i+2] = id[m_dofVZ];
+        lm[4*i+3] = id[m_dofE];
     }
 }
 

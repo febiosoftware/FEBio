@@ -1,26 +1,26 @@
 //
-//  FEFluidNormalTraction.hpp
+//  FEFluidNormalVelocity.hpp
 //  FEBioFluid
 //
-//  Created by Gerard Ateshian on 8/22/16.
-//  Copyright © 2016 febio.org. All rights reserved.
+//  Created by Gerard Ateshian on 3/2/17.
+//  Copyright © 2017 febio.org. All rights reserved.
 //
 
-#ifndef FEFluidNormalTraction_hpp
-#define FEFluidNormalTraction_hpp
+#ifndef FEFluidNormalVelocity_hpp
+#define FEFluidNormalVelocity_hpp
 
 #include "FECore/FESurfaceLoad.h"
 #include <FECore/FESurfaceMap.h>
 
 //-----------------------------------------------------------------------------
-//! FEFluidNormalTraction is a fluid surface that has a normal
-//! viscous traction prescribed on it.
+//! FEFluidNormalVelocity is a fluid surface that has a normal
+//! velocity prescribed on it.
 //!
-class FEFluidNormalTraction : public FESurfaceLoad
+class FEFluidNormalVelocity : public FESurfaceLoad
 {
 public:
     //! constructor
-    FEFluidNormalTraction(FEModel* pfem);
+    FEFluidNormalVelocity(FEModel* pfem);
     
     //! Set the surface to apply the load to
     void SetSurface(FESurface* ps);
@@ -35,14 +35,12 @@ public:
     void UnpackLM(FEElement& el, vector<int>& lm);
     
 private:
-    double			m_scale;	//!< magnitude of traction load
-    FESurfaceMap	m_TC;		//!< traction boundary cards
+    double			m_velocity;	//!< magnitude of traction load
+    FESurfaceMap	m_VC;		//!< traction boundary cards
     
-    int		m_dofVX;
-    int		m_dofVY;
-    int		m_dofVZ;
+    int		m_dofE;
     
     DECLARE_PARAMETER_LIST();
 };
 
-#endif /* FEFluidNormalTraction_hpp */
+#endif /* FEFluidNormalVelocity_hpp */
