@@ -700,6 +700,7 @@
     <ClInclude Include="..\..\FECore\ParamString.h" />
     <ClInclude Include="..\..\FECore\quatd.h" />
     <ClInclude Include="..\..\FECore\RigidBC.h" />
+    <ClInclude Include="..\..\FECore\sdk.h" />
     <ClInclude Include="..\..\FECore\SparseMatrix.h" />
     <ClInclude Include="..\..\FECore\stdafx.h" />
     <ClInclude Include="..\..\FECore\table.h" />
