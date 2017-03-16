@@ -13,6 +13,7 @@
 BEGIN_PARAMETER_LIST(FEFluidNormalVelocity, FESurfaceLoad)
 ADD_PARAMETER(m_velocity, FE_PARAM_DOUBLE    , "velocity");
 ADD_PARAMETER(m_VC      , FE_PARAM_DATA_ARRAY, "value"   );
+ADD_PARAMETER(m_bpv     , FE_PARAM_BOOL      , "prescribe_nodal_velocities");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -21,6 +22,7 @@ FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem
 {
     m_velocity = 0.0;
     m_VC.set(1.0);
+    m_bpv = true;
     
     m_dofVX = pfem->GetDOFIndex("vx");
     m_dofVY = pfem->GetDOFIndex("vy");

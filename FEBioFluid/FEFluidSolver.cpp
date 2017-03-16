@@ -140,7 +140,7 @@ bool FEFluidSolver::Init()
         FEFluidNormalVelocity* pnv = dynamic_cast<FEFluidNormalVelocity*>(psl);
         if (pfr && psl->IsActive()) pfr->MarkDilatation();
         else if (pbs && psl->IsActive()) pbs->MarkDilatation();
-        else if (pnv && psl->IsActive()) pnv->MarkVelocity();
+        else if (pnv && psl->IsActive() && pnv->m_bpv) pnv->MarkVelocity();
     }
     
     return true;
@@ -312,7 +312,7 @@ void FEFluidSolver::Update(vector<double>& ui)
         FEFluidNormalVelocity* pnv = dynamic_cast<FEFluidNormalVelocity*>(psl);
         if (pfr && psl->IsActive()) pfr->SetDilatation();
         else if (pbs && psl->IsActive()) pbs->SetDilatation();
-        else if (pnv && psl->IsActive()) pnv->SetVelocity();
+        else if (pnv && psl->IsActive() && pnv->m_bpv) pnv->SetVelocity();
     }
     
     // update element stresses

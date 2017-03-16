@@ -48,6 +48,9 @@ private:
     FESurfaceMap	m_VC;		//!< traction boundary cards
     vector<double>  m_VN;       //!< nodal scale factors
     vector<vec3d>   m_nu;       //!< nodal normals
+
+public:
+    bool            m_bpv;      //!< flag for prescribing nodal values
     
     int		m_dofVX;
     int		m_dofVY;
