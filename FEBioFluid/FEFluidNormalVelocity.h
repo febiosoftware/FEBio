@@ -14,8 +14,8 @@
 
 //-----------------------------------------------------------------------------
 //! FEFluidNormalVelocity is a fluid surface that has a normal
-//! velocity prescribed on it.
-//!
+//! velocity prescribed on it.  This routine simultaneously prescribes a
+//! surface load and nodal prescribed velocities
 class FEFluidNormalVelocity : public FESurfaceLoad
 {
 public:
@@ -34,10 +34,24 @@ public:
     //! Unpack surface element data
     void UnpackLM(FEElement& el, vector<int>& lm);
     
+    //! mark the velocity
+    void MarkVelocity();
+    
+    //! set the velocity
+    void SetVelocity();
+    
+    //! initialization
+    bool Init();
+    
 private:
     double			m_velocity;	//!< magnitude of traction load
     FESurfaceMap	m_VC;		//!< traction boundary cards
+    vector<double>  m_VN;       //!< nodal scale factors
+    vector<vec3d>   m_nu;       //!< nodal normals
     
+    int		m_dofVX;
+    int		m_dofVY;
+    int		m_dofVZ;
     int		m_dofE;
     
     DECLARE_PARAMETER_LIST();
