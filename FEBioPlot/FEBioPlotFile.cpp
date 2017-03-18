@@ -743,7 +743,8 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 		case ET_HEX20 : ne = 20; dtype = PLT_ELEM_HEX20; break;
 		case ET_HEX27 : ne = 27; dtype = PLT_ELEM_HEX27; break;
 		case ET_TET20 : ne = 20; dtype = PLT_ELEM_TET20; break;
-		default:
+        case ET_PENTA15:ne = 15; dtype = PLT_ELEM_PENTA15; break;
+        default:
 			assert(false);
 	}
 

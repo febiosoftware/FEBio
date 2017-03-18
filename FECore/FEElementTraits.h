@@ -227,6 +227,12 @@ protected:
 };
 
 //=============================================================================
+//
+//   FEPenta6
+//
+//=============================================================================
+
+//=============================================================================
 //! Base class for 6-node pentahedral "wedge" elements
 class FEPenta6_ : public FESolidElementTraits
 {
@@ -260,6 +266,48 @@ public:
 
 protected:
 	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
+};
+
+//=============================================================================
+//
+//   FEPenta15
+//
+//=============================================================================
+
+//=============================================================================
+//! Base class for 15-node quadratic pentahedral "wedge" elements
+class FEPenta15_ : public FESolidElementTraits
+{
+public:
+    enum { NELN = 15 };
+    
+public:
+    FEPenta15_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_PENTA15, et){}
+    
+    //! values of shape functions
+    void shape_fnc(double* H, double r, double s, double t);
+    
+    //! values of shape function derivatives
+    void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
+    
+    //! values of shape function second derivatives
+    void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
+};
+
+//=============================================================================
+// 15-node pentahedral elements with 12-point gaussian quadrature
+class FEPenta15G12 : public FEPenta15_
+{
+public:
+    enum { NINT = 12 };
+    
+public:
+    FEPenta15G12();
+    
+    void project_to_nodes(double* ai, double* ao);
+    
+protected:
+    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================
