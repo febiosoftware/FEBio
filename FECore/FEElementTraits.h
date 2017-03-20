@@ -295,14 +295,14 @@ public:
 };
 
 //=============================================================================
-// 15-node pentahedral elements with 12-point gaussian quadrature
-class FEPenta15G12 : public FEPenta15_
+// 15-node pentahedral elements with 21-point gaussian quadrature
+class FEPenta15G21 : public FEPenta15_
 {
 public:
-    enum { NINT = 12 };
+    enum { NINT = 21 };
     
 public:
-    FEPenta15G12();
+    FEPenta15G21();
     
     void project_to_nodes(double* ai, double* ao);
     

@@ -439,7 +439,7 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	{
 	case ET_HEX8  : etype = m_pim->m_nhex8; break;
 	case ET_PENTA6: etype = FE_PENTA6G6; break;
-    case ET_PENTA15: etype = FE_PENTA15G12; break;
+    case ET_PENTA15: etype = FE_PENTA15G21; break;
 	case ET_TET4  : etype = m_pim->m_ntet4; break;
 	case ET_TET10 : etype = m_pim->m_ntet10; break;
 	case ET_TET15 : etype = m_pim->m_ntet15; break;
