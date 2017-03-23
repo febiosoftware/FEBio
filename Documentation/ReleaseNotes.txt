@@ -77,27 +77,25 @@ NEW FEATURES:
 
 3. A tied multiphasic contact interface has been added to enforce continuity of solid displacements, effective fluid pressure, and effective solute concentrations at a tied interface between multiphasic materials.
 
-4. Added definition of shell concentration and allowed initialization of shell pressure and shell concentration. 
+4. A 20-node cubic tetrahedral element was implemented (tet20). This element has 4 corner nodes, 2 nodes on each edge, and one node at the center of each face. 
 
-5. A 20-node cubic tetrahedral element was implemented (tet20). This element has 4 corner nodes, 2 nodes on each edge, and one node at the center of each face. 
+5. The parameter update_penalty was added to the sliding-multiphasic interface to recalculate auto-penalty at the start of each time step.
 
-6. The parameter update_penalty was added to the sliding-multiphasic interface to recalculate auto-penalty at the start of each time step.
+6. Two new chemical reactions were added: "mass-action-forward-effective", and "mass-action-reversible-effective".  These reactions employ the effective solute concentrations instead of actual solute concentrations, which will make a difference when the multiphasic mixture has non-zero fixed-charge density and charged solutes.
 
-7. Two new chemical reactions were added: "mass-action-forward-effective", and "mass-action-reversible-effective".  These reactions employ the effective solute concentrations instead of actual solute concentrations, which will make a difference when the multiphasic mixture has non-zero fixed-charge density and charged solutes.
+7. The 2.5 file format now supports Part and Instance keywords for defining multiple-parts model. The Part keyword defines a part, including nodes, elements, nodesets, surfaces, etc. Then, the Instance keyword can be used to instantiate a particular part. The same part can be instantiated multiple times. 
 
-8. The 2.5 file format now supports Part and Instance keywords for defining multiple-parts model. The Part keyword defines a part, including nodes, elements, nodesets, surfaces, etc. Then, the Instance keyword can be used to instantiate a particular part. The same part can be instantiated multiple times. 
+8. Added plot_range, and plot_zero_state control parameters. The plot_range parameter specifies a range and only time steps that fall within this range will be stored to the plot file. The plot_zero_state flag is used to indicate whether to store the "zero" (i.e. reference) state even when it doesn't fall inside the plot range.
 
-9. Added plot_range, and plot_zero_state control parameters. The plot_range parameter specifies a range and only time steps that fall within this range will be stored to the plot file. The plot_zero_state flag is used to indicate whether to store the "zero" (i.e. reference) state even when it doesn't fall inside the plot range.
+9. Added reform_each_time_step control parameter. Setting this to 0 will prevent the quasi-Newton solver from reforming the stiffness matrix at the start of each time step. This may result in a significant reduction of runtime for quasi-linear problems that have many time steps, such as transient or dynamic analyses with small strains. 
 
-10. Added reform_each_time_step control parameter. Setting this to 0 will prevent the quasi-Newton solver from reforming the stiffness matrix at the start of each time step. This may result in a significant reduction of runtime for quasi-linear problems that have many time steps, such as transient or dynamic analyses with small strains. 
+10. Added "rigid sliding" contact interface, which generalizes the rigid wall feature. Now, any rigid surface can be used as part of the rigid sliding contact interface. Rigid surfaces have to be defined in the new "Rigid" section in the input file.
 
-11. Added "rigid sliding" contact interface, which generalizes the rigid wall feature. Now, any rigid surface can be used as part of the rigid sliding contact interface. Rigid surfaces have to be defined in the new "Rigid" section in the input file.
+11. Inhomogeneous linear constraints are now supported.
 
-12. Inhomogeneous linear constraints are now supported.
+12. Added "rigid lock" constraint to constrain two rigid bodies to move together.
 
-13. Added "rigid lock" constraint to constrain two rigid bodies to move together.
-
-14. Added optional force and moment damping for revolute and prismatic joints to minimize oscillations during dynamic analyses. 
+13. Added optional force and moment damping for revolute and prismatic joints to minimize oscillations during dynamic analyses. 
 
 ===========================================================================
 
