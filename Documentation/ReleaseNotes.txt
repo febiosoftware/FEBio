@@ -24,7 +24,7 @@
   Columbia University
   http://me.columbia.edu/mbl
 
-  copyright (c) University of Utah 2006-2014 - All rights reserved
+  copyright (c) University of Utah 2006-2017 - All rights reserved
 
 
 ===========================================================================
@@ -38,6 +38,68 @@ FEBio release as well as the more important bug fixes. Please consult
 the FEBio User's Manual for a more detailed description of the new features.
 To report any bugs or request new features, please visit the FEBio forum 
 at http://mrlforums.sci.utah.edu/forums/.
+
+===========================================================================
+
+ R E L E A S E   2.6.0    
+
+===========================================================================
+
+BUG FIXED AND IMPROVEMENTS
+--------------------------
+
+1. A performance issue was fixed in the assembly of unsymmetric matrices. This fix may result in a signficant reduction of runtime for problems requiring a nonsymmetric stiffness matrix. Speedups of a factor 5x to 10x have been observed for these types of problems.
+
+2. A bug was fixed in the second derivatives of shape functions for tet10.
+
+3. The  EFD material was modified to evaluate stresses and tangent more efficiently.
+
+4. A bug was fixed in the tangent of the Ogden material. 
+
+5. A more efficient method was implemented for calculating the total contact force the the sliding2 contact interface.
+
+6. A more efficient method was implemented for evaluating the contact area for sliding2 and sliding-biphasic.
+
+7. Several issues were addressed with the restart feature.
+
+8. when max_retries is set to zero, serialization is not done.
+
+9. A bug was fixed in solvent supply "Starling" to properly read the parameters qc and qv.
+
+10. More efficient implementation for rigid body forces.
+
+NEW FEATURES:
+-------------
+
+1. A new shell formulation was implemented that adds several new capabilities to shells, namely compressive loading of shells and wedging shells between solid elements. Since this formulation defines the top surface as the reference surface, slight difference can be noticed in convergence and results. The old formulation is still available, but now requires a special control flag. Set <shell_formulation> to 0 to recover the old formulation.
+
+2. Quadratic shell elements have been implemented: quad8, quad9, tri6
+
+3. porous shells, biphasic solute, multiphasic shells.
+
+4. tied multiphasic contact
+
+5. Added definition of shell concentration and allowed initialization of shell pressure and shell concentration. 
+
+6. A 20-node cubic tetrahedral element was implemented (tet20). This element has 4 corner nodes, 2 nodes on each edge, and one node at the center of each face. 
+
+7. The paramter update_penalty was added to the sliding-multiphasic interface to recalculate auto-penalty at the start of each time step.
+
+8. Two new chemical reactions were added: "mass-action-forward-effective", and "mass-action-reversible-effective".
+
+9. The 2.5 file format now supports Part and Instance keywords for defining multiple-parts model. The Part keyword defines a part, including nodes, elements, nodesets, surfaces, etc. Then, the Instance keyword can be used to instantiate a particular part. The same part can be instantiated multiple times. 
+
+10. Added plot_range, and plot_zero_state control parameters. The plot_range parameter specifies a range and only time steps that fall within this range will be stored to the plot file. The plot_zero_state flag is used to indicate whether to store the "zero" (i.e. reference) state even when it doesn't fall inside the plot range.
+
+11. Added reform_each_time_step control parameter. Setting this to 0 will prevent the quasi-Newton solver from reforming the stiffness matrix at the start of each time step. This may result in a significant reduction of runtime for quasi-linear problems that have many time steps, such as transient or dynamic analysis with small strains. 
+
+12. Added "rigid sliding" contact interface, which generalizes the rigid wall feature. Now, any rigid surface can be used as part of the rigid sliding contact interface. Rigid surfaces have to be defined in the new "Rigid" section in the input file.
+
+13. Inhomogeneous linear constraints are now supported.
+
+14. Added "rigid lock" constraint to constrain two rigid bodies to move together.
+
+15. Added optional force and moment damping for revolute and prismatic joints to minimize oscillations during dynamic analyses. 
 
 ===========================================================================
 
