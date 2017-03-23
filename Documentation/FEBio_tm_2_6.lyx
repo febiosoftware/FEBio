@@ -6340,6 +6340,29 @@ reference "eq151"
 
 \end_inset
 
+In the special case of the solvent (
+\begin_inset Formula $\alpha=w$
+\end_inset
+
+), FEBio uses a solvent supply, 
+\begin_inset Formula $\hat{\varphi}^{w}=\hat{\rho}^{w}/\hat{\rho}_{T}^{w}$
+\end_inset
+
+, which may be incorporated in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq163"
+
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{equation}
+\divg\left(\mathbf{v}^{s}+\mathbf{w}\right)=\hat{\varphi}^{w}+\sum\limits _{\alpha\ne w}\frac{\hat{\rho}^{\alpha}}{\rho_{T}^{\alpha}}\,.\label{eq163b}
+\end{equation}
+
+\end_inset
+
 
 \end_layout
 
@@ -6534,20 +6557,20 @@ Thus, properly balancing a chemical reaction satisfies this constraint.
 The mixture mass balance in 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq163"
+reference "eq163b"
 
 \end_inset
 
  may now be rewritten as 
 \begin_inset Formula 
 \begin{equation}
-\divg\left(\mathbf{v}^{s}+\mathbf{w}^{w}\right)=\left(1-\varphi^{s}\right)\hat{\zeta}\overline{\mathcal{V}}\,,\label{eq170}
+\divg\left(\mathbf{v}^{s}+\mathbf{w}^{w}\right)=\hat{\varphi}^{w}+\left(1-\varphi^{s}\right)\hat{\zeta}\overline{\mathcal{V}}\,,\label{eq170}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\overline{\mathcal{V}}=\sum\limits _{\alpha}\nu^{\alpha}\mathcal{V}^{\alpha}$
+\begin_inset Formula $\overline{\mathcal{V}}=\sum\limits _{\alpha\ne w}\nu^{\alpha}\mathcal{V}^{\alpha}$
 \end_inset
 
  and 
@@ -6559,7 +6582,45 @@ where
 \end_inset
 
 .
- Similarly, the solute mass balance in 
+ (Currently in FEBio, 
+\begin_inset Formula $\hat{\varphi}^{w}$
+\end_inset
+
+ is specified independently of 
+\begin_inset Formula $\hat{\zeta}$
+\end_inset
+
+, because users may choose to neglect the contribution from 
+\begin_inset Formula $\overline{\mathcal{V}}$
+\end_inset
+
+ in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq170"
+
+\end_inset
+
+; therefore, if one desires to model chemical reactions, 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq165"
+
+\end_inset
+
+ or 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq168"
+
+\end_inset
+
+, that involve the solvent, it is necessary to explicitly provide a solvent
+ supply function compatible with the above relations, namely 
+\begin_inset Formula $\hat{\varphi}^{w}=\left(1-\varphi^{s}\right)\hat{\zeta}\nu^{w}\mathcal{V}^{w}$
+\end_inset
+
+.) Similarly, the solute mass balance in 
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq161"
@@ -11391,7 +11452,156 @@ The contribution to
 , where 
 \begin_inset Formula 
 \begin{equation}
-\delta G=\overline{\mathcal{V}}\int_{b}\delta\tilde{p}\left(1-\varphi^{s}\right)\hat{\zeta}\,dv+\sum\limits _{\iota}\nu^{\iota}\int_{b}\delta\tilde{c}^{\iota}\left(1-\varphi^{s}\right)\hat{\zeta}\,dv\,.\label{eq354}
+\delta G=\int_{b}\delta\tilde{p}\left[\hat{\varphi}^{w}+\left(1-\varphi^{s}\right)\hat{\zeta}\overline{\mathcal{V}}\right]\,dv+\sum\limits _{\iota}\nu^{\iota}\int_{b}\delta\tilde{c}^{\iota}\left(1-\varphi^{s}\right)\hat{\zeta}\,dv\,.\label{eq354}
+\end{equation}
+
+\end_inset
+
+The linearization of 
+\begin_inset Formula $\delta G$
+\end_inset
+
+ along a solid displacement increment 
+\begin_inset Formula $\Delta\mathbf{u}$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G\left[\Delta\mathbf{u}\right] & =\int_{b}\delta\tilde{p}\,\left(\hat{\varphi}^{w}\,\divg\Delta\mathbf{u}+\hat{\boldsymbol{\varphi}}_{\varepsilon}^{w}:\Delta\boldsymbol{\varepsilon}\right)\,dv\\
+ & +\overline{\mathcal{V}}\int_{b}\delta\tilde{p}\left[\hat{\zeta}\,\divg\Delta\mathbf{u}+\left(J-\varphi_{r}^{s}\right)\hat{\boldsymbol{\zeta}}_{\varepsilon}:\Delta\boldsymbol{\varepsilon}\right]\,dv\\
+ & +\sum_{\iota}\nu^{\iota}\int_{b}\delta\tilde{c}^{\iota}\left[\hat{\zeta}\,\divg\Delta\mathbf{u}+\left(J-\varphi_{r}^{s}\right)\hat{\boldsymbol{\zeta}}_{\varepsilon}:\Delta\boldsymbol{\varepsilon}\right]\,dv
+\end{aligned}
+\,,\label{eq354b}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{\varphi}}_{\varepsilon}^{w}=\mathbf{F}\cdot\frac{\partial\hat{\varphi}^{w}}{\partial\mathbf{E}}\cdot\mathbf{F}^{T}\,,\quad\hat{\boldsymbol{\zeta}}_{\varepsilon}=J^{-1}\mathbf{F}\cdot\frac{\partial\hat{\zeta}}{\partial\mathbf{E}}\cdot\mathbf{F}^{T}\,.\label{eq354c}
+\end{equation}
+
+\end_inset
+
+Currently, 
+\begin_inset Formula $\hat{\zeta}$
+\end_inset
+
+ is assumed to be independent of 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ in FEBio; it follows that the linearization along the effective fluid pressure
+ increment 
+\begin_inset Formula $\Delta\tilde{p}$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+D\delta G\left[\Delta\tilde{p}\right]=\int_{b}\delta\tilde{p}\,\frac{\partial\hat{\varphi}^{w}}{\partial\tilde{p}}\Delta p\,dv\,.\label{eq354d}
+\end{equation}
+
+\end_inset
+
+Finally, the linearization along a concentration increment 
+\begin_inset Formula $\Delta\tilde{c}^{\iota}$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G\left[\Delta\tilde{c}^{\iota}\right] & =\int_{b}\delta\tilde{p}\,\frac{\partial\hat{\varphi}^{w}}{\partial\tilde{c}^{\iota}}\Delta\tilde{c}^{\iota}\,dv\\
+ & +\overline{\mathcal{V}}\int_{b}\delta\tilde{p}\left(1-\varphi^{s}\right)\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\iota}}\Delta\tilde{c}^{\iota}\,dv\\
+ & +\sum_{\gamma}\nu^{\gamma}\int_{b}\delta\tilde{c}^{\gamma}\left(1-\varphi^{s}\right)\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\iota}}\Delta\tilde{c}^{\iota}\,dv
+\end{aligned}
+\,.\label{eq354e}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The discretized form of these expressions is given by
+\begin_inset Formula 
+\begin{equation}
+\delta G=\sum_{a}\delta\tilde{p}_{a}r_{a}^{p}+\sum_{\gamma}\sum_{a}\delta\tilde{c}_{a}^{\gamma}r_{a}^{\gamma}\,,\label{eq354f}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}r_{a}^{p} & =\int_{b}N_{a}\,\left[\hat{\varphi}^{w}+\left(1-\varphi^{s}\right)\hat{\zeta}\bar{\mathcal{V}}\right]\,dv\\
+r_{a}^{\gamma} & =\nu^{\gamma}\int_{b}N_{a}\left(1-\varphi^{s}\right)\hat{\zeta}\,dv
+\end{aligned}
+\,.\label{eq354g}
+\end{equation}
+
+\end_inset
+
+Similarly,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G\left[\Delta\mathbf{u}\right] & =\sum_{a}\delta\tilde{p}_{a}\sum_{b}\mathbf{k}_{ab}^{pu}\cdot\Delta\mathbf{u}_{b}\\
+ & +\sum_{\gamma}\sum_{a}\delta\tilde{c}_{a}^{\gamma}\sum_{b}\mathbf{k}_{ab}^{\gamma u}\cdot\Delta\mathbf{u}_{b}
+\end{aligned}
+\,,\label{eq354h}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{k}_{ab}^{pu} & =\int_{b}N_{a}\left(\hat{\varphi}^{w}\mathbf{I}+\hat{\boldsymbol{\varphi}}_{\varepsilon}^{w}\right)\cdot\grad N_{b}\,dv\\
+ & +\bar{\mathcal{V}}\int_{a}N_{a}\left[\hat{\zeta}\mathbf{I}+\left(J-\varphi_{r}^{s}\right)\hat{\boldsymbol{\zeta}}_{\varepsilon}\right]\cdot\grad N_{b}\,dv\\
+\mathbf{k}_{ab}^{\gamma u} & =\nu^{\gamma}\int_{a}N_{a}\left[\hat{\zeta}\mathbf{I}+\left(J-\varphi_{r}^{s}\right)\hat{\boldsymbol{\zeta}}_{\varepsilon}\right]\cdot\grad N_{b}\,dv
+\end{aligned}
+\,.\label{eq354i}
+\end{equation}
+
+\end_inset
+
+Then,
+\begin_inset Formula 
+\begin{equation}
+D\delta G\left[\Delta\tilde{p}\right]=\sum_{a}\delta\tilde{p}_{a}\sum_{b}k_{ab}^{pp}\Delta\tilde{p}_{b}\,,\label{eq354j}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+k_{ab}^{pp}=\int_{b}N_{a}\,\frac{\partial\hat{\varphi}^{w}}{\partial\tilde{p}}N_{b}\,dv\,.\label{eq354k}
+\end{equation}
+
+\end_inset
+
+Finally,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G\left[\Delta\tilde{c}^{\iota}\right] & =\sum_{a}\delta\tilde{p}_{a}\sum_{b}k_{ab}^{p\iota}\Delta\tilde{c}_{b}^{\iota}\\
+ & +\sum_{\gamma}\sum_{a}\delta\tilde{c}_{a}^{\gamma}\sum_{b}k_{ab}^{\gamma\iota}\Delta\tilde{c}_{b}^{\iota}
+\end{aligned}
+\,,\label{eq354l}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}k_{ab}^{p\iota} & =\int_{b}N_{a}N_{b}\frac{\partial\hat{\varphi}^{w}}{\partial\tilde{c}^{\iota}}\,dv+\bar{\mathcal{V}}\int_{b}N_{a}N_{b}\left(1-\varphi^{s}\right)\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\iota}}\,dv\\
+k_{ab}^{\gamma\iota} & =\nu^{\gamma}\int_{b}N_{a}N_{b}\left(1-\varphi^{s}\right)\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\iota}}\,dv
+\end{aligned}
+\,.\label{eq354m}
 \end{equation}
 
 \end_inset
