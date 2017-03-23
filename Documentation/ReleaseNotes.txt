@@ -56,7 +56,7 @@ BUG FIXED AND IMPROVEMENTS
 
 4. A bug was fixed in the tangent of the Ogden material. 
 
-5. A more efficient method was implemented for calculating the total contact force the the sliding2 contact interface.
+5. A more efficient method was implemented for calculating the total contact force for the sliding2 contact interface.
 
 6. A more efficient method was implemented for evaluating the contact area for sliding2 and sliding-biphasic.
 
@@ -71,35 +71,33 @@ BUG FIXED AND IMPROVEMENTS
 NEW FEATURES:
 -------------
 
-1. A new shell formulation was implemented that adds several new capabilities to shells, namely compressive loading of shells and wedging shells between solid elements. Since this formulation defines the top surface as the reference surface, slight difference can be noticed in convergence and results. The old formulation is still available, but now requires a special control flag. Set <shell_formulation> to 0 to recover the old formulation.
+1. A new shell formulation was implemented that adds several new capabilities to shells, namely compressive loading of shells, attaching shells to solid elements, and placing shells between solid elements. In this formulation, "rotation" degrees of freedom represent nodal displacements on the shell bottom surface.  Since this formulation defines the top surface as the reference surface, slight difference can be noticed in convergence and results. The old formulation is still available, but now requires a special control flag. Set <shell_formulation> to 0 in the <Control> section to recover the old formulation.
 
 2. Quadratic shell elements have been implemented: quad8, quad9, tri6
 
-3. porous shells, biphasic solute, multiphasic shells.
+3. A tied multiphasic contact interface has been added to enforce continuity of solid displacements, effective fluid pressure, and effective solute concentrations at a tied interface between multiphasic materials.
 
-4. tied multiphasic contact
+4. Added definition of shell concentration and allowed initialization of shell pressure and shell concentration. 
 
-5. Added definition of shell concentration and allowed initialization of shell pressure and shell concentration. 
+5. A 20-node cubic tetrahedral element was implemented (tet20). This element has 4 corner nodes, 2 nodes on each edge, and one node at the center of each face. 
 
-6. A 20-node cubic tetrahedral element was implemented (tet20). This element has 4 corner nodes, 2 nodes on each edge, and one node at the center of each face. 
+6. The parameter update_penalty was added to the sliding-multiphasic interface to recalculate auto-penalty at the start of each time step.
 
-7. The paramter update_penalty was added to the sliding-multiphasic interface to recalculate auto-penalty at the start of each time step.
+7. Two new chemical reactions were added: "mass-action-forward-effective", and "mass-action-reversible-effective".  These reactions employ the effective solute concentrations instead of actual solute concentrations, which will make a difference when the multiphasic mixture has non-zero fixed-charge density and charged solutes.
 
-8. Two new chemical reactions were added: "mass-action-forward-effective", and "mass-action-reversible-effective".
+8. The 2.5 file format now supports Part and Instance keywords for defining multiple-parts model. The Part keyword defines a part, including nodes, elements, nodesets, surfaces, etc. Then, the Instance keyword can be used to instantiate a particular part. The same part can be instantiated multiple times. 
 
-9. The 2.5 file format now supports Part and Instance keywords for defining multiple-parts model. The Part keyword defines a part, including nodes, elements, nodesets, surfaces, etc. Then, the Instance keyword can be used to instantiate a particular part. The same part can be instantiated multiple times. 
+9. Added plot_range, and plot_zero_state control parameters. The plot_range parameter specifies a range and only time steps that fall within this range will be stored to the plot file. The plot_zero_state flag is used to indicate whether to store the "zero" (i.e. reference) state even when it doesn't fall inside the plot range.
 
-10. Added plot_range, and plot_zero_state control parameters. The plot_range parameter specifies a range and only time steps that fall within this range will be stored to the plot file. The plot_zero_state flag is used to indicate whether to store the "zero" (i.e. reference) state even when it doesn't fall inside the plot range.
+10. Added reform_each_time_step control parameter. Setting this to 0 will prevent the quasi-Newton solver from reforming the stiffness matrix at the start of each time step. This may result in a significant reduction of runtime for quasi-linear problems that have many time steps, such as transient or dynamic analyses with small strains. 
 
-11. Added reform_each_time_step control parameter. Setting this to 0 will prevent the quasi-Newton solver from reforming the stiffness matrix at the start of each time step. This may result in a significant reduction of runtime for quasi-linear problems that have many time steps, such as transient or dynamic analysis with small strains. 
+11. Added "rigid sliding" contact interface, which generalizes the rigid wall feature. Now, any rigid surface can be used as part of the rigid sliding contact interface. Rigid surfaces have to be defined in the new "Rigid" section in the input file.
 
-12. Added "rigid sliding" contact interface, which generalizes the rigid wall feature. Now, any rigid surface can be used as part of the rigid sliding contact interface. Rigid surfaces have to be defined in the new "Rigid" section in the input file.
+12. Inhomogeneous linear constraints are now supported.
 
-13. Inhomogeneous linear constraints are now supported.
+13. Added "rigid lock" constraint to constrain two rigid bodies to move together.
 
-14. Added "rigid lock" constraint to constrain two rigid bodies to move together.
-
-15. Added optional force and moment damping for revolute and prismatic joints to minimize oscillations during dynamic analyses. 
+14. Added optional force and moment damping for revolute and prismatic joints to minimize oscillations during dynamic analyses. 
 
 ===========================================================================
 
