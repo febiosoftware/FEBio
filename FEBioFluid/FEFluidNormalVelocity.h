@@ -43,11 +43,15 @@ public:
     //! initialization
     bool Init();
     
+    //! parabolic velocity profile
+    bool SetParabolicVelocity();
+    
 private:
-    double			m_velocity;	//!< magnitude of traction load
-    FESurfaceMap	m_VC;		//!< traction boundary cards
+    double			m_velocity;	//!< average velocity
+    FESurfaceMap	m_VC;		//!< velocity boundary cards
     vector<double>  m_VN;       //!< nodal scale factors
     vector<vec3d>   m_nu;       //!< nodal normals
+    bool            m_bpar;     //!< flag for parabolic velocity
 
 public:
     bool            m_bpv;      //!< flag for prescribing nodal values

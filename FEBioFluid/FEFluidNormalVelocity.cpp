@@ -8,12 +8,18 @@
 
 #include "FEFluidNormalVelocity.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEElemElemList.h"
+#include "FECore/FEGlobalMatrix.h"
+#include "FECore/FEGlobalVector.h"
+#include "FECore/log.h"
+#include "FECore/LinearSolver.h"
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FEFluidNormalVelocity, FESurfaceLoad)
 ADD_PARAMETER(m_velocity, FE_PARAM_DOUBLE    , "velocity");
 ADD_PARAMETER(m_VC      , FE_PARAM_DATA_ARRAY, "value"   );
 ADD_PARAMETER(m_bpv     , FE_PARAM_BOOL      , "prescribe_nodal_velocities");
+ADD_PARAMETER(m_bpar    , FE_PARAM_BOOL      , "parabolic"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -23,6 +29,7 @@ FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem
     m_velocity = 0.0;
     m_VC.set(1.0);
     m_bpv = true;
+    m_bpar = false;
     
     m_dofVX = pfem->GetDOFIndex("vx");
     m_dofVY = pfem->GetDOFIndex("vy");
@@ -55,7 +62,7 @@ void FEFluidNormalVelocity::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-//! Calculate the residual for the traction load
+//! Calculate the residual for the prescribed normal velocity
 void FEFluidNormalVelocity::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 {
     FEModel& fem = R.GetFEModel();
@@ -90,7 +97,7 @@ void FEFluidNormalVelocity::Residual(const FETimeInfo& tp, FEGlobalVector& R)
         vec3d dxr, dxs;
         
         // get the velocity at the integration point
-        double vn = m_VC.get<double>(iel)*m_velocity;
+        double vn;
         
         // repeat over integration points
         zero(fe);
@@ -101,18 +108,16 @@ void FEFluidNormalVelocity::Residual(const FETimeInfo& tp, FEGlobalVector& R)
             Gs = el.Gs(n);
             
             // calculate the tangent vectors
+            vn = 0;
             dxr = dxs = vec3d(0,0,0);
             for (i=0; i<neln; ++i)
             {
-                dxr.x += Gr[i]*r0[i].x;
-                dxr.y += Gr[i]*r0[i].y;
-                dxr.z += Gr[i]*r0[i].z;
-                
-                dxs.x += Gs[i]*r0[i].x;
-                dxs.y += Gs[i]*r0[i].y;
-                dxs.z += Gs[i]*r0[i].z;
+                vn += N[i]*m_VN[el.m_lnode[i]];
+                dxr += r0[i]*Gr[i];
+                dxs += r0[i]*Gs[i];
             }
             
+            vn *= m_velocity;
             double da = (dxr ^ dxs).norm();
             
             for (i=0; i<neln; ++i)
@@ -193,6 +198,11 @@ bool FEFluidNormalVelocity::Init()
         m_VN[i] /= nf[i];
     }
     
+    // Set parabolic velocity profile if requested.
+    // This will override velocity boundary cards in m_VC
+    // and nodal cards in m_VN
+    if (m_bpar) return SetParabolicVelocity();
+    
     return true;
 }
 
@@ -230,4 +240,208 @@ void FEFluidNormalVelocity::SetVelocity()
         if (node.m_ID[m_dofVY] < -1) node.set(m_dofVY, v.y);
         if (node.m_ID[m_dofVZ] < -1) node.set(m_dofVZ, v.z);
     }
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate normal velocities by solving Poiseuille flow across the surface
+bool FEFluidNormalVelocity::SetParabolicVelocity()
+{
+    // find surface boundary nodes
+    FEElemElemList EEL;
+    FESurface* ps = &GetSurface();
+    EEL.Create(ps);
+
+    vector<bool> boundary(ps->Nodes(), false);
+    for (int i=0; i<ps->Elements(); ++i) {
+        FESurfaceElement& el = ps->Element(i);
+        for (int j=0; j<el.facet_edges(); ++j) {
+            FEElement* nel = EEL.Neighbor(i, j);
+            if (nel == nullptr) {
+                int en[3] = {-1,-1,-1};
+                el.facet_edge(j, en);
+                boundary[en[0]] = true;
+                boundary[en[1]] = true;
+                if (en[2] > -1) boundary[en[2]] = true;
+            }
+        }
+    }
+    
+    // count number of non-boundary nodes
+    int neq = 0;
+    vector<int> glm(ps->Nodes(),-1);
+    for (int i=0; i<ps->Nodes(); ++i)
+        if (!boundary[i]) glm[i] = neq++;
+    if (neq == 0)
+    {
+        felog.printbox("FATAL ERROR","Unable to set parabolic fluid normal velocity\n");
+        return false;
+    }
+    
+    // create a linear solver
+    LinearSolver*		plinsolve;	//!< the linear solver
+    FEGlobalMatrix*		pK;			//!< stiffness matrix
+    FECoreKernel& fecore = FECoreKernel::GetInstance();
+    plinsolve = fecore.CreateLinearSolver(SKYLINE_SOLVER);
+    if (plinsolve == 0)
+    {
+        felog.printbox("FATAL ERROR","Unknown solver type selected\n");
+        return false;
+    }
+    
+    SparseMatrix* pS = plinsolve->CreateSparseMatrix(REAL_SYMMETRIC);
+    pK = new FEGlobalMatrix(pS);
+    if (pK == 0)
+    {
+        felog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
+        return false;
+    }
+    // build matrix profile for normal velocity at non-boundary nodes
+    pK->build_begin(neq);
+    for (int i=0; i<ps->Elements(); ++i) {
+        FESurfaceElement& el = ps->Element(i);
+        vector<int> elm(el.Nodes(),-1);
+        for (int j=0; j<el.Nodes(); ++j)
+            elm[j] = glm[el.m_lnode[j]];
+        pK->build_add(elm);
+    }
+    pK->build_end();
+    
+    // create global vector
+    vector<double> v;           //!< normal velocity solution
+    vector<double> rhs;         //!< right-hand-side
+    vector<double> Fr;          //!< reaction forces
+    v.assign(neq, 0);
+    rhs.assign(neq, 0);
+    Fr.assign(neq, 0);
+    FEModel pfem;
+    FEGlobalVector pR(pfem, rhs, Fr);
+    
+    // calculate the global matrix and vector
+    matrix ke;
+    vector<double> fe;
+    vector<int> lm;
+    
+    for (int m=0; m<ps->Elements(); ++m)
+    {
+        // get the surface element
+        FESurfaceElement& el = ps->Element(m);
+        
+        int neln = el.Nodes();
+
+        // get the element stiffness matrix
+        ke.resize(neln, neln);
+        lm.resize(neln);
+        fe.resize(neln);
+        vector<vec3d> gradN(neln);
+        
+        // calculate stiffness
+        int nint = el.GaussPoints();
+        
+        // gauss weights
+        double* w = el.GaussWeights();
+        
+        // nodal coordinates
+        FEMesh& mesh = *ps->GetMesh();
+        vec3d rt[FEElement::MAX_NODES];
+        for (int j=0; j<neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_rt;
+        
+        // repeat over integration points
+        ke.zero();
+        zero(fe);
+        vec3d gcnt[2];
+        for (int n=0; n<nint; ++n)
+        {
+            double* N = el.H(n);
+            double* Gr = el.Gr(n);
+            double* Gs = el.Gs(n);
+            ps->ContraBaseVectors(el, n, gcnt);
+            
+            vec3d dxr(0,0,0), dxs(0,0,0);
+            for (int i=0; i<neln; ++i)
+            {
+                dxr += rt[i]*Gr[i];
+                dxs += rt[i]*Gs[i];
+                gradN[i] = gcnt[0]*Gr[i] + gcnt[1]*Gs[i];
+            }
+            
+            double da = (dxr ^ dxs).norm();
+            
+            // calculate stiffness component
+            for (int i=0; i<neln; ++i) {
+                fe[i] += N[i]*w[n]*da;
+                for (int j=0; j<neln; ++j)
+                    ke[i][j] += (gradN[i]*gradN[j])*w[n]*da;
+            }
+        }
+        
+        // get the element's LM vector
+        for (int j=0; j<el.Nodes(); ++j)
+            lm[j] = glm[el.m_lnode[j]];
+        
+        // assemble element matrix in global stiffness matrix
+        pK->Assemble(ke, lm);
+        pR.Assemble(lm, fe);
+    }
+
+    // solve linear system
+    plinsolve->PreProcess();
+    plinsolve->Factor();
+    if (plinsolve->BackSolve(v, rhs) == false)
+    {
+        felog.printbox("FATAL ERROR","Unable to solve for parabolic fluid normal velocity\n");
+        return false;
+    }
+    
+    // set the nodal normal velocity scale factors
+    for (int i=0; i<ps->Nodes(); ++i) {
+        if (glm[i] == -1) m_VN[i] = 0;
+        else m_VN[i] = v[glm[i]];
+    }
+    
+    // evaluate net area and volumetric flow rate
+    double A = 0, Q = 0;
+    for (int m=0; m<ps->Elements(); ++m)
+    {
+        // get the surface element
+        FESurfaceElement& el = ps->Element(m);
+        
+        int neln = el.Nodes();
+        int nint = el.GaussPoints();
+        double* w = el.GaussWeights();
+        
+        // nodal coordinates
+        FEMesh& mesh = *ps->GetMesh();
+        vec3d rt[FEElement::MAX_NODES];
+        for (int j=0; j<neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_rt;
+        
+        // repeat over integration points
+        for (int n=0; n<nint; ++n)
+        {
+            double* N = el.H(n);
+            double* Gr = el.Gr(n);
+            double* Gs = el.Gs(n);
+
+            double vn = 0;
+            vec3d dxr(0,0,0), dxs(0,0,0);
+            for (int i=0; i<neln; ++i)
+            {
+                vn += N[i]*m_VN[el.m_lnode[i]];
+                dxr += rt[i]*Gr[i];
+                dxs += rt[i]*Gs[i];
+            }
+            
+            double da = (dxr ^ dxs).norm();
+            
+            for (int i=0; i<neln; ++i) {
+                A += N[i]*w[n]*da;
+                Q += N[i]*vn*w[n]*da;
+            }
+        }
+    }
+    
+    // normalize nodal velocity cards
+    double vbar = Q/A;
+    for (int i=0; i<ps->Nodes(); ++i) m_VN[i] /= vbar;
+    
+    return true;
 }

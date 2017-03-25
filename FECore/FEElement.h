@@ -343,8 +343,14 @@ public:
 		((FESurfaceElementTraits*)m_pT)->project_to_nodes(ai, ao);
 	}
 
+    //! return number of edges
+    int facet_edges();
+    
+    //! return node list of edge
+    void facet_edge(int j, int* en);
+    
 public:
-	//! local ID of surface element
+    //! local ID of surface element
 	int		m_lid;
 
 	// indices of solid or shell element this surface is a face of

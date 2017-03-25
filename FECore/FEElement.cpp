@@ -212,6 +212,55 @@ void FESurfaceElement::SetTraits(FEElementTraits* pt)
 	m_lnode.resize(Nodes());
 }
 
+int FESurfaceElement::facet_edges()
+{
+    int nn = Nodes(), nf = 0;
+    switch (nn)
+    {
+        case 3:
+        case 6:
+        case 7:
+            nf = 3;
+            break;
+        case 4:
+        case 8:
+        case 9:
+            nf = 4;
+            break;
+        default:
+            assert(false);
+    }
+    return nf;
+}
+
+void FESurfaceElement::facet_edge(int j, int* en)
+{
+    int nn = Nodes();
+    switch (nn)
+    {
+        case 3:
+            en[0] = m_lnode[j];
+            en[1] = m_lnode[(j+1)%3];
+            break;
+        case 6:
+        case 7:
+            en[0] = m_lnode[j];
+            en[1] = m_lnode[(j+1)%3];
+            en[2] = m_lnode[j+3];
+            break;
+        case 4:
+            en[0] = m_lnode[j];
+            en[1] = m_lnode[(j+1)%4];
+            break;
+        case 8:
+        case 9:
+            en[0] = m_lnode[j];
+            en[1] = m_lnode[(j+1)%4];
+            en[2] = m_lnode[j+4];
+            break;
+    }
+}
+
 //-----------------------------------------------------------------------------
 FETrussElement::FETrussElement()
 {
