@@ -305,6 +305,7 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
         pK->build_add(elm);
     }
     pK->build_end();
+    pS->zero();
     
     // create global vector
     vector<double> v;           //!< normal velocity solution
@@ -391,6 +392,7 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
         felog.printbox("FATAL ERROR","Unable to solve for parabolic fluid normal velocity\n");
         return false;
     }
+    plinsolve->Destroy();
     
     // set the nodal normal velocity scale factors
     for (int i=0; i<ps->Nodes(); ++i) {
