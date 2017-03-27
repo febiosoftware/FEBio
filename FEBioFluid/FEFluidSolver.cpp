@@ -374,6 +374,8 @@ void FEFluidSolver::PrepStep(const FETimeInfo& timeInfo)
     
     // zero total DOFs
     zero(m_Ui);
+    zero(m_Vi);
+    zero(m_Di);
     
     // store previous mesh state
     // we need them for strain and acceleration calculations

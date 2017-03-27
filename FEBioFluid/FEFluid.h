@@ -38,8 +38,6 @@ public:
     vec3d       m_gradJ;    //!< gradient of J
 	double		m_p;		//!< elastic fluid pressure
     mat3ds		m_s;		//!< fluid stress
-    vec3d       m_lapv;     //!< laplacian of velocity
-    vec3d       m_gdiv;     //!< gradient of divergence of velocity
 };
 
 //-----------------------------------------------------------------------------

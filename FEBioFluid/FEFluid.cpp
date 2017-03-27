@@ -20,7 +20,6 @@ FEFluidMaterialPoint::FEFluidMaterialPoint()
     m_vt = m_vp = m_at = m_gradJ = vec3d(0,0,0);
     m_s.zero();
     m_L.zero();
-    m_lapv = m_gdiv = vec3d(0,0,0);
 }
 
 //-----------------------------------------------------------------------------
@@ -36,11 +35,11 @@ void FEFluidMaterialPoint::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_p << m_L << m_J << m_Jp << m_gradJ << m_vt << m_vp << m_at << m_s << m_lapv << m_gdiv;
+		ar << m_p << m_L << m_J << m_Jp << m_gradJ << m_vt << m_vp << m_at << m_s;
 	}
 	else
 	{
-		ar >> m_p >> m_L >> m_J >> m_Jp >> m_gradJ >> m_vt >> m_vp >> m_at >> m_s >> m_lapv >> m_gdiv;
+		ar >> m_p >> m_L >> m_J >> m_Jp >> m_gradJ >> m_vt >> m_vp >> m_at >> m_s;
 	}
 
 	if (m_pNext) m_pNext->Serialize(ar);
@@ -55,7 +54,6 @@ void FEFluidMaterialPoint::Init()
 	m_Jp = 1;
 	m_vt = m_vp = m_at = m_gradJ = vec3d(0,0,0);
 	m_s.zero();
-	m_lapv = m_gdiv = vec3d(0,0,0);
     
     // don't forget to initialize the base class
     FEMaterialPoint::Init();
