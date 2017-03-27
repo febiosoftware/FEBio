@@ -97,6 +97,7 @@ public:
 	FEGlobalMatrix*		m_pK;			//!< global stiffness matrix
 	int					m_neq;			//!< number of equations
     bool				m_breshape;		//!< Matrix reshape flag
+	int					m_profileUpdateMethod; //!< profile update method (0 or 1) NOTE: This is a test parameter that will problably be removed!
 
 	// data used by Quasin
 	vector<double> m_R0;	//!< residual at iteration i-1

@@ -84,7 +84,7 @@ void FEGlobalMatrix::build_end()
 }
 
 //-----------------------------------------------------------------------------
-bool FEGlobalMatrix::Create(FEModel* pfem, int neq, bool breset)
+bool FEGlobalMatrix::Create(FEModel* pfem, int neq, bool breset, SparseMatrixProfile::UpdateMethod updateMethod)
 {
 	// The first time we come here we build the "static" profile.
 	// This static profile stores the contribution to the matrix profile
@@ -107,6 +107,7 @@ bool FEGlobalMatrix::Create(FEModel* pfem, int neq, bool breset)
 		if (breset)
 		{
 			m_MPs.clear();
+			m_MPs.SetUpdateMethod(updateMethod);
 
 			// build the matrix profile
 			pfem->BuildMatrixProfile(*this, true);

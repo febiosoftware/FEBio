@@ -36,6 +36,13 @@ public:
 class SparseMatrixProfile
 {
 public:
+	enum UpdateMethod
+	{
+		Method1,
+		Method2
+	};
+
+public:
 	//! Constructor. Takes the nr of equations as the input argument
 	SparseMatrixProfile(int n = 0);
 
@@ -51,9 +58,11 @@ public:
 	//! assignment operator
 	SparseMatrixProfile& operator = (const SparseMatrixProfile& mp);
 
+	//! set the update method
+	void SetUpdateMethod(UpdateMethod m);
+
 	//! updates the profile for an array of elements
 	void UpdateProfile(vector< vector<int> >& LM, int N);
-	void UpdateProfile2(vector< vector<int> >& LM, int N);
 
 	//! returns the size of the profile. That is the nr of equations
 	int size() { return (int)m_prof.size(); }
@@ -61,14 +70,15 @@ public:
 	//! returns the non-zero row indices (in condensed format) for a column
 	vector<int>& column(int i) { return m_prof[i]; }
 
-//protected:
-	void insertRowIndex(int ncol, vector<int>& row);
-
 public:
 	SparseMatrixProfile GetBlockProfile(int nrow0, int ncol0, int nrow1, int ncol1) const;
 
+	void UpdateProfile1(vector< vector<int> >& LM, int N);
+	void UpdateProfile2(vector< vector<int> >& LM, int N);
+
 protected:
 	vector< vector<int> >	m_prof;	//!< the actual profile in condensed format
+	int	m_updateMethod;
 };
 
 #endif // !defined(AFX_MATRIXPROFILE_H__F83C6F4F_AB5B_445F_AD8C_9C0CBAD26D09__INCLUDED_)

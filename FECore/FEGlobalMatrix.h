@@ -34,7 +34,7 @@ public:
 	virtual ~FEGlobalMatrix();
 
 	//! construct the stiffness matrix from a FEM object
-	bool Create(FEModel* pfem, int neq, bool breset);
+	bool Create(FEModel* pfem, int neq, bool breset, SparseMatrixProfile::UpdateMethod updateMethod = SparseMatrixProfile::Method1);
 
 	//! construct the stiffness matrix from a mesh
 	bool Create(FEMesh& mesh, int neq);
