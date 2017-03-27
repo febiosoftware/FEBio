@@ -871,6 +871,7 @@ void FESlidingInterfaceBiphasic::ProjectSurface(FESlidingSurfaceBiphasic& ss, FE
                 {
                     pt.m_Lmd = 0;
                     pt.m_gap = 0;
+                    if (bmove) pt.m_pme = 0;
                     if (sporo) {
                         pt.m_Lmp = 0;
                         pt.m_pg = 0;
