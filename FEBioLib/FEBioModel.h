@@ -11,7 +11,7 @@
 //!
 //! In addition it adds support for all I/O capabilities. 
 //!
-class FECORE_EXPORT FEBioModel : public FEModel
+class FECOREDLL_EXPORT FEBioModel : public FEModel
 {
 public:
 	//! constructor

@@ -2,7 +2,7 @@
 #include "FEDiagnostic.h"
 #include <FECore/FECoreTask.h>
 
-class FECORE_EXPORT FEBioDiagnostic : public FECoreTask
+class FECOREDLL_EXPORT FEBioDiagnostic : public FECoreTask
 {
 public:
 	FEBioDiagnostic(FEModel* pfem) : FECoreTask(pfem){ m_pdia = 0; }

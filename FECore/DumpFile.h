@@ -16,7 +16,7 @@
 //! simplify in- and output.
 //! \sa FEM::Serialize()
 
-class FECORE_EXPORT DumpFile : public DumpStream
+class FECOREDLL_EXPORT DumpFile : public DumpStream
 {
 public:
 	// overloaded from DumpStream

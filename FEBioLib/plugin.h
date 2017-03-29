@@ -68,7 +68,7 @@ private:
 
 //-----------------------------------------------------------------------------
 //! This class manages all the plugins
-class FECORE_EXPORT FEBioPluginManager
+class FECOREDLL_EXPORT FEBioPluginManager
 {
 public:
 	//! Get the plugin manager

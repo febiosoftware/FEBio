@@ -31,7 +31,7 @@ struct FECORE_CALLBACK {
 
 //-----------------------------------------------------------------------------
 // class that handles callbacks
-class FECORE_EXPORT CallbackHandler
+class FECOREDLL_EXPORT CallbackHandler
 {
 public:
 	CallbackHandler();

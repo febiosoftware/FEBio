@@ -9,7 +9,7 @@ class FEModel;
 
 //-----------------------------------------------------------------------------
 //! The factory class contains the mechanism for instantiating a class.
-class FECORE_EXPORT FECoreFactory
+class FECOREDLL_EXPORT FECoreFactory
 {
 public:
 	//! constructor
@@ -46,7 +46,7 @@ class FEMaterial;
 //-----------------------------------------------------------------------------
 //! Creation of domains are a little more elaborate and deviate from the usual
 //! factory methods.
-class FECORE_EXPORT FEDomainFactory
+class FECOREDLL_EXPORT FEDomainFactory
 {
 public:
 	FEDomainFactory(){}
@@ -59,7 +59,7 @@ public:
 // factory class for linear solvers.
 class LinearSolver;
 
-class FECORE_EXPORT FELinearSolverFactory : public FEParamContainer
+class FECOREDLL_EXPORT FELinearSolverFactory : public FEParamContainer
 {
 public:
 	FELinearSolverFactory(int nid) : m_nsolver_id(nid) {}

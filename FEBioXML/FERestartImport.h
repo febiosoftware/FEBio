@@ -14,7 +14,7 @@
 
 //-----------------------------------------------------------------------------
 //! Restart input file reader.
-class FECORE_EXPORT FERestartImport : public FEFileImport
+class FECOREDLL_EXPORT FERestartImport : public FEFileImport
 {
 public:
 	FERestartImport();

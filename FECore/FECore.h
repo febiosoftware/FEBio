@@ -6,12 +6,12 @@
 namespace FECore
 {
 	// retrieve version numbers
-	FECORE_EXPORT void get_version(int& version, int& subversion);
+	FECOREDLL_EXPORT void get_version(int& version, int& subversion);
 
 	// retrieve version number string
-	FECORE_EXPORT const char* get_version_string();
+	FECOREDLL_EXPORT const char* get_version_string();
 
 	// initialize the module
-	FECORE_EXPORT void InitModule();
+	FECOREDLL_EXPORT void InitModule();
 
 } // namespace FECore

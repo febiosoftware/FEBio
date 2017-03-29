@@ -20,7 +20,7 @@ class FEModel;
 //! Base class for file import classes. This class offers a simple error reporting
 //! mechanism and manages the FILE* pointer. 
 
-class FECORE_EXPORT FEFileImport
+class FECOREDLL_EXPORT FEFileImport
 {
 public:
 	//! constructor

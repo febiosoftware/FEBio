@@ -32,7 +32,7 @@ class FELinearConstraintManager;
 //! geometry, analysis steps, boundary and loading conditions, contact interfaces
 //! and so on.
 //!
-class FECORE_EXPORT FEModel : public FECoreBase, public CallbackHandler
+class FECOREDLL_EXPORT FEModel : public FECoreBase, public CallbackHandler
 {
 public:
 	enum {MAX_STRING = 256};

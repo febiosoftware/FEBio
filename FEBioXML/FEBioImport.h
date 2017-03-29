@@ -17,7 +17,7 @@ class FEBioImport;
 
 //-----------------------------------------------------------------------------
 // Base class for XML sections parsers
-class FECORE_EXPORT FEBioFileSection
+class FECOREDLL_EXPORT FEBioFileSection
 {
 public:
 	FEBioFileSection(FEBioImport* pim) { m_pim = pim; }
@@ -43,7 +43,7 @@ public:
 //=============================================================================
 //! Implements a class to import FEBio input files
 //!
-class FECORE_EXPORT FEBioImport : public FEFileImport
+class FECOREDLL_EXPORT FEBioImport : public FEFileImport
 {
 public:
 	// Base class for FEBio import exceptions

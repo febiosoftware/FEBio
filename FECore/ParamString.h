@@ -5,7 +5,7 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------
-class FECORE_EXPORT ParamRef
+class FECOREDLL_EXPORT ParamRef
 {
 public:
 	string	name;		// name of parameter
@@ -31,7 +31,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // helper class for retrieving parameters
-class FECORE_EXPORT ParamString
+class FECOREDLL_EXPORT ParamString
 {
 public:
 	//! constructor

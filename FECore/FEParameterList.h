@@ -64,7 +64,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Base class for classes that wish to support parameter lists
-class FECORE_EXPORT FEParamContainer
+class FECOREDLL_EXPORT FEParamContainer
 {
 public:
 	//! constructor

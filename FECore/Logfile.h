@@ -13,7 +13,7 @@
 
 //-----------------------------------------------------------------------------
 // class used to create an abstract interface to a screen
-class FECORE_EXPORT LogStream
+class FECOREDLL_EXPORT LogStream
 {
 public:
 	LogStream() {}
@@ -28,7 +28,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // A stream that outputs to a file
-class FECORE_EXPORT LogFileStream : public LogStream
+class FECOREDLL_EXPORT LogFileStream : public LogStream
 {
 public:
 	// constructor
@@ -69,7 +69,7 @@ private:
 //! Note that this class is implemented as a singleton, in other words, only one
 //! instance can be created.
 
-class FECORE_EXPORT Logfile
+class FECOREDLL_EXPORT Logfile
 {
 public:
 	enum MODE { LOG_NEVER = 0, LOG_FILE = 1, LOG_SCREEN, LOG_FILE_AND_SCREEN };

@@ -15,7 +15,7 @@ class FEModel;
 //! This is used in FEBio for running and cold restarts. 
 //! This is just an abstract base class. Classes must be derived from this
 //! to implement the actual storage mechanism.
-class FECORE_EXPORT DumpStream
+class FECOREDLL_EXPORT DumpStream
 {
 public:
 	// This class is thrown when an error occurs reading the dumpfile

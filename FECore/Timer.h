@@ -18,7 +18,7 @@
 //! function stops it and the GetTime function returns the time elapsed between
 //! the call to start and stop
 
-class FECORE_EXPORT Timer  
+class FECOREDLL_EXPORT Timer  
 {
 public:
 	//! constructor

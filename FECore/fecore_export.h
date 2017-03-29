@@ -3,13 +3,13 @@
 #ifdef WIN32
 	#ifdef FECORE_DLL
 		#ifdef FECORE_API
-			#define FECORE_EXPORT __declspec(dllexport)
+			#define FECOREDLL_EXPORT __declspec(dllexport)
 		#else
-			#define FECORE_EXPORT __declspec(dllimport)
+			#define FECOREDLL_EXPORT __declspec(dllimport)
 		#endif
 	#else
-		#define FECORE_EXPORT
+		#define FECOREDLL_EXPORT
 	#endif
 #else
-	#define FECORE_EXPORT
+	#define FECOREDLL_EXPORT
 #endif
