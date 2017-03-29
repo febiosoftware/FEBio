@@ -25,19 +25,16 @@ public:
     void SetSurface(FESurface* ps);
     
     //! calculate pressure stiffness
-    void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) {}
+    void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver);
     
     //! calculate residual
-    void Residual(const FETimeInfo& tp, FEGlobalVector& R) {}
+    void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+    
+    //! Unpack surface element data
+    void UnpackLM(FEElement& el, vector<int>& lm);
     
     //! serialize data
     void Serialize(DumpStream& ar);
-    
-    //! mark the dilatation
-    void MarkDilatation();
-    
-    //! set the dilatation
-    void SetDilatation();
     
     //! initialization
     bool Init();
@@ -52,16 +49,11 @@ protected:
 protected:
     double			m_beta;     //!< backflow stabilization coefficient
     double          m_rho;      //!< fluid density
-    bool            m_bout;     //!< outflow flag
-    double          m_dir;      //!< flow direction
-    double          m_k;        //!< fluid bulk modulus
-    vector<vec3d>   m_nu;       //!< nodal normals
     
     // degrees of freedom
     int		m_dofVX;
     int		m_dofVY;
     int		m_dofVZ;
-    int		m_dofE;
     
     DECLARE_PARAMETER_LIST();
 };

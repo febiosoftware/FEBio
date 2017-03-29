@@ -27,7 +27,6 @@ FETangentialFlowStabilization::FETangentialFlowStabilization(FEModel* pfem) : FE
     m_dofVX = pfem->GetDOFIndex("vx");
     m_dofVY = pfem->GetDOFIndex("vy");
     m_dofVZ = pfem->GetDOFIndex("vz");
-    m_dofE = pfem->GetDOFIndex("e");
 }
 
 //-----------------------------------------------------------------------------
@@ -188,17 +187,16 @@ void FETangentialFlowStabilization::UnpackLM(FEElement& el, vector<int>& lm)
 {
     FEMesh& mesh = *GetSurface().GetMesh();
     int N = el.Nodes();
-    lm.resize(N*4);
+    lm.resize(N*3);
     for (int i=0; i<N; ++i)
     {
         int n = el.m_node[i];
         FENode& node = mesh.Node(n);
         vector<int>& id = node.m_ID;
         
-        lm[4*i  ] = id[m_dofVX];
-        lm[4*i+1] = id[m_dofVY];
-        lm[4*i+2] = id[m_dofVZ];
-        lm[4*i+3] = id[m_dofE];
+        lm[3*i  ] = id[m_dofVX];
+        lm[3*i+1] = id[m_dofVY];
+        lm[3*i+2] = id[m_dofVZ];
     }
 }
 

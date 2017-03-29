@@ -136,10 +136,8 @@ bool FEFluidSolver::Init()
     {
         FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
         FEFluidResistanceBC* pfr = dynamic_cast<FEFluidResistanceBC*>(psl);
-        FEBackFlowStabilization* pbs = dynamic_cast<FEBackFlowStabilization*>(psl);
         FEFluidNormalVelocity* pnv = dynamic_cast<FEFluidNormalVelocity*>(psl);
         if (pfr && psl->IsActive()) pfr->MarkDilatation();
-        else if (pbs && psl->IsActive()) pbs->MarkDilatation();
         else if (pnv && psl->IsActive() && pnv->m_bpv) pnv->MarkVelocity();
     }
     
@@ -308,10 +306,8 @@ void FEFluidSolver::Update(vector<double>& ui)
     {
         FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
         FEFluidResistanceBC* pfr = dynamic_cast<FEFluidResistanceBC*>(psl);
-        FEBackFlowStabilization* pbs = dynamic_cast<FEBackFlowStabilization*>(psl);
         FEFluidNormalVelocity* pnv = dynamic_cast<FEFluidNormalVelocity*>(psl);
         if (pfr && psl->IsActive()) pfr->SetDilatation();
-        else if (pbs && psl->IsActive()) pbs->SetDilatation();
         else if (pnv && psl->IsActive() && pnv->m_bpv) pnv->SetVelocity();
     }
     

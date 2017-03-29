@@ -55,7 +55,6 @@ protected:
     int		m_dofVX;
     int		m_dofVY;
     int		m_dofVZ;
-    int		m_dofE;
     
     DECLARE_PARAMETER_LIST();
 };
