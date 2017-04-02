@@ -430,9 +430,9 @@ bool FEFluidSolver::Quasin(double time)
     double	normv;		// velocity increment norm
     double	normRi = 0;	// initial residual norm
     double	normVi = 0;	// initial velocity norm
-    double	normEi;		// initial energy norm
-    double	normEm;		// max energy norm
-    double	normDi;		// initial dilatation norm
+    double	normEi = 0; // initial energy norm
+    double	normEm = 0;	// max energy norm
+    double	normDi = 0;	// initial dilatation norm
     double	normD;		// current dilatation norm
     double	normd;		// incremement dilatation norm
     

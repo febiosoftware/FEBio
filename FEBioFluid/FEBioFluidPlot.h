@@ -128,3 +128,12 @@ public:
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Element fluid shear viscosity
+class FEPlotFluidShearViscosity : public FEDomainData
+{
+public:
+    FEPlotFluidShearViscosity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+

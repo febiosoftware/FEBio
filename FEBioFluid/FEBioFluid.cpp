@@ -2,6 +2,9 @@
 #include "FEFluid.h"
 #include "FENewtonianFluid.h"
 #include "FECarreauFluid.h"
+#include "FECarreauYasudaFluid.h"
+#include "FEPowellEyringFluid.h"
+#include "FECrossFluid.h"
 
 #include "FEFluidSolver.h"
 #include "FEFluidDomain3D.h"
@@ -39,10 +42,13 @@ REGISTER_FECORE_CLASS(FEFluidSolver        , FESOLVER_ID, "fluid"         );
 
 //-----------------------------------------------------------------------------
 // Materials
-REGISTER_FECORE_CLASS(FEFluid                       ,FEMATERIAL_ID, "fluid"             );
-REGISTER_FECORE_CLASS(FENewtonianFluid              ,FEMATERIAL_ID, "Newtonian fluid"   );
-REGISTER_FECORE_CLASS(FECarreauFluid                ,FEMATERIAL_ID, "Carreau fluid"     );
-
+REGISTER_FECORE_CLASS(FEFluid                       ,FEMATERIAL_ID, "fluid"         );
+REGISTER_FECORE_CLASS(FENewtonianFluid              ,FEMATERIAL_ID, "Newtonian fluid");
+REGISTER_FECORE_CLASS(FECarreauFluid                ,FEMATERIAL_ID, "Carreau"       );
+REGISTER_FECORE_CLASS(FECarreauYasudaFluid          ,FEMATERIAL_ID, "Carreau-Yasuda");
+REGISTER_FECORE_CLASS(FEPowellEyringFluid           ,FEMATERIAL_ID, "Powell-Eyring" );
+REGISTER_FECORE_CLASS(FECrossFluid                  ,FEMATERIAL_ID, "Cross"         );
+    
 //-----------------------------------------------------------------------------
 // Domain classes
 REGISTER_FECORE_CLASS(FEFluidDomain3D               , FEDOMAIN_ID, "fluid"              );
@@ -77,6 +83,7 @@ REGISTER_FECORE_CLASS(FEPlotElementFluidStress      , FEPLOTDATA_ID, "fluid stre
 REGISTER_FECORE_CLASS(FEPlotElementFluidRateOfDef   , FEPLOTDATA_ID, "fluid rate of deformation");
 REGISTER_FECORE_CLASS(FEPlotFluidStressPower        , FEPLOTDATA_ID, "fluid stress power"       );
 REGISTER_FECORE_CLASS(FEPlotFluidSurfaceForce       , FEPLOTDATA_ID, "fluid surface force"      );
+REGISTER_FECORE_CLASS(FEPlotFluidShearViscosity     , FEPLOTDATA_ID, "fluid shear viscosity"    );
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FELogElemFluidPosX,        FEELEMLOGDATA_ID, "fx");

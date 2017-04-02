@@ -11,12 +11,18 @@
 		D50876FD1BBB6C18007D55F1 /* FECarreauFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D50876FB1BBB6C18007D55F1 /* FECarreauFluid.h */; };
 		D50F0EC41D6BA3660095E621 /* FEFluidNormalTraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50F0EC21D6BA3660095E621 /* FEFluidNormalTraction.cpp */; };
 		D50F0EC51D6BA3660095E621 /* FEFluidNormalTraction.h in Headers */ = {isa = PBXBuildFile; fileRef = D50F0EC31D6BA3660095E621 /* FEFluidNormalTraction.h */; };
+		D51902481E8FC35F0063DD84 /* FECarreauYasudaFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D51902461E8FC35F0063DD84 /* FECarreauYasudaFluid.cpp */; };
+		D51902491E8FC35F0063DD84 /* FECarreauYasudaFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D51902471E8FC35F0063DD84 /* FECarreauYasudaFluid.h */; };
+		D519024C1E8FC7020063DD84 /* FEPowellEyringFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D519024A1E8FC7020063DD84 /* FEPowellEyringFluid.cpp */; };
+		D519024D1E8FC7020063DD84 /* FEPowellEyringFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D519024B1E8FC7020063DD84 /* FEPowellEyringFluid.h */; };
 		D522BC161D7DDA4A00803669 /* FEConstraintFrictionlessWall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D522BC141D7DDA4A00803669 /* FEConstraintFrictionlessWall.cpp */; };
 		D522BC171D7DDA4A00803669 /* FEConstraintFrictionlessWall.h in Headers */ = {isa = PBXBuildFile; fileRef = D522BC151D7DDA4A00803669 /* FEConstraintFrictionlessWall.h */; };
 		D522BC1A1D7E5C6400803669 /* FEConstraintNormalFlow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D522BC181D7E5C6400803669 /* FEConstraintNormalFlow.cpp */; };
 		D522BC1B1D7E5C6400803669 /* FEConstraintNormalFlow.h in Headers */ = {isa = PBXBuildFile; fileRef = D522BC191D7E5C6400803669 /* FEConstraintNormalFlow.h */; };
 		D52E5EB41E73728D0080CD7E /* FEFluidNormalVelocity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52E5EB21E73728D0080CD7E /* FEFluidNormalVelocity.cpp */; };
 		D52E5EB51E73728D0080CD7E /* FEFluidNormalVelocity.h in Headers */ = {isa = PBXBuildFile; fileRef = D52E5EB31E73728D0080CD7E /* FEFluidNormalVelocity.h */; };
+		D53598BC1E8FE10700584A4F /* FECrossFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53598BA1E8FE10700584A4F /* FECrossFluid.cpp */; };
+		D53598BD1E8FE10700584A4F /* FECrossFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D53598BB1E8FE10700584A4F /* FECrossFluid.h */; };
 		D53C4F901B9C837800718FBC /* FEBioFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4F801B9C837800718FBC /* FEBioFluid.cpp */; };
 		D53C4F911B9C837800718FBC /* FEBioFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D53C4F811B9C837800718FBC /* FEBioFluid.h */; };
 		D53C4F921B9C837800718FBC /* FEBioFluidData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4F821B9C837800718FBC /* FEBioFluidData.cpp */; };
@@ -59,12 +65,18 @@
 		D50876FB1BBB6C18007D55F1 /* FECarreauFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECarreauFluid.h; sourceTree = "<group>"; };
 		D50F0EC21D6BA3660095E621 /* FEFluidNormalTraction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidNormalTraction.cpp; sourceTree = "<group>"; };
 		D50F0EC31D6BA3660095E621 /* FEFluidNormalTraction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidNormalTraction.h; sourceTree = "<group>"; };
+		D51902461E8FC35F0063DD84 /* FECarreauYasudaFluid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECarreauYasudaFluid.cpp; sourceTree = "<group>"; };
+		D51902471E8FC35F0063DD84 /* FECarreauYasudaFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECarreauYasudaFluid.h; sourceTree = "<group>"; };
+		D519024A1E8FC7020063DD84 /* FEPowellEyringFluid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPowellEyringFluid.cpp; sourceTree = "<group>"; };
+		D519024B1E8FC7020063DD84 /* FEPowellEyringFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPowellEyringFluid.h; sourceTree = "<group>"; };
 		D522BC141D7DDA4A00803669 /* FEConstraintFrictionlessWall.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEConstraintFrictionlessWall.cpp; sourceTree = "<group>"; };
 		D522BC151D7DDA4A00803669 /* FEConstraintFrictionlessWall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEConstraintFrictionlessWall.h; sourceTree = "<group>"; };
 		D522BC181D7E5C6400803669 /* FEConstraintNormalFlow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEConstraintNormalFlow.cpp; sourceTree = "<group>"; };
 		D522BC191D7E5C6400803669 /* FEConstraintNormalFlow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEConstraintNormalFlow.h; sourceTree = "<group>"; };
 		D52E5EB21E73728D0080CD7E /* FEFluidNormalVelocity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidNormalVelocity.cpp; sourceTree = "<group>"; };
 		D52E5EB31E73728D0080CD7E /* FEFluidNormalVelocity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidNormalVelocity.h; sourceTree = "<group>"; };
+		D53598BA1E8FE10700584A4F /* FECrossFluid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECrossFluid.cpp; sourceTree = "<group>"; };
+		D53598BB1E8FE10700584A4F /* FECrossFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECrossFluid.h; sourceTree = "<group>"; };
 		D53C4F781B9C836800718FBC /* libFEBioFluid.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioFluid.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D53C4F801B9C837800718FBC /* FEBioFluid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioFluid.cpp; sourceTree = "<group>"; };
 		D53C4F811B9C837800718FBC /* FEBioFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioFluid.h; sourceTree = "<group>"; };
@@ -143,10 +155,14 @@
 				D53C4F851B9C837800718FBC /* FEBioFluidPlot.h */,
 				D50876FA1BBB6C18007D55F1 /* FECarreauFluid.cpp */,
 				D50876FB1BBB6C18007D55F1 /* FECarreauFluid.h */,
+				D51902461E8FC35F0063DD84 /* FECarreauYasudaFluid.cpp */,
+				D51902471E8FC35F0063DD84 /* FECarreauYasudaFluid.h */,
 				D522BC141D7DDA4A00803669 /* FEConstraintFrictionlessWall.cpp */,
 				D522BC151D7DDA4A00803669 /* FEConstraintFrictionlessWall.h */,
 				D522BC181D7E5C6400803669 /* FEConstraintNormalFlow.cpp */,
 				D522BC191D7E5C6400803669 /* FEConstraintNormalFlow.h */,
+				D53598BA1E8FE10700584A4F /* FECrossFluid.cpp */,
+				D53598BB1E8FE10700584A4F /* FECrossFluid.h */,
 				D53C4F881B9C837800718FBC /* FEFluid.cpp */,
 				D53C4F891B9C837800718FBC /* FEFluid.h */,
 				D53C4F8C1B9C837800718FBC /* FEFluidDomain.cpp */,
@@ -171,6 +187,8 @@
 				D53C4FC11B9E306800718FBC /* FEFluidTractionLoad.h */,
 				D53C4FB21B9CB6B200718FBC /* FENewtonianFluid.cpp */,
 				D53C4FB31B9CB6B200718FBC /* FENewtonianFluid.h */,
+				D519024A1E8FC7020063DD84 /* FEPowellEyringFluid.cpp */,
+				D519024B1E8FC7020063DD84 /* FEPowellEyringFluid.h */,
 				D543AB741E67883900A72E7E /* FETangentialDamping.cpp */,
 				D543AB751E67883900A72E7E /* FETangentialDamping.h */,
 				D543AB781E689F8800A72E7E /* FETangentialFlowStabilization.cpp */,
@@ -197,6 +215,8 @@
 				D50F0EC51D6BA3660095E621 /* FEFluidNormalTraction.h in Headers */,
 				D50876FD1BBB6C18007D55F1 /* FECarreauFluid.h in Headers */,
 				D53C4FB91B9D242600718FBC /* FEFluidResidualVector.h in Headers */,
+				D51902491E8FC35F0063DD84 /* FECarreauYasudaFluid.h in Headers */,
+				D519024D1E8FC7020063DD84 /* FEPowellEyringFluid.h in Headers */,
 				D522BC1B1D7E5C6400803669 /* FEConstraintNormalFlow.h in Headers */,
 				D543AB771E67883900A72E7E /* FETangentialDamping.h in Headers */,
 				D5A32E0E1C20982A00162B01 /* FEFluidDomain2D.h in Headers */,
@@ -207,6 +227,7 @@
 				D53C4F9F1B9C837800718FBC /* FEFluidSolver.h in Headers */,
 				D53C4F951B9C837800718FBC /* FEBioFluidPlot.h in Headers */,
 				D543AB7B1E689F8800A72E7E /* FETangentialFlowStabilization.h in Headers */,
+				D53598BD1E8FE10700584A4F /* FECrossFluid.h in Headers */,
 				D53C4F991B9C837800718FBC /* FEFluid.h in Headers */,
 				D53C4F931B9C837800718FBC /* FEBioFluidData.h in Headers */,
 				D53C4F971B9C837800718FBC /* FEFluidDomainFactory.h in Headers */,
@@ -283,10 +304,13 @@
 				D50876FC1BBB6C18007D55F1 /* FECarreauFluid.cpp in Sources */,
 				D53C4FC21B9E306800718FBC /* FEFluidTractionLoad.cpp in Sources */,
 				D543AB7A1E689F8800A72E7E /* FETangentialFlowStabilization.cpp in Sources */,
+				D51902481E8FC35F0063DD84 /* FECarreauYasudaFluid.cpp in Sources */,
 				D543AB8E1E68DEC200A72E7E /* FEBackFlowStabilization.cpp in Sources */,
 				D5A32E0D1C20982A00162B01 /* FEFluidDomain2D.cpp in Sources */,
 				D53C4FB81B9D242600718FBC /* FEFluidResidualVector.cpp in Sources */,
+				D53598BC1E8FE10700584A4F /* FECrossFluid.cpp in Sources */,
 				D543AB761E67883900A72E7E /* FETangentialDamping.cpp in Sources */,
+				D519024C1E8FC7020063DD84 /* FEPowellEyringFluid.cpp in Sources */,
 				D52E5EB41E73728D0080CD7E /* FEFluidNormalVelocity.cpp in Sources */,
 				D522BC1A1D7E5C6400803669 /* FEConstraintNormalFlow.cpp in Sources */,
 				D53C4F921B9C837800718FBC /* FEBioFluidData.cpp in Sources */,
