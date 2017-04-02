@@ -4,7 +4,6 @@
 #include "FEFluidDomain2D.h"
 #include "FEFluid.h"
 #include "FEBioPlot/FEBioPlotFile.h"
-#include <FECore/FEModel.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -66,7 +65,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
         {
             FESurfaceElement& el = pcs->Element(j);
             m_area[j] = pcs->SurfaceNormal(el,0,0)*pcs->FaceArea(el);
-            m_elem[j] = pcs->FindElement(el);
+            m_elem[j] = m_pMesh->FindElementFromID(pcs->FindElement(el));
         }
         m_binit = false;
     }
@@ -75,7 +74,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
     for (int j=0; j<NF; ++j)
     {
         // get the element this surface element belongs to
-        FEElement* pe = m_pMesh->FindElementFromID(m_elem[j]);
+        FEElement* pe = m_elem[j];
         if (pe)
         {
             // get the material
@@ -105,6 +104,84 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
     
     // save results
 	a << fn;
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidMassFlux::Save(FESurface &surf, FEDataStream &a)
+{
+    FESurface* pcs = &surf;
+    if (pcs == 0) return false;
+    
+    // Evaluate this field only for a specific domain, by checking domain name
+    if (strcmp(pcs->GetName(), "") == 0) return false;
+    if (strcmp(pcs->GetName(), m_szdom) != 0) return false;
+    
+    int dofVX = m_pfem->GetDOFIndex("vx");
+    int dofVY = m_pfem->GetDOFIndex("vy");
+    int dofVZ = m_pfem->GetDOFIndex("vz");
+    int dofE  = m_pfem->GetDOFIndex("e");
+    
+    int NF = pcs->Elements();
+    double fn = 0;    // initialize
+    
+    FEMesh* m_pMesh = pcs->GetMesh();
+    
+    // initialize on the first pass to identify solid element associated with this surface element
+    if (m_binit) {
+        m_elem.resize(NF);
+        for (int j=0; j<NF; ++j)
+        {
+            FESurfaceElement& el = pcs->Element(j);
+            m_elem[j] = m_pMesh->FindElementFromID(pcs->FindElement(el));
+        }
+        m_binit = false;
+    }
+    
+    // calculate net fluid mass flow rate
+    for (int j=0; j<NF; ++j)
+    {
+        // get the element this surface element belongs to
+        FEElement* pe = m_elem[j];
+        if (pe)
+        {
+            // get the material
+            FEMaterial* pm = m_pfem->GetMaterial(pe->GetMatID());
+            
+            // see if this is a fluid element
+            FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
+            if (fluid) {
+                // get referential density
+                double rhor = fluid->m_rhor;
+                
+                // get the surface element
+                FESurfaceElement& el = pcs->Element(j);
+                // extract nodal velocities and dilatation
+                int neln = el.Nodes();
+                vec3d vt[FEElement::MAX_NODES];
+                double et[FEElement::MAX_NODES];
+                for (int j=0; j<neln; ++j) {
+                    vt[j] = m_pMesh->Node(el.m_node[j]).get_vec3d(dofVX, dofVY, dofVZ);
+                    et[j] = m_pMesh->Node(el.m_node[j]).get(dofE);
+                }
+                
+                // evaluate mass flux across this surface element
+                int nint = el.GaussPoints();
+                double*	gw = el.GaussWeights();
+                vec3d gcov[2];
+                for (int n=0; n<nint; ++n) {
+                    vec3d v = el.eval(vt, n);
+                    double J = 1 + el.eval(et, n);
+                    pcs->CoBaseVectors(el, n, gcov);
+                    fn += (v*(gcov[0] ^ gcov[1]))*rhor/J*gw[n];
+                }
+            }
+        }
+    }
+    
+    // save results
+    a << fn;
     
     return true;
 }

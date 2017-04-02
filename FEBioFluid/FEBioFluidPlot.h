@@ -1,5 +1,6 @@
 #pragma once
 #include "FECore/FEPlotData.h"
+#include <FECore/FEModel.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -33,13 +34,28 @@ public:
 class FEPlotFluidSurfaceForce : public FESurfaceData
 {
 private:
-    FEModel*        m_pfem;
-    bool            m_binit;
-    vector<int>     m_elem;
-    vector<vec3d>   m_area;
+    FEModel*            m_pfem;
+    bool                m_binit;
+    vector<FEElement*>  m_elem;
+    vector<vec3d>       m_area;
     
 public:
     FEPlotFluidSurfaceForce(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_REGION){ m_pfem = pfem; m_binit = true; }
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Fluid mass flux
+//!
+class FEPlotFluidMassFlux : public FESurfaceData
+{
+private:
+    FEModel*            m_pfem;
+    bool                m_binit;
+    vector<FEElement*>  m_elem;
+    
+public:
+    FEPlotFluidMassFlux(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; m_binit = true; }
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
