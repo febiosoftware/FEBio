@@ -45,9 +45,9 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Fluid mass flux
+//! Fluid mass flow rate
 //!
-class FEPlotFluidMassFlux : public FESurfaceData
+class FEPlotFluidMassFlowRate : public FESurfaceData
 {
 private:
     FEModel*            m_pfem;
@@ -55,7 +55,7 @@ private:
     vector<FEElement*>  m_elem;
     
 public:
-    FEPlotFluidMassFlux(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; m_binit = true; }
+    FEPlotFluidMassFlowRate(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; m_binit = true; }
     bool Save(FESurface& surf, FEDataStream& a);
 };
 

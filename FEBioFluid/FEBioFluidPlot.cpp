@@ -109,7 +109,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidMassFlux::Save(FESurface &surf, FEDataStream &a)
+bool FEPlotFluidMassFlowRate::Save(FESurface &surf, FEDataStream &a)
 {
     FESurface* pcs = &surf;
     if (pcs == 0) return false;

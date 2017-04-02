@@ -84,7 +84,7 @@ REGISTER_FECORE_CLASS(FEPlotElementFluidRateOfDef   , FEPLOTDATA_ID, "fluid rate
 REGISTER_FECORE_CLASS(FEPlotFluidStressPower        , FEPLOTDATA_ID, "fluid stress power"       );
 REGISTER_FECORE_CLASS(FEPlotFluidSurfaceForce       , FEPLOTDATA_ID, "fluid surface force"      );
 REGISTER_FECORE_CLASS(FEPlotFluidShearViscosity     , FEPLOTDATA_ID, "fluid shear viscosity"    );
-REGISTER_FECORE_CLASS(FEPlotFluidMassFlux           , FEPLOTDATA_ID, "fluid mass flux"          );
+REGISTER_FECORE_CLASS(FEPlotFluidMassFlowRate       , FEPLOTDATA_ID, "fluid mass flow rate"     );
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FELogElemFluidPosX,        FEELEMLOGDATA_ID, "fx");
