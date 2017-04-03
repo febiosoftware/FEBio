@@ -725,6 +725,7 @@
     <ClCompile Include="..\..\FEBioMech\FERemodelingElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEResidualVector.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidAngularDamper.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERigidCable.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidConnector.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidContractileForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidCylindricalJoint.cpp" />
@@ -924,6 +925,7 @@
     <ClInclude Include="..\..\FEBioMech\FERemodelingElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEResidualVector.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidAngularDamper.h" />
+    <ClInclude Include="..\..\FEBioMech\FERigidCable.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidConnector.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidContractileForce.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidCylindricalJoint.h" />

@@ -388,6 +388,8 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioTest\FEBioDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBioTest\FEBioTest.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEBiphasicTangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEContactDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEContactDiagnosticBiphasic.cpp" />
@@ -402,6 +404,8 @@
     <ClCompile Include="..\..\FEBioTest\FETiedBiphasicDiagnostic.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBioTest\FEBioDiagnostic.h" />
+    <ClInclude Include="..\..\FEBioTest\FEBioTest.h" />
     <ClInclude Include="..\..\FEBioTest\FEBiphasicTangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEContactDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEContactDiagnosticBiphasic.h" />
