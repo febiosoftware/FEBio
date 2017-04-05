@@ -242,8 +242,9 @@ bool FETangentDiagnostic::Run()
 	// solve the problem
 	FEModel& fem = GetFEModel();
 	felog.SetMode(Logfile::LOG_NEVER);
-	fem.Solve();
+	bool bret = fem.Solve();
 	felog.SetMode(Logfile::LOG_FILE);
+	if (bret == false) return false;
 
 	FEMesh& mesh = fem.GetMesh();
 	FEElasticSolidDomain& bd = static_cast<FEElasticSolidDomain&>(mesh.Domain(0));

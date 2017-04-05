@@ -81,6 +81,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 
         // keep a pointer to the fem object
         m_pStep = fem.GetCurrentStep();
+		fem.SetCurrentStepIndex(0);
         
 		++tag;
 		do
