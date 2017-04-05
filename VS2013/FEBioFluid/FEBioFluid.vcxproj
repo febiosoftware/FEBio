@@ -403,8 +403,10 @@
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidData.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidPlot.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FECarreauFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FECarreauYasudaFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEConstraintFrictionlessWall.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEConstraintNormalFlow.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FECrossFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidDomain.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidDomain2D.cpp" />
@@ -417,6 +419,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidTractionLoad.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FENewtonianFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEPowellEyringFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialFlowStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEViscousFluid.cpp" />
   </ItemGroup>
@@ -426,8 +429,10 @@
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidData.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidPlot.h" />
     <ClInclude Include="..\..\FEBioFluid\FECarreauFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FECarreauYasudaFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEConstraintFrictionlessWall.h" />
     <ClInclude Include="..\..\FEBioFluid\FEConstraintNormalFlow.h" />
+    <ClInclude Include="..\..\FEBioFluid\FECrossFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidDomain.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidDomain2D.h" />
@@ -440,6 +445,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidTractionLoad.h" />
     <ClInclude Include="..\..\FEBioFluid\FENewtonianFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEPowellEyringFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialFlowStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FEViscousFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\stdafx.h" />
