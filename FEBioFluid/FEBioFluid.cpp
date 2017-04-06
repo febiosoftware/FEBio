@@ -13,6 +13,7 @@
 #include "FEFluidTractionLoad.h"
 #include "FEFluidNormalTraction.h"
 #include "FEFluidNormalVelocity.h"
+#include "FEFluidVelocity.h"
 #include "FEFluidResistanceBC.h"
 #include "FETangentialDamping.h"
 #include "FETangentialFlowStabilization.h"
@@ -59,6 +60,7 @@ REGISTER_FECORE_CLASS(FEFluidDomain2D               , FEDOMAIN_ID, "fluid2D"    
 REGISTER_FECORE_CLASS(FEFluidTractionLoad           , FESURFACELOAD_ID, "fluid traction");
 REGISTER_FECORE_CLASS(FEFluidNormalTraction         , FESURFACELOAD_ID, "fluid normal traction");
 REGISTER_FECORE_CLASS(FEFluidNormalVelocity         , FESURFACELOAD_ID, "fluid normal velocity");
+REGISTER_FECORE_CLASS(FEFluidVelocity               , FESURFACELOAD_ID, "fluid velocity");
 REGISTER_FECORE_CLASS(FEFluidResistanceBC           , FESURFACELOAD_ID, "fluid resistance");
 REGISTER_FECORE_CLASS(FETangentialDamping           , FESURFACELOAD_ID, "fluid tangential damping");
 REGISTER_FECORE_CLASS(FETangentialFlowStabilization , FESURFACELOAD_ID, "fluid tangential stabilization");
