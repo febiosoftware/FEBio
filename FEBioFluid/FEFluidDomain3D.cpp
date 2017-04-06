@@ -620,7 +620,7 @@ void FEFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
                 ke[i4+2][j4  ] += Mv(2,0);
                 ke[i4+2][j4+1] += Mv(2,1);
                 ke[i4+2][j4+2] += Mv(2,2);
-                ke[i4+2][j4+2] += mJ.z;
+                ke[i4+2][j4+3] += mJ.z;
             }
         }
     }
