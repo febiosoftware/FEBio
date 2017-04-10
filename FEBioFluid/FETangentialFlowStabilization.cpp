@@ -63,7 +63,7 @@ bool FETangentialFlowStabilization::Init()
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to hydrostatic pressure
 
-void FETangentialFlowStabilization::ElementStiffness(FESurfaceElement& el, matrix& ke)
+void FETangentialFlowStabilization::ElementStiffness(FESurfaceElement& el, matrix& ke, const double alpha)
 {
     int nint = el.GaussPoints();
     int neln = el.Nodes();
@@ -77,8 +77,9 @@ void FETangentialFlowStabilization::ElementStiffness(FESurfaceElement& el, matri
     FEMesh& mesh = *m_psurf->GetMesh();
     vec3d rt[FEElement::MAX_NODES], vt[FEElement::MAX_NODES];
     for (int j=0; j<neln; ++j) {
-        rt[j] = mesh.Node(el.m_node[j]).m_rt;
-        vt[j] = mesh.Node(el.m_node[j]).get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
+        FENode& node = mesh.Node(el.m_node[j]);
+        rt[j] = node.m_rt;
+        vt[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*alpha + node.m_vp*(1-alpha);
     }
     
     // repeat over integration points
@@ -120,7 +121,7 @@ void FETangentialFlowStabilization::ElementStiffness(FESurfaceElement& el, matri
 //-----------------------------------------------------------------------------
 //! calculates the element force
 
-void FETangentialFlowStabilization::ElementForce(FESurfaceElement& el, vector<double>& fe)
+void FETangentialFlowStabilization::ElementForce(FESurfaceElement& el, vector<double>& fe, const double alpha)
 {
     // nr integration points
     int nint = el.GaussPoints();
@@ -134,8 +135,9 @@ void FETangentialFlowStabilization::ElementForce(FESurfaceElement& el, vector<do
     FEMesh& mesh = *m_psurf->GetMesh();
     vec3d rt[FEElement::MAX_NODES], vt[FEElement::MAX_NODES];
     for (int j=0; j<neln; ++j) {
-        rt[j] = mesh.Node(el.m_node[j]).m_rt;
-        vt[j] = mesh.Node(el.m_node[j]).get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
+        FENode& node = mesh.Node(el.m_node[j]);
+        rt[j] = node.m_rt;
+        vt[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*alpha + node.m_vp*(1-alpha);
     }
     
     // repeat over integration points
@@ -222,7 +224,7 @@ void FETangentialFlowStabilization::StiffnessMatrix(const FETimeInfo& tp, FESolv
         ke.resize(ndof, ndof);
         
         // calculate pressure stiffness
-        ElementStiffness(el, ke);
+        ElementStiffness(el, ke, tp.alpha);
         
         // get the element's LM vector
         UnpackLM(el, lm);
@@ -251,7 +253,7 @@ void FETangentialFlowStabilization::Residual(const FETimeInfo& tp, FEGlobalVecto
         int ndof = 3*neln;
         fe.resize(ndof);
         
-        ElementForce(el, fe);
+        ElementForce(el, fe, tp.alpha);
         
         // get the element's LM vector
         UnpackLM(el, lm);

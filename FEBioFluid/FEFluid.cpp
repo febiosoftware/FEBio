@@ -16,8 +16,8 @@ FEFluidMaterialPoint::FEFluidMaterialPoint()
     m_p = 0;
     m_L.zero();
     m_J = 1;
-    m_Jp = 1;
-    m_vt = m_vp = m_at = m_gradJ = vec3d(0,0,0);
+    m_Jdot = 0;
+    m_vt = m_at = m_gradJ = vec3d(0,0,0);
     m_s.zero();
     m_L.zero();
 }
@@ -35,11 +35,11 @@ void FEFluidMaterialPoint::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_p << m_L << m_J << m_Jp << m_gradJ << m_vt << m_vp << m_at << m_s;
+		ar << m_p << m_L << m_J << m_Jdot << m_gradJ << m_vt << m_at << m_s;
 	}
 	else
 	{
-		ar >> m_p >> m_L >> m_J >> m_Jp >> m_gradJ >> m_vt >> m_vp >> m_at >> m_s;
+		ar >> m_p >> m_L >> m_J >> m_Jdot >> m_gradJ >> m_vt >> m_at >> m_s;
 	}
 
 	if (m_pNext) m_pNext->Serialize(ar);
@@ -51,8 +51,8 @@ void FEFluidMaterialPoint::Init()
 	m_p = 0;
 	m_L.zero();
 	m_J = 1;
-	m_Jp = 1;
-	m_vt = m_vp = m_at = m_gradJ = vec3d(0,0,0);
+	m_Jdot = 0;
+	m_vt = m_at = m_gradJ = vec3d(0,0,0);
 	m_s.zero();
     
     // don't forget to initialize the base class
@@ -158,4 +158,29 @@ double FEFluid::AcousticSpeed(FEMaterialPoint& mp)
     double c = sqrt(BulkModulus(mp)/Density(mp));
     
     return c;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate strain energy density (per referential volume)
+double FEFluid::StrainEnergyDensity(FEMaterialPoint& mp)
+{
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    double sed = m_k*pow(fp.m_J-1,2)/2;
+    return sed;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate kinetic energy density (per referential volume)
+double FEFluid::KineticEnergyDensity(FEMaterialPoint& mp)
+{
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    double ked = m_rhor*(fp.m_vt*fp.m_vt)/2;
+    return ked;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate energy density
+double FEFluid::EnergyDensity(FEMaterialPoint& mp)
+{
+    return StrainEnergyDensity(mp) + KineticEnergyDensity(mp);
 }

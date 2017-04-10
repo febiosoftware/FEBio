@@ -153,3 +153,30 @@ public:
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Element strain energy density
+class FEPlotFluidStrainEnergyDensity : public FEDomainData
+{
+public:
+    FEPlotFluidStrainEnergyDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element kinetic energy density
+class FEPlotFluidKineticEnergyDensity : public FEDomainData
+{
+public:
+    FEPlotFluidKineticEnergyDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element energy density
+class FEPlotFluidEnergyDensity : public FEDomainData
+{
+public:
+    FEPlotFluidEnergyDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+

@@ -30,11 +30,10 @@ public:
     // fluid data
     vec3d       m_r0;       //!< material position
     vec3d       m_vt;       //!< velocity
-    vec3d       m_vp;       //!< velocity at previous time
     vec3d       m_at;       //!< acceleration
     mat3d       m_L;        //!< velocity gradient
     double      m_J;        //!< determinant of fluid deformation gradient
-    double      m_Jp;       //!< determinant of fluid deformation gradient at previous time
+    double      m_Jdot;     //!< material time derivative of J
     vec3d       m_gradJ;    //!< gradient of J
 	double		m_p;		//!< elastic fluid pressure
     mat3ds		m_s;		//!< fluid stress
@@ -87,6 +86,15 @@ public:
     
     //! bulk modulus
     double BulkModulus(FEMaterialPoint& mp);
+    
+    //! strain energy density
+    double StrainEnergyDensity(FEMaterialPoint& mp);
+    
+    //! kinetic energy density
+    double KineticEnergyDensity(FEMaterialPoint& mp);
+    
+    //! strain + kinetic energy density
+    double EnergyDensity(FEMaterialPoint& mp);
     
 private: // material properties
     FEPropertyT<FEViscousFluid> m_pViscous; //!< pointer to viscous part of fluid material

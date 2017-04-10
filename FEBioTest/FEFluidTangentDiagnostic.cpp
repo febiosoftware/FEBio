@@ -270,6 +270,11 @@ bool FEFluidTangentDiagnostic::Run()
     pstep->Activate();
     fem.Solve();
 	felog.SetMode(Logfile::LOG_FILE);
+    FETimeInfo tp;
+    tp.timeIncrement = dt;
+    tp.alpha = 1;
+    tp.beta = 1;
+    tp.gamma = 1;
     
     FEMesh& mesh = fem.GetMesh();
     FEFluidDomain3D& bd = static_cast<FEFluidDomain3D&>(mesh.Domain(0));
@@ -281,8 +286,8 @@ bool FEFluidTangentDiagnostic::Run()
     // set up the element stiffness matrix
     matrix k0(4*N, 4*N);
     k0.zero();
-    bd.ElementStiffness(el, k0);
-    bd.ElementMassMatrix(el,k0);
+    bd.ElementStiffness(el, k0, tp);
+    bd.ElementMassMatrix(el,k0, tp);
     
     // print the element stiffness matrix
     felog.printf("\nActual stiffness matrix:\n");
@@ -341,6 +346,11 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
     pstep->m_tend = dt;
     pstep->m_final_time = dt;
     FEFluidSolver& solver = static_cast<FEFluidSolver&>(*pstep->GetFESolver());
+    FETimeInfo tp;
+    tp.timeIncrement = dt;
+    tp.alpha = 1;
+    tp.beta = 1;
+    tp.gamma = 1;
 
 	// get the dof indices
 	const int dof_VX = fem.GetDOFIndex("vx");
@@ -360,8 +370,8 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
     // first calculate the initial residual
     vector<double> f0(4*N);
     zero(f0);
-    bd.ElementInternalForce(el, f0);
-    bd.ElementInertialForce(el, f0);
+    bd.ElementInternalForce(el, f0, tp);
+    bd.ElementInertialForce(el, f0, tp);
     
     // now calculate the perturbed residuals
     ke.resize(4*N, 4*N);
@@ -385,8 +395,8 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
         solver.UpdateStresses();
         
         zero(f1);
-        bd.ElementInternalForce(el, f1);
-        bd.ElementInertialForce(el, f1);
+        bd.ElementInternalForce(el, f1, tp);
+        bd.ElementInertialForce(el, f1, tp);
         
         switch (nj)
         {

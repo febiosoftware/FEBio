@@ -36,48 +36,48 @@ public: // overrides from FEElasticDomain
     void Update(const FETimeInfo& tp);
     
     // update the element stress
-    void UpdateElementStress(int iel, double dt);
+    void UpdateElementStress(int iel, const FETimeInfo& tp);
     
     //! internal stress forces
-    void InternalForces(FEGlobalVector& R);
+    void InternalForces(FEGlobalVector& R, const FETimeInfo& tp);
     
     //! body forces
-    void BodyForce(FEGlobalVector& R, FEBodyForce& BF);
+    void BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBodyForce& BF);
     
     //! intertial forces for dynamic problems
-    void InertialForces(FEGlobalVector& R);
+    void InertialForces(FEGlobalVector& R, const FETimeInfo& tp);
     
     //! calculates the global stiffness matrix for this domain
-    void StiffnessMatrix(FESolver* psolver);
+    void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
     
     //! calculates inertial stiffness
-    void MassMatrix(FESolver* psolver);
+    void MassMatrix(FESolver* psolver, const FETimeInfo& tp);
     
     //! body force stiffness
-    void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf);
+    void BodyForceStiffness(FESolver* psolver, const FETimeInfo& tp, FEBodyForce& bf);
     
 public:
     // --- S T I F F N E S S ---
     
     //! calculates the solid element stiffness matrix
-    void ElementStiffness(FESolidElement& el, matrix& ke);
+    void ElementStiffness(FESolidElement& el, matrix& ke, const FETimeInfo& tp);
     
     //! calculates the solid element mass matrix
-    void ElementMassMatrix(FESolidElement& el, matrix& ke);
+    void ElementMassMatrix(FESolidElement& el, matrix& ke, const FETimeInfo& tp);
     
     //! calculates the stiffness matrix due to body forces
-    void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke);
+    void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke, const FETimeInfo& tp);
     
     // --- R E S I D U A L ---
     
     //! Calculates the internal stress vector for solid elements
-    void ElementInternalForce(FESolidElement& el, vector<double>& fe);
+    void ElementInternalForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp);
     
     //! Calculatess external body forces for solid elements
-    void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe);
+    void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe, const FETimeInfo& tp);
     
     //! Calculates the inertial force vector for solid elements
-    void ElementInertialForce(FESolidElement& el, vector<double>& fe);
+    void ElementInertialForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp);
     
 protected:
     FEFluid*	m_pMat;
@@ -85,4 +85,7 @@ protected:
 protected:
     int	m_dofVX, m_dofVY, m_dofVZ;
     int	m_dofE;
+    int m_dofEP;
+    int m_dofAE;
+    int m_dofAEP;
 };

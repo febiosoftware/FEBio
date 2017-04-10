@@ -22,6 +22,7 @@ FEFluidResistanceBC::FEFluidResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem)
 {
     m_R = 0.0;
     m_k = 1.0;
+    m_alpha = 1.0;
     
     m_dofVX = pfem->GetDOFIndex("vx");
     m_dofVY = pfem->GetDOFIndex("vy");
@@ -128,8 +129,9 @@ double FEFluidResistanceBC::FlowRate()
         
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
-            r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
-            vt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
+            FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
+            r0[i] = node.m_r0;
+            vt[i] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*m_alpha + node.m_vp*(1-m_alpha);
         }
         
         double* Nr, *Ns;

@@ -23,6 +23,9 @@ public:
     //! Initializes data structures
     bool Init();
     
+    //! initialize the step
+    bool InitStep(double time);
+    
     //! Initialize linear equation system
     bool InitEquations();
     
@@ -113,6 +116,13 @@ public:
     vector<double> m_di;	//!< dilatation increment vector
     vector<double> m_Di;	//!< Total dilatation vector for iteration
     
+    // generalized alpha method
+    double  m_rhoi;         //!< rho infinity
+    double  m_alphaf;       //!< alpha step for Y={v,e}
+    double  m_alpham;       //!< alpha step for Ydot={∂v/∂t,∂e/∂t}
+    double  m_gamma;        //!< gamma
+    int     m_pred;         //!< predictor method
+
 public:
     bool		m_baugment;		//!< augmentation flag
     
@@ -121,6 +131,10 @@ protected:
 	int		m_dofVY;
 	int		m_dofVZ;
 	int		m_dofE;
+    
+    int     m_dofEP;
+    int     m_dofAE;
+    int     m_dofAEP;
     
     // declare the parameter list
     DECLARE_PARAMETER_LIST();

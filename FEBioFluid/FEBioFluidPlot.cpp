@@ -515,3 +515,102 @@ bool FEPlotFluidShearViscosity::Save(FEDomain &dom, FEDataStream& a)
     return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotFluidStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
+    if (pme == 0) return false;
+    
+    // write solid element data
+    int N = dom.Elements();
+    for (int i=0; i<N; ++i)
+    {
+        FEElement& el = dom.ElementRef(i);
+        
+        int nint = el.GaussPoints();
+        double f = 1.0 / (double) nint;
+        
+        // since the PLOT file requires floats we need to convert
+        // the doubles to single precision
+        // we output the average density values of the gauss points
+        double r = 0;
+        for (int j=0; j<nint; ++j)
+        {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+            FEFluidMaterialPoint* ppt = (mp.ExtractData<FEFluidMaterialPoint>());
+            if (ppt) r += pme->StrainEnergyDensity(mp);
+        }
+        r *= f;
+        
+        a << r;
+    }
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
+    if (pme == 0) return false;
+    
+    // write solid element data
+    int N = dom.Elements();
+    for (int i=0; i<N; ++i)
+    {
+        FEElement& el = dom.ElementRef(i);
+        
+        int nint = el.GaussPoints();
+        double f = 1.0 / (double) nint;
+        
+        // since the PLOT file requires floats we need to convert
+        // the doubles to single precision
+        // we output the average density values of the gauss points
+        double r = 0;
+        for (int j=0; j<nint; ++j)
+        {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+            FEFluidMaterialPoint* ppt = (mp.ExtractData<FEFluidMaterialPoint>());
+            if (ppt) r += pme->KineticEnergyDensity(mp);
+        }
+        r *= f;
+        
+        a << r;
+    }
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
+    if (pme == 0) return false;
+    
+    // write solid element data
+    int N = dom.Elements();
+    for (int i=0; i<N; ++i)
+    {
+        FEElement& el = dom.ElementRef(i);
+        
+        int nint = el.GaussPoints();
+        double f = 1.0 / (double) nint;
+        
+        // since the PLOT file requires floats we need to convert
+        // the doubles to single precision
+        // we output the average density values of the gauss points
+        double r = 0;
+        for (int j=0; j<nint; ++j)
+        {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+            FEFluidMaterialPoint* ppt = (mp.ExtractData<FEFluidMaterialPoint>());
+            if (ppt) r += pme->EnergyDensity(mp);
+        }
+        r *= f;
+        
+        a << r;
+    }
+    
+    return true;
+}
+

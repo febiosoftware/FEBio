@@ -29,7 +29,7 @@ public:
     void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) {}
     
     //! calculate residual
-    void Residual(const FETimeInfo& tp, FEGlobalVector& R) {}
+    void Residual(const FETimeInfo& tp, FEGlobalVector& R) { m_alpha = tp.alpha; }
     
     //! mark the dilatation
     void MarkDilatation();
@@ -46,6 +46,7 @@ public:
 private:
     double			m_R;	//!< flow resistance
     double          m_k;    //!< fluid bulk modulus
+    double          m_alpha;
     
     int		m_dofVX;
     int		m_dofVY;

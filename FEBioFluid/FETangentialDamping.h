@@ -39,10 +39,10 @@ public:
     
 protected:
     //! calculate stiffness for an element
-    void ElementStiffness(FESurfaceElement& el, matrix& ke);
+    void ElementStiffness(FESurfaceElement& el, matrix& ke, const double alpha);
     
     //! Calculates the force for an element
-    void ElementForce(FESurfaceElement& el, vector<double>& fe);
+    void ElementForce(FESurfaceElement& el, vector<double>& fe, const double alpha);
     
 protected:
     double			m_eps;      //!< damping coefficient (penalty)
