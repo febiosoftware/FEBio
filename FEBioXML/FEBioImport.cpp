@@ -480,6 +480,12 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			dofs.SetDOFName(varV, 2, "vz");
 			int varE = dofs.AddVariable("fluid dilation");
 			dofs.SetDOFName(varE, 0, "e");
+            int nEP = dofs.AddVariable("previous fluid dilation");
+            dofs.SetDOFName(nEP, 0, "ep");
+            int nAE = dofs.AddVariable("fluid dilation tderiv");
+            dofs.SetDOFName(nAE, 0, "ae");
+            int nAEP = dofs.AddVariable("previous fluid dilation tderiv");
+            dofs.SetDOFName(nAEP, 0, "aep");
 			int varQP = dofs.AddVariable("previous rotation", VAR_VEC3);
 			dofs.SetDOFName(varQP, 0, "up");
 			dofs.SetDOFName(varQP, 1, "vp");
