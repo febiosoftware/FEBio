@@ -80,6 +80,9 @@ public:
 	//! Invert the surface
 	void Invert();
 
+	//! Get the spatial position given natural coordinates
+	vec3d Position(FESurfaceElement& el, double r, double s);
+
 public:
 	//! calculate the surface area of a surface element
 	double FaceArea(FESurfaceElement& el);

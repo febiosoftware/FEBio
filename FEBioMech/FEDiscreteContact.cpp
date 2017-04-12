@@ -728,25 +728,28 @@ void FEDiscreteContact2::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 			el.shape_fnc(H, r, s);
 
 			vec3d F = m_dom->NodalForce(n);
-
-			vector<double> fe(3*neln, 0.0);
-			for (int i=0; i<neln; ++i)
+			vec3d nu = nodeData.nu;
+			if (F*nu < 0.0)
 			{
-				fe[3*i  ] = H[i]*F.x;
-				fe[3*i+1] = H[i]*F.y;
-				fe[3*i+2] = H[i]*F.z;
-			}
+				vector<double> fe(3*neln, 0.0);
+				for (int i=0; i<neln; ++i)
+				{
+					fe[3*i  ] = H[i]*F.x;
+					fe[3*i+1] = H[i]*F.y;
+					fe[3*i+2] = H[i]*F.z;
+				}
 
-			vector<int> lm(3*neln, -1);
-			for (int i=0; i<neln; ++i)
-			{
-				FENode& nodei = mesh.Node(el.m_node[i]);
-				lm[3*i  ] = nodei.m_ID[0];
-				lm[3*i+1] = nodei.m_ID[1];
-				lm[3*i+2] = nodei.m_ID[2];
-			}
+				vector<int> lm(3*neln, -1);
+				for (int i=0; i<neln; ++i)
+				{
+					FENode& nodei = mesh.Node(el.m_node[i]);
+					lm[3*i  ] = nodei.m_ID[0];
+					lm[3*i+1] = nodei.m_ID[1];
+					lm[3*i+2] = nodei.m_ID[2];
+				}
 
-			R.Assemble(el.m_node, lm, fe);
+				R.Assemble(el.m_node, lm, fe);
+			}
 		}
 	}
 }
@@ -782,6 +785,7 @@ void FEDiscreteContact2::ProjectNodes()
 
 	m_dom->UpdateNodes();
 
+	const double snap_tol = 1e-6;
 	const int maxIter = 1000;
 	int iter = 0;
 	while ((bdone == false) && (iter < maxIter))
@@ -813,27 +817,42 @@ void FEDiscreteContact2::ProjectNodes()
 				// evaluate center
 				vec3d c = (ra + rb)*0.5;
 
-				// project onto surface
-				vec2d rs(r,s);
-				vec3d q;
-				FESurfaceElement* pe = cpp.Project(c, q, rs);
+				// try the same element first
+				FESurfaceElement* pe = nodeData.pe;
+				vec3d q = m_surf.ProjectToSurface(mel, c, r, s);
+				if (m_surf.IsInsideElement(mel, r, s, 0.05) == false)
+				{
+					// project onto surface
+					vec2d rs(r,s);
+					pe = cpp.Project(c, q, rs);
+					r = rs.x();
+					s = rs.y();
+				}
+
 				if (pe)
 				{
-					vec3d nu = m_surf.SurfaceNormal(*pe, rs.x(), rs.y());
+					vec3d nu = m_surf.SurfaceNormal(*pe, r, s);
 					double gap = nu*(c - q);
-					if (gap < 0)
+					if (gap < 0.0)
 					{
 						nodeData.pe = pe;
-						nodeData.proj[0] = rs.x();
-						nodeData.proj[1] = rs.y();
+						nodeData.proj[0] = r;
+						nodeData.proj[1] = s;
 						nodeData.nu = nu;
 						nodeData.q = q;
 
 						// see if the node moved significantly
 						double d = (q - x).norm();
-						if (d / L > 1e-5) bdone = false;
+						if (d / L > 1e-2) bdone = false;
 					}
-					else
+					else if (gap > snap_tol)
+					{
+						// projection failed, release node and redo
+						m_dom->AnchorNode(i, false);
+						nodeData.pe = 0;
+						bdone = false;
+					}
+					else if ((x - c).norm2() > snap_tol)
 					{
 						// projection failed, release node and redo
 						m_dom->AnchorNode(i, false);
@@ -886,6 +905,6 @@ void FEDiscreteContact2::ProjectNodes()
 		m_dom->UpdateNodes();
 	}
 
-	assert(iter < maxIter);
+//	assert(iter < maxIter);
 	felog.printf("iterations = %d\n", iter);
 }

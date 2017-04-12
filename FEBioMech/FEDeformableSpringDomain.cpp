@@ -563,7 +563,8 @@ double FEDeformableSpringDomain2::InitialLength()
 		vec3d& r1 = n1.m_r0;
 		vec3d& r2 = n2.m_r0;
 
-		L += (r2 - r1).norm();
+		double DL = (r2 - r1).norm();
+		L += DL;
 	}
 	return L;
 }
@@ -587,7 +588,8 @@ double FEDeformableSpringDomain2::CurrentLength()
 		vec3d& r1 = n1.m_rt;
 		vec3d& r2 = n2.m_rt;
 
-		L += (r2 - r1).norm();
+		double DL = (r2 - r1).norm();
+		L += DL;
 	}
 	return L;
 }

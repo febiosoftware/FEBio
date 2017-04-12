@@ -419,6 +419,31 @@ bool project2surf(FESurfaceElement& el, vec3d* y, vec3d x, double& r, double& s,
 }
 
 //-----------------------------------------------------------------------------
+vec3d FESurface::Position(FESurfaceElement& el, double r, double s)
+{
+	// get the mesh to which this surface belongs
+	FEMesh& mesh = *m_pMesh;
+
+	// number of element nodes
+	int ne = el.Nodes();
+
+	// get the elements nodal positions
+	vec3d y[FEElement::MAX_NODES];
+	for (int i = 0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
+
+	double H[FEElement::MAX_NODES];
+	el.shape_fnc(H, r, s);
+
+	vec3d q(0,0,0);
+	for (int i=0; i<ne; ++i)
+	{
+		q += y[i]*H[i];
+	}
+
+	return q;
+}
+
+//-----------------------------------------------------------------------------
 //! This function calculates the projection of x on the surface element el.
 //! It does this by finding the solution of the nonlinear equation (x-y)*y,[a]=0,
 //! where the comma denotes differentation and a ranges from 1 to 2.

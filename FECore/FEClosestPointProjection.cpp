@@ -124,13 +124,13 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 
 			// only consider triangles (for now)
 			int N = el.Nodes();
-			if (N == 3)
+			if ((N == 3) || (N == 4))
 			{
 				int kmin = -1;
 				// we got to find a point closer than the closest point
 				double Dmin = (x - rm).norm();
 				vec3d qmin;
-				for (int k=0; k<3; ++k)
+				for (int k=0; k<N; ++k)
 				{
 					// we don't allow projection on boundary edges
 					// so make sure the element has a neighbor
@@ -138,7 +138,7 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 					{
 						// get the two edge node indices
 						int nk1 = el.m_node[k];
-						int nk2 = el.m_node[(k+1)%3];
+						int nk2 = el.m_node[(k+1)%N];
 
 						// make sure one of them is our closest point
 						if ((nk1 == m) || (nk2 == m))
