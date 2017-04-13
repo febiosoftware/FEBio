@@ -8,6 +8,7 @@
 
 #include "FEPowellEyringFluid.h"
 #include "FEFluid.h"
+#include <math.h>
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPowellEyringFluid, FEViscousFluid)

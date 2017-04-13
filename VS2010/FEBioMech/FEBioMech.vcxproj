@@ -717,6 +717,7 @@
     <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionTransIsoUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxialUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPrescribedNormalDisplacement.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPressureLoad.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPRLig.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.cpp" />
@@ -917,6 +918,7 @@
     <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionTransIsoUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxial.h" />
     <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxialUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPrescribedNormalDisplacement.h" />
     <ClInclude Include="..\..\FEBioMech\FEPressureLoad.h" />
     <ClInclude Include="..\..\FEBioMech\FEPRLig.h" />
     <ClInclude Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.h" />

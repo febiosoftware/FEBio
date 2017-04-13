@@ -410,6 +410,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidResistanceBC.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidTractionLoad.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidVelocity.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FENewtonianFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEPowellEyringFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialDamping.cpp" />
@@ -438,6 +439,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidResistanceBC.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidTractionLoad.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidVelocity.h" />
     <ClInclude Include="..\..\FEBioFluid\FEIdealFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEIdealGas.h" />
     <ClInclude Include="..\..\FEBioFluid\FENewtonianFluid.h" />
