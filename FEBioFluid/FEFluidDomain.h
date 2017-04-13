@@ -13,7 +13,7 @@ class FEModel;
 class FESolver;
 class FEBodyForce;
 class FEGlobalVector;
-class FETimeInfo;
+struct FETimeInfo;
 
 //-----------------------------------------------------------------------------
 //! Abstract interface class for fluid domains.
