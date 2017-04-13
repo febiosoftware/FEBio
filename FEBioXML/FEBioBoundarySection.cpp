@@ -645,12 +645,27 @@ void FEBioBoundarySection::ParseBC(XMLTag& tag)
 	if (pdc == 0) throw XMLReader::InvalidTag(tag);
 
 	// get the node set
-	const char* szset = tag.AttributeValue("node_set");
-	FENodeSet* nodeSet = mesh.FindNodeSet(szset);;
-	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+	const char* szset = tag.AttributeValue("node_set", true);
+	if (szset)
+	{
+		FENodeSet* nodeSet = mesh.FindNodeSet(szset);
+		if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
-	// add the nodes to the BC
-	pdc->AddNodes(*nodeSet);
+		// add the nodes to the BC
+		pdc->AddNodes(*nodeSet);
+	}
+	else
+	{
+		// if a node set is not defined, see if a surface is defined
+		szset = tag.AttributeValue("surface");
+		FEFacetSet* set = mesh.FindFacetSet(szset);
+		FESurface* surf = new FESurface(&mesh);
+		surf->BuildFromSet(*set);
+
+		pdc->AddNodes(*surf);
+
+		delete surf;		
+	}
 
 	// add this boundary condition to the current step
 	fem.AddPrescribedBC(pdc);

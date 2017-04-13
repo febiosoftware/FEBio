@@ -60,6 +60,9 @@ public:
 	//! return an element of the surface
 	FESurfaceElement& Element(int i) { return m_el[i]; }
 
+	//! return an element of the surface
+	const FESurfaceElement& Element(int i) const { return m_el[i]; }
+
 	//! returns reference to element
 	FEElement& ElementRef(int n) { return m_el[n]; }
 

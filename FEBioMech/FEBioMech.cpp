@@ -174,6 +174,7 @@
 #include "FEDeformableSpringDomain.h"
 #include <FECore/RigidBC.h>
 #include "FEBCPrescribedDeformation.h"
+#include "FEPrescribedNormalDisplacement.h"
 
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
@@ -359,6 +360,7 @@ REGISTER_FECORE_CLASS(FEDeformableSpringDomain2  , FEDOMAIN_ID, "deformable-spri
 // classes derived from FEBoundaryCondition
 REGISTER_FECORE_CLASS(FEBCPrescribedDeformation  , FEBC_ID, "prescribed deformation"   );
 REGISTER_FECORE_CLASS(FEBCPrescribedDeformation2O, FEBC_ID, "prescribed deformation 2O");
+REGISTER_FECORE_CLASS(FEPrescribedNormalDisplacement, FEBC_ID, "normal displacement");
 
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad

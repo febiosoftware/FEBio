@@ -6,6 +6,7 @@
 
 class FESolver;
 class FENodeSet;
+class FESurface;
 
 //-----------------------------------------------------------------------------
 //! Nodal load boundary condition
@@ -100,7 +101,10 @@ public:
 	// implement these functions
 
 	// assign a node set to the prescribed BC
-	virtual void AddNodes(const FENodeSet& set) = 0;
+	virtual void AddNodes(const FENodeSet& set) {};
+
+	// assign a surface to the BC
+	virtual void AddNodes(const FESurface& surf) {}
 
 	// This function is called when the solver needs to know the 
 	// prescribed dof values. The brel flag indicates wheter the total 
