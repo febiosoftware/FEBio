@@ -160,25 +160,25 @@ double FEFluid::AcousticSpeed(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! calculate strain energy density (per referential volume)
+//! calculate strain energy density (per current volume)
 double FEFluid::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double sed = m_k*pow(fp.m_J-1,2)/2;
+    double sed = m_k*pow(fp.m_J-1,2)/2/fp.m_J;
     return sed;
 }
 
 //-----------------------------------------------------------------------------
-//! calculate kinetic energy density (per referential volume)
+//! calculate kinetic energy density (per current volume)
 double FEFluid::KineticEnergyDensity(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double ked = m_rhor*(fp.m_vt*fp.m_vt)/2;
+    double ked = m_rhor/fp.m_J*(fp.m_vt*fp.m_vt)/2;
     return ked;
 }
 
 //-----------------------------------------------------------------------------
-//! calculate energy density
+//! calculate strain + kinetic energy density (per current volume)
 double FEFluid::EnergyDensity(FEMaterialPoint& mp)
 {
     return StrainEnergyDensity(mp) + KineticEnergyDensity(mp);
