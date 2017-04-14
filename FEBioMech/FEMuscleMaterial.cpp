@@ -129,12 +129,11 @@ mat3ds FEMuscleMaterial::DevStress(FEMaterialPoint& mp)
 
 	// calculate passive fiber force
 	double Fp;
-/*	if (lat <= m_Lofl)
+	if (lat <= m_Lofl)
 	{
 		Fp = 0;
 	}
-	else if (lat < lam1)
-*/	if (lat < m_lam1)
+	else if (lat < m_lam1)
 	{
 		Fp = m_P1*(exp(m_P2*(lat/m_Lofl - 1)) - 1);
 	}
@@ -294,13 +293,12 @@ tens4ds FEMuscleMaterial::DevTangent(FEMaterialPoint& mp)
 
 	// calculate passive fiber force
 	double Fp, FpDl;
-/*	if (lat <= m_Lofl)
+	if (lat <= m_Lofl)
 	{
 		Fp = 0;
 		FpDl = 0;
 	}
-	else if (lat < lam1)
-*/	if (lat < m_lam1)
+	else if (lat < m_lam1)
 	{
 		Fp = m_P1*(exp(m_P2*(lat/m_Lofl - 1)) - 1);
 		FpDl = m_P1*m_P2*exp(m_P2*(lat/m_Lofl-1))/m_Lofl;
