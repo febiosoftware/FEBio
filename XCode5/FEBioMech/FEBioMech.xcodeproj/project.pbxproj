@@ -176,6 +176,8 @@
 		D5D4CC211BF7D6CD00A2BD96 /* FEMortarInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D4CC1D1BF7D6CD00A2BD96 /* FEMortarInterface.h */; };
 		D5D806081C7D270B00547F07 /* FEElasticMaterial2O.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D806061C7D270B00547F07 /* FEElasticMaterial2O.cpp */; };
 		D5D806091C7D270B00547F07 /* FEElasticMaterial2O.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D806071C7D270B00547F07 /* FEElasticMaterial2O.h */; };
+		D5DA05F81EA0FA3200DE7D7D /* FEPrescribedNormalDisplacement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5DA05F61EA0FA3200DE7D7D /* FEPrescribedNormalDisplacement.cpp */; };
+		D5DA05F91EA0FA3200DE7D7D /* FEPrescribedNormalDisplacement.h in Headers */ = {isa = PBXBuildFile; fileRef = D5DA05F71EA0FA3200DE7D7D /* FEPrescribedNormalDisplacement.h */; };
 		D5DAFE531E29A6A900E06376 /* FERigidSlidingContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5DAFE511E29A6A900E06376 /* FERigidSlidingContact.cpp */; };
 		D5DAFE541E29A6A900E06376 /* FERigidSlidingContact.h in Headers */ = {isa = PBXBuildFile; fileRef = D5DAFE521E29A6A900E06376 /* FERigidSlidingContact.h */; };
 		D5E107741865DFAD00B23922 /* FE2DFiberNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1068D1865DFAC00B23922 /* FE2DFiberNeoHookean.cpp */; };
@@ -578,6 +580,8 @@
 		D5D4CC1D1BF7D6CD00A2BD96 /* FEMortarInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMortarInterface.h; sourceTree = "<group>"; };
 		D5D806061C7D270B00547F07 /* FEElasticMaterial2O.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElasticMaterial2O.cpp; sourceTree = "<group>"; };
 		D5D806071C7D270B00547F07 /* FEElasticMaterial2O.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElasticMaterial2O.h; sourceTree = "<group>"; };
+		D5DA05F61EA0FA3200DE7D7D /* FEPrescribedNormalDisplacement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPrescribedNormalDisplacement.cpp; sourceTree = "<group>"; };
+		D5DA05F71EA0FA3200DE7D7D /* FEPrescribedNormalDisplacement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPrescribedNormalDisplacement.h; sourceTree = "<group>"; };
 		D5DAFE511E29A6A900E06376 /* FERigidSlidingContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidSlidingContact.cpp; sourceTree = "<group>"; };
 		D5DAFE521E29A6A900E06376 /* FERigidSlidingContact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidSlidingContact.h; sourceTree = "<group>"; };
 		D5E106851865DF9F00B23922 /* libFEBioMech.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioMech.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1105,6 +1109,8 @@
 				D54CBEF71AB31FD3003CF33F /* FEPrescribedActiveContractionUniaxial.h */,
 				D54CBEFA1AB3289C003CF33F /* FEPrescribedActiveContractionUniaxialUC.cpp */,
 				D54CBEFB1AB3289C003CF33F /* FEPrescribedActiveContractionUniaxialUC.h */,
+				D5DA05F61EA0FA3200DE7D7D /* FEPrescribedNormalDisplacement.cpp */,
+				D5DA05F71EA0FA3200DE7D7D /* FEPrescribedNormalDisplacement.h */,
 				D5E107231865DFAD00B23922 /* FEPressureLoad.cpp */,
 				D5E107241865DFAD00B23922 /* FEPressureLoad.h */,
 				D515BD3818DB3D7B00B661B2 /* FEPRLig.cpp */,
@@ -1319,6 +1325,7 @@
 				D5E108321865DFAD00B23922 /* FESurfaceConstraint.h in Headers */,
 				D5E108201865DFAD00B23922 /* FESlidingInterfaceBW.h in Headers */,
 				D5B042551D97270E00519C2B /* FEDeformableSpringDomain.h in Headers */,
+				D5DA05F91EA0FA3200DE7D7D /* FEPrescribedNormalDisplacement.h in Headers */,
 				D5E107F21865DFAD00B23922 /* FEMooneyRivlin.h in Headers */,
 				D593574D1B11046A00AF4DF8 /* FERigidContractileForce.h in Headers */,
 				D5E107B61865DFAD00B23922 /* FEElasticShellDomain.h in Headers */,
@@ -1537,6 +1544,7 @@
 				D53981761D8244A400F07DD6 /* FEPeriodicLinearConstraint.cpp in Sources */,
 				D5E108531865DFAD00B23922 /* FEViscoElasticMaterial.cpp in Sources */,
 				D5E107861865DFAD00B23922 /* FEBodyForce.cpp in Sources */,
+				D5DA05F81EA0FA3200DE7D7D /* FEPrescribedNormalDisplacement.cpp in Sources */,
 				D5E1081D1865DFAD00B23922 /* FESlidingInterface.cpp in Sources */,
 				D5E1079E1865DFAD00B23922 /* FEDonnanEquilibrium.cpp in Sources */,
 				D5E107841865DFAD00B23922 /* FEBioMechPlot.cpp in Sources */,

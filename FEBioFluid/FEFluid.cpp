@@ -19,7 +19,6 @@ FEFluidMaterialPoint::FEFluidMaterialPoint()
     m_Jdot = 0;
     m_vt = m_at = m_gradJ = vec3d(0,0,0);
     m_s.zero();
-    m_L.zero();
 }
 
 //-----------------------------------------------------------------------------
