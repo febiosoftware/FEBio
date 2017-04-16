@@ -46,8 +46,11 @@ void FEGlobalMatrix::build_begin(int neq)
 //! all elements in this array are added to the matrix profile.
 void FEGlobalMatrix::build_add(vector<int>& lm)
 {
-	m_LM[m_nlm++] = lm;
-	if (m_nlm >= MAX_LM_SIZE) build_flush();
+	if (lm.empty() == false)
+	{
+		m_LM[m_nlm++] = lm;
+		if (m_nlm >= MAX_LM_SIZE) build_flush();
+	}
 }
 
 //-----------------------------------------------------------------------------

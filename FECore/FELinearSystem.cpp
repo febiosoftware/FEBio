@@ -10,6 +10,8 @@ FELinearSystem::FELinearSystem(FEGlobalMatrix& K, vector<double>& F, vector<doub
 //! assemble global stiffness matrix
 void FELinearSystem::AssembleLHS(vector<int>& elm, matrix& ke)
 {
+	if (elm.empty()) return;
+
 	// assemble into the global stiffness
 	m_K.Assemble(ke, elm);
 
