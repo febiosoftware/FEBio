@@ -7,6 +7,7 @@
 #include "FESurface.h"
 #include "FEMesh.h"
 #include "FEDomain.h"
+#include "FEShellDomain.h"
 
 //-----------------------------------------------------------------------------
 int FENodeElemList::MaxValence()
@@ -122,20 +123,42 @@ void FENodeElemList::Create(FEMesh& mesh)
 	for (i=0; i<NN; ++i) m_nval[i] = 0;
 
 	// fill eref table
+    // Prioritize shell domains over other domains.
+    // This is needed when shells are connected to solids
+    // and contact interfaces need to use the shell properties
+    // for auto-penalty calculation.
 	for (nd=0; nd<mesh.Domains(); ++nd)
 	{
 		FEDomain& d = mesh.Domain(nd);
-		for (i=0; i<d.Elements(); ++i)
-		{
-			FEElement& el = d.ElementRef(i);
-			for (j=0; j<el.Nodes(); ++j)
-			{
-				n = el.m_node[j];
-				m_eref[m_pn[n] + m_nval[n]] = &el;
-				m_nval[n]++;
-			}
-		}
+        if (dynamic_cast<FEShellDomain*>(&d)) {
+            for (i=0; i<d.Elements(); ++i)
+            {
+                FEElement& el = d.ElementRef(i);
+                for (j=0; j<el.Nodes(); ++j)
+                {
+                    n = el.m_node[j];
+                    m_eref[m_pn[n] + m_nval[n]] = &el;
+                    m_nval[n]++;
+                }
+            }
+        }
 	}
+    for (nd=0; nd<mesh.Domains(); ++nd)
+    {
+        FEDomain& d = mesh.Domain(nd);
+        if (dynamic_cast<FEShellDomain*>(&d) == nullptr) {
+            for (i=0; i<d.Elements(); ++i)
+            {
+                FEElement& el = d.ElementRef(i);
+                for (j=0; j<el.Nodes(); ++j)
+                {
+                    n = el.m_node[j];
+                    m_eref[m_pn[n] + m_nval[n]] = &el;
+                    m_nval[n]++;
+                }
+            }
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
