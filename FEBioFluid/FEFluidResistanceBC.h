@@ -47,6 +47,7 @@ private:
     double			m_R;	//!< flow resistance
     double          m_k;    //!< fluid bulk modulus
     double          m_alpha;
+    double          m_p0;   //!< fluid pressure offset
     
     int		m_dofVX;
     int		m_dofVY;

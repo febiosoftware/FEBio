@@ -14,6 +14,7 @@
 //=============================================================================
 BEGIN_PARAMETER_LIST(FEFluidResistanceBC, FESurfaceLoad)
 ADD_PARAMETER(m_R, FE_PARAM_DOUBLE    , "R");
+ADD_PARAMETER(m_p0, FE_PARAM_DOUBLE   , "pressure_offset");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -23,6 +24,7 @@ FEFluidResistanceBC::FEFluidResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem)
     m_R = 0.0;
     m_k = 1.0;
     m_alpha = 1.0;
+    m_p0 = 0;
     
     m_dofVX = pfem->GetDOFIndex("vx");
     m_dofVY = pfem->GetDOFIndex("vy");
@@ -92,7 +94,7 @@ void FEFluidResistanceBC::SetDilatation()
     double p = m_R*Q;
     
     // calculate the dilatation
-    double e = -p/m_k;
+    double e = -(p+m_p0)/m_k;
     
     // prescribe this dilatation at the nodes
     FESurface* ps = &GetSurface();
