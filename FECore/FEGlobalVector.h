@@ -28,6 +28,9 @@ public:
 	//! Get the FE model
 	FEModel& GetFEModel() { return m_fem; }
 
+	//! get the size of the vector
+	int Size() const { return (int) m_R.size(); }
+
 protected:
 	FEModel&			m_fem;	//!< model
 	vector<double>&		m_R;	//!< residual

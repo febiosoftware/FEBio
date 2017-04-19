@@ -99,8 +99,7 @@ bool FELinearSolidSolver::Quasin(double time)
 		ReformStiffness(tp);
 
 		// solve the equations
-		if (m_plinsolve->BackSolve(du, m_R) == false)
-			throw LinearSolverFailed();
+		SolveLinearSystem(du, m_R);
 
 		// update solution
 		// NOTE: m_u is not being used in Update!

@@ -40,6 +40,9 @@ public: // overloaded from FESolver
 	//! Initialize linear equation system
 	bool InitEquations();
 
+	//! return number of equations
+	int NumberOfEquations() const { return m_neq; }
+
 	//! Clean up
 	void Clean();
 
@@ -62,6 +65,9 @@ public:
 protected:
 	//! Performs a linesearch
 	double LineSearch(double s);
+
+	//! solve the linear system of equations
+	void SolveLinearSystem(vector<double>& x, vector<double>& R);
 
 	//! Do a Quasi-Newton step
 	//! This is called from SolveStep and must be implemented by derived classes.

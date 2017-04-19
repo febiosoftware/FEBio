@@ -471,6 +471,17 @@ bool FENewtonSolver::SolveStep(double time)
 }
 
 //-----------------------------------------------------------------------------
+//! Solve the linear system of equations.
+//! x is the solution vector
+//! R is the right-hand-side vector
+void FENewtonSolver::SolveLinearSystem(vector<double>& x, vector<double>& R)
+{
+	// solve the equations
+	if (m_plinsolve->BackSolve(x, R) == false)
+		throw LinearSolverFailed();
+}
+
+//-----------------------------------------------------------------------------
 //! Performs a linesearch on a NR iteration
 //! The description of this method can be found in:
 //!    "Nonlinear Continuum Mechanics for Finite Element Analysis", 	Bonet & Wood.

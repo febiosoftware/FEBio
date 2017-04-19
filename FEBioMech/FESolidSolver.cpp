@@ -598,7 +598,10 @@ bool FESolidSolver::Quasin(double time)
 		if ((m_LStol > 0) && (s < m_LSmin)) bconv = false;
 
 		// check energy divergence
-		if (normE1 > normEm) bconv = false;
+		if (m_bdivreform)
+		{
+			if (normE1 > normEm) bconv = false;
+		}
 
 		// print convergence summary
 		oldmode = felog.GetMode();
