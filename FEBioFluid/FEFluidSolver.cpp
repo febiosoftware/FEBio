@@ -941,7 +941,9 @@ void FEFluidSolver::AssembleResidual(int node_id, int dof, double f, vector<doub
     int n = node.m_ID[dof];
     
     // assemble into global vector
-    if (n >= 0) R[n] += f;
+    if (n >= 0)
+#pragma omp atomic
+        R[n] += f;
 }
 
 //-----------------------------------------------------------------------------
