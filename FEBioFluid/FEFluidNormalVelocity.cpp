@@ -65,17 +65,16 @@ void FEFluidNormalVelocity::UnpackLM(FEElement& el, vector<int>& lm)
 //! Calculate the residual for the prescribed normal velocity
 void FEFluidNormalVelocity::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 {
-    FEModel& fem = R.GetFEModel();
-    
-    vector<double> fe;
-    vector<int> elm;
-    
-    vec3d r0[FEElement::MAX_NODES];
-    
-    int i, n;
     int npr = (int)m_VC.size();
+#pragma omp parallel for
     for (int iel=0; iel<npr; ++iel)
     {
+        int i, n;
+        vector<double> fe;
+        vector<int> elm;
+        
+        vec3d r0[FEElement::MAX_NODES];
+        
         FESurfaceElement& el = m_psurf->Element(iel);
         
         int ndof = el.Nodes();

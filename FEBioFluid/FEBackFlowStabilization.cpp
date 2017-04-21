@@ -188,13 +188,14 @@ void FEBackFlowStabilization::ElementForce(FESurfaceElement& el, vector<double>&
 //-----------------------------------------------------------------------------
 void FEBackFlowStabilization::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 {
-    matrix ke;
-    vector<int> lm;
-    
     FESurface& surf = GetSurface();
     int npr = surf.Elements();
+#pragma omp parallel for
     for (int m=0; m<npr; ++m)
     {
+        matrix ke;
+        vector<int> lm;
+        
         // get the surface element
         FESurfaceElement& el = m_psurf->Element(m);
         
@@ -213,6 +214,7 @@ void FEBackFlowStabilization::StiffnessMatrix(const FETimeInfo& tp, FESolver* ps
         UnpackLM(el, lm);
         
         // assemble element matrix in global stiffness matrix
+#pragma omp critical
         psolver->AssembleStiffness(el.m_node, lm, ke);
     }
 }
@@ -220,13 +222,14 @@ void FEBackFlowStabilization::StiffnessMatrix(const FETimeInfo& tp, FESolver* ps
 //-----------------------------------------------------------------------------
 void FEBackFlowStabilization::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 {
-    vector<double> fe;
-    vector<int> lm;
-    
     FESurface& surf = GetSurface();
     int npr = surf.Elements();
+#pragma omp parallel for
     for (int i=0; i<npr; ++i)
     {
+        vector<double> fe;
+        vector<int> lm;
+        
         FESurfaceElement& el = m_psurf->Element(i);
         
         // calculate nodal normal tractions
