@@ -310,7 +310,10 @@ bool FEMultiphasicSolver::Quasin(double time)
 		if ((m_LStol > 0) && (s < m_LSmin)) bconv = false;
 
 		// check energy divergence
-		if (normE1 > normEm) bconv = false;
+		if (m_bdivreform)
+		{
+			if (normE1 > normEm) bconv = false;
+		}
 
 		// check poroelastic convergence
 		m_UpdateTime.start();
@@ -402,7 +405,7 @@ bool FEMultiphasicSolver::Quasin(double time)
 				felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
 				breform = true;
 			}
-			else if (normE1 > normEm)
+			else if ((normE1 > normEm) && m_bdivreform)
 			{
 				// check for diverging
 				felog.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
