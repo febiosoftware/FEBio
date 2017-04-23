@@ -109,6 +109,134 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotFluidSurfaceTractionPower::Save(FESurface &surf, FEDataStream &a)
+{
+    FESurface* pcs = &surf;
+    if (pcs == 0) return false;
+    
+    // Evaluate this field only for a specific domain, by checking domain name
+    if (strcmp(pcs->GetName(), "") == 0) return false;
+    if (strcmp(pcs->GetName(), m_szdom) != 0) return false;
+    
+    int NF = pcs->Elements();
+    double fn = 0;    // initialize
+    
+    FEMesh* m_pMesh = pcs->GetMesh();
+    
+    // initialize on the first pass to calculate the vectorial area of each surface element and to identify solid element associated with this surface element
+    if (m_binit) {
+        m_area.resize(NF);
+        m_elem.resize(NF);
+        for (int j=0; j<NF; ++j)
+        {
+            FESurfaceElement& el = pcs->Element(j);
+            m_area[j] = pcs->SurfaceNormal(el,0,0)*pcs->FaceArea(el);
+            m_elem[j] = m_pMesh->FindElementFromID(pcs->FindElement(el));
+        }
+        m_binit = false;
+    }
+    
+    // calculate net fluid force
+    for (int j=0; j<NF; ++j)
+    {
+        // get the element this surface element belongs to
+        FEElement* pe = m_elem[j];
+        if (pe)
+        {
+            // get the material
+            FEMaterial* pm = m_pfem->GetMaterial(pe->GetMatID());
+            
+            // see if this is a fluid element
+            FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
+            if (fluid) {
+                // evaluate the average stress in this element
+                int nint = pe->GaussPoints();
+                double s = 0;
+                for (int n=0; n<nint; ++n)
+                {
+                    FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+                    FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+                    s += pt.m_vt*(pt.m_s*m_area[j]);
+                }
+                s /= nint;
+                
+                // Evaluate contribution to net traction power on surface.
+                fn += s;
+            }
+        }
+    }
+    
+    // save results
+    a << fn;
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidSurfaceEnergyFlux::Save(FESurface &surf, FEDataStream &a)
+{
+    FESurface* pcs = &surf;
+    if (pcs == 0) return false;
+    
+    // Evaluate this field only for a specific domain, by checking domain name
+    if (strcmp(pcs->GetName(), "") == 0) return false;
+    if (strcmp(pcs->GetName(), m_szdom) != 0) return false;
+    
+    int NF = pcs->Elements();
+    double fn = 0;    // initialize
+    
+    FEMesh* m_pMesh = pcs->GetMesh();
+    
+    // initialize on the first pass to calculate the vectorial area of each surface element and to identify solid element associated with this surface element
+    if (m_binit) {
+        m_area.resize(NF);
+        m_elem.resize(NF);
+        for (int j=0; j<NF; ++j)
+        {
+            FESurfaceElement& el = pcs->Element(j);
+            m_area[j] = pcs->SurfaceNormal(el,0,0)*pcs->FaceArea(el);
+            m_elem[j] = m_pMesh->FindElementFromID(pcs->FindElement(el));
+        }
+        m_binit = false;
+    }
+    
+    // calculate net fluid force
+    for (int j=0; j<NF; ++j)
+    {
+        // get the element this surface element belongs to
+        FEElement* pe = m_elem[j];
+        if (pe)
+        {
+            // get the material
+            FEMaterial* pm = m_pfem->GetMaterial(pe->GetMatID());
+            
+            // see if this is a fluid element
+            FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
+            if (fluid) {
+                // evaluate the average stress in this element
+                int nint = pe->GaussPoints();
+                double s = 0;
+                for (int n=0; n<nint; ++n)
+                {
+                    FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+                    FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+                    s += fluid->EnergyDensity(mp)*(pt.m_vt*m_area[j]);
+                }
+                s /= nint;
+                
+                // Evaluate contribution to net energy flux on surface.
+                fn += s;
+            }
+        }
+    }
+    
+    // save results
+    a << fn;
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotFluidMassFlowRate::Save(FESurface &surf, FEDataStream &a)
 {
     FESurface* pcs = &surf;
@@ -450,7 +578,7 @@ bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidStressPower::Save(FEDomain &dom, FEDataStream& a)
+bool FEPlotFluidStressPowerDensity::Save(FEDomain &dom, FEDataStream& a)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
     if (pme == 0) return false;
@@ -473,6 +601,39 @@ bool FEPlotFluidStressPower::Save(FEDomain &dom, FEDataStream& a)
             FEMaterialPoint& mp = *el.GetMaterialPoint(j);
             FEFluidMaterialPoint* ppt = (mp.ExtractData<FEFluidMaterialPoint>());
             if (ppt) r += (ppt->m_s*ppt->m_L).trace();
+        }
+        r *= f;
+        
+        a << r;
+    }
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidHeatSupplyDensity::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
+    if (pme == 0) return false;
+    
+    // write solid element data
+    int N = dom.Elements();
+    for (int i=0; i<N; ++i)
+    {
+        FEElement& el = dom.ElementRef(i);
+        
+        int nint = el.GaussPoints();
+        double f = 1.0 / (double) nint;
+        
+        // since the PLOT file requires floats we need to convert
+        // the doubles to single precision
+        // we output the average stress power values of the gauss points
+        double r = 0;
+        for (int j=0; j<nint; ++j)
+        {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+            FEFluidMaterialPoint* ppt = (mp.ExtractData<FEFluidMaterialPoint>());
+            if (ppt) r -= (pme->GetViscous()->Stress(mp)*ppt->m_L).trace();
         }
         r *= f;
         

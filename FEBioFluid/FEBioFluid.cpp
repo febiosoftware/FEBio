@@ -83,8 +83,11 @@ REGISTER_FECORE_CLASS(FEPlotFluidAcceleration       , FEPLOTDATA_ID, "fluid acce
 REGISTER_FECORE_CLASS(FEPlotFluidVorticity          , FEPLOTDATA_ID, "fluid vorticity"          );
 REGISTER_FECORE_CLASS(FEPlotElementFluidStress      , FEPLOTDATA_ID, "fluid stress"             );
 REGISTER_FECORE_CLASS(FEPlotElementFluidRateOfDef   , FEPLOTDATA_ID, "fluid rate of deformation");
-REGISTER_FECORE_CLASS(FEPlotFluidStressPower        , FEPLOTDATA_ID, "fluid stress power"       );
+REGISTER_FECORE_CLASS(FEPlotFluidStressPowerDensity , FEPLOTDATA_ID, "fluid stress power density");
+REGISTER_FECORE_CLASS(FEPlotFluidHeatSupplyDensity  , FEPLOTDATA_ID, "fluid heat supply density");
 REGISTER_FECORE_CLASS(FEPlotFluidSurfaceForce       , FEPLOTDATA_ID, "fluid surface force"      );
+REGISTER_FECORE_CLASS(FEPlotFluidSurfaceTractionPower, FEPLOTDATA_ID, "fluid surface traction power");
+REGISTER_FECORE_CLASS(FEPlotFluidSurfaceEnergyFlux  , FEPLOTDATA_ID, "fluid surface energy flux");
 REGISTER_FECORE_CLASS(FEPlotFluidShearViscosity     , FEPLOTDATA_ID, "fluid shear viscosity"    );
 REGISTER_FECORE_CLASS(FEPlotFluidMassFlowRate       , FEPLOTDATA_ID, "fluid mass flow rate"     );
 REGISTER_FECORE_CLASS(FEPlotFluidStrainEnergyDensity, FEPLOTDATA_ID, "fluid strain energy density");

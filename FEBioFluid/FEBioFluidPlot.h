@@ -45,6 +45,38 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Fluid surface traction power
+//!
+class FEPlotFluidSurfaceTractionPower : public FESurfaceData
+{
+private:
+    FEModel*            m_pfem;
+    bool                m_binit;
+    vector<FEElement*>  m_elem;
+    vector<vec3d>       m_area;
+    
+public:
+    FEPlotFluidSurfaceTractionPower(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; m_binit = true; }
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Fluid surface energy flux
+//!
+class FEPlotFluidSurfaceEnergyFlux : public FESurfaceData
+{
+private:
+    FEModel*            m_pfem;
+    bool                m_binit;
+    vector<FEElement*>  m_elem;
+    vector<vec3d>       m_area;
+    
+public:
+    FEPlotFluidSurfaceEnergyFlux(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; m_binit = true; }
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Fluid mass flow rate
 //!
 class FEPlotFluidMassFlowRate : public FESurfaceData
@@ -136,11 +168,20 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Element fluid stress power
-class FEPlotFluidStressPower : public FEDomainData
+//! Element fluid stress power density
+class FEPlotFluidStressPowerDensity : public FEDomainData
 {
 public:
-    FEPlotFluidStressPower(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotFluidStressPowerDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element fluid heat supply density
+class FEPlotFluidHeatSupplyDensity : public FEDomainData
+{
+public:
+    FEPlotFluidHeatSupplyDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
