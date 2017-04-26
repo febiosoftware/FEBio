@@ -66,7 +66,7 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 			int nlp = tag.children();
 
 			// create the loadcurve
-			FEDataLoadCurve* plc = new FEDataLoadCurve(&fem);
+			FEDataLoadCurve* plc = dynamic_cast<FEDataLoadCurve*>(fecore_new<FELoadCurve>(FELOADCURVE_ID, "loadcurve", &fem));
 			plc->SetInterpolation(ntype);
 			plc->SetExtendMode(nextm);
 
