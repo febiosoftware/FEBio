@@ -343,6 +343,9 @@ public:
 		((FESurfaceElementTraits*)m_pT)->project_to_nodes(ai, ao);
 	}
 
+    //! this function projects vector data from the gauss-points to the nodal points
+    void project_to_nodes(vec3d* ai, vec3d* ao);
+    
     //! return number of edges
     int facet_edges();
     
