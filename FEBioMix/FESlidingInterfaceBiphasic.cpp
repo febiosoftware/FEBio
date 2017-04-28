@@ -512,7 +512,6 @@ void FESlidingInterfaceBiphasic::BuildMatrixProfile(FEGlobalMatrix& K)
     for (int np=0; np<npass; ++np)
     {
         FESlidingSurfaceBiphasic& ss = (np == 0? m_ss : m_ms);
-        FESlidingSurfaceBiphasic& ms = (np == 0? m_ms : m_ss);
         
         int k, l;
         for (int j=0; j<ss.Elements(); ++j)
@@ -1066,9 +1065,6 @@ void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
     
     FEModel& fem = *GetFEModel();
     
-    // get the mesh
-    FEMesh* pm = m_ss.GetMesh();
-    
     // if we're using the symmetric formulation
     // we need to multiply with the timestep
     double dt = fem.GetCurrentStep()->m_dt;
@@ -1244,7 +1240,6 @@ void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
 {
-    int i, j, k, l;
     vector<int> sLM, mLM, LM, en;
     const int MN = FEElement::MAX_NODES;
     double detJ[MN], w[MN], *Hs, Hm[MN], pt[MN], dpr[MN], dps[MN];
@@ -1283,7 +1278,7 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
         FEMesh& mesh = *ms.GetMesh();
         
         // loop over all slave elements
-        for (i=0; i<ss.Elements(); ++i)
+        for (int i=0; i<ss.Elements(); ++i)
         {
             // get ths slave element
             FESurfaceElement& se = ss.Element(i);
@@ -1296,14 +1291,14 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
             
             // nodal pressures
             double pn[MN];
-            for (j=0; j<nseln; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).get(m_dofP);
+            for (int j=0; j<nseln; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).get(m_dofP);
             
             // copy the LM vector
             ss.UnpackLM(se, sLM);
             
             // we calculate all the metrics we need before we
             // calculate the nodal forces
-            for (j=0; j<nint; ++j)
+            for (int j=0; j<nint; ++j)
             {
                 // get the base vectors
                 vec3d g[2];
@@ -1325,7 +1320,7 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
             }
             
             // loop over all integration points
-            for (j=0; j<nint; ++j)
+            for (int j=0; j<nint; ++j)
             {
                 // get integration point data
                 FESlidingSurfaceBiphasic::Data& pt = ss.m_Data[i][j];
@@ -1343,7 +1338,7 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                     
                     // nodal pressure
                     double pm[MN];
-                    for (k=0; k<nmeln; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).get(m_dofP);
+                    for (int k=0; k<nmeln; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).get(m_dofP);
                     
                     // copy the LM vector
                     ms.UnpackLM(me, mLM);
@@ -1359,14 +1354,14 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                         // build the LM vector
                         LM.resize(ndof);
                         
-                        for (k=0; k<nseln; ++k)
+                        for (int k=0; k<nseln; ++k)
                         {
                             LM[4*k  ] = sLM[3*k  ];			// x-dof
                             LM[4*k+1] = sLM[3*k+1];			// y-dof
                             LM[4*k+2] = sLM[3*k+2];			// z-dof
                             LM[4*k+3] = sLM[3*nseln+k];		// p-dof
                         }
-                        for (k=0; k<nmeln; ++k)
+                        for (int k=0; k<nmeln; ++k)
                         {
                             LM[4*(k+nseln)  ] = mLM[3*k  ];			// x-dof
                             LM[4*(k+nseln)+1] = mLM[3*k+1];			// y-dof
@@ -1383,14 +1378,14 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                         // build the LM vector
                         LM.resize(ndof);
                         
-                        for (k=0; k<nseln; ++k)
+                        for (int k=0; k<nseln; ++k)
                         {
                             LM[3*k  ] = sLM[3*k  ];
                             LM[3*k+1] = sLM[3*k+1];
                             LM[3*k+2] = sLM[3*k+2];
                         }
                         
-                        for (k=0; k<nmeln; ++k)
+                        for (int k=0; k<nmeln; ++k)
                         {
                             LM[3*(k+nseln)  ] = mLM[3*k  ];
                             LM[3*(k+nseln)+1] = mLM[3*k+1];
@@ -1400,8 +1395,8 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                     
                     // build the en vector
                     en.resize(nseln+nmeln);
-                    for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
-                    for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
+                    for (int k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
+                    for (int k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
                     
                     // slave shape functions
                     Hs = se.H(j);
@@ -1593,8 +1588,8 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                         {
                             // get the nodal pressures on the master surface
                             double pm[MN];
-                            for (int j=0; j<nmeln; ++j)
-                                pm[j] = mesh.Node(me.m_node[j]).get(m_dofP);
+                            for (int k=0; k<nmeln; ++k)
+                                pm[k] = mesh.Node(me.m_node[k]).get(m_dofP);
                             
                             // evaluate q2
                             double dpr=0, dps = 0;
@@ -1624,8 +1619,8 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                             
                             // a. q-term
                             //-------------------------------------
-                            for (k=0; k<nseln+nmeln; ++k)
-                                for (l=0; l<nseln+nmeln; ++l)
+                            for (int k=0; k<nseln+nmeln; ++k)
+                                for (int l=0; l<nseln+nmeln; ++l)
                                 {
                                     ke[4*k + 3][4*l  ] -= -tmp*epsp*N[k]*N[l]*q2.x;
                                     ke[4*k + 3][4*l+1] -= -tmp*epsp*N[k]*N[l]*q2.y;
@@ -1637,9 +1632,9 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                             // b. A-term
                             //-------------------------------------
                             
-                            for (l=0; l<nseln; ++l) {
+                            for (int l=0; l<nseln; ++l) {
                                 vec3d Acn = Ac[l]*nu;
-                                for (k=0; k<nseln+nmeln; ++k)
+                                for (int k=0; k<nseln+nmeln; ++k)
                                 {
                                     ke[4*k + 3][4*l  ] -= tmp*wn*N[k]*Acn.x;
                                     ke[4*k + 3][4*l+1] -= tmp*wn*N[k]*Acn.y;
@@ -1650,8 +1645,8 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                             // c. m-term
                             //---------------------------------------
                             
-                            for (k=0; k<nmeln; ++k) {
-                                for (l=0; l<nseln+nmeln; ++l)
+                            for (int k=0; k<nmeln; ++k) {
+                                for (int l=0; l<nseln+nmeln; ++l)
                                 {
                                     ke[4*(k+nseln) + 3][4*l  ] -= -tmp*wn*N[l]*mb[k].x;
                                     ke[4*(k+nseln) + 3][4*l+1] -= -tmp*wn*N[l]*mb[k].y;
@@ -1661,8 +1656,8 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                             
                             // d. gc-term
                             //-------------------------------------
-                            for (k=0; k<nseln+nmeln; ++k)
-                                for (l=0; l<nseln; ++l)
+                            for (int k=0; k<nseln+nmeln; ++k)
+                                for (int l=0; l<nseln; ++l)
                                 {
                                     ke[4*k + 3][4*l  ] -= tmp*epsp*N[k]*gc[l]*nu.x;
                                     ke[4*k + 3][4*l+1] -= tmp*epsp*N[k]*gc[l]*nu.y;
@@ -1672,8 +1667,8 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                             // e. Gbc-term
                             //---------------------------------------
                             
-                            for (k=0; k<nmeln; ++k) {
-                                for (l=0; l<nseln; ++l)
+                            for (int k=0; k<nmeln; ++k) {
+                                for (int l=0; l<nseln; ++l)
                                 {
                                     ke[4*(k+nseln) + 3][4*l  ] -= tmp*wn*Gbc[k][l]*nu.x;
                                     ke[4*(k+nseln) + 3][4*l+1] -= tmp*wn*Gbc[k][l]*nu.y;
@@ -1684,7 +1679,7 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                             // --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
                             
                             // calculate the N-vector
-                            for (k=0; k<nseln; ++k)
+                            for (int k=0; k<nseln; ++k)
                             {
                                 N[ndpn*k  ] = 0;
                                 N[ndpn*k+1] = 0;
@@ -1692,7 +1687,7 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                                 N[ndpn*k+3] = Hs[k];
                             }
                             
-                            for (k=0; k<nmeln; ++k)
+                            for (int k=0; k<nmeln; ++k)
                             {
                                 N[ndpn*(k+nseln)  ] = 0;
                                 N[ndpn*(k+nseln)+1] = 0;
@@ -1700,8 +1695,8 @@ void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
                                 N[ndpn*(k+nseln)+3] = -Hm[k];
                             }
                             
-                            for (k=0; k<ndof; ++k)
-                                for (l=0; l<ndof; ++l) ke[k][l] -= tmp*epsp*N[k]*N[l];
+                            for (int k=0; k<ndof; ++k)
+                                for (int l=0; l<ndof; ++l) ke[k][l] -= tmp*epsp*N[k]*N[l];
                             
                         }
                         
@@ -1773,8 +1768,8 @@ bool FESlidingInterfaceBiphasic::Augment(int naug)
     bool bconv = true;
     
     bool bporo = (m_ss.m_bporo && m_ms.m_bporo);
-    int NS = m_ss.m_Data.size();
-    int NM = m_ms.m_Data.size();
+    int NS = (int)m_ss.m_Data.size();
+    int NM = (int)m_ms.m_Data.size();
     
     // --- c a l c u l a t e   i n i t i a l   n o r m s ---
     // a. normal component
@@ -1912,10 +1907,10 @@ void FESlidingInterfaceBiphasic::Serialize(DumpStream &ar)
     {
         if (ar.IsSaving())
         {
-            int NE = m_ss.m_Data.size();
+            int NE = (int)m_ss.m_Data.size();
             for (int i=0; i<NE; ++i)
             {
-                int NI = m_ss.m_Data[i].size();
+                int NI = (int)m_ss.m_Data[i].size();
                 for (int j=0; j<NI; ++j)
                 {
                     FESurfaceElement* pe = m_ss.m_Data[i][j].m_pme;
@@ -1923,10 +1918,10 @@ void FESlidingInterfaceBiphasic::Serialize(DumpStream &ar)
                 }
             }
             
-            NE = m_ms.m_Data.size();
+            NE = (int)m_ms.m_Data.size();
             for (int i = 0; i<NE; ++i)
             {
-                int NI = m_ms.m_Data[i].size();
+                int NI = (int)m_ms.m_Data[i].size();
                 for (int j = 0; j<NI; ++j)
                 {
                     FESurfaceElement* pe = m_ms.m_Data[i][j].m_pme;
@@ -1936,10 +1931,10 @@ void FESlidingInterfaceBiphasic::Serialize(DumpStream &ar)
         }
         else
         {
-            int NE = m_ss.m_Data.size(), nid;
+            int NE = (int)m_ss.m_Data.size(), nid;
             for (int i = 0; i<NE; ++i)
             {
-                int NI = m_ss.m_Data[i].size();
+                int NI = (int)m_ss.m_Data[i].size();
                 for (int j = 0; j<NI; ++j)
                 {
                     ar >> nid;
@@ -1947,10 +1942,10 @@ void FESlidingInterfaceBiphasic::Serialize(DumpStream &ar)
                 }
             }
             
-            NE = m_ms.m_Data.size();
+            NE = (int)m_ms.m_Data.size();
             for (int i = 0; i<NE; ++i)
             {
-                int NI = m_ms.m_Data[i].size();
+                int NI = (int)m_ms.m_Data[i].size();
                 for (int j = 0; j<NI; ++j)
                 {
                     ar >> nid;
