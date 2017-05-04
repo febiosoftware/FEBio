@@ -328,7 +328,7 @@ void DOFS::GetDOFList(const char* varName, std::vector<int>& dofs)
 }
 
 //-----------------------------------------------------------------------------
-void DOFS::ParseDOFString(const char* sz, std::vector<int>& dofs)
+bool DOFS::ParseDOFString(const char* sz, std::vector<int>& dofs)
 {
 	const char* ch = sz;
 	char szdof[8] = {0}, *c = szdof;
@@ -337,13 +337,15 @@ void DOFS::ParseDOFString(const char* sz, std::vector<int>& dofs)
 		if ((*ch==',')||(*ch==0))
 		{
 			*c = 0;
-			dofs.push_back(GetDOF(szdof));
+			int ndof = GetDOF(szdof);
+			if (ndof != -1) dofs.push_back(ndof); else return false;
 			c = szdof;
 			if (*ch != 0) ch++; else ch = 0;
 		}
 		else *c++ = *ch++;
 	}
 	while (ch);
+	return true;
 }
 
 //-----------------------------------------------------------------------------

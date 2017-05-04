@@ -297,7 +297,12 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 			bc.push_back(dof_X); bc.push_back(dof_Y); bc.push_back(dof_Z);
 			bc.push_back(dof_U); bc.push_back(dof_V); bc.push_back(dof_W);
 		}
-		else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+		else 
+		{
+			// see if this is a comma seperated list
+			if (dofs.ParseDOFString(szbc, bc) == false)
+				throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+		}
 	}
 
 	if (bc.empty()) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
