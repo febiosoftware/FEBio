@@ -25,6 +25,7 @@ gcc64g:    PLAT = gcc64g
 osx:    PLAT = osx
 osxd:   PLAT = osxd
 clang: PLAT = clang
+llvm: PLAT = llvm
 sky:    PLAT = sky
 lnx64clean:  PLAT = lnx64
 lnx32clean:  PLAT = lnx32
@@ -37,12 +38,13 @@ gcc64clean:    PLAT = gcc64
 gcc64gclean:    PLAT = gcc64g
 osxdclean:   PLAT = osxd
 clangclean:  PLAT = clang
+llvmclean:  PLAT = llvm
 skyclean:    PLAT = sky
 
 export PLAT
 export FEBDIR
 
-lnx64 lnx64d lnx64g lnx64np lnx32 gcc gcc64 gcc64g osx osxd clang sky:
+lnx64 lnx64d lnx64g lnx64np lnx32 gcc gcc64 gcc64g osx osxd clang llvm sky:
 	( cd $(PLAT)/FEBioLib;		$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FEBioPlot;		$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FEBioHeat;		$(MAKE) -f ../../Makelibs.mk )
@@ -56,7 +58,7 @@ lnx64 lnx64d lnx64g lnx64np lnx32 gcc gcc64 gcc64g osx osxd clang sky:
 	( cd $(PLAT)/FEBioFluid;	$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FEBio2;		$(MAKE) -f ../../febio2.mk )
 
-lnx64clean lnx32clean osxclean lnx64dclean lnx64gclean lnx64npclean gccclean gcc64clean gcc64gclean osxdclean clangclean skyclean:
+lnx64clean lnx32clean osxclean lnx64dclean lnx64gclean lnx64npclean gccclean gcc64clean gcc64gclean osxdclean clangclean llvmclean skyclean:
 	( cd $(PLAT)/FEBioLib;		$(MAKE) -f ../../Makelibs.mk clean )
 	( cd $(PLAT)/FEBioPlot;		$(MAKE) -f ../../Makelibs.mk clean )
 	( cd $(PLAT)/FEBioHeat;		$(MAKE) -f ../../Makelibs.mk clean )
@@ -71,4 +73,4 @@ lnx64clean lnx32clean osxclean lnx64dclean lnx64gclean lnx64npclean gccclean gcc
 	( cd $(PLAT)/FEBio2;		$(MAKE) -f ../../febio2.mk clean )
 
 
-.PHONY: lnx64 lnx32 osx lnx64d lnx64g lnx64np gcc gcc64 gcc64g osxd clang sky
+.PHONY: lnx64 lnx32 osx lnx64d lnx64g lnx64np gcc gcc64 gcc64g osxd clang llvm sky
