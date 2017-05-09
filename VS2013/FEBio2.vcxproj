@@ -273,7 +273,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LEVMARDIR)\x64\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LEVMARDIR)\x64\Debug;$(ZLIBDIR)\lib64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dll|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -318,7 +318,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LEVMARDIR)\x64\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LEVMARDIR)\x64\Release;$(ZLIBDIR)\lib64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Dll|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -328,7 +328,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OMP|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LMDir)\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LMDir)\lib;$(ZLIBDIR)\lib64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <LinkIncremental>false</LinkIncremental>
@@ -407,7 +407,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;levmar.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;levmar.lib;zlib64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dll|x64'">
@@ -553,7 +553,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;levmar.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;levmar.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
@@ -594,7 +594,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;levmar64.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;febioheat.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;levmar64.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
