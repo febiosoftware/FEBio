@@ -145,6 +145,9 @@ void FESlidingSurfaceBiphasic::UpdateNodeNormals()
 //-----------------------------------------------------------------------------
 vec3d FESlidingSurfaceBiphasic::GetContactForce()
 {
+	return m_Ft;
+
+/*
     int n, i;
     
     // initialize contact force
@@ -173,6 +176,7 @@ vec3d FESlidingSurfaceBiphasic::GetContactForce()
     }
     
     return f;
+*/
 }
 
 //-----------------------------------------------------------------------------
@@ -1056,7 +1060,6 @@ void FESlidingInterfaceBiphasic::Update(int niter)
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
 {
-    int i, j, k;
     vector<int> sLM, mLM, LM, en;
     vector<double> fe;
     const int MN = FEElement::MAX_NODES;
@@ -1069,6 +1072,9 @@ void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
     // we need to multiply with the timestep
     double dt = fem.GetCurrentStep()->m_dt;
     
+	m_ss.m_Ft = vec3d(0, 0, 0);
+	m_ms.m_Ft = vec3d(0, 0, 0);
+
     // loop over the nr of passes
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np<npass; ++np)
@@ -1078,7 +1084,7 @@ void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
         FESlidingSurfaceBiphasic& ms = (np == 0? m_ms : m_ss);
         
         // loop over all slave elements
-        for (i=0; i<ss.Elements(); ++i)
+        for (int i=0; i<ss.Elements(); ++i)
         {
             // get the surface element
             FESurfaceElement& se = ss.Element(i);
@@ -1094,7 +1100,7 @@ void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
             
             // we calculate all the metrics we need before we
             // calculate the nodal forces
-            for (j=0; j<nint; ++j)
+			for (int j = 0; j<nint; ++j)
             {
                 // get the base vectors
                 vec3d g[2];
@@ -1109,7 +1115,7 @@ void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
             
             // loop over all integration points
             // note that we are integrating over the current surface
-            for (j=0; j<nint; ++j)
+			for (int j = 0; j<nint; ++j)
             {
                 // get the integration point data
                 FESlidingSurfaceBiphasic::Data& pt = ss.m_Data[i][j];
@@ -1134,14 +1140,14 @@ void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
                     
                     // build the LM vector
                     LM.resize(ndof);
-                    for (k=0; k<nseln; ++k)
+					for (int k = 0; k<nseln; ++k)
                     {
                         LM[3*k  ] = sLM[3*k  ];
                         LM[3*k+1] = sLM[3*k+1];
                         LM[3*k+2] = sLM[3*k+2];
                     }
                     
-                    for (k=0; k<nmeln; ++k)
+					for (int k = 0; k<nmeln; ++k)
                     {
                         LM[3*(k+nseln)  ] = mLM[3*k  ];
                         LM[3*(k+nseln)+1] = mLM[3*k+1];
@@ -1150,8 +1156,8 @@ void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
                     
                     // build the en vector
                     en.resize(nseln+nmeln);
-                    for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
-                    for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
+					for (int k = 0; k<nseln; ++k) en[k] = se.m_node[k];
+					for (int k = 0; k<nmeln; ++k) en[k + nseln] = me.m_node[k];
                     
                     // get slave element shape functions
                     Hs = se.H(j);
@@ -1184,21 +1190,32 @@ void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
                         fe.resize(ndof);
                         zero(fe);
                         
-                        for (k=0; k<nseln; ++k)
+						for (int k = 0; k<nseln; ++k)
                         {
                             N[3*k  ] = Hs[k]*t.x;
                             N[3*k+1] = Hs[k]*t.y;
                             N[3*k+2] = Hs[k]*t.z;
                         }
                         
-                        for (k=0; k<nmeln; ++k)
+						for (int k = 0; k<nmeln; ++k)
                         {
                             N[3*(k+nseln)  ] = -Hm[k]*t.x;
                             N[3*(k+nseln)+1] = -Hm[k]*t.y;
                             N[3*(k+nseln)+2] = -Hm[k]*t.z;
                         }
                         
-                        for (k=0; k<ndof; ++k) fe[k] += N[k]*detJ[j]*w[j];
+						for (int k = 0; k<ndof; ++k) fe[k] += N[k] * detJ[j] * w[j];
+
+						for (int k = 0; k<nseln; ++k)
+						{
+							ss.m_Ft += vec3d(fe[k * 3], fe[k * 3 + 1], fe[k * 3 + 2]);
+						}
+
+						for (int k = 0; k<nmeln; ++k)
+						{
+							ms.m_Ft += vec3d(fe[(k + nseln) * 3], fe[(k + nseln) * 3 + 1], fe[(k + nseln) * 3 + 2]);
+						}
+
                         
                         // assemble the global residual
                         R.Assemble(en, LM, fe);
@@ -1216,16 +1233,16 @@ void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
                             
                             // fill the LM
                             LM.resize(ndof);
-                            for (k=0; k<nseln; ++k) LM[k        ] = sLM[3*nseln+k];
-                            for (k=0; k<nmeln; ++k) LM[k + nseln] = mLM[3*nmeln+k];
+							for (int k = 0; k<nseln; ++k) LM[k] = sLM[3 * nseln + k];
+							for (int k = 0; k<nmeln; ++k) LM[k + nseln] = mLM[3 * nmeln + k];
                             
                             // fill the force array
                             fe.resize(ndof);
                             zero(fe);
-                            for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
-                            for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
+							for (int k = 0; k<nseln; ++k) N[k] = Hs[k];
+							for (int k = 0; k<nmeln; ++k) N[k + nseln] = -Hm[k];
                             
-                            for (k=0; k<ndof; ++k) fe[k] += dt*wn*N[k]*detJ[j]*w[j];
+							for (int k = 0; k<ndof; ++k) fe[k] += dt*wn*N[k] * detJ[j] * w[j];
                             
                             // assemble residual
                             R.Assemble(en, LM, fe);

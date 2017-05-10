@@ -74,6 +74,8 @@ public:
     vector< vector<Data> >	m_Data;	//!< integration point data
     vector<bool>		m_poro;	//!< surface element poro status
     vector<vec3d>		m_nn;	//!< node normals
+
+	vec3d	m_Ft;	//!< total contact force (from equivalent nodal forces)
 };
 
 //-----------------------------------------------------------------------------
