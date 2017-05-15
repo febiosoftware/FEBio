@@ -374,3 +374,22 @@ double FEDataLoadCurve::Deriv(double time) const
 
 	return D;
 }
+
+//-----------------------------------------------------------------------------
+bool FEDataLoadCurve::CopyFrom(FELoadCurve* lc)
+{
+	FEDataLoadCurve* plc = dynamic_cast<FEDataLoadCurve*>(lc); assert(plc);
+	if (plc == 0) return false;
+
+	m_fnc = plc->m_fnc;
+	m_ext = plc->m_ext;
+
+	Clear();
+	for (int i=0; i<plc->Points(); ++i)
+	{
+		LOADPOINT lp = plc->LoadPoint(i);
+		Add(lp.time, lp.value);
+	}
+
+	return true;
+}

@@ -1283,21 +1283,22 @@ void FEModel::CopyFrom(FEModel& fem)
 	// copy the mesh data
 	// NOTE: This will not assign materials to the new domains
 	// A. copy nodes
-	FEMesh& mesh = fem.GetMesh();
-	int N = mesh.Nodes();
+	FEMesh& sourceMesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
+	int N = sourceMesh.Nodes();
 	mesh.CreateNodes(N);
 	for (int i=0; i<N; ++i)
 	{
-		mesh.Node(i) = mesh.Node(i);
+		mesh.Node(i) = sourceMesh.Node(i);
 	}
 
 	// B. domains
 	// let's first create a table of material indices for the old domains
-	int NDOM = mesh.Domains();
+	int NDOM = sourceMesh.Domains();
 	vector<int> LUT(NDOM);
 	for (int i=0; i<NDOM; ++i)
 	{
-		FEMaterial* pm = mesh.Domain(i).GetMaterial();
+		FEMaterial* pm = sourceMesh.Domain(i).GetMaterial();
 		for (int j=0; j<NMAT; ++j)
 		{
 			if (pm == fem.GetMaterial(j))
@@ -1311,7 +1312,7 @@ void FEModel::CopyFrom(FEModel& fem)
 	// now allocate domains
 	for (int i=0; i<NDOM; ++i)
 	{
-		FEDomain& dom = mesh.Domain(i);
+		FEDomain& dom = sourceMesh.Domain(i);
 		const char* sz = dom.GetTypeStr();
 
 		// create a new domain
@@ -1390,6 +1391,22 @@ void FEModel::CopyFrom(FEModel& fem)
 	}
 
 	// --- Load curves ---
+	// copy load curves
+	int NLD = fem.LoadCurves();
+	for (int i = 0; i<NLD; ++i)
+	{
+		FELoadCurve* lc = fem.GetLoadCurve(i);
+		FELoadCurve* newlc = fecore_new<FELoadCurve>(FELOADCURVE_ID, lc->GetTypeStr(), this);
+		if (newlc == 0)
+		{
+			// we can get here if the load curve was not created with fecore_new
+			// do it the hard way
+			if (dynamic_cast<FELinearRamp*>(lc)) newlc = new FELinearRamp(this);
+			else if (dynamic_cast<FEDataLoadCurve*>(lc)) newlc = new FEDataLoadCurve(this);
+		}
+		bool b = newlc->CopyFrom(lc); assert(b);
+		AddLoadCurve(newlc);
+	}
 
 	// copy linear constraints
 	if (fem.m_imp->m_LCM)
@@ -1400,7 +1417,7 @@ void FEModel::CopyFrom(FEModel& fem)
 	}
 
 	// TODO: copy all the properties
-	assert(false);
+//	assert(false);
 }
 
 //-----------------------------------------------------------------------------

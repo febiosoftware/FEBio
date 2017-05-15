@@ -33,3 +33,14 @@ void FELoadCurve::Serialize(DumpStream& ar)
 		ar >> m_value;
 	}
 }
+
+bool FELinearRamp::CopyFrom(FELoadCurve* lc)
+{
+	FELinearRamp* plc = dynamic_cast<FELinearRamp*>(lc);
+	if (plc == 0) return false;
+
+	m_slope = plc->m_slope;
+	m_intercept = plc->m_intercept;
+
+	return true;
+}

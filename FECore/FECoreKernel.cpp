@@ -98,6 +98,8 @@ void FECoreKernel::RegisterClass(FECoreFactory* ptf)
 //! and the type-string. 
 void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 {
+	if (sztype == 0) return 0;
+
 	std::vector<FECoreFactory*>::iterator pf;
 	for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
 	{

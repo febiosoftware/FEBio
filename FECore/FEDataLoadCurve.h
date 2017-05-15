@@ -83,6 +83,9 @@ public:
 	//! Serialize data to archive
 	void Serialize(DumpStream& ar);
 
+	// copy data from other curve
+	bool CopyFrom(FELoadCurve* lc);
+
 public: // implement from base class
 
 	//! returns the value of the load curve at time

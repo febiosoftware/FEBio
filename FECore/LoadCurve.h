@@ -26,6 +26,8 @@ public:
 
 	void Serialize(DumpStream& ar);
 
+	virtual bool CopyFrom(FELoadCurve* lc) = 0;
+
 public:
 	// evaluate the function at time t
 	virtual double Value(double t) const = 0;
@@ -54,6 +56,8 @@ public:
 	{
 		return m_slope;
 	}
+
+	bool CopyFrom(FELoadCurve* lc);
 
 private:
 	double	m_slope;
