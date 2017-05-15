@@ -638,6 +638,48 @@ public:
 };
 
 //=============================================================================
+// 
+// FEPyra5
+//
+//=============================================================================
+
+//=============================================================================
+//! Base class for 5-node pyramid element
+class FEPyra5_ : public FESolidElementTraits
+{
+public:
+	enum { NELN = 5 };
+
+public:
+	FEPyra5_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_PYRA5, et){}
+
+	//! values of shape functions
+	void shape_fnc(double* H, double r, double s, double t);
+
+	//! values of shape function derivatives
+	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
+
+	//! values of shape function second derivatives
+	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
+};
+
+//=============================================================================
+// 5-node pyramid element using a 2x2x2 Gaussian integration rule
+class FEPyra5G8: public FEPyra5_
+{
+public:
+	enum { NINT = 8 };
+
+public:
+	FEPyra5G8();
+
+	void project_to_nodes(double* ai, double* ao);
+
+protected:
+	matrix	Ai;
+};
+
+//=============================================================================
 //    S U R F A C E   E L E M E N T S
 //
 // This section defines a set of surface element formulations for use in 3D

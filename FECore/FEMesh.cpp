@@ -1048,7 +1048,8 @@ int FEMesh::Faces(FEElement& el)
 	case FE_HEX20G27: 
 	case FE_HEX27G27: return 6;
 	case FE_PENTA6G6:
-    case FE_PENTA15G21: return 5;
+    case FE_PENTA15G21: 
+	case FE_PYRA5G8: return 5;
 	case FE_TET4G4:
 	case FE_TET10G4:
 	case FE_TET10G8:
@@ -1116,7 +1117,17 @@ int FEMesh::GetFace(FEElement& el, int n, int* nf)
             case 4: nn = 6; nf[0] = en[3]; nf[1] = en[4]; nf[2] = en[5]; nf[3] = en[9]; nf[4] = en[10]; nf[5] = en[11]; break;
         }
         break;
-        case FE_TET4G4:
+	case FE_PYRA5G8:
+		switch (n)
+		{
+			case 0: nn = 3; nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[4]; break;
+			case 1: nn = 3; nf[0] = en[1]; nf[1] = en[2]; nf[2] = en[4]; break;
+			case 2: nn = 3; nf[0] = en[2]; nf[1] = en[3]; nf[2] = en[4]; break;
+			case 3: nn = 3; nf[0] = en[3]; nf[1] = en[0]; nf[2] = en[4]; break;
+			case 4: nn = 4; nf[0] = en[3]; nf[1] = en[2]; nf[2] = en[1]; nf[3] = en[0]; break;
+		}
+		break;
+    case FE_TET4G4:
 	case FE_TET4G1:
 		nn = 3;
 		switch (n)

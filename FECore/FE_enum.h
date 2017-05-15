@@ -48,7 +48,8 @@ enum FE_Element_Shape {
 	ET_TRUSS2,
 	ET_LINE2,
 	ET_DISCRETE,
-    ET_PENTA15
+    ET_PENTA15,
+	ET_PYRA5
 };
 
 //-----------------------------------------------------------------------------
@@ -81,6 +82,7 @@ enum FE_Element_Type {
 	FE_HEX20G27,
 	FE_HEX27G27,
     FE_PENTA15G21,
+	FE_PYRA5G8,
 
 	// 2.5D surface elements
 	FE_QUAD4G4,

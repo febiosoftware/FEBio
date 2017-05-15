@@ -649,15 +649,16 @@ void FEBioPlotFile2::WriteSolidDomain(FESolidDomain& dom)
 	int dtype = 0;
 	switch (eshape)
 	{
-		case ET_HEX8  : ne =  8; dtype = PLT_ELEM_HEX; break;
-		case ET_PENTA6: ne =  6; dtype = PLT_ELEM_PENTA; break;
-		case ET_TET4  : ne =  4; dtype = PLT_ELEM_TET; break;
-		case ET_TET10 : ne = 10; dtype = PLT_ELEM_TET10; break;
-		case ET_TET15 : ne = 15; dtype = PLT_ELEM_TET15; break;
-		case ET_HEX20 : ne = 20; dtype = PLT_ELEM_HEX20; break;
-		case ET_HEX27 : ne = 27; dtype = PLT_ELEM_HEX27; break;
-		case ET_TET20 : ne = 20; dtype = PLT_ELEM_TET20; break;
-        case ET_PENTA15:ne = 15; dtype = PLT_ELEM_PENTA15; break;
+		case ET_HEX8   : ne =  8; dtype = PLT_ELEM_HEX; break;
+		case ET_PENTA6 : ne =  6; dtype = PLT_ELEM_PENTA; break;
+		case ET_TET4   : ne =  4; dtype = PLT_ELEM_TET; break;
+		case ET_TET10  : ne = 10; dtype = PLT_ELEM_TET10; break;
+		case ET_TET15  : ne = 15; dtype = PLT_ELEM_TET15; break;
+		case ET_HEX20  : ne = 20; dtype = PLT_ELEM_HEX20; break;
+		case ET_HEX27  : ne = 27; dtype = PLT_ELEM_HEX27; break;
+		case ET_TET20  : ne = 20; dtype = PLT_ELEM_TET20; break;
+        case ET_PENTA15: ne = 15; dtype = PLT_ELEM_PENTA15; break;
+		case ET_PYRA5  : ne =  5; dtype = PLT_ELEM_PYRA5; break;
         default:
 			assert(false);
 	}

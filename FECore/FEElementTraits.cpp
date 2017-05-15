@@ -2085,6 +2085,100 @@ void FEHex27G27::project_to_nodes(double* ai, double* ao)
 }
 
 //=============================================================================
+//              P Y R A 5
+//=============================================================================
+
+//! values of shape functions
+void FEPyra5_::shape_fnc(double* H, double r, double s, double t)
+{
+	H[0] = 0.125*(1.0 - r)*(1.0 - s)*(1.0 - t);
+	H[1] = 0.125*(1.0 + r)*(1.0 - s)*(1.0 - t);
+	H[2] = 0.125*(1.0 + r)*(1.0 + s)*(1.0 - t);
+	H[3] = 0.125*(1.0 - r)*(1.0 + s)*(1.0 - t);
+	H[4] = 0.5*(1.0 + t);
+}
+
+//! values of shape function derivatives
+void FEPyra5_::shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t)
+{
+	Hr[0] = -0.125*(1.0 - s)*(1.0 - t);
+	Hr[1] =  0.125*(1.0 - s)*(1.0 - t);
+	Hr[2] =  0.125*(1.0 + s)*(1.0 - t);
+	Hr[3] = -0.125*(1.0 + s)*(1.0 - t);
+	Hr[4] =  0.0;
+
+	Hs[0] = -0.125*(1.0 - r)*(1.0 - t);
+	Hs[1] = -0.125*(1.0 + r)*(1.0 - t);
+	Hs[2] =  0.125*(1.0 + r)*(1.0 - t);
+	Hs[3] =  0.125*(1.0 - r)*(1.0 - t);
+	Hs[4] =  0.0;
+
+	Ht[0] = -0.125*(1.0 - r)*(1.0 - s);
+	Ht[1] = -0.125*(1.0 + r)*(1.0 - s);
+	Ht[2] = -0.125*(1.0 + r)*(1.0 + s);
+	Ht[3] = -0.125*(1.0 - r)*(1.0 + s);
+	Ht[4] =  0.5;
+}
+
+//! values of shape function second derivatives
+void FEPyra5_::shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t)
+{
+	Hrr[0] = 0.0; Hss[0] = 0.0; Htt[0] = 0.0;
+	Hrr[1] = 0.0; Hss[1] = 0.0; Htt[1] = 0.0;
+	Hrr[2] = 0.0; Hss[2] = 0.0; Htt[2] = 0.0;
+	Hrr[3] = 0.0; Hss[3] = 0.0; Htt[3] = 0.0;
+	Hrr[4] = 0.0; Hss[4] = 0.0; Htt[4] = 0.0;
+
+	Hrs[0] =  0.125*(1.0 - t); Hrt[0] =  0.125*(1.0 - s); Hst[0] =  0.125*(1.0 - r);
+	Hrs[1] = -0.125*(1.0 - t); Hrt[1] = -0.125*(1.0 - s); Hst[1] =  0.125*(1.0 + r);
+	Hrs[2] =  0.125*(1.0 - t); Hrt[2] = -0.125*(1.0 + s); Hst[2] = -0.125*(1.0 + r);
+	Hrs[3] = -0.125*(1.0 - t); Hrt[3] =  0.125*(1.0 + s); Hst[3] = -0.125*(1.0 - r);
+	Hrs[4] =              0.0; Hrt[4] =              0.0; Hst[4] =              0.0;
+}
+
+//=============================================================================
+//              P Y R A 5 G 8
+//=============================================================================
+
+FEPyra5G8::FEPyra5G8() : FEPyra5_(NINT, FE_PYRA5G8)
+{
+	// integration point coordinates
+	const double a = 1.0 / sqrt(3.0);
+	gr[0] = -a; gs[0] = -a; gt[0] = -a; gw[0] = 1;
+	gr[1] = a; gs[1] = -a; gt[1] = -a; gw[1] = 1;
+	gr[2] = a; gs[2] = a; gt[2] = -a; gw[2] = 1;
+	gr[3] = -a; gs[3] = a; gt[3] = -a; gw[3] = 1;
+	gr[4] = -a; gs[4] = -a; gt[4] = a; gw[4] = 1;
+	gr[5] = a; gs[5] = -a; gt[5] = a; gw[5] = 1;
+	gr[6] = a; gs[6] = a; gt[6] = a; gw[6] = 1;
+	gr[7] = -a; gs[7] = a; gt[7] = a; gw[7] = 1;
+	init();
+
+	// we need Ai to project integration point data to the nodes
+	matrix A(NELN, NELN);
+	Ai.resize(NELN, NELN);
+	A = H.transpose()*H;
+	Ai = A.inverse();
+}
+
+void FEPyra5G8::project_to_nodes(double* ai, double* ao)
+{
+	vector<double> b(NELN);
+	for (int i = 0; i<NELN; ++i)
+	{
+		b[i] = 0;
+		for (int j = 0; j<NINT; ++j) b[i] += H[j][i] * ai[j];
+	}
+
+	for (int i = 0; i<NELN; ++i)
+	{
+		ao[i] = 0;
+		for (int j = 0; j<NELN; ++j) ao[i] += Ai[i][j] * b[j];
+	}
+}
+
+
+//=============================================================================
 //
 //                  S U R F A C E   E L E M E N T S
 //

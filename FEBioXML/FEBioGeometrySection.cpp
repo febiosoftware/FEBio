@@ -370,21 +370,22 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	FE_Element_Shape eshape = FE_ELEM_INVALID_SHAPE;
     // for shells, don't overwrite m_pim->m_ntri3/6 or m_nquad4/8, since they are needed for surface definitions
     FE_Element_Type stype = FE_ELEM_INVALID_TYPE;
-	if      (strcmp(sztype, "hex8"  ) == 0) eshape = ET_HEX8;
-	else if (strcmp(sztype, "hex20" ) == 0) eshape = ET_HEX20;
-	else if (strcmp(sztype, "hex27" ) == 0) eshape = ET_HEX27;
-	else if (strcmp(sztype, "penta6") == 0) eshape = ET_PENTA6;
+	if      (strcmp(sztype, "hex8"   ) == 0) eshape = ET_HEX8;
+	else if (strcmp(sztype, "hex20"  ) == 0) eshape = ET_HEX20;
+	else if (strcmp(sztype, "hex27"  ) == 0) eshape = ET_HEX27;
+	else if (strcmp(sztype, "penta6" ) == 0) eshape = ET_PENTA6;
     else if (strcmp(sztype, "penta15") == 0) eshape = ET_PENTA15;
-	else if (strcmp(sztype, "tet4"  ) == 0) eshape = ET_TET4;
-	else if (strcmp(sztype, "tet10" ) == 0) eshape = ET_TET10;
-	else if (strcmp(sztype, "tet15" ) == 0) eshape = ET_TET15;
-	else if (strcmp(sztype, "tet20" ) == 0) eshape = ET_TET20;
-    else if (strcmp(sztype, "quad4" ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; }   // default shell type for quad4
-    else if (strcmp(sztype, "quad8" ) == 0) { eshape = ET_QUAD8; stype = FE_SHELL_QUAD8G18;}   // default shell type for quad8
-	else if (strcmp(sztype, "quad9" ) == 0) eshape = ET_QUAD9;
-    else if (strcmp(sztype, "tri3"  ) == 0) { eshape = ET_TRI3; stype = FE_SHELL_TRI3G6; }     // default shell type for tri3
-    else if (strcmp(sztype, "tri6"  ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G14;}     // default shell type for tri6
-	else if (strcmp(sztype, "truss2") == 0) eshape = ET_TRUSS2;
+	else if (strcmp(sztype, "pyra5"  ) == 0) eshape = ET_PYRA5;
+	else if (strcmp(sztype, "tet4"   ) == 0) eshape = ET_TET4;
+	else if (strcmp(sztype, "tet10"  ) == 0) eshape = ET_TET10;
+	else if (strcmp(sztype, "tet15"  ) == 0) eshape = ET_TET15;
+	else if (strcmp(sztype, "tet20"  ) == 0) eshape = ET_TET20;
+    else if (strcmp(sztype, "quad4"  ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; }   // default shell type for quad4
+    else if (strcmp(sztype, "quad8"  ) == 0) { eshape = ET_QUAD8; stype = FE_SHELL_QUAD8G18;}   // default shell type for quad8
+	else if (strcmp(sztype, "quad9"  ) == 0) eshape = ET_QUAD9;
+    else if (strcmp(sztype, "tri3"   ) == 0) { eshape = ET_TRI3; stype = FE_SHELL_TRI3G6; }     // default shell type for tri3
+    else if (strcmp(sztype, "tri6"   ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G14;}     // default shell type for tri6
+	else if (strcmp(sztype, "truss2" ) == 0) eshape = ET_TRUSS2;
 	else
 	{
 		// new way for defining element type and integration rule at the same time
@@ -437,21 +438,22 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	FE_Element_Type etype = FE_ELEM_INVALID_TYPE;
 	switch (eshape)
 	{
-	case ET_HEX8  : etype = m_pim->m_nhex8; break;
-	case ET_PENTA6: etype = FE_PENTA6G6; break;
+	case ET_HEX8   : etype = m_pim->m_nhex8; break;
+	case ET_PENTA6 : etype = FE_PENTA6G6; break;
     case ET_PENTA15: etype = FE_PENTA15G21; break;
-	case ET_TET4  : etype = m_pim->m_ntet4; break;
-	case ET_TET10 : etype = m_pim->m_ntet10; break;
-	case ET_TET15 : etype = m_pim->m_ntet15; break;
-	case ET_TET20 : etype = m_pim->m_ntet20; break;
-	case ET_HEX20 : etype = FE_HEX20G27; break;
-	case ET_HEX27 : etype = FE_HEX27G27; break;
-	case ET_QUAD4 : etype = (NDIM == 3 ? stype : FE2D_QUAD4G4); break;
-	case ET_TRI3  : etype = (NDIM == 3 ? stype  : FE2D_TRI3G1 ); break;
-    case ET_TRI6  : etype = (NDIM == 3 ? stype  : FE2D_TRI6G3 ); break;
-	case ET_QUAD8 : etype = (NDIM == 3 ? stype : FE2D_QUAD8G9); break;
-	case ET_QUAD9 : etype = FE2D_QUAD9G9; break;
-	case ET_TRUSS2: etype = FE_TRUSS; break;
+	case ET_PYRA5  : etype = FE_PYRA5G8; break;
+	case ET_TET4   : etype = m_pim->m_ntet4; break;
+	case ET_TET10  : etype = m_pim->m_ntet10; break;
+	case ET_TET15  : etype = m_pim->m_ntet15; break;
+	case ET_TET20  : etype = m_pim->m_ntet20; break;
+	case ET_HEX20  : etype = FE_HEX20G27; break;
+	case ET_HEX27  : etype = FE_HEX27G27; break;
+	case ET_QUAD4  : etype = (NDIM == 3 ? stype : FE2D_QUAD4G4); break;
+	case ET_TRI3   : etype = (NDIM == 3 ? stype  : FE2D_TRI3G1 ); break;
+    case ET_TRI6   : etype = (NDIM == 3 ? stype  : FE2D_TRI6G3 ); break;
+	case ET_QUAD8  : etype = (NDIM == 3 ? stype : FE2D_QUAD8G9); break;
+	case ET_QUAD9  : etype = FE2D_QUAD9G9; break;
+	case ET_TRUSS2 : etype = FE_TRUSS; break;
 	default:
 		throw FEBioImport::InvalidElementType();
 	}
