@@ -103,17 +103,6 @@ void FEElasticMixture::AddMaterial(FEElasticMaterial* pm)
 }
 
 //-----------------------------------------------------------------------------
-bool FEElasticMixture::Init()
-{
-    for (int i=0; i < (int)m_pMat.size(); ++i)
-	{
-		if (m_pMat[i]->Init() == false) return false;
-	}
-    
-    return FEElasticMaterial::Init();
-}
-
-//-----------------------------------------------------------------------------
 //! This function evaluates the stress at the material point by evaluating the
 //! individual stress components. 
 mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)

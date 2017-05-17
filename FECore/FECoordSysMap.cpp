@@ -384,14 +384,29 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FEVectorMap::FEVectorMap(FEModel* pfem) : FECoordSysMap(pfem) 
 {
+	m_a = vec3d(1,0,0);
+	m_d = vec3d(0,1,0);
 }
 
 //-----------------------------------------------------------------------------
 bool FEVectorMap::Init()
 {
+	// generators have to be unit vectors
 	m_a.unit();
-	m_d = vec3d(1,0,0);
-	if (m_a*m_d > .999) m_d = vec3d(0,1,0);
+	m_d.unit();
+
+	// make sure the vectors are not 0-vectors
+	if ((m_a.norm2() == 0.0) || (m_d.norm2() == 0.0)) return false;
+
+	// make sure that a, d are not aligned
+	if (fabs(m_a*m_d) > 0.999)
+	{
+		// if they are, find a different value for d
+		// Note: If this is used for a mat_axis parameter, then this
+		// would modify the user specified value. 
+		m_d = vec3d(1,0,0);
+		if (fabs(m_a*m_d) > 0.999) m_d = vec3d(0,1,0);
+	}
 	return true;
 }
 
