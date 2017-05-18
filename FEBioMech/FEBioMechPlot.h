@@ -44,8 +44,18 @@ public:
 class FEPlotContactGap : public FESurfaceData
 {
 public:
-	FEPlotContactGap(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_MULT){}
-	bool Save(FESurface& surf, FEDataStream& a);
+    FEPlotContactGap(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Vector gap
+//!
+class FEPlotVectorGap : public FESurfaceData
+{
+public:
+    FEPlotVectorGap(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -54,8 +64,8 @@ public:
 class FEPlotContactPressure : public FESurfaceData
 {
 public:
-	FEPlotContactPressure(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_MULT){}
-	bool Save(FESurface& surf, FEDataStream& a);
+    FEPlotContactPressure(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -64,8 +74,68 @@ public:
 class FEPlotContactTraction : public FESurfaceData
 {
 public:
-	FEPlotContactTraction(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+    FEPlotContactTraction(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal contact gap
+//!
+class FEPlotNodalContactGap : public FESurfaceData
+{
+public:
+	FEPlotNodalContactGap(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_MULT){}
 	bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal vector gap
+//!
+class FEPlotNodalVectorGap : public FESurfaceData
+{
+public:
+    FEPlotNodalVectorGap(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal contact pressure
+//!
+class FEPlotNodalContactPressure : public FESurfaceData
+{
+public:
+    FEPlotNodalContactPressure(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_MULT){}
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal contact traction
+//!
+class FEPlotNodalContactTraction : public FESurfaceData
+{
+public:
+	FEPlotNodalContactTraction(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+	bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Surface traction
+//!
+class FEPlotSurfaceTraction : public FESurfaceData
+{
+public:
+    FEPlotSurfaceTraction(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal surface traction
+//!
+class FEPlotNodalSurfaceTraction : public FESurfaceData
+{
+public:
+    FEPlotNodalSurfaceTraction(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+    bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------

@@ -402,7 +402,7 @@ REGISTER_FECORE_CLASS(FEPeriodicBoundary     , FESURFACEPAIRINTERACTION_ID, "per
 REGISTER_FECORE_CLASS(FEPeriodicBoundary1O   , FESURFACEPAIRINTERACTION_ID, "periodic boundary1O"        );
 REGISTER_FECORE_CLASS(FEPeriodicBoundary2O   , FESURFACEPAIRINTERACTION_ID, "periodic boundary2O"        );
 REGISTER_FECORE_CLASS(FERigidWallInterface   , FESURFACEPAIRINTERACTION_ID, "rigid_wall"                 );
-REGISTER_FECORE_CLASS(FERigidSlidingContact  , FESURFACEPAIRINTERACTION_ID, "rigid sliding"               );
+REGISTER_FECORE_CLASS(FERigidSlidingContact  , FESURFACEPAIRINTERACTION_ID, "rigid sliding"              );
 REGISTER_FECORE_CLASS(FESlidingInterface     , FESURFACEPAIRINTERACTION_ID, "sliding_with_gaps"          );
 REGISTER_FECORE_CLASS(FESlidingInterfaceBW   , FESURFACEPAIRINTERACTION_ID, "sliding-tension-compression");
 REGISTER_FECORE_CLASS(FESurfaceConstraint    , FESURFACEPAIRINTERACTION_ID, "surface constraint"         );
@@ -448,8 +448,13 @@ REGISTER_FECORE_CLASS(FEPlotMixtureVolumeFraction, FEPLOTDATA_ID, "volume fracti
 REGISTER_FECORE_CLASS(FEPlotUT4NodalStresses     , FEPLOTDATA_ID, "ut4 nodal stress"      );
 REGISTER_FECORE_CLASS(FEPlotShellStrain          , FEPLOTDATA_ID, "shell strain"          );
 REGISTER_FECORE_CLASS(FEPlotContactGap			 , FEPLOTDATA_ID, "contact gap"           );
+REGISTER_FECORE_CLASS(FEPlotNodalContactGap      , FEPLOTDATA_ID, "nodal contact gap"     );
+REGISTER_FECORE_CLASS(FEPlotVectorGap			 , FEPLOTDATA_ID, "vector gap"            );
+REGISTER_FECORE_CLASS(FEPlotNodalVectorGap       , FEPLOTDATA_ID, "nodal vector gap"      );
 REGISTER_FECORE_CLASS(FEPlotContactPressure		 , FEPLOTDATA_ID, "contact pressure"      );
+REGISTER_FECORE_CLASS(FEPlotNodalContactPressure , FEPLOTDATA_ID, "nodal contact pressure");
 REGISTER_FECORE_CLASS(FEPlotContactTraction		 , FEPLOTDATA_ID, "contact traction"      );
+REGISTER_FECORE_CLASS(FEPlotNodalContactTraction , FEPLOTDATA_ID, "nodal contact traction");
 REGISTER_FECORE_CLASS(FEPlotContactForce 		 , FEPLOTDATA_ID, "contact force"         );
 REGISTER_FECORE_CLASS(FEPlotContactArea 		 , FEPLOTDATA_ID, "contact area"          );
 REGISTER_FECORE_CLASS(FEPlotContactPenalty 		 , FEPLOTDATA_ID, "contact penalty"       );
@@ -461,6 +466,8 @@ REGISTER_FECORE_CLASS(FEPlotSPRTestQuadratic	 , FEPLOTDATA_ID, "SPR test quadrat
 REGISTER_FECORE_CLASS(FEPlotNodalStresses		 , FEPLOTDATA_ID, "nodal stress"		  );
 REGISTER_FECORE_CLASS(FEPlotLagrangeStrain       , FEPLOTDATA_ID, "Lagrange strain"       );
 REGISTER_FECORE_CLASS(FEPlotMortarContactGap     , FEPLOTDATA_ID, "mortar-gap"            );
+REGISTER_FECORE_CLASS(FEPlotSurfaceTraction		 , FEPLOTDATA_ID, "surface traction"      );
+REGISTER_FECORE_CLASS(FEPlotNodalSurfaceTraction , FEPLOTDATA_ID, "nodal surface traction");
 
 // LTE - 2O continuum fields
 REGISTER_FECORE_CLASS(FEPlotElementGnorm         , FEPLOTDATA_ID, "G norm"                );              

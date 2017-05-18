@@ -27,6 +27,8 @@ BEGIN_PARAMETER_LIST(FESlidingInterface3, FEContactInterface)
 	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"               );
 	ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"               );
 	ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"               );
+    ADD_PARAMETER(m_breloc   , FE_PARAM_BOOL  , "node_reloc"         );
+    ADD_PARAMETER(m_bsmaug   , FE_PARAM_BOOL  , "smooth_aug"         );
 	ADD_PARAMETER(m_ambp     , FE_PARAM_DOUBLE, "ambient_pressure"     );
 	ADD_PARAMETER(m_ambc     , FE_PARAM_DOUBLE, "ambient_concentration");
 END_PARAMETER_LIST();
@@ -120,6 +122,7 @@ bool FESlidingSurface3::Init()
 	}
 	
 	m_nn.assign(Nodes(), vec3d(0,0,0));
+    m_pn.assign(Nodes(), 0);
 	
 	// determine biphasic and biphasic-solute status
 	m_poro.resize(Elements(),false);
@@ -151,6 +154,45 @@ bool FESlidingSurface3::Init()
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate the nodal contact pressures by averaging values from surrounding
+//! faces.  This function ensures that nodal contact pressures are always
+//! positive, so that they can be used to detect free-draining status.
+
+void FESlidingSurface3::EvaluateNodalContactPressures()
+{
+    const int N = Nodes();
+    
+    // number of faces with non-zero contact pressure connected to this node
+    vector<int> nfaces(N,0);
+    
+    // zero nodal contact pressures
+    zero(m_pn);
+    
+    // loop over all elements
+    for (int i=0; i<Elements(); ++i)
+    {
+        FESurfaceElement& el = Element(i);
+        int ne = el.Nodes();
+        
+        // get the average contact pressure for that face
+        double pn = 0;
+        GetContactPressure(i, pn);
+        
+        if (pn > 0) {
+            for (int j=0; j<ne; ++j)
+            {
+                m_pn[el.m_lnode[j]] += pn;
+                ++nfaces[el.m_lnode[j]];
+            }
+        }
+    }
+    
+    // get average over all contacting faces sharing that node
+    for (int i=0; i<N; ++i)
+        if (nfaces[i] > 0) m_pn[i] /= nfaces[i];
 }
 
 //-----------------------------------------------------------------------------
@@ -193,34 +235,7 @@ void FESlidingSurface3::UpdateNodeNormals()
 //-----------------------------------------------------------------------------
 vec3d FESlidingSurface3::GetContactForce()
 {
-	int n, i;
-	
-	// initialize contact force
-	vec3d f(0,0,0);
-	
-	// loop over all elements of the primary surface
-	for (n=0; n<Elements(); ++n)
-	{
-		FESurfaceElement& el = Element(n);
-		int nint = el.GaussPoints();
-		
-		// evaluate the contact force for that element
-		for (i=0; i<nint; ++i)
-		{
-			Data& data = m_Data[n][i];
-			// get the base vectors
-			vec3d g[2];
-			CoBaseVectors(el, i, g);
-			// normal (magnitude = area)
-			vec3d n = g[0] ^ g[1];
-			// gauss weight
-			double w = el.GaussWeights()[i];
-			// contact force
-			f += n*(w*data.m_Ln);
-		}
-	}
-	
-	return f;
+    return m_Ft;
 }
 
 //-----------------------------------------------------------------------------
@@ -460,6 +475,36 @@ void FESlidingSurface3::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
+void FESlidingSurface3::GetContactGap(int nface, double& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ni = el.GaussPoints();
+    pg = 0;
+    for (int k=0; k<ni; ++k) pg += m_Data[nface][k].m_gap;
+    pg /= ni;
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurface3::GetContactPressure(int nface, double& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ni = el.GaussPoints();
+    pg = 0;
+    for (int k=0; k<ni; ++k) pg += m_Data[nface][k].m_Ln;
+    pg /= ni;
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurface3::GetContactTraction(int nface, vec3d& pt)
+{
+    FESurfaceElement& el = Element(nface);
+    int ni = el.GaussPoints();
+    pt = vec3d(0,0,0);
+    for (int k=0; k<ni; ++k) pt -= m_Data[nface][k].m_nu*m_Data[nface][k].m_Ln;
+    pt /= ni;
+}
+
+//-----------------------------------------------------------------------------
 void FESlidingSurface3::GetNodalContactGap(int nface, double* gn)
 {
 	double gi[FEElement::MAX_INTPOINTS];
@@ -473,10 +518,8 @@ void FESlidingSurface3::GetNodalContactGap(int nface, double* gn)
 void FESlidingSurface3::GetNodalContactPressure(int nface, double* pn)
 {
 	FESurfaceElement& el = Element(nface);
-	int ni = el.GaussPoints();
-	double ti[FEElement::MAX_INTPOINTS];
-	for (int k=0; k<ni; ++k) ti[k] = m_Data[nface][k].m_Ln;
-	el.project_to_nodes(ti, pn);
+    for (int k=0; k<el.Nodes(); ++k)
+        pn[k] = m_pn[el.m_lnode[k]];
 }
 
 //-----------------------------------------------------------------------------
@@ -493,35 +536,8 @@ void FESlidingSurface3::GetNodalPressureGap(int nface, double* pg)
 void FESlidingSurface3::GetNodalContactTraction(int nface, vec3d* tn)
 {
 	FESurfaceElement& el = Element(nface);
-	int ne = el.Nodes();
-	int ni = el.GaussPoints();
-
-	vec3d t;
-	const int MFI = FEElement::MAX_INTPOINTS;
-	double tix[MFI], tiy[MFI], tiz[MFI];
-	for (int k=0; k<ni; ++k)
-	{
-		FESlidingSurface3::Data& pt = m_Data[nface][k];
-		double Li = pt.m_Ln;
-		vec3d  ti = pt.m_nu;
-		t = ti*(Li);
-		tix[k] = t.x; tiy[k] = t.y; tiz[k] = t.z;
-	}
-
-	// project traction to nodes
-	const int MFN = FEElement::MAX_NODES;
-	double tnx[MFN], tny[MFN], tnz[MFN];
-	el.project_to_nodes(tix, tnx);
-	el.project_to_nodes(tiy, tny);
-	el.project_to_nodes(tiz, tnz);
-
-	// store data
-	for (int k=0; k<ne; ++k)
-	{
-		tn[k].x = tnx[k];
-		tn[k].y = tny[k];
-		tn[k].z = tnz[k];
-	}
+    for (int k=0; k<el.Nodes(); ++k)
+        tn[k] = m_nn[el.m_lnode[k]]*(-m_pn[el.m_lnode[k]]);
 }
 
 //-----------------------------------------------------------------------------
@@ -550,6 +566,8 @@ FESlidingInterface3::FESlidingInterface3(FEModel* pfem) : FEContactInterface(pfe
 	m_ambc = 0;
 	m_nsegup = 0;
 	m_bautopen = false;
+    m_breloc = false;
+    m_bsmaug = false;
 	
 	m_naugmin = 0;
 	m_naugmax = 10;
@@ -927,7 +945,7 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface3& ms, bool bupseg)
+void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface3& ms, bool bupseg, bool bmove)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	FESurfaceElement* pme;
@@ -946,6 +964,58 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 	np.SetSearchRadius(m_srad);
 	np.Init();
 
+    // if we need to project the nodes onto the master surface,
+    // let's do this first
+    if (bmove)
+    {
+        int NN = ss.Nodes();
+        int NE = ss.Elements();
+        // first we need to calculate the node normals
+        vector<vec3d> normal; normal.assign(NN, vec3d(0,0,0));
+        for (int i=0; i<NE; ++i)
+        {
+            FESurfaceElement& el = ss.Element(i);
+            int ne = el.Nodes();
+            for (int j=0; j<ne; ++j)
+            {
+                vec3d r0 = ss.Node(el.m_lnode[ j         ]).m_rt;
+                vec3d rp = ss.Node(el.m_lnode[(j+   1)%ne]).m_rt;
+                vec3d rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).m_rt;
+                vec3d n = (rp - r0)^(rm - r0);
+                normal[el.m_lnode[j]] += n;
+            }
+        }
+        for (int i=0; i<NN; ++i) normal[i].unit();
+        
+        // loop over all nodes
+        for (int i=0; i<NN; ++i)
+        {
+            FENode& node = ss.Node(i);
+            
+            // get the spatial nodal coordinates
+            vec3d rt = node.m_rt;
+            vec3d nu = normal[i];
+            
+            // project onto the master surface
+            vec3d q;
+            double rs[2] = {0,0};
+            FESurfaceElement* pme = np.Project(rt, nu, rs);
+            if (pme)
+            {
+                // the node could potentially be in contact
+                // find the global location of the intersection point
+                vec3d q = ms.Local2Global(*pme, rs[0], rs[1]);
+                
+                // calculate the gap function
+                // NOTE: this has the opposite sign compared
+                // to Gerard's notes.
+                double gap = nu*(rt - q);
+                
+                if (gap>0) node.m_r0 = node.m_rt = q;
+            }
+        }
+    }
+    
 	// loop over all integration points
 //    #pragma omp parallel for shared(R, bupseg)
 	for (int i=0; i<ss.Elements(); ++i)
@@ -1086,7 +1156,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 
 void FESlidingInterface3::Update(int niter)
 {	
-	int i, j, n, id, np;
+	int j, n, id, np;
 	double rs[2];
 
 	FEModel& fem = *GetFEModel();
@@ -1120,21 +1190,23 @@ void FESlidingInterface3::Update(int niter)
 	
 	// project the surfaces onto each other
 	// this will update the gap functions as well
-	ProjectSurface(m_ss, m_ms, bupseg);
+    static bool bfirst = true;
+    ProjectSurface(m_ss, m_ms, bupseg, (m_breloc && bfirst));
 	if (m_btwo_pass || m_ss.m_bporo) ProjectSurface(m_ms, m_ss, bupseg);
+    bfirst = false;
 	
 	// Update the net contact pressures
 	UpdateContactPressures();
 
+    // update node normals
+    m_ss.UpdateNodeNormals();
+    m_ms.UpdateNodeNormals();
+    
 	// set poro flag
 	bool bporo = (m_ss.m_bporo || m_ms.m_bporo);
 	
 	// only continue if we are doing a poro-elastic simulation
 	if (bporo == false) return;
-	
-	// update node normals
-	m_ss.UpdateNodeNormals();
-	if (bporo) m_ms.UpdateNodeNormals();
 	
 	// Now that the nodes have been projected, we need to figure out
 	// if we need to modify the constraints on the pressure and concentration dofs.
@@ -1151,57 +1223,33 @@ void FESlidingInterface3::Update(int niter)
 		FESlidingSurface3& ss = (np == 0? m_ss : m_ms);
 		FESlidingSurface3& ms = (np == 0? m_ms : m_ss);
 		
-		// initialize projection data
-		FENormalProjection np(ss);
-		np.SetTolerance(m_stol);
-		np.SetSearchRadius(m_srad);
-		np.Init();
-
-		// loop over all elements of the primary surface
-		for (n=0; n<ss.Elements(); ++n)
-		{
-			FESurfaceElement& el = ss.Element(n);
-			int nint = el.GaussPoints();
-			int neln = el.Nodes();
-			
-			// get the normal tractions at the integration points
-			double ti[FEElement::MAX_NODES], gap, eps;
-			for (i=0; i<nint; ++i) 
-			{
-				FESlidingSurface3::Data& pt = ss.m_Data[n][i];
-				gap = pt.m_gap;
-				eps = m_epsn*pt.m_epsn;
-				ti[i] = MBRACKET(pt.m_Lmd + eps*gap);
-			}
-			
-			// project the data to the nodes
-			double tn[FEElement::MAX_NODES];
-			el.project_to_nodes(ti, tn);
-			
-			// see if we need to make changes to the BC's
-			for (i=0; i<neln; ++i)
-			{
-				if (tn[i] > 0)
-				{
-					FENode& node = ss.Node(el.m_lnode[i]);
-					id = node.m_ID[m_dofP];
-					if (id < -1)
-						// mark node as non-ambient (= pos ID)
-						node.m_ID[m_dofP] = -id-2;
-					for (j=0; j<MAX_CDOFS; ++j) {
-						id = node.m_ID[m_dofC+j];
-						if (id < -1)
-							// mark node as non-ambient (= pos ID)
-							node.m_ID[m_dofC+j] = -id-2;
-					}
-				}
-			}
-		}
-		
+        // loop over all the nodes of the primary surface
+        for (int n=0; n<ss.Nodes(); ++n) {
+            if (ss.m_pn[n] > 0) {
+                FENode& node = ss.Node(n);
+                int id = node.m_ID[m_dofP];
+                if (id < -1)
+                    // mark node as non-free-draining (= pos ID)
+                    node.m_ID[m_dofP] = -id-2;
+                for (j=0; j<MAX_CDOFS; ++j) {
+                    id = node.m_ID[m_dofC+j];
+                    if (id < -1)
+                        // mark node as non-ambient (= pos ID)
+                        node.m_ID[m_dofC+j] = -id-2;
+                }
+            }
+        }
+        
 		// loop over all nodes of the secondary surface
 		// the secondary surface is trickier since we need
 		// to look at the primary's surface projection
 		if (ms.m_bporo) {
+            // initialize projection data
+            FENormalProjection np(ss);
+            np.SetTolerance(m_stol);
+            np.SetSearchRadius(m_srad);
+            np.Init();
+            
 			for (n=0; n<ms.Nodes(); ++n)
 			{
 				// get the node
@@ -1222,20 +1270,10 @@ void FESlidingInterface3::Update(int niter)
 					if (fabs(g) <= R)
 					{
 						// we found an element so let's calculate the nodal traction values for this element
-						// get the normal tractions at the integration points
-						double ti[FEElement::MAX_NODES], gap, eps;
-						int nint = pse->GaussPoints();
-						vector<FESlidingSurface3::Data>& sd = ss.m_Data[pse->m_lid];
-						for (i=0; i<nint; ++i) 
-						{
-							gap = sd[i].m_gap;
-							eps = m_epsn*sd[i].m_epsn;
-							ti[i] = MBRACKET(sd[i].m_Lmd + eps*gap);
-						}
-						
-						// project the data to the nodes
-						double tn[FEElement::MAX_NODES];
-						pse->project_to_nodes(ti, tn);
+						// get the normal tractions at the nodes
+                        double tn[FEElement::MAX_NODES];
+                        for (int i=0; i<pse->Nodes(); ++i)
+                            tn[i] = ss.m_pn[pse->m_lnode[i]];
 						
 						// now evaluate the traction at the intersection point
 						double tp = pse->eval(tn, rs[0], rs[1]);
@@ -1274,6 +1312,9 @@ void FESlidingInterface3::ContactForces(FEGlobalVector& R)
 
 	double dt = fem.GetTime().timeIncrement;
 	
+    m_ss.m_Ft = vec3d(0, 0, 0);
+    m_ms.m_Ft = vec3d(0, 0, 0);
+    
 	// loop over the nr of passes
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
@@ -1404,12 +1445,20 @@ void FESlidingInterface3::ContactForces(FEGlobalVector& R)
 					
 					for (k=0; k<ndof; ++k) fe[k] += tn*N[k]*detJ[j]*w[j];
 					
+                    for (int k=0; k<nseln; ++k)
+                    {
+                        ss.m_Ft += vec3d(fe[k*3], fe[k*3+1], fe[k*3+2]);
+                    }
+                    
+                    for (int k = 0; k<nmeln; ++k)
+                    {
+                        ms.m_Ft += vec3d(fe[(k + nseln) * 3], fe[(k + nseln) * 3 + 1], fe[(k + nseln) * 3 + 2]);
+                    }
+                    
 					// assemble the global residual
 					R.Assemble(en, LM, fe);
 					
 					// do the biphasic stuff
-					// TODO: I should only do this when the node is actually in contact
-					//       in other words, when tn > 0
 					if (tn > 0)
 					{
 						if (sporo && mporo)
@@ -2110,6 +2159,7 @@ void FESlidingInterface3::UpdateContactPressures()
 				}
 			}
 		}
+        ss.EvaluateNodalContactPressures();
 	}
 }
 
@@ -2155,74 +2205,100 @@ bool FESlidingInterface3::Augment(int naug)
 	
 	// update Lagrange multipliers
 	double normL1 = 0, eps, epsp, epsc;
-	for (int i=0; i<NS; ++i)
-	{
-		vector<FESlidingSurface3::Data>& sd = m_ss.m_Data[i];
-		for (int j=0; j<(int)sd.size(); ++j)
-		{
-			FESlidingSurface3::Data& ds = sd[j];
-
-			// update Lagrange multipliers on slave surface
-			eps = m_epsn*ds.m_epsn;
-			Ln = ds.m_Lmd + eps*ds.m_gap;
-			ds.m_Lmd = MBRACKET(Ln);
-		
-			normL1 += ds.m_Lmd*ds.m_Lmd;
-		
-			if (m_ss.m_bporo) {
-				Lp = Lc = 0;
-				if (Ln > 0) {
-					epsp = m_epsp*ds.m_epsp;
-					Lp = ds.m_Lmp + epsp*ds.m_pg;
-					maxpg = max(maxpg,fabs(ds.m_pg));
-					normDP += ds.m_pg*ds.m_pg;
-					epsc = m_epsc*ds.m_epsc;
-					Lc = ds.m_Lmc + epsc*ds.m_cg;
-					maxcg = max(maxcg,fabs(ds.m_cg));
-					normDC += ds.m_cg*ds.m_cg;
-				}
-				ds.m_Lmp = Lp;
-				ds.m_Lmc = Lc;
-			}
-		
-			if (Ln > 0) maxgap = max(maxgap,fabs(ds.m_gap));
-		}
-	}	
-	
-	for (int i=0; i<NM; ++i)
-	{
-		vector<FESlidingSurface3::Data>& md = m_ms.m_Data[i];
-		for (int j=0; j<(int)md.size(); ++j)
-		{
-			FESlidingSurface3::Data& dm = md[j];
-
-			// update Lagrange multipliers on master surface
-			eps = m_epsn*dm.m_epsn;
-			Ln = dm.m_Lmd + eps*dm.m_gap;
-			dm.m_Lmd = MBRACKET(Ln);
-		
-			normL1 += dm.m_Lmd*dm.m_Lmd;
-		
-			if (m_ms.m_bporo) {
-				Lp = Lc = 0;
-				if (Ln > 0) {
-					epsp = m_epsp*dm.m_epsp;
-					Lp = dm.m_Lmp + epsp*dm.m_pg;
-					maxpg = max(maxpg,fabs(dm.m_pg));
-					normDP += dm.m_pg*dm.m_pg;
-					epsc = m_epsc*dm.m_epsc;
-					Lc = dm.m_Lmc + epsc*dm.m_cg;
-					maxcg = max(maxcg,fabs(dm.m_cg));
-					normDC += dm.m_cg*dm.m_cg;
-				}
-				dm.m_Lmp = Lp;
-				dm.m_Lmc = Lc;
-			}
-		
-			if (Ln > 0) maxgap = max(maxgap,fabs(dm.m_gap));
-		}
-	}
-	
+    for (int i=0; i<m_ss.Elements(); ++i) {
+        FESurfaceElement& el = m_ss.Element(i);
+        vec3d tn[FEElement::MAX_INTPOINTS];
+        if (m_bsmaug) m_ss.GetGPSurfaceTraction(i, tn);
+        for (int j=0; j<el.GaussPoints(); ++j) {
+            FESlidingSurface3::Data& data = m_ss.m_Data[i][j];
+            // update Lagrange multipliers on slave surface
+            if (m_bsmaug) {
+                // replace this multiplier with a smoother version
+                Ln = -(tn[j]*data.m_nu);
+                data.m_Lmd = MBRACKET(Ln);
+                if (m_btwo_pass) data.m_Lmd /= 2;
+            }
+            else {
+                eps = m_epsn*data.m_epsn;
+                Ln = data.m_Lmd + eps*data.m_gap;
+                data.m_Lmd = MBRACKET(Ln);
+            }
+            
+            normL1 += data.m_Lmd*data.m_Lmd;
+            
+            if (m_ss.m_bporo) {
+                Lp = 0;
+                if (Ln > 0) {
+                    epsp = m_epsp*data.m_epsp;
+                    Lp = data.m_Lmp + epsp*data.m_pg;
+                    maxpg = max(maxpg,fabs(data.m_pg));
+                    normDP += data.m_pg*data.m_pg;
+                }
+                data.m_Lmp = Lp;
+            }
+            
+            if (m_ss.m_bsolu) {
+                Lc = 0;
+                if (Ln > 0) {
+                    epsc = m_epsc*data.m_epsc;
+                    Lc = data.m_Lmc + epsc*data.m_cg;
+                    maxcg = max(maxcg,fabs(data.m_cg));
+                    normDC += data.m_cg*data.m_cg;
+                }
+                data.m_Lmc = Lc;
+            }
+            
+            if (Ln > 0) maxgap = max(maxgap,fabs(data.m_gap));
+        }
+    }
+    
+    for (int i=0; i<m_ms.Elements(); ++i) {
+        FESurfaceElement& el = m_ms.Element(i);
+        vec3d tn[FEElement::MAX_INTPOINTS];
+        if (m_bsmaug) m_ms.GetGPSurfaceTraction(i, tn);
+        for (int j=0; j<el.GaussPoints(); ++j) {
+            FESlidingSurface3::Data& data = m_ms.m_Data[i][j];
+            // update Lagrange multipliers on master surface
+            if (m_bsmaug) {
+                // replace this multiplier with a smoother version
+                Ln = -(tn[j]*data.m_nu);
+                data.m_Lmd = MBRACKET(Ln);
+                if (m_btwo_pass) data.m_Lmd /= 2;
+            }
+            else {
+                eps = m_epsn*data.m_epsn;
+                Ln = data.m_Lmd + eps*data.m_gap;
+                data.m_Lmd = MBRACKET(Ln);
+            }
+            
+            normL1 += data.m_Lmd*data.m_Lmd;
+            
+            if (m_ms.m_bporo) {
+                Lp = 0;
+                if (Ln > 0) {
+                    epsp = m_epsp*data.m_epsp;
+                    Lp = data.m_Lmp + epsp*data.m_pg;
+                    maxpg = max(maxpg,fabs(data.m_pg));
+                    normDP += data.m_pg*data.m_pg;
+                }
+                data.m_Lmp = Lp;
+            }
+            
+            if (m_ms.m_bsolu) {
+                Lc = 0;
+                if (Ln > 0) {
+                    epsc = m_epsc*data.m_epsc;
+                    Lc = data.m_Lmc + epsc*data.m_cg;
+                    maxcg = max(maxcg,fabs(data.m_cg));
+                    normDC += data.m_cg*data.m_cg;
+                }
+                data.m_Lmc = Lc;
+            }
+            
+            if (Ln > 0) maxgap = max(maxgap,fabs(data.m_gap));
+        }
+    }
+    
 	// normP should be a measure of the fluid pressure at the
 	// contact interface.  However, since it could be zero,
 	// use an average measure of the contact traction instead.

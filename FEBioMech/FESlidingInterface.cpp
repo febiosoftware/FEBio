@@ -351,6 +351,40 @@ void FESlidingSurface::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
+void FESlidingSurface::GetContactGap(int nface, double& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ne = el.Nodes();
+    pg = 0;
+    for (int k=0; k<ne; ++k) pg += m_gap[el.m_lnode[k]];
+    pg /= ne;
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurface::GetContactPressure(int nface, double& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ne = el.Nodes();
+    pg = 0;
+    for (int k=0; k<ne; ++k) pg += m_Ln[el.m_lnode[k]];
+    pg /= ne;
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurface::GetContactTraction(int nface, vec3d& pt)
+{
+    FESurfaceElement& el = Element(nface);
+    int ne = el.Nodes();
+    pt = vec3d(0,0,0);
+    for (int k=0; k<ne; ++k)
+    {
+        int nj = el.m_lnode[k];
+        if (m_gap[nj] > 0) pt += m_nu[nj]*m_Ln[nj];
+    }
+    pt /= ne;
+}
+
+//-----------------------------------------------------------------------------
 void FESlidingSurface::GetNodalContactGap(int nface, double* pg)
 {
 	FESurfaceElement& f = Element(nface);

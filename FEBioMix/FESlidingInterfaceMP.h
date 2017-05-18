@@ -59,10 +59,14 @@ public:
 	void UnpackLM(FEElement& el, vector<int>& lm);
 	
 public:
+    void GetContactGap     (int nface, double& pg);
+    void GetContactPressure(int nface, double& pg);
+    void GetContactTraction(int nface, vec3d& pt);
 	void GetNodalContactGap     (int nface, double* pg);
 	void GetNodalContactPressure(int nface, double* pg);
 	void GetNodalContactTraction(int nface, vec3d* tn);
     void GetNodalPressureGap    (int nface, double* pg);
+    void EvaluateNodalContactPressures();
 	
 protected:
 	FEModel*	m_pfem;
@@ -74,8 +78,11 @@ public:
 	bool						m_bsolu;	//!< set solute-mode
 	
 	vector<vec3d>				m_nn;	//!< node normals
+    vector<double>              m_pn;   //!< nodal contact pressures
 	
 	vector<int>					m_sid;	//!< list of solute id's for this surface
+    
+    vec3d	m_Ft;                       //!< total contact force (from equivalent nodal forces)
 
 protected:
 	int	m_dofC;
@@ -144,7 +151,7 @@ public:
     FESoluteData* FindSoluteData(int nid);
     
 protected:
-	void ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfaceMP& ms, bool bupseg);
+	void ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfaceMP& ms, bool bupseg, bool bmove = false);
 	
 	//! calculate penalty factor
 	void CalcAutoPenalty(FESlidingSurfaceMP& s);
@@ -173,6 +180,8 @@ public:
 	int				m_naugmax;		//!< maximum nr of augmentations
 	int				m_naugmin;		//!< minimum nr of augmentations
 	int				m_nsegup;		//!< segment update parameter
+    bool			m_breloc;		//!< node relocation on startup
+    bool            m_bsmaug;       //!< smooth augmentation
 	
 	double			m_epsn;         //!< normal penalty factor
 	bool			m_bautopen;     //!< use autopenalty factor

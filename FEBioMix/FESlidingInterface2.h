@@ -50,10 +50,14 @@ public:
 	void SetPoroMode(bool bporo) { m_bporo = bporo; }
 
 public:
+    void GetContactGap     (int nface, double& pg);
+    void GetContactPressure(int nface, double& pg);
+    void GetContactTraction(int nface, vec3d& pt);
 	void GetNodalContactGap     (int nface, double* pg);
 	void GetNodalContactPressure(int nface, double* pg);
 	void GetNodalContactTraction(int nface, vec3d* pt);
     void GetNodalPressureGap    (int nface, double* pg);
+    void EvaluateNodalContactPressures();
     
 protected:
 	FEModel*	m_pfem;
@@ -64,6 +68,7 @@ public:
 	vector< vector<Data> >	m_Data;	//!< integration point data
 	vector<bool>		m_poro;	//!< surface element poro status
 	vector<vec3d>		m_nn;	//!< node normals
+    vector<double>      m_pn;   //!< nodal contact pressures
 
 	vec3d	m_Ft;	//!< total contact force (from equivalent nodal forces)
 };
@@ -143,6 +148,7 @@ public:
 	int				m_naugmin;		//!< minimum nr of augmentations
 	int				m_nsegup;		//!< segment update parameter
 	bool			m_breloc;		//!< node relocation on startup
+    bool            m_bsmaug;       //!< smooth augmentation
 
 	double			m_epsn;		//!< normal penalty factor
 	bool			m_bautopen;	//!< use autopenalty factor

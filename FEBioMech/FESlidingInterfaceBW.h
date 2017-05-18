@@ -42,6 +42,9 @@ public:
 	double GetContactArea();
     
 public:
+    void GetContactGap     (int nface, double& pg);
+    void GetContactPressure(int nface, double& pg);
+    void GetContactTraction(int nface, vec3d& pt);
 	void GetNodalContactGap     (int nface, double* pg);
 	void GetNodalContactPressure(int nface, double* pg);
 	void GetNodalContactTraction(int nface, vec3d* pt);
@@ -51,6 +54,8 @@ protected:
 	
 public:
 	vector< vector<Data> >	m_Data;		//!< integration point data for all elements
+    
+    vec3d	m_Ft;	//!< total contact force (from equivalent nodal forces)
 };
 
 //-----------------------------------------------------------------------------
@@ -118,6 +123,7 @@ public:
 	int				m_naugmin;		//!< minimum nr of augmentations
 	int				m_nsegup;		//!< segment update parameter
 	bool			m_breloc;		//!< node relocation on activation
+    bool            m_bsmaug;       //!< smooth augmentation
 	
 	double			m_epsn;			//!< normal penalty factor
 	bool			m_bautopen;		//!< use autopenalty factor

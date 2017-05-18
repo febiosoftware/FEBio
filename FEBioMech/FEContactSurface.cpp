@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEContactSurface.h"
 #include "FECore/FEModel.h"
+#include "FEBioMech/FEElasticMaterial.h"
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
@@ -31,7 +32,22 @@ bool FEContactSurface::Init()
 void FEContactSurface::SetSibling(FEContactSurface* ps) { m_pSibling = ps; }
 
 //-----------------------------------------------------------------------------
+void FEContactSurface::GetContactGap(int nface, double& pg) {}
+
+//-----------------------------------------------------------------------------
+void FEContactSurface::GetVectorGap(int nface, vec3d& pg) {}
+
+//-----------------------------------------------------------------------------
+void FEContactSurface::GetContactPressure(int nface, double& pg) {}
+
+//-----------------------------------------------------------------------------
+void FEContactSurface::GetContactTraction(int nface, vec3d& pt) {}
+
+//-----------------------------------------------------------------------------
 void FEContactSurface::GetNodalContactGap(int nface, double* pg) {}
+
+//-----------------------------------------------------------------------------
+void FEContactSurface::GetNodalVectorGap(int nface, vec3d* pg) {}
 
 //-----------------------------------------------------------------------------
 void FEContactSurface::GetNodalContactPressure(int nface, double* pg) {}
@@ -44,6 +60,129 @@ vec3d FEContactSurface::GetContactForce() { return vec3d(0,0,0); }
 
 //-----------------------------------------------------------------------------
 double FEContactSurface::GetContactArea() { return 0; }
+
+//-----------------------------------------------------------------------------
+// Evaluate surface traction from the stress tensor of the attached solid element
+void FEContactSurface::GetSurfaceTraction(int nface, vec3d& pt)
+{
+    FESurfaceElement& el = Element(nface);
+    FEElement* e = m_pMesh->FindElementFromID(FindElement(el));
+    FESolidElement* se = dynamic_cast<FESolidElement*>(e);
+    if (se) {
+        mat3ds si[FEElement::MAX_INTPOINTS];
+        mat3ds so[FEElement::MAX_NODES];
+        for (int i=0; i<se->GaussPoints(); ++i) {
+            FEMaterialPoint* pt = se->GetMaterialPoint(i);
+            FEElasticMaterialPoint* ep = pt->ExtractData<FEElasticMaterialPoint>();
+            if (ep)
+                si[i] = ep->m_s;
+            else
+                si[i].zero();
+        }
+        // project stresses from integration points to nodes
+        se->project_to_nodes(si, so);
+        // only keep the stresses at the nodes of the contact face
+        mat3ds sn[FEElement::MAX_NODES];
+        for (int i=0; i<el.Nodes(); ++i)
+            sn[i] = so[se->FindNode(el.m_node[i])];
+        // evaluate tractions at integration points of that face
+        vec3d t[FEElement::MAX_INTPOINTS];
+        for (int i=0; i<el.GaussPoints(); ++i) {
+            double *H = el.H(i);
+            t[i] = vec3d(0,0,0);
+            for (int j=0; j<el.Nodes(); ++j) {
+                vec3d n = SurfaceNormal(el, j);
+                t[i] += sn[j]*n*H[j];
+            }
+        }
+        // now save the average traction on that face
+        int ni = el.GaussPoints();
+        pt = vec3d(0,0,0);
+        for (int k=0; k<ni; ++k) pt += t[k];
+        pt /= ni;
+    }
+    else
+        pt = vec3d(0,0,0);
+}
+
+//-----------------------------------------------------------------------------
+// Evaluate surface traction from the stress tensor of the attached solid element
+void FEContactSurface::GetNodalSurfaceTraction(int nface, vec3d* pt)
+{
+    FESurfaceElement& el = Element(nface);
+    FEElement* e = m_pMesh->FindElementFromID(FindElement(el));
+    FESolidElement* se = dynamic_cast<FESolidElement*>(e);
+    if (se) {
+        mat3ds si[FEElement::MAX_INTPOINTS];
+        mat3ds so[FEElement::MAX_NODES];
+        for (int i=0; i<se->GaussPoints(); ++i) {
+            FEMaterialPoint* pt = se->GetMaterialPoint(i);
+            FEElasticMaterialPoint* ep = pt->ExtractData<FEElasticMaterialPoint>();
+            if (ep)
+                si[i] = ep->m_s;
+            else
+                si[i].zero();
+        }
+        // project stresses from integration points to nodes
+        se->project_to_nodes(si, so);
+        // only keep the stresses at the nodes of the contact face
+        mat3ds sn[FEElement::MAX_NODES];
+        for (int i=0; i<el.Nodes(); ++i)
+            sn[i] = so[se->FindNode(el.m_node[i])];
+        // evaluate tractions at integration points of that face
+        vec3d t[FEElement::MAX_INTPOINTS];
+        for (int i=0; i<el.GaussPoints(); ++i) {
+            double *H = el.H(i);
+            t[i] = vec3d(0,0,0);
+            for (int j=0; j<el.Nodes(); ++j) {
+                vec3d n = SurfaceNormal(el, j);
+                t[i] += sn[j]*n*H[j];
+            }
+        }
+        // now project the traction from integration points back to nodes
+        el.project_to_nodes(t, pt);
+    }
+    else
+        for (int i=0; i<el.Nodes(); ++i) pt[i] = vec3d(0,0,0);
+}
+
+//-----------------------------------------------------------------------------
+// Evaluate surface traction from the stress tensor of the attached solid element
+void FEContactSurface::GetGPSurfaceTraction(int nface, vec3d* pt)
+{
+    FESurfaceElement& el = Element(nface);
+    FEElement* e = m_pMesh->FindElementFromID(FindElement(el));
+    FESolidElement* se = dynamic_cast<FESolidElement*>(e);
+    if (se) {
+        mat3ds si[FEElement::MAX_INTPOINTS];
+        mat3ds so[FEElement::MAX_NODES];
+        for (int i=0; i<se->GaussPoints(); ++i) {
+            FEMaterialPoint* pt = se->GetMaterialPoint(i);
+            FEElasticMaterialPoint* ep = pt->ExtractData<FEElasticMaterialPoint>();
+            if (ep)
+                si[i] = ep->m_s;
+            else
+                si[i].zero();
+        }
+        // project stresses from integration points to nodes
+        se->project_to_nodes(si, so);
+        // only keep the stresses at the nodes of the contact face
+        mat3ds sn[FEElement::MAX_NODES];
+        for (int i=0; i<el.Nodes(); ++i)
+            sn[i] = so[se->FindNode(el.m_node[i])];
+        // evaluate tractions at integration points of that face
+        for (int i=0; i<el.GaussPoints(); ++i) {
+            double *H = el.H(i);
+            pt[i] = vec3d(0,0,0);
+            for (int j=0; j<el.Nodes(); ++j) {
+                vec3d n = SurfaceNormal(el, j);
+                pt[i] += sn[j]*n*H[j];
+            }
+        }
+    }
+    else
+        for (int i=0; i<el.Nodes(); ++i) pt[i] = vec3d(0,0,0);
+}
 
 //-----------------------------------------------------------------------------
 void FEContactSurface::UnpackLM(FEElement& el, vector<int>& lm)

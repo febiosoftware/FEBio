@@ -72,6 +72,85 @@ bool FEPlotNodeReactionForces::Save(FEMesh& m, FEDataStream& a)
 // Plot contact gap
 bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
 {
+    FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    a.assign(NF, 0.f);
+    double gn;
+    for (int i=0; i<NF; ++i)
+    {
+        pcs->GetContactGap(i, gn);
+        a[i] = (float) gn;
+    }
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot vector gap
+bool FEPlotVectorGap::Save(FESurface& surf, FEDataStream& a)
+{
+    FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    a.assign(3*NF, 0.f);
+    vec3d gn;
+    for (int i=0; i<NF; ++i)
+    {
+        pcs->GetVectorGap(i, gn);
+        a[3*i   ] = (float) gn.x;
+        a[3*i +1] = (float) gn.y;
+        a[3*i +2] = (float) gn.z;
+    }
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot contact pressure
+bool FEPlotContactPressure::Save(FESurface &surf, FEDataStream& a)
+{
+    FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    a.assign(NF, 0.f);
+    double tn;
+    for (int i=0; i<NF; ++i)
+    {
+        pcs->GetContactPressure(i, tn);
+        a[i] = (float) tn;
+    }
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot contact traction
+bool FEPlotContactTraction::Save(FESurface &surf, FEDataStream& a)
+{
+    FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    a.assign(3*NF, 0.f);
+    vec3d tn;
+    for (int j=0; j<NF; ++j)
+    {
+        pcs->GetContactTraction(j, tn);
+        
+        // store in archive
+        a[3*j   ] = (float) tn.x;
+        a[3*j +1] = (float) tn.y;
+        a[3*j +2] = (float) tn.z;
+    }
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot nodal contact gap
+bool FEPlotNodalContactGap::Save(FESurface& surf, FEDataStream& a)
+{
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
 
@@ -90,29 +169,58 @@ bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-// Plot contact pressure
-bool FEPlotContactPressure::Save(FESurface &surf, FEDataStream& a)
+// Plot nodal vector gap
+bool FEPlotNodalVectorGap::Save(FESurface &surf, FEDataStream& a)
 {
-	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
-	if (pcs == 0) return false;
-
-	int NF = pcs->Elements();
-	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
-	a.assign(MFN*NF, 0.f);
-	double tn[MFN];
-	for (int i=0; i<NF; ++i)
-	{
-		FESurfaceElement& el = pcs->Element(i);
-		pcs->GetNodalContactPressure(i, tn);
-		int ne = el.Nodes();
-		for (int k=0; k<ne; ++k) a[MFN*i + k] = (float) tn[k];
-	}
-	return true;
+    FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+    a.assign(3*MFN*NF, 0.f);
+    vec3d gn[MFN];
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        pcs->GetNodalVectorGap(j, gn);
+        
+        // store in archive
+        int ne = el.Nodes();
+        for (int k=0; k<ne; ++k)
+        {
+            a[3*MFN*j +3*k   ] = (float) gn[k].x;
+            a[3*MFN*j +3*k +1] = (float) gn[k].y;
+            a[3*MFN*j +3*k +2] = (float) gn[k].z;
+        }
+    }
+    
+    return true;
 }
 
 //-----------------------------------------------------------------------------
-// Plot contact traction
-bool FEPlotContactTraction::Save(FESurface &surf, FEDataStream& a)
+// Plot nodal contact pressure
+bool FEPlotNodalContactPressure::Save(FESurface &surf, FEDataStream& a)
+{
+    FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+    a.assign(MFN*NF, 0.f);
+    double tn[MFN];
+    for (int i=0; i<NF; ++i)
+    {
+        FESurfaceElement& el = pcs->Element(i);
+        pcs->GetNodalContactPressure(i, tn);
+        int ne = el.Nodes();
+        for (int k=0; k<ne; ++k) a[MFN*i + k] = (float) tn[k];
+    }
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot nodal contact traction
+bool FEPlotNodalContactTraction::Save(FESurface &surf, FEDataStream& a)
 {
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
@@ -137,6 +245,58 @@ bool FEPlotContactTraction::Save(FESurface &surf, FEDataStream& a)
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot surface traction
+bool FEPlotSurfaceTraction::Save(FESurface &surf, FEDataStream& a)
+{
+    FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    a.assign(3*NF, 0.f);
+    vec3d tn;
+    for (int j=0; j<NF; ++j)
+    {
+        pcs->GetSurfaceTraction(j, tn);
+        
+        // store in archive
+        a[3*j   ] = (float) tn.x;
+        a[3*j +1] = (float) tn.y;
+        a[3*j +2] = (float) tn.z;
+    }
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot nodal contact traction
+bool FEPlotNodalSurfaceTraction::Save(FESurface &surf, FEDataStream& a)
+{
+    FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+    a.assign(3*MFN*NF, 0.f);
+    vec3d tn[MFN];
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        pcs->GetNodalSurfaceTraction(j, tn);
+        
+        // store in archive
+        int ne = el.Nodes();
+        for (int k=0; k<ne; ++k)
+        {
+            a[3*MFN*j +3*k   ] = (float) tn[k].x;
+            a[3*MFN*j +3*k +1] = (float) tn[k].y;
+            a[3*MFN*j +3*k +2] = (float) tn[k].z;
+        }
+    }
+    
+    return true;
 }
 
 //-----------------------------------------------------------------------------

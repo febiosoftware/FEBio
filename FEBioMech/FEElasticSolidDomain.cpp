@@ -747,7 +747,7 @@ void FEElasticSolidDomain::Update(const FETimeInfo& tp)
 	{
 		try
 		{
-			UpdateElementStress(i, dt);
+			UpdateElementStress(i);
 		}
 		catch (NegativeJacobian e)
 		{
@@ -775,7 +775,7 @@ void FEElasticSolidDomain::Update(const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 //! Update element state data (mostly stresses, but some other stuff as well)
 //! \todo Remove the remodeling solid stuff
-void FEElasticSolidDomain::UpdateElementStress(int iel, double dt)
+void FEElasticSolidDomain::UpdateElementStress(int iel)
 {
 	// get the solid element
 	FESolidElement& el = m_Elem[iel];

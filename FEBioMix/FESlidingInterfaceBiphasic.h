@@ -23,16 +23,24 @@ public:
         Data();
         
     public:
-        double	m_gap;	//!< gap function
-        double	m_Lmd;	//!< lagrange multipliers for displacement
-        double	m_Lmp;	//!< lagrange multipliers for fluid pressures
-        double	m_Ln;	//!< net contact pressure
-        double	m_epsn;	//!< penalty factor
-        double	m_epsp;	//!< pressure penatly factor
-        double	m_pg;	//!< pressure "gap" for biphasic contact
-        vec3d	m_nu;	//!< normal at integration points
-        vec2d	m_rs;	//!< natrual coordinates of projection
+        double	m_gap;      //!< gap function
+        vec3d   m_dg;       //!< vector gap
+        double	m_Lmd;      //!< Lagrange multipliers for normal traction
+        vec3d   m_Lmt;      //!< Lagrange multipliers for vector traction
+        double	m_Lmp;      //!< lagrange multipliers for fluid pressures
+        double	m_Ln;       //!< net contact pressure
+        double	m_epsn;     //!< penalty factor
+        double	m_epsp;     //!< pressure penatly factor
+        double	m_pg;       //!< pressure "gap" for biphasic contact
+        double  m_p1;       //!< fluid pressure
+        vec3d	m_nu;       //!< normal at integration points
+        vec3d   m_s1;       //!< tangent along slip direction
+        vec3d   m_tr;       //!< contact traction
+        vec2d	m_rs;       //!< natrual coordinates of projection
+        vec2d   m_rsp;      //!< m_rs at the previous time step
+        bool    m_bstick;   //!< stick flag
         FESurfaceElement*	m_pme;	//!< master element
+        FESurfaceElement*   m_pmep; //!< m_pme at the previous time step
     };
     
 public:
@@ -44,6 +52,9 @@ public:
     
     // data serialization
     void Serialize(DumpStream& ar);
+    
+    //! initialize sliding surface and store previous values
+    void InitSlidingSurface();
     
     //! evaluate net contact force
     vec3d GetContactForce();
@@ -60,10 +71,14 @@ public:
     void SetPoroMode(bool bporo) { m_bporo = bporo; }
     
 public:
+    void GetContactGap     (int nface, double& pg);
+    void GetContactPressure(int nface, double& pg);
+    void GetContactTraction(int nface, vec3d& pt);
     void GetNodalContactGap     (int nface, double* pg);
     void GetNodalContactPressure(int nface, double* pg);
     void GetNodalContactTraction(int nface, vec3d* pt);
     void GetNodalPressureGap    (int nface, double* pg);
+    void EvaluateNodalContactTractions();
     
 protected:
     FEModel*	m_pfem;
@@ -74,8 +89,9 @@ public:
     vector< vector<Data> >	m_Data;	//!< integration point data
     vector<bool>		m_poro;	//!< surface element poro status
     vector<vec3d>		m_nn;	//!< node normals
+    vector<vec3d>       m_tn;   //!< nodal contact tractions
 
-	vec3d	m_Ft;	//!< total contact force (from equivalent nodal forces)
+    vec3d    m_Ft;     //!< total contact force (from equivalent nodal forces)
 };
 
 //-----------------------------------------------------------------------------
@@ -96,6 +112,12 @@ public:
     
     //! update
     void Update(int niter);
+    
+    //! calculate the slip direction on the primary surface
+    vec3d SlipTangent(FESlidingSurfaceBiphasic& ss, const int nel, const int nint, FESlidingSurfaceBiphasic& ms, double& dh, vec3d& r);
+    
+    //! calculate contact traction
+    vec3d ContactTraction(FESlidingSurfaceBiphasic& ss, const int nel, const int n, FESlidingSurfaceBiphasic& ms, double& pn);
     
     //! calculate contact forces
     void ContactForces(FEGlobalVector& R);
@@ -153,12 +175,16 @@ public:
     int				m_naugmin;		//!< minimum nr of augmentations
     int				m_nsegup;		//!< segment update parameter
     bool			m_breloc;		//!< node relocation on startup
+    bool            m_bsmaug;       //!< smooth augmentation
     
     double			m_epsn;		//!< normal penalty factor
     bool			m_bautopen;	//!< use autopenalty factor
     
     // biphasic contact parameters
     double	m_epsp;		//!< flow rate penalty
+    
+    double          m_mu;           //!< friction coefficient
+    double          m_phi;          //!< solid-solid contact fraction
     
 protected:
     int	m_dofP;

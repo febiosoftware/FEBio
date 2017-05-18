@@ -25,6 +25,7 @@ BEGIN_PARAMETER_LIST(FEFacet2FacetSliding, FEContactInterface)
 	ADD_PARAMETER(m_epsf     , FE_PARAM_DOUBLE, "fric_penalty" );
 	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"       );
 	ADD_PARAMETER(m_breloc   , FE_PARAM_BOOL  , "node_reloc"   );
+    ADD_PARAMETER(m_bsmaug   , FE_PARAM_BOOL  , "smooth_aug"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -228,6 +229,36 @@ void FEFacetSlidingSurface::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
+void FEFacetSlidingSurface::GetContactGap(int nface, double& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ni = el.GaussPoints();
+    pg = 0;
+    for (int k=0; k<ni; ++k) pg += m_Data[nface][k].m_gap;
+    pg /= ni;
+}
+
+//-----------------------------------------------------------------------------
+void FEFacetSlidingSurface::GetContactPressure(int nface, double& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ni = el.GaussPoints();
+    pg = 0;
+    for (int k=0; k<ni; ++k) pg += m_Data[nface][k].m_Ln;
+    pg /= ni;
+}
+
+//-----------------------------------------------------------------------------
+void FEFacetSlidingSurface::GetContactTraction(int nface, vec3d& pt)
+{
+    FESurfaceElement& el = Element(nface);
+    int ni = el.GaussPoints();
+    pt = vec3d(0,0,0);
+    for (int k=0; k<ni; ++k) pt -= m_Data[nface][k].m_nu*m_Data[nface][k].m_Ln;
+    pt /= ni;
+}
+
+//-----------------------------------------------------------------------------
 void FEFacetSlidingSurface::GetNodalContactGap(int nface, double* gn)
 {
 	FESurfaceElement& el = Element(nface);
@@ -314,6 +345,7 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(p
 	m_bautopen = false;
 	m_nsegup = 0;	// always do segment updates
 	m_breloc = false;
+    m_bsmaug = false;
 
 	m_atol = 0.01;
 	m_gtol = 0;
@@ -1171,56 +1203,69 @@ bool FEFacet2FacetSliding::Augment(int naug)
 	normL0 = sqrt(normL0);
 
 	// --- c a l c u l a t e   c u r r e n t   n o r m s ---
-	// a. normal component
+	// b. normal component
 	double normL1 = 0;	// force norm
 	double normg1 = 0;	// gap norm
 	int N = 0;
-	for (int i=0; i<NS; ++i)
-	{
-		vector<FEFacetSlidingSurface::Data>& sd = m_ss.m_Data[i];
-		for (int j=0; j<(int)sd.size(); ++j)
-		{
-			FEFacetSlidingSurface::Data& ds = sd[j];
-
-			// penalty value
-			double eps = m_epsn*ds.m_eps;
-
-			// update Lagrange multipliers
-			double Ln = ds.m_Lm + eps*ds.m_gap;
-			Ln = MBRACKET(Ln);
-
-			normL1 += Ln*Ln;
-
-			if (ds.m_gap > 0)
-			{
-				normg1 += ds.m_gap*ds.m_gap;
-				++N;
-			}
-		}
-	}	
-
-	for (int i=0; i<NM; ++i)
-	{
-		vector<FEFacetSlidingSurface::Data>& md = m_ms.m_Data[i];
-		for (int j=0; j<(int)md.size(); ++j)
-		{
-			FEFacetSlidingSurface::Data& dm = md[j];
-
-			// penalty value
-			double eps = m_epsn*dm.m_eps;
-
-			// update Lagrange multipliers
-			double Ln = dm.m_Lm + eps*dm.m_gap;
-			Ln = MBRACKET(Ln);
-
-			normL1 += Ln*Ln;
-			if (dm.m_gap > 0)
-			{
-				normg1 += dm.m_gap*dm.m_gap;
-				++N;
-			}
-		}
-	}
+    double Ln;
+    for (int i=0; i<m_ss.Elements(); ++i) {
+        FESurfaceElement& el = m_ss.Element(i);
+        vec3d tn[FEElement::MAX_INTPOINTS];
+        if (m_bsmaug) m_ss.GetGPSurfaceTraction(i, tn);
+        for (int j=0; j<el.GaussPoints(); ++j) {
+            FEFacetSlidingSurface::Data& data = m_ss.m_Data[i][j];
+            // update Lagrange multipliers on slave surface
+            if (m_bsmaug) {
+                // replace this multiplier with a smoother version
+                Ln = -(tn[j]*data.m_nu);
+                data.m_Lm = MBRACKET(Ln);
+                if (m_btwo_pass) data.m_Lm /= 2;
+            }
+            else {
+                double eps = m_epsn*data.m_eps;
+                Ln = data.m_Lm + eps*data.m_gap;
+                data.m_Lm = MBRACKET(Ln);
+            }
+            
+            normL1 += data.m_Lm*data.m_Lm;
+            
+            if (data.m_gap > 0)
+            {
+                normg1 += data.m_gap*data.m_gap;
+                ++N;
+            }
+        }
+    }
+    
+    for (int i=0; i<m_ms.Elements(); ++i) {
+        FESurfaceElement& el = m_ms.Element(i);
+        vec3d tn[FEElement::MAX_INTPOINTS];
+        if (m_bsmaug) m_ms.GetGPSurfaceTraction(i, tn);
+        for (int j=0; j<el.GaussPoints(); ++j) {
+            FEFacetSlidingSurface::Data& data = m_ms.m_Data[i][j];
+            // update Lagrange multipliers on master surface
+            if (m_bsmaug) {
+                // replace this multiplier with a smoother version
+                Ln = -(tn[j]*data.m_nu);
+                data.m_Lm = MBRACKET(Ln);
+                if (m_btwo_pass) data.m_Lm /= 2;
+            }
+            else {
+                double eps = m_epsn*data.m_eps;
+                Ln = data.m_Lm + eps*data.m_gap;
+                data.m_Lm = MBRACKET(Ln);
+            }
+            
+            normL1 += data.m_Lm*data.m_Lm;
+            
+            if (data.m_gap > 0)
+            {
+                normg1 += data.m_gap*data.m_gap;
+                ++N;
+            }
+        }
+    }
+    
 	if (N == 0) N=1;
 
 	normL1 = sqrt(normL1);

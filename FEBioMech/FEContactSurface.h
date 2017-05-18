@@ -28,9 +28,19 @@ public:
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 public:
+    virtual void GetContactGap     (int nface, double& pg);
+    virtual void GetVectorGap      (int nface, vec3d& pg);
+    virtual void GetContactPressure(int nface, double& pg);
+    virtual void GetContactTraction(int nface, vec3d& pt);
+    
 	virtual void GetNodalContactGap     (int nface, double* pg);
+    virtual void GetNodalVectorGap      (int nface, vec3d* pg);
 	virtual void GetNodalContactPressure(int nface, double* pg);
 	virtual void GetNodalContactTraction(int nface, vec3d* pt);
+
+    void GetSurfaceTraction(int nface, vec3d& pt);
+    void GetNodalSurfaceTraction(int nface, vec3d* pt);
+    void GetGPSurfaceTraction(int nface, vec3d* pt);
 
 	virtual vec3d GetContactForce();
     virtual double GetContactArea();

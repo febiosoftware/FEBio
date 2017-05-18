@@ -41,6 +41,9 @@ public:
 	void Serialize(DumpStream& ar);
 
 public:
+    void GetContactGap     (int nface, double& pg);
+    void GetContactPressure(int nface, double& pg);
+    void GetContactTraction(int nface, vec3d& pt);
 	void GetNodalContactGap     (int nface, double* gn);
 	void GetNodalContactPressure(int nface, double* pn);
 	void GetNodalContactTraction(int nface, vec3d* tn);
@@ -112,9 +115,10 @@ public:
 	bool	m_bautopen;		//!< auto-penalty flag
 	double	m_srad;			//!< search radius (% of model size)
 	int		m_nsegup;		//!< segment update parameter
-	bool	m_breloc;	//!< node relocation on initilization
+	bool	m_breloc;       //!< node relocation on initialization
+    bool    m_bsmaug;       //!< smooth augmentation
 
-	double	m_atol;			//!< aug lag tolernace
+	double	m_atol;			//!< aug lag tolerance
 	double	m_gtol;			//!< gap tolerance
 	int		m_naugmin;		//!< min nr of augmentations
 	int		m_naugmax;		//!< max nr of augmentations

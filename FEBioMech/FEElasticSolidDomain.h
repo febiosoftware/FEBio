@@ -42,7 +42,7 @@ public: // overrides from FEElasticDomain
 	void Update(const FETimeInfo& tp);
 
 	// update the element stress
-	virtual void UpdateElementStress(int iel, double dt);
+	virtual void UpdateElementStress(int iel);
 
 	//! intertial forces for dynamic problems
 	void InertialForces(FEGlobalVector& R, vector<double>& F);

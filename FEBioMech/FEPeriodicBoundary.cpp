@@ -101,6 +101,36 @@ void FEPeriodicSurface::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
+void FEPeriodicSurface::GetContactGap(int nface, double& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ne = el.Nodes();
+    pg = 0;
+    for (int k=0; k<ne; ++k) pg += m_gap[el.m_lnode[k]].norm();
+    pg /= ne;
+}
+
+//-----------------------------------------------------------------------------
+void FEPeriodicSurface::GetContactPressure(int nface, double& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ne = el.Nodes();
+    pg = 0;
+    for (int k=0; k<ne; ++k) pg += m_Tn[el.m_lnode[k]].norm();
+    pg /= ne;
+}
+
+//-----------------------------------------------------------------------------
+void FEPeriodicSurface::GetContactTraction(int nface, vec3d& pt)
+{
+    FESurfaceElement& el = Element(nface);
+    int ne = el.Nodes();
+    pt = vec3d(0,0,0);
+    for (int k=0; k<ne; ++k) pt += m_Tn[el.m_lnode[k]];
+    pt /= ne;
+}
+
+//-----------------------------------------------------------------------------
 void FEPeriodicSurface::GetNodalContactGap(int nface, double* pg)
 {
 	FESurfaceElement& el = Element(nface);

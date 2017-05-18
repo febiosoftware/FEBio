@@ -83,10 +83,40 @@ void FEStickySurface::Serialize(DumpStream &ar)
 }
 
 //-----------------------------------------------------------------------------
+void FEStickySurface::GetContactGap(int nface, double& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ne = el.Nodes();
+    pg = 0;
+    for (int k=0; k<ne; ++k) pg += m_Node[el.m_lnode[k]].gap.norm();
+    pg /= ne;
+}
+
+//-----------------------------------------------------------------------------
+void FEStickySurface::GetContactPressure(int nface, double& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ne = el.Nodes();
+    pg = 0;
+    for (int k=0; k<ne; ++k) pg += m_Node[el.m_lnode[k]].tn.norm();
+    pg /= ne;
+}
+
+//-----------------------------------------------------------------------------
+void FEStickySurface::GetContactTraction(int nface, vec3d& pt)
+{
+    FESurfaceElement& el = Element(nface);
+    int ne = el.Nodes();
+    pt = vec3d(0,0,0);
+    for (int k=0; k<ne; ++k) pt += m_Node[el.m_lnode[k]].tn;
+    pt /= ne;
+}
+
+//-----------------------------------------------------------------------------
 void FEStickySurface::GetNodalContactGap(int nface, double* gn)
 {
 	FESurfaceElement& f = Element(nface);
-	int ne = f.m_lnode.size();
+	int ne = f.Nodes();
 	for (int j= 0; j< ne; ++j) gn[j] = m_Node[f.m_lnode[j]].gap.norm();
 }
 
@@ -94,7 +124,7 @@ void FEStickySurface::GetNodalContactGap(int nface, double* gn)
 void FEStickySurface::GetNodalContactPressure(int nface, double* pn)
 {
 	FESurfaceElement& f = Element(nface);
-	int ne = f.m_lnode.size();
+	int ne = f.Nodes();
 	for (int j= 0; j< ne; ++j) pn[j] = m_Node[f.m_lnode[j]].tn.norm();
 }
 
@@ -102,7 +132,7 @@ void FEStickySurface::GetNodalContactPressure(int nface, double* pn)
 void FEStickySurface::GetNodalContactTraction(int nface, vec3d* tn)
 {
 	FESurfaceElement& f = Element(nface);
-	int ne = f.m_lnode.size();
+	int ne = f.Nodes();
 	for (int j= 0; j< ne; ++j) tn[j] = m_Node[f.m_lnode[j]].tn;
 }
 
