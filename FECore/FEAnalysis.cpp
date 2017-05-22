@@ -593,7 +593,7 @@ double FEAnalysis::CheckMustPoints(double t, double dt)
 {
 	double tnew = t + dt;
 	double dtnew = dt;
-	const double eps = m_tend*1e-07;
+	const double eps = m_tend*1e-12;
 	double tmust = tnew + eps;
 	FEDataLoadCurve& lc = dynamic_cast<FEDataLoadCurve&>(*m_fem.GetLoadCurve(m_nmplc));
 	m_nmust = -1;
@@ -602,14 +602,16 @@ double FEAnalysis::CheckMustPoints(double t, double dt)
 		FEDataLoadCurve::LOADPOINT lp;
 		if (m_next_must < 0)
 		{
-			// find the first must-point that is past this time
+			// find the first must-point that is on or past this time
 			m_next_must = 0;
+			bool bfound = false;
 			do
 			{
 				lp = lc.LoadPoint(m_next_must);
-				if (tmust > lp.time) ++m_next_must;
+				if ((tmust > lp.time) && (fabs(tnew - lp.time) > 1e-12)) ++m_next_must;
+				else bfound = true;
 			}
-			while ((tmust > lp.time)&&(m_next_must < lc.Points()));
+			while ((bfound == false)&&(m_next_must < lc.Points()));
 
 			// make sure we did not pass all must points
 			if (m_next_must >= lc.Points()) return dt;
@@ -623,7 +625,13 @@ double FEAnalysis::CheckMustPoints(double t, double dt)
 			felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
 			m_nmust = m_next_must++;
 		}
-		else if (tnew == lp.time) m_nmust = m_next_must++;
+		else if (fabs(tnew - lp.time) < 1e-12)
+		{
+			m_nmust = m_next_must++;
+			tnew = lp.time;
+			dtnew = tnew - t;
+			felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
+		}
 		else if (tnew > m_tend)
 		{
 			dtnew = m_tend - t;
