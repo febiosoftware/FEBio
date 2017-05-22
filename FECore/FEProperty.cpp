@@ -30,7 +30,9 @@ void FEProperty::Write(DumpStream& ar, FECoreBase* pc)
 	ar << nflag;
 	if (nflag)
 	{
+		int ntype = pc->GetSuperClassID();
 		ar << pc->GetTypeStr();
+		ar << ntype;
 		pc->Serialize(ar);
 	}
 }
@@ -43,17 +45,16 @@ FECoreBase* FEProperty::Read(DumpStream& ar)
 	ar >> nflag;
 	if (nflag)
 	{
-		// TODO: don't know how to do this yet
-		assert(false);
-		/*		char sz[256];
+		char sz[256];
+		int ntype = 0;
 		ar >> sz;
-		pm = fecore_new<FEMaterial>(FEMATERIAL_ID, sz, &ar.GetFEModel());
+		ar >> ntype;
+		pm = fecore_new<FECoreBase>(ntype, sz, &ar.GetFEModel());
 		pm->SetParent(GetParent());
 		pm->Serialize(ar);
 
 		// TODO: Do I really need to do this here?
 		//pm->Init();
-*/
 	}
 	return pm;
 }
