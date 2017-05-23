@@ -124,7 +124,10 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 
 			// only consider triangles (for now)
 			int N = el.Nodes();
-			if ((N == 3) || (N == 4))
+
+			// TODO: The case N==4 is causing convergence issues for some test suite problems.
+			//       I'm commenting it out until I get a chance to look further into this
+			if ((N == 3))// || (N == 4))
 			{
 				int kmin = -1;
 				// we got to find a point closer than the closest point
