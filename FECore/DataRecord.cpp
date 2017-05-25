@@ -191,6 +191,8 @@ bool DataRecord::Write()
 		}
 	}
 
+	if (fp) fflush(fp);
+
 	return true;
 }
 
