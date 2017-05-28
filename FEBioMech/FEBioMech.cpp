@@ -455,6 +455,7 @@ REGISTER_FECORE_CLASS(FEPlotContactPressure		 , FEPLOTDATA_ID, "contact pressure
 REGISTER_FECORE_CLASS(FEPlotNodalContactPressure , FEPLOTDATA_ID, "nodal contact pressure");
 REGISTER_FECORE_CLASS(FEPlotContactTraction		 , FEPLOTDATA_ID, "contact traction"      );
 REGISTER_FECORE_CLASS(FEPlotNodalContactTraction , FEPLOTDATA_ID, "nodal contact traction");
+REGISTER_FECORE_CLASS(FEPlotStickStatus			 , FEPLOTDATA_ID, "contact stick"         );
 REGISTER_FECORE_CLASS(FEPlotContactForce 		 , FEPLOTDATA_ID, "contact force"         );
 REGISTER_FECORE_CLASS(FEPlotContactArea 		 , FEPLOTDATA_ID, "contact area"          );
 REGISTER_FECORE_CLASS(FEPlotContactPenalty 		 , FEPLOTDATA_ID, "contact penalty"       );

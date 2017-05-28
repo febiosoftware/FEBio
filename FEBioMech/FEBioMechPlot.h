@@ -139,6 +139,16 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Stick status
+//!
+class FEPlotStickStatus : public FESurfaceData
+{
+public:
+    FEPlotStickStatus(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Contact force
 //!
 class FEPlotContactForce : public FESurfaceData

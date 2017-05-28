@@ -300,6 +300,24 @@ bool FEPlotNodalSurfaceTraction::Save(FESurface &surf, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+// Plot stick status
+bool FEPlotStickStatus::Save(FESurface& surf, FEDataStream& a)
+{
+    FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    a.assign(NF, 0.f);
+    double gn;
+    for (int i=0; i<NF; ++i)
+    {
+        pcs->GetStickStatus(i, gn);
+        a[i] = (float) gn;
+    }
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotContactForce::Save(FESurface &surf, FEDataStream &a)
 {
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);

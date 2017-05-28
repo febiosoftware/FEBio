@@ -38,6 +38,8 @@ public:
 	virtual void GetNodalContactPressure(int nface, double* pg);
 	virtual void GetNodalContactTraction(int nface, vec3d* pt);
 
+    virtual void GetStickStatus(int nface, double& pt);
+    
     void GetSurfaceTraction(int nface, vec3d& pt);
     void GetNodalSurfaceTraction(int nface, vec3d* pt);
     void GetGPSurfaceTraction(int nface, vec3d* pt);

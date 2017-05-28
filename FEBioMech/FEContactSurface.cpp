@@ -185,6 +185,9 @@ void FEContactSurface::GetGPSurfaceTraction(int nface, vec3d* pt)
 }
 
 //-----------------------------------------------------------------------------
+void FEContactSurface::GetStickStatus(int nface, double& pt) {}
+
+//-----------------------------------------------------------------------------
 void FEContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	int N = el.Nodes();
