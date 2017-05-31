@@ -25,6 +25,7 @@ BEGIN_PARAMETER_LIST(FESlidingInterface2, FEContactInterface)
 	ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"             );
 	ADD_PARAMETER(m_breloc   , FE_PARAM_BOOL  , "node_reloc"         );
     ADD_PARAMETER(m_bsmaug   , FE_PARAM_BOOL  , "smooth_aug"         );
+    ADD_PARAMETER(m_bdupr    , FE_PARAM_BOOL  , "dual_proj"          );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -474,6 +475,7 @@ FESlidingInterface2::FESlidingInterface2(FEModel* pfem) : FEContactInterface(pfe
 	m_bautopen = false;
 	m_breloc = false;
     m_bsmaug = false;
+    m_bdupr = true;
 
 	m_naugmin = 0;
 	m_naugmax = 10;
@@ -980,7 +982,7 @@ void FESlidingInterface2::Update(int niter)
 		// loop over all nodes of the secondary surface
 		// the secondary surface is trickier since we need
 		// to look at the primary surface's projection
-		if (ms.m_bporo && (npass == 1)) {
+		if (ms.m_bporo && ((npass == 1) || m_bdupr)) {
 			FENormalProjection np(ss);
 			np.SetTolerance(m_stol);
 			np.SetSearchRadius(R);

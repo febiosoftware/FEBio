@@ -149,6 +149,7 @@ public:
 	int				m_nsegup;		//!< segment update parameter
 	bool			m_breloc;		//!< node relocation on startup
     bool            m_bsmaug;       //!< smooth augmentation
+    bool            m_bdupr;        //!< dual projection flag for free-draining
 
 	double			m_epsn;		//!< normal penalty factor
 	bool			m_bautopen;	//!< use autopenalty factor
