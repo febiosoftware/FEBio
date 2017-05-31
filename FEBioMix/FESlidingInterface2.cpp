@@ -980,7 +980,7 @@ void FESlidingInterface2::Update(int niter)
 		// loop over all nodes of the secondary surface
 		// the secondary surface is trickier since we need
 		// to look at the primary surface's projection
-		if (ms.m_bporo) {
+		if (ms.m_bporo && (npass == 1)) {
 			FENormalProjection np(ss);
 			np.SetTolerance(m_stol);
 			np.SetSearchRadius(R);
