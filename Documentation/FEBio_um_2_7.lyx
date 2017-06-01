@@ -24024,7 +24024,7 @@ name
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="47" columns="3">
+<lyxtabular version="3" rows="56" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top">
@@ -24706,6 +24706,154 @@ Material fiber vector
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357707
+fluid acceleration
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357709
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357746
+Fluid acceleration (material time derivative of fluid velocity 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+, Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Fluids"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357671
+fluid density
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357674
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357691
+Fluid density 
+\begin_inset Formula $\rho$
+\end_inset
+
+, Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:cfd-density"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357758
+fluid dilatation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357760
+Node
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357771
+Fluid dilatation 
+\begin_inset Formula $e$
+\end_inset
+
+, Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Fluids"
+
+\end_inset
+
+)
+\change_unchanged
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -24787,9 +24935,12 @@ Surface*
 
 \begin_layout Plain Layout
 
-\change_inserted 2145056167 1496356260
-Volumetric fluid flow rate across a named surface (biphasic and multiphasic
- analyses)
+\change_inserted 2145056167 1496358179
+Volumetric fluid flow rate 
+\begin_inset Formula $Q=\int_{A}\mathbf{w}\cdot\mathbf{n}\,dA$
+\end_inset
+
+ across a named surface (biphasic and multiphasic analyses)
 \end_layout
 
 \end_inset
@@ -24859,43 +25010,25 @@ Surface*
 
 \begin_layout Plain Layout
 
-\change_inserted 2145056167 1496356033
-Mass flow rate across a named surface (fluid analysis)
-\end_layout
+\change_inserted 2145056167 1496358228
+Mass flow rate across a named surface, 
+\begin_inset Formula $\dot{m}=\int_{A}\rho\mathbf{v}\cdot\mathbf{n}\,dA$
+\end_inset
+
+, Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Fluids"
 
 \end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
 
-\begin_layout Plain Layout
 
-\change_inserted 2145056167 1496356062
-fluid surface force
-\end_layout
+\change_unchanged
 
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\change_inserted 2145056167 1496356231
-Surface*
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\change_inserted 2145056167 1496356088
-Net force exerted by a fluid on a named surface (fluid analysis)
 \end_layout
 
 \end_inset
@@ -24942,14 +25075,387 @@ reference "eq:bs-effective-p-c"
 
 \end_inset
 
-, and triphasic/multiphasic materials, Eq.
+, 
+\change_deleted 2145056167 1496357427
+and
+\change_unchanged
+ triphasic/multiphasic materials, Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:mp-effective-p-c"
 
 \end_inset
 
+
+\change_inserted 2145056167 1496357432
+,
+\change_unchanged
  
+\change_inserted 2145056167 1496357461
+and fluid materials, Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:cfd-pressure"
+
+\end_inset
+
+
+\change_unchanged
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496358023
+fluid rate of deformation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496358025
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496358034
+Fluid rate of deformation tensor 
+\begin_inset Formula $\mathbf{D}$
+\end_inset
+
+, Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Fluids"
+
+\end_inset
+
+
+\change_unchanged
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357613
+fluid stress
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357615
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357632
+Fluid stress 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+, Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:cfd-stress"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496358046
+fluid stress power
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496358049
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496358073
+Fluid stress power 
+\begin_inset Formula $\boldsymbol{\sigma}:\mathbf{D}$
+\end_inset
+
+, Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Fluids"
+
+\end_inset
+
+
+\change_unchanged
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357534
+fluid surface force
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357534
+Surface*
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496358281
+Net force exerted by a fluid on a named surface, 
+\begin_inset Formula $\mathbf{f}=-\int_{A}\mathbf{t}\,dA$
+\end_inset
+
+, Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Fluids"
+
+\end_inset
+
+
+\change_unchanged
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357818
+fluid velocity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357923
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496358376
+Element fluid velocity 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+, Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Fluids"
+
+\end_inset
+
+
+\change_unchanged
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496358098
+fluid volume ratio
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496358100
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496358117
+Fluid volume ratio 
+\begin_inset Formula $J$
+\end_inset
+
+, Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Fluids"
+
+\end_inset
+
+
+\change_unchanged
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357896
+fluid vorticity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357899
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496357904
+Fluid vorticity, Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Fluids"
+
+\end_inset
+
+
+\change_unchanged
+
 \end_layout
 
 \end_inset
@@ -25656,6 +26162,10 @@ Node
 
 \begin_layout Plain Layout
 Nodal velocities 
+\change_inserted 2145056167 1496357966
+(fluid nodal velocities in fluid analyses)
+\change_unchanged
+
 \end_layout
 
 \end_inset
