@@ -24024,7 +24024,7 @@ name
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="44" columns="3">
+<lyxtabular version="3" rows="47" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top">
@@ -24618,6 +24618,10 @@ enclosed volume
 
 \begin_layout Plain Layout
 Surface
+\change_inserted 2145056167 1496356245
+*
+\change_unchanged
+
 \end_layout
 
 \end_inset
@@ -24756,6 +24760,42 @@ reference "eq:mp-fluxes-w-j"
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496356178
+fluid flow rate
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496356194
+Surface*
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496356260
+Volumetric fluid flow rate across a named surface (biphasic and multiphasic
+ analyses)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -24786,6 +24826,76 @@ Net fluid force across biphasic (sliding2), biphasic-solute (sliding3) and
 
  over the contact surface.
  
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496356003
+fluid mass flow rate
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496356198
+Surface*
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496356033
+Mass flow rate across a named surface (fluid analysis)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496356062
+fluid surface force
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496356231
+Surface*
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496356088
+Net force exerted by a fluid on a named surface (fluid analysis)
 \end_layout
 
 \end_inset
@@ -25627,6 +25737,68 @@ The optional alias can be used to rename the variable.
 This variable will store the solute concentration of a solute named `Na'
  to the plot file using the name `Na concentration'.
  This is the name that will be shown in PostView for instance.
+\change_inserted 2145056167 1496356282
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496356331
+Some variables require the specification of a named surface (* in above
+ table).
+ For example,
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496356351
+<var type="fluid surface force" surface=
+\begin_inset Quotes erd
+\end_inset
+
+airfoil
+\begin_inset Quotes erd
+\end_inset
+
+/>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496356561
+The named surface should be described in a 
+\emph on
+Surface
+\emph default
+ element (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Surface-Section"
+
+\end_inset
+
+) within 
+\emph on
+Geometry
+\emph default
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Geometry-Section"
+
+\end_inset
+
+).
+\change_unchanged
+
 \end_layout
 
 \begin_layout Standard
