@@ -91,11 +91,12 @@ figs-within-sections
 \papercolumns 1
 \papersides 2
 \paperpagestyle default
-\tracking_changes false
+\tracking_changes true
 \output_changes false
 \html_math_output 0
 \html_css_as_file 0
 \html_be_strict false
+\author 2145056167 "Gerard Ateshian"
 \end_header
 
 \begin_body
@@ -551,7 +552,11 @@ url{http://febio.org}
 \begin_layout Standard
 FEBio can solve different kinds of physics.
  It can solve problems in structural mechanics, heat transfer, biphasic
- and multiphasic physics.
+ and multiphasic physics
+\change_inserted 2145056167 1496339794
+, and fluid mechanics
+\change_unchanged
+.
  Both a (quasi-) static and dynamic (or transient) analysis can be performed
  in each of the different physics modules.
  For instance, in the structural mechanics module, the (quasi-) static response
@@ -565,6 +570,11 @@ FEBio can solve different kinds of physics.
  For the steady-state analysis the final relaxed state is recovered.
  Similarly, for multiphasic and heat transfer problems, both the time dependent
  transient response as well as the steady-state response can be determined.
+
+\change_inserted 2145056167 1496339945
+ For fluid analyses, dynamic and steady-state responses may be specified.
+\change_unchanged
+
 \end_layout
 
 \begin_layout Standard
@@ -632,8 +642,21 @@ FEBio supports a wide range of boundary conditions to model interactions
 FEBio has a large library of element formulations.
  These include linear tetrahedral, hexahedral and pentahedral (wedge) elements,
  as well as quadratic tetrahedral and hexahedral elements.
- FEBio also supports triangular and bi-linear quadratic director-based shell
- elements.
+ FEBio also supports triangular 
+\change_deleted 2145056167 1496339995
+and bi-linear quadratic
+\change_inserted 2145056167 1496339997
+quadrilateral
+\change_unchanged
+ 
+\change_deleted 2145056167 1496340004
+director-based
+\change_unchanged
+ shell elements
+\change_inserted 2145056167 1496340019
+, with linear and quadratic interpolations
+\change_unchanged
+.
 \end_layout
 
 \begin_layout Standard
@@ -4460,7 +4483,7 @@ type
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
+<lyxtabular version="3" rows="7" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -4569,7 +4592,7 @@ Multiphasic analysis including solute transport and chemical reactions
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4578,11 +4601,35 @@ heat
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Heat transfer analysis: steady-state or transient
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496340057
+fluid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496340092
+Fluid mechanics analysis: steady-state or dynamic
 \end_layout
 
 \end_inset
@@ -6411,8 +6458,12 @@ dynamic
 \begin_inset Text
 
 \begin_layout Plain Layout
-dynamic analysis.
+dynamic analysis
+\change_deleted 2145056167 1496345714
+.
  
+\change_unchanged
+
 \end_layout
 
 \end_inset
@@ -7804,6 +7855,134 @@ Only output the data at the last converged time step.
 \end_layout
 
 \end_deeper
+\begin_layout Subsection
+
+\change_inserted 2145056167 1496345864
+Parameters for a Structural Mechanics Analysis
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Parameters-Solid-Analysis"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496345819
+A structural mechanics analysis is defined by using the 
+\shape italic
+solid 
+\shape default
+type in Module section.
+ All control parameters above can be used in a structural mechanics analysis.
+ In addition, the following parameter can be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\change_inserted 2145056167 1496345780
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496345780
+
+\series bold
+Parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496345780
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496345780
+
+\series bold
+Default
+\series default
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496345835
+symmetric_stiffness
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496345780
+Choose between a symmetric or nonsymmetric formulation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496345780
+1 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Parameters for Biphasic Analysis
 \begin_inset CommandInset label
@@ -10773,15 +10952,53 @@ z apply displacement in
 \end_layout
 
 \begin_layout Description
-u apply rotation about x-direction
+u apply 
+\change_deleted 2145056167 1496344888
+rotation about
+\change_inserted 2145056167 1496344896
+shell back-face displacement in
+\change_unchanged
+ 
+\change_deleted 2145056167 1496344897
+x
+\change_inserted 2145056167 1496344897
+
+\begin_inset Formula $x$
+\end_inset
+
+
+\change_unchanged
+-direction
 \end_layout
 
 \begin_layout Description
-v apply rotation about y-direction
+v apply 
+\change_deleted 2145056167 1496344906
+rotation about
+\change_inserted 2145056167 1496344916
+shell back-face displacement in
+\change_unchanged
+ 
+\change_deleted 2145056167 1496344919
+y
+\change_inserted 2145056167 1496344919
+
+\begin_inset Formula $y$
+\end_inset
+
+
+\change_unchanged
+-direction
 \end_layout
 
 \begin_layout Description
-w apply rotation about 
+w apply 
+\change_deleted 2145056167 1496344925
+rotation about
+\change_inserted 2145056167 1496344930
+shell back-face displacement in
+\change_unchanged
+ 
 \begin_inset Formula $z$
 \end_inset
 
@@ -10790,6 +11007,10 @@ w apply rotation about
 
 \begin_layout Description
 p apply prescribed effective fluid pressure
+\change_inserted 2145056167 1496344951
+ (biphasic and multiphasic analyses)
+\change_unchanged
+
 \end_layout
 
 \begin_layout Description
@@ -10809,6 +11030,50 @@ c[
 \begin_inset Formula $n$
 \end_inset
 
+
+\change_inserted 2145056167 1496344962
+
+\end_layout
+
+\begin_layout Description
+
+\change_inserted 2145056167 1496345045
+vx apply prescribed fluid velocity in 
+\begin_inset Formula $x$
+\end_inset
+
+-direction (fluid analysis)
+\end_layout
+
+\begin_layout Description
+
+\change_inserted 2145056167 1496345050
+vy apply prescribed fluid velocity in 
+\begin_inset Formula $y$
+\end_inset
+
+-direction (fluid analysis)
+\end_layout
+
+\begin_layout Description
+
+\change_inserted 2145056167 1496345052
+vz apply prescribed fluid velocity in 
+\begin_inset Formula $x$
+\end_inset
+
+-direction (fluid analysis)
+\end_layout
+
+\begin_layout Description
+
+\change_inserted 2145056167 1496345062
+
+\series bold
+e
+\series default
+ apply prescribed fluid dilatation (fluid analysis)
+\change_unchanged
 
 \end_layout
 
@@ -11645,7 +11910,11 @@ c
 \end_layout
 
 \begin_layout Description
-t: apply normal heat flux (heat transfer analysis)
+t
+\change_deleted 2145056167 1496345121
+:
+\change_unchanged
+ apply normal heat flux (heat transfer analysis)
 \end_layout
 
 \begin_layout Standard
@@ -11811,6 +12080,16 @@ pressure
 
 \begin_layout LyX-Code
   <value surface_data="pressure_value"/>
+\change_inserted 2145056167 1496345403
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496345429
+  <symmetric_stiffness>0</symmetric_stiffness>
+\change_unchanged
+
 \end_layout
 
 \begin_layout LyX-Code
@@ -11832,7 +12111,22 @@ parameter and the
 \shape italic
 surface_data 
 \shape default
-attribute.
+attribute
+\change_inserted 2145056167 1496353686
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SurfaceData"
+
+\end_inset
+
+)
+\change_unchanged
+.
 \end_layout
 
 \begin_layout Standard
@@ -11863,6 +12157,35 @@ lc
 lc
 \shape default
  is not defined a constant pressure is applied.
+\change_inserted 2145056167 1496345437
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496345956
+The optional 
+\emph on
+symmetric_stiffness
+\emph default
+ parameter (0 or 1) determines whether to use the exact form of the stiffness
+ matrix for this surface load (0=non-symmetric), or the symmetric form (1=defaul
+t).
+ The non-symmetric form is numerically more robust, but it may also require
+ using a globally non-symmetric stiffness matrix (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Parameters-Solid-Analysis"
+
+\end_inset
+
+).
+\change_unchanged
+
 \end_layout
 
 \begin_layout Subsubsection
@@ -12754,7 +13077,871 @@ parameter with the
 surface_data 
 \shape default
 attribute can be defined to define a different temperature value for each
- surface facet.
+ surface facet
+\change_inserted 2145056167 1496353713
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SurfaceData"
+
+\end_inset
+
+)
+\change_unchanged
+.
+\change_inserted 2145056167 1496353712
+
+\end_layout
+
+\begin_layout Subsubsection
+
+\change_inserted 2145056167 1496346544
+Fluid Traction
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Traction"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496354035
+In a fluid analysis, the Cauchy stress is given by 
+\begin_inset Formula $\boldsymbol{\sigma}=-p\mathbf{I}+\boldsymbol{\tau}$
+\end_inset
+
+, where 
+\begin_inset Formula $p$
+\end_inset
+
+ is the elastic pressure and 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ is the viscous stress.
+ The traction on a fluid surface with outward normal 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ is given by 
+\begin_inset Formula $\mathbf{t}=\boldsymbol{\sigma}\cdot\mathbf{n}=-p\mathbf{n}+\mathbf{t}^{\tau}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{t}^{\tau}=\boldsymbol{\tau}\cdot\mathbf{n}$
+\end_inset
+
+ is the viscous component of the traction.
+ The 
+\emph on
+fluid traction
+\emph default
+ surface load prescribes 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+ on a boundary surface.
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496346498
+<surface_load type="fluid traction" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496346493
+  <scale lc="1">1.0</scale>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496346493
+  <traction>0,0,1</traction>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496346493
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496346518
+If a different vector value needs to be specified for each facet, use the
+ following syntax,
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496346535
+<surface_load type="fluid traction" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496346493
+  <scale lc="1">1.0</scale>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496346493
+  <traction surface_data="traction_value"/>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496353724
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496353909
+and provide the facet values in a user-defined 
+\emph on
+SurfaceData
+\emph default
+ map (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SurfaceData"
+
+\end_inset
+
+).
+\change_unchanged
+
+\end_layout
+
+\begin_layout Subsubsection
+
+\change_inserted 2145056167 1496351766
+Fluid Normal Traction
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Normal-Traction"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496354031
+In a fluid analysis, the normal component 
+\begin_inset Formula $t_{n}^{\tau}=\mathbf{t}^{\tau}\cdot\mathbf{n}$
+\end_inset
+
+ of the viscous traction 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Traction"
+
+\end_inset
+
+) may be prescribed on a boundary surface in a fluid analysis.
+ The
+\emph on
+ fluid normal traction
+\emph default
+ surface load prescribes 
+\begin_inset Formula $t_{n}^{\tau}$
+\end_inset
+
+ on a boundary surface.
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496346736
+<surface_load type="fluid normal traction" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496352073
+  <scale [lc="1"]>1.0</scale>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496346691
+  <traction>1</traction>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496346691
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496346749
+If a different scalar value needs to be specified for each facet, use the
+ following syntax,
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496346754
+<surface_load type="fluid normal traction" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496352066
+  <scale [lc="1"]>1.0</scale>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496346691
+  <traction surface_data="traction_value"/>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496353805
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496353919
+and provide the facet values in a user-defined 
+\emph on
+SurfaceData
+\emph default
+ map (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SurfaceData"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsubsection
+
+\change_inserted 2145056167 1496352533
+Fluid Backflow Stabilization
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Backflow-Stabilization"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496354025
+In a fluid analysis, this boundary condition prescribes the normal component
+ of the viscous traction (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Traction"
+
+\end_inset
+
+), 
+\begin_inset Formula $t_{n}^{\tau}=\mathbf{t}^{\tau}\cdot\mathbf{n}$
+\end_inset
+
+, such that it opposes backflow, i.e., when 
+\begin_inset Formula $v_{n}=\mathbf{v}\cdot\mathbf{n}$
+\end_inset
+
+ is negative.
+ Specifically, 
+\begin_inset Formula $t_{n}^{\tau}=\beta\rho_{r}v_{n}^{2}$
+\end_inset
+
+ when 
+\begin_inset Formula $v_{n}<0$
+\end_inset
+
+ and 
+\begin_inset Formula $0$
+\end_inset
+
+ otherwise, where 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is a unitless user-defined parameter (typical values may range from 0 to
+ 1) and 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ is the referential fluid density.
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496352728
+<surface_load type="fluid backflow stabilization" surface="surface1">>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496352730
+	<beta [lc="1"]>1</beta>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496352734
+</surface_load>
+\change_unchanged
+
+\end_layout
+
+\begin_layout Subsubsection
+
+\change_inserted 2145056167 1496351770
+Fluid Tangential Stabilization
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Tangential-Stabilization"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496354020
+In a fluid analysis, this boundary condition prescribes the tangential component
+ of the viscous traction (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Traction"
+
+\end_inset
+
+), 
+\begin_inset Formula $\mathbf{t}_{t}^{\tau}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\mathbf{t}^{\tau}$
+\end_inset
+
+, such that it opposes the tangential fluid flow 
+\begin_inset Formula $\mathbf{v}_{t}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\mathbf{v}$
+\end_inset
+
+ on the selected boundary surface, with 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ representing the outward normal to this surface.
+ Specifically, 
+\begin_inset Formula $\mathbf{t}_{t}^{\tau}=-\beta\rho_{r}\left|\mathbf{v}_{t}\right|\mathbf{v}_{t}$
+\end_inset
+
+, where 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is a unitless user-defined parameter (typical values may range from 0 to
+ 1) and 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ is the referential fluid density.
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496352459
+<surface_load type="fluid tangential stabilization" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496352061
+	<beta [lc="1"]>1</beta>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496352442
+</surface_load>
+\end_layout
+
+\begin_layout Subsubsection
+
+\change_inserted 2145056167 1496351775
+Fluid Normal Velocity
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Normal-Velocity"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496348899
+In a fluid analysis, the velocity 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ on a boundary surface with outward normal 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ may be decomposed into the normal component, 
+\begin_inset Formula $v_{n}=\mathbf{v}\cdot\mathbf{n}$
+\end_inset
+
+, and tangential component, 
+\begin_inset Formula $\mathbf{v}_{\tau}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\mathbf{v}=\mathbf{v}-v_{n}\mathbf{n}$
+\end_inset
+
+.
+ The surface load 
+\emph on
+fluid normal velocity
+\emph default
+ may be used to prescribe a desired value of 
+\begin_inset Formula $v_{n}$
+\end_inset
+
+ on a boundary surface.
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496348906
+<surface_load type="fluid normal velocity" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496353070
+  <value [lc="1"]>1.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496348943
+  <velocity>1</velocity>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496348899
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496353107
+Optionally, FEBio can generate a parabolic velocity profile over the named
+ surface, This option can be turned on using the 
+\emph on
+parabolic
+\emph default
+ element (0=default, 1=parabolic).
+ In this case, the 
+\emph on
+velocity
+\emph default
+ element provides the average value of this parabolic velocity profile,
+ while 
+\emph on
+value
+\emph default
+ remains a scale factor optionally tied to a loadcurve.
+ The parabolic profile is calculated under the assumption of steady Poiseuille
+ flow in an infinite tube whose cross-section has the shape of the named
+ surface.
+ All nodes located along the curve boundary of this surface are prescribed
+ zero normal velocity.
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496350129
+<surface_load type="fluid normal velocity" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496350129
+  <value lc="1">1.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496350132
+  <velocity>1</velocity>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496350145
+  <parabolic>1</parabolic>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496350129
+</surface_load>
+\change_unchanged
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496350452
+If an arbitrary distribution with different scalar value needs to be specified
+ for each facet, use the following syntax,
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496348910
+<surface_load type="fluid normal velocity" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496348992
+  <value lc="1">1.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496349002
+  <velocity surface_data="traction_value"/>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496350463
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496353925
+and provide the facet values in a user-defined 
+\emph on
+SurfaceData
+\emph default
+ map (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SurfaceData"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496353833
+By default, this condition only prescribes the natural boundary condition
+ 
+\begin_inset Formula $v_{n}$
+\end_inset
+
+, leaving 
+\begin_inset Formula $\mathbf{v}_{\tau}$
+\end_inset
+
+ free.
+ Optionally, it is possible to also enforce 
+\begin_inset Formula $\mathbf{v}_{\tau}=\mathbf{0}$
+\end_inset
+
+ by prescribing essential boundary conditions on the vx, vy and vz components
+ of 
+\begin_inset Formula $\mathbf{v}=v_{n}\mathbf{n}$
+\end_inset
+
+ at the nodes of each facet, based on the value of 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ at each node (obtained by averaging 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ from adjoining facets).
+ This option may be turned on using the 
+\emph on
+prescribe_nodal_velocities
+\emph default
+ element (0=default, 1=prescribed), for example,
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496350611
+<surface_load type="fluid normal velocity" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496350611
+  <value lc="1">1.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496350627
+  <velocity>1</velocity>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496350643
+  <prescribe_nodal_velocities>1</prescribe_nodal_velocities>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496350611
+</surface_load>
+\change_unchanged
+
+\end_layout
+
+\begin_layout Subsubsection
+
+\change_inserted 2145056167 1496351780
+Fluid Velocity
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Velocity"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496354002
+In a fluid analysis, this boundary condition prescribes the fluid velocity
+ vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ on a named surface, simultaneously satisfying the natural boundary condition
+ for 
+\begin_inset Formula $v_{n}=\mathbf{v}\cdot\mathbf{n}$
+\end_inset
+
+ and prescribing essential boundary conditions on the vx, vy and vz components
+ of 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ at the nodes of each facet, based on the value of 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ at each node (obtained by averaging 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ from adjoining facets).
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496351264
+<surface_load type="fluid velocity" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496351260
+  <scale lc="1">1.0</scale>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496351280
+  <velocity>0,0,1</velocity>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496351260
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496351260
+If a different vector value needs to be specified for each facet, use the
+ following syntax,
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496351293
+<surface_load type="fluid velocity" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496351260
+  <scale lc="1">1.0</scale>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496351297
+  <velocity surface_data="traction_value"/>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496353866
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496353896
+and provide the facet values in a user-defined 
+\emph on
+SurfaceData
+\emph default
+ map (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SurfaceData"
+
+\end_inset
+
+).
+\change_unchanged
+
+\end_layout
+
+\begin_layout Subsubsection
+
+\change_inserted 2145056167 1496351783
+Fluid Resistance
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Resistance"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496354010
+In a fluid analysis, this boundary condition prescribes an elastic pressure
+ 
+\begin_inset Formula $p=R\,Q+p_{0}$
+\end_inset
+
+ on a surface, where 
+\begin_inset Formula $R$
+\end_inset
+
+ is the flow resistance and 
+\begin_inset Formula $Q$
+\end_inset
+
+ is the volumetric flow rate across the surface (calculated internally);
+ 
+\begin_inset Formula $p_{0}$
+\end_inset
+
+ is an optional offset pressure.
+ The pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ is converted to a dilatation and prescribed as an essential boundary condition
+ at the nodes of the facets.
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496351603
+<surface_load type="fluid resistance" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496351572
+  <R lc="1">7.93e+07</R>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496351590
+  <pressure_offset lc="2">10640</pressure_offset>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496351731
+<surface_load>
+\change_unchanged
+
 \end_layout
 
 \begin_layout Subsection
@@ -63096,6 +64283,2214 @@ Isotropic contraction in a mixture containing a neo-Hookean solid.
 
 \begin_layout LyX-Code
 </material>
+\change_inserted 2145056167 1496339836
+
+\end_layout
+
+\begin_layout Section
+
+\change_inserted 2145056167 1496354125
+Viscous Fluids
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Fluids"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496354215
+Fluid mechanics analyses may be used to examine fluid flow over fixed domains.
+ FEBio's fluid module treats the fluid as isothermal (constant and uniform
+ temperature) and compressible; incompressible flow is simulated by prescribing
+ a physically realistic bulk modulus 
+\begin_inset Formula $K$
+\end_inset
+
+ to model the fluid's elastic compressibility (for example, 
+\begin_inset Formula $K=2.2\,\text{GPa}$
+\end_inset
+
+ for water at room temperature).
+ The Cauchy stress 
+\begin_inset Formula ${\rm \boldsymbol{\sigma}}$
+\end_inset
+
+ in a fluid is given by 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=-p\mathbf{I}+\boldsymbol{\tau}\,,\label{eq:cfd-stress}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $p$
+\end_inset
+
+ is the fluid pressure arising from the elastic response and 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ is the viscous stress resulting from the fluid viscosity and its rate of
+ deformation.
+ The fluid pressure is evaluated from
+\begin_inset Formula 
+\begin{equation}
+p=K\left(1-J\right)=-K\,e\,,\label{eq:cfd-pressure}
+\end{equation}
+
+\end_inset
+
+whre 
+\begin_inset Formula $J$
+\end_inset
+
+ is the fluid volume ratio and 
+\begin_inset Formula $e=J-1$
+\end_inset
+
+ is the dilatation (the relative change in volume).
+ The fluid density 
+\begin_inset Formula $\rho$
+\end_inset
+
+ varies with 
+\begin_inset Formula $J$
+\end_inset
+
+ according to
+\begin_inset Formula 
+\begin{equation}
+\rho=\frac{\rho_{r}}{J}\,,\label{eq:cfd-density}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ is the fluid density in the reference configuration (when the pressure
+ 
+\begin_inset Formula $p$
+\end_inset
+
+ is zero).
+ The dependence of 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ on the rate of deformation tensor 
+\begin_inset Formula $\mathbf{D}=\frac{1}{2}\left(\grad\mathbf{v}+\grad^{T}\mathbf{v}\right)$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{v}=$
+\end_inset
+
+fluid velocity, is given by a constitutive model which may be chosen from
+ the list provided in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Viscous-Fluid-Materials"
+
+\end_inset
+
+.
+ Though Newtonian and non-Newtonian fluids may be analyzed in this framework,
+ all fluids are purely viscous (no viscoelasticity is included in this formulati
+on).
+ Setting the viscosity to zero is allowable, for the purpose of analyzing
+ inviscid flow.
+ The user is referred to the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496339836
+
+
+\backslash
+href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+\backslash
+emph{FEBio Theory Manual}}
+\end_layout
+
+\end_inset
+
+ for a general description of this isothermal compressible viscous flow
+ framework.
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496355279
+For fluid analyses, FEBio solves for the components of the fluid velocity
+ 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ and fluid dilatation 
+\begin_inset Formula $e$
+\end_inset
+
+ at each node.
+ On any fluid boundary, the outward surface normal may be denoted by 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ and the traction vector on the fluid is given by 
+\begin_inset Formula $\mathbf{t}=\boldsymbol{\sigma}\cdot\mathbf{n}=-p\,\mathbf{n}+\mathbf{t}^{\tau}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{t}^{\tau}=\boldsymbol{\tau}\cdot\mathbf{n}$
+\end_inset
+
+ is the viscous traction.
+ Essential (Dirichlet) boundary conditions may be prescribed on 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ and 
+\begin_inset Formula $e$
+\end_inset
+
+, while natural (Neumann) boundary conditions may be prescribed on 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+ and 
+\begin_inset Formula $v_{n}$
+\end_inset
+
+.
+ The appearance of velocity in both essential and natural boundary conditions
+ may seem surprising at first.
+ To better understand the nature of these boundary conditions, it is convenient
+ to separate the velocity into its normal and tangential components, 
+\begin_inset Formula $\mathbf{v}=v_{n}\mathbf{n}+\mathbf{v}_{t}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{v}_{t}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\mathbf{v}$
+\end_inset
+
+.
+ In particular, for inviscid flow, the viscous stress 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ and its corresponding traction 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+ are both zero, leaving 
+\begin_inset Formula $v_{n}$
+\end_inset
+
+ as the sole natural boundary condition; similarly, 
+\begin_inset Formula $e$
+\end_inset
+
+ becomes the only essential boundary condition in such flows, since 
+\begin_inset Formula $\mathbf{v}_{t}$
+\end_inset
+
+ is unknown 
+\emph on
+a priori
+\emph default
+ on a frictionless boundary and must be obtained from the solution of the
+ analysis.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496355276
+In general, prescribing 
+\begin_inset Formula $e$
+\end_inset
+
+ is equivalent to prescribing the elastic fluid pressure, since 
+\begin_inset Formula $p$
+\end_inset
+
+ is only a function of 
+\begin_inset Formula $e$
+\end_inset
+
+.
+ On a boundary where no conditions are prescribed explicitly, we conclude
+ that 
+\begin_inset Formula $v_{n}=0$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{t}^{\tau}=\mathbf{0}$
+\end_inset
+
+, which represents a frictionless wall.
+ Conversely, it is possible to prescribe 
+\begin_inset Formula $v_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+ on a boundary to produce a desired inflow or outflow while simultaneously
+ stabilizing the flow conditions by prescribing a suitable viscous traction.
+ Prescribing essential boundary conditions 
+\begin_inset Formula $\mathbf{v}_{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $e$
+\end_inset
+
+ determines the tangential velocity on a boundary as well as the elastic
+ fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+, leaving the option to also prescribe the normal component of the viscous
+ traction, 
+\begin_inset Formula $t_{n}^{\tau}=\mathbf{t}^{\tau}\cdot\mathbf{n}$
+\end_inset
+
+, to completely determine the normal traction 
+\begin_inset Formula $t_{n}=\mathbf{t}\cdot\mathbf{n}$
+\end_inset
+
+ (or else 
+\begin_inset Formula $t_{n}^{\tau}$
+\end_inset
+
+ naturally equals zero).
+ Mixed boundary conditions represent common physical features: Prescribing
+ 
+\begin_inset Formula $v_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}_{t}$
+\end_inset
+
+ completely determines the velocity 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ on a boundary; prescribing 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+ and 
+\begin_inset Formula $e$
+\end_inset
+
+ completely determines the traction 
+\begin_inset Formula $\mathbf{t}=\boldsymbol{\sigma}\cdot\mathbf{n}$
+\end_inset
+
+ on a boundary.
+ Note that 
+\begin_inset Formula $v_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $e$
+\end_inset
+
+ are mutually exclusive boundary conditions, and the same holds for 
+\begin_inset Formula $\mathbf{v}_{t}$
+\end_inset
+
+ and the tangential component of the viscous traction, 
+\begin_inset Formula $\mathbf{t}_{t}^{\tau}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\mathbf{t}^{\tau}$
+\end_inset
+
+.
+\change_unchanged
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496355608
+For viscous fluids, the no-slip boundary condition at an impermeable wall
+ is enforced by setting 
+\begin_inset Formula $\mathbf{v}_{t}=\mathbf{0}$
+\end_inset
+
+, whereas the wall impermeability condition implies 
+\begin_inset Formula $v_{n}=0$
+\end_inset
+
+.
+ Therefore, these conditions may be combined by prescribing vx, vy and vz
+ components of 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ to zero.
+ FEBio offers a range of options for conveniently prescribing natural and
+ mixed conditions on boundary surfaces in fluid analyses (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Surface-Loads"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496339836
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+\change_inserted 2145056167 1496339836
+General Specification of Biphasic Materials
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:General-Specification-Biphasic-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496342032
+The material type for a fluid material is 
+\shape italic
+
+\begin_inset Quotes eld
+\end_inset
+
+fluid
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\change_inserted 2145056167 1496339836
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342058
+<density>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342157
+Fluid referential density 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342297
+[
+\series bold
+M
+\series default
+/
+\series bold
+L
+\series default
+
+\begin_inset Formula $^{\mathrm{3}}$
+\end_inset
+
+] 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342163
+<k>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342170
+Bulk modulus 
+\begin_inset Formula $K$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342185
+[
+\series bold
+P
+\series default
+] 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342310
+<viscous>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342346
+Specification of viscous model for 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496339836
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496342556
+The <viscous> tag encloses a description of the viscous stress constitutive
+ relation and associated material properties, as may be selected from the
+ list provided in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Viscous-Fluid-Materials"
+
+\end_inset
+
+.
+ The parameters <density> and <k> must be greater than 0.
+ These parameters are always required.
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496339836
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496342627
+<material id="1" name="Water" type="fluid">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496342595
+	<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496342622
+	<k>2.2e+09</k>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496342595
+	<viscous type="Newtonian fluid">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496342595
+		<mu>0.001</mu>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496342595
+		<kappa>0</kappa>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496342595
+	</viscous>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496342595
+</material>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496342595
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496339836
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+\change_inserted 2145056167 1496342425
+Viscous Fluid Materials
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Viscous-Fluid-Materials"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496344713
+Viscous fluid materials provide a constitutive relation for the dependence
+ of the viscous stress 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ on the rate of deformation tensor 
+\begin_inset Formula $\mathbf{D}$
+\end_inset
+
+ of a fluid.
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496339836
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+
+\change_inserted 2145056167 1496342682
+Newtonian Fluid
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Newtonian-Fluid"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496342700
+The material type for a Newtonian fluid is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+Newtonian fluid
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\change_inserted 2145056167 1496339836
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342711
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342718
+shear viscosity 
+\begin_inset Formula $\mu$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342743
+[
+\series bold
+P
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+] 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342756
+<kappa>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342762
+bulk viscosity 
+\begin_inset Formula $\kappa$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496342770
+[
+\series bold
+P
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496343736
+The viscous shear stress for this material model is
+\begin_inset Formula 
+\[
+\boldsymbol{\tau}=\left(\kappa-\frac{2}{3}\mu\right)\left(\tr\mathbf{D}\right)\mathbf{I}+2\mu\mathbf{D}
+\]
+
+\end_inset
+
+Stokes' condition is a constitutive assumption that sets 
+\begin_inset Formula $\tr\boldsymbol{\tau}=0$
+\end_inset
+
+, implying that 
+\begin_inset Formula $\kappa=0$
+\end_inset
+
+.
+ This assumption is only valid for some fluids (e.g., monoatomic gas 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Panton06"
+
+\end_inset
+
+).
+ Users may use or ignore this assumption by selecting an appropriate value
+ for 
+\begin_inset Formula $\kappa$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496339836
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496343161
+<viscous type="Newtonian fluid">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496343161
+	<mu>0.001</mu>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496343161
+	<kappa>0</kappa>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496343161
+</viscous>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496339836
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+
+\change_inserted 2145056167 1496343596
+Carreau Model
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Carreau-Fluid"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496343924
+The material type for a Carreau model 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Cho91"
+
+\end_inset
+
+ is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+Carreau
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\change_inserted 2145056167 1496343246
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496343614
+<mu0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496343630
+shear viscosity at zero shear rate, 
+\begin_inset Formula $\mu_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496343246
+[
+\series bold
+P
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+] 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496343620
+<mui>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496343642
+shear viscosity at infinite shear rate, 
+\begin_inset Formula $\mu_{\infty}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496343246
+[
+\series bold
+P
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496343664
+<lambda>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496343696
+time constant
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496343699
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496343667
+<n>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496343729
+power-law exponent
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496343651
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496343875
+The viscous shear stress for this material model is
+\begin_inset Formula 
+\[
+\boldsymbol{\tau}=2\mu\mathbf{D}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\mu=\mu_{\infty}+\left(\mu_{0}-\mu_{\infty}\right)\left(1+\left(\lambda\dot{\gamma}\right)^{2}\right)^{\left(n-1\right)/2}
+\]
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\dot{\gamma}=\sqrt{2\mathbf{D}:\mathbf{D}}$
+\end_inset
+
+ is the engineering shear rate.
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496343246
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496343934
+<viscous type="Carreau">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344039
+	<mu0>0.056</mu0>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344037
+	<mui>0.0035</mui>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496343989
+	<lambda>3.3</lambda>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344012
+	<n>0.36</n>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344226
+</viscous>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496344064
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+
+\change_inserted 2145056167 1496344079
+Carreau-Yasuda Model
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Carreau-Yasuda-Model"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496344088
+The material type for a Carreau-Yasuda model 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Cho91"
+
+\end_inset
+
+ is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+Carreau-Yasuda
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\change_inserted 2145056167 1496344064
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344064
+<mu0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344064
+shear viscosity at zero shear rate, 
+\begin_inset Formula $\mu_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344064
+[
+\series bold
+P
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+] 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344064
+<mui>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344064
+shear viscosity at infinite shear rate, 
+\begin_inset Formula $\mu_{\infty}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344064
+[
+\series bold
+P
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344064
+<lambda>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344064
+time constant
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344064
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344064
+<n>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344064
+power-law exponent
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344064
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344111
+<a>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344145
+power-law exponent divider
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344108
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496344064
+The viscous shear stress for this material model is
+\begin_inset Formula 
+\[
+\boldsymbol{\tau}=2\mu\mathbf{D}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\mu=\mu_{\infty}+\left(\mu_{0}-\mu_{\infty}\right)\left(1+\left(\lambda\dot{\gamma}\right)^{2}\right)^{\left(n-1\right)/a}
+\]
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\dot{\gamma}=\sqrt{2\mathbf{D}:\mathbf{D}}$
+\end_inset
+
+ is the engineering shear rate.
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496344064
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344574
+<viscous type="Carreau-Yasuda">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344064
+	<mu0>0.056</mu0>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344064
+	<mui>0.0035</mui>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344167
+	<lambda>1.9</lambda>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344177
+	<n>0.22</n>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344195
+	<a>1.25</a>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344245
+</viscous>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496344245
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+
+\change_inserted 2145056167 1496344270
+Powell-Eyring Model
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Powell-Eyring-Model"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496344283
+The material type for a Powell-Eyring model 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Cho91"
+
+\end_inset
+
+ is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+Powell-Eyring
+\shape italic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\change_inserted 2145056167 1496344245
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344245
+<mu0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344245
+shear viscosity at zero shear rate, 
+\begin_inset Formula $\mu_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344245
+[
+\series bold
+P
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+] 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344245
+<mui>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344245
+shear viscosity at infinite shear rate, 
+\begin_inset Formula $\mu_{\infty}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344245
+[
+\series bold
+P
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344245
+<lambda>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344245
+time constant
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344245
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496344245
+The viscous shear stress for this material model is
+\begin_inset Formula 
+\[
+\boldsymbol{\tau}=2\mu\mathbf{D}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\mu=\mu_{\infty}+\left(\mu_{0}-\mu_{\infty}\right)\frac{\sinh^{-1}\lambda\dot{\gamma}}{\lambda\dot{\gamma}}
+\]
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\dot{\gamma}=\sqrt{2\mathbf{D}:\mathbf{D}}$
+\end_inset
+
+ is the engineering shear rate.
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496344245
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344544
+<viscous type="Powell-Eyring">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344245
+	<mu0>0.056</mu0>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344245
+	<mui>0.0035</mui>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344559
+	<lambda>5.4</lambda>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344410
+</viscous>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496344413
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+
+\change_inserted 2145056167 1496344426
+Cross Model
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Cross-Model"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496344435
+The material type for a Cross model 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Cho91"
+
+\end_inset
+
+ is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+Cross
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\change_inserted 2145056167 1496344413
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344413
+<mu0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344413
+shear viscosity at zero shear rate, 
+\begin_inset Formula $\mu_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344413
+[
+\series bold
+P
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+] 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344413
+<mui>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344413
+shear viscosity at infinite shear rate, 
+\begin_inset Formula $\mu_{\infty}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344413
+[
+\series bold
+P
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344413
+<lambda>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344413
+time constant
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344413
+[
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344453
+<m>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344488
+exponent
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496344450
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496344413
+The viscous shear stress for this material model is
+\begin_inset Formula 
+\[
+\boldsymbol{\tau}=2\mu\mathbf{D}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\mu=\mu_{\infty}+\left(\mu_{0}-\mu_{\infty}\right)\frac{1}{1+\left(\lambda\dot{\gamma}\right)^{m}}
+\]
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\dot{\gamma}=\sqrt{2\mathbf{D}:\mathbf{D}}$
+\end_inset
+
+ is the engineering shear rate.
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496344413
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344581
+<viscous type="Cross">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344413
+	<mu0>0.056</mu0>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344413
+	<mui>0.0035</mui>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344599
+	<lambda>1.0</lambda>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344609
+	<m>1.0</m>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1496344413
+</viscous>
 \end_layout
 
 \begin_layout Chapter
