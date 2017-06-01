@@ -15519,6 +15519,9 @@ The augmented Lagrangian method may produce a non-smooth contact pressure
  Turning this flag on changes the method of updating the Lagrange multiplier
  to use the projection of the element stress to the corresponding contact
  face.
+ This feature only works with some element types (HEX8G8, HEX8G1, TET4G4,
+ TET4G1, PENTA6G6, TET10G1, TET10G4, TET10G8, TET10GL11, TET15G4, TET15G8,
+ TET15G11, TET15G15, PYRA5G8).
 \end_layout
 
 \begin_layout Enumerate
@@ -22834,7 +22837,7 @@ name
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="42" columns="3">
+<lyxtabular version="3" rows="44" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top">
@@ -23021,6 +23024,37 @@ Surface
 
 \begin_layout Plain Layout
 Contact pressure, evaluated at contact surface faces
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+contact stick
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Surface
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Stick status in stick-slip frictional contact (1=stick, 0=slip).
+ Values between 0 and 1 imply that a fraction of that face is in stick mode.
+ Currently works only with sliding-tension-compression.
 \end_layout
 
 \end_inset
@@ -23377,6 +23411,35 @@ reference "sec:Triphasic-Multiphasic-Materials"
 \end_inset
 
  
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+enclosed volume
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Surface
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Volume enclosed by named surface
 \end_layout
 
 \end_inset
