@@ -396,6 +396,41 @@ bool FEPlotMortarContactGap::Save(FESurface& S, FEDataStream& a)
 	else return false;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotEnclosedVolume::Save(FESurface &surf, FEDataStream &a)
+{
+    FESurface* pcs = &surf;
+    if (pcs == 0) return false;
+    
+    // Evaluate this field only for a specific domain, by checking domain name
+    if (strcmp(pcs->GetName(), "") == 0) return false;
+    if (strcmp(pcs->GetName(), m_szdom) != 0) return false;
+    
+    int NF = pcs->Elements();
+    double V = 0;    // initialize
+    
+    vec3d gi[FEElement::MAX_INTPOINTS];
+    
+    // calculate net fluid force
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        int nint = el.GaussPoints();
+        double* w  = el.GaussWeights();
+        
+        for (int i=0; i<nint; ++i) {
+            vec3d xi = pcs->Local2Global(el, i);
+            pcs->CoBaseVectors(el, i, gi);
+            V += xi*(gi[0] ^ gi[1])*(w[i]/3);
+        }
+    }
+    
+    // save results
+    a << (float)V;
+    
+    return true;
+}
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

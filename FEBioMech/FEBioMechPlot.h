@@ -186,6 +186,22 @@ public:
 	bool Save(FESurface& S, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Enclosed volume
+//!
+class FEPlotEnclosedVolume : public FESurfaceData
+{
+private:
+    FEModel*            m_pfem;
+    bool                m_binit;
+    vector<FEElement*>  m_elem;
+    vector<vec3d>       m_area;
+    
+public:
+    FEPlotEnclosedVolume(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; m_binit = true; }
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

@@ -469,6 +469,7 @@ REGISTER_FECORE_CLASS(FEPlotLagrangeStrain       , FEPLOTDATA_ID, "Lagrange stra
 REGISTER_FECORE_CLASS(FEPlotMortarContactGap     , FEPLOTDATA_ID, "mortar-gap"            );
 REGISTER_FECORE_CLASS(FEPlotSurfaceTraction		 , FEPLOTDATA_ID, "surface traction"      );
 REGISTER_FECORE_CLASS(FEPlotNodalSurfaceTraction , FEPLOTDATA_ID, "nodal surface traction");
+REGISTER_FECORE_CLASS(FEPlotEnclosedVolume       , FEPLOTDATA_ID, "enclosed volume"       );
 
 // LTE - 2O continuum fields
 REGISTER_FECORE_CLASS(FEPlotElementGnorm         , FEPLOTDATA_ID, "G norm"                );              
