@@ -230,7 +230,10 @@ void FERVEModel::FindBoundaryNodes(vector<int>& BN)
 bool FERVEModel::PrepDisplacementBC(const FENodeSet& ns)
 {
 	// create a load curve
-	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
+	FEDataLoadCurve* plc = new FEDataLoadCurve(this);
+	plc->SetInterpolation(FEDataLoadCurve::LINEAR);
+	plc->Add(0.0, 0.0);
+	plc->Add(1.0, 1.0);
 	AddLoadCurve(plc);
 	int NLC = LoadCurves() - 1;
 
@@ -272,7 +275,10 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	}
 
 	// create a load curve
-	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
+	FEDataLoadCurve* plc = new FEDataLoadCurve(this);
+	plc->SetInterpolation(FEDataLoadCurve::LINEAR);
+	plc->Add(0.0, 0.0);
+	plc->Add(1.0, 1.0);
 	AddLoadCurve(plc);
 	int NLC = LoadCurves() - 1;
 

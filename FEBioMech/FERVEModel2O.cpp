@@ -213,7 +213,10 @@ bool FERVEModel2O::PrepDisplacementBC()
 	assert(NN > 0);
 
 	// create a load curve
-	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
+	FEDataLoadCurve* plc = new FEDataLoadCurve(this);
+	plc->SetInterpolation(FEDataLoadCurve::LINEAR);
+	plc->Add(0.0, 0.0);
+	plc->Add(1.0, 1.0);
 	AddLoadCurve(plc);
 	int NLC = LoadCurves() - 1;
 
@@ -261,7 +264,10 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 	}
 
 	// create a load curve
-	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
+	FEDataLoadCurve* plc = new FEDataLoadCurve(this);
+	plc->SetInterpolation(FEDataLoadCurve::LINEAR);
+	plc->Add(0.0, 0.0);
+	plc->Add(1.0, 1.0);
 	AddLoadCurve(plc);
 	int NLC = LoadCurves() - 1;
 
@@ -300,7 +306,10 @@ bool FERVEModel2O::PrepPeriodicLC(const char* szbc)
 	FENodeSet& ns = *pset;
 
 	// create a load curve
-	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
+	FEDataLoadCurve* plc = new FEDataLoadCurve(this);
+	plc->SetInterpolation(FEDataLoadCurve::LINEAR);
+	plc->Add(0.0, 0.0);
+	plc->Add(1.0, 1.0);
 	AddLoadCurve(plc);
 	int NLC = LoadCurves() - 1;
 

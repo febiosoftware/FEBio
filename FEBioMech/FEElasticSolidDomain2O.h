@@ -105,7 +105,7 @@ protected:
 	void ElementStiffnessMatrixDG3(FESurfaceElement& el, FEInternalSurface2O::Data* pdata, matrix& ke);
 
 private:
-	void UpdateElementStress(int iel, double dt);
+	void UpdateElementStress(int iel);
 	void UpdateInternalSurfaceStresses();
 	void UpdateKinematics();
 
