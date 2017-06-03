@@ -4779,7 +4779,7 @@ The following parameters are common for all analysis.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="23" columns="3">
+<lyxtabular version="3" rows="24" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="3in">
@@ -4913,35 +4913,6 @@ dt
 
 \begin_layout Plain Layout
 (none) 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-dtol
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Convergence tolerance on displacements (2)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.001 
 \end_layout
 
 \end_inset
@@ -5093,6 +5064,41 @@ Max number of stiffness reformations (5)
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507873
+qnmethod
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507888
+Quasi-Newton update method (5)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496508125
+0 (BFGS)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -5106,7 +5112,11 @@ max_ups
 \begin_inset Text
 
 \begin_layout Plain Layout
-Max number of BFGS stiffness updates (5)
+Max number of BFGS
+\change_inserted 2145056167 1496507853
+/Broyden
+\change_unchanged
+ stiffness updates (5)
 \end_layout
 
 \end_inset
@@ -5116,6 +5126,41 @@ Max number of BFGS stiffness updates (5)
 
 \begin_layout Plain Layout
 10 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496508334
+diverge_reform
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496508400
+Flag for reforming stiffness matrix when the solution diverges (5)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496508384
+1
 \end_layout
 
 \end_inset
@@ -5943,6 +5988,24 @@ parameter is set to PLOT_MUST_POINTS, then only the three defined time points
 
 \end_deeper
 \begin_layout Enumerate
+
+\change_inserted 2145056167 1496508258
+The 
+\emph on
+qnmethod
+\emph default
+ parameter determines the quasi-Newton update method.
+ For the BFGS method set 
+\emph on
+qnmethod
+\emph default
+ to 0 (default); for Broyden's method set 
+\emph on
+qnmethod
+\emph default
+ to 2.
+ 
+\change_unchanged
 The 
 \shape italic
 max_ups 
@@ -5951,8 +6014,11 @@ and
 \shape italic
 max_refs 
 \shape default
-parameters control the BFGS method that FEBio uses to solve the nonlinear
- FE equations.
+parameters control the BFGS
+\change_inserted 2145056167 1496508268
+/Broyden
+\change_unchanged
+ method that FEBio uses to solve the nonlinear FE equations.
  In this method the global stiffness matrix is only calculated at the beginning
  of each time step.
  For each iteration, a matrix update is then done.
@@ -5961,10 +6027,21 @@ parameters control the BFGS method that FEBio uses to solve the nonlinear
 max_ups
 \shape default
 .
- When FEBio reaches this number, it reforms the global stiffness matrix
- (that is, it recalculates it) and factorizes it, essentially taking a "full
- Newton" iteration.
- Then FEBio continues with BFGS iterations.
+ When FEBio reaches this number, 
+\change_inserted 2145056167 1496508439
+or if the solution diverges and 
+\emph on
+diverge_reform
+\emph default
+ is set to 1, 
+\change_unchanged
+it reforms the global stiffness matrix (that is, it recalculates it) and
+ factorizes it, essentially taking a "full Newton" iteration.
+ Then FEBio continues with BFGS
+\change_inserted 2145056167 1496508283
+/Broyden
+\change_unchanged
+ iterations.
  The 
 \shape italic
 max_refs 
@@ -7889,7 +7966,7 @@ type in Module section.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="3">
+<lyxtabular version="3" rows="3" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -7938,35 +8015,70 @@ Default
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
-\change_inserted 2145056167 1496345835
+\change_inserted 2145056167 1496507566
+dtol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507572
+convergence tolerance on displacement
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507574
+0.001
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507553
 symmetric_stiffness
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
-\change_inserted 2145056167 1496345780
+\change_inserted 2145056167 1496507557
 Choose between a symmetric or nonsymmetric formulation
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
-\change_inserted 2145056167 1496345780
-1 
+\change_inserted 2145056167 1496507561
+1
 \end_layout
 
 \end_inset
@@ -8144,9 +8256,13 @@ solute
 triphasic
 \shape default
 , 
+\change_deleted 2145056167 1496507760
+
 \begin_inset space \quad{}
 \end_inset
 
+
+\change_unchanged
 an analysis is solved that includes solute transport.
  All parameters for a biphasic analysis can be used (including the ones
  for a structural mechanics analysis).
@@ -8269,6 +8385,379 @@ reference "subsec:Common-Parameters"
  However, not all parameters have an effect.
  In particular, any parameter related to the auto-time stepping capability
  of FEBio or the nonlinear solution strategy is ignored.
+\change_inserted 2145056167 1496507423
+
+\end_layout
+
+\begin_layout Subsection
+
+\change_inserted 2145056167 1496507439
+Parameters for Fluid Analysis
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496507699
+A fluid analysis is defined by using the 
+\emph on
+fluid
+\emph default
+ type in Module section.
+ In addition to the common parameters, the following parameters can be specified
+:
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\change_inserted 2145056167 1496507699
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507699
+
+\series bold
+Parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507699
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507699
+
+\series bold
+Default
+\series default
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507725
+vtol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507729
+convergence tolerance on velocity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507699
+0.001
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507713
+dtol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507719
+convergence tolerance on dilatation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507723
+0.001
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496508629
+qnmethod
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496508661
+Quasi-Newton update method (5)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496508664
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496508931
+rhoi
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496524714
+Spectral radius parameter 
+\begin_inset Formula $\rho_{\infty}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496508972
+-1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496508705
+reform_each_time_step
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496508733
+Flag for reforming stiffness matrix at the start of each time step
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496508735
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507699
+symmetric_stiffness
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507699
+Choose between a symmetric or nonsymmetric formulation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496507737
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\change_unchanged
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496526943
+Transient fluid analyses may often run very efficiently using Broyden's
+ method (
+\emph on
+qnmethod
+\emph default
+ set to 2) with 
+\emph on
+max_ups
+\emph default
+ set to 50; efficiency may be further increased by setting 
+\emph on
+reform_each_time_step
+\emph default
+ to 0, which will postpone reforming the stiffness matrix at subsequent
+ time steps until 
+\emph on
+max_ups
+\emph default
+ updates have been exhausted.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1496526929
+The parameter 
+\begin_inset Formula $\rho_{\infty}$
+\end_inset
+
+ determines the time integration scheme: -1 (default) uses Euler's method,
+ while values in the range 
+\begin_inset Formula $0\le\rho_{\infty}\le1$
+\end_inset
+
+ use the generalized 
+\begin_inset Formula $\alpha-$
+\end_inset
+
+method (see 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1496509040
+
+
+\backslash
+href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+\backslash
+emph{FEBio Theory Manual}}
+\end_layout
+
+\end_inset
+
+).
+ When solving transient flows that exhibit eddies or shed vorticies, a value
+ of 
+\begin_inset Formula $\rho_{\infty}=0.5$
+\end_inset
+
+ represents a good balance between too much and too little numerical damping.
+\change_unchanged
+
 \end_layout
 
 \begin_layout Standard
@@ -65352,11 +65841,11 @@ reference "subsec:Surface-Loads"
 
 \begin_layout Subsection
 
-\change_inserted 2145056167 1496339836
-General Specification of Biphasic Materials
+\change_inserted 2145056167 1496507366
+General Specification of Fluid Materials
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:General-Specification-Biphasic-1"
+name "subsec:General-Specification-Fluid"
 
 \end_inset
 
