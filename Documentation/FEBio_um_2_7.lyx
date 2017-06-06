@@ -164,13 +164,31 @@ status open
 
 \end_inset
 
-User's Manual Version 2.6
+User's Manual Version 2.
+\change_deleted 2145056167 1496710681
+6
+\change_inserted 2145056167 1496710681
+7
+\change_unchanged
+
 \end_layout
 
 \begin_layout Date
 
 \series bold
-Last Updated: December 21, 2016
+Last Updated: 
+\change_deleted 2145056167 1496710685
+December 21
+\change_inserted 2145056167 1496710690
+June 5
+\change_unchanged
+, 201
+\change_deleted 2145056167 1496710691
+6
+\change_inserted 2145056167 1496710691
+7
+\change_unchanged
+
 \end_layout
 
 \begin_layout Standard
