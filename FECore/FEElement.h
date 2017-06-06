@@ -392,6 +392,12 @@ public:
 	double gs(int n) { return ((FEShellElementTraits*)(m_pT))->gs[n]; }
 	double gt(int n) { return ((FEShellElementTraits*)(m_pT))->gt[n]; }
 
+    //! this function projects data from the gauss-points to the nodal points
+    void project_to_nodes(double* ai, double* ao)
+    {
+        ((FEShellElementTraits*)m_pT)->project_to_nodes(ai, ao);
+    }
+    
 public:
 	vector<double>	m_h0;	//!< initial shell thicknesses
 

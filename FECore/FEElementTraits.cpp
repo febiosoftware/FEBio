@@ -692,7 +692,7 @@ FEPenta15G21::FEPenta15G21() : FEPenta15_(NINT, FE_PENTA15G21)
 }
 
 //-----------------------------------------------------------------------------
-//! \todo implement this
+//! project to nodes
 void FEPenta15G21::project_to_nodes(double* ai, double* ao)
 {
     for (int j=0; j<NELN; ++j)
@@ -3470,6 +3470,21 @@ FEShellElementTraits::FEShellElementTraits(int ni, int ne, FE_Element_Shape es, 
 	Hs.resize(ni, ne);
 }
 
+//-----------------------------------------------------------------------------
+//! project mat3ds integration point data to nodes
+void FEShellElementTraits::project_to_nodes(mat3ds* si, mat3ds* so)
+{
+    double ai[FEElement::MAX_INTPOINTS];
+    double ao[FEElement::MAX_NODES];
+    for (int i=0; i<3; ++i) {
+        for (int j=i; j<3; ++j) {
+            for (int n=0; n<nint; ++n) ai[n] = si[n](i,j);
+            project_to_nodes(ai, ao);
+            for (int n=0; n<neln; ++n) so[n](i,j) = ao[n];
+        }
+    }
+}
+
 //*****************************************************************************
 //                          S H E L L Q U A D 4 G 8
 //*****************************************************************************
@@ -3500,8 +3515,6 @@ FEShellQuad4G8::FEShellQuad4G8() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G8)
         H[n][3] = 0.25*(1-gr[n])*(1+gs[n]);
     }
     
-    //	Hi = H.inverse();
-    
     for (n=0; n<NINT; ++n)
     {
         Hr[n][0] = -0.25*(1-gs[n]);
@@ -3513,6 +3526,26 @@ FEShellQuad4G8::FEShellQuad4G8() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G8)
         Hs[n][1] = -0.25*(1+gr[n]);
         Hs[n][2] =  0.25*(1+gr[n]);
         Hs[n][3] =  0.25*(1-gr[n]);
+    }
+    
+    Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
+        for (int n=0; n<NELN; ++n)
+            Hi(i,n) = H(ni[i],n);
+    Hi = Hi.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! project to nodes
+void FEShellQuad4G8::project_to_nodes(double* ai, double* ao)
+{
+    for (int j=0; j<NELN; ++j)
+    {
+        ao[j] = 0;
+        for (int k=0; k<NELN; ++k)
+        {
+            ao[j] += Hi[j][k]*ai[ni[k]];
+        }
     }
 }
 
@@ -3552,8 +3585,6 @@ FEShellQuad4G12::FEShellQuad4G12() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G12)
         H[n][3] = 0.25*(1-gr[n])*(1+gs[n]);
     }
     
-    //	Hi = H.inverse();
-    
     for (n=0; n<NINT; ++n)
     {
         Hr[n][0] = -0.25*(1-gs[n]);
@@ -3565,6 +3596,26 @@ FEShellQuad4G12::FEShellQuad4G12() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G12)
         Hs[n][1] = -0.25*(1+gr[n]);
         Hs[n][2] =  0.25*(1+gr[n]);
         Hs[n][3] =  0.25*(1-gr[n]);
+    }
+    
+    Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
+        for (int n=0; n<NELN; ++n)
+            Hi(i,n) = H(ni[i],n);
+    Hi = Hi.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! project to nodes
+void FEShellQuad4G12::project_to_nodes(double* ai, double* ao)
+{
+    for (int j=0; j<NELN; ++j)
+    {
+        ao[j] = 0;
+        for (int k=0; k<NELN; ++k)
+        {
+            ao[j] += Hi[j][k]*ai[ni[k]];
+        }
     }
 }
 
@@ -3595,8 +3646,6 @@ FEShellTri3G6::FEShellTri3G6() : FEShellTri3_(NINT, FE_SHELL_TRI3G6)
         H[n][2] = gs[n];
     }
     
-    //	Hi = H.inverse();
-    
     for (n=0; n<NINT; ++n)
     {
         Hr[n][0] = -1;
@@ -3606,6 +3655,26 @@ FEShellTri3G6::FEShellTri3G6() : FEShellTri3_(NINT, FE_SHELL_TRI3G6)
         Hs[n][0] = -1;
         Hs[n][1] =  0;
         Hs[n][2] =  1;
+    }
+    
+    Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
+        for (int n=0; n<NELN; ++n)
+            Hi(i,n) = H(ni[i],n);
+    Hi = Hi.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! project to nodes
+void FEShellTri3G6::project_to_nodes(double* ai, double* ao)
+{
+    for (int j=0; j<NELN; ++j)
+    {
+        ao[j] = 0;
+        for (int k=0; k<NELN; ++k)
+        {
+            ao[j] += Hi[j][k]*ai[ni[k]];
+        }
     }
 }
 
@@ -3641,8 +3710,6 @@ FEShellTri3G9::FEShellTri3G9() : FEShellTri3_(NINT, FE_SHELL_TRI3G9)
         H[n][2] = gs[n];
     }
     
-    //	Hi = H.inverse();
-    
     for (n=0; n<NINT; ++n)
     {
         Hr[n][0] = -1;
@@ -3652,6 +3719,26 @@ FEShellTri3G9::FEShellTri3G9() : FEShellTri3_(NINT, FE_SHELL_TRI3G9)
         Hs[n][0] = -1;
         Hs[n][1] =  0;
         Hs[n][2] =  1;
+    }
+    
+    Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
+        for (int n=0; n<NELN; ++n)
+            Hi(i,n) = H(ni[i],n);
+    Hi = Hi.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! project to nodes
+void FEShellTri3G9::project_to_nodes(double* ai, double* ao)
+{
+    for (int j=0; j<NELN; ++j)
+    {
+        ao[j] = 0;
+        for (int k=0; k<NELN; ++k)
+        {
+            ao[j] += Hi[j][k]*ai[ni[k]];
+        }
     }
 }
 
@@ -3725,6 +3812,26 @@ FEShellQuad8G18::FEShellQuad8G18() : FEShellQuad8_(NINT, FE_SHELL_QUAD8G18)
         Hs[n][1] = -0.25*(1 + r) - 0.5*(Hs[n][4] + Hs[n][5]);
         Hs[n][2] =  0.25*(1 + r) - 0.5*(Hs[n][5] + Hs[n][6]);
         Hs[n][3] =  0.25*(1 - r) - 0.5*(Hs[n][6] + Hs[n][7]);
+    }
+    
+    Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
+        for (int n=0; n<NELN; ++n)
+            Hi(i,n) = H(ni[i],n);
+    Hi = Hi.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! project to nodes
+void FEShellQuad8G18::project_to_nodes(double* ai, double* ao)
+{
+    for (int j=0; j<NELN; ++j)
+    {
+        ao[j] = 0;
+        for (int k=0; k<NELN; ++k)
+        {
+            ao[j] += Hi[j][k]*ai[ni[k]];
+        }
     }
 }
 
@@ -3807,6 +3914,26 @@ FEShellQuad8G27::FEShellQuad8G27() : FEShellQuad8_(NINT, FE_SHELL_QUAD8G27)
         Hs[n][2] =  0.25*(1 + r) - 0.5*(Hs[n][5] + Hs[n][6]);
         Hs[n][3] =  0.25*(1 - r) - 0.5*(Hs[n][6] + Hs[n][7]);
     }
+    
+    Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
+        for (int n=0; n<NELN; ++n)
+            Hi(i,n) = H(ni[i],n);
+    Hi = Hi.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! project to nodes
+void FEShellQuad8G27::project_to_nodes(double* ai, double* ao)
+{
+    for (int j=0; j<NELN; ++j)
+    {
+        ao[j] = 0;
+        for (int k=0; k<NELN; ++k)
+        {
+            ao[j] += Hi[j][k]*ai[ni[k]];
+        }
+    }
 }
 
 //*****************************************************************************
@@ -3869,6 +3996,26 @@ FEShellTri6G14::FEShellTri6G14() : FEShellTri6_(NINT, FE_SHELL_TRI6G14)
         Hs[n][3] = -4.0*r;
         Hs[n][4] =  4.0*r;
         Hs[n][5] =  4.0 - 8.0*s - 4.0*r;
+    }
+    
+    Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
+        for (int n=0; n<NELN; ++n)
+            Hi(i,n) = H(ni[i],n);
+    Hi = Hi.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! project to nodes
+void FEShellTri6G14::project_to_nodes(double* ai, double* ao)
+{
+    for (int j=0; j<NELN; ++j)
+    {
+        ao[j] = 0;
+        for (int k=0; k<NELN; ++k)
+        {
+            ao[j] += Hi[j][k]*ai[ni[k]];
+        }
     }
 }
 
@@ -3941,6 +4088,26 @@ FEShellTri6G21::FEShellTri6G21() : FEShellTri6_(NINT, FE_SHELL_TRI6G21)
         Hs[n][3] = -4.0*r;
         Hs[n][4] =  4.0*r;
         Hs[n][5] =  4.0 - 8.0*s - 4.0*r;
+    }
+    
+    Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
+        for (int n=0; n<NELN; ++n)
+            Hi(i,n) = H(ni[i],n);
+    Hi = Hi.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! project to nodes
+void FEShellTri6G21::project_to_nodes(double* ai, double* ao)
+{
+    for (int j=0; j<NELN; ++j)
+    {
+        ao[j] = 0;
+        for (int k=0; k<NELN; ++k)
+        {
+            ao[j] += Hi[j][k]*ai[ni[k]];
+        }
     }
 }
 

@@ -1360,6 +1360,11 @@ public:
 	matrix Hr, Hs;
     
     void init() {}
+
+    //! project integration point data to nodes
+    virtual void project_to_nodes(double* ai, double* ao) = 0;
+    void project_to_nodes(mat3ds* si, mat3ds* so);
+    
 };
 
 //=============================================================================
@@ -1386,6 +1391,13 @@ public:
 public:
     FEShellQuad4G8();
     
+    void project_to_nodes(double* ai, double* ao);
+    
+protected:
+    // use these integration points to project to nodes
+    int ni[NELN] = {4,5,6,7};
+    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    
 };
 
 //=============================================================================
@@ -1398,6 +1410,13 @@ public:
     
 public:
     FEShellQuad4G12();
+    
+    void project_to_nodes(double* ai, double* ao);
+    
+protected:
+    // use these integration points to project to nodes
+    int ni[NELN] = {8,9,10,11};
+    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
     
 };
 
@@ -1425,6 +1444,13 @@ public:
 public:
     FEShellTri3G6();
     
+    void project_to_nodes(double* ai, double* ao);
+    
+protected:
+    // use these integration points to project to nodes
+    int ni[NELN] = {3,4,5};
+    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    
 };
 
 //=============================================================================
@@ -1437,6 +1463,13 @@ public:
     
 public:
     FEShellTri3G9();
+    
+    void project_to_nodes(double* ai, double* ao);
+    
+protected:
+    // use these integration points to project to nodes
+    int ni[NELN] = {6,7,8};
+    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
     
 };
 
@@ -1464,6 +1497,13 @@ public:
 public:
     FEShellQuad8G18();
     
+    void project_to_nodes(double* ai, double* ao);
+    
+protected:
+    // use these integration points to project to nodes
+    int ni[NELN] = {9,10,11,12,14,15,16,17};
+    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    
 };
 
 //=============================================================================
@@ -1476,6 +1516,13 @@ public:
     
 public:
     FEShellQuad8G27();
+    
+    void project_to_nodes(double* ai, double* ao);
+    
+protected:
+    // use these integration points to project to nodes
+    int ni[NELN] = {18,19,20,21,23,24,25,26};
+    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
     
 };
 
@@ -1503,6 +1550,13 @@ public:
 public:
     FEShellTri6G14();
     
+    void project_to_nodes(double* ai, double* ao);
+    
+protected:
+    // use these integration points to project to nodes
+    int ni[NELN] = {8,9,10,11,12,13};
+    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    
 };
 
 //=============================================================================
@@ -1515,6 +1569,13 @@ public:
     
 public:
     FEShellTri6G21();
+    
+    void project_to_nodes(double* ai, double* ao);
+    
+protected:
+    // use these integration points to project to nodes
+    int ni[NELN] = {15,16,17,18,19,20};
+    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
     
 };
 

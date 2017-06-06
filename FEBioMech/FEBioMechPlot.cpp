@@ -2108,9 +2108,9 @@ bool FEPlotRigidRotationVector::Save(FEDomain& dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 {
-	// make sure this is a solid-domain class
+	// make sure this is a solid-domain or shell-domain class
 	FESolidDomain* pd = dynamic_cast<FESolidDomain*>(&dom);
-	if (pd == 0) return false;
+    FEShellDomain* ps = dynamic_cast<FEShellDomain*>(&dom);
 
 	// stress component look-up table
 	int LUT[6][2] = {{0,0},{1,1},{2,2},{0,1},{1,2},{0,2}};
@@ -2120,37 +2120,72 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 	double si[27];	// 27 = max nr of integration points for now.
 	double sn[FEElement::MAX_NODES];
 
-	// loop over all elements
-	int NE = pd->Elements();
-	for (int i=0; i<NE; ++i)
-	{
-		FESolidElement& e = pd->Element(i);
-		int ne = e.Nodes();
-		int ni = e.GaussPoints();
-
-		// loop over stress-components
-		for (int j=0; j<6; ++j)
-		{
-			// get the integration point values
-			int j0 = LUT[j][0];
-			int j1 = LUT[j][1];
-			for (int k=0; k<ni; ++k) 
-			{
-				FEMaterialPoint& mp = *e.GetMaterialPoint(k);
-				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-				si[k] = pt.m_s(j0, j1);
-			}
-
-			// project to nodes
-			e.project_to_nodes(si, sn);
-
-			// store stress component
-			for (int k=0; k<ne; ++k) s[k](j0, j1) = sn[k];
-		}
-
-		// push data to archive
-		for (int j=0; j<ne; ++j) a << s[j];
-	}
+    if (pd) {
+        // loop over all elements
+        int NE = pd->Elements();
+        for (int i=0; i<NE; ++i)
+        {
+            FESolidElement& e = pd->Element(i);
+            int ne = e.Nodes();
+            int ni = e.GaussPoints();
+            
+            // loop over stress-components
+            for (int j=0; j<6; ++j)
+            {
+                // get the integration point values
+                int j0 = LUT[j][0];
+                int j1 = LUT[j][1];
+                for (int k=0; k<ni; ++k)
+                {
+                    FEMaterialPoint& mp = *e.GetMaterialPoint(k);
+                    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+                    si[k] = pt.m_s(j0, j1);
+                }
+                
+                // project to nodes
+                e.project_to_nodes(si, sn);
+                
+                // store stress component
+                for (int k=0; k<ne; ++k) s[k](j0, j1) = sn[k];
+            }
+            
+            // push data to archive
+            for (int j=0; j<ne; ++j) a << s[j];
+        }
+    }
+    else if (ps) {
+        // loop over all elements
+        int NE = ps->Elements();
+        for (int i=0; i<NE; ++i)
+        {
+            FEShellElement& e = ps->Element(i);
+            int ne = e.Nodes();
+            int ni = e.GaussPoints();
+            
+            // loop over stress-components
+            for (int j=0; j<6; ++j)
+            {
+                // get the integration point values
+                int j0 = LUT[j][0];
+                int j1 = LUT[j][1];
+                for (int k=0; k<ni; ++k)
+                {
+                    FEMaterialPoint& mp = *e.GetMaterialPoint(k);
+                    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+                    si[k] = pt.m_s(j0, j1);
+                }
+                
+                // project to nodes
+                e.project_to_nodes(si, sn);
+                
+                // store stress component
+                for (int k=0; k<ne; ++k) s[k](j0, j1) = sn[k];
+            }
+            
+            // push data to archive
+            for (int j=0; j<ne; ++j) a << s[j];
+        }
+    }
 	return true;
 }
 
