@@ -596,6 +596,11 @@ public:
 	FEHex20G27();
 
 	void project_to_nodes(double* ai, double* ao);
+    
+protected:
+    // use these integration points to project to nodes
+    int ni[20] = {0,1,2,3,5,6,7,8,9,11,15,17,18,19,20,21,23,24,25,26};
+    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================
@@ -623,6 +628,9 @@ public:
 
 	//! values of shape function second derivatives
 	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
+    
+protected:
+    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================

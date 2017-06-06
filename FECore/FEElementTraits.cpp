@@ -1897,13 +1897,26 @@ FEHex20G27::FEHex20G27() : FEHex20_(NINT, FE_HEX20G27)
 	gr[26] =  a; gs[26] =  a; gt[26] =  a; gw[26] = w1*w1*w1;
 
 	init();
+    
+    Hi.resize(20, 20);
+    for (int i=0; i<20; ++i)
+        for (int n=0; n<20; ++n)
+            Hi(i,n) = H(ni[i],n);
+    Hi = Hi.inverse();
 }
 
 //-----------------------------------------------------------------------------
 //! \todo implement this
 void FEHex20G27::project_to_nodes(double* ai, double* ao)
 {
-	
+    for (int j=0; j<NELN; ++j)
+    {
+        ao[j] = 0;
+        for (int k=0; k<NELN; ++k)
+        {
+            ao[j] += Hi[j][k]*ai[ni[k]];
+        }
+    }
 }
 
 //=============================================================================
@@ -2090,13 +2103,21 @@ FEHex27G27::FEHex27G27() : FEHex27_(NINT, FE_HEX27G27)
 	gr[26] =  a; gs[26] =  a; gt[26] =  a; gw[26] = w1*w1*w1;
 
 	init();
+    Hi = H.inverse();
 }
 
 //-----------------------------------------------------------------------------
 //! \todo implement this
 void FEHex27G27::project_to_nodes(double* ai, double* ao)
 {
-	
+    for (int j=0; j<NELN; ++j)
+    {
+        ao[j] = 0;
+        for (int k=0; k<NINT; ++k)
+        {
+            ao[j] += Hi[j][k]*ai[k];
+        }
+    }
 }
 
 //=============================================================================
