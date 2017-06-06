@@ -16,6 +16,7 @@
 #include "FEFluidResistanceBC.h"
 #include "FEBackFlowStabilization.h"
 #include "FEFluidNormalVelocity.h"
+#include "FEFluidRotationalVelocity.h"
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
@@ -152,10 +153,14 @@ bool FEFluidSolver::Init()
     for (int i=0; i<nsl; ++i)
     {
         FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-        FEFluidResistanceBC* pfr = dynamic_cast<FEFluidResistanceBC*>(psl);
-        FEFluidNormalVelocity* pnv = dynamic_cast<FEFluidNormalVelocity*>(psl);
-        if (pfr && psl->IsActive()) pfr->MarkDilatation();
-        else if (pnv && psl->IsActive() && pnv->m_bpv) pnv->MarkVelocity();
+        if (psl->IsActive()) {
+            FEFluidResistanceBC* pfr = dynamic_cast<FEFluidResistanceBC*>(psl);
+            FEFluidNormalVelocity* pnv = dynamic_cast<FEFluidNormalVelocity*>(psl);
+            FEFluidRotationalVelocity* prv = dynamic_cast<FEFluidRotationalVelocity*>(psl);
+            if (pfr) pfr->MarkDilatation();
+            else if (pnv && pnv->m_bpv) pnv->MarkVelocity();
+            else if (prv) prv->MarkVelocity();
+        }
     }
     
     return true;
@@ -340,10 +345,14 @@ void FEFluidSolver::Update(vector<double>& ui)
     for (int i=0; i<nsl; ++i)
     {
         FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-        FEFluidResistanceBC* pfr = dynamic_cast<FEFluidResistanceBC*>(psl);
-        FEFluidNormalVelocity* pnv = dynamic_cast<FEFluidNormalVelocity*>(psl);
-        if (pfr && psl->IsActive()) pfr->SetDilatation();
-        else if (pnv && psl->IsActive() && pnv->m_bpv) pnv->SetVelocity();
+        if (psl->IsActive()) {
+            FEFluidResistanceBC* pfr = dynamic_cast<FEFluidResistanceBC*>(psl);
+            FEFluidNormalVelocity* pnv = dynamic_cast<FEFluidNormalVelocity*>(psl);
+            FEFluidRotationalVelocity* prv = dynamic_cast<FEFluidRotationalVelocity*>(psl);
+            if (pfr) pfr->SetDilatation();
+            else if (pnv && pnv->m_bpv) pnv->SetVelocity();
+            else if (prv) prv->SetVelocity();
+        }
     }
     
     // update element stresses
