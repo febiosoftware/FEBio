@@ -308,6 +308,8 @@ public:
     void project_to_nodes(double* ai, double* ao);
     
 protected:
+    // use these integration points to project to nodes
+    int ni[NELN] = {1,2,3,4,5,6,8,9,10,15,16,17,18,19,20};
     matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
@@ -599,7 +601,7 @@ public:
     
 protected:
     // use these integration points to project to nodes
-    int ni[20] = {0,1,2,3,5,6,7,8,9,11,15,17,18,19,20,21,23,24,25,26};
+    int ni[NELN] = {0,1,2,3,5,6,7,8,9,11,15,17,18,19,20,21,23,24,25,26};
     matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 

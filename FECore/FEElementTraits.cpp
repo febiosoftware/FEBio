@@ -652,7 +652,7 @@ void FEPenta15_::shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs
 }
 
 //=============================================================================
-//                          F E P E N T A 1 6 G 1 2
+//                          F E P E N T A 1 5 G 2 1
 //=============================================================================
 
 FEPenta15G21::FEPenta15G21() : FEPenta15_(NINT, FE_PENTA15G21)
@@ -683,13 +683,26 @@ FEPenta15G21::FEPenta15G21() : FEPenta15_(NINT, FE_PENTA15G21)
     gr[19] = 0.470142064105115; gs[19] = 0.059715871789770; gt[19] =  a; gw[19] = w*w1*0.132394152788506;
     gr[20] = 0.059715871789770; gs[20] = 0.470142064105115; gt[20] =  a; gw[20] = w*w1*0.132394152788506;
     init();
+    
+    Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
+        for (int n=0; n<NELN; ++n)
+            Hi(i,n) = H(ni[i],n);
+    Hi = Hi.inverse();
 }
 
 //-----------------------------------------------------------------------------
 //! \todo implement this
 void FEPenta15G21::project_to_nodes(double* ai, double* ao)
 {
-    
+    for (int j=0; j<NELN; ++j)
+    {
+        ao[j] = 0;
+        for (int k=0; k<NELN; ++k)
+        {
+            ao[j] += Hi[j][k]*ai[ni[k]];
+        }
+    }
 }
 
 //=============================================================================
@@ -1898,9 +1911,9 @@ FEHex20G27::FEHex20G27() : FEHex20_(NINT, FE_HEX20G27)
 
 	init();
     
-    Hi.resize(20, 20);
-    for (int i=0; i<20; ++i)
-        for (int n=0; n<20; ++n)
+    Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
+        for (int n=0; n<NELN; ++n)
             Hi(i,n) = H(ni[i],n);
     Hi = Hi.inverse();
 }
