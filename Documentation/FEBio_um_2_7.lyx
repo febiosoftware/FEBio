@@ -658,8 +658,15 @@ FEBio supports a wide range of boundary conditions to model interactions
 
 \begin_layout Standard
 FEBio has a large library of element formulations.
- These include linear tetrahedral, hexahedral and pentahedral (wedge) elements,
- as well as quadratic tetrahedral and hexahedral elements.
+ These include linear 
+\change_inserted 2145056167 1496710926
+and quadratic 
+\change_unchanged
+tetrahedral, hexahedral and pentahedral (wedge) elements
+\change_deleted 2145056167 1496710932
+, as well as quadratic tetrahedral and hexahedral elements
+\change_unchanged
+.
  FEBio also supports triangular 
 \change_deleted 2145056167 1496339995
 and bi-linear quadratic
