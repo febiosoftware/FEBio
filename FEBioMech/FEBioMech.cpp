@@ -319,7 +319,8 @@ REGISTER_FECORE_CLASS(FEBondRelaxationFung                 , FEMATERIAL_ID, "rel
 REGISTER_FECORE_CLASS(FEBondRelaxationPark                 , FEMATERIAL_ID, "relaxation-Park"           );
 REGISTER_FECORE_CLASS(FEBondRelaxationParkDistortion       , FEMATERIAL_ID, "relaxation-Park-distortion");
 REGISTER_FECORE_CLASS(FEBondRelaxationPower                , FEMATERIAL_ID, "relaxation-power"           );
-REGISTER_FECORE_CLASS(FEBondRelaxationPowerDistortion       , FEMATERIAL_ID, "relaxation-power-distortion");
+REGISTER_FECORE_CLASS(FEBondRelaxationPowerDistortion      , FEMATERIAL_ID, "relaxation-power-distortion");
+REGISTER_FECORE_CLASS(FEBondRelaxationCarreau              , FEMATERIAL_ID, "relaxation-Carreau"         );
     
 REGISTER_FECORE_CLASS(FEDamageMaterial                     , FEMATERIAL_ID, "elastic damage"       );
 REGISTER_FECORE_CLASS(FEDamageMaterialUC                   , FEMATERIAL_ID, "uncoupled elastic damage");

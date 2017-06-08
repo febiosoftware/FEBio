@@ -386,7 +386,7 @@ inline mat3ds mat3ds::inverse() const
 }
 
 // L2-norm
-inline double mat3ds::norm()
+inline double mat3ds::norm() const
 { 
 	double D = m[XX]*m[XX] + m[YY]*m[YY] + m[ZZ]*m[ZZ] + 2*(m[XY]*m[XY] + m[YZ]*m[YZ] + m[XZ]*m[XZ]);
 	return sqrt(D); 

@@ -22,7 +22,7 @@ public:
 	virtual ~FEBondRelaxation() {}
     
 	//! relaxation
-	virtual double Relaxation(FEMaterialPoint& pt, const double t) = 0;
+	virtual double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ public:
     FEBondRelaxationExponential(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
     
 public:
 	double	m_tau;      //!< relaxation time
@@ -55,7 +55,7 @@ public:
     FEBondRelaxationExpDistortion(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
     
 public:
     double	m_tau0;     //!< relaxation time
@@ -76,7 +76,7 @@ public:
     FEBondRelaxationFung(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
     
     //! data initialization and checking
     bool Validate();
@@ -99,7 +99,7 @@ public:
     FEBondRelaxationPark(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
     
 public:
     double	m_tau;      //!< relaxation time
@@ -120,7 +120,7 @@ public:
     FEBondRelaxationParkDistortion(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
     
 public:
     double	m_tau0;      //!< relaxation time
@@ -143,7 +143,7 @@ public:
     FEBondRelaxationPower(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
     
 public:
     double	m_tau;      //!< relaxation time
@@ -164,7 +164,7 @@ public:
     FEBondRelaxationPowerDistortion(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
     
 public:
     double	m_tau0;      //!< relaxation time at zero strain
@@ -172,6 +172,28 @@ public:
     double	m_tau1;     //!< relaxation time coeff. of 2nd term
     double  m_beta1;    //!< coefficient of 2nd for beta
     double  m_alpha;    //!< exponent of 2nd term
+    
+    // declare parameter list
+    DECLARE_PARAMETER_LIST();
+};
+
+//-----------------------------------------------------------------------------
+// This class implements a relaxation that produces Carreau fluid response
+// under stead-state conditions
+
+class FEBondRelaxationCarreau : public FEBondRelaxation
+{
+public:
+    //! constructor
+    FEBondRelaxationCarreau(FEModel* pfem);
+    
+    //! relaxation
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
+    
+public:
+    double	m_tau0;		//!< characteristic time constant
+    double  m_lam;      //!< time constant
+    double  m_n;        //!< power-law index
     
     // declare parameter list
     DECLARE_PARAMETER_LIST();

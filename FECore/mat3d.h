@@ -193,7 +193,7 @@ public:
 	void eigen2(double d[3], vec3d r[3] = 0);
 
 	// L2-norm 
-	double norm();
+	double norm() const;
 
 	// double contraction
 	double dotdot(const mat3ds& S);

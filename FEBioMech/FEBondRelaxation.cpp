@@ -8,6 +8,7 @@
 
 #include "FEBondRelaxation.h"
 #include "FEElasticMaterial.h"
+#include "FEViscousMaterialPoint.h"
 #ifdef HAVE_GSL
     #include "gsl/gsl_sf_expint.h"
 #endif
@@ -32,7 +33,7 @@ FEBondRelaxationExponential::FEBondRelaxationExponential(FEModel* pfem) : FEBond
 
 //-----------------------------------------------------------------------------
 //! Relaxation function
-double FEBondRelaxationExponential::Relaxation(FEMaterialPoint& mp, const double t)
+double FEBondRelaxationExponential::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
 	// --- constant relaxation times ---
     double g = exp(-t/m_tau);
@@ -64,7 +65,7 @@ FEBondRelaxationExpDistortion::FEBondRelaxationExpDistortion(FEModel* pfem) : FE
 
 //-----------------------------------------------------------------------------
 //! Relaxation function
-double FEBondRelaxationExpDistortion::Relaxation(FEMaterialPoint& mp, const double t)
+double FEBondRelaxationExpDistortion::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
     // get the elastic material point data
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -116,7 +117,7 @@ bool FEBondRelaxationFung::Validate()
 
 //-----------------------------------------------------------------------------
 //! Relaxation function
-double FEBondRelaxationFung::Relaxation(FEMaterialPoint& mp, const double t)
+double FEBondRelaxationFung::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
     double g = 0;
     
@@ -153,7 +154,7 @@ FEBondRelaxationPark::FEBondRelaxationPark(FEModel* pfem) : FEBondRelaxation(pfe
 
 //-----------------------------------------------------------------------------
 //! Relaxation function
-double FEBondRelaxationPark::Relaxation(FEMaterialPoint& mp, const double t)
+double FEBondRelaxationPark::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
     double g = 1./(1+pow(t/m_tau,m_beta));
     
@@ -188,7 +189,7 @@ FEBondRelaxationParkDistortion::FEBondRelaxationParkDistortion(FEModel* pfem) : 
 
 //-----------------------------------------------------------------------------
 //! Relaxation function
-double FEBondRelaxationParkDistortion::Relaxation(FEMaterialPoint& mp, const double t)
+double FEBondRelaxationParkDistortion::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
     double g;
     
@@ -233,7 +234,7 @@ FEBondRelaxationPower::FEBondRelaxationPower(FEModel* pfem) : FEBondRelaxation(p
 
 //-----------------------------------------------------------------------------
 //! Relaxation function
-double FEBondRelaxationPower::Relaxation(FEMaterialPoint& mp, const double t)
+double FEBondRelaxationPower::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
     double g = pow(1+t/m_tau,-m_beta);
     
@@ -265,7 +266,7 @@ FEBondRelaxationPowerDistortion::FEBondRelaxationPowerDistortion(FEModel* pfem) 
 
 //-----------------------------------------------------------------------------
 //! Relaxation function
-double FEBondRelaxationPowerDistortion::Relaxation(FEMaterialPoint& mp, const double t)
+double FEBondRelaxationPowerDistortion::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
 {
     double g;
     
@@ -287,6 +288,45 @@ double FEBondRelaxationPowerDistortion::Relaxation(FEMaterialPoint& mp, const do
     double beta = m_beta0 + m_beta1*K2a;
 
     g = pow(1+t/tau,-beta);
+    
+    return g;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FEBondRelaxationCarreau
+//
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_PARAMETER_LIST(FEBondRelaxationCarreau, FEBondRelaxation)
+    ADD_PARAMETER2(m_tau0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "tau0");
+    ADD_PARAMETER2(m_lam  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lambda");
+    ADD_PARAMETER2(m_n    , FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "n");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEBondRelaxationCarreau::FEBondRelaxationCarreau(FEModel* pfem) : FEBondRelaxation(pfem)
+{
+    m_tau0 = 0;
+    m_lam = 0;
+    m_n = 1;
+}
+
+//-----------------------------------------------------------------------------
+//! Relaxation function
+double FEBondRelaxationCarreau::Relaxation(FEMaterialPoint& mp, const double t, const mat3ds D)
+{
+    double g;
+    
+    // evaluate the engineering shear rate
+    double gdot = sqrt(2.)*D.norm();
+    
+    // evaluate the relaxation time
+    double tau = m_tau0*pow(1+pow(m_lam*gdot,2),(m_n-1)/2.);
+    
+    g = exp(-t/tau);
     
     return g;
 }

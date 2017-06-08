@@ -129,7 +129,7 @@ bool FEUncoupledReactiveViscoelasticMaterial::NewGeneration(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! evaluate bond mass fraction
-double FEUncoupledReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMaterialPoint& mp, const int ig)
+double FEUncoupledReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMaterialPoint& mp, const int ig, const mat3ds D)
 {
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
@@ -147,7 +147,7 @@ double FEUncoupledReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMater
             double v = pt.m_v[ig];
             
             if (time >= v)
-                w = pt.m_w[ig]*m_pRelx->Relaxation(mp, time - v);
+                w = pt.m_w[ig]*m_pRelx->Relaxation(mp, time - v, D);
         }
             break;
         case 2:
@@ -155,13 +155,13 @@ double FEUncoupledReactiveViscoelasticMaterial::BreakingBondMassFraction(FEMater
             double tu, tv;
             if (ig == 0) {
                 tv = time - pt.m_v[ig];
-                w = m_pRelx->Relaxation(mp, tv);
+                w = m_pRelx->Relaxation(mp, tv, D);
             }
             else
             {
                 tu = time - pt.m_v[ig-1];
                 tv = time - pt.m_v[ig];
-                w = m_pRelx->Relaxation(mp, tv) - m_pRelx->Relaxation(mp, tu);
+                w = m_pRelx->Relaxation(mp, tv, D) - m_pRelx->Relaxation(mp, tu, D);
             }
         }
             break;
@@ -185,6 +185,10 @@ double FEUncoupledReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMate
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
     
+    // get the viscous point data
+    FEViscousMaterialPoint& vt = *mp.ExtractData<FEViscousMaterialPoint>();
+    mat3ds D = vt.RateOfDeformation();
+    
     // keep safe copy of deformation gradient
     mat3d F = ep.m_F;
     double J = ep.m_J;
@@ -200,7 +204,7 @@ double FEUncoupledReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMate
         ep.m_F = pt.m_Fi[ig+1].inverse()*pt.m_Fi[ig];
         ep.m_J = pt.m_Ji[ig]/pt.m_Ji[ig+1];
         // evaluate the breaking bond mass fraction for this generation
-        w -= BreakingBondMassFraction(mp, ig);
+        w -= BreakingBondMassFraction(mp, ig, D);
     }
     
     // restore safe copy of deformation gradient
@@ -225,6 +229,10 @@ mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStress(FEMaterialPoint& mp)
     
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
+    
+    // get the viscous point data
+    FEViscousMaterialPoint& vt = *mp.ExtractData<FEViscousMaterialPoint>();
+    mat3ds D = vt.RateOfDeformation();
     
     // calculate the base material Cauchy stress
     mat3ds s = m_pBase->DevStress(mp);
@@ -251,7 +259,7 @@ mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStress(FEMaterialPoint& mp)
             ep.m_F = F*pt.m_Fi[ig];
             ep.m_J = J*pt.m_Ji[ig];
             // evaluate bond mass fraction for this generation
-            w = BreakingBondMassFraction(mp, ig);
+            w = BreakingBondMassFraction(mp, ig, D);
             // evaluate bond stress
             sb = m_pBond->DevStress(mp);
             // add bond stress to total stress
@@ -279,6 +287,10 @@ tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangent(FEMaterialPoint& mp)
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
     
+    // get the viscous point data
+    FEViscousMaterialPoint& vt = *mp.ExtractData<FEViscousMaterialPoint>();
+    mat3ds D = vt.RateOfDeformation();
+    
     // calculate the base material tangent
     tens4ds c = m_pBase->DevTangent(mp);
     
@@ -304,7 +316,7 @@ tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangent(FEMaterialPoint& mp)
             ep.m_F = F*pt.m_Fi[ig];
             ep.m_J = J*pt.m_Ji[ig];
             // evaluate bond mass fraction for this generation
-            w = BreakingBondMassFraction(mp, ig);
+            w = BreakingBondMassFraction(mp, ig, D);
             // evaluate bond tangent
             cb = m_pBond->DevTangent(mp);
             // add bond tangent to total tangent
@@ -333,6 +345,10 @@ double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensity(FEMateria
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
     
+    // get the viscous point data
+    FEViscousMaterialPoint& vt = *mp.ExtractData<FEViscousMaterialPoint>();
+    mat3ds D = vt.RateOfDeformation();
+    
     // calculate the base material Cauchy stress
     double sed = m_pBase->DevStrainEnergyDensity(mp);
     
@@ -358,7 +374,7 @@ double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensity(FEMateria
             ep.m_F = F*pt.m_Fi[ig];
             ep.m_J = J*pt.m_Ji[ig];
             // evaluate bond mass fraction for this generation
-            w = BreakingBondMassFraction(mp, ig);
+            w = BreakingBondMassFraction(mp, ig, D);
             // evaluate bond stress
             sedb = m_pBond->DevStrainEnergyDensity(mp);
             // add bond stress to total stress
@@ -381,6 +397,10 @@ void FEUncoupledReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& m
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
     
+    // get the viscous point data
+    FEViscousMaterialPoint& vt = *mp.ExtractData<FEViscousMaterialPoint>();
+    mat3ds D = vt.RateOfDeformation();
+    
     if (pt.m_Fi.empty()) return;
     
     // culling termination flag
@@ -388,7 +408,7 @@ void FEUncoupledReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& m
     
     // always check oldest generation
     while (!done) {
-        double w = BreakingBondMassFraction(mp, 0);
+        double w = BreakingBondMassFraction(mp, 0, D);
         if ((w > m_wmin) || (pt.m_Fi.size() == 1))
             done = true;
         else {

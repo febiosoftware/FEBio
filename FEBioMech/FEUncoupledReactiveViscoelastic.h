@@ -55,7 +55,7 @@ public:
     void CullGenerations(FEMaterialPoint& pt);
     
     //! evaluate bond mass fraction for a given generation
-    double BreakingBondMassFraction(FEMaterialPoint& pt, const int ig);
+    double BreakingBondMassFraction(FEMaterialPoint& pt, const int ig, const mat3ds D);
     
     //! evaluate bond mass fraction of reforming generation
     double ReformingBondMassFraction(FEMaterialPoint& pt);
