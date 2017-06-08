@@ -1598,22 +1598,20 @@ void FESlidingInterfaceBW::UpdateContactPressures()
                         FESlidingSurfaceBW::Data& md = mdv[j];
                         
                         pn = 0;
-                        md.m_tr = ContactTraction(ms, pme->m_lid, j, ss, pn);
-                        md.m_Ln = pn;
                         // evaluate traction on master surface
                         double eps = m_epsn*md.m_epsn;
                         if (md.m_bstick) {
                             // if stick, evaluate total traction
-                            ti[j] = md.m_Lmt + md.m_dg*eps;
+                            md.m_tr = ti[j] = md.m_Lmt + md.m_dg*eps;
                             // then derive normal component
-                            pi[j] = -ti[j]*md.m_nu;
+                            md.m_Ln = pi[j] = -ti[j]*md.m_nu;
                         }
                         else {
                             // if slip, evaluate normal traction
                             double Ln = md.m_Lmd + eps*md.m_gap;
-                            pi[j] = m_btension ? Ln : MBRACKET(Ln);
+                            md.m_Ln = pi[j] = m_btension ? Ln : MBRACKET(Ln);
                             // then derive total traction
-                            ti[j] = -(md.m_nu + md.m_s1*m_mu)*pi[j];
+                            md.m_tr = ti[j] = -(md.m_nu + md.m_s1*m_mu)*pi[j];
                         }
                     }
                     // project the data to the nodes
@@ -1699,6 +1697,7 @@ bool FESlidingInterfaceBW::Augment(int naug)
                 }
                 // then derive normal component
                 data.m_Lmd = -data.m_Lmt*data.m_nu;
+                Ln = data.m_Lmd;
                 normL1 += data.m_Lmt*data.m_Lmt;
                 
                 if (m_btension)
@@ -1747,6 +1746,7 @@ bool FESlidingInterfaceBW::Augment(int naug)
                 }
                 // then derive normal component
                 data.m_Lmd = -data.m_Lmt*data.m_nu;
+                Ln = data.m_Lmd;
                 normL1 += data.m_Lmt*data.m_Lmt;
                 
                 if (m_btension)
