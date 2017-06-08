@@ -655,6 +655,8 @@ void FEPenta15_::shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs
 //                          F E P E N T A 1 5 G 2 1
 //=============================================================================
 
+int FEPenta15G21::ni[NELN] = { 1, 2, 3, 4, 5, 6, 8, 9, 10, 15, 16, 17, 18, 19, 20 };
+
 FEPenta15G21::FEPenta15G21() : FEPenta15_(NINT, FE_PENTA15G21)
 {
     const double w = 1.0/2.0;
@@ -1874,6 +1876,8 @@ void FEHex20_::shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, 
 //=============================================================================
 //              H E X 2 0 G 2 7
 //=============================================================================
+
+int FEHex20G27::ni[NELN] = { 0, 1, 2, 3, 5, 6, 7, 8, 9, 11, 15, 17, 18, 19, 20, 21, 23, 24, 25, 26 };
 
 FEHex20G27::FEHex20G27() : FEHex20_(NINT, FE_HEX20G27)
 {
@@ -3489,6 +3493,8 @@ void FEShellElementTraits::project_to_nodes(mat3ds* si, mat3ds* so)
 //                          S H E L L Q U A D 4 G 8
 //*****************************************************************************
 
+int FEShellQuad4G8::ni[NELN] = { 4, 5, 6, 7 };
+
 FEShellQuad4G8::FEShellQuad4G8() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G8)
 {
     int n;
@@ -3552,6 +3558,8 @@ void FEShellQuad4G8::project_to_nodes(double* ai, double* ao)
 //*****************************************************************************
 //                          S H E L L Q U A D 4 G 1 2
 //*****************************************************************************
+
+int FEShellQuad4G12::ni[NELN] = { 8, 9, 10, 11 };
 
 FEShellQuad4G12::FEShellQuad4G12() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G12)
 {
@@ -3623,6 +3631,8 @@ void FEShellQuad4G12::project_to_nodes(double* ai, double* ao)
 //                          S H E L L T R I 3 G 6
 //*****************************************************************************
 
+int FEShellTri3G6::ni[NELN] = { 3, 4, 5 };
+
 FEShellTri3G6::FEShellTri3G6() : FEShellTri3_(NINT, FE_SHELL_TRI3G6)
 {
     //gauss intergration points
@@ -3681,6 +3691,8 @@ void FEShellTri3G6::project_to_nodes(double* ai, double* ao)
 //*****************************************************************************
 //                          S H E L L T R I 3 G 9
 //*****************************************************************************
+
+int FEShellTri3G9::ni[NELN] = { 6, 7, 8 };
 
 FEShellTri3G9::FEShellTri3G9() : FEShellTri3_(NINT, FE_SHELL_TRI3G9)
 {
@@ -3745,6 +3757,8 @@ void FEShellTri3G9::project_to_nodes(double* ai, double* ao)
 //*****************************************************************************
 //                          S H E L L Q U A D 8 G 1 8
 //*****************************************************************************
+
+int FEShellQuad8G18::ni[NELN] = { 9, 10, 11, 12, 14, 15, 16, 17 };
 
 FEShellQuad8G18::FEShellQuad8G18() : FEShellQuad8_(NINT, FE_SHELL_QUAD8G18)
 {
@@ -3838,6 +3852,8 @@ void FEShellQuad8G18::project_to_nodes(double* ai, double* ao)
 //*****************************************************************************
 //                          S H E L L Q U A D 8 G 2 7
 //*****************************************************************************
+
+int FEShellQuad8G27::ni[NELN] = { 18, 19, 20, 21, 23, 24, 25, 26 };
 
 FEShellQuad8G27::FEShellQuad8G27() : FEShellQuad8_(NINT, FE_SHELL_QUAD8G27)
 {
@@ -3940,6 +3956,8 @@ void FEShellQuad8G27::project_to_nodes(double* ai, double* ao)
 //                          S H E L L T R I 6 G 1 4
 //*****************************************************************************
 
+int FEShellTri6G14::ni[NELN] = { 8, 9, 10, 11, 12, 13 };
+
 FEShellTri6G14::FEShellTri6G14() : FEShellTri6_(NINT, FE_SHELL_TRI6G14)
 {
     int n;
@@ -4022,6 +4040,8 @@ void FEShellTri6G14::project_to_nodes(double* ai, double* ao)
 //*****************************************************************************
 //                          S H E L L T R I 6 G 2 1
 //*****************************************************************************
+
+int FEShellTri6G21::ni[NELN] = { 15, 16, 17, 18, 19, 20 };
 
 FEShellTri6G21::FEShellTri6G21() : FEShellTri6_(NINT, FE_SHELL_TRI6G21)
 {
