@@ -62,7 +62,7 @@ bool FEUncoupledReactiveViscoelasticMaterial::Init()
 //! Create material point data for this material
 FEMaterialPoint* FEUncoupledReactiveViscoelasticMaterial::CreateMaterialPointData()
 {
-    return new FEReactiveVEMaterialPoint(m_pBase->CreateMaterialPointData(), this);
+    return new FEReactiveVEMaterialPoint(new FEViscousMaterialPoint(m_pBase->CreateMaterialPointData()), this);
 }
 
 //-----------------------------------------------------------------------------
