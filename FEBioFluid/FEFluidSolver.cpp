@@ -16,6 +16,7 @@
 #include "FEFluidResistanceBC.h"
 #include "FEBackFlowStabilization.h"
 #include "FEFluidNormalVelocity.h"
+#include "FEFluidVelocity.h"
 #include "FEFluidRotationalVelocity.h"
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
@@ -157,9 +158,11 @@ bool FEFluidSolver::Init()
             FEFluidResistanceBC* pfr = dynamic_cast<FEFluidResistanceBC*>(psl);
             FEFluidNormalVelocity* pnv = dynamic_cast<FEFluidNormalVelocity*>(psl);
             FEFluidRotationalVelocity* prv = dynamic_cast<FEFluidRotationalVelocity*>(psl);
+            FEFluidVelocity* pv = dynamic_cast<FEFluidVelocity*>(psl);
             if (pfr) pfr->MarkDilatation();
             else if (pnv && pnv->m_bpv) pnv->MarkVelocity();
             else if (prv) prv->MarkVelocity();
+            else if (pv) pv->MarkVelocity();
         }
     }
     
@@ -349,9 +352,11 @@ void FEFluidSolver::Update(vector<double>& ui)
             FEFluidResistanceBC* pfr = dynamic_cast<FEFluidResistanceBC*>(psl);
             FEFluidNormalVelocity* pnv = dynamic_cast<FEFluidNormalVelocity*>(psl);
             FEFluidRotationalVelocity* prv = dynamic_cast<FEFluidRotationalVelocity*>(psl);
+            FEFluidVelocity* pv = dynamic_cast<FEFluidVelocity*>(psl);
             if (pfr) pfr->SetDilatation();
             else if (pnv && pnv->m_bpv) pnv->SetVelocity();
             else if (prv) prv->SetVelocity();
+            else if (pv) pv->SetVelocity();
         }
     }
     
