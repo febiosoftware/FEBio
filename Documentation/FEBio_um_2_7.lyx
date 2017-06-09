@@ -31357,7 +31357,15 @@ P
 \begin_inset Text
 
 \begin_layout Plain Layout
-<G13>
+<G
+\change_deleted 2145056167 1497032130
+1
+\change_unchanged
+3
+\change_inserted 2145056167 1497032132
+1
+\change_unchanged
+>
 \end_layout
 
 \end_inset
@@ -31366,7 +31374,7 @@ P
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $G_{13}$
+\begin_inset Formula $G_{31}$
 \end_inset
 
  shear modulus
@@ -31666,7 +31674,7 @@ reference "subsec:Orthotropic-Materials"
 -\frac{\nu_{31}}{E_{3}} & -\frac{\nu_{32}}{E_{3}} & \frac{1}{E_{3}} & 0 & 0 & 0\\
 0 & 0 & 0 & \frac{1}{G_{12}} & 0 & 0\\
 0 & 0 & 0 & 0 & \frac{1}{G_{23}} & 0\\
-0 & 0 & 0 & 0 & 0 & \frac{1}{G_{13}}
+0 & 0 & 0 & 0 & 0 & \frac{1}{G_{31}}
 \end{array}\right]
 \end{aligned}
 .
@@ -31711,7 +31719,19 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-  <G13>40</G13>
+  <G
+\change_deleted 2145056167 1497032108
+13
+\change_inserted 2145056167 1497032108
+31
+\change_unchanged
+>40</G
+\change_deleted 2145056167 1497032111
+13
+\change_inserted 2145056167 1497032111
+31
+\change_unchanged
+>
 \end_layout
 
 \begin_layout LyX-Code
@@ -39749,7 +39769,15 @@ P
 \begin_inset Text
 
 \begin_layout Plain Layout
-<G13>
+<G
+\change_deleted 2145056167 1497032151
+1
+\change_unchanged
+3
+\change_inserted 2145056167 1497032153
+1
+\change_unchanged
+>
 \end_layout
 
 \end_inset
@@ -39758,7 +39786,7 @@ P
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $G_{13}$
+\begin_inset Formula $G_{31}$
 \end_inset
 
  shear modulus
@@ -40069,7 +40097,7 @@ reference "subsec:Orthotropic-Materials"
 -\frac{\nu_{31}}{E_{3}} & -\frac{\nu_{32}}{E_{3}} & \frac{1}{E_{3}} & 0 & 0 & 0\\
 0 & 0 & 0 & \frac{1}{G_{12}} & 0 & 0\\
 0 & 0 & 0 & 0 & \frac{1}{G_{23}} & 0\\
-0 & 0 & 0 & 0 & 0 & \frac{1}{G_{13}}
+0 & 0 & 0 & 0 & 0 & \frac{1}{G_{31}}
 \end{array}\right]
 \end{aligned}
 \]
@@ -40113,7 +40141,23 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-  <G13>40</G13>
+  <G
+\change_deleted 2145056167 1497032167
+1
+\change_unchanged
+3
+\change_inserted 2145056167 1497032168
+1
+\change_unchanged
+>40</G
+\change_deleted 2145056167 1497032170
+1
+\change_unchanged
+3
+\change_inserted 2145056167 1497032171
+1
+\change_unchanged
+>
 \end_layout
 
 \begin_layout LyX-Code
