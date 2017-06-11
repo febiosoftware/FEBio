@@ -14368,7 +14368,7 @@ If a different vector value needs to be specified for each facet, use the
 
 \begin_layout Standard
 
-\change_inserted 2145056167 1496353896
+\change_inserted 2145056167 1497112282
 and provide the facet values in a user-defined 
 \emph on
 SurfaceData
@@ -14385,7 +14385,102 @@ reference "subsec:SurfaceData"
 \end_inset
 
 ).
-\change_unchanged
+\end_layout
+
+\begin_layout Subsubsection
+
+\change_inserted 2145056167 1497112865
+Fluid Rotational Velocity
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Rotational-Velocity"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1497112937
+This boundary condition prescribes a rotational velocity on an axisymmetric
+ surface.
+ It is the user's responsibility to ensure that the surface is axisymmetric.
+ The angular velocity 
+\begin_inset Formula $\boldsymbol{\omega}=\omega\mathbf{n}$
+\end_inset
+
+ is prescribed by specifying the angular speed 
+\begin_inset Formula $\omega$
+\end_inset
+
+ and the unit vector along the axis of rotation (axis of symmetry) 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+.
+ The user-defined vector 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ is automatically normalized.
+ If the axis does not pass through the origin, the user may specify any
+ point 
+\begin_inset Formula $\mathbf{p}$
+\end_inset
+
+ on the axis.
+ The velocity 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ of nodes on the selected surface is evaluated from 
+\begin_inset Formula $\mathbf{v}=\boldsymbol{\omega}\times\mathbf{r}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{r}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\left(\mathbf{x}-\mathbf{p}\right)$
+\end_inset
+
+ is the shortest vector from the axis to the node and 
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ is the nodal position.
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1497112836
+<surface_load type="fluid rotational velocity" surface="FluidRotationalVelocity0
+1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1497112836
+	<angular_speed lc="1">1</angular_speed>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1497112853
+	<axis>0,0,1</axis>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1497112858
+	<origin>0,0,0</origin>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1497112836
+</surface_load>
+\end_layout
+
+\begin_layout LyX-Code
 
 \end_layout
 
