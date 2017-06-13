@@ -45,7 +45,7 @@
 #include "FEBioLib/version.h"
 #include "FEBioCommand.h"
 #include "FECore/FECore.h"
-//#include "FEBioLib/validate.h" // For the KeyGen library
+#include "FEBioLib/validate.h"
 #include "console.h"
 #include "FECore/log.h"
 #include "FEBioStdSolver.h"
@@ -212,15 +212,15 @@ int main(int argc, char* argv[])
 	CMDOPTIONS ops;
 	if (ParseCmdLine(argc, argv, ops) == false) return 0;
 
-	// load the license file (for KeyGen)
-	//LoadLicenseFile();
+	// load the license file
+	int licenseStatus = GetLicenseKeyStatus();
 
-	// print welcome message
-#ifdef NALPLIB
-	if (febio::Hello()) return 1;
-#else
-	if (ops.bsplash && (!ops.bsilent)) febio::Hello();
-#endif
+	// say hello
+	if (ops.bsplash && (!ops.bsilent)) febio::Hello(licenseStatus);
+
+	// only continue if the license is valid
+	if (licenseStatus == -1) return 1;
+
 	// Initialize FEBio library
 	febio::InitLibrary();
 

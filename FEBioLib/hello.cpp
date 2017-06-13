@@ -1,82 +1,11 @@
 #include "stdafx.h"
 #include "version.h"
-//#include "validate.h" // For KeyGen
-#ifdef NALPLIB
-	#include "FEBioNSL.h"
-#endif
 #include "FECore/log.h"
 #include "febio.h"
 #include <stdio.h>
 
-unsigned char banner[] = {
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,8,8,0,0,0,0,8,8,7,0,0,0,0,0,0,8,8,8,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,8,8,8,8,8,8,7,0,0,8,8,8,8,8,8,8,8,7,0,0,8,8,8,8,8,8,8,8,8,7,0,0,0,7,7,0,0,0,0,8,8,8,8,8,8,8,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,7,7,7,7,7,7,7,0,0,8,8,7,7,7,7,7,7,7,0,0,8,8,7,7,7,7,7,8,8,8,7,0,0,0,0,0,0,0,8,8,8,7,7,7,7,8,8,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,8,8,7,0,8,8,0,0,0,0,8,8,7,7,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,8,8,7,0,8,8,7,0,0,8,8,7,7,0,0,0,0,0,0,8,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,8,8,8,7,0,8,8,7,0,0,8,8,7,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,8,8,8,8,8,0,0,0,0,8,8,8,8,8,8,8,0,0,0,0,8,8,8,8,8,8,8,8,8,7,7,0,8,8,7,0,0,8,8,7,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,8,8,8,8,8,7,0,0,0,8,8,8,8,8,8,8,7,0,0,0,8,8,8,8,8,8,8,8,8,7,0,0,8,8,7,0,0,8,8,7,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,7,7,7,7,7,7,0,0,0,8,8,7,7,7,7,7,7,0,0,0,8,8,7,7,7,7,7,8,8,8,0,0,8,8,7,0,0,8,8,7,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,8,8,7,0,8,8,7,0,0,8,8,7,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,8,8,7,0,8,8,7,0,0,0,8,8,0,0,0,0,0,0,8,8,7,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,8,8,8,7,0,8,8,7,0,0,0,8,8,8,0,0,0,0,8,8,8,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,8,8,8,8,8,8,0,0,0,8,8,8,8,8,8,8,8,8,7,7,0,8,8,7,0,0,0,0,8,8,8,8,8,8,8,8,7,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,7,0,0,0,0,0,0,0,0,8,8,8,8,8,8,8,8,7,0,0,8,8,8,8,8,8,8,8,7,7,0,0,8,8,7,0,0,0,0,0,7,8,8,8,8,7,7,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,0,0,0,0,0,0,0,0,0,7,7,7,7,7,7,7,7,0,0,0,7,7,7,7,7,7,7,7,0,0,0,0,7,7,0,0,0,0,0,0,0,7,7,7,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-};
-
-
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : Hello
-// Prints the FEBio banner to a file
-//
-/*
-#ifdef WIN32
-
-//#include "console.h"
-#include "windows.h"
-
-void print_banner()
+int febio::Hello(int licenseStatus)
 {
-	char sz[] = "                                                                          ";
-
-	Console* pwnd = Console::GetHandle();
-
-	pwnd->Write(sz, 0xF0 );
-	pwnd->Draw(banner, 80, 18);
-
-	printf("                                                                           \n");
-	printf("      F I N I T E   E L E M E N T S   F O R   B I O M E C H A N I C S      \n");
-	printf("                                                                           \n");
-	printf("                 --- v e r s i o n - %d . %d . %d", VERSION, SUBVERSION, SUBSUBVERSION);
-	if (SVNREVISION) printf(" . %d ---                 \n", SVNREVISION);
-	else printf(" ---                 \n");
-	printf("                                                                           \n");
-	printf("                                                                           \n");
-	printf("  Musculoskeletal Research Laboratory                                      \n");
-	printf("  University of Utah                                                       \n");
-	printf("  http://mrl.sci.utah.edu                                                  \n");
-	printf("                                                                           \n");
-	printf("  copyright (c) 2006-2015 - All rights reserved                            \n");
-	printf("                                                                           \n");
-	pwnd->Write(sz, 0xF0 );
-	printf("\n\n");
-}
-
-#else
-
-void print_banner() {}
-
-#endif
-*/
-int febio::Hello()
-{
-	//int nlic = GetLicenseKeyStatus(); // For KeyGen
-
 	felog.printf("===========================================================================\n");
 	felog.printf("         ________    _________   _________     __     _________            \n");
 	felog.printf("        |        |\\ |        |\\ |        |\\   |  |\\  /         \\\\          \n");
@@ -107,18 +36,7 @@ int febio::Hello()
 	felog.printf("  copyright (c) 2006-2016 - All rights reserved                            \n");
 	felog.printf("                                                                           \n");
 
-#ifdef NALPLIB
-	FEBioNSL NSL = FEBioNSL();
-
-	if (NSL.CheckLicense()) return 1;
-#else
-	felog.printf(" This is the NON-COMMERCIAL version of FEBio. This version may only be  \n");
-	felog.printf(" used for non-commercial purposes as described in the license agreement.\n");
-	felog.printf(" To obtain a valid commercial license file, please contact the developers.\n");
-#endif
-
-	/* Used with KeyGen
-	if(nlic == 0)
+	if (licenseStatus == 0)
 	{
 		felog.printf("                                                                              \n");
 		felog.printf(" This is the NON-COMMERCIAL version of FEBio or the commercial license        \n");
@@ -129,14 +47,11 @@ int febio::Hello()
 		felog.printf(" version. If you wish to obtain a valid commercial license file, please       \n");
 		felog.printf(" contact the developers.                                                      \n");
 	}
-	else if (nlic == 1)
+	else if (licenseStatus == 1)
 	{
-		felog.printf("                                                                           \n");
-		felog.printf("  This version is licensed to:                                             \n");
-		felog.printf("  \t%s\n", GetLicenseUser());
-		felog.printf("  \t%s\n", GetLicenseCompany());
+		// TODO: print something useful here. E.g. when the license will expire or something?
 	}
-	else if(nlic == 2)
+	else if (licenseStatus == -1)
 	{
 		felog.printf("                                                                           \n");
 		felog.printf(" The license file is INVALID. You may continue to use FEBio as an          \n");
@@ -145,7 +60,11 @@ int febio::Hello()
 		felog.printf(" the functionality may be limited. If you wish to obtain a valid license   \n");
 		felog.printf(" file or if you think your license is valid, please contact the developers.\n");
 	}
-	*/
+	else if (licenseStatus == 2)
+	{
+		felog.printf("                                                                           \n");
+		felog.printf(" This is a TRIAL license.                                                  \n");
+	}
 
 	felog.printf("                                                                           \n");
 	felog.printf("===========================================================================\n");

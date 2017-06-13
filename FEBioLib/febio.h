@@ -22,5 +22,5 @@ namespace febio
 	FECOREDLL_EXPORT int get_app_path(char *pname, size_t pathsize);
 
 	// print hello message
-	FECOREDLL_EXPORT int Hello();
+	FECOREDLL_EXPORT int Hello(int licenseStatus = 0);
 }
