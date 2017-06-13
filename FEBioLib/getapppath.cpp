@@ -24,7 +24,7 @@
 int febio::get_app_path (char *pname, size_t pathsize)
 {
 	long result;
-
+	int status = -1;
 #ifdef LINUX
 	/* Oddly, the readlink(2) man page says no NULL is appended. */
 	/* So you have to do it yourself, based on the return value: */
@@ -35,7 +35,7 @@ int febio::get_app_path (char *pname, size_t pathsize)
 		pname[result] = 0; /* add the #@!%ing NULL */
 
 		if ((access(pname, 0) == 0))
-		return 0; /* file exists, return OK */
+		status = 0; /* file exists, return OK */
 		          /*else name doesn't seem to exist, return FAIL (falls through) */
 	}
 #endif /* LINUX */
@@ -51,7 +51,7 @@ int febio::get_app_path (char *pname, size_t pathsize)
 		{
 			if (pname[idx] == '\\') pname[idx] = '/';
 		}
-		return 0; /* file exists, return OK */
+		status = 0; /* file exists, return OK */
 		          /*else name doesn't seem to exist, return FAIL (falls through) */
 	}
 #endif /* WIN32 */
@@ -88,8 +88,15 @@ int febio::get_app_path (char *pname, size_t pathsize)
 			status = 0; /* file exists, return OK */
 		}
 	}
-	return status;
 #endif /* APPLE */
 
-	return -1; /* Path Lookup Failed */
+	if (status == 0)
+	{
+		// remove the application's name
+		char* ch = strrchr(pname, '\\');
+		if (ch == 0) ch = strrchr(pname, '/');
+		if (ch) ch[1] = 0;
+	}
+
+	return status;
 }

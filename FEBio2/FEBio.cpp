@@ -213,7 +213,9 @@ int main(int argc, char* argv[])
 	if (ParseCmdLine(argc, argv, ops) == false) return 0;
 
 	// load the license file
-	int licenseStatus = GetLicenseKeyStatus();
+	std::string licenseKey = LoadLicenseKey();
+	if (licenseKey.empty()) licenseKey = "";
+	int licenseStatus = GetLicenseKeyStatus(licenseKey.c_str());
 
 	// say hello
 	if (ops.bsplash && (!ops.bsilent)) febio::Hello(licenseStatus);
@@ -271,10 +273,6 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	// set the location of the configuration file
 	char szpath[1024] = {0};
 	febio::get_app_path (szpath, 1023);
-
-	char* ch = strrchr(szpath, '\\');
-	if (ch == 0) ch = strrchr(szpath, '/');
-	if (ch) ch[1] = 0;
 
 	sprintf(ops.szcnf, "%sfebio.xml", szpath);
 
@@ -449,7 +447,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	if (ops.szfile[0])
 	{
 		char szbase[256]; strcpy(szbase, ops.szfile);
-		ch = strrchr(szbase, '.');
+		char* ch = strrchr(szbase, '.');
 		if (ch) *ch = 0;
 
 		char szlogbase[256];
@@ -469,7 +467,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	{
 		char szbase[256]; strcpy(szbase, ops.szfile);
 		strcpy(szbase, ops.szctrl);
-		ch = strrchr(szbase, '.');
+		char* ch = strrchr(szbase, '.');
 		if (ch) *ch = 0;
 
 		if (!blog) sprintf(ops.szlog, "%s.log", szbase);
