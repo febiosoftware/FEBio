@@ -51,7 +51,7 @@ int febio::Hello(int licenseStatus)
 	{
 		// TODO: print something useful here. E.g. when the license will expire or something?
 	}
-	else if (licenseStatus == -1)
+	else if (licenseStatus < 0)
 	{
 		felog.printf("                                                                           \n");
 		felog.printf(" The license file is INVALID. You may continue to use FEBio as an          \n");

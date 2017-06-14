@@ -221,7 +221,7 @@ int main(int argc, char* argv[])
 	if (ops.bsplash && (!ops.bsilent)) febio::Hello(licenseStatus);
 
 	// only continue if the license is valid
-	if (licenseStatus == -1) return 1;
+	if (licenseStatus < 0) return 1;
 
 	// Initialize FEBio library
 	febio::InitLibrary();
