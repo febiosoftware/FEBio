@@ -1448,9 +1448,9 @@ bool FEPlotEffectiveShellSoluteConcentration::SetFilter(int nsol)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveShellSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEBiphasicShellDomain* pbsd = dynamic_cast<FEBiphasicShellDomain*>(&dom);
-    FEBiphasicSoluteShellDomain* pbssd = dynamic_cast<FEBiphasicSoluteShellDomain*>(&dom);
-    FEMultiphasicShellDomain* pmpsd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
+    FEBiphasicDomain* pbsd = dynamic_cast<FEBiphasicDomain*>(&dom);
+    FEBiphasicSoluteDomain* pbssd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+    FEMultiphasicDomain* pmpsd = dynamic_cast<FEMultiphasicDomain*>(&dom);
     if (pbsd || pbssd || pmpsd)
     {
         // make sure we have a valid index
@@ -1459,6 +1459,7 @@ bool FEPlotEffectiveShellSoluteConcentration::Save(FEDomain &dom, FEDataStream& 
         
         // get the dof
         const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", nsid);
+        if (dof_D == -1) return false;
         
         int N = dom.Nodes();
         for (int i=0; i<N; ++i)
@@ -1474,9 +1475,9 @@ bool FEPlotEffectiveShellSoluteConcentration::Save(FEDomain &dom, FEDataStream& 
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveShellSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEBiphasicShellDomain* pbsd = dynamic_cast<FEBiphasicShellDomain*>(&dom);
-    FEBiphasicSoluteShellDomain* pbssd = dynamic_cast<FEBiphasicSoluteShellDomain*>(&dom);
-    FEMultiphasicShellDomain* pmpsd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
+    FEBiphasicDomain* pbsd = dynamic_cast<FEBiphasicDomain*>(&dom);
+    FEBiphasicSoluteDomain* pbssd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+    FEMultiphasicDomain* pmpsd = dynamic_cast<FEMultiphasicDomain*>(&dom);
     if (pbsd || pbssd || pmpsd)
     {
         FEBiphasicSolute* pbm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -1488,7 +1489,7 @@ bool FEPlotEffectiveShellSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
             
             // get the dof
             const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
-            assert (dof_D != -1);
+            if (dof_D == -1) return false;
             
             int N = dom.Nodes();
             for (int i=0; i<N; ++i)
@@ -1508,7 +1509,7 @@ bool FEPlotEffectiveShellSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
             
             // get the dof
             const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
-            assert (dof_D != -1);
+            if (dof_D == -1) return false;
             
             int N = dom.Nodes();
             for (int i=0; i<N; ++i)
@@ -1530,7 +1531,7 @@ bool FEPlotEffectiveShellSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
             
             // get the dof
             const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
-            assert (dof_D != -1);
+            if (dof_D == -1) return false;
             
             int N = dom.Nodes();
             for (int i=0; i<N; ++i)

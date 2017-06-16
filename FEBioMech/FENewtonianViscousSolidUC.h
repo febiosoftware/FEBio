@@ -1,0 +1,42 @@
+//
+//  FENewtonianViscousSolidUC.hpp
+//  FEBioMech
+//
+//  Created by Gerard Ateshian on 6/14/17.
+//  Copyright © 2017 febio.org. All rights reserved.
+//
+
+#ifndef FENewtonianViscousSolidUC_hpp
+#define FENewtonianViscousSolidUC_hpp
+
+#include "FEUncoupledMaterial.h"
+#include "FEViscousMaterialPoint.h"
+
+class FENewtonianViscousSolidUC : public FEUncoupledMaterial
+{
+public:
+    FENewtonianViscousSolidUC(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
+    
+public:
+    double	m_kappa;	//!< bulk viscosity
+    double	m_mu;       //!< shear viscosity
+    
+public:
+    // returns a pointer to a new material point object
+    FEMaterialPoint* CreateMaterialPointData() { return new FEViscousMaterialPoint(new FEElasticMaterialPoint); }
+    
+public:
+    //! calculate stress at material point
+    mat3ds DevStress(FEMaterialPoint& pt);
+    
+    //! calculate tangent stiffness at material point
+    tens4ds DevTangent(FEMaterialPoint& pt);
+    
+    //! calculate strain energy density at material point
+    double DevStrainEnergyDensity(FEMaterialPoint& pt);
+    
+    // declare the parameter list
+    DECLARE_PARAMETER_LIST();
+};
+
+#endif /* FENewtonianViscousSolidUC_hpp */

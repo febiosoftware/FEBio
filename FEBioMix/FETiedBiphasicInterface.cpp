@@ -32,6 +32,7 @@ FETiedBiphasicSurface::Data::Data()
     m_nu = vec3d(0,0,0);
     m_rs = vec2d(0,0);
     m_Lmd = vec3d(0,0,0);
+    m_tr = vec3d(0,0,0);
     m_Lmp  = 0.0;
     m_epsn = 1.0;
     m_epsp = 1.0;
@@ -152,6 +153,7 @@ void FETiedBiphasicSurface::Serialize(DumpStream& ar)
                     ar << d.m_dg;
                     ar << d.m_pg;
                     ar << d.m_Lmp;
+                    ar << d.m_tr;
                 }
             }
 		}
@@ -171,6 +173,7 @@ void FETiedBiphasicSurface::Serialize(DumpStream& ar)
                     ar >> d.m_dg;
                     ar >> d.m_pg;
                     ar >> d.m_Lmp;
+                    ar >> d.m_tr;
                 }
             }
 		}
@@ -210,6 +213,7 @@ void FETiedBiphasicSurface::Serialize(DumpStream& ar)
                     ar << d.m_epsn;
                     ar << d.m_epsp;
                     ar << d.m_pg;
+                    ar << d.m_tr;
                 }
             }
             ar << m_poro;
@@ -233,12 +237,33 @@ void FETiedBiphasicSurface::Serialize(DumpStream& ar)
                     ar >> d.m_epsn;
                     ar >> d.m_epsp;
                     ar >> d.m_pg;
+                    ar >> d.m_tr;
                 }
             }
             ar >> m_poro;
             ar >> m_nn;
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FETiedBiphasicSurface::GetVectorGap(int nface, vec3d& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ni = el.GaussPoints();
+    pg = vec3d(0,0,0);
+    for (int k=0; k<ni; ++k) pg += m_Data[nface][k].m_dg;
+    pg /= ni;
+}
+
+//-----------------------------------------------------------------------------
+void FETiedBiphasicSurface::GetContactTraction(int nface, vec3d& pt)
+{
+    FESurfaceElement& el = Element(nface);
+    int ni = el.GaussPoints();
+    pt = vec3d(0,0,0);
+    for (int k=0; k<ni; ++k) pt += m_Data[nface][k].m_tr;
+    pt /= ni;
 }
 
 //-----------------------------------------------------------------------------
@@ -774,6 +799,7 @@ void FETiedBiphasicInterface::ContactForces(FEGlobalVector& R)
 					
 					// contact traction
 					vec3d t = Lm + dg*eps;
+                    pt.m_tr = t;
 					
 					// calculate the force vector
 					fe.resize(ndof);

@@ -193,11 +193,21 @@ void FEMultiphasicSolidDomain::Activate()
         // get the number of nodes
         int neln = el.Nodes();
         // get initial values of fluid pressure and solute concentrations
-        for (int i = 0; i<neln; ++i)
-        {
-            p0[i] = m.Node(el.m_node[i]).get(m_dofP);
-            for (int isol = 0; isol<nsol; ++isol)
-                c0[isol][i] = m.Node(el.m_node[i]).get(m_dofC + sid[isol]);
+        if (el.m_bitfc.size() == 0) {
+            for (int i = 0; i<neln; ++i)
+            {
+                p0[i] = m.Node(el.m_node[i]).get(m_dofP);
+                for (int isol = 0; isol<nsol; ++isol)
+                    c0[isol][i] = m.Node(el.m_node[i]).get(m_dofC + sid[isol]);
+            }
+        }
+        else {
+            for (int i = 0; i<neln; ++i)
+            {
+                p0[i] = el.m_bitfc[i] ? m.Node(el.m_node[i]).get(m_dofQ) : m.Node(el.m_node[i]).get(m_dofP);
+                for (int isol = 0; isol<nsol; ++isol)
+                    c0[isol][i] = el.m_bitfc[i] ? m.Node(el.m_node[i]).get(m_dofD + sid[isol]) : m.Node(el.m_node[i]).get(m_dofC + sid[isol]);
+            }
         }
         
         // get the number of integration points

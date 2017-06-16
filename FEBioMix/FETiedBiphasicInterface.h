@@ -18,6 +18,7 @@ public:
         vec3d	m_nu;	//!< normal at integration points
         vec2d	m_rs;	//!< natural coordinates of projection of integration point
         vec3d	m_Lmd;	//!< lagrange multipliers for displacements
+        vec3d   m_tr;   //!< contact traction
         double	m_Lmp;	//!< lagrange multipliers for fluid pressures
         double	m_epsn;	//!< penalty factors
         double	m_epsp;	//!< pressure penalty factors
@@ -38,6 +39,10 @@ public:
 	
 	void SetPoroMode(bool bporo) { m_bporo = bporo; }
 	
+public:
+    void GetVectorGap      (int nface, vec3d& pg);
+    void GetContactTraction(int nface, vec3d& pt);
+    
 protected:
 	FEModel*	m_pfem;
 	

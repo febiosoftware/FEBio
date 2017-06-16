@@ -44,6 +44,7 @@
 #include "FENeoHookean.h"
 #include "FENeoHookeanTransIso.h"
 #include "FENewtonianViscousSolid.h"
+#include "FENewtonianViscousSolidUC.h"
 #include "FEOgdenMaterial.h"
 #include "FEOgdenUnconstrained.h"
 #include "FEOrthoElastic.h"
@@ -238,6 +239,7 @@ REGISTER_FECORE_CLASS(FEMuscleMaterial               ,FEMATERIAL_ID, "muscle mat
 REGISTER_FECORE_CLASS(FENeoHookean                   ,FEMATERIAL_ID, "neo-Hookean"                   );
 REGISTER_FECORE_CLASS(FENeoHookeanTransIso           ,FEMATERIAL_ID, "neo-Hookean transiso"          );
 REGISTER_FECORE_CLASS(FENewtonianViscousSolid        ,FEMATERIAL_ID, "Newtonian viscous solid"       );
+REGISTER_FECORE_CLASS(FENewtonianViscousSolidUC      ,FEMATERIAL_ID, "Newtonian viscous solid uncoupled");
 REGISTER_FECORE_CLASS(FEOgdenMaterial                ,FEMATERIAL_ID, "Ogden"                         );
 REGISTER_FECORE_CLASS(FEOgdenUnconstrained           ,FEMATERIAL_ID, "Ogden unconstrained"           );
 REGISTER_FECORE_CLASS(FEOrthoElastic                 ,FEMATERIAL_ID, "orthotropic elastic"           );
