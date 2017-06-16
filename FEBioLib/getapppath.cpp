@@ -7,6 +7,7 @@
 
 #ifdef LINUX
 #include <unistd.h>
+#include <string.h>
 #endif // LINUX
 
 #ifdef __APPLE__
@@ -14,6 +15,7 @@
 #include <mach-o/dyld.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #endif
 
 //-----------------------------------------------------------------------------

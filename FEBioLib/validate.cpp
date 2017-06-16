@@ -2,6 +2,7 @@
 #include "febio.h"
 #include "validate.h"
 #include "febio.h"
+#include <string.h>
 
 #ifndef FEBIOLM
 int GetLicenseKeyStatus(const char* licenseKey)
