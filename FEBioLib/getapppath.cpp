@@ -75,7 +75,6 @@ int febio::get_app_path (char *pname, size_t pathsize)
         not the real file. And with  deep  directories  the  total
         bufsize needed could be more than MAXPATHLEN.
 */
-	int status = -1;
 	char given_path[MAXPATHLEN * 2];
 	if (!given_path) return status;
 
