@@ -693,6 +693,7 @@
     <ClInclude Include="..\..\FECore\FEAnalysis.h" />
     <ClInclude Include="..\..\FECore\FEBodyLoad.h" />
     <ClInclude Include="..\..\FECore\FEBoundaryCondition.h" />
+    <ClInclude Include="..\..\FECore\FEBoundingBox.h" />
     <ClInclude Include="..\..\FECore\FEBox.h" />
     <ClInclude Include="..\..\FECore\FEBroydenStrategy.h" />
     <ClInclude Include="..\..\FECore\FECallBack.h" />

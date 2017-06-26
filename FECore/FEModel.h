@@ -298,16 +298,6 @@ public:	// --- Miscellaneous routines ---
 	//! Set the optimize band width flag
 	void SetOptimizeBandwidth(bool b);
 
-protected:
-	// helper functions for serialization
-	void SerializeLoadData    (DumpStream& ar);
-	void SerializeGlobals     (DumpStream& ar);
-	void SerializeMaterials   (DumpStream& ar);
-	void SerializeGeometry    (DumpStream& ar);
-	void SerializeContactData (DumpStream& ar);
-	void SerializeBoundaryData(DumpStream& ar);
-	void SerializeAnalysisData(DumpStream& ar);
-
 public: // Global data
 	void AddGlobalData(FEGlobalData* psd);
 	FEGlobalData* GetGlobalData(int i);
@@ -316,6 +306,11 @@ public: // Global data
 	// get/set global data
 	void SetGlobalConstant(const string& s, double v);
 	double GetGlobalConstant(const string& s);
+
+public: // Data retrieval
+
+	// get nodal dof data
+	bool GetNodeData(int dof, vector<double>& data);
 
 public:
 	// TODO: put this somewhere else
