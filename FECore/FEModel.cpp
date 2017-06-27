@@ -1262,6 +1262,9 @@ void FEModel::CopyFrom(FEModel& fem)
 		assert(pnew_solver);
 		pnew->SetFESolver(pnew_solver);
 
+		// copy parameters
+		pnew_solver->GetParameterList() = psolver->GetParameterList();
+
 		// add the step
 		AddStep(pnew);
 	}
