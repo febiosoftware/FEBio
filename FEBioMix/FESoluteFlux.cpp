@@ -6,6 +6,7 @@
 BEGIN_PARAMETER_LIST(FESoluteFlux, FESurfaceLoad)
 	ADD_PARAMETER(m_flux, FE_PARAM_DOUBLE, "flux");
 	ADD_PARAMETER(m_blinear, FE_PARAM_BOOL, "linear");
+    ADD_PARAMETER(m_bshellb, FE_PARAM_BOOL, "shell_bottom");
 	ADD_PARAMETER(m_isol, FE_PARAM_INT, "solute_id");
 	ADD_PARAMETER(m_PC  , FE_PARAM_DATA_ARRAY, "value");
 END_PARAMETER_LIST();
@@ -16,13 +17,18 @@ FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE)
 { 
 	m_flux = 1.0;
 	m_blinear = false; 
-	m_isol = 0; 
+    m_bshellb = false;
+	m_isol = 0;
 	m_PC.set(1.0);
 
 	m_dofX = pfem->GetDOFIndex("x");
 	m_dofY = pfem->GetDOFIndex("y");
 	m_dofZ = pfem->GetDOFIndex("z");
 	m_dofC = pfem->GetDOFIndex("concentration", 0);
+    m_dofU = pfem->GetDOFIndex("u");
+    m_dofV = pfem->GetDOFIndex("v");
+    m_dofW = pfem->GetDOFIndex("w");
+    m_dofD = pfem->GetDOFIndex("shell concentration", 0);
 }
 	
 //-----------------------------------------------------------------------------
@@ -46,22 +52,42 @@ void FESoluteFlux::UnpackLM(FEElement& el, vector<int>& lm)
 	int N = el.Nodes();
 	lm.resize(N*(3+MAX_CDOFS));
 
-	for (int i=0; i<N; ++i)
-	{
-		int n = el.m_node[i];
-
-		FENode& node = mesh.Node(n);
-		vector<int>& id = node.m_ID;
-
-		// first the displacement dofs
-		lm[3*i  ] = id[m_dofX];
-		lm[3*i+1] = id[m_dofY];
-		lm[3*i+2] = id[m_dofZ];
-
-		// concentration dofs
-		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(3+k)*N + i] = id[m_dofC+k];
-	}
+    if (!m_bshellb) {
+        for (int i=0; i<N; ++i)
+        {
+            int n = el.m_node[i];
+            
+            FENode& node = mesh.Node(n);
+            vector<int>& id = node.m_ID;
+            
+            // first the displacement dofs
+            lm[3*i  ] = id[m_dofX];
+            lm[3*i+1] = id[m_dofY];
+            lm[3*i+2] = id[m_dofZ];
+            
+            // concentration dofs
+            for (int k=0; k<MAX_CDOFS; ++k)
+                lm[(3+k)*N + i] = id[m_dofC+k];
+        }
+    }
+    else {
+        for (int i=0; i<N; ++i)
+        {
+            int n = el.m_node[i];
+            
+            FENode& node = mesh.Node(n);
+            vector<int>& id = node.m_ID;
+            
+            // first the displacement dofs
+            lm[3*i  ] = id[m_dofU];
+            lm[3*i+1] = id[m_dofV];
+            lm[3*i+2] = id[m_dofW];
+            
+            // concentration dofs
+            for (int k=0; k<MAX_CDOFS; ++k)
+                lm[(3+k)*N + i] = id[m_dofD+k];
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -85,6 +111,13 @@ void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double
 	// get the element's nodal coordinates
 	vec3d rt[FEElement::MAX_NODES];
 	for (j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
+    if (m_bshellb) {
+        for (int j=0; j<neln; ++j) {
+            FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
+            
+        }
+    }
 	
 	vec3d kab, t1, t2;
 	
@@ -108,6 +141,7 @@ void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
+        if (m_bshellb) wr = -wr;
 		
 		// calculate surface normal
 		vec3d dxt = dxr ^ dxs;
@@ -143,6 +177,13 @@ bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<dou
 	// get the element's nodal coordinates
 	vec3d rt[FEElement::MAX_NODES];
 	for (int j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
+    if (m_bshellb) {
+        for (int j=0; j<neln; ++j) {
+            FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
+            
+        }
+    }
 	
 	double* Gr, *Gs;
 	double* N;
@@ -172,6 +213,7 @@ bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<dou
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
+        if (m_bshellb) wr = -wr;
 		dxt = dxr ^ dxs;
 		
 		f = dxt.norm()*wr*w[n]*dt;
@@ -201,6 +243,12 @@ bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vect
 	// nodal coordinates
 	vec3d r0[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
+    if (m_bshellb) {
+        for (int j=0; j<neln; ++j) {
+            FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
+            r0[j] -= nd.m_d0;
+        }
+    }
 	
 	double* Gr, *Gs;
 	double* N;
@@ -230,6 +278,7 @@ bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vect
 			dxr += r0[i]*Gr[i];
 			dxs += r0[i]*Gs[i];
 		}
+        if (m_bshellb) wr = -wr;
 		dxt = dxr ^ dxs;
 		
 		f = dxt.norm()*wr*w[n]*dt;

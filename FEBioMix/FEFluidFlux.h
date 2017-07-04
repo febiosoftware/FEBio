@@ -49,6 +49,7 @@ protected:
 protected:
 	double	m_flux;			//!< fluid flux
 	bool	m_bmixture;		//!< mixture velocity or relative fluid flux
+    bool    m_bshellb;      //!< flag for prescribing flux on shell bottom
 	bool	m_blinear;		//!< type (linear or nonlinear)
 
 	// Fluid flux boundary data
@@ -64,6 +65,13 @@ protected:
 	int	m_dofVX;
 	int	m_dofVY;
 	int	m_dofVZ;
+    int	m_dofU;
+    int	m_dofV;
+    int	m_dofW;
+    int	m_dofQ;
+    int	m_dofVU;
+    int	m_dofVV;
+    int	m_dofVW;
 
 	DECLARE_PARAMETER_LIST();
 };

@@ -5,6 +5,7 @@
 BEGIN_PARAMETER_LIST(FEPoroNormalTraction, FESurfaceLoad)
 	ADD_PARAMETER(m_traction  , FE_PARAM_DOUBLE, "traction" );
 	ADD_PARAMETER(m_blinear   , FE_PARAM_BOOL  , "linear"   );
+    ADD_PARAMETER(m_bshellb , FE_PARAM_BOOL  , "shell_bottom");
 	ADD_PARAMETER(m_beffective, FE_PARAM_BOOL  , "effective");
 	ADD_PARAMETER(m_PC        , FE_PARAM_DATA_ARRAY, "value");
 END_PARAMETER_LIST();
@@ -15,7 +16,8 @@ FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem),
 { 
 	m_traction = 1.0;
 	m_blinear = false; 
-	m_beffective = false; 
+    m_bshellb = false;
+	m_beffective = false;
 	m_PC.set(1.0);
 
 	// get the degrees of freedom
@@ -23,6 +25,10 @@ FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem),
 	m_dofY = pfem->GetDOFIndex("y");
 	m_dofZ = pfem->GetDOFIndex("z");
 	m_dofP = pfem->GetDOFIndex("p");
+    m_dofU = pfem->GetDOFIndex("u");
+    m_dofV = pfem->GetDOFIndex("v");
+    m_dofW = pfem->GetDOFIndex("w");
+    m_dofQ = pfem->GetDOFIndex("q");
 }
 
 //-----------------------------------------------------------------------------
@@ -39,20 +45,38 @@ void FEPoroNormalTraction::UnpackLM(FEElement& el, vector<int>& lm)
 	FEMesh& mesh = *GetSurface().GetMesh();
 	int N = el.Nodes();
 	lm.resize(N*4);
-	for (int i=0; i<N; ++i)
-	{
-		int n = el.m_node[i];
-		FENode& node = mesh.Node(n);
-		vector<int>& id = node.m_ID;
-
-		// first the displacement dofs
-		lm[3*i  ] = id[m_dofX];
-		lm[3*i+1] = id[m_dofY];
-		lm[3*i+2] = id[m_dofZ];
-
-		// now the pressure dofs
-		lm[3*N+i] = id[m_dofP];
-	}
+    if (!m_bshellb) {
+        for (int i=0; i<N; ++i)
+        {
+            int n = el.m_node[i];
+            FENode& node = mesh.Node(n);
+            vector<int>& id = node.m_ID;
+            
+            // first the displacement dofs
+            lm[3*i  ] = id[m_dofX];
+            lm[3*i+1] = id[m_dofY];
+            lm[3*i+2] = id[m_dofZ];
+            
+            // now the pressure dofs
+            lm[3*N+i] = id[m_dofP];
+        }
+    }
+    else {
+        for (int i=0; i<N; ++i)
+        {
+            int n = el.m_node[i];
+            FENode& node = mesh.Node(n);
+            vector<int>& id = node.m_ID;
+            
+            // first the displacement dofs
+            lm[3*i  ] = id[m_dofU];
+            lm[3*i+1] = id[m_dofV];
+            lm[3*i+2] = id[m_dofW];
+            
+            // now the pressure dofs
+            lm[3*N+i] = id[m_dofQ];
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -75,6 +99,13 @@ void FEPoroNormalTraction::TractionStiffness(FESurfaceElement& el, matrix& ke, v
 	// nodal coordinates
 	vec3d rt[FEElement::MAX_NODES];
 	for (j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
+    if (m_bshellb) {
+        for (int j=0; j<neln; ++j) {
+            FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
+            
+        }
+    }
 
 	vec3d kab;
 
@@ -97,6 +128,7 @@ void FEPoroNormalTraction::TractionStiffness(FESurfaceElement& el, matrix& ke, v
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
+        if (m_bshellb) tr = -tr;
 		
 		// calculate stiffness component
 		if (!bsymm) {
@@ -190,6 +222,13 @@ bool FEPoroNormalTraction::TractionForce(FESurfaceElement& el, vector<double>& f
 	// nodal coordinates
 	vec3d rt[FEElement::MAX_NODES];
 	for (int j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
+    if (m_bshellb) {
+        for (int j=0; j<neln; ++j) {
+            FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
+            
+        }
+    }
 
 	double* Gr, *Gs;
 	double* N;
@@ -219,6 +258,7 @@ bool FEPoroNormalTraction::TractionForce(FESurfaceElement& el, vector<double>& f
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
+        if (m_bshellb) tr = -tr;
 
 		f = (dxr ^ dxs)*tr*w[n];
 
@@ -250,6 +290,12 @@ bool FEPoroNormalTraction::LinearTractionForce(FESurfaceElement& el, vector<doub
 	// nodal coordinates
 	vec3d r0[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
+    if (m_bshellb) {
+        for (int j=0; j<neln; ++j) {
+            FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
+            r0[j] -= nd.m_d0;
+        }
+    }
 
 	double* Gr, *Gs;
 	double* N;
@@ -279,6 +325,7 @@ bool FEPoroNormalTraction::LinearTractionForce(FESurfaceElement& el, vector<doub
 			dxr += r0[i]*Gr[i];
 			dxs += r0[i]*Gs[i];
 		}
+        if (m_bshellb) tr = -tr;
 
 		f = (dxr ^ dxs)*tr*w[n];
 
@@ -311,7 +358,12 @@ void FEPoroNormalTraction::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolv
 
 		// fluid pressure
 		double pt[FEElement::MAX_NODES];
-		for (int i=0; i<neln; ++i) pt[i] = mesh.Node(el.m_node[i]).get(m_dofP);
+        if (!m_bshellb) {
+            for (int i=0; i<neln; ++i) pt[i] = mesh.Node(el.m_node[i]).get(m_dofP);
+        }
+        else {
+            for (int i=0; i<neln; ++i) pt[i] = mesh.Node(el.m_node[i]).get(m_dofQ);
+        }
 			
 		// calculate nodal normal tractions
 		vector<double> tn(neln);
@@ -357,7 +409,12 @@ void FEPoroNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 
 		// fluid pressure
 		double pt[FEElement::MAX_NODES];
-		for (int j=0; j<neln; ++j) pt[j] = mesh.Node(el.m_node[j]).get(m_dofP);
+        if (!m_bshellb) {
+            for (int j=0; j<neln; ++j) pt[j] = mesh.Node(el.m_node[j]).get(m_dofP);
+        }
+        else {
+            for (int j=0; j<neln; ++j) pt[j] = mesh.Node(el.m_node[j]).get(m_dofQ);
+        }
 
 		// calculate nodal normal tractions
 		vector<double> tn(neln);

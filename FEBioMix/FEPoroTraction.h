@@ -40,6 +40,7 @@ protected:
 protected:
 	double	m_traction;		//!< traction value
 	bool	m_blinear;		//!< linear or not (true is non-follower, false is follower)
+    bool    m_bshellb;      //!< flag for prescribing traction on shell bottom
 	bool	m_beffective;	//!< effective or total normal traction
 
 	// pressure boundary data
@@ -52,6 +53,10 @@ protected:
 	int	m_dofY;
 	int	m_dofZ;
 	int	m_dofP;
+    int	m_dofU;
+    int	m_dofV;
+    int	m_dofW;
+    int	m_dofQ;
 
 	DECLARE_PARAMETER_LIST();
 };

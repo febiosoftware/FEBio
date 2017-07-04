@@ -48,6 +48,7 @@ protected:
 
 protected:
 	bool			m_blinear;	//!< pressure load type (linear or nonlinear)
+    bool            m_bshellb; //!< flag for prescribing pressure on shell bottom
 	double			m_pressure;	//!< pressure value
 	bool			m_bsymm;	//!< use symmetric formulation
 	FESurfaceMap	m_PC;		//!< pressure scale factors
@@ -58,6 +59,9 @@ protected:
 	int	m_dofX;
 	int	m_dofY;
 	int	m_dofZ;
+    int	m_dofU;
+    int	m_dofV;
+    int	m_dofW;
 
 	DECLARE_PARAMETER_LIST();
 };
