@@ -66,6 +66,7 @@ public:
 
 tens3drs operator * (const mat3d& F, const tens3drs& t);
 tens3drs dyad3rs(const vec3d& l, const vec3d& r);
+tens3drs dyad3rs(const mat3d& L, const vec3d& r);
 
 //-----------------------------------------------------------------------------
 //! Class for 3rd order tensor with left-conjugate symmetry Gijk = Gjik (only 18 out of 27 components are unique)

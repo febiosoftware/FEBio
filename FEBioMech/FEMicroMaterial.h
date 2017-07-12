@@ -101,6 +101,7 @@ public:
 	char		m_szrve[256];	//!< filename for RVE file
 	char		m_szbc[256];	//!< name of nodeset defining boundary
 	int			m_bctype;		//!< periodic bc flag
+	double		m_scale;		//!< RVE scale factor
 	FERVEModel	m_mrve;			//!< the master RVE (Representive Volume Element)
 
 public:

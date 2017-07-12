@@ -135,7 +135,7 @@ BEGIN_PARAMETER_LIST(FEMicroMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_szrve    , FE_PARAM_STRING, "RVE"     );
 	ADD_PARAMETER(m_szbc     , FE_PARAM_STRING, "bc_set"  );
 	ADD_PARAMETER(m_bctype   , FE_PARAM_INT   , "bc_type" );
-	ADD_PARAMETER(m_bctype   , FE_PARAM_INT   , "periodic"); // obsolete
+	ADD_PARAMETER(m_scale	 , FE_PARAM_DOUBLE, "scale"   ); 
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -145,6 +145,7 @@ FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 	m_szrve[0] = 0;
 	m_szbc[0] = 0;
 	m_bctype = FERVEModel::DISPLACEMENT;	// use displacement BCs by default
+	m_scale = 1.0;
 
 	AddProperty(&m_probe, "probe", false);
 }
@@ -177,6 +178,9 @@ bool FEMicroMaterial::Init()
 	// the RVE problem.
 	Logfile::MODE nmode = felog.GetMode();
 	felog.SetMode(Logfile::LOG_NEVER);
+
+	// scale the RVE
+	if (m_scale != 1.0) m_mrve.ScaleGeometry(m_scale);
 
 	// initialize the RVE model
 	// This also creates the necessary boundary conditions

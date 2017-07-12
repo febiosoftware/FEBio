@@ -322,6 +322,32 @@ void FERVEModel::Update(const mat3d& F)
 }
 
 //-----------------------------------------------------------------------------
+void FERVEModel::ScaleGeometry(double scale)
+{
+	// get the mesh
+	FEMesh& mesh = GetMesh();
+
+	// calculate the center of mass first
+	vec3d rc(0,0,0);
+	for (int i = 0; i<mesh.Nodes(); ++i)
+	{
+		rc += mesh.Node(i).m_r0;
+	}
+	rc /= (double) mesh.Nodes();
+
+	// scale the nodal positions around the center
+	for (int i = 0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		vec3d r0 = node.m_r0;
+		node.m_r0 = rc + (r0 - rc)*scale;
+
+		vec3d rt = node.m_rt;
+		node.m_rt = rc + (rt - rc)*scale;
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! return current volume (calculated each time)
 double FERVEModel::CurrentVolume()
 {

@@ -30,6 +30,9 @@ public:
 	//! return current volume (calculated each time)
 	double CurrentVolume();
 
+	// scale the geometry
+	void ScaleGeometry(double scale);
+
 	//! see if node is boundary node
 	bool IsBoundaryNode(int i) const { return (m_BN[i]==1); }
 

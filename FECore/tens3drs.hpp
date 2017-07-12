@@ -84,6 +84,34 @@ inline tens3drs dyad3rs(const vec3d& l, const vec3d& r)
 	return a;
 }
 
+// calculates the dyadic product T_ijk = 1/2*(L_ij*r_k + L_ik*r_j)
+inline tens3drs dyad3rs(const mat3d& L, const vec3d& r)
+{
+	tens3drs a;
+	a.d[0] =  L(0, 0)*r.x;
+	a.d[1] = (L(0, 0)*r.y + L(0, 1)*r.x)*0.5;
+	a.d[2] = (L(0, 0)*r.z + L(0, 2)*r.x)*0.5;
+	a.d[3] =  L(0, 1)*r.y;
+	a.d[4] = (L(0, 1)*r.z + L(0, 2)*r.y)*0.5;
+	a.d[5] =  L(0, 2)*r.z;
+
+	a.d[ 6] =  L(1, 0)*r.x;
+	a.d[ 7] = (L(1, 0)*r.y + L(1, 1)*r.x)*0.5;
+	a.d[ 8] = (L(1, 0)*r.z + L(1, 2)*r.x)*0.5;
+	a.d[ 9] =  L(1, 1)*r.y;
+	a.d[10] = (L(1, 1)*r.z + L(1, 2)*r.y)*0.5;
+	a.d[11] =  L(1, 2)*r.z;
+
+	a.d[12] =  L(2, 0)*r.x;
+	a.d[13] = (L(2, 0)*r.y + L(2, 1)*r.x)*0.5;
+	a.d[14] = (L(2, 0)*r.z + L(2, 2)*r.x)*0.5;
+	a.d[15] =  L(2, 1)*r.y;
+	a.d[16] = (L(2, 1)*r.z + L(2, 2)*r.y)*0.5;
+	a.d[17] =  L(2, 2)*r.z;
+
+	return a;
+}
+
 // calculate the transpose ((G_iJK)T = G_KJi)
 inline tens3dls tens3drs::transpose()
 {

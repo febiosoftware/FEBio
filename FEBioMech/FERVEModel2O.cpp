@@ -29,12 +29,26 @@ FERVEModel2O::~FERVEModel2O()
 //-----------------------------------------------------------------------------
 void FERVEModel2O::ScaleGeometry(double scale)
 {
+	// get the mesh
 	FEMesh& mesh = GetMesh();
-	for (int i=0; i<mesh.Nodes(); ++i)
+
+	// calculate the center of mass first
+	vec3d rc(0, 0, 0);
+	for (int i = 0; i<mesh.Nodes(); ++i)
+	{
+		rc += mesh.Node(i).m_r0;
+	}
+	rc /= (double)mesh.Nodes();
+
+	// scale the nodal positions around the center
+	for (int i = 0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		node.m_r0 *= scale;
-		node.m_rt *= scale;
+		vec3d r0 = node.m_r0;
+		node.m_r0 = rc + (r0 - rc)*scale;
+
+		vec3d rt = node.m_rt;
+		node.m_rt = rc + (rt - rc)*scale;
 	}
 }
 
@@ -504,6 +518,62 @@ void FEMicroModel2O::AveragedStress2O(mat3d& Pa, tens3drs& Qa)
 	// get the RVE mesh
 	FEMesh& m = GetMesh();
 
+	// calculate average PK1 stress
+	Pa.zero();
+	Qa.zero();
+	for (int i = 0; i<m.Domains(); ++i)
+	{
+		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(m.Domain(i));
+		int NE = dom.Elements();
+		for (int j = 0; j<NE; ++j)
+		{
+			FESolidElement& el = dom.Element(j);
+
+			int ni = el.GaussPoints();
+			int ne = el.Nodes();
+			double* w = el.GaussWeights();
+			for (int n = 0; n<ni; ++n)
+			{
+				FEMaterialPoint& pt = *el.GetMaterialPoint(n);
+				FEElasticMaterialPoint& ep = *pt.ExtractData<FEElasticMaterialPoint>();
+
+				// calculate Jacobian
+				double Jn = dom.detJt(el, n);
+
+				// get the Cauchy stress 
+				mat3ds& s = ep.m_s;
+
+				// convert to PK1
+				mat3d& F = ep.m_F;
+				double J = ep.m_J;
+
+				mat3d Pn = (s*F.transinv())*J;
+
+				// add it all up
+				Pa += Pn*(w[n] * Jn);
+
+				// now do the second order stress
+				vec3d X = ep.m_r0;
+
+				tens3drs Qn = dyad3rs(Pn, X);
+
+				// add it all up
+//				Qa += Qn*(w[n] * Jn);
+			}
+		}
+	}
+	Pa /= m_V0;
+	Qa /= m_V0;
+}
+
+/*
+//-----------------------------------------------------------------------------
+//! Calculate the average stress from the RVE solution.
+void FEMicroModel2O::AveragedStress2O(mat3d& Pa, tens3drs& Qa)
+{
+	// get the RVE mesh
+	FEMesh& m = GetMesh();
+
 	Pa.zero();
 	Qa.zero();
 
@@ -566,6 +636,8 @@ void FEMicroModel2O::AveragedStress2O(mat3d& Pa, tens3drs& Qa)
 	Pa /= m_V0;
 	Qa /= 2*m_V0;
 }
+*/
+
 /*
 //-----------------------------------------------------------------------------
 //! Calculate the average stress from the RVE solution.

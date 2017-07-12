@@ -15,6 +15,7 @@ void FEElementList::iterator::operator ++ ()
 		if (m_nel >= m_pmesh->Domain(m_ndom).Elements())
 		{
 			m_ndom++;
+			m_nel = 0;
 			if (m_ndom >= m_pmesh->Domains())
 			{
 				m_ndom = -1;
