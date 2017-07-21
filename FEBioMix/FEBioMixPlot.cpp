@@ -163,6 +163,101 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotNPRFluidPressure::Save(FEDomain &dom, FEDataStream& a)
+{
+	vector<double> pi(FEElement::MAX_INTPOINTS);
+	vector<double> pn(FEElement::MAX_NODES);
+
+	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+	FEShellDomain& bsd = static_cast<FEShellDomain&>(dom);
+	if ((dynamic_cast<FEBiphasicSolidDomain* >(&bd)) ||
+		(dynamic_cast<FEBiphasicSoluteSolidDomain*>(&bd)) ||
+		(dynamic_cast<FETriphasicDomain*     >(&bd)) ||
+		(dynamic_cast<FEMultiphasicSolidDomain*   >(&bd)))
+	{
+		for (int i = 0; i<bd.Elements(); ++i)
+		{
+			FESolidElement& el = bd.Element(i);
+
+			int nint = el.GaussPoints();
+			int neln = el.Nodes();
+
+			// get integration point pressures
+			for (int j = 0; j<nint; ++j)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+				FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+
+				if (pt) pi[j] = pt->m_pa; else pi[j] = 0.0;
+			}
+
+			// project to the nodes
+			el.project_to_nodes(&pi[0], &pn[0]);
+
+			// store the nodal values
+			for (int j=0; j<neln; ++j) a << pn[j];
+		}
+		return true;
+	}
+	else if ((dynamic_cast<FEBiphasicShellDomain*>(&bsd)) ||
+		(dynamic_cast<FEBiphasicSoluteShellDomain*>(&bsd)) ||
+		(dynamic_cast<FEMultiphasicShellDomain*>(&bsd))
+		)
+	{
+		for (int i = 0; i<bsd.Elements(); ++i)
+		{
+			FEShellElement& el = bsd.Element(i);
+
+			int nint = el.GaussPoints();
+			int neln = el.Nodes();
+
+			// get integration point pressures
+			for (int j = 0; j<nint; ++j)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+				FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+
+				if (pt) pi[j] = pt->m_pa; else pi[j] = 0.0;
+			}
+
+			// project to the nodes
+			el.project_to_nodes(&pi[0], &pn[0]);
+
+			// store the nodal values
+			for (int j = 0; j<neln; ++j) a << pn[j];
+		}
+		return true;
+	}
+	else if (dynamic_cast<FEFluidDomain* >(&bd))
+	{
+		for (int i = 0; i<bd.Elements(); ++i)
+		{
+			FESolidElement& el = bd.Element(i);
+
+			int nint = el.GaussPoints();
+			int neln = el.Nodes();
+
+			// get integration point pressures
+			for (int j = 0; j<nint; ++j)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+				FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
+
+				if (pt) pi[j] = pt->m_p; else pi[j] = 0.0;
+			}
+
+			// project to the nodes
+			el.project_to_nodes(&pi[0], &pn[0]);
+
+			// store the nodal values
+			for (int j = 0; j<neln; ++j) a << pn[j];
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 {
 	FESolidDomain* bd = dynamic_cast<FESolidDomain*>(&dom);
