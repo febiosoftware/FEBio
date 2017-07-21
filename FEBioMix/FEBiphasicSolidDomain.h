@@ -87,4 +87,12 @@ public: // biphasic domain "properties"
 	// assumption in this implementation. Consequently, the fluid flux would be a good example of a domain property.
 	// That is why I've taken this calculation out of the FEBiphasic class and placed it here. 
 	vec3d FluidFlux(FEMaterialPoint& mp);
+
+private:
+	// NOTE: This is a temporary construction. Just trying something out here.
+	// Idea is here to construct a data export for the nodal pressures (the ones from the integration points, not the nodal dofs).
+	vector<double>	m_nodePressure;	//!< nodal pressures projected from the integration points
+
+	// This function updates the m_nodePressure variable
+	void UpdateNodalPressures();
 };

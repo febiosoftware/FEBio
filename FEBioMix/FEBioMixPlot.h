@@ -35,15 +35,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Fluid pressure calculated from projecting integration point pressures to nodes
-class FEPlotNPRFluidPressure : public FEDomainData
-{
-public:
-	FEPlotNPRFluidPressure(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_MULT){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
 //! Fluid flux
 class FEPlotFluidFlux : public FEDomainData
 {

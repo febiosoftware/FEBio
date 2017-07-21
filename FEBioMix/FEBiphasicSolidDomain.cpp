@@ -1,11 +1,13 @@
 #include "FEBiphasicSolidDomain.h"
 #include "FECore/FEMesh.h"
 #include "FECore/log.h"
+#include <FECore/FEDataExport.h>
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicDomain(pfem)
 {
+	EXPORT_DATA(PLT_FLOAT, FMT_NODE, &m_nodePressure, "NPR fluid pressure");
 }
 
 //-----------------------------------------------------------------------------
@@ -86,6 +88,9 @@ bool FEBiphasicSolidDomain::Initialize()
 		FESolidElement& el = m_Elem[i];
 		for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
 	}
+
+	// allocate nodal pressures
+	m_nodePressure.resize(Nodes(), 0.0);
 
 	return true;
 }
@@ -808,6 +813,9 @@ void FEBiphasicSolidDomain::Update(const FETimeInfo& tp)
 		if (NegativeJacobian::m_boutput == false) felog.printbox("ERROR", "Negative jacobian was detected.");
 		throw DoRunningRestart();
 	}
+
+	// also update the nodal pressures
+	UpdateNodalPressures();
 }
 
 //-----------------------------------------------------------------------------
@@ -1121,4 +1129,46 @@ vec3d FEBiphasicSolidDomain::FluidFlux(FEMaterialPoint& mp)
     }
     
     return w;
+}
+
+//-----------------------------------------------------------------------------
+void FEBiphasicSolidDomain::UpdateNodalPressures()
+{
+	vector<double> pi(FEElement::MAX_INTPOINTS);
+	vector<double> pn(FEElement::MAX_NODES);
+
+	int NN = Nodes();
+	vector<int> tag(NN, 0);
+	m_nodePressure.assign(NN, 0.0);
+
+	for (int i = 0; i<Elements(); ++i)
+	{
+		FESolidElement& el = Element(i);
+
+		int nint = el.GaussPoints();
+		int neln = el.Nodes();
+
+		// get integration point pressures
+		for (int j = 0; j<nint; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+
+			if (pt) pi[j] = pt->m_pa; else pi[j] = 0.0;
+		}
+
+		// project to the nodes
+		el.project_to_nodes(&pi[0], &pn[0]);
+
+		// store the nodal values
+		for (int j=0; j<neln; ++j)
+		{
+			int m = el.m_lnode[j];
+			m_nodePressure[m] += pn[j];
+			tag[m]++;
+		}
+	}
+
+	for (int i=0; i<NN; ++i)
+		if (tag[i] > 0) m_nodePressure[i] /= (double) tag[i];
 }

@@ -5,10 +5,10 @@
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 
-class FEPlotDataExport : public FEPlotData
+class FEPlotSurfaceDataExport : public FEPlotData
 {
 public:
-	FEPlotDataExport(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(FE_REGION_SURFACE, itype, fmt) { m_szname = szname; }
+	FEPlotSurfaceDataExport(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(FE_REGION_SURFACE, itype, fmt) { m_szname = szname; }
 	void Save(FEModel& fem, Archive& ar)
 	{
 		FEMesh& mesh = fem.GetMesh();
@@ -37,6 +37,40 @@ public:
 private:
 	const char*		m_szname;
 };
+
+class FEPlotDomainDataExport : public FEPlotData
+{
+public:
+	FEPlotDomainDataExport(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(FE_REGION_DOMAIN, itype, fmt) { m_szname = szname; }
+	void Save(FEModel& fem, Archive& ar)
+	{
+		FEMesh& mesh = fem.GetMesh();
+		int NDOMS = mesh.Domains();
+		for (int i = 0; i<NDOMS; ++i)
+		{
+			FEDomain& dom = mesh.Domain(i);
+			int NDATA = dom.DataExports();
+			if (NDATA > 0)
+			{
+				for (int j = 0; j<NDATA; ++j)
+				{
+					FEDataExport* pd = dom.GetDataExport(j);
+					if (strcmp(pd->m_szname, m_szname) == 0)
+					{
+						FEDataStream d;
+						pd->Serialize(d);
+						ar.WriteData(i + 1, d.data());
+						break;
+					}
+				}
+			}
+		}
+	}
+
+private:
+	const char*		m_szname;
+};
+
 
 class FEPlotVariable : public FENodeData
 {
@@ -235,6 +269,7 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 	{
 		// If we get here then this variable is not a plot field.
 		// But let's see if it is an export variable from a domain
+		// Check the surfaces first
 		FEMesh& mesh = pfem->GetMesh();
 		for (int i=0; i<mesh.Surfaces(); ++i)
 		{
@@ -246,8 +281,25 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 				if (strcmp(pd->m_szname, szname) == 0)
 				{
 					// We have a match. Create a plot field for this export
-					ps = new FEPlotDataExport(pd->m_szname, pd->m_type, pd->m_fmt);
+					ps = new FEPlotSurfaceDataExport(pd->m_szname, pd->m_type, pd->m_fmt);
 					return AddSurfaceVariable(ps, szname, item);
+				}
+			}
+		}
+
+		// now the domains.
+		for (int i = 0; i<mesh.Domains(); ++i)
+		{
+			FEDomain& dom = mesh.Domain(i);
+			int ND = dom.DataExports();
+			for (int j = 0; j<ND; ++j)
+			{
+				FEDataExport* pd = dom.GetDataExport(j);
+				if (strcmp(pd->m_szname, szname) == 0)
+				{
+					// We have a match. Create a plot field for this export
+					ps = new FEPlotDomainDataExport(pd->m_szname, pd->m_type, pd->m_fmt);
+					return AddDomainVariable(ps, szname, item);
 				}
 			}
 		}
