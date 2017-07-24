@@ -1,0 +1,12 @@
+/**
+\page building_a_plugin Building a Plugin
+
+In order to build a plugin you need to have the FEBio SDK (Software Development Kit). This SDK contains the header files and the pre-built libraries that you
+need to create a plugin. The SDK can be obtained from the febio website www.febio.org and is usually installed in the same location as FEBio (usually in a subfolder named sdk). Next, you need a C++ compiler since the
+plugin has to be written in C++. We also recommend having a IDE (Integrated Development Environment) as this makes writing code much easier (e.g. Visual Studio on Windows, or XCode on Mac). Select one of the following links to learn more about setting up a plugin project for a specific operating system.
+
+\li \subpage create_plugin_vs
+\li \subpage create_plugin_osx
+\li \subpage create_plugin_linux
+
+*/
