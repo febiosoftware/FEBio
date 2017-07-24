@@ -88,6 +88,11 @@ public: // biphasic domain "properties"
 	// That is why I've taken this calculation out of the FEBiphasic class and placed it here. 
 	vec3d FluidFlux(FEMaterialPoint& mp);
 
+	// Evaluate the nodal pressures
+	// Note that the data vector stores the values for all of the nodes of the mesh, not just the domain nodes.
+	// The values will be set to zero for nodes that don't belong to this domain.
+	void GetNodalPressures(vector<double>& data);
+
 private:
 	// NOTE: This is a temporary construction. Just trying something out here.
 	// Idea is here to construct a data export for the nodal pressures (the ones from the integration points, not the nodal dofs).

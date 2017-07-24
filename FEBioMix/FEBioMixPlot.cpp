@@ -1826,3 +1826,73 @@ bool FEPlotFluidForce::Save(FESurface &surf, FEDataStream &a)
     
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidForce2::Save(FESurface &surf, FEDataStream &a)
+{
+	// get number of facets
+	int NF = surf.Elements();
+	if (NF == 0) return false;
+
+	// this assumes that the surface sits on top of a single domain
+	// so that we can figure out the domain from a single element
+	FESurfaceElement& ref = surf.Element(0);
+	if (ref.m_elem[0] <= 0) return false;
+
+	// get the element
+	FEMesh& mesh = *surf.GetMesh();
+	FEElement* el = mesh.FindElementFromID(ref.m_elem[0]);
+	if (el == 0) return false;
+
+	// get the domain this element belongs to
+	FEDomain* dom = el->GetDomain();
+	if (dom == 0) return false;
+
+	// see if this is a biphasic domain
+	FEBiphasicSolidDomain* biphasicDomain = dynamic_cast<FEBiphasicSolidDomain*>(dom);
+	if (biphasicDomain == 0) return false;
+
+	// The biphasic solid domain contains actual nodal pressures.
+	// we want to evaluate this over the surface. 
+	vector<double> nodalPressures;
+	biphasicDomain->GetNodalPressures(nodalPressures);
+
+	// loop over all surfaces facets
+	double pn[FEElement::MAX_NODES];
+	vec3d F(0, 0, 0);
+	for (int i = 0; i<NF; ++i)
+	{
+		FESurfaceElement& face = surf.Element(i);
+
+		int nint = face.GaussPoints();
+		int neln = face.Nodes();
+
+		// nodal pressures
+		for (int j = 0; j<neln; ++j) pn[j] = nodalPressures[face.m_node[j]];
+
+		// evaluate the fluid force for that element
+		for (int j = 0; j<nint; ++j)
+		{
+			// get the base vectors
+			vec3d g[2];
+			surf.CoBaseVectors(face, j, g);
+
+			// normal (magnitude = area)
+			vec3d n = g[0] ^ g[1];
+
+			// gauss weight
+			double w = face.GaussWeights()[j];
+
+			// fluid pressure
+			double p = face.eval(pn, j);
+			
+			// contact force
+			F += n*(w*p);
+		}
+	}
+
+	// store the force
+	a << F;
+
+	return true;
+}

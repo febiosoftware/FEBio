@@ -206,6 +206,7 @@ REGISTER_FECORE_CLASS(FEPlotNodalFluidFlux               , FEPLOTDATA_ID, "nodal
 REGISTER_FECORE_CLASS(FEPlotOsmolarity                   , FEPLOTDATA_ID,  "osmolarity"         );
 REGISTER_FECORE_CLASS(FEPlotPressureGap					 , FEPLOTDATA_ID, "pressure gap"        );
 REGISTER_FECORE_CLASS(FEPlotFluidForce                   , FEPLOTDATA_ID, "fluid force"         );
+REGISTER_FECORE_CLASS(FEPlotFluidForce2                  , FEPLOTDATA_ID, "fluid force2"        );
 REGISTER_FECORE_CLASS(FEPlotFluidFlowRate                , FEPLOTDATA_ID, "fluid flow rate"     );
 REGISTER_FECORE_CLASS(FEPlotSBMRefAppDensity             , FEPLOTDATA_ID, "sbm referential apparent density");
 REGISTER_FECORE_CLASS_T(FEPlotSBMRefAppDensityT          , FEPLOTDATA_ID, 0, "sbm 1 referential apparent density");

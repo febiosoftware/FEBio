@@ -1172,3 +1172,18 @@ void FEBiphasicSolidDomain::UpdateNodalPressures()
 	for (int i=0; i<NN; ++i)
 		if (tag[i] > 0) m_nodePressure[i] /= (double) tag[i];
 }
+
+//-----------------------------------------------------------------------------
+// Note that the data vector stores the values for all of the nodes of the mesh, not just the domain nodes.
+// The values will be set to zero for nodes that don't belong to this domain.
+void FEBiphasicSolidDomain::GetNodalPressures(vector<double>& data)
+{
+	FEMesh& mesh = *GetMesh();	
+	data.resize(mesh.Nodes(), 0.0);
+
+	int NN = Nodes();
+	for (int i=0; i<NN; ++i)
+	{
+		data[NodeIndex(i)] = m_nodePressure[i];
+	}
+}

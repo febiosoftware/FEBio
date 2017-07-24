@@ -354,6 +354,17 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Fluid force
+//! 
+class FEPlotFluidForce2 : public FESurfaceData
+{
+public:
+	FEPlotFluidForce2(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_REGION){}
+	bool Save(FESurface& surf, FEDataStream& a);
+};
+
+
+//-----------------------------------------------------------------------------
 //! Fluid pressure gap
 //!
 class FEPlotPressureGap : public FESurfaceData
