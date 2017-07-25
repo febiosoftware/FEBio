@@ -123,16 +123,16 @@ FEModel::FEModel(void) : FECoreBase(FEMODEL_ID), m_imp(new FEModel::Implementati
 
 	// Add all properties
 	AddProperty(&m_imp->m_MAT, "material");
-	AddProperty(&m_imp->m_BC , "fixedbc");
-	AddProperty(&m_imp->m_DC , "prescribedbc");
-	AddProperty(&m_imp->m_FC , "nodalload");
-	AddProperty(&m_imp->m_SL , "surfaceload");
-	AddProperty(&m_imp->m_EL , "edgeload");
-	AddProperty(&m_imp->m_BL , "bodyload");
+	AddProperty(&m_imp->m_BC , "bc_fixed");
+	AddProperty(&m_imp->m_DC , "bc_prescribed");
+	AddProperty(&m_imp->m_FC , "nodal_load");
+	AddProperty(&m_imp->m_SL , "surface_load");
+	AddProperty(&m_imp->m_EL , "edge_load");
+	AddProperty(&m_imp->m_BL , "body_load");
 	AddProperty(&m_imp->m_IC , "initial" );
 	AddProperty(&m_imp->m_CI , "contact");
 	AddProperty(&m_imp->m_NLC, "constraint");
-	AddProperty(&m_imp->m_ML , "modelload");
+	AddProperty(&m_imp->m_ML , "model_load");
 	AddProperty(&m_imp->m_LC , "loadcurve");
 	AddProperty(&m_imp->m_Step, "step");
 }
@@ -676,7 +676,7 @@ bool FEModel::Solve()
 	{
 		// set the current analysis step
 		m_imp->m_nStep = (int)nstep;
-		m_imp->m_pStep = m_imp->m_Step[nstep];
+		m_imp->m_pStep = m_imp->m_Step[(int)nstep];
 
 		// intitialize step data
 		if (m_imp->m_pStep->Activate() == false)
@@ -836,16 +836,16 @@ void FEModel::SetCurrentTime(double t) { m_imp->m_ftime = t; }
 
 //-----------------------------------------------------------------------------
 // helper functions for accessing components of parameters via parameter strings
-double* GetParameterComponent(const ParamString& paramName, FEParam* param)
+FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 {
 	// make sure we have something to do
-	if (param == 0) return 0;
+	if (param == 0) return FEParamValue();
 
 	if (param->type() == FE_PARAM_DOUBLE)
 	{
 		int lc = param->GetLoadCurve();
-		if (lc == -1) return param->pvalue<double>(0);
-		else return &param->GetScaleDouble();
+		if (lc == -1) return param->paramValue();
+		else return param->GetScale();
 	}
 	else if (param->type() == FE_PARAM_VEC3D)
 	{
@@ -853,25 +853,29 @@ double* GetParameterComponent(const ParamString& paramName, FEParam* param)
 		assert(v);
 		if (v)
 		{
-			if      (paramName == "x") return &v->x;
-			else if (paramName == "y") return &v->y;
-			else if (paramName == "z") return &v->z;
-			else return 0;
+			if      (paramName == "x") return FEParamValue(v->x);
+			else if (paramName == "y") return FEParamValue(v->y);
+			else if (paramName == "z") return FEParamValue(v->z);
+			else return FEParamValue();
 		}
-		else return 0;
+		else return FEParamValue();
+	}
+	else if (param->type() == FE_PARAM_BOOL)
+	{
+		return param->paramValue();
 	}
 
-	return 0;
+	return FEParamValue();
 }
 
 //-----------------------------------------------------------------------------
 //! Return a pointer to the named variable
 //! This function returns a pointer to a named variable.
 
-double* FEModel::FindParameter(const ParamString& paramString)
+FEParamValue FEModel::FindParameter(const ParamString& paramString)
 {
 	// make sure it starts with the name of this model
-	if (paramString != GetName()) return 0;
+	if (paramString != GetName()) return FEParamValue();
 
 	// see what the next reference is
 	ParamString next = paramString.next();
@@ -901,7 +905,7 @@ double* FEModel::FindParameter(const ParamString& paramString)
 					node = mesh.FindNodeFromID(nid);
 					nodeString = nodeString.next();
 				}
-				else return 0;
+				else return FEParamValue();
 			}
 			else if ((nid >=0) && (nid < mesh.Nodes()))
 			{
@@ -915,22 +919,22 @@ double* FEModel::FindParameter(const ParamString& paramString)
 				{
 					vec3d& rt = node->m_rt;
 					ParamString c = paramString.next();
-					if (c == "x") return &rt.x;
-					if (c == "y") return &rt.y;
-					if (c == "z") return &rt.z;
-					return 0;
+					if (c == "x") return FEParamValue(rt.x);
+					if (c == "y") return FEParamValue(rt.y);
+					if (c == "z") return FEParamValue(rt.z);
+					return FEParamValue();
 				}
-				else return 0;
+				else return FEParamValue();
 			}
-			else return 0;
+			else return FEParamValue();
 		}
-		else return 0;
+		else return FEParamValue();
 	}
 
 	if ((next == "rigidbody") && m_imp->m_prs)
 	{
 		FEMaterial* mat = 0;
-		if (next.IndexString()) mat = FindMaterial(next.IndexString());
+		if (next.IDString()) mat = FindMaterial(next.IDString());
 		if ((mat != 0) && (mat->IsRigid()))
 		{
 			ParamString paramName = next.next();
@@ -951,7 +955,22 @@ double* FEModel::FindParameter(const ParamString& paramString)
 	}
 
 	// oh, oh, we didn't find it
-	return 0;
+	return FEParamValue();
+}
+
+//-----------------------------------------------------------------------------
+FECoreBase* FEModel::FindComponent(const ParamString& prop)
+{
+	// make sure it starts with the name of this model
+	if (prop != GetName()) return 0;
+
+	// see what the next reference is
+	ParamString next = prop.next();
+
+	// next, find the property
+	FECoreBase* pc = GetProperty(next);
+
+	return pc;
 }
 
 //-----------------------------------------------------------------------------

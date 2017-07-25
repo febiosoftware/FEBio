@@ -55,9 +55,6 @@ public:
 	//! performs initialization
 	bool Init();
 
-	int GetID() { return m_nID; }
-	void SetID(int nid) { m_nID = nid; }
-
 	//! Serialize material data to archive
 	void Serialize(DumpStream& ar);
 
@@ -94,7 +91,6 @@ public:
 	FEModel* GetFEModel();
 
 private:
-	int		m_nID;			//!< material ID
 	int		m_nRB;			//!< rigid body ID (TODO: I hope to remove this sometime)
 
 private:

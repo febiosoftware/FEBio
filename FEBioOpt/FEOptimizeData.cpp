@@ -20,7 +20,10 @@ bool FEModelParameter::Init()
 	// find the variable
 	FEModel& fem = *GetFEModel();
 	string name = GetName();
-	double* pd = fem.FindParameter(ParamString(name.c_str()));
+	FEParamValue val = fem.FindParameter(ParamString(name.c_str()));
+	if (val.isValid() == false) return false;
+	if (val.type() != FE_PARAM_DOUBLE) return false;
+	double* pd = (double*) val.m_pv;
 	if (pd == 0) return false;
 
 	// store the pointer to the parameter

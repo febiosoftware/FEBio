@@ -150,10 +150,15 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 		else
 		{
 			// assume it is a material parameter
-			double* pd = m_pfem->FindParameter(ParamString(argv[1]));
-			if (pd)
+			FEParamValue val = m_pfem->FindParameter(ParamString(argv[1]));
+			if (val.isValid())
 			{
-				printf("%lg\n", *pd);
+				switch (val.type())
+				{
+				case FE_PARAM_DOUBLE: printf("%lg\n", val.toDouble()); break;
+				default:
+					printf("(cannot print value)\n");
+				}
 			}
 			else
 			{

@@ -21,23 +21,9 @@ ParamString::ParamString(const char* szparam)
 			m_param.push_back(p);
 
 			// reset
-			p.name.clear();
-			p.idName.clear();
-			p.id = -1;
+			p.clear();
 			tmp.clear();
 			in = 0;
-		}
-		else if (*sz == '(')
-		{
-			in = 2;
-		}
-		else if (*sz == ')')
-		{
-			if (in == 2)
-			{
-				const char* s = tmp.c_str();
-				p.id = atoi(s);
-			}
 		}
 		else if (*sz == '[')
 		{
@@ -48,19 +34,41 @@ ParamString::ParamString(const char* szparam)
 			if (in == 1)
 			{
 				const char* s = tmp.c_str();
-				p.id = atoi(s);
+				p._index = atoi(s);
+			}
+		}
+		else if (*sz == '(')
+		{
+			in = 2;
+		}
+		else if (*sz == ')')
+		{
+			if (in == 2)
+			{
+				const char* s = tmp.c_str();
+				p._id = atoi(s);
 			}
 		}
 		else if (*sz == '\'')
 		{
-			in = 3;
+			if (in == 2)
+			{
+				in = 3;
+			}
+		}
+		else if (*sz == '"')
+		{
+			if (in == 2)
+			{
+				in = 3;
+			}
 		}
 		else 
 		{
-			if      (in == 0) p.name.push_back(*sz);
+			if      (in == 0) p._name.push_back(*sz);
 			else if (in == 1) tmp.push_back(*sz);
 			else if (in == 2) tmp.push_back(*sz);
-			else if (in == 3) p.idName.push_back(*sz);
+			else if (in == 3) p._idName.push_back(*sz);
 		}
 
 		// next char
@@ -107,6 +115,12 @@ ParamString ParamString::next() const
 }
 
 //-----------------------------------------------------------------------------
+bool ParamString::isValid() const { return (m_param.empty() == false); }
+
+//-----------------------------------------------------------------------------
+void ParamString::clear() { m_param.clear(); }
+
+//-----------------------------------------------------------------------------
 ParamString ParamString::last() const
 {
 	ParamString p;
@@ -121,21 +135,21 @@ ParamString ParamString::last() const
 bool ParamString::operator==(const string& s) const
 {
 	if (m_param.empty()) return false;
-	return m_param[0].name == s;
+	return m_param[0]._name == s;
 }
 
 //-----------------------------------------------------------------------------
 bool ParamString::operator!=(const string& s) const
 {
 	if (m_param.empty()) return false;
-	return m_param[0].name != s;
+	return m_param[0]._name != s;
 }
 
 //-----------------------------------------------------------------------------
 const char* ParamString::c_str() const
 {
 	if (m_param.empty()) return 0;
-	return m_param[0].name.c_str();
+	return m_param[0]._name.c_str();
 }
 
 //-----------------------------------------------------------------------------
@@ -143,14 +157,22 @@ const char* ParamString::c_str() const
 int ParamString::Index() const
 {
 	if (m_param.empty()) return -1;
-	return m_param[0].id;
+	return m_param[0]._index;
+}
+
+//-----------------------------------------------------------------------------
+//! get the ID (-1 if index not a number)
+int ParamString::ID() const
+{
+	if (m_param.empty()) return -1;
+	return m_param[0]._id;
 }
 
 //-----------------------------------------------------------------------------
 //! get the index name (null if not defined)
-const char* ParamString::IndexString() const
+const char* ParamString::IDString() const
 {
 	if (m_param.empty()) return 0;
-	if (m_param[0].idName.empty()) return 0;
-	return m_param[0].idName.c_str();
+	if (m_param[0]._idName.empty()) return 0;
+	return m_param[0]._idName.c_str();
 }

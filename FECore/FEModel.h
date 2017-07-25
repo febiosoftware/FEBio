@@ -262,8 +262,12 @@ public: // --- parameter functions ---
 	//! Evaluate parameter list
 	bool EvaluateParameterList(FECoreBase* pc);
 
-	//! return a pointer to the named variable
-	double* FindParameter(const ParamString& param);
+	//! return a reference to the named parameter
+	FEParamValue FindParameter(const ParamString& param);
+
+	//! Find property 
+	//! Note: Can't call this FindProperty, since this is already defined in base class
+	FECoreBase* FindComponent(const ParamString& prop);
 
 public:	// --- Miscellaneous routines ---
 

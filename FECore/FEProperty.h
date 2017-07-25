@@ -54,6 +54,9 @@ public: // these functions have to be implemented by derived classes
 	//! return a specific property by name
 	virtual FECoreBase* get(const char* szname) = 0;
 
+	//! return a specific property by ID
+	virtual FECoreBase* getFromID(int nid) = 0;
+
 	//! serialize property data
 	virtual void Serialize(DumpStream& ar) = 0;
 
@@ -105,6 +108,11 @@ public:
 	virtual FECoreBase* get(int i) { return m_pmp; }
 	virtual FECoreBase* get(const char* szname) { if (strcmp(szname, m_pmp->GetName()) == 0) return m_pmp; else return 0; }
 
+	virtual FECoreBase* getFromID(int nid)
+	{
+		if (m_pmp && (m_pmp->GetID() == nid)) return m_pmp; else return 0;	
+	}
+
 	void Serialize(DumpStream& ar)
 	{
 		if (ar.IsSaving())
@@ -152,6 +160,16 @@ public:
 		{
 			T* p = m_pmp[i];
 			if (strcmp(szname, p->GetName()) == 0) return p;
+		}
+		return 0;
+	}
+
+	virtual FECoreBase* getFromID(int nid)
+	{
+		for (int i = 0; i<(int)m_pmp.size(); ++i)
+		{
+			T* p = m_pmp[i];
+			if (p && (p->GetID() == nid)) return p;
 		}
 		return 0;
 	}

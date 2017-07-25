@@ -121,6 +121,8 @@ FEParam* FEParameterList::Find(void* pv)
 // \param sz name of parameter to find
 FEParam* FEParameterList::Find(const char* sz)
 {
+	if (sz == 0) return 0;
+
 	FEParam* pp = 0;
 	if (m_pl.size() > 0)
 	{

@@ -68,6 +68,9 @@ public: // interface for getting/setting properties
 	//! return a property (class)
 	FEProperty* FindProperty(const char* sz);
 
+	//! return a property from a paramstring
+	FECoreBase* GetProperty(const ParamString& prop);
+
 	//! return the number of properties defined
 	int PropertyClasses() { return (int)m_Prop.size(); }
 
@@ -83,6 +86,12 @@ public:
 
 	//! Set the parent of this class
 	void SetParent(FECoreBase* parent) { m_pParent = parent; }
+
+	//! return the component ID
+	int GetID() const { return m_nID; }
+
+	//! set the component ID
+	void SetID(int nid) { m_nID = nid; }
 
 protected:
 	//! Add a property
@@ -102,6 +111,9 @@ private:
 	const char*		m_sztype;	//!< the type string
 
 	vector<FEProperty*>	m_Prop;		//!< list of properties
+
+private:
+	int		m_nID;			//!< component ID
 
 	friend class FECoreFactory;
 };

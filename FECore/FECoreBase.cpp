@@ -9,7 +9,8 @@
 //! eliminate a lot of akward dynamic_casts.)
 FECoreBase::FECoreBase(SUPER_CLASS_ID sid) : m_sid(sid) 
 { 
-	m_sztype = 0; 
+	m_nID = -1;
+	m_sztype = 0;
 	m_szname[0] = 0;
 	m_pParent = 0;
 }
@@ -59,10 +60,12 @@ void FECoreBase::Serialize(DumpStream& ar)
 		if (ar.IsSaving())
 		{
 			ar << m_szname;
+			ar << m_nID;
 		}
 		else
 		{
 			ar >> m_szname;
+			ar >> m_nID;
 		}
 	}
 
@@ -207,20 +210,86 @@ FEParam* FECoreBase::GetParameter(const ParamString& s)
 			{
 				// get the number of items in this property
 				int nsize = mp->size();
-				int nid = s.Index();
-				if ((nid >= 0) && (nid < nsize))
+				int index = s.Index();
+				if ((index >= 0) && (index < nsize))
 				{
-					return mp->get(nid)->GetParameter(s.next());
+					return mp->get(index)->GetParameter(s.next());
 				}
-				else if (s.IndexString())
+				else
 				{
-					FECoreBase* c = mp->get(s.IndexString());
-					if (c) return c->GetParameter(s.next());
+					int nid = s.ID();
+					if (nid != -1)
+					{
+						FECoreBase* pc = mp->getFromID(nid);
+						if (pc) return pc->GetParameter(s.next());
+					}
+					else if (s.IDString())
+					{
+						FECoreBase* c = mp->get(s.IDString());
+						if (c) return c->GetParameter(s.next());
+					}
 				}
 			}
 			else
 			{
 				return mp->get(0)->GetParameter(s.next());
+			}
+		}
+	}
+
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+FECoreBase* FECoreBase::GetProperty(const ParamString& prop)
+{
+	int NP = (int) m_Prop.size();
+	for (int i=0; i<NP; ++i)
+	{	
+		FEProperty* mp = m_Prop[i];
+
+		if (prop == mp->GetName())
+		{
+			if (mp->IsArray())
+			{
+				// get the number of items in this property
+				int nsize = mp->size();
+				int index = prop.Index();
+				if ((index >= 0) && (index < nsize))
+				{
+					FECoreBase* pc = mp->get(index);
+					if (pc)
+					{
+						ParamString next = prop.next();
+						if (next.count() == 0) return pc;
+						else return pc->GetProperty(next);
+					}
+				}
+				else
+				{
+					int nid = prop.ID();
+					if (nid != -1)
+					{
+						FECoreBase* pc = mp->getFromID(nid);
+					}
+					else if (prop.IDString())
+					{
+						FECoreBase* pc = mp->get(prop.IDString());
+						if (pc)
+						{
+							ParamString next = prop.next();
+							if (next.count() == 0) return pc;
+							else return pc->GetProperty(next);
+						}
+					}
+				}
+			}
+			else
+			{
+				FECoreBase* pc = mp->get(0);
+				ParamString next = prop.next();
+				if (next.count() == 0) return pc;
+				else return pc->GetProperty(next);
 			}
 		}
 	}
