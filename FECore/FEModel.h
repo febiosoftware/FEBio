@@ -26,6 +26,7 @@ class FEAnalysis;
 class FEGlobalData;
 class FEGlobalMatrix;
 class FELinearConstraintManager;
+class FEModelData;
 
 //-----------------------------------------------------------------------------
 //! The FEModel class stores all the data for the finite element model, including
@@ -311,6 +312,14 @@ public: // Global data
 	void SetGlobalConstant(const string& s, double v);
 	double GetGlobalConstant(const string& s);
 
+public: // model data
+	void AddModelData(FEModelData* data);
+	FEModelData* GetModelData(int i);
+	int ModelDataItems() const;
+
+	// update all model data
+	void UpdateModelData();
+
 public: // Data retrieval
 
 	// get nodal dof data
@@ -325,4 +334,6 @@ public:
 private:
 	class Implementation;
 	Implementation*	m_imp;
+
+	DECLARE_PARAMETER_LIST();
 };

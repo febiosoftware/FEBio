@@ -2,6 +2,7 @@
 #include "vec3d.h"
 #include "mat3d.h"
 #include <assert.h>
+#include <vector>
 
 //-----------------------------------------------------------------------------
 class FEParamValidator;
@@ -22,19 +23,18 @@ enum FEParamType {
 	FE_PARAM_STRING,
 	FE_PARAM_DATA_ARRAY,
 	FE_PARAM_FUNC1D,
-	FE_PARAM_TENS3DRS
+	FE_PARAM_TENS3DRS,
+	FE_PARAM_STD_VECTOR_DOUBLE
 };
 
 //-----------------------------------------------------------------------------
 // class describing the value of parameter
 class FEParamValue
 {
-public:
+private:
 	void*			m_pv;		// pointer to variable data
 	FEParamType		m_itype;	// type of variable
 	int				m_ndim;		// dimension of array (or 1 for non-array types)
-
-	FEParamType type() const { return m_itype; }
 
 public:
 
@@ -59,52 +59,28 @@ public:
 		m_ndim = 1;
 	}
 
+	explicit FEParamValue(void* data, FEParamType itype, int dim = 1)
+	{
+		m_pv = data;
+		m_itype = itype;
+		m_ndim = dim;
+	}
+
 	bool isValid() const { return (m_pv != 0); }
 
-	int toInt() const
+	FEParamType type() const { return m_itype; }
+
+	void* data_ptr() const { return m_pv; }
+
+	int dim() const
 	{
-		if (m_itype == FE_PARAM_INT) return *((int*)m_pv);
-		else
-		{
-			assert(false);
-			return 0;
-		}
+		return m_ndim;
 	}
 
-	bool toBool() const
-	{
-		if (m_itype == FE_PARAM_BOOL) return *((bool*)m_pv);
-		else
-		{
-			assert(false);
-			return false;
-		}
-	}
+	template <typename T> T& value() { return *((T*)m_pv); }
+	template <typename T> const T& value() const { return *((T*)m_pv); }
 
-	double toDouble() const
-	{
-		if (m_itype == FE_PARAM_DOUBLE) return *((double*)m_pv);
-		else
-		{
-			assert(false);
-			return 0.0;
-		}
-	}
-
-	void setInt(int v)
-	{
-		if (m_itype == FE_PARAM_INT) *((int*)m_pv) = v;
-	}
-
-	void setBool(bool v)
-	{
-		if (m_itype == FE_PARAM_BOOL) *((bool*)m_pv) = v;
-	}
-
-	void setDouble(double v)
-	{
-		if (m_itype == FE_PARAM_DOUBLE) *((double*) m_pv) = v;
-	}
+	void Serialize(DumpStream& ar);
 };
 
 //-----------------------------------------------------------------------------
@@ -148,13 +124,13 @@ public:
 	const char* name() const { return m_szname; }
 
 	// parameter dimension
-	int dim() const { return m_val.m_ndim; }
+	int dim() const { return m_val.dim(); }
 
 	// parameter type
-	FEParamType type() const { return m_val.m_itype; }
+	FEParamType type() const { return m_val.type(); }
 
 	// data pointer
-	void* data_ptr() const { return m_val.m_pv; }
+	void* data_ptr() const { return m_val.data_ptr(); }
 
 	// set the load curve ID and scale factor
 	void SetLoadCurve(int lc);
@@ -167,9 +143,9 @@ public:
 	// get the scale factors
 	FEParamValue GetScale() 
 	{ 
-		if (m_val.m_itype == FE_PARAM_DOUBLE)
+		if (m_val.type() == FE_PARAM_DOUBLE)
 			return FEParamValue(m_scl); 
-		else if (m_val.m_itype == FE_PARAM_VEC3D)
+		else if (m_val.type() == FE_PARAM_VEC3D)
 			return FEParamValue(m_vscl);
 		else return FEParamValue();
 	}
@@ -185,28 +161,28 @@ public:
 
 public:
 	//! retrieves the value for a non-array item
-	template <class T> T& value() { return *((T*)m_val.m_pv); }
+	template <class T> T& value() { return *((T*)m_val.data_ptr()); }
 
 	//! retrieves the value for a non-array item
-	template <class T> T value() const { return *((T*)m_val.m_pv); }
+	template <class T> T value() const { return *((T*)m_val.data_ptr()); }
 
 	//! retrieves the value for an array item
-	template <class T> T* pvalue() { return (T*)m_val.m_pv; }
+	template <class T> T* pvalue() { return (T*)m_val.data_ptr(); }
 
 	//! retrieves the value for an array item
-	template <class T> T value(int i) const { return ((T*)m_val.m_pv)[i]; }
+	template <class T> T value(int i) const { return ((T*)m_val.data_ptr())[i]; }
 
 	//! retrieves pointer to element in array
 	template <class T> T* pvalue(int n);
 
 	//! override the template for char pointers
-	char* cvalue() { return (char*)m_val.m_pv; }
+	char* cvalue() { return (char*)m_val.data_ptr(); }
 };
 
 //-----------------------------------------------------------------------------
 //! Retrieves a pointer to element in array
 template<class T> inline T* FEParam::pvalue(int n)
 {
-	assert((n >= 0) && (n < m_val.m_ndim));
+	assert((n >= 0) && (n < m_val.dim()));
 	return &(pvalue<T>()[n]);
 }

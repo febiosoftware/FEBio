@@ -198,6 +198,7 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FEDATAGENERATOR_ID			0x0016	// derived from FEDataGenerator
 #define FELOADCURVE_ID				0x0017	// derived from FELoadCurve (TODO: work in progress)
 #define FEMODEL_ID					0x0018	// derived from FEModel (TODO: work in progress)
+#define FEMODELDATA_ID				0x0019	// derived from FEModelData (TODO: work in progress)
 
 /////////////////////////////////////////////////////////////////////////////
 // ENUM: Linear solvers

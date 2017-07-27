@@ -23,7 +23,7 @@ bool FEModelParameter::Init()
 	FEParamValue val = fem.FindParameter(ParamString(name.c_str()));
 	if (val.isValid() == false) return false;
 	if (val.type() != FE_PARAM_DOUBLE) return false;
-	double* pd = (double*) val.m_pv;
+	double* pd = (double*) val.data_ptr();
 	if (pd == 0) return false;
 
 	// store the pointer to the parameter

@@ -70,7 +70,7 @@ void FECoreBase::Serialize(DumpStream& ar)
 	}
 
 	// serialize all the properties
-	int NP = m_Prop.size();
+	int NP = (int)m_Prop.size();
 	for (int i = 0; i<NP; ++i)
 	{
 		FEProperty* pmat = m_Prop[i];

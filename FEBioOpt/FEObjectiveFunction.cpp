@@ -101,7 +101,7 @@ bool FEDataFitObjective::Init()
 	FEParamValue val = fem.FindParameter(ParamString(m_name.c_str()));
 	if (val.isValid() == false) return false;
 	if (val.type() != FE_PARAM_DOUBLE) return false;
-	m_pd = (double*)val.m_pv;
+	m_pd = (double*)val.data_ptr();
 	if (m_pd == 0) return false;
 
 	// register callback
@@ -187,7 +187,7 @@ bool FEMinimizeObjective::Init()
 		FEParamValue val = fem->FindParameter(ParamString(Fi.name.c_str()));
 		if (val.isValid() == false) return false;
 		if (val.type() != FE_PARAM_DOUBLE) return false;
-		Fi.var = (double*) val.m_pv;
+		Fi.var = (double*) val.data_ptr();
 		if (Fi.var == 0) return false;
 	}
 

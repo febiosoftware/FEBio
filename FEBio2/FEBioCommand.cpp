@@ -155,7 +155,7 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 			{
 				switch (val.type())
 				{
-				case FE_PARAM_DOUBLE: printf("%lg\n", val.toDouble()); break;
+				case FE_PARAM_DOUBLE: printf("%lg\n", val.value<double>()); break;
 				default:
 					printf("(cannot print value)\n");
 				}

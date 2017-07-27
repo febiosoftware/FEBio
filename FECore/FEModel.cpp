@@ -17,6 +17,7 @@
 #include "FELinearConstraintManager.h"
 #include "log.h"
 #include "FERigidBody.h"
+#include "FEModelData.h"
 #include <string>
 #include <map>
 using namespace std;
@@ -82,6 +83,7 @@ public:
 	FEVecPropertyT<FEModelLoad>					m_ML;		//!< model loads
 	FEVecPropertyT<FELoadCurve>					m_LC;		//!< load curve data
 	FEVecPropertyT<FEAnalysis>					m_Step;		//!< array of analysis steps
+	FEVecPropertyT<FEModelData>					m_Data;		//!< the model output data
 
 public:
 	FEAnalysis*		m_pStep;	//!< pointer to current analysis step
@@ -112,6 +114,11 @@ public: // Global Data
 };
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FEModel, FECoreBase)
+	ADD_PARAMETER(m_imp->m_ftime, FE_PARAM_DOUBLE, "time");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 FEModel::FEModel(void) : FECoreBase(FEMODEL_ID), m_imp(new FEModel::Implementation(this))
 {
 	m_ut4_alpha = 0.05;
@@ -135,6 +142,7 @@ FEModel::FEModel(void) : FECoreBase(FEMODEL_ID), m_imp(new FEModel::Implementati
 	AddProperty(&m_imp->m_ML , "model_load");
 	AddProperty(&m_imp->m_LC , "loadcurve");
 	AddProperty(&m_imp->m_Step, "step");
+	AddProperty(&m_imp->m_Data, "data");
 }
 
 //-----------------------------------------------------------------------------
@@ -864,6 +872,13 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 	{
 		return param->paramValue();
 	}
+	else if (param->type() == FE_PARAM_STD_VECTOR_DOUBLE)
+	{
+		vector<double>& data = param->value< vector<double> >();
+		int index = paramName.Index();
+		if ((index >= 0) && (index < data.size()))
+		return FEParamValue(data[index]);
+	}
 
 	return FEParamValue();
 }
@@ -1187,6 +1202,34 @@ FEGlobalData* FEModel::GetGlobalData(int i)
 int FEModel::GlobalDataItems()
 {
 	return (int)m_imp->m_GD.size();
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::AddModelData(FEModelData* data)
+{
+	m_imp->m_Data.AddProperty(data);
+}
+
+//-----------------------------------------------------------------------------
+FEModelData* FEModel::GetModelData(int i)
+{
+	return m_imp->m_Data[i];
+}
+
+//-----------------------------------------------------------------------------
+int FEModel::ModelDataItems() const
+{
+	return (int) m_imp->m_Data.size();
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::UpdateModelData()
+{
+	for (int i=0; i<ModelDataItems(); ++i)
+	{
+		FEModelData* data = GetModelData(i);
+		data->Update();
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -57,7 +57,7 @@ bool FERemodelingElasticDomain::Initialize()
 void FERemodelingElasticDomain::StiffnessMatrix(FESolver* psolver)
 {
 	// repeat over all solid elements
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 
 	// I only need this for the element density stiffness
 	FEModel& fem = psolver->GetFEModel();
