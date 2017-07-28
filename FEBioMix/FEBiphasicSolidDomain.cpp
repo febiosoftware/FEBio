@@ -1149,22 +1149,22 @@ void FEBiphasicSolidDomain::UpdateNodalPressures()
 		int neln = el.Nodes();
 
 		// get integration point pressures
+		double pavg = 0.0;
+		int c = 0;
 		for (int j = 0; j<nint; ++j)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 			FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 
-			if (pt) pi[j] = pt->m_pa; else pi[j] = 0.0;
+			if (pt) { pavg += pt->m_pa; c++; }
 		}
-
-		// project to the nodes
-		el.project_to_nodes(&pi[0], &pn[0]);
+		if (c > 0) pavg /= (double) c;
 
 		// store the nodal values
 		for (int j=0; j<neln; ++j)
 		{
 			int m = el.m_lnode[j];
-			m_nodePressure[m] += pn[j];
+			m_nodePressure[m] += pavg;
 			tag[m]++;
 		}
 	}
