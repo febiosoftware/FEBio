@@ -1155,7 +1155,11 @@ bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 			A[2][0] = F1.z; A[2][1] = F2.z; A[2][2] = F3.z;
 
 			// calculate solution increment
-			dx = -(A.inverse()*F);
+            mat3d Ai;
+            if (A.invert(Ai) != 0)
+                dx = -(Ai*F);
+            else
+                return false;
 
 			// update solution
 			l1 += dx.x;
@@ -1245,7 +1249,11 @@ bool IntersectQuad8(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double 
 		A[2][0] = F1.z; A[2][1] = F2.z; A[2][2] = F3.z;
 
 		// calculate solution increment
-		dx = -(A.inverse()*F);
+        mat3d Ai;
+        if (A.invert(Ai) != 0)
+            dx = -(Ai*F);
+        else
+            return false;
 
 		// update solution
 		l1 += dx.x;
@@ -1338,7 +1346,11 @@ bool IntersectQuad9(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double 
 		A[2][0] = F1.z; A[2][1] = F2.z; A[2][2] = F3.z;
 
 		// calculate solution increment
-		dx = -(A.inverse()*F);
+        mat3d Ai;
+        if (A.invert(Ai) != 0)
+            dx = -(Ai*F);
+        else
+            return false;
 
 		// update solution
 		l1 += dx.x;
@@ -1462,7 +1474,11 @@ bool IntersectTri6(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 			A[2][0] = F1.z; A[2][1] = F2.z; A[2][2] = F3.z;
 			
 			// calculate solution increment
-			dx = -(A.inverse()*F);
+            mat3d Ai;
+            if (A.invert(Ai) != 0)
+                dx = -(Ai*F);
+            else
+                return false;
 			
 			// update solution
 			l1 += dx.x;
@@ -1589,7 +1605,11 @@ bool IntersectTri7(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 			A[2][0] = F1.z; A[2][1] = F2.z; A[2][2] = F3.z;
 			
 			// calculate solution increment
-			dx = -(A.inverse()*F);
+            mat3d Ai;
+            if (A.invert(Ai) != 0)
+                dx = -(Ai*F);
+            else
+                return false;
 			
 			// update solution
 			l1 += dx.x;

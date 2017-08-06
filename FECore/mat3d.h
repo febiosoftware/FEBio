@@ -186,6 +186,7 @@ public:
 
 	// calculates the inverse
 	mat3ds inverse() const;
+    double invert(mat3ds& Ai);
 	
 	// determine eigen values and vectors
 	void eigen(double d[3], vec3d r[3] = 0);
@@ -355,6 +356,7 @@ public:
 
 	// calculates the inverse
 	mat3d inverse() const;
+    double invert(mat3d& Ai);
 
 	// calculates the transpose
 	mat3d transpose() const;

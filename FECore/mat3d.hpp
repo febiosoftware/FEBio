@@ -385,6 +385,23 @@ inline mat3ds mat3ds::inverse() const
 				  D*(m[XY]*m[YZ]-m[YY]*m[XZ]));
 }
 
+// invert
+inline double mat3ds::invert(mat3ds& Ai)
+{
+    double D = det();
+    if (D != 0) {
+        double Di = 1/D;
+        
+        Ai = mat3ds(Di*(m[YY]*m[ZZ]-m[YZ]*m[YZ]),
+                    Di*(m[XX]*m[ZZ]-m[XZ]*m[XZ]),
+                    Di*(m[XX]*m[YY]-m[XY]*m[XY]),
+                    Di*(m[XZ]*m[YZ]-m[XY]*m[ZZ]),
+                    Di*(m[XY]*m[XZ]-m[XX]*m[YZ]),
+                    Di*(m[XY]*m[YZ]-m[YY]*m[XZ]));
+    }
+    return D;
+}
+
 // L2-norm
 inline double mat3ds::norm() const
 { 
@@ -841,6 +858,25 @@ inline mat3d mat3d::inverse() const
 				 D*(d[1][0]*d[2][1] - d[1][1]*d[2][0]),
 				 D*(d[0][1]*d[2][0] - d[0][0]*d[2][1]),
 				 D*(d[0][0]*d[1][1] - d[0][1]*d[1][0]));
+}
+
+// return the inverse matrix
+inline double mat3d::invert(mat3d& Ai)
+{
+    double D = det();
+    if (D != 0) {
+        double Di = 1/D;
+        Ai = mat3d(Di*(d[1][1]*d[2][2] - d[1][2]*d[2][1]),
+                   Di*(d[0][2]*d[2][1] - d[0][1]*d[2][2]),
+                   Di*(d[0][1]*d[1][2] - d[1][1]*d[0][2]),
+                   Di*(d[1][2]*d[2][0] - d[1][0]*d[2][2]),
+                   Di*(d[0][0]*d[2][2] - d[0][2]*d[2][0]),
+                   Di*(d[0][2]*d[1][0] - d[0][0]*d[1][2]),
+                   Di*(d[1][0]*d[2][1] - d[1][1]*d[2][0]),
+                   Di*(d[0][1]*d[2][0] - d[0][0]*d[2][1]),
+                   Di*(d[0][0]*d[1][1] - d[0][1]*d[1][0]));
+    }
+    return D;
 }
 
 // return the transpose matrix
