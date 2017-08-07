@@ -69,6 +69,7 @@ void FEBiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             
             pb.m_p = p;
             pb.m_gradp = gradient(el, pn, qn, j);
+            pb.m_gradpp = pb.m_gradp;
             pb.m_phi0p = pb.m_phi0;
             
             mp.Update(timeInfo);
@@ -527,6 +528,7 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffness(FEShellElement& el, matrix&
     int neln = el.Nodes();
     
     double dt = GetFEModel()->GetTime().timeIncrement;
+    double tau = m_pMat->m_tau;
     
     vector<vec3d> gradMu(neln), gradMd(neln);
     vector<double> Mu(neln), Md(neln);
@@ -577,7 +579,7 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffness(FEShellElement& el, matrix&
         tens4ds c = m_pMat->Tangent(pt);
         
         // get the fluid flux and pressure gradient
-        vec3d gradp = pt.m_gradp;
+        vec3d gradp = pt.m_gradp + (pt.m_gradp - pt.m_gradpp)*(tau/dt);
         
         // evaluate the permeability and its derivatives
         mat3ds K = m_pMat->Permeability(mp);
@@ -674,10 +676,10 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffness(FEShellElement& el, matrix&
         for (i=0; i<neln; ++i)
             for (j=0; j<neln; ++j)
             {
-                double kpp = (gradMu[i]*(K*gradMu[j]) - Phip*Mu[i]*Mu[j])*(detJt*dt);
-                double kpq = (gradMu[i]*(K*gradMd[j]) - Phip*Mu[i]*Md[j])*(detJt*dt);
-                double kqp = (gradMd[i]*(K*gradMu[j]) - Phip*Md[i]*Mu[j])*(detJt*dt);
-                double kqq = (gradMd[i]*(K*gradMd[j]) - Phip*Md[i]*Md[j])*(detJt*dt);
+                double kpp = (gradMu[i]*(K*gradMu[j])*(1+tau/dt) - Phip*Mu[i]*Mu[j])*(detJt*dt);
+                double kpq = (gradMu[i]*(K*gradMd[j])*(1+tau/dt) - Phip*Mu[i]*Md[j])*(detJt*dt);
+                double kqp = (gradMd[i]*(K*gradMu[j])*(1+tau/dt) - Phip*Md[i]*Mu[j])*(detJt*dt);
+                double kqq = (gradMd[i]*(K*gradMd[j])*(1+tau/dt) - Phip*Md[i]*Md[j])*(detJt*dt);
                 
                 ke[8*i+6][8*j+6] -= kpp;
                 

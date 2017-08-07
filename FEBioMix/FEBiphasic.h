@@ -32,6 +32,7 @@ public:
 	// pressure fields.
 	double		m_p;		//!< fluid pressure
 	vec3d		m_gradp;	//!< spatial gradient of p
+    vec3d		m_gradpp;	//!< gradp at previous time
 	vec3d		m_w;		//!< fluid flux
 	double		m_pa;		//!< actual fluid pressure
 	double		m_phi0;		//!< referential solid volume fraction at current time
@@ -94,6 +95,7 @@ public:
 public: // material parameters
 	double						m_rhoTw;	//!< true fluid density
 	double						m_phi0;		//!< solid volume fraction in reference configuration
+    double                      m_tau;      //!< characteristic time constant for stabilization
     vector<FEBodyForce*>        m_bf;       //!< body forces acting on this biphasic material
 
 private: // material properties

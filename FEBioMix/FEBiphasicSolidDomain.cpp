@@ -59,6 +59,7 @@ void FEBiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             
             pb.m_p = p;
             pb.m_gradp = gradient(el, pn, j);
+            pb.m_gradpp = pb.m_gradp;
             pb.m_phi0p = pb.m_phi0;
             
             mp.Update(timeInfo);
@@ -91,7 +92,7 @@ bool FEBiphasicSolidDomain::Initialize()
 
 	// allocate nodal pressures
 	m_nodePressure.resize(Nodes(), 0.0);
-
+    
 	return true;
 }
 
@@ -513,6 +514,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
     double* gw = el.GaussWeights();
     
     double dt = GetFEModel()->GetTime().timeIncrement;
+    double tau = m_pMat->m_tau;
     
     // zero stiffness matrix
     ke.zero();
@@ -552,7 +554,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
         tens4ds c = m_pMat->Tangent(mp);
         
         // get the fluid flux and pressure gradient
-        vec3d gradp = pt.m_gradp;
+        vec3d gradp = pt.m_gradp + (pt.m_gradp - pt.m_gradpp)*(tau/dt);
         
         // evaluate the permeability and its derivatives
         mat3ds K = m_pMat->Permeability(mp);
@@ -588,7 +590,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
         for (i=0; i<neln; ++i)
             for (j=0; j<neln; ++j)
             {
-                ke[4*i+3][4*j+3] += (H[i]*H[j]*Phip - gradN[i]*(K*gradN[j]))*tmp;
+                ke[4*i+3][4*j+3] += (H[i]*H[j]*Phip - gradN[i]*(K*gradN[j])*(1+tau/dt))*tmp;
             }
         
         if (!bsymm) {
@@ -1100,7 +1102,13 @@ vec3d FEBiphasicSolidDomain::FluidFlux(FEMaterialPoint& mp)
 	mat3ds kt = m_pMat->Permeability(mp);
     
     vec3d w = -(kt*gradp);
-
+    
+    double tau = m_pMat->m_tau;
+    if (tau > 0) {
+        double dt = GetFEModel()->GetTime().timeIncrement;
+        w -= kt*(gradp - ppt.m_gradpp)*(tau/dt);
+    }
+    
 	// get true fluid density
 	double rhoTw = m_pMat->FluidDensity();
     
