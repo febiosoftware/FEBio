@@ -589,6 +589,26 @@ public:
 };
 
 //=============================================================================
+// 20-node hexahedral element using a 2x2x2 Gaussian integration rule
+class FEHex20G8 : public FEHex20_
+{
+public:
+    enum { NINT = 8 };
+    
+public:
+    FEHex20G8();
+    
+    void project_to_nodes(double* ai, double* ao);
+    
+protected:
+    // use these integration points to project to nodes
+    static int ni[NELN];
+    
+    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix MT;
+};
+
+//=============================================================================
 // 20-node hexahedral element using a 3x3x3 Gaussian integration rule
 class FEHex20G27 : public FEHex20_
 {

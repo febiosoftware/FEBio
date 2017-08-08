@@ -1874,6 +1874,58 @@ void FEHex20_::shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, 
 }
 
 //=============================================================================
+//              H E X 2 0 G 8
+//=============================================================================
+
+int FEHex20G8::ni[NELN] = {};
+
+FEHex20G8::FEHex20G8() : FEHex20_(NINT, FE_HEX20G8)
+{
+    // integration point coordinates
+    const double a = 1.0 / sqrt(3.0);
+    gr[0] = -a; gs[0] = -a; gt[0] = -a; gw[0] = 1;
+    gr[1] =  a; gs[1] = -a; gt[1] = -a; gw[1] = 1;
+    gr[2] =  a; gs[2] =  a; gt[2] = -a; gw[2] = 1;
+    gr[3] = -a; gs[3] =  a; gt[3] = -a; gw[3] = 1;
+    gr[4] = -a; gs[4] = -a; gt[4] =  a; gw[4] = 1;
+    gr[5] =  a; gs[5] = -a; gt[5] =  a; gw[5] = 1;
+    gr[6] =  a; gs[6] =  a; gt[6] =  a; gw[6] = 1;
+    gr[7] = -a; gs[7] =  a; gt[7] =  a; gw[7] = 1;
+    
+    init();
+    
+    MT.resize(NELN, NINT);
+    for (int i=0; i<NINT; ++i)
+        for (int n=0; n<NELN; ++n)
+            MT(n,i) = H(i,n);
+    
+    Hi.resize(NELN, NELN);
+    Hi = MT*MT.transpose();
+    Hi = Hi.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! Use least-squares extrapolation
+void FEHex20G8::project_to_nodes(double* ai, double* ao)
+{
+    double v[NELN];
+    for (int n=0; n<NELN; ++n) {
+        v[n] = 0;
+        for (int i=0; i<NINT; ++i) {
+            v[n] += MT(n,i)*ai[i];
+        }
+    }
+    for (int j=0; j<NELN; ++j)
+    {
+        ao[j] = 0;
+        for (int k=0; k<NELN; ++k)
+        {
+            ao[j] += Hi[j][k]*v[k];
+        }
+    }
+}
+
+//=============================================================================
 //              H E X 2 0 G 2 7
 //=============================================================================
 

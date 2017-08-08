@@ -38,6 +38,7 @@ FEElementLibrary* FEElementLibrary::GetInstance()
 		n = m_pThis->RegisterTraits(new FETet15G15  ); assert(n==FE_TET15G15 );
 		n = m_pThis->RegisterTraits(new FETet15G15RI4); assert(n==FE_TET15G15RI4);
 		n = m_pThis->RegisterTraits(new FETet20G15  ); assert(n==FE_TET20G15 );
+        n = m_pThis->RegisterTraits(new FEHex20G8   ); assert(n==FE_HEX20G8  );
 		n = m_pThis->RegisterTraits(new FEHex20G27  ); assert(n==FE_HEX20G27 );
 		n = m_pThis->RegisterTraits(new FEHex27G27  ); assert(n==FE_HEX27G27 );
         n = m_pThis->RegisterTraits(new FEPenta15G21); assert(n==FE_PENTA15G21);
