@@ -82,6 +82,7 @@ enum FE_Element_Type {
     FE_HEX20G8,
 	FE_HEX20G27,
 	FE_HEX27G27,
+    FE_PENTA15G8,
     FE_PENTA15G21,
 	FE_PYRA5G8,
 

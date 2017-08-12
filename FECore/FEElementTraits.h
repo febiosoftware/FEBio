@@ -296,6 +296,26 @@ public:
 };
 
 //=============================================================================
+// 15-node pentahedral elements with 8-point gaussian quadrature
+class FEPenta15G8 : public FEPenta15_
+{
+public:
+    enum { NINT = 8 };
+    
+public:
+    FEPenta15G8();
+    
+    void project_to_nodes(double* ai, double* ao);
+    
+protected:
+    // use these integration points to project to nodes
+    static int ni[NELN];
+    
+    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix MT;
+};
+
+//=============================================================================
 // 15-node pentahedral elements with 21-point gaussian quadrature
 class FEPenta15G21 : public FEPenta15_
 {

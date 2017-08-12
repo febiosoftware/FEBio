@@ -652,6 +652,61 @@ void FEPenta15_::shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs
 }
 
 //=============================================================================
+//                          F E P E N T A 1 5 G 8
+//=============================================================================
+
+int FEPenta15G8::ni[NELN] = {};
+
+FEPenta15G8::FEPenta15G8() : FEPenta15_(NINT, FE_PENTA15G8)
+{
+    const double a = 1.0/3.0;
+    const double b = 1.0/5.0;
+    const double c = 3.0/5.0;
+    const double d = sqrt(a);
+    gr[0] = a; gs[0] = a; gt[0] = -d; gw[0] = -27.0/96.0;
+    gr[1] = c; gs[1] = b; gt[1] = -d; gw[1] =  25.0/96.0;
+    gr[2] = b; gs[2] = b; gt[2] = -d; gw[2] =  25.0/96.0;
+    gr[3] = b; gs[3] = c; gt[3] = -d; gw[3] =  25.0/96.0;
+    gr[4] = a; gs[4] = a; gt[4] =  d; gw[4] = -27.0/96.0;
+    gr[5] = c; gs[5] = b; gt[5] =  d; gw[5] =  25.0/96.0;
+    gr[6] = b; gs[6] = b; gt[6] =  d; gw[6] =  25.0/96.0;
+    gr[7] = b; gs[7] = c; gt[7] =  d; gw[7] =  25.0/96.0;
+    
+    init();
+    
+    MT.resize(NELN, NINT);
+    for (int i=0; i<NINT; ++i)
+        for (int n=0; n<NELN; ++n)
+            MT(n,i) = H(i,n);
+    
+    Hi.resize(NELN, NELN);
+    Hi = MT*MT.transpose();
+    Hi = Hi.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! project to nodes
+//! Use least-squares extrapolation
+void FEPenta15G8::project_to_nodes(double* ai, double* ao)
+{
+    double v[NELN];
+    for (int n=0; n<NELN; ++n) {
+        v[n] = 0;
+        for (int i=0; i<NINT; ++i) {
+            v[n] += MT(n,i)*ai[i];
+        }
+    }
+    for (int j=0; j<NELN; ++j)
+    {
+        ao[j] = 0;
+        for (int k=0; k<NELN; ++k)
+        {
+            ao[j] += Hi[j][k]*v[k];
+        }
+    }
+}
+
+//=============================================================================
 //                          F E P E N T A 1 5 G 2 1
 //=============================================================================
 

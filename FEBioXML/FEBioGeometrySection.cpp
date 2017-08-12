@@ -414,6 +414,7 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 		else if (strcmp(sztype, "TET15G8_S7"  ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G8; m_pim->m_ntri7 = FE_TRI7G7; }
 		else if (strcmp(sztype, "TET15G11_S7" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G7; }
 		else if (strcmp(sztype, "TET15G15_S7" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G7; }
+        else if (strcmp(sztype, "PENTA15G8"   ) == 0) { eshape = ET_PENTA15; stype = FE_PENTA15G8; }
         else if (strcmp(sztype, "HEX20G8"     ) == 0) { eshape = ET_HEX20; stype = FE_HEX20G8; }
         else if (strcmp(sztype, "QUAD4G8"     ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8;  }
         else if (strcmp(sztype, "QUAD4G12"    ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G12; }
