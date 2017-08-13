@@ -42,6 +42,7 @@
 #include "FEPoroTraction.h"
 #include "FEFluidFlux.h"
 #include "FESoluteFlux.h"
+#include "FEPressureStabilization.h"
 
 #include "FESlidingInterface2.h"
 #include "FESlidingInterfaceBiphasic.h"
@@ -145,6 +146,7 @@ REGISTER_FECORE_CLASS(FEMultiphasicShellDomain   , FEDOMAIN_ID, "multiphasic-she
 REGISTER_FECORE_CLASS(FEPoroNormalTraction, FESURFACELOAD_ID, "normal_traction");
 REGISTER_FECORE_CLASS(FEFluidFlux         , FESURFACELOAD_ID, "fluidflux"      );
 REGISTER_FECORE_CLASS(FESoluteFlux        , FESURFACELOAD_ID, "soluteflux"     );
+REGISTER_FECORE_CLASS(FEPressureStabilization, FESURFACELOAD_ID, "pressure_stabilization");
 
 //-----------------------------------------------------------------------------
 // Contact interfaces

@@ -27,6 +27,8 @@
 		D534C48318BA930A006B5E1B /* FEMultiphasicStandard.h in Headers */ = {isa = PBXBuildFile; fileRef = D534C48118BA930A006B5E1B /* FEMultiphasicStandard.h */; };
 		D534C48618BAAE70006B5E1B /* FEMultiphasicMultigeneration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D534C48418BAAE70006B5E1B /* FEMultiphasicMultigeneration.cpp */; };
 		D534C48718BAAE70006B5E1B /* FEMultiphasicMultigeneration.h in Headers */ = {isa = PBXBuildFile; fileRef = D534C48518BAAE70006B5E1B /* FEMultiphasicMultigeneration.h */; };
+		D54885A21F3AA86F00CDABD1 /* FEPressureStabilization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54885A01F3AA86F00CDABD1 /* FEPressureStabilization.cpp */; };
+		D54885A31F3AA86F00CDABD1 /* FEPressureStabilization.h in Headers */ = {isa = PBXBuildFile; fileRef = D54885A11F3AA86F00CDABD1 /* FEPressureStabilization.h */; };
 		D577FBD91CD63A5E00E4857B /* FESlidingInterfaceBiphasic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D577FBD71CD63A5E00E4857B /* FESlidingInterfaceBiphasic.cpp */; };
 		D577FBDA1CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h in Headers */ = {isa = PBXBuildFile; fileRef = D577FBD81CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h */; };
 		D5794FF41E35243700FC1CBD /* FETiedMultiphasicInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5794FF21E35243700FC1CBD /* FETiedMultiphasicInterface.cpp */; };
@@ -177,6 +179,8 @@
 		D534C48118BA930A006B5E1B /* FEMultiphasicStandard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicStandard.h; sourceTree = "<group>"; };
 		D534C48418BAAE70006B5E1B /* FEMultiphasicMultigeneration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicMultigeneration.cpp; sourceTree = "<group>"; };
 		D534C48518BAAE70006B5E1B /* FEMultiphasicMultigeneration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicMultigeneration.h; sourceTree = "<group>"; };
+		D54885A01F3AA86F00CDABD1 /* FEPressureStabilization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPressureStabilization.cpp; sourceTree = "<group>"; };
+		D54885A11F3AA86F00CDABD1 /* FEPressureStabilization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPressureStabilization.h; sourceTree = "<group>"; };
 		D577FBD71CD63A5E00E4857B /* FESlidingInterfaceBiphasic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESlidingInterfaceBiphasic.cpp; sourceTree = "<group>"; };
 		D577FBD81CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESlidingInterfaceBiphasic.h; sourceTree = "<group>"; };
 		D5794FF21E35243700FC1CBD /* FETiedMultiphasicInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETiedMultiphasicInterface.cpp; sourceTree = "<group>"; };
@@ -435,6 +439,8 @@
 				D5E108AD1865E02800B23922 /* FEPermRefTransIso.h */,
 				D5E108AE1865E02800B23922 /* FEPoroTraction.cpp */,
 				D5E108AF1865E02800B23922 /* FEPoroTraction.h */,
+				D54885A01F3AA86F00CDABD1 /* FEPressureStabilization.cpp */,
+				D54885A11F3AA86F00CDABD1 /* FEPressureStabilization.h */,
 				D5E108B01865E02800B23922 /* FEReactionRateConst.cpp */,
 				D5E108B11865E02800B23922 /* FEReactionRateConst.h */,
 				D58570F71A81BEC60038367C /* FEReactionRateExpSED.cpp */,
@@ -500,6 +506,7 @@
 				D59F6B141E008219000E7922 /* FEBiphasicShellDomain.h in Headers */,
 				D5E1091A1865E02800B23922 /* FEReactionRateHuiskes.h in Headers */,
 				D534C48718BAAE70006B5E1B /* FEMultiphasicMultigeneration.h in Headers */,
+				D54885A31F3AA86F00CDABD1 /* FEPressureStabilization.h in Headers */,
 				D50797BB1E50BF510086B1EA /* FEMultiphasicShellDomain.h in Headers */,
 				D58570FA1A81BEC60038367C /* FEReactionRateExpSED.h in Headers */,
 				D577FBDA1CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h in Headers */,
@@ -691,6 +698,7 @@
 				D50F0ECC1D6CBD0A0095E621 /* FEMassActionForwardEffective.cpp in Sources */,
 				D534C48618BAAE70006B5E1B /* FEMultiphasicMultigeneration.cpp in Sources */,
 				D5ECCEE3186644B00073481A /* FEHydraulicPermeability.cpp in Sources */,
+				D54885A21F3AA86F00CDABD1 /* FEPressureStabilization.cpp in Sources */,
 				D5E109311865E02800B23922 /* FESupplySynthesisBinding.cpp in Sources */,
 				D5E108E51865E02800B23922 /* FEBiphasicSoluteSolver.cpp in Sources */,
 				D5E108F91865E02800B23922 /* FEMassActionForward.cpp in Sources */,
