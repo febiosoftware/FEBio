@@ -726,6 +726,7 @@
     <ClInclude Include="..\..\FEBioMix\FEPermRefOrtho.h" />
     <ClInclude Include="..\..\FEBioMix\FEPermRefTransIso.h" />
     <ClInclude Include="..\..\FEBioMix\FEPoroTraction.h" />
+    <ClInclude Include="..\..\FEBioMix\FEPressureStabilization.h" />
     <ClInclude Include="..\..\FEBioMix\FEReactionRateConst.h" />
     <ClInclude Include="..\..\FEBioMix\FEReactionRateExpSED.h" />
     <ClInclude Include="..\..\FEBioMix\FEReactionRateHuiskes.h" />
@@ -803,6 +804,7 @@
     <ClCompile Include="..\..\FEBioMix\FEPermRefOrtho.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPermRefTransIso.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPoroTraction.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEPressureStabilization.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEReactionRateConst.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEReactionRateExpSED.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEReactionRateHuiskes.cpp" />
