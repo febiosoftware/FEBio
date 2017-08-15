@@ -447,7 +447,8 @@ void FEFileSectionMap::Parse(XMLTag& tag)
 		else throw XMLReader::InvalidTag(tag);
 
 		++tag;
-	} while (!tag.isend());
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------

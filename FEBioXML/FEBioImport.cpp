@@ -143,7 +143,6 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 	m_map["Module"     ] = new FEBioModuleSection     (this);
 	m_map["Control"    ] = new FEBioControlSection    (this);
 	m_map["Material"   ] = new FEBioMaterialSection   (this);
-	m_map["Boundary"   ] = new FEBioBoundarySection   (this);
 	m_map["Loads"      ] = new FEBioLoadsSection      (this);
 	m_map["LoadData"   ] = new FEBioLoadDataSection   (this);
 	m_map["Globals"    ] = new FEBioGlobalsSection    (this);
@@ -153,9 +152,10 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 	if (nversion < 0x0200)
 	{
 	    m_map["Geometry"   ] = new FEBioGeometrySection1x   (this);
+		m_map["Boundary"   ] = new FEBioBoundarySection1x   (this);
 		m_map["Constraints"] = new FEBioConstraintsSection1x(this);
 		m_map["Step"       ] = new FEBioStepSection         (this);
-		m_map["Initial"] = new FEBioInitialSection(this);
+		m_map["Initial"    ] = new FEBioInitialSection      (this);
 	}
 
 	// version 2.0
@@ -163,7 +163,8 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 	{
 		m_map["Parameters" ] = new FEBioParametersSection  (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection2   (this);
-		m_map["Initial"    ] = new FEBioInitialSection    (this);
+		m_map["Initial"    ] = new FEBioInitialSection     (this);
+		m_map["Boundary"   ] = new FEBioBoundarySection2   (this);
 		m_map["Include"    ] = new FEBioIncludeSection     (this);
 		m_map["Contact"    ] = new FEBioContactSection     (this);
 		m_map["Discrete"   ] = new FEBioDiscreteSection    (this);
@@ -179,6 +180,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 	    m_map["Geometry"   ] = new FEBioGeometrySection25   (this);
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection25    (this);
+		m_map["Boundary"   ] = new FEBioBoundarySection25   (this);
 		m_map["Contact"    ] = new FEBioContactSection      (this);
 		m_map["Discrete"   ] = new FEBioDiscreteSection25   (this);
 		m_map["Constraints"] = new FEBioConstraintsSection25(this);

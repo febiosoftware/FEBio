@@ -96,6 +96,7 @@ figs-within-sections
 \html_math_output 0
 \html_css_as_file 0
 \html_be_strict false
+\author 274815820 "steve"
 \author 2145056167 "Gerard Ateshian"
 \end_header
 
@@ -68815,7 +68816,12 @@ Archive
 Control
 \shape default
 \emph default
- redefine some control parameters 
+ redefine some control parameters
+\change_inserted 274815820 1502831579
+.
+
+\change_unchanged
+ 
 \end_layout
 
 \begin_layout Description
@@ -68825,8 +68831,20 @@ Control
 LoadData
 \shape default
 \emph default
- redefine some loadcurves.
+ redefine 
+\change_inserted 274815820 1502829845
+or add 
+\change_unchanged
+some loadcurves.
  
+\change_inserted 274815820 1502829857
+
+\end_layout
+
+\begin_layout Description
+
+\change_inserted 274815820 1502829866
+Step add an analysis step.
 \end_layout
 
 \begin_layout Standard
@@ -69095,7 +69113,15 @@ name "sec:The-LoadData-Section"
 \end_layout
 
 \begin_layout Standard
-In the LoadData section the user can redefine some or all of the load curves.
+In the LoadData section 
+\change_deleted 274815820 1502831168
+the user can redefine 
+\change_unchanged
+some or all of the load curves
+\change_inserted 274815820 1502831178
+ can be redefined, or new load curves can be added
+\change_unchanged
+.
  The syntax is identical to the LoadData section of the FEBio input file:
 \end_layout
 
@@ -69104,7 +69130,13 @@ In the LoadData section the user can redefine some or all of the load curves.
 \end_layout
 
 \begin_layout LyX-Code
-  <loadcurve id="n">
+  <loadcurve id="
+\change_deleted 274815820 1502831190
+n
+\change_inserted 274815820 1502831190
+1
+\change_unchanged
+">
 \end_layout
 
 \begin_layout LyX-Code
@@ -69133,6 +69165,52 @@ In this case the loadcurve
 id 
 \shape default
 is the loadcurve number of the loadcurve that the user wishes to redefine.
+
+\change_inserted 274815820 1502831223
+ 
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1502831367
+New loadcurves can be added.
+ This is useful when in addition adding new Step sections, where new boundary
+ conditions are defined.
+ When adding new loadcurves, make sure to continue the numbering of the
+ parent input file.
+ 
+\end_layout
+
+\begin_layout Section
+
+\change_inserted 274815820 1502830053
+The Step Section 
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:The-Step-Section-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1502830782
+The Step section can be used to add additional analysis steps to the model.
+ These steps are executed after the initial model has completed.
+ This section cannot be use to modify the steps defined in the parent file.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1502831132
+Using the Step section, additional boundary conditions, loads, contact definitio
+ns, etc.
+ can be added, just like in a regular model input file.
+ The syntax is the same as the Step section in the regular model input file.
+ 
 \end_layout
 
 \begin_layout Section

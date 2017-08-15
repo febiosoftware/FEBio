@@ -19,7 +19,7 @@ void FEBioStepSection::Parse(XMLTag& tag)
 	Map["Module"     ] = new FEBioModuleSection       (feb);
 	Map["Control"    ] = new FEBioControlSection      (feb);
 	Map["Constraints"] = new FEBioConstraintsSection1x(feb);
-	Map["Boundary"   ] = new FEBioBoundarySection     (feb);
+	Map["Boundary"   ] = new FEBioBoundarySection1x   (feb);
 	Map["Loads"      ] = new FEBioLoadsSection        (feb);
 	Map["Initial"    ] = new FEBioInitialSection      (feb);
 
@@ -38,7 +38,7 @@ void FEBioStepSection2::Parse(XMLTag& tag)
 	Map["Module"     ] = new FEBioModuleSection      (feb);
 	Map["Control"    ] = new FEBioControlSection     (feb);
 	Map["Constraints"] = new FEBioConstraintsSection2(feb);
-	Map["Boundary"   ] = new FEBioBoundarySection    (feb);
+	Map["Boundary"   ] = new FEBioBoundarySection2   (feb);
 	Map["Loads"      ] = new FEBioLoadsSection       (feb);
 	Map["Initial"    ] = new FEBioInitialSection     (feb);
 	Map["Contact"    ] = new FEBioContactSection     (feb);
@@ -64,7 +64,7 @@ void FEBioStepSection25::Parse(XMLTag& tag)
 	FEFileSectionMap Map;
 	Map["Control"    ] = new FEStepControlSection     (imp);
 	Map["Constraints"] = new FEBioConstraintsSection25(imp);
-	Map["Boundary"   ] = new FEBioBoundarySection     (imp);
+	Map["Boundary"   ] = new FEBioBoundarySection25   (imp);
 	Map["Loads"      ] = new FEBioLoadsSection        (imp);
 	Map["Initial"    ] = new FEBioInitialSection25    (imp);
 	Map["Contact"    ] = new FEBioContactSection      (imp);

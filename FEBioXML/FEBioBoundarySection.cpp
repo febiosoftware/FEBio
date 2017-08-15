@@ -5,16 +5,6 @@
 #include "FECore/FEDiscreteDomain.h"
 #include "FEBioMech/FERigidWallInterface.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
-#include "FEBioMech/FERigidJoint.h"
-#include "FEBioMech/FERigidSphericalJoint.h"
-#include "FEBioMech/FERigidRevoluteJoint.h"
-#include "FEBioMech/FERigidPrismaticJoint.h"
-#include "FEBioMech/FERigidCylindricalJoint.h"
-#include "FEBioMech/FERigidPlanarJoint.h"
-#include "FEBioMech/FERigidSpring.h"
-#include "FEBioMech/FERigidDamper.h"
-#include "FEBioMech/FERigidAngularDamper.h"
-#include "FEBioMech/FERigidContractileForce.h"
 #include "FEBioMech/FERigidForce.h"
 #include "FECore/BC.h"
 #include "FECore/RigidBC.h"
@@ -26,47 +16,59 @@
 #include <FEBioMech/FEMergedConstraint.h>
 
 //-----------------------------------------------------------------------------
-//!  Parses the boundary section from the xml file
-//!
-void FEBioBoundarySection::Parse(XMLTag& tag)
+void FEBioBoundarySection1x::Parse(XMLTag& tag)
 {
 	if (tag.isleaf()) return;
-
-	int nversion = GetFileReader()->GetFileVersion();
 
 	++tag;
 	do
 	{
-		if (nversion < 0x0200)
-		{
-			if      (tag == "fix"              ) ParseBCFix         (tag);
-			else if (tag == "prescribe"        ) ParseBCPrescribe   (tag);
-			else if (tag == "contact"          ) ParseContactSection(tag);
-			else if (tag == "linear_constraint") ParseConstraints   (tag);
-			else if (tag == "spring"           ) ParseSpringSection (tag);
-			else throw XMLReader::InvalidTag(tag);
-		}
-		else if (nversion == 0x0200)
-		{
-			if      (tag == "fix"              ) ParseBCFix20      (tag);
-			else if (tag == "prescribe"        ) ParseBCPrescribe20(tag);
-			else if (tag == "linear_constraint") ParseConstraints  (tag);
-			else throw XMLReader::InvalidTag(tag);
-		}
-		else if (nversion >= 0x0205)
-		{
-			if      (tag == "fix"              ) ParseBCFix25      (tag);
-			else if (tag == "prescribe"        ) ParseBCPrescribe25(tag);
-			else if (tag == "bc"               ) ParseBC(tag);
-			else if (tag == "rigid"            ) ParseBCRigid(tag);
-			else if (tag == "rigid_body"       ) ParseRigidBody    (tag);
-			else if (tag == "linear_constraint") ParseConstraints  (tag);
-			else if (tag == "periodic_linear_constraint") ParsePeriodicLinearConstraint(tag);
-			else if (tag == "periodic_linear_constraint_2O") ParsePeriodicLinearConstraint2O(tag);
-			else if (tag == "merge") ParseMergeConstraint(tag);
-			else throw XMLReader::InvalidTag(tag);
-		}
+		if      (tag == "fix"              ) ParseBCFix         (tag);
+		else if (tag == "prescribe"        ) ParseBCPrescribe   (tag);
+		else if (tag == "contact"          ) ParseContactSection(tag);
+		else if (tag == "linear_constraint") ParseConstraints   (tag);
+		else if (tag == "spring"           ) ParseSpringSection (tag);
+		else throw XMLReader::InvalidTag(tag);
 		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioBoundarySection2::Parse(XMLTag& tag)
+{
+	if (tag.isleaf()) return;
+
+	++tag;
+	do
+	{
+		if      (tag == "fix"              ) ParseBCFix      (tag);
+		else if (tag == "prescribe"        ) ParseBCPrescribe(tag);
+		else if (tag == "linear_constraint") ParseConstraints(tag);
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioBoundarySection25::Parse(XMLTag& tag)
+{
+	if (tag.isleaf()) return;
+
+	++tag;
+	do
+	{
+		if      (tag == "fix"                          ) ParseBCFix                     (tag);
+		else if (tag == "prescribe"                    ) ParseBCPrescribe               (tag);
+		else if (tag == "bc"                           ) ParseBC                        (tag);
+		else if (tag == "rigid"                        ) ParseBCRigid                   (tag);
+		else if (tag == "rigid_body"                   ) ParseRigidBody                 (tag);
+		else if (tag == "linear_constraint"            ) ParseConstraints               (tag);
+		else if (tag == "periodic_linear_constraint"   ) ParsePeriodicLinearConstraint  (tag);
+		else if (tag == "periodic_linear_constraint_2O") ParsePeriodicLinearConstraint2O(tag);
+		else if (tag == "merge"                        ) ParseMergeConstraint           (tag);
+		else throw XMLReader::InvalidTag(tag);
 	}
 	while (!tag.isend());
 }
@@ -248,7 +250,7 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 
 
 //-----------------------------------------------------------------------------
-void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
+void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
 	DOFS& dofs = fem.GetDOFS();
@@ -349,7 +351,7 @@ void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioBoundarySection::ParseBCFix25(XMLTag &tag)
+void FEBioBoundarySection25::ParseBCFix(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
 	DOFS& dofs = fem.GetDOFS();
@@ -396,10 +398,6 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	DOFS& dofs = fem.GetDOFS();
-
-	int nversion = GetFileReader()->GetFileVersion();
-
-	assert(nversion < 0x0200);
 
 	// see if this tag defines a set
 	const char* szset = tag.AttributeValue("set", true);
@@ -484,16 +482,12 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
+void FEBioBoundarySection2::ParseBCPrescribe(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	DOFS& dofs = fem.GetDOFS();
 	int NN = mesh.Nodes();
-
-	int nversion = GetFileReader()->GetFileVersion();
-
-	assert(nversion >= 0x0200);
 
 	// count how many prescibed nodes there are
 	int ndis = tag.children();
@@ -569,7 +563,7 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 //-----------------------------------------------------------------------------
 //! In version 2.5 all prescribed boundary conditions use a node set to define
 //! the list of nodes to which the bc is applied.
-void FEBioBoundarySection::ParseBCPrescribe25(XMLTag& tag)
+void FEBioBoundarySection25::ParseBCPrescribe(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -600,14 +594,10 @@ void FEBioBoundarySection::ParseBCPrescribe25(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioBoundarySection::ParseBC(XMLTag& tag)
+void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-
-	// double-check the version
-	int nversion = GetFileReader()->GetFileVersion();
-	if (nversion < 0x0205) throw XMLReader::InvalidTag(tag);
 
 	// get the type string
 	const char* sztype = tag.AttributeValue("type");
@@ -787,7 +777,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 	}
 }
 
-void FEBioBoundarySection::ParseMergeConstraint(XMLTag& tag)
+void FEBioBoundarySection25::ParseMergeConstraint(XMLTag& tag)
 {
 	// make sure this is an empty tag
 	if (tag.isempty() == false) throw XMLReader::InvalidValue(tag);
@@ -806,16 +796,17 @@ void FEBioBoundarySection::ParseMergeConstraint(XMLTag& tag)
 	if (dofs.empty()) throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
 	// get the surfaces
-	FEModelBuilder::SurfacePair* sp = GetBuilder()->FindSurfacePair(szsp);
+	FEMesh& mesh = fem.GetMesh();
+	FESurfacePair* sp = mesh.FindSurfacePair(szsp);
 	if (sp == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szsp);
 
 	// merge the interfaces
 	FEMergedConstraint merge(fem);
-	if (merge.Merge(sp->pmaster, sp->pslave, dofs) == false)
+	if (merge.Merge(sp->GetMasterSurface(), sp->GetSlaveSurface(), dofs) == false)
 		throw XMLReader::InvalidTag(tag);
 }
 
-void FEBioBoundarySection::ParsePeriodicLinearConstraint(XMLTag& tag)
+void FEBioBoundarySection25::ParsePeriodicLinearConstraint(XMLTag& tag)
 {
 	FEModel* fem = GetFEModel();
 	FEMesh& mesh = fem->GetMesh();
@@ -831,11 +822,11 @@ void FEBioBoundarySection::ParsePeriodicLinearConstraint(XMLTag& tag)
 			const char* sz = tag.AttributeValue("surface_pair", true);
 			if (sz)
 			{
-				FEModelBuilder::SurfacePair* spair = feb->FindSurfacePair(sz);
+				FESurfacePair* spair = mesh.FindSurfacePair(sz);
 				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", sz);
 
-				FESurface* ms = new FESurface(&mesh); feb->BuildSurface(*ms, *spair->pmaster);
-				FESurface* ss = new FESurface(&mesh); feb->BuildSurface(*ss, *spair->pslave);
+				FESurface* ms = new FESurface(&mesh); feb->BuildSurface(*ms, *spair->GetMasterSurface());
+				FESurface* ss = new FESurface(&mesh); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
 				plc.AddNodeSetPair(ms->GetNodeSet(), ss->GetNodeSet());
 			}
 			else
@@ -873,7 +864,7 @@ void FEBioBoundarySection::ParsePeriodicLinearConstraint(XMLTag& tag)
 
 }
 
-void FEBioBoundarySection::ParsePeriodicLinearConstraint2O(XMLTag& tag)
+void FEBioBoundarySection25::ParsePeriodicLinearConstraint2O(XMLTag& tag)
 {
 	FEModel* fem = GetFEModel();
 	FEMesh& mesh = fem->GetMesh();
@@ -889,11 +880,11 @@ void FEBioBoundarySection::ParsePeriodicLinearConstraint2O(XMLTag& tag)
 			const char* sz = tag.AttributeValue("surface_pair", true);
 			if (sz)
 			{
-				FEModelBuilder::SurfacePair* spair = feb->FindSurfacePair(sz);
+				FESurfacePair* spair = mesh.FindSurfacePair(sz);
 				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", sz);
 
-				FESurface* ms = new FESurface(&mesh); feb->BuildSurface(*ms, *spair->pmaster);
-				FESurface* ss = new FESurface(&mesh); feb->BuildSurface(*ss, *spair->pslave);
+				FESurface* ms = new FESurface(&mesh); feb->BuildSurface(*ms, *spair->GetMasterSurface());
+				FESurface* ss = new FESurface(&mesh); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
 				plc.AddNodeSetPair(ms->GetNodeSet(), ss->GetNodeSet());
 			}
 			else
@@ -1069,86 +1060,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			++tag;
 		}
 	}
-	else if (strcmp(szt, "rigid joint") == 0)
-	{
-		// --- R I G I D   J O I N T   I N T E R F A C E ---
-
-		FERigidJoint* prj = dynamic_cast<FERigidJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
-		ReadParameterList(tag, prj);
-		fem.AddNonlinearConstraint(prj);
-	}
-	else if (strcmp(szt, "rigid spherical joint") == 0)
-	{
-		// --- R I G I D   S P H E R I C A L   J O I N T   I N T E R F A C E ---
-        
-		FERigidSphericalJoint* prj = dynamic_cast<FERigidSphericalJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
-		ReadParameterList(tag, prj);
-		fem.AddNonlinearConstraint(prj);
-	}
-    else if (strcmp(szt, "rigid revolute joint") == 0)
-    {
-        // --- R I G I D   R E V O L U T E  J O I N T   I N T E R F A C E ---
-        
-        FERigidRevoluteJoint* prj = dynamic_cast<FERigidRevoluteJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
-		ReadParameterList(tag, prj);
-		fem.AddNonlinearConstraint(prj);
-    }
-    else if (strcmp(szt, "rigid prismatic joint") == 0)
-    {
-        // --- R I G I D   P R I S M A T I C  J O I N T   I N T E R F A C E ---
-        
-        FERigidPrismaticJoint* prj = dynamic_cast<FERigidPrismaticJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
-		ReadParameterList(tag, prj);
-        fem.AddNonlinearConstraint(prj);
-    }
-    else if (strcmp(szt, "rigid cylindrical joint") == 0)
-    {
-        // --- R I G I D   C Y L I N D R I C A L  J O I N T   I N T E R F A C E ---
-        
-        FERigidCylindricalJoint* prj = dynamic_cast<FERigidCylindricalJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
-		ReadParameterList(tag, prj);
-		fem.AddNonlinearConstraint(prj);
-    }
-    else if (strcmp(szt, "rigid planar joint") == 0)
-    {
-        // --- R I G I D   P L A N A R  J O I N T   I N T E R F A C E ---
-        
-        FERigidPlanarJoint* prj = dynamic_cast<FERigidPlanarJoint*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
-		ReadParameterList(tag, prj);
-		fem.AddNonlinearConstraint(prj);
-    }
-    else if (strcmp(szt, "rigid spring") == 0)
-    {
-        // --- R I G I D   S P R I N G   I N T E R F A C E ---
-        
-        FERigidSpring* prj = dynamic_cast<FERigidSpring*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
-		ReadParameterList(tag, prj);
-		fem.AddNonlinearConstraint(prj);
-    }
-    else if (strcmp(szt, "rigid damper") == 0)
-    {
-        // --- R I G I D   D A M P E R   I N T E R F A C E ---
-        
-        FERigidDamper* prj = dynamic_cast<FERigidDamper*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
-		ReadParameterList(tag, prj);
-		fem.AddNonlinearConstraint(prj);
-    }
-    else if (strcmp(szt, "rigid angular damper") == 0)
-    {
-        // --- R I G I D   A N G U L A R D A M P E R   I N T E R F A C E ---
-        
-        FERigidAngularDamper* prj = dynamic_cast<FERigidAngularDamper*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
-		ReadParameterList(tag, prj);
-		fem.AddNonlinearConstraint(prj);
-    }
-    else if (strcmp(szt, "rigid contractile force") == 0)
-    {
-        // --- R I G I D   C O N T R A C T I L E F O R C E   I N T E R F A C E ---
-        
-        FERigidContractileForce* prj = dynamic_cast<FERigidContractileForce*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
-		ReadParameterList(tag, prj);
-		fem.AddNonlinearConstraint(prj);
-    }
 	else if (strcmp(szt, "linear constraint") == 0)
 	{
 		FEModel& fem = *GetFEModel();
@@ -1214,14 +1125,25 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			// parse the interface
 			ParseContactInterface(tag, pci);
 		}
-		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+		else 
+		{
+			// some nonlinear constraints are also defined in the Contact section, so let's try that next.
+			// TODO: These are mostly rigid constraints. Therefore, I would like to move this elsewhere (maybe in the new Rigid section?)
+			FENLConstraint* pnlc = fecore_new<FENLConstraint>(FENLCLOGDATA_ID, szt, GetFEModel());
+			if (pnlc)
+			{
+				ReadParameterList(tag, pnlc);
+				fem.AddNonlinearConstraint(pnlc);
+			}
+			else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+		}
 	}
 }
 
 //-----------------------------------------------------------------------------
 // Rigid node sets are defined in the Boundary section since version 2.5
 // (Used to be defined in the Contact section)
-void FEBioBoundarySection::ParseBCRigid(XMLTag& tag)
+void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -1257,7 +1179,7 @@ void FEBioBoundarySection::ParseBCRigid(XMLTag& tag)
 
 //-----------------------------------------------------------------------------
 // The rigid body "constraints" are moved to the Boundary section in 2.5
-void FEBioBoundarySection::ParseRigidBody(XMLTag& tag)
+void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FERigidSystem& rigid = *fem.GetRigidSystem();
