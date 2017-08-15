@@ -6,6 +6,13 @@
 class FEBioLoadDataSection : public FEFileSection
 {
 public:
-	FEBioLoadDataSection(FEFileImport* pim) : FEFileSection(pim) {}
+	FEBioLoadDataSection(FEFileImport* pim);
 	void Parse(XMLTag& tag);
+
+	// Set the redefine curves flag.
+	// When this flag is set, curves can be redefined by using an existing ID
+	void SetRedefineCurvesFlag(bool b) { m_redefineCurves = b; }
+
+protected:
+	bool	m_redefineCurves;	// flag to allow redefining curves
 };

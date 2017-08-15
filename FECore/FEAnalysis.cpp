@@ -29,7 +29,6 @@ FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID)
 
 	// --- Analysis data ---
 	m_nanalysis = FE_STATIC;	// do quasi-static analysis
-	m_istiffpr = 1;				// use pressure stiffness
 
 	// --- Time Step Data ---
 	m_ntime = -1;
@@ -652,7 +651,6 @@ void FEAnalysis::Serialize(DumpStream& ar)
 	{
 		// --- analysis data ---
 		ar << m_nanalysis;
-		ar << m_istiffpr;
 		ar << m_bactive;
 
 		// --- Time Step Data ---
@@ -692,6 +690,7 @@ void FEAnalysis::Serialize(DumpStream& ar)
 
 		// Seriaize solver data
 		FESolver* psolver = GetFESolver();
+		const char* szsolver = psolver->GetTypeStr();
 		ar << psolver->GetTypeStr();
 		psolver->Serialize(ar);
 	}
@@ -699,7 +698,6 @@ void FEAnalysis::Serialize(DumpStream& ar)
 	{
 		// --- analysis data ---
 		ar >> m_nanalysis;
-		ar >> m_istiffpr;
 		ar >> m_bactive;
 
 		// --- Time Step Data ---

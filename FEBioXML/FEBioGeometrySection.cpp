@@ -1186,7 +1186,7 @@ void FEBioGeometrySection::ParseEdgeSection(XMLTag& tag)
 	int nsegs = tag.children();
 
 	// allocate storage for segments
-	FESegmentSet* ps = new FESegmentSet;
+	FESegmentSet* ps = new FESegmentSet(&mesh);
 	ps->Create(nsegs);
 	ps->SetName(szname);
 
@@ -1221,12 +1221,15 @@ void FEBioGeometrySection::ParseEdgeSection(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioGeometrySection::ParseSurfacePairSection(XMLTag& tag)
 {
-	FEModelBuilder::SurfacePair p;
-	const char* szname = tag.AttributeValue("name");
-	strcpy(p.szname, szname);
-
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
+
+	// create new surface pair
+	FESurfacePair* p = new FESurfacePair(&mesh);
+
+	// set its name
+	const char* szname = tag.AttributeValue("name");
+	p->SetName(szname);
 
 	++tag;
 	do
@@ -1234,21 +1237,22 @@ void FEBioGeometrySection::ParseSurfacePairSection(XMLTag& tag)
 		if (tag == "master")
 		{
 			const char* sz = tag.AttributeValue("surface");
-			p.pmaster = mesh.FindFacetSet(sz);
-			if (p.pmaster == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+			p->SetMasterSurface(mesh.FindFacetSet(sz));
+			if (p->GetMasterSurface() == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 		}
 		else if (tag == "slave")
 		{
 			const char* sz = tag.AttributeValue("surface");
-			p.pslave = mesh.FindFacetSet(sz);
-			if (p.pslave == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+			p->SetSlaveSurface(mesh.FindFacetSet(sz));
+			if (p->GetSlaveSurface() == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());
 
-	GetBuilder()->AddSurfacePair(p);
+	// add it to the mesh
+	mesh.AddSurfacePair(p);
 }
 
 //-----------------------------------------------------------------------------

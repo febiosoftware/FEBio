@@ -766,8 +766,10 @@ bool FEMultiphasicSolver::StiffnessMatrix(const FETimeInfo& tp)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
 
-		// respect the pressure stiffness flag
-		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(tp, this); 
+		if (psl->IsActive())
+		{
+			psl->StiffnessMatrix(tp, this); 
+		}
 	}
 
 	// calculate nonlinear constraint stiffness

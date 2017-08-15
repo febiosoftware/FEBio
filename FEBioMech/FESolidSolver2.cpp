@@ -956,9 +956,7 @@ bool FESolidSolver2::StiffnessMatrix(const FETimeInfo& tp)
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
 		if (psl->IsActive())
 		{
-			// respect the pressure stiffness flag
-			// TODO: Find a different solution for this. Maybe I can pass the flag to the pressure load?
-			if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(tp, this); 
+			psl->StiffnessMatrix(tp, this); 
 		}
 	}
 

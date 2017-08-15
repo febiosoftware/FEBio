@@ -161,6 +161,23 @@ FENode* FENodeSet::Node(int i)
 	return &m_pmesh->Node(m_Node[i]); 
 }
 
+//-----------------------------------------------------------------------------
+void FENodeSet::Serialize(DumpStream& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_nID;
+		ar << m_szname;
+		ar << m_Node;
+	}
+	else
+	{
+		ar >> m_nID;
+		ar >> m_szname;
+		ar >> m_Node;
+	}
+}
+
 //=============================================================================
 // FEDiscreteSet
 //-----------------------------------------------------------------------------
@@ -187,6 +204,21 @@ void FEDiscreteSet::add(int n0, int n1)
 void FEDiscreteSet::SetName(const char* sz)
 {
 	strcpy(m_szname, sz); 
+}
+
+//-----------------------------------------------------------------------------
+void FEDiscreteSet::Serialize(DumpStream& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_szname;
+		ar << m_pair;
+	}
+	else
+	{
+		ar >> m_szname;
+		ar >> m_pair;
+	}
 }
 
 //=============================================================================
@@ -244,10 +276,25 @@ FENodeSet FEFacetSet::GetNodeSet()
 	return set;
 }
 
+//-----------------------------------------------------------------------------
+void FEFacetSet::Serialize(DumpStream& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_szname;
+		ar << m_Face;
+	}
+	else
+	{
+		ar >> m_szname;
+		ar >> m_Face;
+	}
+}
+
 //=============================================================================
 // FESegmentSet
 //-----------------------------------------------------------------------------
-FESegmentSet::FESegmentSet()
+FESegmentSet::FESegmentSet(FEMesh* pm) : m_mesh(pm)
 {
 	m_szname[0] = 0;
 }
@@ -270,6 +317,21 @@ void FESegmentSet::SetName(const char* sz)
 	strcpy(m_szname, sz); 
 }
 
+//-----------------------------------------------------------------------------
+void FESegmentSet::Serialize(DumpStream& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_szname;
+		ar << m_Seg;
+	}
+	else
+	{
+		ar >> m_szname;
+		ar >> m_Seg;
+	}
+}
+
 //=============================================================================
 // FEElementSet
 //-----------------------------------------------------------------------------
@@ -289,6 +351,104 @@ void FEElementSet::create(int n)
 void FEElementSet::SetName(const char* sz)
 {
 	strcpy(m_szname, sz); 
+}
+
+//-----------------------------------------------------------------------------
+void FEElementSet::Serialize(DumpStream& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_szname;
+		ar << m_Elem;
+	}
+	else
+	{
+		ar >> m_szname;
+		ar >> m_Elem;
+	}
+}
+
+//=============================================================================
+FESurfacePair::FESurfacePair(FEMesh* pm) : m_mesh(pm)
+{
+	m_master = 0;
+	m_slave = 0;
+}
+
+void FESurfacePair::SetName(const char* szname)
+{
+	strcpy(m_szname, szname);
+}
+
+const char* FESurfacePair::GetName() const
+{
+	return m_szname;
+}
+
+FEFacetSet* FESurfacePair::GetMasterSurface()
+{
+	return m_master;
+}
+
+void FESurfacePair::SetMasterSurface(FEFacetSet* pf)
+{
+	m_master = pf;
+}
+
+FEFacetSet* FESurfacePair::GetSlaveSurface()
+{
+	return m_slave;
+}
+
+void FESurfacePair::SetSlaveSurface(FEFacetSet* pf)
+{
+	m_slave = pf;
+}
+
+void FESurfacePair::Serialize(DumpStream& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_szname;
+
+		if (m_master)
+		{
+			ar << (int) 1;
+			ar << m_master->GetName();
+		}
+		else ar << (int) 0;
+
+		if (m_slave)
+		{
+			ar << (int) 1;
+			ar << m_slave->GetName();
+		}
+		else ar << (int) 0;
+	}
+	else
+	{
+		ar >> m_szname;
+
+		// NOTE: This assumes that facet sets have already been serialized!!
+		int flag = 0;
+		ar >> flag;
+		if (flag == 1)
+		{
+			char sz[256] = {0};
+			ar >> sz;
+			m_master = m_mesh->FindFacetSet(sz); assert(m_master);
+		}
+		else m_master = 0;
+
+		ar >> flag;
+		if (flag == 1)
+		{
+			char sz[256] = {0};
+			ar >> sz;
+			m_slave = m_mesh->FindFacetSet(sz); assert(m_slave);
+		}
+		else m_slave = 0;
+	}
 }
 
 //=============================================================================
@@ -395,6 +555,60 @@ void FEMesh::Serialize(DumpStream& ar)
 				ar << d.GetTypeStr() << d.Elements();
 				d.Serialize(ar);
 			}
+
+			// write node sets
+			int nsets = NodeSets();
+			ar << nsets;
+			for (int i=0; i<nsets; ++i)
+			{
+				FENodeSet* nset = NodeSet(i);
+				nset->Serialize(ar);
+			}
+
+			// write segment sets
+			int ssets = SegmentSets();
+			ar << ssets;
+			for (int i=0; i<ssets; ++i)
+			{
+				FESegmentSet& sset = SegmentSet(i);
+				sset.Serialize(ar);
+			}
+
+			// write facet sets
+			int fsets = FacetSets();
+			ar << fsets;
+			for (int i=0; i<fsets; ++i)
+			{
+				FEFacetSet& fset = FacetSet(i);
+				fset.Serialize(ar);
+			}
+
+			// write element sets
+			int esets = ElementSets();
+			ar << esets;
+			for (int i=0; i<esets; ++i)
+			{
+				FEElementSet& eset = ElementSet(i);
+				eset.Serialize(ar);
+			}
+
+			// write discrete sets
+			int dsets = DiscreteSets();
+			ar << dsets;
+			for (int i=0; i<dsets; ++i)
+			{
+				FEDiscreteSet& dset = DiscreteSet(i);
+				dset.Serialize(ar);
+			}
+
+			// write surface pairs
+			int spairs = SurfacePairs();
+			ar << spairs;
+			for (int i=0; i<spairs; ++i)
+			{
+				FESurfacePair& sp = SurfacePair(i);
+				sp.Serialize(ar);
+			}
 		}
 		else
 		{
@@ -442,6 +656,66 @@ void FEMesh::Serialize(DumpStream& ar)
 				pd->Serialize(ar);
 
 				AddDomain(pd);
+			}
+
+			// read node sets
+			int nsets = 0;
+			ar >> nsets;
+			for (int i = 0; i<nsets; ++i)
+			{
+				FENodeSet* nset = new FENodeSet(this);
+				AddNodeSet(nset);
+				nset->Serialize(ar);
+			}
+
+			// read segment sets
+			int ssets = 0;
+			ar >> ssets;
+			for (int i=0; i<ssets; ++i)
+			{
+				FESegmentSet* sset = new FESegmentSet(this);
+				AddSegmentSet(sset);
+				sset->Serialize(ar);
+			}
+
+			// read facet sets
+			int fsets = 0;
+			ar >> fsets;
+			for (int i=0; i<fsets; ++i)
+			{
+				FEFacetSet* fset = new FEFacetSet(this);
+				AddFacetSet(fset);
+				fset->Serialize(ar);
+			}
+
+			// read element sets
+			int esets = 0;
+			ar >> esets;
+			for (int i=0; i<esets; ++i)
+			{
+				FEElementSet* eset = new FEElementSet(this);
+				AddElementSet(eset);
+				eset->Serialize(ar);
+			}
+
+			// read discrete sets
+			int dsets = 0;
+			ar >> dsets;
+			for (int i=0; i<dsets; ++i)
+			{
+				FEDiscreteSet* dset = new FEDiscreteSet(this);
+				AddDiscreteSet(dset);
+				dset->Serialize(ar);
+			}
+
+			// read surface pairs
+			int spairs = 0;
+			ar >> spairs;
+			for (int i=0; i<spairs; ++i)
+			{
+				FESurfacePair* sp = new FESurfacePair(this);
+				AddSurfacePair(sp);
+				sp->Serialize(ar);
 			}
 
 			UpdateBox();
@@ -1025,6 +1299,13 @@ FEDiscreteSet* FEMesh::FindDiscreteSet(const char* szname)
 FEElementSet* FEMesh::FindElementSet(const char* szname)
 {
 	for (size_t i=0; i<m_ElemSet.size(); ++i) if (strcmp(m_ElemSet[i]->GetName(), szname) == 0) return m_ElemSet[i];
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+FESurfacePair* FEMesh::FindSurfacePair(const char* szname)
+{
+	for (size_t i = 0; i<m_SurfPair.size(); ++i) if (strcmp(m_SurfPair[i]->GetName(), szname) == 0) return m_SurfPair[i];
 	return 0;
 }
 

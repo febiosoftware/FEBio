@@ -7,13 +7,6 @@
 class FEModelBuilder
 {
 public:
-	struct SurfacePair
-	{
-		char		szname[256];
-		FEFacetSet*	pmaster;
-		FEFacetSet*	pslave;
-	};
-
 	struct NodeSetPair
 	{
 		char		szname[256];
@@ -75,9 +68,6 @@ public:
 	void AddRigidNodeSet            (FERigidNodeSet* rs);
 
 public:
-	void AddSurfacePair(SurfacePair& p) { m_surfacePair.push_back(p); }
-	SurfacePair* FindSurfacePair(const char* szname);
-
 	void AddNodeSetPair(NodeSetPair& p) { m_nsetPair.push_back(p); }
 	NodeSetPair* FindNodeSetPair(const char* szname);
 
@@ -123,7 +113,6 @@ public:
 	FE_Element_Type		m_nquad9;	//!< quad9 integration rule
 
 protected:
-	vector<SurfacePair>	m_surfacePair;
 	vector<NodeSetPair>	m_nsetPair;
 	vector<NodeSetSet>	m_nsetSet;
 

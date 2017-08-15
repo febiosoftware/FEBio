@@ -32,7 +32,6 @@ void FERestartControlSection::Parse(XMLTag& tag)
 //		else if (tag == "max_refs"          ) tag.value(pstep->m_psolver->m_pbfgs->m_maxref);
 //		else if (tag == "max_ups"           ) tag.value(pstep->m_psolver->m_pbfgs->m_maxups);
 //		else if (tag == "cmax"              ) tag.value(pstep->m_psolver->m_pbfgs->m_cmax);
-		else if (tag == "pressure_stiffness") tag.value(pstep->m_istiffpr);
 		else if (tag == "restart" ) 
 		{
 //			const char* szf = tag.AttributeValue("file", true);
@@ -113,8 +112,15 @@ bool FERestartImport::Parse(const char* szfile)
 	m_szdmp[0] = 0;
 
 	m_map["Control" ] = new FERestartControlSection(this);
-	m_map["LoadData"] = new FEBioLoadDataSection   (this);
-	m_map["Step"    ] = new FEBioStepSection25     (this);
+
+	// make sure we can redefine curves in the LoadData section
+	FEBioLoadDataSection* lcSection = new FEBioLoadDataSection(this);
+	lcSection->SetRedefineCurvesFlag(true);
+
+	m_map["LoadData"] = lcSection;
+
+	// set the file version to make sure we are using the correct format
+	SetFileVerion(0x0205);
 
 	// loop over child tags
 	try
@@ -131,7 +137,13 @@ bool FERestartImport::Parse(const char* szfile)
 
 		if (nversion == -1) return errf("FATAL ERROR: Incorrect restart file version\n");
 
-		// the next tag has to be the archive
+		// Add the Step section for version 2
+		if (nversion == 2)
+		{
+			m_map["Step"] = new FEBioStepSection25(this);
+		}
+
+		// the first section has to be the archive
 		++tag;
 		if (tag != "Archive") return errf("FATAL ERROR: The first element must be the archive name\n");
 		char szar[256];
@@ -144,7 +156,7 @@ bool FERestartImport::Parse(const char* szfile)
 		// read the archive
 		fem.Serialize(ar);
 
-		// read the restart data
+		// read the rest of the restart input file
 		m_map.Parse(tag);
 	}
 	catch (XMLReader::Error& e)

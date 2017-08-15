@@ -242,15 +242,6 @@ bool FEModelBuilder::BuildSurface(FESurface& s, FEFacetSet& fs)
 	return true;
 }
 
-
-//-----------------------------------------------------------------------------
-FEModelBuilder::SurfacePair* FEModelBuilder::FindSurfacePair(const char* szname)
-{
-	for (int i = 0; i<m_surfacePair.size(); ++i)
-		if (strcmp(m_surfacePair[i].szname, szname) == 0) return &m_surfacePair[i];
-	return 0;
-}
-
 //-----------------------------------------------------------------------------
 FEModelBuilder::NodeSetPair* FEModelBuilder::FindNodeSetPair(const char* szname)
 {

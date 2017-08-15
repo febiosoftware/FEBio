@@ -122,7 +122,6 @@ public:
 	// --- Control Data ---
 	//{
 		int		m_nanalysis;	//!< analysis type
-		int		m_istiffpr;		//!< calculate pressure stiffness \todo remove
 	//}
 
 	// --- Time Step Data ---

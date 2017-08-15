@@ -142,12 +142,15 @@ public:
 
 	FENode* Node(int i);
 
+	void Serialize(DumpStream& ar);
+
 protected:
-	FEMesh*	m_pmesh;
+	int			m_nID;
+	char		m_szname[256];
 	vector<int>	m_Node;		//!< list of nodes
 
-	int	m_nID;
-	char	m_szname[256];
+protected:
+	FEMesh*	m_pmesh;
 };
 
 //-----------------------------------------------------------------------------
@@ -171,6 +174,8 @@ public:
 	const char* GetName() const { return m_szname; }
 
 	const NodePair& Element(int i) const { return m_pair[i]; }	
+
+	void Serialize(DumpStream& ar);
 
 private:
 	FEMesh*				m_pmesh;
@@ -204,9 +209,13 @@ public:
 
 	FENodeSet GetNodeSet();
 
-public:
-	vector<FACET>	m_Face;
+	void Serialize(DumpStream& ar);
+
+private:
 	char			m_szname[256];
+	vector<FACET>	m_Face;
+
+private:
 	FEMesh*			m_mesh;
 };
 
@@ -222,7 +231,7 @@ public:
 	};
 
 public:
-	FESegmentSet();
+	FESegmentSet(FEMesh* pm);
 	const char* GetName() { return m_szname; }
 	void SetName(const char* sz);
 
@@ -231,9 +240,12 @@ public:
 	int Segments() { return (int) m_Seg.size(); }
 	SEGMENT& Segment(int i);
 
-public:
+	void Serialize(DumpStream& ar);
+
+private:
 	vector<SEGMENT>	m_Seg;
 	char			m_szname[256];
+	FEMesh*			m_mesh;
 };
 
 //-----------------------------------------------------------------------------
@@ -253,10 +265,36 @@ public:
 	void SetName(const char* sz);
 	const char* GetName() { return m_szname; }
 
+	void Serialize(DumpStream& ar);
+
 protected:
 	char		m_szname[256];	//!< name of element set
 	FEMesh*		m_pmesh;		//!< pointer to parent mesh
 	vector<int>	m_Elem;			//!< list of elements
+};
+
+//-----------------------------------------------------------------------------
+class FESurfacePair
+{
+public:
+	FESurfacePair(FEMesh* pm);
+
+	void SetName(const char* szname);
+	const char* GetName() const;
+
+	FEFacetSet* GetMasterSurface();
+	void SetMasterSurface(FEFacetSet* pf);
+
+	FEFacetSet* GetSlaveSurface();
+	void SetSlaveSurface(FEFacetSet* pf);
+
+	void Serialize(DumpStream& ar);
+
+private:
+	char	m_szname[256];
+	FEFacetSet*	m_master;
+	FEFacetSet*	m_slave;
+	FEMesh*		m_mesh;
 };
 
 //-----------------------------------------------------------------------------
@@ -417,6 +455,12 @@ public:
 	void AddDiscreteSet(FEDiscreteSet* ps) { m_DiscSet.push_back(ps); }
 	FEDiscreteSet* FindDiscreteSet(const char* szname);
 
+	// --- surface pairs ---
+	int SurfacePairs() { return (int)m_SurfPair.size(); }
+	FESurfacePair& SurfacePair(int n) { return *m_SurfPair[n]; }
+	void AddSurfacePair(FESurfacePair* ps) { m_SurfPair.push_back(ps); }
+	FESurfacePair* FindSurfacePair(const char* szname);
+
 public:
 	//! Calculate the surface representing the element boundaries
 	//! boutside : include all exterior facets
@@ -456,6 +500,7 @@ protected:
 	vector<FEFacetSet*>		m_FaceSet;	//!< facet sets
 	vector<FEElementSet*>	m_ElemSet;	//!< element sets
 	vector<FEDiscreteSet*>	m_DiscSet;	//!< discrete element sets
+	vector<FESurfacePair*>	m_SurfPair;	//!< facet set pairs
 
 	FEBoundingBox		m_box;	//!< bounding box
 

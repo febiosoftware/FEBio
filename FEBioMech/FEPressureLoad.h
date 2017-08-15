@@ -51,6 +51,7 @@ protected:
     bool            m_bshellb; //!< flag for prescribing pressure on shell bottom
 	double			m_pressure;	//!< pressure value
 	bool			m_bsymm;	//!< use symmetric formulation
+	bool			m_bstiff;	//!< use stiffness or not
 	FESurfaceMap	m_PC;		//!< pressure scale factors
 
 	// degrees of freedom

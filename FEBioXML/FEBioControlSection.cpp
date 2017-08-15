@@ -54,7 +54,6 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	else if (tag == "final_time"        ) tag.value(pstep->m_final_time);
 	else if (tag == "step_size"         ) { tag.value(pstep->m_dt0); pstep->m_dt = pstep->m_dt0; pstep->m_dtp = pstep->m_dt0; }
 	else if (tag == "optimize_bw"       ) { tag.value(b); fem.SetOptimizeBandwidth(b); }
-	else if (tag == "pressure_stiffness") tag.value(pstep->m_istiffpr);
 	else if (tag == "hourglass"         ) tag.value(fem.m_udghex_hg);
 	else if (tag == "analysis")
 	{
@@ -326,14 +325,12 @@ bool FEStepControlSection::ParseCommonParams(XMLTag& tag)
 
 	FEModel& fem = *GetFEModel();
 	FEAnalysis* pstep = GetBuilder()->GetStep();
-	char sztitle[256];
 	bool b;
 
 	if      (tag == "time_steps") tag.value(pstep->m_ntime);
 	else if (tag == "final_time") tag.value(pstep->m_final_time);
 	else if (tag == "step_size") { tag.value(pstep->m_dt0); pstep->m_dt = pstep->m_dt0; pstep->m_dtp = pstep->m_dt0; }
 	else if (tag == "optimize_bw") { tag.value(b); fem.SetOptimizeBandwidth(b); }
-	else if (tag == "pressure_stiffness") tag.value(pstep->m_istiffpr);
 	else if (tag == "analysis")
 	{
 		XMLAtt& att = tag.Attribute("type");

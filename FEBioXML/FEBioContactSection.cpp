@@ -185,12 +185,12 @@ void FEBioContactSection::ParseContactInterface25(XMLTag& tag, FESurfacePairInte
 
 	// get the surface pair
 	const char* szpair = tag.AttributeValue("surface_pair");
-	FEModelBuilder::SurfacePair* surfacePair = GetBuilder()->FindSurfacePair(szpair);
+	FESurfacePair* surfacePair = m.FindSurfacePair(szpair);
 	if (surfacePair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
 
 	// build the surfaces
-	if (BuildSurface(*pci->GetMasterSurface(), *surfacePair->pmaster, pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
-	if (BuildSurface(*pci->GetSlaveSurface (), *surfacePair->pslave , pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
+	if (BuildSurface(*pci->GetMasterSurface(), *surfacePair->GetMasterSurface(), pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
+	if (BuildSurface(*pci->GetSlaveSurface (), *surfacePair->GetSlaveSurface() , pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
 
 	// get the parameter list
 	FEParameterList& pl = pci->GetParameterList();

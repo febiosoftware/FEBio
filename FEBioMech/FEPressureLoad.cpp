@@ -9,6 +9,7 @@ BEGIN_PARAMETER_LIST(FEPressureLoad, FESurfaceLoad)
     ADD_PARAMETER(m_bshellb , FE_PARAM_BOOL  , "shell_bottom");
 	ADD_PARAMETER(m_pressure, FE_PARAM_DOUBLE, "pressure");
 	ADD_PARAMETER(m_bsymm   , FE_PARAM_BOOL  , "symmetric_stiffness");
+	ADD_PARAMETER(m_bstiff  , FE_PARAM_BOOL  , "pressure_stiffness");
 	ADD_PARAMETER(m_PC      , FE_PARAM_DATA_ARRAY, "value");
 END_PARAMETER_LIST()
 
@@ -20,6 +21,7 @@ FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOU
     m_bshellb = false;
 	m_pressure = 0.0;
 	m_bsymm = true;
+	m_bstiff = true;
 
 	m_PC.set(1.0);
 
@@ -313,6 +315,9 @@ void FEPressureLoad::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 {
 	// We only need the stiffness for nonlinear pressure forces
 	if (m_blinear) return;
+
+	// unless of course we don't want it at all
+	if (m_bstiff == false) return;
 
 	matrix ke;
 	vector<int> lm;

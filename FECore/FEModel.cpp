@@ -1302,7 +1302,6 @@ void FEModel::CopyFrom(FEModel& fem)
 
 		// copy additional info
 		pnew->m_nanalysis = ps->m_nanalysis;
-		pnew->m_istiffpr = ps->m_istiffpr;
 
 		pnew->m_ntime		= ps->m_ntime;
 		pnew->m_final_time	= ps->m_final_time;
