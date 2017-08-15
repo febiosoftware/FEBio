@@ -6,18 +6,7 @@
 #include <FECore/FECoreKernel.h>
 
 //-----------------------------------------------------------------------------
-//! Read the Initial from the FEBio input file
-//!
 void FEBioInitialSection::Parse(XMLTag& tag)
-{
-	if (tag.isleaf()) return;
-
-	int nversion = m_pim->Version();
-	if (nversion < 0x0205) ParseInitialSection(tag);
-	else ParseInitialSection25(tag);
-}
-
-void FEBioInitialSection::ParseInitialSection(XMLTag& tag)
 {
 	if (tag.isleaf()) return;
 
@@ -39,23 +28,18 @@ void FEBioInitialSection::ParseInitialSection(XMLTag& tag)
 			const int dof_VZ = dofs.GetDOF("vz");
 			FEInitialBCVec3D* pic = dynamic_cast<FEInitialBCVec3D*>(fecore_new<FEInitialCondition>(FEIC_ID, "init_bc_vec3d", &fem));
 			pic->SetDOF(dof_VX, dof_VY, dof_VZ);
-			fem.AddInitialCondition(pic);
 
-			// add this boundary condition to the current step
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(pic);
-				pic->Deactivate();
-			}
+			// add it to the model
+			GetBuilder()->AddInitialCondition(pic);
 
 			++tag;
 			do
 			{
 				if (tag == "node")
 				{
-					int nid = m_pim->ReadNodeID(tag);
+					int nid = ReadNodeID(tag);
 					vec3d v;
-					m_pim->value(tag, v);
+					value(tag, v);
 
 					pic->Add(nid, v);
 				}
@@ -75,18 +59,14 @@ void FEBioInitialSection::ParseInitialSection(XMLTag& tag)
 				++tag;
 				do
 				{
-					if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+					if (ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
 					++tag;
 				}
 				while (!tag.isend());
 			}
 			
-			fem.AddInitialCondition(pic);
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(pic);
-				pic->Deactivate();
-			}
+			// add it to the model
+			GetBuilder()->AddInitialCondition(pic);
 		}
 		else
 		{
@@ -121,13 +101,8 @@ void FEBioInitialSection::ParseInitialSection(XMLTag& tag)
 			FEInitialBC* pic = dynamic_cast<FEInitialBC*>(fecore_new<FEInitialCondition>(FEIC_ID, "init_bc", &fem));
 			pic->SetDOF(ndof);
 
-			// add this boundary condition to the current step
-			fem.AddInitialCondition(pic);
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(pic);
-				pic->Deactivate();
-			}
+			// add it to the model
+			GetBuilder()->AddInitialCondition(pic);
 
 			// read the node list and values
 			++tag;
@@ -135,9 +110,9 @@ void FEBioInitialSection::ParseInitialSection(XMLTag& tag)
 			{
 				if (tag == "node")
 				{
-					int nid = m_pim->ReadNodeID(tag);
+					int nid = ReadNodeID(tag);
 					double p;
-					m_pim->value(tag, p);
+					value(tag, p);
 					pic->Add(nid, p);
 				}
 				else throw XMLReader::InvalidTag(tag);
@@ -151,7 +126,7 @@ void FEBioInitialSection::ParseInitialSection(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioInitialSection::ParseInitialSection25(XMLTag& tag)
+void FEBioInitialSection25::Parse(XMLTag& tag)
 {
 	if (tag.isleaf()) return;
 
@@ -183,41 +158,21 @@ void FEBioInitialSection::ParseInitialSection25(XMLTag& tag)
 			pic->SetDOF(ndof);
 			pic->SetNodes(*pns);
 
-			// add this boundary condition to the current step
-			fem.AddInitialCondition(pic);
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(pic);
-				pic->Deactivate();
-			}
+			// add it to the model
+			GetBuilder()->AddInitialCondition(pic);
 
 			// read parameters
-			FEParameterList& pl = pic->GetParameterList();
-			m_pim->ReadParameterList(tag, pl);
+			ReadParameterList(tag, pic);
 		}
 		else if (tag == "ic")
 		{
 			const char* sztype = tag.AttributeValue("type");
 			FEInitialCondition* pic = dynamic_cast<FEInitialCondition*>(fecore_new<FEInitialCondition>(FEIC_ID, sztype, &fem));
 
-			if (tag.isleaf() == false)
-			{
-				FEParameterList& pl = pic->GetParameterList();
-				++tag;
-				do
-				{
-					if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-					++tag;
-				}
-				while (!tag.isend());
-			}
+			ReadParameterList(tag, pic);
 			
-			fem.AddInitialCondition(pic);
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(pic);
-				pic->Deactivate();
-			}
+			// add it to the model
+			GetBuilder()->AddInitialCondition(pic);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

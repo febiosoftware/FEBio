@@ -9,11 +9,23 @@
 #include <FECore/RigidBC.h>
 
 //-----------------------------------------------------------------------------
+FEBioContactSection::MissingSlaveSurface::MissingSlaveSurface()
+{
+	SetErrorString("Missing contact slave surface");
+}
+
+//-----------------------------------------------------------------------------
+FEBioContactSection::MissingMasterSurface::MissingMasterSurface()
+{
+	SetErrorString("Missing contact master surface");
+}
+
+//-----------------------------------------------------------------------------
 //! Parse the Contact section (new in version 2.0)
 void FEBioContactSection::Parse(XMLTag& tag)
 {
 	// make sure that the version is 2.x
-	int nversion = m_pim->Version();
+	int nversion = GetFileReader()->GetFileVersion();
 	if (nversion < 0x0200) throw XMLReader::InvalidTag(tag);
 
 	// make sure there are children
@@ -58,17 +70,10 @@ void FEBioContactSection::Parse(XMLTag& tag)
 				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, sztype, &fem));
 				if (pci)
 				{
-					fem.AddSurfacePairInteraction(pci);
+					GetBuilder()->AddContactInterface(pci);
 
-					if (m_pim->Version() <= 0x0200) ParseContactInterface(tag, pci);
+					if (nversion <= 0x0200) ParseContactInterface(tag, pci);
 					else ParseContactInterface25(tag, pci);
-
-					// add this boundary condition to the current step
-					if (m_pim->m_nsteps > 0)
-					{
-						GetStep()->AddModelComponent(pci);
-						pci->Deactivate();
-					}
 				}
 				else
 				{
@@ -78,22 +83,11 @@ void FEBioContactSection::Parse(XMLTag& tag)
 					// now it is preferred that they are defined in the Constraints section. For backward
 					// compatibility we still allow constraints to be defined in this section. 
 					FENLConstraint* pc = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, &fem);
-					if (pc && (m_pim->Version() <= 0x0200))
+					if (pc && (nversion <= 0x0200))
 					{
-						FEParameterList& pl = pc->GetParameterList();
-						++tag;
-						do
-						{
-							if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-							++tag;
-						}
-						while (!tag.isend());
-						fem.AddNonlinearConstraint(pc);
-						if (m_pim->m_nsteps > 0)
-						{
-							GetStep()->AddModelComponent(pc);
-							pc->Deactivate();
-						}
+						ReadParameterList(tag, pc);
+
+						GetBuilder()->AddNonlinearConstraint(pc);
 					}
 					else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 				}
@@ -119,7 +113,7 @@ void FEBioContactSection::ParseContactInterface(XMLTag& tag, FESurfacePairIntera
 	++tag;
 	do
 	{
-		if (m_pim->ReadParameter(tag, pl) == false)
+		if (ReadParameter(tag, pl) == false)
 		{
 			if (tag == "surface")
 			{
@@ -179,8 +173,8 @@ void FEBioContactSection::ParseContactInterface(XMLTag& tag, FESurfacePairIntera
 	while (!tag.isend());
 
 	// Make sure we have a master and a slave interface
-	FESurface* pss = pci->GetSlaveSurface (); if ((pss == 0) || (pss->Elements()==0)) throw FEBioImport::MissingSlaveSurface ();
-	FESurface* pms = pci->GetMasterSurface(); if ((pms == 0) || (pms->Elements()==0)) throw FEBioImport::MissingMasterSurface();
+	FESurface* pss = pci->GetSlaveSurface (); if ((pss == 0) || (pss->Elements()==0)) throw MissingSlaveSurface ();
+	FESurface* pms = pci->GetMasterSurface(); if ((pms == 0) || (pms->Elements()==0)) throw MissingMasterSurface();
 }
 
 //-----------------------------------------------------------------------------
@@ -191,7 +185,7 @@ void FEBioContactSection::ParseContactInterface25(XMLTag& tag, FESurfacePairInte
 
 	// get the surface pair
 	const char* szpair = tag.AttributeValue("surface_pair");
-	FEBioImport::SurfacePair* surfacePair = m_pim->FindSurfacePair(szpair);
+	FEModelBuilder::SurfacePair* surfacePair = GetBuilder()->FindSurfacePair(szpair);
 	if (surfacePair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
 
 	// build the surfaces
@@ -200,12 +194,12 @@ void FEBioContactSection::ParseContactInterface25(XMLTag& tag, FESurfacePairInte
 
 	// get the parameter list
 	FEParameterList& pl = pci->GetParameterList();
-	m_pim->ReadParameterList(tag, pl);
+	ReadParameterList(tag, pl);
 
 	// Make sure we have a master and a slave interface
-	FESurface* pss = pci->GetSlaveSurface (); if ((pss == 0) || (pss->Elements()==0)) throw FEBioImport::MissingSlaveSurface ();
+	FESurface* pss = pci->GetSlaveSurface (); if ((pss == 0) || (pss->Elements()==0)) throw MissingSlaveSurface ();
 	m.AddSurface(pss);
-	FESurface* pms = pci->GetMasterSurface(); if ((pms == 0) || (pms->Elements()==0)) throw FEBioImport::MissingMasterSurface();
+	FESurface* pms = pci->GetMasterSurface(); if ((pms == 0) || (pms->Elements()==0)) throw MissingMasterSurface();
 	m.AddSurface(pms);
 }
 
@@ -235,7 +229,7 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 			}
 		}
 
-		if (m_pim->ReadParameter(tag, ps) == false)
+		if (ReadParameter(tag, ps) == false)
 		{
 			if (tag == "surface")
 			{
@@ -276,8 +270,7 @@ void FEBioContactSection::ParseRigidWall25(XMLTag& tag)
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 	if (BuildSurface(ps->m_ss, *pface, ps->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 
-	FEParameterList& pl = ps->GetParameterList();
-	m_pim->ReadParameterList(tag, pl);
+	ReadParameterList(tag, ps);
 }
 
 //-----------------------------------------------------------------------------
@@ -296,8 +289,7 @@ void FEBioContactSection::ParseRigidSliding(XMLTag& tag)
 	if (BuildSurface(*ps->GetSlaveSurface(), *pface, false) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 	mesh.AddSurface(ps->GetSlaveSurface());
 
-	FEParameterList& pl = ps->GetParameterList();
-	m_pim->ReadParameterList(tag, pl);
+	ReadParameterList(tag, ps);
 }
 
 //-----------------------------------------------------------------------------
@@ -329,12 +321,8 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 		{
 			prn = new FERigidNodeSet(&fem);
 			prn->SetRigidID(rb);
-			rigid.AddRigidNodeSet(prn);
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(prn);
-				prn->Deactivate();
-			}
+
+			GetBuilder()->AddRigidNodeSet(prn);
 			rbp = rb;
 		}
 		prn->AddNode(id);
@@ -373,7 +361,7 @@ void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 				if (tag == "node")
 				{
 					tag.value(dof.val);
-					dof.node = m_pim->ReadNodeID(tag);
+					dof.node = ReadNodeID(tag);
 
 					const char* szbc = tag.AttributeValue("bc");
                     int ndof = dofs.GetDOF(szbc);
@@ -390,7 +378,7 @@ void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 			// add the linear constraint to the system
 			pLCS->add(pLC);
 		}
-		else if (m_pim->ReadParameter(tag, pLCS) == false)
+		else if (ReadParameter(tag, pLCS) == false)
 		{
 			throw XMLReader::InvalidTag(tag);
 		}
@@ -416,6 +404,8 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 	// allocate storage for faces
 	s.Create(faces);
 
+	FEModelBuilder* feb = GetBuilder();
+
 	// read faces
 	++tag;
 	for (int i=0; i<faces; ++i)
@@ -435,10 +425,10 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 		else
 		{
 			if      (tag == "quad4") el.SetType(FE_QUAD4G4);
-			else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
-			else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
-			else if (tag == "tri7" ) el.SetType(m_pim->m_ntri7);
-			else if (tag == "tri10") el.SetType(m_pim->m_ntri10);
+			else if (tag == "tri3" ) el.SetType(feb->m_ntri3);
+			else if (tag == "tri6" ) el.SetType(feb->m_ntri6);
+			else if (tag == "tri7" ) el.SetType(feb->m_ntri7);
+			else if (tag == "tri10") el.SetType(feb->m_ntri10);
 			else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 			else if (tag == "quad9") el.SetType(FE_QUAD9G9);
 			else throw XMLReader::InvalidTag(tag);
@@ -491,6 +481,8 @@ bool FEBioContactSection::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal
 	// allocate storage for faces
 	s.Create(faces);
 
+	FEModelBuilder* feb = GetBuilder();
+
 	// read faces
 	for (int i=0; i<faces; ++i)
 	{
@@ -510,10 +502,10 @@ bool FEBioContactSection::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal
 		else
 		{
 			if      (fi.ntype ==  4) el.SetType(FE_QUAD4G4);
-			else if (fi.ntype ==  3) el.SetType(m_pim->m_ntri3);
-			else if (fi.ntype ==  6) el.SetType(m_pim->m_ntri6);
-			else if (fi.ntype ==  7) el.SetType(m_pim->m_ntri7);
-			else if (fi.ntype == 10) el.SetType(m_pim->m_ntri10);
+			else if (fi.ntype ==  3) el.SetType(feb->m_ntri3);
+			else if (fi.ntype ==  6) el.SetType(feb->m_ntri6);
+			else if (fi.ntype ==  7) el.SetType(feb->m_ntri7);
+			else if (fi.ntype == 10) el.SetType(feb->m_ntri10);
 			else if (fi.ntype ==  8) el.SetType(FE_QUAD8G9);
 			else if (fi.ntype ==  9) el.SetType(FE_QUAD9G9);
 			else return false;

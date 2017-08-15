@@ -3,7 +3,7 @@
 #include "FEBModel.h"
 
 //-----------------------------------------------------------------------------
-// Geometry Section
+// Geometry Section (base class)
 class FEBioGeometrySection : public FEBioFileSection
 {
 private:
@@ -15,13 +15,7 @@ private:
 	};
 
 public:
-	FEBioGeometrySection(FEBioImport* pim);
-	void Parse(XMLTag& tag);
-
-protected:
-	void Parse12(XMLTag& tag);
-	void Parse20(XMLTag& tag);
-	void Parse25(XMLTag& tag);
+	FEBioGeometrySection(FEBioImport* pim) : FEBioFileSection(pim) {}
 
 protected:
 	void ParseNodeSection       (XMLTag& tag);
@@ -57,4 +51,28 @@ protected:
 protected:
 	vector<FEDOMAIN>	m_dom;
 	FEBModel			m_feb;	// User by 2.5 when defining the geometry in parts
+};
+
+//-----------------------------------------------------------------------------
+class FEBioGeometrySection1x : public FEBioGeometrySection
+{
+public:
+	FEBioGeometrySection1x(FEBioImport* pim) : FEBioGeometrySection(pim) {}
+	void Parse(XMLTag& tag);
+};
+
+//-----------------------------------------------------------------------------
+class FEBioGeometrySection2 : public FEBioGeometrySection
+{
+public:
+	FEBioGeometrySection2(FEBioImport* pim) : FEBioGeometrySection(pim) {}
+	void Parse(XMLTag& tag);
+};
+
+//-----------------------------------------------------------------------------
+class FEBioGeometrySection25 : public FEBioGeometrySection
+{
+public:
+	FEBioGeometrySection25(FEBioImport* pim) : FEBioGeometrySection(pim) {}
+	void Parse(XMLTag& tag);
 };

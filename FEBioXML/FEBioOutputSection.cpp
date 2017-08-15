@@ -58,7 +58,9 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 	// see if the log file has any attributes
 	const char* szlog = tag.AttributeValue("file", true);
-	if (szlog) m_pim->SetLogfileName(szlog);
+	if (szlog) GetFEBioImport()->SetLogfileName(szlog);
+
+	const char* szpath = GetFileReader()->GetFilePath();
 
 	if (tag.isleaf()) return;
 	++tag;
@@ -72,7 +74,6 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			if (sz)
 			{
 				// if we have a path, prepend the path's name
-				const char* szpath = m_pim->m_szpath;
 				char szfile[1024] = {0};
 				if (szpath && szpath[0])
 				{
@@ -112,7 +113,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			}
 			else prec->DataRecord::SetItemList(tag.szvalue());
 
-			m_pim->AddDataRecord(prec);
+			GetFEBioImport()->AddDataRecord(prec);
 		}
 		else if (tag == "element_data")
 		{
@@ -122,7 +123,6 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			if (sz)
 			{
 				// if we have a path, prepend the path's name
-				const char* szpath = m_pim->m_szpath;
 				char szfile[1024] = {0};
 				if (szpath && szpath[0])
 				{
@@ -153,7 +153,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			}
 
 			const char* sztmp = "elset";
-			if (m_pim->Version() >= 0x0205) sztmp = "elem_set";
+			if (GetFileReader()->GetFileVersion() >= 0x0205) sztmp = "elem_set";
 
 			sz = tag.AttributeValue(sztmp, true);
 			if (sz)
@@ -164,7 +164,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			}
 			else prec->DataRecord::SetItemList(tag.szvalue());
 
-			m_pim->AddDataRecord(prec);
+			GetFEBioImport()->AddDataRecord(prec);
 		}
 		else if (tag == "rigid_body_data")
 		{
@@ -174,7 +174,6 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			if (sz)
 			{
 				// if we have a path, prepend the path's name
-				const char* szpath = m_pim->m_szpath;
 				char szfile[1024] = {0};
 				if (szpath && szpath[0])
 				{
@@ -206,7 +205,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 			prec->SetItemList(tag.szvalue());
 
-			m_pim->AddDataRecord(prec);
+			GetFEBioImport()->AddDataRecord(prec);
 		}
         else if (tag == "rigid_connector_data")
         {
@@ -216,7 +215,6 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
             if (sz)
             {
                 // if we have a path, prepend the path's name
-                const char* szpath = m_pim->m_szpath;
                 char szfile[1024] = {0};
                 if (szpath && szpath[0])
                 {
@@ -248,7 +246,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
             
             prec->SetItemList(tag.szvalue());
             
-            m_pim->AddDataRecord(prec);
+			GetFEBioImport()->AddDataRecord(prec);
         }
 		else throw XMLReader::InvalidTag(tag);
 
@@ -269,11 +267,11 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 		if ((strcmp(sz, "febio") != 0) && (strcmp(sz, "febio2") != 0)) throw XMLReader::InvalidAttributeValue(tag, "type", sz);
 	}
 	else sz = "febio";
-	strcpy(m_pim->m_szplot_type, sz);
+	strcpy(GetFEBioImport()->m_szplot_type, sz);
 
 	// get the optional plot file name
 	const char* szplt = tag.AttributeValue("file", true);
-	if (szplt) m_pim->SetPlotfileName(szplt);
+	if (szplt) GetFEBioImport()->SetPlotfileName(szplt);
 
 	// read and store the plot variables
 	if (!tag.isleaf())
@@ -316,66 +314,28 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
                         // create a new surface
                         FESurface* psurf = new FESurface(&fem.GetMesh());
                         fem.GetMesh().AddSurface(psurf);
-                        if (BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag);
+                        if (GetBuilder()->BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag);
+
                         // Add the plot variable
                         const char* szd = psurf->GetName();
-                        m_pim->AddPlotVariable(szt, item, szd);
+						GetFEBioImport()->AddPlotVariable(szt, item, szd);
                     }
                     else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
                 }
                 else
                 {
                     // Add the plot variable
-                    m_pim->AddPlotVariable(szt, item);
+					GetFEBioImport()->AddPlotVariable(szt, item);
                 }
 			}
 			else if (tag=="compression")
 			{
 				int ncomp;
 				tag.value(ncomp);
-				m_pim->SetPlotCompression(ncomp);
+				GetFEBioImport()->SetPlotCompression(ncomp);
 			}
 			++tag;
 		}
 		while (!tag.isend());
 	}
-}
-
-
-//-----------------------------------------------------------------------------
-bool FEBioOutputSection::BuildSurface(FESurface& s, FEFacetSet& fs)
-{
-    FEModel& fem = *GetFEModel();
-    FEMesh& m = fem.GetMesh();
-    int NN = m.Nodes();
-    
-    // count nr of faces
-    int faces = fs.Faces();
-    
-    // allocate storage for faces
-    s.Create(faces);
-    
-    // read faces
-    for (int i=0; i<faces; ++i)
-    {
-        FESurfaceElement& el = s.Element(i);
-        FEFacetSet::FACET& fi = fs.Face(i);
-        
-        if      (fi.ntype ==  4) el.SetType(FE_QUAD4G4);
-        else if (fi.ntype ==  3) el.SetType(m_pim->m_ntri3);
-        else if (fi.ntype ==  6) el.SetType(m_pim->m_ntri6);
-        else if (fi.ntype ==  7) el.SetType(m_pim->m_ntri7);
-		else if (fi.ntype == 10) el.SetType(m_pim->m_ntri10);
-		else if (fi.ntype ==  8) el.SetType(FE_QUAD8G9);
-        else if (fi.ntype ==  9) el.SetType(FE_QUAD9G9);
-        else return false;
-        
-        int N = el.Nodes(); assert(N == fi.ntype);
-        for (int j=0; j<N; ++j) el.m_node[j] = fi.node[j];
-    }
-    
-    // copy the name
-    s.SetName(fs.GetName());
-    
-    return true;
 }

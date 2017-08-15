@@ -1,15 +1,29 @@
 #pragma once
-#include "FEBioImport.h"
-#include "FECore/FESurfacePairInteraction.h"
+#include "FileImport.h"
+#include <FECore/FESurfacePairInteraction.h>
 
 class FEFacetSet;
 
 //-----------------------------------------------------------------------------
 // Contact section (new in version 2.0)
-class FEBioContactSection : public FEBioFileSection
+class FEBioContactSection : public FEFileSection
 {
+	//! missing slave surface
+	class MissingSlaveSurface : public FEFileException
+	{
+	public:
+		MissingSlaveSurface();
+	};
+
+	//! missing master surface
+	class MissingMasterSurface : public FEFileException
+	{
+	public:
+		MissingMasterSurface();
+	};
+
 public:
-	FEBioContactSection(FEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioContactSection(FEFileImport* pim) : FEFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:

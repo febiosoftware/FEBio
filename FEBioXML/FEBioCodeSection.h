@@ -2,9 +2,11 @@
 #include "FEBioImport.h"
 
 //-----------------------------------------------------------------------------
-class FEBioCodeSection : public FEBioFileSection
+// This is an experimental feature. 
+// This section allows users to define callbacks from the input file. 
+class FEBioCodeSection : public FEFileSection
 {
 public:
-	FEBioCodeSection(FEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioCodeSection(FEFileImport* pim) : FEFileSection(pim){}
 	void Parse(XMLTag& tag);
 };

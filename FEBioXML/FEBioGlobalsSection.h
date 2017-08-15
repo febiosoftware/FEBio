@@ -1,13 +1,13 @@
 #pragma once
-#include "FEBioImport.h"
+#include "FileImport.h"
 
 //-----------------------------------------------------------------------------
 //! Globals Section
-class FEBioGlobalsSection : public FEBioFileSection
+class FEBioGlobalsSection : public FEFileSection
 {
 public:
-	FEBioGlobalsSection(FEBioImport* pim) : FEBioFileSection(pim){}
-	void Parse            (XMLTag& tag);
+	FEBioGlobalsSection(FEFileImport* pim) : FEFileSection(pim){}
+	void Parse(XMLTag& tag);
 
 protected:
 	void ParseConstants   (XMLTag& tag);

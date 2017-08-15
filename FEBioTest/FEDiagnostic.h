@@ -60,11 +60,20 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-// Scenario Section parser
-class FEBioScenarioSection : public FEBioFileSection
+// Control Section
+class FEDiagnosticControlSection : public FEFileSection
 {
 public:
-	FEBioScenarioSection(FEBioImport* pim) : FEBioFileSection(pim){}
+	FEDiagnosticControlSection(FEFileImport* pim) : FEFileSection(pim) {}
+	void Parse(XMLTag& tag);
+};
+
+//-----------------------------------------------------------------------------
+// Scenario Section parser
+class FEDiagnosticScenarioSection : public FEFileSection
+{
+public:
+	FEDiagnosticScenarioSection(FEFileImport* pim) : FEFileSection(pim){}
 	void Parse(XMLTag& tag);
 };
 
@@ -72,15 +81,18 @@ public:
 //! The FEDiagnosticImport class creates a specific diagnostic test. Currently
 //! the only way to create a diagnostic is to load a diagnostic from file
 
-class FECOREDLL_EXPORT FEDiagnosticImport : public FEBioImport
+class FECOREDLL_EXPORT FEDiagnosticImport : public FEFileImport
 {
 public:
 	FEDiagnostic* LoadFile(FEModel& fem, const char* szfile);
 
 protected:
+	bool Parse(const char* szfile);
+
+protected:
 	FEDiagnostic* m_pdia;
 
-	friend class FEBioScenarioSection;
+	friend class FEDiagnosticScenarioSection;
 };
 
 #endif // !defined(AFX_FEDIAGNOSTIC_H__75EB5A08_CE16_45BD_A223_7BD93BF0837A__INCLUDED_)

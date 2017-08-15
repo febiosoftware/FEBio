@@ -12,3 +12,15 @@ public:
 protected:
 	bool ParseCommonParams(XMLTag& tag);
 };
+
+//-----------------------------------------------------------------------------
+// Control Section for steps
+class FEStepControlSection : public FEFileSection
+{
+public:
+	FEStepControlSection(FEFileImport* pim) : FEFileSection(pim) {}
+	void Parse(XMLTag& tag);
+
+protected:
+	bool ParseCommonParams(XMLTag& tag);
+};

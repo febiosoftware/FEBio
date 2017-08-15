@@ -8,15 +8,11 @@
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::Parse(XMLTag& tag)
 {
-	// make sure that the version is 2.5
-	int nversion = m_pim->Version();
-	if (nversion < 0x0205) throw XMLReader::InvalidTag(tag);
-
 	// Make sure there is something in this tag
 	if (tag.isleaf()) return;
 
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEMesh& mesh = fem.GetMesh();
 
 	// get the total nr of elements
 	int nelems = mesh.Elements();
@@ -48,6 +44,8 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			m_pelem[el.GetID()-1] = &el;
 		}
 	}
+
+	FEBioImport* feb = GetFEBioImport();
 
 	// loop over all mesh data
 	++tag;
@@ -81,8 +79,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				const char* szvar = tag.AttributeValue("var");
 
 				// read the parameters
-				FEParameterList& pl = gen->GetParameterList();
-				m_pim->ReadParameterList(tag, pl);
+				ReadParameterList(tag, gen);
 
 				// get the domain
 				FEMesh& mesh = fem.GetMesh();
@@ -113,11 +110,11 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 
 			const char* szname = tag.AttributeValue("name");
 			FESurfaceMap* pdata = new FESurfaceMap(dataType);
-			m_pim->AddDataArray(szname, pdata);
+			fem.AddDataArray(szname, pdata);
 
 			pdata->SetName(szname);
 			pdata->Create(psurf);
-			m_pim->ParseDataArray(tag, *pdata, "face");
+			feb->ParseDataArray(tag, *pdata, "face");
 		}
 		else if (tag == "EdgeData")
 		{
@@ -136,10 +133,10 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 
 			const char* szname = tag.AttributeValue("name");
 			FEDataArray* pdata = new FEDataArray(dataType);
-			m_pim->AddDataArray(szname, pdata);
+			fem.AddDataArray(szname, pdata);
 
 			pdata->resize(pset->Segments());
-			m_pim->ParseDataArray(tag, *pdata, "edge");
+			feb->ParseDataArray(tag, *pdata, "edge");
 		}
 		else if (tag == "NodeData")
 		{
@@ -159,10 +156,10 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			const char* szname = tag.AttributeValue("name");
 
 			FEDataArray* pdata = new FEDataArray(dataType);
-			m_pim->AddDataArray(szname, pdata);
+			fem.AddDataArray(szname, pdata);
 
 			pdata->resize(nodeSet->size());
-			m_pim->ParseDataArray(tag, *pdata, "node");
+			feb->ParseDataArray(tag, *pdata, "node");
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
@@ -283,7 +280,7 @@ void FEBioMeshDataSection::ParseElementData(XMLTag& tag, FEElementSet& set, vect
 {
 	// get the total nr of elements
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEMesh& mesh = fem.GetMesh();
 	int nelems = set.size();
 
 	// resize the array

@@ -13,6 +13,14 @@
 #include "XMLReader.h"
 
 //-----------------------------------------------------------------------------
+class FERestartControlSection : public FEFileSection
+{
+public:
+	FERestartControlSection(FEFileImport* reader) : FEFileSection(reader) {}
+	void Parse(XMLTag& tag);
+};
+
+//-----------------------------------------------------------------------------
 //! Restart input file reader.
 class FECOREDLL_EXPORT FERestartImport : public FEFileImport
 {
@@ -20,17 +28,12 @@ public:
 	FERestartImport();
 	virtual ~FERestartImport();
 
-	bool Load(FEModel& fem, const char* szfile);
-
-protected:
-	bool ParseControlSection (XMLTag& tag);
-	bool ParseLoadSection    (XMLTag& tag);
+	bool Parse(const char* szfile);
 
 public:
 	char		m_szdmp[256];	// user defined restart file name
 
 protected:
-	FEModel*	m_pfem;			// point to the FEM
 	XMLReader	m_xml;			// the file reader
 };
 

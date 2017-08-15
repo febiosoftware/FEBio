@@ -23,7 +23,7 @@ void FEBioRigidSection::Parse(XMLTag& tag)
 			RS.AddRigidSurface(rs);
 
 			FEParameterList& pl = rs->GetParameterList();
-			m_pim->ReadParameterList(tag, pl);
+			ReadParameterList(tag, pl);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

@@ -9,14 +9,7 @@
 void FEBioLoadDataSection::Parse(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	int nmplc = -1;
 	
-	if (m_pim->m_nsteps > 0)
-	{
-		FEAnalysis* pstep = m_pim->GetStep();
-		nmplc = pstep->m_nmplc+1;
-	}
-
 	++tag;
 	do
 	{
@@ -34,10 +27,6 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 			// default type and extend mode
 			FEDataLoadCurve::INTFUNC ntype = FEDataLoadCurve::LINEAR;
 			FEDataLoadCurve::EXTMODE nextm = FEDataLoadCurve::CONSTANT;
-
-			// For backward compatibility we must set the default to STEP for the mustpoint loadcurve
-			// Note that this assumes that the step has already been read in.
-			if (nid == nmplc) ntype = FEDataLoadCurve::STEP;
 
 			// get the (optional) type
 			XMLAtt* patt = tag.Attribute("type", true);

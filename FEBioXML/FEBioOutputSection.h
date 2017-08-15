@@ -15,7 +15,4 @@ protected:
 	void ParseLogfile    (XMLTag& tag);
 	void ParsePlotfile   (XMLTag& tag);
 	void ParseDataSection(XMLTag& tag);
-    
-protected:
-    bool BuildSurface(FESurface& s, FEFacetSet& fs);
 };

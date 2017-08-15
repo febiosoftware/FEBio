@@ -4,10 +4,10 @@
 
 //-----------------------------------------------------------------------------
 // Boundary Section
-class FEBioBoundarySection : public FEBioFileSection
+class FEBioBoundarySection : public FEFileSection
 {
 public:
-	FEBioBoundarySection(FEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioBoundarySection(FEFileImport* pim) : FEFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:

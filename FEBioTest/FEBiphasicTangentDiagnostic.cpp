@@ -243,7 +243,7 @@ bool FEBiphasicTangentDiagnostic::Run()
 // element residual.
 void FEBiphasicTangentDiagnostic::deriv_residual(matrix& ke)
 {
-    int i, j, k, nj;
+    int i, j, nj;
     
     // get the solver
 	FEModel& fem = GetFEModel();

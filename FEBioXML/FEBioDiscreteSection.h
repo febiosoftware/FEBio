@@ -2,18 +2,25 @@
 #include "FEBioImport.h"
 
 //-----------------------------------------------------------------------------
-class FEBioDiscreteSection : public FEBioFileSection
+class FEBioDiscreteSection : public FEFileSection
 {
 public:
-	FEBioDiscreteSection(FEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioDiscreteSection(FEFileImport* pim) : FEFileSection(pim){}
 	void Parse(XMLTag& tag);
-
-protected:
-	void ParseDiscreteSection(XMLTag& tag);
-	void ParseDiscreteSection25(XMLTag& tag);
 
 protected:
 	void ParseSpringSection  (XMLTag& tag);
 	void ParseRigidAxialForce(XMLTag& tag);
-	void ParseRigidCable     (XMLTag& tag);
+};
+
+//-----------------------------------------------------------------------------
+class FEBioDiscreteSection25 : public FEFileSection
+{
+public:
+	FEBioDiscreteSection25(FEFileImport* pim) : FEFileSection(pim){}
+	void Parse(XMLTag& tag);
+
+protected:
+	void ParseRigidAxialForce(XMLTag& tag);
+	void ParseRigidCable(XMLTag& tag);
 };

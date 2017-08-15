@@ -37,6 +37,16 @@ FEDiagnostic::~FEDiagnostic()
 //-----------------------------------------------------------------------------
 FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 {
+	m_pdia = 0;
+
+	if (Load(fem, szfile) == false) return 0;
+
+	return m_pdia;
+}
+
+//-----------------------------------------------------------------------------
+bool FEDiagnosticImport::Parse(const char* szfile)
+{
 	// Open the XML file
 	XMLReader xml;
 	if (xml.Open(szfile) == false) 
@@ -46,15 +56,14 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 	}
 
 	// define file structure
-	FEBioFileSectionMap map;
-	map["Control" ] = new FEBioControlSection (this);
-	map["Material"] = new FEBioMaterialSection(this);
-	map["Scenario"] = new FEBioScenarioSection(this);
-    map["Globals" ] = new FEBioGlobalsSection (this);
+	FEFileSectionMap map;
+	map["Control" ] = new FEDiagnosticControlSection (this);
+	map["Material"] = new FEBioMaterialSection       (this);
+	map["Scenario"] = new FEDiagnosticScenarioSection(this);
+    map["Globals" ] = new FEBioGlobalsSection        (this);
 
-    m_pfem = &fem;
-    m_pdia = 0;
-    
+	FEModel& fem = *GetFEModel();
+
 	// loop over all child tags
 	try
 	{
@@ -80,28 +89,18 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 		}
 
         // keep a pointer to the fem object
-        m_pStep = fem.GetCurrentStep();
+
 		fem.SetCurrentStepIndex(0);
         
-		++tag;
-		do
-		{
-			// parse the file
-			FEBioFileSectionMap::iterator is = map.find(tag.Name());
-			if (is != map.end()) is->second->Parse(tag);
-			else throw XMLReader::InvalidTag(tag);
-
-			// go to the next tag
-			++tag;
-		}
-		while (!tag.isend());
+		// parse the file
+		map.Parse(tag);
 	}
 	catch (XMLReader::Error& e)
 	{
 		felog.printf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 		return 0;
 	}
-	catch (FEBioImport::Exception& e)
+	catch (FEFileException& e)
 	{
 		felog.printf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 		return 0;
@@ -116,14 +115,31 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 	xml.Close();
 
 	// we're done!
-	return m_pdia;
-
+	return true;
 }
 
 //-----------------------------------------------------------------------------
-void FEBioScenarioSection::Parse(XMLTag &tag)
+void FEDiagnosticControlSection::Parse(XMLTag &tag)
 {
-	FEDiagnosticImport& dim = static_cast<FEDiagnosticImport&>(*m_pim);
+	FEModel& fem = *GetFEModel();
+	FEAnalysis* pstep = new FEAnalysis(&fem);
+
+	++tag;
+	do
+	{
+		if      (tag == "time_steps") tag.value(pstep->m_ntime);
+		else if (tag == "step_size" ) { tag.value(pstep->m_dt0); pstep->m_dt = pstep->m_dt0; pstep->m_dtp = pstep->m_dt0; }
+		else throw XMLReader::InvalidValue(tag);
+
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEDiagnosticScenarioSection::Parse(XMLTag &tag)
+{
+	FEDiagnosticImport& dim = static_cast<FEDiagnosticImport&>(*GetFileReader());
 
 	// get the diagnostic
 	FEDiagnostic* pdia = dim.m_pdia;
@@ -139,7 +155,7 @@ void FEBioScenarioSection::Parse(XMLTag &tag)
 	++tag;
 	do
 	{
-		if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+		if (ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());

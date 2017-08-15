@@ -7,7 +7,7 @@
 void FEBioIncludeSection::Parse(XMLTag& tag)
 {
 	// make sure that the version is 2.x
-	int nversion = m_pim->Version();
+	int nversion = GetFileReader()->GetFileVersion();
 	if (nversion < 0x0200) throw XMLReader::InvalidTag(tag);
 
 	// see if we need to pre-pend a path
@@ -18,10 +18,10 @@ void FEBioIncludeSection::Parse(XMLTag& tag)
 	if (ch==0)
 	{
 		// pre-pend the name with the input path
-		sprintf(szin, "%s%s", m_pim->m_szpath, tag.szvalue());
+		sprintf(szin, "%s%s", GetFileReader()->GetFilePath(), tag.szvalue());
 	}
 
 	// read the file
-	if (m_pim->ReadFile(szin, false) == false)
+	if (GetFEBioImport()->ReadFile(szin, false) == false)
 		throw XMLReader::InvalidValue(tag);
 }

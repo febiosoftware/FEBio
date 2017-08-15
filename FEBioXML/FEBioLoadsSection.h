@@ -9,10 +9,10 @@ class FESegmentSet;
 
 //-----------------------------------------------------------------------------
 // Loads Section (new in version 1.2)
-class FEBioLoadsSection : public FEBioFileSection
+class FEBioLoadsSection : public FEFileSection
 {
 public:
-	FEBioLoadsSection(FEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioLoadsSection(FEFileImport* pim) : FEFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:

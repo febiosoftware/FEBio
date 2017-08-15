@@ -741,6 +741,7 @@
     <ClInclude Include="..\..\FECore\FEModel.h" />
     <ClInclude Include="..\..\FECore\FEModelComponent.h" />
     <ClInclude Include="..\..\FECore\FEModelData.h" />
+    <ClInclude Include="..\..\FECore\FEModelLoad.h" />
     <ClInclude Include="..\..\FECore\FENewtonSolver.h" />
     <ClInclude Include="..\..\FECore\FENewtonStrategy.h" />
     <ClInclude Include="..\..\FECore\FENLConstraint.h" />
@@ -875,6 +876,7 @@
     <ClCompile Include="..\..\FECore\FEModel.cpp" />
     <ClCompile Include="..\..\FECore\FEModelComponent.cpp" />
     <ClCompile Include="..\..\FECore\FEModelData.cpp" />
+    <ClCompile Include="..\..\FECore\FEModelLoad.cpp" />
     <ClCompile Include="..\..\FECore\FENewtonSolver.cpp" />
     <ClCompile Include="..\..\FECore\FENewtonStrategy.cpp" />
     <ClCompile Include="..\..\FECore\FENLConstraint.cpp" />

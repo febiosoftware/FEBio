@@ -27,6 +27,7 @@ class FEGlobalData;
 class FEGlobalMatrix;
 class FELinearConstraintManager;
 class FEModelData;
+class FEDataArray;
 
 //-----------------------------------------------------------------------------
 //! The FEModel class stores all the data for the finite element model, including
@@ -324,6 +325,11 @@ public: // Data retrieval
 
 	// get nodal dof data
 	bool GetNodeData(int dof, vector<double>& data);
+
+public: // data arrays
+	void ClearDataArrays();
+	void AddDataArray(const char* szname, FEDataArray* map);
+	FEDataArray* FindDataArray(const char* szmap);
 
 public:
 	// TODO: put this somewhere else

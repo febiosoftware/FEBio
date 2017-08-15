@@ -119,7 +119,7 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 	do
 	{
 		// see if we can find this parameter
-		if (m_pim->ReadParameter(tag, pl) == false)
+		if (ReadParameter(tag, pl) == false)
 		{
 			// if we get here the parameter was not part of the parameter list
 			// however, not all parameters can be read from the parameter lists yet
@@ -195,8 +195,8 @@ bool FEBioMaterialSection::ParseMatAxisTag(XMLTag &tag, FEMaterial *pm)
 		++tag;
 		do
 		{
-			if      (tag == "a") m_pim->value(tag, a);
-			else if (tag == "d") m_pim->value(tag, d);
+			if      (tag == "a") value(tag, a);
+			else if (tag == "d") value(tag, d);
 			else throw XMLReader::InvalidTag(tag);
 			
 			++tag;
@@ -213,8 +213,8 @@ bool FEBioMaterialSection::ParseMatAxisTag(XMLTag &tag, FEMaterial *pm)
 		++tag;
 		do
 		{
-			if      (tag == "theta") m_pim->value(tag, theta);
-			else if (tag == "phi"  ) m_pim->value(tag, phi  );
+			if      (tag == "theta") value(tag, theta);
+			else if (tag == "phi"  ) value(tag, phi  );
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
 		}
@@ -263,7 +263,7 @@ bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
 		pm->SetCoordinateSystemMap(pmap);
 
 		vec3d a;
-		m_pim->value(tag, a);
+		value(tag, a);
 		pmap->SetVectors(a, vec3d(0,0,1));
 	}
 	else if (type == "angles")
@@ -275,8 +275,8 @@ bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
 		++tag;
 		do
 		{
-			if      (tag == "theta") m_pim->value(tag, theta);
-			else if (tag == "phi"  ) m_pim->value(tag, phi  );
+			if      (tag == "theta") value(tag, theta);
+			else if (tag == "phi"  ) value(tag, phi  );
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
 		}
@@ -292,13 +292,13 @@ bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
 		FEParameterList& pl = pmap->GetParameterList();
 		if (pl.Parameters() > 0)
 		{
-			if (tag.isleaf()) m_pim->ReadParameter(tag, pl, type.cvalue());
+			if (tag.isleaf()) ReadParameter(tag, pl, type.cvalue());
 			else
 			{
 				++tag;
 				do
 				{
-					if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+					if (ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
 					++tag;
 				}
 				while(!tag.isend());

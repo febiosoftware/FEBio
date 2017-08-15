@@ -9,14 +9,6 @@
 //-----------------------------------------------------------------------------
 void FEBioDiscreteSection::Parse(XMLTag& tag)
 {
-	int nversion = m_pim->Version();
-	if (nversion < 0x0205) ParseDiscreteSection(tag);
-	else ParseDiscreteSection25(tag);
-}
-
-//-----------------------------------------------------------------------------
-void FEBioDiscreteSection::ParseDiscreteSection(XMLTag& tag)
-{
 	// make sure this tag has children
 	if (tag.isleaf()) return;
 
@@ -30,7 +22,6 @@ void FEBioDiscreteSection::ParseDiscreteSection(XMLTag& tag)
 	}
 	while (!tag.isend());
 }
-
 
 //-----------------------------------------------------------------------------
 void FEBioDiscreteSection::ParseSpringSection(XMLTag &tag)
@@ -64,6 +55,9 @@ void FEBioDiscreteSection::ParseSpringSection(XMLTag &tag)
 	if (pd == 0) throw FEBioImport::InvalidDomainType();
 	mesh.AddDomain(pd);
 
+	int elems = fem.GetMesh().Elements();
+	int maxid = elems+1;
+
 	// read spring discrete elements
 	++tag;
 	do
@@ -75,17 +69,17 @@ void FEBioDiscreteSection::ParseSpringSection(XMLTag &tag)
 			tag.value(n, 2);
 			n[0] -= 1;
 			n[1] -= 1;
-			pd->AddElement(++m_pim->m_maxid, n);
+			pd->AddElement(++maxid, n);
 		}
 		else
 		{
 			// first read the domain paramters
 			FEParameterList& pl = pd->GetParameterList();
-			if (m_pim->ReadParameter(tag, pl) == 0)
+			if (ReadParameter(tag, pl) == 0)
 			{
 				// read the actual spring material parameters
 				FEParameterList& pl = pm->GetParameterList();
-				if (m_pim->ReadParameter(tag, pl) == 0)
+				if (ReadParameter(tag, pl) == 0)
 				{
 					throw XMLReader::InvalidTag(tag);
 				}
@@ -109,7 +103,7 @@ void FEBioDiscreteSection::ParseRigidAxialForce(XMLTag& tag)
 	++tag;
 	do
 	{
-		if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+		if (ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());
@@ -120,32 +114,15 @@ void FEBioDiscreteSection::ParseRigidAxialForce(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioDiscreteSection::ParseRigidCable(XMLTag& tag)
-{
-	// create a new rigid constraint
-	FEModelLoad* pml = fecore_new<FEModelLoad>(FEBC_ID, tag.Name(), GetFEModel());
-
-	// read all parameters and properties
-	++tag;
-	do
-	{
-		if (m_pim->ReadParameter(tag, pml) == false) throw XMLReader::InvalidTag(tag);
-		++tag;
-	}
-	while (!tag.isend());
-
-	// add it to the model
-	FEModel& fem = *GetFEModel();
-	fem.AddModelLoad(pml);
-}
-
-//-----------------------------------------------------------------------------
-void FEBioDiscreteSection::ParseDiscreteSection25(XMLTag& tag)
+void FEBioDiscreteSection25::Parse(XMLTag& tag)
 {
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	vector<FEDiscreteMaterial*> dmat;
+
+	int elems = fem.GetMesh().Elements();
+	int maxid = elems + 1;
 
 	++tag;
 	do
@@ -176,7 +153,7 @@ void FEBioDiscreteSection::ParseDiscreteSection25(XMLTag& tag)
 			++tag;
 			do
 			{
-				if (m_pim->ReadParameter(tag, pl) == 0) throw XMLReader::InvalidTag(tag);
+				if (ReadParameter(tag, pl) == 0) throw XMLReader::InvalidTag(tag);
 				++tag;
 			}
 			while (!tag.isend());
@@ -225,12 +202,12 @@ void FEBioDiscreteSection::ParseDiscreteSection25(XMLTag& tag)
 			{
 				const FEDiscreteSet::NodePair& np = pset->Element(i);
 				int n[2] = {np.n0, np.n1};
-				pd->AddElement(++m_pim->m_maxid, n);
+				pd->AddElement(++maxid, n);
 			}
 
 			// get the domain parameters
 			FEParameterList& pl = pd->GetParameterList();
-			m_pim->ReadParameterList(tag, pl);
+			ReadParameterList(tag, pl);
 
 			// initialize domain
 			pd->CreateMaterialPointData();
@@ -241,4 +218,43 @@ void FEBioDiscreteSection::ParseDiscreteSection25(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
+}
+
+//---------------------------------------------------------------------------------
+void FEBioDiscreteSection25::ParseRigidAxialForce(XMLTag& tag)
+{
+	// create a new rigid constraint
+	FEModelLoad* paf = fecore_new<FEModelLoad>(FEBC_ID, tag.Name(), GetFEModel());
+
+	// read the parameters
+	FEParameterList& pl = paf->GetParameterList();
+	++tag;
+	do
+	{
+		if (ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+		++tag;
+	} while (!tag.isend());
+
+	// add it to the model
+	FEModel& fem = *GetFEModel();
+	fem.AddModelLoad(paf);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioDiscreteSection25::ParseRigidCable(XMLTag& tag)
+{
+	// create a new rigid constraint
+	FEModelLoad* pml = fecore_new<FEModelLoad>(FEBC_ID, tag.Name(), GetFEModel());
+
+	// read all parameters and properties
+	++tag;
+	do
+	{
+		if (ReadParameter(tag, pml) == false) throw XMLReader::InvalidTag(tag);
+		++tag;
+	} while (!tag.isend());
+
+	// add it to the model
+	FEModel& fem = *GetFEModel();
+	fem.AddModelLoad(pml);
 }

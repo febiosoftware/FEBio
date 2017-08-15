@@ -696,13 +696,13 @@
     <ClInclude Include="..\..\FEBioXML\FEBioParametersSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioStepSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBModel.h" />
+    <ClInclude Include="..\..\FEBioXML\FEModelBuilder.h" />
     <ClInclude Include="..\..\FEBioXML\FERestartImport.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioRigidSection.h" />
     <ClInclude Include="..\..\FEBioXML\FileImport.h" />
     <ClInclude Include="..\..\FEBioXML\stdafx.h" />
     <ClInclude Include="..\..\FEBioXML\XMLReader.h" />
     <ClInclude Include="..\..\FEBioXML\xmltool.h" />
-    <ClInclude Include="..\..\FECore\FEModelLoad.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioXML\FEBioBoundarySection.cpp" />
@@ -725,12 +725,12 @@
     <ClCompile Include="..\..\FEBioXML\FEBioParametersSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioStepSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBModel.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEModelBuilder.cpp" />
     <ClCompile Include="..\..\FEBioXML\FERestartImport.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioRigidSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FileImport.cpp" />
     <ClCompile Include="..\..\FEBioXML\XMLReader.cpp" />
     <ClCompile Include="..\..\FEBioXML\xmltool.cpp" />
-    <ClCompile Include="..\..\FECore\FEModelLoad.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

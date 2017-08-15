@@ -4,7 +4,7 @@
 
 //-----------------------------------------------------------------------------
 //! This function parses a parameter list
-bool xmlReadParameter(XMLTag& tag, FEParameterList& paramList, const char* paramName)
+bool fexml::readParameter(XMLTag& tag, FEParameterList& paramList, const char* paramName)
 {
 	// see if we can find this parameter
 	FEParam* pp = paramList.Find((paramName == 0 ? tag.Name() : paramName));
@@ -32,4 +32,38 @@ bool xmlReadParameter(XMLTag& tag, FEParameterList& paramList, const char* param
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void fexml::readList(XMLTag& tag, vector<int>& l)
+{
+	// make sure the list is empty
+	l.clear();
+
+	// get a pointer to the value
+	const char* sz = tag.szvalue();
+
+	// parse the string
+	const char* ch;
+	do
+	{
+		int n0, n1, nn;
+		int nread = sscanf(sz, "%d:%d:%d", &n0, &n1, &nn);
+		switch (nread)
+		{
+		case 1:
+			n1 = n0;
+			nn = 1;
+			break;
+		case 2:
+			nn = 1;
+			break;
+		}
+
+		for (int i = n0; i <= n1; i += nn) l.push_back(i);
+
+		ch = strchr(sz, ',');
+		if (ch) sz = ch + 1;
+	}
+	while (ch != 0);
 }

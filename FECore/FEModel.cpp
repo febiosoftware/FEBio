@@ -18,6 +18,7 @@
 #include "log.h"
 #include "FERigidBody.h"
 #include "FEModelData.h"
+#include "FEDataArray.h"
 #include <string>
 #include <map>
 using namespace std;
@@ -110,7 +111,10 @@ public:
 
 public: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
-	vector<FEGlobalData*>	m_GD;		//!< global data structures};
+	vector<FEGlobalData*>	m_GD;		//!< global data structures
+
+public:
+	vector<pair<string, FEDataArray*> >	m_DataArray;
 };
 
 //-----------------------------------------------------------------------------
@@ -2132,4 +2136,29 @@ bool FEModel::GetNodeData(int ndof, vector<double>& data)
 	}
 	
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::ClearDataArrays()
+{
+	// clear the surface maps
+	for (int i = 0; i<(int)m_imp->m_DataArray.size(); ++i) delete m_imp->m_DataArray[i].second;
+	m_imp->m_DataArray.clear();
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::AddDataArray(const char* szname, FEDataArray* map)
+{
+	m_imp->m_DataArray.push_back(pair<string, FEDataArray*>(string(szname), map));
+}
+
+//-----------------------------------------------------------------------------
+FEDataArray* FEModel::FindDataArray(const char* szmap)
+{
+	string name(szmap);
+	for (int i = 0; i<(int)m_imp->m_DataArray.size(); ++i)
+	{
+		if (m_imp->m_DataArray[i].first == name) return m_imp->m_DataArray[i].second;
+	}
+	return 0;
 }

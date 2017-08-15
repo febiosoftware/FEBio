@@ -2,10 +2,11 @@
 #include "FEBioImport.h"
 
 //-----------------------------------------------------------------------------
-// Parameters section (new in version 2.0)
-class FEBioParametersSection : public FEBioFileSection
+// Parameters section
+// Allows users to define parameters in the input file
+class FEBioParametersSection : public FEFileSection
 {
 public:
-	FEBioParametersSection(FEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioParametersSection(FEFileImport* pim) : FEFileSection(pim){}
 	void Parse(XMLTag& tag);
 };

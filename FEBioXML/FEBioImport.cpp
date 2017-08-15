@@ -24,7 +24,6 @@
 #include "FEBioCodeSection.h"
 #include "FEBioRigidSection.h"
 #include "FECore/DataStore.h"
-#include "FECore/Image.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/FESurfaceMap.h>
@@ -33,18 +32,11 @@
 #include "FECore/DOFS.h"
 #include <string.h>
 #include <stdarg.h>
+#include "xmltool.h"
 
-//-----------------------------------------------------------------------------
-void FEBioImport::Exception::SetErrorString(const char* sz, ...)
-{
-	// get a pointer to the argument list
-	va_list	args;
+FEBioFileSection::FEBioFileSection(FEBioImport* feb) : FEFileSection(feb) {}
 
-	// make the message
-	va_start(args, sz);
-	vsprintf(m_szerr, sz, args);
-	va_end(args);
-}
+FEBioImport* FEBioFileSection::GetFEBioImport() { return static_cast<FEBioImport*>(GetFileReader()); }
 
 //-----------------------------------------------------------------------------
 FEBioImport::InvalidVersion::InvalidVersion()
@@ -107,24 +99,6 @@ FEBioImport::FailedAllocatingSolver::FailedAllocatingSolver(const char* sztype)
 }
 
 //-----------------------------------------------------------------------------
-FEBioImport::InvalidNodeID::InvalidNodeID()
-{
-	SetErrorString("Invalid node ID");
-}
-
-//-----------------------------------------------------------------------------
-FEBioImport::MissingSlaveSurface::MissingSlaveSurface()
-{
-	SetErrorString("Missing contact slave surface");
-}
-
-//-----------------------------------------------------------------------------
-FEBioImport::MissingMasterSurface::MissingMasterSurface()
-{
-	SetErrorString("Missing contact master surface");
-}
-
-//-----------------------------------------------------------------------------
 FEBioImport::DataGeneratorError::DataGeneratorError()
 {
 	SetErrorString("Error in data generation");
@@ -134,28 +108,6 @@ FEBioImport::DataGeneratorError::DataGeneratorError()
 FEBioImport::FailedBuildingPart::FailedBuildingPart(const std::string& partName)
 {
 	SetErrorString("Failed building part %s", partName.c_str());
-}
-
-//-----------------------------------------------------------------------------
-FEModel* FEBioFileSection::GetFEModel() { return m_pim->GetFEModel(); }
-FEAnalysis* FEBioFileSection::GetStep() { return m_pim->GetStep(); }
-
-//-----------------------------------------------------------------------------
-FEBioFileSectionMap::~FEBioFileSectionMap()
-{
-	Clear();
-}
-
-//-----------------------------------------------------------------------------
-void FEBioFileSectionMap::Clear()
-{
-	// clear the map
-	FEBioFileSectionMap::iterator is;
-	for (is = begin(); is != end(); ++is)
-	{
-		FEBioFileSection* ps = is->second; delete ps;
-	}
-	clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -173,179 +125,9 @@ FEBioImport::PlotVariable::PlotVariable(const char* szvar, vector<int>& item, co
     strcpy(m_szdom, szdom);
 }
 
-//=============================================================================
-//  The FEBioImport class imports an XML formatted FEBio input file.
-//  The actual file is parsed using the XMLReader class.
-//
-//-----------------------------------------------------------------------------
-void FEBioImport::ClearParams()
-{
-	m_Param.clear();
-}
-
-//-----------------------------------------------------------------------------
-FEBioImport::XMLParam* FEBioImport::FindParameter(const char* sz)
-{
-	for (size_t i=0; i<m_Param.size(); ++i)
-	{
-		XMLParam& p = m_Param[i];
-		if (strcmp(p.m_szname, sz) == 0) return &p;
-	}
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::AddParameter(const char* szname, const char* szval)
-{
-	XMLParam p;
-	strcpy(p.m_szname, szname);
-	strcpy(p.m_szval , szval);
-	m_Param.push_back(p);
-}
-
-//-----------------------------------------------------------------------------
-const char* FEBioImport::get_value_string(XMLTag& tag)
-{
-	const char* sz = tag.szvalue();
-	if (sz[0]=='@')
-	{
-		XMLParam* p = FindParameter(sz+1);
-		if (p==0) throw XMLReader::InvalidValue(tag);
-		sz = p->m_szval;
-	}
-	return sz;
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::value(XMLTag& tag, int& n)
-{
-	const char* sz = get_value_string(tag);
-	n = atoi(sz);
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::value(XMLTag& tag, double& g)
-{
-	const char* sz = get_value_string(tag);
-	g = atof(sz);
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::value(XMLTag& tag, bool& b)
-{
-	const char* sz = get_value_string(tag);
-	int n=0; 
-	sscanf(sz, "%d", &n); 
-	b = (n != 0); 
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::value(XMLTag& tag, vec3d& v)
-{
-	const char* sz = get_value_string(tag);
-	int n = sscanf(sz, "%lg,%lg,%lg", &v.x, &v.y, &v.z);
-	if (n != 3) throw XMLReader::XMLSyntaxError();
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::value(XMLTag& tag, mat3d& m)
-{
-	const char* sz = get_value_string(tag);
-	double xx, xy, xz, yx, yy, yz, zx, zy, zz;
-	int n = sscanf(sz, "%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
-	if (n != 9) throw XMLReader::XMLSyntaxError();
-	m = mat3d(xx, xy, xz, yx, yy, yz, zx, zy, zz);
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::value(XMLTag& tag, mat3ds& m)
-{
-	const char* sz = get_value_string(tag);
-	double x, y, z, xy, yz, xz;
-	int n = sscanf(sz, "%lg,%lg,%lg,%lg,%lg,%lg", &x, &y, &z, &xy, &yz, &xz);
-	if (n != 6) throw XMLReader::XMLSyntaxError();
-	m = mat3ds(x, y, z, xy, yz, xz);
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::value(XMLTag& tag, tens3drs& m)
-{
-	double v[18];
-	int n = value(tag, v, 18);
-	if (n != 18) throw XMLReader::InvalidValue(tag);
-	for (int i=0; i<18; ++i) m.d[i] = v[i];
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::value(XMLTag& tag, char* szstr)
-{
-	const char* sz = get_value_string(tag);
-	strcpy(szstr, sz); 
-}
-
-//-----------------------------------------------------------------------------
-int FEBioImport::value(XMLTag& tag, int* pi, int n)
-{
-	const char* sz = get_value_string(tag);
-	int nr = 0;
-	for (int i=0; i<n; ++i)
-	{
-		const char* sze = strchr(sz, ',');
-
-		pi[i] = atoi(sz);
-		nr++;
-
-		if (sze) sz = sze+1;
-		else break;
-	}
-	return nr;
-}
-
-//-----------------------------------------------------------------------------
-int FEBioImport::value(XMLTag& tag, double* pf, int n)
-{
-	const char* sz = get_value_string(tag);
-	int nr = 0;
-	for (int i=0; i<n; ++i)
-	{
-		const char* sze = strchr(sz, ',');
-
-		pf[i] = atof(sz);
-		nr++;
-
-		if (sze) sz = sze+1;
-		else break;
-	}
-	return nr;
-}
-
 //-----------------------------------------------------------------------------
 FEBioImport::FEBioImport()
 {
-	// define the file structure
-	m_map["Module"     ] = new FEBioModuleSection     (this);
-	m_map["Control"    ] = new FEBioControlSection    (this);
-	m_map["Material"   ] = new FEBioMaterialSection   (this);
-	m_map["Geometry"   ] = new FEBioGeometrySection   (this);
-	m_map["Boundary"   ] = new FEBioBoundarySection   (this);
-	m_map["Loads"      ] = new FEBioLoadsSection      (this);
-	m_map["Initial"    ] = new FEBioInitialSection    (this);
-	m_map["LoadData"   ] = new FEBioLoadDataSection   (this);
-	m_map["Globals"    ] = new FEBioGlobalsSection    (this);
-	m_map["Output"     ] = new FEBioOutputSection     (this);
-	m_map["Constraints"] = new FEBioConstraintsSection(this);
-	m_map["Step"       ] = new FEBioStepSection       (this);
-
-	// version 2.0 only!
-	m_map["Parameters" ] = new FEBioParametersSection (this);
-	m_map["Include"    ] = new FEBioIncludeSection    (this);
-	m_map["Contact"    ] = new FEBioContactSection    (this);
-	m_map["Discrete"   ] = new FEBioDiscreteSection   (this);
-	m_map["Code"       ] = new FEBioCodeSection       (this);	// added in FEBio 2.4 (experimental feature!)
-
-	// version 2.5 only
-	m_map["MeshData"] = new FEBioMeshDataSection(this);
-	m_map["Rigid"   ] = new FEBioRigidSection   (this); // added in FEBio 2.6 (experimental feature!)
 }
 
 //-----------------------------------------------------------------------------
@@ -354,19 +136,68 @@ FEBioImport::~FEBioImport()
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioImport::Load(FEModel& fem, const char* szfile)
+// Build the file section map based on the version number
+void FEBioImport::BuildFileSectionMap(int nversion)
 {
-	// keep a pointer to the fem object
-	m_pfem = &fem;
+	// define the file structure
+	m_map["Module"     ] = new FEBioModuleSection     (this);
+	m_map["Control"    ] = new FEBioControlSection    (this);
+	m_map["Material"   ] = new FEBioMaterialSection   (this);
+	m_map["Boundary"   ] = new FEBioBoundarySection   (this);
+	m_map["Loads"      ] = new FEBioLoadsSection      (this);
+	m_map["LoadData"   ] = new FEBioLoadDataSection   (this);
+	m_map["Globals"    ] = new FEBioGlobalsSection    (this);
+	m_map["Output"     ] = new FEBioOutputSection     (this);
+
+	// older formats
+	if (nversion < 0x0200)
+	{
+	    m_map["Geometry"   ] = new FEBioGeometrySection1x   (this);
+		m_map["Constraints"] = new FEBioConstraintsSection1x(this);
+		m_map["Step"       ] = new FEBioStepSection         (this);
+		m_map["Initial"] = new FEBioInitialSection(this);
+	}
+
+	// version 2.0
+	if (nversion == 0x0200)
+	{
+		m_map["Parameters" ] = new FEBioParametersSection  (this);
+	    m_map["Geometry"   ] = new FEBioGeometrySection2   (this);
+		m_map["Initial"    ] = new FEBioInitialSection    (this);
+		m_map["Include"    ] = new FEBioIncludeSection     (this);
+		m_map["Contact"    ] = new FEBioContactSection     (this);
+		m_map["Discrete"   ] = new FEBioDiscreteSection    (this);
+		m_map["Code"       ] = new FEBioCodeSection        (this); // added in FEBio 2.4 (experimental feature!)
+		m_map["Constraints"] = new FEBioConstraintsSection2(this);
+		m_map["Step"       ] = new FEBioStepSection2       (this);
+	}
+
+	// version 2.5
+	if (nversion == 0x0205)
+	{
+		m_map["Parameters" ] = new FEBioParametersSection   (this);
+	    m_map["Geometry"   ] = new FEBioGeometrySection25   (this);
+		m_map["Include"    ] = new FEBioIncludeSection      (this);
+		m_map["Initial"    ] = new FEBioInitialSection25    (this);
+		m_map["Contact"    ] = new FEBioContactSection      (this);
+		m_map["Discrete"   ] = new FEBioDiscreteSection25   (this);
+		m_map["Constraints"] = new FEBioConstraintsSection25(this);
+		m_map["Code"       ] = new FEBioCodeSection         (this); // added in FEBio 2.4 (experimental feature!)
+		m_map["MeshData"   ] = new FEBioMeshDataSection     (this);
+		m_map["Rigid"      ] = new FEBioRigidSection        (this); // added in FEBio 2.6 (experimental feature!)
+		m_map["Step"       ] = new FEBioStepSection25       (this);
+	}
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioImport::Parse(const char* szfile)
+{
+	FEModel& fem = *GetFEModel();
 
 	// keep a pointer to the mesh
 	m_pMesh = &fem.GetMesh();
 
 	// intialize some variables
-	m_pStep = 0;	// zero step pointer
-	m_nsteps = 0;	// reset step section counter
-	m_szmod[0] = 0;
-	m_nversion = -1;
 	m_szdmp[0] = 0;
 	m_szlog[0] = 0;
 	m_szplt[0] = 0;
@@ -378,24 +209,6 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 
 	m_data.clear();
 
-	// default element type
-	m_ntet4  = FE_TET4G1;
-	m_nhex8  = FE_HEX8G8;
-	m_ntet10 = FE_TET10G8;
-	m_ntet15 = FE_TET15G15;
-	m_ntet20 = FE_TET20G15;
-	m_ntri6  = FE_TRI6G7;
-	m_ntri3  = FE_TRI3G3;
-	m_ntri7  = FE_TRI7G7;
-	m_ntri10 = FE_TRI10G7;
-
-	// 3-field formulation flags
-	m_b3field_hex = true;
-	m_b3field_tet = false;
-
-	// UT4 formulation off by default
-	m_but4 = false;
-
 	// extract the path
 	strcpy(m_szpath, szfile);
 	char* ch = strrchr(m_szpath, '\\');
@@ -403,8 +216,8 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	if (ch==0) m_szpath[0] = 0; else *(ch+1)=0;
 
 	// clean up
-	ClearParams();
-	ClearDataArrays();
+	ClearFileParams();
+	fem.ClearDataArrays();
 
 	// read the file
 	return ReadFile(szfile);
@@ -437,18 +250,22 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 		ParseVersion(tag);
 
 		// FEBio2 only supports file version 1.2, 2.0, and 2.5
-		if ((m_nversion != 0x0102) && 
-			(m_nversion != 0x0200) && 
-			(m_nversion != 0x0205)) throw InvalidVersion();
+		int nversion = GetFileVersion();
+		if ((nversion != 0x0102) && 
+			(nversion != 0x0200) && 
+			(nversion != 0x0205)) throw InvalidVersion();
+
+		// build the file section map based on the version number
+		BuildFileSectionMap(nversion);
 
 		// For versions before 2.5 we need to allocate all the degrees of freedom beforehand. 
 		// This is necessary because the Module section doesn't have to defined until a Control section appears.
 		// That means that model components that depend on DOFs can be defined before the Module tag (e.g. in multi-step analyses) and this leads to problems.
 		// In 2.5 this is solved by requiring that the Module tag is defined at the top of the file. 
-		if (broot && (m_nversion < 0x0205))
+		if (broot && (nversion < 0x0205))
 		{
 			// We need to define a default Module type since before 2.5 this tag is optional for structural mechanics model definitions.
-			sprintf(m_szmod, "solid");
+			GetBuilder()->SetModuleName("solid");
 
 			// Reset degrees of
 			FEModel& fem = *GetFEModel();
@@ -516,7 +333,7 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 		++tag;
 
 		// From version 2.5 and up the first tag of the master file has to be the Module tag.
-		if (broot && (m_nversion >= 0x0205))
+		if (broot && (nversion >= 0x0205))
 		{
 			if (tag != "Module")
 			{
@@ -524,7 +341,7 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			}
 
 			// try to find a section parser
-			FEBioFileSectionMap::iterator is = m_map.find(tag.Name());
+			FEFileSectionMap::iterator is = m_map.find(tag.Name());
 
 			// make sure we found a section reader
 			if (is == m_map.end()) throw XMLReader::InvalidTag(tag);
@@ -536,7 +353,7 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			// Creating an analysis step will allocate a solver class (based on the module) 
 			// and this in turn will allocate the degrees of freedom.
 			// TODO: This is kind of a round-about way and I really want to find a better solution.
-			GetStep();
+			GetBuilder()->GetStep();
 
 			// let's get the next tag
 			++tag;
@@ -545,13 +362,13 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 		do
 		{
 			// try to find a section parser
-			FEBioFileSectionMap::iterator is = m_map.find(tag.Name());
+			FEFileSectionMap::iterator is = m_map.find(tag.Name());
 
 			// make sure we found a section reader
 			if (is == m_map.end()) throw XMLReader::InvalidTag(tag);
 
 			// see if the file has the "from" attribute (for version 2.0 and up)
-			if (m_nversion >= 0x0200)
+			if (nversion >= 0x0200)
 			{
 				const char* szinc = tag.AttributeValue("from", true);
 				if (szinc)
@@ -594,7 +411,7 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 		return errf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 	}
 	// --- FEBioImport Exceptions ---
-	catch (FEBioImport::Exception& e)
+	catch (FEFileException& e)
 	{
 		return errf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 	}
@@ -618,45 +435,6 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 }
 
 //-----------------------------------------------------------------------------
-FEAnalysis* FEBioImport::GetStep()
-{
-	if (m_pStep == 0)
-	{
-		m_pStep = CreateNewStep();
-		m_pfem->AddStep(m_pStep);	
-		if (m_pfem->Steps() == 1) 
-		{
-			m_pfem->SetCurrentStep(m_pStep);
-			m_pfem->SetCurrentStepIndex(0);
-		}
-	}
-	return m_pStep;
-}
-
-//-----------------------------------------------------------------------------
-FESolver* FEBioImport::BuildSolver(const char* sztype, FEModel& fem)
-{
-	FESolver* ps = fecore_new<FESolver>(FESOLVER_ID, sztype, &fem);
-	return ps;
-}
-
-//-----------------------------------------------------------------------------
-FEAnalysis* FEBioImport::CreateNewStep()
-{
-	FEAnalysis* pstep = new FEAnalysis(m_pfem);
-
-	// make sure we have a solver defined
-	FESolver* psolver = pstep->GetFESolver();
-	if (psolver == 0)
-	{
-		psolver = BuildSolver(m_szmod, *GetFEModel());
-		if (psolver == 0) throw FEBioImport::FailedAllocatingSolver(m_szmod);
-		pstep->SetFESolver(psolver);
-	}
-	return pstep;
-}
-
-//-----------------------------------------------------------------------------
 //! This function parses the febio_spec tag for the version number
 void FEBioImport::ParseVersion(XMLTag &tag)
 {
@@ -667,280 +445,8 @@ void FEBioImport::ParseVersion(XMLTag &tag)
 	if (nr != 2) throw InvalidVersion();
 	if ((n1 < 1) || (n1 > 0xFF)) throw InvalidVersion();
 	if ((n2 < 0) || (n2 > 0xFF)) throw InvalidVersion();
-	m_nversion = (n1 << 8) + n2;
-}
-
-//-----------------------------------------------------------------------------
-//! This function parese a parameter list
-bool FEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam)
-{
-	// see if we can find this parameter
-	FEParam* pp = pl.Find((szparam == 0 ? tag.Name() : szparam));
-	if (pp == 0) return false;
-	
-	if (pp->dim() == 1)
-	{
-		switch (pp->type())
-		{
-		case FE_PARAM_DOUBLE  : value(tag, pp->value<double  >()); break;
-		case FE_PARAM_INT     : value(tag, pp->value<int     >()); break;
-		case FE_PARAM_BOOL    : value(tag, pp->value<bool    >()); break;
-		case FE_PARAM_VEC3D   : value(tag, pp->value<vec3d   >()); break;
-		case FE_PARAM_MAT3D   : value(tag, pp->value<mat3d   >()); break;
-		case FE_PARAM_MAT3DS  : value(tag, pp->value<mat3ds  >()); break;
-		case FE_PARAM_TENS3DRS: value(tag, pp->value<tens3drs>()); break;
-		case FE_PARAM_STRING  : value(tag, pp->cvalue()); break;
-		case FE_PARAM_IMAGE_3D:
-			{
-				const char* szfile = tag.AttributeValue("file");
-				++tag;
-				int n[3] = {0};
-				do
-				{
-					if (tag == "size") tag.value(n, 3);
-					else throw XMLReader::InvalidTag(tag);
-					++tag;
-				}
-				while (!tag.isend());
-				Image& im = pp->value<Image>();
-				im.Create(n[0], n[1], n[2]);
-				
-				// see if we need to pre-pend a path
-				char szin[512];
-				strcpy(szin, szfile);
-				char* ch = strrchr(szin, '\\');
-				if (ch==0) ch = strrchr(szin, '/');
-				if (ch==0)
-				{
-					// pre-pend the name with the input path
-					sprintf(szin, "%s%s", m_szpath, szfile);
-				}
-
-				// Try to load the image file
-				if (im.Load(szin) == false) throw XMLReader::InvalidValue(tag);
-			}
-			break;
-		case FE_PARAM_DATA_ARRAY:
-			{
-				// get the surface map
-				FEDataArray& map = pp->value<FEDataArray>();
-
-				// Make sure that the tag is a leaf
-				if (!tag.isleaf()) throw XMLReader::InvalidValue(tag);
-
-				// read the surface map data
-				const char* szmap = tag.AttributeValue("surface_data", true);
-				if (szmap)
-				{
-					FEDataArray* pdata = FindDataArray(szmap);
-					if (pdata == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_data");
-
-					// make sure the types match
-					if (map.DataType() != pdata->DataType()) throw XMLReader::InvalidAttributeValue(tag, "surface_data", szmap);
-
-					// copy data
-					map = *pdata;
-				}
-				else 
-				{
-					const char* szmap = tag.AttributeValue("node_data", true);
-					if (szmap)
-					{
-						FEDataArray* pdata = FindDataArray(szmap);
-						if (pdata == 0) throw XMLReader::InvalidAttributeValue(tag, "node_data");
-
-						// make sure the types match
-						if (map.DataType() != pdata->DataType()) throw XMLReader::InvalidAttributeValue(tag, "node_data", szmap);
-
-						// copy data
-						map = *pdata;
-					}
-					else 
-					{
-						if (map.DataType() == FE_DOUBLE)
-						{
-							double v;
-							tag.value(v);
-							map.set(v);
-						}
-						else if (map.DataType() == FE_VEC2D)
-						{
-							double v[2] = {0};
-							tag.value(v, 2);
-							map.set(vec2d(v[0], v[1]));
-						}
-						else if (map.DataType() == FE_VEC3D)
-						{
-							double v[3] = {0};
-							tag.value(v, 3);
-							map.set(vec3d(v[0], v[1], v[2]));
-						}
-					}
-				}
-			};
-			break;
-		case FE_PARAM_FUNC1D:
-			{
-				int lc = -1;
-				tag.AttributeValue("lc", lc, true);
-				double v = 1.0;
-				tag.value(v);
-
-				FEFunction1D& f = pp->value<FEFunction1D>();
-				f.SetLoadCurveIndex(lc - 1, v);
-			}
-			break;
-		default:
-			assert(false);
-			return false;
-		}
-	}
-	else
-	{
-		switch (pp->type())
-		{
-		case FE_PARAM_INT   : value(tag, pp->pvalue<int   >(), pp->dim()); break;
-		case FE_PARAM_DOUBLE: value(tag, pp->pvalue<double>(), pp->dim()); break;
-		}
-	}
-
-	int nattr = tag.m_natt;
-	for (int i=0; i<nattr; ++i)
-	{
-		const char* szat = tag.m_att[i].m_szatt;
-		if (pl.GetContainer()->SetParameterAttribute(*pp, szat, tag.m_att[i].m_szatv) == false)
-		{
-			// If we get here, the container did not understand the attribute.
-			// If the attribute is a "lc", we interpret it as a load curve
-			if (strcmp(szat, "lc") == 0)
-			{
-				int lc = atoi(tag.m_att[i].m_szatv)-1;
-				if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-				switch (pp->type())
-				{
-				case FE_PARAM_INT   : pp->SetLoadCurve(lc); break;
-				case FE_PARAM_BOOL  : pp->SetLoadCurve(lc); break;
-				case FE_PARAM_DOUBLE: pp->SetLoadCurve(lc, pp->value<double>()); break;
-				case FE_PARAM_VEC3D : pp->SetLoadCurve(lc, pp->value<vec3d >()); break;
-				case FE_PARAM_FUNC1D: break; // don't do anything for 1D functions since the lc attribute is already processed.
-				default:
-					assert(false);
-				}
-			}
-/*			else 
-			{
-				throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-			}
-*/		}
-		// This is not true. Parameters can have attributes that are used for other purposed. E.g. The local fiber option.
-//		else felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
-	}
-
-	// give the parameter container a chance to do additional processing
-	pl.GetContainer()->SetParameter(*pp);
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! This function parses a parameter list
-bool FEBioImport::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam)
-{
-	// get the parameter list
-	FEParameterList& pl = pc->GetParameterList();
-
-	// see if we can find this parameter
-	if (ReadParameter(tag, pl, szparam) == false)
-	{
-		// if we get here, the parameter is not found.
-		// See if the parameter container has defined a property of this name
-		int n = pc->FindPropertyIndex(tag.Name());
-		if (n >= 0)
-		{
-			// get the property
-			FECoreBase* pp = pc->GetProperty(n);
-			if (pp)
-			{
-				// process attributes first
-				for (int i = 0; i<tag.m_natt; ++i)
-				{
-					XMLAtt& att = tag.m_att[i];
-					if (pp->SetAttribute(att.m_szatt, att.m_szatv) == false) throw XMLReader::InvalidAttributeValue(tag, att.m_szatt);
-				}
-
-				// process the parameter lists
-				if (!tag.isleaf())
-				{
-					++tag;
-					do
-					{
-						if (ReadParameter(tag, pp) == false) throw XMLReader::InvalidTag(tag);
-						++tag;
-					}
-					while (!tag.isend());
-				}
-				else
-				{
-					// there should be one parameter with the same name as the tag
-					if (ReadParameter(tag, pp) == false) throw XMLReader::InvalidTag(tag);
-				}
-			}
-			else throw XMLReader::InvalidTag(tag);
-			return true;
-		}
-		else return false;
-	}
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::ReadParameterList(XMLTag& tag, FEParameterList& pl)
-{
-	// Make sure there is something to read
-	if (tag.isleaf() || tag.isempty()) return;
-
-	// parse the child tags
-	++tag;
-	do
-	{
-		if (ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-		++tag;
-	}
-	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::ReadList(XMLTag& tag, vector<int>& l)
-{
-	// make sure the list is empty
-	l.clear();
-
-	// get a pointer to the value
-	const char* sz = tag.szvalue();
-
-	// parse the string
-	const char* ch;
-	do
-	{
-		int n0, n1, nn;
-		int nread = sscanf(sz, "%d:%d:%d", &n0, &n1, &nn);
-		switch (nread)
-		{
-		case 1:
-			n1 = n0;
-			nn = 1;
-			break;
-		case 2:
-			nn = 1;
-			break;
-		}
-
-		for (int i=n0; i<=n1; i += nn) l.push_back(i);
-
-		ch = strchr(sz, ',');
-		if (ch) sz = ch+1;
-	}
-	while (ch != 0);
+	int nversion = (n1 << 8) + n2;
+	SetFileVerion(nversion);
 }
 
 //-----------------------------------------------------------------------------
@@ -1004,8 +510,8 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 		{
 			// This format is deprecated
 			vector<int> l;
-			ReadList(tag, l);
-			for (int i=0; i<l.size(); ++i) pns->add(FindNodeFromID(l[i]));
+			fexml::readList(tag, l);
+			for (int i=0; i<l.size(); ++i) pns->add(GetBuilder()->FindNodeFromID(l[i]));
 		}
 		else
 		{
@@ -1018,7 +524,7 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 					int nid = -1;
 					tag.AttributeValue("id", nid);
 
-					nid = FindNodeFromID(nid);
+					nid = GetBuilder()->FindNodeFromID(nid);
 					pns->add(nid);
 				}
 				else if (tag == "NodeSet")
@@ -1038,8 +544,8 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 				else if (tag == "node_list")
 				{
 					vector<int> nl;
-					ReadList(tag, nl);
-					for (int i=0; i<nl.size(); ++i) pns->add(FindNodeFromID(nl[i]));
+					fexml::readList(tag, nl);
+					for (int i = 0; i<nl.size(); ++i) pns->add(GetBuilder()->FindNodeFromID(nl[i]));
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
@@ -1082,7 +588,7 @@ FESurface* FEBioImport::ParseSurface(XMLTag& tag, const char* szatt)
 		// create a surface from the facet set
 		if (ps)
 		{
-			if (BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag);
+			if (GetBuilder()->BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag);
 		}
 		else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 	}
@@ -1092,6 +598,8 @@ FESurface* FEBioImport::ParseSurface(XMLTag& tag, const char* szatt)
 		int npr = tag.children();
 		psurf->Create(npr);
 
+		FEModelBuilder* feb = GetBuilder();
+
 		++tag;
 		int nf[FEElement::MAX_NODES ], N;
 		for (int i=0; i<npr; ++i)
@@ -1099,10 +607,10 @@ FESurface* FEBioImport::ParseSurface(XMLTag& tag, const char* szatt)
 			FESurfaceElement& el = psurf->Element(i);
 
 			if      (tag == "quad4") el.SetType(FE_QUAD4G4);
-			else if (tag == "tri3" ) el.SetType(m_ntri3);
-			else if (tag == "tri6" ) el.SetType(m_ntri6);
-			else if (tag == "tri7" ) el.SetType(m_ntri7);
-			else if (tag == "tri10") el.SetType(m_ntri10);
+			else if (tag == "tri3" ) el.SetType(feb->m_ntri3);
+			else if (tag == "tri6" ) el.SetType(feb->m_ntri6);
+			else if (tag == "tri7" ) el.SetType(feb->m_ntri7);
+			else if (tag == "tri10") el.SetType(feb->m_ntri10);
 			else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 			else if (tag == "quad9") el.SetType(FE_QUAD9G9);
 			else throw XMLReader::InvalidTag(tag);
@@ -1116,70 +624,6 @@ FESurface* FEBioImport::ParseSurface(XMLTag& tag, const char* szatt)
 	}
 
 	return psurf;
-}
-
-//-----------------------------------------------------------------------------
-bool FEBioImport::BuildSurface(FESurface& s, FEFacetSet& fs)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
-	int NN = m.Nodes();
-
-	// count nr of faces
-	int faces = fs.Faces();
-
-	// allocate storage for faces
-	s.Create(faces);
-
-	// read faces
-	for (int i=0; i<faces; ++i)
-	{
-		FESurfaceElement& el = s.Element(i);
-		FEFacetSet::FACET& fi = fs.Face(i);
-
-		if      (fi.ntype == 4) el.SetType(FE_QUAD4G4);
-		else if (fi.ntype == 3) el.SetType(m_ntri3);
-		else if (fi.ntype == 6) el.SetType(m_ntri6);
-		else if (fi.ntype == 7) el.SetType(m_ntri7);
-		else if (fi.ntype == 10) el.SetType(m_ntri10);
-		else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
-		else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
-		else return false;
-
-		int N = el.Nodes(); assert(N == fi.ntype);
-		for (int j=0; j<N; ++j) el.m_node[j] = fi.node[j];
-	}
-
-	// copy the name
-	s.SetName(fs.GetName());
-
-	return true;
-}
-
-
-//-----------------------------------------------------------------------------
-void FEBioImport::ClearDataArrays()
-{
-	// clear the surface maps
-	for (int i=0; i<(int) m_Data.size(); ++i) delete m_Data[i].second;
-	m_Data.clear();
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::AddDataArray(const char* szname, FEDataArray* map)
-{
-	m_Data.push_back(pair<string,FEDataArray*>(string(szname), map));
-}
-
-//-----------------------------------------------------------------------------
-FEDataArray* FEBioImport::FindDataArray(const char* szmap)
-{
-	string name(szmap);
-	for (int i=0; i<(int) m_Data.size(); ++i)
-	{
-		if (m_Data[i].first == name) return m_Data[i].second;
-	}
-	return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1227,84 +671,4 @@ void FEBioImport::ParseDataArray(XMLTag& tag, FEDataArray& map, const char* szta
 		}
 		while (!tag.isend());
 	}
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::BuildNodeList()
-{
-	// find the min, max ID
-	// (We assume that they are given by the first and last node)
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	int NN = mesh.Nodes();
-	int nmin = mesh.Node(0   ).GetID();
-	int nmax = mesh.Node(NN-1).GetID();
-	assert(nmax >= nmin);
-
-	// get the range
-	int nn = nmax - nmin+1;
-
-	// allocate list
-	m_node_off = nmin;
-	m_node_list.assign(nn, -1);
-
-	// build the list
-	for (int i=0; i<NN; ++i)
-	{
-		int nid = mesh.Node(i).GetID();
-		m_node_list[nid - m_node_off] = i;
-	}
-}
-
-//-----------------------------------------------------------------------------
-int FEBioImport::FindNodeFromID(int nid)
-{
-	int N = (int) m_node_list.size();
-	if (N > 0)
-	{
-		int n = nid - m_node_off;
-		if ((n>=0)&&(n<N)) return m_node_list[n];
-	}
-	throw FEBioImport::InvalidNodeID();
-	return -1;
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::GlobalToLocalID(int* l, int n, vector<int>& m)
-{
-	assert((int) m.size()==n);
-	for (int i=0; i<n; ++i)
-	{
-		m[i] = FindNodeFromID(l[i]);
-	}
-}
-
-//-----------------------------------------------------------------------------
-int FEBioImport::ReadNodeID(XMLTag& tag)
-{
-	int n = atoi(tag.AttributeValue("id"));
-	return FindNodeFromID(n);
-}
-
-//-----------------------------------------------------------------------------
-FEBioImport::SurfacePair* FEBioImport::FindSurfacePair(const char* szname)
-{
-	for (int i=0; i<m_surfacePair.size(); ++i)
-		if (strcmp(m_surfacePair[i].szname, szname) == 0) return &m_surfacePair[i];
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-FEBioImport::NodeSetPair* FEBioImport::FindNodeSetPair(const char* szname)
-{
-	for (int i = 0; i<m_nsetPair.size(); ++i)
-	if (strcmp(m_nsetPair[i].szname, szname) == 0) return &m_nsetPair[i];
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-FEBioImport::NodeSetSet* FEBioImport::FindNodeSetSet(const char* szname)
-{
-	for (int i = 0; i<m_nsetSet.size(); ++i)
-	if (strcmp(m_nsetSet[i].szname, szname) == 0) return &m_nsetSet[i];
-	return 0;
 }

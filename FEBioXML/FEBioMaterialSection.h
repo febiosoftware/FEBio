@@ -3,10 +3,10 @@
 
 //-----------------------------------------------------------------------------
 // Material Section
-class FEBioMaterialSection : public FEBioFileSection
+class FEBioMaterialSection : public FEFileSection
 {
 public:
-	FEBioMaterialSection(FEBioImport* pim) : FEBioFileSection(pim){}
+	FEBioMaterialSection(FEFileImport* pim) : FEFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:

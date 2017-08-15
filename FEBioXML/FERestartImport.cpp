@@ -9,139 +9,12 @@
 #include "FECore/FEModel.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEDataLoadCurve.h"
+#include "FEBioLoadDataSection.h"
+#include "FEBioStepSection.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
-FERestartImport::FERestartImport()
+void FERestartControlSection::Parse(XMLTag& tag)
 {
-	m_pfem = 0;
-}
-
-FERestartImport::~FERestartImport()
-{
-	m_pfem = 0;
-}
-
-//-----------------------------------------------------------------------------
-
-bool FERestartImport::Load(FEModel& fem, const char* szfile)
-{
-	// open the XML file
-	if (m_xml.Open(szfile) == false) return errf("FATAL ERROR: Failed opening restart file %s\n", szfile);
-
-	// keep a pointer to the fem object
-	m_pfem = &fem;
-
-	m_szdmp[0] = 0;
-
-	// loop over child tags
-	try
-	{
-		// find the root element
-		XMLTag tag;
-		if (m_xml.FindTag("febio_restart", tag) == false) return errf("FATAL ERROR: File does not contain restart data.\n");
-
-		// check the version number
-		if (strcmp(tag.m_att[0].m_szatv, "1.0") != 0) return errf("FATAL ERROR: Incorrect restart file version\n");
-
-		// the next tag has to be the archive
-		++tag;
-		if (tag != "Archive") return errf("FATAL ERROR: The first element must be the archive name\n");
-		char szar[256];
-		tag.value(szar);
-
-		// open the archive
-		DumpFile ar(fem);
-		if (ar.Open(szar) == false) return errf("FATAL ERROR: failed opening restart archive\n");
-
-		// read the archive
-		fem.Serialize(ar);
-
-		// read the restart data
-		++tag;
-		while (!tag.isend())
-		{
-			if      (tag == "Control") ParseControlSection  (tag);
-			else if (tag == "LoadData") ParseLoadSection    (tag);
-			else throw XMLReader::InvalidTag(tag);
-
-			++tag;
-		}
-	}
-	catch (XMLReader::Error& e)
-	{
-		fprintf(stderr, "FATAL ERROR: %s (line %d)\n", e.GetErrorString(), m_xml.GetCurrentLine());
-		return false;
-	}
-	catch (...)
-	{
-		fprintf(stderr, "FATAL ERROR: unrecoverable error (line %d)\n", m_xml.GetCurrentLine());
-		return false;
-	}
-
-	// close the XML file
-	m_xml.Close();
-
-	// we're done!
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! This function reads the load data section from the restart file.
-
-bool FERestartImport::ParseLoadSection(XMLTag& tag)
-{
-	FEModel& fem = *m_pfem;
-
-	++tag;
-	do
-	{
-		if (tag == "loadcurve")
-		{
-			// get the ID from the curve
-			const char* szid = tag.AttributeValue("id");
-			int nid = atoi(szid);
-
-			// find the loadcurve with this ID
-			FEDataLoadCurve* plc = dynamic_cast<FEDataLoadCurve*>(fem.GetLoadCurve(nid - 1));
-			if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "id", szid);
-
-			// count how many points we have
-			XMLTag t(tag); ++t;
-			int nlp = 0;
-			while (!t.isend()) { ++nlp; ++t; }
-
-			// create the loadcurve
-			plc->Clear();
-
-			// read the points
-			double d[2];
-			++tag;
-			for (int i=0; i<nlp; ++i)
-			{
-				tag.value(d, 2);
-				plc->Add(d[0], d[1]);
-
-				++tag;
-			}
-		}
-		else throw XMLReader::InvalidTag(tag);
-
-		++tag;
-	}
-	while (!tag.isend());
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//!  This function parses the control section from the restart file
-
-bool FERestartImport::ParseControlSection(XMLTag& tag)
-{
-	FEModel& fem = *m_pfem;
+	FEModel& fem = *GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	++tag;
@@ -162,8 +35,8 @@ bool FERestartImport::ParseControlSection(XMLTag& tag)
 		else if (tag == "pressure_stiffness") tag.value(pstep->m_istiffpr);
 		else if (tag == "restart" ) 
 		{
-			const char* szf = tag.AttributeValue("file", true);
-			if (szf) strcpy(m_szdmp, szf);
+//			const char* szf = tag.AttributeValue("file", true);
+//			if (szf) strcpy(m_szdmp, szf);
 			char szval[256];
 			tag.value(szval);
 			if		(strcmp(szval, "DUMP_DEFAULT"    ) == 0) {} // don't change the restart level
@@ -212,5 +85,82 @@ bool FERestartImport::ParseControlSection(XMLTag& tag)
 	pstep->m_dt = pstep->m_dt0;
 	pstep->m_tend = pstep->m_tstart = pstep->m_ntime*pstep->m_dt0;
 
+}
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+FERestartImport::FERestartImport()
+{
+	
+}
+
+FERestartImport::~FERestartImport()
+{
+	
+}
+
+//-----------------------------------------------------------------------------
+
+bool FERestartImport::Parse(const char* szfile)
+{
+	// open the XML file
+	if (m_xml.Open(szfile) == false) return errf("FATAL ERROR: Failed opening restart file %s\n", szfile);
+
+	FEModel& fem = *GetFEModel();
+
+	m_szdmp[0] = 0;
+
+	m_map["Control" ] = new FERestartControlSection(this);
+	m_map["LoadData"] = new FEBioLoadDataSection   (this);
+	m_map["Step"    ] = new FEBioStepSection25     (this);
+
+	// loop over child tags
+	try
+	{
+		// find the root element
+		XMLTag tag;
+		if (m_xml.FindTag("febio_restart", tag) == false) return errf("FATAL ERROR: File does not contain restart data.\n");
+
+		// check the version number
+		const char* szversion = tag.m_att[0].m_szatv;
+		int nversion = -1;
+		if      (strcmp(szversion, "1.0") == 0) nversion = 1;
+		else if (strcmp(szversion, "2.0") == 0) nversion = 2;
+
+		if (nversion == -1) return errf("FATAL ERROR: Incorrect restart file version\n");
+
+		// the next tag has to be the archive
+		++tag;
+		if (tag != "Archive") return errf("FATAL ERROR: The first element must be the archive name\n");
+		char szar[256];
+		tag.value(szar);
+
+		// open the archive
+		DumpFile ar(fem);
+		if (ar.Open(szar) == false) return errf("FATAL ERROR: failed opening restart archive\n");
+
+		// read the archive
+		fem.Serialize(ar);
+
+		// read the restart data
+		m_map.Parse(tag);
+	}
+	catch (XMLReader::Error& e)
+	{
+		fprintf(stderr, "FATAL ERROR: %s (line %d)\n", e.GetErrorString(), m_xml.GetCurrentLine());
+		return false;
+	}
+	catch (...)
+	{
+		fprintf(stderr, "FATAL ERROR: unrecoverable error (line %d)\n", m_xml.GetCurrentLine());
+		return false;
+	}
+
+	// close the XML file
+	m_xml.Close();
+
+	// we're done!
 	return true;
 }

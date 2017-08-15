@@ -10,24 +10,21 @@
 #include "FEBioMech/FEElasticMixture.h"
 
 //-----------------------------------------------------------------------------
-FEBioGeometrySection::FEBioGeometrySection(FEBioImport* pim) : FEBioFileSection(pim)
+void FEBioGeometrySection1x::Parse(XMLTag& tag)
 {
-	
-}
+	FEModelBuilder* feb = GetBuilder();
+	feb->m_maxid = 0;
 
-//-----------------------------------------------------------------------------
-//!  Parses the geometry section from the xml file
-//!
-void FEBioGeometrySection::Parse(XMLTag& tag)
-{
-	m_pim->m_maxid = 0;
-	int nversion = m_pim->Version();
-
-	// parse the Geometry section
-	if      (nversion  < 0x0200) Parse12(tag);
-	else if (nversion == 0x0200) Parse20(tag);
-	else if (nversion == 0x0205) Parse25(tag);
-	else throw FEBioImport::InvalidVersion();
+	++tag;
+	do
+	{
+		if      (tag == "Nodes"      ) ParseNodeSection(tag);
+		else if (tag == "Elements"   ) ParseElementSection(tag);
+		else if (tag == "ElementData") ParseElementDataSection(tag);
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	} 
+	while (!tag.isend());
 
 	// At this point the mesh is completely read in.
 	// Now we can allocate the degrees of freedom.
@@ -39,22 +36,12 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 	fem.GetMesh().SetDOFS(MAX_DOFS);
 }
 
-void FEBioGeometrySection::Parse12(XMLTag& tag)
+//-----------------------------------------------------------------------------
+void FEBioGeometrySection2::Parse(XMLTag& tag)
 {
-	++tag;
-	do
-	{
-		if      (tag == "Nodes"      ) ParseNodeSection(tag);
-		else if (tag == "Elements"   ) ParseElementSection(tag);
-		else if (tag == "ElementData") ParseElementDataSection(tag);
-		else throw XMLReader::InvalidTag(tag);
-		++tag;
-	} 
-	while (!tag.isend());
-}
+	FEModelBuilder* feb = GetBuilder();
+	feb->m_maxid = 0;
 
-void FEBioGeometrySection::Parse20(XMLTag& tag)
-{
 	++tag;
 	do
 	{
@@ -69,10 +56,23 @@ void FEBioGeometrySection::Parse20(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
+
+	// At this point the mesh is completely read in.
+	// Now we can allocate the degrees of freedom.
+	// NOTE: We do this here since the mesh no longer automatically allocates the dofs.
+	//       At some point I want to be able to read the mesh before deciding any physics.
+	//       When that happens I'll have to move this elsewhere.
+	FEModel& fem = *GetFEModel();
+	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
+	fem.GetMesh().SetDOFS(MAX_DOFS);
 }
 
-void FEBioGeometrySection::Parse25(XMLTag& tag)
+//-----------------------------------------------------------------------------
+void FEBioGeometrySection25::Parse(XMLTag& tag)
 {
+	FEModelBuilder* feb = GetBuilder();
+	feb->m_maxid = 0;
+
 	// read all sections
 	++tag;
 	do
@@ -93,6 +93,15 @@ void FEBioGeometrySection::Parse25(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
+
+	// At this point the mesh is completely read in.
+	// Now we can allocate the degrees of freedom.
+	// NOTE: We do this here since the mesh no longer automatically allocates the dofs.
+	//       At some point I want to be able to read the mesh before deciding any physics.
+	//       When that happens I'll have to move this elsewhere.
+	FEModel& fem = *GetFEModel();
+	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
+	fem.GetMesh().SetDOFS(MAX_DOFS);
 }
 
 //-----------------------------------------------------------------------------
@@ -255,7 +264,8 @@ void FEBioGeometrySection::ParseInstanceSection(XMLTag& tag)
 //! Reads the Nodes section of the FEBio input file
 void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 {
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 	int N0 = mesh.Nodes();
 
 	// get the largest nodal ID
@@ -268,7 +278,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	int nodes = tag.children();
 
 	// see if this list defines a set
-	const char* szref = (m_pim->Version() >= 0x0205 ? "name" : "set");
+	const char* szref = (GetFileReader()->GetFileVersion() >= 0x0205 ? "name" : "set");
 	const char* szl = tag.AttributeValue(szref, true);
 	FENodeSet* ps = 0;
 	if (szl)
@@ -288,7 +298,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	for (int i=0; i<nodes; ++i)
 	{
 		FENode& node = mesh.Node(N0 + i);
-		m_pim->value(tag, node.m_r0);
+		value(tag, node.m_r0);
 		node.m_rt = node.m_r0;
 
 		// get the nodal ID
@@ -313,14 +323,15 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	}
 
 	// tell the file reader to rebuild the node ID table
-	m_pim->BuildNodeList();
+	GetBuilder()->BuildNodeList();
 }
 
 //-----------------------------------------------------------------------------
 //! Reads the Nodes section of the FEBio input file
 void FEBioGeometrySection::ParseNodeSection25(XMLTag& tag, FEBModel::Part* part)
 {
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 	int N0 = mesh.Nodes();
 
 	// first we need to figure out how many nodes there are
@@ -345,7 +356,7 @@ void FEBioGeometrySection::ParseNodeSection25(XMLTag& tag, FEBModel::Part* part)
 	for (int i = 0; i<nodes; ++i)
 	{
 		FEBModel::NODE& nd = node[i];
-		m_pim->value(tag, nd.r);
+		value(tag, nd.r);
 
 		// get the nodal ID
 		tag.AttributeValue("id", nd.id);
@@ -366,6 +377,8 @@ void FEBioGeometrySection::ParseNodeSection25(XMLTag& tag, FEBModel::Part* part)
 //! Get the element type from a XML tag
 FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 {
+	FEModelBuilder* feb = GetBuilder();
+
 	// determine the element shape 
 	FE_Element_Shape eshape = FE_ELEM_INVALID_SHAPE;
     // for shells, don't overwrite m_pim->m_ntri3/6 or m_nquad4/8, since they are needed for surface definitions
@@ -390,30 +403,30 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	{
 		// new way for defining element type and integration rule at the same time
 		// this is useful for multi-step analyses where the geometry is read in before the control section.
-		if      (strcmp(sztype, "TET10G4"     ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G4; }
-		else if (strcmp(sztype, "TET10G8"     ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G8; }
-		else if (strcmp(sztype, "TET10GL11"   ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; }
-		else if (strcmp(sztype, "TET10G4_S3"  ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G4; m_pim->m_ntri6 = FE_TRI6G3; }
-		else if (strcmp(sztype, "TET10G8_S3"  ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G8; m_pim->m_ntri6 = FE_TRI6G3; }
-		else if (strcmp(sztype, "TET10GL11_S3") == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; m_pim->m_ntri6 = FE_TRI6G3; }
-		else if (strcmp(sztype, "TET10G4_S4"  ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G4; m_pim->m_ntri6 = FE_TRI6G4; }
-		else if (strcmp(sztype, "TET10G8_S4"  ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G8; m_pim->m_ntri6 = FE_TRI6G4; }
-		else if (strcmp(sztype, "TET10GL11_S4") == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; m_pim->m_ntri6 = FE_TRI6G4; }
-		else if (strcmp(sztype, "TET10G4_S7"  ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G4; m_pim->m_ntri6 = FE_TRI6G7; }
-		else if (strcmp(sztype, "TET10G8_S7"  ) == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10G8; m_pim->m_ntri6 = FE_TRI6G7; }
-		else if (strcmp(sztype, "TET10GL11_S7") == 0) { eshape = ET_TET10; m_pim->m_ntet10 = FE_TET10GL11; m_pim->m_ntri6 = FE_TRI6G7; }
-		else if (strcmp(sztype, "TET15G8"     ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G8; }
-		else if (strcmp(sztype, "TET15G11"    ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; }
-		else if (strcmp(sztype, "TET15G15"    ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; }
-		else if (strcmp(sztype, "TET15G8_S3"  ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G8; m_pim->m_ntri7 = FE_TRI7G3; }
-		else if (strcmp(sztype, "TET15G11_S3" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G3; }
-		else if (strcmp(sztype, "TET15G15_S3" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G3; }
-		else if (strcmp(sztype, "TET15G8_S4"  ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G8; m_pim->m_ntri7 = FE_TRI7G4; }
-		else if (strcmp(sztype, "TET15G11_S4" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G4; }
-		else if (strcmp(sztype, "TET15G15_S4" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G4; }
-		else if (strcmp(sztype, "TET15G8_S7"  ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G8; m_pim->m_ntri7 = FE_TRI7G7; }
-		else if (strcmp(sztype, "TET15G11_S7" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G11; m_pim->m_ntri7 = FE_TRI7G7; }
-		else if (strcmp(sztype, "TET15G15_S7" ) == 0) { eshape = ET_TET15; m_pim->m_ntet15 = FE_TET15G15; m_pim->m_ntri7 = FE_TRI7G7; }
+		if      (strcmp(sztype, "TET10G4"     ) == 0) { eshape = ET_TET10; feb->m_ntet10 = FE_TET10G4; }
+		else if (strcmp(sztype, "TET10G8"     ) == 0) { eshape = ET_TET10; feb->m_ntet10 = FE_TET10G8; }
+		else if (strcmp(sztype, "TET10GL11"   ) == 0) { eshape = ET_TET10; feb->m_ntet10 = FE_TET10GL11; }
+		else if (strcmp(sztype, "TET10G4_S3"  ) == 0) { eshape = ET_TET10; feb->m_ntet10 = FE_TET10G4;   feb->m_ntri6 = FE_TRI6G3; }
+		else if (strcmp(sztype, "TET10G8_S3"  ) == 0) { eshape = ET_TET10; feb->m_ntet10 = FE_TET10G8;   feb->m_ntri6 = FE_TRI6G3; }
+		else if (strcmp(sztype, "TET10GL11_S3") == 0) { eshape = ET_TET10; feb->m_ntet10 = FE_TET10GL11; feb->m_ntri6 = FE_TRI6G3; }
+		else if (strcmp(sztype, "TET10G4_S4"  ) == 0) { eshape = ET_TET10; feb->m_ntet10 = FE_TET10G4;   feb->m_ntri6 = FE_TRI6G4; }
+		else if (strcmp(sztype, "TET10G8_S4"  ) == 0) { eshape = ET_TET10; feb->m_ntet10 = FE_TET10G8;   feb->m_ntri6 = FE_TRI6G4; }
+		else if (strcmp(sztype, "TET10GL11_S4") == 0) { eshape = ET_TET10; feb->m_ntet10 = FE_TET10GL11; feb->m_ntri6 = FE_TRI6G4; }
+		else if (strcmp(sztype, "TET10G4_S7"  ) == 0) { eshape = ET_TET10; feb->m_ntet10 = FE_TET10G4;   feb->m_ntri6 = FE_TRI6G7; }
+		else if (strcmp(sztype, "TET10G8_S7"  ) == 0) { eshape = ET_TET10; feb->m_ntet10 = FE_TET10G8;   feb->m_ntri6 = FE_TRI6G7; }
+		else if (strcmp(sztype, "TET10GL11_S7") == 0) { eshape = ET_TET10; feb->m_ntet10 = FE_TET10GL11; feb->m_ntri6 = FE_TRI6G7; }
+		else if (strcmp(sztype, "TET15G8"     ) == 0) { eshape = ET_TET15; feb->m_ntet15 = FE_TET15G8; }
+		else if (strcmp(sztype, "TET15G11"    ) == 0) { eshape = ET_TET15; feb->m_ntet15 = FE_TET15G11; }
+		else if (strcmp(sztype, "TET15G15"    ) == 0) { eshape = ET_TET15; feb->m_ntet15 = FE_TET15G15; }
+		else if (strcmp(sztype, "TET15G8_S3"  ) == 0) { eshape = ET_TET15; feb->m_ntet15 = FE_TET15G8;  feb->m_ntri7 = FE_TRI7G3; }
+		else if (strcmp(sztype, "TET15G11_S3" ) == 0) { eshape = ET_TET15; feb->m_ntet15 = FE_TET15G11; feb->m_ntri7 = FE_TRI7G3; }
+		else if (strcmp(sztype, "TET15G15_S3" ) == 0) { eshape = ET_TET15; feb->m_ntet15 = FE_TET15G15; feb->m_ntri7 = FE_TRI7G3; }
+		else if (strcmp(sztype, "TET15G8_S4"  ) == 0) { eshape = ET_TET15; feb->m_ntet15 = FE_TET15G8;  feb->m_ntri7 = FE_TRI7G4; }
+		else if (strcmp(sztype, "TET15G11_S4" ) == 0) { eshape = ET_TET15; feb->m_ntet15 = FE_TET15G11; feb->m_ntri7 = FE_TRI7G4; }
+		else if (strcmp(sztype, "TET15G15_S4" ) == 0) { eshape = ET_TET15; feb->m_ntet15 = FE_TET15G15; feb->m_ntri7 = FE_TRI7G4; }
+		else if (strcmp(sztype, "TET15G8_S7"  ) == 0) { eshape = ET_TET15; feb->m_ntet15 = FE_TET15G8;  feb->m_ntri7 = FE_TRI7G7; }
+		else if (strcmp(sztype, "TET15G11_S7" ) == 0) { eshape = ET_TET15; feb->m_ntet15 = FE_TET15G11; feb->m_ntri7 = FE_TRI7G7; }
+		else if (strcmp(sztype, "TET15G15_S7" ) == 0) { eshape = ET_TET15; feb->m_ntet15 = FE_TET15G15; feb->m_ntri7 = FE_TRI7G7; }
         else if (strcmp(sztype, "PENTA15G8"   ) == 0) { eshape = ET_PENTA15; stype = FE_PENTA15G8; }
         else if (strcmp(sztype, "HEX20G8"     ) == 0) { eshape = ET_HEX20; stype = FE_HEX20G8; }
         else if (strcmp(sztype, "QUAD4G8"     ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8;  }
@@ -434,20 +447,20 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	// NOTE: This is only used by quad/tri elements.
 	// TODO: find a better way
 	int NDIM = 3;
-	if (strcmp(m_pim->m_szmod, "fluid") == 0) NDIM = 2;
+	if (GetBuilder()->GetModuleName() == "fluid") NDIM = 2;
 
 	// determine the element type
 	FE_Element_Type etype = FE_ELEM_INVALID_TYPE;
 	switch (eshape)
 	{
-	case ET_HEX8   : etype = m_pim->m_nhex8; break;
+	case ET_HEX8   : etype = feb->m_nhex8; break;
 	case ET_PENTA6 : etype = FE_PENTA6G6; break;
     case ET_PENTA15: etype = FE_PENTA15G21; break;
 	case ET_PYRA5  : etype = FE_PYRA5G8; break;
-	case ET_TET4   : etype = m_pim->m_ntet4; break;
-	case ET_TET10  : etype = m_pim->m_ntet10; break;
-	case ET_TET15  : etype = m_pim->m_ntet15; break;
-	case ET_TET20  : etype = m_pim->m_ntet20; break;
+	case ET_TET4   : etype = feb->m_ntet4; break;
+	case ET_TET10  : etype = feb->m_ntet10; break;
+	case ET_TET15  : etype = feb->m_ntet15; break;
+	case ET_TET20  : etype = feb->m_ntet20; break;
 	case ET_HEX20  : etype = FE_HEX20G27; break;
 	case ET_HEX27  : etype = FE_HEX27G27; break;
 	case ET_QUAD4  : etype = (NDIM == 3 ? stype : FE2D_QUAD4G4); break;
@@ -468,9 +481,9 @@ FE_Element_Spec FEBioGeometrySection::ElementSpec(const char* sztype)
 	spec.eclass = eclass;
 	spec.eshape = eshape;
 	spec.etype  = etype;
-	spec.m_bthree_field_hex = m_pim->m_b3field_hex;
-	spec.m_bthree_field_tet = m_pim->m_b3field_tet;
-	spec.m_but4 = m_pim->m_but4;
+	spec.m_bthree_field_hex = feb->m_b3field_hex;
+	spec.m_bthree_field_tet = feb->m_b3field_tet;
+	spec.m_but4 = feb->m_but4;
 
 	// Make sure this is a valid element specification
 	if (FEElementLibrary::IsValid(spec) == false) FEBioImport::InvalidElementType();
@@ -496,7 +509,7 @@ FEDomain* FEBioGeometrySection::CreateDomain(const FE_Element_Spec& spec, FEMesh
 void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEMesh& mesh = fem.GetMesh();
 
 	// first we need to figure out how many elements 
 	// and how many domains there are
@@ -519,7 +532,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		t.AttributeValue("id", nid);
 
 		// keep track of the largest element ID
-		if (nid > m_pim->m_maxid) m_pim->m_maxid = nid;
+		if (nid > GetBuilder()->m_maxid) GetBuilder()->m_maxid = nid;
 
 		// find a domain for this element
 		int ndom = -1;
@@ -635,7 +648,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 	}
 
 	// get the name
-	const char* szref = (m_pim->Version() >= 0x0205 ? "name" : "elset");
+	const char* szref = (GetFileReader()->GetFileVersion() >= 0x0205 ? "name" : "elset");
 	const char* szname = tag.AttributeValue(szref, true);
 
 	// get the element type
@@ -683,7 +696,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 
 		// keep track of the largest element ID
 		// (which by assumption is the ID that was just read in)
-		m_pim->m_maxid = nid;
+		GetBuilder()->m_maxid = nid;
 
 		// add to the element set (if we have one)
 		if (pg) (*pg)[i] = nid;
@@ -775,7 +788,8 @@ void FEBioGeometrySection::ParseElementSection25(XMLTag& tag, FEBModel::Part* pa
 //!
 void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 {
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	// first we need to figure out how many elements 
 	// and how many domains there are
@@ -862,7 +876,7 @@ void FEBioGeometrySection::ReadElement(XMLTag &tag, FEElement& el, int nid)
 	el.SetID(nid);
 	int n[FEElement::MAX_NODES];
 	tag.value(n,el.Nodes());
-	m_pim->GlobalToLocalID(n, el.Nodes(), el.m_node);
+	GetBuilder()->GlobalToLocalID(n, el.Nodes(), el.m_node);
 }
 
 //-----------------------------------------------------------------------------
@@ -922,7 +936,7 @@ void FEBioGeometrySection::ParseElementData(FEElement& el, XMLTag& tag)
 	if (tag == "fiber")
 	{
 		// read the fiber direction
-		m_pim->value(tag, a);
+		value(tag, a);
 		set_element_fiber(el, a);
 	}
 	else if (tag == "mat_axis")
@@ -930,8 +944,8 @@ void FEBioGeometrySection::ParseElementData(FEElement& el, XMLTag& tag)
 		++tag;
 		do
 		{
-			if      (tag == "a") m_pim->value(tag, a);
-			else if (tag == "d") m_pim->value(tag, d);
+			if      (tag == "a") value(tag, a);
+			else if (tag == "d") value(tag, d);
 			else throw XMLReader::InvalidTag(tag);
 
 			++tag;
@@ -953,7 +967,7 @@ void FEBioGeometrySection::ParseElementData(FEElement& el, XMLTag& tag)
 		FETrussElement& truss = static_cast<FETrussElement&>(el);
 
 		// read truss area
-		m_pim->value(tag, truss.m_a0);
+		value(tag, truss.m_a0);
 	}
 	else
 	{
@@ -963,7 +977,7 @@ void FEBioGeometrySection::ParseElementData(FEElement& el, XMLTag& tag)
 			while (pt)
 			{
 				FEParameterList& pl = pt->GetParameterList();
-				if (m_pim->ReadParameter(tag, pl)) break;
+				if (ReadParameter(tag, pl)) break;
 
 				FEElasticMixtureMaterialPoint* mPt = dynamic_cast<FEElasticMixtureMaterialPoint*>(pt);
 
@@ -974,7 +988,7 @@ void FEBioGeometrySection::ParseElementData(FEElement& el, XMLTag& tag)
 					for (int i=0; i<(int)mPtV.size(); ++i)
 					{
 						FEParameterList& pl = mPtV[i]->GetParameterList();
-						if (m_pim->ReadParameter(tag, pl))
+						if (ReadParameter(tag, pl))
 						{
 							tagFound=true;
 							break;
@@ -999,7 +1013,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 	int i;
 
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEMesh& mesh = fem.GetMesh();
 
 	// get the total nr of elements
 	int nelems = mesh.Elements();
@@ -1081,11 +1095,11 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 
 void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 {
-	int nversion = m_pim->Version();
+	int nversion = GetFileReader()->GetFileVersion();
 	const char* szatt = (nversion < 0x0205 ? "set" : "node_set");
 
 	// read the node set
-	FENodeSet* pns = m_pim->ParseNodeSet(tag, szatt);
+	FENodeSet* pns = GetFEBioImport()->ParseNodeSet(tag, szatt);
 	if (pns == 0) throw XMLReader::InvalidTag(tag);
 }
 
@@ -1125,7 +1139,8 @@ void FEBioGeometrySection::ParseNodeSetSection25(XMLTag& tag, FEBModel::Part* pa
 void FEBioGeometrySection::ParseDiscreteSetSection(XMLTag& tag)
 {
 	// get the mesh
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	// get the name
 	const char* szname = tag.AttributeValue("name");
@@ -1157,7 +1172,8 @@ void FEBioGeometrySection::ParseDiscreteSetSection(XMLTag& tag)
 void FEBioGeometrySection::ParseEdgeSection(XMLTag& tag)
 {
 	// get the mesh
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	// get the number of nodes
 	// (we use this for checking the node indices of the facets)
@@ -1205,11 +1221,12 @@ void FEBioGeometrySection::ParseEdgeSection(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioGeometrySection::ParseSurfacePairSection(XMLTag& tag)
 {
-	FEBioImport::SurfacePair p;
+	FEModelBuilder::SurfacePair p;
 	const char* szname = tag.AttributeValue("name");
 	strcpy(p.szname, szname);
 
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	++tag;
 	do
@@ -1231,17 +1248,18 @@ void FEBioGeometrySection::ParseSurfacePairSection(XMLTag& tag)
 	}
 	while (!tag.isend());
 
-	m_pim->AddSurfacePair(p);
+	GetBuilder()->AddSurfacePair(p);
 }
 
 //-----------------------------------------------------------------------------
 void FEBioGeometrySection::ParseNodeSetPairSection(XMLTag& tag)
 {
-	FEBioImport::NodeSetPair p;
+	FEModelBuilder::NodeSetPair p;
 	const char* szname = tag.AttributeValue("name");
 	strcpy(p.szname, szname);
 
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	++tag;
 	do
@@ -1262,17 +1280,18 @@ void FEBioGeometrySection::ParseNodeSetPairSection(XMLTag& tag)
 		++tag;
 	} while (!tag.isend());
 
-	m_pim->AddNodeSetPair(p);
+	GetBuilder()->AddNodeSetPair(p);
 }
 
 //-----------------------------------------------------------------------------
 void FEBioGeometrySection::ParseNodeSetSetSection(XMLTag& tag)
 {
-	FEBioImport::NodeSetSet p;
+	FEModelBuilder::NodeSetSet p;
 	const char* szname = tag.AttributeValue("name");
 	strcpy(p.szname, szname);
 
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	++tag;
 	do
@@ -1289,7 +1308,7 @@ void FEBioGeometrySection::ParseNodeSetSetSection(XMLTag& tag)
 	}
 	while (!tag.isend());
 
-	m_pim->AddNodeSetSet(p);
+	GetBuilder()->AddNodeSetSet(p);
 }
 
 
@@ -1298,7 +1317,8 @@ void FEBioGeometrySection::ParseNodeSetSetSection(XMLTag& tag)
 void FEBioGeometrySection::ParseSurfaceSection(XMLTag& tag)
 {
 	// get the mesh
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	// get the number of nodes
 	// (we use this for checking the node indices of the facets)
@@ -1384,7 +1404,8 @@ void FEBioGeometrySection::ParseSurfaceSection(XMLTag& tag)
 void FEBioGeometrySection::ParseSurfaceSection25(XMLTag& tag, FEBModel::Part* part)
 {
 	// get the mesh
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	// get the required name attribute
 	const char* szname = tag.AttributeValue("name");
@@ -1428,7 +1449,8 @@ void FEBioGeometrySection::ParseSurfaceSection25(XMLTag& tag, FEBModel::Part* pa
 
 void FEBioGeometrySection::ParseElementSetSection(XMLTag& tag)
 {
-	FEMesh& mesh = *m_pim->GetFEMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	// get the name attribute
 	const char* szname = tag.AttributeValue("name");
@@ -1456,7 +1478,7 @@ void FEBioGeometrySection::ParseElementSetSection(XMLTag& tag)
 	if (l.empty() == false)
 	{
 		// assign indices to element set
-		int N = l.size();
+		int N = (int)l.size();
 		pg->create(N);
 		for (int i=0; i<N; ++i) (*pg)[i] = l[i];
 

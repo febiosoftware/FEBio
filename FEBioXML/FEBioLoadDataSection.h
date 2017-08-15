@@ -3,9 +3,9 @@
 
 //-----------------------------------------------------------------------------
 // LoadData Section
-class FEBioLoadDataSection : public FEBioFileSection
+class FEBioLoadDataSection : public FEFileSection
 {
 public:
-	FEBioLoadDataSection(FEBioImport* pim) : FEBioFileSection(pim) {}
+	FEBioLoadDataSection(FEFileImport* pim) : FEFileSection(pim) {}
 	void Parse(XMLTag& tag);
 };

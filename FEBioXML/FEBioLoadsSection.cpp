@@ -12,7 +12,8 @@
 //!
 void FEBioLoadsSection::Parse(XMLTag& tag)
 {
-	assert(m_pim->Version() >= 0x0102);
+	int nversion = GetFileReader()->GetFileVersion();
+	assert(nversion >= 0x0102);
 	
 	// make sure this tag has children
 	if (tag.isleaf()) return;
@@ -20,7 +21,6 @@ void FEBioLoadsSection::Parse(XMLTag& tag)
 	++tag;
 	do
 	{
-		int nversion = m_pim->Version();
 		if (nversion < 0x0200)
 		{
 			if      (tag == "force"      ) ParseNodalLoad(tag);
@@ -69,14 +69,14 @@ void FEBioLoadsSection::ParseBodyForce(XMLTag &tag)
 			{
 				const char* szlc = tag.AttributeValue("lc");
 //						pf->lc[0] = pf->lc[1] = pf->lc[2] = atoi(szlc);
-				m_pim->value(tag, pf->m_a);
+				value(tag, pf->m_a);
 			}
 			else if (tag == "node")
 			{
-				m_pim->value(tag, pf->m_inode); 
+				value(tag, pf->m_inode); 
 				pf->m_inode -= 1;
 			}
-			else if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+			else if (ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
 			++tag;
 		}
 		while (!tag.isend());
@@ -85,25 +85,15 @@ void FEBioLoadsSection::ParseBodyForce(XMLTag &tag)
 	}
 	else
 	{
-		// see if the kernel knows this force
+		// create the body force
 		FEBodyLoad* pf = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, szt, &fem);
-		if (pf)
-		{
-			if (!tag.isleaf())
-			{
-				FEParameterList& pl = pf->GetParameterList();
-				++tag;
-				do
-				{
-					if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-					++tag;
-				}
-				while (!tag.isend());
-			}
+		if (pf == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
-			fem.AddBodyLoad(pf);
-		}
-		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+		// add it to the model
+		fem.AddBodyLoad(pf);
+
+		// read the parameter list
+		ReadParameterList(tag, pf);
 	}
 }
 
@@ -113,14 +103,7 @@ void FEBioLoadsSection::ParseBodyLoad(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, tag.Name(), &fem);
 	if (pbl == 0) throw XMLReader::InvalidTag(tag);
-	FEParameterList& PL = pbl->GetParameterList();
-	++tag;
-	do
-	{
-		if (m_pim->ReadParameter(tag, PL) == false) throw XMLReader::InvalidTag(tag);
-		++tag;
-	}
-	while (!tag.isend());
+	ReadParameterList(tag, pbl);
 	fem.AddBodyLoad(pbl);
 }
 
@@ -131,8 +114,7 @@ void FEBioLoadsSection::ParseBodyLoad20(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, sztype, &fem);
 	if (pbl == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-	FEParameterList& PL = pbl->GetParameterList();
-	m_pim->ReadParameterList(tag, PL);
+	ReadParameterList(tag, pbl);
 	fem.AddBodyLoad(pbl);
 }
 
@@ -143,7 +125,7 @@ void FEBioLoadsSection::ParseNodalLoad(XMLTag &tag)
 	FEMesh& mesh = fem.GetMesh();
 	DOFS& dofs = fem.GetDOFS();
 
-	int nversion = m_pim->Version();
+	int nversion = GetFileReader()->GetFileVersion();
 	if (nversion >= 0x0200)
 	{
 		// count how many nodal forces there are
@@ -183,14 +165,9 @@ void FEBioLoadsSection::ParseNodalLoad(XMLTag &tag)
 				pfc->SetDOF(bc);
 				pfc->SetLoad(scale, lc);
 				pfc->AddNode(n);
-				fem.AddNodalLoad(pfc);
 
-				// add this boundary condition to the current step
-				if (m_pim->m_nsteps > 0)
-				{
-					GetStep()->AddModelComponent(pfc);
-					pfc->Deactivate();
-				}
+				// add it to the model
+				GetBuilder()->AddNodalLoad(pfc);
 			}
 		}
 		else
@@ -204,21 +181,16 @@ void FEBioLoadsSection::ParseNodalLoad(XMLTag &tag)
 
 				// get the load scale factor
 				double scale = 0.0;
-				m_pim->value(tag, scale);
+				value(tag, scale);
 
 				// create new nodal force
 				FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
 				pfc->SetDOF(bc);
 				pfc->SetLoad(scale, lc);
 				pfc->AddNode(n);
-				fem.AddNodalLoad(pfc);
 
-				// add this boundary condition to the current step
-				if (m_pim->m_nsteps > 0)
-				{
-					GetStep()->AddModelComponent(pfc);
-					pfc->Deactivate();
-				}
+				// add it to the model
+				GetBuilder()->AddNodalLoad(pfc);
 
 				++tag;
 			}
@@ -243,20 +215,15 @@ void FEBioLoadsSection::ParseNodalLoad(XMLTag &tag)
 			int lc = atoi(sz) - 1;
 
 			double scale = 0.0;
-			m_pim->value(tag, scale);
+			value(tag, scale);
 
 			FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
 			pfc->SetDOF(bc);
 			pfc->SetLoad(scale, lc);
 			pfc->AddNode(n);
-			fem.AddNodalLoad(pfc);
 
-			// add this boundary condition to the current step
-			if (m_pim->m_nsteps > 0)
-			{
-				GetStep()->AddModelComponent(pfc);
-				pfc->Deactivate();
-			}
+			// add it to the model
+			GetBuilder()->AddNodalLoad(pfc);
 
 			++tag;
 		}
@@ -285,17 +252,11 @@ void FEBioLoadsSection::ParseNodalLoad25(XMLTag &tag)
 	pfc->SetDOF(bc);
 	pfc->AddNodes(*nodeSet);
 
-	// add nodal load to model
-	fem.AddNodalLoad(pfc);
-	if (m_pim->m_nsteps > 0)
-	{
-		GetStep()->AddModelComponent(pfc);
-		pfc->Deactivate();
-	}
+	// add it to the model
+	GetBuilder()->AddNodalLoad(pfc);
 
 	// read parameters
-	FEParameterList& pl = pfc->GetParameterList();
-	m_pim->ReadParameterList(tag, pl);
+	ReadParameterList(tag, pfc);
 }
 
 //-----------------------------------------------------------------------------
@@ -322,6 +283,8 @@ void FEBioLoadsSection::ParseSurfaceLoad(XMLTag& tag)
 		if (ps->SetAttribute(att.m_szatt, att.m_szatv) == false) throw XMLReader::InvalidAttributeValue(tag, att.m_szatt, att.m_szatv);
 	}
 
+	FEModelBuilder* feb = GetBuilder();
+
 	// read the pressure data
 	++tag;
 	int nf[FEElement::MAX_NODES ], N;
@@ -330,10 +293,10 @@ void FEBioLoadsSection::ParseSurfaceLoad(XMLTag& tag)
 		FESurfaceElement& el = psurf->Element(i);
 
 		if      (tag == "quad4") el.SetType(FE_QUAD4G4);
-		else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
-		else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
-		else if (tag == "tri7" ) el.SetType(m_pim->m_ntri7);
-		else if (tag == "tri10") el.SetType(m_pim->m_ntri10);
+		else if (tag == "tri3" ) el.SetType(feb->m_ntri3);
+		else if (tag == "tri6" ) el.SetType(feb->m_ntri6);
+		else if (tag == "tri7" ) el.SetType(feb->m_ntri7);
+		else if (tag == "tri10") el.SetType(feb->m_ntri10);
 		else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 		else if (tag == "quad9") el.SetType(FE_QUAD9G9);
 		else throw XMLReader::InvalidTag(tag);
@@ -347,17 +310,9 @@ void FEBioLoadsSection::ParseSurfaceLoad(XMLTag& tag)
 
 	ps->SetSurface(psurf);
 
-	// add surface load to model
-	fem.AddSurfaceLoad(ps);
-
-	// add this boundary condition to the current step
-	if (m_pim->m_nsteps > 0)
-	{
-		GetStep()->AddModelComponent(ps);
-		ps->Deactivate();
-	}
+	// add it to the model
+	GetBuilder()->AddSurfaceLoad(ps);
 }
-
 
 //-----------------------------------------------------------------------------
 void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
@@ -380,11 +335,13 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 	// read the parameters
 	FEParameterList& pl = psl->GetParameterList();
 
+	FEModelBuilder* feb = GetBuilder();
+
 	// read the pressure data
 	++tag;
 	do
 	{
-		if (m_pim->ReadParameter(tag, pl) == false)
+		if (ReadParameter(tag, pl) == false)
 		{
 			if (tag == "surface")
 			{
@@ -411,7 +368,7 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 					// create a surface from the facet set
 					if (ps)
 					{
-						if (m_pim->BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag);
+						if (feb->BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag);
 						psl->SetSurface(psurf);
 					}
 					else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
@@ -430,10 +387,10 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 						FESurfaceElement& el = psurf->Element(i);
 
 						if      (tag == "quad4") el.SetType(FE_QUAD4G4);
-						else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
-						else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
-						else if (tag == "tri7" ) el.SetType(m_pim->m_ntri7);
-						else if (tag == "tri10") el.SetType(m_pim->m_ntri10);
+						else if (tag == "tri3" ) el.SetType(feb->m_ntri3);
+						else if (tag == "tri6" ) el.SetType(feb->m_ntri6);
+						else if (tag == "tri7" ) el.SetType(feb->m_ntri7);
+						else if (tag == "tri10") el.SetType(feb->m_ntri10);
 						else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 						else if (tag == "quad9") el.SetType(FE_QUAD9G9);
 						else throw XMLReader::InvalidTag(tag);
@@ -452,15 +409,8 @@ void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
 	}
 	while (!tag.isend());
 
-	// add surface load to model
-	fem.AddSurfaceLoad(psl);
-
-	// add this boundary condition to the current step
-	if (m_pim->m_nsteps > 0)
-	{
-		GetStep()->AddModelComponent(psl);
-		psl->Deactivate();
-	}
+	// add it to the model
+	GetBuilder()->AddSurfaceLoad(psl);
 }
 
 //-----------------------------------------------------------------------------
@@ -484,24 +434,16 @@ void FEBioLoadsSection::ParseSurfaceLoad25(XMLTag& tag)
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
 
 	FESurface* psurf = new FESurface(&mesh);
-	m_pim->BuildSurface(*psurf, *pface);
+	GetBuilder()->BuildSurface(*psurf, *pface);
 	
 	mesh.AddSurface(psurf);
 	psl->SetSurface(psurf);
 
 	// read the parameters
-	FEParameterList& pl = psl->GetParameterList();
-	m_pim->ReadParameterList(tag, pl);
+	ReadParameterList(tag, psl);
 
-	// add surface load to model
-	fem.AddSurfaceLoad(psl);
-
-	// add this boundary condition to the current step
-	if (m_pim->m_nsteps > 0)
-	{
-		GetStep()->AddModelComponent(psl);
-		psl->Deactivate();
-	}
+	// add it to the model
+	GetBuilder()->AddSurfaceLoad(psl);
 }
 
 //-----------------------------------------------------------------------------
@@ -526,7 +468,7 @@ void FEBioLoadsSection::ParseEdgeLoad(XMLTag& tag)
 	++tag;
 	do
 	{
-		if (m_pim->ReadParameter(tag, pl) == false)
+		if (ReadParameter(tag, pl) == false)
 		{
 			if (tag == "edge")
 			{
@@ -580,14 +522,7 @@ void FEBioLoadsSection::ParseEdgeLoad(XMLTag& tag)
 	while (!tag.isend());
 
 	// add edge load to model
-	fem.AddEdgeLoad(pel);
-
-	// add this boundary condition to the current step
-	if (m_pim->m_nsteps > 0)
-	{
-		GetStep()->AddModelComponent(pel);
-		pel->Deactivate();
-	}
+	GetBuilder()->AddEdgeLoad(pel);
 }
 
 //-----------------------------------------------------------------------------
@@ -614,17 +549,10 @@ void FEBioLoadsSection::ParseEdgeLoad25(XMLTag& tag)
 
 	// read the parameters
 	FEParameterList& pl = pel->GetParameterList();
-	m_pim->ReadParameterList(tag, pl);
+	ReadParameterList(tag, pl);
 
 	// add edge load to model
-	fem.AddEdgeLoad(pel);
-
-	// add this boundary condition to the current step
-	if (m_pim->m_nsteps > 0)
-	{
-		GetStep()->AddModelComponent(pel);
-		pel->Deactivate();
-	}
+	GetBuilder()->AddEdgeLoad(pel);
 }
 
 //-----------------------------------------------------------------------------

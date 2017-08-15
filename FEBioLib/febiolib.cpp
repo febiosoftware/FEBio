@@ -103,7 +103,7 @@ bool Configure(const char* szfile)
 								FEParam* p = PL.Find(tag.m_sztag);
 								if (p)
 								{
-									if (xmlReadParameter(tag, PL) == false)
+									if (fexml::readParameter(tag, PL) == false)
 									{
 										fprintf(stderr, "Invalid linear solver parameter value\n"); return false;
 									}
