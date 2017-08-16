@@ -69,6 +69,7 @@ void FEBioBoundarySection25::Parse(XMLTag& tag)
 		else if (tag == "periodic_linear_constraint_2O") ParsePeriodicLinearConstraint2O(tag);
 		else if (tag == "merge"                        ) ParseMergeConstraint           (tag);
 		else throw XMLReader::InvalidTag(tag);
+		++tag;
 	}
 	while (!tag.isend());
 }

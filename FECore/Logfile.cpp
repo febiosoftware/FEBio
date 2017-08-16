@@ -59,7 +59,7 @@ bool LogFileStream::append(const char* szfile)
 //-----------------------------------------------------------------------------
 void LogFileStream::print(const char* sztxt)
 {
-	fprintf(m_fp, sztxt);
+	if (m_fp) fprintf(m_fp, sztxt);
 }
 
 //=============================================================================
