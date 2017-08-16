@@ -178,15 +178,15 @@ User's Manual Version 2.
 
 \series bold
 Last Updated: 
-\change_deleted 2145056167 1496710685
-December 21
-\change_inserted 2145056167 1496710690
+\change_deleted 274815820 1502905203
 June 5
-\change_unchanged
+\change_inserted 274815820 1502905203
+08/16/17
+\change_deleted 274815820 1502905207
 , 201
 \change_deleted 2145056167 1496710691
 6
-\change_inserted 2145056167 1496710691
+\change_deleted 274815820 1502905207
 7
 \change_unchanged
 
@@ -68728,12 +68728,88 @@ name "chap:Restart-Input-file"
 \end_inset
 
 
+\change_inserted 274815820 1502903644
+
+\end_layout
+
+\begin_layout Section
+
+\change_inserted 274815820 1502903699
+Introduction
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Restart-Introduction"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-As of version 1.1.6, FEBio will output a binary dump restart file.
- The user can either run the restart on the binary dump or create a restart
- input file.
+
+\change_deleted 274815820 1502903400
+As of version 1.1.6, 
+\change_inserted 274815820 1502903403
+Users can request 
+\change_unchanged
+FEBio 
+\change_deleted 274815820 1502903405
+will 
+\change_inserted 274815820 1502903406
+to 
+\change_unchanged
+output a binary dump 
+\change_deleted 274815820 1502903415
+restart 
+\change_unchanged
+file.
+ 
+\change_inserted 274815820 1502903464
+This dump file can be used to restart the analysis from the time point saved
+ in the dump file.
+ 
+\change_unchanged
+The user can 
+\change_deleted 274815820 1502903480
+either run the 
+\change_unchanged
+restart 
+\change_inserted 274815820 1502903746
+the analysis either directly from 
+\change_deleted 274815820 1502903494
+on the 
+\change_inserted 274815820 1502903495
+this 
+\change_unchanged
+binary dump 
+\change_inserted 274815820 1502903497
+file 
+\change_unchanged
+or 
+\change_deleted 274815820 1502903500
+create 
+\change_inserted 274815820 1502903501
+via 
+\change_unchanged
+a restart input file
+\change_inserted 274815820 1502903574
+, which is described in this chapter.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Restarting-a-Run"
+
+\end_inset
+
+
+\change_deleted 274815820 1502903516
+.
+
+\change_inserted 274815820 1502903589
+ for more information on how to use the restart feature.
+ 
+\change_unchanged
+
 \end_layout
 
 \begin_layout Standard
@@ -68765,14 +68841,29 @@ element in the Control section:
 \end_layout
 
 \begin_layout Standard
-This describes the format of the restart input file.
+This 
+\change_inserted 274815820 1502903625
+chapter 
+\change_unchanged
+describes the format of the restart input file.
  This file is used to redefine some parameters when restarting a previously
- terminated run.
- The structure is very similar to the FEBio input file and also uses XML
- formatting.
+ terminated run
+\change_inserted 274815820 1502903800
+ and can also be used to extend the analysis
+\change_unchanged
+.
+ 
+\change_inserted 274815820 1502903806
+
 \end_layout
 
 \begin_layout Standard
+The structure is very similar to the FEBio input file and also uses XML
+ formatting.
+
+\change_inserted 274815820 1502903818
+ 
+\change_unchanged
 Since the file uses XML, the first line must be the XML header:
 \end_layout
 
@@ -68786,7 +68877,13 @@ The next line contains the root element of the restart file, and has to
 \end_layout
 
 \begin_layout LyX-Code
-<febio_restart version="1.0">
+<febio_restart version="
+\change_deleted 274815820 1502903827
+1
+\change_inserted 274815820 1502903827
+2
+\change_unchanged
+.0">
 \end_layout
 
 \begin_layout Standard
@@ -68798,22 +68895,28 @@ febio_restart
 root element.
 \end_layout
 
-\begin_layout Description
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
 
+\series bold
 \shape italic
 \emph on
 Archive
+\series default
 \shape default
 \emph default
  define the binary dump file used for restarting.
  
 \end_layout
 
-\begin_layout Description
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
 
+\series bold
 \shape italic
 \emph on
 Control
+\series default
 \shape default
 \emph default
  redefine some control parameters
@@ -68824,11 +68927,14 @@ Control
  
 \end_layout
 
-\begin_layout Description
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
 
+\series bold
 \shape italic
 \emph on
 LoadData
+\series default
 \shape default
 \emph default
  redefine 
@@ -68841,15 +68947,23 @@ some loadcurves.
 
 \end_layout
 
-\begin_layout Description
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
 
 \change_inserted 274815820 1502829866
-Step add an analysis step.
+
+\series bold
+Step
+\series default
+ add an analysis step.
 \end_layout
 
 \begin_layout Standard
-All sections are optional except for the Archive section, and need only
- be defined when redefining parameters.
+All sections are optional except for the Archive section
+\change_deleted 274815820 1502904899
+, and need only be defined when redefining parameters
+\change_unchanged
+.
  In the following paragraphs we describe the different sections in more
  detail.
 \end_layout
@@ -68876,6 +68990,18 @@ root element.
 
 \begin_layout LyX-Code
 <Archive>archive.dmp</Archive>
+\change_inserted 274815820 1502904941
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1502904985
+This file will be created by FEBio when requested by the user and contains
+ the solution of the analysis up to the last converged time step.
+ 
+\change_unchanged
+
 \end_layout
 
 \begin_layout Section
@@ -69160,7 +69286,11 @@ n
 \end_layout
 
 \begin_layout Standard
-In this case the loadcurve 
+In this case
+\change_inserted 274815820 1502903906
+,
+\change_unchanged
+ the loadcurve 
 \shape italic
 id 
 \shape default
@@ -69172,13 +69302,14 @@ is the loadcurve number of the loadcurve that the user wishes to redefine.
 
 \begin_layout Standard
 
-\change_inserted 274815820 1502831367
-New loadcurves can be added.
+\change_inserted 274815820 1502903971
+New loadcurves can be added as well.
  This is useful when in addition adding new Step sections, where new boundary
  conditions are defined.
  When adding new loadcurves, make sure to continue the numbering of the
  parent input file.
- 
+ That is, if the last loadcurve of the parent input file has and id of n,
+ then the first new load curve defined here must have id of n+1.
 \end_layout
 
 \begin_layout Section
@@ -69196,21 +69327,32 @@ name "sec:The-Step-Section-1"
 
 \begin_layout Standard
 
-\change_inserted 274815820 1502830782
+\change_inserted 274815820 1502905548
 The Step section can be used to add additional analysis steps to the model.
  These steps are executed after the initial model has completed.
- This section cannot be use to modify the steps defined in the parent file.
+ This section cannot be used to modify the steps defined in the parent file.
+ See chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Multi-step-Analysis"
+
+\end_inset
+
+ for more information on the Step section or multi-step analyses in general.
  
 \end_layout
 
 \begin_layout Standard
 
-\change_inserted 274815820 1502831132
+\change_inserted 274815820 1502904257
 Using the Step section, additional boundary conditions, loads, contact definitio
 ns, etc.
  can be added, just like in a regular model input file.
  The syntax is the same as the Step section in the regular model input file.
- 
+ The only difference is that the type attribute is required to define the
+ type of analysis.
+ The type has the same role as the Module section in the regular FEBio input
+ file.
 \end_layout
 
 \begin_layout Section
@@ -69221,6 +69363,16 @@ name "sec:Example"
 
 \end_inset
 
+
+\change_inserted 274815820 1502904021
+
+\end_layout
+
+\begin_layout Subsection
+
+\change_inserted 274815820 1502904028
+Example 1
+\change_unchanged
 
 \end_layout
 
@@ -69249,6 +69401,198 @@ element is defined.
 
 \begin_layout LyX-Code
 </febio_restart>
+\change_inserted 274815820 1502904044
+
+\end_layout
+
+\begin_layout Subsection
+
+\change_inserted 274815820 1502904052
+Example 2
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1502904084
+In the following example an additional step is defined, which defines a
+ new boundary condition and a new loadcurve.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904138
+<?xml version="1.0" encoding="utf-8"?>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904155
+<febio_restart version="2.0">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904184
+  <Archive>out.dmp</Archive>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904271
+  <Step type="solid">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904286
+    <Control>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904293
+      <time_steps>10</time_steps>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904301
+      <step_size>0.1</step_size>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904315
+    </Control>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904325
+    <Boundary>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904405
+      <prescribe bc="x" node_set="set1">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904432
+         <scale lc="2">1.0</scale>
+\change_unchanged
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904404
+      </prescribe>
+\change_unchanged
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904324
+    </Boundary>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904435
+  </Step>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904442
+  <LoadData>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904464
+    <loadcurve id="2" type="linear">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904479
+      <point>1, 0</point>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904485
+      <point>2, 1</point>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904461
+    </loadcuve>
+\change_unchanged
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904441
+  </LoadData>
+\change_unchanged
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1502904499
+</febio_restart>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1502905117
+Notice the 
+\begin_inset Quotes eld
+\end_inset
+
+type
+\begin_inset Quotes erd
+\end_inset
+
+ attribute in the Step section.
+ This serves a similar purpose as the Module section in the FEBio input
+ file and defines the solver that FEBio will use to solve this step.
+ This attribute is required when defining steps in the restart file.
+ (The Module section is not supported in the restart input file.)
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1502904680
+The prescribed boundary condition references a node set named 
+\begin_inset Quotes eld
+\end_inset
+
+set1
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This node set must be defined in the parent input file.
+ No new node sets (or surfaces, etc.) can be defined in the restart input
+ file.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_deleted 274815820 1502904494
+
 \end_layout
 
 \begin_layout Chapter
