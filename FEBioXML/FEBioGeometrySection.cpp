@@ -105,7 +105,7 @@ void FEBioGeometrySection25::Parse(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
+void FEBioGeometrySection25::ParsePartSection(XMLTag& tag)
 {
 	// get the part name
 	const char* szname = tag.AttributeValue("name");
@@ -150,7 +150,7 @@ void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
 	}
 }
 
-void FEBioGeometrySection::ParsePart(XMLTag& tag, FEBModel::Part* part)
+void FEBioGeometrySection25::ParsePart(XMLTag& tag, FEBModel::Part* part)
 {
 	// read the part's sections
 	++tag;
@@ -172,7 +172,7 @@ void FEBioGeometrySection::ParsePart(XMLTag& tag, FEBModel::Part* part)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioGeometrySection::ParseInstanceSection(XMLTag& tag)
+void FEBioGeometrySection25::ParseInstanceSection(XMLTag& tag)
 {
 	// get the name and part tags
 	const char* szname = tag.AttributeValue("name", true);
@@ -328,7 +328,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 
 //-----------------------------------------------------------------------------
 //! Reads the Nodes section of the FEBio input file
-void FEBioGeometrySection::ParseNodeSection25(XMLTag& tag, FEBModel::Part* part)
+void FEBioGeometrySection25::ParseNodeSection25(XMLTag& tag, FEBModel::Part* part)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -719,7 +719,7 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 //! by the module (structural, poro, heat, etc), the element type (solid, shell,
 //! etc.) and the material. 
 //!
-void FEBioGeometrySection::ParseElementSection25(XMLTag& tag, FEBModel::Part* part)
+void FEBioGeometrySection25::ParseElementSection25(XMLTag& tag, FEBModel::Part* part)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -1105,7 +1105,7 @@ void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 
 //-----------------------------------------------------------------------------
 //! Reads the Geometry::Groups section of the FEBio input file
-void FEBioGeometrySection::ParseNodeSetSection25(XMLTag& tag, FEBModel::Part* part)
+void FEBioGeometrySection25::ParseNodeSetSection25(XMLTag& tag, FEBModel::Part* part)
 {
 	const char* szname = tag.AttributeValue("name");
 
@@ -1136,7 +1136,7 @@ void FEBioGeometrySection::ParseNodeSetSection25(XMLTag& tag, FEBModel::Part* pa
 }
 
 //-----------------------------------------------------------------------------
-void FEBioGeometrySection::ParseDiscreteSetSection(XMLTag& tag)
+void FEBioGeometrySection25::ParseDiscreteSetSection(XMLTag& tag)
 {
 	// get the mesh
 	FEModel& fem = *GetFEModel();
@@ -1219,7 +1219,7 @@ void FEBioGeometrySection::ParseEdgeSection(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioGeometrySection::ParseSurfacePairSection(XMLTag& tag)
+void FEBioGeometrySection25::ParseSurfacePairSection(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -1256,7 +1256,7 @@ void FEBioGeometrySection::ParseSurfacePairSection(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioGeometrySection::ParseNodeSetPairSection(XMLTag& tag)
+void FEBioGeometrySection25::ParseNodeSetPairSection(XMLTag& tag)
 {
 	FEModelBuilder::NodeSetPair p;
 	const char* szname = tag.AttributeValue("name");
@@ -1288,7 +1288,7 @@ void FEBioGeometrySection::ParseNodeSetPairSection(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioGeometrySection::ParseNodeSetSetSection(XMLTag& tag)
+void FEBioGeometrySection25::ParseNodeSetSetSection(XMLTag& tag)
 {
 	FEModelBuilder::NodeSetSet p;
 	const char* szname = tag.AttributeValue("name");
@@ -1405,7 +1405,7 @@ void FEBioGeometrySection::ParseSurfaceSection(XMLTag& tag)
 
 //-----------------------------------------------------------------------------
 //! Reads a Geometry\Surface section.
-void FEBioGeometrySection::ParseSurfaceSection25(XMLTag& tag, FEBModel::Part* part)
+void FEBioGeometrySection25::ParseSurfaceSection25(XMLTag& tag, FEBModel::Part* part)
 {
 	// get the mesh
 	FEModel& fem = *GetFEModel();

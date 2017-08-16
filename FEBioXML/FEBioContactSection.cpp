@@ -22,12 +22,8 @@ FEBioContactSection::MissingMasterSurface::MissingMasterSurface()
 
 //-----------------------------------------------------------------------------
 //! Parse the Contact section (new in version 2.0)
-void FEBioContactSection::Parse(XMLTag& tag)
+void FEBioContactSection2::Parse(XMLTag& tag)
 {
-	// make sure that the version is 2.x
-	int nversion = GetFileReader()->GetFileVersion();
-	if (nversion < 0x0200) throw XMLReader::InvalidTag(tag);
-
 	// make sure there are children
 	if (tag.isleaf()) return;
 
@@ -43,26 +39,9 @@ void FEBioContactSection::Parse(XMLTag& tag)
 			const char* sztype = tag.AttributeValue("type");
 
 			// Not all contact interfaces can be automated, so we first handle these special cases
-			if      (strcmp(sztype, "rigid_wall"             ) == 0)
-			{
-				if (nversion <= 0x0200) ParseRigidWall(tag);
-				else ParseRigidWall25(tag);
-			}
-			else if (strcmp(sztype, "rigid sliding") == 0)
-			{
-				if (nversion >= 0x0205) ParseRigidSliding(tag);
-				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-			}
-			else if (strcmp(sztype, "rigid") == 0)
-			{
-				if (nversion < 0x0205) ParseRigidInterface(tag);
-				else 
-				{
-					// Rigid boundaries are now defined in the Boundary section
-					throw XMLReader::InvalidAttributeValue(tag, "type", "rigid");
-				}
-			}
-			else if (strcmp(sztype, "linear constraint"      ) == 0) ParseLinearConstraint     (tag);
+			if      (strcmp(sztype, "rigid_wall"       ) == 0) ParseRigidWall       (tag);
+			else if (strcmp(sztype, "rigid"            ) == 0) ParseRigidInterface  (tag);
+			else if (strcmp(sztype, "linear constraint") == 0) ParseLinearConstraint(tag);
 			else 
 			{
 				// If we get here, we try to create a contact interface
@@ -71,9 +50,7 @@ void FEBioContactSection::Parse(XMLTag& tag)
 				if (pci)
 				{
 					GetBuilder()->AddContactInterface(pci);
-
-					if (nversion <= 0x0200) ParseContactInterface(tag, pci);
-					else ParseContactInterface25(tag, pci);
+					ParseContactInterface(tag, pci);
 				}
 				else
 				{
@@ -83,10 +60,9 @@ void FEBioContactSection::Parse(XMLTag& tag)
 					// now it is preferred that they are defined in the Constraints section. For backward
 					// compatibility we still allow constraints to be defined in this section. 
 					FENLConstraint* pc = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, &fem);
-					if (pc && (nversion <= 0x0200))
+					if (pc)
 					{
 						ReadParameterList(tag, pc);
-
 						GetBuilder()->AddNonlinearConstraint(pc);
 					}
 					else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
@@ -101,7 +77,48 @@ void FEBioContactSection::Parse(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioContactSection::ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci)
+//! Parse the Contact section (new in version 2.0)
+void FEBioContactSection25::Parse(XMLTag& tag)
+{
+	// make sure there are children
+	if (tag.isleaf()) return;
+
+	FEModel& fem = *GetFEModel();
+
+	// loop over tags
+	++tag;
+	do
+	{
+		if (tag == "contact")
+		{
+			// get the contact type
+			const char* sztype = tag.AttributeValue("type");
+
+			// Not all contact interfaces can be automated, so we first handle these special cases
+			if      (strcmp(sztype, "rigid_wall"       ) == 0) ParseRigidWall       (tag);
+			else if (strcmp(sztype, "rigid sliding"    ) == 0) ParseRigidSliding    (tag);
+			else if (strcmp(sztype, "linear constraint") == 0) ParseLinearConstraint(tag);
+			else
+			{
+				// If we get here, we try to create a contact interface
+				// using the FEBio kernel. 
+				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, sztype, &fem));
+				if (pci)
+				{
+					GetBuilder()->AddContactInterface(pci);
+					ParseContactInterface(tag, pci);
+				}
+				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+			}
+		}
+		else throw XMLReader::InvalidTag(tag);
+
+		++tag;
+	} while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioContactSection2::ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.GetMesh();
@@ -178,7 +195,7 @@ void FEBioContactSection::ParseContactInterface(XMLTag& tag, FESurfacePairIntera
 }
 
 //-----------------------------------------------------------------------------
-void FEBioContactSection::ParseContactInterface25(XMLTag& tag, FESurfacePairInteraction* pci)
+void FEBioContactSection25::ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.GetMesh();
@@ -205,7 +222,7 @@ void FEBioContactSection::ParseContactInterface25(XMLTag& tag, FESurfacePairInte
 
 //-----------------------------------------------------------------------------
 // --- R I G I D   W A L L   I N T E R F A C E ---
-void FEBioContactSection::ParseRigidWall(XMLTag& tag)
+void FEBioContactSection2::ParseRigidWall(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 
@@ -256,7 +273,7 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 
 //-----------------------------------------------------------------------------
 // --- R I G I D   W A L L   I N T E R F A C E ---
-void FEBioContactSection::ParseRigidWall25(XMLTag& tag)
+void FEBioContactSection25::ParseRigidWall(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -274,7 +291,7 @@ void FEBioContactSection::ParseRigidWall25(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioContactSection::ParseRigidSliding(XMLTag& tag)
+void FEBioContactSection25::ParseRigidSliding(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -294,7 +311,7 @@ void FEBioContactSection::ParseRigidSliding(XMLTag& tag)
 
 //-----------------------------------------------------------------------------
 // --- R I G I D   B O D Y   I N T E R F A C E ---
-void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
+void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FERigidSystem& rigid = *fem.GetRigidSystem();

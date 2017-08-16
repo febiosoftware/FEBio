@@ -41,7 +41,7 @@ void FEBioStepSection2::Parse(XMLTag& tag)
 	Map["Boundary"   ] = new FEBioBoundarySection2   (feb);
 	Map["Loads"      ] = new FEBioLoadsSection       (feb);
 	Map["Initial"    ] = new FEBioInitialSection     (feb);
-	Map["Contact"    ] = new FEBioContactSection     (feb);
+	Map["Contact"    ] = new FEBioContactSection2    (feb);
 
 	// parse the file sections
 	Map.Parse(tag);
@@ -67,7 +67,7 @@ void FEBioStepSection25::Parse(XMLTag& tag)
 	Map["Boundary"   ] = new FEBioBoundarySection25   (imp);
 	Map["Loads"      ] = new FEBioLoadsSection        (imp);
 	Map["Initial"    ] = new FEBioInitialSection25    (imp);
-	Map["Contact"    ] = new FEBioContactSection      (imp);
+	Map["Contact"    ] = new FEBioContactSection25    (imp);
 
 	// parse the file sections
 	Map.Parse(tag);

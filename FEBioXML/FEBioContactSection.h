@@ -8,6 +8,7 @@ class FEFacetSet;
 // Contact section (new in version 2.0)
 class FEBioContactSection : public FEFileSection
 {
+protected:
 	//! missing slave surface
 	class MissingSlaveSurface : public FEFileException
 	{
@@ -24,20 +25,41 @@ class FEBioContactSection : public FEFileSection
 
 public:
 	FEBioContactSection(FEFileImport* pim) : FEFileSection(pim){}
-	void Parse(XMLTag& tag);
 
 protected:
-	void ParseRigidWall            (XMLTag& tag);
-	void ParseRigidWall25          (XMLTag& tag);
-	void ParseRigidSliding         (XMLTag& tag); // new in 2.5
-	void ParseRigidInterface       (XMLTag& tag);
 	void ParseLinearConstraint     (XMLTag& tag);
 
 protected:
-	void ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci);
-	void ParseContactInterface25(XMLTag& tag, FESurfacePairInteraction* pci);
 	bool ParseSurfaceSection  (XMLTag& tag, FESurface& s, int nfmt, bool bnodal);
 
 protected:
 	bool BuildSurface(FESurface& s, FEFacetSet& f, bool bnodal);
+};
+
+//-----------------------------------------------------------------------------
+// Version 2.0
+class FEBioContactSection2 : public FEBioContactSection
+{
+public:
+	FEBioContactSection2(FEFileImport* im) : FEBioContactSection(im){}
+	void Parse(XMLTag& tag);
+
+protected:
+	void ParseRigidInterface(XMLTag& tag);
+	void ParseRigidWall(XMLTag& tag);
+	void ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci);
+};
+
+//-----------------------------------------------------------------------------
+// Version 2.5
+class FEBioContactSection25 : public FEBioContactSection
+{
+public:
+	FEBioContactSection25(FEFileImport* im) : FEBioContactSection(im){}
+	void Parse(XMLTag& tag);
+
+protected:
+	void ParseRigidWall(XMLTag& tag);
+	void ParseRigidSliding(XMLTag& tag);
+	void ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci);
 };

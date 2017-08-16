@@ -166,7 +166,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Initial"    ] = new FEBioInitialSection     (this);
 		m_map["Boundary"   ] = new FEBioBoundarySection2   (this);
 		m_map["Include"    ] = new FEBioIncludeSection     (this);
-		m_map["Contact"    ] = new FEBioContactSection     (this);
+		m_map["Contact"    ] = new FEBioContactSection2    (this);
 		m_map["Discrete"   ] = new FEBioDiscreteSection    (this);
 		m_map["Code"       ] = new FEBioCodeSection        (this); // added in FEBio 2.4 (experimental feature!)
 		m_map["Constraints"] = new FEBioConstraintsSection2(this);
@@ -181,7 +181,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection25    (this);
 		m_map["Boundary"   ] = new FEBioBoundarySection25   (this);
-		m_map["Contact"    ] = new FEBioContactSection      (this);
+		m_map["Contact"    ] = new FEBioContactSection25    (this);
 		m_map["Discrete"   ] = new FEBioDiscreteSection25   (this);
 		m_map["Constraints"] = new FEBioConstraintsSection25(this);
 		m_map["Code"       ] = new FEBioCodeSection         (this); // added in FEBio 2.4 (experimental feature!)
