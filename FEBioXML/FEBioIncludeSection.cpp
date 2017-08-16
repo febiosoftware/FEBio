@@ -6,10 +6,6 @@
 //! This section includes the contents of another FEB file.
 void FEBioIncludeSection::Parse(XMLTag& tag)
 {
-	// make sure that the version is 2.x
-	int nversion = GetFileReader()->GetFileVersion();
-	if (nversion < 0x0200) throw XMLReader::InvalidTag(tag);
-
 	// see if we need to pre-pend a path
 	char szin[512];
 	strcpy(szin, tag.szvalue());

@@ -2,8 +2,6 @@
 #include "FileImport.h"
 #include <FECore/FESurfacePairInteraction.h>
 
-class FEFacetSet;
-
 //-----------------------------------------------------------------------------
 // Contact section (new in version 2.0)
 class FEBioContactSection : public FEFileSection
@@ -31,9 +29,6 @@ protected:
 
 protected:
 	bool ParseSurfaceSection  (XMLTag& tag, FESurface& s, int nfmt, bool bnodal);
-
-protected:
-	bool BuildSurface(FESurface& s, FEFacetSet& f, bool bnodal);
 };
 
 //-----------------------------------------------------------------------------

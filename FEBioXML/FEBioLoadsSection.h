@@ -2,31 +2,46 @@
 #include "FEBioImport.h"
 
 //-----------------------------------------------------------------------------
-class FEFaceSet;
-class FEEdge;
-class FEFacetSet;
-class FESegmentSet;
-
-//-----------------------------------------------------------------------------
-// Loads Section (new in version 1.2)
-class FEBioLoadsSection : public FEFileSection
+// Version 1.2
+class FEBioLoadsSection1x : public FEFileSection
 {
 public:
-	FEBioLoadsSection(FEFileImport* pim) : FEFileSection(pim){}
+	FEBioLoadsSection1x(FEFileImport* pim) : FEFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:
-	void ParseNodalLoad    (XMLTag& tag);
-	void ParseNodalLoad25  (XMLTag& tag);
-	void ParseBodyForce    (XMLTag& tag);
-	void ParseBodyLoad     (XMLTag& tag);
-	void ParseBodyLoad20   (XMLTag& tag);
-	void ParseEdgeLoad     (XMLTag& tag);
-	void ParseEdgeLoad25   (XMLTag& tag);
-	void ParseSurfaceLoad  (XMLTag& tag);
-	void ParseSurfaceLoad20(XMLTag& tag);
-	void ParseSurfaceLoad25(XMLTag& tag);
+	void ParseNodalLoad  (XMLTag& tag);
+	void ParseBodyForce  (XMLTag& tag);
+	void ParseBodyLoad   (XMLTag& tag);
+	void ParseSurfaceLoad(XMLTag& tag);
+};
+
+//-----------------------------------------------------------------------------
+// Version 2.0
+class FEBioLoadsSection2 : public FEFileSection
+{
+public:
+	FEBioLoadsSection2(FEFileImport* pim) : FEFileSection(pim){}
+	void Parse(XMLTag& tag);
 
 protected:
-	bool BuildEdge   (FEEdge&    s, FESegmentSet& f);
+	void ParseNodalLoad  (XMLTag& tag);
+	void ParseBodyLoad   (XMLTag& tag);
+	void ParseEdgeLoad   (XMLTag& tag);
+	void ParseSurfaceLoad(XMLTag& tag);
+};
+
+//-----------------------------------------------------------------------------
+// Version 2.5
+class FEBioLoadsSection25 : public FEFileSection
+{
+public:
+	FEBioLoadsSection25(FEFileImport* pim) : FEFileSection(pim){}
+	void Parse(XMLTag& tag);
+
+protected:
+	void ParseNodalLoad  (XMLTag& tag);
+	void ParseEdgeLoad   (XMLTag& tag);
+	void ParseSurfaceLoad(XMLTag& tag);
+	void ParseBodyLoad   (XMLTag& tag);
 };

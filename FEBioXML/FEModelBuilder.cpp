@@ -205,8 +205,10 @@ void FEModelBuilder::AddRigidNodeSet(FERigidNodeSet* rs)
 	AddComponent(rs);
 }
 
-//-----------------------------------------------------------------------------
-bool FEModelBuilder::BuildSurface(FESurface& s, FEFacetSet& fs)
+//---------------------------------------------------------------------------------
+// parse a surface section for contact definitions
+//
+bool FEModelBuilder::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal)
 {
 	FEMesh& m = m_fem.GetMesh();
 	int NN = m.Nodes();
@@ -223,21 +225,61 @@ bool FEModelBuilder::BuildSurface(FESurface& s, FEFacetSet& fs)
 		FESurfaceElement& el = s.Element(i);
 		FEFacetSet::FACET& fi = fs.Face(i);
 
-		if (fi.ntype == 4) el.SetType(FE_QUAD4G4);
-		else if (fi.ntype == 3) el.SetType(m_ntri3);
-		else if (fi.ntype == 6) el.SetType(m_ntri6);
-		else if (fi.ntype == 7) el.SetType(m_ntri7);
-		else if (fi.ntype == 10) el.SetType(m_ntri10);
-		else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
-		else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
-		else return false;
+		// set the element type/integration rule
+		if (bnodal)
+		{
+			if (fi.ntype == 4) el.SetType(FE_QUAD4NI);
+			else if (fi.ntype == 3) el.SetType(FE_TRI3NI);
+			else if (fi.ntype == 6) el.SetType(FE_TRI6NI);
+			else if (fi.ntype == 8) el.SetType(FE_QUAD8NI);
+			else if (fi.ntype == 9) el.SetType(FE_QUAD9NI);
+			else return false;
+		}
+		else
+		{
+			if (fi.ntype == 4) el.SetType(FE_QUAD4G4);
+			else if (fi.ntype == 3) el.SetType(m_ntri3);
+			else if (fi.ntype == 6) el.SetType(m_ntri6);
+			else if (fi.ntype == 7) el.SetType(m_ntri7);
+			else if (fi.ntype == 10) el.SetType(m_ntri10);
+			else if (fi.ntype == 8) el.SetType(FE_QUAD8G9);
+			else if (fi.ntype == 9) el.SetType(FE_QUAD9G9);
+			else return false;
+		}
 
 		int N = el.Nodes(); assert(N == fi.ntype);
 		for (int j = 0; j<N; ++j) el.m_node[j] = fi.node[j];
 	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEModelBuilder::BuildEdge(FEEdge& e, FESegmentSet& es)
+{
+	FEMesh& m = m_fem.GetMesh();
+	int NN = m.Nodes();
+
+	// count nr of segments
+	int nsegs = es.Segments();
+
+	// allocate storage for faces
+	e.Create(nsegs);
+
+	// read segments
+	for (int i = 0; i<nsegs; ++i)
+	{
+		FELineElement& el = e.Element(i);
+		FESegmentSet::SEGMENT& si = es.Segment(i);
+
+		if (si.ntype == 2) el.SetType(FE_LINE2G1);
+		else return false;
+
+		int N = el.Nodes(); assert(N == si.ntype);
+		for (int j = 0; j<N; ++j) el.m_node[j] = si.node[j];
+	}
 
 	// copy the name
-	s.SetName(fs.GetName());
+	e.SetName(es.GetName());
 
 	return true;
 }
@@ -304,4 +346,121 @@ void FEModelBuilder::GlobalToLocalID(int* l, int n, vector<int>& m)
 	{
 		m[i] = FindNodeFromID(l[i]);
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Get the element type from a XML tag
+FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
+{
+	// determine the element shape 
+	FE_Element_Shape eshape = FE_ELEM_INVALID_SHAPE;
+
+	// for shells, don't overwrite m_pim->m_ntri3/6 or m_nquad4/8, since they are needed for surface definitions
+	FE_Element_Type stype = FE_ELEM_INVALID_TYPE;
+	if      (strcmp(sztype, "hex8"   ) == 0) eshape = ET_HEX8;
+	else if (strcmp(sztype, "hex20"  ) == 0) eshape = ET_HEX20;
+	else if (strcmp(sztype, "hex27"  ) == 0) eshape = ET_HEX27;
+	else if (strcmp(sztype, "penta6" ) == 0) eshape = ET_PENTA6;
+	else if (strcmp(sztype, "penta15") == 0) eshape = ET_PENTA15;
+	else if (strcmp(sztype, "pyra5"  ) == 0) eshape = ET_PYRA5;
+	else if (strcmp(sztype, "tet4"   ) == 0) eshape = ET_TET4;
+	else if (strcmp(sztype, "tet10"  ) == 0) eshape = ET_TET10;
+	else if (strcmp(sztype, "tet15"  ) == 0) eshape = ET_TET15;
+	else if (strcmp(sztype, "tet20"  ) == 0) eshape = ET_TET20;
+	else if (strcmp(sztype, "quad4"  ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; }   // default shell type for quad4
+	else if (strcmp(sztype, "quad8"  ) == 0) { eshape = ET_QUAD8; stype = FE_SHELL_QUAD8G18; }   // default shell type for quad8
+	else if (strcmp(sztype, "quad9"  ) == 0) eshape = ET_QUAD9;
+	else if (strcmp(sztype, "tri3"   ) == 0) { eshape = ET_TRI3; stype = FE_SHELL_TRI3G6; }     // default shell type for tri3
+	else if (strcmp(sztype, "tri6"   ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G14; }     // default shell type for tri6
+	else if (strcmp(sztype, "truss2" ) == 0) eshape = ET_TRUSS2;
+	else
+	{
+		// new way for defining element type and integration rule at the same time
+		// this is useful for multi-step analyses where the geometry is read in before the control section.
+		if      (strcmp(sztype, "TET10G4"     ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10G4; }
+		else if (strcmp(sztype, "TET10G8"     ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10G8; }
+		else if (strcmp(sztype, "TET10GL11"   ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10GL11; }
+		else if (strcmp(sztype, "TET10G4_S3"  ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10G4;   m_ntri6 = FE_TRI6G3; }
+		else if (strcmp(sztype, "TET10G8_S3"  ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10G8;   m_ntri6 = FE_TRI6G3; }
+		else if (strcmp(sztype, "TET10GL11_S3") == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10GL11; m_ntri6 = FE_TRI6G3; }
+		else if (strcmp(sztype, "TET10G4_S4"  ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10G4;   m_ntri6 = FE_TRI6G4; }
+		else if (strcmp(sztype, "TET10G8_S4"  ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10G8;   m_ntri6 = FE_TRI6G4; }
+		else if (strcmp(sztype, "TET10GL11_S4") == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10GL11; m_ntri6 = FE_TRI6G4; }
+		else if (strcmp(sztype, "TET10G4_S7"  ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10G4;   m_ntri6 = FE_TRI6G7; }
+		else if (strcmp(sztype, "TET10G8_S7"  ) == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10G8;   m_ntri6 = FE_TRI6G7; }
+		else if (strcmp(sztype, "TET10GL11_S7") == 0) { eshape = ET_TET10; m_ntet10 = FE_TET10GL11; m_ntri6 = FE_TRI6G7; }
+		else if (strcmp(sztype, "TET15G8"     ) == 0) { eshape = ET_TET15; m_ntet15 = FE_TET15G8; }
+		else if (strcmp(sztype, "TET15G11"    ) == 0) { eshape = ET_TET15; m_ntet15 = FE_TET15G11; }
+		else if (strcmp(sztype, "TET15G15"    ) == 0) { eshape = ET_TET15; m_ntet15 = FE_TET15G15; }
+		else if (strcmp(sztype, "TET15G8_S3"  ) == 0) { eshape = ET_TET15; m_ntet15 = FE_TET15G8;  m_ntri7 = FE_TRI7G3; }
+		else if (strcmp(sztype, "TET15G11_S3" ) == 0) { eshape = ET_TET15; m_ntet15 = FE_TET15G11; m_ntri7 = FE_TRI7G3; }
+		else if (strcmp(sztype, "TET15G15_S3" ) == 0) { eshape = ET_TET15; m_ntet15 = FE_TET15G15; m_ntri7 = FE_TRI7G3; }
+		else if (strcmp(sztype, "TET15G8_S4"  ) == 0) { eshape = ET_TET15; m_ntet15 = FE_TET15G8;  m_ntri7 = FE_TRI7G4; }
+		else if (strcmp(sztype, "TET15G11_S4" ) == 0) { eshape = ET_TET15; m_ntet15 = FE_TET15G11; m_ntri7 = FE_TRI7G4; }
+		else if (strcmp(sztype, "TET15G15_S4" ) == 0) { eshape = ET_TET15; m_ntet15 = FE_TET15G15; m_ntri7 = FE_TRI7G4; }
+		else if (strcmp(sztype, "TET15G8_S7"  ) == 0) { eshape = ET_TET15; m_ntet15 = FE_TET15G8;  m_ntri7 = FE_TRI7G7; }
+		else if (strcmp(sztype, "TET15G11_S7" ) == 0) { eshape = ET_TET15; m_ntet15 = FE_TET15G11; m_ntri7 = FE_TRI7G7; }
+		else if (strcmp(sztype, "TET15G15_S7" ) == 0) { eshape = ET_TET15; m_ntet15 = FE_TET15G15; m_ntri7 = FE_TRI7G7; }
+		else if (strcmp(sztype, "PENTA15G8"   ) == 0) { eshape = ET_PENTA15; stype = FE_PENTA15G8; }
+		else if (strcmp(sztype, "HEX20G8"     ) == 0) { eshape = ET_HEX20; stype = FE_HEX20G8; }
+		else if (strcmp(sztype, "QUAD4G8"     ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; }
+		else if (strcmp(sztype, "QUAD4G12"    ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G12; }
+		else if (strcmp(sztype, "QUAD8G18"    ) == 0) { eshape = ET_QUAD8; stype = FE_SHELL_QUAD8G18; }
+		else if (strcmp(sztype, "QUAD8G27"    ) == 0) { eshape = ET_QUAD8; stype = FE_SHELL_QUAD8G27; }
+		else if (strcmp(sztype, "TRI3G6"      ) == 0) { eshape = ET_TRI3; stype = FE_SHELL_TRI3G6; }
+		else if (strcmp(sztype, "TRI3G9"      ) == 0) { eshape = ET_TRI3; stype = FE_SHELL_TRI3G9; }
+		else if (strcmp(sztype, "TRI6G14"     ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G14; }
+		else if (strcmp(sztype, "TRI6G21"     ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G21; }
+		else
+		{
+			assert(false);
+		}
+	}
+
+	// this is a hack to choose between 2D elements and shell elements.
+	// NOTE: This is only used by quad/tri elements.
+	// TODO: find a better way
+	int NDIM = 3;
+	if (GetModuleName() == "fluid") NDIM = 2;
+
+	// determine the element type
+	FE_Element_Type etype = FE_ELEM_INVALID_TYPE;
+	switch (eshape)
+	{
+	case ET_HEX8   : etype = m_nhex8; break;
+	case ET_PENTA6 : etype = FE_PENTA6G6; break;
+	case ET_PENTA15: etype = FE_PENTA15G21; break;
+	case ET_PYRA5  : etype = FE_PYRA5G8; break;
+	case ET_TET4   : etype = m_ntet4; break;
+	case ET_TET10  : etype = m_ntet10; break;
+	case ET_TET15  : etype = m_ntet15; break;
+	case ET_TET20  : etype = m_ntet20; break;
+	case ET_HEX20  : etype = FE_HEX20G27; break;
+	case ET_HEX27  : etype = FE_HEX27G27; break;
+	case ET_QUAD4  : etype = (NDIM == 3 ? stype : FE2D_QUAD4G4); break;
+	case ET_TRI3   : etype = (NDIM == 3 ? stype : FE2D_TRI3G1); break;
+	case ET_TRI6   : etype = (NDIM == 3 ? stype : FE2D_TRI6G3); break;
+	case ET_QUAD8  : etype = (NDIM == 3 ? stype : FE2D_QUAD8G9); break;
+	case ET_QUAD9  : etype = FE2D_QUAD9G9; break;
+	case ET_TRUSS2 : etype = FE_TRUSS; break;
+	default:
+		assert(false);
+	}
+
+	// determine the element class
+	FE_Element_Class eclass = FEElementLibrary::GetElementClass(etype);
+
+	// return the spec
+	FE_Element_Spec spec;
+	spec.eclass = eclass;
+	spec.eshape = eshape;
+	spec.etype = etype;
+	spec.m_bthree_field_hex = m_b3field_hex;
+	spec.m_bthree_field_tet = m_b3field_tet;
+	spec.m_but4 = m_but4;
+
+	// Make sure this is a valid element specification
+	assert(FEElementLibrary::IsValid(spec));
+
+	return spec;
 }

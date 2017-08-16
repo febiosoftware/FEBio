@@ -20,7 +20,7 @@ FELinearSolidDomain::FELinearSolidDomain(FEModel* pfem, FEMaterial* pmat) : FESo
 	dof.push_back(pfem->GetDOFIndex("x"));
 	dof.push_back(pfem->GetDOFIndex("y"));
 	dof.push_back(pfem->GetDOFIndex("z"));
-	SetDOF(dof);
+	SetDOFList(dof);
 }
 
 //-----------------------------------------------------------------------------

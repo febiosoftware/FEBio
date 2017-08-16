@@ -38,7 +38,7 @@ FEFluidDomain2D::FEFluidDomain2D(FEModel* pfem) : FEDomain2D(&pfem->GetMesh()), 
 	dof.push_back(m_dofVX);
 	dof.push_back(m_dofVY);
 	dof.push_back(m_dofE);
-	SetDOF(dof);
+	SetDOFList(dof);
 }
 
 //-----------------------------------------------------------------------------

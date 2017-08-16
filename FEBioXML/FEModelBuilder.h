@@ -48,7 +48,11 @@ public:
 	void NextStep();
 
 public:
-	bool BuildSurface(FESurface& s, FEFacetSet& fs);
+	bool BuildSurface(FESurface& s, FEFacetSet& f, bool bnodal = false);
+
+	bool BuildEdge(FEEdge& s, FESegmentSet& f);
+
+	FE_Element_Spec ElementSpec(const char* sz);
 
 public:
 	void AddFixedBC(FEFixedBC* pbc);

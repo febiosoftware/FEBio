@@ -32,7 +32,7 @@ FEFluidDomain3D::FEFluidDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEFluidDo
 	dof.push_back(m_dofVY);
 	dof.push_back(m_dofVZ);
 	dof.push_back(m_dofE);
-	SetDOF(dof);
+	SetDOFList(dof);
 }
 
 //-----------------------------------------------------------------------------

@@ -66,7 +66,7 @@ void FEDomain::SetMatID(int mid)
 }
 
 //-----------------------------------------------------------------------------
-void FEDomain::SetDOF(vector<int>& dof)
+void FEDomain::SetDOFList(vector<int>& dof)
 {
 	m_dof = dof;
 }

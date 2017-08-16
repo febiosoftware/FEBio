@@ -10,7 +10,7 @@ FEHeatSolidDomain::FEHeatSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEHea
 	// list the degrees of freedom
 	vector<int> dof;
 	dof.push_back(pfem->GetDOFIndex("T"));
-	SetDOF(dof);
+	SetDOFList(dof);
 }
 
 //-----------------------------------------------------------------------------

@@ -96,7 +96,7 @@ void FEBioConstraintsSection1x::Parse(XMLTag &tag)
 								// create a surface from the facet set
 								if (pset)
 								{
-									if (BuildSurface(*psurf, *pset, true) == false) throw XMLReader::InvalidTag(tag);
+									if (GetBuilder()->BuildSurface(*psurf, *pset, true) == false) throw XMLReader::InvalidTag(tag);
 								}
 								else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 							}
@@ -203,7 +203,7 @@ void FEBioConstraintsSection2::Parse(XMLTag &tag)
 								// create a surface from the facet set
 								if (pset)
 								{
-									if (BuildSurface(*psurf, *pset, true) == false) throw XMLReader::InvalidTag(tag);
+									if (GetBuilder()->BuildSurface(*psurf, *pset, true) == false) throw XMLReader::InvalidTag(tag);
 								}
 								else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 							}
@@ -280,7 +280,7 @@ void FEBioConstraintsSection25::Parse(XMLTag &tag)
 					const char* szsurf = tag.AttributeValue("surface");
 					FEFacetSet* pface = mesh.FindFacetSet(szsurf);
 					if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
-					if (BuildSurface(*psurf, *pface, true) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
+					if (GetBuilder()->BuildSurface(*psurf, *pface, true) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
 				}
 
 				// get the nodeset (this is needed by FEDiscreteContact)
@@ -316,59 +316,8 @@ void FEBioConstraintsSection25::Parse(XMLTag &tag)
 	while (!tag.isend());
 }
 
-//---------------------------------------------------------------------------------
-// parse a surface section for contact definitions
-//
-bool FEBioConstraintsSection_::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
-	int NN = m.Nodes();
-
-	// count nr of faces
-	int faces = fs.Faces();
-
-	// allocate storage for faces
-	s.Create(faces);
-
-	FEModelBuilder* feb = GetBuilder();
-
-	// read faces
-	for (int i=0; i<faces; ++i)
-	{
-		FESurfaceElement& el = s.Element(i);
-		FEFacetSet::FACET& fi = fs.Face(i);
-
-		// set the element type/integration rule
-		if (bnodal)
-		{
-			if      (fi.ntype == 4) el.SetType(FE_QUAD4NI);
-			else if (fi.ntype == 3) el.SetType(FE_TRI3NI );
-			else if (fi.ntype == 6) el.SetType(FE_TRI6NI );
-            else if (fi.ntype == 8) el.SetType(FE_QUAD8NI);
-            else if (fi.ntype == 9) el.SetType(FE_QUAD9NI);
-			else return false;
-		}
-		else
-		{
-			if      (fi.ntype ==  4) el.SetType(FE_QUAD4G4);
-			else if (fi.ntype ==  3) el.SetType(feb->m_ntri3);
-			else if (fi.ntype ==  6) el.SetType(feb->m_ntri6);
-			else if (fi.ntype ==  7) el.SetType(feb->m_ntri7);
-			else if (fi.ntype == 10) el.SetType(feb->m_ntri10);
-			else if (fi.ntype ==  8) el.SetType(FE_QUAD8G9);
-			else if (fi.ntype ==  9) el.SetType(FE_QUAD9G9);
-			else return false;
-		}
-
-		int N = el.Nodes(); assert(N == fi.ntype);
-		for (int j=0; j<N; ++j) el.m_node[j] = fi.node[j];
-	}
-	return true;
-}
-
 //-----------------------------------------------------------------------------
-void FEBioConstraintsSection_::ParseRigidConstraint(XMLTag& tag)
+void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 
@@ -501,7 +450,7 @@ void FEBioConstraintsSection_::ParseRigidConstraint(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioConstraintsSection_::ParseRigidConstraint20(XMLTag& tag)
+void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 
@@ -659,7 +608,7 @@ void FEBioConstraintsSection_::ParseRigidConstraint20(XMLTag& tag)
 //---------------------------------------------------------------------------------
 // parse a surface section for contact definitions
 //
-bool FEBioConstraintsSection_::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt, bool bnodal)
+bool FEBioConstraintsSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt, bool bnodal)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.GetMesh();

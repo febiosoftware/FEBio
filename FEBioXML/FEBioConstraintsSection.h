@@ -6,41 +6,44 @@ class FEFacetSet;
 //-----------------------------------------------------------------------------
 // Constraints Section
 // (Base class. Don't use this directly!)
-class FEBioConstraintsSection_ : public FEFileSection
+class FEBioConstraintsSection : public FEFileSection
 {
 public:
-	FEBioConstraintsSection_(FEFileImport* pim) : FEFileSection(pim){}
+	FEBioConstraintsSection(FEFileImport* pim) : FEFileSection(pim){}
 
 protected:
-	void ParseRigidConstraint(XMLTag& tag);
-	void ParseRigidConstraint20(XMLTag& tag);
 	bool ParseSurfaceSection(XMLTag& tag, FESurface& s, int nfmt, bool bnodal);
-	bool BuildSurface(FESurface& s, FEFacetSet& f, bool bnodal);
 };
 
 //-----------------------------------------------------------------------------
 // Constraints Section (format 1.x)
-class FEBioConstraintsSection1x : public FEBioConstraintsSection_
+class FEBioConstraintsSection1x : public FEBioConstraintsSection
 {
 public:
-	FEBioConstraintsSection1x(FEFileImport* pim) : FEBioConstraintsSection_(pim){}
+	FEBioConstraintsSection1x(FEFileImport* pim) : FEBioConstraintsSection(pim){}
 	void Parse(XMLTag& tag);
+
+protected:
+	void ParseRigidConstraint(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------
 // Constraints Section (format 2.0)
-class FEBioConstraintsSection2 : public FEBioConstraintsSection_
+class FEBioConstraintsSection2 : public FEBioConstraintsSection
 {
 public:
-	FEBioConstraintsSection2(FEFileImport* pim) : FEBioConstraintsSection_(pim){}
+	FEBioConstraintsSection2(FEFileImport* pim) : FEBioConstraintsSection(pim){}
 	void Parse(XMLTag& tag);
+	
+protected:
+	void ParseRigidConstraint20(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------
 // Constraints Section (format 2.5)
-class FEBioConstraintsSection25 : public FEBioConstraintsSection_
+class FEBioConstraintsSection25 : public FEBioConstraintsSection
 {
 public:
-	FEBioConstraintsSection25(FEFileImport* pim) : FEBioConstraintsSection_(pim){}
+	FEBioConstraintsSection25(FEFileImport* pim) : FEBioConstraintsSection(pim){}
 	void Parse(XMLTag& tag);
 };

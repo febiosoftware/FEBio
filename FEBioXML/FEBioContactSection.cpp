@@ -172,7 +172,7 @@ void FEBioContactSection2::ParseContactInterface(XMLTag& tag, FESurfacePairInter
 					// create a surface from the facet set
 					if (ps)
 					{
-						if (BuildSurface(s, *ps, pci->UseNodalIntegration()) == false) throw XMLReader::InvalidTag(tag);
+						if (GetBuilder()->BuildSurface(s, *ps, pci->UseNodalIntegration()) == false) throw XMLReader::InvalidTag(tag);
 					}
 					else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 				}
@@ -206,8 +206,8 @@ void FEBioContactSection25::ParseContactInterface(XMLTag& tag, FESurfacePairInte
 	if (surfacePair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
 
 	// build the surfaces
-	if (BuildSurface(*pci->GetMasterSurface(), *surfacePair->GetMasterSurface(), pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
-	if (BuildSurface(*pci->GetSlaveSurface (), *surfacePair->GetSlaveSurface() , pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
+	if (GetBuilder()->BuildSurface(*pci->GetMasterSurface(), *surfacePair->GetMasterSurface(), pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
+	if (GetBuilder()->BuildSurface(*pci->GetSlaveSurface(), *surfacePair->GetSlaveSurface(), pci->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
 
 	// get the parameter list
 	FEParameterList& pl = pci->GetParameterList();
@@ -285,7 +285,7 @@ void FEBioContactSection25::ParseRigidWall(XMLTag& tag)
 	const char* sz = tag.AttributeValue("surface");
 	FEFacetSet* pface = mesh.FindFacetSet(sz);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
-	if (BuildSurface(ps->m_ss, *pface, ps->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+	if (GetBuilder()->BuildSurface(ps->m_ss, *pface, ps->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 
 	ReadParameterList(tag, ps);
 }
@@ -303,7 +303,7 @@ void FEBioContactSection25::ParseRigidSliding(XMLTag& tag)
 	const char* sz = tag.AttributeValue("surface");
 	FEFacetSet* pface = mesh.FindFacetSet(sz);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
-	if (BuildSurface(*ps->GetSlaveSurface(), *pface, false) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+	if (GetBuilder()->BuildSurface(*ps->GetSlaveSurface(), *pface, false) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 	mesh.AddSurface(ps->GetSlaveSurface());
 
 	ReadParameterList(tag, ps);
@@ -480,60 +480,5 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 
 		++tag;
 	}
-	return true;
-}
-
-//---------------------------------------------------------------------------------
-// parse a surface section for contact definitions
-//
-bool FEBioContactSection::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
-	int NN = m.Nodes();
-
-	// count nr of faces
-	int faces = fs.Faces();
-
-	// allocate storage for faces
-	s.Create(faces);
-
-	FEModelBuilder* feb = GetBuilder();
-
-	// read faces
-	for (int i=0; i<faces; ++i)
-	{
-		FESurfaceElement& el = s.Element(i);
-		FEFacetSet::FACET& fi = fs.Face(i);
-
-		// set the element type/integration rule
-		if (bnodal)
-		{
-			if      (fi.ntype == 4) el.SetType(FE_QUAD4NI);
-			else if (fi.ntype == 3) el.SetType(FE_TRI3NI );
-			else if (fi.ntype == 6) el.SetType(FE_TRI6NI );
-            else if (fi.ntype == 8) el.SetType(FE_QUAD8NI);
-            else if (fi.ntype == 9) el.SetType(FE_QUAD9NI);
-			else return false;
-		}
-		else
-		{
-			if      (fi.ntype ==  4) el.SetType(FE_QUAD4G4);
-			else if (fi.ntype ==  3) el.SetType(feb->m_ntri3);
-			else if (fi.ntype ==  6) el.SetType(feb->m_ntri6);
-			else if (fi.ntype ==  7) el.SetType(feb->m_ntri7);
-			else if (fi.ntype == 10) el.SetType(feb->m_ntri10);
-			else if (fi.ntype ==  8) el.SetType(FE_QUAD8G9);
-			else if (fi.ntype ==  9) el.SetType(FE_QUAD9G9);
-			else return false;
-		}
-
-		int N = el.Nodes(); assert(N == fi.ntype);
-		for (int j=0; j<N; ++j) el.m_node[j] = fi.node[j];
-	}
-
-	// copy the name
-	s.SetName(fs.GetName());
-
 	return true;
 }

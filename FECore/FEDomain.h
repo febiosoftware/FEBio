@@ -118,7 +118,7 @@ public: // optional functions to overload
 	virtual void BuildMatrixProfile(FEGlobalMatrix& M);
 
 public:
-	void SetDOF(vector<int>& dof);
+	void SetDOFList(vector<int>& dof);
 
 	int GetDOFS() const { return (int) m_dof.size(); }
 
