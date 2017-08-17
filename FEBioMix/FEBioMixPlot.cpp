@@ -569,7 +569,7 @@ bool FEPlotActualSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM)
 {
 	m_nsol = 0;
-	m_pfem = 0;
+	m_pfem = pfem;
 }
 
 //-----------------------------------------------------------------------------
