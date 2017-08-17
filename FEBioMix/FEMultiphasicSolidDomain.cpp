@@ -133,6 +133,17 @@ bool FEMultiphasicSolidDomain::Initialize()
             ps.m_sbmrhat.assign(nsbm, 0);
         }
     }
+
+	// set the active degrees of freedom list
+	vector<int> dofs;
+	int nsol = m_pMat->Solutes();
+	for (int i=0; i<nsol; ++i)
+	{
+		int m = m_pMat->GetSolute(i)->GetSoluteID();
+		dofs.push_back(m_dofC + m);
+	}
+	SetDOFList(dofs);
+
     return true;
 }
 

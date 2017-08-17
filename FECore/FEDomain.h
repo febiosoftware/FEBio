@@ -120,7 +120,7 @@ public: // optional functions to overload
 public:
 	void SetDOFList(vector<int>& dof);
 
-	int GetDOFS() const { return (int) m_dof.size(); }
+	int GetDOFCount() const { return (int) m_dof.size(); }
 
 	const vector<int>& GetDOFList() const { return m_dof; }
 
