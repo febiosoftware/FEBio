@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FESolidSolver2.h"
 #include "FERigidMaterial.h"
+#include "FERigidConnector.h"
+#include "FESlidingInterfaceBW.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FEBodyForce.h"
 #include "FEPressureLoad.h"
@@ -139,6 +141,39 @@ FESolidSolver2::~FESolidSolver2()
 }
 
 //-----------------------------------------------------------------------------
+//! Generate warnings if needed
+void FESolidSolver2:: SolverWarnings()
+{
+    // Generate warning if rigid connectors are used with symmetric stiffness
+    if (m_bsymm) {
+        for (int i=0; i<m_fem.NonlinearConstraints(); ++i)
+        {
+            FENLConstraint* plc = m_fem.NonlinearConstraint(i);
+            FERigidConnector* prc = dynamic_cast<FERigidConnector*>(plc);
+            if (prc) {
+                felog.printbox("WARNING", "Rigid connectors require non-symmetric stiffness matrix.\nSet symmetric_stiffness flag to false in Control section.");
+                break;
+            }
+        }
+        
+        // Generate warning if sliding-tension-compression contact is used with symmetric stiffness
+        if (m_fem.SurfacePairInteractions() > 0)
+        {
+            // loop over all contact interfaces
+            for (int i=0; i<m_fem.SurfacePairInteractions(); ++i)
+            {
+                FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
+                FESlidingInterfaceBW* pbw = dynamic_cast<FESlidingInterfaceBW*>(pci);
+                if (pbw) {
+                    felog.printbox("WARNING", "The sliding-tension-compression contact algorithm \nruns better with a non-symmetric stiffness matrix.\nYou may set symmetric_stiffness flag to false in Control section.");
+                    break;
+                }
+            }
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! Allocates and initializes the data structures used by the FESolidSolver2
 //
 bool FESolidSolver2::Init()
@@ -163,6 +198,8 @@ bool FESolidSolver2::Init()
 	gather(m_Ut, mesh, m_dofV);
 	gather(m_Ut, mesh, m_dofW);
 
+    SolverWarnings();
+    
 	return true;
 }
 

@@ -30,6 +30,9 @@ public:
 	//! Initialize linear equation system
 	bool InitEquations();
 
+    //! Generate warnings if needed
+    void SolverWarnings();
+    
 public:
 	//! assemble the element residual into the global residual
 	//! \todo This was implemented for nodal forces
