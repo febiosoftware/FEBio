@@ -114,10 +114,6 @@ public:
 	void defhess(FESolidElement &el, int n, tens3drs &G);
 	void defhess(FESolidElement &el, double r, double s, double t, tens3drs &G);
 
-	// calculates derivatives of shape functions
-	void shape_gradient(const FESolidElement& el, int n, vec3d* G);
-	void shape_gradient(const FESolidElement& el, double r, double s, double t, vec3d* G);
-
 	// Calculates second derivative of shape function N[node]
 	void shape_gradient2(const FESolidElement& el, vec3d* X, int n, mat3d* H);
 	void shape_gradient2(const FESolidElement& el, vec3d* X, double r, double s, double t, mat3d* H);

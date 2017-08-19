@@ -1009,6 +1009,109 @@ void FESolidDomain::gradTgradShape(FESolidElement& el, int j, vector<mat3d>& mn)
 }
 
 //-----------------------------------------------------------------------------
+double FESolidDomain::ShapeGradient(FESolidElement& el, int n, vec3d* GradH)
+{
+	// calculate jacobian
+	double Ji[3][3];
+	double detJt = invjact(el, Ji, n);
+
+	// evaluate shape function derivatives
+	int ne = el.Nodes();
+	for (int i = 0; i<ne; ++i)
+	{
+		double Gr = el.Gr(n)[i];
+		double Gs = el.Gs(n)[i];
+		double Gt = el.Gt(n)[i];
+
+		// calculate global gradient of shape functions
+		// note that we need the transposed of Ji, not Ji itself !
+		GradH[i].x = Ji[0][0] * Gr + Ji[1][0] * Gs + Ji[2][0] * Gt;
+		GradH[i].y = Ji[0][1] * Gr + Ji[1][1] * Gs + Ji[2][1] * Gt;
+		GradH[i].z = Ji[0][2] * Gr + Ji[1][2] * Gs + Ji[2][2] * Gt;
+	}
+
+	return detJt;
+}
+
+//-----------------------------------------------------------------------------
+double FESolidDomain::ShapeGradient0(FESolidElement& el, int n, vec3d* GradH)
+{
+	// calculate jacobian
+	double Ji[3][3];
+	double detJ0 = invjac0(el, Ji, n);
+
+	// evaluate shape function derivatives
+	int ne = el.Nodes();
+	for (int i = 0; i<ne; ++i)
+	{
+		double Gr = el.Gr(n)[i];
+		double Gs = el.Gs(n)[i];
+		double Gt = el.Gt(n)[i];
+
+		// calculate global gradient of shape functions
+		// note that we need the transposed of Ji, not Ji itself !
+		GradH[i].x = Ji[0][0] * Gr + Ji[1][0] * Gs + Ji[2][0] * Gt;
+		GradH[i].y = Ji[0][1] * Gr + Ji[1][1] * Gs + Ji[2][1] * Gt;
+		GradH[i].z = Ji[0][2] * Gr + Ji[1][2] * Gs + Ji[2][2] * Gt;
+	}
+
+	return detJ0;
+}
+
+//-----------------------------------------------------------------------------
+double FESolidDomain::ShapeGradient(FESolidElement& el, double r, double s, double t, vec3d* GradH)
+{
+	// calculate jacobian
+	double Ji[3][3];
+	double detJt = invjact(el, Ji, r, s, t);
+
+	// shape function derivatives
+	double Gr[FEElement::MAX_NODES];
+	double Gs[FEElement::MAX_NODES];
+	double Gt[FEElement::MAX_NODES];
+	el.shape_deriv(Gr, Gs, Gt, r, s, t);
+
+	int neln = el.Nodes();
+	for (int i = 0; i<neln; ++i)
+	{
+		// calculate global gradient of shape functions
+		// note that we need the transposed of Ji, not Ji itself !
+		GradH[i].x = Ji[0][0] * Gr[i] + Ji[1][0] * Gs[i] + Ji[2][0] * Gt[i];
+		GradH[i].y = Ji[0][1] * Gr[i] + Ji[1][1] * Gs[i] + Ji[2][1] * Gt[i];
+		GradH[i].z = Ji[0][2] * Gr[i] + Ji[1][2] * Gs[i] + Ji[2][2] * Gt[i];
+	}
+
+	return detJt;
+}
+
+//-----------------------------------------------------------------------------
+double FESolidDomain::ShapeGradient0(FESolidElement& el, double r, double s, double t, vec3d* GradH)
+{
+	// calculate jacobian
+	double Ji[3][3];
+	double detJ0 = invjac0(el, Ji, r, s, t);
+
+	// shape function derivatives
+	double Gr[FEElement::MAX_NODES];
+	double Gs[FEElement::MAX_NODES];
+	double Gt[FEElement::MAX_NODES];
+	el.shape_deriv(Gr, Gs, Gt, r, s, t);
+
+	int neln = el.Nodes();
+	for (int i = 0; i<neln; ++i)
+	{
+		// calculate global gradient of shape functions
+		// note that we need the transposed of Ji, not Ji itself !
+		GradH[i].x = Ji[0][0] * Gr[i] + Ji[1][0] * Gs[i] + Ji[2][0] * Gt[i];
+		GradH[i].y = Ji[0][1] * Gr[i] + Ji[1][1] * Gs[i] + Ji[2][1] * Gt[i];
+		GradH[i].z = Ji[0][2] * Gr[i] + Ji[1][2] * Gs[i] + Ji[2][2] * Gt[i];
+	}
+
+	return detJ0;
+}
+
+
+//-----------------------------------------------------------------------------
 void FESolidDomain::Serialize(DumpStream &ar)
 {
 	if (ar.IsShallow())

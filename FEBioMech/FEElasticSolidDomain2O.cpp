@@ -401,7 +401,7 @@ void FEElasticSolidDomain2O::UpdateKinematics()
 				// evaluate element Jacobian and shape function derivatives
 				// at this integration point
 				vec3d& ksi = data.ksi[m];
-				shape_gradient(el, ksi.x, ksi.y, ksi.z, G);
+				ShapeGradient0(el, ksi.x, ksi.y, ksi.z, G);
 
 				// calculate displacement gradient
 				mat3d Gu; Gu.zero();
@@ -705,7 +705,7 @@ void FEElasticSolidDomain2O::InternalForcesDG2(FEGlobalVector& R)
 				// evaluate element shape function derivatives
 				// at this integration point
 				vec3d& ksi = data.ksi[m];
-				shape_gradient(el, ksi.x, ksi.y, ksi.z, G);
+				ShapeGradient0(el, ksi.x, ksi.y, ksi.z, G);
 				shape_gradient2(el, X, ksi.x, ksi.y, ksi.z, H);
 
 				for (int a=0; a<neln; ++a)
@@ -1143,8 +1143,8 @@ void FEElasticSolidDomain2O::ElementStiffnessMatrixDG1(FESurfaceElement& face, F
 		double Nu[3] = {nu.x, nu.y, nu.z};
 
 		// shape function gradients at this integration point
-		shape_gradient(ela, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, Ga);
-		shape_gradient(elb, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, Gb);
+		ShapeGradient0(ela, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, Ga);
+		ShapeGradient0(elb, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, Gb);
 
 		shape_gradient2(ela, Xa, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, Ha);
 		shape_gradient2(elb, Xb, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, Hb);
@@ -1363,8 +1363,8 @@ void FEElasticSolidDomain2O::ElementStiffnessMatrixDG2(FESurfaceElement& face, F
 		double Nu[3] = {nu.x, nu.y, nu.z};
 
 		// shape function gradients at this integration point
-		shape_gradient(ela, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, G1a);
-		shape_gradient(elb, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, G1b);
+		ShapeGradient0(ela, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, G1a);
+		ShapeGradient0(elb, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, G1b);
 		shape_gradient2(ela, Xa, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, G2a);
 		shape_gradient2(elb, Xb, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, G2b);
 
@@ -1598,8 +1598,8 @@ void FEElasticSolidDomain2O::ElementStiffnessMatrixDG3(FESurfaceElement& face, F
 		double Nu[3] = {nu.x, nu.y, nu.z};
 
 		// shape function gradients at this integration point
-		shape_gradient(ela, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, Ga);
-		shape_gradient(elb, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, Gb);
+		ShapeGradient0(ela, data.ksi[1].x, data.ksi[1].y, data.ksi[1].z, Ga);
+		ShapeGradient0(elb, data.ksi[0].x, data.ksi[0].y, data.ksi[0].z, Gb);
 
 		// average stiffness 
 		tens6d& Javg = data.J0avg;
@@ -1745,11 +1745,8 @@ void FEElasticSolidDomain2O::ElementStiffness(const FETimeInfo& tp, int iel, mat
 		tens6d J;
 		pmat->Tangent(mp, C, L, H, J);
 
-		// Jacobian determinant
-		double J0 = detJ0(el, ni);
-
 		// get the first derivative of shape functions
-		shape_gradient(el, ni, G);
+		double J0 = ShapeGradient0(el, ni, G);
 
 		// second derivative of shape functions
 		shape_gradient2(el, X, ni, G2);
@@ -1923,57 +1920,6 @@ void FEElasticSolidDomain2O::defhess(FESolidElement &el, double r, double s, dou
 				G(1,j,k) += Ha[j][k]*x[a].y;
 				G(2,j,k) += Ha[j][k]*x[a].z;
 			}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEElasticSolidDomain2O::shape_gradient(const FESolidElement& el, int n, vec3d* G)
-{
-	// calculate jacobian
-	double Ji[3][3];
-	invjac0(el, Ji, n);
-
-	// shape function derivatives
-	double* Grn = el.Gr(n);
-	double* Gsn = el.Gs(n);
-	double* Gtn = el.Gt(n);
-
-	int neln = el.Nodes();
-	for (int i=0; i<neln; ++i)
-	{
-		double Gr = Grn[i];
-		double Gs = Gsn[i];
-		double Gt = Gtn[i];
-
-		// calculate global gradient of shape functions
-		// note that we need the transposed of Ji, not Ji itself !
-		G[i].x = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
-		G[i].y = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
-		G[i].z = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEElasticSolidDomain2O::shape_gradient(const FESolidElement& el, double r, double s, double t, vec3d* G)
-{
-	// calculate jacobian
-	double Ji[3][3];
-	invjac0(el, Ji, r, s, t);
-
-	// shape function derivatives
-	double Gr[FEElement::MAX_NODES];
-	double Gs[FEElement::MAX_NODES];
-	double Gt[FEElement::MAX_NODES];
-	el.shape_deriv(Gr, Gs, Gt, r, s, t);
-
-	int neln = el.Nodes();
-	for (int i=0; i<neln; ++i)
-	{
-		// calculate global gradient of shape functions
-		// note that we need the transposed of Ji, not Ji itself !
-		G[i].x = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-		G[i].y = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-		G[i].z = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
 	}
 }
 

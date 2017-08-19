@@ -92,7 +92,19 @@ public:
     
     //! calculate the transpose of the gradient of the shape function gradients at an integration point
     void gradTgradShape(FESolidElement& el, int j, vector<mat3d>& mn);
-    
+
+	//! calculate spatial gradient of shapefunctions at integration point (returns Jacobian determinant)
+	double ShapeGradient(FESolidElement& el, int n, vec3d* GradH);
+
+	//! calculate spatial gradient of shapefunctions at integration point in reference frame (returns Jacobian determinant)
+	double ShapeGradient0(FESolidElement& el, int n, vec3d* GradH);
+
+	//! calculate spatial gradient of shapefunctions at integration point (returns Jacobian determinant)
+	double ShapeGradient(FESolidElement& el, double r, double s, double t, vec3d* GradH);
+
+	//! calculate spatial gradient of shapefunctions at integration point in reference frame (returns Jacobian determinant)
+	double ShapeGradient0(FESolidElement& el, double r, double s, double t, vec3d* GradH);
+
 public:
 	//! serialize data to archive
 	void Serialize(DumpStream& ar);

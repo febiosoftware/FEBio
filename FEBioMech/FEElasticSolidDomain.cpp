@@ -357,69 +357,33 @@ void FEElasticSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEle
 
 //-----------------------------------------------------------------------------
 //! calculates element's geometrical stiffness component for integration point n
-
 void FEElasticSolidDomain::ElementGeometricalStiffness(FESolidElement &el, matrix &ke)
 {
-	int n, i, j;
-
-	double Gx[FEElement::MAX_NODES];
-	double Gy[FEElement::MAX_NODES];
-	double Gz[FEElement::MAX_NODES];
-	double *Grn, *Gsn, *Gtn;
-	double Gr, Gs, Gt;
-
-	// nr of nodes
-	int neln = el.Nodes();
-
-	// nr of integration points
-	int nint = el.GaussPoints();
-
-	// jacobian
-	double Ji[3][3], detJt;
+	// spatial derivatives of shape functions
+	vec3d G[FEElement::MAX_NODES];
 
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
-	// stiffness component for the initial stress component of stiffness matrix
-	double kab;
-
 	// calculate geometrical element stiffness matrix
-	for (n=0; n<nint; ++n)
+	int neln = el.Nodes();
+	int nint = el.GaussPoints();
+	for (int n = 0; n<nint; ++n)
 	{
-		// calculate jacobian
-		detJt = invjact(el, Ji, n)*gw[n];
-
-		Grn = el.Gr(n);
-		Gsn = el.Gs(n);
-		Gtn = el.Gt(n);
-
-		for (i=0; i<neln; ++i)
-		{
-			Gr = Grn[i];
-			Gs = Gsn[i];
-			Gt = Gtn[i];
-
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx[i] = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
-			Gy[i] = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
-			Gz[i] = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
-		}
+		// calculate shape function gradients and jacobian
+		double w = ShapeGradient(el, n, G)*gw[n];
 
 		// get the material point data
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// element's Cauchy-stress tensor at gauss point n
-		// s is the voight vector
 		mat3ds& s = pt.m_s;
 
-		for (i=0; i<neln; ++i)
-			for (j=i; j<neln; ++j)
+		for (int i = 0; i<neln; ++i)
+			for (int j = i; j<neln; ++j)
 			{
-				kab = (Gx[i]*(s.xx()*Gx[j]+s.xy()*Gy[j]+s.xz()*Gz[j]) +
-					   Gy[i]*(s.xy()*Gx[j]+s.yy()*Gy[j]+s.yz()*Gz[j]) + 
-					   Gz[i]*(s.xz()*Gx[j]+s.yz()*Gy[j]+s.zz()*Gz[j]))*detJt;
+				double kab = (G[i]*(s * G[j]))*w;
 
 				ke[3*i  ][3*j  ] += kab;
 				ke[3*i+1][3*j+1] += kab;
@@ -428,24 +392,18 @@ void FEElasticSolidDomain::ElementGeometricalStiffness(FESolidElement &el, matri
 	}
 }
 
-
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
 void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &ke)
 {
-	int i, i3, j, j3, n;
-
 	// Get the current element's data
 	const int nint = el.GaussPoints();
 	const int neln = el.Nodes();
 	const int ndof = 3*neln;
 
 	// global derivatives of shape functions
-	// Gx = dH/dx
-	double Gx[FEElement::MAX_NODES];
-	double Gy[FEElement::MAX_NODES];
-	double Gz[FEElement::MAX_NODES];
+	vec3d G[FEElement::MAX_NODES];
 
 	double Gxi, Gyi, Gzi;
 	double Gxj, Gyj, Gzj;
@@ -456,24 +414,17 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 	// The 'D*BL' matrix
 	double DBL[6][3];
 
-	double *Grn, *Gsn, *Gtn;
-	double Gr, Gs, Gt;
-
 	// jacobian
-	double Ji[3][3], detJt;
+	double detJt;
 	
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
 	// calculate element stiffness matrix
-	for (n=0; n<nint; ++n)
+	for (int n=0; n<nint; ++n)
 	{
-		// calculate jacobian
-		detJt = invjact(el, Ji, n)*gw[n];
-
-		Grn = el.Gr(n);
-		Gsn = el.Gs(n);
-		Gtn = el.Gt(n);
+		// calculate jacobian and shape function gradients
+		detJt = ShapeGradient(el, n, G)*gw[n];
 
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
@@ -484,33 +435,20 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 		tens4ds C = m_pMat->Tangent(mp);
 		C.extract(D);
 
-		for (i=0; i<neln; ++i)
-		{
-			Gr = Grn[i];
-			Gs = Gsn[i];
-			Gt = Gtn[i];
-
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx[i] = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
-			Gy[i] = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
-			Gz[i] = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
-		}
-
 		// we only calculate the upper triangular part
 		// since ke is symmetric. The other part is
 		// determined below using this symmetry.
-		for (i=0, i3=0; i<neln; ++i, i3 += 3)
+		for (int i=0, i3=0; i<neln; ++i, i3 += 3)
 		{
-			Gxi = Gx[i];
-			Gyi = Gy[i];
-			Gzi = Gz[i];
+			Gxi = G[i].x;
+			Gyi = G[i].y;
+			Gzi = G[i].z;
 
-			for (j=i, j3 = i3; j<neln; ++j, j3 += 3)
+			for (int j=i, j3 = i3; j<neln; ++j, j3 += 3)
 			{
-				Gxj = Gx[j];
-				Gyj = Gy[j];
-				Gzj = Gz[j];
+				Gxj = G[j].x;
+				Gyj = G[j].y;
+				Gzj = G[j].z;
 
 				// calculate D*BL matrices
 				DBL[0][0] = (D[0][0]*Gxj+D[0][3]*Gyj+D[0][5]*Gzj);
