@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		D546F0651E037D7400B7FFAF /* xmltool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D546F0631E037D7400B7FFAF /* xmltool.cpp */; };
 		D546F0661E037D7400B7FFAF /* xmltool.h in Headers */ = {isa = PBXBuildFile; fileRef = D546F0641E037D7400B7FFAF /* xmltool.h */; };
+		D5485CD31F48677900902C45 /* FEModelBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5485CD11F48677900902C45 /* FEModelBuilder.cpp */; };
+		D5485CD41F48677900902C45 /* FEModelBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = D5485CD21F48677900902C45 /* FEModelBuilder.h */; };
 		D58D4D191B5D804F002BB72A /* FEBioCodeSection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58D4D171B5D804F002BB72A /* FEBioCodeSection.cpp */; };
 		D58D4D1A1B5D804F002BB72A /* FEBioCodeSection.h in Headers */ = {isa = PBXBuildFile; fileRef = D58D4D181B5D804F002BB72A /* FEBioCodeSection.h */; };
 		D5D4B7581DE5BA8D00D02B27 /* FEBModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D4B7561DE5BA8D00D02B27 /* FEBModel.cpp */; };
@@ -63,6 +65,8 @@
 /* Begin PBXFileReference section */
 		D546F0631E037D7400B7FFAF /* xmltool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xmltool.cpp; sourceTree = "<group>"; };
 		D546F0641E037D7400B7FFAF /* xmltool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xmltool.h; sourceTree = "<group>"; };
+		D5485CD11F48677900902C45 /* FEModelBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEModelBuilder.cpp; sourceTree = "<group>"; };
+		D5485CD21F48677900902C45 /* FEModelBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEModelBuilder.h; sourceTree = "<group>"; };
 		D58D4D171B5D804F002BB72A /* FEBioCodeSection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioCodeSection.cpp; sourceTree = "<group>"; };
 		D58D4D181B5D804F002BB72A /* FEBioCodeSection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioCodeSection.h; sourceTree = "<group>"; };
 		D5D4B7561DE5BA8D00D02B27 /* FEBModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBModel.cpp; sourceTree = "<group>"; };
@@ -187,6 +191,8 @@
 				D5E109B01865E11600B23922 /* FEBioStepSection.h */,
 				D5D4B7561DE5BA8D00D02B27 /* FEBModel.cpp */,
 				D5D4B7571DE5BA8D00D02B27 /* FEBModel.h */,
+				D5485CD11F48677900902C45 /* FEModelBuilder.cpp */,
+				D5485CD21F48677900902C45 /* FEModelBuilder.h */,
 				D5E109B21865E11600B23922 /* FERestartImport.cpp */,
 				D5E109B31865E11600B23922 /* FERestartImport.h */,
 				D5E109B41865E11600B23922 /* FileImport.cpp */,
@@ -224,6 +230,7 @@
 				D5E109D21865E11600B23922 /* FEBioModuleSection.h in Headers */,
 				D5E109CC1865E11600B23922 /* FEBioLoadDataSection.h in Headers */,
 				D5E109C81865E11600B23922 /* FEBioImport.h in Headers */,
+				D5485CD41F48677900902C45 /* FEModelBuilder.h in Headers */,
 				D5D4B7591DE5BA8D00D02B27 /* FEBModel.h in Headers */,
 				D5E109BC1865E11600B23922 /* FEBioConstraintsSection.h in Headers */,
 				D5E109C01865E11600B23922 /* FEBioControlSection.h in Headers */,
@@ -302,6 +309,7 @@
 				D5E109CB1865E11600B23922 /* FEBioLoadDataSection.cpp in Sources */,
 				D5E109B91865E11600B23922 /* FEBioBoundarySection.cpp in Sources */,
 				D5E109CF1865E11600B23922 /* FEBioMaterialSection.cpp in Sources */,
+				D5485CD31F48677900902C45 /* FEModelBuilder.cpp in Sources */,
 				D5F705F41A6DB9A300A44888 /* FEBioIncludeSection.cpp in Sources */,
 				D5E109BF1865E11600B23922 /* FEBioControlSection.cpp in Sources */,
 				D5E109C51865E11600B23922 /* FEBioGlobalsSection.cpp in Sources */,
