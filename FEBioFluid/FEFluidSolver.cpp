@@ -139,8 +139,6 @@ bool FEFluidSolver::Init()
     m_di.assign(m_ndeq,0);
     m_Di.assign(m_ndeq,0);
     
-    int i, n;
-    
     // we need to fill the total DOF vector m_Ut
     // TODO: I need to find an easier way to do this
     FEMesh& mesh = m_fem.GetMesh();
@@ -277,8 +275,6 @@ void FEFluidSolver::Serialize(DumpStream& ar)
 //! accelerations, etc.
 void FEFluidSolver::UpdateKinematics(vector<double>& ui)
 {
-    int i, n;
-    
     // get the mesh
     FEMesh& mesh = m_fem.GetMesh();
     
@@ -293,7 +289,7 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
     
     // make sure the prescribed velocities are fullfilled
     int nvel = m_fem.PrescribedBCs();
-    for (i=0; i<nvel; ++i)
+    for (int i=0; i<nvel; ++i)
     {
         FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
         if (dc.IsActive()) dc.Update();
@@ -550,6 +546,8 @@ bool FEFluidSolver::Quasin(double time)
     // initialize flags
     bool bconv = false;		// convergence flag
     
+    static int nretries = 0;
+    
     // Get the current step
     FEAnalysis* pstep = m_fem.GetCurrentStep();
     
@@ -563,6 +561,9 @@ bool FEFluidSolver::Quasin(double time)
 	// calculate initial stiffness matrix
 	bool breform = m_breformtimestep;
 	if (pstep->m_ntotiter == 0) breform = true;
+    // force reformation on a retry, if m_breformtimestep is set to false
+    if ((m_breformtimestep == false) && (pstep->m_nretries > nretries)) breform = true;
+    nretries = pstep->m_nretries;
 	if (breform)
 	{
 		// reset the bfgs updates
