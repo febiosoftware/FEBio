@@ -1,14 +1,4 @@
-//
-//  FERigidLock.hpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 1/31/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FERigidLock_hpp
-#define FERigidLock_hpp
-
+#pragma once
 #include "FECore/vec3d.h"
 #include "FERigidConnector.h"
 
@@ -68,10 +58,5 @@ protected:
     vec3d	m_L;	//! Lagrange multiplier for constraining force
     vec3d	m_U;	//! Lagrange multiplier for constraining moment
     
-protected:
-    bool	m_binit;
-    
     DECLARE_PARAMETER_LIST();
 };
-
-#endif /* FERigidLock_hpp */

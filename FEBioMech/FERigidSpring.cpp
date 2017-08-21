@@ -1,17 +1,8 @@
-//
-//  FERigidSpring.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 5/11/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FERigidSpring.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FEModel.h"
-#include "FECore/FERigidSystem.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/FEMaterial.h"
 
@@ -27,7 +18,6 @@ END_PARAMETER_LIST();
 FERigidSpring::FERigidSpring(FEModel* pfem) : FERigidConnector(pfem)
 {
     m_nID = m_ncount++;
-    m_binit = false;
     m_L0 = 0;
 }
 
@@ -36,43 +26,18 @@ FERigidSpring::FERigidSpring(FEModel* pfem) : FERigidConnector(pfem)
 //!       phase. Is that necessary?
 bool FERigidSpring::Init()
 {
-    if (m_binit) return true;
+	// base class first
+	if (FERigidConnector::Init() == false) return false;
     
     // reset force
     m_F = vec3d(0,0,0);
     
-    FEModel& fem = *GetFEModel();
-    
-    // When the rigid spring is read in, the ID's correspond to the rigid materials.
-    // Now we want to make the ID's refer to the rigid body ID's
-    
-    FEMaterial* pm = fem.GetMaterial(m_nRBa-1);
-    if (pm->IsRigid() == false)
-    {
-        felog.printbox("FATAL ERROR", "Rigid connector %d (spring) does not connect two rigid bodies\n", m_nID+1);
-        return false;
-    }
-    m_nRBa = pm->GetRigidBodyID();
-    
-    pm = fem.GetMaterial(m_nRBb-1);
-    if (pm->IsRigid() == false)
-    {
-        felog.printbox("FATAL ERROR", "Rigid connector %d (spring) does not connect two rigid bodies\n", m_nID);
-        return false;
-    }
-    m_nRBb = pm->GetRigidBodyID();
-
-	FERigidSystem& rs = *fem.GetRigidSystem();
-    FERigidBody& ra = *rs.Object(m_nRBa);
-    FERigidBody& rb = *rs.Object(m_nRBb);
-
     // if not specified by use, get free length of spring
     if (m_L0 == 0) m_L0 = (m_b0 - m_a0).norm();
+
     // set spring insertions relative to rigid body center of mass
-    m_qa0 = m_a0 - ra.m_r0;
-    m_qb0 = m_b0 - rb.m_r0;
-    
-    m_binit = true;
+    m_qa0 = m_a0 - m_rbA->m_r0;
+    m_qb0 = m_b0 - m_rbB->m_r0;
     
     return true;
 }
@@ -83,13 +48,11 @@ void FERigidSpring::Serialize(DumpStream& ar)
 	FERigidConnector::Serialize(ar);
     if (ar.IsSaving())
     {
-		ar << m_binit;
         ar << m_qa0 << m_qb0;
         ar << m_L0 << m_k;
     }
     else
     {
-		ar >> m_binit;
         ar >> m_qa0 >> m_qb0;
         ar >> m_L0 >> m_k;
     }
@@ -102,9 +65,8 @@ void FERigidSpring::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     vector<double> fa(6);
     vector<double> fb(6);
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
+    FERigidBody& RBa = *m_rbA;
+    FERigidBody& RBb = *m_rbB;
 
 	double alpha = tp.alpha;
 
@@ -161,10 +123,9 @@ void FERigidSpring::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
     matrix ke(12,12);
     ke.zero();
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
 	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
@@ -310,9 +271,8 @@ void FERigidSpring::Update(const FETimeInfo& tp)
     vec3d ra, rb, c;
     vec3d za, zb;
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
 
 	double alpha = tp.alpha;
 
@@ -337,10 +297,9 @@ void FERigidSpring::Reset()
 {
     m_F = vec3d(0,0,0);
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     m_qa0 = m_a0 - RBa.m_r0;
     m_qb0 = m_b0 - RBb.m_r0;
 }

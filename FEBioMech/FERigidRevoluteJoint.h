@@ -1,14 +1,4 @@
-//
-//  FERigidRevoluteJoint.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 10/29/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FERigidRevoluteJoint__
-#define __FEBioMech__FERigidRevoluteJoint__
-
+#pragma once
 #include "FECore/vec3d.h"
 #include "FERigidConnector.h"
 
@@ -73,10 +63,5 @@ protected:
     vec3d	m_L;	//! Lagrange multiplier for constraining force
     vec3d	m_U;	//! Lagrange multiplier for constraining moment
    
-protected:
-    bool	m_binit;
-    
     DECLARE_PARAMETER_LIST();
 };
-
-#endif /* defined(__FEBioMech__FERigidRevoluteJoint__) */

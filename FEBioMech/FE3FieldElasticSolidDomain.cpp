@@ -180,8 +180,6 @@ void FE3FieldElasticSolidDomain::ElementDilatationalStiffness(FEModel& fem, int 
 
 void FE3FieldElasticSolidDomain::ElementMaterialStiffness(int iel, matrix &ke)
 {
-	int i, i3, j, j3, n;
-
 	FESolidElement &el = Element(iel);
 	ELEM_DATA& ed = m_Data[iel];
 
@@ -192,7 +190,7 @@ void FE3FieldElasticSolidDomain::ElementMaterialStiffness(int iel, matrix &ke)
 
 	// global derivatives of shape functions
 	const int NME = FEElement::MAX_NODES;
-	double Gx[NME], Gy[NME], Gz[NME];
+	vec3d G[NME];
 
 	double Gxi, Gyi, Gzi;
 	double Gxj, Gyj, Gzj;
@@ -203,12 +201,6 @@ void FE3FieldElasticSolidDomain::ElementMaterialStiffness(int iel, matrix &ke)
 	// The 'D*BL' matrix
 	double DBL[6][3];
 
-	double *Grn, *Gsn, *Gtn;
-	double Gr, Gs, Gt;
-
-	// jacobian
-	double Ji[3][3], detJt;
-	
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
@@ -222,14 +214,10 @@ void FE3FieldElasticSolidDomain::ElementMaterialStiffness(int iel, matrix &ke)
 	tens4ds Cp = IxI - I4*2;
 
 	// calculate element stiffness matrix
-	for (n=0; n<nint; ++n)
+	for (int n=0; n<nint; ++n)
 	{
 		// calculate jacobian
-		detJt = invjact(el, Ji, n)*gw[n];
-
-		Grn = el.Gr(n);
-		Gsn = el.Gs(n);
-		Gtn = el.Gt(n);
+		double detJt = ShapeGradient(el, n, G)*gw[n];
 
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
@@ -245,33 +233,20 @@ void FE3FieldElasticSolidDomain::ElementMaterialStiffness(int iel, matrix &ke)
 		// get the 'D' matrix
 		C.extract(D);
 
-		for (i=0; i<neln; ++i)
-		{
-			Gr = Grn[i];
-			Gs = Gsn[i];
-			Gt = Gtn[i];
-
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx[i] = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
-			Gy[i] = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
-			Gz[i] = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
-		}
-
 		// we only calculate the upper triangular part
 		// since ke is symmetric. The other part is
 		// determined below using this symmetry.
-		for (i=0, i3=0; i<neln; ++i, i3 += 3)
+		for (int i = 0, i3 = 0; i<neln; ++i, i3 += 3)
 		{
-			Gxi = Gx[i];
-			Gyi = Gy[i];
-			Gzi = Gz[i];
+			Gxi = G[i].x;
+			Gyi = G[i].y;
+			Gzi = G[i].z;
 
-			for (j=i, j3 = i3; j<neln; ++j, j3 += 3)
+			for (int j = i, j3 = i3; j<neln; ++j, j3 += 3)
 			{
-				Gxj = Gx[j];
-				Gyj = Gy[j];
-				Gzj = Gz[j];
+				Gxj = G[j].x;
+				Gyj = G[j].y;
+				Gzj = G[j].z;
 
 				// calculate D*BL matrices
 				DBL[0][0] = (D[0][0]*Gxj+D[0][3]*Gyj+D[0][5]*Gzj);
@@ -319,8 +294,6 @@ void FE3FieldElasticSolidDomain::ElementMaterialStiffness(int iel, matrix &ke)
 
 void FE3FieldElasticSolidDomain::ElementGeometricalStiffness(int iel, matrix &ke)
 {
-	int n, i, j;
-
 	FESolidElement &el = Element(iel);
 
 	const int NME = FEElement::MAX_NODES;
@@ -344,7 +317,7 @@ void FE3FieldElasticSolidDomain::ElementGeometricalStiffness(int iel, matrix &ke
 	double kab;
 
 	// calculate geometrical element stiffness matrix
-	for (n=0; n<nint; ++n)
+	for (int n=0; n<nint; ++n)
 	{
 		// calculate jacobian
 		detJt = invjact(el, Ji, n)*gw[n];
@@ -353,7 +326,7 @@ void FE3FieldElasticSolidDomain::ElementGeometricalStiffness(int iel, matrix &ke
 		Gsn = el.Gs(n);
 		Gtn = el.Gt(n);
 
-		for (i=0; i<neln; ++i)
+		for (int i = 0; i<neln; ++i)
 		{
 			Gr = Grn[i];
 			Gs = Gsn[i];
@@ -374,8 +347,8 @@ void FE3FieldElasticSolidDomain::ElementGeometricalStiffness(int iel, matrix &ke
 		// s is the voight vector
 		mat3ds& s = pt.m_s;
 
-		for (i=0; i<neln; ++i)
-			for (j=i; j<neln; ++j)
+		for (int i = 0; i<neln; ++i)
+			for (int j = i; j<neln; ++j)
 			{
 				kab = (Gx[i]*(s.xx()*Gx[j]+s.xy()*Gy[j]+s.xz()*Gz[j]) +
 					   Gy[i]*(s.xy()*Gx[j]+s.yy()*Gy[j]+s.yz()*Gz[j]) + 

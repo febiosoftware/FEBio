@@ -1,14 +1,4 @@
-//
-//  FERigidCylindricalJoint.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 5/9/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FERigidCylindricalJoint__
-#define __FEBioMech__FERigidCylindricalJoint__
-
+#pragma once
 #include "FECore/vec3d.h"
 #include "FERigidConnector.h"
 
@@ -74,10 +64,5 @@ protected:
     vec3d	m_L;	//! Lagrange multiplier for constraining force
     vec3d	m_U;	//! Lagrange multiplier for constraining moment
     
-protected:
-    bool	m_binit;
-
 	DECLARE_PARAMETER_LIST();
 };
-
-#endif /* defined(__FEBioMech__FERigidCylindricalJoint__) */

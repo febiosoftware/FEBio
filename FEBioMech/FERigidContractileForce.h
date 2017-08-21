@@ -1,14 +1,4 @@
-//
-//  FERigidContractileForce.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 5/23/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FERigidContractileForce__
-#define __FEBioMech__FERigidContractileForce__
-
+#pragma once
 #include "FECore/vec3d.h"
 #include "FERigidConnector.h"
 
@@ -55,10 +45,5 @@ protected:
     vec3d	m_qa0;      //! initial relative position vector of insertion on body A
     vec3d	m_qb0;      //! initial relative position vector of insertion on body B
     
-protected:
-    bool	m_binit;
-    
     DECLARE_PARAMETER_LIST();
 };
-
-#endif /* defined(__FEBioMech__FERigidContractileForce__) */

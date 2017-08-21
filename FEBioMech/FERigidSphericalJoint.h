@@ -1,14 +1,4 @@
-// FERigidSphericalJoint.h: interface for the FERigidSphericalJoint class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FERigidSphericalJoint_H__22EBB207_A1C7_465E_B985_A2140CBA9BDB__INCLUDED_)
-#define AFX_FERigidSphericalJoint_H__22EBB207_A1C7_465E_B985_A2140CBA9BDB__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FECore/vec3d.h"
 #include "FERigidConnector.h"
 
@@ -75,10 +65,5 @@ protected:
     vec3d	m_L;        //! Lagrange multiplier for constraining force
     vec3d	m_U;        //! Lagrange multiplier for constraining moment
     
-protected:
-    bool	m_binit;
-    
     DECLARE_PARAMETER_LIST();
 };
-
-#endif // !defined(AFX_FERigidSphericalJoint_H__22EBB207_A1C7_465E_B985_A2140CBA9BDB__INCLUDED_)

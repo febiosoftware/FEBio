@@ -1,17 +1,12 @@
-// FERigidJoint.cpp: implementation of the FERigidJoint class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FERigidJoint.h"
-#include "FECore/FERigidSystem.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidJoint, FENLConstraint);
+BEGIN_PARAMETER_LIST(FERigidJoint, FERigidConnector);
 	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"   );
 	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance");
 	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"  );
@@ -21,67 +16,29 @@ BEGIN_PARAMETER_LIST(FERigidJoint, FENLConstraint);
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FERigidJoint::FERigidJoint(FEModel* pfem) : FENLConstraint(pfem)
+FERigidJoint::FERigidJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
 	static int count = 1;
 	m_nID = count++;
-	m_binit = false;
 	m_blaugon = true; // on by default for backward compatibility
+
+	m_rbA = m_rbB = 0;
 }
 
 //-----------------------------------------------------------------------------
 bool FERigidJoint::Init()
 {
-	if (m_binit) return true;
-
 	// reset force
 	m_F = vec3d(0,0,0);
 
-	FEModel& fem = *GetFEModel();
+	// base class first
+	if (FERigidConnector::Init() == false) return false;
 
-	// When the rigid joint is read in, the ID's correspond to the rigid materials.
-	// Now we want to make the ID's refer to the rigid body ID's. 
-	// Note that the rigid body ID's are one-based when read in
-	FEMaterial* pm = fem.GetMaterial(m_nRBa-1);
-	if (pm->IsRigid() == false)
-	{
-		felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
-		return false;
-	}
-	m_nRBa = pm->GetRigidBodyID();
-
-	pm = fem.GetMaterial(m_nRBb-1);
-	if (pm->IsRigid() == false)
-	{
-		felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
-		return false;
-	}
-	m_nRBb = pm->GetRigidBodyID();
-
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
-
-	m_qa0 = m_q0 - RBa.m_r0;
-	m_qb0 = m_q0 - RBb.m_r0;
-
-	m_binit = true;
+	// initialize relative joint positions
+	m_qa0 = m_q0 - m_rbA->m_r0;
+	m_qb0 = m_q0 - m_rbB->m_r0;
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FERigidJoint::BuildMatrixProfile(FEGlobalMatrix& M)
-{
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-	vector<int> lm(12);
-			
-	int* lm1 = rigid.Object(m_nRBa)->m_LM;
-	int* lm2 = rigid.Object(m_nRBb)->m_LM;
-
-	for (int j=0; j<6; ++j) lm[j  ] = lm1[j];
-	for (int j=0; j<6; ++j) lm[j+6] = lm2[j];
-	M.build_add(lm);
 }
 
 //-----------------------------------------------------------------------------
@@ -93,9 +50,8 @@ void FERigidJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 	vector<int> lma(6);
 	vector<int> lmb(6);
 
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
+    FERigidBody& RBa = *m_rbA;
+    FERigidBody& RBb = *m_rbB;
 
 	for (int i=0; i<6; ++i)
 	{
@@ -140,8 +96,6 @@ void FERigidJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 //! \todo Why is this class not using the FESolver for assembly?
 void FERigidJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
-	int j, k;
-
 	vector<int> LM(12);
 	matrix ke(12,12);
 	ke.zero();
@@ -149,9 +103,8 @@ void FERigidJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 
 	double y1[3][3], y2[3][3], y11[3][3], y12[3][3], y22[3][3];
 
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
+    FERigidBody& RBa = *m_rbA;
+    FERigidBody& RBb = *m_rbB;
 
 	a = m_qa0;
 	RBa.GetRotation().RotateVector(a);
@@ -167,7 +120,7 @@ void FERigidJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 	y2[1][0] = -a.z; y2[1][1] =    0; y2[1][2] =  a.x;
 	y2[2][0] =  a.y; y2[2][1] = -a.x; y2[2][2] =    0;
 
-	for (j=0; j<3; ++j)
+	for (int j=0; j<3; ++j)
 	{
 		y11[j][0] = y1[0][j]*y1[0][0]+y1[1][j]*y1[1][0]+y1[2][j]*y1[2][0];
 		y11[j][1] = y1[0][j]*y1[0][1]+y1[1][j]*y1[1][1]+y1[2][j]*y1[2][1];
@@ -235,18 +188,20 @@ void FERigidJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 	ke[10][9] = y22[1][0]; ke[10][10] = y22[1][1]; ke[10][11] = y22[1][2];
 	ke[11][9] = y22[2][0]; ke[11][10] = y22[2][1]; ke[11][11] = y22[2][2];
 
-	for (j=0; j<12; ++j)
-		for (k=0; k<12; ++k)
+	for (int j = 0; j<12; ++j)
+		for (int k = 0; k<12; ++k)
 		{
 			ke[j][k] *= m_eps;
 		}
 
-	for (j=0; j<6; ++j)
+	// unpack LM
+	for (int j = 0; j<6; ++j)
 	{
 		LM[j  ] = RBa.m_LM[j];
 		LM[j+6] = RBb.m_LM[j];
 	}
 
+	// assemle into global stiffness matrix
 	psolver->AssembleStiffness(LM, ke);
 }
 
@@ -260,9 +215,8 @@ bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 	double normF0, normF1;
 	bool bconv = true;
 
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
+    FERigidBody& RBa = *m_rbA;
+    FERigidBody& RBb = *m_rbB;
 
 	ra = RBa.m_rt;
 	rb = RBb.m_rt;
@@ -307,17 +261,16 @@ bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FERigidJoint::Serialize(DumpStream& ar)
 {
+	FERigidConnector::Serialize(ar);
 	if (ar.IsSaving())
 	{
 		ar << m_nID;
-		ar << m_nRBa << m_nRBb;
 		ar << m_q0 << m_qa0 << m_qb0;
 		ar << m_F << m_L << m_eps << m_atol;
 	}
 	else
 	{
 		ar >> m_nID;
-		ar >> m_nRBa >> m_nRBb;
 		ar >> m_q0 >> m_qa0 >> m_qb0;
 		ar >> m_F >> m_L >> m_eps >> m_atol;
 	}
@@ -326,9 +279,8 @@ void FERigidJoint::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 void FERigidJoint::Update(const FETimeInfo& tp)
 {
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
+    FERigidBody& RBa = *m_rbA;
+    FERigidBody& RBb = *m_rbB;
 
 	vec3d ra = RBa.m_rt;
 	vec3d rb = RBb.m_rt;
@@ -349,10 +301,6 @@ void FERigidJoint::Reset()
 	m_F = vec3d(0,0,0);
 	m_L = vec3d(0,0,0);
 
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
-
-	m_qa0 = m_q0 - RBa.m_r0;
-	m_qb0 = m_q0 - RBb.m_r0;
+	m_qa0 = m_q0 - m_rbA->m_r0;
+	m_qb0 = m_q0 - m_rbB->m_r0;
 }

@@ -1,13 +1,4 @@
-//
-//  FERigidContractileForce.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 5/23/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
 #include "FERigidContractileForce.h"
-#include "FECore/FERigidSystem.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FEModel.h"
@@ -15,16 +6,15 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidContractileForce, FERigidConnector);
-ADD_PARAMETER(m_f0  , FE_PARAM_DOUBLE, "f0"         );
-ADD_PARAMETER(m_a0  , FE_PARAM_VEC3D , "insertion_a");
-ADD_PARAMETER(m_b0  , FE_PARAM_VEC3D , "insertion_b");
+	ADD_PARAMETER(m_f0  , FE_PARAM_DOUBLE, "f0"         );
+	ADD_PARAMETER(m_a0  , FE_PARAM_VEC3D , "insertion_a");
+	ADD_PARAMETER(m_b0  , FE_PARAM_VEC3D , "insertion_b");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 FERigidContractileForce::FERigidContractileForce(FEModel* pfem) : FERigidConnector(pfem)
 {
     m_nID = m_ncount++;
-    m_binit = false;
     m_f0 = 0;
 }
 
@@ -33,41 +23,15 @@ FERigidContractileForce::FERigidContractileForce(FEModel* pfem) : FERigidConnect
 //!       phase. Is that necessary?
 bool FERigidContractileForce::Init()
 {
-    if (m_binit) return true;
+	// base class first
+	if (FERigidConnector::Init() == false) return false;
     
     // reset force
     m_F = vec3d(0,0,0);
     
-    FEModel& fem = *GetFEModel();
-    
-    // When the rigid contractile force is read in, the ID's correspond to the rigid materials.
-    // Now we want to make the ID's refer to the rigid body ID's
-    
-    FEMaterial* pm = fem.GetMaterial(m_nRBa-1);
-    if (pm->IsRigid() == false)
-    {
-        felog.printbox("FATAL ERROR", "Rigid connector %d (contractile force) does not connect two rigid bodies\n", m_nID+1);
-        return false;
-    }
-    m_nRBa = pm->GetRigidBodyID();
-    
-    pm = fem.GetMaterial(m_nRBb-1);
-    if (pm->IsRigid() == false)
-    {
-        felog.printbox("FATAL ERROR", "Rigid connector %d (contractile force) does not connect two rigid bodies\n", m_nID+1);
-        return false;
-    }
-    m_nRBb = pm->GetRigidBodyID();
-    
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
-    
     // set force insertions relative to rigid body center of mass
-    m_qa0 = m_a0 - RBa.m_r0;
-    m_qb0 = m_b0 - RBb.m_r0;
-    
-    m_binit = true;
+    m_qa0 = m_a0 - m_rbA->m_r0;
+    m_qb0 = m_b0 - m_rbB->m_r0;
     
     return true;
 }
@@ -78,12 +42,10 @@ void FERigidContractileForce::Serialize(DumpStream& ar)
 	FERigidConnector::Serialize(ar);
     if (ar.IsSaving())
     {
-		ar << m_binit;
         ar << m_qa0 << m_qb0;
     }
     else
     {
-		ar >> m_binit;
         ar >> m_qa0 >> m_qb0;
     }
 }
@@ -95,9 +57,8 @@ void FERigidContractileForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     vector<double> fa(6);
     vector<double> fb(6);
     
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
 
 	double alpha = tp.alpha;
     
@@ -154,10 +115,9 @@ void FERigidContractileForce::StiffnessMatrix(FESolver* psolver, const FETimeInf
     matrix ke(12,12);
     ke.zero();
     
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
-   
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
 	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
@@ -303,10 +263,9 @@ void FERigidContractileForce::Update(const FETimeInfo& tp)
     vec3d ra, rb, c;
     vec3d za, zb;
     
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
 	double alpha = tp.alpha;
 
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
@@ -330,10 +289,9 @@ void FERigidContractileForce::Reset()
 {
     m_F = vec3d(0,0,0);
     
- 	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
-   
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     m_qa0 = m_a0 - RBa.m_r0;
     m_qb0 = m_b0 - RBb.m_r0;
 }

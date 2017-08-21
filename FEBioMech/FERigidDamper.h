@@ -1,21 +1,11 @@
-//
-//  FERigidDamper.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 5/12/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FERigidDamper__
-#define __FEBioMech__FERigidDamper__
-
+#pragma once
 #include "FECore/vec3d.h"
 #include "FERigidConnector.h"
 
 //-----------------------------------------------------------------------------
 //! The FERigidDamper class implements a linear damper that connects
 //! two rigid bodies at arbitrary points (not necessarily nodes).
-
+//! TODO: This inherits from FENLConstraint, which is not the appropriate base class
 class FERigidDamper : public FERigidConnector
 {
 public:
@@ -55,10 +45,5 @@ protected:
     vec3d	m_qa0;      //! initial relative position vector of spring on body A
     vec3d	m_qb0;      //! initial relative position vector of spring on body B
     
-protected:
-    bool	m_binit;
-    
     DECLARE_PARAMETER_LIST();
 };
-
-#endif /* defined(__FEBioMech__FERigidDamper__) */

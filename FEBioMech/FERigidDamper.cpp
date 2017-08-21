@@ -1,14 +1,5 @@
-//
-//  FERigidDamper.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 5/12/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FERigidDamper.h"
-#include "FECore/FERigidSystem.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FEModel.h"
@@ -26,7 +17,6 @@ END_PARAMETER_LIST();
 FERigidDamper::FERigidDamper(FEModel* pfem) : FERigidConnector(pfem)
 {
     m_nID = m_ncount++;
-    m_binit = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -34,41 +24,15 @@ FERigidDamper::FERigidDamper(FEModel* pfem) : FERigidConnector(pfem)
 //!       phase. Is that necessary?
 bool FERigidDamper::Init()
 {
-    if (m_binit) return true;
-    
     // reset force
     m_F = vec3d(0,0,0);
     
-    FEModel& fem = *GetFEModel();
-    
-    // When the rigid spring is read in, the ID's correspond to the rigid materials.
-    // Now we want to make the ID's refer to the rigid body ID's
-    
-    FEMaterial* pm = fem.GetMaterial(m_nRBa-1);
-    if (pm->IsRigid() == false)
-    {
-        felog.printbox("FATAL ERROR", "Rigid connector %d (damper) does not connect two rigid bodies\n", m_nID+1);
-        return false;
-    }
-    m_nRBa = pm->GetRigidBodyID();
-    
-    pm = fem.GetMaterial(m_nRBb-1);
-    if (pm->IsRigid() == false)
-    {
-        felog.printbox("FATAL ERROR", "Rigid connector %d (damper) does not connect two rigid bodies\n", m_nID+1);
-        return false;
-    }
-    m_nRBb = pm->GetRigidBodyID();
-    
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
-    
+	// base class first
+	if (FERigidConnector::Init() == false) return false;
+
     // set spring insertions relative to rigid body center of mass
-    m_qa0 = m_a0 - RBa.m_r0;
-    m_qb0 = m_b0 - RBb.m_r0;
-    
-    m_binit = true;
+    m_qa0 = m_a0 - m_rbA->m_r0;
+    m_qb0 = m_b0 - m_rbB->m_r0;
     
     return true;
 }
@@ -79,12 +43,10 @@ void FERigidDamper::Serialize(DumpStream& ar)
 	FERigidConnector::Serialize(ar);
     if (ar.IsSaving())
     {
-		ar << m_binit;
         ar << m_qa0 << m_qb0;
     }
     else
     {
-		ar >> m_binit;
         ar >> m_qa0 >> m_qb0;
     }
 }
@@ -96,9 +58,8 @@ void FERigidDamper::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     vector<double> fa(6);
     vector<double> fb(6);
     
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
 
 	double alpha = tp.alpha;
     
@@ -162,11 +123,9 @@ void FERigidDamper::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
     matrix ke(12,12);
     ke.zero();
     
-    FEModel& fem = *GetFEModel();
-	FERigidSystem& rigid = *fem.GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     mat3dd I(1);
     
     // body A
@@ -319,9 +278,8 @@ bool FERigidDamper::Augment(int naug, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FERigidDamper::Update(const FETimeInfo& tp)
 {
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
 
 	double alpha = tp.alpha;
 
@@ -347,10 +305,9 @@ void FERigidDamper::Reset()
 {
     m_F = vec3d(0,0,0);
     
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rigid.Object(m_nRBa);
-    FERigidBody& RBb = *rigid.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     m_qa0 = m_a0 - RBa.m_r0;
     m_qb0 = m_b0 - RBb.m_r0;
 }

@@ -1,14 +1,5 @@
-//
-//  FERigidRevoluteJoint.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 10/29/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FERigidRevoluteJoint.h"
-#include "FECore/FERigidSystem.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FEModel.h"
@@ -37,7 +28,6 @@ END_PARAMETER_LIST();
 FERigidRevoluteJoint::FERigidRevoluteJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
     m_nID = m_ncount++;
-    m_binit = false;
     m_atol = 0;
     m_gtol = 0;
     m_qtol = 0;
@@ -62,8 +52,6 @@ bool FERigidRevoluteJoint::Init()
         return false;
     }
     
-    if (m_binit) return true;
-    
     FEModel& fem = *GetFEModel();
     
     // initialize joint basis
@@ -75,36 +63,14 @@ bool FERigidRevoluteJoint::Init()
     m_F = vec3d(0,0,0); m_L = vec3d(0,0,0);
     m_M = vec3d(0,0,0); m_U = vec3d(0,0,0);
     
-    // When the rigid joint is read in, the ID's correspond to the rigid materials.
-    // Now we want to make the ID's refer to the rigid body ID's
-    
-    FEMaterial* pm = fem.GetMaterial(m_nRBa-1);
-    if (pm->IsRigid() == false)
-    {
-        felog.printbox("FATAL ERROR", "Rigid connector %d (revolute joint) does not connect two rigid bodies\n", m_nID+1);
-        return false;
-    }
-    m_nRBa = pm->GetRigidBodyID();
-    
-    pm = fem.GetMaterial(m_nRBb-1);
-    if (pm->IsRigid() == false)
-    {
-        felog.printbox("FATAL ERROR", "Rigid connector %d (revolute joint) does not connect two rigid bodies\n", m_nID+1);
-        return false;
-    }
-    m_nRBb = pm->GetRigidBodyID();
-    
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
-    m_qa0 = m_q0 - RBa.m_r0;
-    m_qb0 = m_q0 - RBb.m_r0;
+	// base class first
+	if (FERigidConnector::Init() == false) return false;
+
+    m_qa0 = m_q0 - m_rbA->m_r0;
+    m_qb0 = m_q0 - m_rbB->m_r0;
     
     m_ea0[0] = m_e0[0]; m_ea0[1] = m_e0[1]; m_ea0[2] = m_e0[2];
     m_eb0[0] = m_e0[0]; m_eb0[1] = m_e0[1]; m_eb0[2] = m_e0[2];
-    
-    m_binit = true;
     
     return true;
 }
@@ -115,7 +81,6 @@ void FERigidRevoluteJoint::Serialize(DumpStream& ar)
 	FERigidConnector::Serialize(ar);
     if (ar.IsSaving())
     {
-		ar << m_binit;
         ar << m_qa0 << m_qb0;
         ar << m_e0[0] << m_e0[1] << m_e0[2];
         ar << m_ea0[0] << m_ea0[1] << m_ea0[2];
@@ -124,7 +89,6 @@ void FERigidRevoluteJoint::Serialize(DumpStream& ar)
     }
     else
     {
-		ar >> m_binit;
         ar >> m_qa0 >> m_qb0;
         ar >> m_e0[0] >> m_e0[1] >> m_e0[2];
         ar >> m_ea0[0] >> m_ea0[1] >> m_ea0[2];
@@ -143,9 +107,8 @@ void FERigidRevoluteJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     vec3d eat[3], eap[3], ea[3];
     vec3d ebt[3], ebp[3], eb[3];
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
 
 	double alpha = tp.alpha;
 
@@ -265,10 +228,9 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
     matrix ke(12,12);
     ke.zero();
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
 	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
@@ -509,9 +471,8 @@ bool FERigidRevoluteJoint::Augment(int naug, const FETimeInfo& tp)
     double normM0, normM1;
     bool bconv = true;
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
 
 	double alpha = tp.alpha;
 
@@ -612,9 +573,8 @@ void FERigidRevoluteJoint::Update(const FETimeInfo& tp)
     vec3d eat[3], eap[3], ea[3];
     vec3d ebt[3], ebp[3], eb[3];
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
 
 	double alpha = tp.alpha;
 
@@ -698,10 +658,9 @@ void FERigidRevoluteJoint::Reset()
     m_M = vec3d(0,0,0);
     m_U = vec3d(0,0,0);
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     m_qa0 = m_q0 - RBa.m_r0;
     m_qb0 = m_q0 - RBb.m_r0;
     

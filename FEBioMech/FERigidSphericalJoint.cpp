@@ -1,10 +1,5 @@
-// FERigidSphericalJoint.cpp: implementation of the FERigidSphericalJoint class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FERigidSphericalJoint.h"
-#include "FECore/FERigidSystem.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FEModel.h"
@@ -12,28 +7,27 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidSphericalJoint, FERigidConnector);
-ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
-ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
-ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
-ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
-ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
-ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint_origin"  );
-ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
-ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
-ADD_PARAMETER(m_bq     , FE_PARAM_BOOL  , "prescribed_rotation");
-ADD_PARAMETER(m_qpx    , FE_PARAM_DOUBLE, "rotation_x" );
-ADD_PARAMETER(m_qpy    , FE_PARAM_DOUBLE, "rotation_y" );
-ADD_PARAMETER(m_qpz    , FE_PARAM_DOUBLE, "rotation_z" );
-ADD_PARAMETER(m_Mpx    , FE_PARAM_DOUBLE, "moment_x"   );
-ADD_PARAMETER(m_Mpy    , FE_PARAM_DOUBLE, "moment_y"   );
-ADD_PARAMETER(m_Mpz    , FE_PARAM_DOUBLE, "moment_z"   );
+	ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
+	ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
+	ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
+	ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
+	ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
+	ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint_origin"  );
+	ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
+	ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
+	ADD_PARAMETER(m_bq     , FE_PARAM_BOOL  , "prescribed_rotation");
+	ADD_PARAMETER(m_qpx    , FE_PARAM_DOUBLE, "rotation_x" );
+	ADD_PARAMETER(m_qpy    , FE_PARAM_DOUBLE, "rotation_y" );
+	ADD_PARAMETER(m_qpz    , FE_PARAM_DOUBLE, "rotation_z" );
+	ADD_PARAMETER(m_Mpx    , FE_PARAM_DOUBLE, "moment_x"   );
+	ADD_PARAMETER(m_Mpy    , FE_PARAM_DOUBLE, "moment_y"   );
+	ADD_PARAMETER(m_Mpz    , FE_PARAM_DOUBLE, "moment_z"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 FERigidSphericalJoint::FERigidSphericalJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
     m_nID = m_ncount++;
-    m_binit = false;
     m_atol = 0;
     m_gtol = 0;
     m_qtol = 0;
@@ -54,44 +48,20 @@ bool FERigidSphericalJoint::Init()
         return false;
     }
     
-    if (m_binit) return true;
-    
     FEModel& fem = *GetFEModel();
     
     // reset force
     m_F = vec3d(0,0,0); m_L = vec3d(0,0,0);
     m_M = vec3d(0,0,0); m_U = vec3d(0,0,0);
     
-    // When the rigid joint is read in, the ID's correspond to the rigid materials.
-    // Now we want to make the ID's refer to the rigid body ID's
-    
-    FEMaterial* pm = fem.GetMaterial(m_nRBa-1);
-    if (pm->IsRigid() == false)
-    {
-        felog.printbox("FATAL ERROR", "Rigid connector %d (spherical joint) does not connect two rigid bodies\n", m_nID+1);
-        return false;
-    }
-    m_nRBa = pm->GetRigidBodyID();
-    
-    pm = fem.GetMaterial(m_nRBb-1);
-    if (pm->IsRigid() == false)
-    {
-        felog.printbox("FATAL ERROR", "Rigid connector %d (spherical joint) does not connect two rigid bodies\n", m_nID+1);
-        return false;
-    }
-    m_nRBb = pm->GetRigidBodyID();
-    
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& ra = *rs.Object(m_nRBa);
-    FERigidBody& rb = *rs.Object(m_nRBb);
-    
-    m_qa0 = m_q0 - ra.m_r0;
-    m_qb0 = m_q0 - rb.m_r0;
+	// base class first
+	if (FERigidConnector::Init() == false) return false;
+
+    m_qa0 = m_q0 - m_rbA->m_r0;
+    m_qb0 = m_q0 - m_rbB->m_r0;
     
     m_ea0[0] = m_e0[0]; m_ea0[1] = m_e0[1]; m_ea0[2] = m_e0[2];
     m_eb0[0] = m_e0[0]; m_eb0[1] = m_e0[1]; m_eb0[2] = m_e0[2];
-    
-    m_binit = true;
     
     return true;
 }
@@ -102,7 +72,6 @@ void FERigidSphericalJoint::Serialize(DumpStream& ar)
 	FERigidConnector::Serialize(ar);
     if (ar.IsSaving())
     {
-		ar << m_binit;
         ar << m_qa0 << m_qb0;
         ar << m_L << m_U;
 		ar << m_e0[0] << m_e0[1] << m_e0[2];
@@ -111,7 +80,6 @@ void FERigidSphericalJoint::Serialize(DumpStream& ar)
     }
     else
     {
-		ar >> m_binit;
         ar >> m_qa0 >> m_qb0;
         ar >> m_L >> m_U;
 		ar >> m_e0[0] >> m_e0[1] >> m_e0[2];
@@ -127,9 +95,8 @@ void FERigidSphericalJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     vector<double> fa(6);
     vector<double> fb(6);
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
 
 	double alpha = tp.alpha;
     
@@ -195,10 +162,9 @@ void FERigidSphericalJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo&
     matrix ke(12,12);
     ke.zero();
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
 	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
@@ -362,9 +328,8 @@ bool FERigidSphericalJoint::Augment(int naug, const FETimeInfo& tp)
     double normM0, normM1;
     bool bconv = true;
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
 
 	double alpha = tp.alpha;
     
@@ -446,10 +411,9 @@ void FERigidSphericalJoint::Update(const FETimeInfo& tp)
 
 	double alpha = tp.alpha;
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
     
@@ -484,10 +448,9 @@ void FERigidSphericalJoint::Reset()
     m_M = vec3d(0,0,0);
     m_U = vec3d(0,0,0);
     
-	FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     m_qa0 = m_q0 - RBa.m_r0;
     m_qb0 = m_q0 - RBb.m_r0;
 }

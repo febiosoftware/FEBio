@@ -1,14 +1,5 @@
-//
-//  FERigidLock.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 1/31/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FERigidLock.h"
-#include "FECore/FERigidSystem.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FEModel.h"
@@ -16,23 +7,22 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidLock, FERigidConnector);
-ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
-ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
-ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
-ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
-ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
-ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint_origin"  );
-ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "first_axis"    );
-ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "second_axis"   );
-ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
-ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
+	ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
+	ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
+	ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
+	ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
+	ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
+	ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint_origin"  );
+	ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "first_axis"    );
+	ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "second_axis"   );
+	ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
+	ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 FERigidLock::FERigidLock(FEModel* pfem) : FERigidConnector(pfem)
 {
     m_nID = m_ncount++;
-    m_binit = false;
     m_atol = 0;
     m_gtol = 0;
     m_qtol = 0;
@@ -45,8 +35,6 @@ FERigidLock::FERigidLock(FEModel* pfem) : FERigidConnector(pfem)
 //!       phase. Is that necessary?
 bool FERigidLock::Init()
 {
-    if (m_binit) return true;
-    
     // initialize joint basis
     m_e0[0].unit();
     m_e0[2] = m_e0[0] ^ m_e0[1]; m_e0[2].unit();
@@ -56,38 +44,14 @@ bool FERigidLock::Init()
     m_F = vec3d(0,0,0); m_L = vec3d(0,0,0);
     m_M = vec3d(0,0,0); m_U = vec3d(0,0,0);
     
-    FEModel& fem = *GetFEModel();
-    
-    // When the rigid joint is read in, the ID's correspond to the rigid materials.
-    // Now we want to make the ID's refer to the rigid body ID's
-    
-    FEMaterial* pm = fem.GetMaterial(m_nRBa-1);
-    if (pm->IsRigid() == false)
-    {
-        felog.printbox("FATAL ERROR", "Rigid conenctor %d (prismatic joint) does not connect two rigid bodies\n", m_nID+1);
-        return false;
-    }
-    m_nRBa = pm->GetRigidBodyID();
-    
-    pm = fem.GetMaterial(m_nRBb-1);
-    if (pm->IsRigid() == false)
-    {
-        felog.printbox("FATAL ERROR", "Rigid connector %d (prismatic joint) does not connect two rigid bodies\n", m_nID+1);
-        return false;
-    }
-    m_nRBb = pm->GetRigidBodyID();
-    
-    FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
-    m_qa0 = m_q0 - RBa.m_r0;
-    m_qb0 = m_q0 - RBb.m_r0;
+	// base class first
+	if (FERigidConnector::Init() == false) return false;
+
+    m_qa0 = m_q0 - m_rbA->m_r0;
+    m_qb0 = m_q0 - m_rbB->m_r0;
     
     m_ea0[0] = m_e0[0]; m_ea0[1] = m_e0[1]; m_ea0[2] = m_e0[2];
     m_eb0[0] = m_e0[0]; m_eb0[1] = m_e0[1]; m_eb0[2] = m_e0[2];
-    
-    m_binit = true;
     
     return true;
 }
@@ -98,7 +62,6 @@ void FERigidLock::Serialize(DumpStream& ar)
     FERigidConnector::Serialize(ar);
     if (ar.IsSaving())
     {
-        ar << m_binit;
         ar << m_qa0 << m_qb0;
         ar << m_L << m_U;
         ar << m_e0[0] << m_e0[1] << m_e0[2];
@@ -107,7 +70,6 @@ void FERigidLock::Serialize(DumpStream& ar)
     }
     else
     {
-        ar >> m_binit;
         ar >> m_qa0 >> m_qb0;
         ar >> m_L >> m_U;
         ar >> m_e0[0] >> m_e0[1] >> m_e0[2];
@@ -126,10 +88,9 @@ void FERigidLock::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     vec3d eat[3], eap[3], ea[3];
     vec3d ebt[3], ebp[3], eb[3];
     
-    FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     double alpha = tp.alpha;
     
     // body A
@@ -211,10 +172,9 @@ void FERigidLock::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
     matrix ke(12,12);
     ke.zero();
     
-    FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     // body A
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
 	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
@@ -389,10 +349,9 @@ bool FERigidLock::Augment(int naug, const FETimeInfo& tp)
     double normM0, normM1;
     bool bconv = true;
     
-    FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     double alpha = tp.alpha;
     
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
@@ -487,10 +446,9 @@ void FERigidLock::Update(const FETimeInfo& tp)
     vec3d eat[3], eap[3], ea[3];
     vec3d ebt[3], ebp[3], eb[3];
     
-    FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     double alpha = tp.alpha;
     
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
@@ -541,10 +499,9 @@ void FERigidLock::Reset()
     m_M = vec3d(0,0,0);
     m_U = vec3d(0,0,0);
     
-    FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
-    FERigidBody& RBa = *rs.Object(m_nRBa);
-    FERigidBody& RBb = *rs.Object(m_nRBb);
-    
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
+
     m_qa0 = m_q0 - RBa.m_r0;
     m_qb0 = m_q0 - RBb.m_r0;
     

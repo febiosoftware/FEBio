@@ -132,9 +132,7 @@ void FELinearSolidDomain::ElementStiffness(FESolidElement &el, matrix &ke)
 
 	// global derivatives of shape functions
 	// Gx = dH/dx
-	double Gx[FEElement::MAX_NODES];
-	double Gy[FEElement::MAX_NODES];
-	double Gz[FEElement::MAX_NODES];
+	vec3d G[FEElement::MAX_NODES];
 
 	double Gxi, Gyi, Gzi;
 	double Gxj, Gyj, Gzj;
@@ -145,12 +143,6 @@ void FELinearSolidDomain::ElementStiffness(FESolidElement &el, matrix &ke)
 	// The 'D*BL' matrix
 	double DBL[6][3];
 
-	double *Grn, *Gsn, *Gtn;
-	double Gr, Gs, Gt;
-
-	// jacobian
-	double Ji[3][3], detJ0;
-	
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
@@ -159,29 +151,12 @@ void FELinearSolidDomain::ElementStiffness(FESolidElement &el, matrix &ke)
 	for (n=0; n<nint; ++n)
 	{
 		// calculate jacobian
-		detJ0 = invjac0(el, Ji, n)*gw[n];
-
-		Grn = el.Gr(n);
-		Gsn = el.Gs(n);
-		Gtn = el.Gt(n);
+		double detJ0 = ShapeGradient0(el, n, G)*gw[n];
 
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-
-		for (i=0; i<neln; ++i)
-		{
-			Gr = Grn[i];
-			Gs = Gsn[i];
-			Gt = Gtn[i];
-
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx[i] = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
-			Gy[i] = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
-			Gz[i] = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
-		}
 
 		// get the 'D' matrix
 		tens4ds C = m_pMat->Tangent(mp);
@@ -192,15 +167,15 @@ void FELinearSolidDomain::ElementStiffness(FESolidElement &el, matrix &ke)
 		// determined below using this symmetry.
 		for (i=0, i3=0; i<neln; ++i, i3 += 3)
 		{
-			Gxi = Gx[i];
-			Gyi = Gy[i];
-			Gzi = Gz[i];
+			Gxi = G[i].x;
+			Gyi = G[i].y;
+			Gzi = G[i].z;
 
 			for (j=i, j3 = i3; j<neln; ++j, j3 += 3)
 			{
-				Gxj = Gx[j];
-				Gyj = Gy[j];
-				Gzj = Gz[j];
+				Gxj = G[j].x;
+				Gyj = G[j].y;
+				Gzj = G[j].z;
 
 				// calculate D*BL matrices
 				DBL[0][0] = (D[0][0]*Gxj+D[0][3]*Gyj+D[0][5]*Gzj);

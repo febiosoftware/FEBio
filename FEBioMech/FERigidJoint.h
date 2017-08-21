@@ -1,22 +1,12 @@
-// FERigidJoint.h: interface for the FERigidJoint class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FERIGIDJOINT_H__22EBB207_A1C7_465E_B985_A2140CBA9BDB__INCLUDED_)
-#define AFX_FERIGIDJOINT_H__22EBB207_A1C7_465E_B985_A2140CBA9BDB__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FECore/vec3d.h"
-#include "FECore/FENLConstraint.h"
+#include "FERigidConnector.h"
 
 //-----------------------------------------------------------------------------
 //! The FERigidJoint class implements a rigid joint. The rigid joint allows the
 //! user to connect two rigid bodies at a point in space.
 
-class FERigidJoint : public FENLConstraint
+class FERigidJoint : public FERigidConnector
 {
 public:
 	//! constructor
@@ -46,13 +36,7 @@ public:
 	//! Reset data
 	void Reset();
 
-	//! build connectivity for matrix profile
-	void BuildMatrixProfile(FEGlobalMatrix& M);
-
 public:
-	int	m_nRBa;		//!< rigid body A that the joint connects
-	int	m_nRBb;		//!< rigid body B that the joint connects
-
 	vec3d	m_q0;		//! initial position of joint
 	vec3d	m_qa0;	//! initial relative position vector of joint w.r.t. A
 	vec3d	m_qb0;	//! initial relative position vector of joint w.r.t. B
@@ -66,7 +50,6 @@ public:
 protected:
 	int		m_nID;	//!< ID of rigid joint
 	bool	m_binit;
+
 	DECLARE_PARAMETER_LIST();
 };
-
-#endif // !defined(AFX_FERIGIDJOINT_H__22EBB207_A1C7_465E_B985_A2140CBA9BDB__INCLUDED_)

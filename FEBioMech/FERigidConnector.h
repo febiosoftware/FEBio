@@ -1,15 +1,8 @@
-//
-//  FERigidConnector.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 5/27/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
+#pragma once
+#include <FECore/FENLConstraint.h>
 
-#ifndef __FEBioMech__FERigidConnector__
-#define __FEBioMech__FERigidConnector__
-
-#include "FECore/FENLConstraint.h"
+//-----------------------------------------------------------------------------
+class FERigidBody;
 
 //-----------------------------------------------------------------------------
 //! This is a virtual class for all rigid connectors, including
@@ -24,8 +17,11 @@ public:
     
     //! destructor
     virtual ~FERigidConnector();
+
+	//! initialization
+	bool Init();
     
-    int     GetConnectorID() { return m_nID; }
+    int GetConnectorID() { return m_nID; }
 
 	//! build connectivity for matrix profile
 	void BuildMatrixProfile(FEGlobalMatrix& M);
@@ -41,11 +37,13 @@ public:
     vec3d	m_M;	//! constraining moment
     
 protected:
-    int		m_nID;	//!< ID of rigid connector
+    int		m_nID;		//!< ID of rigid connector
+	bool	m_binit;	//!< initialization flag
+
+	FERigidBody*	m_rbA;
+	FERigidBody*	m_rbB;
     
     static int	m_ncount;	//!< used to create unique ID's for the nonlinear constraints
     
     DECLARE_PARAMETER_LIST();
 };
-
-#endif /* defined(__FEBioMech__FERigidConnector__) */
