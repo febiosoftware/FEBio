@@ -433,9 +433,6 @@ REGISTER_FECORE_CLASS(FERigidCable           , FEBC_ID, "rigid_cable"      );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
-REGISTER_FECORE_CLASS(FEPlotStrainEnergyDensity  , FEPLOTDATA_ID, "strain energy density" );
-REGISTER_FECORE_CLASS(FEPlotDevStrainEnergyDensity  , FEPLOTDATA_ID, "deviatoric strain energy density" );
-REGISTER_FECORE_CLASS(FEPlotSpecificStrainEnergy , FEPLOTDATA_ID, "specific strain energy");
 REGISTER_FECORE_CLASS(FEPlotDensity              , FEPLOTDATA_ID, "density"               );
 REGISTER_FECORE_CLASS(FEPlotElementStress        , FEPLOTDATA_ID, "stress"                );
 REGISTER_FECORE_CLASS(FEPlotElementElasticity    , FEPLOTDATA_ID, "elasticity"            );
@@ -473,6 +470,15 @@ REGISTER_FECORE_CLASS(FEPlotMortarContactGap     , FEPLOTDATA_ID, "mortar-gap"  
 REGISTER_FECORE_CLASS(FEPlotSurfaceTraction		 , FEPLOTDATA_ID, "surface traction"      );
 REGISTER_FECORE_CLASS(FEPlotNodalSurfaceTraction , FEPLOTDATA_ID, "nodal surface traction");
 REGISTER_FECORE_CLASS(FEPlotEnclosedVolume       , FEPLOTDATA_ID, "enclosed volume"       );
+REGISTER_FECORE_CLASS(FEPlotStrainEnergyDensity  , FEPLOTDATA_ID, "strain energy density" );
+REGISTER_FECORE_CLASS(FEPlotDevStrainEnergyDensity  , FEPLOTDATA_ID, "deviatoric strain energy density" );
+REGISTER_FECORE_CLASS(FEPlotSpecificStrainEnergy , FEPLOTDATA_ID, "specific strain energy");
+REGISTER_FECORE_CLASS(FEPlotKineticEnergyDensity , FEPLOTDATA_ID, "kinetic energy density");
+REGISTER_FECORE_CLASS(FEPlotElementStrainEnergy  , FEPLOTDATA_ID, "element strain energy" );
+REGISTER_FECORE_CLASS(FEPlotElementKineticEnergy , FEPLOTDATA_ID, "element kinetic energy");
+REGISTER_FECORE_CLASS(FEPlotElementCenterOfMass  , FEPLOTDATA_ID, "element center of mass");
+REGISTER_FECORE_CLASS(FEPlotElementLinearMomentum, FEPLOTDATA_ID, "element linear momentum");
+REGISTER_FECORE_CLASS(FEPlotElementAngularMomentum, FEPLOTDATA_ID, "element angular momentum");
 
 // LTE - 2O continuum fields
 REGISTER_FECORE_CLASS(FEPlotElementGnorm         , FEPLOTDATA_ID, "G norm"                );              

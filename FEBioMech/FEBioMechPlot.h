@@ -360,12 +360,66 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Kinetic energy density
+class FEPlotKineticEnergyDensity : public FEDomainData
+{
+public:
+    FEPlotKineticEnergyDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Mass density
 class FEPlotDensity : public FEDomainData
 {
 public:
 	FEPlotDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Strain energy
+class FEPlotElementStrainEnergy : public FEDomainData
+{
+public:
+    FEPlotElementStrainEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Kinetic energy
+class FEPlotElementKineticEnergy : public FEDomainData
+{
+public:
+    FEPlotElementKineticEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Center of mass
+class FEPlotElementCenterOfMass : public FEDomainData
+{
+public:
+    FEPlotElementCenterOfMass(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Linear momentum
+class FEPlotElementLinearMomentum : public FEDomainData
+{
+public:
+    FEPlotElementLinearMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Angular momentum
+class FEPlotElementAngularMomentum : public FEDomainData
+{
+public:
+    FEPlotElementAngularMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------

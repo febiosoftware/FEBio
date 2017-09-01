@@ -1041,6 +1041,104 @@ bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
+{
+    const int dof_VX = GetFEModel()->GetDOFIndex("vx");
+    const int dof_VY = GetFEModel()->GetDOFIndex("vy");
+    const int dof_VZ = GetFEModel()->GetDOFIndex("vz");
+    const int dof_VU = GetFEModel()->GetDOFIndex("vu");
+    const int dof_VV = GetFEModel()->GetDOFIndex("vv");
+    const int dof_VW = GetFEModel()->GetDOFIndex("vw");
+    
+    FEMesh& mesh = *dom.GetMesh();
+    FEMaterial* pmm = dom.GetMaterial();
+    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
+    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
+    
+    if ((pme == 0) || pme->IsRigid()) return false;
+    
+    double dens = pme->Density();
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+        for (int i=0; i<bd.Elements(); ++i)
+        {
+            FESolidElement& el = bd.Element(i);
+            double *H;
+            double* gw = el.GaussWeights();
+            
+            // get nodal velocities
+            vec3d vt[FEElement::MAX_NODES];
+            vec3d vn[FEElement::MAX_NODES];
+            for (int j=0; j<el.Nodes(); ++j) {
+                vt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VX, dof_VY, dof_VZ);
+            }
+            
+            // evaluate velocities at integration points
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                H = el.H(j);
+                vn[j] = vec3d(0, 0, 0);
+                for (int k=0; k<el.Nodes(); ++k)
+                    vn[j] += vt[k]*H[k];
+            }
+            
+            // integrate kinetic energy
+            double ew = 0;
+            double V = 0;
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                double detJ = bd.detJ0(el, j)*gw[j];
+                V += detJ;
+                ew += vn[j]*vn[j]*(dens/2*detJ);
+            }
+            
+            a.push_back((float) ew/V);
+        }
+        return true;
+    }
+    else if (dom.Class() == FE_DOMAIN_SHELL)
+    {
+        FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
+        if (bd == 0) return false;
+        for (int i=0; i<bd->Elements(); ++i)
+        {
+            FEShellElement& el = bd->Element(i);
+            double *H;
+            double* gw = el.GaussWeights();
+            
+            // get nodal velocities
+            vec3d vt[FEElement::MAX_NODES];
+            vec3d wt[FEElement::MAX_NODES];
+            vec3d vn[FEElement::MAX_NODES];
+            for (int j=0; j<el.Nodes(); ++j) {
+                vt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VX, dof_VY, dof_VZ);
+                wt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VU, dof_VV, dof_VW);
+            }
+            
+            // evaluate velocities at integration points
+            for (int j=0; j<el.GaussPoints(); ++j)
+                vn[j] = bd->evaluate(el, vt, wt, j);
+            
+            // integrate kinetic energy
+            double ew = 0;
+            double V = 0;
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                double detJ = bd->detJ0(el, j)*gw[j];
+                V += detJ;
+                ew += vn[j]*vn[j]*(dens/2*detJ);
+            }
+            
+            a.push_back((float) ew/V);
+        }
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
 // TODO: Should I call the density for remodeling materials something else? 
 //       Or maybe the FEElasticMaterialPoint should define a density parameter
 //       that will be updated by the materials to define the current density?
@@ -1101,6 +1199,404 @@ bool FEPlotDensity::Save(FEDomain &dom, FEDataStream& a)
 	return false;
 }
 
+
+//-----------------------------------------------------------------------------
+bool FEPlotElementStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEMesh& mesh = *dom.GetMesh();
+    FEMaterial* pmm = dom.GetMaterial();
+    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
+    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
+    
+    if ((pme == 0) || pme->IsRigid()) return false;
+    
+    double dens = pme->Density();
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+        for (int i=0; i<bd.Elements(); ++i)
+        {
+            FESolidElement& el = bd.Element(i);
+            double *H;
+            double* gw = el.GaussWeights();
+            
+            // integrate strain energy
+            double ew = 0;
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                double sed = pme->StrainEnergyDensity(mp);
+                double detJ = bd.detJ0(el, j)*gw[j];
+                ew += sed*detJ;
+            }
+            
+            a.push_back((float) ew);
+        }
+        return true;
+    }
+    else if (dom.Class() == FE_DOMAIN_SHELL)
+    {
+        FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
+        if (bd == 0) return false;
+        for (int i=0; i<bd->Elements(); ++i)
+        {
+            FEShellElement& el = bd->Element(i);
+            double *H;
+            double* gw = el.GaussWeights();
+            
+            // integrate strain energy
+            double ew = 0;
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                double sed = pme->StrainEnergyDensity(mp);
+                double detJ = bd->detJ0(el, j)*gw[j];
+                ew += sed*detJ;
+            }
+            
+            a.push_back((float) ew);
+        }
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
+{
+    const int dof_VX = GetFEModel()->GetDOFIndex("vx");
+    const int dof_VY = GetFEModel()->GetDOFIndex("vy");
+    const int dof_VZ = GetFEModel()->GetDOFIndex("vz");
+    const int dof_VU = GetFEModel()->GetDOFIndex("vu");
+    const int dof_VV = GetFEModel()->GetDOFIndex("vv");
+    const int dof_VW = GetFEModel()->GetDOFIndex("vw");
+    
+    FEMesh& mesh = *dom.GetMesh();
+    FEMaterial* pmm = dom.GetMaterial();
+    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
+    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
+    
+    if ((pme == 0) || pme->IsRigid()) return false;
+    
+    double dens = pme->Density();
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+        for (int i=0; i<bd.Elements(); ++i)
+        {
+            FESolidElement& el = bd.Element(i);
+            double *H;
+            double* gw = el.GaussWeights();
+            
+            // get nodal velocities
+            vec3d vt[FEElement::MAX_NODES];
+            vec3d vn[FEElement::MAX_NODES];
+            for (int j=0; j<el.Nodes(); ++j) {
+                vt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VX, dof_VY, dof_VZ);
+            }
+            
+            // evaluate velocities at integration points
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                H = el.H(j);
+                vn[j] = vec3d(0, 0, 0);
+                for (int k=0; k<el.Nodes(); ++k)
+                    vn[j] += vt[k]*H[k];
+            }
+            
+            // integrate kinetic energy
+            double ew = 0;
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                double detJ = bd.detJ0(el, j)*gw[j];
+                ew += vn[j]*vn[j]*(dens/2*detJ);
+            }
+            
+            a.push_back((float) ew);
+        }
+        return true;
+    }
+    else if (dom.Class() == FE_DOMAIN_SHELL)
+    {
+        FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
+        if (bd == 0) return false;
+        for (int i=0; i<bd->Elements(); ++i)
+        {
+            FEShellElement& el = bd->Element(i);
+            double *H;
+            double* gw = el.GaussWeights();
+            
+            // get nodal velocities
+            vec3d vt[FEElement::MAX_NODES];
+            vec3d wt[FEElement::MAX_NODES];
+            vec3d vn[FEElement::MAX_NODES];
+            for (int j=0; j<el.Nodes(); ++j) {
+                vt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VX, dof_VY, dof_VZ);
+                wt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VU, dof_VV, dof_VW);
+            }
+            
+            // evaluate velocities at integration points
+            for (int j=0; j<el.GaussPoints(); ++j)
+                vn[j] = bd->evaluate(el, vt, wt, j);
+            
+            // integrate kinetic energy
+            double ew = 0;
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                double detJ = bd->detJ0(el, j)*gw[j];
+                ew += vn[j]*vn[j]*(dens/2*detJ);
+            }
+            
+            a.push_back((float) ew);
+        }
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEMesh& mesh = *dom.GetMesh();
+    FEMaterial* pmm = dom.GetMaterial();
+    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
+    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
+    
+    if ((pme == 0) || pme->IsRigid()) return false;
+    
+    double dens = pme->Density();
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+        for (int i=0; i<bd.Elements(); ++i)
+        {
+            FESolidElement& el = bd.Element(i);
+            double* gw = el.GaussWeights();
+            
+            // integrate zeroth and first mass moments
+            vec3d ew = vec3d(0,0,0);
+            double m = 0;
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+                double detJ = bd.detJ0(el, j)*gw[j];
+                ew += pt.m_rt*(dens*detJ);
+                m += dens*detJ;
+            }
+            
+            a << ew/m;
+        }
+        return true;
+    }
+    else if (dom.Class() == FE_DOMAIN_SHELL)
+    {
+        FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
+        if (bd == 0) return false;
+        for (int i=0; i<bd->Elements(); ++i)
+        {
+            FEShellElement& el = bd->Element(i);
+            double* gw = el.GaussWeights();
+            
+            // integrate zeroth and first mass moments
+            vec3d ew = vec3d(0,0,0);
+            double m = 0;
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+                double detJ = bd->detJ0(el, j)*gw[j];
+                ew += pt.m_rt*(dens*detJ);
+                m += dens*detJ;
+            }
+            
+            a << ew/m;
+        }
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
+{
+    const int dof_VX = GetFEModel()->GetDOFIndex("vx");
+    const int dof_VY = GetFEModel()->GetDOFIndex("vy");
+    const int dof_VZ = GetFEModel()->GetDOFIndex("vz");
+    const int dof_VU = GetFEModel()->GetDOFIndex("vu");
+    const int dof_VV = GetFEModel()->GetDOFIndex("vv");
+    const int dof_VW = GetFEModel()->GetDOFIndex("vw");
+    
+    FEMesh& mesh = *dom.GetMesh();
+    FEMaterial* pmm = dom.GetMaterial();
+    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
+    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
+    
+    if ((pme == 0) || pme->IsRigid()) return false;
+    
+    double dens = pme->Density();
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+        for (int i=0; i<bd.Elements(); ++i)
+        {
+            FESolidElement& el = bd.Element(i);
+            double *H;
+            double* gw = el.GaussWeights();
+            
+            // get nodal velocities
+            vec3d vt[FEElement::MAX_NODES];
+            vec3d vn[FEElement::MAX_NODES];
+            for (int j=0; j<el.Nodes(); ++j) {
+                vt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VX, dof_VY, dof_VZ);
+            }
+            
+            // evaluate velocities at integration points
+            for (int j=0; j<el.GaussPoints(); ++j)
+                vn[j] = el.Evaluate(vt, j);
+            
+            // integrate linear momentum
+            vec3d ew = vec3d(0,0,0);
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                double detJ = bd.detJ0(el, j)*gw[j];
+                ew += vn[j]*(dens*detJ);
+            }
+            
+            a << ew;
+        }
+        return true;
+    }
+    else if (dom.Class() == FE_DOMAIN_SHELL)
+    {
+        FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
+        if (bd == 0) return false;
+        for (int i=0; i<bd->Elements(); ++i)
+        {
+            FEShellElement& el = bd->Element(i);
+            double *H;
+            double* gw = el.GaussWeights();
+            
+            // get nodal velocities
+            vec3d vt[FEElement::MAX_NODES];
+            vec3d wt[FEElement::MAX_NODES];
+            vec3d vn[FEElement::MAX_NODES];
+            for (int j=0; j<el.Nodes(); ++j) {
+                vt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VX, dof_VY, dof_VZ);
+                wt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VU, dof_VV, dof_VW);
+            }
+            
+            // evaluate velocities at integration points
+            for (int j=0; j<el.GaussPoints(); ++j)
+                vn[j] = bd->evaluate(el, vt, wt, j);
+            
+            // integrate linear momentum
+            vec3d ew = vec3d(0,0,0);
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                double detJ = bd->detJ0(el, j)*gw[j];
+                ew += vn[j]*(dens*detJ);
+            }
+            
+            a << ew;
+        }
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
+{
+    const int dof_VX = GetFEModel()->GetDOFIndex("vx");
+    const int dof_VY = GetFEModel()->GetDOFIndex("vy");
+    const int dof_VZ = GetFEModel()->GetDOFIndex("vz");
+    const int dof_VU = GetFEModel()->GetDOFIndex("vu");
+    const int dof_VV = GetFEModel()->GetDOFIndex("vv");
+    const int dof_VW = GetFEModel()->GetDOFIndex("vw");
+    
+    FEMesh& mesh = *dom.GetMesh();
+    FEMaterial* pmm = dom.GetMaterial();
+    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
+    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
+    
+    if ((pme == 0) || pme->IsRigid()) return false;
+    
+    double dens = pme->Density();
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+        for (int i=0; i<bd.Elements(); ++i)
+        {
+            FESolidElement& el = bd.Element(i);
+            double *H;
+            double* gw = el.GaussWeights();
+            
+            // get nodal velocities
+            vec3d vt[FEElement::MAX_NODES];
+            vec3d vn[FEElement::MAX_NODES];
+            for (int j=0; j<el.Nodes(); ++j) {
+                vt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VX, dof_VY, dof_VZ);
+            }
+            
+            // evaluate velocities at integration points
+            for (int j=0; j<el.GaussPoints(); ++j)
+                vn[j] = el.Evaluate(vt, j);
+            
+            // integrate linear momentum
+            vec3d ew = vec3d(0,0,0);
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+                double detJ = bd.detJ0(el, j)*gw[j];
+                ew += (pt.m_rt ^ vn[j])*(dens*detJ);
+            }
+            
+            a << ew;
+        }
+        return true;
+    }
+    else if (dom.Class() == FE_DOMAIN_SHELL)
+    {
+        FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
+        if (bd == 0) return false;
+        for (int i=0; i<bd->Elements(); ++i)
+        {
+            FEShellElement& el = bd->Element(i);
+            double *H;
+            double* gw = el.GaussWeights();
+            
+            // get nodal velocities
+            vec3d vt[FEElement::MAX_NODES];
+            vec3d wt[FEElement::MAX_NODES];
+            vec3d vn[FEElement::MAX_NODES];
+            for (int j=0; j<el.Nodes(); ++j) {
+                vt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VX, dof_VY, dof_VZ);
+                wt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VU, dof_VV, dof_VW);
+            }
+            
+            // evaluate velocities at integration points
+            for (int j=0; j<el.GaussPoints(); ++j)
+                vn[j] = bd->evaluate(el, vt, wt, j);
+            
+            // integrate linear momentum
+            vec3d ew = vec3d(0,0,0);
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+                double detJ = bd->detJ0(el, j)*gw[j];
+                ew += (pt.m_rt ^ vn[j])*(dens*detJ);
+            }
+            
+            a << ew;
+        }
+        return true;
+    }
+    return false;
+}
 
 //-----------------------------------------------------------------------------
 bool FEPlotRelativeVolume::Save(FEDomain &dom, FEDataStream& a)
