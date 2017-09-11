@@ -11659,7 +11659,7 @@ th integration point, and
  In the above expression, 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{r}_{a}^{u} & =\boldsymbol{\sigma}\cdot\grad radN_{a}\,,\\
+\begin{aligned}\mathbf{r}_{a}^{u} & =\boldsymbol{\sigma}\cdot\grad N_{a}\,,\\
 r_{a}^{p} & =\mathbf{w}\cdot\grad N_{a}-N_{a}\frac{1}{J}\frac{\partial J}{\partial t}\,,\\
 r_{a}^{\alpha} & =\mathbf{j}^{\alpha}\cdot\grad N_{a}-N_{a}\frac{1}{J}\frac{\partial}{\partial t}\left(J\varphi^{w}\tilde{\kappa}^{\alpha}\tilde{c}^{\alpha}\right)\,,
 \end{aligned}
@@ -22394,7 +22394,35 @@ Here,
 \begin_inset Formula $\lambda_{m}$
 \end_inset
 
-.
+,
+\begin_inset Formula 
+\begin{equation}
+C_{6}=\frac{1}{\lambda_{m}}\left[C_{3}\left(e^{C_{4}\left(\lambda_{m}-1\right)}-1\right)-C_{5}\right]\,.\label{eq464b}
+\end{equation}
+
+\end_inset
+
+It also follows that
+\begin_inset Formula 
+\begin{equation}
+F_{2}\left(\tilde{\lambda}\right)=\begin{cases}
+0 & \tilde{\lambda}\leqslant1\\
+C_{3}\left(e^{-C_{4}}\left[\Ei\left(C_{4}\tilde{\lambda}\right)-\Ei\left(C_{4}\right)\right]-\ln\tilde{\lambda}\right) & 1<\tilde{\lambda}<\lambda_{m}\\
+\left(C_{5}+\frac{C_{6}}{2}\tilde{\lambda}\right)\tilde{\lambda}+C_{7} & \tilde{\lambda}\geqslant\lambda_{m}
+\end{cases}\,,\label{eq464c}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+C_{7}=C_{3}\left(e^{-C_{4}}\left[\Ei\left(C_{4}\lambda_{m}\right)-\Ei\left(C_{4}\right)\right]-\ln\lambda_{m}\right)-\left(C_{5}+\frac{C_{6}}{2}\lambda_{m}\right)\lambda_{m}\,.\label{eq464d}
+\end{equation}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

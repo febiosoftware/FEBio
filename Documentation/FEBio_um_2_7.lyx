@@ -18994,10 +18994,19 @@ name "subsec:Rigid-Joints"
 \end_layout
 
 \begin_layout Standard
-Rigid joints produce nonlinear constraints between rigid bodies.
+Rigid joints produce nonlinear constraints between rigid bodies
+\change_inserted 2145056167 1505153207
+, which prevent relative motion except along the degrees of freedom of the
+ joint
+\change_unchanged
+.
  The term `rigid' refers to the bodies, not to the joints.
- These nonlinear constraints are enforced using Lagrange multipliers.
- Each rigid joint needs to define two rigid bodies (
+ 
+\change_deleted 2145056167 1505153825
+These nonlinear constraints are enforced using Lagrange multipliers.
+ 
+\change_unchanged
+Each rigid joint needs to define two rigid bodies (
 \begin_inset Formula $a$
 \end_inset
 
@@ -19020,6 +19029,91 @@ Rigid joints produce nonlinear constraints between rigid bodies.
 \end_inset
 
 , at the start of the analysis, and given in world coordinates.
+\change_inserted 2145056167 1505153484
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1505154046
+The rigid joint nonlinear constraints produce reaction forces and moments
+ that are enforced with penalty parameters and Lagrange multipliers.
+ The penalty parameters, 
+\emph on
+force_penalty
+\emph default
+ and 
+\emph on
+moment_penalty
+\emph default
+, may be conceptualized as stiffnesses of linear/torsional springs that
+ prevent relative translations/rotations of the rigid bodies along degrees
+ of freedom that must remain constrained for that joint.
+ The penalty values should be selected based on a rough estimation of the
+ maximum reactions forces and moments acting at these joints, divided by
+ the maximum amount of linear/angular separation that your analysis can
+ tolerate for that joint.
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1505155908
+The augmented Lagrangian method is used by default, where the joint reaction
+ force and moment are treated as Lagrange multipliers, augmented at each
+ time step by the product of the force/moment penalty parameter and the
+ linear/angular gap.
+ Use the parameter 
+\emph on
+maxaug
+\emph default
+ to control the maximum allowable number of augmentations at each time step
+ (
+\emph on
+maxaug
+\emph default
+=0 produces the penalty method); use a non-zero value for the parameter
+ 
+\emph on
+minaug
+\emph default
+ to ensure a minimum number of augmentations.
+ Augmentations will proceed until the relative change in the reaction force/mome
+nt magnitude is less than 
+\emph on
+tolerance
+\emph default
+, and/or the linear gap is less than 
+\emph on
+gaptol
+\emph default
+, and/or the angular gap is less than 
+\emph on
+angtol
+\emph default
+.
+ Setting any of these parameters to zero disables that check.
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1505154020
+The nonlinear constraints that enforce these joints produce a non-symmetric
+ stiffness matrix.
+ Therefore, when using rigid joints, use the analysis setting for a non-symmetri
+c formulation, see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Parameters-Solid-Analysis"
+
+\end_inset
+
+.
+\change_unchanged
+
 \end_layout
 
 \begin_layout Subsubsection
@@ -19063,11 +19157,23 @@ A rigid revolute joint connects rigid bodies
 \end_layout
 
 \begin_layout LyX-Code
-  <force_penalty>1e12</force_penalty>
+  <force_penalty>1e
+\change_deleted 2145056167 1505152866
+12
+\change_inserted 2145056167 1505152866
+4
+\change_unchanged
+</force_penalty>
 \end_layout
 
 \begin_layout LyX-Code
-  <moment_penalty>1e12</moment_penalty>
+  <moment_penalty>1e
+\change_deleted 2145056167 1505152869
+12
+\change_inserted 2145056167 1505152869
+4
+\change_unchanged
+</moment_penalty>
 \end_layout
 
 \begin_layout LyX-Code
@@ -19262,11 +19368,23 @@ A rigid prismatic joint connects rigid bodies
 \end_layout
 
 \begin_layout LyX-Code
-  <force_penalty>1e12</force_penalty>
+  <force_penalty>1e
+\change_deleted 2145056167 1505152876
+12
+\change_inserted 2145056167 1505152876
+4
+\change_unchanged
+</force_penalty>
 \end_layout
 
 \begin_layout LyX-Code
-  <moment_penalty>1e12</moment_penalty>
+  <moment_penalty>1e
+\change_deleted 2145056167 1505152877
+12
+\change_inserted 2145056167 1505152877
+4
+\change_unchanged
+</moment_penalty>
 \end_layout
 
 \begin_layout LyX-Code
@@ -19470,11 +19588,23 @@ A rigid cylindrical joint connects rigid bodies
 \end_layout
 
 \begin_layout LyX-Code
-  <force_penalty>1e12</force_penalty>
+  <force_penalty>1e
+\change_deleted 2145056167 1505153122
+12
+\change_inserted 2145056167 1505153122
+4
+\change_unchanged
+</force_penalty>
 \end_layout
 
 \begin_layout LyX-Code
-  <moment_penalty>1e12</moment_penalty>
+  <moment_penalty>1e
+\change_deleted 2145056167 1505153124
+12
+\change_inserted 2145056167 1505153124
+4
+\change_unchanged
+</moment_penalty>
 \end_layout
 
 \begin_layout LyX-Code
@@ -19701,7 +19831,13 @@ A rigid spherical joint connects rigid bodies
 \end_layout
 
 \begin_layout LyX-Code
-  <force_penalty>1e12</force_penalty>
+  <force_penalty>1e
+\change_deleted 2145056167 1505153978
+12
+\change_inserted 2145056167 1505153978
+4
+\change_unchanged
+</force_penalty>
 \end_layout
 
 \begin_layout LyX-Code
@@ -19936,11 +20072,23 @@ A rigid planar joint connects rigid bodies
 \end_layout
 
 \begin_layout LyX-Code
-  <force_penalty>1e12</force_penalty>
+  <force_penalty>1e
+\change_deleted 2145056167 1505155966
+12
+\change_inserted 2145056167 1505155966
+4
+\change_unchanged
+</force_penalty>
 \end_layout
 
 \begin_layout LyX-Code
-  <moment_penalty>1e16</moment_penalty>
+  <moment_penalty>1e
+\change_deleted 2145056167 1505155968
+16
+\change_inserted 2145056167 1505155968
+4
+\change_unchanged
+</moment_penalty>
 \end_layout
 
 \begin_layout LyX-Code
