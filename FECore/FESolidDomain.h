@@ -7,74 +7,87 @@
 class FESolidDomain : public FEDomain
 {
 public:
-	//! constructor
+    //! constructor
     FESolidDomain(FEModel* pfem);
-
-	//! create storage for elements
-	void Create(int nsize, int elemType);
-
-	//! return nr of elements
-	int Elements() const { return (int)m_Elem.size(); }
-
-	//! reset data (overridden from FEDomain)
-	void Reset();
-
-	//! copy data from another domain (overridden from FEDomain)
-	void CopyFrom(FEDomain* pd);
-
-	//! element access
-	FESolidElement& Element(int n) { return m_Elem[n]; }
-	FEElement& ElementRef(int n) { return m_Elem[n]; }
-
-	int GetElementType() const { return m_Elem[0].Type(); }
-
-	int GetElementShape() const { return m_Elem[0].Shape(); }
-
-	//! find the element in which point y lies
-	FESolidElement* FindElement(vec3d y, double r[3]);
-
-	//! Calculate deformation gradient at integration point n
-	double defgrad(FESolidElement& el, mat3d& F, int n);
-
-	//! Calculate deformation gradient at integration point n
-	double defgrad(FESolidElement& el, mat3d& F, double r, double s, double t);
-
-	//! calculate inverse jacobian matrix w.r.t. reference frame
-	double invjac0(const FESolidElement& el, double J[3][3], int n);
-
-	//! calculate inverse jacobian matrix w.r.t. reference frame
-	double invjac0(const FESolidElement& el, double J[3][3], double r, double s, double t);
-
-	//! calculate inverse jacobian matrix w.r.t. reference frame
-	double invjac0(const FESolidElement& el, double r, double s, double t, mat3d& J);
-
-	//! calculate inverse jacobian matrix w.r.t. current frame
-	double invjact(FESolidElement& el, double J[3][3], int n);
-
-	//! calculate inverse jacobian matrix w.r.t. reference frame
-	double invjact(FESolidElement& el, double J[3][3], double r, double s, double t);
-
-	//! calculate gradient of function at integration points
-	vec3d gradient(FESolidElement& el, double* fn, int n);
-
-	//! calculate gradient of function at integration points
-	vec3d gradient(FESolidElement& el, vector<double>& fn, int n);
-
+    
+    //! create storage for elements
+    void Create(int nsize, int elemType);
+    
+    //! return nr of elements
+    int Elements() const { return (int)m_Elem.size(); }
+    
+    //! reset data (overridden from FEDomain)
+    void Reset();
+    
+    //! copy data from another domain (overridden from FEDomain)
+    void CopyFrom(FEDomain* pd);
+    
+    //! element access
+    FESolidElement& Element(int n) { return m_Elem[n]; }
+    FEElement& ElementRef(int n) { return m_Elem[n]; }
+    
+    int GetElementType() const { return m_Elem[0].Type(); }
+    
+    int GetElementShape() const { return m_Elem[0].Shape(); }
+    
+    //! find the element in which point y lies
+    FESolidElement* FindElement(vec3d y, double r[3]);
+    
+    //! Calculate deformation gradient at integration point n
+    double defgrad(FESolidElement& el, mat3d& F, int n);
+    
+    //! Calculate deformation gradient at integration point n
+    double defgrad(FESolidElement& el, mat3d& F, double r, double s, double t);
+    
+    //! Calculate deformation gradient at integration point n at previous time
+    double defgradp(FESolidElement& el, mat3d& F, int n);
+    
+    //! calculate inverse jacobian matrix w.r.t. reference frame
+    double invjac0(const FESolidElement& el, double J[3][3], int n);
+    
+    //! calculate inverse jacobian matrix w.r.t. reference frame
+    double invjac0(const FESolidElement& el, double J[3][3], double r, double s, double t);
+    
+    //! calculate inverse jacobian matrix w.r.t. reference frame
+    double invjac0(const FESolidElement& el, double r, double s, double t, mat3d& J);
+    
+    //! calculate inverse jacobian matrix w.r.t. current frame
+    double invjact(FESolidElement& el, double J[3][3], int n);
+    
+    //! calculate inverse jacobian matrix w.r.t. reference frame
+    double invjact(FESolidElement& el, double J[3][3], double r, double s, double t);
+    
+    //! calculate inverse jacobian matrix w.r.t. current frame
+    double invjact(FESolidElement& el, double J[3][3], int n, const double alpha);
+    
+    //! calculate inverse jacobian matrix w.r.t. previous time
+    double invjactp(FESolidElement& el, double J[3][3], int n);
+    
+    //! calculate gradient of function at integration points
+    vec3d gradient(FESolidElement& el, double* fn, int n);
+    
+    //! calculate gradient of function at integration points
+    vec3d gradient(FESolidElement& el, vector<double>& fn, int n);
+    
     //! calculate spatial gradient of vector function at integration points
     mat3d gradient(FESolidElement& el, vec3d* fn, int n);
+    
+    //! calculate spatial gradient of vector function at integration points
+    //! at previous time
+    mat3d gradientp(FESolidElement& el, vec3d* fn, int n);
     
     //! calculate material gradient of vector function at integration points
     mat3d Gradient(FESolidElement& el, vec3d* fn, int n);
     
-	//! calculate jacobian in reference frame
-	double detJ0(FESolidElement& el, int n);
-
-	//! calculate jacobian in current frame
-	double detJt(FESolidElement& el, int n);
+    //! calculate jacobian in reference frame
+    double detJ0(FESolidElement& el, int n);
+    
+    //! calculate jacobian in current frame
+    double detJt(FESolidElement& el, int n);
     
     //! calculates covariant basis vectors at an integration point
     void CoBaseVectors(FESolidElement& el, int j, vec3d g[3]);
-
+    
     //! calculates contravariant basis vectors at an integration point
     void ContraBaseVectors(FESolidElement& el, int j, vec3d g[3]);
     
@@ -86,35 +99,41 @@ public:
     
     //! calculate the laplacian of a vector function at an integration point
     vec3d lapvec(FESolidElement& el, vec3d* fn, int n);
-
+    
     //! calculate the gradient of the divergence of a vector function at an integration point
     vec3d gradivec(FESolidElement& el, vec3d* fn, int n);
     
     //! calculate the transpose of the gradient of the shape function gradients at an integration point
     void gradTgradShape(FESolidElement& el, int j, vector<mat3d>& mn);
-
-	//! calculate spatial gradient of shapefunctions at integration point (returns Jacobian determinant)
-	double ShapeGradient(FESolidElement& el, int n, vec3d* GradH);
-
-	//! calculate spatial gradient of shapefunctions at integration point in reference frame (returns Jacobian determinant)
-	double ShapeGradient0(FESolidElement& el, int n, vec3d* GradH);
-
-	//! calculate spatial gradient of shapefunctions at integration point (returns Jacobian determinant)
-	double ShapeGradient(FESolidElement& el, double r, double s, double t, vec3d* GradH);
-
-	//! calculate spatial gradient of shapefunctions at integration point in reference frame (returns Jacobian determinant)
-	double ShapeGradient0(FESolidElement& el, double r, double s, double t, vec3d* GradH);
-
+    
+    //! calculate spatial gradient of shapefunctions at integration point (returns Jacobian determinant)
+    double ShapeGradient(FESolidElement& el, int n, vec3d* GradH);
+    
+    //! calculate spatial gradient of shapefunctions at integration point (returns Jacobian determinant)
+    double ShapeGradient(FESolidElement& el, int n, vec3d* GradH, const double alpha);
+    
+    //! calculate spatial gradient of shapefunctions at integration point in reference frame (returns Jacobian determinant)
+    double ShapeGradient0(FESolidElement& el, int n, vec3d* GradH);
+    
+    //! calculate spatial gradient of shapefunctions at integration point (returns Jacobian determinant)
+    double ShapeGradient(FESolidElement& el, double r, double s, double t, vec3d* GradH);
+    
+    //! calculate spatial gradient of shapefunctions at integration point in reference frame (returns Jacobian determinant)
+    double ShapeGradient0(FESolidElement& el, double r, double s, double t, vec3d* GradH);
+    
 public:
-	//! serialize data to archive
-	void Serialize(DumpStream& ar);
-
+    //! serialize data to archive
+    void Serialize(DumpStream& ar);
+    
 protected:
-	vector<FESolidElement>	m_Elem;		//!< array of elements
+    vector<FESolidElement>	m_Elem;		//!< array of elements
     int     m_dofx;
     int     m_dofy;
     int     m_dofz;
     int     m_dofu;
     int     m_dofv;
     int     m_dofw;
+    int     m_dofup;
+    int     m_dofvp;
+    int     m_dofwp;
 };

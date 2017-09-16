@@ -65,6 +65,9 @@ public: // overrides from FEElasticDomain
 	//! body force stiffness
 	void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf);
 
+    //! midpoint stress (for dynamic analyses)
+    mat3ds MidpointStress(FEMaterialPoint& mp);
+    
 public:
 	// --- S T I F F N E S S ---
 
@@ -94,4 +97,5 @@ public:
     
 protected:
 	FESolidMaterial*	m_pMat;
+    double              m_alpha;
 };

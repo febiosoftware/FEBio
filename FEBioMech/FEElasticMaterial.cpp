@@ -13,6 +13,8 @@ FEElasticMaterialPoint::FEElasticMaterialPoint()
 	m_s.zero();
 	m_s0.zero();
 	m_buncoupled = false;
+    m_Wt = m_Wp = 0;
+    m_Fp.unit();
 }
 
 //-----------------------------------------------------------------------------
@@ -35,6 +37,9 @@ void FEElasticMaterialPoint::Init()
 
 //	m_Q.unit();
 
+    m_Wt = m_Wp = 0;
+    m_Fp.unit();
+    
 	// don't forget to initialize the base class
     FEMaterialPoint::Init();
 }
@@ -44,11 +49,11 @@ void FEElasticMaterialPoint::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_F << m_J << m_Q << m_s << m_s0;
+		ar << m_F << m_J << m_Q << m_s << m_s0 << m_Wt << m_Wp << m_Fp;
 	}
 	else
 	{
-		ar >> m_F >> m_J >> m_Q >> m_s >> m_s0;
+		ar >> m_F >> m_J >> m_Q >> m_s >> m_s0 >> m_Wt >> m_Wp >> m_Fp;
 	}
 
 	FEMaterialPoint::Serialize(ar);

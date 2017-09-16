@@ -14,6 +14,7 @@
 FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
+    m_alpha = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -113,7 +114,9 @@ void FEElasticSolidDomain::Activate()
 //! Initialize element data
 void FEElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
-	const int NE = FEElement::MAX_NODES;
+    m_alpha = timeInfo.alpha;
+
+    const int NE = FEElement::MAX_NODES;
 	vec3d x0[NE], xt[NE], r0, rt;
 	FEMesh& m = *GetMesh();
 	for (size_t i=0; i<m_Elem.size(); ++i)
@@ -138,6 +141,9 @@ void FEElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 			pt.m_rt = rt;
 
 			pt.m_J = defgrad(el, pt.m_F, j);
+            
+            pt.m_Fp = pt.m_F;
+            pt.m_Wp = pt.m_Wt;
 
 			mp.Update(timeInfo);
 		}
@@ -163,8 +169,8 @@ void FEElasticSolidDomain::InternalForces(FEGlobalVector& R)
 		fe.assign(ndof, 0);
 
 		// calculate internal force vector
-		ElementInternalForce(el, fe);
-
+        ElementInternalForce(el, fe);
+        
 		// get the element's LM vector
 		UnpackLM(el, lm);
 
@@ -194,12 +200,13 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// calculate the jacobian
-		double detJt = invjact(el, Ji, n);
+		double detJt = invjact(el, Ji, n, m_alpha);
 
 		detJt *= gw[n];
 
 		// get the stress vector for this integration point
 		mat3ds s = pt.m_s;
+        if (m_alpha == 0.5) s = MidpointStress(mp);
 
 		const double* Gr = el.Gr(n);
 		const double* Gs = el.Gs(n);
@@ -371,7 +378,7 @@ void FEElasticSolidDomain::ElementGeometricalStiffness(FESolidElement &el, matri
 	for (int n = 0; n<nint; ++n)
 	{
 		// calculate shape function gradients and jacobian
-		double w = ShapeGradient(el, n, G)*gw[n];
+		double w = ShapeGradient(el, n, G, m_alpha)*gw[n];
 
 		// get the material point data
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
@@ -400,7 +407,6 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 	// Get the current element's data
 	const int nint = el.GaussPoints();
 	const int neln = el.Nodes();
-	const int ndof = 3*neln;
 
 	// global derivatives of shape functions
 	vec3d G[FEElement::MAX_NODES];
@@ -424,12 +430,11 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 	for (int n=0; n<nint; ++n)
 	{
 		// calculate jacobian and shape function gradients
-		detJt = ShapeGradient(el, n, G)*gw[n];
+		detJt = ShapeGradient(el, n, G, m_alpha)*gw[n];
 
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// get the 'D' matrix
 		tens4ds C = m_pMat->Tangent(mp);
@@ -666,9 +671,7 @@ void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, dou
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::Update(const FETimeInfo& tp)
 {
-    double dt = tp.timeIncrement;
-	
-	// TODO: This is temporary hack for running micro-materials in parallel. 
+	// TODO: This is temporary hack for running micro-materials in parallel.
 	//	     Evaluating the stress for a micro-material will make FEBio solve
 	//       a new FE problem. We don't want to see the output of that problem.
 	//       The logfile is a shared resource between the master FEM and the RVE
@@ -733,9 +736,6 @@ void FEElasticSolidDomain::UpdateElementStress(int iel)
 		rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
 	}
 
-	// get the integration weights
-	double* gw = el.GaussWeights();
-
 	// loop over the integration points and calculate
 	// the stress at the integration point
 	for (int n=0; n<nint; ++n)
@@ -749,12 +749,15 @@ void FEElasticSolidDomain::UpdateElementStress(int iel)
 		pt.m_r0 = el.Evaluate(r0, n);
 		pt.m_rt = el.Evaluate(rt, n);
 
-		// get the deformation gradient and determinant
+		// get the deformation gradient and determinant at current time
 		pt.m_J = defgrad(el, pt.m_F, n);
 
 		// calculate the stress at this material point
-		pt.m_s = m_pMat->Stress(mp);
-	}
+        pt.m_s = m_pMat->Stress(mp);
+        
+        // calculate the strain energy density at this material point
+        pt.m_Wt = m_pMat->GetElasticMaterial()->StrainEnergyDensity(mp);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -917,4 +920,45 @@ void FEElasticSolidDomain::InertialForces2(FEGlobalVector& R, vector<double>& F)
         // assemble fe into R
         R.Assemble(el.m_node, lm, fe);
     }
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the midpoint stress for dynamic analyses.
+mat3ds FEElasticSolidDomain::MidpointStress(FEMaterialPoint& mp)
+{
+    FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
+    if (pme == 0) return mat3ds(0,0,0,0,0,0);
+    
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    mat3ds Ct = pt.RightCauchyGreen();
+    mat3ds Cp = (pt.m_Fp.transpose()*pt.m_Fp).sym();
+    mat3ds M = Ct - Cp;
+    // midpoint deformation gradient
+    mat3d Fm = pt.m_F*m_alpha + pt.m_Fp*(1-m_alpha);
+    double Jm = Fm.det();
+    mat3d Fi = Fm.inverse();
+    
+    // keep safe copy of current F
+    mat3d Ft = pt.m_F;
+    double Jt = pt.m_J;
+    // substitute midpoint F
+    pt.m_F = Fm;
+    pt.m_J = Jm;
+    // evaluate Cauchy stress at midpoint field
+    mat3ds sm = m_pMat->GetElasticMaterial()->Stress(mp);
+    // get corresponding 2nd P-K stress
+    mat3ds Sm = (Fi*sm*Fi.transpose()).sym()*Jm;
+    // restore safe copy of F
+    pt.m_F = Ft;
+    pt.m_J = Jt;
+    
+    double M2 = M.dotdot(M);
+    
+    if (M2 > 0)
+        Sm += M*((2*(pt.m_Wt-pt.m_Wp) - Sm.dotdot(M))/M2);
+    
+    // convert to Cauchy stress
+    sm = (Fm*Sm*Fm.transpose()).sym()/Jm;
+    
+    return sm;
 }

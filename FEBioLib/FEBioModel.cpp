@@ -350,8 +350,8 @@ void FEBioModel::Write(unsigned int nwhen)
 						inRange = false;
 						if ((currentStep >= nmin) && (currentStep <= nmax)) inRange = true;
 
-						isStride = ((pstep->m_ntimesteps - nmin) % pstep->m_nplot_stride) == 0;
 					}
+                    isStride = ((pstep->m_ntimesteps - nmin) % pstep->m_nplot_stride) == 0;
 
 					switch (nwhen)
 					{

@@ -552,7 +552,6 @@ void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
 	// we save the prescribed displacements increments in the ui vector
 	vector<double>& ui = m_ui;
 	zero(ui);
-	int neq = m_neq;
 	int nbc = m_fem.PrescribedBCs();
 	for (int i=0; i<nbc; ++i)
 	{
@@ -624,7 +623,6 @@ bool FESolidSolver2::Quasin(double time)
 
 	// initialize flags
 	bool bconv = false;		// convergence flag
-	bool sdflag = true;		// flag for steepest descent iterations in NLCG
 
 	// Get the current step
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
@@ -1115,10 +1113,6 @@ void FESolidSolver2::AssembleStiffness2(vector<int>& lmi, vector<int>& lmj, matr
 
 void FESolidSolver2::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 {
-    // get nodal DOFS
-    DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_NDOFS = fedofs.GetTotalDOFS();
-
 	// assemble into global stiffness matrix
 	m_pK->Assemble(ke, elm);
 
